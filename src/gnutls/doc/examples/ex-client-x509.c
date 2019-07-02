@@ -17,9 +17,13 @@
  */
 
 #define CHECK(x) assert((x)>=0)
+#define LOOP_CHECK(rval, cmd) \
+        do { \
+                rval = cmd; \
+        } while(rval == GNUTLS_E_AGAIN || rval == GNUTLS_E_INTERRUPTED); \
+        assert(rval >= 0)
 
 #define MAX_BUF 1024
-#define CAFILE "/etc/ssl/certs/ca-certificates.crt"
 #define MSG "GET / HTTP/1.0\r\n\r\n"
 
 extern int tcp_connect(void);
@@ -29,13 +33,10 @@ int main(void)
 {
         int ret, sd, ii;
         gnutls_session_t session;
-        char buffer[MAX_BUF + 1];
+        char buffer[MAX_BUF + 1], *desc;
         gnutls_datum_t out;
         int type;
         unsigned status;
-#if 0
-        const char *err;
-#endif
         gnutls_certificate_credentials_t xcred;
 
         if (gnutls_check_version("3.4.6") == NULL) {
@@ -49,43 +50,28 @@ int main(void)
         /* X509 stuff */
         CHECK(gnutls_certificate_allocate_credentials(&xcred));
 
-        /* sets the trusted cas file
-         */
-        CHECK(gnutls_certificate_set_x509_trust_file(xcred, CAFILE,
-                                                     GNUTLS_X509_FMT_PEM));
+        /* sets the system trusted CAs for Internet PKI */
+        CHECK(gnutls_certificate_set_x509_system_trust(xcred));
 
         /* If client holds a certificate it can be set using the following:
          *
-         gnutls_certificate_set_x509_key_file (xcred, 
-         "cert.pem", "key.pem", 
+         gnutls_certificate_set_x509_key_file (xcred, "cert.pem", "key.pem", 
          GNUTLS_X509_FMT_PEM); 
          */
 
-        /* Initialize TLS session 
-         */
+        /* Initialize TLS session */
         CHECK(gnutls_init(&session, GNUTLS_CLIENT));
 
-        CHECK(gnutls_server_name_set(session, GNUTLS_NAME_DNS, "my_host_name",
-                                     strlen("my_host_name")));
+        CHECK(gnutls_server_name_set(session, GNUTLS_NAME_DNS, "www.example.com",
+                                     strlen("www.example.com")));
 
         /* It is recommended to use the default priorities */
         CHECK(gnutls_set_default_priority(session));
-#if 0
-	/* if more fine-graned control is required */
-        ret = gnutls_priority_set_direct(session, 
-                                         "NORMAL", &err);
-        if (ret < 0) {
-                if (ret == GNUTLS_E_INVALID_REQUEST) {
-                        fprintf(stderr, "Syntax error at: %s\n", err);
-                }
-                exit(1);
-        }
-#endif
 
         /* put the x509 credentials to the current session
          */
         CHECK(gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred));
-        gnutls_session_set_verify_cert(session, "my_host_name", 0);
+        gnutls_session_set_verify_cert(session, "www.example.com", 0);
 
         /* connect to the peer
          */
@@ -114,17 +100,15 @@ int main(void)
                 fprintf(stderr, "*** Handshake failed: %s\n", gnutls_strerror(ret));
                 goto end;
         } else {
-                char *desc;
-
                 desc = gnutls_session_get_desc(session);
                 printf("- Session info: %s\n", desc);
                 gnutls_free(desc);
         }
 
 	/* send data */
-        CHECK(gnutls_record_send(session, MSG, strlen(MSG)));
+        LOOP_CHECK(ret, gnutls_record_send(session, MSG, strlen(MSG)));
 
-        ret = gnutls_record_recv(session, buffer, MAX_BUF);
+        LOOP_CHECK(ret, gnutls_record_recv(session, buffer, MAX_BUF));
         if (ret == 0) {
                 printf("- Peer has closed the TLS connection\n");
                 goto end;

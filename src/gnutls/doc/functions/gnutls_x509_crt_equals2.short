@@ -1,1 +1,1 @@
-@item @var{unsigned} @ref{gnutls_x509_crt_equals2} (gnutls_x509_crt_t @var{cert1}, gnutls_datum_t * @var{der})
+@item @var{unsigned} @ref{gnutls_x509_crt_equals2} (gnutls_x509_crt_t @var{cert1}, const gnutls_datum_t * @var{der})

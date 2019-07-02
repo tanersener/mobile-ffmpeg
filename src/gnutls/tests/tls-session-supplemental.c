@@ -15,12 +15,11 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with GnuTLS; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  */
 
-/* Parts copied from GnuTLS example programs. */
+/* This tests the supplemental data extension under TLS1.2 */
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -42,16 +41,15 @@ int main(int argc, char **argv)
 #include <string.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <assert.h>
 #if !defined(_WIN32)
 #include <sys/wait.h>
 #endif
 #include <unistd.h>
 #include <gnutls/gnutls.h>
 
+#include "cert-common.h"
 #include "utils.h"
-
-/* A very basic TLS client, with supplemental data
- */
 
 const char *side = "";
 
@@ -60,15 +58,15 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "%s|<%d>| %s", side, level, str);
 }
 
-#define TLS_SUPPLEMENTALDATATYPE_SAMPLE						0xBABE
+#define TLS_SUPPLEMENTALDATATYPE_SAMPLE	0xBABE
 
-static int TLS_SUPPLEMENTALDATA_client_sent			= 0;
-static int TLS_SUPPLEMENTALDATA_client_received		= 0;
-static int TLS_SUPPLEMENTALDATA_server_sent			= 0;
-static int TLS_SUPPLEMENTALDATA_server_received		= 0;
+static int TLS_SUPPLEMENTALDATA_client_sent	= 0;
+static int TLS_SUPPLEMENTALDATA_client_received	= 0;
+static int TLS_SUPPLEMENTALDATA_server_sent	= 0;
+static int TLS_SUPPLEMENTALDATA_server_received	= 0;
 
 static const unsigned char supp_data[] =
-{	
+{
 	0xFE,
 	0xED
 };
@@ -117,7 +115,7 @@ int supp_server_send_func(gnutls_session_t session, gnutls_buffer_t buf)
 	return GNUTLS_E_SUCCESS;
 }
 
-static void client(int sd)
+static void client(int sd, const char *prio, unsigned server_only)
 {
 	int ret;
 	gnutls_session_t session;
@@ -135,10 +133,9 @@ static void client(int sd)
 	/* Initialize TLS session
 	 */
 	gnutls_init(&session, GNUTLS_CLIENT);
+	gnutls_handshake_set_timeout(session, 20 * 1000);
 
-	/* Use default priorities */
-	gnutls_priority_set_direct(session, "PERFORMANCE:+ANON-ECDH:+ANON-DH",
-				   NULL);
+	assert(gnutls_priority_set_direct(session, prio, NULL) >= 0);
 
 	/* put the anonymous credentials to the current session
 	 */
@@ -147,10 +144,12 @@ static void client(int sd)
 
 	gnutls_transport_set_int(session, sd);
 
-	gnutls_supplemental_recv(session, 1);
-	gnutls_supplemental_send(session, 1);
+	if (!server_only) {
+		gnutls_supplemental_recv(session, 1);
+		gnutls_supplemental_send(session, 1);
 
-	gnutls_session_supplemental_register(session, "supplemental_client", TLS_SUPPLEMENTALDATATYPE_SAMPLE, supp_client_recv_func, supp_client_send_func, 0);
+		gnutls_session_supplemental_register(session, "supplemental_client", TLS_SUPPLEMENTALDATATYPE_SAMPLE, supp_client_recv_func, supp_client_send_func, 0);
+	}
 
 	/* Perform the TLS handshake
 	 */
@@ -165,8 +164,14 @@ static void client(int sd)
 			success("client: Handshake was completed\n");
 	}
 
-	if (TLS_SUPPLEMENTALDATA_client_sent != 1 || TLS_SUPPLEMENTALDATA_client_received != 1)
-		fail("client: extension not properly sent/received\n");
+	if (!server_only) {
+		if (TLS_SUPPLEMENTALDATA_client_sent != 1 || TLS_SUPPLEMENTALDATA_client_received != 1)
+			fail("client: extension not properly sent/received\n");
+	} else {
+		/* we expect TLS1.2 handshake as TLS1.3 is not (yet) defined
+		 * with supplemental data */
+		assert(gnutls_protocol_get_version(session) == GNUTLS_TLS1_2);
+	}
 
 	gnutls_bye(session, GNUTLS_SHUT_RDWR);
 
@@ -180,57 +185,10 @@ end:
 	gnutls_global_deinit();
 }
 
-/* This is a sample TLS 1.0 server, for extension
- */
-
-static unsigned char server_cert_pem[] =
-    "-----BEGIN CERTIFICATE-----\n"
-    "MIICVjCCAcGgAwIBAgIERiYdMTALBgkqhkiG9w0BAQUwGTEXMBUGA1UEAxMOR251\n"
-    "VExTIHRlc3QgQ0EwHhcNMDcwNDE4MTMyOTIxWhcNMDgwNDE3MTMyOTIxWjA3MRsw\n"
-    "GQYDVQQKExJHbnVUTFMgdGVzdCBzZXJ2ZXIxGDAWBgNVBAMTD3Rlc3QuZ251dGxz\n"
-    "Lm9yZzCBnDALBgkqhkiG9w0BAQEDgYwAMIGIAoGA17pcr6MM8C6pJ1aqU46o63+B\n"
-    "dUxrmL5K6rce+EvDasTaDQC46kwTHzYWk95y78akXrJutsoKiFV1kJbtple8DDt2\n"
-    "DZcevensf9Op7PuFZKBroEjOd35znDET/z3IrqVgbtm2jFqab7a+n2q9p/CgMyf1\n"
-    "tx2S5Zacc1LWn9bIjrECAwEAAaOBkzCBkDAMBgNVHRMBAf8EAjAAMBoGA1UdEQQT\n"
-    "MBGCD3Rlc3QuZ251dGxzLm9yZzATBgNVHSUEDDAKBggrBgEFBQcDATAPBgNVHQ8B\n"
-    "Af8EBQMDB6AAMB0GA1UdDgQWBBTrx0Vu5fglyoyNgw106YbU3VW0dTAfBgNVHSME\n"
-    "GDAWgBTpPBz7rZJu5gakViyi4cBTJ8jylTALBgkqhkiG9w0BAQUDgYEAaFEPTt+7\n"
-    "bzvBuOf7+QmeQcn29kT6Bsyh1RHJXf8KTk5QRfwp6ogbp94JQWcNQ/S7YDFHglD1\n"
-    "AwUNBRXwd3riUsMnsxgeSDxYBfJYbDLeohNBsqaPDJb7XailWbMQKfAbFQ8cnOxg\n"
-    "rOKLUQRWJ0K3HyXRMhbqjdLIaQiCvQLuizo=\n" "-----END CERTIFICATE-----\n";
-
-const gnutls_datum_t server_cert = { server_cert_pem,
-	sizeof(server_cert_pem)
-};
-
-static unsigned char server_key_pem[] =
-    "-----BEGIN RSA PRIVATE KEY-----\n"
-    "MIICXAIBAAKBgQDXulyvowzwLqknVqpTjqjrf4F1TGuYvkrqtx74S8NqxNoNALjq\n"
-    "TBMfNhaT3nLvxqResm62ygqIVXWQlu2mV7wMO3YNlx696ex/06ns+4VkoGugSM53\n"
-    "fnOcMRP/PciupWBu2baMWppvtr6far2n8KAzJ/W3HZLllpxzUtaf1siOsQIDAQAB\n"
-    "AoGAYAFyKkAYC/PYF8e7+X+tsVCHXppp8AoP8TEZuUqOZz/AArVlle/ROrypg5kl\n"
-    "8YunrvUdzH9R/KZ7saNZlAPLjZyFG9beL/am6Ai7q7Ma5HMqjGU8kTEGwD7K+lbG\n"
-    "iomokKMOl+kkbY/2sI5Czmbm+/PqLXOjtVc5RAsdbgvtmvkCQQDdV5QuU8jap8Hs\n"
-    "Eodv/tLJ2z4+SKCV2k/7FXSKWe0vlrq0cl2qZfoTUYRnKRBcWxc9o92DxK44wgPi\n"
-    "oMQS+O7fAkEA+YG+K9e60sj1K4NYbMPAbYILbZxORDecvP8lcphvwkOVUqbmxOGh\n"
-    "XRmTZUuhBrJhJKKf6u7gf3KWlPl6ShKEbwJASC118cF6nurTjuLf7YKARDjNTEws\n"
-    "qZEeQbdWYINAmCMj0RH2P0mvybrsXSOD5UoDAyO7aWuqkHGcCLv6FGG+qwJAOVqq\n"
-    "tXdUucl6GjOKKw5geIvRRrQMhb/m5scb+5iw8A4LEEHPgGiBaF5NtJZLALgWfo5n\n"
-    "hmC8+G8F0F78znQtPwJBANexu+Tg5KfOnzSILJMo3oXiXhf5PqXIDmbN0BKyCKAQ\n"
-    "LfkcEcUbVfmDaHpvzwY9VEaoMOKVLitETXdNSxVpvWM=\n"
-    "-----END RSA PRIVATE KEY-----\n";
-
-const gnutls_datum_t server_key = { server_key_pem,
-	sizeof(server_key_pem)
-};
-
-int err, ret;
-char topbuf[512];
-gnutls_session_t session;
-int optval = 1;
-
-static void server(int sd)
+static void server(int sd, const char *prio, unsigned server_only)
 {
+	int ret;
+	gnutls_session_t session;
 	gnutls_certificate_credentials_t serverx509cred;
 
 	/* this must be called once in the program
@@ -248,18 +206,17 @@ static void server(int sd)
 					    GNUTLS_X509_FMT_PEM);
 
 	gnutls_init(&session, GNUTLS_SERVER);
+	gnutls_handshake_set_timeout(session, 20 * 1000);
 
-	/* avoid calling all the priority functions, since the defaults
-	 * are adequate.
-	 */
-	gnutls_priority_set_direct(session, "PERFORMANCE:+ANON-ECDH:+ANON-DH",
-				   NULL);
+	assert(gnutls_priority_set_direct(session, prio, NULL) >= 0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
 				serverx509cred);
 
-	gnutls_supplemental_recv(session, 1);
-	gnutls_supplemental_send(session, 1);
+	if (!server_only) {
+		gnutls_supplemental_recv(session, 1);
+		gnutls_supplemental_send(session, 1);
+	}
 
 	gnutls_session_supplemental_register(session, "supplemental_server", TLS_SUPPLEMENTALDATATYPE_SAMPLE, supp_server_recv_func, supp_server_send_func, 0);
 
@@ -275,8 +232,10 @@ static void server(int sd)
 	if (debug)
 		success("server: Handshake was completed\n");
 
-	if (TLS_SUPPLEMENTALDATA_server_sent != 1 || TLS_SUPPLEMENTALDATA_server_received != 1)
-		fail("server: extension not properly sent/received\n");
+	if (!server_only) {
+		if (TLS_SUPPLEMENTALDATA_server_sent != 1 || TLS_SUPPLEMENTALDATA_server_received != 1)
+			fail("server: extension not properly sent/received\n");
+	}
 
 	/* do not wait for the peer to close the connection.
 	 */
@@ -293,10 +252,19 @@ static void server(int sd)
 		success("server: finished\n");
 }
 
-void doit(void)
+static
+void start(const char *prio, unsigned server_only)
 {
 	pid_t child;
-	int sockets[2];
+	int sockets[2], err;
+
+	signal(SIGPIPE, SIG_IGN);
+	TLS_SUPPLEMENTALDATA_client_sent = 0;
+	TLS_SUPPLEMENTALDATA_client_received = 0;
+	TLS_SUPPLEMENTALDATA_server_sent = 0;
+	TLS_SUPPLEMENTALDATA_server_received = 0;
+
+	success("trying: %s\n", prio);
 
 	err = socketpair(AF_UNIX, SOCK_STREAM, 0, sockets);
 	if (err == -1) {
@@ -315,10 +283,23 @@ void doit(void)
 	if (child) {
 		int status;
 		/* parent */
-		server(sockets[0]);
+		server(sockets[0], prio, server_only);
 		wait(&status);
-	} else
-		client(sockets[1]);
+		check_wait_status(status);
+	} else {
+		client(sockets[1], prio, server_only);
+		exit(0);
+	}
 }
 
+void doit(void)
+{
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2", 0);
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.2", 0);
+	start("NORMAL", 0);
+	/* try setting supplemental only in server side, it should
+	 * lead to normal authentication */
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2", 1);
+	start("NORMAL", 1);
+}
 #endif				/* _WIN32 */

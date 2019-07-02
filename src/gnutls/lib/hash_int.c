@@ -16,7 +16,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -77,6 +77,9 @@ int _gnutls_hash_init(digest_hd_st * dig, const mac_entry_st * e)
 int _gnutls_digest_exists(gnutls_digest_algorithm_t algo)
 {
 	const gnutls_crypto_digest_st *cc = NULL;
+
+	if (is_mac_algo_forbidden(algo))
+		return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
 
 	cc = _gnutls_get_crypto_digest(algo);
 	if (cc != NULL)
@@ -173,6 +176,13 @@ _gnutls_mac_fast(gnutls_mac_algorithm_t algorithm, const void *key,
 int _gnutls_mac_exists(gnutls_mac_algorithm_t algo)
 {
 	const gnutls_crypto_mac_st *cc = NULL;
+
+	/* exceptionally it exists, as it is not a real MAC */
+	if (algo == GNUTLS_MAC_AEAD)
+		return 1;
+
+	if (is_mac_algo_forbidden(algo))
+		return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
 
 	cc = _gnutls_get_crypto_mac(algo);
 	if (cc != NULL)
@@ -461,38 +471,6 @@ ssl3_md5(int i, uint8_t * secret, int secret_len,
 
 	_gnutls_hash_deinit(&td, digest);
 	return 0;
-}
-
-int
-_gnutls_ssl3_hash_md5(const void *first, int first_len,
-		      const void *second, int second_len,
-		      int ret_len, uint8_t * ret)
-{
-	uint8_t digest[MAX_HASH_SIZE];
-	digest_hd_st td;
-	int block = MD5_DIGEST_OUTPUT;
-	int rc;
-
-	rc = _gnutls_hash_init(&td, mac_to_entry(GNUTLS_MAC_MD5));
-	if (rc < 0) {
-		gnutls_assert();
-		return rc;
-	}
-
-	_gnutls_hash(&td, first, first_len);
-	_gnutls_hash(&td, second, second_len);
-
-	_gnutls_hash_deinit(&td, digest);
-
-	if (ret_len > block) {
-		gnutls_assert();
-		return GNUTLS_E_INTERNAL_ERROR;
-	}
-
-	memcpy(ret, digest, ret_len);
-
-	return 0;
-
 }
 
 int

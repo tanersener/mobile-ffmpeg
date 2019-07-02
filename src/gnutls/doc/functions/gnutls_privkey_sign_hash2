@@ -1,0 +1,35 @@
+
+
+
+
+@deftypefun {int} {gnutls_privkey_sign_hash2} (gnutls_privkey_t @var{signer}, gnutls_sign_algorithm_t @var{algo}, unsigned int @var{flags}, const gnutls_datum_t * @var{hash_data}, gnutls_datum_t * @var{signature})
+@var{signer}: Holds the signer's key
+
+@var{algo}: The signature algorithm used
+
+@var{flags}: Zero or one of @code{gnutls_privkey_flags_t} 
+
+@var{hash_data}: holds the data to be signed
+
+@var{signature}: will contain newly allocated signature
+
+This function will sign the given hashed data using a signature algorithm
+supported by the private key. Signature algorithms are always used
+together with a hash functions.  Different hash functions may be
+used for the RSA algorithm, but only SHA-XXX for the DSA keys.
+
+You may use @code{gnutls_pubkey_get_preferred_hash_algorithm()}  to determine
+the hash algorithm.
+
+The flags may be @code{GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA}  or @code{GNUTLS_PRIVKEY_SIGN_FLAG_RSA_PSS} .
+In the former case this function will ignore  @code{hash_algo} and perform a raw PKCS1 signature,
+and in the latter an RSA-PSS signature will be generated.
+
+Note that, not all algorithm support signing already hashed data. When
+signing with Ed25519, @code{gnutls_privkey_sign_data()}  should be used.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.6.0
+@end deftypefun

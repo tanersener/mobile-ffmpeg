@@ -48,6 +48,7 @@ int main(int argc, char **argv)
 #include <sys/wait.h>
 #endif
 #include <unistd.h>
+#include <assert.h>
 #include <gnutls/gnutls.h>
 
 #include "utils.h"
@@ -111,7 +112,7 @@ static void server(int sd)
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	gnutls_priority_set_direct(session, "NORMAL", NULL);
+	assert(gnutls_priority_set_direct(session, "NORMAL:-VERS-ALL:+VERS-TLS1.2", NULL)>=0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
@@ -164,8 +165,11 @@ void doit(void)
 
 		server(sockets[0]);
 		wait(&status);
-	} else
+		check_wait_status(status);
+	} else {
 		client(sockets[1]);
+		exit(0);
+	}
 }
 
 #endif				/* _WIN32 */

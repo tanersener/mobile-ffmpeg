@@ -23,6 +23,9 @@ session. The provided  @code{type} must be an unassigned type in
 If the type is already registered or handled by GnuTLS internally
 @code{GNUTLS_E_ALREADY_REGISTERED}  will be returned.
 
+As supplemental data are not defined under TLS 1.3, this function will
+disable TLS 1.3 support for the given session.
+
 @strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
 
 @strong{Since:} 3.5.5

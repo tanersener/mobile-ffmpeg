@@ -6,8 +6,22 @@
 @var{session}: is a @code{gnutls_session_t}  type.
 
 Sets the default priority on the ciphers, key exchange methods,
-macs and compression methods. For more fine-tuning you could
-use @code{gnutls_priority_set_direct()}  or @code{gnutls_priority_set()}  instead.
+and macs. This is the recommended method of
+setting the defaults, in order to promote consistency between applications
+using GnuTLS, and to allow GnuTLS using applications to update settings
+in par with the library. For client applications which require
+maximum compatibility consider calling @code{gnutls_session_enable_compatibility_mode()} 
+after this function.
+
+For an application to specify additional options to priority string
+consider using @code{gnutls_set_default_priority_append()} .
+
+To allow a user to override the defaults (e.g., when a user interface
+or configuration file is available), the functions
+@code{gnutls_priority_set_direct()}  or @code{gnutls_priority_set()}  can
+be used.
 
 @strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, or an error code.
+
+@strong{Since:} 2.1.4
 @end deftypefun

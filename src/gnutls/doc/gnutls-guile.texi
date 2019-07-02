@@ -71,9 +71,9 @@ Documentation License''.
 @node Preface
 @chapter Preface
 
-This manual describes the @uref{http://www.gnu.org/software/guile/,
+This manual describes the @uref{https://www.gnu.org/software/guile/,
 GNU Guile} Scheme programming interface to GnuTLS, which is distributed
-as part of @uref{http://gnutls.org,GnuTLS}.  The reader is
+as part of @uref{https://gnutls.org,GnuTLS}.  The reader is
 assumed to have basic knowledge of the protocol and library.  Details
 missing from this chapter may be found in Function reference,
 of the C API reference.
@@ -369,7 +369,7 @@ Once a TLS session is established, data can be communicated through it
       (bye session close-request/rdwr))))
 @end example
 
-@c See <http://bugs.gnu.org/22966> for details.
+@c See <https://bugs.gnu.org/22966> for details.
 @cindex buffering
 Note that each write to the session record port leads to the
 transmission of an encrypted TLS ``Application Data'' packet.  In the

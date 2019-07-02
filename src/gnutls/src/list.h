@@ -18,6 +18,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
  */
 
+#ifndef GNUTLS_SRC_LIST_H
+#define GNUTLS_SRC_LIST_H
+
 /*
     SOAP:
     
@@ -122,10 +125,6 @@ int main (int argc, char **argv)
 }
 
 */
-
-
-#ifndef _LIST_H
-#define _LIST_H
 
 /* the `search' member points to the last found.
    this speeds up repeated searches on the same list-item,
@@ -444,4 +443,4 @@ struct list {
 	free (__t);									\
     }											\
 
-#endif				/* _LIST_H */
+#endif /* GNUTLS_SRC_LIST_H */

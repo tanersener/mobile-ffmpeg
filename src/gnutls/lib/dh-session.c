@@ -17,7 +17,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -72,7 +72,7 @@ void gnutls_dh_set_prime_bits(gnutls_session_t session, unsigned int bits)
 		_gnutls_audit_log(session,
 				  "Note that the security level of the Diffie-Hellman key exchange has been lowered to %u bits and this may allow decryption of the session data\n",
 				  bits);
-	session->internals.priorities.dh_prime_bits = bits;
+	session->internals.dh_prime_bits = bits;
 }
 
 

@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_privkey_decrypt_data2} (gnutls_privkey_t @var{key}, unsigned int @var{flags}, const gnutls_datum_t * @var{ciphertext}, unsigned char * @var{plaintext}, size_t @var{plaintext_size})

@@ -16,47 +16,18 @@ A mailing list where users may help each other exists, and you can
 reach it by sending e-mail to @email{gnutls-help@@gnutls.org}.  Archives
 of the mailing list discussions, and an interface to manage
 subscriptions, is available through the World Wide Web at
-@url{http://lists.gnutls.org/pipermail/gnutls-help/}.
+@url{https://lists.gnutls.org/pipermail/gnutls-help/}.
 
 A mailing list for developers are also available, see
-@url{http://www.gnutls.org/lists.html}.
+@url{https://www.gnutls.org/lists.html}.
 Bug reports should be sent to @email{bugs@@gnutls.org}, see
 @ref{Bug Reports}.
 
 @node Commercial Support
 @section Commercial Support
 
-Commercial support is available for users of GnuTLS.  The kind of
-support that can be purchased may include:
-
-@itemize
-
-@item Implement new features.
-Such as a new TLS extension.
-
-@item Port GnuTLS to new platforms.
-This could include porting to an embedded platforms that may need
-memory or size optimization.
-
-@item Integrating TLS as a security environment in your existing project.
-
-@item System design of components related to TLS.
-
-@end itemize
-
-If you are interested, please write to:
-
-@verbatim
-Simon Josefsson Datakonsult
-Hagagatan 24
-113 47 Stockholm
-Sweden
-
-E-mail: simon@josefsson.org
-@end verbatim
-
-If your company provides support related to GnuTLS and would like to
-be mentioned here, contact the authors.
+Commercial support is available for users of GnuTLS. See
+@url{https://www.gnutls.org/commercial.html} for more information.
 
 
 @node Bug Reports
@@ -160,13 +131,9 @@ formatted, are extracted into Texinfo manuals and GTK-DOC web pages.
 @section Certification
 @cindex certification
 
-Many cryptographic libraries claim certifications from national or international bodies. These certifications are tied on a specific (and often restricted) version of the library or a 
-specific product using the library, and typically in the case of software they assure that the algorithms implemented are correct. The major certifications known are:
-@itemize
-@item USA's FIPS 140-2 at Level 1 which certifies that approved algorithms are used (see @url{http://en.wikipedia.org/wiki/FIPS_140-2});
-@item Common Criteria for Information Technology Security Evaluation (CC), an international standard for verification of elaborate security claims (see @url{http://en.wikipedia.org/wiki/Common_Criteria}).
-@end itemize
+There are certifications from national or international bodies which "prove"
+to an auditor that the crypto component follows some best practices, such
+as unit testing and reliance on well known crypto primitives.
 
-Obtaining such a certification is an expensive and elaborate job that has no immediate value for a continuously developed free software library (as the certification is tied to the
-particular version tested). While, as a free software project, we are not actively pursuing this kind of certification, GnuTLS has been FIPS-140-2 certified in several systems by
-third parties. If you are, interested, see @ref{Commercial Support}.
+GnuTLS has support for the FIPS 140-2 certification under Red Hat Enterprise Linux.
+See @ref{FIPS140-2 mode} for more information.

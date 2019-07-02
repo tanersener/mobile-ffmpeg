@@ -1,5 +1,5 @@
 /* Convenience header for conditional use of GNU <libintl.h>.
-   Copyright (C) 1995-1998, 2000-2002, 2004-2006, 2009-2016 Free Software
+   Copyright (C) 1995-1998, 2000-2002, 2004-2006, 2009-2019 Free Software
    Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
@@ -13,13 +13,14 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License along
-   with this program; if not, see <http://www.gnu.org/licenses/>.  */
+   with this program; if not, see <https://www.gnu.org/licenses/>.  */
 
 #ifndef _LIBGETTEXT_H
 #define _LIBGETTEXT_H 1
 
-/* NLS can be disabled through the configure --disable-nls option.  */
-#if ENABLE_NLS
+/* NLS can be disabled through the configure --disable-nls option
+   or through "#define ENABLE NLS 0" before including this file.  */
+#if defined ENABLE_NLS && ENABLE_NLS
 
 /* Get declarations of GNU message catalog functions.  */
 # include <libintl.h>
@@ -183,8 +184,16 @@ npgettext_aux (const char *domain,
 
 #include <string.h>
 
-#if (((__GNUC__ >= 3 || __GNUG__ >= 2) && !defined __STRICT_ANSI__) \
-     /* || __STDC_VERSION__ >= 199901L */ )
+/* GNULIB_NO_VLA can be defined to disable use of VLAs even if supported.
+   This relates to the -Wvla and -Wvla-larger-than warnings, enabled in
+   the default GCC many warnings set.  This allows programs to disable use
+   of VLAs, which may be unintended, or may be awkward to support portably,
+   or may have security implications due to non-deterministic stack usage.  */
+
+#if (!defined GNULIB_NO_VLA \
+     && (((__GNUC__ >= 3 || __GNUG__ >= 2) && !defined __STRICT_ANSI__) \
+     /*  || (__STDC_VERSION__ == 199901L && !defined __HP_cc)
+         || (__STDC_VERSION__ >= 201112L && !defined __STDC_NO_VLA__) */ ))
 # define _LIBGETTEXT_HAVE_VARIABLE_SIZE_ARRAYS 1
 #else
 # define _LIBGETTEXT_HAVE_VARIABLE_SIZE_ARRAYS 0

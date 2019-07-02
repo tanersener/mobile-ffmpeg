@@ -16,9 +16,12 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
+
+#ifndef GNUTLS_LIB_AUTH_SRP_PASSWD_H
+#define GNUTLS_LIB_AUTH_SRP_PASSWD_H
 
 #ifdef ENABLE_SRP
 
@@ -39,3 +42,5 @@ int _gnutls_sbase64_decode(char *data, size_t data_size,
 			   uint8_t ** result);
 
 #endif				/* ENABLE_SRP */
+
+#endif /* GNUTLS_LIB_AUTH_SRP_PASSWD_H */

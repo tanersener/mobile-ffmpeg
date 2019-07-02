@@ -31,7 +31,7 @@
 /* This test checks whether an invalid extensions field will lead
  * to a GNUTLS_E_UNEXPECTED_EXTENSIONS_LENGTH. */
 
-#if defined(_WIN32) || !defined(HAVE_LIBSECCOMP)
+#if defined(_WIN32)
 
 int main()
 {
@@ -48,6 +48,7 @@ int main()
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <signal.h>
+#include <assert.h>
 #include <gnutls/gnutls.h>
 
 #include "utils.h"
@@ -112,7 +113,7 @@ static ssize_t odd_push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 /* A very basic DTLS client handling DTLS 0.9 which sets premaster secret.
  */
 
-static void client(int fd)
+static void client(int fd, const char *prio)
 {
 	int ret;
 	gnutls_certificate_credentials_t xcred;
@@ -132,10 +133,7 @@ static void client(int fd)
 	gnutls_init(&session, GNUTLS_CLIENT);
 	gnutls_handshake_set_timeout(session, 20 * 1000);
 
-	/* Use default priorities */
-	gnutls_priority_set_direct(session,
-				   "NORMAL:-KX-ALL:+ECDHE-RSA:%COMPAT",
-				   NULL);
+	assert(gnutls_priority_set_direct(session, prio, NULL) >= 0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
@@ -176,7 +174,7 @@ static void terminate(void)
 	exit(1);
 }
 
-static void server(int fd)
+static void server(int fd, const char *prio)
 {
 	int ret;
 	gnutls_certificate_credentials_t xcred;
@@ -205,9 +203,7 @@ static void server(int fd)
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	gnutls_priority_set_direct(session,
-				   "NORMAL:-KX-ALL:+ECDHE-RSA",
-				   NULL);
+	assert(gnutls_priority_set_direct(session, prio, NULL) >= 0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
@@ -225,7 +221,6 @@ static void server(int fd)
 		     gnutls_strerror(ret));
 		terminate();
 	}
-	success("server: Handshake failed as expected\n");
 
 	close(fd);
 	gnutls_deinit(session);
@@ -235,14 +230,15 @@ static void server(int fd)
 	gnutls_global_deinit();
 
 	if (debug)
-		success("server: finished\n");
+		success("server: Handshake failed as expected\n");
 }
 
-static void start(void)
+static void start(const char *prio)
 {
 	int fd[2];
 	int ret;
 
+	success("trying %s\n", prio);
 	signal(SIGPIPE, SIG_IGN);
 
 	ret = socketpair(AF_UNIX, SOCK_STREAM, 0, fd);
@@ -263,25 +259,29 @@ static void start(void)
 		/* parent */
 
 		close(fd[0]);
-		server(fd[1]);
+		server(fd[1], prio);
 
 		wait(&status);
 		check_wait_status(status);
 		close(fd[1]);
 	} else {
 		close(fd[1]);
-		client(fd[0]);
+		client(fd[0], prio);
 		exit(0);
 	}
 }
 
 void doit(void)
 {
-	/* check overflow */
-	start();
+	success("checking overflow\n");
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.2");
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.3");
+	start("NORMAL");
 
-	/* check underflow */
+	success("checking underflow\n");
 	reduce = 1;
-	start();
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.2");
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.3");
+	start("NORMAL");
 }
 #endif				/* _WIN32 */

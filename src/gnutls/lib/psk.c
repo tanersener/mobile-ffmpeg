@@ -16,7 +16,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -67,6 +67,8 @@ gnutls_psk_allocate_client_credentials(gnutls_psk_client_credentials_t *
 	if (*sc == NULL)
 		return GNUTLS_E_MEMORY_ERROR;
 
+	/* TLS 1.3 - Default binder HMAC algorithm is SHA-256 */
+	(*sc)->binder_algo = _gnutls_mac_to_entry(GNUTLS_MAC_SHA256);
 	return 0;
 }
 
@@ -81,9 +83,9 @@ gnutls_psk_allocate_client_credentials(gnutls_psk_client_credentials_t *
  * This function sets the username and password, in a
  * gnutls_psk_client_credentials_t type.  Those will be used in
  * PSK authentication.  @username should be an ASCII string or UTF-8
- * strings prepared using the "SASLprep" profile of "stringprep".  The
- * key can be either in raw byte format or in Hex format (without the
- * 0x prefix).
+ * string. In case of a UTF-8 string it is recommended to be following
+ * the PRECIS framework for usernames (rfc8265). The key can be either
+ * in raw byte format or in Hex format (without the 0x prefix).
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.
@@ -182,6 +184,8 @@ gnutls_psk_allocate_server_credentials(gnutls_psk_server_credentials_t *
 	if (*sc == NULL)
 		return GNUTLS_E_MEMORY_ERROR;
 
+	/* TLS 1.3 - Default binder HMAC algorithm is SHA-256 */
+	(*sc)->binder_algo = _gnutls_mac_to_entry(GNUTLS_MAC_SHA256);
 	return 0;
 }
 
@@ -292,8 +296,9 @@ gnutls_psk_set_server_credentials_function(gnutls_psk_server_credentials_t
  *  gnutls_datum_t* key);
  *
  * The @username and @key->data must be allocated using gnutls_malloc().
- * @username should be ASCII strings or UTF-8 strings prepared using
- * the "SASLprep" profile of "stringprep".
+ * The @username should be an ASCII string or UTF-8
+ * string. In case of a UTF-8 string it is recommended to be following
+ * the PRECIS framework for usernames (rfc8265).
  *
  * The callback function will be called once per handshake.
  *
@@ -323,7 +328,7 @@ const char *gnutls_psk_server_get_username(gnutls_session_t session)
 {
 	psk_auth_info_t info;
 
-	CHECK_AUTH(GNUTLS_CRD_PSK, NULL);
+	CHECK_AUTH_TYPE(GNUTLS_CRD_PSK, NULL);
 
 	info = _gnutls_get_auth_info(session, GNUTLS_CRD_PSK);
 	if (info == NULL)
@@ -343,7 +348,10 @@ const char *gnutls_psk_server_get_username(gnutls_session_t session)
  * username to use.  This should only be called in case of PSK
  * authentication and in case of a client.
  *
- * Returns: the identity hint of the peer, or %NULL in case of an error.
+ * Note: there is no hint in TLS 1.3, so this function will return %NULL
+ * if TLS 1.3 has been negotiated.
+ *
+ * Returns: the identity hint of the peer, or %NULL in case of an error or if TLS 1.3 is being used.
  *
  * Since: 2.4.0
  **/
@@ -351,7 +359,7 @@ const char *gnutls_psk_client_get_hint(gnutls_session_t session)
 {
 	psk_auth_info_t info;
 
-	CHECK_AUTH(GNUTLS_CRD_PSK, NULL);
+	CHECK_AUTH_TYPE(GNUTLS_CRD_PSK, NULL);
 
 	info = _gnutls_get_auth_info(session, GNUTLS_CRD_PSK);
 	if (info == NULL)
@@ -371,12 +379,24 @@ const char *gnutls_psk_client_get_hint(gnutls_session_t session)
  * This function will set the Diffie-Hellman parameters for an
  * anonymous server to use. These parameters will be used in
  * Diffie-Hellman exchange with PSK cipher suites.
+ *
+ * Deprecated: This function is unnecessary and discouraged on GnuTLS 3.6.0
+ * or later. Since 3.6.0, DH parameters are negotiated
+ * following RFC7919.
+ *
  **/
 void
 gnutls_psk_set_server_dh_params(gnutls_psk_server_credentials_t res,
 				gnutls_dh_params_t dh_params)
 {
+	if (res->deinit_dh_params) {
+		res->deinit_dh_params = 0;
+		gnutls_dh_params_deinit(res->dh_params);
+		res->dh_params = NULL;
+	}
+
 	res->dh_params = dh_params;
+	res->dh_sec_param = gnutls_pk_bits_to_sec_param(GNUTLS_PK_DH, _gnutls_mpi_get_nbits(dh_params->params[0]));
 }
 
 /**
@@ -389,6 +409,10 @@ gnutls_psk_set_server_dh_params(gnutls_psk_server_credentials_t res,
  * Ephemeral Diffie-Hellman cipher suites and will be selected from
  * the FFDHE set of RFC7919 according to the security level provided.
  *
+ * Deprecated: This function is unnecessary and discouraged on GnuTLS 3.6.0
+ * or later. Since 3.6.0, DH parameters are negotiated
+ * following RFC7919.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
@@ -398,19 +422,7 @@ int
 gnutls_psk_set_server_known_dh_params(gnutls_psk_server_credentials_t res,
 				       gnutls_sec_param_t sec_param)
 {
-	int ret;
-
-	if (res->deinit_dh_params) {
-		res->deinit_dh_params = 0;
-		gnutls_dh_params_deinit(res->dh_params);
-		res->dh_params = NULL;
-	}
-
-	ret = _gnutls_set_cred_dh_params(&res->dh_params, sec_param);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
-	res->deinit_dh_params = 1;
+	res->dh_sec_param = sec_param;
 
 	return 0;
 }
@@ -423,6 +435,11 @@ gnutls_psk_set_server_known_dh_params(gnutls_psk_server_credentials_t res,
  * This function will set a callback in order for the server to get
  * the Diffie-Hellman parameters for PSK authentication.  The callback
  * should return %GNUTLS_E_SUCCESS (0) on success.
+ *
+ * Deprecated: This function is unnecessary and discouraged on GnuTLS 3.6.0
+ * or later. Since 3.6.0, DH parameters are negotiated
+ * following RFC7919.
+ *
  **/
 void
 gnutls_psk_set_server_params_function(gnutls_psk_server_credentials_t res,
@@ -439,6 +456,11 @@ gnutls_psk_set_server_params_function(gnutls_psk_server_credentials_t res,
  * This function will set a callback in order for the server to get
  * the Diffie-Hellman or RSA parameters for PSK authentication.  The
  * callback should return %GNUTLS_E_SUCCESS (0) on success.
+ *
+ * Deprecated: This function is unnecessary and discouraged on GnuTLS 3.6.0
+ * or later. Since 3.6.0, DH parameters are negotiated
+ * following RFC7919.
+ *
  **/
 void
 gnutls_psk_set_params_function(gnutls_psk_server_credentials_t res,

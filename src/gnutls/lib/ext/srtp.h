@@ -16,13 +16,16 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
+
+#ifndef GNUTLS_LIB_EXT_SRTP_H
+#define GNUTLS_LIB_EXT_SRTP_H
 #ifndef EXT_SRTP_H
 #define EXT_SRTP_H
 
-#include <extensions.h>
+#include <hello_ext.h>
 
 #define MAX_SRTP_PROFILES 4
 
@@ -35,6 +38,8 @@ typedef struct {
 	unsigned int mki_received;
 } srtp_ext_st;
 
-extern const extension_entry_st ext_mod_srtp;
+extern const hello_ext_entry_st ext_mod_srtp;
 
 #endif
+
+#endif /* GNUTLS_LIB_EXT_SRTP_H */

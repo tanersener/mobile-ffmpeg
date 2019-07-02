@@ -767,7 +767,6 @@ void doit(void)
 			}
 		}
 		gnutls_free(ext.data);
-		ext.data = NULL;
 	}
 
 	if (debug)

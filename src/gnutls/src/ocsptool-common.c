@@ -15,7 +15,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see
- * <http://www.gnu.org/licenses/>.
+ * <https://www.gnu.org/licenses/>.
  */
 
 #include <config.h>
@@ -183,6 +183,9 @@ int send_ocsp_request(const char *server,
 		}
 
 		url = malloc(data.size + 1);
+		if (url == NULL) {
+		    return -1;
+		}
 		memcpy(url, data.data, data.size);
 		url[data.size] = 0;
 
@@ -219,7 +222,8 @@ int send_ocsp_request(const char *server,
 
 	if (ret < 0 || ud.size == 0) {
 		perror("recv");
-		return -1;
+		ret = -1;
+		goto cleanup;
 	}
 
 	socket_bye(&hd, 0);
@@ -227,22 +231,29 @@ int send_ocsp_request(const char *server,
 	p = memmem(ud.data, ud.size, "\r\n\r\n", 4);
 	if (p == NULL) {
 		fprintf(stderr, "Cannot interpret HTTP response\n");
-		return -1;
+		ret = -1;
+		goto cleanup;
 	}
 
 	p += 4;
 	resp_data->size = ud.size - (p - ud.data);
 	resp_data->data = malloc(resp_data->size);
-	if (resp_data->data == NULL)
-		return -1;
+	if (resp_data->data == NULL) {
+		perror("recv");
+		ret = -1;
+		goto cleanup;
+	}
 
 	memcpy(resp_data->data, p, resp_data->size);
 
+	ret = 0;
+
+ cleanup:
 	free(ud.data);
 	if (url != server)
 		free(url);
 
-	return 0;
+	return ret;
 }
 
 void print_ocsp_verify_res(unsigned int output)
@@ -303,7 +314,7 @@ void print_ocsp_verify_res(unsigned int output)
 		if (comma)
 			printf(", ");
 		printf("Signer cert expired");
-		comma = 1;
+		/*comma = 1;*/
 	}
 }
 
@@ -324,6 +335,8 @@ check_ocsp_response(gnutls_x509_crt_t cert,
 	int ret;
 	unsigned int status, cert_status;
 	time_t rtime, vtime, ntime, now;
+	char timebuf1[SIMPLE_CTIME_BUF_SIZE];
+	char timebuf2[SIMPLE_CTIME_BUF_SIZE];
 
 	now = time(0);
 
@@ -384,7 +397,7 @@ check_ocsp_response(gnutls_x509_crt_t cert,
 	}
 
 	if (cert_status == GNUTLS_OCSP_CERT_REVOKED) {
-		printf("*** Certificate was revoked at %s", ctime(&rtime));
+		printf("*** Certificate was revoked at %s\n", simple_ctime(&rtime, timebuf1));
 		ret = 0;
 		goto cleanup;
 	}
@@ -392,17 +405,16 @@ check_ocsp_response(gnutls_x509_crt_t cert,
 	if (ntime == -1) {
 		if (now - vtime > OCSP_VALIDITY_SECS) {
 			printf
-			    ("*** The OCSP response is old (was issued at: %s) ignoring",
-			     ctime(&vtime));
+			    ("*** The OCSP response is old (was issued at: %s) ignoring\n",
+			     simple_ctime(&vtime, timebuf1));
 			ret = -1;
 			goto cleanup;
 		}
 	} else {
 		/* there is a newer OCSP answer, don't trust this one */
 		if (ntime < now) {
-			printf
-			    ("*** The OCSP response was issued at: %s, but there is a newer issue at %s",
-			     ctime(&vtime), ctime(&ntime));
+			printf("*** The OCSP response was issued at: %s but there is a newer issue at %s\n",
+				simple_ctime(&vtime, timebuf1), simple_ctime(&ntime, timebuf2));
 			ret = -1;
 			goto cleanup;
 		}
@@ -434,8 +446,8 @@ check_ocsp_response(gnutls_x509_crt_t cert,
 	}
 
  finish_ok:
-	printf("- OCSP server flags certificate not revoked as of %s",
-	       ctime(&vtime));
+	printf("- OCSP server flags certificate not revoked as of %s\n",
+	       simple_ctime(&vtime, timebuf1));
 	ret = 1;
  cleanup:
 	gnutls_ocsp_resp_deinit(resp);

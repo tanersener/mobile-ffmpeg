@@ -16,7 +16,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -26,6 +26,8 @@
 #include <common.h>
 #include "errors.h"
 #include <system.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 /**
  * gnutls_x509_crt_check_hostname:
@@ -49,7 +51,7 @@ gnutls_x509_crt_check_hostname(gnutls_x509_crt_t cert,
 }
 
 static int
-check_ip(gnutls_x509_crt_t cert, const void *ip, unsigned ip_size, unsigned flags)
+check_ip(gnutls_x509_crt_t cert, const void *ip, unsigned ip_size)
 {
 	char temp[16];
 	size_t temp_size;
@@ -92,6 +94,34 @@ static int has_embedded_null(const char *str, unsigned size)
 }
 
 /**
+ * gnutls_x509_crt_check_ip:
+ * @cert: should contain an gnutls_x509_crt_t type
+ * @ip: A pointer to the raw IP address
+ * @ip_size: the number of bytes in ip (4 or 16)
+ * @flags: should be zero
+ *
+ * This function will check if the IP allowed IP addresses in 
+ * the certificate's subject alternative name match the provided
+ * IP address.
+ *
+ * Returns: non-zero for a successful match, and zero on failure.
+ **/
+unsigned
+gnutls_x509_crt_check_ip(gnutls_x509_crt_t cert,
+			 const unsigned char *ip, unsigned int ip_size,
+			 unsigned int flags)
+{
+	return check_ip(cert, ip, ip_size);
+}
+
+/* whether gnutls_x509_crt_check_hostname2() will consider these
+ * alternative name types. This is to satisfy RFC6125 requirement
+ * that we do not fallback to CN-ID if we encounter a supported name
+ * type.
+ */
+#define IS_SAN_SUPPORTED(san) (san==GNUTLS_SAN_DNSNAME||san==GNUTLS_SAN_IPADDRESS)
+
+/**
  * gnutls_x509_crt_check_hostname2:
  * @cert: should contain an gnutls_x509_crt_t type
  * @hostname: A null terminated string that contains a DNS name
@@ -113,6 +143,10 @@ static int has_embedded_null(const char *str, unsigned size)
  * wildcards are considered. Otherwise they are only considered if the
  * domain name consists of three components or more, and the wildcard
  * starts at the leftmost position.
+
+ * When the flag %GNUTLS_VERIFY_DO_NOT_ALLOW_IP_MATCHES is specified,
+ * the input will be treated as a DNS name, and matching of textual IP addresses
+ * against the IPAddress part of the alternative name will not be allowed.
  *
  * The function gnutls_x509_crt_check_ip() is available for matching
  * IP addresses.
@@ -133,10 +167,12 @@ gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 	struct in_addr ipv4;
 	char *p = NULL;
 	char *a_hostname;
+	unsigned have_other_addresses = 0;
 	gnutls_datum_t out;
 
 	/* check whether @hostname is an ip address */
-	if ((p=strchr(hostname, ':')) != NULL || inet_aton(hostname, &ipv4) != 0) {
+	if (!(flags & GNUTLS_VERIFY_DO_NOT_ALLOW_IP_MATCHES) &&
+	    ((p=strchr(hostname, ':')) != NULL || inet_pton(AF_INET, hostname, &ipv4) != 0)) {
 
 		if (p != NULL) {
 			struct in6_addr ipv6;
@@ -146,9 +182,9 @@ gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 				gnutls_assert();
 				goto hostname_fallback;
 			}
-			ret = check_ip(cert, &ipv6, 16, flags);
+			ret = check_ip(cert, &ipv6, 16);
 		} else {
-			ret = check_ip(cert, &ipv4, 4, flags);
+			ret = check_ip(cert, &ipv4, 4);
 		}
 
 		/* Prior to 3.6.0 we were accepting misconfigured servers, that place their IP
@@ -197,7 +233,7 @@ gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 			}
 
 			if (!_gnutls_str_is_print(dnsname, dnsnamesize)) {
-				_gnutls_debug_log("invalid (non-ASCII) name in certificate %.*s", (int)dnsnamesize, dnsname);
+				_gnutls_debug_log("invalid (non-ASCII) name in certificate %.*s\n", (int)dnsnamesize, dnsname);
 				continue;
 			}
 
@@ -206,10 +242,13 @@ gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 				ret = 1;
 				goto cleanup;
 			}
+		} else {
+			if (IS_SAN_SUPPORTED(ret))
+				have_other_addresses = 1;
 		}
 	}
 
-	if (!found_dnsname && _gnutls_check_key_purpose(cert, GNUTLS_KP_TLS_WWW_SERVER, 0) != 0) {
+	if (!have_other_addresses && !found_dnsname && _gnutls_check_key_purpose(cert, GNUTLS_KP_TLS_WWW_SERVER, 0) != 0) {
 		/* did not get the necessary extension, use CN instead, if the
 		 * certificate would have been acceptable for a TLS WWW server purpose.
 		 * That is because only for that purpose the CN is a valid field to
@@ -243,7 +282,7 @@ gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 		}
 
 		if (!_gnutls_str_is_print(dnsname, dnsnamesize)) {
-			_gnutls_debug_log("invalid (non-ASCII) name in certificate CN %.*s", (int)dnsnamesize, dnsname);
+			_gnutls_debug_log("invalid (non-ASCII) name in certificate CN %.*s\n", (int)dnsnamesize, dnsname);
 			ret = 0;
 			goto cleanup;
 		}

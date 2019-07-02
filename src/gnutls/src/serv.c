@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2004-2012 Free Software Foundation, Inc.
  * Copyright (C) 2001,2002 Paul Sheer
+ * Copyright (C) 2016-2018 Red Hat, Inc.
  * Portions Copyright (C) 2002,2003 Nikos Mavrogiannopoulos
  *
  * This file is part of GnuTLS.
@@ -16,7 +17,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 /* This server is heavily modified for GnuTLS by Nikos Mavrogiannopoulos
@@ -34,7 +35,6 @@
 #include <string.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/dtls.h>
-#include <gnutls/openpgp.h>
 #include <sys/time.h>
 #include <sys/select.h>
 #include <fcntl.h>
@@ -61,30 +61,33 @@ static int debug = 0;
 unsigned int verbose = 1;
 static int nodb;
 static int noticket;
+static int earlydata;
 int require_cert;
 int disable_client_cert;
 
 const char *psk_passwd = NULL;
 const char *srp_passwd = NULL;
 const char *srp_passwd_conf = NULL;
-const char *pgp_keyring = NULL;
-const char *pgp_keyfile = NULL;
-const char *pgp_certfile = NULL;
-const char *x509_keyfile = NULL;
-const char *x509_certfile = NULL;
-const char *x509_dsakeyfile = NULL;
-const char *x509_dsacertfile = NULL;
-const char *x509_ecckeyfile = NULL;
-const char *x509_ecccertfile = NULL;
+const char **x509_keyfile = NULL;
+const char **x509_certfile = NULL;
+unsigned x509_certfile_size = 0;
+unsigned x509_keyfile_size = 0;
 const char *x509_cafile = NULL;
 const char *dh_params_file = NULL;
 const char *x509_crlfile = NULL;
 const char *priorities = NULL;
-const char *status_response_ocsp = NULL;
+
+const char **ocsp_responses = NULL;
+unsigned ocsp_responses_size = 0;
+
 const char *sni_hostname = NULL;
 int sni_hostname_fatal = 0;
 
+const char **alpn_protos = NULL;
+unsigned alpn_protos_size = 0;
+
 gnutls_datum_t session_ticket_key;
+gnutls_anti_replay_t anti_replay;
 static void tcp_server(const char *name, int port);
 
 /* end of globals */
@@ -96,7 +99,7 @@ static void tcp_server(const char *name, int port);
 
 #define SMALL_READ_TEST (2147483647)
 
-#define GERR(ret) fprintf(stdout, "Error: %s\n", safe_strerror(ret))
+#define GERR(ret) fprintf(stderr, "Error: %s\n", safe_strerror(ret))
 
 #define HTTP_END  "</BODY></HTML>\n\n"
 
@@ -115,7 +118,7 @@ gnutls_psk_server_credentials_t psk_cred = NULL;
 gnutls_anon_server_credentials_t dh_cred = NULL;
 gnutls_certificate_credentials_t cert_cred = NULL;
 
-const int ssl_session_cache = 128;
+const int ssl_session_cache = 2048;
 
 static void wrap_db_init(void);
 static void wrap_db_deinit(void);
@@ -123,6 +126,8 @@ static int wrap_db_store(void *dbf, gnutls_datum_t key,
 			 gnutls_datum_t data);
 static gnutls_datum_t wrap_db_fetch(void *dbf, gnutls_datum_t key);
 static int wrap_db_delete(void *dbf, gnutls_datum_t key);
+static int anti_replay_db_add(void *dbf, time_t exp, const gnutls_datum_t *key,
+			      const gnutls_datum_t *data);
 
 static void cmd_parser(int argc, char **argv);
 
@@ -137,8 +142,9 @@ LIST_TYPE_DECLARE(listener_item, char *http_request; char *http_response;
 		  int listen_socket; int fd;
 		  gnutls_session_t tls_session;
 		  int handshake_ok;
-		  int no_close;
+		  int close_ok;
 		  time_t start;
+		  int earlydata_eof;
     );
 
 static const char *safe_strerror(int value)
@@ -155,7 +161,7 @@ static void listener_free(listener_item * j)
 	free(j->http_request);
 	free(j->http_response);
 	if (j->fd >= 0) {
-		if (j->no_close == 0)
+		if (j->close_ok)
 			gnutls_bye(j->tls_session, GNUTLS_SHUT_WR);
 		shutdown(j->fd, 2);
 		close(j->fd);
@@ -272,7 +278,7 @@ int ret;
 		if (!require_cert && gnutls_certificate_get_peers(session, &size) == NULL)
 			return 0;
 
-		if (require_cert || ENABLED_OPT(VERIFY_CLIENT_CERT)) {
+		if (ENABLED_OPT(VERIFY_CLIENT_CERT)) {
 			if (cert_verify(session, NULL, NULL) == 0) {
 				do {
 					ret = gnutls_alert_send(session, GNUTLS_AL_FATAL, GNUTLS_A_ACCESS_DENIED);
@@ -365,19 +371,24 @@ end:
 	return ret;
 }
 
+#define MAX_ALPN_PROTOCOLS 16
 gnutls_session_t initialize_session(int dtls)
 {
 	gnutls_session_t session;
 	int ret;
+	unsigned i;
 	const char *err;
-
-	if (priorities == NULL)
-		priorities = "NORMAL";
+	gnutls_datum_t alpn[MAX_ALPN_PROTOCOLS];
+	unsigned alpn_size;
+	unsigned flags = GNUTLS_SERVER | GNUTLS_POST_HANDSHAKE_AUTH;
 
 	if (dtls)
-		gnutls_init(&session, GNUTLS_SERVER | GNUTLS_DATAGRAM);
-	else
-		gnutls_init(&session, GNUTLS_SERVER);
+		flags |= GNUTLS_DATAGRAM;
+
+	if (earlydata)
+		flags |= GNUTLS_ENABLE_EARLY_DATA;
+
+	gnutls_init(&session, flags);
 
 	/* allow the use of private ciphersuites.
 	 */
@@ -393,18 +404,48 @@ gnutls_session_t initialize_session(int dtls)
 		gnutls_db_set_ptr(session, NULL);
 	}
 
-#ifdef ENABLE_SESSION_TICKETS
 	if (noticket == 0)
 		gnutls_session_ticket_enable_server(session,
 						    &session_ticket_key);
-#endif
+
+	if (earlydata) {
+		gnutls_anti_replay_enable(session, anti_replay);
+		if (HAVE_OPT(MAXEARLYDATA)) {
+			ret = gnutls_record_set_max_early_data_size(session, OPT_VALUE_MAXEARLYDATA);
+			if (ret < 0) {
+				fprintf(stderr, "Could not set max early data size: %s\n", gnutls_strerror(ret));
+				exit(1);
+			}
+		}
+	}
 
 	if (sni_hostname != NULL)
 		gnutls_handshake_set_post_client_hello_function(session,
 								&post_client_hello);
 
-	if (gnutls_priority_set_direct(session, priorities, &err) < 0) {
-		fprintf(stderr, "Syntax error at: %s\n", err);
+	if (priorities == NULL) {
+		ret = gnutls_set_default_priority(session);
+		if (ret < 0) {
+			fprintf(stderr, "Could not set default policy: %s\n", gnutls_strerror(ret));
+			exit(1);
+		}
+	} else {
+		ret = gnutls_priority_set_direct(session, priorities, &err);
+		if (ret < 0) {
+			fprintf(stderr, "Syntax error at: %s\n", err);
+			exit(1);
+		}
+	}
+
+	alpn_size = MIN(MAX_ALPN_PROTOCOLS,alpn_protos_size);
+	for (i=0;i<alpn_size;i++) {
+		alpn[i].data = (void*)alpn_protos[i];
+		alpn[i].size = strlen(alpn_protos[i]);
+	}
+
+	ret = gnutls_alpn_set_protocols(session, alpn, alpn_size, HAVE_OPT(ALPN_FATAL)?GNUTLS_ALPN_MANDATORY:0);
+	if (ret < 0) {
+		fprintf(stderr, "Error setting ALPN protocols: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -467,7 +508,7 @@ gnutls_session_t initialize_session(int dtls)
 static const char DEFAULT_DATA[] =
     "This is the default message reported by the GnuTLS implementation. "
     "For more information please visit "
-    "<a href=\"http://www.gnutls.org/\">http://www.gnutls.org/</a>.";
+    "<a href=\"https://www.gnutls.org/\">https://www.gnutls.org/</a>.";
 
 /* Creates html with the current session information.
  */
@@ -479,10 +520,11 @@ static char *peer_print_info(gnutls_session_t session, int *ret_length,
 	const char *tmp;
 	unsigned char sesid[32];
 	size_t i, sesid_size;
-	char *http_buffer;
+	char *http_buffer, *desc;
 	gnutls_kx_algorithm_t kx_alg;
 	size_t len = 20 * 1024 + strlen(header);
 	char *crtinfo = NULL, *crtinfo_old = NULL;
+	gnutls_protocol_t version;
 	size_t ncrtinfo = 0;
 
 	if (verbose == 0) {
@@ -509,7 +551,7 @@ static char *peer_print_info(gnutls_session_t session, int *ret_length,
 		    gnutls_certificate_get_peers(session, &cert_list_size);
 
 		for (i = 0; i < cert_list_size; i++) {
-			gnutls_x509_crt_t cert;
+			gnutls_x509_crt_t cert = NULL;
 			gnutls_datum_t info;
 
 			if (gnutls_x509_crt_init(&cert) == 0 &&
@@ -539,6 +581,7 @@ static char *peer_print_info(gnutls_session_t session, int *ret_length,
 				crtinfo[ncrtinfo] = '\0';
 				gnutls_free(info.data);
 			}
+			gnutls_x509_crt_deinit(cert);
 		}
 	}
 
@@ -550,6 +593,8 @@ static char *peer_print_info(gnutls_session_t session, int *ret_length,
 
 	strcpy(http_buffer, HTTP_BEGIN);
 
+	version = gnutls_protocol_get_version(session);
+
 	/* print session_id */
 	sesid_size = sizeof(sesid);
 	gnutls_session_get_id(session, sesid, &sesid_size);
@@ -558,7 +603,7 @@ static char *peer_print_info(gnutls_session_t session, int *ret_length,
 		snprintf(tmp_buffer, tmp_buffer_size, "%.2X", sesid[i]);
 	snprintf(tmp_buffer, tmp_buffer_size, "</i></p>\n");
 	snprintf(tmp_buffer, tmp_buffer_size,
-		 "<h5>If your browser supports session resuming, then you should see the "
+		 "<h5>If your browser supports session resumption, then you should see the "
 		 "same session ID, when you press the <b>reload</b> button.</h5>\n");
 
 	/* Here unlike print_info() we use the kx algorithm to distinguish
@@ -589,39 +634,35 @@ static char *peer_print_info(gnutls_session_t session, int *ret_length,
 #endif
 
 #ifdef ENABLE_PSK
-	if (kx_alg == GNUTLS_KX_PSK) {
+	if (kx_alg == GNUTLS_KX_PSK && gnutls_psk_server_get_username(session)) {
 		snprintf(tmp_buffer, tmp_buffer_size,
 			 "<p>Connected as user '%s'.</p>\n",
 			 gnutls_psk_server_get_username(session));
 	}
 #endif
 
-#ifdef ENABLE_ANON
-	if (kx_alg == GNUTLS_KX_ANON_DH) {
-		snprintf(tmp_buffer, tmp_buffer_size,
-			 "<p> Connect using anonymous DH (prime of %d bits)</p>\n",
-			 gnutls_dh_get_prime_bits(session));
-	}
-#endif
-
-	if (kx_alg == GNUTLS_KX_DHE_RSA || kx_alg == GNUTLS_KX_DHE_DSS) {
-		snprintf(tmp_buffer, tmp_buffer_size,
-			 "Ephemeral DH using prime of <b>%d</b> bits.<br>\n",
-			 gnutls_dh_get_prime_bits(session));
-	}
 
 	/* print session information */
 	strcat(http_buffer, "<P>\n");
 
 	tmp =
-	    gnutls_protocol_get_name(gnutls_protocol_get_version(session));
+	    gnutls_protocol_get_name(version);
 	if (tmp == NULL)
 		tmp = str_unknown;
 	snprintf(tmp_buffer, tmp_buffer_size,
 		 "<TABLE border=1><TR><TD>Protocol version:</TD><TD>%s</TD></TR>\n",
 		 tmp);
 
-	if (gnutls_auth_get_type(session) == GNUTLS_CRD_CERTIFICATE) {
+	desc = gnutls_session_get_desc(session);
+	if (desc) {
+		snprintf(tmp_buffer, tmp_buffer_size,
+			"<TR><TD>Description:</TD><TD>%s</TD></TR>\n",
+			desc);
+		gnutls_free(desc);
+	}
+
+	if (gnutls_auth_get_type(session) == GNUTLS_CRD_CERTIFICATE &&
+	    gnutls_certificate_type_get(session) != GNUTLS_CRT_X509) {
 		tmp =
 		    gnutls_certificate_type_get_name
 		    (gnutls_certificate_type_get(session));
@@ -632,17 +673,42 @@ static char *peer_print_info(gnutls_session_t session, int *ret_length,
 			 tmp);
 	}
 
-	tmp = gnutls_kx_get_name(kx_alg);
-	if (tmp == NULL)
-		tmp = str_unknown;
-	snprintf(tmp_buffer, tmp_buffer_size,
-		 "<TR><TD>Key Exchange:</TD><TD>%s</TD></TR>\n", tmp);
+	if (version < GNUTLS_TLS1_3) {
+		tmp = gnutls_kx_get_name(kx_alg);
+		if (tmp == NULL)
+			tmp = str_unknown;
+		snprintf(tmp_buffer, tmp_buffer_size,
+			 "<TR><TD>Key Exchange:</TD><TD>%s</TD></TR>\n", tmp);
 
-	tmp = gnutls_compression_get_name(gnutls_compression_get(session));
-	if (tmp == NULL)
-		tmp = str_unknown;
-	snprintf(tmp_buffer, tmp_buffer_size,
-		 "<TR><TD>Compression</TD><TD>%s</TD></TR>\n", tmp);
+#ifdef ENABLE_ANON
+		if (kx_alg == GNUTLS_KX_ANON_DH) {
+			snprintf(tmp_buffer, tmp_buffer_size,
+				 "<p> Connect using anonymous DH (prime of %d bits)</p>\n",
+				 gnutls_dh_get_prime_bits(session));
+		}
+#endif
+
+		if (kx_alg == GNUTLS_KX_DHE_RSA || kx_alg == GNUTLS_KX_DHE_DSS) {
+			snprintf(tmp_buffer, tmp_buffer_size,
+				 "Ephemeral DH using prime of <b>%d</b> bits.<br>\n",
+				 gnutls_dh_get_prime_bits(session));
+		}
+
+		tmp = gnutls_compression_get_name(gnutls_compression_get(session));
+		if (tmp == NULL)
+			tmp = str_unknown;
+		snprintf(tmp_buffer, tmp_buffer_size,
+			 "<TR><TD>Compression</TD><TD>%s</TD></TR>\n", tmp);
+
+		tmp = gnutls_cipher_suite_get_name(kx_alg,
+						   gnutls_cipher_get(session),
+						   gnutls_mac_get(session));
+		if (tmp == NULL)
+			tmp = str_unknown;
+		snprintf(tmp_buffer, tmp_buffer_size,
+			 "<TR><TD>Ciphersuite</TD><TD>%s</TD></TR></p></TABLE>\n",
+			 tmp);
+	}
 
 	tmp = gnutls_cipher_get_name(gnutls_cipher_get(session));
 	if (tmp == NULL)
@@ -656,14 +722,6 @@ static char *peer_print_info(gnutls_session_t session, int *ret_length,
 	snprintf(tmp_buffer, tmp_buffer_size,
 		 "<TR><TD>MAC</TD><TD>%s</TD></TR>\n", tmp);
 
-	tmp = gnutls_cipher_suite_get_name(kx_alg,
-					   gnutls_cipher_get(session),
-					   gnutls_mac_get(session));
-	if (tmp == NULL)
-		tmp = str_unknown;
-	snprintf(tmp_buffer, tmp_buffer_size,
-		 "<TR><TD>Ciphersuite</TD><TD>%s</TD></TR></p></TABLE>\n",
-		 tmp);
 
 	if (crtinfo) {
 		snprintf(tmp_buffer, tmp_buffer_size,
@@ -821,7 +879,7 @@ int listen_socket(const char *name, int listen_port, int socktype)
 			yes = 1;
 			/* avoid listen on ipv6 addresses failing
 			 * because already listening on ipv4 addresses: */
-			setsockopt(s, IPPROTO_IPV6, IPV6_V6ONLY,
+			(void)setsockopt(s, IPPROTO_IPV6, IPV6_V6ONLY,
 				   (const void *) &yes, sizeof(yes));
 		}
 #endif
@@ -890,7 +948,7 @@ static void strip(char *data)
 
 	for (i = 0; i < len; i++) {
 		if (data[i] == '\r' && data[i + 1] == '\n'
-		    && data[i + 1] == 0) {
+		    && data[i + 2] == 0) {
 			data[i] = '\n';
 			data[i + 1] = 0;
 			break;
@@ -923,15 +981,27 @@ get_response(gnutls_session_t session, char *request,
 	if (http != 0) {
 		*response = peer_print_info(session, response_length, h);
 	} else {
+		int ret;
 		strip(request);
-		fprintf(stderr, "received: %s\n", request);
-		if (check_command(session, request)) {
-			*response = NULL;
-			*response_length = 0;
+		fprintf(stderr, "received cmd: %s\n", request);
+
+		ret = check_command(session, request, disable_client_cert);
+		if (ret > 0) {
+			*response = strdup("Successfully executed command\n");
+			if (*response == NULL) {
+				fprintf(stderr, "Memory error\n");
+				exit(1);
+			}
+			*response_length = strlen(*response);
 			return;
+		} else if (ret == 0) {
+			*response = strdup(request);
+			*response_length = ((*response) ? strlen(*response) : 0);
+		} else {
+			do {
+				ret = gnutls_alert_send(session, GNUTLS_AL_FATAL, GNUTLS_A_UNEXPECTED_MESSAGE);
+			} while(ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 		}
-		*response = strdup(request);
-		*response_length = ((*response) ? strlen(*response) : 0);
 	}
 
 	return;
@@ -981,6 +1051,7 @@ int main(int argc, char **argv)
 	char name[256];
 	int cert_set = 0;
 	unsigned use_static_dh_params = 0;
+	unsigned i;
 
 	cmd_parser(argc, argv);
 
@@ -1074,79 +1145,20 @@ int main(int argc, char **argv)
 			printf("Processed %d CRL(s).\n", ret);
 		}
 	}
-#ifdef ENABLE_OPENPGP
-	if (pgp_keyring != NULL) {
-		ret =
-		    gnutls_certificate_set_openpgp_keyring_file(cert_cred,
-								pgp_keyring,
-								GNUTLS_OPENPGP_FMT_BASE64);
-		if (ret < 0) {
-			fprintf(stderr,
-				"Error setting the OpenPGP keyring file\n");
-			GERR(ret);
+
+	if (x509_certfile_size > 0 && x509_keyfile_size > 0) {
+		for (i = 0; i < x509_certfile_size; i++) {
+			ret = gnutls_certificate_set_x509_key_file
+			    (cert_cred, x509_certfile[i], x509_keyfile[i], x509ctype);
+			if (ret < 0) {
+				fprintf(stderr,
+						"Error reading '%s' or '%s'\n",
+						x509_certfile[i], x509_keyfile[i]);
+				GERR(ret);
+				exit(1);
+			} else
+				cert_set = 1;
 		}
-	}
-
-	if (pgp_certfile != NULL && pgp_keyfile != NULL) {
-		if (HAVE_OPT(PGPSUBKEY))
-			ret = gnutls_certificate_set_openpgp_key_file2
-			    (cert_cred, pgp_certfile, pgp_keyfile,
-			     OPT_ARG(PGPSUBKEY),
-			     GNUTLS_OPENPGP_FMT_BASE64);
-		else
-			ret = gnutls_certificate_set_openpgp_key_file
-			    (cert_cred, pgp_certfile, pgp_keyfile,
-			     GNUTLS_OPENPGP_FMT_BASE64);
-
-		if (ret < 0) {
-			fprintf(stderr,
-				"Error[%d] while reading the OpenPGP key pair ('%s', '%s')\n",
-				ret, pgp_certfile, pgp_keyfile);
-			GERR(ret);
-		} else
-			cert_set = 1;
-	}
-#endif
-
-	if (x509_certfile != NULL && x509_keyfile != NULL) {
-		ret = gnutls_certificate_set_x509_key_file
-		    (cert_cred, x509_certfile, x509_keyfile, x509ctype);
-		if (ret < 0) {
-			fprintf(stderr,
-				"Error reading '%s' or '%s'\n",
-				x509_certfile, x509_keyfile);
-			GERR(ret);
-			exit(1);
-		} else
-			cert_set = 1;
-	}
-
-	if (x509_dsacertfile != NULL && x509_dsakeyfile != NULL) {
-		ret = gnutls_certificate_set_x509_key_file
-		    (cert_cred, x509_dsacertfile, x509_dsakeyfile,
-		     x509ctype);
-		if (ret < 0) {
-			fprintf(stderr,
-				"Error reading '%s' or '%s'\n",
-				x509_dsacertfile, x509_dsakeyfile);
-			GERR(ret);
-			exit(1);
-		} else
-			cert_set = 1;
-	}
-
-	if (x509_ecccertfile != NULL && x509_ecckeyfile != NULL) {
-		ret = gnutls_certificate_set_x509_key_file
-		    (cert_cred, x509_ecccertfile, x509_ecckeyfile,
-		     x509ctype);
-		if (ret < 0) {
-			fprintf(stderr,
-				"Error reading '%s' or '%s'\n",
-				x509_ecccertfile, x509_ecckeyfile);
-			GERR(ret);
-			exit(1);
-		} else
-			cert_set = 1;
 	}
 
 	if (cert_set == 0) {
@@ -1155,11 +1167,16 @@ int main(int argc, char **argv)
 	}
 
 	/* OCSP status-request TLS extension */
-	if (status_response_ocsp) {
-		if (gnutls_certificate_set_ocsp_status_request_file
-		    (cert_cred, status_response_ocsp, 0) < 0) {
+	if (HAVE_OPT(IGNORE_OCSP_RESPONSE_ERRORS))
+		gnutls_certificate_set_flags(cert_cred, GNUTLS_CERTIFICATE_SKIP_OCSP_RESPONSE_CHECK);
+
+	for (i = 0; i < ocsp_responses_size; i++ ) {
+		ret = gnutls_certificate_set_ocsp_status_request_file
+		    (cert_cred, ocsp_responses[i], 0);
+		if (ret < 0) {
 			fprintf(stderr,
-				"Cannot set OCSP status request file: %s\n",
+				"Cannot set OCSP status request file: %s: %s\n",
+				ocsp_responses[i],
 				gnutls_strerror(ret));
 			exit(1);
 		}
@@ -1251,10 +1268,18 @@ int main(int argc, char **argv)
 	}
 #endif
 
-#ifdef ENABLE_SESSION_TICKETS
 	if (noticket == 0)
 		gnutls_session_ticket_key_generate(&session_ticket_key);
-#endif
+
+	if (earlydata) {
+		ret = gnutls_anti_replay_init(&anti_replay);
+		if (ret < 0) {
+			fprintf(stderr, "Error while initializing anti-replay: %s\n", gnutls_strerror(ret));
+			exit(1);
+		}
+		gnutls_anti_replay_set_add_function(anti_replay, anti_replay_db_add);
+		gnutls_anti_replay_set_ptr(anti_replay, NULL);
+	}
 
 	if (HAVE_OPT(MTU))
 		mtu = OPT_VALUE_MTU;
@@ -1290,7 +1315,7 @@ static void retry_handshake(listener_item *j)
 		do {
 			ret = gnutls_alert_send_appropriate(j->tls_session, r);
 		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
-		j->no_close = 1;
+		j->close_ok = 0;
 	} else if (r == 0) {
 		if (gnutls_session_is_resumed(j->tls_session) != 0 && verbose != 0)
 			printf("*** This is a resumed session\n");
@@ -1306,16 +1331,25 @@ static void retry_handshake(listener_item *j)
 #endif
 
 			print_info(j->tls_session, verbose, verbose);
+
+			if (HAVE_OPT(KEYMATEXPORT))
+				print_key_material(j->tls_session,
+						   OPT_ARG(KEYMATEXPORT),
+						   HAVE_OPT(KEYMATEXPORTSIZE) ?
+						   OPT_VALUE_KEYMATEXPORTSIZE :
+						   20);
 		}
 
+		j->close_ok = 1;
 		j->handshake_ok = 1;
 	}
 }
 
 static void try_rehandshake(listener_item *j)
 {
-int r, ret;
+	int r, ret;
 	fprintf(stderr, "*** Received hello message\n");
+
 	do {
 		r = gnutls_handshake(j->tls_session);
 	} while (r == GNUTLS_E_INTERRUPTED || r == GNUTLS_E_AGAIN);
@@ -1327,6 +1361,7 @@ int r, ret;
 		fprintf(stderr, "Error in rehandshake: %s\n", gnutls_strerror(r));
 		j->http_state = HTTP_STATE_CLOSING;
 	} else {
+		j->close_ok = 1;
 		j->http_state = HTTP_STATE_REQUEST;
 	}
 }
@@ -1416,6 +1451,7 @@ static void tcp_server(const char *name, int port)
 				if (accept_fd < 0) {
 					perror("accept()");
 				} else {
+					char timebuf[SIMPLE_CTIME_BUF_SIZE];
 					time_t tt = time(0);
 					char *ctt;
 
@@ -1434,10 +1470,10 @@ static void tcp_server(const char *name, int port)
 					    (j->tls_session, accept_fd);
 					set_read_funcs(j->tls_session);
 					j->handshake_ok = 0;
-					j->no_close = 0;
+					j->close_ok = 0;
 
 					if (verbose != 0) {
-						ctt = ctime(&tt);
+						ctt = simple_ctime(&tt, timebuf);
 						ctt[strlen(ctt) - 1] = 0;
 
 						printf
@@ -1465,11 +1501,27 @@ static void tcp_server(const char *name, int port)
 				}
 
 				if (j->handshake_ok == 1) {
-					r = gnutls_record_recv(j->
-							       tls_session,
-							       buf,
-							       MIN(sizeof(buf),
-								   SMALL_READ_TEST));
+					int earlydata_read = 0;
+					if (earlydata && !j->earlydata_eof) {
+						r = gnutls_record_recv_early_data(j->
+										  tls_session,
+										  buf,
+										  MIN(sizeof(buf),
+										      SMALL_READ_TEST));
+						if (r == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+							j->earlydata_eof = 1;
+						}
+						if (r == 0) {
+							earlydata_read = 1;
+						}
+					}
+					if (!earlydata_read) {
+						r = gnutls_record_recv(j->
+								       tls_session,
+								       buf,
+								       MIN(sizeof(buf),
+									   SMALL_READ_TEST));
+					}
 					if (r == GNUTLS_E_INTERRUPTED || r == GNUTLS_E_AGAIN) {
 						/* do nothing */
 					} else if (r <= 0) {
@@ -1488,7 +1540,7 @@ static void tcp_server(const char *name, int port)
 									ret = gnutls_alert_send_appropriate(j->tls_session, r);
 								} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 								GERR(r);
-								j->no_close = 1;
+								j->close_ok = 0;
 							}
 						}
 					} else {
@@ -1588,6 +1640,7 @@ static void tcp_server(const char *name, int port)
 								j->http_state = HTTP_STATE_REQUEST;
 								free(j->
 								     http_response);
+								j->http_response = NULL;
 								j->response_length = 0;
 								j->request_length = 0;
 								j->http_request[0] = 0;
@@ -1632,6 +1685,9 @@ static void tcp_server(const char *name, int port)
 	if (noticket == 0)
 		gnutls_free(session_ticket_key.data);
 
+	if (earlydata)
+		gnutls_anti_replay_deinit(anti_replay);
+
 	if (nodb == 0)
 		wrap_db_deinit();
 	gnutls_global_deinit();
@@ -1660,6 +1716,7 @@ static void cmd_parser(int argc, char **argv)
 
 	nodb = HAVE_OPT(NODB);
 	noticket = HAVE_OPT(NOTICKET);
+	earlydata = HAVE_OPT(EARLYDATA);
 
 	if (HAVE_OPT(ECHO))
 		http = 0;
@@ -1676,34 +1733,30 @@ static void cmd_parser(int argc, char **argv)
 	if (HAVE_OPT(DHPARAMS))
 		dh_params_file = OPT_ARG(DHPARAMS);
 
-	if (HAVE_OPT(X509KEYFILE))
-		x509_keyfile = OPT_ARG(X509KEYFILE);
-	if (HAVE_OPT(X509CERTFILE))
-		x509_certfile = OPT_ARG(X509CERTFILE);
+	if (HAVE_OPT(ALPN)) {
+		alpn_protos = STACKLST_OPT(ALPN);
+		alpn_protos_size = STACKCT_OPT(ALPN);
+	}
 
-	if (HAVE_OPT(X509DSAKEYFILE))
-		x509_dsakeyfile = OPT_ARG(X509DSAKEYFILE);
-	if (HAVE_OPT(X509DSACERTFILE))
-		x509_dsacertfile = OPT_ARG(X509DSACERTFILE);
+	if (HAVE_OPT(X509KEYFILE)) {
+		x509_keyfile = STACKLST_OPT(X509KEYFILE);
+		x509_keyfile_size = STACKCT_OPT(X509KEYFILE);
+	}
 
+	if (HAVE_OPT(X509CERTFILE)) {
+		x509_certfile = STACKLST_OPT(X509CERTFILE);
+		x509_certfile_size = STACKCT_OPT(X509CERTFILE);
+	}
 
-	if (HAVE_OPT(X509ECCKEYFILE))
-		x509_ecckeyfile = OPT_ARG(X509ECCKEYFILE);
-	if (HAVE_OPT(X509ECCCERTFILE))
-		x509_ecccertfile = OPT_ARG(X509ECCCERTFILE);
+	if (x509_certfile_size != x509_keyfile_size) {
+		fprintf(stderr, "The certificate number provided (%u) doesn't match the keys (%u)\n",
+			x509_certfile_size, x509_keyfile_size);
+	}
 
 	if (HAVE_OPT(X509CAFILE))
 		x509_cafile = OPT_ARG(X509CAFILE);
 	if (HAVE_OPT(X509CRLFILE))
 		x509_crlfile = OPT_ARG(X509CRLFILE);
-
-	if (HAVE_OPT(PGPKEYFILE))
-		pgp_keyfile = OPT_ARG(PGPKEYFILE);
-	if (HAVE_OPT(PGPCERTFILE))
-		pgp_certfile = OPT_ARG(PGPCERTFILE);
-
-	if (HAVE_OPT(PGPKEYRING))
-		pgp_keyring = OPT_ARG(PGPKEYRING);
 
 	if (HAVE_OPT(SRPPASSWD))
 		srp_passwd = OPT_ARG(SRPPASSWD);
@@ -1713,8 +1766,10 @@ static void cmd_parser(int argc, char **argv)
 	if (HAVE_OPT(PSKPASSWD))
 		psk_passwd = OPT_ARG(PSKPASSWD);
 
-	if (HAVE_OPT(OCSP_RESPONSE))
-		status_response_ocsp = OPT_ARG(OCSP_RESPONSE);
+	if (HAVE_OPT(OCSP_RESPONSE)) {
+		ocsp_responses = STACKLST_OPT(OCSP_RESPONSE);
+		ocsp_responses_size = STACKCT_OPT(OCSP_RESPONSE);
+	}
 
 	if (HAVE_OPT(SNI_HOSTNAME))
 		sni_hostname = OPT_ARG(SNI_HOSTNAME);
@@ -1726,50 +1781,86 @@ static void cmd_parser(int argc, char **argv)
 
 /* session resuming support */
 
-#define SESSION_ID_SIZE 32
-#define SESSION_DATA_SIZE 1024
+#define SESSION_ID_SIZE 128
+#define SESSION_DATA_SIZE (16*1024)
 
 typedef struct {
-	char session_id[SESSION_ID_SIZE];
+	unsigned char session_id[SESSION_ID_SIZE];
 	unsigned int session_id_size;
 
-	char session_data[SESSION_DATA_SIZE];
-	unsigned int session_data_size;
+	gnutls_datum_t session_data;
 } CACHE;
 
 static CACHE *cache_db;
-int cache_db_ptr = 0;
+static int cache_db_ptr;
+static int cache_db_alloc;
 
 static void wrap_db_init(void)
 {
-	/* allocate cache_db */
-	cache_db = calloc(1, ssl_session_cache * sizeof(CACHE));
 }
 
 static void wrap_db_deinit(void)
 {
+	int i;
+
+	for (i = 0; i < cache_db_ptr; i++)
+		free(cache_db[i].session_data.data);
+	free(cache_db);
 }
 
 static int
 wrap_db_store(void *dbf, gnutls_datum_t key, gnutls_datum_t data)
 {
-
-	if (cache_db == NULL)
-		return -1;
+	int i;
+	time_t now = time(0);
 
 	if (key.size > SESSION_ID_SIZE)
-		return -1;
+		return GNUTLS_E_DB_ERROR;
 	if (data.size > SESSION_DATA_SIZE)
-		return -1;
+		return GNUTLS_E_DB_ERROR;
 
-	memcpy(cache_db[cache_db_ptr].session_id, key.data, key.size);
-	cache_db[cache_db_ptr].session_id_size = key.size;
+	if (cache_db_ptr < cache_db_alloc)
+		i = cache_db_ptr++;
+	else {
+		/* find empty or expired slot to store the new entry */
+		for (i = 0; i < cache_db_ptr; i++)
+			if (cache_db[i].session_id_size == 0 ||
+			    !(now <
+			      gnutls_db_check_entry_expire_time(&cache_db[i].
+								session_data)))
+				break;
 
-	memcpy(cache_db[cache_db_ptr].session_data, data.data, data.size);
-	cache_db[cache_db_ptr].session_data_size = data.size;
+		if (i == cache_db_ptr) {
+			/* try to allocate additional slots */
+			if (cache_db_ptr == ssl_session_cache) {
+				fprintf(stderr,
+					"Error: too many sessions\n");
+				return GNUTLS_E_DB_ERROR;
+			}
+			cache_db_alloc = cache_db_alloc * 2 + 1;
+			cache_db = realloc(cache_db,
+					   cache_db_alloc * sizeof(CACHE));
+			if (!cache_db)
+				return GNUTLS_E_MEMORY_ERROR;
+			memset(cache_db + cache_db_ptr, 0,
+			       (cache_db_alloc - cache_db_ptr) * sizeof(CACHE));
+			cache_db_ptr++;
+		}
+	}
 
-	cache_db_ptr++;
-	cache_db_ptr %= ssl_session_cache;
+	memcpy(cache_db[i].session_id, key.data, key.size);
+	cache_db[i].session_id_size = key.size;
+
+	/* resize the data slot if needed */
+	if (cache_db[i].session_data.size < data.size) {
+		cache_db[i].session_data.data =
+			realloc(cache_db[i].session_data.data,
+				data.size);
+		if (!cache_db[i].session_data.data)
+			return GNUTLS_E_MEMORY_ERROR;
+	}
+	memcpy(cache_db[i].session_data.data, data.data, data.size);
+	cache_db[i].session_data.size = data.size;
 
 	return 0;
 }
@@ -1777,22 +1868,22 @@ wrap_db_store(void *dbf, gnutls_datum_t key, gnutls_datum_t data)
 static gnutls_datum_t wrap_db_fetch(void *dbf, gnutls_datum_t key)
 {
 	gnutls_datum_t res = { NULL, 0 };
+	time_t now = time(0);
 	int i;
 
-	if (cache_db == NULL)
-		return res;
-
-	for (i = 0; i < ssl_session_cache; i++) {
+	for (i = 0; i < cache_db_ptr; i++) {
 		if (key.size == cache_db[i].session_id_size &&
 		    memcmp(key.data, cache_db[i].session_id,
-			   key.size) == 0) {
-			res.size = cache_db[i].session_data_size;
+			   key.size) == 0 &&
+		    now < gnutls_db_check_entry_expire_time(&cache_db[i].
+							    session_data)) {
+			res.size = cache_db[i].session_data.size;
 
-			res.data = gnutls_malloc(res.size);
+			res.data = malloc(res.size);
 			if (res.data == NULL)
 				return res;
 
-			memcpy(res.data, cache_db[i].session_data,
+			memcpy(res.data, cache_db[i].session_data.data,
 			       res.size);
 
 			return res;
@@ -1805,20 +1896,37 @@ static int wrap_db_delete(void *dbf, gnutls_datum_t key)
 {
 	int i;
 
-	if (cache_db == NULL)
-		return -1;
-
-	for (i = 0; i < ssl_session_cache; i++) {
-		if (key.size == (unsigned int) cache_db[i].session_id_size
-		    && memcmp(key.data, cache_db[i].session_id,
-			      key.size) == 0) {
+	for (i = 0; i < cache_db_ptr; i++) {
+		if (key.size == cache_db[i].session_id_size &&
+		    memcmp(key.data, cache_db[i].session_id,
+			   key.size) == 0) {
 
 			cache_db[i].session_id_size = 0;
-			cache_db[i].session_data_size = 0;
+			free(cache_db[i].session_data.data);
+			cache_db[i].session_data.data = NULL;
+			cache_db[i].session_data.size = 0;
 
 			return 0;
 		}
 	}
 
-	return -1;
+	return GNUTLS_E_DB_ERROR;
+}
+
+static int
+anti_replay_db_add(void *dbf, time_t exp, const gnutls_datum_t *key, const gnutls_datum_t *data)
+{
+	time_t now = time(0);
+	int i;
+
+	for (i = 0; i < cache_db_ptr; i++) {
+		if (key->size == cache_db[i].session_id_size &&
+		    memcmp(key->data, cache_db[i].session_id,
+			   key->size) == 0 &&
+		    now < gnutls_db_check_entry_expire_time(&cache_db[i].
+							    session_data))
+			return GNUTLS_E_DB_ENTRY_EXISTS;
+	}
+
+	return wrap_db_store(dbf, *key, *data);
 }

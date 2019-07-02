@@ -64,7 +64,7 @@ static void tls_log_func(int level, const char *str)
 #define MAX_BUF 1024
 #define MSG "Hello TLS"
 
-static void client(int sd, const char *prio)
+static void client(int sd, const char *prio, unsigned exp_hint)
 {
 	int ret, ii;
 	gnutls_session_t session;
@@ -112,10 +112,12 @@ static void client(int sd, const char *prio)
 	}
 
 	/* check the hint */
-	hint = gnutls_psk_client_get_hint(session);
-	if (hint == NULL || strcmp(hint, "hint") != 0) {
-		fail("client: hint is not the expected: %s\n", gnutls_psk_client_get_hint(session));
-		goto end;
+	if (exp_hint) {
+		hint = gnutls_psk_client_get_hint(session);
+		if (hint == NULL || strcmp(hint, "hint") != 0) {
+			fail("client: hint is not the expected: %s\n", gnutls_psk_client_get_hint(session));
+			goto end;
+		}
 	}
 
 	gnutls_record_send(session, MSG, strlen(MSG));
@@ -274,11 +276,13 @@ char buffer[MAX_BUF + 1];
 }
 
 static
-void run_test(const char *prio)
+void run_test(const char *prio, unsigned exp_hint)
 {
 	pid_t child;
 	int err;
 	int sockets[2];
+
+	success("trying with %s\n", prio);
 
 	err = socketpair(AF_UNIX, SOCK_STREAM, 0, sockets);
 	if (err == -1) {
@@ -297,10 +301,14 @@ void run_test(const char *prio)
 	if (child) {
 		int status;
 		/* parent */
+		close(sockets[1]);
 		server(sockets[0], prio);
 		wait(&status);
+		check_wait_status(status);
 	} else {
-		client(sockets[1], prio);
+		close(sockets[0]);
+		client(sockets[1], prio, exp_hint);
+		exit(0);
 	}
 }
 
@@ -308,9 +316,19 @@ void doit(void)
 {
 	generate_dh_params();
 
-	run_test("NORMAL:-KX-ALL:+PSK");
-	run_test("NORMAL:-KX-ALL:+ECDHE-PSK");
-	run_test("NORMAL:-KX-ALL:+DHE-PSK");
+	run_test("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+PSK", 1);
+	run_test("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+ECDHE-PSK", 1);
+	run_test("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+DHE-PSK", 1);
+
+	run_test("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK", 0);
+	run_test("NORMAL:-VERS-ALL:+VERS-TLS1.3:-GROUP-ALL:+GROUP-FFDHE2048:+DHE-PSK", 0);
+	run_test("NORMAL:-VERS-ALL:+VERS-TLS1.3:-GROUP-ALL:+GROUP-SECP256R1:+ECDHE-PSK", 0);
+	/* the following should work once we support PSK without DH */
+	run_test("NORMAL:-VERS-ALL:+VERS-TLS1.3:-GROUP-ALL:+PSK", 0);
+
+	run_test("NORMAL:-KX-ALL:+PSK", 0);
+	run_test("NORMAL:-KX-ALL:+ECDHE-PSK", 0);
+	run_test("NORMAL:-KX-ALL:+DHE-PSK", 0);
 
 	gnutls_dh_params_deinit(dh_params);
 }

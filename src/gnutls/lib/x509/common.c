@@ -17,7 +17,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -30,6 +30,7 @@
 #include <x509.h>
 #include <num.h>
 #include <x509_b64.h>
+#include <c-strcase.h>
 #include "x509_int.h"
 #include "extras/hex.h"
 #include <common.h>
@@ -130,6 +131,14 @@ static const struct oid_to_string _oid2str[] = {
 	/* rfc3920 section 5.1.1 */
 	ENTRY("1.3.6.1.5.5.7.8.5", "XmppAddr", NULL, ASN1_ETYPE_UTF8_STRING),
 
+	/* Russian things: https://cdnimg.rg.ru/pril/66/91/91/23041_pril.pdf */
+	/* Main state registration number */
+	ENTRY("1.2.643.100.1", "OGRN", NULL, ASN1_ETYPE_NUMERIC_STRING),
+	/* Individual insurance account number */
+	ENTRY("1.2.643.100.3", "SNILS", NULL, ASN1_ETYPE_NUMERIC_STRING),
+	/* VAT identification number */
+	ENTRY("1.2.643.3.131.1.1", "INN", NULL, ASN1_ETYPE_NUMERIC_STRING),
+
 	{NULL, 0, NULL, 0, NULL, 0}
 };
 
@@ -156,7 +165,7 @@ const char *_gnutls_ldap_string_to_oid(const char *str, unsigned str_len)
 	do {
 		if ((_oid2str[i].ldap_desc != NULL) &&
 		    (str_len == _oid2str[i].ldap_desc_size) &&
-		    (strncasecmp(_oid2str[i].ldap_desc, str, str_len) ==
+		    (c_strncasecmp(_oid2str[i].ldap_desc, str, str_len) ==
 		     0))
 			return _oid2str[i].oid;
 		i++;
@@ -432,7 +441,7 @@ _gnutls_x509_dn_to_string(const char *oid, void *value,
 {
 	const struct oid_to_string *oentry;
 	int ret;
-	gnutls_datum_t tmp;
+	gnutls_datum_t tmp = {NULL, 0};
 
 	if (value == NULL || value_size <= 0) {
 		gnutls_assert();
@@ -624,6 +633,9 @@ _gnutls_x509_decode_string(unsigned int etype,
 	unsigned int str_size, len;
 	gnutls_datum_t td;
 
+	output->data = NULL;
+	output->size = 0;
+
 	if (allow_ber)
 		ret =
 		    asn1_decode_simple_ber(etype, der, der_size, &str, &str_size, NULL);
@@ -695,7 +707,6 @@ x509_read_value(ASN1_TYPE c, const char *root,
 
 	if (result != ASN1_MEM_ERROR) {
 		if (result != ASN1_SUCCESS || allow_null == 0 || len != 0) {
-			gnutls_assert();
 			result = _gnutls_asn2err(result);
 			return result;
 		}
@@ -936,7 +947,7 @@ _gnutls_x509_der_encode_and_copy(ASN1_TYPE src, const char *src_name,
 				 int str)
 {
 	int result;
-	gnutls_datum_t encoded;
+	gnutls_datum_t encoded = {NULL, 0};
 
 	result = _gnutls_x509_der_encode(src, src_name, &encoded, str);
 
@@ -1032,17 +1043,15 @@ _asnstr_append_name(char *name, size_t name_size, const char *part1,
 int
 _gnutls_x509_encode_and_copy_PKI_params(ASN1_TYPE dst,
 					const char *dst_name,
-					gnutls_pk_algorithm_t
-					pk_algorithm,
 					gnutls_pk_params_st * params)
 {
-	const char *pk;
+	const char *oid;
 	gnutls_datum_t der = { NULL, 0 };
 	int result;
 	char name[128];
 
-	pk = gnutls_pk_get_oid(pk_algorithm);
-	if (pk == NULL) {
+	oid = gnutls_pk_get_oid(params->algo);
+	if (oid == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_PK_ALGORITHM;
 	}
@@ -1052,14 +1061,14 @@ _gnutls_x509_encode_and_copy_PKI_params(ASN1_TYPE dst,
 	_asnstr_append_name(name, sizeof(name), dst_name,
 			    ".algorithm.algorithm");
 
-	result = asn1_write_value(dst, name, pk, 1);
+	result = asn1_write_value(dst, name, oid, 1);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
 
 	result =
-	    _gnutls_x509_write_pubkey_params(pk_algorithm, params, &der);
+	    _gnutls_x509_write_pubkey_params(params, &der);
 	if (result < 0) {
 		gnutls_assert();
 		return result;
@@ -1076,7 +1085,7 @@ _gnutls_x509_encode_and_copy_PKI_params(ASN1_TYPE dst,
 		return _gnutls_asn2err(result);
 	}
 
-	result = _gnutls_x509_write_pubkey(pk_algorithm, params, &der);
+	result = _gnutls_x509_write_pubkey(params, &der);
 	if (result < 0) {
 		gnutls_assert();
 		return result;
@@ -1102,8 +1111,7 @@ _gnutls_x509_encode_and_copy_PKI_params(ASN1_TYPE dst,
  */
 int
 _gnutls_x509_encode_PKI_params(gnutls_datum_t * der,
-			       gnutls_pk_algorithm_t
-			       pk_algorithm, gnutls_pk_params_st * params)
+			       gnutls_pk_params_st * params)
 {
 	int ret;
 	ASN1_TYPE tmp;
@@ -1117,7 +1125,6 @@ _gnutls_x509_encode_PKI_params(gnutls_datum_t * der,
 
 	ret = _gnutls_x509_encode_and_copy_PKI_params(tmp,
 						      "tbsCertificate.subjectPublicKeyInfo",
-						      pk_algorithm,
 						      params);
 	if (ret != ASN1_SUCCESS) {
 		gnutls_assert();
@@ -1141,16 +1148,15 @@ _gnutls_x509_encode_PKI_params(gnutls_datum_t * der,
  */
 int
 _gnutls_x509_get_pk_algorithm(ASN1_TYPE src, const char *src_name,
+			      gnutls_ecc_curve_t *curve,
 			      unsigned int *bits)
 {
 	int result;
 	int algo;
 	char oid[64];
 	int len;
-	gnutls_pk_params_st params;
+	gnutls_ecc_curve_t lcurve = GNUTLS_ECC_CURVE_INVALID;
 	char name[128];
-
-	gnutls_pk_params_init(&params);
 
 	_asnstr_append_name(name, sizeof(name), src_name,
 			    ".algorithm.algorithm");
@@ -1162,12 +1168,15 @@ _gnutls_x509_get_pk_algorithm(ASN1_TYPE src, const char *src_name,
 		return _gnutls_asn2err(result);
 	}
 
-	algo = gnutls_oid_to_pk(oid);
+	algo = _gnutls_oid_to_pk_and_curve(oid, &lcurve);
 	if (algo == GNUTLS_PK_UNKNOWN) {
 		_gnutls_debug_log
 		    ("%s: unknown public key algorithm: %s\n", __func__,
 		     oid);
 	}
+
+	if (curve)
+		*curve = lcurve;
 
 	if (bits == NULL) {
 		return algo;
@@ -1175,13 +1184,20 @@ _gnutls_x509_get_pk_algorithm(ASN1_TYPE src, const char *src_name,
 
 	/* Now read the parameters' bits 
 	 */
-	result = _gnutls_get_asn_mpis(src, src_name, &params);
-	if (result < 0)
-		return gnutls_assert_val(result);
+	if (lcurve != GNUTLS_ECC_CURVE_INVALID) { /* curve present */
+		bits[0] = gnutls_ecc_curve_get_size(lcurve)*8;
+	} else {
+		gnutls_pk_params_st params;
+		gnutls_pk_params_init(&params);
 
-	bits[0] = pubkey_to_bits(algo, &params);
+		result = _gnutls_get_asn_mpis(src, src_name, &params);
+		if (result < 0)
+			return gnutls_assert_val(result);
 
-	gnutls_pk_params_release(&params);
+		bits[0] = pubkey_to_bits(&params);
+		gnutls_pk_params_release(&params);
+	}
+
 	return algo;
 }
 
@@ -1240,21 +1256,53 @@ int
 _gnutls_x509_get_signature_algorithm(ASN1_TYPE src, const char *src_name)
 {
 	int result;
-	gnutls_datum_t sa;
+	char name[128];
+	gnutls_datum_t sa = {NULL, 0};
 
-	/* Read the signature algorithm. Note that parameters are not
-	 * read. They will be read from the issuer's certificate if needed.
-	 */
-	result = _gnutls_x509_read_value(src, src_name, &sa);
+	_gnutls_str_cpy(name, sizeof(name), src_name);
+	_gnutls_str_cat(name, sizeof(name), ".algorithm");
+
+	/* Read the signature algorithm */
+	result = _gnutls_x509_read_value(src, name, &sa);
 
 	if (result < 0) {
 		gnutls_assert();
 		return result;
 	}
 
-	result = gnutls_oid_to_sign((char *) sa.data);
+	/* Read the signature parameters. Unless the algorithm is
+	 * RSA-PSS, parameters are not read. They will be read from
+	 * the issuer's certificate if needed.
+	 */
+	if (sa.data && strcmp ((char *) sa.data, PK_PKIX1_RSA_PSS_OID) == 0) {
+		gnutls_datum_t der = {NULL, 0};
+		gnutls_x509_spki_st params;
+
+		_gnutls_str_cpy(name, sizeof(name), src_name);
+		_gnutls_str_cat(name, sizeof(name), ".parameters");
+
+		result = _gnutls_x509_read_value(src, name, &der);
+		if (result < 0) {
+			_gnutls_free_datum(&sa);
+			return gnutls_assert_val(result);
+		}
+
+		result = _gnutls_x509_read_rsa_pss_params(der.data, der.size,
+							  &params);
+		_gnutls_free_datum(&der);
+
+		if (result == 0)
+			result = gnutls_pk_to_sign(params.pk, params.rsa_pss_dig);
+	} else if (sa.data) {
+		result = gnutls_oid_to_sign((char *) sa.data);
+	} else {
+		result = GNUTLS_E_UNKNOWN_ALGORITHM;
+	}
 
 	_gnutls_free_datum(&sa);
+
+	if (result == GNUTLS_SIGN_UNKNOWN)
+		result = GNUTLS_E_UNKNOWN_ALGORITHM;
 
 	return result;
 }
@@ -1605,7 +1653,7 @@ int x509_crt_to_raw_pubkey(gnutls_x509_crt_t crt,
 }
 
 /* Converts an X.509 certificate to subjectPublicKeyInfo */
-int x509_raw_crt_to_raw_pubkey(const gnutls_datum_t * cert,
+int _gnutls_x509_raw_crt_to_raw_pubkey(const gnutls_datum_t * cert,
 			   gnutls_datum_t * rpubkey)
 {
 	gnutls_x509_crt_t crt = NULL;
@@ -1630,11 +1678,15 @@ int x509_raw_crt_to_raw_pubkey(const gnutls_datum_t * cert,
 
 unsigned
 _gnutls_check_valid_key_id(gnutls_datum_t *key_id,
-			   gnutls_x509_crt_t cert, time_t now)
+			   gnutls_x509_crt_t cert, time_t now,
+			   unsigned *has_ski)
 {
 	uint8_t id[MAX_KEY_ID_SIZE];
 	size_t id_size;
 	unsigned result = 0;
+
+	if (has_ski)
+		*has_ski = 0;
 
 	if (now > gnutls_x509_crt_get_expiration_time(cert) ||
 	    now < gnutls_x509_crt_get_activation_time(cert)) {
@@ -1648,6 +1700,9 @@ _gnutls_check_valid_key_id(gnutls_datum_t *key_id,
 		gnutls_assert();
 		goto out;
 	}
+
+	if (has_ski)
+		*has_ski = 1;
 
 	if (id_size == key_id->size && !memcmp(id, key_id->data, id_size))
 		result = 1;
@@ -1776,4 +1831,91 @@ int _gnutls_check_if_sorted(gnutls_x509_crt_t * crt, int nr)
 
 cleanup:
 	return ret;
+}
+
+/**
+ * gnutls_gost_paramset_get_name:
+ * @param: is a GOST 28147 param set
+ *
+ * Convert a #gnutls_gost_paramset_t value to a string.
+ *
+ * Returns: a string that contains the name of the specified GOST param set,
+ *   or %NULL.
+ *
+ * Since: 3.6.3
+ **/
+const char *gnutls_gost_paramset_get_name(gnutls_gost_paramset_t param)
+{
+	switch(param) {
+	case GNUTLS_GOST_PARAMSET_TC26_Z:
+		return "TC26-Z";
+	case GNUTLS_GOST_PARAMSET_CP_A:
+		return "CryptoPro-A";
+	case GNUTLS_GOST_PARAMSET_CP_B:
+		return "CryptoPro-B";
+	case GNUTLS_GOST_PARAMSET_CP_C:
+		return "CryptoPro-C";
+	case GNUTLS_GOST_PARAMSET_CP_D:
+		return "CryptoPro-D";
+	default:
+		gnutls_assert();
+		return "Unknown";
+	}
+}
+
+/**
+ * gnutls_gost_paramset_get_oid:
+ * @param: is a GOST 28147 param set
+ *
+ * Convert a #gnutls_gost_paramset_t value to its object identifier.
+ *
+ * Returns: a string that contains the object identifier of the specified GOST
+ *   param set, or %NULL.
+ *
+ * Since: 3.6.3
+ **/
+const char *gnutls_gost_paramset_get_oid(gnutls_gost_paramset_t param)
+{
+	switch(param) {
+	case GNUTLS_GOST_PARAMSET_TC26_Z:
+		return GOST28147_89_TC26Z_OID;
+	case GNUTLS_GOST_PARAMSET_CP_A:
+		return GOST28147_89_CPA_OID;
+	case GNUTLS_GOST_PARAMSET_CP_B:
+		return GOST28147_89_CPB_OID;
+	case GNUTLS_GOST_PARAMSET_CP_C:
+		return GOST28147_89_CPC_OID;
+	case GNUTLS_GOST_PARAMSET_CP_D:
+		return GOST28147_89_CPD_OID;
+	default:
+		gnutls_assert();
+		return NULL;
+	}
+}
+
+/**
+ * gnutls_oid_to_gost_paramset:
+ * @oid: is an object identifier
+ *
+ * Converts a textual object identifier to a #gnutls_gost_paramset_t value.
+ *
+ * Returns: a #gnutls_gost_paramset_get_oid of the specified GOST 28147
+ *   param st, or %GNUTLS_GOST_PARAMSET_UNKNOWN on failure.
+ *
+ * Since: 3.6.3
+ **/
+gnutls_gost_paramset_t gnutls_oid_to_gost_paramset(const char *oid)
+{
+	if (!strcmp(oid, GOST28147_89_TC26Z_OID))
+		return GNUTLS_GOST_PARAMSET_TC26_Z;
+	else if (!strcmp(oid, GOST28147_89_CPA_OID))
+		return GNUTLS_GOST_PARAMSET_CP_A;
+	else if (!strcmp(oid, GOST28147_89_CPB_OID))
+		return GNUTLS_GOST_PARAMSET_CP_B;
+	else if (!strcmp(oid, GOST28147_89_CPC_OID))
+		return GNUTLS_GOST_PARAMSET_CP_C;
+	else if (!strcmp(oid, GOST28147_89_CPD_OID))
+		return GNUTLS_GOST_PARAMSET_CP_D;
+	else
+		return gnutls_assert_val(GNUTLS_GOST_PARAMSET_UNKNOWN);
 }

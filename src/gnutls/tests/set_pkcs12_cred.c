@@ -40,11 +40,9 @@ typedef struct {
 } files_st;
 
 files_st files[] = {
-#ifndef ENABLE_FIPS140
 	{"client.p12", "foobar"},
 	{"cert-ca.p12", "1234"}, /* 2 certs, one is a CA */
 	{"pkcs12_2certs.p12", ""}, /* 2 certs, on is unrelated */
-#endif
 	{NULL, NULL}
 };
 
@@ -55,6 +53,10 @@ void doit(void)
 	unsigned int i;
 	char file[512];
 	int ret;
+
+	if (gnutls_fips140_mode_enabled()) {
+		exit(77);
+	}
 
 	ret = global_init();
 	if (ret < 0)

@@ -22,7 +22,8 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 # This test cannot run under windows because it passes UTF8 data on command
-# line. This seems not to work under windows.
+# line. This seems not to work under windows. It intentionally depends on
+# bash as few other shells cannot handle utf8 strings
 
 srcdir="${srcdir:-.}"
 CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"

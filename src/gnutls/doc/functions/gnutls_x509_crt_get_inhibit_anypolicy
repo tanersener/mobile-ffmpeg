@@ -1,0 +1,24 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_get_inhibit_anypolicy} (gnutls_x509_crt_t @var{cert}, unsigned int * @var{skipcerts}, unsigned int * @var{critical})
+@var{cert}: should contain a @code{gnutls_x509_crt_t}  type
+
+@var{skipcerts}: will hold the number of certificates after which anypolicy is no longer acceptable.
+
+@var{critical}: will be non-zero if the extension is marked as critical
+
+This function will return certificate's value of the SkipCerts, i.e.,
+the Inhibit anyPolicy X.509 extension (2.5.29.54).
+
+The returned value is the number of additional certificates that
+may appear in the path before the anyPolicy is no longer acceptable.
+
+@strong{Returns:} zero on success, or a negative error code in case of
+parsing error.  If the certificate does not contain the Inhibit anyPolicy
+extension @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  will be
+returned.
+
+@strong{Since:} 3.6.0
+@end deftypefun

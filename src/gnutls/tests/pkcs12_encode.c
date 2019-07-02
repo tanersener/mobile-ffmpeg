@@ -128,11 +128,12 @@ void doit(void)
 	}
 
 	/* Generate and add PKCS#12 cert bags. */
-#ifndef ENABLE_FIPS140
-	tests = 2; /* include RC2 */
-#else
-	tests = 1;
-#endif
+	if (!gnutls_fips140_mode_enabled()) {
+		tests = 2; /* include RC2 */
+	} else {
+		tests = 1;
+	}
+
 	for (i = 0; i < tests; i++) {
 		ret = gnutls_pkcs12_bag_init(&bag);
 		if (ret < 0) {
@@ -215,6 +216,18 @@ void doit(void)
 	}
 
 	ret = gnutls_pkcs12_verify_mac(pkcs12, "passwd");
+	if (ret < 0) {
+		fprintf(stderr, "verify_mac2: %s (%d)\n", gnutls_strerror(ret), ret);
+		exit(1);
+	}
+
+	ret = gnutls_pkcs12_generate_mac2(pkcs12, GNUTLS_MAC_SHA512, "passwd1");
+	if (ret < 0) {
+		fprintf(stderr, "generate_mac2: %s (%d)\n", gnutls_strerror(ret), ret);
+		exit(1);
+	}
+
+	ret = gnutls_pkcs12_verify_mac(pkcs12, "passwd1");
 	if (ret < 0) {
 		fprintf(stderr, "verify_mac2: %s (%d)\n", gnutls_strerror(ret), ret);
 		exit(1);

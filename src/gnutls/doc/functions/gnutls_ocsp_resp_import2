@@ -1,0 +1,20 @@
+
+
+
+
+@deftypefun {int} {gnutls_ocsp_resp_import2} (gnutls_ocsp_resp_t @var{resp}, const gnutls_datum_t * @var{data}, gnutls_x509_crt_fmt_t @var{fmt})
+@var{resp}: The data to store the parsed response.
+
+@var{data}: DER or PEM encoded OCSP response.
+
+@var{fmt}: DER or PEM
+
+This function will convert the given OCSP response to
+the native @code{gnutls_ocsp_resp_t}  format.  It also decodes the Basic
+OCSP Response part, if any.  The output will be stored in  @code{resp} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.6.3
+@end deftypefun

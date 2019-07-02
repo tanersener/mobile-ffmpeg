@@ -16,7 +16,7 @@
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>
+# along with this program.  If not, see <https://www.gnu.org/licenses/>
 
 include $(top_srcdir)/lib/common.mk
 
@@ -26,8 +26,7 @@ AM_CPPFLAGS = \
 	-I$(srcdir)/../includes		\
 	-I$(builddir)/../includes	\
 	-I$(builddir)/../../gl          \
-	-I$(srcdir)/..			\
-	-I$(srcdir)/../opencdk
+	-I$(srcdir)/..	
 
 EXTRA_DIST = licenses/CC0
 

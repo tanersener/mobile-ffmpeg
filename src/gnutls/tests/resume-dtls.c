@@ -363,7 +363,6 @@ static void server(int sds[], struct params_res *params)
 	}
 
 	gnutls_free(session_ticket_key.data);
-	session_ticket_key.data = NULL;
 	gnutls_anon_free_server_credentials(anoncred);
 
 	if (debug)

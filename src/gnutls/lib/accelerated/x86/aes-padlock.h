@@ -1,5 +1,5 @@
-#ifndef AES_PADLOCK_H
-#define AES_PADLOCK_H
+#ifndef GNUTLS_LIB_ACCELERATED_X86_AES_PADLOCK_H
+#define GNUTLS_LIB_ACCELERATED_X86_AES_PADLOCK_H
 
 #include "gnutls_int.h"
 #include <aes-x86.h>
@@ -43,4 +43,4 @@ int padlock_ecb_encrypt(void *out, const void *inp,
 			struct padlock_cipher_data *ctx, size_t len);
 int padlock_cbc_encrypt(void *out, const void *inp,
 			struct padlock_cipher_data *ctx, size_t len);
-#endif
+#endif /* GNUTLS_LIB_ACCELERATED_X86_AES_PADLOCK_H */

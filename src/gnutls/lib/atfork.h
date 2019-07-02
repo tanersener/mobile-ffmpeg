@@ -16,12 +16,12 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
-#ifndef ATFORK_H
-# define ATFORK_H
+#ifndef GNUTLS_LIB_ATFORK_H
+#define GNUTLS_LIB_ATFORK_H
 
 #include <config.h>
 #include "gnutls_int.h"
@@ -61,4 +61,4 @@ unsigned int _gnutls_get_forkid(void);
 
 #endif
 
-#endif
+#endif /* GNUTLS_LIB_ATFORK_H */

@@ -75,7 +75,7 @@ static void try(unsigned char major, unsigned char minor, int ret1, int ret2)
 				serverx509cred);
 
 	gnutls_priority_set_direct(server,
-				   "NORMAL",
+				   "NORMAL:+VERS-TLS-ALL",
 				   NULL);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);

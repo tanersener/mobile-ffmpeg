@@ -17,15 +17,18 @@
 
 @var{out}: pre-allocated buffer to hold the generated data.
 
-Applies the TLS Pseudo-Random-Function (PRF) on the master secret
-and the provided data, seeded with the client and server random fields,
-as specified in RFC5705.
+Exports keying material from TLS/DTLS session to an application, as
+specified in RFC5705.
+
+In the TLS versions prior to 1.3, it applies the TLS
+Pseudo-Random-Function (PRF) on the master secret and the provided
+data, seeded with the client and server random fields.
+
+In TLS 1.3, it applies HKDF on the exporter master secret derived
+from the master secret.
 
 The  @code{label} variable usually contains a string denoting the purpose
-for the generated data.  The  @code{server_random_first} indicates whether
-the client random field or the server random field should be first
-in the seed.  Non-zero indicates that the server random field is first,
-0 that the client random field is first.
+for the generated data.
 
 The  @code{context} variable can be used to add more data to the seed, after
 the random variables.  It can be used to make sure the

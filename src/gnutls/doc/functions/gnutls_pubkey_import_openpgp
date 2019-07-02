@@ -9,13 +9,9 @@
 
 @var{flags}: should be zero
 
-Imports a public key from an openpgp key. This function will import
-the given public key to the abstract @code{gnutls_pubkey_t} 
-type. The subkey set as preferred will be imported or the
-master key otherwise.
+This function is no-op.
 
-@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
-negative error value.
+@strong{Returns:} @code{GNUTLS_E_UNIMPLEMENTED_FEATURE} .
 
 @strong{Since:} 2.12.0
 @end deftypefun

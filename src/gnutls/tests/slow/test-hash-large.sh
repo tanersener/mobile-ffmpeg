@@ -1,6 +1,7 @@
 #!/bin/sh
 
 # Copyright (C) 2016 Nikos Mavrogiannopoulos
+# Copyright (C) 2017 Red Hat, Inc.
 #
 # Author: Nikos Mavrogiannopoulos
 #
@@ -16,9 +17,9 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
-# along with GnuTLS; if not, write to the Free Software Foundation,
-# Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+# You should have received a copy of the GNU Lesser General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>
+#
 
 PROG=./hash-large${EXEEXT}
 unset RETCODE
@@ -29,41 +30,55 @@ fi
 srcdir="${srcdir:-.}"
 . "${srcdir}/../scripts/common.sh"
 
-${PROG}
-ret=$?
-if test $ret != 0; then
-	echo "default cipher tests failed"
-	exit $ret
+run_test() {
+	GNUTLS_CPUID_OVERRIDE=$1 ${PROG}
+	ret=$?
+	if test $ret != 0; then
+		echo "tests failed for flags $1"
+		exit $ret
+	fi
+}
+
+#0x4: SSSE3
+#0x1: no optimizations
+#"": default optimizations
+
+SSSE3FLAG=""
+which lscpu >/dev/null 2>&1
+if test $? = 0;then
+        $(which lscpu)|grep Architecture|grep x86 >/dev/null
+        if test $? = 0;then
+                SSSE3FLAG="0x4"
+        fi
 fi
 
-GNUTLS_CPUID_OVERRIDE=0x1 ${PROG}
-ret=$?
-if test $ret != 0; then
-	echo "included cipher tests failed"
-	exit $ret
-fi
+WAITPID=""
+for flags in "" "0x1" ${SSSE3FLAG};do
+	run_test ${flags} &
+	WAITPID="${WAITPID} $!"
+done
 
-exit_if_non_x86
+for i in "$WAITPID";do
+	wait $i
+	ret=$?
+	test ${ret} != 0 && exit ${ret}
+done
 
-GNUTLS_CPUID_OVERRIDE=0x4 ${PROG}
-ret=$?
-if test $ret != 0; then
-	echo "SSSE3 cipher tests failed"
-	exit $ret
-fi
+exit_if_non_padlock
 
-GNUTLS_CPUID_OVERRIDE=0x200000 ${PROG}
-ret=$?
-if test $ret != 0; then
-	echo "padlock PHE cipher tests failed"
-	exit $ret
-fi
+#0x200000: Padlock PHE
+#0x400000: Padlock PHE SHA512
 
-GNUTLS_CPUID_OVERRIDE=0x400000 ${PROG}
-ret=$?
-if test $ret != 0; then
-	echo "padlock PHE SHA512 cipher tests failed"
-	exit $ret
-fi
+WAITPID=""
+for flags in "0x200000" "0x400000";do
+	run_test ${flags} &
+	WAITPID="${WAITPID} $!"
+done
+
+for i in "$WAITPID";do
+	wait $i
+	ret=$?
+	test ${ret} != 0 && exit ${ret}
+done
 
 exit 0

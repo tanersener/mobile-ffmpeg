@@ -52,7 +52,7 @@ enum {
 };
 
 #define myfail(fmt, ...) \
-	fail("%s%s %d: "fmt, dtls?"-dtls":"", name, testno, ##__VA_ARGS__)
+	fail("%s%s %d: "fmt, dtls?"dtls":"tls", name, testno, ##__VA_ARGS__)
 
 static void try(const char *name, unsigned testno, unsigned fs,
 		const char *prio, unsigned dhsize,
@@ -161,12 +161,12 @@ static void try(const char *name, unsigned testno, unsigned fs,
 
 	if ((gnutls_session_get_flags(client) & GNUTLS_SFLAGS_FALSE_START)
 	    && !fs) {
-		myfail("%d: false start occurred but not expected\n", __LINE__);
+		myfail("false start occurred but not expected\n");
 	}
 
 	if (!(gnutls_session_get_flags(client) & GNUTLS_SFLAGS_FALSE_START)
 	    && fs) {
-		myfail("%d: false start expected but not happened\n", __LINE__);
+		myfail("false start expected but not happened\n");
 	}
 
 	if (testno == TEST_SEND_RECV) {
@@ -174,8 +174,8 @@ static void try(const char *name, unsigned testno, unsigned fs,
 		ret =
 		    gnutls_record_send(client, TESTDATA, sizeof(TESTDATA) - 1);
 		if (ret < 0) {
-			myfail("%d: error sending false start data: %s\n",
-				__LINE__, gnutls_strerror(ret));
+			myfail("error sending false start data: %s\n",
+				gnutls_strerror(ret));
 			exit(1);
 		}
 
@@ -183,24 +183,24 @@ static void try(const char *name, unsigned testno, unsigned fs,
 		/* verify whether the server received the expected data */
 		ret = gnutls_record_recv(server, buffer, sizeof(buffer));
 		if (ret < 0) {
-			myfail("%d: error receiving data: %s\n", __LINE__,
+			myfail("error receiving data: %s\n",
 				gnutls_strerror(ret));
 		}
 
 		if (ret != sizeof(TESTDATA) - 1) {
-			myfail("%d: error in received data size\n", __LINE__);
+			myfail("error in received data size\n");
 		}
 
 		if (memcmp(buffer, TESTDATA, ret) != 0) {
-			myfail("%d: error in received data\n", __LINE__);
+			myfail("error in received data\n");
 		}
 
 		/* check handshake completion */
 		ret =
 		    gnutls_record_send(server, TESTDATA, sizeof(TESTDATA) - 1);
 		if (ret < 0) {
-			myfail("%d: error sending false start data: %s\n",
-				__LINE__, gnutls_strerror(ret));
+			myfail("error sending false start data: %s\n",
+				gnutls_strerror(ret));
 			exit(1);
 		}
 
@@ -210,7 +210,7 @@ static void try(const char *name, unsigned testno, unsigned fs,
 			    gnutls_record_recv(client, buffer, sizeof(buffer));
 		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 		if (ret < 0) {
-			myfail("%d: error receiving data: %s\n", __LINE__,
+			myfail("error receiving data: %s\n",
 				gnutls_strerror(ret));
 		}
 	} else if (testno == TEST_RECV_SEND) {
@@ -218,8 +218,8 @@ static void try(const char *name, unsigned testno, unsigned fs,
 		ret =
 		    gnutls_record_send(server, TESTDATA, sizeof(TESTDATA) - 1);
 		if (ret < 0) {
-			myfail("%d: error sending false start data: %s\n",
-				__LINE__, gnutls_strerror(ret));
+			myfail("error sending false start data: %s\n",
+				gnutls_strerror(ret));
 			exit(1);
 		}
 
@@ -227,24 +227,24 @@ static void try(const char *name, unsigned testno, unsigned fs,
 		/* verify whether the server received the expected data */
 		ret = gnutls_record_recv(client, buffer, sizeof(buffer));
 		if (ret < 0) {
-			myfail("%d: error receiving data: %s\n", __LINE__,
+			myfail("error receiving data: %s\n",
 				gnutls_strerror(ret));
 		}
 
 		if (ret != sizeof(TESTDATA) - 1) {
-			myfail("%d: error in received data size\n", __LINE__);
+			myfail("error in received data size\n");
 		}
 
 		if (memcmp(buffer, TESTDATA, ret) != 0) {
-			myfail("%d: error in received data\n", __LINE__);
+			myfail("error in received data\n");
 		}
 	} else if (testno == TEST_HANDSHAKE_CALL) {
 		/* explicit completion by caller */
 		ret = gnutls_handshake(client);
 		if (ret != GNUTLS_E_HANDSHAKE_DURING_FALSE_START) {
 			myfail
-			    ("%d: error in explicit handshake after false start: %s\n",
-			     __LINE__, gnutls_strerror(ret));
+			    ("error in explicit handshake after false start: %s\n",
+			     gnutls_strerror(ret));
 			exit(1);
 		}
 
@@ -254,18 +254,18 @@ static void try(const char *name, unsigned testno, unsigned fs,
 	side = "server";
 	ret = gnutls_bye(server, GNUTLS_SHUT_WR);
 	if (ret < 0) {
-		myfail("%d: error in server bye: %s\n", __LINE__,
+		myfail("error in server bye: %s\n",
 			gnutls_strerror(ret));
 	}
 
 	side = "client";
 	ret = gnutls_bye(client, GNUTLS_SHUT_RDWR);
 	if (ret < 0) {
-		myfail("%d: error in client bye: %s\n", __LINE__,
+		myfail("error in client bye: %s\n",
 			gnutls_strerror(ret));
 	}
 
-	success("%5s%s \tok\n", dtls?"dtls-":"", name);
+	success("%5s%s \tok\n", dtls?"dtls-":"tls-", name);
  exit:
 	gnutls_deinit(client);
 	gnutls_deinit(server);
@@ -286,21 +286,28 @@ void doit(void)
 
 	for (j=0;j<2;j++) {
 		for (i = 0; i < TESTNO_MAX; i++) {
-			try("anon-dh  :", i, 0, "NORMAL:-KX-ALL:+ANON-DH", 3072, j);
+			try("1.2 anon-dh  :", i, 0, "NORMAL:-VERS-ALL:+VERS-DTLS1.2:+VERS-TLS1.2:-KX-ALL:+ANON-DH", 3072, j);
 			reset_buffers();
-			try("anon-ecdh:", i, 0, "NORMAL:-KX-ALL:+ANON-ECDH", 2048, j);
+			try("1.2 anon-ecdh:", i, 0, "NORMAL:-VERS-ALL:+VERS-DTLS1.2:+VERS-TLS1.2:-KX-ALL:+ANON-ECDH", 2048, j);
 			reset_buffers();
-			try("ecdhe-rsa:", i, 1, "NORMAL:-KX-ALL:+ECDHE-RSA", 2048, j);
+			try("1.2 ecdhe-rsa:", i, 1, "NORMAL:-VERS-ALL:+VERS-DTLS1.2:+VERS-TLS1.2:-KX-ALL:+ECDHE-RSA", 2048, j);
 			reset_buffers();
-			try("ecdhe-x25519-rsa:", i, 1, "NORMAL:-KX-ALL:+ECDHE-RSA:-CURVE-ALL:+CURVE-X25519", 2048, j);
+			try("1.2 ecdhe-x25519-rsa:", i, 1, "NORMAL:-VERS-ALL:+VERS-DTLS1.2:+VERS-TLS1.2:-KX-ALL:+ECDHE-RSA:-CURVE-ALL:+CURVE-X25519", 2048, j);
 			reset_buffers();
-			try("ecdhe-ecdsa:", i, 1, "NORMAL:-KX-ALL:+ECDHE-ECDSA", 2048, j);
+			try("1.2 ecdhe-ecdsa:", i, 1, "NORMAL:-VERS-ALL:+VERS-DTLS1.2:+VERS-TLS1.2:-KX-ALL:+ECDHE-ECDSA", 2048, j);
 			reset_buffers();
-			try("dhe-rsa-2048:", i, 0, "NORMAL:-KX-ALL:+DHE-RSA", 2048, j);
+			try("1.2 dhe-rsa-2048:", i, 0, "NORMAL:-VERS-ALL:+VERS-DTLS1.2:+VERS-TLS1.2:-KX-ALL:+DHE-RSA", 2048, j);
 			reset_buffers();
-			try("dhe-rsa-3072:", i, 1, "NORMAL:-KX-ALL:+DHE-RSA", 3072, j);
+			try("1.2 dhe-rsa-3072:", i, 1, "NORMAL:-VERS-ALL:+VERS-DTLS1.2:+VERS-TLS1.2:-KX-ALL:+DHE-RSA", 3072, j);
 			reset_buffers();
 		}
 	}
+
+	/* it should work, but false start will not be reported */
+	try("1.3 secp256r1:", i, 0, "NORMAL:-VERS-ALL:+VERS-TLS1.3:-GROUP-ALL:+GROUP-SECP256R1", 2048, 0);
+	reset_buffers();
+	try("1.3 ffdhe2048:", i, 0, "NORMAL:-VERS-ALL:+VERS-TLS1.3:+GROUP-FFDHE2048", 2048, 0);
+	reset_buffers();
+
 	gnutls_global_deinit();
 }

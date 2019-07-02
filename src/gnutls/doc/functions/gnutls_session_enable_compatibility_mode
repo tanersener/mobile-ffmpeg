@@ -15,4 +15,6 @@ everything out there, need to call this function.
 
 Note that this function must be called after any call to gnutls_priority
 functions.
+
+@strong{Since:} 2.1.4
 @end deftypefun

@@ -14,14 +14,15 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
-#ifndef EXT_DUMBFW_H
-#define EXT_DUMBFW_H
 
-#include <extensions.h>
+#ifndef GNUTLS_LIB_EXT_DUMBFW_H
+#define GNUTLS_LIB_EXT_DUMBFW_H
 
-extern const extension_entry_st ext_mod_dumbfw;
+#include <hello_ext.h>
 
-#endif
+extern const hello_ext_entry_st ext_mod_dumbfw;
+
+#endif /* GNUTLS_LIB_EXT_DUMBFW_H */

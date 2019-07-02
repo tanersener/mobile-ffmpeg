@@ -12,12 +12,16 @@
 @var{status}: is the output of the verification
 
 This function will verify the peer's certificate and store the
-status in the  @code{status} variable as a bitwise or'd gnutls_certificate_status_t
+the status in the  @code{status} variable as a bitwise OR of gnutls_certificate_status_t
 values or zero if the certificate is trusted. Note that value in  @code{status} is set only when the return value of this function is success (i.e, failure 
 to trust a certificate does not imply a negative return value).
 The default verification flags used by this function can be overridden
 using @code{gnutls_certificate_set_verify_flags()} . See the documentation
 of @code{gnutls_certificate_verify_peers2()}  for details in the verification process.
+
+This function will take into account the stapled OCSP responses sent by the server,
+as well as the following X.509 certificate extensions: Name Constraints,
+Key Usage, and Basic Constraints (pathlen).
 
 The acceptable  @code{data} types are @code{GNUTLS_DT_DNS_HOSTNAME} , @code{GNUTLS_DT_RFC822NAME}  and @code{GNUTLS_DT_KEY_PURPOSE_OID} .
 The former two accept as data a null-terminated hostname or email address, and the latter a null-terminated
@@ -31,8 +35,16 @@ usage PKIX extension, it will be required to be have the provided key purpose
 or be marked for any purpose, otherwise verification status will have the
 @code{GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE}  flag set.
 
+To avoid denial of service attacks some
+default upper limits regarding the certificate key size and chain
+size are set. To override them use @code{gnutls_certificate_set_verify_limits()} .
+
+Note that when using raw public-keys verification will not work because there is
+no corresponding certificate body belonging to the raw key that can be verified. In that
+case this function will return @code{GNUTLS_E_INVALID_REQUEST} .
+
 @strong{Returns:} @code{GNUTLS_E_SUCCESS}  (0) when the validation is performed, or a negative error code otherwise.
-A sucessful error code means that the  @code{status} parameter must be checked to obtain the validation status.
+A successful error code means that the  @code{status} parameter must be checked to obtain the validation status.
 
 @strong{Since:} 3.3.0
 @end deftypefun

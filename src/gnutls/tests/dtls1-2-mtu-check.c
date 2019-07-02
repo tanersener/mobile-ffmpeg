@@ -79,7 +79,7 @@ static void dtls_mtu_try(const char *name, const char *client_prio,
 				serverx509cred);
 
 	assert(gnutls_priority_set_direct(server,
-				   "NORMAL:+ANON-ECDH:+ANON-DH:+ECDHE-RSA:+DHE-RSA:+RSA:+ECDHE-ECDSA:+CURVE-X25519:+SHA256",
+				   "NORMAL:+ANON-ECDH:+ANON-DH:+3DES-CBC:+ECDHE-RSA:+DHE-RSA:+RSA:+ECDHE-ECDSA:+SHA256:+CURVE-X25519",
 				   NULL) >= 0);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
@@ -119,8 +119,9 @@ static void dtls_mtu_try(const char *name, const char *client_prio,
 	}
 
 	{
-		char msg[dmtu+1];
-		memset(msg, 1, sizeof(msg));
+		char *msg = gnutls_malloc(dmtu+1);
+		assert(msg);
+		memset(msg, 1, dmtu+1);
 		ret = gnutls_record_send(client, msg, dmtu+1);
 		if (ret != (int)GNUTLS_E_LARGE_PACKET) {
 			myfail("could send larger packet than MTU (%d), ret: %d\n", dmtu, ret);
@@ -139,6 +140,8 @@ static void dtls_mtu_try(const char *name, const char *client_prio,
 
 		for (i=0;i<dmtu;i++)
 			assert(msg[i]==1);
+
+		gnutls_free(msg);
 	}
 
 	gnutls_dtls_set_data_mtu(client, link_mtu);

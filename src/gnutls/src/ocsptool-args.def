@@ -2,11 +2,25 @@ AutoGen Definitions options;
 prog-name     = ocsptool;
 prog-title    = "GnuTLS OCSP tool";
 prog-desc     = "Program to handle OCSP request/responses.";
-detail    = "Ocsptool is a program that can parse and print information about
-OCSP requests/responses, generate requests and verify responses.
-";
+detail    = "ocsptool is a program that can parse and print information about
+OCSP requests/responses, generate requests and verify responses. Unlike
+other GnuTLS applications it outputs DER encoded structures by default
+unless the '--outpem' option is specified.";
 short-usage   = "ocsptool [options]\nocsptool --help for usage instructions.\n";
 explain       = "";
+
+doc-section = {
+  ds-type = 'DESCRIPTION';
+  ds-format = 'texi';
+  ds-text   = <<-_EOT_
+@subheading On verification
+Responses are typically signed/issued by designated certificates or
+certificate authorities and thus this tool requires on verification
+the certificate of the issuer or the full certificate chain in order to
+determine the appropriate signing authority. The specified certificate
+of the issuer is assumed trusted.
+_EOT_;
+};
 
 #define  INFILE_OPT   1
 #define  OUTFILE_OPT  1
@@ -19,36 +33,40 @@ flag = {
     arg-name  = "server name|url";
     arg-optional;
     descrip   = "Ask an OCSP/HTTP server on a certificate validity";
-    flags-must = load-cert;
-    flags-must = load-issuer;
-    doc = "Connects to the specified HTTP OCSP server and queries on the validity of the loaded certificate.";
+    doc = "Connects to the specified HTTP OCSP server and queries on the validity of the loaded certificate.
+Its argument can be a URL or a plain server name. It can be combined with --load-chain, where it checks
+all certificates in the provided chain, or with --load-cert and
+--load-issuer options. The latter checks the provided certificate
+against its specified issuer certificate.";
 };
 
 flag = {
     name      = verify-response;
     value     = e;
     descrip   = "Verify response";
-    doc = "";
+    doc = "Verifies the provided OCSP response against the system trust
+anchors (unless --load-trust is provided). It requires the --load-signer
+or --load-chain options to obtain the signer of the OCSP response.";
 };
 
 flag = {
     name      = request-info;
     value     = i;
     descrip   = "Print information on a OCSP request";
-    doc = "";
+    doc = "Display detailed information on the provided OCSP request.";
 };
 
 flag = {
     name      = response-info;
     value     = j;
     descrip   = "Print information on a OCSP response";
-    doc = "";
+    doc = "Display detailed information on the provided OCSP response.";
 };
 
 flag = {
     name      = generate-request;
     value     = q;
-    descrip   = "Generate an OCSP request";
+    descrip   = "Generates an OCSP request";
     doc = "";
 };
 
@@ -61,10 +79,18 @@ flag = {
 };
 
 flag = {
+    name      = load-chain;
+    arg-type  = file;
+    file-exists = yes;
+    descrip   = "Reads a set of certificates forming a chain from file";
+    doc = "";
+};
+
+flag = {
     name      = load-issuer;
     arg-type  = file;
     file-exists = yes;
-    descrip   = "Read issuer certificate from file";
+    descrip   = "Reads issuer's certificate from file";
     doc = "";
 };
 
@@ -72,7 +98,7 @@ flag = {
     name      = load-cert;
     arg-type  = file;
     file-exists = yes;
-    descrip   = "Read certificate to check from file";
+    descrip   = "Reads the certificate to check from file";
     doc = "";
 };
 
@@ -82,14 +108,16 @@ flag = {
     file-exists = yes;
     descrip   = "Read OCSP trust anchors from file";
     flags-cant = load-signer;
-    doc = "";
+    doc = "When verifying an OCSP response read the trust anchors from the
+provided file. When this is not provided, the system's trust anchors will be
+used.";
 };
 
 flag = {
     name      = load-signer;
     arg-type  = file;
     file-exists = yes;
-    descrip   = "Read OCSP response signer from file";
+    descrip   = "Reads the OCSP response signer from file";
     flags-cant = load-trust;
     doc = "";
 };
@@ -103,11 +131,23 @@ flag = {
 };
 
 flag = {
+    name      = outder;
+    descrip   = "Use DER format for output of responses (this is the default)";
+    doc = "The output will be in DER encoded format. Unlike other GnuTLS tools, this is the default for this tool";
+};
+
+flag = {
+    name      = outpem;
+    descrip   = "Use PEM format for output of responses";
+    doc       = "The output will be in PEM format.";
+};
+
+flag = {
     name      = load-request;
     value     = Q;
     arg-type  = file;
     file-exists = yes;
-    descrip   = "Read DER encoded OCSP request from file";
+    descrip   = "Reads the DER encoded OCSP request from file";
     doc      = "";
 };
 
@@ -116,7 +156,7 @@ flag = {
     value     = S;
     arg-type  = file;
     file-exists = yes;
-    descrip   = "Read DER encoded OCSP response from file";
+    descrip   = "Reads the DER encoded OCSP response from file";
     doc      = "";
 };
 
@@ -124,6 +164,12 @@ flag = {
     name      = ignore-errors;
     descrip   = "Ignore any verification errors";
     doc = "";
+};
+
+flag = {
+    name      = verify-allow-broken;
+    descrip   = "Allow broken algorithms, such as MD5 for verification";
+    doc = "This can be combined with --verify-response.";
 };
 
 doc-section = {
@@ -236,36 +282,35 @@ copy of the server certificate chain.  The server is not required to
 send this information, but this particular one is configured to do so.
 
 @example
-$ echo | gnutls-cli -p 443 blog.josefsson.org --print-cert > chain.pem
+$ echo | gnutls-cli -p 443 blog.josefsson.org --save-cert chain.pem
 @end example
 
-Use a text editor on @code{chain.pem} to create three files for each
-separate certificates, called @code{cert.pem} for the first
-certificate for the domain itself, secondly @code{issuer.pem} for the
-intermediate certificate and @code{root.pem} for the final root
-certificate.
-
-The domain certificate normally contains a pointer to where the OCSP
+The saved certificates normally contain a pointer to where the OCSP
 responder is located, in the Authority Information Access Information
-extension.  For example, from @code{certtool -i < cert.pem} there is
+extension.  For example, from @code{certtool -i < chain.pem} there is
 this information:
 
 @example
 		Authority Information Access Information (not critical):
 			Access Method: 1.3.6.1.5.5.7.48.1 (id-ad-ocsp)
-			Access Location URI: http://ocsp.CAcert.org/
+			Access Location URI: https://ocsp.CAcert.org/
 @end example
 
-This means the CA support OCSP queries over HTTP.  We are now ready to
-create a OCSP request for the certificate.
+This means that ocsptool can discover the servers to contact over HTTP.
+We can now request information on the chain certificates.
 
 @example
-$ ocsptool --ask ocsp.CAcert.org --load-issuer issuer.pem \
-           --load-cert cert.pem --outfile ocsp-response.der
+$ ocsptool --ask --load-chain chain.pem
 @end example
 
-The request is sent via HTTP to the OCSP server address specified. If the
-address is omitted ocsptool will use the address stored in the certificate.
+The request is sent via HTTP to the OCSP server address found in
+the certificates. It is possible to override the address of the
+OCSP server as well as ask information on a particular certificate
+using --load-cert and --load-issuer.
+
+@example
+$ ocsptool --ask https://ocsp.CAcert.org/ --load-chain chain.pem
+@end example
 
 _EOF_;
 };

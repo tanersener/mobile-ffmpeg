@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_crt_get_pk_gost_raw} (gnutls_x509_crt_t @var{crt}, gnutls_ecc_curve_t * @var{curve}, gnutls_digest_algorithm_t * @var{digest}, gnutls_gost_paramset_t * @var{paramset}, gnutls_datum_t * @var{x}, gnutls_datum_t * @var{y})

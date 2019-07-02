@@ -1,0 +1,14 @@
+
+
+
+
+@deftypefun {gnutls_group_t} {gnutls_group_get_id} (const char * @var{name})
+@var{name}: is a group name
+
+The names are compared in a case insensitive way.
+
+@strong{Returns:} return a @code{gnutls_group_t}  value corresponding to
+the specified group, or @code{GNUTLS_GROUP_INVALID}  on error.
+
+@strong{Since:} 3.6.0
+@end deftypefun

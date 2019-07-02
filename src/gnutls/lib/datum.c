@@ -16,7 +16,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -68,21 +68,6 @@ _gnutls_set_strdatum(gnutls_datum_t * dat, const void *data, size_t data_size)
 	dat->size = data_size;
 	memcpy(dat->data, data, data_size);
 	dat->data[data_size] = 0;
-
-	return 0;
-}
-
-int
-_gnutls_datum_append(gnutls_datum_t * dst, const void *data,
-		     size_t data_size)
-{
-
-	dst->data = gnutls_realloc_fast(dst->data, data_size + dst->size);
-	if (dst->data == NULL)
-		return GNUTLS_E_MEMORY_ERROR;
-
-	memcpy(&dst->data[dst->size], data, data_size);
-	dst->size += data_size;
 
 	return 0;
 }

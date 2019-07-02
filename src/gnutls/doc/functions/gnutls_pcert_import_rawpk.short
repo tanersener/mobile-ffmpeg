@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pcert_import_rawpk} (gnutls_pcert_st* @var{pcert}, gnutls_pubkey_t @var{pubkey}, unsigned int @var{flags})

@@ -1,0 +1,31 @@
+
+
+
+
+@deftypefun {int} {gnutls_pcert_list_import_x509_file} (gnutls_pcert_st * @var{pcert_list}, unsigned * @var{pcert_list_size}, const char * @var{file}, gnutls_x509_crt_fmt_t @var{format}, gnutls_pin_callback_t @var{pin_fn}, void * @var{pin_fn_userdata}, unsigned int @var{flags})
+@var{pcert_list}: The structures to store the certificates; must not contain initialized @code{gnutls_pcert_st}  structures.
+
+@var{pcert_list_size}: Initially must hold the maximum number of certs. It will be updated with the number of certs available.
+
+@var{file}: A file or supported URI with the certificates to load
+
+@var{format}: @code{GNUTLS_X509_FMT_DER}  or @code{GNUTLS_X509_FMT_PEM}  if a file is given
+
+@var{pin_fn}: a PIN callback if not globally set
+
+@var{pin_fn_userdata}: parameter for the PIN callback
+
+@var{flags}: zero or flags from @code{gnutls_certificate_import_flags} 
+
+This convenience function will import a certificate chain from the given
+file or supported URI to @code{gnutls_pcert_st}  structures. The structures
+must be deinitialized afterwards using @code{gnutls_pcert_deinit()} .
+
+This function will always return a sorted certificate chain.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value; if the  @code{pcert} list doesn't have enough space
+@code{GNUTLS_E_SHORT_MEMORY_BUFFER}  will be returned.
+
+@strong{Since:} 3.6.3
+@end deftypefun

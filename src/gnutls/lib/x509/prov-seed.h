@@ -16,9 +16,14 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
+#ifndef GNUTLS_LIB_X509_PROV_SEED_H
+#define GNUTLS_LIB_X509_PROV_SEED_H
+
 int _x509_encode_provable_seed(gnutls_x509_privkey_t pkey, gnutls_datum_t *der);
 int _x509_decode_provable_seed(gnutls_x509_privkey_t pkey, const gnutls_datum_t *der);
+
+#endif /* GNUTLS_LIB_X509_PROV_SEED_H */

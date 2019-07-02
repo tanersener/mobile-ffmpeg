@@ -23,5 +23,15 @@ Some schemas distinguish between an empty and a NULL password.
 @item GNUTLS_@-PKCS_@-PBES2_@-DES
 PBES2 single DES.
 @item GNUTLS_@-PKCS_@-PBES1_@-DES_@-MD5
--- undescribed --
+PBES1 with single DES; for compatibility with openssl only.
+@item GNUTLS_@-PKCS_@-PBES2_@-GOST_@-TC26Z
+PBES2 GOST 28147-89 CFB with TC26-Z S-box.
+@item GNUTLS_@-PKCS_@-PBES2_@-GOST_@-CPA
+PBES2 GOST 28147-89 CFB with CryptoPro-A S-box.
+@item GNUTLS_@-PKCS_@-PBES2_@-GOST_@-CPB
+PBES2 GOST 28147-89 CFB with CryptoPro-B S-box.
+@item GNUTLS_@-PKCS_@-PBES2_@-GOST_@-CPC
+PBES2 GOST 28147-89 CFB with CryptoPro-C S-box.
+@item GNUTLS_@-PKCS_@-PBES2_@-GOST_@-CPD
+PBES2 GOST 28147-89 CFB with CryptoPro-D S-box.
 @end table

@@ -32,6 +32,7 @@
 #include <gnutls/gnutls.h>
 #include "utils.h"
 #include "eagain-common.h"
+#include <assert.h>
 
 /* Tests whether the session verify callbacks are operational.
  */
@@ -51,16 +52,20 @@ static int server_callback(gnutls_session_t session)
 {
 	server_ok = 1;
 
-	if (gnutls_handshake_get_last_in(session) !=
-	    GNUTLS_HANDSHAKE_CERTIFICATE_PKT) {
-		fail("client's last input message was unexpected\n");
-		exit(1);
-	}
+	if (gnutls_protocol_get_version(session) == GNUTLS_TLS1_2) {
+		if (gnutls_handshake_get_last_in(session) !=
+		    GNUTLS_HANDSHAKE_CERTIFICATE_PKT) {
+			fail("client's last input message was unexpected: %s\n",
+			     gnutls_handshake_description_get_name(gnutls_handshake_get_last_in(session)));
+			exit(1);
+		}
 
-	if (gnutls_handshake_get_last_out(session) !=
-	    GNUTLS_HANDSHAKE_SERVER_HELLO_DONE) {
-		fail("client's last output message was unexpected\n");
-		exit(1);
+		if (gnutls_handshake_get_last_out(session) !=
+		    GNUTLS_HANDSHAKE_SERVER_HELLO_DONE) {
+			fail("client's last output message was unexpected: %s\n",
+			     gnutls_handshake_description_get_name(gnutls_handshake_get_last_out(session)));
+			exit(1);
+		}
 	}
 	return server_ret_val;
 }
@@ -112,7 +117,7 @@ const gnutls_datum_t server_key = { server_key_pem,
 };
 
 static
-void test_success1(void)
+void test_success1(const char *prio)
 {
 	/* Server stuff. */
 	gnutls_certificate_credentials_t serverx509cred;
@@ -138,12 +143,11 @@ void test_success1(void)
 	gnutls_init(&server, GNUTLS_SERVER);
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
 				serverx509cred);
-	gnutls_priority_set_direct(server, "NORMAL", NULL);
+	assert(gnutls_priority_set_direct(server, prio, NULL)>=0);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
-	gnutls_session_set_verify_function(server,
-						server_callback);
+	gnutls_session_set_verify_function(server, server_callback);
 	gnutls_certificate_server_set_request(server, GNUTLS_CERT_REQUEST);
 
 	/* Init client */
@@ -151,7 +155,7 @@ void test_success1(void)
 	gnutls_init(&client, GNUTLS_CLIENT);
 	gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
 				clientx509cred);
-	gnutls_priority_set_direct(client, "NORMAL", NULL);
+	gnutls_priority_set_direct(client, prio, NULL);
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);
@@ -177,7 +181,7 @@ void test_success1(void)
 }
 
 static
-void test_failure_client(void)
+void test_failure_client(const char *prio)
 {
 	/* Server stuff. */
 	gnutls_certificate_credentials_t serverx509cred;
@@ -205,12 +209,11 @@ void test_failure_client(void)
 	gnutls_init(&server, GNUTLS_SERVER);
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
 				serverx509cred);
-	gnutls_priority_set_direct(server, "NORMAL", NULL);
+	assert(gnutls_priority_set_direct(server, prio, NULL)>=0);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
-	gnutls_session_set_verify_function(server,
-						server_callback);
+	gnutls_session_set_verify_function(server, server_callback);
 	gnutls_certificate_server_set_request(server, GNUTLS_CERT_REQUEST);
 
 	/* Init client */
@@ -218,7 +221,7 @@ void test_failure_client(void)
 	gnutls_init(&client, GNUTLS_CLIENT);
 	gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
 				clientx509cred);
-	gnutls_priority_set_direct(client, "NORMAL", NULL);
+	gnutls_priority_set_direct(client, prio, NULL);
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);
@@ -238,7 +241,7 @@ void test_failure_client(void)
 }
 
 static
-void test_failure_server(void)
+void test_failure_server(const char *prio)
 {
 	/* Server stuff. */
 	gnutls_certificate_credentials_t serverx509cred;
@@ -266,12 +269,11 @@ void test_failure_server(void)
 	gnutls_init(&server, GNUTLS_SERVER);
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
 				serverx509cred);
-	gnutls_priority_set_direct(server, "NORMAL", NULL);
+	assert(gnutls_priority_set_direct(server, prio, NULL)>=0);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
-	gnutls_session_set_verify_function(server,
-						server_callback);
+	gnutls_session_set_verify_function(server, server_callback);
 	gnutls_certificate_server_set_request(server, GNUTLS_CERT_REQUEST);
 
 	/* Init client */
@@ -279,14 +281,13 @@ void test_failure_server(void)
 	gnutls_init(&client, GNUTLS_CLIENT);
 	gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
 				clientx509cred);
-	gnutls_priority_set_direct(client, "NORMAL", NULL);
+	gnutls_priority_set_direct(client, prio, NULL);
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);
-	gnutls_session_set_verify_function(client,
-						client_callback);
+	gnutls_session_set_verify_function(client, client_callback);
 
-	HANDSHAKE_EXPECT(client, server, GNUTLS_E_AGAIN, GNUTLS_E_CERTIFICATE_ERROR);
+	HANDSHAKE_EXPECT(client, server, -1, GNUTLS_E_CERTIFICATE_ERROR);
 
 	gnutls_deinit(client);
 	gnutls_deinit(server);
@@ -298,6 +299,20 @@ void test_failure_server(void)
 		fail("%s: certificate verify callback wasn't called\n", __func__);
 }
 
+static void start(const char *prio)
+{
+	success("running tests for %s\n", prio);
+
+	client_ok = 0;
+	server_ok = 0;
+	client_ret_val = 0;
+	server_ret_val = 0;
+
+	test_failure_client(prio);
+	test_failure_server(prio);
+	test_success1(prio);
+}
+
 void doit(void)
 {
 	global_init();
@@ -305,9 +320,9 @@ void doit(void)
 	if (debug)
 		gnutls_global_set_log_level(99);
 
-	test_failure_client();
-	test_failure_server();
-	test_success1();
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.2");
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.3");
+	start("NORMAL");
 
 	gnutls_global_deinit();
 }

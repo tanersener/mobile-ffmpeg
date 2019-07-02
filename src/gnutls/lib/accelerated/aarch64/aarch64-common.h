@@ -16,9 +16,12 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
+
+#ifndef GNUTLS_LIB_ACCELERATED_AARCH64_AARCH64_COMMON_H
+# define GNUTLS_LIB_ACCELERATED_AARCH64_AARCH64_COMMON_H
 
 #if !__ASSEMBLER__
 #define NN_HASH(name, update_func, digest_func, NAME) {	\
@@ -34,7 +37,12 @@
 void register_aarch64_crypto(void);
 #endif
 
+#define ARMV7_NEON      (1<<0)
+#define ARMV7_TICK      (1<<1)
 #define ARMV8_AES       (1<<2)
 #define ARMV8_SHA1      (1<<3)
 #define ARMV8_SHA256    (1<<4)
 #define ARMV8_PMULL     (1<<5)
+#define ARMV8_SHA512    (1<<6)
+
+#endif /* GNUTLS_LIB_ACCELERATED_AARCH64_AARCH64_COMMON_H */

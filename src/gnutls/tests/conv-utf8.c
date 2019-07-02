@@ -35,7 +35,7 @@
 #include <cmocka.h>
 
 int _gnutls_utf8_to_ucs2(const void *data, size_t size,
-			 gnutls_datum_t * output);
+			 gnutls_datum_t * output, unsigned be);
 
 int _gnutls_ucs2_to_utf8(const void *data, size_t size,
 			 gnutls_datum_t * output, unsigned be);
@@ -60,7 +60,7 @@ static void PRINT(const char *str, unsigned char *val, unsigned int size)
 static void fname(void **glob_state) \
 { \
 	gnutls_datum_t out; \
-	int ret = _gnutls_utf8_to_ucs2(utf8, strlen(utf8), &out); \
+	int ret = _gnutls_utf8_to_ucs2(utf8, strlen(utf8), &out, 1); \
 	assert_int_equal(ret, 0); \
 	if (out.size != sizeof(utf16)-1 || memcmp(utf16, out.data, out.size) != 0) { PRINT("got:      ", out.data, out.size); \
 	PRINT("expected: ", (unsigned char*)utf16, sizeof(utf16)-1); } \
@@ -86,7 +86,7 @@ static void fname(void **glob_state) \
 static void fname(void **glob_state) \
 { \
 	gnutls_datum_t out; \
-	int ret = _gnutls_utf8_to_ucs2(utf8, utf8_size, &out); \
+	int ret = _gnutls_utf8_to_ucs2(utf8, utf8_size, &out, 1); \
 	assert_int_not_equal(ret, 0); \
 }
 

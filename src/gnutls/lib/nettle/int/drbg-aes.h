@@ -21,8 +21,8 @@
  * MA 02111-1301, USA.
  */
 
-#ifndef DRBG_AES_H_INCLUDED
-#define DRBG_AES_H_INCLUDED
+#ifndef GNUTLS_LIB_NETTLE_INT_DRBG_AES_H
+#define GNUTLS_LIB_NETTLE_INT_DRBG_AES_H
 
 #include <config.h>
 #include <nettle/aes.h>
@@ -38,7 +38,7 @@
         ;                                       \
   } while (0)
 
-#define DRBG_AES_KEY_SIZE 32
+#define DRBG_AES_KEY_SIZE AES256_KEY_SIZE
 #define DRBG_AES_SEED_SIZE (AES_BLOCK_SIZE+DRBG_AES_KEY_SIZE)
 
 /* This is the CTR-AES-256-based random-number generator from SP800-90A.
@@ -46,12 +46,10 @@
 struct drbg_aes_ctx {
 	unsigned seeded;
 	/* The current key */
-	struct aes_ctx key;
+	struct aes256_ctx key;
 
 	uint8_t v[AES_BLOCK_SIZE];
 
-	unsigned prev_block_present;
-	uint8_t prev_block[AES_BLOCK_SIZE];
 	unsigned reseed_counter;
 };
 
@@ -92,4 +90,4 @@ int drbg_aes_is_seeded(struct drbg_aes_ctx *ctx);
 
 int drbg_aes_self_test(void);
 
-#endif				/* DRBG_AES_H_INCLUDED */
+#endif /* GNUTLS_LIB_NETTLE_INT_DRBG_AES_H */

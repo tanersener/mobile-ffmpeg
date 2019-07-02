@@ -10,11 +10,12 @@
 @var{err_pos}: In case of an error this will have the position in the string the error occurred
 
 Sets the priorities to use on the ciphers, key exchange methods,
-macs and compression methods.  This function avoids keeping a
+and macs.  This function avoids keeping a
 priority cache and is used to directly set string priorities to a
 TLS session.  For documentation check the @code{gnutls_priority_init()} .
 
-To simply use a reasonable default, consider using @code{gnutls_set_default_priority()} .
+To use a reasonable default, consider using @code{gnutls_set_default_priority()} ,
+or @code{gnutls_set_default_priority_append()}  instead of this function.
 
 @strong{Returns:} On syntax error @code{GNUTLS_E_INVALID_REQUEST}  is returned,
 @code{GNUTLS_E_SUCCESS}  on success, or an error code.

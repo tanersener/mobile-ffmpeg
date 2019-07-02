@@ -5,36 +5,36 @@
 @deftypefun {int} {gnutls_handshake} (gnutls_session_t @var{session})
 @var{session}: is a @code{gnutls_session_t}  type.
 
-This function does the handshake of the TLS/SSL protocol, and
-initializes the TLS connection.
-
-This function will fail if any problem is encountered, and will
-return a negative error code. In case of a client, if the client
-has asked to resume a session, but the server couldn't, then a
-full handshake will be performed.
+This function performs the handshake of the TLS/SSL protocol, and
+initializes the TLS session parameters.
 
 The non-fatal errors expected by this function are:
 @code{GNUTLS_E_INTERRUPTED} , @code{GNUTLS_E_AGAIN} , 
-@code{GNUTLS_E_WARNING_ALERT_RECEIVED} , and @code{GNUTLS_E_GOT_APPLICATION_DATA} ,
-the latter only in a case of rehandshake.
+@code{GNUTLS_E_WARNING_ALERT_RECEIVED} . When this function is called
+for re-handshake under TLS 1.2 or earlier, the non-fatal error code
+@code{GNUTLS_E_GOT_APPLICATION_DATA}  may also be returned.
 
-The former two interrupt the handshake procedure due to the lower
-layer being interrupted, and the latter because of an alert that
-may be sent by a server (it is always a good idea to check any
-received alerts). On these errors call this function again, until it
-returns 0; cf.  @code{gnutls_record_get_direction()}  and
+The former two interrupt the handshake procedure due to the transport
+layer being interrupted, and the latter because of a "warning" alert that
+was sent by the peer (it is always a good idea to check any
+received alerts). On these non-fatal errors call this function again,
+until it returns 0; cf.  @code{gnutls_record_get_direction()}  and
 @code{gnutls_error_is_fatal()} . In DTLS sessions the non-fatal error
 @code{GNUTLS_E_LARGE_PACKET}  is also possible, and indicates that
 the MTU should be adjusted.
 
-If this function is called by a server after a rehandshake request
-then @code{GNUTLS_E_GOT_APPLICATION_DATA}  or
-@code{GNUTLS_E_WARNING_ALERT_RECEIVED}  may be returned.  Note that these
-are non fatal errors, only in the specific case of a rehandshake.
-Their meaning is that the client rejected the rehandshake request or
-in the case of @code{GNUTLS_E_GOT_APPLICATION_DATA}  it could also mean that
-some data were pending. A client may receive that error code if
-it initiates the handshake and the server doesn't agreed.
+When this function is called by a server after a rehandshake request
+under TLS 1.2 or earlier the @code{GNUTLS_E_GOT_APPLICATION_DATA}  error code indicates
+that some data were pending prior to peer initiating the handshake.
+Under TLS 1.3 this function when called after a successful handshake, is a no-op
+and always succeeds in server side; in client side this function is
+equivalent to @code{gnutls_session_key_update()}  with @code{GNUTLS_KU_PEER}  flag.
 
-@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
+This function handles both full and abbreviated TLS handshakes (resumption).
+For abbreviated handshakes, in client side, the @code{gnutls_session_set_data()} 
+should be called prior to this function to set parameters from a previous session.
+In server side, resumption is handled by either setting a DB back-end, or setting
+up keys for session tickets.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on a successful handshake, otherwise a negative error code.
 @end deftypefun

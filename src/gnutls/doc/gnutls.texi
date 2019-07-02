@@ -16,8 +16,8 @@
 This manual is last updated @value{UPDATED} for version
 @value{VERSION} of GnuTLS.
 
-Copyright @copyright{} 2001-2018 Free Software Foundation, Inc.\\
-Copyright @copyright{} 2001-2018 Nikos Mavrogiannopoulos
+Copyright @copyright{} 2001-2019 Free Software Foundation, Inc.\\
+Copyright @copyright{} 2001-2019 Nikos Mavrogiannopoulos
 
 @quotation
 Permission is granted to copy, distribute and/or modify this document
@@ -36,12 +36,12 @@ Documentation License''.
 
 @dircategory System Administration
 @direntry
-* certtool: (gnutls)Invoking certtool.	Manipulate certificates and keys.
-* gnutls-serv: (gnutls)Invoking gnutls-serv.	GnuTLS test server.
-* gnutls-cli: (gnutls)Invoking gnutls-cli.	GnuTLS test client.
-* gnutls-cli-debug: (gnutls)Invoking gnutls-cli-debug.	GnuTLS debug client.
-* psktool: (gnutls)Invoking psktool.	Simple TLS-Pre-Shared-Keys manager.
-* srptool: (gnutls)Invoking srptool.	Simple SRP password tool.
+* certtool: (gnutls)certtool Invocation.	Manipulate certificates and keys.
+* gnutls-serv: (gnutls)gnutls-serv Invocation.	GnuTLS test server.
+* gnutls-cli: (gnutls)gnutls-cli Invocation.	GnuTLS test client.
+* gnutls-cli-debug: (gnutls)gnutls-cli-debug Invocation.	GnuTLS debug client.
+* psktool: (gnutls)psktool Invocation.	Simple TLS-Pre-Shared-Keys manager.
+* srptool: (gnutls)srptool Invocation.	Simple SRP password tool.
 @end direntry
 
 @titlepage
@@ -63,7 +63,7 @@ Documentation License''.
 @end macro
 
 @macro xcite{ref}
-[@emph{\ref\}]
+[@ref{\ref\}]
 @end macro
 
 @macro funcref{ref}

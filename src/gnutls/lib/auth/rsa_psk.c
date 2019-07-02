@@ -136,6 +136,7 @@ _gnutls_gen_rsa_psk_client_kx(gnutls_session_t session,
 	gnutls_psk_client_credentials_t cred;
 	gnutls_datum_t username, key;
 	int ret, free;
+	unsigned init_pos;
 
 	if (auth == NULL) {
 		/* this shouldn't have happened. The proc_certificate
@@ -220,6 +221,8 @@ _gnutls_gen_rsa_psk_client_kx(gnutls_session_t session,
 	 * }
 	 */
 
+	init_pos = data->length;
+
 	/* Write psk_identity and EncryptedPreMasterSecret into data stream
 	 */
 	ret =
@@ -239,7 +242,7 @@ _gnutls_gen_rsa_psk_client_kx(gnutls_session_t session,
 		goto cleanup;
 	}
 
-	ret = data->length;
+	ret = data->length - init_pos;
 
       cleanup:
 	_gnutls_free_datum(&sdata);
@@ -278,7 +281,7 @@ _gnutls_proc_rsa_psk_client_kx(gnutls_session_t session, uint8_t * data,
 		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 
-	ret = _gnutls_auth_info_set(session, GNUTLS_CRD_PSK,
+	ret = _gnutls_auth_info_init(session, GNUTLS_CRD_PSK,
 				    sizeof(psk_auth_info_st), 1);
 	if (ret < 0) {
 		gnutls_assert();
@@ -331,11 +334,14 @@ _gnutls_proc_rsa_psk_client_kx(gnutls_session_t session, uint8_t * data,
 	if (ret < 0 || plaintext.size != GNUTLS_MASTER_SIZE) {
 		/* In case decryption fails then don't inform
 		 * the peer. Just use a random key. (in order to avoid
-		 * attack against pkcs-1 formating).
+		 * attack against pkcs-1 formatting).
 		 */
 		gnutls_assert();
 		_gnutls_debug_log
 		    ("auth_rsa_psk: Possible PKCS #1 format attack\n");
+		if (ret >= 0) {
+			gnutls_free(plaintext.data);
+		}
 		randomize_key = 1;
 	} else {
 		/* If the secret was properly formatted, then
@@ -343,7 +349,7 @@ _gnutls_proc_rsa_psk_client_kx(gnutls_session_t session, uint8_t * data,
 		 */
 		if (_gnutls_get_adv_version_major(session) !=
 		    plaintext.data[0]
-		    || (session->internals.priorities.allow_wrong_pms == 0
+		    || (session->internals.allow_wrong_pms == 0
 			&& _gnutls_get_adv_version_minor(session) !=
 			plaintext.data[1])) {
 			/* No error is returned here, if the version number check

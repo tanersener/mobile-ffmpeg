@@ -43,7 +43,15 @@ Usage:  gnutls-serv [ -<flag> [<val>] | --<name>[@{=| @}<val>] ]...
                                   0 to 9999
        --sni-hostname=str     Server's hostname for server name extension
        --sni-hostname-fatal   Send fatal alert on sni-hostname mismatch
+       --alpn=str             Specify ALPN protocol to be enabled by the server
+                                - may appear multiple times
+       --alpn-fatal           Send fatal alert on non-matching ALPN name
        --noticket             Don't accept session tickets
+       --earlydata            Accept early data
+       --maxearlydata=num     The maximum early data size to accept
+                                - it must be in the range:
+                                  1 to 4294967295
+       --nocookie             Don't require cookie on DTLS sessions
    -g, --generate             Generate Diffie-Hellman parameters
    -q, --quiet                Suppress some messages
        --nodb                 Do not use a resumption database
@@ -55,6 +63,7 @@ Usage:  gnutls-serv [ -<flag> [<val>] | --<name>[@{=| @}<val>] ]...
                                   0 to 17000
        --srtp-profiles=str    Offer SRTP profiles
    -a, --disable-client-cert  Do not request a client certificate
+                                - prohibits the option 'require-client-cert'
    -r, --require-client-cert  Require a client certificate
        --verify-client-cert   If a client certificate is sent then verify it.
    -b, --heartbeat            Activate heartbeat support
@@ -65,19 +74,10 @@ Usage:  gnutls-serv [ -<flag> [<val>] | --<name>[@{=| @}<val>] ]...
        --x509cafile=str       Certificate file or PKCS #11 URL to use
        --x509crlfile=file     CRL file to use
                                 - file must pre-exist
-       --pgpkeyfile=file      PGP Key file to use
-                                - file must pre-exist
-       --pgpkeyring=file      PGP Key ring file to use
-                                - file must pre-exist
-       --pgpcertfile=file     PGP Public Key (certificate) file to use
-                                - file must pre-exist
        --x509keyfile=str      X.509 key file or PKCS #11 URL to use
+                                - may appear multiple times
        --x509certfile=str     X.509 Certificate file or PKCS #11 URL to use
-       --x509dsakeyfile=str   Alternative X.509 key file or PKCS #11 URL to use
-       --x509dsacertfile=str  Alternative X.509 Certificate file or PKCS #11 URL to use
-       --x509ecckeyfile=str   Alternative X.509 key file or PKCS #11 URL to use
-       --x509ecccertfile=str  Alternative X.509 Certificate file or PKCS #11 URL to use
-       --pgpsubkey=str        PGP subkey to use (hex or auto)
+                                - may appear multiple times
        --srppasswd=file       SRP password file to use
                                 - file must pre-exist
        --srppasswdconf=file   SRP password configuration file to use
@@ -85,12 +85,15 @@ Usage:  gnutls-serv [ -<flag> [<val>] | --<name>[@{=| @}<val>] ]...
        --pskpasswd=file       PSK password file to use
                                 - file must pre-exist
        --pskhint=str          PSK identity hint to use
-       --ocsp-response=file   The OCSP response to send to client
-                                - file must pre-exist
+       --ocsp-response=str    The OCSP response to send to client
+                                - may appear multiple times
+       --ignore-ocsp-response-errors  Ignore any errors when setting the OCSP response
    -p, --port=num             The port to connect to
    -l, --list                 Print a list of the supported algorithms and modes
-       --provider=file        Specify the PKCS #11 provider library
+   -!, --provider=file        Specify the PKCS #11 provider library
                                 - file must pre-exist
+   -", --keymatexport=str     Label used for exporting keying material
+   -#, --keymatexportsize=num Size of the exported keying material
    -v, --version[=arg]        output version information and exit
    -h, --help                 display extended usage information and exit
    -!, --more-help            extended usage information passed thru pager
@@ -115,6 +118,26 @@ Specifies the debug level.
 This is the ``server's hostname for server name extension'' option.
 This option takes a string argument.
 Server name of type host_name that the server will recognise as its own. If the server receives client hello with different name, it will send a warning-level unrecognized_name alert.
+@anchor{gnutls-serv alpn}
+@subheading alpn option
+
+This is the ``specify alpn protocol to be enabled by the server'' option.
+This option takes a string argument.
+
+@noindent
+This option has some usage constraints.  It:
+@itemize @bullet
+@item
+may appear an unlimited number of times.
+@end itemize
+
+Specify the (textual) ALPN protocol for the server to use.
+@anchor{gnutls-serv require-client-cert}
+@subheading require-client-cert option (-r)
+
+This is the ``require a client certificate'' option.
+This option before 3.6.0 used to imply --verify-client-cert.
+Since 3.6.0 it will no longer verify the certificate by default.
 @anchor{gnutls-serv verify-client-cert}
 @subheading verify-client-cert option
 
@@ -136,12 +159,83 @@ NORMAL, SECURE128, SECURE256. The default is NORMAL.
 
 Check  the  GnuTLS  manual  on  section  ``Priority strings'' for more
 information on allowed keywords
+@anchor{gnutls-serv x509keyfile}
+@subheading x509keyfile option
+
+This is the ``x.509 key file or pkcs #11 url to use'' option.
+This option takes a string argument.
+
+@noindent
+This option has some usage constraints.  It:
+@itemize @bullet
+@item
+may appear an unlimited number of times.
+@end itemize
+
+Specify the private key file or URI to use; it must correspond to
+the certificate specified in --x509certfile. Multiple keys and certificates
+can be specified with this option and in that case each occurrence of keyfile
+must be followed by the corresponding x509certfile or vice-versa.
+@anchor{gnutls-serv x509certfile}
+@subheading x509certfile option
+
+This is the ``x.509 certificate file or pkcs #11 url to use'' option.
+This option takes a string argument.
+
+@noindent
+This option has some usage constraints.  It:
+@itemize @bullet
+@item
+may appear an unlimited number of times.
+@end itemize
+
+Specify the certificate file or URI to use; it must correspond to
+the key specified in --x509keyfile. Multiple keys and certificates
+can be specified with this option and in that case each occurrence of keyfile
+must be followed by the corresponding x509certfile or vice-versa.
+@anchor{gnutls-serv x509dsakeyfile}
+@subheading x509dsakeyfile option
+
+This is an alias for the @code{x509keyfile} option,
+@pxref{gnutls-serv x509keyfile, the x509keyfile option documentation}.
+
+@anchor{gnutls-serv x509dsacertfile}
+@subheading x509dsacertfile option
+
+This is an alias for the @code{x509certfile} option,
+@pxref{gnutls-serv x509certfile, the x509certfile option documentation}.
+
+@anchor{gnutls-serv x509ecckeyfile}
+@subheading x509ecckeyfile option
+
+This is an alias for the @code{x509keyfile} option,
+@pxref{gnutls-serv x509keyfile, the x509keyfile option documentation}.
+
+@anchor{gnutls-serv x509ecccertfile}
+@subheading x509ecccertfile option
+
+This is an alias for the @code{x509certfile} option,
+@pxref{gnutls-serv x509certfile, the x509certfile option documentation}.
+
 @anchor{gnutls-serv ocsp-response}
 @subheading ocsp-response option
 
 This is the ``the ocsp response to send to client'' option.
-This option takes a file argument.
+This option takes a string argument.
+
+@noindent
+This option has some usage constraints.  It:
+@itemize @bullet
+@item
+may appear an unlimited number of times.
+@end itemize
+
 If the client requested an OCSP response, return data from this file to the client.
+@anchor{gnutls-serv ignore-ocsp-response-errors}
+@subheading ignore-ocsp-response-errors option
+
+This is the ``ignore any errors when setting the ocsp response'' option.
+That option instructs gnutls to not attempt to match the provided OCSP responses with the certificates.
 @anchor{gnutls-serv list}
 @subheading list option (-l)
 
@@ -256,42 +350,17 @@ $ gnutls-serv --http \
 Try connecting to the server using your web browser.  Note that the
 server listens to port 5556 by default.
 
-While you are at it, to allow connections using DSA, you can also
-create a DSA key and certificate for the server.  These credentials
+While you are at it, to allow connections using ECDSA, you can also
+create a ECDSA key and certificate for the server.  These credentials
 will be used in the final example below.
 
 @example
-$ certtool --generate-privkey --dsa > x509-server-key-dsa.pem
-$ certtool --generate-certificate --load-privkey x509-server-key-dsa.pem \
+$ certtool --generate-privkey --ecdsa > x509-server-key-ecc.pem
+$ certtool --generate-certificate --load-privkey x509-server-key-ecc.pem \
   --load-ca-certificate x509-ca.pem --load-ca-privkey x509-ca-key.pem \
-  --template server.tmpl --outfile x509-server-dsa.pem
+  --template server.tmpl --outfile x509-server-ecc.pem
 @end example
 
-The next step is to create OpenPGP credentials for the server.
-
-@example
-gpg --gen-key
-Enter whatever details you want, use 'test.gnutls.org' as name...
-@end example
-
-Make a note of the OpenPGP key identifier of the newly generated key,
-here it was @code{5D1D14D8}.  You will need to export the key for
-GnuTLS to be able to use it.
-
-@example
-gpg -a --export 5D1D14D8 > openpgp-server.txt
-gpg --export 5D1D14D8 > openpgp-server.bin
-gpg --export-secret-keys 5D1D14D8 > openpgp-server-key.bin
-gpg -a --export-secret-keys 5D1D14D8 > openpgp-server-key.txt
-@end example
-
-Let's start the server with support for OpenPGP credentials:
-
-@example
-gnutls-serv --http --priority NORMAL:+CTYPE-OPENPGP \
-            --pgpkeyfile openpgp-server-key.txt \
-            --pgpcertfile openpgp-server.txt
-@end example
 
 The next step is to add support for SRP authentication. This requires
 an SRP password file created with @code{srptool}.
@@ -315,14 +384,12 @@ Finally, we start the server with all the earlier parameters and you
 get this command:
 
 @example
-gnutls-serv --http --priority NORMAL:+PSK:+SRP:+CTYPE-OPENPGP \
+gnutls-serv --http --priority NORMAL:+PSK:+SRP \
             --x509cafile x509-ca.pem \
             --x509keyfile x509-server-key.pem \
             --x509certfile x509-server.pem \
-            --x509dsakeyfile x509-server-key-dsa.pem \
-            --x509dsacertfile x509-server-dsa.pem \
-            --pgpkeyfile openpgp-server-key.txt \
-            --pgpcertfile openpgp-server.txt \
+            --x509keyfile x509-server-key-ecc.pem \
+            --x509certfile x509-server-ecc.pem \
             --srppasswdconf srp-tpasswd.conf \
             --srppasswd srp-passwd.txt \
             --pskpasswd psk-passwd.txt

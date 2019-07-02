@@ -16,8 +16,8 @@ issuer's certificate, then the issuer's issuer etc. However, there
 are servers which violate this principle and thus on certain
 occasions this may be an unsorted list.
 
-In case of OpenPGP keys a single key will be returned in raw
-format.
+In resumed sessions, this function will return the peer's certificate
+list as used in the first/original session.
 
 @strong{Returns:} a pointer to a @code{gnutls_datum_t}  containing the peer's
 certificates, or @code{NULL}  in case of an error or if no certificate

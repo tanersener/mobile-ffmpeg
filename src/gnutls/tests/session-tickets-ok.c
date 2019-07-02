@@ -74,19 +74,19 @@ static int handshake_callback(gnutls_session_t session, unsigned int htype,
 	if (htype != GNUTLS_HANDSHAKE_NEW_SESSION_TICKET)
 		return 0;
 
-	success("sent session ticket\n");
+	if (debug)
+		success("sent session ticket\n");
 	sent = 1;
 	return 0;
 }
 	
 #define MAX_BUF 1024
 
-static void client(int fd)
+static void client(int fd, const char *prio)
 {
 	int ret;
 	gnutls_certificate_credentials_t x509_cred;
 	gnutls_session_t session;
-	/* Need to enable anonymous KX specifically. */
 
 	global_init();
 
@@ -97,30 +97,18 @@ static void client(int fd)
 
 	gnutls_certificate_allocate_credentials(&x509_cred);
 
-	/* Initialize TLS session
-	 */
-	gnutls_init(&session, GNUTLS_CLIENT);
+	assert(gnutls_init(&session, GNUTLS_CLIENT)>=0);
 
-	/* Use default priorities */
-	gnutls_priority_set_direct(session, "NORMAL:-KX-ALL:+ECDHE-RSA", NULL);
+	assert(gnutls_priority_set_direct(session, prio, NULL)>=0);
 
-	/* put the anonymous credentials to the current session
-	 */
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
 	gnutls_transport_set_int(session, fd);
 
-	/* Perform the TLS handshake
-	 */
 	do {
 		ret = gnutls_handshake(session);
 	}
 	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
-
-	if (ret == GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM) {
-		/* success */
-		goto end;
-	}
 
 	if (ret < 0) {
 		fail("client: Handshake failed: %s\n", gnutls_strerror(ret));
@@ -136,8 +124,6 @@ static void client(int fd)
 			(gnutls_protocol_get_version(session)));
 
 	gnutls_bye(session, GNUTLS_SHUT_WR);
-
-      end:
 
 	close(fd);
 
@@ -158,7 +144,7 @@ static void terminate(void)
 	exit(1);
 }
 
-static void server(int fd)
+static void server(int fd, const char *prio)
 {
 	int ret;
 	char buffer[MAX_BUF + 1];
@@ -193,7 +179,7 @@ static void server(int fd)
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	assert(gnutls_priority_set_direct(session, "NORMAL", NULL)>=0);
+	assert(gnutls_priority_set_direct(session, prio, NULL)>=0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
@@ -243,11 +229,14 @@ static void ch_handler(int sig)
 	return;
 }
 
-void doit(void)
+static
+void start(const char *prio)
 {
 	int fd[2];
 	int ret, status = 0;
 
+	sent = 0;
+	success("trying %s\n", prio);
 	signal(SIGCHLD, ch_handler);
 	signal(SIGPIPE, SIG_IGN);
 
@@ -267,16 +256,23 @@ void doit(void)
 	if (child) {
 		/* parent */
 		close(fd[1]);
-		server(fd[0]);
+		server(fd[0], prio);
 		waitpid(child, &status, 0);
 		check_wait_status(status);
 	} else {
 		close(fd[0]);
-		client(fd[1]);
+		client(fd[1], prio);
 		exit(0);
 	}
 
 	return;
+}
+
+void doit(void)
+{
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.2");
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.3");
+	start("NORMAL");
 }
 
 #endif				/* _WIN32 */

@@ -16,12 +16,12 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
-#ifndef GNUTLS_HASH_INT_H
-#define GNUTLS_HASH_INT_H
+#ifndef GNUTLS_LIB_HASH_INT_H
+#define GNUTLS_LIB_HASH_INT_H
 
 #include "gnutls_int.h"
 #include <gnutls/crypto.h>
@@ -136,9 +136,6 @@ int _gnutls_mac_output_ssl3(digest_hd_st * handle, void *digest);
 int _gnutls_ssl3_generate_random(void *secret, int secret_len,
 				 void *rnd, int random_len, int bytes,
 				 uint8_t * ret);
-int _gnutls_ssl3_hash_md5(const void *first, int first_len,
-			  const void *second, int second_len,
-			  int ret_len, uint8_t * ret);
 
 int _gnutls_mac_deinit_ssl3_handshake(digest_hd_st * handle, void *digest,
 				      uint8_t * key, uint32_t key_size);
@@ -153,4 +150,4 @@ inline static int IS_SHA(gnutls_digest_algorithm_t algo)
 	return 0;
 }
 
-#endif				/* GNUTLS_HASH_INT_H */
+#endif /* GNUTLS_LIB_HASH_INT_H */

@@ -16,7 +16,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see
- * <http://www.gnu.org/licenses/>.
+ * <https://www.gnu.org/licenses/>.
  *
  * Written by Nikos Mavrogiannopoulos <nmav@gnutls.org>.
  */
@@ -31,7 +31,6 @@
 #include <gnutls/x509-ext.h>
 #include <string.h>
 #include <limits.h>
-#include <inttypes.h>
 #include <time.h>
 #include <timespec.h>
 #include <parse-datetime.h>
@@ -57,16 +56,24 @@
 #include "certtool-common.h"
 
 /* to print uint64_t */
-#if SIZEOF_LONG < 8
 # define __STDC_FORMAT_MACROS
 # include <inttypes.h>
-#endif
 
 extern int batch;
 extern int ask_pass;
 
 #define MAX_ENTRIES 128
 #define MAX_POLICIES 8
+
+#define CHECK_MALLOC(x) \
+	if (x == NULL) { \
+		fprintf(stderr, "memory error\n"); \
+		exit(1); \
+	}
+
+#define PRINT_TIME_T_ERROR \
+	if (sizeof(time_t) < 8) \
+		fprintf(stderr, "This system expresses time with a 32-bit time_t; that prevents dates after 2038 to be expressed by GnuTLS.\n")
 
 enum option_types { OPTION_NUMERIC, OPTION_STRING, OPTION_BOOLEAN, OPTION_MULTI_LINE };
 
@@ -123,12 +130,13 @@ static struct cfg_options available_options[] = {
 	{ .name = "crl_this_update_date", .type = OPTION_STRING },
 	{ .name = "crl_next_update_date", .type = OPTION_STRING },
 	{ .name = "policy*", .type = OPTION_MULTI_LINE }, /* not a multi-line but there are multi as it is a wildcard */
+	{ .name = "inhibit_anypolicy_skip_certs", .type = OPTION_NUMERIC },
 	{ .name = "pkcs12_key_name", .type = OPTION_STRING },
 	{ .name = "proxy_policy_language", .type = OPTION_STRING },
-	{ .name = "serial", .type = OPTION_NUMERIC },
+	{ .name = "serial", .type = OPTION_STRING },
 	{ .name = "expiration_days", .type = OPTION_NUMERIC },
 	{ .name = "crl_next_update", .type = OPTION_NUMERIC },
-	{ .name = "crl_number", .type = OPTION_NUMERIC },
+	{ .name = "crl_number", .type = OPTION_STRING },
 	{ .name = "path_len", .type = OPTION_NUMERIC },
 	{ .name = "ca", .type = OPTION_BOOLEAN },
 	{ .name = "honor_crq_extensions", .type = OPTION_BOOLEAN },
@@ -195,8 +203,10 @@ typedef struct _cfg_ctx {
 	char *revocation_date;
 	char *this_update_date;
 	char *next_update_date;
-	int64_t serial;
+	uint8_t *serial;
+	unsigned serial_size;
 	int expiration_days;
+	int skip_certs; /* from inhibit anypolicy */
 	int ca;
 	int path_len;
 	int tls_www_client;
@@ -215,7 +225,8 @@ typedef struct _cfg_ctx {
 	int ipsec_ike_key;
 	char **key_purpose_oids;
 	int crl_next_update;
-	int64_t crl_number;
+	uint8_t *crl_number;
+	unsigned crl_number_size;
 	int honor_crq_extensions;
 	char *proxy_policy_language;
 	char **exts_to_honor;
@@ -230,8 +241,7 @@ void cfg_init(void)
 {
 	memset(&cfg, 0, sizeof(cfg));
 	cfg.path_len = -1;
-	cfg.crl_number = -1;
-	cfg.serial = -1;
+	cfg.skip_certs = -1;
 }
 
 #define READ_MULTI_LINE(name, s_name) \
@@ -241,8 +251,9 @@ void cfg_init(void)
     if (s_name == NULL) { \
       i = 0; \
       s_name = malloc(sizeof(char*)*MAX_ENTRIES); \
+      CHECK_MALLOC(s_name); \
       do { \
-	if (val && !strcmp(val->pzName, name)==0) \
+	if (val && strcmp(val->pzName, name)!=0) \
 	  continue; \
 	s_name[i] = strdup(val->v.strVal); \
 	i++; \
@@ -257,22 +268,17 @@ void cfg_init(void)
   val = optionGetValue(pov, name); \
   if (val != NULL && val->valType == OPARG_TYPE_STRING) \
   { \
-    char str[512]; \
-    char * p; \
-    int len; \
+    char *str; \
+    char *p; \
     if (s_name == NULL) { \
       i = 0; \
       s_name = malloc(sizeof(char*)*MAX_ENTRIES); \
+      CHECK_MALLOC(s_name); \
       do { \
-	if (val && !strcmp(val->pzName, name)==0) \
+	if (val && strcmp(val->pzName, name)!=0) \
 	  continue; \
-	len = strlen(val->v.strVal); \
-	if (sizeof(str) > (unsigned)len) { \
-		strcpy(str, val->v.strVal); \
-	} else { \
-		memcpy(str, val->v.strVal, sizeof(str)-1); \
-		str[sizeof(str)-1] = 0; \
-	} \
+	str = strdup(val->v.strVal); \
+	CHECK_MALLOC(str); \
 	if ((p=strchr(str, ' ')) == NULL && (p=strchr(str, '\t')) == NULL) { \
 	  fprintf(stderr, "Error parsing %s\n", name); \
 	  exit(1); \
@@ -287,6 +293,7 @@ void cfg_init(void)
 	} \
 	s_name[i+1] = strdup(p); \
 	i+=2; \
+	free(str); \
 	if (i>=MAX_ENTRIES) \
 	  break; \
       } while((val = optionNextValue(pov, val)) != NULL); \
@@ -302,12 +309,6 @@ void cfg_init(void)
     }
 
 /* READ_NUMERIC only returns a long */
-#define CHECK_LONG_OVERFLOW(x) \
-      if (x == LONG_MAX) { \
-        fprintf(stderr, "overflow in number\n"); \
-        exit(1); \
-      }
-
 #define READ_NUMERIC(name, s_name) \
   val = optionGetValue(pov, name); \
   if (val != NULL) \
@@ -330,6 +331,19 @@ void cfg_init(void)
 		output = _output.data; \
 		output_size = _output.size; \
 	}
+
+#define SERIAL_DECODE(input, output, output_size) \
+	{ \
+		gnutls_datum_t _output; \
+		ret = serial_decode(input, &_output); \
+		if (ret < 0) { \
+			fprintf(stderr, "error parsing number: %s\n", input); \
+			exit(1); \
+		} \
+		output = _output.data; \
+		output_size = _output.size; \
+	}
+
 
 static int handle_option(const tOptionValue* val)
 {
@@ -456,6 +470,8 @@ int template_parse(const char *template)
 	if (val != NULL && val->valType == OPARG_TYPE_STRING)
 		cfg.next_update_date = strdup(val->v.strVal);
 
+	READ_NUMERIC("inhibit_anypolicy_skip_certs", cfg.skip_certs);
+
 	for (i = 0; i < MAX_POLICIES; i++) {
 		snprintf(tmpstr, sizeof(tmpstr), "policy%d", i + 1);
 		val = optionGetValue(pov, tmpstr);
@@ -512,13 +528,16 @@ int template_parse(const char *template)
 		cfg.pkcs12_key_name = strdup(val->v.strVal);
 
 
-	READ_NUMERIC("serial", cfg.serial);
-	CHECK_LONG_OVERFLOW(cfg.serial);
+	val = optionGetValue(pov, "serial");
+	if (val != NULL && val->valType == OPARG_TYPE_STRING)
+		SERIAL_DECODE(val->v.strVal, cfg.serial, cfg.serial_size);
 
 	READ_NUMERIC("expiration_days", cfg.expiration_days);
 	READ_NUMERIC("crl_next_update", cfg.crl_next_update);
-	READ_NUMERIC("crl_number", cfg.crl_number);
-	CHECK_LONG_OVERFLOW(cfg.crl_number);
+
+	val = optionGetValue(pov, "crl_number");
+	if (val != NULL && val->valType == OPARG_TYPE_STRING)
+		SERIAL_DECODE(val->v.strVal, cfg.crl_number, cfg.crl_number_size);
 
 	READ_NUMERIC("path_len", cfg.path_len);
 
@@ -559,48 +578,86 @@ int template_parse(const char *template)
 #define IS_NEWLINE(x) ((x[0] == '\n') || (x[0] == '\r'))
 #define MAX_INPUT_SIZE 512
 
+static size_t strip_nl(char *str, size_t str_size)
+{
+	if ((str_size > 0) && (str[str_size - 1] == '\n')) {
+		str_size--;
+		str[str_size] = 0;
+	}
+	if ((str_size > 0) && (str[str_size - 1] == '\r')) {
+		str_size--;
+		str[str_size] = 0;
+	}
+	return str_size;
+}
+
+static int copystr_without_nl(char *out, size_t out_size, const char *in, size_t in_size)
+{
+	if (in_size+1 >= out_size) {
+		fprintf(stderr, "Too long line to parse in interactive mode; please use templates.\n");
+		exit(1);
+	}
+	memcpy(out, in, in_size+1); /* copy terminating null */
+	strip_nl(out, in_size);
+	return 0;
+}
+
 void
 read_crt_set(gnutls_x509_crt_t crt, const char *input_str, const char *oid)
 {
-	char input[MAX_INPUT_SIZE];
-	int ret;
+	ssize_t ret;
+	char *lineptr = NULL;
+	size_t linesize = 0;
 
 	fputs(input_str, stderr);
-	if (fgets(input, sizeof(input), stdin) == NULL)
+	ret = getline(&lineptr, &linesize, stdin);
+	if (ret == -1)
 		return;
 
-	if (IS_NEWLINE(input))
+	if (IS_NEWLINE(lineptr)) {
+		free(lineptr);
 		return;
+	}
+
+	linesize = strip_nl(lineptr, ret);
 
 	ret =
-	    gnutls_x509_crt_set_dn_by_oid(crt, oid, 0, input,
-					  strlen(input) - 1);
+	    gnutls_x509_crt_set_dn_by_oid(crt, oid, 0, lineptr,
+					  linesize);
 	if (ret < 0) {
 		fprintf(stderr, "set_dn: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
+	free(lineptr);
 }
 
 void
 read_crq_set(gnutls_x509_crq_t crq, const char *input_str, const char *oid)
 {
-	char input[MAX_INPUT_SIZE];
-	int ret;
+	ssize_t ret;
+	char *lineptr = NULL;
+	size_t linesize = 0;
 
 	fputs(input_str, stderr);
-	if (fgets(input, sizeof(input), stdin) == NULL)
+	ret = getline(&lineptr, &linesize, stdin);
+	if (ret == -1)
 		return;
 
-	if (IS_NEWLINE(input))
+	if (IS_NEWLINE(lineptr)) {
+		free(lineptr);
 		return;
+	}
+
+	linesize = strip_nl(lineptr, ret);
 
 	ret =
-	    gnutls_x509_crq_set_dn_by_oid(crq, oid, 0, input,
-					  strlen(input) - 1);
+	    gnutls_x509_crq_set_dn_by_oid(crq, oid, 0, lineptr,
+					  linesize);
 	if (ret < 0) {
 		fprintf(stderr, "set_dn: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
+	free(lineptr);
 }
 
 /* The input_str should contain %d or %u to print the default.
@@ -663,21 +720,76 @@ int64_t read_int(const char *input_str)
 	return read_int_with_default(input_str, 0);
 }
 
+int serial_decode(const char *input, gnutls_datum_t *output)
+{
+	int i;
+	int64_t value;
+	char *endptr;
+	int64_t value_limit;
+	gnutls_datum_t input_datum;
+
+	if (input[0] == '0' && input[1] == 'x') {
+		input_datum.data = (void *) (input + 2);
+		input_datum.size = strlen(input + 2);
+		if (input_datum.size == 0) {
+			return GNUTLS_E_PARSING_ERROR;
+		}
+		return gnutls_hex_decode2(&input_datum, output);
+	}
+
+#if SIZEOF_LONG < 8
+	value = strtol(input, &endptr, 10);
+	value_limit = LONG_MAX;
+#else
+	value = strtoll(input, &endptr, 10);
+	value_limit = LLONG_MAX;
+#endif
+
+	if (*endptr != '\0') {
+		fprintf(stderr, "Trailing garbage: `%s'\n", endptr);
+		return GNUTLS_E_PARSING_ERROR;
+	}
+
+	if (value <= 0 || value >= value_limit) {
+		fprintf(stderr, "Integer out of range: `%s' (min: 1, max: %"PRId64")\n", input, value_limit-1);
+		return GNUTLS_E_PARSING_ERROR;
+	}
+
+	output->size = sizeof(int64_t);
+	output->data = gnutls_malloc(output->size);
+	if (output->data == NULL) {
+		output->size = 0;
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	for (i = output->size - 1; i >= 0; i--) {
+		output->data[i] = value & 0xff;
+		value = value >> 8;
+	}
+
+	return 0;
+}
+
 const char *read_str(const char *input_str)
 {
 	static char input[MAX_INPUT_SIZE];
-	int len;
+	ssize_t ret;
+	char *lineptr = NULL;
+	size_t linesize = 0;
 
 	fputs(input_str, stderr);
-	if (fgets(input, sizeof(input), stdin) == NULL)
+	ret = getline(&lineptr, &linesize, stdin);
+	if (ret == -1)
+		return NULL;
+
+	ret = copystr_without_nl(input, sizeof(input), lineptr, ret);
+	free(lineptr);
+	if (ret < 0)
 		return NULL;
 
 	if (IS_NEWLINE(input))
 		return NULL;
 
-	len = strlen(input);
-	if ((len > 0) && (input[len - 1] == '\n'))
-		input[len - 1] = 0;
 	if (input[0] == 0)
 		return NULL;
 
@@ -773,15 +885,25 @@ void get_crl_dist_point_set(gnutls_x509_crt_t crt)
 		}
 	} else {
 		const char *p;
+		unsigned int counter = 0;
 
 		do {
-			p = read_str
-			    ("Enter the URI of the CRL distribution point: ");
+			if (counter == 0) {
+				p = read_str
+				    ("Enter the URI of the CRL distribution point: ");
+			} else {
+				p = read_str
+				    ("Enter an additional URI of the CRL distribution point: ");
+			}
 			if (!p)
 				return;
 
 			ret = gnutls_x509_crt_set_crl_dist_points
 			    (crt, GNUTLS_SAN_URI, p, 0);
+			if (ret < 0)
+				break;
+
+			counter++;
 		}
 		while (p);
 	}
@@ -1394,75 +1516,179 @@ void get_pkcs9_email_crt_set(gnutls_x509_crt_t crt)
 
 
 static
-void get_rand_int_value(unsigned char* serial, size_t * size, int64_t cfg_val, const char *msg)
+int default_crl_number(unsigned char* serial, size_t *size)
 {
 	struct timespec ts;
-	uint32_t default_serial[2];
+	time_t tv_sec_tmp;
+	int i;
 
 	/* default format:
-	 * |  4 b |  4 b  |  4b
+	 * |  5 b |  4 b  |  11b
 	 * | secs | nsecs | rnd  |
 	 */
 	gettime(&ts);
 
-	if (*size < 12) {
-		fprintf(stderr, "error in get_serial()!\n");
+	if (*size < 20) {
+		return GNUTLS_E_SHORT_MEMORY_BUFFER;
+	}
+
+	tv_sec_tmp = ts.tv_sec;
+	for (i = 4; i >= 0; i--) {
+		serial[i] = tv_sec_tmp & 0xff;
+		tv_sec_tmp = tv_sec_tmp >> 8;
+	}
+	serial[5] = (ts.tv_nsec >> 24) & 0xff;
+	serial[6] = (ts.tv_nsec >> 16) & 0xff;
+	serial[7] = (ts.tv_nsec >> 8) & 0xff;
+	serial[8] = (ts.tv_nsec) & 0xff;
+	// crl number must be positive and max 20 octets
+	// so we must zero the most significant bit (with MSB set, the DER encoding
+	// would be 21 octets long). See RFC 5280, section 5.2.3.
+	serial[0] &= 0x7F;
+	*size = 20;
+	return gnutls_rnd(GNUTLS_RND_NONCE, &serial[9], 11);
+}
+
+/**
+ * read_serial_value:
+ * @serial: pointer to buffer with serial number
+ * @size: pointer to actual size of data in buffer
+ * @max_size: capacity of the buffer
+ * @label: user-facing description of the field we are reading value for
+ * @rfc_section: rfc section number that defines the field
+ *
+ * This function will read a serial number from the user. It takes a buffer
+ * that contains a default value that will be displayed to the user and
+ * maximum size of the buffer that it can fill. When the function
+ * returns, either the buffer is not modified to use the default value
+ * or it's contents are changed to reflect the user-entered value.
+ **/
+static
+void read_serial_value(unsigned char *serial, size_t *size, size_t max_size,
+		const char *label, const char *rfc_section)
+{
+	static char input[MAX_INPUT_SIZE];
+	int ret;
+	size_t input_len;
+	gnutls_datum_t decoded;
+	gnutls_datum_t serial_datum;
+	gnutls_datum_t encoded_default;
+
+	serial_datum.data = serial;
+	serial_datum.size = *size;
+
+	ret = gnutls_hex_encode2(&serial_datum, &encoded_default);
+	if (ret < 0) {
+		fprintf(stderr, "error encoding default to hex: %d\n", ret);
 		exit(1);
 	}
 
-	if (batch && cfg_val < 0) {
-		serial[0] = (ts.tv_sec >> 24) & 0xff;
-		serial[1] = (ts.tv_sec >> 16) & 0xff;
-		serial[2] = (ts.tv_sec >> 8) & 0xff;
-		serial[3] = (ts.tv_sec) & 0xff;
-		serial[4] = (ts.tv_nsec >> 24) & 0xff;
-		serial[5] = (ts.tv_nsec >> 16) & 0xff;
-		serial[6] = (ts.tv_nsec >> 8) & 0xff;
-		serial[7] = (ts.tv_nsec) & 0xff;
-		serial[0] &= 0x7F;
-		gnutls_rnd(GNUTLS_RND_NONCE, &serial[8], 4);
-		*size = 12;
-		return;
+	while (true) {
+		fprintf(stderr,
+			"Enter the %s in decimal (123) or hex (0xabcd)\n"
+			"(default is 0x%s)\n"
+			"value: ",
+			label, encoded_default.data);
+
+		if (fgets(input, sizeof(input), stdin) == NULL)
+			break;
+
+		input_len = strip_nl(input, strlen(input));
+
+		if (input_len == 0)
+			break;
+
+		ret = serial_decode(input, &decoded);
+		if (ret < 0) {
+			fprintf(stderr, "error parsing %s: %s\n", label, input);
+			continue;
+		}
+
+		if ((decoded.size == SERIAL_MAX_BYTES && decoded.data[0] & 0x80) ||
+				decoded.size > SERIAL_MAX_BYTES) {
+			fprintf(stderr, "%s would be encoded in more than 20 bytes,"
+				"see RFC 5280, section %s\n", label, rfc_section);
+			gnutls_free(decoded.data);
+			continue;
+		}
+
+		if (decoded.size > max_size) {
+			fprintf(stderr, "maximum %zu octets allowed for %s\n",
+					max_size, label);
+			gnutls_free(decoded.data);
+			continue;
+		}
+
+		memcpy(serial, decoded.data, decoded.size);
+		*size = decoded.size;
+		gnutls_free(decoded.data);
+		break;
 	}
 
-	if (batch) {
-		default_serial[0] = cfg_val >> 32;
-		default_serial[1] = cfg_val;
-	} else {
-		uint64_t default_serial_int;
-		char tmsg[256];
-
-#if SIZEOF_LONG < 8
-		default_serial_int = ts.tv_sec;
-		snprintf(tmsg, sizeof(tmsg), "%s (default: %" PRIu64"): ", msg, default_serial_int);
-#else
-		default_serial_int = (ts.tv_sec << 32) | ts.tv_nsec;
-		snprintf(tmsg, sizeof(tmsg), "%s (default: %lu): ", msg, default_serial_int);
-#endif
-		default_serial_int = read_int_with_default(tmsg, (long)default_serial_int);
-
-		default_serial[0] = default_serial_int >> 32;
-		default_serial[1] = default_serial_int;
-	}
-
-	serial[0] = (default_serial[0] >> 24) & 0xff;
-	serial[1] = (default_serial[0] >> 16) & 0xff;
-	serial[2] = (default_serial[0] >> 8) & 0xff;
-	serial[3] = (default_serial[0]) & 0xff;
-	serial[4] = (default_serial[1] >> 24) & 0xff;
-	serial[5] = (default_serial[1] >> 16) & 0xff;
-	serial[6] = (default_serial[1] >> 8) & 0xff;
-	serial[7] = (default_serial[1]) & 0xff;
-	serial[0] &= 0x7F;
-
-	*size = 8;
-
-	return;
+	gnutls_free(encoded_default.data);
 }
 
-void get_serial(unsigned char* serial, size_t * size)
+static
+void get_serial_value(unsigned char *serial, size_t *size,
+		const unsigned char *config, size_t config_size,
+		int (create_default)(unsigned char *, size_t *),
+		const char *label, const char *rfc_section)
 {
-	get_rand_int_value(serial, size, cfg.serial, "Enter the certificate's serial number in decimal");
+	size_t max_size = *size;
+	int ret;
+
+	if (batch && config != NULL) {
+		if (config_size > max_size) {
+			fprintf(stderr, "maximum %zu octets allowed for %s!\n",
+					max_size, label);
+			exit(1);
+		}
+		memcpy(serial, config, config_size);
+		*size = config_size;
+	} else {
+		ret = create_default(serial, size);
+		if (ret < 0) {
+			fprintf(stderr, "error generating default %s: %s\n",
+					label, gnutls_strerror(ret));
+			exit(1);
+		}
+	}
+
+	if (!batch)
+		read_serial_value(serial, size, max_size, label, rfc_section);
+
+	if ((*size == SERIAL_MAX_BYTES && serial[0] & 0x80) || *size > SERIAL_MAX_BYTES) {
+		fprintf(stderr, "%s would be encoded in more than 20 bytes,"
+				"see RFC 5280, section %s\n", label, rfc_section);
+		exit(1);
+	}
+}
+
+static
+int default_serial(unsigned char *serial, size_t *size)
+{
+	int ret;
+
+	if (*size < SERIAL_MAX_BYTES)
+		return GNUTLS_E_SHORT_MEMORY_BUFFER;
+
+	ret = gnutls_rnd(GNUTLS_RND_NONCE, serial, SERIAL_MAX_BYTES);
+	if (ret < 0)
+		return ret;
+
+	// serial must be positive and max 20 octets
+	// so we must zero the most significant bit (with MSB set, the DER encoding
+	// would be 21 octets long). See RFC 5280, section 4.1.2.2.
+	serial[0] &= 0x7F;
+	*size = SERIAL_MAX_BYTES;
+
+	return 0;
+}
+
+void get_serial(unsigned char *serial, size_t *size)
+{
+	get_serial_value(serial, size, cfg.serial, cfg.serial_size,
+			default_serial, "certificate's serial number", "4.1.2.2");
 }
 
 static
@@ -1471,6 +1697,7 @@ time_t get_date(const char* date)
 	struct timespec r;
 
 	if (date==NULL || parse_datetime(&r, date, NULL) == 0) {
+		PRINT_TIME_T_ERROR;
 		fprintf(stderr, "Cannot parse date: %s\n", date);
 		exit(1);
 	}
@@ -1532,6 +1759,7 @@ time_t now = time(NULL);
 
 	return secs;
  overflow:
+	PRINT_TIME_T_ERROR;
 	fprintf(stderr, "Overflow while parsing days\n");
 	exit(1);
 }
@@ -1557,8 +1785,7 @@ time_t get_int_date(const char *txt_val, int int_val, const char *msg)
 
 		do {
 			days =
-			    read_int
-			    ("The certificate will expire in (days): ");
+			    read_int(msg);
 		}
 		while (days == 0);
 		return days_to_secs(days);
@@ -1596,7 +1823,8 @@ int get_crq_extensions_status(void)
 
 void get_crl_number(unsigned char* serial, size_t * size)
 {
-	get_rand_int_value(serial, size, cfg.crl_number, "CRL Number");
+	get_serial_value(serial, size, cfg.crl_number, cfg.crl_number_size,
+			default_crl_number, "CRL's serial number", "5.2.3");
 }
 
 int get_path_len(void)
@@ -1839,10 +2067,16 @@ void get_dc_set(int type, void *crt)
 		}
 	} else {
 		const char *p;
+		unsigned int counter = 0;
 
 		do {
-			p = read_str
-			    ("Enter the subject's domain component (DC): ");
+			if (counter == 0) {
+				p = read_str
+				    ("Enter the subject's domain component (DC): ");
+			} else {
+				p = read_str
+				    ("Enter an additional domain component (DC): ");
+			}
 			if (!p)
 				return;
 
@@ -1860,6 +2094,9 @@ void get_dc_set(int type, void *crt)
 								  0, p,
 								  strlen
 								  (p));
+			counter++;
+			if (ret < 0)
+				break;
 		}
 		while (p != NULL);
 	}
@@ -1900,10 +2137,14 @@ void get_dns_name_set(int type, void *crt)
 		}
 	} else {
 		const char *p;
+		unsigned int counter = 0;
 
 		do {
-			p = read_str
-			    ("Enter a dnsName of the subject of the certificate: ");
+			if (counter == 0) {
+				p = read_str("Enter a dnsName of the subject of the certificate: ");
+			} else {
+				p = read_str("Enter an additional dnsName of the subject of the certificate: ");
+			}
 			if (!p)
 				return;
 
@@ -1915,8 +2156,8 @@ void get_dns_name_set(int type, void *crt)
 				ret = gnutls_x509_crq_set_subject_alt_name
 				    (crt, GNUTLS_SAN_DNSNAME, p, strlen(p),
 				     GNUTLS_FSAN_APPEND);
-		}
-		while (p);
+			counter++;
+		} while (p);
 	}
 
 	if (ret < 0) {
@@ -2160,8 +2401,13 @@ void get_policy_set(gnutls_x509_crt_t crt)
 	gnutls_x509_policy_st policy;
 
 	if (batch) {
-		if (!cfg.policy_oid)
-			return;
+		if (cfg.skip_certs >= 0) {
+			ret = gnutls_x509_crt_set_inhibit_anypolicy(crt, cfg.skip_certs);
+			if (ret < 0) {
+				fprintf(stderr, "error setting inhibit anypolicy: %s\n", gnutls_strerror(ret));
+				exit(1);
+			}
+		}
 
 		for (i = 0; cfg.policy_oid[i] != NULL; i++) {
 			memset(&policy, 0, sizeof(policy));
@@ -2226,10 +2472,16 @@ void get_uri_set(int type, void *crt)
 		}
 	} else {
 		const char *p;
+		unsigned int counter = 0;
 
 		do {
-			p = read_str
-			    ("Enter a URI of the subject of the certificate: ");
+			if (counter == 0) {
+				p = read_str
+				    ("Enter a URI of the subject of the certificate: ");
+			} else {
+				p = read_str
+				    ("Enter an additional URI of the subject of the certificate: ");
+			}
 			if (!p)
 				return;
 
@@ -2241,6 +2493,9 @@ void get_uri_set(int type, void *crt)
 				ret = gnutls_x509_crq_set_subject_alt_name
 				    (crt, GNUTLS_SAN_URI, p, strlen(p),
 				     GNUTLS_FSAN_APPEND);
+			counter++;
+			if (ret < 0)
+				break;
 		}
 		while (p);
 	}
@@ -2337,8 +2592,7 @@ int get_data_encipherment_status(void)
 	if (batch) {
 		return cfg.data_encipherment;
 	} else {
-		/* this option is not asked in interactive mode */
-		return 0;
+		return read_yesno("Will the certificate be used for data encryption? (y/N): ", 0);
 	}
 }
 

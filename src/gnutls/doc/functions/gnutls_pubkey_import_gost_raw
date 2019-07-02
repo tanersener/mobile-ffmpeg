@@ -1,0 +1,31 @@
+
+
+
+
+@deftypefun {int} {gnutls_pubkey_import_gost_raw} (gnutls_pubkey_t @var{key}, gnutls_ecc_curve_t @var{curve}, gnutls_digest_algorithm_t @var{digest}, gnutls_gost_paramset_t @var{paramset}, const gnutls_datum_t * @var{x}, const gnutls_datum_t * @var{y})
+@var{key}: The structure to store the parsed key
+
+@var{curve}: holds the curve
+
+@var{digest}: holds the digest
+
+@var{paramset}: holds the parameters id
+
+@var{x}: holds the x-coordinate
+
+@var{y}: holds the y-coordinate
+
+This function will convert the given GOST public key's parameters to a
+@code{gnutls_pubkey_t} .  The output will be stored in  @code{key} .   @code{digest} should be
+one of GNUTLS_DIG_GOSR_94, GNUTLS_DIG_STREEBOG_256 or
+GNUTLS_DIG_STREEBOG_512.  If  @code{paramset} is set to GNUTLS_GOST_PARAMSET_UNKNOWN
+default one will be selected depending on  @code{digest} .
+
+@strong{Note:} parameters should be stored with least significant byte first. On
+version 3.6.3 big-endian format was used incorrectly.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.6.3
+@end deftypefun

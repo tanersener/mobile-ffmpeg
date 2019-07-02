@@ -16,9 +16,14 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
+#ifndef GNUTLS_LIB_SSLV2_COMPAT_H
+#define GNUTLS_LIB_SSLV2_COMPAT_H
+
 int _gnutls_read_client_hello_v2(gnutls_session_t session, uint8_t * data,
 				 unsigned int datalen);
+
+#endif /* GNUTLS_LIB_SSLV2_COMPAT_H */

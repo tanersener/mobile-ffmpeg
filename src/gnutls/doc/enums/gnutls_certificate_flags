@@ -6,4 +6,10 @@
 Skip the key and certificate matching check.
 @item GNUTLS_@-CERTIFICATE_@-API_@-V2
 If set the gnutls_certificate_set_*key* functions will return an index of the added key pair instead of zero.
+@item GNUTLS_@-CERTIFICATE_@-SKIP_@-OCSP_@-RESPONSE_@-CHECK
+If set, the gnutls_certificate_set_ocsp_status_request_file
+function, will not check whether the response set matches any of the certificates.
+@item GNUTLS_@-CERTIFICATE_@-VERIFY_@-CRLS
+This will enable CRL verification when added in the certificate structure.
+When used, it requires CAs to be added before CRLs.
 @end table

@@ -17,7 +17,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -29,7 +29,7 @@
 #include <dtls.h>
 #include <record.h>
 #include <ext/heartbeat.h>
-#include <extensions.h>
+#include <hello_ext.h>
 #include <random.h>
 
 #ifdef ENABLE_HEARTBEAT
@@ -40,7 +40,8 @@
   *
   * If this function is called with the %GNUTLS_HB_PEER_ALLOWED_TO_SEND
   * @type, GnuTLS will allow heartbeat messages to be received. Moreover it also
-  * request the peer to accept heartbeat messages.
+  * request the peer to accept heartbeat messages. This function
+  * must be called prior to TLS handshake.
   *
   * If the @type used is %GNUTLS_HB_LOCAL_ALLOWED_TO_SEND, then the peer
   * will be asked to accept heartbeat messages but not send ones.
@@ -52,10 +53,10 @@
   **/
 void gnutls_heartbeat_enable(gnutls_session_t session, unsigned int type)
 {
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 
 	epriv = (void*)(intptr_t)type;
-	_gnutls_ext_set_session_data(session, GNUTLS_EXTENSION_HEARTBEAT,
+	_gnutls_hello_ext_set_priv(session, GNUTLS_EXTENSION_HEARTBEAT,
 				     epriv);
 }
 
@@ -71,14 +72,14 @@ void gnutls_heartbeat_enable(gnutls_session_t session, unsigned int type)
   *
   * Since: 3.1.2
   **/
-int gnutls_heartbeat_allowed(gnutls_session_t session, unsigned int type)
+unsigned gnutls_heartbeat_allowed(gnutls_session_t session, unsigned int type)
 {
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 
 	if (session->internals.handshake_in_progress != 0)
 		return 0; /* not allowed */
 
-	if (_gnutls_ext_get_session_data
+	if (_gnutls_hello_ext_get_priv
 	    (session, GNUTLS_EXTENSION_HEARTBEAT, &epriv) < 0)
 		return 0;	/* Not enabled */
 
@@ -201,11 +202,11 @@ gnutls_heartbeat_ping(gnutls_session_t session, size_t data_size,
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-		gettime(&session->internals.hb_ping_start);
+		gnutls_gettime(&session->internals.hb_ping_start);
 		session->internals.hb_local_data.length = data_size;
 		session->internals.hb_state = SHB_SEND2;
 
-		/* fallthrough */
+		FALLTHROUGH;
 	case SHB_SEND2:
 		session->internals.hb_actual_retrans_timeout_ms =
 		    session->internals.hb_retrans_timeout_ms;
@@ -219,7 +220,7 @@ gnutls_heartbeat_ping(gnutls_session_t session, size_t data_size,
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-		gettime(&session->internals.hb_ping_sent);
+		gnutls_gettime(&session->internals.hb_ping_sent);
 
 		if (!(flags & GNUTLS_HEARTBEAT_WAIT)) {
 			session->internals.hb_state = SHB_SEND1;
@@ -227,7 +228,7 @@ gnutls_heartbeat_ping(gnutls_session_t session, size_t data_size,
 		}
 
 		session->internals.hb_state = SHB_RECV;
-		/* fallthrough */
+		FALLTHROUGH;
 
 	case SHB_RECV:
 		ret =
@@ -245,7 +246,7 @@ gnutls_heartbeat_ping(gnutls_session_t session, size_t data_size,
 				return gnutls_assert_val(ret);
 			}
 
-			gettime(&now);
+			gnutls_gettime(&now);
 			diff =
 			    timespec_sub_ms(&now,
 					    &session->internals.
@@ -404,7 +405,7 @@ unsigned int gnutls_heartbeat_get_timeout(gnutls_session_t session)
 	struct timespec now;
 	unsigned int diff;
 
-	gettime(&now);
+	gnutls_gettime(&now);
 	diff = timespec_sub_ms(&now, &session->internals.hb_ping_sent);
 	if (diff >= session->internals.hb_actual_retrans_timeout_ms)
 		return 0;
@@ -441,9 +442,9 @@ _gnutls_heartbeat_recv_params(gnutls_session_t session,
 			      const uint8_t * data, size_t _data_size)
 {
 	unsigned policy;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 
-	if (_gnutls_ext_get_session_data
+	if (_gnutls_hello_ext_get_priv
 	    (session, GNUTLS_EXTENSION_HEARTBEAT, &epriv) < 0) {
 		if (session->security_parameters.entity == GNUTLS_CLIENT)
 			return
@@ -466,7 +467,7 @@ _gnutls_heartbeat_recv_params(gnutls_session_t session,
 		    gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
 	epriv = (void*)(intptr_t)policy;
-	_gnutls_ext_set_session_data(session, GNUTLS_EXTENSION_HEARTBEAT,
+	_gnutls_hello_ext_set_priv(session, GNUTLS_EXTENSION_HEARTBEAT,
 				     epriv);
 
 	return 0;
@@ -476,10 +477,10 @@ static int
 _gnutls_heartbeat_send_params(gnutls_session_t session,
 			      gnutls_buffer_st * extdata)
 {
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 	uint8_t p;
 
-	if (_gnutls_ext_get_session_data
+	if (_gnutls_hello_ext_get_priv
 	    (session, GNUTLS_EXTENSION_HEARTBEAT, &epriv) < 0)
 		return 0;	/* nothing to send - not enabled */
 
@@ -495,7 +496,7 @@ _gnutls_heartbeat_send_params(gnutls_session_t session,
 }
 
 static int
-_gnutls_heartbeat_pack(extension_priv_data_t epriv, gnutls_buffer_st * ps)
+_gnutls_heartbeat_pack(gnutls_ext_priv_data_t epriv, gnutls_buffer_st * ps)
 {
 	int ret;
 
@@ -507,9 +508,9 @@ _gnutls_heartbeat_pack(extension_priv_data_t epriv, gnutls_buffer_st * ps)
 
 static int
 _gnutls_heartbeat_unpack(gnutls_buffer_st * ps,
-			 extension_priv_data_t * _priv)
+			 gnutls_ext_priv_data_t * _priv)
 {
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 	int ret;
 
 	BUFFER_POP_CAST_NUM(ps, epriv);
@@ -521,16 +522,19 @@ _gnutls_heartbeat_unpack(gnutls_buffer_st * ps,
 	return ret;
 }
 
-const extension_entry_st ext_mod_heartbeat = {
+const hello_ext_entry_st ext_mod_heartbeat = {
 	.name = "Heartbeat",
-	.type = GNUTLS_EXTENSION_HEARTBEAT,
+	.tls_id = 15,
+	.gid = GNUTLS_EXTENSION_HEARTBEAT,
 	.parse_type = GNUTLS_EXT_TLS,
-
+	.validity = GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_DTLS | GNUTLS_EXT_FLAG_CLIENT_HELLO |
+		    GNUTLS_EXT_FLAG_EE | GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
 	.recv_func = _gnutls_heartbeat_recv_params,
 	.send_func = _gnutls_heartbeat_send_params,
 	.pack_func = _gnutls_heartbeat_pack,
 	.unpack_func = _gnutls_heartbeat_unpack,
-	.deinit_func = NULL
+	.deinit_func = NULL,
+	.cannot_be_overriden = 1
 };
 
 #else
@@ -538,7 +542,7 @@ void gnutls_heartbeat_enable(gnutls_session_t session, unsigned int type)
 {
 }
 
-int gnutls_heartbeat_allowed(gnutls_session_t session, unsigned int type)
+unsigned gnutls_heartbeat_allowed(gnutls_session_t session, unsigned int type)
 {
 	return 0;
 }

@@ -16,16 +16,16 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
-#ifndef GNUTLS_ECC_H
-#define GNUTLS_ECC_H
+#ifndef GNUTLS_LIB_ECC_H
+#define GNUTLS_LIB_ECC_H
 
-int _gnutls_ecc_ansi_x963_import(const uint8_t * in, unsigned long inlen,
+int _gnutls_ecc_ansi_x962_import(const uint8_t * in, unsigned long inlen,
 				 bigint_t * x, bigint_t * y);
-int _gnutls_ecc_ansi_x963_export(gnutls_ecc_curve_t curve, bigint_t x,
+int _gnutls_ecc_ansi_x962_export(gnutls_ecc_curve_t curve, bigint_t x,
 				 bigint_t y, gnutls_datum_t * out);
 
-#endif
+#endif /* GNUTLS_LIB_ECC_H */

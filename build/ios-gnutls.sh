@@ -42,11 +42,11 @@ export CXXFLAGS="${COMMON_CXXFLAGS}"
 export LDFLAGS="${COMMON_LDFLAGS} -L${BASEDIR}/prebuilt/$(get_target_build_directory)/libiconv/lib"
 
 export NETTLE_CFLAGS="-I${BASEDIR}/prebuilt/$(get_target_build_directory)/nettle/include"
-export NETTLE_LIBS="-L${BASEDIR}/prebuilt/$(get_target_build_directory)/nettle/lib"
+export NETTLE_LIBS="-L${BASEDIR}/prebuilt/$(get_target_build_directory)/nettle/lib -lnettle -L${BASEDIR}/prebuilt/$(get_target_build_directory)/gmp/lib -lgmp"
 export HOGWEED_CFLAGS="-I${BASEDIR}/prebuilt/$(get_target_build_directory)/nettle/include"
-export HOGWEED_LIBS="-L${BASEDIR}/prebuilt/$(get_target_build_directory)/nettle/lib"
+export HOGWEED_LIBS="-L${BASEDIR}/prebuilt/$(get_target_build_directory)/nettle/lib -lhogweed -L${BASEDIR}/prebuilt/$(get_target_build_directory)/gmp/lib -lgmp"
 export GMP_CFLAGS="-I${BASEDIR}/prebuilt/$(get_target_build_directory)/gmp/include"
-export GMP_LIBS="-L${BASEDIR}/prebuilt/$(get_target_build_directory)/gmp/lib"
+export GMP_LIBS="-L${BASEDIR}/prebuilt/$(get_target_build_directory)/gmp/lib -lgmp"
 
 HARDWARE_ACCELERATION=""
 case ${ARCH} in
@@ -97,6 +97,6 @@ fi
 make -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_gnutls_package_config "3.5.19"
+create_gnutls_package_config "3.6.8"
 
 make install || exit 1

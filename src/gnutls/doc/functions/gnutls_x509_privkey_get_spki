@@ -1,0 +1,16 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_privkey_get_spki} (gnutls_x509_privkey_t @var{key}, gnutls_x509_spki_t @var{spki}, unsigned int @var{flags})
+@var{key}: should contain a @code{gnutls_x509_privkey_t}  type
+
+@var{spki}: a SubjectPublicKeyInfo structure of type @code{gnutls_x509_spki_t} 
+
+@var{flags}: must be zero
+
+This function will return the public key information of a private
+key. The provided  @code{spki} must be initialized.
+
+@strong{Returns:} Zero on success, or a negative error code on error.
+@end deftypefun

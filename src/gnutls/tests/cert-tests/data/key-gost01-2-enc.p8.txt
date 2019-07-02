@@ -1,0 +1,40 @@
+PKCS #8 information:
+	Cipher: GOST28147-CPA-CFB
+	Schema: PBES2-GOST28147-89-CPA (1.2.643.2.2.31.1)
+	Salt: ba6e1a22b5dcc4d361c9630aefb7a7d2f8943f5051c89d7f4ba89811fca745f8
+	Salt size: 32
+	Iteration count: 2000
+
+Public Key Info:
+	Public Key Algorithm: GOST R 34.10-2001
+	Key Security Level: High (256 bits)
+
+curve:	CryptoPro-A
+digest:	GOSTR341194
+paramset:	CryptoPro-A
+private key:
+	c9:0d:4a:60:74:4b:6e:f9:dd:b1:f1:d5:e2:34:f0:6c
+	ef:73:74:52:2d:03:91:89:d9:2e:82:dd:cf:41:14:16
+	
+
+x:
+	da:14:e3:09:c9:90:76:36:7e:d2:1e:f2:32:54:62:a0
+	a3:7a:fe:69:16:88:40:1d:28:98:25:00:23:30:52:79
+	
+
+y:
+	92:01:db:d3:34:89:e6:74:86:e1:6c:81:a4:76:aa:d9
+	1d:ac:c9:8a:5e:a2:fa:cf:ad:2e:47:8c:65:ed:c8:7b
+	
+
+
+Public Key PIN:
+	pin-sha256:naEvzBbx6qkKlM3WetsTn09kpou+R1k6eCZvVFxEPc0=
+Public Key ID:
+	sha256:9da12fcc16f1eaa90a94cdd67adb139f4f64a68bbe47593a78266f545c443dcd
+	sha1:56f0aab16eb873a50453b5209b65fe31e6493317
+
+-----BEGIN PRIVATE KEY-----
+MEUCAQAwHAYGKoUDAgITMBIGByqFAwICIwEGByqFAwICHgEEIgQgFhRBz92CLtmJ
+kQMtUnRz72zwNOLV8bHd+W5LdGBKDck=
+-----END PRIVATE KEY-----

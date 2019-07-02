@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2002-2016 Free Software Foundation, Inc.
  * Copyright (C) 2014-2016 Nikos Mavrogiannopoulos
- * Copyright (C) 2015-2016 Red Hat, Inc.
+ * Copyright (C) 2015-2018 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -18,7 +18,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -44,13 +44,20 @@
 #include <auth/anon.h>
 #include <auth/psk.h>
 #include <algorithms.h>
-#include <extensions.h>
+#include <hello_ext.h>
 #include <system.h>
 #include <random.h>
 #include <fips.h>
 #include <intprops.h>
 #include <gnutls/dtls.h>
 #include "dtls.h"
+#include "tls13/session_ticket.h"
+#include "ext/cert_types.h"
+#include "locks.h"
+
+/* to be used by supplemental data support to disable TLS1.3
+ * when supplemental data have been globally registered */
+unsigned _gnutls_disable_tls13 = 0;
 
 /* These should really be static, but src/tests.c calls them.  Make
    them public functions?  */
@@ -58,30 +65,11 @@ void
 _gnutls_rsa_pms_set_version(gnutls_session_t session,
 			    unsigned char major, unsigned char minor);
 
-void
-_gnutls_session_cert_type_set(gnutls_session_t session,
-			      gnutls_certificate_type_t ct)
-{
-	_gnutls_handshake_log
-	    ("HSK[%p]: Selected certificate type %s (%d)\n", session,
-	     gnutls_certificate_type_get_name(ct), ct);
-	session->security_parameters.cert_type = ct;
-}
-
-void
-_gnutls_session_ecc_curve_set(gnutls_session_t session,
-			      gnutls_ecc_curve_t c)
-{
-	_gnutls_handshake_log("HSK[%p]: Selected ECC curve %s (%d)\n",
-			      session, gnutls_ecc_curve_get_name(c), c);
-	session->security_parameters.ecc_curve = c;
-}
-
 /**
  * gnutls_cipher_get:
  * @session: is a #gnutls_session_t type.
  *
- * Get currently used cipher.
+ * Get the currently used cipher.
  *
  * Returns: the currently used cipher, a #gnutls_cipher_algorithm_t
  *   type.
@@ -103,42 +91,112 @@ gnutls_cipher_algorithm_t gnutls_cipher_get(gnutls_session_t session)
  * gnutls_certificate_type_get:
  * @session: is a #gnutls_session_t type.
  *
- * The certificate type is by default X.509, unless it is negotiated
- * as a TLS extension.
+ * This function returns the type of the certificate that is negotiated
+ * for this side to send to the peer. The certificate type is by default
+ * X.509, unless an alternative certificate type is enabled by
+ * gnutls_init() and negotiated during the session.
+ *
+ * Resumed sessions will return the certificate type that was negotiated
+ * and used in the original session.
+ *
+ * As of version 3.6.4 it is recommended to use
+ * gnutls_certificate_type_get2() which is more fine-grained.
  *
  * Returns: the currently used #gnutls_certificate_type_t certificate
- *   type.
+ *   type as negotiated for 'our' side of the connection.
  **/
 gnutls_certificate_type_t
 gnutls_certificate_type_get(gnutls_session_t session)
 {
-	return session->security_parameters.cert_type;
+	return gnutls_certificate_type_get2(session, GNUTLS_CTYPE_OURS);
+}
+
+/**
+ * gnutls_certificate_type_get2:
+ * @session: is a #gnutls_session_t type.
+ * @target: is a #gnutls_ctype_target_t type.
+ *
+ * This function returns the type of the certificate that a side
+ * is negotiated to use.  The certificate type is by default X.509,
+ * unless an alternative certificate type is enabled by gnutls_init() and
+ * negotiated during the session.
+ *
+ * The @target parameter specifies whether to request the negotiated
+ * certificate type for the client (%GNUTLS_CTYPE_CLIENT),
+ * or for the server (%GNUTLS_CTYPE_SERVER). Additionally, in P2P mode
+ * connection set up where you don't know in advance who will be client
+ * and who will be server you can use the flag (%GNUTLS_CTYPE_OURS) and
+ * (%GNUTLS_CTYPE_PEERS) to retrieve the corresponding certificate types.
+ *
+ * Resumed sessions will return the certificate type that was negotiated
+ * and used in the original session. That is, this function can be used
+ * to reliably determine the type of the certificate returned by
+ * gnutls_certificate_get_peers().
+ *
+ * Returns: the currently used #gnutls_certificate_type_t certificate
+ *   type for the client or the server.
+ *
+ * Since: 3.6.4
+ **/
+gnutls_certificate_type_t
+gnutls_certificate_type_get2(gnutls_session_t session,
+			     gnutls_ctype_target_t target)
+{
+	/* We want to inline this function so therefore
+	 * we've defined it in gnutls_int.h */
+	return get_certificate_type(session, target);
 }
 
 /**
  * gnutls_kx_get:
  * @session: is a #gnutls_session_t type.
  *
- * Get currently used key exchange algorithm.
+ * Get the currently used key exchange algorithm.
+ *
+ * This function will return %GNUTLS_KX_ECDHE_RSA, or %GNUTLS_KX_DHE_RSA
+ * under TLS 1.3, to indicate an elliptic curve DH key exchange or
+ * a finite field one. The precise group used is available
+ * by calling gnutls_group_get() instead.
  *
  * Returns: the key exchange algorithm used in the last handshake, a
  *   #gnutls_kx_algorithm_t value.
  **/
 gnutls_kx_algorithm_t gnutls_kx_get(gnutls_session_t session)
 {
-	if (session->internals.handshake_in_progress) {
-		/* This allows early call during handshake */
-		return _gnutls_cipher_suite_get_kx_algo(session->security_parameters.cipher_suite);
-	} else {
-		return session->security_parameters.kx_algorithm;
+	if (session->security_parameters.cs == 0)
+		return 0;
+
+	if (session->security_parameters.cs->kx_algorithm == 0) { /* TLS 1.3 */
+		const version_entry_st *ver = get_version(session);
+		const gnutls_group_entry_st *group = get_group(session);
+
+		if (ver->tls13_sem) {
+			if (session->internals.hsk_flags & HSK_PSK_SELECTED) {
+				if (group) {
+					if (group->pk == GNUTLS_PK_DH)
+						return GNUTLS_KX_DHE_PSK;
+					else
+						return GNUTLS_KX_ECDHE_PSK;
+				} else {
+					return GNUTLS_KX_PSK;
+				}
+			} else if (group) {
+				if (group->pk == GNUTLS_PK_DH)
+					return GNUTLS_KX_DHE_RSA;
+				else
+					return GNUTLS_KX_ECDHE_RSA;
+			}
+		}
 	}
+
+	return session->security_parameters.cs->kx_algorithm;
 }
 
 /**
  * gnutls_mac_get:
  * @session: is a #gnutls_session_t type.
  *
- * Get currently used MAC algorithm.
+ * Get the currently used MAC algorithm.
  *
  * Returns: the currently used mac algorithm, a
  *   #gnutls_mac_algorithm_t value.
@@ -160,7 +218,7 @@ gnutls_mac_algorithm_t gnutls_mac_get(gnutls_session_t session)
  * gnutls_compression_get:
  * @session: is a #gnutls_session_t type.
  *
- * Get currently used compression algorithm.
+ * Get the currently used compression algorithm.
  *
  * Returns: the currently used compression method, a
  *   #gnutls_compression_method_t value.
@@ -168,63 +226,109 @@ gnutls_mac_algorithm_t gnutls_mac_get(gnutls_session_t session)
 gnutls_compression_method_t
 gnutls_compression_get(gnutls_session_t session)
 {
-	record_parameters_st *record_params;
-	int ret;
-
-	ret =
-	    _gnutls_epoch_get(session, EPOCH_READ_CURRENT, &record_params);
-	if (ret < 0)
-		return gnutls_assert_val(GNUTLS_COMP_NULL);
-
-	return record_params->compression_algorithm;
+	return GNUTLS_COMP_NULL;
 }
 
-/* Check if the given certificate type is supported.
- * This means that it is enabled by the priority functions,
- * and a matching certificate exists.
+void reset_binders(gnutls_session_t session)
+{
+	_gnutls_free_temp_key_datum(&session->key.binders[0].psk);
+	_gnutls_free_temp_key_datum(&session->key.binders[1].psk);
+	memset(session->key.binders, 0, sizeof(session->key.binders));
+}
+
+/* Check whether certificate credentials of type @cert_type are set
+ * for the current session.
  */
-int
-_gnutls_session_cert_type_supported(gnutls_session_t session,
-				    gnutls_certificate_type_t cert_type)
+static bool _gnutls_has_cert_credentials(gnutls_session_t session,
+						gnutls_certificate_type_t cert_type)
 {
 	unsigned i;
 	unsigned cert_found = 0;
 	gnutls_certificate_credentials_t cred;
 
-	if (session->security_parameters.entity == GNUTLS_SERVER) {
-		cred = (gnutls_certificate_credentials_t)
-		    _gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE);
+	/* First, check for certificate credentials. If we have no certificate
+	 * credentials set then we don't support certificates at all.
+	 */
+	cred = (gnutls_certificate_credentials_t)
+			_gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE);
 
-		if (cred == NULL)
-			return GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE;
+	if (cred == NULL)
+		return false;
 
-		if (cred->get_cert_callback == NULL && cred->get_cert_callback2 == NULL) {
-			for (i = 0; i < cred->ncerts; i++) {
-				if (cred->certs[i].cert_list[0].type ==
-				    cert_type) {
-					cert_found = 1;
-					break;
-				}
+	/* There are credentials initialized. Now check whether we can find
+	 * pre-set certificates of the required type, but only if we don't
+	 * use the callback functions.
+	 */
+	if (cred->get_cert_callback3 == NULL) {
+		for (i = 0; i < cred->ncerts; i++) {
+			if (cred->certs[i].cert_list[0].type == cert_type) {
+				cert_found = 1;
+				break;
 			}
+		}
 
-			if (cert_found == 0)
-				/* no certificate is of that type.
-				 */
-				return
-				    GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE;
+		if (cert_found == 0) {
+			/* No matching certificate found. */
+			return false;
 		}
 	}
 
-	if (session->internals.priorities.cert_type.algorithms == 0
+	return true; // OK
+}
+
+/* Check if the given certificate type is supported.
+ * This means that it is enabled by the priority functions,
+ * and in some cases a matching certificate exists. A check for
+ * the latter can be toggled via the parameter @check_credentials.
+ */
+int
+_gnutls_session_cert_type_supported(gnutls_session_t session,
+				    gnutls_certificate_type_t cert_type,
+				    bool check_credentials,
+				    gnutls_ctype_target_t target)
+{
+	unsigned i;
+	priority_st* ctype_priorities;
+
+	// Check whether this cert type is enabled by the application
+	if (!is_cert_type_enabled(session, cert_type))
+		return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE);
+
+	// Perform a credentials check if requested
+	if (check_credentials)	{
+		if (!_gnutls_has_cert_credentials(session, cert_type))
+			return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE);
+	}
+
+	/* So far so good. We have the required credentials (if needed).
+	 * Now check whether we are allowed to use them according to our
+	 * priorities.
+	 */
+	// Which certificate type should we query?
+	switch (target) {
+		case GNUTLS_CTYPE_CLIENT:
+			ctype_priorities =
+					&(session->internals.priorities->client_ctype);
+			break;
+		case GNUTLS_CTYPE_SERVER:
+			ctype_priorities =
+					&(session->internals.priorities->server_ctype);
+			break;
+		default:
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	}
+
+	// No explicit priorities set, and default ctype is asked
+	if (ctype_priorities->num_priorities == 0
 	    && cert_type == DEFAULT_CERT_TYPE)
 		return 0;
 
-	for (i = 0; i < session->internals.priorities.cert_type.algorithms;
-	     i++) {
-		if (session->internals.priorities.cert_type.priority[i] ==
-		    cert_type) {
-			return 0;	/* ok */
-		}
+	/* Now lets find out whether our cert type is in our priority
+	 * list, i.e. set of allowed cert types.
+	 */
+	for (i = 0; i < ctype_priorities->num_priorities; i++) {
+		if (ctype_priorities->priorities[i] == cert_type)
+			return 0;
 	}
 
 	return GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE;
@@ -232,52 +336,47 @@ _gnutls_session_cert_type_supported(gnutls_session_t session,
 
 static void deinit_keys(gnutls_session_t session)
 {
-	gnutls_pk_params_release(&session->key.ecdh_params);
-	gnutls_pk_params_release(&session->key.dh_params);
-	zrelease_temp_mpi_key(&session->key.ecdh_x);
-	zrelease_temp_mpi_key(&session->key.ecdh_y);
-	_gnutls_free_temp_key_datum(&session->key.ecdhx);
+	const version_entry_st *vers = get_version(session);
 
-	zrelease_temp_mpi_key(&session->key.client_Y);
+	if (vers == NULL)
+		return;
 
-	/* SRP */
-	zrelease_temp_mpi_key(&session->key.srp_p);
-	zrelease_temp_mpi_key(&session->key.srp_g);
-	zrelease_temp_mpi_key(&session->key.srp_key);
+	gnutls_pk_params_release(&session->key.kshare.ecdhx_params);
+	gnutls_pk_params_release(&session->key.kshare.ecdh_params);
+	gnutls_pk_params_release(&session->key.kshare.dh_params);
 
-	zrelease_temp_mpi_key(&session->key.u);
-	zrelease_temp_mpi_key(&session->key.a);
-	zrelease_temp_mpi_key(&session->key.x);
-	zrelease_temp_mpi_key(&session->key.A);
-	zrelease_temp_mpi_key(&session->key.B);
-	zrelease_temp_mpi_key(&session->key.b);
+	if (!vers->tls13_sem && session->key.binders[0].prf == NULL) {
+		gnutls_pk_params_release(&session->key.proto.tls12.ecdh.params);
+		gnutls_pk_params_release(&session->key.proto.tls12.dh.params);
+		zrelease_temp_mpi_key(&session->key.proto.tls12.ecdh.x);
+		zrelease_temp_mpi_key(&session->key.proto.tls12.ecdh.y);
+		_gnutls_free_temp_key_datum(&session->key.proto.tls12.ecdh.raw);
 
-	_gnutls_free_temp_key_datum(&session->key.key);
+		zrelease_temp_mpi_key(&session->key.proto.tls12.dh.client_Y);
+
+		/* SRP */
+		zrelease_temp_mpi_key(&session->key.proto.tls12.srp.srp_p);
+		zrelease_temp_mpi_key(&session->key.proto.tls12.srp.srp_g);
+		zrelease_temp_mpi_key(&session->key.proto.tls12.srp.srp_key);
+
+		zrelease_temp_mpi_key(&session->key.proto.tls12.srp.u);
+		zrelease_temp_mpi_key(&session->key.proto.tls12.srp.a);
+		zrelease_temp_mpi_key(&session->key.proto.tls12.srp.x);
+		zrelease_temp_mpi_key(&session->key.proto.tls12.srp.A);
+		zrelease_temp_mpi_key(&session->key.proto.tls12.srp.B);
+		zrelease_temp_mpi_key(&session->key.proto.tls12.srp.b);
+	} else {
+		gnutls_memset(session->key.proto.tls13.temp_secret, 0,
+			      sizeof(session->key.proto.tls13.temp_secret));
+	}
+
+	reset_binders(session);
 	_gnutls_free_temp_key_datum(&session->key.key);
 }
 
-/* this function deinitializes all the internal parameters stored
- * in a session struct.
- */
-inline static void deinit_internal_params(gnutls_session_t session)
-{
-#if defined(ENABLE_DHE) || defined(ENABLE_ANON)
-	if (session->internals.params.free_dh_params)
-		gnutls_dh_params_deinit(session->internals.params.
-					dh_params);
-#endif
-
-	_gnutls_handshake_hash_buffers_clear(session);
-
-	memset(&session->internals.params, 0,
-	       sizeof(session->internals.params));
-}
-
-/* This function will clear all the variables in internals
- * structure within the session, which depend on the current handshake.
- * This is used to allow further handshakes.
- */
-static void _gnutls_handshake_internal_state_init(gnutls_session_t session)
+/* An internal version of _gnutls_handshake_internal_state_clear(),
+ * it will not attempt to deallocate, only initialize */
+static void handshake_internal_state_clear1(gnutls_session_t session)
 {
 	/* by default no selected certificate */
 	session->internals.adv_version_major = 0;
@@ -295,22 +394,34 @@ static void _gnutls_handshake_internal_state_init(gnutls_session_t session)
 	session->internals.handshake_suspicious_loops = 0;
 	session->internals.dtls.hsk_read_seq = 0;
 	session->internals.dtls.hsk_write_seq = 0;
+
+	session->internals.cand_ec_group = 0;
+	session->internals.cand_dh_group = 0;
+
+	session->internals.hrr_cs[0] = CS_INVALID_MAJOR;
+	session->internals.hrr_cs[1] = CS_INVALID_MINOR;
 }
 
+/* This function will clear all the variables in internals
+ * structure within the session, which depend on the current handshake.
+ * This is used to allow further handshakes.
+ */
 void _gnutls_handshake_internal_state_clear(gnutls_session_t session)
 {
-	_gnutls_handshake_internal_state_init(session);
+	handshake_internal_state_clear1(session);
 
-	deinit_internal_params(session);
+	_gnutls_handshake_hash_buffers_clear(session);
 	deinit_keys(session);
 
 	_gnutls_epoch_gc(session);
 
-	session->internals.handshake_endtime = 0;
+	session->internals.handshake_abs_timeout.tv_sec = 0;
+	session->internals.handshake_abs_timeout.tv_nsec = 0;
 	session->internals.handshake_in_progress = 0;
 
 	session->internals.tfo.connect_addrlen = 0;
 	session->internals.tfo.connect_only = 0;
+	session->internals.early_data_received = 0;
 }
 
 /**
@@ -334,45 +445,66 @@ void _gnutls_handshake_internal_state_clear(gnutls_session_t session)
 int gnutls_init(gnutls_session_t * session, unsigned int flags)
 {
 	int ret;
-	record_parameters_st *epoch;
-	
+
 	FAIL_IF_LIB_ERROR;
 
 	*session = gnutls_calloc(1, sizeof(struct gnutls_session_int));
 	if (*session == NULL)
 		return GNUTLS_E_MEMORY_ERROR;
 
-	ret = _gnutls_epoch_alloc(*session, 0, &epoch);
+	ret = gnutls_mutex_init(&(*session)->internals.post_negotiation_lock);
 	if (ret < 0) {
 		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
+		gnutls_free(*session);
+		return ret;
 	}
 
-	/* Set all NULL algos on epoch 0 */
-	_gnutls_epoch_set_null_algos(*session, epoch);
+	ret = gnutls_mutex_init(&(*session)->internals.epoch_lock);
+	if (ret < 0) {
+		gnutls_assert();
+		gnutls_mutex_deinit(&(*session)->internals.post_negotiation_lock);
+		gnutls_free(*session);
+		return ret;
+	}
 
-	(*session)->security_parameters.epoch_next = 1;
+	ret = _gnutls_epoch_setup_next(*session, 1, NULL);
+	if (ret < 0) {
+		gnutls_mutex_deinit(&(*session)->internals.post_negotiation_lock);
+		gnutls_mutex_deinit(&(*session)->internals.epoch_lock);
+		gnutls_free(*session);
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+	}
+	_gnutls_epoch_bump(*session);
 
 	(*session)->security_parameters.entity =
 	    (flags & GNUTLS_SERVER ? GNUTLS_SERVER : GNUTLS_CLIENT);
 
 	/* the default certificate type for TLS */
-	(*session)->security_parameters.cert_type = DEFAULT_CERT_TYPE;
+	(*session)->security_parameters.client_ctype = DEFAULT_CERT_TYPE;
+	(*session)->security_parameters.server_ctype = DEFAULT_CERT_TYPE;
 
 	/* Initialize buffers */
 	_gnutls_buffer_init(&(*session)->internals.handshake_hash_buffer);
+	_gnutls_buffer_init(&(*session)->internals.post_handshake_hash_buffer);
 	_gnutls_buffer_init(&(*session)->internals.hb_remote_data);
 	_gnutls_buffer_init(&(*session)->internals.hb_local_data);
 	_gnutls_buffer_init(&(*session)->internals.record_presend_buffer);
+	_gnutls_buffer_init(&(*session)->internals.record_key_update_buffer);
+	_gnutls_buffer_init(&(*session)->internals.reauth_buffer);
 
 	_mbuffer_head_init(&(*session)->internals.record_buffer);
 	_mbuffer_head_init(&(*session)->internals.record_send_buffer);
 	_mbuffer_head_init(&(*session)->internals.record_recv_buffer);
+	_mbuffer_head_init(&(*session)->internals.early_data_recv_buffer);
+	_gnutls_buffer_init(&(*session)->internals.early_data_presend_buffer);
 
 	_mbuffer_head_init(&(*session)->internals.handshake_send_buffer);
 	_gnutls_handshake_recv_buffer_init(*session);
 
-	(*session)->internals.expire_time = DEFAULT_EXPIRE_TIME;	/* one hour default */
+	(*session)->internals.expire_time = DEFAULT_EXPIRE_TIME;
+
+	/* Ticket key rotation - set the default X to 3 times the ticket expire time */
+	(*session)->key.totp.last_result = 0;
 
 	gnutls_handshake_set_max_packet_length((*session),
 					       MAX_HANDSHAKE_PACKET_SIZE);
@@ -390,19 +522,26 @@ int gnutls_init(gnutls_session_t * session, unsigned int flags)
 	    DEFAULT_MAX_RECORD_SIZE;
 	(*session)->security_parameters.max_record_send_size =
 	    DEFAULT_MAX_RECORD_SIZE;
+	(*session)->security_parameters.max_user_record_recv_size =
+	    DEFAULT_MAX_RECORD_SIZE;
+	(*session)->security_parameters.max_user_record_send_size =
+	    DEFAULT_MAX_RECORD_SIZE;
+
+	/* set the default early data size for TLS
+	 */
+	if ((*session)->security_parameters.entity == GNUTLS_SERVER) {
+		(*session)->security_parameters.max_early_data_size =
+			DEFAULT_MAX_EARLY_DATA_SIZE;
+	} else {
+		(*session)->security_parameters.max_early_data_size =
+			UINT32_MAX;
+	}
 
 	/* everything else not initialized here is initialized
 	 * as NULL or 0. This is why calloc is used.
 	 */
 
-	_gnutls_handshake_internal_state_init(*session);
-
-	(*session)->internals.extensions_sent_size = 0;
-
-	/* emulate old gnutls behavior for old applications that do not use the priority_*
-	 * functions.
-	 */
-	(*session)->internals.priorities.sr = SR_PARTIAL;
+	handshake_internal_state_clear1(*session);
 
 #ifdef HAVE_WRITEV
 #ifdef MSG_NOSIGNAL
@@ -433,17 +572,20 @@ int gnutls_init(gnutls_session_t * session, unsigned int flags)
 
 	/* Enable useful extensions */
 	if ((flags & GNUTLS_CLIENT) && !(flags & GNUTLS_NO_EXTENSIONS)) {
-#ifdef ENABLE_SESSION_TICKETS
-		if (!(flags & GNUTLS_NO_TICKETS))
-			gnutls_session_ticket_enable_client(*session);
-#endif
 #ifdef ENABLE_OCSP
 		gnutls_ocsp_status_request_enable_client(*session, NULL, 0,
 							 NULL);
 #endif
 	}
 
+	/* session tickets in server side are enabled by setting a key */
+	if (flags & GNUTLS_SERVER)
+		flags |= GNUTLS_NO_TICKETS;
+
 	(*session)->internals.flags = flags;
+
+	if (_gnutls_disable_tls13 != 0)
+		(*session)->internals.flags |= INT_FLAG_NO_TLS13;
 
 	return 0;
 }
@@ -476,7 +618,7 @@ void gnutls_deinit(gnutls_session_t session)
 
 	_gnutls_handshake_internal_state_clear(session);
 	_gnutls_handshake_io_buffer_clear(session);
-	_gnutls_ext_free_session_data(session);
+	_gnutls_hello_ext_priv_deinit(session);
 
 	for (i = 0; i < MAX_EPOCH_INDEX; i++)
 		if (session->record_parameters[i] != NULL) {
@@ -486,22 +628,42 @@ void gnutls_deinit(gnutls_session_t session)
 		}
 
 	_gnutls_buffer_clear(&session->internals.handshake_hash_buffer);
+	_gnutls_buffer_clear(&session->internals.post_handshake_hash_buffer);
 	_gnutls_buffer_clear(&session->internals.hb_remote_data);
 	_gnutls_buffer_clear(&session->internals.hb_local_data);
 	_gnutls_buffer_clear(&session->internals.record_presend_buffer);
+	_gnutls_buffer_clear(&session->internals.record_key_update_buffer);
+	_gnutls_buffer_clear(&session->internals.reauth_buffer);
 
 	_mbuffer_head_clear(&session->internals.record_buffer);
 	_mbuffer_head_clear(&session->internals.record_recv_buffer);
 	_mbuffer_head_clear(&session->internals.record_send_buffer);
 
+	_mbuffer_head_clear(&session->internals.early_data_recv_buffer);
+	_gnutls_buffer_clear(&session->internals.early_data_presend_buffer);
+
 	_gnutls_free_datum(&session->internals.resumption_data);
+	_gnutls_free_datum(&session->internals.dtls.dcookie);
 
 	gnutls_free(session->internals.rexts);
+	gnutls_free(session->internals.post_handshake_cr_context.data);
 
 	gnutls_free(session->internals.rsup);
 
 	gnutls_credentials_clear(session);
 	_gnutls_selected_certs_deinit(session);
+
+	/* destroy any session ticket we may have received */
+	_gnutls13_session_ticket_unset(session);
+
+	/* we rely on priorities' internal reference counting */
+	gnutls_priority_deinit(session->internals.priorities);
+
+	/* overwrite any temp TLS1.3 keys */
+	gnutls_memset(&session->key.proto, 0, sizeof(session->key.proto));
+
+	gnutls_mutex_deinit(&session->internals.post_negotiation_lock);
+	gnutls_mutex_deinit(&session->internals.epoch_lock);
 
 	gnutls_free(session);
 }
@@ -601,7 +763,7 @@ int _gnutls_dh_set_secret_bits(gnutls_session_t session, unsigned bits)
 /* Sets the prime and the generator in the auth info structure.
  */
 int
-_gnutls_dh_set_group(gnutls_session_t session, bigint_t gen,
+_gnutls_dh_save_group(gnutls_session_t session, bigint_t gen,
 		     bigint_t prime)
 {
 	dh_info_st *dh;
@@ -669,25 +831,6 @@ _gnutls_dh_set_group(gnutls_session_t session, bigint_t gen,
 	return 0;
 }
 
-#ifdef ENABLE_OPENPGP
-/**
- * gnutls_openpgp_send_cert:
- * @session: a #gnutls_session_t type.
- * @status: is one of GNUTLS_OPENPGP_CERT, or GNUTLS_OPENPGP_CERT_FINGERPRINT
- *
- * This function will order gnutls to send the key fingerprint
- * instead of the key in the initial handshake procedure. This should
- * be used with care and only when there is indication or knowledge
- * that the server can obtain the client's key.
- **/
-void
-gnutls_openpgp_send_cert(gnutls_session_t session,
-			 gnutls_openpgp_crt_status_t status)
-{
-	session->internals.pgp_fingerprint = status;
-}
-#endif
-
 /**
  * gnutls_certificate_send_x509_rdn_sequence:
  * @session: a #gnutls_session_t type.
@@ -708,13 +851,6 @@ gnutls_certificate_send_x509_rdn_sequence(gnutls_session_t session,
 {
 	session->internals.ignore_rdn_sequence = status;
 }
-
-#ifdef ENABLE_OPENPGP
-int _gnutls_openpgp_send_fingerprint(gnutls_session_t session)
-{
-	return session->internals.pgp_fingerprint;
-}
-#endif
 
 /*-
  * _gnutls_record_set_default_version - Used to set the default version for the first record packet
@@ -773,7 +909,8 @@ void
 gnutls_handshake_set_private_extensions(gnutls_session_t session,
 					int allow)
 {
-	session->internals.enable_private = allow;
+	/* we have no private extensions */
+	return;
 }
 
 
@@ -781,7 +918,8 @@ gnutls_handshake_set_private_extensions(gnutls_session_t session,
  * gnutls_session_is_resumed:
  * @session: is a #gnutls_session_t type.
  *
- * Check whether session is resumed or not.
+ * Checks whether session is resumed or not. This is functional
+ * for both server and client side.
  *
  * Returns: non zero if this session is resumed, or a zero if this is
  *   a new session.
@@ -789,6 +927,11 @@ gnutls_handshake_set_private_extensions(gnutls_session_t session,
 int gnutls_session_is_resumed(gnutls_session_t session)
 {
 	if (session->security_parameters.entity == GNUTLS_CLIENT) {
+		const version_entry_st *ver = get_version(session);
+		if (ver && ver->tls13_sem &&
+		    session->internals.resumed != RESUME_FALSE)
+			return 1;
+
 		if (session->security_parameters.session_id_size > 0 &&
 		    session->security_parameters.session_id_size ==
 		    session->internals.resumed_security_parameters.
@@ -837,8 +980,7 @@ int _gnutls_session_is_psk(gnutls_session_t session)
 {
 	gnutls_kx_algorithm_t kx;
 
-	kx = _gnutls_cipher_suite_get_kx_algo(session->security_parameters.
-					      cipher_suite);
+	kx = session->security_parameters.cs->kx_algorithm;
 	if (kx == GNUTLS_KX_PSK || kx == GNUTLS_KX_DHE_PSK
 	    || kx == GNUTLS_KX_RSA_PSK)
 		return 1;
@@ -860,8 +1002,7 @@ int _gnutls_session_is_ecc(gnutls_session_t session)
 	/* We get the key exchange algorithm through the ciphersuite because
 	 * the negotiated key exchange might not have been set yet.
 	 */
-	kx = _gnutls_cipher_suite_get_kx_algo(session->security_parameters.
-					      cipher_suite);
+	kx = session->security_parameters.cs->kx_algorithm;
 
 	return _gnutls_kx_is_ecc(kx);
 }
@@ -931,15 +1072,18 @@ void
  * gnutls_record_get_direction:
  * @session: is a #gnutls_session_t type.
  *
- * This function provides information about the internals of the
- * record protocol and is only useful if a prior gnutls function call,
- * e.g.  gnutls_handshake(), was interrupted for some reason. That
- * is, if a function returned %GNUTLS_E_INTERRUPTED or
- * %GNUTLS_E_AGAIN. In such a case, you might want to call select()
- * or poll() before restoring the interrupted gnutls function.
+ * This function is useful to determine whether a GnuTLS function was interrupted
+ * while sending or receiving, so that select() or poll() may be called appropriately.
+ *
+ * It provides information about the internals of the record
+ * protocol and is only useful if a prior gnutls function call,
+ * e.g.  gnutls_handshake(), was interrupted and returned
+ * %GNUTLS_E_INTERRUPTED or %GNUTLS_E_AGAIN. After such an interrupt
+ * applications may call select() or poll() before restoring the
+ * interrupted GnuTLS function.
  *
  * This function's output is unreliable if you are using the same
- * @session in different threads, for sending and receiving.
+ * @session in different threads for sending and receiving.
  *
  * Returns: 0 if interrupted while trying to read data, or 1 while trying to write data.
  **/
@@ -964,6 +1108,24 @@ _gnutls_rsa_pms_set_version(gnutls_session_t session,
 {
 	session->internals.rsa_pms_version[0] = major;
 	session->internals.rsa_pms_version[1] = minor;
+}
+
+void _gnutls_session_client_cert_type_set(gnutls_session_t session,
+			      gnutls_certificate_type_t ct)
+{
+	_gnutls_handshake_log
+	    ("HSK[%p]: Selected client certificate type %s (%d)\n", session,
+	     gnutls_certificate_type_get_name(ct), ct);
+	session->security_parameters.client_ctype = ct;
+}
+
+void _gnutls_session_server_cert_type_set(gnutls_session_t session,
+			      gnutls_certificate_type_t ct)
+{
+	_gnutls_handshake_log
+	    ("HSK[%p]: Selected server certificate type %s (%d)\n", session,
+	     gnutls_certificate_type_get_name(ct), ct);
+	session->security_parameters.server_ctype = ct;
 }
 
 /**
@@ -1014,10 +1176,12 @@ gnutls_handshake_set_post_client_hello_function(gnutls_session_t session,
  *
  * Note that this function must be called after any call to gnutls_priority
  * functions.
+ *
+ * Since: 2.1.4
  **/
 void gnutls_session_enable_compatibility_mode(gnutls_session_t session)
 {
-	ENABLE_COMPAT(&session->internals.priorities);
+	ENABLE_COMPAT(&session->internals);
 }
 
 /**
@@ -1061,7 +1225,7 @@ gnutls_session_channel_binding(gnutls_session_t session,
  * gnutls_ecc_curve_get:
  * @session: is a #gnutls_session_t type.
  *
- * Returns the currently used elliptic curve. Only valid
+ * Returns the currently used elliptic curve for key exchange. Only valid
  * when using an elliptic curve ciphersuite.
  *
  * Returns: the currently used curve, a #gnutls_ecc_curve_t
@@ -1071,7 +1235,34 @@ gnutls_session_channel_binding(gnutls_session_t session,
  **/
 gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session)
 {
-	return _gnutls_session_ecc_curve_get(session);
+	const gnutls_group_entry_st *e;
+
+	e = get_group(session);
+	if (e == NULL || e->curve == 0)
+		return 0;
+	return e->curve;
+}
+
+/**
+ * gnutls_group_get:
+ * @session: is a #gnutls_session_t type.
+ *
+ * Returns the currently used group for key exchange. Only valid
+ * when using an elliptic curve or DH ciphersuite.
+ *
+ * Returns: the currently used group, a #gnutls_group_t
+ *   type.
+ *
+ * Since: 3.6.0
+ **/
+gnutls_group_t gnutls_group_get(gnutls_session_t session)
+{
+	const gnutls_group_entry_st *e;
+
+	e = get_group(session);
+	if (e == NULL)
+		return 0;
+	return e->id;
 }
 
 /**
@@ -1126,6 +1317,8 @@ gnutls_session_get_random(gnutls_session_t session,
  *
  * This function returns pointers to the master secret
  * used in the TLS session. The pointers are not to be modified or deallocated.
+ *
+ * This function is only applicable under TLS 1.2 or earlier versions.
  *
  * Since: 3.5.0
  **/
@@ -1188,21 +1381,21 @@ gnutls_handshake_set_random(gnutls_session_t session,
  * gnutls_handshake_set_hook_function:
  * @session: is a #gnutls_session_t type
  * @htype: the %gnutls_handshake_description_t of the message to hook at
- * @post: %GNUTLS_HOOK_* depending on when the hook function should be called
+ * @when: %GNUTLS_HOOK_* depending on when the hook function should be called
  * @func: is the function to be called
  *
  * This function will set a callback to be called after or before the specified
  * handshake message has been received or generated. This is a
  * generalization of gnutls_handshake_set_post_client_hello_function().
  *
- * To call the hook function prior to the message being sent/generated use
- * %GNUTLS_HOOK_PRE as @post parameter, %GNUTLS_HOOK_POST to call
+ * To call the hook function prior to the message being generated or processed
+ * use %GNUTLS_HOOK_PRE as @when parameter, %GNUTLS_HOOK_POST to call
  * after, and %GNUTLS_HOOK_BOTH for both cases.
  *
  * This callback must return 0 on success or a gnutls error code to
  * terminate the handshake.
  *
- * Note to hook at all handshake messages use an @htype of %GNUTLS_HANDSHAKE_ANY.
+ * To hook at all handshake messages use an @htype of %GNUTLS_HANDSHAKE_ANY.
  *
  * Warning: You should not use this function to terminate the
  * handshake based on client input unless you know what you are
@@ -1212,12 +1405,12 @@ gnutls_handshake_set_random(gnutls_session_t session,
 void
 gnutls_handshake_set_hook_function(gnutls_session_t session,
 				   unsigned int htype,
-				   int post,
+				   int when,
 				   gnutls_handshake_hook_func func)
 {
 	session->internals.h_hook = func;
 	session->internals.h_type = htype;
-	session->internals.h_post = post;
+	session->internals.h_post = when;
 }
 
 /**
@@ -1231,9 +1424,10 @@ gnutls_handshake_set_hook_function(gnutls_session_t session,
  *
  * This function will return the parameters of the current record state.
  * These are only useful to be provided to an external off-loading device
- * or subsystem.
+ * or subsystem. The returned values should be considered constant
+ * and valid for the lifetime of the session.
  *
- * In that case, to sync the state you must call gnutls_record_set_state().
+ * In that case, to sync the state back you must call gnutls_record_set_state().
  *
  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
  *
@@ -1269,12 +1463,21 @@ gnutls_record_get_state(gnutls_session_t session,
 	else
 		record_state = &record_params->write;
 
-	if (mac_key)
-		memcpy(mac_key, &record_state->mac_secret, sizeof(gnutls_datum_t));
-	if (IV)
-		memcpy(IV, &record_state->IV, sizeof(gnutls_datum_t));
-	if (cipher_key)
-		memcpy(cipher_key, &record_state->key, sizeof(gnutls_datum_t));
+	if (mac_key) {
+		mac_key->data = record_state->mac_key;
+		mac_key->size = record_state->mac_key_size;
+	}
+
+	if (IV) {
+		IV->data = record_state->iv;
+		IV->size = record_state->iv_size;
+	}
+
+	if (cipher_key) {
+		cipher_key->data = record_state->key;
+		cipher_key->size = record_state->key_size;
+	}
+
 	if (seq_number)
 		memcpy(seq_number, UINT64DATA(record_state->sequence_number), 8);
 	return 0;
@@ -1297,7 +1500,7 @@ gnutls_record_get_state(gnutls_session_t session,
 int
 gnutls_record_set_state(gnutls_session_t session,
 			unsigned read,
-			unsigned char seq_number[8])
+			const unsigned char seq_number[8])
 {
 	record_parameters_st *record_params;
 	record_state_st *record_state;
@@ -1358,8 +1561,19 @@ unsigned gnutls_session_get_flags(gnutls_session_t session)
 		flags |= GNUTLS_SFLAGS_HB_LOCAL_SEND;
 	if (gnutls_heartbeat_allowed(session, GNUTLS_HB_PEER_ALLOWED_TO_SEND))
 		flags |= GNUTLS_SFLAGS_HB_PEER_SEND;
-	if (session->internals.false_start_used)
+	if (session->internals.hsk_flags & HSK_FALSE_START_USED)
 		flags |= GNUTLS_SFLAGS_FALSE_START;
+	if ((session->internals.hsk_flags & HSK_EARLY_START_USED) &&
+	    (session->internals.flags & GNUTLS_ENABLE_EARLY_START))
+		flags |= GNUTLS_SFLAGS_EARLY_START;
+	if (session->internals.hsk_flags & HSK_USED_FFDHE)
+		flags |= GNUTLS_SFLAGS_RFC7919;
+	if (session->internals.hsk_flags & HSK_TICKET_RECEIVED)
+		flags |= GNUTLS_SFLAGS_SESSION_TICKET;
+	if (session->security_parameters.post_handshake_auth)
+		flags |= GNUTLS_SFLAGS_POST_HANDSHAKE_AUTH;
+	if (session->internals.hsk_flags & HSK_EARLY_DATA_ACCEPTED)
+		flags |= GNUTLS_SFLAGS_EARLY_DATA;
 
 	return flags;
 }

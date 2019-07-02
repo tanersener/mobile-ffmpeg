@@ -28,6 +28,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <assert.h>
 #include <gnutls/gnutls.h>
 #include "utils.h"
 #include "eagain-common.h"
@@ -44,10 +45,9 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "%s|<%d>| %s", side, level, str);
 }
 
-void doit(void)
+static
+void start(const char *prio)
 {
-	global_init();
-
 	int ret;
 	/* Server stuff. */
 	gnutls_certificate_credentials_t serverx509cred;
@@ -60,6 +60,10 @@ void doit(void)
 	gnutls_datum_t v1, v2;
 	char client_random[32];
 	char server_random[32];
+
+	global_init();
+
+	success("trying %s\n", prio);
 
 	memset(client_random, 1, sizeof(client_random));
 	memset(server_random, 2, sizeof(server_random));
@@ -79,9 +83,7 @@ void doit(void)
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
 				serverx509cred);
 
-	gnutls_priority_set_direct(server,
-				   "NORMAL",
-				   NULL);
+	assert(gnutls_priority_set_direct(server, prio, NULL)>=0);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_pull_timeout_function(server,
@@ -107,7 +109,7 @@ void doit(void)
 	if (ret < 0)
 		exit(1);
 
-	ret = gnutls_priority_set_direct(client, "NORMAL", NULL);
+	ret = gnutls_priority_set_direct(client, prio, NULL);
 	if (ret < 0)
 		exit(1);
 
@@ -179,4 +181,12 @@ void doit(void)
 	gnutls_certificate_free_credentials(clientx509cred);
 
 	gnutls_global_deinit();
+	reset_buffers();
+}
+
+void doit(void)
+{
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.2");
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.3");
+	start("NORMAL");
 }

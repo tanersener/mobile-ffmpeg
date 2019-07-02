@@ -13,7 +13,7 @@
 
 This function is to be used by server to register a callback to
 provide OCSP status requests that correspond to the indexed certificate chain
-from the client.  The callback will be invoked if the client supplied a 
+from the client.  The callback will be invoked if the client supplied a
 status-request OCSP extension.
 
 The callback function prototype is:

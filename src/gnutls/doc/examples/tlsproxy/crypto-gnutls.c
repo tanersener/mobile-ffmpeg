@@ -24,10 +24,10 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 */
 
-#define _GNU_SOURCE
+#include "config.h"
+
 #include <errno.h>
 #include <fcntl.h>
-#include <signal.h>
 #include <string.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -46,14 +46,10 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include "crypto-gnutls.h"
 #include "buffer.h"
 
-#define MAX_CERTS 10
-
 #define FALSE 0
 #define TRUE 1
 
-#define PRIORITY "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2"
-
-typedef struct tlssession
+struct tlssession
 {
   gnutls_certificate_credentials_t creds;
   gnutls_session_t session;
@@ -62,7 +58,7 @@ typedef struct tlssession
   int (*erroutfn) (void *opaque, const char *format, va_list ap);
   int debug;
   void *opaque;
-} tlssession_t;
+};
 
 #define BUF_SIZE 65536
 #define BUF_HWM ((BUF_SIZE*3)/4)
@@ -79,9 +75,11 @@ quit (tlssession_t * s)
   return s->quitfn (s->opaque);
 }
 
+#if defined __clang__ || __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5)
+# pragma GCC diagnostic ignored "-Wsuggest-attribute=format"
+#endif
 
-static int
-stderrout (void *opaque, const char *format, va_list ap)
+static int stderrout (void *opaque, const char *format, va_list ap)
 {
   return vfprintf (stderr, format, ap);
 }
@@ -127,78 +125,42 @@ static int
 verify_certificate_callback (gnutls_session_t session)
 {
   unsigned int status;
-  const gnutls_datum_t *cert_list;
-  unsigned int cert_list_size;
   int ret;
-  gnutls_x509_crt_t cert;
   tlssession_t *s;
 
   /* read session pointer */
   s = (tlssession_t *) gnutls_session_get_ptr (session);
 
+  if (gnutls_certificate_type_get (session) != GNUTLS_CRT_X509)
+    return GNUTLS_E_CERTIFICATE_ERROR;
+
   /* This verification function uses the trusted CAs in the credentials
    * structure. So you must have installed one or more CA certificates.
    */
-  ret = gnutls_certificate_verify_peers2 (session, &status);
+  if (s->hostname && *s->hostname)
+    ret = gnutls_certificate_verify_peers3 (session, s->hostname, &status);
+  else
+    ret = gnutls_certificate_verify_peers2 (session, &status);
+
   if (ret < 0)
     {
       debugout (s, "Could not verfify peer certificate due to an error\n");
       return GNUTLS_E_CERTIFICATE_ERROR;
     }
 
-  if (status & GNUTLS_CERT_INVALID)
-    debugout (s, "The certificate is not trusted.\n");
-
-  if (status & GNUTLS_CERT_SIGNER_NOT_FOUND)
-    debugout (s, "The certificate hasn't got a known issuer.\n");
-
-  if (status & GNUTLS_CERT_REVOKED)
-    debugout (s, "The certificate has been revoked.\n");
-
-  if (status & GNUTLS_CERT_EXPIRED)
-    debugout (s, "The certificate has expired\n");
-
-  if (status & GNUTLS_CERT_NOT_ACTIVATED)
-    debugout (s, "The certificate is not yet activated\n");
-
   if (status)
-    return GNUTLS_E_CERTIFICATE_ERROR;
-
-  if (gnutls_certificate_type_get (session) != GNUTLS_CRT_X509)
-    return GNUTLS_E_CERTIFICATE_ERROR;
-
-  if (gnutls_x509_crt_init (&cert) < 0)
     {
-      debugout (s, "error in initialization\n");
+      gnutls_datum_t txt;
+      ret = gnutls_certificate_verification_status_print(status, GNUTLS_CRT_X509,
+							 &txt, 0);
+      if (ret >= 0)
+        {
+          debugout (s, "verification error: %s\n", txt.data);
+          gnutls_free(txt.data);
+        }
+
       return GNUTLS_E_CERTIFICATE_ERROR;
     }
-
-  cert_list = gnutls_certificate_get_peers (session, &cert_list_size);
-  if (cert_list == NULL)
-    {
-      debugout (s, "No certificate was found!\n");
-      return GNUTLS_E_CERTIFICATE_ERROR;
-    }
-
-  /* check only the first certificate - seems to be what curl does */
-  if (gnutls_x509_crt_import (cert, &cert_list[0], GNUTLS_X509_FMT_DER) < 0)
-    {
-      debugout (s, "error parsing certificate\n");
-      return GNUTLS_E_CERTIFICATE_ERROR;
-    }
-
-  if (s->hostname && *s->hostname)
-    {
-      if (!gnutls_x509_crt_check_hostname (cert, s->hostname))
-	{
-	  debugout (s,
-		    "The certificate's owner does not match hostname '%s'\n",
-		    s->hostname);
-	  return GNUTLS_E_CERTIFICATE_ERROR;
-	}
-    }
-
-  gnutls_x509_crt_deinit (cert);
 
   debugout (s, "Peer passed certificate verification\n");
 
@@ -216,6 +178,8 @@ tlssession_new (int isserver,
 {
   int ret;
   tlssession_t *s = calloc (1, sizeof (tlssession_t));
+  if (!s)
+    return NULL;
 
   if (quitfn)
     s->quitfn = quitfn;
@@ -278,13 +242,10 @@ tlssession_new (int isserver,
     }
 
   if (isserver)
-    {
-      ret = gnutls_init (&s->session, GNUTLS_SERVER);
-    }
+    ret = gnutls_init (&s->session, GNUTLS_SERVER);
   else
-    {
-      ret = gnutls_init (&s->session, GNUTLS_CLIENT);
-    }
+    ret = gnutls_init (&s->session, GNUTLS_CLIENT);
+
   if (ret < 0)
     {
       errout (s, "Cannot initialize GNUTLS session: %s\n",
@@ -294,6 +255,18 @@ tlssession_new (int isserver,
 
   gnutls_session_set_ptr (s->session, (void *) s);
 
+  if (!isserver && s->hostname && *s->hostname)
+    {
+      ret = gnutls_server_name_set (s->session, GNUTLS_NAME_DNS, s->hostname,
+				    strlen (s->hostname));
+      if (ret < 0)
+        {
+          errout (s, "Cannot set server name: %s\n",
+	          gnutls_strerror (ret));
+          goto error;
+        }
+    }
+
   ret = gnutls_set_default_priority (s->session);
   if (ret < 0)
     {
@@ -301,17 +274,6 @@ tlssession_new (int isserver,
 	      gnutls_strerror (ret));
       goto error;
     }
-
-  const char *errpos = NULL;
-  ret = gnutls_priority_set_direct(s->session, PRIORITY, &errpos);
-  if (ret < 0)
-    {
-      errout (s, "Cannot set GNUTLS session priority: %s\n",
-	      gnutls_strerror (ret));
-      goto error;
-    }
-
-  gnutls_session_set_ptr (s->session, (void *) s);
 
   ret = gnutls_credentials_set (s->session, GNUTLS_CRD_CERTIFICATE, s->creds);
   if (ret < 0)
@@ -347,7 +309,7 @@ tlssession_close (tlssession_t * s)
 }
 
 int
-tlssession_init ()
+tlssession_init (void)
 {
   return gnutls_global_init ();
 }
@@ -362,7 +324,7 @@ tlssession_mainloop (int cryptfd, int plainfd, tlssession_t * s)
   int tls_wr_interrupted = 0;
   int plainEOF = FALSE;
   int cryptEOF = FALSE;
-  int ret;
+  ssize_t ret;
 
   buffer_t *plainToCrypt = bufNew (BUF_SIZE, BUF_HWM);
   buffer_t *cryptToPlain = bufNew (BUF_SIZE, BUF_HWM);
@@ -474,7 +436,6 @@ tlssession_mainloop (int cryptfd, int plainfd, tlssession_t * s)
 	  ssize_t len = bufGetWriteSpan (plainToCrypt, &addr);
 	  if (len > 0)
 	    {
-	      ssize_t ret;
 	      do
 		{
 		  ret = read (plainfd, addr, (size_t) len);
@@ -509,7 +470,6 @@ tlssession_mainloop (int cryptfd, int plainfd, tlssession_t * s)
 	  ssize_t len = bufGetReadSpan (cryptToPlain, &addr);
 	  if (len > 0)
 	    {
-	      ssize_t ret;
 	      do
 		{
 		  ret = write (plainfd, addr, (size_t) len);
@@ -537,7 +497,6 @@ tlssession_mainloop (int cryptfd, int plainfd, tlssession_t * s)
 	  ssize_t len = bufGetWriteSpan (cryptToPlain, &addr);
 	  if (len > 0)
 	    {
-	      ssize_t ret;
 	      do
 		{
 		  ret = gnutls_record_recv (s->session, addr, (size_t) len);
@@ -576,7 +535,6 @@ tlssession_mainloop (int cryptfd, int plainfd, tlssession_t * s)
 	  ssize_t len = bufGetReadSpan (plainToCrypt, &addr);
 	  if (len > 0)
 	    {
-	      ssize_t ret;
 	      do
 		{
 		  if (tls_wr_interrupted)
@@ -604,7 +562,10 @@ tlssession_mainloop (int cryptfd, int plainfd, tlssession_t * s)
 			  gnutls_strerror (ret));
 		  goto error;
 		}
-	      bufDoneRead (plainToCrypt, ret);	/* mark ret bytes as read from the buffer */
+	      else
+		{
+		  bufDoneRead (plainToCrypt, ret);	/* mark ret bytes as read from the buffer */
+		}
 	    }
 	}
     }

@@ -32,6 +32,7 @@
 #include <gnutls/x509.h>
 #include "utils.h"
 #include "eagain-common.h"
+#include <assert.h>
 
 /* This tests gnutls_certificate_set_x509_key() */
 
@@ -178,9 +179,9 @@ const gnutls_datum_t server_key = { server_key_pem,
 	sizeof(server_key_pem)
 };
 
-void doit(void)
+static
+void start(const char *prio)
 {
-	int exit_code = EXIT_SUCCESS;
 	int ret;
 	/* Server stuff. */
 	gnutls_certificate_credentials_t serverx509cred;
@@ -194,6 +195,8 @@ void doit(void)
 	unsigned int crts_size;
 	unsigned i;
 	gnutls_x509_privkey_t pkey;
+
+	success("trying %s\n", prio);
 
 	/* General init. */
 	global_init();
@@ -233,9 +236,7 @@ void doit(void)
 	gnutls_init(&server, GNUTLS_SERVER);
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
 				serverx509cred);
-	gnutls_priority_set_direct(server,
-				   "NORMAL:-CIPHER-ALL:+AES-128-GCM",
-				   NULL);
+	assert(gnutls_priority_set_direct(server, prio, NULL) >= 0);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
@@ -264,7 +265,7 @@ void doit(void)
 	if (ret < 0)
 		exit(1);
 
-	gnutls_priority_set_direct(client, "NORMAL", NULL);
+	gnutls_priority_set_direct(client, prio, NULL);
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);
@@ -302,6 +303,8 @@ void doit(void)
 			exit(1);
 		}
 		gnutls_free(scert.data);
+
+		assert(gnutls_certificate_type_get(server)==GNUTLS_CRT_X509);
 	}
 
 	/* check gnutls_certificate_get_ours() - client side */
@@ -335,6 +338,8 @@ void doit(void)
 			exit(1);
 		}
 		gnutls_free(ccert.data);
+
+		assert(gnutls_certificate_type_get(client)==GNUTLS_CRT_X509);
 	}
 
 	/* check the number of certificates received */
@@ -423,10 +428,12 @@ void doit(void)
 
 	gnutls_global_deinit();
 
-	if (debug > 0) {
-		if (exit_code == 0)
-			puts("Self-test successful");
-		else
-			puts("Self-test failed");
-	}
+	reset_buffers();
+}
+
+void doit(void)
+{
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.2");
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.3");
+	start("NORMAL");
 }

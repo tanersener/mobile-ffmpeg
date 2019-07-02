@@ -16,7 +16,7 @@ includedir=@includedir@
 
 Name: GnuTLS-DANE
 Description: DANE security library for the GNU system
-URL: http://www.gnu.org/software/gnutls/
+URL: https://www.gnu.org/software/gnutls/
 Version: @VERSION@
 Libs: -L${libdir} -lgnutls-dane
 Libs.private: @UNBOUND_LIBS@

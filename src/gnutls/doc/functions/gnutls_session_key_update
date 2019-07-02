@@ -1,0 +1,26 @@
+
+
+
+
+@deftypefun {int} {gnutls_session_key_update} (gnutls_session_t @var{session}, unsigned @var{flags})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{flags}: zero of @code{GNUTLS_KU_PEER} 
+
+This function will update/refresh the session keys when the
+TLS protocol is 1.3 or better. The peer is notified of the
+update by sending a message, so this function should be
+treated similarly to @code{gnutls_record_send()}  --i.e., it may
+return @code{GNUTLS_E_AGAIN}  or @code{GNUTLS_E_INTERRUPTED} .
+
+When this flag @code{GNUTLS_KU_PEER}  is specified, this function
+in addition to updating the local keys, will ask the peer to
+refresh its keys too.
+
+If the negotiated version is not TLS 1.3 or better this
+function will return @code{GNUTLS_E_INVALID_REQUEST} .
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
+
+@strong{Since:} 3.6.3
+@end deftypefun

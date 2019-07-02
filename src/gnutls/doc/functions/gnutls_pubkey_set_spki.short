@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pubkey_set_spki} (gnutls_pubkey_t @var{pubkey}, const gnutls_x509_spki_t @var{spki}, unsigned int @var{flags})

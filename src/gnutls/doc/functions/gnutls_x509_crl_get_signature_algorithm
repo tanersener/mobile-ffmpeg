@@ -8,6 +8,9 @@
 This function will return a value of the @code{gnutls_sign_algorithm_t} 
 enumeration that is the signature algorithm.
 
-@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
-negative error value.
+Since 3.6.0 this function never returns a negative error code.
+Error cases and unknown/unsupported signature algorithms are
+mapped to @code{GNUTLS_SIGN_UNKNOWN} .
+
+@strong{Returns:} a @code{gnutls_sign_algorithm_t}  value
 @end deftypefun

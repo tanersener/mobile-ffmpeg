@@ -16,29 +16,27 @@
  */
 int print_info(gnutls_session_t session)
 {
-        const char *tmp;
         gnutls_credentials_type_t cred;
         gnutls_kx_algorithm_t kx;
-        int dhe, ecdh;
+        int dhe, ecdh, group;
+        char *desc;
+
+        /* get a description of the session connection, protocol,
+         * cipher/key exchange */
+        desc = gnutls_session_get_desc(session);
+        if (desc != NULL) {
+                printf("- Session: %s\n", desc);
+        }
 
         dhe = ecdh = 0;
 
-        /* print the key exchange's algorithm name
-         */
         kx = gnutls_kx_get(session);
-        tmp = gnutls_kx_get_name(kx);
-        printf("- Key Exchange: %s\n", tmp);
 
         /* Check the authentication type used and switch
          * to the appropriate.
          */
         cred = gnutls_auth_get_type(session);
         switch (cred) {
-        case GNUTLS_CRD_IA:
-                printf("- TLS/IA session\n");
-                break;
-
-
 #ifdef ENABLE_SRP
         case GNUTLS_CRD_SRP:
                 printf("- SRP session with username %s\n",
@@ -87,48 +85,25 @@ int print_info(gnutls_session_t session)
                  * print some information about it.
                  */
                 print_x509_certificate_info(session);
-
+                break;
+	default:
+		break;
         }                       /* switch */
 
-        if (ecdh != 0)
-                printf("- Ephemeral ECDH using curve %s\n",
-                       gnutls_ecc_curve_get_name(gnutls_ecc_curve_get
-                                                 (session)));
-        else if (dhe != 0)
-                printf("- Ephemeral DH using prime of %d bits\n",
-                       gnutls_dh_get_prime_bits(session));
-
-        /* print the protocol's name (ie TLS 1.0) 
-         */
-        tmp =
-            gnutls_protocol_get_name(gnutls_protocol_get_version(session));
-        printf("- Protocol: %s\n", tmp);
-
-        /* print the certificate type of the peer.
-         * ie X.509
-         */
-        tmp =
-            gnutls_certificate_type_get_name(gnutls_certificate_type_get
-                                             (session));
-
-        printf("- Certificate Type: %s\n", tmp);
-
-        /* print the compression algorithm (if any)
-         */
-        tmp = gnutls_compression_get_name(gnutls_compression_get(session));
-        printf("- Compression: %s\n", tmp);
-
-        /* print the name of the cipher used.
-         * ie 3DES.
-         */
-        tmp = gnutls_cipher_get_name(gnutls_cipher_get(session));
-        printf("- Cipher: %s\n", tmp);
-
-        /* Print the MAC algorithms name.
-         * ie SHA1
-         */
-        tmp = gnutls_mac_get_name(gnutls_mac_get(session));
-        printf("- MAC: %s\n", tmp);
+        /* read the negotiated group - if any */
+        group = gnutls_group_get(session);
+        if (group != 0) {
+                printf("- Negotiated group %s\n",
+                       gnutls_group_get_name(group));
+        } else {
+                if (ecdh != 0)
+                        printf("- Ephemeral ECDH using curve %s\n",
+	                       gnutls_ecc_curve_get_name(gnutls_ecc_curve_get
+                                                         (session)));
+                else if (dhe != 0)
+                        printf("- Ephemeral DH using prime of %d bits\n",
+                               gnutls_dh_get_prime_bits(session));
+        }
 
         return 0;
 }

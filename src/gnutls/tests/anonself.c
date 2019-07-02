@@ -1,8 +1,9 @@
 /*
  * Copyright (C) 2004-2012 Free Software Foundation, Inc.
  * Copyright (C) 2013 Adam Sampson <ats@offog.org>
+ * Copyright (C) 2018 Red Hat, Inc.
  *
- * Author: Simon Josefsson
+ * Author: Simon Josefsson, Nikos Mavrogiannopoulos
  *
  * This file is part of GnuTLS.
  *
@@ -21,8 +22,6 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
  */
 
-/* Parts copied from GnuTLS example programs. */
-
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -35,7 +34,6 @@
 
 #if defined(_WIN32)
 
-/* socketpair isn't supported on Win32. */
 int main(int argc, char **argv)
 {
 	exit(77);
@@ -51,6 +49,7 @@ int main(int argc, char **argv)
 #include <sys/wait.h>
 #endif
 #include <unistd.h>
+#include <assert.h>
 #include <gnutls/gnutls.h>
 
 #include "utils.h"
@@ -60,10 +59,10 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "|<%d>| %s", level, str);
 }
 
-#define MAX_BUF 1024
 #define MSG "Hello TLS"
+#define MAX_BUF 1024
 
-static void client(int sd)
+static void client(int sd, const char *prio)
 {
 	int ret, ii;
 	gnutls_session_t session;
@@ -84,9 +83,9 @@ static void client(int sd)
 	gnutls_init(&session, GNUTLS_CLIENT);
 
 	/* Use default priorities */
-	gnutls_priority_set_direct(session,
-				   "NONE:+VERS-TLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH",
-				   NULL);
+	assert(gnutls_priority_set_direct(session,
+					  prio,
+					  NULL) >= 0);
 
 	/* put the anonymous credentials to the current session
 	 */
@@ -107,15 +106,8 @@ static void client(int sd)
 			success("client: Handshake was completed\n");
 	}
 
-	ret = gnutls_dh_get_prime_bits(session);
-	if (ret < 512) {
-		fail("server: too small prime size: %d\n", ret);
-	}
-
-	ret = gnutls_dh_get_secret_bits(session);
-	if (ret < 256) {
-		fail("server: too small secret key size: %d\n", ret);
-	}
+	if (debug)
+		print_dh_params_info(session);
 
 	if (debug)
 		success("client: TLS version is: %s\n",
@@ -166,58 +158,15 @@ static void client(int sd)
 	gnutls_global_deinit();
 }
 
-/* This is a sample TLS 1.0 echo server, for anonymous authentication only.
- */
-
-#define MAX_BUF 1024
 #define DH_BITS 1024
 
-/* These are global */
-gnutls_anon_server_credentials_t anoncred;
-
-static gnutls_session_t initialize_tls_session(void)
-{
-	gnutls_session_t session;
-
-	gnutls_init(&session, GNUTLS_SERVER);
-
-	/* avoid calling all the priority functions, since the defaults
-	 * are adequate.
-	 */
-	gnutls_priority_set_direct(session,
-				   "NONE:+VERS-TLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH",
-				   NULL);
-
-	gnutls_credentials_set(session, GNUTLS_CRD_ANON, anoncred);
-
-	gnutls_dh_set_prime_bits(session, DH_BITS);
-
-	return session;
-}
-
-static gnutls_dh_params_t dh_params;
-
-static int generate_dh_params(void)
+static void server(int sd, const char *prio)
 {
 	const gnutls_datum_t p3 = { (void *) pkcs3, strlen(pkcs3) };
-	/* Generate Diffie-Hellman parameters - for use with DHE
-	 * kx algorithms. These should be discarded and regenerated
-	 * once a day, once a week or once a month. Depending on the
-	 * security requirements.
-	 */
-	gnutls_dh_params_init(&dh_params);
-	return gnutls_dh_params_import_pkcs3(dh_params, &p3,
-					     GNUTLS_X509_FMT_PEM);
-}
-
-int err, ret;
-char topbuf[512];
-gnutls_session_t session;
-char buffer[MAX_BUF + 1];
-int optval = 1;
-
-static void server(int sd)
-{
+	gnutls_anon_server_credentials_t anoncred;
+	gnutls_dh_params_t dh_params;
+	int ret;
+	gnutls_session_t session;
 	gnutls_packet_t packet;
 
 	/* this must be called once in the program
@@ -233,11 +182,20 @@ static void server(int sd)
 	if (debug)
 		success("Launched, generating DH parameters...\n");
 
-	generate_dh_params();
+	assert(gnutls_dh_params_init(&dh_params)>=0);
+	assert(gnutls_dh_params_import_pkcs3(dh_params, &p3,
+					     GNUTLS_X509_FMT_PEM)>=0);
 
 	gnutls_anon_set_server_dh_params(anoncred, dh_params);
 
-	session = initialize_tls_session();
+	assert(gnutls_init(&session, GNUTLS_SERVER)>=0);
+
+	assert(gnutls_priority_set_direct(session, prio, NULL) >= 0);
+
+	gnutls_handshake_set_timeout(session, 20 * 1000);
+	gnutls_credentials_set(session, GNUTLS_CRD_ANON, anoncred);
+
+	gnutls_dh_set_prime_bits(session, DH_BITS);
 
 	gnutls_transport_set_int(session, sd);
 	ret = gnutls_handshake(session);
@@ -256,18 +214,8 @@ static void server(int sd)
 			gnutls_protocol_get_name
 			(gnutls_protocol_get_version(session)));
 
-	ret = gnutls_dh_get_prime_bits(session);
-	if (ret < 512) {
-		fail("server: too small prime size: %d\n", ret);
-	}
-
-	ret = gnutls_dh_get_secret_bits(session);
-	if (ret < 256) {
-		fail("server: too small secret key size: %d\n", ret);
-	}
-
-	/* see the Getting peer's information example */
-	/* print_info(session); */
+	if (debug)
+		print_dh_params_info(session);
 
 	for (;;) {
 		ret = gnutls_record_recv_packet(session, &packet);
@@ -309,11 +257,13 @@ static void server(int sd)
 		success("server: finished\n");
 }
 
-void doit(void)
+static
+void start(const char *name, const char *prio)
 {
 	pid_t child;
-	int sockets[2];
+	int sockets[2], err;
 
+	success("testing: %s\n", name);
 	err = socketpair(AF_UNIX, SOCK_STREAM, 0, sockets);
 	if (err == -1) {
 		perror("socketpair");
@@ -331,10 +281,23 @@ void doit(void)
 	if (child) {
 		int status;
 		/* parent */
-		server(sockets[0]);
+		server(sockets[0], prio);
 		wait(&status);
-	} else
-		client(sockets[1]);
+		check_wait_status(status);
+	} else {
+		client(sockets[1], prio);
+		exit(0);
+	}
+}
+
+void doit(void)
+{
+	start("tls1.2 anon-dh", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+ANON-DH");
+	start("tls1.2 anon-ecdh", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+ANON-ECDH");
+	start("tls1.3 anon-dh", "NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:-KX-ALL:+ANON-DH");
+	start("tls1.3 anon-ecdh", "NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:-KX-ALL:+ANON-ECDH");
+	start("default anon-dh", "NORMAL:-KX-ALL:+ANON-DH");
+	start("default anon-ecdh", "NORMAL:-KX-ALL:+ANON-ECDH");
 }
 
 #endif				/* _WIN32 */

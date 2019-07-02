@@ -1,0 +1,29 @@
+
+
+
+
+@deftypefun {int} {gnutls_ext_raw_parse} (void * @var{ctx}, gnutls_ext_raw_process_func @var{cb}, const gnutls_datum_t * @var{data}, unsigned int @var{flags})
+@var{ctx}: a pointer to pass to callback function
+
+@var{cb}: callback function to process each extension found
+
+@var{data}: TLS extension data
+
+@var{flags}: should be zero or @code{GNUTLS_EXT_RAW_FLAG_TLS_CLIENT_HELLO}  or @code{GNUTLS_EXT_RAW_FLAG_DTLS_CLIENT_HELLO} 
+
+This function iterates through the TLS extensions as passed in
+ @code{data} , passing the individual extension data to callback. The
+ @code{data} must conform to Extension extensions<0..2^16-1> format.
+
+If flags is @code{GNUTLS_EXT_RAW_TLS_FLAG_CLIENT_HELLO}  then this function
+will parse the extension data from the position, as if the packet in
+ @code{data} is a client hello (without record or handshake headers) -
+as provided by @code{gnutls_handshake_set_hook_function()} .
+
+The return value of the callback will be propagated.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, or an error code. On unknown
+flags it returns @code{GNUTLS_E_INVALID_REQUEST} .
+
+@strong{Since:} 3.6.3
+@end deftypefun

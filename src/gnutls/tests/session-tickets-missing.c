@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Red Hat, Inc
+ * Copyright (C) 2016-2018 Red Hat, Inc
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -15,9 +15,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with GnuTLS; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
+ *
  */
 
 #ifdef HAVE_CONFIG_H
@@ -55,7 +55,10 @@ int main()
 static void terminate(void);
 
 /* This program tests that handshakes do not include a session ticket
- * if the flag GNUTLS_NO_TICKETS is specified.
+ * if the flag GNUTLS_NO_TICKETS is specified under TLS 1.2.
+ *
+ * Under TLS 1.3 it verifies that not enabling session tickets doesn't
+ * result in a ticket being sent.
  */
 
 static time_t mytime(time_t * t)
@@ -91,12 +94,14 @@ static int handshake_callback(gnutls_session_t session, unsigned int htype,
 
 #define MAX_BUF 1024
 
-static void client(int fd)
+static void client(int fd, const char *prio, unsigned int flags)
 {
 	int ret;
 	gnutls_certificate_credentials_t x509_cred;
 	gnutls_session_t session;
 	/* Need to enable anonymous KX specifically. */
+
+	flags |= GNUTLS_CLIENT;
 
 	gnutls_global_set_time_function(mytime);
 	global_init();
@@ -110,10 +115,9 @@ static void client(int fd)
 
 	/* Initialize TLS session
 	 */
-	gnutls_init(&session, GNUTLS_CLIENT|GNUTLS_NO_TICKETS);
+	gnutls_init(&session, flags);
 
-	/* Use default priorities */
-	gnutls_priority_set_direct(session, "NORMAL:-KX-ALL:+ECDHE-RSA", NULL);
+	assert(gnutls_priority_set_direct(session, prio, NULL)>=0);
 
 	/* put the anonymous credentials to the current session
 	 */
@@ -169,13 +173,15 @@ static void terminate(void)
 	exit(1);
 }
 
-static void server(int fd)
+static void server(int fd, const char *prio, unsigned int flags)
 {
 	int ret;
 	char buffer[MAX_BUF + 1];
 	gnutls_session_t session;
 	gnutls_certificate_credentials_t x509_cred;
-	gnutls_datum_t skey;
+	gnutls_datum_t skey = {NULL, 0};
+
+	flags |= GNUTLS_SERVER;
 
 	/* this must be called once in the program
 	 */
@@ -192,10 +198,12 @@ static void server(int fd)
 					    &server_key,
 					    GNUTLS_X509_FMT_PEM)>=0);
 
-	assert(gnutls_init(&session, GNUTLS_SERVER)>=0);
+	assert(gnutls_init(&session, flags)>=0);
 
-	assert(gnutls_session_ticket_key_generate(&skey)>=0);
-	assert(gnutls_session_ticket_enable_server(session, &skey) >= 0);
+	if (!(flags & GNUTLS_NO_TICKETS)) {
+		assert(gnutls_session_ticket_key_generate(&skey)>=0);
+		assert(gnutls_session_ticket_enable_server(session, &skey) >= 0);
+	}
 
 	gnutls_handshake_set_hook_function(session, GNUTLS_HANDSHAKE_NEW_SESSION_TICKET,
 					   GNUTLS_HOOK_POST,
@@ -204,7 +212,7 @@ static void server(int fd)
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	assert(gnutls_priority_set_direct(session, "NORMAL", NULL)>=0);
+	assert(gnutls_priority_set_direct(session, prio, NULL)>=0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
@@ -254,11 +262,15 @@ static void ch_handler(int sig)
 	return;
 }
 
-void doit(void)
+static
+void start2(const char *prio, const char *sprio, unsigned int flags, unsigned int sflags)
 {
 	int fd[2];
 	int ret, status = 0;
 
+	success("trying %s\n", prio);
+
+	sent = 0;
 	signal(SIGCHLD, ch_handler);
 	signal(SIGPIPE, SIG_IGN);
 
@@ -278,16 +290,33 @@ void doit(void)
 	if (child) {
 		/* parent */
 		close(fd[1]);
-		server(fd[0]);
+		server(fd[0], sprio, sflags);
 		waitpid(child, &status, 0);
 		check_wait_status(status);
 	} else {
 		close(fd[0]);
-		client(fd[1]);
+		client(fd[1], prio, flags);
 		exit(0);
 	}
 
 	return;
+}
+
+static
+void start(const char *prio, unsigned int flags)
+{
+	start2(prio, prio, GNUTLS_NO_TICKETS, flags);
+}
+
+void doit(void)
+{
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.2", 0);
+	/* Under TLS 1.3 session tickets are not negotiated; they are
+	 * always sent unless server sets GNUTLS_NO_TICKETS... */
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.3", GNUTLS_NO_TICKETS);
+	/* ...or there is no overlap between PSK key exchange modes */
+	start2("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK:-DHE-PSK", "NORMAL:-VERS-ALL:+VERS-TLS1.3", 0, 0);
+	start("NORMAL", GNUTLS_NO_TICKETS);
 }
 
 #endif				/* _WIN32 */

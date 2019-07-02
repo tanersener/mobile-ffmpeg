@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2011-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2018 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -16,7 +17,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -86,6 +87,9 @@ static int aes_setiv(void *_ctx, const void *iv, size_t iv_size)
 {
 	struct aes_ctx *ctx = _ctx;
 
+	if (iv_size != 16)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
 	memcpy(ctx->iv, iv, 16);
 	return 0;
 }
@@ -95,6 +99,9 @@ aes_encrypt(void *_ctx, const void *src, size_t src_size,
 	    void *dst, size_t dst_size)
 {
 	struct aes_ctx *ctx = _ctx;
+
+	if (unlikely(src_size % 16 != 0))
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	aesni_cbc_encrypt(src, dst, src_size, ALIGN16(&ctx->expanded_key),
 			  ctx->iv, 1);
@@ -106,6 +113,9 @@ aes_decrypt(void *_ctx, const void *src, size_t src_size,
 	    void *dst, size_t dst_size)
 {
 	struct aes_ctx *ctx = _ctx;
+
+	if (unlikely(src_size % 16 != 0))
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	aesni_cbc_encrypt(src, dst, src_size, ALIGN16(&ctx->expanded_key),
 			  ctx->iv, 0);

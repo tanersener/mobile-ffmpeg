@@ -7,7 +7,7 @@
 
 @var{hash}: The result of the call with the hash algorithm used for signature
 
-@var{mand}: If non-zero it means that the algorithm MUST use this hash. May be NULL.
+@var{mand}: If non-zero it means that the algorithm MUST use this hash. May be @code{NULL} .
 
 This function will read the certificate and return the appropriate digest
 algorithm to use for signing with this certificate. Some certificates (i.e.

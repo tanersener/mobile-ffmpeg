@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2011-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2011-2018 Free Software Foundation, Inc.
+ * Copyright (C) 2018 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -16,7 +17,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -31,10 +32,8 @@
 #include "errors.h"
 #include <aes-x86.h>
 #include <x86-common.h>
-#ifdef HAVE_LIBNETTLE
-# include <nettle/aes.h>		/* for key generation in 192 and 256 bits */
-# include <sha-padlock.h>
-#endif
+#include <nettle/aes.h>		/* for key generation in 192 and 256 bits */
+#include <sha-padlock.h>
 #include <aes-padlock.h>
 
 static int
@@ -42,7 +41,6 @@ aes_cipher_init(gnutls_cipher_algorithm_t algorithm, void **_ctx, int enc)
 {
 	/* we use key size to distinguish */
 	if (algorithm != GNUTLS_CIPHER_AES_128_CBC
-	    && algorithm != GNUTLS_CIPHER_AES_192_CBC
 	    && algorithm != GNUTLS_CIPHER_AES_256_CBC)
 		return GNUTLS_E_INVALID_REQUEST;
 
@@ -61,9 +59,7 @@ padlock_aes_cipher_setkey(void *_ctx, const void *userkey, size_t keysize)
 {
 	struct padlock_ctx *ctx = _ctx;
 	struct padlock_cipher_data *pce;
-#ifdef HAVE_LIBNETTLE
-	struct aes_ctx nc;
-#endif
+	struct aes256_ctx nc;
 
 	memset(_ctx, 0, sizeof(struct padlock_cipher_data));
 
@@ -78,27 +74,21 @@ padlock_aes_cipher_setkey(void *_ctx, const void *userkey, size_t keysize)
 		memcpy(pce->ks.rd_key, userkey, 16);
 		pce->cword.b.keygen = 0;
 		break;
-#ifdef HAVE_LIBNETTLE
-	case 24:
-		pce->cword.b.ksize = 1;
-		pce->cword.b.rounds = 12;
-		goto common_24_32;
 	case 32:
 		pce->cword.b.ksize = 2;
 		pce->cword.b.rounds = 14;
-	      common_24_32:
+
 		/* expand key using nettle */
 		if (ctx->enc)
-			aes_set_encrypt_key(&nc, keysize, userkey);
+			aes256_set_encrypt_key(&nc, userkey);
 		else
-			aes_set_decrypt_key(&nc, keysize, userkey);
+			aes256_set_decrypt_key(&nc, userkey);
 
 		memcpy(pce->ks.rd_key, nc.keys, sizeof(nc.keys));
-		pce->ks.rounds = nc.rounds;
+		pce->ks.rounds = _AES256_ROUNDS;
 
 		pce->cword.b.keygen = 1;
 		break;
-#endif
 	default:
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
@@ -115,7 +105,7 @@ static int aes_setiv(void *_ctx, const void *iv, size_t iv_size)
 
 	pce = ALIGN16(&ctx->expanded_key);
 
-	if (iv_size < 16)
+	if (iv_size != 16)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	memcpy(pce->iv, iv, 16);

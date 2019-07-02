@@ -34,6 +34,7 @@ if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=15"
 fi
 
+TMPFILE=crq.$$.tmp
 OUTFILE=out.$$.tmp
 OUTFILE2=out2.$$.tmp
 
@@ -65,6 +66,19 @@ datefudge -s "2007-04-22" \
 		--template "${srcdir}/templates/template-tlsfeature.tmpl" \
 		--outfile $OUTFILE 2>/dev/null
 
+${CERTTOOL} --crq-info --no-text --infile ${OUTFILE} --outfile ${TMPFILE}
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "--no-text crq info failed 1"
+	exit ${rc}
+fi
+
+if grep -v '^-----BEGIN [A-Z0-9 ]\+-----$' ${TMPFILE} | grep -v '^[A-Za-z0-9/+=]\+$' | grep -v '^-----END [A-Z0-9 ]\+-----$' ; then
+	echo "--no-text crq info failed 2"
+	exit 1
+fi
+
 datefudge -s "2007-04-22" \
 	"${CERTTOOL}" --generate-certificate \
 		--load-ca-privkey "${srcdir}/data/template-test.key" \
@@ -84,5 +98,55 @@ if test "${rc}" != "0"; then
 fi
 
 rm -f "${OUTFILE}" "${OUTFILE2}"
+
+
+# Test interactive CRQ creation with very long input
+cat >$TMPFILE <<__EOF__
+super-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-long.com
+
+
+
+
+
+
+
+super-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-long.com
+
+
+
+
+
+
+
+
+N
+Y
+N
+Y
+N
+N
+N
+N
+N
+N
+__EOF__
+
+setsid \
+datefudge -s "2007-04-22" \
+	"${CERTTOOL}" -q \
+		--load-privkey "${srcdir}/data/template-test.key" \
+		--outfile "${OUTFILE}" <$TMPFILE 2>/dev/null
+
+${DIFF} --ignore-matching-lines "Algorithm Security Level" "${srcdir}/data/template-long-dns-crq.pem" "${OUTFILE}" >/dev/null 2>&1
+rc=$?
+
+# We're done.
+if test "${rc}" != "0"; then
+	echo "Certificate request generation with long DNS failed"
+	echo $OUTFILE
+	exit ${rc}
+fi
+
+rm -f "${OUTFILE}" "${OUTFILE2}" "${TMPFILE}"
 
 exit 0

@@ -1,44 +1,17 @@
 
-@subheading int
-@anchor{int}
-@deftypefun {typedef} {int} (* @var{gnutls_pin_callback_t})
-@var{gnutls_pin_callback_t}: -- undescribed --
-
-Callback function type for PKCS@code{11}  or TPM PIN entry.  It is set by
-functions like @code{gnutls_pkcs11_set_pin_function()} .
-
-The callback should provides the PIN code to unlock the token with
-label  @code{token_label} , specified by the URL  @code{token_url} .
-
-The PIN code, as a NUL-terminated ASCII string, should be copied
-into the  @code{pin} buffer (of maximum size  @code{pin_max} ), and return 0 to
-indicate success.  Alternatively, the callback may return a
-negative gnutls error code to indicate failure and cancel PIN entry
-(in which case, the contents of the  @code{pin} parameter are ignored).
-
-When a PIN is required, the callback will be invoked repeatedly
-(and indefinitely) until either the returned PIN code is correct,
-the callback returns failure, or the token refuses login (e.g. when
-the token is locked due to too many incorrect PINs!).  For the
-first such invocation, the  @code{attempt} counter will have value zero;
-it will increase by one for each subsequent attempt.
-
-@strong{Returns:} @code{GNUTLS_E_SUCCESS}  (0) on success or a negative error code on error.
-
-@strong{Since:} 2.12.0
-@end deftypefun
-
 
 @c gnutls_ext_parse_type_t
 @table @code
 @item GNUTLS_@-EXT_@-ANY
-Any extension type (internal use only).
+Any extension type (should not be used as it is used only internally).
 @item GNUTLS_@-EXT_@-APPLICATION
-Application extension.
+Parsed after  @code{GNUTLS_EXT_MANDATORY} 
 @item GNUTLS_@-EXT_@-TLS
-TLS-internal extension.
+TLS-internal extensions, parsed after  @code{GNUTLS_EXT_APPLICATION} .
 @item GNUTLS_@-EXT_@-MANDATORY
-Extension parsed even if resuming (or extensions are disabled).
+Parsed after  @code{GNUTLS_EXT_VERSION_NEG} and even when resuming.
 @item GNUTLS_@-EXT_@-NONE
-Never parsed
+Never to be parsed
+@item GNUTLS_@-EXT_@-VERSION_@-NEG
+Extensions to be parsed first for TLS version negotiation.
 @end table

@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_ext_raw_parse} (void * @var{ctx}, gnutls_ext_raw_process_func @var{cb}, const gnutls_datum_t * @var{data}, unsigned int @var{flags})

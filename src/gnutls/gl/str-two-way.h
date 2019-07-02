@@ -1,24 +1,24 @@
 /* Byte-wise substring search, using the Two-Way algorithm.
-   Copyright (C) 2008-2016 Free Software Foundation, Inc.
+   Copyright (C) 2008-2019 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Written by Eric Blake <ebb9@byu.net>, 2008.
 
    This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU Lesser General Public License as published by
-   the Free Software Foundation; either version 2.1, or (at your option)
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 3, or (at your option)
    any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU Lesser General Public License for more details.
+   GNU General Public License for more details.
 
-   You should have received a copy of the GNU Lesser General Public License along
-   with this program; if not, see <http://www.gnu.org/licenses/>.  */
+   You should have received a copy of the GNU General Public License along
+   with this program; if not, see <https://www.gnu.org/licenses/>.  */
 
 /* Before including this file, you need to include <config.h> and
    <string.h>, and define:
-     RESULT_TYPE             A macro that expands to the return type.
+     RETURN_TYPE             A macro that expands to the return type.
      AVAILABLE(h, h_l, j, n_l)
                              A macro that returns nonzero if there are
                              at least N_L bytes left starting at H[J].
@@ -50,8 +50,8 @@
    achieve improved (potentially sub-linear) performance.
 
    See http://www-igm.univ-mlv.fr/~lecroq/string/node26.html#SECTION00260,
-   http://en.wikipedia.org/wiki/Boyer-Moore_string_search_algorithm,
-   http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.34.6641&rep=rep1&type=pdf
+   https://en.wikipedia.org/wiki/Boyer-Moore_string_search_algorithm,
+   https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.34.6641&rep=rep1&type=pdf
 */
 
 /* Point at which computing a bad-byte shift table is likely to be

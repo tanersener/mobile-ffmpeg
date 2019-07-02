@@ -16,7 +16,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -24,24 +24,29 @@
 #include <algorithms.h>
 #include "errors.h"
 #include <x509/common.h>
+#include "c-strcase.h"
 
 /* TLS Versions */
 static const version_entry_st sup_versions[] = {
-	{.name = "SSL3.0", 
+	{.name = "SSL3.0",
 	 .id = GNUTLS_SSL3,
 	 .age = 0,
 	 .major = 3,
 	 .minor = 0,
 	 .transport = GNUTLS_STREAM,
+#ifdef ENABLE_SSL3
 	 .supported = 1,
+#endif
 	 .explicit_iv = 0,
 	 .extensions = 0,
 	 .selectable_sighash = 0,
 	 .selectable_prf = 0,
 	 .obsolete = 1,
+	 .only_extension = 0,
+	 .tls_sig_sem = SIG_SEM_PRE_TLS12,
 	 .false_start = 0
 	},
-	{.name = "TLS1.0", 
+	{.name = "TLS1.0",
 	 .id = GNUTLS_TLS1,
 	 .age = 1,
 	 .major = 3,
@@ -53,9 +58,11 @@ static const version_entry_st sup_versions[] = {
 	 .selectable_sighash = 0,
 	 .selectable_prf = 0,
 	 .obsolete = 0,
+	 .only_extension = 0,
+	 .tls_sig_sem = SIG_SEM_PRE_TLS12,
 	 .false_start = 0
 	},
-	{.name = "TLS1.1", 
+	{.name = "TLS1.1",
 	 .id = GNUTLS_TLS1_1,
 	 .age = 2,
 	 .major = 3,
@@ -67,9 +74,11 @@ static const version_entry_st sup_versions[] = {
 	 .selectable_sighash = 0,
 	 .selectable_prf = 0,
 	 .obsolete = 0,
+	 .only_extension = 0,
+	 .tls_sig_sem = SIG_SEM_PRE_TLS12,
 	 .false_start = 0
 	},
-	{.name = "TLS1.2", 
+	{.name = "TLS1.2",
 	 .id = GNUTLS_TLS1_2,
 	 .age = 3,
 	 .major = 3,
@@ -81,7 +90,28 @@ static const version_entry_st sup_versions[] = {
 	 .selectable_sighash = 1,
 	 .selectable_prf = 1,
 	 .obsolete = 0,
+	 .only_extension = 0,
+	 .tls_sig_sem = SIG_SEM_PRE_TLS12,
 	 .false_start = 1
+	},
+	{.name = "TLS1.3",
+	 .id = GNUTLS_TLS1_3,
+	 .age = 5,
+	 .major = 3,
+	 .minor = 4,
+	 .transport = GNUTLS_STREAM,
+	 .supported = 1,
+	 .explicit_iv = 0,
+	 .extensions = 1,
+	 .selectable_sighash = 1,
+	 .selectable_prf = 1,
+	 .tls13_sem = 1,
+	 .obsolete = 0,
+	 .only_extension = 1,
+	 .post_handshake_auth = 1,
+	 .key_shares = 1,
+	 .false_start = 0, /* doesn't make sense */
+	 .tls_sig_sem = SIG_SEM_TLS13
 	},
 	{.name = "DTLS0.9", /* Cisco AnyConnect (based on about OpenSSL 0.9.8e) */
 	 .id = GNUTLS_DTLS0_9,
@@ -95,9 +125,11 @@ static const version_entry_st sup_versions[] = {
 	 .selectable_sighash = 0,
 	 .selectable_prf = 0,
 	 .obsolete = 0,
+	 .only_extension = 0,
+	 .tls_sig_sem = SIG_SEM_PRE_TLS12,
 	 .false_start = 0
 	},
-	{.name = "DTLS1.0", 
+	{.name = "DTLS1.0",
 	 .id = GNUTLS_DTLS1_0,
 	 .age = 201,
 	 .major = 254,
@@ -109,9 +141,11 @@ static const version_entry_st sup_versions[] = {
 	 .selectable_sighash = 0,
 	 .selectable_prf = 0,
 	 .obsolete = 0,
+	 .only_extension = 0,
+	 .tls_sig_sem = SIG_SEM_PRE_TLS12,
 	 .false_start = 0
 	},
-	{.name = "DTLS1.2", 
+	{.name = "DTLS1.2",
 	 .id = GNUTLS_DTLS1_2,
 	 .age = 202,
 	 .major = 254,
@@ -123,21 +157,31 @@ static const version_entry_st sup_versions[] = {
 	 .selectable_sighash = 1,
 	 .selectable_prf = 1,
 	 .obsolete = 0,
+	 .only_extension = 0,
+	 .tls_sig_sem = SIG_SEM_PRE_TLS12,
 	 .false_start = 1
 	},
 	{0, 0, 0, 0, 0}
 };
 
-#define GNUTLS_VERSION_LOOP(b) \
-	const version_entry_st *p; \
-		for(p = sup_versions; p->name != NULL; p++) { b ; }
-
-#define GNUTLS_VERSION_ALG_LOOP(a) \
-	GNUTLS_VERSION_LOOP( if(p->id == version) { a; break; })
-
 const version_entry_st *version_to_entry(gnutls_protocol_t version)
 {
-	GNUTLS_VERSION_ALG_LOOP(return p);
+	const version_entry_st *p;
+
+	for (p = sup_versions; p->name != NULL; p++)
+		if (p->id == version)
+			return p;
+	return NULL;
+}
+
+const version_entry_st *nversion_to_entry(uint8_t major, uint8_t minor)
+{
+	const version_entry_st *p;
+
+	for (p = sup_versions; p->name != NULL; p++) {
+		if ((p->major == major) && (p->minor == minor))
+			    return p;
+	}
 	return NULL;
 }
 
@@ -158,9 +202,9 @@ _gnutls_version_priority(gnutls_session_t session,
 {
 	unsigned int i;
 
-	for (i = 0; i < session->internals.priorities.protocol.algorithms;
+	for (i = 0; i < session->internals.priorities->protocol.num_priorities;
 	     i++) {
-		if (session->internals.priorities.protocol.priority[i] ==
+		if (session->internals.priorities->protocol.priorities[i] ==
 		    version)
 			return i;
 	}
@@ -176,9 +220,9 @@ const version_entry_st *_gnutls_version_lowest(gnutls_session_t session)
 	const version_entry_st *v, *min_v = NULL;
 	const version_entry_st *backup = NULL;
 
-	for (i=0;i < session->internals.priorities.protocol.algorithms;i++) {
+	for (i=0;i < session->internals.priorities->protocol.num_priorities;i++) {
 		cur_prot =
-		    session->internals.priorities.protocol.priority[i];
+		    session->internals.priorities->protocol.priorities[i];
 		v = version_to_entry(cur_prot);
 
 		if (v != NULL && version_is_valid_for_session(session, v)) {
@@ -199,37 +243,112 @@ const version_entry_st *_gnutls_version_lowest(gnutls_session_t session)
 	return min_v;
 }
 
-/* Returns the maximum version in the priorities 
+/* Returns the maximum version in the priorities
  */
-static const version_entry_st *version_max(gnutls_session_t session)
+const version_entry_st *_gnutls_version_max(gnutls_session_t session)
 {
-	int max_proto = _gnutls_version_max(session);
-
-	if (max_proto < 0)
-		return NULL;
-
-	return version_to_entry(max_proto);
-}
-
-gnutls_protocol_t _gnutls_version_max(gnutls_session_t session)
-{
-	unsigned int i, max = 0x00;
+	unsigned int i;
 	gnutls_protocol_t cur_prot;
+	const version_entry_st *p, *max = NULL;
 
-	for (i = 0; i < session->internals.priorities.protocol.algorithms;
+	for (i = 0; i < session->internals.priorities->protocol.num_priorities;
 	     i++) {
 		cur_prot =
-		    session->internals.priorities.protocol.priority[i];
+		    session->internals.priorities->protocol.priorities[i];
 
-		if (cur_prot > max
-		    && _gnutls_version_is_supported(session, cur_prot))
-			max = cur_prot;
+		for (p = sup_versions; p->name != NULL; p++) {
+			if(p->id == cur_prot) {
+#ifndef ENABLE_SSL3
+				if (p->obsolete != 0)
+					break;
+#endif
+				if (!p->supported || p->transport != session->internals.transport)
+					break;
+
+				if (p->tls13_sem && (session->internals.flags & INT_FLAG_NO_TLS13))
+				    break;
+
+				if (max == NULL || cur_prot > max->id) {
+					max = p;
+				}
+
+				break;
+			}
+		}
 	}
 
-	if (max == 0x00)
-		return GNUTLS_VERSION_UNKNOWN;	/* unknown version */
+	return max;
+}
+
+const version_entry_st *_gnutls_legacy_version_max(gnutls_session_t session)
+{
+	const version_entry_st *max = _gnutls_version_max(session);
+
+	if (max && max->only_extension != 0) {
+		/* TLS 1.3 or later found */
+		if (max->transport == GNUTLS_STREAM) {
+			return version_to_entry(GNUTLS_TLS1_2);
+		} else {
+			return version_to_entry(GNUTLS_DTLS1_2);
+		}
+	}
 
 	return max;
+}
+
+/* Returns the number of bytes written to buffer or a negative
+ * error code. It will return GNUTLS_E_UNSUPPORTED_VERSION_PACKET
+ * if there is no version >= TLS 1.3.
+ */
+int _gnutls_write_supported_versions(gnutls_session_t session, uint8_t *buffer, ssize_t buffer_size)
+{
+	gnutls_protocol_t cur_prot;
+	size_t written_bytes = 0;
+	unsigned at_least_one_new = 0;
+	unsigned i;
+	const version_entry_st *p;
+
+	for (i = 0; i < session->internals.priorities->protocol.num_priorities; i++) {
+		cur_prot =
+		    session->internals.priorities->protocol.priorities[i];
+
+		for (p = sup_versions; p->name != NULL; p++) {
+			if(p->id == cur_prot) {
+				if (p->obsolete != 0)
+					break;
+
+				if (!p->supported || p->transport != session->internals.transport)
+					break;
+
+				if (p->only_extension)
+					at_least_one_new = 1;
+
+				if (buffer_size > 2) {
+					_gnutls_debug_log("Advertizing version %d.%d\n", (int)p->major, (int)p->minor);
+					buffer[0] = p->major;
+					buffer[1] = p->minor;
+					written_bytes += 2;
+					buffer += 2;
+				}
+
+				buffer_size -= 2;
+
+				if (buffer_size <= 0)
+					goto finish;
+
+				break;
+			}
+		}
+	}
+
+ finish:
+	if (written_bytes == 0)
+		return gnutls_assert_val(GNUTLS_E_NO_PRIORITIES_WERE_SET);
+
+	if (at_least_one_new == 0)
+		return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
+
+	return written_bytes;
 }
 
 /* Returns true (1) if the given version is higher than the highest supported
@@ -238,7 +357,7 @@ unsigned _gnutls_version_is_too_high(gnutls_session_t session, uint8_t major, ui
 {
 	const version_entry_st *e;
 
-	e = version_max(session);
+	e = _gnutls_legacy_version_max(session);
 	if (e == NULL) /* we don't know; but that means something is unconfigured */
 		return 1;
 
@@ -270,11 +389,12 @@ unsigned _gnutls_version_is_too_high(gnutls_session_t session, uint8_t major, ui
  **/
 const char *gnutls_protocol_get_name(gnutls_protocol_t version)
 {
-	const char *ret = NULL;
-
+	const version_entry_st *p;
 	/* avoid prefix */
-	GNUTLS_VERSION_ALG_LOOP(ret = p->name);
-	return ret;
+	for (p = sup_versions; p->name != NULL; p++)
+		if (p->id == version)
+			return p->name;
+	return NULL;
 }
 
 /**
@@ -288,14 +408,15 @@ const char *gnutls_protocol_get_name(gnutls_protocol_t version)
  **/
 gnutls_protocol_t gnutls_protocol_get_id(const char *name)
 {
+	const version_entry_st *p;
 	gnutls_protocol_t ret = GNUTLS_VERSION_UNKNOWN;
 
-	GNUTLS_VERSION_LOOP(
-		if (strcasecmp(p->name, name) == 0) {
+	for (p = sup_versions; p->name != NULL; p++) {
+		if (c_strcasecmp(p->name, name) == 0) {
 			ret = p->id;
 			break;
 		}
-	);
+	}
 
 	return ret;
 }
@@ -313,12 +434,14 @@ gnutls_protocol_t gnutls_protocol_get_id(const char *name)
  **/
 const gnutls_protocol_t *gnutls_protocol_list(void)
 {
+	const version_entry_st *p;
 	static gnutls_protocol_t supported_protocols[MAX_ALGOS] = { 0 };
 
 	if (supported_protocols[0] == 0) {
 		int i = 0;
 
-		GNUTLS_VERSION_LOOP(supported_protocols[i++] = p->id);
+		for (p = sup_versions; p->name != NULL; p++)
+			supported_protocols[i++] = p->id;
 		supported_protocols[i++] = 0;
 	}
 
@@ -329,34 +452,41 @@ const gnutls_protocol_t *gnutls_protocol_list(void)
  */
 gnutls_protocol_t _gnutls_version_get(uint8_t major, uint8_t minor)
 {
+	const version_entry_st *p;
 	int ret = GNUTLS_VERSION_UNKNOWN;
 
-	GNUTLS_VERSION_LOOP(
+	for (p = sup_versions; p->name != NULL; p++)
 		if ((p->major == major) && (p->minor == minor))
-			    ret = p->id
-	);
+			ret = p->id;
 	return ret;
 }
 
 /* Version Functions */
 
 int
-_gnutls_version_is_supported(gnutls_session_t session,
-			     const gnutls_protocol_t version)
+_gnutls_nversion_is_supported(gnutls_session_t session,
+			      unsigned char major, unsigned char minor)
 {
-	int ret = 0;
+	const version_entry_st *p;
+	int version = 0;
 
-	GNUTLS_VERSION_LOOP(
-		if(p->id == version) {
+	for (p = sup_versions; p->name != NULL; p++) {
+		if(p->major == major && p->minor == minor) {
 #ifndef ENABLE_SSL3
 			if (p->obsolete != 0) return 0;
 #endif
-			ret = p->supported && p->transport == session->internals.transport;
+			if (p->tls13_sem && (session->internals.flags & INT_FLAG_NO_TLS13))
+				return 0;
+
+			if (!p->supported || p->transport != session->internals.transport)
+				return 0;
+
+			version = p->id;
 			break;
 		}
-	)
+	}
 
-	if (ret == 0)
+	if (version == 0)
 		return 0;
 
 	if (_gnutls_version_priority(session, version) < 0)
@@ -364,4 +494,3 @@ _gnutls_version_is_supported(gnutls_session_t session,
 	else
 		return 1;
 }
-

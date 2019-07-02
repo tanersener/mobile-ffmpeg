@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2002-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2016-2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -16,7 +17,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -28,7 +29,6 @@
 #include <c-ctype.h>
 #include <intprops.h>
 #include <nettle/base64.h>
-#include "vasprintf.h"
 #include "extras/hex.h"
 
 /* These functions are like strcat, strcpy. They only
@@ -67,33 +67,11 @@ void _gnutls_str_cpy(char *dest, size_t dest_tot_size, const char *src)
 	}
 }
 
-void
-_gnutls_mem_cpy(char *dest, size_t dest_tot_size, const char *src,
-		size_t src_size)
-{
-
-	if (dest_tot_size >= src_size) {
-		memcpy(dest, src, src_size);
-	} else {
-		if (dest_tot_size > 0) {
-			memcpy(dest, src, dest_tot_size);
-		}
-	}
-}
-
 void _gnutls_buffer_init(gnutls_buffer_st * str)
 {
 	str->data = str->allocd = NULL;
 	str->max_length = 0;
 	str->length = 0;
-}
-
-void _gnutls_buffer_replace_data(gnutls_buffer_st * buf,
-				 gnutls_datum_t * data)
-{
-	gnutls_free(buf->allocd);
-	buf->allocd = buf->data = data->data;
-	buf->max_length = buf->length = data->size;
 }
 
 void _gnutls_buffer_clear(gnutls_buffer_st * str)
@@ -102,7 +80,7 @@ void _gnutls_buffer_clear(gnutls_buffer_st * str)
 		return;
 	gnutls_free(str->allocd);
 
-	str->data = str->allocd = NULL;
+	str->data = NULL;
 	str->max_length = 0;
 	str->length = 0;
 }
@@ -111,6 +89,8 @@ void _gnutls_buffer_clear(gnutls_buffer_st * str)
 
 static void align_allocd_with_data(gnutls_buffer_st * dest)
 {
+	assert(dest->allocd != NULL);
+	assert(dest->data != NULL);
 	if (dest->length)
 		memmove(dest->allocd, dest->data, dest->length);
 	dest->data = dest->allocd;
@@ -134,6 +114,9 @@ gnutls_buffer_append_data(gnutls_buffer_t dest, const void *data,
 {
 	size_t const tot_len = data_size + dest->length;
 	size_t const unused = MEMSUB(dest->data, dest->allocd);
+
+	if (unlikely(dest->data != NULL && dest->allocd == NULL))
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	if (data_size == 0)
 		return 0;
@@ -163,6 +146,7 @@ gnutls_buffer_append_data(gnutls_buffer_t dest, const void *data,
 
 		align_allocd_with_data(dest);
 	}
+	assert(dest->data != NULL);
 
 	memcpy(&dest->data[dest->length], data, data_size);
 	dest->length = tot_len;
@@ -172,6 +156,9 @@ gnutls_buffer_append_data(gnutls_buffer_t dest, const void *data,
 
 int _gnutls_buffer_resize(gnutls_buffer_st * dest, size_t new_size)
 {
+	if (unlikely(dest->data != NULL && dest->allocd == NULL))
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
 	if (dest->max_length >= new_size) {
 		size_t unused = MEMSUB(dest->data, dest->allocd);
 		if (dest->max_length - unused <= new_size) {
@@ -221,7 +208,6 @@ void
 _gnutls_buffer_pop_datum(gnutls_buffer_st * str, gnutls_datum_t * data,
 			 size_t req_size)
 {
-
 	if (str->length == 0) {
 		data->data = NULL;
 		data->size = 0;
@@ -237,7 +223,7 @@ _gnutls_buffer_pop_datum(gnutls_buffer_st * str, gnutls_datum_t * data,
 	str->data += req_size;
 	str->length -= req_size;
 
-	/* if string becomes empty start from begining */
+	/* if string becomes empty start from beginning */
 	if (str->length == 0) {
 		str->data = str->allocd;
 	}
@@ -293,24 +279,23 @@ int _gnutls_buffer_to_datum(gnutls_buffer_st * str, gnutls_datum_t * data, unsig
 	return ret;
 }
 
-/* returns data from a string in a constant buffer.
+/* returns data from a string in a constant buffer. Will
+ * fail with GNUTLS_E_PARSING_ERROR, if the string has not enough data.
  */
-void
+int
 _gnutls_buffer_pop_data(gnutls_buffer_st * str, void *data,
-			size_t * req_size)
+			size_t req_size)
 {
 	gnutls_datum_t tdata;
 
-	_gnutls_buffer_pop_datum(str, &tdata, *req_size);
-	if (tdata.data == NULL) {
-		*req_size = 0;
-		return;
+	_gnutls_buffer_pop_datum(str, &tdata, req_size);
+	if (tdata.data == NULL || tdata.size != req_size) {
+		return GNUTLS_E_PARSING_ERROR;
 	}
 
-	*req_size = tdata.size;
 	memcpy(data, tdata.data, tdata.size);
 
-	return;
+	return 0;
 }
 
 int
@@ -344,6 +329,8 @@ _gnutls_buffer_insert_data(gnutls_buffer_st * dest, int pos,
 	ret = _gnutls_buffer_resize(dest, dest->length + str_size);	/* resize to make space */
 	if (ret < 0)
 		return ret;
+
+	assert(dest->data != NULL);
 
 	memmove(&dest->data[pos + str_size], &dest->data[pos],
 		orig_length - pos);
@@ -785,8 +772,8 @@ _gnutls_buffer_append_prefix(gnutls_buffer_st * buf, int pfx_size,
  * the number read, is less than the data in the buffer
  */
 int
-_gnutls_buffer_pop_prefix(gnutls_buffer_st * buf, size_t * data_size,
-			  int check)
+_gnutls_buffer_pop_prefix32(gnutls_buffer_st * buf, size_t * data_size,
+			    int check)
 {
 	size_t size;
 
@@ -809,14 +796,59 @@ _gnutls_buffer_pop_prefix(gnutls_buffer_st * buf, size_t * data_size,
 	return 0;
 }
 
+int _gnutls_buffer_pop_prefix8(gnutls_buffer_st *buf, uint8_t *data, int check)
+{
+	if (buf->length < 1) {
+		gnutls_assert();
+		return GNUTLS_E_PARSING_ERROR;
+	}
+
+	*data = buf->data[0];
+
+	if (check && *data > buf->length - 1) {
+		gnutls_assert();
+		return GNUTLS_E_PARSING_ERROR;
+	}
+
+	buf->data++;
+	buf->length--;
+
+	return 0;
+}
+
 int
-_gnutls_buffer_pop_datum_prefix(gnutls_buffer_st * buf,
-				gnutls_datum_t * data)
+_gnutls_buffer_pop_prefix24(gnutls_buffer_st * buf, size_t * data_size,
+			    int check)
+{
+	size_t size;
+
+	if (buf->length < 3) {
+		gnutls_assert();
+		return GNUTLS_E_PARSING_ERROR;
+	}
+
+	size = _gnutls_read_uint24(buf->data);
+	if (check && size > buf->length - 3) {
+		gnutls_assert();
+		return GNUTLS_E_PARSING_ERROR;
+	}
+
+	buf->data += 3;
+	buf->length -= 3;
+
+	*data_size = size;
+
+	return 0;
+}
+
+int
+_gnutls_buffer_pop_datum_prefix32(gnutls_buffer_st * buf,
+				  gnutls_datum_t * data)
 {
 	size_t size;
 	int ret;
 
-	ret = _gnutls_buffer_pop_prefix(buf, &size, 1);
+	ret = _gnutls_buffer_pop_prefix32(buf, &size, 1);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -838,24 +870,85 @@ _gnutls_buffer_pop_datum_prefix(gnutls_buffer_st * buf,
 }
 
 int
+_gnutls_buffer_pop_datum_prefix16(gnutls_buffer_st * buf,
+				  gnutls_datum_t * data)
+{
+	size_t size;
+
+	if (buf->length < 2) {
+		gnutls_assert();
+		return GNUTLS_E_PARSING_ERROR;
+	}
+
+	size = _gnutls_read_uint16(buf->data);
+
+	buf->data += 2;
+	buf->length -= 2;
+
+	if (size > 0) {
+		size_t osize = size;
+		_gnutls_buffer_pop_datum(buf, data, size);
+		if (osize != data->size) {
+			gnutls_assert();
+			return GNUTLS_E_PARSING_ERROR;
+		}
+	} else {
+		data->size = 0;
+		data->data = NULL;
+	}
+
+	return 0;
+}
+
+int
+_gnutls_buffer_pop_datum_prefix8(gnutls_buffer_st * buf,
+				 gnutls_datum_t * data)
+{
+	size_t size;
+
+	if (buf->length < 1) {
+		gnutls_assert();
+		return GNUTLS_E_PARSING_ERROR;
+	}
+
+	size = buf->data[0];
+
+	buf->data++;
+	buf->length--;
+
+	if (size > 0) {
+		size_t osize = size;
+		_gnutls_buffer_pop_datum(buf, data, size);
+		if (osize != data->size) {
+			gnutls_assert();
+			return GNUTLS_E_PARSING_ERROR;
+		}
+	} else {
+		data->size = 0;
+		data->data = NULL;
+	}
+
+	return 0;
+}
+
+int
 _gnutls_buffer_append_data_prefix(gnutls_buffer_st * buf,
 				  int pfx_size, const void *data,
 				  size_t data_size)
 {
-	int ret = 0, ret1;
+	int ret;
 
-	ret1 = _gnutls_buffer_append_prefix(buf, pfx_size, data_size);
-	if (ret1 < 0)
-		return gnutls_assert_val(ret1);
+	ret = _gnutls_buffer_append_prefix(buf, pfx_size, data_size);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 	if (data_size > 0) {
 		ret = _gnutls_buffer_append_data(buf, data, data_size);
-
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 	}
 
-	return ret + ret1;
+	return 0;
 }
 
 int _gnutls_buffer_append_mpi(gnutls_buffer_st * buf, int pfx_size,
@@ -881,23 +974,40 @@ int _gnutls_buffer_append_mpi(gnutls_buffer_st * buf, int pfx_size,
 	return ret;
 }
 
-int
-_gnutls_buffer_pop_data_prefix(gnutls_buffer_st * buf, void *data,
-			       size_t * data_size)
+/* Appends an MPI of fixed-size in bytes left-padded with zeros if necessary */
+int _gnutls_buffer_append_fixed_mpi(gnutls_buffer_st * buf,
+				    bigint_t mpi, unsigned size)
 {
-	size_t size;
+	gnutls_datum_t dd;
+	unsigned pad, i;
 	int ret;
 
-	ret = _gnutls_buffer_pop_prefix(buf, &size, 1);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
+	ret = _gnutls_mpi_dprint(mpi, &dd);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	if (size < dd.size) {
+		ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		goto cleanup;
 	}
 
-	if (size > 0)
-		_gnutls_buffer_pop_data(buf, data, data_size);
+	pad = size - dd.size;
+	for (i=0;i<pad;i++) {
+		ret =
+		    _gnutls_buffer_append_data(buf, "\x00", 1);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+	}
 
-	return 0;
+	/* append the rest */
+	ret =
+	    _gnutls_buffer_append_data(buf, dd.data, dd.size);
+
+ cleanup:
+	_gnutls_free_datum(&dd);
+	return ret;
 }
 
 void
@@ -929,7 +1039,7 @@ _gnutls_buffer_base64print(gnutls_buffer_st * str,
 		return gnutls_assert_val(ret);
 	}
 
-	base64_encode_raw(&str->data[str->length], len, data);
+	base64_encode_raw((void*)&str->data[str->length], len, data);
 	str->length += b64len;
 	str->data[str->length] = 0;
 

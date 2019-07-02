@@ -1,0 +1,22 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs11_token_get_ptr} (const char * @var{url}, void ** @var{ptr}, unsigned long * @var{slot_id}, unsigned int @var{flags})
+@var{url}: should contain a PKCS@code{11}  URL identifying a token
+
+@var{ptr}: will contain the CK_FUNCTION_LIST_PTR pointer
+
+@var{slot_id}: will contain the slot_id (may be @code{NULL} )
+
+@var{flags}: should be zero
+
+This function will return the function pointer of the specified
+token by the URL. The returned pointers are valid until
+gnutls is deinitialized, c.f. @code{_global_deinit()} .
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  (0) on success or a negative error code
+on error.
+
+@strong{Since:} 3.6.3
+@end deftypefun

@@ -76,6 +76,9 @@
 @item GNUTLS_@-A_@-NO_@-RENEGOTIATION
 @tab 100
 @tab No renegotiation is allowed
+@item GNUTLS_@-A_@-MISSING_@-EXTENSION
+@tab 109
+@tab An extension was expected but was not seen
 @item GNUTLS_@-A_@-UNSUPPORTED_@-EXTENSION
 @tab 110
 @tab An unsupported extension was sent
@@ -88,6 +91,9 @@
 @item GNUTLS_@-A_@-UNKNOWN_@-PSK_@-IDENTITY
 @tab 115
 @tab The SRP/PSK username is missing or not known
+@item GNUTLS_@-A_@-CERTIFICATE_@-REQUIRED
+@tab 116
+@tab Certificate is required
 @item GNUTLS_@-A_@-NO_@-APPLICATION_@-PROTOCOL
 @tab 120
 @tab No supported application protocol could be negotiated

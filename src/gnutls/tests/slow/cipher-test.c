@@ -32,12 +32,6 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "<%d>| %s", level, str);
 }
 
-#ifndef ENABLE_SELF_CHECKS
-# define AVOID_INTERNALS
-# include "../../lib/crypto-selftests.c"
-# include "../../lib/crypto-selftests-pk.c"
-#endif
-
 int main(int argc, char **argv)
 {
 	gnutls_global_set_log_function(tls_log_func);

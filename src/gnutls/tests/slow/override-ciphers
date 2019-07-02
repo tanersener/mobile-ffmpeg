@@ -29,21 +29,21 @@ PROG=./cipher-override${EXEEXT}
 GNUTLS_NO_EXPLICIT_INIT=1 ${VALGRIND} ${PROG}
 ret=$?
 if test $ret != 0; then
-	echo "overriden cipher tests failed"
+	echo "overridden cipher tests failed"
 	exit $ret
 fi
 
 ${VALGRIND} ${PROG}
 ret=$?
 if test $ret != 0; then
-	echo "overriden cipher tests 2 failed"
+	echo "overridden cipher tests 2 failed"
 	exit $ret
 fi
 
 ${VALGRIND} ${PROG}
 ret=$?
 if test $ret != 0; then
-	echo "overriden cipher tests 3 failed"
+	echo "overridden cipher tests 3 failed"
 	exit $ret
 fi
 
@@ -54,14 +54,14 @@ else
 	GNUTLS_NO_EXPLICIT_INIT=1 ${VALGRIND} ./mac-override
 	ret=$?
 	if test $ret != 0; then
-		echo "overriden mac tests failed"
+		echo "overridden mac tests failed"
 		exit $ret
 	fi
 
 	${VALGRIND} ./mac-override
 	ret=$?
 	if test $ret != 0; then
-		echo "overriden mac tests 2 failed"
+		echo "overridden mac tests 2 failed"
 		exit $ret
 	fi
 fi

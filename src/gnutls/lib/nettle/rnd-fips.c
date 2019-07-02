@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Red Hat
+ * Copyright (C) 2013-2017 Red Hat
  *
  * This file is part of GnuTLS.
  *
@@ -14,7 +14,7 @@
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this program; if not, see <http://www.gnu.org/licenses/>.
+ * License along with this program; if not, see <https://www.gnu.org/licenses/>.
  */
 
 #include <config.h>
@@ -34,20 +34,12 @@
 #include <rnd-common.h>
 
 /* This provides a random generator for gnutls. It uses
- * three instances of the DRBG-AES-CTR generator, one for
- * each level of randomness. It uses /dev/urandom for their
- * seeding.
+ * two instances of the DRBG-AES-CTR generator, one for
+ * nonce level and another for the other levels of randomness.
  */
-
-#define RND_LOCK if (gnutls_mutex_lock(&rnd_mutex)!=0) abort()
-#define RND_UNLOCK if (gnutls_mutex_unlock(&rnd_mutex)!=0) abort()
-
-static void *rnd_mutex;
-
 struct fips_ctx {
 	struct drbg_aes_ctx nonce_context;
 	struct drbg_aes_ctx normal_context;
-	struct drbg_aes_ctx strong_context;
 	unsigned int forkid;
 };
 
@@ -120,11 +112,6 @@ static int _rngfips_ctx_init(struct fips_ctx *fctx)
 {
 	int ret;
 
-	/* strong */
-	ret = drbg_init(&fctx->strong_context);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
 	/* normal */
 	ret = drbg_init(&fctx->normal_context);
 	if (ret < 0)
@@ -144,11 +131,6 @@ static int _rngfips_ctx_reinit(struct fips_ctx *fctx)
 {
 	int ret;
 
-	/* strong */
-	ret = drbg_reseed(&fctx->strong_context);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
 	/* normal */
 	ret = drbg_reseed(&fctx->normal_context);
 	if (ret < 0)
@@ -167,7 +149,7 @@ static int _rngfips_ctx_reinit(struct fips_ctx *fctx)
 /* Initialize this random subsystem. */
 static int _rngfips_init(void **_ctx)
 {
-/* Basic initialization is required to initialize mutexes and
+/* Basic initialization is required to
    do a few checks on the implementation.  */
 	struct fips_ctx *ctx;
 	int ret;
@@ -176,13 +158,11 @@ static int _rngfips_init(void **_ctx)
 	if (ctx == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
-	ret = gnutls_mutex_init(&rnd_mutex);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
 	ret = _rngfips_ctx_init(ctx);
-	if (ret < 0)
+	if (ret < 0) {
+		gnutls_free(ctx);
 		return gnutls_assert_val(ret);
+	}
 
 	*_ctx = ctx;
 
@@ -194,19 +174,18 @@ static int _rngfips_rnd(void *_ctx, int level, void *buffer, size_t length)
 	struct fips_ctx *ctx = _ctx;
 	int ret;
 
-	RND_LOCK;
 	switch (level) {
 	case GNUTLS_RND_RANDOM:
-		ret = get_random(&ctx->normal_context, ctx, buffer, length);
-		break;
 	case GNUTLS_RND_KEY:
-		ret = get_random(&ctx->strong_context, ctx, buffer, length);
+		/* Unlike the chacha generator in rnd.c we do not need
+		 * to explicitly protect against backtracking in GNUTLS_RND_KEY
+		 * level. This protection is part of the DRBG generator. */
+		ret = get_random(&ctx->normal_context, ctx, buffer, length);
 		break;
 	default:
 		ret = get_random(&ctx->nonce_context, ctx, buffer, length);
 		break;
 	}
-	RND_UNLOCK;
 
 	return ret;
 }
@@ -214,9 +193,6 @@ static int _rngfips_rnd(void *_ctx, int level, void *buffer, size_t length)
 static void _rngfips_deinit(void *_ctx)
 {
 	struct fips_ctx *ctx = _ctx;
-
-	gnutls_mutex_deinit(&rnd_mutex);
-	rnd_mutex = NULL;
 
 	zeroize_key(ctx, sizeof(*ctx));
 	free(ctx);
@@ -232,9 +208,7 @@ static int selftest_kat(void)
 {
 	int ret;
 
-	RND_LOCK;
 	ret = drbg_aes_self_test();
-	RND_UNLOCK;
 
 	if (ret == 0) {
 		_gnutls_debug_log("DRBG-AES self test failed\n");

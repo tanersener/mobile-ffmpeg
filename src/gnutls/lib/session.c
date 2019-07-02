@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2000-2016 Free Software Foundation, Inc.
- * Copyright (C) 2016 Red Hat, Inc.
+ * Copyright (C) 2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -17,7 +17,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 #include "gnutls_int.h"
@@ -25,6 +25,10 @@
 #include "debug.h"
 #include <session_pack.h>
 #include <datum.h>
+#include "buffers.h"
+#include "state.h"
+#include "ext/cert_types.h"
+#include <minmax.h>
 
 /**
  * gnutls_session_get_data:
@@ -32,13 +36,10 @@
  * @session_data: is a pointer to space to hold the session.
  * @session_data_size: is the session_data's size, or it will be set by the function.
  *
- * Returns all session parameters needed to be stored to support resumption.
- * The client should call this, and store the returned session data. A session
- * may be resumed later by calling gnutls_session_set_data().  
+ * Returns all session parameters needed to be stored to support resumption,
+ * in a pre-allocated buffer.
  *
- * This function will fail if called prior to handshake completion. In
- * case of false start TLS, the handshake completes only after data have
- * been successfully received from the peer.
+ * See gnutls_session_get_data2() for more information.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.
@@ -74,14 +75,20 @@ gnutls_session_get_data(gnutls_session_t session,
 	return ret;
 }
 
+#define EMPTY_DATA "\x00\x00\x00\x00"
+#define EMPTY_DATA_SIZE 4
+
 /**
  * gnutls_session_get_data2:
  * @session: is a #gnutls_session_t type.
  * @data: is a pointer to a datum that will hold the session.
  *
- * Returns all session parameters needed to be stored to support resumption.
- * The client should call this, and store the returned session data. A session
- * may be resumed later by calling gnutls_session_set_data().  
+ * Returns necessary parameters to support resumption. The client
+ * should call this function and store the returned session data. A session
+ * can be resumed later by calling gnutls_session_set_data() with the returned
+ * data. Note that under TLS 1.3, it is recommended for clients to use
+ * session parameters only once, to prevent passive-observers from correlating
+ * the different connections.
  *
  * The returned @data are allocated and must be released using gnutls_free().
  *
@@ -89,25 +96,61 @@ gnutls_session_get_data(gnutls_session_t session,
  * case of false start TLS, the handshake completes only after data have
  * been successfully received from the peer.
  *
+ * Under TLS1.3 session resumption is possible only after a session ticket
+ * is received by the client. To ensure that such a ticket has been received use
+ * gnutls_session_get_flags() and check for flag %GNUTLS_SFLAGS_SESSION_TICKET;
+ * if this flag is not set, this function will wait for a new ticket within
+ * an estimated rountrip, and if not received will return dummy data which
+ * cannot lead to resumption.
+ *
+ * To get notified when new tickets are received by the server
+ * use gnutls_handshake_set_hook_function() to wait for %GNUTLS_HANDSHAKE_NEW_SESSION_TICKET
+ * messages. Each call of gnutls_session_get_data2() after a ticket is
+ * received, will return session resumption data corresponding to the last
+ * received ticket.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.
  **/
 int
 gnutls_session_get_data2(gnutls_session_t session, gnutls_datum_t *data)
 {
-
+	const version_entry_st *vers = get_version(session);
 	int ret;
 
-	if (data == NULL) {
+	if (data == NULL || vers == NULL) {
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
 
-	if (gnutls_session_is_resumed(session) && session->internals.resumption_data.data) {
-		ret = _gnutls_set_datum(data, session->internals.resumption_data.data, session->internals.resumption_data.size);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
+	if (vers->tls13_sem && !(session->internals.hsk_flags & HSK_TICKET_RECEIVED)) {
+		unsigned ertt = session->internals.ertt;
+		/* use our estimation of round-trip + some time for the server to calculate
+		 * the value(s). */
+		ertt += 60;
 
-		return 0;
+		/* wait for a message with timeout */
+		ret = _gnutls_recv_in_buffers(session, GNUTLS_APPLICATION_DATA, -1, ertt);
+		if (ret < 0 && (gnutls_error_is_fatal(ret) && ret != GNUTLS_E_TIMEDOUT)) {
+			return gnutls_assert_val(ret);
+		}
+
+		if (!(session->internals.hsk_flags & HSK_TICKET_RECEIVED)) {
+			ret = _gnutls_set_datum(data, EMPTY_DATA, EMPTY_DATA_SIZE);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
+
+			return 0;
+		}
+	} else if (!vers->tls13_sem) {
+		/* under TLS1.3 we want to pack the latest ticket, while that's
+		 * not the case in TLS1.2 or earlier. */
+		if (gnutls_session_is_resumed(session) && session->internals.resumption_data.data) {
+			ret = _gnutls_set_datum(data, session->internals.resumption_data.data, session->internals.resumption_data.size);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
+
+			return 0;
+		}
 	}
 
 	if (session->internals.resumable == RESUME_FALSE)
@@ -129,14 +172,23 @@ gnutls_session_get_data2(gnutls_session_t session, gnutls_datum_t *data)
  * @session_id: is a pointer to space to hold the session id.
  * @session_id_size: initially should contain the maximum @session_id size and will be updated.
  *
- * Returns the current session ID. This can be used if you want to
- * check if the next session you tried to resume was actually
- * resumed.  That is because resumed sessions share the same session ID
- * with the original session.
+ * Returns the TLS session identifier. The session ID is selected by the
+ * server, and in older versions of TLS was a unique identifier shared
+ * between client and server which was persistent across resumption.
+ * In the latest version of TLS (1.3) or TLS with session tickets, the
+ * notion of session identifiers is undefined and cannot be relied for uniquely
+ * identifying sessions across client and server.
  *
- * The session ID is selected by the server, that identify the
- * current session.  In all supported TLS protocols, the session id
- * is less than %GNUTLS_MAX_SESSION_ID_SIZE.
+ * In client side this function returns the identifier returned by the
+ * server, and cannot be assumed to have any relation to session resumption.
+ * In server side this function is guaranteed to return a persistent
+ * identifier of the session since GnuTLS 3.6.4, which may not necessarily
+ * map into the TLS session ID value. Prior to that version the value
+ * could only be considered a persistent identifier, under TLS1.2 or earlier
+ * and when no session tickets were in use.
+ *
+ * The session identifier value returned is always less than
+ * %GNUTLS_MAX_SESSION_ID_SIZE.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.
@@ -170,8 +222,23 @@ gnutls_session_get_id(gnutls_session_t session,
  * @session: is a #gnutls_session_t type.
  * @session_id: will point to the session ID.
  *
- * Returns the current session ID. The returned data should be
- * treated as constant.
+ * Returns the TLS session identifier. The session ID is selected by the
+ * server, and in older versions of TLS was a unique identifier shared
+ * between client and server which was persistent across resumption.
+ * In the latest version of TLS (1.3) or TLS 1.2 with session tickets, the
+ * notion of session identifiers is undefined and cannot be relied for uniquely
+ * identifying sessions across client and server.
+ *
+ * In client side this function returns the identifier returned by the
+ * server, and cannot be assumed to have any relation to session resumption.
+ * In server side this function is guaranteed to return a persistent
+ * identifier of the session since GnuTLS 3.6.4, which may not necessarily
+ * map into the TLS session ID value. Prior to that version the value
+ * could only be considered a persistent identifier, under TLS1.2 or earlier
+ * and when no session tickets were in use.
+ *
+ * The session identifier value returned is always less than
+ * %GNUTLS_MAX_SESSION_ID_SIZE and should be treated as constant.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.
@@ -220,6 +287,14 @@ gnutls_session_set_data(gnutls_session_t session,
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
+
+	/* under TLS1.3 we always return some data on resumption when there
+	 * is no ticket in order to keep compatibility with existing apps */
+	if (session_data_size == EMPTY_DATA_SIZE &&
+	    memcmp(session_data, EMPTY_DATA, EMPTY_DATA_SIZE) == 0) {
+		return 0;
+	}
+
 	ret = _gnutls_session_unpack(session, &psession);
 	if (ret < 0) {
 		gnutls_assert();
@@ -251,7 +326,7 @@ void gnutls_session_force_valid(gnutls_session_t session)
 	session->internals.invalid_connection = 0;
 }
 
-#define DESC_SIZE 64
+#define DESC_SIZE 96
 
 /**
  * gnutls_session_get_desc:
@@ -270,57 +345,114 @@ void gnutls_session_force_valid(gnutls_session_t session)
 char *gnutls_session_get_desc(gnutls_session_t session)
 {
 	gnutls_kx_algorithm_t kx;
-	const char *kx_str;
-	unsigned type;
-	char kx_name[32];
+	const char *kx_str, *sign_str;
+	gnutls_certificate_type_t ctype_client, ctype_server;
+	char kx_name[64] = "";
 	char proto_name[32];
-	const char *curve_name = NULL;
-	unsigned dh_bits = 0;
+	char _group_name[24];
+	const char *group_name = NULL;
+	int dh_bits = 0;
 	unsigned mac_id;
+	unsigned sign_algo;
 	char *desc;
+	const struct gnutls_group_entry_st *group = get_group(session);
+	const version_entry_st *ver = get_version(session);
 
 	if (session->internals.initial_negotiation_completed == 0)
 		return NULL;
 
-	kx = session->security_parameters.kx_algorithm;
-
-	if (kx == GNUTLS_KX_ANON_ECDH || kx == GNUTLS_KX_ECDHE_PSK ||
-	    kx == GNUTLS_KX_ECDHE_RSA || kx == GNUTLS_KX_ECDHE_ECDSA) {
-		curve_name =
-		    gnutls_ecc_curve_get_name(gnutls_ecc_curve_get
-					      (session));
+	kx = session->security_parameters.cs->kx_algorithm;
+	if (group)
+		group_name = group->name;
 #if defined(ENABLE_DHE) || defined(ENABLE_ANON)
-	} else if (kx == GNUTLS_KX_ANON_DH || kx == GNUTLS_KX_DHE_PSK
-		   || kx == GNUTLS_KX_DHE_RSA || kx == GNUTLS_KX_DHE_DSS) {
+	if (group_name == NULL && _gnutls_kx_is_dhe(kx)) {
 		dh_bits = gnutls_dh_get_prime_bits(session);
-#endif
-	}
-
-	kx_str = gnutls_kx_get_name(kx);
-	if (kx_str) {
-		if (curve_name != NULL)
-			snprintf(kx_name, sizeof(kx_name), "%s-%s",
-				 kx_str, curve_name);
-		else if (dh_bits != 0)
-			snprintf(kx_name, sizeof(kx_name), "%s-%u",
-				 kx_str, dh_bits);
+		if (dh_bits > 0)
+			snprintf(_group_name, sizeof(_group_name), "CUSTOM%u", dh_bits);
 		else
-			snprintf(kx_name, sizeof(kx_name), "%s",
-				 kx_str);
+			snprintf(_group_name, sizeof(_group_name), "CUSTOM");
+		group_name = _group_name;
+	}
+#endif
+
+	/* Key exchange    - Signature algorithm */
+	/* DHE-3072        - RSA-PSS-2048        */
+	/* ECDHE-SECP256R1 - ECDSA-SECP256R1     */
+
+	sign_algo = gnutls_sign_algorithm_get(session);
+	sign_str = gnutls_sign_get_name(sign_algo);
+
+	if (kx == 0 && ver->tls13_sem) { /* TLS 1.3 */
+		if (session->internals.hsk_flags & HSK_PSK_SELECTED) {
+			if (group) {
+				if (group->pk == GNUTLS_PK_DH)
+					snprintf(kx_name, sizeof(kx_name), "(DHE-PSK-%s)",
+						 group_name);
+				else
+					snprintf(kx_name, sizeof(kx_name), "(ECDHE-PSK-%s)",
+						 group_name);
+			} else {
+					snprintf(kx_name, sizeof(kx_name), "(PSK)");
+			}
+		} else if (group && sign_str) {
+			if (group->curve)
+				snprintf(kx_name, sizeof(kx_name), "(ECDHE-%s)-(%s)",
+					 group_name, sign_str);
+			else
+				snprintf(kx_name, sizeof(kx_name), "(DHE-%s)-(%s)",
+					 group_name, sign_str);
+		}
 	} else {
-		strcpy(kx_name, "NULL");
+		kx_str = gnutls_kx_get_name(kx);
+		if (kx_str == NULL) {
+			gnutls_assert();
+			return NULL;
+		}
+
+		if (kx == GNUTLS_KX_ECDHE_ECDSA || kx == GNUTLS_KX_ECDHE_RSA || 
+		    kx == GNUTLS_KX_ECDHE_PSK) {
+			if (sign_str)
+				snprintf(kx_name, sizeof(kx_name), "(ECDHE-%s)-(%s)",
+					 group_name, sign_str);
+			else
+				snprintf(kx_name, sizeof(kx_name), "(ECDHE-%s)",
+					 group_name);
+		} else if (kx == GNUTLS_KX_DHE_DSS || kx == GNUTLS_KX_DHE_RSA || 
+		    kx == GNUTLS_KX_DHE_PSK) {
+			if (sign_str)
+				snprintf(kx_name, sizeof(kx_name), "(DHE-%s)-(%s)", group_name, sign_str);
+			else
+				snprintf(kx_name, sizeof(kx_name), "(DHE-%s)", group_name);
+		} else if (kx == GNUTLS_KX_RSA) {
+			/* Possible enhancement: include the certificate bits */
+			snprintf(kx_name, sizeof(kx_name), "(RSA)");
+		} else {
+			snprintf(kx_name, sizeof(kx_name), "(%s)",
+				 kx_str);
+		}
 	}
 
-	type = gnutls_certificate_type_get(session);
-	if (type == GNUTLS_CRT_X509)
+	if (are_alternative_cert_types_allowed(session)) {
+		// Get certificate types
+		ctype_client = get_certificate_type(session, GNUTLS_CTYPE_CLIENT);
+		ctype_server = get_certificate_type(session, GNUTLS_CTYPE_SERVER);
+
+		if (ctype_client == ctype_server) {
+			// print proto version, client/server cert type
+			snprintf(proto_name, sizeof(proto_name), "%s-%s",
+				 gnutls_protocol_get_name(get_num_version(session)),
+				 gnutls_certificate_type_get_name(ctype_client));
+		} else {
+			// print proto version, client cert type, server cert type
+			snprintf(proto_name, sizeof(proto_name), "%s-%s-%s",
+				 gnutls_protocol_get_name(get_num_version(session)),
+				 gnutls_certificate_type_get_name(ctype_client),
+				 gnutls_certificate_type_get_name(ctype_server));
+		}
+	} else { // Assumed default certificate type (X.509)
 		snprintf(proto_name, sizeof(proto_name), "%s",
-			 gnutls_protocol_get_name(get_num_version
-						  (session)));
-	else
-		snprintf(proto_name, sizeof(proto_name), "%s-%s",
-			 gnutls_protocol_get_name(get_num_version
-						  (session)),
-			 gnutls_certificate_type_get_name(type));
+				 gnutls_protocol_get_name(get_num_version(session)));
+	}
 
 	desc = gnutls_malloc(DESC_SIZE);
 	if (desc == NULL)
@@ -329,13 +461,13 @@ char *gnutls_session_get_desc(gnutls_session_t session)
 	mac_id = gnutls_mac_get(session);
 	if (mac_id == GNUTLS_MAC_AEAD) { /* no need to print */
 		snprintf(desc, DESC_SIZE,
-			 "(%s)-(%s)-(%s)",
+			 "(%s)-%s-(%s)",
 			 proto_name,
 			 kx_name,
 			 gnutls_cipher_get_name(gnutls_cipher_get(session)));
 	} else {
 		snprintf(desc, DESC_SIZE,
-			 "(%s)-(%s)-(%s)-(%s)",
+			 "(%s)-%s-(%s)-(%s)",
 			 proto_name,
 			 kx_name,
 			 gnutls_cipher_get_name(gnutls_cipher_get(session)),

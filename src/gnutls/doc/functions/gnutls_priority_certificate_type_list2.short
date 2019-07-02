@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_priority_certificate_type_list2} (gnutls_priority_t @var{pcache}, const unsigned int ** @var{list}, gnutls_ctype_target_t @var{target})

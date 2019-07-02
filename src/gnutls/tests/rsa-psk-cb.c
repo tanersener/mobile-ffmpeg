@@ -22,7 +22,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
  */
 
-/* Parts copied from GnuTLS example programs. */
+/* Tests the RSA-PSK ciphersuites under TLS1.2 */
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -108,8 +108,8 @@ static void client(int sd)
 	gnutls_init(&session, GNUTLS_CLIENT);
 
 	/* Use default priorities */
-	gnutls_priority_set_direct(session, "NORMAL:-KX-ALL:+RSA-PSK",
-				   NULL);
+	assert(gnutls_priority_set_direct(session, "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+RSA-PSK",
+					  NULL)>=0);
 
 	/* put the anonymous credentials to the current session
 	 */
@@ -228,8 +228,8 @@ static void server(int sd)
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	gnutls_priority_set_direct(session, "NORMAL:-KX-ALL:+RSA-PSK",
-				   NULL);
+	assert(gnutls_priority_set_direct(session, "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+RSA-PSK",
+					  NULL)>=0);
 
 
 	gnutls_credentials_set(session, GNUTLS_CRD_PSK, server_pskcred);
@@ -309,10 +309,15 @@ void doit(void)
 	if (child) {
 		int status;
 		/* parent */
+		close(sockets[1]);
 		server(sockets[0]);
 		wait(&status);
-	} else
+		check_wait_status(status);
+	} else {
+		close(sockets[0]);
 		client(sockets[1]);
+		exit(0);
+	}
 }
 
 #endif				/* _WIN32 */

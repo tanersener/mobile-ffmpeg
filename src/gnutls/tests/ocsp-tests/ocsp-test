@@ -21,7 +21,7 @@
 #set -e
 
 srcdir="${srcdir:-.}"
-OCSPTOOL="${OCSPTOOL:-../../src/ocsptool${EXEEXT}}"
+OCSPTOOL="${OCSPTOOL:-../src/ocsptool${EXEEXT}}"
 DIFF="${DIFF:-diff}"
 
 if ! test -x "${OCSPTOOL}"; then
@@ -43,7 +43,7 @@ fi
 # (if example the system was busy)
 
 datefudge -s "2016-04-22" \
-	"${OCSPTOOL}" -e --load-signer "${srcdir}/certs/ca.pem" --infile "${srcdir}/response1.der"
+	"${OCSPTOOL}" -e --load-signer "${srcdir}/ocsp-tests/certs/ca.pem" --infile "${srcdir}/ocsp-tests/response1.der"
 rc=$?
 
 # We're done.
@@ -53,7 +53,7 @@ if test "${rc}" != "0"; then
 fi
 
 datefudge -s "2016-04-22" \
-	"${OCSPTOOL}" -e --load-signer "${srcdir}/certs/ocsp-server.pem" --infile "${srcdir}/response2.der"
+	"${OCSPTOOL}" -e --load-signer "${srcdir}/ocsp-tests/certs/ocsp-server.pem" --infile "${srcdir}/ocsp-tests/response2.der"
 rc=$?
 
 # We're done.
@@ -63,7 +63,7 @@ if test "${rc}" != "0"; then
 fi
 
 datefudge -s "2016-04-22" \
-	"${OCSPTOOL}" -e --load-signer "${srcdir}/certs/ca.pem" --infile "${srcdir}/response2.der" -d 4
+	"${OCSPTOOL}" -e --load-signer "${srcdir}/ocsp-tests/certs/ca.pem" --infile "${srcdir}/ocsp-tests/response2.der" -d 4
 rc=$?
 
 # We're done.

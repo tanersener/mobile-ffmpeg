@@ -16,9 +16,12 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
+
+#ifndef GNUTLS_LIB_KX_H
+#define GNUTLS_LIB_KX_H
 
 int _gnutls_send_server_kx_message(gnutls_session_t session, int again);
 int _gnutls_send_client_kx_message(gnutls_session_t session, int again);
@@ -35,3 +38,8 @@ int _gnutls_recv_server_crt_request(gnutls_session_t session);
 int _gnutls_send_server_crt_request(gnutls_session_t session, int again);
 int _gnutls_recv_client_certificate_verify_message(gnutls_session_t
 						   session);
+void _gnutls_nss_keylog_write(gnutls_session_t session,
+			      const char *label,
+			      const uint8_t *secret, size_t secret_size);
+
+#endif /* GNUTLS_LIB_KX_H */

@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2000-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2017 Red Hat, Inc.
  *
  * This file is part of GnuTLS.
  *
@@ -15,7 +16,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see
- * <http://www.gnu.org/licenses/>.
+ * <https://www.gnu.org/licenses/>.
  */
 
 #include <config.h>
@@ -61,6 +62,7 @@ unsigned int verbose = 0;
 extern int tls1_ok;
 extern int tls1_1_ok;
 extern int tls1_2_ok;
+extern int tls1_3_ok;
 extern int ssl3_ok;
 extern const char *ext_text;
 
@@ -81,9 +83,11 @@ typedef struct {
 } TLS_TEST;
 
 static const TLS_TEST tls_tests[] = {
+#ifdef ENABLE_SSL3
 	{"for SSL 3.0 (RFC6101) support", test_ssl3, "yes", "no", "dunno"},
 	/* The following tests will disable TLS 1.x if the server is
 	 * buggy */
+#endif
 	{"whether we need to disable TLS 1.2", test_tls_disable2, "no",
 	 "yes", "dunno"},
 	{"whether we need to disable TLS 1.1", test_tls_disable1, "no",
@@ -101,7 +105,8 @@ static const TLS_TEST tls_tests[] = {
 	 "failed",
 	 "SSL 3.0"},
 	{"for TLS 1.2 (RFC5246) support", test_tls1_2, "yes", "no", "dunno"},
-	{"fallback from TLS 1.6 to", test_tls1_6_fallback, NULL,
+	{"for TLS 1.3 (RFC8446) support", test_tls1_3, "yes", "no", "dunno"},
+	{"TLS1.2 neg fallback from TLS 1.6 to", test_tls1_6_fallback, NULL,
 	 "failed (server requires fallback dance)", "dunno"},
 	{"for inappropriate fallback (RFC7507) support", test_rfc7507, "yes", "no", "dunno"},
 	{"for HTTPS server name", test_server, NULL, "failed", "not checked", 1},
@@ -142,6 +147,8 @@ static const TLS_TEST tls_tests[] = {
 #endif
 	{"for ephemeral Diffie-Hellman support", test_dhe, "yes", "no",
 	 "dunno"},
+	{"for RFC7919 Diffie-Hellman support", test_rfc7919, "yes", "no",
+	 "dunno"},
 	{"ephemeral Diffie-Hellman group info", test_dhe_group, NULL, "N/A",
 	 "N/A"},
 	{"for ephemeral EC Diffie-Hellman support", test_ecdhe, "yes",
@@ -150,18 +157,18 @@ static const TLS_TEST tls_tests[] = {
 	{"for curve SECP256r1 (RFC4492)", test_ecdhe_secp256r1, "yes", "no", "dunno"},
 	{"for curve SECP384r1 (RFC4492)", test_ecdhe_secp384r1, "yes", "no", "dunno"},
 	{"for curve SECP521r1 (RFC4492)", test_ecdhe_secp521r1, "yes", "no", "dunno"},
-	{"for curve X25519 (draft-ietf-tls-rfc4492bis-07)", test_ecdhe_x25519, "yes", "no", "dunno"},
-	{"for AES-128-GCM cipher (RFC5288) support", test_aes_gcm, "yes", "no",
+	{"for curve X25519 (RFC8422)", test_ecdhe_x25519, "yes", "no", "dunno"},
+	{"for AES-GCM cipher (RFC5288) support", test_aes_gcm, "yes", "no",
 	 "dunno"},
-	{"for AES-128-CCM cipher (RFC6655) support", test_aes_ccm, "yes", "no",
+	{"for AES-CCM cipher (RFC6655) support", test_aes_ccm, "yes", "no",
 	 "dunno"},
-	{"for AES-128-CCM-8 cipher (RFC6655) support", test_aes_ccm_8, "yes", "no",
+	{"for AES-CCM-8 cipher (RFC6655) support", test_aes_ccm_8, "yes", "no",
 	 "dunno"},
-	{"for AES-128-CBC cipher (RFC3268) support", test_aes, "yes", "no",
+	{"for AES-CBC cipher (RFC3268) support", test_aes, "yes", "no",
 	 "dunno"},
-	{"for CAMELLIA-128-GCM cipher (RFC6367) support", test_camellia_gcm, "yes", "no",
+	{"for CAMELLIA-GCM cipher (RFC6367) support", test_camellia_gcm, "yes", "no",
 	 "dunno"},
-	{"for CAMELLIA-128-CBC cipher (RFC5932) support", test_camellia_cbc, "yes", "no",
+	{"for CAMELLIA-CBC cipher (RFC5932) support", test_camellia_cbc, "yes", "no",
 	 "dunno"},
 	{"for 3DES-CBC cipher (RFC2246) support", test_3des, "yes", "no", "dunno"},
 	{"for ARCFOUR 128 cipher (RFC2246) support", test_arcfour, "yes", "no",
@@ -171,18 +178,12 @@ static const TLS_TEST tls_tests[] = {
 	{"for MD5 MAC support", test_md5, "yes", "no", "dunno"},
 	{"for SHA1 MAC support", test_sha, "yes", "no", "dunno"},
 	{"for SHA256 MAC support", test_sha256, "yes", "no", "dunno"},
-#ifdef HAVE_LIBZ
-	{"for ZLIB compression support", test_zlib, "yes",
-	 "no", "dunno"},
-#endif
 	{"for max record size (RFC6066) support", test_max_record_size, "yes",
 	 "no", "dunno"},
 #ifdef ENABLE_OCSP
 	{"for OCSP status response (RFC6066) support", test_ocsp_status, "yes",
 	 "no", "dunno"},
 #endif
-	{"for OpenPGP authentication (RFC6091) support", test_openpgp1,
-	 "yes", "no", "dunno"},
 	{NULL, NULL, NULL, NULL, NULL}
 };
 
@@ -191,7 +192,7 @@ const char *ip;
 gnutls_session_t init_tls_session(const char *host)
 {
 	gnutls_session_t state = NULL;
-	gnutls_init(&state, GNUTLS_CLIENT | GNUTLS_NO_EXTENSIONS);
+	gnutls_init(&state, GNUTLS_CLIENT);
 
 	set_read_funcs(state);
 	if (host && is_ip(host) == 0)
@@ -278,10 +279,10 @@ int main(int argc, char **argv)
 
 		/* if neither of SSL3 and TLSv1 are supported, exit
 		 */
-		if (i > 10 && tls1_2_ok == 0 && tls1_1_ok == 0 && tls1_ok == 0
-		    && ssl3_ok == 0) {
+		if (i > 11 && tls1_2_ok == 0 && tls1_1_ok == 0 && tls1_ok == 0
+		    && ssl3_ok == 0 && tls1_3_ok == 0) {
 			fprintf(stderr,
-				"\nServer does not support any of SSL 3.0, TLS 1.0 and TLS 1.1 and TLS 1.2\n");
+				"\nServer does not support any of SSL 3.0, TLS 1.0, 1.1, 1.2 and 1.3\n");
 			break;
 		}
 

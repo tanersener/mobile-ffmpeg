@@ -23,17 +23,29 @@ HMAC-SHA-512 algorithm.
 @item GNUTLS_@-MAC_@-SHA224
 HMAC-SHA-224 algorithm.
 @item GNUTLS_@-MAC_@-SHA3_@-224
--- undescribed --
+Reserved; unimplemented.
 @item GNUTLS_@-MAC_@-SHA3_@-256
--- undescribed --
+Reserved; unimplemented.
 @item GNUTLS_@-MAC_@-SHA3_@-384
--- undescribed --
+Reserved; unimplemented.
 @item GNUTLS_@-MAC_@-SHA3_@-512
--- undescribed --
+Reserved; unimplemented.
+@item GNUTLS_@-MAC_@-MD5_@-SHA1
+Combined MD5+SHA1 MAC placeholder.
+@item GNUTLS_@-MAC_@-GOSTR_@-94
+HMAC GOST R 34.11-94 algorithm.
+@item GNUTLS_@-MAC_@-STREEBOG_@-256
+HMAC GOST R 34.11-2001 (Streebog) algorithm, 256 bit.
+@item GNUTLS_@-MAC_@-STREEBOG_@-512
+HMAC GOST R 34.11-2001 (Streebog) algorithm, 512 bit.
 @item GNUTLS_@-MAC_@-AEAD
 MAC implicit through AEAD cipher.
 @item GNUTLS_@-MAC_@-UMAC_@-96
 The UMAC-96 MAC algorithm.
 @item GNUTLS_@-MAC_@-UMAC_@-128
 The UMAC-128 MAC algorithm.
+@item GNUTLS_@-MAC_@-AES_@-CMAC_@-128
+The AES-CMAC-128 MAC algorithm.
+@item GNUTLS_@-MAC_@-AES_@-CMAC_@-256
+The AES-CMAC-256 MAC algorithm.
 @end table

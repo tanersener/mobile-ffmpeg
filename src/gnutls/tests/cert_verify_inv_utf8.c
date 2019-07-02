@@ -137,7 +137,7 @@ static void auto_parse(void)
 	test_cli_serv_expect(x509_cred, clicred, "NORMAL", "NORMAL", "localhost", 0, 0);
 	test_cli_serv_vf(x509_cred, clicred, "NORMAL", "www.νίκοσ.com");
 	test_cli_serv_vf(x509_cred, clicred, "NORMAL", "www.νίκος.com");
-	test_cli_serv_vf(x509_cred, clicred, "NORMAL", "raw:www.νίκος.com");
+	test_cli_serv_expect(x509_cred, clicred, "NORMAL", "NORMAL", "raw:www.νίκος.com", GNUTLS_E_RECEIVED_DISALLOWED_NAME, GNUTLS_E_AGAIN);
 
 	gnutls_certificate_free_credentials(x509_cred);
 	gnutls_certificate_free_credentials(clicred);
@@ -150,7 +150,7 @@ static void auto_parse(void)
 
 void doit(void)
 {
-#if !defined(HAVE_LIBIDN) && !defined(HAVE_LIBIDN2)
+#if !defined(HAVE_LIBIDN2)
 	exit(77);
 #endif
 	auto_parse();

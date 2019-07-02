@@ -1,5 +1,5 @@
 /* Test of <float.h> substitute.
-   Copyright (C) 2011-2016 Free Software Foundation, Inc.
+   Copyright (C) 2011-2019 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Bruno Haible <bruno@clisp.org>, 2011.  */
 
@@ -23,10 +23,10 @@
 #include "fpucw.h"
 #include "macros.h"
 
-#if 0
-
 /* Check that FLT_RADIX is a constant expression.  */
 int a[] = { FLT_RADIX };
+
+#if FLT_RADIX == 2
 
 /* Return 2^n.  */
 static float
@@ -377,6 +377,7 @@ main ()
 int
 main ()
 {
+  fprintf (stderr, "Skipping test: FLT_RADIX is not 2.\n");
   return 77;
 }
 

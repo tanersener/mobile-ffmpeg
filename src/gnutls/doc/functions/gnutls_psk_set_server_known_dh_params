@@ -12,6 +12,10 @@ PSK server to use. These parameters will be used in
 Ephemeral Diffie-Hellman cipher suites and will be selected from
 the FFDHE set of RFC7919 according to the security level provided.
 
+@strong{Deprecated:} This function is unnecessary and discouraged on GnuTLS 3.6.0
+or later. Since 3.6.0, DH parameters are negotiated
+following RFC7919.
+
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.
 

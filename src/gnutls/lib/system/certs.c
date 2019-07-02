@@ -17,7 +17,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -161,9 +161,9 @@ int add_system_trust(gnutls_x509_trust_list_t list, unsigned int tl_flags,
 		gnutls_datum_t data;
 
 		if (i == 0)
-			store = CertOpenSystemStore(0, "ROOT");
+			store = CertOpenStore(CERT_STORE_PROV_SYSTEM, 0, 0, CERT_SYSTEM_STORE_CURRENT_USER , L"ROOT");
 		else
-			store = CertOpenSystemStore(0, "CA");
+			store = CertOpenStore(CERT_STORE_PROV_SYSTEM, 0, 0, CERT_SYSTEM_STORE_CURRENT_USER, L"CA");
 
 		if (store == NULL)
 			return GNUTLS_E_FILE_ERROR;

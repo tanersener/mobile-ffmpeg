@@ -1,5 +1,5 @@
-#ifndef AES_ARM_H
-#define AES_ARM_H
+#ifndef GNUTLS_LIB_ACCELERATED_AARCH64_AES_AARCH64_H
+#define GNUTLS_LIB_ACCELERATED_AARCH64_AES_AARCH64_H
 
 #include "gnutls_int.h"
 
@@ -31,4 +31,4 @@ extern const gnutls_crypto_cipher_st _gnutls_aes_gcm_aarch64;
 extern const gnutls_crypto_cipher_st _gnutls_aes_cbc_aarch64;
 extern const gnutls_crypto_cipher_st _gnutls_aes_ccm_aarch64;
 
-#endif
+#endif /* GNUTLS_LIB_ACCELERATED_AARCH64_AES_AARCH64_H */

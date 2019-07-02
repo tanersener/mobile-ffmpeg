@@ -16,7 +16,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -33,22 +33,25 @@ static int _gnutls_srtp_send_params(gnutls_session_t session,
 				    gnutls_buffer_st * extdata);
 
 static int _gnutls_srtp_unpack(gnutls_buffer_st * ps,
-			       extension_priv_data_t * _priv);
-static int _gnutls_srtp_pack(extension_priv_data_t _priv,
+			       gnutls_ext_priv_data_t * _priv);
+static int _gnutls_srtp_pack(gnutls_ext_priv_data_t _priv,
 			     gnutls_buffer_st * ps);
-static void _gnutls_srtp_deinit_data(extension_priv_data_t priv);
+static void _gnutls_srtp_deinit_data(gnutls_ext_priv_data_t priv);
 
 
-const extension_entry_st ext_mod_srtp = {
+const hello_ext_entry_st ext_mod_srtp = {
 	.name = "SRTP",
-	.type = GNUTLS_EXTENSION_SRTP,
+	.tls_id = 14,
+	.gid = GNUTLS_EXTENSION_SRTP,
+	.validity = GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_DTLS | GNUTLS_EXT_FLAG_CLIENT_HELLO |
+		    GNUTLS_EXT_FLAG_EE | GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
 	.parse_type = GNUTLS_EXT_APPLICATION,
-
 	.recv_func = _gnutls_srtp_recv_params,
 	.send_func = _gnutls_srtp_send_params,
 	.pack_func = _gnutls_srtp_pack,
 	.unpack_func = _gnutls_srtp_unpack,
 	.deinit_func = _gnutls_srtp_deinit_data,
+	.cannot_be_overriden = 1
 };
 
 typedef struct {
@@ -167,11 +170,11 @@ _gnutls_srtp_recv_params(gnutls_session_t session,
 	int len;
 	ssize_t data_size = _data_size;
 	srtp_ext_st *priv;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 	uint16_t profile;
 
 	ret =
-	    _gnutls_ext_get_session_data(session, GNUTLS_EXTENSION_SRTP,
+	    _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_SRTP,
 					 &epriv);
 	if (ret < 0)
 		return 0;
@@ -234,10 +237,10 @@ _gnutls_srtp_send_params(gnutls_session_t session,
 	unsigned i;
 	int total_size = 0, ret;
 	srtp_ext_st *priv;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 
 	ret =
-	    _gnutls_ext_get_session_data(session, GNUTLS_EXTENSION_SRTP,
+	    _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_SRTP,
 					 &epriv);
 	if (ret < 0)
 		return 0;
@@ -308,10 +311,10 @@ gnutls_srtp_get_selected_profile(gnutls_session_t session,
 {
 	srtp_ext_st *priv;
 	int ret;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 
 	ret =
-	    _gnutls_ext_get_session_data(session, GNUTLS_EXTENSION_SRTP,
+	    _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_SRTP,
 					 &epriv);
 	if (ret < 0) {
 		gnutls_assert();
@@ -347,10 +350,10 @@ int gnutls_srtp_get_mki(gnutls_session_t session, gnutls_datum_t * mki)
 {
 	srtp_ext_st *priv;
 	int ret;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 
 	ret =
-	    _gnutls_ext_get_session_data(session, GNUTLS_EXTENSION_SRTP,
+	    _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_SRTP,
 					 &epriv);
 	if (ret < 0)
 		return
@@ -388,10 +391,10 @@ gnutls_srtp_set_mki(gnutls_session_t session, const gnutls_datum_t * mki)
 {
 	int ret;
 	srtp_ext_st *priv;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 
 	ret =
-	    _gnutls_ext_get_session_data(session, GNUTLS_EXTENSION_SRTP,
+	    _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_SRTP,
 					 &epriv);
 	if (ret < 0) {
 		priv = gnutls_calloc(1, sizeof(*priv));
@@ -400,7 +403,7 @@ gnutls_srtp_set_mki(gnutls_session_t session, const gnutls_datum_t * mki)
 			return GNUTLS_E_MEMORY_ERROR;
 		}
 		epriv = priv;
-		_gnutls_ext_set_session_data(session,
+		_gnutls_hello_ext_set_priv(session,
 					     GNUTLS_EXTENSION_SRTP, epriv);
 	} else
 		priv = epriv;
@@ -433,10 +436,10 @@ gnutls_srtp_set_profile(gnutls_session_t session,
 {
 	int ret;
 	srtp_ext_st *priv;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 
 	ret =
-	    _gnutls_ext_get_session_data(session, GNUTLS_EXTENSION_SRTP,
+	    _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_SRTP,
 					 &epriv);
 	if (ret < 0) {
 		priv = gnutls_calloc(1, sizeof(*priv));
@@ -445,7 +448,7 @@ gnutls_srtp_set_profile(gnutls_session_t session,
 			return GNUTLS_E_MEMORY_ERROR;
 		}
 		epriv = priv;
-		_gnutls_ext_set_session_data(session,
+		_gnutls_hello_ext_set_priv(session,
 					     GNUTLS_EXTENSION_SRTP, epriv);
 	} else
 		priv = epriv;
@@ -478,13 +481,13 @@ gnutls_srtp_set_profile_direct(gnutls_session_t session,
 {
 	int ret;
 	srtp_ext_st *priv;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 	int set = 0;
 	const char *col;
 	gnutls_srtp_profile_t id;
 
 	ret =
-	    _gnutls_ext_get_session_data(session, GNUTLS_EXTENSION_SRTP,
+	    _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_SRTP,
 					 &epriv);
 	if (ret < 0) {
 		set = 1;
@@ -518,7 +521,7 @@ gnutls_srtp_set_profile_direct(gnutls_session_t session,
 	} while (col != NULL);
 
 	if (set != 0)
-		_gnutls_ext_set_session_data(session,
+		_gnutls_hello_ext_set_priv(session,
 					     GNUTLS_EXTENSION_SRTP, epriv);
 
 	return 0;
@@ -607,13 +610,13 @@ gnutls_srtp_get_keys(gnutls_session_t session,
 	return msize;
 }
 
-static void _gnutls_srtp_deinit_data(extension_priv_data_t priv)
+static void _gnutls_srtp_deinit_data(gnutls_ext_priv_data_t priv)
 {
 	gnutls_free(priv);
 }
 
 static int
-_gnutls_srtp_pack(extension_priv_data_t epriv, gnutls_buffer_st * ps)
+_gnutls_srtp_pack(gnutls_ext_priv_data_t epriv, gnutls_buffer_st * ps)
 {
 	srtp_ext_st *priv = epriv;
 	unsigned int i;
@@ -633,12 +636,12 @@ _gnutls_srtp_pack(extension_priv_data_t epriv, gnutls_buffer_st * ps)
 }
 
 static int
-_gnutls_srtp_unpack(gnutls_buffer_st * ps, extension_priv_data_t * _priv)
+_gnutls_srtp_unpack(gnutls_buffer_st * ps, gnutls_ext_priv_data_t * _priv)
 {
 	srtp_ext_st *priv;
 	unsigned int i;
 	int ret;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 
 	priv = gnutls_calloc(1, sizeof(*priv));
 	if (priv == NULL) {

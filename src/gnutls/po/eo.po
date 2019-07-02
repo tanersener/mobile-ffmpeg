@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: libgnutls 3.2.1\n"
 "Report-Msgid-Bugs-To: bug-gnutls@gnu.org\n"
-"POT-Creation-Date: 2018-07-16 08:05+0200\n"
+"POT-Creation-Date: 2019-05-25 22:49+0200\n"
 "PO-Revision-Date: 2013-06-28 14:49-0300\n"
 "Last-Translator: Felipe Castro <fefcas@gmail.com>\n"
 "Language-Team: Esperanto <translation-team-eo@lists.sourceforge.net>\n"
@@ -15,6 +15,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Bugs: Report translation errors to the Language-Team address.\n"
 
 #: lib/alert.c:39
 msgid "Close notify"
@@ -132,44 +133,53 @@ msgstr "La sendita servilnomo ne estis rekonata"
 msgid "The SRP/PSK username is missing or not known"
 msgstr "Mankas uzantnomo SRP/PSK aŭ ĝi ne estas konata"
 
-#: lib/alert.c:84
+#: lib/alert.c:83
+msgid "An extension was expected but was not seen"
+msgstr ""
+
+#: lib/alert.c:86
 msgid "No supported application protocol could be negotiated"
 msgstr "Neniu subtenata aplikaĵ-protokolo povis esti negocata"
 
-#: lib/errors.c:44
+#: lib/alert.c:88
+#, fuzzy
+msgid "Certificate is required"
+msgstr "Atestilo senvalidiĝis"
+
+#: lib/errors.c:43
 msgid "Could not negotiate a supported cipher suite."
 msgstr "Ne eblis negoci subtenatan ĉifran algoritmaron."
 
-#: lib/errors.c:46
+#: lib/errors.c:45
 msgid "No or insufficient priorities were set."
 msgstr "Neniu aŭ nesufiĉaj prioritatoj estis difinataj."
 
-#: lib/errors.c:48
+#: lib/errors.c:47
 msgid "The cipher type is unsupported."
 msgstr "La ĉifra tipo estas nesubtenata."
 
-#: lib/errors.c:50
+#: lib/errors.c:49
 msgid "The certificate and the given key do not match."
 msgstr "La atestilo kaj la indikita ŝlosilo ne interkongruas."
 
-#: lib/errors.c:53
+#: lib/errors.c:52
 msgid "Could not negotiate a supported compression method."
 msgstr "Ne eblis negoci subtenatan densigan metodon."
 
-#: lib/errors.c:55
+#: lib/errors.c:54
 msgid "An unknown public key algorithm was encountered."
 msgstr "Nekonata publik-ŝlosila algoritmo estis trovata."
 
-#: lib/errors.c:58
+#: lib/errors.c:57
 msgid "An algorithm that is not enabled was negotiated."
 msgstr "Algoritmo kiu ne estas ebligata estis negocata."
 
-#: lib/errors.c:61
+#: lib/errors.c:60
 #, fuzzy
 msgid "A packet with illegal or unsupported version was received."
 msgstr "Rikord-paketo kun malpermesata versio estis ricevata."
 
-#: lib/errors.c:64
+#: lib/errors.c:63
 msgid ""
 "The Diffie-Hellman prime sent by the server is not acceptable (not long "
 "enough)."
@@ -177,566 +187,607 @@ msgstr ""
 "La primo Diffie-Hellman sendita de la servilo ne estas akceptebla (ne sufiĉe "
 "longa)."
 
-#: lib/errors.c:67
-msgid "A TLS packet with unexpected length was received."
-msgstr "TLS-paketo kun neatendita longo estis ricevata."
+#: lib/errors.c:66
+msgid "Error decoding the received TLS packet."
+msgstr ""
 
 #: lib/errors.c:69
+#, fuzzy
+msgid "A TLS record packet with invalid length was received."
+msgstr "TLS-paketo kun neatendita longo estis ricevata."
+
+#: lib/errors.c:71
 msgid "The TLS connection was non-properly terminated."
 msgstr "La TLS-konekto estis finigita neĝuste."
 
-#: lib/errors.c:72
+#: lib/errors.c:74
 msgid "The specified session has been invalidated for some reason."
 msgstr "La specifa seanco estis ial malvalidigata."
 
-#: lib/errors.c:75
+#: lib/errors.c:77
 msgid "GnuTLS internal error."
 msgstr "Interna eraro e GnuTLS."
 
-#: lib/errors.c:77
+#: lib/errors.c:79
 msgid "A connection with inappropriate fallback was attempted."
 msgstr ""
 
-#: lib/errors.c:79
+#: lib/errors.c:81
 msgid "An illegal TLS extension was received."
 msgstr "Malpermesata TLS-etendo estis ricevata."
 
-#: lib/errors.c:81
+#: lib/errors.c:83
+#, fuzzy
+msgid "An required TLS extension was received."
+msgstr "Malpermesata TLS-etendo estis ricevata."
+
+#: lib/errors.c:85
 msgid "A TLS fatal alert has been received."
 msgstr "Gravega atentigo TLS estas ricevita."
 
-#: lib/errors.c:83
+#: lib/errors.c:87
 msgid "An unexpected TLS packet was received."
 msgstr "Neatendita paketo TLS estis ricevata."
 
-#: lib/errors.c:85
+#: lib/errors.c:89
 msgid "Failed to import the key into store."
 msgstr ""
 
-#: lib/errors.c:88
+#: lib/errors.c:92
 msgid "An error was encountered at the TLS Finished packet calculation."
 msgstr "Eraro estis trovata ĉe la kalkulo de paketo TLS Finigita."
 
-#: lib/errors.c:90 libdane/errors.c:67
+#: lib/errors.c:94 libdane/errors.c:67
 msgid "No certificate was found."
 msgstr "Neniu atestilo estis trovata."
 
-#: lib/errors.c:93
+#: lib/errors.c:96
+#, fuzzy
+msgid "Certificate is required."
+msgstr "Atestilo senvalidiĝis"
+
+#: lib/errors.c:99
 msgid "The given DSA key is incompatible with the selected TLS protocol."
 msgstr "La indikita ŝlosilo DSA malkongruas kun la elektita protokolo TLS."
 
-#: lib/errors.c:96
+#: lib/errors.c:102
 msgid "There is already a crypto algorithm with lower priority."
 msgstr "Jam ekzistas ĉifra algoritmo kun pli malalta prioritato."
 
-#: lib/errors.c:99
+#: lib/errors.c:105
 msgid "No temporary RSA parameters were found."
 msgstr "Neniu provizora parametro RSA estis trovata."
 
-#: lib/errors.c:101
+#: lib/errors.c:107
 msgid "No temporary DH parameters were found."
 msgstr "Neniu provizora parametro DH estis trovata."
 
-#: lib/errors.c:103
+#: lib/errors.c:109
 msgid "An unexpected TLS handshake packet was received."
 msgstr "Neatendita TLS-kvitanca paketo estis ricevata."
 
-#: lib/errors.c:105
+#: lib/errors.c:111
 msgid "The scanning of a large integer has failed."
 msgstr "La skanado de granda entjero fiaskis."
 
-#: lib/errors.c:107
+#: lib/errors.c:113
 msgid "Could not export a large integer."
 msgstr "Ne eblis eksporti grandan entjeron."
 
-#: lib/errors.c:109
+#: lib/errors.c:115
 msgid "Decryption has failed."
 msgstr "Malĉifrigo fiaskis."
 
-#: lib/errors.c:111
+#: lib/errors.c:117
 msgid "Encryption has failed."
 msgstr "Ĉifrigo fiaskis."
 
-#: lib/errors.c:113
+#: lib/errors.c:119
 msgid "Public key decryption has failed."
 msgstr "Malĉifrigo de publika ŝlosilo fiaskis."
 
-#: lib/errors.c:115
+#: lib/errors.c:121
 msgid "Public key encryption has failed."
 msgstr "Ĉifrigo de publika ŝlosilo fiaskis."
 
-#: lib/errors.c:117
+#: lib/errors.c:123
 msgid "Public key signing has failed."
 msgstr "Subskribo de publika ŝlosilo fiaskis."
 
-#: lib/errors.c:119
+#: lib/errors.c:125
 msgid "Public key signature verification has failed."
 msgstr "Kontrolo de publik-ŝlosila subskribo fiaskis."
 
-#: lib/errors.c:122
+#: lib/errors.c:128
 msgid "Decompression of the TLS record packet has failed."
 msgstr "Maldensigo de la rikord-paketo TLS fiaskis."
 
-#: lib/errors.c:124
+#: lib/errors.c:130
 msgid "Compression of the TLS record packet has failed."
 msgstr "Densigo de la rikord-paketo TLS fiaskis."
 
-#: lib/errors.c:127
+#: lib/errors.c:133
 msgid "Internal error in memory allocation."
 msgstr "Interna eraro en rezervigo de memoro."
 
-#: lib/errors.c:130
+#: lib/errors.c:136
 msgid "An unimplemented or disabled feature has been requested."
 msgstr "Nerealigita aŭ malebligita trajto estas petata."
 
-#: lib/errors.c:132
+#: lib/errors.c:138
 msgid "Insufficient credentials for that request."
 msgstr "Nesufiĉe da legitimaĵojj por tiu peto."
 
-#: lib/errors.c:134
-msgid "Error in password file."
+#: lib/errors.c:140
+#, fuzzy
+msgid "Error in password/key file."
 msgstr "Eraro en pasvorta dosiero."
 
-#: lib/errors.c:135
+#: lib/errors.c:141
 msgid "Wrong padding in PKCS1 packet."
 msgstr "Malĝusta ŝtopado en paketo PKCS1."
 
-#: lib/errors.c:137
+#: lib/errors.c:143
 #, fuzzy
 msgid "The session or certificate has expired."
 msgstr "La petita seanco senvalidiĝis."
 
-#: lib/errors.c:139
+#: lib/errors.c:145
 #, fuzzy
 msgid "The certificate is not yet activated."
 msgstr "La atestilo havas nesubtenatajn atributojn."
 
-#: lib/errors.c:141
+#: lib/errors.c:147
 msgid "Hashing has failed."
 msgstr "Haketado fiaskis."
 
-#: lib/errors.c:142
+#: lib/errors.c:148
 msgid "Base64 decoding error."
 msgstr "Dekodig-eraro de Base64."
 
-#: lib/errors.c:144
+#: lib/errors.c:150
 msgid "Base64 unexpected header error."
 msgstr "Neatendita kap-eraro de Base64."
 
-#: lib/errors.c:146
+#: lib/errors.c:152
 msgid "Base64 encoding error."
 msgstr "Enkodig-eraro de Base64."
 
-#: lib/errors.c:148
-msgid "Parsing error in password file."
+#: lib/errors.c:154
+#, fuzzy
+msgid "Parsing error in password/key file."
 msgstr "Analiz-eraro en pasvorta dosiero."
 
-#: lib/errors.c:150
+#: lib/errors.c:156
 msgid "The requested data were not available."
 msgstr "La petita datumaro ne estis disponebla."
 
-#: lib/errors.c:152
+#: lib/errors.c:158
 msgid "There are no embedded data in the structure."
 msgstr ""
 
-#: lib/errors.c:154
+#: lib/errors.c:160
 msgid "Error in the pull function."
 msgstr "Eraro en tira funkcio."
 
-#: lib/errors.c:155
+#: lib/errors.c:161
 msgid "Error in the push function."
 msgstr "Eraro en puŝa funkcio."
 
-#: lib/errors.c:157
+#: lib/errors.c:163
 msgid ""
 "The upper limit of record packet sequence numbers has been reached. Wow!"
 msgstr "La supra limo de rikord-paketa sekvo-numeroj estas atingita. Hoo!"
 
-#: lib/errors.c:159
+#: lib/errors.c:165
 msgid "Error in the certificate."
 msgstr "Eraro en atestilo."
 
-#: lib/errors.c:161
+#: lib/errors.c:167
+#, fuzzy
+msgid "Error in the time fields of certificate."
+msgstr "Eraro en atestilo."
+
+#: lib/errors.c:169
 #, fuzzy
 msgid "Error in the certificate verification."
 msgstr "Eraro en atestilo."
 
-#: lib/errors.c:163
+#: lib/errors.c:171
+#, fuzzy
+msgid "Error in the CRL verification."
+msgstr "Eraro en atestilo."
+
+#: lib/errors.c:173
 msgid "Error in the private key verification; seed doesn't match."
 msgstr ""
 
-#: lib/errors.c:165
+#: lib/errors.c:175
 msgid "Could not authenticate peer."
 msgstr "Ne eblis aŭtentikigi samtavolanon."
 
-#: lib/errors.c:168
+#: lib/errors.c:178
 msgid "Unknown Subject Alternative name in X.509 certificate."
 msgstr "Nekonata nomo de temo-alternativo en atestilo X.509."
 
-#: lib/errors.c:171
+#: lib/errors.c:181
 msgid "CIDR name constraint is malformed in size or structure."
 msgstr ""
 
-#: lib/errors.c:175
+#: lib/errors.c:185
 msgid "Unsupported critical extension in X.509 certificate."
 msgstr "Nesubtenata gravega etendo en atestilo X.509."
 
-#: lib/errors.c:177
+#: lib/errors.c:187
 msgid "Unsupported extension in X.509 certificate."
 msgstr "Nesubtenata etendo en atestilo X.509."
 
-#: lib/errors.c:180
+#: lib/errors.c:190
 msgid "Key usage violation in certificate has been detected."
 msgstr "Malrespekto en ŝlosil-uzmaniero estas detektita."
 
-#: lib/errors.c:182 lib/errors.c:425
+#: lib/errors.c:192 lib/errors.c:454
 msgid "Function was interrupted."
 msgstr "Funkcio estis haltigata."
 
-#: lib/errors.c:184
+#: lib/errors.c:194
 msgid "TLS Application data were received, while expecting handshake data."
 msgstr ""
 "TLS-aplikaĵa datumaro estis ricevata, dum ni atendis kvitancan datumaron."
 
-#: lib/errors.c:186
+#: lib/errors.c:196
 msgid "Error in Database backend."
 msgstr "Eraro en datumara internaĵo."
 
-#: lib/errors.c:187
+#: lib/errors.c:197
+msgid "The Database entry already exists."
+msgstr ""
+
+#: lib/errors.c:198
 msgid "The certificate type is not supported."
 msgstr "La tipo de atestilo ne estas subtenata."
 
-#: lib/errors.c:190
+#: lib/errors.c:201
 msgid "The given memory buffer is too short to hold parameters."
 msgstr "La indikita memor-bufro estas tro mallonga por teni parametrojn."
 
-#: lib/errors.c:192 libdane/errors.c:61
+#: lib/errors.c:203 libdane/errors.c:61
 msgid "The request is invalid."
 msgstr "La peto malvalidas."
 
-#: lib/errors.c:194
+#: lib/errors.c:205
 msgid "The cookie was bad."
 msgstr "La kuketo malĝustis."
 
-#: lib/errors.c:195
+#: lib/errors.c:206
 msgid "An illegal parameter has been received."
 msgstr "Malpermesata parametro estas ricevita."
 
-#: lib/errors.c:197
+#: lib/errors.c:208
 msgid "An illegal parameter was found."
 msgstr "Malpermesata parametro estis trovata."
 
-#: lib/errors.c:199
+#: lib/errors.c:210
 msgid "Error while reading file."
 msgstr "Eraro dum lego de dosiero."
 
-#: lib/errors.c:201
+#: lib/errors.c:211
+#, fuzzy
+msgid "A disallowed SNI server name has been received."
+msgstr "Malpermesata parametro estas ricevita."
+
+#: lib/errors.c:214
 msgid "ASN1 parser: Element was not found."
 msgstr "Analizilo ASN1: elemento ne estis trovata."
 
-#: lib/errors.c:203
+#: lib/errors.c:216
 msgid "ASN1 parser: Identifier was not found"
 msgstr "Analizilo ASN1: identiganto ne estis trovata"
 
-#: lib/errors.c:205
+#: lib/errors.c:218
 msgid "ASN1 parser: Error in DER parsing."
 msgstr "Analizilo ASN1: eraro en analizo de DER."
 
-#: lib/errors.c:207
+#: lib/errors.c:220
 msgid "ASN1 parser: Value was not found."
 msgstr "Analizilo ASN1: valoro ne estis trovata."
 
-#: lib/errors.c:209
+#: lib/errors.c:222
 msgid "ASN1 parser: Generic parsing error."
 msgstr "Analizilo ASN1: ĝenerala analiz-eraro."
 
-#: lib/errors.c:211
+#: lib/errors.c:224
 msgid "ASN1 parser: Value is not valid."
 msgstr "Analizilo ASN1: valoro ne validas."
 
-#: lib/errors.c:213
+#: lib/errors.c:226
 msgid "ASN1 parser: Error in TAG."
 msgstr "Analizilo ASN1: eraro en TAG."
 
-#: lib/errors.c:215
+#: lib/errors.c:228
 msgid "ASN1 parser: error in implicit tag"
 msgstr "Analizilo ASN1: eraro en implicita marko"
 
-#: lib/errors.c:217
+#: lib/errors.c:230
 msgid "ASN1 parser: Error in type 'ANY'."
 msgstr "Analizilo ASN1: eraro en tipo 'ANY'."
 
-#: lib/errors.c:219
+#: lib/errors.c:232
 msgid "ASN1 parser: Syntax error."
 msgstr "Analizilo ASN1: sintaks-eraro."
 
-#: lib/errors.c:221
+#: lib/errors.c:234
 msgid "ASN1 parser: Overflow in DER parsing."
 msgstr "Analizilo ASN1: troigo en analizo de DER."
 
-#: lib/errors.c:225
+#: lib/errors.c:238
 msgid "Too many empty record packets have been received."
 msgstr "Tro multaj malplenaj rikord-paketoj estas ricevitaj."
 
-#: lib/errors.c:227
+#: lib/errors.c:240
 msgid "Too many handshake packets have been received."
 msgstr "Tro multaj kvitancaj paketoj estas ricevitaj."
 
-#: lib/errors.c:229
+#: lib/errors.c:242
+msgid "More than a single object matches the criteria."
+msgstr ""
+
+#: lib/errors.c:244
 msgid "The crypto library version is too old."
 msgstr "La versio de ĉifra biblioteko tro malnovas."
 
-#: lib/errors.c:232
+#: lib/errors.c:247
 msgid "The tasn1 library version is too old."
 msgstr "La versio de biblioteko tasn1 tro malnovas."
 
-#: lib/errors.c:234
+#: lib/errors.c:249
 msgid "The OpenPGP User ID is revoked."
 msgstr "La uzant-ID de OpenPGP estas revokita."
 
-#: lib/errors.c:236
+#: lib/errors.c:251
 msgid "The OpenPGP key has not a preferred key set."
 msgstr "La ŝlosilo OpenPGP ne havas preferatan ŝlosilaron."
 
-#: lib/errors.c:238
+#: lib/errors.c:253
 msgid "Error loading the keyring."
 msgstr "Eraro dum ŝargo je la ŝlosilringo."
 
-#: lib/errors.c:240
+#: lib/errors.c:255
 msgid "The initialization of crypto backend has failed."
 msgstr "La ekigo de ĉifra internaĵo fiaskis."
 
-#: lib/errors.c:243
+#: lib/errors.c:258
 msgid "No supported compression algorithms have been found."
 msgstr "Neniu subtenata densig-algoritmo estas trovita."
 
-#: lib/errors.c:245
+#: lib/errors.c:260
 msgid "No supported cipher suites have been found."
 msgstr "Neniu subtenata ĉifra algoritmaro estas trovita."
 
-#: lib/errors.c:247
+#: lib/errors.c:262
 msgid "Could not get OpenPGP key."
 msgstr "Ne eblis havigi ŝlosilon OpenPGP."
 
-#: lib/errors.c:249
+#: lib/errors.c:264
 msgid "Could not find OpenPGP subkey."
 msgstr "Ne eblis trovi subŝlosilon OpenPGP."
 
-#: lib/errors.c:251
+#: lib/errors.c:266
 msgid "Safe renegotiation failed."
 msgstr "Sekura renegocado fiaskis."
 
-#: lib/errors.c:253
+#: lib/errors.c:268
 msgid "Unsafe renegotiation denied."
 msgstr "Malsekura renegocado estas rifuzita."
 
-#: lib/errors.c:256
+#: lib/errors.c:271
 msgid "The SRP username supplied is illegal."
 msgstr "La liverita SRP-uzantnomo estas malpermesata."
 
-#: lib/errors.c:258
-msgid "The SRP username supplied is unknown."
+#: lib/errors.c:273
+#, fuzzy
+msgid "The username supplied is unknown."
 msgstr "La liverita SRP-uzantnomo estas nekonata."
 
-#: lib/errors.c:261
+#: lib/errors.c:276
 msgid "The OpenPGP fingerprint is not supported."
 msgstr "La fingropremo OpenPGP ne esats subtenata."
 
-#: lib/errors.c:263
+#: lib/errors.c:278
 msgid "The signature algorithm is not supported."
 msgstr "La subskriba algoritmo ne estas subtenata."
 
-#: lib/errors.c:265
+#: lib/errors.c:280
 msgid "The certificate has unsupported attributes."
 msgstr "La atestilo havas nesubtenatajn atributojn."
 
-#: lib/errors.c:267
+#: lib/errors.c:282
 msgid "The OID is not supported."
 msgstr "La OID ne estas subtenata."
 
-#: lib/errors.c:269
+#: lib/errors.c:284
 msgid "The hash algorithm is unknown."
 msgstr "La haketa algoritmo estas nekonata."
 
-#: lib/errors.c:271
+#: lib/errors.c:286
 msgid "The PKCS structure's content type is unknown."
 msgstr "La enhav-tipo de strukturo PKCS estas ne konata."
 
-#: lib/errors.c:273
+#: lib/errors.c:288
 msgid "The PKCS structure's bag type is unknown."
 msgstr "La ujo-tipo de strukturo PKCS estas ne konata."
 
-#: lib/errors.c:275 lib/errors.c:281
+#: lib/errors.c:290 lib/errors.c:296
 msgid "The given password contains invalid characters."
 msgstr "La indikita pasvorto enhavas malvalidajn signojn."
 
-#: lib/errors.c:277
+#: lib/errors.c:292
 #, fuzzy
 msgid "The given string contains invalid UTF-8 characters."
 msgstr "La indikita pasvorto enhavas malvalidajn signojn."
 
-#: lib/errors.c:279
+#: lib/errors.c:294
 #, fuzzy
 msgid "The given email string contains non-ASCII characters before '@'."
 msgstr "La indikita pasvorto enhavas malvalidajn signojn."
 
-#: lib/errors.c:284
+#: lib/errors.c:299
 msgid "The Message Authentication Code verification failed."
 msgstr "La kontrolo de mesaĝ-aŭtentikiga kodo fiaskis."
 
-#: lib/errors.c:286
+#: lib/errors.c:301
 msgid "Some constraint limits were reached."
 msgstr "Kelkaj limigoj estis atingataj."
 
-#: lib/errors.c:288
+#: lib/errors.c:303
 msgid "Failed to acquire random data."
 msgstr "Ni fiaskis havigi hazardan datumaron."
 
-#: lib/errors.c:290
+#: lib/errors.c:305
 msgid "Verifying TLS/IA phase checksum failed"
 msgstr "Kontrolo de faza kontrolsumo de TLS/IA fiaskis"
 
-#: lib/errors.c:293
+#: lib/errors.c:308
 msgid "The specified algorithm or protocol is unknown."
 msgstr "La indikita algoritmo aŭ protokolo estas nekonata."
 
-#: lib/errors.c:296
+#: lib/errors.c:311
 msgid "The handshake data size is too large."
 msgstr "La kvitanca damutara grando estas troa."
 
-#: lib/errors.c:299
+#: lib/errors.c:314
 msgid "Error opening /dev/crypto"
 msgstr "Eraro dum malfermo de /dev/crypto"
 
-#: lib/errors.c:302
+#: lib/errors.c:317
 msgid "Error interfacing with /dev/crypto"
 msgstr "Eraro dum interfaco kun /dev/crypto"
 
-#: lib/errors.c:304
+#: lib/errors.c:319
 msgid "Peer has terminated the connection"
 msgstr "Samtavolano ĉesigis la konekton"
 
-#: lib/errors.c:306
+#: lib/errors.c:321
 msgid "Channel binding data not available"
 msgstr "Kanal-bindiga datumaro ne disponeblas"
 
-#: lib/errors.c:309
+#: lib/errors.c:324
 msgid "TPM error."
 msgstr "Eraro TPM."
 
-#: lib/errors.c:311
+#: lib/errors.c:326
 msgid "The TPM library (trousers) cannot be found."
 msgstr ""
 
-#: lib/errors.c:313
+#: lib/errors.c:328
 msgid "TPM is not initialized."
 msgstr "TPM ne estas ekigita."
 
-#: lib/errors.c:315
+#: lib/errors.c:330
 msgid "TPM key was not found in persistent storage."
 msgstr "Ŝlosilo TPM ne estis trovata en persista konsevado."
 
-#: lib/errors.c:317
+#: lib/errors.c:332
 msgid "Cannot initialize a session with the TPM."
 msgstr "Ne eblis ekiggi seancon kun la TPM."
 
-#: lib/errors.c:319
+#: lib/errors.c:334
 msgid "PKCS #11 error."
 msgstr "Eraro PKCS #11."
 
-#: lib/errors.c:321
+#: lib/errors.c:336
 msgid "PKCS #11 initialization error."
 msgstr "Ekiga eraro PKCS #11."
 
-#: lib/errors.c:323
+#: lib/errors.c:338
 msgid "Error in parsing."
 msgstr "Eraro dum analizo."
 
-#: lib/errors.c:325
+#: lib/errors.c:340
 msgid "Error in provided PIN."
 msgstr "Eraro en provizita PIN."
 
-#: lib/errors.c:327
+#: lib/errors.c:342
 msgid "Error in provided SRK password for TPM."
 msgstr "Eraro en provizita pasvorta SRK por TPM."
 
-#: lib/errors.c:330
+#: lib/errors.c:345
 msgid "Error in provided password for key to be loaded in TPM."
 msgstr "Eraro en provizita pasvorto por ŝlosilo ŝargota en TPM."
 
-#: lib/errors.c:332
+#: lib/errors.c:347
 msgid "PKCS #11 error in slot"
 msgstr "Eraro PKCS #11 en konektingo"
 
-#: lib/errors.c:334
+#: lib/errors.c:349
 msgid "Thread locking error"
 msgstr "Eraro de faden-ŝloso"
 
-#: lib/errors.c:336
+#: lib/errors.c:351
 msgid "PKCS #11 error in attribute"
 msgstr "Eraro PKCS #11 en atributo"
 
-#: lib/errors.c:338
+#: lib/errors.c:353
 msgid "PKCS #11 error in device"
 msgstr "Eraro PKCS #11 en aparato"
 
-#: lib/errors.c:340
+#: lib/errors.c:355
 msgid "PKCS #11 error in data"
 msgstr "Eraro PKCS #11 en datumaro"
 
-#: lib/errors.c:342
+#: lib/errors.c:357
 msgid "PKCS #11 unsupported feature"
 msgstr "PKCS #11 nesubtenata trajto"
 
-#: lib/errors.c:344
+#: lib/errors.c:359
 msgid "PKCS #11 error in key"
 msgstr "Eraro PKCS #11 en ŝlosilo"
 
-#: lib/errors.c:346
+#: lib/errors.c:361
 msgid "PKCS #11 PIN expired"
 msgstr "PKCS #11 PIN senvalidiĝis"
 
-#: lib/errors.c:348
+#: lib/errors.c:363
 msgid "PKCS #11 PIN locked"
 msgstr "PKCS #11 PIN ŝlosita"
 
-#: lib/errors.c:350
+#: lib/errors.c:365
 msgid "PKCS #11 error in session"
 msgstr "Eraro PKCS #11 en seanco"
 
-#: lib/errors.c:352
+#: lib/errors.c:367
 msgid "PKCS #11 error in signature"
 msgstr "Eraro PKCS #11 en subskribo"
 
-#: lib/errors.c:354
+#: lib/errors.c:369
 msgid "PKCS #11 error in token"
 msgstr "Eraro PKCS #11 en ĵetono"
 
-#: lib/errors.c:356
+#: lib/errors.c:371
 msgid "PKCS #11 user error"
 msgstr "PKCS #11 uzant-eraro"
 
-#: lib/errors.c:358
+#: lib/errors.c:373
 msgid "The operation timed out"
 msgstr "La tempo por operacio finis"
 
-#: lib/errors.c:360
+#: lib/errors.c:375
 msgid "The operation was cancelled due to user error"
 msgstr "La operacio estis nuligata pro uzant-eraro"
 
-#: lib/errors.c:362
+#: lib/errors.c:377
 msgid "No supported ECC curves were found"
 msgstr "Neniu subtenata kurbo ECC estis trovata"
 
-#: lib/errors.c:364
+#: lib/errors.c:379
 msgid "The curve is unsupported"
 msgstr "La kurbo estas nesubtenata"
 
-#: lib/errors.c:366
+#: lib/errors.c:381
 msgid "The requested PKCS #11 object is not available"
 msgstr "La petita objekto PKCS #11 ne disponeblas"
 
-#: lib/errors.c:369
+#: lib/errors.c:384
 msgid ""
 "The provided X.509 certificate list is not sorted (in subject to issuer "
 "order)"
@@ -744,311 +795,213 @@ msgstr ""
 "La provizita atestilo-listo X.509 ne estas ordigita (laŭ ordo de temo al "
 "eldonanto)"
 
-#: lib/errors.c:371
+#: lib/errors.c:386
 msgid "The OCSP response is invalid"
 msgstr "La respondo OCSP malvalidas."
 
-#: lib/errors.c:373
+#: lib/errors.c:388
+msgid "The OCSP response provided doesn't match the available certificates"
+msgstr ""
+
+#: lib/errors.c:390
 msgid "There is no certificate status (OCSP)."
 msgstr "Estas neniu atestila stato (OCSP)."
 
-#: lib/errors.c:375
+#: lib/errors.c:392
 msgid "Error in the system's randomness device."
 msgstr "Eraro en la hazardec-aparato de la sistemo."
 
-#: lib/errors.c:378
+#: lib/errors.c:395
 msgid "No common application protocol could be negotiated."
 msgstr "Neniu ordinara aplikaĵ-protokolo povis esti negocata."
 
-#: lib/errors.c:380
+#: lib/errors.c:397
 #, fuzzy
 msgid "Error while performing self checks."
 msgstr "Eraro dum lego de dosiero."
 
-#: lib/errors.c:382
+#: lib/errors.c:399
 msgid "There is no self test for this algorithm."
 msgstr ""
 
-#: lib/errors.c:384
+#: lib/errors.c:401
 msgid ""
 "An error has been detected in the library and cannot continue operations."
 msgstr ""
 
-#: lib/errors.c:386
+#: lib/errors.c:403
 #, fuzzy
 msgid "Error in sockets initialization."
 msgstr "Eraro en puŝa funkcio."
 
-#: lib/errors.c:388
+#: lib/errors.c:405
 #, fuzzy
 msgid "Error in public key generation."
 msgstr "Eraro en tira funkcio."
 
-#: lib/errors.c:390
+#: lib/errors.c:407
 #, fuzzy
 msgid "Invalid TLS extensions length field."
 msgstr "Malpermesata TLS-etendo estis ricevata."
 
-#: lib/errors.c:392
+#: lib/errors.c:409
 msgid "Peer's certificate or username has changed during a rehandshake."
 msgstr ""
 
-#: lib/errors.c:394
+#: lib/errors.c:411
 msgid "The provided string has an embedded null."
 msgstr ""
 
-#: lib/errors.c:396
+#: lib/errors.c:413
 msgid "Attempted handshake during false start."
 msgstr ""
 
-#: lib/errors.c:398
+#: lib/errors.c:415
 #, fuzzy
 msgid "The SNI host name not recognised."
 msgstr "La sendita servilnomo ne estis rekonata"
 
-#: lib/errors.c:400
+#: lib/errors.c:417
 msgid "There was an issue converting to or from UTF8."
 msgstr ""
 
-#: lib/errors.c:402
-msgid "Cannot obtain resumption parameters while handshake is incomplete."
+#: lib/errors.c:419
+msgid "Cannot perform this action while handshake is in progress."
 msgstr ""
 
-#: lib/errors.c:404
+#: lib/errors.c:421
 #, fuzzy
-msgid "The obtained public key is invalid."
+msgid "The public key is invalid."
 msgstr "La peto malvalidas."
 
-#: lib/errors.c:406
+#: lib/errors.c:423
+msgid "There are no validation parameters present."
+msgstr ""
+
+#: lib/errors.c:425
+msgid "The public key parameters are invalid."
+msgstr ""
+
+#: lib/errors.c:427
 #, fuzzy
 msgid "The private key is invalid."
 msgstr "La peto malvalidas."
 
-#: lib/errors.c:408
+#: lib/errors.c:429
+#, fuzzy
+msgid "The DER time encoding is invalid."
+msgstr "La peto malvalidas."
+
+#: lib/errors.c:431
+#, fuzzy
+msgid "The signature is incompatible with the public key."
+msgstr "La indikita ŝlosilo DSA malkongruas kun la elektita protokolo TLS."
+
+#: lib/errors.c:433
 msgid "One of the involved algorithms has insufficient security level."
 msgstr ""
 
-#: lib/errors.c:414 libdane/errors.c:42
+#: lib/errors.c:435
+msgid "No common key share with peer."
+msgstr ""
+
+#: lib/errors.c:437
+msgid "The early data were rejected."
+msgstr ""
+
+#: lib/errors.c:443 libdane/errors.c:42
 msgid "Success."
 msgstr "Sukceso."
 
-#: lib/errors.c:415
+#: lib/errors.c:444
 msgid "A TLS warning alert has been received."
 msgstr "Averta atentigo TLS estas ricevita."
 
-#: lib/errors.c:417
+#: lib/errors.c:446
 msgid "A heartbeat pong message was received."
 msgstr "Korbata mesaĝo 'pong' estis ricevata."
 
-#: lib/errors.c:419
+#: lib/errors.c:448
 msgid "A heartbeat ping message was received."
 msgstr "Korbata mesaĝo 'ping' estis ricevata."
 
-#: lib/errors.c:421
+#: lib/errors.c:450
 msgid "Resource temporarily unavailable, try again."
 msgstr "La rimedo estas provizore nedisponebla, provu refoje."
 
-#: lib/errors.c:423
+#: lib/errors.c:452
 msgid "The transmitted packet is too large (EMSGSIZE)."
 msgstr "La transigita pako tro larĝas (EMSGSIZE)."
 
-#: lib/errors.c:426
+#: lib/errors.c:455
 msgid "Rehandshake was requested by the peer."
 msgstr "Rekvitanco estis petata de la samtavolano."
 
-#: lib/errors.c:518 libdane/errors.c:100
+#: lib/errors.c:457
+#, fuzzy
+msgid "Re-authentication was requested by the peer."
+msgstr "Rekvitanco estis petata de la samtavolano."
+
+#: lib/errors.c:549 libdane/errors.c:100
 msgid "(unknown error code)"
 msgstr "(nekonata erar-kodo)"
 
-#: lib/openpgp/output.c:41
-msgid "\t\tKey Usage:\n"
-msgstr "\t\tŜlosila uzmaniero:\n"
+#: lib/x509/ocsp.c:2605
+#, fuzzy
+msgid "The OCSP response is trusted. "
+msgstr "La respondo OCSP malvalidas."
 
-#: lib/openpgp/output.c:51
-#, c-format
-msgid "error: get_key_usage: %s\n"
-msgstr "eraro: get_key_usage: %s\n"
+#: lib/x509/ocsp.c:2610
+#, fuzzy
+msgid "The OCSP response's signer could not be found. "
+msgstr "La respondo OCSP malvalidas."
 
-#: lib/openpgp/output.c:57
-msgid "\t\t\tDigital signatures.\n"
-msgstr "\t\t\tCiferecaj subskriboj.\n"
+#: lib/x509/ocsp.c:2615
+msgid "Error in the signer's key usageflags. "
+msgstr ""
 
-#: lib/openpgp/output.c:59
-msgid "\t\t\tCommunications encipherment.\n"
-msgstr "\t\t\tKomunikada ĉifrigo.\n"
+#: lib/x509/ocsp.c:2620
+#, fuzzy
+msgid "The OCSP response's signer is not trusted. "
+msgstr "La respondo OCSP malvalidas."
 
-#: lib/openpgp/output.c:61
-msgid "\t\t\tStorage data encipherment.\n"
-msgstr "\t\t\tKonserv-datumara ĉifrigo.\n"
+#: lib/x509/ocsp.c:2625
+#, fuzzy
+msgid "The OCSP response depends on insecure algorithms. "
+msgstr "La respondo OCSP malvalidas."
 
-#: lib/openpgp/output.c:63
-msgid "\t\t\tAuthentication.\n"
-msgstr "\t\t\tAŭtentikigo.\n"
+#: lib/x509/ocsp.c:2630
+#, fuzzy
+msgid "The OCSP response's signature cannot be validated. "
+msgstr "La respondo OCSP malvalidas."
 
-#: lib/openpgp/output.c:65
-msgid "\t\t\tCertificate signing.\n"
-msgstr "\t\t\tSubskribo de atestilo.\n"
+#: lib/x509/ocsp.c:2635
+msgid "The OCSP response's signer's certificate is not activated. "
+msgstr ""
 
-#: lib/openpgp/output.c:85
-msgid "\tID (hex): "
-msgstr "\tID (16-ume): "
+#: lib/x509/ocsp.c:2640
+#, fuzzy
+msgid "The OCSP response's signer's certificate is expired. "
+msgstr "La respondo OCSP malvalidas."
 
-#: lib/openpgp/output.c:110
-msgid "\tFingerprint (hex): "
-msgstr "\tFingropremo (16-ume): "
+#: lib/x509/ocsp.c:2644
+#, fuzzy
+msgid "Memory error"
+msgstr "Malĉifra eraro"
 
-#: lib/openpgp/output.c:128
-msgid "\tFingerprint's random art:\n"
-msgstr "\tHazarda artaĵo de fingropremo:\n"
-
-#: lib/openpgp/output.c:149
-msgid "\tRevoked: True\n"
-msgstr "\tRevokita: vere\n"
-
-#: lib/openpgp/output.c:151
-msgid "\tRevoked: False\n"
-msgstr "\tRevokita: false\n"
-
-#: lib/openpgp/output.c:159
-msgid "\tTime stamps:\n"
-msgstr "\tTempindikoj:\n"
-
-#: lib/openpgp/output.c:180
-#, c-format
-msgid "\t\tCreation: %s\n"
-msgstr "\t\tKreo: %s\n"
-
-#: lib/openpgp/output.c:195
-msgid "\t\tExpiration: Never\n"
-msgstr "\t\tLimdato: Neniam\n"
-
-#: lib/openpgp/output.c:206
-#, c-format
-msgid "\t\tExpiration: %s\n"
-msgstr "\t\tLimdato: %s\n"
-
-#: lib/openpgp/output.c:230 lib/x509/ocsp_output.c:524 lib/x509/output.c:1178
-#: lib/x509/output.c:1375 lib/x509/output.c:1519 lib/x509/output.c:1748
-#: lib/x509/output.c:1761 lib/x509/output.c:2178 lib/x509/output.c:2276
-#: lib/x509/output.c:2327
-msgid "unknown"
-msgstr "nekonata"
-
-#: lib/openpgp/output.c:232
-#, c-format
-msgid "\tPublic Key Algorithm: %s\n"
-msgstr "\tPublik-ŝlosila algoritmo: %s\n"
-
-#: lib/openpgp/output.c:233
-#, c-format
-msgid "\tKey Security Level: %s\n"
-msgstr "\tŜlosila sekurec-nivelo: %s\n"
-
-#: lib/openpgp/output.c:257 lib/x509/output.c:1214
-#, c-format
-msgid "\t\tModulus (bits %d):\n"
-msgstr "\t\tDividresto (bitoj %d):\n"
-
-#: lib/openpgp/output.c:262
-msgid "\t\tExponent:\n"
-msgstr "\t\tEksponento:\n"
-
-#: lib/openpgp/output.c:293 lib/x509/output.c:1317
-#, c-format
-msgid "\t\tPublic key (bits %d):\n"
-msgstr "\t\tPublika ŝlosilo (bitoj %d):\n"
-
-#: lib/openpgp/output.c:295 lib/x509/output.c:1266
-msgid "\t\tY:\n"
-msgstr "\t\tY:\n"
-
-#: lib/openpgp/output.c:299 lib/x509/output.c:1322
-msgid "\t\tP:\n"
-msgstr "\t\tP:\n"
-
-#: lib/openpgp/output.c:303 lib/x509/output.c:1326
-msgid "\t\tQ:\n"
-msgstr "\t\tQ:\n"
-
-#: lib/openpgp/output.c:307 lib/x509/output.c:1330
-msgid "\t\tG:\n"
-msgstr "\t\tG:\n"
-
-#: lib/openpgp/output.c:341 lib/x509/ocsp_output.c:50
-#: lib/x509/ocsp_output.c:276 lib/x509/output.c:1398 lib/x509/output.c:1931
-#: lib/x509/output.c:2299
+#: lib/x509/ocsp_output.c:50 lib/x509/ocsp_output.c:276 lib/x509/output.c:1575
+#: lib/x509/output.c:2108 lib/x509/output.c:2506
 #, c-format
 msgid "\tVersion: %d\n"
 msgstr "\tVersio: %d\n"
 
-#: lib/openpgp/output.c:381
-#, c-format
-msgid "\tName[%d]: %s\n"
-msgstr "\tNomo[%d]: %s\n"
-
-#: lib/openpgp/output.c:386
-#, c-format
-msgid "\tRevoked Name[%d]: %s\n"
-msgstr "\tRevokita nomo[%d]: %s\n"
-
-#: lib/openpgp/output.c:407
-#, c-format
-msgid ""
-"\n"
-"\tSubkey[%d]:\n"
-msgstr ""
-"\n"
-"\tSubŝlosilo[%d]:\n"
-
-#: lib/openpgp/output.c:453
-#, c-format
-msgid "name[%d]: %s, "
-msgstr "nomo[%d]: %s, "
-
-#: lib/openpgp/output.c:458
-#, c-format
-msgid "revoked name[%d]: %s, "
-msgstr "revokita nomo[%d]: %s, "
-
-#: lib/openpgp/output.c:480
-msgid "fingerprint: "
-msgstr "fingropremo: "
-
-#: lib/openpgp/output.c:504
-#, c-format
-msgid "created: %s, "
-msgstr "kreita: %s, "
-
-#: lib/openpgp/output.c:514
-msgid "never expires, "
-msgstr "neniam senvalidiĝas, "
-
-#: lib/openpgp/output.c:527
-#, c-format
-msgid "expires: %s, "
-msgstr "senvalidiĝas: %s, "
-
-#: lib/openpgp/output.c:539
-#, c-format
-msgid "key algorithm %s (%d bits)"
-msgstr "ŝlosil-algoritmo %s (%d bitoj)"
-
-#: lib/openpgp/output.c:542
-#, c-format
-msgid "unknown key algorithm (%d)"
-msgstr "nekonata ŝlosil-algoritmo (%d)"
-
-#: lib/openpgp/output.c:584
-msgid "OpenPGP Certificate Information:\n"
-msgstr "Atestil-informo de OpenPGP:\n"
-
-#: lib/x509/ocsp_output.c:136 lib/x509/ocsp_output.c:500 lib/x509/output.c:2099
-#: lib/x509/output.c:2461
+#: lib/x509/ocsp_output.c:136 lib/x509/ocsp_output.c:500 lib/x509/output.c:2276
+#: lib/x509/output.c:2670
 msgid "\t\t\tASCII: "
 msgstr "\t\t\tASCII: "
 
-#: lib/x509/ocsp_output.c:141 lib/x509/ocsp_output.c:505 lib/x509/output.c:2103
-#: lib/x509/output.c:2466
+#: lib/x509/ocsp_output.c:141 lib/x509/ocsp_output.c:505 lib/x509/output.c:2280
+#: lib/x509/output.c:2675
 msgid "\t\t\tHexdump: "
 msgstr "\t\t\t16-uma nekropsio: "
 
@@ -1086,20 +1039,27 @@ msgstr "\t\tTiu ĉi ĝisdatigo: %s\n"
 msgid "\t\tNext Update: %s\n"
 msgstr "\t\tVenonta ĝisdatigo: %s\n"
 
-#: lib/x509/ocsp_output.c:525 lib/x509/output.c:1523 lib/x509/output.c:2182
-#: lib/x509/output.c:2331
+#: lib/x509/ocsp_output.c:524 lib/x509/output.c:1239 lib/x509/output.c:1510
+#: lib/x509/output.c:1636 lib/x509/output.c:1656 lib/x509/output.c:1700
+#: lib/x509/output.c:1928 lib/x509/output.c:1941 lib/x509/output.c:2355
+#: lib/x509/output.c:2483 lib/x509/output.c:2534
+msgid "unknown"
+msgstr "nekonata"
+
+#: lib/x509/ocsp_output.c:525 lib/x509/output.c:1704 lib/x509/output.c:2359
+#: lib/x509/output.c:2538
 #, c-format
 msgid "\tSignature Algorithm: %s\n"
 msgstr "\tSubskriba algoritmo: %s\n"
 
-#: lib/x509/ocsp_output.c:529 lib/x509/output.c:1528 lib/x509/output.c:2187
+#: lib/x509/ocsp_output.c:529 lib/x509/output.c:1711 lib/x509/output.c:2364
 msgid ""
 "warning: signed using a broken signature algorithm that can be forged.\n"
 msgstr ""
 "averto: subskribita uzante rompitan subskrib-algoritmon kiu povas esti "
 "imitata.\n"
 
-#: lib/x509/ocsp_output.c:543 lib/x509/output.c:1554 lib/x509/output.c:2213
+#: lib/x509/ocsp_output.c:543 lib/x509/output.c:1737 lib/x509/output.c:2390
 msgid "\tSignature:\n"
 msgstr "\tSubskribo:\n"
 
@@ -1107,67 +1067,62 @@ msgstr "\tSubskribo:\n"
 msgid "OCSP Response Information:\n"
 msgstr "Respond-informo de OCSP:\n"
 
-#: lib/x509/output.c:55
+#: lib/x509/output.c:54 lib/x509/output.c:84
 #, c-format
 msgid "%s%s: %.*s (contains illegal chars)\n"
 msgstr ""
 
-#: lib/x509/output.c:61
+#: lib/x509/output.c:60 lib/x509/output.c:90
 #, c-format
 msgid "%s%s: %.*s (%s)\n"
 msgstr ""
 
-#: lib/x509/output.c:69
-#, fuzzy, c-format
+#: lib/x509/output.c:68 lib/x509/output.c:98
+#, c-format
 msgid "%s%s: %.*s\n"
-msgstr "%s\t\t\taliNomo OID: %.*s\n"
+msgstr ""
 
-#: lib/x509/output.c:85
+#: lib/x509/output.c:114
 #, fuzzy
 msgid "warning: SAN contains an embedded NUL, replacing with '!'\n"
 msgstr "averto: altname enhavas enkorpigitan NUL, ni anstataŭigas per '!'\n"
 
-#: lib/x509/output.c:97
-#, c-format
-msgid "%sRFC822Name: %.*s\n"
-msgstr ""
-
-#: lib/x509/output.c:101
+#: lib/x509/output.c:130
 #, c-format
 msgid "%sURI: %.*s\n"
 msgstr ""
 
-#: lib/x509/output.c:115
+#: lib/x509/output.c:144
 #, fuzzy, c-format
 msgid "%sdirectoryName: %.*s\n"
 msgstr "%s\t\t\taliNomo OID: %.*s\n"
 
-#: lib/x509/output.c:119
+#: lib/x509/output.c:148
 #, fuzzy, c-format
 msgid "%sXMPP Address: %.*s\n"
 msgstr "%s\t\t\tAdreso XMPP: %.*s\n"
 
-#: lib/x509/output.c:123
+#: lib/x509/output.c:152
 #, c-format
 msgid "%sKRB5Principal: %.*s\n"
 msgstr ""
 
-#: lib/x509/output.c:127
+#: lib/x509/output.c:156
 #, c-format
 msgid "%sUnknown name: "
 msgstr ""
 
-#: lib/x509/output.c:269
+#: lib/x509/output.c:298
 #, c-format
 msgid "\t\t\tPath Length Constraint: %d\n"
 msgstr "\t\t\tLimigo de voj-longo: %d\n"
 
-#: lib/x509/output.c:271
+#: lib/x509/output.c:300
 #, c-format
 msgid "\t\t\tPolicy Language: %s"
 msgstr "\t\t\tLingvo de politiko: %s"
 
-#: lib/x509/output.c:279
+#: lib/x509/output.c:308
 msgid ""
 "\t\t\tPolicy:\n"
 "\t\t\t\tASCII: "
@@ -1175,7 +1130,7 @@ msgstr ""
 "\t\t\tPolitiko:\n"
 "\t\t\t\tASCII: "
 
-#: lib/x509/output.c:281
+#: lib/x509/output.c:310
 msgid ""
 "\n"
 "\t\t\t\tHexdump: "
@@ -1183,142 +1138,142 @@ msgstr ""
 "\n"
 "\t\t\t\t16-uma nekropsio: "
 
-#: lib/x509/output.c:314
+#: lib/x509/output.c:343
 #, c-format
 msgid "%s\t\t\tPermitted:\n"
 msgstr ""
 
-#: lib/x509/output.c:326
+#: lib/x509/output.c:355
 #, c-format
 msgid "%s\t\t\tExcluded:\n"
 msgstr ""
 
-#: lib/x509/output.c:366 lib/x509/output.c:368 lib/x509/output.c:370
+#: lib/x509/output.c:395 lib/x509/output.c:397 lib/x509/output.c:399
 #, fuzzy, c-format
 msgid "\t\t\tAccess Method: %s (%s)\n"
 msgstr "\t\t\tAlir-metodo: %.*s"
 
-#: lib/x509/output.c:474
+#: lib/x509/output.c:503
 #, c-format
 msgid "%sDigital signature.\n"
 msgstr "%sCifereca subskribo.\n"
 
-#: lib/x509/output.c:476
+#: lib/x509/output.c:505
 #, c-format
 msgid "%sNon repudiation.\n"
 msgstr "%sNe-repudio.\n"
 
-#: lib/x509/output.c:478
+#: lib/x509/output.c:507
 #, c-format
 msgid "%sKey encipherment.\n"
 msgstr "%sŜlosila ĉifrigo.\n"
 
-#: lib/x509/output.c:480
+#: lib/x509/output.c:509
 #, c-format
 msgid "%sData encipherment.\n"
 msgstr "%sDatumara ĉifrigo.\n"
 
-#: lib/x509/output.c:482
+#: lib/x509/output.c:511
 #, c-format
 msgid "%sKey agreement.\n"
 msgstr "%sŜlosila interakordo.\n"
 
-#: lib/x509/output.c:484
+#: lib/x509/output.c:513
 #, c-format
 msgid "%sCertificate signing.\n"
 msgstr "%sAtestila subskribo.\n"
 
-#: lib/x509/output.c:486
+#: lib/x509/output.c:515
 #, c-format
 msgid "%sCRL signing.\n"
 msgstr "%sSubskribo de CRL.\n"
 
-#: lib/x509/output.c:488
+#: lib/x509/output.c:517
 #, c-format
 msgid "%sKey encipher only.\n"
 msgstr "%sNur ŝlosil-ĉifrigo.\n"
 
-#: lib/x509/output.c:490
+#: lib/x509/output.c:519
 #, c-format
 msgid "%sKey decipher only.\n"
 msgstr "%sNur ŝlosil-malĉifrigo.\n"
 
-#: lib/x509/output.c:534
+#: lib/x509/output.c:563
 #, c-format
 msgid "\t\t\tNot Before: %s\n"
 msgstr "\t\t\tNe antaŭ ol: %s\n"
 
-#: lib/x509/output.c:543
+#: lib/x509/output.c:572
 #, c-format
 msgid "\t\t\tNot After: %s\n"
 msgstr "\t\t\tNe post: %s\n"
 
-#: lib/x509/output.c:621
+#: lib/x509/output.c:650
 #, c-format
 msgid "%s\t\t\tTLS WWW Server.\n"
 msgstr "%s\t\t\tServilo TLS WWW.\n"
 
-#: lib/x509/output.c:623
+#: lib/x509/output.c:652
 #, c-format
 msgid "%s\t\t\tTLS WWW Client.\n"
 msgstr "%s\t\t\tKliento TLS WWW.\n"
 
-#: lib/x509/output.c:625
+#: lib/x509/output.c:654
 #, c-format
 msgid "%s\t\t\tCode signing.\n"
 msgstr "%s\t\t\tSubskribo de kodo.\n"
 
-#: lib/x509/output.c:627
+#: lib/x509/output.c:656
 #, c-format
 msgid "%s\t\t\tEmail protection.\n"
 msgstr "%s\t\t\tRetadresa protekto.\n"
 
-#: lib/x509/output.c:630
+#: lib/x509/output.c:659
 #, c-format
 msgid "%s\t\t\tTime stamping.\n"
 msgstr "%s\t\t\tTempindikigo.\n"
 
-#: lib/x509/output.c:632
+#: lib/x509/output.c:661
 #, c-format
 msgid "%s\t\t\tOCSP signing.\n"
 msgstr "%s\t\t\tSubskribo de OCSP.\n"
 
-#: lib/x509/output.c:634
+#: lib/x509/output.c:663
 #, c-format
 msgid "%s\t\t\tIpsec IKE.\n"
 msgstr "%s\t\t\tIpsec IKE.\n"
 
-#: lib/x509/output.c:636
+#: lib/x509/output.c:665
 #, c-format
 msgid "%s\t\t\tAny purpose.\n"
 msgstr "%s\t\t\tIu ajn celo.\n"
 
-#: lib/x509/output.c:659
+#: lib/x509/output.c:688
 #, c-format
 msgid "%s\t\t\tCertificate Authority (CA): FALSE\n"
 msgstr "%s\t\t\tAtestila aŭtoritato (CA): FALSA\n"
 
-#: lib/x509/output.c:662
+#: lib/x509/output.c:691
 #, c-format
 msgid "%s\t\t\tCertificate Authority (CA): TRUE\n"
 msgstr "%s\t\t\tAtestila aŭtoritato (CA): VERA\n"
 
-#: lib/x509/output.c:666
+#: lib/x509/output.c:695
 #, c-format
 msgid "%s\t\t\tPath Length Constraint: %d\n"
 msgstr "%s\t\t\tLimigo de voj-longo: %d\n"
 
-#: lib/x509/output.c:722
+#: lib/x509/output.c:751
 #, c-format
 msgid "%s\t\t\totherName OID: %.*s\n"
 msgstr "%s\t\t\taliNomo OID: %.*s\n"
 
-#: lib/x509/output.c:724
+#: lib/x509/output.c:753
 #, c-format
 msgid "%s\t\t\totherName DER: "
 msgstr "%s\t\t\taliNomo DER: "
 
-#: lib/x509/output.c:727
+#: lib/x509/output.c:756
 #, c-format
 msgid ""
 "\n"
@@ -1327,233 +1282,273 @@ msgstr ""
 "\n"
 "%s\t\t\taliNomo ASCII: "
 
-#: lib/x509/output.c:867
+#: lib/x509/output.c:896
 #, c-format
 msgid "%s\t\tBasic Constraints (%s):\n"
 msgstr "%s\t\tBazaj limigoj (%s):\n"
 
-#: lib/x509/output.c:869 lib/x509/output.c:883 lib/x509/output.c:928
-#: lib/x509/output.c:958 lib/x509/output.c:970 lib/x509/output.c:985
-#: lib/x509/output.c:997 lib/x509/output.c:1010 lib/x509/output.c:1022
-#: lib/x509/output.c:1036 lib/x509/output.c:1050 lib/x509/output.c:1058
-#: lib/x509/output.c:1069 lib/x509/output.c:1080 lib/x509/output.c:1088
-#: lib/x509/output.c:2040 lib/x509/output.c:2065 lib/x509/output.c:2085
+#: lib/x509/output.c:898 lib/x509/output.c:912 lib/x509/output.c:957
+#: lib/x509/output.c:991 lib/x509/output.c:1004 lib/x509/output.c:1016
+#: lib/x509/output.c:1031 lib/x509/output.c:1043 lib/x509/output.c:1056
+#: lib/x509/output.c:1068 lib/x509/output.c:1082 lib/x509/output.c:1096
+#: lib/x509/output.c:1104 lib/x509/output.c:1115 lib/x509/output.c:1126
+#: lib/x509/output.c:1134 lib/x509/output.c:2217 lib/x509/output.c:2242
+#: lib/x509/output.c:2262
 msgid "critical"
 msgstr "gravega"
 
-#: lib/x509/output.c:869 lib/x509/output.c:883 lib/x509/output.c:929
-#: lib/x509/output.c:958 lib/x509/output.c:970 lib/x509/output.c:985
-#: lib/x509/output.c:997 lib/x509/output.c:1010 lib/x509/output.c:1022
-#: lib/x509/output.c:1036 lib/x509/output.c:1050 lib/x509/output.c:1058
-#: lib/x509/output.c:1069 lib/x509/output.c:1080 lib/x509/output.c:1088
-#: lib/x509/output.c:2041 lib/x509/output.c:2066 lib/x509/output.c:2086
+#: lib/x509/output.c:898 lib/x509/output.c:912 lib/x509/output.c:958
+#: lib/x509/output.c:992 lib/x509/output.c:1004 lib/x509/output.c:1016
+#: lib/x509/output.c:1031 lib/x509/output.c:1043 lib/x509/output.c:1056
+#: lib/x509/output.c:1068 lib/x509/output.c:1082 lib/x509/output.c:1096
+#: lib/x509/output.c:1104 lib/x509/output.c:1115 lib/x509/output.c:1126
+#: lib/x509/output.c:1134 lib/x509/output.c:2218 lib/x509/output.c:2243
+#: lib/x509/output.c:2263
 msgid "not critical"
 msgstr "ne gravega"
 
-#: lib/x509/output.c:881
+#: lib/x509/output.c:910
 #, c-format
 msgid "%s\t\tSubject Key Identifier (%s):\n"
 msgstr "%s\t\tTema ŝlosil-identiganto (%s):\n"
 
-#: lib/x509/output.c:956
+#: lib/x509/output.c:1002
 #, c-format
 msgid "%s\t\tAuthority Key Identifier (%s):\n"
 msgstr "%s\t\tAŭtoritata ŝlosil-identiganto (%s):\n"
 
-#: lib/x509/output.c:969
+#: lib/x509/output.c:1015
 #, c-format
 msgid "%s\t\tKey Usage (%s):\n"
 msgstr "%s\t\tŜlosila uzmaniero (%s):\n"
 
-#: lib/x509/output.c:983
+#: lib/x509/output.c:1029
 #, c-format
 msgid "%s\t\tPrivate Key Usage Period (%s):\n"
 msgstr "%s\t\tTempo por uzado de privata ŝlosilo (%s):\n"
 
-#: lib/x509/output.c:996
+#: lib/x509/output.c:1042
 #, c-format
 msgid "%s\t\tKey Purpose (%s):\n"
 msgstr "%s\t\tŜlosila celo (%s):\n"
 
-#: lib/x509/output.c:1008
+#: lib/x509/output.c:1054
 #, c-format
 msgid "%s\t\tSubject Alternative Name (%s):\n"
 msgstr "%s\t\tNomo de temo-alternativo (%s):\n"
 
-#: lib/x509/output.c:1020
+#: lib/x509/output.c:1066
 #, c-format
 msgid "%s\t\tIssuer Alternative Name (%s):\n"
 msgstr "%s\t\tNomo de eldonant-alternativo (%s):\n"
 
-#: lib/x509/output.c:1034
+#: lib/x509/output.c:1080
 #, c-format
 msgid "%s\t\tCRL Distribution points (%s):\n"
 msgstr "%s\t\tDistribu-pukntoj de CRL (%s):\n"
 
-#: lib/x509/output.c:1048
+#: lib/x509/output.c:1094
 #, c-format
 msgid "%s\t\tProxy Certificate Information (%s):\n"
 msgstr "%s\t\tProkuril-atestila informo (%s):\n"
 
-#: lib/x509/output.c:1056
+#: lib/x509/output.c:1102
 #, c-format
 msgid "%s\t\tAuthority Information Access (%s):\n"
 msgstr "%s\t\tAŭtoritat-informa aliro (%s):\n"
 
-#: lib/x509/output.c:1068
+#: lib/x509/output.c:1114
 #, fuzzy, c-format
 msgid "%s\t\tName Constraints (%s):\n"
 msgstr "%s\t\tBazaj limigoj (%s):\n"
 
-#: lib/x509/output.c:1078
+#: lib/x509/output.c:1124
 #, fuzzy, c-format
 msgid "%s\t\tTLS Features (%s):\n"
 msgstr "%s\t\tŜlosila celo (%s):\n"
 
-#: lib/x509/output.c:1086
+#: lib/x509/output.c:1132
 #, c-format
 msgid "%s\t\tUnknown extension %s (%s):\n"
 msgstr "%s\t\tNekonata etendo %s (%s):\n"
 
-#: lib/x509/output.c:1090
+#: lib/x509/output.c:1136
 #, c-format
 msgid "%s\t\t\tASCII: "
 msgstr "%s\t\t\tASCII: "
 
-#: lib/x509/output.c:1094
+#: lib/x509/output.c:1140
 #, c-format
 msgid "%s\t\t\tHexdump: "
 msgstr "%s\t\t\t16-uma nekropsio: "
 
-#: lib/x509/output.c:1143
+#: lib/x509/output.c:1189
 #, c-format
 msgid "%s\tExtensions:\n"
 msgstr "%s\tEtendoj:\n"
 
-#: lib/x509/output.c:1182
+#: lib/x509/output.c:1241
 #, c-format
 msgid "\t%sPublic Key Algorithm: %s\n"
 msgstr "\t%sPublik-ŝlosila algoritmo: %s\n"
 
-#: lib/x509/output.c:1183
+#: lib/x509/output.c:1243
 #, c-format
 msgid "\tAlgorithm Security Level: %s (%d bits)\n"
 msgstr "\tAlgoritma sekureca nivelo: %s (%d bitoj)\n"
 
-#: lib/x509/output.c:1199
+#: lib/x509/output.c:1248
+msgid "\t\tParameters:\n"
+msgstr ""
+
+#: lib/x509/output.c:1268
 #, c-format
 msgid "\t\tModulus (bits %d): "
 msgstr "\t\tDividresto (bitoj %d): "
 
-#: lib/x509/output.c:1206
+#: lib/x509/output.c:1275
 #, c-format
 msgid "\t\tExponent (bits %d): "
 msgstr "\t\tEksponanto (bitoj %d): "
 
-#: lib/x509/output.c:1221
+#: lib/x509/output.c:1283
+#, c-format
+msgid "\t\tModulus (bits %d):\n"
+msgstr "\t\tDividresto (bitoj %d):\n"
+
+#: lib/x509/output.c:1290
 #, c-format
 msgid "\t\tExponent (bits %d):\n"
 msgstr "\t\tEksponanto (bitoj %d):\n"
 
-#: lib/x509/output.c:1247
+#: lib/x509/output.c:1317 lib/x509/output.c:1437
 #, c-format
 msgid "\t\tCurve:\t%s\n"
 msgstr "\t\tKurbo:\t%s\n"
 
-#: lib/x509/output.c:1251
+#: lib/x509/output.c:1321 lib/x509/output.c:1447
 msgid "\t\tX: "
 msgstr "\t\tX: "
 
-#: lib/x509/output.c:1256
+#: lib/x509/output.c:1327 lib/x509/output.c:1452
 msgid "\t\tY: "
 msgstr "\t\tY: "
 
-#: lib/x509/output.c:1262
+#: lib/x509/output.c:1334 lib/x509/output.c:1458
 msgid "\t\tX:\n"
 msgstr "\t\tX:\n"
 
-#: lib/x509/output.c:1293
+#: lib/x509/output.c:1339 lib/x509/output.c:1462
+msgid "\t\tY:\n"
+msgstr "\t\tY:\n"
+
+#: lib/x509/output.c:1367
 #, c-format
 msgid "\t\tPublic key (bits %d): "
 msgstr "\t\tPublika ŝlosilo (bitoj %d): "
 
-#: lib/x509/output.c:1299
+#: lib/x509/output.c:1373
 msgid "\t\tP: "
 msgstr "\t\tP: "
 
-#: lib/x509/output.c:1304
+#: lib/x509/output.c:1378
 msgid "\t\tQ: "
 msgstr "\t\tQ: "
 
-#: lib/x509/output.c:1309
+#: lib/x509/output.c:1383
 msgid "\t\tG: "
 msgstr "\t\tG: "
 
-#: lib/x509/output.c:1365 lib/x509/output.c:2266
+#: lib/x509/output.c:1391
+#, c-format
+msgid "\t\tPublic key (bits %d):\n"
+msgstr "\t\tPublika ŝlosilo (bitoj %d):\n"
+
+#: lib/x509/output.c:1396
+msgid "\t\tP:\n"
+msgstr "\t\tP:\n"
+
+#: lib/x509/output.c:1400
+msgid "\t\tQ:\n"
+msgstr "\t\tQ:\n"
+
+#: lib/x509/output.c:1404
+msgid "\t\tG:\n"
+msgstr "\t\tG:\n"
+
+#: lib/x509/output.c:1439
+#, fuzzy, c-format
+msgid "\t\tDigest:\t%s\n"
+msgstr "\t\tKurbo:\t%s\n"
+
+#: lib/x509/output.c:1441
+#, fuzzy, c-format
+msgid "\t\tParamSet: %s\n"
+msgstr "\t\tKreo: %s\n"
+
+#: lib/x509/output.c:1554 lib/x509/output.c:2473
 msgid "Subject "
 msgstr "Temo "
 
-#: lib/x509/output.c:1413
+#: lib/x509/output.c:1590
 msgid "\tSerial Number (hex): "
 msgstr "\tSeri-numero (16-ume): "
 
-#: lib/x509/output.c:1426 lib/x509/output.c:1941
+#: lib/x509/output.c:1603 lib/x509/output.c:2118
 #, fuzzy
 msgid "\tIssuer:\n"
 msgstr "\tEldonanto: %s\n"
 
-#: lib/x509/output.c:1431 lib/x509/output.c:1946
+#: lib/x509/output.c:1608 lib/x509/output.c:2123
 #, c-format
 msgid "\tIssuer: %s\n"
 msgstr "\tEldonanto: %s\n"
 
-#: lib/x509/output.c:1440
+#: lib/x509/output.c:1617
 msgid "\tValidity:\n"
 msgstr "\tValideco:\n"
 
-#: lib/x509/output.c:1457
+#: lib/x509/output.c:1634 lib/x509/output.c:1636
 #, c-format
 msgid "\t\tNot Before: %s\n"
 msgstr "\t\tNe antaŭ ol: %s\n"
 
-#: lib/x509/output.c:1475
+#: lib/x509/output.c:1654 lib/x509/output.c:1656
 #, c-format
 msgid "\t\tNot After: %s\n"
 msgstr "\t\tNe post: %s\n"
 
-#: lib/x509/output.c:1486 lib/x509/output.c:2309
+#: lib/x509/output.c:1667 lib/x509/output.c:2516
 #, fuzzy
 msgid "\tSubject:\n"
 msgstr "\tTemo: %s\n"
 
-#: lib/x509/output.c:1491 lib/x509/output.c:2314
+#: lib/x509/output.c:1672 lib/x509/output.c:2521
 #, c-format
 msgid "\tSubject: %s\n"
 msgstr "\tTemo: %s\n"
 
-#: lib/x509/output.c:1568
+#: lib/x509/output.c:1751
 #, fuzzy
 msgid "\tFingerprint:\n"
 msgstr "fingropremo: "
 
-#: lib/x509/output.c:1577
+#: lib/x509/output.c:1760
 msgid "\t\tsha1:"
 msgstr ""
 
-#: lib/x509/output.c:1588
+#: lib/x509/output.c:1771
 msgid "\t\tsha256:"
 msgstr ""
 
-#: lib/x509/output.c:1622
+#: lib/x509/output.c:1805
 #, fuzzy, c-format
 msgid ""
 "%sPublic Key ID:\n"
 "%s\tsha1:"
-msgstr ""
-"\tPublik-ŝlosila Id:\n"
-"\t\t"
+msgstr "Publik-ŝlosila ID: "
 
-#: lib/x509/output.c:1628
+#: lib/x509/output.c:1811
 #, fuzzy, c-format
 msgid ""
 "%sPublic Key PIN:\n"
@@ -1562,143 +1557,139 @@ msgstr ""
 "\tPublik-ŝlosila Id:\n"
 "\t\t"
 
-#: lib/x509/output.c:1676
-msgid "\tPublic key's random art:\n"
-msgstr "\tHazarda artaĵo de fingropremo:\n"
-
-#: lib/x509/output.c:1703
+#: lib/x509/output.c:1883
 #, fuzzy
 msgid "no subject,"
 msgstr "Temo "
 
-#: lib/x509/output.c:1719
+#: lib/x509/output.c:1899
 msgid "no issuer,"
 msgstr ""
 
-#: lib/x509/output.c:1766
+#: lib/x509/output.c:1946
 #, c-format
 msgid "signed using %s (broken!), "
 msgstr "subskribita uzante %s (fuŝita!), "
 
-#: lib/x509/output.c:1768
+#: lib/x509/output.c:1948
 #, c-format
 msgid "signed using %s, "
 msgstr "subskribita uzante %s, "
 
-#: lib/x509/output.c:1907
+#: lib/x509/output.c:2084
 msgid "X.509 Certificate Information:\n"
 msgstr "Atestil-informo de X.509:\n"
 
-#: lib/x509/output.c:1911 lib/x509/output.c:2512
+#: lib/x509/output.c:2088 lib/x509/output.c:2728
 msgid "Other Information:\n"
 msgstr "Alia informo:\n"
 
-#: lib/x509/output.c:1926
+#: lib/x509/output.c:2103
 msgid "\tVersion: 1 (default)\n"
 msgstr "\tVersio: 1 (apriora)\n"
 
-#: lib/x509/output.c:1955
+#: lib/x509/output.c:2132
 msgid "\tUpdate dates:\n"
 msgstr "\tĜisdatigaj datoj:\n"
 
-#: lib/x509/output.c:1972
+#: lib/x509/output.c:2149
 #, c-format
 msgid "\t\tIssued: %s\n"
 msgstr "\t\tEldonita: %s\n"
 
-#: lib/x509/output.c:1992
+#: lib/x509/output.c:2169
 #, c-format
 msgid "\t\tNext at: %s\n"
 msgstr "\t\tVenonta ĉe: %s\n"
 
-#: lib/x509/output.c:2023
+#: lib/x509/output.c:2200
 msgid "\tExtensions:\n"
 msgstr "\tEtendoj:\n"
 
-#: lib/x509/output.c:2039
+#: lib/x509/output.c:2216
 #, c-format
 msgid "\t\tCRL Number (%s): "
 msgstr "\t\tNumero CRL (%s): "
 
-#: lib/x509/output.c:2064
+#: lib/x509/output.c:2241
 #, c-format
 msgid "\t\tAuthority Key Identifier (%s):\n"
 msgstr "\t\tAŭtoritata ŝlosil-identiganto (%s):\n"
 
-#: lib/x509/output.c:2083
+#: lib/x509/output.c:2260
 #, c-format
 msgid "\t\tUnknown extension %s (%s):\n"
 msgstr "\t\tNekonata etendo %s (%s):\n"
 
-#: lib/x509/output.c:2120
+#: lib/x509/output.c:2297
 #, c-format
 msgid "\tRevoked certificates (%d):\n"
 msgstr "\tRevokitaj atestiloj (%d):\n"
 
-#: lib/x509/output.c:2123
+#: lib/x509/output.c:2300
 msgid "\tNo revoked certificates.\n"
 msgstr "\tNeniu revokita atestilo.\n"
 
-#: lib/x509/output.c:2144
+#: lib/x509/output.c:2321
 msgid "\t\tSerial Number (hex): "
 msgstr "\t\tSeri-numero (16-ume): "
 
-#: lib/x509/output.c:2162
+#: lib/x509/output.c:2339
 #, c-format
 msgid "\t\tRevoked at: %s\n"
 msgstr "\t\tRevokita ĉe: %s\n"
 
-#: lib/x509/output.c:2244
+#: lib/x509/output.c:2421
 msgid "X.509 Certificate Revocation List Information:\n"
 msgstr "Informo de atestil-revoka listo de X.509:\n"
 
-#: lib/x509/output.c:2362
+#: lib/x509/output.c:2571
 msgid "\tAttributes:\n"
 msgstr "\tAtributoj:\n"
 
-#: lib/x509/output.c:2419
+#: lib/x509/output.c:2628
 #, c-format
 msgid "\t\tChallenge password: %s\n"
 msgstr "\t\tDefia pasvorto: %s\n"
 
-#: lib/x509/output.c:2429
+#: lib/x509/output.c:2638
 #, c-format
 msgid "\t\tUnknown attribute %s:\n"
 msgstr "\t\tNekonata atributo %s:\n"
 
-#: lib/x509/output.c:2508
+#: lib/x509/output.c:2724
 msgid "PKCS #10 Certificate Request Information:\n"
 msgstr "Atestil-peta informo de PKCS #10:\n"
 
-#: lib/x509/output.c:2535
+#: lib/x509/output.c:2751
 msgid "Public Key Usage:\n"
 msgstr "Uzado de publik-ŝlosilo:\n"
 
-#: lib/x509/output.c:2570
+#: lib/x509/output.c:2791
 msgid "Public Key Information:\n"
 msgstr "Publik-ŝlosila informo:\n"
 
-#: libdane/dane.c:1040
+#: libdane/dane.c:1050
 #, fuzzy
 msgid "Certificate matches. "
 msgstr "Atestilo malĝustas"
 
-#: libdane/dane.c:1043
+#: libdane/dane.c:1053
 #, fuzzy
 msgid "Verification failed. "
 msgstr "Malĉifro fiaskis"
 
-#: libdane/dane.c:1048
+#: libdane/dane.c:1058
 #, fuzzy
 msgid "CA constrains were violated. "
 msgstr "Kelkaj limigoj estis atingataj."
 
-#: libdane/dane.c:1052
+#: libdane/dane.c:1062
 #, fuzzy
 msgid "The certificate differs. "
 msgstr "Atestilo malĝustas"
 
-#: libdane/dane.c:1057
+#: libdane/dane.c:1067
 msgid "There were no DANE information. "
 msgstr ""
 
@@ -1756,22 +1747,102 @@ msgstr ""
 msgid "Error in file."
 msgstr "Eraro en pasvorta dosiero."
 
-#, fuzzy
-#~ msgid ""
-#~ "\t%s fingerprint:\n"
-#~ "\t\t"
-#~ msgstr ""
-#~ "\tFingropremo MD5:\n"
-#~ "\t\t"
-
-#~ msgid "Public Key ID: "
-#~ msgstr "Publik-ŝlosila ID: "
-
 #~ msgid "Received a TLS/IA Intermediate Phase Finished message"
 #~ msgstr "Ricevita mesaĝo: 'TLS/IA intermeza fazo finis'"
 
 #~ msgid "Received a TLS/IA Final Phase Finished message"
 #~ msgstr "Ricevita mesaĝo: 'TLS/IA fina fazo finis'"
+
+#~ msgid "\t\tKey Usage:\n"
+#~ msgstr "\t\tŜlosila uzmaniero:\n"
+
+#~ msgid "error: get_key_usage: %s\n"
+#~ msgstr "eraro: get_key_usage: %s\n"
+
+#~ msgid "\t\t\tDigital signatures.\n"
+#~ msgstr "\t\t\tCiferecaj subskriboj.\n"
+
+#~ msgid "\t\t\tCommunications encipherment.\n"
+#~ msgstr "\t\t\tKomunikada ĉifrigo.\n"
+
+#~ msgid "\t\t\tStorage data encipherment.\n"
+#~ msgstr "\t\t\tKonserv-datumara ĉifrigo.\n"
+
+#~ msgid "\t\t\tAuthentication.\n"
+#~ msgstr "\t\t\tAŭtentikigo.\n"
+
+#~ msgid "\t\t\tCertificate signing.\n"
+#~ msgstr "\t\t\tSubskribo de atestilo.\n"
+
+#~ msgid "\tID (hex): "
+#~ msgstr "\tID (16-ume): "
+
+#~ msgid "\tFingerprint (hex): "
+#~ msgstr "\tFingropremo (16-ume): "
+
+#~ msgid "\tFingerprint's random art:\n"
+#~ msgstr "\tHazarda artaĵo de fingropremo:\n"
+
+#~ msgid "\tRevoked: True\n"
+#~ msgstr "\tRevokita: vere\n"
+
+#~ msgid "\tRevoked: False\n"
+#~ msgstr "\tRevokita: false\n"
+
+#~ msgid "\tTime stamps:\n"
+#~ msgstr "\tTempindikoj:\n"
+
+#~ msgid "\t\tExpiration: Never\n"
+#~ msgstr "\t\tLimdato: Neniam\n"
+
+#~ msgid "\t\tExpiration: %s\n"
+#~ msgstr "\t\tLimdato: %s\n"
+
+#~ msgid "\tPublic Key Algorithm: %s\n"
+#~ msgstr "\tPublik-ŝlosila algoritmo: %s\n"
+
+#~ msgid "\tKey Security Level: %s\n"
+#~ msgstr "\tŜlosila sekurec-nivelo: %s\n"
+
+#~ msgid "\t\tExponent:\n"
+#~ msgstr "\t\tEksponento:\n"
+
+#~ msgid "\tName[%d]: %s\n"
+#~ msgstr "\tNomo[%d]: %s\n"
+
+#~ msgid "\tRevoked Name[%d]: %s\n"
+#~ msgstr "\tRevokita nomo[%d]: %s\n"
+
+#~ msgid ""
+#~ "\n"
+#~ "\tSubkey[%d]:\n"
+#~ msgstr ""
+#~ "\n"
+#~ "\tSubŝlosilo[%d]:\n"
+
+#~ msgid "name[%d]: %s, "
+#~ msgstr "nomo[%d]: %s, "
+
+#~ msgid "revoked name[%d]: %s, "
+#~ msgstr "revokita nomo[%d]: %s, "
+
+#~ msgid "created: %s, "
+#~ msgstr "kreita: %s, "
+
+#~ msgid "never expires, "
+#~ msgstr "neniam senvalidiĝas, "
+
+#~ msgid "expires: %s, "
+#~ msgstr "senvalidiĝas: %s, "
+
+#~ msgid "key algorithm %s (%d bits)"
+#~ msgstr "ŝlosil-algoritmo %s (%d bitoj)"
+
+#~ msgid "unknown key algorithm (%d)"
+#~ msgstr "nekonata ŝlosil-algoritmo (%d)"
+
+#~ msgid "OpenPGP Certificate Information:\n"
+#~ msgstr "Atestil-informo de OpenPGP:\n"
 
 #~ msgid ""
 #~ "warning: distributionPoint contains an embedded NUL, replacing with '!'\n"
@@ -1780,11 +1851,21 @@ msgstr "Eraro en pasvorta dosiero."
 #~ "'!'\n"
 
 #~ msgid ""
+#~ "\tMD5 fingerprint:\n"
+#~ "\t\t"
+#~ msgstr ""
+#~ "\tFingropremo MD5:\n"
+#~ "\t\t"
+
+#~ msgid ""
 #~ "\tSHA-1 fingerprint:\n"
 #~ "\t\t"
 #~ msgstr ""
 #~ "\tFingropremo SHA-1:\n"
 #~ "\t\t"
+
+#~ msgid "\tPublic key's random art:\n"
+#~ msgstr "\tHazarda artaĵo de fingropremo:\n"
 
 #~ msgid "PKCS #11 error in PIN."
 #~ msgstr "Eraro PKCS #11 en PIN."

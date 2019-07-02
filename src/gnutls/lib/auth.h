@@ -16,12 +16,12 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
-#ifndef GNUTLS_AUTH_H
-#define GNUTLS_AUTH_H
+#ifndef GNUTLS_LIB_AUTH_H
+#define GNUTLS_LIB_AUTH_H
 
 #include "str.h"
 
@@ -54,10 +54,10 @@ typedef struct mod_auth_st_int {
 } mod_auth_st;
 
 const void *_gnutls_get_cred(gnutls_session_t session,
-			     gnutls_credentials_type_t kx);
+			     gnutls_credentials_type_t type);
 const void *_gnutls_get_kx_cred(gnutls_session_t session,
 				gnutls_kx_algorithm_t algo);
-int _gnutls_auth_info_set(gnutls_session_t session,
+int _gnutls_auth_info_init(gnutls_session_t session,
 			  gnutls_credentials_type_t type, int size,
 			  int allow_change);
 
@@ -83,4 +83,4 @@ void *_gnutls_get_auth_info(gnutls_session_t session, gnutls_credentials_type_t 
 		return NULL;
 }
 
-#endif
+#endif /* GNUTLS_LIB_AUTH_H */

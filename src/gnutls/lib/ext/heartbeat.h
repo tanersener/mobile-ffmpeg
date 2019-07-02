@@ -17,14 +17,14 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
-#ifndef EXT_HEARTBEAT_H
-#define EXT_HEARTBEAT_H
+#ifndef GNUTLS_LIB_EXT_HEARTBEAT_H
+#define GNUTLS_LIB_EXT_HEARTBEAT_H
 
-#include <extensions.h>
+#include <hello_ext.h>
 
 #define HEARTBEAT_REQUEST 1
 #define HEARTBEAT_RESPONSE 2
@@ -36,8 +36,9 @@
 
 #define HEARTBEAT_DEFAULT_POLICY PEER_NOT_ALLOWED_TO_SEND
 
-extern const extension_entry_st ext_mod_heartbeat;
+extern const hello_ext_entry_st ext_mod_heartbeat;
 
 int _gnutls_heartbeat_handle(gnutls_session_t session, mbuffer_st * bufel);
 int _gnutls_heartbeat_enabled(gnutls_session_t session, int local);
-#endif
+
+#endif /* GNUTLS_LIB_EXT_HEARTBEAT_H */

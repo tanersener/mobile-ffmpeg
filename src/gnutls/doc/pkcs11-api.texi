@@ -62,8 +62,8 @@ negative error value.
 
 This function will copy a public key object into a PKCS @code{11}  token specified by
 a URL. Valid flags to mark the key: @code{GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED} ,
-@code{GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE} , @code{GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE} ,
-@code{GNUTLS_PKCS11_OBJ_FLAG_MARK_CA} , @code{GNUTLS_PKCS11_OBJ_FLAG_MARK_ALWAYS_AUTH} .
+@code{GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE} , @code{GNUTLS_PKCS11_OBJ_FLAG_MARK_CA} ,
+@code{GNUTLS_PKCS11_OBJ_FLAG_MARK_ALWAYS_AUTH} .
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.
@@ -128,8 +128,8 @@ negative error value.
 
 This function will copy a certificate into a PKCS @code{11}  token specified by
 a URL. Valid flags to mark the certificate: @code{GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED} ,
-@code{GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE} , @code{GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE} ,
-@code{GNUTLS_PKCS11_OBJ_FLAG_MARK_CA} , @code{GNUTLS_PKCS11_OBJ_FLAG_MARK_ALWAYS_AUTH} .
+@code{GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE} , @code{GNUTLS_PKCS11_OBJ_FLAG_MARK_CA} ,
+@code{GNUTLS_PKCS11_OBJ_FLAG_MARK_ALWAYS_AUTH} .
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.
@@ -151,8 +151,10 @@ negative error value.
 @var{flags}: One of GNUTLS_PKCS11_OBJ_* flags
 
 This function will copy a private key into a PKCS @code{11}  token specified by
-a URL. It is highly recommended flags to contain @code{GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE} 
-unless there is a strong reason not to.
+a URL.
+
+Since 3.6.3 the objects are marked as sensitive by default unless
+@code{GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_SENSITIVE}  is specified.
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.
@@ -176,8 +178,10 @@ negative error value.
 @var{flags}: One of GNUTLS_PKCS11_OBJ_* flags
 
 This function will copy a private key into a PKCS @code{11}  token specified by
-a URL. It is highly recommended flags to contain @code{GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE} 
-unless there is a strong reason not to.
+a URL.
+
+Since 3.6.3 the objects are marked as sensitive by default unless
+@code{GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_SENSITIVE}  is specified.
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.
@@ -268,7 +272,7 @@ This function will return the callback function set using
 
 This function will return the issuer of a given certificate, if it
 is stored in the token. By default only marked as trusted issuers
-are retuned. If any issuer should be returned specify
+are returned. If any issuer should be returned specify
 @code{GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_ANY}  in  @code{flags} .
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
@@ -292,7 +296,7 @@ negative error value.
 
 This function will return the certificate with the given DN, if it
 is stored in the token. By default only marked as trusted issuers
-are retuned. If any issuer should be returned specify
+are returned. If any issuer should be returned specify
 @code{GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_ANY}  in  @code{flags} .
 
 The name of the function includes issuer because it can
@@ -321,7 +325,7 @@ negative error value.
 
 This function will return the certificate with the given DN and  @code{spki} , if it
 is stored in the token. By default only marked as trusted issuers
-are retuned. If any issuer should be returned specify
+are returned. If any issuer should be returned specify
 @code{GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_ANY}  in  @code{flags} .
 
 The name of the function includes issuer because it can
@@ -378,7 +382,7 @@ This function will deinitialize a certificate structure.
 replaced by the actual size of parameters)
 
 This function will export the PKCS11 object data.  It is normal for
-data to be inaccesible and in that case @code{GNUTLS_E_INVALID_REQUEST} 
+data to be inaccessible and in that case @code{GNUTLS_E_INVALID_REQUEST} 
 will be returned.
 
 If the buffer provided is not long enough to hold the output, then
@@ -399,7 +403,7 @@ returned, and @code{GNUTLS_E_SUCCESS}  (0) on success.
 @var{out}: will contain the object data
 
 This function will export the PKCS11 object data.  It is normal for
-data to be inaccesible and in that case @code{GNUTLS_E_INVALID_REQUEST} 
+data to be inaccessible and in that case @code{GNUTLS_E_INVALID_REQUEST} 
 will be returned.
 
 The output buffer is allocated using @code{gnutls_malloc()} .
@@ -420,7 +424,7 @@ returned, and @code{GNUTLS_E_SUCCESS}  (0) on success.
 @var{out}: will contain the object data
 
 This function will export the PKCS11 object data.  It is normal for
-data to be inaccesible and in that case @code{GNUTLS_E_INVALID_REQUEST} 
+data to be inaccessible and in that case @code{GNUTLS_E_INVALID_REQUEST} 
 will be returned.
 
 The output buffer is allocated using @code{gnutls_malloc()} .
@@ -511,16 +515,48 @@ negative error value.
 
 @var{output}: where output will be stored
 
-@var{output_size}: contains the maximum size of the output and will be overwritten with actual
+@var{output_size}: contains the maximum size of the output buffer and will be
+overwritten with the actual size.
 
 This function will return information about the PKCS11 certificate
 such as the label, id as well as token information where the key is
-stored. When output is text it returns null terminated string
-although  @code{output_size} contains the size of the actual data only.
+stored.
+
+When output is text, a null terminated string is written to  @code{output} and its
+string length is written to  @code{output_size} (without null terminator). If the
+buffer is too small,  @code{output_size} will contain the expected buffer size
+(with null terminator for text) and return @code{GNUTLS_E_SHORT_MEMORY_BUFFER} .
+
+In versions previously to 3.6.0 this function included the null terminator
+to  @code{output_size} . After 3.6.0 the output size doesn't include the terminator character.
 
 @strong{Returns:} @code{GNUTLS_E_SUCCESS}  (0) on success or a negative error code on error.
 
 @strong{Since:} 2.12.0
+@end deftypefun
+
+@subheading gnutls_pkcs11_obj_get_ptr
+@anchor{gnutls_pkcs11_obj_get_ptr}
+@deftypefun {int} {gnutls_pkcs11_obj_get_ptr} (gnutls_pkcs11_obj_t @var{obj}, void ** @var{ptr}, void ** @var{session}, void ** @var{ohandle}, unsigned long * @var{slot_id}, unsigned int @var{flags})
+@var{obj}: should contain a @code{gnutls_pkcs11_obj_t}  type
+
+@var{ptr}: will contain the CK_FUNCTION_LIST_PTR pointer (may be @code{NULL} )
+
+@var{session}: will contain the CK_SESSION_HANDLE of the object
+
+@var{ohandle}: will contain the CK_OBJECT_HANDLE of the object
+
+@var{slot_id}: the identifier of the slot (may be @code{NULL} )
+
+@var{flags}: Or sequence of GNUTLS_PKCS11_OBJ_* flags
+
+Obtains the PKCS@code{11}  session handles of an object.  @code{session} and  @code{ohandle} must be deinitialized by the caller. The returned pointers are
+independent of the  @code{obj} lifetime.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  (0) on success or a negative error code
+on error.
+
+@strong{Since:} 3.6.3
 @end deftypefun
 
 @subheading gnutls_pkcs11_obj_get_type
@@ -787,7 +823,7 @@ negative error value.
 This function will generate a private key in the specified
 by the  @code{url} token. The private key will be generate within
 the token and will not be exportable. This function will
-store the DER-encoded public key in the SubjectPublicKeyInfo format 
+store the DER-encoded public key in the SubjectPublicKeyInfo format
 in  @code{pubkey} . The  @code{pubkey} should be deinitialized using @code{gnutls_free()} .
 
 Note that when generating an elliptic curve key, the curve
@@ -830,6 +866,9 @@ in  @code{pubkey} . The  @code{pubkey} should be deinitialized using @code{gnutl
 Note that when generating an elliptic curve key, the curve
 can be substituted in the place of the bits parameter using the
 @code{GNUTLS_CURVE_TO_BITS()}  macro.
+
+Since 3.6.3 the objects are marked as sensitive by default unless
+@code{GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_SENSITIVE}  is specified.
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.
@@ -978,6 +1017,28 @@ needs to be inserted to continue PKCS 11 operations.
 @strong{Since:} 2.12.0
 @end deftypefun
 
+@subheading gnutls_pkcs11_token_check_mechanism
+@anchor{gnutls_pkcs11_token_check_mechanism}
+@deftypefun {unsigned} {gnutls_pkcs11_token_check_mechanism} (const char * @var{url}, unsigned long @var{mechanism}, void * @var{ptr}, unsigned @var{psize}, unsigned @var{flags})
+@var{url}: should contain a PKCS 11 URL
+
+@var{mechanism}: The PKCS @code{11}  mechanism ID
+
+@var{ptr}: if set it should point to a CK_MECHANISM_INFO struct
+
+@var{psize}: the size of CK_MECHANISM_INFO struct (for safety)
+
+@var{flags}: must be zero
+
+This function will return whether a mechanism is supported
+by the given token. If the mechanism is supported and
+ @code{ptr} is set, it will be updated with the token information.
+
+@strong{Returns:} Non-zero if the mechanism is supported or zero otherwise.
+
+@strong{Since:} 3.6.0
+@end deftypefun
+
 @subheading gnutls_pkcs11_token_get_flags
 @anchor{gnutls_pkcs11_token_get_flags}
 @deftypefun {int} {gnutls_pkcs11_token_get_flags} (const char * @var{url}, unsigned int * @var{flags})
@@ -1003,10 +1064,16 @@ The supported flags are: @code{GNUTLS_PKCS11_TOKEN_HW}  and @code{GNUTLS_PKCS11_
 
 @var{output}: where output will be stored
 
-@var{output_size}: contains the maximum size of the output and will be overwritten with actual
+@var{output_size}: contains the maximum size of the output buffer and will be
+overwritten with the actual size.
 
 This function will return information about the PKCS 11 token such
 as the label, id, etc.
+
+When output is text, a null terminated string is written to  @code{output} and its
+string length is written to  @code{output_size} (without null terminator). If the
+buffer is too small,  @code{output_size} will contain the expected buffer size
+(with null terminator for text) and return @code{GNUTLS_E_SHORT_MEMORY_BUFFER} .
 
 @strong{Returns:} @code{GNUTLS_E_SUCCESS}  (0) on success or a negative error code
 on error.
@@ -1030,6 +1097,27 @@ it return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE.
 @strong{Returns:} @code{GNUTLS_E_SUCCESS}  (0) on success or a negative error code on error.
 
 @strong{Since:} 2.12.0
+@end deftypefun
+
+@subheading gnutls_pkcs11_token_get_ptr
+@anchor{gnutls_pkcs11_token_get_ptr}
+@deftypefun {int} {gnutls_pkcs11_token_get_ptr} (const char * @var{url}, void ** @var{ptr}, unsigned long * @var{slot_id}, unsigned int @var{flags})
+@var{url}: should contain a PKCS@code{11}  URL identifying a token
+
+@var{ptr}: will contain the CK_FUNCTION_LIST_PTR pointer
+
+@var{slot_id}: will contain the slot_id (may be @code{NULL} )
+
+@var{flags}: should be zero
+
+This function will return the function pointer of the specified
+token by the URL. The returned pointers are valid until
+gnutls is deinitialized, c.f. @code{_global_deinit()} .
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  (0) on success or a negative error code
+on error.
+
+@strong{Since:} 3.6.3
 @end deftypefun
 
 @subheading gnutls_pkcs11_token_get_random
@@ -1096,9 +1184,11 @@ negative error value.
 
 @var{flags}: one of @code{gnutls_pin_flag_t} .
 
-This function will modify or set a user's PIN for the given token. 
-If it is called to set a user pin for first time the oldpin must
-be NULL.
+This function will modify or set a user or administrator's PIN for
+the given token.  If it is called to set a PIN for first time
+the oldpin must be @code{NULL} . When setting the admin's PIN with the
+@code{GNUTLS_PIN_SO}  flag, the  @code{oldpin} value must be provided (this requirement
+is relaxed after GnuTLS 3.6.5 since which the PIN will be requested if missing).
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.

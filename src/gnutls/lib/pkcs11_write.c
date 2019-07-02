@@ -15,7 +15,7 @@
  * Library General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  */
 
 #include "gnutls_int.h"
@@ -27,6 +27,7 @@
 #include <pkcs11_int.h>
 #include "pkcs11x.h"
 #include <x509/common.h>
+#include "pk.h"
 
 static const ck_bool_t tval = 1;
 static const ck_bool_t fval = 0;
@@ -90,8 +91,8 @@ static void mark_flags(unsigned flags, struct ck_attribute *a, unsigned *a_val, 
  *
  * This function will copy a certificate into a PKCS #11 token specified by
  * a URL. Valid flags to mark the certificate: %GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED,
- * %GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE, %GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE,
- * %GNUTLS_PKCS11_OBJ_FLAG_MARK_CA, %GNUTLS_PKCS11_OBJ_FLAG_MARK_ALWAYS_AUTH.
+ * %GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE, %GNUTLS_PKCS11_OBJ_FLAG_MARK_CA,
+ * %GNUTLS_PKCS11_OBJ_FLAG_MARK_ALWAYS_AUTH.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -186,6 +187,8 @@ gnutls_pkcs11_copy_x509_crt2(const char *token_url,
 		a[1].value_len = cid->size;
 	}
 
+	/* we do not use the key usage flags; these are apparent from
+	 * the certificate itself. */
 	a[2].type = CKA_VALUE;
 	a[2].value = der;
 	a[2].value_len = der_size;
@@ -195,7 +198,6 @@ gnutls_pkcs11_copy_x509_crt2(const char *token_url,
 	a[4].type = CKA_CERTIFICATE_TYPE;
 	a[4].value = &type;
 	a[4].value_len = sizeof(type);
-	/* FIXME: copy key usage flags */
 
 	a_val = 5;
 
@@ -204,10 +206,12 @@ gnutls_pkcs11_copy_x509_crt2(const char *token_url,
 	a[a_val].value_len = crt->raw_dn.size;
 	a_val++;
 
-	a[a_val].type = CKA_ISSUER;
-	a[a_val].value = crt->raw_issuer_dn.data;
-	a[a_val].value_len = crt->raw_issuer_dn.size;
-	a_val++;
+	if (crt->raw_issuer_dn.size > 0) {
+		a[a_val].type = CKA_ISSUER;
+		a[a_val].value = crt->raw_issuer_dn.data;
+		a[a_val].value_len = crt->raw_issuer_dn.size;
+		a_val++;
+	}
 
 	serial_size = sizeof(serial);
 	if (gnutls_x509_crt_get_serial(crt, serial, &serial_size) >= 0) {
@@ -265,22 +269,8 @@ static void clean_pubkey(struct ck_attribute *a, unsigned a_val)
 			case CKA_EC_PARAMS:
 			case CKA_EC_POINT:
 				gnutls_free(a[i].value);
-				a[i].value = NULL;
 				break;
 		}
-	}
-}
-
-static void skip_leading_zeros(gnutls_datum_t *d)
-{
-	unsigned nr = 0;
-
-	while(nr < d->size && d->data[nr] == 0)
-		nr++;
-	if (nr > 0) {
-		d->size -= nr;
-		if (d->size > 0)
-			memmove(d->data, &d->data[nr], d->size);
 	}
 }
 
@@ -292,20 +282,19 @@ static int add_pubkey(gnutls_pubkey_t pubkey, struct ck_attribute *a, unsigned *
 	pk = gnutls_pubkey_get_pk_algorithm(pubkey, NULL);
 
 	switch (pk) {
+	case GNUTLS_PK_RSA_PSS:
 	case GNUTLS_PK_RSA: {
 		gnutls_datum_t m, e;
 
-		ret = gnutls_pubkey_export_rsa_raw(pubkey, &m, &e);
+		/* PKCS#11 defines integers as unsigned having most significant byte
+		 * first, e.g., 32768 = 0x80 0x00. This is interpreted literraly by
+		 * some HSMs which do not accept an integer with a leading zero */
+		ret = gnutls_pubkey_export_rsa_raw2(pubkey, &m, &e, GNUTLS_EXPORT_FLAG_NO_LZ);
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;
 		}
 
-		/* PKCS#11 defines integers as unsigned having most significant byte
-		 * first, e.g., 32768 = 0x80 0x00. This is interpreted literraly by
-		 * some HSMs which do not accept an integer with a leading zero */
-		skip_leading_zeros(&m);
-		skip_leading_zeros(&e);
 
 		a[*a_val].type = CKA_MODULUS;
 		a[*a_val].value = m.data;
@@ -321,16 +310,11 @@ static int add_pubkey(gnutls_pubkey_t pubkey, struct ck_attribute *a, unsigned *
 	case GNUTLS_PK_DSA: {
 		gnutls_datum_t p, q, g, y;
 
-		ret = gnutls_pubkey_export_dsa_raw(pubkey, &p, &q, &g, &y);
+		ret = gnutls_pubkey_export_dsa_raw2(pubkey, &p, &q, &g, &y, GNUTLS_EXPORT_FLAG_NO_LZ);
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;
 		}
-
-		skip_leading_zeros(&p);
-		skip_leading_zeros(&q);
-		skip_leading_zeros(&g);
-		skip_leading_zeros(&y);
 
 		a[*a_val].type = CKA_PRIME;
 		a[*a_val].value = p.data;
@@ -373,6 +357,29 @@ static int add_pubkey(gnutls_pubkey_t pubkey, struct ck_attribute *a, unsigned *
 		(*a_val)++;
 		break;
 	}
+	case GNUTLS_PK_EDDSA_ED25519: {
+		gnutls_datum_t params;
+
+		ret =
+		    _gnutls_x509_write_ecc_params(pubkey->params.curve,
+						  &params);
+		if (ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
+
+		a[*a_val].type = CKA_EC_PARAMS;
+		a[*a_val].value = params.data;
+		a[*a_val].value_len = params.size;
+		(*a_val)++;
+
+		a[*a_val].type = CKA_EC_POINT;
+		a[*a_val].value = pubkey->params.raw_pub.data;
+		a[*a_val].value_len = pubkey->params.raw_pub.size;
+		(*a_val)++;
+		break;
+	}
+
 	default:
 		_gnutls_debug_log("requested writing public key of unsupported type %u\n", (unsigned)pk);
 		return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
@@ -392,8 +399,8 @@ static int add_pubkey(gnutls_pubkey_t pubkey, struct ck_attribute *a, unsigned *
  *
  * This function will copy a public key object into a PKCS #11 token specified by
  * a URL. Valid flags to mark the key: %GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED,
- * %GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE, %GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE,
- * %GNUTLS_PKCS11_OBJ_FLAG_MARK_CA, %GNUTLS_PKCS11_OBJ_FLAG_MARK_ALWAYS_AUTH.
+ * %GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE, %GNUTLS_PKCS11_OBJ_FLAG_MARK_CA,
+ * %GNUTLS_PKCS11_OBJ_FLAG_MARK_ALWAYS_AUTH.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -643,8 +650,10 @@ gnutls_pkcs11_copy_attached_extension(const char *token_url,
  * @flags: One of GNUTLS_PKCS11_OBJ_* flags
  *
  * This function will copy a private key into a PKCS #11 token specified by
- * a URL. It is highly recommended flags to contain %GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE
- * unless there is a strong reason not to.
+ * a URL.
+ *
+ * Since 3.6.3 the objects are marked as sensitive by default unless
+ * %GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_SENSITIVE is specified.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -707,7 +716,6 @@ gnutls_pkcs11_copy_x509_privkey2(const char *token_url,
 	pk = gnutls_x509_privkey_get_pk_algorithm(key);
 	FIX_KEY_USAGE(pk, key_usage);
 
-	/* FIXME: copy key usage flags */
 	a_val = 0;
 	a[a_val].type = CKA_CLASS;
 	a[a_val].value = &class;
@@ -744,7 +752,8 @@ gnutls_pkcs11_copy_x509_privkey2(const char *token_url,
 
 	if (pk == GNUTLS_PK_RSA) {
 		a[a_val].type = CKA_DECRYPT;
-		if (key_usage & (GNUTLS_KEY_ENCIPHER_ONLY|GNUTLS_KEY_DECIPHER_ONLY)) {
+		if ((key_usage & (GNUTLS_KEY_ENCIPHER_ONLY|GNUTLS_KEY_DECIPHER_ONLY)) ||
+		    (key_usage & GNUTLS_KEY_KEY_ENCIPHERMENT)) {
 			a[a_val].value = (void*)&tval;
 			a[a_val].value_len = sizeof(tval);
 		} else {
@@ -800,7 +809,7 @@ gnutls_pkcs11_copy_x509_privkey2(const char *token_url,
 		a_val++;
 	}
 
-	if (flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE) {
+	if (!(flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_SENSITIVE)) {
 		a[a_val].type = CKA_SENSITIVE;
 		a[a_val].value = (void *) &tval;
 		a[a_val].value_len = sizeof(tval);
@@ -814,29 +823,18 @@ gnutls_pkcs11_copy_x509_privkey2(const char *token_url,
 
 	switch (pk) {
 	case GNUTLS_PK_RSA:
+	case GNUTLS_PK_RSA_PSS:
 		{
 
-			ret =
-			    gnutls_x509_privkey_export_rsa_raw2(key, &m,
-								&e, &d, &p,
-								&q, &u,
-								&exp1,
-								&exp2);
+			ret = _gnutls_params_get_rsa_raw(&key->params, &m, &e, &d, &p,
+							 &q, &u, &exp1, &exp2,
+							 GNUTLS_EXPORT_FLAG_NO_LZ);
 			if (ret < 0) {
 				gnutls_assert();
 				goto cleanup;
 			}
 
 			type = CKK_RSA;
-
-			skip_leading_zeros(&m);
-			skip_leading_zeros(&e);
-			skip_leading_zeros(&d);
-			skip_leading_zeros(&p);
-			skip_leading_zeros(&q);
-			skip_leading_zeros(&u);
-			skip_leading_zeros(&exp1);
-			skip_leading_zeros(&exp2);
 
 			a[a_val].type = CKA_MODULUS;
 			a[a_val].value = m.data;
@@ -882,21 +880,14 @@ gnutls_pkcs11_copy_x509_privkey2(const char *token_url,
 		}
 	case GNUTLS_PK_DSA:
 		{
-			ret =
-			    gnutls_x509_privkey_export_dsa_raw(key, &p, &q,
-							       &g, &y, &x);
+			ret = _gnutls_params_get_dsa_raw(&key->params, &p, &q, &g, &y, &x,
+							 GNUTLS_EXPORT_FLAG_NO_LZ);
 			if (ret < 0) {
 				gnutls_assert();
 				goto cleanup;
 			}
 
 			type = CKK_DSA;
-
-			skip_leading_zeros(&p);
-			skip_leading_zeros(&q);
-			skip_leading_zeros(&g);
-			skip_leading_zeros(&y);
-			skip_leading_zeros(&x);
 
 			a[a_val].type = CKA_PRIME;
 			a[a_val].value = p.data;
@@ -923,7 +914,7 @@ gnutls_pkcs11_copy_x509_privkey2(const char *token_url,
 	case GNUTLS_PK_EC:
 		{
 			ret =
-			    _gnutls_x509_write_ecc_params(key->params.flags,
+			    _gnutls_x509_write_ecc_params(key->params.curve,
 							  &p);
 			if (ret < 0) {
 				gnutls_assert();
@@ -952,6 +943,32 @@ gnutls_pkcs11_copy_x509_privkey2(const char *token_url,
 
 			break;
 		}
+#ifdef HAVE_CKM_EDDSA
+	case GNUTLS_PK_EDDSA_ED25519:
+		{
+			ret =
+			    _gnutls_x509_write_ecc_params(key->params.curve,
+							  &p);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
+
+			type = CKK_EC_EDWARDS;
+
+			a[a_val].type = CKA_EC_PARAMS;
+			a[a_val].value = p.data;
+			a[a_val].value_len = p.size;
+			a_val++;
+
+			a[a_val].type = CKA_VALUE;
+			a[a_val].value = key->params.raw_priv.data;
+			a[a_val].value_len = key->params.raw_priv.size;
+			a_val++;
+
+			break;
+		}
+#endif
 	default:
 		gnutls_assert();
 		ret = GNUTLS_E_INVALID_REQUEST;
@@ -975,6 +992,7 @@ gnutls_pkcs11_copy_x509_privkey2(const char *token_url,
 
       cleanup:
 	switch (pk) {
+	case GNUTLS_PK_RSA_PSS:
 	case GNUTLS_PK_RSA:
 		{
 			gnutls_free(m.data);
@@ -997,6 +1015,7 @@ gnutls_pkcs11_copy_x509_privkey2(const char *token_url,
 			break;
 		}
 	case GNUTLS_PK_EC:
+	case GNUTLS_PK_EDDSA_ED25519:
 		{
 			gnutls_free(p.data);
 			gnutls_free(x.data);
@@ -1224,6 +1243,8 @@ gnutls_pkcs11_token_init(const char *token_url,
 
 }
 
+#define L(x) ((x==NULL)?0:strlen(x))
+
 /**
  * gnutls_pkcs11_token_set_pin:
  * @token_url: A PKCS #11 URL specifying a token
@@ -1231,9 +1252,11 @@ gnutls_pkcs11_token_init(const char *token_url,
  * @newpin: new user's PIN
  * @flags: one of #gnutls_pin_flag_t.
  *
- * This function will modify or set a user's PIN for the given token. 
- * If it is called to set a user pin for first time the oldpin must
- * be NULL.
+ * This function will modify or set a user or administrator's PIN for
+ * the given token.  If it is called to set a PIN for first time
+ * the oldpin must be %NULL. When setting the admin's PIN with the
+ * %GNUTLS_PIN_SO flag, the @oldpin value must be provided (this requirement
+ * is relaxed after GnuTLS 3.6.5 since which the PIN will be requested if missing).
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -1271,7 +1294,8 @@ gnutls_pkcs11_token_set_pin(const char *token_url,
 		return ret;
 	}
 
-	if (oldpin == NULL) {
+	if (oldpin == NULL && !(flags & GNUTLS_PIN_SO)) {
+		/* This changes only the user PIN */
 		rv = pkcs11_init_pin(sinfo.module, sinfo.pks,
 				     (uint8_t *) newpin, strlen(newpin));
 		if (rv != CKR_OK) {
@@ -1282,9 +1306,32 @@ gnutls_pkcs11_token_set_pin(const char *token_url,
 			goto finish;
 		}
 	} else {
+		struct p11_kit_pin *pin;
+		unsigned oldpin_size;
+
+		oldpin_size = L(oldpin);
+
+		if (!(sinfo.tinfo.flags & CKF_PROTECTED_AUTHENTICATION_PATH)) {
+			if (newpin == NULL)
+				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+			if (oldpin == NULL) {
+				struct pin_info_st pin_info;
+				memset(&pin_info, 0, sizeof(pin_info));
+
+				ret = pkcs11_retrieve_pin(&pin_info, info, &sinfo.tinfo, 0, CKU_SO, &pin);
+				if (ret < 0) {
+					gnutls_assert();
+					goto finish;
+				}
+				oldpin = (const char*)p11_kit_pin_get_value(pin, NULL);
+				oldpin_size = p11_kit_pin_get_length(pin);
+			}
+		}
+
 		rv = pkcs11_set_pin(sinfo.module, sinfo.pks,
-				    oldpin, strlen(oldpin),
-				    newpin, strlen(newpin));
+				    oldpin, oldpin_size,
+				    newpin, L(newpin));
 		if (rv != CKR_OK) {
 			gnutls_assert();
 			_gnutls_debug_log("p11: %s\n",
@@ -1391,8 +1438,10 @@ int gnutls_pkcs11_copy_x509_crt(const char *token_url,
  * @flags: One of GNUTLS_PKCS11_OBJ_* flags
  *
  * This function will copy a private key into a PKCS #11 token specified by
- * a URL. It is highly recommended flags to contain %GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE
- * unless there is a strong reason not to.
+ * a URL.
+ *
+ * Since 3.6.3 the objects are marked as sensitive by default unless
+ * %GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_SENSITIVE is specified.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.

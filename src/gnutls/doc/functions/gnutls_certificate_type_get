@@ -5,9 +5,17 @@
 @deftypefun {gnutls_certificate_type_t} {gnutls_certificate_type_get} (gnutls_session_t @var{session})
 @var{session}: is a @code{gnutls_session_t}  type.
 
-The certificate type is by default X.509, unless it is negotiated
-as a TLS extension.
+This function returns the type of the certificate that is negotiated
+for this side to send to the peer. The certificate type is by default
+X.509, unless an alternative certificate type is enabled by
+@code{gnutls_init()}  and negotiated during the session.
+
+Resumed sessions will return the certificate type that was negotiated
+and used in the original session.
+
+As of version 3.6.4 it is recommended to use
+@code{gnutls_certificate_type_get2()}  which is more fine-grained.
 
 @strong{Returns:} the currently used @code{gnutls_certificate_type_t}  certificate
-type.
+type as negotiated for 'our' side of the connection.
 @end deftypefun

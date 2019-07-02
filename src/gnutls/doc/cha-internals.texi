@@ -11,8 +11,10 @@ happens inside the black box.
 * The TLS Protocol::
 * TLS Handshake Protocol::
 * TLS Authentication Methods::
-* TLS Extension Handling::
+* TLS Hello Extension Handling::
 * Cryptographic Backend::
+* Random Number Generators-internals::
+* FIPS140-2 mode::
 @end menu
 
 @node The TLS Protocol
@@ -38,10 +40,10 @@ transport layer functions are used. The main idea is shown in @ref{fig-gnutls-ha
 @caption{GnuTLS handshake state machine.}
 @end float
 
-Also the way the input is processed varies per ciphersuite. Several 
-implementations of the internal handlers are available and 
-@funcref{gnutls_handshake} only multiplexes the input to the appropriate 
-handler. For example a @acronym{PSK} ciphersuite has a different 
+Also the way the input is processed varies per ciphersuite. Several
+implementations of the internal handlers are available and
+@funcref{gnutls_handshake} only multiplexes the input to the appropriate
+handler. For example a @acronym{PSK} ciphersuite has a different
 implementation of the @code{process_client_key_exchange} than a
 certificate ciphersuite. We illustrate the idea in @ref{fig-gnutls-handshake-sequence}.
 
@@ -58,7 +60,7 @@ affect only the handshake protocol, a simple interface is used. An
 authentication method needs to implement the functions shown below.
 
 @verbatim
-typedef struct 
+typedef struct
 {
   const char *name;
   int (*gnutls_generate_server_certificate) (gnutls_session_t, gnutls_buffer_st*);
@@ -95,10 +97,10 @@ ciphersuites. After implementing these functions the structure holding
 its pointers has to be registered in @code{gnutls_@-algorithms.c} in the
 @code{_gnutls_@-kx_@-algorithms} structure.
 
-@node TLS Extension Handling
+@node TLS Hello Extension Handling
 @section TLS Extension Handling
-As with authentication methods, the TLS extensions handlers can be
-implemented using the interface shown below.
+As with authentication methods, adding TLS hello extensions can be done
+quite easily by implementing the interface shown below.
 
 @verbatim
 typedef int (*gnutls_ext_recv_func) (gnutls_session_t session,
@@ -107,35 +109,37 @@ typedef int (*gnutls_ext_send_func) (gnutls_session_t session,
                                      gnutls_buffer_st *extdata);
 @end verbatim
 
-Here there are two functions, one for receiving the extension data
-and one for sending. These functions have to check internally whether
-they operate in client or server side. 
+Here there are two main functions, one for parsing the received extension data
+and one for formatting the extension data that must be send. These functions
+have to check internally whether they operate within a client or a server session.
 
 A simple example of an extension handler can be seen in
-@code{ext/@-srp.c} in GnuTLS' source code. After implementing these functions, 
-together with the extension number they handle, they have to be registered 
-using @funcintref{_gnutls_ext_register} in
-@code{gnutls_extensions.c} typically within @funcintref{_gnutls_ext_init}.
+@code{lib/ext/@-srp.c} in GnuTLS' source code. After implementing these functions,
+the extension has to be registered. Registering an extension can be done in two
+ways. You can create a GnuTLS internal extension and register it in
+@code{hello_ext.c} or write an external extension (not inside GnuTLS but
+inside an application using GnuTLS) and register it via the exported functions
+@funcref{gnutls_session_ext_register} or @funcref{gnutls_ext_register}.
 
-@subheading Adding a new TLS extension
+@subheading Adding a new TLS hello extension
 
-Adding support for a new TLS extension is done from time to time, and
-the process to do so is not difficult.  Here are the steps you need to
-follow if you wish to do this yourself.  For sake of discussion, let's
-consider adding support for the hypothetical TLS extension
-@code{foobar}. The following section is about adding an extension to GnuTLS,
-for custom application extensions you should check the exported functions
+Adding support for a new TLS hello extension is done from time to time, and
+the process to do so is not difficult. Here are the steps you need to
+follow if you wish to do this yourself. For the sake of discussion, let's
+consider adding support for the hypothetical TLS extension @code{foobar}.
+The following section is about adding an hello extension to GnuTLS itself.
+For custom application extensions you should check the exported functions
 @funcref{gnutls_session_ext_register} or @funcref{gnutls_ext_register}.
 
 @subsubheading Add @code{configure} option like @code{--enable-foobar} or @code{--disable-foobar}.
 
 This step is useful when the extension code is large and it might be desirable
-to disable the extension under some circumstances. Otherwise it can be safely
-skipped.
+under some circumstances to be able to leave out the extension during compilation of GnuTLS.
+If you don't need this kind of feature this step can be safely skipped.
 
-Whether to chose enable or disable depends on whether you intend to make the extension be
-enabled by default.  Look at existing checks (i.e., SRP, authz) for
-how to model the code.  For example:
+Whether to choose enable or disable depends on whether you intend to make the extension be
+enabled by default. Look at existing checks (i.e., SRP, authz) for
+how to model the code. For example:
 
 @example
 AC_MSG_CHECKING([whether to disable foobar support])
@@ -153,129 +157,157 @@ fi
 AM_CONDITIONAL(ENABLE_FOOBAR, test "$ac_enable_foobar" != "no")
 @end example
 
-These lines should go in @code{m4/hooks.m4}.
+These lines should go in @code{lib/m4/hooks.m4}.
 
-@subsubheading Add IANA extension value to @code{extensions_t} in @code{gnutls_int.h}.
+@subsubheading Add an extension identifier to @code{extensions_t} in @code{gnutls_int.h}.
 
-A good name for the value would be GNUTLS_EXTENSION_FOOBAR.  Check
-with @url{http://www.iana.org/assignments/tls-extensiontype-values}
-for allocated values.  For experiments, you could pick a number but
-remember that some consider it a bad idea to deploy such modified
-version since it will lead to interoperability problems in the future
-when the IANA allocates that number to someone else, or when the
-foobar protocol is allocated another number.
+A good name for the identifier would be GNUTLS_EXTENSION_FOOBAR. If the
+extension that you are implementing is an extension that is officially
+registered by IANA then it is recommended to use its official name such
+that the extension can be correctly identified by other developers. Check
+with @url{https://www.iana.org/assignments/tls-extensiontype-values}
+for registered extensions.
 
-@subsubheading Add an entry to @code{_gnutls_extensions} in @code{gnutls_extensions.c}.
+@subsubheading Register the extension in @code{lib/hello_ext.c}.
+
+In order for the extension to be executed you need to register it in the
+@code{static hello_ext_entry_st const *extfunc[]} list in @code{lib/hello_ext.c}.
 
 A typical entry would be:
 
 @example
-  int ret;
-
-#if ENABLE_FOOBAR
-  ret = _gnutls_ext_register (&foobar_ext);
-  if (ret != GNUTLS_E_SUCCESS)
-    return ret;
+#ifdef ENABLE_FOOBAR
+	[GNUTLS_EXTENSION_FOOBAR] = &ext_mod_foobar,
 #endif
 @end example
 
-Most likely you'll need to add an @code{#include "ext/@-foobar.h"}, that
-will contain something like
-like:
+Also for every extension you need to create an @code{hello_ext_entry_st}
+that describes the extension. This structure is placed in the designated
+c file for your extension and its name is used in the registration entry
+as depicted above.
+
+The structure of @code{hello_ext_entry_st} is as follows:
 @example
-  extension_entry_st foobar_ext = @{
+  const hello_ext_entry_st ext_mod_foobar = @{
     .name = "FOOBAR",
-    .type = GNUTLS_EXTENSION_FOOBAR,
+    .tls_id = 255,
+    .gid = GNUTLS_EXTENSION_FOOBAR,
     .parse_type = GNUTLS_EXT_TLS,
-    .recv_func = _foobar_recv_params,
-    .send_func = _foobar_send_params,
-    .pack_func = _foobar_pack,
-    .unpack_func = _foobar_unpack,
-    .deinit_func = NULL
-  @}
+    .validity = GNUTLS_EXT_FLAG_CLIENT_HELLO |
+	GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO |
+	GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO |
+	GNUTLS_EXT_FLAG_TLS,
+    .recv_func = _gnutls_foobar_recv_params,
+    .send_func = _gnutls_foobar_send_params,
+    .pack_func = _gnutls_foobar_pack,
+    .unpack_func = _gnutls_foobar_unpack,
+    .deinit_func = _gnutls_foobar_deinit,
+    .cannot_be_overriden = 1
+  @};
 @end example
 
-The GNUTLS_EXTENSION_FOOBAR is the integer value you added to
-@code{gnutls_int.h} earlier.  In this structure you specify the
-functions to read the extension from the hello message, the function
-to send the reply to, and two more functions to pack and unpack from
-stored session data (e.g. when resumming a session). The @code{deinit} function
-will be called to deinitialize the extension's private parameters, if any.
+The GNUTLS_EXTENSION_FOOBAR is the identifier that you've added to
+@code{gnutls_int.h} earlier. The @code{.tls_id} should contain the number
+that IANA has assigned to this extension, or an unassigned number of your
+choice if this is an unregistered extension. In the rest of this structure
+you specify the functions to handle the extension data. The @code{receive} function
+will be called upon reception of the data and will be used to parse or
+interpret the extension data. The @code{send} function will be called prior to
+sending the extension data on the wire and will be used to format the data
+such that it can be send over the wire. The @code{pack} and @code{unpack}
+functions will be used to prepare the data for storage in case of session resumption
+(and vice versa). The @code{deinit} function will be called to deinitialize
+the extension's private parameters, if any.
 
-Note that the conditional @code{ENABLE_FOOBAR} definition should only be 
+Look at @code{gnutls_ext_parse_type_t} and @code{gnutls_ext_flags_t} for a complete
+list of available flags.
+
+Note that the conditional @code{ENABLE_FOOBAR} definition should only be
 used if step 1 with the @code{configure} options has taken place.
 
-@subsubheading Add new files that implement the extension.
+@subsubheading Add new files that implement the hello extension.
 
-The functions you are responsible to add are those mentioned in the
-previous step.  They should be added in a file such as @code{ext/@-foobar.c} 
-and headers should be placed in @code{ext/@-foobar.h}.
+To keep things structured every extension should have its own files. The
+functions that you should (at least) add are those referenced in the struct
+from the previous step. Use descriptive file names such as @code{lib/ext/@-foobar.c}
+and for the corresponding header @code{lib/ext/@-foobar.h}.
 As a starter, you could add this:
 
 @example
 int
-_foobar_recv_params (gnutls_session_t session, const opaque * data,
+_gnutls_foobar_recv_params (gnutls_session_t session, const uint8_t * data,
                      size_t data_size)
 @{
   return 0;
 @}
 
 int
-_foobar_send_params (gnutls_session_t session, gnutls_buffer_st* data)
+_gnutls_foobar_send_params (gnutls_session_t session, gnutls_buffer_st* data)
 @{
   return 0;
 @}
 
 int
-_foobar_pack (extension_priv_data_t epriv, gnutls_buffer_st * ps)
+_gnutls_foobar_pack (extension_priv_data_t epriv, gnutls_buffer_st * ps)
 @{
    /* Append the extension's internal state to buffer */
    return 0;
 @}
 
 int
-_foobar_unpack (gnutls_buffer_st * ps, extension_priv_data_t * epriv)
+_gnutls_foobar_unpack (gnutls_buffer_st * ps, extension_priv_data_t * epriv)
 @{
    /* Read the internal state from buffer */
    return 0;
 @}
 @end example
 
-The @funcintref{_foobar_recv_params} function is responsible for
+The @funcintref{_gnutls_foobar_recv_params} function is responsible for
 parsing incoming extension data (both in the client and server).
 
-The @funcintref{_foobar_send_params} function is responsible for
-sending extension data (both in the client and server).
+The @funcintref{_gnutls_foobar_send_params} function is responsible for
+formatting extension data such that it can be send over the wire (both in
+the client and server). It should append data to provided buffer and
+return a positive (or zero) number on success or a negative error code.
+Previous to 3.6.0 versions of GnuTLS required that function to return the
+number of bytes that were written. If zero is returned and no bytes are
+appended the extension will not be sent. If a zero byte extension is to
+be sent this function must return @code{GNUTLS_E_INT_RET_0}.
 
 If you receive length fields that don't match, return
 @code{GNUTLS_E_@-UNEXPECTED_@-PACKET_@-LENGTH}.  If you receive invalid
 data, return @code{GNUTLS_E_@-RECEIVED_@-ILLEGAL_@-PARAMETER}.  You can use
-other error codes from the list in @ref{Error codes}.  Return 0 on success.
+other error codes from the list in @ref{Error codes}. Return 0 on success.
 
 An extension typically stores private information in the @code{session}
-data for later usage. That can be done using the functions 
-@funcintref{_gnutls_ext_set_session_data} and
-@funcintref{_gnutls_ext_get_session_data}. You can check simple examples
-at @code{ext/@-max_@-record.c} and @code{ext/@-server_@-name.c} extensions.
-That private information can be saved and restored across session 
+data for later usage. That can be done using the functions
+@funcintref{_gnutls_hello_ext_set_datum} and
+@funcintref{_gnutls_hello_ext_get_datum}. You can check simple examples
+at @code{lib/ext/@-max_@-record.c} and @code{lib/ext/@-server_@-name.c} extensions.
+That private information can be saved and restored across session
 resumption if the following functions are set:
 
-The @funcintref{_foobar_pack} function is responsible for packing
+The @funcintref{_gnutls_foobar_pack} function is responsible for packing
 internal extension data to save them in the session resumption storage.
 
-The @funcintref{_foobar_unpack} function is responsible for
+The @funcintref{_gnutls_foobar_unpack} function is responsible for
 restoring session data from the session resumption storage.
 
-Recall that both the client and server, send and receive
-parameters, and your code most likely will need to do different things
-depending on which mode it is in.  It may be useful to make this
-distinction explicit in the code.  Thus, for example, a better
+When the internal data is stored using the @funcintref{_gnutls_hello_ext_set_datum},
+then you can rely on the default pack and unpack functions:
+@funcintref{_gnutls_hello_ext_default_pack} and
+@funcintref{_gnutls_hello_ext_default_unpack}.
+
+Recall that both for the client and server, the send and receive
+functions most likely will need to do different things
+depending on which mode they are in. It may be useful to make this
+distinction explicit in the code. Thus, for example, a better
 template than above would be:
 
 @example
 int
 _gnutls_foobar_recv_params (gnutls_session_t session,
-                            const opaque * data,
+                            const uint8_t * data,
                             size_t data_size)
 @{
   if (session->security_parameters.entity == GNUTLS_CLIENT)
@@ -297,7 +329,8 @@ _gnutls_foobar_send_params (gnutls_session_t session,
 
 The functions used would be declared as @code{static} functions, of
 the appropriate prototype, in the same file.
-When adding the files, you'll need to add them to @code{ext/@-Makefile.am}
+
+When adding the new extension files, you'll need to add them to @code{lib/ext/@-Makefile.am}
 as well, for example:
 
 @example
@@ -306,54 +339,26 @@ libgnutls_ext_la_SOURCES += ext/foobar.c ext/foobar.h
 endif
 @end example
 
-@subsubheading Add API functions to enable/disable the extension.
+@subsubheading Add API functions to use the extension.
 
 It might be desirable to allow users of the extension to
-request use of the extension, or set extension specific data.  
+request the use of the extension, or set extension specific data.
 This can be implemented by adding extension specific function calls
 that can be added to @code{includes/@-gnutls/@-gnutls.h},
 as long as the LGPLv2.1+ applies.
-The implementation of the function should lie in the @code{ext/@-foobar.c} file.
+The implementation of these functions should lie in the @code{lib/ext/@-foobar.c} file.
 
-To make the API available in the shared library you need to add the
-symbol in @code{lib/@-libgnutls.map}, so that the symbol
-is exported properly.
+To make the API available in the shared library you need to add the added
+symbols in @code{lib/@-libgnutls.map}, so that the symbols are exported properly.
 
 When writing GTK-DOC style documentation for your new APIs, don't
 forget to add @code{Since:} tags to indicate the GnuTLS version the
 API was introduced in.
 
-@subsubheading Heartbeat extension.
-
-One such extension is HeartBeat protocol (RFC6520:
-@url{https://tools.ietf.org/html/rfc6520}) implementation. To enable
-it use option --heartbeat with example client and server supplied with
-gnutls:
-
-@example
-./doc/credentials/gnutls-http-serv --priority "NORMAL:-CIPHER-ALL:+NULL" -d 100 \
-    --heartbeat --echo
-./src/gnutls-cli --priority "NORMAL:-CIPHER-ALL:+NULL" -d 100 localhost -p 5556 \
-    --insecure --heartbeat
-@end example
-
-After that pasting
-@example
-**HEARTBEAT**
-@end example
-command into gnutls-cli will trigger corresponding command on the server and it will send HeartBeat Request with random length to client.
-
-Another way is to run capabilities check with:
-
-@example
-./doc/credentials/gnutls-http-serv -d 100 --heartbeat
-./src/gnutls-cli-debug localhost -p 5556
-@end example
-
 @subheading Adding a new Supplemental Data Handshake Message
 
 TLS handshake extensions allow to send so called supplemental data
-handshake messages @xcite{RFC4680}. This short section explains how to 
+handshake messages @xcite{RFC4680}. This short section explains how to
 implement a supplemental data handshake message for a given TLS extension.
 
 First of all, modify your extension @code{foobar} in the way, to instruct
@@ -379,7 +384,7 @@ _gnutls_foobar_send_params (gnutls_session_t session, gnutls_buffer_st *extdata)
 @end example
 
 Furthermore you'll need two new functions @funcintref{_foobar_supp_recv_params}
-and @funcintref{_foobar_supp_send_params}, which must conform to the following 
+and @funcintref{_foobar_supp_send_params}, which must conform to the following
 prototypes.
 
 @example
@@ -394,7 +399,7 @@ The following example code shows how to send a
 ``Hello World'' string in the supplemental data handshake message.
 
 @example
-int 
+int
 _foobar_supp_recv_params(gnutls_session_t session, const opaque *data, size_t _data_size)
 @{
    uint8_t len = _data_size;
@@ -412,7 +417,7 @@ _foobar_supp_recv_params(gnutls_session_t session, const opaque *data, size_t _d
    return len;
 @}
 
-int 
+int
 _foobar_supp_send_params(gnutls_session_t session, gnutls_buffer_t buf)
 @{
    unsigned char *msg = "hello world";
@@ -433,8 +438,8 @@ or @funcref{gnutls_supplemental_register} at some point in your program.
 
 Today most new processors, either for embedded or desktop systems
 include either instructions  intended to speed up cryptographic operations,
-or a co-processor with cryptographic capabilities. Taking advantage of 
-those is a challenging task for every cryptographic  application or 
+or a co-processor with cryptographic capabilities. Taking advantage of
+those is a challenging task for every cryptographic  application or
 library. GnuTLS handles the cryptographic provider in a modular
 way, following a layered approach to access
 cryptographic operations as in @ref{fig-crypto-layers}.
@@ -444,7 +449,7 @@ cryptographic operations as in @ref{fig-crypto-layers}.
 @caption{GnuTLS cryptographic back-end design.}
 @end float
 
-The TLS layer uses a cryptographic provider layer, that will in turn either 
+The TLS layer uses a cryptographic provider layer, that will in turn either
 use the default crypto provider -- a software crypto library, or use an external
 crypto provider, if available in the local system. The reason of handling
 the external cryptographic provider in GnuTLS and not delegating it to
@@ -456,22 +461,22 @@ an efficient way.
 The Cryptographic library layer, currently supports only
 libnettle. Older versions of GnuTLS used to support libgcrypt,
 but it was switched with nettle mainly for performance reasons@footnote{See
-@url{http://lists.gnu.org/archive/html/gnutls-devel/2011-02/msg00079.html}.}
+@url{https://lists.gnu.org/archive/html/gnutls-devel/2011-02/msg00079.html}.}
 and secondary because it is a simpler library to use.
 In the future other cryptographic libraries might be supported as well.
 
 @subheading External cryptography provider
 Systems that include a cryptographic co-processor, typically come with
-kernel drivers to utilize the operations from software. For this reason 
+kernel drivers to utilize the operations from software. For this reason
 GnuTLS provides a layer where each individual algorithm used can be replaced
 by another implementation, i.e., the one provided by the driver. The
-FreeBSD, OpenBSD and Linux kernels@footnote{Check @url{http://home.gna.org/cryptodev-linux/} 
-for the Linux kernel implementation of @code{/dev/crypto}.} include already 
-a number of hardware assisted implementations, and also provide an interface 
+FreeBSD, OpenBSD and Linux kernels@footnote{Check @url{https://home.gna.org/cryptodev-linux/}
+for the Linux kernel implementation of @code{/dev/crypto}.} include already
+a number of hardware assisted implementations, and also provide an interface
 to access them, called @code{/dev/crypto}.
 GnuTLS will take advantage of this interface if compiled with special
-options. That is because in most systems where hardware-assisted 
-cryptographic operations are not available, using this interface might 
+options. That is because in most systems where hardware-assisted
+cryptographic operations are not available, using this interface might
 actually harm performance.
 
 In systems that include cryptographic instructions with the CPU's
@@ -487,7 +492,7 @@ source code in @code{lib/accelerated/}.
 @subsubheading Overriding specific algorithms
 When an optimized implementation of a single algorithm is available,
 say a hardware assisted version of @acronym{AES-CBC} then the
-following functions, from @code{crypto.h}, can 
+following functions, from @code{crypto.h}, can
 be used to register those algorithms.
 
 @itemize
@@ -516,3 +521,222 @@ For asymmetric or public keys, GnuTLS supports PKCS #11 which allows
 operation without access to long term keys, in addition to CPU offloading.
 For more information see @ref{Hardware security modules and abstract key types}.
 
+
+@node Random Number Generators-internals
+@section Random Number Generators
+
+@subheading About the generators
+
+GnuTLS provides two random generators. The default, and the AES-DRBG random
+generator which is only used when the library is compiled with support for
+FIPS140-2 and the system is in FIPS140-2 mode.
+
+@subheading The default generator - inner workings
+
+The random number generator levels in @code{gnutls_rnd_level_t} map to two CHACHA-based random generators which
+are initially seeded using the OS random device, e.g., @code{/dev/urandom}
+or @code{getrandom()}. These random generators are unique per thread, and
+are automatically re-seeded when a fork is detected.
+
+The reason the CHACHA cipher was selected for the GnuTLS' PRNG is the fact
+that CHACHA is considered a secure and fast stream cipher, and is already
+defined for use in TLS protocol. As such, the utilization of it would
+not stress the CPU caches, and would allow for better performance on busy
+servers, irrespective of their architecture (e.g., even if AES is not
+available with an optimized instruction set).
+
+The generators are unique per thread to allow lock-free operation. That
+induces a cost of around 140-bytes for the state of the generators per
+thread, on threads that would utilize @funcref{gnutls_rnd}. At the same time
+it allows fast and lock-free access to the generators. The lock-free access
+benefits servers which utilize more than 4 threads, while imposes no cost on
+single threaded processes.
+
+On the first call to @funcref{gnutls_rnd} the generators are seeded with two independent
+keys obtained from the OS random device. Their seed is used to output a fixed amount
+of bytes before re-seeding; the number of bytes output varies per generator.
+
+One generator is dedicated for the @code{GNUTLS_RND_NONCE} level, and the
+second is shared for the @code{GNUTLS_RND_KEY} and @code{GNUTLS_RND_RANDOM}
+levels. For the rest of this section we refer to the first as the nonce
+generator and the second as the key generator.
+
+The nonce generator will reseed after outputting a fixed amount of bytes
+(typically few megabytes), or after few hours of operation without reaching
+the limit has passed. It is being re-seed using
+the key generator to obtain a new key for the CHACHA cipher, which is mixed
+with its old one.
+
+Similarly, the key generator, will also re-seed after a fixed amount
+of bytes is generated (typically less than the nonce), and will also re-seed
+based on time, i.e., after few hours of operation without reaching the limit
+for a re-seed. For its re-seed it mixes mixes data obtained from the OS random
+device with the previous key.
+
+Although the key generator used to provide data for the @code{GNUTLS_RND_RANDOM}
+and @code{GNUTLS_RND_KEY} levels is identical, when used with the @code{GNUTLS_RND_KEY} level
+a re-key of the PRNG using its own output, is additionally performed. That ensures that
+the recovery of the PRNG state will not be sufficient to recover previously generated values.
+
+
+@subheading The AES-DRBG generator - inner workings
+
+Similar with the default generator, the random number generator levels in @code{gnutls_rnd_level_t} map to two
+AES-DRBG random generators which are initially seeded using the OS random device,
+e.g., @code{/dev/urandom} or @code{getrandom()}. These random generators are
+unique per thread, and are automatically re-seeded when a fork is detected.
+
+The AES-DRBG generator is based on the AES cipher in counter mode and is
+re-seeded after a fixed amount of bytes are generated.
+
+
+@subheading Defense against PRNG attacks
+
+This section describes the counter-measures available in the Pseudo-random number generator (PRNG)
+of GnuTLS for known attacks as described in @xcite{PRNGATTACKS}. Note that, the attacks on a PRNG such as
+state-compromise, assume a quite powerful adversary which has in practice
+access to the PRNG state.
+
+@subsubheading Cryptanalytic
+
+To defend against cryptanalytic attacks GnuTLS' PRNG is a stream cipher
+designed to defend against the same attacks. As such, GnuTLS' PRNG strength
+with regards to this attack relies on the underlying crypto block,
+which at the time of writing is CHACHA. That is easily replaceable in
+the future if attacks are found to be possible in that cipher.
+
+@subsubheading Input-based attacks
+
+These attacks assume that the attacker can influence the input that is used
+to form the state of the PRNG. To counter these attacks GnuTLS does not
+gather input from the system environment but rather relies on the OS
+provided random generator. That is the @code{/dev/urandom} or
+@code{getentropy}/@code{getrandom} system calls. As such, GnuTLS' PRNG
+is as strong as the system random generator can assure with regards to
+input-based attacks.
+
+@subsubheading State-compromise: Backtracking
+
+A backtracking attack, assumes that an adversary obtains at some point of time
+access to the generator state, and wants to recover past bytes. As the
+GnuTLS generator is fine-tuned to provide multiple levels, such an attack
+mainly concerns levels @code{GNUTLS_RND_RANDOM} and @code{GNUTLS_RND_KEY},
+since @code{GNUTLS_RND_NONCE} is intended to output non-secret data.
+The @code{GNUTLS_RND_RANDOM} generator at the time of writing can output
+2MB prior to being re-seeded thus this is its upper bound for previously
+generated data recovered using this attack. That assumes that the state
+of the operating system random generator is unknown to the attacker, and we carry that
+assumption on the next paragraphs. The usage of @code{GNUTLS_RND_KEY} level
+ensures that no backtracking is possible for all output data, by re-keying
+the PRNG using its own output.
+
+Such an attack reflects the real world scenario where application's memory is
+temporarily compromised, while the kernel's memory is inaccessible.
+
+@subsubheading State-compromise: Permanent Compromise Attack
+
+A permanent compromise attack implies that once an attacker compromises the
+state of GnuTLS' random generator at a specific time, future and past
+outputs from the generator are compromised. For past outputs the
+previous paragraph applies. For future outputs, both the @code{GNUTLS_RND_RANDOM}
+and the @code{GNUTLS_RND_KEY} will recover after 2MB of data have been generated
+or few hours have passed (two at the time of writing). Similarly the @code{GNUTLS_RND_NONCE}
+level generator will recover after several megabytes of output is generated,
+or its re-key time is reached.
+
+@subsubheading State-compromise: Iterative guessing
+
+This attack assumes that after an attacker obtained the PRNG state
+at some point, is able to recover the state at a later time by observing
+outputs of the PRNG. That is countered by switching the key to generators
+using a combination of a fresh key and the old one (using XOR), at
+re-seed time. All levels are immune to such attack after a re-seed.
+
+@subsubheading State-compromise: Meet-in-the-Middle
+
+This attack assumes that the attacker obtained the PRNG state at
+two distinct times, and being able to recover the state at the third time
+after observing the output of the PRNG. Given the approach described
+on the above paragraph, all levels are immune to such attack.
+
+@node FIPS140-2 mode
+@section FIPS140-2 mode
+
+GnuTLS can operate in a special mode for FIPS140-2. That mode of operation
+is for the conformance to NIST's FIPS140-2 publication, which consists of policies
+for cryptographic modules (such as software libraries). Its implementation in
+GnuTLS is designed for Red Hat Enterprise Linux, and can only be enabled
+when the library is explicitly compiled with the '--enable-fips140-mode'
+configure option. The operation of the library is then modified, as follows.
+
+@itemize
+@item FIPS140-2 mode is enabled when @code{/proc/sys/crypto/fips_enabled} contains '1' and @code{/etc/system-fips} is present.
+@item Only approved by FIPS140-2 algorithms are enabled
+@item Only approved by FIPS140-2 key lengths are allowed for key generation
+@item The random generator used switches to DRBG-AES
+@item The integrity of the GnuTLS and dependent libraries is checked on startup
+@item Algorithm self-tests are run on library load
+@item Any cryptographic operation will be refused if any of the self-tests failed
+@end itemize
+
+
+There are also few environment variables which modify that operation. The
+environment variable @code{GNUTLS_SKIP_FIPS_INTEGRITY_CHECKS} will disable
+the library integrity tests on startup, and the variable
+@code{GNUTLS_FORCE_FIPS_MODE} can be set to force a value from
+@ref{gnutls_fips_mode_t}, i.e., '1' will enable the FIPS140-2
+mode, while '0' will disable it.
+
+The integrity checks for the dependent libraries and GnuTLS are performed
+using '.hmac' files which are present at the same path as the library. The
+key for the operations can be provided on compile-time with the configure
+option '--with-fips140-key'. The MAC algorithm used is HMAC-SHA256.
+
+On runtime an application can verify whether the library is in FIPS140-2
+mode using the @funcref{gnutls_fips140_mode_enabled} function.
+
+@subheading Relaxing FIPS140-2 requirements
+
+The library by default operates in a strict enforcing mode, ensuring that
+all constraints imposed by the FIPS140-2 specification are enforced. However
+the application can relax these requirements via @funcref{gnutls_fips140_set_mode}
+which can switch to alternative modes as in @ref{gnutls_fips_mode_t}.
+
+@showenumdesc{gnutls_fips_mode_t,The @code{gnutls_@-fips_@-mode_t} enumeration.}
+
+The intention of this API is to be used by applications which may run in
+FIPS140-2 mode, while they utilize few algorithms not in the allowed set,
+e.g., for non-security related purposes. In these cases applications should
+wrap the non-compliant code within blocks like the following.
+
+@example
+GNUTLS_FIPS140_SET_LAX_MODE();
+
+_gnutls_hash_fast(GNUTLS_DIG_MD5, buffer, sizeof(buffer), output);
+
+GNUTLS_FIPS140_SET_STRICT_MODE();
+@end example
+
+The @code{GNUTLS_FIPS140_SET_LAX_MODE} and
+@code{GNUTLS_FIPS140_SET_STRICT_MODE} are macros to simplify the following
+sequence of calls.
+
+@example
+if (gnutls_fips140_mode_enabled())
+  gnutls_fips140_set_mode(GNUTLS_FIPS140_LAX, GNUTLS_FIPS140_SET_MODE_THREAD);
+
+_gnutls_hash_fast(GNUTLS_DIG_MD5, buffer, sizeof(buffer), output);
+
+if (gnutls_fips140_mode_enabled())
+  gnutls_fips140_set_mode(GNUTLS_FIPS140_STRICT, GNUTLS_FIPS140_SET_MODE_THREAD);
+@end example
+
+The reason of the @code{GNUTLS_FIPS140_SET_MODE_THREAD} flag in the
+previous calls is to localize the change in the mode. Note also, that
+such a block has no effect when the library is not operating
+under FIPS140-2 mode, and thus it can be considered a no-op.
+
+Applications could also switch FIPS140-2 mode explicitly off, by calling
+@example
+gnutls_fips140_set_mode(GNUTLS_FIPS140_LAX, 0);
+@end example

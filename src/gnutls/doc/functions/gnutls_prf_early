@@ -1,0 +1,44 @@
+
+
+
+
+@deftypefun {int} {gnutls_prf_early} (gnutls_session_t @var{session}, size_t @var{label_size}, const char * @var{label}, size_t @var{context_size}, const char * @var{context}, size_t @var{outsize}, char * @var{out})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{label_size}: length of the  @code{label} variable.
+
+@var{label}: label used in PRF computation, typically a short string.
+
+@var{context_size}: length of the  @code{extra} variable.
+
+@var{context}: optional extra data to seed the PRF with.
+
+@var{outsize}: size of pre-allocated output buffer to hold the output.
+
+@var{out}: pre-allocated buffer to hold the generated data.
+
+This function is similar to @code{gnutls_prf_rfc5705()} , but only works in
+TLS 1.3 or later to export early keying material.
+
+Note that the keying material is only available after the
+ClientHello message is processed and before the application traffic
+keys are established.  Therefore this function shall be called in a
+handshake hook function for @code{GNUTLS_HANDSHAKE_CLIENT_HELLO} .
+
+The  @code{label} variable usually contains a string denoting the purpose
+for the generated data.
+
+The  @code{context} variable can be used to add more data to the seed, after
+the random variables.  It can be used to make sure the
+generated output is strongly connected to some additional data
+(e.g., a string used in user authentication).
+
+The output is placed in  @code{out} , which must be pre-allocated.
+
+Note that, to provide the RFC5705 context, the  @code{context} variable
+must be non-null.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, or an error code.
+
+@strong{Since:} 3.6.6
+@end deftypefun

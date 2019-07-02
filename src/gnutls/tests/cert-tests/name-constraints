@@ -32,14 +32,14 @@ if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
 fi
 
-TMPFILE=tmp.$$.pem
+TMPFILE=constraints.$$.pem.tmp
 
 . ${srcdir}/../scripts/common.sh
 
 check_for_datefudge
 
 datefudge -s "2016-04-22" \
-	${VALGRIND} "${CERTTOOL}" -e --infile "${srcdir}/data/name-constraints-ip.pem"
+	${VALGRIND} "${CERTTOOL}" --verify-allow-broken -e --infile "${srcdir}/data/name-constraints-ip.pem"
 rc=$?
 
 if test "${rc}" != "0"; then
@@ -55,7 +55,7 @@ if test "${rc}" != "0"; then
 	exit 1
 fi
 
-${DIFF} "${TMPFILE}" "${srcdir}/data/name-constraints-ip2.pem" >/dev/null 2>&1
+${DIFF} -I ^warning "${TMPFILE}" "${srcdir}/data/name-constraints-ip2.pem" >/dev/null 2>&1
 rc=$?
 
 if test "${rc}" != "0"; then

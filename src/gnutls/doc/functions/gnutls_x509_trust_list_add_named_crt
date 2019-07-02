@@ -24,8 +24,8 @@ In principle this function can be used to set individual "server"
 certificates that are trusted by the user for that specific server
 but for no other purposes.
 
-The certificate must not be deinitialized during the lifetime
-of the trusted list.
+The certificate  @code{cert} must not be deinitialized during the lifetime
+of the  @code{list} .
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.

@@ -14,7 +14,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -23,6 +23,7 @@
 #include "str.h"
 #include "urls.h"
 #include "system-keys.h"
+#include <c-strcase.h>
 
 #define MAX_CUSTOM_URLS 8
 
@@ -46,19 +47,19 @@ unsigned gnutls_url_is_supported(const char *url)
 	unsigned i;
 
 	for (i=0;i<_gnutls_custom_urls_size;i++) {
-		if (strncmp(url, _gnutls_custom_urls[i].name, _gnutls_custom_urls[i].name_size) == 0)
+		if (c_strncasecmp(url, _gnutls_custom_urls[i].name, _gnutls_custom_urls[i].name_size) == 0)
 			return 1;
 	}
 
 #ifdef ENABLE_PKCS11
-	if (strncmp(url, PKCS11_URL, sizeof(PKCS11_URL)-1) == 0)
+	if (c_strncasecmp(url, PKCS11_URL, sizeof(PKCS11_URL)-1) == 0)
 		return 1;
 #endif
 #ifdef HAVE_TROUSERS
-	if (strncmp(url, TPMKEY_URL, sizeof(TPMKEY_URL)-1) == 0)
+	if (c_strncasecmp(url, TPMKEY_URL, sizeof(TPMKEY_URL)-1) == 0)
 		return 1;
 #endif
-	if (strncmp(url, SYSTEM_URL, sizeof(SYSTEM_URL)-1) == 0)
+	if (c_strncasecmp(url, SYSTEM_URL, sizeof(SYSTEM_URL)-1) == 0)
 		return _gnutls_system_url_is_supported(url);
 
 	return 0;
@@ -68,15 +69,15 @@ int _gnutls_url_is_known(const char *url)
 {
 	unsigned i;
 
-	if (strncmp(url, PKCS11_URL, sizeof(PKCS11_URL)-1) == 0)
+	if (c_strncasecmp(url, PKCS11_URL, sizeof(PKCS11_URL)-1) == 0)
 		return 1;
-	else if (strncmp(url, TPMKEY_URL, sizeof(TPMKEY_URL)-1) == 0)
+	else if (c_strncasecmp(url, TPMKEY_URL, sizeof(TPMKEY_URL)-1) == 0)
 		return 1;
-	else if (strncmp(url, SYSTEM_URL, sizeof(SYSTEM_URL)-1) == 0)
+	else if (c_strncasecmp(url, SYSTEM_URL, sizeof(SYSTEM_URL)-1) == 0)
 		return 1;
 	else {
 		for (i=0;i<_gnutls_custom_urls_size;i++) {
-			if (strncmp(url, _gnutls_custom_urls[i].name, _gnutls_custom_urls[i].name_size) == 0)
+			if (c_strncasecmp(url, _gnutls_custom_urls[i].name, _gnutls_custom_urls[i].name_size) == 0)
 				return 1;
 		}
 
@@ -147,12 +148,12 @@ int _gnutls_get_raw_issuer(const char *url, gnutls_x509_crt_t cert,
 	unsigned i;
 
 #ifdef ENABLE_PKCS11
-	if (strncmp(url, PKCS11_URL, PKCS11_URL_SIZE) == 0) {
-		return gnutls_pkcs11_get_raw_issuer(url, cert, issuer, GNUTLS_X509_FMT_DER, 0);
+	if (c_strncasecmp(url, PKCS11_URL, PKCS11_URL_SIZE) == 0) {
+		return gnutls_pkcs11_get_raw_issuer(url, cert, issuer, GNUTLS_X509_FMT_DER, flags);
 	}
 #endif
 	for (i=0;i<_gnutls_custom_urls_size;i++) {
-		if (strncmp(url, _gnutls_custom_urls[i].name, _gnutls_custom_urls[i].name_size) == 0) {
+		if (c_strncasecmp(url, _gnutls_custom_urls[i].name, _gnutls_custom_urls[i].name_size) == 0) {
 			if (_gnutls_custom_urls[i].get_issuer) {
 				return _gnutls_custom_urls[i].get_issuer(url, cert, issuer, flags);
 			}

@@ -201,7 +201,7 @@ static void client(int fd, const char *prio, int ign)
 		exit(1);
 	}
 	
-	ret = gnutls_alert_send(session, GNUTLS_AL_WARNING, GNUTLS_A_USER_CANCELED);
+	ret = gnutls_bye(session, GNUTLS_SHUT_WR);
 	if (ret < 0) {
 		fail("server (%s): Error sending alert\n", prio);
 		exit(1);
@@ -229,8 +229,6 @@ static void client(int fd, const char *prio, int ign)
 			exit(1);
 		}
 	}
-
-	gnutls_bye(session, GNUTLS_SHUT_WR);
 
       end:
 
@@ -327,16 +325,14 @@ static void server(int fd, const char *prio, int ign)
 		} while (ret == GNUTLS_E_AGAIN
 			 || ret == GNUTLS_E_INTERRUPTED);
 	} while (ret > 0);
-	
-	if (ret != GNUTLS_E_WARNING_ALERT_RECEIVED ||
-		gnutls_alert_get(session) != GNUTLS_A_USER_CANCELED) {
 
-		if (ret <= 0) {
-			if (ret != 0) {
-				fail("client: Error: %s\n", gnutls_strerror(ret));
-				exit(1);
-			}
-		}
+	if (ret < 0) {
+		fail("client: Error: %s\n", gnutls_strerror(ret));
+		exit(1);
+	}
+
+	if (ret != 0) {
+		fail("expected closure alert! Got: %d\n", ret);
 	}
 
 	/* Test sending */
@@ -383,10 +379,11 @@ static void server(int fd, const char *prio, int ign)
 		success("server: finished\n");
 }
 
-static void start(const char *prio, int ign)
+static void start(const char *name, const char *prio, int ign)
 {
 	int fd[2];
 	int ret;
+	int status;
 
 	ret = socketpair(AF_UNIX, SOCK_STREAM, 0, fd);
 	if (ret < 0) {
@@ -403,8 +400,11 @@ static void start(const char *prio, int ign)
 
 	if (child) {
 		/* parent */
+		success("testing %s\n", name);
 		close(fd[1]);
 		server(fd[0], prio, ign);
+		wait(&status);
+		check_wait_status(status);
 	} else {
 		close(fd[0]);
 		client(fd[1], prio, ign);
@@ -423,16 +423,14 @@ static void start(const char *prio, int ign)
 
 #define NULL_SHA1 "NONE:+VERS-TLS1.0:-CIPHER-ALL:+NULL:+SHA1:+SIGN-ALL:+COMP-NULL:+ANON-ECDH:+RSA:+CURVE-ALL"
 
-#define ARCFOUR_SHA1_ZLIB "NONE:+VERS-TLS1.0:-CIPHER-ALL:+ARCFOUR-128:+SHA1:+SIGN-ALL:+COMP-DEFLATE:+ANON-ECDH:+CURVE-ALL"
-
-#define AES_GCM_ZLIB "NONE:+VERS-TLS1.2:-CIPHER-ALL:+AES-128-GCM:+AEAD:+SIGN-ALL:+COMP-DEFLATE:+RSA:+CURVE-ALL"
 #define CHACHA_POLY1305 "NONE:+VERS-TLS1.2:-CIPHER-ALL:+RSA:+CHACHA20-POLY1305:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ECDHE-RSA:+CURVE-ALL"
+
+#define TLS13_AES_GCM "NONE:+VERS-TLS1.3:-CIPHER-ALL:+RSA:+AES-128-GCM:+MAC-ALL:+SIGN-ALL:+COMP-NULL:+GROUP-ALL"
+#define TLS13_AES_CCM "NONE:+VERS-TLS1.3:-CIPHER-ALL:+RSA:+AES-128-CCM:+MAC-ALL:+SIGN-ALL:+COMP-NULL:+GROUP-ALL"
+#define TLS13_CHACHA_POLY1305 "NONE:+VERS-TLS1.3:-CIPHER-ALL:+RSA:+CHACHA20-POLY1305:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+GROUP-ALL"
 
 static void ch_handler(int sig)
 {
-	int status;
-	wait(&status);
-	check_wait_status(status);
 	return;
 }
 
@@ -440,27 +438,24 @@ void doit(void)
 {
 	signal(SIGCHLD, ch_handler);
 
-	start(AES_CBC, 1);
-	start(AES_CBC_SHA256, 1);
-	start(AES_GCM, 0);
-	start(AES_CCM, 0);
-	start(AES_CCM_8, 0);
+	start("aes-cbc", AES_CBC, 1);
+	start("aes-cbc-sha256", AES_CBC_SHA256, 1);
+	start("aes-gcm", AES_GCM, 0);
+	start("aes-ccm", AES_CCM, 0);
+	start("aes-ccm-8", AES_CCM_8, 0);
 
-#ifndef ENABLE_FIPS140
-	start(NULL_SHA1, 0);
+	if (!gnutls_fips140_mode_enabled()) {
+		start("null-sha1", NULL_SHA1, 0);
 
-	start(ARCFOUR_SHA1, 0);
-	start(ARCFOUR_MD5, 0);
-	start(CHACHA_POLY1305, 0);
+		start("arcfour-sha1", ARCFOUR_SHA1, 0);
+		start("arcfour-md5", ARCFOUR_MD5, 0);
+		start("chacha20-poly1305", CHACHA_POLY1305, 0);
+		start("tls13-chacha20-poly1305", TLS13_CHACHA_POLY1305, 0);
+	}
 
-# ifdef HAVE_LIBZ
-	start(ARCFOUR_SHA1_ZLIB, 0);
-# endif
-#endif
+	start("tls13-aes-gcm", TLS13_AES_GCM, 0);
+	start("tls13-aes-ccm", TLS13_AES_CCM, 0);
 
-#ifdef HAVE_LIBZ
-	start(AES_GCM_ZLIB, 0);
-#endif
 }
 
 #endif				/* _WIN32 */

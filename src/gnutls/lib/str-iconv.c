@@ -17,7 +17,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -66,7 +66,7 @@ int _gnutls_ucs2_to_utf8(const void *data, size_t size,
 {
 	int ret;
 	size_t dstlen;
-	uint8_t *src;
+	void *src;
 	uint8_t *tmp_dst = NULL;
 	uint8_t *dst = NULL;
 
@@ -117,9 +117,8 @@ int _gnutls_ucs2_to_utf8(const void *data, size_t size,
 	return ret;
 }
 
-/* This is big-endian output only */
 int _gnutls_utf8_to_ucs2(const void *data, size_t size,
-			 gnutls_datum_t * output)
+			 gnutls_datum_t * output, unsigned be)
 {
 	int ret;
 	size_t dstlen, nrm_size = 0, tmp_size = 0;
@@ -130,7 +129,6 @@ int _gnutls_utf8_to_ucs2(const void *data, size_t size,
 	if (size == 0)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	dstlen = 0;
 	tmp_dst = u8_to_u16(data, size, NULL, &tmp_size);
 	if (tmp_dst == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
@@ -151,7 +149,7 @@ int _gnutls_utf8_to_ucs2(const void *data, size_t size,
 	}
 
 	/* convert to BE */
-	change_u16_endianness(dst, (uint8_t*)tmp_dst, dstlen, 1);
+	change_u16_endianness(dst, (uint8_t*)tmp_dst, dstlen, be);
 	dst[dstlen] = 0;
 	dst[dstlen+1] = 0;
 

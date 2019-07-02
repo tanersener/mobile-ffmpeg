@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pkcs11_token_get_ptr} (const char * @var{url}, void ** @var{ptr}, unsigned long * @var{slot_id}, unsigned int @var{flags})

@@ -1,0 +1,1 @@
+@item @var{gnutls_gost_paramset_t} @ref{gnutls_oid_to_gost_paramset} (const char * @var{oid})

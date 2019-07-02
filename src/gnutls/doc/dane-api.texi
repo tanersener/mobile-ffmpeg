@@ -262,7 +262,7 @@ rather than mentioning a successful DANE verication.
 
 Note that this function is designed to be run in addition to
 PKIX - certificate chain - verification. To be run independently
-the @code{DANE_VFLAG_ONLY_CHECK_EE_USAGE}  flag should be specified; 
+the @code{DANE_VFLAG_ONLY_CHECK_EE_USAGE}  flag should be specified;
 then the function will check whether the key of the peer matches the
 key advertized in the DANE entry.
 

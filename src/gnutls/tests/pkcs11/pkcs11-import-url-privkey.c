@@ -39,6 +39,12 @@
 /* Tests the private key import for sensitive keys in the common case and in
  * some problematic cases. */
 
+#ifdef ALL_CAPS_URI
+#define PURI "PKCS11:"
+#else
+#define PURI "pkcs11:"
+#endif
+
 #ifdef _WIN32
 # define P11LIB "libpkcs11mock1.dll"
 #else
@@ -76,7 +82,7 @@ void doit(void)
 		exit(1);
 	}
 
-	ret = gnutls_pkcs11_obj_list_import_url4(&obj_list, &obj_list_size, "pkcs11:", GNUTLS_PKCS11_OBJ_FLAG_PRIVKEY);
+	ret = gnutls_pkcs11_obj_list_import_url4(&obj_list, &obj_list_size, PURI, GNUTLS_PKCS11_OBJ_FLAG_PRIVKEY);
 	if (ret < 0) {
 		fail("%d: %s\n", ret, gnutls_strerror(ret));
 		exit(1);
@@ -85,7 +91,6 @@ void doit(void)
 	for (i=0;i<obj_list_size;i++)
 		gnutls_pkcs11_obj_deinit(obj_list[i]);
 	gnutls_free(obj_list);
-	obj_list = NULL;
 	obj_list_size = 0;
 
 #ifndef _WIN32
@@ -107,7 +112,7 @@ void doit(void)
 
 		*pflags = MOCK_FLAG_BROKEN_GET_ATTRIBUTES;
 
-		ret = gnutls_pkcs11_obj_list_import_url4(&obj_list, &obj_list_size, "pkcs11:", GNUTLS_PKCS11_OBJ_FLAG_PRIVKEY);
+		ret = gnutls_pkcs11_obj_list_import_url4(&obj_list, &obj_list_size, PURI, GNUTLS_PKCS11_OBJ_FLAG_PRIVKEY);
 		if (ret < 0) {
 			fail("%d: %s\n", ret, gnutls_strerror(ret));
 			exit(1);
@@ -116,7 +121,6 @@ void doit(void)
 		for (i=0;i<obj_list_size;i++)
 			gnutls_pkcs11_obj_deinit(obj_list[i]);
 		gnutls_free(obj_list);
-		obj_list = NULL;
 		obj_list_size = 0;
 	}
 #endif

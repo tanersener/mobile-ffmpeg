@@ -50,6 +50,30 @@ AES in CCM mode with 64-bit tag and 128-bit keys.
 AES in CCM mode with 64-bit tag and 256-bit keys.
 @item GNUTLS_@-CIPHER_@-CHACHA20_@-POLY1305
 The Chacha20 cipher with the Poly1305 authenticator (AEAD).
+@item GNUTLS_@-CIPHER_@-GOST28147_@-TC26Z_@-CFB
+GOST 28147-89 (Magma) cipher in CFB mode with TC26 Z S-box.
+@item GNUTLS_@-CIPHER_@-GOST28147_@-CPA_@-CFB
+GOST 28147-89 (Magma) cipher in CFB mode with CryptoPro A S-box.
+@item GNUTLS_@-CIPHER_@-GOST28147_@-CPB_@-CFB
+GOST 28147-89 (Magma) cipher in CFB mode with CryptoPro B S-box.
+@item GNUTLS_@-CIPHER_@-GOST28147_@-CPC_@-CFB
+GOST 28147-89 (Magma) cipher in CFB mode with CryptoPro C S-box.
+@item GNUTLS_@-CIPHER_@-GOST28147_@-CPD_@-CFB
+GOST 28147-89 (Magma) cipher in CFB mode with CryptoPro D S-box.
+@item GNUTLS_@-CIPHER_@-AES_@-128_@-CFB8
+AES in CFB8 mode with 128-bit keys.
+@item GNUTLS_@-CIPHER_@-AES_@-192_@-CFB8
+AES in CFB8 mode with 192-bit keys.
+@item GNUTLS_@-CIPHER_@-AES_@-256_@-CFB8
+AES in CFB8 mode with 256-bit keys.
+@item GNUTLS_@-CIPHER_@-AES_@-128_@-XTS
+AES in XTS mode with 128-bit key + 128bit tweak key.
+@item GNUTLS_@-CIPHER_@-AES_@-256_@-XTS
+AES in XTS mode with 256-bit key + 256bit tweak key.
+Note that the XTS ciphers are message oriented.
+The whole message needs to be provided with a single call, because
+cipher-stealing requires to know where the message actually terminates
+in order to be able to compute where the stealing occurs.
 @item GNUTLS_@-CIPHER_@-IDEA_@-PGP_@-CFB
 IDEA in CFB mode (placeholder - unsupported).
 @item GNUTLS_@-CIPHER_@-3DES_@-PGP_@-CFB
@@ -153,19 +177,31 @@ HMAC-SHA-512 algorithm.
 @item GNUTLS_@-MAC_@-SHA224
 HMAC-SHA-224 algorithm.
 @item GNUTLS_@-MAC_@-SHA3_@-224
--- undescribed --
+Reserved; unimplemented.
 @item GNUTLS_@-MAC_@-SHA3_@-256
--- undescribed --
+Reserved; unimplemented.
 @item GNUTLS_@-MAC_@-SHA3_@-384
--- undescribed --
+Reserved; unimplemented.
 @item GNUTLS_@-MAC_@-SHA3_@-512
--- undescribed --
+Reserved; unimplemented.
+@item GNUTLS_@-MAC_@-MD5_@-SHA1
+Combined MD5+SHA1 MAC placeholder.
+@item GNUTLS_@-MAC_@-GOSTR_@-94
+HMAC GOST R 34.11-94 algorithm.
+@item GNUTLS_@-MAC_@-STREEBOG_@-256
+HMAC GOST R 34.11-2001 (Streebog) algorithm, 256 bit.
+@item GNUTLS_@-MAC_@-STREEBOG_@-512
+HMAC GOST R 34.11-2001 (Streebog) algorithm, 512 bit.
 @item GNUTLS_@-MAC_@-AEAD
 MAC implicit through AEAD cipher.
 @item GNUTLS_@-MAC_@-UMAC_@-96
 The UMAC-96 MAC algorithm.
 @item GNUTLS_@-MAC_@-UMAC_@-128
 The UMAC-128 MAC algorithm.
+@item GNUTLS_@-MAC_@-AES_@-CMAC_@-128
+The AES-CMAC-128 MAC algorithm.
+@item GNUTLS_@-MAC_@-AES_@-CMAC_@-256
+The AES-CMAC-256 MAC algorithm.
 @end table
 
 @c gnutls_digest_algorithm_t
@@ -198,6 +234,14 @@ SHA3-256 algorithm.
 SHA3-384 algorithm.
 @item GNUTLS_@-DIG_@-SHA3_@-512
 SHA3-512 algorithm.
+@item GNUTLS_@-DIG_@-MD5_@-SHA1
+Combined MD5+SHA1 algorithm.
+@item GNUTLS_@-DIG_@-GOSTR_@-94
+GOST R 34.11-94 algorithm.
+@item GNUTLS_@-DIG_@-STREEBOG_@-256
+GOST R 34.11-2001 (Streebog) algorithm, 256 bit.
+@item GNUTLS_@-DIG_@-STREEBOG_@-512
+GOST R 34.11-2001 (Streebog) algorithm, 512 bit.
 @end table
 
 @c gnutls_compression_method_t
@@ -223,7 +267,7 @@ Connection is datagram oriented (DTLS). Since 3.0.0.
 @item GNUTLS_@-NONBLOCK
 Connection should not block. Since 3.0.0.
 @item GNUTLS_@-NO_@-EXTENSIONS
-Do not enable any TLS extensions by default (since 3.1.2).
+Do not enable any TLS extensions by default (since 3.1.2). As TLS 1.2 and later require extensions this option is considered obsolete and should not be used.
 @item GNUTLS_@-NO_@-REPLAY_@-PROTECTION
 Disable any replay protection in DTLS. This must only be used if  replay protection is achieved using other means. Since 3.2.2.
 @item GNUTLS_@-NO_@-SIGNAL
@@ -236,6 +280,50 @@ Enable the TLS false start on client side if the negotiated ciphersuites allow i
 When in client side and only a single cert is specified, send that certificate irrespective of the issuers expected by the server. Since 3.5.0.
 @item GNUTLS_@-NO_@-TICKETS
 Flag to indicate that the session should not use resumption with session tickets.
+@item GNUTLS_@-KEY_@-SHARE_@-TOP
+Generate key share for the first group which is enabled.
+For example x25519. This option is the most performant for client (less CPU spent
+generating keys), but if the server doesn't support the advertized option it may
+result to more roundtrips needed to discover the server's choice.
+@item GNUTLS_@-KEY_@-SHARE_@-TOP2
+Generate key shares for the top-2 different groups which are enabled.
+For example (ECDH + x25519). This is the default.
+@item GNUTLS_@-KEY_@-SHARE_@-TOP3
+Generate key shares for the top-3 different groups which are enabled.
+That is, as each group is associated with a key type (EC, finite field, x25519), generate
+three keys using @code{GNUTLS_PK_DH} , @code{GNUTLS_PK_EC} , @code{GNUTLS_PK_ECDH_X25519}  if all of them are enabled.
+@item GNUTLS_@-POST_@-HANDSHAKE_@-AUTH
+Enable post handshake authentication for server and client. When set and
+a server requests authentication after handshake @code{GNUTLS_E_REAUTH_REQUEST}  will be returned
+by @code{gnutls_record_recv()} . A client should then call @code{gnutls_reauth()}  to re-authenticate.
+@item GNUTLS_@-NO_@-AUTO_@-REKEY
+Disable auto-rekeying under TLS1.3. If this option is not specified
+gnutls will force a rekey after 2^24 records have been sent.
+@item GNUTLS_@-SAFE_@-PADDING_@-CHECK
+Flag to indicate that the TLS 1.3 padding check will be done in a
+safe way which doesn't leak the pad size based on GnuTLS processing time. This is of use to
+applications which hide the length of transferred data via the TLS1.3 padding mechanism and
+are already taking steps to hide the data processing time. This comes at a performance
+penalty.
+@item GNUTLS_@-ENABLE_@-EARLY_@-START
+Under TLS1.3 allow the server to return earlier than the full handshake
+finish; similarly to false start the handshake will be completed once data are received by the
+client, while the server is able to transmit sooner. This is not enabled by default as it could
+break certain existing server assumptions and use-cases. Since 3.6.4.
+@item GNUTLS_@-ENABLE_@-RAWPK
+Allows raw public-keys to be negotiated during the handshake. Since 3.6.6.
+@item GNUTLS_@-AUTO_@-REAUTH
+Enable transparent re-authentication in client side when the server
+requests to. That is, reauthentication is handled within @code{gnutls_record_recv()} , and
+the @code{GNUTLS_E_REHANDSHAKE}  or @code{GNUTLS_E_REAUTH_REQUEST}  are not returned. This must be
+enabled with @code{GNUTLS_POST_HANDSHAKE_AUTH}  for TLS1.3. Enabling this flag requires to restore
+interrupted calls to @code{gnutls_record_recv()}  based on the output of @code{gnutls_record_get_direction()} ,
+since @code{gnutls_record_recv()}  could be interrupted when sending when this flag is enabled.
+Note this flag may not be used if you are using the same session for sending and receiving
+in different threads.
+@item GNUTLS_@-ENABLE_@-EARLY_@-DATA
+Under TLS1.3 allow the server to receive early data sent as part of the initial ClientHello (0-RTT). 
+This is not enabled by default as early data has weaker security properties than other data. Since 3.6.5.
 @end table
 
 @c gnutls_alert_level_t
@@ -298,6 +386,8 @@ Inappropriate fallback,
 User canceled.
 @item GNUTLS_@-A_@-NO_@-RENEGOTIATION
 No renegotiation is allowed.
+@item GNUTLS_@-A_@-MISSING_@-EXTENSION
+An extension was expected but was not seen
 @item GNUTLS_@-A_@-UNSUPPORTED_@-EXTENSION
 An unsupported extension was
 sent.
@@ -310,9 +400,13 @@ recognized.
 @item GNUTLS_@-A_@-UNKNOWN_@-PSK_@-IDENTITY
 The SRP/PSK username is missing
 or not known.
+@item GNUTLS_@-A_@-CERTIFICATE_@-REQUIRED
+Certificate is required.
 @item GNUTLS_@-A_@-NO_@-APPLICATION_@-PROTOCOL
 The ALPN protocol requested is
 not supported by the peer.
+@item GNUTLS_@-A_@-MAX
+-- undescribed --
 @end table
 
 @c gnutls_handshake_description_t
@@ -327,6 +421,10 @@ Server hello.
 DTLS Hello verify request.
 @item GNUTLS_@-HANDSHAKE_@-NEW_@-SESSION_@-TICKET
 New session ticket.
+@item GNUTLS_@-HANDSHAKE_@-END_@-OF_@-EARLY_@-DATA
+End of early data.
+@item GNUTLS_@-HANDSHAKE_@-ENCRYPTED_@-EXTENSIONS
+Encrypted extensions message.
 @item GNUTLS_@-HANDSHAKE_@-CERTIFICATE_@-PKT
 Certificate packet.
 @item GNUTLS_@-HANDSHAKE_@-SERVER_@-KEY_@-EXCHANGE
@@ -345,10 +443,14 @@ Finished.
 Certificate status (OCSP).
 @item GNUTLS_@-HANDSHAKE_@-SUPPLEMENTAL
 Supplemental.
+@item GNUTLS_@-HANDSHAKE_@-KEY_@-UPDATE
+TLS1.3 key update message.
 @item GNUTLS_@-HANDSHAKE_@-CHANGE_@-CIPHER_@-SPEC
 Change Cipher Spec.
 @item GNUTLS_@-HANDSHAKE_@-CLIENT_@-HELLO_@-V2
 SSLv2 Client Hello.
+@item GNUTLS_@-HANDSHAKE_@-HELLO_@-RETRY_@-REQUEST
+Hello retry request.
 @end table
 
 @c gnutls_certificate_status_t
@@ -365,7 +467,7 @@ The certificate's issuer is not known.
 This is the case if the issuer is not included in the trusted certificate list.
 @item GNUTLS_@-CERT_@-SIGNER_@-NOT_@-CA
 The certificate's signer was not a CA. This
-may happen if this was a version 1 certificate, which is common with 
+may happen if this was a version 1 certificate, which is common with
 some CAs, or a version 3 certificate without the basic constrains extension.
 @item GNUTLS_@-CERT_@-INSECURE_@-ALGORITHM
 The certificate was signed using an insecure
@@ -394,6 +496,8 @@ The certificate or an intermediate does not match the intended purpose (extended
 The certificate requires the server to send the certifiate status, but no status was received.
 @item GNUTLS_@-CERT_@-INVALID_@-OCSP_@-STATUS
 The received OCSP status response is invalid.
+@item GNUTLS_@-CERT_@-UNKNOWN_@-CRIT_@-EXTENSIONS
+The certificate has extensions marked as critical which are not supported.
 @end table
 
 @c gnutls_certificate_request_t
@@ -434,6 +538,8 @@ Same as @code{GNUTLS_TLS1_0} .
 TLS version 1.1.
 @item GNUTLS_@-TLS1_@-2
 TLS version 1.2.
+@item GNUTLS_@-TLS1_@-3
+TLS version 1.3.
 @item GNUTLS_@-DTLS0_@-9
 DTLS version 0.9 (Cisco AnyConnect / OpenSSL 0.9.8e).
 @item GNUTLS_@-DTLS1_@-0
@@ -443,9 +549,9 @@ DTLS version 1.2.
 @item GNUTLS_@-DTLS_@-VERSION_@-MIN
 -- undescribed --
 @item GNUTLS_@-DTLS_@-VERSION_@-MAX
--- undescribed --
+Maps to the highest supported DTLS version.
 @item GNUTLS_@-TLS_@-VERSION_@-MAX
--- undescribed --
+Maps to the highest supported TLS version.
 @item GNUTLS_@-VERSION_@-UNKNOWN
 Unknown SSL/TLS version.
 @end table
@@ -458,8 +564,10 @@ Unknown certificate type.
 X.509 Certificate.
 @item GNUTLS_@-CRT_@-OPENPGP
 OpenPGP certificate.
-@item GNUTLS_@-CRT_@-RAW
-Raw public key (SubjectPublicKey)
+@item GNUTLS_@-CRT_@-RAWPK
+Raw public-key (SubjectPublicKeyInfo)
+@item GNUTLS_@-CRT_@-MAX
+-- undescribed --
 @end table
 
 @c gnutls_x509_crt_fmt_t
@@ -496,8 +604,20 @@ DSA public-key algorithm.
 Diffie-Hellman algorithm. Used to generate parameters.
 @item GNUTLS_@-PK_@-ECDSA
 Elliptic curve algorithm. These parameters are compatible with the ECDSA and ECDH algorithm.
-@item GNUTLS_@-PK_@-ECDHX
+@item GNUTLS_@-PK_@-ECDH_@-X25519
 Elliptic curve algorithm, restricted to ECDH as per rfc7748.
+@item GNUTLS_@-PK_@-RSA_@-PSS
+RSA public-key algorithm, with PSS padding.
+@item GNUTLS_@-PK_@-EDDSA_@-ED25519
+Edwards curve Digital signature algorithm. Used with SHA512 on signatures.
+@item GNUTLS_@-PK_@-GOST_@-01
+GOST R 34.10-2001 algorithm per rfc5832.
+@item GNUTLS_@-PK_@-GOST_@-12_@-256
+GOST R 34.10-2012 algorithm, 256-bit key per rfc7091.
+@item GNUTLS_@-PK_@-GOST_@-12_@-512
+GOST R 34.10-2012 algorithm, 512-bit key per rfc7091.
+@item GNUTLS_@-PK_@-MAX
+-- undescribed --
 @end table
 
 @c gnutls_sign_algorithm_t
@@ -568,6 +688,45 @@ Digital signature algorithm RSA with SHA3-256.
 Digital signature algorithm RSA with SHA3-384.
 @item GNUTLS_@-SIGN_@-RSA_@-SHA3_@-512
 Digital signature algorithm RSA with SHA3-512.
+@item GNUTLS_@-SIGN_@-RSA_@-PSS_@-SHA256
+Digital signature algorithm RSA with SHA-256, with PSS padding (RSA-PSS certificate).
+@item GNUTLS_@-SIGN_@-RSA_@-PSS_@-SHA384
+Digital signature algorithm RSA with SHA-384, with PSS padding (RSA-PSS certificate).
+@item GNUTLS_@-SIGN_@-RSA_@-PSS_@-SHA512
+Digital signature algorithm RSA with SHA-512, with PSS padding (RSA-PSS certificate).
+@item GNUTLS_@-SIGN_@-EDDSA_@-ED25519
+Digital signature algorithm EdDSA with Ed25519 curve.
+@item GNUTLS_@-SIGN_@-RSA_@-RAW
+Digital signature algorithm RSA with DigestInfo formatted data
+@item GNUTLS_@-SIGN_@-ECDSA_@-SECP256R1_@-SHA256
+Digital signature algorithm ECDSA-SECP256R1 with SHA-256 (used in TLS 1.3 but not PKIX).
+@item GNUTLS_@-SIGN_@-ECDSA_@-SECP384R1_@-SHA384
+Digital signature algorithm ECDSA-SECP384R1 with SHA-384 (used in TLS 1.3 but not PKIX).
+@item GNUTLS_@-SIGN_@-ECDSA_@-SECP521R1_@-SHA512
+Digital signature algorithm ECDSA-SECP521R1 with SHA-512 (used in TLS 1.3 but not PKIX).
+@item GNUTLS_@-SIGN_@-RSA_@-PSS_@-RSAE_@-SHA256
+Digital signature algorithm RSA with SHA-256,
+with PSS padding (RSA PKCS@code{1}  1.5 certificate). This signature is identical
+to @code{GNUTLS_SIGN_RSA_PSS_SHA256} , but they are distinct as the TLS1.3 protocol
+treats them differently.
+@item GNUTLS_@-SIGN_@-RSA_@-PSS_@-RSAE_@-SHA384
+Digital signature algorithm RSA with SHA-384,
+with PSS padding (RSA PKCS@code{1}  1.5 certificate). This signature is identical
+to @code{GNUTLS_SIGN_RSA_PSS_SHA384} , but they are distinct as the TLS1.3 protocol
+treats them differently.
+@item GNUTLS_@-SIGN_@-RSA_@-PSS_@-RSAE_@-SHA512
+Digital signature algorithm RSA with SHA-512,
+with PSS padding (RSA PKCS@code{1}  1.5 certificate). This signature is identical
+to @code{GNUTLS_SIGN_RSA_PSS_SHA512} , but they are distinct as the TLS1.3 protocol
+treats them differently.
+@item GNUTLS_@-SIGN_@-GOST_@-94
+Digital signature algorithm GOST R 34.10-2001 with GOST R 34.11-94
+@item GNUTLS_@-SIGN_@-GOST_@-256
+Digital signature algorithm GOST R 34.10-2012 with GOST R 34.11-2012 256 bit
+@item GNUTLS_@-SIGN_@-GOST_@-512
+Digital signature algorithm GOST R 34.10-2012 with GOST R 34.11-2012 512 bit
+@item GNUTLS_@-SIGN_@-MAX
+-- undescribed --
 @end table
 
 @c gnutls_ecc_curve_t
@@ -586,6 +745,54 @@ the SECP521R1 curve
 the SECP192R1 curve
 @item GNUTLS_@-ECC_@-CURVE_@-X25519
 the X25519 curve (ECDH only)
+@item GNUTLS_@-ECC_@-CURVE_@-ED25519
+the Ed25519 curve
+@item GNUTLS_@-ECC_@-CURVE_@-GOST256CPA
+GOST R 34.10 CryptoPro 256 A curve
+@item GNUTLS_@-ECC_@-CURVE_@-GOST256CPB
+GOST R 34.10 CryptoPro 256 B curve
+@item GNUTLS_@-ECC_@-CURVE_@-GOST256CPC
+GOST R 34.10 CryptoPro 256 C curve
+@item GNUTLS_@-ECC_@-CURVE_@-GOST256CPXA
+GOST R 34.10 CryptoPro 256 XchA curve
+@item GNUTLS_@-ECC_@-CURVE_@-GOST256CPXB
+GOST R 34.10 CryptoPro 256 XchB curve
+@item GNUTLS_@-ECC_@-CURVE_@-GOST512A
+GOST R 34.10 TC26 512 A curve
+@item GNUTLS_@-ECC_@-CURVE_@-GOST512B
+GOST R 34.10 TC26 512 B curve
+@item GNUTLS_@-ECC_@-CURVE_@-MAX
+-- undescribed --
+@end table
+
+@c gnutls_group_t
+@table @code
+@item GNUTLS_@-GROUP_@-INVALID
+Indicates unknown/invalid group
+@item GNUTLS_@-GROUP_@-SECP192R1
+the SECP192R1 curve group (legacy, only for TLS 1.2 compatibility)
+@item GNUTLS_@-GROUP_@-SECP224R1
+the SECP224R1 curve group (legacy, only for TLS 1.2 compatibility)
+@item GNUTLS_@-GROUP_@-SECP256R1
+the SECP256R1 curve group
+@item GNUTLS_@-GROUP_@-SECP384R1
+the SECP384R1 curve group
+@item GNUTLS_@-GROUP_@-SECP521R1
+the SECP521R1 curve group
+@item GNUTLS_@-GROUP_@-X25519
+the X25519 curve group
+@item GNUTLS_@-GROUP_@-FFDHE2048
+the FFDHE2048 group
+@item GNUTLS_@-GROUP_@-FFDHE3072
+the FFDHE3072 group
+@item GNUTLS_@-GROUP_@-FFDHE4096
+the FFDHE4096 group
+@item GNUTLS_@-GROUP_@-FFDHE8192
+the FFDHE8192 group
+@item GNUTLS_@-GROUP_@-FFDHE6144
+the FFDHE6144 group
+@item GNUTLS_@-GROUP_@-MAX
+-- undescribed --
 @end table
 
 @c gnutls_sec_param_t
@@ -612,12 +819,42 @@ Less than 42 bits of security
 192 bits of security
 @item GNUTLS_@-SEC_@-PARAM_@-FUTURE
 256 bits of security
+@item GNUTLS_@-SEC_@-PARAM_@-MAX
+-- undescribed --
 @end table
 
 @c gnutls_channel_binding_t
 @table @code
 @item GNUTLS_@-CB_@-TLS_@-UNIQUE
 "tls-unique" (RFC 5929) channel binding
+@end table
+
+@c gnutls_gost_paramset_t
+@table @code
+@item GNUTLS_@-GOST_@-PARAMSET_@-UNKNOWN
+Unknown/default parameter set
+@item GNUTLS_@-GOST_@-PARAMSET_@-TC26_@-Z
+Specified by TC26, see rfc7836
+@item GNUTLS_@-GOST_@-PARAMSET_@-CP_@-A
+CryptoPro-A, see rfc4357
+@item GNUTLS_@-GOST_@-PARAMSET_@-CP_@-B
+CryptoPro-B, see rfc4357
+@item GNUTLS_@-GOST_@-PARAMSET_@-CP_@-C
+CryptoPro-C, see rfc4357
+@item GNUTLS_@-GOST_@-PARAMSET_@-CP_@-D
+CryptoPro-D, see rfc4357
+@end table
+
+@c gnutls_ctype_target_t
+@table @code
+@item GNUTLS_@-CTYPE_@-CLIENT
+for requesting client certificate type values.
+@item GNUTLS_@-CTYPE_@-SERVER
+for requesting server certificate type values.
+@item GNUTLS_@-CTYPE_@-OURS
+for requesting our certificate type values.
+@item GNUTLS_@-CTYPE_@-PEERS
+for requesting the peers' certificate type values.
 @end table
 
 @c gnutls_server_name_type_t
@@ -639,7 +876,17 @@ The heartbeat negotiation allows the local side to send heartbeat messages
 @item GNUTLS_@-SFLAGS_@-HB_@-PEER_@-SEND
 The heartbeat negotiation allows the peer to send heartbeat messages
 @item GNUTLS_@-SFLAGS_@-FALSE_@-START
-The appdata set with @code{gnutls_handshake_set_appdata()}  were sent during handshake (false start)
+False start was used in this client session.
+@item GNUTLS_@-SFLAGS_@-RFC7919
+The RFC7919 Diffie-Hellman parameters were negotiated
+@item GNUTLS_@-SFLAGS_@-SESSION_@-TICKET
+A session ticket has been received by the server.
+@item GNUTLS_@-SFLAGS_@-POST_@-HANDSHAKE_@-AUTH
+Indicates client capability for post-handshake auth; set only on server side.
+@item GNUTLS_@-SFLAGS_@-EARLY_@-START
+The TLS1.3 server session returned early.
+@item GNUTLS_@-SFLAGS_@-EARLY_@-DATA
+The TLS1.3 early data has been received by the server.
 @end table
 
 @c gnutls_supplemental_data_format_type_t
@@ -676,15 +923,20 @@ will take precedence over the client's.
 Unknown data type.
 @item GNUTLS_@-DT_@-DNS_@-HOSTNAME
 The data contain a null-terminated DNS hostname; the hostname will be 
-matched using the RFC6125 rules.
+matched using the RFC6125 rules. If the data contain a textual IP (v4 or v6) address it will
+be marched against the IPAddress Alternative name, unless the verification flag @code{GNUTLS_VERIFY_DO_NOT_ALLOW_IP_MATCHES} 
+is specified.
 @item GNUTLS_@-DT_@-KEY_@-PURPOSE_@-OID
 The data contain a null-terminated key purpose OID. It will be matched
 against the certificate's Extended Key Usage extension.
 @item GNUTLS_@-DT_@-RFC822NAME
 The data contain a null-terminated email address; the email will be
-matched against the RFC822Name field of the certificate, or the EMAIL DN component if the
+matched against the RFC822Name Alternative name of the certificate, or the EMAIL DN component if the
 former isn't available. Prior to matching the email address will be converted to ACE
 (ASCII-compatible-encoding).
+@item GNUTLS_@-DT_@-IP_@-ADDRESS
+The data contain a raw IP address (4 or 16 bytes). If will be matched
+against the IPAddress Alternative name; option available since 3.6.0.
 @end table
 
 @c gnutls_certificate_flags
@@ -693,6 +945,12 @@ former isn't available. Prior to matching the email address will be converted to
 Skip the key and certificate matching check.
 @item GNUTLS_@-CERTIFICATE_@-API_@-V2
 If set the gnutls_certificate_set_*key* functions will return an index of the added key pair instead of zero.
+@item GNUTLS_@-CERTIFICATE_@-SKIP_@-OCSP_@-RESPONSE_@-CHECK
+If set, the gnutls_certificate_set_ocsp_status_request_file
+function, will not check whether the response set matches any of the certificates.
+@item GNUTLS_@-CERTIFICATE_@-VERIFY_@-CRLS
+This will enable CRL verification when added in the certificate structure.
+When used, it requires CAs to be added before CRLs.
 @end table
 
 @c gnutls_psk_key_flags
@@ -752,54 +1010,63 @@ The PIN is for a specific action and key like signing.
 @item GNUTLS_@-PIN_@-WRONG
 Last given PIN was not correct.
 @end table
-@subheading int
-@anchor{int}
-@deftypefun {typedef} {int} (* @var{gnutls_pin_callback_t})
-@var{gnutls_pin_callback_t}: -- undescribed --
-
-Callback function type for PKCS@code{11}  or TPM PIN entry.  It is set by
-functions like @code{gnutls_pkcs11_set_pin_function()} .
-
-The callback should provides the PIN code to unlock the token with
-label  @code{token_label} , specified by the URL  @code{token_url} .
-
-The PIN code, as a NUL-terminated ASCII string, should be copied
-into the  @code{pin} buffer (of maximum size  @code{pin_max} ), and return 0 to
-indicate success.  Alternatively, the callback may return a
-negative gnutls error code to indicate failure and cancel PIN entry
-(in which case, the contents of the  @code{pin} parameter are ignored).
-
-When a PIN is required, the callback will be invoked repeatedly
-(and indefinitely) until either the returned PIN code is correct,
-the callback returns failure, or the token refuses login (e.g. when
-the token is locked due to too many incorrect PINs!).  For the
-first such invocation, the  @code{attempt} counter will have value zero;
-it will increase by one for each subsequent attempt.
-
-@strong{Returns:} @code{GNUTLS_E_SUCCESS}  (0) on success or a negative error code on error.
-
-@strong{Since:} 2.12.0
-@end deftypefun
-
 
 @c gnutls_ext_parse_type_t
 @table @code
 @item GNUTLS_@-EXT_@-ANY
-Any extension type (internal use only).
+Any extension type (should not be used as it is used only internally).
 @item GNUTLS_@-EXT_@-APPLICATION
-Application extension.
+Parsed after  @code{GNUTLS_EXT_MANDATORY} 
 @item GNUTLS_@-EXT_@-TLS
-TLS-internal extension.
+TLS-internal extensions, parsed after  @code{GNUTLS_EXT_APPLICATION} .
 @item GNUTLS_@-EXT_@-MANDATORY
-Extension parsed even if resuming (or extensions are disabled).
+Parsed after  @code{GNUTLS_EXT_VERSION_NEG} and even when resuming.
 @item GNUTLS_@-EXT_@-NONE
-Never parsed
+Never to be parsed
+@item GNUTLS_@-EXT_@-VERSION_@-NEG
+Extensions to be parsed first for TLS version negotiation.
 @end table
 
 @c gnutls_ext_flags_t
 @table @code
 @item GNUTLS_@-EXT_@-FLAG_@-OVERRIDE_@-INTERNAL
-If specified the extension registered will override the internal; this does not work with extensions existing prior to 3.5.12.
+If specified the extension registered will override the internal; this does not work with extensions existing prior to 3.6.0.
+@item GNUTLS_@-EXT_@-FLAG_@-CLIENT_@-HELLO
+This extension can be present in a client hello
+@item GNUTLS_@-EXT_@-FLAG_@-TLS12_@-SERVER_@-HELLO
+This extension can be present in a TLS1.2 or earlier server hello
+@item GNUTLS_@-EXT_@-FLAG_@-TLS13_@-SERVER_@-HELLO
+This extension can be present in a TLS1.3 server hello
+@item GNUTLS_@-EXT_@-FLAG_@-EE
+This extension can be present in encrypted extensions message
+@item GNUTLS_@-EXT_@-FLAG_@-HRR
+This extension can be present in hello retry request message
+@item GNUTLS_@-EXT_@-FLAG_@-IGNORE_@-CLIENT_@-REQUEST
+When flag is present, this extension will be send even if the client didn't advertise it. An extension of this type is the Cookie TLS1.3 extension.
+@item GNUTLS_@-EXT_@-FLAG_@-TLS
+This extension can be present under TLS; otherwise ignored.
+@item GNUTLS_@-EXT_@-FLAG_@-DTLS
+This extension can be present under DTLS; otherwise ignored.
+@end table
+
+@c gnutls_fips_mode_t
+@table @code
+@item GNUTLS_@-FIPS140_@-DISABLED
+The FIPS140-2 mode is disabled.
+@item GNUTLS_@-FIPS140_@-STRICT
+The default mode; all forbidden operations will cause an
+operation failure via error code.
+@item GNUTLS_@-FIPS140_@-SELFTESTS
+A transient state during library initialization. That state
+cannot be set or seen by applications.
+@item GNUTLS_@-FIPS140_@-LAX
+The library still uses the FIPS140-2 relevant algorithms but all
+forbidden by FIPS140-2 operations are allowed; this is useful when the
+application is aware of the followed security policy, and needs
+to utilize disallowed operations for other reasons (e.g., compatibility).
+@item GNUTLS_@-FIPS140_@-LOG
+Similarly to @code{GNUTLS_FIPS140_LAX} , it allows forbidden operations; any use of them results
+to a message to the audit callback functions.
 @end table
 
 @c gnutls_certificate_import_flags
@@ -816,12 +1083,22 @@ The error code will be @code{GNUTLS_E_CERTIFICATE_LIST_UNSORTED} .
 Sort the certificate chain if unsorted.
 @end table
 
+@c gnutls_x509_crt_flags
+@table @code
+@item GNUTLS_@-X509_@-CRT_@-FLAG_@-IGNORE_@-SANITY
+Ignore any sanity checks at the
+import of the certificate; i.e., ignore checks such as version/field
+matching and strict time field checks. Intended to be used for debugging.
+@end table
+
 @c gnutls_keyid_flags_t
 @table @code
 @item GNUTLS_@-KEYID_@-USE_@-SHA1
 Use SHA1 as the key ID algorithm (default).
 @item GNUTLS_@-KEYID_@-USE_@-SHA256
 Use SHA256 as the key ID algorithm.
+@item GNUTLS_@-KEYID_@-USE_@-SHA512
+Use SHA512 as the key ID algorithm.
 @item GNUTLS_@-KEYID_@-USE_@-BEST_@-KNOWN
 Use the best known algorithm to calculate key ID. Using that option will make your program behavior depend on the version of gnutls linked with. That option has a cap of 64-bytes key IDs.
 @end table
@@ -832,6 +1109,10 @@ Use the best known algorithm to calculate key ID. Using that option will make yo
 If set a signer does not have to be
 a certificate authority. This flag should normally be disabled,
 unless you know what this means.
+@item GNUTLS_@-VERIFY_@-DO_@-NOT_@-ALLOW_@-IP_@-MATCHES
+When verifying a hostname
+prevent textual IP addresses from matching IP addresses in the
+certificate. Treat the input only as a DNS name.
 @item GNUTLS_@-VERIFY_@-DO_@-NOT_@-ALLOW_@-SAME
 If a certificate is not signed by
 anyone trusted but exists in the trusted CA list do not treat it
@@ -874,10 +1155,18 @@ check in the verification, do not consider any wildcards.
 @item GNUTLS_@-VERIFY_@-USE_@-TLS1_@-RSA
 This indicates that a (raw) RSA signature is provided
 as in the TLS 1.0 protocol. Not all functions accept this flag.
+@item GNUTLS_@-VERIFY_@-IGNORE_@-UNKNOWN_@-CRIT_@-EXTENSIONS
+This signals the verification
+process, not to fail on unknown critical extensions.
+@item GNUTLS_@-VERIFY_@-ALLOW_@-SIGN_@-WITH_@-SHA1
+Allow certificates to be signed
+using the broken SHA1 hash algorithm.
 @end table
 
 @c gnutls_certificate_verification_profiles_t
 @table @code
+@item GNUTLS_@-PROFILE_@-UNKNOWN
+An invalid/unknown profile.
 @item GNUTLS_@-PROFILE_@-VERY_@-WEAK
 A verification profile that
 corresponds to  @code{GNUTLS_SEC_PARAM_VERY_WEAK} (64 bits)
@@ -895,7 +1184,10 @@ A verification profile that
 corresponds to  @code{GNUTLS_SEC_PARAM_HIGH} (128 bits)
 @item GNUTLS_@-PROFILE_@-ULTRA
 A verification profile that
-corresponds to  @code{GNUTLS_SEC_PARAM_ULTRA} (256 bits)
+corresponds to  @code{GNUTLS_SEC_PARAM_ULTRA} (192 bits)
+@item GNUTLS_@-PROFILE_@-FUTURE
+A verification profile that
+corresponds to  @code{GNUTLS_SEC_PARAM_FUTURE} (256 bits)
 @item GNUTLS_@-PROFILE_@-SUITEB128
 A verification profile that
 applies the SUITEB128 rules
@@ -927,7 +1219,17 @@ Some schemas distinguish between an empty and a NULL password.
 @item GNUTLS_@-PKCS_@-PBES2_@-DES
 PBES2 single DES.
 @item GNUTLS_@-PKCS_@-PBES1_@-DES_@-MD5
--- undescribed --
+PBES1 with single DES; for compatibility with openssl only.
+@item GNUTLS_@-PKCS_@-PBES2_@-GOST_@-TC26Z
+PBES2 GOST 28147-89 CFB with TC26-Z S-box.
+@item GNUTLS_@-PKCS_@-PBES2_@-GOST_@-CPA
+PBES2 GOST 28147-89 CFB with CryptoPro-A S-box.
+@item GNUTLS_@-PKCS_@-PBES2_@-GOST_@-CPB
+PBES2 GOST 28147-89 CFB with CryptoPro-B S-box.
+@item GNUTLS_@-PKCS_@-PBES2_@-GOST_@-CPC
+PBES2 GOST 28147-89 CFB with CryptoPro-C S-box.
+@item GNUTLS_@-PKCS_@-PBES2_@-GOST_@-CPD
+PBES2 GOST 28147-89 CFB with CryptoPro-D S-box.
 @end table
 
 @c gnutls_keygen_types_t
@@ -936,6 +1238,8 @@ PBES2 single DES.
 Specifies the seed to be used in key generation.
 @item GNUTLS_@-KEYGEN_@-DIGEST
 The size field specifies the hash algorithm to be used in key generation.
+@item GNUTLS_@-KEYGEN_@-SPKI
+data points to a @code{gnutls_x509_spki_t}  structure; it is not used after the key generation call.
 @end table
 
 @c gnutls_pkcs12_bag_type_t
@@ -957,24 +1261,6 @@ Encrypted PKCS-12 bag.
 @item GNUTLS_@-BAG_@-UNKNOWN
 Unknown PKCS-12 bag.
 @end table
-@subheading int
-@anchor{int}
-@deftypefun {typedef} {int} (* @var{gnutls_pkcs11_token_callback_t})
-@var{gnutls_pkcs11_token_callback_t}: -- undescribed --
-
-Token callback function. The callback will be used to ask the user
-to re-insert the token with given (null terminated) label.  The
-callback should return zero if token has been inserted by user and
-a negative error code otherwise.  It might be called multiple times
-if the token is not detected and the retry counter will be
-increased.
-
-@strong{Returns:} @code{GNUTLS_E_SUCCESS}  (0) on success or a negative error code
-on error.
-
-@strong{Since:} 2.12.0
-@end deftypefun
-
 
 @c gnutls_pkcs11_obj_flags
 @table @code
@@ -983,7 +1269,7 @@ Force login in the token for the operation (seek+store).
 @item GNUTLS_@-PKCS11_@-OBJ_@-FLAG_@-MARK_@-TRUSTED
 object marked as trusted (seek+store).
 @item GNUTLS_@-PKCS11_@-OBJ_@-FLAG_@-MARK_@-SENSITIVE
-object marked as sensitive -unexportable (store).
+object is explicitly marked as sensitive -unexportable (store).
 @item GNUTLS_@-PKCS11_@-OBJ_@-FLAG_@-LOGIN_@-SO
 force login as a security officer in the token for the operation (seek+store).
 @item GNUTLS_@-PKCS11_@-OBJ_@-FLAG_@-MARK_@-PRIVATE
@@ -1027,6 +1313,8 @@ When searching, restrict to public key objects only (seek).
 When generating a keypair don't store the public key (store).
 @item GNUTLS_@-PKCS11_@-OBJ_@-FLAG_@-PRIVKEY
 When searching, restrict to private key objects only (seek).
+@item GNUTLS_@-PKCS11_@-OBJ_@-FLAG_@-MARK_@-NOT_@-SENSITIVE
+object marked as not sensitive -exportable (store).
 @end table
 
 @c gnutls_pkcs11_url_type_t
@@ -1042,25 +1330,25 @@ A URL that specifies the library and its version.
 @c gnutls_pkcs11_obj_info_t
 @table @code
 @item GNUTLS_@-PKCS11_@-OBJ_@-ID_@-HEX
-The object ID in hex.
+The object ID in hex. Null-terminated text.
 @item GNUTLS_@-PKCS11_@-OBJ_@-LABEL
-The object label.
+The object label. Null-terminated text.
 @item GNUTLS_@-PKCS11_@-OBJ_@-TOKEN_@-LABEL
-The token's label.
+The token's label. Null-terminated text.
 @item GNUTLS_@-PKCS11_@-OBJ_@-TOKEN_@-SERIAL
-The token's serial number.
+The token's serial number. Null-terminated text.
 @item GNUTLS_@-PKCS11_@-OBJ_@-TOKEN_@-MANUFACTURER
-The token's manufacturer.
+The token's manufacturer. Null-terminated text.
 @item GNUTLS_@-PKCS11_@-OBJ_@-TOKEN_@-MODEL
-The token's model.
+The token's model. Null-terminated text.
 @item GNUTLS_@-PKCS11_@-OBJ_@-ID
-The object ID.
+The object ID. Raw bytes.
 @item GNUTLS_@-PKCS11_@-OBJ_@-LIBRARY_@-VERSION
-The library's version.
+The library's version. Null-terminated text.
 @item GNUTLS_@-PKCS11_@-OBJ_@-LIBRARY_@-DESCRIPTION
-The library's description.
+The library's description. Null-terminated text.
 @item GNUTLS_@-PKCS11_@-OBJ_@-LIBRARY_@-MANUFACTURER
-The library's manufacturer name.
+The library's manufacturer name. Null-terminated text.
 @end table
 
 @c gnutls_pkcs11_token_info_t
@@ -1074,7 +1362,8 @@ The token's manufacturer (string)
 @item GNUTLS_@-PKCS11_@-TOKEN_@-MODEL
 The token's model (string)
 @item GNUTLS_@-PKCS11_@-TOKEN_@-MODNAME
-The token's module name (string - since 3.4.3)
+The token's module name (string - since 3.4.3). This value is
+unavailable for providers which were manually loaded.
 @end table
 
 @c gnutls_pkcs11_obj_type_t
@@ -1104,6 +1393,12 @@ relevant to TPM keys.
 request an OPENPGP fingerprint instead of the default.
 @end table
 
+@c gnutls_abstract_export_flags_t
+@table @code
+@item GNUTLS_@-EXPORT_@-FLAG_@-NO_@-LZ
+do not prepend a leading zero to exported values
+@end table
+
 @c gnutls_privkey_flags_t
 @table @code
 @item GNUTLS_@-PRIVKEY_@-IMPORT_@-AUTO_@-RELEASE
@@ -1122,6 +1417,12 @@ When generating a key involving prime numbers, use provable primes; a seed may b
 Keys generated or imported as provable require an extended format which cannot be read by previous versions
 of gnutls or other applications. By setting this flag the key will be exported in a backwards compatible way,
 even if the information about the seed used will be lost.
+@item GNUTLS_@-PRIVKEY_@-SIGN_@-FLAG_@-RSA_@-PSS
+Make an RSA signature on the hashed data with the PSS padding.
+@item GNUTLS_@-PRIVKEY_@-FLAG_@-REPRODUCIBLE
+Make an RSA-PSS signature on the hashed data with reproducible parameters (zero salt).
+@item GNUTLS_@-PRIVKEY_@-FLAG_@-CA
+The generated private key is going to be used as a CA (relevant for RSA-PSS keys).
 @end table
 
 @c gnutls_rnd_level_t
@@ -1131,9 +1432,10 @@ Non-predictable random number.  Fatal in parts
 of session if broken, i.e., vulnerable to statistical analysis.
 @item GNUTLS_@-RND_@-RANDOM
 Pseudo-random cryptographic random number.
-Fatal in session if broken.
+Fatal in session if broken. Example use: temporal keys.
 @item GNUTLS_@-RND_@-KEY
-Fatal in many sessions if broken.
+Fatal in many sessions if broken. Example use:
+Long-term keys.
 @end table
 
 @c gnutls_ocsp_print_formats_t

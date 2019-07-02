@@ -16,9 +16,12 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
+
+#ifndef GNUTLS_LIB_X509_B64_H
+#define GNUTLS_LIB_X509_B64_H
 
 int _gnutls_fbase64_encode(const char *msg, const uint8_t * data,
 			   size_t data_size, gnutls_datum_t * result);
@@ -37,3 +40,5 @@ _gnutls_base64_decode(const uint8_t * data, size_t data_size,
 #define B64FSIZE( hsize, dsize) \
 	(B64SIZE(dsize) + (hsize) + /*newlines*/ \
 	B64SIZE(dsize)/64 + (((B64SIZE(dsize) % 64) > 0) ? 1 : 0))
+
+#endif /* GNUTLS_LIB_X509_B64_H */

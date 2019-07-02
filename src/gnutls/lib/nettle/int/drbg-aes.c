@@ -1,6 +1,6 @@
 /* drbg-aes.c */
 
-/* Copyright (C) 2013, 2014 Red Hat
+/* Copyright (C) 2013-2018 Red Hat
  *
  * This file is part of GnuTLS.
  *  
@@ -15,9 +15,7 @@
  * License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public License
- * along with the nettle library; see the file COPYING.LIB.  If not, write to
- * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA 02111-1301, USA.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  */
 
 #include <config.h>
@@ -28,18 +26,20 @@
 #include <string.h>
 #include <stdio.h>
 #include <fips.h>
+#include <assert.h>
 
 int
 drbg_aes_init(struct drbg_aes_ctx *ctx,
 	      unsigned entropy_size, const uint8_t * entropy,
 	      unsigned pstring_size, const uint8_t * pstring)
 {
-	uint8_t tmp[DRBG_AES_KEY_SIZE];
+	uint8_t tmp[AES256_KEY_SIZE];
 
+	assert(AES256_KEY_SIZE == DRBG_AES_KEY_SIZE);
 	memset(ctx, 0, sizeof(*ctx));
 	memset(tmp, 0, sizeof(tmp));
 
-	aes_set_encrypt_key(&ctx->key, DRBG_AES_KEY_SIZE, tmp);
+	aes256_set_encrypt_key(&ctx->key, tmp);
 
 	return drbg_aes_reseed(ctx, entropy_size, entropy,
 			       pstring_size, pstring);
@@ -56,14 +56,14 @@ drbg_aes_update(struct drbg_aes_ctx *ctx,
 
 	while (len < DRBG_AES_SEED_SIZE) {
 		INCREMENT(sizeof(ctx->v), ctx->v);
-		aes_encrypt(&ctx->key, AES_BLOCK_SIZE, t, ctx->v);
+		aes256_encrypt(&ctx->key, AES_BLOCK_SIZE, t, ctx->v);
 		t += AES_BLOCK_SIZE;
 		len += AES_BLOCK_SIZE;
 	}
 
 	memxor(tmp, pdata, DRBG_AES_SEED_SIZE);
 
-	aes_set_encrypt_key(&ctx->key, DRBG_AES_KEY_SIZE, tmp);
+	aes256_set_encrypt_key(&ctx->key, tmp);
 
 	memcpy(ctx->v, &tmp[DRBG_AES_KEY_SIZE], AES_BLOCK_SIZE);
 
@@ -143,44 +143,16 @@ int drbg_aes_generate(struct drbg_aes_ctx *ctx, unsigned length, uint8_t * dst,
 		memset(seed, 0, DRBG_AES_SEED_SIZE);
 	}
 
-	/* Throw the first block generated. FIPS 140-2 requirement (see 
-	 * the continuous random number generator test in 4.9.2)
-	 */
-	if (ctx->prev_block_present == 0) {
-		INCREMENT(sizeof(ctx->v), ctx->v);
-		aes_encrypt(&ctx->key, AES_BLOCK_SIZE, ctx->prev_block, ctx->v);
-
-		ctx->prev_block_present = 1;
-	}
-
 	/* Perform the actual encryption */
 	for (left = length; left >= AES_BLOCK_SIZE;
 	     left -= AES_BLOCK_SIZE, dst += AES_BLOCK_SIZE) {
-
 		INCREMENT(sizeof(ctx->v), ctx->v);
-		aes_encrypt(&ctx->key, AES_BLOCK_SIZE, dst, ctx->v);
-
-		/* if detected loop */
-		if (memcmp(dst, ctx->prev_block, AES_BLOCK_SIZE) == 0) {
-			_gnutls_switch_lib_state(LIB_STATE_ERROR);
-			return gnutls_assert_val(0);
-		}
-
-		memcpy(ctx->prev_block, dst, AES_BLOCK_SIZE);
+		aes256_encrypt(&ctx->key, AES_BLOCK_SIZE, dst, ctx->v);
 	}
 
 	if (left > 0) {		/* partial fill */
-
 		INCREMENT(sizeof(ctx->v), ctx->v);
-		aes_encrypt(&ctx->key, AES_BLOCK_SIZE, tmp, ctx->v);
-
-		/* if detected loop */
-		if (memcmp(tmp, ctx->prev_block, AES_BLOCK_SIZE) == 0) {
-			_gnutls_switch_lib_state(LIB_STATE_ERROR);
-			return gnutls_assert_val(0);
-		}
-
-		memcpy(ctx->prev_block, tmp, AES_BLOCK_SIZE);
+		aes256_encrypt(&ctx->key, AES_BLOCK_SIZE, tmp, ctx->v);
 		memcpy(dst, tmp, left);
 	}
 

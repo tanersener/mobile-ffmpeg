@@ -1,0 +1,12 @@
+
+
+
+
+@deftypefun {void} {gnutls_anti_replay_set_ptr} (gnutls_anti_replay_t @var{anti_replay}, void * @var{ptr})
+@var{anti_replay}: is a @code{gnutls_anti_replay_t}  type.
+
+@var{ptr}: is the pointer
+
+Sets the pointer that will be provided to db add function
+as the first argument.
+@end deftypefun

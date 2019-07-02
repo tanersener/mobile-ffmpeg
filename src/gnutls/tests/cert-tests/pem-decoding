@@ -24,7 +24,6 @@
 
 srcdir="${srcdir:-.}"
 CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
-DIFF="${DIFF:-diff -b -B}"
 
 if ! test -x "${CERTTOOL}"; then
 	exit 77
@@ -33,6 +32,8 @@ fi
 if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
 fi
+
+. "${srcdir}/../scripts/common.sh"
 
 TMPFILE=tmp-$$.pem.tmp
 TMPFILE1=tmp1-$$.pem.tmp
@@ -57,8 +58,7 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-#FIXME: the output string differs in windows and linux on the last char.
-${DIFF} -I 'Algorithm Security Level' "${srcdir}/data/bmpstring.pem" ${TMPFILE} || ${DIFF} -I 'Algorithm Security Level' --strip-trailing-cr "${srcdir}/data/bmpstring.pem" ${TMPFILE}
+check_if_equal "${srcdir}/data/bmpstring.pem" ${TMPFILE} "Algorithm Security Level"
 rc=$?
 
 if test "${rc}" != "0"; then
@@ -75,9 +75,7 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-cat "${srcdir}/data/complex-cert.pem" |grep -v "Not After:" >${TMPFILE1}
-cat ${TMPFILE} |grep -v "Not After:" >${TMPFILE2}
-${DIFF} -I 'Algorithm Security Level' ${TMPFILE1} ${TMPFILE2} || ${DIFF} -I 'Algorithm Security Level' --strip-trailing-cr ${TMPFILE1} ${TMPFILE2}
+check_if_equal "${srcdir}/data/complex-cert.pem" ${TMPFILE} "Not After:|Algorithm Security Level"
 rc=$?
 
 if test "${rc}" != "0"; then
@@ -94,9 +92,7 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-cat "${srcdir}/data/xmpp-othername.pem" |grep -v "Not After:" >${TMPFILE1}
-cat ${TMPFILE} |grep -v "Not After:" >${TMPFILE2}
-${DIFF} -I 'Algorithm Security Level' ${TMPFILE1} ${TMPFILE2} || ${DIFF} -I 'Algorithm Security Level' --strip-trailing-cr ${TMPFILE1} ${TMPFILE2}
+check_if_equal "${srcdir}/data/xmpp-othername.pem" ${TMPFILE} "^warning|Not After:|Algorithm Security Level"
 rc=$?
 
 if test "${rc}" != "0"; then
@@ -112,9 +108,9 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-cat ${TMPFILE} |grep "KRB5Principal:" >${TMPFILE1}
-cat "${srcdir}/data/template-krb5name-full.pem" |grep "KRB5Principal:" >${TMPFILE2}
-${DIFF} -I 'Algorithm Security Level' -u ${TMPFILE1} ${TMPFILE2} || ${DIFF} -I 'Algorithm Security Level' -u --strip-trailing-cr ${TMPFILE1} ${TMPFILE2}
+grep "KRB5Principal:" ${TMPFILE} >${TMPFILE1}
+grep "KRB5Principal:" "${srcdir}/data/template-krb5name-full.pem" >${TMPFILE2}
+check_if_equal ${TMPFILE1} ${TMPFILE2}
 rc=$?
 
 if test "${rc}" != "0"; then
@@ -124,7 +120,13 @@ fi
 
 
 #check whether the cert with GOST parameters is decoded as expected
-${VALGRIND} "${CERTTOOL}" --certificate-info --infile "${srcdir}/data/gost-cert.pem" >${TMPFILE}
+if test "${ENABLE_GOST}" = "1"; then
+	GOSTCERT="${srcdir}/data/gost-cert.pem"
+else
+	GOSTCERT="${srcdir}/data/gost-cert-nogost.pem"
+fi
+
+${VALGRIND} "${CERTTOOL}" --certificate-info --infile "${GOSTCERT}" >${TMPFILE}
 rc=$?
 
 if test "${rc}" != "0"; then
@@ -132,11 +134,28 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-${DIFF} -I 'Algorithm Security Level' ${TMPFILE} "${srcdir}/data/gost-cert.pem" || ${DIFF} -I 'Algorithm Security Level' --strip-trailing-cr "${TMPFILE}" "${srcdir}/data/gost-cert.pem"
+check_if_equal ${TMPFILE} "${GOSTCERT}"
 rc=$?
 
 if test "${rc}" != "0"; then
 	echo "GOST cert decoding failed 2"
+	exit ${rc}
+fi
+
+#check whether the cert with GOST 31.10/11-94 parameters is decoded as expected
+${VALGRIND} "${CERTTOOL}" --certificate-info --infile "${srcdir}/data/gost94-cert.pem" >${TMPFILE}
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "GOST94 cert decoding failed 1"
+	exit ${rc}
+fi
+
+check_if_equal ${TMPFILE} "${srcdir}/data/gost94-cert.pem" "Algorithm Security Level"
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "GOST94 cert decoding failed 2"
 	exit ${rc}
 fi
 
@@ -148,12 +167,55 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-${DIFF} -I 'Algorithm Security Level' ${TMPFILE} "${srcdir}/data/multi-value-dn.pem" || ${DIFF} -I 'Algorithm Security Level' --strip-trailing-cr "${TMPFILE}" "${srcdir}/data/multi-value-dn.pem"
+# Needed for FIPS140 mode
+check_if_equal "${srcdir}/data/multi-value-dn.pem" ${TMPFILE} "Algorithm Security Level:"
 rc=$?
 
 if test "${rc}" != "0"; then
 	echo "MV-DN cert decoding failed 2"
 	exit ${rc}
+fi
+
+#check if --no-text works as expected
+${VALGRIND} "${CERTTOOL}" --certificate-info --infile "${srcdir}/data/cert-ecc256.pem" --no-text --outfile ${TMPFILE}
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "--no-text -k --certificate-info failed 1"
+	exit ${rc}
+fi
+
+if grep -v '^-----BEGIN [A-Z0-9 ]\+-----$' ${TMPFILE} | grep -v '^[A-Za-z0-9/+=]\+$' | grep -v '^-----END [A-Z0-9 ]\+-----$' ; then
+	echo "--no-text -k --certificate-info failed 2"
+	exit 1
+fi
+
+#check if --no-text works as expected
+${VALGRIND} "${CERTTOOL}" --certificate-pubkey --infile "${srcdir}/data/cert-ecc256.pem" --no-text  --outfile ${TMPFILE}
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "--no-text cert pubkey failed 1"
+	exit ${rc}
+fi
+
+if grep -v '^-----BEGIN [A-Z0-9 ]\+-----$' ${TMPFILE} | grep -v '^[A-Za-z0-9/+=]\+$' | grep -v '^-----END [A-Z0-9 ]\+-----$' ; then
+	echo "--no-text cert pubkey failed 2"
+	exit 1
+fi
+
+#check if --no-text works as expected
+${VALGRIND} "${CERTTOOL}" --pubkey-info --infile "${srcdir}/data/cert-ecc256.pem" --no-text  --outfile ${TMPFILE}
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "--no-text pubkey info failed 1"
+	exit ${rc}
+fi
+
+if grep -v '^-----BEGIN [A-Z0-9 ]\+-----$' ${TMPFILE} | grep -v '^[A-Za-z0-9/+=]\+$' | grep -v '^-----END [A-Z0-9 ]\+-----$' ; then
+	echo "--no-text pubkey info failed 2"
+	exit 1
 fi
 
 rm -f ${TMPFILE} ${TMPFILE1} ${TMPFILE2}

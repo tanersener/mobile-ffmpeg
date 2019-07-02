@@ -1,1 +1,1 @@
-@item @var{int} @ref{gnutls_record_get_state} (gnutls_session_t @var{session}, unsigned @var{read}, gnutls_datum_t * @var{mac_key}, gnutls_datum_t * @var{IV}, gnutls_datum_t * @var{cipher_key}, unsigned char @var{seq_number[8]})
+@item @var{int} @ref{gnutls_record_get_state} (gnutls_session_t @var{session}, unsigned @var{read}, gnutls_datum_t * @var{mac_key}, gnutls_datum_t * @var{IV}, gnutls_datum_t * @var{cipher_key}, unsigned char [8] @var{seq_number})

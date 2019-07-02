@@ -5,20 +5,20 @@
    <ctype.h> functions' behaviour depends on the current locale set via
    setlocale.
 
-   Copyright (C) 2000-2003, 2006, 2008-2016 Free Software Foundation, Inc.
+   Copyright (C) 2000-2003, 2006, 2008-2019 Free Software Foundation, Inc.
 
 This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU Lesser General Public License as published by
-the Free Software Foundation; either version 2.1 of the License, or
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3 of the License, or
 (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Lesser General Public License for more details.
+GNU General Public License for more details.
 
-You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, see <http://www.gnu.org/licenses/>.  */
+You should have received a copy of the GNU General Public License
+along with this program; if not, see <https://www.gnu.org/licenses/>.  */
 
 #ifndef C_CTYPE_H
 #define C_CTYPE_H
@@ -115,16 +115,16 @@ extern "C" {
 
 /* Cases for lowercase hex letters, and lowercase letters, all offset by N.  */
 
-#define _C_CTYPE_LOWER_A_THRU_F_N(n) \
-   case 'a' + (n): case 'b' + (n): case 'c' + (n): case 'd' + (n): \
-   case 'e' + (n): case 'f' + (n)
-#define _C_CTYPE_LOWER_N(n) \
-   _C_CTYPE_LOWER_A_THRU_F_N(n): \
-   case 'g' + (n): case 'h' + (n): case 'i' + (n): case 'j' + (n): \
-   case 'k' + (n): case 'l' + (n): case 'm' + (n): case 'n' + (n): \
-   case 'o' + (n): case 'p' + (n): case 'q' + (n): case 'r' + (n): \
-   case 's' + (n): case 't' + (n): case 'u' + (n): case 'v' + (n): \
-   case 'w' + (n): case 'x' + (n): case 'y' + (n): case 'z' + (n)
+#define _C_CTYPE_LOWER_A_THRU_F_N(N) \
+   case 'a' + (N): case 'b' + (N): case 'c' + (N): case 'd' + (N): \
+   case 'e' + (N): case 'f' + (N)
+#define _C_CTYPE_LOWER_N(N) \
+   _C_CTYPE_LOWER_A_THRU_F_N(N): \
+   case 'g' + (N): case 'h' + (N): case 'i' + (N): case 'j' + (N): \
+   case 'k' + (N): case 'l' + (N): case 'm' + (N): case 'n' + (N): \
+   case 'o' + (N): case 'p' + (N): case 'q' + (N): case 'r' + (N): \
+   case 's' + (N): case 't' + (N): case 'u' + (N): case 'v' + (N): \
+   case 'w' + (N): case 'x' + (N): case 'y' + (N): case 'z' + (N)
 
 /* Cases for hex letters, digits, lower, punct, and upper.  */
 

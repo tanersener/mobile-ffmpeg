@@ -1,0 +1,24 @@
+
+
+
+
+@deftypefun {int} {gnutls_privkey_decrypt_data2} (gnutls_privkey_t @var{key}, unsigned int @var{flags}, const gnutls_datum_t * @var{ciphertext}, unsigned char * @var{plaintext}, size_t @var{plaintext_size})
+@var{key}: Holds the key
+
+@var{flags}: zero for now
+
+@var{ciphertext}: holds the data to be decrypted
+
+@var{plaintext}: a preallocated buffer that will be filled with the plaintext
+
+@var{plaintext_size}: in/out size of the plaintext
+
+This function will decrypt the given data using the algorithm
+supported by the private key. Unlike with @code{gnutls_privkey_decrypt_data()} 
+this function operates in constant time and constant memory access.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.6.5
+@end deftypefun

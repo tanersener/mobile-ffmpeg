@@ -1,0 +1,23 @@
+
+
+
+
+@deftypefun {unsigned} {gnutls_pkcs11_token_check_mechanism} (const char * @var{url}, unsigned long @var{mechanism}, void * @var{ptr}, unsigned @var{psize}, unsigned @var{flags})
+@var{url}: should contain a PKCS 11 URL
+
+@var{mechanism}: The PKCS @code{11}  mechanism ID
+
+@var{ptr}: if set it should point to a CK_MECHANISM_INFO struct
+
+@var{psize}: the size of CK_MECHANISM_INFO struct (for safety)
+
+@var{flags}: must be zero
+
+This function will return whether a mechanism is supported
+by the given token. If the mechanism is supported and
+ @code{ptr} is set, it will be updated with the token information.
+
+@strong{Returns:} Non-zero if the mechanism is supported or zero otherwise.
+
+@strong{Since:} 3.6.0
+@end deftypefun

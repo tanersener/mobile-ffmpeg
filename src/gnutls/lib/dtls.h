@@ -16,12 +16,12 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
-#ifndef DTLS_H
-#define DTLS_H
+#ifndef GNUTLS_LIB_DTLS_H
+#define GNUTLS_LIB_DTLS_H
 
 #include <config.h>
 #include "gnutls_int.h"
@@ -40,7 +40,7 @@ void _dtls_reset_window(struct record_parameters_st *rp);
 #define RETURN_DTLS_EAGAIN_OR_TIMEOUT(session, r) { \
   struct timespec _now; \
   unsigned int _diff; \
-  gettime(&_now); \
+  gnutls_gettime(&_now); \
    \
   _diff = timespec_sub_ms(&_now, &session->internals.handshake_start_time); \
   if (_diff > session->internals.handshake_timeout_ms) \
@@ -111,6 +111,11 @@ inline static void _dtls_async_timer_check(gnutls_session_t session)
 	}
 }
 
+unsigned _gnutls_record_overhead(const version_entry_st *ver,
+				 const cipher_entry_st *cipher,
+				 const mac_entry_st *mac,
+				 unsigned max);
+
 /* Returns non-zero if the async timer is active */
 inline static int _dtls_async_timer_active(gnutls_session_t session)
 {
@@ -130,4 +135,4 @@ inline static int _dtls_retransmit(gnutls_session_t session)
 	return _dtls_transmit(session);
 }
 
-#endif
+#endif /* GNUTLS_LIB_DTLS_H */

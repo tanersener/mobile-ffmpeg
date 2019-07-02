@@ -17,11 +17,11 @@
 
 @var{flags}: should be 0.
 
-This function will try to verify the provided (raw or DER-encoded) certificate 
-using a list of stored public keys.  The  @code{service} field if non-NULL should
-be a port number.
+This function will try to verify a raw public-key or a public-key provided via
+a raw (DER-encoded) certificate using a list of stored public keys.
+The  @code{service} field if non-NULL should be a port number.
 
-The  @code{retrieve} variable if non-null specifies a custom backend for
+The  @code{db_name} variable if non-null specifies a custom backend for
 the retrieval of entries. If it is NULL then the
 default file backend will be used. In POSIX-like systems the
 file backend uses the $HOME/.gnutls/known_hosts file.
@@ -33,10 +33,12 @@ if the host/service pair is found but key doesn't match,
 the given key is found, and 0 if it was found. The storage
 function should return 0 on success.
 
+As of GnuTLS 3.6.6 this function also verifies raw public keys.
+
 @strong{Returns:} If no associated public key is found
 then @code{GNUTLS_E_NO_CERTIFICATE_FOUND}  will be returned. If a key
 is found but does not match @code{GNUTLS_E_CERTIFICATE_KEY_MISMATCH} 
-is returned. On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, 
+is returned. On success, @code{GNUTLS_E_SUCCESS}  (0) is returned,
 or a negative error value on other errors.
 
 @strong{Since:} 3.0.13

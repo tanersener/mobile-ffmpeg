@@ -15,7 +15,7 @@
 
 @var{mac}: the MAC algorithm
 
-@var{comp}: the compression method
+@var{comp}: the compression method (ignored)
 
 @var{master}: the master key to use
 

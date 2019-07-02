@@ -42,11 +42,11 @@ Usage:  psktool [ -<flag> [<val>] | --<name>[@{=| @}<val>] ]...
    -d, --debug=num            Enable debugging
                                 - it must be in the range:
                                   0 to 9999
-   -s, --keysize=num          specify the key size in bytes
+   -s, --keysize=num          Specify the key size in bytes (default is 32-bytes or 256-bits)
                                 - it must be in the range:
                                   0 to 512
-   -u, --username=str         specify a username
-   -p, --passwd=str           specify a password file
+   -u, --username=str         Specify the username to use
+   -p, --pskfile=str          Specify a pre-shared key file
    -v, --version[=arg]        output version information and exit
    -h, --help                 display extended usage information and exit
    -!, --more-help            extended usage information passed thru pager
@@ -66,6 +66,18 @@ stored in hexadecimal format in a key file.
 This is the ``enable debugging'' option.
 This option takes a number argument.
 Specifies the debug level.
+@anchor{psktool pskfile}
+@subsubheading pskfile option (-p)
+
+This is the ``specify a pre-shared key file'' option.
+This option takes a string argument.
+This option will specify the pre-shared key file to store the generated keys.
+@anchor{psktool passwd}
+@subsubheading passwd option
+
+This is an alias for the @code{pskfile} option,
+@pxref{psktool pskfile, the pskfile option documentation}.
+
 @anchor{psktool exit status}
 @subsubheading psktool exit status
 
@@ -81,15 +93,15 @@ The operation failed or the command syntax was not valid.
     gnutls-cli-debug (1), gnutls-serv (1), srptool (1), certtool (1)
 @anchor{psktool Examples}
 @subsubheading psktool Examples
-To add a user 'psk_identity' in @file{passwd.psk} for use with GnuTLS run:
+To add a user 'psk_identity' in @file{keys.psk} for use with GnuTLS run:
 @example
-$ ./psktool -u psk_identity -p passwd.psk
+$ ./psktool -u psk_identity -p keys.psk
 Generating a random key for user 'psk_identity'
-Key stored to passwd.psk
-$ cat psks.txt
+Key stored to keys.psk
+$ cat keys.psk
 psk_identity:88f3824b3e5659f52d00e959bacab954b6540344
 $
 @end example
 
-This command will create @file{passwd.psk} if it does not exist
-and will add user 'psk_identity' (you will also be prompted for a password).
+This command will create @file{keys.psk} if it does not exist
+and will add user 'psk_identity'.

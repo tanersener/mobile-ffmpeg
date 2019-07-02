@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Nikos Mavrogiannopoulos
+ * Copyright (C) 2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -15,9 +16,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with GnuTLS; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
+ *
  */
 
 #ifdef HAVE_CONFIG_H
@@ -46,13 +47,14 @@ int main()
 #include <gnutls/gnutls.h>
 #include <gnutls/dtls.h>
 #include <signal.h>
-
+#include "cert-common.h"
 #include "utils.h"
 
 static void terminate(void);
 
-/* This program tests the ability to detect modified record
- * packets.
+/* This program tests the ability of the record layer,
+ * to detect modified record packets, under various
+ * ciphersuites.
  */
 
 static void server_log_func(int level, const char *str)
@@ -64,47 +66,6 @@ static void client_log_func(int level, const char *str)
 {
 	fprintf(stderr, "client|<%d>| %s", level, str);
 }
-
-static unsigned char server_cert_pem[] =
-    "-----BEGIN CERTIFICATE-----\n"
-    "MIICVjCCAcGgAwIBAgIERiYdMTALBgkqhkiG9w0BAQUwGTEXMBUGA1UEAxMOR251\n"
-    "VExTIHRlc3QgQ0EwHhcNMDcwNDE4MTMyOTIxWhcNMDgwNDE3MTMyOTIxWjA3MRsw\n"
-    "GQYDVQQKExJHbnVUTFMgdGVzdCBzZXJ2ZXIxGDAWBgNVBAMTD3Rlc3QuZ251dGxz\n"
-    "Lm9yZzCBnDALBgkqhkiG9w0BAQEDgYwAMIGIAoGA17pcr6MM8C6pJ1aqU46o63+B\n"
-    "dUxrmL5K6rce+EvDasTaDQC46kwTHzYWk95y78akXrJutsoKiFV1kJbtple8DDt2\n"
-    "DZcevensf9Op7PuFZKBroEjOd35znDET/z3IrqVgbtm2jFqab7a+n2q9p/CgMyf1\n"
-    "tx2S5Zacc1LWn9bIjrECAwEAAaOBkzCBkDAMBgNVHRMBAf8EAjAAMBoGA1UdEQQT\n"
-    "MBGCD3Rlc3QuZ251dGxzLm9yZzATBgNVHSUEDDAKBggrBgEFBQcDATAPBgNVHQ8B\n"
-    "Af8EBQMDB6AAMB0GA1UdDgQWBBTrx0Vu5fglyoyNgw106YbU3VW0dTAfBgNVHSME\n"
-    "GDAWgBTpPBz7rZJu5gakViyi4cBTJ8jylTALBgkqhkiG9w0BAQUDgYEAaFEPTt+7\n"
-    "bzvBuOf7+QmeQcn29kT6Bsyh1RHJXf8KTk5QRfwp6ogbp94JQWcNQ/S7YDFHglD1\n"
-    "AwUNBRXwd3riUsMnsxgeSDxYBfJYbDLeohNBsqaPDJb7XailWbMQKfAbFQ8cnOxg\n"
-    "rOKLUQRWJ0K3HyXRMhbqjdLIaQiCvQLuizo=\n" "-----END CERTIFICATE-----\n";
-
-const gnutls_datum_t server_cert = { server_cert_pem,
-	sizeof(server_cert_pem)
-};
-
-static unsigned char server_key_pem[] =
-    "-----BEGIN RSA PRIVATE KEY-----\n"
-    "MIICXAIBAAKBgQDXulyvowzwLqknVqpTjqjrf4F1TGuYvkrqtx74S8NqxNoNALjq\n"
-    "TBMfNhaT3nLvxqResm62ygqIVXWQlu2mV7wMO3YNlx696ex/06ns+4VkoGugSM53\n"
-    "fnOcMRP/PciupWBu2baMWppvtr6far2n8KAzJ/W3HZLllpxzUtaf1siOsQIDAQAB\n"
-    "AoGAYAFyKkAYC/PYF8e7+X+tsVCHXppp8AoP8TEZuUqOZz/AArVlle/ROrypg5kl\n"
-    "8YunrvUdzH9R/KZ7saNZlAPLjZyFG9beL/am6Ai7q7Ma5HMqjGU8kTEGwD7K+lbG\n"
-    "iomokKMOl+kkbY/2sI5Czmbm+/PqLXOjtVc5RAsdbgvtmvkCQQDdV5QuU8jap8Hs\n"
-    "Eodv/tLJ2z4+SKCV2k/7FXSKWe0vlrq0cl2qZfoTUYRnKRBcWxc9o92DxK44wgPi\n"
-    "oMQS+O7fAkEA+YG+K9e60sj1K4NYbMPAbYILbZxORDecvP8lcphvwkOVUqbmxOGh\n"
-    "XRmTZUuhBrJhJKKf6u7gf3KWlPl6ShKEbwJASC118cF6nurTjuLf7YKARDjNTEws\n"
-    "qZEeQbdWYINAmCMj0RH2P0mvybrsXSOD5UoDAyO7aWuqkHGcCLv6FGG+qwJAOVqq\n"
-    "tXdUucl6GjOKKw5geIvRRrQMhb/m5scb+5iw8A4LEEHPgGiBaF5NtJZLALgWfo5n\n"
-    "hmC8+G8F0F78znQtPwJBANexu+Tg5KfOnzSILJMo3oXiXhf5PqXIDmbN0BKyCKAQ\n"
-    "LfkcEcUbVfmDaHpvzwY9VEaoMOKVLitETXdNSxVpvWM=\n"
-    "-----END RSA PRIVATE KEY-----\n";
-
-const gnutls_datum_t server_key = { server_key_pem,
-	sizeof(server_key_pem)
-};
 
 static int modify = 0;
 
@@ -125,9 +86,6 @@ client_push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 		return send(fd, data, len, 0);
 	}
 }
-
-/* A very basic TLS client, with anonymous authentication.
- */
 
 #define MAX_BUF 24*1024
 
@@ -316,7 +274,7 @@ static void server(int fd, const char *prio, int ign)
 		success("server: finished\n");
 }
 
-static void start(const char *prio, int ign)
+static void start(const char *name, const char *prio, int ign)
 {
 	int fd[2];
 	int ret;
@@ -336,6 +294,7 @@ static void start(const char *prio, int ign)
 
 	if (child) {
 		/* parent */
+		success("testing %s\n", name);
 		close(fd[1]);
 		server(fd[0], prio, ign);
 	} else {
@@ -356,11 +315,11 @@ static void start(const char *prio, int ign)
 
 #define NULL_SHA1 "NONE:+VERS-TLS1.0:-CIPHER-ALL:+NULL:+SHA1:+SIGN-ALL:+COMP-NULL:+ANON-ECDH:+RSA:+CURVE-ALL"
 
-#define ARCFOUR_SHA1_ZLIB "NONE:+VERS-TLS1.0:-CIPHER-ALL:+ARCFOUR-128:+SHA1:+SIGN-ALL:+COMP-DEFLATE:+ANON-ECDH:+CURVE-ALL"
-
-#define AES_GCM_ZLIB "NONE:+VERS-TLS1.2:-CIPHER-ALL:+AES-128-GCM:+AEAD:+SIGN-ALL:+COMP-DEFLATE:+RSA:+CURVE-ALL"
-
 #define NO_ETM ":%NO_ETM"
+
+#define TLS13_AES_GCM "NONE:+VERS-TLS1.3:-CIPHER-ALL:+RSA:+AES-128-GCM:+MAC-ALL:+SIGN-ALL:+COMP-NULL:+GROUP-ALL"
+#define TLS13_AES_CCM "NONE:+VERS-TLS1.3:-CIPHER-ALL:+RSA:+AES-128-CCM:+MAC-ALL:+SIGN-ALL:+COMP-NULL:+GROUP-ALL"
+#define TLS13_CHACHA_POLY1305 "NONE:+VERS-TLS1.3:-CIPHER-ALL:+RSA:+CHACHA20-POLY1305:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+GROUP-ALL"
 
 static void ch_handler(int sig)
 {
@@ -372,47 +331,36 @@ static void ch_handler(int sig)
 
 void doit(void)
 {
+	signal(SIGPIPE, SIG_IGN);
 	signal(SIGCHLD, ch_handler);
 
-	start(AES_CBC, 1);
-	start(AES_CBC_SHA256, 1);
-	start(AES_GCM, 0);
-	start(AES_CCM, 0);
-	start(AES_CCM_8, 0);
+	start("aes-cbc", AES_CBC, 1);
+	start("aes-cbc-sha256", AES_CBC_SHA256, 1);
+	start("aes-gcm", AES_GCM, 0);
+	start("aes-ccm", AES_CCM, 0);
+	start("aes-ccm-8", AES_CCM_8, 0);
 
-#ifndef ENABLE_FIPS140
-	start(NULL_SHA1, 0);
+	if (!gnutls_fips140_mode_enabled()) {
+		start("null-sha1", NULL_SHA1, 0);
 
-	start(ARCFOUR_SHA1, 0);
-	start(ARCFOUR_MD5, 0);
+		start("arcfour-sha1", ARCFOUR_SHA1, 0);
+		start("arcfour-md5", ARCFOUR_MD5, 0);
+	}
 
-# ifdef HAVE_LIBZ
-	start(ARCFOUR_SHA1_ZLIB, 0);
-# endif
-#endif
+	start("aes-cbc-no-etm", AES_CBC NO_ETM, 1);
+	start("aes-cbc-sha256-no-etm", AES_CBC_SHA256 NO_ETM, 1);
+	start("aes-gcm-no-etm", AES_GCM NO_ETM, 0);
 
-#ifdef HAVE_LIBZ
-	start(AES_GCM_ZLIB, 0);
-#endif
+	if (!gnutls_fips140_mode_enabled()) {
+		start("null-sha1-no-etm", NULL_SHA1 NO_ETM, 0);
 
-	start(AES_CBC NO_ETM, 1);
-	start(AES_CBC_SHA256 NO_ETM, 1);
-	start(AES_GCM NO_ETM, 0);
+		start("arcfour-sha1-no-etm", ARCFOUR_SHA1 NO_ETM, 0);
+		start("arcfour-md5-no-etm", ARCFOUR_MD5 NO_ETM, 0);
+		start("tls13-chacha20-poly1305", TLS13_CHACHA_POLY1305, 0);
+	}
 
-#ifndef ENABLE_FIPS140
-	start(NULL_SHA1 NO_ETM, 0);
-
-	start(ARCFOUR_SHA1 NO_ETM, 0);
-	start(ARCFOUR_MD5 NO_ETM, 0);
-
-# ifdef HAVE_LIBZ
-	start(ARCFOUR_SHA1_ZLIB NO_ETM, 0);
-# endif
-#endif
-
-#ifdef HAVE_LIBZ
-	start(AES_GCM_ZLIB NO_ETM, 0);
-#endif
+	start("tls13-aes-gcm", TLS13_AES_GCM, 0);
+	start("tls13-aes-ccm", TLS13_AES_CCM, 0);
 }
 
 #endif				/* _WIN32 */

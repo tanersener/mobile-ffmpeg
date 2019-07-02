@@ -34,24 +34,48 @@
 
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
+#include <gnutls/x509-ext.h>
 
 #include "utils.h"
 
-/* We test whether implicit global initialization can be overriden */
+/* We test whether implicit global initialization can be overridden */
+
+static int weak_symbol_works;
+
+struct gnutls_subject_alt_names_st {
+	struct name_st *names;
+	unsigned int size;
+};
+
+/* gnutls_subject_alt_names_init() is called by gnutls_x509_crt_init().
+ * We override it here to test if weak symbols work at all.
+ */
+__attribute__ ((visibility ("protected")))
+int gnutls_subject_alt_names_init(gnutls_subject_alt_names_t * sans)
+{
+	weak_symbol_works = 1;
+
+	*sans = gnutls_calloc(1, sizeof(struct gnutls_subject_alt_names_st));
+	if (*sans == NULL) {
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	return 0;
+}
 
 GNUTLS_SKIP_GLOBAL_INIT
 
 void doit(void)
 {
-#ifdef _WIN32
-	/* weak symbols don't seem to work in windows */
-	exit(77);
-#else
+
 	int ret;
 	gnutls_x509_crt_t crt;
 
 	ret = gnutls_x509_crt_init(&crt);
 	if (ret >= 0) {
+		if (!weak_symbol_works)
+			exit(77);
+
 		fail("Library is already initialized\n");
 	}
 
@@ -64,5 +88,4 @@ void doit(void)
 	gnutls_x509_crt_deinit(crt);
 
 	gnutls_global_deinit();
-#endif
 }

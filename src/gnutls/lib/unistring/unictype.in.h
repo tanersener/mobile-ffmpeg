@@ -1,28 +1,27 @@
 /* Unicode character classification and properties.
-   Copyright (C) 2002, 2005-2016 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2005-2019 Free Software Foundation, Inc.
 
-   This program is free software: you can redistribute it and/or modify it
-   under the terms of either:
+   This program is free software: you can redistribute it and/or
+   modify it under the terms of either:
 
-    * the GNU Lesser General Public License as published
-   by the Free Software Foundation; either version 3 of the License, or
-   (at your option) any later version.
+     * the GNU Lesser General Public License as published by the Free
+       Software Foundation; either version 3 of the License, or (at your
+       option) any later version.
 
    or
 
-   * the GNU General Public License as published by the Free
-   Software Foundation; either version 2 of the License, or
-   (at your option) any later version.
+     * the GNU General Public License as published by the Free
+       Software Foundation; either version 2 of the License, or (at your
+       option) any later version.
 
    or both in parallel, as here.
-
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #ifndef _UNICTYPE_H
 #define _UNICTYPE_H
@@ -561,7 +560,10 @@ enum
   UC_JOINING_GROUP_MANICHAEAN_FIVE,       /* Manichaean_Five */
   UC_JOINING_GROUP_MANICHAEAN_TEN,        /* Manichaean_Ten */
   UC_JOINING_GROUP_MANICHAEAN_TWENTY,     /* Manichaean_Twenty */
-  UC_JOINING_GROUP_MANICHAEAN_HUNDRED     /* Manichaean_Hundred */
+  UC_JOINING_GROUP_MANICHAEAN_HUNDRED,    /* Manichaean_Hundred */
+  UC_JOINING_GROUP_AFRICAN_FEH,           /* African_Feh */
+  UC_JOINING_GROUP_AFRICAN_QAF,           /* African_Qaf */
+  UC_JOINING_GROUP_AFRICAN_NOON           /* African_Noon */
 };
 
 /* Return the name of a joining group.  */

@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2016 Nikos Mavrogiannopoulos
+ * Copyright (C) 2017 Red Hat, Inc.
  *
  * This file is part of GnuTLS.
  *
@@ -13,9 +14,8 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  */
 
 #ifdef HAVE_CONFIG_H
@@ -29,14 +29,15 @@
 #include <limits.h>
 #include "utils.h"
 
-#if defined(__FreeBSD__)
-/* its libc cannot handle that large allocations */
+#if defined(__FreeBSD__) || !defined(HAVE_MMAP)
 void doit(void)
 {
 	exit(77);
 }
 
-#else /* not freebsd */
+#else /* working test */
+
+/* Test hashing on very large buffers >= 2^31 */
 
 #if !defined(_WIN32)
 # include <signal.h>
@@ -49,10 +50,6 @@ static void exit_77(int signo)
 #endif
 
 #define MIN(x,y) ((x)<(y))?(x):(y)
-
-/* Test hashing on large buffers */
-
-#ifdef HAVE_MMAP
 
 #include <sys/mman.h>
 
@@ -71,13 +68,6 @@ static void put_mem(void *mem)
 {
 	munmap(mem, _mmap_size);
 }
-
-#else
-
-# define get_mem(x) calloc(1, x)
-# define put_mem(x) free(x)
-
-#endif
 
 void doit(void)
 {

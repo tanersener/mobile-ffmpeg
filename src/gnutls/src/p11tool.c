@@ -18,7 +18,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see
- * <http://www.gnu.org/licenses/>.
+ * <https://www.gnu.org/licenses/>.
  */
 
 #include <config.h>
@@ -51,8 +51,18 @@
 static void cmd_parser(int argc, char **argv);
 
 static FILE *outfile;
+static const char *outfile_name = NULL;
 int batch = 0;
 int ask_pass = 0;
+
+void app_exit(int val)
+{
+	if (val != 0) {
+		if (outfile_name)
+			(void)remove(outfile_name);
+	}
+	exit(val);
+}
 
 static void tls_log_func(int level, const char *str)
 {
@@ -150,10 +160,15 @@ static void cmd_parser(int argc, char **argv)
 
 	if ((ret = gnutls_global_init()) < 0) {
 		fprintf(stderr, "global_init: %s\n", gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	if (HAVE_OPT(PROVIDER)) {
+		const char *params = NULL;
+
+		if (HAVE_OPT(PROVIDER_OPTS))
+			params = OPT_ARG(PROVIDER_OPTS);
+
 		ret = gnutls_pkcs11_init(GNUTLS_PKCS11_FLAG_MANUAL, NULL);
 		if (ret < 0)
 			fprintf(stderr, "pkcs11_init: %s\n",
@@ -161,11 +176,11 @@ static void cmd_parser(int argc, char **argv)
 		else {
 			ret =
 			    gnutls_pkcs11_add_provider(OPT_ARG(PROVIDER),
-						       NULL);
+						       params);
 			if (ret < 0) {
 				fprintf(stderr, "pkcs11_add_provider: %s\n",
 					gnutls_strerror(ret));
-				exit(1);
+				app_exit(1);
 			}
 		}
 	} else {
@@ -179,12 +194,24 @@ static void cmd_parser(int argc, char **argv)
 		outfile = safe_open_rw(OPT_ARG(OUTFILE), 0);
 		if (outfile == NULL) {
 			fprintf(stderr, "cannot open %s\n", OPT_ARG(OUTFILE));
-			exit(1);
+			app_exit(1);
 		}
+		outfile_name = OPT_ARG(OUTFILE);
 	} else
 		outfile = stdout;
 
 	memset(&cinfo, 0, sizeof(cinfo));
+
+	if (HAVE_OPT(HASH)) {
+		cinfo.hash = hash_to_id(OPT_ARG(HASH));
+		if (cinfo.hash == GNUTLS_DIG_UNKNOWN) {
+			fprintf(stderr, "invalid hash: %s\n", OPT_ARG(HASH));
+			app_exit(1);
+		}
+	}
+
+	if (HAVE_OPT(SIGN_PARAMS))
+		sign_params_to_flags(&cinfo, OPT_ARG(SIGN_PARAMS));
 
 	if (HAVE_OPT(SECRET_KEY))
 		cinfo.secret_key = OPT_ARG(SECRET_KEY);
@@ -301,12 +328,20 @@ static void cmd_parser(int argc, char **argv)
 	} else if (HAVE_OPT(INITIALIZE)) {
 		pkcs11_init(outfile, url, label, &cinfo);
 	} else if (HAVE_OPT(INITIALIZE_PIN)) {
-		pkcs11_set_pin(outfile, url, &cinfo, 0);
+		pkcs11_set_token_pin(outfile, url, &cinfo, 0);
 	} else if (HAVE_OPT(INITIALIZE_SO_PIN)) {
-		pkcs11_set_pin(outfile, url, &cinfo, 1);
-	} else if (HAVE_OPT(DELETE))
+		pkcs11_set_token_pin(outfile, url, &cinfo, 1);
+	} else if (HAVE_OPT(DELETE)) {
 		pkcs11_delete(outfile, url, flags, &cinfo);
-	else if (HAVE_OPT(GENERATE_ECC)) {
+	} else if (HAVE_OPT(GENERATE_PRIVKEY)) {
+		key_type = figure_key_type(OPT_ARG(GENERATE_PRIVKEY));
+		if (key_type == GNUTLS_PK_UNKNOWN)
+			app_exit(1);
+		pkcs11_generate(outfile, url, key_type,
+				get_bits(key_type, bits, sec_param, 0),
+				label, id, detailed_url,
+				flags, &cinfo);
+	} else if (HAVE_OPT(GENERATE_ECC)) {
 		key_type = GNUTLS_PK_EC;
 		pkcs11_generate(outfile, url, key_type,
 				get_bits(key_type, bits, sec_param, 0),

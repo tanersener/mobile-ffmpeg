@@ -17,17 +17,14 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
 #include "gnutls_int.h"
 #include "ip.h"
 #include <gnutls/x509.h>
-
-#ifdef HAVE_INET_NTOP
-# include <arpa/inet.h>
-#endif
+#include <arpa/inet.h>
 
 /*-
  * _gnutls_mask_to_prefix:

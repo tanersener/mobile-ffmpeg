@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_aead_cipher_encryptv} (gnutls_aead_cipher_hd_t @var{handle}, const void * @var{nonce}, size_t @var{nonce_len}, const giovec_t * @var{auth_iov}, int @var{auth_iovcnt}, size_t @var{tag_size}, const giovec_t * @var{iov}, int @var{iovcnt}, void * @var{ctext}, size_t * @var{ctext_len})

@@ -14,7 +14,7 @@ flag = {
     value     = s;
     arg-type  = number;
     arg-range = "0 -> 512";
-    descrip   = "specify the key size in bytes";
+    descrip   = "Specify the key size in bytes (default is 32-bytes or 256-bits)";
     doc = "";
 };
 
@@ -22,16 +22,23 @@ flag = {
     name      = username;
     value     = u;
     arg-type  = string;
-    descrip   = "specify a username";
+    descrip   = "Specify the username to use";
     doc = "";
 };
 
 flag = {
-    name      = passwd;
+    name      = pskfile;
     value     = p;
     arg-type  = string;
-    descrip   = "specify a password file";
-    doc       = "";
+    descrip   = "Specify a pre-shared key file";
+    doc       = "This option will specify the pre-shared key file to store the generated keys.";
+};
+
+flag = {
+    name      = passwd;
+    aliases   = pskfile;
+    descrip   = "Specify a pre-shared key file";
+    deprecated;
 };
 
 doc-section = {
@@ -46,18 +53,18 @@ doc-section = {
   ds-type = 'EXAMPLES';
   ds-format = 'texi';
   ds-text   = <<-_EOT_
-To add a user 'psk_identity' in @file{passwd.psk} for use with GnuTLS run:
+To add a user 'psk_identity' in @file{keys.psk} for use with GnuTLS run:
 @example
-$ ./psktool -u psk_identity -p passwd.psk
+$ ./psktool -u psk_identity -p keys.psk
 Generating a random key for user 'psk_identity'
-Key stored to passwd.psk
-$ cat psks.txt
+Key stored to keys.psk
+$ cat keys.psk
 psk_identity:88f3824b3e5659f52d00e959bacab954b6540344
 $
 @end example
 
-This command will create @file{passwd.psk} if it does not exist
-and will add user 'psk_identity' (you will also be prompted for a password). 
+This command will create @file{keys.psk} if it does not exist
+and will add user 'psk_identity'.
 _EOT_;
 };
 

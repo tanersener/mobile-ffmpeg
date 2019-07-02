@@ -117,7 +117,7 @@ void doit(void)
 	}
 
 	if (ret == 0) {
-		fail("overriden cert is not a CA!\n");
+		fail("overridden cert is not a CA!\n");
 		exit(1);
 	}
 

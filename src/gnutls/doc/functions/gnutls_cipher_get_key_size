@@ -5,7 +5,7 @@
 @deftypefun {size_t} {gnutls_cipher_get_key_size} (gnutls_cipher_algorithm_t @var{algorithm})
 @var{algorithm}: is an encryption algorithm
 
-Get key size for cipher.
+This function returns the key size of the provided algorithm.
 
 @strong{Returns:} length (in bytes) of the given cipher's key size, or 0 if
 the given cipher is invalid.

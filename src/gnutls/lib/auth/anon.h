@@ -16,9 +16,12 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
+
+#ifndef GNUTLS_LIB_AUTH_ANON_H
+#define GNUTLS_LIB_AUTH_ANON_H
 
 /* this is not to be included by gnutls_anon.c */
 #include <auth.h>
@@ -27,6 +30,7 @@
 typedef struct gnutls_anon_server_credentials_st {
 	gnutls_dh_params_t dh_params;
 	unsigned deinit_dh_params;
+	gnutls_sec_param_t dh_sec_param;
 
 	/* this callback is used to retrieve the DH or RSA
 	 * parameters.
@@ -44,3 +48,5 @@ typedef struct anon_auth_info_st {
 } *anon_auth_info_t;
 
 typedef struct anon_auth_info_st anon_auth_info_st;
+
+#endif /* GNUTLS_LIB_AUTH_ANON_H */

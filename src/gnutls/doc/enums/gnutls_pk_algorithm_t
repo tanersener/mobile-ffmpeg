@@ -12,6 +12,18 @@ DSA public-key algorithm.
 Diffie-Hellman algorithm. Used to generate parameters.
 @item GNUTLS_@-PK_@-ECDSA
 Elliptic curve algorithm. These parameters are compatible with the ECDSA and ECDH algorithm.
-@item GNUTLS_@-PK_@-ECDHX
+@item GNUTLS_@-PK_@-ECDH_@-X25519
 Elliptic curve algorithm, restricted to ECDH as per rfc7748.
+@item GNUTLS_@-PK_@-RSA_@-PSS
+RSA public-key algorithm, with PSS padding.
+@item GNUTLS_@-PK_@-EDDSA_@-ED25519
+Edwards curve Digital signature algorithm. Used with SHA512 on signatures.
+@item GNUTLS_@-PK_@-GOST_@-01
+GOST R 34.10-2001 algorithm per rfc5832.
+@item GNUTLS_@-PK_@-GOST_@-12_@-256
+GOST R 34.10-2012 algorithm, 256-bit key per rfc7091.
+@item GNUTLS_@-PK_@-GOST_@-12_@-512
+GOST R 34.10-2012 algorithm, 512-bit key per rfc7091.
+@item GNUTLS_@-PK_@-MAX
+-- undescribed --
 @end table

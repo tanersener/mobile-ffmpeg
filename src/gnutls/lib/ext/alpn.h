@@ -14,13 +14,14 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
-#ifndef EXT_ALPN_H
-#define EXT_ALPN_H
 
-#include <extensions.h>
+#ifndef GNUTLS_LIB_EXT_ALPN_H
+#define GNUTLS_LIB_EXT_ALPN_H
+
+#include <hello_ext.h>
 
 #define MAX_ALPN_PROTOCOLS 8
 #define MAX_ALPN_PROTOCOL_NAME 32
@@ -34,6 +35,6 @@ typedef struct {
 	unsigned flags;
 } alpn_ext_st;
 
-extern const extension_entry_st ext_mod_alpn;
+extern const hello_ext_entry_st ext_mod_alpn;
 
-#endif
+#endif /* GNUTLS_LIB_EXT_ALPN_H */

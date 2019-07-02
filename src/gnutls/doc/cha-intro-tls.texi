@@ -8,11 +8,11 @@ by @acronym{IETF}@footnote{IETF, or Internet Engineering Task Force,
 is a large open international community of network designers,
 operators, vendors, and researchers concerned with the evolution of
 the Internet architecture and the smooth operation of the Internet.
-It is open to any interested individual.}, described in @xcite{RFC5246}.  
+It is open to any interested individual.}, described in @xcite{RFC5246}.
 The protocol provides
 confidentiality, and authentication layers over any reliable transport
 layer.  The description, above, refers to @acronym{TLS} 1.0 but applies
-to all other TLS versions as the differences between the protocols are not major.  
+to all other TLS versions as the differences between the protocols are not major.
 
 The @acronym{DTLS} protocol, or ``Datagram @acronym{TLS}'' @xcite{RFC4347} is a
 protocol with identical goals as @acronym{TLS}, but can operate
@@ -38,15 +38,17 @@ noted otherwise.
 @acronym{TLS} is a layered protocol, and consists of the record
 protocol, the handshake protocol and the alert protocol. The record
 protocol is to serve all other protocols and is above the transport
-layer.  The record protocol offers symmetric encryption, data
-authenticity, and optionally compression.
+layer.  The record protocol offers symmetric encryption, and data
+authenticity@footnote{In early versions of TLS compression was optionally
+available as well. This is no longer the case in recent versions of the
+protocol.}.
 The alert protocol offers some signaling to the other protocols. It
 can help informing the peer for the cause of failures and other error
 conditions.  @xref{The Alert Protocol}, for more information.  The
 alert protocol is above the record protocol.
 
 The handshake protocol is responsible for the security parameters'
-negotiation, the initial key exchange and authentication.  
+negotiation, the initial key exchange and authentication.
 @xref{The Handshake Protocol}, for more information about the handshake
 protocol.  The protocol layering in TLS is shown in @ref{fig-tls-layers}.
 
@@ -65,7 +67,7 @@ above any transport layer, as long as it is a reliable one.  @acronym{DTLS}
 can be used over reliable and unreliable transport layers.
 @acronym{GnuTLS} supports TCP and UDP layers transparently using
 the Berkeley sockets API. However, any transport layer can be used
-by providing callbacks for @acronym{GnuTLS} to access the transport layer 
+by providing callbacks for @acronym{GnuTLS} to access the transport layer
 (for details see @ref{Setting up the transport layer}).
 
 @node The TLS record protocol
@@ -73,17 +75,17 @@ by providing callbacks for @acronym{GnuTLS} to access the transport layer
 @cindex record protocol
 
 The record protocol is the secure communications provider. Its purpose
-is to encrypt, authenticate and ---optionally--- compress packets.
+is to encrypt, and authenticate packets.
 The record layer functions can be called at any time after
 the handshake process is finished, when there is need to receive
 or send data. In @acronym{DTLS} however, due to re-transmission
 timers used in the handshake out-of-order handshake data might
 be received for some time (maximum 60 seconds) after the handshake
-process is finished. 
+process is finished.
 
 The functions to access the record protocol are limited to send
-and receive functions, which might, given 
-the importance of this protocol in @acronym{TLS}, seem awkward.  This is because 
+and receive functions, which might, given
+the importance of this protocol in @acronym{TLS}, seem awkward.  This is because
 the record protocol's parameters are all set by the handshake protocol.
 The record protocol initially starts with NULL parameters, which means
 no encryption, and no MAC is used. Encryption and authentication begin
@@ -91,8 +93,7 @@ just after the handshake protocol has finished.
 
 @menu
 * Encryption algorithms used in the record layer::
-* Compression algorithms used in the record layer::
-* Weaknesses and countermeasures::
+* Compression algorithms and the record layer::
 * On Record Padding::
 @end menu
 
@@ -101,10 +102,10 @@ just after the handshake protocol has finished.
 @cindex symmetric encryption algorithms
 
 Confidentiality in the record layer is achieved by using symmetric
-ciphers like @code{AES} or @code{CHACHA20}.  Ciphers are encryption algorithms 
+ciphers like @code{AES} or @code{CHACHA20}.  Ciphers are encryption algorithms
 that use a single, secret, key to encrypt and decrypt data. Early
 versions of TLS separated between block and stream ciphers and had
-message authentication plugged in to them by the protocol, though later 
+message authentication plugged in to them by the protocol, though later
 versions switched to using authenticated-encryption (AEAD) ciphers. The AEAD
 ciphers are defined to combine encryption and authentication, and as such
 they are not only more efficient, as the primitives used are designed to
@@ -115,59 +116,78 @@ The supported in @acronym{GnuTLS} ciphers and MAC algorithms are shown in @ref{t
 @ref{tab:macs}.
 
 @float Table,tab:ciphers
-@multitable @columnfractions .20 .20 .60
-@headitem Algorithm @tab Type @tab Description
+@multitable @columnfractions .20 .10 .15 .55
+@headitem Algorithm @tab Type @tab Applicable Protocols @tab Description
 @item AES-128-GCM, AES-256-GCM @tab
 AEAD @tab
+TLS 1.2, TLS 1.3 @tab
 This is the AES algorithm in the authenticated encryption GCM mode.
 This mode combines message authentication and encryption and can
 be extremely fast on CPUs that support hardware acceleration.
 
 @item AES-128-CCM, AES-256-CCM @tab
 AEAD @tab
+TLS 1.2, TLS 1.3 @tab
 This is the AES algorithm in the authenticated encryption CCM mode.
 This mode combines message authentication and encryption and is
 often used by systems without AES or GCM acceleration support.
 
-@item AES-128-CCM-8, AES-256-CCM-8 @tab
-AEAD @tab
-This is the AES algorithm in the authenticated encryption CCM mode
-with a truncated to 64-bit authentication tag. This mode is for
-communication with restricted systems.
-
-@item CAMELLIA-128-GCM, CAMELLIA-256-GCM @tab
-AEAD @tab
-This is the CAMELLIA algorithm in the authenticated encryption GCM mode.
-
 @item CHACHA20-POLY1305 @tab
 AEAD @tab
+TLS 1.2, TLS 1.3 @tab
 CHACHA20-POLY1305 is an authenticated encryption algorithm based on CHACHA20 cipher and
 POLY1305 MAC. CHACHA20 is a refinement of SALSA20 algorithm, an approved cipher by
 the European ESTREAM project. POLY1305 is Wegman-Carter, one-time authenticator. The
 combination provides a fast stream cipher suitable for systems where a hardware AES
 accelerator is not available.
 
+@item AES-128-CCM-8, AES-256-CCM-8 @tab
+AEAD @tab
+TLS 1.2, TLS 1.3 @tab
+This is the AES algorithm in the authenticated encryption CCM mode
+with a truncated to 64-bit authentication tag. This mode is for
+communication with restricted systems.
+
+@item CAMELLIA-128-GCM, CAMELLIA-256-GCM @tab
+AEAD @tab
+TLS 1.2 @tab
+This is the CAMELLIA algorithm in the authenticated encryption GCM mode.
+
 @item AES-128-CBC, AES-256-CBC @tab
 Legacy (block) @tab
+TLS 1.0, TLS 1.1, TLS 1.2 @tab
 AES or RIJNDAEL is the block cipher algorithm that replaces the old
 DES algorithm.  It has 128 bits block size and is used in CBC mode.
 
 @item CAMELLIA-128-CBC, CAMELLIA-256-CBC @tab
 Legacy (block) @tab
+TLS 1.0, TLS 1.1, TLS 1.2 @tab
 This is an 128-bit block cipher developed by Mitsubishi and NTT. It
 is one of the approved ciphers of the European NESSIE and Japanese
 CRYPTREC projects.
 
 @item 3DES-CBC @tab
 Legacy (block) @tab
+TLS 1.0, TLS 1.1, TLS 1.2 @tab
 This is the DES block cipher algorithm used with triple
 encryption (EDE). Has 64 bits block size and is used in CBC mode.
 
 @item ARCFOUR-128 @tab
 Legacy (stream) @tab
+TLS 1.0, TLS 1.1, TLS 1.2 @tab
 ARCFOUR-128 is a compatible algorithm with RSA's RC4 algorithm, which is considered to be a trade
 secret. It is a considered to be broken, and is only used for compatibility
 purposed. For this reason it is not enabled by default.
+
+@item NULL @tab
+Legacy (stream) @tab
+TLS 1.0, TLS 1.1, TLS 1.2 @tab
+NULL is the empty/identity cipher which doesn't encrypt any data. It can be
+combined with data authentication under TLS 1.2 or earlier, but is only used
+transiently under TLS 1.3 until encryption starts. This cipher cannot be negotiated
+by default (need to be explicitly enabled) under TLS 1.2, and cannot be
+negotiated at all under TLS 1.3. When enabled, TLS 1.3 (or later) support will be
+implicitly disabled.
 
 @end multitable
 @caption{Supported ciphers in TLS.}
@@ -178,11 +198,11 @@ purposed. For this reason it is not enabled by default.
 @multitable @columnfractions .20 .70
 @headitem Algorithm @tab Description
 @item MAC-MD5 @tab
-This is an HMAC based on MD5 a cryptographic hash algorithm designed 
+This is an HMAC based on MD5 a cryptographic hash algorithm designed
 by Ron Rivest. Outputs 128 bits of data.
 
 @item MAC-SHA1 @tab
-An HMAC based on the SHA1 cryptographic hash algorithm 
+An HMAC based on the SHA1 cryptographic hash algorithm
 designed by NSA. Outputs 160 bits of data.
 
 @item MAC-SHA256 @tab
@@ -200,96 +220,44 @@ GCM, is in use.
 @end float
 
 
-@node Compression algorithms used in the record layer
-@subsection Compression algorithms used in the record layer
+@node Compression algorithms and the record layer
+@subsection Compression algorithms and the record layer
 @cindex compression algorithms
 
-The TLS record layer also supports compression.  The algorithms
-implemented in @acronym{GnuTLS} can be found in the table below.
-The included algorithms perform really good when text, or other
-compressible data are to be transferred, but offer nothing on already
-compressed data, such as compressed images, zipped archives etc.
-These compression algorithms, may be useful in high bandwidth TLS
-tunnels, and in cases where network usage has to be minimized. It
-should be noted however that compression increases latency.
-
-The record layer compression in @acronym{GnuTLS} is implemented based
-on @xcite{RFC3749}. The supported algorithms are shown below.
-
-@showenumdesc{gnutls_compression_method_t,Supported compression algorithms}
-
-Note that compression enables attacks such as traffic analysis, or even
-plaintext recovery under certain circumstances. To avoid some of these
-attacks GnuTLS allows each record to be compressed independently (i.e.,
-stateless compression), by using the "%STATELESS_COMPRESSION" priority string,
-in order to be used in cases where the attacker controlled data are
-pt in separate records.
-
-@node Weaknesses and countermeasures
-@subsection Weaknesses and countermeasures
-
-Some weaknesses that may affect the security of the record layer have
-been found in @acronym{TLS} 1.0 protocol. These weaknesses can be
-exploited by active attackers, and exploit the facts that
-
-@enumerate
-
-@item
-@acronym{TLS} has separate alerts for ``decryption_failed'' and
-``bad_record_mac''
-
-@item
-The decryption failure reason can be detected by timing the response
-time.
-
-@item
-The IV for CBC encrypted packets is the last block of the previous
-encrypted packet.
-
-@end enumerate
-
-Those weaknesses were solved in @acronym{TLS} 1.1 @xcite{RFC4346}
-which is implemented in @acronym{GnuTLS}. For this reason we suggest
-to always negotiate the highest supported TLS version with the 
-peer@footnote{If this is not possible then please consult @ref{Interoperability}.}.
-For a detailed discussion of the issues see the archives of the TLS 
-Working Group mailing list and @xcite{CBCATT}.
+In early versions of TLS the record layer supported compression. However,
+that proved to be problematic in many ways, and enabled several attacks
+based on traffic analysis on the transported data. For that newer versions of the protocol no longer
+offer compression, and @acronym{GnuTLS} since 3.6.0 no longer implements any
+support for compression.
 
 @node On Record Padding
 @subsection On record padding
 @cindex record padding
 @cindex bad_record_mac
 
-The TLS protocol allows for extra padding of records in CBC ciphers, to prevent
-statistical analysis based on the length of exchanged messages (see @xcite{RFC5246} section 6.2.3.2).  
-GnuTLS appears to be one of few implementations that take advantage of this feature: 
-the user can provide some plaintext data with a range of lengths she wishes to hide,
-and GnuTLS adds extra padding to make sure the attacker cannot tell the real plaintext
-length is in a range smaller than the user-provided one.
-Use @funcref{gnutls_record_send_range} to send length-hidden messages and
-@funcref{gnutls_record_can_use_length_hiding} to check whether the current
-session supports length hiding. Using the standard @funcref{gnutls_record_send}
-will only add minimal padding.
+The TLS 1.3 protocol allows for extra padding of records to prevent
+statistical analysis based on the length of exchanged messages.
+GnuTLS takes advantage of this feature, by allowing the user
+to specify the amount of padding for a particular message. The simplest
+interface is provided by @funcref{gnutls_record_send2}, and is made
+available when under TLS1.3; alternatively @funcref{gnutls_record_can_use_length_hiding}
+can be queried.
 
-The TLS implementation in the Symbian operating system, frequently
-used by Nokia and Sony-Ericsson mobile phones, cannot handle
-non-minimal record padding.  What happens when one of these clients
-handshake with a GnuTLS server is that the client will fail to compute
-the correct MAC for the record.  The client sends a TLS alert
-(@code{bad_record_mac}) and disconnects.  Typically this will result
-in error messages such as 'A TLS fatal alert has been received', 'Bad
-record MAC', or both, on the GnuTLS server side.
+Note that this interface is not sufficient to completely hide the length of the
+data. The application code may reveal the data transferred by leaking its
+data processing time, or by leaking the TLS1.3 record processing time by
+GnuTLS. That is because under TLS1.3 the padding removal time depends on the
+padding data for an efficient implementation. To make that processing
+constant time the @funcref{gnutls_init} function must be called with
+the flag @code{GNUTLS_SAFE_PADDING_CHECK}.
 
-If compatibility with such devices is a concern, not sending length-hidden messages
-solves the problem by using minimal padding.
+@showfuncdesc{gnutls_record_send2}
 
-If you implement an application that has a configuration file, we
-recommend that you make it possible for users or administrators to
-specify a GnuTLS protocol priority string, which is used by your
-application via @funcref{gnutls_priority_set}.  To allow the best
-flexibility, make it possible to have a different priority string for
-different incoming IP addresses.
+Older GnuTLS versions provided an API suitable for cases where the sender
+sends data that are always within a given range. That API is still
+available, and consists of the following functions.
 
+@showfuncB{gnutls_record_can_use_length_hiding,gnutls_record_send_range}
 
 @node The TLS Alert Protocol
 @section The TLS alert protocol
@@ -303,14 +271,14 @@ protocol and the application protocol does not have to cope with them
 (e.g. @code{GNUTLS_@-A_@-CLOSE_@-NOTIFY}), and others refer to the
 application protocol solely (e.g. @code{GNUTLS_@-A_@-USER_@-CANCELLED}).  An
 alert signal includes a level indication which may be either fatal or
-warning. Fatal alerts always terminate the current connection, and
-prevent future re-negotiations using the current session ID. All alert
-messages are summarized in the table below.
+warning (under TLS1.3 all alerts are fatal). Fatal alerts always terminate
+the current connection, and prevent future re-negotiations using the current
+session ID. All supported alert messages are summarized in the table below.
 
 The alert messages are protected by the record protocol, thus the
 information that is included does not leak. You must take extreme care
 for the alert information not to leak to a possible attacker, via
-public log files etc. 
+public log files etc.
 
 @include alerts.texi
 
@@ -323,7 +291,7 @@ The handshake protocol is responsible for the ciphersuite negotiation,
 the initial key exchange, and the authentication of the two peers.
 This is fully controlled by the application layer, thus your program
 has to set up the required parameters. The main handshake function
-is @funcref{gnutls_handshake}. In the next paragraphs we elaborate on 
+is @funcref{gnutls_handshake}. In the next paragraphs we elaborate on
 the handshake protocol, i.e., the ciphersuite negotiation.
 
 
@@ -338,9 +306,14 @@ the handshake protocol, i.e., the ciphersuite negotiation.
 @node TLS Cipher Suites
 @subsection TLS ciphersuites
 
-The handshake protocol of @acronym{TLS} negotiates cipher suites of
-a special form illustrated by the @code{TLS_DHE_RSA_WITH_3DES_CBC_SHA} cipher suite name.  A typical cipher
-suite contains these parameters:
+The TLS cipher suites have slightly different meaning under different
+protocols. Under @acronym{TLS 1.3}, a cipher suite indicates the symmetric
+encryption algorithm in use, as well as the pseudo-random function (PRF)
+used in the TLS session.
+
+Under TLS 1.2 or early the handshake protocol negotiates cipher suites of
+a special form illustrated by the @code{TLS_DHE_RSA_WITH_3DES_CBC_SHA} cipher suite name.
+A typical cipher suite contains these parameters:
 
 @itemize
 
@@ -367,14 +340,23 @@ All the supported ciphersuites are listed in @ref{ciphersuites}.
 @subsection Authentication
 
 The key exchange algorithms of the @acronym{TLS} protocol offer
-authentication, which is a prerequisite for a secure connection. 
-The available authentication methods in @acronym{GnuTLS} follow.
+authentication, which is a prerequisite for a secure connection.
+The available authentication methods in @acronym{GnuTLS}, under
+TLS 1.3 or earlier versions, follow.
 
 @itemize
 
-@item Certificate authentication: Authenticated key exchange using public key infrastructure and certificates (X.509 or OpenPGP).
-@item @acronym{SRP} authentication: Authenticated key exchange using a password.
+@item Certificate authentication: Authenticated key exchange using public key infrastructure and X.509 certificates.
 @item @acronym{PSK} authentication: Authenticated key exchange using a pre-shared key.
+
+@end itemize
+
+Under TLS 1.2 or earlier versions, the following authentication methods
+are also available.
+
+@itemize
+
+@item @acronym{SRP} authentication: Authenticated key exchange using a password.
 @item Anonymous authentication: Key exchange without peer authentication.
 
 @end itemize
@@ -386,7 +368,7 @@ The available authentication methods in @acronym{GnuTLS} follow.
 In the case of ciphersuites that use certificate authentication, the
 authentication of the client is optional in @acronym{TLS}.  A server
 may request a certificate from the client using the
-@funcref{gnutls_certificate_server_set_request} function. We elaborate 
+@funcref{gnutls_certificate_server_set_request} function. We elaborate
 in @ref{Certificate credentials}.
 
 @node Resuming Sessions
@@ -396,7 +378,7 @@ in @ref{Certificate credentials}.
 @cindex session resumption
 
 The TLS handshake process performs expensive calculations
-and a busy server might easily be put under load. To 
+and a busy server might easily be put under load. To
 reduce the load, session resumption may be used. This
 is a feature of the @acronym{TLS} protocol which allows a
 client to connect to a server after a successful handshake, without
@@ -404,8 +386,8 @@ the expensive calculations.  This is achieved by re-using the previously
 established keys, meaning the server needs to store the state of established
 connections (unless session tickets are used -- @ref{Session tickets}).
 
-Session resumption is an integral part of @acronym{GnuTLS}, and 
-@ref{Session resumption}, @ref{ex-resume-client} illustrate typical 
+Session resumption is an integral part of @acronym{GnuTLS}, and
+@ref{Session resumption}, @ref{ex-resume-client} illustrate typical
 uses of it.
 
 @node TLS Extensions
@@ -482,6 +464,9 @@ regularly.
 Since version 3.1.3 GnuTLS clients transparently support session tickets,
 unless forward secrecy is explicitly requested (with the PFS priority string).
 
+Under TLS 1.3 session tickets are mandatory for session resumption, and they
+do not share the forward secrecy concerns as with TLS 1.2 or earlier.
+
 @node HeartBeat
 @subsection HeartBeat
 @cindex TLS extensions
@@ -491,10 +476,10 @@ This is a TLS extension that allows to ping and receive confirmation from the pe
 and is described in @xcite{RFC6520}. The extension is disabled by default and
 @funcref{gnutls_heartbeat_enable} can be used to enable it. A policy
 may be negotiated to only allow sending heartbeat messages or sending and receiving.
-The current session policy can be checked with @funcref{gnutls_heartbeat_allowed}. 
+The current session policy can be checked with @funcref{gnutls_heartbeat_allowed}.
 The requests coming from the peer result to @code{GNUTLS_@-E_@-HEARTBEAT_@-PING_@-RECEIVED}
 being returned from the receive function. Ping requests to peer can be send via
-@funcref{gnutls_heartbeat_ping}. 
+@funcref{gnutls_heartbeat_ping}.
 
 @showfuncB{gnutls_heartbeat_allowed,gnutls_heartbeat_enable}
 
@@ -527,7 +512,7 @@ to access certain parts of a web site.  The
 attack works by having the attacker simulate a client and connect to a
 server, with server-only authentication, and send some data intended
 to cause harm.  The server will then require renegotiation from him
-in order to perform the request. 
+in order to perform the request.
 When the proper client attempts to contact the server,
 the attacker hijacks that connection and forwards traffic to
 the initial server that requested renegotiation.  The
@@ -565,7 +550,7 @@ Note that it is easy to configure clients to always require the safe
 renegotiation extension from servers.
 
 To modify the default behavior, we have introduced some new priority
-strings (see @ref{Priority Strings}).  
+strings (see @ref{Priority Strings}).
 The @code{%UNSAFE_RENEGOTIATION} priority string permits
 (re-)handshakes even when the safe renegotiation extension was not
 negotiated. The default behavior is @code{%PARTIAL_RENEGOTIATION} that will
@@ -649,9 +634,9 @@ Other helper functions are listed below.
 @cindex False Start
 @cindex TLS False Start
 
-The TLS protocol was extended in @xcite{draft-ietf-tls-falsestart-01} to allow the client
+The TLS protocol was extended in @xcite{RFC7918} to allow the client
 to send data to server in a single round trip. This change however operates on the borderline
-of the TLS protocol security guarrantees and should be used for the cases where the reduced
+of the TLS protocol security guarantees and should be used for the cases where the reduced
 latency outperforms the risk of an adversary intercepting the transferred data. In GnuTLS
 applications can use the @acronym{GNUTLS_ENABLE_FALSE_START} as option to @funcref{gnutls_init}
 to request an early return of the @funcref{gnutls_handshake} function. After that early
@@ -670,7 +655,7 @@ whitelisted for false start or on insufficient key sizes, the handshake
 process will complete properly (i.e., no early return). To verify that false start was used you
 may use @funcref{gnutls_session_get_flags} and check for the @acronym{GNUTLS_SFLAGS_FALSE_START}
 flag. For GnuTLS the false start is whitelisted for the following
-key exchange methods (see @xcite{draft-ietf-tls-falsestart-01} for rationale)
+key exchange methods (see @xcite{RFC7918} for rationale)
 @itemize
 @item DHE
 @item ECDHE
@@ -683,7 +668,7 @@ but only when the negotiated parameters exceed @code{GNUTLS_SEC_PARAM_HIGH}
 @cindex ALPN
 @cindex Application Layer Protocol Negotiation
 
-The TLS protocol was extended in @code{RFC7301} 
+The TLS protocol was extended in @code{RFC7301}
 to provide the application layer a method of
 negotiating the application protocol version. This allows for negotiation
 of the application protocol during the TLS handshake, thus reducing
@@ -704,8 +689,8 @@ to register them.
 It is possible to transfer supplemental data during the TLS handshake, following
 @xcite{RFC4680}. This is for "custom" protocol modifications for applications which
 may want to transfer additional data (e.g. additional authentication messages). Such
-an exchange requires a custom extension to be registered. 
-The provided API for this functionality is low-level and described in @ref{TLS Extension Handling}.
+an exchange requires a custom extension to be registered.
+The provided API for this functionality is low-level and described in @ref{TLS Hello Extension Handling}.
 
 @include sec-tls-app.texi
 

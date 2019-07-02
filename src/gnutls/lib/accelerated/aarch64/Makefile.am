@@ -16,7 +16,7 @@
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>
+# along with this program.  If not, see <https://www.gnu.org/licenses/>
 
 AM_LIBTOOLFLAGS=--tag=CC
 
@@ -43,8 +43,12 @@ noinst_LTLIBRARIES = libaarch64.la
 libaarch64_la_SOURCES = aarch64-common.c aarch64-common.h sha-aarch64.h sha-aarch64.c \
 	hmac-sha-aarch64.c aes-cbc-aarch64.c aes-gcm-aarch64.c aes-aarch64.h aes-ccm-aarch64.c
 
-if ASM_AARCH64
-libaarch64_la_SOURCES += elf/sha1-armv8.s elf/sha512-armv8.s elf/sha256-armv8.s \
-	elf/aes-aarch64.s elf/ghash-aarch64.s
+if MACOSX
+ADIR=macosx
+else
+ADIR=elf
+endif
 
-endif #ASM_AARCH64
+libaarch64_la_SOURCES += $(ADIR)/sha1-armv8.s $(ADIR)/sha512-armv8.s $(ADIR)/sha256-armv8.s \
+	$(ADIR)/aes-aarch64.s $(ADIR)/ghash-aarch64.s
+

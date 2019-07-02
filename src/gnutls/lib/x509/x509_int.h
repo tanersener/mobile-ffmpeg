@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2003-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -16,12 +17,12 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
-#ifndef X509_H
-#define X509_H
+#ifndef GNUTLS_LIB_X509_X509_INT_H
+#define GNUTLS_LIB_X509_X509_INT_H
 
 #include <gnutls/x509.h>
 #include <gnutls/x509-ext.h>
@@ -32,6 +33,7 @@
 #define MAX_CRQ_EXTENSIONS_SIZE 8*1024
 #define MAX_OID_SIZE 128
 #define MAX_KEY_ID_SIZE 128
+#define MAX_SALT_SIZE 256
 #define MAX_NAME_SIZE (3*ASN1_MAX_NAME_SIZE)
 
 #define HASH_OID_SHA1 "1.3.14.3.2.26"
@@ -46,7 +48,13 @@
 #define HASH_OID_SHA3_256 "2.16.840.1.101.3.4.2.8"
 #define HASH_OID_SHA3_384 "2.16.840.1.101.3.4.2.9"
 #define HASH_OID_SHA3_512 "2.16.840.1.101.3.4.2.10"
+#define HASH_OID_GOST_R_3411_94 "1.2.643.2.2.9"
+#define HASH_OID_STREEBOG_256 "1.2.643.7.1.1.2.2"
+#define HASH_OID_STREEBOG_512 "1.2.643.7.1.1.2.3"
 
+#define HASH_OID_GOST_R_3411_94_CRYPTOPRO_PARAMS "1.2.643.2.2.30.1"
+
+/* from rfc8479 */
 #define OID_ATTR_PROV_SEED "1.3.6.1.4.1.2312.18.8.1"
 
 struct gnutls_x509_crl_iter {
@@ -77,6 +85,7 @@ typedef struct gnutls_x509_crt_int {
 	int use_extensions;
 	unsigned expanded; /* a certificate has been expanded */
 	unsigned modified; /* the cached values below may no longer be valid */
+	unsigned flags;
 
 	struct pin_info_st pin;
 
@@ -121,7 +130,7 @@ typedef struct gnutls_pkcs7_int {
 } gnutls_pkcs7_int;
 
 struct pbkdf2_params {
-	uint8_t salt[32];
+	uint8_t salt[MAX_SALT_SIZE];
 	int salt_size;
 	unsigned iter_count;
 	unsigned key_size;
@@ -134,7 +143,6 @@ typedef struct gnutls_x509_privkey_int {
 	 */
 	gnutls_pk_params_st params;
 
-	gnutls_pk_algorithm_t pk_algorithm;
 	unsigned expanded;
 	unsigned flags;
 
@@ -156,8 +164,14 @@ int _gnutls_x509_get_tbs(ASN1_TYPE cert, const char *tbs_name,
 			 gnutls_datum_t * tbs);
 int _gnutls_x509_pkix_sign(ASN1_TYPE src, const char *src_name,
 			   gnutls_digest_algorithm_t,
+			   unsigned int flags,
 			   gnutls_x509_crt_t issuer,
 			   gnutls_privkey_t issuer_key);
+int _gnutls_x509_crt_get_spki_params(gnutls_x509_crt_t issuer,
+				     const gnutls_x509_spki_st *key_params,
+				     gnutls_x509_spki_st *params);
+
+#define map_errs_to_zero(x) ((x)<0?0:(x))
 
 /* dn.c */
 #define OID_X520_COUNTRY_NAME		"2.5.4.6"
@@ -229,11 +243,6 @@ _gnutls_x509_verify_algorithm(gnutls_digest_algorithm_t * hash,
 			      gnutls_pk_algorithm_t pk,
 			      gnutls_pk_params_st * issuer_params);
 
-int _gnutls_x509_verify_data(const mac_entry_st * me,
-			     const gnutls_datum_t * data,
-			     const gnutls_datum_t * signature,
-			     gnutls_x509_crt_t issuer);
-
 /* privkey.h */
 void _gnutls_x509_privkey_reinit(gnutls_x509_privkey_t key);
 
@@ -245,12 +254,30 @@ int _gnutls_privkey_decode_ecc_key(ASN1_TYPE* pkey_asn, const gnutls_datum_t *
 					 gnutls_x509_privkey_t pkey,
 					 gnutls_ecc_curve_t curve);
 
+int _gnutls_privkey_decode_eddsa_key(ASN1_TYPE* pkey_asn,
+		const gnutls_datum_t *raw_key,
+		gnutls_x509_privkey_t pkey,
+		gnutls_ecc_curve_t curve);
+
 int
 _gnutls_x509_read_ecc_params(uint8_t * der, int dersize,
 			     unsigned int *curve);
 
-int _gnutls_asn1_encode_privkey(gnutls_pk_algorithm_t pk, ASN1_TYPE * c2,
+int
+_gnutls_x509_read_gost_params(uint8_t * der, int dersize,
+			      gnutls_pk_params_st * params,
+			      gnutls_pk_algorithm_t algo);
+
+int _gnutls_asn1_encode_privkey(ASN1_TYPE * c2,
 				gnutls_pk_params_st * params);
+
+void _gnutls_x509_privkey_get_spki_params(gnutls_x509_privkey_t key,
+					  gnutls_x509_spki_st * params);
+
+int _gnutls_x509_read_rsa_pss_params(uint8_t * der, int dersize,
+				     gnutls_x509_spki_st * params);
+int _gnutls_x509_write_rsa_pss_params(gnutls_x509_spki_st * params,
+				      gnutls_datum_t * der);
 
 /* extensions.c */
 int _gnutls_x509_crl_get_extension_oid(gnutls_x509_crl_t crl,
@@ -286,7 +313,7 @@ _gnutls_x509_ext_extract_number(uint8_t * number,
 				size_t * nr_size,
 				uint8_t * extnValue, int extnValueLen);
 int
-_gnutls_x509_ext_gen_number(const uint8_t * nuber, size_t nr_size,
+_gnutls_x509_ext_gen_number(const uint8_t * number, size_t nr_size,
 			    gnutls_datum_t * der_ext);
 
 
@@ -315,44 +342,86 @@ int _gnutls_x509_crt_get_mpis(gnutls_x509_crt_t cert,
 int _gnutls_x509_read_pubkey_params(gnutls_pk_algorithm_t, uint8_t * der,
 				    int dersize,
 				    gnutls_pk_params_st * params);
+int _gnutls_x509_check_pubkey_params(gnutls_pk_params_st * params);
 
 int _gnutls_x509_read_pubkey(gnutls_pk_algorithm_t, uint8_t * der,
 			     int dersize, gnutls_pk_params_st * params);
+
+int _gnutls_x509_read_pubkey_signature_params(gnutls_pk_algorithm_t algo,
+					      uint8_t * der, int dersize,
+					      gnutls_pk_params_st * params);
 
 int _gnutls_x509_write_ecc_params(gnutls_ecc_curve_t curve,
 				  gnutls_datum_t * der);
 int _gnutls_x509_write_ecc_pubkey(gnutls_pk_params_st * params,
 				  gnutls_datum_t * der);
 
+int _gnutls_x509_write_eddsa_pubkey(gnutls_pk_params_st * params,
+				    gnutls_datum_t * der);
+
 int
-_gnutls_x509_write_pubkey_params(gnutls_pk_algorithm_t algo,
-				 gnutls_pk_params_st * params,
+_gnutls_x509_write_pubkey_params(gnutls_pk_params_st * params,
 				 gnutls_datum_t * der);
-int _gnutls_x509_write_pubkey(gnutls_pk_algorithm_t,
-			      gnutls_pk_params_st * params,
+int _gnutls_x509_write_pubkey(gnutls_pk_params_st * params,
 			      gnutls_datum_t * der);
 
 int _gnutls_x509_read_uint(ASN1_TYPE node, const char *value,
 			   unsigned int *ret);
 
 int _gnutls_x509_read_der_int(uint8_t * der, int dersize, bigint_t * out);
+int _gnutls_x509_read_der_uint(uint8_t * der, int dersize, unsigned int *out);
 
 int _gnutls_x509_read_int(ASN1_TYPE node, const char *value,
 			  bigint_t * ret_mpi);
 int _gnutls_x509_write_int(ASN1_TYPE node, const char *value, bigint_t mpi,
 			   int lz);
 
+int _gnutls_x509_write_uint32(ASN1_TYPE node, const char *value,
+			      uint32_t num);
+
+
 int _gnutls_x509_read_key_int(ASN1_TYPE node, const char *value,
 			  bigint_t * ret_mpi);
 int _gnutls_x509_write_key_int(ASN1_TYPE node, const char *value, bigint_t mpi,
 			   int lz);
 
-int _gnutls_x509_write_uint32(ASN1_TYPE node, const char *value,
-			      uint32_t num);
+int _gnutls_x509_read_key_int_le(ASN1_TYPE node, const char *value,
+				 bigint_t * ret_mpi);
+int _gnutls_x509_write_key_int_le(ASN1_TYPE node, const char *value,
+				  bigint_t mpi);
 
-int _gnutls_x509_write_sig_params(ASN1_TYPE dst, const char *dst_name,
-				  gnutls_pk_algorithm_t pk_algorithm,
-				  gnutls_digest_algorithm_t, unsigned legacy);
+int _gnutls_x509_read_pkalgo_params(ASN1_TYPE src, const char *src_name,
+				  gnutls_x509_spki_st *params, unsigned is_sig);
+int _gnutls_x509_write_sign_params(ASN1_TYPE dst, const char *dst_name,
+				   const gnutls_sign_entry_st *se, gnutls_x509_spki_st *params);
+
+#define _gnutls_x509_read_sign_params(src,name,params) _gnutls_x509_read_pkalgo_params(src,name,params,1)
+#define _gnutls_x509_read_spki_params(src,name,params) _gnutls_x509_read_pkalgo_params(src,name,params,0)
+int _gnutls_x509_write_spki_params(ASN1_TYPE dst, const char *dst_name,
+				   gnutls_x509_spki_st *params);
+
+inline static int
+_gnutls_x509_crt_read_spki_params(gnutls_x509_crt_t crt,
+				  gnutls_x509_spki_st *params)
+{
+	return _gnutls_x509_read_spki_params(crt->cert,
+					     "tbsCertificate."
+					     "subjectPublicKeyInfo."
+					     "algorithm",
+					     params);
+}
+
+inline static int
+_gnutls_x509_crq_read_spki_params(gnutls_x509_crq_t crt,
+				  gnutls_x509_spki_st *params)
+{
+	return _gnutls_x509_read_spki_params(crt->crq,
+					     "certificationRequestInfo."
+					     "subjectPKInfo."
+					     "algorithm",
+					     params);
+}
+
 
 /* pkcs12.h */
 #include <gnutls/pkcs12.h>
@@ -443,6 +512,8 @@ _gnutls_pkcs11_verify_crt_status(const char* url,
 				gnutls_verify_output_function func);
 #endif
 
+int _gnutls_check_cert_sanity(gnutls_x509_crt_t cert);
+
 int
 _gnutls_x509_crt_check_revocation(gnutls_x509_crt_t cert,
 				  const gnutls_x509_crl_t * crl_list,
@@ -473,6 +544,6 @@ struct gnutls_x509_tlsfeatures_st {
 	unsigned int size;
 };
 
-unsigned _gnutls_is_broken_sig_allowed(gnutls_sign_algorithm_t sig, unsigned int flags);
+unsigned _gnutls_is_broken_sig_allowed(const gnutls_sign_entry_st *se, unsigned int flags);
 
-#endif
+#endif /* GNUTLS_LIB_X509_X509_INT_H */

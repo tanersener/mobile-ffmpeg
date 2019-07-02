@@ -16,12 +16,12 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
-#ifndef AUTH_SRP_H
-#define AUTH_SRP_H
+#ifndef GNUTLS_LIB_AUTH_SRP_KX_H
+#define GNUTLS_LIB_AUTH_SRP_KX_H
 
 #include <auth.h>
 
@@ -68,4 +68,4 @@ typedef struct srp_server_auth_info_st srp_server_auth_info_st;
 
 #endif				/* ENABLE_SRP */
 
-#endif
+#endif /* GNUTLS_LIB_AUTH_SRP_KX_H */

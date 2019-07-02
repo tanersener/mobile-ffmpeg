@@ -2,6 +2,8 @@
 
 @c gnutls_certificate_verification_profiles_t
 @table @code
+@item GNUTLS_@-PROFILE_@-UNKNOWN
+An invalid/unknown profile.
 @item GNUTLS_@-PROFILE_@-VERY_@-WEAK
 A verification profile that
 corresponds to  @code{GNUTLS_SEC_PARAM_VERY_WEAK} (64 bits)
@@ -19,7 +21,10 @@ A verification profile that
 corresponds to  @code{GNUTLS_SEC_PARAM_HIGH} (128 bits)
 @item GNUTLS_@-PROFILE_@-ULTRA
 A verification profile that
-corresponds to  @code{GNUTLS_SEC_PARAM_ULTRA} (256 bits)
+corresponds to  @code{GNUTLS_SEC_PARAM_ULTRA} (192 bits)
+@item GNUTLS_@-PROFILE_@-FUTURE
+A verification profile that
+corresponds to  @code{GNUTLS_SEC_PARAM_FUTURE} (256 bits)
 @item GNUTLS_@-PROFILE_@-SUITEB128
 A verification profile that
 applies the SUITEB128 rules

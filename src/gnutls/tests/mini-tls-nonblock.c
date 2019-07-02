@@ -136,7 +136,7 @@ my_pull_timeout(gnutls_transport_ptr_t tr, unsigned ms)
 	return 1;
 }
 
-static void client(int fd, const char *msg, unsigned expl)
+static void client(int fd, const char *msg, const char *prio, unsigned expl)
 {
 	int ret;
 	gnutls_anon_client_credentials_t anoncred;
@@ -164,7 +164,7 @@ static void client(int fd, const char *msg, unsigned expl)
 	gnutls_init(&session, GNUTLS_CLIENT|expl);
 
 	/* Use default priorities */
-	ret = gnutls_priority_set_direct(session, "NORMAL", NULL);
+	ret = gnutls_priority_set_direct(session, prio, NULL);
 	if (ret < 0) {
 		fail("error in setting priority\n");
 		exit(1);
@@ -222,7 +222,7 @@ static void terminate(void)
 	exit(1);
 }
 
-static void server(int fd, unsigned expl)
+static void server(int fd, const char *prio, unsigned expl)
 {
 	int ret;
 	char buffer[MAX_BUF + 1];
@@ -255,7 +255,7 @@ static void server(int fd, unsigned expl)
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	gnutls_priority_set_direct(session, "NORMAL", NULL);
+	gnutls_priority_set_direct(session, prio, NULL);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_ANON, anoncred);
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
@@ -292,10 +292,12 @@ static void server(int fd, unsigned expl)
 		success("server: finished\n");
 }
 
-static void start(const char *msg, unsigned expl)
+static void start(const char *msg, const char *prio, unsigned expl)
 {
 	int fd[2];
 	int ret;
+
+	success("trying %s\n", msg);
 
 	ret = socketpair(AF_UNIX, SOCK_STREAM, 0, fd);
 	if (ret < 0) {
@@ -313,12 +315,12 @@ static void start(const char *msg, unsigned expl)
 	if (child) {
 		/* parent */
 		close(fd[1]);
-		client(fd[0], msg, expl);
+		client(fd[0], msg, prio, expl);
 		waitpid(-1, NULL, 0);
 		//kill(child, SIGTERM);
 	} else {
 		close(fd[0]);
-		server(fd[1], expl);
+		server(fd[1], prio, expl);
 		exit(0);
 	}
 }
@@ -340,9 +342,14 @@ void doit(void)
 {
 	signal(SIGCHLD, ch_handler);
 
-	start("TLS-explicit flag", GNUTLS_NONBLOCK);
-	start("DTLS-explicit flag", GNUTLS_NONBLOCK|GNUTLS_DATAGRAM);
-	start("TLS-no flag", 0);
+	start("TLS1.2-explicit flag", "NORMAL:-VERS-ALL:+VERS-TLS1.2", GNUTLS_NONBLOCK);
+	start("TLS1.2-explicit flag", "NORMAL:-VERS-ALL:+VERS-TLS1.3", GNUTLS_NONBLOCK);
+	start("TLS-explicit flag", "NORMAL", GNUTLS_NONBLOCK);
+	start("DTLS1.2-explicit flag", "NORMAL:-VERS-ALL:+VERS-DTLS1.2", GNUTLS_NONBLOCK|GNUTLS_DATAGRAM);
+	start("DTLS-explicit flag", "NORMAL", GNUTLS_NONBLOCK|GNUTLS_DATAGRAM);
+	start("TLS1.2-no flag", "NORMAL:-VERS-ALL:+VERS-TLS1.2", 0);
+	start("TLS1.3-no flag", "NORMAL:-VERS-ALL:+VERS-TLS1.3", 0);
+	start("TLS-no flag", "NORMAL", 0);
 }
 
 #endif				/* _WIN32 */

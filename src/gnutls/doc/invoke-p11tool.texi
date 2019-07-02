@@ -56,7 +56,7 @@ Tokens:
        --list-mechanisms      List all available mechanisms in a token
        --initialize           Initializes a PKCS #11 token
        --initialize-pin       Initializes/Resets a PKCS #11 token user PIN
-       --initialize-so-pin    Initializes/Resets a PKCS #11 token security officer PIN
+       --initialize-so-pin    Initializes/Resets a PKCS #11 token security officer PIN.
        --set-pin=str          Specify the PIN to use on token operations
        --set-so-pin=str       Specify the Security Officer's PIN to use on token initialization
 
@@ -95,9 +95,7 @@ Object listing:
 
 Key generation:
 
-       --generate-rsa         Generate an RSA private-public key pair
-       --generate-dsa         Generate a DSA private-public key pair
-       --generate-ecc         Generate an ECDSA private-public key pair
+       --generate-privkey=str Generate private-public key pair of given type
        --bits=num             Specify the number of bits for the key generate
        --curve=str            Specify the curve used for EC key generation
        --sec-param=str        Specify the security level
@@ -111,33 +109,33 @@ Writing objects:
                                 write
                                 set-id
        --write                Writes the loaded objects to a PKCS #11 token
-       --delete               Deletes the objects matching the given PKCS #11 URL
-       --label=str            Sets a label for the write operation
-       --id=str               Sets an ID for the write operation
-       --mark-wrap            Marks the generated key to be a wrapping key
+   -!, --delete               Deletes the objects matching the given PKCS #11 URL
+   -", --label=str            Sets a label for the write operation
+   -#, --id=str               Sets an ID for the write operation
+   -$, --mark-wrap            Marks the generated key to be a wrapping key
                                 - disabled as '--no-mark-wrap'
-       --mark-trusted         Marks the object to be written as trusted
+   -%, --mark-trusted         Marks the object to be written as trusted
                                 - prohibits the option 'mark-distrusted'
                                 - disabled as '--no-mark-trusted'
-       --mark-distrusted      When retrieving objects, it requires the objects to be distrusted
+   -&, --mark-distrusted      When retrieving objects, it requires the objects to be distrusted
 (blacklisted)
                                 - prohibits the option 'mark-trusted'
-       --mark-decrypt         Marks the object to be written for decryption
+   -', --mark-decrypt         Marks the object to be written for decryption
                                 - disabled as '--no-mark-decrypt'
-       --mark-sign            Marks the object to be written for signature generation
+   -(, --mark-sign            Marks the object to be written for signature generation
                                 - disabled as '--no-mark-sign'
-       --mark-ca              Marks the object to be written as a CA
+   -), --mark-ca              Marks the object to be written as a CA
                                 - disabled as '--no-mark-ca'
-       --mark-private         Marks the object to be written as private
+   -*, --mark-private         Marks the object to be written as private
                                 - disabled as '--no-mark-private'
-       --ca                   an alias for the 'mark-ca' option
-       --private              an alias for the 'mark-private' option
-       --secret-key=str       Provide a hex encoded secret key
-       --load-privkey=file    Private key file to use
+   -+, --ca                   an alias for the 'mark-ca' option
+   -,, --private              an alias for the 'mark-private' option
+   --, --secret-key=str       Provide a hex encoded secret key
+   -., --load-privkey=file    Private key file to use
                                 - file must pre-exist
-       --load-pubkey=file     Public key file to use
+   -/, --load-pubkey=file     Public key file to use
                                 - file must pre-exist
-       --load-certificate=file Certificate file to use
+   -0, --load-certificate=file Certificate file to use
                                 - file must pre-exist
 
 Other options:
@@ -145,26 +143,28 @@ Other options:
    -d, --debug=num            Enable debugging
                                 - it must be in the range:
                                   0 to 9999
-       --outfile=str          Output file
-       --login                Force (user) login to token
+   -1, --outfile=str          Output file
+   -2, --login                Force (user) login to token
                                 - disabled as '--no-login'
-       --so-login             Force security officer login to token
+   -3, --so-login             Force security officer login to token
                                 - disabled as '--no-so-login'
-       --admin-login          an alias for the 'so-login' option
-       --test-sign            Tests the signature operation of the provided object
-       --generate-random=num  Generate random data
+   -4, --admin-login          an alias for the 'so-login' option
+   -5, --test-sign            Tests the signature operation of the provided object
+   -6, --sign-params=str      Sign with a specific signature algorithm
+   -7, --hash=str             Hash algorithm to use for signing
+   -8, --generate-random=num  Generate random data
    -8, --pkcs8                Use PKCS #8 format for private keys
-       --inder                Use DER/RAW format for input
+   -9, --inder                Use DER/RAW format for input
                                 - disabled as '--no-inder'
-       --inraw                an alias for the 'inder' option
-       --outder               Use DER format for output certificates, private keys, and DH parameters
+   -:, --inraw                an alias for the 'inder' option
+   -;, --outder               Use DER format for output certificates, private keys, and DH parameters
                                 - disabled as '--no-outder'
-       --outraw               an alias for the 'outder' option
-       --provider=file        Specify the PKCS #11 provider library
-       --detailed-url         Print detailed URLs
+   -<, --outraw               an alias for the 'outder' option
+   -=, --provider=file        Specify the PKCS #11 provider library
+   -?, --detailed-url         Print detailed URLs
                                 - disabled as '--no-detailed-url'
-       --only-urls            Print a compact listing using only the URLs
-       --batch                Disable all interaction with the tool
+   -@@, --only-urls            Print a compact listing using only the URLs
+   -A, --batch                Disable all interaction with the tool
 
 Version, usage and configuration options:
 
@@ -199,6 +199,12 @@ Tokens.
 
 This is the ``list the urls available tokens'' option.
 This is a more compact version of --list-tokens.
+@subsubheading initialize-so-pin option.
+@anchor{p11tool initialize-so-pin}
+
+This is the ``initializes/resets a pkcs #11 token security officer pin.'' option.
+This initializes the security officer's PIN. When used non-interactively use the GNUTLS_NEW_SO_PIN
+environment variables to initialize SO's PIN.
 @subsubheading set-pin option.
 @anchor{p11tool set-pin}
 
@@ -214,6 +220,25 @@ Alternatively the GNUTLS_SO_PIN environment variable may be used.
 @anchor{p11tool object-list-related-options}
 @subheading object-list-related-options options
 Object listing.
+@subsubheading list-all option.
+@anchor{p11tool list-all}
+
+This is the ``list all available objects in a token'' option.
+All objects available in the token will be listed. That includes
+objects which are potentially unaccessible using this tool.
+@subsubheading list-all-certs option.
+@anchor{p11tool list-all-certs}
+
+This is the ``list all available certificates in a token'' option.
+That option will also provide more information on the
+certificates, for example, expand the attached extensions in a trust
+token (like p11-kit-trust).
+@subsubheading list-certs option.
+@anchor{p11tool list-certs}
+
+This is the ``list all certificates that have an associated private key'' option.
+That option will only display certificates which have a private
+key associated with them (share the same ID).
 @subsubheading list-all-privkeys option.
 @anchor{p11tool list-all-privkeys}
 
@@ -290,24 +315,37 @@ This is an alias for the @code{mark-distrusted} option,
 @anchor{p11tool keygen-related-options}
 @subheading keygen-related-options options
 Key generation.
+@subsubheading generate-privkey option.
+@anchor{p11tool generate-privkey}
+
+This is the ``generate private-public key pair of given type'' option.
+This option takes a string argument.
+Generates a private-public key pair in the specified token.
+Acceptable types are RSA, ECDSA, Ed25519, and DSA. Should be combined with --sec-param or --bits.
 @subsubheading generate-rsa option.
 @anchor{p11tool generate-rsa}
 
 This is the ``generate an rsa private-public key pair'' option.
 Generates an RSA private-public key pair on the specified token.
 Should be combined with --sec-param or --bits.
+
+@strong{NOTE}@strong{: THIS OPTION IS DEPRECATED}
 @subsubheading generate-dsa option.
 @anchor{p11tool generate-dsa}
 
 This is the ``generate a dsa private-public key pair'' option.
 Generates a DSA private-public key pair on the specified token.
 Should be combined with --sec-param or --bits.
+
+@strong{NOTE}@strong{: THIS OPTION IS DEPRECATED}
 @subsubheading generate-ecc option.
 @anchor{p11tool generate-ecc}
 
 This is the ``generate an ecdsa private-public key pair'' option.
 Generates an ECDSA private-public key pair on the specified token.
 Should be combined with --curve, --sec-param or --bits.
+
+@strong{NOTE}@strong{: THIS OPTION IS DEPRECATED}
 @subsubheading bits option.
 @anchor{p11tool bits}
 
@@ -523,6 +561,20 @@ This is the ``tests the signature operation of the provided object'' option.
 It can be used to test the correct operation of the signature operation.
 If both a private and a public key are available this operation will sign and verify
 the signed data.
+@subsubheading sign-params option.
+@anchor{p11tool sign-params}
+
+This is the ``sign with a specific signature algorithm'' option.
+This option takes a string argument.
+This option can be combined with --test-sign, to sign with
+a specific signature algorithm variant. The only option supported is 'RSA-PSS', and should be
+specified in order to use RSA-PSS signature on RSA keys.
+@subsubheading hash option.
+@anchor{p11tool hash}
+
+This is the ``hash algorithm to use for signing'' option.
+This option takes a string argument.
+This option can be combined with test-sign. Available hash functions are SHA1, RMD160, SHA256, SHA384, SHA512, SHA3-224, SHA3-256, SHA3-384, SHA3-512.
 @subsubheading generate-random option.
 @anchor{p11tool generate-random}
 
@@ -573,6 +625,15 @@ This is an alias for the @code{outder} option,
 This is the ``specify the pkcs #11 provider library'' option.
 This option takes a file argument.
 This will override the default options in /etc/gnutls/pkcs11.conf
+@subsubheading provider-opts option.
+@anchor{p11tool provider-opts}
+
+This is the ``specify parameters for the pkcs #11 provider library'' option.
+This option takes a string argument.
+This is a PKCS#11 internal option used by few modules.
+    Mainly for testing PKCS#11 modules.
+
+@strong{NOTE}@strong{: THIS OPTION IS DEPRECATED}
 @subsubheading batch option.
 @anchor{p11tool batch}
 
@@ -615,7 +676,7 @@ and its corresponding private key.
 
 To generate an RSA private key inside the token use:
 @example
-$ p11tool --login --generate-rsa --bits 1024 --label "MyNewKey" \
+$ p11tool --login --generate-privkey rsa --bits 1024 --label "MyNewKey" \
           --outfile MyNewKey.pub "pkcs11:TOKEN-URL"
 @end example
 The bits parameter in the above example is explicitly set because some

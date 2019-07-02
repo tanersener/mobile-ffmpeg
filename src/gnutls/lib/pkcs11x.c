@@ -16,7 +16,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  */
 
 #include "gnutls_int.h"
@@ -277,7 +277,7 @@ gnutls_pkcs11_obj_get_exts(gnutls_pkcs11_obj_t obj,
 		spki.data = obj->raw.data;
 		spki.size = obj->raw.size;
 	} else {
-		ret = x509_raw_crt_to_raw_pubkey(&obj->raw, &spki);
+		ret = _gnutls_x509_raw_crt_to_raw_pubkey(&obj->raw, &spki);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 		deinit_spki = 1;

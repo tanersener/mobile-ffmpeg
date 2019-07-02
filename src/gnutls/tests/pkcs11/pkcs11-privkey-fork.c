@@ -123,7 +123,6 @@ void doit(void)
 	}
 
 	gnutls_free(sig.data);
-	sig.data = NULL;
 
 	pid = fork();
 	if (pid != 0) {

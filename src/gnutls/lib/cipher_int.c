@@ -17,7 +17,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -55,16 +55,15 @@ int _gnutls_cipher_exists(gnutls_cipher_algorithm_t cipher)
 	const gnutls_crypto_cipher_st *cc;
 	int ret;
 
+	if (is_cipher_algo_forbidden(cipher))
+		return 0;
+
 	/* All the other ciphers are disabled on the back-end library.
 	 * The NULL needs to be detected here as it is not a cipher
 	 * that is provided by the back-end.
 	 */
-	if (cipher == GNUTLS_CIPHER_NULL) {
-		if (_gnutls_fips_mode_enabled() == 0)
-			return 1;
-		else
-			return 0;
-	}
+	if (cipher == GNUTLS_CIPHER_NULL)
+		return 1;
 
 	cc = _gnutls_get_crypto_cipher(cipher);
 	if (cc != NULL)
@@ -102,6 +101,7 @@ _gnutls_cipher_init(cipher_hd_st *handle, const cipher_entry_st *e,
 		handle->auth = cc->auth;
 		handle->tag = cc->tag;
 		handle->setiv = cc->setiv;
+		handle->getiv = cc->getiv;
 
 		/* if cc->init() returns GNUTLS_E_NEED_FALLBACK we
 		 * use the default ciphers */
@@ -127,6 +127,7 @@ _gnutls_cipher_init(cipher_hd_st *handle, const cipher_entry_st *e,
 	handle->auth = _gnutls_cipher_ops.auth;
 	handle->tag = _gnutls_cipher_ops.tag;
 	handle->setiv = _gnutls_cipher_ops.setiv;
+	handle->getiv = _gnutls_cipher_ops.getiv;
 
 	/* otherwise use generic cipher interface
 	 */
@@ -277,6 +278,8 @@ int _gnutls_auth_cipher_encrypt2_tag(auth_cipher_hd_st * handle,
 	    _gnutls_cipher_get_block_size(handle->cipher.e);
 	unsigned l;
 
+	assert(ciphertext != NULL);
+
 	if (handle->is_mac) { /* cipher + mac */
 		if (handle->non_null == 0) { /* NULL cipher + MAC */
 			MAC(handle, text, textlen);
@@ -305,6 +308,7 @@ int _gnutls_auth_cipher_encrypt2_tag(auth_cipher_hd_st * handle,
 			    ciphertextlen)
 				return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
+			assert(blocksize != 0);
 			l = (textlen / blocksize) * blocksize;
 			if (l > 0) {
 				ret =

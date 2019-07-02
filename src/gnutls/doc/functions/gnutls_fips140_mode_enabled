@@ -4,7 +4,13 @@
 
 @deftypefun {unsigned} {gnutls_fips140_mode_enabled} ( @var{void})
 
-Checks whether this library is in FIPS140 mode.
+Checks whether this library is in FIPS140 mode. The returned
+value corresponds to the library mode as set with
+@code{gnutls_fips140_set_mode()} .
+
+If @code{gnutls_fips140_set_mode()}  was called with @code{GNUTLS_FIPS140_SET_MODE_THREAD} 
+then this function will return the current thread's FIPS140 mode, otherwise
+the global value is returned.
 
 @strong{Returns:} return non-zero if true or zero if false.
 

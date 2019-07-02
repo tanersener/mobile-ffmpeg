@@ -1,0 +1,31 @@
+
+
+
+
+@deftypefun {gnutls_certificate_type_t} {gnutls_certificate_type_get2} (gnutls_session_t @var{session}, gnutls_ctype_target_t @var{target})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{target}: is a @code{gnutls_ctype_target_t}  type.
+
+This function returns the type of the certificate that a side
+is negotiated to use.  The certificate type is by default X.509,
+unless an alternative certificate type is enabled by @code{gnutls_init()}  and
+negotiated during the session.
+
+The  @code{target} parameter specifies whether to request the negotiated
+certificate type for the client (@code{GNUTLS_CTYPE_CLIENT} ),
+or for the server (@code{GNUTLS_CTYPE_SERVER} ). Additionally, in P2P mode
+connection set up where you don't know in advance who will be client
+and who will be server you can use the flag (@code{GNUTLS_CTYPE_OURS} ) and
+(@code{GNUTLS_CTYPE_PEERS} ) to retrieve the corresponding certificate types.
+
+Resumed sessions will return the certificate type that was negotiated
+and used in the original session. That is, this function can be used
+to reliably determine the type of the certificate returned by
+@code{gnutls_certificate_get_peers()} .
+
+@strong{Returns:} the currently used @code{gnutls_certificate_type_t}  certificate
+type for the client or the server.
+
+@strong{Since:} 3.6.4
+@end deftypefun

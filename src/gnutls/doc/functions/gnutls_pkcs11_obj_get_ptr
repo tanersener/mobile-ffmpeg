@@ -1,0 +1,25 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs11_obj_get_ptr} (gnutls_pkcs11_obj_t @var{obj}, void ** @var{ptr}, void ** @var{session}, void ** @var{ohandle}, unsigned long * @var{slot_id}, unsigned int @var{flags})
+@var{obj}: should contain a @code{gnutls_pkcs11_obj_t}  type
+
+@var{ptr}: will contain the CK_FUNCTION_LIST_PTR pointer (may be @code{NULL} )
+
+@var{session}: will contain the CK_SESSION_HANDLE of the object
+
+@var{ohandle}: will contain the CK_OBJECT_HANDLE of the object
+
+@var{slot_id}: the identifier of the slot (may be @code{NULL} )
+
+@var{flags}: Or sequence of GNUTLS_PKCS11_OBJ_* flags
+
+Obtains the PKCS@code{11}  session handles of an object.  @code{session} and  @code{ohandle} must be deinitialized by the caller. The returned pointers are
+independent of the  @code{obj} lifetime.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  (0) on success or a negative error code
+on error.
+
+@strong{Since:} 3.6.3
+@end deftypefun

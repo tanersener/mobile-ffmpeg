@@ -16,20 +16,19 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
-#ifndef GNUTLS_DH_H
-#define GNUTLS_DH_H
+#ifndef GNUTLS_LIB_DH_H
+#define GNUTLS_LIB_DH_H
 
 const bigint_t *_gnutls_dh_params_to_mpi(gnutls_dh_params_t);
 
-gnutls_dh_params_t
-_gnutls_get_dh_params(gnutls_dh_params_t dh_params,
-		      gnutls_params_function * func,
-		      gnutls_session_t session);
+int
+_gnutls_figure_dh_params(gnutls_session_t session, gnutls_dh_params_t dh_params,
+		      gnutls_params_function * func, gnutls_sec_param_t sec_param);
 
 int _gnutls_set_cred_dh_params(gnutls_dh_params_t *cparams, gnutls_sec_param_t sec_param);
 
-#endif
+#endif /* GNUTLS_LIB_DH_H */

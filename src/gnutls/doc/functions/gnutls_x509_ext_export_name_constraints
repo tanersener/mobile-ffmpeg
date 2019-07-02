@@ -9,7 +9,7 @@
 
 This function will convert the provided name constraints type to a
 DER-encoded PKIX NameConstraints (2.5.29.30) extension. The output data in 
- @code{ext} will be allocated usin @code{gnutls_malloc()} .
+ @code{ext} will be allocated using @code{gnutls_malloc()} .
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a negative error value.
 

@@ -88,8 +88,8 @@ void doit(void)
 		exit(1);
 	}
 
-	test_cli_serv_expect(serv_cred, cli_cred, "NORMAL", "NORMAL:-SIGN-ALL", NULL, GNUTLS_E_AGAIN, GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM);
-	test_cli_serv_expect(serv_cred, cli_cred, "NORMAL", "NORMAL:-SIGN-ECDSA-SHA224:-SIGN-ECDSA-SHA1:-SIGN-ECDSA-SHA256:-SIGN-ECDSA-SHA384:-SIGN-ECDSA-SHA512", NULL, GNUTLS_E_UNKNOWN_PK_ALGORITHM, GNUTLS_E_AGAIN);
+	test_cli_serv_expect(serv_cred, cli_cred, "NORMAL", "NORMAL:-VERS-TLS1.1:+VERS-TLS1.2:-SIGN-ALL", NULL, 0, 0);
+	test_cli_serv_expect(serv_cred, cli_cred, "NORMAL", "NORMAL:-SIGN-ECDSA-SHA224:-SIGN-ECDSA-SHA1:-SIGN-ECDSA-SHA256:-SIGN-ECDSA-SHA384:-SIGN-ECDSA-SHA512:-SIGN-ECDSA-SECP256R1-SHA256:-SIGN-ECDSA-SECP384R1-SHA384:-SIGN-ECDSA-SECP521R1-SHA512", NULL, GNUTLS_E_NO_CIPHER_SUITES, GNUTLS_E_AGAIN);
 
 	gnutls_certificate_free_credentials(serv_cred);
 	gnutls_certificate_free_credentials(cli_cred);

@@ -19,7 +19,7 @@
  * The psktool program is copyrighted and licensed
  * under the following terms:
  *
- *  Copyright (C) 2000-2018 Free Software Foundation, and others, all rights reserved.
+ *  Copyright (C) 2000-2019 Free Software Foundation, and others, all rights reserved.
  *  This is free software. It is licensed for use, modification and
  *  redistribution under the terms of the GNU General Public License,
  *  version 3 or later <http://gnu.org/licenses/gpl.html>
@@ -69,17 +69,18 @@ typedef enum {
     INDEX_OPT_DEBUG       =  0,
     INDEX_OPT_KEYSIZE     =  1,
     INDEX_OPT_USERNAME    =  2,
-    INDEX_OPT_PASSWD      =  3,
-    INDEX_OPT_VERSION     =  4,
-    INDEX_OPT_HELP        =  5,
-    INDEX_OPT_MORE_HELP   =  6
+    INDEX_OPT_PSKFILE     =  3,
+    INDEX_OPT_PASSWD      =  4,
+    INDEX_OPT_VERSION     =  5,
+    INDEX_OPT_HELP        =  6,
+    INDEX_OPT_MORE_HELP   =  7
 } teOptIndex;
 /** count of all options for psktool */
-#define OPTION_CT    7
+#define OPTION_CT    8
 /** psktool version */
-#define PSKTOOL_VERSION       "3.5.19"
+#define PSKTOOL_VERSION       "3.6.8"
 /** Full psktool version text */
-#define PSKTOOL_FULL_VERSION  "psktool 3.5.19"
+#define PSKTOOL_FULL_VERSION  "psktool 3.6.8"
 
 /**
  *  Interface defines for all options.  Replace "n" with the UPPER_CASED
@@ -137,7 +138,8 @@ typedef enum {
 
 #define OPT_VALUE_KEYSIZE        (DESC(KEYSIZE).optArg.argInt)
 #define VALUE_OPT_USERNAME       'u'
-#define VALUE_OPT_PASSWD         'p'
+#define VALUE_OPT_PSKFILE        'p'
+#define VALUE_OPT_PASSWD         0x1001
 /** option flag (value) for help-value option */
 #define VALUE_OPT_HELP          'h'
 /** option flag (value) for more-help-value option */

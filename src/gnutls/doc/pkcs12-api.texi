@@ -449,7 +449,7 @@ certs (may be @code{NULL} ).
 
 This function parses a PKCS12 structure in  @code{pkcs12} and extracts the
 private key, the corresponding certificate chain, any additional
-certificates and a CRL.
+certificates and a CRL. The structures in  @code{key} ,  @code{chain}  @code{crl} , and  @code{extra_certs} must not be initialized.
 
 The  @code{extra_certs} and  @code{extra_certs_len} parameters are optional
 and both may be set to @code{NULL} . If either is non-@code{NULL} , then both must

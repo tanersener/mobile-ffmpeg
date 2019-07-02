@@ -38,11 +38,11 @@ export CXXFLAGS="${COMMON_CXXFLAGS}"
 export LDFLAGS="${COMMON_LDFLAGS} -L${BASEDIR}/prebuilt/android-$(get_target_build)/libiconv/lib"
 
 export NETTLE_CFLAGS="-I${BASEDIR}/prebuilt/android-$(get_target_build)/nettle/include"
-export NETTLE_LIBS="-L${BASEDIR}/prebuilt/android-$(get_target_build)/nettle/lib"
+export NETTLE_LIBS="-L${BASEDIR}/prebuilt/android-$(get_target_build)/nettle/lib -lnettle -L${BASEDIR}/prebuilt/android-$(get_target_build)/gmp/lib -lgmp"
 export HOGWEED_CFLAGS="-I${BASEDIR}/prebuilt/android-$(get_target_build)/nettle/include"
-export HOGWEED_LIBS="-L${BASEDIR}/prebuilt/android-$(get_target_build)/nettle/lib"
+export HOGWEED_LIBS="-L${BASEDIR}/prebuilt/android-$(get_target_build)/nettle/lib -lhogweed -L${BASEDIR}/prebuilt/android-$(get_target_build)/gmp/lib -lgmp"
 export GMP_CFLAGS="-I${BASEDIR}/prebuilt/android-$(get_target_build)/gmp/include"
-export GMP_LIBS="-L${BASEDIR}/prebuilt/android-$(get_target_build)/gmp/lib"
+export GMP_LIBS="-L${BASEDIR}/prebuilt/android-$(get_target_build)/gmp/lib -lgmp"
 
 cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
@@ -78,6 +78,6 @@ fi
 make -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_gnutls_package_config "3.5.19"
+create_gnutls_package_config "3.6.8"
 
 make install || exit 1

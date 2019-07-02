@@ -1,0 +1,16 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_get_spki} (gnutls_x509_crt_t @var{cert}, gnutls_x509_spki_t @var{spki}, unsigned int @var{flags})
+@var{cert}: a certificate of type @code{gnutls_x509_crt_t} 
+
+@var{spki}: a SubjectPublicKeyInfo structure of type @code{gnutls_x509_spki_t} 
+
+@var{flags}: must be zero
+
+This function will return the public key information of an X.509
+certificate. The provided  @code{spki} must be initialized.
+
+@strong{Since:} 3.6.0
+@end deftypefun

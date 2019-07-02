@@ -6,4 +6,6 @@
 Specifies the seed to be used in key generation.
 @item GNUTLS_@-KEYGEN_@-DIGEST
 The size field specifies the hash algorithm to be used in key generation.
+@item GNUTLS_@-KEYGEN_@-SPKI
+data points to a @code{gnutls_x509_spki_t}  structure; it is not used after the key generation call.
 @end table

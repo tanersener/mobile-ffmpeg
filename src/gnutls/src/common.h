@@ -15,16 +15,17 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef INCLUDE_COMMON_H
-# define INCLUDE_COMMON_H
+#ifndef GNUTLS_SRC_COMMON_H
+#define GNUTLS_SRC_COMMON_H
 
 #define SERVER "127.0.0.1"
 
 #include <config.h>
 #include <gnutls/gnutls.h>
+#include <gnutls/pkcs11.h>
 #include <certtool-common.h>
 #include <c-ctype.h>
 #include <string.h>
@@ -40,6 +41,7 @@
 #include <io.h>
 #include <winbase.h>
 #include <sys/select.h>
+#include "socket.h"
 #undef OCSP_RESPONSE
 #endif
 
@@ -59,7 +61,10 @@ extern const char str_unknown[];
 #define P_WAIT_FOR_CERT (1<<1)
 int print_info(gnutls_session_t state, int verbose, int flags);
 void print_cert_info(gnutls_session_t, int flag, int print_cert);
-void print_cert_info_compact(gnutls_session_t session);
+void print_key_material(gnutls_session_t, const char *label, size_t size);
+
+int log_msg(FILE *file, const char *message, ...) __attribute__((format(printf, 2, 3)));
+void log_set(FILE *file);
 
 void print_cert_info2(gnutls_session_t, int flag, FILE *fp, int print_cert);
 
@@ -69,7 +74,11 @@ int cert_verify(gnutls_session_t session, const char *hostname, const char *purp
 const char *raw_to_string(const unsigned char *raw, size_t raw_size);
 const char *raw_to_hex(const unsigned char *raw, size_t raw_size);
 const char *raw_to_base64(const unsigned char *raw, size_t raw_size);
-int check_command(gnutls_session_t session, const char *str);
+int check_command(gnutls_session_t session, const char *str, unsigned no_cli_cert);
+
+#define MAX_PIN_LEN GNUTLS_PKCS11_MAX_PIN_LEN
+void getenv_copy(char *str, size_t max_str_size, const char *envvar);
+void getpass_copy(char *pass, size_t max_pass_size, const char *prompt);
 
 int
 pin_callback(void *user, int attempt, const char *token_url,
@@ -96,17 +105,14 @@ static int system_recv_timeout(gnutls_transport_ptr_t ptr, unsigned int ms)
 {
 	fd_set rfds;
 	struct timeval tv;
-	int ret, fd = (long)ptr;
+	socket_st *hd = ptr;
+	int fd = hd->fd;
 
 	FD_ZERO(&rfds);
 	FD_SET(fd, &rfds);
 
-	tv.tv_sec = 0;
-	tv.tv_usec = ms * 1000;
-	while (tv.tv_usec >= 1000000) {
-		tv.tv_usec -= 1000000;
-		tv.tv_sec++;
-	}
+	tv.tv_sec = ms / 1000;
+	tv.tv_usec = (ms % 1000) * 1000;
 
 	return select(fd + 1, &rfds, NULL, NULL, &tv);
 }
@@ -114,13 +120,17 @@ static int system_recv_timeout(gnutls_transport_ptr_t ptr, unsigned int ms)
 static ssize_t
 system_write(gnutls_transport_ptr ptr, const void *data, size_t data_size)
 {
-	return send((long)ptr, data, data_size, 0);
+	socket_st *hd = ptr;
+
+	return send(hd->fd, data, data_size, 0);
 }
 
 static ssize_t
 system_read(gnutls_transport_ptr_t ptr, void *data, size_t data_size)
 {
-	return recv((long)ptr, data, data_size, 0);
+	socket_st *hd = ptr;
+
+	return recv(hd->fd, data, data_size, 0);
 }
 
 static
@@ -134,4 +144,7 @@ void set_read_funcs(gnutls_session_t session)
 # define set_read_funcs(x)
 #endif
 
-#endif
+#define SIMPLE_CTIME_BUF_SIZE 64
+char *simple_ctime(const time_t *t, char buf[SIMPLE_CTIME_BUF_SIZE]);
+
+#endif /* GNUTLS_SRC_COMMON_H */

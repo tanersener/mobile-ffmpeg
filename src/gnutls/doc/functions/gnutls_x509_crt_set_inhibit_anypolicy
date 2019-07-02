@@ -1,0 +1,14 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_set_inhibit_anypolicy} (gnutls_x509_crt_t @var{crt}, unsigned int @var{skipcerts})
+@var{crt}: a certificate of type @code{gnutls_x509_crt_t} 
+
+@var{skipcerts}: number of certificates after which anypolicy is no longer acceptable.
+
+This function will set the Inhibit anyPolicy certificate extension.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

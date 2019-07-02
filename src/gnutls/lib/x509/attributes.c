@@ -18,7 +18,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -110,7 +110,7 @@ _x509_parse_attribute(ASN1_TYPE asn1_struct,
 			goto cleanup;
 		}
 
-		/* Move to the attibute type and values
+		/* Move to the attribute type and values
 		 */
 		/* Read the OID
 		 */

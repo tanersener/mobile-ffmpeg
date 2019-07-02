@@ -1,0 +1,16 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crq_get_spki} (gnutls_x509_crq_t @var{crq}, gnutls_x509_spki_t @var{spki}, unsigned int @var{flags})
+@var{crq}: should contain a @code{gnutls_x509_crq_t}  type
+
+@var{spki}: a SubjectPublicKeyInfo structure of type @code{gnutls_x509_spki_t} 
+
+@var{flags}: must be zero
+
+This function will return the public key information of a PKCS@code{10} 
+certificate request. The provided  @code{spki} must be initialized.
+
+@strong{Returns:} Zero on success, or a negative error code on error.
+@end deftypefun

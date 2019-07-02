@@ -1,6 +1,7 @@
 #!/bin/sh
 
-# Copyright (C) 2014 Nikos Mavrogiannopoulos
+# Copyright (C) 2014-2018 Nikos Mavrogiannopoulos
+# Copyright (C) 2018 Red Hat, Inc.
 #
 # This file is part of GnuTLS.
 #
@@ -14,15 +15,21 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
-# along with GnuTLS; if not, write to the Free Software Foundation,
-# Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+# You should have received a copy of the GNU Lesser General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>
 
 #set -e
 
 srcdir="${srcdir:-.}"
 CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
 DIFF="${DIFF:-diff -b -B}"
+TMPFILE1=certtool-file1.$$.tmp
+TMPFILE2=certtool-file2.$$.tmp
+PASS="1234"
+
+if test -n "$DISABLE_BASH_TESTS"; then
+	exit 77
+fi
 
 if ! test -x "${CERTTOOL}"; then
 	exit 77
@@ -30,6 +37,33 @@ fi
 
 if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
+fi
+
+SETSID=$(which setsid)
+if test -n "${SETSID}";then
+	${VALGRIND} "${CERTTOOL}" --generate-privkey --rsa --outfile ${TMPFILE1} --pkcs8 --password ${PASS}
+	if test $? != 0;then
+		echo "private key generation failed"
+		exit 1
+	fi
+
+	#check whether password is being honoured
+	#some CI runners need GNUTLS_PIN (GNUTLS_PIN=${PASS})
+	${SETSID} "${CERTTOOL}" --generate-self-signed --load-privkey ${TMPFILE1} --template ${srcdir}/templates/template-test.tmpl --ask-pass >${TMPFILE2} 2>&1 <<EOF
+$PASS
+EOF
+	if test $? != 0;then
+		cat ${TMPFILE2}
+		echo "cert generation failed"
+		exit 1
+	fi
+
+	grep "Enter password" ${TMPFILE2} >/dev/null 2>&1
+	if test $? != 0;then
+		cat ${TMPFILE2}
+		echo "No password was asked"
+		exit 1
+	fi
 fi
 
 #check whether "funny" spaces can be interpreted
@@ -65,6 +99,14 @@ if test "${id}" != "118e72e3655150c895ecbd19b3634179fb4a87c7a25abefcb11f5d66661d
 	exit 1
 fi
 
+id=`"${CERTTOOL}" --pubkey-info <"${srcdir}/data/funny-spacing.pem"|"${CERTTOOL}" --key-id --hash sha512| tr -d '\r'`
+rc=$?
+
+if test "${id}" != "5e81ba533b1e7b88b3b0834a392c1cd63f8ccbe45f39edf4cb4b6a3e7700b333cfa386c54b1c5704a2b82a20dc417b347bb8f961c339134a91158a134ca6c478"; then
+	echo "Key-ID4 doesn't match the expected: ${id}"
+	exit 1
+fi
+
 #fingerprint
 id=`${VALGRIND} "${CERTTOOL}" --fingerprint --infile "${srcdir}/data/funny-spacing.pem"| tr -d '\r'`
 rc=$?
@@ -90,6 +132,22 @@ if test "${id}" != "c4880390506a849cd2d8289fb8aea8c189e635aff1054faba58658a0f107
 	exit 1
 fi
 
+# Test whether certtool --outder doesn't output the informational text data
+
+${VALGRIND} "${CERTTOOL}" -i --infile "${srcdir}/data/funny-spacing.pem" --outder --outfile ${TMPFILE1}
+if test $? != 0;then
+	echo "cert output to DER failed"
+	exit 1
+fi
+
+grep 'Version:' ${TMPFILE1}
+if test $? = 0;then
+	echo "found text info in DER certificate"
+	exit 1
+fi
+
+rm -f ${TMPFILE1} ${TMPFILE2}
+
 export TZ="UTC"
 
 . ${srcdir}/../scripts/common.sh
@@ -104,6 +162,5 @@ if test "${rc}" != "0"; then
 	echo "There was an issue verifying the chain"
 	exit 1
 fi
-
 
 exit 0

@@ -16,7 +16,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -87,17 +87,20 @@ gen_srp_cert_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
 	int apr_cert_list_length;
 	gnutls_sign_algorithm_t sign_algo;
 	const version_entry_st *ver = get_version(session);
+	unsigned init_pos;
 
 	if (unlikely(ver == NULL))
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+	init_pos = data->length;
 
 	ret = _gnutls_gen_srp_server_kx(session, data);
 
 	if (ret < 0)
 		return ret;
 
-	ddata.data = data->data;
-	ddata.size = data->length;
+	ddata.data = &data->data[init_pos];
+	ddata.size = data->length-init_pos;
 
 	cred = (gnutls_certificate_credentials_t)
 	    _gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE);
@@ -139,8 +142,8 @@ gen_srp_cert_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
 			goto cleanup;
 		}
 
-		p[0] = aid->hash_algorithm;
-		p[1] = aid->sign_algorithm;
+		p[0] = aid->id[0];
+		p[1] = aid->id[1];
 
 		ret = _gnutls_buffer_append_data(data, p, 2);
 		if (ret < 0) {
@@ -158,7 +161,7 @@ gen_srp_cert_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
 		goto cleanup;
 	}
 
-	ret = data->length;
+	ret = data->length - init_pos;
 
       cleanup:
 	_gnutls_free_datum(&signature);
@@ -177,6 +180,8 @@ proc_srp_cert_server_kx(gnutls_session_t session, uint8_t * data,
 	gnutls_pcert_st peer_cert;
 	uint8_t *p;
 	gnutls_sign_algorithm_t sign_algo = GNUTLS_SIGN_UNKNOWN;
+	gnutls_certificate_credentials_t cred;
+	unsigned vflags;
 	const version_entry_st *ver = get_version(session);
 
 	if (unlikely(ver == NULL))
@@ -187,6 +192,15 @@ proc_srp_cert_server_kx(gnutls_session_t session, uint8_t * data,
 		return ret;
 
 	data_size = _data_size - ret;
+
+	cred = (gnutls_certificate_credentials_t)
+	    _gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE);
+	if (cred == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
+	}
+
+	vflags = cred->verify_flags | session->internals.additional_verify_flags;
 
 	info = _gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
 	if (info == NULL || info->ncerts == 0) {
@@ -202,17 +216,17 @@ proc_srp_cert_server_kx(gnutls_session_t session, uint8_t * data,
 
 	p = &data[vparams.size];
 	if (_gnutls_version_has_selectable_sighash(ver)) {
-		sign_algorithm_st aid;
+		uint8_t id[2];
 
 		DECR_LEN(data_size, 1);
-		aid.hash_algorithm = *p++;
+		id[0] = *p++;
 		DECR_LEN(data_size, 1);
-		aid.sign_algorithm = *p++;
-		sign_algo = _gnutls_tls_aid_to_sign(&aid);
+		id[1] = *p++;
+
+		sign_algo = _gnutls_tls_aid_to_sign(id[0], id[1], ver);
 		if (sign_algo == GNUTLS_SIGN_UNKNOWN) {
 			_gnutls_debug_log("unknown signature %d.%d\n",
-					  aid.sign_algorithm,
-					  aid.hash_algorithm);
+					  (int)id[0], (int)id[1]);
 			gnutls_assert();
 			return GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM;
 		}
@@ -227,8 +241,7 @@ proc_srp_cert_server_kx(gnutls_session_t session, uint8_t * data,
 
 	ret =
 	    _gnutls_get_auth_info_pcert(&peer_cert,
-					session->security_parameters.
-					cert_type, info);
+					session->security_parameters.server_ctype, info);
 
 	if (ret < 0) {
 		gnutls_assert();
@@ -236,7 +249,7 @@ proc_srp_cert_server_kx(gnutls_session_t session, uint8_t * data,
 	}
 
 	ret =
-	    _gnutls_handshake_verify_data(session, &peer_cert, &vparams,
+	    _gnutls_handshake_verify_data(session, vflags, &peer_cert, &vparams,
 					  &signature, sign_algo);
 
 	gnutls_pcert_deinit(&peer_cert);

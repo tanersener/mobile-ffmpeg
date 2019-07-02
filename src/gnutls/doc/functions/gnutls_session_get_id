@@ -9,14 +9,23 @@
 
 @var{session_id_size}: initially should contain the maximum  @code{session_id} size and will be updated.
 
-Returns the current session ID. This can be used if you want to
-check if the next session you tried to resume was actually
-resumed.  That is because resumed sessions share the same session ID
-with the original session.
+Returns the TLS session identifier. The session ID is selected by the
+server, and in older versions of TLS was a unique identifier shared
+between client and server which was persistent across resumption.
+In the latest version of TLS (1.3) or TLS with session tickets, the
+notion of session identifiers is undefined and cannot be relied for uniquely
+identifying sessions across client and server.
 
-The session ID is selected by the server, that identify the
-current session.  In all supported TLS protocols, the session id
-is less than @code{GNUTLS_MAX_SESSION_ID_SIZE} .
+In client side this function returns the identifier returned by the
+server, and cannot be assumed to have any relation to session resumption.
+In server side this function is guaranteed to return a persistent
+identifier of the session since GnuTLS 3.6.4, which may not necessarily
+map into the TLS session ID value. Prior to that version the value
+could only be considered a persistent identifier, under TLS1.2 or earlier
+and when no session tickets were in use.
+
+The session identifier value returned is always less than
+@code{GNUTLS_MAX_SESSION_ID_SIZE} .
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise
 an error code is returned.

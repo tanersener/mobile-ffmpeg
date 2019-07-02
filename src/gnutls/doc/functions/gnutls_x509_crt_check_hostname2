@@ -25,6 +25,9 @@ When the flag @code{GNUTLS_VERIFY_DO_NOT_ALLOW_WILDCARDS}  is specified no
 wildcards are considered. Otherwise they are only considered if the
 domain name consists of three components or more, and the wildcard
 starts at the leftmost position.
+When the flag @code{GNUTLS_VERIFY_DO_NOT_ALLOW_IP_MATCHES}  is specified,
+the input will be treated as a DNS name, and matching of textual IP addresses
+against the IPAddress part of the alternative name will not be allowed.
 
 The function @code{gnutls_x509_crt_check_ip()}  is available for matching
 IP addresses.

@@ -1,0 +1,14 @@
+
+
+
+
+@deftypefun {const char *} {gnutls_group_get_name} (gnutls_group_t @var{group})
+@var{group}: is an element from @code{gnutls_group_t} 
+
+Convert a @code{gnutls_group_t}  value to a string.
+
+@strong{Returns:} a string that contains the name of the specified
+group or @code{NULL} .
+
+@strong{Since:} 3.6.0
+@end deftypefun

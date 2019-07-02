@@ -1,3 +1,6 @@
+#ifndef GNUTLS_LIB_ACCELERATED_X86_AES_GCM_AEAD_H
+# define GNUTLS_LIB_ACCELERATED_X86_AES_GCM_AEAD_H
+
 static int
 aes_gcm_aead_encrypt(void *ctx,
 			const void *nonce, size_t nonce_size,
@@ -46,3 +49,4 @@ aes_gcm_aead_decrypt(void *ctx,
 	return 0;
 }
 
+#endif /* GNUTLS_LIB_ACCELERATED_X86_AES_GCM_AEAD_H */

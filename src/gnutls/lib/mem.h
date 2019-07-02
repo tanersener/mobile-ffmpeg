@@ -16,12 +16,12 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
-#ifndef GNUTLS_MEM_H
-#define GNUTLS_MEM_H
+#ifndef GNUTLS_LIB_MEM_H
+#define GNUTLS_LIB_MEM_H
 
 #include <config.h>
 
@@ -54,4 +54,4 @@ int safe_memcmp(const void *s1, const void *s2, size_t n)
 #define zeroize_temp_key zeroize_key
 #define zrelease_temp_mpi_key zrelease_mpi_key
 
-#endif				/* GNUTLS_MEM_H */
+#endif /* GNUTLS_LIB_MEM_H */

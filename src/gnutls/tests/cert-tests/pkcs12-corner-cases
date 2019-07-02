@@ -34,20 +34,35 @@ if test "${GNUTLS_FORCE_FIPS_MODE}" = 1;then
 fi
 
 if ! test -z "${VALGRIND}"; then
-	VALGRIND=$(echo ${VALGRIND}|cut -d ' ' -f 1)
+#	VALGRIND=$(echo ${VALGRIND}|cut -d ' ' -f 1)
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=6"
 fi
 
-DIFF="${DIFF:-diff}"
+. "${srcdir}/../scripts/common.sh"
+
 TMPFILE="pkcs12-corner.$$.tmp"
 
+# Cases from oss-fuzz
+
+cpassword='1234'
+for p12 in "mem-leak.p12";do
+	set -- ${p12}
+	file="$1"
+	${VALGRIND} "${CERTTOOL}" --p12-info --inder --password "${cpassword}" \
+		--infile "${srcdir}/data/${file}" >${TMPFILE} 2>&1
+	rc=$?
+	if test ${rc} != 0 && test ${rc} != 1; then
+		cat ${TMPFILE}
+		echo "PKCS12 FATAL ${file}"
+		exit 1
+	fi
+done
 
 # Check corner cases in PKCS#12 decoding. Typically the structures tested fail
 # in parsing, but we check against crashes, etc. These test cases were taken
 # from Hubert Kario's corpus at: https://github.com/redhat-qe-security/keyfile-corpus
 
 cpassword='Red Hat Enterprise Linux 7.4'
-
 for p12 in "key-corpus-rc2-1.p12" "key-corpus-rc2-2.p12" "key-corpus-rc2-3.p12";do 
 	set -- ${p12}
 	file="$1"
@@ -56,7 +71,27 @@ for p12 in "key-corpus-rc2-1.p12" "key-corpus-rc2-2.p12" "key-corpus-rc2-3.p12";
 	rc=$?
 	if test ${rc} != 0 && test ${rc} != 1; then
 		cat ${TMPFILE}
-		echo "PKCS12 FATAL ${p12}"
+		echo "PKCS12 FATAL ${file}"
+		exit 1
+	fi
+done
+
+for p12 in "key-corpus-rc2-1.p12";do
+	set -- ${p12}
+	file="$1"
+	"${CERTTOOL}" --p12-info --inder --password "${cpassword}" \
+		--infile "${srcdir}/data/${file}" | tr -d '\r' >${TMPFILE} 2>/dev/null
+	rc=$?
+	if test ${rc} != 0 && test ${rc} != 1; then
+		cat ${TMPFILE}
+		echo "Error in output from ${file}"
+		exit 1
+	fi
+
+	check_if_equal ${TMPFILE} "${srcdir}/data/${file}.out"
+	rc=$?
+	if test ${rc} != 0;then
+		echo "Output differs in ${file}.out ${TMPFILE}"
 		exit 1
 	fi
 done

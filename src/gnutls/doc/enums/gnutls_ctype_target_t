@@ -1,0 +1,13 @@
+
+
+@c gnutls_ctype_target_t
+@table @code
+@item GNUTLS_@-CTYPE_@-CLIENT
+for requesting client certificate type values.
+@item GNUTLS_@-CTYPE_@-SERVER
+for requesting server certificate type values.
+@item GNUTLS_@-CTYPE_@-OURS
+for requesting our certificate type values.
+@item GNUTLS_@-CTYPE_@-PEERS
+for requesting the peers' certificate type values.
+@end table

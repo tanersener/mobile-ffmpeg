@@ -16,7 +16,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
 
@@ -108,6 +108,9 @@ cryptodev_cipher_setkey(void *_ctx, const void *key, size_t keysize)
 static int cryptodev_setiv(void *_ctx, const void *iv, size_t iv_size)
 {
 	struct cryptodev_ctx *ctx = _ctx;
+
+	if (iv_size > EALG_MAX_BLOCK_LEN)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	memcpy(ctx->iv, iv, iv_size);
 
@@ -248,7 +251,7 @@ int _gnutls_cryptodev_init(void)
 			return GNUTLS_E_CRYPTODEV_IOCTL_ERROR;
 		}
 
-		/* Set close-on-exec (not really neede here) */
+		/* Set close-on-exec (not really needed here) */
 		if (fcntl(cfd, F_SETFD, 1) == -1) {
 			gnutls_assert();
 			return GNUTLS_E_CRYPTODEV_IOCTL_ERROR;

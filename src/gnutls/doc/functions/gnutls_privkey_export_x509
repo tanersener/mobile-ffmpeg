@@ -8,8 +8,9 @@
 @var{key}: Location for the key to be exported.
 
 Converts the given abstract private key to a @code{gnutls_x509_privkey_t} 
-type. The key must be of type @code{GNUTLS_PRIVKEY_X509} . The key returned
-in  @code{key} must be deinitialized with @code{gnutls_x509_privkey_deinit()} .
+type. The abstract key must be of type @code{GNUTLS_PRIVKEY_X509} . The input
+ @code{key} must not be initialized. The key returned in  @code{key} should be deinitialized
+using @code{gnutls_x509_privkey_deinit()} .
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.

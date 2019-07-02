@@ -5,11 +5,12 @@
 @deftypefun {void} {gnutls_certificate_server_set_request} (gnutls_session_t @var{session}, gnutls_certificate_request_t @var{req})
 @var{session}: is a @code{gnutls_session_t}  type.
 
-@var{req}: is one of GNUTLS_CERT_REQUEST, GNUTLS_CERT_REQUIRE
+@var{req}: is one of GNUTLS_CERT_REQUEST, GNUTLS_CERT_REQUIRE, GNUTLS_CERT_IGNORE
 
 This function specifies if we (in case of a server) are going to
 send a certificate request message to the client. If  @code{req} is
-GNUTLS_CERT_REQUIRE then the server will return an error if the
-peer does not provide a certificate. If you do not call this
-function then the client will not be asked to send a certificate.
+GNUTLS_CERT_REQUIRE then the server will return the @code{GNUTLS_E_NO_CERTIFICATE_FOUND} 
+error if the peer does not provide a certificate. If you do not call this
+function then the client will not be asked to send a certificate. Invoking
+the function with  @code{req} GNUTLS_CERT_IGNORE has the same effect.
 @end deftypefun

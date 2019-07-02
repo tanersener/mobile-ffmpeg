@@ -16,12 +16,12 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
-#ifndef _SRP_H
-# define _SRP_H
+#ifndef GNUTLS_LIB_SRP_H
+#define GNUTLS_LIB_SRP_H
 
 #include <config.h>
 
@@ -44,4 +44,4 @@ int _gnutls_srp_gn(uint8_t ** ret_g, uint8_t ** ret_n, int bits);
 
 #endif
 
-#endif
+#endif /* GNUTLS_LIB_SRP_H */

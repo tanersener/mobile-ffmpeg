@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2011-2016 Free Software Foundation, Inc.
- * Copyright (C) 2016 Red Hat, Inc.
+ * Copyright (C) 2016-2018 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -17,7 +17,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -60,6 +60,8 @@ struct gcm128_context {
 struct aes_gcm_ctx {
 	AES_KEY expanded_key;
 	struct gcm128_context gcm;
+	unsigned finished;
+	unsigned auth_finished;
 };
 
 void gcm_init_v8(u128 Htable[16], const uint64_t Xi[2]);
@@ -136,6 +138,8 @@ static int aes_gcm_setiv(void *_ctx, const void *iv, size_t iv_size)
 	aes_v8_encrypt(ctx->gcm.Yi.c, ctx->gcm.EK0.c,
 			ALIGN16(&ctx->expanded_key));
 	ctx->gcm.Yi.c[GCM_BLOCK_SIZE - 1] = 2;
+	ctx->finished = 0;
+	ctx->auth_finished = 0;
 	return 0;
 }
 
@@ -225,6 +229,9 @@ aes_gcm_encrypt(void *_ctx, const void *src, size_t src_size,
 	int rest = src_size - (exp_blocks);
 	uint32_t counter;
 
+	if (unlikely(ctx->finished))
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
 	if (blocks > 0) {
 		ctr32_encrypt_blocks(src, dst,
 				     blocks,
@@ -236,8 +243,10 @@ aes_gcm_encrypt(void *_ctx, const void *src, size_t src_size,
 		_gnutls_write_uint32(counter, ctx->gcm.Yi.c + 12);
 	}
 
-	if (rest > 0)		/* last incomplete block */
+	if (rest > 0) {	/* last incomplete block */
 		ctr_encrypt_last(ctx, src, dst, exp_blocks, rest);
+		ctx->finished = 1;
+	}
 
 	gcm_ghash(ctx, dst, src_size);
 	ctx->gcm.len.u[1] += src_size;
@@ -255,6 +264,9 @@ aes_gcm_decrypt(void *_ctx, const void *src, size_t src_size,
 	int rest = src_size - (exp_blocks);
 	uint32_t counter;
 
+	if (unlikely(ctx->finished))
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
 	gcm_ghash(ctx, src, src_size);
 	ctx->gcm.len.u[1] += src_size;
 
@@ -269,8 +281,10 @@ aes_gcm_decrypt(void *_ctx, const void *src, size_t src_size,
 		_gnutls_write_uint32(counter, ctx->gcm.Yi.c + 12);
 	}
 
-	if (rest > 0)		/* last incomplete block */
+	if (rest > 0) { /* last incomplete block */
 		ctr_encrypt_last(ctx, src, dst, exp_blocks, rest);
+		ctx->finished = 1;
+	}
 
 	return 0;
 }
@@ -279,8 +293,14 @@ static int aes_gcm_auth(void *_ctx, const void *src, size_t src_size)
 {
 	struct aes_gcm_ctx *ctx = _ctx;
 
+	if (unlikely(ctx->auth_finished))
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
 	gcm_ghash(ctx, src, src_size);
 	ctx->gcm.len.u[0] += src_size;
+
+	if (src_size % GCM_BLOCK_SIZE != 0)
+		ctx->auth_finished = 1;
 
 	return 0;
 }

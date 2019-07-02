@@ -14,10 +14,8 @@
 # of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
-# You should have received a copy of the GNU Lesser General Public
-# License along with GnuTLS; if not, write to the Free
-# Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-# MA 02110-1301, USA
+# You should have received a copy of the GNU Lesser General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>
 
 AC_DEFUN([LIBGNUTLS_EXTRA_HOOKS],
 [
@@ -38,10 +36,13 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
   # Library code modified:                              REVISION++
   # Interfaces changed/added/removed:   CURRENT++       REVISION=0
   # Interfaces added:                             AGE++
+  #   + add new version symbol in libgnutls.map, see Symbol and library versioning
+  #     in CONTRIBUTION.md for more info.
+  #
   # Interfaces removed:                           AGE=0 (+bump all symbol versions in .map)
-  AC_SUBST(LT_CURRENT, 44)
-  AC_SUBST(LT_REVISION, 11)
-  AC_SUBST(LT_AGE, 14)
+  AC_SUBST(LT_CURRENT, 54)
+  AC_SUBST(LT_REVISION, 0)
+  AC_SUBST(LT_AGE, 24)
 
   AC_SUBST(LT_SSL_CURRENT, 27)
   AC_SUBST(LT_SSL_REVISION, 2)
@@ -67,16 +68,17 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
   DLL_SSL_VERSION=`expr ${LT_SSL_CURRENT} - ${LT_SSL_AGE}`
   AC_SUBST(DLL_SSL_VERSION)
 
-  PKG_CHECK_MODULES(NETTLE, [nettle >= 3.1], [cryptolib="nettle"], [
+NETTLE_MINIMUM=3.4.1
+  PKG_CHECK_MODULES(NETTLE, [nettle >= $NETTLE_MINIMUM], [cryptolib="nettle"], [
 AC_MSG_ERROR([[
-  *** 
-  *** Libnettle 3.1 was not found. 
+  ***
+  *** Libnettle $NETTLE_MINIMUM was not found.
 ]])
   ])
-  PKG_CHECK_MODULES(HOGWEED, [hogweed >= 3.1], [], [
+  PKG_CHECK_MODULES(HOGWEED, [hogweed >= $NETTLE_MINIMUM ], [], [
 AC_MSG_ERROR([[
-  *** 
-  *** Libhogweed (nettle's companion library) was not found. Note that you must compile nettle with gmp support.
+  ***
+  *** Libhogweed (nettle's companion library) $NETTLE_MINIMUM was not found. Note that you must compile nettle with gmp support.
 ]])
   ])
   AM_CONDITIONAL(ENABLE_NETTLE, test "$cryptolib" = "nettle")
@@ -114,7 +116,7 @@ LIBTASN1_MINIMUM=4.9
     PKG_CHECK_MODULES(LIBTASN1, [libtasn1 >= $LIBTASN1_MINIMUM], [], [included_libtasn1=yes])
     if test "$included_libtasn1" = yes; then
       AC_MSG_ERROR([[
-  *** 
+  ***
   *** Libtasn1 $LIBTASN1_MINIMUM was not found. To use the included one, use --with-included-libtasn1
   ]])
     fi
@@ -130,7 +132,7 @@ LIBTASN1_MINIMUM=4.9
   AC_MSG_CHECKING([whether C99 macros are supported])
   AC_TRY_COMPILE(,
   [
-    #define test_mac(...) 
+    #define test_mac(...)
     int z,y,x;
     test_mac(x,y,z);
     return 0;
@@ -142,11 +144,25 @@ LIBTASN1_MINIMUM=4.9
     AC_MSG_WARN([C99 macros not supported. This may affect compiling.])
   ])
 
-  ac_enable_ssl3=yes
+  ac_allow_sha1=no
+  AC_MSG_CHECKING([whether to allow SHA1 as an acceptable hash for cert digital signatures])
+  AC_ARG_ENABLE(sha1-support,
+    AS_HELP_STRING([--enable-sha1-support],
+                   [allow SHA1 as an acceptable hash for cert digital signatures]),
+    ac_allow_sha1=$enableval)
+  if test x$ac_allow_sha1 != xno; then
+   AC_MSG_RESULT(no)
+   AC_DEFINE([ALLOW_SHA1], 1, [allow SHA1 as an acceptable hash for digital signatures])
+  else
+   AC_MSG_RESULT(yes)
+  fi
+  AM_CONDITIONAL(ALLOW_SHA1, test "$ac_allow_sha1" != "no")
+
+  ac_enable_ssl3=no
   AC_MSG_CHECKING([whether to disable the SSL 3.0 protocol])
   AC_ARG_ENABLE(ssl3-support,
-    AS_HELP_STRING([--disable-ssl3-support],
-                   [disable support for the SSL 3.0 protocol]),
+    AS_HELP_STRING([--enable-ssl3-support],
+                   [enable support for the SSL 3.0 protocol]),
     ac_enable_ssl3=$enableval)
   if test x$ac_enable_ssl3 != xno; then
    AC_MSG_RESULT(no)
@@ -155,6 +171,7 @@ LIBTASN1_MINIMUM=4.9
    ac_full=0
    AC_MSG_RESULT(yes)
   fi
+
   AM_CONDITIONAL(ENABLE_SSL3, test "$ac_enable_ssl3" != "no")
 
   ac_enable_ssl2=yes
@@ -170,7 +187,7 @@ LIBTASN1_MINIMUM=4.9
    ac_full=0
    AC_MSG_RESULT(yes)
   fi
-  AM_CONDITIONAL(ENABLE_SSL3, test "$ac_enable_ssl2" != "no")
+  AM_CONDITIONAL(ENABLE_SSL2, test "$ac_enable_ssl2" != "no")
 
   ac_enable_srtp=yes
   AC_MSG_CHECKING([whether to disable DTLS-SRTP extension])
@@ -229,7 +246,7 @@ LIBTASN1_MINIMUM=4.9
    AC_MSG_RESULT(yes)
   fi
   AM_CONDITIONAL(ENABLE_SRP, test "$ac_enable_srp" != "no")
-  
+
   ac_enable_psk=yes
   AC_MSG_CHECKING([whether to disable PSK authentication support])
   AC_ARG_ENABLE(psk-authentication,
@@ -244,7 +261,7 @@ LIBTASN1_MINIMUM=4.9
    AC_MSG_RESULT(yes)
   fi
   AM_CONDITIONAL(ENABLE_PSK, test "$ac_enable_psk" != "no")
-  
+
   ac_enable_anon=yes
   AC_MSG_CHECKING([whether to disable anonymous authentication support])
   AC_ARG_ENABLE(anon-authentication,
@@ -288,20 +305,19 @@ LIBTASN1_MINIMUM=4.9
   fi
   AM_CONDITIONAL(ENABLE_ECDHE, test "$ac_enable_ecdhe" != "no")
 
-  ac_enable_openpgp=yes
-  AC_MSG_CHECKING([whether to disable OpenPGP Certificate authentication support])
-  AC_ARG_ENABLE(openpgp-authentication,
-    AS_HELP_STRING([--disable-openpgp-authentication],
-                   [disable the OpenPGP authentication support]),
-    ac_enable_openpgp=$enableval)
-  if test x$ac_enable_openpgp = xno; then
-   AC_MSG_RESULT(yes)
-   ac_full=0
-  else
-   AC_DEFINE([ENABLE_OPENPGP], 1, [use openpgp authentication])
+  AC_MSG_CHECKING([whether to disable GOST support])
+  AC_ARG_ENABLE(gost,
+    AS_HELP_STRING([--disable-gost],
+                   [disable the GOST support]),
+    ac_enable_gost=$enableval, ac_enable_gost=yes)
+  if test x$ac_enable_gost != xno; then
    AC_MSG_RESULT(no)
+   AC_DEFINE([ENABLE_GOST], 1, [enable GOST])
+  else
+   ac_full=0
+   AC_MSG_RESULT(yes)
   fi
-  AM_CONDITIONAL(ENABLE_OPENPGP, test "$ac_enable_openpgp" = "yes")
+  AM_CONDITIONAL(ENABLE_GOST, test "$ac_enable_gost" != "no")
 
   # For cryptodev
   AC_MSG_CHECKING([whether to add cryptodev support])
@@ -329,24 +345,8 @@ LIBTASN1_MINIMUM=4.9
   fi
   AM_CONDITIONAL(ENABLE_OCSP, test "$ac_enable_ocsp" != "no")
 
-
-  AC_MSG_CHECKING([whether to disable session tickets support])
-  AC_ARG_ENABLE(session-tickets,
-    AS_HELP_STRING([--disable-session-tickets],
-                   [disable session tickets support]),
-    ac_enable_session_tickets=$enableval,ac_enable_session_tickets=yes)
-  if test x$ac_enable_session_tickets != xno; then
-   ac_enable_session_tickets=yes
-   AC_MSG_RESULT(no)
-   AC_DEFINE([ENABLE_SESSION_TICKETS], 1, [enable session tickets support])
-  else
-   ac_full=0
-   AC_MSG_RESULT(yes)
-  fi
-  AM_CONDITIONAL(ENABLE_SESSION_TICKETS, test "$ac_enable_session_tickets" != "no")
-
   # For storing integers in pointers without warnings
-  # http://developer.gnome.org/doc/API/2.0/glib/glib-Type-Conversion-Macros.html#desc
+  # https://developer.gnome.org/doc/API/2.0/glib/glib-Type-Conversion-Macros.html#desc
   AC_CHECK_SIZEOF(void *)
   AC_CHECK_SIZEOF(long long)
   AC_CHECK_SIZEOF(long)

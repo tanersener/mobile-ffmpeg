@@ -1,0 +1,17 @@
+
+
+@c gnutls_gost_paramset_t
+@table @code
+@item GNUTLS_@-GOST_@-PARAMSET_@-UNKNOWN
+Unknown/default parameter set
+@item GNUTLS_@-GOST_@-PARAMSET_@-TC26_@-Z
+Specified by TC26, see rfc7836
+@item GNUTLS_@-GOST_@-PARAMSET_@-CP_@-A
+CryptoPro-A, see rfc4357
+@item GNUTLS_@-GOST_@-PARAMSET_@-CP_@-B
+CryptoPro-B, see rfc4357
+@item GNUTLS_@-GOST_@-PARAMSET_@-CP_@-C
+CryptoPro-C, see rfc4357
+@item GNUTLS_@-GOST_@-PARAMSET_@-CP_@-D
+CryptoPro-D, see rfc4357
+@end table

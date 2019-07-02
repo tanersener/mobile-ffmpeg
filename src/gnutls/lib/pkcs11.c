@@ -22,7 +22,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  */
 
 #include "gnutls_int.h"
@@ -35,10 +35,9 @@
 
 #include <pin.h>
 #include <pkcs11_int.h>
-#include <p11-kit/p11-kit.h>
 #include "pkcs11x.h"
-#include <p11-kit/pin.h>
 #include <system-keys.h>
+#include "x509/x509_int.h"
 
 #include <atfork.h>
 
@@ -51,6 +50,7 @@ extern void *_gnutls_pkcs11_mutex;
 struct gnutls_pkcs11_provider_st {
 	struct ck_function_list *module;
 	unsigned active;
+	unsigned custom_init;
 	unsigned trusted; /* in the sense of p11-kit trusted:
 			   * it can be used for verification */
 	struct ck_info info;
@@ -58,16 +58,25 @@ struct gnutls_pkcs11_provider_st {
 
 struct find_flags_data_st {
 	struct p11_kit_uri *info;
-	unsigned int slot_flags;
+	unsigned int slot_flags; /* Slot Information Flags */
+	unsigned int token_flags; /* Token Information Flags */
 	unsigned int trusted;
 };
 
-struct find_url_data_st {
+struct find_single_obj_st {
 	gnutls_pkcs11_obj_t obj;
 	bool overwrite_exts; /* only valid if looking for a certificate */
 };
 
-struct find_obj_data_st {
+struct find_obj_session_st {
+	gnutls_pkcs11_obj_t obj;
+	struct ck_function_list *ptr;
+	ck_session_handle_t pks;
+	ck_object_handle_t ohandle;
+	unsigned long slot_id;
+};
+
+struct find_multi_obj_st {
 	gnutls_pkcs11_obj_t *p_list;
 	unsigned int current;
 	unsigned int flags;
@@ -84,6 +93,8 @@ struct find_token_num {
 struct find_token_modname {
 	struct p11_kit_uri *info;
 	char *modname;
+	void *ptr;
+	unsigned long slot_id;
 };
 
 struct find_pkey_list_st {
@@ -217,7 +228,7 @@ static int scan_slots(struct gnutls_pkcs11_provider_st *p,
 }
 
 static int
-pkcs11_add_module(const char* name, struct ck_function_list *module, const char *params)
+pkcs11_add_module(const char* name, struct ck_function_list *module, unsigned custom_init, const char *params)
 {
 	unsigned int i;
 	struct ck_info info;
@@ -244,6 +255,7 @@ pkcs11_add_module(const char* name, struct ck_function_list *module, const char 
 	providers[active_providers - 1].module = module;
 	providers[active_providers - 1].active = 1;
 	providers[active_providers - 1].trusted = 0;
+	providers[active_providers - 1].custom_init = custom_init;
 
 	if (p11_kit_module_get_flags(module) & P11_KIT_MODULE_TRUSTED ||
 		(params != NULL && strstr(params, "trusted") != 0))
@@ -366,9 +378,21 @@ int _gnutls_pkcs11_check_init(init_level_t req_level, void *priv, pkcs11_reinit_
 int gnutls_pkcs11_add_provider(const char *name, const char *params)
 {
 	struct ck_function_list *module;
+	unsigned custom_init = 0, flags = 0;
+	struct ck_c_initialize_args args;
+	const char *p;
 	int ret;
 
-	module = p11_kit_module_load(name, P11_KIT_MODULE_CRITICAL);
+	if (params && (p = strstr(params, "p11-kit:")) != 0) {
+		memset (&args, 0, sizeof (args));
+		args.reserved = (char*)(p + sizeof("p11-kit:")-1);
+		args.flags = CKF_OS_LOCKING_OK;
+
+		custom_init = 1;
+		flags = P11_KIT_MODULE_UNMANAGED;
+	}
+
+	module = p11_kit_module_load(name, P11_KIT_MODULE_CRITICAL|flags);
 	if (module == NULL) {
 		gnutls_assert();
 		_gnutls_debug_log("p11: Cannot load provider %s\n", name);
@@ -378,18 +402,27 @@ int gnutls_pkcs11_add_provider(const char *name, const char *params)
 	_gnutls_debug_log
 		    ("p11: Initializing module: %s\n", name);
 
-	ret = p11_kit_module_initialize(module);
+	/* check if we have special information for a p11-kit trust module */
+	if (custom_init) {
+		ret = module->C_Initialize(&args);
+	} else {
+		ret = p11_kit_module_initialize(module);
+	}
+
 	if (ret != CKR_OK) {
 		p11_kit_module_release(module);
 		gnutls_assert();
 		return pkcs11_rv_to_err(ret);
 	}
 
-	ret = pkcs11_add_module(name, module, params);
+	ret = pkcs11_add_module(name, module, custom_init, params);
 	if (ret != 0) {
 		if (ret == GNUTLS_E_INT_RET_0)
 			ret = 0;
-		p11_kit_module_finalize(module);
+		if (!custom_init)
+			p11_kit_module_finalize(module);
+		else
+			module->C_Finalize(NULL);
 		p11_kit_module_release(module);
 		gnutls_assert();
 	}
@@ -533,7 +566,8 @@ gnutls_pkcs11_obj_set_info(gnutls_pkcs11_obj_t obj,
 		}
 		data = tmp;
 		data_size = size;
-		/* fallthrough */
+
+		FALLTHROUGH;
 	case GNUTLS_PKCS11_OBJ_ID:
 		a[0].type = CKA_ID;
 		a[0].value = (void*)data;
@@ -578,12 +612,20 @@ gnutls_pkcs11_obj_set_info(gnutls_pkcs11_obj_t obj,
  * @obj: should contain a #gnutls_pkcs11_obj_t type
  * @itype: Denotes the type of information requested
  * @output: where output will be stored
- * @output_size: contains the maximum size of the output and will be overwritten with actual
+ * @output_size: contains the maximum size of the output buffer and will be
+ *     overwritten with the actual size.
  *
  * This function will return information about the PKCS11 certificate
  * such as the label, id as well as token information where the key is
- * stored. When output is text it returns null terminated string
- * although @output_size contains the size of the actual data only.
+ * stored.
+ *
+ * When output is text, a null terminated string is written to @output and its
+ * string length is written to @output_size (without null terminator). If the
+ * buffer is too small, @output_size will contain the expected buffer size
+ * (with null terminator for text) and return %GNUTLS_E_SHORT_MEMORY_BUFFER.
+ *
+ * In versions previously to 3.6.0 this function included the null terminator
+ * to @output_size. After 3.6.0 the output size doesn't include the terminator character.
  *
  * Returns: %GNUTLS_E_SUCCESS (0) on success or a negative error code on error.
  *
@@ -595,6 +637,128 @@ gnutls_pkcs11_obj_get_info(gnutls_pkcs11_obj_t obj,
 			   void *output, size_t * output_size)
 {
 	return pkcs11_get_info(obj->info, itype, output, output_size);
+}
+
+static int
+find_obj_session_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
+		    struct ck_token_info *tinfo, struct ck_info *lib_info,
+		    void *input)
+{
+	struct find_obj_session_st *find_data = input;
+	struct ck_attribute a[4];
+	ck_rv_t rv;
+	ck_object_handle_t ctx = CK_INVALID_HANDLE;
+	unsigned long count;
+	unsigned a_vals;
+        ck_certificate_type_t type;
+        ck_object_class_t class;
+	int found = 0, ret;
+
+	if (tinfo == NULL) {	/* we don't support multiple calls */
+		gnutls_assert();
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	}
+
+	/* do not bother reading the token if basic fields do not match
+	 */
+	if (!p11_kit_uri_match_token_info(find_data->obj->info, tinfo) ||
+	    !p11_kit_uri_match_module_info(find_data->obj->info,
+					      lib_info)) {
+		gnutls_assert();
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	}
+
+	ret = add_obj_attrs(find_data->obj->info, a, &a_vals, &class, &type);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	rv = pkcs11_find_objects_init(sinfo->module, sinfo->pks, a,
+				      a_vals);
+	if (rv != CKR_OK) {
+		gnutls_assert();
+		_gnutls_debug_log("p11: FindObjectsInit failed.\n");
+		ret = pkcs11_rv_to_err(rv);
+		goto cleanup;
+	}
+
+	if (pkcs11_find_objects(sinfo->module, sinfo->pks, &ctx, 1, &count) == CKR_OK &&
+	    count == 1) {
+		find_data->ptr = sinfo->module;
+		find_data->pks = sinfo->pks;
+		find_data->slot_id = sinfo->sid;
+		find_data->ohandle = ctx;
+		found = 1;
+	}
+
+	if (found == 0) {
+		gnutls_assert();
+		if (count > 1)
+			ret = GNUTLS_E_TOO_MANY_MATCHES;
+		else
+			ret = GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+
+	} else {
+		ret = 0;
+	}
+
+ cleanup:
+	pkcs11_find_objects_final(sinfo);
+
+	return ret;
+}
+
+
+/**
+ * gnutls_pkcs11_obj_get_ptr:
+ * @obj: should contain a #gnutls_pkcs11_obj_t type
+ * @ptr: will contain the CK_FUNCTION_LIST_PTR pointer (may be %NULL)
+ * @session: will contain the CK_SESSION_HANDLE of the object
+ * @ohandle: will contain the CK_OBJECT_HANDLE of the object
+ * @slot_id: the identifier of the slot (may be %NULL)
+ * @flags: Or sequence of GNUTLS_PKCS11_OBJ_* flags
+ *
+ * Obtains the PKCS#11 session handles of an object. @session and @ohandle
+ * must be deinitialized by the caller. The returned pointers are
+ * independent of the @obj lifetime.
+ *
+ * Returns: %GNUTLS_E_SUCCESS (0) on success or a negative error code
+ * on error.
+ *
+ * Since: 3.6.3
+ **/
+int
+gnutls_pkcs11_obj_get_ptr(gnutls_pkcs11_obj_t obj, void **ptr,
+			  void **session, void **ohandle,
+			  unsigned long *slot_id,
+			  unsigned int flags)
+{
+	int ret;
+	struct find_obj_session_st find_data;
+
+	PKCS11_CHECK_INIT;
+	memset(&find_data, 0, sizeof(find_data));
+
+	find_data.obj = obj;
+
+	ret =
+	    _pkcs11_traverse_tokens(find_obj_session_cb, &find_data, obj->info,
+				    &obj->pin,
+				    SESSION_NO_CLOSE|pkcs11_obj_flags_to_int(flags));
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	if (ptr)
+		*ptr = find_data.ptr;
+
+	*ohandle = (void*)find_data.ohandle;
+	*session = (void*)find_data.pks;
+
+	if (slot_id)
+		*slot_id = find_data.slot_id;
+
+	return 0;
 }
 
 int
@@ -705,7 +869,7 @@ pkcs11_get_info(struct p11_kit_uri *info,
 			if (terminate)
 				((unsigned char *) output)[length] = '\0';
 		}
-		*output_size = length + terminate;
+		*output_size = length;
 	}
 
 	return 0;
@@ -780,7 +944,7 @@ static int auto_load(unsigned trusted)
 		_gnutls_debug_log
 			    ("p11: Initializing module: %s\n", name);
 
-		ret = pkcs11_add_module(name, modules[i], NULL);
+		ret = pkcs11_add_module(name, modules[i], 0, NULL);
 		if (ret < 0) {
 			gnutls_assert();
 			_gnutls_debug_log
@@ -932,8 +1096,13 @@ void gnutls_pkcs11_deinit(void)
 		return;
 
 	for (i = 0; i < active_providers; i++) {
-		if (providers[i].active)
-			p11_kit_module_finalize(providers[i].module);
+		if (providers[i].active) {
+
+			if (!providers[i].custom_init)
+				p11_kit_module_finalize(providers[i].module);
+			else
+				providers[i].module->C_Finalize(NULL);
+		}
 		p11_kit_module_release(providers[i].module);
 	}
 	active_providers = 0;
@@ -1067,7 +1236,6 @@ int gnutls_pkcs11_obj_init(gnutls_pkcs11_obj_t * obj)
 	(*obj)->info = p11_kit_uri_new();
 	if ((*obj)->info == NULL) {
 		gnutls_free(*obj);
-		*obj = NULL;
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
@@ -1122,7 +1290,7 @@ void gnutls_pkcs11_obj_deinit(gnutls_pkcs11_obj_t obj)
  *   replaced by the actual size of parameters)
  *
  * This function will export the PKCS11 object data.  It is normal for
- * data to be inaccesible and in that case %GNUTLS_E_INVALID_REQUEST
+ * data to be inaccessible and in that case %GNUTLS_E_INVALID_REQUEST
  * will be returned.
  *
  * If the buffer provided is not long enough to hold the output, then
@@ -1160,7 +1328,7 @@ gnutls_pkcs11_obj_export(gnutls_pkcs11_obj_t obj,
  * @out: will contain the object data
  *
  * This function will export the PKCS11 object data.  It is normal for
- * data to be inaccesible and in that case %GNUTLS_E_INVALID_REQUEST
+ * data to be inaccessible and in that case %GNUTLS_E_INVALID_REQUEST
  * will be returned.
  *
  * The output buffer is allocated using gnutls_malloc().
@@ -1183,7 +1351,7 @@ gnutls_pkcs11_obj_export2(gnutls_pkcs11_obj_t obj, gnutls_datum_t * out)
  * @fmt: The format of the exported data
  *
  * This function will export the PKCS11 object data.  It is normal for
- * data to be inaccesible and in that case %GNUTLS_E_INVALID_REQUEST
+ * data to be inaccessible and in that case %GNUTLS_E_INVALID_REQUEST
  * will be returned.
  *
  * The output buffer is allocated using gnutls_malloc().
@@ -1274,6 +1442,11 @@ pkcs11_find_slot(struct ck_function_list **module, ck_slot_id_t * slot,
 		if (providers[x].active == 0)
 			continue;
 
+		if (!p11_kit_uri_match_module_info(info,
+					      &providers[x].info)) {
+			continue;
+		}
+
 		nslots = sizeof(slots) / sizeof(slots[0]);
 		ret = scan_slots(&providers[x], slots, &nslots);
 		if (ret < 0) {
@@ -1291,17 +1464,12 @@ pkcs11_find_slot(struct ck_function_list **module, ck_slot_id_t * slot,
 				continue;
 			}
 
-			if (pkcs11_get_slot_info
-			    (providers[x].module, slots[z],
-			     &sinfo) != CKR_OK) {
+			if (!p11_kit_uri_match_token_info(info, &tinfo)) {
 				continue;
 			}
 
-			if (!p11_kit_uri_match_token_info
-			    (info, &tinfo)
-			    || !p11_kit_uri_match_module_info(info,
-							      &providers
-							      [x].info)) {
+			if (pkcs11_get_slot_info
+			    (providers[x].module, slots[z], &sinfo) != CKR_OK) {
 				continue;
 			}
 
@@ -1397,6 +1565,10 @@ _pkcs11_traverse_tokens(find_func_t find_func, void *input,
 		if (flags & SESSION_TRUSTED && providers[x].trusted == 0)
 			continue;
 
+		if (info && !p11_kit_uri_match_module_info(info, &providers[x].info)) {
+			continue;
+		}
+
 		nslots = sizeof(slots) / sizeof(slots[0]);
 		ret = scan_slots(&providers[x], slots, &nslots);
 		if (ret < 0) {
@@ -1414,17 +1586,13 @@ _pkcs11_traverse_tokens(find_func_t find_func, void *input,
 				continue;
 			}
 
-			if (pkcs11_get_slot_info(module, slots[z],
-						 &l_sinfo) != CKR_OK) {
+			if (info && !p11_kit_uri_match_token_info(info, &l_tinfo)) {
 				continue;
 			}
 
-			if (info != NULL) {
-				if (!p11_kit_uri_match_token_info(info, &l_tinfo) ||
-				    !p11_kit_uri_match_module_info(info, &providers
-							      [x].info)) {
+			if (pkcs11_get_slot_info(module, slots[z],
+						 &l_sinfo) != CKR_OK) {
 				continue;
-			    }
 			}
 
 			rv = (module)->C_OpenSession(slots[z],
@@ -1482,7 +1650,8 @@ _pkcs11_traverse_tokens(find_func_t find_func, void *input,
 	}
 
 	if (pks != 0 && module != NULL) {
-		pkcs11_close_session(&sinfo);
+		if (ret != 0 || !(flags & SESSION_NO_CLOSE))
+			pkcs11_close_session(&sinfo);
 	}
 
 	return ret;
@@ -1890,8 +2059,12 @@ pkcs11_import_object(ck_object_handle_t ctx, ck_object_class_t class,
 	a[0].value_len = sizeof(b);
 
 	rv = pkcs11_get_attribute_value(sinfo->module, sinfo->pks, ctx, a, 1);
-	if (rv == CKR_OK && b != 0)
-		pobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE;
+	if (rv == CKR_OK) {
+		if (b != 0)
+			pobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE;
+		else
+			pobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_SENSITIVE;
+	}
 
 	a[0].type = CKA_EXTRACTABLE;
 	a[0].value = &b;
@@ -1994,11 +2167,11 @@ pkcs11_import_object(ck_object_handle_t ctx, ck_object_class_t class,
 }
 
 static int
-find_obj_url_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
+find_single_obj_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
 	     struct ck_token_info *tinfo, struct ck_info *lib_info,
 	     void *input)
 {
-	struct find_url_data_st *find_data = input;
+	struct find_single_obj_st *find_data = input;
 	struct ck_attribute a[4];
 	ck_certificate_type_t type;
 	ck_object_class_t class;
@@ -2024,10 +2197,8 @@ find_obj_url_cb(struct ck_function_list *module, struct pkcs11_session_info *sin
 	}
 
 	ret = add_obj_attrs(find_data->obj->info, a, &a_vals, &class, &type);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 	rv = pkcs11_find_objects_init(sinfo->module, sinfo->pks, a,
 				      a_vals);
@@ -2083,7 +2254,7 @@ unsigned int pkcs11_obj_flags_to_int(unsigned int flags)
 		ret_flags |= SESSION_LOGIN | SESSION_FORCE_LOGIN;
 
 	if (flags & GNUTLS_PKCS11_OBJ_FLAG_LOGIN_SO)
-		ret_flags |= SESSION_LOGIN | SESSION_SO | SESSION_FORCE_LOGIN;
+		ret_flags |= SESSION_LOGIN | SESSION_SO | SESSION_FORCE_LOGIN | SESSION_WRITE;
 
 	if (flags & GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE)
 		ret_flags |= SESSION_TRUSTED;
@@ -2116,7 +2287,7 @@ gnutls_pkcs11_obj_import_url(gnutls_pkcs11_obj_t obj, const char *url,
 			     unsigned int flags)
 {
 	int ret;
-	struct find_url_data_st find_data;
+	struct find_single_obj_st find_data;
 
 	PKCS11_CHECK_INIT;
 	memset(&find_data, 0, sizeof(find_data));
@@ -2135,7 +2306,7 @@ gnutls_pkcs11_obj_import_url(gnutls_pkcs11_obj_t obj, const char *url,
 	}
 
 	ret =
-	    _pkcs11_traverse_tokens(find_obj_url_cb, &find_data, obj->info,
+	    _pkcs11_traverse_tokens(find_single_obj_cb, &find_data, obj->info,
 				    &obj->pin,
 				    pkcs11_obj_flags_to_int(flags));
 	if (ret < 0) {
@@ -2193,14 +2364,23 @@ find_token_modname_cb(struct ck_function_list *module, struct pkcs11_session_inf
 	}
 
 	find_data->modname = p11_kit_config_option(module, "module");
+	find_data->ptr = module;
+	find_data->slot_id = sinfo->sid;
 	return 0;
 }
 
+/* Internal symbol used by tests */
+int
+_gnutls_pkcs11_token_get_url(unsigned int seq,
+			     gnutls_pkcs11_url_type_t detailed, char **url,
+			     unsigned flags);
+
 /**
- * gnutls_pkcs11_token_get_url:
+ * _gnutls_pkcs11_token_get_url:
  * @seq: sequence number starting from 0
  * @detailed: non zero if a detailed URL is required
  * @url: will contain an allocated url
+ * @flags: zero or 1. When 1 no initialization is performed.
  *
  * This function will return the URL for each token available
  * in system. The url has to be released using gnutls_free()
@@ -2209,16 +2389,18 @@ find_token_modname_cb(struct ck_function_list *module, struct pkcs11_session_inf
  * %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE if the sequence number
  * exceeds the available tokens, otherwise a negative error value.
  *
- * Since: 2.12.0
  **/
 int
-gnutls_pkcs11_token_get_url(unsigned int seq,
-			    gnutls_pkcs11_url_type_t detailed, char **url)
+_gnutls_pkcs11_token_get_url(unsigned int seq,
+			     gnutls_pkcs11_url_type_t detailed, char **url,
+			     unsigned flags)
 {
 	int ret;
 	struct find_token_num tn;
 
-	PKCS11_CHECK_INIT;
+	if (!(flags & 1)) {
+		PKCS11_CHECK_INIT;
+	}
 
 	memset(&tn, 0, sizeof(tn));
 	tn.seq = seq;
@@ -2243,14 +2425,42 @@ gnutls_pkcs11_token_get_url(unsigned int seq,
 }
 
 /**
+ * gnutls_pkcs11_token_get_url:
+ * @seq: sequence number starting from 0
+ * @detailed: non zero if a detailed URL is required
+ * @url: will contain an allocated url
+ *
+ * This function will return the URL for each token available
+ * in system. The url has to be released using gnutls_free()
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
+ * %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE if the sequence number
+ * exceeds the available tokens, otherwise a negative error value.
+ *
+ * Since: 2.12.0
+ **/
+int
+gnutls_pkcs11_token_get_url(unsigned int seq,
+			    gnutls_pkcs11_url_type_t detailed, char **url)
+{
+	return _gnutls_pkcs11_token_get_url(seq, detailed, url, 0);
+}
+
+/**
  * gnutls_pkcs11_token_get_info:
  * @url: should contain a PKCS 11 URL
  * @ttype: Denotes the type of information requested
  * @output: where output will be stored
- * @output_size: contains the maximum size of the output and will be overwritten with actual
+ * @output_size: contains the maximum size of the output buffer and will be
+ *     overwritten with the actual size.
  *
  * This function will return information about the PKCS 11 token such
  * as the label, id, etc.
+ *
+ * When output is text, a null terminated string is written to @output and its
+ * string length is written to @output_size (without null terminator). If the
+ * buffer is too small, @output_size will contain the expected buffer size
+ * (with null terminator for text) and return %GNUTLS_E_SHORT_MEMORY_BUFFER.
  *
  * Returns: %GNUTLS_E_SUCCESS (0) on success or a negative error code
  * on error.
@@ -2264,7 +2474,7 @@ gnutls_pkcs11_token_get_info(const char *url,
 {
 	struct p11_kit_uri *info = NULL;
 	const uint8_t *str;
-	size_t str_max;
+	char *temp_str = NULL;
 	size_t len;
 	int ret;
 
@@ -2279,19 +2489,19 @@ gnutls_pkcs11_token_get_info(const char *url,
 	switch (ttype) {
 	case GNUTLS_PKCS11_TOKEN_LABEL:
 		str = p11_kit_uri_get_token_info(info)->label;
-		str_max = 32;
+		len = p11_kit_space_strlen(str, 32);
 		break;
 	case GNUTLS_PKCS11_TOKEN_SERIAL:
 		str = p11_kit_uri_get_token_info(info)->serial_number;
-		str_max = 16;
+		len = p11_kit_space_strlen(str, 16);
 		break;
 	case GNUTLS_PKCS11_TOKEN_MANUFACTURER:
 		str = p11_kit_uri_get_token_info(info)->manufacturer_id;
-		str_max = 32;
+		len = p11_kit_space_strlen(str, 32);
 		break;
 	case GNUTLS_PKCS11_TOKEN_MODEL:
 		str = p11_kit_uri_get_token_info(info)->model;
-		str_max = 16;
+		len = p11_kit_space_strlen(str, 16);
 		break;
 	case GNUTLS_PKCS11_TOKEN_MODNAME: {
 		struct find_token_modname tn;
@@ -2305,10 +2515,15 @@ gnutls_pkcs11_token_get_info(const char *url,
 			goto cleanup;
 		}
 
-		snprintf(output, *output_size, "%s", tn.modname);
-		*output_size = strlen(output);
-		ret = 0;
-		goto cleanup;
+		temp_str = tn.modname;
+		if (temp_str) {
+			str = (uint8_t *)temp_str;
+			len = strlen(temp_str);
+		} else {
+			gnutls_assert();
+			len = 0;
+		}
+		break;
 	}
 	default:
 		gnutls_assert();
@@ -2316,21 +2531,73 @@ gnutls_pkcs11_token_get_info(const char *url,
 		goto cleanup;
 	}
 
-	len = p11_kit_space_strlen(str, str_max);
-
-	if (len + 1 > *output_size) {
+	if (len < *output_size) {
+		if (len)
+			memcpy(output, str, len);
+		((char *) output)[len] = '\0';
+		*output_size = len;
+		ret = 0;
+	} else {
 		*output_size = len + 1;
-		return GNUTLS_E_SHORT_MEMORY_BUFFER;
+		ret = GNUTLS_E_SHORT_MEMORY_BUFFER;
 	}
 
-	memcpy(output, str, len);
-	((char *) output)[len] = '\0';
+ cleanup:
+	free(temp_str);
+	p11_kit_uri_free(info);
+	return ret;
+}
 
-	*output_size = len;
+/**
+ * gnutls_pkcs11_token_get_ptr:
+ * @url: should contain a PKCS#11 URL identifying a token
+ * @ptr: will contain the CK_FUNCTION_LIST_PTR pointer
+ * @slot_id: will contain the slot_id (may be %NULL)
+ * @flags: should be zero
+ *
+ * This function will return the function pointer of the specified
+ * token by the URL. The returned pointers are valid until
+ * gnutls is deinitialized, c.f. _global_deinit().
+ *
+ * Returns: %GNUTLS_E_SUCCESS (0) on success or a negative error code
+ * on error.
+ *
+ * Since: 3.6.3
+ **/
+int
+gnutls_pkcs11_token_get_ptr(const char *url, void **ptr, unsigned long *slot_id,
+			    unsigned int flags)
+{
+	struct p11_kit_uri *info = NULL;
+	int ret;
+	struct find_token_modname tn;
+
+	PKCS11_CHECK_INIT;
+
+	ret = pkcs11_url_to_info(url, &info, 0);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	memset(&tn, 0, sizeof(tn));
+	tn.info = info;
+
+	ret = _pkcs11_traverse_tokens(find_token_modname_cb, &tn, NULL, NULL, 0);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	if (ptr)
+		*ptr = tn.ptr;
+	if (slot_id)
+		*slot_id = tn.slot_id;
 
 	ret = 0;
 
  cleanup:
+	free(tn.modname);
 	p11_kit_uri_free(info);
 	return ret;
 }
@@ -2526,10 +2793,10 @@ retrieve_pin_from_callback(const struct pin_info_st *pin_info,
 	return 0;
 }
 
-static int
-retrieve_pin(struct pin_info_st *pin_info, struct p11_kit_uri *info,
-	     struct ck_token_info *token_info, int attempts,
-	     ck_user_type_t user_type, struct p11_kit_pin **pin)
+int
+pkcs11_retrieve_pin(struct pin_info_st *pin_info, struct p11_kit_uri *info,
+		    struct ck_token_info *token_info, int attempts,
+		    ck_user_type_t user_type, struct p11_kit_pin **pin)
 {
 	const char *pinfile;
 	int ret = GNUTLS_E_PKCS11_PIN_ERROR;
@@ -2626,7 +2893,7 @@ pkcs11_login(struct pkcs11_session_info *sinfo,
 			gnutls_assert();
 			_gnutls_debug_log
 			    ("p11: Protected login failed.\n");
-			ret = GNUTLS_E_PKCS11_ERROR;
+			ret = pkcs11_rv_to_err(rv);
 			goto cleanup;
 		}
 	}
@@ -2637,37 +2904,46 @@ pkcs11_login(struct pkcs11_session_info *sinfo,
 
 		memcpy(&tinfo, &sinfo->tinfo, sizeof(tinfo));
 
-		/* Check whether the session is already logged in, and if so, just skip */
 		if (!(flags & SESSION_CONTEXT_SPECIFIC)) {
+			/* Check whether the session is already logged in, and if so, just skip */
 			rv = (sinfo->module)->C_GetSessionInfo(sinfo->pks,
 							       &session_info);
-			if (rv == CKR_OK &&
-				(session_info.state == CKS_RO_USER_FUNCTIONS
-				|| session_info.state == CKS_RW_USER_FUNCTIONS)) {
-				ret = 0;
-				_gnutls_debug_log
-				    ("p11: Already logged in\n");
-				goto cleanup;
+			if (rv == CKR_OK) {
+				if (flags & SESSION_SO) {
+					if (session_info.state == CKS_RW_SO_FUNCTIONS) {
+						ret = 0;
+						_gnutls_debug_log
+						    ("p11: Already logged in as SO\n");
+						goto cleanup;
+					}
+				} else if (session_info.state == CKS_RO_USER_FUNCTIONS
+					|| session_info.state == CKS_RW_USER_FUNCTIONS) {
+					ret = 0;
+					_gnutls_debug_log
+					    ("p11: Already logged in as user\n");
+					goto cleanup;
+				}
 			}
 		}
 
 		/* If login has been attempted once already, check the token
 		 * status again, the flags might change. */
 		if (attempt) {
-			if (pkcs11_get_token_info
-			    (sinfo->module, sinfo->sid,
-			     &tinfo) != CKR_OK) {
+			rv = pkcs11_get_token_info(sinfo->module, sinfo->sid,
+				     &tinfo);
+			if (rv != CKR_OK) {
 				gnutls_assert();
 				_gnutls_debug_log
 				    ("p11: GetTokenInfo failed\n");
-				ret = GNUTLS_E_PKCS11_ERROR;
+
+				ret = pkcs11_rv_to_err(rv);
 				goto cleanup;
 			}
 		}
 
 		ret =
-		    retrieve_pin(pin_info, info, &tinfo, attempt++,
-				 user_type, &pin);
+		    pkcs11_retrieve_pin(pin_info, info, &tinfo, attempt++,
+					user_type, &pin);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
@@ -2685,8 +2961,7 @@ pkcs11_login(struct pkcs11_session_info *sinfo,
 
 	_gnutls_debug_log("p11: Login result = %s (%lu)\n", (rv==0)?"ok":p11_kit_strerror(rv), rv);
 
-	ret = (rv == CKR_OK
-	       || rv ==
+	ret = (rv == CKR_OK || rv ==
 	       CKR_USER_ALREADY_LOGGED_IN) ? 0 : pkcs11_rv_to_err(rv);
 
  cleanup:
@@ -2724,7 +2999,6 @@ find_privkeys(struct pkcs11_session_info *sinfo,
 
 	/* Find an object with private key class and a certificate ID
 	 * which matches the certificate. */
-	/* FIXME: also match the cert subject. */
 	a[0].type = CKA_CLASS;
 	a[0].value = &class;
 	a[0].value_len = sizeof class;
@@ -2804,10 +3078,10 @@ find_privkeys(struct pkcs11_session_info *sinfo,
 #define OBJECTS_A_TIME 8*1024
 
 static int
-find_objs_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
+find_multi_objs_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
 	  struct ck_token_info *tinfo, struct ck_info *lib_info, void *input)
 {
-	struct find_obj_data_st *find_data = input;
+	struct find_multi_obj_st *find_data = input;
 	struct ck_attribute a[16];
 	struct ck_attribute *attr;
 	ck_object_class_t class = (ck_object_class_t) -1;
@@ -3192,7 +3466,7 @@ gnutls_pkcs11_obj_list_import_url4(gnutls_pkcs11_obj_t ** p_list,
 				   unsigned int flags)
 {
 	int ret;
-	struct find_obj_data_st priv;
+	struct find_multi_obj_st priv;
 
 	PKCS11_CHECK_INIT_FLAGS(flags);
 
@@ -3216,7 +3490,7 @@ gnutls_pkcs11_obj_list_import_url4(gnutls_pkcs11_obj_t ** p_list,
 	}
 
 	ret =
-	    _pkcs11_traverse_tokens(find_objs_cb, &priv, priv.info,
+	    _pkcs11_traverse_tokens(find_multi_objs_cb, &priv, priv.info,
 				    NULL, pkcs11_obj_flags_to_int(flags));
 	p11_kit_uri_free(priv.info);
 
@@ -3382,6 +3656,7 @@ find_flags_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo
 	else
 		find_data->trusted = 0;
 	find_data->slot_flags = sinfo->slot_info.flags;
+	find_data->token_flags = sinfo->tinfo.flags;
 
 	return 0;
 }
@@ -3424,9 +3699,51 @@ int gnutls_pkcs11_token_get_flags(const char *url, unsigned int *flags)
 	}
 
 	*flags = 0;
+
+	/* read slot flags */
 	if (find_data.slot_flags & CKF_HW_SLOT)
 		*flags |= GNUTLS_PKCS11_TOKEN_HW;
 
+	/* read token flags */
+	if (find_data.token_flags & CKF_RNG)
+		*flags |= GNUTLS_PKCS11_TOKEN_RNG;
+
+	if (find_data.token_flags & CKF_LOGIN_REQUIRED)
+		*flags |= GNUTLS_PKCS11_TOKEN_LOGIN_REQUIRED;
+
+	if (find_data.token_flags & CKF_PROTECTED_AUTHENTICATION_PATH)
+		*flags |= GNUTLS_PKCS11_TOKEN_PROTECTED_AUTHENTICATION_PATH;
+
+	if (find_data.token_flags & CKF_TOKEN_INITIALIZED)
+		*flags |= GNUTLS_PKCS11_TOKEN_INITIALIZED;
+
+	if (find_data.token_flags & CKF_USER_PIN_COUNT_LOW)
+		*flags |= GNUTLS_PKCS11_TOKEN_USER_PIN_COUNT_LOW;
+
+	if (find_data.token_flags & CKF_USER_PIN_FINAL_TRY)
+		*flags |= GNUTLS_PKCS11_TOKEN_USER_PIN_FINAL_TRY;
+
+	if (find_data.token_flags & CKF_USER_PIN_LOCKED)
+		*flags |= GNUTLS_PKCS11_TOKEN_USER_PIN_LOCKED;
+
+	if (find_data.token_flags & CKF_SO_PIN_COUNT_LOW)
+		*flags |= GNUTLS_PKCS11_TOKEN_SO_PIN_COUNT_LOW;
+
+	if (find_data.token_flags & CKF_SO_PIN_FINAL_TRY)
+		*flags |= GNUTLS_PKCS11_TOKEN_SO_PIN_FINAL_TRY;
+
+	if (find_data.token_flags & CKF_SO_PIN_LOCKED)
+		*flags |= GNUTLS_PKCS11_TOKEN_SO_PIN_LOCKED;
+
+	if (find_data.token_flags & CKF_USER_PIN_INITIALIZED)
+		*flags |= GNUTLS_PKCS11_TOKEN_USER_PIN_INITIALIZED;
+
+#ifdef CKF_ERROR_STATE
+	if (find_data.token_flags & CKF_ERROR_STATE)
+		*flags |= GNUTLS_PKCS11_TOKEN_ERROR_STATE;
+#endif
+
+	/* other flags */
 	if (find_data.trusted != 0)
 		*flags |= GNUTLS_PKCS11_TOKEN_TRUSTED;
 
@@ -3492,7 +3809,68 @@ gnutls_pkcs11_token_get_mechanism(const char *url, unsigned int idx,
 	*mechanism = mlist[idx];
 
 	return 0;
+}
 
+/**
+ * gnutls_pkcs11_token_check_mechanism:
+ * @url: should contain a PKCS 11 URL
+ * @mechanism: The PKCS #11 mechanism ID
+ * @ptr: if set it should point to a CK_MECHANISM_INFO struct
+ * @psize: the size of CK_MECHANISM_INFO struct (for safety)
+ * @flags: must be zero
+ *
+ * This function will return whether a mechanism is supported
+ * by the given token. If the mechanism is supported and
+ * @ptr is set, it will be updated with the token information.
+ *
+ * Returns: Non-zero if the mechanism is supported or zero otherwise.
+ *
+ * Since: 3.6.0
+ **/
+unsigned
+gnutls_pkcs11_token_check_mechanism(const char *url,
+				    unsigned long mechanism,
+				    void *ptr, unsigned psize, unsigned flags)
+{
+	int ret;
+	ck_rv_t rv;
+	struct ck_function_list *module;
+	ck_slot_id_t slot;
+	struct ck_token_info tinfo;
+	struct p11_kit_uri *info = NULL;
+	struct ck_mechanism_info minfo;
+
+	PKCS11_CHECK_INIT;
+
+	ret = pkcs11_url_to_info(url, &info, 0);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	ret = pkcs11_find_slot(&module, &slot, info, &tinfo, NULL, NULL);
+	p11_kit_uri_free(info);
+
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	rv = pkcs11_get_mechanism_info(module, slot, mechanism, &minfo);
+	if (rv != CKR_OK) {
+		gnutls_assert();
+		return 0;
+	}
+
+	if (ptr) {
+		if (sizeof(minfo) > psize)
+			return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
+		else if (sizeof(minfo) < psize)
+			memset(ptr, 0, psize);
+		memcpy(ptr, &minfo, sizeof(minfo));
+	}
+
+	return 1;
 }
 
 /**
@@ -3530,9 +3908,14 @@ const char *gnutls_pkcs11_type_get_name(gnutls_pkcs11_obj_type_t type)
 }
 
 static
-int check_found_cert(struct find_cert_st *priv, gnutls_datum_t *data, time_t now)
+int check_found_cert(struct find_cert_st *priv,
+		     ck_object_handle_t ctx,
+		     gnutls_datum_t *data,
+		     time_t now,
+		     ck_object_handle_t *cand_ctx)
 {
 	gnutls_x509_crt_t tcrt = NULL;
+	unsigned has_ski;
 	int ret;
 
 	ret = gnutls_x509_crt_init(&tcrt);
@@ -3544,14 +3927,6 @@ int check_found_cert(struct find_cert_st *priv, gnutls_datum_t *data, time_t now
 	ret = gnutls_x509_crt_import(tcrt, data, GNUTLS_X509_FMT_DER);
 	if (ret < 0) {
 		gnutls_assert();
-		goto cleanup;
-	}
-
-	if (priv->key_id.size > 0 &&
-	    !_gnutls_check_valid_key_id(&priv->key_id, tcrt, now)) {
-		gnutls_assert();
-		_gnutls_debug_log("check_found_cert: cert has invalid key ID\n");
-		ret = -1;
 		goto cleanup;
 	}
 
@@ -3585,11 +3960,63 @@ int check_found_cert(struct find_cert_st *priv, gnutls_datum_t *data, time_t now
 		}
 	}
 
+	if (priv->key_id.size > 0 &&
+	    !_gnutls_check_valid_key_id(&priv->key_id, tcrt, now, &has_ski)) {
+		gnutls_assert();
+		if (has_ski) {
+			_gnutls_debug_log("check_found_cert: cert has invalid key ID\n");
+			ret = -1;
+		} else {
+			/* That's a possible match; there can be CA certificates without
+			 * an SKI, which match a cert which has AKI. */
+			*cand_ctx = ctx;
+		}
+		goto cleanup;
+	}
+
 	ret = 0;
 cleanup:
 	if (tcrt != NULL)
 		gnutls_x509_crt_deinit(tcrt);
 	return ret;
+}
+
+static int get_data_and_attrs(struct pkcs11_session_info *sinfo,
+			      ck_object_handle_t object, gnutls_datum_t *data,
+			      char *label, size_t label_size,
+			      uint8_t *id, size_t id_size,
+			      gnutls_datum_t *o_label, gnutls_datum_t *o_id)
+{
+	ck_rv_t rv;
+	struct ck_attribute a[2];
+
+	/* data will contain the certificate */
+	rv = pkcs11_get_attribute_avalue(sinfo->module, sinfo->pks, object, CKA_VALUE, data);
+	if (rv == CKR_OK) {
+		a[0].type = CKA_LABEL;
+		a[0].value = label;
+		a[0].value_len = label_size;
+
+		a[1].type = CKA_ID;
+		a[1].value = id;
+		a[1].value_len = id_size;
+
+		if (pkcs11_get_attribute_value(sinfo->module, sinfo->pks, object, a,
+				     2) == CKR_OK) {
+			o_label->data = a[0].value;
+			o_label->size = a[0].value_len;
+			o_id->data = a[1].value;
+			o_id->size = a[1].value_len;
+
+			return 0;
+		} else {
+			_gnutls_free_datum(data);
+			_gnutls_debug_log
+				    ("p11: Skipped cert, missing attrs.\n");
+		}
+	}
+
+	return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 }
 
 static int
@@ -3600,14 +4027,15 @@ find_cert_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
 	ck_object_class_t class = -1;
 	ck_certificate_type_t type = (ck_certificate_type_t) - 1;
 	ck_rv_t rv;
-	ck_object_handle_t ctx;
+	ck_object_handle_t ctx, cand_ctx = CK_INVALID_HANDLE;
 	unsigned long count, a_vals;
 	int found = 0, ret;
 	struct find_cert_st *priv = input;
 	char label_tmp[PKCS11_LABEL_SIZE];
-	char id_tmp[PKCS11_ID_SIZE];
+	uint8_t id_tmp[PKCS11_ID_SIZE];
 	gnutls_datum_t data = {NULL, 0};
-	unsigned tries, i, finalized;
+	unsigned finalized;
+	int i, tries;
 	ck_bool_t trusted = 1;
 	time_t now;
 	gnutls_datum_t label = {NULL,0}, id = {NULL,0};
@@ -3720,38 +4148,38 @@ find_cert_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
 				break;
 			}
 
-			/* data will contain the certificate */
-			rv = pkcs11_get_attribute_avalue(sinfo->module, sinfo->pks, ctx, CKA_VALUE, &data);
-			if (rv == CKR_OK) {
-				ret = check_found_cert(priv, &data, now);
-				if (ret < 0) {
-					_gnutls_free_datum(&data);
-					continue;
-				}
+			ret = get_data_and_attrs(sinfo, ctx, &data,
+						 label_tmp, sizeof(label_tmp),
+						 id_tmp, sizeof(id_tmp),
+						 &label,
+						 &id);
+			if (ret < 0)
+				continue;
 
-				a[0].type = CKA_LABEL;
-				a[0].value = label_tmp;
-				a[0].value_len = sizeof(label_tmp);
-
-				a[1].type = CKA_ID;
-				a[1].value = id_tmp;
-				a[1].value_len = sizeof(id_tmp);
-
-				if (pkcs11_get_attribute_value(sinfo->module, sinfo->pks, ctx, a,
-				     2) == CKR_OK) {
-					label.data = a[0].value;
-					label.size = a[0].value_len;
-					id.data = a[1].value;
-					id.size = a[1].value_len;
-
-					found = 1;
-					break;
-				} else {
-					_gnutls_free_datum(&data);
-					_gnutls_debug_log
-					    ("p11: Skipped cert, missing attrs.\n");
-				}
+			ret = check_found_cert(priv, ctx, &data, now, &cand_ctx);
+			if (ret < 0) {
+				_gnutls_free_datum(&data);
+				continue;
 			}
+
+			found = 1;
+			break;
+		}
+
+		if (!found && cand_ctx != CK_INVALID_HANDLE) {
+			/* there was a possible match; let's retrieve that one instead of
+			 * failing */
+			ret = get_data_and_attrs(sinfo, cand_ctx, &data,
+						 label_tmp, sizeof(label_tmp),
+						 id_tmp, sizeof(id_tmp),
+						 &label,
+						 &id);
+			if (ret >= 0)
+				found = 1;
+
+			/* we do not need to use check_found_cert() because
+			 * in case we have a candidate, we already have checked it
+			 */
 		}
 
 		pkcs11_find_objects_final(sinfo);
@@ -3812,7 +4240,7 @@ find_cert_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
  *
  * This function will return the issuer of a given certificate, if it
  * is stored in the token. By default only marked as trusted issuers
- * are retuned. If any issuer should be returned specify
+ * are returned. If any issuer should be returned specify
  * %GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_ANY in @flags.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
@@ -3866,11 +4294,23 @@ int gnutls_pkcs11_get_raw_issuer(const char *url, gnutls_x509_crt_t cert,
 		gnutls_assert();
 		goto cleanup;
 	}
+
+	gnutls_pkcs11_obj_set_pin_function(priv.obj, cert->pin.cb, cert->pin.data);
+
 	priv.need_import = 1;
 
 	ret =
 	    _pkcs11_traverse_tokens(find_cert_cb, &priv, info,
-				    NULL, pkcs11_obj_flags_to_int(flags));
+				    &cert->pin, pkcs11_obj_flags_to_int(flags));
+	if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+		/* we have failed retrieving the right certificate; if there
+		 * was a close match return that one. */
+		priv.flags |= GNUTLS_PKCS11_OBJ_FLAG_FIRST_CLOSE_MATCH;
+		ret =
+		    _pkcs11_traverse_tokens(find_cert_cb, &priv, info,
+					    &cert->pin, pkcs11_obj_flags_to_int(flags));
+	}
+
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -3903,7 +4343,7 @@ int gnutls_pkcs11_get_raw_issuer(const char *url, gnutls_x509_crt_t cert,
  *
  * This function will return the certificate with the given DN, if it
  * is stored in the token. By default only marked as trusted issuers
- * are retuned. If any issuer should be returned specify
+ * are returned. If any issuer should be returned specify
  * %GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_ANY in @flags.
  *
  * The name of the function includes issuer because it can
@@ -3988,7 +4428,7 @@ int gnutls_pkcs11_get_raw_issuer_by_dn (const char *url, const gnutls_datum_t *d
  *
  * This function will return the certificate with the given DN and @spki, if it
  * is stored in the token. By default only marked as trusted issuers
- * are retuned. If any issuer should be returned specify
+ * are returned. If any issuer should be returned specify
  * %GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_ANY in @flags.
  *
  * The name of the function includes issuer because it can

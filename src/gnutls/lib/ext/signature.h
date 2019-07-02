@@ -16,28 +16,30 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
+#ifndef GNUTLS_LIB_EXT_SIGNATURE_H
+#define GNUTLS_LIB_EXT_SIGNATURE_H
+
 /* signature algorithms extension
  */
-#ifndef EXT_SIGNATURE_H
-#define EXT_SIGNATURE_H
 
-#include <extensions.h>
+#include <hello_ext.h>
 
-extern const extension_entry_st ext_mod_sig;
+extern const hello_ext_entry_st ext_mod_sig;
 
 gnutls_sign_algorithm_t
 _gnutls_session_get_sign_algo(gnutls_session_t session,
-			      gnutls_pcert_st * cert, unsigned client_cert);
+			      gnutls_pcert_st * cert,
+			      gnutls_privkey_t privkey,
+			      unsigned client_cert);
 int _gnutls_sign_algorithm_parse_data(gnutls_session_t session,
 				      const uint8_t * data,
 				      size_t data_size);
 int _gnutls_sign_algorithm_write_params(gnutls_session_t session,
-					uint8_t * data,
-					size_t max_data_size);
+					gnutls_buffer_st * extdata);
 int _gnutls_session_sign_algo_enabled(gnutls_session_t session,
 				      gnutls_sign_algorithm_t sig);
 
@@ -54,4 +56,5 @@ gnutls_sign_algorithm_set_client(gnutls_session_t session,
 {
 	session->security_parameters.client_sign_algo = sign;
 }
-#endif
+
+#endif /* GNUTLS_LIB_EXT_SIGNATURE_H */

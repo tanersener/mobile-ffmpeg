@@ -1,0 +1,19 @@
+
+
+
+
+@deftypefun {int} {gnutls_pubkey_get_spki} (gnutls_pubkey_t @var{pubkey}, gnutls_x509_spki_t @var{spki}, unsigned int @var{flags})
+@var{pubkey}: a public key of type @code{gnutls_pubkey_t} 
+
+@var{spki}: a SubjectPublicKeyInfo structure of type @code{gnutls_pubkey_spki_t} 
+
+@var{flags}: must be zero
+
+This function will return the public key information if available.
+The provided  @code{spki} must be initialized.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.6.0
+@end deftypefun

@@ -22,8 +22,43 @@ flag = {
 };
 
 flag = {
+    name      = alpn;
+    arg-type  = string;
+    descrip   = "Specify ALPN protocol to be enabled by the server";
+    doc      = "Specify the (textual) ALPN protocol for the server to use.";
+    stack-arg;
+    max       = NOLIMIT;
+};
+
+flag = {
+    name      = alpn-fatal;
+    descrip   = "Send fatal alert on non-matching ALPN name";
+    doc      = "";
+};
+
+flag = {
     name      = noticket;
     descrip   = "Don't accept session tickets";
+    doc      = "";
+};
+
+flag = {
+    name      = earlydata;
+    descrip   = "Accept early data";
+    doc      = "";
+};
+
+flag = {
+    name      = maxearlydata;
+    arg-type  = number;
+    arg-range = "1->4294967295";
+    descrip   = "The maximum early data size to accept";
+    doc      = "";
+};
+
+flag = {
+    name      = nocookie;
+    descrip   = "Don't require cookie on DTLS sessions";
     doc      = "";
 };
 
@@ -86,13 +121,15 @@ flag = {
     value     = a;
     descrip   = "Do not request a client certificate";
     doc      = "";
+    flags-cant = require-client-cert;
 };
 
 flag = {
     name      = require-client-cert;
     value     = r;
     descrip   = "Require a client certificate";
-    doc      = "";
+    doc      = "This option before 3.6.0 used to imply --verify-client-cert.
+Since 3.6.0 it will no longer verify the certificate by default.";
 };
 
 flag = {
@@ -156,71 +193,60 @@ flag = {
     file-exists = yes;
     descrip   = "PGP Key file to use";
     doc      = "";
+    deprecated;
 };
 
-flag = {
-    name      = pgpkeyring;
-    arg-type  = file;
-    file-exists = yes;
-    descrip   = "PGP Key ring file to use";
-    doc      = "";
-};
-
-flag = {
-    name      = pgpcertfile;
-    arg-type  = file;
-    file-exists = yes;
-    descrip   = "PGP Public Key (certificate) file to use";
-    doc      = "";
-};
 
 flag = {
     name      = x509keyfile;
     arg-type  = string;
     descrip   = "X.509 key file or PKCS #11 URL to use";
-    doc      = "";
+    doc      = "Specify the private key file or URI to use; it must correspond to
+the certificate specified in --x509certfile. Multiple keys and certificates
+can be specified with this option and in that case each occurrence of keyfile
+must be followed by the corresponding x509certfile or vice-versa.";
+    stack-arg;
+    max       = NOLIMIT;
 };
 
 flag = {
     name      = x509certfile;
     arg-type  = string;
     descrip   = "X.509 Certificate file or PKCS #11 URL to use";
-    doc      = "";
+    doc      = "Specify the certificate file or URI to use; it must correspond to
+the key specified in --x509keyfile. Multiple keys and certificates
+can be specified with this option and in that case each occurrence of keyfile
+must be followed by the corresponding x509certfile or vice-versa.";
+    stack-arg;
+    max       = NOLIMIT;
 };
 
 flag = {
     name      = x509dsakeyfile;
-    arg-type  = string;
+    aliases   = x509keyfile;
     descrip   = "Alternative X.509 key file or PKCS #11 URL to use";
-    doc      = "";
+    deprecated;
 };
 
 flag = {
     name      = x509dsacertfile;
-    arg-type  = string;
+    aliases   = x509certfile;
     descrip   = "Alternative X.509 Certificate file or PKCS #11 URL to use";
-    doc      = "";
+    deprecated;
 };
 
 flag = {
     name      = x509ecckeyfile;
-    arg-type  = string;
+    aliases   = x509keyfile;
     descrip   = "Alternative X.509 key file or PKCS #11 URL to use";
-    doc      = "";
+    deprecated;
 };
 
 flag = {
     name      = x509ecccertfile;
-    arg-type  = string;
+    aliases   = x509certfile;
     descrip   = "Alternative X.509 Certificate file or PKCS #11 URL to use";
-    doc      = "";
-};
-
-flag = {
-    name      = pgpsubkey;
-    arg-type  = string;
-    descrip   = "PGP subkey to use (hex or auto)";
-    doc      = "";
+    deprecated;
 };
 
 flag = {
@@ -256,10 +282,17 @@ flag = {
 
 flag = {
     name      = ocsp-response;
-    arg-type  = file;
-    file-exists = yes;
+    arg-type  = string;
     descrip   = "The OCSP response to send to client";
     doc      = "If the client requested an OCSP response, return data from this file to the client.";
+    stack-arg;
+    max       = NOLIMIT;
+};
+
+flag = {
+    name      = ignore-ocsp-response-errors;
+    descrip   = "Ignore any errors when setting the OCSP response";
+    doc      = "That option instructs gnutls to not attempt to match the provided OCSP responses with the certificates.";
 };
 
 flag = {
@@ -283,6 +316,20 @@ flag = {
     file-exists = yes;
     descrip   = "Specify the PKCS #11 provider library";
     doc      = "This will override the default options in /etc/gnutls/pkcs11.conf";
+};
+
+flag = {
+    name      = keymatexport;
+    arg-type  = string;
+    descrip   = "Label used for exporting keying material";
+    doc      = "";
+};
+
+flag = {
+    name      = keymatexportsize;
+    arg-type  = number;
+    descrip   = "Size of the exported keying material";
+    doc      = "";
 };
 
 doc-section = {
@@ -385,42 +432,17 @@ $ gnutls-serv --http \
 Try connecting to the server using your web browser.  Note that the
 server listens to port 5556 by default.
 
-While you are at it, to allow connections using DSA, you can also
-create a DSA key and certificate for the server.  These credentials
+While you are at it, to allow connections using ECDSA, you can also
+create a ECDSA key and certificate for the server.  These credentials
 will be used in the final example below.
 
 @example
-$ certtool --generate-privkey --dsa > x509-server-key-dsa.pem
-$ certtool --generate-certificate --load-privkey x509-server-key-dsa.pem \
+$ certtool --generate-privkey --ecdsa > x509-server-key-ecc.pem
+$ certtool --generate-certificate --load-privkey x509-server-key-ecc.pem \
   --load-ca-certificate x509-ca.pem --load-ca-privkey x509-ca-key.pem \
-  --template server.tmpl --outfile x509-server-dsa.pem
+  --template server.tmpl --outfile x509-server-ecc.pem
 @end example
 
-The next step is to create OpenPGP credentials for the server.
-
-@example
-gpg --gen-key
-Enter whatever details you want, use 'test.gnutls.org' as name...
-@end example
-
-Make a note of the OpenPGP key identifier of the newly generated key,
-here it was @code{5D1D14D8}.  You will need to export the key for
-GnuTLS to be able to use it.
-
-@example
-gpg -a --export 5D1D14D8 > openpgp-server.txt
-gpg --export 5D1D14D8 > openpgp-server.bin
-gpg --export-secret-keys 5D1D14D8 > openpgp-server-key.bin
-gpg -a --export-secret-keys 5D1D14D8 > openpgp-server-key.txt
-@end example
-
-Let's start the server with support for OpenPGP credentials:
-
-@example
-gnutls-serv --http --priority NORMAL:+CTYPE-OPENPGP \
-            --pgpkeyfile openpgp-server-key.txt \
-            --pgpcertfile openpgp-server.txt
-@end example
 
 The next step is to add support for SRP authentication. This requires
 an SRP password file created with @code{srptool}.
@@ -444,14 +466,12 @@ Finally, we start the server with all the earlier parameters and you
 get this command:
 
 @example
-gnutls-serv --http --priority NORMAL:+PSK:+SRP:+CTYPE-OPENPGP \
+gnutls-serv --http --priority NORMAL:+PSK:+SRP \
             --x509cafile x509-ca.pem \
             --x509keyfile x509-server-key.pem \
             --x509certfile x509-server.pem \
-            --x509dsakeyfile x509-server-key-dsa.pem \
-            --x509dsacertfile x509-server-dsa.pem \
-            --pgpkeyfile openpgp-server-key.txt \
-            --pgpcertfile openpgp-server.txt \
+            --x509keyfile x509-server-key-ecc.pem \
+            --x509certfile x509-server-ecc.pem \
             --srppasswdconf srp-tpasswd.conf \
             --srppasswd srp-passwd.txt \
             --pskpasswd psk-passwd.txt

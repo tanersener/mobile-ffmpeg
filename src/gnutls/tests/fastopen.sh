@@ -48,13 +48,20 @@ SERV="${SERV} -q"
 
 echo "Checking Fast open"
 
+KEY1=${srcdir}/../doc/credentials/x509/key-rsa.pem
+CERT1=${srcdir}/../doc/credentials/x509/cert-rsa.pem
+CA1=${srcdir}/../doc/credentials/x509/ca.pem
+
 eval "${GETPORT}"
-launch_server $$ --echo --priority "NORMAL:+ANON-ECDH"
+launch_server $$ --echo --x509keyfile ${KEY1} --x509certfile ${CERT1}
 PID=$!
 wait_server ${PID}
 
-${VALGRIND} "${CLI}" -p "${PORT}" 127.0.0.1 --fastopen --rehandshake --priority "NORMAL:+ANON-ECDH:+ANON-DH" </dev/null >/dev/null || \
-	fail ${PID} "1. rehandshake should have succeeded!"
+${VALGRIND} "${CLI}" -p "${PORT}" localhost --fastopen --priority "NORMAL:-VERS-ALL:+VERS-TLS1.2" --x509cafile ${CA1}  </dev/null || \
+	fail ${PID} "1. TLS1.2 handshake should have succeeded!"
+
+${VALGRIND} "${CLI}" -p "${PORT}" localhost --fastopen --x509cafile ${CA1}  </dev/null || \
+	fail ${PID} "2. handshake should have succeeded!"
 
 
 kill ${PID}

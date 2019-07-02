@@ -23,10 +23,10 @@ deallocated when the  @code{res} structure is deinitialized.
 
 @var{flags}: must be zero
 
-This function sets a trust list in the gnutls_certificate_credentials_t type. 
+This function sets a trust list in the gnutls_certificate_credentials_t type.
 
-Note that the  @code{tlist} will become part of the credentials 
-structure and must not be deallocated. It will be automatically deallocated 
+Note that the  @code{tlist} will become part of the credentials
+structure and must not be deallocated. It will be automatically deallocated
 when the  @code{res} structure is deinitialized.
 
 @strong{Returns:} @code{GNUTLS_E_SUCCESS}  (0) on success, or a negative error code.
@@ -705,7 +705,7 @@ will be returned.
 
 @subheading gnutls_x509_crl_get_issuer_dn
 @anchor{gnutls_x509_crl_get_issuer_dn}
-@deftypefun {int} {gnutls_x509_crl_get_issuer_dn} (const gnutls_x509_crl_t @var{crl}, char * @var{buf}, size_t * @var{sizeof_buf})
+@deftypefun {int} {gnutls_x509_crl_get_issuer_dn} (gnutls_x509_crl_t @var{crl}, char * @var{buf}, size_t * @var{sizeof_buf})
 @var{crl}: should contain a gnutls_x509_crl_t type
 
 @var{buf}: a pointer to a structure to hold the peer's name (may be null)
@@ -876,8 +876,11 @@ negative error value.
 This function will return a value of the @code{gnutls_sign_algorithm_t} 
 enumeration that is the signature algorithm.
 
-@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
-negative error value.
+Since 3.6.0 this function never returns a negative error code.
+Error cases and unknown/unsupported signature algorithms are
+mapped to @code{GNUTLS_SIGN_UNKNOWN} .
+
+@strong{Returns:} a @code{gnutls_sign_algorithm_t}  value
 @end deftypefun
 
 @subheading gnutls_x509_crl_get_signature_oid
@@ -1171,6 +1174,24 @@ by gnutls should have a version number of 2.
 negative error value.
 @end deftypefun
 
+@subheading gnutls_x509_crl_sign
+@anchor{gnutls_x509_crl_sign}
+@deftypefun {int} {gnutls_x509_crl_sign} (gnutls_x509_crl_t @var{crl}, gnutls_x509_crt_t @var{issuer}, gnutls_x509_privkey_t @var{issuer_key})
+@var{crl}: should contain a gnutls_x509_crl_t type
+
+@var{issuer}: is the certificate of the certificate issuer
+
+@var{issuer_key}: holds the issuer's private key
+
+This function is the same a @code{gnutls_x509_crl_sign2()}  with no flags,
+and an appropriate hash algorithm. The hash algorithm used may
+vary between versions of GnuTLS, and it is tied to the security
+level of the issuer's public key.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun
+
 @subheading gnutls_x509_crl_sign2
 @anchor{gnutls_x509_crl_sign2}
 @deftypefun {int} {gnutls_x509_crl_sign2} (gnutls_x509_crl_t @var{crl}, gnutls_x509_crt_t @var{issuer}, gnutls_x509_privkey_t @var{issuer_key}, gnutls_digest_algorithm_t @var{dig}, unsigned int @var{flags})
@@ -1193,6 +1214,9 @@ the previously set parameters are now signed.
 A known limitation of this function is, that a newly-signed CRL will not
 be fully functional (e.g., for signature verification), until it
 is exported an re-imported.
+
+After GnuTLS 3.6.1 the value of  @code{dig} may be @code{GNUTLS_DIG_UNKNOWN} ,
+and in that case, a suitable but reasonable for the key algorithm will be selected.
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.
@@ -1826,8 +1850,11 @@ This function will return a value of the @code{gnutls_sign_algorithm_t}
 enumeration that is the signature algorithm that has been used to
 sign this certificate request.
 
-@strong{Returns:} a @code{gnutls_sign_algorithm_t}  value, or a negative error code on
-error.
+Since 3.6.0 this function never returns a negative error code.
+Error cases and unknown/unsupported signature algorithms are
+mapped to @code{GNUTLS_SIGN_UNKNOWN} .
+
+@strong{Returns:} a @code{gnutls_sign_algorithm_t}  value
 
 @strong{Since:} 3.4.0
 @end deftypefun
@@ -1849,6 +1876,21 @@ returned @code{GNUTLS_SIGN_UNKNOWN} .
 @strong{Returns:} zero or a negative error code on error.
 
 @strong{Since:} 3.5.0
+@end deftypefun
+
+@subheading gnutls_x509_crq_get_spki
+@anchor{gnutls_x509_crq_get_spki}
+@deftypefun {int} {gnutls_x509_crq_get_spki} (gnutls_x509_crq_t @var{crq}, gnutls_x509_spki_t @var{spki}, unsigned int @var{flags})
+@var{crq}: should contain a @code{gnutls_x509_crq_t}  type
+
+@var{spki}: a SubjectPublicKeyInfo structure of type @code{gnutls_x509_spki_t} 
+
+@var{flags}: must be zero
+
+This function will return the public key information of a PKCS@code{10} 
+certificate request. The provided  @code{spki} must be initialized.
+
+@strong{Returns:} Zero on success, or a negative error code on error.
 @end deftypefun
 
 @subheading gnutls_x509_crq_get_subject_alt_name
@@ -2216,6 +2258,29 @@ This function will set the private key usage period extension (2.5.29.16).
 negative error value.
 @end deftypefun
 
+@subheading gnutls_x509_crq_set_spki
+@anchor{gnutls_x509_crq_set_spki}
+@deftypefun {int} {gnutls_x509_crq_set_spki} (gnutls_x509_crq_t @var{crq}, const gnutls_x509_spki_t @var{spki}, unsigned int @var{flags})
+@var{crq}: a certificate request of type @code{gnutls_x509_crq_t} 
+
+@var{spki}: a SubjectPublicKeyInfo structure of type @code{gnutls_x509_spki_t} 
+
+@var{flags}: must be zero
+
+This function will set the certificate request's subject public key
+information explicitly. This is intended to be used in the cases
+where a single public key (e.g., RSA) can be used for multiple
+signature algorithms (RSA PKCS1-1.5, and RSA-PSS).
+
+To export the public key (i.e., the SubjectPublicKeyInfo part), check
+@code{gnutls_pubkey_import_x509()} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.6.0
+@end deftypefun
+
 @subheading gnutls_x509_crq_set_subject_alt_name
 @anchor{gnutls_x509_crq_set_subject_alt_name}
 @deftypefun {int} {gnutls_x509_crq_set_subject_alt_name} (gnutls_x509_crq_t @var{crq}, gnutls_x509_subject_alt_name_t @var{nt}, const void * @var{data}, unsigned int @var{data_size}, unsigned int @var{flags})
@@ -2296,6 +2361,26 @@ version 1 requests this must be one.
 negative error value.
 @end deftypefun
 
+@subheading gnutls_x509_crq_sign
+@anchor{gnutls_x509_crq_sign}
+@deftypefun {int} {gnutls_x509_crq_sign} (gnutls_x509_crq_t @var{crq}, gnutls_x509_privkey_t @var{key})
+@var{crq}: should contain a @code{gnutls_x509_crq_t}  type
+
+@var{key}: holds a private key
+
+This function is the same a @code{gnutls_x509_crq_sign2()}  with no flags,
+and an appropriate hash algorithm. The hash algorithm used may
+vary between versions of GnuTLS, and it is tied to the security
+level of the issuer's public key.
+
+A known limitation of this function is, that a newly-signed request will not
+be fully functional (e.g., for signature verification), until it
+is exported an re-imported.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun
+
 @subheading gnutls_x509_crq_sign2
 @anchor{gnutls_x509_crq_sign2}
 @deftypefun {int} {gnutls_x509_crq_sign2} (gnutls_x509_crq_t @var{crq}, gnutls_x509_privkey_t @var{key}, gnutls_digest_algorithm_t @var{dig}, unsigned int @var{flags})
@@ -2303,7 +2388,7 @@ negative error value.
 
 @var{key}: holds a private key
 
-@var{dig}: The message digest to use, i.e., @code{GNUTLS_DIG_SHA1} 
+@var{dig}: The message digest to use, i.e., @code{GNUTLS_DIG_SHA256} 
 
 @var{flags}: must be 0
 
@@ -2314,6 +2399,13 @@ signed.
 
 This must be the last step in a certificate request generation
 since all the previously set parameters are now signed.
+
+A known limitation of this function is, that a newly-signed request will not
+be fully functional (e.g., for signature verification), until it
+is exported an re-imported.
+
+After GnuTLS 3.6.1 the value of  @code{dig} may be @code{GNUTLS_DIG_UNKNOWN} ,
+and in that case, a suitable but reasonable for the key algorithm will be selected.
 
 @strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
 @code{GNUTLS_E_ASN1_VALUE_NOT_FOUND}  is returned if you didn't set all
@@ -2394,6 +2486,9 @@ When the flag @code{GNUTLS_VERIFY_DO_NOT_ALLOW_WILDCARDS}  is specified no
 wildcards are considered. Otherwise they are only considered if the
 domain name consists of three components or more, and the wildcard
 starts at the leftmost position.
+When the flag @code{GNUTLS_VERIFY_DO_NOT_ALLOW_IP_MATCHES}  is specified,
+the input will be treated as a DNS name, and matching of textual IP addresses
+against the IPAddress part of the alternative name will not be allowed.
 
 The function @code{gnutls_x509_crt_check_ip()}  is available for matching
 IP addresses.
@@ -2401,6 +2496,24 @@ IP addresses.
 @strong{Returns:} non-zero for a successful match, and zero on failure.
 
 @strong{Since:} 3.3.0
+@end deftypefun
+
+@subheading gnutls_x509_crt_check_ip
+@anchor{gnutls_x509_crt_check_ip}
+@deftypefun {unsigned} {gnutls_x509_crt_check_ip} (gnutls_x509_crt_t @var{cert}, const unsigned char * @var{ip}, unsigned int @var{ip_size}, unsigned int @var{flags})
+@var{cert}: should contain an gnutls_x509_crt_t type
+
+@var{ip}: A pointer to the raw IP address
+
+@var{ip_size}: the number of bytes in ip (4 or 16)
+
+@var{flags}: should be zero
+
+This function will check if the IP allowed IP addresses in 
+the certificate's subject alternative name match the provided
+IP address.
+
+@strong{Returns:} non-zero for a successful match, and zero on failure.
 @end deftypefun
 
 @subheading gnutls_x509_crt_check_issuer
@@ -2494,7 +2607,7 @@ This function will compare two X.509 certificate structures.
 
 @subheading gnutls_x509_crt_equals2
 @anchor{gnutls_x509_crt_equals2}
-@deftypefun {unsigned} {gnutls_x509_crt_equals2} (gnutls_x509_crt_t @var{cert1}, gnutls_datum_t * @var{der})
+@deftypefun {unsigned} {gnutls_x509_crt_equals2} (gnutls_x509_crt_t @var{cert1}, const gnutls_datum_t * @var{der})
 @var{cert1}: The first certificate
 
 @var{der}: A DER encoded certificate
@@ -2900,11 +3013,8 @@ are no data in the current index. On success 0 is returned.
 @deftypefun {time_t} {gnutls_x509_crt_get_expiration_time} (gnutls_x509_crt_t @var{cert})
 @var{cert}: should contain a @code{gnutls_x509_crt_t}  type
 
-This function will return the time this Certificate was or will be
+This function will return the time this certificate was or will be
 expired.
-
-The no well defined expiration time can be checked against with the
-@code{GNUTLS_X509_NO_WELL_DEFINED_EXPIRATION}  macro.
 
 @strong{Returns:} expiration time, or (time_t)-1 on error.
 @end deftypefun
@@ -3028,7 +3138,8 @@ be stored as a string in the provided buffer.  Use
 If the buffer provided is not long enough to hold the output, then
  @code{oid_size} is updated and @code{GNUTLS_E_SHORT_MEMORY_BUFFER}  will be
 returned. The  @code{oid} returned will be null terminated, although 
- @code{oid_size} will not account for the trailing null.
+ @code{oid_size} will not account for the trailing null (the latter is not
+true for GnuTLS prior to 3.6.0).
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned,
 otherwise a negative error code is returned.  If you have reached the
@@ -3079,6 +3190,29 @@ If the buffer is null then only the size will be filled.
 @strong{Returns:} @code{GNUTLS_E_SHORT_MEMORY_BUFFER}  if the provided buffer is
 not long enough, and in that case the *buf_size will be updated
 with the required size.  On success 0 is returned.
+@end deftypefun
+
+@subheading gnutls_x509_crt_get_inhibit_anypolicy
+@anchor{gnutls_x509_crt_get_inhibit_anypolicy}
+@deftypefun {int} {gnutls_x509_crt_get_inhibit_anypolicy} (gnutls_x509_crt_t @var{cert}, unsigned int * @var{skipcerts}, unsigned int * @var{critical})
+@var{cert}: should contain a @code{gnutls_x509_crt_t}  type
+
+@var{skipcerts}: will hold the number of certificates after which anypolicy is no longer acceptable.
+
+@var{critical}: will be non-zero if the extension is marked as critical
+
+This function will return certificate's value of the SkipCerts, i.e.,
+the Inhibit anyPolicy X.509 extension (2.5.29.54).
+
+The returned value is the number of additional certificates that
+may appear in the path before the anyPolicy is no longer acceptable.
+
+@strong{Returns:} zero on success, or a negative error code in case of
+parsing error.  If the certificate does not contain the Inhibit anyPolicy
+extension @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  will be
+returned.
+
+@strong{Since:} 3.6.0
 @end deftypefun
 
 @subheading gnutls_x509_crt_get_issuer
@@ -3429,7 +3563,7 @@ values of the: @code{GNUTLS_KEY_DIGITAL_SIGNATURE} ,
 @code{GNUTLS_KEY_KEY_CERT_SIGN} , @code{GNUTLS_KEY_CRL_SIGN} ,
 @code{GNUTLS_KEY_ENCIPHER_ONLY} , @code{GNUTLS_KEY_DECIPHER_ONLY} .
 
-@strong{Returns:} the certificate key usage, or a negative error code in case of
+@strong{Returns:} zero on success, or a negative error code in case of
 parsing error.  If the certificate does not contain the keyUsage
 extension @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  will be
 returned.
@@ -3515,17 +3649,44 @@ the given certificate.  The new parameters will be allocated using
 
 @var{curve}: will hold the curve
 
-@var{x}: will hold x
+@var{x}: will hold the x-coordinate
 
-@var{y}: will hold y
+@var{y}: will hold the y-coordinate
 
 This function will export the ECC public key's parameters found in
 the given certificate.  The new parameters will be allocated using
 @code{gnutls_malloc()}  and will be stored in the appropriate datum.
 
+In EdDSA curves the  @code{y} parameter will be @code{NULL}  and the other parameters
+will be in the native format for the curve.
+
 @strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
 
 @strong{Since:} 3.4.1
+@end deftypefun
+
+@subheading gnutls_x509_crt_get_pk_gost_raw
+@anchor{gnutls_x509_crt_get_pk_gost_raw}
+@deftypefun {int} {gnutls_x509_crt_get_pk_gost_raw} (gnutls_x509_crt_t @var{crt}, gnutls_ecc_curve_t * @var{curve}, gnutls_digest_algorithm_t * @var{digest}, gnutls_gost_paramset_t * @var{paramset}, gnutls_datum_t * @var{x}, gnutls_datum_t * @var{y})
+@var{crt}: Holds the certificate
+
+@var{curve}: will hold the curve
+
+@var{digest}: will hold the digest
+
+@var{paramset}: will hold the GOST parameter set ID
+
+@var{x}: will hold the x-coordinate
+
+@var{y}: will hold the y-coordinate
+
+This function will export the GOST public key's parameters found in
+the given certificate.  The new parameters will be allocated using
+@code{gnutls_malloc()}  and will be stored in the appropriate datum.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
+
+@strong{Since:} 3.6.3
 @end deftypefun
 
 @subheading gnutls_x509_crt_get_pk_oid
@@ -3699,10 +3860,11 @@ This function will return a value of the @code{gnutls_sign_algorithm_t}
 enumeration that is the signature algorithm that has been used to
 sign this certificate.
 
-Unknown/unsupported signature algorithms are mapped to @code{GNUTLS_SIGN_UNKNOWN} .
+Since 3.6.0 this function never returns a negative error code.
+Error cases and unknown/unsupported signature algorithms are
+mapped to @code{GNUTLS_SIGN_UNKNOWN} .
 
-@strong{Returns:} a @code{gnutls_sign_algorithm_t}  value, or a negative error code on
-error.
+@strong{Returns:} a @code{gnutls_sign_algorithm_t}  value
 @end deftypefun
 
 @subheading gnutls_x509_crt_get_signature_oid
@@ -3722,6 +3884,21 @@ returned @code{GNUTLS_SIGN_UNKNOWN} .
 @strong{Returns:} zero or a negative error code on error.
 
 @strong{Since:} 3.5.0
+@end deftypefun
+
+@subheading gnutls_x509_crt_get_spki
+@anchor{gnutls_x509_crt_get_spki}
+@deftypefun {int} {gnutls_x509_crt_get_spki} (gnutls_x509_crt_t @var{cert}, gnutls_x509_spki_t @var{spki}, unsigned int @var{flags})
+@var{cert}: a certificate of type @code{gnutls_x509_crt_t} 
+
+@var{spki}: a SubjectPublicKeyInfo structure of type @code{gnutls_x509_spki_t} 
+
+@var{flags}: must be zero
+
+This function will return the public key information of an X.509
+certificate. The provided  @code{spki} must be initialized.
+
+@strong{Since:} 3.6.0
 @end deftypefun
 
 @subheading gnutls_x509_crt_get_subject
@@ -4023,17 +4200,47 @@ CERTIFICATE", or "CERTIFICATE".
 
 This function will convert the given PEM encoded certificate list
 to the native gnutls_x509_crt_t format. The output will be stored
-in  @code{certs} which will allocated and initialized.
+in  @code{certs} which will be allocated and initialized.
 
 If the Certificate is PEM encoded it should have a header of "X509
 CERTIFICATE", or "CERTIFICATE".
 
 To deinitialize  @code{certs} , you need to deinitialize each crt structure
-independently, and use @code{gnutls_free()}  at
+independently, and use @code{gnutls_free()}  at  @code{certs} .
 
 @strong{Returns:} the number of certificates read or a negative error value.
 
 @strong{Since:} 3.0
+@end deftypefun
+
+@subheading gnutls_x509_crt_list_import_url
+@anchor{gnutls_x509_crt_list_import_url}
+@deftypefun {int} {gnutls_x509_crt_list_import_url} (gnutls_x509_crt_t ** @var{certs}, unsigned int * @var{size}, const char * @var{url}, gnutls_pin_callback_t @var{pin_fn}, void * @var{pin_fn_userdata}, unsigned int @var{flags})
+@var{certs}: Will hold the allocated certificate list.
+
+@var{size}: It will contain the size of the list.
+
+@var{url}: A PKCS 11 url
+
+@var{pin_fn}: a PIN callback if not globally set
+
+@var{pin_fn_userdata}: parameter for the PIN callback
+
+@var{flags}: One of GNUTLS_PKCS11_OBJ_* flags for PKCS@code{11}  URLs or zero otherwise
+
+This function will import a certificate chain present in a PKCS@code{11}  token
+or any type of back-end that supports URLs. The certificates
+must be deinitialized afterwards using @code{gnutls_x509_crt_deinit()} 
+and the returned pointer must be freed using @code{gnutls_free()} .
+
+The URI provided must be the first certificate in the chain; subsequent
+certificates will be retrieved using @code{gnutls_pkcs11_get_raw_issuer()}  or
+equivalent functionality for the supported URI.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.6.3
 @end deftypefun
 
 @subheading gnutls_x509_crt_list_verify
@@ -4102,7 +4309,7 @@ negative error value.
 
 @var{act_time}: The actual time
 
-This function will set the time this Certificate was or will be
+This function will set the time this certificate was or will be
 activated.
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
@@ -4331,8 +4538,8 @@ negative error value.
 @var{exp_time}: The actual time
 
 This function will set the time this Certificate will expire.
-Setting an expiration time to (time_t)-1 or to @code{GNUTLS_X509_NO_WELL_DEFINED_EXPIRATION} 
-will set to the no well-defined expiration date value. 
+Setting an expiration time to (time_t)-1 will set
+to the no well-defined expiration date value.
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.
@@ -4354,6 +4561,33 @@ negative error value.
 This function will set an the extension, by the specified OID, in
 the certificate.  The extension data should be binary data DER
 encoded.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun
+
+@subheading gnutls_x509_crt_set_flags
+@anchor{gnutls_x509_crt_set_flags}
+@deftypefun {void} {gnutls_x509_crt_set_flags} (gnutls_x509_crt_t @var{cert}, unsigned int @var{flags})
+@var{cert}: A type @code{gnutls_x509_crt_t} 
+
+@var{flags}: flags from the @code{gnutls_x509_crt_flags} 
+
+This function will set flags for the specified certificate.
+Currently this is useful for the @code{GNUTLS_X509_CRT_FLAG_IGNORE_SANITY} 
+which allows importing certificates even if they have known issues.
+
+@strong{Since:} 3.6.0
+@end deftypefun
+
+@subheading gnutls_x509_crt_set_inhibit_anypolicy
+@anchor{gnutls_x509_crt_set_inhibit_anypolicy}
+@deftypefun {int} {gnutls_x509_crt_set_inhibit_anypolicy} (gnutls_x509_crt_t @var{crt}, unsigned int @var{skipcerts})
+@var{crt}: a certificate of type @code{gnutls_x509_crt_t} 
+
+@var{skipcerts}: number of certificates after which anypolicy is no longer acceptable.
+
+This function will set the Inhibit anyPolicy certificate extension.
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.
@@ -4657,8 +4891,35 @@ accepts any kind of data as a serial number. To be consistent
 with the X.509/PKIX specifications the provided  @code{serial} should be 
 a big-endian positive number (i.e. it's leftmost bit should be zero).
 
+The size of the serial is restricted to 20 bytes maximum by RFC5280.
+This function allows writing more than 20 bytes but the generated
+certificates in that case may be rejected by other implementations.
+
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.
+@end deftypefun
+
+@subheading gnutls_x509_crt_set_spki
+@anchor{gnutls_x509_crt_set_spki}
+@deftypefun {int} {gnutls_x509_crt_set_spki} (gnutls_x509_crt_t @var{crt}, const gnutls_x509_spki_t @var{spki}, unsigned int @var{flags})
+@var{crt}: a certificate of type @code{gnutls_x509_crt_t} 
+
+@var{spki}: a SubjectPublicKeyInfo structure of type @code{gnutls_x509_spki_t} 
+
+@var{flags}: must be zero
+
+This function will set the certificate's subject public key
+information explicitly. This is intended to be used in the cases
+where a single public key (e.g., RSA) can be used for multiple
+signature algorithms (RSA PKCS1-1.5, and RSA-PSS).
+
+To export the public key (i.e., the SubjectPublicKeyInfo part), check
+@code{gnutls_pubkey_import_x509()} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.6.0
 @end deftypefun
 
 @subheading gnutls_x509_crt_set_subject_alt_name
@@ -4817,7 +5078,9 @@ negative error value.
 @var{issuer_key}: holds the issuer's private key
 
 This function is the same a @code{gnutls_x509_crt_sign2()}  with no flags,
-and SHA1 as the hash algorithm.
+and an appropriate hash algorithm. The hash algorithm used may
+vary between versions of GnuTLS, and it is tied to the security
+level of the issuer's public key.
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.
@@ -4845,6 +5108,9 @@ the previously set parameters are now signed.
 A known limitation of this function is, that a newly-signed certificate will not
 be fully functional (e.g., for signature verification), until it
 is exported an re-imported.
+
+After GnuTLS 3.6.1 the value of  @code{dig} may be @code{GNUTLS_DIG_UNKNOWN} ,
+and in that case, a suitable but reasonable for the key algorithm will be selected.
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.
@@ -5200,6 +5466,23 @@ The  @code{ext} data will be allocated using @code{gnutls_malloc()} .
 @strong{Since:} 3.3.0
 @end deftypefun
 
+@subheading gnutls_x509_ext_export_inhibit_anypolicy
+@anchor{gnutls_x509_ext_export_inhibit_anypolicy}
+@deftypefun {int} {gnutls_x509_ext_export_inhibit_anypolicy} (unsigned int @var{skipcerts}, gnutls_datum_t * @var{ext})
+@var{skipcerts}: number of certificates after which anypolicy is no longer acceptable.
+
+@var{ext}: The DER-encoded extension data; must be freed using @code{gnutls_free()} .
+
+This function will convert the  @code{skipcerts} value to a DER
+encoded Inhibit AnyPolicy PKIX extension. The  @code{ext} data will be allocated using
+@code{gnutls_malloc()} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.6.0
+@end deftypefun
+
 @subheading gnutls_x509_ext_export_key_purposes
 @anchor{gnutls_x509_ext_export_key_purposes}
 @deftypefun {int} {gnutls_x509_ext_export_key_purposes} (gnutls_x509_key_purposes_t @var{p}, gnutls_datum_t * @var{ext})
@@ -5209,7 +5492,7 @@ The  @code{ext} data will be allocated using @code{gnutls_malloc()} .
 
 This function will convert the key purposes type to a
 DER-encoded PKIX ExtKeyUsageSyntax (2.5.29.37) extension. The output data in 
- @code{ext} will be allocated usin @code{gnutls_malloc()} .
+ @code{ext} will be allocated using @code{gnutls_malloc()} .
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a negative error value.
 
@@ -5242,7 +5525,7 @@ negative error value.
 
 This function will convert the provided name constraints type to a
 DER-encoded PKIX NameConstraints (2.5.29.30) extension. The output data in 
- @code{ext} will be allocated usin @code{gnutls_malloc()} .
+ @code{ext} will be allocated using @code{gnutls_malloc()} .
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a negative error value.
 
@@ -5429,6 +5712,28 @@ and store it into the provided type.
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a negative error value.
 
 @strong{Since:} 3.3.0
+@end deftypefun
+
+@subheading gnutls_x509_ext_import_inhibit_anypolicy
+@anchor{gnutls_x509_ext_import_inhibit_anypolicy}
+@deftypefun {int} {gnutls_x509_ext_import_inhibit_anypolicy} (const gnutls_datum_t * @var{ext}, unsigned int * @var{skipcerts})
+@var{ext}: the DER encoded extension data
+
+@var{skipcerts}: will hold the number of certificates after which anypolicy is no longer acceptable.
+
+This function will return certificate's value of SkipCerts,
+by reading the DER data of the Inhibit anyPolicy X.509 extension (2.5.29.54).
+
+The  @code{skipcerts} value is the number of additional certificates that
+may appear in the path before the anyPolicy (@code{GNUTLS_X509_OID_POLICY_ANY} )
+is no longer acceptable.
+
+@strong{Returns:} zero, or a negative error code in case of
+parsing error.  If the certificate does not contain the Inhibit anyPolicy
+extension @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  will be
+returned.
+
+@strong{Since:} 3.6.0
 @end deftypefun
 
 @subheading gnutls_x509_ext_import_key_purposes
@@ -5889,6 +6194,8 @@ This function will return a specific policy as stored in
 the  @code{policies} type. The returned values should be treated as constant
 and valid for the lifetime of  @code{policies} .
 
+The any policy OID is available as the @code{GNUTLS_X509_OID_POLICY_ANY}  macro.
+
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE} 
 if the index is out of bounds, otherwise a negative error value.
 
@@ -5967,16 +6274,15 @@ This function will deinitialize a private key structure.
 @var{output_data_size}: holds the size of output_data (and will be
 replaced by the actual size of parameters)
 
-This function will export the private key to a PKCS1 structure for
-RSA keys, or an integer sequence for DSA keys.  The DSA keys are in
-the same format with the parameters used by openssl.
-
-If the buffer provided is not long enough to hold the output, then
-* @code{output_data_size} is updated and @code{GNUTLS_E_SHORT_MEMORY_BUFFER} 
-will be returned.
+This function will export the private key to a PKCS@code{1}  structure for
+RSA or RSA-PSS keys, and integer sequence for DSA keys. Other keys types
+will be exported in PKCS@code{8}  form.
 
 If the structure is PEM encoded, it will have a header
 of "BEGIN RSA PRIVATE KEY".
+
+It is recommended to use @code{gnutls_x509_privkey_export_pkcs8()}  instead
+of this function, when a consistent output format is required.
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.
@@ -5991,14 +6297,14 @@ negative error value.
 
 @var{out}: will contain a private key PEM or DER encoded
 
-This function will export the private key to a PKCS1 structure for
-RSA keys, or an integer sequence for DSA keys.  The DSA keys are in
-the same format with the parameters used by openssl.
+This function will export the private key to a PKCS@code{1}  structure for
+RSA or RSA-PSS keys, and integer sequence for DSA keys. Other keys types
+will be exported in PKCS@code{8}  form.
 
 The output buffer is allocated using @code{gnutls_malloc()} .
 
-If the structure is PEM encoded, it will have a header
-of "BEGIN RSA PRIVATE KEY".
+It is recommended to use @code{gnutls_x509_privkey_export2_pkcs8()}  instead
+of this function, when a consistent output format is required.
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.
@@ -6069,9 +6375,9 @@ negative error value.
 
 @var{curve}: will hold the curve
 
-@var{x}: will hold the x coordinate
+@var{x}: will hold the x-coordinate
 
-@var{y}: will hold the y coordinate
+@var{y}: will hold the y-coordinate
 
 @var{k}: will hold the private key
 
@@ -6079,10 +6385,43 @@ This function will export the ECC private key's parameters found
 in the given structure. The new parameters will be allocated using
 @code{gnutls_malloc()}  and will be stored in the appropriate datum.
 
+In EdDSA curves the  @code{y} parameter will be @code{NULL}  and the other parameters
+will be in the native format for the curve.
+
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.
 
 @strong{Since:} 3.0
+@end deftypefun
+
+@subheading gnutls_x509_privkey_export_gost_raw
+@anchor{gnutls_x509_privkey_export_gost_raw}
+@deftypefun {int} {gnutls_x509_privkey_export_gost_raw} (gnutls_x509_privkey_t @var{key}, gnutls_ecc_curve_t * @var{curve}, gnutls_digest_algorithm_t * @var{digest}, gnutls_gost_paramset_t * @var{paramset}, gnutls_datum_t * @var{x}, gnutls_datum_t * @var{y}, gnutls_datum_t * @var{k})
+@var{key}: a key
+
+@var{curve}: will hold the curve
+
+@var{digest}: will hold the digest
+
+@var{paramset}: will hold the GOST parameter set ID
+
+@var{x}: will hold the x-coordinate
+
+@var{y}: will hold the y-coordinate
+
+@var{k}: will hold the private key
+
+This function will export the GOST private key's parameters found
+in the given structure. The new parameters will be allocated using
+@code{gnutls_malloc()}  and will be stored in the appropriate datum.
+
+@strong{Note:} parameters will be stored with least significant byte first. On
+version 3.6.3 this was incorrectly returned in big-endian format.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.6.3
 @end deftypefun
 
 @subheading gnutls_x509_privkey_export_pkcs8
@@ -6201,9 +6540,13 @@ negative error value.
 @var{flags}: Must be zero or flags from @code{gnutls_privkey_flags_t} .
 
 This function will generate a random private key. Note that this
-function must be called on an empty private key. The flag @code{GNUTLS_PRIVKEY_FLAG_PROVABLE} 
+function must be called on an initialized private key.
+
+The flag @code{GNUTLS_PRIVKEY_FLAG_PROVABLE} 
 instructs the key generation process to use algorithms like Shawe-Taylor
-which generate provable parameters out of a seed.
+(from FIPS PUB186-4) which generate provable parameters out of a seed
+for RSA and DSA keys. See @code{gnutls_x509_privkey_generate2()}  for more
+information.
 
 Note that when generating an elliptic curve key, the curve
 can be substituted in the place of the bits parameter using the
@@ -6214,6 +6557,8 @@ For DSA keys, if the subgroup size needs to be specified check
 the @code{GNUTLS_SUBGROUP_TO_BITS()}  macro.
 
 It is recommended to do not set the number of  @code{bits} directly, use @code{gnutls_sec_param_to_pk_bits()}  instead .
+
+See also @code{gnutls_privkey_generate()} , @code{gnutls_x509_privkey_generate2()} .
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.
@@ -6235,18 +6580,32 @@ negative error value.
 @var{data_size}: The number of  @code{data} available.
 
 This function will generate a random private key. Note that this
-function must be called on an empty private key. The flag @code{GNUTLS_PRIVKEY_FLAG_PROVABLE} 
-instructs the key generation process to use algorithms which generate
-provable parameters out of a seed.
+function must be called on an initialized private key.
+
+The flag @code{GNUTLS_PRIVKEY_FLAG_PROVABLE} 
+instructs the key generation process to use algorithms like Shawe-Taylor
+(from FIPS PUB186-4) which generate provable parameters out of a seed
+for RSA and DSA keys. On DSA keys the PQG parameters are generated using the
+seed, while on RSA the two primes. To specify an explicit seed
+(by default a random seed is used), use the  @code{data} with a @code{GNUTLS_KEYGEN_SEED} 
+type.
 
 Note that when generating an elliptic curve key, the curve
 can be substituted in the place of the bits parameter using the
 @code{GNUTLS_CURVE_TO_BITS()}  macro.
 
-For DSA keys, if the subgroup size needs to be specified check
-the @code{GNUTLS_SUBGROUP_TO_BITS()}  macro.
+To export the generated keys in memory or in files it is recommended to use the
+PKCS@code{8}  form as it can handle all key types, and can store additional parameters
+such as the seed, in case of provable RSA or DSA keys.
+Generated keys can be exported in memory using @code{gnutls_privkey_export_x509()} ,
+and then with @code{gnutls_x509_privkey_export2_pkcs8()} .
 
-Do not set the number of bits directly, use @code{gnutls_sec_param_to_pk_bits()} .
+If key generation is part of your application, avoid setting the number
+of bits directly, and instead use @code{gnutls_sec_param_to_pk_bits()} .
+That way the generated keys will adapt to the security levels
+of the underlying GnuTLS library.
+
+See also @code{gnutls_privkey_generate2()} .
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.
@@ -6322,6 +6681,21 @@ as a provable key.
 negative error value.
 
 @strong{Since:} 3.5.0
+@end deftypefun
+
+@subheading gnutls_x509_privkey_get_spki
+@anchor{gnutls_x509_privkey_get_spki}
+@deftypefun {int} {gnutls_x509_privkey_get_spki} (gnutls_x509_privkey_t @var{key}, gnutls_x509_spki_t @var{spki}, unsigned int @var{flags})
+@var{key}: should contain a @code{gnutls_x509_privkey_t}  type
+
+@var{spki}: a SubjectPublicKeyInfo structure of type @code{gnutls_x509_spki_t} 
+
+@var{flags}: must be zero
+
+This function will return the public key information of a private
+key. The provided  @code{spki} must be initialized.
+
+@strong{Returns:} Zero on success, or a negative error code on error.
 @end deftypefun
 
 @subheading gnutls_x509_privkey_import
@@ -6403,20 +6777,54 @@ negative error value.
 
 @var{curve}: holds the curve
 
-@var{x}: holds the x
+@var{x}: holds the x-coordinate
 
-@var{y}: holds the y
+@var{y}: holds the y-coordinate
 
 @var{k}: holds the k
 
 This function will convert the given elliptic curve parameters to the
 native @code{gnutls_x509_privkey_t}  format.  The output will be stored
-in  @code{key} .
+in  @code{key} . For EdDSA keys, the  @code{x} and  @code{k} values must be in the
+native to curve format.
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.
 
 @strong{Since:} 3.0
+@end deftypefun
+
+@subheading gnutls_x509_privkey_import_gost_raw
+@anchor{gnutls_x509_privkey_import_gost_raw}
+@deftypefun {int} {gnutls_x509_privkey_import_gost_raw} (gnutls_x509_privkey_t @var{key}, gnutls_ecc_curve_t @var{curve}, gnutls_digest_algorithm_t @var{digest}, gnutls_gost_paramset_t @var{paramset}, const gnutls_datum_t * @var{x}, const gnutls_datum_t * @var{y}, const gnutls_datum_t * @var{k})
+@var{key}: The data to store the parsed key
+
+@var{curve}: holds the curve
+
+@var{digest}: will hold the digest
+
+@var{paramset}: will hold the GOST parameter set ID
+
+@var{x}: holds the x-coordinate
+
+@var{y}: holds the y-coordinate
+
+@var{k}: holds the k (private key)
+
+This function will convert the given GOST private key's parameters to the
+native @code{gnutls_x509_privkey_t}  format.  The output will be stored
+in  @code{key} .   @code{digest} should be one of GNUTLS_DIG_GOSR_94,
+GNUTLS_DIG_STREEBOG_256 or GNUTLS_DIG_STREEBOG_512.  If  @code{paramset} is set to
+GNUTLS_GOST_PARAMSET_UNKNOWN default one will be selected depending on
+ @code{digest} .
+
+@strong{Note:} parameters should be stored with least significant byte first. On
+version 3.6.3 big-endian format was used incorrectly.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.6.3
 @end deftypefun
 
 @subheading gnutls_x509_privkey_import_openssl
@@ -6587,6 +6995,21 @@ Note that this callback is used when decrypting a key.
 @strong{Since:} 3.4.0
 @end deftypefun
 
+@subheading gnutls_x509_privkey_set_spki
+@anchor{gnutls_x509_privkey_set_spki}
+@deftypefun {int} {gnutls_x509_privkey_set_spki} (gnutls_x509_privkey_t @var{key}, const gnutls_x509_spki_t @var{spki}, unsigned int @var{flags})
+@var{key}: should contain a @code{gnutls_x509_privkey_t}  type
+
+@var{spki}: a SubjectPublicKeyInfo structure of type @code{gnutls_x509_spki_t} 
+
+@var{flags}: must be zero
+
+This function will return the public key information of a private
+key. The provided  @code{spki} must be initialized.
+
+@strong{Returns:} Zero on success, or a negative error code on error.
+@end deftypefun
+
 @subheading gnutls_x509_privkey_sign_data
 @anchor{gnutls_x509_privkey_sign_data}
 @deftypefun {int} {gnutls_x509_privkey_sign_data} (gnutls_x509_privkey_t @var{key}, gnutls_digest_algorithm_t @var{digest}, unsigned int @var{flags}, const gnutls_datum_t * @var{data}, void * @var{signature}, size_t * @var{signature_size})
@@ -6744,6 +7167,64 @@ negative error value.
 @strong{Since:} 2.4.0
 @end deftypefun
 
+@subheading gnutls_x509_spki_deinit
+@anchor{gnutls_x509_spki_deinit}
+@deftypefun {void} {gnutls_x509_spki_deinit} (gnutls_x509_spki_t @var{spki})
+@var{spki}: the SubjectPublicKeyInfo structure
+
+This function will deinitialize a SubjectPublicKeyInfo structure.
+
+@strong{Since:} 3.6.0
+@end deftypefun
+
+@subheading gnutls_x509_spki_get_rsa_pss_params
+@anchor{gnutls_x509_spki_get_rsa_pss_params}
+@deftypefun {int} {gnutls_x509_spki_get_rsa_pss_params} (gnutls_x509_spki_t @var{spki}, gnutls_digest_algorithm_t * @var{dig}, unsigned int * @var{salt_size})
+@var{spki}: the SubjectPublicKeyInfo structure
+
+@var{dig}: if non-NULL, it will hold the digest algorithm
+
+@var{salt_size}: if non-NULL, it will hold the salt size
+
+This function will get the public key algorithm parameters
+of RSA-PSS type.
+
+@strong{Returns:} zero if the parameters are present or a negative
+value on error.
+
+@strong{Since:} 3.6.0
+@end deftypefun
+
+@subheading gnutls_x509_spki_init
+@anchor{gnutls_x509_spki_init}
+@deftypefun {int} {gnutls_x509_spki_init} (gnutls_x509_spki_t * @var{spki})
+@var{spki}: A pointer to the type to be initialized
+
+This function will initialize a SubjectPublicKeyInfo structure used
+in PKIX. The structure is used to set additional parameters
+in the public key information field of a certificate.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.6.0
+@end deftypefun
+
+@subheading gnutls_x509_spki_set_rsa_pss_params
+@anchor{gnutls_x509_spki_set_rsa_pss_params}
+@deftypefun {void} {gnutls_x509_spki_set_rsa_pss_params} (gnutls_x509_spki_t @var{spki}, gnutls_digest_algorithm_t @var{dig}, unsigned int @var{salt_size})
+@var{spki}: the SubjectPublicKeyInfo structure
+
+@var{dig}: a digest algorithm of type @code{gnutls_digest_algorithm_t} 
+
+@var{salt_size}: the size of salt string
+
+This function will set the public key parameters for
+an RSA-PSS algorithm, in the SubjectPublicKeyInfo structure.
+
+@strong{Since:} 3.6.0
+@end deftypefun
+
 @subheading gnutls_x509_tlsfeatures_add
 @anchor{gnutls_x509_tlsfeatures_add}
 @deftypefun {int} {gnutls_x509_tlsfeatures_add} (gnutls_x509_tlsfeatures_t @var{f}, unsigned int @var{feature})
@@ -6829,14 +7310,23 @@ otherwise a negative error value.
 @var{flags}: flags from @code{gnutls_trust_list_flags_t} 
 
 This function will add the given certificate authorities
-to the trusted list. The list of CAs must not be deinitialized
-during this structure's lifetime.
+to the trusted list. The CAs in  @code{clist} must not be deinitialized
+during the lifetime of  @code{list} .
 
 If the flag @code{GNUTLS_TL_NO_DUPLICATES}  is specified, then
-the provided  @code{clist} entries that are duplicates will not be
-added to the list and will be deinitialized.
+this function will ensure that no duplicates will be
+present in the final trust list.
 
-@strong{Returns:} The number of added elements is returned.
+If the flag @code{GNUTLS_TL_NO_DUPLICATE_KEY}  is specified, then
+this function will ensure that no certificates with the
+same key are present in the final trust list.
+
+If either @code{GNUTLS_TL_NO_DUPLICATE_KEY}  or @code{GNUTLS_TL_NO_DUPLICATES} 
+are given, @code{gnutls_x509_trust_list_deinit()}  must be called with parameter
+ @code{all} being 1.
+
+@strong{Returns:} The number of added elements is returned; that includes
+duplicate entries.
 
 @strong{Since:} 3.0.0
 @end deftypefun
@@ -6855,18 +7345,21 @@ added to the list and will be deinitialized.
 @var{verification_flags}: gnutls_certificate_verify_flags if flags specifies GNUTLS_TL_VERIFY_CRL
 
 This function will add the given certificate revocation lists
-to the trusted list. The list of CRLs must not be deinitialized
-during this structure's lifetime.
+to the trusted list. The CRLs in  @code{crl_list} must not be deinitialized
+during the lifetime of  @code{list} .
 
 This function must be called after @code{gnutls_x509_trust_list_add_cas()} 
 to allow verifying the CRLs for validity. If the flag @code{GNUTLS_TL_NO_DUPLICATES} 
-is given, then any provided CRLs that are a duplicate, will be deinitialized
-and not added to the list (that assumes that @code{gnutls_x509_trust_list_deinit()} 
-will be called with all=1).
+is given, then the final CRL list will not contain duplicate entries.
 
-If GNUTLS_TL_VERIFY_CRL is given the CRLs will be verified before being added.
+If the flag @code{GNUTLS_TL_NO_DUPLICATES}  is given, @code{gnutls_x509_trust_list_deinit()}  must be
+called with parameter  @code{all} being 1.
 
-@strong{Returns:} The number of added elements is returned.
+If flag @code{GNUTLS_TL_VERIFY_CRL}  is given the CRLs will be verified before being added,
+and if verification fails, they will be skipped.
+
+@strong{Returns:} The number of added elements is returned; that includes
+duplicate entries.
 
 @strong{Since:} 3.0
 @end deftypefun
@@ -6895,8 +7388,8 @@ In principle this function can be used to set individual "server"
 certificates that are trusted by the user for that specific server
 but for no other purposes.
 
-The certificate must not be deinitialized during the lifetime
-of the trusted list.
+The certificate  @code{cert} must not be deinitialized during the lifetime
+of the  @code{list} .
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.
@@ -6992,6 +7485,9 @@ trust databases can be set; they cannot be stacked with multiple calls.
 
 This function will add the given certificate authorities
 to the trusted list. 
+
+If this function is used @code{gnutls_x509_trust_list_deinit()}  must be called
+with parameter  @code{all} being 1.
 
 @strong{Returns:} The number of added elements is returned.
 
@@ -7121,7 +7617,10 @@ deallocated with @code{gnutls_x509_crt_deinit()} .
 When past the last element is accessed @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE} 
 is returned and the iterator is reset.
 
-After use, the iterator must be deinitialized usin
+The iterator is deinitialized and reset to @code{NULL}  automatically by this
+function after iterating through all elements until
+@code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  is returned. If the iteration is
+aborted early, it must be manually deinitialized using
 @code{gnutls_x509_trust_list_iter_deinit()} .
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
@@ -7255,7 +7754,7 @@ ORing the result of @code{GNUTLS_PROFILE_TO_VFLAGS()}  to the verification
 flags.
 
 Additional verification parameters are possible via the  @code{data} types; the
-acceptable types are @code{GNUTLS_DT_DNS_HOSTNAME}  and @code{GNUTLS_DT_KEY_PURPOSE_OID} .
+acceptable types are @code{GNUTLS_DT_DNS_HOSTNAME} , @code{GNUTLS_DT_IP_ADDRESS}  and @code{GNUTLS_DT_KEY_PURPOSE_OID} .
 The former accepts as data a null-terminated hostname, and the latter a null-terminated
 object identifier (e.g., @code{GNUTLS_KP_TLS_WWW_SERVER} ).
 If a DNS hostname is provided then this function will compare

@@ -1,0 +1,18 @@
+
+
+
+
+@deftypefun {int} {gnutls_ocsp_resp_export2} (gnutls_ocsp_resp_t @var{resp}, gnutls_datum_t * @var{data}, gnutls_x509_crt_fmt_t @var{fmt})
+@var{resp}: Holds the OCSP response
+
+@var{data}: newly allocate buffer holding DER or PEM encoded OCSP response
+
+@var{fmt}: DER or PEM
+
+This function will export the OCSP response to DER or PEM format.
+
+@strong{Returns:} In case of failure a negative error code will be
+returned, and 0 on success.
+
+@strong{Since:} 3.6.3
+@end deftypefun

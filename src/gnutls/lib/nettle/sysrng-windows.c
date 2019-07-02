@@ -18,7 +18,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -47,6 +47,8 @@
 
 #include <windows.h>
 #include <wincrypt.h>
+
+get_entropy_func _rnd_get_system_entropy = NULL;
 
 static HCRYPTPROV device_fd = 0;
 

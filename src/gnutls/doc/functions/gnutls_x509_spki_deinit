@@ -1,0 +1,11 @@
+
+
+
+
+@deftypefun {void} {gnutls_x509_spki_deinit} (gnutls_x509_spki_t @var{spki})
+@var{spki}: the SubjectPublicKeyInfo structure
+
+This function will deinitialize a SubjectPublicKeyInfo structure.
+
+@strong{Since:} 3.6.0
+@end deftypefun

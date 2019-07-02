@@ -16,7 +16,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -26,7 +26,7 @@
 #include "gnutls_int.h"
 #include "errors.h"
 #include "num.h"
-#include <extensions.h>
+#include <hello_ext.h>
 #include <ext/etm.h>
 
 static int _gnutls_ext_etm_recv_params(gnutls_session_t session,
@@ -35,16 +35,19 @@ static int _gnutls_ext_etm_recv_params(gnutls_session_t session,
 static int _gnutls_ext_etm_send_params(gnutls_session_t session,
 					  gnutls_buffer_st * extdata);
 
-const extension_entry_st ext_mod_etm = {
+const hello_ext_entry_st ext_mod_etm = {
 	.name = "Encrypt-then-MAC",
-	.type = GNUTLS_EXTENSION_ETM,
+	.tls_id = 22,
+	.gid = GNUTLS_EXTENSION_ETM,
 	.parse_type = GNUTLS_EXT_MANDATORY,
-
+	.validity = GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_DTLS | GNUTLS_EXT_FLAG_CLIENT_HELLO |
+		    GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
 	.recv_func = _gnutls_ext_etm_recv_params,
 	.send_func = _gnutls_ext_etm_send_params,
 	.pack_func = NULL,
 	.unpack_func = NULL,
-	.deinit_func = NULL
+	.deinit_func = NULL,
+	.cannot_be_overriden = 1
 };
 
 /* 
@@ -63,26 +66,29 @@ _gnutls_ext_etm_recv_params(gnutls_session_t session,
 	}
 
 	if (session->security_parameters.entity == GNUTLS_SERVER) {
-		extension_priv_data_t epriv;
+		gnutls_ext_priv_data_t epriv;
 
-		if (session->internals.priorities.no_etm != 0)
+		if (session->internals.no_etm != 0)
 			return 0;
 
 		epriv = (void*)(intptr_t)1;
-		_gnutls_ext_set_session_data(session,
+		_gnutls_hello_ext_set_priv(session,
 						   GNUTLS_EXTENSION_ETM,
 						   epriv);
 
 		/* don't decide now, decide on send */
 		return 0;
 	} else { /* client */
-		const cipher_entry_st *c;
+		const gnutls_cipher_suite_entry_st *e = 
+			session->security_parameters.cs;
+		if (e != NULL) {
+			const cipher_entry_st *c;
+			c = cipher_to_entry(e->block_algorithm);
+			if (c == NULL || (c->type == CIPHER_AEAD || c->type == CIPHER_STREAM))
+				return 0;
 
-		c = _gnutls_cipher_suite_get_cipher_algo(session->security_parameters.cipher_suite);
-		if (c == NULL || (c->type == CIPHER_AEAD || c->type == CIPHER_STREAM))
-			return 0;
-
-		session->security_parameters.etm = 1;
+			session->security_parameters.etm = 1;
+		}
 	}
 
 	return 0;
@@ -94,32 +100,36 @@ static int
 _gnutls_ext_etm_send_params(gnutls_session_t session,
 			       gnutls_buffer_st * extdata)
 {
-	if (session->internals.priorities.no_etm != 0)
+	if (session->internals.no_etm != 0)
 		return 0;
 
 	/* this function sends the client extension data */
 	if (session->security_parameters.entity == GNUTLS_CLIENT) {
-		if (session->internals.priorities.have_cbc != 0)
+		if (session->internals.priorities->have_cbc != 0)
 			return GNUTLS_E_INT_RET_0;
 		else
 			return 0;
 	} else { /* server side */
+		const gnutls_cipher_suite_entry_st *e;
 		const cipher_entry_st *c;
 		int ret;
-		extension_priv_data_t epriv;
+		gnutls_ext_priv_data_t epriv;
 
-		c = _gnutls_cipher_suite_get_cipher_algo(session->security_parameters.cipher_suite);
-		if (c == NULL || (c->type == CIPHER_AEAD || c->type == CIPHER_STREAM))
-			return 0;
+		e = session->security_parameters.cs;
+		if (e != NULL) {
+			c = cipher_to_entry(e->block_algorithm);
+			if (c == NULL || (c->type == CIPHER_AEAD || c->type == CIPHER_STREAM))
+				return 0;
 
-		ret = _gnutls_ext_get_session_data(session,
-						   GNUTLS_EXTENSION_ETM,
-						   &epriv);
-		if (ret < 0 || ((intptr_t)epriv) == 0)
-			return 0;
+			ret = _gnutls_hello_ext_get_priv(session,
+							   GNUTLS_EXTENSION_ETM,
+							   &epriv);
+			if (ret < 0 || ((intptr_t)epriv) == 0)
+				return 0;
 
-		session->security_parameters.etm = 1;
-		return GNUTLS_E_INT_RET_0;
+			session->security_parameters.etm = 1;
+			return GNUTLS_E_INT_RET_0;
+		}
 	}
 
 	return 0;

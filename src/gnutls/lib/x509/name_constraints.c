@@ -17,7 +17,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -242,7 +242,7 @@ static name_constraints_node_st* name_constraints_node_new(unsigned type,
  * @_nc_excluded: Corresponding excluded name constraints list
  *
  * This function finds the intersection of @_nc and @_nc2. The result is placed in @_nc,
- * the original @_nc is deallocated. @_nc2 is not chenged. If necessary, a universal
+ * the original @_nc is deallocated. @_nc2 is not changed. If necessary, a universal
  * excluded name constraint node of the right type is added to the list provided
  * in @_nc_excluded.
  *
@@ -774,10 +774,11 @@ name_constraints_intersect_nodes(name_constraints_node_st * nc1,
 {
 	// presume empty intersection
 	name_constraints_node_st *intersection = NULL;
-	*_intersection = NULL;
 	name_constraints_node_st *to_copy = NULL;
 	unsigned iplength = 0;
 	unsigned byte;
+
+	*_intersection = NULL;
 
 	if (nc1->type != nc2->type) {
 		return GNUTLS_E_SUCCESS;
@@ -812,12 +813,16 @@ name_constraints_intersect_nodes(name_constraints_node_st * nc1,
 		// for other types, we don't know how to do the intersection, assume empty
 		return GNUTLS_E_SUCCESS;
 	}
+
 	// copy existing node if applicable
 	if (to_copy != NULL) {
 		*_intersection = name_constraints_node_new(to_copy->type, to_copy->name.data, to_copy->name.size);
 		if (*_intersection == NULL)
 			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 		intersection = *_intersection;
+
+		assert(intersection->name.data != NULL);
+
 		if (intersection->type == GNUTLS_SAN_IPADDRESS) {
 			// make sure both IP addresses are correctly masked
 			_gnutls_mask_ip(intersection->name.data, intersection->name.data+iplength, iplength);
@@ -828,9 +833,13 @@ name_constraints_intersect_nodes(name_constraints_node_st * nc1,
 			}
 		}
 	}
+
 	return GNUTLS_E_SUCCESS;
 }
 
+/*
+ * Returns: true if the certification is acceptable, and false otherwise.
+ */
 static
 unsigned check_unsupported_constraint(gnutls_x509_name_constraints_t nc,
 									  gnutls_x509_subject_alt_name_t type)
@@ -1048,10 +1057,13 @@ unsigned gnutls_x509_name_constraints_check(gnutls_x509_name_constraints_t nc,
 /* This function checks for unsupported constraints, that we also
  * know their structure. That is it will fail only if the constraint
  * is present in the CA, _and_ the name in the end certificate contains
- * the constrained element. */
-static int check_unsupported_constraint2(gnutls_x509_crt_t cert, 
-					 gnutls_x509_name_constraints_t nc,
-					 gnutls_x509_subject_alt_name_t type)
+ * the constrained element.
+ *
+ * Returns: true if the certification is acceptable, and false otherwise
+ */
+static unsigned check_unsupported_constraint2(gnutls_x509_crt_t cert, 
+					      gnutls_x509_name_constraints_t nc,
+					      gnutls_x509_subject_alt_name_t type)
 {
 	unsigned idx, found_one;
 	char name[MAX_CN];

@@ -17,7 +17,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -34,8 +34,10 @@
 #include "extras/hex.h"
 #include <common.h>
 
+time_t _gnutls_utcTime2gtime(const char *ttime);
+
 /* TIME functions 
- * Convertions between generalized or UTC time to time_t
+ * Conversions between generalized or UTC time to time_t
  *
  */
 
@@ -69,7 +71,7 @@ static const int MONTHDAYS[] = {
 /*
  **  Given a struct tm representing a calendar time in UTC, convert it to
  **  seconds since epoch.  Returns (time_t) -1 if the time is not
- **  convertable.  Note that this function does not canonicalize the provided
+ **  convertible.  Note that this function does not canonicalize the provided
  **  struct tm, nor does it allow out of range values or years before 1970.
  */
 static time_t mktime_utc(const struct fake_tm *tm)
@@ -83,6 +85,10 @@ static time_t mktime_utc(const struct fake_tm *tm)
  * or other algorithm problems. 
  */
 	if (tm->tm_mon < 0 || tm->tm_mon > 11 || tm->tm_year < 1970)
+		return (time_t) - 1;
+
+	/* Check for "obvious" mistakes in dates */
+	if (tm->tm_sec > 60 || tm->tm_min > 59 || tm->tm_mday > 31 || tm->tm_mday < 1 || tm->tm_hour > 23)
 		return (time_t) - 1;
 
 /* Convert to a time_t. 
@@ -167,7 +173,7 @@ static time_t time2gtime(const char *ttime, int year)
  *
  * (seconds are optional)
  */
-static time_t utcTime2gtime(const char *ttime)
+time_t _gnutls_utcTime2gtime(const char *ttime)
 {
 	char xx[3];
 	int year;
@@ -207,8 +213,13 @@ time_t _gnutls_x509_generalTime2gtime(const char *ttime)
 
 	if (strchr(ttime, 'Z') == 0) {
 		gnutls_assert();
-		/* sorry we don't support it yet
-		 */
+		/* required to be in GMT */
+		return (time_t) - 1;
+	}
+
+	if (strchr(ttime, '.') != 0) {
+		gnutls_assert();
+		/* no fractional seconds allowed */
 		return (time_t) - 1;
 	}
 	xx[4] = 0;
@@ -336,7 +347,7 @@ time_t _gnutls_x509_get_time(ASN1_TYPE c2, const char *where, int force_general)
 			len = sizeof(ttime) - 1;
 			result = asn1_read_value(c2, name, ttime, &len);
 			if (result == ASN1_SUCCESS)
-				c_time = utcTime2gtime(ttime);
+				c_time = _gnutls_utcTime2gtime(ttime);
 		}
 
 		/* We cannot handle dates after 2031 in 32 bit machines.

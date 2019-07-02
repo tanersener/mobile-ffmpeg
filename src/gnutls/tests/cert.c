@@ -89,7 +89,6 @@ static int getnextcert(DIR **dirp, gnutls_datum_t *der, int *exp_ret)
 				*exp_ret = atoi((char*)local.data);
 				success("expecting error code %d\n", *exp_ret);
 				gnutls_free(local.data);
-				local.data = NULL;
 			}
 
 			return 0;
@@ -116,6 +115,8 @@ void doit(void)
 		if (ret < 0)
 			fail("crt_init %d\n", ret);
 
+		gnutls_x509_crt_set_flags(cert, GNUTLS_X509_CRT_FLAG_IGNORE_SANITY);
+
 		ret = gnutls_x509_crt_import(cert, &der, GNUTLS_X509_FMT_DER);
 		if (ret != exp_ret) {
 			fail("crt_import %s\n", gnutls_strerror(ret));
@@ -133,7 +134,6 @@ void doit(void)
 
 		gnutls_x509_crt_deinit(cert);
 		gnutls_free(der.data);
-		der.data = NULL;
 		der.size = 0;
 		exp_ret = -1;
 	}

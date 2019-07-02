@@ -1,5 +1,5 @@
 /* Test of <stdbool.h> substitute.
-   Copyright (C) 2002-2007, 2009-2016 Free Software Foundation, Inc.
+   Copyright (C) 2002-2007, 2009-2019 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Bruno Haible <bruno@clisp.org>, 2007.  */
 
@@ -81,8 +81,8 @@ _Bool n[m];
 char o[sizeof n == m * sizeof n[0] ? 1 : -1];
 char p[-1 - (_Bool) 0 < 0 && -1 - (bool) 0 < 0 ? 1 : -1];
 /* Catch a bug in an HP-UX C compiler.  See
-   http://gcc.gnu.org/ml/gcc-patches/2003-12/msg02303.html
-   http://lists.gnu.org/archive/html/bug-coreutils/2005-11/msg00161.html
+   https://gcc.gnu.org/ml/gcc-patches/2003-12/msg02303.html
+   https://lists.gnu.org/r/bug-coreutils/2005-11/msg00161.html
  */
 _Bool q = true;
 _Bool *pq = &q;
@@ -105,7 +105,7 @@ main ()
 
   /* Catch a bug in IBM AIX xlc compiler version 6.0.0.0
      reported by James Lemley on 2005-10-05; see
-     http://lists.gnu.org/archive/html/bug-coreutils/2005-10/msg00086.html
+     https://lists.gnu.org/r/bug-coreutils/2005-10/msg00086.html
      This is a runtime test, since a corresponding compile-time
      test would rely on initializer extensions.  */
   {

@@ -1,6 +1,6 @@
 /* Test the "verify" module.
 
-   Copyright (C) 2005, 2009-2016 Free Software Foundation, Inc.
+   Copyright (C) 2005, 2009-2019 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Bruno Haible.  */
 
@@ -39,7 +39,7 @@ verify (1 == 1); verify (1 == 1); /* should be ok */
 
 enum
 {
-  item = verify_true (1 == 1) * 0 + 17 /* should be ok */
+  item = verify_expr (1 == 1, 10) * 0 + 17 /* should be ok */
 };
 
 static int

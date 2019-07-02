@@ -4,17 +4,17 @@
  */
 
 /* Copyright (C) 2013 Red Hat
- *  
+ *
  * The nettle library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at your
  * option) any later version.
- * 
+ *
  * The nettle library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
  * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
  * License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with the nettle library; see the file COPYING.LIB.  If not, write to
  * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
@@ -1102,10 +1102,10 @@ static int st_provable_prime_small(mpz_t p,
 	return 0;
 }
 
-/* The Shawe-Taylor algorithm described in FIPS 186-4. 
- * 
+/* The Shawe-Taylor algorithm described in FIPS 186-4.
+ *
  * p: (output) the prime
- * prime_seed_length: (output) the length of prime_seed. Initially 
+ * prime_seed_length: (output) the length of prime_seed. Initially
  *   must hold the maximum size of prime_seed. The size should be a
  *   byte more than seed_length.
  * prime_seed: (output) the prime_seed (may be NULL)
@@ -1113,7 +1113,7 @@ static int st_provable_prime_small(mpz_t p,
  * bits: The requested number of bits for prime
  * seed_length: The length of seed. It is limited by MAX_PVP_SEED_SIZE.
  * seed: The initial seed
- * 
+ *
  * Returns non zero on success.
  */
 int
@@ -1129,7 +1129,7 @@ st_provable_prime(mpz_t p,
 	uint8_t tseed[MAX_PVP_SEED_SIZE+1];
 	int ret;
 	unsigned pseed_length, iterations;
-	uint8_t pseed[seed_length + 2];
+	uint8_t *pseed;
 	unsigned old_counter, i;
 	mpz_t s, tmp, r, dc0, c0, c, t, z;
 	uint8_t *storage = NULL;
@@ -1151,7 +1151,12 @@ st_provable_prime(mpz_t p,
 	mpz_init(c0);
 	mpz_init(dc0);
 
-	pseed_length = sizeof(pseed);
+	pseed_length = seed_length + 2;
+
+	pseed = gnutls_malloc(pseed_length);
+	if (pseed == NULL)
+		goto fail;
+
 	ret = st_provable_prime(c0, &pseed_length, pseed, &gen_counter,
 				1+div_ceil(bits, 2), seed_length, seed,
 				progress_ctx, progress);
@@ -1191,7 +1196,7 @@ st_provable_prime(mpz_t p,
 	mpz_set_ui(r, 1);
 	mpz_mul_2exp(r, r, bits - 1);	/* r = 2^(bits-1) */
 
-	mpz_mod_2exp(tmp, tmp, bits - 1);
+	mpz_fdiv_r_2exp(tmp, tmp, bits - 1);
 	mpz_add(tmp, tmp, r);	/* tmp = x */
 
 	/* Generate candidate prime c in [2^(bits-1), 2^bits] */
@@ -1212,7 +1217,7 @@ st_provable_prime(mpz_t p,
 	if (mpz_cmp(c, r) > 0) {
 		/* t = 2^(bits-1)/2c0 */
 
-		mpz_div_2exp(r, r, 1); /* r = 2^(bits-1) */
+		mpz_fdiv_q_2exp(r, r, 1); /* r = 2^(bits-1) */
 		mpz_cdiv_q(t, r, dc0);
 
 		/* c = t* 2c0 + 1 */
@@ -1302,6 +1307,7 @@ st_provable_prime(mpz_t p,
 	mpz_clear(t);
 	mpz_clear(tmp);
 	mpz_clear(c);
+	free(pseed);
 	free(storage);
 	return ret;
 }

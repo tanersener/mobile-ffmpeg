@@ -1,0 +1,31 @@
+
+
+
+
+@deftypefun {int} {gnutls_ocsp_resp_list_import2} (gnutls_ocsp_resp_t ** @var{ocsps}, unsigned int * @var{size}, const gnutls_datum_t * @var{resp_data}, gnutls_x509_crt_fmt_t @var{format}, unsigned int @var{flags})
+@var{ocsps}: Will hold the parsed OCSP response list.
+
+@var{size}: It will contain the size of the list.
+
+@var{resp_data}: The PEM encoded OCSP list.
+
+@var{format}: One of @code{GNUTLS_X509_FMT_PEM}  or @code{GNUTLS_X509_FMT_DER} 
+
+@var{flags}: must be (0) or an OR'd sequence of gnutls_certificate_import_flags.
+
+This function will convert the given PEM encoded OCSP response list
+to the native gnutls_ocsp_resp_t format. The output will be stored
+in  @code{ocsps} which will be allocated and initialized.
+
+The OCSP responses should have a header of "OCSP RESPONSE".
+
+To deinitialize responses, you need to deinitialize each @code{gnutls_ocsp_resp_t} 
+structure independently, and use @code{gnutls_free()}  at  @code{ocsps} .
+
+In PEM files, when no OCSP responses are detected
+@code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  will be returned.
+
+@strong{Returns:} the number of responses read or a negative error value.
+
+@strong{Since:} 3.6.3
+@end deftypefun

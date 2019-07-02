@@ -46,6 +46,7 @@ int main(int argc, char **argv)
 #endif
 #include <unistd.h>
 #include <gnutls/gnutls.h>
+#include <assert.h>
 
 #include "utils.h"
 #include "cert-common.h"
@@ -109,7 +110,7 @@ static int ext_send_server_params(gnutls_session_t session, gnutls_buffer_t extd
 	return MAX_SIZE;
 }
 
-static void client(int sd)
+static void client(int sd, const char *prio)
 {
 	int ret;
 	gnutls_session_t session;
@@ -129,8 +130,7 @@ static void client(int sd)
 	gnutls_init(&session, GNUTLS_CLIENT);
 
 	/* Use default priorities */
-	gnutls_priority_set_direct(session, "PERFORMANCE:+ANON-ECDH:+ANON-DH",
-				   NULL);
+	assert(gnutls_priority_set_direct(session, prio, NULL) >= 0);
 
 	/* put the anonymous credentials to the current session
 	 */
@@ -140,11 +140,11 @@ static void client(int sd)
 	gnutls_transport_set_int(session, sd);
 	gnutls_handshake_set_timeout(session, 20 * 1000);
 
-	gnutls_ext_register("ext_client1", TLSEXT_TYPE1, GNUTLS_EXT_TLS, ext_recv_client_params, ext_send_client_params, NULL, NULL, NULL);
-	gnutls_ext_register("ext_client2", TLSEXT_TYPE2, GNUTLS_EXT_TLS, ext_recv_client_params, ext_send_client_params, NULL, NULL, NULL);
-	gnutls_ext_register("ext_client3", TLSEXT_TYPE3, GNUTLS_EXT_TLS, ext_recv_client_params, ext_send_client_params, NULL, NULL, NULL);
-	gnutls_ext_register("ext_client4", TLSEXT_TYPE4, GNUTLS_EXT_TLS, ext_recv_client_params, ext_send_client_params, NULL, NULL, NULL);
-	gnutls_ext_register("ext_client5", TLSEXT_TYPE5, GNUTLS_EXT_TLS, ext_recv_client_params, ext_send_client_params, NULL, NULL, NULL);
+	gnutls_session_ext_register(session, "ext_client1", TLSEXT_TYPE1, GNUTLS_EXT_TLS, ext_recv_client_params, ext_send_client_params, NULL, NULL, NULL, 0);
+	gnutls_session_ext_register(session, "ext_client2", TLSEXT_TYPE2, GNUTLS_EXT_TLS, ext_recv_client_params, ext_send_client_params, NULL, NULL, NULL, 0);
+	gnutls_session_ext_register(session, "ext_client3", TLSEXT_TYPE3, GNUTLS_EXT_TLS, ext_recv_client_params, ext_send_client_params, NULL, NULL, NULL, 0);
+	gnutls_session_ext_register(session, "ext_client4", TLSEXT_TYPE4, GNUTLS_EXT_TLS, ext_recv_client_params, ext_send_client_params, NULL, NULL, NULL, 0);
+	gnutls_session_ext_register(session, "ext_client5", TLSEXT_TYPE5, GNUTLS_EXT_TLS, ext_recv_client_params, ext_send_client_params, NULL, NULL, NULL, 0);
 
 	/* Perform the TLS handshake
 	 */
@@ -176,7 +176,7 @@ end:
 	gnutls_global_deinit();
 }
 
-static void server(int sd)
+static void server(int sd, const char *prio)
 {
 	gnutls_certificate_credentials_t serverx509cred;
 	int ret;
@@ -201,17 +201,16 @@ static void server(int sd)
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	gnutls_priority_set_direct(session, "PERFORMANCE:+ANON-ECDH:+ANON-DH",
-				   NULL);
+	assert(gnutls_priority_set_direct(session, prio, NULL) >= 0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
 				serverx509cred);
 
-	gnutls_ext_register("ext_server1", TLSEXT_TYPE1, GNUTLS_EXT_TLS, ext_recv_server_params, ext_send_server_params, NULL, NULL, NULL);
-	gnutls_ext_register("ext_server2", TLSEXT_TYPE2, GNUTLS_EXT_TLS, ext_recv_server_params, ext_send_server_params, NULL, NULL, NULL);
-	gnutls_ext_register("ext_server3", TLSEXT_TYPE3, GNUTLS_EXT_TLS, ext_recv_server_params, ext_send_server_params, NULL, NULL, NULL);
-	gnutls_ext_register("ext_server4", TLSEXT_TYPE4, GNUTLS_EXT_TLS, ext_recv_server_params, ext_send_server_params, NULL, NULL, NULL);
-	gnutls_ext_register("ext_server5", TLSEXT_TYPE5, GNUTLS_EXT_TLS, ext_recv_server_params, ext_send_server_params, NULL, NULL, NULL);
+	gnutls_session_ext_register(session, "ext_server1", TLSEXT_TYPE1, GNUTLS_EXT_TLS, ext_recv_server_params, ext_send_server_params, NULL, NULL, NULL, 0);
+	gnutls_session_ext_register(session, "ext_server2", TLSEXT_TYPE2, GNUTLS_EXT_TLS, ext_recv_server_params, ext_send_server_params, NULL, NULL, NULL, 0);
+	gnutls_session_ext_register(session, "ext_server3", TLSEXT_TYPE3, GNUTLS_EXT_TLS, ext_recv_server_params, ext_send_server_params, NULL, NULL, NULL, 0);
+	gnutls_session_ext_register(session, "ext_server4", TLSEXT_TYPE4, GNUTLS_EXT_TLS, ext_recv_server_params, ext_send_server_params, NULL, NULL, NULL, 0);
+	gnutls_session_ext_register(session, "ext_server5", TLSEXT_TYPE5, GNUTLS_EXT_TLS, ext_recv_server_params, ext_send_server_params, NULL, NULL, NULL, 0);
 
 	gnutls_transport_set_int(session, sd);
 	gnutls_handshake_set_timeout(session, 20 * 1000);
@@ -248,13 +247,16 @@ static void server(int sd)
 		success("server: finished\n");
 }
 
-void doit(void)
+static
+void start(const char *prio)
 {
 	pid_t child;
 	int sockets[2];
 	int err;
 
 	signal(SIGPIPE, SIG_IGN);
+	TLSEXT_TYPE_server_sent  = 0;
+	TLSEXT_TYPE_client_received = 0;
 
 	err = socketpair(AF_UNIX, SOCK_STREAM, 0, sockets);
 	if (err == -1) {
@@ -274,12 +276,22 @@ void doit(void)
 		int status;
 		/* parent */
 		close(sockets[0]);
-		client(sockets[1]);
+		client(sockets[1], prio);
 		wait(&status);
+		check_wait_status(status);
 	} else {
 		close(sockets[1]);
-		server(sockets[0]);
+		server(sockets[0], prio);
+		exit(0);
 	}
+}
+
+void doit(void)
+{
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.1");
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.2");
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.3");
+	start("NORMAL");
 }
 
 #endif				/* _WIN32 */

@@ -4,7 +4,7 @@
 @item -6 @tab GNUTLS_@-E_@-UNKNOWN_@-CIPHER_@-TYPE @tab The cipher type is unsupported.
 @item -7 @tab GNUTLS_@-E_@-LARGE_@-PACKET @tab The transmitted packet is too large (EMSGSIZE).
 @item -8 @tab GNUTLS_@-E_@-UNSUPPORTED_@-VERSION_@-PACKET @tab A packet with illegal or unsupported version was received.
-@item -9 @tab GNUTLS_@-E_@-UNEXPECTED_@-PACKET_@-LENGTH @tab A TLS packet with unexpected length was received.
+@item -9 @tab GNUTLS_@-E_@-UNEXPECTED_@-PACKET_@-LENGTH @tab Error decoding the received TLS packet.
 @item -10 @tab GNUTLS_@-E_@-INVALID_@-SESSION @tab The specified session has been invalidated for some reason.
 @item -12 @tab GNUTLS_@-E_@-FATAL_@-ALERT_@-RECEIVED @tab A TLS fatal alert has been received.
 @item -15 @tab GNUTLS_@-E_@-UNEXPECTED_@-PACKET @tab An unexpected TLS packet was received.
@@ -21,7 +21,7 @@
 @item -28 @tab GNUTLS_@-E_@-AGAIN @tab Resource temporarily unavailable, try again.
 @item -29 @tab GNUTLS_@-E_@-EXPIRED @tab The session or certificate has expired.
 @item -30 @tab GNUTLS_@-E_@-DB_@-ERROR @tab Error in Database backend.
-@item -31 @tab GNUTLS_@-E_@-SRP_@-PWD_@-ERROR @tab Error in password file.
+@item -31 @tab GNUTLS_@-E_@-SRP_@-PWD_@-ERROR @tab Error in password/key file.
 @item -32 @tab GNUTLS_@-E_@-INSUFFICIENT_@-CREDENTIALS @tab Insufficient credentials for that request.
 @item -33 @tab GNUTLS_@-E_@-HASH_@-FAILED @tab Hashing has failed.
 @item -34 @tab GNUTLS_@-E_@-BASE64_@-DECODING_@-ERROR @tab Base64 decoding error.
@@ -67,13 +67,14 @@
 @item -79 @tab GNUTLS_@-E_@-OPENPGP_@-UID_@-REVOKED @tab The OpenPGP User ID is revoked.
 @item -80 @tab GNUTLS_@-E_@-UNKNOWN_@-PK_@-ALGORITHM @tab An unknown public key algorithm was encountered.
 @item -81 @tab GNUTLS_@-E_@-TOO_@-MANY_@-HANDSHAKE_@-PACKETS @tab Too many handshake packets have been received.
+@item -82 @tab GNUTLS_@-E_@-RECEIVED_@-DISALLOWED_@-NAME @tab A disallowed SNI server name has been received.
 @item -84 @tab GNUTLS_@-E_@-NO_@-TEMPORARY_@-RSA_@-PARAMS @tab No temporary RSA parameters were found.
 @item -86 @tab GNUTLS_@-E_@-NO_@-COMPRESSION_@-ALGORITHMS @tab No supported compression algorithms have been found.
 @item -87 @tab GNUTLS_@-E_@-NO_@-CIPHER_@-SUITES @tab No supported cipher suites have been found.
 @item -88 @tab GNUTLS_@-E_@-OPENPGP_@-GETKEY_@-FAILED @tab Could not get OpenPGP key.
 @item -89 @tab GNUTLS_@-E_@-PK_@-SIG_@-VERIFY_@-FAILED @tab Public key signature verification has failed.
 @item -90 @tab GNUTLS_@-E_@-ILLEGAL_@-SRP_@-USERNAME @tab The SRP username supplied is illegal.
-@item -91 @tab GNUTLS_@-E_@-SRP_@-PWD_@-PARSING_@-ERROR @tab Parsing error in password file.
+@item -91 @tab GNUTLS_@-E_@-SRP_@-PWD_@-PARSING_@-ERROR @tab Parsing error in password/key file.
 @item -93 @tab GNUTLS_@-E_@-NO_@-TEMPORARY_@-DH_@-PARAMS @tab No temporary DH parameters were found.
 @item -94 @tab GNUTLS_@-E_@-OPENPGP_@-FINGERPRINT_@-UNSUPPORTED @tab The OpenPGP fingerprint is not supported.
 @item -95 @tab GNUTLS_@-E_@-X509_@-UNSUPPORTED_@-ATTRIBUTE @tab The certificate has unsupported attributes.
@@ -88,9 +89,10 @@
 @item -106 @tab GNUTLS_@-E_@-UNSUPPORTED_@-SIGNATURE_@-ALGORITHM @tab The signature algorithm is not supported.
 @item -107 @tab GNUTLS_@-E_@-SAFE_@-RENEGOTIATION_@-FAILED @tab Safe renegotiation failed.
 @item -108 @tab GNUTLS_@-E_@-UNSAFE_@-RENEGOTIATION_@-DENIED @tab Unsafe renegotiation denied.
-@item -109 @tab GNUTLS_@-E_@-UNKNOWN_@-SRP_@-USERNAME @tab The SRP username supplied is unknown.
+@item -109 @tab GNUTLS_@-E_@-UNKNOWN_@-SRP_@-USERNAME @tab The username supplied is unknown.
 @item -110 @tab GNUTLS_@-E_@-PREMATURE_@-TERMINATION @tab The TLS connection was non-properly terminated.
 @item -111 @tab GNUTLS_@-E_@-MALFORMED_@-CIDR @tab CIDR name constraint is malformed in size or structure.
+@item -112 @tab GNUTLS_@-E_@-CERTIFICATE_@-REQUIRED @tab Certificate is required.
 @item -201 @tab GNUTLS_@-E_@-BASE64_@-ENCODING_@-ERROR @tab Base64 encoding error.
 @item -202 @tab GNUTLS_@-E_@-INCOMPATIBLE_@-GCRYPT_@-LIBRARY @tab The crypto library version is too old.
 @item -203 @tab GNUTLS_@-E_@-INCOMPATIBLE_@-LIBTASN1_@-LIBRARY @tab The tasn1 library version is too old.
@@ -165,12 +167,26 @@
 @item -404 @tab GNUTLS_@-E_@-IDNA_@-ERROR @tab There was an issue converting to or from UTF8.
 @item -406 @tab GNUTLS_@-E_@-SESSION_@-USER_@-ID_@-CHANGED @tab Peer's certificate or username has changed during a rehandshake.
 @item -407 @tab GNUTLS_@-E_@-HANDSHAKE_@-DURING_@-FALSE_@-START @tab Attempted handshake during false start.
-@item -408 @tab GNUTLS_@-E_@-UNAVAILABLE_@-DURING_@-HANDSHAKE @tab Cannot obtain resumption parameters while handshake is incomplete.
-@item -409 @tab GNUTLS_@-E_@-PK_@-INVALID_@-PUBKEY @tab The obtained public key is invalid.
+@item -408 @tab GNUTLS_@-E_@-UNAVAILABLE_@-DURING_@-HANDSHAKE @tab Cannot perform this action while handshake is in progress.
+@item -409 @tab GNUTLS_@-E_@-PK_@-INVALID_@-PUBKEY @tab The public key is invalid.
 @item -410 @tab GNUTLS_@-E_@-PK_@-INVALID_@-PRIVKEY @tab The private key is invalid.
 @item -411 @tab GNUTLS_@-E_@-NOT_@-YET_@-ACTIVATED @tab The certificate is not yet activated.
 @item -412 @tab GNUTLS_@-E_@-INVALID_@-UTF8_@-STRING @tab The given string contains invalid UTF-8 characters.
 @item -413 @tab GNUTLS_@-E_@-NO_@-EMBEDDED_@-DATA @tab There are no embedded data in the structure.
 @item -414 @tab GNUTLS_@-E_@-INVALID_@-UTF8_@-EMAIL @tab The given email string contains non-ASCII characters before '@'.
 @item -415 @tab GNUTLS_@-E_@-INVALID_@-PASSWORD_@-STRING @tab The given password contains invalid characters.
+@item -416 @tab GNUTLS_@-E_@-CERTIFICATE_@-TIME_@-ERROR @tab Error in the time fields of certificate.
+@item -417 @tab GNUTLS_@-E_@-RECORD_@-OVERFLOW @tab A TLS record packet with invalid length was received.
+@item -418 @tab GNUTLS_@-E_@-ASN1_@-TIME_@-ERROR @tab The DER time encoding is invalid.
+@item -419 @tab GNUTLS_@-E_@-INCOMPATIBLE_@-SIG_@-WITH_@-KEY @tab The signature is incompatible with the public key.
+@item -420 @tab GNUTLS_@-E_@-PK_@-INVALID_@-PUBKEY_@-PARAMS @tab The public key parameters are invalid.
+@item -421 @tab GNUTLS_@-E_@-PK_@-NO_@-VALIDATION_@-PARAMS @tab There are no validation parameters present.
+@item -422 @tab GNUTLS_@-E_@-OCSP_@-MISMATCH_@-WITH_@-CERTS @tab The OCSP response provided doesn't match the available certificates
+@item -423 @tab GNUTLS_@-E_@-NO_@-COMMON_@-KEY_@-SHARE @tab No common key share with peer.
+@item -424 @tab GNUTLS_@-E_@-REAUTH_@-REQUEST @tab Re-authentication was requested by the peer.
+@item -425 @tab GNUTLS_@-E_@-TOO_@-MANY_@-MATCHES @tab More than a single object matches the criteria.
+@item -426 @tab GNUTLS_@-E_@-CRL_@-VERIFICATION_@-ERROR @tab Error in the CRL verification.
+@item -427 @tab GNUTLS_@-E_@-MISSING_@-EXTENSION @tab An required TLS extension was received.
+@item -428 @tab GNUTLS_@-E_@-DB_@-ENTRY_@-EXISTS @tab The Database entry already exists.
+@item -429 @tab GNUTLS_@-E_@-EARLY_@-DATA_@-REJECTED @tab The early data were rejected.
 @end multitable

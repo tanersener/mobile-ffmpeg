@@ -16,12 +16,12 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
-#ifndef GNUTLS_STR_ARRAY_H
-#define GNUTLS_STR_ARRAY_H
+#ifndef GNUTLS_LIB_STR_ARRAY_H
+#define GNUTLS_LIB_STR_ARRAY_H
 
 #include "gnutls_int.h"
 #include "errors.h"
@@ -112,4 +112,24 @@ inline static int _gnutls_str_array_append(gnutls_str_array_t * head,
 	return 0;
 }
 
-#endif
+inline static int _gnutls_str_array_append_idna(gnutls_str_array_t * head,
+			const char *name, size_t size)
+{
+	int ret;
+	gnutls_datum_t ahost;
+
+	/* convert the provided hostname to ACE-Labels domain. */
+	ret = gnutls_idna_map(name, size, &ahost, 0);
+	if (ret < 0) {
+		_gnutls_debug_log("unable to convert hostname %s to IDNA format\n", name);
+		/* insert the raw name */
+		return _gnutls_str_array_append(head, name, size);
+	}
+
+	ret = _gnutls_str_array_append(head, (char*)ahost.data, ahost.size);
+	gnutls_free(ahost.data);
+
+	return ret;
+}
+
+#endif /* GNUTLS_LIB_STR_ARRAY_H */

@@ -1,9 +1,9 @@
 This is gnutls.info, produced by makeinfo version 6.5 from gnutls.texi.
 
-This manual is last updated 7 January 2018 for version 3.5.19 of GnuTLS.
+This manual is last updated 3 January 2019 for version 3.6.8 of GnuTLS.
 
-Copyright (C) 2001-2018 Free Software Foundation, Inc.\\ Copyright (C)
-2001-2018 Nikos Mavrogiannopoulos
+Copyright (C) 2001-2019 Free Software Foundation, Inc.\\ Copyright (C)
+2001-2019 Nikos Mavrogiannopoulos
 
      Permission is granted to copy, distribute and/or modify this
      document under the terms of the GNU Free Documentation License,
@@ -18,12 +18,12 @@ END-INFO-DIR-ENTRY
 
 INFO-DIR-SECTION System Administration
 START-INFO-DIR-ENTRY
-* certtool: (gnutls)Invoking certtool.	Manipulate certificates and keys.
-* gnutls-serv: (gnutls)Invoking gnutls-serv.	GnuTLS test server.
-* gnutls-cli: (gnutls)Invoking gnutls-cli.	GnuTLS test client.
-* gnutls-cli-debug: (gnutls)Invoking gnutls-cli-debug.	GnuTLS debug client.
-* psktool: (gnutls)Invoking psktool.	Simple TLS-Pre-Shared-Keys manager.
-* srptool: (gnutls)Invoking srptool.	Simple SRP password tool.
+* certtool: (gnutls)certtool Invocation.	Manipulate certificates and keys.
+* gnutls-serv: (gnutls)gnutls-serv Invocation.	GnuTLS test server.
+* gnutls-cli: (gnutls)gnutls-cli Invocation.	GnuTLS test client.
+* gnutls-cli-debug: (gnutls)gnutls-cli-debug Invocation.	GnuTLS debug client.
+* psktool: (gnutls)psktool Invocation.	Simple TLS-Pre-Shared-Keys manager.
+* srptool: (gnutls)srptool Invocation.	Simple SRP password tool.
 END-INFO-DIR-ENTRY
 
 
@@ -32,10 +32,10 @@ File: gnutls.info,  Node: Top,  Next: Preface,  Up: (dir)
 GnuTLS
 ******
 
-This manual is last updated 7 January 2018 for version 3.5.19 of GnuTLS.
+This manual is last updated 3 January 2019 for version 3.6.8 of GnuTLS.
 
-Copyright (C) 2001-2018 Free Software Foundation, Inc.\\ Copyright (C)
-2001-2018 Nikos Mavrogiannopoulos
+Copyright (C) 2001-2019 Free Software Foundation, Inc.\\ Copyright (C)
+2001-2019 Nikos Mavrogiannopoulos
 
      Permission is granted to copy, distribute and/or modify this
      document under the terms of the GNU Free Documentation License,
@@ -87,12 +87,12 @@ or a communication line and GnuTLS only helps with some of them.
 
 Although this document tries to be self contained, basic network
 programming and public key infrastructure (PKI) knowledge is assumed in
-most of it.  A good introduction to networking can be found in
-[_STEVENS_], to public key infrastructure in [_GUTPKI_] and to security
-engineering in [_ANDERSON_].
+most of it.  A good introduction to networking can be found in [*note
+STEVENS::], to public key infrastructure in [*note GUTPKI::] and to
+security engineering in [*note ANDERSON::].
 
 Updated versions of the GnuTLS software and this document will be
-available from <http://www.gnutls.org/>.
+available from <https://www.gnutls.org/>.
 
 
 File: gnutls.info,  Node: Introduction to GnuTLS,  Next: Introduction to TLS,  Prev: Preface,  Up: Top
@@ -106,17 +106,17 @@ over insecure lines, and were designed to prevent eavesdropping,
 tampering, or message forgery.
 
 Technically GnuTLS is a portable ANSI C based library which implements
-the protocols ranging from SSL 3.0 to TLS 1.2 (see *note Introduction to
+the protocols ranging from SSL 3.0 to TLS 1.3 (see *note Introduction to
 TLS::, for a detailed description of the protocols), accompanied with
 the required framework for authentication and public key infrastructure.
 Important features of the GnuTLS library include:
 
-   * Support for TLS 1.2, TLS 1.1, TLS 1.0 and SSL 3.0 protocols.
+   * Support for TLS 1.3, TLS 1.2, TLS 1.1, TLS 1.0 and optionally SSL
+     3.0 protocols.
 
    * Support for Datagram TLS 1.0 and 1.2.
 
-   * Support for handling and verification of X.509 and OpenPGP
-     certificates.
+   * Support for handling and verification of X.509 certificates.
 
    * Support for password authentication using TLS-SRP.
 
@@ -145,7 +145,7 @@ File: gnutls.info,  Node: Downloading and installing,  Next: Installing for a so
 ==============================
 
 GnuTLS is available for download at:
-<http://www.gnutls.org/download.html>
+<https://www.gnutls.org/download.html>
 
 GnuTLS uses a development cycle where even minor version numbers
 indicate a stable release and a odd minor version number indicate a
@@ -155,9 +155,9 @@ is odd.
 
 GnuTLS depends on 'nettle' and 'gmplib', and you will need to install it
 before installing GnuTLS. The 'nettle' library is available from
-<http://www.lysator.liu.se/~nisse/nettle/>, while 'gmplib' is available
-from <http://www.gmplib.org/>.  Don't forget to verify the cryptographic
-signature after downloading source code packages.
+<https://www.lysator.liu.se/~nisse/nettle/>, while 'gmplib' is available
+from <https://www.gmplib.org/>.  Don't forget to verify the
+cryptographic signature after downloading source code packages.
 
 The package is then extracted, configured and built like many other
 packages that use Autoconf.  For detailed information on configuring and
@@ -170,7 +170,7 @@ Several parts of GnuTLS require ASN.1 functionality, which is provided
 by a library called libtasn1.  A copy of libtasn1 is included in GnuTLS.
 If you want to install it separately (e.g., to make it possibly to use
 libtasn1 in other programs), you can get it from
-<http://www.gnu.org/software/libtasn1/>.
+<https://www.gnu.org/software/libtasn1/>.
 
 The compression library, 'libz', the PKCS #11 helper library 'p11-kit',
 the TPM library 'trousers', as well as the IDN library 'libidn'(1) are
@@ -186,7 +186,6 @@ compile if some of these options are given.
 --disable-srp-authentication
 --disable-psk-authentication
 --disable-anon-authentication
---disable-openpgp-authentication
 --disable-dhe
 --disable-ecdhe
 --disable-openssl-compatibility
@@ -241,7 +240,7 @@ available PKCS #11 trust module is p11-kit's trust module(1).
 
    ---------- Footnotes ----------
 
-   (1) <http://p11-glue.freedesktop.org/doc/p11-kit/trust-module.html>
+   (1) <https://p11-glue.freedesktop.org/doc/p11-kit/trust-module.html>
 
 
 File: gnutls.info,  Node: Document overview,  Prev: Installing for a software distribution,  Up: Introduction to GnuTLS
@@ -270,15 +269,15 @@ File: gnutls.info,  Node: Introduction to TLS,  Next: Authentication methods,  P
 ******************************
 
 TLS stands for "Transport Layer Security" and is the successor of SSL,
-the Secure Sockets Layer protocol [_SSL3_] designed by Netscape.  TLS is
-an Internet protocol, defined by IETF(1), described in [_RFC5246_].  The
-protocol provides confidentiality, and authentication layers over any
-reliable transport layer.  The description, above, refers to TLS 1.0 but
-applies to all other TLS versions as the differences between the
-protocols are not major.
+the Secure Sockets Layer protocol [*note SSL3::] designed by Netscape.
+TLS is an Internet protocol, defined by IETF(1), described in [*note
+RFC5246::].  The protocol provides confidentiality, and authentication
+layers over any reliable transport layer.  The description, above,
+refers to TLS 1.0 but applies to all other TLS versions as the
+differences between the protocols are not major.
 
-The DTLS protocol, or "Datagram TLS" [_RFC4347_] is a protocol with
-identical goals as TLS, but can operate under unreliable transport
+The DTLS protocol, or "Datagram TLS" [*note RFC4347::] is a protocol
+with identical goals as TLS, but can operate under unreliable transport
 layers such as UDP.  The discussions below apply to this protocol as
 well, except when noted otherwise.
 
@@ -310,11 +309,11 @@ File: gnutls.info,  Node: TLS layers,  Next: The transport layer,  Up: Introduct
 TLS is a layered protocol, and consists of the record protocol, the
 handshake protocol and the alert protocol.  The record protocol is to
 serve all other protocols and is above the transport layer.  The record
-protocol offers symmetric encryption, data authenticity, and optionally
-compression.  The alert protocol offers some signaling to the other
-protocols.  It can help informing the peer for the cause of failures and
-other error conditions.  *Note The Alert Protocol::, for more
-information.  The alert protocol is above the record protocol.
+protocol offers symmetric encryption, and data authenticity(1).  The
+alert protocol offers some signaling to the other protocols.  It can
+help informing the peer for the cause of failures and other error
+conditions.  *Note The Alert Protocol::, for more information.  The
+alert protocol is above the record protocol.
 
 The handshake protocol is responsible for the security parameters'
 negotiation, the initial key exchange and authentication.  *Note The
@@ -325,6 +324,11 @@ fig-tls-layers.
  [image src="gnutls-layers.png" ]
 
 Figure 3.1: The TLS protocol layers.
+
+   ---------- Footnotes ----------
+
+   (1) In early versions of TLS compression was optionally available as
+well.  This is no longer the case in recent versions of the protocol.
 
 
 File: gnutls.info,  Node: The transport layer,  Next: The TLS record protocol,  Prev: TLS layers,  Up: Introduction to TLS
@@ -347,12 +351,12 @@ File: gnutls.info,  Node: The TLS record protocol,  Next: The TLS Alert Protocol
 ===========================
 
 The record protocol is the secure communications provider.  Its purpose
-is to encrypt, authenticate and --optionally-- compress packets.  The
-record layer functions can be called at any time after the handshake
-process is finished, when there is need to receive or send data.  In
-DTLS however, due to re-transmission timers used in the handshake
-out-of-order handshake data might be received for some time (maximum 60
-seconds) after the handshake process is finished.
+is to encrypt, and authenticate packets.  The record layer functions can
+be called at any time after the handshake process is finished, when
+there is need to receive or send data.  In DTLS however, due to
+re-transmission timers used in the handshake out-of-order handshake data
+might be received for some time (maximum 60 seconds) after the handshake
+process is finished.
 
 The functions to access the record protocol are limited to send and
 receive functions, which might, given the importance of this protocol in
@@ -365,12 +369,11 @@ has finished.
 * Menu:
 
 * Encryption algorithms used in the record layer::
-* Compression algorithms used in the record layer::
-* Weaknesses and countermeasures::
+* Compression algorithms and the record layer::
 * On Record Padding::
 
 
-File: gnutls.info,  Node: Encryption algorithms used in the record layer,  Next: Compression algorithms used in the record layer,  Up: The TLS record protocol
+File: gnutls.info,  Node: Encryption algorithms used in the record layer,  Next: Compression algorithms and the record layer,  Up: The TLS record protocol
 
 3.3.1 Encryption algorithms used in the record layer
 ----------------------------------------------------
@@ -389,61 +392,81 @@ in a secure way.
 The supported in GnuTLS ciphers and MAC algorithms are shown in *note
 Table 3.1: tab:ciphers. and *note Table 3.2: tab:macs.
 
-Algorithm      Type           Description
---------------------------------------------------------------------------
-AES-128-GCM,   AEAD           This is the AES algorithm in the
-AES-256-GCM                   authenticated encryption GCM mode.  This
-                              mode combines message authentication and
-                              encryption and can be extremely fast on
-                              CPUs that support hardware acceleration.
-                              
-AES-128-CCM,   AEAD           This is the AES algorithm in the
-AES-256-CCM                   authenticated encryption CCM mode.  This
-                              mode combines message authentication and
-                              encryption and is often used by systems
-                              without AES or GCM acceleration support.
-                              
-AES-128-CCM-8, AEAD           This is the AES algorithm in the
-AES-256-CCM-8                 authenticated encryption CCM mode with a
-                              truncated to 64-bit authentication tag.
-                              This mode is for communication with
-                              restricted systems.
-                              
-CAMELLIA-128-GCM,AEAD         This is the CAMELLIA algorithm in the
-CAMELLIA-256-GCM              authenticated encryption GCM mode.
-                              
-CHACHA20-POLY1305AEAD         CHACHA20-POLY1305 is an authenticated
-                              encryption algorithm based on CHACHA20
-                              cipher and POLY1305 MAC. CHACHA20 is a
-                              refinement of SALSA20 algorithm, an
-                              approved cipher by the European ESTREAM
-                              project.  POLY1305 is Wegman-Carter,
-                              one-time authenticator.  The combination
-                              provides a fast stream cipher suitable
-                              for systems where a hardware AES
-                              accelerator is not available.
-                              
-AES-128-CBC,   Legacy         AES or RIJNDAEL is the block cipher
-AES-256-CBC    (block)        algorithm that replaces the old DES
-                              algorithm.  It has 128 bits block size
-                              and is used in CBC mode.
-                              
-CAMELLIA-128-CBC,Legacy       This is an 128-bit block cipher developed
-CAMELLIA-256-CBC(block)       by Mitsubishi and NTT. It is one of the
-                              approved ciphers of the European NESSIE
-                              and Japanese CRYPTREC projects.
-                              
-3DES-CBC       Legacy         This is the DES block cipher algorithm
-               (block)        used with triple encryption (EDE). Has 64
-                              bits block size and is used in CBC mode.
-                              
-ARCFOUR-128    Legacy         ARCFOUR-128 is a compatible algorithm
-               (stream)       with RSA's RC4 algorithm, which is
-                              considered to be a trade secret.  It is a
-                              considered to be broken, and is only used
-                              for compatibility purposed.  For this
-                              reason it is not enabled by default.
-                              
+Algorithm      Type    Applicable  Description
+                       Protocols
+----------------------------------------------------------------------------
+AES-128-GCM,   AEAD    TLS 1.2,    This is the AES algorithm in the
+AES-256-GCM            TLS 1.3     authenticated encryption GCM mode.
+                                   This mode combines message
+                                   authentication and encryption and can
+                                   be extremely fast on CPUs that support
+                                   hardware acceleration.
+                                   
+AES-128-CCM,   AEAD    TLS 1.2,    This is the AES algorithm in the
+AES-256-CCM            TLS 1.3     authenticated encryption CCM mode.
+                                   This mode combines message
+                                   authentication and encryption and is
+                                   often used by systems without AES or
+                                   GCM acceleration support.
+                                   
+CHACHA20-POLY1305AEAD  TLS 1.2,    CHACHA20-POLY1305 is an authenticated
+                       TLS 1.3     encryption algorithm based on CHACHA20
+                                   cipher and POLY1305 MAC. CHACHA20 is a
+                                   refinement of SALSA20 algorithm, an
+                                   approved cipher by the European
+                                   ESTREAM project.  POLY1305 is
+                                   Wegman-Carter, one-time authenticator.
+                                   The combination provides a fast stream
+                                   cipher suitable for systems where a
+                                   hardware AES accelerator is not
+                                   available.
+                                   
+AES-128-CCM-8, AEAD    TLS 1.2,    This is the AES algorithm in the
+AES-256-CCM-8          TLS 1.3     authenticated encryption CCM mode with
+                                   a truncated to 64-bit authentication
+                                   tag.  This mode is for communication
+                                   with restricted systems.
+                                   
+CAMELLIA-128-GCM,AEAD  TLS 1.2     This is the CAMELLIA algorithm in the
+CAMELLIA-256-GCM                   authenticated encryption GCM mode.
+                                   
+AES-128-CBC,   Legacy  TLS 1.0,    AES or RIJNDAEL is the block cipher
+AES-256-CBC    (block) TLS 1.1,    algorithm that replaces the old DES
+                       TLS 1.2     algorithm.  It has 128 bits block size
+                                   and is used in CBC mode.
+                                   
+CAMELLIA-128-CBC,LegacyTLS 1.0,    This is an 128-bit block cipher
+CAMELLIA-256-CBC(block)TLS 1.1,    developed by Mitsubishi and NTT. It is
+                       TLS 1.2     one of the approved ciphers of the
+                                   European NESSIE and Japanese CRYPTREC
+                                   projects.
+                                   
+3DES-CBC       Legacy  TLS 1.0,    This is the DES block cipher algorithm
+               (block) TLS 1.1,    used with triple encryption (EDE). Has
+                       TLS 1.2     64 bits block size and is used in CBC
+                                   mode.
+                                   
+ARCFOUR-128    Legacy  TLS 1.0,    ARCFOUR-128 is a compatible algorithm
+               (stream)TLS 1.1,    with RSA's RC4 algorithm, which is
+                       TLS 1.2     considered to be a trade secret.  It
+                                   is a considered to be broken, and is
+                                   only used for compatibility purposed.
+                                   For this reason it is not enabled by
+                                   default.
+                                   
+NULL           Legacy  TLS 1.0,    NULL is the empty/identity cipher
+               (stream)TLS 1.1,    which doesn't encrypt any data.  It
+                       TLS 1.2     can be combined with data
+                                   authentication under TLS 1.2 or
+                                   earlier, but is only used transiently
+                                   under TLS 1.3 until encryption starts.
+                                   This cipher cannot be negotiated by
+                                   default (need to be explicitly
+                                   enabled) under TLS 1.2, and cannot be
+                                   negotiated at all under TLS 1.3.  When
+                                   enabled, TLS 1.3 (or later) support
+                                   will be implicitly disabled.
+                                   
 
 Table 3.1: Supported ciphers in TLS.
 
@@ -470,107 +493,76 @@ MAC-AEAD       This indicates that an authenticated encryption
 Table 3.2: Supported MAC algorithms in TLS.
 
 
-File: gnutls.info,  Node: Compression algorithms used in the record layer,  Next: Weaknesses and countermeasures,  Prev: Encryption algorithms used in the record layer,  Up: The TLS record protocol
+File: gnutls.info,  Node: Compression algorithms and the record layer,  Next: On Record Padding,  Prev: Encryption algorithms used in the record layer,  Up: The TLS record protocol
 
-3.3.2 Compression algorithms used in the record layer
------------------------------------------------------
+3.3.2 Compression algorithms and the record layer
+-------------------------------------------------
 
-The TLS record layer also supports compression.  The algorithms
-implemented in GnuTLS can be found in the table below.  The included
-algorithms perform really good when text, or other compressible data are
-to be transferred, but offer nothing on already compressed data, such as
-compressed images, zipped archives etc.  These compression algorithms,
-may be useful in high bandwidth TLS tunnels, and in cases where network
-usage has to be minimized.  It should be noted however that compression
-increases latency.
-
-The record layer compression in GnuTLS is implemented based on
-[_RFC3749_].  The supported algorithms are shown below.
-
-'GNUTLS_COMP_UNKNOWN'
-     Unknown compression method.
-'GNUTLS_COMP_NULL'
-     The NULL compression method (no compression).
-'GNUTLS_COMP_DEFLATE'
-     The DEFLATE compression method from zlib.
-'GNUTLS_COMP_ZLIB'
-     Same as 'GNUTLS_COMP_DEFLATE' .
-
-Figure 3.2: Supported compression algorithms
-
-Note that compression enables attacks such as traffic analysis, or even
-plaintext recovery under certain circumstances.  To avoid some of these
-attacks GnuTLS allows each record to be compressed independently (i.e.,
-stateless compression), by using the "%STATELESS_COMPRESSION" priority
-string, in order to be used in cases where the attacker controlled data
-are pt in separate records.
+In early versions of TLS the record layer supported compression.
+However, that proved to be problematic in many ways, and enabled several
+attacks based on traffic analysis on the transported data.  For that
+newer versions of the protocol no longer offer compression, and GnuTLS
+since 3.6.0 no longer implements any support for compression.
 
 
-File: gnutls.info,  Node: Weaknesses and countermeasures,  Next: On Record Padding,  Prev: Compression algorithms used in the record layer,  Up: The TLS record protocol
+File: gnutls.info,  Node: On Record Padding,  Prev: Compression algorithms and the record layer,  Up: The TLS record protocol
 
-3.3.3 Weaknesses and countermeasures
-------------------------------------
-
-Some weaknesses that may affect the security of the record layer have
-been found in TLS 1.0 protocol.  These weaknesses can be exploited by
-active attackers, and exploit the facts that
-
-  1. TLS has separate alerts for "decryption_failed" and
-     "bad_record_mac"
-
-  2. The decryption failure reason can be detected by timing the
-     response time.
-
-  3. The IV for CBC encrypted packets is the last block of the previous
-     encrypted packet.
-
-Those weaknesses were solved in TLS 1.1 [_RFC4346_] which is implemented
-in GnuTLS.  For this reason we suggest to always negotiate the highest
-supported TLS version with the peer(1).  For a detailed discussion of
-the issues see the archives of the TLS Working Group mailing list and
-[_CBCATT_].
-
-   ---------- Footnotes ----------
-
-   (1) If this is not possible then please consult *note
-Interoperability::.
-
-
-File: gnutls.info,  Node: On Record Padding,  Prev: Weaknesses and countermeasures,  Up: The TLS record protocol
-
-3.3.4 On record padding
+3.3.3 On record padding
 -----------------------
 
-The TLS protocol allows for extra padding of records in CBC ciphers, to
-prevent statistical analysis based on the length of exchanged messages
-(see [_RFC5246_] section 6.2.3.2).  GnuTLS appears to be one of few
-implementations that take advantage of this feature: the user can
-provide some plaintext data with a range of lengths she wishes to hide,
-and GnuTLS adds extra padding to make sure the attacker cannot tell the
-real plaintext length is in a range smaller than the user-provided one.
-Use *note gnutls_record_send_range:: to send length-hidden messages and
-*note gnutls_record_can_use_length_hiding:: to check whether the current
-session supports length hiding.  Using the standard *note
-gnutls_record_send:: will only add minimal padding.
+The TLS 1.3 protocol allows for extra padding of records to prevent
+statistical analysis based on the length of exchanged messages.  GnuTLS
+takes advantage of this feature, by allowing the user to specify the
+amount of padding for a particular message.  The simplest interface is
+provided by *note gnutls_record_send2::, and is made available when
+under TLS1.3; alternatively *note gnutls_record_can_use_length_hiding::
+can be queried.
 
-The TLS implementation in the Symbian operating system, frequently used
-by Nokia and Sony-Ericsson mobile phones, cannot handle non-minimal
-record padding.  What happens when one of these clients handshake with a
-GnuTLS server is that the client will fail to compute the correct MAC
-for the record.  The client sends a TLS alert ('bad_record_mac') and
-disconnects.  Typically this will result in error messages such as 'A
-TLS fatal alert has been received', 'Bad record MAC', or both, on the
-GnuTLS server side.
+Note that this interface is not sufficient to completely hide the length
+of the data.  The application code may reveal the data transferred by
+leaking its data processing time, or by leaking the TLS1.3 record
+processing time by GnuTLS. That is because under TLS1.3 the padding
+removal time depends on the padding data for an efficient
+implementation.  To make that processing constant time the *note
+gnutls_init:: function must be called with the flag
+'GNUTLS_SAFE_PADDING_CHECK'.
 
-If compatibility with such devices is a concern, not sending
-length-hidden messages solves the problem by using minimal padding.
+ -- Function: ssize_t gnutls_record_send2 (gnutls_session_t SESSION,
+          const void * DATA, size_t DATA_SIZE, size_t PAD, unsigned
+          FLAGS)
+     SESSION: is a 'gnutls_session_t' type.
 
-If you implement an application that has a configuration file, we
-recommend that you make it possible for users or administrators to
-specify a GnuTLS protocol priority string, which is used by your
-application via *note gnutls_priority_set::.  To allow the best
-flexibility, make it possible to have a different priority string for
-different incoming IP addresses.
+     DATA: contains the data to send
+
+     DATA_SIZE: is the length of the data
+
+     PAD: padding to be added to the record
+
+     FLAGS: must be zero
+
+     This function is identical to 'gnutls_record_send()' except that it
+     takes an extra argument to specify padding to be added the record.
+     To determine the maximum size of padding, use
+     'gnutls_record_get_max_size()' and 'gnutls_record_overhead_size()'
+     .
+
+     Note that in order for GnuTLS to provide constant time processing
+     of padding and data in TLS1.3, the flag 'GNUTLS_SAFE_PADDING_CHECK'
+     must be used in 'gnutls_init()' .
+
+     *Returns:* The number of bytes sent, or a negative error code.  The
+     number of bytes sent might be less than 'data_size' .  The maximum
+     number of bytes this function can send in a single call depends on
+     the negotiated maximum record size.
+
+     *Since:* 3.6.3
+
+Older GnuTLS versions provided an API suitable for cases where the
+sender sends data that are always within a given range.  That API is
+still available, and consists of the following functions.
+
+'UNSIGNED *note gnutls_record_can_use_length_hiding:: (gnutls_session_t SESSION)'
+'SSIZE_T *note gnutls_record_send_range:: (gnutls_session_t SESSION, const void * DATA, size_t DATA_SIZE, const gnutls_range_st * RANGE)'
 
 
 File: gnutls.info,  Node: The TLS Alert Protocol,  Next: The TLS Handshake Protocol,  Prev: The TLS record protocol,  Up: Introduction to TLS
@@ -584,10 +576,10 @@ protocol failure.  Some of these signals are used internally by the
 protocol and the application protocol does not have to cope with them
 (e.g.  'GNUTLS_A_CLOSE_NOTIFY'), and others refer to the application
 protocol solely (e.g.  'GNUTLS_A_USER_CANCELLED').  An alert signal
-includes a level indication which may be either fatal or warning.  Fatal
-alerts always terminate the current connection, and prevent future
-re-negotiations using the current session ID. All alert messages are
-summarized in the table below.
+includes a level indication which may be either fatal or warning (under
+TLS1.3 all alerts are fatal).  Fatal alerts always terminate the current
+connection, and prevent future re-negotiations using the current session
+ID. All supported alert messages are summarized in the table below.
 
 The alert messages are protected by the record protocol, thus the
 information that is included does not leak.  You must take extreme care
@@ -629,6 +621,9 @@ GNUTLS_A_INAPPROPRIATE_FALLBACK          86      Inappropriate
 GNUTLS_A_USER_CANCELED                   90      User canceled
 GNUTLS_A_NO_RENEGOTIATION                100     No renegotiation is
                                                  allowed
+GNUTLS_A_MISSING_EXTENSION               109     An extension was
+                                                 expected but was not
+                                                 seen
 GNUTLS_A_UNSUPPORTED_EXTENSION           110     An unsupported
                                                  extension was sent
 GNUTLS_A_CERTIFICATE_UNOBTAINABLE        111     Could not retrieve
@@ -639,6 +634,8 @@ GNUTLS_A_UNRECOGNIZED_NAME               112     The server name sent
 GNUTLS_A_UNKNOWN_PSK_IDENTITY            115     The SRP/PSK username
                                                  is missing or not
                                                  known
+GNUTLS_A_CERTIFICATE_REQUIRED            116     Certificate is
+                                                 required
 GNUTLS_A_NO_APPLICATION_PROTOCOL         120     No supported
                                                  application protocol
                                                  could be negotiated
@@ -669,9 +666,14 @@ File: gnutls.info,  Node: TLS Cipher Suites,  Next: Authentication,  Up: The TLS
 3.5.1 TLS ciphersuites
 ----------------------
 
-The handshake protocol of TLS negotiates cipher suites of a special form
-illustrated by the 'TLS_DHE_RSA_WITH_3DES_CBC_SHA' cipher suite name.  A
-typical cipher suite contains these parameters:
+The TLS cipher suites have slightly different meaning under different
+protocols.  Under TLS 1.3, a cipher suite indicates the symmetric
+encryption algorithm in use, as well as the pseudo-random function (PRF)
+used in the TLS session.
+
+Under TLS 1.2 or early the handshake protocol negotiates cipher suites
+of a special form illustrated by the 'TLS_DHE_RSA_WITH_3DES_CBC_SHA'
+cipher suite name.  A typical cipher suite contains these parameters:
 
    * The key exchange algorithm.  'DHE_RSA' in the example.
 
@@ -702,13 +704,18 @@ File: gnutls.info,  Node: Authentication,  Next: Client Authentication,  Prev: T
 
 The key exchange algorithms of the TLS protocol offer authentication,
 which is a prerequisite for a secure connection.  The available
-authentication methods in GnuTLS follow.
+authentication methods in GnuTLS, under TLS 1.3 or earlier versions,
+follow.
 
    * Certificate authentication: Authenticated key exchange using public
-     key infrastructure and certificates (X.509 or OpenPGP).
-   * SRP authentication: Authenticated key exchange using a password.
+     key infrastructure and X.509 certificates.
    * PSK authentication: Authenticated key exchange using a pre-shared
      key.
+
+Under TLS 1.2 or earlier versions, the following authentication methods
+are also available.
+
+   * SRP authentication: Authenticated key exchange using a password.
    * Anonymous authentication: Key exchange without peer authentication.
 
 
@@ -748,8 +755,8 @@ File: gnutls.info,  Node: TLS Extensions,  Next: How to use TLS in application p
 ==================
 
 A number of extensions to the TLS protocol have been proposed mainly in
-[_TLSEXT_]. The extensions supported in GnuTLS are discussed in the
-subsections that follow.
+[*note TLSEXT::].  The extensions supported in GnuTLS are discussed in
+the subsections that follow.
 
 * Menu:
 
@@ -809,7 +816,7 @@ This complicates deployment, and can be avoided by delegating the
 storage to the client.  Because session parameters are sensitive they
 are encrypted and authenticated with a key only known to the server and
 then sent to the client.  The Session Tickets extension is described in
-RFC 5077 [_TLSTKT_].
+RFC 5077 [*note TLSTKT::].
 
 A disadvantage of session tickets is that they eliminate the effects of
 forward secrecy when a server uses the same key for long time.  That is,
@@ -821,6 +828,10 @@ Since version 3.1.3 GnuTLS clients transparently support session
 tickets, unless forward secrecy is explicitly requested (with the PFS
 priority string).
 
+Under TLS 1.3 session tickets are mandatory for session resumption, and
+they do not share the forward secrecy concerns as with TLS 1.2 or
+earlier.
+
 
 File: gnutls.info,  Node: HeartBeat,  Next: Safe renegotiation,  Prev: Session tickets,  Up: TLS Extensions
 
@@ -828,7 +839,7 @@ File: gnutls.info,  Node: HeartBeat,  Next: Safe renegotiation,  Prev: Session t
 ---------------
 
 This is a TLS extension that allows to ping and receive confirmation
-from the peer, and is described in [_RFC6520_].  The extension is
+from the peer, and is described in [*note RFC6520::].  The extension is
 disabled by default and *note gnutls_heartbeat_enable:: can be used to
 enable it.  A policy may be negotiated to only allow sending heartbeat
 messages or sending and receiving.  The current session policy can be
@@ -837,7 +848,7 @@ the peer result to 'GNUTLS_E_HEARTBEAT_PING_RECEIVED' being returned
 from the receive function.  Ping requests to peer can be send via *note
 gnutls_heartbeat_ping::.
 
-'INT *note gnutls_heartbeat_allowed:: (gnutls_session_t SESSION, unsigned int TYPE)'
+'UNSIGNED *note gnutls_heartbeat_allowed:: (gnutls_session_t SESSION, unsigned int TYPE)'
 'VOID *note gnutls_heartbeat_enable:: (gnutls_session_t SESSION, unsigned int TYPE)'
 
 'INT *note gnutls_heartbeat_ping:: (gnutls_session_t SESSION, size_t DATA_SIZE, unsigned int MAX_TRIES, unsigned int FLAGS)'
@@ -892,8 +903,8 @@ While fixing these application protocols and implementations would be
 one natural reaction, an extension to TLS has been designed that
 cryptographically binds together any renegotiated handshakes with the
 initial negotiation.  When the extension is used, the attack is detected
-and the session can be terminated.  The extension is specified in
-[_RFC5746_].
+and the session can be terminated.  The extension is specified in [*note
+RFC5746::].
 
 GnuTLS supports the safe renegotiation extension.  The default behavior
 is as follows.  Clients will attempt to negotiate the safe renegotiation
@@ -971,11 +982,11 @@ File: gnutls.info,  Node: SRTP,  Next: False Start,  Prev: OCSP status request, 
 3.6.7 SRTP
 ----------
 
-The TLS protocol was extended in [_RFC5764_] to provide keying material
-to the Secure RTP (SRTP) protocol.  The SRTP protocol provides an
-encapsulation of encrypted data that is optimized for voice data.  With
-the SRTP TLS extension two peers can negotiate keys using TLS or DTLS
-and obtain keying material for use with SRTP. The available SRTP
+The TLS protocol was extended in [*note RFC5764::] to provide keying
+material to the Secure RTP (SRTP) protocol.  The SRTP protocol provides
+an encapsulation of encrypted data that is optimized for voice data.
+With the SRTP TLS extension two peers can negotiate keys using TLS or
+DTLS and obtain keying material for use with SRTP. The available SRTP
 profiles are listed below.
 
 'GNUTLS_SRTP_AES128_CM_HMAC_SHA1_80'
@@ -987,7 +998,7 @@ profiles are listed below.
 'GNUTLS_SRTP_NULL_HMAC_SHA1_32'
      NULL cipher with a 32 bit HMAC-SHA1
 
-Figure 3.3: Supported SRTP profiles
+Figure 3.2: Supported SRTP profiles
 
 To enable use the following functions.
 
@@ -1043,16 +1054,15 @@ File: gnutls.info,  Node: False Start,  Next: Application Layer Protocol Negotia
 3.6.8 False Start
 -----------------
 
-The TLS protocol was extended in [_draft-ietf-tls-falsestart-01_] to
-allow the client to send data to server in a single round trip.  This
-change however operates on the borderline of the TLS protocol security
-guarrantees and should be used for the cases where the reduced latency
-outperforms the risk of an adversary intercepting the transferred data.
-In GnuTLS applications can use the GNUTLS_ENABLE_FALSE_START as option
-to *note gnutls_init:: to request an early return of the *note
-gnutls_handshake:: function.  After that early return the application is
-expected to transfer any data to be piggybacked on the last handshake
-message.
+The TLS protocol was extended in [*note RFC7918::] to allow the client
+to send data to server in a single round trip.  This change however
+operates on the borderline of the TLS protocol security guarantees and
+should be used for the cases where the reduced latency outperforms the
+risk of an adversary intercepting the transferred data.  In GnuTLS
+applications can use the GNUTLS_ENABLE_FALSE_START as option to *note
+gnutls_init:: to request an early return of the *note gnutls_handshake::
+function.  After that early return the application is expected to
+transfer any data to be piggybacked on the last handshake message.
 
 After handshake's early termination, the application is expected to
 transmit data using *note gnutls_record_send::, and call *note
@@ -1068,8 +1078,8 @@ insufficient key sizes, the handshake process will complete properly
 (i.e., no early return).  To verify that false start was used you may
 use *note gnutls_session_get_flags:: and check for the
 GNUTLS_SFLAGS_FALSE_START flag.  For GnuTLS the false start is
-whitelisted for the following key exchange methods (see
-[_draft-ietf-tls-falsestart-01_] for rationale)
+whitelisted for the following key exchange methods (see [*note
+RFC7918::] for rationale)
    * DHE
    * ECDHE
 but only when the negotiated parameters exceed 'GNUTLS_SEC_PARAM_HIGH'
@@ -1102,11 +1112,12 @@ File: gnutls.info,  Node: Extensions and Supplemental Data,  Prev: Application L
 ---------------------------------------
 
 It is possible to transfer supplemental data during the TLS handshake,
-following [_RFC4680_].  This is for "custom" protocol modifications for
-applications which may want to transfer additional data (e.g.
-additional authentication messages).  Such an exchange requires a custom
-extension to be registered.  The provided API for this functionality is
-low-level and described in *note TLS Extension Handling::.
+following [*note RFC4680::].  This is for "custom" protocol
+modifications for applications which may want to transfer additional
+data (e.g.  additional authentication messages).  Such an exchange
+requires a custom extension to be registered.  The provided API for this
+functionality is low-level and described in *note TLS Hello Extension
+Handling::.
 
 
 File: gnutls.info,  Node: How to use TLS in application protocols,  Next: On SSL 2 and older protocols,  Prev: TLS Extensions,  Up: Introduction to TLS
@@ -1137,7 +1148,7 @@ sessions.  This method ensures that if a user requests a secure session
 then the client will attempt to connect to the secure port and fail
 otherwise.  The only possible attack with this method is to perform a
 denial of service attack.  The most famous example of this method is
-"HTTP over TLS" or HTTPS protocol [_RFC2818_].
+"HTTP over TLS" or HTTPS protocol [*note RFC2818::].
 
 Despite its wide use, this method has several issues.  This approach
 starts the TLS Handshake procedure just after the client connects on the
@@ -1170,7 +1181,7 @@ is to extend the application protocol to have a "STARTTLS" request,
 whose purpose it to start the TLS protocols just after the client
 requests it.  This approach does not require any extra port to be
 reserved.  There is even an extension to HTTP protocol to support this
-method [_RFC2817_].
+method [*note RFC2817::].
 
 The tricky part, in this method, is that the "STARTTLS" request is sent
 in the clear, thus is vulnerable to modifications.  A typical attack is
@@ -1317,9 +1328,9 @@ File: gnutls.info,  Node: Certificate authentication,  Next: More on certificate
 ==============================
 
 The most known authentication method of TLS are certificates.  The PKIX
-[_PKIX_] public key infrastructure is daily used by anyone using a
-browser today.  GnuTLS provides a simple API to use the X.509
-certificates [_PKIX_].
+[*note PKIX::] public key infrastructure is daily used by anyone using a
+browser today.  GnuTLS provides a simple API to verify the X.509
+certificates as in [*note PKIX::].
 
 The key exchange algorithms supported by certificate authentication are
 shown in *note Table 4.1: tab:key-exchange.
@@ -1371,6 +1382,7 @@ Table 4.1: Supported key exchange algorithms.
 
 * X.509 certificates::
 * OpenPGP certificates::
+* Raw public-keys::
 * Advanced certificate verification::
 * Digital signatures::
 
@@ -1414,7 +1426,7 @@ File: gnutls.info,  Node: X.509 certificate structure,  Next: Importing an X.509
 
 An X.509 certificate usually contains information about the certificate
 holder, the signer, a unique serial number, expiration dates and some
-other fields [_PKIX_] as shown in *note Table 4.2: tab:x509.
+other fields [*note PKIX::] as shown in *note Table 4.2: tab:x509.
 
 Field          Description
                
@@ -1509,9 +1521,9 @@ certificate.  The following functions provide access to that names.
 
 Note however, that server certificates often used the Common Name (CN),
 part of the certificate DistinguishedName to place a single DNS address.
-That practice is discouraged (see [_RFC6125_]), because only a single
-address can be specified, and the CN field is free-form making matching
-ambiguous.
+That practice is discouraged (see [*note RFC6125::]), because only a
+single address can be specified, and the CN field is free-form making
+matching ambiguous.
 
 
 File: gnutls.info,  Node: X.509 distinguished names,  Next: X.509 extensions,  Prev: X.509 certificate names,  Up: X.509 certificates
@@ -1523,8 +1535,8 @@ The "subject" of an X.509 certificate is not described by a single name,
 but rather with a distinguished name.  This in X.509 terminology is a
 list of strings each associated an object identifier.  To make things
 simple GnuTLS provides *note gnutls_x509_crt_get_dn2:: which follows the
-rules in [_RFC4514_] and returns a single string.  Access to each string
-by individual object identifiers can be accessed using *note
+rules in [*note RFC4514::] and returns a single string.  Access to each
+string by individual object identifiers can be accessed using *note
 gnutls_x509_crt_get_dn_by_oid::.
 
  -- Function: int gnutls_x509_crt_get_dn2 (gnutls_x509_crt_t CERT,
@@ -1679,13 +1691,22 @@ Name constraints       2.5.29.30      A field in CA certificates
                                       
 CRL distribution       2.5.29.31      This extension is set by
 points                                the CA, in order to inform
-                                      about the issued CRLs.
+                                      about the location of
+                                      issued Certificate
+                                      Revocation Lists.
                                       
 Certificate policy     2.5.29.32      This extension is set to
                                       indicate the certificate
                                       policy as object identifier
                                       and may contain a
                                       descriptive string or URL.
+                                      
+Extended key usage     2.5.29.54      Inhibit any policy
+                                      extension.  Constraints the
+                                      any policy OID
+                                      ('GNUTLS_X509_OID_POLICY_ANY')
+                                      use in the policy
+                                      extension.
                                       
 Authority key          2.5.29.35      An identifier of the key of
 identifier                            the issuer of the
@@ -1709,7 +1730,7 @@ Information                           this extension that
                                       the maximum lengths of
                                       proxy chains.  Proxy
                                       Certificates are specified
-                                      in [_RFC3820_].
+                                      in [*note RFC3820::].
                                       
 
 Table 4.3: Supported X.509 certificate extensions.
@@ -1789,14 +1810,23 @@ this purpose the following functions are provided.
      FLAGS: flags from 'gnutls_trust_list_flags_t'
 
      This function will add the given certificate authorities to the
-     trusted list.  The list of CAs must not be deinitialized during
-     this structure's lifetime.
+     trusted list.  The CAs in 'clist' must not be deinitialized during
+     the lifetime of 'list' .
 
-     If the flag 'GNUTLS_TL_NO_DUPLICATES' is specified, then the
-     provided 'clist' entries that are duplicates will not be added to
-     the list and will be deinitialized.
+     If the flag 'GNUTLS_TL_NO_DUPLICATES' is specified, then this
+     function will ensure that no duplicates will be present in the
+     final trust list.
 
-     *Returns:* The number of added elements is returned.
+     If the flag 'GNUTLS_TL_NO_DUPLICATE_KEY' is specified, then this
+     function will ensure that no certificates with the same key are
+     present in the final trust list.
+
+     If either 'GNUTLS_TL_NO_DUPLICATE_KEY' or 'GNUTLS_TL_NO_DUPLICATES'
+     are given, 'gnutls_x509_trust_list_deinit()' must be called with
+     parameter 'all' being 1.
+
+     *Returns:* The number of added elements is returned; that includes
+     duplicate entries.
 
      *Since:* 3.0.0
 
@@ -1824,8 +1854,8 @@ this purpose the following functions are provided.
      certificates that are trusted by the user for that specific server
      but for no other purposes.
 
-     The certificate must not be deinitialized during the lifetime of
-     the trusted list.
+     The certificate 'cert' must not be deinitialized during the
+     lifetime of the 'list' .
 
      *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
      otherwise a negative error value.
@@ -1848,20 +1878,24 @@ this purpose the following functions are provided.
      specifies GNUTLS_TL_VERIFY_CRL
 
      This function will add the given certificate revocation lists to
-     the trusted list.  The list of CRLs must not be deinitialized
-     during this structure's lifetime.
+     the trusted list.  The CRLs in 'crl_list' must not be deinitialized
+     during the lifetime of 'list' .
 
      This function must be called after
      'gnutls_x509_trust_list_add_cas()' to allow verifying the CRLs for
-     validity.  If the flag 'GNUTLS_TL_NO_DUPLICATES' is given, then any
-     provided CRLs that are a duplicate, will be deinitialized and not
-     added to the list (that assumes that
-     'gnutls_x509_trust_list_deinit()' will be called with all=1).
+     validity.  If the flag 'GNUTLS_TL_NO_DUPLICATES' is given, then the
+     final CRL list will not contain duplicate entries.
 
-     If GNUTLS_TL_VERIFY_CRL is given the CRLs will be verified before
-     being added.
+     If the flag 'GNUTLS_TL_NO_DUPLICATES' is given,
+     'gnutls_x509_trust_list_deinit()' must be called with parameter
+     'all' being 1.
 
-     *Returns:* The number of added elements is returned.
+     If flag 'GNUTLS_TL_VERIFY_CRL' is given the CRLs will be verified
+     before being added, and if verification fails, they will be
+     skipped.
+
+     *Returns:* The number of added elements is returned; that includes
+     duplicate entries.
 
      *Since:* 3.0
 
@@ -1935,14 +1969,14 @@ this purpose the following functions are provided.
      verification flags.
 
      Additional verification parameters are possible via the 'data'
-     types; the acceptable types are 'GNUTLS_DT_DNS_HOSTNAME' and
-     'GNUTLS_DT_KEY_PURPOSE_OID' .  The former accepts as data a
-     null-terminated hostname, and the latter a null-terminated object
-     identifier (e.g., 'GNUTLS_KP_TLS_WWW_SERVER' ).  If a DNS hostname
-     is provided then this function will compare the hostname in the end
-     certificate against the given.  If names do not match the
-     'GNUTLS_CERT_UNEXPECTED_OWNER' status flag will be set.  In
-     addition it will consider certificates provided with
+     types; the acceptable types are 'GNUTLS_DT_DNS_HOSTNAME' ,
+     'GNUTLS_DT_IP_ADDRESS' and 'GNUTLS_DT_KEY_PURPOSE_OID' .  The
+     former accepts as data a null-terminated hostname, and the latter a
+     null-terminated object identifier (e.g., 'GNUTLS_KP_TLS_WWW_SERVER'
+     ).  If a DNS hostname is provided then this function will compare
+     the hostname in the end certificate against the given.  If names do
+     not match the 'GNUTLS_CERT_UNEXPECTED_OWNER' status flag will be
+     set.  In addition it will consider certificates provided with
      'gnutls_x509_trust_list_add_named_crt()' .
 
      If a key purpose OID is provided and the end-certificate contains
@@ -2041,6 +2075,9 @@ this purpose the following functions are provided.
      This function will add the given certificate authorities to the
      trusted list.
 
+     If this function is used 'gnutls_x509_trust_list_deinit()' must be
+     called with parameter 'all' being 1.
+
      *Returns:* The number of added elements is returned.
 
      *Since:* 3.1
@@ -2116,6 +2153,9 @@ more detailed flags will also be set when appropriate.
      but no status was received.
 'GNUTLS_CERT_INVALID_OCSP_STATUS'
      The received OCSP status response is invalid.
+'GNUTLS_CERT_UNKNOWN_CRIT_EXTENSIONS'
+     The certificate has extensions marked as critical which are not
+     supported.
 
 Figure 4.2: The 'gnutls_certificate_status_t' enumeration.
 
@@ -2170,6 +2210,10 @@ are part of the enumeration 'gnutls_certificate_verify_flags' shown in
 'GNUTLS_VERIFY_DISABLE_CA_SIGN'
      If set a signer does not have to be a certificate authority.  This
      flag should normally be disabled, unless you know what this means.
+'GNUTLS_VERIFY_DO_NOT_ALLOW_IP_MATCHES'
+     When verifying a hostname prevent textual IP addresses from
+     matching IP addresses in the certificate.  Treat the input only as
+     a DNS name.
 'GNUTLS_VERIFY_DO_NOT_ALLOW_SAME'
      If a certificate is not signed by anyone trusted but exists in the
      trusted CA list do not treat it as trusted.
@@ -2205,6 +2249,12 @@ are part of the enumeration 'gnutls_certificate_verify_flags' shown in
 'GNUTLS_VERIFY_USE_TLS1_RSA'
      This indicates that a (raw) RSA signature is provided as in the TLS
      1.0 protocol.  Not all functions accept this flag.
+'GNUTLS_VERIFY_IGNORE_UNKNOWN_CRIT_EXTENSIONS'
+     This signals the verification process, not to fail on unknown
+     critical extensions.
+'GNUTLS_VERIFY_ALLOW_SIGN_WITH_SHA1'
+     Allow certificates to be signed using the broken SHA1 hash
+     algorithm.
 
 Figure 4.3: The 'gnutls_certificate_verify_flags' enumeration.
 
@@ -2230,8 +2280,8 @@ gnutls_certificate_set_x509_trust_file::), a pkcs11 URL, or simply
 The trust modules of p11-kit assign a purpose to trusted authorities
 using the extended key usage object identifiers.  The common purposes
 are shown in *note Table 4.4: tab:purposes.  Note that typically
-according to [_RFC5280_] the extended key usage object identifiers apply
-to end certificates.  Their application to CA certificates is an
+according to [*note RFC5280::] the extended key usage object identifiers
+apply to end certificates.  Their application to CA certificates is an
 extension used by the trust modules.
 
 Purpose        OID            Description
@@ -2263,7 +2313,7 @@ GNUTLS_KP_OCSP_SIGNING1.3.6.1.5.5.7.3.9The certificate is to be used for signing
                               OCSP responses.  When in a CA
                               certificate, it indicates that the CA is
                               allowed to sign certificates which sign
-                              OCSP reponses.
+                              OCSP responses.
                               
 GNUTLS_KP_ANY  2.5.29.37.0    The certificate is to be used for any
                               purpose.  When in a CA certificate, it
@@ -2282,30 +2332,72 @@ requested from the trusted authorities.
 
    ---------- Footnotes ----------
 
-   (1) see <http://p11-glue.freedesktop.org/trust-module.html>.
+   (1) see <https://p11-glue.freedesktop.org/trust-module.html>.
 
 
-File: gnutls.info,  Node: OpenPGP certificates,  Next: Advanced certificate verification,  Prev: X.509 certificates,  Up: Certificate authentication
+File: gnutls.info,  Node: OpenPGP certificates,  Next: Raw public-keys,  Prev: X.509 certificates,  Up: Certificate authentication
 
 4.1.2 OpenPGP certificates
 --------------------------
 
 Previous versions of GnuTLS supported limited OpenPGP key
-authentication.  That functionality has been deprecated and although is
-still made available, it is no longer recommended to use.  The reason is
-that, supporting alternative authentication methods, when X.509 and PKIX
-were new and not well established, seemed like a good idea, in today's
-internet X.509 is unquestionably the main container for certificates.
-As such supporting more options with no clear use-cases, is a
-distraction that consumes considerable resources for improving and
-testing.  For that we have decided to mark this functionality as
-deprecated, and will be dropped in one of the next GnuTLS major
-releases.
+authentication.  That functionality has been deprecated and is no longer
+made available.  The reason is that, supporting alternative
+authentication methods, when X.509 and PKIX were new on the Internet and
+not well established, seemed like a good idea, in today's Internet X.509
+is unquestionably the main container for certificates.  As such
+supporting more options with no clear use-cases, is a distraction that
+consumes considerable resources for improving and testing the library.
+For that we have decided to drop this functionality completely in 3.6.0.
 
 
-File: gnutls.info,  Node: Advanced certificate verification,  Next: Digital signatures,  Prev: OpenPGP certificates,  Up: Certificate authentication
+File: gnutls.info,  Node: Raw public-keys,  Next: Advanced certificate verification,  Prev: OpenPGP certificates,  Up: Certificate authentication
 
-4.1.3 Advanced certificate verification
+4.1.3 Raw public-keys
+---------------------
+
+There are situations in which a rather large certificate / certificate
+chain is undesirable or impractical.  An example could be a resource
+contrained sensor network in which you do want to use authentication of
+and encryption between your devices but where your devices lack loads of
+memory or processing power.  Furthermore, there are situations in which
+you don't want to or can't rely on a PKIX. TLS is, next to a PKIX
+environment, also commonly used with self-signed certificates in smaller
+deployments where the self-signed certificates are distributed to all
+involved protocol endpoints out-of-band.  This practice does, however,
+still require the overhead of the certificate generation even though
+none of the information found in the certificate is actually used.
+
+With raw public-keys, only a subset of the information found in typical
+certificates is utilized: namely, the SubjectPublicKeyInfo structure (in
+ASN.1 format) of a PKIX certificate that carries the parameters
+necessary to describe the public-key.  Other parameters found in PKIX
+certificates are omitted.  By omitting various certificate-related
+structures, the resulting raw public-key is kept fairly small in
+comparison to the original certificate, and the code to process the keys
+can be simpler.
+
+It should be noted however, that the authenticity of these raw keys must
+be verified by an out-of-band mechanism or something like TOFU.
+
+* Menu:
+
+* Importing raw public-keys::
+
+
+File: gnutls.info,  Node: Importing raw public-keys,  Up: Raw public-keys
+
+4.1.3.1 Importing raw public-keys
+.................................
+
+Raw public-keys and their private counterparts can best be handled by
+using the abstract types 'gnutls_pubkey_t' and 'gnutls_privkey_t'
+respectively.  To learn how to use these see *note Abstract key types::.
+
+
+File: gnutls.info,  Node: Advanced certificate verification,  Next: Digital signatures,  Prev: Raw public-keys,  Up: Certificate authentication
+
+4.1.4 Advanced certificate verification
 ---------------------------------------
 
 The verification of X.509 certificates in the HTTPS and other Internet
@@ -2326,7 +2418,7 @@ methods.
 
 File: gnutls.info,  Node: Verifying a certificate using trust on first use authentication,  Next: Verifying a certificate using DANE,  Up: Advanced certificate verification
 
-4.1.3.1 Verifying a certificate using trust on first use authentication
+4.1.4.1 Verifying a certificate using trust on first use authentication
 .......................................................................
 
 It is possible to use a trust on first use (TOFU) authentication method
@@ -2339,8 +2431,8 @@ provide multiple factor verification, where a single point of failure is
 not enough to compromise the system.  For example a server compromise
 may be detected using OCSP, and a CA compromise can be detected using
 the trust on first use method.  Such a hybrid system with X.509 and
-trust on first use authentication is shown in *note Simple client
-example with SSH-style certificate verification::.
+trust on first use authentication is shown in *note Client example with
+SSH-style certificate verification::.
 
 See *note Certificate verification:: on how to use the available
 functionality.
@@ -2348,7 +2440,7 @@ functionality.
 
 File: gnutls.info,  Node: Verifying a certificate using DANE,  Prev: Verifying a certificate using trust on first use authentication,  Up: Advanced certificate verification
 
-4.1.3.2 Verifying a certificate using DANE (DNSSEC)
+4.1.4.2 Verifying a certificate using DANE (DNSSEC)
 ...................................................
 
 The DANE protocol is a protocol that can be used to verify TLS
@@ -2377,7 +2469,7 @@ on top of DANE.
 
 File: gnutls.info,  Node: Digital signatures,  Prev: Advanced certificate verification,  Up: Certificate authentication
 
-4.1.4 Digital signatures
+4.1.5 Digital signatures
 ------------------------
 
 In this section we will provide some information about digital
@@ -2416,7 +2508,7 @@ broken usually it means that the Collision resistance of the algorithm
 is less than brute force.  Using the birthday paradox the brute force
 attack takes 2^{((hash size) / 2)} operations.  Today colliding
 certificates using the MD5 hash algorithm have been generated as shown
-in [_WEGER_].
+in [*note WEGER::].
 
 There has been cryptographic results for the SHA-1 hash algorithms as
 well, although they are not yet critical.  Before 2004, MD5 had a
@@ -2430,7 +2522,7 @@ computer power available sometime in the future, SHA-1 will be disabled
 as well.  The collision attacks on SHA-1 may also get better, given the
 new interest in tools for creating them.
 
-4.1.4.1 Trading security for interoperability
+4.1.5.1 Trading security for interoperability
 .............................................
 
 If you connect to a server and use GnuTLS' functions to verify the
@@ -2454,6 +2546,8 @@ certificate chain, you can call *note
 gnutls_certificate_set_verify_flags:: with the flags:
    * 'GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD2'
    * 'GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5'
+   * 'GNUTLS_VERIFY_ALLOW_SIGN_WITH_SHA1'
+   * 'GNUTLS_VERIFY_ALLOW_BROKEN'
 as in the following example:
 
        gnutls_certificate_set_verify_flags (x509cred,
@@ -2510,8 +2604,9 @@ File: gnutls.info,  Node: PKCS 10 certificate requests,  Next: PKIX certificate 
 A certificate request is a structure, which contain information about an
 applicant of a certificate service.  It typically contains a public key,
 a distinguished name and secondary data such as a challenge password.
-GnuTLS supports the requests defined in PKCS #10 [_RFC2986_].  Other
-formats of certificate requests are not currently supported by GnuTLS.
+GnuTLS supports the requests defined in PKCS #10 [*note RFC2986::].
+Other formats of certificate requests are not currently supported by
+GnuTLS.
 
 A certificate request can be generated by associating it with a private
 key, setting the subject's information and finally self signing it.  The
@@ -2550,7 +2645,7 @@ types::.
 
      KEY: holds a private key
 
-     DIG: The message digest to use, i.e., 'GNUTLS_DIG_SHA1'
+     DIG: The message digest to use, i.e., 'GNUTLS_DIG_SHA256'
 
      FLAGS: must be 0
 
@@ -2561,6 +2656,14 @@ types::.
 
      This must be the last step in a certificate request generation
      since all the previously set parameters are now signed.
+
+     A known limitation of this function is, that a newly-signed request
+     will not be fully functional (e.g., for signature verification),
+     until it is exported an re-imported.
+
+     After GnuTLS 3.6.1 the value of 'dig' may be 'GNUTLS_DIG_UNKNOWN' ,
+     and in that case, a suitable but reasonable for the key algorithm
+     will be selected.
 
      *Returns:* 'GNUTLS_E_SUCCESS' on success, otherwise a negative
      error code.  'GNUTLS_E_ASN1_VALUE_NOT_FOUND' is returned if you
@@ -2742,7 +2845,7 @@ provided.
      otherwise a negative error value.
 
 'INT *note gnutls_x509_crl_get_version:: (gnutls_x509_crl_t CRL)'
-'INT *note gnutls_x509_crl_get_issuer_dn:: (const gnutls_x509_crl_t CRL, char * BUF, size_t * SIZEOF_BUF)'
+'INT *note gnutls_x509_crl_get_issuer_dn:: (gnutls_x509_crl_t CRL, char * BUF, size_t * SIZEOF_BUF)'
 'INT *note gnutls_x509_crl_get_issuer_dn2:: (gnutls_x509_crl_t CRL, gnutls_datum_t * DN)'
 'TIME_T *note gnutls_x509_crl_get_this_update:: (gnutls_x509_crl_t CRL)'
 'TIME_T *note gnutls_x509_crl_get_next_update:: (gnutls_x509_crl_t CRL)'
@@ -2788,6 +2891,10 @@ residing in a PKCS #11 token.
      will not be fully functional (e.g., for signature verification),
      until it is exported an re-imported.
 
+     After GnuTLS 3.6.1 the value of 'dig' may be 'GNUTLS_DIG_UNKNOWN' ,
+     and in that case, a suitable but reasonable for the key algorithm
+     will be selected.
+
      *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
      otherwise a negative error value.
 
@@ -2815,6 +2922,10 @@ residing in a PKCS #11 token.
      will not be fully functional (e.g., for signature verification),
      until it is exported an re-imported.
 
+     After GnuTLS 3.6.1 the value of 'dig' may be 'GNUTLS_DIG_UNKNOWN' ,
+     and in that case, a suitable but reasonable for the key algorithm
+     will be selected.
+
      *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
      otherwise a negative error value.
 
@@ -2837,10 +2948,11 @@ reached.  There are several reasons for revoking certificates, but a
 typical situation is when the private key associated with a certificate
 has been compromised.  Traditionally, Certificate Revocation Lists
 (CRLs) have been used by application to implement revocation checking,
-however, several problems with CRLs have been identified [_RIVESTCRL_].
+however, several problems with CRLs have been identified [*note
+RIVESTCRL::].
 
-The Online Certificate Status Protocol, or OCSP [_RFC2560_], is a widely
-implemented protocol which performs certificate revocation status
+The Online Certificate Status Protocol, or OCSP [*note RFC2560::], is a
+widely implemented protocol which performs certificate revocation status
 checking.  An application that wish to verify the identity of a peer
 will verify the certificate against a set of trusted certificates and
 then check whether the certificate is listed in a CRL and/or perform an
@@ -3076,31 +3188,85 @@ can provide a "stapled" OCSP response in the TLS handshake.  That way
 the client application needs to do nothing more.  GnuTLS will
 automatically consider the stapled OCSP response during the TLS
 certificate verification (see *note gnutls_certificate_verify_peers2::).
-The stapled response can be obtained using *note
-gnutls_ocsp_status_request_get::.
+To disable the automatic OCSP verification the flag
+'GNUTLS_VERIFY_DISABLE_CRL_CHECKS' should be specified to *note
+gnutls_certificate_set_verify_flags::.
 
-In addition, since GnuTLS 3.5.1 the client will consider the [_RFC7633_]
-OCSP-Must-staple certificate extension, and will consider it while
-checking for stapled OCSP responses.  If the extension is present and no
-OCSP staple is found the certificate verification will fail and the
-status code 'GNUTLS_CERT_MISSING_OCSP_STATUS' will returned from the
-verification function.
+Since GnuTLS 3.5.1 the client certificate verification will consider the
+[*note RFC7633::] OCSP-Must-staple certificate extension, and will
+consider it while checking for stapled OCSP responses.  If the extension
+is present and no OCSP staple is found, the certificate verification
+will fail and the status code 'GNUTLS_CERT_MISSING_OCSP_STATUS' will
+returned from the verification function.
 
-GnuTLS servers can provide this response to their clients using the
+Under TLS 1.2 only one stapled response can be sent by a server, the
+OCSP response associated with the end-certificate.  Under TLS 1.3 a
+server can send multiple OCSP responses, typically one for each
+certificate in the certificate chain.  The following functions can be
+used by a client application to retrieve the OCSP responses as sent by
+the server.
+
+'INT *note gnutls_ocsp_status_request_get:: (gnutls_session_t SESSION, gnutls_datum_t * RESPONSE)'
+'INT *note gnutls_ocsp_status_request_get2:: (gnutls_session_t SESSION, unsigned IDX, gnutls_datum_t * RESPONSE)'
+
+GnuTLS servers can provide OCSP responses to their clients using the
 following functions.
 
-'VOID *note gnutls_certificate_set_ocsp_status_request_function:: (gnutls_certificate_credentials_t SC, gnutls_status_request_ocsp_func OCSP_FUNC, void * PTR)'
-'INT *note gnutls_certificate_set_ocsp_status_request_file:: (gnutls_certificate_credentials_t SC, const char * RESPONSE_FILE, unsigned IDX)'
+'VOID *note gnutls_certificate_set_retrieve_function3:: (gnutls_certificate_credentials_t CRED, gnutls_certificate_retrieve_function3 * FUNC)'
+'INT *note gnutls_certificate_set_ocsp_status_request_file2:: (gnutls_certificate_credentials_t SC, const char * RESPONSE_FILE, unsigned IDX, gnutls_x509_crt_fmt_t FMT)'
 'INT *note gnutls_ocsp_status_request_is_checked:: (gnutls_session_t SESSION, unsigned int FLAGS)'
 
-The simplest approach is for a server to provide the OCSP server's
-response using the *note
-gnutls_certificate_set_ocsp_status_request_file::.  The response may be
-updated periodically using the following command (see also *note
-ocsptool Invocation::).
+A server is expected to provide the relevant certificate's OCSP
+responses using *note
+gnutls_certificate_set_ocsp_status_request_file2::, and ensure a
+periodic reload/renew of the credentials.  An estimation of the OCSP
+responses expiration can be obtained using the *note
+gnutls_certificate_get_ocsp_expiration:: function.
+
+ -- Function: time_t gnutls_certificate_get_ocsp_expiration
+          (gnutls_certificate_credentials_t SC, unsigned IDX, int OIDX,
+          unsigned FLAGS)
+     SC: is a credentials structure.
+
+     IDX: is a certificate chain index as returned by
+     'gnutls_certificate_set_key()' and friends
+
+     OIDX: is an OCSP response index
+
+     FLAGS: should be zero
+
+     This function returns the validity of the loaded OCSP responses, to
+     provide information on when to reload/refresh them.
+
+     Note that the credentials structure should be read-only when in
+     use, thus when reloading, either the credentials structure must not
+     be in use by any sessions, or a new credentials structure should be
+     allocated for new sessions.
+
+     When 'oidx' is (-1) then the minimum refresh time for all responses
+     is returned.  Otherwise the index specifies the response
+     corresponding to the 'odix' certificate in the certificate chain.
+
+     *Returns:* On success, the expiration time of the OCSP response.
+     Otherwise (time_t)(-1) on error, or (time_t)-2 on out of bounds.
+
+     *Since:* 3.6.3
+
+Prior to GnuTLS 3.6.4, the functions *note
+gnutls_certificate_set_ocsp_status_request_function2:: *note
+gnutls_certificate_set_ocsp_status_request_file:: were provided to set
+OCSP responses.  These functions are still functional, but cannot be
+used to set multiple OCSP responses as allowed by TLS1.3.
+
+The responses can be updated periodically using the 'ocsptool' command
+(see also *note ocsptool Invocation::).
 
      ocsptool --ask --load-cert server_cert.pem --load-issuer the_issuer.pem
-              --load-signer the_issuer.pem --outfile ocsp.response
+              --load-signer the_issuer.pem --outfile ocsp.resp
+
+In order to allow multiple OCSP responses to be concatenated, GnuTLS
+supports PEM-encoded OCSP responses.  These can be generated using
+'ocsptool' with the '-no-outder' parameter.
 
 
 File: gnutls.info,  Node: Managing encrypted keys,  Next: certtool Invocation,  Prev: OCSP stapling,  Up: More on certificate authentication
@@ -3220,17 +3386,27 @@ the obsolete PBES1 scheme cannot be decrypted.
 'GNUTLS_PKCS_PBES2_DES'
      PBES2 single DES.
 'GNUTLS_PKCS_PBES1_DES_MD5'
-     - undescribed -
+     PBES1 with single DES; for compatibility with openssl only.
+'GNUTLS_PKCS_PBES2_GOST_TC26Z'
+     PBES2 GOST 28147-89 CFB with TC26-Z S-box.
+'GNUTLS_PKCS_PBES2_GOST_CPA'
+     PBES2 GOST 28147-89 CFB with CryptoPro-A S-box.
+'GNUTLS_PKCS_PBES2_GOST_CPB'
+     PBES2 GOST 28147-89 CFB with CryptoPro-B S-box.
+'GNUTLS_PKCS_PBES2_GOST_CPC'
+     PBES2 GOST 28147-89 CFB with CryptoPro-C S-box.
+'GNUTLS_PKCS_PBES2_GOST_CPD'
+     PBES2 GOST 28147-89 CFB with CryptoPro-D S-box.
 
 Figure 4.5: Encryption flags
 
 PKCS #12 structures
 ...................
 
-A PKCS #12 structure [_PKCS12_] usually contains a user's private keys
-and certificates.  It is commonly used in browsers to export and import
-the user's identities.  A file containing such a key can be directly
-imported to a certificate credentials structure by using *note
+A PKCS #12 structure [*note PKCS12::] usually contains a user's private
+keys and certificates.  It is commonly used in browsers to export and
+import the user's identities.  A file containing such a key can be
+directly imported to a certificate credentials structure by using *note
 gnutls_certificate_set_x509_simple_pkcs12_file::.
 
 In GnuTLS the PKCS #12 structures are handled using the
@@ -3280,7 +3456,8 @@ functions below.
 
      This function parses a PKCS12 structure in 'pkcs12' and extracts
      the private key, the corresponding certificate chain, any
-     additional certificates and a CRL.
+     additional certificates and a CRL. The structures in 'key' ,
+     'chain' 'crl' , and 'extra_certs' must not be initialized.
 
      The 'extra_certs' and 'extra_certs_len' parameters are optional and
      both may be set to 'NULL' .  If either is non-'NULL' , then both
@@ -3369,9 +3546,9 @@ Tool to parse and generate X.509 certificates, requests and private
 keys.  It can be used interactively or non interactively by specifying
 the template command line option.
 
-The tool accepts files or URLs supported by GnuTLS. In case PIN is
-required for the URL access you can provide it using the environment
-variables GNUTLS_PIN and GNUTLS_SO_PIN.
+The tool accepts files or supported URIs via the -infile option.  In
+case PIN is required for URI access you can provide it using the
+environment variables GNUTLS_PIN and GNUTLS_SO_PIN.
 
 This section was generated by *AutoGen*, using the 'agtexi-cmd' template
 and the option descriptions for the 'certtool' program.  This software
@@ -3400,94 +3577,119 @@ to 'more'.  Both will exit with a status code of 0.
             --infile=file          Input file
                                      - file must pre-exist
             --outfile=str          Output file
+
+     Certificate related options:
+
+        -i, --certificate-info     Print information on the given certificate
+            --pubkey-info          Print information on a public key
         -s, --generate-self-signed  Generate a self-signed certificate
         -c, --generate-certificate  Generate a signed certificate
             --generate-proxy       Generates a proxy certificate
-            --generate-crl         Generate a CRL
         -u, --update-certificate   Update a signed certificate
+            --fingerprint          Print the fingerprint of the given certificate
+            --key-id               Print the key ID of the given certificate
+            --v1                   Generate an X.509 version 1 certificate (with no extensions)
+            --sign-params=str      Sign a certificate with a specific signature algorithm
+
+     Certificate request related options:
+
+            --crq-info             Print information on the given certificate request
+        -q, --generate-request     Generate a PKCS #10 certificate request
+                                     - prohibits the option 'infile'
+            --no-crq-extensions    Do not use extensions in certificate requests
+
+     PKCS#12 file related options:
+
+            --p12-info             Print information on a PKCS #12 structure
+            --p12-name=str         The PKCS #12 friendly name to use
+            --to-p12               Generate a PKCS #12 structure
+
+     Private key related options:
+
+        -k, --key-info             Print information on a private key
+            --p8-info              Print information on a PKCS #8 structure
+            --to-rsa               Convert an RSA-PSS key to raw RSA format
         -p, --generate-privkey     Generate a private key
+            --key-type=str         Specify the key type to use on key generation
+            --bits=num             Specify the number of bits for key generation
+            --curve=str            Specify the curve used for EC key generation
+            --sec-param=str        Specify the security level [low, legacy, medium, high, ultra]
+            --to-p8                Convert a given key to a PKCS #8 structure
+        -8, --pkcs8                Use PKCS #8 format for private keys
             --provable             Generate a private key or parameters from a seed using a provable method
             --verify-provable-privkey  Verify a private key generated from a seed using a provable method
             --seed=str             When generating a private key use the given hex-encoded seed
-        -q, --generate-request     Generate a PKCS #10 certificate request
-                                     - prohibits the option 'infile'
-        -e, --verify-chain         Verify a PEM encoded certificate chain
-            --verify               Verify a PEM encoded certificate chain using a trusted list
-            --verify-crl           Verify a CRL using a trusted list
+
+     CRL related options:
+
+        -l, --crl-info             Print information on the given CRL structure
+            --generate-crl         Generate a CRL
+            --verify-crl           Verify a Certificate Revocation List using a trusted list
                                      - requires the option 'load-ca-certificate'
+
+     Certificate verification related options:
+
+        -e, --verify-chain         Verify a PEM encoded certificate chain
+            --verify               Verify a PEM encoded certificate (chain) against a trusted set
             --verify-hostname=str  Specify a hostname to be used for certificate chain verification
             --verify-email=str     Specify a email to be used for certificate chain verification
                                      - prohibits the option 'verify-hostname'
             --verify-purpose=str   Specify a purpose OID to be used for certificate chain verification
             --verify-allow-broken  Allow broken algorithms, such as MD5 for verification
-            --generate-dh-params   Generate PKCS #3 encoded Diffie-Hellman parameters
-            --get-dh-params        Get the included PKCS #3 encoded Diffie-Hellman parameters
-            --dh-info              Print information PKCS #3 encoded Diffie-Hellman parameters
-            --load-privkey=str     Loads a private key file
-            --load-pubkey=str      Loads a public key file
-            --load-request=str     Loads a certificate request file
-            --load-certificate=str Loads a certificate file
-            --load-ca-privkey=str  Loads the certificate authority's private key file
-            --load-ca-certificate=str Loads the certificate authority's certificate file
-            --load-crl=str         Loads the provided CRL
-            --load-data=str        Loads auxiliary data
-            --password=str         Password to use
-            --null-password        Enforce a NULL password
-            --empty-password       Enforce an empty password
-            --hex-numbers          Print big number in an easier format to parse
-            --cprint               In certain operations it prints the information in C-friendly format
-        -i, --certificate-info     Print information on the given certificate
-            --fingerprint          Print the fingerprint of the given certificate
-            --key-id               Print the key ID of the given certificate
-            --certificate-pubkey   Print certificate's public key
-            --pgp-certificate-info  Print information on the given OpenPGP certificate
-            --pgp-ring-info        Print information on the given OpenPGP keyring structure
-        -l, --crl-info             Print information on the given CRL structure
-            --crq-info             Print information on the given certificate request
-            --no-crq-extensions    Do not use extensions in certificate requests
-            --p12-info             Print information on a PKCS #12 structure
-            --p12-name=str         The PKCS #12 friendly name to use
+
+     PKCS#7 structure options:
+
             --p7-generate          Generate a PKCS #7 structure
-            --p7-sign              Signs using a PKCS #7 structure
-            --p7-detached-sign     Signs using a detached PKCS #7 structure
-            --p7-include-cert      The signer's certificate will be included in the cert list.
+        -!, --p7-sign              Signs using a PKCS #7 structure
+        -", --p7-detached-sign     Signs using a detached PKCS #7 structure
+        -#, --p7-include-cert      The signer's certificate will be included in the cert list.
                                      - disabled as '--no-p7-include-cert'
                                      - enabled by default
-            --p7-time              Will include a timestamp in the PKCS #7 structure
+        -$, --p7-time              Will include a timestamp in the PKCS #7 structure
                                      - disabled as '--no-p7-time'
-            --p7-show-data         Will show the embedded data in the PKCS #7 structure
+        -%, --p7-show-data         Will show the embedded data in the PKCS #7 structure
                                      - disabled as '--no-p7-show-data'
-            --p7-info              Print information on a PKCS #7 structure
-            --p7-verify            Verify the provided PKCS #7 structure
-            --p8-info              Print information on a PKCS #8 structure
-            --smime-to-p7          Convert S/MIME to PKCS #7 structure
-        -k, --key-info             Print information on a private key
-            --pgp-key-info         Print information on an OpenPGP private key
-            --pubkey-info          Print information on a public key
-            --v1                   Generate an X.509 version 1 certificate (with no extensions)
-            --to-p12               Generate a PKCS #12 structure
-            --to-p8                Generate a PKCS #8 structure
-        -8, --pkcs8                Use PKCS #8 format for private keys
-            --rsa                  Generate RSA key
-            --dsa                  Generate DSA key
-            --ecc                  Generate ECC (ECDSA) key
-            --ecdsa                an alias for the 'ecc' option
-            --hash=str             Hash algorithm to use for signing
-            --inder                Use DER format for input certificates, private keys, and DH parameters
+        -&, --p7-info              Print information on a PKCS #7 structure
+        -', --p7-verify            Verify the provided PKCS #7 structure
+        -(, --smime-to-p7          Convert S/MIME to PKCS #7 structure
+
+     Other options:
+
+        -*, --get-dh-params        List the included PKCS #3 encoded Diffie-Hellman parameters
+        -+, --dh-info              Print information PKCS #3 encoded Diffie-Hellman parameters
+        -,, --load-privkey=str     Loads a private key file
+        --, --load-pubkey=str      Loads a public key file
+        -., --load-request=str     Loads a certificate request file
+        -/, --load-certificate=str Loads a certificate file
+        -0, --load-ca-privkey=str  Loads the certificate authority's private key file
+        -1, --load-ca-certificate=str Loads the certificate authority's certificate file
+        -2, --load-crl=str         Loads the provided CRL
+        -3, --load-data=str        Loads auxiliary data
+        -4, --password=str         Password to use
+        -5, --null-password        Enforce a NULL password
+        -6, --empty-password       Enforce an empty password
+        -7, --hex-numbers          Print big number in an easier format to parse
+        -8, --cprint               In certain operations it prints the information in C-friendly format
+        -=, --hash=str             Hash algorithm to use for signing
+        ->, --salt-size=num        Specify the RSA-PSS key default salt size
+        -?, --inder                Use DER format for input certificates, private keys, and DH parameters
                                      - disabled as '--no-inder'
-            --inraw                an alias for the 'inder' option
-            --outder               Use DER format for output certificates, private keys, and DH parameters
+        -@, --inraw                an alias for the 'inder' option
+        -A, --outder               Use DER format for output certificates, private keys, and DH parameters
                                      - disabled as '--no-outder'
-            --outraw               an alias for the 'outder' option
-            --bits=num             Specify the number of bits for key generate
-            --curve=str            Specify the curve used for EC key generation
-            --sec-param=str        Specify the security level [low, legacy, medium, high, ultra]
-            --disable-quick-random  No effect
-            --template=str         Template file to use for non-interactive operation
-            --stdout-info          Print information to stdout instead of stderr
-            --ask-pass             Enable interaction for entering password when in batch mode.
-            --pkcs-cipher=str      Cipher to use for PKCS #8 and #12 operations
-            --provider=str         Specify the PKCS #11 provider library
+        -B, --outraw               an alias for the 'outder' option
+        -D, --template=str         Template file to use for non-interactive operation
+        -E, --stdout-info          Print information to stdout instead of stderr
+        -F, --ask-pass             Enable interaction for entering password when in batch mode.
+        -G, --pkcs-cipher=str      Cipher to use for PKCS #8 and #12 operations
+        -H, --provider=str         Specify the PKCS #11 provider library
+        -I, --text                 Output textual information before PEM-encoded certificates, private
+     keys, etc
+                                     - disabled as '--no-text'
+                                     - enabled by default
+
+     Version, usage and configuration options:
+
         -v, --version[=arg]        output version information and exit
         -h, --help                 display extended usage information and exit
         -!, --more-help            extended usage information passed thru pager
@@ -3499,50 +3701,74 @@ to 'more'.  Both will exit with a status code of 0.
      It can be used interactively or non interactively by specifying the
      template command line option.
 
-     The tool accepts files or URLs supported by GnuTLS.  In case PIN is
-     required for the URL access you can provide it using the environment
+     The tool accepts files or supported URIs via the --infile option.  In case
+     PIN is required for URI access you can provide it using the environment
      variables GNUTLS_PIN and GNUTLS_SO_PIN.
 
 
-debug option (-d)
-.................
+Base options
+............
+
+debug option (-d).
+..................
 
 This is the "enable debugging" option.  This option takes a number
 argument.  Specifies the debug level.
 
-generate-crl option
+cert-options options
+....................
+
+Certificate related options.
+
+pubkey-info option.
 ...................
 
-This is the "generate a crl" option.  This option generates a CRL. When
-combined with -load-crl it would use the loaded CRL as base for the
-generated (i.e., all revoked certificates in the base will be copied to
-the new CRL).
+This is the "print information on a public key" option.  The option
+combined with -load-request, -load-pubkey, -load-privkey and
+-load-certificate will extract the public key of the object in question.
 
-provable option
-...............
+fingerprint option.
+...................
 
-This is the "generate a private key or parameters from a seed using a
-provable method" option.  This will use the FIPS-186-4 algorithms (i.e.,
-Shawe-Taylor) for provable key generation.  When specified the private
-keys or parameters will be generated from a seed, and can be later
-validated with -verify-provable-privkey to be correctly generated from
-the seed.  You may specify -seed or allow GnuTLS to generate one
-(recommended).  This option can be combined with -generate-privkey or
--generate-dh-params.
+This is the "print the fingerprint of the given certificate" option.
+This is a simple hash of the DER encoding of the certificate.  It can be
+combined with the -hash parameter.  However, it is recommended for
+identification to use the key-id which depends only on the certificate's
+key.
 
-That option applies to RSA and DSA keys.  On the DSA keys the PQG
-parameters are generated using the seed, and on RSA the two primes.
+key-id option.
+..............
 
-verify-provable-privkey option
-..............................
+This is the "print the key id of the given certificate" option.  This is
+a hash of the public key of the given certificate.  It identifies the
+key uniquely, remains the same on a certificate renewal and depends only
+on signed fields of the certificate.
 
-This is the "verify a private key generated from a seed using a provable
-method" option.  This will use the FIPS-186-4 algorithms for provable
-key generation.  You may specify -seed or use the seed stored in the
-private key structure.
+certificate-pubkey option.
+..........................
 
-generate-request option (-q)
-............................
+This is the "print certificate's public key" option.  This option is
+deprecated as a duplicate of -pubkey-info
+
+*NOTE**: THIS OPTION IS DEPRECATED*
+
+sign-params option.
+...................
+
+This is the "sign a certificate with a specific signature algorithm"
+option.  This option takes a string argument.  This option can be
+combined with -generate-certificate, to sign the certificate with a
+specific signature algorithm variant.  The only option supported is
+'RSA-PSS', and should be specified when the signer does not have a
+certificate which is marked for RSA-PSS use only.
+
+crq-options options
+...................
+
+Certificate request related options.
+
+generate-request option (-q).
+.............................
 
 This is the "generate a pkcs #10 certificate request" option.
 
@@ -3553,28 +3779,140 @@ This option has some usage constraints.  It:
 Will generate a PKCS #10 certificate request.  To specify a private key
 use -load-privkey.
 
-verify-chain option (-e)
-........................
+pkcs12-options options
+......................
 
-This is the "verify a pem encoded certificate chain" option.  The last
-certificate in the chain must be a self signed one.  It can be combined
-with -verify-purpose or -verify-hostname.
+PKCS#12 file related options.
 
-verify option
+p12-info option.
+................
+
+This is the "print information on a pkcs #12 structure" option.  This
+option will dump the contents and print the metadata of the provided
+PKCS #12 structure.
+
+p12-name option.
+................
+
+This is the "the pkcs #12 friendly name to use" option.  This option
+takes a string argument.  The name to be used for the primary
+certificate and private key in a PKCS #12 file.
+
+to-p12 option.
+..............
+
+This is the "generate a pkcs #12 structure" option.  It requires a
+certificate, a private key and possibly a CA certificate to be
+specified.
+
+key-options options
+...................
+
+Private key related options.
+
+p8-info option.
+...............
+
+This is the "print information on a pkcs #8 structure" option.  This
+option will print information about encrypted PKCS #8 structures.  That
+option does not require the decryption of the structure.
+
+to-rsa option.
+..............
+
+This is the "convert an rsa-pss key to raw rsa format" option.  It
+requires an RSA-PSS key as input and will output a raw RSA key.  This
+command is necessary for compatibility with applications that cannot
+read RSA-PSS keys.
+
+generate-privkey option (-p).
+.............................
+
+This is the "generate a private key" option.  When generating RSA-PSS
+private keys, the -hash option will restrict the allowed hash for the
+key; in the same keys the -salt-size option is also acceptable.
+
+key-type option.
+................
+
+This is the "specify the key type to use on key generation" option.
+This option takes a string argument.  This option can be combined with
+-generate-privkey, to specify the key type to be generated.  Valid
+options are, 'rsa', 'rsa-pss', 'dsa', 'ecdsa', and 'ed25519'.  When
+combined with certificate generation it can be used to specify an
+RSA-PSS certificate when an RSA key is given.
+
+curve option.
 .............
 
-This is the "verify a pem encoded certificate chain using a trusted
-list" option.  The trusted certificate list can be loaded with
--load-ca-certificate.  If no certificate list is provided, then the
-system's certificate list is used.  Note that during verification
-multiple paths may be explored.  On a successful verification the
-successful path will be the last one.  It can be combined with
--verify-purpose or -verify-hostname.
+This is the "specify the curve used for ec key generation" option.  This
+option takes a string argument.  Supported values are secp192r1,
+secp224r1, secp256r1, secp384r1 and secp521r1.
 
-verify-crl option
+sec-param option.
 .................
 
-This is the "verify a crl using a trusted list" option.
+This is the "specify the security level [low, legacy, medium, high,
+ultra]" option.  This option takes a string argument 'Security
+parameter'.  This is alternative to the bits option.
+
+to-p8 option.
+.............
+
+This is the "convert a given key to a pkcs #8 structure" option.  This
+needs to be combined with -load-privkey.
+
+provable option.
+................
+
+This is the "generate a private key or parameters from a seed using a
+provable method" option.  This will use the FIPS PUB186-4 algorithms
+(i.e., Shawe-Taylor) for provable key generation.  When specified the
+private keys or parameters will be generated from a seed, and can be
+later validated with -verify-provable-privkey to be correctly generated
+from the seed.  You may specify -seed or allow GnuTLS to generate one
+(recommended).  This option can be combined with -generate-privkey or
+-generate-dh-params.
+
+That option applies to RSA and DSA keys.  On the DSA keys the PQG
+parameters are generated using the seed, and on RSA the two primes.
+
+verify-provable-privkey option.
+...............................
+
+This is the "verify a private key generated from a seed using a provable
+method" option.  This will use the FIPS-186-4 algorithms for provable
+key generation.  You may specify -seed or use the seed stored in the
+private key structure.
+
+seed option.
+............
+
+This is the "when generating a private key use the given hex-encoded
+seed" option.  This option takes a string argument.  The seed acts as a
+security parameter for the private key, and thus a seed size which
+corresponds to the security level of the private key should be provided
+(e.g., 256-bits seed).
+
+crl-options options
+...................
+
+CRL related options.
+
+generate-crl option.
+....................
+
+This is the "generate a crl" option.  This option generates a
+Certificate Revocation List.  When combined with -load-crl it would use
+the loaded CRL as base for the generated (i.e., all revoked certificates
+in the base will be copied to the new CRL). To add new certificates to
+the CRL use -load-certificate.
+
+verify-crl option.
+..................
+
+This is the "verify a certificate revocation list using a trusted list"
+option.
 
 This option has some usage constraints.  It:
    * must appear in combination with the following options:
@@ -3582,15 +3920,41 @@ This option has some usage constraints.  It:
 
 The trusted certificate list must be loaded with -load-ca-certificate.
 
-verify-hostname option
-......................
+cert-verify-options options
+...........................
+
+Certificate verification related options.
+
+verify-chain option (-e).
+.........................
+
+This is the "verify a pem encoded certificate chain" option.  Verifies
+the validity of a certificate chain.  That is, an ordered set of
+certificates where each one is the issuer of the previous, and the first
+is the end-certificate to be validated.  In a proper chain the last
+certificate is a self signed one.  It can be combined with
+-verify-purpose or -verify-hostname.
+
+verify option.
+..............
+
+This is the "verify a pem encoded certificate (chain) against a trusted
+set" option.  The trusted certificate list can be loaded with
+-load-ca-certificate.  If no certificate list is provided, then the
+system's trusted certificate list is used.  Note that during
+verification multiple paths may be explored.  On a successful
+verification the successful path will be the last one.  It can be
+combined with -verify-purpose or -verify-hostname.
+
+verify-hostname option.
+.......................
 
 This is the "specify a hostname to be used for certificate chain
 verification" option.  This option takes a string argument.  This is to
 be combined with one of the verify certificate options.
 
-verify-email option
-...................
+verify-email option.
+....................
 
 This is the "specify a email to be used for certificate chain
 verification" option.  This option takes a string argument.
@@ -3601,8 +3965,8 @@ This option has some usage constraints.  It:
 
 This is to be combined with one of the verify certificate options.
 
-verify-purpose option
-.....................
+verify-purpose option.
+......................
 
 This is the "specify a purpose oid to be used for certificate chain
 verification" option.  This option takes a string argument.  This object
@@ -3611,149 +3975,26 @@ Example purposes are 1.3.6.1.5.5.7.3.1 (TLS WWW), 1.3.6.1.5.5.7.3.4
 (EMAIL) etc.  Note that a CA certificate without a purpose set (extended
 key usage) is valid for any purpose.
 
-verify-allow-broken option
-..........................
+verify-allow-broken option.
+...........................
 
 This is the "allow broken algorithms, such as md5 for verification"
 option.  This can be combined with -p7-verify, -verify or -verify-chain.
 
-generate-dh-params option
-.........................
-
-This is the "generate pkcs #3 encoded diffie-hellman parameters" option.
-The will generate random parameters to be used with Diffie-Hellman key
-exchange.  The output parameters will be in PKCS #3 format.  Note that
-it is recommended to use the -get-dh-params option instead.
-
-get-dh-params option
-....................
-
-This is the "get the included pkcs #3 encoded diffie-hellman parameters"
-option.  Returns stored DH parameters in GnuTLS. Those parameters
-returned are defined in RFC7919, and can be considered standard
-parameters for a TLS key exchange.
-
-load-privkey option
-...................
-
-This is the "loads a private key file" option.  This option takes a
-string argument.  This can be either a file or a PKCS #11 URL
-
-load-pubkey option
-..................
-
-This is the "loads a public key file" option.  This option takes a
-string argument.  This can be either a file or a PKCS #11 URL
-
-load-request option
-...................
-
-This is the "loads a certificate request file" option.  This option
-takes a string argument.  This option can be used with a file
-
-load-certificate option
-.......................
-
-This is the "loads a certificate file" option.  This option takes a
-string argument.  This option can be used with a file
-
-load-ca-privkey option
-......................
-
-This is the "loads the certificate authority's private key file" option.
-This option takes a string argument.  This can be either a file or a
-PKCS #11 URL
-
-load-ca-certificate option
-..........................
-
-This is the "loads the certificate authority's certificate file" option.
-This option takes a string argument.  This option can be used with a
-file
-
-load-crl option
-...............
-
-This is the "loads the provided crl" option.  This option takes a string
-argument.  This option can be used with a file
-
-load-data option
-................
-
-This is the "loads auxiliary data" option.  This option takes a string
-argument.  This option can be used with a file
-
-password option
-...............
-
-This is the "password to use" option.  This option takes a string
-argument.  You can use this option to specify the password in the
-command line instead of reading it from the tty.  Note, that the command
-line arguments are available for view in others in the system.
-Specifying password as " is the same as specifying no password.
-
-null-password option
-....................
-
-This is the "enforce a null password" option.  This option enforces a
-NULL password.  This is different than the empty or no password in
-schemas like PKCS #8.
-
-empty-password option
+pkcs7-options options
 .....................
 
-This is the "enforce an empty password" option.  This option enforces an
-empty password.  This is different than the NULL or no password in
-schemas like PKCS #8.
+PKCS#7 structure options.
 
-cprint option
-.............
-
-This is the "in certain operations it prints the information in
-c-friendly format" option.  In certain operations it prints the
-information in C-friendly format, suitable for including into C
-programs.
-
-fingerprint option
-..................
-
-This is the "print the fingerprint of the given certificate" option.
-This is a simple hash of the DER encoding of the certificate.  It can be
-combined with the -hash parameter.  However, it is recommended for
-identification to use the key-id which depends only on the certificate's
-key.
-
-key-id option
-.............
-
-This is the "print the key id of the given certificate" option.  This is
-a hash of the public key of the given certificate.  It identifies the
-key uniquely, remains the same on a certificate renewal and depends only
-on signed fields of the certificate.
-
-p12-info option
-...............
-
-This is the "print information on a pkcs #12 structure" option.  This
-option will dump the contents and print the metadata of the provided
-PKCS #12 structure.
-
-p12-name option
-...............
-
-This is the "the pkcs #12 friendly name to use" option.  This option
-takes a string argument.  The name to be used for the primary
-certificate and private key in a PKCS #12 file.
-
-p7-generate option
-..................
+p7-generate option.
+...................
 
 This is the "generate a pkcs #7 structure" option.  This option
 generates a PKCS #7 certificate container structure.  To add
 certificates in the structure use -load-certificate and -load-crl.
 
-p7-sign option
-..............
+p7-sign option.
+...............
 
 This is the "signs using a pkcs #7 structure" option.  This option
 generates a PKCS #7 structure containing a signature for the provided
@@ -3763,8 +4004,8 @@ certificate has to be specified using -load-certificate and
 certificates.  In case of a list, the first certificate is used for
 signing and the other certificates are included in the structure.
 
-p7-detached-sign option
-.......................
+p7-detached-sign option.
+........................
 
 This is the "signs using a detached pkcs #7 structure" option.  This
 option generates a PKCS #7 structure containing a signature for the
@@ -3774,8 +4015,8 @@ using -load-certificate and -load-privkey.  The input to
 first certificate is used for signing and the other certificates are
 included in the structure.
 
-p7-include-cert option
-......................
+p7-include-cert option.
+.......................
 
 This is the "the signer's certificate will be included in the cert
 list."  option.
@@ -3787,8 +4028,8 @@ This option has some usage constraints.  It:
 This options works with -p7-sign or -p7-detached-sign and will include
 or exclude the signer's certificate into the generated signature.
 
-p7-time option
-..............
+p7-time option.
+...............
 
 This is the "will include a timestamp in the pkcs #7 structure" option.
 
@@ -3797,8 +4038,8 @@ This option has some usage constraints.  It:
 
 This option will include a timestamp in the generated signature
 
-p7-show-data option
-...................
+p7-show-data option.
+....................
 
 This is the "will show the embedded data in the pkcs #7 structure"
 option.
@@ -3809,8 +4050,8 @@ This option has some usage constraints.  It:
 This option can be combined with -p7-verify or -p7-info and will display
 the embedded signed data in the PKCS #7 structure.
 
-p7-verify option
-................
+p7-verify option.
+.................
 
 This is the "verify the provided pkcs #7 structure" option.  This option
 verifies the signed PKCS #7 structure.  The certificate list to use for
@@ -3821,61 +4062,159 @@ used.  Alternatively a direct signer can be provided using
 -verify-purpose option, and the -load-data option will utilize detached
 data.
 
-p8-info option
+other-options options
+.....................
+
+Other options.
+
+generate-dh-params option.
+..........................
+
+This is the "generate pkcs #3 encoded diffie-hellman parameters" option.
+The will generate random parameters to be used with Diffie-Hellman key
+exchange.  The output parameters will be in PKCS #3 format.  Note that
+it is recommended to use the -get-dh-params option instead.
+
+*NOTE**: THIS OPTION IS DEPRECATED*
+
+get-dh-params option.
+.....................
+
+This is the "list the included pkcs #3 encoded diffie-hellman
+parameters" option.  Returns stored DH parameters in GnuTLS. Those
+parameters returned are defined in RFC7919, and can be considered
+standard parameters for a TLS key exchange.  This option is provided for
+old applications which require DH parameters to be specified; modern
+GnuTLS applications should not require them.
+
+load-privkey option.
+....................
+
+This is the "loads a private key file" option.  This option takes a
+string argument.  This can be either a file or a PKCS #11 URL
+
+load-pubkey option.
+...................
+
+This is the "loads a public key file" option.  This option takes a
+string argument.  This can be either a file or a PKCS #11 URL
+
+load-request option.
+....................
+
+This is the "loads a certificate request file" option.  This option
+takes a string argument.  This option can be used with a file
+
+load-certificate option.
+........................
+
+This is the "loads a certificate file" option.  This option takes a
+string argument.  This option can be used with a file
+
+load-ca-privkey option.
+.......................
+
+This is the "loads the certificate authority's private key file" option.
+This option takes a string argument.  This can be either a file or a
+PKCS #11 URL
+
+load-ca-certificate option.
+...........................
+
+This is the "loads the certificate authority's certificate file" option.
+This option takes a string argument.  This can be either a file or a
+PKCS #11 URL
+
+load-crl option.
+................
+
+This is the "loads the provided crl" option.  This option takes a string
+argument.  This option can be used with a file
+
+load-data option.
+.................
+
+This is the "loads auxiliary data" option.  This option takes a string
+argument.  This option can be used with a file
+
+password option.
+................
+
+This is the "password to use" option.  This option takes a string
+argument.  You can use this option to specify the password in the
+command line instead of reading it from the tty.  Note, that the command
+line arguments are available for view in others in the system.
+Specifying password as " is the same as specifying no password.
+
+null-password option.
+.....................
+
+This is the "enforce a null password" option.  This option enforces a
+NULL password.  This is different than the empty or no password in
+schemas like PKCS #8.
+
+empty-password option.
+......................
+
+This is the "enforce an empty password" option.  This option enforces an
+empty password.  This is different than the NULL or no password in
+schemas like PKCS #8.
+
+cprint option.
 ..............
 
-This is the "print information on a pkcs #8 structure" option.  This
-option will print information about encrypted PKCS #8 structures.  That
-option does not require the decryption of the structure.
+This is the "in certain operations it prints the information in
+c-friendly format" option.  In certain operations it prints the
+information in C-friendly format, suitable for including into C
+programs.
 
-pubkey-info option
-..................
-
-This is the "print information on a public key" option.  The option
-combined with -load-request, -load-pubkey, -load-privkey and
--load-certificate will extract the public key of the object in question.
-
-to-p12 option
-.............
-
-This is the "generate a pkcs #12 structure" option.  It requires a
-certificate, a private key and possibly a CA certificate to be
-specified.
-
-rsa option
-..........
+rsa option.
+...........
 
 This is the "generate rsa key" option.  When combined with
 -generate-privkey generates an RSA private key.
 
-dsa option
-..........
+*NOTE**: THIS OPTION IS DEPRECATED*
+
+dsa option.
+...........
 
 This is the "generate dsa key" option.  When combined with
 -generate-privkey generates a DSA private key.
 
-ecc option
-..........
+*NOTE**: THIS OPTION IS DEPRECATED*
+
+ecc option.
+...........
 
 This is the "generate ecc (ecdsa) key" option.  When combined with
 -generate-privkey generates an elliptic curve private key to be used
 with ECDSA.
 
-ecdsa option
-............
+*NOTE**: THIS OPTION IS DEPRECATED*
+
+ecdsa option.
+.............
 
 This is an alias for the 'ecc' option, *note the ecc option
 documentation: certtool ecc.
 
-hash option
-...........
+hash option.
+............
 
 This is the "hash algorithm to use for signing" option.  This option
 takes a string argument.  Available hash functions are SHA1, RMD160,
 SHA256, SHA384, SHA512, SHA3-224, SHA3-256, SHA3-384, SHA3-512.
 
-inder option
-............
+salt-size option.
+.................
+
+This is the "specify the rsa-pss key default salt size" option.  This
+option takes a number argument.  Typical keys shouldn't set or restrict
+this option.
+
+inder option.
+.............
 
 This is the "use der format for input certificates, private keys, and dh
 parameters " option.
@@ -3888,14 +4227,14 @@ options that in PEM input would allow multiple input data (e.g.
 multiple certificates), when reading in DER format a single data
 structure is read.
 
-inraw option
-............
+inraw option.
+.............
 
 This is an alias for the 'inder' option, *note the inder option
 documentation: certtool inder.
 
-outder option
-.............
+outder option.
+..............
 
 This is the "use der format for output certificates, private keys, and
 dh parameters" option.
@@ -3905,47 +4244,45 @@ This option has some usage constraints.  It:
 
 The output will be in DER or RAW format.
 
-outraw option
-.............
+outraw option.
+..............
 
 This is an alias for the 'outder' option, *note the outder option
 documentation: certtool outder.
 
-curve option
-............
-
-This is the "specify the curve used for ec key generation" option.  This
-option takes a string argument.  Supported values are secp192r1,
-secp224r1, secp256r1, secp384r1 and secp521r1.
-
-sec-param option
+ask-pass option.
 ................
-
-This is the "specify the security level [low, legacy, medium, high,
-ultra]" option.  This option takes a string argument 'Security
-parameter'.  This is alternative to the bits option.
-
-ask-pass option
-...............
 
 This is the "enable interaction for entering password when in batch
 mode."  option.  This option will enable interaction to enter password
 when in batch mode.  That is useful when the template option has been
 specified.
 
-pkcs-cipher option
-..................
+pkcs-cipher option.
+...................
 
 This is the "cipher to use for pkcs #8 and #12 operations" option.  This
 option takes a string argument 'Cipher'.  Cipher may be one of 3des,
 3des-pkcs12, aes-128, aes-192, aes-256, rc2-40, arcfour.
 
-provider option
-...............
+provider option.
+................
 
 This is the "specify the pkcs #11 provider library" option.  This option
 takes a string argument.  This will override the default options in
 /etc/gnutls/pkcs11.conf
+
+text option.
+............
+
+This is the "output textual information before pem-encoded certificates,
+private keys, etc" option.
+
+This option has some usage constraints.  It:
+   * can be disabled with -no-text.
+   * It is enabled by default.
+
+Output textual information before PEM-encoded data
 
 certtool exit status
 ....................
@@ -3959,7 +4296,7 @@ One of the following exit values will be returned:
 certtool See Also
 .................
 
-p11tool (1)
+p11tool (1), psktool (1), srptool (1)
 
 certtool Examples
 .................
@@ -4016,6 +4353,12 @@ Certificate information
 To view the certificate information, use:
      $ certtool --certificate-info --infile cert.pem
 
+Changing the certificate format
+...............................
+
+To convert the certificate from PEM to DER format, use:
+     $ certtool --certificate-info --infile cert.pem --outder --outfile cert.der
+
 PKCS #12 structure generation
 .............................
 
@@ -4033,11 +4376,23 @@ work around that problem in the tool, you can use the
        --load-certificate cert.pem --load-privkey key.pem \
        --to-p12 --outder --outfile key.p12
 
-Diffie-Hellman parameter generation
+Obtaining Diffie-Hellman parameters
 ...................................
 
-To generate parameters for Diffie-Hellman key exchange, use the command:
-     $ certtool --generate-dh-params --outfile dh.pem --sec-param medium
+To obtain the RFC7919 parameters for Diffie-Hellman key exchange, use
+the command:
+     $ certtool --get-dh-params --outfile dh.pem --sec-param medium
+
+Verifying a certificate
+.......................
+
+To verify a certificate in a file against the system's CA trust store
+use the following command:
+     $ certtool --verify --infile cert.pem
+
+It is also possible to simulate hostname verification with the following
+options:
+     $ certtool --verify --verify-hostname www.example.com --infile cert.pem
 
 Proxy certificate generation
 ............................
@@ -4140,7 +4495,8 @@ certificate request or a self signed certificate follows.
      #dn = "cn = Nikos,st = New\, Something,C=GR,surName=Mavrogiannopoulos,2.5.4.9=Arkadias"
 
      # The serial number of the certificate
-     # Comment the field for a time-based serial number.
+     # The value is in decimal (i.e. 1963) or hex (i.e. 0x07ab).
+     # Comment the field for a random serial number.
      serial = 007
 
      # In how many days, counting from today, this certificate will expire.
@@ -4149,7 +4505,7 @@ certificate request or a self signed certificate follows.
 
      # Alternatively you may set concrete dates and time. The GNU date string
      # formats are accepted. See:
-     # http://www.gnu.org/software/tar/manual/html_node/Date-input-formats.html
+     # https://www.gnu.org/software/tar/manual/html_node/Date-input-formats.html
 
      #activation_date = "2004-02-29 16:21:42"
      #expiration_date = "2025-02-29 16:24:41"
@@ -4173,7 +4529,7 @@ certificate request or a self signed certificate follows.
      #krb5_principal = HTTP/user@REALM.COM
 
      # A subject alternative name URI
-     #uri = "http://www.example.com"
+     #uri = "https://www.example.com"
 
      # An IP address in case of a server.
      #ip_address = "192.168.1.1"
@@ -4198,7 +4554,7 @@ certificate request or a self signed certificate follows.
 
      # An URL that has CRLs (certificate revocation lists)
      # available. Needed in CA certificates.
-     #crl_dist_points = "http://www.getcrl.crl/getcrl/"
+     #crl_dist_points = "https://www.getcrl.crl/getcrl/"
 
      # Whether this is a CA certificate or not
      #ca
@@ -4252,12 +4608,12 @@ certificate request or a self signed certificate follows.
 
 
      # Whether this certificate will be used for a TLS client;
-     # this sets the id-kp-serverAuth (1.3.6.1.5.5.7.3.1) of
+     # this sets the id-kp-clientAuth (1.3.6.1.5.5.7.3.2) of
      # extended key usage.
      #tls_www_client
 
      # Whether this certificate will be used for a TLS server;
-     # This sets the id-kp-clientAuth (1.3.6.1.5.5.7.3.2) of
+     # this sets the id-kp-serverAuth (1.3.6.1.5.5.7.3.1) of
      # extended key usage.
      #tls_www_server
 
@@ -4321,19 +4677,23 @@ certificate request or a self signed certificate follows.
      #path_len = 2
 
      # OCSP URI
-     # ocsp_uri = http://my.ocsp.server/ocsp
+     # ocsp_uri = https://my.ocsp.server/ocsp
 
      # CA issuers URI
-     # ca_issuers_uri = http://my.ca.issuer
+     # ca_issuers_uri = https://my.ca.issuer
 
      # Certificate policies
      #policy1 = 1.3.6.1.4.1.5484.1.10.99.1.0
      #policy1_txt = "This is a long policy to summarize"
-     #policy1_url = http://www.example.com/a-policy-to-read
+     #policy1_url = https://www.example.com/a-policy-to-read
 
      #policy2 = 1.3.6.1.4.1.5484.1.10.99.1.1
      #policy2_txt = "This is a short policy"
-     #policy2_url = http://www.example.com/another-policy-to-read
+     #policy2_url = https://www.example.com/another-policy-to-read
+
+     # The number of additional certificates that may appear in a
+     # path before the anyPolicy is no longer acceptable.
+     #inhibit_anypolicy_skip_certs 1
 
      # Name constraints
 
@@ -4367,7 +4727,15 @@ certificate request or a self signed certificate follows.
      #crl_next_update = 43
 
      # this is the 5th CRL by this CA
+     # The value is in decimal (i.e. 1963) or hex (i.e. 0x07ab).
      # Comment the field for a time-based number.
+     # Time-based CRL numbers generated in GnuTLS 3.6.3 and later
+     # are significantly larger than those generated in previous
+     # versions. Since CRL numbers need to be monotonic, you need
+     # to specify the CRL number here manually if you intend to
+     # downgrade to an earlier version than 3.6.3 after publishing
+     # the CRL as it is not possible to specify CRL numbers greater
+     # than 2**63-2 using hex notation in those versions.
      #crl_number = 5
 
      # Specify the update dates more precisely.
@@ -4385,8 +4753,14 @@ File: gnutls.info,  Node: ocsptool Invocation,  Next: danetool Invocation,  Prev
 4.2.7 Invoking ocsptool
 -----------------------
 
-Ocsptool is a program that can parse and print information about OCSP
-requests/responses, generate requests and verify responses.
+On verification
+...............
+
+Responses are typically signed/issued by designated certificates or
+certificate authorities and thus this tool requires on verification the
+certificate of the issuer or the full certificate chain in order to
+determine the appropriate signing authority.  The specified certificate
+of the issuer is assumed trusted.
 
 This section was generated by *AutoGen*, using the 'agtexi-cmd' template
 and the option descriptions for the 'ocsptool' program.  This software
@@ -4416,32 +4790,34 @@ to 'more'.  Both will exit with a status code of 0.
                                      - file must pre-exist
             --outfile=str          Output file
             --ask[=arg]            Ask an OCSP/HTTP server on a certificate validity
-                                     - requires these options:
-                                     load-cert
-                                     load-issuer
         -e, --verify-response      Verify response
         -i, --request-info         Print information on a OCSP request
         -j, --response-info        Print information on a OCSP response
-        -q, --generate-request     Generate an OCSP request
+        -q, --generate-request     Generates an OCSP request
             --nonce                Use (or not) a nonce to OCSP request
                                      - disabled as '--no-nonce'
-            --load-issuer=file     Read issuer certificate from file
+            --load-chain=file      Reads a set of certificates forming a chain from file
                                      - file must pre-exist
-            --load-cert=file       Read certificate to check from file
+            --load-issuer=file     Reads issuer's certificate from file
+                                     - file must pre-exist
+            --load-cert=file       Reads the certificate to check from file
                                      - file must pre-exist
             --load-trust=file      Read OCSP trust anchors from file
                                      - prohibits the option 'load-signer'
                                      - file must pre-exist
-            --load-signer=file     Read OCSP response signer from file
+            --load-signer=file     Reads the OCSP response signer from file
                                      - prohibits the option 'load-trust'
                                      - file must pre-exist
             --inder                Use DER format for input certificates and private keys
                                      - disabled as '--no-inder'
-        -Q, --load-request=file    Read DER encoded OCSP request from file
+            --outder               Use DER format for output of responses (this is the default)
+            --outpem               Use PEM format for output of responses
+        -Q, --load-request=file    Reads the DER encoded OCSP request from file
                                      - file must pre-exist
-        -S, --load-response=file   Read DER encoded OCSP response from file
+        -S, --load-response=file   Reads the DER encoded OCSP response from file
                                      - file must pre-exist
             --ignore-errors        Ignore any verification errors
+            --verify-allow-broken  Allow broken algorithms, such as MD5 for verification
         -v, --version[=arg]        output version information and exit
         -h, --help                 display extended usage information and exit
         -!, --more-help            extended usage information passed thru pager
@@ -4449,8 +4825,10 @@ to 'more'.  Both will exit with a status code of 0.
      Options are specified by doubled hyphens and their name or by a single
      hyphen and the flag character.
 
-     Ocsptool is a program that can parse and print information about OCSP
-     requests/responses, generate requests and verify responses.
+     ocsptool is a program that can parse and print information about OCSP
+     requests/responses, generate requests and verify responses.  Unlike other
+     GnuTLS applications it outputs DER encoded structures by default unless the
+     '--outpem' option is specified.
 
 
 debug option (-d)
@@ -4464,13 +4842,65 @@ ask option
 
 This is the "ask an ocsp/http server on a certificate validity" option.
 This option takes an optional string argument 'server name|url'.
+Connects to the specified HTTP OCSP server and queries on the validity
+of the loaded certificate.  Its argument can be a URL or a plain server
+name.  It can be combined with -load-chain, where it checks all
+certificates in the provided chain, or with -load-cert and -load-issuer
+options.  The latter checks the provided certificate against its
+specified issuer certificate.
+
+verify-response option (-e)
+...........................
+
+This is the "verify response" option.  Verifies the provided OCSP
+response against the system trust anchors (unless -load-trust is
+provided).  It requires the -load-signer or -load-chain options to
+obtain the signer of the OCSP response.
+
+request-info option (-i)
+........................
+
+This is the "print information on a ocsp request" option.  Display
+detailed information on the provided OCSP request.
+
+response-info option (-j)
+.........................
+
+This is the "print information on a ocsp response" option.  Display
+detailed information on the provided OCSP response.
+
+load-trust option
+.................
+
+This is the "read ocsp trust anchors from file" option.  This option
+takes a file argument.
 
 This option has some usage constraints.  It:
-   * must appear in combination with the following options: load-cert,
-     load-issuer.
+   * must not appear in combination with any of the following options:
+     load-signer.
 
-Connects to the specified HTTP OCSP server and queries on the validity
-of the loaded certificate.
+When verifying an OCSP response read the trust anchors from the provided
+file.  When this is not provided, the system's trust anchors will be
+used.
+
+outder option
+.............
+
+This is the "use der format for output of responses (this is the
+default)" option.  The output will be in DER encoded format.  Unlike
+other GnuTLS tools, this is the default for this tool
+
+outpem option
+.............
+
+This is the "use pem format for output of responses" option.  The output
+will be in PEM format.
+
+verify-allow-broken option
+..........................
+
+This is the "allow broken algorithms, such as md5 for verification"
+option.  This can be combined with -verify-response.
 
 ocsptool exit status
 ....................
@@ -4578,31 +5008,28 @@ CACert.  First we'll use 'gnutls-cli' to get a copy of the server
 certificate chain.  The server is not required to send this information,
 but this particular one is configured to do so.
 
-     $ echo | gnutls-cli -p 443 blog.josefsson.org --print-cert > chain.pem
+     $ echo | gnutls-cli -p 443 blog.josefsson.org --save-cert chain.pem
 
-Use a text editor on 'chain.pem' to create three files for each separate
-certificates, called 'cert.pem' for the first certificate for the domain
-itself, secondly 'issuer.pem' for the intermediate certificate and
-'root.pem' for the final root certificate.
-
-The domain certificate normally contains a pointer to where the OCSP
+The saved certificates normally contain a pointer to where the OCSP
 responder is located, in the Authority Information Access Information
-extension.  For example, from 'certtool -i < cert.pem' there is this
+extension.  For example, from 'certtool -i < chain.pem' there is this
 information:
 
      Authority Information Access Information (not critical):
      Access Method: 1.3.6.1.5.5.7.48.1 (id-ad-ocsp)
-     Access Location URI: http://ocsp.CAcert.org/
+     Access Location URI: https://ocsp.CAcert.org/
 
-This means the CA support OCSP queries over HTTP. We are now ready to
-create a OCSP request for the certificate.
+This means that ocsptool can discover the servers to contact over HTTP.
+We can now request information on the chain certificates.
 
-     $ ocsptool --ask ocsp.CAcert.org --load-issuer issuer.pem \
-                --load-cert cert.pem --outfile ocsp-response.der
+     $ ocsptool --ask --load-chain chain.pem
 
-The request is sent via HTTP to the OCSP server address specified.  If
-the address is omitted ocsptool will use the address stored in the
-certificate.
+The request is sent via HTTP to the OCSP server address found in the
+certificates.  It is possible to override the address of the OCSP server
+as well as ask information on a particular certificate using -load-cert
+and -load-issuer.
+
+     $ ocsptool --ask https://ocsp.CAcert.org/ --load-chain chain.pem
 
 
 File: gnutls.info,  Node: danetool Invocation,  Prev: ocsptool Invocation,  Up: More on certificate authentication
@@ -4927,14 +5354,156 @@ rest of this chapter discusses details of these methods.
 
 * Menu:
 
-* SRP authentication::
 * PSK authentication::
+* SRP authentication::
 * Anonymous authentication::
 
 
-File: gnutls.info,  Node: SRP authentication,  Next: PSK authentication,  Up: Shared-key and anonymous authentication
+File: gnutls.info,  Node: PSK authentication,  Next: SRP authentication,  Up: Shared-key and anonymous authentication
 
-4.3.1 SRP authentication
+4.3.1 PSK authentication
+------------------------
+
+* Menu:
+
+* Authentication using PSK::
+* psktool Invocation::             Invoking psktool
+
+
+File: gnutls.info,  Node: Authentication using PSK,  Next: psktool Invocation,  Up: PSK authentication
+
+4.3.1.1 Authentication using PSK
+................................
+
+Authentication using Pre-shared keys is a method to authenticate using
+usernames and binary keys.  This protocol avoids making use of public
+key infrastructure and expensive calculations, thus it is suitable for
+constraint clients.  It is available under all TLS protocol versions.
+
+The implementation in GnuTLS is based on [*note TLSPSK::].  The
+supported PSK key exchange methods are:
+
+'PSK:'
+     Authentication using the PSK protocol (no forward secrecy).
+
+'DHE-PSK:'
+     Authentication using the PSK protocol and Diffie-Hellman key
+     exchange.  This method offers perfect forward secrecy.
+
+'ECDHE-PSK:'
+     Authentication using the PSK protocol and Elliptic curve
+     Diffie-Hellman key exchange.  This method offers perfect forward
+     secrecy.
+
+'RSA-PSK:'
+     Authentication using the PSK protocol for the client and an RSA
+     certificate for the server.  This is not available under TLS 1.3.
+
+Helper functions to generate and maintain PSK keys are also included in
+GnuTLS.
+
+'INT *note gnutls_key_generate:: (gnutls_datum_t * KEY, unsigned int KEY_SIZE)'
+'INT *note gnutls_hex_encode:: (const gnutls_datum_t * DATA, char * RESULT, size_t * RESULT_SIZE)'
+'INT *note gnutls_hex_decode:: (const gnutls_datum_t * HEX_DATA, void * RESULT, size_t * RESULT_SIZE)'
+
+
+File: gnutls.info,  Node: psktool Invocation,  Prev: Authentication using PSK,  Up: PSK authentication
+
+4.3.1.2 Invoking psktool
+........................
+
+Program that generates random keys for use with TLS-PSK. The keys are
+stored in hexadecimal format in a key file.
+
+This section was generated by *AutoGen*, using the 'agtexi-cmd' template
+and the option descriptions for the 'psktool' program.  This software is
+released under the GNU General Public License, version 3 or later.
+
+psktool help/usage ('--help')
+.............................
+
+This is the automatically generated usage text for psktool.
+
+The text printed is the same whether selected with the 'help' option
+('--help') or the 'more-help' option ('--more-help').  'more-help' will
+print the usage text by passing it through a pager program.  'more-help'
+is disabled on platforms without a working 'fork(2)' function.  The
+'PAGER' environment variable is used to select the program, defaulting
+to 'more'.  Both will exit with a status code of 0.
+
+     psktool - GnuTLS PSK tool
+     Usage:  psktool [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
+
+        -d, --debug=num            Enable debugging
+                                     - it must be in the range:
+                                       0 to 9999
+        -s, --keysize=num          Specify the key size in bytes (default is 32-bytes or 256-bits)
+                                     - it must be in the range:
+                                       0 to 512
+        -u, --username=str         Specify the username to use
+        -p, --pskfile=str          Specify a pre-shared key file
+        -v, --version[=arg]        output version information and exit
+        -h, --help                 display extended usage information and exit
+        -!, --more-help            extended usage information passed thru pager
+
+     Options are specified by doubled hyphens and their name or by a single
+     hyphen and the flag character.
+
+     Program that generates random keys for use with TLS-PSK.  The keys are
+     stored in hexadecimal format in a key file.
+
+
+debug option (-d)
+.................
+
+This is the "enable debugging" option.  This option takes a number
+argument.  Specifies the debug level.
+
+pskfile option (-p)
+...................
+
+This is the "specify a pre-shared key file" option.  This option takes a
+string argument.  This option will specify the pre-shared key file to
+store the generated keys.
+
+passwd option
+.............
+
+This is an alias for the 'pskfile' option, *note the pskfile option
+documentation: psktool pskfile.
+
+psktool exit status
+...................
+
+One of the following exit values will be returned:
+'0 (EXIT_SUCCESS)'
+     Successful program execution.
+'1 (EXIT_FAILURE)'
+     The operation failed or the command syntax was not valid.
+
+psktool See Also
+................
+
+gnutls-cli-debug (1), gnutls-serv (1), srptool (1), certtool (1)
+
+psktool Examples
+................
+
+To add a user 'psk_identity' in 'keys.psk' for use with GnuTLS run:
+     $ ./psktool -u psk_identity -p keys.psk
+     Generating a random key for user 'psk_identity'
+     Key stored to keys.psk
+     $ cat keys.psk
+     psk_identity:88f3824b3e5659f52d00e959bacab954b6540344
+     $
+
+This command will create 'keys.psk' if it does not exist and will add
+user 'psk_identity'.
+
+
+File: gnutls.info,  Node: SRP authentication,  Next: Anonymous authentication,  Prev: PSK authentication,  Up: Shared-key and anonymous authentication
+
+4.3.2 SRP authentication
 ------------------------
 
 * Menu:
@@ -4945,15 +5514,16 @@ File: gnutls.info,  Node: SRP authentication,  Next: PSK authentication,  Up: Sh
 
 File: gnutls.info,  Node: Authentication using SRP,  Next: srptool Invocation,  Up: SRP authentication
 
-4.3.1.1 Authentication using SRP
+4.3.2.1 Authentication using SRP
 ................................
 
 GnuTLS supports authentication via the Secure Remote Password or SRP
-protocol (see [_RFC2945,TOMSRP_] for a description).  The SRP key
+protocol (see [*note TOMSRP: RFC2945.] for a description).  The SRP key
 exchange is an extension to the TLS protocol, and it provides an
 authenticated with a password key exchange.  The peers can be identified
 using a single password, or there can be combinations where the client
-is authenticated using SRP and the server using a certificate.
+is authenticated using SRP and the server using a certificate.  It is
+only available under TLS 1.2 or earlier versions.
 
 The advantage of SRP authentication, over other proposed secure password
 authentication schemes, is that SRP is not susceptible to off-line
@@ -4971,8 +5541,9 @@ holds the SRP verifiers (encoded passwords) and another file,
 GnuTLS helper follow those conventions.  The srptool program, discussed
 in the next section is a tool to manipulate the SRP parameters.
 
-The implementation in GnuTLS is based on [_TLSSRP_]. The supported key
-exchange methods are shown below.
+The implementation in GnuTLS is based on [*note TLSSRP::].  The
+supported key exchange methods are shown below.  Enabling any of these
+key exchange methods in a session disables support for TLS1.3.
 
 'SRP:'
      Authentication using the SRP protocol.
@@ -5017,7 +5588,7 @@ exchange methods are shown below.
 
 File: gnutls.info,  Node: srptool Invocation,  Prev: Authentication using SRP,  Up: SRP authentication
 
-4.3.1.2 Invoking srptool
+4.3.2.2 Invoking srptool
 ........................
 
 Simple program that emulates the programs in the Stanford SRP (Secure
@@ -5133,136 +5704,7 @@ one in '/etc/tpasswd' you will get an ok.
      $ srptool --passwd /etc/tpasswd --passwd\-conf /etc/tpasswd.conf --verify -u test
 
 
-File: gnutls.info,  Node: PSK authentication,  Next: Anonymous authentication,  Prev: SRP authentication,  Up: Shared-key and anonymous authentication
-
-4.3.2 PSK authentication
-------------------------
-
-* Menu:
-
-* Authentication using PSK::
-* psktool Invocation::             Invoking psktool
-
-
-File: gnutls.info,  Node: Authentication using PSK,  Next: psktool Invocation,  Up: PSK authentication
-
-4.3.2.1 Authentication using PSK
-................................
-
-Authentication using Pre-shared keys is a method to authenticate using
-usernames and binary keys.  This protocol avoids making use of public
-key infrastructure and expensive calculations, thus it is suitable for
-constraint clients.
-
-The implementation in GnuTLS is based on [_TLSPSK_]. The supported PSK
-key exchange methods are:
-
-'PSK:'
-     Authentication using the PSK protocol.
-
-'DHE-PSK:'
-     Authentication using the PSK protocol and Diffie-Hellman key
-     exchange.  This method offers perfect forward secrecy.
-
-'ECDHE-PSK:'
-     Authentication using the PSK protocol and Elliptic curve
-     Diffie-Hellman key exchange.  This method offers perfect forward
-     secrecy.
-
-'RSA-PSK:'
-     Authentication using the PSK protocol for the client and an RSA
-     certificate for the server.
-
-Helper functions to generate and maintain PSK keys are also included in
-GnuTLS.
-
-'INT *note gnutls_key_generate:: (gnutls_datum_t * KEY, unsigned int KEY_SIZE)'
-'INT *note gnutls_hex_encode:: (const gnutls_datum_t * DATA, char * RESULT, size_t * RESULT_SIZE)'
-'INT *note gnutls_hex_decode:: (const gnutls_datum_t * HEX_DATA, void * RESULT, size_t * RESULT_SIZE)'
-
-
-File: gnutls.info,  Node: psktool Invocation,  Prev: Authentication using PSK,  Up: PSK authentication
-
-4.3.2.2 Invoking psktool
-........................
-
-Program that generates random keys for use with TLS-PSK. The keys are
-stored in hexadecimal format in a key file.
-
-This section was generated by *AutoGen*, using the 'agtexi-cmd' template
-and the option descriptions for the 'psktool' program.  This software is
-released under the GNU General Public License, version 3 or later.
-
-psktool help/usage ('--help')
-.............................
-
-This is the automatically generated usage text for psktool.
-
-The text printed is the same whether selected with the 'help' option
-('--help') or the 'more-help' option ('--more-help').  'more-help' will
-print the usage text by passing it through a pager program.  'more-help'
-is disabled on platforms without a working 'fork(2)' function.  The
-'PAGER' environment variable is used to select the program, defaulting
-to 'more'.  Both will exit with a status code of 0.
-
-     psktool - GnuTLS PSK tool
-     Usage:  psktool [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
-
-        -d, --debug=num            Enable debugging
-                                     - it must be in the range:
-                                       0 to 9999
-        -s, --keysize=num          specify the key size in bytes
-                                     - it must be in the range:
-                                       0 to 512
-        -u, --username=str         specify a username
-        -p, --passwd=str           specify a password file
-        -v, --version[=arg]        output version information and exit
-        -h, --help                 display extended usage information and exit
-        -!, --more-help            extended usage information passed thru pager
-
-     Options are specified by doubled hyphens and their name or by a single
-     hyphen and the flag character.
-
-     Program that generates random keys for use with TLS-PSK.  The keys are
-     stored in hexadecimal format in a key file.
-
-
-debug option (-d)
-.................
-
-This is the "enable debugging" option.  This option takes a number
-argument.  Specifies the debug level.
-
-psktool exit status
-...................
-
-One of the following exit values will be returned:
-'0 (EXIT_SUCCESS)'
-     Successful program execution.
-'1 (EXIT_FAILURE)'
-     The operation failed or the command syntax was not valid.
-
-psktool See Also
-................
-
-gnutls-cli-debug (1), gnutls-serv (1), srptool (1), certtool (1)
-
-psktool Examples
-................
-
-To add a user 'psk_identity' in 'passwd.psk' for use with GnuTLS run:
-     $ ./psktool -u psk_identity -p passwd.psk
-     Generating a random key for user 'psk_identity'
-     Key stored to passwd.psk
-     $ cat psks.txt
-     psk_identity:88f3824b3e5659f52d00e959bacab954b6540344
-     $
-
-This command will create 'passwd.psk' if it does not exist and will add
-user 'psk_identity' (you will also be prompted for a password).
-
-
-File: gnutls.info,  Node: Anonymous authentication,  Prev: PSK authentication,  Up: Shared-key and anonymous authentication
+File: gnutls.info,  Node: Anonymous authentication,  Prev: SRP authentication,  Up: Shared-key and anonymous authentication
 
 4.3.3 Anonymous authentication
 ------------------------------
@@ -5273,7 +5715,7 @@ in the middle attack, but can be used even if there is no prior
 communication or shared trusted parties with the peer.  It is useful to
 establish a session over which certificate authentication will occur in
 order to hide the indentities of the participants from passive
-eavesdroppers.
+eavesdroppers.  It is only available under TLS 1.2 or earlier versions.
 
 Unless in the above case, it is not recommended to use anonymous
 authentication.  In the cases where there is no prior communication with
@@ -5283,7 +5725,8 @@ using trust on first use authentication::).
 
 The available key exchange algorithms for anonymous authentication are
 shown below, but note that few public servers support them, and they
-have to be explicitly enabled.
+have to be explicitly enabled.  These ciphersuites are negotiated only
+under TLS 1.2.
 
 'ANON_DH:'
      This algorithm exchanges Diffie-Hellman parameters.
@@ -5410,7 +5853,7 @@ In GnuTLS the approach is to handle all keys transparently by the high
 level API, e.g., the API that loads a key or certificate from a file.
 The high-level API will accept URIs in addition to files that specify
 keys on an HSM or in TPM, and a callback function will be used to obtain
-any required keys.  The URI format is defined in [_PKCS11URI_].
+any required keys.  The URI format is defined in [*note PKCS11URI::].
 
 More information on the API is provided in the next sections.  Examples
 of a URI of a certificate stored in an HSM, as well as a key stored in
@@ -5434,15 +5877,15 @@ File: gnutls.info,  Node: Abstract key types,  Next: Application-specific keys, 
 ======================
 
 Since there are many forms of a public or private keys supported by
-GnuTLS such as X.509, OpenPGP, PKCS #11 or TPM it is desirable to allow
-common operations on them.  For these reasons the abstract
-'gnutls_privkey_t' and 'gnutls_pubkey_t' were introduced in
-'gnutls/abstract.h' header.  Those types are initialized using a
-specific type of key and then can be used to perform operations in an
-abstract way.  For example in order to sign an X.509 certificate with a
-key that resides in a token the following steps can be used.
+GnuTLS such as X.509, PKCS #11 or TPM it is desirable to allow common
+operations on them.  For these reasons the abstract 'gnutls_privkey_t'
+and 'gnutls_pubkey_t' were introduced in 'gnutls/abstract.h' header.
+Those types are initialized using a specific type of key and then can be
+used to perform operations in an abstract way.  For example in order to
+sign an X.509 certificate with a key that resides in a token the
+following steps can be used.
 
-     #inlude <gnutls/abstract.h>
+     #include <gnutls/abstract.h>
 
      void sign_cert( gnutls_x509_crt_t to_be_signed)
      {
@@ -5475,10 +5918,15 @@ File: gnutls.info,  Node: Abstract public keys,  Next: Abstract private keys,  U
 5.1.1 Public keys
 -----------------
 
-An abstract 'gnutls_pubkey_t' can be initialized using the functions
-below.  It can be imported through an existing structure like
-'gnutls_x509_crt_t', or through an ASN.1 encoding of the X.509
-'SubjectPublicKeyInfo' sequence.
+An abstract 'gnutls_pubkey_t' can be initialized and freed by using the
+functions below.
+
+'INT *note gnutls_pubkey_init:: (gnutls_pubkey_t * KEY)'
+'VOID *note gnutls_pubkey_deinit:: (gnutls_pubkey_t KEY)'
+
+After initialization its values can be imported from an existing
+structure like 'gnutls_x509_crt_t', or through an ASN.1 encoding of the
+X.509 'SubjectPublicKeyInfo' sequence.
 
 'INT *note gnutls_pubkey_import_x509:: (gnutls_pubkey_t KEY, gnutls_x509_crt_t CRT, unsigned int FLAGS)'
 'INT *note gnutls_pubkey_import_pkcs11:: (gnutls_pubkey_t KEY, gnutls_pkcs11_obj_t OBJ, unsigned int FLAGS)'
@@ -5510,8 +5958,8 @@ below.  It can be imported through an existing structure like
 
      *Since:* 3.1.3
 
-Other helper functions that allow directly importing from raw X.509 or
-OpenPGP structures are shown below.
+Other helper functions that allow directly importing from raw X.509
+structures are shown below.
 
 'INT *note gnutls_pubkey_import_x509_raw:: (gnutls_pubkey_t PKEY, const gnutls_datum_t * DATA, gnutls_x509_crt_fmt_t FORMAT, unsigned int FLAGS)'
 
@@ -5539,8 +5987,8 @@ public key fingerprint would provide a memorable sketch.
 Note that *note gnutls_pubkey_get_key_id:: calculates a SHA1 digest of
 the public key as a DER-formatted, subjectPublicKeyInfo object.  Other
 implementations use different approaches, e.g., some use the "common
-method" described in section 4.2.1.2 of [_RFC5280_] which calculates a
-digest on a part of the subjectPublicKeyInfo object.
+method" described in section 4.2.1.2 of [*note RFC5280::] which
+calculates a digest on a part of the subjectPublicKeyInfo object.
 
 'INT *note gnutls_pubkey_get_pk_algorithm:: (gnutls_pubkey_t KEY, unsigned int * BITS)'
 'INT *note gnutls_pubkey_get_preferred_hash_algorithm:: (gnutls_pubkey_t KEY, gnutls_digest_algorithm_t * HASH, unsigned int * MAND)'
@@ -5550,9 +5998,9 @@ digest on a part of the subjectPublicKeyInfo object.
 To export the key-specific parameters, or obtain a unique key ID the
 following functions are provided.
 
-'INT *note gnutls_pubkey_export_rsa_raw:: (gnutls_pubkey_t KEY, gnutls_datum_t * M, gnutls_datum_t * E)'
-'INT *note gnutls_pubkey_export_dsa_raw:: (gnutls_pubkey_t KEY, gnutls_datum_t * P, gnutls_datum_t * Q, gnutls_datum_t * G, gnutls_datum_t * Y)'
-'INT *note gnutls_pubkey_export_ecc_raw:: (gnutls_pubkey_t KEY, gnutls_ecc_curve_t * CURVE, gnutls_datum_t * X, gnutls_datum_t * Y)'
+'INT *note gnutls_pubkey_export_rsa_raw2:: (gnutls_pubkey_t KEY, gnutls_datum_t * M, gnutls_datum_t * E, unsigned FLAGS)'
+'INT *note gnutls_pubkey_export_dsa_raw2:: (gnutls_pubkey_t KEY, gnutls_datum_t * P, gnutls_datum_t * Q, gnutls_datum_t * G, gnutls_datum_t * Y, unsigned FLAGS)'
+'INT *note gnutls_pubkey_export_ecc_raw2:: (gnutls_pubkey_t KEY, gnutls_ecc_curve_t * CURVE, gnutls_datum_t * X, gnutls_datum_t * Y, unsigned int FLAGS)'
 'INT *note gnutls_pubkey_export_ecc_x962:: (gnutls_pubkey_t KEY, gnutls_datum_t * PARAMETERS, gnutls_datum_t * ECPOINT)'
 
 
@@ -5561,18 +6009,23 @@ File: gnutls.info,  Node: Abstract private keys,  Next: Operations,  Prev: Abstr
 5.1.2 Private keys
 ------------------
 
-An abstract 'gnutls_privkey_t' can be initialized using the functions
-below.  It can be imported through an existing structure like
-'gnutls_x509_privkey_t', but unlike public keys it cannot be exported.
-That is to allow abstraction over keys stored in hardware that makes
-available only operations.
+An abstract 'gnutls_privkey_t' can be initialized and freed by using the
+functions below.
+
+'INT *note gnutls_privkey_init:: (gnutls_privkey_t * KEY)'
+'VOID *note gnutls_privkey_deinit:: (gnutls_privkey_t KEY)'
+
+After initialization its values can be imported from an existing
+structure like 'gnutls_x509_privkey_t', but unlike public keys it cannot
+be exported.  That is to allow abstraction over keys stored in hardware
+that makes available only operations.
 
 'INT *note gnutls_privkey_import_x509:: (gnutls_privkey_t PKEY, gnutls_x509_privkey_t KEY, unsigned int FLAGS)'
 'INT *note gnutls_privkey_import_pkcs11:: (gnutls_privkey_t PKEY, gnutls_pkcs11_privkey_t KEY, unsigned int FLAGS)'
 
-Other helper functions that allow directly importing from raw X.509 or
-OpenPGP structures are shown below.  Again, as with public keys, private
-keys can be imported from a hardware module using URLs.
+Other helper functions that allow directly importing from raw X.509
+structures are shown below.  Again, as with public keys, private keys
+can be imported from a hardware module using URLs.
 
  -- Function: int gnutls_privkey_import_url (gnutls_privkey_t KEY, const
           char * URL, unsigned int FLAGS)
@@ -5600,8 +6053,9 @@ In order to support cryptographic operations using an external API, the
 following function is provided.  This allows for a simple extensibility
 API without resorting to PKCS #11.
 
- -- Function: int gnutls_privkey_import_ext3 (gnutls_privkey_t PKEY,
-          void * USERDATA, gnutls_privkey_sign_func SIGN_FN,
+ -- Function: int gnutls_privkey_import_ext4 (gnutls_privkey_t PKEY,
+          void * USERDATA, gnutls_privkey_sign_data_func SIGN_DATA_FN,
+          gnutls_privkey_sign_hash_func SIGN_HASH_FN,
           gnutls_privkey_decrypt_func DECRYPT_FN,
           gnutls_privkey_deinit_func DEINIT_FN, gnutls_privkey_info_func
           INFO_FN, unsigned int FLAGS)
@@ -5609,9 +6063,11 @@ API without resorting to PKCS #11.
 
      USERDATA: private data to be provided to the callbacks
 
-     SIGN_FN: callback for signature operations
+     SIGN_DATA_FN: callback for signature operations (may be 'NULL' )
 
-     DECRYPT_FN: callback for decryption operations
+     SIGN_HASH_FN: callback for signature operations (may be 'NULL' )
+
+     DECRYPT_FN: callback for decryption operations (may be 'NULL' )
 
      DEINIT_FN: a deinitialization function
 
@@ -5621,24 +6077,50 @@ API without resorting to PKCS #11.
      FLAGS: Flags for the import
 
      This function will associate the given callbacks with the
-     'gnutls_privkey_t' type.  At least one of the two callbacks must be
+     'gnutls_privkey_t' type.  At least one of the callbacks must be
      non-null.  If a deinitialization function is provided then flags is
      assumed to contain 'GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE' .
 
-     Note that the signing function is supposed to "raw" sign data,
-     i.e., without any hashing or preprocessing.  In case of RSA the
-     DigestInfo will be provided, and the signing function is expected
-     to do the PKCS '1' 1.5 padding and the exponentiation.
+     Note that in contrast with the signing function of
+     'gnutls_privkey_import_ext3()' , the signing functions provided to
+     this function take explicitly the signature algorithm as parameter
+     and different functions are provided to sign the data and hashes.
 
-     The 'info_fn' must provide information on the algorithms supported
-     by this private key, and should support the flags
-     'GNUTLS_PRIVKEY_INFO_PK_ALGO' and 'GNUTLS_PRIVKEY_INFO_SIGN_ALGO' .
-     It must return -1 on unknown flags.
+     The 'sign_hash_fn' is to be called to sign pre-hashed data.  The
+     input to the callback is the output of the hash (such as SHA256)
+     corresponding to the signature algorithm.  For RSA PKCS'1'
+     signatures, the signature algorithm can be set to
+     'GNUTLS_SIGN_RSA_RAW' , and in that case the data should be handled
+     as if they were an RSA PKCS'1' DigestInfo structure.
+
+     The 'sign_data_fn' is to be called to sign data.  The input data
+     will be he data to be signed (and hashed), with the provided
+     signature algorithm.  This function is to be used for signature
+     algorithms like Ed25519 which cannot take pre-hashed data as input.
+
+     When both 'sign_data_fn' and 'sign_hash_fn' functions are provided
+     they must be able to operate on all the supported signature
+     algorithms, unless prohibited by the type of the algorithm (e.g.,
+     as with Ed25519).
+
+     The 'info_fn' must provide information on the signature algorithms
+     supported by this private key, and should support the flags
+     'GNUTLS_PRIVKEY_INFO_PK_ALGO' ,
+     'GNUTLS_PRIVKEY_INFO_HAVE_SIGN_ALGO' and
+     'GNUTLS_PRIVKEY_INFO_PK_ALGO_BITS' .  It must return -1 on unknown
+     flags.
 
      *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
      otherwise a negative error value.
 
-     *Since:* 3.4.0
+     *Since:* 3.6.0
+
+On the private keys where exporting of parameters is possible (i.e.,
+software keys), the following functions are also available.
+
+'INT *note gnutls_privkey_export_rsa_raw2:: (gnutls_privkey_t KEY, gnutls_datum_t * M, gnutls_datum_t * E, gnutls_datum_t * D, gnutls_datum_t * P, gnutls_datum_t * Q, gnutls_datum_t * U, gnutls_datum_t * E1, gnutls_datum_t * E2, unsigned int FLAGS)'
+'INT *note gnutls_privkey_export_dsa_raw2:: (gnutls_privkey_t KEY, gnutls_datum_t * P, gnutls_datum_t * Q, gnutls_datum_t * G, gnutls_datum_t * Y, gnutls_datum_t * X, unsigned int FLAGS)'
+'INT *note gnutls_privkey_export_ecc_raw2:: (gnutls_privkey_t KEY, gnutls_ecc_curve_t * CURVE, gnutls_datum_t * X, gnutls_datum_t * Y, gnutls_datum_t * K, unsigned int FLAGS)'
 
 
 File: gnutls.info,  Node: Operations,  Prev: Abstract private keys,  Up: Abstract key types
@@ -5694,7 +6176,9 @@ verification operations with the underlying keys.
 
      *Returns:* In case of a verification failure
      'GNUTLS_E_PK_SIG_VERIFY_FAILED' is returned, and zero or positive
-     code on success.
+     code on success.  For known to be insecure signatures this function
+     will return 'GNUTLS_E_INSUFFICIENT_SECURITY' unless the flag
+     'GNUTLS_VERIFY_ALLOW_BROKEN' is specified.
 
      *Since:* 3.0
 
@@ -5768,9 +6252,14 @@ verification operations with the underlying keys.
      You may use 'gnutls_pubkey_get_preferred_hash_algorithm()' to
      determine the hash algorithm.
 
-     Note that if 'GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA' flag is specified
-     this function will ignore 'hash_algo' and perform a raw PKCS1
-     signature.
+     The flags may be 'GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA' or
+     'GNUTLS_PRIVKEY_SIGN_FLAG_RSA_PSS' .  In the former case this
+     function will ignore 'hash_algo' and perform a raw PKCS1 signature,
+     and in the latter an RSA-PSS signature will be generated.
+
+     Note that, not all algorithm support signing already hashed data.
+     When signing with Ed25519, 'gnutls_privkey_sign_data()' should be
+     used.
 
      *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
      otherwise a negative error value.
@@ -5929,7 +6418,7 @@ prefix of the URL, (e.g., "mypkcs11:") and the length of the prefix.
 The types of the callbacks are shown below, and are expected to use the
 exported gnutls functions to import the keys and certificates.  E.g., a
 typical 'import_key' callback should use *note
-gnutls_privkey_import_ext3::.
+gnutls_privkey_import_ext4::.
 
      typedef int (*gnutls_privkey_import_url_func)(gnutls_privkey_t pkey,
                                                    const char *url,
@@ -5968,14 +6457,14 @@ File: gnutls.info,  Node: Smart cards and HSMs,  Next: Trusted Platform Module, 
 ========================
 
 In this section we present the smart-card and hardware security module
-(HSM) support in GnuTLS using PKCS #11 [_PKCS11_].  Hardware security
-modules and smart cards provide a way to store private keys and perform
-operations on them without exposing them.  This decouples cryptographic
-keys from the applications that use them and provide an additional
-security layer against cryptographic key extraction.  Since this can
-also be achieved in software components such as in Gnome keyring, we
-will use the term security module to describe any cryptographic key
-separation subsystem.
+(HSM) support in GnuTLS using PKCS #11 [*note PKCS11::].  Hardware
+security modules and smart cards provide a way to store private keys and
+perform operations on them without exposing them.  This decouples
+cryptographic keys from the applications that use them and provide an
+additional security layer against cryptographic key extraction.  Since
+this can also be achieved in software components such as in Gnome
+keyring, we will use the term security module to describe any
+cryptographic key separation subsystem.
 
 PKCS #11 is plugin API allowing applications to access cryptographic
 operations on a security module, as well as to objects residing on it.
@@ -5999,6 +6488,7 @@ Figure 5.1: PKCS #11 module usage.
 * Accessing objects that require a PIN::
 * Reading objects::
 * Writing objects::
+* PKCS11 Low Level Access::
 * Using a PKCS11 token with TLS::
 * Verifying certificates over PKCS11::
 * p11tool Invocation::
@@ -6049,7 +6539,7 @@ after a fork() call; since 3.3.0 this is no longer required.
 
    ---------- Footnotes ----------
 
-   (1) <http://p11-glue.freedesktop.org/>
+   (1) <https://p11-glue.freedesktop.org/>
 
    (2) For example when an open session is to be reinitialized, but the
 PIN is not available to GnuTLS (e.g., it was entered at a pinpad).
@@ -6088,7 +6578,7 @@ after having called *note gnutls_pkcs11_init:: specifying the
      *Since:* 2.12.0
 
 In that case, the application will only have access to the modules
-explictly loaded.  If the 'GNUTLS_PKCS11_FLAG_MANUAL' flag is specified
+explicitly loaded.  If the 'GNUTLS_PKCS11_FLAG_MANUAL' flag is specified
 and no calls to *note gnutls_pkcs11_add_provider:: are made, then the
 PKCS #11 functionality is effectively disabled.
 
@@ -6186,9 +6676,9 @@ File: gnutls.info,  Node: Reading objects,  Next: Writing objects,  Prev: Access
 ---------------------
 
 All PKCS #11 objects are referenced by GnuTLS functions by URLs as
-described in [_PKCS11URI_]. This allows for a consistent naming of
-objects across systems and applications in the same system.  For example
-a public key on a smart card may be referenced as:
+described in [*note PKCS11URI::].  This allows for a consistent naming
+of objects across systems and applications in the same system.  For
+example a public key on a smart card may be referenced as:
 
      pkcs11:token=Nikos;serial=307521161601031;model=PKCS%2315; \
      manufacturer=EnterSafe;object=test1;type=public;\
@@ -6216,13 +6706,22 @@ objects are shown below.
 
      OUTPUT: where output will be stored
 
-     OUTPUT_SIZE: contains the maximum size of the output and will be
-     overwritten with actual
+     OUTPUT_SIZE: contains the maximum size of the output buffer and
+     will be overwritten with the actual size.
 
      This function will return information about the PKCS11 certificate
      such as the label, id as well as token information where the key is
-     stored.  When output is text it returns null terminated string
-     although 'output_size' contains the size of the actual data only.
+     stored.
+
+     When output is text, a null terminated string is written to
+     'output' and its string length is written to 'output_size' (without
+     null terminator).  If the buffer is too small, 'output_size' will
+     contain the expected buffer size (with null terminator for text)
+     and return 'GNUTLS_E_SHORT_MEMORY_BUFFER' .
+
+     In versions previously to 3.6.0 this function included the null
+     terminator to 'output_size' .  After 3.6.0 the output size doesn't
+     include the terminator character.
 
      *Returns:* 'GNUTLS_E_SUCCESS' (0) on success or a negative error
      code on error.
@@ -6315,7 +6814,7 @@ int main(int argc, char **argv)
 }
 
 
-File: gnutls.info,  Node: Writing objects,  Next: Using a PKCS11 token with TLS,  Prev: Reading objects,  Up: Smart cards and HSMs
+File: gnutls.info,  Node: Writing objects,  Next: PKCS11 Low Level Access,  Prev: Reading objects,  Up: Smart cards and HSMs
 
 5.3.5 Writing objects
 ---------------------
@@ -6345,9 +6844,10 @@ before accessing the object (for operations or otherwise).
      FLAGS: One of GNUTLS_PKCS11_OBJ_* flags
 
      This function will copy a private key into a PKCS '11' token
-     specified by a URL. It is highly recommended flags to contain
-     'GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE' unless there is a strong
-     reason not to.
+     specified by a URL.
+
+     Since 3.6.3 the objects are marked as sensitive by default unless
+     'GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_SENSITIVE' is specified.
 
      *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
      otherwise a negative error value.
@@ -6371,7 +6871,6 @@ before accessing the object (for operations or otherwise).
      This function will copy a certificate into a PKCS '11' token
      specified by a URL. Valid flags to mark the certificate:
      'GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED' ,
-     'GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE' ,
      'GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE' ,
      'GNUTLS_PKCS11_OBJ_FLAG_MARK_CA' ,
      'GNUTLS_PKCS11_OBJ_FLAG_MARK_ALWAYS_AUTH' .
@@ -6396,9 +6895,64 @@ before accessing the object (for operations or otherwise).
      *Since:* 2.12.0
 
 
-File: gnutls.info,  Node: Using a PKCS11 token with TLS,  Next: Verifying certificates over PKCS11,  Prev: Writing objects,  Up: Smart cards and HSMs
+File: gnutls.info,  Node: PKCS11 Low Level Access,  Next: Using a PKCS11 token with TLS,  Prev: Writing objects,  Up: Smart cards and HSMs
 
-5.3.6 Using a PKCS #11 token with TLS
+5.3.6 Low Level Access
+----------------------
+
+When it is needed to use PKCS#11 functionality which is not wrapped by
+GnuTLS, it is possible to extract the PKCS#11 session, object or token
+pointers.  That allows an application to still access the low-level
+functionality, while at the same time take advantage of the URI
+addressing scheme supported by GnuTLS.
+
+ -- Function: int gnutls_pkcs11_token_get_ptr (const char * URL, void **
+          PTR, unsigned long * SLOT_ID, unsigned int FLAGS)
+     URL: should contain a PKCS'11' URL identifying a token
+
+     PTR: will contain the CK_FUNCTION_LIST_PTR pointer
+
+     SLOT_ID: will contain the slot_id (may be 'NULL' )
+
+     FLAGS: should be zero
+
+     This function will return the function pointer of the specified
+     token by the URL. The returned pointers are valid until gnutls is
+     deinitialized, c.f.  '_global_deinit()' .
+
+     *Returns:* 'GNUTLS_E_SUCCESS' (0) on success or a negative error
+     code on error.
+
+     *Since:* 3.6.3
+
+ -- Function: int gnutls_pkcs11_obj_get_ptr (gnutls_pkcs11_obj_t OBJ,
+          void ** PTR, void ** SESSION, void ** OHANDLE, unsigned long *
+          SLOT_ID, unsigned int FLAGS)
+     OBJ: should contain a 'gnutls_pkcs11_obj_t' type
+
+     PTR: will contain the CK_FUNCTION_LIST_PTR pointer (may be 'NULL' )
+
+     SESSION: will contain the CK_SESSION_HANDLE of the object
+
+     OHANDLE: will contain the CK_OBJECT_HANDLE of the object
+
+     SLOT_ID: the identifier of the slot (may be 'NULL' )
+
+     FLAGS: Or sequence of GNUTLS_PKCS11_OBJ_* flags
+
+     Obtains the PKCS'11' session handles of an object.  'session' and
+     'ohandle' must be deinitialized by the caller.  The returned
+     pointers are independent of the 'obj' lifetime.
+
+     *Returns:* 'GNUTLS_E_SUCCESS' (0) on success or a negative error
+     code on error.
+
+     *Since:* 3.6.3
+
+
+File: gnutls.info,  Node: Using a PKCS11 token with TLS,  Next: Verifying certificates over PKCS11,  Prev: PKCS11 Low Level Access,  Up: Smart cards and HSMs
+
+5.3.7 Using a PKCS #11 token with TLS
 -------------------------------------
 
 It is possible to use a PKCS #11 token to a TLS session, as shown in
@@ -6412,7 +6966,7 @@ instead of a filename.
 
 File: gnutls.info,  Node: Verifying certificates over PKCS11,  Next: p11tool Invocation,  Prev: Using a PKCS11 token with TLS,  Up: Smart cards and HSMs
 
-5.3.7 Verifying certificates over PKCS #11
+5.3.8 Verifying certificates over PKCS #11
 ------------------------------------------
 
 The PKCS #11 API can be used to allow all applications in the same
@@ -6434,15 +6988,15 @@ given to the configure script.
 
    ---------- Footnotes ----------
 
-   (1) <http://p11-glue.freedesktop.org/trust-module.html>
+   (1) <https://p11-glue.freedesktop.org/trust-module.html>
 
    (2) See the 'Restricting the scope of CA certificates' post at
-<http://nmav.gnutls.org/2016/06/restricting-scope-of-ca-certificates.html>
+<https://nmav.gnutls.org/2016/06/restricting-scope-of-ca-certificates.html>
 
 
 File: gnutls.info,  Node: p11tool Invocation,  Prev: Verifying certificates over PKCS11,  Up: Smart cards and HSMs
 
-5.3.8 Invoking p11tool
+5.3.9 Invoking p11tool
 ----------------------
 
 Program that allows operations on PKCS #11 smart cards and security
@@ -6484,7 +7038,7 @@ to 'more'.  Both will exit with a status code of 0.
             --list-mechanisms      List all available mechanisms in a token
             --initialize           Initializes a PKCS #11 token
             --initialize-pin       Initializes/Resets a PKCS #11 token user PIN
-            --initialize-so-pin    Initializes/Resets a PKCS #11 token security officer PIN
+            --initialize-so-pin    Initializes/Resets a PKCS #11 token security officer PIN.
             --set-pin=str          Specify the PIN to use on token operations
             --set-so-pin=str       Specify the Security Officer's PIN to use on token initialization
 
@@ -6523,9 +7077,7 @@ to 'more'.  Both will exit with a status code of 0.
 
      Key generation:
 
-            --generate-rsa         Generate an RSA private-public key pair
-            --generate-dsa         Generate a DSA private-public key pair
-            --generate-ecc         Generate an ECDSA private-public key pair
+            --generate-privkey=str Generate private-public key pair of given type
             --bits=num             Specify the number of bits for the key generate
             --curve=str            Specify the curve used for EC key generation
             --sec-param=str        Specify the security level
@@ -6539,33 +7091,33 @@ to 'more'.  Both will exit with a status code of 0.
                                      write
                                      set-id
             --write                Writes the loaded objects to a PKCS #11 token
-            --delete               Deletes the objects matching the given PKCS #11 URL
-            --label=str            Sets a label for the write operation
-            --id=str               Sets an ID for the write operation
-            --mark-wrap            Marks the generated key to be a wrapping key
+        -!, --delete               Deletes the objects matching the given PKCS #11 URL
+        -", --label=str            Sets a label for the write operation
+        -#, --id=str               Sets an ID for the write operation
+        -$, --mark-wrap            Marks the generated key to be a wrapping key
                                      - disabled as '--no-mark-wrap'
-            --mark-trusted         Marks the object to be written as trusted
+        -%, --mark-trusted         Marks the object to be written as trusted
                                      - prohibits the option 'mark-distrusted'
                                      - disabled as '--no-mark-trusted'
-            --mark-distrusted      When retrieving objects, it requires the objects to be distrusted
+        -&, --mark-distrusted      When retrieving objects, it requires the objects to be distrusted
      (blacklisted)
                                      - prohibits the option 'mark-trusted'
-            --mark-decrypt         Marks the object to be written for decryption
+        -', --mark-decrypt         Marks the object to be written for decryption
                                      - disabled as '--no-mark-decrypt'
-            --mark-sign            Marks the object to be written for signature generation
+        -(, --mark-sign            Marks the object to be written for signature generation
                                      - disabled as '--no-mark-sign'
-            --mark-ca              Marks the object to be written as a CA
+        -), --mark-ca              Marks the object to be written as a CA
                                      - disabled as '--no-mark-ca'
-            --mark-private         Marks the object to be written as private
+        -*, --mark-private         Marks the object to be written as private
                                      - disabled as '--no-mark-private'
-            --ca                   an alias for the 'mark-ca' option
-            --private              an alias for the 'mark-private' option
-            --secret-key=str       Provide a hex encoded secret key
-            --load-privkey=file    Private key file to use
+        -+, --ca                   an alias for the 'mark-ca' option
+        -,, --private              an alias for the 'mark-private' option
+        --, --secret-key=str       Provide a hex encoded secret key
+        -., --load-privkey=file    Private key file to use
                                      - file must pre-exist
-            --load-pubkey=file     Public key file to use
+        -/, --load-pubkey=file     Public key file to use
                                      - file must pre-exist
-            --load-certificate=file Certificate file to use
+        -0, --load-certificate=file Certificate file to use
                                      - file must pre-exist
 
      Other options:
@@ -6573,26 +7125,28 @@ to 'more'.  Both will exit with a status code of 0.
         -d, --debug=num            Enable debugging
                                      - it must be in the range:
                                        0 to 9999
-            --outfile=str          Output file
-            --login                Force (user) login to token
+        -1, --outfile=str          Output file
+        -2, --login                Force (user) login to token
                                      - disabled as '--no-login'
-            --so-login             Force security officer login to token
+        -3, --so-login             Force security officer login to token
                                      - disabled as '--no-so-login'
-            --admin-login          an alias for the 'so-login' option
-            --test-sign            Tests the signature operation of the provided object
-            --generate-random=num  Generate random data
+        -4, --admin-login          an alias for the 'so-login' option
+        -5, --test-sign            Tests the signature operation of the provided object
+        -6, --sign-params=str      Sign with a specific signature algorithm
+        -7, --hash=str             Hash algorithm to use for signing
+        -8, --generate-random=num  Generate random data
         -8, --pkcs8                Use PKCS #8 format for private keys
-            --inder                Use DER/RAW format for input
+        -9, --inder                Use DER/RAW format for input
                                      - disabled as '--no-inder'
-            --inraw                an alias for the 'inder' option
-            --outder               Use DER format for output certificates, private keys, and DH parameters
+        -:, --inraw                an alias for the 'inder' option
+        -;, --outder               Use DER format for output certificates, private keys, and DH parameters
                                      - disabled as '--no-outder'
-            --outraw               an alias for the 'outder' option
-            --provider=file        Specify the PKCS #11 provider library
-            --detailed-url         Print detailed URLs
+        -<, --outraw               an alias for the 'outder' option
+        -=, --provider=file        Specify the PKCS #11 provider library
+        -?, --detailed-url         Print detailed URLs
                                      - disabled as '--no-detailed-url'
-            --only-urls            Print a compact listing using only the URLs
-            --batch                Disable all interaction with the tool
+        -@, --only-urls            Print a compact listing using only the URLs
+        -A, --batch                Disable all interaction with the tool
 
      Version, usage and configuration options:
 
@@ -6628,6 +7182,14 @@ list-token-urls option.
 This is the "list the urls available tokens" option.  This is a more
 compact version of -list-tokens.
 
+initialize-so-pin option.
+.........................
+
+This is the "initializes/resets a pkcs #11 token security officer pin."
+option.  This initializes the security officer's PIN. When used
+non-interactively use the GNUTLS_NEW_SO_PIN environment variables to
+initialize SO's PIN.
+
 set-pin option.
 ...............
 
@@ -6646,6 +7208,28 @@ object-list-related-options options
 -----------------------------------
 
 Object listing.
+
+list-all option.
+................
+
+This is the "list all available objects in a token" option.  All objects
+available in the token will be listed.  That includes objects which are
+potentially unaccessible using this tool.
+
+list-all-certs option.
+......................
+
+This is the "list all available certificates in a token" option.  That
+option will also provide more information on the certificates, for
+example, expand the attached extensions in a trust token (like
+p11-kit-trust).
+
+list-certs option.
+..................
+
+This is the "list all certificates that have an associated private key"
+option.  That option will only display certificates which have a private
+key associated with them (share the same ID).
 
 list-all-privkeys option.
 .........................
@@ -6720,12 +7304,22 @@ keygen-related-options options
 
 Key generation.
 
+generate-privkey option.
+........................
+
+This is the "generate private-public key pair of given type" option.
+This option takes a string argument.  Generates a private-public key
+pair in the specified token.  Acceptable types are RSA, ECDSA, Ed25519,
+and DSA. Should be combined with -sec-param or -bits.
+
 generate-rsa option.
 ....................
 
 This is the "generate an rsa private-public key pair" option.  Generates
 an RSA private-public key pair on the specified token.  Should be
 combined with -sec-param or -bits.
+
+*NOTE**: THIS OPTION IS DEPRECATED*
 
 generate-dsa option.
 ....................
@@ -6734,12 +7328,16 @@ This is the "generate a dsa private-public key pair" option.  Generates
 a DSA private-public key pair on the specified token.  Should be
 combined with -sec-param or -bits.
 
+*NOTE**: THIS OPTION IS DEPRECATED*
+
 generate-ecc option.
 ....................
 
 This is the "generate an ecdsa private-public key pair" option.
 Generates an ECDSA private-public key pair on the specified token.
 Should be combined with -curve, -sec-param or -bits.
+
+*NOTE**: THIS OPTION IS DEPRECATED*
 
 bits option.
 ............
@@ -6945,6 +7543,23 @@ option.  It can be used to test the correct operation of the signature
 operation.  If both a private and a public key are available this
 operation will sign and verify the signed data.
 
+sign-params option.
+...................
+
+This is the "sign with a specific signature algorithm" option.  This
+option takes a string argument.  This option can be combined with
+-test-sign, to sign with a specific signature algorithm variant.  The
+only option supported is 'RSA-PSS', and should be specified in order to
+use RSA-PSS signature on RSA keys.
+
+hash option.
+............
+
+This is the "hash algorithm to use for signing" option.  This option
+takes a string argument.  This option can be combined with test-sign.
+Available hash functions are SHA1, RMD160, SHA256, SHA384, SHA512,
+SHA3-224, SHA3-256, SHA3-384, SHA3-512.
+
 generate-random option.
 .......................
 
@@ -6991,6 +7606,16 @@ This is the "specify the pkcs #11 provider library" option.  This option
 takes a file argument.  This will override the default options in
 /etc/gnutls/pkcs11.conf
 
+provider-opts option.
+.....................
+
+This is the "specify parameters for the pkcs #11 provider library"
+option.  This option takes a string argument.  This is a PKCS#11
+internal option used by few modules.  Mainly for testing PKCS#11
+modules.
+
+*NOTE**: THIS OPTION IS DEPRECATED*
+
 batch option.
 .............
 
@@ -7030,7 +7655,7 @@ Note that some tokens require the same label to be used for the
 certificate and its corresponding private key.
 
 To generate an RSA private key inside the token use:
-     $ p11tool --login --generate-rsa --bits 1024 --label "MyNewKey" \
+     $ p11tool --login --generate-privkey rsa --bits 1024 --label "MyNewKey" \
                --outfile MyNewKey.pub "pkcs11:TOKEN-URL"
 The bits parameter in the above example is explicitly set because some
 tokens only support limited choices in the bit length.  The output file
@@ -7038,145 +7663,4 @@ is the corresponding public key.  This key can be used to general a
 certificate request with certtool.
      certtool --generate-request --load-privkey "pkcs11:KEY-URL" \
         --load-pubkey MyNewKey.pub --outfile request.pem
-
-
-File: gnutls.info,  Node: Trusted Platform Module,  Prev: Smart cards and HSMs,  Up: Hardware security modules and abstract key types
-
-5.4 Trusted Platform Module (TPM)
-=================================
-
-In this section we present the Trusted Platform Module (TPM) support in
-GnuTLS.  Note that we recommend against using TPM with this API because
-it is restricted to TPM 1.2.  We recommend instead to use PKCS#11
-wrappers for TPM such as CHAPS(1) or opencryptoki(2).  These will allow
-using the standard smart card and HSM functionality (see *note Smart
-cards and HSMs::) for TPM keys.
-
-There was a big hype when the TPM chip was introduced into computers.
-Briefly it is a co-processor in your PC that allows it to perform
-calculations independently of the main processor.  This has good and bad
-side-effects.  In this section we focus on the good ones; these are the
-fact that you can use the TPM chip to perform cryptographic operations
-on keys stored in it, without accessing them.  That is very similar to
-the operation of a PKCS #11 smart card.  The chip allows for storage and
-usage of RSA keys, but has quite some operational differences from PKCS
-#11 module, and thus require different handling.  The basic TPM
-operations supported and used by GnuTLS, are key generation and signing.
-That support is currently limited to TPM 1.2.
-
-The next sections assume that the TPM chip in the system is already
-initialized and in a operational state.  If not, ensure that the TPM
-chip is enabled by your BIOS, that the 'tcsd' daemon is running, and
-that TPM ownership is set (by running 'tpm_takeownership').
-
-In GnuTLS the TPM functionality is available in 'gnutls/tpm.h'.
-
-* Menu:
-
-* Keys in TPM::
-* Key generation::
-* Using keys::
-* tpmtool Invocation::
-
-   ---------- Footnotes ----------
-
-   (1) <https://github.com/google/chaps-linux>
-
-   (2) <https://sourceforge.net/projects/opencryptoki/>
-
-
-File: gnutls.info,  Node: Keys in TPM,  Next: Key generation,  Up: Trusted Platform Module
-
-5.4.1 Keys in TPM
------------------
-
-The RSA keys in the TPM module may either be stored in a flash memory
-within TPM or stored in a file in disk.  In the former case the key can
-provide operations as with PKCS #11 and is identified by a URL. The URL
-is described in [_TPMURI_] and is of the following form.
-tpmkey:uuid=42309df8-d101-11e1-a89a-97bb33c23ad1;storage=user
-
-It consists from a unique identifier of the key as well as the part of
-the flash memory the key is stored at.  The two options for the storage
-field are 'user' and 'system'.  The user keys are typically only
-available to the generating user and the system keys to all users.  The
-stored in TPM keys are called registered keys.
-
-The keys that are stored in the disk are exported from the TPM but in an
-encrypted form.  To access them two passwords are required.  The first
-is the TPM Storage Root Key (SRK), and the other is a key-specific
-password.  Also those keys are identified by a URL of the form:
-tpmkey:file=/path/to/file
-
-When objects require a PIN to be accessed the same callbacks as with
-PKCS #11 objects are expected (see *note Accessing objects that require
-a PIN::).  Note that the PIN function may be called multiple times to
-unlock the SRK and the specific key in use.  The label in the key
-function will then be set to 'SRK' when unlocking the SRK key, or to
-'TPM' when unlocking any other key.
-
-
-File: gnutls.info,  Node: Key generation,  Next: Using keys,  Prev: Keys in TPM,  Up: Trusted Platform Module
-
-5.4.2 Key generation
---------------------
-
-All keys used by the TPM must be generated by the TPM. This can be done
-using *note gnutls_tpm_privkey_generate::.
-
- -- Function: int gnutls_tpm_privkey_generate (gnutls_pk_algorithm_t PK,
-          unsigned int BITS, const char * SRK_PASSWORD, const char *
-          KEY_PASSWORD, gnutls_tpmkey_fmt_t FORMAT,
-          gnutls_x509_crt_fmt_t PUB_FORMAT, gnutls_datum_t * PRIVKEY,
-          gnutls_datum_t * PUBKEY, unsigned int FLAGS)
-     PK: the public key algorithm
-
-     BITS: the security bits
-
-     SRK_PASSWORD: a password to protect the exported key (optional)
-
-     KEY_PASSWORD: the password for the TPM (optional)
-
-     FORMAT: the format of the private key
-
-     PUB_FORMAT: the format of the public key
-
-     PRIVKEY: the generated key
-
-     PUBKEY: the corresponding public key (may be null)
-
-     FLAGS: should be a list of GNUTLS_TPM_* flags
-
-     This function will generate a private key in the TPM chip.  The
-     private key will be generated within the chip and will be exported
-     in a wrapped with TPM's master key form.  Furthermore the wrapped
-     key can be protected with the provided 'password' .
-
-     Note that bits in TPM is quantized value.  If the input value is
-     not one of the allowed values, then it will be quantized to one of
-     512, 1024, 2048, 4096, 8192 and 16384.
-
-     Allowed flags are:
-
-     *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
-     otherwise a negative error value.
-
-     *Since:* 3.1.0
-
-'INT *note gnutls_tpm_get_registered:: (gnutls_tpm_key_list_t * LIST)'
-'VOID *note gnutls_tpm_key_list_deinit:: (gnutls_tpm_key_list_t LIST)'
-'INT *note gnutls_tpm_key_list_get_url:: (gnutls_tpm_key_list_t LIST, unsigned int IDX, char ** URL, unsigned int FLAGS)'
-
- -- Function: int gnutls_tpm_privkey_delete (const char * URL, const
-          char * SRK_PASSWORD)
-     URL: the URL describing the key
-
-     SRK_PASSWORD: a password for the SRK key
-
-     This function will unregister the private key from the TPM chip.
-
-     *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
-     otherwise a negative error value.
-
-     *Since:* 3.1.0
 

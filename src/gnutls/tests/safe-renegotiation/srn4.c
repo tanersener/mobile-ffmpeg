@@ -112,7 +112,7 @@ void doit(void)
 	gnutls_init(&server, GNUTLS_SERVER);
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
 			       serverx509cred);
-	gnutls_priority_set_direct(server, "NORMAL", NULL);
+	gnutls_priority_set_direct(server, "NORMAL:-VERS-ALL:+VERS-TLS1.2", NULL);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
@@ -123,7 +123,7 @@ void doit(void)
 	gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
 			       clientx509cred);
 	gnutls_priority_set_direct(client,
-				   "NORMAL:%DISABLE_SAFE_RENEGOTIATION",
+				   "NORMAL:-VERS-ALL:+VERS-TLS1.2:%DISABLE_SAFE_RENEGOTIATION",
 				   NULL);
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);

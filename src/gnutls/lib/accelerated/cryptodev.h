@@ -1,3 +1,6 @@
+#ifndef GNUTLS_LIB_ACCELERATED_CRYPTODEV_H
+# define GNUTLS_LIB_ACCELERATED_CRYPTODEV_H
+
 extern int _gnutls_cryptodev_fd;
 
 #define CHECK_AES_KEYSIZE(s) \
@@ -7,3 +10,5 @@ extern int _gnutls_cryptodev_fd;
 void _gnutls_cryptodev_deinit(void);
 int _gnutls_cryptodev_init(void);
 int _cryptodev_register_gcm_crypto(int cfd);
+
+#endif /* GNUTLS_LIB_ACCELERATED_CRYPTODEV_H */

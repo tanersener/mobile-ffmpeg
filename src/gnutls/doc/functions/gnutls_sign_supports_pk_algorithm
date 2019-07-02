@@ -1,0 +1,17 @@
+
+
+
+
+@deftypefun {unsigned} {gnutls_sign_supports_pk_algorithm} (gnutls_sign_algorithm_t @var{sign}, gnutls_pk_algorithm_t @var{pk})
+@var{sign}: is a signature algorithm
+
+@var{pk}: is a public key algorithm
+
+This function returns non-zero if the public key algorithm corresponds to
+the given signature algorithm. That is, if that signature can be generated
+from the given private key algorithm.
+
+@strong{Since:} 3.6.0
+
+@strong{Returns:} return non-zero when the provided algorithms are compatible.
+@end deftypefun

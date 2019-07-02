@@ -1,0 +1,22 @@
+
+
+
+
+@deftypefun {int} {gnutls_encode_gost_rs_value} (gnutls_datum_t * @var{sig_value}, const gnutls_datum_t * @var{r}, const gnutls_datum_t  * @var{s})
+@var{sig_value}: will hold a GOST signature according to RFC 4491 section 2.2.2
+
+@var{r}: must contain the r value
+
+@var{s}: must contain the s value
+
+This function will encode the provided r and s values, into binary
+representation according to RFC 4491 section 2.2.2, used for GOST R
+34.10-2001 (and thus also for GOST R 34.10-2012) signatures.
+
+The output value should be deallocated using @code{gnutls_free()} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise
+an error code is returned.
+
+@strong{Since:} 3.6.0
+@end deftypefun

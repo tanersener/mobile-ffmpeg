@@ -15,7 +15,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see
- * <http://www.gnu.org/licenses/>.
+ * <https://www.gnu.org/licenses/>.
  */
 
 #include <config.h>
@@ -59,8 +59,7 @@ int main(int argc, char **argv)
 static int write_key(const char *username, const char *key, int key_size,
 		     const char *passwd_file);
 
-#define KPASSWD "/etc/passwd.psk"
-#define MAX_KEY_SIZE 64
+#define MAX_KEY_SIZE 512
 int main(int argc, char **argv)
 {
 	int ret;
@@ -69,7 +68,7 @@ int main(int argc, char **argv)
 #endif
 	unsigned char key[MAX_KEY_SIZE];
 	char hex_key[MAX_KEY_SIZE * 2 + 1];
-	int optct, key_size;
+	int key_size;
 	gnutls_datum_t dkey;
 	const char *passwd, *username;
 	size_t hex_key_size = sizeof(hex_key);
@@ -81,14 +80,13 @@ int main(int argc, char **argv)
 
 	umask(066);
 
-	optct = optionProcess(&psktoolOptions, argc, argv);
-	argc -= optct;
-	argv += optct;
+	optionProcess(&psktoolOptions, argc, argv);
 
-	if (!HAVE_OPT(PASSWD))
-		passwd = (char *) KPASSWD;
-	else
-		passwd = OPT_ARG(PASSWD);
+	if (!HAVE_OPT(PSKFILE)) {
+		fprintf(stderr, "You need to specify a PSK key file\n");
+		exit(1);
+	} else
+		passwd = OPT_ARG(PSKFILE);
 
 	if (!HAVE_OPT(USERNAME)) {
 #ifndef _WIN32
@@ -113,7 +111,7 @@ int main(int argc, char **argv)
 	}
 
 	if (!HAVE_OPT(KEYSIZE) || OPT_VALUE_KEYSIZE < 1)
-		key_size = 16;
+		key_size = 32;
 	else
 		key_size = OPT_VALUE_KEYSIZE;
 
@@ -213,14 +211,14 @@ write_key(const char *username, const char *key, int key_size,
 	if (fd == NULL) {
 		fprintf(stderr, "Cannot open '%s' for write\n",
 			passwd_file);
-		remove(tmpname);
+		(void)remove(tmpname);
 		return -1;
 	}
 
 	fd2 = fopen(tmpname, "r");
 	if (fd2 == NULL) {
 		fprintf(stderr, "Cannot open '%s' for read\n", tmpname);
-		remove(tmpname);
+		(void)remove(tmpname);
 		fclose(fd);
 		return -1;
 	}
@@ -253,7 +251,7 @@ write_key(const char *username, const char *key, int key_size,
 	fclose(fd);
 	fclose(fd2);
 
-	remove(tmpname);
+	(void)remove(tmpname);
 
 
 	return 0;

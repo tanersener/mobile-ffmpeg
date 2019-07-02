@@ -129,6 +129,12 @@ void doit(void)
 			printf("Chain '%s' (%d)...\n", chains[i].name,
 			       (int) i);
 
+		if (chains[i].notfips && gnutls_fips140_mode_enabled()) {
+			if (debug)
+				printf("Skipping in FIPS mode...\n");
+			continue;
+		}
+
 		for (j = 0; chains[i].chain[j]; j++) {
 			if (debug > 2)
 				printf("\tAdding certificate %d...",

@@ -16,7 +16,10 @@ deallocated with @code{gnutls_x509_crt_deinit()} .
 When past the last element is accessed @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE} 
 is returned and the iterator is reset.
 
-After use, the iterator must be deinitialized usin
+The iterator is deinitialized and reset to @code{NULL}  automatically by this
+function after iterating through all elements until
+@code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  is returned. If the iteration is
+aborted early, it must be manually deinitialized using
 @code{gnutls_x509_trust_list_iter_deinit()} .
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a

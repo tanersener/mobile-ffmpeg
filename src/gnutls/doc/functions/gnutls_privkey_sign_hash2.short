@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_privkey_sign_hash2} (gnutls_privkey_t @var{signer}, gnutls_sign_algorithm_t @var{algo}, unsigned int @var{flags}, const gnutls_datum_t * @var{hash_data}, gnutls_datum_t * @var{signature})

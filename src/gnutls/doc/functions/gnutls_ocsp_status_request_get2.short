@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_ocsp_status_request_get2} (gnutls_session_t @var{session}, unsigned @var{idx}, gnutls_datum_t * @var{response})

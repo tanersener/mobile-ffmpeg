@@ -16,7 +16,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -79,9 +79,13 @@ static const gnutls_alert_entry sup_alerts[] = {
 		    N_("The server name sent was not recognized")),
 	ALERT_ENTRY(GNUTLS_A_UNKNOWN_PSK_IDENTITY,
 		    N_("The SRP/PSK username is missing or not known")),
+	ALERT_ENTRY(GNUTLS_A_MISSING_EXTENSION,
+		    N_("An extension was expected but was not seen")),
 	ALERT_ENTRY(GNUTLS_A_NO_APPLICATION_PROTOCOL,
 		    N_
 		    ("No supported application protocol could be negotiated")),
+	ALERT_ENTRY(GNUTLS_A_CERTIFICATE_REQUIRED,
+		    N_("Certificate is required")),
 	{0, NULL, NULL}
 };
 
@@ -155,7 +159,7 @@ gnutls_alert_send(gnutls_session_t session, gnutls_alert_level_t level,
 	data[0] = (uint8_t) level;
 	data[1] = (uint8_t) desc;
 
-	name = gnutls_alert_get_name((int) data[1]);
+	name = gnutls_alert_get_name((gnutls_alert_description_t) data[1]);
 	if (name == NULL)
 		name = "(unknown)";
 	_gnutls_record_log("REC: Sending Alert[%d|%d] - %s\n", data[0],
@@ -182,7 +186,7 @@ gnutls_alert_send(gnutls_session_t session, gnutls_alert_level_t level,
  * renegotiation will be performed.
  *
  * If there is no mapping to a valid alert the alert to indicate
- * internal error is returned.
+ * internal error (%GNUTLS_A_INTERNAL_ERROR) is returned.
  *
  * Returns: the alert code to use for a particular error code.
  **/
@@ -191,6 +195,11 @@ int gnutls_error_to_alert(int err, int *level)
 	int ret, _level = -1;
 
 	switch (err) {		/* send appropriate alert */
+	case GNUTLS_E_PK_SIG_VERIFY_FAILED:
+	case GNUTLS_E_ERROR_IN_FINISHED_PACKET:
+		ret = GNUTLS_A_DECRYPT_ERROR;
+		_level = GNUTLS_AL_FATAL;
+		break;
 	case GNUTLS_E_DECRYPTION_FAILED:
 		/* GNUTLS_A_DECRYPTION_FAILED is not sent, because
 		 * it is not defined in SSL3. Note that we must
@@ -201,7 +210,10 @@ int gnutls_error_to_alert(int err, int *level)
 		ret = GNUTLS_A_BAD_RECORD_MAC;
 		_level = GNUTLS_AL_FATAL;
 		break;
+	case GNUTLS_E_UNEXPECTED_PACKET_LENGTH:
 	case GNUTLS_E_UNEXPECTED_EXTENSIONS_LENGTH:
+	case GNUTLS_E_NO_CERTIFICATE_FOUND:
+	case GNUTLS_E_HANDSHAKE_TOO_LARGE:
 		ret = GNUTLS_A_DECODE_ERROR;
 		_level = GNUTLS_AL_FATAL;
 		break;
@@ -209,8 +221,12 @@ int gnutls_error_to_alert(int err, int *level)
 		ret = GNUTLS_A_DECOMPRESSION_FAILURE;
 		_level = GNUTLS_AL_FATAL;
 		break;
+	case GNUTLS_E_ILLEGAL_PARAMETER:
 	case GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER:
 	case GNUTLS_E_ILLEGAL_SRP_USERNAME:
+	case GNUTLS_E_PK_INVALID_PUBKEY:
+	case GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM:
+	case GNUTLS_E_RECEIVED_DISALLOWED_NAME:
 		ret = GNUTLS_A_ILLEGAL_PARAMETER;
 		_level = GNUTLS_AL_FATAL;
 		break;
@@ -235,7 +251,6 @@ int gnutls_error_to_alert(int err, int *level)
 		_level = GNUTLS_AL_FATAL;
 		break;
 	case GNUTLS_E_UNKNOWN_CIPHER_SUITE:
-	case GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM:
 	case GNUTLS_E_INSUFFICIENT_CREDENTIALS:
 	case GNUTLS_E_NO_CIPHER_SUITES:
 	case GNUTLS_E_NO_COMPRESSION_ALGORITHMS:
@@ -243,11 +258,19 @@ int gnutls_error_to_alert(int err, int *level)
 	case GNUTLS_E_SAFE_RENEGOTIATION_FAILED:
 	case GNUTLS_E_INCOMPAT_DSA_KEY_WITH_TLS_PROTOCOL:
 	case GNUTLS_E_UNKNOWN_PK_ALGORITHM:
+	case GNUTLS_E_UNWANTED_ALGORITHM:
+	case GNUTLS_E_NO_COMMON_KEY_SHARE:
+	case GNUTLS_E_ECC_NO_SUPPORTED_CURVES:
+	case GNUTLS_E_ECC_UNSUPPORTED_CURVE:
 		ret = GNUTLS_A_HANDSHAKE_FAILURE;
 		_level = GNUTLS_AL_FATAL;
 		break;
 	case GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION:
 		ret = GNUTLS_A_UNSUPPORTED_EXTENSION;
+		_level = GNUTLS_AL_FATAL;
+		break;
+	case GNUTLS_E_MISSING_EXTENSION:
+		ret = GNUTLS_A_MISSING_EXTENSION;
 		_level = GNUTLS_AL_FATAL;
 		break;
 	case GNUTLS_E_USER_ERROR:
@@ -273,7 +296,7 @@ int gnutls_error_to_alert(int err, int *level)
 		ret = GNUTLS_A_UNSUPPORTED_CERTIFICATE;
 		_level = GNUTLS_AL_FATAL;
 		break;
-	case GNUTLS_E_UNEXPECTED_PACKET_LENGTH:
+	case GNUTLS_E_RECORD_OVERFLOW:
 		ret = GNUTLS_A_RECORD_OVERFLOW;
 		_level = GNUTLS_AL_FATAL;
 		break;
@@ -292,8 +315,8 @@ int gnutls_error_to_alert(int err, int *level)
 		_level = GNUTLS_AL_FATAL;
 		break;
 	case GNUTLS_E_DH_PRIME_UNACCEPTABLE:
-	case GNUTLS_E_NO_CERTIFICATE_FOUND:
 	case GNUTLS_E_SESSION_USER_ID_CHANGED:
+	case GNUTLS_E_INSUFFICIENT_SECURITY:
 		ret = GNUTLS_A_INSUFFICIENT_SECURITY;
 		_level = GNUTLS_AL_FATAL;
 		break;
@@ -303,6 +326,10 @@ int gnutls_error_to_alert(int err, int *level)
 		break;
 	case GNUTLS_E_UNRECOGNIZED_NAME:
 		ret = GNUTLS_A_UNRECOGNIZED_NAME;
+		_level = GNUTLS_AL_FATAL;
+		break;
+	case GNUTLS_E_CERTIFICATE_REQUIRED:
+		ret = GNUTLS_A_CERTIFICATE_REQUIRED;
 		_level = GNUTLS_AL_FATAL;
 		break;
 	default:
@@ -320,7 +347,7 @@ int gnutls_error_to_alert(int err, int *level)
 /**
  * gnutls_alert_send_appropriate:
  * @session: is a #gnutls_session_t type.
- * @err: is an integer
+ * @err: is an error code returned by another GnuTLS function
  *
  * Sends an alert to the peer depending on the error code returned by
  * a gnutls function. This function will call gnutls_error_to_alert()
@@ -329,8 +356,11 @@ int gnutls_error_to_alert(int err, int *level)
  * This function may also return %GNUTLS_E_AGAIN, or
  * %GNUTLS_E_INTERRUPTED.
  *
- * If the return value is %GNUTLS_E_INVALID_REQUEST, then no alert has
- * been sent to the peer.
+ * This function historically was always sending an alert to the
+ * peer, even if @err was inappropriate to respond with an alert
+ * (e.g., %GNUTLS_E_SUCCESS). Since 3.6.6 this function returns
+ * success without transmitting any data on error codes that
+ * should not result to an alert.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.
@@ -340,12 +370,13 @@ int gnutls_alert_send_appropriate(gnutls_session_t session, int err)
 	int alert;
 	int level;
 
-	alert = gnutls_error_to_alert(err, &level);
-	if (alert < 0) {
-		return alert;
-	}
+	if (err != GNUTLS_E_REHANDSHAKE && (!gnutls_error_is_fatal(err) ||
+	    err == GNUTLS_E_FATAL_ALERT_RECEIVED))
+		return gnutls_assert_val(0);
 
-	return gnutls_alert_send(session, level, alert);
+	alert = gnutls_error_to_alert(err, &level);
+
+	return gnutls_alert_send(session, (gnutls_alert_level_t)level, alert);
 }
 
 /**
@@ -363,5 +394,5 @@ int gnutls_alert_send_appropriate(gnutls_session_t session, int err)
  **/
 gnutls_alert_description_t gnutls_alert_get(gnutls_session_t session)
 {
-	return session->internals.last_alert;
+	return (gnutls_alert_description_t)session->internals.last_alert;
 }

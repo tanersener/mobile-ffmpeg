@@ -50,8 +50,8 @@ datefudge -s "2007-04-22" \
 rc=$?
 
 if test -f "${srcdir}/data/template-rsa-$i.pem";then
-${DIFF} "${srcdir}/data/template-rsa-$i.pem" "${TMPFILE}" >/dev/null 2>&1
-rc=$?
+	${DIFF} "${srcdir}/data/template-rsa-$i.pem" "${TMPFILE}" >/dev/null 2>&1
+	rc=$?
 fi
 
 # We're done.

@@ -3,23 +3,23 @@
 @c gnutls_pkcs11_obj_info_t
 @table @code
 @item GNUTLS_@-PKCS11_@-OBJ_@-ID_@-HEX
-The object ID in hex.
+The object ID in hex. Null-terminated text.
 @item GNUTLS_@-PKCS11_@-OBJ_@-LABEL
-The object label.
+The object label. Null-terminated text.
 @item GNUTLS_@-PKCS11_@-OBJ_@-TOKEN_@-LABEL
-The token's label.
+The token's label. Null-terminated text.
 @item GNUTLS_@-PKCS11_@-OBJ_@-TOKEN_@-SERIAL
-The token's serial number.
+The token's serial number. Null-terminated text.
 @item GNUTLS_@-PKCS11_@-OBJ_@-TOKEN_@-MANUFACTURER
-The token's manufacturer.
+The token's manufacturer. Null-terminated text.
 @item GNUTLS_@-PKCS11_@-OBJ_@-TOKEN_@-MODEL
-The token's model.
+The token's model. Null-terminated text.
 @item GNUTLS_@-PKCS11_@-OBJ_@-ID
-The object ID.
+The object ID. Raw bytes.
 @item GNUTLS_@-PKCS11_@-OBJ_@-LIBRARY_@-VERSION
-The library's version.
+The library's version. Null-terminated text.
 @item GNUTLS_@-PKCS11_@-OBJ_@-LIBRARY_@-DESCRIPTION
-The library's description.
+The library's description. Null-terminated text.
 @item GNUTLS_@-PKCS11_@-OBJ_@-LIBRARY_@-MANUFACTURER
-The library's manufacturer name.
+The library's manufacturer name. Null-terminated text.
 @end table

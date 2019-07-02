@@ -16,7 +16,7 @@
  * General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with GnuTLS.  If not, see <http://www.gnu.org/licenses/>.
+ * along with GnuTLS.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
 
@@ -24,13 +24,14 @@
 #include <config.h>
 #endif
 
+#include <stdlib.h>
+
 /* This program verifies whether the low-level random functions can operate
  * properly, even if interrupted by signals */
 
 #if defined(HAVE_SETITIMER) && (defined(HAVE_LINUX_GETRANDOM) || defined(__linux__))
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/time.h>
@@ -99,6 +100,8 @@ void doit(void)
 	_rnd_system_entropy_deinit();
 }
 #else
+void doit(void); /* prototype to avoid warning with -Wmissing-prototypes */
+
 void doit(void)
 {
 	exit(77);

@@ -9,20 +9,28 @@
 
 @var{idx}: is a certificate index as returned by @code{gnutls_certificate_set_key()}  and friends
 
-This function sets the filename of an OCSP response, that will be
+This function loads the provided OCSP response. It will be
 sent to the client if requests an OCSP certificate status for
 the certificate chain specified by  @code{idx} .
-
-This is a convenience function which may be inefficient on busy servers since
-the file is opened on every access. Use 
-@code{gnutls_certificate_set_ocsp_status_request_function2()}  to fine-tune
-file accesses.
 
 @strong{Note:} the ability to set multiple OCSP responses per credential
 structure via the index  @code{idx} was added in version 3.5.6. To keep
 backwards compatibility, it requires using @code{gnutls_certificate_set_flags()} 
 with the @code{GNUTLS_CERTIFICATE_API_V2}  flag to make the set certificate
 functions return an index usable by this function.
+
+This function can be called multiple times since GnuTLS 3.6.3
+when multiple responses which apply to the chain are available.
+If the response provided does not match any certificates present
+in the chain, the code @code{GNUTLS_E_OCSP_MISMATCH_WITH_CERTS}  is returned.
+To revert to the previous behavior set the flag @code{GNUTLS_CERTIFICATE_SKIP_OCSP_RESPONSE_CHECK} 
+in the certificate credentials structure. In that case, only the
+end-certificate's OCSP response can be set.
+If the response is already expired at the time of loading the code
+@code{GNUTLS_E_EXPIRED}  is returned.
+
+To revert to the previous behavior of this function which does not return
+any errors, set the flag @code{GNUTLS_CERTIFICATE_SKIP_OCSP_RESPONSE_CHECK} 
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned,
 otherwise a negative error code is returned.

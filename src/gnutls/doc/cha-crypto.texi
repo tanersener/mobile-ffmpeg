@@ -6,11 +6,12 @@ it does not provide access to basic cryptographic primitives. However
 it abstracts the internal cryptographic back-end (see @ref{Cryptographic Backend}),
 providing symmetric crypto, hash and HMAC algorithms, as well access
 to the random number generation. For a low-level crypto API the usage of nettle
-@footnote{See @uref{http://www.lysator.liu.se/~nisse/nettle/}.} library is recommended.
+@footnote{See @uref{https://www.lysator.liu.se/~nisse/nettle/}.} library is recommended.
 
 @menu
 * Symmetric algorithms::
 * Public key algorithms::
+* Cryptographic Message Syntax / PKCS7::
 * Hash and MAC functions::
 * Random number generation::
 * Overriding algorithms::
@@ -22,10 +23,36 @@ to the random number generation. For a low-level crypto API the usage of nettle
 @cindex symmetric cryptography
 
 The available functions to access symmetric crypto algorithms operations
-are shown below. The supported algorithms are the algorithms required by the TLS protocol.
-They are listed in @ref{gnutls_cipher_algorithm_t}.
+are listed in the sections below. The supported algorithms are the algorithms required by the TLS protocol.
+They are listed in @ref{gnutls_cipher_algorithm_t}. Note that there two
+types of ciphers, the ones providing an authenticated-encryption with
+associated data (AEAD), and the legacy ciphers which provide raw access
+to the ciphers. We recommend the use of the AEAD APIs for new applications
+as it is designed to minimize misuse of cryptography.
 
 @showenumdesc{gnutls_cipher_algorithm_t,The supported ciphers.}
+
+@subheading Authenticated-encryption API
+
+The AEAD API provides access to all ciphers supported by GnuTLS which support
+authenticated encryption with associated data. That is particularly suitable
+for message or packet-encryption as it provides authentication and
+encryption on the same API. See @code{RFC5116} for more information on
+authenticated encryption.
+
+@showfuncD{gnutls_aead_cipher_init,gnutls_aead_cipher_encrypt,gnutls_aead_cipher_decrypt,gnutls_aead_cipher_deinit}
+
+Because the encryption function above may be difficult to use with
+scattered data, we provide the following API.
+
+@showfuncdesc{gnutls_aead_cipher_encryptv}
+
+@subheading Legacy API
+
+The legacy API provides low-level access to all legacy ciphers supported by GnuTLS,
+and some of the AEAD ciphers (e.g., AES-GCM and CHACHA20). The restrictions
+of the nettle library implementation of the ciphers apply verbatim to this
+API@footnote{See the nettle manual @url{https://www.lysator.liu.se/~nisse/nettle/nettle.html}}.
 
 @showfuncE{gnutls_cipher_init,gnutls_cipher_encrypt2,gnutls_cipher_decrypt2,gnutls_cipher_set_iv,gnutls_cipher_deinit}
 
@@ -35,34 +62,68 @@ it is recommended to use the following functions which are solely for AEAD ciphe
 API is designed to be simple to use and also hard to misuse, by handling the tag verification
 and addition in transparent way.
 
-@showfuncD{gnutls_aead_cipher_init,gnutls_aead_cipher_encrypt,gnutls_aead_cipher_decrypt,gnutls_aead_cipher_deinit}
-
 @node Public key algorithms
 @section Public key algorithms
 @cindex public key algorithms
 
-Public key cryptography algorithms such as RSA, DSA and ECDSA, can be
+Public key cryptography algorithms such as RSA, DSA and ECDSA, are
 accessed using the abstract key API in @ref{Abstract key types}. This
 is a high level API with the advantage of transparently handling keys
-in memory and keys present in smart cards.
+stored in memory and keys present in smart cards.
 
-@subsection PKCS #7 signing
-@cindex PKCS #7
+@showfuncF{gnutls_privkey_init,gnutls_privkey_import_url,gnutls_privkey_import_x509_raw,gnutls_privkey_sign_data,gnutls_privkey_sign_hash,gnutls_privkey_deinit}
+
+@showfuncF{gnutls_pubkey_init,gnutls_pubkey_import_url,gnutls_pubkey_import_x509,gnutls_pubkey_verify_data2,gnutls_pubkey_verify_hash2,gnutls_pubkey_deinit}
+
+Keys stored in memory can be imported using functions like
+@funcref{gnutls_privkey_import_x509_raw}, while keys on smart cards or HSMs
+should be imported using their PKCS#11 URL with
+@funcref{gnutls_privkey_import_url}.
+
+If any of the smart card operations require PIN, that should be provided
+either by setting the global PIN function
+(@funcref{gnutls_pkcs11_set_pin_function}), or better with the targeted to
+structures functions such as @funcref{gnutls_privkey_set_pin_function}.
+
+
+@subsection Key generation
+
+All supported key types (including RSA, DSA, ECDSA, Ed25519) can be generated
+with GnuTLS. They can be generated with the simpler @funcref{gnutls_privkey_generate}
+or with the more advanced @funcref{gnutls_privkey_generate2}.
+
+@showfuncdesc{gnutls_privkey_generate2}
+
+@node Cryptographic Message Syntax / PKCS7
+@section Cryptographic Message Syntax / PKCS7
+@cindex public key algorithms
+@cindex cryptographic message syntax
 @cindex file signing
+@cindex CMS
+@cindex PKCS #7
 
-The PKCS #7 format is common format used for digital signatures. It allows to sign
+The CMS or PKCS #7 format is a commonly used format for digital signatures.
+PKCS #7 is the name of the original standard when published by RSA, though
+today the standard is adopted by IETF under the name CMS.
+
+The standards include multiple ways of signing a digital document, e.g.,
 by embedding the data into the signature, or creating detached signatures of the data,
-including a timestamp, additional certificates etc. In certain cases this format is also
-used to transport lists of certificates and CRLs.
+including a timestamp, additional certificates etc. In certain cases the
+same format is also used to transport lists of certificates and CRLs.
 
-The basic functions to initialize, deinitialize, import, export or print information
-about a PKCS #7 structure are shown below.
+It is a relatively popular standard to sign structures, and is being used to
+sign in PDF files, as well as for signing kernel modules and other
+structures.
+
+In GnuTLS, the basic functions to initialize, deinitialize, import, export or print information
+about a PKCS #7 structure are listed below.
 @showfuncE{gnutls_pkcs7_init,gnutls_pkcs7_deinit,gnutls_pkcs7_export2,gnutls_pkcs7_import,gnutls_pkcs7_print}
 
 The following functions allow the verification of a structure using either a trust list, or
 individual certificates. The @funcref{gnutls_pkcs7_sign} function is the data signing function.
 
 @showfuncB{gnutls_pkcs7_verify_direct,gnutls_pkcs7_verify}
+
 @showfuncdesc{gnutls_pkcs7_sign}
 
 @showenumdesc{gnutls_pkcs7_sign_flags,Flags applicable to gnutls_pkcs7_sign()}
@@ -107,6 +168,9 @@ function. It allows obtaining random data of various levels.
 
 @showenumdesc{gnutls_rnd_level_t,The random number levels.}
 @showfuncdesc{gnutls_rnd}
+
+See @ref{Random Number Generators-internals} for more information
+on the random number generator operation.
 
 @node Overriding algorithms
 @section Overriding algorithms

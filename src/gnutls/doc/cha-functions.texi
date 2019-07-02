@@ -114,6 +114,10 @@ with the @code{libgnutls-dane} library to use them.
 The following functions are to be used for low-level cryptographic operations.
 Their prototypes lie in @file{gnutls/crypto.h}.
 
+Note that due to historic reasons several functions, (e.g.
+@funcref{gnutls_mac_list}, @funcref{gnutls_mac_get_name}) of this API are part
+of the @ref{Core TLS API}.
+
 @include crypto-api.texi
 
 @node Compatibility API

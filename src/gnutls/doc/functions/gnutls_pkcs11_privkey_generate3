@@ -31,6 +31,9 @@ Note that when generating an elliptic curve key, the curve
 can be substituted in the place of the bits parameter using the
 @code{GNUTLS_CURVE_TO_BITS()}  macro.
 
+Since 3.6.3 the objects are marked as sensitive by default unless
+@code{GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_SENSITIVE}  is specified.
+
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.
 

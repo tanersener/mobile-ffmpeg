@@ -15,7 +15,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  */
 
 #include "gnutls_int.h"
@@ -89,8 +89,8 @@ gnutls_pkcs11_copy_secret_key(const char *token_url, gnutls_datum_t * key,
 		return ret;
 	}
 
-	/* FIXME: copy key usage flags */
-
+	/* We do not copy key usage flags.
+	 */
 	a[0].type = CKA_CLASS;
 	a[0].value = &class;
 	a[0].value_len = sizeof(class);
@@ -119,7 +119,7 @@ gnutls_pkcs11_copy_secret_key(const char *token_url, gnutls_datum_t * key,
 		a_val++;
 	}
 
-	if (flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE)
+	if (!(flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_SENSITIVE))
 		tval = 1;
 	else
 		tval = 0;

@@ -14,7 +14,7 @@ The certificate's issuer is not known.
 This is the case if the issuer is not included in the trusted certificate list.
 @item GNUTLS_@-CERT_@-SIGNER_@-NOT_@-CA
 The certificate's signer was not a CA. This
-may happen if this was a version 1 certificate, which is common with 
+may happen if this was a version 1 certificate, which is common with
 some CAs, or a version 3 certificate without the basic constrains extension.
 @item GNUTLS_@-CERT_@-INSECURE_@-ALGORITHM
 The certificate was signed using an insecure
@@ -43,4 +43,6 @@ The certificate or an intermediate does not match the intended purpose (extended
 The certificate requires the server to send the certifiate status, but no status was received.
 @item GNUTLS_@-CERT_@-INVALID_@-OCSP_@-STATUS
 The received OCSP status response is invalid.
+@item GNUTLS_@-CERT_@-UNKNOWN_@-CRIT_@-EXTENSIONS
+The certificate has extensions marked as critical which are not supported.
 @end table

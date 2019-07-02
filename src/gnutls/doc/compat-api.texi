@@ -1,4 +1,47 @@
 
+@subheading gnutls_compression_get
+@anchor{gnutls_compression_get}
+@deftypefun {gnutls_compression_method_t} {gnutls_compression_get} (gnutls_session_t @var{session})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+Get the currently used compression algorithm.
+
+@strong{Returns:} the currently used compression method, a
+@code{gnutls_compression_method_t}  value.
+@end deftypefun
+
+@subheading gnutls_compression_get_id
+@anchor{gnutls_compression_get_id}
+@deftypefun {gnutls_compression_method_t} {gnutls_compression_get_id} (const char * @var{name})
+@var{name}: is a compression method name
+
+The names are compared in a case insensitive way.
+
+@strong{Returns:} an id of the specified in a string compression method, or
+@code{GNUTLS_COMP_UNKNOWN}  on error.
+@end deftypefun
+
+@subheading gnutls_compression_get_name
+@anchor{gnutls_compression_get_name}
+@deftypefun {const char *} {gnutls_compression_get_name} (gnutls_compression_method_t      @var{algorithm})
+@var{algorithm}: is a Compression algorithm
+
+Convert a @code{gnutls_compression_method_t}  value to a string.
+
+@strong{Returns:} a pointer to a string that contains the name of the
+specified compression algorithm, or @code{NULL} .
+@end deftypefun
+
+@subheading gnutls_compression_list
+@anchor{gnutls_compression_list}
+@deftypefun {const gnutls_compression_method_t *} {gnutls_compression_list} ( @var{void})
+
+Get a list of compression methods.
+
+@strong{Returns:} a zero-terminated list of @code{gnutls_compression_method_t} 
+integers indicating the available compression methods.
+@end deftypefun
+
 @subheading gnutls_global_set_mem_functions
 @anchor{gnutls_global_set_mem_functions}
 @deftypefun {void} {gnutls_global_set_mem_functions} (gnutls_alloc_function @var{alloc_func}, gnutls_alloc_function @var{secure_alloc_func}, gnutls_is_secure_function @var{is_secure_func}, gnutls_realloc_function @var{realloc_func}, gnutls_free_function @var{free_func})
@@ -35,48 +78,24 @@ This function is not thread safe.
 
 @var{signature}: will contain newly allocated signature
 
-This function will sign the given hash using the private key.  You
-should use @code{gnutls_openpgp_privkey_set_preferred_key_id()}  before
-calling this function to set the subkey to use.
+This function is no-op.
 
-@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
-negative error value.
-
-@strong{Deprecated:} Use @code{gnutls_privkey_sign_hash()}  instead.
+@strong{Returns:} @code{GNUTLS_E_UNIMPLEMENTED_FEATURE} .
 @end deftypefun
 
-@subheading gnutls_x509_crl_sign
-@anchor{gnutls_x509_crl_sign}
-@deftypefun {int} {gnutls_x509_crl_sign} (gnutls_x509_crl_t @var{crl}, gnutls_x509_crt_t @var{issuer}, gnutls_x509_privkey_t @var{issuer_key})
-@var{crl}: should contain a gnutls_x509_crl_t type
+@subheading gnutls_priority_compression_list
+@anchor{gnutls_priority_compression_list}
+@deftypefun {int} {gnutls_priority_compression_list} (gnutls_priority_t @var{pcache}, const unsigned int ** @var{list})
+@var{pcache}: is a @code{gnutls_prioritity_t}  type.
 
-@var{issuer}: is the certificate of the certificate issuer
+@var{list}: will point to an integer list
 
-@var{issuer_key}: holds the issuer's private key
+Get a list of available compression method in the priority
+structure.
 
-This function is the same a @code{gnutls_x509_crl_sign2()}  with no flags, and
-SHA1 as the hash algorithm.
+@strong{Returns:} the number of methods, or an error code.
 
-@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
-negative error value.
-
-@strong{Deprecated:} Use @code{gnutls_x509_crl_privkey_sign()} .
-@end deftypefun
-
-@subheading gnutls_x509_crq_sign
-@anchor{gnutls_x509_crq_sign}
-@deftypefun {int} {gnutls_x509_crq_sign} (gnutls_x509_crq_t @var{crq}, gnutls_x509_privkey_t @var{key})
-@var{crq}: should contain a @code{gnutls_x509_crq_t}  type
-
-@var{key}: holds a private key
-
-This function is the same a @code{gnutls_x509_crq_sign2()}  with no flags,
-and SHA1 as the hash algorithm.
-
-@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
-negative error value.
-
-@strong{Deprecated:} Use @code{gnutls_x509_crq_privkey_sign()}  instead.
+@strong{Since:} 3.0
 @end deftypefun
 
 @subheading gnutls_x509_crt_get_preferred_hash_algorithm
@@ -86,7 +105,7 @@ negative error value.
 
 @var{hash}: The result of the call with the hash algorithm used for signature
 
-@var{mand}: If non-zero it means that the algorithm MUST use this hash. May be NULL.
+@var{mand}: If non-zero it means that the algorithm MUST use this hash. May be @code{NULL} .
 
 This function will read the certificate and return the appropriate digest
 algorithm to use for signing with this certificate. Some certificates (i.e.
@@ -113,6 +132,10 @@ This function will sign the given hash using the private key. Do not
 use this function directly unless you know what it is. Typical signing
 requires the data to be hashed and stored in special formats 
 (e.g. BER Digest-Info for RSA).
+
+This API is provided only for backwards compatibility, and thus
+restricted to RSA, DSA and ECDSA key types. For other key types please
+use @code{gnutls_privkey_sign_hash()}  and @code{gnutls_privkey_sign_data()} .
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.

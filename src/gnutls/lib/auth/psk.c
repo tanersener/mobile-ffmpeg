@@ -16,7 +16,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -25,7 +25,6 @@
 #ifdef ENABLE_PSK
 
 #include "errors.h"
-#include "auth.h"
 #include "auth.h"
 #include "debug.h"
 #include "num.h"
@@ -111,40 +110,6 @@ _gnutls_set_psk_session_key(gnutls_session_t session,
 	return ret;
 }
 
-/* returns the username and they key for the PSK session.
- * Free is non (0) if they have to be freed.
- */
-int _gnutls_find_psk_key(gnutls_session_t session,
-			 gnutls_psk_client_credentials_t cred,
-			 gnutls_datum_t * username, gnutls_datum_t * key,
-			 int *free)
-{
-	char *user_p;
-	int ret;
-
-	*free = 0;
-
-	if (cred->username.data != NULL && cred->key.data != NULL) {
-		username->data = cred->username.data;
-		username->size = cred->username.size;
-		key->data = cred->key.data;
-		key->size = cred->key.size;
-	} else if (cred->get_function != NULL) {
-		ret = cred->get_function(session, &user_p, key);
-		if (ret)
-			return gnutls_assert_val(ret);
-
-		username->data = (uint8_t *) user_p;
-		username->size = strlen(user_p);
-
-		*free = 1;
-	} else
-		return
-		    gnutls_assert_val(GNUTLS_E_INSUFFICIENT_CREDENTIALS);
-
-	return 0;
-}
-
 
 /* Generates the PSK client key exchange
  *
@@ -203,6 +168,7 @@ _gnutls_gen_psk_client_kx(gnutls_session_t session,
 		goto cleanup;
 	}
 
+	assert(username.data != NULL);
 	memcpy(info->username, username.data, username.size);
 	info->username[username.size] = 0;
 
@@ -238,7 +204,7 @@ _gnutls_proc_psk_client_kx(gnutls_session_t session, uint8_t * data,
 	}
 
 	if ((ret =
-	     _gnutls_auth_info_set(session, GNUTLS_CRD_PSK,
+	     _gnutls_auth_info_init(session, GNUTLS_CRD_PSK,
 				   sizeof(psk_auth_info_st), 1)) < 0) {
 		gnutls_assert();
 		return ret;
@@ -349,7 +315,7 @@ _gnutls_proc_psk_server_kx(gnutls_session_t session, uint8_t * data,
 	}
 
 	if ((ret =
-	     _gnutls_auth_info_set(session, GNUTLS_CRD_PSK,
+	     _gnutls_auth_info_init(session, GNUTLS_CRD_PSK,
 				   sizeof(psk_auth_info_st), 1)) < 0) {
 		gnutls_assert();
 		return ret;

@@ -1,0 +1,1 @@
+@item @var{void} @ref{gnutls_anti_replay_set_ptr} (gnutls_anti_replay_t @var{anti_replay}, void * @var{ptr})

@@ -16,7 +16,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -240,7 +240,6 @@ gnutls_x509_privkey_import_openssl(gnutls_x509_privkey_t key,
 		goto out_b64;
 	}
 
-	ret = GNUTLS_E_MEMORY_ERROR;
 	enc_key.size = gnutls_cipher_get_key_size(cipher);
 	enc_key.data = gnutls_malloc(enc_key.size);
 	if (!enc_key.data) {

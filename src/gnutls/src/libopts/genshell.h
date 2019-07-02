@@ -22,7 +22,7 @@
  *  Copyright (C) 1999-2014 Bruce Korb, all rights reserved.
  *  This is free software. It is licensed for use, modification and
  *  redistribution under the terms of the GNU Lesser General Public License,
- *  version 2 or later <http://www.gnu.org/licenses/old-licenses/lgpl-2.0.html>
+ *  version 2 or later <https://www.gnu.org/licenses/old-licenses/lgpl-2.0.html>
  *
  *  The genshellopt library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public License as
@@ -36,7 +36,7 @@
  *
  *  You should have received a copy of the GNU Library General Public
  *  License along with this library; if not, see
- *  <http://www.gnu.org/licenses/old-licenses/lgpl-2.0.html>
+ *  <https://www.gnu.org/licenses/old-licenses/lgpl-2.0.html>
  */
 /**
  *  This file contains the programmatic interface to the Automated

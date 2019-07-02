@@ -16,7 +16,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -29,6 +29,9 @@
 #include <num.h>
 #include <mpi.h>
 #include <nettle/bignum.h> /* includes gmp.h */
+#if ENABLE_GOST
+#include "gost/bignum-le.h"
+#endif
 #include <gnettle.h>
 #include <random.h>
 
@@ -43,8 +46,10 @@ wrap_nettle_mpi_print(const bigint_t a, void *buffer, size_t * nbytes,
 		size = nettle_mpz_sizeinbase_256_u(*p);
 	} else if (format == GNUTLS_MPI_FORMAT_STD) {
 		size = nettle_mpz_sizeinbase_256_s(*p);
-	} else if (format == GNUTLS_MPI_FORMAT_PGP) {
-		size = nettle_mpz_sizeinbase_256_u(*p) + 2;
+#if ENABLE_GOST
+	} else if (format == GNUTLS_MPI_FORMAT_ULE) {
+		size = nettle_mpz_sizeinbase_256_u_le(*p);
+#endif
 	} else {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
@@ -52,18 +57,16 @@ wrap_nettle_mpi_print(const bigint_t a, void *buffer, size_t * nbytes,
 
 	if (buffer == NULL || size > *nbytes) {
 		*nbytes = size;
+		gnutls_assert();
 		return GNUTLS_E_SHORT_MEMORY_BUFFER;
 	}
 
-	if (format == GNUTLS_MPI_FORMAT_PGP) {
-		uint8_t *buf = buffer;
-		unsigned int nbits = _gnutls_mpi_get_nbits(a);
-		buf[0] = (nbits >> 8) & 0xff;
-		buf[1] = (nbits) & 0xff;
-		nettle_mpz_get_str_256(size - 2, buf + 2, *p);
-	} else {
+#if ENABLE_GOST
+	if (format == GNUTLS_MPI_FORMAT_ULE)
+		nettle_mpz_get_str_256_u_le(size, buffer, *p);
+	else
+#endif
 		nettle_mpz_get_str_256(size, buffer, *p);
-	}
 	*nbytes = size;
 
 	return 0;
@@ -119,7 +122,6 @@ static int wrap_nettle_mpi_init_multi(bigint_t *w, ...)
 fail:
 	mpz_clear(TOMPZ(*w));
 	gnutls_free(*w);
-	*w = NULL;
 
 	va_start(args, w);
 	
@@ -128,7 +130,6 @@ fail:
 		if (next != last_failed) {
 			mpz_clear(TOMPZ(*next));
 			gnutls_free(*next);
-			*next = NULL;
 		}
 	} while(next != last_failed);
 	
@@ -145,23 +146,10 @@ wrap_nettle_mpi_scan(bigint_t r, const void *buffer, size_t nbytes,
 		nettle_mpz_set_str_256_u(TOMPZ(r), nbytes, buffer);
 	} else if (format == GNUTLS_MPI_FORMAT_STD) {
 		nettle_mpz_set_str_256_s(TOMPZ(r), nbytes, buffer);
-	} else if (format == GNUTLS_MPI_FORMAT_PGP) {
-		const uint8_t *buf = buffer;
-		size_t size;
-
-		if (nbytes < 3) {
-			gnutls_assert();
-			goto fail;
-		}
-
-		size = (buf[0] << 8) | buf[1];
-		size = (size + 7) / 8;
-
-		if (size > nbytes - 2) {
-			gnutls_assert();
-			goto fail;
-		}
-		nettle_mpz_set_str_256_u(TOMPZ(r), size, buf + 2);
+#if ENABLE_GOST
+	} else if (format == GNUTLS_MPI_FORMAT_ULE) {
+		nettle_mpz_set_str_256_u_le(TOMPZ(r), nbytes, buffer);
+#endif
 	} else {
 		gnutls_assert();
 		goto fail;

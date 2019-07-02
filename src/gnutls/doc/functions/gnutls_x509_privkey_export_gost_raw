@@ -1,0 +1,31 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_privkey_export_gost_raw} (gnutls_x509_privkey_t @var{key}, gnutls_ecc_curve_t * @var{curve}, gnutls_digest_algorithm_t * @var{digest}, gnutls_gost_paramset_t * @var{paramset}, gnutls_datum_t * @var{x}, gnutls_datum_t * @var{y}, gnutls_datum_t * @var{k})
+@var{key}: a key
+
+@var{curve}: will hold the curve
+
+@var{digest}: will hold the digest
+
+@var{paramset}: will hold the GOST parameter set ID
+
+@var{x}: will hold the x-coordinate
+
+@var{y}: will hold the y-coordinate
+
+@var{k}: will hold the private key
+
+This function will export the GOST private key's parameters found
+in the given structure. The new parameters will be allocated using
+@code{gnutls_malloc()}  and will be stored in the appropriate datum.
+
+@strong{Note:} parameters will be stored with least significant byte first. On
+version 3.6.3 this was incorrectly returned in big-endian format.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.6.3
+@end deftypefun

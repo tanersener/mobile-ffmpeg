@@ -6,7 +6,9 @@
 @var{sign}: is a signature algorithm
 
 This function returns the public key algorithm corresponding to
-the given signature algorithms.
+the given signature algorithms. Note that there may be multiple
+public key algorithms supporting a particular signature type;
+when dealing with such algorithms use instead @code{gnutls_sign_supports_pk_algorithm()} .
 
 @strong{Since:} 3.1.1
 

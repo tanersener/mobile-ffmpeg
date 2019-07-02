@@ -46,7 +46,8 @@ Usage:  gnutls-cli [ -<flag> [<val>] | --<name>[@{=| @}<val>] ]... [hostname]
                                 - may appear multiple times
        --tofu                 Enable trust on first use authentication
                                 - disabled as '--no-tofu'
-       --strict-tofu          Fail to connect if a known certificate has changed
+       --strict-tofu          Fail to connect if a certificate is unknown or a known certificate has
+changed
                                 - disabled as '--no-strict-tofu'
        --dane                 Enable DANE certificate verification (DNSSEC)
                                 - disabled as '--no-dane'
@@ -58,8 +59,10 @@ Usage:  gnutls-cli [ -<flag> [<val>] | --<name>[@{=| @}<val>] ]... [hostname]
        --ocsp                 Enable OCSP certificate verification
                                 - disabled as '--no-ocsp'
    -r, --resume               Establish a session and resume
+       --earlydata=str        Send early data on resumption from the specified file
    -e, --rehandshake          Establish a session and rehandshake
        --sni-hostname=str     Server's hostname for server name indication extension
+       --verify-hostname=str  Server's hostname to use for validation
    -s, --starttls             Connect, establish a plain session and start TLS
        --app-proto=str        an alias for the 'starttls-proto' option
        --starttls-proto=str   The application protocol to be used to obtain the server's certificate
@@ -72,54 +75,51 @@ Usage:  gnutls-cli [ -<flag> [<val>] | --<name>[@{=| @}<val>] ]... [hostname]
        --crlf                 Send CR LF instead of LF
        --fastopen             Enable TCP Fast Open
        --x509fmtder           Use DER format for certificates to read from
-   -f, --fingerprint          Send the openpgp fingerprint, instead of the key
        --print-cert           Print peer's certificate in PEM format
        --save-cert=str        Save the peer's certificate chain in the specified file in PEM format
        --save-ocsp=str        Save the peer's OCSP status response in the provided file
+       --save-server-trace=str Save the server-side TLS message trace in the provided file
+       --save-client-trace=str Save the client-side TLS message trace in the provided file
        --dh-bits=num          The minimum number of bits allowed for DH
        --priority=str         Priorities string
        --x509cafile=str       Certificate file or PKCS #11 URL to use
        --x509crlfile=file     CRL file to use
                                 - file must pre-exist
-       --pgpkeyfile=file      PGP Key file to use
-                                - file must pre-exist
-       --pgpkeyring=file      PGP Key ring file to use
-                                - file must pre-exist
-       --pgpcertfile=file     PGP Public Key (certificate) file to use
-                                - requires the option 'pgpkeyfile'
-                                - file must pre-exist
        --x509keyfile=str      X.509 key file or PKCS #11 URL to use
        --x509certfile=str     X.509 Certificate file or PKCS #11 URL to use
                                 - requires the option 'x509keyfile'
-       --pgpsubkey=str        PGP subkey to use (hex or auto)
        --srpusername=str      SRP username to use
        --srppasswd=str        SRP password to use
        --pskusername=str      PSK username to use
        --pskkey=str           PSK key (in hex) to use
    -p, --port=str             The port or service to connect to
        --insecure             Don't abort program if server certificate can't be validated
-       --ranges               Use length-hiding padding to prevent traffic analysis
-       --benchmark-ciphers    Benchmark individual ciphers
-       --benchmark-tls-kx     Benchmark TLS key exchange methods
-       --benchmark-tls-ciphers  Benchmark TLS ciphers
+       --verify-allow-broken  Allow broken algorithms, such as MD5 for certificate verification
+   -", --benchmark-ciphers    Benchmark individual ciphers
+   -#, --benchmark-tls-kx     Benchmark TLS key exchange methods
+   -$, --benchmark-tls-ciphers  Benchmark TLS ciphers
    -l, --list                 Print a list of the supported algorithms and modes
                                 - prohibits the option 'port'
-       --priority-list        Print a list of the supported priority strings
-       --noticket             Don't allow session tickets
-       --srtp-profiles=str    Offer SRTP profiles
-       --alpn=str             Application layer protocol
+   -%, --priority-list        Print a list of the supported priority strings
+   -&, --noticket             Don't allow session tickets
+   -', --srtp-profiles=str    Offer SRTP profiles
+   -(, --alpn=str             Application layer protocol
                                 - may appear multiple times
    -b, --heartbeat            Activate heartbeat support
-       --recordsize=num       The maximum record size to advertize
+   -), --recordsize=num       The maximum record size to advertize
                                 - it must be in the range:
                                   0 to 4096
-       --disable-sni          Do not send a Server Name Indication (SNI)
-       --disable-extensions   Disable all the TLS extensions
-       --inline-commands      Inline commands of the form ^<cmd>^
-       --inline-commands-prefix=str Change the default delimiter for inline commands.
-       --provider=file        Specify the PKCS #11 provider library
+   -*, --disable-sni          Do not send a Server Name Indication (SNI)
+   -,, --single-key-share     Send a single key share under TLS1.3
+   --, --post-handshake-auth  Enable post-handshake authentication under TLS1.3
+   -., --inline-commands      Inline commands of the form ^<cmd>^
+   -/, --inline-commands-prefix=str Change the default delimiter for inline commands.
+   -0, --provider=file        Specify the PKCS #11 provider library
                                 - file must pre-exist
-       --fips140-mode         Reports the status of the FIPS140-2 mode in gnutls library
+   -1, --fips140-mode         Reports the status of the FIPS140-2 mode in gnutls library
+   -2, --logfile=str          Redirect informational messages to a specific file.
+   -3, --keymatexport=str     Label used for exporting keying material
+   -4, --keymatexportsize=num Size of the exported keying material
    -v, --version[=arg]        output version information and exit
    -h, --help                 display extended usage information and exit
    -!, --more-help            extended usage information passed thru pager
@@ -160,7 +160,7 @@ process.
 @anchor{gnutls-cli strict-tofu}
 @subheading strict-tofu option
 
-This is the ``fail to connect if a known certificate has changed'' option.
+This is the ``fail to connect if a certificate is unknown or a known certificate has changed'' option.
 
 @noindent
 This option has some usage constraints.  It:
@@ -169,7 +169,7 @@ This option has some usage constraints.  It:
 can be disabled with --no-strict-tofu.
 @end itemize
 
-This option will perform authentication as with option --tofu; however, while --tofu asks whether to trust a changed public key, this option will fail in case of public key changes.
+This option will perform authentication as with option --tofu; however, no questions shall be asked whatsoever, neither to accept an unknown certificate nor a changed one.
 @anchor{gnutls-cli dane}
 @subheading dane option
 
@@ -242,7 +242,13 @@ Connect, establish a session and rehandshake immediately.
 
 This is the ``server's hostname for server name indication extension'' option.
 This option takes a string argument.
-Set explicitly the server name used in the TLS server name indication extension. That is useful when testing with servers setup on different DNS name than the intended. If not specified, the provided hostname is used.
+Set explicitly the server name used in the TLS server name indication extension. That is useful when testing with servers setup on different DNS name than the intended. If not specified, the provided hostname is used. Even with this option server certificate verification still uses the hostname passed on the main commandline. Use --verify-hostname to change this.
+@anchor{gnutls-cli verify-hostname}
+@subheading verify-hostname option
+
+This is the ``server's hostname to use for validation'' option.
+This option takes a string argument.
+Set explicitly the server name to be used when validating the server's certificate.
 @anchor{gnutls-cli starttls}
 @subheading starttls option (-s)
 
@@ -291,6 +297,8 @@ information on the allowed keywords
 
 This is the ``use length-hiding padding to prevent traffic analysis'' option.
 When possible (e.g., when using CBC ciphersuites), use length-hiding padding to prevent traffic analysis.
+
+@strong{NOTE}@strong{: THIS OPTION IS DEPRECATED}
 @anchor{gnutls-cli benchmark-ciphers}
 @subheading benchmark-ciphers option
 
@@ -320,6 +328,11 @@ Print a list of the supported algorithms and modes. If a priority string is give
 
 This is the ``print a list of the supported priority strings'' option.
 Print a list of the supported priority strings. The ciphersuites corresponding to each priority string can be examined using -l -p.
+@anchor{gnutls-cli noticket}
+@subheading noticket option
+
+This is the ``don't allow session tickets'' option.
+Disable the request of receiving of session tickets under TLS1.2 or earlier
 @anchor{gnutls-cli alpn}
 @subheading alpn option
 
@@ -339,11 +352,24 @@ This option will set and enable the Application Layer Protocol Negotiation  (ALP
 
 This is the ``disable all the tls extensions'' option.
 This option disables all TLS extensions. Deprecated option. Use the priority string.
+
+@strong{NOTE}@strong{: THIS OPTION IS DEPRECATED}
+@anchor{gnutls-cli single-key-share}
+@subheading single-key-share option
+
+This is the ``send a single key share under tls1.3'' option.
+This option switches the default mode of sending multiple
+key shares, to send a single one (the top one).
+@anchor{gnutls-cli post-handshake-auth}
+@subheading post-handshake-auth option
+
+This is the ``enable post-handshake authentication under tls1.3'' option.
+This option enables post-handshake authentication when under TLS1.3.
 @anchor{gnutls-cli inline-commands}
 @subheading inline-commands option
 
 This is the ``inline commands of the form ^<cmd>^'' option.
-Enable inline commands of the form ^<cmd>^. The inline commands are expected to be in a line by themselves. The available commands are: resume and renegotiate.
+Enable inline commands of the form ^<cmd>^. The inline commands are expected to be in a line by themselves. The available commands are: resume, rekey1 (local rekey), rekey (rekey on both peers) and renegotiate.
 @anchor{gnutls-cli inline-commands-prefix}
 @subheading inline-commands-prefix option
 

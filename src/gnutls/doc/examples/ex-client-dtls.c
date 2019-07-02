@@ -19,9 +19,13 @@
  */
 
 #define CHECK(x) assert((x)>=0)
+#define LOOP_CHECK(rval, cmd) \
+        do { \
+                rval = cmd; \
+        } while(rval == GNUTLS_E_AGAIN || rval == GNUTLS_E_INTERRUPTED); \
+        assert(rval >= 0)
 
 #define MAX_BUF 1024
-#define CAFILE "/etc/ssl/certs/ca-certificates.crt"
 #define MSG "GET / HTTP/1.0\r\n\r\n"
 
 extern int udp_connect(void);
@@ -46,9 +50,8 @@ int main(void)
         /* X509 stuff */
         CHECK(gnutls_certificate_allocate_credentials(&xcred));
 
-        /* sets the trusted cas file */
-        CHECK(gnutls_certificate_set_x509_trust_file(xcred, CAFILE,
-                                                     GNUTLS_X509_FMT_PEM));
+        /* sets the system trusted CAs for Internet PKI */
+        CHECK(gnutls_certificate_set_x509_system_trust(xcred));
 
         /* Initialize TLS session */
         CHECK(gnutls_init(&session, GNUTLS_CLIENT | GNUTLS_DATAGRAM));
@@ -58,10 +61,10 @@ int main(void)
 
         /* put the x509 credentials to the current session */
         CHECK(gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred));
-        CHECK(gnutls_server_name_set(session, GNUTLS_NAME_DNS, "my_host_name",
-                                     strlen("my_host_name")));
+        CHECK(gnutls_server_name_set(session, GNUTLS_NAME_DNS, "www.example.com",
+                                     strlen("www.example.com")));
 
-        gnutls_session_set_verify_cert(session, "my_host_name", 0);
+        gnutls_session_set_verify_cert(session, "www.example.com", 0);
 
         /* connect to the peer */
         sd = udp_connect();
@@ -91,9 +94,9 @@ int main(void)
                 gnutls_free(desc);
         }
 
-        CHECK(gnutls_record_send(session, MSG, strlen(MSG)));
+        LOOP_CHECK(ret, gnutls_record_send(session, MSG, strlen(MSG)));
 
-        ret = gnutls_record_recv(session, buffer, MAX_BUF);
+        LOOP_CHECK(ret, gnutls_record_recv(session, buffer, MAX_BUF));
         if (ret == 0) {
                 printf("- Peer has closed the TLS connection\n");
                 goto end;

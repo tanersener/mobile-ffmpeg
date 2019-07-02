@@ -17,12 +17,12 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
-#ifndef PKCS7_INT_H
-#define PKCS7_INT_H
+#ifndef GNUTLS_LIB_X509_PKCS7_INT_H
+#define GNUTLS_LIB_X509_PKCS7_INT_H
 
 #include <gnutls/x509.h>
 
@@ -42,6 +42,11 @@ typedef enum schema_id {
 	PBES2_AES_128,
 	PBES2_AES_192,
 	PBES2_AES_256,
+	PBES2_GOST28147_89_TC26Z,
+	PBES2_GOST28147_89_CPA,
+	PBES2_GOST28147_89_CPB,
+	PBES2_GOST28147_89_CPC,
+	PBES2_GOST28147_89_CPD,
 	PKCS12_3DES_SHA1,	/* the stuff in PKCS #12 */
 	PKCS12_ARCFOUR_SHA1,
 	PKCS12_RC2_40_SHA1,
@@ -57,6 +62,7 @@ struct pkcs_cipher_schema_st {
 	const char *cipher_oid;
 	const char *write_oid;
 	const char *desc;
+	const char *iv_name;
 	unsigned decrypt_only;
 };
 
@@ -66,6 +72,7 @@ struct pbe_enc_params {
 	gnutls_cipher_algorithm_t cipher;
 	uint8_t iv[MAX_CIPHER_BLOCK_SIZE];
 	int iv_size;
+	char pbes2_oid[MAX_OID_SIZE]; /* when reading params, the OID is stored for info purposes */
 };
 
 int
@@ -124,4 +131,4 @@ int
 _gnutls_pkcs7_data_enc_info(const gnutls_datum_t * data, const struct pkcs_cipher_schema_st **p,
 	struct pbkdf2_params *kdf_params, char **oid);
 
-#endif
+#endif /* GNUTLS_LIB_X509_PKCS7_INT_H */

@@ -1,0 +1,1 @@
+@item @var{unsigned} @ref{gnutls_sign_supports_pk_algorithm} (gnutls_sign_algorithm_t @var{sign}, gnutls_pk_algorithm_t @var{pk})

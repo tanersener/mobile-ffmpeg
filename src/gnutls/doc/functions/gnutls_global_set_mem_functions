@@ -1,6 +1,7 @@
 
 
 
+
 @deftypefun {void} {gnutls_global_set_mem_functions} (gnutls_alloc_function @var{alloc_func}, gnutls_alloc_function @var{secure_alloc_func}, gnutls_is_secure_function @var{is_secure_func}, gnutls_realloc_function @var{realloc_func}, gnutls_free_function @var{free_func})
 @var{alloc_func}: it's the default memory allocation function. Like @code{malloc()} .
 

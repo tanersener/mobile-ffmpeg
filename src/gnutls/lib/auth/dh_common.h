@@ -16,12 +16,12 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
-#ifndef AUTH_DH_COMMON
-#define AUTH_DH_COMMON
+#ifndef GNUTLS_LIB_AUTH_DH_COMMON_H
+#define GNUTLS_LIB_AUTH_DH_COMMON_H
 
 #include <auth.h>
 
@@ -34,19 +34,17 @@ typedef struct {
 } dh_info_st;
 
 void _gnutls_free_dh_info(dh_info_st * dh);
-int _gnutls_set_dh_pk_params(gnutls_session_t session, bigint_t g, bigint_t p,
-	unsigned q_bits);
+
 int _gnutls_gen_dh_common_client_kx_int(gnutls_session_t,
 					gnutls_buffer_st *,
 					gnutls_datum_t * pskkey);
 int _gnutls_gen_dh_common_client_kx(gnutls_session_t, gnutls_buffer_st *);
 int _gnutls_proc_dh_common_client_kx(gnutls_session_t session,
 				     uint8_t * data, size_t _data_size,
-				     bigint_t p, bigint_t g,
 				     gnutls_datum_t * psk_key);
 int _gnutls_dh_common_print_server_kx(gnutls_session_t, 
 				      gnutls_buffer_st * data);
 int _gnutls_proc_dh_common_server_kx(gnutls_session_t session,
 				     uint8_t * data, size_t _data_size);
 
-#endif
+#endif /* GNUTLS_LIB_AUTH_DH_COMMON_H */

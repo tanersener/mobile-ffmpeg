@@ -16,7 +16,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -30,6 +30,9 @@
 #include <mpi.h>
 #include "prov-seed.h"
 
+/* This function encodes a seed value and a hash algorithm OID to the format
+ * described in RFC8479. The output is the DER encoded form.
+ */
 int _x509_encode_provable_seed(gnutls_x509_privkey_t pkey, gnutls_datum_t *der)
 {
 
@@ -76,6 +79,9 @@ int _x509_encode_provable_seed(gnutls_x509_privkey_t pkey, gnutls_datum_t *der)
 	return ret;
 }
 
+/* This function decodes a DER encoded form of seed and a hash algorithm, as in
+ * RFC8479.
+ */
 int _x509_decode_provable_seed(gnutls_x509_privkey_t pkey, const gnutls_datum_t *der)
 {
 
@@ -124,7 +130,7 @@ int _x509_decode_provable_seed(gnutls_x509_privkey_t pkey, const gnutls_datum_t 
 	}
 
 	pkey->params.palgo = gnutls_oid_to_digest(oid);
-	pkey->params.flags |= GNUTLS_PK_FLAG_PROVABLE;
+	pkey->params.pkflags |= GNUTLS_PK_FLAG_PROVABLE;
 
 	ret = 0;
 

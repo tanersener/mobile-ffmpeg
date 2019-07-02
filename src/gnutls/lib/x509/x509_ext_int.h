@@ -15,12 +15,12 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
-#ifndef X509_EXT_INT_H
-#define X509_EXT_INT_H
+#ifndef GNUTLS_LIB_X509_X509_EXT_INT_H
+#define GNUTLS_LIB_X509_X509_EXT_INT_H
 
 #include "gnutls_int.h"
 struct name_st {
@@ -31,4 +31,4 @@ struct name_st {
 
 int _gnutls_alt_name_process(gnutls_datum_t *out, unsigned type, const gnutls_datum_t *san, unsigned raw);
 
-#endif
+#endif /* GNUTLS_LIB_X509_X509_EXT_INT_H */

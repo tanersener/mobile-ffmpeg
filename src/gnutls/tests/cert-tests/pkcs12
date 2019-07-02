@@ -28,6 +28,11 @@ if ! test -x "${CERTTOOL}"; then
 	exit 77
 fi
 
+if test "${GNUTLS_FORCE_FIPS_MODE}" = 1;then
+	echo "Cannot run in FIPS140-2 mode"
+	exit 77
+fi
+
 if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=1"
 fi
@@ -40,11 +45,11 @@ TMPFILE_PEM=pkcs12.$$.pem.tmp
 
 DEBUG="1"
 
-ret=0
-for p12 in "client.p12 foobar" "openssl.p12 CaudFocwijRupogDoicsApfiHadManUgNa" "noclient.p12" "unclient.p12" "pkcs12_2certs.p12"; do
+for p12 in "aes-128.p12 Red%20Hat%20Enterprise%20Linux%207.4" "pbes1-no-salt.p12 Red%20Hat%20Enterprise%20Linux%207.4" "no-salt.p12 Red%20Hat%20Enterprise%20Linux%207.4" "mac-sha512.p12 Red%20Hat%20Enterprise%20Linux%207.4" "cert-with-crl.p12 password" "client.p12 foobar" "openssl.p12 CaudFocwijRupogDoicsApfiHadManUgNa" "noclient.p12" "unclient.p12" "pkcs12_2certs.p12"; do
 	set -- ${p12}
 	file="$1"
-	passwd="$2"
+	passwd=$(echo $2|sed 's/%20/ /g')
+
 	if test "x$DEBUG" != "x"; then
 		${VALGRIND} "${CERTTOOL}" -d 99 --p12-info --inder --password "${passwd}" \
 			--infile "${srcdir}/data/${file}"
@@ -54,7 +59,7 @@ for p12 in "client.p12 foobar" "openssl.p12 CaudFocwijRupogDoicsApfiHadManUgNa" 
 	fi
 	rc=$?
 	if test ${rc} != 0; then
-		echo "NEON PKCS12 FATAL ${p12}"
+		echo "PKCS12 FATAL ${p12}"
 		exit 1
 	fi
 done
@@ -72,6 +77,19 @@ ${VALGRIND} "${CERTTOOL}" --p12-info --inder --password 1234 --infile "${file}" 
 rc=$?
 if test ${rc} != 0; then
 	echo "PKCS12 FATAL ${file}"
+	exit 1
+fi
+
+${VALGRIND} "${CERTTOOL}" --p12-info --inder --password 1234 --infile "$srcdir/data/sha256.p12" --outfile "${TMPFILE}" --no-text
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "--no-text pkcs12 info failed 1"
+	exit ${rc}
+fi
+
+if grep -v '^-----BEGIN [A-Z0-9 ]\+-----$' ${TMPFILE} | grep -v '^[A-Za-z0-9/+=]\+$' | grep -v '^-----END [A-Z0-9 ]\+-----$' ; then
+	echo "--no-text pkcs12 info failed 2"
 	exit 1
 fi
 
@@ -104,36 +122,4 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-# test whether we can encode a certificate, a key and a CA
-${VALGRIND} "${CERTTOOL}" --to-p12 --password 123456 --p12-name "my-key" --load-certificate "${srcdir}/../certs/cert-ecc256.pem" --load-privkey "${srcdir}/../certs/ecc256.pem" --load-ca-certificate "${srcdir}/../certs/ca-cert-ecc.pem" --outder --outfile $TMPFILE >/dev/null
-rc=$?
-if test ${rc} != 0; then
-	echo "PKCS12 FATAL encoding 2"
-	exit 1
-fi
-
-${VALGRIND} "${CERTTOOL}" --p12-info --inder --password 123456 --infile $TMPFILE >${TMPFILE_PEM} 2>/dev/null
-rc=$?
-if test ${rc} != 0; then
-	echo "PKCS12 FATAL decrypting/decoding 2"
-	exit 1
-fi
-
-grep "BEGIN ENCRYPTED PRIVATE KEY" ${TMPFILE_PEM} >/dev/null 2>&1
-rc=$?
-
-if test "${rc}" != "0"; then
-	exit ${rc}
-fi
-
-count=`grep -c "BEGIN CERTIFICATE" ${TMPFILE_PEM}`
-
-if test "$count" != "2"; then
-	echo "Only one certificate was included"
-	exit 1
-fi
-
-rm -f ${TMPFILE_PEM} $TMPFILE
-
-#echo "NEON PKCS12 DONE (rc ${ret})"
-exit ${ret}
+exit 0

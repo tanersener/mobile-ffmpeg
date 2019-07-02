@@ -17,7 +17,7 @@
 # General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>
+# along with this program.  If not, see <https://www.gnu.org/licenses/>
 
 srcdir="${srcdir:-.}"
 SERV="${SERV:-../src/gnutls-serv${EXEEXT}}"
@@ -124,7 +124,7 @@ PID=$!
 wait_server ${PID}
 
 datefudge "2018-1-1" \
-${VALGRIND} "${CLI}" -p "${PORT}" localhost >${TMPFILE} 2>&1 && \
+${VALGRIND} "${CLI}" -p "${PORT}" localhost >${TMPFILE} 2>&1 </dev/null && \
 	fail ${PID} "1. handshake should have failed!"
 
 

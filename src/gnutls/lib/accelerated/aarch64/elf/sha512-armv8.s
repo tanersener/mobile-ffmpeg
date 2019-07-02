@@ -1,32 +1,28 @@
-# 1 "lib/accelerated/aarch64/elf/sha512-armv8.s.tmp.S"
-# 1 "<built-in>"
-# 1 "<command-line>"
-# 1 "lib/accelerated/aarch64/elf/sha512-armv8.s.tmp.S"
 # Copyright (c) 2011-2016, Andy Polyakov <appro@openssl.org>
 # All rights reserved.
-
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
 # are met:
-
-# * Redistributions of source code must retain copyright notices,
-# this list of conditions and the following disclaimer.
-
-# * Redistributions in binary form must reproduce the above
-# copyright notice, this list of conditions and the following
-# disclaimer in the documentation and/or other materials
-# provided with the distribution.
-
-# * Neither the name of the Andy Polyakov nor the names of its
-# copyright holder and contributors may be used to endorse or
-# promote products derived from this software without specific
-# prior written permission.
-
+# 
+#     * Redistributions of source code must retain copyright notices,
+#      this list of conditions and the following disclaimer.
+#
+#     * Redistributions in binary form must reproduce the above
+#      copyright notice, this list of conditions and the following
+#      disclaimer in the documentation and/or other materials
+#      provided with the distribution.
+#
+#     * Neither the name of the Andy Polyakov nor the names of its
+#      copyright holder and contributors may be used to endorse or
+#      promote products derived from this software without specific
+#      prior written permission.
+#
 # ALTERNATIVELY, provided that this notice is retained in full, this
 # product may be distributed under the terms of the GNU General Public
 # License (GPL), in which case the provisions of the GPL apply INSTEAD OF
 # those given above.
-
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER AND CONTRIBUTORS
 # "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 # LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -38,11 +34,19 @@
 # THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+#
 # *** This file is auto-generated ***
-
+#
+# 1 "lib/accelerated/aarch64/elf/sha512-armv8.s.tmp.S"
+# 1 "<built-in>"
+# 1 "<command-line>"
+# 1 "/usr/aarch64-linux-gnu/include/stdc-predef.h" 1 3
+# 1 "<command-line>" 2
+# 1 "lib/accelerated/aarch64/elf/sha512-armv8.s.tmp.S"
+# 56 "lib/accelerated/aarch64/elf/sha512-armv8.s.tmp.S"
 # 1 "lib/accelerated/aarch64/aarch64-common.h" 1
-# 41 "lib/accelerated/aarch64/elf/sha512-armv8.s.tmp.S" 2
+# 57 "lib/accelerated/aarch64/elf/sha512-armv8.s.tmp.S" 2
+
 
 .text
 
@@ -51,6 +55,18 @@
 .type sha512_block_data_order,%function
 .align 6
 sha512_block_data_order:
+
+
+
+
+ ldr x16,.L_gnutls_arm_cpuid_s
+
+ adr x17,.L_gnutls_arm_cpuid_s
+ add x16,x16,x17
+ ldr w16,[x16]
+ tst w16,#(1<<6)
+ b.ne .Lv8_entry
+
  stp x29,x30,[sp,#-128]!
  add x29,sp,#0
 
@@ -1058,6 +1074,7 @@ sha512_block_data_order:
 .quad 0x5fcb6fab3ad6faec,0x6c44198c4a475817
 .quad 0
 .size .LK512,.-.LK512
+
 .align 3
 .L_gnutls_arm_cpuid_s:
 
@@ -1065,9 +1082,529 @@ sha512_block_data_order:
 
 .quad _gnutls_arm_cpuid_s-.
 
+
 .byte 83,72,65,53,49,50,32,98,108,111,99,107,32,116,114,97,110,115,102,111,114,109,32,102,111,114,32,65,82,77,118,56,44,32,67,82,89,80,84,79,71,65,77,83,32,98,121,32,60,97,112,112,114,111,64,111,112,101,110,115,115,108,46,111,114,103,62,0
 .align 2
 .align 2
-.comm _gnutls_arm_cpuid_s,4,4
 
+.type sha512_block_armv8,%function
+.align 6
+sha512_block_armv8:
+.Lv8_entry:
+ stp x29,x30,[sp,#-16]!
+ add x29,sp,#0
+
+ ld1 {v16.16b,v17.16b,v18.16b,v19.16b},[x1],#64
+ ld1 {v20.16b,v21.16b,v22.16b,v23.16b},[x1],#64
+
+ ld1 {v0.2d,v1.2d,v2.2d,v3.2d},[x0]
+ adr x3,.LK512
+
+ rev64 v16.16b,v16.16b
+ rev64 v17.16b,v17.16b
+ rev64 v18.16b,v18.16b
+ rev64 v19.16b,v19.16b
+ rev64 v20.16b,v20.16b
+ rev64 v21.16b,v21.16b
+ rev64 v22.16b,v22.16b
+ rev64 v23.16b,v23.16b
+ b .Loop_hw
+
+.align 4
+.Loop_hw:
+ ld1 {v24.2d},[x3],#16
+ subs x2,x2,#1
+ sub x4,x1,#128
+ orr v26.16b,v0.16b,v0.16b
+ orr v27.16b,v1.16b,v1.16b
+ orr v28.16b,v2.16b,v2.16b
+ orr v29.16b,v3.16b,v3.16b
+ csel x1,x1,x4,ne
+ add v24.2d,v24.2d,v16.2d
+ ld1 {v25.2d},[x3],#16
+ ext v24.16b,v24.16b,v24.16b,#8
+ ext v5.16b,v2.16b,v3.16b,#8
+ ext v6.16b,v1.16b,v2.16b,#8
+ add v3.2d,v3.2d,v24.2d
+.inst 0xcec08230
+ ext v7.16b,v20.16b,v21.16b,#8
+.inst 0xce6680a3
+.inst 0xce678af0
+ add v4.2d,v1.2d,v3.2d
+.inst 0xce608423
+ add v25.2d,v25.2d,v17.2d
+ ld1 {v24.2d},[x3],#16
+ ext v25.16b,v25.16b,v25.16b,#8
+ ext v5.16b,v4.16b,v2.16b,#8
+ ext v6.16b,v0.16b,v4.16b,#8
+ add v2.2d,v2.2d,v25.2d
+.inst 0xcec08251
+ ext v7.16b,v21.16b,v22.16b,#8
+.inst 0xce6680a2
+.inst 0xce678a11
+ add v1.2d,v0.2d,v2.2d
+.inst 0xce638402
+ add v24.2d,v24.2d,v18.2d
+ ld1 {v25.2d},[x3],#16
+ ext v24.16b,v24.16b,v24.16b,#8
+ ext v5.16b,v1.16b,v4.16b,#8
+ ext v6.16b,v3.16b,v1.16b,#8
+ add v4.2d,v4.2d,v24.2d
+.inst 0xcec08272
+ ext v7.16b,v22.16b,v23.16b,#8
+.inst 0xce6680a4
+.inst 0xce678a32
+ add v0.2d,v3.2d,v4.2d
+.inst 0xce628464
+ add v25.2d,v25.2d,v19.2d
+ ld1 {v24.2d},[x3],#16
+ ext v25.16b,v25.16b,v25.16b,#8
+ ext v5.16b,v0.16b,v1.16b,#8
+ ext v6.16b,v2.16b,v0.16b,#8
+ add v1.2d,v1.2d,v25.2d
+.inst 0xcec08293
+ ext v7.16b,v23.16b,v16.16b,#8
+.inst 0xce6680a1
+.inst 0xce678a53
+ add v3.2d,v2.2d,v1.2d
+.inst 0xce648441
+ add v24.2d,v24.2d,v20.2d
+ ld1 {v25.2d},[x3],#16
+ ext v24.16b,v24.16b,v24.16b,#8
+ ext v5.16b,v3.16b,v0.16b,#8
+ ext v6.16b,v4.16b,v3.16b,#8
+ add v0.2d,v0.2d,v24.2d
+.inst 0xcec082b4
+ ext v7.16b,v16.16b,v17.16b,#8
+.inst 0xce6680a0
+.inst 0xce678a74
+ add v2.2d,v4.2d,v0.2d
+.inst 0xce618480
+ add v25.2d,v25.2d,v21.2d
+ ld1 {v24.2d},[x3],#16
+ ext v25.16b,v25.16b,v25.16b,#8
+ ext v5.16b,v2.16b,v3.16b,#8
+ ext v6.16b,v1.16b,v2.16b,#8
+ add v3.2d,v3.2d,v25.2d
+.inst 0xcec082d5
+ ext v7.16b,v17.16b,v18.16b,#8
+.inst 0xce6680a3
+.inst 0xce678a95
+ add v4.2d,v1.2d,v3.2d
+.inst 0xce608423
+ add v24.2d,v24.2d,v22.2d
+ ld1 {v25.2d},[x3],#16
+ ext v24.16b,v24.16b,v24.16b,#8
+ ext v5.16b,v4.16b,v2.16b,#8
+ ext v6.16b,v0.16b,v4.16b,#8
+ add v2.2d,v2.2d,v24.2d
+.inst 0xcec082f6
+ ext v7.16b,v18.16b,v19.16b,#8
+.inst 0xce6680a2
+.inst 0xce678ab6
+ add v1.2d,v0.2d,v2.2d
+.inst 0xce638402
+ add v25.2d,v25.2d,v23.2d
+ ld1 {v24.2d},[x3],#16
+ ext v25.16b,v25.16b,v25.16b,#8
+ ext v5.16b,v1.16b,v4.16b,#8
+ ext v6.16b,v3.16b,v1.16b,#8
+ add v4.2d,v4.2d,v25.2d
+.inst 0xcec08217
+ ext v7.16b,v19.16b,v20.16b,#8
+.inst 0xce6680a4
+.inst 0xce678ad7
+ add v0.2d,v3.2d,v4.2d
+.inst 0xce628464
+ add v24.2d,v24.2d,v16.2d
+ ld1 {v25.2d},[x3],#16
+ ext v24.16b,v24.16b,v24.16b,#8
+ ext v5.16b,v0.16b,v1.16b,#8
+ ext v6.16b,v2.16b,v0.16b,#8
+ add v1.2d,v1.2d,v24.2d
+.inst 0xcec08230
+ ext v7.16b,v20.16b,v21.16b,#8
+.inst 0xce6680a1
+.inst 0xce678af0
+ add v3.2d,v2.2d,v1.2d
+.inst 0xce648441
+ add v25.2d,v25.2d,v17.2d
+ ld1 {v24.2d},[x3],#16
+ ext v25.16b,v25.16b,v25.16b,#8
+ ext v5.16b,v3.16b,v0.16b,#8
+ ext v6.16b,v4.16b,v3.16b,#8
+ add v0.2d,v0.2d,v25.2d
+.inst 0xcec08251
+ ext v7.16b,v21.16b,v22.16b,#8
+.inst 0xce6680a0
+.inst 0xce678a11
+ add v2.2d,v4.2d,v0.2d
+.inst 0xce618480
+ add v24.2d,v24.2d,v18.2d
+ ld1 {v25.2d},[x3],#16
+ ext v24.16b,v24.16b,v24.16b,#8
+ ext v5.16b,v2.16b,v3.16b,#8
+ ext v6.16b,v1.16b,v2.16b,#8
+ add v3.2d,v3.2d,v24.2d
+.inst 0xcec08272
+ ext v7.16b,v22.16b,v23.16b,#8
+.inst 0xce6680a3
+.inst 0xce678a32
+ add v4.2d,v1.2d,v3.2d
+.inst 0xce608423
+ add v25.2d,v25.2d,v19.2d
+ ld1 {v24.2d},[x3],#16
+ ext v25.16b,v25.16b,v25.16b,#8
+ ext v5.16b,v4.16b,v2.16b,#8
+ ext v6.16b,v0.16b,v4.16b,#8
+ add v2.2d,v2.2d,v25.2d
+.inst 0xcec08293
+ ext v7.16b,v23.16b,v16.16b,#8
+.inst 0xce6680a2
+.inst 0xce678a53
+ add v1.2d,v0.2d,v2.2d
+.inst 0xce638402
+ add v24.2d,v24.2d,v20.2d
+ ld1 {v25.2d},[x3],#16
+ ext v24.16b,v24.16b,v24.16b,#8
+ ext v5.16b,v1.16b,v4.16b,#8
+ ext v6.16b,v3.16b,v1.16b,#8
+ add v4.2d,v4.2d,v24.2d
+.inst 0xcec082b4
+ ext v7.16b,v16.16b,v17.16b,#8
+.inst 0xce6680a4
+.inst 0xce678a74
+ add v0.2d,v3.2d,v4.2d
+.inst 0xce628464
+ add v25.2d,v25.2d,v21.2d
+ ld1 {v24.2d},[x3],#16
+ ext v25.16b,v25.16b,v25.16b,#8
+ ext v5.16b,v0.16b,v1.16b,#8
+ ext v6.16b,v2.16b,v0.16b,#8
+ add v1.2d,v1.2d,v25.2d
+.inst 0xcec082d5
+ ext v7.16b,v17.16b,v18.16b,#8
+.inst 0xce6680a1
+.inst 0xce678a95
+ add v3.2d,v2.2d,v1.2d
+.inst 0xce648441
+ add v24.2d,v24.2d,v22.2d
+ ld1 {v25.2d},[x3],#16
+ ext v24.16b,v24.16b,v24.16b,#8
+ ext v5.16b,v3.16b,v0.16b,#8
+ ext v6.16b,v4.16b,v3.16b,#8
+ add v0.2d,v0.2d,v24.2d
+.inst 0xcec082f6
+ ext v7.16b,v18.16b,v19.16b,#8
+.inst 0xce6680a0
+.inst 0xce678ab6
+ add v2.2d,v4.2d,v0.2d
+.inst 0xce618480
+ add v25.2d,v25.2d,v23.2d
+ ld1 {v24.2d},[x3],#16
+ ext v25.16b,v25.16b,v25.16b,#8
+ ext v5.16b,v2.16b,v3.16b,#8
+ ext v6.16b,v1.16b,v2.16b,#8
+ add v3.2d,v3.2d,v25.2d
+.inst 0xcec08217
+ ext v7.16b,v19.16b,v20.16b,#8
+.inst 0xce6680a3
+.inst 0xce678ad7
+ add v4.2d,v1.2d,v3.2d
+.inst 0xce608423
+ add v24.2d,v24.2d,v16.2d
+ ld1 {v25.2d},[x3],#16
+ ext v24.16b,v24.16b,v24.16b,#8
+ ext v5.16b,v4.16b,v2.16b,#8
+ ext v6.16b,v0.16b,v4.16b,#8
+ add v2.2d,v2.2d,v24.2d
+.inst 0xcec08230
+ ext v7.16b,v20.16b,v21.16b,#8
+.inst 0xce6680a2
+.inst 0xce678af0
+ add v1.2d,v0.2d,v2.2d
+.inst 0xce638402
+ add v25.2d,v25.2d,v17.2d
+ ld1 {v24.2d},[x3],#16
+ ext v25.16b,v25.16b,v25.16b,#8
+ ext v5.16b,v1.16b,v4.16b,#8
+ ext v6.16b,v3.16b,v1.16b,#8
+ add v4.2d,v4.2d,v25.2d
+.inst 0xcec08251
+ ext v7.16b,v21.16b,v22.16b,#8
+.inst 0xce6680a4
+.inst 0xce678a11
+ add v0.2d,v3.2d,v4.2d
+.inst 0xce628464
+ add v24.2d,v24.2d,v18.2d
+ ld1 {v25.2d},[x3],#16
+ ext v24.16b,v24.16b,v24.16b,#8
+ ext v5.16b,v0.16b,v1.16b,#8
+ ext v6.16b,v2.16b,v0.16b,#8
+ add v1.2d,v1.2d,v24.2d
+.inst 0xcec08272
+ ext v7.16b,v22.16b,v23.16b,#8
+.inst 0xce6680a1
+.inst 0xce678a32
+ add v3.2d,v2.2d,v1.2d
+.inst 0xce648441
+ add v25.2d,v25.2d,v19.2d
+ ld1 {v24.2d},[x3],#16
+ ext v25.16b,v25.16b,v25.16b,#8
+ ext v5.16b,v3.16b,v0.16b,#8
+ ext v6.16b,v4.16b,v3.16b,#8
+ add v0.2d,v0.2d,v25.2d
+.inst 0xcec08293
+ ext v7.16b,v23.16b,v16.16b,#8
+.inst 0xce6680a0
+.inst 0xce678a53
+ add v2.2d,v4.2d,v0.2d
+.inst 0xce618480
+ add v24.2d,v24.2d,v20.2d
+ ld1 {v25.2d},[x3],#16
+ ext v24.16b,v24.16b,v24.16b,#8
+ ext v5.16b,v2.16b,v3.16b,#8
+ ext v6.16b,v1.16b,v2.16b,#8
+ add v3.2d,v3.2d,v24.2d
+.inst 0xcec082b4
+ ext v7.16b,v16.16b,v17.16b,#8
+.inst 0xce6680a3
+.inst 0xce678a74
+ add v4.2d,v1.2d,v3.2d
+.inst 0xce608423
+ add v25.2d,v25.2d,v21.2d
+ ld1 {v24.2d},[x3],#16
+ ext v25.16b,v25.16b,v25.16b,#8
+ ext v5.16b,v4.16b,v2.16b,#8
+ ext v6.16b,v0.16b,v4.16b,#8
+ add v2.2d,v2.2d,v25.2d
+.inst 0xcec082d5
+ ext v7.16b,v17.16b,v18.16b,#8
+.inst 0xce6680a2
+.inst 0xce678a95
+ add v1.2d,v0.2d,v2.2d
+.inst 0xce638402
+ add v24.2d,v24.2d,v22.2d
+ ld1 {v25.2d},[x3],#16
+ ext v24.16b,v24.16b,v24.16b,#8
+ ext v5.16b,v1.16b,v4.16b,#8
+ ext v6.16b,v3.16b,v1.16b,#8
+ add v4.2d,v4.2d,v24.2d
+.inst 0xcec082f6
+ ext v7.16b,v18.16b,v19.16b,#8
+.inst 0xce6680a4
+.inst 0xce678ab6
+ add v0.2d,v3.2d,v4.2d
+.inst 0xce628464
+ add v25.2d,v25.2d,v23.2d
+ ld1 {v24.2d},[x3],#16
+ ext v25.16b,v25.16b,v25.16b,#8
+ ext v5.16b,v0.16b,v1.16b,#8
+ ext v6.16b,v2.16b,v0.16b,#8
+ add v1.2d,v1.2d,v25.2d
+.inst 0xcec08217
+ ext v7.16b,v19.16b,v20.16b,#8
+.inst 0xce6680a1
+.inst 0xce678ad7
+ add v3.2d,v2.2d,v1.2d
+.inst 0xce648441
+ add v24.2d,v24.2d,v16.2d
+ ld1 {v25.2d},[x3],#16
+ ext v24.16b,v24.16b,v24.16b,#8
+ ext v5.16b,v3.16b,v0.16b,#8
+ ext v6.16b,v4.16b,v3.16b,#8
+ add v0.2d,v0.2d,v24.2d
+.inst 0xcec08230
+ ext v7.16b,v20.16b,v21.16b,#8
+.inst 0xce6680a0
+.inst 0xce678af0
+ add v2.2d,v4.2d,v0.2d
+.inst 0xce618480
+ add v25.2d,v25.2d,v17.2d
+ ld1 {v24.2d},[x3],#16
+ ext v25.16b,v25.16b,v25.16b,#8
+ ext v5.16b,v2.16b,v3.16b,#8
+ ext v6.16b,v1.16b,v2.16b,#8
+ add v3.2d,v3.2d,v25.2d
+.inst 0xcec08251
+ ext v7.16b,v21.16b,v22.16b,#8
+.inst 0xce6680a3
+.inst 0xce678a11
+ add v4.2d,v1.2d,v3.2d
+.inst 0xce608423
+ add v24.2d,v24.2d,v18.2d
+ ld1 {v25.2d},[x3],#16
+ ext v24.16b,v24.16b,v24.16b,#8
+ ext v5.16b,v4.16b,v2.16b,#8
+ ext v6.16b,v0.16b,v4.16b,#8
+ add v2.2d,v2.2d,v24.2d
+.inst 0xcec08272
+ ext v7.16b,v22.16b,v23.16b,#8
+.inst 0xce6680a2
+.inst 0xce678a32
+ add v1.2d,v0.2d,v2.2d
+.inst 0xce638402
+ add v25.2d,v25.2d,v19.2d
+ ld1 {v24.2d},[x3],#16
+ ext v25.16b,v25.16b,v25.16b,#8
+ ext v5.16b,v1.16b,v4.16b,#8
+ ext v6.16b,v3.16b,v1.16b,#8
+ add v4.2d,v4.2d,v25.2d
+.inst 0xcec08293
+ ext v7.16b,v23.16b,v16.16b,#8
+.inst 0xce6680a4
+.inst 0xce678a53
+ add v0.2d,v3.2d,v4.2d
+.inst 0xce628464
+ add v24.2d,v24.2d,v20.2d
+ ld1 {v25.2d},[x3],#16
+ ext v24.16b,v24.16b,v24.16b,#8
+ ext v5.16b,v0.16b,v1.16b,#8
+ ext v6.16b,v2.16b,v0.16b,#8
+ add v1.2d,v1.2d,v24.2d
+.inst 0xcec082b4
+ ext v7.16b,v16.16b,v17.16b,#8
+.inst 0xce6680a1
+.inst 0xce678a74
+ add v3.2d,v2.2d,v1.2d
+.inst 0xce648441
+ add v25.2d,v25.2d,v21.2d
+ ld1 {v24.2d},[x3],#16
+ ext v25.16b,v25.16b,v25.16b,#8
+ ext v5.16b,v3.16b,v0.16b,#8
+ ext v6.16b,v4.16b,v3.16b,#8
+ add v0.2d,v0.2d,v25.2d
+.inst 0xcec082d5
+ ext v7.16b,v17.16b,v18.16b,#8
+.inst 0xce6680a0
+.inst 0xce678a95
+ add v2.2d,v4.2d,v0.2d
+.inst 0xce618480
+ add v24.2d,v24.2d,v22.2d
+ ld1 {v25.2d},[x3],#16
+ ext v24.16b,v24.16b,v24.16b,#8
+ ext v5.16b,v2.16b,v3.16b,#8
+ ext v6.16b,v1.16b,v2.16b,#8
+ add v3.2d,v3.2d,v24.2d
+.inst 0xcec082f6
+ ext v7.16b,v18.16b,v19.16b,#8
+.inst 0xce6680a3
+.inst 0xce678ab6
+ add v4.2d,v1.2d,v3.2d
+.inst 0xce608423
+ add v25.2d,v25.2d,v23.2d
+ ld1 {v24.2d},[x3],#16
+ ext v25.16b,v25.16b,v25.16b,#8
+ ext v5.16b,v4.16b,v2.16b,#8
+ ext v6.16b,v0.16b,v4.16b,#8
+ add v2.2d,v2.2d,v25.2d
+.inst 0xcec08217
+ ext v7.16b,v19.16b,v20.16b,#8
+.inst 0xce6680a2
+.inst 0xce678ad7
+ add v1.2d,v0.2d,v2.2d
+.inst 0xce638402
+ ld1 {v25.2d},[x3],#16
+ add v24.2d,v24.2d,v16.2d
+ ld1 {v16.16b},[x1],#16
+ ext v24.16b,v24.16b,v24.16b,#8
+ ext v5.16b,v1.16b,v4.16b,#8
+ ext v6.16b,v3.16b,v1.16b,#8
+ add v4.2d,v4.2d,v24.2d
+.inst 0xce6680a4
+ rev64 v16.16b,v16.16b
+ add v0.2d,v3.2d,v4.2d
+.inst 0xce628464
+ ld1 {v24.2d},[x3],#16
+ add v25.2d,v25.2d,v17.2d
+ ld1 {v17.16b},[x1],#16
+ ext v25.16b,v25.16b,v25.16b,#8
+ ext v5.16b,v0.16b,v1.16b,#8
+ ext v6.16b,v2.16b,v0.16b,#8
+ add v1.2d,v1.2d,v25.2d
+.inst 0xce6680a1
+ rev64 v17.16b,v17.16b
+ add v3.2d,v2.2d,v1.2d
+.inst 0xce648441
+ ld1 {v25.2d},[x3],#16
+ add v24.2d,v24.2d,v18.2d
+ ld1 {v18.16b},[x1],#16
+ ext v24.16b,v24.16b,v24.16b,#8
+ ext v5.16b,v3.16b,v0.16b,#8
+ ext v6.16b,v4.16b,v3.16b,#8
+ add v0.2d,v0.2d,v24.2d
+.inst 0xce6680a0
+ rev64 v18.16b,v18.16b
+ add v2.2d,v4.2d,v0.2d
+.inst 0xce618480
+ ld1 {v24.2d},[x3],#16
+ add v25.2d,v25.2d,v19.2d
+ ld1 {v19.16b},[x1],#16
+ ext v25.16b,v25.16b,v25.16b,#8
+ ext v5.16b,v2.16b,v3.16b,#8
+ ext v6.16b,v1.16b,v2.16b,#8
+ add v3.2d,v3.2d,v25.2d
+.inst 0xce6680a3
+ rev64 v19.16b,v19.16b
+ add v4.2d,v1.2d,v3.2d
+.inst 0xce608423
+ ld1 {v25.2d},[x3],#16
+ add v24.2d,v24.2d,v20.2d
+ ld1 {v20.16b},[x1],#16
+ ext v24.16b,v24.16b,v24.16b,#8
+ ext v5.16b,v4.16b,v2.16b,#8
+ ext v6.16b,v0.16b,v4.16b,#8
+ add v2.2d,v2.2d,v24.2d
+.inst 0xce6680a2
+ rev64 v20.16b,v20.16b
+ add v1.2d,v0.2d,v2.2d
+.inst 0xce638402
+ ld1 {v24.2d},[x3],#16
+ add v25.2d,v25.2d,v21.2d
+ ld1 {v21.16b},[x1],#16
+ ext v25.16b,v25.16b,v25.16b,#8
+ ext v5.16b,v1.16b,v4.16b,#8
+ ext v6.16b,v3.16b,v1.16b,#8
+ add v4.2d,v4.2d,v25.2d
+.inst 0xce6680a4
+ rev64 v21.16b,v21.16b
+ add v0.2d,v3.2d,v4.2d
+.inst 0xce628464
+ ld1 {v25.2d},[x3],#16
+ add v24.2d,v24.2d,v22.2d
+ ld1 {v22.16b},[x1],#16
+ ext v24.16b,v24.16b,v24.16b,#8
+ ext v5.16b,v0.16b,v1.16b,#8
+ ext v6.16b,v2.16b,v0.16b,#8
+ add v1.2d,v1.2d,v24.2d
+.inst 0xce6680a1
+ rev64 v22.16b,v22.16b
+ add v3.2d,v2.2d,v1.2d
+.inst 0xce648441
+ sub x3,x3,#80*8
+ add v25.2d,v25.2d,v23.2d
+ ld1 {v23.16b},[x1],#16
+ ext v25.16b,v25.16b,v25.16b,#8
+ ext v5.16b,v3.16b,v0.16b,#8
+ ext v6.16b,v4.16b,v3.16b,#8
+ add v0.2d,v0.2d,v25.2d
+.inst 0xce6680a0
+ rev64 v23.16b,v23.16b
+ add v2.2d,v4.2d,v0.2d
+.inst 0xce618480
+ add v0.2d,v0.2d,v26.2d
+ add v1.2d,v1.2d,v27.2d
+ add v2.2d,v2.2d,v28.2d
+ add v3.2d,v3.2d,v29.2d
+
+ cbnz x2,.Loop_hw
+
+ st1 {v0.2d,v1.2d,v2.2d,v3.2d},[x0]
+
+ ldr x29,[sp],#16
+ ret
+.size sha512_block_armv8,.-sha512_block_armv8
+
+
+.comm _gnutls_arm_cpuid_s,4,4
 .section .note.GNU-stack,"",%progbits

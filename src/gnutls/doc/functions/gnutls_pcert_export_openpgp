@@ -7,13 +7,9 @@
 
 @var{crt}: An initialized @code{gnutls_openpgp_crt_t} .
 
-Converts the given @code{gnutls_pcert_t}  type into a @code{gnutls_openpgp_crt_t} .
-This function only works if the type of  @code{pcert} is @code{GNUTLS_CRT_OPENPGP} .
-When successful, the value written to  @code{crt} must be freed with
-@code{gnutls_openpgp_crt_deinit()}  when no longer needed.
+This function is no-op.
 
-@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
-negative error value.
+@strong{Returns:} @code{GNUTLS_E_UNIMPLEMENTED_FEATURE} .
 
 @strong{Since:} 3.4.0
 @end deftypefun

@@ -14,18 +14,21 @@
 @var{verification_flags}: gnutls_certificate_verify_flags if flags specifies GNUTLS_TL_VERIFY_CRL
 
 This function will add the given certificate revocation lists
-to the trusted list. The list of CRLs must not be deinitialized
-during this structure's lifetime.
+to the trusted list. The CRLs in  @code{crl_list} must not be deinitialized
+during the lifetime of  @code{list} .
 
 This function must be called after @code{gnutls_x509_trust_list_add_cas()} 
 to allow verifying the CRLs for validity. If the flag @code{GNUTLS_TL_NO_DUPLICATES} 
-is given, then any provided CRLs that are a duplicate, will be deinitialized
-and not added to the list (that assumes that @code{gnutls_x509_trust_list_deinit()} 
-will be called with all=1).
+is given, then the final CRL list will not contain duplicate entries.
 
-If GNUTLS_TL_VERIFY_CRL is given the CRLs will be verified before being added.
+If the flag @code{GNUTLS_TL_NO_DUPLICATES}  is given, @code{gnutls_x509_trust_list_deinit()}  must be
+called with parameter  @code{all} being 1.
 
-@strong{Returns:} The number of added elements is returned.
+If flag @code{GNUTLS_TL_VERIFY_CRL}  is given the CRLs will be verified before being added,
+and if verification fails, they will be skipped.
+
+@strong{Returns:} The number of added elements is returned; that includes
+duplicate entries.
 
 @strong{Since:} 3.0
 @end deftypefun

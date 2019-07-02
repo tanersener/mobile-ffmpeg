@@ -1,32 +1,28 @@
-# 1 "lib/accelerated/aarch64/elf/sha1-armv8.s.tmp.S"
-# 1 "<built-in>"
-# 1 "<command-line>"
-# 1 "lib/accelerated/aarch64/elf/sha1-armv8.s.tmp.S"
 # Copyright (c) 2011-2016, Andy Polyakov <appro@openssl.org>
 # All rights reserved.
-
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
 # are met:
-
-# * Redistributions of source code must retain copyright notices,
-# this list of conditions and the following disclaimer.
-
-# * Redistributions in binary form must reproduce the above
-# copyright notice, this list of conditions and the following
-# disclaimer in the documentation and/or other materials
-# provided with the distribution.
-
-# * Neither the name of the Andy Polyakov nor the names of its
-# copyright holder and contributors may be used to endorse or
-# promote products derived from this software without specific
-# prior written permission.
-
+# 
+#     * Redistributions of source code must retain copyright notices,
+#      this list of conditions and the following disclaimer.
+#
+#     * Redistributions in binary form must reproduce the above
+#      copyright notice, this list of conditions and the following
+#      disclaimer in the documentation and/or other materials
+#      provided with the distribution.
+#
+#     * Neither the name of the Andy Polyakov nor the names of its
+#      copyright holder and contributors may be used to endorse or
+#      promote products derived from this software without specific
+#      prior written permission.
+#
 # ALTERNATIVELY, provided that this notice is retained in full, this
 # product may be distributed under the terms of the GNU General Public
 # License (GPL), in which case the provisions of the GPL apply INSTEAD OF
 # those given above.
-
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER AND CONTRIBUTORS
 # "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 # LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -38,11 +34,17 @@
 # THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+#
 # *** This file is auto-generated ***
-
+#
+# 1 "lib/accelerated/aarch64/elf/sha1-armv8.s.tmp.S"
+# 1 "<built-in>"
+# 1 "<command-line>"
+# 1 "/usr/aarch64-linux-gnu/include/stdc-predef.h" 1 3
+# 1 "<command-line>" 2
+# 1 "lib/accelerated/aarch64/elf/sha1-armv8.s.tmp.S"
 # 1 "lib/accelerated/aarch64/aarch64-common.h" 1
-# 41 "lib/accelerated/aarch64/elf/sha1-armv8.s.tmp.S" 2
+# 2 "lib/accelerated/aarch64/elf/sha1-armv8.s.tmp.S" 2
 
 .text
 
@@ -1263,5 +1265,4 @@ sha1_block_armv8:
 .align 2
 .align 2
 .comm _gnutls_arm_cpuid_s,4,4
-
 .section .note.GNU-stack,"",%progbits

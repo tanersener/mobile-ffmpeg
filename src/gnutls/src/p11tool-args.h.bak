@@ -19,7 +19,7 @@
  * The p11tool program is copyrighted and licensed
  * under the following terms:
  *
- *  Copyright (C) 2000-2018 Free Software Foundation, and others, all rights reserved.
+ *  Copyright (C) 2000-2019 Free Software Foundation, and others, all rights reserved.
  *  This is free software. It is licensed for use, modification and
  *  redistribution under the terms of the GNU General Public License,
  *  version 3 or later <http://gnu.org/licenses/gpl.html>
@@ -88,57 +88,61 @@ typedef enum {
     INDEX_OPT_INFO                          = 21,
     INDEX_OPT_TRUSTED                       = 22,
     INDEX_OPT_DISTRUSTED                    = 23,
-    INDEX_OPT_GENERATE_RSA                  = 25,
-    INDEX_OPT_GENERATE_DSA                  = 26,
-    INDEX_OPT_GENERATE_ECC                  = 27,
-    INDEX_OPT_BITS                          = 28,
-    INDEX_OPT_CURVE                         = 29,
-    INDEX_OPT_SEC_PARAM                     = 30,
-    INDEX_OPT_SET_ID                        = 32,
-    INDEX_OPT_SET_LABEL                     = 33,
-    INDEX_OPT_WRITE                         = 34,
-    INDEX_OPT_DELETE                        = 35,
-    INDEX_OPT_LABEL                         = 36,
-    INDEX_OPT_ID                            = 37,
-    INDEX_OPT_MARK_WRAP                     = 38,
-    INDEX_OPT_MARK_TRUSTED                  = 39,
-    INDEX_OPT_MARK_DISTRUSTED               = 40,
-    INDEX_OPT_MARK_DECRYPT                  = 41,
-    INDEX_OPT_MARK_SIGN                     = 42,
-    INDEX_OPT_MARK_CA                       = 43,
-    INDEX_OPT_MARK_PRIVATE                  = 44,
-    INDEX_OPT_CA                            = 45,
-    INDEX_OPT_PRIVATE                       = 46,
-    INDEX_OPT_SECRET_KEY                    = 47,
-    INDEX_OPT_LOAD_PRIVKEY                  = 48,
-    INDEX_OPT_LOAD_PUBKEY                   = 49,
-    INDEX_OPT_LOAD_CERTIFICATE              = 50,
-    INDEX_OPT_DEBUG                         = 52,
-    INDEX_OPT_OUTFILE                       = 53,
-    INDEX_OPT_LOGIN                         = 54,
-    INDEX_OPT_SO_LOGIN                      = 55,
-    INDEX_OPT_ADMIN_LOGIN                   = 56,
-    INDEX_OPT_TEST_SIGN                     = 57,
-    INDEX_OPT_GENERATE_RANDOM               = 58,
-    INDEX_OPT_PKCS8                         = 59,
-    INDEX_OPT_INDER                         = 60,
-    INDEX_OPT_INRAW                         = 61,
-    INDEX_OPT_OUTDER                        = 62,
-    INDEX_OPT_OUTRAW                        = 63,
-    INDEX_OPT_PROVIDER                      = 64,
-    INDEX_OPT_DETAILED_URL                  = 65,
-    INDEX_OPT_ONLY_URLS                     = 66,
-    INDEX_OPT_BATCH                         = 67,
-    INDEX_OPT_VERSION                       = 68,
-    INDEX_OPT_HELP                          = 69,
-    INDEX_OPT_MORE_HELP                     = 70
+    INDEX_OPT_GENERATE_PRIVKEY              = 25,
+    INDEX_OPT_GENERATE_RSA                  = 26,
+    INDEX_OPT_GENERATE_DSA                  = 27,
+    INDEX_OPT_GENERATE_ECC                  = 28,
+    INDEX_OPT_BITS                          = 29,
+    INDEX_OPT_CURVE                         = 30,
+    INDEX_OPT_SEC_PARAM                     = 31,
+    INDEX_OPT_SET_ID                        = 33,
+    INDEX_OPT_SET_LABEL                     = 34,
+    INDEX_OPT_WRITE                         = 35,
+    INDEX_OPT_DELETE                        = 36,
+    INDEX_OPT_LABEL                         = 37,
+    INDEX_OPT_ID                            = 38,
+    INDEX_OPT_MARK_WRAP                     = 39,
+    INDEX_OPT_MARK_TRUSTED                  = 40,
+    INDEX_OPT_MARK_DISTRUSTED               = 41,
+    INDEX_OPT_MARK_DECRYPT                  = 42,
+    INDEX_OPT_MARK_SIGN                     = 43,
+    INDEX_OPT_MARK_CA                       = 44,
+    INDEX_OPT_MARK_PRIVATE                  = 45,
+    INDEX_OPT_CA                            = 46,
+    INDEX_OPT_PRIVATE                       = 47,
+    INDEX_OPT_SECRET_KEY                    = 48,
+    INDEX_OPT_LOAD_PRIVKEY                  = 49,
+    INDEX_OPT_LOAD_PUBKEY                   = 50,
+    INDEX_OPT_LOAD_CERTIFICATE              = 51,
+    INDEX_OPT_DEBUG                         = 53,
+    INDEX_OPT_OUTFILE                       = 54,
+    INDEX_OPT_LOGIN                         = 55,
+    INDEX_OPT_SO_LOGIN                      = 56,
+    INDEX_OPT_ADMIN_LOGIN                   = 57,
+    INDEX_OPT_TEST_SIGN                     = 58,
+    INDEX_OPT_SIGN_PARAMS                   = 59,
+    INDEX_OPT_HASH                          = 60,
+    INDEX_OPT_GENERATE_RANDOM               = 61,
+    INDEX_OPT_PKCS8                         = 62,
+    INDEX_OPT_INDER                         = 63,
+    INDEX_OPT_INRAW                         = 64,
+    INDEX_OPT_OUTDER                        = 65,
+    INDEX_OPT_OUTRAW                        = 66,
+    INDEX_OPT_PROVIDER                      = 67,
+    INDEX_OPT_PROVIDER_OPTS                 = 68,
+    INDEX_OPT_DETAILED_URL                  = 69,
+    INDEX_OPT_ONLY_URLS                     = 70,
+    INDEX_OPT_BATCH                         = 71,
+    INDEX_OPT_VERSION                       = 72,
+    INDEX_OPT_HELP                          = 73,
+    INDEX_OPT_MORE_HELP                     = 74
 } teOptIndex;
 /** count of all options for p11tool */
-#define OPTION_CT    71
+#define OPTION_CT    75
 /** p11tool version */
-#define P11TOOL_VERSION       "3.5.19"
+#define P11TOOL_VERSION       "3.6.8"
 /** Full p11tool version text */
-#define P11TOOL_FULL_VERSION  "p11tool 3.5.19"
+#define P11TOOL_FULL_VERSION  "p11tool 3.6.8"
 
 /**
  *  Interface defines for all options.  Replace "n" with the UPPER_CASED
@@ -211,53 +215,57 @@ typedef enum {
 #define VALUE_OPT_INFO           0x1014
 #define VALUE_OPT_TRUSTED        0x1015
 #define VALUE_OPT_DISTRUSTED     0x1016
-#define VALUE_OPT_GENERATE_RSA   0x1017
-#define VALUE_OPT_GENERATE_DSA   0x1018
-#define VALUE_OPT_GENERATE_ECC   0x1019
-#define VALUE_OPT_BITS           0x101A
+#define VALUE_OPT_GENERATE_PRIVKEY 0x1017
+#define VALUE_OPT_GENERATE_RSA   0x1018
+#define VALUE_OPT_GENERATE_DSA   0x1019
+#define VALUE_OPT_GENERATE_ECC   0x101A
+#define VALUE_OPT_BITS           0x101B
 
 #define OPT_VALUE_BITS           (DESC(BITS).optArg.argInt)
-#define VALUE_OPT_CURVE          0x101B
-#define VALUE_OPT_SEC_PARAM      0x101C
-#define VALUE_OPT_SET_ID         0x101D
-#define VALUE_OPT_SET_LABEL      0x101E
-#define VALUE_OPT_WRITE          0x101F
-#define VALUE_OPT_DELETE         0x1020
-#define VALUE_OPT_LABEL          0x1021
-#define VALUE_OPT_ID             0x1022
-#define VALUE_OPT_MARK_WRAP      0x1023
-#define VALUE_OPT_MARK_TRUSTED   0x1024
-#define VALUE_OPT_MARK_DISTRUSTED 0x1025
-#define VALUE_OPT_MARK_DECRYPT   0x1026
-#define VALUE_OPT_MARK_SIGN      0x1027
-#define VALUE_OPT_MARK_CA        0x1028
-#define VALUE_OPT_MARK_PRIVATE   0x1029
-#define VALUE_OPT_CA             0x102A
-#define VALUE_OPT_PRIVATE        0x102B
-#define VALUE_OPT_SECRET_KEY     0x102C
-#define VALUE_OPT_LOAD_PRIVKEY   0x102D
-#define VALUE_OPT_LOAD_PUBKEY    0x102E
-#define VALUE_OPT_LOAD_CERTIFICATE 0x102F
+#define VALUE_OPT_CURVE          0x101C
+#define VALUE_OPT_SEC_PARAM      0x101D
+#define VALUE_OPT_SET_ID         0x101E
+#define VALUE_OPT_SET_LABEL      0x101F
+#define VALUE_OPT_WRITE          0x1020
+#define VALUE_OPT_DELETE         0x1021
+#define VALUE_OPT_LABEL          0x1022
+#define VALUE_OPT_ID             0x1023
+#define VALUE_OPT_MARK_WRAP      0x1024
+#define VALUE_OPT_MARK_TRUSTED   0x1025
+#define VALUE_OPT_MARK_DISTRUSTED 0x1026
+#define VALUE_OPT_MARK_DECRYPT   0x1027
+#define VALUE_OPT_MARK_SIGN      0x1028
+#define VALUE_OPT_MARK_CA        0x1029
+#define VALUE_OPT_MARK_PRIVATE   0x102A
+#define VALUE_OPT_CA             0x102B
+#define VALUE_OPT_PRIVATE        0x102C
+#define VALUE_OPT_SECRET_KEY     0x102D
+#define VALUE_OPT_LOAD_PRIVKEY   0x102E
+#define VALUE_OPT_LOAD_PUBKEY    0x102F
+#define VALUE_OPT_LOAD_CERTIFICATE 0x1030
 #define VALUE_OPT_DEBUG          'd'
 
 #define OPT_VALUE_DEBUG          (DESC(DEBUG).optArg.argInt)
-#define VALUE_OPT_OUTFILE        0x1030
-#define VALUE_OPT_LOGIN          0x1031
-#define VALUE_OPT_SO_LOGIN       0x1032
-#define VALUE_OPT_ADMIN_LOGIN    0x1033
-#define VALUE_OPT_TEST_SIGN      0x1034
-#define VALUE_OPT_GENERATE_RANDOM 0x1035
+#define VALUE_OPT_OUTFILE        0x1031
+#define VALUE_OPT_LOGIN          0x1032
+#define VALUE_OPT_SO_LOGIN       0x1033
+#define VALUE_OPT_ADMIN_LOGIN    0x1034
+#define VALUE_OPT_TEST_SIGN      0x1035
+#define VALUE_OPT_SIGN_PARAMS    0x1036
+#define VALUE_OPT_HASH           0x1037
+#define VALUE_OPT_GENERATE_RANDOM 0x1038
 
 #define OPT_VALUE_GENERATE_RANDOM (DESC(GENERATE_RANDOM).optArg.argInt)
 #define VALUE_OPT_PKCS8          '8'
-#define VALUE_OPT_INDER          0x1036
-#define VALUE_OPT_INRAW          0x1037
-#define VALUE_OPT_OUTDER         0x1038
-#define VALUE_OPT_OUTRAW         0x1039
-#define VALUE_OPT_PROVIDER       0x103A
-#define VALUE_OPT_DETAILED_URL   0x103B
-#define VALUE_OPT_ONLY_URLS      0x103C
-#define VALUE_OPT_BATCH          0x103D
+#define VALUE_OPT_INDER          0x1039
+#define VALUE_OPT_INRAW          0x103A
+#define VALUE_OPT_OUTDER         0x103B
+#define VALUE_OPT_OUTRAW         0x103C
+#define VALUE_OPT_PROVIDER       0x103D
+#define VALUE_OPT_PROVIDER_OPTS  0x103E
+#define VALUE_OPT_DETAILED_URL   0x103F
+#define VALUE_OPT_ONLY_URLS      0x1040
+#define VALUE_OPT_BATCH          0x1041
 /** option flag (value) for help-value option */
 #define VALUE_OPT_HELP          'h'
 /** option flag (value) for more-help-value option */

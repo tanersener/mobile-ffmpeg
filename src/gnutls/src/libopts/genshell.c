@@ -22,7 +22,7 @@
  *  Copyright (C) 1999-2014 Bruce Korb, all rights reserved.
  *  This is free software. It is licensed for use, modification and
  *  redistribution under the terms of the GNU Lesser General Public License,
- *  version 2 or later <http://www.gnu.org/licenses/old-licenses/lgpl-2.0.html>
+ *  version 2 or later <https://www.gnu.org/licenses/old-licenses/lgpl-2.0.html>
  *
  *  The genshellopt library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public License as
@@ -36,7 +36,7 @@
  *
  *  You should have received a copy of the GNU Library General Public
  *  License along with this library; if not, see
- *  <http://www.gnu.org/licenses/old-licenses/lgpl-2.0.html>
+ *  <https://www.gnu.org/licenses/old-licenses/lgpl-2.0.html>
  */
 
 #ifndef __doxygen__
@@ -69,7 +69,7 @@ static char const genshellopt_opt_strs[1769] =
             "Copyright (C) 1999-2014 Bruce Korb, all rights reserved.\n"
             "This is free software. It is licensed for use, modification and\n"
             "redistribution under the terms of the GNU Lesser General Public License,\n"
-            "version 2 or later <http://www.gnu.org/licenses/old-licenses/lgpl-2.0.html>\n\0"
+            "version 2 or later <https://www.gnu.org/licenses/old-licenses/lgpl-2.0.html>\n\0"
 /*   285 */ "The genshellopt library is free software; you can redistribute it and/or\n"
             "modify it under the terms of the GNU Library General Public License as\n"
             "published by the Free Software Foundation; either version 2 of the License,\n"
@@ -80,7 +80,7 @@ static char const genshellopt_opt_strs[1769] =
             "License for more details.\n\n"
             "You should have received a copy of the GNU Library General Public License\n"
             "along with this library; if not, see\n"
-            "<http://www.gnu.org/licenses/old-licenses/lgpl-2.0.html>\n\0"
+            "<https://www.gnu.org/licenses/old-licenses/lgpl-2.0.html>\n\0"
 /*   957 */ "Output Script File\0"
 /*   976 */ "SCRIPT\0"
 /*   983 */ "script\0"
@@ -496,7 +496,7 @@ static void bogus_function(void) {
 Copyright (C) 1999-2014 Bruce Korb, all rights reserved.\n\
 This is free software. It is licensed for use, modification and\n\
 redistribution under the terms of the GNU Lesser General Public License,\n\
-version 2 or later <http://www.gnu.org/licenses/old-licenses/lgpl-2.0.html>\n"));
+version 2 or later <https://www.gnu.org/licenses/old-licenses/lgpl-2.0.html>\n"));
 
   /* referenced via genshelloptOptions.pzCopyNotice */
   puts(_("The genshellopt library is free software; you can redistribute it and/or\n\
@@ -509,7 +509,7 @@ FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Library General Public\n\
 License for more details.\n\n"));
   puts(_("You should have received a copy of the GNU Library General Public License\n\
 along with this library; if not, see\n\
-<http://www.gnu.org/licenses/old-licenses/lgpl-2.0.html>\n"));
+<https://www.gnu.org/licenses/old-licenses/lgpl-2.0.html>\n"));
 
   /* referenced via genshelloptOptions.pOptDesc->pzText */
   puts(_("Output Script File"));

@@ -791,6 +791,10 @@ SCM_DEFINE (scm_gnutls_record_receive_x, "record-receive!", 2, 0, 0,
    so we have a separate implementation for these newer versions.  */
 #if USING_GUILE_BEFORE_2_2
 static scm_t_bits session_record_port_type;
+
+/* Hint for the `scm_gc_' functions.  */
+static const char session_record_port_gc_hint[] =
+  "gnutls-session-record-port";
 #else
 static scm_t_port_type *session_record_port_type;
 #endif
@@ -801,10 +805,6 @@ static scm_t_port_type *session_record_port_type;
 
 /* Size of a session port's input buffer.  */
 #define SCM_GNUTLS_SESSION_RECORD_PORT_BUFFER_SIZE 4096
-
-/* Hint for the `scm_gc_' functions.  */
-static const char session_record_port_gc_hint[] =
-  "gnutls-session-record-port";
 
 
 #if SCM_MAJOR_VERSION == 1 && SCM_MINOR_VERSION <= 8
@@ -2404,7 +2404,7 @@ SCM_DEFINE (scm_gnutls_x509_certificate_dn, "x509-certificate-dn",
             (SCM cert),
             "Return the distinguished name (DN) of X.509 certificate "
             "@var{cert}.  The form of the DN is as described in @uref{"
-            "http://tools.ietf.org/html/rfc2253, RFC 2253}.")
+            "https://tools.ietf.org/html/rfc2253, RFC 2253}.")
 #define FUNC_NAME s_scm_gnutls_x509_certificate_dn
 {
   X509_CERTIFICATE_DN_FUNCTION_BODY (gnutls_x509_crt_get_dn);
@@ -2510,7 +2510,7 @@ SCM_DEFINE (scm_gnutls_x509_certificate_matches_hostname_p,
             (SCM cert, SCM hostname),
             "Return true if @var{cert} matches @var{hostname}, a string "
             "denoting a DNS host name.  This is the basic implementation "
-            "of @uref{http://tools.ietf.org/html/rfc2818, RFC 2818} (aka. "
+            "of @uref{https://tools.ietf.org/html/rfc2818, RFC 2818} (aka. "
             "HTTPS).")
 #define FUNC_NAME s_scm_gnutls_x509_certificate_matches_hostname_p
 {

@@ -17,9 +17,12 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
+
+#ifndef GNUTLS_LIB_NETTLE_RND_COMMON_H
+#define GNUTLS_LIB_NETTLE_RND_COMMON_H
 
 #include "gnutls_int.h"
 #ifdef HAVE_GETPID
@@ -31,20 +34,6 @@
 
 #include <fips.h>
 
-struct event_st {
-		struct timespec now; /* current time */
-#ifdef HAVE_GETRUSAGE
-		struct rusage rusage;
-#endif
-#ifdef HAVE_GETPID
-		pid_t pid;	/* the process PID */
-#endif
-		unsigned count; /* a running counter */
-		unsigned err; /* the last errno */
-};
-
-void _rnd_get_event(struct event_st *e);
-
 int _rnd_system_entropy_init(void);
 int _rnd_system_entropy_check(void);
 void _rnd_system_entropy_deinit(void);
@@ -53,3 +42,5 @@ typedef int (*get_entropy_func)(void* rnd, size_t size);
 
 extern get_entropy_func _rnd_get_system_entropy;
 
+
+#endif /* GNUTLS_LIB_NETTLE_RND_COMMON_H */

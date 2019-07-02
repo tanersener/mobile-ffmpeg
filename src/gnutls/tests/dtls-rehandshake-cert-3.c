@@ -102,7 +102,7 @@ static ssize_t push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 	return send(fd, data, len, 0);
 }
 
-static void client(int fd)
+static void client(int fd, const char *prio)
 {
 	int ret;
 	char buffer[MAX_BUF + 1];
@@ -125,8 +125,9 @@ static void client(int fd)
 	gnutls_init(&session, GNUTLS_CLIENT | GNUTLS_DATAGRAM);
 	gnutls_dtls_set_mtu(session, MTU);
 
+	snprintf(buffer, sizeof(buffer), "%s:+ANON-ECDH", prio);
 	assert(gnutls_priority_set_direct(session,
-					  "NONE:+VERS-DTLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL",
+					  buffer,
 					  NULL) >= 0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_ANON, anoncred);
@@ -158,8 +159,9 @@ static void client(int fd)
 			(gnutls_protocol_get_version(session)));
 
 	/* update priorities to allow cert auth */
+	snprintf(buffer, sizeof(buffer), "%s:+ECDHE-RSA", prio);
 	assert(gnutls_priority_set_direct(session,
-					  "NONE:+VERS-DTLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ECDHE-RSA:+CURVE-ALL",
+					  buffer,
 					  NULL) >= 0);
 
 	do {
@@ -216,7 +218,7 @@ static void terminate(void)
 	exit(1);
 }
 
-static void server(int fd)
+static void server(int fd, const char *prio)
 {
 	int ret;
 	char buffer[MAX_BUF + 1];
@@ -244,8 +246,9 @@ static void server(int fd)
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
+	snprintf(buffer, sizeof(buffer), "%s:+ECDHE-RSA:+ANON-ECDH", prio);
 	assert(gnutls_priority_set_direct(session,
-					  "NONE:+VERS-DTLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ECDHE-RSA:+ANON-ECDH:+CURVE-ALL",
+					  buffer,
 					  NULL) >= 0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_ANON, anoncred);
@@ -348,7 +351,7 @@ static void server(int fd)
 		success("server: finished\n");
 }
 
-void doit(void)
+static void start(const char *prio)
 {
 	int fd[2];
 	int ret;
@@ -371,14 +374,19 @@ void doit(void)
 		/* parent */
 
 		server_fd = fd[0];
-		server(fd[0]);
+		server(fd[0], prio);
 		wait(&status);
 		check_wait_status(status);
 	} else {
 		close(fd[0]);
-		client(fd[1]);
+		client(fd[1], prio);
 		exit(0);
 	}
+}
+
+void doit(void)
+{
+	start("NONE:+VERS-DTLS1.2:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+CURVE-ALL");
 }
 
 #endif				/* _WIN32 */

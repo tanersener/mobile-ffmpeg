@@ -14,7 +14,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 #include <config.h>
@@ -47,7 +47,7 @@ static void alarm_handler(int signo)
 #endif
 
 static void
-value2human(unsigned long bytes, double time, double *data, double *speed,
+value2human(uint64_t bytes, double time, double *data, double *speed,
 	    char *metric)
 {
 	if (bytes > 1000 && bytes < 1000 * 1000) {
@@ -130,9 +130,7 @@ double stop_benchmark(struct benchmark_st *st, const char *metric,
 
 	gettime(&stop);
 
-	lsecs = (stop.tv_sec * 1000 + stop.tv_nsec / (1000 * 1000) -
-		 (st->start.tv_sec * 1000 +
-		  st->start.tv_nsec / (1000 * 1000)));
+	lsecs = timespec_sub_ms(&stop, &st->start);
 	secs = lsecs;
 	secs /= 1000;
 

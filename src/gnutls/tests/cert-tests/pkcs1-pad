@@ -32,12 +32,9 @@ fi
 
 export TZ="UTC"
 
-# Check for datefudge
-TSTAMP=`datefudge "2006-09-23" date -u +%s || true`
-if test "${TSTAMP}" != "1158969600"; then
-	echo "You need datefudge to run this test"
-	exit 77
-fi
+. ${srcdir}/../scripts/common.sh
+
+check_for_datefudge
 
 TMPFILE1=pkcs1-pad.$$.tmp
 TMPFILE2=pkcs1-pad-2.$$.tmp
@@ -46,8 +43,8 @@ TMPFILE2=pkcs1-pad-2.$$.tmp
 
 EXPECT1=2002
 
-datefudge "2006-09-23" "${CERTTOOL}" --verify-chain --infile "${srcdir}/data/pkcs1-pad-ok.pem" | tee $TMPFILE1 >/dev/null 2>&1
-datefudge "2006-09-23" "${CERTTOOL}" --verify-chain --infile "${srcdir}/data/pkcs1-pad-broken.pem" | tee $TMPFILE2 >/dev/null 2>&1
+datefudge "2006-09-23" "${CERTTOOL}" --verify-allow-broken --verify-chain --infile "${srcdir}/data/pkcs1-pad-ok.pem" | tee $TMPFILE1 >/dev/null 2>&1
+datefudge "2006-09-23" "${CERTTOOL}" --verify-allow-broken --verify-chain --infile "${srcdir}/data/pkcs1-pad-broken.pem" | tee $TMPFILE2 >/dev/null 2>&1
 
 out1oks=`grep 'Verified.' $TMPFILE1 | wc -l | tr -d " "`
 out2oks=`grep 'Verified.' $TMPFILE2 | wc -l | tr -d " "`
@@ -92,14 +89,12 @@ echo "PKCS1-PAD2 OK"
 # by Andrei Pyshkin, Erik Tews and Ralf-Philipp Weinmann.
 
 
-EXPECT3=02
-
 datefudge "2006-09-23" "${CERTTOOL}" --verify-chain --infile "${srcdir}/data/pkcs1-pad-broken3.pem" | tee $TMPFILE1 >/dev/null 2>&1
 
 out1oks=`grep 'Verified.' $TMPFILE1 | wc -l | tr -d " "`
 out1fails=`grep 'Not verified.' $TMPFILE1 | wc -l | tr -d " "`
 
-if test "${out1oks}${out1fails}" != "${EXPECT3}"; then
+if test ${out1fails} -lt 2 || test ${out1oks} != 0;then
 	echo "$TMPFILE1 oks ${out1oks} fails ${out1fails}"
 	echo "expected ${EXPECT3}"
 	echo "PKCS1-PAD3 FAIL"

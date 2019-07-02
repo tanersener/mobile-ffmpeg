@@ -78,7 +78,6 @@ static void check_test_result(int ret, int expected_outcome,
 static void parse_cidr(const char* cidr, gnutls_datum_t *datum) {
 	if (datum->data != NULL) {
 		gnutls_free(datum->data);
-		datum->data = NULL;
 	}
 	int ret = gnutls_x509_cidr_to_rfc5280(cidr, datum);
 	check_for_error(ret);
@@ -699,7 +698,7 @@ static int teardown(void **state) {
 	gnutls_free(test_vars->ip.data);
 	gnutls_x509_name_constraints_deinit(test_vars->nc);
 	gnutls_x509_name_constraints_deinit(test_vars->nc2);
-	gnutls_free(test_vars);
+	gnutls_free(*state);
 	return 0;
 }
 

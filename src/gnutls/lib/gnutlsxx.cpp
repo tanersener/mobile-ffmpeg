@@ -16,7 +16,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -46,6 +46,11 @@ namespace gnutls
     gnutls_deinit (s);
   }
 
+  gnutls_session_t session::ptr()
+  {
+    return s;
+  }
+
   int session::bye (gnutls_close_request_t how)
   {
     return RETWRAP (gnutls_bye (s, how));
@@ -57,6 +62,11 @@ namespace gnutls
   }
 
   server_session::server_session ():session (GNUTLS_SERVER)
+  {
+  }
+
+  server_session::server_session (int flags):session (GNUTLS_SERVER |
+			      (flags & ~GNUTLS_CLIENT))
   {
   }
 
@@ -277,11 +287,21 @@ namespace gnutls
   {
   }
 
+  client_session::client_session (int flags):session (GNUTLS_CLIENT |
+				  (flags & ~GNUTLS_SERVER))
+  {
+  }
+
   client_session::~client_session ()
   {
   }
 
 // client session
+  void client_session::set_verify_cert (const char *hostname, unsigned flags)
+  {
+    gnutls_session_set_verify_cert(s, hostname, flags);
+  }
+
   void client_session::set_server_name (gnutls_server_name_type_t type,
 					const void *name, size_t name_length)
   {
@@ -457,6 +477,11 @@ namespace gnutls
   void session::set_transport_pull_function (gnutls_pull_func pull_func)
   {
     gnutls_transport_set_pull_function (s, pull_func);
+  }
+
+  void session::set_transport_pull_timeout_function (gnutls_pull_timeout_func pull_timeout_func)
+  {
+    gnutls_transport_set_pull_timeout_function (s, pull_timeout_func);
   }
 
   void session::set_user_ptr (void *ptr)

@@ -16,7 +16,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -29,18 +29,21 @@ static int _gnutls_sr_recv_params(gnutls_session_t state,
 				  const uint8_t * data, size_t data_size);
 static int _gnutls_sr_send_params(gnutls_session_t state,
 				  gnutls_buffer_st *);
-static void _gnutls_sr_deinit_data(extension_priv_data_t priv);
+static void _gnutls_sr_deinit_data(gnutls_ext_priv_data_t priv);
 
-const extension_entry_st ext_mod_sr = {
+const hello_ext_entry_st ext_mod_sr = {
 	.name = "Safe Renegotiation",
-	.type = GNUTLS_EXTENSION_SAFE_RENEGOTIATION,
+	.tls_id = 65281,
+	.gid = GNUTLS_EXTENSION_SAFE_RENEGOTIATION,
+	.validity = GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_DTLS | GNUTLS_EXT_FLAG_CLIENT_HELLO |
+		    GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
 	.parse_type = GNUTLS_EXT_MANDATORY,
-
 	.recv_func = _gnutls_sr_recv_params,
 	.send_func = _gnutls_sr_send_params,
 	.pack_func = NULL,
 	.unpack_func = NULL,
 	.deinit_func = _gnutls_sr_deinit_data,
+	.cannot_be_overriden = 1
 };
 
 int
@@ -49,13 +52,14 @@ _gnutls_ext_sr_finished(gnutls_session_t session, void *vdata,
 {
 	int ret;
 	sr_ext_st *priv;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 
-	if (session->internals.priorities.sr == SR_DISABLED) {
+	if (session->internals.priorities->sr == SR_DISABLED ||
+	    session->internals.priorities->no_extensions) {
 		return 0;
 	}
 
-	ret = _gnutls_ext_get_session_data(session,
+	ret = _gnutls_hello_ext_get_priv(session,
 					   GNUTLS_EXTENSION_SAFE_RENEGOTIATION,
 					   &epriv);
 	if (ret < 0) {
@@ -93,14 +97,14 @@ int _gnutls_ext_sr_verify(gnutls_session_t session)
 {
 	int ret;
 	sr_ext_st *priv = NULL;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 
-	if (session->internals.priorities.sr == SR_DISABLED) {
+	if (session->internals.priorities->sr == SR_DISABLED) {
 		gnutls_assert();
 		return 0;
 	}
 
-	ret = _gnutls_ext_get_session_data(session,
+	ret = _gnutls_hello_ext_get_priv(session,
 					   GNUTLS_EXTENSION_SAFE_RENEGOTIATION,
 					   &epriv);
 	if (ret >= 0)
@@ -162,7 +166,7 @@ int _gnutls_ext_sr_verify(gnutls_session_t session)
 
 		/* Clients can't tell if it's an initial negotiation */
 		if (session->internals.initial_negotiation_completed) {
-			if (session->internals.priorities.sr < SR_PARTIAL) {
+			if (session->internals.priorities->sr < SR_PARTIAL) {
 				_gnutls_handshake_log
 				    ("HSK[%p]: Allowing unsafe (re)negotiation\n",
 				     session);
@@ -175,7 +179,7 @@ int _gnutls_ext_sr_verify(gnutls_session_t session)
 				    GNUTLS_E_UNSAFE_RENEGOTIATION_DENIED;
 			}
 		} else {
-			if (session->internals.priorities.sr < SR_SAFE) {
+			if (session->internals.priorities->sr < SR_SAFE) {
 				_gnutls_handshake_log
 				    ("HSK[%p]: Allowing unsafe initial negotiation\n",
 				     session);
@@ -198,9 +202,9 @@ int _gnutls_ext_sr_recv_cs(gnutls_session_t session)
 {
 	int ret, set = 0;
 	sr_ext_st *priv;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 
-	ret = _gnutls_ext_get_session_data(session,
+	ret = _gnutls_hello_ext_get_priv(session,
 					   GNUTLS_EXTENSION_SAFE_RENEGOTIATION,
 					   &epriv);
 	if (ret < 0) {
@@ -219,10 +223,10 @@ int _gnutls_ext_sr_recv_cs(gnutls_session_t session)
 
 	priv->safe_renegotiation_received = 1;
 	priv->connection_using_safe_renegotiation = 1;
-	_gnutls_extension_list_add(session, GNUTLS_EXTENSION_SAFE_RENEGOTIATION);
+	_gnutls_hello_ext_save_sr(session);
 
 	if (set != 0)
-		_gnutls_ext_set_session_data(session,
+		_gnutls_hello_ext_set_priv(session,
 					     GNUTLS_EXTENSION_SAFE_RENEGOTIATION,
 					     epriv);
 
@@ -233,9 +237,9 @@ int _gnutls_ext_sr_send_cs(gnutls_session_t session)
 {
 	int ret, set = 0;
 	sr_ext_st *priv;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 
-	ret = _gnutls_ext_get_session_data(session,
+	ret = _gnutls_hello_ext_get_priv(session,
 					   GNUTLS_EXTENSION_SAFE_RENEGOTIATION,
 					   &epriv);
 	if (ret < 0) {
@@ -252,7 +256,7 @@ int _gnutls_ext_sr_send_cs(gnutls_session_t session)
 	}
 
 	if (set != 0)
-		_gnutls_ext_set_session_data(session,
+		_gnutls_hello_ext_set_priv(session,
 					     GNUTLS_EXTENSION_SAFE_RENEGOTIATION,
 					     epriv);
 
@@ -266,7 +270,7 @@ _gnutls_sr_recv_params(gnutls_session_t session,
 	unsigned int len;
 	ssize_t data_size = _data_size;
 	sr_ext_st *priv;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 	int set = 0, ret;
 
 	if (data_size == 0)
@@ -276,12 +280,12 @@ _gnutls_sr_recv_params(gnutls_session_t session,
 	DECR_LEN(data_size,
 		 len + 1 /* count the first byte and payload */ );
 
-	if (session->internals.priorities.sr == SR_DISABLED) {
+	if (session->internals.priorities->sr == SR_DISABLED) {
 		gnutls_assert();
 		return 0;
 	}
 
-	ret = _gnutls_ext_get_session_data(session,
+	ret = _gnutls_hello_ext_get_priv(session,
 					   GNUTLS_EXTENSION_SAFE_RENEGOTIATION,
 					   &epriv);
 	if (ret < 0
@@ -300,7 +304,7 @@ _gnutls_sr_recv_params(gnutls_session_t session,
 		}
 		epriv = priv;
 
-		_gnutls_ext_set_session_data(session,
+		_gnutls_hello_ext_set_priv(session,
 					     GNUTLS_EXTENSION_SAFE_RENEGOTIATION,
 					     epriv);
 	} else {
@@ -346,15 +350,15 @@ _gnutls_sr_send_params(gnutls_session_t session,
 	 */
 	sr_ext_st *priv;
 	int ret, set = 0, len;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 	size_t init_length = extdata->length;
 
-	if (session->internals.priorities.sr == SR_DISABLED) {
+	if (session->internals.priorities->sr == SR_DISABLED) {
 		gnutls_assert();
 		return 0;
 	}
 
-	ret = _gnutls_ext_get_session_data(session,
+	ret = _gnutls_hello_ext_get_priv(session,
 					   GNUTLS_EXTENSION_SAFE_RENEGOTIATION,
 					   &epriv);
 	if (ret < 0) {
@@ -369,7 +373,7 @@ _gnutls_sr_send_params(gnutls_session_t session,
 		}
 		epriv = priv;
 
-		_gnutls_ext_set_session_data(session,
+		_gnutls_hello_ext_set_priv(session,
 					     GNUTLS_EXTENSION_SAFE_RENEGOTIATION,
 					     epriv);
 	} else
@@ -410,7 +414,7 @@ _gnutls_sr_send_params(gnutls_session_t session,
 	return extdata->length - init_length;
 }
 
-static void _gnutls_sr_deinit_data(extension_priv_data_t priv)
+static void _gnutls_sr_deinit_data(gnutls_ext_priv_data_t priv)
 {
 	gnutls_free(priv);
 }
@@ -431,9 +435,9 @@ unsigned gnutls_safe_renegotiation_status(gnutls_session_t session)
 {
 	int ret;
 	sr_ext_st *priv;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 
-	ret = _gnutls_ext_get_session_data(session,
+	ret = _gnutls_hello_ext_get_priv(session,
 					   GNUTLS_EXTENSION_SAFE_RENEGOTIATION,
 					   &epriv);
 	if (ret < 0) {

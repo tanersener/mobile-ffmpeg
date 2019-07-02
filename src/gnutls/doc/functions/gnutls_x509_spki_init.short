@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_spki_init} (gnutls_x509_spki_t * @var{spki})

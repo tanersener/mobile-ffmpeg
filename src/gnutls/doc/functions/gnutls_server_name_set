@@ -9,7 +9,7 @@
 
 @var{name}: is a string that contains the server name.
 
-@var{name_length}: holds the length of name
+@var{name_length}: holds the length of name excluding the terminating null byte
 
 This function is to be used by clients that want to inform (via a
 TLS extension mechanism) the server of the name they connected to.

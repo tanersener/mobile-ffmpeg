@@ -44,8 +44,10 @@ int main()
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <errno.h>
+#include <signal.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/dtls.h>
+#include <assert.h>
 
 #include "utils.h"
 
@@ -57,9 +59,6 @@ int main()
 
 static void terminate(void);
 
-/* This program tests the client hello verify in DTLS
- */
-
 static void server_log_func(int level, const char *str)
 {
 	fprintf(stderr, "server|<%d>| %s", level, str);
@@ -69,9 +68,6 @@ static void client_log_func(int level, const char *str)
 {
 	fprintf(stderr, "client|<%d>| %s", level, str);
 }
-
-/* A very basic TLS client, with anonymous authentication.
- */
 
 #define MAX_BUF 1024
 
@@ -89,7 +85,7 @@ push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 	return send(fd, data, len, 0);
 }
 
-static void client(int fd)
+static void client(int fd, const char *prio)
 {
 	int ret;
 	gnutls_anon_client_credentials_t anoncred;
@@ -112,9 +108,7 @@ static void client(int fd)
 	gnutls_handshake_set_timeout(session, 20 * 1000);
 
 	/* Use default priorities */
-	gnutls_priority_set_direct(session,
-				   "NONE:+VERS-DTLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL",
-				   NULL);
+	assert(gnutls_priority_set_direct(session, prio, NULL) >= 0);
 
 	/* put the anonymous credentials to the current session
 	 */
@@ -181,7 +175,7 @@ static void terminate(void)
 	exit(1);
 }
 
-static void server(int fd)
+static void server(int fd, const char *prio)
 {
 	int ret;
 	gnutls_anon_server_credentials_t anoncred;
@@ -206,9 +200,7 @@ static void server(int fd)
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	gnutls_priority_set_direct(session,
-				   "NONE:+VERS-DTLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL",
-				   NULL);
+	assert(gnutls_priority_set_direct(session, prio, NULL) >= 0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_ANON, anoncred);
 
@@ -269,10 +261,13 @@ static void server(int fd)
 		success("server: finished\n");
 }
 
-void doit(void)
+static
+void start(const char *prio)
 {
 	int fd[2];
 	int ret;
+
+	signal(SIGPIPE, SIG_IGN);
 
 	ret = socketpair(AF_UNIX, SOCK_STREAM, 0, fd);
 	if (ret < 0) {
@@ -291,14 +286,20 @@ void doit(void)
 		int status;
 		/* parent */
 
-		server(fd[0]);
+		server(fd[0], prio);
 		wait(&status);
 		check_wait_status(status);
 	} else {
 		close(fd[0]);
-		client(fd[1]);
+		client(fd[1], prio);
 		exit(0);
 	}
+}
+
+void doit(void)
+{
+	start("NONE:+VERS-DTLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL");
+	start("NONE:+VERS-DTLS1.2:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL");
 }
 
 #endif				/* _WIN32 */

@@ -1,0 +1,66 @@
+
+
+
+
+@deftypefun {int} {gnutls_certificate_set_rawpk_key_file} (gnutls_certificate_credentials_t @var{cred}, const char* @var{rawpkfile}, const char* @var{privkeyfile}, gnutls_x509_crt_fmt_t @var{format}, const char * @var{pass}, unsigned int @var{key_usage}, const char ** @var{names}, unsigned int @var{names_length}, unsigned int @var{privkey_flags}, unsigned int @var{pkcs11_flags})
+@var{cred}: is a @code{gnutls_certificate_credentials_t}  type.
+
+@var{rawpkfile}: contains a raw public key in
+PKIX.SubjectPublicKeyInfo format.
+
+@var{privkeyfile}: contains a file path to a private key.
+
+@var{format}: encoding of the keys. DER or PEM.
+
+@var{pass}: an optional password to unlock the private key privkeyfile.
+
+@var{key_usage}: an ORed sequence of @code{GNUTLS_KEY_} * flags.
+
+@var{names}: is an array of DNS names belonging to the public-key (NULL if none).
+
+@var{names_length}: holds the length of the names list.
+
+@var{privkey_flags}: an ORed sequence of @code{gnutls_pkcs_encrypt_flags_t} .
+These apply to the private key pkey.
+
+@var{pkcs11_flags}: one of gnutls_pkcs11_obj_flags. These apply to URLs.
+
+This function sets a public/private keypair read from file in the
+@code{gnutls_certificate_credentials_t}  type to be used for authentication
+and/or encryption.  @code{spki} and  @code{privkey} should match otherwise set
+signatures cannot be validated. In case of no match this function
+returns @code{GNUTLS_E_CERTIFICATE_KEY_MISMATCH} . This function should
+be called once for the client because there is currently no mechanism
+to determine which raw public-key to select for the peer when there
+are multiple present. Multiple raw public keys for the server can be
+distinghuished by setting the  @code{names} .
+
+Note here that  @code{spki} is a raw public-key as defined
+in RFC7250. It means that there is no surrounding certificate that
+holds the public key and that there is therefore no direct mechanism
+to prove the authenticity of this key. The keypair can be used during
+a TLS handshake but its authenticity should be established via a
+different mechanism (e.g. TOFU or known fingerprint).
+
+The supported formats are basic unencrypted key, PKCS8, PKCS12,
+and the openssl format and will be autodetected.
+
+If the raw public-key and the private key are given in PEM encoding
+then the strings that hold their values must be null terminated.
+
+Key usage (as defined by X.509 extension (2.5.29.15)) can be explicitly
+set because there is no certificate structure around the key to define
+this value. See for more info @code{gnutls_x509_crt_get_key_usage()} .
+
+Note that, this function by default returns zero on success and a
+negative value on error. Since 3.5.6, when the flag @code{GNUTLS_CERTIFICATE_API_V2} 
+is set using @code{gnutls_certificate_set_flags()}  it returns an index
+(greater or equal to zero). That index can be used in other functions
+to refer to the added key-pair.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, in case the
+key pair does not match @code{GNUTLS_E_CERTIFICATE_KEY_MISMATCH}  is returned,
+in other erroneous cases a different negative error code is returned.
+
+@strong{Since:} 3.6.6
+@end deftypefun

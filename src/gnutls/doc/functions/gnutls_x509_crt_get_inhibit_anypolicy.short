@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_crt_get_inhibit_anypolicy} (gnutls_x509_crt_t @var{cert}, unsigned int * @var{skipcerts}, unsigned int * @var{critical})

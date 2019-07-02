@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2003-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2017 Red Hat, Inc.
  *
  * This file is part of GnuTLS.
  *
@@ -15,17 +16,20 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see
- * <http://www.gnu.org/licenses/>.
+ * <https://www.gnu.org/licenses/>.
  */
 
-#ifndef CERTTOOL_COMMON_H
-#define CERTTOOL_COMMON_H
+#ifndef GNUTLS_SRC_CERTTOOL_COMMON_H
+#define GNUTLS_SRC_CERTTOOL_COMMON_H
 
 #include <gnutls/x509.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 #define TYPE_CRT 1
 #define TYPE_CRQ 2
+
+#define SERIAL_MAX_BYTES 20
 
 void certtool_version(void);
 
@@ -39,6 +43,7 @@ typedef struct common_info {
 	int pkcs8;
 	int incert_format;
 	int outcert_format;
+	int outtext;
 	const char *cert;
 
 	const char *request;
@@ -52,6 +57,7 @@ typedef struct common_info {
 	const char *password;
 	int null_password;
 	int empty_password;
+	int ask_pass;
 	unsigned int crq_extensions;
 	unsigned int v1_cert;
 	/* for key generation */
@@ -63,6 +69,7 @@ typedef struct common_info {
 	const char *pin;
 	const char *so_pin;
 
+	gnutls_digest_algorithm_t hash;
 	int cprint;
 	unsigned key_usage;
 
@@ -70,8 +77,45 @@ typedef struct common_info {
 	/* when printing PKCS #11 objects, only print urls */
 	unsigned int only_urls;
 	unsigned int verbose;
+
+	unsigned rsa_pss_sign;
+	unsigned sort_chain;
 } common_info_st;
 
+static inline
+void switch_to_pkcs8_when_needed(common_info_st *cinfo, gnutls_x509_privkey_t key, unsigned key_type)
+{
+	if (cinfo->pkcs8)
+		return;
+
+	if (key_type == GNUTLS_PK_RSA_PSS || key_type == GNUTLS_PK_EDDSA_ED25519 ||
+	    key_type == GNUTLS_PK_GOST_01 || key_type == GNUTLS_PK_GOST_12_256 ||
+	    key_type == GNUTLS_PK_GOST_12_512) {
+		if (cinfo->verbose)
+			fprintf(stderr, "Assuming --pkcs8 is given; %s private keys can only be exported in PKCS#8 format\n",
+				gnutls_pk_algorithm_get_name(key_type));
+		cinfo->pkcs8 = 1;
+		if (cinfo->password == NULL)
+			cinfo->password = "";
+	}
+
+	if (gnutls_x509_privkey_get_seed(key, NULL, NULL, 0) != GNUTLS_E_INVALID_REQUEST) {
+		if (cinfo->verbose)
+			fprintf(stderr, "Assuming --pkcs8 is given; provable private keys can only be exported in PKCS#8 format\n");
+		cinfo->pkcs8 = 1;
+		if (cinfo->password == NULL)
+			cinfo->password = "";
+	}
+}
+
+/* this must be provided by the app */
+const char *get_pass(void);
+const char *get_confirmed_pass(bool empty_ok);
+void app_exit(int val)
+#ifdef __GNUC__
+__attribute__ ((noreturn))
+#endif
+;
 int cipher_to_flags(const char *cipher);
 
 void
@@ -107,11 +151,19 @@ void dh_info(FILE * infile, FILE * outfile, common_info_st * ci);
 gnutls_x509_privkey_t *load_privkey_list(int mand, size_t * privkey_size,
 					 common_info_st * info);
 
-void _pubkey_info(FILE * outfile, gnutls_certificate_print_formats_t,
-		  gnutls_pubkey_t pubkey);
+void print_pubkey_info(gnutls_pubkey_t pubkey,
+		       FILE *outfile,
+		       gnutls_certificate_print_formats_t format,
+		       gnutls_x509_crt_fmt_t outcert_format,
+		       unsigned int outtext);
 void print_ecc_pkey(FILE * outfile, gnutls_ecc_curve_t curve,
 		    gnutls_datum_t * k, gnutls_datum_t * x,
 		    gnutls_datum_t * y, int cprint);
+void print_gost_pkey(FILE * outfile, gnutls_ecc_curve_t curve,
+		     gnutls_digest_algorithm_t digest,
+		     gnutls_gost_paramset_t paramset,
+		     gnutls_datum_t * k, gnutls_datum_t * x,
+		     gnutls_datum_t * y, int cprint);
 void print_rsa_pkey(FILE * outfile, gnutls_datum_t * m, gnutls_datum_t * e,
 		    gnutls_datum_t * d, gnutls_datum_t * p,
 		    gnutls_datum_t * q, gnutls_datum_t * u,
@@ -133,4 +185,12 @@ void fix_lbuffer(unsigned long);
 
 void decode_seed(gnutls_datum_t *seed, const char *hex, unsigned hex_size);
 
-#endif
+#define GNUTLS_PK_IS_RSA(pk) ((pk) == GNUTLS_PK_RSA || (pk) == GNUTLS_PK_RSA_PSS)
+
+gnutls_pk_algorithm_t figure_key_type(const char *key_type);
+
+gnutls_digest_algorithm_t hash_to_id(const char *hash);
+
+void sign_params_to_flags(common_info_st *cinfo, const char *params);
+
+#endif /* GNUTLS_SRC_CERTTOOL_COMMON_H */

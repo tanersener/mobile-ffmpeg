@@ -1,0 +1,1886 @@
+# Spanish transaltion for libgnutls 3.2.3.
+# Copyright (C) 2018 Free Software Foundation, Inc.
+# This file is distributed under the same license as the libgnutls package.
+# Francisco Javier Serrador <fserrador@gmail.com>, 2018.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: libgnutls 3.2.3\n"
+"Report-Msgid-Bugs-To: bug-gnutls@gnu.org\n"
+"POT-Creation-Date: 2019-05-25 22:49+0200\n"
+"PO-Revision-Date: 2018-05-02 19:11+0200\n"
+"Last-Translator: Francisco Javier Serrador <fserrador@gmail.com>\n"
+"Language-Team: Spanish <es@tp.org.es>\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Bugs: Report translation errors to the Language-Team address.\n"
+"X-Generator: Poedit 2.0.4\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-SourceCharset: ISO-8859-1\n"
+
+#: lib/alert.c:39
+msgid "Close notify"
+msgstr "Cerrar notificación"
+
+#: lib/alert.c:40
+msgid "Unexpected message"
+msgstr "Mensaje inesperado"
+
+#: lib/alert.c:41
+msgid "Bad record MAC"
+msgstr "Registro MAC equivocado"
+
+#: lib/alert.c:42
+msgid "Decryption failed"
+msgstr "Descifrado fallado"
+
+#: lib/alert.c:43
+msgid "Record overflow"
+msgstr "Desbordamiento de registro"
+
+#: lib/alert.c:45
+msgid "Decompression failed"
+msgstr "Descompresión fallada"
+
+#: lib/alert.c:46
+msgid "Handshake failed"
+msgstr "Coloquio fallado: %s"
+
+#: lib/alert.c:47
+msgid "Certificate is bad"
+msgstr "Certificado está equivocado"
+
+#: lib/alert.c:49
+msgid "Certificate is not supported"
+msgstr "Certificado no está soportado"
+
+#: lib/alert.c:51
+msgid "Certificate was revoked"
+msgstr "Certificado fue revocado"
+
+#: lib/alert.c:53
+msgid "Certificate is expired"
+msgstr "Certificado está caducado"
+
+#: lib/alert.c:55
+msgid "Unknown certificate"
+msgstr "Certificado desconocido"
+
+#: lib/alert.c:56
+msgid "Illegal parameter"
+msgstr "Parámetro ilegal"
+
+#: lib/alert.c:57
+msgid "CA is unknown"
+msgstr "CA es desconocido"
+
+#: lib/alert.c:58
+msgid "Access was denied"
+msgstr "Acceso fue denegado"
+
+#: lib/alert.c:59
+msgid "Decode error"
+msgstr "Decodificar error"
+
+#: lib/alert.c:60
+msgid "Decrypt error"
+msgstr "Error descifrado"
+
+#: lib/alert.c:61
+msgid "Export restriction"
+msgstr "Exportar restricción"
+
+#: lib/alert.c:63
+msgid "Error in protocol version"
+msgstr "Error en versión de protocolo"
+
+#: lib/alert.c:65
+msgid "Insufficient security"
+msgstr "Garantía insuficiente"
+
+#: lib/alert.c:66
+msgid "User canceled"
+msgstr "Usuario cancelado"
+
+#: lib/alert.c:68
+msgid "No certificate (SSL 3.0)"
+msgstr "Sin certificado (SSL 3.0)"
+
+#: lib/alert.c:69
+msgid "Internal error"
+msgstr "Error interno"
+
+#: lib/alert.c:71
+msgid "Inappropriate fallback"
+msgstr ""
+
+#: lib/alert.c:73
+msgid "No renegotiation is allowed"
+msgstr "Ninguna renegociación está permitida"
+
+#: lib/alert.c:75
+msgid "Could not retrieve the specified certificate"
+msgstr "No pudo obtener el certificado especificado"
+
+#: lib/alert.c:77
+msgid "An unsupported extension was sent"
+msgstr "Una extensión no soportada fue enviada"
+
+#: lib/alert.c:79
+msgid "The server name sent was not recognized"
+msgstr "El nombre del servidor enviado no fue reconocido"
+
+#: lib/alert.c:81
+msgid "The SRP/PSK username is missing or not known"
+msgstr "El nombre del usuario SRP/PSK falta o no es conocido"
+
+#: lib/alert.c:83
+msgid "An extension was expected but was not seen"
+msgstr ""
+
+#: lib/alert.c:86
+msgid "No supported application protocol could be negotiated"
+msgstr "Protocolo no compatible de aplicación no pudo ser negociado"
+
+#: lib/alert.c:88
+#, fuzzy
+msgid "Certificate is required"
+msgstr "Certificado está caducado"
+
+#: lib/errors.c:43
+msgid "Could not negotiate a supported cipher suite."
+msgstr "No pudo negociar un equipo de cifra mantenido."
+
+#: lib/errors.c:45
+msgid "No or insufficient priorities were set."
+msgstr "Ninguno o insuficientes prioridades fueron establecidas."
+
+#: lib/errors.c:47
+msgid "The cipher type is unsupported."
+msgstr "El tipo cifrado no es compatible."
+
+#: lib/errors.c:49
+msgid "The certificate and the given key do not match."
+msgstr "El certificado y la clave dada no coincide."
+
+#: lib/errors.c:52
+msgid "Could not negotiate a supported compression method."
+msgstr "No pudo negociar un método de compresión compatible."
+
+#: lib/errors.c:54
+msgid "An unknown public key algorithm was encountered."
+msgstr "Un algoritmo clave público desconocido fue encontrado."
+
+#: lib/errors.c:57
+msgid "An algorithm that is not enabled was negotiated."
+msgstr "Un algoritmo que no está activado fue negociado."
+
+#: lib/errors.c:60
+#, fuzzy
+msgid "A packet with illegal or unsupported version was received."
+msgstr "Un paquete de registro con versión ilegal fue recibido."
+
+#: lib/errors.c:63
+msgid ""
+"The Diffie-Hellman prime sent by the server is not acceptable (not long "
+"enough)."
+msgstr ""
+"El primo Diffie-Hellman enviado por el servidor no es aceptable (sin largura "
+"suficiente)"
+
+#: lib/errors.c:66
+msgid "Error decoding the received TLS packet."
+msgstr ""
+
+#: lib/errors.c:69
+#, fuzzy
+msgid "A TLS record packet with invalid length was received."
+msgstr "Un paquete TLS con longitud inesperado fue recibido."
+
+#: lib/errors.c:71
+msgid "The TLS connection was non-properly terminated."
+msgstr "La conexión TLS no fue apropiadamente finalizada."
+
+#: lib/errors.c:74
+msgid "The specified session has been invalidated for some reason."
+msgstr "La sesión especificada ha sido invalidada para otras razones."
+
+#: lib/errors.c:77
+msgid "GnuTLS internal error."
+msgstr "Error interno GnuTLS."
+
+#: lib/errors.c:79
+msgid "A connection with inappropriate fallback was attempted."
+msgstr ""
+
+#: lib/errors.c:81
+msgid "An illegal TLS extension was received."
+msgstr "Una extensión TSL ilegal fue recibida."
+
+#: lib/errors.c:83
+#, fuzzy
+msgid "An required TLS extension was received."
+msgstr "Una extensión TSL ilegal fue recibida."
+
+#: lib/errors.c:85
+msgid "A TLS fatal alert has been received."
+msgstr "Una alerta fatal TLS ha sido recibida."
+
+#: lib/errors.c:87
+msgid "An unexpected TLS packet was received."
+msgstr "Un paquete TLS inesperado fue recibido."
+
+#: lib/errors.c:89
+msgid "Failed to import the key into store."
+msgstr ""
+
+#: lib/errors.c:92
+msgid "An error was encountered at the TLS Finished packet calculation."
+msgstr "Un error fue encontrado en el paquete TLS Finalizado calculado."
+
+#: lib/errors.c:94 libdane/errors.c:67
+msgid "No certificate was found."
+msgstr "Ningún certificado fue encontrado."
+
+#: lib/errors.c:96
+#, fuzzy
+msgid "Certificate is required."
+msgstr "Certificado está caducado"
+
+#: lib/errors.c:99
+msgid "The given DSA key is incompatible with the selected TLS protocol."
+msgstr "La clave DSA dada es incompatible con el protocolo TLS seleccionado."
+
+#: lib/errors.c:102
+msgid "There is already a crypto algorithm with lower priority."
+msgstr "Ya hay un algoritmo de cifrado con prioridad más baja."
+
+#: lib/errors.c:105
+msgid "No temporary RSA parameters were found."
+msgstr "Ninguno de los parámetros RSA temporales fue encontrado."
+
+#: lib/errors.c:107
+msgid "No temporary DH parameters were found."
+msgstr "Ninguno de los parámetros DH temporales fue encontrado."
+
+#: lib/errors.c:109
+msgid "An unexpected TLS handshake packet was received."
+msgstr "Un paquete de negociación TLS inesperado fue recibido."
+
+#: lib/errors.c:111
+msgid "The scanning of a large integer has failed."
+msgstr "El análisis de un entero grande ha fallado."
+
+#: lib/errors.c:113
+msgid "Could not export a large integer."
+msgstr "No pudo exportar un gran entero largo."
+
+#: lib/errors.c:115
+msgid "Decryption has failed."
+msgstr "Descifrado ha fallado."
+
+#: lib/errors.c:117
+msgid "Encryption has failed."
+msgstr "Cifrado ha fallado."
+
+#: lib/errors.c:119
+msgid "Public key decryption has failed."
+msgstr "Descifrado de clave pública ha fallado."
+
+#: lib/errors.c:121
+msgid "Public key encryption has failed."
+msgstr "Cifrado de clave pública ha fallado."
+
+#: lib/errors.c:123
+msgid "Public key signing has failed."
+msgstr "Firma de clave pública ha fallado."
+
+#: lib/errors.c:125
+msgid "Public key signature verification has failed."
+msgstr "Verificación de firma de clave pública ha fallado."
+
+#: lib/errors.c:128
+msgid "Decompression of the TLS record packet has failed."
+msgstr "Descompresión del registro TLS del paquete ha fallado."
+
+#: lib/errors.c:130
+msgid "Compression of the TLS record packet has failed."
+msgstr "Compresión del registro TLS del paquete ha fallado."
+
+#: lib/errors.c:133
+msgid "Internal error in memory allocation."
+msgstr "Error interno dentro de reserva de memoria."
+
+#: lib/errors.c:136
+msgid "An unimplemented or disabled feature has been requested."
+msgstr "Una característica implementada o desactivada ha sido solicitada."
+
+#: lib/errors.c:138
+msgid "Insufficient credentials for that request."
+msgstr "Credenciales insuficientes para esa petición."
+
+#: lib/errors.c:140
+#, fuzzy
+msgid "Error in password/key file."
+msgstr "Error en fichero contraseña."
+
+#: lib/errors.c:141
+msgid "Wrong padding in PKCS1 packet."
+msgstr "Relleno empaquetado equivocado en paquete PLCS1."
+
+#: lib/errors.c:143
+#, fuzzy
+msgid "The session or certificate has expired."
+msgstr "La sesión solicitada ha caducado."
+
+#: lib/errors.c:145
+#, fuzzy
+msgid "The certificate is not yet activated."
+msgstr "El certificado tiene atributos no compatibles."
+
+#: lib/errors.c:147
+msgid "Hashing has failed."
+msgstr "Hash ha fallado."
+
+#: lib/errors.c:148
+msgid "Base64 decoding error."
+msgstr "Error decodificando Base64."
+
+#: lib/errors.c:150
+msgid "Base64 unexpected header error."
+msgstr "Cabecera inesperada de base64 errónea."
+
+#: lib/errors.c:152
+msgid "Base64 encoding error."
+msgstr "Error codificando Base64."
+
+#: lib/errors.c:154
+#, fuzzy
+msgid "Parsing error in password/key file."
+msgstr "Error al interpretar dentro del fichero de contraseña."
+
+#: lib/errors.c:156
+msgid "The requested data were not available."
+msgstr "Los datos solicitados no establan disponibles."
+
+#: lib/errors.c:158
+msgid "There are no embedded data in the structure."
+msgstr ""
+
+#: lib/errors.c:160
+msgid "Error in the pull function."
+msgstr "Error en la función empuje."
+
+#: lib/errors.c:161
+msgid "Error in the push function."
+msgstr "Error dentro de la función push."
+
+#: lib/errors.c:163
+msgid ""
+"The upper limit of record packet sequence numbers has been reached. Wow!"
+msgstr ""
+"El limite superior de secuencia registrada de paquetes ha sido alcanzado. "
+"¡Guau!"
+
+#: lib/errors.c:165
+msgid "Error in the certificate."
+msgstr "Error en el certificado."
+
+#: lib/errors.c:167
+#, fuzzy
+msgid "Error in the time fields of certificate."
+msgstr "Error en el certificado."
+
+#: lib/errors.c:169
+#, fuzzy
+msgid "Error in the certificate verification."
+msgstr "Error en el certificado."
+
+#: lib/errors.c:171
+#, fuzzy
+msgid "Error in the CRL verification."
+msgstr "Error en el certificado."
+
+#: lib/errors.c:173
+msgid "Error in the private key verification; seed doesn't match."
+msgstr ""
+
+#: lib/errors.c:175
+msgid "Could not authenticate peer."
+msgstr "No pudo autenticar pareja."
+
+#: lib/errors.c:178
+msgid "Unknown Subject Alternative name in X.509 certificate."
+msgstr "Nombra Sujeto Alternativo desconocido en certificado X.509."
+
+#: lib/errors.c:181
+msgid "CIDR name constraint is malformed in size or structure."
+msgstr ""
+
+#: lib/errors.c:185
+msgid "Unsupported critical extension in X.509 certificate."
+msgstr "Extensión crítica no compatible en certificado X.509."
+
+#: lib/errors.c:187
+msgid "Unsupported extension in X.509 certificate."
+msgstr "Extensión no compatible en certificados X.509."
+
+#: lib/errors.c:190
+msgid "Key usage violation in certificate has been detected."
+msgstr "Ha sido detectada una violación del uso de clave certificada."
+
+#: lib/errors.c:192 lib/errors.c:454
+msgid "Function was interrupted."
+msgstr "Función fue interrumpida."
+
+#: lib/errors.c:194
+msgid "TLS Application data were received, while expecting handshake data."
+msgstr ""
+"Datos de aplicación TLS fuero recibidos, mientras esperaban datos de "
+"coloquio."
+
+#: lib/errors.c:196
+msgid "Error in Database backend."
+msgstr "Error en backend de BD."
+
+#: lib/errors.c:197
+msgid "The Database entry already exists."
+msgstr ""
+
+#: lib/errors.c:198
+msgid "The certificate type is not supported."
+msgstr "El tipo certificado no está soportado."
+
+#: lib/errors.c:201
+msgid "The given memory buffer is too short to hold parameters."
+msgstr "El búfer de memoria dado es demasiado corto para albergar parámetros."
+
+#: lib/errors.c:203 libdane/errors.c:61
+msgid "The request is invalid."
+msgstr "La petición es inválida."
+
+#: lib/errors.c:205
+msgid "The cookie was bad."
+msgstr "El cookie estaba equivocado."
+
+#: lib/errors.c:206
+msgid "An illegal parameter has been received."
+msgstr "Un parámetro ilegal ha sido recibido."
+
+#: lib/errors.c:208
+msgid "An illegal parameter was found."
+msgstr "Un parámetro ilegal fue encontrado."
+
+#: lib/errors.c:210
+msgid "Error while reading file."
+msgstr "Error mientras lee fichero."
+
+#: lib/errors.c:211
+#, fuzzy
+msgid "A disallowed SNI server name has been received."
+msgstr "Un parámetro ilegal ha sido recibido."
+
+#: lib/errors.c:214
+msgid "ASN1 parser: Element was not found."
+msgstr "Intérprete ASN1: elemento no fue encontrado."
+
+#: lib/errors.c:216
+msgid "ASN1 parser: Identifier was not found"
+msgstr "Intérprete ASN1: identificador no fue encontrado"
+
+#: lib/errors.c:218
+msgid "ASN1 parser: Error in DER parsing."
+msgstr "Intérprete ASN1: Error en DER interpretando."
+
+#: lib/errors.c:220
+msgid "ASN1 parser: Value was not found."
+msgstr "Intérprete ASN1: valor fue no conocido."
+
+#: lib/errors.c:222
+msgid "ASN1 parser: Generic parsing error."
+msgstr "Intérprete ASN1: Error en interpretación genérica."
+
+#: lib/errors.c:224
+msgid "ASN1 parser: Value is not valid."
+msgstr "Intérprete ASN1: valor no es válido."
+
+#: lib/errors.c:226
+msgid "ASN1 parser: Error in TAG."
+msgstr "Intérprete ASN1: error en TAG."
+
+#: lib/errors.c:228
+msgid "ASN1 parser: error in implicit tag"
+msgstr "Intérprete ASN1: error en etiquetado implícito"
+
+#: lib/errors.c:230
+msgid "ASN1 parser: Error in type 'ANY'."
+msgstr "Intérprete ASN1: Error en tipo 'ANY'."
+
+#: lib/errors.c:232
+msgid "ASN1 parser: Syntax error."
+msgstr "Intérprete ASN1: error sintáctico."
+
+#: lib/errors.c:234
+msgid "ASN1 parser: Overflow in DER parsing."
+msgstr "Intérprete ASN1: Desbordamiento interpretación DER.."
+
+#: lib/errors.c:238
+msgid "Too many empty record packets have been received."
+msgstr "Han sido recibidos demasiados paquetes de registro vacíos."
+
+#: lib/errors.c:240
+msgid "Too many handshake packets have been received."
+msgstr "Han sido recibidos demasiados paquetes de saludos."
+
+#: lib/errors.c:242
+msgid "More than a single object matches the criteria."
+msgstr ""
+
+#: lib/errors.c:244
+msgid "The crypto library version is too old."
+msgstr "La versión de biblioteca criptográfica es demasiado antigua."
+
+#: lib/errors.c:247
+msgid "The tasn1 library version is too old."
+msgstr "La versión de biblioteca tasn1 es demasiado antigua."
+
+#: lib/errors.c:249
+msgid "The OpenPGP User ID is revoked."
+msgstr "El ID de Usuario OpenPGP está revocado."
+
+#: lib/errors.c:251
+msgid "The OpenPGP key has not a preferred key set."
+msgstr "La clave OpenPGP no tiene clave privilegiada establecida."
+
+#: lib/errors.c:253
+msgid "Error loading the keyring."
+msgstr "Error cargando el anillo."
+
+#: lib/errors.c:255
+msgid "The initialization of crypto backend has failed."
+msgstr "La inicialización del backend de cifrado ha fallado."
+
+#: lib/errors.c:258
+msgid "No supported compression algorithms have been found."
+msgstr "Ningún algoritmo de compresión compatible ha sido encontrado."
+
+#: lib/errors.c:260
+msgid "No supported cipher suites have been found."
+msgstr "Se han encontrado suites de cifrado sin apoyo."
+
+#: lib/errors.c:262
+msgid "Could not get OpenPGP key."
+msgstr "No pudo obtener clave OpenPGP."
+
+#: lib/errors.c:264
+msgid "Could not find OpenPGP subkey."
+msgstr "No pudo encontrar subclave OpenPGP."
+
+#: lib/errors.c:266
+msgid "Safe renegotiation failed."
+msgstr "Renegociación segura fallada."
+
+#: lib/errors.c:268
+msgid "Unsafe renegotiation denied."
+msgstr "Renegociación no segura denagada."
+
+#: lib/errors.c:271
+msgid "The SRP username supplied is illegal."
+msgstr "El usuario SRP admitió ser alegal."
+
+#: lib/errors.c:273
+#, fuzzy
+msgid "The username supplied is unknown."
+msgstr "El nombre de usuario SRP aplicado es desconocido."
+
+#: lib/errors.c:276
+msgid "The OpenPGP fingerprint is not supported."
+msgstr "La huella OpenPGP no es compatible."
+
+#: lib/errors.c:278
+msgid "The signature algorithm is not supported."
+msgstr "EL algoritmo firmador no es compatible."
+
+#: lib/errors.c:280
+msgid "The certificate has unsupported attributes."
+msgstr "El certificado tiene atributos no compatibles."
+
+#: lib/errors.c:282
+msgid "The OID is not supported."
+msgstr "El OID no está soportado."
+
+#: lib/errors.c:284
+msgid "The hash algorithm is unknown."
+msgstr "El algoritmo hash es desconocido."
+
+#: lib/errors.c:286
+msgid "The PKCS structure's content type is unknown."
+msgstr "El tipo de contenido estructural PKCS es desconocido."
+
+#: lib/errors.c:288
+msgid "The PKCS structure's bag type is unknown."
+msgstr "El tipo de empaquetado estructural PKCS es desconocido."
+
+#: lib/errors.c:290 lib/errors.c:296
+msgid "The given password contains invalid characters."
+msgstr "La contraseña dada contiene caracteres no válidos."
+
+#: lib/errors.c:292
+#, fuzzy
+msgid "The given string contains invalid UTF-8 characters."
+msgstr "La contraseña dada contiene caracteres no válidos."
+
+#: lib/errors.c:294
+#, fuzzy
+msgid "The given email string contains non-ASCII characters before '@'."
+msgstr "La contraseña dada contiene caracteres no válidos."
+
+#: lib/errors.c:299
+msgid "The Message Authentication Code verification failed."
+msgstr ""
+"La verificación del Código de Autenticación de Mensaje Autenticación fallado."
+
+#: lib/errors.c:301
+msgid "Some constraint limits were reached."
+msgstr "Algunos límites restrictivos fueron alcanzados."
+
+#: lib/errors.c:303
+msgid "Failed to acquire random data."
+msgstr "Falló al adquirir datos aleatorios."
+
+#: lib/errors.c:305
+msgid "Verifying TLS/IA phase checksum failed"
+msgstr "Verificando fase de suma comprobatoria TLS/AI fallada"
+
+#: lib/errors.c:308
+msgid "The specified algorithm or protocol is unknown."
+msgstr "El algoritmo especificado o protocolo es desconocido."
+
+#: lib/errors.c:311
+msgid "The handshake data size is too large."
+msgstr "El tamaño de datos del apretón de manos es demasiado largo."
+
+#: lib/errors.c:314
+msgid "Error opening /dev/crypto"
+msgstr "Error abriendo /dev/crypto"
+
+#: lib/errors.c:317
+msgid "Error interfacing with /dev/crypto"
+msgstr "Error interpolando con  /dev/crypto"
+
+#: lib/errors.c:319
+msgid "Peer has terminated the connection"
+msgstr "El compañero ha quitado la conexión"
+
+#: lib/errors.c:321
+msgid "Channel binding data not available"
+msgstr "Canal enlazando datos no disponible"
+
+#: lib/errors.c:324
+msgid "TPM error."
+msgstr "Error TPM."
+
+#: lib/errors.c:326
+msgid "The TPM library (trousers) cannot be found."
+msgstr ""
+
+#: lib/errors.c:328
+msgid "TPM is not initialized."
+msgstr "TPM no está inicializado."
+
+#: lib/errors.c:330
+msgid "TPM key was not found in persistent storage."
+msgstr "Clave TPM no fue encontrada dentro de almacenaje persistente."
+
+#: lib/errors.c:332
+msgid "Cannot initialize a session with the TPM."
+msgstr "No puede inicializar una sesión con el TPM."
+
+#: lib/errors.c:334
+msgid "PKCS #11 error."
+msgstr "Error PKCS #11."
+
+#: lib/errors.c:336
+msgid "PKCS #11 initialization error."
+msgstr "Error inicializador PKCS #11."
+
+#: lib/errors.c:338
+msgid "Error in parsing."
+msgstr "Error en interpretación."
+
+#: lib/errors.c:340
+msgid "Error in provided PIN."
+msgstr "Error en PIN proporcionado."
+
+#: lib/errors.c:342
+msgid "Error in provided SRK password for TPM."
+msgstr "Error en proporcionar contraseña SRK para TPM."
+
+#: lib/errors.c:345
+msgid "Error in provided password for key to be loaded in TPM."
+msgstr "Error en contraseña solicitada para tecla a ser cargada en TPM."
+
+#: lib/errors.c:347
+msgid "PKCS #11 error in slot"
+msgstr "PKCS #11 error en ranura"
+
+#: lib/errors.c:349
+msgid "Thread locking error"
+msgstr "Error bloqueando hilo"
+
+#: lib/errors.c:351
+msgid "PKCS #11 error in attribute"
+msgstr "PKCS #11 error en atributo"
+
+#: lib/errors.c:353
+msgid "PKCS #11 error in device"
+msgstr "PKCS #11 error en dispositivo"
+
+#: lib/errors.c:355
+msgid "PKCS #11 error in data"
+msgstr "PKCS #11 error en datos"
+
+#: lib/errors.c:357
+msgid "PKCS #11 unsupported feature"
+msgstr "Característica PKCS #11 sin apoyo"
+
+#: lib/errors.c:359
+msgid "PKCS #11 error in key"
+msgstr "PKCS #11 error en clave"
+
+#: lib/errors.c:361
+msgid "PKCS #11 PIN expired"
+msgstr "PKCS #11 PIN caducado"
+
+#: lib/errors.c:363
+msgid "PKCS #11 PIN locked"
+msgstr "PKCS #11 PIN bloqueado"
+
+#: lib/errors.c:365
+msgid "PKCS #11 error in session"
+msgstr "PKCS #11 error en sesión"
+
+#: lib/errors.c:367
+msgid "PKCS #11 error in signature"
+msgstr "PKCS #11 error en firma"
+
+#: lib/errors.c:369
+msgid "PKCS #11 error in token"
+msgstr "Error PKCS #11 en token"
+
+#: lib/errors.c:371
+msgid "PKCS #11 user error"
+msgstr "Error PKCS #11 usuario"
+
+#: lib/errors.c:373
+msgid "The operation timed out"
+msgstr "Tiempo de operación agotado"
+
+#: lib/errors.c:375
+msgid "The operation was cancelled due to user error"
+msgstr "La operación fue cancelada debido a error de usuario"
+
+#: lib/errors.c:377
+msgid "No supported ECC curves were found"
+msgstr "Ninguna de las curvas ECC encontradas fueron soportadas"
+
+#: lib/errors.c:379
+msgid "The curve is unsupported"
+msgstr "La curva no está soportado"
+
+#: lib/errors.c:381
+msgid "The requested PKCS #11 object is not available"
+msgstr "El objeto PKCS #11 solicitado no está disponible"
+
+#: lib/errors.c:384
+msgid ""
+"The provided X.509 certificate list is not sorted (in subject to issuer "
+"order)"
+msgstr ""
+"La lista de certificado X.509 proporcionada no está ordenada (dentro de "
+"sujeto a ordenamiento de emisor)"
+
+#: lib/errors.c:386
+msgid "The OCSP response is invalid"
+msgstr "La respuesta OCSP es inválida"
+
+#: lib/errors.c:388
+msgid "The OCSP response provided doesn't match the available certificates"
+msgstr ""
+
+#: lib/errors.c:390
+msgid "There is no certificate status (OCSP)."
+msgstr "No hay estado certificante (OCSP)."
+
+#: lib/errors.c:392
+msgid "Error in the system's randomness device."
+msgstr "Error en dispositivo aleatorio del sistema."
+
+#: lib/errors.c:395
+msgid "No common application protocol could be negotiated."
+msgstr "Ningún protocolo de aplicación común pudo ser negociado."
+
+#: lib/errors.c:397
+#, fuzzy
+msgid "Error while performing self checks."
+msgstr "Error mientras lee fichero."
+
+#: lib/errors.c:399
+msgid "There is no self test for this algorithm."
+msgstr ""
+
+#: lib/errors.c:401
+msgid ""
+"An error has been detected in the library and cannot continue operations."
+msgstr ""
+
+#: lib/errors.c:403
+#, fuzzy
+msgid "Error in sockets initialization."
+msgstr "Error dentro de la función push."
+
+#: lib/errors.c:405
+#, fuzzy
+msgid "Error in public key generation."
+msgstr "Error en la función empuje."
+
+#: lib/errors.c:407
+#, fuzzy
+msgid "Invalid TLS extensions length field."
+msgstr "Una extensión TSL ilegal fue recibida."
+
+#: lib/errors.c:409
+msgid "Peer's certificate or username has changed during a rehandshake."
+msgstr ""
+
+#: lib/errors.c:411
+msgid "The provided string has an embedded null."
+msgstr ""
+
+#: lib/errors.c:413
+msgid "Attempted handshake during false start."
+msgstr ""
+
+#: lib/errors.c:415
+#, fuzzy
+msgid "The SNI host name not recognised."
+msgstr "El nombre del servidor enviado no fue reconocido"
+
+#: lib/errors.c:417
+msgid "There was an issue converting to or from UTF8."
+msgstr ""
+
+#: lib/errors.c:419
+msgid "Cannot perform this action while handshake is in progress."
+msgstr ""
+
+#: lib/errors.c:421
+#, fuzzy
+msgid "The public key is invalid."
+msgstr "La petición es inválida."
+
+#: lib/errors.c:423
+msgid "There are no validation parameters present."
+msgstr ""
+
+#: lib/errors.c:425
+msgid "The public key parameters are invalid."
+msgstr ""
+
+#: lib/errors.c:427
+#, fuzzy
+msgid "The private key is invalid."
+msgstr "La petición es inválida."
+
+#: lib/errors.c:429
+#, fuzzy
+msgid "The DER time encoding is invalid."
+msgstr "La petición es inválida."
+
+#: lib/errors.c:431
+#, fuzzy
+msgid "The signature is incompatible with the public key."
+msgstr "La clave DSA dada es incompatible con el protocolo TLS seleccionado."
+
+#: lib/errors.c:433
+msgid "One of the involved algorithms has insufficient security level."
+msgstr ""
+
+#: lib/errors.c:435
+msgid "No common key share with peer."
+msgstr ""
+
+#: lib/errors.c:437
+msgid "The early data were rejected."
+msgstr ""
+
+#: lib/errors.c:443 libdane/errors.c:42
+msgid "Success."
+msgstr "Correcto."
+
+#: lib/errors.c:444
+msgid "A TLS warning alert has been received."
+msgstr "Una alerta de advertencia TLS ha sido recibida."
+
+#: lib/errors.c:446
+msgid "A heartbeat pong message was received."
+msgstr "Un latido de mensaje pong fue recibido."
+
+#: lib/errors.c:448
+msgid "A heartbeat ping message was received."
+msgstr "Un latido de mensaje ping fue recibido."
+
+#: lib/errors.c:450
+msgid "Resource temporarily unavailable, try again."
+msgstr "Recurso temporalmente no disponible, pruebe de nuevo."
+
+#: lib/errors.c:452
+msgid "The transmitted packet is too large (EMSGSIZE)."
+msgstr "El paquete transmitido es muy grande (EMSCSIZE)."
+
+#: lib/errors.c:455
+msgid "Rehandshake was requested by the peer."
+msgstr "Negociación fue solicitado por el compañero."
+
+#: lib/errors.c:457
+#, fuzzy
+msgid "Re-authentication was requested by the peer."
+msgstr "Negociación fue solicitado por el compañero."
+
+#: lib/errors.c:549 libdane/errors.c:100
+msgid "(unknown error code)"
+msgstr "(código erróneo desconocido)"
+
+#: lib/x509/ocsp.c:2605
+#, fuzzy
+msgid "The OCSP response is trusted. "
+msgstr "La respuesta OCSP es inválida"
+
+#: lib/x509/ocsp.c:2610
+#, fuzzy
+msgid "The OCSP response's signer could not be found. "
+msgstr "La respuesta OCSP es inválida"
+
+#: lib/x509/ocsp.c:2615
+msgid "Error in the signer's key usageflags. "
+msgstr ""
+
+#: lib/x509/ocsp.c:2620
+#, fuzzy
+msgid "The OCSP response's signer is not trusted. "
+msgstr "La respuesta OCSP es inválida"
+
+#: lib/x509/ocsp.c:2625
+#, fuzzy
+msgid "The OCSP response depends on insecure algorithms. "
+msgstr "La respuesta OCSP es inválida"
+
+#: lib/x509/ocsp.c:2630
+#, fuzzy
+msgid "The OCSP response's signature cannot be validated. "
+msgstr "La respuesta OCSP es inválida"
+
+#: lib/x509/ocsp.c:2635
+msgid "The OCSP response's signer's certificate is not activated. "
+msgstr ""
+
+#: lib/x509/ocsp.c:2640
+#, fuzzy
+msgid "The OCSP response's signer's certificate is expired. "
+msgstr "La respuesta OCSP es inválida"
+
+#: lib/x509/ocsp.c:2644
+#, fuzzy
+msgid "Memory error"
+msgstr "Error descifrado"
+
+#: lib/x509/ocsp_output.c:50 lib/x509/ocsp_output.c:276 lib/x509/output.c:1575
+#: lib/x509/output.c:2108 lib/x509/output.c:2506
+#, c-format
+msgid "\tVersion: %d\n"
+msgstr "\tVersión: %d\n"
+
+#: lib/x509/ocsp_output.c:136 lib/x509/ocsp_output.c:500 lib/x509/output.c:2276
+#: lib/x509/output.c:2670
+msgid "\t\t\tASCII: "
+msgstr "\t\t\tASCII: "
+
+#: lib/x509/ocsp_output.c:141 lib/x509/ocsp_output.c:505 lib/x509/output.c:2280
+#: lib/x509/output.c:2675
+msgid "\t\t\tHexdump: "
+msgstr "\t\t\tVolcadoHex: "
+
+#: lib/x509/ocsp_output.c:186
+msgid "OCSP Request Information:\n"
+msgstr "Petición Informativa OCSP:\n"
+
+#: lib/x509/ocsp_output.c:289
+#, fuzzy
+msgid "\tResponder Key ID: "
+msgstr "\tRespondedor ID: %.*s\n"
+
+#: lib/x509/ocsp_output.c:299
+#, fuzzy, c-format
+msgid "\tResponder ID: %s\n"
+msgstr "\tRespondedor ID: %.*s\n"
+
+#: lib/x509/ocsp_output.c:320
+#, c-format
+msgid "\tProduced At: %s\n"
+msgstr "\tProducido en: %s\n"
+
+#: lib/x509/ocsp_output.c:414
+#, c-format
+msgid "\t\tRevocation time: %s\n"
+msgstr "\t\tHora revocada: %s\n"
+
+#: lib/x509/ocsp_output.c:434
+#, c-format
+msgid "\t\tThis Update: %s\n"
+msgstr "\t\tEsta Actualización: %s\n"
+
+#: lib/x509/ocsp_output.c:452
+#, c-format
+msgid "\t\tNext Update: %s\n"
+msgstr "\t\tSiguiente Actualización: %s\n"
+
+#: lib/x509/ocsp_output.c:524 lib/x509/output.c:1239 lib/x509/output.c:1510
+#: lib/x509/output.c:1636 lib/x509/output.c:1656 lib/x509/output.c:1700
+#: lib/x509/output.c:1928 lib/x509/output.c:1941 lib/x509/output.c:2355
+#: lib/x509/output.c:2483 lib/x509/output.c:2534
+msgid "unknown"
+msgstr "desconocido"
+
+#: lib/x509/ocsp_output.c:525 lib/x509/output.c:1704 lib/x509/output.c:2359
+#: lib/x509/output.c:2538
+#, c-format
+msgid "\tSignature Algorithm: %s\n"
+msgstr "\tAlgoritmo Firma: %s\n"
+
+#: lib/x509/ocsp_output.c:529 lib/x509/output.c:1711 lib/x509/output.c:2364
+msgid ""
+"warning: signed using a broken signature algorithm that can be forged.\n"
+msgstr ""
+"aviso: firmado utilizando un algoritmo de firma defectuoso que puede ser "
+"forzado.\n"
+" \n"
+
+#: lib/x509/ocsp_output.c:543 lib/x509/output.c:1737 lib/x509/output.c:2390
+msgid "\tSignature:\n"
+msgstr "\tFirma:\n"
+
+#: lib/x509/ocsp_output.c:651
+msgid "OCSP Response Information:\n"
+msgstr "Información Responsable OCSP:\n"
+
+#: lib/x509/output.c:54 lib/x509/output.c:84
+#, c-format
+msgid "%s%s: %.*s (contains illegal chars)\n"
+msgstr ""
+
+#: lib/x509/output.c:60 lib/x509/output.c:90
+#, c-format
+msgid "%s%s: %.*s (%s)\n"
+msgstr ""
+
+#: lib/x509/output.c:68 lib/x509/output.c:98
+#, c-format
+msgid "%s%s: %.*s\n"
+msgstr ""
+
+#: lib/x509/output.c:114
+#, fuzzy
+msgid "warning: SAN contains an embedded NUL, replacing with '!'\n"
+msgstr "aviso: altname contiene un NULO embebido, remplazando con '!'\n"
+
+#: lib/x509/output.c:130
+#, c-format
+msgid "%sURI: %.*s\n"
+msgstr ""
+
+#: lib/x509/output.c:144
+#, fuzzy, c-format
+msgid "%sdirectoryName: %.*s\n"
+msgstr "%s\t\t\totherName OID: %.*s\n"
+
+#: lib/x509/output.c:148
+#, fuzzy, c-format
+msgid "%sXMPP Address: %.*s\n"
+msgstr "%s\t\t\tDirección XMPP: %.*s\n"
+
+#: lib/x509/output.c:152
+#, c-format
+msgid "%sKRB5Principal: %.*s\n"
+msgstr ""
+
+#: lib/x509/output.c:156
+#, c-format
+msgid "%sUnknown name: "
+msgstr ""
+
+#: lib/x509/output.c:298
+#, c-format
+msgid "\t\t\tPath Length Constraint: %d\n"
+msgstr "\t\t\tRestricción de Longitud de Ruta: %d\n"
+
+#: lib/x509/output.c:300
+#, c-format
+msgid "\t\t\tPolicy Language: %s"
+msgstr "\t\t\tIdioma Normativo: %s"
+
+#: lib/x509/output.c:308
+msgid ""
+"\t\t\tPolicy:\n"
+"\t\t\t\tASCII: "
+msgstr ""
+"\t\t\tNormativa:\n"
+"\t\t\t\tASCII: "
+
+#: lib/x509/output.c:310
+msgid ""
+"\n"
+"\t\t\t\tHexdump: "
+msgstr ""
+"\n"
+"\t\t\t\tVolcadoHex: "
+
+#: lib/x509/output.c:343
+#, c-format
+msgid "%s\t\t\tPermitted:\n"
+msgstr ""
+
+#: lib/x509/output.c:355
+#, c-format
+msgid "%s\t\t\tExcluded:\n"
+msgstr ""
+
+#: lib/x509/output.c:395 lib/x509/output.c:397 lib/x509/output.c:399
+#, fuzzy, c-format
+msgid "\t\t\tAccess Method: %s (%s)\n"
+msgstr "\t\t\tMétodo Acceso: %.*s"
+
+#: lib/x509/output.c:503
+#, c-format
+msgid "%sDigital signature.\n"
+msgstr "%sFirma digital.\n"
+
+#: lib/x509/output.c:505
+#, c-format
+msgid "%sNon repudiation.\n"
+msgstr "%sNo repudiado.\n"
+
+#: lib/x509/output.c:507
+#, c-format
+msgid "%sKey encipherment.\n"
+msgstr "%sCifrador clave.\n"
+
+#: lib/x509/output.c:509
+#, c-format
+msgid "%sData encipherment.\n"
+msgstr ""
+"%sDado cifrado.\n"
+"\n"
+
+#: lib/x509/output.c:511
+#, c-format
+msgid "%sKey agreement.\n"
+msgstr "%sClave de acuerdo.\n"
+
+#: lib/x509/output.c:513
+#, c-format
+msgid "%sCertificate signing.\n"
+msgstr "%sCertificado firmado.\n"
+
+#: lib/x509/output.c:515
+#, c-format
+msgid "%sCRL signing.\n"
+msgstr "%sCRL firmando.\n"
+
+#: lib/x509/output.c:517
+#, c-format
+msgid "%sKey encipher only.\n"
+msgstr "%sSolo cifrador clave.\n"
+
+#: lib/x509/output.c:519
+#, c-format
+msgid "%sKey decipher only.\n"
+msgstr "%sSolo descifrador clave.\n"
+
+#: lib/x509/output.c:563
+#, c-format
+msgid "\t\t\tNot Before: %s\n"
+msgstr "\t\t\tNo Anterior: %s\n"
+
+#: lib/x509/output.c:572
+#, c-format
+msgid "\t\t\tNot After: %s\n"
+msgstr "\t\t\tNo Tras: %s\n"
+
+#: lib/x509/output.c:650
+#, c-format
+msgid "%s\t\t\tTLS WWW Server.\n"
+msgstr "%s\t\t\tServidor WWW TLS.\n"
+
+#: lib/x509/output.c:652
+#, c-format
+msgid "%s\t\t\tTLS WWW Client.\n"
+msgstr "%s\t\t\tCliente WWW TLS.\n"
+
+#: lib/x509/output.c:654
+#, c-format
+msgid "%s\t\t\tCode signing.\n"
+msgstr "%s\t\t\tFirma de código.\n"
+
+#: lib/x509/output.c:656
+#, c-format
+msgid "%s\t\t\tEmail protection.\n"
+msgstr "%s\t\t\tProtección correo-e.\n"
+
+#: lib/x509/output.c:659
+#, c-format
+msgid "%s\t\t\tTime stamping.\n"
+msgstr "%s\t\t\tHora sellada.\n"
+
+#: lib/x509/output.c:661
+#, c-format
+msgid "%s\t\t\tOCSP signing.\n"
+msgstr "%s\t\t\tFirma OCSP.\n"
+
+#: lib/x509/output.c:663
+#, c-format
+msgid "%s\t\t\tIpsec IKE.\n"
+msgstr "%s\t\t\tIpsec IKE.\n"
+
+#: lib/x509/output.c:665
+#, c-format
+msgid "%s\t\t\tAny purpose.\n"
+msgstr "%s\t\t\tCualquier propósito.\n"
+
+#: lib/x509/output.c:688
+#, c-format
+msgid "%s\t\t\tCertificate Authority (CA): FALSE\n"
+msgstr "%s\t\t\tCertificado Autoritario (CA): FALSO\n"
+
+#: lib/x509/output.c:691
+#, c-format
+msgid "%s\t\t\tCertificate Authority (CA): TRUE\n"
+msgstr "%s\t\t\tCertificado de Autoridad (CA): CIERTO\n"
+
+#: lib/x509/output.c:695
+#, c-format
+msgid "%s\t\t\tPath Length Constraint: %d\n"
+msgstr "%s\t\t\tRuta de Longitud Constante: %d\n"
+
+#: lib/x509/output.c:751
+#, c-format
+msgid "%s\t\t\totherName OID: %.*s\n"
+msgstr "%s\t\t\totherName OID: %.*s\n"
+
+#: lib/x509/output.c:753
+#, c-format
+msgid "%s\t\t\totherName DER: "
+msgstr "%s\t\t\totherName DER: "
+
+#: lib/x509/output.c:756
+#, c-format
+msgid ""
+"\n"
+"%s\t\t\totherName ASCII: "
+msgstr ""
+"\n"
+"%s\t\t\totherName ASCII: "
+
+#: lib/x509/output.c:896
+#, c-format
+msgid "%s\t\tBasic Constraints (%s):\n"
+msgstr "%s\t\tContingencia Básia (%s):\n"
+
+#: lib/x509/output.c:898 lib/x509/output.c:912 lib/x509/output.c:957
+#: lib/x509/output.c:991 lib/x509/output.c:1004 lib/x509/output.c:1016
+#: lib/x509/output.c:1031 lib/x509/output.c:1043 lib/x509/output.c:1056
+#: lib/x509/output.c:1068 lib/x509/output.c:1082 lib/x509/output.c:1096
+#: lib/x509/output.c:1104 lib/x509/output.c:1115 lib/x509/output.c:1126
+#: lib/x509/output.c:1134 lib/x509/output.c:2217 lib/x509/output.c:2242
+#: lib/x509/output.c:2262
+msgid "critical"
+msgstr "crítico"
+
+#: lib/x509/output.c:898 lib/x509/output.c:912 lib/x509/output.c:958
+#: lib/x509/output.c:992 lib/x509/output.c:1004 lib/x509/output.c:1016
+#: lib/x509/output.c:1031 lib/x509/output.c:1043 lib/x509/output.c:1056
+#: lib/x509/output.c:1068 lib/x509/output.c:1082 lib/x509/output.c:1096
+#: lib/x509/output.c:1104 lib/x509/output.c:1115 lib/x509/output.c:1126
+#: lib/x509/output.c:1134 lib/x509/output.c:2218 lib/x509/output.c:2243
+#: lib/x509/output.c:2263
+msgid "not critical"
+msgstr "no crítico"
+
+#: lib/x509/output.c:910
+#, c-format
+msgid "%s\t\tSubject Key Identifier (%s):\n"
+msgstr "%s\t\tSujeto Clave Identificador (%s):\n"
+
+#: lib/x509/output.c:1002
+#, c-format
+msgid "%s\t\tAuthority Key Identifier (%s):\n"
+msgstr "%s\t\tClave Autoritaria Identificadora (%s):\n"
+
+#: lib/x509/output.c:1015
+#, c-format
+msgid "%s\t\tKey Usage (%s):\n"
+msgstr "%s\t\tClave Utilizada (%s):\n"
+
+#: lib/x509/output.c:1029
+#, c-format
+msgid "%s\t\tPrivate Key Usage Period (%s):\n"
+msgstr "%s\t\tClave Privada de Utilización Periódica (%s):\n"
+
+#: lib/x509/output.c:1042
+#, c-format
+msgid "%s\t\tKey Purpose (%s):\n"
+msgstr "%s\t\tPropósito Clave (%s):\n"
+
+#: lib/x509/output.c:1054
+#, c-format
+msgid "%s\t\tSubject Alternative Name (%s):\n"
+msgstr "%s\t\tNombre Alternativo Sujeto (%s):\n"
+
+#: lib/x509/output.c:1066
+#, c-format
+msgid "%s\t\tIssuer Alternative Name (%s):\n"
+msgstr "%s\t\tNombre Emisor Alternativo (%s):\n"
+
+#: lib/x509/output.c:1080
+#, c-format
+msgid "%s\t\tCRL Distribution points (%s):\n"
+msgstr "%s\t\tPuntos CRL Distribución (%s):\n"
+
+#: lib/x509/output.c:1094
+#, c-format
+msgid "%s\t\tProxy Certificate Information (%s):\n"
+msgstr "%s\t\tInformación Certificada Proxy (%s):\n"
+
+#: lib/x509/output.c:1102
+#, c-format
+msgid "%s\t\tAuthority Information Access (%s):\n"
+msgstr ""
+"%s\t\tInformación Autoritativa de Acceso (%s):\n"
+"\n"
+
+#: lib/x509/output.c:1114
+#, fuzzy, c-format
+msgid "%s\t\tName Constraints (%s):\n"
+msgstr "%s\t\tContingencia Básia (%s):\n"
+
+#: lib/x509/output.c:1124
+#, fuzzy, c-format
+msgid "%s\t\tTLS Features (%s):\n"
+msgstr "%s\t\tPropósito Clave (%s):\n"
+
+#: lib/x509/output.c:1132
+#, c-format
+msgid "%s\t\tUnknown extension %s (%s):\n"
+msgstr "%s\t\tExtensión desconocida %s (%s):\n"
+
+#: lib/x509/output.c:1136
+#, c-format
+msgid "%s\t\t\tASCII: "
+msgstr "%s\t\t\tASCII: "
+
+#: lib/x509/output.c:1140
+#, c-format
+msgid "%s\t\t\tHexdump: "
+msgstr "%s\t\t\tVolvadoHex: "
+
+#: lib/x509/output.c:1189
+#, c-format
+msgid "%s\tExtensions:\n"
+msgstr "%s\tExtensiones:\n"
+
+#: lib/x509/output.c:1241
+#, c-format
+msgid "\t%sPublic Key Algorithm: %s\n"
+msgstr "\t%sAlcoritmo de Clave Pública: %s\n"
+
+#: lib/x509/output.c:1243
+#, c-format
+msgid "\tAlgorithm Security Level: %s (%d bits)\n"
+msgstr "\tNivel Garantizado Algoritmo: %s (%d bits)\n"
+
+#: lib/x509/output.c:1248
+msgid "\t\tParameters:\n"
+msgstr ""
+
+#: lib/x509/output.c:1268
+#, c-format
+msgid "\t\tModulus (bits %d): "
+msgstr "\t\tModulus (bits %d): "
+
+#: lib/x509/output.c:1275
+#, c-format
+msgid "\t\tExponent (bits %d): "
+msgstr "\t\tExponente (bits %d): "
+
+#: lib/x509/output.c:1283
+#, c-format
+msgid "\t\tModulus (bits %d):\n"
+msgstr "\t\tModulus (bits %d):\n"
+
+#: lib/x509/output.c:1290
+#, c-format
+msgid "\t\tExponent (bits %d):\n"
+msgstr "\t\tExponente (bits %d):\n"
+
+#: lib/x509/output.c:1317 lib/x509/output.c:1437
+#, c-format
+msgid "\t\tCurve:\t%s\n"
+msgstr "\t\tCurva:\t%s\n"
+
+#: lib/x509/output.c:1321 lib/x509/output.c:1447
+msgid "\t\tX: "
+msgstr "\t\tX: "
+
+#: lib/x509/output.c:1327 lib/x509/output.c:1452
+msgid "\t\tY: "
+msgstr "\t\tY: "
+
+#: lib/x509/output.c:1334 lib/x509/output.c:1458
+msgid "\t\tX:\n"
+msgstr "\t\tX:\n"
+
+#: lib/x509/output.c:1339 lib/x509/output.c:1462
+msgid "\t\tY:\n"
+msgstr "\t\tY:\n"
+
+#: lib/x509/output.c:1367
+#, c-format
+msgid "\t\tPublic key (bits %d): "
+msgstr "\t\tClave pública (%d bits): "
+
+#: lib/x509/output.c:1373
+msgid "\t\tP: "
+msgstr "\t\tP: "
+
+#: lib/x509/output.c:1378
+msgid "\t\tQ: "
+msgstr "\t\tQ: "
+
+#: lib/x509/output.c:1383
+msgid "\t\tG: "
+msgstr "\t\tG: "
+
+#: lib/x509/output.c:1391
+#, c-format
+msgid "\t\tPublic key (bits %d):\n"
+msgstr "\t\tClave pública (%d bits):\n"
+
+#: lib/x509/output.c:1396
+msgid "\t\tP:\n"
+msgstr "\t\tP:\n"
+
+#: lib/x509/output.c:1400
+msgid "\t\tQ:\n"
+msgstr "\t\tQ:\n"
+
+#: lib/x509/output.c:1404
+msgid "\t\tG:\n"
+msgstr "\t\tG:\n"
+
+#: lib/x509/output.c:1439
+#, fuzzy, c-format
+msgid "\t\tDigest:\t%s\n"
+msgstr "\t\tCurva:\t%s\n"
+
+#: lib/x509/output.c:1441
+#, fuzzy, c-format
+msgid "\t\tParamSet: %s\n"
+msgstr "\t\tCreación: %s\n"
+
+#: lib/x509/output.c:1554 lib/x509/output.c:2473
+msgid "Subject "
+msgstr "Asunto "
+
+#: lib/x509/output.c:1590
+msgid "\tSerial Number (hex): "
+msgstr "\tNúmero serial (hex): "
+
+#: lib/x509/output.c:1603 lib/x509/output.c:2118
+#, fuzzy
+msgid "\tIssuer:\n"
+msgstr "\tEmisor: %s\n"
+
+#: lib/x509/output.c:1608 lib/x509/output.c:2123
+#, c-format
+msgid "\tIssuer: %s\n"
+msgstr "\tEmisor: %s\n"
+
+#: lib/x509/output.c:1617
+msgid "\tValidity:\n"
+msgstr "\tValidación:\n"
+
+#: lib/x509/output.c:1634 lib/x509/output.c:1636
+#, c-format
+msgid "\t\tNot Before: %s\n"
+msgstr "\t\tNo Anterior: %s\n"
+
+#: lib/x509/output.c:1654 lib/x509/output.c:1656
+#, c-format
+msgid "\t\tNot After: %s\n"
+msgstr "\t\tNo Tras: %s\n"
+
+#: lib/x509/output.c:1667 lib/x509/output.c:2516
+#, fuzzy
+msgid "\tSubject:\n"
+msgstr "\tAsunto: %s\n"
+
+#: lib/x509/output.c:1672 lib/x509/output.c:2521
+#, c-format
+msgid "\tSubject: %s\n"
+msgstr "\tAsunto: %s\n"
+
+#: lib/x509/output.c:1751
+#, fuzzy
+msgid "\tFingerprint:\n"
+msgstr "huella: "
+
+#: lib/x509/output.c:1760
+msgid "\t\tsha1:"
+msgstr ""
+
+#: lib/x509/output.c:1771
+msgid "\t\tsha256:"
+msgstr ""
+
+#: lib/x509/output.c:1805
+#, fuzzy, c-format
+msgid ""
+"%sPublic Key ID:\n"
+"%s\tsha1:"
+msgstr "ID Clave Pública: "
+
+#: lib/x509/output.c:1811
+#, fuzzy, c-format
+msgid ""
+"%sPublic Key PIN:\n"
+"%s\tpin-sha256:"
+msgstr ""
+"\tId Clave Pública:\n"
+"\t\t"
+
+#: lib/x509/output.c:1883
+#, fuzzy
+msgid "no subject,"
+msgstr "Asunto "
+
+#: lib/x509/output.c:1899
+msgid "no issuer,"
+msgstr ""
+
+#: lib/x509/output.c:1946
+#, c-format
+msgid "signed using %s (broken!), "
+msgstr "firmado utilizando %s (¡defectuoso!), "
+
+#: lib/x509/output.c:1948
+#, c-format
+msgid "signed using %s, "
+msgstr "firmado utilizando %s, "
+
+#: lib/x509/output.c:2084
+msgid "X.509 Certificate Information:\n"
+msgstr "Información Certificadora X.509:\n"
+
+#: lib/x509/output.c:2088 lib/x509/output.c:2728
+msgid "Other Information:\n"
+msgstr ""
+"Otra información:\n"
+"\n"
+
+#: lib/x509/output.c:2103
+msgid "\tVersion: 1 (default)\n"
+msgstr "\tVersión: 1 (predet.)\n"
+
+#: lib/x509/output.c:2132
+msgid "\tUpdate dates:\n"
+msgstr "\tActualizar datos:\n"
+
+#: lib/x509/output.c:2149
+#, c-format
+msgid "\t\tIssued: %s\n"
+msgstr "\t\tEmitido: %s\n"
+
+#: lib/x509/output.c:2169
+#, c-format
+msgid "\t\tNext at: %s\n"
+msgstr "\t\tSiguiente en: %s\n"
+
+#: lib/x509/output.c:2200
+msgid "\tExtensions:\n"
+msgstr "\tExtensiones:\n"
+
+#: lib/x509/output.c:2216
+#, c-format
+msgid "\t\tCRL Number (%s): "
+msgstr "\t\tCRL Numérico (%s): "
+
+#: lib/x509/output.c:2241
+#, c-format
+msgid "\t\tAuthority Key Identifier (%s):\n"
+msgstr "\t\tIdentificador de Clave Autoritaria (%s):\n"
+
+#: lib/x509/output.c:2260
+#, c-format
+msgid "\t\tUnknown extension %s (%s):\n"
+msgstr "\t\tExtensión desconocida %s (%s):\n"
+
+#: lib/x509/output.c:2297
+#, c-format
+msgid "\tRevoked certificates (%d):\n"
+msgstr "\tCertificado revocado (%d):\n"
+
+#: lib/x509/output.c:2300
+msgid "\tNo revoked certificates.\n"
+msgstr "\tNingún certificado revocado.\n"
+
+#: lib/x509/output.c:2321
+msgid "\t\tSerial Number (hex): "
+msgstr "\t\tNúmero serial (hex): "
+
+#: lib/x509/output.c:2339
+#, c-format
+msgid "\t\tRevoked at: %s\n"
+msgstr "\t\tRevocado en: %s\n"
+
+#: lib/x509/output.c:2421
+msgid "X.509 Certificate Revocation List Information:\n"
+msgstr ""
+"Información Listada de Revocaciones de Certificados X.509:\n"
+"\n"
+
+#: lib/x509/output.c:2571
+msgid "\tAttributes:\n"
+msgstr "\tAtributos:\n"
+
+#: lib/x509/output.c:2628
+#, c-format
+msgid "\t\tChallenge password: %s\n"
+msgstr "\t\tContraseña de negociación: %s\n"
+
+#: lib/x509/output.c:2638
+#, c-format
+msgid "\t\tUnknown attribute %s:\n"
+msgstr "\t\tAtributo desconocido %s:\n"
+
+#: lib/x509/output.c:2724
+msgid "PKCS #10 Certificate Request Information:\n"
+msgstr "Solicitud de Información del Certificado PKCS #10:\n"
+
+#: lib/x509/output.c:2751
+msgid "Public Key Usage:\n"
+msgstr "Utilización de Clave Pública:\n"
+
+#: lib/x509/output.c:2791
+msgid "Public Key Information:\n"
+msgstr "Información de Clave Pública:\n"
+
+#: libdane/dane.c:1050
+#, fuzzy
+msgid "Certificate matches. "
+msgstr "Certificado está equivocado"
+
+#: libdane/dane.c:1053
+#, fuzzy
+msgid "Verification failed. "
+msgstr "Descifrado fallado"
+
+#: libdane/dane.c:1058
+#, fuzzy
+msgid "CA constrains were violated. "
+msgstr "Algunos límites restrictivos fueron alcanzados."
+
+#: libdane/dane.c:1062
+#, fuzzy
+msgid "The certificate differs. "
+msgstr "Certificado está equivocado"
+
+#: libdane/dane.c:1067
+msgid "There were no DANE information. "
+msgstr ""
+
+#: libdane/errors.c:43
+msgid "There was error initializing the DNS query."
+msgstr ""
+
+#: libdane/errors.c:45
+msgid "There was an error while resolving."
+msgstr ""
+
+#: libdane/errors.c:47
+#, fuzzy
+msgid "No DANE data were found."
+msgstr "Ninguno de los parámetros DH temporales fue encontrado."
+
+#: libdane/errors.c:49
+msgid "Unknown DANE data were found."
+msgstr ""
+
+#: libdane/errors.c:51
+#, fuzzy
+msgid "No DNSSEC signature was found."
+msgstr "Ningún certificado fue encontrado."
+
+#: libdane/errors.c:53
+msgid "Received corrupt data."
+msgstr ""
+
+#: libdane/errors.c:55
+#, fuzzy
+msgid "The DNSSEC signature is invalid."
+msgstr "La respuesta OCSP es inválida"
+
+#: libdane/errors.c:57
+msgid "There was a memory error."
+msgstr ""
+
+#: libdane/errors.c:59
+#, fuzzy
+msgid "The requested data are not available."
+msgstr "Los datos solicitados no establan disponibles."
+
+#: libdane/errors.c:63
+#, fuzzy
+msgid "There was an error in the certificate."
+msgstr "Error en el certificado."
+
+#: libdane/errors.c:65
+msgid "There was an error in the public key."
+msgstr ""
+
+#: libdane/errors.c:69
+#, fuzzy
+msgid "Error in file."
+msgstr "Error en fichero contraseña."
+
+#~ msgid "Received a TLS/IA Intermediate Phase Finished message"
+#~ msgstr "Recibió un mensaje de Fase TLS/IA Intermediada Terminada"
+
+#~ msgid "Received a TLS/IA Final Phase Finished message"
+#~ msgstr "Recibió un mensaje de Fase TLS/IA Final Terminada"
+
+#~ msgid "\t\tKey Usage:\n"
+#~ msgstr "\t\tClave Utilizada:\n"
+
+#~ msgid "error: get_key_usage: %s\n"
+#~ msgstr "error: get_key_usage: %s\n"
+
+#~ msgid "\t\t\tDigital signatures.\n"
+#~ msgstr "\t\t\tFirmas digitales.\n"
+
+#~ msgid "\t\t\tCommunications encipherment.\n"
+#~ msgstr "\t\t\tComunicaciones cifradas.\n"
+
+#~ msgid "\t\t\tStorage data encipherment.\n"
+#~ msgstr "\t\t\tEncriptación de datos almacenados.\n"
+
+#~ msgid "\t\t\tAuthentication.\n"
+#~ msgstr "\t\t\tAutenticación.\n"
+
+#~ msgid "\t\t\tCertificate signing.\n"
+#~ msgstr "\t\t\tCertificado firmado.\n"
+
+#~ msgid "\tID (hex): "
+#~ msgstr "\tID (hex): "
+
+#~ msgid "\tFingerprint (hex): "
+#~ msgstr "\tHuella (hex): "
+
+#~ msgid "\tFingerprint's random art:\n"
+#~ msgstr "\tArte aleatorio huella:\n"
+
+#~ msgid "\tRevoked: True\n"
+#~ msgstr "\tRevocado: Cierto\n"
+
+#~ msgid "\tRevoked: False\n"
+#~ msgstr "\tRevocado: Falso\n"
+
+#~ msgid "\tTime stamps:\n"
+#~ msgstr "\tSello de hora:\n"
+
+#~ msgid "\t\tExpiration: Never\n"
+#~ msgstr "\t\tCaducidad: Nunca\n"
+
+#~ msgid "\t\tExpiration: %s\n"
+#~ msgstr "\t\tCaducidad: %s\n"
+
+#~ msgid "\tPublic Key Algorithm: %s\n"
+#~ msgstr "\tAlgoritmo de Clave Pública: %s\n"
+
+#~ msgid "\tKey Security Level: %s\n"
+#~ msgstr ""
+#~ "\tNivel Garantizado Clave: %s\n"
+#~ "\n"
+
+#~ msgid "\t\tExponent:\n"
+#~ msgstr "\t\tExponente:\n"
+
+#~ msgid "\tName[%d]: %s\n"
+#~ msgstr "\tNombre[%d]: %s\n"
+
+#~ msgid "\tRevoked Name[%d]: %s\n"
+#~ msgstr "\tNombre[%d] Revocado: %s\n"
+
+#~ msgid ""
+#~ "\n"
+#~ "\tSubkey[%d]:\n"
+#~ msgstr ""
+#~ "\n"
+#~ "\tSubclave[%d]:\n"
+
+#~ msgid "name[%d]: %s, "
+#~ msgstr "nombre[%d]: %s, "
+
+#~ msgid "revoked name[%d]: %s, "
+#~ msgstr "nombre revocado[%d]: %s, "
+
+#~ msgid "created: %s, "
+#~ msgstr "creado: %s, "
+
+#~ msgid "never expires, "
+#~ msgstr "nunca caduca, "
+
+#~ msgid "expires: %s, "
+#~ msgstr "caduca: %s, "
+
+#~ msgid "key algorithm %s (%d bits)"
+#~ msgstr "algoritmo clave %s (%d bits)"
+
+#~ msgid "unknown key algorithm (%d)"
+#~ msgstr "algoritmo clave desconocido (%d)"
+
+#~ msgid "OpenPGP Certificate Information:\n"
+#~ msgstr "Información Certificada OpenPGP:\n"
+
+#~ msgid ""
+#~ "warning: distributionPoint contains an embedded NUL, replacing with '!'\n"
+#~ msgstr ""
+#~ "aviso: distributationPoint contiene un NULO embebido, remplazando con "
+#~ "'!'\n"
+
+#~ msgid ""
+#~ "\tMD5 fingerprint:\n"
+#~ "\t\t"
+#~ msgstr ""
+#~ "\tHuella MD5:\n"
+#~ "\t\t"
+
+#~ msgid ""
+#~ "\tSHA-1 fingerprint:\n"
+#~ "\t\t"
+#~ msgstr ""
+#~ "\tHuella SHA-1:\n"
+#~ "\t\t"
+
+#~ msgid "\tPublic key's random art:\n"
+#~ msgstr "\tArte Aleatorio Clave Privada:\n"

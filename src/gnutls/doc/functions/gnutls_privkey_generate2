@@ -16,15 +16,30 @@
 @var{data_size}: The number of  @code{data} available.
 
 This function will generate a random private key. Note that this
-function must be called on an empty private key. The flag @code{GNUTLS_PRIVKEY_FLAG_PROVABLE} 
+function must be called on an initialized private key.
+
+The flag @code{GNUTLS_PRIVKEY_FLAG_PROVABLE} 
 instructs the key generation process to use algorithms like Shawe-Taylor
-which generate provable parameters out of a seed.
+(from FIPS PUB186-4) which generate provable parameters out of a seed
+for RSA and DSA keys. On DSA keys the PQG parameters are generated using the
+seed, while on RSA the two primes. To specify an explicit seed
+(by default a random seed is used), use the  @code{data} with a @code{GNUTLS_KEYGEN_SEED} 
+type.
 
 Note that when generating an elliptic curve key, the curve
 can be substituted in the place of the bits parameter using the
 @code{GNUTLS_CURVE_TO_BITS()}  macro.
 
-Do not set the number of bits directly, use @code{gnutls_sec_param_to_pk_bits()} .
+To export the generated keys in memory or in files it is recommended to use the
+PKCS@code{8}  form as it can handle all key types, and can store additional parameters
+such as the seed, in case of provable RSA or DSA keys.
+Generated keys can be exported in memory using @code{gnutls_privkey_export_x509()} ,
+and then with @code{gnutls_x509_privkey_export2_pkcs8()} .
+
+If key generation is part of your application, avoid setting the number
+of bits directly, and instead use @code{gnutls_sec_param_to_pk_bits()} .
+That way the generated keys will adapt to the security levels
+of the underlying GnuTLS library.
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.

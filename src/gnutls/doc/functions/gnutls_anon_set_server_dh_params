@@ -10,4 +10,8 @@
 This function will set the Diffie-Hellman parameters for an
 anonymous server to use.  These parameters will be used in
 Anonymous Diffie-Hellman cipher suites.
+
+@strong{Deprecated:} This function is unnecessary and discouraged on GnuTLS 3.6.0
+or later. Since 3.6.0, DH parameters are negotiated
+following RFC7919.
 @end deftypefun

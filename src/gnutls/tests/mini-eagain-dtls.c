@@ -59,7 +59,6 @@ void doit(void)
 	gnutls_session_t client;
 	/* Need to enable anonymous KX specifically. */
 	char buffer[MAX_BUF + 1];
-	ssize_t ns;
 	int ret, transferred = 0, msglen;
 
 	/* General init. */
@@ -116,7 +115,6 @@ void doit(void)
 		ret = gnutls_record_send(client, MSG, strlen(MSG));
 	}
 	while (ret == GNUTLS_E_AGAIN);
-	//success ("client: sent %d\n", ns);
 
 	msglen = strlen(MSG);
 	TRANSFER(client, server, MSG, msglen, buffer, MAX_BUF);

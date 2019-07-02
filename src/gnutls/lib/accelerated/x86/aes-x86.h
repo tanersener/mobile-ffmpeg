@@ -1,5 +1,5 @@
-#ifndef AES_X86_H
-#define AES_X86_H
+#ifndef GNUTLS_LIB_ACCELERATED_X86_AES_X86_H
+#define GNUTLS_LIB_ACCELERATED_X86_AES_X86_H
 
 #include "gnutls_int.h"
 
@@ -62,4 +62,4 @@ extern const gnutls_crypto_cipher_st _gnutls_aes_ssse3;
 
 extern const gnutls_crypto_cipher_st _gnutls_aesni_x86;
 
-#endif
+#endif /* GNUTLS_LIB_ACCELERATED_X86_AES_X86_H */

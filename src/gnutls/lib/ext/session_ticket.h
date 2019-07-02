@@ -16,18 +16,25 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
-#ifndef EXT_SESSION_TICKET_H
-#define EXT_SESSION_TICKET_H
+#ifndef GNUTLS_LIB_EXT_SESSION_TICKET_H
+#define GNUTLS_LIB_EXT_SESSION_TICKET_H
 
-#include <extensions.h>
+#include <hello_ext.h>
 
-extern const extension_entry_st ext_mod_session_ticket;
+extern const hello_ext_entry_st ext_mod_session_ticket;
 
 int _gnutls_send_new_session_ticket(gnutls_session_t session, int again);
 int _gnutls_recv_new_session_ticket(gnutls_session_t session);
 
-#endif
+int _gnutls_encrypt_session_ticket(gnutls_session_t session,
+				   const gnutls_datum_t *state,
+				   gnutls_datum_t *ticket_data);
+int _gnutls_decrypt_session_ticket(gnutls_session_t session,
+				   const gnutls_datum_t *ticket_data,
+				   gnutls_datum_t *state);
+
+#endif /* GNUTLS_LIB_EXT_SESSION_TICKET_H */

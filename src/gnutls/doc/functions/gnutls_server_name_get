@@ -25,7 +25,7 @@ If  @code{data} has not enough size to hold the server name
 GNUTLS_E_SHORT_MEMORY_BUFFER is returned, and  @code{data_length} will
 hold the required size.
 
- @code{index} is used to retrieve more than one server names (if sent by
+ @code{indx} is used to retrieve more than one server names (if sent by
 the client).  The first server name has an index of 0, the second 1
 and so on.  If no name with the given index exists
 GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE is returned.

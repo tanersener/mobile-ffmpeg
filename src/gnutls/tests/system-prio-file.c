@@ -57,7 +57,7 @@ try_prio(const char *prio, const char *expected_str)
 	}
 
  ok:
-	free(p);
+	gnutls_free(p);
 	gnutls_global_deinit();
 }
 
@@ -84,4 +84,3 @@ void doit(void)
 	try_prio("@HELLONO:+AES-128-CBC", NULL);
 	try_prio("@HELLONO,:+AES-128-CBC", NULL);
 }
-

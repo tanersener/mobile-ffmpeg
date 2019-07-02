@@ -1,0 +1,58 @@
+
+prog-group      = GnuTLS;
+config-header   = config.h;
+gnu-usage;
+disable-save;
+long-opts;
+no-xlate        = opt;
+version         = "@VERSION@";
+no-misuse-usage;
+export          = '#include <gettext.h>';
+
+copyright = {
+    date  = "2000-@YEAR@";
+    owner = "Free Software Foundation, and others";
+    author = "Nikos Mavrogiannopoulos, Simon Josefsson and others; "
+             "see /usr/share/doc/gnutls/AUTHORS for a complete list.";
+    eaddr  = "@PACKAGE_BUGREPORT@";
+    type  = gpl;
+};
+
+help-value    = h;
+flag = {
+    name      = debug;
+    value     = d;
+    arg-type  = number;
+    arg-range = "0 -> 9999";
+    descrip   = "Enable debugging";
+    doc       = "Specifies the debug level.";
+};
+
+#ifdef VERBOSE_OPT
+flag = {
+    name      = verbose;
+    value     = V;
+    max       = NOLIMIT;
+    descrip   = "More verbose output";
+    doc      = "";
+};
+#endif
+
+#ifdef INFILE_OPT
+flag = {
+    name      = infile;
+    arg-type  = file;
+    file-exists = yes;
+    descrip   = "Input file";
+    doc   = "";
+};
+#endif
+
+#ifdef OUTFILE_OPT
+flag = {
+    name      = outfile;
+    arg-type  = string;
+    descrip   = "Output file";
+    doc   = "";
+};
+#endif

@@ -17,7 +17,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -91,6 +91,9 @@ gnutls_x509_crl_set_version(gnutls_x509_crl_t crl, unsigned int version)
  * be fully functional (e.g., for signature verification), until it
  * is exported an re-imported.
  *
+ * After GnuTLS 3.6.1 the value of @dig may be %GNUTLS_DIG_UNKNOWN,
+ * and in that case, a suitable but reasonable for the key algorithm will be selected.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
@@ -141,20 +144,20 @@ gnutls_x509_crl_sign2(gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer,
  * @issuer: is the certificate of the certificate issuer
  * @issuer_key: holds the issuer's private key
  *
- * This function is the same a gnutls_x509_crl_sign2() with no flags, and
- * SHA1 as the hash algorithm.
+ * This function is the same a gnutls_x509_crl_sign2() with no flags,
+ * and an appropriate hash algorithm. The hash algorithm used may
+ * vary between versions of GnuTLS, and it is tied to the security
+ * level of the issuer's public key.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
- *
- * Deprecated: Use gnutls_x509_crl_privkey_sign().
  */
 int
 gnutls_x509_crl_sign(gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer,
 		     gnutls_x509_privkey_t issuer_key)
 {
 	return gnutls_x509_crl_sign2(crl, issuer, issuer_key,
-				     GNUTLS_DIG_SHA1, 0);
+				     0, 0);
 }
 
 /**
@@ -475,6 +478,9 @@ gnutls_x509_crl_set_number(gnutls_x509_crl_t crl,
  * be fully functional (e.g., for signature verification), until it
  * is exported an re-imported.
  *
+ * After GnuTLS 3.6.1 the value of @dig may be %GNUTLS_DIG_UNKNOWN,
+ * and in that case, a suitable but reasonable for the key algorithm will be selected.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
@@ -494,12 +500,18 @@ gnutls_x509_crl_privkey_sign(gnutls_x509_crl_t crl,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
+	if (dig == 0) {
+		result = gnutls_x509_crt_get_preferred_hash_algorithm(issuer, &dig, NULL);
+		if (result < 0)
+			return gnutls_assert_val(result);
+	}
+
 	/* disable all the unneeded OPTIONAL fields.
 	 */
 	disable_optional_stuff(crl);
 
 	result = _gnutls_x509_pkix_sign(crl->crl, "tbsCertList",
-					dig, issuer, issuer_key);
+					dig, 0, issuer, issuer_key);
 	if (result < 0) {
 		gnutls_assert();
 		return result;

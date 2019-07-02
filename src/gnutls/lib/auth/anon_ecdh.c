@@ -16,7 +16,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -37,7 +37,7 @@
 #include "mpi.h"
 #include <state.h>
 #include <auth/ecdhe.h>
-#include <ext/ecc.h>
+#include <ext/supported_groups.h>
 
 static int gen_anon_ecdh_server_kx(gnutls_session_t, gnutls_buffer_st *);
 static int proc_anon_ecdh_client_kx(gnutls_session_t, uint8_t *, size_t);
@@ -74,7 +74,7 @@ gen_anon_ecdh_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
 	}
 
 	if ((ret =
-	     _gnutls_auth_info_set(session, GNUTLS_CRD_ANON,
+	     _gnutls_auth_info_init(session, GNUTLS_CRD_ANON,
 				   sizeof(anon_auth_info_st), 1)) < 0) {
 		gnutls_assert();
 		return ret;
@@ -82,7 +82,7 @@ gen_anon_ecdh_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
 
 	ret =
 	    _gnutls_ecdh_common_print_server_kx(session, data,
-						_gnutls_session_ecc_curve_get
+						get_group
 						(session));
 	if (ret < 0) {
 		gnutls_assert();
@@ -107,7 +107,7 @@ proc_anon_ecdh_client_kx(gnutls_session_t session, uint8_t * data,
 
 	return _gnutls_proc_ecdh_common_client_kx(session, data,
 						  _data_size,
-						  _gnutls_session_ecc_curve_get
+						  get_group
 						  (session), NULL);
 }
 
@@ -120,7 +120,7 @@ proc_anon_ecdh_server_kx(gnutls_session_t session, uint8_t * data,
 
 	/* set auth_info */
 	if ((ret =
-	     _gnutls_auth_info_set(session, GNUTLS_CRD_ANON,
+	     _gnutls_auth_info_init(session, GNUTLS_CRD_ANON,
 				   sizeof(anon_auth_info_st), 1)) < 0) {
 		gnutls_assert();
 		return ret;

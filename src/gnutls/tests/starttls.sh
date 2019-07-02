@@ -37,7 +37,7 @@ launch_server $$ --echo --priority "NORMAL:+ANON-ECDH"
 PID=$!
 wait_server ${PID}
 
-${VALGRIND} "${CLI}" -p "${PORT}" 127.0.0.1 --priority NORMAL:+ANON-ECDH --insecure --starttls </dev/null >/dev/null || \
+${VALGRIND} "${CLI}" -p "${PORT}" 127.0.0.1 --priority NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2:+ANON-ECDH --insecure --starttls -d 6 </dev/null >/dev/null || \
 	fail ${PID} "starttls connect should have succeeded!"
 
 

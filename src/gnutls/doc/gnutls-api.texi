@@ -64,7 +64,7 @@ an error code is returned.
 @deftypefun {int} {gnutls_alert_send_appropriate} (gnutls_session_t @var{session}, int @var{err})
 @var{session}: is a @code{gnutls_session_t}  type.
 
-@var{err}: is an integer
+@var{err}: is an error code returned by another GnuTLS function
 
 Sends an alert to the peer depending on the error code returned by
 a gnutls function. This function will call @code{gnutls_error_to_alert()} 
@@ -73,8 +73,11 @@ to determine the appropriate alert to send.
 This function may also return @code{GNUTLS_E_AGAIN} , or
 @code{GNUTLS_E_INTERRUPTED} .
 
-If the return value is @code{GNUTLS_E_INVALID_REQUEST} , then no alert has
-been sent to the peer.
+This function historically was always sending an alert to the
+peer, even if  @code{err} was inappropriate to respond with an alert
+(e.g., @code{GNUTLS_E_SUCCESS} ). Since 3.6.6 this function returns
+success without transmitting any data on error codes that
+should not result to an alert.
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise
 an error code is returned.
@@ -169,6 +172,10 @@ Free a gnutls_anon_server_credentials_t structure.
 This function will set a callback in order for the server to get
 the Diffie-Hellman or RSA parameters for anonymous authentication.
 The callback should return @code{GNUTLS_E_SUCCESS}  (0) on success.
+
+@strong{Deprecated:} This function is unnecessary and discouraged on GnuTLS 3.6.0
+or later. Since 3.6.0, DH parameters are negotiated
+following RFC7919.
 @end deftypefun
 
 @subheading gnutls_anon_set_server_dh_params
@@ -181,6 +188,10 @@ The callback should return @code{GNUTLS_E_SUCCESS}  (0) on success.
 This function will set the Diffie-Hellman parameters for an
 anonymous server to use.  These parameters will be used in
 Anonymous Diffie-Hellman cipher suites.
+
+@strong{Deprecated:} This function is unnecessary and discouraged on GnuTLS 3.6.0
+or later. Since 3.6.0, DH parameters are negotiated
+following RFC7919.
 @end deftypefun
 
 @subheading gnutls_anon_set_server_known_dh_params
@@ -194,6 +205,10 @@ This function will set the Diffie-Hellman parameters for an
 anonymous server to use.  These parameters will be used in
 Anonymous Diffie-Hellman cipher suites and will be selected from
 the FFDHE set of RFC7919 according to the security level provided.
+
+@strong{Deprecated:} This function is unnecessary and discouraged on GnuTLS 3.6.0
+or later. Since 3.6.0, DH parameters are negotiated
+following RFC7919.
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.
@@ -211,6 +226,103 @@ negative error value.
 This function will set a callback in order for the server to get
 the Diffie-Hellman parameters for anonymous authentication.  The
 callback should return @code{GNUTLS_E_SUCCESS}  (0) on success.
+
+@strong{Deprecated:} This function is unnecessary and discouraged on GnuTLS 3.6.0
+or later. Since 3.6.0, DH parameters are negotiated
+following RFC7919.
+@end deftypefun
+
+@subheading gnutls_anti_replay_deinit
+@anchor{gnutls_anti_replay_deinit}
+@deftypefun {void} {gnutls_anti_replay_deinit} (gnutls_anti_replay_t @var{anti_replay})
+@var{anti_replay}: is a @code{gnutls_anti_replay}  type
+
+This function will deinitialize all resources occupied by the given
+anti-replay context.
+
+@strong{Since:} 3.6.5
+@end deftypefun
+
+@subheading gnutls_anti_replay_enable
+@anchor{gnutls_anti_replay_enable}
+@deftypefun {void} {gnutls_anti_replay_enable} (gnutls_session_t @var{session}, gnutls_anti_replay_t @var{anti_replay})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{anti_replay}: is a @code{gnutls_anti_replay_t}  type.
+
+Request that the server should use anti-replay mechanism.
+
+@strong{Since:} 3.6.5
+@end deftypefun
+
+@subheading gnutls_anti_replay_init
+@anchor{gnutls_anti_replay_init}
+@deftypefun {int} {gnutls_anti_replay_init} (gnutls_anti_replay_t * @var{anti_replay})
+@var{anti_replay}: is a pointer to @code{gnutls_anti_replay_t}  type
+
+This function will allocate and initialize the  @code{anti_replay} context
+to be usable for detect replay attacks. The context can then be
+attached to a  @code{gnutls_session_t} with
+@code{gnutls_anti_replay_enable()} .
+
+@strong{Returns:} Zero or a negative error code on error.
+
+@strong{Since:} 3.6.5
+@end deftypefun
+
+@subheading gnutls_anti_replay_set_add_function
+@anchor{gnutls_anti_replay_set_add_function}
+@deftypefun {void} {gnutls_anti_replay_set_add_function} (gnutls_anti_replay_t @var{anti_replay}, gnutls_db_add_func @var{add_func})
+@var{anti_replay}: is a @code{gnutls_anti_replay_t}  type.
+
+@var{add_func}: is the function.
+
+Sets the function that will be used to store an entry if it is not
+already present in the resumed sessions database.  This function returns 0
+if the entry is successfully stored, and a negative error code
+otherwise.  In particular, if the entry is found in the database,
+it returns @code{GNUTLS_E_DB_ENTRY_EXISTS} .
+
+The arguments to the  @code{add_func} are:
+- @code{ptr} : the pointer set with @code{gnutls_anti_replay_set_ptr()} 
+- @code{exp_time} : the expiration time of the entry
+- @code{key} : a pointer to the key
+- @code{data} : a pointer to data to store
+
+The data set by this function can be examined using
+@code{gnutls_db_check_entry_expire_time()}  and @code{gnutls_db_check_entry_time()} .
+
+@strong{Since:} 3.6.5
+@end deftypefun
+
+@subheading gnutls_anti_replay_set_ptr
+@anchor{gnutls_anti_replay_set_ptr}
+@deftypefun {void} {gnutls_anti_replay_set_ptr} (gnutls_anti_replay_t @var{anti_replay}, void * @var{ptr})
+@var{anti_replay}: is a @code{gnutls_anti_replay_t}  type.
+
+@var{ptr}: is the pointer
+
+Sets the pointer that will be provided to db add function
+as the first argument.
+@end deftypefun
+
+@subheading gnutls_anti_replay_set_window
+@anchor{gnutls_anti_replay_set_window}
+@deftypefun {void} {gnutls_anti_replay_set_window} (gnutls_anti_replay_t @var{anti_replay}, unsigned int @var{window})
+@var{anti_replay}: is a @code{gnutls_anti_replay_t}  type.
+
+@var{window}: is the time window recording ClientHello, in milliseconds
+
+Sets the time window used for ClientHello recording.  In order to
+protect against replay attacks, the server records ClientHello
+messages within this time period from the last update, and
+considers it a replay when a ClientHello outside of the period; if
+a ClientHello arrives within this period, the server checks the
+database and detects duplicates.
+
+For the details of the algorithm, see RFC 8446, section 8.2.
+
+@strong{Since:} 3.6.5
 @end deftypefun
 
 @subheading gnutls_auth_client_get_type
@@ -221,6 +333,9 @@ callback should return @code{GNUTLS_E_SUCCESS}  (0) on success.
 Returns the type of credentials that were used for client authentication.
 The returned information is to be used to distinguish the function used
 to access authentication data.
+
+Note that on resumed sessions, this function returns the schema
+used in the original session authentication.
 
 @strong{Returns:} The type of credentials for the client authentication
 schema, a @code{gnutls_credentials_type_t}  type.
@@ -239,6 +354,9 @@ Eg. for CERTIFICATE ciphersuites (key exchange algorithms:
 @code{GNUTLS_KX_RSA} , @code{GNUTLS_KX_DHE_RSA} ), the same function are to be
 used to access the authentication data.
 
+Note that on resumed sessions, this function returns the schema
+used in the original session authentication.
+
 @strong{Returns:} The type of credentials for the current authentication
 schema, a @code{gnutls_credentials_type_t}  type.
 @end deftypefun
@@ -252,8 +370,48 @@ Returns the type of credentials that were used for server authentication.
 The returned information is to be used to distinguish the function used
 to access authentication data.
 
+Note that on resumed sessions, this function returns the schema
+used in the original session authentication.
+
 @strong{Returns:} The type of credentials for the server authentication
 schema, a @code{gnutls_credentials_type_t}  type.
+@end deftypefun
+
+@subheading gnutls_base64_decode2
+@anchor{gnutls_base64_decode2}
+@deftypefun {int} {gnutls_base64_decode2} (const gnutls_datum_t * @var{base64}, gnutls_datum_t * @var{result})
+@var{base64}: contains the encoded data
+
+@var{result}: the location of decoded data
+
+This function will decode the given base64 encoded data. The decoded data
+will be allocated, and stored into result.
+
+You should use @code{gnutls_free()}  to free the returned data.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise
+an error code is returned.
+
+@strong{Since:} 3.6.0
+@end deftypefun
+
+@subheading gnutls_base64_encode2
+@anchor{gnutls_base64_encode2}
+@deftypefun {int} {gnutls_base64_encode2} (const gnutls_datum_t * @var{data}, gnutls_datum_t * @var{result})
+@var{data}: contains the raw data
+
+@var{result}: will hold the newly allocated encoded data
+
+This function will convert the given data to printable data, using
+the base64 encoding. This function will allocate the required
+memory to hold the encoded data.
+
+You should use @code{gnutls_free()}  to free the returned data.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise
+an error code is returned.
+
+@strong{Since:} 3.6.0
 @end deftypefun
 
 @subheading gnutls_buffer_append_data
@@ -313,7 +471,6 @@ function documentation for entire semantics.
 @var{session}: is a gnutls session
 
 This function will return the peer's certificate activation time.
-This is the creation time for openpgp keys.
 
 @strong{Returns:} (time_t)-1 on error.
 
@@ -332,7 +489,7 @@ Allocate a gnutls_certificate_credentials_t structure.
 
 @subheading gnutls_certificate_client_get_request_status
 @anchor{gnutls_certificate_client_get_request_status}
-@deftypefun {int} {gnutls_certificate_client_get_request_status} (gnutls_session_t @var{session})
+@deftypefun {unsigned} {gnutls_certificate_client_get_request_status} (gnutls_session_t @var{session})
 @var{session}: is a gnutls session
 
 Get whether client certificate was requested on the last
@@ -363,7 +520,7 @@ This function will delete all the CA name in the given
 credentials. Clients may call this to save some memory since in
 client side the CA names are not used. Servers might want to use
 this function if a large list of trusted CAs is present and
-sending the names of it would just consume bandwidth without providing 
+sending the names of it would just consume bandwidth without providing
 information to client.
 
 CA names are used by servers to advertise the CAs they support to
@@ -375,10 +532,9 @@ clients.
 @deftypefun {void} {gnutls_certificate_free_cas} (gnutls_certificate_credentials_t @var{sc})
 @var{sc}: is a @code{gnutls_certificate_credentials_t}  type.
 
-This function will delete all the CAs associated with the given
-credentials. Servers that do not use
-@code{gnutls_certificate_verify_peers2()}  may call this to save some
-memory.
+This function was operational on very early versions of gnutls.
+Due to internal refactorings and the fact that this was hardly ever
+used, it is currently a no-op.
 @end deftypefun
 
 @subheading gnutls_certificate_free_credentials
@@ -454,12 +610,41 @@ In that case the provided  @code{issuer} must not be initialized.
 
 As with @code{gnutls_x509_trust_list_get_issuer()}  this function requires
 the @code{GNUTLS_TL_GET_COPY}  flag in order to operate with PKCS@code{11}  trust
-lists in a thread-safe way. 
+lists in a thread-safe way.
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.
 
 @strong{Since:} 3.0
+@end deftypefun
+
+@subheading gnutls_certificate_get_ocsp_expiration
+@anchor{gnutls_certificate_get_ocsp_expiration}
+@deftypefun {time_t} {gnutls_certificate_get_ocsp_expiration} (gnutls_certificate_credentials_t @var{sc}, unsigned @var{idx}, int @var{oidx}, unsigned @var{flags})
+@var{sc}: is a credentials structure.
+
+@var{idx}: is a certificate chain index as returned by @code{gnutls_certificate_set_key()}  and friends
+
+@var{oidx}: is an OCSP response index
+
+@var{flags}: should be zero
+
+This function returns the validity of the loaded OCSP responses,
+to provide information on when to reload/refresh them.
+
+Note that the credentials structure should be read-only when in
+use, thus when reloading, either the credentials structure must not
+be in use by any sessions, or a new credentials structure should be
+allocated for new sessions.
+
+When  @code{oidx} is (-1) then the minimum refresh time for all responses
+is returned. Otherwise the index specifies the response corresponding
+to the  @code{odix} certificate in the certificate chain.
+
+@strong{Returns:} On success, the expiration time of the OCSP response. Otherwise
+(time_t)(-1) on error, or (time_t)-2 on out of bounds.
+
+@strong{Since:} 3.6.3
 @end deftypefun
 
 @subheading gnutls_certificate_get_ours
@@ -470,6 +655,11 @@ negative error value.
 Gets the certificate as sent to the peer in the last handshake.
 The certificate is in raw (DER) format.  No certificate
 list is being returned. Only the first certificate.
+
+This function returns the certificate that was sent in the current
+handshake. In subsequent resumed sessions this function will return
+@code{NULL} . That differs from @code{gnutls_certificate_get_peers()}  which always
+returns the peer's certificate used in the original session.
 
 @strong{Returns:} a pointer to a @code{gnutls_datum_t}  containing our
 certificate, or @code{NULL}  in case of an error or if no certificate
@@ -492,8 +682,8 @@ issuer's certificate, then the issuer's issuer etc. However, there
 are servers which violate this principle and thus on certain
 occasions this may be an unsorted list.
 
-In case of OpenPGP keys a single key will be returned in raw
-format.
+In resumed sessions, this function will return the peer's certificate
+list as used in the first/original session.
 
 @strong{Returns:} a pointer to a @code{gnutls_datum_t}  containing the peer's
 certificates, or @code{NULL}  in case of an error or if no certificate
@@ -507,11 +697,9 @@ was used.
 
 @var{id}: will contain the ID
 
-Get the peer's subkey ID when OpenPGP certificates are
-used. The returned  @code{id} should be treated as constant.
+This function is no-op.
 
-@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise
-an error code is returned.
+@strong{Returns:} @code{GNUTLS_E_UNIMPLEMENTED_FEATURE} .
 
 @strong{Since:} 3.1.3
 @end deftypefun
@@ -614,13 +802,14 @@ methods other than certificate with X.509 certificates.
 @deftypefun {void} {gnutls_certificate_server_set_request} (gnutls_session_t @var{session}, gnutls_certificate_request_t @var{req})
 @var{session}: is a @code{gnutls_session_t}  type.
 
-@var{req}: is one of GNUTLS_CERT_REQUEST, GNUTLS_CERT_REQUIRE
+@var{req}: is one of GNUTLS_CERT_REQUEST, GNUTLS_CERT_REQUIRE, GNUTLS_CERT_IGNORE
 
 This function specifies if we (in case of a server) are going to
 send a certificate request message to the client. If  @code{req} is
-GNUTLS_CERT_REQUIRE then the server will return an error if the
-peer does not provide a certificate. If you do not call this
-function then the client will not be asked to send a certificate.
+GNUTLS_CERT_REQUIRE then the server will return the @code{GNUTLS_E_NO_CERTIFICATE_FOUND} 
+error if the peer does not provide a certificate. If you do not call this
+function then the client will not be asked to send a certificate. Invoking
+the function with  @code{req} GNUTLS_CERT_IGNORE has the same effect.
 @end deftypefun
 
 @subheading gnutls_certificate_set_dh_params
@@ -635,6 +824,10 @@ certificate server to use. These parameters will be used in
 Ephemeral Diffie-Hellman cipher suites.  Note that only a pointer
 to the parameters are stored in the certificate handle, so you
 must not deallocate the parameters before the certificate is deallocated.
+
+@strong{Deprecated:} This function is unnecessary and discouraged on GnuTLS 3.6.0
+or later. Since 3.6.0, DH parameters are negotiated
+following RFC7919.
 @end deftypefun
 
 @subheading gnutls_certificate_set_flags
@@ -663,6 +856,10 @@ certificate server to use. These parameters will be used in
 Ephemeral Diffie-Hellman cipher suites and will be selected from
 the FFDHE set of RFC7919 according to the security level provided.
 
+@strong{Deprecated:} This function is unnecessary and discouraged on GnuTLS 3.6.0
+or later. Since 3.6.0, DH parameters are negotiated
+following RFC7919.
+
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.
 
@@ -678,20 +875,61 @@ negative error value.
 
 @var{idx}: is a certificate index as returned by @code{gnutls_certificate_set_key()}  and friends
 
-This function sets the filename of an OCSP response, that will be
+This function loads the provided OCSP response. It will be
 sent to the client if requests an OCSP certificate status for
 the certificate chain specified by  @code{idx} .
-
-This is a convenience function which may be inefficient on busy servers since
-the file is opened on every access. Use 
-@code{gnutls_certificate_set_ocsp_status_request_function2()}  to fine-tune
-file accesses.
 
 @strong{Note:} the ability to set multiple OCSP responses per credential
 structure via the index  @code{idx} was added in version 3.5.6. To keep
 backwards compatibility, it requires using @code{gnutls_certificate_set_flags()} 
 with the @code{GNUTLS_CERTIFICATE_API_V2}  flag to make the set certificate
 functions return an index usable by this function.
+
+This function can be called multiple times since GnuTLS 3.6.3
+when multiple responses which apply to the chain are available.
+If the response provided does not match any certificates present
+in the chain, the code @code{GNUTLS_E_OCSP_MISMATCH_WITH_CERTS}  is returned.
+To revert to the previous behavior set the flag @code{GNUTLS_CERTIFICATE_SKIP_OCSP_RESPONSE_CHECK} 
+in the certificate credentials structure. In that case, only the
+end-certificate's OCSP response can be set.
+If the response is already expired at the time of loading the code
+@code{GNUTLS_E_EXPIRED}  is returned.
+
+To revert to the previous behavior of this function which does not return
+any errors, set the flag @code{GNUTLS_CERTIFICATE_SKIP_OCSP_RESPONSE_CHECK} 
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned,
+otherwise a negative error code is returned.
+
+@strong{Since:} 3.1.3
+@end deftypefun
+
+@subheading gnutls_certificate_set_ocsp_status_request_file2
+@anchor{gnutls_certificate_set_ocsp_status_request_file2}
+@deftypefun {int} {gnutls_certificate_set_ocsp_status_request_file2} (gnutls_certificate_credentials_t @var{sc}, const char * @var{response_file}, unsigned @var{idx}, gnutls_x509_crt_fmt_t @var{fmt})
+@var{sc}: is a credentials structure.
+
+@var{response_file}: a filename of the OCSP response
+
+@var{idx}: is a certificate index as returned by @code{gnutls_certificate_set_key()}  and friends
+
+@var{fmt}: is PEM or DER
+
+This function loads the OCSP responses to be sent to the
+peer for the certificate chain specified by  @code{idx} . When  @code{fmt} is
+set to PEM, multiple responses can be loaded.
+
+This function must be called after setting any certificates, and
+cannot be used for certificates that are provided via a callback --
+that is when @code{gnutls_certificate_set_retrieve_function()}  is used. In
+that case consider using @code{gnutls_certificate_set_retrieve_function3()} .
+
+This function can be called multiple times when multiple responses
+applicable to the certificate chain are available.
+If the response provided does not match any certificates present
+in the chain, the code @code{GNUTLS_E_OCSP_MISMATCH_WITH_CERTS}  is returned.
+If the response is already expired at the time of loading the code
+@code{GNUTLS_E_EXPIRED}  is returned.
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned,
 otherwise a negative error code is returned.
@@ -742,7 +980,7 @@ using @code{gnutls_certificate_set_ocsp_status_request_function2()} .
 
 This function is to be used by server to register a callback to
 provide OCSP status requests that correspond to the indexed certificate chain
-from the client.  The callback will be invoked if the client supplied a 
+from the client.  The callback will be invoked if the client supplied a
 status-request OCSP extension.
 
 The callback function prototype is:
@@ -769,6 +1007,44 @@ otherwise a negative error code is returned.
 @strong{Since:} 3.5.5
 @end deftypefun
 
+@subheading gnutls_certificate_set_ocsp_status_request_mem
+@anchor{gnutls_certificate_set_ocsp_status_request_mem}
+@deftypefun {int} {gnutls_certificate_set_ocsp_status_request_mem} (gnutls_certificate_credentials_t @var{sc}, const gnutls_datum_t * @var{resp_data}, unsigned @var{idx}, gnutls_x509_crt_fmt_t @var{fmt})
+@var{sc}: is a credentials structure.
+
+@var{resp_data}: a memory buffer holding an OCSP response
+
+@var{idx}: is a certificate index as returned by @code{gnutls_certificate_set_key()}  and friends
+
+@var{fmt}: is PEM or DER
+
+This function sets the OCSP responses to be sent to the
+peer for the certificate chain specified by  @code{idx} . When  @code{fmt} is set
+to PEM, multiple responses can be loaded.
+
+@strong{Note:} the ability to set multiple OCSP responses per credential
+structure via the index  @code{idx} was added in version 3.5.6. To keep
+backwards compatibility, it requires using @code{gnutls_certificate_set_flags()} 
+with the @code{GNUTLS_CERTIFICATE_API_V2}  flag to make the set certificate
+functions return an index usable by this function.
+
+This function must be called after setting any certificates, and
+cannot be used for certificates that are provided via a callback --
+that is when @code{gnutls_certificate_set_retrieve_function()}  is used.
+
+This function can be called multiple times when multiple responses which
+apply to the certificate chain are available.
+If the response provided does not match any certificates present
+in the chain, the code @code{GNUTLS_E_OCSP_MISMATCH_WITH_CERTS}  is returned.
+If the response is already expired at the time of loading the code
+@code{GNUTLS_E_EXPIRED}  is returned.
+
+@strong{Returns:} On success, the number of loaded responses is returned,
+otherwise a negative error code.
+
+@strong{Since:} 3.6.3
+@end deftypefun
+
 @subheading gnutls_certificate_set_params_function
 @anchor{gnutls_certificate_set_params_function}
 @deftypefun {void} {gnutls_certificate_set_params_function} (gnutls_certificate_credentials_t            @var{res}, gnutls_params_function * @var{func})
@@ -779,6 +1055,10 @@ otherwise a negative error code is returned.
 This function will set a callback in order for the server to get
 the Diffie-Hellman or RSA parameters for certificate
 authentication.  The callback should return @code{GNUTLS_E_SUCCESS}  (0) on success.
+
+@strong{Deprecated:} This function is unnecessary and discouraged on GnuTLS 3.6.0
+or later. Since 3.6.0, DH parameters are negotiated
+following RFC7919.
 @end deftypefun
 
 @subheading gnutls_certificate_set_pin_function
@@ -798,6 +1078,134 @@ Note that this function must be called right after initialization
 to have effect.
 
 @strong{Since:} 3.1.0
+@end deftypefun
+
+@subheading gnutls_certificate_set_rawpk_key_file
+@anchor{gnutls_certificate_set_rawpk_key_file}
+@deftypefun {int} {gnutls_certificate_set_rawpk_key_file} (gnutls_certificate_credentials_t @var{cred}, const char* @var{rawpkfile}, const char* @var{privkeyfile}, gnutls_x509_crt_fmt_t @var{format}, const char * @var{pass}, unsigned int @var{key_usage}, const char ** @var{names}, unsigned int @var{names_length}, unsigned int @var{privkey_flags}, unsigned int @var{pkcs11_flags})
+@var{cred}: is a @code{gnutls_certificate_credentials_t}  type.
+
+@var{rawpkfile}: contains a raw public key in
+PKIX.SubjectPublicKeyInfo format.
+
+@var{privkeyfile}: contains a file path to a private key.
+
+@var{format}: encoding of the keys. DER or PEM.
+
+@var{pass}: an optional password to unlock the private key privkeyfile.
+
+@var{key_usage}: an ORed sequence of @code{GNUTLS_KEY_} * flags.
+
+@var{names}: is an array of DNS names belonging to the public-key (NULL if none).
+
+@var{names_length}: holds the length of the names list.
+
+@var{privkey_flags}: an ORed sequence of @code{gnutls_pkcs_encrypt_flags_t} .
+These apply to the private key pkey.
+
+@var{pkcs11_flags}: one of gnutls_pkcs11_obj_flags. These apply to URLs.
+
+This function sets a public/private keypair read from file in the
+@code{gnutls_certificate_credentials_t}  type to be used for authentication
+and/or encryption.  @code{spki} and  @code{privkey} should match otherwise set
+signatures cannot be validated. In case of no match this function
+returns @code{GNUTLS_E_CERTIFICATE_KEY_MISMATCH} . This function should
+be called once for the client because there is currently no mechanism
+to determine which raw public-key to select for the peer when there
+are multiple present. Multiple raw public keys for the server can be
+distinghuished by setting the  @code{names} .
+
+Note here that  @code{spki} is a raw public-key as defined
+in RFC7250. It means that there is no surrounding certificate that
+holds the public key and that there is therefore no direct mechanism
+to prove the authenticity of this key. The keypair can be used during
+a TLS handshake but its authenticity should be established via a
+different mechanism (e.g. TOFU or known fingerprint).
+
+The supported formats are basic unencrypted key, PKCS8, PKCS12,
+and the openssl format and will be autodetected.
+
+If the raw public-key and the private key are given in PEM encoding
+then the strings that hold their values must be null terminated.
+
+Key usage (as defined by X.509 extension (2.5.29.15)) can be explicitly
+set because there is no certificate structure around the key to define
+this value. See for more info @code{gnutls_x509_crt_get_key_usage()} .
+
+Note that, this function by default returns zero on success and a
+negative value on error. Since 3.5.6, when the flag @code{GNUTLS_CERTIFICATE_API_V2} 
+is set using @code{gnutls_certificate_set_flags()}  it returns an index
+(greater or equal to zero). That index can be used in other functions
+to refer to the added key-pair.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, in case the
+key pair does not match @code{GNUTLS_E_CERTIFICATE_KEY_MISMATCH}  is returned,
+in other erroneous cases a different negative error code is returned.
+
+@strong{Since:} 3.6.6
+@end deftypefun
+
+@subheading gnutls_certificate_set_rawpk_key_mem
+@anchor{gnutls_certificate_set_rawpk_key_mem}
+@deftypefun {int} {gnutls_certificate_set_rawpk_key_mem} (gnutls_certificate_credentials_t @var{cred}, const gnutls_datum_t* @var{spki}, const gnutls_datum_t* @var{pkey}, gnutls_x509_crt_fmt_t @var{format}, const char* @var{pass}, unsigned int @var{key_usage}, const char ** @var{names}, unsigned int @var{names_length}, unsigned int @var{flags})
+@var{cred}: is a @code{gnutls_certificate_credentials_t}  type.
+
+@var{spki}: contains a raw public key in
+PKIX.SubjectPublicKeyInfo format.
+
+@var{pkey}: contains a raw private key.
+
+@var{format}: encoding of the keys. DER or PEM.
+
+@var{pass}: an optional password to unlock the private key pkey.
+
+@var{key_usage}: An ORed sequence of @code{GNUTLS_KEY_} * flags.
+
+@var{names}: is an array of DNS names belonging to the public-key (NULL if none).
+
+@var{names_length}: holds the length of the names list.
+
+@var{flags}: an ORed sequence of @code{gnutls_pkcs_encrypt_flags_t} .
+These apply to the private key pkey.
+
+This function sets a public/private keypair in the
+@code{gnutls_certificate_credentials_t}  type to be used for authentication
+and/or encryption.  @code{spki} and  @code{privkey} should match otherwise set
+signatures cannot be validated. In case of no match this function
+returns @code{GNUTLS_E_CERTIFICATE_KEY_MISMATCH} . This function should
+be called once for the client because there is currently no mechanism
+to determine which raw public-key to select for the peer when there
+are multiple present. Multiple raw public keys for the server can be
+distinghuished by setting the  @code{names} .
+
+Note here that  @code{spki} is a raw public-key as defined
+in RFC7250. It means that there is no surrounding certificate that
+holds the public key and that there is therefore no direct mechanism
+to prove the authenticity of this key. The keypair can be used during
+a TLS handshake but its authenticity should be established via a
+different mechanism (e.g. TOFU or known fingerprint).
+
+The supported formats are basic unencrypted key, PKCS8, PKCS12,
+and the openssl format and will be autodetected.
+
+If the raw public-key and the private key are given in PEM encoding
+then the strings that hold their values must be null terminated.
+
+Key usage (as defined by X.509 extension (2.5.29.15)) can be explicitly
+set because there is no certificate structure around the key to define
+this value. See for more info @code{gnutls_x509_crt_get_key_usage()} .
+
+Note that, this function by default returns zero on success and a
+negative value on error. Since 3.5.6, when the flag @code{GNUTLS_CERTIFICATE_API_V2} 
+is set using @code{gnutls_certificate_set_flags()}  it returns an index
+(greater or equal to zero). That index can be used in other functions
+to refer to the added key-pair.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, in case the
+key pair does not match @code{GNUTLS_E_CERTIFICATE_KEY_MISMATCH}  is returned,
+in other erroneous cases a different negative error code is returned.
+
+@strong{Since:} 3.6.6
 @end deftypefun
 
 @subheading gnutls_certificate_set_retrieve_function
@@ -1279,7 +1687,7 @@ on error.
 
 @var{type}: is PEM or DER
 
-This function adds the trusted CAs present in the directory in order to 
+This function adds the trusted CAs present in the directory in order to
 verify client or server certificates. This function is identical
 to @code{gnutls_certificate_set_x509_trust_file()}  but loads all certificates
 in a directory.
@@ -1343,11 +1751,49 @@ on error.
 @deftypefun {gnutls_certificate_type_t} {gnutls_certificate_type_get} (gnutls_session_t @var{session})
 @var{session}: is a @code{gnutls_session_t}  type.
 
-The certificate type is by default X.509, unless it is negotiated
-as a TLS extension.
+This function returns the type of the certificate that is negotiated
+for this side to send to the peer. The certificate type is by default
+X.509, unless an alternative certificate type is enabled by
+@code{gnutls_init()}  and negotiated during the session.
+
+Resumed sessions will return the certificate type that was negotiated
+and used in the original session.
+
+As of version 3.6.4 it is recommended to use
+@code{gnutls_certificate_type_get2()}  which is more fine-grained.
 
 @strong{Returns:} the currently used @code{gnutls_certificate_type_t}  certificate
-type.
+type as negotiated for 'our' side of the connection.
+@end deftypefun
+
+@subheading gnutls_certificate_type_get2
+@anchor{gnutls_certificate_type_get2}
+@deftypefun {gnutls_certificate_type_t} {gnutls_certificate_type_get2} (gnutls_session_t @var{session}, gnutls_ctype_target_t @var{target})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{target}: is a @code{gnutls_ctype_target_t}  type.
+
+This function returns the type of the certificate that a side
+is negotiated to use.  The certificate type is by default X.509,
+unless an alternative certificate type is enabled by @code{gnutls_init()}  and
+negotiated during the session.
+
+The  @code{target} parameter specifies whether to request the negotiated
+certificate type for the client (@code{GNUTLS_CTYPE_CLIENT} ),
+or for the server (@code{GNUTLS_CTYPE_SERVER} ). Additionally, in P2P mode
+connection set up where you don't know in advance who will be client
+and who will be server you can use the flag (@code{GNUTLS_CTYPE_OURS} ) and
+(@code{GNUTLS_CTYPE_PEERS} ) to retrieve the corresponding certificate types.
+
+Resumed sessions will return the certificate type that was negotiated
+and used in the original session. That is, this function can be used
+to reliably determine the type of the certificate returned by
+@code{gnutls_certificate_get_peers()} .
+
+@strong{Returns:} the currently used @code{gnutls_certificate_type_t}  certificate
+type for the client or the server.
+
+@strong{Since:} 3.6.4
 @end deftypefun
 
 @subheading gnutls_certificate_type_get_id
@@ -1416,12 +1862,16 @@ negative error value.
 @var{status}: is the output of the verification
 
 This function will verify the peer's certificate and store the
-status in the  @code{status} variable as a bitwise or'd gnutls_certificate_status_t
+the status in the  @code{status} variable as a bitwise OR of gnutls_certificate_status_t
 values or zero if the certificate is trusted. Note that value in  @code{status} is set only when the return value of this function is success (i.e, failure 
 to trust a certificate does not imply a negative return value).
 The default verification flags used by this function can be overridden
 using @code{gnutls_certificate_set_verify_flags()} . See the documentation
 of @code{gnutls_certificate_verify_peers2()}  for details in the verification process.
+
+This function will take into account the stapled OCSP responses sent by the server,
+as well as the following X.509 certificate extensions: Name Constraints,
+Key Usage, and Basic Constraints (pathlen).
 
 The acceptable  @code{data} types are @code{GNUTLS_DT_DNS_HOSTNAME} , @code{GNUTLS_DT_RFC822NAME}  and @code{GNUTLS_DT_KEY_PURPOSE_OID} .
 The former two accept as data a null-terminated hostname or email address, and the latter a null-terminated
@@ -1435,8 +1885,16 @@ usage PKIX extension, it will be required to be have the provided key purpose
 or be marked for any purpose, otherwise verification status will have the
 @code{GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE}  flag set.
 
+To avoid denial of service attacks some
+default upper limits regarding the certificate key size and chain
+size are set. To override them use @code{gnutls_certificate_set_verify_limits()} .
+
+Note that when using raw public-keys verification will not work because there is
+no corresponding certificate body belonging to the raw key that can be verified. In that
+case this function will return @code{GNUTLS_E_INVALID_REQUEST} .
+
 @strong{Returns:} @code{GNUTLS_E_SUCCESS}  (0) when the validation is performed, or a negative error code otherwise.
-A sucessful error code means that the  @code{status} parameter must be checked to obtain the validation status.
+A successful error code means that the  @code{status} parameter must be checked to obtain the validation status.
 
 @strong{Since:} 3.3.0
 @end deftypefun
@@ -1449,26 +1907,30 @@ A sucessful error code means that the  @code{status} parameter must be checked t
 @var{status}: is the output of the verification
 
 This function will verify the peer's certificate and store
-the status in the  @code{status} variable as a bitwise or'd gnutls_certificate_status_t
+the status in the  @code{status} variable as a bitwise OR of gnutls_certificate_status_t
 values or zero if the certificate is trusted. Note that value in  @code{status} is set only when the return value of this function is success (i.e, failure 
 to trust a certificate does not imply a negative return value).
 The default verification flags used by this function can be overridden
 using @code{gnutls_certificate_set_verify_flags()} .
 
-This function will take into account the OCSP Certificate Status TLS extension,
+This function will take into account the stapled OCSP responses sent by the server,
 as well as the following X.509 certificate extensions: Name Constraints,
 Key Usage, and Basic Constraints (pathlen).
-
-To avoid denial of service attacks some
-default upper limits regarding the certificate key size and chain
-size are set. To override them use @code{gnutls_certificate_set_verify_limits()} .
 
 Note that you must also check the peer's name in order to check if
 the verified certificate belongs to the actual peer, see @code{gnutls_x509_crt_check_hostname()} ,
 or use @code{gnutls_certificate_verify_peers3()} .
 
+To avoid denial of service attacks some
+default upper limits regarding the certificate key size and chain
+size are set. To override them use @code{gnutls_certificate_set_verify_limits()} .
+
+Note that when using raw public-keys verification will not work because there is
+no corresponding certificate body belonging to the raw key that can be verified. In that
+case this function will return @code{GNUTLS_E_INVALID_REQUEST} .
+
 @strong{Returns:} @code{GNUTLS_E_SUCCESS}  (0) when the validation is performed, or a negative error code otherwise.
-A sucessful error code means that the  @code{status} parameter must be checked to obtain the validation status.
+A successful error code means that the  @code{status} parameter must be checked to obtain the validation status.
 @end deftypefun
 
 @subheading gnutls_certificate_verify_peers3
@@ -1481,12 +1943,16 @@ A sucessful error code means that the  @code{status} parameter must be checked t
 @var{status}: is the output of the verification
 
 This function will verify the peer's certificate and store the
-status in the  @code{status} variable as a bitwise or'd gnutls_certificate_status_t
+the status in the  @code{status} variable as a bitwise OR of gnutls_certificate_status_t
 values or zero if the certificate is trusted. Note that value in  @code{status} is set only when the return value of this function is success (i.e, failure 
 to trust a certificate does not imply a negative return value).
 The default verification flags used by this function can be overridden
 using @code{gnutls_certificate_set_verify_flags()} . See the documentation
 of @code{gnutls_certificate_verify_peers2()}  for details in the verification process.
+
+This function will take into account the stapled OCSP responses sent by the server,
+as well as the following X.509 certificate extensions: Name Constraints,
+Key Usage, and Basic Constraints (pathlen).
 
 If the  @code{hostname} provided is non-NULL then this function will compare
 the hostname in the certificate against it. The comparison will follow
@@ -1496,8 +1962,16 @@ the RFC6125 recommendations. If names do not match the
 In order to verify the purpose of the end-certificate (by checking the extended
 key usage), use @code{gnutls_certificate_verify_peers()} .
 
+To avoid denial of service attacks some
+default upper limits regarding the certificate key size and chain
+size are set. To override them use @code{gnutls_certificate_set_verify_limits()} .
+
+Note that when using raw public-keys verification will not work because there is
+no corresponding certificate body belonging to the raw key that can be verified. In that
+case this function will return @code{GNUTLS_E_INVALID_REQUEST} .
+
 @strong{Returns:} @code{GNUTLS_E_SUCCESS}  (0) when the validation is performed, or a negative error code otherwise.
-A sucessful error code means that the  @code{status} parameter must be checked to obtain the validation status.
+A successful error code means that the  @code{status} parameter must be checked to obtain the validation status.
 
 @strong{Since:} 3.1.4
 @end deftypefun
@@ -1525,7 +1999,7 @@ check is done and only the version string is returned.
 @deftypefun {gnutls_cipher_algorithm_t} {gnutls_cipher_get} (gnutls_session_t @var{session})
 @var{session}: is a @code{gnutls_session_t}  type.
 
-Get currently used cipher.
+Get the currently used cipher.
 
 @strong{Returns:} the currently used cipher, a @code{gnutls_cipher_algorithm_t} 
 type.
@@ -1547,7 +2021,7 @@ the specified cipher, or @code{GNUTLS_CIPHER_UNKNOWN}  on error.
 @deftypefun {size_t} {gnutls_cipher_get_key_size} (gnutls_cipher_algorithm_t @var{algorithm})
 @var{algorithm}: is an encryption algorithm
 
-Get key size for cipher.
+This function returns the key size of the provided algorithm.
 
 @strong{Returns:} length (in bytes) of the given cipher's key size, or 0 if
 the given cipher is invalid.
@@ -1588,8 +2062,12 @@ integers indicating the available ciphers.
 
 @var{mac_algorithm}: is a MAC algorithm
 
-Note that the full cipher suite name must be prepended by TLS or
-SSL depending of the protocol in use.
+This function returns the ciphersuite name under TLS1.2 or earlier
+versions when provided with individual algorithms. The full cipher suite
+name must be prepended by TLS or SSL depending of the protocol in use.
+
+To get a description of the current ciphersuite across versions, it
+is recommended to use @code{gnutls_session_get_desc()} .
 
 @strong{Returns:} a string that contains the name of a TLS cipher suite,
 specified by the given algorithms, or @code{NULL} .
@@ -1618,49 +2096,6 @@ idx=1 and so on until the function returns NULL.
 @strong{Returns:} the name of  @code{idx} cipher suite, and set the information
 about the cipher suite in the output variables.  If  @code{idx} is out of
 bounds, @code{NULL}  is returned.
-@end deftypefun
-
-@subheading gnutls_compression_get
-@anchor{gnutls_compression_get}
-@deftypefun {gnutls_compression_method_t} {gnutls_compression_get} (gnutls_session_t @var{session})
-@var{session}: is a @code{gnutls_session_t}  type.
-
-Get currently used compression algorithm.
-
-@strong{Returns:} the currently used compression method, a
-@code{gnutls_compression_method_t}  value.
-@end deftypefun
-
-@subheading gnutls_compression_get_id
-@anchor{gnutls_compression_get_id}
-@deftypefun {gnutls_compression_method_t} {gnutls_compression_get_id} (const char * @var{name})
-@var{name}: is a compression method name
-
-The names are compared in a case insensitive way.
-
-@strong{Returns:} an id of the specified in a string compression method, or
-@code{GNUTLS_COMP_UNKNOWN}  on error.
-@end deftypefun
-
-@subheading gnutls_compression_get_name
-@anchor{gnutls_compression_get_name}
-@deftypefun {const char *} {gnutls_compression_get_name} (gnutls_compression_method_t      @var{algorithm})
-@var{algorithm}: is a Compression algorithm
-
-Convert a @code{gnutls_compression_method_t}  value to a string.
-
-@strong{Returns:} a pointer to a string that contains the name of the
-specified compression algorithm, or @code{NULL} .
-@end deftypefun
-
-@subheading gnutls_compression_list
-@anchor{gnutls_compression_list}
-@deftypefun {const gnutls_compression_method_t *} {gnutls_compression_list} ( @var{void})
-
-Get a list of compression methods.  
-
-@strong{Returns:} a zero-terminated list of @code{gnutls_compression_method_t} 
-integers indicating the available compression methods.
 @end deftypefun
 
 @subheading gnutls_credentials_clear
@@ -1744,6 +2179,21 @@ This function has no effect.
 
 @strong{Returns:} Returns @code{GNUTLS_E_EXPIRED} , if the database entry has
 expired or 0 otherwise.
+
+@strong{Deprecated:} This function is deprecated.
+@end deftypefun
+
+@subheading gnutls_db_check_entry_expire_time
+@anchor{gnutls_db_check_entry_expire_time}
+@deftypefun {time_t} {gnutls_db_check_entry_expire_time} (gnutls_datum_t * @var{entry})
+@var{entry}: is a pointer to a @code{gnutls_datum_t}  type.
+
+This function returns the time that this entry will expire.
+It can be used for database entry expiration.
+
+@strong{Returns:} The time this entry will expire, or zero on error.
+
+@strong{Since:} 3.6.5
 @end deftypefun
 
 @subheading gnutls_db_check_entry_time
@@ -1796,8 +2246,11 @@ sessions.
 
 @var{seconds}: is the number of seconds.
 
-Set the expiration time for resumed sessions. The default is 3600
-(one hour) at the time of this writing.
+Set the expiration time for resumed sessions. The default is 21600
+(size hours) at the time of writing.
+
+The maximum value that can be set using this function is 604800
+(7 days).
 @end deftypefun
 
 @subheading gnutls_db_set_ptr
@@ -2135,6 +2588,25 @@ stored in the appropriate gnutls_datum.
 otherwise a negative error code is returned.
 @end deftypefun
 
+@subheading gnutls_dh_params_import_raw3
+@anchor{gnutls_dh_params_import_raw3}
+@deftypefun {int} {gnutls_dh_params_import_raw3} (gnutls_dh_params_t @var{dh_params}, const gnutls_datum_t * @var{prime}, const gnutls_datum_t * @var{q}, const gnutls_datum_t * @var{generator})
+@var{dh_params}: The parameters
+
+@var{prime}: holds the new prime
+
+@var{q}: holds the subgroup if available, otherwise NULL
+
+@var{generator}: holds the new generator
+
+This function will replace the pair of prime and generator for use
+in the Diffie-Hellman key exchange.  The new parameters should be
+stored in the appropriate gnutls_datum.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned,
+otherwise a negative error code is returned.
+@end deftypefun
+
 @subheading gnutls_dh_params_init
 @anchor{gnutls_dh_params_init}
 @deftypefun {int} {gnutls_dh_params_init} (gnutls_dh_params_t * @var{dh_params})
@@ -2226,7 +2698,7 @@ integers indicating the available digests.
 @deftypefun {gnutls_ecc_curve_t} {gnutls_ecc_curve_get} (gnutls_session_t @var{session})
 @var{session}: is a @code{gnutls_session_t}  type.
 
-Returns the currently used elliptic curve. Only valid
+Returns the currently used elliptic curve for key exchange. Only valid
 when using an elliptic curve ciphersuite.
 
 @strong{Returns:} the currently used curve, a @code{gnutls_ecc_curve_t} 
@@ -2315,14 +2787,14 @@ integers indicating the available curves.
 
 If a GnuTLS function returns a negative error code you may feed that
 value to this function to see if the error condition is fatal to
-a TLS session (i.e., must be terminated). 
+a TLS session (i.e., must be terminated).
 
 Note that you may also want to check the error code manually, since some
 non-fatal errors to the protocol (such as a warning alert or
 a rehandshake request) may be fatal for your program.
 
 This function is only useful if you are dealing with errors from
-functions that relate to a TLS session (e.g., record layer or handshake 
+functions that relate to a TLS session (e.g., record layer or handshake
 layer handling functions).
 
 @strong{Returns:} Non-zero value on fatal errors or zero on non-fatal.
@@ -2342,7 +2814,7 @@ where a warning alert should be sent to the peer indicating that no
 renegotiation will be performed.
 
 If there is no mapping to a valid alert the alert to indicate
-internal error is returned.
+internal error (@code{GNUTLS_A_INTERNAL_ERROR} ) is returned.
 
 @strong{Returns:} the alert code to use for a particular error code.
 @end deftypefun
@@ -2356,7 +2828,7 @@ internal error is returned.
 
 @var{mac}: is a @code{gnutls_mac_algorithm_t}  value
 
-@var{comp}: is a @code{gnutls_compression_method_t}  value
+@var{comp}: is a @code{gnutls_compression_method_t}  value (ignored)
 
 @var{flags}: must be zero
 
@@ -2371,12 +2843,29 @@ after a completed handshake.
 @strong{Since:} 3.2.2
 @end deftypefun
 
-@subheading gnutls_ext_get_data
-@anchor{gnutls_ext_get_data}
-@deftypefun {int} {gnutls_ext_get_data} (gnutls_session_t @var{session}, unsigned @var{type}, gnutls_ext_priv_data_t * @var{data})
+@subheading gnutls_ext_get_current_msg
+@anchor{gnutls_ext_get_current_msg}
+@deftypefun {unsigned} {gnutls_ext_get_current_msg} (gnutls_session_t @var{session})
 @var{session}: a @code{gnutls_session_t}  opaque pointer
 
-@var{type}: the numeric id of the extension
+This function allows an extension handler to obtain the message
+this extension is being called from. The returned value is a single
+entry of the @code{gnutls_ext_flags_t}  enumeration. That is, if an
+extension was registered with the @code{GNUTLS_EXT_FLAG_HRR}  and
+@code{GNUTLS_EXT_FLAG_EE}  flags, the value when called during parsing of the
+encrypted extensions message will be @code{GNUTLS_EXT_FLAG_EE} .
+
+If not called under an extension handler, its value is undefined.
+
+@strong{Since:} 3.6.3
+@end deftypefun
+
+@subheading gnutls_ext_get_data
+@anchor{gnutls_ext_get_data}
+@deftypefun {int} {gnutls_ext_get_data} (gnutls_session_t @var{session}, unsigned @var{tls_id}, gnutls_ext_priv_data_t * @var{data})
+@var{session}: a @code{gnutls_session_t}  opaque pointer
+
+@var{tls_id}: the numeric id of the extension
 
 @var{data}: a pointer to the private data to retrieve
 
@@ -2398,12 +2887,40 @@ Convert a TLS extension numeric ID to a printable string.
 specified cipher, or @code{NULL} .
 @end deftypefun
 
+@subheading gnutls_ext_raw_parse
+@anchor{gnutls_ext_raw_parse}
+@deftypefun {int} {gnutls_ext_raw_parse} (void * @var{ctx}, gnutls_ext_raw_process_func @var{cb}, const gnutls_datum_t * @var{data}, unsigned int @var{flags})
+@var{ctx}: a pointer to pass to callback function
+
+@var{cb}: callback function to process each extension found
+
+@var{data}: TLS extension data
+
+@var{flags}: should be zero or @code{GNUTLS_EXT_RAW_FLAG_TLS_CLIENT_HELLO}  or @code{GNUTLS_EXT_RAW_FLAG_DTLS_CLIENT_HELLO} 
+
+This function iterates through the TLS extensions as passed in
+ @code{data} , passing the individual extension data to callback. The
+ @code{data} must conform to Extension extensions<0..2^16-1> format.
+
+If flags is @code{GNUTLS_EXT_RAW_TLS_FLAG_CLIENT_HELLO}  then this function
+will parse the extension data from the position, as if the packet in
+ @code{data} is a client hello (without record or handshake headers) -
+as provided by @code{gnutls_handshake_set_hook_function()} .
+
+The return value of the callback will be propagated.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, or an error code. On unknown
+flags it returns @code{GNUTLS_E_INVALID_REQUEST} .
+
+@strong{Since:} 3.6.3
+@end deftypefun
+
 @subheading gnutls_ext_register
 @anchor{gnutls_ext_register}
-@deftypefun {int} {gnutls_ext_register} (const char * @var{name}, int @var{type}, gnutls_ext_parse_type_t @var{parse_type}, gnutls_ext_recv_func @var{recv_func}, gnutls_ext_send_func @var{send_func}, gnutls_ext_deinit_data_func @var{deinit_func}, gnutls_ext_pack_func @var{pack_func}, gnutls_ext_unpack_func @var{unpack_func})
+@deftypefun {int} {gnutls_ext_register} (const char * @var{name}, int @var{id}, gnutls_ext_parse_type_t @var{parse_type}, gnutls_ext_recv_func @var{recv_func}, gnutls_ext_send_func @var{send_func}, gnutls_ext_deinit_data_func @var{deinit_func}, gnutls_ext_pack_func @var{pack_func}, gnutls_ext_unpack_func @var{unpack_func})
 @var{name}: the name of the extension to register
 
-@var{type}: the numeric id of the extension
+@var{id}: the numeric TLS id of the extension
 
 @var{parse_type}: the parse type of the extension (see gnutls_ext_parse_type_t)
 
@@ -2425,6 +2942,9 @@ Each registered extension can store temporary data into the gnutls_session_t
 structure using @code{gnutls_ext_set_data()} , and they can be retrieved using
 @code{gnutls_ext_get_data()} .
 
+Any extensions registered with this function are valid for the client
+and TLS1.2 server hello (or encrypted extensions for TLS1.3).
+
 This function is not thread safe.
 
 @strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
@@ -2434,10 +2954,10 @@ This function is not thread safe.
 
 @subheading gnutls_ext_set_data
 @anchor{gnutls_ext_set_data}
-@deftypefun {void} {gnutls_ext_set_data} (gnutls_session_t @var{session}, unsigned @var{type}, gnutls_ext_priv_data_t @var{data})
+@deftypefun {void} {gnutls_ext_set_data} (gnutls_session_t @var{session}, unsigned @var{tls_id}, gnutls_ext_priv_data_t @var{data})
 @var{session}: a @code{gnutls_session_t}  opaque pointer
 
-@var{type}: the numeric id of the extension
+@var{tls_id}: the numeric id of the extension
 
 @var{data}: the private data to set
 
@@ -2477,11 +2997,42 @@ an error code is returned.
 @anchor{gnutls_fips140_mode_enabled}
 @deftypefun {unsigned} {gnutls_fips140_mode_enabled} ( @var{void})
 
-Checks whether this library is in FIPS140 mode.
+Checks whether this library is in FIPS140 mode. The returned
+value corresponds to the library mode as set with
+@code{gnutls_fips140_set_mode()} .
+
+If @code{gnutls_fips140_set_mode()}  was called with @code{GNUTLS_FIPS140_SET_MODE_THREAD} 
+then this function will return the current thread's FIPS140 mode, otherwise
+the global value is returned.
 
 @strong{Returns:} return non-zero if true or zero if false.
 
 @strong{Since:} 3.3.0
+@end deftypefun
+
+@subheading gnutls_fips140_set_mode
+@anchor{gnutls_fips140_set_mode}
+@deftypefun {void} {gnutls_fips140_set_mode} (gnutls_fips_mode_t @var{mode}, unsigned @var{flags})
+@var{mode}: the FIPS140-2 mode to switch to
+
+@var{flags}: should be zero or @code{GNUTLS_FIPS140_SET_MODE_THREAD} 
+
+That function is not thread-safe when changing the mode with no flags
+(globally), and should be called prior to creating any threads. Its
+behavior with no flags after threads are created is undefined.
+
+When the flag @code{GNUTLS_FIPS140_SET_MODE_THREAD}  is specified
+then this call will change the FIPS140-2 mode for this particular
+thread and not for the whole process. That way an application
+can utilize this function to set and reset mode for specific
+operations.
+
+This function never fails but will be a no-op if used when
+the library is not in FIPS140-2 mode. When asked to switch to unknown
+values for  @code{mode} or to @code{GNUTLS_FIPS140_SELFTESTS}  mode, the library
+switches to @code{GNUTLS_FIPS140_STRICT}  mode.
+
+@strong{Since:} 3.6.2
 @end deftypefun
 
 @subheading gnutls_global_deinit
@@ -2607,43 +3158,123 @@ as the standard function.
 @strong{Since:} 2.12.0
 @end deftypefun
 
+@subheading gnutls_gost_paramset_get_name
+@anchor{gnutls_gost_paramset_get_name}
+@deftypefun {const char *} {gnutls_gost_paramset_get_name} (gnutls_gost_paramset_t @var{param})
+@var{param}: is a GOST 28147 param set
+
+Convert a @code{gnutls_gost_paramset_t}  value to a string.
+
+@strong{Returns:} a string that contains the name of the specified GOST param set,
+or @code{NULL} .
+
+@strong{Since:} 3.6.3
+@end deftypefun
+
+@subheading gnutls_gost_paramset_get_oid
+@anchor{gnutls_gost_paramset_get_oid}
+@deftypefun {const char *} {gnutls_gost_paramset_get_oid} (gnutls_gost_paramset_t @var{param})
+@var{param}: is a GOST 28147 param set
+
+Convert a @code{gnutls_gost_paramset_t}  value to its object identifier.
+
+@strong{Returns:} a string that contains the object identifier of the specified GOST
+param set, or @code{NULL} .
+
+@strong{Since:} 3.6.3
+@end deftypefun
+
+@subheading gnutls_group_get
+@anchor{gnutls_group_get}
+@deftypefun {gnutls_group_t} {gnutls_group_get} (gnutls_session_t @var{session})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+Returns the currently used group for key exchange. Only valid
+when using an elliptic curve or DH ciphersuite.
+
+@strong{Returns:} the currently used group, a @code{gnutls_group_t} 
+type.
+
+@strong{Since:} 3.6.0
+@end deftypefun
+
+@subheading gnutls_group_get_id
+@anchor{gnutls_group_get_id}
+@deftypefun {gnutls_group_t} {gnutls_group_get_id} (const char * @var{name})
+@var{name}: is a group name
+
+The names are compared in a case insensitive way.
+
+@strong{Returns:} return a @code{gnutls_group_t}  value corresponding to
+the specified group, or @code{GNUTLS_GROUP_INVALID}  on error.
+
+@strong{Since:} 3.6.0
+@end deftypefun
+
+@subheading gnutls_group_get_name
+@anchor{gnutls_group_get_name}
+@deftypefun {const char *} {gnutls_group_get_name} (gnutls_group_t @var{group})
+@var{group}: is an element from @code{gnutls_group_t} 
+
+Convert a @code{gnutls_group_t}  value to a string.
+
+@strong{Returns:} a string that contains the name of the specified
+group or @code{NULL} .
+
+@strong{Since:} 3.6.0
+@end deftypefun
+
+@subheading gnutls_group_list
+@anchor{gnutls_group_list}
+@deftypefun {const gnutls_group_t *} {gnutls_group_list} ( @var{void})
+
+Get the list of supported elliptic curves.
+
+This function is not thread safe.
+
+@strong{Returns:} Return a (0)-terminated list of @code{gnutls_group_t} 
+integers indicating the available groups.
+
+@strong{Since:} 3.6.0
+@end deftypefun
+
 @subheading gnutls_handshake
 @anchor{gnutls_handshake}
 @deftypefun {int} {gnutls_handshake} (gnutls_session_t @var{session})
 @var{session}: is a @code{gnutls_session_t}  type.
 
-This function does the handshake of the TLS/SSL protocol, and
-initializes the TLS connection.
-
-This function will fail if any problem is encountered, and will
-return a negative error code. In case of a client, if the client
-has asked to resume a session, but the server couldn't, then a
-full handshake will be performed.
+This function performs the handshake of the TLS/SSL protocol, and
+initializes the TLS session parameters.
 
 The non-fatal errors expected by this function are:
 @code{GNUTLS_E_INTERRUPTED} , @code{GNUTLS_E_AGAIN} , 
-@code{GNUTLS_E_WARNING_ALERT_RECEIVED} , and @code{GNUTLS_E_GOT_APPLICATION_DATA} ,
-the latter only in a case of rehandshake.
+@code{GNUTLS_E_WARNING_ALERT_RECEIVED} . When this function is called
+for re-handshake under TLS 1.2 or earlier, the non-fatal error code
+@code{GNUTLS_E_GOT_APPLICATION_DATA}  may also be returned.
 
-The former two interrupt the handshake procedure due to the lower
-layer being interrupted, and the latter because of an alert that
-may be sent by a server (it is always a good idea to check any
-received alerts). On these errors call this function again, until it
-returns 0; cf.  @code{gnutls_record_get_direction()}  and
+The former two interrupt the handshake procedure due to the transport
+layer being interrupted, and the latter because of a "warning" alert that
+was sent by the peer (it is always a good idea to check any
+received alerts). On these non-fatal errors call this function again,
+until it returns 0; cf.  @code{gnutls_record_get_direction()}  and
 @code{gnutls_error_is_fatal()} . In DTLS sessions the non-fatal error
 @code{GNUTLS_E_LARGE_PACKET}  is also possible, and indicates that
 the MTU should be adjusted.
 
-If this function is called by a server after a rehandshake request
-then @code{GNUTLS_E_GOT_APPLICATION_DATA}  or
-@code{GNUTLS_E_WARNING_ALERT_RECEIVED}  may be returned.  Note that these
-are non fatal errors, only in the specific case of a rehandshake.
-Their meaning is that the client rejected the rehandshake request or
-in the case of @code{GNUTLS_E_GOT_APPLICATION_DATA}  it could also mean that
-some data were pending. A client may receive that error code if
-it initiates the handshake and the server doesn't agreed.
+When this function is called by a server after a rehandshake request
+under TLS 1.2 or earlier the @code{GNUTLS_E_GOT_APPLICATION_DATA}  error code indicates
+that some data were pending prior to peer initiating the handshake.
+Under TLS 1.3 this function when called after a successful handshake, is a no-op
+and always succeeds in server side; in client side this function is
+equivalent to @code{gnutls_session_key_update()}  with @code{GNUTLS_KU_PEER}  flag.
 
-@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
+This function handles both full and abbreviated TLS handshakes (resumption).
+For abbreviated handshakes, in client side, the @code{gnutls_session_set_data()} 
+should be called prior to this function to set parameters from a previous session.
+In server side, resumption is handled by either setting a DB back-end, or setting
+up keys for session tickets.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on a successful handshake, otherwise a negative error code.
 @end deftypefun
 
 @subheading gnutls_handshake_description_get_name
@@ -2691,12 +3322,12 @@ available handshake descriptions.
 
 @subheading gnutls_handshake_set_hook_function
 @anchor{gnutls_handshake_set_hook_function}
-@deftypefun {void} {gnutls_handshake_set_hook_function} (gnutls_session_t @var{session}, unsigned int @var{htype}, int @var{post}, gnutls_handshake_hook_func @var{func})
+@deftypefun {void} {gnutls_handshake_set_hook_function} (gnutls_session_t @var{session}, unsigned int @var{htype}, int @var{when}, gnutls_handshake_hook_func @var{func})
 @var{session}: is a @code{gnutls_session_t}  type
 
 @var{htype}: the @code{gnutls_handshake_description_t}  of the message to hook at
 
-@var{post}: @code{GNUTLS_HOOK_} * depending on when the hook function should be called
+@var{when}: @code{GNUTLS_HOOK_} * depending on when the hook function should be called
 
 @var{func}: is the function to be called
 
@@ -2704,14 +3335,14 @@ This function will set a callback to be called after or before the specified
 handshake message has been received or generated. This is a
 generalization of @code{gnutls_handshake_set_post_client_hello_function()} .
 
-To call the hook function prior to the message being sent/generated use
-@code{GNUTLS_HOOK_PRE}  as  @code{post} parameter, @code{GNUTLS_HOOK_POST}  to call
+To call the hook function prior to the message being generated or processed
+use @code{GNUTLS_HOOK_PRE}  as  @code{when} parameter, @code{GNUTLS_HOOK_POST}  to call
 after, and @code{GNUTLS_HOOK_BOTH}  for both cases.
 
 This callback must return 0 on success or a gnutls error code to
 terminate the handshake.
 
-Note to hook at all handshake messages use an  @code{htype} of @code{GNUTLS_HANDSHAKE_ANY} .
+To hook at all handshake messages use an  @code{htype} of @code{GNUTLS_HANDSHAKE_ANY} .
 
 @strong{Warning:} You should not use this function to terminate the
 handshake based on client input unless you know what you are
@@ -2827,7 +3458,7 @@ This function requires to set a pull timeout callback. See
 
 @subheading gnutls_heartbeat_allowed
 @anchor{gnutls_heartbeat_allowed}
-@deftypefun {int} {gnutls_heartbeat_allowed} (gnutls_session_t @var{session}, unsigned int @var{type})
+@deftypefun {unsigned} {gnutls_heartbeat_allowed} (gnutls_session_t @var{session}, unsigned int @var{type})
 @var{session}: is a @code{gnutls_session_t}  type.
 
 @var{type}: one of @code{GNUTLS_HB_LOCAL_ALLOWED_TO_SEND}  and @code{GNUTLS_HB_PEER_ALLOWED_TO_SEND} 
@@ -2849,7 +3480,8 @@ to be sent or received in this session.
 
 If this function is called with the @code{GNUTLS_HB_PEER_ALLOWED_TO_SEND} 
  @code{type} , GnuTLS will allow heartbeat messages to be received. Moreover it also
-request the peer to accept heartbeat messages.
+request the peer to accept heartbeat messages. This function
+must be called prior to TLS handshake.
 
 If the  @code{type} used is @code{GNUTLS_HB_LOCAL_ALLOWED_TO_SEND} , then the peer
 will be asked to accept heartbeat messages but not send ones.
@@ -3115,7 +3747,12 @@ error code.
 @deftypefun {gnutls_kx_algorithm_t} {gnutls_kx_get} (gnutls_session_t @var{session})
 @var{session}: is a @code{gnutls_session_t}  type.
 
-Get currently used key exchange algorithm.
+Get the currently used key exchange algorithm.
+
+This function will return @code{GNUTLS_KX_ECDHE_RSA} , or @code{GNUTLS_KX_DHE_RSA} 
+under TLS 1.3, to indicate an elliptic curve DH key exchange or
+a finite field one. The precise group used is available
+by calling @code{gnutls_group_get()}  instead.
 
 @strong{Returns:} the key exchange algorithm used in the last handshake, a
 @code{gnutls_kx_algorithm_t}  value.
@@ -3178,7 +3815,7 @@ Since 3.1.0
 @deftypefun {gnutls_mac_algorithm_t} {gnutls_mac_get} (gnutls_session_t @var{session})
 @var{session}: is a @code{gnutls_session_t}  type.
 
-Get currently used MAC algorithm.
+Get the currently used MAC algorithm.
 
 @strong{Returns:} the currently used mac algorithm, a
 @code{gnutls_mac_algorithm_t}  value.
@@ -3201,7 +3838,7 @@ algorithm string, or @code{GNUTLS_MAC_UNKNOWN}  on failure.
 @deftypefun {size_t} {gnutls_mac_get_key_size} (gnutls_mac_algorithm_t @var{algorithm})
 @var{algorithm}: is an encryption algorithm
 
-Returns the size of the MAC key used in TLS. 
+Returns the size of the MAC key used in TLS.
 
 @strong{Returns:} length (in bytes) of the given MAC key size, or 0 if the
 given MAC algorithm is invalid.
@@ -3223,7 +3860,7 @@ algorithm, or @code{NULL} .
 @deftypefun {const gnutls_mac_algorithm_t *} {gnutls_mac_list} ( @var{void})
 
 Get a list of hash algorithms for use as MACs.  Note that not
-necessarily all MACs are supported in TLS cipher suites.  
+necessarily all MACs are supported in TLS cipher suites.
 This function is not thread safe.
 
 @strong{Returns:} Return a (0)-terminated list of @code{gnutls_mac_algorithm_t} 
@@ -3260,8 +3897,6 @@ not return early if the strings don't match on the first byte.
 This function will operate similarly to @code{memset()} , but will
 not be optimized out by the compiler.
 
-@strong{Returns:} void.
-
 @strong{Since:} 3.4.0
 @end deftypefun
 
@@ -3270,22 +3905,20 @@ not be optimized out by the compiler.
 @deftypefun {int} {gnutls_ocsp_status_request_enable_client} (gnutls_session_t @var{session}, gnutls_datum_t * @var{responder_id}, size_t @var{responder_id_size}, gnutls_datum_t * @var{extensions})
 @var{session}: is a @code{gnutls_session_t}  type.
 
-@var{responder_id}: array with @code{gnutls_datum_t}  with DER data of responder id
+@var{responder_id}: ignored, must be @code{NULL} 
 
-@var{responder_id_size}: number of members in  @code{responder_id} array
+@var{responder_id_size}: ignored, must be zero
 
-@var{extensions}: a @code{gnutls_datum_t}  with DER encoded OCSP extensions
+@var{extensions}: ignored, must be @code{NULL} 
 
 This function is to be used by clients to request OCSP response
 from the server, using the "status_request" TLS extension.  Only
 OCSP status type is supported.
 
-The  @code{responder_id} array, its containing elements as well as
-the data of  @code{extensions} , must be allocated using @code{gnutls_malloc()} . They
-will be deinitialized on session cleanup.
-
-Due to the difficult semantics of the  @code{responder_id} and  @code{extensions} parameters, it is recommended to only call this function with these
-parameters set to @code{NULL} .
+Previous versions of GnuTLS supported setting  @code{responder_id} and
+ @code{extensions} fields, but due to the difficult semantics of the
+parameter usage, and other issues, this support was removed
+since 3.6.0 and these parameters must be set to @code{NULL} .
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned,
 otherwise a negative error code is returned.
@@ -3309,6 +3942,32 @@ constant. If no OCSP response is available then
 otherwise a negative error code is returned.
 
 @strong{Since:} 3.1.3
+@end deftypefun
+
+@subheading gnutls_ocsp_status_request_get2
+@anchor{gnutls_ocsp_status_request_get2}
+@deftypefun {int} {gnutls_ocsp_status_request_get2} (gnutls_session_t @var{session}, unsigned @var{idx}, gnutls_datum_t * @var{response})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{idx}: the index of peer's certificate
+
+@var{response}: a @code{gnutls_datum_t}  with DER encoded OCSP response
+
+This function returns the OCSP status response received
+from the TLS server for the certificate index provided.
+The index corresponds to certificates as returned by
+gnutls_certificate_get_peers. When index is zero this
+function operates identically to @code{gnutls_ocsp_status_request_get()} .
+
+The returned  @code{response} should be treated as
+constant. If no OCSP response is available for the
+given index then @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE} 
+is returned.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned,
+otherwise a negative error code is returned.
+
+@strong{Since:} 3.6.3
 @end deftypefun
 
 @subheading gnutls_ocsp_status_request_is_checked
@@ -3362,6 +4021,19 @@ the specified OID, or @code{GNUTLS_ECC_CURVE_INVALID}  on error.
 @strong{Since:} 3.4.3
 @end deftypefun
 
+@subheading gnutls_oid_to_gost_paramset
+@anchor{gnutls_oid_to_gost_paramset}
+@deftypefun {gnutls_gost_paramset_t} {gnutls_oid_to_gost_paramset} (const char * @var{oid})
+@var{oid}: is an object identifier
+
+Converts a textual object identifier to a @code{gnutls_gost_paramset_t}  value.
+
+@strong{Returns:} a @code{gnutls_gost_paramset_get_oid}  of the specified GOST 28147
+param st, or @code{GNUTLS_GOST_PARAMSET_UNKNOWN}  on failure.
+
+@strong{Since:} 3.6.3
+@end deftypefun
+
 @subheading gnutls_oid_to_mac
 @anchor{gnutls_oid_to_mac}
 @deftypefun {gnutls_mac_algorithm_t} {gnutls_oid_to_mac} (const char * @var{oid})
@@ -3404,14 +4076,13 @@ algorithm, or @code{GNUTLS_SIGN_UNKNOWN}  on failure.
 @subheading gnutls_openpgp_send_cert
 @anchor{gnutls_openpgp_send_cert}
 @deftypefun {void} {gnutls_openpgp_send_cert} (gnutls_session_t @var{session}, gnutls_openpgp_crt_status_t @var{status})
-@var{session}: a @code{gnutls_session_t}  type.
+@var{session}: is a gnutls session
 
-@var{status}: is one of GNUTLS_OPENPGP_CERT, or GNUTLS_OPENPGP_CERT_FINGERPRINT
+@var{status}: is ignored
 
-This function will order gnutls to send the key fingerprint
-instead of the key in the initial handshake procedure. This should
-be used with care and only when there is indication or knowledge
-that the server can obtain the client's key.
+This function is no-op.
+
+@strong{Returns:} @code{GNUTLS_E_UNIMPLEMENTED_FEATURE} .
 @end deftypefun
 
 @subheading gnutls_packet_deinit
@@ -3452,7 +4123,7 @@ the received packet.
 @var{result_size}: holds the size of the result
 
 This function will decode the given encoded data.  If the header
-given is non null this function will search for "-----BEGIN header"
+given is non @code{NULL}  this function will search for "-----BEGIN header"
 and decode only this part.  Otherwise it will decode the first PEM
 packet found.
 
@@ -3468,7 +4139,7 @@ not long enough, or 0 on success.
 
 @var{b64_data}: contains the encoded data
 
-@var{result}: the place where decoded data lie
+@var{result}: the location of decoded data
 
 This function will decode the given encoded data. The decoded data
 will be allocated, and stored into result.  If the header given is
@@ -3512,8 +4183,8 @@ not long enough, or 0 on success.
 
 @subheading gnutls_pem_base64_encode2
 @anchor{gnutls_pem_base64_encode2}
-@deftypefun {int} {gnutls_pem_base64_encode2} (const char * @var{msg}, const gnutls_datum_t * @var{data}, gnutls_datum_t * @var{result})
-@var{msg}: is a message to be put in the encoded header (may be @code{NULL} )
+@deftypefun {int} {gnutls_pem_base64_encode2} (const char * @var{header}, const gnutls_datum_t * @var{data}, gnutls_datum_t * @var{result})
+@var{header}: is a message to be put in the encoded header (may be @code{NULL} )
 
 @var{data}: contains the raw data
 
@@ -3677,9 +4348,54 @@ generated output is strongly connected to some additional data
 The output is placed in  @code{out} , which must be pre-allocated.
 
 @strong{Note:} This function produces identical output with @code{gnutls_prf_rfc5705()} 
-when  @code{server_random_first} is set to 0 and  @code{extra} is @code{NULL} .
+when  @code{server_random_first} is set to 0 and  @code{extra} is @code{NULL} . Under TLS1.3
+this function will only operate when these conditions are true, or otherwise
+return @code{GNUTLS_E_INVALID_REQUEST} .
 
 @strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, or an error code.
+@end deftypefun
+
+@subheading gnutls_prf_early
+@anchor{gnutls_prf_early}
+@deftypefun {int} {gnutls_prf_early} (gnutls_session_t @var{session}, size_t @var{label_size}, const char * @var{label}, size_t @var{context_size}, const char * @var{context}, size_t @var{outsize}, char * @var{out})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{label_size}: length of the  @code{label} variable.
+
+@var{label}: label used in PRF computation, typically a short string.
+
+@var{context_size}: length of the  @code{extra} variable.
+
+@var{context}: optional extra data to seed the PRF with.
+
+@var{outsize}: size of pre-allocated output buffer to hold the output.
+
+@var{out}: pre-allocated buffer to hold the generated data.
+
+This function is similar to @code{gnutls_prf_rfc5705()} , but only works in
+TLS 1.3 or later to export early keying material.
+
+Note that the keying material is only available after the
+ClientHello message is processed and before the application traffic
+keys are established.  Therefore this function shall be called in a
+handshake hook function for @code{GNUTLS_HANDSHAKE_CLIENT_HELLO} .
+
+The  @code{label} variable usually contains a string denoting the purpose
+for the generated data.
+
+The  @code{context} variable can be used to add more data to the seed, after
+the random variables.  It can be used to make sure the
+generated output is strongly connected to some additional data
+(e.g., a string used in user authentication).
+
+The output is placed in  @code{out} , which must be pre-allocated.
+
+Note that, to provide the RFC5705 context, the  @code{context} variable
+must be non-null.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, or an error code.
+
+@strong{Since:} 3.6.6
 @end deftypefun
 
 @subheading gnutls_prf_raw
@@ -3716,6 +4432,11 @@ function directly.  The @code{gnutls_prf()}  function seeds the PRF with the
 client and server random fields directly, and is recommended if you
 want to generate pseudo random data unique for each session.
 
+@strong{Note:} This function will only operate under TLS versions prior to 1.3.
+In TLS1.3 the use of PRF is replaced with HKDF and the generic
+exporters like @code{gnutls_prf_rfc5705()}  should be used instead. Under
+TLS1.3 this function returns @code{GNUTLS_E_INVALID_REQUEST} .
+
 @strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, or an error code.
 @end deftypefun
 
@@ -3736,15 +4457,18 @@ want to generate pseudo random data unique for each session.
 
 @var{out}: pre-allocated buffer to hold the generated data.
 
-Applies the TLS Pseudo-Random-Function (PRF) on the master secret
-and the provided data, seeded with the client and server random fields,
-as specified in RFC5705.
+Exports keying material from TLS/DTLS session to an application, as
+specified in RFC5705.
+
+In the TLS versions prior to 1.3, it applies the TLS
+Pseudo-Random-Function (PRF) on the master secret and the provided
+data, seeded with the client and server random fields.
+
+In TLS 1.3, it applies HKDF on the exporter master secret derived
+from the master secret.
 
 The  @code{label} variable usually contains a string denoting the purpose
-for the generated data.  The  @code{server_random_first} indicates whether
-the client random field or the server random field should be first
-in the seed.  Non-zero indicates that the server random field is first,
-0 that the client random field is first.
+for the generated data.
 
 The  @code{context} variable can be used to add more data to the seed, after
 the random variables.  It can be used to make sure the
@@ -3769,11 +4493,35 @@ must be non-null.
 @var{list}: will point to an integer list
 
 Get a list of available certificate types in the priority
-structure. 
+structure.
+
+As of version 3.6.4 this function is an alias for
+gnutls_priority_certificate_type_list2 with the target parameter
+set to:
+- GNUTLS_CTYPE_SERVER, if the @code{SERVER_PRECEDENCE}  option is set
+- GNUTLS_CTYPE_CLIENT, otherwise.
 
 @strong{Returns:} the number of certificate types, or an error code.
 
 @strong{Since:} 3.0
+@end deftypefun
+
+@subheading gnutls_priority_certificate_type_list2
+@anchor{gnutls_priority_certificate_type_list2}
+@deftypefun {int} {gnutls_priority_certificate_type_list2} (gnutls_priority_t @var{pcache}, const unsigned int ** @var{list}, gnutls_ctype_target_t @var{target})
+@var{pcache}: is a @code{gnutls_prioritity_t}  type.
+
+@var{list}: will point to an integer list.
+
+@var{target}: is a @code{gnutls_ctype_target_t}  type. Valid arguments are
+GNUTLS_CTYPE_CLIENT and GNUTLS_CTYPE_SERVER
+
+Get a list of available certificate types for the given target
+in the priority structure.
+
+@strong{Returns:} the number of certificate types, or an error code.
+
+@strong{Since:} 3.6.4
 @end deftypefun
 
 @subheading gnutls_priority_cipher_list
@@ -3784,26 +4532,11 @@ structure.
 @var{list}: will point to an integer list
 
 Get a list of available ciphers in the priority
-structure. 
+structure.
 
-@strong{Returns:} the number of curves, or an error code.
+@strong{Returns:} the number of items, or an error code.
 
 @strong{Since:} 3.2.3
-@end deftypefun
-
-@subheading gnutls_priority_compression_list
-@anchor{gnutls_priority_compression_list}
-@deftypefun {int} {gnutls_priority_compression_list} (gnutls_priority_t @var{pcache}, const unsigned int ** @var{list})
-@var{pcache}: is a @code{gnutls_prioritity_t}  type.
-
-@var{list}: will point to an integer list
-
-Get a list of available compression method in the priority
-structure. 
-
-@strong{Returns:} the number of methods, or an error code.
-
-@strong{Since:} 3.0
 @end deftypefun
 
 @subheading gnutls_priority_deinit
@@ -3822,9 +4555,12 @@ Deinitializes the priority cache.
 @var{list}: will point to an integer list
 
 Get a list of available elliptic curves in the priority
-structure. 
+structure.
 
-@strong{Returns:} the number of curves, or an error code.
+@strong{Deprecated:} This function has been replaced by
+@code{gnutls_priority_group_list()}  since 3.6.0.
+
+@strong{Returns:} the number of items, or an error code.
 
 @strong{Since:} 3.0
 @end deftypefun
@@ -3839,16 +4575,31 @@ structure.
 @var{sidx}: internal index of cipher suite to get information about.
 
 Provides the internal ciphersuite index to be used with
-@code{gnutls_cipher_suite_info()} . The index  @code{idx} provided is an 
+@code{gnutls_cipher_suite_info()} . The index  @code{idx} provided is an
 index kept at the priorities structure. It might be that a valid
-priorities index does not correspond to a ciphersuite and in 
-that case @code{GNUTLS_E_UNKNOWN_CIPHER_SUITE}  will be returned. 
-Once the last available index is crossed then 
+priorities index does not correspond to a ciphersuite and in
+that case @code{GNUTLS_E_UNKNOWN_CIPHER_SUITE}  will be returned.
+Once the last available index is crossed then
 @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  will be returned.
 
 @strong{Returns:} On success it returns @code{GNUTLS_E_SUCCESS}  (0), or a negative error value otherwise.
 
 @strong{Since:} 3.0.9
+@end deftypefun
+
+@subheading gnutls_priority_group_list
+@anchor{gnutls_priority_group_list}
+@deftypefun {int} {gnutls_priority_group_list} (gnutls_priority_t @var{pcache}, const unsigned int ** @var{list})
+@var{pcache}: is a @code{gnutls_prioritity_t}  type.
+
+@var{list}: will point to an integer list
+
+Get a list of available groups in the priority
+structure.
+
+@strong{Returns:} the number of items, or an error code.
+
+@strong{Since:} 3.6.0
 @end deftypefun
 
 @subheading gnutls_priority_init
@@ -3860,14 +4611,42 @@ Once the last available index is crossed then
 
 @var{err_pos}: In case of an error this will have the position in the string the error occurred
 
-Sets priorities for the ciphers, key exchange methods, macs and
-compression methods. The  @code{priority_cache} should be deinitialized
+For applications that do not modify their crypto settings per release, consider
+using @code{gnutls_priority_init2()}  with @code{GNUTLS_PRIORITY_INIT_DEF_APPEND}  flag
+instead. We suggest to use centralized crypto settings handled by the GnuTLS
+library, and applications modifying the default settings to their needs.
+
+This function is identical to @code{gnutls_priority_init2()}  with zero
+flags.
+
+A @code{NULL}   @code{priorities} string indicates the default priorities to be
+used (this is available since GnuTLS 3.3.0).
+
+@strong{Returns:} On syntax error @code{GNUTLS_E_INVALID_REQUEST}  is returned,
+@code{GNUTLS_E_SUCCESS}  on success, or an error code.
+@end deftypefun
+
+@subheading gnutls_priority_init2
+@anchor{gnutls_priority_init2}
+@deftypefun {int} {gnutls_priority_init2} (gnutls_priority_t * @var{priority_cache}, const char * @var{priorities}, const char ** @var{err_pos}, unsigned @var{flags})
+@var{priority_cache}: is a @code{gnutls_prioritity_t}  type.
+
+@var{priorities}: is a string describing priorities (may be @code{NULL} )
+
+@var{err_pos}: In case of an error this will have the position in the string the error occurred
+
+@var{flags}: zero or @code{GNUTLS_PRIORITY_INIT_DEF_APPEND} 
+
+Sets priorities for the ciphers, key exchange methods, and macs.
+The  @code{priority_cache} should be deinitialized
 using @code{gnutls_priority_deinit()} .
 
 The @code{priorities}  option allows you to specify a colon
 separated list of the cipher priorities to enable.
 Some keywords are defined to provide quick access
 to common preferences.
+
+When  @code{flags} is set to @code{GNUTLS_PRIORITY_INIT_DEF_APPEND}  then the  @code{priorities} specified will be appended to the default options.
 
 Unless there is a special need, use the "NORMAL" keyword to
 apply a reasonable security level, or "NORMAL:%COMPAT" for compatibility.
@@ -3884,8 +4663,8 @@ weak today.
 included as a fallback only.  The ciphers are sorted by security
 margin.
 
-"PFS" means all "secure" ciphersuites that support perfect forward secrecy. 
-The 256-bit ciphers are included as a fallback only.  
+"PFS" means all "secure" ciphersuites that support perfect forward secrecy.
+The 256-bit ciphers are included as a fallback only.
 The ciphers are sorted by security margin.
 
 "SECURE128" means all "secure" ciphersuites of security level 128-bit
@@ -3900,8 +4679,7 @@ of 128.
 "SUITEB192" means all the NSA SuiteB ciphersuites with security level
 of 192.
 
-"NONE" means nothing is enabled.  This disables even protocols and
-compression methods.
+"NONE" means nothing is enabled.  This disables everything, including protocols.
 
 "@@KEYWORD1,KEYWORD2,..." The system administrator imposed settings.
 The provided keyword(s) will be expanded from a configuration-time
@@ -3932,12 +4710,12 @@ information.
 
 "NORMAL:+ARCFOUR-128" means normal ciphers plus ARCFOUR-128.
 
-"SECURE128:-VERS-SSL3.0:+COMP-DEFLATE" means that only secure ciphers are
-enabled, SSL3.0 is disabled, and libz compression enabled.
+"SECURE128:-VERS-SSL3.0" means that only secure ciphers are
+and enabled, SSL3.0 is disabled.
 
-"NONE:+VERS-TLS-ALL:+AES-128-CBC:+RSA:+SHA1:+COMP-NULL:+SIGN-RSA-SHA1", 
+"NONE:+VERS-TLS-ALL:+AES-128-CBC:+RSA:+SHA1:+COMP-NULL:+SIGN-RSA-SHA1",
 
-"NONE:+VERS-TLS-ALL:+AES-128-CBC:+ECDHE-RSA:+SHA1:+COMP-NULL:+SIGN-RSA-SHA1:+CURVE-SECP256R1", 
+"NONE:+VERS-TLS-ALL:+AES-128-CBC:+ECDHE-RSA:+SHA1:+COMP-NULL:+SIGN-RSA-SHA1:+CURVE-SECP256R1",
 
 "SECURE256:+SECURE128",
 
@@ -3948,6 +4726,8 @@ used (this is available since GnuTLS 3.3.0).
 
 @strong{Returns:} On syntax error @code{GNUTLS_E_INVALID_REQUEST}  is returned,
 @code{GNUTLS_E_SUCCESS}  on success, or an error code.
+
+@strong{Since:} 3.6.3
 @end deftypefun
 
 @subheading gnutls_priority_kx_list
@@ -3958,9 +4738,9 @@ used (this is available since GnuTLS 3.3.0).
 @var{list}: will point to an integer list
 
 Get a list of available key exchange methods in the priority
-structure. 
+structure.
 
-@strong{Returns:} the number of curves, or an error code.
+@strong{Returns:} the number of items, or an error code.
 
 @strong{Since:} 3.2.3
 @end deftypefun
@@ -3973,9 +4753,9 @@ structure.
 @var{list}: will point to an integer list
 
 Get a list of available MAC algorithms in the priority
-structure. 
+structure.
 
-@strong{Returns:} the number of curves, or an error code.
+@strong{Returns:} the number of items, or an error code.
 
 @strong{Since:} 3.2.3
 @end deftypefun
@@ -3988,7 +4768,7 @@ structure.
 @var{list}: will point to an integer list
 
 Get a list of available TLS version numbers in the priority
-structure. 
+structure.
 
 @strong{Returns:} the number of protocols, or an error code.
 
@@ -4003,9 +4783,12 @@ structure.
 @var{priority}: is a @code{gnutls_priority_t}  type.
 
 Sets the priorities to use on the ciphers, key exchange methods,
-macs and compression methods.
+and macs. Note that this function is expected to be called once
+per session; when called multiple times (e.g., before a re-handshake,
+the caller should make sure that any new settings are not incompatible
+with the original session).
 
-@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, or an error code.
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, or an error code on error.
 @end deftypefun
 
 @subheading gnutls_priority_set_direct
@@ -4018,11 +4801,12 @@ macs and compression methods.
 @var{err_pos}: In case of an error this will have the position in the string the error occurred
 
 Sets the priorities to use on the ciphers, key exchange methods,
-macs and compression methods.  This function avoids keeping a
+and macs.  This function avoids keeping a
 priority cache and is used to directly set string priorities to a
 TLS session.  For documentation check the @code{gnutls_priority_init()} .
 
-To simply use a reasonable default, consider using @code{gnutls_set_default_priority()} .
+To use a reasonable default, consider using @code{gnutls_set_default_priority()} ,
+or @code{gnutls_set_default_priority_append()}  instead of this function.
 
 @strong{Returns:} On syntax error @code{GNUTLS_E_INVALID_REQUEST}  is returned,
 @code{GNUTLS_E_SUCCESS}  on success, or an error code.
@@ -4036,7 +4820,7 @@ To simply use a reasonable default, consider using @code{gnutls_set_default_prio
 @var{list}: will point to an integer list
 
 Get a list of available signature algorithms in the priority
-structure. 
+structure.
 
 @strong{Returns:} the number of algorithms, or an error code.
 
@@ -4135,7 +4919,10 @@ The PSK identity hint may give the client help in deciding which
 username to use.  This should only be called in case of PSK
 authentication and in case of a client.
 
-@strong{Returns:} the identity hint of the peer, or @code{NULL}  in case of an error.
+@strong{Note:} there is no hint in TLS 1.3, so this function will return @code{NULL} 
+if TLS 1.3 has been negotiated.
+
+@strong{Returns:} the identity hint of the peer, or @code{NULL}  in case of an error or if TLS 1.3 is being used.
 
 @strong{Since:} 2.4.0
 @end deftypefun
@@ -4182,9 +4969,9 @@ case of a server.
 This function sets the username and password, in a
 gnutls_psk_client_credentials_t type.  Those will be used in
 PSK authentication.   @code{username} should be an ASCII string or UTF-8
-strings prepared using the "SASLprep" profile of "stringprep".  The
-key can be either in raw byte format or in Hex format (without the
-0x prefix).
+string. In case of a UTF-8 string it is recommended to be following
+the PRECIS framework for usernames (rfc8265). The key can be either
+in raw byte format or in Hex format (without the 0x prefix).
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise
 an error code is returned.
@@ -4204,8 +4991,9 @@ int (*callback)(gnutls_session_t, char** username,
 gnutls_datum_t* key);
 
 The  @code{username} and  @code{key} ->data must be allocated using @code{gnutls_malloc()} .
- @code{username} should be ASCII strings or UTF-8 strings prepared using
-the "SASLprep" profile of "stringprep".
+The  @code{username} should be an ASCII string or UTF-8
+string. In case of a UTF-8 string it is recommended to be following
+the PRECIS framework for usernames (rfc8265).
 
 The callback function will be called once per handshake.
 
@@ -4223,6 +5011,10 @@ The callback function should return 0 on success.
 This function will set a callback in order for the server to get
 the Diffie-Hellman or RSA parameters for PSK authentication.  The
 callback should return @code{GNUTLS_E_SUCCESS}  (0) on success.
+
+@strong{Deprecated:} This function is unnecessary and discouraged on GnuTLS 3.6.0
+or later. Since 3.6.0, DH parameters are negotiated
+following RFC7919.
 @end deftypefun
 
 @subheading gnutls_psk_set_server_credentials_file
@@ -4291,6 +5083,10 @@ an error code is returned.
 This function will set the Diffie-Hellman parameters for an
 anonymous server to use. These parameters will be used in
 Diffie-Hellman exchange with PSK cipher suites.
+
+@strong{Deprecated:} This function is unnecessary and discouraged on GnuTLS 3.6.0
+or later. Since 3.6.0, DH parameters are negotiated
+following RFC7919.
 @end deftypefun
 
 @subheading gnutls_psk_set_server_known_dh_params
@@ -4304,6 +5100,10 @@ This function will set the Diffie-Hellman parameters for a
 PSK server to use. These parameters will be used in
 Ephemeral Diffie-Hellman cipher suites and will be selected from
 the FFDHE set of RFC7919 according to the security level provided.
+
+@strong{Deprecated:} This function is unnecessary and discouraged on GnuTLS 3.6.0
+or later. Since 3.6.0, DH parameters are negotiated
+following RFC7919.
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.
@@ -4321,6 +5121,10 @@ negative error value.
 This function will set a callback in order for the server to get
 the Diffie-Hellman parameters for PSK authentication.  The callback
 should return @code{GNUTLS_E_SUCCESS}  (0) on success.
+
+@strong{Deprecated:} This function is unnecessary and discouraged on GnuTLS 3.6.0
+or later. Since 3.6.0, DH parameters are negotiated
+following RFC7919.
 @end deftypefun
 
 @subheading gnutls_random_art
@@ -4368,16 +5172,57 @@ That process should be repeated until  @code{remainder} is (0,0).
 Note that  @code{orig} is not changed, while the values of  @code{next} and  @code{remainder} are modified to store the resulting values.
 @end deftypefun
 
+@subheading gnutls_reauth
+@anchor{gnutls_reauth}
+@deftypefun {int} {gnutls_reauth} (gnutls_session_t @var{session}, unsigned int @var{flags})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{flags}: must be zero
+
+This function performs the post-handshake authentication
+for TLS 1.3. The post-handshake authentication is initiated by the server
+by calling this function. Clients respond when @code{GNUTLS_E_REAUTH_REQUEST} 
+has been seen while receiving data.
+
+The non-fatal errors expected by this function are:
+@code{GNUTLS_E_INTERRUPTED} , @code{GNUTLS_E_AGAIN} , as well as
+@code{GNUTLS_E_GOT_APPLICATION_DATA}  when called on server side.
+
+The former two interrupt the authentication procedure due to the transport
+layer being interrupted, and the latter because there were pending data prior
+to peer initiating the re-authentication. The server should read/process that
+data as unauthenticated and retry calling @code{gnutls_reauth()} .
+
+When this function is called under TLS1.2 or earlier or the peer didn't
+advertise post-handshake auth, it always fails with
+@code{GNUTLS_E_INVALID_REQUEST} . The verification of the received peers certificate
+is delegated to the session or credentials verification callbacks. A
+server can check whether post handshake authentication is supported
+by the client by checking the session flags with @code{gnutls_session_get_flags()} .
+
+Prior to calling this function in server side, the function
+@code{gnutls_certificate_server_set_request()}  must be called setting expectations
+for the received certificate (request or require). If none are set
+this function will return with @code{GNUTLS_E_INVALID_REQUEST} .
+
+Note that post handshake authentication is available irrespective
+of the initial negotiation type (PSK or certificate). In all cases
+however, certificate credentials must be set to the session prior
+to calling this function.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on a successful authentication, otherwise a negative error code.
+@end deftypefun
+
 @subheading gnutls_record_can_use_length_hiding
 @anchor{gnutls_record_can_use_length_hiding}
-@deftypefun {int} {gnutls_record_can_use_length_hiding} (gnutls_session_t @var{session})
+@deftypefun {unsigned} {gnutls_record_can_use_length_hiding} (gnutls_session_t @var{session})
 @var{session}: is a @code{gnutls_session_t}  type.
 
 If the session supports length-hiding padding, you can
-invoke @code{gnutls_range_send_message()}  to send a message whose
+invoke @code{gnutls_record_send_range()}  to send a message whose
 length is hidden in the given range. If the session does not
 support length hiding padding, you can use the standard
-@code{gnutls_record_send()}  function, or @code{gnutls_range_send_message()} 
+@code{gnutls_record_send()}  function, or @code{gnutls_record_send_range()} 
 making sure that the range is the same as the length of the
 message you are trying to send.
 
@@ -4434,8 +5279,8 @@ need to use this function, but there are buggy clients that
 complain if a server pads the encrypted data.  This of course will
 disable protection against statistical attacks on the data.
 
-This functions is defunt since 3.1.7. Random padding is disabled
-by default unless requested using @code{gnutls_range_send_message()} .
+This function is defunct since 3.1.7. Random padding is disabled
+by default unless requested using @code{gnutls_record_send_range()} .
 @end deftypefun
 
 @subheading gnutls_record_discard_queued
@@ -4456,17 +5301,35 @@ These are the packets queued after an interrupted @code{gnutls_record_send()} .
 @deftypefun {int} {gnutls_record_get_direction} (gnutls_session_t @var{session})
 @var{session}: is a @code{gnutls_session_t}  type.
 
-This function provides information about the internals of the
-record protocol and is only useful if a prior gnutls function call,
-e.g.  @code{gnutls_handshake()} , was interrupted for some reason. That
-is, if a function returned @code{GNUTLS_E_INTERRUPTED}  or
-@code{GNUTLS_E_AGAIN} . In such a case, you might want to call @code{select()} 
-or @code{poll()}  before restoring the interrupted gnutls function.
+This function is useful to determine whether a GnuTLS function was interrupted
+while sending or receiving, so that @code{select()}  or @code{poll()}  may be called appropriately.
+
+It provides information about the internals of the record
+protocol and is only useful if a prior gnutls function call,
+e.g.  @code{gnutls_handshake()} , was interrupted and returned
+@code{GNUTLS_E_INTERRUPTED}  or @code{GNUTLS_E_AGAIN} . After such an interrupt
+applications may call @code{select()}  or @code{poll()}  before restoring the
+interrupted GnuTLS function.
 
 This function's output is unreliable if you are using the same
- @code{session} in different threads, for sending and receiving.
+ @code{session} in different threads for sending and receiving.
 
 @strong{Returns:} 0 if interrupted while trying to read data, or 1 while trying to write data.
+@end deftypefun
+
+@subheading gnutls_record_get_max_early_data_size
+@anchor{gnutls_record_get_max_early_data_size}
+@deftypefun {size_t} {gnutls_record_get_max_early_data_size} (gnutls_session_t @var{session})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+This function returns the maximum early data size in this connection.
+This property can only be set to servers.  The client may be
+provided with the maximum allowed size through the "early_data"
+extension of the NewSessionTicket handshake message.
+
+@strong{Returns:} The maximum early data size in this connection.
+
+@strong{Since:} 3.6.5
 @end deftypefun
 
 @subheading gnutls_record_get_max_size
@@ -4482,7 +5345,7 @@ client after the first handshake message.
 
 @subheading gnutls_record_get_state
 @anchor{gnutls_record_get_state}
-@deftypefun {int} {gnutls_record_get_state} (gnutls_session_t @var{session}, unsigned @var{read}, gnutls_datum_t * @var{mac_key}, gnutls_datum_t * @var{IV}, gnutls_datum_t * @var{cipher_key}, unsigned char @var{seq_number[8]})
+@deftypefun {int} {gnutls_record_get_state} (gnutls_session_t @var{session}, unsigned @var{read}, gnutls_datum_t * @var{mac_key}, gnutls_datum_t * @var{IV}, gnutls_datum_t * @var{cipher_key}, unsigned char [8] @var{seq_number})
 @var{session}: is a @code{gnutls_session_t}  type
 
 @var{read}: if non-zero the read parameters are returned, otherwise the write
@@ -4493,13 +5356,14 @@ client after the first handshake message.
 
 @var{cipher_key}: the cipher key
 
-@var{seq_number[8]}: -- undescribed --
+@var{seq_number}: A 64-bit sequence number
 
 This function will return the parameters of the current record state.
 These are only useful to be provided to an external off-loading device
-or subsystem.
+or subsystem. The returned values should be considered constant
+and valid for the lifetime of the session.
 
-In that case, to sync the state you must call @code{gnutls_record_set_state()} .
+In that case, to sync the state back you must call @code{gnutls_record_set_state()} .
 
 @strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, or an error code.
 
@@ -4547,6 +5411,33 @@ call this function again to get the data.  See also
 @strong{Returns:} The number of bytes received and zero on EOF (for stream
 connections).  A negative error code is returned in case of an error.  
 The number of bytes received might be less than the requested  @code{data_size} .
+@end deftypefun
+
+@subheading gnutls_record_recv_early_data
+@anchor{gnutls_record_recv_early_data}
+@deftypefun {ssize_t} {gnutls_record_recv_early_data} (gnutls_session_t @var{session}, void * @var{data}, size_t @var{data_size})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{data}: the buffer that the data will be read into
+
+@var{data_size}: the number of requested bytes
+
+This function can be used by a searver to retrieve data sent early
+in the handshake processes when resuming a session.  This is used
+to implement a zero-roundtrip (0-RTT) mode.  It has the same
+semantics as @code{gnutls_record_recv()} .
+
+This function can be called either in a handshake hook, or after
+the handshake is complete.
+
+@strong{Returns:} The number of bytes received and zero when early data
+reading is complete.  A negative error code is returned in case of
+an error.  If no early data is received during the handshake, this
+function returns @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE} .  The
+number of bytes received might be less than the requested
+ @code{data_size} .
+
+@strong{Since:} 3.6.5
 @end deftypefun
 
 @subheading gnutls_record_recv_packet
@@ -4635,6 +5526,63 @@ number of bytes this function can send in a single call depends
 on the negotiated maximum record size.
 @end deftypefun
 
+@subheading gnutls_record_send2
+@anchor{gnutls_record_send2}
+@deftypefun {ssize_t} {gnutls_record_send2} (gnutls_session_t @var{session}, const void * @var{data}, size_t @var{data_size}, size_t @var{pad}, unsigned @var{flags})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{data}: contains the data to send
+
+@var{data_size}: is the length of the data
+
+@var{pad}: padding to be added to the record
+
+@var{flags}: must be zero
+
+This function is identical to @code{gnutls_record_send()}  except that it
+takes an extra argument to specify padding to be added the record.
+To determine the maximum size of padding, use
+@code{gnutls_record_get_max_size()}  and @code{gnutls_record_overhead_size()} .
+
+Note that in order for GnuTLS to provide constant time processing
+of padding and data in TLS1.3, the flag @code{GNUTLS_SAFE_PADDING_CHECK} 
+must be used in @code{gnutls_init()} .
+
+@strong{Returns:} The number of bytes sent, or a negative error code.  The
+number of bytes sent might be less than  @code{data_size} .  The maximum
+number of bytes this function can send in a single call depends
+on the negotiated maximum record size.
+
+@strong{Since:} 3.6.3
+@end deftypefun
+
+@subheading gnutls_record_send_early_data
+@anchor{gnutls_record_send_early_data}
+@deftypefun {ssize_t} {gnutls_record_send_early_data} (gnutls_session_t @var{session}, const void * @var{data}, size_t @var{data_size})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{data}: contains the data to send
+
+@var{data_size}: is the length of the data
+
+This function can be used by a client to send data early in the
+handshake processes when resuming a session.  This is used to
+implement a zero-roundtrip (0-RTT) mode.  It has the same semantics
+as @code{gnutls_record_send()} .
+
+There may be a limit to the amount of data sent as early data.  Use
+@code{gnutls_record_get_max_early_data_size()}  to check the limit.  If the
+limit exceeds, this function returns
+@code{GNUTLS_E_RECORD_LIMIT_REACHED} .
+
+@strong{Returns:} The number of bytes sent, or a negative error code.  The
+number of bytes sent might be less than  @code{data_size} .  The maximum
+number of bytes this function can send in a single call depends
+on the negotiated maximum record size.
+
+@strong{Since:} 3.6.5
+@end deftypefun
+
 @subheading gnutls_record_send_range
 @anchor{gnutls_record_send_range}
 @deftypefun {ssize_t} {gnutls_record_send_range} (gnutls_session_t @var{session}, const void * @var{data}, size_t @var{data_size}, const gnutls_range_st * @var{range})
@@ -4655,10 +5603,49 @@ TLS or SSL3 sessions). To know whether the current session supports extra
 padding, and hence length hiding, use the @code{gnutls_record_can_use_length_hiding()} 
 function.
 
-@strong{Note:} This function currently is only limited to blocking sockets.
+@strong{Note:} This function currently is limited to blocking sockets.
 
 @strong{Returns:} The number of bytes sent (that is data_size in a successful invocation),
 or a negative error code.
+@end deftypefun
+
+@subheading gnutls_record_set_max_early_data_size
+@anchor{gnutls_record_set_max_early_data_size}
+@deftypefun {int} {gnutls_record_set_max_early_data_size} (gnutls_session_t @var{session}, size_t @var{size})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{size}: is the new size
+
+This function sets the maximum early data size in this connection.
+This property can only be set to servers.  The client may be
+provided with the maximum allowed size through the "early_data"
+extension of the NewSessionTicket handshake message.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned,
+otherwise a negative error code is returned.
+
+@strong{Since:} 3.6.4
+@end deftypefun
+
+@subheading gnutls_record_set_max_recv_size
+@anchor{gnutls_record_set_max_recv_size}
+@deftypefun {ssize_t} {gnutls_record_set_max_recv_size} (gnutls_session_t @var{session}, size_t @var{size})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{size}: is the new size
+
+This function sets the maximum amount of plaintext received in a
+record in this connection.
+
+The limit is also negotiated through a TLS extension called 'record
+size limit'.  Note that while the 'record size limit' extension is
+preferred, not all TLS implementations use or even understand the
+extension.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned,
+otherwise a negative error code is returned.
+
+@strong{Since:} 3.6.8
 @end deftypefun
 
 @subheading gnutls_record_set_max_size
@@ -4668,17 +5655,22 @@ or a negative error code.
 
 @var{size}: is the new size
 
-This function sets the maximum record packet size in this
-connection.  This property can only be set to clients.  The server
-may choose not to accept the requested size.
+This function sets the maximum amount of plaintext sent and
+received in a record in this connection.
 
-Acceptable values are 512(=2^9), 1024(=2^10), 2048(=2^11) and
-4096(=2^12).  The requested record size does get in effect
-immediately only while sending data. The receive part will take
-effect after a successful handshake.
+Prior to 3.6.4, this function was implemented using a TLS extension
+called 'max fragment length', which limits the acceptable values to
+512(=2^9), 1024(=2^10), 2048(=2^11) and 4096(=2^12).
 
-This function uses a TLS extension called 'max record size'.  Not
-all TLS implementations use or even understand this extension.
+Since 3.6.4, the limit is also negotiated through a new TLS
+extension called 'record size limit', which doesn't have the
+limitation, as long as the value ranges between 512 and 16384.
+Note that while the 'record size limit' extension is preferred, not
+all TLS implementations use or even understand the extension.
+
+@strong{Deprecated:} if the client can assume that the 'record size limit'
+extension is supported by the server, we recommend using
+@code{gnutls_record_set_max_recv_size()}  instead.
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned,
 otherwise a negative error code is returned.
@@ -4686,12 +5678,12 @@ otherwise a negative error code is returned.
 
 @subheading gnutls_record_set_state
 @anchor{gnutls_record_set_state}
-@deftypefun {int} {gnutls_record_set_state} (gnutls_session_t @var{session}, unsigned @var{read}, unsigned char @var{seq_number[8]})
+@deftypefun {int} {gnutls_record_set_state} (gnutls_session_t @var{session}, unsigned @var{read}, const unsigned char [8] @var{seq_number})
 @var{session}: is a @code{gnutls_session_t}  type
 
 @var{read}: if non-zero the read parameters are returned, otherwise the write
 
-@var{seq_number[8]}: -- undescribed --
+@var{seq_number}: A 64-bit sequence number
 
 This function will set the sequence number in the current record state.
 This function is useful if sending and receiving are offloaded from
@@ -4749,28 +5741,38 @@ otherwise a negative error code.
 @deftypefun {int} {gnutls_rehandshake} (gnutls_session_t @var{session})
 @var{session}: is a @code{gnutls_session_t}  type.
 
-This function will renegotiate security parameters with the
-client.  This should only be called in case of a server.
+This function can only be called in server side, and
+instructs a TLS 1.2 or earlier client to renegotiate
+parameters (perform a handshake), by sending a 
+hello request message.
 
-This message informs the peer that we want to renegotiate
-parameters (perform a handshake).
+If this function succeeds, the calling application
+should call @code{gnutls_record_recv()}  until @code{GNUTLS_E_REHANDSHAKE} 
+is returned to clear any pending data. If the @code{GNUTLS_E_REHANDSHAKE} 
+error code is not seen, then the handshake request was
+not followed by the peer (the TLS protocol does not require
+the client to do, and such compliance should be handled
+by the application protocol).
 
-If this function succeeds (returns 0), you must call the
-@code{gnutls_handshake()}  function in order to negotiate the new
+Once the @code{GNUTLS_E_REHANDSHAKE}  error code is seen, the
+calling application should proceed to calling
+@code{gnutls_handshake()}  to negotiate the new
 parameters.
 
-Since TLS is full duplex some application data might have been
-sent during peer's processing of this message. In that case
-one should call @code{gnutls_record_recv()}  until GNUTLS_E_REHANDSHAKE
-is returned to clear any pending data. Care must be taken, if
-rehandshake is mandatory, to terminate if it does not start after
-some threshold.
-
 If the client does not wish to renegotiate parameters he 
-should reply with an alert message, thus the return code will be
-@code{GNUTLS_E_WARNING_ALERT_RECEIVED}  and the alert will be
+may reply with an alert message, and in that case the return code seen
+by subsequent @code{gnutls_record_recv()}  will be
+@code{GNUTLS_E_WARNING_ALERT_RECEIVED}  with the specific alert being
 @code{GNUTLS_A_NO_RENEGOTIATION} .  A client may also choose to ignore
-this message.
+this request.
+
+Under TLS 1.3 this function is equivalent to @code{gnutls_session_key_update()} 
+with the @code{GNUTLS_KU_PEER}  flag. In that case subsequent calls to
+@code{gnutls_record_recv()}  will not return @code{GNUTLS_E_REHANDSHAKE} , and
+calls to @code{gnutls_handshake()}  in server side are a no-op.
+
+This function always fails with @code{GNUTLS_E_INVALID_REQUEST}  when
+called in client side.
 
 @strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
 @end deftypefun
@@ -4858,7 +5860,7 @@ If  @code{data} has not enough size to hold the server name
 GNUTLS_E_SHORT_MEMORY_BUFFER is returned, and  @code{data_length} will
 hold the required size.
 
- @code{index} is used to retrieve more than one server names (if sent by
+ @code{indx} is used to retrieve more than one server names (if sent by
 the client).  The first server name has an index of 0, the second 1
 and so on.  If no name with the given index exists
 GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE is returned.
@@ -4877,7 +5879,7 @@ error code is returned.
 
 @var{name}: is a string that contains the server name.
 
-@var{name_length}: holds the length of name
+@var{name_length}: holds the length of name excluding the terminating null byte
 
 This function is to be used by clients that want to inform (via a
 TLS extension mechanism) the server of the name they connected to.
@@ -4931,6 +5933,8 @@ everything out there, need to call this function.
 
 Note that this function must be called after any call to gnutls_priority
 functions.
+
+@strong{Since:} 2.1.4
 @end deftypefun
 
 @subheading gnutls_session_etm_status
@@ -4950,19 +5954,20 @@ This is in accordance to rfc7366
 @var{session}: is a @code{gnutls_session_t}  type.
 
 Get the status of the extended master secret extension negotiation.
-This is in accordance to draft-ietf-tls-session-hash-01
+This is in accordance to RFC7627. That information is also
+available to the more generic @code{gnutls_session_get_flags()} .
 
 @strong{Returns:} Non-zero if the negotiation was successful or zero otherwise.
 @end deftypefun
 
 @subheading gnutls_session_ext_register
 @anchor{gnutls_session_ext_register}
-@deftypefun {int} {gnutls_session_ext_register} (gnutls_session_t @var{session}, const char * @var{name}, int @var{type}, gnutls_ext_parse_type_t @var{parse_type}, gnutls_ext_recv_func @var{recv_func}, gnutls_ext_send_func @var{send_func}, gnutls_ext_deinit_data_func @var{deinit_func}, gnutls_ext_pack_func @var{pack_func}, gnutls_ext_unpack_func @var{unpack_func}, unsigned @var{flags})
+@deftypefun {int} {gnutls_session_ext_register} (gnutls_session_t @var{session}, const char * @var{name}, int @var{id}, gnutls_ext_parse_type_t @var{parse_type}, gnutls_ext_recv_func @var{recv_func}, gnutls_ext_send_func @var{send_func}, gnutls_ext_deinit_data_func @var{deinit_func}, gnutls_ext_pack_func @var{pack_func}, gnutls_ext_unpack_func @var{unpack_func}, unsigned @var{flags})
 @var{session}: the session for which this extension will be set
 
 @var{name}: the name of the extension to register
 
-@var{type}: the numeric id of the extension
+@var{id}: the numeric id of the extension
 
 @var{parse_type}: the parse type of the extension (see gnutls_ext_parse_type_t)
 
@@ -4983,13 +5988,17 @@ only usable within the registered session. If the extension type
 is already registered then @code{GNUTLS_E_ALREADY_REGISTERED}  will be returned,
 unless the flag @code{GNUTLS_EXT_FLAG_OVERRIDE_INTERNAL}  is specified. The latter
 flag when specified can be used to override certain extensions introduced
-after 3.5.12. It is expected to be used by applications which handle
+after 3.6.0. It is expected to be used by applications which handle
 custom extensions that are not currently supported in GnuTLS, but direct
 support for them may be added in the future.
 
 Each registered extension can store temporary data into the gnutls_session_t
 structure using @code{gnutls_ext_set_data()} , and they can be retrieved using
 @code{gnutls_ext_get_data()} .
+
+The validity of the extension registered can be given by the appropriate flags
+of @code{gnutls_ext_flags_t} . If no validity is given, then the registered extension
+will be valid for client and TLS1.2 server hello (or encrypted extensions for TLS1.3).
 
 @strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
 
@@ -5017,13 +6026,10 @@ applications.
 
 @var{session_data_size}: is the session_data's size, or it will be set by the function.
 
-Returns all session parameters needed to be stored to support resumption.
-The client should call this, and store the returned session data. A session
-may be resumed later by calling @code{gnutls_session_set_data()} .  
+Returns all session parameters needed to be stored to support resumption,
+in a pre-allocated buffer.
 
-This function will fail if called prior to handshake completion. In
-case of false start TLS, the handshake completes only after data have
-been successfully received from the peer.
+See @code{gnutls_session_get_data2()}  for more information.
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise
 an error code is returned.
@@ -5036,15 +6042,31 @@ an error code is returned.
 
 @var{data}: is a pointer to a datum that will hold the session.
 
-Returns all session parameters needed to be stored to support resumption.
-The client should call this, and store the returned session data. A session
-may be resumed later by calling @code{gnutls_session_set_data()} .  
+Returns necessary parameters to support resumption. The client
+should call this function and store the returned session data. A session
+can be resumed later by calling @code{gnutls_session_set_data()}  with the returned
+data. Note that under TLS 1.3, it is recommended for clients to use
+session parameters only once, to prevent passive-observers from correlating
+the different connections.
 
 The returned  @code{data} are allocated and must be released using @code{gnutls_free()} .
 
 This function will fail if called prior to handshake completion. In
 case of false start TLS, the handshake completes only after data have
 been successfully received from the peer.
+
+Under TLS1.3 session resumption is possible only after a session ticket
+is received by the client. To ensure that such a ticket has been received use
+@code{gnutls_session_get_flags()}  and check for flag @code{GNUTLS_SFLAGS_SESSION_TICKET} ;
+if this flag is not set, this function will wait for a new ticket within
+an estimated rountrip, and if not received will return dummy data which
+cannot lead to resumption.
+
+To get notified when new tickets are received by the server
+use @code{gnutls_handshake_set_hook_function()}  to wait for @code{GNUTLS_HANDSHAKE_NEW_SESSION_TICKET} 
+messages. Each call of @code{gnutls_session_get_data2()}  after a ticket is
+received, will return session resumption data corresponding to the last
+received ticket.
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise
 an error code is returned.
@@ -5092,14 +6114,23 @@ etc.
 
 @var{session_id_size}: initially should contain the maximum  @code{session_id} size and will be updated.
 
-Returns the current session ID. This can be used if you want to
-check if the next session you tried to resume was actually
-resumed.  That is because resumed sessions share the same session ID
-with the original session.
+Returns the TLS session identifier. The session ID is selected by the
+server, and in older versions of TLS was a unique identifier shared
+between client and server which was persistent across resumption.
+In the latest version of TLS (1.3) or TLS with session tickets, the
+notion of session identifiers is undefined and cannot be relied for uniquely
+identifying sessions across client and server.
 
-The session ID is selected by the server, that identify the
-current session.  In all supported TLS protocols, the session id
-is less than @code{GNUTLS_MAX_SESSION_ID_SIZE} .
+In client side this function returns the identifier returned by the
+server, and cannot be assumed to have any relation to session resumption.
+In server side this function is guaranteed to return a persistent
+identifier of the session since GnuTLS 3.6.4, which may not necessarily
+map into the TLS session ID value. Prior to that version the value
+could only be considered a persistent identifier, under TLS1.2 or earlier
+and when no session tickets were in use.
+
+The session identifier value returned is always less than
+@code{GNUTLS_MAX_SESSION_ID_SIZE} .
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise
 an error code is returned.
@@ -5112,8 +6143,23 @@ an error code is returned.
 
 @var{session_id}: will point to the session ID.
 
-Returns the current session ID. The returned data should be
-treated as constant.
+Returns the TLS session identifier. The session ID is selected by the
+server, and in older versions of TLS was a unique identifier shared
+between client and server which was persistent across resumption.
+In the latest version of TLS (1.3) or TLS 1.2 with session tickets, the
+notion of session identifiers is undefined and cannot be relied for uniquely
+identifying sessions across client and server.
+
+In client side this function returns the identifier returned by the
+server, and cannot be assumed to have any relation to session resumption.
+In server side this function is guaranteed to return a persistent
+identifier of the session since GnuTLS 3.6.4, which may not necessarily
+map into the TLS session ID value. Prior to that version the value
+could only be considered a persistent identifier, under TLS1.2 or earlier
+and when no session tickets were in use.
+
+The session identifier value returned is always less than
+@code{GNUTLS_MAX_SESSION_ID_SIZE}  and should be treated as constant.
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise
 an error code is returned.
@@ -5130,6 +6176,8 @@ an error code is returned.
 
 This function returns pointers to the master secret
 used in the TLS session. The pointers are not to be modified or deallocated.
+
+This function is only applicable under TLS 1.2 or earlier versions.
 
 @strong{Since:} 3.5.0
 @end deftypefun
@@ -5187,10 +6235,36 @@ The certificate verification status is the same as in @code{gnutls_certificate_v
 @deftypefun {int} {gnutls_session_is_resumed} (gnutls_session_t @var{session})
 @var{session}: is a @code{gnutls_session_t}  type.
 
-Check whether session is resumed or not.
+Checks whether session is resumed or not. This is functional
+for both server and client side.
 
 @strong{Returns:} non zero if this session is resumed, or a zero if this is
 a new session.
+@end deftypefun
+
+@subheading gnutls_session_key_update
+@anchor{gnutls_session_key_update}
+@deftypefun {int} {gnutls_session_key_update} (gnutls_session_t @var{session}, unsigned @var{flags})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{flags}: zero of @code{GNUTLS_KU_PEER} 
+
+This function will update/refresh the session keys when the
+TLS protocol is 1.3 or better. The peer is notified of the
+update by sending a message, so this function should be
+treated similarly to @code{gnutls_record_send()}  --i.e., it may
+return @code{GNUTLS_E_AGAIN}  or @code{GNUTLS_E_INTERRUPTED} .
+
+When this flag @code{GNUTLS_KU_PEER}  is specified, this function
+in addition to updating the local keys, will ask the peer to
+refresh its keys too.
+
+If the negotiated version is not TLS 1.3 or better this
+function will return @code{GNUTLS_E_INVALID_REQUEST} .
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
+
+@strong{Since:} 3.6.3
 @end deftypefun
 
 @subheading gnutls_session_resumption_requested
@@ -5260,7 +6334,7 @@ an error code is returned.
 
 @var{mac}: the MAC algorithm
 
-@var{comp}: the compression method
+@var{comp}: the compression method (ignored)
 
 @var{master}: the master key to use
 
@@ -5392,6 +6466,9 @@ session. The provided  @code{type} must be an unassigned type in
 If the type is already registered or handled by GnuTLS internally
 @code{GNUTLS_E_ALREADY_REGISTERED}  will be returned.
 
+As supplemental data are not defined under TLS 1.3, this function will
+disable TLS 1.3 support for the given session.
+
 @strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
 
 @strong{Since:} 3.5.5
@@ -5403,7 +6480,8 @@ If the type is already registered or handled by GnuTLS internally
 @var{session}: is a @code{gnutls_session_t}  type.
 
 Request that the client should attempt session resumption using
-SessionTicket.
+SessionTicket. This call is typically unnecessary as session
+tickets are enabled by default.
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, or an
 error code.
@@ -5419,9 +6497,13 @@ error code.
 @var{key}: key to encrypt session parameters.
 
 Request that the server should attempt session resumption using
-SessionTicket.   @code{key} must be initialized with
-@code{gnutls_session_ticket_key_generate()} , and should be overwritten
-using @code{gnutls_memset()}  before being released.
+session tickets, i.e., by delegating storage to the client.
+ @code{key} must be initialized using @code{gnutls_session_ticket_key_generate()} .
+To avoid leaking that key, use @code{gnutls_memset()}  prior to
+releasing it.
+
+The default ticket expiration time can be overridden using
+@code{gnutls_db_set_cache_expiration()} .
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, or an
 error code.
@@ -5444,16 +6526,77 @@ error code.
 @strong{Since:} 2.10.0
 @end deftypefun
 
+@subheading gnutls_session_ticket_send
+@anchor{gnutls_session_ticket_send}
+@deftypefun {int} {gnutls_session_ticket_send} (gnutls_session_t @var{session}, unsigned @var{nr}, unsigned @var{flags})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{nr}: the number of tickets to send
+
+@var{flags}: must be zero
+
+Sends a fresh session ticket to the peer. This is relevant only
+in server side under TLS1.3. This function may also return @code{GNUTLS_E_AGAIN} 
+or @code{GNUTLS_E_INTERRUPTED}  and in that case it must be called again.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, or a negative error code.
+@end deftypefun
+
 @subheading gnutls_set_default_priority
 @anchor{gnutls_set_default_priority}
 @deftypefun {int} {gnutls_set_default_priority} (gnutls_session_t @var{session})
 @var{session}: is a @code{gnutls_session_t}  type.
 
 Sets the default priority on the ciphers, key exchange methods,
-macs and compression methods. For more fine-tuning you could
-use @code{gnutls_priority_set_direct()}  or @code{gnutls_priority_set()}  instead.
+and macs. This is the recommended method of
+setting the defaults, in order to promote consistency between applications
+using GnuTLS, and to allow GnuTLS using applications to update settings
+in par with the library. For client applications which require
+maximum compatibility consider calling @code{gnutls_session_enable_compatibility_mode()} 
+after this function.
+
+For an application to specify additional options to priority string
+consider using @code{gnutls_set_default_priority_append()} .
+
+To allow a user to override the defaults (e.g., when a user interface
+or configuration file is available), the functions
+@code{gnutls_priority_set_direct()}  or @code{gnutls_priority_set()}  can
+be used.
 
 @strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, or an error code.
+
+@strong{Since:} 2.1.4
+@end deftypefun
+
+@subheading gnutls_set_default_priority_append
+@anchor{gnutls_set_default_priority_append}
+@deftypefun {int} {gnutls_set_default_priority_append} (gnutls_session_t @var{session}, const char * @var{add_prio}, const char ** @var{err_pos}, unsigned @var{flags})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{add_prio}: is a string describing priorities to be appended to default
+
+@var{err_pos}: In case of an error this will have the position in the string the error occurred
+
+@var{flags}: must be zero
+
+Sets the default priority on the ciphers, key exchange methods,
+and macs with the additional options in  @code{add_prio} . This is the recommended method of
+setting the defaults when only few additional options are to be added. This promotes
+consistency between applications using GnuTLS, and allows GnuTLS using applications
+to update settings in par with the library.
+
+The  @code{add_prio} string should start as a normal priority string, e.g.,
+'-VERS-TLS-ALL:+VERS-TLS1.3:%COMPAT' or '%FORCE_ETM'. That is, it must not start
+with ':'.
+
+To allow a user to override the defaults (e.g., when a user interface
+or configuration file is available), the functions
+@code{gnutls_priority_set_direct()}  or @code{gnutls_priority_set()}  can
+be used.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, or an error code.
+
+@strong{Since:} 3.6.3
 @end deftypefun
 
 @subheading gnutls_sign_algorithm_get
@@ -5461,7 +6604,7 @@ use @code{gnutls_priority_set_direct()}  or @code{gnutls_priority_set()}  instea
 @deftypefun {int} {gnutls_sign_algorithm_get} (gnutls_session_t @var{session})
 @var{session}: is a @code{gnutls_session_t}  type.
 
-Returns the signature algorithm that is (or will be) used in this 
+Returns the signature algorithm that is (or will be) used in this
 session by the server to sign data. This function should be
 used only with TLS 1.2 or later.
 
@@ -5475,7 +6618,7 @@ used only with TLS 1.2 or later.
 @deftypefun {int} {gnutls_sign_algorithm_get_client} (gnutls_session_t @var{session})
 @var{session}: is a @code{gnutls_session_t}  type.
 
-Returns the signature algorithm that is (or will be) used in this 
+Returns the signature algorithm that is (or will be) used in this
 session by the client to sign data. This function should be
 used only with TLS 1.2 or later.
 
@@ -5563,7 +6706,9 @@ algorithm, or @code{NULL} .
 @var{sign}: is a signature algorithm
 
 This function returns the public key algorithm corresponding to
-the given signature algorithms.
+the given signature algorithms. Note that there may be multiple
+public key algorithms supporting a particular signature type;
+when dealing with such algorithms use instead @code{gnutls_sign_supports_pk_algorithm()} .
 
 @strong{Since:} 3.1.1
 
@@ -5572,8 +6717,19 @@ the given signature algorithms.
 
 @subheading gnutls_sign_is_secure
 @anchor{gnutls_sign_is_secure}
-@deftypefun {int} {gnutls_sign_is_secure} (gnutls_sign_algorithm_t @var{algorithm})
+@deftypefun {unsigned} {gnutls_sign_is_secure} (gnutls_sign_algorithm_t @var{algorithm})
 @var{algorithm}: is a sign algorithm
+
+
+@strong{Returns:} Non-zero if the provided signature algorithm is considered to be secure.
+@end deftypefun
+
+@subheading gnutls_sign_is_secure2
+@anchor{gnutls_sign_is_secure2}
+@deftypefun {unsigned} {gnutls_sign_is_secure2} (gnutls_sign_algorithm_t @var{algorithm}, unsigned int @var{flags})
+@var{algorithm}: is a sign algorithm
+
+@var{flags}: zero or @code{GNUTLS_SIGN_FLAG_SECURE_FOR_CERTS} 
 
 
 @strong{Returns:} Non-zero if the provided signature algorithm is considered to be secure.
@@ -5584,9 +6740,26 @@ the given signature algorithms.
 @deftypefun {const gnutls_sign_algorithm_t *} {gnutls_sign_list} ( @var{void})
 
 Get a list of supported public key signature algorithms.
+This function is not thread safe.
 
 @strong{Returns:} a (0)-terminated list of @code{gnutls_sign_algorithm_t} 
 integers indicating the available ciphers.
+@end deftypefun
+
+@subheading gnutls_sign_supports_pk_algorithm
+@anchor{gnutls_sign_supports_pk_algorithm}
+@deftypefun {unsigned} {gnutls_sign_supports_pk_algorithm} (gnutls_sign_algorithm_t @var{sign}, gnutls_pk_algorithm_t @var{pk})
+@var{sign}: is a signature algorithm
+
+@var{pk}: is a public key algorithm
+
+This function returns non-zero if the public key algorithm corresponds to
+the given signature algorithm. That is, if that signature can be generated
+from the given private key algorithm.
+
+@strong{Since:} 3.6.0
+
+@strong{Returns:} return non-zero when the provided algorithms are compatible.
 @end deftypefun
 
 @subheading gnutls_srp_allocate_client_credentials
@@ -5731,9 +6904,10 @@ server.  Returns NULL in case of an error.
 
 This function sets the username and password, in a
 @code{gnutls_srp_client_credentials_t}  type.  Those will be used in
-SRP authentication.   @code{username} and  @code{password} should be ASCII
-strings or UTF-8 strings prepared using the "SASLprep" profile of
-"stringprep".
+SRP authentication.   @code{username} should be an ASCII string or UTF-8
+string. In case of a UTF-8 string it is recommended to be following
+the PRECIS framework for usernames (rfc8265). The password can
+be in ASCII format, or normalized using @code{gnutls_utf8_password_normalize()} .
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, or an
 error code.
@@ -5753,9 +6927,12 @@ callback's function form is:
 int (*callback)(gnutls_session_t, char** username, char**password);
 
 The  @code{username} and  @code{password} must be allocated using
-@code{gnutls_malloc()} .   @code{username} and  @code{password} should be ASCII strings
-or UTF-8 strings prepared using the "SASLprep" profile of
-"stringprep".
+@code{gnutls_malloc()} .
+
+The  @code{username} should be an ASCII string or UTF-8
+string. In case of a UTF-8 string it is recommended to be following
+the PRECIS framework for usernames (rfc8265). The password can
+be in ASCII format, or normalized using @code{gnutls_utf8_password_normalize()} .
 
 The callback function will be called once per handshake before the
 initial hello message is sent.
@@ -6061,11 +7238,11 @@ Since 3.1.4
 
 @var{flags}: should be 0 or @code{GNUTLS_SCOMMIT_FLAG_ALLOW_BROKEN} .
 
-This function will store the provided hash commitment to 
+This function will store the provided hash commitment to
 the list of stored public keys. The key with the given
 hash will be considered valid until the provided expiration time.
 
-The  @code{store} variable if non-null specifies a custom backend for
+The  @code{tdb} variable if non-null specifies a custom backend for
 the storage of entries. If it is NULL then the
 default file backend will be used.
 
@@ -6096,11 +7273,11 @@ negative error value.
 
 @var{flags}: should be 0.
 
-This function will store the provided (raw or DER-encoded) certificate to 
-the list of stored public keys. The key will be considered valid until 
-the provided expiration time.
+This function will store a raw public-key or a public-key provided via
+a raw (DER-encoded) certificate to the list of stored public keys. The key
+will be considered valid until the provided expiration time.
 
-The  @code{store} variable if non-null specifies a custom backend for
+The  @code{tdb} variable if non-null specifies a custom backend for
 the storage of entries. If it is NULL then the
 default file backend will be used.
 
@@ -6110,6 +7287,8 @@ the fields are a format-identifier which is set to 'g0', the hostname that the
 rest of the data applies to, the numeric port or host name, the expiration
 time in seconds since the epoch (0 for no expiration), and a base64
 encoding of the raw (DER) public key information (SPKI) of the peer.
+
+As of GnuTLS 3.6.6 this function also accepts raw public keys.
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.
@@ -6190,7 +7369,8 @@ is called. The provided  @code{type} must be an unassigned type in
 registered or handled by GnuTLS internally @code{GNUTLS_E_ALREADY_REGISTERED} 
 will be returned.
 
-This function is not thread safe.
+This function is not thread safe. As supplemental data are not defined under
+TLS 1.3, this function will disable TLS 1.3 support globally.
 
 @strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
 
@@ -6213,7 +7393,7 @@ instruct gnutls to send supplemental data during the handshake process.
 @subheading gnutls_system_recv_timeout
 @anchor{gnutls_system_recv_timeout}
 @deftypefun {int} {gnutls_system_recv_timeout} (gnutls_transport_ptr_t @var{ptr}, unsigned int @var{ms})
-@var{ptr}: A gnutls_transport_ptr_t pointer
+@var{ptr}: A file descriptor (wrapped in a gnutls_transport_ptr_t pointer)
 
 @var{ms}: The number of milliseconds to wait.
 
@@ -6373,6 +7553,9 @@ This function is useful in replacement push and pull functions set by
 @code{gnutls_transport_set_pull_function()}  under Windows, where the
 replacements may not have access to the same  @code{errno} variable that is used by GnuTLS (e.g., the application is linked to
 msvcr71.dll and gnutls is linked to msvcrt.dll).
+
+This function is unreliable if you are using the same
+ @code{session} in different threads for sending and receiving.
 @end deftypefun
 
 @subheading gnutls_transport_set_errno_function
@@ -6602,11 +7785,11 @@ errors will be ignored, and in that case the output will be a copy of the input.
 
 @var{flags}: should be 0.
 
-This function will try to verify the provided (raw or DER-encoded) certificate 
-using a list of stored public keys.  The  @code{service} field if non-NULL should
-be a port number.
+This function will try to verify a raw public-key or a public-key provided via
+a raw (DER-encoded) certificate using a list of stored public keys.
+The  @code{service} field if non-NULL should be a port number.
 
-The  @code{retrieve} variable if non-null specifies a custom backend for
+The  @code{db_name} variable if non-null specifies a custom backend for
 the retrieval of entries. If it is NULL then the
 default file backend will be used. In POSIX-like systems the
 file backend uses the $HOME/.gnutls/known_hosts file.
@@ -6618,10 +7801,12 @@ if the host/service pair is found but key doesn't match,
 the given key is found, and 0 if it was found. The storage
 function should return 0 on success.
 
+As of GnuTLS 3.6.6 this function also verifies raw public keys.
+
 @strong{Returns:} If no associated public key is found
 then @code{GNUTLS_E_NO_CERTIFICATE_FOUND}  will be returned. If a key
 is found but does not match @code{GNUTLS_E_CERTIFICATE_KEY_MISMATCH} 
-is returned. On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, 
+is returned. On success, @code{GNUTLS_E_SUCCESS}  (0) is returned,
 or a negative error value on other errors.
 
 @strong{Since:} 3.0.13

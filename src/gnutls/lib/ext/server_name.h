@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2000-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -16,30 +17,17 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
-#ifndef EXT_SERVER_NAME_H
-#define EXT_SERVER_NAME_H
 
-#include <extensions.h>
+#ifndef GNUTLS_LIB_EXT_SERVER_NAME_H
+#define GNUTLS_LIB_EXT_SERVER_NAME_H
 
-typedef struct {
-	uint8_t name[MAX_SERVER_NAME_SIZE+1];
-	unsigned name_length;
-	gnutls_server_name_type_t type;
-} server_name_st;
+#include <hello_ext.h>
 
-#define MAX_SERVER_NAME_EXTENSIONS 3
-
-typedef struct {
-	server_name_st server_names[MAX_SERVER_NAME_EXTENSIONS];
-	/* limit server_name extensions */
-	unsigned server_names_size;
-} server_name_ext_st;
-
-extern const extension_entry_st ext_mod_server_name;
+extern const hello_ext_entry_st ext_mod_server_name;
 
 unsigned _gnutls_server_name_matches_resumed(gnutls_session_t);
 
-#endif
+#endif /* GNUTLS_LIB_EXT_SERVER_NAME_H */

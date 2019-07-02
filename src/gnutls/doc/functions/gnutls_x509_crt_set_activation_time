@@ -7,7 +7,7 @@
 
 @var{act_time}: The actual time
 
-This function will set the time this Certificate was or will be
+This function will set the time this certificate was or will be
 activated.
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a

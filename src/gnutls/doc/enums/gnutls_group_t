@@ -1,0 +1,31 @@
+
+
+@c gnutls_group_t
+@table @code
+@item GNUTLS_@-GROUP_@-INVALID
+Indicates unknown/invalid group
+@item GNUTLS_@-GROUP_@-SECP192R1
+the SECP192R1 curve group (legacy, only for TLS 1.2 compatibility)
+@item GNUTLS_@-GROUP_@-SECP224R1
+the SECP224R1 curve group (legacy, only for TLS 1.2 compatibility)
+@item GNUTLS_@-GROUP_@-SECP256R1
+the SECP256R1 curve group
+@item GNUTLS_@-GROUP_@-SECP384R1
+the SECP384R1 curve group
+@item GNUTLS_@-GROUP_@-SECP521R1
+the SECP521R1 curve group
+@item GNUTLS_@-GROUP_@-X25519
+the X25519 curve group
+@item GNUTLS_@-GROUP_@-FFDHE2048
+the FFDHE2048 group
+@item GNUTLS_@-GROUP_@-FFDHE3072
+the FFDHE3072 group
+@item GNUTLS_@-GROUP_@-FFDHE4096
+the FFDHE4096 group
+@item GNUTLS_@-GROUP_@-FFDHE8192
+the FFDHE8192 group
+@item GNUTLS_@-GROUP_@-FFDHE6144
+the FFDHE6144 group
+@item GNUTLS_@-GROUP_@-MAX
+-- undescribed --
+@end table

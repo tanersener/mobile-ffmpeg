@@ -16,7 +16,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -124,6 +124,25 @@ mbuffer_st *_mbuffer_dequeue(mbuffer_head_st * buf, mbuffer_st * bufel)
 	bufel->next = bufel->prev = NULL;
 
 	return ret;
+}
+
+/* Append a segment to the beginning of this buffer.
+ *
+ * Cost: O(1)
+ */
+void _mbuffer_head_push_first(mbuffer_head_st * buf, mbuffer_st * bufel)
+{
+	bufel->prev = NULL;
+	bufel->next = buf->head;
+
+	buf->length++;
+	buf->byte_length += bufel->msg.size - bufel->mark;
+
+	if (buf->head != NULL)
+		buf->head->prev = bufel;
+	else
+		buf->tail = bufel;
+	buf->head = bufel;
 }
 
 /* Get a reference to the first segment of the buffer and
@@ -305,7 +324,7 @@ _mbuffer_append_data(mbuffer_st * bufel, void *newdata,
 #ifdef ENABLE_ALIGN16
 # define ALIGN_SIZE 16
 
-/* Allocate a 16-byte alligned buffer segment. The segment is not initially "owned" by
+/* Allocate a 16-byte aligned buffer segment. The segment is not initially "owned" by
  * any buffer.
  *
  * maximum_size: Amount of data that this segment can contain.

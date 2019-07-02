@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_privkey_export_dsa_raw2} (gnutls_privkey_t @var{key}, gnutls_datum_t * @var{p}, gnutls_datum_t * @var{q}, gnutls_datum_t * @var{g}, gnutls_datum_t * @var{y}, gnutls_datum_t * @var{x}, unsigned int @var{flags})

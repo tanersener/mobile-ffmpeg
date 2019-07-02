@@ -10,7 +10,7 @@
 @var{out}: will contain the object data
 
 This function will export the PKCS11 object data.  It is normal for
-data to be inaccesible and in that case @code{GNUTLS_E_INVALID_REQUEST} 
+data to be inaccessible and in that case @code{GNUTLS_E_INVALID_REQUEST} 
 will be returned.
 
 The output buffer is allocated using @code{gnutls_malloc()} .

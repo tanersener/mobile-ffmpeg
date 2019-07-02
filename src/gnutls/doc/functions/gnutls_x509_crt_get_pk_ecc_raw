@@ -7,13 +7,16 @@
 
 @var{curve}: will hold the curve
 
-@var{x}: will hold x
+@var{x}: will hold the x-coordinate
 
-@var{y}: will hold y
+@var{y}: will hold the y-coordinate
 
 This function will export the ECC public key's parameters found in
 the given certificate.  The new parameters will be allocated using
 @code{gnutls_malloc()}  and will be stored in the appropriate datum.
+
+In EdDSA curves the  @code{y} parameter will be @code{NULL}  and the other parameters
+will be in the native format for the curve.
 
 @strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
 

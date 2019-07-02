@@ -16,21 +16,21 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
-#ifndef EXT_SRP_H
-#define EXT_SRP_H
+#ifndef GNUTLS_LIB_EXT_SRP_H
+#define GNUTLS_LIB_EXT_SRP_H
 
-#include <extensions.h>
-
-#ifdef ENABLE_SRP
+#include <hello_ext.h>
 
 #define IS_SRP_KX(kx) ((kx == GNUTLS_KX_SRP || (kx == GNUTLS_KX_SRP_RSA) || \
 	  kx == GNUTLS_KX_SRP_DSS)?1:0)
 
-extern const extension_entry_st ext_mod_srp;
+#ifdef ENABLE_SRP
+
+extern const hello_ext_entry_st ext_mod_srp;
 
 typedef struct {
 	char *username;
@@ -39,4 +39,4 @@ typedef struct {
 
 #endif
 
-#endif
+#endif /* GNUTLS_LIB_EXT_SRP_H */

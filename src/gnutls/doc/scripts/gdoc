@@ -21,7 +21,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 # This will read a C source code file and scan for embedded comments
 # in the style of gnome comments (+minor extensions - see below).
@@ -95,7 +95,7 @@
 #  * my_function
 #  **/
 #
-# If the Description: header tag is ommitted, then there must be a blank line
+# If the Description: header tag is omitted, then there must be a blank line
 # after the last parameter specification.
 # e.g.
 # /**
@@ -195,6 +195,8 @@ $blankline_man = "";
 		     ['\@\@', '"\@"']);
 $blankline_text = "";
 my $lineprefix = "";
+
+my $function_found = 0;
 
 sub usage {
     print "Usage: $0 [ -v ] [ -docbook | -html | -text | -man | -tex | -texinfo  -listfunc ]\n";
@@ -308,7 +310,7 @@ sub dump_section {
 #  parameterlist => @list of parameters
 #  parameters => %parameter descriptions
 #  sectionlist => @list of sections
-#  sections => %descriont descriptions
+#  sections => %section descriptions
 #  
 
 sub just_highlight {
@@ -561,6 +563,7 @@ sub output_enum_tex {
         $param2 = $args{'parameters'}{$parameter};
 	$param2 =~ s/\#([a-zA-Z\_]+)/{\\it $1}/g;
 	$param2 =~ s/\%([a-zA-Z\_]+)/{\\bf $1}/g;
+	$param2 =~ s/([0-9]+)\^([0-9]+)/\$\{$1\}\^\{$2\}\$/g;
 	$out = just_highlight($param2);
 	$out =~ s/_/\\_/g;
 	chomp $out;
@@ -710,7 +713,7 @@ sub output_man {
 	print ".SH \"REPORTING BUGS\"\n";
 	print "Report bugs to <". $args{'bugsto'} . ">.\n";
         #print ".br\n";
-	#print "General guidelines for reporting bugs: http://www.gnu.org/gethelp/\n";
+	#print "General guidelines for reporting bugs: https://www.gnu.org/gethelp/\n";
         print ".br\n";
 	if ($args{'pkgsite'}) {
 	    print "Home page: " . $args{'pkgsite'} . "\n";
@@ -796,6 +799,10 @@ sub dump_function {
 	$function_name = $2;
 	$args = $3;
 
+	if ($return_type eq 'typedef') {
+	    return;
+	}
+
 #	print STDERR "ARGS = '$args'\n";
 
 	foreach $arg (split ',', $args) {
@@ -812,7 +819,7 @@ sub dump_function {
 		$param = $2;
 		push @args, $1;
 	    }
-	    if ($param =~ m/^(.*)(\[\])$/) {
+	    if ($param =~ m/^(.*)(\[[0-9]*\])$/) {
 		$param = $1;
 		push @args, $2;
 	    }
@@ -821,7 +828,8 @@ sub dump_function {
 
 	    if ((!defined($parameters{$param}) || $parameters{$param} eq "") && $param ne "void") {
 		$parameters{$param} = "-- undescribed --";
-		print STDERR "warning: $lineno: Function parameter '$param' not described in '$function_name'\n";
+		print STDERR "error: $lineno: Function parameter '$param' not described in '$function_name'\n";
+		exit 1;
 	    }
 
 	    push @parameterlist, $param;
@@ -830,11 +838,12 @@ sub dump_function {
 #	    print STDERR "param = '$param', type = '$type'\n";
 	}
     } else {
-	print STDERR "warning: $lineno: Cannot understand prototype: '$prototype'\n";
-	return;
+	print STDERR "error: $lineno: Cannot understand prototype: '$prototype'\n";
+	exit 1;
     }
 
     if ($function_only==0 || defined($function_table{$function_name})) {
+	$function_found=1;
 	output_function({'function' => $function_name,
 			 'module' => $modulename,
 			 'sourceversion' => $sourceversion,
@@ -1006,8 +1015,8 @@ foreach $file (@ARGV) {
 		    $contents .= $1."\n";
 		}
 	    } else {
-		# i dont know - bad line?  ignore.
-		print STDERR "warning: $lineno: Bad line: $_";
+		# i don't know - bad line?  ignore.
+		#print STDERR "warning: $lineno: Bad line: $_";
 	    }
 	} elsif ($state == 3) {	# scanning for function { (end of prototype)
 	    if ($line =~ /([a-zA-Z\s]+)enum(.*)$/) {
@@ -1065,5 +1074,9 @@ foreach $file (@ARGV) {
     
 	}
     }
+}
 
+if ($function_only != 0 && $function_found == 0) {
+	print STDERR "error: could not find the expected function\n";
+	exit 1;
 }

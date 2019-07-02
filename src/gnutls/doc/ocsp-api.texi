@@ -301,6 +301,23 @@ This function will export the OCSP response to DER format.
 returned, and 0 on success.
 @end deftypefun
 
+@subheading gnutls_ocsp_resp_export2
+@anchor{gnutls_ocsp_resp_export2}
+@deftypefun {int} {gnutls_ocsp_resp_export2} (gnutls_ocsp_resp_t @var{resp}, gnutls_datum_t * @var{data}, gnutls_x509_crt_fmt_t @var{fmt})
+@var{resp}: Holds the OCSP response
+
+@var{data}: newly allocate buffer holding DER or PEM encoded OCSP response
+
+@var{fmt}: DER or PEM
+
+This function will export the OCSP response to DER or PEM format.
+
+@strong{Returns:} In case of failure a negative error code will be
+returned, and 0 on success.
+
+@strong{Since:} 3.6.3
+@end deftypefun
+
 @subheading gnutls_ocsp_resp_get_certs
 @anchor{gnutls_ocsp_resp_get_certs}
 @deftypefun {int} {gnutls_ocsp_resp_get_certs} (gnutls_ocsp_resp_t @var{resp}, gnutls_x509_crt_t ** @var{certs}, size_t * @var{ncerts})
@@ -589,6 +606,25 @@ OCSP Response part, if any.  The output will be stored in  @code{resp} .
 negative error value.
 @end deftypefun
 
+@subheading gnutls_ocsp_resp_import2
+@anchor{gnutls_ocsp_resp_import2}
+@deftypefun {int} {gnutls_ocsp_resp_import2} (gnutls_ocsp_resp_t @var{resp}, const gnutls_datum_t * @var{data}, gnutls_x509_crt_fmt_t @var{fmt})
+@var{resp}: The data to store the parsed response.
+
+@var{data}: DER or PEM encoded OCSP response.
+
+@var{fmt}: DER or PEM
+
+This function will convert the given OCSP response to
+the native @code{gnutls_ocsp_resp_t}  format.  It also decodes the Basic
+OCSP Response part, if any.  The output will be stored in  @code{resp} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.6.3
+@end deftypefun
+
 @subheading gnutls_ocsp_resp_init
 @anchor{gnutls_ocsp_resp_init}
 @deftypefun {int} {gnutls_ocsp_resp_init} (gnutls_ocsp_resp_t * @var{resp})
@@ -598,6 +634,36 @@ This function will initialize an OCSP response structure.
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.
+@end deftypefun
+
+@subheading gnutls_ocsp_resp_list_import2
+@anchor{gnutls_ocsp_resp_list_import2}
+@deftypefun {int} {gnutls_ocsp_resp_list_import2} (gnutls_ocsp_resp_t ** @var{ocsps}, unsigned int * @var{size}, const gnutls_datum_t * @var{resp_data}, gnutls_x509_crt_fmt_t @var{format}, unsigned int @var{flags})
+@var{ocsps}: Will hold the parsed OCSP response list.
+
+@var{size}: It will contain the size of the list.
+
+@var{resp_data}: The PEM encoded OCSP list.
+
+@var{format}: One of @code{GNUTLS_X509_FMT_PEM}  or @code{GNUTLS_X509_FMT_DER} 
+
+@var{flags}: must be (0) or an OR'd sequence of gnutls_certificate_import_flags.
+
+This function will convert the given PEM encoded OCSP response list
+to the native gnutls_ocsp_resp_t format. The output will be stored
+in  @code{ocsps} which will be allocated and initialized.
+
+The OCSP responses should have a header of "OCSP RESPONSE".
+
+To deinitialize responses, you need to deinitialize each @code{gnutls_ocsp_resp_t} 
+structure independently, and use @code{gnutls_free()}  at  @code{ocsps} .
+
+In PEM files, when no OCSP responses are detected
+@code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  will be returned.
+
+@strong{Returns:} the number of responses read or a negative error value.
+
+@strong{Since:} 3.6.3
 @end deftypefun
 
 @subheading gnutls_ocsp_resp_print

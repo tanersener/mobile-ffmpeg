@@ -56,7 +56,7 @@ TMPFILE1=save-data1.$$.tmp
 TMPFILE2=save-data2.$$.tmp
 
 eval "${GETPORT}"
-launch_server $$ --echo --x509keyfile ${KEY1} --x509certfile ${CERT1} --ocsp-response=${OCSP1}
+launch_server $$ --echo --x509keyfile ${KEY1} --x509certfile ${CERT1} --ocsp-response=${OCSP1} --ignore-ocsp-response-errors -d 6
 PID=$!
 wait_server ${PID}
 
@@ -67,8 +67,13 @@ ${VALGRIND} "${CLI}" -p "${PORT}" 127.0.0.1 --save-cert ${TMPFILE1} --save-ocsp 
 kill ${PID}
 wait
 
-if ! test -f ${TMPFILE1} || ! test -f ${TMPFILE2};then
-	echo "Could not retrieve OCSP response or certificate"
+if ! test -f ${TMPFILE1};then
+	echo "Could not retrieve certificate"
+	exit 1
+fi
+
+if ! test -f ${TMPFILE2};then
+	echo "Could not retrieve OCSP response"
 	exit 1
 fi
 

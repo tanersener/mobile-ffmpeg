@@ -21,8 +21,8 @@
  * MA 02111-1301, USA.
  */
 
-#ifndef RSA_FIPS_H_INCLUDED
-#define RSA_FIPS_H_INCLUDED
+#ifndef GNUTLS_LIB_NETTLE_INT_RSA_FIPS_H
+#define GNUTLS_LIB_NETTLE_INT_RSA_FIPS_H
 
 #include <nettle/rsa.h>
 
@@ -46,4 +46,4 @@ rsa_generate_fips186_4_keypair(struct rsa_public_key *pub,
 			       /* Desired size of modulo, in bits */
 			       unsigned n_size);
 
-#endif
+#endif /* GNUTLS_LIB_NETTLE_INT_RSA_FIPS_H */

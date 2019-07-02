@@ -16,7 +16,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -54,6 +54,9 @@
  * replacements may not have access to the same @errno
  * variable that is used by GnuTLS (e.g., the application is linked to
  * msvcr71.dll and gnutls is linked to msvcrt.dll).
+ *
+ * This function is unreliable if you are using the same
+ * @session in different threads for sending and receiving.
  *
  **/
 void gnutls_transport_set_errno(gnutls_session_t session, int err)

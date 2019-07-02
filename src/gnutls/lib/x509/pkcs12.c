@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2003-2012 Free Software Foundation, Inc.
  * Copyright (C) 2012 Nikos Mavrogiannopoulos
+ * Copyright (C) 2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -17,7 +18,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -36,6 +37,10 @@
 #include "x509_int.h"
 #include "pkcs7_int.h"
 #include <random.h>
+#include <nettle/pbkdf2.h>
+#if ENABLE_GOST
+#include "../nettle/gost/pbkdf2-gost.h"
+#endif
 
 
 /* Decodes the PKCS #12 auth_safe, and returns the allocated raw data,
@@ -441,16 +446,17 @@ _pkcs12_decode_safe_contents(const gnutls_datum_t * content,
 		    || bag_type == GNUTLS_BAG_CRL
 		    || bag_type == GNUTLS_BAG_SECRET) {
 			gnutls_datum_t tmp = bag->element[i].data;
+			bag->element[i].data.data = NULL;
+			bag->element[i].data.size = 0;
 
 			result =
 			    _pkcs12_decode_crt_bag(bag_type, &tmp,
 						   &bag->element[i].data);
+			_gnutls_free_datum(&tmp);
 			if (result < 0) {
 				gnutls_assert();
 				goto cleanup;
 			}
-
-			_gnutls_free_datum(&tmp);
 		}
 
 		/* read the bag attributes
@@ -491,6 +497,7 @@ _pkcs12_decode_safe_contents(const gnutls_datum_t * content,
 					    (ASN1_ETYPE_OCTET_STRING,
 					     attr_val.data, attr_val.size,
 					     &t, 1);
+
 					_gnutls_free_datum(&attr_val);
 					if (result < 0) {
 						gnutls_assert();
@@ -500,18 +507,16 @@ _pkcs12_decode_safe_contents(const gnutls_datum_t * content,
 						continue;
 					}
 
-					attr_val.data = t.data;
-					attr_val.size = t.size;
-
-					bag->element[i].local_key_id =
-					    attr_val;
-				} else if (strcmp(oid, FRIENDLY_NAME_OID)
-					   == 0) {
+					_gnutls_free_datum(&bag->element[i].local_key_id);
+					bag->element[i].local_key_id.data = t.data;
+					bag->element[i].local_key_id.size = t.size;
+				} else if (strcmp(oid, FRIENDLY_NAME_OID) == 0 && bag->element[i].friendly_name == NULL) {
 					result =
 					    _gnutls_x509_decode_string
 					    (ASN1_ETYPE_BMP_STRING,
 					     attr_val.data, attr_val.size,
 					     &t, 1);
+
 					_gnutls_free_datum(&attr_val);
 					if (result < 0) {
 						gnutls_assert();
@@ -521,11 +526,8 @@ _pkcs12_decode_safe_contents(const gnutls_datum_t * content,
 						continue;
 					}
 
-					attr_val.data = t.data;
-					attr_val.size = t.size;
-
-					bag->element[i].friendly_name =
-					    (char *) t.data;
+					gnutls_free(bag->element[i].friendly_name);
+					bag->element[i].friendly_name = (char *) t.data;
 				} else {
 					_gnutls_free_datum(&attr_val);
 					_gnutls_debug_log
@@ -539,10 +541,7 @@ _pkcs12_decode_safe_contents(const gnutls_datum_t * content,
 
 	}
 
-	asn1_delete_structure(&c2);
-
-
-	return 0;
+	result = 0;
 
       cleanup:
 	if (c2)
@@ -828,7 +827,7 @@ int gnutls_pkcs12_set_bag(gnutls_pkcs12_t pkcs12, gnutls_pkcs12_bag_t bag)
 	asn1_delete_structure(&safe_cont);
 
 
-	/* Step 5. Reencode and copy the AuthenticatedSafe into the pkcs12
+	/* Step 5. Re-encode and copy the AuthenticatedSafe into the pkcs12
 	 * structure.
 	 */
 	result =
@@ -849,6 +848,53 @@ int gnutls_pkcs12_set_bag(gnutls_pkcs12_t pkcs12, gnutls_pkcs12_bag_t bag)
 	return result;
 }
 
+#if ENABLE_GOST
+/*
+ * Russian differs from PKCS#12 here. It described proprietary way
+ * to obtain MAC key instead of using standard mechanism.
+ *
+ * See https://wwwold.tc26.ru/standard/rs/%D0%A0%2050.1.112-2016.pdf
+ * section 5.
+ */
+static int
+_gnutls_pkcs12_gost_string_to_key(gnutls_mac_algorithm_t algo,
+				  const uint8_t * salt,
+				  unsigned int salt_size, unsigned int iter,
+				  const char *pass, unsigned int req_keylen,
+				  uint8_t * keybuf)
+{
+	uint8_t temp[96];
+	size_t temp_len = sizeof(temp);
+	unsigned int pass_len = 0;
+
+	if (pass)
+		pass_len = strlen(pass);
+
+	if (algo == GNUTLS_MAC_GOSTR_94)
+		pbkdf2_hmac_gosthash94cp(pass_len, (uint8_t *) pass,
+				iter,
+				salt_size,
+				salt, temp_len, temp);
+	else if (algo == GNUTLS_MAC_STREEBOG_256)
+		pbkdf2_hmac_streebog256(pass_len, (uint8_t *) pass,
+				iter,
+				salt_size,
+				salt, temp_len, temp);
+	else if (algo == GNUTLS_MAC_STREEBOG_512)
+		pbkdf2_hmac_streebog512(pass_len, (uint8_t *) pass,
+				iter,
+				salt_size,
+				salt, temp_len, temp);
+	else
+		/* Should not reach here */
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	memcpy(keybuf, temp + temp_len - req_keylen, req_keylen);
+
+	return 0;
+}
+#endif
+
 /**
  * gnutls_pkcs12_generate_mac2:
  * @pkcs12: A pkcs12 type
@@ -867,7 +913,7 @@ int gnutls_pkcs12_generate_mac2(gnutls_pkcs12_t pkcs12, gnutls_mac_algorithm_t m
 	const int iter = 10*1024;
 	mac_hd_st td1;
 	gnutls_datum_t tmp = { NULL, 0 };
-	unsigned mac_size;
+	unsigned mac_size, key_len;
 	uint8_t mac_out[MAX_HASH_SIZE];
 	const mac_entry_st *me = mac_to_entry(mac);
 
@@ -878,6 +924,7 @@ int gnutls_pkcs12_generate_mac2(gnutls_pkcs12_t pkcs12, gnutls_mac_algorithm_t m
 		return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 
 	mac_size = _gnutls_mac_get_algo_len(me);
+	key_len = mac_size;
 
 	/* Generate the salt.
 	 */
@@ -913,9 +960,24 @@ int gnutls_pkcs12_generate_mac2(gnutls_pkcs12_t pkcs12, gnutls_mac_algorithm_t m
 
 	/* Generate the key.
 	 */
-	result =
-	    _gnutls_pkcs12_string_to_key(me, 3 /*MAC*/, salt, sizeof(salt),
-					 iter, pass, mac_size, key);
+#if ENABLE_GOST
+	if (me->id == GNUTLS_MAC_GOSTR_94 ||
+	    me->id == GNUTLS_MAC_STREEBOG_256 ||
+	    me->id == GNUTLS_MAC_STREEBOG_512) {
+		key_len = 32;
+		result = _gnutls_pkcs12_gost_string_to_key(me->id,
+							   salt,
+							   sizeof(salt),
+							   iter,
+							   pass,
+							   mac_size,
+							   key);
+	} else
+#endif
+		result = _gnutls_pkcs12_string_to_key(me, 3 /*MAC*/,
+						      salt, sizeof(salt),
+						      iter, pass,
+						      mac_size, key);
 	if (result < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -932,7 +994,7 @@ int gnutls_pkcs12_generate_mac2(gnutls_pkcs12_t pkcs12, gnutls_mac_algorithm_t m
 	/* MAC the data
 	 */
 	result = _gnutls_mac_init(&td1, me,
-				  key, mac_size);
+				  key, key_len);
 	if (result < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -1020,6 +1082,9 @@ int gnutls_pkcs12_verify_mac(gnutls_pkcs12_t pkcs12, const char *pass)
 	gnutls_mac_algorithm_t algo;
 	unsigned mac_len, key_len;
 	const mac_entry_st *entry;
+#if ENABLE_GOST
+	int gost_retry = 0;
+#endif
 
 	if (pkcs12 == NULL) {
 		gnutls_assert();
@@ -1061,7 +1126,7 @@ int gnutls_pkcs12_verify_mac(gnutls_pkcs12_t pkcs12, const char *pass)
 	/* Read the salt from the structure.
 	 */
 	result =
-	    _gnutls_x509_read_value(pkcs12->pkcs12, "macData.macSalt",
+	    _gnutls_x509_read_null_value(pkcs12->pkcs12, "macData.macSalt",
 				    &salt);
 	if (result < 0) {
 		gnutls_assert();
@@ -1070,15 +1135,14 @@ int gnutls_pkcs12_verify_mac(gnutls_pkcs12_t pkcs12, const char *pass)
 
 	/* Generate the key.
 	 */
-	result =
-	    _gnutls_pkcs12_string_to_key(entry, 3 /*MAC*/, salt.data, salt.size,
-					 iter, pass, key_len, key);
+	result = _gnutls_pkcs12_string_to_key(entry, 3 /*MAC*/,
+					      salt.data, salt.size,
+					      iter, pass,
+					      key_len, key);
 	if (result < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
-
-	_gnutls_free_datum(&salt);
 
 	/* Get the data to be MACed
 	 */
@@ -1087,6 +1151,12 @@ int gnutls_pkcs12_verify_mac(gnutls_pkcs12_t pkcs12, const char *pass)
 		gnutls_assert();
 		goto cleanup;
 	}
+
+#if ENABLE_GOST
+	/* GOST PKCS#12 files use either PKCS#12 scheme or proprietary
+	 * HMAC-based scheme to generate MAC key. */
+pkcs12_try_gost:
+#endif
 
 	/* MAC the data
 	 */
@@ -1097,7 +1167,6 @@ int gnutls_pkcs12_verify_mac(gnutls_pkcs12_t pkcs12, const char *pass)
 	}
 
 	_gnutls_mac(&td1, tmp.data, tmp.size);
-	_gnutls_free_datum(&tmp);
 
 	_gnutls_mac_deinit(&td1, mac_output);
 
@@ -1113,13 +1182,39 @@ int gnutls_pkcs12_verify_mac(gnutls_pkcs12_t pkcs12, const char *pass)
 
 	if ((unsigned)len != mac_len ||
 	    memcmp(mac_output_orig, mac_output, len) != 0) {
+
+#if ENABLE_GOST
+		/* It is possible that GOST files use proprietary
+		 * key generation scheme */
+		if (!gost_retry &&
+		    (algo == GNUTLS_MAC_GOSTR_94 ||
+		     algo == GNUTLS_MAC_STREEBOG_256 ||
+		     algo == GNUTLS_MAC_STREEBOG_512)) {
+			gost_retry = 1;
+			key_len = 32;
+			result = _gnutls_pkcs12_gost_string_to_key(algo,
+								   salt.data,
+								   salt.size,
+								   iter,
+								   pass,
+								   key_len,
+								   key);
+			if (result < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
+
+			goto pkcs12_try_gost;
+		}
+#endif
+
 		gnutls_assert();
-		return GNUTLS_E_MAC_VERIFY_FAILED;
+		result = GNUTLS_E_MAC_VERIFY_FAILED;
+		goto cleanup;
 	}
 
-	return 0;
-
-      cleanup:
+	result = 0;
+ cleanup:
 	_gnutls_free_datum(&tmp);
 	_gnutls_free_datum(&salt);
 	return result;
@@ -1411,7 +1506,8 @@ static int make_chain(gnutls_x509_crt_t ** chain, unsigned int *chain_len,
  *
  * This function parses a PKCS12 structure in @pkcs12 and extracts the
  * private key, the corresponding certificate chain, any additional
- * certificates and a CRL.
+ * certificates and a CRL. The structures in @key, @chain @crl, and @extra_certs
+ * must not be initialized.
  *
  * The @extra_certs and @extra_certs_len parameters are optional
  * and both may be set to %NULL. If either is non-%NULL, then both must
@@ -1484,8 +1580,11 @@ gnutls_pkcs12_simple_parse(gnutls_pkcs12_t p12,
 		}
 
 		ret = gnutls_pkcs12_get_bag(p12, idx, bag);
-		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+			gnutls_pkcs12_bag_deinit(bag);
+			bag = NULL;
 			break;
+		}
 		if (ret < 0) {
 			gnutls_assert();
 			goto done;
@@ -1543,7 +1642,7 @@ gnutls_pkcs12_simple_parse(gnutls_pkcs12_t p12,
 					goto done;
 				}
 
-				/* fallthrough */
+				FALLTHROUGH;
 			case GNUTLS_BAG_PKCS8_KEY:
 				if (*key != NULL) {	/* too simple to continue */
 					gnutls_assert();
@@ -1586,6 +1685,7 @@ gnutls_pkcs12_simple_parse(gnutls_pkcs12_t p12,
 
 		idx++;
 		gnutls_pkcs12_bag_deinit(bag);
+		bag = NULL;
 
 		if (privkey_ok != 0)	/* private key was found */
 			break;
@@ -1609,8 +1709,11 @@ gnutls_pkcs12_simple_parse(gnutls_pkcs12_t p12,
 		}
 
 		ret = gnutls_pkcs12_get_bag(p12, idx, bag);
-		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+			gnutls_pkcs12_bag_deinit(bag);
+			bag = NULL;
 			break;
+		}
 		if (ret < 0) {
 			gnutls_assert();
 			goto done;
@@ -1668,6 +1771,7 @@ gnutls_pkcs12_simple_parse(gnutls_pkcs12_t p12,
 				if (ret < 0) {
 					gnutls_assert();
 					gnutls_x509_crt_deinit(this_cert);
+					this_cert = NULL;
 					goto done;
 				}
 
@@ -1680,6 +1784,7 @@ gnutls_pkcs12_simple_parse(gnutls_pkcs12_t p12,
 				if (ret < 0) {
 					gnutls_assert();
 					gnutls_x509_crt_deinit(this_cert);
+					this_cert = NULL;
 					goto done;
 				}
 
@@ -1719,6 +1824,7 @@ gnutls_pkcs12_simple_parse(gnutls_pkcs12_t p12,
 					} else {
 						gnutls_x509_crt_deinit
 						    (this_cert);
+						this_cert = NULL;
 					}
 				}
 				break;
@@ -1741,6 +1847,7 @@ gnutls_pkcs12_simple_parse(gnutls_pkcs12_t p12,
 				if (ret < 0) {
 					gnutls_assert();
 					gnutls_x509_crl_deinit(*crl);
+					*crl = NULL;
 					goto done;
 				}
 				break;
@@ -1756,6 +1863,7 @@ gnutls_pkcs12_simple_parse(gnutls_pkcs12_t p12,
 
 		idx++;
 		gnutls_pkcs12_bag_deinit(bag);
+		bag = NULL;
 	}
 
 	if (chain != NULL) {
@@ -1783,6 +1891,10 @@ gnutls_pkcs12_simple_parse(gnutls_pkcs12_t p12,
 		if (*key) {
 			gnutls_x509_privkey_deinit(*key);
 			*key = NULL;
+		}
+		if (crl != NULL && *crl != NULL) {
+			gnutls_x509_crl_deinit(*crl);
+			*crl = NULL;
 		}
 		if (_extra_certs_len && _extra_certs != NULL) {
 			for (i = 0; i < _extra_certs_len; i++)
@@ -1896,7 +2008,7 @@ gnutls_pkcs12_mac_info(gnutls_pkcs12_t pkcs12, unsigned int *mac,
 		/* Read the salt from the structure.
 		 */
 		ret =
-		    _gnutls_x509_read_value(pkcs12->pkcs12, "macData.macSalt",
+		    _gnutls_x509_read_null_value(pkcs12->pkcs12, "macData.macSalt",
 					    &dsalt);
 		if (ret < 0) {
 			gnutls_assert();
@@ -1905,15 +2017,17 @@ gnutls_pkcs12_mac_info(gnutls_pkcs12_t pkcs12, unsigned int *mac,
 
 		if (*salt_size >= (unsigned)dsalt.size) {
 			*salt_size = dsalt.size;
-			memcpy(salt, dsalt.data, dsalt.size);
+			if (dsalt.size > 0)
+				memcpy(salt, dsalt.data, dsalt.size);
 		} else {
 			*salt_size = dsalt.size;
-			return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
+			ret = gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
+			goto cleanup;
 		}
 	}
 
 	ret = 0;
-      cleanup:
+ cleanup:
 	_gnutls_free_datum(&tmp);
 	_gnutls_free_datum(&dsalt);
 	return ret;

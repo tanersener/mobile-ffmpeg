@@ -1,0 +1,31 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_list_import_url} (gnutls_x509_crt_t ** @var{certs}, unsigned int * @var{size}, const char * @var{url}, gnutls_pin_callback_t @var{pin_fn}, void * @var{pin_fn_userdata}, unsigned int @var{flags})
+@var{certs}: Will hold the allocated certificate list.
+
+@var{size}: It will contain the size of the list.
+
+@var{url}: A PKCS 11 url
+
+@var{pin_fn}: a PIN callback if not globally set
+
+@var{pin_fn_userdata}: parameter for the PIN callback
+
+@var{flags}: One of GNUTLS_PKCS11_OBJ_* flags for PKCS@code{11}  URLs or zero otherwise
+
+This function will import a certificate chain present in a PKCS@code{11}  token
+or any type of back-end that supports URLs. The certificates
+must be deinitialized afterwards using @code{gnutls_x509_crt_deinit()} 
+and the returned pointer must be freed using @code{gnutls_free()} .
+
+The URI provided must be the first certificate in the chain; subsequent
+certificates will be retrieved using @code{gnutls_pkcs11_get_raw_issuer()}  or
+equivalent functionality for the supported URI.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.6.3
+@end deftypefun

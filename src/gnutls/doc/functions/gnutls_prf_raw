@@ -34,5 +34,10 @@ function directly.  The @code{gnutls_prf()}  function seeds the PRF with the
 client and server random fields directly, and is recommended if you
 want to generate pseudo random data unique for each session.
 
+@strong{Note:} This function will only operate under TLS versions prior to 1.3.
+In TLS1.3 the use of PRF is replaced with HKDF and the generic
+exporters like @code{gnutls_prf_rfc5705()}  should be used instead. Under
+TLS1.3 this function returns @code{GNUTLS_E_INVALID_REQUEST} .
+
 @strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, or an error code.
 @end deftypefun

@@ -16,7 +16,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -27,8 +27,6 @@
 #include "gnutls_int.h"
 #include <gnutls/openpgp.h>
 #include <gnutls/abstract.h>
-
-#ifndef ENABLE_OPENPGP
 
 int gnutls_openpgp_crt_init(gnutls_openpgp_crt_t * key)
 {
@@ -605,6 +603,18 @@ int gnutls_certificate_set_openpgp_keyring_file
 	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 }
 
+/**
+ * gnutls_pubkey_import_openpgp:
+ * @key: The public key
+ * @crt: The certificate to be imported
+ * @flags: should be zero
+ *
+ * This function is no-op.
+ *
+ * Returns: %GNUTLS_E_UNIMPLEMENTED_FEATURE.
+ *
+ * Since: 2.12.0
+ **/
 int gnutls_pubkey_import_openpgp(gnutls_pubkey_t key,
 				 gnutls_openpgp_crt_t crt,
 				 unsigned int flags)
@@ -612,6 +622,20 @@ int gnutls_pubkey_import_openpgp(gnutls_pubkey_t key,
 	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 }
 
+/**
+ * gnutls_pubkey_import_openpgp_raw:
+ * @pkey: The public key
+ * @data: The public key data to be imported
+ * @format: The format of the public key
+ * @keyid: The key id to use (optional)
+ * @flags: Should be zero
+ *
+ * This function is no-op.
+ *
+ * Returns: %GNUTLS_E_UNIMPLEMENTED_FEATURE.
+ *
+ * Since: 3.1.3
+ **/
 int gnutls_pubkey_import_openpgp_raw(gnutls_pubkey_t pkey,
 				     const gnutls_datum_t * data,
 				     gnutls_openpgp_crt_fmt_t
@@ -622,6 +646,21 @@ int gnutls_pubkey_import_openpgp_raw(gnutls_pubkey_t pkey,
 	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 }
 
+/**
+ * gnutls_pubkey_get_key_id:
+ * @key: Holds the public key
+ * @flags: should be one of the flags from %gnutls_keyid_flags_t
+ * @output_data: will contain the key ID
+ * @output_data_size: holds the size of output_data (and will be
+ *   replaced by the actual size of parameters)
+ * @subkey: ignored
+ *
+ * This function is no-op.
+ *
+ * Returns: %GNUTLS_E_UNIMPLEMENTED_FEATURE.
+ *
+ * Since: 2.12.0
+ **/
 int
 gnutls_pubkey_get_openpgp_key_id(gnutls_pubkey_t key,
 				 unsigned int flags,
@@ -632,6 +671,18 @@ gnutls_pubkey_get_openpgp_key_id(gnutls_pubkey_t key,
 	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 }
 
+/**
+ * gnutls_privkey_import_openpgp:
+ * @pkey: The private key
+ * @key: The private key to be imported
+ * @flags: Flags for the import
+ *
+ * This function is no-op.
+ *
+ * Returns: %GNUTLS_E_UNIMPLEMENTED_FEATURE.
+ *
+ * Since: 2.12.0
+ **/
 int gnutls_privkey_import_openpgp(gnutls_privkey_t pkey,
 				  gnutls_openpgp_privkey_t key,
 				  unsigned int flags)
@@ -639,12 +690,37 @@ int gnutls_privkey_import_openpgp(gnutls_privkey_t pkey,
 	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 }
 
+/**
+ * gnutls_privkey_export_openpgp:
+ * @pkey: The private key
+ * @key: Location for the key to be exported.
+ *
+ * This function is no-op.
+ *
+ * Returns: %GNUTLS_E_UNIMPLEMENTED_FEATURE.
+ *
+ * Since: 3.4.0
+ */
 int gnutls_privkey_export_openpgp(gnutls_privkey_t pkey,
                                   gnutls_openpgp_privkey_t * key)
 {
 	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 }
 
+/**
+ * gnutls_privkey_import_openpgp_raw:
+ * @pkey: The private key
+ * @data: The private key data to be imported
+ * @format: The format of the private key
+ * @keyid: The key id to use (optional)
+ * @password: A password (optional)
+ *
+ * This function is no-op.
+ *
+ * Returns: %GNUTLS_E_UNIMPLEMENTED_FEATURE.
+ *
+ * Since: 3.1.0
+ **/
 int gnutls_privkey_import_openpgp_raw(gnutls_privkey_t pkey,
 				      const gnutls_datum_t * data,
 				      gnutls_openpgp_crt_fmt_t
@@ -655,6 +731,20 @@ int gnutls_privkey_import_openpgp_raw(gnutls_privkey_t pkey,
 	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 }
 
+/**
+ * gnutls_pcert_import_openpgp_raw:
+ * @pcert: The pcert structure
+ * @cert: The raw certificate to be imported
+ * @format: The format of the certificate
+ * @keyid: The key ID to use (NULL for the master key)
+ * @flags: zero for now
+ *
+ * This function is no-op.
+ *
+ * Returns: %GNUTLS_E_UNIMPLEMENTED_FEATURE.
+ *
+ * Since: 3.0
+ **/
 int gnutls_pcert_import_openpgp_raw(gnutls_pcert_st * pcert,
 				    const gnutls_datum_t * cert,
 				    gnutls_openpgp_crt_fmt_t
@@ -665,6 +755,18 @@ int gnutls_pcert_import_openpgp_raw(gnutls_pcert_st * pcert,
 	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 }
 
+/**
+ * gnutls_pcert_import_openpgp:
+ * @pcert: The pcert structure
+ * @crt: The raw certificate to be imported
+ * @flags: zero for now
+ *
+ * This function is no-op.
+ *
+ * Returns: %GNUTLS_E_UNIMPLEMENTED_FEATURE.
+ *
+ * Since: 3.0
+ **/
 int gnutls_pcert_import_openpgp(gnutls_pcert_st * pcert,
 				gnutls_openpgp_crt_t crt,
 				unsigned int flags)
@@ -672,12 +774,32 @@ int gnutls_pcert_import_openpgp(gnutls_pcert_st * pcert,
 	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 }
 
+/**
+ * gnutls_pcert_export_x509:
+ * @pcert: The pcert structure.
+ * @crt: An initialized #gnutls_openpgp_crt_t.
+ *
+ * This function is no-op.
+ *
+ * Returns: %GNUTLS_E_UNIMPLEMENTED_FEATURE.
+ *
+ * Since: 3.4.0
+ */
 int gnutls_pcert_export_openpgp(gnutls_pcert_st * pcert,
                                 gnutls_openpgp_crt_t * crt)
 {
 	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 }
 
+/**
+ * gnutls_openpgp_privkey_sign_hash:
+ * @session: is a gnutls session
+ * @status: is ignored
+ *
+ * This function is no-op.
+ *
+ * Returns: %GNUTLS_E_UNIMPLEMENTED_FEATURE.
+ */
 void
 gnutls_openpgp_send_cert(gnutls_session_t session,
 			 gnutls_openpgp_crt_status_t status)
@@ -685,12 +807,33 @@ gnutls_openpgp_send_cert(gnutls_session_t session,
 	return;
 }
 
+/**
+ * gnutls_certificate_get_peers_subkey_id:
+ * @session: is a gnutls session
+ * @id: will contain the ID
+ *
+ * This function is no-op.
+ *
+ * Returns: %GNUTLS_E_UNIMPLEMENTED_FEATURE.
+ *
+ * Since: 3.1.3
+ **/
 int gnutls_certificate_get_peers_subkey_id(gnutls_session_t session,
 					   gnutls_datum_t * id)
 {
 	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 }
 
+/**
+ * gnutls_openpgp_privkey_sign_hash:
+ * @key: Holds the key
+ * @hash: holds the data to be signed
+ * @signature: will contain newly allocated signature
+ *
+ * This function is no-op.
+ *
+ * Returns: %GNUTLS_E_UNIMPLEMENTED_FEATURE.
+ */
 int
 gnutls_openpgp_privkey_sign_hash(gnutls_openpgp_privkey_t key,
 				 const gnutls_datum_t * hash,
@@ -699,4 +842,3 @@ gnutls_openpgp_privkey_sign_hash(gnutls_openpgp_privkey_t key,
 	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 }
 
-#endif

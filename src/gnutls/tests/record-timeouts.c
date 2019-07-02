@@ -28,8 +28,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <assert.h>
 #include <gnutls/gnutls.h>
 #include "eagain-common.h"
+#include "cert-common.h"
 
 #include "utils.h"
 
@@ -65,22 +67,20 @@ static int pull_timeout_func(gnutls_transport_ptr_t ptr, unsigned int ms)
 #define MAX_VALS 4
 static const int vals[MAX_VALS] = {0, 1000, 5000, GNUTLS_INDEFINITE_TIMEOUT};
 
-void doit(void)
+static void start(const char *prio)
 {
 	/* Server stuff. */
-	gnutls_anon_server_credentials_t s_anoncred;
-	const gnutls_datum_t p3 =
-	    { (unsigned char *) pkcs3, strlen(pkcs3) };
-	static gnutls_dh_params_t dh_params;
+	gnutls_certificate_credentials_t serverx509cred;
 	gnutls_session_t server;
 	int sret = GNUTLS_E_AGAIN;
 	/* Client stuff. */
-	gnutls_anon_client_credentials_t c_anoncred;
+	gnutls_certificate_credentials_t clientx509cred;
 	gnutls_session_t client;
 	int cret = GNUTLS_E_AGAIN, i;
 	/* Need to enable anonymous KX specifically. */
-	ssize_t ns;
-	int ret, transferred = 0;
+	int transferred = 0;
+
+	success("trying %s\n", prio);
 
 	/* General init. */
 	global_init();
@@ -89,26 +89,26 @@ void doit(void)
 		gnutls_global_set_log_level(4711);
 
 	/* Init server */
-	gnutls_anon_allocate_server_credentials(&s_anoncred);
-	gnutls_dh_params_init(&dh_params);
-	gnutls_dh_params_import_pkcs3(dh_params, &p3, GNUTLS_X509_FMT_PEM);
-	gnutls_anon_set_server_dh_params(s_anoncred, dh_params);
+	gnutls_certificate_allocate_credentials(&serverx509cred);
+	gnutls_certificate_set_x509_key_mem(serverx509cred,
+					    &server_cert, &server_key,
+					    GNUTLS_X509_FMT_PEM);
+
 	gnutls_init(&server, GNUTLS_SERVER);
-	gnutls_priority_set_direct(server,
-				   "NORMAL:+ANON-DH:+ANON-ECDH",
-				   NULL);
-	gnutls_credentials_set(server, GNUTLS_CRD_ANON, s_anoncred);
+
+	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
+				serverx509cred);
+	assert(gnutls_priority_set_direct(server, prio, NULL) >= 0);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
 
 	/* Init client */
-	gnutls_anon_allocate_client_credentials(&c_anoncred);
+	assert(gnutls_certificate_allocate_credentials(&clientx509cred)>=0);
 	gnutls_init(&client, GNUTLS_CLIENT);
-	gnutls_priority_set_direct(client,
-				   "NORMAL:+ANON-DH:+ANON-ECDH",
-				   NULL);
-	gnutls_credentials_set(client, GNUTLS_CRD_ANON, c_anoncred);
+	assert(gnutls_priority_set_direct(client, prio, NULL) >= 0);
+	assert(gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
+				      clientx509cred)>=0);
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_pull_timeout_function(client, pull_timeout_func);
@@ -147,11 +147,16 @@ void doit(void)
 	gnutls_deinit(client);
 	gnutls_deinit(server);
 
-	gnutls_anon_free_client_credentials(c_anoncred);
-	gnutls_anon_free_server_credentials(s_anoncred);
-
-	gnutls_dh_params_deinit(dh_params);
+	gnutls_certificate_free_credentials(serverx509cred);
+	gnutls_certificate_free_credentials(clientx509cred);
 
 	gnutls_global_deinit();
+	reset_buffers();
 }
 
+void doit(void)
+{
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.2");
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.3");
+	start("NORMAL");
+}

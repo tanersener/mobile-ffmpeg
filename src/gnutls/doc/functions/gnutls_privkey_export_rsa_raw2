@@ -1,0 +1,33 @@
+
+
+
+
+@deftypefun {int} {gnutls_privkey_export_rsa_raw2} (gnutls_privkey_t @var{key}, gnutls_datum_t * @var{m}, gnutls_datum_t * @var{e}, gnutls_datum_t * @var{d}, gnutls_datum_t * @var{p}, gnutls_datum_t * @var{q}, gnutls_datum_t * @var{u}, gnutls_datum_t * @var{e1}, gnutls_datum_t * @var{e2}, unsigned int @var{flags})
+@var{key}: Holds the certificate
+
+@var{m}: will hold the modulus
+
+@var{e}: will hold the public exponent
+
+@var{d}: will hold the private exponent
+
+@var{p}: will hold the first prime (p)
+
+@var{q}: will hold the second prime (q)
+
+@var{u}: will hold the coefficient
+
+@var{e1}: will hold e1 = d mod (p-1)
+
+@var{e2}: will hold e2 = d mod (q-1)
+
+@var{flags}: flags from @code{gnutls_abstract_export_flags_t} 
+
+This function will export the RSA private key's parameters found
+in the given structure. The new parameters will be allocated using
+@code{gnutls_malloc()}  and will be stored in the appropriate datum.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
+
+@strong{Since:} 3.6.0
+@end deftypefun

@@ -5,8 +5,7 @@
 @deftypefun {void} {gnutls_certificate_free_cas} (gnutls_certificate_credentials_t @var{sc})
 @var{sc}: is a @code{gnutls_certificate_credentials_t}  type.
 
-This function will delete all the CAs associated with the given
-credentials. Servers that do not use
-@code{gnutls_certificate_verify_peers2()}  may call this to save some
-memory.
+This function was operational on very early versions of gnutls.
+Due to internal refactorings and the fact that this was hardly ever
+used, it is currently a no-op.
 @end deftypefun

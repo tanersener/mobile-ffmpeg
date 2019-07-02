@@ -52,6 +52,8 @@ Inappropriate fallback,
 User canceled.
 @item GNUTLS_@-A_@-NO_@-RENEGOTIATION
 No renegotiation is allowed.
+@item GNUTLS_@-A_@-MISSING_@-EXTENSION
+An extension was expected but was not seen
 @item GNUTLS_@-A_@-UNSUPPORTED_@-EXTENSION
 An unsupported extension was
 sent.
@@ -64,7 +66,11 @@ recognized.
 @item GNUTLS_@-A_@-UNKNOWN_@-PSK_@-IDENTITY
 The SRP/PSK username is missing
 or not known.
+@item GNUTLS_@-A_@-CERTIFICATE_@-REQUIRED
+Certificate is required.
 @item GNUTLS_@-A_@-NO_@-APPLICATION_@-PROTOCOL
 The ALPN protocol requested is
 not supported by the peer.
+@item GNUTLS_@-A_@-MAX
+-- undescribed --
 @end table

@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2010-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2015-2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -16,7 +17,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -51,27 +52,79 @@ typedef enum gnutls_pubkey_flags {
 	GNUTLS_PUBKEY_GET_OPENPGP_FINGERPRINT = 1 << 3
 } gnutls_pubkey_flags_t;
 
+/**
+ * gnutls_abstract_export_flags:
+ * @GNUTLS_EXPORT_FLAG_NO_LZ: do not prepend a leading zero to exported values
+ *
+ * Enumeration of different certificate import flags.
+ */
+typedef enum gnutls_abstract_export_flags {
+	GNUTLS_EXPORT_FLAG_NO_LZ = 1
+} gnutls_abstract_export_flags_t;
+
 #define GNUTLS_PUBKEY_VERIFY_FLAG_TLS1_RSA GNUTLS_VERIFY_USE_TLS1_RSA
 
 typedef int (*gnutls_privkey_sign_func) (gnutls_privkey_t key,
 					 void *userdata,
-					 const gnutls_datum_t *
-					 raw_data,
+					 const gnutls_datum_t *raw_data,
 					 gnutls_datum_t * signature);
+
+
 typedef int (*gnutls_privkey_decrypt_func) (gnutls_privkey_t key,
 					    void *userdata,
-					    const gnutls_datum_t *
-					    ciphertext,
+					    const gnutls_datum_t *ciphertext,
 					    gnutls_datum_t * plaintext);
+
+typedef int (*gnutls_privkey_decrypt_func2) (gnutls_privkey_t key,
+					     void *userdata,
+					     const gnutls_datum_t *ciphertext,
+					     unsigned char * plaintext,
+					     size_t plaintext_size);
+
+/* to be called to sign pre-hashed data. The input will be
+ * the output of the hash (such as SHA256) corresponding to
+ * the signature algorithm. The algorithm GNUTLS_SIGN_RSA_RAW
+ * will be provided when RSA PKCS#1 DigestInfo structure is provided
+ * as data (when this is called from a TLS 1.0 or 1.1 session).
+ */
+typedef int (*gnutls_privkey_sign_hash_func) (gnutls_privkey_t key,
+					      gnutls_sign_algorithm_t algo,
+					      void *userdata,
+					      unsigned int flags,
+					      const gnutls_datum_t *hash,
+					      gnutls_datum_t * signature);
+
+/* to be called to sign data. The input data will be
+ * the data to be signed (and hashed), with the provided
+ * signature algorithm. This function is used for algorithms
+ * like ed25519 which cannot take pre-hashed data as input.
+ */
+typedef int (*gnutls_privkey_sign_data_func) (gnutls_privkey_t key,
+					      gnutls_sign_algorithm_t algo,
+					      void *userdata,
+					      unsigned int flags,
+					      const gnutls_datum_t *data,
+					      gnutls_datum_t * signature);
 
 typedef void (*gnutls_privkey_deinit_func) (gnutls_privkey_t key,
 					    void *userdata);
 
+
+#define GNUTLS_SIGN_ALGO_TO_FLAGS(sig) (unsigned int)((sig)<<20)
+#define GNUTLS_FLAGS_TO_SIGN_ALGO(flags) (unsigned int)((flags)>>20)
+
 /* Should return the public key algorithm (gnutls_pk_algorithm_t) */
 #define GNUTLS_PRIVKEY_INFO_PK_ALGO 1
-
 /* Should return the preferred signature algorithm (gnutls_sign_algorithm_t) or 0. */
 #define GNUTLS_PRIVKEY_INFO_SIGN_ALGO (1<<1)
+/* Should return true (1) or false (0) if the provided sign algorithm
+ * (obtained with GNUTLS_FLAGS_TO_SIGN_ALGO) is supported.
+ */
+#define GNUTLS_PRIVKEY_INFO_HAVE_SIGN_ALGO (1<<2)
+/* Should return the number of bits of the public key algorithm (required for RSA-PSS)
+ * It is the value that should be returned by gnutls_pubkey_get_pk_algorithm() */
+#define GNUTLS_PRIVKEY_INFO_PK_ALGO_BITS (1<<3)
+
 /* returns information on the public key associated with userdata */
 typedef int (*gnutls_privkey_info_func) (gnutls_privkey_t key, unsigned int flags, void *userdata);
 
@@ -86,6 +139,16 @@ void gnutls_pubkey_set_pin_function(gnutls_pubkey_t key,
 
 int gnutls_pubkey_get_pk_algorithm(gnutls_pubkey_t key,
 				   unsigned int *bits);
+
+int
+gnutls_pubkey_set_spki(gnutls_pubkey_t key,
+			const gnutls_x509_spki_t spki,
+			unsigned int flags);
+
+int
+gnutls_pubkey_get_spki(gnutls_pubkey_t key,
+			const gnutls_x509_spki_t spki,
+			unsigned int flags);
 
 int gnutls_pubkey_import_x509(gnutls_pubkey_t key,
 			      gnutls_x509_crt_t crt, unsigned int flags);
@@ -138,11 +201,33 @@ int gnutls_pubkey_get_preferred_hash_algorithm(gnutls_pubkey_t key,
 int gnutls_pubkey_export_rsa_raw(gnutls_pubkey_t key,
 				 gnutls_datum_t * m, gnutls_datum_t * e);
 
+int gnutls_pubkey_export_rsa_raw2(gnutls_pubkey_t key,
+				  gnutls_datum_t * m, gnutls_datum_t * e,
+				  unsigned flags);
+
 #define gnutls_pubkey_get_pk_dsa_raw gnutls_pubkey_export_dsa_raw
 int gnutls_pubkey_export_dsa_raw(gnutls_pubkey_t key,
 				 gnutls_datum_t * p,
 				 gnutls_datum_t * q,
 				 gnutls_datum_t * g, gnutls_datum_t * y);
+
+int gnutls_pubkey_export_dsa_raw2(gnutls_pubkey_t key,
+				 gnutls_datum_t * p,
+				 gnutls_datum_t * q,
+				 gnutls_datum_t * g, gnutls_datum_t * y,
+				 unsigned flags);
+
+int gnutls_pubkey_export_ecc_raw2(gnutls_pubkey_t key,
+				 gnutls_ecc_curve_t * curve,
+				 gnutls_datum_t * x, gnutls_datum_t * y,
+				 unsigned flags);
+
+int gnutls_pubkey_export_gost_raw2(gnutls_pubkey_t key,
+				   gnutls_ecc_curve_t * curve,
+				   gnutls_digest_algorithm_t * digest,
+				   gnutls_gost_paramset_t * paramset,
+				   gnutls_datum_t * x, gnutls_datum_t * y,
+				   unsigned int flags);
 
 #define gnutls_pubkey_get_pk_ecc_raw gnutls_pubkey_export_ecc_raw
 int gnutls_pubkey_export_ecc_raw(gnutls_pubkey_t key,
@@ -205,6 +290,14 @@ gnutls_pubkey_import_ecc_raw(gnutls_pubkey_t key,
 			     const gnutls_datum_t * y);
 
 int
+gnutls_pubkey_import_gost_raw(gnutls_pubkey_t key,
+			     gnutls_ecc_curve_t curve,
+			     gnutls_digest_algorithm_t digest,
+			     gnutls_gost_paramset_t paramset,
+			     const gnutls_datum_t * x,
+			     const gnutls_datum_t * y);
+
+int
 gnutls_pubkey_encrypt_data(gnutls_pubkey_t key,
 			   unsigned int flags,
 			   const gnutls_datum_t * plaintext,
@@ -249,6 +342,16 @@ gnutls_privkey_generate2(gnutls_privkey_t pkey,
 			 gnutls_pk_algorithm_t algo, unsigned int bits,
 			 unsigned int flags, const gnutls_keygen_data_st *data, unsigned data_size);
 
+int
+gnutls_privkey_set_spki(gnutls_privkey_t key,
+			const gnutls_x509_spki_t spki,
+			unsigned int flags);
+
+int
+gnutls_privkey_get_spki(gnutls_privkey_t key,
+			const gnutls_x509_spki_t spki,
+			unsigned int flags);
+
 int gnutls_privkey_verify_seed(gnutls_privkey_t key, gnutls_digest_algorithm_t, const void *seed, size_t seed_size);
 int gnutls_privkey_get_seed(gnutls_privkey_t key, gnutls_digest_algorithm_t*, void *seed, size_t *seed_size);
 
@@ -267,12 +370,15 @@ int gnutls_privkey_status(gnutls_privkey_t key);
 /**
  * gnutls_privkey_flags:
  * @GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA: Make an RSA signature on the hashed data as in the TLS protocol.
+ * @GNUTLS_PRIVKEY_SIGN_FLAG_RSA_PSS: Make an RSA signature on the hashed data with the PSS padding.
+ * @GNUTLS_PRIVKEY_FLAG_REPRODUCIBLE: Make an RSA-PSS signature on the hashed data with reproducible parameters (zero salt).
  * @GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE: When importing a private key, automatically
  *   release it when the structure it was imported is released.
  * @GNUTLS_PRIVKEY_IMPORT_COPY: Copy required values during import.
  * @GNUTLS_PRIVKEY_DISABLE_CALLBACKS: The following flag disables call to PIN callbacks etc.
  *   Only relevant to TPM keys.
  * @GNUTLS_PRIVKEY_FLAG_PROVABLE: When generating a key involving prime numbers, use provable primes; a seed may be required.
+ * @GNUTLS_PRIVKEY_FLAG_CA: The generated private key is going to be used as a CA (relevant for RSA-PSS keys).
  * @GNUTLS_PRIVKEY_FLAG_EXPORT_COMPAT: Keys generated or imported as provable require an extended format which cannot be read by previous versions
  *   of gnutls or other applications. By setting this flag the key will be exported in a backwards compatible way,
  *   even if the information about the seed used will be lost.
@@ -285,7 +391,10 @@ typedef enum gnutls_privkey_flags {
 	GNUTLS_PRIVKEY_DISABLE_CALLBACKS = 1 << 2,
 	GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA = 1 << 4,
 	GNUTLS_PRIVKEY_FLAG_PROVABLE = 1 << 5,
-	GNUTLS_PRIVKEY_FLAG_EXPORT_COMPAT = 1 << 6
+	GNUTLS_PRIVKEY_FLAG_EXPORT_COMPAT = 1 << 6,
+	GNUTLS_PRIVKEY_SIGN_FLAG_RSA_PSS = 1 << 7,
+	GNUTLS_PRIVKEY_FLAG_REPRODUCIBLE = 1 << 8,
+	GNUTLS_PRIVKEY_FLAG_CA = 1 << 9
 } gnutls_privkey_flags_t;
 
 int gnutls_privkey_import_pkcs11(gnutls_privkey_t pkey,
@@ -371,6 +480,16 @@ gnutls_privkey_import_ext3(gnutls_privkey_t pkey,
                            gnutls_privkey_info_func info_func,
                            unsigned int flags);
 
+int
+gnutls_privkey_import_ext4(gnutls_privkey_t pkey,
+                           void *userdata,
+                           gnutls_privkey_sign_data_func sign_data_func,
+                           gnutls_privkey_sign_hash_func sign_hash_func,
+                           gnutls_privkey_decrypt_func decrypt_func,
+                           gnutls_privkey_deinit_func deinit_func,
+                           gnutls_privkey_info_func info_func,
+                           unsigned int flags);
+
 int gnutls_privkey_import_dsa_raw(gnutls_privkey_t key,
 				       const gnutls_datum_t * p,
 				       const gnutls_datum_t * q,
@@ -393,12 +512,26 @@ int gnutls_privkey_import_ecc_raw(gnutls_privkey_t key,
 				       const gnutls_datum_t * y,
 				       const gnutls_datum_t * k);
 
+int gnutls_privkey_import_gost_raw(gnutls_privkey_t key,
+				       gnutls_ecc_curve_t curve,
+				       gnutls_digest_algorithm_t digest,
+				       gnutls_gost_paramset_t paramset,
+				       const gnutls_datum_t * x,
+				       const gnutls_datum_t * y,
+				       const gnutls_datum_t * k);
+
 
 int gnutls_privkey_sign_data(gnutls_privkey_t signer,
 			     gnutls_digest_algorithm_t hash,
 			     unsigned int flags,
 			     const gnutls_datum_t * data,
 			     gnutls_datum_t * signature);
+
+int gnutls_privkey_sign_data2(gnutls_privkey_t signer,
+			      gnutls_sign_algorithm_t algo,
+			      unsigned int flags,
+			      const gnutls_datum_t * data,
+			      gnutls_datum_t * signature);
 
 #define gnutls_privkey_sign_raw_data(key, flags, data, sig) \
 	gnutls_privkey_sign_hash ( key, 0, GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA, data, sig)
@@ -409,11 +542,22 @@ int gnutls_privkey_sign_hash(gnutls_privkey_t signer,
 			     const gnutls_datum_t * hash_data,
 			     gnutls_datum_t * signature);
 
+int gnutls_privkey_sign_hash2(gnutls_privkey_t signer,
+			      gnutls_sign_algorithm_t algo,
+			      unsigned int flags,
+			      const gnutls_datum_t * hash_data,
+			      gnutls_datum_t * signature);
 
 int gnutls_privkey_decrypt_data(gnutls_privkey_t key,
 				unsigned int flags,
 				const gnutls_datum_t * ciphertext,
 				gnutls_datum_t * plaintext);
+
+int gnutls_privkey_decrypt_data2(gnutls_privkey_t key,
+				 unsigned int flags,
+				 const gnutls_datum_t * ciphertext,
+				 unsigned char * plaintext,
+                                 size_t plaintext_size);
 
 int
 gnutls_privkey_export_rsa_raw(gnutls_privkey_t key,
@@ -424,10 +568,24 @@ gnutls_privkey_export_rsa_raw(gnutls_privkey_t key,
 				    gnutls_datum_t * e2);
 
 int
+gnutls_privkey_export_rsa_raw2(gnutls_privkey_t key,
+				    gnutls_datum_t * m, gnutls_datum_t * e,
+				    gnutls_datum_t * d, gnutls_datum_t * p,
+				    gnutls_datum_t * q, gnutls_datum_t * u,
+				    gnutls_datum_t * e1,
+				    gnutls_datum_t * e2, unsigned flags);
+
+int
 gnutls_privkey_export_dsa_raw(gnutls_privkey_t key,
 			     gnutls_datum_t * p, gnutls_datum_t * q,
 			     gnutls_datum_t * g, gnutls_datum_t * y,
 			     gnutls_datum_t * x);
+
+int
+gnutls_privkey_export_dsa_raw2(gnutls_privkey_t key,
+			     gnutls_datum_t * p, gnutls_datum_t * q,
+			     gnutls_datum_t * g, gnutls_datum_t * y,
+			     gnutls_datum_t * x, unsigned flags);
 
 int
 gnutls_privkey_export_ecc_raw(gnutls_privkey_t key,
@@ -435,6 +593,24 @@ gnutls_privkey_export_ecc_raw(gnutls_privkey_t key,
 				       gnutls_datum_t * x,
 				       gnutls_datum_t * y,
 				       gnutls_datum_t * k);
+
+int
+gnutls_privkey_export_ecc_raw2(gnutls_privkey_t key,
+				       gnutls_ecc_curve_t * curve,
+				       gnutls_datum_t * x,
+				       gnutls_datum_t * y,
+				       gnutls_datum_t * k,
+				       unsigned flags);
+
+int
+gnutls_privkey_export_gost_raw2(gnutls_privkey_t key,
+				       gnutls_ecc_curve_t * curve,
+				       gnutls_digest_algorithm_t * digest,
+				       gnutls_gost_paramset_t * paramset,
+				       gnutls_datum_t * x,
+				       gnutls_datum_t * y,
+				       gnutls_datum_t * k,
+				       unsigned flags);
 
 
 int gnutls_x509_crt_privkey_sign(gnutls_x509_crt_t crt,
@@ -468,8 +644,7 @@ typedef struct gnutls_pcert_st {
 	gnutls_certificate_type_t type;
 } gnutls_pcert_st;
 
-/* Do not initialize the "cert" element of
- * the certificate */
+/* This flag is unused/ignored */
 #define GNUTLS_PCERT_NO_CERT 1
 
 int gnutls_pcert_import_x509(gnutls_pcert_st * pcert,
@@ -488,6 +663,14 @@ gnutls_pcert_list_import_x509_raw(gnutls_pcert_st * pcerts,
 				  const gnutls_datum_t * data,
 				  gnutls_x509_crt_fmt_t format,
 				  unsigned int flags);
+
+int gnutls_pcert_list_import_x509_file(gnutls_pcert_st *pcert_list,
+				       unsigned *pcert_list_size,
+				       const char *file,
+				       gnutls_x509_crt_fmt_t format,
+				       gnutls_pin_callback_t pin_fn,
+				       void *pin_fn_userdata,
+				       unsigned int flags);
 
 int gnutls_pcert_import_x509_raw(gnutls_pcert_st * pcert,
 				 const gnutls_datum_t * cert,
@@ -510,6 +693,14 @@ int gnutls_pcert_export_openpgp(gnutls_pcert_st * pcert,
 
 void gnutls_pcert_deinit(gnutls_pcert_st * pcert);
 
+int gnutls_pcert_import_rawpk(gnutls_pcert_st* pcert,
+			     gnutls_pubkey_t key, unsigned int flags);
+
+int gnutls_pcert_import_rawpk_raw(gnutls_pcert_st* pcert,
+				    const gnutls_datum_t* rawpubkey,
+				    gnutls_x509_crt_fmt_t format,
+				    unsigned int key_usage, unsigned int flags);
+
 /* For certificate credentials */
 	/* This is the same as gnutls_certificate_retrieve_function()
 	 * but retrieves a gnutls_pcert_st which requires much less processing
@@ -527,7 +718,38 @@ typedef int gnutls_certificate_retrieve_function2(gnutls_session_t,
 
 void gnutls_certificate_set_retrieve_function2
     (gnutls_certificate_credentials_t cred,
-     gnutls_certificate_retrieve_function2 * func);
+     gnutls_certificate_retrieve_function2 *func);
+
+struct gnutls_cert_retr_st {
+	unsigned version; /* set to 1 */
+	gnutls_certificate_credentials_t cred;
+	const gnutls_datum_t *req_ca_rdn;
+	unsigned nreqs;
+	const gnutls_pk_algorithm_t *pk_algos;
+	unsigned pk_algos_length;
+
+	/* other fields may be added if version is > 1 */
+	unsigned char padding[64];
+};
+
+/* When the callback sets this value, gnutls will deinitialize the given
+ * values after use */
+#define GNUTLS_CERT_RETR_DEINIT_ALL 1
+
+typedef int gnutls_certificate_retrieve_function3(
+				gnutls_session_t,
+				const struct gnutls_cert_retr_st *info,
+				gnutls_pcert_st **certs,
+				unsigned int *pcert_length,
+				gnutls_ocsp_data_st **ocsp,
+				unsigned int *ocsp_length,
+				gnutls_privkey_t *privkey,
+				unsigned int *flags);
+
+
+void gnutls_certificate_set_retrieve_function3
+    (gnutls_certificate_credentials_t cred,
+     gnutls_certificate_retrieve_function3 *func);
 
 int
 gnutls_certificate_set_key(gnutls_certificate_credentials_t res,

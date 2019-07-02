@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2011-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2018 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -16,7 +17,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -36,6 +37,7 @@
 #include <byteswap.h>
 #include <nettle/gcm.h>
 #include <aes-x86.h>
+#include <assert.h>
 
 /* GCM mode 
  * It is used when the CPU doesn't include the PCLMUL instructions.
@@ -49,6 +51,8 @@ static void x86_aes_encrypt(const void *_ctx,
 	AES_KEY *ctx = (void*)_ctx;
 	unsigned i;
 	unsigned blocks = (length+15) / 16;
+
+	assert(blocks*16 == length);
 
 	for (i=0;i<blocks;i++) {
 		vpaes_encrypt(src, dst, ctx);
