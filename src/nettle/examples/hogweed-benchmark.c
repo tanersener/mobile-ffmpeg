@@ -59,6 +59,7 @@
 
 #if WITH_OPENSSL
 #include <openssl/rsa.h>
+#include <openssl/bn.h>
 #include <openssl/ec.h>
 #include <openssl/ecdsa.h>
 #include <openssl/objects.h>
@@ -148,7 +149,7 @@ bench_alg (const struct alg *alg)
   ctx = alg->init(alg->size);
   if (ctx == NULL)
     {
-      printf("%15s %4d N/A\n", alg->name, alg->size);
+      printf("%16s %4d N/A\n", alg->name, alg->size);
       return;
     }
 
@@ -157,7 +158,7 @@ bench_alg (const struct alg *alg)
 
   alg->clear (ctx);
 
-  printf("%15s %4d %9.4f %9.4f\n",
+  printf("%16s %4d %9.4f %9.4f\n",
 	 alg->name, alg->size, 1e-3/sign, 1e-3/verify);
 }
 
@@ -165,6 +166,7 @@ struct rsa_ctx
 {
   struct rsa_public_key pub;
   struct rsa_private_key key;
+  struct knuth_lfib_ctx lfib;
   uint8_t *digest;
   mpz_t s;
 };
@@ -223,6 +225,7 @@ bench_rsa_init (unsigned size)
   rsa_public_key_init (&ctx->pub);
   rsa_private_key_init (&ctx->key);
   mpz_init (ctx->s);
+  knuth_lfib_init (&ctx->lfib, 1);
 
   /* NOTE: Base64-decodes the strings in-place */
   if (size == 1024)
@@ -253,6 +256,19 @@ bench_rsa_sign (void *p)
   mpz_t s;
   mpz_init (s);
   rsa_sha256_sign_digest (&ctx->key, ctx->digest, s);
+  mpz_clear (s);
+}
+
+static void
+bench_rsa_sign_tr (void *p)
+{
+  struct rsa_ctx *ctx = p;
+
+  mpz_t s;
+  mpz_init (s);
+  rsa_sha256_sign_digest_tr (&ctx->pub, &ctx->key,
+			     &ctx->lfib, (nettle_random_func *)knuth_lfib_random,
+			     ctx->digest, s);
   mpz_clear (s);
 }
 
@@ -394,7 +410,7 @@ bench_ecdsa_init (unsigned size)
   switch (size)
     {
     case 192:
-      ecc = &nettle_secp_192r1;
+      ecc = &_nettle_secp_192r1;
       xs = "8e8e07360350fb6b7ad8370cfd32fa8c6bba785e6e200599";
       ys = "7f82ddb58a43d59ff8dc66053002b918b99bd01bd68d6736";
       zs = "f2e620e086d658b4b507996988480917640e4dc107808bdd";
@@ -402,7 +418,7 @@ bench_ecdsa_init (unsigned size)
       ctx->digest_size = 20;
       break;
     case 224:
-      ecc = &nettle_secp_224r1;
+      ecc = &_nettle_secp_224r1;
       xs = "993bf363f4f2bc0f255f22563980449164e9c894d9efd088d7b77334";
       ys = "b75fff9849997d02d135140e4d0030944589586e22df1fc4b629082a";
       zs = "cdfd01838247f5de3cc70b688418046f10a2bfaca6de9ec836d48c27";
@@ -412,7 +428,7 @@ bench_ecdsa_init (unsigned size)
 
       /* From RFC 4754 */
     case 256:
-      ecc = &nettle_secp_256r1;
+      ecc = &_nettle_secp_256r1;
       xs = "2442A5CC 0ECD015F A3CA31DC 8E2BBC70 BF42D60C BCA20085 E0822CB0 4235E970";
       ys = "6FC98BD7 E50211A4 A27102FA 3549DF79 EBCB4BF2 46B80945 CDDFE7D5 09BBFD7D";
       zs = "DC51D386 6A15BACD E33D96F9 92FCA99D A7E6EF09 34E70975 59C27F16 14C88A7F";
@@ -420,7 +436,7 @@ bench_ecdsa_init (unsigned size)
       ctx->digest_size = 32;
       break;
     case 384:
-      ecc = &nettle_secp_384r1;
+      ecc = &_nettle_secp_384r1;
       xs = "96281BF8 DD5E0525 CA049C04 8D345D30 82968D10 FEDF5C5A CA0C64E6 465A97EA"
 	"5CE10C9D FEC21797 41571072 1F437922";
       ys = "447688BA 94708EB6 E2E4D59F 6AB6D7ED FF9301D2 49FE49C3 3096655F 5D502FAD"
@@ -431,7 +447,7 @@ bench_ecdsa_init (unsigned size)
       ctx->digest_size = 48;
       break;
     case 521:
-      ecc = &nettle_secp_521r1;
+      ecc = &_nettle_secp_521r1;
       xs = "0151518F 1AF0F563 517EDD54 85190DF9 5A4BF57B 5CBA4CF2 A9A3F647 4725A35F"
 	"7AFE0A6D DEB8BEDB CD6A197E 592D4018 8901CECD 650699C9 B5E456AE A5ADD190"
 	"52A8";
@@ -517,22 +533,38 @@ struct openssl_rsa_ctx
   uint8_t *digest;
 };
 
-static void *
-bench_openssl_rsa_init (unsigned size)
+static struct openssl_rsa_ctx*
+make_openssl_rsa_ctx (unsigned size)
 {
   struct openssl_rsa_ctx *ctx = xalloc (sizeof (*ctx));
-
-  ctx->key = RSA_generate_key (size, 65537, NULL, NULL);
+  BIGNUM *e = BN_new();
+  BN_set_word(e, 65537);
+  ctx->key = RSA_new();
+  RSA_generate_key_ex (ctx->key, size, e, NULL);
   ctx->ref = xalloc (RSA_size (ctx->key));
   ctx->signature = xalloc (RSA_size (ctx->key));
   ctx->digest = hash_string (&nettle_sha1, "foo");
-  RSA_blinding_off(ctx->key);
 
   if (! RSA_sign (NID_sha1, ctx->digest, SHA1_DIGEST_SIZE,
 		  ctx->ref, &ctx->siglen, ctx->key))
     die ("OpenSSL RSA_sign failed.\n");
 
+  BN_free(e);
   return ctx;
+}
+
+static void *
+bench_openssl_rsa_init (unsigned size)
+{
+  struct openssl_rsa_ctx *ctx = make_openssl_rsa_ctx (size);
+  RSA_blinding_off(ctx->key);
+  return ctx;
+}
+
+static void *
+bench_openssl_rsa_tr_init (unsigned size)
+{
+  return make_openssl_rsa_ctx (size);
 }
 
 static void
@@ -689,16 +721,20 @@ bench_curve25519 (void)
   mul_g = time_function (bench_curve25519_mul_g, &ctx);
   mul = time_function (bench_curve25519_mul, &ctx);
 
-  printf("%15s %4d %9.4f %9.4f\n",
+  printf("%16s %4d %9.4f %9.4f\n",
 	 "curve25519", 255, 1e-3/mul_g, 1e-3/mul);
 }
 
 struct alg alg_list[] = {
   { "rsa",   1024, bench_rsa_init,   bench_rsa_sign,   bench_rsa_verify,   bench_rsa_clear },
   { "rsa",   2048, bench_rsa_init,   bench_rsa_sign,   bench_rsa_verify,   bench_rsa_clear },
+  { "rsa-tr",   1024, bench_rsa_init,   bench_rsa_sign_tr,   bench_rsa_verify,   bench_rsa_clear },
+  { "rsa-tr",   2048, bench_rsa_init,   bench_rsa_sign_tr,   bench_rsa_verify,   bench_rsa_clear },
 #if WITH_OPENSSL
   { "rsa (openssl)",  1024, bench_openssl_rsa_init, bench_openssl_rsa_sign, bench_openssl_rsa_verify, bench_openssl_rsa_clear },
   { "rsa (openssl)",  2048, bench_openssl_rsa_init, bench_openssl_rsa_sign, bench_openssl_rsa_verify, bench_openssl_rsa_clear },
+  { "rsa-tr (openssl)",  1024, bench_openssl_rsa_tr_init, bench_openssl_rsa_sign, bench_openssl_rsa_verify, bench_openssl_rsa_clear },
+  { "rsa-tr (openssl)",  2048, bench_openssl_rsa_tr_init, bench_openssl_rsa_sign, bench_openssl_rsa_verify, bench_openssl_rsa_clear },
 #endif
   { "dsa",   1024, bench_dsa_init,   bench_dsa_sign,   bench_dsa_verify,   bench_dsa_clear },
 #if 0
@@ -730,7 +766,7 @@ main (int argc, char **argv)
     filter = argv[1];
 
   time_init();
-  printf ("%15s %4s %9s %9s\n",
+  printf ("%16s %4s %9s %9s\n",
 	  "name", "size", "sign/ms", "verify/ms");
 
   for (i = 0; i < numberof(alg_list); i++)

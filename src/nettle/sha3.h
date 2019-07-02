@@ -42,8 +42,6 @@ extern "C" {
 
 /* Name mangling */
 #define sha3_permute nettle_sha3_permute
-#define _sha3_update _nettle_sha3_update
-#define _sha3_pad _nettle_sha3_pad
 #define sha3_224_init nettle_sha3_224_init
 #define sha3_224_update nettle_sha3_224_update
 #define sha3_224_digest nettle_sha3_224_digest
@@ -74,15 +72,6 @@ struct sha3_state
 
 void
 sha3_permute (struct sha3_state *state);
-
-unsigned
-_sha3_update (struct sha3_state *state,
-	      unsigned block_size, uint8_t *block,
-	      unsigned pos,
-	      size_t length, const uint8_t *data);
-void
-_sha3_pad (struct sha3_state *state,
-	   unsigned block_size, uint8_t *block, unsigned pos);
 
 /* The "capacity" is set to 2*(digest size), 512 bits or 64 octets.
    The "rate" is the width - capacity, or width - 2 * (digest

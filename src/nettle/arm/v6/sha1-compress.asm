@@ -52,7 +52,7 @@ define(<LOAD>, <
 	sel	W, WPREV, T0
 	ror	W, W, SHIFT
 	mov	WPREV, T0
-	rev	W, W
+IF_LE(<	rev	W, W>)
 	str	W, [SP,#eval(4*$1)]
 >)
 define(<EXPN>, <
@@ -101,7 +101,7 @@ define(<ROUND3>, <
 	ror	$2, $2, #2
 	add	$5, $5, T0
 >)
-	C void _nettle_sha1_compress(uint32_t *state, const uint8_t *input)
+	C void nettle_sha1_compress(uint32_t *state, const uint8_t *input)
 	
 	.text
 	.align 2
@@ -112,7 +112,7 @@ define(<ROUND3>, <
 .LK3:
 	.int	0x8F1BBCDC
 
-PROLOGUE(_nettle_sha1_compress)
+PROLOGUE(nettle_sha1_compress)
 	push	{r4,r5,r6,r7,r8,r10,lr}
 	sub	sp, sp, #64
 
@@ -127,8 +127,12 @@ PROLOGUE(_nettle_sha1_compress)
 	lsl	SHIFT, SHIFT, #3
 	mov	T0, #0
 	movne	T0, #-1
-	lsl	W, T0, SHIFT
+IF_LE(<	lsl	W, T0, SHIFT>)
+IF_BE(<	lsr	W, T0, SHIFT>)
 	uadd8	T0, T0, W		C Sets APSR.GE bits
+	C on BE rotate right by 32-SHIFT bits
+	C because there is no rotate left
+IF_BE(<	rsb     SHIFT, SHIFT, #32>)
 	
 	ldr	K, .LK1
 	ldm	STATE, {SA,SB,SC,SD,SE}
@@ -242,7 +246,7 @@ PROLOGUE(_nettle_sha1_compress)
 	add	sp, sp, #64
 	stm	STATE, {SA,SB,SC,SD,SE}
 	pop	{r4,r5,r6,r7,r8,r10,pc}	
-EPILOGUE(_nettle_sha1_compress)
+EPILOGUE(nettle_sha1_compress)
 
 .LK4:
 	.int	0xCA62C1D6

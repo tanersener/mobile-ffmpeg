@@ -36,6 +36,7 @@
 #include <assert.h>
 
 #include "umac.h"
+#include "umac-internal.h"
 #include "macros.h"
 
 /* For fat builds */

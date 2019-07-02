@@ -36,8 +36,8 @@
 # include "config.h"
 #endif
 
-#include "rsa.h"
 #include "rsa-internal.h"
+#include "pkcs1-internal.h"
 #include "gmp-glue.h"
 
 int

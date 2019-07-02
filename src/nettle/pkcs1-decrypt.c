@@ -38,10 +38,10 @@
 #include <string.h>
 
 #include "pkcs1.h"
+#include "pkcs1-internal.h"
 
 #include "bignum.h"
 #include "gmp-glue.h"
-#include "rsa-internal.h"
 
 int
 pkcs1_decrypt (size_t key_size,

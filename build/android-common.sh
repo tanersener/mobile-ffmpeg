@@ -256,7 +256,7 @@ get_size_optimization_cflags() {
         ;;
         arm64-v8a)
             case $1 in
-                ffmpeg | nettle)
+                ffmpeg)
                     ARCH_OPTIMIZATION="${LINK_TIME_OPTIMIZATION_FLAGS} -fuse-ld=gold -O2 -ffunction-sections -fdata-sections"
                 ;;
                 *)
@@ -391,7 +391,7 @@ get_size_optimization_ldflags() {
     case ${ARCH} in
         arm64-v8a)
             case $1 in
-                ffmpeg | nettle)
+                ffmpeg)
                     echo "-Wl,--gc-sections ${LINK_TIME_OPTIMIZATION_FLAGS} -fuse-ld=gold -O2 -ffunction-sections -fdata-sections -finline-functions"
                 ;;
                 *)

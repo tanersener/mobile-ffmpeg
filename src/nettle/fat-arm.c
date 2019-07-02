@@ -147,7 +147,7 @@ DECLARE_FAT_FUNC(_nettle_salsa20_core, salsa20_core_func)
 DECLARE_FAT_FUNC_VAR(salsa20_core, salsa20_core_func, c)
 DECLARE_FAT_FUNC_VAR(salsa20_core, salsa20_core_func, neon)
 
-DECLARE_FAT_FUNC(_nettle_sha1_compress, sha1_compress_func)
+DECLARE_FAT_FUNC(nettle_sha1_compress, sha1_compress_func)
 DECLARE_FAT_FUNC_VAR(sha1_compress, sha1_compress_func, c)
 DECLARE_FAT_FUNC_VAR(sha1_compress, sha1_compress_func, armv6)
 
@@ -171,6 +171,10 @@ DECLARE_FAT_FUNC(_nettle_umac_nh_n, umac_nh_n_func)
 DECLARE_FAT_FUNC_VAR(umac_nh_n, umac_nh_n_func, c);
 DECLARE_FAT_FUNC_VAR(umac_nh_n, umac_nh_n_func, neon);
 
+DECLARE_FAT_FUNC(_nettle_chacha_core, chacha_core_func)
+DECLARE_FAT_FUNC_VAR(chacha_core, chacha_core_func, c);
+DECLARE_FAT_FUNC_VAR(chacha_core, chacha_core_func, neon);
+
 static void CONSTRUCTOR
 fat_init (void)
 {
@@ -191,7 +195,7 @@ fat_init (void)
 	fprintf (stderr, "libnettle: enabling armv6 code.\n");
       _nettle_aes_encrypt_vec = _nettle_aes_encrypt_armv6;
       _nettle_aes_decrypt_vec = _nettle_aes_decrypt_armv6;
-      _nettle_sha1_compress_vec = _nettle_sha1_compress_armv6;
+      nettle_sha1_compress_vec = _nettle_sha1_compress_armv6;
       _nettle_sha256_compress_vec = _nettle_sha256_compress_armv6;
     }
   else
@@ -200,7 +204,7 @@ fat_init (void)
 	fprintf (stderr, "libnettle: not enabling armv6 code.\n");
       _nettle_aes_encrypt_vec = _nettle_aes_encrypt_arm;
       _nettle_aes_decrypt_vec = _nettle_aes_decrypt_arm;
-      _nettle_sha1_compress_vec = _nettle_sha1_compress_c;
+      nettle_sha1_compress_vec = _nettle_sha1_compress_c;
       _nettle_sha256_compress_vec = _nettle_sha256_compress_c;
     }
   if (features.have_neon)
@@ -212,6 +216,7 @@ fat_init (void)
       nettle_sha3_permute_vec = _nettle_sha3_permute_neon;
       _nettle_umac_nh_vec = _nettle_umac_nh_neon;
       _nettle_umac_nh_n_vec = _nettle_umac_nh_n_neon;
+      _nettle_chacha_core_vec = _nettle_chacha_core_neon;
     }
   else
     {
@@ -222,6 +227,7 @@ fat_init (void)
       nettle_sha3_permute_vec = _nettle_sha3_permute_c;
       _nettle_umac_nh_vec = _nettle_umac_nh_c;
       _nettle_umac_nh_n_vec = _nettle_umac_nh_n_c;
+      _nettle_chacha_core_vec = _nettle_chacha_core_c;
     }
 }
   
@@ -243,7 +249,7 @@ DEFINE_FAT_FUNC(_nettle_salsa20_core, void,
 		(uint32_t *dst, const uint32_t *src, unsigned rounds),
 		(dst, src, rounds))
 
-DEFINE_FAT_FUNC(_nettle_sha1_compress, void,
+DEFINE_FAT_FUNC(nettle_sha1_compress, void,
 		(uint32_t *state, const uint8_t *input),
 		(state, input))
 
@@ -266,4 +272,8 @@ DEFINE_FAT_FUNC(_nettle_umac_nh_n, void,
 		(uint64_t *out, unsigned n, const uint32_t *key,
 		 unsigned length, const uint8_t *msg),
 		(out, n, key, length, msg))
+
+DEFINE_FAT_FUNC(_nettle_chacha_core, void,
+		(uint32_t *dst, const uint32_t *src, unsigned rounds),
+		(dst, src, rounds))
 

@@ -7,6 +7,7 @@ define(<TYPE_PROGBITS>, <@ASM_TYPE_PROGBITS@>)dnl
 define(<ALIGN_LOG>, <@ASM_ALIGN_LOG@>)dnl
 define(<W64_ABI>, <@W64_ABI@>)dnl
 define(<RODATA>, <@ASM_RODATA@>)dnl
+define(<WORDS_BIGENDIAN>, <@ASM_WORDS_BIGENDIAN@>)dnl
 divert(1)
 @ASM_MARK_NOEXEC_STACK@
 divert

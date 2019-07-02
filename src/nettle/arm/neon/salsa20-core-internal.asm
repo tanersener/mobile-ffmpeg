@@ -88,7 +88,7 @@ define(<QROUND>, <
 PROLOGUE(_nettle_salsa20_core)
 	vldm	SRC, {X0,X1,X2,X3}
 
-	C Input rows:
+	C Input rows little-endian:
 	C	 0  1  2  3	X0
 	C	 4  5  6  7	X1
 	C	 8  9 10 11	X2
@@ -98,6 +98,20 @@ PROLOGUE(_nettle_salsa20_core)
 	C	 4  9 14  3
 	C	 8 13  2  7
 	C	12  1  6 11
+
+	C Input rows big-endian:
+	C	 1  0  3  2	X0
+	C	 5  4  7  6	X1
+	C	 9  8 11 10	X2
+	C	13 12 15 14	X3
+	C even and odd columns switched because
+	C vldm loads consecutive doublewords and
+	C switches words inside them to make them BE
+	C Permuted to:
+	C	 5  0 15 10
+	C	 9  4  3 14
+	C	13  8  7  2
+	C	 1 12 11  6
 
 	C FIXME: Construct in some other way?
 	adr	r12, .Lmasks
@@ -112,6 +126,7 @@ PROLOGUE(_nettle_salsa20_core)
 	C	 4  1  6  3	T0 v
 	C	 8 13 10 15	T1  ^
 	C	12  9 14 11	X3  v
+	C same in big endian just with transposed rows
 	vmov	T0, X1
 	vmov	T1, X2
 	vbit	T0, X0, M0101
@@ -140,22 +155,34 @@ PROLOGUE(_nettle_salsa20_core)
 .Loop:
 	QROUND(X0, X1, X2, X3)
 
-	C Rotate rows, to get
+	C In little-endian rotate rows, to get
 	C	 0  5 10 15
 	C	 3  4  9 14  >>> 1
 	C	 2  7  8 13  >>> 2
 	C	 1  6 11 12  >>> 3
-	vext.32	X1, X1, X1, #3
+
+	C In big-endian rotate rows, to get
+	C	 5  0 15 10
+	C	 4  3 14  9  >>> 3
+	C	 7  2 13  8  >>> 2
+	C	 6  1 12 11  >>> 1
+	C different number of elements needs to be
+	C extracted on BE because of different column order
+IF_LE(<	vext.32	X1, X1, X1, #3>)
+IF_BE(<	vext.32	X1, X1, X1, #1>)
 	vext.32	X2, X2, X2, #2
-	vext.32	X3, X3, X3, #1
+IF_LE(<	vext.32	X3, X3, X3, #1>)
+IF_BE(<	vext.32	X3, X3, X3, #3>)
 
 	QROUND(X0, X3, X2, X1)
 
 	subs	ROUNDS, ROUNDS, #2
 	C Inverse rotation
-	vext.32	X1, X1, X1, #1
+IF_LE(<	vext.32	X1, X1, X1, #1>)
+IF_BE(<	vext.32	X1, X1, X1, #3>)
 	vext.32	X2, X2, X2, #2
-	vext.32	X3, X3, X3, #3
+IF_LE(<	vext.32	X3, X3, X3, #3>)
+IF_BE(<	vext.32	X3, X3, X3, #1>)
 
 	bhi	.Loop
 
@@ -180,6 +207,12 @@ PROLOGUE(_nettle_salsa20_core)
 	vadd.u32	X1, X1, S1
 	vadd.u32	X2, X2, S2
 	vadd.u32	X3, X3, S3
+
+	C caller expects result little-endian
+IF_BE(<	vrev32.u8	X0, X0
+	vrev32.u8	X1, X1
+	vrev32.u8	X2, X2
+	vrev32.u8	X3, X3>)
 
 	vstm	DST, {X0,X1,X2,X3}
 	bx	lr

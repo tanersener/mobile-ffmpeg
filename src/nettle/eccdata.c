@@ -612,17 +612,61 @@ ecc_curve_init (struct ecc_curve *ecc, unsigned bit_size)
 }
 
 static void
+ecc_curve_clear (struct ecc_curve *ecc)
+{
+  mpz_clear (ecc->p);
+  mpz_clear (ecc->b);
+  mpz_clear (ecc->q);
+  ecc_clear (&ecc->g);
+  mpz_clear (ecc->d);
+  mpz_clear (ecc->t);
+  if (ecc->table)
+    {
+      size_t i;
+      for (i = 0; i < ecc->table_size; i++)
+	ecc_clear (&ecc->table[i]);
+      free (ecc->table);
+    }
+  if (ecc->ref)
+    {
+      size_t i;
+      for (i = 0; i < 3; i++)
+	ecc_clear (&ecc->ref[i]);
+      free (ecc->ref);
+    }
+}
+
+static unsigned
+ecc_table_size(unsigned bits, unsigned k, unsigned c)
+{
+  unsigned p = (bits + k-1) / k;
+  unsigned M = (p + c-1)/c;
+  return M;
+}
+
+static void
 ecc_pippenger_precompute (struct ecc_curve *ecc, unsigned k, unsigned c)
 {
-  unsigned p = (ecc->bit_size + k-1) / k;
-  unsigned M = (p + c-1)/c;
+  unsigned M = ecc_table_size (ecc->bit_size, k, c);
   unsigned i, j;
+
+  if (M < 2)
+    {
+      fprintf (stderr, "Invalid parameters, implies M = %u\n", M);
+      exit (EXIT_FAILURE);
+    }
+
+  if (M == ecc_table_size (ecc->bit_size, k-1, c))
+    fprintf(stderr,
+	    "warn: Parameters k = %u, c = %d are suboptimal, could use smaller k\n",
+	    k, c);
 
   ecc->pippenger_k = k;
   ecc->pippenger_c = c;
   ecc->table_size = M << c;
+  assert (ecc->table_size >= 2);
   ecc->table = ecc_alloc (ecc->table_size);
-  
+
   /* Compute the first 2^c entries */
   ecc_set_zero (&ecc->table[0]);
   ecc_set (&ecc->table[1], &ecc->g);
@@ -630,12 +674,16 @@ ecc_pippenger_precompute (struct ecc_curve *ecc, unsigned k, unsigned c)
   for (j = 2; j < (1U<<c); j <<= 1)
     {
       /* T[j] = 2^k T[j/2] */
+      assert (j < ecc->table_size);
       ecc_dup (ecc, &ecc->table[j], &ecc->table[j/2]);
       for (i = 1; i < k; i++)
 	ecc_dup (ecc, &ecc->table[j], &ecc->table[j]);
 
       for (i = 1; i < j; i++)
-	ecc_add (ecc, &ecc->table[j + i], &ecc->table[j], &ecc->table[i]);
+	{
+	  assert (j + i < ecc->table_size);
+	  ecc_add (ecc, &ecc->table[j + i], &ecc->table[j], &ecc->table[i]);
+	}
     }
   for (j = 1<<c; j < ecc->table_size; j++)
     {
@@ -1131,7 +1179,7 @@ output_curve (const struct ecc_curve *ecc, unsigned bits_per_limb)
 
   printf ("#else\n");
 
-  mpz_init_set_ui (t, 1);
+  mpz_set_ui (t, 1);
   output_bignum ("ecc_unit", t, limb_size, bits_per_limb);
   
   printf ("static const mp_limb_t ecc_table[%lu] = {",
@@ -1168,5 +1216,6 @@ main (int argc, char **argv)
   if (argc > 4)
     output_curve (&ecc, atoi(argv[4]));
 
+  ecc_curve_clear (&ecc);
   return EXIT_SUCCESS;
 }

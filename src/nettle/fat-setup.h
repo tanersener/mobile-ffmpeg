@@ -174,3 +174,5 @@ typedef void sha512_compress_func (uint64_t *state, const uint8_t *input, const 
 typedef uint64_t umac_nh_func (const uint32_t *key, unsigned length, const uint8_t *msg);
 typedef void umac_nh_n_func (uint64_t *out, unsigned n, const uint32_t *key,
 			     unsigned length, const uint8_t *msg);
+
+typedef void chacha_core_func(uint32_t *dst, const uint32_t *src, unsigned rounds);

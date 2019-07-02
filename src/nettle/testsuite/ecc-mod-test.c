@@ -105,23 +105,23 @@ test_fixed (void)
   /* Triggered a bug reported by Hanno Böck. */
   mpz_set_str (r, "FFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFF001C2C00", 16);
   mpz_mul_2exp (r, r, 256);
-  test_one ("p", &nettle_secp_256r1.p, r);
-  test_one ("q", &nettle_secp_256r1.q, r);
+  test_one ("p", &_nettle_secp_256r1.p, r);
+  test_one ("q", &_nettle_secp_256r1.q, r);
 
   mpz_set_str (r, "ffffffff00000001fffffffeffffffffffffffffffffffffffffffc0000000000007ffffffffffffffffffffffffffff00000000000000000fffffffffffffff", 16);
-  test_one ("p", &nettle_secp_256r1.p, r);
-  test_one ("q", &nettle_secp_256r1.q, r);
+  test_one ("p", &_nettle_secp_256r1.p, r);
+  test_one ("q", &_nettle_secp_256r1.q, r);
 
   /* Triggered a bug reported by Hanno Böck. */
   mpz_set_str (r, "4c9000000000000000000000000000000000000000000000004a604db486e000000000000000000000000000000000000000121025be29575adb2c8ffffffffffffffffffffffffffffffffffffffffffffffffffffffff", 16);
-  test_one ("p", &nettle_secp_384r1.p, r);
-  test_one ("q", &nettle_secp_384r1.q, r);
+  test_one ("p", &_nettle_secp_384r1.p, r);
+  test_one ("q", &_nettle_secp_384r1.q, r);
 
   /* Triggered a carry bug in development version. */
   mpz_set_str (r, "e64a84643150260640e4677c19ffc4faef06042132b86af6e9ee33fe1850222e57a514d5f1d6d444008bb896a96a43d5629945e57548f5e12f66be132b24110cbb2df6d7d3dd3aaadc98b0bbf29573843ad72e57f59fc5d4f56cc599da18bb99", 16);
 
-  test_one ("p", &nettle_secp_384r1.p, r);
-  test_one ("q", &nettle_secp_384r1.q, r);
+  test_one ("p", &_nettle_secp_384r1.p, r);
+  test_one ("q", &_nettle_secp_384r1.q, r);
 
   mpz_clear (r);
 }

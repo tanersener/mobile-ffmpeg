@@ -47,6 +47,7 @@
 #include <string.h>
 
 #include "chacha.h"
+#include "chacha-internal.h"
 
 #include "macros.h"
 #include "memxor.h"

@@ -36,6 +36,7 @@
 #include <assert.h>
 
 #include "eddsa.h"
+#include "eddsa-internal.h"
 
 #include "ecc.h"
 #include "ecc-internal.h"

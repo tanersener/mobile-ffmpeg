@@ -155,11 +155,11 @@ define(<ROUND_F3>, <
 
 	.file "sha1-compress.asm"
 
-	C _nettle_sha1_compress(uint32_t *state, uint8_t *data)
+	C nettle_sha1_compress(uint32_t *state, uint8_t *data)
 	
 	.text
 
-PROLOGUE(_nettle_sha1_compress)
+PROLOGUE(nettle_sha1_compress)
 	C save all registers that need to be saved
 	C 			   88(%esp)  data
 	C 			   84(%esp)  state
@@ -1540,7 +1540,7 @@ C 	ROUND_F2(SB, SC, SD, SE, SA, 79, K4VALUE)
 	popl	%ebp
 	popl	%ebx
 	ret
-EPILOGUE(_nettle_sha1_compress)
+EPILOGUE(nettle_sha1_compress)
 
 C TODO:
 

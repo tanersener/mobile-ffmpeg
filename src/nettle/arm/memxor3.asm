@@ -49,6 +49,11 @@ define(<ATNC>, <r10>)
 define(<BCNT>, <r11>)
 define(<BTNC>, <r12>)
 
+C little-endian and big-endian need to shift in different directions for
+C alignment correction
+define(<S0ADJ>, IF_LE(<lsr>, <lsl>))
+define(<S1ADJ>, IF_LE(<lsl>, <lsr>))
+
 	.syntax unified
 
 	.file "memxor3.asm"
@@ -124,6 +129,8 @@ PROLOGUE(nettle_memxor3)
 	C
 	C With little-endian, we need to do
 	C DST[i-i] ^= (SRC[i-i] >> CNT) ^ (SRC[i] << TNC)
+	C With big-endian, we need to do
+	C DST[i-i] ^= (SRC[i-i] << CNT) ^ (SRC[i] >> TNC)
 	rsb	ATNC, ACNT, #32
 	bic	BP, #3
 
@@ -138,14 +145,14 @@ PROLOGUE(nettle_memxor3)
 .Lmemxor3_au_loop:
 	ldr	r5, [BP, #-4]!
 	ldr	r6, [AP, #-4]!
-	eor	r6, r6, r4, lsl ATNC
-	eor	r6, r6, r5, lsr ACNT
+	eor	r6, r6, r4, S1ADJ ATNC
+	eor	r6, r6, r5, S0ADJ ACNT
 	str	r6, [DST, #-4]!
 .Lmemxor3_au_odd:
 	ldr	r4, [BP, #-4]!
 	ldr	r6, [AP, #-4]!
-	eor	r6, r6, r5, lsl ATNC
-	eor	r6, r6, r4, lsr ACNT
+	eor	r6, r6, r5, S1ADJ ATNC
+	eor	r6, r6, r4, S0ADJ ACNT
 	str	r6, [DST, #-4]!
 	subs	N, #8
 	bcs	.Lmemxor3_au_loop
@@ -154,7 +161,11 @@ PROLOGUE(nettle_memxor3)
 
 	C Leftover bytes in r4, low end
 	ldr	r5, [AP, #-4]
-	eor	r4, r5, r4, lsl ATNC
+	eor	r4, r5, r4, S1ADJ ATNC
+
+	C leftover does an LSB store
+	C so we need to reverse if actually BE
+IF_BE(<	rev	r4, r4>)
 
 .Lmemxor3_au_leftover:
 	C Store a byte at a time
@@ -247,20 +258,24 @@ PROLOGUE(nettle_memxor3)
 	ldr	r5, [AP, #-4]!
 	ldr	r6, [BP, #-4]!
 	eor	r5, r6
-	lsl	r4, ATNC
-	eor	r4, r4, r5, lsr ACNT
+	S1ADJ	r4, ATNC
+	eor	r4, r4, r5, S0ADJ ACNT
 	str	r4, [DST, #-4]!
 .Lmemxor3_uu_odd:
 	ldr	r4, [AP, #-4]!
 	ldr	r6, [BP, #-4]!
 	eor	r4, r6
-	lsl	r5, ATNC
-	eor	r5, r5, r4, lsr ACNT
+	S1ADJ	r5, ATNC
+	eor	r5, r5, r4, S0ADJ ACNT
 	str	r5, [DST, #-4]!
 	subs	N, #8
 	bcs	.Lmemxor3_uu_loop
 	adds	N, #8
 	beq	.Lmemxor3_done
+
+	C leftover does an LSB store
+	C so we need to reverse if actually BE
+IF_BE(<	rev	r4, r4>)
 
 	C Leftover bytes in a4, low end
 	ror	r4, ACNT
@@ -290,18 +305,18 @@ PROLOGUE(nettle_memxor3)
 .Lmemxor3_uud_loop:
 	ldr	r5, [AP, #-4]!
 	ldr	r7, [BP, #-4]!
-	lsl	r4, ATNC
-	eor	r4, r4, r6, lsl BTNC
-	eor	r4, r4, r5, lsr ACNT
-	eor	r4, r4, r7, lsr BCNT
+	S1ADJ	r4, ATNC
+	eor	r4, r4, r6, S1ADJ BTNC
+	eor	r4, r4, r5, S0ADJ ACNT
+	eor	r4, r4, r7, S0ADJ BCNT
 	str	r4, [DST, #-4]!
 .Lmemxor3_uud_odd:
 	ldr	r4, [AP, #-4]!
 	ldr	r6, [BP, #-4]!
-	lsl	r5, ATNC
-	eor	r5, r5, r7, lsl BTNC
-	eor	r5, r5, r4, lsr ACNT
-	eor	r5, r5, r6, lsr BCNT
+	S1ADJ	r5, ATNC
+	eor	r5, r5, r7, S1ADJ BTNC
+	eor	r5, r5, r4, S0ADJ ACNT
+	eor	r5, r5, r6, S0ADJ BCNT
 	str	r5, [DST, #-4]!
 	subs	N, #8
 	bcs	.Lmemxor3_uud_loop

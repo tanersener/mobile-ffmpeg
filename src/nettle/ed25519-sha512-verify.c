@@ -36,6 +36,7 @@
 #include <string.h>
 
 #include "eddsa.h"
+#include "eddsa-internal.h"
 
 #include "ecc-internal.h"
 #include "sha2.h"

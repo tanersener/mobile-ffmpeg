@@ -6,8 +6,9 @@
    See also the gcm paper at
    http://www.cryptobarn.com/papers/gcm-spec.pdf.
 
-   Copyright (C) 2011, 2013 Niels Möller
    Copyright (C) 2011 Katholieke Universiteit Leuven
+   Copyright (C) 2011, 2013, 2018 Niels Möller
+   Copyright (C) 2018 Red Hat, Inc.
    
    Contributed by Nikos Mavrogiannopoulos
 
@@ -51,6 +52,7 @@
 #include "memxor.h"
 #include "nettle-internal.h"
 #include "macros.h"
+#include "ctr-internal.h"
 
 #define GHASH_POLYNOMIAL 0xE1UL
 
@@ -434,41 +436,21 @@ gcm_update(struct gcm_ctx *ctx, const struct gcm_key *key,
   ctx->auth_size += length;
 }
 
+static nettle_fill16_func gcm_fill;
 static void
-gcm_crypt(struct gcm_ctx *ctx, const void *cipher, nettle_cipher_func *f,
-	  size_t length, uint8_t *dst, const uint8_t *src)
+gcm_fill(uint8_t *ctr, size_t blocks, union nettle_block16 *buffer)
 {
-  uint8_t buffer[GCM_BLOCK_SIZE];
+  uint32_t c;
 
-  if (src != dst)
+  c = READ_UINT32(ctr + GCM_BLOCK_SIZE - 4);
+
+  for (; blocks-- > 0; buffer++, c++)
     {
-      for (; length >= GCM_BLOCK_SIZE;
-           (length -= GCM_BLOCK_SIZE,
-	    src += GCM_BLOCK_SIZE, dst += GCM_BLOCK_SIZE))
-        {
-          f (cipher, GCM_BLOCK_SIZE, dst, ctx->ctr.b);
-          memxor (dst, src, GCM_BLOCK_SIZE);
-          INC32 (ctx->ctr);
-        }
+      memcpy(buffer->b, ctr, GCM_BLOCK_SIZE - 4);
+      WRITE_UINT32(buffer->b + GCM_BLOCK_SIZE - 4, c);
     }
-  else
-    {
-      for (; length >= GCM_BLOCK_SIZE;
-           (length -= GCM_BLOCK_SIZE,
-	    src += GCM_BLOCK_SIZE, dst += GCM_BLOCK_SIZE))
-        {
-          f (cipher, GCM_BLOCK_SIZE, buffer, ctx->ctr.b);
-          memxor3 (dst, src, buffer, GCM_BLOCK_SIZE);
-          INC32 (ctx->ctr);
-        }
-    }
-  if (length > 0)
-    {
-      /* A final partial block */
-      f (cipher, GCM_BLOCK_SIZE, buffer, ctx->ctr.b);
-      memxor3 (dst, src, buffer, length);
-      INC32 (ctx->ctr);
-    }
+
+  WRITE_UINT32(ctr + GCM_BLOCK_SIZE - 4, c);
 }
 
 void
@@ -478,7 +460,7 @@ gcm_encrypt (struct gcm_ctx *ctx, const struct gcm_key *key,
 {
   assert(ctx->data_size % GCM_BLOCK_SIZE == 0);
 
-  gcm_crypt(ctx, cipher, f, length, dst, src);
+  _ctr_crypt16(cipher, f, gcm_fill, ctx->ctr.b, length, dst, src);
   gcm_hash(key, &ctx->x, length, dst);
 
   ctx->data_size += length;
@@ -492,7 +474,7 @@ gcm_decrypt(struct gcm_ctx *ctx, const struct gcm_key *key,
   assert(ctx->data_size % GCM_BLOCK_SIZE == 0);
 
   gcm_hash(key, &ctx->x, length, src);
-  gcm_crypt(ctx, cipher, f, length, dst, src);
+  _ctr_crypt16(cipher, f, gcm_fill, ctx->ctr.b, length, dst, src);
 
   ctx->data_size += length;
 }

@@ -127,7 +127,7 @@ ecc_mod_pow_2kp1 (const struct ecc_modulo *m,
   ecc_mod_mul (m, rp, tp, xp);
 }
 
-/* Computes a^{(p-5)/8} = a^{2^{252-3}} mod m. Needs 5 * n scratch
+/* Computes a^{(p-5)/8} = a^{2^{252}-3} mod m. Needs 5 * n scratch
    space. */
 static void
 ecc_mod_pow_252m3 (const struct ecc_modulo *m,

@@ -748,3 +748,4 @@ C parallell.
 	pop	%rbx
 	W64_EXIT(4, 13)
 	ret
+EPILOGUE(nettle_serpent_encrypt)

@@ -60,16 +60,8 @@ struct nettle_cipher
   nettle_cipher_func *decrypt;
 };
 
-/* FIXME: Rename with leading underscore, but keep current name (and
-   size!) for now, for ABI compatibility with nettle-3.1, soname
-   libnettle.so.6. */
 /* null-terminated list of ciphers implemented by this version of nettle */
-extern const struct nettle_cipher * const nettle_ciphers[];
-
-const struct nettle_cipher * const *
-#ifdef __GNUC__
-__attribute__((pure))
-#endif
+const struct nettle_cipher * const * _NETTLE_ATTRIBUTE_PURE
 nettle_get_ciphers (void);
 
 #define nettle_ciphers (nettle_get_ciphers())
@@ -125,16 +117,8 @@ struct nettle_hash
  (nettle_hash_digest_func *) name##_digest	\
 } 
 
-/* FIXME: Rename with leading underscore, but keep current name (and
-   size!) for now, for ABI compatibility with nettle-3.1, soname
-   libnettle.so.6. */
 /* null-terminated list of digests implemented by this version of nettle */
-extern const struct nettle_hash * const nettle_hashes[];
-
-const struct nettle_hash * const *
-#ifdef __GNUC__
-__attribute__((pure))
-#endif
+const struct nettle_hash * const * _NETTLE_ATTRIBUTE_PURE
 nettle_get_hashes (void);
 
 #define nettle_hashes (nettle_get_hashes())
@@ -180,17 +164,9 @@ struct nettle_aead
   nettle_hash_digest_func *digest;
 };
 
-/* FIXME: Rename with leading underscore, but keep current name (and
-   size!) for now, for ABI compatibility with nettle-3.1, soname
-   libnettle.so.6. */
 /* null-terminated list of aead constructions implemented by this
    version of nettle */
-extern const struct nettle_aead * const nettle_aeads[];
-
-const struct nettle_aead * const *
-#ifdef __GNUC__
-__attribute__((pure))
-#endif
+const struct nettle_aead * const * _NETTLE_ATTRIBUTE_PURE
 nettle_get_aeads (void);
 
 #define nettle_aeads (nettle_get_aeads())
@@ -252,16 +228,8 @@ struct nettle_armor
   (nettle_armor_decode_final_func *) name##_decode_final,	\
 }
 
-/* FIXME: Rename with leading underscore, but keep current name (and
-   size!) for now, for ABI compatibility with nettle-3.1, soname
-   libnettle.so.6. */
 /* null-terminated list of armor schemes implemented by this version of nettle */
-extern const struct nettle_armor * const nettle_armors[];
-
-const struct nettle_armor * const *
-#ifdef __GNUC__
-__attribute__((pure))
-#endif
+const struct nettle_armor * const * _NETTLE_ATTRIBUTE_PURE
 nettle_get_armors (void);
 
 #define nettle_armors (nettle_get_armors())

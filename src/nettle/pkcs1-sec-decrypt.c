@@ -43,8 +43,7 @@
 #include "memops.h"
 
 #include "gmp-glue.h"
-#include "rsa.h"
-#include "rsa-internal.h"
+#include "pkcs1-internal.h"
 
 /* Inputs are always cast to uint32_t values. But all values used in this
  * function should never exceed the maximum value of a uint32_t anyway.

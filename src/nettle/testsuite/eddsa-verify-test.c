@@ -32,6 +32,7 @@
 #include "testutils.h"
 
 #include "eddsa.h"
+#include "eddsa-internal.h"
 
 static void
 test_eddsa (const struct ecc_curve *ecc,

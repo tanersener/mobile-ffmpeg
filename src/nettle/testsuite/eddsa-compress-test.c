@@ -32,6 +32,7 @@
 #include "testutils.h"
 
 #include "eddsa.h"
+#include "eddsa-internal.h"
 
 #define COUNT 1000
 

@@ -1,3 +1,110 @@
+NEWS for the Nettle 3.5.1 release
+
+	The Nettle-3.5.1 corrects a packaging mistake in Nettle-3.5.
+	The new directory x86_64/sha_ni were missing in the tar file,
+	breaking x86_64 builds with --enable-fat, and producing worse
+	performance than promised for builds with --enable-x86-sha-ni.
+	Also a few unused in-progress assembly files were accidentally
+	included in the tar file.
+
+	These problems are corrected in Nettle-3.5.1. There are no
+	other changes, and also the library version numbers are
+	unchanged.
+
+NEWS for the Nettle 3.5 release
+
+	This release adds a couple of new features and optimizations,
+	and deletes or deprecates a few obsolete features. It is *not*
+	binary (ABI) compatible with earlier versions. Except for
+	deprecations listed below, it is intended to be fully
+	source-level (API) compatible with Nettle-3.4.1.
+
+	The shared library names are libnettle.so.7.0 and
+	libhogweed.so.5.0, with sonames libnettle.so.7 and
+	libhogweed.so.5.
+
+	Changes in behavior:
+
+	* Nettle's gcm_crypt will now call the underlying block cipher
+	  to process more than one block at a time. This is not a
+	  change to the documented behavior, but unfortunately breaks
+	  assumptions accidentally made in GnuTLS, up to and including
+	  version 3.6.1.
+
+	New features:
+
+	* Support for CFB8 (Cipher Feedback Mode, processing a single
+	  octet per block cipher operation), contributed by Dmitry
+	  Eremin-Solenikov.
+
+	* Support for CMAC (RFC 4493), contributed by Nikos
+	  Mavrogiannopoulos.
+
+	* Support for XTS mode, contributed by Simo Sorce.
+
+	Optimizations:
+
+	* Improved performance of the x86_64 AES implementation using
+	  the aesni instructions. Gives a large speedup for operations
+	  processing multiple blocks at a time (including CTR mode,
+	  GCM mode, and CBC decrypt, but *not* CBC encrypt).
+
+	* Improved performance for CTR mode, for the common case of
+	  16-byte block size. Pass more data at a time to underlying
+	  block cipher, and fill the counter blocks more efficiently.
+	  Extension to also handle GCM mode efficiently contributed
+	  by Nikos Mavrogiannopoulos.
+
+	* New x86_64 implementation of sha1 and sha256, for processors
+	  supporting the sha_ni instructions. Speedup of 3-5 times on
+	  affected processors.
+
+	* Improved parameters for the precomputation of tables used
+	  for ecc signatures. Roughly 10%-15% speedup of the ecdsa
+	  sign operation using the secp_256r1, secp_384r1 and
+	  secp_521r1 curves, and 25% speedup of ed25519 sign
+	  operation, benchmarked on x86_64. Table sizes unchanged,
+	  around 16 KB per curve.
+
+	* In ARM fat builds, automatically select Neon implementation
+	  of Chacha, where possible. Contributed by Yuriy M.
+	  Kaminskiy.
+
+	Deleted features:
+
+	* The header file des-compat.h and everything declared therein
+	  has been deleted, as announced earlier. This file provided a
+	  subset of the old libdes/ssleay/openssl interface for DES
+	  and triple-DES. DES is still supported, via the functions
+	  declared in des.h.
+
+	* Functions using the old struct aes_ctx have been marked as
+	  deprecated. Use the fixed key size interface instead, e.g.,
+	  struct aes256_ctx, introduced in Nettle-3.0.
+
+	* The header file nettle-stdint.h, and corresponding autoconf
+	  tests, have been deleted. Nettle now requires that the
+	  compiler/libc provides <stdint.h>.
+
+	Miscellaneous:
+
+	* Support for big-endian ARM systems, contributed by Michael
+	  Weiser.
+
+	* The programs aesdata, desdata, twofishdata, shadata and
+	  gcmdata are no longer built by default. Makefile
+	  improvements contributed by Jay Foad.
+
+	* The "example" program examples/eratosthenes.c has been
+	  deleted.
+
+	* The contents of hash context structs, and the deprecated
+	  aes_ctx struct, have been reorganized, to enable later
+	  optimizations.
+
+	The shared library names are libnettle.so.7.0 and
+	libhogweed.so.5.0.
+
 NEWS for the Nettle 3.4.1 release
 
 	This release fixes a few bugs, and makes the RSA private key
