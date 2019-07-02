@@ -60,7 +60,6 @@ fi
     --with-included-libtasn1 \
     --with-included-unistring \
     --without-idn \
-    --without-libidn2 \
     --without-p11-kit \
     --enable-hardware-acceleration \
     --enable-static \
@@ -70,6 +69,7 @@ fi
     --disable-code-coverage \
     --disable-doc \
     --disable-manpages \
+    --disable-guile \
     --disable-tests \
     --disable-tools \
     --disable-maintainer-mode \

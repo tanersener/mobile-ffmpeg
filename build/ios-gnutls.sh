@@ -58,6 +58,11 @@ case ${ARCH} in
         #  .inst 0x5e280803
         HARDWARE_ACCELERATION="--disable-hardware-acceleration"
     ;;
+    i386)
+        # DISABLING thread_local WHICH IS NOT SUPPORTED ON i386
+        export CFLAGS+=" -D__thread="
+        HARDWARE_ACCELERATION="--enable-hardware-acceleration"
+    ;;
     *)
         HARDWARE_ACCELERATION="--enable-hardware-acceleration"
     ;;
@@ -79,7 +84,6 @@ fi
     --with-included-libtasn1 \
     --with-included-unistring \
     --without-idn \
-    --without-libidn2 \
     --without-p11-kit \
     ${HARDWARE_ACCELERATION} \
     --enable-static \
@@ -89,6 +93,7 @@ fi
     --disable-code-coverage \
     --disable-doc \
     --disable-manpages \
+    --disable-guile \
     --disable-tests \
     --disable-tools \
     --disable-maintainer-mode \
