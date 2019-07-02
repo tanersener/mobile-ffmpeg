@@ -14,6 +14,7 @@ var searchData=
   ['passlogfiles',['passlogfiles',['../df/d77/struct_options_context.html#a964798ad981fce4fa7f38a4c281a23fa',1,'OptionsContext']]],
   ['pict_5ftype',['pict_type',['../db/dde/struct_output_stream.html#a606467e84f8cc1c55a33fe253accc581',1,'OutputStream']]],
   ['pix_5ffmt',['pix_fmt',['../df/d37/struct_h_w_accel.html#a379aaf6aad89d4c2036baf423e3bbb5e',1,'HWAccel']]],
+  ['posix_5fmemalign',['posix_memalign',['../df/dff/android__lts__support_8c.html#aed1e9c27ea92f5ae3a480059bf45c311',1,'android_lts_support.c']]],
   ['prepare_5fapp_5farguments',['prepare_app_arguments',['../d7/dcc/fftools__cmdutils_8c.html#a0cd6e5cbbafaff05295a751def5d32ad',1,'fftools_cmdutils.c']]],
   ['presets',['presets',['../df/d77/struct_options_context.html#ae4626f848474b1ce5648eb4936074020',1,'OptionsContext']]],
   ['prev_5fsub',['prev_sub',['../d3/d6e/struct_input_stream.html#a64b033c0e4f7e540880f3c8d84c42158',1,'InputStream']]],

@@ -15,6 +15,7 @@ var searchData=
   ['accurate_5fseek',['accurate_seek',['../df/d77/struct_options_context.html#a58cdaa9e499f724c724822155f886aa2',1,'OptionsContext::accurate_seek()'],['../d8/d99/struct_input_file.html#a0d2afa337cfd75b91096045ed941a494',1,'InputFile::accurate_seek()']]],
   ['add_5finput_5fstreams',['add_input_streams',['../da/d66/fftools__ffmpeg__opt_8c.html#a202e1b3df6c5e9ed4f9404a388f9cb69',1,'fftools_ffmpeg_opt.c']]],
   ['add_5fopt',['add_opt',['../d7/dcc/fftools__cmdutils_8c.html#a69d117c59ea1d4359816e413ea3717ad',1,'fftools_cmdutils.c']]],
+  ['android_5flts_5fsupport_2ec',['android_lts_support.c',['../df/dff/android__lts__support_8c.html',1,'']]],
   ['apad',['apad',['../df/d77/struct_options_context.html#aaaa5ad7ac13bf15c516f988c818d6efb',1,'OptionsContext::apad()'],['../db/dde/struct_output_stream.html#a76d4d92835e9dd3d0619e79e4fb762c6',1,'OutputStream::apad()']]],
   ['arg',['arg',['../d6/d69/struct_option_group.html#ade02874f0cc6716575a7d02e3c38ac95',1,'OptionGroup']]],
   ['argname',['argname',['../dc/d1e/struct_option_def.html#a38e18b48cea8c11195541d927361894f',1,'OptionDef']]],

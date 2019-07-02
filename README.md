@@ -54,9 +54,10 @@ FFmpeg for Android and iOS / tvOS
 ### 2. Using
 Published binaries are available at [Github](https://github.com/tanersener/mobile-ffmpeg/releases), [JCenter](https://bintray.com/bintray/jcenter) and [CocoaPods](https://cocoapods.org).
 
-Unpublished development builds can be found under the [development-snapshot](https://www.dropbox.com/sh/frzg32yjzyucmob/AADX81RhiVfk9o7Vo2J8jlH2a) directory. 
+  - Visit [Importing iOS Frameworks](https://github.com/tanersener/mobile-ffmpeg/wiki/Importing-iOS-Frameworks) guide to manually import iOS / tvOS frameworks
+  - Refer to [Using iOS Universal Binaries](https://github.com/tanersener/mobile-ffmpeg/wiki/Using-iOS-Universal-Binaries) guide to import iOS / tvOS universal binaries  
 
-Refer to [Using iOS Universal Binaries](https://github.com/tanersener/mobile-ffmpeg/wiki/Using-iOS-Universal-Binaries) guide to import iOS / tvOS universal binaries released at [Github](https://github.com/tanersener/mobile-ffmpeg/releases).
+Unpublished development builds can be found under the [development-snapshot](https://www.dropbox.com/sh/frzg32yjzyucmob/AADX81RhiVfk9o7Vo2J8jlH2a) directory. 
 
 There are eight different binary packages. Below you can see which system libraries and external libraries are enabled in each of them.
 
@@ -117,7 +118,7 @@ There are eight different binary packages. Below you can see which system librar
 1. Add MobileFFmpeg dependency from `jcenter()`
     ```
     dependencies {
-        implementation 'com.arthenica:mobile-ffmpeg-full:4.2.1'
+        implementation 'com.arthenica:mobile-ffmpeg-min:4.2.1'
     }
     ```
 
@@ -195,12 +196,12 @@ There are eight different binary packages. Below you can see which system librar
 
     - iOS
     ```
-    pod 'mobile-ffmpeg-full', '~> 4.2.1'
+    pod 'mobile-ffmpeg-min', '~> 4.2.1'
     ```
 
     - tvOS
     ```
-    pod 'mobile-ffmpeg-tv-full', '~> 4.2.1'
+    pod 'mobile-ffmpeg-tv-min', '~> 4.2.1'
     ```
 
 2. Execute commands.
@@ -289,7 +290,7 @@ burning subtitles, video stabilization and pipe operations.
 
 ### 3. Versions
 
-- `MobileFFmpeg` version number is aligned with `FFmpeg` since version `4.2`. 
+`MobileFFmpeg` version number is aligned with `FFmpeg` since version `4.2`. 
 In previous versions, `MobileFFmpeg` version of a release and `FFmpeg` version included in that release was different.
 - `dev` part in `FFmpeg` version number indicates that `FFmpeg` source is pulled from the `FFmpeg` `master` branch. 
 Exact version number is obtained using `git describe --tags`. 
@@ -313,15 +314,15 @@ Exact version number is obtained using `git describe --tags`.
 
 Starting from `v4.2`, `MobileFFmpeg` binaries are published in two different variants: `Main Release` and `LTS Release`. 
 
-- They include complete functionality of the library and support the latest SDK/API features.
+- Main releases include complete functionality of the library and support the latest SDK/API features.
 
-- These releases are customized to support a wide range of devices. They are built using older API/SDK versions, so some features are not available for them.
+- LTS releases are customized to support a wide range of devices. They are built using older API/SDK versions, so some features are not available for them.
 
 This table shows the differences between two variants.
 
 |        | Main Release | LTS Release |
 | :----: | :----: | :----: |
-| Android API Level | 24 | 21 | 
+| Android API Level | 24 | 16 | 
 | Android Camera Access | Yes | - |
 | Android Architectures | arm-v7a-neon<br/>arm64-v8a<br/>x86<br/>x86-64</br> | arm-v7a<br/>arm-v7a-neon<br/>arm64-v8a<br/>x86<br/>x86-64</br> |
 | Xcode Support | 10.1 | 7.3.1 |

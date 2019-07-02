@@ -125,93 +125,93 @@ public class HttpsTabFragment extends Fragment {
         // HTTPS COMMAND ARGUMENTS
         MediaInformation information = FFmpeg.getMediaInformation(testUrl);
         if (information == null) {
-            android.util.Log.d(MainActivity.TAG, "Get media information failed");
+            appendLog("Get media information failed\n");
         } else {
-            android.util.Log.d(MainActivity.TAG, "Media information for " + information.getPath());
+            appendLog("Media information for " + information.getPath() + "\n");
 
             if (information.getFormat() != null) {
-                android.util.Log.d(MainActivity.TAG, "Format: " + information.getFormat());
+                appendLog("Format: " + information.getFormat() + "\n");
             }
             if (information.getBitrate() != null) {
-                android.util.Log.d(MainActivity.TAG, "Bitrate: " + information.getBitrate());
+                appendLog("Bitrate: " + information.getBitrate() + "\n");
             }
             if (information.getDuration() != null) {
-                android.util.Log.d(MainActivity.TAG, "Duration: " + information.getDuration());
+                appendLog("Duration: " + information.getDuration() + "\n");
             }
             if (information.getStartTime() != null) {
-                android.util.Log.d(MainActivity.TAG, "Start time: " + information.getStartTime());
+                appendLog("Start time: " + information.getStartTime() + "\n");
             }
             if (information.getMetadataEntries() != null) {
                 Set<Map.Entry<String, String>> entries = information.getMetadataEntries();
                 for (Map.Entry<String, String> entry : entries) {
-                    android.util.Log.d(MainActivity.TAG, "Metadata: " + entry.getKey() + ":" + entry.getValue());
+                    appendLog("Metadata: " + entry.getKey() + ":" + entry.getValue() + "\n");
                 }
             }
             if (information.getStreams() != null) {
                 for (StreamInformation stream : information.getStreams()) {
                     if (stream.getIndex() != null) {
-                        android.util.Log.d(MainActivity.TAG, "Stream index: " + stream.getIndex());
+                        appendLog("Stream index: " + stream.getIndex() + "\n");
                     }
                     if (stream.getType() != null) {
-                        android.util.Log.d(MainActivity.TAG, "Stream type: " + stream.getType());
+                        appendLog("Stream type: " + stream.getType() + "\n");
                     }
                     if (stream.getCodec() != null) {
-                        android.util.Log.d(MainActivity.TAG, "Stream codec: " + stream.getCodec());
+                        appendLog("Stream codec: " + stream.getCodec() + "\n");
                     }
                     if (stream.getFullCodec() != null) {
-                        android.util.Log.d(MainActivity.TAG, "Stream full codec: " + stream.getFullCodec());
+                        appendLog("Stream full codec: " + stream.getFullCodec() + "\n");
                     }
                     if (stream.getFormat() != null) {
-                        android.util.Log.d(MainActivity.TAG, "Stream format: " + stream.getFormat());
+                        appendLog("Stream format: " + stream.getFormat() + "\n");
                     }
                     if (stream.getFullFormat() != null) {
-                        android.util.Log.d(MainActivity.TAG, "Stream full format: " + stream.getFullFormat());
+                        appendLog("Stream full format: " + stream.getFullFormat() + "\n");
                     }
 
                     if (stream.getWidth() != null) {
-                        android.util.Log.d(MainActivity.TAG, "Stream width: " + stream.getWidth());
+                        appendLog("Stream width: " + stream.getWidth() + "\n");
                     }
                     if (stream.getHeight() != null) {
-                        android.util.Log.d(MainActivity.TAG, "Stream height: " + stream.getHeight());
+                        appendLog("Stream height: " + stream.getHeight() + "\n");
                     }
 
                     if (stream.getBitrate() != null) {
-                        android.util.Log.d(MainActivity.TAG, "Stream bitrate: " + stream.getBitrate());
+                        appendLog("Stream bitrate: " + stream.getBitrate() + "\n");
                     }
                     if (stream.getSampleRate() != null) {
-                        android.util.Log.d(MainActivity.TAG, "Stream sample rate: " + stream.getSampleRate());
+                        appendLog("Stream sample rate: " + stream.getSampleRate() + "\n");
                     }
                     if (stream.getSampleFormat() != null) {
-                        android.util.Log.d(MainActivity.TAG, "Stream sample format: " + stream.getSampleFormat());
+                        appendLog("Stream sample format: " + stream.getSampleFormat() + "\n");
                     }
                     if (stream.getChannelLayout() != null) {
-                        android.util.Log.d(MainActivity.TAG, "Stream channel layout: " + stream.getChannelLayout());
+                        appendLog("Stream channel layout: " + stream.getChannelLayout() + "\n");
                     }
 
                     if (stream.getSampleAspectRatio() != null) {
-                        android.util.Log.d(MainActivity.TAG, "Stream sample aspect ratio: " + stream.getSampleAspectRatio());
+                        appendLog("Stream sample aspect ratio: " + stream.getSampleAspectRatio() + "\n");
                     }
                     if (stream.getDisplayAspectRatio() != null) {
-                        android.util.Log.d(MainActivity.TAG, "Stream display ascpect ratio: " + stream.getDisplayAspectRatio())
+                        appendLog("Stream display ascpect ratio: " + stream.getDisplayAspectRatio() + "\n");
                         ;
                     }
                     if (stream.getAverageFrameRate() != null) {
-                        android.util.Log.d(MainActivity.TAG, "Stream average frame rate: " + stream.getAverageFrameRate());
+                        appendLog("Stream average frame rate: " + stream.getAverageFrameRate() + "\n");
                     }
                     if (stream.getRealFrameRate() != null) {
-                        android.util.Log.d(MainActivity.TAG, "Stream real frame rate: " + stream.getRealFrameRate());
+                        appendLog("Stream real frame rate: " + stream.getRealFrameRate() + "\n");
                     }
                     if (stream.getTimeBase() != null) {
-                        android.util.Log.d(MainActivity.TAG, "Stream time base: " + stream.getTimeBase());
+                        appendLog("Stream time base: " + stream.getTimeBase() + "\n");
                     }
                     if (stream.getCodecTimeBase() != null) {
-                        android.util.Log.d(MainActivity.TAG, "Stream codec time base: " + stream.getCodecTimeBase());
+                        appendLog("Stream codec time base: " + stream.getCodecTimeBase() + "\n");
                     }
 
                     if (stream.getMetadataEntries() != null) {
                         Set<Map.Entry<String, String>> entries = stream.getMetadataEntries();
                         for (Map.Entry<String, String> entry : entries) {
-                            android.util.Log.d(MainActivity.TAG, "Stream metadata: " + entry.getKey() + ":" + entry.getValue());
+                            appendLog("Stream metadata: " + entry.getKey() + ":" + entry.getValue() + "\n");
                         }
                     }
                 }
