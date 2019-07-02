@@ -821,7 +821,9 @@ static aom_codec_err_t set_encoder_config(
   oxcf->enable_global_motion = extra_cfg->enable_global_motion;
   oxcf->enable_warped_motion = extra_cfg->enable_warped_motion;
   oxcf->allow_warped_motion =
-      extra_cfg->allow_warped_motion & extra_cfg->enable_warped_motion;
+      (cfg->g_usage == AOM_USAGE_REALTIME)
+          ? 0
+          : (extra_cfg->allow_warped_motion & extra_cfg->enable_warped_motion);
   oxcf->enable_filter_intra = extra_cfg->enable_filter_intra;
   oxcf->enable_smooth_intra = extra_cfg->enable_smooth_intra;
   oxcf->enable_paeth_intra = extra_cfg->enable_paeth_intra;

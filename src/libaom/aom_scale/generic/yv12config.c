@@ -38,6 +38,7 @@ int aom_free_frame_buffer(YV12_BUFFER_CONFIG *ybf) {
       u_buffer and v_buffer point to buffer_alloc and are used.  Clear out
       all of this so that a freed pointer isn't inadvertently used */
     memset(ybf, 0, sizeof(YV12_BUFFER_CONFIG));
+    return 0;
   }
 
   return AOM_CODEC_MEM_ERROR;

@@ -1056,7 +1056,8 @@ static void get_intra_q_and_bounds_two_pass(const AV1_COMP *cpi, int width,
     int delta_qindex;
     int qindex;
 
-    if (cpi->twopass.last_kfgroup_zeromotion_pct >= STATIC_MOTION_THRESH) {
+    if (oxcf->pass == 2 &&
+        cpi->twopass.last_kfgroup_zeromotion_pct >= STATIC_MOTION_THRESH) {
       qindex = AOMMIN(rc->last_kf_qindex, rc->last_boosted_qindex);
       active_best_quality = qindex;
       last_boosted_q = av1_convert_qindex_to_q(qindex, bit_depth);
@@ -1080,7 +1081,8 @@ static void get_intra_q_and_bounds_two_pass(const AV1_COMP *cpi, int width,
     active_best_quality =
         get_kf_active_quality(rc, active_worst_quality, bit_depth);
 
-    if (cpi->twopass.kf_zeromotion_pct >= STATIC_KF_GROUP_THRESH) {
+    if (oxcf->pass == 2 &&
+        cpi->twopass.kf_zeromotion_pct >= STATIC_KF_GROUP_THRESH) {
       active_best_quality /= 3;
     }
 
@@ -1090,7 +1092,8 @@ static void get_intra_q_and_bounds_two_pass(const AV1_COMP *cpi, int width,
     }
 
     // Make a further adjustment based on the kf zero motion measure.
-    q_adj_factor += 0.05 - (0.001 * (double)cpi->twopass.kf_zeromotion_pct);
+    if (oxcf->pass == 2)
+      q_adj_factor += 0.05 - (0.001 * (double)cpi->twopass.kf_zeromotion_pct);
 
     // Convert the adjustment factor to a qindex delta
     // on active_best_quality.
@@ -1422,11 +1425,10 @@ static int rc_pick_q_and_bounds_two_pass(const AV1_COMP *cpi, int width,
 int av1_rc_pick_q_and_bounds(AV1_COMP *cpi, int width, int height,
                              int *bottom_index, int *top_index) {
   int q;
-  // TODO(sarahparker) merge onepass vbr, keyframe and altref q computation
+  // TODO(sarahparker) merge onepass vbr and altref q computation
   // with two pass
   GF_GROUP *gf_group = &cpi->gf_group;
   if ((cpi->oxcf.rc_mode != AOM_Q ||
-       gf_group->update_type[gf_group->index] == KF_UPDATE ||
        gf_group->update_type[gf_group->index] == ARF_UPDATE) &&
       cpi->oxcf.pass == 0) {
     if (cpi->oxcf.rc_mode == AOM_CBR)

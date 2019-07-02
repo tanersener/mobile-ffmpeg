@@ -10,6 +10,7 @@
  */
 
 #include <stdbool.h>
+#include <memory>
 #include "aom_mem/aom_mem.h"
 #include "av1/encoder/rdopt.h"
 #include "test/util.h"
@@ -59,6 +60,11 @@ static uint8_t *pad_8tap_convolve(const int *data, int w, int h, bool high_bd) {
   } else {
     dst = (uint8_t *)aom_memalign(32, sizeof(uint8_t) * pad_w * pad_h);
   }
+  if (dst == nullptr) {
+    EXPECT_NE(dst, nullptr);
+    return nullptr;
+  }
+
   for (int j = 0; j < pad_h; ++j) {
     for (int i = 0; i < pad_w; ++i) {
       const int v = get_nearest_pix(data, w, h, i - 3, j - 3);
@@ -82,6 +88,18 @@ static void free_pad_8tap(uint8_t *padded, int width, bool high_bd) {
   }
 }
 
+struct Pad8TapConvolveDeleter {
+  Pad8TapConvolveDeleter(const int width, const bool high_bd)
+      : width(width), high_bd(high_bd) {}
+  void operator()(uint8_t *p) {
+    if (p != nullptr) {
+      free_pad_8tap(p, width, high_bd);
+    }
+  }
+  const int width;
+  const bool high_bd;
+};
+
 static uint8_t *malloc_bd(int num_entries, bool high_bd) {
   const int bytes_per_entry = high_bd ? sizeof(uint16_t) : sizeof(uint8_t);
 
@@ -101,6 +119,12 @@ static void free_bd(uint8_t *p, bool high_bd) {
   }
 }
 
+struct MallocBdDeleter {
+  explicit MallocBdDeleter(const bool high_bd) : high_bd(high_bd) {}
+  void operator()(uint8_t *p) { free_bd(p, high_bd); }
+  const bool high_bd;
+};
+
 class EdgeDetectBrightnessTest :
     // Parameters are (brightness, width, height, high bit depth representation,
     // bit depth).
@@ -116,13 +140,15 @@ class EdgeDetectBrightnessTest :
     const bool high_bd = GET_PARAM(3);
 
     // Create the padded image of uniform brightness.
-    int *orig = (int *)malloc(width * height * sizeof(int));
+    std::unique_ptr<int[]> orig(new int[width * height]);
+    ASSERT_NE(orig, nullptr);
     for (int i = 0; i < width * height; ++i) {
       orig[i] = brightness;
     }
-    input_ = pad_8tap_convolve(orig, width, height, high_bd);
-    free(orig);
+    input_ = pad_8tap_convolve(orig.get(), width, height, high_bd);
+    ASSERT_NE(input_, nullptr);
     output_ = malloc_bd(width * height, high_bd);
+    ASSERT_NE(output_, nullptr);
   }
 
   void TearDown() override {
@@ -232,7 +258,7 @@ TEST_P(EdgeDetectImageTest, BlackWhite) {
   const int bd = GET_PARAM(3);
 
   const int white = (1 << bd) - 1;
-  int *orig = (int *)malloc(width * height * sizeof(int));
+  std::unique_ptr<int[]> orig(new int[width * height]);
   for (int j = 0; j < height; ++j) {
     for (int i = 0; i < width; ++i) {
       if (i < width / 2) {
@@ -242,17 +268,18 @@ TEST_P(EdgeDetectImageTest, BlackWhite) {
       }
     }
   }
-  uint8_t *padded = pad_8tap_convolve(orig, width, height, high_bd);
-  free(orig);
-  // Value should be between 556 and 560.
-  ASSERT_LE(556, av1_edge_exists(padded, stride_8tap(width), width, height,
-                                 high_bd, bd)
-                     .magnitude);
-  ASSERT_GE(560, av1_edge_exists(padded, stride_8tap(width), width, height,
-                                 high_bd, bd)
-                     .magnitude);
 
-  free_pad_8tap(padded, width, high_bd);
+  std::unique_ptr<uint8_t[], Pad8TapConvolveDeleter> padded(
+      pad_8tap_convolve(orig.get(), width, height, high_bd),
+      Pad8TapConvolveDeleter(width, high_bd));
+  ASSERT_NE(padded, nullptr);
+  // Value should be between 556 and 560.
+  ASSERT_LE(556, av1_edge_exists(padded.get(), stride_8tap(width), width,
+                                 height, high_bd, bd)
+                     .magnitude);
+  ASSERT_GE(560, av1_edge_exists(padded.get(), stride_8tap(width), width,
+                                 height, high_bd, bd)
+                     .magnitude);
 }
 
 // Hardcoded blur tests.
@@ -274,14 +301,18 @@ static void hardcoded_blur_test_aux(const bool high_bd) {
     if (bd > 8 && !high_bd) {
       break;
     }
-    uint8_t *output = malloc_bd(w * h, high_bd);
-    uint8_t *padded = pad_8tap_convolve(luma, w, h, high_bd);
-    av1_gaussian_blur(padded, stride_8tap(w), w, h, output, high_bd, bd);
+    std::unique_ptr<uint8_t[], MallocBdDeleter> output(
+        malloc_bd(w * h, high_bd), MallocBdDeleter(high_bd));
+    ASSERT_NE(output, nullptr);
+    std::unique_ptr<uint8_t[], Pad8TapConvolveDeleter> padded(
+        pad_8tap_convolve(luma, w, h, high_bd),
+        Pad8TapConvolveDeleter(w, high_bd));
+    ASSERT_NE(padded, nullptr);
+    av1_gaussian_blur(padded.get(), stride_8tap(w), w, h, output.get(), high_bd,
+                      bd);
     for (int i = 0; i < w * h; ++i) {
-      ASSERT_EQ(expected[i], get_pix(output, i, high_bd));
+      ASSERT_EQ(expected[i], get_pix(output.get(), i, high_bd));
     }
-    free_pad_8tap(padded, w, high_bd);
-    free_bd(output, high_bd);
 
     // If we multiply the inputs by a constant factor, the output should not
     // vary more than 0.5 * factor.
@@ -290,14 +321,14 @@ static void hardcoded_blur_test_aux(const bool high_bd) {
       for (int i = 0; i < 32; ++i) {
         scaled_luma[i] = luma[i] * c;
       }
-      uint8_t *output = malloc_bd(w * h, high_bd);
-      uint8_t *padded = pad_8tap_convolve(scaled_luma, w, h, high_bd);
-      av1_gaussian_blur(padded, stride_8tap(w), w, h, output, high_bd, bd);
+      padded.reset(pad_8tap_convolve(scaled_luma, w, h, high_bd));
+      ASSERT_NE(padded, nullptr);
+      av1_gaussian_blur(padded.get(), stride_8tap(w), w, h, output.get(),
+                        high_bd, bd);
       for (int i = 0; i < w * h; ++i) {
-        ASSERT_GE(c / 2, abs(expected[i] * c - get_pix(output, i, high_bd)));
+        ASSERT_GE(c / 2,
+                  abs(expected[i] * c - get_pix(output.get(), i, high_bd)));
       }
-      free_pad_8tap(padded, w, high_bd);
-      free_bd(output, high_bd);
     }
   }
 }

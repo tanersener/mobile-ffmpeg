@@ -632,7 +632,7 @@ static const arg_def_t aq_mode = ARG_DEF(
     "3: cyclic refresh)");
 static const arg_def_t deltaq_mode =
     ARG_DEF(NULL, "deltaq-mode", 1,
-            "Delta qindex mode (0: off (default), 1: deltaq pred efficiency, "
+            "Delta qindex mode (0: off, 1: deltaq pred efficiency (default), "
             "2: deltaq perceptual)");
 static const arg_def_t deltalf_mode = ARG_DEF(
     NULL, "delta-lf-mode", 1, "Enable delta-lf-mode (0: off (default), 1: on)");

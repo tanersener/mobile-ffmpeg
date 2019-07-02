@@ -318,7 +318,8 @@ list(APPEND AOM_AV1_ENCODER_INTRIN_AVX2
             "${AOM_ROOT}/av1/encoder/x86/pickrst_avx2.c")
 
 list(APPEND AOM_AV1_ENCODER_INTRIN_NEON
-            "${AOM_ROOT}/av1/encoder/arm/neon/quantize_neon.c")
+            "${AOM_ROOT}/av1/encoder/arm/neon/quantize_neon.c"
+            "${AOM_ROOT}/av1/encoder/arm/neon/av1_error_neon.c")
 
 list(APPEND AOM_AV1_ENCODER_INTRIN_MSA
             "${AOM_ROOT}/av1/encoder/mips/msa/error_msa.c"

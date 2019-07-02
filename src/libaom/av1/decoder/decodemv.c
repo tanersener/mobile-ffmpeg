@@ -1033,8 +1033,8 @@ static INLINE void read_mb_interp_filter(AV1_COMMON *const cm,
       }
     }
     // The index system works as: (0, 1) -> (vertical, horizontal) filter types
-    mbmi->interp_filters =
-        av1_make_interp_filters(ref0_filter[0], ref0_filter[1]);
+    mbmi->interp_filters.as_filters.x_filter = ref0_filter[1];
+    mbmi->interp_filters.as_filters.y_filter = ref0_filter[0];
   }
 }
 

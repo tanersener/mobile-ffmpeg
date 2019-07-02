@@ -55,9 +55,10 @@ struct scale_factors;
 
 void av1_convolve_2d_facade(const uint8_t *src, int src_stride, uint8_t *dst,
                             int dst_stride, int w, int h,
-                            InterpFilters interp_filters, const int subpel_x_qn,
-                            int x_step_q4, const int subpel_y_qn, int y_step_q4,
-                            int scaled, ConvolveParams *conv_params,
+                            int_interpfilters interp_filters,
+                            const int subpel_x_qn, int x_step_q4,
+                            const int subpel_y_qn, int y_step_q4, int scaled,
+                            ConvolveParams *conv_params,
                             const struct scale_factors *sf, int is_intrabc);
 
 static INLINE ConvolveParams get_conv_params_no_round(int do_average, int plane,
@@ -111,7 +112,7 @@ static INLINE ConvolveParams get_conv_params_wiener(int bd) {
 
 void av1_highbd_convolve_2d_facade(const uint8_t *src8, int src_stride,
                                    uint8_t *dst, int dst_stride, int w, int h,
-                                   InterpFilters interp_filters,
+                                   int_interpfilters interp_filters,
                                    const int subpel_x_qn, int x_step_q4,
                                    const int subpel_y_qn, int y_step_q4,
                                    int scaled, ConvolveParams *conv_params,

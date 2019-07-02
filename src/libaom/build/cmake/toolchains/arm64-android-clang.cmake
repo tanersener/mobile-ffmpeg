@@ -14,7 +14,7 @@ endif() # AOM_BUILD_CMAKE_TOOLCHAINS_ARM64_ANDROID_CLANG_CMAKE_
 set(AOM_BUILD_CMAKE_TOOLCHAINS_ARM64_ANDROID_CLANG_CMAKE_ 1)
 
 if(NOT ANDROID_PLATFORM)
-  set(ANDROID_PLATFORM 21)
+  set(ANDROID_PLATFORM android-21)
 endif()
 
 if(NOT ANDROID_ABI)
@@ -23,9 +23,9 @@ endif()
 
 set(AS_EXECUTABLE as)
 
-# Toolchain file doesn't have access to cached variables:
+# Toolchain files don't have access to cached variables:
 # https://gitlab.kitware.com/cmake/cmake/issues/16170. Set an intermediate
-# environment variable when loaded first time.
+# environment variable when loaded the first time.
 if(AOM_ANDROID_NDK_PATH)
   set(ENV{_AOM_ANDROID_NDK_PATH} "${AOM_ANDROID_NDK_PATH}")
 else()
@@ -44,3 +44,5 @@ set(AOM_NEON_INTRIN_FLAG "")
 
 # No runtime cpu detect for arm64-android-clang.
 set(CONFIG_RUNTIME_CPU_DETECT 0 CACHE NUMBER "")
+
+set(CMAKE_SYSTEM_NAME "Android")

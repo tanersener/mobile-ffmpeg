@@ -61,8 +61,8 @@ static void temporal_filter_predictors_mb_c(
   int uv_stride;
   // TODO(angiebird): change plane setting accordingly
   ConvolveParams conv_params = get_conv_params(0, 0, xd->bd);
-  const InterpFilters interp_filters =
-      av1_make_interp_filters(MULTITAP_SHARP, MULTITAP_SHARP);
+  const int_interpfilters interp_filters =
+      av1_broadcast_interp_filter(MULTITAP_SHARP);
   WarpTypesAllowed warp_types;
   memset(&warp_types, 0, sizeof(WarpTypesAllowed));
 
@@ -148,13 +148,9 @@ static void apply_temporal_filter_self(const uint8_t *pred, int buf_stride,
                                        unsigned int block_width,
                                        unsigned int block_height,
                                        int filter_weight, uint32_t *accumulator,
-                                       uint16_t *count) {
-#if EXPERIMENT_TEMPORAL_FILTER
-  (void)filter_weight;
-  const int modifier = SCALE;
-#else
-  const int modifier = filter_weight * 16;
-#endif  // EXPERIMENT_TEMPORAL_FILTER
+                                       uint16_t *count,
+                                       int use_new_temporal_mode) {
+  const int modifier = use_new_temporal_mode ? SCALE : filter_weight * 16;
   unsigned int i, j, k = 0;
   assert(filter_weight == 2);
 
@@ -171,13 +167,8 @@ static void apply_temporal_filter_self(const uint8_t *pred, int buf_stride,
 static void highbd_apply_temporal_filter_self(
     const uint8_t *pred8, int buf_stride, unsigned int block_width,
     unsigned int block_height, int filter_weight, uint32_t *accumulator,
-    uint16_t *count) {
-#if EXPERIMENT_TEMPORAL_FILTER
-  (void)filter_weight;
-  const int modifier = SCALE;
-#else
-  const int modifier = filter_weight * 16;
-#endif  // EXPERIMENT_TEMPORAL_FILTER
+    uint16_t *count, int use_new_temporal_mode) {
+  const int modifier = use_new_temporal_mode ? SCALE : filter_weight * 16;
   const uint16_t *pred = CONVERT_TO_SHORTPTR(pred8);
   unsigned int i, j, k = 0;
   assert(filter_weight == 2);
@@ -762,11 +753,12 @@ void apply_temporal_filter_block(YV12_BUFFER_CONFIG *frame, MACROBLOCKD *mbd,
                                  int num_planes, uint8_t *predictor,
                                  int frame_height, int strength, double sigma,
                                  int *blk_fw, int use_32x32,
-                                 unsigned int *accumulator, uint16_t *count) {
+                                 unsigned int *accumulator, uint16_t *count,
+                                 int use_new_temporal_mode) {
   const int is_hbd = is_cur_buf_hbd(mbd);
   // High bitdepth
   if (is_hbd) {
-    if (frame_height >= 480) {
+    if (use_new_temporal_mode) {
       // Apply frame size dependent non-local means filtering.
       int decay_control;
       // The decay is obtained empirically, subject to better tuning.
@@ -818,7 +810,7 @@ void apply_temporal_filter_block(YV12_BUFFER_CONFIG *frame, MACROBLOCKD *mbd,
   }
 
   // Low bitdepth
-  if (frame_height >= 480) {
+  if (use_new_temporal_mode) {
     // Apply frame size dependent non-local means filtering.
     int decay_control;
     // The decay is obtained empirically, subject to better tuning.
@@ -1015,6 +1007,14 @@ static void temporal_filter_iterate_c(AV1_COMP *cpi,
   uint8_t *predictor;
   const int mb_uv_height = BH >> mbd->plane[1].subsampling_y;
   const int mb_uv_width = BW >> mbd->plane[1].subsampling_x;
+#if EXPERIMENT_TEMPORAL_FILTER
+  const int is_screen_content_type = cm->allow_screen_content_tools != 0;
+  const int use_new_temporal_mode =
+      AOMMIN(cm->width, cm->height) >= 480 && !is_screen_content_type;
+#else
+  (void)sigma;
+  const int use_new_temporal_mode = 0;
+#endif
 
   // Save input state
   uint8_t *input_buffer[MAX_MB_PLANE];
@@ -1145,10 +1145,11 @@ static void temporal_filter_iterate_c(AV1_COMP *cpi,
 
               if (is_hbd) {
                 highbd_apply_temporal_filter_self(pred, pred_stride, w, h,
-                                                  blk_fw[0], accum, cnt);
+                                                  blk_fw[0], accum, cnt,
+                                                  use_new_temporal_mode);
               } else {
                 apply_temporal_filter_self(pred, pred_stride, w, h, blk_fw[0],
-                                           accum, cnt);
+                                           accum, cnt, use_new_temporal_mode);
               }
 
               pred += BLK_PELS;
@@ -1161,7 +1162,8 @@ static void temporal_filter_iterate_c(AV1_COMP *cpi,
               apply_temporal_filter_block(
                   f, mbd, mb_y_src_offset, mb_uv_src_offset, mb_uv_width,
                   mb_uv_height, num_planes, predictor, cm->height, strength,
-                  sigma, blk_fw, use_32x32, accumulator, count);
+                  sigma, blk_fw, use_32x32, accumulator, count,
+                  use_new_temporal_mode);
 #else
               const int adj_strength = strength + 2 * (mbd->bd - 8);
               if (num_planes <= 1) {
@@ -1188,7 +1190,8 @@ static void temporal_filter_iterate_c(AV1_COMP *cpi,
               apply_temporal_filter_block(
                   f, mbd, mb_y_src_offset, mb_uv_src_offset, mb_uv_width,
                   mb_uv_height, num_planes, predictor, cm->height, strength,
-                  sigma, blk_fw, use_32x32, accumulator, count);
+                  sigma, blk_fw, use_32x32, accumulator, count,
+                  use_new_temporal_mode);
 #else
               if (num_planes <= 1) {
                 // Single plane case

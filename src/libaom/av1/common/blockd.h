@@ -217,7 +217,7 @@ typedef struct MB_MODE_INFO {
   int_mv mv[2];
   int current_qindex;
   // Only for INTER blocks
-  InterpFilters interp_filters;
+  int_interpfilters interp_filters;
   // TODO(debargha): Consolidate these flags
 #if CONFIG_RD_DEBUG
   RD_STATS rd_stats;

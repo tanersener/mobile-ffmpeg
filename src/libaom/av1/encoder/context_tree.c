@@ -230,7 +230,6 @@ void av1_copy_tree_context(PICK_MODE_CONTEXT *dst_ctx,
   dst_ctx->rd_mode_is_ready = src_ctx->rd_mode_is_ready;
 
   memcpy(dst_ctx->pred_mv, src_ctx->pred_mv, sizeof(MV) * REF_FRAMES);
-  dst_ctx->pred_interp_filter = src_ctx->pred_interp_filter;
 
   dst_ctx->partition = src_ctx->partition;
 }

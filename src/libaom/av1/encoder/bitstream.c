@@ -620,9 +620,10 @@ static void write_mb_interp_filter(AV1_COMP *cpi, const MACROBLOCKD *xd,
   FRAME_CONTEXT *ec_ctx = xd->tile_ctx;
 
   if (!av1_is_interp_needed(xd)) {
-    assert(mbmi->interp_filters ==
-           av1_broadcast_interp_filter(
-               av1_unswitchable_filter(cm->interp_filter)));
+    int_interpfilters filters =
+        av1_broadcast_interp_filter(av1_unswitchable_filter(cm->interp_filter));
+    assert(mbmi->interp_filters.as_int == filters.as_int);
+    (void)filters;
     return;
   }
   if (cm->interp_filter == SWITCHABLE) {

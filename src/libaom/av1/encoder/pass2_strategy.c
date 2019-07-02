@@ -27,7 +27,7 @@
 #include "av1/encoder/ratectrl.h"
 #include "av1/encoder/use_flat_gop_model_params.h"
 
-#define DEFAULT_KF_BOOST 2000
+#define DEFAULT_KF_BOOST 2300
 #define DEFAULT_GF_BOOST 2000
 
 // Calculate an active area of the image that discounts formatting

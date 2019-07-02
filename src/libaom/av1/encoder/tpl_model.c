@@ -113,8 +113,8 @@ static void mode_estimation(AV1_COMP *cpi, MACROBLOCK *x, MACROBLOCKD *xd,
   const int bw = 4 << mi_size_wide_log2[bsize];
   const int bh = 4 << mi_size_high_log2[bsize];
   const int pix_num = bw * bh;
-  const InterpFilters kernel =
-      av1_make_interp_filters(EIGHTTAP_REGULAR, EIGHTTAP_REGULAR);
+  const int_interpfilters kernel =
+      av1_broadcast_interp_filter(EIGHTTAP_REGULAR);
 
   int64_t best_intra_cost = INT64_MAX;
   int64_t intra_cost;
@@ -747,8 +747,8 @@ static void get_tpl_forward_stats(AV1_COMP *cpi, MACROBLOCK *x, MACROBLOCKD *xd,
   ConvolveParams conv_params = get_conv_params(0, 0, xd->bd);
   WarpTypesAllowed warp_types;
   memset(&warp_types, 0, sizeof(WarpTypesAllowed));
-  const InterpFilters kernel =
-      av1_make_interp_filters(EIGHTTAP_REGULAR, EIGHTTAP_REGULAR);
+  const int_interpfilters kernel =
+      av1_broadcast_interp_filter(EIGHTTAP_REGULAR);
   xd->above_mbmi = NULL;
   xd->left_mbmi = NULL;
   xd->mi[0]->sb_type = bsize;

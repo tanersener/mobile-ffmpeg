@@ -433,12 +433,6 @@ typedef struct SPEED_FEATURES {
   // Pattern to be used for any exhaustive mesh searches.
   MESH_PATTERN mesh_patterns[MAX_MESH_STEP];
 
-  // Allows sub 8x8 modes to use the prediction filter that was determined
-  // best for 8x8 mode. If set to 0 we always re check all the filters for
-  // sizes less than 8x8, 1 means we check all filter modes if no 8x8 filter
-  // was selected, and 2 means we use 8 tap if no 8x8 filter mode was selected.
-  int adaptive_pred_interp_filter;
-
   // Adaptive prediction mode search
   int adaptive_mode_search;
 
@@ -719,6 +713,10 @@ typedef struct SPEED_FEATURES {
   // A reference frame is good if, after looking at its performance among
   // the single reference modes, it is one of the two best performers.
   int prune_compound_using_single_ref;
+
+  // Use CNN with luma pixels on source frame on each of the 64x64 subblock to
+  // perform split/no_split decision on intra-frames.
+  int intra_cnn_split;
 } SPEED_FEATURES;
 
 struct AV1_COMP;

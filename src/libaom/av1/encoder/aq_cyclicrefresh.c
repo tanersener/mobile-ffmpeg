@@ -273,9 +273,9 @@ void av1_cyclic_refresh_set_golden_update(AV1_COMP *const cpi) {
   // period. Depending on past encoding stats, GF flag may be reset and update
   // may not occur until next baseline_gf_interval.
   if (cr->percent_refresh > 0)
-    rc->baseline_gf_interval = 4 * (100 / cr->percent_refresh);
+    rc->baseline_gf_interval = 2 * (100 / cr->percent_refresh);
   else
-    rc->baseline_gf_interval = 40;
+    rc->baseline_gf_interval = 20;
 }
 
 // Update the segmentation map, and related quantities: cyclic refresh map,

@@ -199,7 +199,7 @@ void av1_cdef_filter_fb(uint8_t *dst8, uint16_t *dst16, int dstride,
       for (int iy = 0; iy < 1 << bh_log2; iy++) {
         memcpy(&dst16[(bi << (bw_log2 + bh_log2)) + (iy << bw_log2)],
                &in[((by << bh_log2) + iy) * CDEF_BSTRIDE + (bx << bw_log2)],
-               (1 << bw_log2) * sizeof(*dst16));
+               ((size_t)1 << bw_log2) * sizeof(*dst16));
       }
     }
     return;

@@ -4566,7 +4566,6 @@ static void generate_next_ref_frame_map(AV1Decoder *const pbi) {
 // If the refresh_frame_flags bitmask is set, update reference frame id values
 // and mark frames as valid for reference.
 static void update_ref_frame_id(AV1_COMMON *const cm, int frame_id) {
-  assert(cm->seq_params.frame_id_numbers_present_flag);
   int refresh_frame_flags = cm->current_frame.refresh_frame_flags;
   for (int i = 0; i < REF_FRAMES; i++) {
     if ((refresh_frame_flags >> i) & 1) {
@@ -4597,10 +4596,8 @@ static void show_existing_frame_reset(AV1Decoder *const pbi,
 
   // Note that the displayed frame must be valid for referencing in order to
   // have been selected.
-  if (cm->seq_params.frame_id_numbers_present_flag) {
-    cm->current_frame_id = cm->ref_frame_id[existing_frame_idx];
-    update_ref_frame_id(cm, cm->current_frame_id);
-  }
+  cm->current_frame_id = cm->ref_frame_id[existing_frame_idx];
+  update_ref_frame_id(cm, cm->current_frame_id);
 
   cm->refresh_frame_context = REFRESH_FRAME_CONTEXT_DISABLED;
 
@@ -4776,6 +4773,12 @@ static int read_uncompressed_header(AV1Decoder *pbi,
             : aom_rb_read_bit(rb);
   }
 
+  if (current_frame->frame_type == KEY_FRAME && cm->show_frame) {
+    /* All frames need to be marked as not valid for referencing */
+    for (int i = 0; i < REF_FRAMES; i++) {
+      cm->valid_for_referencing[i] = 0;
+    }
+  }
   cm->disable_cdf_update = aom_rb_read_bit(rb);
   if (seq_params->force_screen_content_tools == 2) {
     cm->allow_screen_content_tools = aom_rb_read_bit(rb);
@@ -4827,9 +4830,7 @@ static int read_uncompressed_header(AV1Decoder *pbi,
       }
       /* Check if some frames need to be marked as not valid for referencing */
       for (int i = 0; i < REF_FRAMES; i++) {
-        if (current_frame->frame_type == KEY_FRAME && cm->show_frame) {
-          cm->valid_for_referencing[i] = 0;
-        } else if (cm->current_frame_id - (1 << diff_len) > 0) {
+        if (cm->current_frame_id - (1 << diff_len) > 0) {
           if (cm->ref_frame_id[i] > cm->current_frame_id ||
               cm->ref_frame_id[i] < cm->current_frame_id - (1 << diff_len))
             cm->valid_for_referencing[i] = 0;
@@ -4924,9 +4925,12 @@ static int read_uncompressed_header(AV1Decoder *pbi,
             lock_buffer_pool(pool);
             decrease_ref_count(buf, pool);
             unlock_buffer_pool(pool);
+            cm->ref_frame_map[ref_idx] = NULL;
           }
           // If no corresponding buffer exists, allocate a new buffer with all
           // pixels set to neutral grey.
+          // TODO(https://crbug.com/aomedia/2420): The spec seems to say we
+          // just need to set cm->valid_for_referencing[ref_idx] to 0.
           int buf_idx = get_free_fb(cm);
           if (buf_idx == INVALID_IDX) {
             aom_internal_error(&cm->error, AOM_CODEC_MEM_ERROR,
@@ -5021,6 +5025,10 @@ static int read_uncompressed_header(AV1Decoder *pbi,
         } else {
           ref = cm->remapped_ref_idx[i];
         }
+        // Check valid for referencing
+        if (cm->valid_for_referencing[ref] == 0)
+          aom_internal_error(&cm->error, AOM_CODEC_CORRUPT_FRAME,
+                             "Reference frame not valid for referencing");
 
         cm->ref_frame_sign_bias[LAST_FRAME + i] = 0;
 
@@ -5033,9 +5041,8 @@ static int read_uncompressed_header(AV1Decoder *pbi,
                 (1 << frame_id_length)) %
                (1 << frame_id_length));
           // Compare values derived from delta_frame_id_minus_1 and
-          // refresh_frame_flags. Also, check valid for referencing
-          if (ref_frame_id != cm->ref_frame_id[ref] ||
-              cm->valid_for_referencing[ref] == 0)
+          // refresh_frame_flags.
+          if (ref_frame_id != cm->ref_frame_id[ref])
             aom_internal_error(&cm->error, AOM_CODEC_CORRUPT_FRAME,
                                "Reference buffer frame ID mismatch");
         }
@@ -5091,9 +5098,7 @@ static int read_uncompressed_header(AV1Decoder *pbi,
 
   cm->cur_frame->frame_type = current_frame->frame_type;
 
-  if (seq_params->frame_id_numbers_present_flag) {
-    update_ref_frame_id(cm, cm->current_frame_id);
-  }
+  update_ref_frame_id(cm, cm->current_frame_id);
 
   const int might_bwd_adapt =
       !(seq_params->reduced_still_picture_hdr) && !(cm->disable_cdf_update);

@@ -3596,8 +3596,11 @@ static void set_size_independent_vars(AV1_COMP *cpi) {
   cm->switchable_motion_mode = 1;
 }
 
-static int get_gfu_boost_from_r0(double r0) {
-  int boost = (int)rint(260.0 / r0);
+static int get_gfu_boost_from_r0(double r0, int frames_to_key) {
+  double factor = sqrt((double)frames_to_key);
+  factor = AOMMIN(factor, 10.0);
+  factor = AOMMAX(factor, 4.0);
+  const int boost = (int)rint((200.0 + 10.0 * factor) / r0);
   return boost;
 }
 
@@ -3605,7 +3608,17 @@ static int get_kf_boost_from_r0(double r0, int frames_to_key) {
   double factor = sqrt((double)frames_to_key);
   factor = AOMMIN(factor, 10.0);
   factor = AOMMAX(factor, 4.0);
-  int boost = (int)rint((75.0 + 14.0 * factor) / r0);
+  const int boost = (int)rint((75.0 + 14.0 * factor) / r0);
+  return boost;
+}
+
+int combine_prior_with_tpl_boost(int prior_boost, int tpl_boost,
+                                 int frames_to_key) {
+  double factor = sqrt((double)frames_to_key);
+  factor = AOMMIN(factor, 12.0);
+  factor = AOMMAX(factor, 4.0);
+  factor -= 4.0;
+  int boost = (int)((factor * prior_boost + (8.0 - factor) * tpl_boost) / 8.0);
   return boost;
 }
 
@@ -3643,10 +3656,12 @@ static void process_tpl_stats_frame(AV1_COMP *cpi) {
       cpi->rd.r0 = (double)intra_cost_base / mc_dep_cost_base;
       if (is_frame_arf_and_tpl_eligible(cpi)) {
         cpi->rd.arf_r0 = cpi->rd.r0;
-        const int gfu_boost = get_gfu_boost_from_r0(cpi->rd.arf_r0);
+        const int gfu_boost =
+            get_gfu_boost_from_r0(cpi->rd.arf_r0, cpi->rc.frames_to_key);
         // printf("old boost %d new boost %d\n", cpi->rc.gfu_boost,
         //        gfu_boost);
-        cpi->rc.gfu_boost = (cpi->rc.gfu_boost + gfu_boost) / 2;
+        cpi->rc.gfu_boost = combine_prior_with_tpl_boost(
+            cpi->rc.gfu_boost, gfu_boost, cpi->rc.frames_to_key);
       } else if (frame_is_intra_only(cm)) {
         // TODO(debargha): Turn off q adjustment for kf temporarily to
         // reduce impact on speed of encoding. Need to investigate how
@@ -3656,7 +3671,8 @@ static void process_tpl_stats_frame(AV1_COMP *cpi) {
               get_kf_boost_from_r0(cpi->rd.r0, cpi->rc.frames_to_key);
           // printf("old kf boost %d new kf boost %d [%d]\n", cpi->rc.kf_boost,
           //        kf_boost, cpi->rc.frames_to_key);
-          cpi->rc.kf_boost = (cpi->rc.kf_boost + kf_boost) / 2;
+          cpi->rc.kf_boost = combine_prior_with_tpl_boost(
+              cpi->rc.kf_boost, kf_boost, cpi->rc.frames_to_key);
         }
       }
       cpi->rd.mc_count_base =

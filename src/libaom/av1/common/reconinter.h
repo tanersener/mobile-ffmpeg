@@ -113,7 +113,7 @@ static INLINE void inter_predictor(const uint8_t *src, int src_stride,
                                    const SubpelParams *subpel_params,
                                    const struct scale_factors *sf, int w, int h,
                                    ConvolveParams *conv_params,
-                                   InterpFilters interp_filters,
+                                   int_interpfilters interp_filters,
                                    int is_intrabc) {
   assert(conv_params->do_average == 0 || conv_params->do_average == 1);
   assert(sf);
@@ -138,7 +138,7 @@ static INLINE void highbd_inter_predictor(const uint8_t *src, int src_stride,
                                           const SubpelParams *subpel_params,
                                           const struct scale_factors *sf, int w,
                                           int h, ConvolveParams *conv_params,
-                                          InterpFilters interp_filters,
+                                          int_interpfilters interp_filters,
                                           int is_intrabc, int bd) {
   assert(conv_params->do_average == 0 || conv_params->do_average == 1);
   assert(sf);
@@ -209,7 +209,7 @@ void av1_make_inter_predictor(const uint8_t *src, int src_stride, uint8_t *dst,
                               int dst_stride, const SubpelParams *subpel_params,
                               const struct scale_factors *sf, int w, int h,
                               ConvolveParams *conv_params,
-                              InterpFilters interp_filters,
+                              int_interpfilters interp_filters,
                               const WarpTypesAllowed *warp_types, int p_col,
                               int p_row, int plane, int ref,
                               const MB_MODE_INFO *mi, int build_for_obmc,
@@ -218,9 +218,9 @@ void av1_make_inter_predictor(const uint8_t *src, int src_stride, uint8_t *dst,
 void av1_make_masked_inter_predictor(
     const uint8_t *pre, int pre_stride, uint8_t *dst, int dst_stride,
     const SubpelParams *subpel_params, const struct scale_factors *sf, int w,
-    int h, ConvolveParams *conv_params, InterpFilters interp_filters, int plane,
-    const WarpTypesAllowed *warp_types, int p_col, int p_row, int ref,
-    MACROBLOCKD *xd, int can_use_previous);
+    int h, ConvolveParams *conv_params, int_interpfilters interp_filters,
+    int plane, const WarpTypesAllowed *warp_types, int p_col, int p_row,
+    int ref, MACROBLOCKD *xd, int can_use_previous);
 
 // TODO(jkoleszar): yet another mv clamping function :-(
 static INLINE MV clamp_mv_to_umv_border_sb(const MACROBLOCKD *xd,

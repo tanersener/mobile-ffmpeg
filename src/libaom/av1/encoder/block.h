@@ -15,6 +15,11 @@
 #include "av1/common/entropymv.h"
 #include "av1/common/entropy.h"
 #include "av1/common/mvref_common.h"
+
+#if !CONFIG_REALTIME_ONLY
+#include "av1/encoder/partition_cnn_weights.h"
+#endif
+
 #include "av1/encoder/hash.h"
 #if CONFIG_DIST_8X8
 #include "aom/aomcx.h"
@@ -122,6 +127,7 @@ typedef struct {
   uint8_t txb_entropy_ctx;
   uint8_t valid;
   uint8_t fast;  // This is not being used now.
+  uint8_t perform_block_coeff_opt;
 } TXB_RD_INFO;
 
 #define TX_SIZE_RD_RECORD_BUFFER_LEN 256
@@ -153,7 +159,7 @@ typedef struct {
 
 #define MAX_INTERP_FILTER_STATS 64
 typedef struct {
-  InterpFilters filters;
+  int_interpfilters filters;
   int_mv mv[2];
   int8_t ref_frames[2];
   COMPOUND_TYPE comp_type;
@@ -171,7 +177,7 @@ typedef struct {
   int_mv mv[2];
   MV_REFERENCE_FRAME ref_frames[2];
   PREDICTION_MODE mode;
-  InterpFilters filter;
+  int_interpfilters filter;
   int ref_mv_idx;
   int is_global[2];
 } COMP_RD_STATS;
@@ -404,6 +410,13 @@ struct macroblock {
   int comp_rd_stats_idx;
 
   CB_COEFF_BUFFER *cb_coef_buff;
+
+#if !CONFIG_REALTIME_ONLY
+  int quad_tree_idx;
+  int cnn_output_valid;
+  float cnn_buffer[CNN_OUT_BUF_SIZE];
+  float log_q;
+#endif
 };
 
 static INLINE int is_rect_tx_allowed_bsize(BLOCK_SIZE bsize) {

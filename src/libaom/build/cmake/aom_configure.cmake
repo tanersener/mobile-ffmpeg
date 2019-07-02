@@ -176,7 +176,7 @@ if(CONFIG_GPROF)
   require_compiler_flag("-pg" YES)
 endif()
 
-if("${AOM_TARGET_SYSTEM}" MATCHES "Darwin\|Linux\|Windows")
+if("${AOM_TARGET_SYSTEM}" MATCHES "Darwin\|Linux\|Windows\|Android")
   set(CONFIG_OS_SUPPORT 1)
 endif()
 

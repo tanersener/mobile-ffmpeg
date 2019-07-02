@@ -351,7 +351,8 @@ static INLINE void av1_invalid_rd_stats(RD_STATS *rd_stats) {
 static INLINE void av1_merge_rd_stats(RD_STATS *rd_stats_dst,
                                       const RD_STATS *rd_stats_src) {
   assert(rd_stats_dst->rate != INT_MAX && rd_stats_src->rate != INT_MAX);
-  rd_stats_dst->rate += rd_stats_src->rate;
+  rd_stats_dst->rate = (int)AOMMIN(
+      ((int64_t)rd_stats_dst->rate + (int64_t)rd_stats_src->rate), INT_MAX);
   if (!rd_stats_dst->zero_rate)
     rd_stats_dst->zero_rate = rd_stats_src->zero_rate;
   rd_stats_dst->dist += rd_stats_src->dist;
