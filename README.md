@@ -1,6 +1,6 @@
-# MobileFFmpeg ![GitHub release](https://img.shields.io/badge/release-v4.2.1-blue.svg) ![Bintray](https://img.shields.io/badge/bintray-v4.2.1-blue.svg) ![CocoaPods](https://img.shields.io/badge/pod-v4.2.1-blue.svg) [![Build Status](https://travis-ci.org/tanersener/mobile-ffmpeg.svg?branch=master)](https://travis-ci.org/tanersener/mobile-ffmpeg)
+# MobileFFmpeg ![GitHub release](https://img.shields.io/badge/release-v4.2.2-blue.svg) ![Bintray](https://img.shields.io/badge/bintray-v4.2.2-blue.svg) ![CocoaPods](https://img.shields.io/badge/pod-v4.2.2-blue.svg) [![Build Status](https://travis-ci.org/tanersener/mobile-ffmpeg.svg?branch=master)](https://travis-ci.org/tanersener/mobile-ffmpeg)
 
-FFmpeg for Android and iOS / tvOS
+FFmpeg for Android, iOS and tvOS
 
 <img src="https://github.com/tanersener/mobile-ffmpeg/blob/master/docs/assets/mobile-ffmpeg-logo-v7.png" width="320">
 
@@ -54,12 +54,11 @@ FFmpeg for Android and iOS / tvOS
 ### 2. Using
 Published binaries are available at [Github](https://github.com/tanersener/mobile-ffmpeg/releases), [JCenter](https://bintray.com/bintray/jcenter) and [CocoaPods](https://cocoapods.org).
 
-  - Visit [Importing iOS Frameworks](https://github.com/tanersener/mobile-ffmpeg/wiki/Importing-iOS-Frameworks) guide to manually import iOS / tvOS frameworks
-  - Refer to [Using iOS Universal Binaries](https://github.com/tanersener/mobile-ffmpeg/wiki/Using-iOS-Universal-Binaries) guide to import iOS / tvOS universal binaries  
-
 Unpublished development builds can be found under the [development-snapshot](https://www.dropbox.com/sh/frzg32yjzyucmob/AADX81RhiVfk9o7Vo2J8jlH2a) directory. 
 
-There are eight different binary packages. Below you can see which system libraries and external libraries are enabled in each of them.
+There are eight different `mobile-ffmpeg` packages. Below you can see which system libraries and external libraries are enabled in each of them. 
+
+Please remember that some parts of `FFmpeg` are licensed under the `GPL` and only `GPL` licensed `mobile-ffmpeg` packages include them.
 
 <table>
 <thead>
@@ -115,10 +114,10 @@ There are eight different binary packages. Below you can see which system librar
  - `AVFoundation` is not available on `tvOS`, `VideoToolbox` is not available on `tvOS` LTS releases
 
 #### 2.1 Android
-1. Add MobileFFmpeg dependency from `jcenter()`
+1. Add MobileFFmpeg dependency to your `build.gradle` in `mobile-ffmpeg-<package name>` format
     ```
     dependencies {
-        implementation 'com.arthenica:mobile-ffmpeg-min:4.2.1'
+        implementation 'com.arthenica:mobile-ffmpeg-min:4.2.2'
     }
     ```
 
@@ -192,16 +191,16 @@ There are eight different binary packages. Below you can see which system librar
     ```
 
 #### 2.2 iOS / tvOS
-1. Add MobileFFmpeg pod to your `Podfile`
+1. Add MobileFFmpeg dependency to your `Podfile` in `mobile-ffmpeg-<package name>` format
 
     - iOS
     ```
-    pod 'mobile-ffmpeg-min', '~> 4.2.1'
+    pod 'mobile-ffmpeg-min', '~> 4.2.2'
     ```
 
     - tvOS
     ```
-    pod 'mobile-ffmpeg-tv-min', '~> 4.2.1'
+    pod 'mobile-ffmpeg-tv-min', '~> 4.2.2'
     ```
 
 2. Execute commands.
@@ -277,8 +276,18 @@ There are eight different binary packages. Below you can see which system librar
     ```
     [MobileFFmpegConfig setFontDirectory:@"<folder with fonts>" with:nil];
     ```
+
+#### 2.3 Manual Installation
+##### 2.3.1 Android
+
+You can import `MobileFFmpeg` aar packages in `Android Studio` using the `File` -> `New` -> `New Module` -> `Import .JAR/.AAR Package` menu.
+
+##### 2.3.2 iOS / tvOS
+
+iOS and tvOS frameworks can be installed manually using the [Importing Frameworks](https://github.com/tanersener/mobile-ffmpeg/wiki/Importing-Frameworks) guide. 
+If you want to use universal binaries please refer to [Using Universal Binaries](https://github.com/tanersener/mobile-ffmpeg/wiki/Using-Universal-Binaries) guide.   
     
-#### 2.3 Test Application
+#### 2.4 Test Application
 You can see how MobileFFmpeg is used inside an application by running test applications provided.
 There is an `Android` test application under the `android/test-app` folder, an `iOS` test application under the 
 `ios/test-app` folder and a `tvOS` test application under the `tvos/test-app` folder. 
@@ -291,12 +300,17 @@ burning subtitles, video stabilization and pipe operations.
 ### 3. Versions
 
 `MobileFFmpeg` version number is aligned with `FFmpeg` since version `4.2`. 
-In previous versions, `MobileFFmpeg` version of a release and `FFmpeg` version included in that release was different.
+
+In previous versions, `MobileFFmpeg` version of a release and `FFmpeg` version included in that release was different. 
+The following table lists `FFmpeg` versions used in `MobileFFmpeg` releases.
+  
 - `dev` part in `FFmpeg` version number indicates that `FFmpeg` source is pulled from the `FFmpeg` `master` branch. 
 Exact version number is obtained using `git describe --tags`. 
 
 |  MobileFFmpeg Version | FFmpeg Version | Release Date |
 | :----: | :----: |:----: |
+| [4.2.2](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v4.2.2) | 4.2-dev-1824 | July 3, 2019 |
+| [4.2.2.LTS](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v4.2.2.LTS) | 4.2-dev-1824 | July 3, 2019 |
 | [4.2.1](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v4.2.1) | 4.2-dev-1156 | Apr 2, 2019 |
 | [4.2](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v4.2) | 4.2-dev-480 | Jan 3, 2019 |
 | [4.2.LTS](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v4.2.LTS) | 4.2-dev-480 | Jan 3, 2019 |
@@ -316,7 +330,7 @@ Starting from `v4.2`, `MobileFFmpeg` binaries are published in two different var
 
 - Main releases include complete functionality of the library and support the latest SDK/API features.
 
-- LTS releases are customized to support a wide range of devices. They are built using older API/SDK versions, so some features are not available for them.
+- LTS releases are customized to support a wider range of devices. They are built using older API/SDK versions, so some features are not available on them.
 
 This table shows the differences between two variants.
 
@@ -338,6 +352,8 @@ Unreleased binaries built from `development` branch can be found under the [deve
 Please remember that these builds are provided for testing and development purposes only since they are not % 100 tested and may include minor issues. 
 
 ### 6. Building
+
+Build scripts from `master` and `development` branches are tested periodically. See the latest status from the table below.
 
 | branch | status |
 | :---: | :---: |

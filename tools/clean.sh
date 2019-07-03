@@ -17,6 +17,8 @@ rm -rf ../ios/test-app/universal/Pods
 rm -rf ../ios/test-app/universal/*.framework
 rm -rf ../ios/test-app/universal/mobile-ffmpeg-universal
 
+rm -rf ../tvos/test-app/pods/Pods
+rm -rf ../tvos/test-app/pods/*.framework
 rm -rf ../tvos/test-app/manual-frameworks/Pods
 rm -rf ../tvos/test-app/manual-frameworks/*.framework
 rm -rf ../tvos/test-app/universal/Pods
