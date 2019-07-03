@@ -52,7 +52,7 @@ android.applicationVariants.all { variant ->
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.arthenica:mobile-ffmpeg-full:4.2.2.LTS'
+    implementation 'com.arthenica:mobile-ffmpeg-full:4.2.2'
     // implementation project(':app')
     testImplementation 'junit:junit:4.12'
     implementation 'com.android.support:support-v4:28.0.0'

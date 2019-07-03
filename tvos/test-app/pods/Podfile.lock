@@ -1,0 +1,16 @@
+PODS:
+  - mobile-ffmpeg-tvos-min (4.2.2.LTS)
+
+DEPENDENCIES:
+  - mobile-ffmpeg-tvos-min (= 4.2.2.LTS)
+
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - mobile-ffmpeg-tvos-min
+
+SPEC CHECKSUMS:
+  mobile-ffmpeg-tvos-min: af6224ae4c3a2e1b9a9acfd864047e3d34924143
+
+PODFILE CHECKSUM: 525b6ef0bd6e92c932490d9f7082c96ab90ff5d2
+
+COCOAPODS: 1.7.3
