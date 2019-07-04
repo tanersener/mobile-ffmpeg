@@ -40,7 +40,7 @@ FFmpeg for Android, iOS and tvOS
 - `ARC` enabled library
 - Built with `-fembed-bitcode` flag
 - Creates static framework and static universal (fat) library (.a)
-- Supports `iOS SDK 8.0.x` or later
+- Supports `iOS SDK 9.3` or later
  
 #### 1.3 tvOS
 - Builds `arm64` and `x86_64` architectures
@@ -415,7 +415,7 @@ export ANDROID_NDK_ROOT=<Android NDK Path>
 ./tvos.sh
 ```
 
-<img src="https://github.com/tanersener/mobile-ffmpeg/blob/development/docs/assets/tvos_custom.gif" width="600">
+<img src="https://github.com/tanersener/mobile-ffmpeg/blob/master/docs/assets/tvos_custom.gif" width="600">
 
 
 ##### 6.2.4 Building LTS Binaries
