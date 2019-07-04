@@ -39,7 +39,7 @@ extern const uint32_t kvz_g_go_rice_prefix_len[5];
 void  kvz_rdoq(encoder_state_t *state, coeff_t *coef, coeff_t *dest_coeff, int32_t width,
            int32_t height, int8_t type, int8_t scan_mode, int8_t block_type, int8_t tr_depth);
 
-uint32_t kvz_get_coeff_cost(const encoder_state_t *state,
+uint32_t kvz_get_coeff_cost(const encoder_state_t * const state,
                             const coeff_t *coeff,
                             int32_t width,
                             int32_t type,
@@ -57,8 +57,9 @@ uint32_t kvz_get_coded_level(encoder_state_t * state, double* coded_cost, double
 kvz_mvd_cost_func kvz_calc_mvd_cost_cabac;
 
 uint32_t kvz_get_mvd_coding_cost_cabac(const encoder_state_t *state,
-                                       vector2d_t *mvd,
-                                       const cabac_data_t* cabac);
+                                       const cabac_data_t* cabac,
+                                       int32_t mvd_hor,
+                                       int32_t mvd_ver);
 
 // Number of fixed point fractional bits used in the fractional bit table.
 #define CTX_FRAC_BITS 15

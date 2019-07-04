@@ -123,7 +123,7 @@ public class Config {
                  */
 
                 try {
-                    System.loadLibrary("mobileffmpeg-armv7a-neon");
+                    System.loadLibrary("mobileffmpeg_armv7a_neon");
                     nativeLibraryLoaded = true;
                     AbiDetect.setArmV7aNeonLoaded(true);
                 } catch (final UnsatisfiedLinkError e) {

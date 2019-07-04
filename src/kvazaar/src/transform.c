@@ -186,15 +186,25 @@ void kvz_itransformskip(const encoder_control_t * const encoder, int16_t *block,
  * \param coeff transform coefficients
  * \param block_size width of transform
  */
-void kvz_transform2d(const encoder_control_t * const encoder, int16_t *block, int16_t *coeff, int8_t block_size, int32_t mode)
+void kvz_transform2d(const encoder_control_t * const encoder,
+                     int16_t *block,
+                     int16_t *coeff,
+                     int8_t block_size,
+                     color_t color,
+                     cu_type_t type)
 {
-  dct_func *dct_func = kvz_get_dct_func(block_size, mode);  
+  dct_func *dct_func = kvz_get_dct_func(block_size, color, type);
   dct_func(encoder->bitdepth, block, coeff);
 }
 
-void kvz_itransform2d(const encoder_control_t * const encoder, int16_t *block, int16_t *coeff, int8_t block_size, int32_t mode)
+void kvz_itransform2d(const encoder_control_t * const encoder,
+                      int16_t *block,
+                      int16_t *coeff,
+                      int8_t block_size,
+                      color_t color,
+                      cu_type_t type)
 {
-  dct_func *idct_func = kvz_get_idct_func(block_size, mode);
+  dct_func *idct_func = kvz_get_idct_func(block_size, color, type);
   idct_func(encoder->bitdepth, coeff, block);
 }
 
@@ -359,19 +369,22 @@ static void quantize_tr_residual(encoder_state_t * const state,
     }
 
   } else if (can_use_trskip) {
+    int8_t tr_skip = 0;
+
     // Try quantization with trskip and use it if it's better.
     has_coeffs = kvz_quantize_residual_trskip(state,
                                               cur_pu,
                                               tr_width,
                                               color,
                                               scan_idx,
-                                              &cur_pu->intra.tr_skip,
+                                              &tr_skip,
                                               lcu_width,
                                               lcu_width,
                                               ref,
                                               pred,
                                               pred,
                                               coeff);
+    cur_pu->tr_skip = tr_skip;
   } else {
     has_coeffs = kvz_quantize_residual(state,
                                        cur_pu,
@@ -450,10 +463,8 @@ void kvz_quantize_lcu_residual(encoder_state_t * const state,
       LCU_GET_CU_AT_PX(lcu, lcu_px.x + offset, lcu_px.y + offset)->cbf,
     };
 
-    if (luma && depth < MAX_DEPTH) {
+    if (depth <= MAX_DEPTH) {
       cbf_set_conditionally(&cur_pu->cbf, child_cbfs, depth, COLOR_Y);
-    }
-    if (chroma && depth <= MAX_DEPTH) {
       cbf_set_conditionally(&cur_pu->cbf, child_cbfs, depth, COLOR_U);
       cbf_set_conditionally(&cur_pu->cbf, child_cbfs, depth, COLOR_V);
     }

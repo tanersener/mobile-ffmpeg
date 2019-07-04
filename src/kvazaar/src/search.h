@@ -31,6 +31,7 @@
 #include "global.h" // IWYU pragma: keep
 #include "image.h"
 
+void kvz_sort_modes(int8_t *__restrict modes, double *__restrict costs, uint8_t length);
 
 void kvz_search_lcu(encoder_state_t *state, int x, int y, const yuv_t *hor_buf, const yuv_t *ver_buf);
 
@@ -42,7 +43,7 @@ double kvz_cu_rd_cost_chroma(const encoder_state_t *const state,
                          const int x_px, const int y_px, const int depth,
                          const cu_info_t *const pred_cu,
                          lcu_t *const lcu);
-void kvz_lcu_set_trdepth(lcu_t *lcu, int x_px, int y_px, int depth, int tr_depth);
+void kvz_lcu_fill_trdepth(lcu_t *lcu, int x_px, int y_px, int depth, int tr_depth);
 
 void kvz_intra_recon_lcu_luma(encoder_state_t * const state, int x, int y, int depth, int8_t intra_mode, cu_info_t *cur_cu, lcu_t *lcu);
 void kvz_intra_recon_lcu_chroma(encoder_state_t * const state, int x, int y, int depth, int8_t intra_mode, cu_info_t *cur_cu, lcu_t *lcu);

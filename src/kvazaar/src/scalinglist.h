@@ -33,6 +33,7 @@
 
 typedef struct {
         int8_t   enable;
+        int8_t   use_default_list;
         int32_t  scaling_list_dc   [SCALING_LIST_SIZE_NUM][SCALING_LIST_NUM];
   const int32_t *scaling_list_coeff[SCALING_LIST_SIZE_NUM][SCALING_LIST_NUM];
   const int32_t *quant_coeff[4][6][6];

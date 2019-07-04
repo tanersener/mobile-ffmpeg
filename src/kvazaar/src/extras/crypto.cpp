@@ -16,10 +16,10 @@ int kvz_make_vs_ignore_crypto_not_having_symbols = 0;
 
 struct crypto_handle_t {
   cipher_t *cipher;
-  byte key[CryptoPP::AES::DEFAULT_KEYLENGTH];
-  byte iv[CryptoPP::AES::BLOCKSIZE];
-  byte out_stream_counter[CryptoPP::AES::BLOCKSIZE];
-  byte counter[CryptoPP::AES::BLOCKSIZE];
+  unsigned char key[CryptoPP::AES::DEFAULT_KEYLENGTH];
+  unsigned char iv[CryptoPP::AES::BLOCKSIZE];
+  unsigned char out_stream_counter[CryptoPP::AES::BLOCKSIZE];
+  unsigned char counter[CryptoPP::AES::BLOCKSIZE];
   int couter_avail;
   int counter_index;
   int counter_index_pos;

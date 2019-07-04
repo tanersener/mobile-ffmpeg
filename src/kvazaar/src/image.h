@@ -29,6 +29,7 @@
 #include "global.h" // IWYU pragma: keep
 
 #include "kvazaar.h"
+#include "strategies/optimized_sad_func_ptr_t.h"
 
 
 typedef struct {
@@ -81,7 +82,8 @@ unsigned kvz_image_calc_sad(const kvz_picture *pic,
                             int ref_x,
                             int ref_y,
                             int block_width,
-                            int block_height);
+                            int block_height,
+                            optimized_sad_func_ptr_t optimized_sad);
 
 
 unsigned kvz_image_calc_satd(const kvz_picture *pic,

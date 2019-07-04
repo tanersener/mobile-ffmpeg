@@ -26,10 +26,10 @@
 
 
 // Define function pointers.
-ipol_func *kvz_filter_inter_quarterpel_luma;
-ipol_func *kvz_filter_inter_halfpel_chroma;
-ipol_func *kvz_filter_inter_octpel_chroma;
-ipol_frac_blocks_func *kvz_filter_frac_blocks_luma;
+ipol_blocks_func * kvz_filter_hpel_blocks_hor_ver_luma;
+ipol_blocks_func * kvz_filter_hpel_blocks_diag_luma;
+ipol_blocks_func * kvz_filter_qpel_blocks_hor_ver_luma;
+ipol_blocks_func * kvz_filter_qpel_blocks_diag_luma;
 epol_func *kvz_get_extended_block;
 kvz_sample_quarterpel_luma_func * kvz_sample_quarterpel_luma;
 kvz_sample_octpel_chroma_func * kvz_sample_octpel_chroma;

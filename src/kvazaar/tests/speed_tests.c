@@ -355,7 +355,7 @@ SUITE(speed_tests)
 
   // Loop through all strategies picking out the intra sad ones and run
   // selectec strategies though all tests
-  for (unsigned i = 0; i < strategies.count; ++i) {
+  for (volatile unsigned i = 0; i < strategies.count; ++i) {
     const strategy_t * strategy = &strategies.strategies[i];
 
     // Select buffer width according to function name.

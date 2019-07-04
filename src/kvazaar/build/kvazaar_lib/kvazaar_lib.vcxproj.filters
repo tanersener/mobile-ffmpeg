@@ -49,6 +49,9 @@
     <Filter Include="Threading">
       <UniqueIdentifier>{63c21cb2-b379-4d38-bcb8-173786c2466d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Threadwrapper">
+      <UniqueIdentifier>{f4abece9-e209-4817-a57e-c64ca7c5e05c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\strategies\strategies-nal.c">
@@ -221,6 +224,21 @@
     </ClCompile>
     <ClCompile Include="..\..\src\extras\libmd5.c" />
     <ClCompile Include="..\..\src\extras\crypto.cpp" />
+    <ClCompile Include="..\..\src\strategies\avx2\encode_coding_tree-avx2.c">
+      <Filter>Optimization\strategies\avx2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\strategies\generic\encode_coding_tree-generic.c">
+      <Filter>Optimization\strategies\generic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\strategies\strategies-encode.c">
+      <Filter>Optimization\strategies</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\threadwrapper\src\pthread.cpp">
+      <Filter>Threadwrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\threadwrapper\src\semaphore.cpp">
+      <Filter>Threadwrapper</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\bitstream.h">
@@ -411,6 +429,30 @@
     </ClInclude>
     <ClInclude Include="..\..\src\extras\libmd5.h" />
     <ClInclude Include="..\..\src\extras\crypto.h" />
+    <ClInclude Include="..\..\src\strategies\avx2\encode_coding_tree-avx2.h">
+      <Filter>Optimization\strategies\avx2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\strategies\generic\encode_coding_tree-generic.h">
+      <Filter>Optimization\strategies\generic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\strategies\avx2\avx2_common_functions.h">
+      <Filter>Optimization\strategies\avx2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\strategies\strategies-encode.h">
+      <Filter>Optimization\strategies</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\strategies\avx2\reg_sad_pow2_widths-avx2.h">
+      <Filter>Optimization\strategies\avx2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\strategies\sse41\reg_sad_pow2_widths-sse41.h">
+      <Filter>Optimization\strategies\sse41</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\threadwrapper\include\pthread.h">
+      <Filter>Threadwrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\threadwrapper\include\semaphore.h">
+      <Filter>Threadwrapper</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <YASM Include="..\..\src\extras\x86inc.asm">

@@ -30,10 +30,11 @@
 #include "inter.h"
 #include "kvazaar.h"
 #include "rdo.h"
+#include "search.h"
 #include "strategies/strategies-ipol.h"
 #include "strategies/strategies-picture.h"
+#include "transform.h"
 #include "videoframe.h"
-
 
 typedef struct {
   encoder_state_t *state;
@@ -77,6 +78,13 @@ typedef struct {
    * \brief Bit cost of best_mv
    */
   uint32_t best_bitcost;
+
+  /**
+   * \brief Possible optimized SAD implementation for the width, leave as
+   *        NULL for arbitrary-width blocks
+   */
+  optimized_sad_func_ptr_t optimized_sad;
+
 } inter_search_info_t;
 
 
@@ -204,7 +212,8 @@ static bool check_mv_cost(inter_search_info_t *info, int x, int y)
       info->state->tile->offset_x + info->origin.x + x,
       info->state->tile->offset_y + info->origin.y + y,
       info->width,
-      info->height
+      info->height,
+      info->optimized_sad
   );
 
   if (cost >= info->best_cost) return false;
@@ -261,8 +270,8 @@ static bool mv_in_merge(const inter_search_info_t *info, vector2d_t mv)
   for (int i = 0; i < info->num_merge_cand; ++i) {
     if (info->merge_cand[i].dir == 3) continue;
     const vector2d_t merge_mv = {
-      info->merge_cand[i].mv[info->merge_cand[i].dir - 1][0] >> 2,
-      info->merge_cand[i].mv[info->merge_cand[i].dir - 1][1] >> 2
+      (info->merge_cand[i].mv[info->merge_cand[i].dir - 1][0] + 2) >> 2,
+      (info->merge_cand[i].mv[info->merge_cand[i].dir - 1][1] + 2) >> 2
     };
     if (merge_mv.x == mv.x && merge_mv.y == mv.y) {
       return true;
@@ -296,8 +305,8 @@ static void select_starting_point(inter_search_info_t *info, vector2d_t extra_mv
   for (unsigned i = 0; i < info->num_merge_cand; ++i) {
     if (info->merge_cand[i].dir == 3) continue;
 
-    int x = info->merge_cand[i].mv[info->merge_cand[i].dir - 1][0] >> 2;
-    int y = info->merge_cand[i].mv[info->merge_cand[i].dir - 1][1] >> 2;
+    int x = (info->merge_cand[i].mv[info->merge_cand[i].dir - 1][0] + 2) >> 2;
+    int y = (info->merge_cand[i].mv[info->merge_cand[i].dir - 1][1] + 2) >> 2;
 
     if (x == 0 && y == 0) continue;
 
@@ -307,32 +316,65 @@ static void select_starting_point(inter_search_info_t *info, vector2d_t extra_mv
 
 
 static uint32_t get_mvd_coding_cost(const encoder_state_t *state,
-                                    vector2d_t *mvd,
-                                    const cabac_data_t* cabac)
+                                    const cabac_data_t* cabac,
+                                    const int32_t mvd_hor,
+                                    const int32_t mvd_ver)
 {
   unsigned bitcost = 0;
-  const vector2d_t abs_mvd = { abs(mvd->x), abs(mvd->y) };
+  const vector2d_t abs_mvd = { abs(mvd_hor), abs(mvd_ver) };
 
-  bitcost += CTX_ENTROPY_BITS(&cabac->ctx.cu_mvd_model[0], abs_mvd.x > 0);
-  if (abs_mvd.x > 0) {
-    bitcost += CTX_ENTROPY_BITS(&cabac->ctx.cu_mvd_model[1], abs_mvd.x > 1);
-    if (abs_mvd.x > 1) {
-      bitcost += get_ep_ex_golomb_bitcost(abs_mvd.x - 2) << CTX_FRAC_BITS;
-    }
-    bitcost += CTX_FRAC_ONE_BIT; // sign
-  }
-
-  bitcost += CTX_ENTROPY_BITS(&cabac->ctx.cu_mvd_model[0], abs_mvd.y > 0);
-  if (abs_mvd.y > 0) {
-    bitcost += CTX_ENTROPY_BITS(&cabac->ctx.cu_mvd_model[1], abs_mvd.y > 1);
-    if (abs_mvd.y > 1) {
-      bitcost += get_ep_ex_golomb_bitcost(abs_mvd.y - 2) << CTX_FRAC_BITS;
-    }
-    bitcost += CTX_FRAC_ONE_BIT; // sign
-  }
+  bitcost += get_ep_ex_golomb_bitcost(abs_mvd.x) << CTX_FRAC_BITS;
+  bitcost += get_ep_ex_golomb_bitcost(abs_mvd.y) << CTX_FRAC_BITS;
 
   // Round and shift back to integer bits.
   return (bitcost + CTX_FRAC_HALF_BIT) >> CTX_FRAC_BITS;
+}
+
+
+static int select_mv_cand(const encoder_state_t *state,
+                          int16_t mv_cand[2][2],
+                          int32_t mv_x,
+                          int32_t mv_y,
+                          uint32_t *cost_out)
+{
+  const bool same_cand =
+    (mv_cand[0][0] == mv_cand[1][0] && mv_cand[0][1] == mv_cand[1][1]);
+
+  if (same_cand && !cost_out) {
+    // Pick the first one if both candidates are the same.
+    return 0;
+  }
+
+  uint32_t (*mvd_coding_cost)(const encoder_state_t * const state,
+                              const cabac_data_t*,
+                              int32_t, int32_t);
+  if (state->encoder_control->cfg.mv_rdo) {
+    mvd_coding_cost = kvz_get_mvd_coding_cost_cabac;
+  } else {
+    mvd_coding_cost = get_mvd_coding_cost;
+  }
+
+  uint32_t cand1_cost = mvd_coding_cost(
+      state, &state->cabac,
+      mv_x - mv_cand[0][0],
+      mv_y - mv_cand[0][1]);
+
+  uint32_t cand2_cost;
+  if (same_cand) {
+    cand2_cost = cand1_cost;
+  } else {
+    cand2_cost = mvd_coding_cost(
+      state, &state->cabac,
+      mv_x - mv_cand[1][0],
+      mv_y - mv_cand[1][1]);
+  }
+
+  if (cost_out) {
+    *cost_out = MIN(cand1_cost, cand2_cost);
+  }
+
+  // Pick the second candidate if it has lower cost.
+  return cand2_cost < cand1_cost ? 1 : 0;
 }
 
 
@@ -348,10 +390,7 @@ static uint32_t calc_mvd_cost(const encoder_state_t *state,
 {
   uint32_t temp_bitcost = 0;
   uint32_t merge_idx;
-  int cand1_cost,cand2_cost;
-  vector2d_t mvd_temp1, mvd_temp2;
   int8_t merged      = 0;
-  int8_t cur_mv_cand = 0;
 
   x *= 1 << mv_shift;
   y *= 1 << mv_shift;
@@ -371,20 +410,10 @@ static uint32_t calc_mvd_cost(const encoder_state_t *state,
   }
 
   // Check mvd cost only if mv is not merged
-  if(!merged) {
-    mvd_temp1.x = x - mv_cand[0][0];
-    mvd_temp1.y = y - mv_cand[0][1];
-    cand1_cost = get_mvd_coding_cost(state, &mvd_temp1, &state->cabac);
-
-    mvd_temp2.x = x - mv_cand[1][0];
-    mvd_temp2.y = y - mv_cand[1][1];
-    cand2_cost = get_mvd_coding_cost(state, &mvd_temp2, &state->cabac);
-
-    // Select candidate 1 if it has lower cost
-    if (cand2_cost < cand1_cost) {
-      cur_mv_cand = 1;
-    }
-    temp_bitcost += cur_mv_cand ? cand2_cost : cand1_cost;
+  if (!merged) {
+    uint32_t mvd_cost = 0;
+    select_mv_cand(state, mv_cand, x, y, &mvd_cost);
+    temp_bitcost += mvd_cost;
   }
   *bitcost = temp_bitcost;
   return temp_bitcost*(int32_t)(state->lambda_sqrt + 0.5);
@@ -442,6 +471,7 @@ static bool early_terminate(inter_search_info_t *info)
 void kvz_tz_pattern_search(inter_search_info_t *info,
                            unsigned pattern_type,
                            const int iDist,
+                           vector2d_t mv,
                            int *best_dist)
 {
   assert(pattern_type < 4);
@@ -537,8 +567,6 @@ void kvz_tz_pattern_search(inter_search_info_t *info,
     };
   }
 
-  const vector2d_t mv = { info->best_mv.x >> 2, info->best_mv.y >> 2 };
-
   // Compute SAD values for all chosen points.
   int best_index = -1;
   for (int i = 0; i < n_points; i++) {
@@ -579,8 +607,9 @@ static void tz_search(inter_search_info_t *info, vector2d_t extra_mv)
   const int iRaster = 5;  // search distance limit and downsampling factor for step 3
   const unsigned step2_type = 0;  // search patterns for steps 2 and 4
   const unsigned step4_type = 0;
-  const bool bRasterRefinementEnable = true;  // enable step 4 mode 1
-  const bool bStarRefinementEnable = false;   // enable step 4 mode 2 (only one mode will be executed)
+  const bool use_raster_scan = false;  // enable step 3
+  const bool use_raster_refinement = false;  // enable step 4 mode 1
+  const bool use_star_refinement = true;   // enable step 4 mode 2 (only one mode will be executed)
 
   int best_dist = 0;
   info->best_cost = UINT32_MAX;
@@ -596,13 +625,33 @@ static void tz_search(inter_search_info_t *info, vector2d_t extra_mv)
     return;
   }
 
-  //step 2, grid search
+  vector2d_t start = { info->best_mv.x >> 2, info->best_mv.y >> 2 };
+
+  // step 2, grid search
+  int rounds_without_improvement = 0;
   for (int iDist = 1; iDist <= iSearchRange; iDist *= 2) {
-    kvz_tz_pattern_search(info, step2_type, iDist, &best_dist);
+    kvz_tz_pattern_search(info, step2_type, iDist, start, &best_dist);
+
+    // Break the loop if the last three rounds didn't produce a better MV.
+    if (best_dist != iDist) rounds_without_improvement++;
+    if (rounds_without_improvement >= 3) break;
+  }
+
+  if (start.x != 0 || start.y != 0) {
+    // repeat step 2 starting from the zero MV
+    start.x = 0;
+    start.y = 0;
+    rounds_without_improvement = 0;
+    for (int iDist = 1; iDist <= iSearchRange/2; iDist *= 2) {
+      kvz_tz_pattern_search(info, step2_type, iDist, start, &best_dist);
+
+      if (best_dist != iDist) rounds_without_improvement++;
+      if (rounds_without_improvement >= 3) break;
+    }
   }
 
   //step 3, raster scan
-  if (best_dist > iRaster) {
+  if (use_raster_scan && best_dist > iRaster) {
     best_dist = iRaster;
     kvz_tz_raster_search(info, iSearchRange, iRaster);
   }
@@ -610,16 +659,21 @@ static void tz_search(inter_search_info_t *info, vector2d_t extra_mv)
   //step 4
 
   //raster refinement
-  if (bRasterRefinementEnable && best_dist > 0) {
+  if (use_raster_refinement && best_dist > 0) {
     for (int iDist = best_dist >> 1; iDist > 0; iDist >>= 1) {
-      kvz_tz_pattern_search(info, step4_type, iDist, &best_dist);
+      start.x = info->best_mv.x >> 2;
+      start.y = info->best_mv.y >> 2;
+      kvz_tz_pattern_search(info, step4_type, iDist, start, &best_dist);
     }
   }
 
   //star refinement (repeat step 2 for the current starting point)
-  if (bStarRefinementEnable && best_dist > 0) {
+  while (use_star_refinement && best_dist > 0) {
+    best_dist = 0;
+    start.x = info->best_mv.x >> 2;
+    start.y = info->best_mv.y >> 2;
     for (int iDist = 1; iDist <= iSearchRange; iDist *= 2) {
-      kvz_tz_pattern_search(info, step4_type, iDist, &best_dist);
+      kvz_tz_pattern_search(info, step4_type, iDist, start, &best_dist);
     }
   }
 }
@@ -630,6 +684,7 @@ static void tz_search(inter_search_info_t *info, vector2d_t extra_mv)
  *
  * \param info      search info
  * \param extra_mv  extra motion vector to check
+ * \param steps     how many steps are done at maximum before exiting, does not affect the final step
  *
  * Motion vector is searched by first searching iteratively with the large
  * hexagon pattern until the best match is at the center of the hexagon.
@@ -640,7 +695,7 @@ static void tz_search(inter_search_info_t *info, vector2d_t extra_mv)
  * the predicted motion vector is way off. In the future even more additional
  * points like 0,0 might be used, such as vectors from top or left.
  */
-static void hexagon_search(inter_search_info_t *info, vector2d_t extra_mv)
+static void hexagon_search(inter_search_info_t *info, vector2d_t extra_mv, uint32_t steps)
 {
   // The start of the hexagonal pattern has been repeated at the end so that
   // the indices between 1-6 can be used as the start of a 3-point list of new
@@ -659,9 +714,10 @@ static void hexagon_search(inter_search_info_t *info, vector2d_t extra_mv)
   //   1
   // 2 0 3
   //   4
-  static const vector2d_t small_hexbs[5] = {
+  static const vector2d_t small_hexbs[9] = {
       { 0, 0 },
-      { 0, -1 }, { -1, 0 }, { 1, 0 }, { 0, 1 }
+      { 0, -1 }, { -1, 0 }, { 1, 0 }, { 0, 1 },
+      { -1, -1 }, { 1, -1 }, { -1, 1 }, { 1, 1 }
   };
 
   info->best_cost = UINT32_MAX;
@@ -679,7 +735,7 @@ static void hexagon_search(inter_search_info_t *info, vector2d_t extra_mv)
 
   vector2d_t mv = { info->best_mv.x >> 2, info->best_mv.y >> 2 };
 
-  // Current best index, either to merge_cands, large_hebx or small_hexbs.
+  // Current best index, either to merge_cands, large_hexbs or small_hexbs.
   int best_index = 0;
 
   // Search the initial 7 points of the hexagon.
@@ -691,7 +747,10 @@ static void hexagon_search(inter_search_info_t *info, vector2d_t extra_mv)
 
   // Iteratively search the 3 new points around the best match, until the best
   // match is in the center.
-  while (best_index != 0) {
+  while (best_index != 0 && steps != 0) {
+    // decrement count if enabled
+    if (steps > 0) steps -= 1;
+
     // Starting point of the 3 offsets to be searched.
     unsigned start;
     if (best_index == 1) {
@@ -717,14 +776,118 @@ static void hexagon_search(inter_search_info_t *info, vector2d_t extra_mv)
   }
 
   // Move the center to the best match.
-  mv.x += large_hexbs[best_index].x;
-  mv.y += large_hexbs[best_index].y;
-  best_index = 0;
+  //mv.x += large_hexbs[best_index].x;
+  //mv.y += large_hexbs[best_index].y;
 
   // Do the final step of the search with a small pattern.
-  for (int i = 1; i < 5; ++i) {
+  for (int i = 1; i < 9; ++i) {
     check_mv_cost(info, mv.x + small_hexbs[i].x, mv.y + small_hexbs[i].y);
   }
+}
+
+/**
+* \brief Do motion search using the diamond algorithm.
+*
+* \param info      search info
+* \param extra_mv  extra motion vector to check
+* \param steps     how many steps are done at maximum before exiting
+*
+* Motion vector is searched by searching iteratively with a diamond-shaped
+* pattern. We take care of not checking the direction we came from, but
+* further checking for avoiding visits to already visited points is not done.
+*
+* If a non 0,0 predicted motion vector predictor is given as extra_mv,
+* the 0,0 vector is also tried. This is hoped to help in the case where
+* the predicted motion vector is way off. In the future even more additional
+* points like 0,0 might be used, such as vectors from top or left.
+**/
+static void diamond_search(inter_search_info_t *info, vector2d_t extra_mv, uint32_t steps) 
+{
+  enum diapos {
+    DIA_UP = 0,
+    DIA_RIGHT = 1,
+    DIA_LEFT = 2,
+    DIA_DOWN = 3,
+    DIA_CENTER = 4,
+  };
+
+  // a diamond shape with the center included
+  //   0
+  // 2 4 1
+  //   3
+  static const vector2d_t diamond[5] = {
+    {0, -1}, {1, 0}, {0, 1}, {-1, 0},
+    {0, 0}
+  };
+
+  info->best_cost = UINT32_MAX;
+
+  // Select starting point from among merge candidates. These should
+  // include both mv_cand vectors and (0, 0).
+  select_starting_point(info, extra_mv);
+
+  // Check if we should stop search
+  if (info->state->encoder_control->cfg.me_early_termination &&
+    early_terminate(info))
+  {
+    return;
+  }
+  
+  // current motion vector
+  vector2d_t mv = { info->best_mv.x >> 2, info->best_mv.y >> 2 };
+
+  // current best index
+  enum diapos best_index = DIA_CENTER;
+
+  // initial search of the points of the diamond
+  for (int i = 0; i < 5; ++i) {
+    if (check_mv_cost(info, mv.x + diamond[i].x, mv.y + diamond[i].y)) {
+      best_index = i;
+    }
+  }
+
+  if (best_index == DIA_CENTER) {
+    // the center point was the best in initial check
+    return;
+  }
+
+  // Move the center to the best match.
+  mv.x += diamond[best_index].x;
+  mv.y += diamond[best_index].y;
+
+  // the arrival direction, the index of the diamond member that will be excluded
+  enum diapos from_dir = DIA_CENTER;
+
+  // whether we found a better candidate this iteration
+  uint8_t better_found;
+
+  do {
+    better_found = 0;
+    // decrement count if enabled
+    if (steps > 0) steps -= 1;
+
+    // search the points of the diamond
+    for (int i = 0; i < 4; ++i) {
+      // this is where we came from so it's checked already
+      if (i == from_dir) continue;
+
+      if (check_mv_cost(info, mv.x + diamond[i].x, mv.y + diamond[i].y)) {
+        best_index = i;
+        better_found = 1;
+      }
+    }
+
+    if (better_found) {
+      // Move the center to the best match.
+      mv.x += diamond[best_index].x;
+      mv.y += diamond[best_index].y;
+
+      // record where we came from to the next iteration
+      // the xor operation flips the orientation
+      from_dir = best_index ^ 0x3;
+    }
+  } while (better_found && steps != 0);
+  // and we're done
 }
 
 
@@ -830,65 +993,39 @@ static void search_frac(inter_search_info_t *info)
   unsigned costs[4] = { 0 };
 
   kvz_extended_block src = { 0, 0, 0, 0 };
+  ALIGNED(64) kvz_pixel filtered[4][LCU_WIDTH * LCU_WIDTH];
 
-  // Buffers for interpolated fractional pixels one 
-  // for each position excluding the integer position.
-  // Has one extra column on left and row on top because
-  // samples are used also from those integer pixels when
-  // searching positions to the left and up.
-  frac_search_block fracpel_blocks[15];
-  
-  kvz_pixel *hpel_pos[8];
-  
-  // Horizontal hpel positions
-  hpel_pos[0] = fracpel_blocks[HPEL_POS_HOR] + (LCU_WIDTH + 1);
-  hpel_pos[1] = fracpel_blocks[HPEL_POS_HOR] + (LCU_WIDTH + 1) + 1;
-  
-  // Vertical hpel positions
-  hpel_pos[2] = fracpel_blocks[HPEL_POS_VER] + 1;
-  hpel_pos[3] = fracpel_blocks[HPEL_POS_VER] + (LCU_WIDTH + 1) + 1;
-  
-  // Diagonal hpel positions
-  hpel_pos[4] = fracpel_blocks[HPEL_POS_DIA];
-  hpel_pos[5] = fracpel_blocks[HPEL_POS_DIA] + 1;
-  hpel_pos[6] = fracpel_blocks[HPEL_POS_DIA] + (LCU_WIDTH + 1);
-  hpel_pos[7] = fracpel_blocks[HPEL_POS_DIA] + (LCU_WIDTH + 1) + 1;
+  // Storage buffers for intermediate horizontally filtered results.
+  // Have the first columns in contiguous memory for vectorization.
+  ALIGNED(64) int16_t intermediate[5][(KVZ_EXT_BLOCK_W_LUMA + 1) * LCU_WIDTH];
+  int16_t hor_first_cols[5][KVZ_EXT_BLOCK_W_LUMA + 1];
 
   const kvz_picture *ref = info->ref;
   const kvz_picture *pic = info->pic;
   vector2d_t orig = info->origin;
   const int width = info->width;
   const int height = info->height;
+  const int internal_width  = ((width  + 7) >> 3) << 3; // Round up to closest 8
+  const int internal_height = ((height + 7) >> 3) << 3;
 
   const encoder_state_t *state = info->state;
   int fme_level = state->encoder_control->cfg.fme_level;
+  int8_t sample_off_x = 0;
+  int8_t sample_off_y = 0;
 
   kvz_get_extended_block(orig.x, orig.y, mv.x - 1, mv.y - 1,
                 state->tile->offset_x,
                 state->tile->offset_y,
-                ref->y, ref->width, ref->height, FILTER_SIZE,
-                width+1, height+1,
+                ref->y, ref->width, ref->height, KVZ_LUMA_FILTER_TAPS,
+                internal_width+1, internal_height+1,
                 &src);
 
-  kvz_filter_frac_blocks_luma(state->encoder_control,
-                              src.orig_topleft,
-                              src.stride,
-                              width,
-                              height,
-                              fracpel_blocks,
-                              fme_level);
-
-  kvz_pixel tmp_pic[LCU_WIDTH*LCU_WIDTH];
-  kvz_pixels_blit(pic->y + orig.y * pic->stride + orig.x,
-                  tmp_pic,
-                  width,
-                  height,
-                  pic->stride,
-                  width);
-
+  kvz_pixel *tmp_pic = pic->y + orig.y * pic->stride + orig.x;
+  int tmp_stride = pic->stride;
+                  
   // Search integer position
   costs[0] = kvz_satd_any_size(width, height,
-                            tmp_pic, width,
+                            tmp_pic, tmp_stride,
                             src.orig_topleft + src.stride + 1, src.stride);
 
   costs[0] += info->mvd_cost_func(state,
@@ -900,31 +1037,51 @@ static void search_frac(inter_search_info_t *info)
                                   &bitcosts[0]);
   best_cost = costs[0];
   best_bitcost = bitcosts[0];
-
-  int last_hpel_index = (fme_level == 1) ? 4 : 8;
-
+  
   //Set mv to half-pixel precision
   mv.x *= 2;
   mv.y *= 2;
 
+  ipol_blocks_func * filter_steps[4] = {
+    kvz_filter_hpel_blocks_hor_ver_luma,
+    kvz_filter_hpel_blocks_diag_luma,
+    kvz_filter_qpel_blocks_hor_ver_luma,
+    kvz_filter_qpel_blocks_diag_luma,
+  };
+
   // Search halfpel positions around best integer mv
-  for (int i = 1; i <= last_hpel_index; i += 4) {
+  int i = 1;
+  for (int step = 0; step < fme_level; ++step){
+
+    const int mv_shift = (step < 2) ? 1 : 0;
+
+    filter_steps[step](state->encoder_control,
+      src.orig_topleft,
+      src.stride,
+      internal_width,
+      internal_height,
+      filtered,
+      intermediate,
+      fme_level,
+      hor_first_cols,
+      sample_off_x,
+      sample_off_y);
+          
     const vector2d_t *pattern[4] = { &square[i], &square[i + 1], &square[i + 2], &square[i + 3] };
 
     int8_t within_tile[4];
     for (int j = 0; j < 4; j++) {
       within_tile[j] =
-        fracmv_within_tile(info, (mv.x + pattern[j]->x) * 2, (mv.y + pattern[j]->y) * 2);
+        fracmv_within_tile(info, (mv.x + pattern[j]->x) * (1 << mv_shift), (mv.y + pattern[j]->y) * (1 << mv_shift));
     };
 
-    int hpel_strides[4] = {
-      (LCU_WIDTH + 1),
-      (LCU_WIDTH + 1),
-      (LCU_WIDTH + 1),
-      (LCU_WIDTH + 1)
-    };
+    kvz_pixel *filtered_pos[4] = { 0 };
+    filtered_pos[0] = &filtered[0][0];
+    filtered_pos[1] = &filtered[1][0];
+    filtered_pos[2] = &filtered[2][0];
+    filtered_pos[3] = &filtered[3][0];
 
-    kvz_satd_any_size_quad(width, height, (const kvz_pixel**)(hpel_pos + i - 1), hpel_strides, tmp_pic, width, 4, costs, within_tile);
+    kvz_satd_any_size_quad(width, height, (const kvz_pixel **)filtered_pos, LCU_WIDTH, tmp_pic, tmp_stride, 4, costs, within_tile);
 
     for (int j = 0; j < 4; j++) {
       if (within_tile[j]) {
@@ -932,7 +1089,7 @@ static void search_frac(inter_search_info_t *info)
             state,
             mv.x + pattern[j]->x,
             mv.y + pattern[j]->y,
-            1,
+            mv_shift,
             info->mv_cand,
             info->merge_cand,
             info->num_merge_cand,
@@ -949,108 +1106,26 @@ static void search_frac(inter_search_info_t *info)
         best_index = i + j;
       }
     }
-  }
 
-  unsigned int best_hpel_index = best_index;
+    i += 4;
 
-  // Move search to best_index
-  mv.x += square[best_index].x;
-  mv.y += square[best_index].y;
+    // Update mv for the best position on current precision
+    if (step == 1 || step == fme_level - 1) {
+      // Move search to best_index
+      mv.x += square[best_index].x;
+      mv.y += square[best_index].y;
 
-  //Set mv to quarterpel precision
-  mv.x *= 2;
-  mv.y *= 2;
-
-  if (fme_level >= 3) {
-
-    best_index = 0;
-
-    int last_qpel_index = (fme_level == 3) ? 4 : 8;
-
-    //Search quarterpel points around best halfpel mv
-    for (int i = 1; i <= last_qpel_index; i += 4) {
-      const vector2d_t *pattern[4] = { &square[i], &square[i + 1], &square[i + 2], &square[i + 3] };
-
-      int8_t within_tile[4];
-      for (int j = 0; j < 4; j++) {
-        within_tile[j] =
-          fracmv_within_tile(info, mv.x + pattern[j]->x, mv.y + pattern[j]->y);
-      }
-
-      int qpel_indices[4] = { 0 };
-      int int_offset_x[4] = { 0 };
-      int int_offset_y[4] = { 0 };
-
-      for (int j = 0; j < 4; ++j) {
-        int hpel_offset_x = square[best_hpel_index].x;
-        int hpel_offset_y = square[best_hpel_index].y;
-
-        int qpel_offset_x = 2 * hpel_offset_x + pattern[j]->x;
-        int qpel_offset_y = 2 * hpel_offset_y + pattern[j]->y;
-
-        unsigned qpel_filter_x = (qpel_offset_x + 4) % 4;
-        unsigned qpel_filter_y = (qpel_offset_y + 4) % 4;
-
-        // The first value (-1) is for the integer position and
-        // it will not be used
-        int filters_to_block_idx[4][4] = {
-            { -1, 3, 0, 4 },
-            { 7, 11, 8, 12 },
-            { 1, 5, 2, 6 },
-            { 9, 13, 10, 14 }
-        };
-
-        qpel_indices[j] = filters_to_block_idx[qpel_filter_y][qpel_filter_x];
-
-        // Select values filtered from correct integer samples
-        int_offset_x[j] = qpel_offset_x >= 0;
-        int_offset_y[j] = qpel_offset_y >= 0;
-      }
-
-      kvz_pixel *qpel_pos[4] = {
-        fracpel_blocks[qpel_indices[0]] + int_offset_y[0] * (LCU_WIDTH + 1) + int_offset_x[0],
-        fracpel_blocks[qpel_indices[1]] + int_offset_y[1] * (LCU_WIDTH + 1) + int_offset_x[1],
-        fracpel_blocks[qpel_indices[2]] + int_offset_y[2] * (LCU_WIDTH + 1) + int_offset_x[2],
-        fracpel_blocks[qpel_indices[3]] + int_offset_y[3] * (LCU_WIDTH + 1) + int_offset_x[3]
-      };
-
-      int qpel_strides[4] = {
-        (LCU_WIDTH + 1),
-        (LCU_WIDTH + 1),
-        (LCU_WIDTH + 1),
-        (LCU_WIDTH + 1)
-      };
-
-      kvz_satd_any_size_quad(width, height, (const kvz_pixel**)qpel_pos, qpel_strides, tmp_pic, width, 4, costs, within_tile);
-
-      for (int j = 0; j < 4; j++) {
-        if (within_tile[j]) {
-          costs[j] += info->mvd_cost_func(
-              state,
-              mv.x + pattern[j]->x,
-              mv.y + pattern[j]->y,
-              0,
-              info->mv_cand,
-              info->merge_cand,
-              info->num_merge_cand,
-              info->ref_idx,
-              &bitcosts[j]
-          );
-        }
-      }
-
-      for (int j = 0; j < 4; ++j) {
-        if (within_tile[j] && costs[j] < best_cost) {
-          best_cost = costs[j];
-          best_bitcost = bitcosts[j];
-          best_index = i + j;
-        }
+      // On last hpel step...
+      if (step == MIN(fme_level - 1, 1)) {
+        //Set mv to quarterpel precision
+        mv.x *= 2;
+        mv.y *= 2;
+        sample_off_x = square[best_index].x;
+        sample_off_y = square[best_index].y;
+        best_index = 0;
+        i = 1;
       }
     }
-
-    //Set mv to best final best match
-    mv.x += square[best_index].x;
-    mv.y += square[best_index].y;
   }
 
   info->best_mv = mv;
@@ -1162,8 +1237,12 @@ static void search_pu_inter_ref(inter_search_info_t *info,
       search_mv_full(info, search_range, mv);
       break;
 
+    case KVZ_IME_DIA:
+      diamond_search(info, mv, info->state->encoder_control->cfg.me_max_steps);
+      break;
+
     default:
-      hexagon_search(info, mv);
+      hexagon_search(info, mv, info->state->encoder_control->cfg.me_max_steps);
       break;
   }
 
@@ -1203,30 +1282,9 @@ static void search_pu_inter_ref(inter_search_info_t *info,
 
   // Only check when candidates are different
   int cu_mv_cand = 0;
-  if (!merged && (
-        info->mv_cand[0][0] != info->mv_cand[1][0] ||
-        info->mv_cand[0][1] != info->mv_cand[1][1]))
-  {
-    uint32_t (*mvd_coding_cost)(const encoder_state_t * const state,
-                                vector2d_t *,
-                                const cabac_data_t*) =
-      cfg->mv_rdo ? kvz_get_mvd_coding_cost_cabac : get_mvd_coding_cost;
-
-    vector2d_t mvd_temp1, mvd_temp2;
-    int cand1_cost,cand2_cost;
-
-    mvd_temp1.x = mv.x - info->mv_cand[0][0];
-    mvd_temp1.y = mv.y - info->mv_cand[0][1];
-    cand1_cost = mvd_coding_cost(info->state, &mvd_temp1, &info->state->cabac);
-
-    mvd_temp2.x = mv.x - info->mv_cand[1][0];
-    mvd_temp2.y = mv.y - info->mv_cand[1][1];
-    cand2_cost = mvd_coding_cost(info->state, &mvd_temp2, &info->state->cabac);
-
-    // Select candidate 1 if it has lower cost
-    if (cand2_cost < cand1_cost) {
-      cu_mv_cand = 1;
-    }
+  if (!merged) {
+    cu_mv_cand =
+      select_mv_cand(info->state, info->mv_cand, mv.x, mv.y, NULL);
   }
 
   if (info->best_cost < *inter_cost) {
@@ -1247,6 +1305,141 @@ static void search_pu_inter_ref(inter_search_info_t *info,
   }
 }
 
+
+/**
+ * \brief Search bipred modes for a PU.
+ */
+static void search_pu_inter_bipred(inter_search_info_t *info,
+                                   int depth,
+                                   lcu_t *lcu, cu_info_t *cur_cu,
+                                   double *inter_cost,
+                                   uint32_t *inter_bitcost)
+{
+  const image_list_t *const ref = info->state->frame->ref;
+  uint8_t (*ref_LX)[16] = info->state->frame->ref_LX;
+  const videoframe_t * const frame = info->state->tile->frame;
+  const int x         = info->origin.x;
+  const int y         = info->origin.y;
+  const int width     = info->width;
+  const int height    = info->height;
+
+  static const uint8_t priorityList0[] = { 0, 1, 0, 2, 1, 2, 0, 3, 1, 3, 2, 3 };
+  static const uint8_t priorityList1[] = { 1, 0, 2, 0, 2, 1, 3, 0, 3, 1, 3, 2 };
+  const unsigned num_cand_pairs =
+    MIN(info->num_merge_cand * (info->num_merge_cand - 1), 12);
+
+  inter_merge_cand_t *merge_cand = info->merge_cand;
+
+  for (int32_t idx = 0; idx < num_cand_pairs; idx++) {
+    uint8_t i = priorityList0[idx];
+    uint8_t j = priorityList1[idx];
+    if (i >= info->num_merge_cand || j >= info->num_merge_cand) break;
+
+    // Find one L0 and L1 candidate according to the priority list
+    if (!(merge_cand[i].dir & 0x1) || !(merge_cand[j].dir & 0x2)) continue;
+
+    if (ref_LX[0][merge_cand[i].ref[0]] == ref_LX[1][merge_cand[j].ref[1]] &&
+        merge_cand[i].mv[0][0] == merge_cand[j].mv[1][0] &&
+        merge_cand[i].mv[0][1] == merge_cand[j].mv[1][1])
+    {
+      continue;
+    }
+
+    int16_t mv[2][2];
+    mv[0][0] = merge_cand[i].mv[0][0];
+    mv[0][1] = merge_cand[i].mv[0][1];
+    mv[1][0] = merge_cand[j].mv[1][0];
+    mv[1][1] = merge_cand[j].mv[1][1];
+
+    // Don't try merge candidates that don't satisfy mv constraints.
+    if (!fracmv_within_tile(info, mv[0][0], mv[0][1]) ||
+        !fracmv_within_tile(info, mv[1][0], mv[1][1]))
+    {
+      continue;
+    }
+
+    kvz_inter_recon_bipred(info->state,
+                           ref->images[ref_LX[0][merge_cand[i].ref[0]]],
+                           ref->images[ref_LX[1][merge_cand[j].ref[1]]],
+                           x, y,
+                           width,
+                           height,
+                           mv,
+                           lcu);
+
+    const kvz_pixel *rec = &lcu->rec.y[SUB_SCU(y) * LCU_WIDTH + SUB_SCU(x)];
+    const kvz_pixel *src = &frame->source->y[x + y * frame->source->width];
+    uint32_t cost =
+      kvz_satd_any_size(width, height, rec, LCU_WIDTH, src, frame->source->width);
+
+    uint32_t bitcost[2] = { 0, 0 };
+
+    cost += info->mvd_cost_func(info->state,
+                               merge_cand[i].mv[0][0],
+                               merge_cand[i].mv[0][1],
+                               0,
+                               info->mv_cand,
+                               NULL, 0, 0,
+                               &bitcost[0]);
+    cost += info->mvd_cost_func(info->state,
+                               merge_cand[i].mv[1][0],
+                               merge_cand[i].mv[1][1],
+                               0,
+                               info->mv_cand,
+                               NULL, 0, 0,
+                               &bitcost[1]);
+
+    const uint8_t mv_ref_coded[2] = {
+      merge_cand[i].ref[0],
+      merge_cand[j].ref[1]
+    };
+    const int extra_bits = mv_ref_coded[0] + mv_ref_coded[1] + 2 /* mv dir cost */;
+    cost += info->state->lambda_sqrt * extra_bits + 0.5;
+
+    if (cost < *inter_cost) {
+      cur_cu->inter.mv_dir = 3;
+
+      cur_cu->inter.mv_ref[0] = merge_cand[i].ref[0];
+      cur_cu->inter.mv_ref[1] = merge_cand[j].ref[1];
+
+      cur_cu->inter.mv[0][0] = merge_cand[i].mv[0][0];
+      cur_cu->inter.mv[0][1] = merge_cand[i].mv[0][1];
+      cur_cu->inter.mv[1][0] = merge_cand[j].mv[1][0];
+      cur_cu->inter.mv[1][1] = merge_cand[j].mv[1][1];
+      cur_cu->merged = 0;
+
+      // Check every candidate to find a match
+      for (int merge_idx = 0; merge_idx < info->num_merge_cand; merge_idx++) {
+        if (merge_cand[merge_idx].mv[0][0] == cur_cu->inter.mv[0][0] &&
+            merge_cand[merge_idx].mv[0][1] == cur_cu->inter.mv[0][1] &&
+            merge_cand[merge_idx].mv[1][0] == cur_cu->inter.mv[1][0] &&
+            merge_cand[merge_idx].mv[1][1] == cur_cu->inter.mv[1][1] &&
+            merge_cand[merge_idx].ref[0] == cur_cu->inter.mv_ref[0] &&
+            merge_cand[merge_idx].ref[1] == cur_cu->inter.mv_ref[1])
+        {
+          cur_cu->merged = 1;
+          cur_cu->merge_idx = merge_idx;
+          break;
+        }
+      }
+
+      // Each motion vector has its own candidate
+      for (int reflist = 0; reflist < 2; reflist++) {
+        kvz_inter_get_mv_cand(info->state, x, y, width, height, info->mv_cand, cur_cu, lcu, reflist);
+        int cu_mv_cand = select_mv_cand(
+            info->state,
+            info->mv_cand,
+            cur_cu->inter.mv[reflist][0],
+            cur_cu->inter.mv[reflist][1],
+            NULL);
+        CU_SET_MV_CAND(cur_cu, reflist, cu_mv_cand);
+      }
+
+      *inter_cost = cost;
+      *inter_bitcost = bitcost[0] + bitcost[1] + extra_bits;
+    }
+  }
+}
 
 /**
  * \brief Update PU to have best modes at this depth.
@@ -1300,6 +1493,7 @@ static void search_pu_inter(encoder_state_t * const state,
     .width          = width,
     .height         = height,
     .mvd_cost_func  = cfg->mv_rdo ? kvz_calc_mvd_cost_cabac : calc_mvd_cost,
+    .optimized_sad  = kvz_get_optimized_sad(width),
   };
 
   // Search for merge mode candidates
@@ -1316,6 +1510,90 @@ static void search_pu_inter(encoder_state_t * const state,
   CU_SET_MV_CAND(cur_cu, 0, 0);
   CU_SET_MV_CAND(cur_cu, 1, 0);
 
+  // Early Skip Mode Decision
+  if (cfg->early_skip && cur_cu->part_size == SIZE_2Nx2N) {
+
+    int num_rdo_cands = 0;
+    int8_t mrg_cands[MRG_MAX_NUM_CANDS] = { 0, 1, 2, 3, 4 };
+    double mrg_costs[MRG_MAX_NUM_CANDS] = { MAX_DOUBLE };
+
+    // Check motion vector constraints and perform rough search
+    for (int merge_idx = 0; merge_idx < info.num_merge_cand; ++merge_idx) {
+
+      cur_cu->inter.mv_dir = info.merge_cand[merge_idx].dir;
+      cur_cu->inter.mv_ref[0] = info.merge_cand[merge_idx].ref[0];
+      cur_cu->inter.mv_ref[1] = info.merge_cand[merge_idx].ref[1];
+      cur_cu->inter.mv[0][0] = info.merge_cand[merge_idx].mv[0][0];
+      cur_cu->inter.mv[0][1] = info.merge_cand[merge_idx].mv[0][1];
+      cur_cu->inter.mv[1][0] = info.merge_cand[merge_idx].mv[1][0];
+      cur_cu->inter.mv[1][1] = info.merge_cand[merge_idx].mv[1][1];
+
+      // Don't try merge candidates that don't satisfy mv constraints.
+      if (!fracmv_within_tile(&info, cur_cu->inter.mv[0][0], cur_cu->inter.mv[0][1]) ||
+          !fracmv_within_tile(&info, cur_cu->inter.mv[1][0], cur_cu->inter.mv[1][1]))
+      {
+        continue;
+      }
+
+      if (cfg->rdo >= 2) {
+
+        kvz_lcu_fill_trdepth(lcu, x, y, depth, depth);
+        kvz_inter_recon_cu(state, lcu, x, y, width);
+        mrg_costs[merge_idx] = kvz_satd_any_size(width, height,
+          lcu->rec.y + y_local * LCU_WIDTH + x_local, LCU_WIDTH,
+          lcu->ref.y + y_local * LCU_WIDTH + x_local, LCU_WIDTH);
+      }
+
+      num_rdo_cands++;
+    }
+
+
+    if (cfg->rdo >= 2) {
+      // Sort candidates by cost
+      kvz_sort_modes(mrg_cands, mrg_costs, num_rdo_cands);
+    }
+
+    // Limit by availability
+    // TODO: Do not limit to just 1
+    num_rdo_cands = MIN(1, num_rdo_cands);
+
+    // RDO search
+    for (int merge_rdo_idx = 0; merge_rdo_idx < num_rdo_cands; ++merge_rdo_idx) {
+
+      // Reconstruct blocks with merge candidate.
+      // Check luma CBF. Then, check chroma CBFs if luma CBF is not set
+      // and chroma exists.
+      // Early terminate if merge candidate with zero CBF is found.
+      int merge_idx = mrg_cands[merge_rdo_idx];
+      cur_cu->inter.mv_dir = info.merge_cand[merge_idx].dir;
+      cur_cu->inter.mv_ref[0] = info.merge_cand[merge_idx].ref[0];
+      cur_cu->inter.mv_ref[1] = info.merge_cand[merge_idx].ref[1];
+      cur_cu->inter.mv[0][0] = info.merge_cand[merge_idx].mv[0][0];
+      cur_cu->inter.mv[0][1] = info.merge_cand[merge_idx].mv[0][1];
+      cur_cu->inter.mv[1][0] = info.merge_cand[merge_idx].mv[1][0];
+      cur_cu->inter.mv[1][1] = info.merge_cand[merge_idx].mv[1][1];
+      kvz_lcu_fill_trdepth(lcu, x, y, depth, MAX(1, depth));
+      kvz_inter_recon_cu(state, lcu, x, y, width);
+      kvz_quantize_lcu_residual(state, true, false, x, y, depth, cur_cu, lcu);
+
+      if (cbf_is_set(cur_cu->cbf, depth, COLOR_Y)) {
+        continue;
+      }
+      else if(state->encoder_control->chroma_format != KVZ_CSP_400) {
+
+        kvz_quantize_lcu_residual(state, false, true, x, y, depth, cur_cu, lcu);
+        if (!cbf_is_set_any(cur_cu->cbf, depth)) {
+          cur_cu->type = CU_INTER;
+          cur_cu->merge_idx = merge_idx;
+          cur_cu->skipped = true;
+          *inter_cost = 0.0;  // TODO: Check this
+          *inter_bitcost = 0; // TODO: Check this
+          return;
+        }
+      }
+    }
+  }
+
   for (int ref_idx = 0; ref_idx < state->frame->ref->used_size; ref_idx++) {
     info.ref_idx = ref_idx;
     info.ref = state->frame->ref->images[ref_idx];
@@ -1329,164 +1607,59 @@ static void search_pu_inter(encoder_state_t * const state,
     && width + height >= 16; // 4x8 and 8x4 PBs are restricted to unipred
 
   if (can_use_bipred) {
-    lcu_t *templcu = MALLOC(lcu_t, 1);
-    unsigned cu_width = LCU_WIDTH >> depth;
-    static const uint8_t priorityList0[] = { 0, 1, 0, 2, 1, 2, 0, 3, 1, 3, 2, 3 };
-    static const uint8_t priorityList1[] = { 1, 0, 2, 0, 2, 1, 3, 0, 3, 1, 3, 2 };
-    const unsigned num_cand_pairs =
-      MIN(info.num_merge_cand * (info.num_merge_cand - 1), 12);
-
-    inter_merge_cand_t *merge_cand = info.merge_cand;
-
-    for (int32_t idx = 0; idx < num_cand_pairs; idx++) {
-      uint8_t i = priorityList0[idx];
-      uint8_t j = priorityList1[idx];
-      if (i >= info.num_merge_cand || j >= info.num_merge_cand) break;
-
-      // Find one L0 and L1 candidate according to the priority list
-      if ((merge_cand[i].dir & 0x1) && (merge_cand[j].dir & 0x2)) {
-        if (state->frame->ref_LX[0][merge_cand[i].ref[0]] !=
-            state->frame->ref_LX[1][merge_cand[j].ref[1]] ||
-
-            merge_cand[i].mv[0][0] != merge_cand[j].mv[1][0] ||
-            merge_cand[i].mv[0][1] != merge_cand[j].mv[1][1])
-        {
-          uint32_t bitcost[2];
-          uint32_t cost = 0;
-          int8_t cu_mv_cand = 0;
-          int16_t mv[2][2];
-          kvz_pixel tmp_block[64 * 64];
-          kvz_pixel tmp_pic[64 * 64];
-
-          mv[0][0] = merge_cand[i].mv[0][0];
-          mv[0][1] = merge_cand[i].mv[0][1];
-          mv[1][0] = merge_cand[j].mv[1][0];
-          mv[1][1] = merge_cand[j].mv[1][1];
-
-          // Don't try merge candidates that don't satisfy mv constraints.
-          if (!fracmv_within_tile(&info, mv[0][0], mv[0][1]) ||
-              !fracmv_within_tile(&info, mv[1][0], mv[1][1]))
-          {
-            continue;
-          }
-
-          kvz_inter_recon_lcu_bipred(state,
-                                     state->frame->ref->images[
-                                       state->frame->ref_LX[0][merge_cand[i].ref[0]]
-                                     ],
-                                     state->frame->ref->images[
-                                       state->frame->ref_LX[1][merge_cand[j].ref[1]]
-                                     ],
-                                     x, y,
-                                     width,
-                                     height,
-                                     mv,
-                                     templcu);
-
-          for (int ypos = 0; ypos < height; ++ypos) {
-            int dst_y = ypos * width;
-            for (int xpos = 0; xpos < width; ++xpos) {
-              tmp_block[dst_y + xpos] = templcu->rec.y[
-                SUB_SCU(y + ypos) * LCU_WIDTH + SUB_SCU(x + xpos)];
-              tmp_pic[dst_y + xpos] = frame->source->y[x + xpos + (y + ypos)*frame->source->width];
-            }
-          }
-
-          cost = kvz_satd_any_size(cu_width, cu_width, tmp_pic, cu_width, tmp_block, cu_width);
-
-          cost += info.mvd_cost_func(state,
-                                     merge_cand[i].mv[0][0],
-                                     merge_cand[i].mv[0][1],
-                                     0,
-                                     info.mv_cand,
-                                     NULL, 0, 0,
-                                     &bitcost[0]);
-          cost += info.mvd_cost_func(state,
-                                     merge_cand[i].mv[1][0],
-                                     merge_cand[i].mv[1][1],
-                                     0,
-                                     info.mv_cand,
-                                     NULL, 0, 0,
-                                     &bitcost[1]);
-
-          const uint8_t mv_ref_coded[2] = {
-            merge_cand[i].ref[0],
-            merge_cand[j].ref[1]
-          };
-          const int extra_bits = mv_ref_coded[0] + mv_ref_coded[1] + 2 /* mv dir cost */;
-          cost += state->lambda_sqrt * extra_bits + 0.5;
-
-
-          if (cost < *inter_cost) {
-            cur_cu->inter.mv_dir = 3;
-
-            cur_cu->inter.mv_ref[0] = merge_cand[i].ref[0];
-            cur_cu->inter.mv_ref[1] = merge_cand[j].ref[1];
-
-            cur_cu->inter.mv[0][0] = merge_cand[i].mv[0][0];
-            cur_cu->inter.mv[0][1] = merge_cand[i].mv[0][1];
-            cur_cu->inter.mv[1][0] = merge_cand[j].mv[1][0];
-            cur_cu->inter.mv[1][1] = merge_cand[j].mv[1][1];
-            cur_cu->merged = 0;
-
-            // Check every candidate to find a match
-            for (int merge_idx = 0; merge_idx < info.num_merge_cand; merge_idx++) {
-              if (merge_cand[merge_idx].mv[0][0] == cur_cu->inter.mv[0][0] &&
-                  merge_cand[merge_idx].mv[0][1] == cur_cu->inter.mv[0][1] &&
-                  merge_cand[merge_idx].mv[1][0] == cur_cu->inter.mv[1][0] &&
-                  merge_cand[merge_idx].mv[1][1] == cur_cu->inter.mv[1][1] &&
-                  merge_cand[merge_idx].ref[0] == cur_cu->inter.mv_ref[0] &&
-                  merge_cand[merge_idx].ref[1] == cur_cu->inter.mv_ref[1])
-              {
-                cur_cu->merged = 1;
-                cur_cu->merge_idx = merge_idx;
-                break;
-              }
-            }
-
-            // Each motion vector has its own candidate
-            for (int reflist = 0; reflist < 2; reflist++) {
-              cu_mv_cand = 0;
-              kvz_inter_get_mv_cand(state, x, y, width, height, info.mv_cand, cur_cu, lcu, reflist);
-              if (info.mv_cand[0][0] != info.mv_cand[1][0] ||
-                  info.mv_cand[0][1] != info.mv_cand[1][1])
-              {
-                uint32_t (*mvd_coding_cost)(const encoder_state_t * const state,
-                                            vector2d_t *,
-                                            const cabac_data_t*) =
-                  cfg->mv_rdo ? kvz_get_mvd_coding_cost_cabac : get_mvd_coding_cost;
-
-                vector2d_t mvd_temp1, mvd_temp2;
-                int cand1_cost, cand2_cost;
-
-                mvd_temp1.x = cur_cu->inter.mv[reflist][0] - info.mv_cand[0][0];
-                mvd_temp1.y = cur_cu->inter.mv[reflist][1] - info.mv_cand[0][1];
-                cand1_cost = mvd_coding_cost(state, &mvd_temp1, (cabac_data_t*)&state->cabac);
-
-                mvd_temp2.x = cur_cu->inter.mv[reflist][0] - info.mv_cand[1][0];
-                mvd_temp2.y = cur_cu->inter.mv[reflist][1] - info.mv_cand[1][1];
-                cand2_cost = mvd_coding_cost(state, &mvd_temp2, (cabac_data_t*)&state->cabac);
-
-                // Select candidate 1 if it has lower cost
-                if (cand2_cost < cand1_cost) {
-                  cu_mv_cand = 1;
-                }
-              }
-              CU_SET_MV_CAND(cur_cu, reflist, cu_mv_cand);
-            }
-
-            *inter_cost = cost;
-            *inter_bitcost = bitcost[0] + bitcost[1] + extra_bits;
-          }
-        }
-      }
-    }
-    FREE_POINTER(templcu);
+    search_pu_inter_bipred(&info, depth, lcu, cur_cu, inter_cost, inter_bitcost);
   }
 
   if (*inter_cost < INT_MAX && cur_cu->inter.mv_dir == 1) {
     assert(fracmv_within_tile(&info, cur_cu->inter.mv[0][0], cur_cu->inter.mv[0][1]));
   }
+}
+
+/**
+* \brief Calculate inter coding cost for luma and chroma CBs (--rd=2 accuracy).
+*
+* Calculate inter coding cost of each CB. This should match the intra coding cost
+* calculation that is used on this RDO accuracy, since CU type decision is based
+* on this.
+*
+* The cost includes SSD distortion, transform unit tree bits and motion vector bits
+* for both luma and chroma if enabled.
+*
+* \param state       encoder state
+* \param x           x-coordinate of the CU
+* \param y           y-coordinate of the CU
+* \param depth       depth of the CU in the quadtree
+* \param lcu         containing LCU
+*
+* \param inter_cost    Return inter cost
+* \param inter_bitcost Return inter bitcost
+*/
+void kvz_cu_cost_inter_rd2(encoder_state_t * const state,
+  int x, int y, int depth,
+  lcu_t *lcu,
+  double   *inter_cost,
+  uint32_t *inter_bitcost){
+
+  cu_info_t *cur_cu = LCU_GET_CU_AT_PX(lcu, SUB_SCU(x), SUB_SCU(y));
+  int tr_depth = MAX(1, depth);
+  if (cur_cu->part_size != SIZE_2Nx2N) {
+    tr_depth = depth + 1;
+  }
+  kvz_lcu_fill_trdepth(lcu, x, y, depth, tr_depth);
+  kvz_inter_recon_cu(state, lcu, x, y, CU_WIDTH_FROM_DEPTH(depth));
+
+  const bool reconstruct_chroma = state->encoder_control->chroma_format != KVZ_CSP_400;
+  kvz_quantize_lcu_residual(state, true, reconstruct_chroma,
+    x, y, depth,
+    NULL,
+    lcu);
+
+  *inter_cost = kvz_cu_rd_cost_luma(state, SUB_SCU(x), SUB_SCU(y), depth, cur_cu, lcu);
+  if (state->encoder_control->chroma_format != KVZ_CSP_400) {
+    *inter_cost += kvz_cu_rd_cost_chroma(state, SUB_SCU(x), SUB_SCU(y), depth, cur_cu, lcu);
+  }
+
+  *inter_cost += *inter_bitcost * state->lambda;
 }
 
 
@@ -1516,6 +1689,15 @@ void kvz_search_cu_inter(encoder_state_t * const state,
                   lcu,
                   inter_cost,
                   inter_bitcost);
+
+  // Calculate more accurate cost when needed
+  if (state->encoder_control->cfg.rdo >= 2) {
+    kvz_cu_cost_inter_rd2(state,
+      x, y, depth,
+      lcu,
+      inter_cost,
+      inter_bitcost);
+  }
 }
 
 
@@ -1560,6 +1742,7 @@ void kvz_search_cu_smp(encoder_state_t * const state,
     cur_pu->type      = CU_INTER;
     cur_pu->part_size = part_mode;
     cur_pu->depth     = depth;
+    cur_pu->qp        = state->qp;
 
     double cost      = MAX_INT;
     uint32_t bitcost = MAX_INT;
@@ -1584,4 +1767,28 @@ void kvz_search_cu_smp(encoder_state_t * const state,
       }
     }
   }
+
+  // Calculate more accurate cost when needed
+  if (state->encoder_control->cfg.rdo >= 2) {
+    kvz_cu_cost_inter_rd2(state,
+      x, y, depth,
+      lcu,
+      inter_cost,
+      inter_bitcost);
+  }
+
+  // Count bits spent for coding the partition mode.
+  int smp_extra_bits = 1; // horizontal or vertical
+  if (state->encoder_control->cfg.amp_enable) {
+    smp_extra_bits += 1; // symmetric or asymmetric
+    if (part_mode != SIZE_2NxN && part_mode != SIZE_Nx2N) {
+      smp_extra_bits += 1; // U,L or D,R
+    }
+  }
+  // The transform is split for SMP and AMP blocks so we need more bits for
+  // coding the CBF.
+  smp_extra_bits += 6;
+
+  *inter_cost += (state->encoder_control->cfg.rdo >= 2 ? state->lambda : state->lambda_sqrt) * smp_extra_bits;
+  *inter_bitcost += smp_extra_bits;
 }

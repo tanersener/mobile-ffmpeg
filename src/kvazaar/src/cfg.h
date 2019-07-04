@@ -30,7 +30,6 @@
 
 #include "kvazaar.h"
 
-
 /* Function definitions */
 kvz_config *kvz_config_alloc(void);
 int kvz_config_init(kvz_config *cfg);

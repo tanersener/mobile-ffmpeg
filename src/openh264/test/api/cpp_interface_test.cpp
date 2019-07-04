@@ -47,7 +47,7 @@ struct SVCEncoderImpl : public ISVCEncoder {
     EXPECT_TRUE (gThis == this);
     return 6;
   }
-  virtual int EXTAPI ForceIntraFrame (bool bIDR,int iLayerId = -1) {
+  virtual int EXTAPI ForceIntraFrame (bool bIDR, int iLayerId = -1) {
     EXPECT_TRUE (gThis == this);
     return 7;
   }
@@ -86,6 +86,10 @@ struct SVCDecoderImpl : public ISVCDecoder {
       const int iSrcLen, unsigned char** ppDst, SBufferInfo* pDstInfo) {
     EXPECT_TRUE (gThis == this);
     return static_cast<DECODING_STATE> (5);
+  }
+  virtual DECODING_STATE EXTAPI FlushFrame (unsigned char** ppDst, SBufferInfo* pDstInfo) {
+    EXPECT_TRUE (gThis == this);
+    return static_cast<DECODING_STATE> (10);
   }
   virtual DECODING_STATE EXTAPI DecodeFrameEx (const unsigned char* pSrc,
       const int iSrcLen, unsigned char* pDst, int iDstStride,

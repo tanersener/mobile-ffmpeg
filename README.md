@@ -54,8 +54,6 @@ FFmpeg for Android, iOS and tvOS
 ### 2. Using
 Published binaries are available at [Github](https://github.com/tanersener/mobile-ffmpeg/releases), [JCenter](https://bintray.com/bintray/jcenter) and [CocoaPods](https://cocoapods.org).
 
-Unpublished development builds can be found under the [development-snapshot](https://www.dropbox.com/sh/frzg32yjzyucmob/AADX81RhiVfk9o7Vo2J8jlH2a) directory. 
-
 There are eight different `mobile-ffmpeg` packages. Below you can see which system libraries and external libraries are enabled in each of them. 
 
 Please remember that some parts of `FFmpeg` are licensed under the `GPL` and only `GPL` licensed `mobile-ffmpeg` packages include them.
@@ -338,10 +336,10 @@ This table shows the differences between two variants.
 | :----: | :----: | :----: |
 | Android API Level | 24 | 16 | 
 | Android Camera Access | Yes | - |
-| Android Architectures | arm-v7a-neon<br/>arm64-v8a<br/>x86<br/>x86-64</br> | arm-v7a<br/>arm-v7a-neon<br/>arm64-v8a<br/>x86<br/>x86-64</br> |
+| Android Architectures | arm-v7a-neon<br/>arm64-v8a<br/>x86<br/>x86-64 | arm-v7a<br/>arm-v7a-neon<br/>arm64-v8a<br/>x86<br/>x86-64 |
 | Xcode Support | 10.1 | 7.3.1 |
 | iOS SDK | 12.1 | 9.3 |
-| iOS Architectures | arm64<br/>arm64e<br/>x86-64</br> | armv7<br/>arm64<br/>i386<br/>x86-64</br> |
+| iOS Architectures | arm64<br/>arm64e<br/>x86-64 | armv7<br/>arm64<br/>i386<br/>x86-64 |
 | tvOS SDK | 10.2 | 9.2 |
 | tvOS Architectures | arm64<br/>x86-64 | arm64<br/>x86-64 |
 

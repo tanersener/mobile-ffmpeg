@@ -92,6 +92,7 @@ enum kvz_ime_algorithm {
   KVZ_IME_FULL16 = 4, //! \since 3.6.0
   KVZ_IME_FULL32 = 5, //! \since 3.6.0
   KVZ_IME_FULL64 = 6, //! \since 3.6.0
+  KVZ_IME_DIA = 7, // Experimental. TODO: change into a proper doc comment
 };
 
 /**
@@ -204,6 +205,12 @@ enum kvz_sao {
   KVZ_SAO_EDGE = 1,
   KVZ_SAO_BAND = 2,
   KVZ_SAO_FULL = 3
+};
+
+enum kvz_scalinglist {
+  KVZ_SCALING_LIST_OFF = 0,
+  KVZ_SCALING_LIST_CUSTOM = 1,
+  KVZ_SCALING_LIST_DEFAULT = 2,  
 };
 
 // Map from input format to chroma format.
@@ -322,6 +329,7 @@ typedef struct kvz_config
   uint8_t *optional_key;
 
   enum kvz_me_early_termination me_early_termination; /*!< \since 3.8.0 \brief Mode of me early termination. */
+  int32_t intra_rdo_et; /*!< \since 4.1.0 \brief Use early termination in intra rdo. */
 
   int32_t lossless; /*!< \brief Use lossless coding. */
 
@@ -351,6 +359,37 @@ typedef struct kvz_config
    * \brief Use adaptive QP for 360 video with equirectangular projection.
    */
   int32_t erp_aqp;
+
+  /** \brief The HEVC level */
+  uint8_t level;
+  /** \brief Whether we ignore and just warn from all of the errors about the output not conforming to the level's requirements. */
+  uint8_t force_level;
+  /** \brief Whether we use the high tier bitrates. Requires the level to be 4 or higher. */
+  uint8_t high_tier;
+  /** \brief The maximum allowed bitrate for this level and tier. */
+  uint32_t max_bitrate;
+
+  /** \brief Maximum steps that hexagonal and diagonal motion estimation can use. -1 to disable */
+  uint32_t me_max_steps;
+
+  /** \brief Minimum QP that uses CABAC for residual cost instead of a fast estimate. */
+  int8_t fast_residual_cost_limit;
+
+  /** \brief Set QP at CU level keeping pic_init_qp_minus26 in PPS zero */
+  int8_t set_qp_in_cu;
+
+  /** \brief Flag to enable/disable open GOP configuration */
+  int8_t open_gop;
+
+  /** \brief Type of scaling lists to use */
+  int8_t scaling_list;
+
+  /** \brief Maximum number of merge cadidates */
+  uint8_t max_merge;
+
+  /** \brief Enable Early Skip Mode Decision */
+  uint8_t early_skip;
+
 } kvz_config;
 
 /**
@@ -359,7 +398,8 @@ typedef struct kvz_config
  * Function picture_alloc in kvz_api must be used for allocation.
  */
 typedef struct kvz_picture {
-  kvz_pixel *fulldata;         //!< \brief Allocated buffer (only used in the base_image)
+  kvz_pixel *fulldata_buf;     //!< \brief Allocated buffer with padding (only used in the base_image)
+  kvz_pixel *fulldata;         //!< \brief Allocated buffer portion that's actually used
 
   kvz_pixel *y;                //!< \brief Pointer to luma pixel array.
   kvz_pixel *u;                //!< \brief Pointer to chroma U pixel array.
