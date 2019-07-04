@@ -2,7 +2,7 @@
 
 
 
-@deftypefun {int} {gnutls_x509_crl_get_issuer_dn} (const gnutls_x509_crl_t @var{crl}, char * @var{buf}, size_t * @var{sizeof_buf})
+@deftypefun {int} {gnutls_x509_crl_get_issuer_dn} (gnutls_x509_crl_t @var{crl}, char * @var{buf}, size_t * @var{sizeof_buf})
 @var{crl}: should contain a gnutls_x509_crl_t type
 
 @var{buf}: a pointer to a structure to hold the peer's name (may be null)

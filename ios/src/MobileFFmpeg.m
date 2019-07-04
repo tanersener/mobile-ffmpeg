@@ -17,6 +17,7 @@
  * along with MobileFFmpeg.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "libavutil/ffversion.h"
 #include "fftools_ffmpeg.h"
 
 #include "MobileFFmpeg.h"
@@ -29,7 +30,7 @@ int execute(int argc, char **argv);
 @implementation MobileFFmpeg
 
 /** Global library version */
-NSString *const MOBILE_FFMPEG_VERSION = @"4.2.1";
+NSString *const MOBILE_FFMPEG_VERSION = @"4.2.2";
 
 /** Common return code values */
 int const RETURN_CODE_SUCCESS = 0;
@@ -39,7 +40,7 @@ int lastReturnCode;
 NSMutableString *lastCommandOutput;
 
 extern NSMutableString *systemCommandOutput;
-extern int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPatternList, long timeout);
+extern int mobileffmpeg_system_execute(NSArray *arguments, NSMutableArray *commandOutputEndPatternList, NSString *successPattern, long timeout);
 
 + (void)initialize {
     [MobileFFmpegConfig class];
@@ -172,12 +173,12 @@ extern int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutpu
 /**
  * Returns media information for given file.
  *
- * @param path    path or uri of media file
+ * @param path path or uri of media file
  * @param timeout complete timeout
  * @return media information
  */
  + (MediaInformation*)getMediaInformation: (NSString*)path timeout:(long)timeout {
-    int rc = mobileffmpeg_system_execute([[NSArray alloc] initWithObjects:@"-v", @"info", @"-hide_banner", @"-i", path, @"-f", @"null", @"-", nil], [[NSArray alloc] initWithObjects:@"Press [q] to stop, [?] for help", @"No such file or directory", @"Input/output error", @"Conversion failed", nil], timeout);
+    int rc = mobileffmpeg_system_execute([[NSArray alloc] initWithObjects:@"-v", @"info", @"-hide_banner", @"-i", path, nil], [NSMutableArray arrayWithObjects:@"Press [q] to stop, [?] for help", @"No such file or directory", @"Input/output error", @"Conversion failed", @"HTTP error", nil], @"At least one output file must be specified", timeout);
 
     if (rc == 0) {
         return [MediaInformationParser from:systemCommandOutput];

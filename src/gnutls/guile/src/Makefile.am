@@ -38,7 +38,7 @@ guileextension_LTLIBRARIES  = guile-gnutls-v-2.la
 
 # Use '-module' to build a "dlopenable module", in Libtool terms.
 # Use '-undefined' to placate Libtool on Windows; see
-# <http://lists.gnutls.org/pipermail/gnutls-devel/2014-December/007294.html>.
+# <https://lists.gnutls.org/pipermail/gnutls-devel/2014-December/007294.html>.
 guile_gnutls_v_2_la_LDFLAGS = -module -no-undefined
 
 # Linking against GnuTLS.
@@ -113,7 +113,7 @@ snarfcppopts = $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
 
 # Note: we cannot use the portable ".c.x" form, since that leads
 # prerequisites to be ignored:
-# <http://lists.gnutls.org/pipermail/gnutls-devel/2013-September/006453.html>.
+# <https://lists.gnutls.org/pipermail/gnutls-devel/2013-September/006453.html>.
 %.x: %.c $(GENERATED_BINDINGS)
 	$(AM_V_GEN)$(guile_snarf) -o $@ $< $(snarfcppopts)
 

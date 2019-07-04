@@ -57,16 +57,18 @@ static int server_callback(gnutls_session_t session)
 {
 	server_ok = 1;
 
-	if (gnutls_handshake_get_last_in(session) !=
-	    GNUTLS_HANDSHAKE_CERTIFICATE_PKT) {
-		fail("client's last input message was unexpected\n");
-		exit(1);
-	}
+	if (gnutls_protocol_get_version(session) == GNUTLS_TLS1_2) {
+		if (gnutls_handshake_get_last_in(session) !=
+		    GNUTLS_HANDSHAKE_CERTIFICATE_PKT) {
+			fail("client's last input message was unexpected\n");
+			exit(1);
+		}
 
-	if (gnutls_handshake_get_last_out(session) !=
-	    GNUTLS_HANDSHAKE_SERVER_HELLO_DONE) {
-		fail("client's last output message was unexpected\n");
-		exit(1);
+		if (gnutls_handshake_get_last_out(session) !=
+		    GNUTLS_HANDSHAKE_SERVER_HELLO_DONE) {
+			fail("client's last output message was unexpected\n");
+			exit(1);
+		}
 	}
 
 	return 0;
@@ -118,7 +120,8 @@ const gnutls_datum_t server_key = { server_key_pem,
 	sizeof(server_key_pem)
 };
 
-void doit(void)
+static
+void start(const char *prio)
 {
 	/* Server stuff. */
 	gnutls_certificate_credentials_t serverx509cred;
@@ -128,6 +131,11 @@ void doit(void)
 	gnutls_certificate_credentials_t clientx509cred;
 	gnutls_session_t client;
 	int cret = GNUTLS_E_AGAIN;
+
+	success("trying %s\n", prio);
+	client_ok = 0;
+	server_ok = 0;
+	pch_ok = 0;
 
 	/* General init. */
 	global_init();
@@ -186,4 +194,13 @@ void doit(void)
 
 	if (client_ok == 0)
 		fail("Client certificate verify callback wasn't called\n");
+
+	reset_buffers();
+}
+
+void doit(void)
+{
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.2");
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.3");
+	start("NORMAL");
 }

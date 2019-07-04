@@ -1,4 +1,4 @@
-/* Copyright (C) 2000-2009, 2011-2012, 2016-2017 Free Software Foundation, Inc.
+/* Copyright (C) 2000-2009, 2011-2012, 2016-2019 Free Software Foundation, Inc.
    This file is part of the GNU LIBICONV Library.
 
    This program is free software: you can redistribute it and/or modify
@@ -12,7 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include "config.h"
 #ifndef ICONV_CONST
@@ -191,10 +191,10 @@ static void print_version (void)
 {
   printf("iconv (GNU libiconv %d.%d)\n",
          _libiconv_version >> 8, _libiconv_version & 0xff);
-  printf("Copyright (C) %s Free Software Foundation, Inc.\n", "2000-2017");
+  printf("Copyright (C) %s Free Software Foundation, Inc.\n", "2000-2019");
   /* xgettext: no-wrap */
   fputs (_("\
-License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\n\
+License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>\n\
 This is free software: you are free to change and redistribute it.\n\
 There is NO WARRANTY, to the extent permitted by law.\n\
 "),stdout);
@@ -861,6 +861,15 @@ int main (int argc, char* argv[])
   bindtextdomain("libiconv",relocate(LOCALEDIR));
 #endif
   textdomain("libiconv");
+  /* No need to invoke the gnulib function stdopen() here, because
+     (1) the only file descriptor allocations done by this program are
+         fopen(...,"r"),
+     (2) when such fopen() calls occur, stdin is not used,
+     hence
+     - when an fopen() call happens to open fd 0, it is harmless, by (2),
+     - when an fopen() call happens to open fd 1 or 2, writing to
+       stdout or stderr will produce an error, by (1). */
+
   for (i = 1; i < argc;) {
     size_t len = strlen(argv[i]);
     if (!strcmp(argv[i],"--")) {

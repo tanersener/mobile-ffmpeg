@@ -19,7 +19,7 @@
  */
 
 /* Optional external libraries; can be enabled using:
- * make VERSUS=crypto+gcrypt+tomcrypt tools/crypto_bench */
+ * make VERSUS=crypto+gcrypt+tomcrypt+mbedcrypto tools/crypto_bench */
 #define USE_crypto           0x01    /* OpenSSL's libcrypto */
 #define USE_gcrypt           0x02    /* GnuTLS's libgcrypt */
 #define USE_tomcrypt         0x04    /* LibTomCrypt */
@@ -665,8 +665,8 @@ struct hash_impl implementations[] = {
 
 int main(int argc, char **argv)
 {
-    uint8_t *input = av_malloc(MAX_INPUT_SIZE * 2);
-    uint8_t *output = input + MAX_INPUT_SIZE;
+    uint8_t *input;
+    uint8_t *output;
     unsigned i, impl, size;
     int opt;
 
@@ -702,11 +702,13 @@ int main(int argc, char **argv)
             exit(opt != 'h');
         }
     }
-
+    input = av_malloc(MAX_INPUT_SIZE * 2);
     if (!input)
         fatal_error("out of memory");
     for (i = 0; i < MAX_INPUT_SIZE; i += 4)
         AV_WB32(input + i, i);
+
+    output = input + MAX_INPUT_SIZE;
 
     size = MAX_INPUT_SIZE;
     for (impl = 0; impl < FF_ARRAY_ELEMS(implementations); impl++)

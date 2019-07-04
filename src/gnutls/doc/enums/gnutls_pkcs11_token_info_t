@@ -11,5 +11,6 @@ The token's manufacturer (string)
 @item GNUTLS_@-PKCS11_@-TOKEN_@-MODEL
 The token's model (string)
 @item GNUTLS_@-PKCS11_@-TOKEN_@-MODNAME
-The token's module name (string - since 3.4.3)
+The token's module name (string - since 3.4.3). This value is
+unavailable for providers which were manually loaded.
 @end table

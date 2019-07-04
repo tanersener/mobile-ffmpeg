@@ -34,12 +34,16 @@ import com.arthenica.mobileffmpeg.Config;
 import com.arthenica.mobileffmpeg.FFmpeg;
 import com.arthenica.mobileffmpeg.LogCallback;
 import com.arthenica.mobileffmpeg.LogMessage;
+import com.arthenica.mobileffmpeg.MediaInformation;
+import com.arthenica.mobileffmpeg.StreamInformation;
 
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 public class HttpsTabFragment extends Fragment {
 
-    public static final String HTTPS_TEST_DEFAULT_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/FFmpeg-Logo.svg/568px-FFmpeg-Logo.svg.png";
+    public static final String HTTPS_TEST_DEFAULT_URL = "https://download.blender.org/peach/trailer/trailer_1080p.ogg";
 
     private MainActivity mainActivity;
     private EditText urlText;
@@ -119,14 +123,100 @@ public class HttpsTabFragment extends Fragment {
         }
 
         // HTTPS COMMAND ARGUMENTS
-        final String ffmpegCommand = String.format("-hide_banner -i %s -f null -", testUrl);
+        MediaInformation information = FFmpeg.getMediaInformation(testUrl);
+        if (information == null) {
+            appendLog("Get media information failed\n");
+        } else {
+            appendLog("Media information for " + information.getPath() + "\n");
 
-        android.util.Log.d(MainActivity.TAG, String.format("FFmpeg process started with arguments\n'%s'", ffmpegCommand));
+            if (information.getFormat() != null) {
+                appendLog("Format: " + information.getFormat() + "\n");
+            }
+            if (information.getBitrate() != null) {
+                appendLog("Bitrate: " + information.getBitrate() + "\n");
+            }
+            if (information.getDuration() != null) {
+                appendLog("Duration: " + information.getDuration() + "\n");
+            }
+            if (information.getStartTime() != null) {
+                appendLog("Start time: " + information.getStartTime() + "\n");
+            }
+            if (information.getMetadataEntries() != null) {
+                Set<Map.Entry<String, String>> entries = information.getMetadataEntries();
+                for (Map.Entry<String, String> entry : entries) {
+                    appendLog("Metadata: " + entry.getKey() + ":" + entry.getValue() + "\n");
+                }
+            }
+            if (information.getStreams() != null) {
+                for (StreamInformation stream : information.getStreams()) {
+                    if (stream.getIndex() != null) {
+                        appendLog("Stream index: " + stream.getIndex() + "\n");
+                    }
+                    if (stream.getType() != null) {
+                        appendLog("Stream type: " + stream.getType() + "\n");
+                    }
+                    if (stream.getCodec() != null) {
+                        appendLog("Stream codec: " + stream.getCodec() + "\n");
+                    }
+                    if (stream.getFullCodec() != null) {
+                        appendLog("Stream full codec: " + stream.getFullCodec() + "\n");
+                    }
+                    if (stream.getFormat() != null) {
+                        appendLog("Stream format: " + stream.getFormat() + "\n");
+                    }
+                    if (stream.getFullFormat() != null) {
+                        appendLog("Stream full format: " + stream.getFullFormat() + "\n");
+                    }
 
-        // EXECUTE
-        int result = FFmpeg.execute(ffmpegCommand);
+                    if (stream.getWidth() != null) {
+                        appendLog("Stream width: " + stream.getWidth() + "\n");
+                    }
+                    if (stream.getHeight() != null) {
+                        appendLog("Stream height: " + stream.getHeight() + "\n");
+                    }
 
-        android.util.Log.d(MainActivity.TAG, String.format("FFmpeg process exited with rc %d", result));
+                    if (stream.getBitrate() != null) {
+                        appendLog("Stream bitrate: " + stream.getBitrate() + "\n");
+                    }
+                    if (stream.getSampleRate() != null) {
+                        appendLog("Stream sample rate: " + stream.getSampleRate() + "\n");
+                    }
+                    if (stream.getSampleFormat() != null) {
+                        appendLog("Stream sample format: " + stream.getSampleFormat() + "\n");
+                    }
+                    if (stream.getChannelLayout() != null) {
+                        appendLog("Stream channel layout: " + stream.getChannelLayout() + "\n");
+                    }
+
+                    if (stream.getSampleAspectRatio() != null) {
+                        appendLog("Stream sample aspect ratio: " + stream.getSampleAspectRatio() + "\n");
+                    }
+                    if (stream.getDisplayAspectRatio() != null) {
+                        appendLog("Stream display ascpect ratio: " + stream.getDisplayAspectRatio() + "\n");
+                        ;
+                    }
+                    if (stream.getAverageFrameRate() != null) {
+                        appendLog("Stream average frame rate: " + stream.getAverageFrameRate() + "\n");
+                    }
+                    if (stream.getRealFrameRate() != null) {
+                        appendLog("Stream real frame rate: " + stream.getRealFrameRate() + "\n");
+                    }
+                    if (stream.getTimeBase() != null) {
+                        appendLog("Stream time base: " + stream.getTimeBase() + "\n");
+                    }
+                    if (stream.getCodecTimeBase() != null) {
+                        appendLog("Stream codec time base: " + stream.getCodecTimeBase() + "\n");
+                    }
+
+                    if (stream.getMetadataEntries() != null) {
+                        Set<Map.Entry<String, String>> entries = stream.getMetadataEntries();
+                        for (Map.Entry<String, String> entry : entries) {
+                            appendLog("Stream metadata: " + entry.getKey() + ":" + entry.getValue() + "\n");
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public void setActive() {

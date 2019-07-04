@@ -49,18 +49,19 @@ get_library_name() {
         28) echo "twolame" ;;
         29) echo "sdl" ;;
         30) echo "tesseract" ;;
-        31) echo "giflib" ;;
-        32) echo "jpeg" ;;
-        33) echo "libogg" ;;
-        34) echo "libpng" ;;
-        35) echo "libuuid" ;;
-        36) echo "nettle" ;;
-        37) echo "tiff" ;;
-        38) echo "expat" ;;
-        39) echo "libsndfile" ;;
-        40) echo "leptonica" ;;
-        41) echo "android-zlib" ;;
-        42) echo "android-media-codec" ;;
+        31) echo "openh264" ;;
+        32) echo "giflib" ;;
+        33) echo "jpeg" ;;
+        34) echo "libogg" ;;
+        35) echo "libpng" ;;
+        36) echo "libuuid" ;;
+        37) echo "nettle" ;;
+        38) echo "tiff" ;;
+        39) echo "expat" ;;
+        40) echo "libsndfile" ;;
+        41) echo "leptonica" ;;
+        42) echo "android-zlib" ;;
+        43) echo "android-media-codec" ;;
     esac
 }
 
@@ -211,7 +212,7 @@ get_common_cflags() {
         local LTS_BUILD__FLAG="-DMOBILE_FFMPEG_LTS "
     fi
 
-    echo "-fstrict-aliasing -fPIC -DANDROID ${LTS_BUILD__FLAG}-D__ANDROID__ -D__ANDROID_API__=${API}"
+    echo "-fno-integrated-as -fstrict-aliasing -fPIC -DANDROID ${LTS_BUILD__FLAG}-D__ANDROID__ -D__ANDROID_API__=${API}"
 }
 
 get_arch_specific_cflags() {
@@ -235,13 +236,18 @@ get_arch_specific_cflags() {
 }
 
 get_size_optimization_cflags() {
+    if [[ -z ${NO_LINK_TIME_OPTIMIZATION} ]]; then
+        local LINK_TIME_OPTIMIZATION_FLAGS="-flto"
+    else
+        local LINK_TIME_OPTIMIZATION_FLAGS=""
+    fi
 
     local ARCH_OPTIMIZATION=""
     case ${ARCH} in
         arm-v7a | arm-v7a-neon)
             case $1 in
                 ffmpeg)
-                    ARCH_OPTIMIZATION="-flto -O2 -ffunction-sections -fdata-sections"
+                    ARCH_OPTIMIZATION="${LINK_TIME_OPTIMIZATION_FLAGS} -O2 -ffunction-sections -fdata-sections"
                 ;;
                 *)
                     ARCH_OPTIMIZATION="-Os -ffunction-sections -fdata-sections"
@@ -250,8 +256,8 @@ get_size_optimization_cflags() {
         ;;
         arm64-v8a)
             case $1 in
-                ffmpeg | nettle)
-                    ARCH_OPTIMIZATION="-flto -fuse-ld=gold -O2 -ffunction-sections -fdata-sections"
+                ffmpeg)
+                    ARCH_OPTIMIZATION="${LINK_TIME_OPTIMIZATION_FLAGS} -fuse-ld=gold -O2 -ffunction-sections -fdata-sections"
                 ;;
                 *)
                     ARCH_OPTIMIZATION="-Os -ffunction-sections -fdata-sections"
@@ -261,7 +267,7 @@ get_size_optimization_cflags() {
         x86 | x86-64)
             case $1 in
                 ffmpeg)
-                    ARCH_OPTIMIZATION="-flto -Os -ffunction-sections -fdata-sections"
+                    ARCH_OPTIMIZATION="${LINK_TIME_OPTIMIZATION_FLAGS} -Os -ffunction-sections -fdata-sections"
                 ;;
                 *)
                     ARCH_OPTIMIZATION="-Os -ffunction-sections -fdata-sections"
@@ -317,6 +323,12 @@ get_cflags() {
 }
 
 get_cxxflags() {
+    if [[ -z ${NO_LINK_TIME_OPTIMIZATION} ]]; then
+        local LINK_TIME_OPTIMIZATION_FLAGS="-flto"
+    else
+        local LINK_TIME_OPTIMIZATION_FLAGS=""
+    fi
+
     if [[ -z ${MOBILE_FFMPEG_DEBUG} ]]; then
         local OPTIMIZATION_FLAGS="-Os -ffunction-sections -fdata-sections"
     else
@@ -329,7 +341,7 @@ get_cxxflags() {
         ;;
         ffmpeg)
             if [[ -z ${MOBILE_FFMPEG_DEBUG} ]]; then
-                echo "-std=c++11 -fno-exceptions -fno-rtti -flto -O2 -ffunction-sections -fdata-sections"
+                echo "-std=c++11 -fno-exceptions -fno-rtti ${LINK_TIME_OPTIMIZATION_FLAGS} -O2 -ffunction-sections -fdata-sections"
             else
                 echo "-std=c++11 -fno-exceptions -fno-rtti ${MOBILE_FFMPEG_DEBUG}"
             fi
@@ -370,11 +382,17 @@ get_common_linked_libraries() {
 }
 
 get_size_optimization_ldflags() {
+    if [[ -z ${NO_LINK_TIME_OPTIMIZATION} ]]; then
+        local LINK_TIME_OPTIMIZATION_FLAGS="-flto"
+    else
+        local LINK_TIME_OPTIMIZATION_FLAGS=""
+    fi
+
     case ${ARCH} in
         arm64-v8a)
             case $1 in
-                ffmpeg | nettle)
-                    echo "-Wl,--gc-sections -flto -fuse-ld=gold -O2 -ffunction-sections -fdata-sections -finline-functions"
+                ffmpeg)
+                    echo "-Wl,--gc-sections ${LINK_TIME_OPTIMIZATION_FLAGS} -fuse-ld=gold -O2 -ffunction-sections -fdata-sections -finline-functions"
                 ;;
                 *)
                     echo "-Wl,--gc-sections -Os -ffunction-sections -fdata-sections"
@@ -384,7 +402,7 @@ get_size_optimization_ldflags() {
         *)
             case $1 in
                 ffmpeg)
-                    echo "-Wl,--gc-sections,--icf=safe -flto -O2 -ffunction-sections -fdata-sections -finline-functions"
+                    echo "-Wl,--gc-sections,--icf=safe ${LINK_TIME_OPTIMIZATION_FLAGS} -O2 -ffunction-sections -fdata-sections -finline-functions"
                 ;;
                 *)
                     echo "-Wl,--gc-sections,--icf=safe -Os -ffunction-sections -fdata-sections"
@@ -423,7 +441,7 @@ get_ldflags() {
     fi
     local COMMON_LINKED_LIBS=$(get_common_linked_libraries $1)
 
-    echo "${ARCH_FLAGS} ${OPTIMIZATION_FLAGS} ${COMMON_LINKED_LIBS}"
+    echo "${ARCH_FLAGS} ${OPTIMIZATION_FLAGS} ${COMMON_LINKED_LIBS} -Wl,--exclude-libs,libgcc.a -Wl,--exclude-libs,libunwind.a"
 }
 
 create_chromaprint_package_config() {
@@ -709,7 +727,7 @@ Description: a fast compressor/decompressor
 Version: ${SNAPPY_VERSION}
 
 Requires:
-Libs: -L\${libdir} -lz
+Libs: -L\${libdir} -lz -lc++
 Cflags: -I\${includedir}
 EOF
 }
@@ -895,9 +913,9 @@ download_gpl_library_source() {
             GPL_LIB_DEST_DIR="libvidstab"
         ;;
         x264)
-            GPL_LIB_URL="ftp://ftp.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-20190328-2245-stable.tar.bz2"
-            GPL_LIB_FILE="x264-snapshot-20190328-2245-stable.tar.bz2"
-            GPL_LIB_ORIG_DIR="x264-snapshot-20190328-2245-stable"
+            GPL_LIB_URL="ftp://ftp.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-20190701-2245-stable.tar.bz2"
+            GPL_LIB_FILE="x264-snapshot-20190701-2245-stable.tar.bz2"
+            GPL_LIB_ORIG_DIR="x264-snapshot-20190701-2245-stable"
             GPL_LIB_DEST_DIR="x264"
         ;;
         x265)
@@ -1028,9 +1046,9 @@ build_cpufeatures() {
     rm -f ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/libcpufeatures.a 1>>${BASEDIR}/build.log 2>&1
     rm -f ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/libcpufeatures.so 1>>${BASEDIR}/build.log 2>&1
 
-    set_toolchain_clang_paths "cpu-features"
+    echo -e "\nINFO: Building cpu-features for ${ARCH}\n" 1>>${BASEDIR}/build.log 2>&1
 
-    echo -e "\nINFO: Building cpu-features for for ${ARCH}\n" 1>>${BASEDIR}/build.log 2>&1
+    set_toolchain_clang_paths "cpu-features"
 
     # THEN BUILD FOR THIS ABI
     $(get_clang_target_host)-clang -c ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.c -o ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.o 1>>${BASEDIR}/build.log 2>&1
@@ -1038,6 +1056,28 @@ build_cpufeatures() {
     $(get_clang_target_host)-clang -shared ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.o -o ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/libcpufeatures.so 1>>${BASEDIR}/build.log 2>&1
 
     create_cpufeatures_package_config
+}
+
+build_android_lts_support() {
+
+    # CLEAN OLD BUILD
+    rm -f ${BASEDIR}/android/app/src/main/cpp/android_lts_support.o 1>>${BASEDIR}/build.log 2>&1
+    rm -f ${BASEDIR}/android/app/src/main/cpp/android_lts_support.a 1>>${BASEDIR}/build.log 2>&1
+
+    echo -e "INFO: Building android-lts-support objects for ${ARCH}\n" 1>>${BASEDIR}/build.log 2>&1
+
+    # PREPARING PATHS
+    LIB_NAME="android-lts-support"
+    set_toolchain_clang_paths ${LIB_NAME}
+
+    # PREPARING FLAGS
+    TARGET_HOST=$(get_target_host)
+    CFLAGS=$(get_cflags ${LIB_NAME})
+    LDFLAGS=$(get_ldflags ${LIB_NAME})
+
+    # THEN BUILD FOR THIS ABI
+    $(get_clang_target_host)-clang ${CFLAGS} -Wno-unused-command-line-argument -c ${BASEDIR}/android/app/src/main/cpp/android_lts_support.c -o ${BASEDIR}/android/app/src/main/cpp/android_lts_support.o ${LDFLAGS} 1>>${BASEDIR}/build.log 2>&1
+    ${TARGET_HOST}-ar rcs ${BASEDIR}/android/app/src/main/cpp/libandroidltssupport.a ${BASEDIR}/android/app/src/main/cpp/android_lts_support.o 1>>${BASEDIR}/build.log 2>&1
 }
 
 autoreconf_library() {

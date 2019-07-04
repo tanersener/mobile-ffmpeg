@@ -23,6 +23,7 @@
 srcdir="${srcdir:-.}"
 CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
 DIFF="${DIFF:-diff}"
+TMPFILE=tmp-$$.privkey.tmp
 
 if ! test -x "${CERTTOOL}"; then
 	exit 77
@@ -42,5 +43,20 @@ if test "${rc}" != "0";then
 	exit 1
 fi
 done
+
+${VALGRIND} "${CERTTOOL}" -k --infile "${srcdir}/data/privkey1.pem" --no-text --outfile ${TMPFILE}
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "--no-text privkey info failed 1"
+	exit ${rc}
+fi
+
+if grep -v '^-----BEGIN [A-Z0-9 ]\+-----$' ${TMPFILE} | grep -v '^[A-Za-z0-9/+=]\+$' | grep -v '^-----END [A-Z0-9 ]\+-----$' ; then
+	echo "--no-text privkey info failed 2"
+	exit 1
+fi
+
+rm -f ${TMPFILE}
 
 exit 0

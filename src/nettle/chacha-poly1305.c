@@ -52,6 +52,7 @@
 #include <assert.h>
 #include <string.h>
 
+#include "chacha-internal.h"
 #include "chacha-poly1305.h"
 
 #include "macros.h"

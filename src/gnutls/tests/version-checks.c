@@ -59,7 +59,7 @@ static void try(const char *client_prio, int expected)
 	int cret = GNUTLS_E_AGAIN;
 	unsigned flags = 0;
 	unsigned dtls = 0;
-	const char *server_prio = "NORMAL";
+	const char *server_prio = "NORMAL:+VERS-TLS-ALL";
 
 	if (expected >= GNUTLS_DTLS_VERSION_MIN && expected <= GNUTLS_DTLS_VERSION_MAX) {
 		dtls = 1;
@@ -161,6 +161,15 @@ void doit(void)
 	try("NORMAL:-VERS-TLS-ALL:+VERS-TLS1.1", GNUTLS_TLS1_1);
 	reset_buffers();
 	try("NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2", GNUTLS_TLS1_2);
+	reset_buffers();
+	try("NORMAL:-VERS-TLS-ALL:+VERS-TLS1.3", GNUTLS_TLS1_3);
+	reset_buffers();
+	try("NORMAL:-VERS-TLS-ALL:+VERS-TLS1.3:+VERS-TLS1.0", GNUTLS_TLS1_0);
+	reset_buffers();
+	/* similar to above test, but checks a different syntax */
+	try("NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.1", GNUTLS_TLS1_1);
+	reset_buffers();
+	try("NORMAL:-VERS-TLS-ALL:+VERS-TLS1.3:+VERS-TLS1.2", GNUTLS_TLS1_3);
 	reset_buffers();
 #ifdef ENABLE_SSL3
 	try("NORMAL:-VERS-TLS-ALL:+VERS-SSL3.0", -1);

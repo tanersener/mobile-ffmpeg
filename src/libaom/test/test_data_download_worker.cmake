@@ -27,8 +27,8 @@ if(NOT AOM_TEST_DATA_PATH)
 endif()
 
 if("${AOM_TEST_DATA_PATH}" STREQUAL "")
-  message(WARNING
-            "Writing test data to ${AOM_CONFIG_DIR}, set "
+  message(
+    WARNING "Writing test data to ${AOM_CONFIG_DIR}, set "
             "$LIBAOM_TEST_DATA_PATH in your environment to avoid this warning.")
   set(AOM_TEST_DATA_PATH "${AOM_CONFIG_DIR}")
 endif()

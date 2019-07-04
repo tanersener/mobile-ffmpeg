@@ -20,11 +20,11 @@ HOGWEED_TARGETS = rsa-keygen$(EXEEXT) rsa-sign$(EXEEXT) \
 
 ENC_TARGETS = base16enc$(EXEEXT) base16dec$(EXEEXT) \
 	      base64enc$(EXEEXT) base64dec$(EXEEXT)
-TARGETS = nettle-benchmark$(EXEEXT) eratosthenes$(EXEEXT) \
+TARGETS = nettle-benchmark$(EXEEXT) \
 	  $(ENC_TARGETS) @IF_HOGWEED@ $(HOGWEED_TARGETS)
 
 SOURCES = nettle-benchmark.c hogweed-benchmark.c ecc-benchmark.c \
-	eratosthenes.c random-prime.c \
+	random-prime.c \
 	nettle-openssl.c \
 	io.c read_rsa_key.c \
 	rsa-encrypt.c rsa-decrypt.c rsa-keygen.c rsa-sign.c rsa-verify.c \
@@ -93,9 +93,6 @@ base64enc$(EXEEXT): base64enc.$(OBJEXT) io.$(OBJEXT)
 base64dec$(EXEEXT): base64dec.$(OBJEXT) io.$(OBJEXT)
 	$(LINK) base64dec.$(OBJEXT) io.$(OBJEXT) \
 	-lnettle $(LIBS) -o base64dec$(EXEEXT)
-
-eratosthenes$(EXEEXT): eratosthenes.$(OBJEXT) $(GETOPT_OBJS)
-	$(LINK) eratosthenes.$(OBJEXT) $(GETOPT_OBJS) -o eratosthenes$(EXEEXT)
 
 BENCH_OBJS = nettle-benchmark.$(OBJEXT) nettle-openssl.$(OBJEXT) \
 	$(GETOPT_OBJS) ../nettle-internal.$(OBJEXT) timing.$(OBJEXT)

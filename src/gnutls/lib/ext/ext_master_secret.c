@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Red Hat, Inc.
+ * Copyright (C) 2014-2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -16,17 +16,17 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
-/* This file contains the code for the Max Record Size TLS extension.
+/* This file contains the code for the RFC7627 (ext master secret) TLS extension.
  */
 
 #include "gnutls_int.h"
 #include "errors.h"
 #include "num.h"
-#include <extensions.h>
+#include <hello_ext.h>
 #include <ext/ext_master_secret.h>
 
 static int _gnutls_ext_master_secret_recv_params(gnutls_session_t session,
@@ -35,29 +35,32 @@ static int _gnutls_ext_master_secret_recv_params(gnutls_session_t session,
 static int _gnutls_ext_master_secret_send_params(gnutls_session_t session,
 					  gnutls_buffer_st * extdata);
 
-const extension_entry_st ext_mod_ext_master_secret = {
+const hello_ext_entry_st ext_mod_ext_master_secret = {
 	.name = "Extended Master Secret",
-	.type = GNUTLS_EXTENSION_EXT_MASTER_SECRET,
+	.tls_id = 23,
+	.gid = GNUTLS_EXTENSION_EXT_MASTER_SECRET,
 	.parse_type = GNUTLS_EXT_MANDATORY,
-
+	.validity = GNUTLS_EXT_FLAG_TLS|GNUTLS_EXT_FLAG_DTLS | GNUTLS_EXT_FLAG_CLIENT_HELLO |
+		    GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
 	.recv_func = _gnutls_ext_master_secret_recv_params,
 	.send_func = _gnutls_ext_master_secret_send_params,
 	.pack_func = NULL,
 	.unpack_func = NULL,
-	.deinit_func = NULL
+	.deinit_func = NULL,
+	.cannot_be_overriden = 1
 };
 
 #ifdef ENABLE_SSL3
 static inline unsigned have_only_ssl3_enabled(gnutls_session_t session)
 {
-	if (session->internals.priorities.protocol.algorithms == 1 &&
-	    session->internals.priorities.protocol.priority[0] == GNUTLS_SSL3)
+	if (session->internals.priorities->protocol.num_priorities == 1 &&
+	    session->internals.priorities->protocol.priorities[0] == GNUTLS_SSL3)
 	    return 1;
 	return 0;
 }
 #endif
 
-/* 
+/*
  * In case of a server: if an EXT_MASTER_SECRET extension type is received then it
  * sets a flag into the session security parameters.
  *
@@ -69,12 +72,13 @@ _gnutls_ext_master_secret_recv_params(gnutls_session_t session,
 	ssize_t data_size = _data_size;
 
 	if ((session->internals.flags & GNUTLS_NO_EXTENSIONS) ||
-	    session->internals.priorities.no_ext_master_secret != 0) {
+	    session->internals.priorities->no_extensions ||
+	    session->internals.no_ext_master_secret != 0) {
 		return 0;
 	}
 
 	if (data_size != 0) {
-		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 	}
 
 #ifdef ENABLE_SSL3
@@ -101,7 +105,8 @@ _gnutls_ext_master_secret_send_params(gnutls_session_t session,
 			       gnutls_buffer_st * extdata)
 {
 	if ((session->internals.flags & GNUTLS_NO_EXTENSIONS) ||
-	    session->internals.priorities.no_ext_master_secret != 0) {
+	    session->internals.priorities->no_extensions != 0 ||
+	    session->internals.no_ext_master_secret != 0) {
 	    session->security_parameters.ext_master_secret = 0;
 	    return 0;
 	}
@@ -126,7 +131,7 @@ _gnutls_ext_master_secret_send_params(gnutls_session_t session,
 	return 0;
 #else
 	if (session->security_parameters.entity == GNUTLS_CLIENT ||
-	    session->security_parameters.ext_master_secret != 0) 
+	    session->security_parameters.ext_master_secret != 0)
 		return GNUTLS_E_INT_RET_0;
 	return 0;
 #endif
@@ -137,7 +142,8 @@ _gnutls_ext_master_secret_send_params(gnutls_session_t session,
  * @session: is a #gnutls_session_t type.
  *
  * Get the status of the extended master secret extension negotiation.
- * This is in accordance to draft-ietf-tls-session-hash-01
+ * This is in accordance to RFC7627. That information is also
+ * available to the more generic gnutls_session_get_flags().
  *
  * Returns: Non-zero if the negotiation was successful or zero otherwise.
  **/

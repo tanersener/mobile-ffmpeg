@@ -16,7 +16,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -32,7 +32,16 @@
 #include <nettle/sha3.h>
 #include <nettle/hmac.h>
 #include <nettle/umac.h>
-#include <fips.h>
+#if ENABLE_GOST
+#include "gost/hmac-gost.h"
+#include "gost/gosthash94.h"
+#include "gost/streebog.h"
+#endif
+#ifdef HAVE_NETTLE_CMAC128_UPDATE
+#include <nettle/cmac.h>
+#else
+#include "cmac.h"
+#endif /* HAVE_NETTLE_CMAC128_UPDATE */
 
 typedef void (*update_func) (void *, size_t, const uint8_t *);
 typedef void (*digest_func) (void *, size_t, uint8_t *);
@@ -41,6 +50,11 @@ typedef void (*set_nonce_func) (void *, size_t, const uint8_t *);
 
 static int wrap_nettle_hash_init(gnutls_digest_algorithm_t algo,
 				 void **_ctx);
+
+struct md5_sha1_ctx {
+	struct md5_ctx md5;
+	struct sha1_ctx sha1;
+};
 
 struct nettle_hash_ctx {
 	union {
@@ -55,6 +69,12 @@ struct nettle_hash_ctx {
 		struct sha3_512_ctx sha3_512;
 		struct sha1_ctx sha1;
 		struct md2_ctx md2;
+		struct md5_sha1_ctx md5_sha1;
+#if ENABLE_GOST
+		struct gosthash94cp_ctx gosthash94cp;
+		struct streebog256_ctx streebog256;
+		struct streebog512_ctx streebog512;
+#endif
 	} ctx;
 	void *ctx_ptr;
 	gnutls_digest_algorithm_t algo;
@@ -71,8 +91,15 @@ struct nettle_mac_ctx {
 		struct hmac_sha384_ctx sha384;
 		struct hmac_sha512_ctx sha512;
 		struct hmac_sha1_ctx sha1;
+#if ENABLE_GOST
+		struct hmac_gosthash94cp_ctx gosthash94cp;
+		struct hmac_streebog256_ctx streebog256;
+		struct hmac_streebog512_ctx streebog512;
+#endif
 		struct umac96_ctx umac96;
 		struct umac128_ctx umac128;
+                struct cmac_aes128_ctx cmac128;
+                struct cmac_aes256_ctx cmac256;
 	} ctx;
 
 	void *ctx_ptr;
@@ -100,9 +127,28 @@ _wrap_umac128_set_key(void *ctx, size_t len, const uint8_t * key)
 	umac128_set_key(ctx, key);
 }
 
+static void
+_wrap_cmac128_set_key(void *ctx, size_t len, const uint8_t * key)
+{
+	if (unlikely(len != 16))
+		abort();
+	cmac_aes128_set_key(ctx, key);
+}
+
+static void
+_wrap_cmac256_set_key(void *ctx, size_t len, const uint8_t * key)
+{
+	if (unlikely(len != 32))
+		abort();
+	cmac_aes256_set_key(ctx, key);
+}
+
 static int _mac_ctx_init(gnutls_mac_algorithm_t algo,
 			 struct nettle_mac_ctx *ctx)
 {
+	/* Any FIPS140-2 related enforcement is performed on
+	 * gnutls_hash_init() and gnutls_hmac_init() */
+
 	ctx->set_nonce = NULL;
 	switch (algo) {
 	case GNUTLS_MAC_MD5:
@@ -147,10 +193,30 @@ static int _mac_ctx_init(gnutls_mac_algorithm_t algo,
 		ctx->ctx_ptr = &ctx->ctx.sha512;
 		ctx->length = SHA512_DIGEST_SIZE;
 		break;
+#if ENABLE_GOST
+	case GNUTLS_MAC_GOSTR_94:
+		ctx->update = (update_func) hmac_gosthash94cp_update;
+		ctx->digest = (digest_func) hmac_gosthash94cp_digest;
+		ctx->set_key = (set_key_func) hmac_gosthash94cp_set_key;
+		ctx->ctx_ptr = &ctx->ctx.gosthash94cp;
+		ctx->length = GOSTHASH94CP_DIGEST_SIZE;
+		break;
+	case GNUTLS_MAC_STREEBOG_256:
+		ctx->update = (update_func) hmac_streebog256_update;
+		ctx->digest = (digest_func) hmac_streebog256_digest;
+		ctx->set_key = (set_key_func) hmac_streebog256_set_key;
+		ctx->ctx_ptr = &ctx->ctx.streebog256;
+		ctx->length = STREEBOG256_DIGEST_SIZE;
+		break;
+	case GNUTLS_MAC_STREEBOG_512:
+		ctx->update = (update_func) hmac_streebog512_update;
+		ctx->digest = (digest_func) hmac_streebog512_digest;
+		ctx->set_key = (set_key_func) hmac_streebog512_set_key;
+		ctx->ctx_ptr = &ctx->ctx.streebog512;
+		ctx->length = STREEBOG512_DIGEST_SIZE;
+		break;
+#endif
 	case GNUTLS_MAC_UMAC_96:
-		if (_gnutls_fips_mode_enabled() != 0)
-			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-	
 		ctx->update = (update_func) umac96_update;
 		ctx->digest = (digest_func) umac96_digest;
 		ctx->set_key = _wrap_umac96_set_key;
@@ -159,15 +225,26 @@ static int _mac_ctx_init(gnutls_mac_algorithm_t algo,
 		ctx->length = 12;
 		break;
 	case GNUTLS_MAC_UMAC_128:
-		if (_gnutls_fips_mode_enabled() != 0)
-			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-
 		ctx->update = (update_func) umac128_update;
 		ctx->digest = (digest_func) umac128_digest;
 		ctx->set_key = _wrap_umac128_set_key;
 		ctx->set_nonce = (set_nonce_func) umac128_set_nonce;
 		ctx->ctx_ptr = &ctx->ctx.umac128;
 		ctx->length = 16;
+		break;
+	case GNUTLS_MAC_AES_CMAC_128:
+		ctx->update = (update_func) cmac_aes128_update;
+		ctx->digest = (digest_func) cmac_aes128_digest;
+		ctx->set_key = _wrap_cmac128_set_key;
+		ctx->ctx_ptr = &ctx->ctx.cmac128;
+		ctx->length = CMAC128_DIGEST_SIZE;
+		break;
+	case GNUTLS_MAC_AES_CMAC_256:
+		ctx->update = (update_func) cmac_aes256_update;
+		ctx->digest = (digest_func) cmac_aes256_digest;
+		ctx->set_key = _wrap_cmac256_set_key;
+		ctx->ctx_ptr = &ctx->ctx.cmac256;
+		ctx->length = CMAC128_DIGEST_SIZE;
 		break;
 	default:
 		gnutls_assert();
@@ -210,14 +287,14 @@ static int wrap_nettle_mac_exists(gnutls_mac_algorithm_t algo)
 	case GNUTLS_MAC_SHA256:
 	case GNUTLS_MAC_SHA384:
 	case GNUTLS_MAC_SHA512:
-		return 1;
-
 	case GNUTLS_MAC_UMAC_96:
 	case GNUTLS_MAC_UMAC_128:
-		if (_gnutls_fips_mode_enabled() != 0)
-			return 0;
-		else
-			return 1;
+#if ENABLE_GOST
+	case GNUTLS_MAC_GOSTR_94:
+	case GNUTLS_MAC_STREEBOG_256:
+	case GNUTLS_MAC_STREEBOG_512:
+#endif
+		return 1;
 	default:
 		return 0;
 	}
@@ -325,6 +402,7 @@ static int wrap_nettle_hash_exists(gnutls_digest_algorithm_t algo)
 	switch (algo) {
 	case GNUTLS_DIG_MD5:
 	case GNUTLS_DIG_SHA1:
+	case GNUTLS_DIG_MD5_SHA1:
 
 	case GNUTLS_DIG_SHA224:
 	case GNUTLS_DIG_SHA256:
@@ -341,18 +419,42 @@ static int wrap_nettle_hash_exists(gnutls_digest_algorithm_t algo)
 		return 0;
 #endif
 	case GNUTLS_DIG_MD2:
-		if (_gnutls_fips_mode_enabled() != 0)
-			return 0;
-		else
-			return 1;
+#if ENABLE_GOST
+	case GNUTLS_DIG_GOSTR_94:
+	case GNUTLS_DIG_STREEBOG_256:
+	case GNUTLS_DIG_STREEBOG_512:
+#endif
+		return 1;
 	default:
 		return 0;
 	}
 }
 
+static void _md5_sha1_update(void *_ctx, size_t len, const uint8_t *data)
+{
+	struct md5_sha1_ctx *ctx = _ctx;
+
+	md5_update(&ctx->md5, len, data);
+	sha1_update(&ctx->sha1, len, data);
+}
+
+static void _md5_sha1_digest(void *_ctx, size_t len, uint8_t *digest)
+{
+	struct md5_sha1_ctx *ctx = _ctx;
+
+	md5_digest(&ctx->md5, len <= MD5_DIGEST_SIZE ? len : MD5_DIGEST_SIZE,
+		   digest);
+
+	if (len > MD5_DIGEST_SIZE)
+		sha1_digest(&ctx->sha1, len - MD5_DIGEST_SIZE,
+			    digest + MD5_DIGEST_SIZE);
+}
+
 static int _ctx_init(gnutls_digest_algorithm_t algo,
 		     struct nettle_hash_ctx *ctx)
 {
+	/* Any FIPS140-2 related enforcement is performed on
+	 * gnutls_hash_init() and gnutls_hmac_init() */
 	switch (algo) {
 	case GNUTLS_DIG_MD5:
 		md5_init(&ctx->ctx.md5);
@@ -367,6 +469,14 @@ static int _ctx_init(gnutls_digest_algorithm_t algo,
 		ctx->digest = (digest_func) sha1_digest;
 		ctx->ctx_ptr = &ctx->ctx.sha1;
 		ctx->length = SHA1_DIGEST_SIZE;
+		break;
+	case GNUTLS_DIG_MD5_SHA1:
+		md5_init(&ctx->ctx.md5_sha1.md5);
+		sha1_init(&ctx->ctx.md5_sha1.sha1);
+		ctx->update = (update_func) _md5_sha1_update;
+		ctx->digest = (digest_func) _md5_sha1_digest;
+		ctx->ctx_ptr = &ctx->ctx.md5_sha1;
+		ctx->length = MD5_DIGEST_SIZE + SHA1_DIGEST_SIZE;
 		break;
 	case GNUTLS_DIG_SHA224:
 		sha224_init(&ctx->ctx.sha224);
@@ -427,15 +537,35 @@ static int _ctx_init(gnutls_digest_algorithm_t algo,
 		break;
 #endif
 	case GNUTLS_DIG_MD2:
-		if (_gnutls_fips_mode_enabled() != 0)
-			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-
 		md2_init(&ctx->ctx.md2);
 		ctx->update = (update_func) md2_update;
 		ctx->digest = (digest_func) md2_digest;
 		ctx->ctx_ptr = &ctx->ctx.md2;
 		ctx->length = MD2_DIGEST_SIZE;
 		break;
+#if ENABLE_GOST
+	case GNUTLS_DIG_GOSTR_94:
+		gosthash94cp_init(&ctx->ctx.gosthash94cp);
+		ctx->update = (update_func) gosthash94cp_update;
+		ctx->digest = (digest_func) gosthash94cp_digest;
+		ctx->ctx_ptr = &ctx->ctx.gosthash94cp;
+		ctx->length = GOSTHASH94_DIGEST_SIZE;
+		break;
+	case GNUTLS_DIG_STREEBOG_256:
+		streebog256_init(&ctx->ctx.streebog256);
+		ctx->update = (update_func) streebog256_update;
+		ctx->digest = (digest_func) streebog256_digest;
+		ctx->ctx_ptr = &ctx->ctx.streebog256;
+		ctx->length = STREEBOG256_DIGEST_SIZE;
+		break;
+	case GNUTLS_DIG_STREEBOG_512:
+		streebog512_init(&ctx->ctx.streebog512);
+		ctx->update = (update_func) streebog512_update;
+		ctx->digest = (digest_func) streebog512_digest;
+		ctx->ctx_ptr = &ctx->ctx.streebog512;
+		ctx->length = STREEBOG512_DIGEST_SIZE;
+		break;
+#endif
 	default:
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;

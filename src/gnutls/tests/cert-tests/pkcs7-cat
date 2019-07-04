@@ -38,7 +38,7 @@ OUTFILE=out-pkcs7.$$.tmp
 
 check_for_datefudge
 datefudge -s "2016-10-1" \
-${VALGRIND} "${CERTTOOL}" --p7-verify --inder --infile "${srcdir}/data/pkcs7-cat.p7" --load-ca-certificate "${srcdir}/data/pkcs7-cat-ca.pem" 
+${VALGRIND} "${CERTTOOL}" --verify-allow-broken --p7-verify --inder --infile "${srcdir}/data/pkcs7-cat.p7" --load-ca-certificate "${srcdir}/data/pkcs7-cat-ca.pem" 
 rc=$?
 
 if test "${rc}" != "0"; then

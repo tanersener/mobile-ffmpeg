@@ -15,7 +15,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -453,7 +453,7 @@ int gnutls_x509_ext_import_name_constraints(const gnutls_datum_t * ext,
  *
  * This function will convert the provided name constraints type to a
  * DER-encoded PKIX NameConstraints (2.5.29.30) extension. The output data in 
- * @ext will be allocated usin gnutls_malloc().
+ * @ext will be allocated using gnutls_malloc().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a negative error value.
  *
@@ -1052,7 +1052,7 @@ int gnutls_x509_ext_export_authority_key_id(gnutls_x509_aki_t aki,
 							   san.data,
 							   aki->cert_issuer.
 							   names[i].san.size);
-			if (result < 0) {
+			if (ret < 0) {
 				gnutls_assert();
 				goto cleanup;
 			}
@@ -1178,6 +1178,83 @@ int gnutls_x509_ext_export_key_usage(unsigned int usage, gnutls_datum_t * ext)
 	}
 
 	return 0;
+}
+
+/**
+ * gnutls_x509_ext_import_inhibit_anypolicy:
+ * @ext: the DER encoded extension data
+ * @skipcerts: will hold the number of certificates after which anypolicy is no longer acceptable.
+ *
+ * This function will return certificate's value of SkipCerts,
+ * by reading the DER data of the Inhibit anyPolicy X.509 extension (2.5.29.54).
+ *
+ * The @skipcerts value is the number of additional certificates that
+ * may appear in the path before the anyPolicy (%GNUTLS_X509_OID_POLICY_ANY)
+ * is no longer acceptable.
+ *
+ * Returns: zero, or a negative error code in case of
+ *   parsing error.  If the certificate does not contain the Inhibit anyPolicy
+ *   extension %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be
+ *   returned.
+ *
+ * Since: 3.6.0
+ **/
+int gnutls_x509_ext_import_inhibit_anypolicy(const gnutls_datum_t * ext,
+				  unsigned int *skipcerts)
+{
+	int ret;
+
+	ret = _gnutls_x509_read_der_uint(ext->data, ext->size, skipcerts);
+	if (ret < 0) {
+		gnutls_assert();
+	}
+
+	return ret;
+}
+
+/**
+ * gnutls_x509_ext_export_inhibit_anypolicy:
+ * @skipcerts: number of certificates after which anypolicy is no longer acceptable.
+ * @ext: The DER-encoded extension data; must be freed using gnutls_free().
+ *
+ * This function will convert the @skipcerts value to a DER
+ * encoded Inhibit AnyPolicy PKIX extension. The @ext data will be allocated using
+ * gnutls_malloc().
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.6.0
+ **/
+int gnutls_x509_ext_export_inhibit_anypolicy(unsigned int skipcerts, gnutls_datum_t * ext)
+{
+	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	int result, ret;
+
+	result = asn1_create_element(_gnutls_get_gnutls_asn(), "GNUTLS.DSAPublicKey", &c2);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	ret = _gnutls_x509_write_uint32(c2, "", skipcerts);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret = _gnutls_x509_der_encode(c2, "", ext, 0);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret = 0;
+
+ cleanup:
+	asn1_delete_structure(&c2);
+
+	return ret;
 }
 
 /**
@@ -1443,9 +1520,9 @@ int gnutls_x509_ext_export_basic_constraints(unsigned int ca, int pathlen,
  *
  * Since: 3.3.0
  **/
-int gnutls_x509_ext_import_proxy(const gnutls_datum_t * ext, int *pathlen,
-			      char **policyLanguage, char **policy,
-			      size_t * sizeof_policy)
+int gnutls_x509_ext_import_proxy(const gnutls_datum_t *ext, int *pathlen,
+			         char **policyLanguage, char **policy,
+			         size_t *sizeof_policy)
 {
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
 	int result;
@@ -1486,11 +1563,6 @@ int gnutls_x509_ext_import_proxy(const gnutls_datum_t * ext, int *pathlen,
 		goto cleanup;
 	}
 
-	if (policyLanguage) {
-		*policyLanguage = (char *)value1.data;
-		value1.data = NULL;
-	}
-
 	result = _gnutls_x509_read_value(c2, "proxyPolicy.policy", &value2);
 	if (result == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND) {
 		if (policy)
@@ -1507,6 +1579,11 @@ int gnutls_x509_ext_import_proxy(const gnutls_datum_t * ext, int *pathlen,
 		}
 		if (sizeof_policy)
 			*sizeof_policy = value2.size;
+	}
+
+	if (policyLanguage) {
+		*policyLanguage = (char *)value1.data;
+		value1.data = NULL;
 	}
 
 	result = 0;
@@ -1604,7 +1681,7 @@ static int decode_user_notice(const void *data, size_t size,
 	int ret, len;
 	char choice_type[64];
 	char name[128];
-	gnutls_datum_t td, utd;
+	gnutls_datum_t td = {NULL,0}, utd;
 
 	ret = asn1_create_element(_gnutls_get_pkix(), "PKIX1.UserNotice", &c2);
 	if (ret != ASN1_SUCCESS) {
@@ -1721,6 +1798,8 @@ void gnutls_x509_policies_deinit(gnutls_x509_policies_t policies)
  * This function will return a specific policy as stored in
  * the @policies type. The returned values should be treated as constant
  * and valid for the lifetime of @policies.
+ *
+ * The any policy OID is available as the %GNUTLS_X509_OID_POLICY_ANY macro.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
  * if the index is out of bounds, otherwise a negative error value.
@@ -1915,7 +1994,6 @@ int gnutls_x509_ext_import_policies(const gnutls_datum_t * ext,
 				ret =
 				    decode_user_notice(td.data, td.size, &txt);
 				gnutls_free(td.data);
-				td.data = NULL;
 
 				if (ret < 0) {
 					gnutls_assert();
@@ -2024,7 +2102,7 @@ int gnutls_x509_ext_export_policies(gnutls_x509_policies_t policies,
 {
 	int result;
 	unsigned i, j;
-	gnutls_datum_t der_data, tmpd;
+	gnutls_datum_t der_data = {NULL, 0}, tmpd;
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
 	const char *oid;
 
@@ -2723,18 +2801,24 @@ static int parse_aia(ASN1_TYPE c2, gnutls_x509_aia_t aia)
 		}
 		aia->aia = tmp;
 
-		aia->aia[indx].oid.data = (void*)gnutls_strdup(tmpoid);
-		aia->aia[indx].oid.size = strlen(tmpoid);
-
 		snprintf(nptr, sizeof(nptr), "?%u.accessLocation", i);
+
 
 		ret = _gnutls_parse_general_name2(c2, nptr, -1, &aia->aia[indx].san, 
 			&aia->aia[indx].san_type, 0);
 		if (ret < 0)
 			break;
 
+		/* we do the strdup after parsing to avoid a memory leak */
+		aia->aia[indx].oid.data = (void*)gnutls_strdup(tmpoid);
+		aia->aia[indx].oid.size = strlen(tmpoid);
+
 		aia->size++;
 
+		if (aia->aia[indx].oid.data == NULL) {
+			gnutls_assert();
+			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+		}
 	}
 	
 	if (ret < 0 && ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
@@ -2754,7 +2838,7 @@ static int parse_aia(ASN1_TYPE c2, gnutls_x509_aia_t aia)
  * extension from the provided DER-encoded data; see RFC 5280 section 4.2.2.1 
  * for more information on the extension.  The
  * AIA extension holds a sequence of AccessDescription (AD) data.
- * 
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a negative error value.
  *
  * Since: 3.3.0
@@ -3019,7 +3103,6 @@ int gnutls_x509_ext_import_key_purposes(const gnutls_datum_t * ext,
 
 		ret = _gnutls_x509_read_value(c2, tmpstr, &oid);
 		if (ret == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND) {
-			ret = 0;
 			break;
 		}
 
@@ -3052,7 +3135,7 @@ int gnutls_x509_ext_import_key_purposes(const gnutls_datum_t * ext,
  *
  * This function will convert the key purposes type to a
  * DER-encoded PKIX ExtKeyUsageSyntax (2.5.29.37) extension. The output data in 
- * @ext will be allocated usin gnutls_malloc().
+ * @ext will be allocated using gnutls_malloc().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a negative error value.
  *

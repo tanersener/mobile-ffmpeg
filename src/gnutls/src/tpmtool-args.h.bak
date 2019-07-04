@@ -19,7 +19,7 @@
  * The tpmtool program is copyrighted and licensed
  * under the following terms:
  *
- *  Copyright (C) 2000-2018 Free Software Foundation, and others, all rights reserved.
+ *  Copyright (C) 2000-2019 Free Software Foundation, and others, all rights reserved.
  *  This is free software. It is licensed for use, modification and
  *  redistribution under the terms of the GNU General Public License,
  *  version 3 or later <http://gnu.org/licenses/gpl.html>
@@ -66,33 +66,34 @@
  *  Enumeration of each option type for tpmtool
  */
 typedef enum {
-    INDEX_OPT_DEBUG         =  0,
-    INDEX_OPT_INFILE        =  1,
-    INDEX_OPT_OUTFILE       =  2,
-    INDEX_OPT_GENERATE_RSA  =  3,
-    INDEX_OPT_REGISTER      =  4,
-    INDEX_OPT_SIGNING       =  5,
-    INDEX_OPT_LEGACY        =  6,
-    INDEX_OPT_USER          =  7,
-    INDEX_OPT_SYSTEM        =  8,
-    INDEX_OPT_PUBKEY        =  9,
-    INDEX_OPT_LIST          = 10,
-    INDEX_OPT_DELETE        = 11,
-    INDEX_OPT_TEST_SIGN     = 12,
-    INDEX_OPT_SEC_PARAM     = 13,
-    INDEX_OPT_BITS          = 14,
-    INDEX_OPT_INDER         = 15,
-    INDEX_OPT_OUTDER        = 16,
-    INDEX_OPT_VERSION       = 17,
-    INDEX_OPT_HELP          = 18,
-    INDEX_OPT_MORE_HELP     = 19
+    INDEX_OPT_DEBUG           =  0,
+    INDEX_OPT_INFILE          =  1,
+    INDEX_OPT_OUTFILE         =  2,
+    INDEX_OPT_GENERATE_RSA    =  3,
+    INDEX_OPT_REGISTER        =  4,
+    INDEX_OPT_SIGNING         =  5,
+    INDEX_OPT_LEGACY          =  6,
+    INDEX_OPT_USER            =  7,
+    INDEX_OPT_SYSTEM          =  8,
+    INDEX_OPT_PUBKEY          =  9,
+    INDEX_OPT_LIST            = 10,
+    INDEX_OPT_DELETE          = 11,
+    INDEX_OPT_TEST_SIGN       = 12,
+    INDEX_OPT_SEC_PARAM       = 13,
+    INDEX_OPT_BITS            = 14,
+    INDEX_OPT_INDER           = 15,
+    INDEX_OPT_OUTDER          = 16,
+    INDEX_OPT_SRK_WELL_KNOWN  = 17,
+    INDEX_OPT_VERSION         = 18,
+    INDEX_OPT_HELP            = 19,
+    INDEX_OPT_MORE_HELP       = 20
 } teOptIndex;
 /** count of all options for tpmtool */
-#define OPTION_CT    20
+#define OPTION_CT    21
 /** tpmtool version */
-#define TPMTOOL_VERSION       "3.5.19"
+#define TPMTOOL_VERSION       "3.6.8"
 /** Full tpmtool version text */
-#define TPMTOOL_FULL_VERSION  "tpmtool 3.5.19"
+#define TPMTOOL_FULL_VERSION  "tpmtool 3.6.8"
 
 /**
  *  Interface defines for all options.  Replace "n" with the UPPER_CASED
@@ -164,6 +165,7 @@ typedef enum {
 #define OPT_VALUE_BITS           (DESC(BITS).optArg.argInt)
 #define VALUE_OPT_INDER          0x100F
 #define VALUE_OPT_OUTDER         0x1010
+#define VALUE_OPT_SRK_WELL_KNOWN 0x1011
 /** option flag (value) for help-value option */
 #define VALUE_OPT_HELP          'h'
 /** option flag (value) for more-help-value option */

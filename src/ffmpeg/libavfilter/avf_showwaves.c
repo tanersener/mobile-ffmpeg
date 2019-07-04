@@ -29,6 +29,7 @@
 #include "libavutil/opt.h"
 #include "libavutil/parseutils.h"
 #include "avfilter.h"
+#include "filters.h"
 #include "formats.h"
 #include "audio.h"
 #include "video.h"
@@ -416,7 +417,7 @@ static int config_output(AVFilterLink *outlink)
         showwaves->n = 1;
 
     if (!showwaves->n)
-        showwaves->n = FFMAX(1, ((double)inlink->sample_rate / (showwaves->w * av_q2d(showwaves->rate))) + 0.5);
+        showwaves->n = FFMAX(1, av_rescale_q(inlink->sample_rate, av_make_q(1, showwaves->w), showwaves->rate));
 
     showwaves->buf_idx = 0;
     if (!(showwaves->buf_idy = av_mallocz_array(nb_channels, sizeof(*showwaves->buf_idy)))) {
@@ -559,7 +560,9 @@ static int push_single_pic(AVFilterLink *outlink)
     AVFilterContext *ctx = outlink->src;
     AVFilterLink *inlink = ctx->inputs[0];
     ShowWavesContext *showwaves = ctx->priv;
-    int64_t n = 0, max_samples = showwaves->total_samples / outlink->w;
+    int64_t n = 0, column_max_samples = showwaves->total_samples / outlink->w;
+    int64_t remaining_samples = showwaves->total_samples - (column_max_samples * outlink->w);
+    int64_t last_column_samples = column_max_samples + remaining_samples;
     AVFrame *out = showwaves->outpicref;
     struct frame_node *node;
     const int nb_channels = inlink->channels;
@@ -569,12 +572,12 @@ static int push_single_pic(AVFilterLink *outlink)
     int col = 0;
     int64_t *sum = showwaves->sum;
 
-    if (max_samples == 0) {
+    if (column_max_samples == 0) {
         av_log(ctx, AV_LOG_ERROR, "Too few samples\n");
         return AVERROR(EINVAL);
     }
 
-    av_log(ctx, AV_LOG_DEBUG, "Create frame averaging %"PRId64" samples per column\n", max_samples);
+    av_log(ctx, AV_LOG_DEBUG, "Create frame averaging %"PRId64" samples per column\n", column_max_samples);
 
     memset(sum, 0, nb_channels);
 
@@ -584,11 +587,13 @@ static int push_single_pic(AVFilterLink *outlink)
         const int16_t *p = (const int16_t *)frame->data[0];
 
         for (i = 0; i < frame->nb_samples; i++) {
+            int64_t max_samples = col == outlink->w - 1 ? last_column_samples: column_max_samples;
             int ch;
 
             for (ch = 0; ch < nb_channels; ch++)
                 sum[ch] += abs(p[ch + i*nb_channels]) << 1;
-            if (n++ == max_samples) {
+            n++;
+            if (n == max_samples) {
                 for (ch = 0; ch < nb_channels; ch++) {
                     int16_t sample = sum[ch] / max_samples;
                     uint8_t *buf = out->data[0] + col * pixstep;
@@ -702,7 +707,8 @@ static int showwaves_filter_frame(AVFilterLink *inlink, AVFrame *insamples)
             showwaves->sample_count_mod = 0;
             showwaves->buf_idx++;
         }
-        if (showwaves->buf_idx == showwaves->w)
+        if (showwaves->buf_idx == showwaves->w ||
+            (ff_outlink_get_status(inlink) && i == nb_samples - 1))
             if ((ret = push_frame(outlink)) < 0)
                 break;
         outpicref = showwaves->outpicref;
@@ -713,11 +719,33 @@ end:
     return ret;
 }
 
+static int activate(AVFilterContext *ctx)
+{
+    AVFilterLink *inlink = ctx->inputs[0];
+    AVFilterLink *outlink = ctx->outputs[0];
+    ShowWavesContext *showwaves = ctx->priv;
+    AVFrame *in;
+    const int nb_samples = showwaves->n * outlink->w;
+    int ret;
+
+    FF_FILTER_FORWARD_STATUS_BACK(outlink, inlink);
+
+    ret = ff_inlink_consume_samples(inlink, nb_samples, nb_samples, &in);
+    if (ret < 0)
+        return ret;
+    if (ret > 0)
+        return showwaves_filter_frame(inlink, in);
+
+    FF_FILTER_FORWARD_STATUS(inlink, outlink);
+    FF_FILTER_FORWARD_WANTED(outlink, inlink);
+
+    return FFERROR_NOT_READY;
+}
+
 static const AVFilterPad showwaves_inputs[] = {
     {
         .name         = "default",
         .type         = AVMEDIA_TYPE_AUDIO,
-        .filter_frame = showwaves_filter_frame,
     },
     { NULL }
 };
@@ -727,7 +755,6 @@ static const AVFilterPad showwaves_outputs[] = {
         .name          = "default",
         .type          = AVMEDIA_TYPE_VIDEO,
         .config_props  = config_output,
-        .request_frame = request_frame,
     },
     { NULL }
 };
@@ -740,6 +767,7 @@ AVFilter ff_avf_showwaves = {
     .query_formats = query_formats,
     .priv_size     = sizeof(ShowWavesContext),
     .inputs        = showwaves_inputs,
+    .activate      = activate,
     .outputs       = showwaves_outputs,
     .priv_class    = &showwaves_class,
 };
@@ -761,6 +789,9 @@ static const AVOption showwavespic_options[] = {
         { "log", "logarithmic",    0, AV_OPT_TYPE_CONST, {.i64=SCALE_LOG}, .flags=FLAGS, .unit="scale"},
         { "sqrt", "square root",   0, AV_OPT_TYPE_CONST, {.i64=SCALE_SQRT}, .flags=FLAGS, .unit="scale"},
         { "cbrt", "cubic root",    0, AV_OPT_TYPE_CONST, {.i64=SCALE_CBRT}, .flags=FLAGS, .unit="scale"},
+    { "draw", "set draw mode", OFFSET(draw_mode), AV_OPT_TYPE_INT, {.i64 = DRAW_SCALE}, 0, DRAW_NB-1, FLAGS, .unit="draw" },
+        { "scale", "scale pixel values for each drawn sample", 0, AV_OPT_TYPE_CONST, {.i64=DRAW_SCALE}, .flags=FLAGS, .unit="draw"},
+        { "full",  "draw every pixel for sample directly",     0, AV_OPT_TYPE_CONST, {.i64=DRAW_FULL},  .flags=FLAGS, .unit="draw"},
     { NULL }
 };
 

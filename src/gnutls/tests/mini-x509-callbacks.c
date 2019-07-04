@@ -128,16 +128,18 @@ static int server_callback(gnutls_session_t session)
 {
 	server_ok = 1;
 
-	if (gnutls_handshake_get_last_in(session) !=
-	    GNUTLS_HANDSHAKE_CERTIFICATE_PKT) {
-		fail("client's last input message was unexpected\n");
-		exit(1);
-	}
+	if (gnutls_protocol_get_version(session) == GNUTLS_TLS1_2) {
+		if (gnutls_handshake_get_last_in(session) !=
+		    GNUTLS_HANDSHAKE_CERTIFICATE_PKT) {
+			fail("client's last input message was unexpected\n");
+			exit(1);
+		}
 
-	if (gnutls_handshake_get_last_out(session) !=
-	    GNUTLS_HANDSHAKE_SERVER_HELLO_DONE) {
-		fail("client's last output message was unexpected\n");
-		exit(1);
+		if (gnutls_handshake_get_last_out(session) !=
+		    GNUTLS_HANDSHAKE_SERVER_HELLO_DONE) {
+			fail("client's last output message was unexpected\n");
+			exit(1);
+		}
 	}
 
 	return 0;
@@ -207,7 +209,8 @@ static void append_alpn(gnutls_session_t session)
 	}
 }
 
-void doit(void)
+static
+void start(const char *prio, unsigned check_order)
 {
 	/* Server stuff. */
 	gnutls_certificate_credentials_t serverx509cred;
@@ -217,6 +220,12 @@ void doit(void)
 	gnutls_certificate_credentials_t clientx509cred;
 	gnutls_session_t client;
 	int cret = GNUTLS_E_AGAIN;
+
+	success("trying %s\n", prio);
+
+	client_ok = 0;
+	server_ok = 0;
+	pch_ok = 0;
 
 	/* General init. */
 	global_init();
@@ -232,7 +241,7 @@ void doit(void)
 	gnutls_init(&server, GNUTLS_SERVER);
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
 				serverx509cred);
-	gnutls_priority_set_direct(server, "NORMAL", NULL);
+	gnutls_priority_set_direct(server, prio, NULL);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
@@ -241,9 +250,10 @@ void doit(void)
 	gnutls_certificate_server_set_request(server, GNUTLS_CERT_REQUEST);
 	gnutls_handshake_set_post_client_hello_function(server,
 							post_client_hello_callback);
-	gnutls_handshake_set_hook_function(server, GNUTLS_HANDSHAKE_ANY,
-					   GNUTLS_HOOK_POST,
-					   handshake_callback);
+	if (check_order)
+		gnutls_handshake_set_hook_function(server, GNUTLS_HANDSHAKE_ANY,
+						   GNUTLS_HOOK_POST,
+						   handshake_callback);
 	append_alpn(server);
 
 	/* Init client */
@@ -251,7 +261,7 @@ void doit(void)
 	gnutls_init(&client, GNUTLS_CLIENT);
 	gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
 				clientx509cred);
-	gnutls_priority_set_direct(client, "NORMAL", NULL);
+	gnutls_priority_set_direct(client, prio, NULL);
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);
@@ -280,4 +290,13 @@ void doit(void)
 
 	if (client_ok == 0)
 		fail("Client certificate verify callback wasn't called\n");
+
+	reset_buffers();
+}
+
+void doit(void)
+{
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.2", 1);
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.3", 0);
+	start("NORMAL", 0);
 }

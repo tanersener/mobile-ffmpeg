@@ -6,7 +6,6 @@
 @var{session}: is a gnutls session
 
 This function will return the peer's certificate activation time.
-This is the creation time for openpgp keys.
 
 @strong{Returns:} (time_t)-1 on error.
 

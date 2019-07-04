@@ -8,13 +8,13 @@
 
 @var{nonce_len}: The length of the nonce
 
-@var{auth}: the data to be authenticated
+@var{auth}: additional data to be authenticated
 
 @var{auth_len}: The length of the data
 
 @var{tag_size}: The size of the tag to use (use zero for the default)
 
-@var{ctext}: the data to decrypt
+@var{ctext}: the data to decrypt (including the authentication tag)
 
 @var{ctext_len}: the length of data to decrypt (includes tag size)
 
@@ -23,11 +23,13 @@
 @var{ptext_len}: the length of decrypted data (initially must hold the maximum available size)
 
 This function will decrypt the given data using the algorithm
-specified by the context. This function must be provided the whole
-data to be decrypted, including the tag, and will fail if the tag
-verification fails.
+specified by the context. This function must be provided the complete
+data to be decrypted, including the authentication tag. On several
+AEAD ciphers, the authentication tag is appended to the ciphertext,
+though this is not a general rule. This function will fail if
+the tag verification fails.
 
-@strong{Returns:} Zero or a negative error code on error.
+@strong{Returns:} Zero or a negative error code on verification failure or other error.
 
 @strong{Since:} 3.4.0
 @end deftypefun

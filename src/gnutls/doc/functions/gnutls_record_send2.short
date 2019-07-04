@@ -1,0 +1,1 @@
+@item @var{ssize_t} @ref{gnutls_record_send2} (gnutls_session_t @var{session}, const void * @var{data}, size_t @var{data_size}, size_t @var{pad}, unsigned @var{flags})

@@ -16,7 +16,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -88,7 +88,6 @@ _gnutls_mpi_random_modp(bigint_t r, bigint_t p,
 
 	if (buf_release != 0) {
 		gnutls_free(buf);
-		buf = NULL;
 	}
 
 	if (r != NULL) {
@@ -154,17 +153,16 @@ _gnutls_mpi_init_scan_nz(bigint_t * ret_mpi, const void *buffer, size_t nbytes)
 }
 
 int
-_gnutls_mpi_init_scan_pgp(bigint_t * ret_mpi, const void *buffer, size_t nbytes)
+_gnutls_mpi_init_scan_le(bigint_t * ret_mpi, const void *buffer, size_t nbytes)
 {
-bigint_t r;
-int ret;
+	bigint_t r;
+	int ret;
 
 	ret = _gnutls_mpi_init(&r);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	ret =
-	    _gnutls_mpi_scan_pgp(r, buffer, nbytes);
+	ret = _gnutls_mpi_scan_le(r, buffer, nbytes);
 	if (ret < 0) {
 		gnutls_assert();
 		_gnutls_mpi_release(&r);
@@ -173,6 +171,32 @@ int ret;
 
 	*ret_mpi = r;
 
+	return 0;
+}
+
+int _gnutls_mpi_dprint_le(const bigint_t a, gnutls_datum_t * dest)
+{
+	int ret;
+	uint8_t *buf = NULL;
+	size_t bytes = 0;
+
+	if (dest == NULL || a == NULL)
+		return GNUTLS_E_INVALID_REQUEST;
+
+	_gnutls_mpi_print_le(a, NULL, &bytes);
+	if (bytes != 0)
+		buf = gnutls_malloc(bytes);
+	if (buf == NULL)
+		return GNUTLS_E_MEMORY_ERROR;
+
+	ret = _gnutls_mpi_print_le(a, buf, &bytes);
+	if (ret < 0) {
+		gnutls_free(buf);
+		return ret;
+	}
+
+	dest->data = buf;
+	dest->size = bytes;
 	return 0;
 }
 
@@ -271,13 +295,43 @@ _gnutls_mpi_dprint_size(const bigint_t a, gnutls_datum_t * dest,
 	return 0;
 }
 
+/* like _gnutls_mpi_dprint_size, but prints into preallocated byte buffer */
+int
+_gnutls_mpi_bprint_size(const bigint_t a, uint8_t *buf, size_t size)
+{
+	int result;
+	size_t bytes = 0;
+
+	result = _gnutls_mpi_print(a, NULL, &bytes);
+	if (result != GNUTLS_E_SHORT_MEMORY_BUFFER)
+		return gnutls_assert_val(result);
+
+	if (bytes <= size) {
+		unsigned i;
+		size_t diff = size - bytes;
+
+		for (i = 0; i < diff; i++)
+			buf[i] = 0;
+		result = _gnutls_mpi_print(a, &buf[diff], &bytes);
+	} else {
+		result = _gnutls_mpi_print(a, buf, &bytes);
+	}
+
+	return result;
+}
+
+/* Flags for __gnutls_x509_read_int() and __gnutls_x509_write_int */
+#define GNUTLS_X509_INT_OVERWRITE	(1 << 0)
+#define GNUTLS_X509_INT_LE		(1 << 1)
+#define GNUTLS_X509_INT_LZ		(1 << 2) /* write only */
+
 /* this function reads an integer
  * from asn1 structs. Combines the read and mpi_scan
  * steps.
  */
 static int
 __gnutls_x509_read_int(ASN1_TYPE node, const char *value,
-		      bigint_t * ret_mpi, int overwrite)
+		       bigint_t * ret_mpi, unsigned int flags)
 {
 	int result;
 	uint8_t *tmpstr = NULL;
@@ -303,9 +357,14 @@ __gnutls_x509_read_int(ASN1_TYPE node, const char *value,
 		return _gnutls_asn2err(result);
 	}
 
-	result = _gnutls_mpi_init_scan(ret_mpi, tmpstr, tmpstr_size);
+	if (flags & GNUTLS_X509_INT_LE)
+		result = _gnutls_mpi_init_scan_le(ret_mpi, tmpstr,
+						  tmpstr_size);
+	else
+		result = _gnutls_mpi_init_scan(ret_mpi, tmpstr,
+					       tmpstr_size);
 
-	if (overwrite)
+	if (flags & GNUTLS_X509_INT_OVERWRITE)
 		zeroize_key(tmpstr, tmpstr_size);
 	gnutls_free(tmpstr);
 
@@ -321,29 +380,42 @@ int
 _gnutls_x509_read_int(ASN1_TYPE node, const char *value,
 		      bigint_t * ret_mpi)
 {
-	return __gnutls_x509_read_int(node, value, ret_mpi, 0);
+	return __gnutls_x509_read_int(node, value, ret_mpi,
+				      0);
 }
 
 int
 _gnutls_x509_read_key_int(ASN1_TYPE node, const char *value,
 		      bigint_t * ret_mpi)
 {
-	return __gnutls_x509_read_int(node, value, ret_mpi, 1);
+	return __gnutls_x509_read_int(node, value, ret_mpi,
+				      GNUTLS_X509_INT_OVERWRITE);
+}
+
+int
+_gnutls_x509_read_key_int_le(ASN1_TYPE node, const char *value,
+			     bigint_t * ret_mpi)
+{
+	return __gnutls_x509_read_int(node, value, ret_mpi,
+				      GNUTLS_X509_INT_OVERWRITE |
+				      GNUTLS_X509_INT_LE);
 }
 
 /* Writes the specified integer into the specified node.
  */
 static int
 __gnutls_x509_write_int(ASN1_TYPE node, const char *value, bigint_t mpi,
-		       int lz, int overwrite)
+			unsigned int flags)
 {
 	uint8_t *tmpstr;
 	size_t s_len;
 	int result;
 
 	s_len = 0;
-	if (lz)
+	if (flags & GNUTLS_X509_INT_LZ)
 		result = _gnutls_mpi_print_lz(mpi, NULL, &s_len);
+	else if (GNUTLS_X509_INT_LE)
+		result = _gnutls_mpi_print_le(mpi, NULL, &s_len);
 	else
 		result = _gnutls_mpi_print(mpi, NULL, &s_len);
 
@@ -358,8 +430,10 @@ __gnutls_x509_write_int(ASN1_TYPE node, const char *value, bigint_t mpi,
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	if (lz)
+	if (flags & GNUTLS_X509_INT_LZ)
 		result = _gnutls_mpi_print_lz(mpi, tmpstr, &s_len);
+	else if (GNUTLS_X509_INT_LE)
+		result = _gnutls_mpi_print_le(mpi, tmpstr, &s_len);
 	else
 		result = _gnutls_mpi_print(mpi, tmpstr, &s_len);
 
@@ -370,8 +444,8 @@ __gnutls_x509_write_int(ASN1_TYPE node, const char *value, bigint_t mpi,
 	}
 
 	result = asn1_write_value(node, value, tmpstr, s_len);
-	
-	if (overwrite)
+
+	if (flags & GNUTLS_X509_INT_OVERWRITE)
 		zeroize_key(tmpstr, s_len);
 
 	gnutls_free(tmpstr);
@@ -388,12 +462,23 @@ int
 _gnutls_x509_write_int(ASN1_TYPE node, const char *value, bigint_t mpi,
 		       int lz)
 {
-	return __gnutls_x509_write_int(node, value, mpi, lz, 0);
+	return __gnutls_x509_write_int(node, value, mpi,
+				       lz ? GNUTLS_X509_INT_LZ : 0);
 }
 
 int
 _gnutls_x509_write_key_int(ASN1_TYPE node, const char *value, bigint_t mpi,
 		       int lz)
 {
-	return __gnutls_x509_write_int(node, value, mpi, lz, 1);
+	return __gnutls_x509_write_int(node, value, mpi,
+				       (lz ? GNUTLS_X509_INT_LZ : 0) |
+				       GNUTLS_X509_INT_OVERWRITE);
+}
+
+int
+_gnutls_x509_write_key_int_le(ASN1_TYPE node, const char *value, bigint_t mpi)
+{
+	return __gnutls_x509_write_int(node, value, mpi,
+				       GNUTLS_X509_INT_OVERWRITE |
+				       GNUTLS_X509_INT_LE);
 }

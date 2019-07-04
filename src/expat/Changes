@@ -2,6 +2,41 @@ NOTE: We are looking for help with a few things:
       https://github.com/libexpat/libexpat/labels/help%20wanted
       If you can help, please get in touch.  Thanks!
 
+Release 2.2.7 Wed June 19 2019
+        Security fixes:
+       #186 #262  Fix extraction of namespace prefixes from XML names;
+                    XML names with multiple colons could end up in the
+                    wrong namespace, and take a high amount of RAM and CPU
+                    resources while processing, opening the door to
+                    use for denial-of-service attacks
+
+        Other changes:
+       #195 #197  Autotools/CMake: Utilize -fvisibility=hidden to stop
+                    exporting non-API symbols
+            #227  Autotools: Add --without-examples and --without-tests
+            #228  Autotools: Modernize configure.ac
+       #245 #246  Autotools: Fix check for -fvisibility=hidden for Clang
+       #247 #248  Autotools: Fix compilation for lack of docbook2x-man
+       #236 #258  Autotools: Produce .tar.{gz,lz,xz} release archives
+            #212  CMake: Make libdir of pkgconfig expat.pc support multilib
+       #158 #263  CMake: Build man page in PROJECT_BINARY_DIR not _SOURCE_DIR
+            #219  Remove fallback to bcopy, assume that memmove(3) exists
+            #257  Use portable "/usr/bin/env bash" shebang (e.g. for OpenBSD)
+            #243  Windows: Fix syntax of .def module definition files
+                  Version info bumped from 7:8:6 to 7:9:6
+
+        Special thanks to:
+            Benjamin Peterson
+            Caolán McNamara
+            Hanno Böck
+            KangLin
+            Kishore Kunche
+            Marco Maggi
+            Rhodri James
+            Sebastian Dröge
+            userwithuid
+            Yury Gribov
+
 Release 2.2.6 Sun August 12 2018
         Bug fixes:
        #170 #206  Avoid doing arithmetic with NULL pointers in XML_GetBuffer

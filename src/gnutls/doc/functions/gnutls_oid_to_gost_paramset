@@ -1,0 +1,14 @@
+
+
+
+
+@deftypefun {gnutls_gost_paramset_t} {gnutls_oid_to_gost_paramset} (const char * @var{oid})
+@var{oid}: is an object identifier
+
+Converts a textual object identifier to a @code{gnutls_gost_paramset_t}  value.
+
+@strong{Returns:} a @code{gnutls_gost_paramset_get_oid}  of the specified GOST 28147
+param st, or @code{GNUTLS_GOST_PARAMSET_UNKNOWN}  on failure.
+
+@strong{Since:} 3.6.3
+@end deftypefun

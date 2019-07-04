@@ -2,7 +2,7 @@
 
 
 
-@deftypefun {int} {gnutls_sign_is_secure} (gnutls_sign_algorithm_t @var{algorithm})
+@deftypefun {unsigned} {gnutls_sign_is_secure} (gnutls_sign_algorithm_t @var{algorithm})
 @var{algorithm}: is a sign algorithm
 
 

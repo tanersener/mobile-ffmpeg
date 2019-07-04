@@ -144,6 +144,7 @@ static INLINE void variance8_sse2(const uint8_t *src, const int src_stride,
                                   __m128i *const sum) {
   assert(h <= 128);  // May overflow for larger height.
   *sum = _mm_setzero_si128();
+  *sse = _mm_setzero_si128();
   for (int i = 0; i < h; i++) {
     const __m128i s = load8_8to16_sse2(src);
     const __m128i r = load8_8to16_sse2(ref);
@@ -234,6 +235,14 @@ static INLINE void variance128_sse2(const uint8_t *src, const int src_stride,
     src += src_stride;
     ref += ref_stride;
   }
+}
+
+void aom_get8x8var_sse2(const uint8_t *src_ptr, int src_stride,
+                        const uint8_t *ref_ptr, int ref_stride,
+                        unsigned int *sse, int *sum) {
+  __m128i vsse, vsum;
+  variance8_sse2(src_ptr, src_stride, ref_ptr, ref_stride, 8, &vsse, &vsum);
+  variance_final_128_pel_sse2(vsse, vsum, sse, sum);
 }
 
 #define AOM_VAR_NO_LOOP_SSE2(bw, bh, bits, max_pixels)                        \
@@ -556,7 +565,7 @@ void aom_upsampled_pred_sse2(MACROBLOCKD *xd, const struct AV1Common *const cm,
 
       // Get convolve parameters.
       ConvolveParams conv_params = get_conv_params(0, plane, xd->bd);
-      const InterpFilters filters =
+      const int_interpfilters filters =
           av1_broadcast_interp_filter(EIGHTTAP_REGULAR);
 
       // Get the inter predictor.

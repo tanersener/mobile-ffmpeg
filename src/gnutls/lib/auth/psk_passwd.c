@@ -16,15 +16,13 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
 /* Functions for operating in an PSK passwd file are included here */
 
 #include "gnutls_int.h"
-
-#ifdef ENABLE_PSK
 
 #include "x509_b64.h"
 #include "errors.h"
@@ -202,5 +200,36 @@ cleanup:
 
 }
 
+/* returns the username and they key for the PSK session.
+ * Free is non (0) if they have to be freed.
+ */
+int _gnutls_find_psk_key(gnutls_session_t session,
+			 gnutls_psk_client_credentials_t cred,
+			 gnutls_datum_t * username, gnutls_datum_t * key,
+			 int *free)
+{
+	char *user_p;
+	int ret;
 
-#endif				/* ENABLE PSK */
+	*free = 0;
+
+	if (cred->username.data != NULL && cred->key.data != NULL) {
+		username->data = cred->username.data;
+		username->size = cred->username.size;
+		key->data = cred->key.data;
+		key->size = cred->key.size;
+	} else if (cred->get_function != NULL) {
+		ret = cred->get_function(session, &user_p, key);
+		if (ret)
+			return gnutls_assert_val(ret);
+
+		username->data = (uint8_t *) user_p;
+		username->size = strlen(user_p);
+
+		*free = 1;
+	} else
+		return
+		    gnutls_assert_val(GNUTLS_E_INSUFFICIENT_CREDENTIALS);
+
+	return 0;
+}

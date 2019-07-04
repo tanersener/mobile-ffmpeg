@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_base64_decode2} (const gnutls_datum_t * @var{base64}, gnutls_datum_t * @var{result})

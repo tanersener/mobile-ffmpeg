@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pcert_list_import_x509_file} (gnutls_pcert_st * @var{pcert_list}, unsigned * @var{pcert_list_size}, const char * @var{file}, gnutls_x509_crt_fmt_t @var{format}, gnutls_pin_callback_t @var{pin_fn}, void * @var{pin_fn_userdata}, unsigned int @var{flags})

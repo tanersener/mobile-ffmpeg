@@ -112,7 +112,7 @@ set_dependency_rebuilt_flag() {
 
 echo -e "\nBuilding ${ARCH} platform\n"
 echo -e "\nINFO: Starting new build for ${ARCH} at "$(date)"\n" 1>>${BASEDIR}/build.log 2>&1
-INSTALL_BASE="${BASEDIR}/prebuilt/ios-$(get_target_build_directory)"
+INSTALL_BASE="${BASEDIR}/prebuilt/$(get_target_build_directory)"
 
 # CREATING PACKAGE CONFIG DIRECTORY
 PKG_CONFIG_DIRECTORY="${INSTALL_BASE}/pkgconfig"
@@ -123,7 +123,7 @@ fi
 # FILTERING WHICH EXTERNAL LIBRARIES WILL BE BUILT
 # NOTE THAT BUILT-IN LIBRARIES ARE FORWARDED TO FFMPEG SCRIPT WITHOUT ANY PROCESSING
 enabled_library_list=()
-for library in {1..41}
+for library in {1..42}
 do
     if [[ ${!library} -eq 1 ]]; then
         ENABLED_LIBRARY=$(get_library_name $((library - 1)))

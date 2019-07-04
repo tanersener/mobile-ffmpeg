@@ -57,6 +57,76 @@ void av1_nn_predict_c(const float *input_nodes,
   }
 }
 
+#if CONFIG_NN_V2
+// Applies the ReLu activation to one fc layer
+// output[i] = Max(input[i],0.0f)
+static float *nn_relu(const float *input, FC_LAYER *layer) {
+  for (int i = 0; i < layer->num_outputs; ++i) {
+    layer->output[i] = AOMMAX(input[i], 0.0f);
+  }
+
+  return layer->output;
+}
+
+// Applies the Sigmoid activation to one fc layer
+// output[i] = 1/(1+exp(input[i]))
+static float *nn_sigmoid(const float *input, FC_LAYER *layer) {
+  for (int i = 0; i < layer->num_outputs; ++i) {
+    const float tmp = AOMMIN(AOMMAX(input[i], -10.0f), 10.0f);
+    layer->output[i] = 1.0f / (1.0f + expf(-tmp));
+  }
+
+  return layer->output;
+}
+
+// Forward prediction in one fc layer, used in function av1_nn_predict_V2
+static float *nn_fc_forward(const float *input, FC_LAYER *layer) {
+  const float *weights = layer->weights;
+  const float *bias = layer->bias;
+  assert(layer->num_outputs < NN_MAX_NODES_PER_LAYER);
+  // fc
+  for (int node = 0; node < layer->num_outputs; ++node) {
+    float val = bias[node];
+    for (int i = 0; i < layer->num_inputs; ++i) val += weights[i] * input[i];
+    layer->output[node] = val;
+    weights += layer->num_inputs;
+  }
+
+  // activation
+  switch (layer->activation) {
+    case NONE: return layer->output;
+    case RELU: return nn_relu(layer->output, layer);
+    case SIGMOID: return nn_sigmoid(layer->output, layer);
+    case SOFTSIGN:
+      assert(0 && "Softsign has not been supported in NN.");  // TO DO
+      return NULL;
+    default:
+      assert(0 && "Unknown activation");  // Unknown activation
+      return NULL;
+  }
+}
+
+void av1_nn_predict_v2(const float *feature, NN_CONFIG_V2 *nn_config,
+                       float *output) {
+  const float *input_nodes = feature;
+
+  // Propagate the layers.
+  const int num_layers = nn_config->num_hidden_layers;
+  assert(num_layers <= NN_MAX_HIDDEN_LAYERS);
+  for (int i = 0; i < num_layers; ++i) {
+    input_nodes = nn_fc_forward(input_nodes, nn_config->layer + i);
+    assert(nn_config->layer[i + 1].num_inputs ==
+           nn_config->layer[i].num_outputs);
+  }
+
+  // Final layer
+  input_nodes = nn_fc_forward(input_nodes, nn_config->layer + num_layers);
+  assert(nn_config->layer[num_layers].num_outputs == nn_config->num_logits);
+  // Copy the final layer output
+  memcpy(output, input_nodes, sizeof(*input_nodes) * nn_config->num_logits);
+}
+#endif  // CONFIG_NN_V2
+
 void av1_nn_softmax(const float *input, float *output, int n) {
   // Softmax function is invariant to adding the same constant
   // to all input values, so we subtract the maximum input to avoid

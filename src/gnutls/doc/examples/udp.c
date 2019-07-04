@@ -24,7 +24,10 @@ extern int udp_connect(void)
 {
         const char *PORT = "5557";
         const char *SERVER = "127.0.0.1";
-        int err, sd, optval;
+        int err, sd;
+#if defined(IP_DONTFRAG) || defined(IP_MTU_DISCOVER)
+        int optval;
+#endif
         struct sockaddr_in sa;
 
         /* connects to server

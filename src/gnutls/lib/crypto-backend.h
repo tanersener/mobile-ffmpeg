@@ -16,12 +16,12 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
-#ifndef GNUTLS_CRYPTO_BACKEND_H
-#define GNUTLS_CRYPTO_BACKEND_H
+#ifndef GNUTLS_LIB_CRYPTO_BACKEND_H
+#define GNUTLS_LIB_CRYPTO_BACKEND_H
 
 #include <gnutls/crypto.h>
 
@@ -33,6 +33,7 @@ typedef struct {
 	gnutls_cipher_init_func init;
 	gnutls_cipher_setkey_func setkey;
 	gnutls_cipher_setiv_func setiv;
+	gnutls_cipher_getiv_func getiv;
 	gnutls_cipher_encrypt_func encrypt;
 	gnutls_cipher_decrypt_func decrypt;
 	gnutls_cipher_aead_encrypt_func aead_encrypt;
@@ -87,7 +88,6 @@ typedef void *bigint_t;
  * @GNUTLS_MPI_FORMAT_USG: Raw unsigned integer format.
  * @GNUTLS_MPI_FORMAT_STD: Raw signed integer format, always a leading
  *   zero when positive.
- * @GNUTLS_MPI_FORMAT_PGP: The pgp integer format.
  *
  * Enumeration of different bignum integer encoding formats.
  */
@@ -96,8 +96,8 @@ typedef enum {
 	GNUTLS_MPI_FORMAT_USG = 0,
 	/* raw signed integer format - always a leading zero when positive */
 	GNUTLS_MPI_FORMAT_STD = 1,
-	/* the pgp integer format */
-	GNUTLS_MPI_FORMAT_PGP = 2
+	/* raw unsigned integer format, little endian format */
+	GNUTLS_MPI_FORMAT_ULE = 2
 } gnutls_bigint_format_t;
 
 /* Multi precision integer arithmetic */
@@ -166,18 +166,45 @@ typedef struct gnutls_crypto_bigint {
 			     gnutls_bigint_format_t format);
 } gnutls_crypto_bigint_st;
 
+/* Additional information about the public key, filled from
+ * SubjectPublicKeyInfo parameters. When there are no parameters,
+ * the pk field will be set to GNUTLS_PK_UNKNOWN.
+ */
+typedef struct gnutls_x509_spki_st {
+	/* We can have a key which is of type RSA, but a certificate
+	 * of type RSA-PSS; the value here will be the expected value
+	 * for signatures (i.e., RSA-PSS) */
+	gnutls_pk_algorithm_t pk;
+
+	/* the digest used by RSA-PSS */
+	gnutls_digest_algorithm_t rsa_pss_dig;
+
+	/* the size of salt used by RSA-PSS */
+	unsigned int salt_size;
+
+	/* if non-zero, the legacy value for PKCS#7 signatures will be
+	 * written for RSA signatures. */
+	unsigned int legacy;
+} gnutls_x509_spki_st;
+
 #define GNUTLS_MAX_PK_PARAMS 16
 
 typedef struct {
 	bigint_t params[GNUTLS_MAX_PK_PARAMS];
 	unsigned int params_nr;	/* the number of parameters */
-	unsigned int flags;
+	unsigned int pkflags; /* gnutls_pk_flag_t */
+	unsigned int qbits; /* GNUTLS_PK_DH */
+	gnutls_ecc_curve_t curve; /* GNUTLS_PK_EC, GNUTLS_PK_ED25519, GNUTLS_PK_GOST* */
+	gnutls_group_t dh_group; /* GNUTLS_PK_DH - used by ext/key_share */
+	gnutls_gost_paramset_t gost_params; /* GNUTLS_PK_GOST_* */
 	gnutls_datum_t raw_pub; /* used by x25519 */
 	gnutls_datum_t raw_priv;
 
 	unsigned int seed_size;
 	uint8_t seed[MAX_PVP_SEED_SIZE];
 	gnutls_digest_algorithm_t palgo;
+	/* public key information */
+	gnutls_x509_spki_st spki;
 
 	gnutls_pk_algorithm_t algo;
 } gnutls_pk_params_st;
@@ -206,6 +233,7 @@ void gnutls_pk_params_init(gnutls_pk_params_st * p);
 #define DH_PUBLIC_PARAMS 4
 #define RSA_PUBLIC_PARAMS 2
 #define ECC_PUBLIC_PARAMS 2
+#define GOST_PUBLIC_PARAMS 2
 
 
 #define MAX_PRIV_PARAMS_SIZE GNUTLS_MAX_PK_PARAMS	/* ok for RSA and DSA */
@@ -215,12 +243,17 @@ void gnutls_pk_params_init(gnutls_pk_params_st * p);
 #define DH_PRIVATE_PARAMS 5
 #define RSA_PRIVATE_PARAMS 8
 #define ECC_PRIVATE_PARAMS 3
+#define GOST_PRIVATE_PARAMS 3
 
 #if MAX_PRIV_PARAMS_SIZE - RSA_PRIVATE_PARAMS < 0
 #error INCREASE MAX_PRIV_PARAMS
 #endif
 
 #if MAX_PRIV_PARAMS_SIZE - ECC_PRIVATE_PARAMS < 0
+#error INCREASE MAX_PRIV_PARAMS
+#endif
+
+#if MAX_PRIV_PARAMS_SIZE - GOST_PRIVATE_PARAMS < 0
 #error INCREASE MAX_PRIV_PARAMS
 #endif
 
@@ -268,6 +301,10 @@ void gnutls_pk_params_init(gnutls_pk_params_st * p);
 #define ECC_Y 1
 #define ECC_K 2
 
+#define GOST_X 0
+#define GOST_Y 1
+#define GOST_K 2
+
 #define DSA_P 0
 #define DSA_Q 1
 #define DSA_G 2
@@ -308,23 +345,30 @@ typedef struct gnutls_crypto_pk {
 	int (*encrypt) (gnutls_pk_algorithm_t, gnutls_datum_t * ciphertext,
 			const gnutls_datum_t * plaintext,
 			const gnutls_pk_params_st * pub);
-	int (*decrypt) (gnutls_pk_algorithm_t, gnutls_datum_t * plaintext,
+	int (*decrypt) (gnutls_pk_algorithm_t,
+                        gnutls_datum_t * plaintext,
 			const gnutls_datum_t * ciphertext,
 			const gnutls_pk_params_st * priv);
-
+	int (*decrypt2) (gnutls_pk_algorithm_t,
+			 const gnutls_datum_t * ciphertext,
+                         unsigned char * plaintext,
+                         size_t paintext_size,
+			 const gnutls_pk_params_st * priv);
 	int (*sign) (gnutls_pk_algorithm_t, gnutls_datum_t * signature,
 		     const gnutls_datum_t * data,
-		     const gnutls_pk_params_st * priv);
+		     const gnutls_pk_params_st *priv,
+		     const gnutls_x509_spki_st *sign);
 	int (*verify) (gnutls_pk_algorithm_t, const gnutls_datum_t * data,
 		       const gnutls_datum_t * sig,
-		       const gnutls_pk_params_st * pub);
+		       const gnutls_pk_params_st *pub,
+		       const gnutls_x509_spki_st *sign);
 	/* sanity checks the public key parameters */
 	int (*verify_priv_params) (gnutls_pk_algorithm_t,
 			      const gnutls_pk_params_st * priv);
 	int (*verify_pub_params) (gnutls_pk_algorithm_t,
 			      const gnutls_pk_params_st * pub);
 	int (*generate_keys) (gnutls_pk_algorithm_t, unsigned int nbits,
-			 gnutls_pk_params_st *);
+			 gnutls_pk_params_st *, unsigned ephemeral);
 	int (*generate_params) (gnutls_pk_algorithm_t, unsigned int nbits,
 			 gnutls_pk_params_st *);
 	/* this function should convert params to ones suitable
@@ -333,9 +377,11 @@ typedef struct gnutls_crypto_pk {
 	int (*pk_fixup_private_params) (gnutls_pk_algorithm_t,
 					gnutls_direction_t,
 					gnutls_pk_params_st *);
+#define PK_DERIVE_TLS13 1
 	int (*derive) (gnutls_pk_algorithm_t, gnutls_datum_t * out,
 		       const gnutls_pk_params_st * priv,
-		       const gnutls_pk_params_st * pub);
+		       const gnutls_pk_params_st * pub,
+		       unsigned int flags);
 
 	int (*curve_exists) (gnutls_ecc_curve_t);	/* true/false */
 } gnutls_crypto_pk_st;
@@ -363,4 +409,12 @@ int gnutls_crypto_pk_register(int priority, const gnutls_crypto_pk_st * s);
 int gnutls_crypto_bigint_register(int priority,
 				  const gnutls_crypto_bigint_st * s);
 
-#endif
+/* Provided by crypto-backend */
+int
+_gnutls_prf_raw(gnutls_mac_algorithm_t mac,
+		size_t master_size, const void *master,
+		size_t label_size, const char *label,
+		size_t seed_size, const uint8_t *seed, size_t outsize,
+		char *out);
+
+#endif /* GNUTLS_LIB_CRYPTO_BACKEND_H */

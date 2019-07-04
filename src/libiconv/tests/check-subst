@@ -2,9 +2,6 @@
 # Check of --unicode-subst, --byte-subst, --widechar-subst options.
 set -e
 iconv=../src/iconv_no_i18n
-# Make sure the charset.alias file is found.
-CHARSETALIASDIR=../lib
-export CHARSETALIASDIR
 
 options_ascii='--unicode-subst=<U+%04X> --byte-subst=<0x%02x> --widechar-subst=<%08x>'
 options_utf8='--unicode-subst=«U+%04X» --byte-subst=«0x%02x» --widechar-subst=«%08x»'

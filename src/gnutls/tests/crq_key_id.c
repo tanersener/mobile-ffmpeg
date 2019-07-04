@@ -79,7 +79,7 @@ void doit(void)
 		}
 
 		ret =
-		    gnutls_x509_privkey_generate(pkey, algorithm, (algorithm==GNUTLS_PK_RSA)?2048:2048, 0);
+		    gnutls_x509_privkey_generate(pkey, algorithm, 2048, 0);
 		if (ret < 0) {
 			fail("gnutls_x509_privkey_generate (%s): %d: %s\n",
 			     gnutls_pk_algorithm_get_name(algorithm),

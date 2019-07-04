@@ -1,7 +1,6 @@
 #include "testutils.h"
 
-#include "rsa.h"
-#include "rsa-internal.h"
+#include "pkcs1-internal.h"
 
 #if HAVE_VALGRIND_MEMCHECK_H
 # include <valgrind/memcheck.h>

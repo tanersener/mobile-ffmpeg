@@ -15,10 +15,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see
- * <http://www.gnu.org/licenses/>.
+ * <https://www.gnu.org/licenses/>.
  *
  * Written by Nikos Mavrogiannopoulos <nmav@gnutls.org>.
  */
+
+#ifndef GNUTLS_SRC_CERTTOOL_CFG_H
+#define GNUTLS_SRC_CERTTOOL_CFG_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -32,6 +35,7 @@ void read_crt_set(gnutls_x509_crt_t crt, const char *input_str,
 void read_crq_set(gnutls_x509_crq_t crq, const char *input_str,
 		  const char *oid);
 int64_t read_int(const char *input_str);
+int serial_decode(const char *input, gnutls_datum_t *output);
 const char *read_str(const char *input_str);
 int read_yesno(const char *input_str, int def);
 
@@ -102,3 +106,5 @@ void get_oid_crq_set(gnutls_x509_crq_t crq);
 const char *get_proxy_policy(char **policy, size_t * policylen);
 
 void crq_extensions_set(gnutls_x509_crt_t crt, gnutls_x509_crq_t crq);
+
+#endif /* GNUTLS_SRC_CERTTOOL_CFG_H */

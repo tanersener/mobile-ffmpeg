@@ -16,7 +16,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -123,7 +123,7 @@ static int check_for_valid_freeformclass(uint32_t *ucs4, unsigned ucs4_size)
 
 		/* Disallowed 
 		   o  Old Hangul Jamo characters, i.e., the OldHangulJamo ("I") category
-		      [FIXME: not handled in this code]
+		      (not handled in this code)
 
 		   o  Control characters, i.e., the Controls ("L") category
 

@@ -41,9 +41,7 @@ LDADD = libexamples.la				\
 CXX_LDADD = ../../lib/libgnutlsxx.la \
 	$(LDADD)
 
-EXTRA_DIST = tlsproxy/buffer.c tlsproxy/buffer.h tlsproxy/crypto-gnutls.c \
-	tlsproxy/crypto-gnutls.h tlsproxy/LICENSE tlsproxy/tlsproxy.c \
-	tlsproxy/README.md tlsproxy/Makefile
+EXTRA_DIST = tlsproxy/LICENSE tlsproxy/README.md
 
 noinst_PROGRAMS = ex-client-resume ex-client-dtls
 noinst_PROGRAMS += ex-cert-select ex-client-x509
@@ -75,6 +73,11 @@ endif
 if ENABLE_SRP
 noinst_PROGRAMS += ex-client-srp ex-serv-srp
 endif
+
+noinst_PROGRAMS += tlsproxy/tlsproxy
+
+tlsproxy_tlsproxy_SOURCES = tlsproxy/buffer.c tlsproxy/buffer.h tlsproxy/crypto-gnutls.c \
+	tlsproxy/crypto-gnutls.h tlsproxy/tlsproxy.c
 
 noinst_LTLIBRARIES = libexamples.la
 

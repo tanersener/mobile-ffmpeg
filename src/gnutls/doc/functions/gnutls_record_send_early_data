@@ -1,0 +1,28 @@
+
+
+
+
+@deftypefun {ssize_t} {gnutls_record_send_early_data} (gnutls_session_t @var{session}, const void * @var{data}, size_t @var{data_size})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{data}: contains the data to send
+
+@var{data_size}: is the length of the data
+
+This function can be used by a client to send data early in the
+handshake processes when resuming a session.  This is used to
+implement a zero-roundtrip (0-RTT) mode.  It has the same semantics
+as @code{gnutls_record_send()} .
+
+There may be a limit to the amount of data sent as early data.  Use
+@code{gnutls_record_get_max_early_data_size()}  to check the limit.  If the
+limit exceeds, this function returns
+@code{GNUTLS_E_RECORD_LIMIT_REACHED} .
+
+@strong{Returns:} The number of bytes sent, or a negative error code.  The
+number of bytes sent might be less than  @code{data_size} .  The maximum
+number of bytes this function can send in a single call depends
+on the negotiated maximum record size.
+
+@strong{Since:} 3.6.5
+@end deftypefun

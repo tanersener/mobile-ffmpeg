@@ -18,6 +18,9 @@
    */
 #undef HAVE_ALLOCA_H
 
+/* Define if __builtin_bswap64 is available */
+#undef HAVE_BUILTIN_BSWAP64
+
 /* Define if clock_gettime is available */
 #undef HAVE_CLOCK_GETTIME
 
@@ -53,6 +56,7 @@
 
 /* Define to 1 each of the following for which a native (ie. CPU specific)
     implementation of the corresponding routine exists.  */
+#undef HAVE_NATIVE_chacha_core
 #undef HAVE_NATIVE_ecc_192_modp
 #undef HAVE_NATIVE_ecc_192_redc
 #undef HAVE_NATIVE_ecc_224_modp
@@ -127,23 +131,11 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
-/* The size of `char', as computed by sizeof. */
-#undef SIZEOF_CHAR
-
-/* The size of `int', as computed by sizeof. */
-#undef SIZEOF_INT
-
 /* The size of `long', as computed by sizeof. */
 #undef SIZEOF_LONG
 
-/* The size of `short', as computed by sizeof. */
-#undef SIZEOF_SHORT
-
 /* The size of `size_t', as computed by sizeof. */
 #undef SIZEOF_SIZE_T
-
-/* The size of `void*', as computed by sizeof. */
-#undef SIZEOF_VOIDP
 
 /* If using the C implementation of alloca, define if you know the
    direction of stack growth for your system; otherwise it will be

@@ -21,8 +21,12 @@ used for the RSA algorithm, but only SHA-XXX for the DSA keys.
 You may use @code{gnutls_pubkey_get_preferred_hash_algorithm()}  to determine
 the hash algorithm.
 
-Note that if @code{GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA}  flag is specified this function
-will ignore  @code{hash_algo} and perform a raw PKCS1 signature.
+The flags may be @code{GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA}  or @code{GNUTLS_PRIVKEY_SIGN_FLAG_RSA_PSS} .
+In the former case this function will ignore  @code{hash_algo} and perform a raw PKCS1 signature,
+and in the latter an RSA-PSS signature will be generated.
+
+Note that, not all algorithm support signing already hashed data. When
+signing with Ed25519, @code{gnutls_privkey_sign_data()}  should be used.
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.

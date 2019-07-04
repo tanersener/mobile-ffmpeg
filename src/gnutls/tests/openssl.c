@@ -25,6 +25,7 @@
 #endif
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "utils.h"
 
@@ -34,6 +35,10 @@ void doit(void)
 {
 	MD5_CTX c;
 	unsigned char md[MD5_DIGEST_LENGTH];
+
+	if (gnutls_fips140_mode_enabled()) {
+		exit(77);
+	}
 
 	if (global_init() != 0)
 		fail("global_init\n");

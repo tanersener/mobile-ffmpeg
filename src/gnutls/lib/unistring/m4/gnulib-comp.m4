@@ -1,5 +1,5 @@
 # DO NOT EDIT! GENERATED AUTOMATICALLY!
-# Copyright (C) 2002-2016 Free Software Foundation, Inc.
+# Copyright (C) 2002-2019 Free Software Foundation, Inc.
 #
 # This file is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this file.  If not, see <http://www.gnu.org/licenses/>.
+# along with this file.  If not, see <https://www.gnu.org/licenses/>.
 #
 # As a special exception to the GNU General Public License,
 # this file may be distributed as part of a program that
@@ -165,77 +165,77 @@ AC_DEFUN([unistring_INIT],
   gl_SYS_TYPES_H
   AC_PROG_MKDIR_P
   gl_LIBUNISTRING_LIBHEADER([0.9.4], [unictype.h])
-  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-C])
-  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Cc])
-  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Cf])
-  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Cn])
-  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Co])
-  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Cs])
-  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-L])
-  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-LC])
-  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Ll])
-  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Lm])
-  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Lo])
-  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Lt])
-  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Lu])
-  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-M])
-  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Mc])
-  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Me])
-  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Mn])
-  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-N])
-  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Nd])
-  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Nl])
-  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-No])
-  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-P])
-  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Pc])
-  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Pd])
-  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Pe])
-  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Pf])
-  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Pi])
-  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Po])
-  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Ps])
-  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-S])
-  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Sc])
-  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Sk])
-  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Sm])
-  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-So])
-  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Z])
-  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Zl])
-  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Zp])
-  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Zs])
-  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-and])
-  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-and-not])
-  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-byname])
-  gl_LIBUNISTRING_MODULE([0.9.5], [unictype/category-longname])
-  gl_LIBUNISTRING_MODULE([0.9], [unictype/category-name])
-  gl_LIBUNISTRING_MODULE([0.9.5], [unictype/category-none])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/category-C])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/category-Cc])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/category-Cf])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/category-Cn])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/category-Co])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/category-Cs])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/category-L])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/category-LC])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/category-Ll])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/category-Lm])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/category-Lo])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/category-Lt])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/category-Lu])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/category-M])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/category-Mc])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/category-Me])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/category-Mn])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/category-N])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/category-Nd])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/category-Nl])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/category-No])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/category-P])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/category-Pc])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/category-Pd])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/category-Pe])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/category-Pf])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/category-Pi])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/category-Po])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/category-Ps])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/category-S])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/category-Sc])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/category-Sk])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/category-Sm])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/category-So])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/category-Z])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/category-Zl])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/category-Zp])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/category-Zs])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/category-and])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/category-and-not])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/category-byname])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/category-longname])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/category-name])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/category-none])
   AC_REQUIRE([AC_C_INLINE])
-  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-of])
-  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-or])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/category-of])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/category-or])
   AC_REQUIRE([AC_C_INLINE])
-  gl_LIBUNISTRING_MODULE([0.9.5], [unictype/category-test])
-  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/combining-class])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/category-test])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/combining-class])
   AC_REQUIRE([AC_C_INLINE])
-  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/property-default-ignorable-code-point])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/property-default-ignorable-code-point])
   AC_REQUIRE([AC_C_INLINE])
-  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/property-join-control])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/property-join-control])
   AC_REQUIRE([AC_C_INLINE])
-  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/property-not-a-character])
+  gl_LIBUNISTRING_MODULE([0.9.8], [unictype/property-not-a-character])
   gl_LIBUNISTRING_LIBHEADER([0.9.4], [uninorm.h])
-  gl_LIBUNISTRING_MODULE([0.9.6], [uninorm/canonical-decomposition])
-  gl_LIBUNISTRING_MODULE([0.9.6], [uninorm/composition])
-  gl_LIBUNISTRING_MODULE([0.9.6], [uninorm/decomposition])
+  gl_LIBUNISTRING_MODULE([0.9.8], [uninorm/canonical-decomposition])
+  gl_LIBUNISTRING_MODULE([0.9.8], [uninorm/composition])
+  gl_LIBUNISTRING_MODULE([0.9.8], [uninorm/decomposition])
   AC_REQUIRE([AC_C_INLINE])
-  gl_LIBUNISTRING_MODULE([0.9.6], [uninorm/nfc])
-  gl_LIBUNISTRING_MODULE([0.9.6], [uninorm/nfd])
-  gl_LIBUNISTRING_MODULE([0.9.6], [uninorm/nfkc])
-  gl_LIBUNISTRING_MODULE([0.9.6], [uninorm/nfkd])
+  gl_LIBUNISTRING_MODULE([0.9.8], [uninorm/nfc])
+  gl_LIBUNISTRING_MODULE([0.9.8], [uninorm/nfd])
+  gl_LIBUNISTRING_MODULE([0.9.8], [uninorm/nfkc])
+  gl_LIBUNISTRING_MODULE([0.9.8], [uninorm/nfkd])
   gl_MODULE_INDICATOR_FOR_TESTS([uninorm/u16-normalize])
-  gl_LIBUNISTRING_MODULE([0.9.6], [uninorm/u16-normalize])
+  gl_LIBUNISTRING_MODULE([0.9.8], [uninorm/u16-normalize])
   gl_MODULE_INDICATOR_FOR_TESTS([uninorm/u32-normalize])
-  gl_LIBUNISTRING_MODULE([0.9.6], [uninorm/u32-normalize])
+  gl_LIBUNISTRING_MODULE([0.9.8], [uninorm/u32-normalize])
   gl_MODULE_INDICATOR_FOR_TESTS([uninorm/u8-normalize])
-  gl_LIBUNISTRING_MODULE([0.9.6], [uninorm/u8-normalize])
+  gl_LIBUNISTRING_MODULE([0.9.8], [uninorm/u8-normalize])
   gl_LIBUNISTRING_LIBHEADER([0.9.4], [unistr.h])
   gl_LIBUNISTRING_MODULE([0.9], [unistr/u16-cpy])
   gl_MODULE_INDICATOR([unistr/u16-mbtouc-unsafe])
@@ -398,7 +398,6 @@ AC_DEFUN([unistringtests_LIBSOURCES], [
 # This macro records the list of files which have been installed by
 # gnulib-tool and may be removed by future gnulib-tool invocations.
 AC_DEFUN([unistring_FILE_LIST], [
-  build-aux/snippet/unused-parameter.h
   lib/array-mergesort.h
   lib/limits.in.h
   lib/stdbool.in.h
@@ -545,6 +544,7 @@ AC_DEFUN([unistring_FILE_LIST], [
   lib/unistr/u8-uctomb-aux.c
   lib/unistr/u8-uctomb.c
   lib/unitypes.in.h
+  lib/unused-parameter.h
   m4/00gnulib.m4
   m4/absolute-header.m4
   m4/gnulib-common.m4
@@ -559,4 +559,5 @@ AC_DEFUN([unistring_FILE_LIST], [
   m4/stdbool.m4
   m4/stdint.m4
   m4/sys_types_h.m4
+  m4/wint_t.m4
 ])

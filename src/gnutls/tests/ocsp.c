@@ -1462,7 +1462,7 @@ static void resp_verify(void)
 
 	/* check direct verify with cert (should fail) */
 
-	ret = gnutls_ocsp_resp_verify_direct(resp, cert, &verify, 0);
+	ret = gnutls_ocsp_resp_verify_direct(resp, cert, &verify, GNUTLS_VERIFY_ALLOW_BROKEN);
 	if (ret < 0) {
 		fail("gnutls_ocsp_resp_verify_direct (cert) %d\n", ret);
 		exit(1);
@@ -1487,7 +1487,7 @@ static void resp_verify(void)
 		exit(1);
 	}
 
-	ret = gnutls_ocsp_resp_verify(resp, list, &verify, 0);
+	ret = gnutls_ocsp_resp_verify(resp, list, &verify, GNUTLS_VERIFY_ALLOW_BROKEN);
 	if (ret < 0) {
 		fail("gnutls_ocsp_resp_verify (issuer) %d\n", ret);
 		exit(1);
@@ -1541,7 +1541,7 @@ static void resp_verify(void)
 		exit(1);
 	}
 
-	ret = gnutls_ocsp_resp_verify(resp, list, &verify, 0);
+	ret = gnutls_ocsp_resp_verify(resp, list, &verify, GNUTLS_VERIFY_ALLOW_BROKEN);
 	if (ret < 0) {
 		fail("gnutls_ocsp_resp_verify (issuer) %d\n", ret);
 		exit(1);

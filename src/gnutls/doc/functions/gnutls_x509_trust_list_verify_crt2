@@ -35,7 +35,7 @@ ORing the result of @code{GNUTLS_PROFILE_TO_VFLAGS()}  to the verification
 flags.
 
 Additional verification parameters are possible via the  @code{data} types; the
-acceptable types are @code{GNUTLS_DT_DNS_HOSTNAME}  and @code{GNUTLS_DT_KEY_PURPOSE_OID} .
+acceptable types are @code{GNUTLS_DT_DNS_HOSTNAME} , @code{GNUTLS_DT_IP_ADDRESS}  and @code{GNUTLS_DT_KEY_PURPOSE_OID} .
 The former accepts as data a null-terminated hostname, and the latter a null-terminated
 object identifier (e.g., @code{GNUTLS_KP_TLS_WWW_SERVER} ).
 If a DNS hostname is provided then this function will compare

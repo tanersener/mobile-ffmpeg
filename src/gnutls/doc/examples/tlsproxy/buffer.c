@@ -24,11 +24,12 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 */
 
+#include "config.h"
 #include <sys/types.h>
 
 #include "buffer.h"
 
-typedef struct buffer
+struct buffer
 {
   char *buf;
   ssize_t size;
@@ -36,7 +37,7 @@ typedef struct buffer
   ssize_t ridx;
   ssize_t widx;
   int empty;
-} buffer_t;
+};
 
 /* the buffer is organised internally as follows:
  *
@@ -79,6 +80,8 @@ buffer_t *
 bufNew (ssize_t size, ssize_t hwm)
 {
   buffer_t *b = calloc (1, sizeof (buffer_t));
+  if (!b) return NULL;
+
   b->buf = calloc (1, size);
   b->size = size;
   b->hwm = hwm;

@@ -48,6 +48,7 @@ int main(int argc, char **argv)
 #endif
 #include <unistd.h>
 #include <gnutls/gnutls.h>
+#include <assert.h>
 
 #include "utils.h"
 
@@ -69,7 +70,7 @@ static int TLSEXT_TYPE_server_sent			= 0;
 static int TLSEXT_TYPE_server_received		= 0;
 
 static const unsigned char ext_data[] =
-{	
+{
 	0xFE,
 	0xED
 };
@@ -116,19 +117,22 @@ static int ext_send_server_params(gnutls_session_t session, gnutls_buffer_t extd
 	return sizeof(ext_data);
 }
 
-static void client(int sd)
+static void client(int sd, const char *prio)
 {
 	int ret;
 	gnutls_session_t session;
 	gnutls_certificate_credentials_t clientx509cred;
 	void *p;
 
-	global_init();
 	gnutls_global_set_log_function(tls_log_func);
 	if (debug)
 		gnutls_global_set_log_level(4711);
 
 	side = "client";
+
+	/* extensions are registered globally */
+	ret = gnutls_ext_register("ext_client", TLSEXT_TYPE_SAMPLE, GNUTLS_EXT_TLS, ext_recv_client_params, ext_send_client_params, NULL, NULL, NULL);
+	assert(ret >= 0);
 
 	gnutls_certificate_allocate_credentials(&clientx509cred);
 
@@ -136,9 +140,7 @@ static void client(int sd)
 	 */
 	gnutls_init(&session, GNUTLS_CLIENT);
 
-	/* Use default priorities */
-	gnutls_priority_set_direct(session, "PERFORMANCE:+ANON-ECDH:+ANON-DH",
-				   NULL);
+	assert(gnutls_priority_set_direct(session, prio, NULL) >= 0);
 
 	/* put the anonymous credentials to the current session
 	 */
@@ -147,8 +149,6 @@ static void client(int sd)
 
 	gnutls_transport_set_int(session, sd);
 	gnutls_handshake_set_timeout(session, 20 * 1000);
-
-	gnutls_ext_register("ext_client", TLSEXT_TYPE_SAMPLE, GNUTLS_EXT_TLS, ext_recv_client_params, ext_send_client_params, NULL, NULL, NULL);
 
 	/* Perform the TLS handshake
 	 */
@@ -183,8 +183,6 @@ end:
 	gnutls_deinit(session);
 
 	gnutls_certificate_free_credentials(clientx509cred);
-
-	gnutls_global_deinit();
 }
 
 /* This is a sample TLS 1.0 server, for extension
@@ -232,16 +230,14 @@ const gnutls_datum_t server_key = { server_key_pem,
 };
 
 
-static void server(int sd)
+static void server(int sd, const char *prio)
 {
 	gnutls_certificate_credentials_t serverx509cred;
 	int ret;
 	gnutls_session_t session;
-	unsigned i;
 
 	/* this must be called once in the program
 	 */
-	global_init();
 	gnutls_global_set_log_function(tls_log_func);
 	if (debug)
 		gnutls_global_set_log_level(4711);
@@ -255,16 +251,12 @@ static void server(int sd)
 
 	gnutls_init(&session, GNUTLS_SERVER);
 
-	/* avoid calling all the priority functions, since the defaults
-	 * are adequate.
-	 */
-	gnutls_priority_set_direct(session, "PERFORMANCE:+ANON-ECDH:+ANON-DH",
-				   NULL);
+	assert(gnutls_priority_set_direct(session, prio, NULL) >= 0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
 				serverx509cred);
 
-	gnutls_ext_register("ext_server", TLSEXT_TYPE_SAMPLE, GNUTLS_EXT_TLS, ext_recv_server_params, ext_send_server_params, NULL, NULL, NULL);
+	assert(gnutls_ext_register("ext_server", TLSEXT_TYPE_SAMPLE, GNUTLS_EXT_TLS, ext_recv_server_params, ext_send_server_params, NULL, NULL, NULL)>=0);
 
 	gnutls_transport_set_int(session, sd);
 	gnutls_handshake_set_timeout(session, 20 * 1000);
@@ -287,33 +279,29 @@ static void server(int sd)
 	 */
 	gnutls_bye(session, GNUTLS_SHUT_WR);
 
-	/* check whether we can crash the library by adding many extensions */
-	for (i=0;i<64;i++) {
-		ret = gnutls_ext_register("ext_serverxx", TLSEXT_TYPE_SAMPLE+i+1, GNUTLS_EXT_TLS, ext_recv_server_params, ext_send_server_params, NULL, NULL, NULL);
-		if (ret < 0) {
-			success("failed registering extension no %d (expected)\n", i+1);
-			break;
-		}
-	}
-
 	close(sd);
 	gnutls_deinit(session);
 
 	gnutls_certificate_free_credentials(serverx509cred);
 
-	gnutls_global_deinit();
-
 	if (debug)
 		success("server: finished\n");
 }
 
-void doit(void)
+static
+void start(const char *prio)
 {
-	pid_t child;
+	pid_t child1, child2;
 	int sockets[2];
 	int err;
 
+	success("trying %s\n", prio);
+
 	signal(SIGPIPE, SIG_IGN);
+	TLSEXT_TYPE_client_sent			= 0;
+	TLSEXT_TYPE_client_received		= 0;
+	TLSEXT_TYPE_server_sent			= 0;
+	TLSEXT_TYPE_server_received		= 0;
 
 	err = socketpair(AF_UNIX, SOCK_STREAM, 0, sockets);
 	if (err == -1) {
@@ -322,22 +310,56 @@ void doit(void)
 		return;
 	}
 
-	child = fork();
-	if (child < 0) {
+	child1 = fork();
+	if (child1 < 0) {
 		perror("fork");
 		fail("fork");
-		return;
 	}
 
-	if (child) {
+	if (child1) {
 		int status;
 		/* parent */
 		close(sockets[1]);
-		server(sockets[0]);
-		wait(&status);
+
+		child2 = fork();
+		if (child2 < 0) {
+			perror("fork");
+			fail("fork");
+		}
+
+		if (child2) {
+			waitpid(child1, &status, 0);
+			check_wait_status(status);
+
+			waitpid(child2, &status, 0);
+			check_wait_status(status);
+		} else {
+			server(sockets[0], prio);
+			exit(0);
+		}
 	} else {
 		close(sockets[0]);
-		client(sockets[1]);
+		client(sockets[1], prio);
+		exit(0);
+	}
+}
+
+void doit(void)
+{
+	int ret;
+	unsigned i;
+
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.2");
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.3");
+	start("NORMAL");
+
+	/* check whether we can crash the library by adding many extensions */
+	for (i=0;i<64;i++) {
+		ret = gnutls_ext_register("ext_serverxx", TLSEXT_TYPE_SAMPLE+i+1, GNUTLS_EXT_TLS, ext_recv_server_params, ext_send_server_params, NULL, NULL, NULL);
+		if (ret < 0) {
+			success("failed registering extension no %d (expected)\n", i+1);
+			break;
+		}
 	}
 }
 

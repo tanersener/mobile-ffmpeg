@@ -1,0 +1,27 @@
+
+
+
+
+@deftypefun {int} {gnutls_pubkey_export_dsa_raw2} (gnutls_pubkey_t @var{key}, gnutls_datum_t * @var{p}, gnutls_datum_t * @var{q}, gnutls_datum_t * @var{g}, gnutls_datum_t * @var{y}, unsigned @var{flags})
+@var{key}: Holds the public key
+
+@var{p}: will hold the p (may be @code{NULL} )
+
+@var{q}: will hold the q (may be @code{NULL} )
+
+@var{g}: will hold the g (may be @code{NULL} )
+
+@var{y}: will hold the y (may be @code{NULL} )
+
+@var{flags}: flags from @code{gnutls_abstract_export_flags_t} 
+
+This function will export the DSA public key's parameters found in
+the given certificate.  The new parameters will be allocated using
+@code{gnutls_malloc()}  and will be stored in the appropriate datum.
+
+This function allows for @code{NULL}  parameters since 3.4.1.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
+
+@strong{Since:} 3.6.0
+@end deftypefun

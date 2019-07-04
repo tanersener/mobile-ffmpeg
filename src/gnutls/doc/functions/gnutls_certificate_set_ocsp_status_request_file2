@@ -1,0 +1,34 @@
+
+
+
+
+@deftypefun {int} {gnutls_certificate_set_ocsp_status_request_file2} (gnutls_certificate_credentials_t @var{sc}, const char * @var{response_file}, unsigned @var{idx}, gnutls_x509_crt_fmt_t @var{fmt})
+@var{sc}: is a credentials structure.
+
+@var{response_file}: a filename of the OCSP response
+
+@var{idx}: is a certificate index as returned by @code{gnutls_certificate_set_key()}  and friends
+
+@var{fmt}: is PEM or DER
+
+This function loads the OCSP responses to be sent to the
+peer for the certificate chain specified by  @code{idx} . When  @code{fmt} is
+set to PEM, multiple responses can be loaded.
+
+This function must be called after setting any certificates, and
+cannot be used for certificates that are provided via a callback --
+that is when @code{gnutls_certificate_set_retrieve_function()}  is used. In
+that case consider using @code{gnutls_certificate_set_retrieve_function3()} .
+
+This function can be called multiple times when multiple responses
+applicable to the certificate chain are available.
+If the response provided does not match any certificates present
+in the chain, the code @code{GNUTLS_E_OCSP_MISMATCH_WITH_CERTS}  is returned.
+If the response is already expired at the time of loading the code
+@code{GNUTLS_E_EXPIRED}  is returned.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned,
+otherwise a negative error code is returned.
+
+@strong{Since:} 3.1.3
+@end deftypefun

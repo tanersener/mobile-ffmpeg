@@ -16,9 +16,12 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
+
+#ifndef GNUTLS_LIB_DB_H
+#define GNUTLS_LIB_DB_H
 
 int _gnutls_server_register_current_session(gnutls_session_t session);
 int _gnutls_server_restore_session(gnutls_session_t session,
@@ -27,4 +30,6 @@ int _gnutls_server_restore_session(gnutls_session_t session,
 
 int _gnutls_check_resumed_params(gnutls_session_t session);
 
-#define PACKED_SESSION_MAGIC ((0xfadebadd)+(GNUTLS_VERSION_NUMBER))
+#define PACKED_SESSION_MAGIC ((0xfadebadd)+(_gnutls_global_version))
+
+#endif /* GNUTLS_LIB_DB_H */

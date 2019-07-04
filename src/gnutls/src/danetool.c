@@ -15,7 +15,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see
- * <http://www.gnu.org/licenses/>.
+ * <https://www.gnu.org/licenses/>.
  */
 
 #include <config.h>
@@ -63,6 +63,7 @@ static void dane_check(const char *host, const char *proto,
 		       const char *service, common_info_st * cinfo);
 
 FILE *outfile;
+static const char *outfile_name = NULL;
 static gnutls_digest_algorithm_t default_dig;
 
 /* non interactive operation if set
@@ -70,6 +71,14 @@ static gnutls_digest_algorithm_t default_dig;
 int batch = 0;
 int ask_pass = 0;
 
+void app_exit(int val)
+{
+	if (val != 0) {
+		if (outfile_name)
+			(void)remove(outfile_name);
+	}
+	exit(val);
+}
 
 static void tls_log_func(int level, const char *str)
 {
@@ -98,8 +107,9 @@ static void cmd_parser(int argc, char **argv)
 		outfile = safe_open_rw(OPT_ARG(OUTFILE), privkey_op);
 		if (outfile == NULL) {
 			fprintf(stderr, "%s", OPT_ARG(OUTFILE));
-			exit(1);
+			app_exit(1);
 		}
+		outfile_name = OPT_ARG(OUTFILE);
 	} else
 		outfile = stdout;
 
@@ -123,7 +133,7 @@ static void cmd_parser(int argc, char **argv)
 			default_dig = GNUTLS_DIG_RMD160;
 		else {
 			fprintf(stderr, "invalid hash: %s", OPT_ARG(HASH));
-			exit(1);
+			app_exit(1);
 		}
 	}
 
@@ -136,7 +146,7 @@ static void cmd_parser(int argc, char **argv)
 
 	if ((ret = gnutls_global_init()) < 0) {
 		fprintf(stderr, "global_init: %s", gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 #ifdef ENABLE_PKCS11
 	pkcs11_common(NULL);
@@ -434,10 +444,10 @@ static void dane_check(const char *host, const char *proto,
 
  error:
 	if (del != 0 && cinfo->cert) {
-		remove(cinfo->cert);
+		(void)remove(cinfo->cert);
 	}
 
-	exit(retcode);
+	app_exit(retcode);
 #else
 	fprintf(stderr,
 		"This functionality is disabled (GnuTLS was not compiled with support for DANE).\n");
@@ -472,7 +482,7 @@ static void dane_info(const char *host, const char *proto,
 		if (ret < 0) {
 			fprintf(stderr, "export error: %s\n",
 				gnutls_strerror(ret));
-			exit(1);
+			app_exit(1);
 		}
 
 		gnutls_x509_crt_deinit(crt);
@@ -484,7 +494,7 @@ static void dane_info(const char *host, const char *proto,
 		if (ret < 0) {
 			fprintf(stderr, "pubkey_init: %s\n",
 				gnutls_strerror(ret));
-			exit(1);
+			app_exit(1);
 		}
 
 		if (crt != NULL) {
@@ -493,7 +503,7 @@ static void dane_info(const char *host, const char *proto,
 			if (ret < 0) {
 				fprintf(stderr, "pubkey_import_x509: %s\n",
 					gnutls_strerror(ret));
-				exit(1);
+				app_exit(1);
 			}
 
 			size = lbuffer_size;
@@ -504,7 +514,7 @@ static void dane_info(const char *host, const char *proto,
 			if (ret < 0) {
 				fprintf(stderr, "pubkey_export: %s\n",
 					gnutls_strerror(ret));
-				exit(1);
+				app_exit(1);
 			}
 
 			gnutls_x509_crt_deinit(crt);
@@ -519,7 +529,7 @@ static void dane_info(const char *host, const char *proto,
 			if (ret < 0) {
 				fprintf(stderr, "export error: %s\n",
 					gnutls_strerror(ret));
-				exit(1);
+				app_exit(1);
 			}
 		}
 
@@ -537,7 +547,7 @@ static void dane_info(const char *host, const char *proto,
 	ret = gnutls_hash_fast(default_dig, lbuffer, size, digest);
 	if (ret < 0) {
 		fprintf(stderr, "hash error: %s\n", gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	if (default_dig == GNUTLS_DIG_SHA256)
@@ -566,7 +576,7 @@ static void dane_info(const char *host, const char *proto,
 	if (ret < 0) {
 		fprintf(stderr, "hex encode error: %s\n",
 			gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	fprintf(outfile, "_%u._%s.%s. IN TLSA ( %.2x %.2x %.2x %s )\n",
@@ -603,7 +613,7 @@ static int cert_callback(gnutls_session_t session)
 		if (ret < 0) {
 			fprintf(stderr, "error[%d]: %s\n", __LINE__,
 				gnutls_strerror(ret));
-			exit(1);
+			app_exit(1);
 		}
 
 		write(priv->fd, t.data, t.size);
@@ -631,11 +641,17 @@ gnutls_session_t init_tls_session(const char *hostname)
 	if (ret < 0) {
 		fprintf(stderr, "error[%d]: %s\n", __LINE__,
 			gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 	gnutls_session_set_ptr(session, &priv);
 
-	gnutls_set_default_priority(session);
+	ret = gnutls_set_default_priority(session);
+	if (ret < 0) {
+		fprintf(stderr, "error[%d]: %s\n", __LINE__,
+			gnutls_strerror(ret));
+		app_exit(1);
+	}
+
 	if (hostname && is_ip(hostname)==0) {
 		gnutls_server_name_set(session, GNUTLS_NAME_DNS, hostname, strlen(hostname));
 	}
@@ -672,7 +688,7 @@ static const char *obtain_cert(const char *hostname, const char *proto, const ch
 	if (ret < 0) {
 		fprintf(stderr, "error[%d]: %s\n", __LINE__,
 			gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 	gnutls_certificate_set_verify_function(xcred, cert_callback);
 
@@ -703,7 +719,7 @@ static const char *obtain_cert(const char *hostname, const char *proto, const ch
 		int e = errno;
 		fprintf(stderr, "error[%d]: %s\n", __LINE__,
 			strerror(e));
-		exit(1);
+		app_exit(1);
 	}
 
 	socket_open(&hd, hostname, txt_service, app_proto, socket_flags|SOCKET_FLAG_STARTTLS, str, NULL);

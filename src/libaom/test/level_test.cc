@@ -14,11 +14,15 @@
 
 #include "test/codec_factory.h"
 #include "test/encode_test_driver.h"
+#include "test/i420_video_source.h"
 #include "test/util.h"
 #include "test/y4m_video_source.h"
 #include "test/yuv_video_source.h"
 
 namespace {
+const int kLevelMin = 0;
+const int kLevelMax = 31;
+const int kLevelKeepStats = 24;
 // Speed settings tested
 static const int kCpuUsedVectors[] = {
   1,
@@ -63,11 +67,16 @@ class LevelTest
         encoder->Control(AOME_SET_ARNR_STRENGTH, 5);
       }
     }
+
+    encoder->Control(AV1E_GET_SEQ_LEVEL_IDX, level_);
+    ASSERT_LE(level_[0], kLevelMax);
+    ASSERT_GE(level_[0], kLevelMin);
   }
 
   libaom_test::TestMode encoding_mode_;
   int cpu_used_;
   int target_level_;
+  int level_[32];
 };
 
 TEST_P(LevelTest, TestTargetLevelApi) {
@@ -79,7 +88,7 @@ TEST_P(LevelTest, TestTargetLevelApi) {
   for (int operating_point = 0; operating_point <= 32; ++operating_point) {
     for (int level = 0; level <= 32; ++level) {
       const int target_level = operating_point * 100 + level;
-      if ((level >= 0 && level <= 23) || level == 31 || operating_point > 31) {
+      if ((level >= 0 && level <= 24) || level == 31 || operating_point > 31) {
         EXPECT_EQ(AOM_CODEC_OK,
                   aom_codec_control(&enc, AV1E_SET_TARGET_SEQ_LEVEL_IDX,
                                     target_level));
@@ -100,6 +109,30 @@ TEST_P(LevelTest, TestTargetLevel19) {
   // Level index 19 corresponding to level 6.3.
   target_level_ = 19;
   ASSERT_NO_FATAL_FAILURE(RunLoop(video.get()));
+}
+
+TEST_P(LevelTest, TestLevelMonitoringLowBitrate) {
+  // To save run time, we only test speed 4.
+  if (cpu_used_ == 4) {
+    libaom_test::I420VideoSource video("hantro_collage_w352h288.yuv", 352, 288,
+                                       30, 1, 0, 40);
+    target_level_ = kLevelKeepStats;
+    cfg_.rc_target_bitrate = 1000;
+    ASSERT_NO_FATAL_FAILURE(RunLoop(&video));
+    ASSERT_EQ(level_[0], 0);
+  }
+}
+
+TEST_P(LevelTest, TestLevelMonitoringHighBitrate) {
+  // To save run time, we only test speed 4.
+  if (cpu_used_ == 4) {
+    libaom_test::I420VideoSource video("hantro_collage_w352h288.yuv", 352, 288,
+                                       30, 1, 0, 40);
+    target_level_ = kLevelKeepStats;
+    cfg_.rc_target_bitrate = 3000;
+    ASSERT_NO_FATAL_FAILURE(RunLoop(&video));
+    ASSERT_EQ(level_[0], 1);
+  }
 }
 
 AV1_INSTANTIATE_TEST_CASE(LevelTest,

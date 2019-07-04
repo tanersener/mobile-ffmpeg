@@ -1,0 +1,40 @@
+PKCS #8 information:
+	Cipher: GOST28147-TC26Z-CFB
+	Schema: PBES2-GOST28147-89-TC26Z (1.2.643.7.1.2.5.1.1)
+	Salt: f9a99af44d322c06f760528abfcc5c0ecddc89a218faff85a2c9c7208fd00afd
+	Salt size: 32
+	Iteration count: 2000
+
+Public Key Info:
+	Public Key Algorithm: GOST R 34.10-2012-256
+	Key Security Level: High (256 bits)
+
+curve:	CryptoPro-A
+digest:	STREEBOG-256
+paramset:	TC26-Z
+private key:
+	2b:ea:34:a3:b0:5d:19:64:5b:8f:41:24:6a:99:50:08
+	23:07:00:fd:00:6b:a6:eb:53:b4:22:55:9c:ef:22:52
+	
+
+x:
+	62:22:79:60:91:29:44:b5:72:73:b1:46:e8:ff:7a:df
+	0e:f7:e5:4c:16:3f:25:58:67:af:6f:4a:9a:f2:1c:d7
+	
+
+y:
+	95:c2:14:be:41:07:b0:80:de:cc:93:07:17:51:e0:d2
+	46:c8:d4:f8:91:57:30:85:44:b8:c0:02:3d:d8:e2:4c
+	
+
+
+Public Key PIN:
+	pin-sha256:WB8JpdrRogkTwsox4PlsGW/xvh/47NjXrKg0yXXXo2Y=
+Public Key ID:
+	sha256:581f09a5dad1a20913c2ca31e0f96c196ff1be1ff8ecd8d7aca834c975d7a366
+	sha1:83fbb2e3aad179fd9e712583c91710ceb157e3e6
+
+-----BEGIN PRIVATE KEY-----
+MEgCAQAwHwYIKoUDBwEBAQEwEwYHKoUDAgIjAQYIKoUDBwEBAgIEIgQgUiLvnFUi
+tFPrpmsA/QAHIwhQmWokQY9bZBldsKM06is=
+-----END PRIVATE KEY-----

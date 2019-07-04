@@ -10,9 +10,12 @@ DUMBFW, enable_dumbfw
 NO_EXTENSIONS, enable_no_extensions
 NO_TICKETS, enable_no_tickets
 NO_ETM, enable_no_etm
+FORCE_ETM, enable_force_etm
 NO_SESSION_HASH, enable_no_ext_master_secret
-STATELESS_COMPRESSION, enable_stateless_compression
+STATELESS_COMPRESSION, dummy_func
+VERIFY_ALLOW_BROKEN, enable_verify_allow_broken
 VERIFY_ALLOW_SIGN_RSA_MD5, enable_verify_allow_rsa_md5
+VERIFY_ALLOW_SIGN_WITH_SHA1, enable_verify_allow_sha1
 VERIFY_DISABLE_CRL_CHECKS, disable_crl_checks
 SSL3_RECORD_VERSION, enable_ssl3_record_version
 LATEST_RECORD_VERSION, enable_latest_record_version
@@ -30,7 +33,9 @@ PROFILE_LEGACY, enable_profile_legacy
 PROFILE_MEDIUM, enable_profile_medium
 PROFILE_HIGH, enable_profile_high
 PROFILE_ULTRA, enable_profile_ultra
+PROFILE_FUTURE, enable_profile_future
 PROFILE_SUITEB128, enable_profile_suiteb128
 PROFILE_SUITEB192, enable_profile_suiteb192
 NEW_PADDING, dummy_func
 DEBUG_ALLOW_KEY_USAGE_VIOLATIONS, enable_server_key_usage_violations
+ALLOW_SMALL_RECORDS, enable_allow_small_records

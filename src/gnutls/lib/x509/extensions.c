@@ -16,7 +16,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -62,7 +62,6 @@ _gnutls_get_extension(ASN1_TYPE asn, const char *root,
 		result = asn1_read_value(asn, name2, extnID, &len);
 
 		if (result == ASN1_ELEMENT_NOT_FOUND) {
-			gnutls_assert();
 			break;
 		} else if (result != ASN1_SUCCESS) {
 			gnutls_assert();

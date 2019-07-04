@@ -19,10 +19,10 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 srcdir="${srcdir:-.}"
-CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
-OCSPTOOL="${OCSPTOOL:-../../src/ocsptool${EXEEXT}}"
-GNUTLS_SERV="${GNUTLS_SERV:-../../src/gnutls-serv${EXEEXT}}"
-GNUTLS_CLI="${GNUTLS_CLI:-../../src/gnutls-cli${EXEEXT}}"
+CERTTOOL="${CERTTOOL:-../src/certtool${EXEEXT}}"
+OCSPTOOL="${OCSPTOOL:-../src/ocsptool${EXEEXT}}"
+GNUTLS_SERV="${GNUTLS_SERV:-../src/gnutls-serv${EXEEXT}}"
+GNUTLS_CLI="${GNUTLS_CLI:-../src/gnutls-cli${EXEEXT}}"
 DIFF="${DIFF:-diff}"
 TEMPLATE_FILE="ms-out.$$.tmpl.tmp"
 SERVER_CERT_FILE="ms-cert.$$.pem.tmp"
@@ -51,7 +51,7 @@ if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=15"
 fi
 
-. "${srcdir}/../scripts/common.sh"
+. "${srcdir}/scripts/common.sh"
 
 eval "${GETPORT}"
 # Port for gnutls-serv
@@ -100,23 +100,24 @@ trap stop_servers 1 15 2 EXIT
 echo "=== Generating good server certificate ==="
 
 rm -f "$TEMPLATE_FILE"
-cp "${srcdir}/certs/server_good.template" "$TEMPLATE_FILE"
+cp "${srcdir}/ocsp-tests/certs/server_good.template" "$TEMPLATE_FILE"
+chmod u+w "$TEMPLATE_FILE"
 echo "ocsp_uri=http://localhost:${OCSP_PORT}/ocsp/" >>"$TEMPLATE_FILE"
 echo "tls_feature = 5" >>"$TEMPLATE_FILE"
 
 # Generate certificates with the random port
 datefudge -s "${CERTDATE}" ${CERTTOOL} \
-	--generate-certificate --load-ca-privkey "${srcdir}/certs/ca.key" \
-	--load-ca-certificate "${srcdir}/certs/ca.pem" \
-	--load-privkey "${srcdir}/certs/server_good.key" \
+	--generate-certificate --load-ca-privkey "${srcdir}/ocsp-tests/certs/ca.key" \
+	--load-ca-certificate "${srcdir}/ocsp-tests/certs/ca.pem" \
+	--load-privkey "${srcdir}/ocsp-tests/certs/server_good.key" \
 	--template "${TEMPLATE_FILE}" --outfile "${SERVER_CERT_FILE}" 2>/dev/null
 
 echo "=== Bringing OCSP server up ==="
 
 INDEXFILE="ocsp_index.txt"
 ATTRFILE="${INDEXFILE}.attr"
-cp "${srcdir}/certs/ocsp_index.txt" ${INDEXFILE}
-cp "${srcdir}/certs/ocsp_index.txt.attr" ${ATTRFILE}
+cp "${srcdir}/ocsp-tests/certs/ocsp_index.txt" ${INDEXFILE}
+cp "${srcdir}/ocsp-tests/certs/ocsp_index.txt.attr" ${ATTRFILE}
 
 # Start OpenSSL OCSP server
 #
@@ -128,9 +129,9 @@ launch_bare_server $$ \
 	  datefudge "${TESTDATE}" \
 	  "${OPENSSL}" ocsp -index "${INDEXFILE}" -text \
 	  -port "${OCSP_PORT}" \
-	  -rsigner "${srcdir}/certs/ocsp-server.pem" \
-	  -rkey "${srcdir}/certs/ocsp-server.key" \
-	  -CA "${srcdir}/certs/ca.pem"
+	  -rsigner "${srcdir}/ocsp-tests/certs/ocsp-server.pem" \
+	  -rkey "${srcdir}/ocsp-tests/certs/ocsp-server.key" \
+	  -CA "${srcdir}/ocsp-tests/certs/ca.pem"
 OCSP_PID="${!}"
 wait_server "${OCSP_PID}"
 
@@ -144,7 +145,7 @@ while test "${t}" -lt "${SERVER_START_TIMEOUT}"; do
     datefudge "${TESTDATE}" \
 	      ${VALGRIND} "${OCSPTOOL}" --ask \
 	      --load-cert "${SERVER_CERT_FILE}" \
-	      --load-issuer "${srcdir}/certs/ca.pem" \
+	      --load-issuer "${srcdir}/ocsp-tests/certs/ca.pem" \
 	      --outfile "${OCSP_RESPONSE_FILE}"
     rc=$?
     if test "${rc}" = "0"; then
@@ -168,7 +169,7 @@ PORT=${TLS_SERVER_PORT}
 launch_bare_server $$ \
 	  datefudge "${TESTDATE}" \
 	  "${GNUTLS_SERV}" --echo --disable-client-cert \
-	  --x509keyfile="${srcdir}/certs/server_good.key" \
+	  --x509keyfile="${srcdir}/ocsp-tests/certs/server_good.key" \
 	  --x509certfile="${SERVER_CERT_FILE}" \
 	  --port="${TLS_SERVER_PORT}"
 TLS_SERVER_PID="${!}"
@@ -178,7 +179,7 @@ wait_for_port "${TLS_SERVER_PORT}"
 
 echo "test 123456" | \
     datefudge -s "${TESTDATE}" \
-	      "${GNUTLS_CLI}" --ocsp --x509cafile="${srcdir}/certs/ca.pem" \
+	      "${GNUTLS_CLI}" --ocsp --x509cafile="${srcdir}/ocsp-tests/certs/ca.pem" \
 	      --port="${TLS_SERVER_PORT}" localhost
 rc=$?
 
@@ -200,10 +201,10 @@ PORT=${TLS_SERVER_PORT}
 launch_bare_server $$ \
 	  datefudge "${TESTDATE}" \
 	  "${GNUTLS_SERV}" --echo --disable-client-cert \
-	  --x509keyfile="${srcdir}/certs/server_good.key" \
+	  --x509keyfile="${srcdir}/ocsp-tests/certs/server_good.key" \
 	  --x509certfile="${SERVER_CERT_FILE}" \
 	  --port="${TLS_SERVER_PORT}" \
-	  --ocsp-response="${OCSP_RESPONSE_FILE}"
+	  --ocsp-response="${OCSP_RESPONSE_FILE}" --ignore-ocsp-response-errors
 TLS_SERVER_PID="${!}"
 wait_server $TLS_SERVER_PID
 
@@ -211,7 +212,7 @@ wait_for_port "${TLS_SERVER_PORT}"
 
 echo "test 123456" | \
     datefudge -s "${TESTDATE}" \
-	      "${GNUTLS_CLI}" --ocsp --x509cafile="${srcdir}/certs/ca.pem" \
+	      "${GNUTLS_CLI}" --ocsp --x509cafile="${srcdir}/ocsp-tests/certs/ca.pem" \
 	      --port="${TLS_SERVER_PORT}" localhost
 rc=$?
 
@@ -235,10 +236,10 @@ PORT=${TLS_SERVER_PORT}
 launch_bare_server $$ \
 	  datefudge "${TESTDATE}" \
 	  "${GNUTLS_SERV}" --echo --disable-client-cert \
-	  --x509keyfile="${srcdir}/certs/server_good.key" \
+	  --x509keyfile="${srcdir}/ocsp-tests/certs/server_good.key" \
 	  --x509certfile="${SERVER_CERT_FILE}" \
 	  --port="${TLS_SERVER_PORT}" \
-	  --ocsp-response="${OCSP_RESPONSE_FILE}"
+	  --ocsp-response="${OCSP_RESPONSE_FILE}" --ignore-ocsp-response-errors
 TLS_SERVER_PID="${!}"
 wait_server $TLS_SERVER_PID
 
@@ -246,7 +247,7 @@ wait_for_port "${TLS_SERVER_PORT}"
 
 echo "test 123456" | \
     datefudge -s "${TESTDATE}" \
-	      "${GNUTLS_CLI}" --ocsp --x509cafile="${srcdir}/certs/ca.pem" \
+	      "${GNUTLS_CLI}" --ocsp --x509cafile="${srcdir}/ocsp-tests/certs/ca.pem" \
 	      --port="${TLS_SERVER_PORT}" localhost
 rc=$?
 
@@ -262,7 +263,7 @@ unset TLS_SERVER_PID
 echo "=== Test 4: Server with valid certificate - unrelated cert staple ==="
 
 rm -f "${OCSP_RESPONSE_FILE}"
-cp "${srcdir}/certs/ocsp-staple-unrelated.der" "${OCSP_RESPONSE_FILE}"
+cp "${srcdir}/ocsp-tests/certs/ocsp-staple-unrelated.der" "${OCSP_RESPONSE_FILE}"
 
 eval "${GETPORT}"
 # Port for gnutls-serv
@@ -271,10 +272,10 @@ PORT=${TLS_SERVER_PORT}
 launch_bare_server $$ \
 	  datefudge "${TESTDATE}" \
 	  "${GNUTLS_SERV}" --echo --disable-client-cert \
-	  --x509keyfile="${srcdir}/certs/server_good.key" \
+	  --x509keyfile="${srcdir}/ocsp-tests/certs/server_good.key" \
 	  --x509certfile="${SERVER_CERT_FILE}" \
 	  --port="${TLS_SERVER_PORT}" \
-	  --ocsp-response="${OCSP_RESPONSE_FILE}"
+	  --ocsp-response="${OCSP_RESPONSE_FILE}" --ignore-ocsp-response-errors
 TLS_SERVER_PID="${!}"
 wait_server $TLS_SERVER_PID
 
@@ -282,7 +283,7 @@ wait_for_port "${TLS_SERVER_PORT}"
 
 echo "test 123456" | \
     datefudge -s "${TESTDATE}" \
-	      "${GNUTLS_CLI}" --ocsp --x509cafile="${srcdir}/certs/ca.pem" \
+	      "${GNUTLS_CLI}" --ocsp --x509cafile="${srcdir}/ocsp-tests/certs/ca.pem" \
 	      --port="${TLS_SERVER_PORT}" localhost
 rc=$?
 
@@ -301,21 +302,38 @@ echo "=== Test 5: Server with valid certificate - expired staple ==="
 rm -f "${OCSP_RESPONSE_FILE}"
 
 # Generate an OCSP response which expires in 2 days and use it after
-# a month.
-${VALGRIND} ${OCSPTOOL} --generate-request --load-issuer "${srcdir}/certs/ocsp-server.pem" --load-cert "${SERVER_CERT_FILE}" --outfile "${OCSP_REQ_FILE}"
+# a month. gnutls server doesn't send such a staple to clients.
+${VALGRIND} ${OCSPTOOL} --generate-request --load-issuer "${srcdir}/ocsp-tests/certs/ocsp-server.pem" --load-cert "${SERVER_CERT_FILE}" --outfile "${OCSP_REQ_FILE}"
 datefudge -s ${EXP_OCSP_DATE} \
-	${OPENSSL} ocsp -index "${INDEXFILE}" -rsigner "${srcdir}/certs/ocsp-server.pem" -rkey "${srcdir}/certs/ocsp-server.key" -CA "${srcdir}/certs/ca.pem" -reqin "${OCSP_REQ_FILE}" -respout "${OCSP_RESPONSE_FILE}" -ndays 2
+	${OPENSSL} ocsp -index "${INDEXFILE}" -rsigner "${srcdir}/ocsp-tests/certs/ocsp-server.pem" -rkey "${srcdir}/ocsp-tests/certs/ocsp-server.key" -CA "${srcdir}/ocsp-tests/certs/ca.pem" -reqin "${OCSP_REQ_FILE}" -respout "${OCSP_RESPONSE_FILE}" -ndays 2
 
 eval "${GETPORT}"
 # Port for gnutls-serv
 TLS_SERVER_PORT=$PORT
 PORT=${TLS_SERVER_PORT}
+
+TIMEOUT=$(which timeout)
+if test -n "$TIMEOUT";then
+${TIMEOUT} 30 "${GNUTLS_SERV}" --echo --disable-client-cert \
+	  --x509keyfile="${srcdir}/ocsp-tests/certs/server_good.key" \
+	  --x509certfile="${SERVER_CERT_FILE}" \
+	  --port="${TLS_SERVER_PORT}" \
+	  --ocsp-response="${OCSP_RESPONSE_FILE}"
+if test $? != 1;then
+    echo "Running gnutls-serv with an expired response, succeeds!"
+    exit ${rc}
+fi
+fi
+
+echo "=== Test 5.1: Server with valid certificate - expired staple (ignoring errors) ==="
+
 launch_bare_server $$ \
 	  datefudge "${TESTDATE}" \
 	  "${GNUTLS_SERV}" --echo --disable-client-cert \
-	  --x509keyfile="${srcdir}/certs/server_good.key" \
+	  --x509keyfile="${srcdir}/ocsp-tests/certs/server_good.key" \
 	  --x509certfile="${SERVER_CERT_FILE}" \
 	  --port="${TLS_SERVER_PORT}" \
+	  --ignore-ocsp-response-errors \
 	  --ocsp-response="${OCSP_RESPONSE_FILE}"
 TLS_SERVER_PID="${!}"
 wait_server $TLS_SERVER_PID
@@ -324,7 +342,7 @@ wait_for_port "${TLS_SERVER_PORT}"
 
 echo "test 123456" | \
     datefudge -s "${TESTDATE}" \
-	      "${GNUTLS_CLI}" --ocsp --x509cafile="${srcdir}/certs/ca.pem" \
+	      "${GNUTLS_CLI}" --ocsp --x509cafile="${srcdir}/ocsp-tests/certs/ca.pem" \
 	      --port="${TLS_SERVER_PORT}" localhost
 rc=$?
 
@@ -345,9 +363,9 @@ echo "=== Test 6: Server with valid certificate - old staple ==="
 
 rm -f "${OCSP_RESPONSE_FILE}"
 
-${VALGRIND} ${OCSPTOOL} --generate-request --load-issuer "${srcdir}/certs/ocsp-server.pem" --load-cert "${SERVER_CERT_FILE}" --outfile "${OCSP_REQ_FILE}"
+${VALGRIND} ${OCSPTOOL} --generate-request --load-issuer "${srcdir}/ocsp-tests/certs/ocsp-server.pem" --load-cert "${SERVER_CERT_FILE}" --outfile "${OCSP_REQ_FILE}"
 datefudge -s ${EXP_OCSP_DATE} \
-	${OPENSSL} ocsp -index ${INDEXFILE} -rsigner "${srcdir}/certs/ocsp-server.pem" -rkey "${srcdir}/certs/ocsp-server.key" -CA "${srcdir}/certs/ca.pem" -reqin "${OCSP_REQ_FILE}" -respout "${OCSP_RESPONSE_FILE}"
+	${OPENSSL} ocsp -index ${INDEXFILE} -rsigner "${srcdir}/ocsp-tests/certs/ocsp-server.pem" -rkey "${srcdir}/ocsp-tests/certs/ocsp-server.key" -CA "${srcdir}/ocsp-tests/certs/ca.pem" -reqin "${OCSP_REQ_FILE}" -respout "${OCSP_RESPONSE_FILE}"
 
 eval "${GETPORT}"
 # Port for gnutls-serv
@@ -356,10 +374,10 @@ PORT=${TLS_SERVER_PORT}
 launch_bare_server $$ \
 	  datefudge "${TESTDATE}" \
 	  "${GNUTLS_SERV}" --echo --disable-client-cert \
-	  --x509keyfile="${srcdir}/certs/server_good.key" \
+	  --x509keyfile="${srcdir}/ocsp-tests/certs/server_good.key" \
 	  --x509certfile="${SERVER_CERT_FILE}" \
 	  --port="${TLS_SERVER_PORT}" \
-	  --ocsp-response="${OCSP_RESPONSE_FILE}"
+	  --ocsp-response="${OCSP_RESPONSE_FILE}" --ignore-ocsp-response-errors
 TLS_SERVER_PID="${!}"
 wait_server $TLS_SERVER_PID
 
@@ -367,7 +385,7 @@ wait_for_port "${TLS_SERVER_PORT}"
 
 echo "test 123456" | \
     datefudge -s "${TESTDATE}" \
-	      "${GNUTLS_CLI}" --ocsp --x509cafile="${srcdir}/certs/ca.pem" \
+	      "${GNUTLS_CLI}" --ocsp --x509cafile="${srcdir}/ocsp-tests/certs/ca.pem" \
 	      --port="${TLS_SERVER_PORT}" localhost
 rc=$?
 

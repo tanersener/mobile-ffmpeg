@@ -12,7 +12,5 @@
 This function will operate similarly to @code{memset()} , but will
 not be optimized out by the compiler.
 
-@strong{Returns:} void.
-
 @strong{Since:} 3.4.0
 @end deftypefun

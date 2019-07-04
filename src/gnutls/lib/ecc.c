@@ -16,7 +16,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -30,7 +30,7 @@
 #include "errors.h"
 
 int
-_gnutls_ecc_ansi_x963_export(gnutls_ecc_curve_t curve, bigint_t x,
+_gnutls_ecc_ansi_x962_export(gnutls_ecc_curve_t curve, bigint_t x,
 			     bigint_t y, gnutls_datum_t * out)
 {
 	int numlen = gnutls_ecc_curve_get_size(curve);
@@ -93,7 +93,7 @@ _gnutls_ecc_ansi_x963_export(gnutls_ecc_curve_t curve, bigint_t x,
 
 
 int
-_gnutls_ecc_ansi_x963_import(const uint8_t * in,
+_gnutls_ecc_ansi_x962_import(const uint8_t * in,
 			     unsigned long inlen, bigint_t * x,
 			     bigint_t * y)
 {

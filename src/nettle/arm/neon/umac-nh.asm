@@ -97,6 +97,8 @@ PROLOGUE(_nettle_umac_nh)
 	bhi	.Loop
 
 	vadd.i64 D0REG(QY), D0REG(QY), D1REG(QY)
-	vmov	r0, r1, D0REG(QY)
+	C return value needs to respect word order mandated by AAPCS
+IF_LE(<	vmov	r0, r1, D0REG(QY)>)
+IF_BE(<	vmov	r1, r0, D0REG(QY)>)
 	bx	lr
 EPILOGUE(_nettle_umac_nh)

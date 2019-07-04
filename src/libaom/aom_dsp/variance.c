@@ -353,7 +353,7 @@ void aom_upsampled_pred_c(MACROBLOCKD *xd, const AV1_COMMON *const cm,
 
       // Get convolve parameters.
       ConvolveParams conv_params = get_conv_params(0, plane, xd->bd);
-      const InterpFilters filters =
+      const int_interpfilters filters =
           av1_broadcast_interp_filter(EIGHTTAP_REGULAR);
 
       // Get the inter predictor.
@@ -945,7 +945,7 @@ void aom_highbd_upsampled_pred_c(MACROBLOCKD *xd,
 
       // Get convolve parameters.
       ConvolveParams conv_params = get_conv_params(0, plane, xd->bd);
-      const InterpFilters filters =
+      const int_interpfilters filters =
           av1_broadcast_interp_filter(EIGHTTAP_REGULAR);
 
       // Get the inter predictor.

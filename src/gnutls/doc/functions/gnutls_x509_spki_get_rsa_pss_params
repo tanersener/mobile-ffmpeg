@@ -1,0 +1,19 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_spki_get_rsa_pss_params} (gnutls_x509_spki_t @var{spki}, gnutls_digest_algorithm_t * @var{dig}, unsigned int * @var{salt_size})
+@var{spki}: the SubjectPublicKeyInfo structure
+
+@var{dig}: if non-NULL, it will hold the digest algorithm
+
+@var{salt_size}: if non-NULL, it will hold the salt size
+
+This function will get the public key algorithm parameters
+of RSA-PSS type.
+
+@strong{Returns:} zero if the parameters are present or a negative
+value on error.
+
+@strong{Since:} 3.6.0
+@end deftypefun

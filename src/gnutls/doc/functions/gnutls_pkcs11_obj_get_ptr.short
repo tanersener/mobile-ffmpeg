@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pkcs11_obj_get_ptr} (gnutls_pkcs11_obj_t @var{obj}, void ** @var{ptr}, void ** @var{session}, void ** @var{ohandle}, unsigned long * @var{slot_id}, unsigned int @var{flags})

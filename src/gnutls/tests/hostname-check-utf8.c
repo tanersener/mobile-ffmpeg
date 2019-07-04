@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Red Hat, Inc.
+ * Copyright (C) 2016-2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -24,11 +24,14 @@
 #include <config.h>
 #endif
 
+#include <stdlib.h>
 #include <string.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
-#ifdef ENABLE_OPENPGP
-#include <gnutls/openpgp.h>
+
+#if defined(HAVE_LIBIDN2)
+/* to obtain version */
+#include <idn2.h>
 #endif
 
 #include "utils.h"
@@ -101,6 +104,10 @@ void doit(void)
 	gnutls_datum_t data;
 	int ret;
 
+#if !defined(HAVE_LIBIDN2)
+	exit(77);
+#endif
+
 	ret = global_init();
 	if (ret < 0)
 		fail("global_init: %d\n", ret);
@@ -142,6 +149,15 @@ void doit(void)
 	if (ret)
 		fail("%d: Invalid hostname incorrectly matches (%d)\n", __LINE__, ret);
 
+#if IDN2_VERSION_NUMBER >= 0x00160000
+	ret = gnutls_x509_crt_check_hostname(x509, "γΓγ.τόΣτ.gr");
+	if (ret)
+		fail("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
+
+	ret = gnutls_x509_crt_check_hostname(x509, "ΤΈΣΤ.gr");
+	if (ret)
+		fail("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
+#endif
 	ret = gnutls_x509_crt_check_hostname(x509, "γγγ.τόστ.gr");
 	if (ret)
 		fail("%d: Invalid hostname incorrectly matches (%d)\n", __LINE__, ret);
@@ -188,7 +204,6 @@ void doit(void)
 	if (ret)
 		fail("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
 
-#if defined(HAVE_LIBIDN) || defined(HAVE_LIBIDN2)
 	ret = gnutls_x509_crt_check_hostname(x509, "www.teχ.gr");
 	if (!ret)
 		fail("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);
@@ -201,7 +216,7 @@ void doit(void)
 	if (!ret)
 		fail("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);
 
-#if defined(HAVE_LIBIDN) /* There are IDNA2003 */
+#if IDN2_VERSION_NUMBER >= 0x00160000
 	ret = gnutls_x509_crt_check_hostname(x509, "γΓγ.τόΣτ.gr");
 	if (!ret)
 		fail("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);
@@ -209,7 +224,6 @@ void doit(void)
 	ret = gnutls_x509_crt_check_hostname(x509, "ΤΈΣΤ.gr");
 	if (!ret)
 		fail("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);
-#endif
 #endif
 
 	gnutls_x509_crt_deinit(x509);

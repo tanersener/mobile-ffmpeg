@@ -16,10 +16,12 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
+#ifndef GNUTLS_DANE_H
+#define GNUTLS_DANE_H
 
 #include <gnutls/gnutls.h>	/* for gnutls_datum_t */
 
@@ -198,3 +200,5 @@ const char *dane_strerror(int error);
 #define DANE_E_FILE_ERROR -12
 #define DANE_E_CERT_ERROR -13
 #define DANE_E_UNKNOWN_DANE_DATA -14
+
+#endif /* GNUTLS_DANE_H */

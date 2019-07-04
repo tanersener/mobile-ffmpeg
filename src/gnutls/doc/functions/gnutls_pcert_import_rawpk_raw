@@ -1,0 +1,30 @@
+
+
+
+
+@deftypefun {int} {gnutls_pcert_import_rawpk_raw} (gnutls_pcert_st* @var{pcert}, const gnutls_datum_t* @var{rawpubkey}, gnutls_x509_crt_fmt_t @var{format}, unsigned int @var{key_usage}, unsigned int @var{flags})
+@var{pcert}: The pcert structure to import the data into.
+
+@var{rawpubkey}: The raw public-key in @code{gnutls_datum_t}  format to be imported.
+
+@var{format}: The format of the raw public-key. DER or PEM.
+
+@var{key_usage}: An ORed sequence of @code{GNUTLS_KEY_} * flags.
+
+@var{flags}: zero for now
+
+This convenience function will import (i.e. convert) the given raw
+public key  @code{rawpubkey} into a @code{gnutls_pcert_st}  structure. The structure
+must be deinitialized afterwards using @code{gnutls_pcert_deinit()} .
+Note that the caller is responsible for freeing  @code{rawpubkey} . All necessary
+values will be copied into  @code{pcert} .
+
+Key usage (as defined by X.509 extension (2.5.29.15)) can be explicitly
+set because there is no certificate structure around the key to define
+this value. See for more info @code{gnutls_x509_crt_get_key_usage()} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.6.6
+@end deftypefun

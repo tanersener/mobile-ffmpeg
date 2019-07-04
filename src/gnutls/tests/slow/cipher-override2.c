@@ -16,11 +16,6 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "<%d>| %s", level, str);
 }
 
-#ifndef ENABLE_SELF_CHECKS
-# define AVOID_INTERNALS
-# include "../../lib/crypto-selftests.c"
-#endif
-
 struct myaes_ctx {
 	unsigned char iv[16];
 };

@@ -34,10 +34,7 @@ getopt_TARGETS = $(getopt_SOURCES:.c=.$(OBJEXT))
 internal_SOURCES = nettle-internal.c
 internal_TARGETS = $(internal_SOURCES:.c=.$(OBJEXT))
 
-TARGETS = aesdata$(EXEEXT_FOR_BUILD) desdata$(EXEEXT_FOR_BUILD) \
-          twofishdata$(EXEEXT_FOR_BUILD) shadata$(EXEEXT_FOR_BUILD) \
-          gcmdata$(EXEEXT_FOR_BUILD) \
-	  $(getopt_TARGETS) $(internal_TARGETS) \
+TARGETS = $(getopt_TARGETS) $(internal_TARGETS) \
 	  $(LIBTARGETS) $(SHLIBTARGETS)
 
 DOCTARGETS = @IF_DOCUMENTATION@ nettle.info nettle.html nettle.pdf
@@ -96,7 +93,7 @@ nettle_SOURCES = aes-decrypt-internal.c aes-decrypt.c \
 		 chacha-crypt.c chacha-core-internal.c \
 		 chacha-poly1305.c chacha-poly1305-meta.c \
 		 chacha-set-key.c chacha-set-nonce.c \
-		 ctr.c des.c des3.c des-compat.c \
+		 ctr.c ctr16.c des.c des3.c \
 		 eax.c eax-aes128.c eax-aes128-meta.c \
 		 gcm.c gcm-aes.c \
 		 gcm-aes128.c gcm-aes128-meta.c \
@@ -104,6 +101,7 @@ nettle_SOURCES = aes-decrypt-internal.c aes-decrypt.c \
 		 gcm-aes256.c gcm-aes256-meta.c \
 		 gcm-camellia128.c gcm-camellia128-meta.c \
 		 gcm-camellia256.c gcm-camellia256-meta.c \
+		 cmac.c cmac-aes128.c cmac-aes256.c \
 		 gosthash94.c gosthash94-meta.c \
 		 hmac.c hmac-md5.c hmac-ripemd160.c hmac-sha1.c \
 		 hmac-sha224.c hmac-sha256.c hmac-sha384.c hmac-sha512.c \
@@ -137,7 +135,8 @@ nettle_SOURCES = aes-decrypt-internal.c aes-decrypt.c \
 		 umac32.c umac64.c umac96.c umac128.c \
 		 version.c \
 		 write-be32.c write-le32.c write-le64.c \
-		 yarrow256.c yarrow_key_event.c
+		 yarrow256.c yarrow_key_event.c \
+		 xts.c xts-aes128.c xts-aes256.c
 
 hogweed_SOURCES = sexp.c sexp-format.c \
 		  sexp-transport.c sexp-transport-format.c \
@@ -194,11 +193,12 @@ OPT_SOURCES = fat-x86_64.c fat-arm.c mini-gmp.c
 HEADERS = aes.h arcfour.h arctwo.h asn1.h blowfish.h \
 	  base16.h base64.h bignum.h buffer.h camellia.h cast128.h \
 	  cbc.h ccm.h cfb.h chacha.h chacha-poly1305.h ctr.h \
-	  curve25519.h des.h des-compat.h dsa.h dsa-compat.h eax.h \
+	  curve25519.h des.h dsa.h dsa-compat.h eax.h \
 	  ecc-curve.h ecc.h ecdsa.h eddsa.h \
 	  gcm.h gosthash94.h hmac.h \
 	  knuth-lfib.h hkdf.h \
 	  macros.h \
+	  cmac.h \
 	  md2.h md4.h \
 	  md5.h md5-compat.h \
 	  memops.h memxor.h \
@@ -207,9 +207,9 @@ HEADERS = aes.h arcfour.h arctwo.h asn1.h blowfish.h \
 	  pgp.h pkcs1.h pss.h pss-mgf1.h realloc.h ripemd160.h rsa.h \
 	  salsa20.h sexp.h \
 	  serpent.h sha.h sha1.h sha2.h sha3.h twofish.h \
-	  umac.h yarrow.h poly1305.h
+	  umac.h yarrow.h xts.h poly1305.h
 
-INSTALL_HEADERS = $(HEADERS) nettle-stdint.h version.h @IF_MINI_GMP@ mini-gmp.h
+INSTALL_HEADERS = $(HEADERS) version.h @IF_MINI_GMP@ mini-gmp.h
 
 SOURCES = $(nettle_SOURCES) $(hogweed_SOURCES) \
 	  $(getopt_SOURCES) $(internal_SOURCES) \
@@ -226,13 +226,16 @@ DISTFILES = $(SOURCES) $(HEADERS) getopt.h getopt_int.h \
 	config.guess config.sub install-sh texinfo.tex \
 	config.h.in config.m4.in config.make.in	Makefile.in \
 	README CONTRIBUTING.md AUTHORS COPYING.LESSERv3 COPYINGv2 COPYINGv3 \
-	INSTALL NEWS TODO ChangeLog \
+	INSTALL NEWS ChangeLog \
 	nettle.pc.in hogweed.pc.in \
-	$(des_headers) descore.README \
+	$(des_headers) descore.README desdata.stamp \
 	aes-internal.h camellia-internal.h serpent-internal.h \
 	cast128_sboxes.h desinfo.h desCode.h \
+	ripemd160-internal.h sha2-internal.h \
 	memxor-internal.h nettle-internal.h nettle-write.h \
-	rsa-internal.h \
+	ctr-internal.h chacha-internal.h sha3-internal.h \
+	salsa20-internal.h umac-internal.h hogweed-internal.h \
+	rsa-internal.h pkcs1-internal.h dsa-internal.h eddsa-internal.h \
 	gmp-glue.h ecc-internal.h fat-setup.h \
 	mini-gmp.h asm.m4 \
 	nettle.texinfo nettle.info nettle.html nettle.pdf sha-example.c
@@ -310,64 +313,75 @@ eccdata$(EXEEXT_FOR_BUILD): eccdata.c mini-gmp.c mini-gmp.h
 	$(CC_FOR_BUILD) `test -f eccdata.c || echo '$(srcdir)/'`eccdata.c \
 	-o eccdata$(EXEEXT_FOR_BUILD)
 
+eccparams$(EXEEXT_FOR_BUILD): eccparams.c
+	$(CC_FOR_BUILD) `test -f eccparams.c || echo '$(srcdir)/'`eccparams.c \
+	-o eccparams$(EXEEXT_FOR_BUILD)
+
 # desCore rules
 # It seems using $(srcdir)/ doesn't work with GNU make 3.79.1
 # des_headers = $(srcdir)/rotors.h $(srcdir)/keymap.h 
 des_headers = rotors.h keymap.h 
 
 # Generate DES headers.
-$(des_headers): desdata.c
-	$(MAKE) desdata$(EXEEXT_FOR_BUILD)
+$(des_headers): desdata.stamp
 	f="$(srcdir)/`basename $@`"; \
 	  ./desdata$(EXEEXT_FOR_BUILD) $(@F) > $${f}T; \
 	  test -s $${f}T && mv -f $${f}T $$f
 
+desdata.stamp: desdata.c
+	$(MAKE) desdata$(EXEEXT_FOR_BUILD)
+	echo stamp > desdata.stamp
+
 des.$(OBJEXT): des.c des.h $(des_headers)
 
-# Generate ECC files.
-# Some possible choices for 192:
-#	k = 15, c = 4,  64 entries,  ~3 KB
-#	k = 20, c = 6, 128 entries,  ~6 KB
-#	k = 10, c = 6, 256 entries, ~12 KB
-#	k =  7, c = 6, 320 entries, ~15 KB
-#	k =  9, c = 7, 512 entries, ~24 KB
-ecc-192.h: eccdata.stamp
-	./eccdata$(EXEEXT_FOR_BUILD) 192 7 6 $(NUMB_BITS) > $@T && mv $@T $@
-# Some possible choices for 224:
-#	k = 18, c = 4,  64 entries,  ~4 KB
-#	k = 24, c = 6, 128 entries,  ~8 KB
-#	k = 12, c = 6, 256 entries, ~16 KB
-#	k =  8, c = 6, 320 entries, ~20 KB
-#	k = 10, c = 7, 512 entries, ~32 KB
-ecc-224.h: eccdata.stamp
-	./eccdata$(EXEEXT_FOR_BUILD) 224 12 6 $(NUMB_BITS) > $@T && mv $@T $@
-# Some possible choices for 256:
-#	k = 20, c = 4,  64 entries,  ~4 KB
-#	k = 27, c = 6, 128 entries,  ~8 KB
-#	k = 14, c = 6, 256 entries, ~16 KB
-#	k =  9, c = 6, 320 entries, ~20 KB
-#	k = 12, c = 7, 512 entries, ~32 KB
-ecc-256.h: eccdata.stamp
-	./eccdata$(EXEEXT_FOR_BUILD) 256 14 6 $(NUMB_BITS) > $@T && mv $@T $@
-# Some possible choices for 384:
-#	k = 31, c = 4,  64 entries,  ~6 KB
-#	k = 41, c = 6, 128 entries, ~12 KB
-#	k = 20, c = 6, 256 entries, ~24 KB
-#	k = 14, c = 6, 320 entries, ~30 KB
-#	k = 18, c = 7, 512 entries, ~48 KB
-ecc-384.h: eccdata.stamp
-	./eccdata$(EXEEXT_FOR_BUILD) 384 41 6 $(NUMB_BITS) > $@T && mv $@T $@
-# Some possible choices for 521:
-#	k = 42, c = 4,  64 entries,  ~9 KB
-#	k = 56, c = 6, 128 entries, ~18 KB
-#	k = 28, c = 6, 256 entries, ~35 KB
-#	k = 19, c = 6, 320 entries, ~44 KB
-#	k = 24, c = 7, 512 entries, ~70 KB
-ecc-521.h: eccdata.stamp
-	./eccdata$(EXEEXT_FOR_BUILD) 521 56 6 $(NUMB_BITS) > $@T && mv $@T $@
+# Generate ECC files, with roughly 16 KB of tables per curve.
 
+# Some reasonable choices for 192:
+# k =  8, c =  6, S = 256, T =  40 ( 32 A +  8 D) 12 KB
+# k = 14, c =  7, S = 256, T =  42 ( 28 A + 14 D) 12 KB
+# k = 11, c =  6, S = 192, T =  44 ( 33 A + 11 D)  9 KB
+# k = 16, c =  6, S = 128, T =  48 ( 32 A + 16 D)  6 KB
+ecc-192.h: eccdata.stamp
+	./eccdata$(EXEEXT_FOR_BUILD) 192 8 6 $(NUMB_BITS) > $@T && mv $@T $@
+
+# Some reasonable choices for 224:
+# k = 16, c =  7, S = 256, T =  48 ( 32 A + 16 D) ~16 KB
+# k = 10, c =  6, S = 256, T =  50 ( 40 A + 10 D) ~16 KB
+# k = 13, c =  6, S = 192, T =  52 ( 39 A + 13 D) ~12 KB
+# k =  9, c =  5, S = 160, T =  54 ( 45 A +  9 D) ~10 KB
+ecc-224.h: eccdata.stamp
+	./eccdata$(EXEEXT_FOR_BUILD) 224 16 7 $(NUMB_BITS) > $@T && mv $@T $@
+
+# Some reasonable choices for 256:
+# k =  9, c =  6, S = 320, T =  54 ( 45 A +  9 D) 20 KB
+# k = 11, c =  6, S = 256, T =  55 ( 44 A + 11 D) 16 KB
+# k = 19, c =  7, S = 256, T =  57 ( 38 A + 19 D) 16 KB
+# k = 15, c =  6, S = 192, T =  60 ( 45 A + 15 D) 12 KB
+ecc-256.h: eccdata.stamp
+	./eccdata$(EXEEXT_FOR_BUILD) 256 11 6 $(NUMB_BITS) > $@T && mv $@T $@
+
+# Some reasonable choices for 384:
+# k = 16, c =  6, S = 256, T =  80 ( 64 A + 16 D) 24 KB
+# k = 28, c =  7, S = 256, T =  84 ( 56 A + 28 D) 24 KB
+# k = 11, c =  5, S = 224, T =  88 ( 77 A + 11 D) 21 KB
+# k = 22, c =  6, S = 192, T =  88 ( 66 A + 22 D) 18 KB
+# k = 13, c =  5, S = 192, T =  91 ( 78 A + 13 D) 18 KB
+# k = 16, c =  5, S = 160, T =  96 ( 80 A + 16 D) 15 KB
+# k = 32, c =  6, S = 128, T =  96 ( 64 A + 32 D) 12 KB
+ecc-384.h: eccdata.stamp
+	./eccdata$(EXEEXT_FOR_BUILD) 384 32 6 $(NUMB_BITS) > $@T && mv $@T $@
+
+# Some reasonable choices for 521:
+# k = 29, c =  6, S = 192, T = 116 ( 87 A + 29 D) ~27 KB
+# k = 21, c =  5, S = 160, T = 126 (105 A + 21 D) ~23 KB
+# k = 44, c =  6, S = 128, T = 132 ( 88 A + 44 D) ~18 KB
+# k = 35, c =  5, S =  96, T = 140 (105 A + 35 D) ~14 KB
+ecc-521.h: eccdata.stamp
+	./eccdata$(EXEEXT_FOR_BUILD) 521 44 6 $(NUMB_BITS) > $@T && mv $@T $@
+
+# Parameter choices mostly the same as for ecc-256.h.
 ecc-25519.h: eccdata.stamp
-	./eccdata$(EXEEXT_FOR_BUILD) 255 14 6 $(NUMB_BITS) > $@T && mv $@T $@
+	./eccdata$(EXEEXT_FOR_BUILD) 255 11 6 $(NUMB_BITS) > $@T && mv $@T $@
 
 eccdata.stamp: eccdata.c
 	$(MAKE) eccdata$(EXEEXT_FOR_BUILD)
@@ -572,7 +586,7 @@ distdir: $(DISTFILES)
 	  fi ; \
 	done
 	set -e; for d in sparc32 sparc64 x86 \
-		x86_64 x86_64/aesni x86_64/fat \
+		x86_64 x86_64/aesni x86_64/sha_ni x86_64/fat \
 		arm arm/neon arm/v6 arm/fat ; do \
 	  mkdir "$(distdir)/$$d" ; \
 	  find "$(srcdir)/$$d" -maxdepth 1 '(' -name '*.asm' -o -name '*.m4' ')' \
@@ -632,12 +646,17 @@ distcheck: dist
 clean-here:
 	-rm -f $(TARGETS) *.$(OBJEXT) *.s *.so *.dll *.a \
 		ecc-192.h ecc-224.h ecc-256.h ecc-384.h ecc-521.h ecc-25519.h \
+		aesdata$(EXEEXT_FOR_BUILD) \
+		desdata$(EXEEXT_FOR_BUILD) \
+		twofishdata$(EXEEXT_FOR_BUILD) \
+		shadata$(EXEEXT_FOR_BUILD) \
+		gcmdata$(EXEEXT_FOR_BUILD) \
 		eccdata$(EXEEXT_FOR_BUILD) eccdata.stamp
 	-rm -rf .lib libnettle.stamp libhogweed.stamp
 
 distclean-here: clean-here
 	-rm -f config.h stamp-h config.log config.status machine.m4 \
-	config.make config.m4 Makefile nettle-stdint.h version.h \
+	config.make config.m4 Makefile version.h \
 	nettle.pc hogweed.pc libnettle.map libhogweed.map \
 	*.asm *.d
 

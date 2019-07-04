@@ -15,7 +15,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -94,7 +94,7 @@ gnutls_x509_crt_check_email(gnutls_x509_crt_t cert,
 			}
 
 			if (!_gnutls_str_is_print(rfc822name, rfc822namesize)) {
-				_gnutls_debug_log("invalid (non-ASCII) email in certificate %.*s", (int)rfc822namesize, rfc822name);
+				_gnutls_debug_log("invalid (non-ASCII) email in certificate %.*s\n", (int)rfc822namesize, rfc822name);
 				continue;
 			}
 
@@ -137,7 +137,7 @@ gnutls_x509_crt_check_email(gnutls_x509_crt_t cert,
 		}
 
 		if (!_gnutls_str_is_print(rfc822name, rfc822namesize)) {
-			_gnutls_debug_log("invalid (non-ASCII) email in certificate DN %.*s", (int)rfc822namesize, rfc822name);
+			_gnutls_debug_log("invalid (non-ASCII) email in certificate DN %.*s\n", (int)rfc822namesize, rfc822name);
 			ret = 0;
 			goto cleanup;
 		}

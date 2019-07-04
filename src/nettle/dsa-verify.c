@@ -38,6 +38,7 @@
 #include <stdlib.h>
 
 #include "dsa.h"
+#include "dsa-internal.h"
 
 #include "bignum.h"
 

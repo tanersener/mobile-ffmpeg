@@ -29,4 +29,4 @@ HEADER_FILES = $(top_srcdir)/lib/includes/gnutls/gnutls.h.in \
 	$(top_srcdir)/lib/includes/gnutls/pkcs7.h $(top_srcdir)/lib/includes/gnutls/socket.h
 
 C_SOURCE_FILES = $(top_srcdir)/lib/*/*.c $(top_srcdir)/lib/*.c $(top_srcdir)/libdane/*.c
-C_X509_SOURCE_FILES = $(top_srcdir)/lib/x509/*.c $(top_srcdir)/lib/*.c $(top_srcdir)/lib/system/cert.c
+C_X509_SOURCE_FILES = $(top_srcdir)/lib/x509/*.c $(top_srcdir)/lib/*.c $(top_srcdir)/lib/system/certs.c

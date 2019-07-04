@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_priority_group_list} (gnutls_priority_t @var{pcache}, const unsigned int ** @var{list})

@@ -22,7 +22,8 @@ be stored as a string in the provided buffer.  Use
 If the buffer provided is not long enough to hold the output, then
  @code{oid_size} is updated and @code{GNUTLS_E_SHORT_MEMORY_BUFFER}  will be
 returned. The  @code{oid} returned will be null terminated, although 
- @code{oid_size} will not account for the trailing null.
+ @code{oid_size} will not account for the trailing null (the latter is not
+true for GnuTLS prior to 3.6.0).
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned,
 otherwise a negative error code is returned.  If you have reached the

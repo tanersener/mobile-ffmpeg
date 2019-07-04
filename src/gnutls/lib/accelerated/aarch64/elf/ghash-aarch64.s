@@ -40,6 +40,8 @@
 # 1 "lib/accelerated/aarch64/elf/ghash-aarch64.s.tmp.S"
 # 1 "<built-in>"
 # 1 "<command-line>"
+# 1 "/usr/aarch64-linux-gnu/include/stdc-predef.h" 1 3
+# 1 "<command-line>" 2
 # 1 "lib/accelerated/aarch64/elf/ghash-aarch64.s.tmp.S"
 # 1 "lib/accelerated/aarch64/aarch64-common.h" 1
 # 2 "lib/accelerated/aarch64/elf/ghash-aarch64.s.tmp.S" 2
@@ -92,8 +94,48 @@ gcm_init_v8:
  ext v17.16b,v22.16b,v22.16b,#8
  eor v17.16b,v17.16b,v22.16b
  ext v21.16b,v16.16b,v17.16b,#8
- st1 {v21.2d,v22.2d},[x0]
+ st1 {v21.2d,v22.2d},[x0],#32
 
+ pmull v0.1q,v20.1d, v22.1d
+ pmull v5.1q,v22.1d,v22.1d
+ pmull2 v2.1q,v20.2d, v22.2d
+ pmull2 v7.1q,v22.2d,v22.2d
+ pmull v1.1q,v16.1d,v17.1d
+ pmull v6.1q,v17.1d,v17.1d
+
+ ext v16.16b,v0.16b,v2.16b,#8
+ ext v17.16b,v5.16b,v7.16b,#8
+ eor v18.16b,v0.16b,v2.16b
+ eor v1.16b,v1.16b,v16.16b
+ eor v4.16b,v5.16b,v7.16b
+ eor v6.16b,v6.16b,v17.16b
+ eor v1.16b,v1.16b,v18.16b
+ pmull v18.1q,v0.1d,v19.1d
+ eor v6.16b,v6.16b,v4.16b
+ pmull v4.1q,v5.1d,v19.1d
+
+ ins v2.d[0],v1.d[1]
+ ins v7.d[0],v6.d[1]
+ ins v1.d[1],v0.d[0]
+ ins v6.d[1],v5.d[0]
+ eor v0.16b,v1.16b,v18.16b
+ eor v5.16b,v6.16b,v4.16b
+
+ ext v18.16b,v0.16b,v0.16b,#8
+ ext v4.16b,v5.16b,v5.16b,#8
+ pmull v0.1q,v0.1d,v19.1d
+ pmull v5.1q,v5.1d,v19.1d
+ eor v18.16b,v18.16b,v2.16b
+ eor v4.16b,v4.16b,v7.16b
+ eor v20.16b, v0.16b,v18.16b
+ eor v22.16b,v5.16b,v4.16b
+
+ ext v16.16b,v20.16b, v20.16b,#8
+ ext v17.16b,v22.16b,v22.16b,#8
+ eor v16.16b,v16.16b,v20.16b
+ eor v17.16b,v17.16b,v22.16b
+ ext v21.16b,v16.16b,v17.16b,#8
+ st1 {v20.2d,v21.2d,v22.2d},[x0]
  ret
 .size gcm_init_v8,.-gcm_init_v8
 .globl gcm_gmult_v8
@@ -141,6 +183,8 @@ gcm_gmult_v8:
 .type gcm_ghash_v8,%function
 .align 4
 gcm_ghash_v8:
+ cmp x3,#64
+ b.hs .Lgcm_ghash_v8_4x
  ld1 {v0.2d},[x0]
 
 
@@ -149,7 +193,7 @@ gcm_ghash_v8:
 
  subs x3,x3,#32
  mov x12,#16
-# 116 "lib/accelerated/aarch64/elf/ghash-aarch64.s.tmp.S"
+# 158 "lib/accelerated/aarch64/elf/ghash-aarch64.s.tmp.S"
  ld1 {v20.2d,v21.2d},[x1],#32
  movi v19.16b,#0xe1
  ld1 {v22.2d},[x1]
@@ -260,6 +304,286 @@ gcm_ghash_v8:
 
  ret
 .size gcm_ghash_v8,.-gcm_ghash_v8
+.type gcm_ghash_v8_4x,%function
+.align 4
+gcm_ghash_v8_4x:
+.Lgcm_ghash_v8_4x:
+ ld1 {v0.2d},[x0]
+ ld1 {v20.2d,v21.2d,v22.2d},[x1],#48
+ movi v19.16b,#0xe1
+ ld1 {v26.2d,v27.2d,v28.2d},[x1]
+ shl v19.2d,v19.2d,#57
+
+ ld1 {v4.2d,v5.2d,v6.2d,v7.2d},[x2],#64
+
+ rev64 v0.16b,v0.16b
+ rev64 v5.16b,v5.16b
+ rev64 v6.16b,v6.16b
+ rev64 v7.16b,v7.16b
+ rev64 v4.16b,v4.16b
+
+ ext v25.16b,v7.16b,v7.16b,#8
+ ext v24.16b,v6.16b,v6.16b,#8
+ ext v23.16b,v5.16b,v5.16b,#8
+
+ pmull v29.1q,v20.1d,v25.1d
+ eor v7.16b,v7.16b,v25.16b
+ pmull2 v31.1q,v20.2d,v25.2d
+ pmull v30.1q,v21.1d,v7.1d
+
+ pmull v16.1q,v22.1d,v24.1d
+ eor v6.16b,v6.16b,v24.16b
+ pmull2 v24.1q,v22.2d,v24.2d
+ pmull2 v6.1q,v21.2d,v6.2d
+
+ eor v29.16b,v29.16b,v16.16b
+ eor v31.16b,v31.16b,v24.16b
+ eor v30.16b,v30.16b,v6.16b
+
+ pmull v7.1q,v26.1d,v23.1d
+ eor v5.16b,v5.16b,v23.16b
+ pmull2 v23.1q,v26.2d,v23.2d
+ pmull v5.1q,v27.1d,v5.1d
+
+ eor v29.16b,v29.16b,v7.16b
+ eor v31.16b,v31.16b,v23.16b
+ eor v30.16b,v30.16b,v5.16b
+
+ subs x3,x3,#128
+ b.lo .Ltail4x
+
+ b .Loop4x
+
+.align 4
+.Loop4x:
+ eor v16.16b,v4.16b,v0.16b
+ ld1 {v4.2d,v5.2d,v6.2d,v7.2d},[x2],#64
+ ext v3.16b,v16.16b,v16.16b,#8
+
+ rev64 v5.16b,v5.16b
+ rev64 v6.16b,v6.16b
+ rev64 v7.16b,v7.16b
+ rev64 v4.16b,v4.16b
+
+
+ pmull v0.1q,v28.1d,v3.1d
+ eor v16.16b,v16.16b,v3.16b
+ pmull2 v2.1q,v28.2d,v3.2d
+ ext v25.16b,v7.16b,v7.16b,#8
+ pmull2 v1.1q,v27.2d,v16.2d
+
+ eor v0.16b,v0.16b,v29.16b
+ eor v2.16b,v2.16b,v31.16b
+ ext v24.16b,v6.16b,v6.16b,#8
+ eor v1.16b,v1.16b,v30.16b
+ ext v23.16b,v5.16b,v5.16b,#8
+
+ ext v17.16b,v0.16b,v2.16b,#8
+ eor v18.16b,v0.16b,v2.16b
+ pmull v29.1q,v20.1d,v25.1d
+ eor v7.16b,v7.16b,v25.16b
+ eor v1.16b,v1.16b,v17.16b
+ pmull2 v31.1q,v20.2d,v25.2d
+ eor v1.16b,v1.16b,v18.16b
+ pmull v30.1q,v21.1d,v7.1d
+
+ pmull v18.1q,v0.1d,v19.1d
+ ins v2.d[0],v1.d[1]
+ ins v1.d[1],v0.d[0]
+ pmull v16.1q,v22.1d,v24.1d
+ eor v6.16b,v6.16b,v24.16b
+ pmull2 v24.1q,v22.2d,v24.2d
+ eor v0.16b,v1.16b,v18.16b
+ pmull2 v6.1q,v21.2d,v6.2d
+
+ eor v29.16b,v29.16b,v16.16b
+ eor v31.16b,v31.16b,v24.16b
+ eor v30.16b,v30.16b,v6.16b
+
+ ext v18.16b,v0.16b,v0.16b,#8
+ pmull v0.1q,v0.1d,v19.1d
+ pmull v7.1q,v26.1d,v23.1d
+ eor v5.16b,v5.16b,v23.16b
+ eor v18.16b,v18.16b,v2.16b
+ pmull2 v23.1q,v26.2d,v23.2d
+ pmull v5.1q,v27.1d,v5.1d
+
+ eor v0.16b,v0.16b,v18.16b
+ eor v29.16b,v29.16b,v7.16b
+ eor v31.16b,v31.16b,v23.16b
+ ext v0.16b,v0.16b,v0.16b,#8
+ eor v30.16b,v30.16b,v5.16b
+
+ subs x3,x3,#64
+ b.hs .Loop4x
+
+.Ltail4x:
+ eor v16.16b,v4.16b,v0.16b
+ ext v3.16b,v16.16b,v16.16b,#8
+
+ pmull v0.1q,v28.1d,v3.1d
+ eor v16.16b,v16.16b,v3.16b
+ pmull2 v2.1q,v28.2d,v3.2d
+ pmull2 v1.1q,v27.2d,v16.2d
+
+ eor v0.16b,v0.16b,v29.16b
+ eor v2.16b,v2.16b,v31.16b
+ eor v1.16b,v1.16b,v30.16b
+
+ adds x3,x3,#64
+ b.eq .Ldone4x
+
+ cmp x3,#32
+ b.lo .Lone
+ b.eq .Ltwo
+.Lthree:
+ ext v17.16b,v0.16b,v2.16b,#8
+ eor v18.16b,v0.16b,v2.16b
+ eor v1.16b,v1.16b,v17.16b
+ ld1 {v4.2d,v5.2d,v6.2d},[x2]
+ eor v1.16b,v1.16b,v18.16b
+
+ rev64 v5.16b,v5.16b
+ rev64 v6.16b,v6.16b
+ rev64 v4.16b,v4.16b
+
+
+ pmull v18.1q,v0.1d,v19.1d
+ ins v2.d[0],v1.d[1]
+ ins v1.d[1],v0.d[0]
+ ext v24.16b,v6.16b,v6.16b,#8
+ ext v23.16b,v5.16b,v5.16b,#8
+ eor v0.16b,v1.16b,v18.16b
+
+ pmull v29.1q,v20.1d,v24.1d
+ eor v6.16b,v6.16b,v24.16b
+
+ ext v18.16b,v0.16b,v0.16b,#8
+ pmull v0.1q,v0.1d,v19.1d
+ eor v18.16b,v18.16b,v2.16b
+ pmull2 v31.1q,v20.2d,v24.2d
+ pmull v30.1q,v21.1d,v6.1d
+ eor v0.16b,v0.16b,v18.16b
+ pmull v7.1q,v22.1d,v23.1d
+ eor v5.16b,v5.16b,v23.16b
+ ext v0.16b,v0.16b,v0.16b,#8
+
+ pmull2 v23.1q,v22.2d,v23.2d
+ eor v16.16b,v4.16b,v0.16b
+ pmull2 v5.1q,v21.2d,v5.2d
+ ext v3.16b,v16.16b,v16.16b,#8
+
+ eor v29.16b,v29.16b,v7.16b
+ eor v31.16b,v31.16b,v23.16b
+ eor v30.16b,v30.16b,v5.16b
+
+ pmull v0.1q,v26.1d,v3.1d
+ eor v16.16b,v16.16b,v3.16b
+ pmull2 v2.1q,v26.2d,v3.2d
+ pmull v1.1q,v27.1d,v16.1d
+
+ eor v0.16b,v0.16b,v29.16b
+ eor v2.16b,v2.16b,v31.16b
+ eor v1.16b,v1.16b,v30.16b
+ b .Ldone4x
+
+.align 4
+.Ltwo:
+ ext v17.16b,v0.16b,v2.16b,#8
+ eor v18.16b,v0.16b,v2.16b
+ eor v1.16b,v1.16b,v17.16b
+ ld1 {v4.2d,v5.2d},[x2]
+ eor v1.16b,v1.16b,v18.16b
+
+ rev64 v5.16b,v5.16b
+ rev64 v4.16b,v4.16b
+
+
+ pmull v18.1q,v0.1d,v19.1d
+ ins v2.d[0],v1.d[1]
+ ins v1.d[1],v0.d[0]
+ ext v23.16b,v5.16b,v5.16b,#8
+ eor v0.16b,v1.16b,v18.16b
+
+ ext v18.16b,v0.16b,v0.16b,#8
+ pmull v0.1q,v0.1d,v19.1d
+ eor v18.16b,v18.16b,v2.16b
+ eor v0.16b,v0.16b,v18.16b
+ ext v0.16b,v0.16b,v0.16b,#8
+
+ pmull v29.1q,v20.1d,v23.1d
+ eor v5.16b,v5.16b,v23.16b
+
+ eor v16.16b,v4.16b,v0.16b
+ ext v3.16b,v16.16b,v16.16b,#8
+
+ pmull2 v31.1q,v20.2d,v23.2d
+ pmull v30.1q,v21.1d,v5.1d
+
+ pmull v0.1q,v22.1d,v3.1d
+ eor v16.16b,v16.16b,v3.16b
+ pmull2 v2.1q,v22.2d,v3.2d
+ pmull2 v1.1q,v21.2d,v16.2d
+
+ eor v0.16b,v0.16b,v29.16b
+ eor v2.16b,v2.16b,v31.16b
+ eor v1.16b,v1.16b,v30.16b
+ b .Ldone4x
+
+.align 4
+.Lone:
+ ext v17.16b,v0.16b,v2.16b,#8
+ eor v18.16b,v0.16b,v2.16b
+ eor v1.16b,v1.16b,v17.16b
+ ld1 {v4.2d},[x2]
+ eor v1.16b,v1.16b,v18.16b
+
+ rev64 v4.16b,v4.16b
+
+
+ pmull v18.1q,v0.1d,v19.1d
+ ins v2.d[0],v1.d[1]
+ ins v1.d[1],v0.d[0]
+ eor v0.16b,v1.16b,v18.16b
+
+ ext v18.16b,v0.16b,v0.16b,#8
+ pmull v0.1q,v0.1d,v19.1d
+ eor v18.16b,v18.16b,v2.16b
+ eor v0.16b,v0.16b,v18.16b
+ ext v0.16b,v0.16b,v0.16b,#8
+
+ eor v16.16b,v4.16b,v0.16b
+ ext v3.16b,v16.16b,v16.16b,#8
+
+ pmull v0.1q,v20.1d,v3.1d
+ eor v16.16b,v16.16b,v3.16b
+ pmull2 v2.1q,v20.2d,v3.2d
+ pmull v1.1q,v21.1d,v16.1d
+
+.Ldone4x:
+ ext v17.16b,v0.16b,v2.16b,#8
+ eor v18.16b,v0.16b,v2.16b
+ eor v1.16b,v1.16b,v17.16b
+ eor v1.16b,v1.16b,v18.16b
+
+ pmull v18.1q,v0.1d,v19.1d
+ ins v2.d[0],v1.d[1]
+ ins v1.d[1],v0.d[0]
+ eor v0.16b,v1.16b,v18.16b
+
+ ext v18.16b,v0.16b,v0.16b,#8
+ pmull v0.1q,v0.1d,v19.1d
+ eor v18.16b,v18.16b,v2.16b
+ eor v0.16b,v0.16b,v18.16b
+ ext v0.16b,v0.16b,v0.16b,#8
+
+
+ rev64 v0.16b,v0.16b
+
+ st1 {v0.2d},[x0]
+
+ ret
+.size gcm_ghash_v8_4x,.-gcm_ghash_v8_4x
 .byte 71,72,65,83,72,32,102,111,114,32,65,82,77,118,56,44,32,67,82,89,80,84,79,71,65,77,83,32,98,121,32,60,97,112,112,114,111,64,111,112,101,110,115,115,108,46,111,114,103,62,0
 .align 2
 .align 2

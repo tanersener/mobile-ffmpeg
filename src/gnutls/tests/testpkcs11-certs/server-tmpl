@@ -1,0 +1,67 @@
+# X.509 Certificate options
+#
+# DN options
+
+dn = "cn=Server,C=CZ"
+
+# The serial number of the certificate
+serial = 2
+
+# In how many days, counting from today, this certificate will expire.
+expiration_days = 2590
+
+# X.509 v3 extensions
+
+# A dnsname in case of a WWW server.
+dns_name = "localhost"
+#dns_name = "www.morethanone.org"
+
+# An IP address in case of a server.
+ip_address = "127.0.0.1"
+
+#dns_name = "www.evenmorethanone.org"
+
+# An email in case of a person
+email = "none@none.org"
+
+# An URL that has CRLs (certificate revocation lists)
+# available. Needed in CA certificates.
+#crl_dist_points = "http://www.getcrl.crl/getcrl/"
+
+#email = "where@none.org"
+
+# Whether this is a CA certificate or not
+#ca
+
+# Whether this certificate will be used for a TLS client
+#tls_www_client
+
+# Whether this certificate will be used for a TLS server
+tls_www_server
+
+# Whether this certificate will be used to sign data (needed
+# in TLS DHE ciphersuites).
+signing_key
+
+# Whether this certificate will be used to encrypt data (needed
+# in TLS RSA ciphersuites). Note that it is preferred to use different
+# keys for encryption and signing.
+encryption_key
+
+# Whether this key will be used to sign other certificates.
+#cert_signing_key
+
+# Whether this key will be used to sign CRLs.
+#crl_signing_key
+
+# Whether this key will be used to sign code.
+#code_signing_key
+
+# Whether this key will be used to sign OCSP data.
+#ocsp_signing_key
+
+# Whether this key will be used for time stamping.
+#time_stamping_key
+
+# Whether this key will be used for IPsec IKE operations.
+#ipsec_ike_key

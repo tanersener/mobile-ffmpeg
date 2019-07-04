@@ -16,9 +16,12 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
+
+#ifndef GNUTLS_LIB_X509_ATTRIBUTES_H
+#define GNUTLS_LIB_X509_ATTRIBUTES_H
 
 int
 _x509_parse_attribute(ASN1_TYPE asn1_struct,
@@ -28,3 +31,5 @@ _x509_parse_attribute(ASN1_TYPE asn1_struct,
 int
 _x509_set_attribute(ASN1_TYPE asn, const char *root,
 	      const char *ext_id, const gnutls_datum_t * ext_data);
+
+#endif /* GNUTLS_LIB_X509_ATTRIBUTES_H */

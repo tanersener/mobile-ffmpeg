@@ -2,10 +2,10 @@
 
 
 
-@deftypefun {int} {gnutls_ext_register} (const char * @var{name}, int @var{type}, gnutls_ext_parse_type_t @var{parse_type}, gnutls_ext_recv_func @var{recv_func}, gnutls_ext_send_func @var{send_func}, gnutls_ext_deinit_data_func @var{deinit_func}, gnutls_ext_pack_func @var{pack_func}, gnutls_ext_unpack_func @var{unpack_func})
+@deftypefun {int} {gnutls_ext_register} (const char * @var{name}, int @var{id}, gnutls_ext_parse_type_t @var{parse_type}, gnutls_ext_recv_func @var{recv_func}, gnutls_ext_send_func @var{send_func}, gnutls_ext_deinit_data_func @var{deinit_func}, gnutls_ext_pack_func @var{pack_func}, gnutls_ext_unpack_func @var{unpack_func})
 @var{name}: the name of the extension to register
 
-@var{type}: the numeric id of the extension
+@var{id}: the numeric TLS id of the extension
 
 @var{parse_type}: the parse type of the extension (see gnutls_ext_parse_type_t)
 
@@ -26,6 +26,9 @@ is already registered then @code{GNUTLS_E_ALREADY_REGISTERED}  will be returned.
 Each registered extension can store temporary data into the gnutls_session_t
 structure using @code{gnutls_ext_set_data()} , and they can be retrieved using
 @code{gnutls_ext_get_data()} .
+
+Any extensions registered with this function are valid for the client
+and TLS1.2 server hello (or encrypted extensions for TLS1.3).
 
 This function is not thread safe.
 

@@ -17,4 +17,4 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-EXTRA_DIST = gdoc sort2.pl split-texi.pl cleanup-autogen.pl getfuncs.pl
+EXTRA_DIST = gdoc sort2.pl split-texi.pl cleanup-autogen.pl getfuncs.pl getfuncs-map.pl

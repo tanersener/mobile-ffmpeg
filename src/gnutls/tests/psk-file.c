@@ -27,6 +27,7 @@
 #include <config.h>
 #endif
 
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -47,6 +48,8 @@ int main(int argc, char **argv)
 #include <sys/wait.h>
 #endif
 #include <unistd.h>
+#include <signal.h>
+#include <assert.h>
 #include <gnutls/gnutls.h>
 
 #include "utils.h"
@@ -64,14 +67,13 @@ static void tls_log_func(int level, const char *str)
 #define MAX_BUF 1024
 #define MSG "Hello TLS"
 
-static void client(int sd, const char *user)
+static void client(int sd, const char *prio, const char *user, const gnutls_datum_t *key,
+		   unsigned expect_hint, int expect_fail, int exp_kx)
 {
-	int ret, ii;
+	int ret, ii, kx;
 	gnutls_session_t session;
 	char buffer[MAX_BUF + 1];
 	gnutls_psk_client_credentials_t pskcred;
-	/* Need to enable anonymous KX specifically. */
-	const gnutls_datum_t key = { (void *) "9e32cf7786321a828ef7668f09fb35db", 32 };
 	const char *hint;
 
 	global_init();
@@ -82,15 +84,12 @@ static void client(int sd, const char *user)
 	side = "client";
 
 	gnutls_psk_allocate_client_credentials(&pskcred);
-	gnutls_psk_set_client_credentials(pskcred, user, &key,
+	gnutls_psk_set_client_credentials(pskcred, user, key,
 					  GNUTLS_PSK_KEY_HEX);
 
-	/* Initialize TLS session
-	 */
-	gnutls_init(&session, GNUTLS_CLIENT);
+	assert(gnutls_init(&session, GNUTLS_CLIENT|GNUTLS_KEY_SHARE_TOP)>=0);
 
-	/* Use default priorities */
-	gnutls_priority_set_direct(session, "NORMAL:-KX-ALL:+PSK", NULL);
+	assert(gnutls_priority_set_direct(session, prio, NULL)>=0);
 
 	/* put the anonymous credentials to the current session
 	 */
@@ -103,8 +102,12 @@ static void client(int sd, const char *user)
 	ret = gnutls_handshake(session);
 
 	if (ret < 0) {
-		fail("client: Handshake failed\n");
-		gnutls_perror(ret);
+		if (!expect_fail)
+			fail("client: Handshake failed\n");
+		if (ret != expect_fail) {
+			fail("expected cli error %d (%s), got %d (%s)\n", expect_fail, gnutls_strerror(expect_fail),
+								      ret, gnutls_strerror(ret));
+		}
 		goto end;
 	} else {
 		if (debug)
@@ -112,10 +115,12 @@ static void client(int sd, const char *user)
 	}
 
 	/* check the hint */
-	hint = gnutls_psk_client_get_hint(session);
-	if (hint == NULL || strcmp(hint, "hint") != 0) {
-		fail("client: hint is not the expected: %s\n", gnutls_psk_client_get_hint(session));
-		goto end;
+	if (expect_hint) {
+		hint = gnutls_psk_client_get_hint(session);
+		if (hint == NULL || strcmp(hint, "hint") != 0) {
+			fail("client: hint is not the expected: %s\n", gnutls_psk_client_get_hint(session));
+			goto end;
+		}
 	}
 
 	gnutls_record_send(session, MSG, strlen(MSG));
@@ -131,6 +136,8 @@ static void client(int sd, const char *user)
 		goto end;
 	}
 
+	kx = gnutls_kx_get(session);
+
 	if (debug) {
 		printf("- Received %d bytes: ", ret);
 		for (ii = 0; ii < ret; ii++) {
@@ -140,6 +147,15 @@ static void client(int sd, const char *user)
 	}
 
 	gnutls_bye(session, GNUTLS_SHUT_RDWR);
+
+	if (expect_fail)
+		fail("client: expected failure but connection succeeded!\n");
+
+	if (exp_kx && kx != exp_kx) {
+		fail("client: expected key exchange %s, but got %s\n",
+		     gnutls_kx_get_name(exp_kx),
+		     gnutls_kx_get_name(kx));
+	}
 
       end:
 
@@ -157,13 +173,16 @@ static void client(int sd, const char *user)
 
 #define MAX_BUF 1024
 
-static void server(int sd, const char *user, unsigned expect_fail)
+static void server(int sd, const char *prio, const char *user, bool no_cred,
+		   int expect_fail, int exp_kx)
 {
-gnutls_psk_server_credentials_t server_pskcred;
-int ret;
-gnutls_session_t session;
-char buffer[MAX_BUF + 1];
-char *psk_file = getenv("PSK_FILE");
+	gnutls_psk_server_credentials_t server_pskcred;
+	int ret, kx;
+	gnutls_session_t session;
+	const char *pskid;
+	char buffer[MAX_BUF + 1];
+	char *psk_file = getenv("PSK_FILE");
+	char *desc;
 
 	/* this must be called once in the program
 	 */
@@ -188,27 +207,30 @@ char *psk_file = getenv("PSK_FILE");
 
 	gnutls_init(&session, GNUTLS_SERVER);
 
-	/* avoid calling all the priority functions, since the defaults
-	 * are adequate.
-	 */
-	gnutls_priority_set_direct(session, "NORMAL:-KX-ALL:+PSK", NULL);
+	assert(gnutls_priority_set_direct(session, prio, NULL)>=0);
 
-	gnutls_credentials_set(session, GNUTLS_CRD_PSK, server_pskcred);
+	if (!no_cred)
+		gnutls_credentials_set(session, GNUTLS_CRD_PSK, server_pskcred);
 
 	gnutls_transport_set_int(session, sd);
 	ret = gnutls_handshake(session);
 	if (ret < 0) {
-		close(sd);
-		gnutls_deinit(session);
-		gnutls_psk_free_server_credentials(server_pskcred);
+		gnutls_alert_send_appropriate(session, ret);
 		if (expect_fail) {
-			success("server: Handshake has failed - expected (%s)\n\n",
-			     gnutls_strerror(ret));
+			if (ret != expect_fail) {
+				fail("expected error %d (%s), got %d (%s)\n", expect_fail,
+									      gnutls_strerror(expect_fail),
+									      ret, gnutls_strerror(ret));
+			}
+
+			if (debug)
+				success("server: Handshake has failed - expected (%s)\n\n",
+				     gnutls_strerror(ret));
 		} else {
 			fail("server: Handshake has failed (%s)\n\n",
 			     gnutls_strerror(ret));
 		}
-		return;
+		goto end;
 	}
 	if (debug)
 		success("server: Handshake was completed\n");
@@ -236,10 +258,34 @@ char *psk_file = getenv("PSK_FILE");
 					   strlen(buffer));
 		}
 	}
+
+	kx = gnutls_kx_get(session);
+
+	desc = gnutls_session_get_desc(session);
+	success("  - connected with: %s\n", desc);
+	gnutls_free(desc);
 	/* do not wait for the peer to close the connection.
 	 */
 	gnutls_bye(session, GNUTLS_SHUT_WR);
 
+	if (expect_fail)
+		fail("server: expected failure but connection succeeded!\n");
+
+	if (!no_cred) {
+		pskid = gnutls_psk_server_get_username(session);
+		if (pskid == NULL || strcmp(pskid, user) != 0) {
+			fail("server: username (%s), does not match expected (%s)\n",
+			     pskid, user);
+		}
+	}
+
+	if (exp_kx && kx != exp_kx) {
+		fail("server: expected key exchange %s, but got %s\n",
+		     gnutls_kx_get_name(exp_kx),
+		     gnutls_kx_get_name(kx));
+	}
+
+ end:
 	close(sd);
 	gnutls_deinit(session);
 
@@ -252,11 +298,20 @@ char *psk_file = getenv("PSK_FILE");
 }
 
 static
-void run_test(const char *user, unsigned expect_fail)
+void run_test3(const char *prio, const char *sprio, const char *user, const gnutls_datum_t *key, bool no_cred,
+	      unsigned expect_hint, int exp_kx, int expect_fail_cli, int expect_fail_serv)
 {
 	pid_t child;
 	int err;
 	int sockets[2];
+
+	signal(SIGPIPE, SIG_IGN);
+
+	if (expect_fail_serv || expect_fail_cli) {
+		success("ntest %s (user:%s)\n", prio, user);
+	} else {
+		success("test %s (user:%s)\n", prio, user);
+	}
 
 	err = socketpair(AF_UNIX, SOCK_STREAM, 0, sockets);
 	if (err == -1) {
@@ -276,18 +331,86 @@ void run_test(const char *user, unsigned expect_fail)
 		close(sockets[1]);
 		int status;
 		/* parent */
-		server(sockets[0], user, expect_fail);
+		server(sockets[0], sprio?sprio:prio, user, no_cred, expect_fail_serv, exp_kx);
 		wait(&status);
+		check_wait_status(status);
 	} else {
 		close(sockets[0]);
-		client(sockets[1], user);
+		client(sockets[1], prio, user, key, expect_hint, expect_fail_cli, exp_kx);
+		exit(0);
 	}
+}
+
+static
+void run_test2(const char *prio, const char *sprio, const char *user, const gnutls_datum_t *key,
+	      unsigned expect_hint, int exp_kx, int expect_fail_cli, int expect_fail_serv)
+{
+	run_test3(prio, sprio, user, key, 0, expect_hint, exp_kx, expect_fail_cli, expect_fail_serv);
+}
+
+static
+void run_test_ok(const char *prio, const char *user, const gnutls_datum_t *key, unsigned expect_hint, int expect_fail)
+{
+	run_test2(prio, NULL, user, key, expect_hint, GNUTLS_KX_PSK, expect_fail, expect_fail);
+}
+
+static
+void run_ectest_ok(const char *prio, const char *user, const gnutls_datum_t *key, unsigned expect_hint, int expect_fail)
+{
+	run_test2(prio, NULL, user, key, expect_hint, GNUTLS_KX_ECDHE_PSK, expect_fail, expect_fail);
+}
+
+static
+void run_dhtest_ok(const char *prio, const char *user, const gnutls_datum_t *key, unsigned expect_hint, int expect_fail)
+{
+	run_test2(prio, NULL, user, key, expect_hint, GNUTLS_KX_DHE_PSK, expect_fail, expect_fail);
 }
 
 void doit(void)
 {
-	run_test("jas", 0);
-	run_test("non-hex", 1);
+	const gnutls_datum_t key = { (void *) "9e32cf7786321a828ef7668f09fb35db", 32 };
+	const gnutls_datum_t wrong_key = { (void *) "9e31cf7786321a828ef7668f09fb35db", 32 };
+
+	run_test_ok("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+PSK", "jas", &key, 1, 0);
+	run_dhtest_ok("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+DHE-PSK", "jas", &key, 1, 0);
+	run_ectest_ok("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+ECDHE-PSK", "jas", &key, 1, 0);
+	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+PSK", NULL, "unknown", &key, 1, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_DECRYPTION_FAILED);
+	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+PSK", NULL, "jas", &wrong_key, 1, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_DECRYPTION_FAILED);
+	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+PSK", NULL, "non-hex", &key, 1, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_KEYFILE_ERROR);
+
+	run_test_ok("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+PSK", "jas", &key, 1, 0);
+	run_test_ok("NORMAL:-KX-ALL:+PSK", "jas", &key, 0, 0);
+	run_test2("NORMAL:+PSK", NULL, "unknown", &key, 1, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+	run_test2("NORMAL:+PSK", NULL, "jas", &wrong_key, 1, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+	run_test2("NORMAL:-KX-ALL:+PSK", NULL, "non-hex", &key, 1, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_KEYFILE_ERROR);
+
+	run_dhtest_ok("NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-EC-ALL", "jas", &key, 0, 0);
+	run_test_ok("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK", "jas", &key, 0, 0);
+
+	/* test priorities of DHE-PSK and PSK */
+	run_ectest_ok("NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+DHE-PSK:+PSK:-GROUP-DH-ALL", "jas", &key, 0, 0);
+	run_test_ok("NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+PSK:+DHE-PSK:-GROUP-DH-ALL", "jas", &key, 0, 0);
+	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+DHE-PSK:+PSK:-GROUP-DH-ALL", 
+		  "NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+PSK:+DHE-PSK:%SERVER_PRECEDENCE:-GROUP-DH-ALL",
+		  "jas", &key, 0, GNUTLS_KX_PSK, 0, 0);
+	/* try with PRF that doesn't match binder (SHA256) */
+	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-256-GCM:+PSK:+DHE-PSK", NULL, "jas", &key, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_NO_CIPHER_SUITES);
+	/* try with no groups and PSK */
+	run_test_ok("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK:-GROUP-ALL", "jas", &key, 0, 0);
+	/* try without any groups but DHE-PSK */
+	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-ALL", "NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:+PSK", "jas", &key, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_NO_COMMON_KEY_SHARE);
+	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-ALL", "NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:+PSK:-GROUP-ALL", "jas", &key, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_NO_COMMON_KEY_SHARE);
+
+	/* if user invalid we continue without PSK */
+	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK:+DHE-PSK", NULL, "non-hex", &key, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_KEYFILE_ERROR);
+	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK:+DHE-PSK", NULL, "unknown", &key, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK:+DHE-PSK", NULL, "jas", &wrong_key, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+
+	/* try with HelloRetryRequest and PSK */
+	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-ALL:+GROUP-FFDHE2048:+GROUP-FFDHE4096", "NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-ALL:+GROUP-FFDHE4096", "jas", &key, 0, GNUTLS_KX_DHE_PSK, 0, 0);
+
+	/* try without server credentials */
+	run_test3("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK:+DHE-PSK", NULL, "jas", &key, 1, 0, 0, GNUTLS_E_PUSH_ERROR, GNUTLS_E_INSUFFICIENT_CREDENTIALS);
 }
 
 #endif				/* _WIN32 */

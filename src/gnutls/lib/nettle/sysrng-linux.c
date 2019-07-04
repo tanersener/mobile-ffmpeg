@@ -17,7 +17,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -50,6 +50,8 @@ static int _gnutls_urandom_fd = -1;
 static ino_t _gnutls_urandom_fd_ino = 0;
 static dev_t _gnutls_urandom_fd_rdev = 0;
 
+get_entropy_func _rnd_get_system_entropy = NULL;
+
 #if defined(__linux__)
 # ifdef HAVE_GETRANDOM
 #  include <sys/random.h>
@@ -62,6 +64,7 @@ static dev_t _gnutls_urandom_fd_rdev = 0;
 #   define getrandom(dst,s,flags) -1
 #  endif
 # endif
+
 
 static unsigned have_getrandom(void)
 {

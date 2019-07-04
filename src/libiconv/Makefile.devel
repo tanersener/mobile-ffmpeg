@@ -6,8 +6,8 @@ SHELL = /bin/sh
 MAKE = make
 AUTOCONF = autoconf-2.69
 AUTOHEADER = autoheader-2.69
-AUTOMAKE = automake-1.15
-ACLOCAL = aclocal-1.15
+AUTOMAKE = automake-1.16
+ACLOCAL = aclocal-1.16
 GPERF = gperf
 CC = gcc -Wall
 CFLAGS = -O
@@ -28,13 +28,12 @@ all : srclib/Makefile.gnulib srclib/Makefile.in \
       man/iconv.1.html man/iconv.3.html man/iconv_close.3.html man/iconv_open.3.html man/iconvctl.3.html man/iconv_open_into.3.html \
       force
 	cd libcharset && $(MAKE) -f Makefile.devel all
-	cd preload && $(MAKE) -f Makefile.devel all
 
 
 # Before making a new release:
 # - check that the encoding lists in README and man/iconv_open.3 are up to date,
-# - check that the files in libcharset/lib/ are in sync with the gnulib modules
-#   'localcharset' and 'relocatable-lib-lgpl',
+# - check that the files in libcharset/lib/ are in sync with the gnulib module
+#   'localcharset',
 # - increment the version number in
 #     configure.ac
 #     include/iconv.h.in
@@ -73,12 +72,11 @@ srclib/Makefile.gnulib :
 
 srclib/Makefile.in : srclib/Makefile.am srclib/Makefile.gnulib aclocal.m4
 	if test -n "$$GNULIB_TOOL"; then \
-	  $$GNULIB_TOOL --copy-file build-aux/ar-lib; \
 	  $$GNULIB_TOOL --copy-file build-aux/compile; \
 	fi
 # Make sure we get new versions of files brought in by automake.
-	(cd build-aux && rm -f ar-lib compile depcomp install-sh mdate-sh missing test-driver)
-	$(AUTOMAKE) --gnits --add-missing --copy srclib/Makefile
+	(cd build-aux && rm -f compile depcomp install-sh mdate-sh missing test-driver)
+	$(AUTOMAKE) --gnits --add-missing --copy srclib/Makefile && rm -rf autom4te.cache
 
 gnulib-imported-files : force
 	if test -n "$$GNULIB_TOOL"; then \
@@ -93,20 +91,20 @@ CONFIGURES = configure
 CONFIGURES_IN = configure.ac
 
 aclocal.m4 : $(CONFIGURES_IN) srclib/Makefile.gnulib $(wildcard m4/*.m4) $(wildcard srcm4/*.m4)
-	$(ACLOCAL) -I m4 -I srcm4 --output=$@ && touch $@
+	$(ACLOCAL) -I m4 -I srcm4 --output=$@ && touch $@ && rm -rf autom4te.cache
 
 configures : $(CONFIGURES)
 
 AUTOCONF_FILES = aclocal.m4 $(wildcard m4/*.m4) $(wildcard srcm4/*.m4)
 
 configure : configure.ac $(AUTOCONF_FILES)
-	$(AUTOCONF)
+	$(AUTOCONF) && rm -rf autom4te.cache
 
 check-configures : $(CONFIGURES)
 	set -e; for f in $(CONFIGURES); do bash -x -n $$f; done
 
 config.h.in : configure.ac $(AUTOCONF_FILES)
-	$(AUTOHEADER)
+	$(AUTOHEADER) && rm -rf autom4te.cache
 	touch $@
 
 
@@ -243,7 +241,6 @@ totally-clean : force
 	rm -f lib/translit.h
 	rm -f man/iconv.1.html man/iconv.3.html man/iconv_close.3.html man/iconv_open.3.html man/iconvctl.3.html man/iconv_open_into.3.html
 	cd libcharset && $(MAKE) -f Makefile.devel totally-clean
-	cd preload && $(MAKE) -f Makefile.devel totally-clean
 
 
 force :

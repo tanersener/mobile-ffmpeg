@@ -23,9 +23,11 @@ FATE_CHECKASM = fate-checkasm-aacpsdsp                                  \
                 fate-checkasm-sbrdsp                                    \
                 fate-checkasm-synth_filter                              \
                 fate-checkasm-sw_rgb                                    \
+                fate-checkasm-v210dec                                   \
                 fate-checkasm-v210enc                                   \
                 fate-checkasm-vf_blend                                  \
                 fate-checkasm-vf_colorspace                             \
+                fate-checkasm-vf_gblur                                  \
                 fate-checkasm-vf_hflip                                  \
                 fate-checkasm-vf_threshold                              \
                 fate-checkasm-videodsp                                  \
@@ -33,7 +35,7 @@ FATE_CHECKASM = fate-checkasm-aacpsdsp                                  \
                 fate-checkasm-vp9dsp                                    \
 
 $(FATE_CHECKASM): tests/checkasm/checkasm$(EXESUF)
-$(FATE_CHECKASM): CMD = run tests/checkasm/checkasm --test=$(@:fate-checkasm-%=%)
+$(FATE_CHECKASM): CMD = run tests/checkasm/checkasm$(EXESUF) --test=$(@:fate-checkasm-%=%)
 $(FATE_CHECKASM): CMP = null
 
 FATE += $(FATE_CHECKASM)

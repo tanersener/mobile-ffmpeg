@@ -327,7 +327,7 @@ static const int8_t fwd_shift_32x8[3] = { 2, -2, 0 };
 static const int8_t fwd_shift_16x64[3] = { 0, -2, 0 };
 static const int8_t fwd_shift_64x16[3] = { 2, -4, 0 };
 
-const int8_t *fwd_txfm_shift_ls[TX_SIZES_ALL] = {
+const int8_t *av1_fwd_txfm_shift_ls[TX_SIZES_ALL] = {
   fwd_shift_4x4,   fwd_shift_8x8,   fwd_shift_16x16, fwd_shift_32x32,
   fwd_shift_64x64, fwd_shift_4x8,   fwd_shift_8x4,   fwd_shift_8x16,
   fwd_shift_16x8,  fwd_shift_16x32, fwd_shift_32x16, fwd_shift_32x64,
@@ -335,23 +335,23 @@ const int8_t *fwd_txfm_shift_ls[TX_SIZES_ALL] = {
   fwd_shift_32x8,  fwd_shift_16x64, fwd_shift_64x16,
 };
 
-const int8_t fwd_cos_bit_col[MAX_TXWH_IDX /*txw_idx*/]
-                            [MAX_TXWH_IDX /*txh_idx*/] = {
-                              { 13, 13, 13, 0, 0 },
-                              { 13, 13, 13, 12, 0 },
-                              { 13, 13, 13, 12, 13 },
-                              { 0, 13, 13, 12, 13 },
-                              { 0, 0, 13, 12, 13 }
-                            };
+const int8_t av1_fwd_cos_bit_col[MAX_TXWH_IDX /*txw_idx*/]
+                                [MAX_TXWH_IDX /*txh_idx*/] = {
+                                  { 13, 13, 13, 0, 0 },
+                                  { 13, 13, 13, 12, 0 },
+                                  { 13, 13, 13, 12, 13 },
+                                  { 0, 13, 13, 12, 13 },
+                                  { 0, 0, 13, 12, 13 }
+                                };
 
-const int8_t fwd_cos_bit_row[MAX_TXWH_IDX /*txw_idx*/]
-                            [MAX_TXWH_IDX /*txh_idx*/] = {
-                              { 13, 13, 12, 0, 0 },
-                              { 13, 13, 13, 12, 0 },
-                              { 13, 13, 12, 13, 12 },
-                              { 0, 12, 13, 12, 11 },
-                              { 0, 0, 12, 11, 10 }
-                            };
+const int8_t av1_fwd_cos_bit_row[MAX_TXWH_IDX /*txw_idx*/]
+                                [MAX_TXWH_IDX /*txh_idx*/] = {
+                                  { 13, 13, 12, 0, 0 },
+                                  { 13, 13, 13, 12, 0 },
+                                  { 13, 13, 12, 13, 12 },
+                                  { 0, 12, 13, 12, 11 },
+                                  { 0, 0, 12, 11, 10 }
+                                };
 
 static const int8_t fdct4_range_mult2[4] = { 0, 2, 3, 3 };
 static const int8_t fdct8_range_mult2[6] = { 0, 2, 4, 5, 5, 5 };
@@ -379,7 +379,7 @@ const int8_t fwd_idtx_range_row[MAX_TXWH_IDX /*txw_idx*/]
                                                                 9 } };
 #endif
 
-const int8_t *fwd_txfm_range_mult2_list[TXFM_TYPES] = {
+static const int8_t *fwd_txfm_range_mult2_list[TXFM_TYPES] = {
   fdct4_range_mult2,  fdct8_range_mult2,   fdct16_range_mult2,
   fdct32_range_mult2, fdct64_range_mult2,  fadst4_range_mult2,
   fadst8_range_mult2, fadst16_range_mult2, fidtx4_range_mult2,
@@ -418,9 +418,9 @@ void av1_get_fwd_txfm_cfg(TX_TYPE tx_type, TX_SIZE tx_size,
   const TX_TYPE_1D tx_type_1d_row = htx_tab[tx_type];
   const int txw_idx = tx_size_wide_log2[tx_size] - tx_size_wide_log2[0];
   const int txh_idx = tx_size_high_log2[tx_size] - tx_size_high_log2[0];
-  cfg->shift = fwd_txfm_shift_ls[tx_size];
-  cfg->cos_bit_col = fwd_cos_bit_col[txw_idx][txh_idx];
-  cfg->cos_bit_row = fwd_cos_bit_row[txw_idx][txh_idx];
+  cfg->shift = av1_fwd_txfm_shift_ls[tx_size];
+  cfg->cos_bit_col = av1_fwd_cos_bit_col[txw_idx][txh_idx];
+  cfg->cos_bit_row = av1_fwd_cos_bit_row[txw_idx][txh_idx];
   cfg->txfm_type_col = av1_txfm_type_ls[txh_idx][tx_type_1d_col];
   cfg->txfm_type_row = av1_txfm_type_ls[txw_idx][tx_type_1d_row];
   cfg->stage_num_col = av1_txfm_stage_num_list[cfg->txfm_type_col];

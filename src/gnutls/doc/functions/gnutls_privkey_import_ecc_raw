@@ -7,15 +7,18 @@
 
 @var{curve}: holds the curve
 
-@var{x}: holds the x
+@var{x}: holds the x-coordinate
 
-@var{y}: holds the y
+@var{y}: holds the y-coordinate
 
-@var{k}: holds the k
+@var{k}: holds the k (private key)
 
 This function will convert the given elliptic curve parameters to the
 native @code{gnutls_privkey_t}  format.  The output will be stored
 in  @code{key} .
+
+In EdDSA curves the  @code{y} parameter should be @code{NULL}  and the  @code{x} and  @code{k} parameters
+must be in the native format for the curve.
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.

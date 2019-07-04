@@ -1,4 +1,4 @@
-/* Copyright (C) 1999-2002, 2012 Free Software Foundation, Inc.
+/* Copyright (C) 1999-2002, 2012, 2018 Free Software Foundation, Inc.
    This file is part of the GNU LIBICONV Tools.
 
    This program is free software: you can redistribute it and/or modify
@@ -12,7 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, see <http://www.gnu.org/licenses/>.  */
+   along with this program; if not, see <https://www.gnu.org/licenses/>.  */
 
 /*
  * Generates Unicode variants table from Koichi Yasuoka's UniVariants file.
@@ -49,7 +49,7 @@ int main (int argc, char *argv[])
   printf(" *\n");
   printf(" * You should have received a copy of the GNU Library General Public\n");
   printf(" * License along with the GNU LIBICONV Library; see the file COPYING.LIB.\n");
-  printf(" * If not, see <http://www.gnu.org/licenses/>.\n");
+  printf(" * If not, see <https://www.gnu.org/licenses/>.\n");
   printf(" */\n");
   printf("\n");
   printf("/*\n");

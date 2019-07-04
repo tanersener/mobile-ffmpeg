@@ -1,4 +1,4 @@
 /.deps/
 *.o
 *.lo
-*.dirstamp
+/.dirstamp

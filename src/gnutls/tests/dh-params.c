@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Red Hat, Inc.
+ * Copyright (C) 2016-2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -31,6 +31,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <assert.h>
 #include "cert-common.h"
 #include "utils.h"
 
@@ -62,23 +63,27 @@ static int compare(gnutls_datum_t *d1, gnutls_datum_t *d2)
 
 void doit(void)
 {
-	gnutls_dh_params_t dh_params;
+	gnutls_dh_params_t dh_params, tmp_params;
 	gnutls_x509_privkey_t privkey;
 	gnutls_datum_t p1, g1, p2, g2, q;
 	unsigned bits = 0;
 	int ret;
 
 	/* import DH parameters from DSA key and verify they are the same */
-	gnutls_dh_params_init(&dh_params);
-	gnutls_x509_privkey_init(&privkey);
+	assert(gnutls_dh_params_init(&dh_params) >= 0);
+	assert(gnutls_dh_params_init(&tmp_params) >= 0);
+	assert(gnutls_x509_privkey_init(&privkey) >= 0);
 
 	ret = gnutls_x509_privkey_import(privkey, &dsa_key, GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		fail("error in %s: %d\n", __FILE__, __LINE__);
 
-	ret = gnutls_dh_params_import_dsa(dh_params, privkey);
+	ret = gnutls_dh_params_import_dsa(tmp_params, privkey);
 	if (ret < 0)
 		fail("error in %s: %d\n", __FILE__, __LINE__);
+
+	assert(gnutls_dh_params_cpy(dh_params, tmp_params) >= 0);
+	gnutls_dh_params_deinit(tmp_params);
 
 	ret = gnutls_dh_params_export_raw(dh_params, &p1, &g1, &bits);
 	if (ret < 0)

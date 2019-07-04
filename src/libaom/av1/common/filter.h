@@ -35,6 +35,7 @@ typedef enum ATTRIBUTE_PACKED {
   SWITCHABLE_FILTERS = BILINEAR,
   SWITCHABLE = SWITCHABLE_FILTERS + 1, /* the last switchable one */
   EXTRA_FILTERS = INTERP_FILTERS_ALL - SWITCHABLE_FILTERS,
+  INTERP_INVALID = 0xff,
 } InterpFilter;
 
 enum {
@@ -47,21 +48,28 @@ enum {
 // Pack two InterpFilter's into a uint32_t: since there are at most 10 filters,
 // we can use 16 bits for each and have more than enough space. This reduces
 // argument passing and unifies the operation of setting a (pair of) filters.
-typedef uint32_t InterpFilters;
-static INLINE InterpFilter av1_extract_interp_filter(InterpFilters filters,
-                                                     int x_filter) {
-  return (InterpFilter)((filters >> (x_filter ? 16 : 0)) & 0xf);
+typedef struct InterpFilters {
+  uint16_t y_filter;
+  uint16_t x_filter;
+} InterpFilters;
+
+typedef union int_interpfilters {
+  uint32_t as_int;
+  InterpFilters as_filters;
+} int_interpfilters;
+
+static INLINE InterpFilter av1_extract_interp_filter(int_interpfilters filters,
+                                                     int dir) {
+  return (InterpFilter)((dir) ? filters.as_filters.x_filter
+                              : filters.as_filters.y_filter);
 }
 
-static INLINE InterpFilters av1_make_interp_filters(InterpFilter y_filter,
-                                                    InterpFilter x_filter) {
-  uint16_t y16 = y_filter & 0xf;
-  uint16_t x16 = x_filter & 0xf;
-  return y16 | ((uint32_t)x16 << 16);
-}
-
-static INLINE InterpFilters av1_broadcast_interp_filter(InterpFilter filter) {
-  return av1_make_interp_filters(filter, filter);
+static INLINE int_interpfilters
+av1_broadcast_interp_filter(InterpFilter filter) {
+  int_interpfilters filters;
+  filters.as_filters.x_filter = filter;
+  filters.as_filters.y_filter = filter;
+  return filters;
 }
 
 static INLINE InterpFilter av1_unswitchable_filter(InterpFilter filter) {

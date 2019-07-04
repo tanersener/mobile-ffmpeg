@@ -3720,6 +3720,7 @@ a program from several object files.
 The following components of LINK-COMMAND are treated specially:
 
   -all-static       do not do any dynamic linking at all
+  -static           do not do any dynamic linking at all
   -avoid-version    do not add a version suffix if possible
   -bindir BINDIR    specify path to binaries directory (for systems where
                     libraries must be found in the PATH setting at runtime)
@@ -3746,7 +3747,8 @@ The following components of LINK-COMMAND are treated specially:
   -R[ ]LIBDIR       add LIBDIR to the runtime path of programs and libraries
   -shared           only do dynamic linking of libtool libraries
   -shrext SUFFIX    override the standard shared library file extension
-  -static           do not do any dynamic linking of uninstalled libtool libraries
+  -static-uninstalled-libs
+                    do not do any dynamic linking of uninstalled libtool libraries
   -static-libtool-libs
                     do not do any dynamic linking of libtool libraries
   -version-info CURRENT[:REVISION[:AGE]]
@@ -6573,9 +6575,9 @@ func_mode_link ()
 	build_old_libs=no
 	break
 	;;
-      -all-static | -static | -static-libtool-libs)
+      -all-static | -static | -static-uninstalled-libs | -static-libtool-libs)
 	case $arg in
-	-all-static)
+	-all-static | -static)
 	  if test yes = "$build_libtool_libs" && test -z "$link_static_flag"; then
 	    func_warning "complete static linking is impossible in this configuration"
 	  fi
@@ -6584,7 +6586,7 @@ func_mode_link ()
 	  fi
 	  prefer_static_libs=yes
 	  ;;
-	-static)
+	-static-uninstalled-libs)
 	  if test -z "$pic_flag" && test -n "$link_static_flag"; then
 	    dlopen_self=$dlopen_self_static
 	  fi
@@ -6883,7 +6885,7 @@ func_mode_link ()
       prevarg=$arg
 
       case $arg in
-      -all-static)
+      -all-static | -static)
 	if test -n "$link_static_flag"; then
 	  # See comment for -static flag below, for more details.
 	  func_append compile_command " $link_static_flag"
@@ -7174,9 +7176,9 @@ func_mode_link ()
 	continue
 	;;
 
-      -static | -static-libtool-libs)
-	# The effects of -static are defined in a previous loop.
-	# We used to do the same as -all-static on platforms that
+      -static-uninstalled-libs | -static-libtool-libs)
+	# The effects of -static-uninstalled-libs are defined in a previous
+	# loop.  We used to do the same as -all-static on platforms that
 	# didn't have a PIC flag, but the assumption that the effects
 	# would be equivalent was wrong.  It would break on at least
 	# Digital Unix and AIX.

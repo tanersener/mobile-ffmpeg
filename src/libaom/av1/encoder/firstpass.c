@@ -338,6 +338,7 @@ void av1_first_pass(AV1_COMP *cpi, const int64_t ts_duration) {
   int64_t frame_avg_wavelet_energy = 0;
   int64_t coded_error = 0;
   int64_t sr_coded_error = 0;
+  int64_t tr_coded_error = 0;
 
   int sum_mvr = 0, sum_mvc = 0;
   int sum_mvr_abs = 0, sum_mvc_abs = 0;
@@ -345,6 +346,7 @@ void av1_first_pass(AV1_COMP *cpi, const int64_t ts_duration) {
   int mvcount = 0;
   int intercount = 0;
   int second_ref_count = 0;
+  int third_ref_count = 0;
   const int intrapenalty = INTRA_MODE_PENALTY;
   double neutral_count;
   int intra_skip_count = 0;
@@ -358,8 +360,16 @@ void av1_first_pass(AV1_COMP *cpi, const int64_t ts_duration) {
   const YV12_BUFFER_CONFIG *const lst_yv12 =
       get_ref_frame_yv12_buf(cm, LAST_FRAME);
   const YV12_BUFFER_CONFIG *gld_yv12 = get_ref_frame_yv12_buf(cm, GOLDEN_FRAME);
+  const YV12_BUFFER_CONFIG *alt_yv12 = NULL;
+  const int alt_offset = 16 - (current_frame->frame_number % 16);
+  if (alt_offset < 16) {
+    const struct lookahead_entry *const alt_buf =
+        av1_lookahead_peek(cpi->lookahead, alt_offset);
+    if (alt_buf != NULL) {
+      alt_yv12 = &alt_buf->img;
+    }
+  }
   YV12_BUFFER_CONFIG *const new_yv12 = &cm->cur_frame->buf;
-  const YV12_BUFFER_CONFIG *first_ref_buf = lst_yv12;
   double intra_factor;
   double brightness_factor;
   const int qindex = find_fp_qindex(seq_params->bit_depth);
@@ -399,7 +409,7 @@ void av1_first_pass(AV1_COMP *cpi, const int64_t ts_duration) {
                        num_planes);
 
   if (!frame_is_intra_only(cm)) {
-    av1_setup_pre_planes(xd, 0, first_ref_buf, 0, 0, NULL, num_planes);
+    av1_setup_pre_planes(xd, 0, lst_yv12, 0, 0, NULL, num_planes);
   }
 
   xd->mi = cm->mi_grid_visible;
@@ -435,6 +445,8 @@ void av1_first_pass(AV1_COMP *cpi, const int64_t ts_duration) {
     recon_yoffset = (mb_row * recon_y_stride * 16);
     src_yoffset = (mb_row * src_y_stride * 16);
     recon_uvoffset = (mb_row * recon_uv_stride * uv_mb_height);
+    int alt_yv12_yoffset =
+        (alt_yv12 != NULL) ? mb_row * alt_yv12->y_stride * 16 : -1;
 
     // Set up limit values for motion vectors to prevent them extending
     // outside the UMV borders.
@@ -443,7 +455,7 @@ void av1_first_pass(AV1_COMP *cpi, const int64_t ts_duration) {
         ((cm->mb_rows - 1 - mb_row) * 16) + BORDER_MV_PIXELS_B16;
 
     for (mb_col = 0; mb_col < cm->mb_cols; ++mb_col) {
-      int this_error;
+      int this_intra_error;
       const int use_dc_pred = (mb_col || mb_row) && (!mb_col || !mb_row);
       const BLOCK_SIZE bsize = get_bsize(cm, mb_row, mb_col);
       double log_intra;
@@ -473,9 +485,9 @@ void av1_first_pass(AV1_COMP *cpi, const int64_t ts_duration) {
       xd->mi[0]->tx_size =
           use_dc_pred ? (bsize >= BLOCK_16X16 ? TX_16X16 : TX_8X8) : TX_4X4;
       av1_encode_intra_block_plane(cpi, x, bsize, 0, 0, mb_row * 2, mb_col * 2);
-      this_error = aom_get_mb_ss(x->plane[0].src_diff);
+      this_intra_error = aom_get_mb_ss(x->plane[0].src_diff);
 
-      if (this_error < UL_INTRA_THRESH) {
+      if (this_intra_error < UL_INTRA_THRESH) {
         ++intra_skip_count;
       } else if ((mb_col > 0) && (image_data_start_row == INVALID_ROW)) {
         image_data_start_row = mb_row;
@@ -484,8 +496,8 @@ void av1_first_pass(AV1_COMP *cpi, const int64_t ts_duration) {
       if (seq_params->use_highbitdepth) {
         switch (seq_params->bit_depth) {
           case AOM_BITS_8: break;
-          case AOM_BITS_10: this_error >>= 4; break;
-          case AOM_BITS_12: this_error >>= 8; break;
+          case AOM_BITS_10: this_intra_error >>= 4; break;
+          case AOM_BITS_12: this_intra_error >>= 8; break;
           default:
             assert(0 &&
                    "seq_params->bit_depth should be AOM_BITS_8, "
@@ -495,7 +507,7 @@ void av1_first_pass(AV1_COMP *cpi, const int64_t ts_duration) {
       }
 
       aom_clear_system_state();
-      log_intra = log(this_error + 1.0);
+      log_intra = log(this_intra_error + 1.0);
       if (log_intra < 10.0)
         intra_factor += 1.0 + ((10.0 - log_intra) * 0.05);
       else
@@ -517,10 +529,10 @@ void av1_first_pass(AV1_COMP *cpi, const int64_t ts_duration) {
       // When the error score is very low this causes us to pick all or lots of
       // INTRA modes and throw lots of key frames.
       // This penalty adds a cost matching that of a 0,0 mv to the intra case.
-      this_error += intrapenalty;
+      this_intra_error += intrapenalty;
 
       // Accumulate the intra error.
-      intra_error += (int64_t)this_error;
+      intra_error += (int64_t)this_intra_error;
 
       const int hbd = is_cur_buf_hbd(xd);
       const int stride = x->plane[0].src.stride;
@@ -544,7 +556,7 @@ void av1_first_pass(AV1_COMP *cpi, const int64_t ts_duration) {
         MV mv = kZeroMv, tmp_mv = kZeroMv;
         struct buf_2d unscaled_last_source_buf_2d;
 
-        xd->plane[0].pre[0].buf = first_ref_buf->y_buffer + recon_yoffset;
+        xd->plane[0].pre[0].buf = lst_yv12->y_buffer + recon_yoffset;
         if (is_cur_buf_hbd(xd)) {
           motion_error = highbd_get_prediction_error(
               bsize, &x->plane[0].src, &xd->plane[0].pre[0], xd->bd);
@@ -586,11 +598,10 @@ void av1_first_pass(AV1_COMP *cpi, const int64_t ts_duration) {
             }
           }
 
-          // Search in an older reference frame.
+          // Motion search in 2nd reference frame.
+          int gf_motion_error;
           if ((current_frame->frame_number > 1) && gld_yv12 != NULL) {
             // Assume 0,0 motion with no mv overhead.
-            int gf_motion_error;
-
             xd->plane[0].pre[0].buf = gld_yv12->y_buffer + recon_yoffset;
             if (is_cur_buf_hbd(xd)) {
               gf_motion_error = highbd_get_prediction_error(
@@ -603,53 +614,91 @@ void av1_first_pass(AV1_COMP *cpi, const int64_t ts_duration) {
             first_pass_motion_search(cpi, x, &kZeroMv, &tmp_mv,
                                      &gf_motion_error);
 
-            if (gf_motion_error < motion_error && gf_motion_error < this_error)
+            if (gf_motion_error < motion_error &&
+                gf_motion_error < this_intra_error)
               ++second_ref_count;
 
             // Reset to last frame as reference buffer.
-            xd->plane[0].pre[0].buf = first_ref_buf->y_buffer + recon_yoffset;
-            xd->plane[1].pre[0].buf = first_ref_buf->u_buffer + recon_uvoffset;
-            xd->plane[2].pre[0].buf = first_ref_buf->v_buffer + recon_uvoffset;
+            xd->plane[0].pre[0].buf = lst_yv12->y_buffer + recon_yoffset;
+            xd->plane[1].pre[0].buf = lst_yv12->u_buffer + recon_uvoffset;
+            xd->plane[2].pre[0].buf = lst_yv12->v_buffer + recon_uvoffset;
 
-            // In accumulating a score for the older reference frame take the
+            // In accumulating a score for the 2nd reference frame take the
             // best of the motion predicted score and the intra coded error
             // (just as will be done for) accumulation of "coded_error" for
             // the last frame.
-            if (gf_motion_error < this_error)
+            if (gf_motion_error < this_intra_error)
               sr_coded_error += gf_motion_error;
             else
-              sr_coded_error += this_error;
+              sr_coded_error += this_intra_error;
           } else {
+            gf_motion_error = motion_error;
             sr_coded_error += motion_error;
+          }
+
+          // Motion search in 3rd reference frame.
+          if (alt_yv12 != NULL) {
+            xd->plane[0].pre[0].buf = alt_yv12->y_buffer + alt_yv12_yoffset;
+            xd->plane[0].pre[0].stride = alt_yv12->y_stride;
+            int alt_motion_error;
+            if (is_cur_buf_hbd(xd)) {
+              alt_motion_error = highbd_get_prediction_error(
+                  bsize, &x->plane[0].src, &xd->plane[0].pre[0], xd->bd);
+            } else {
+              alt_motion_error = get_prediction_error(bsize, &x->plane[0].src,
+                                                      &xd->plane[0].pre[0]);
+            }
+
+            first_pass_motion_search(cpi, x, &kZeroMv, &tmp_mv,
+                                     &alt_motion_error);
+
+            if (alt_motion_error < motion_error &&
+                alt_motion_error < gf_motion_error &&
+                alt_motion_error < this_intra_error)
+              ++third_ref_count;
+
+            // Reset to last frame as reference buffer.
+            xd->plane[0].pre[0].buf = lst_yv12->y_buffer + recon_yoffset;
+            xd->plane[0].pre[0].stride = lst_yv12->y_stride;
+
+            // In accumulating a score for the 3rd reference frame take the
+            // best of the motion predicted score and the intra coded error
+            // (just as will be done for) accumulation of "coded_error" for
+            // the last frame.
+            tr_coded_error += AOMMIN(alt_motion_error, this_intra_error);
+          } else {
+            tr_coded_error += motion_error;
           }
         } else {
           sr_coded_error += motion_error;
+          tr_coded_error += motion_error;
         }
 
         // Start by assuming that intra mode is best.
         best_ref_mv.row = 0;
         best_ref_mv.col = 0;
 
-        if (motion_error <= this_error) {
+        if (motion_error <= this_intra_error) {
           aom_clear_system_state();
 
           // Keep a count of cases where the inter and intra were very close
           // and very low. This helps with scene cut detection for example in
           // cropped clips with black bars at the sides or top and bottom.
-          if (((this_error - intrapenalty) * 9 <= motion_error * 10) &&
-              (this_error < (2 * intrapenalty))) {
+          if (((this_intra_error - intrapenalty) * 9 <= motion_error * 10) &&
+              (this_intra_error < (2 * intrapenalty))) {
             neutral_count += 1.0;
             // Also track cases where the intra is not much worse than the inter
             // and use this in limiting the GF/arf group length.
-          } else if ((this_error > NCOUNT_INTRA_THRESH) &&
-                     (this_error < (NCOUNT_INTRA_FACTOR * motion_error))) {
-            neutral_count +=
-                (double)motion_error / DOUBLE_DIVIDE_CHECK((double)this_error);
+          } else if ((this_intra_error > NCOUNT_INTRA_THRESH) &&
+                     (this_intra_error <
+                      (NCOUNT_INTRA_FACTOR * motion_error))) {
+            neutral_count += (double)motion_error /
+                             DOUBLE_DIVIDE_CHECK((double)this_intra_error);
           }
 
           mv.row *= 8;
           mv.col *= 8;
-          this_error = motion_error;
+          this_intra_error = motion_error;
           xd->mi[0]->mode = NEWMV;
           xd->mi[0]->mv[0].as_mv = mv;
           xd->mi[0]->tx_size = TX_4X4;
@@ -705,9 +754,10 @@ void av1_first_pass(AV1_COMP *cpi, const int64_t ts_duration) {
         }
         raw_motion_err_list[raw_motion_err_counts++] = raw_motion_error;
       } else {
-        sr_coded_error += (int64_t)this_error;
+        sr_coded_error += (int64_t)this_intra_error;
+        tr_coded_error += (int64_t)this_intra_error;
       }
-      coded_error += (int64_t)this_error;
+      coded_error += (int64_t)this_intra_error;
 
       // Adjust to the next column of MBs.
       x->plane[0].src.buf += 16;
@@ -717,6 +767,7 @@ void av1_first_pass(AV1_COMP *cpi, const int64_t ts_duration) {
       recon_yoffset += 16;
       src_yoffset += 16;
       recon_uvoffset += uv_mb_height;
+      alt_yv12_yoffset += 16;
     }
     // Adjust to the next row of MBs.
     x->plane[0].src.buf += 16 * x->plane[0].src.stride - 16 * cm->mb_cols;
@@ -743,6 +794,8 @@ void av1_first_pass(AV1_COMP *cpi, const int64_t ts_duration) {
         AOMMAX(0, intra_skip_count - (image_data_start_row * cm->mb_cols * 2));
   }
 
+  FIRSTPASS_STATS *this_frame_stats =
+      &twopass->frame_stats_arr[twopass->frame_stats_next_idx];
   {
     FIRSTPASS_STATS fps;
     // The minimum error here insures some bit allocation to frames even
@@ -762,11 +815,13 @@ void av1_first_pass(AV1_COMP *cpi, const int64_t ts_duration) {
     fps.frame = current_frame->frame_number;
     fps.coded_error = (double)(coded_error >> 8) + min_err;
     fps.sr_coded_error = (double)(sr_coded_error >> 8) + min_err;
+    fps.tr_coded_error = (double)(tr_coded_error >> 8) + min_err;
     fps.intra_error = (double)(intra_error >> 8) + min_err;
     fps.frame_avg_wavelet_energy = (double)frame_avg_wavelet_energy;
     fps.count = 1.0;
     fps.pcnt_inter = (double)intercount / num_mbs;
     fps.pcnt_second_ref = (double)second_ref_count / num_mbs;
+    fps.pcnt_third_ref = (double)third_ref_count / num_mbs;
     fps.pcnt_neutral = (double)neutral_count / num_mbs;
     fps.intra_skip_pct = (double)intra_skip_count / num_mbs;
     fps.inactive_zone_rows = (double)image_data_start_row;
@@ -802,19 +857,23 @@ void av1_first_pass(AV1_COMP *cpi, const int64_t ts_duration) {
     // cpi->source_time_stamp.
     fps.duration = (double)ts_duration;
 
-    // Don't want to do output stats with a stack variable!
-    twopass->this_frame_stats = fps;
-    output_stats(&twopass->this_frame_stats, cpi->output_pkt_list);
+    // We will store the stats inside the persistent twopass struct (and NOT the
+    // local variable 'fps'), and then cpi->output_pkt_list will point to it.
+    *this_frame_stats = fps;
+    output_stats(this_frame_stats, cpi->output_pkt_list);
     accumulate_stats(&twopass->total_stats, &fps);
+    // Update circular index.
+    twopass->frame_stats_next_idx =
+        (twopass->frame_stats_next_idx + 1) % MAX_LAG_BUFFERS;
   }
 
-  // Copy the previous Last Frame back into gf and and arf buffers if
-  // the prediction is good enough... but also don't allow it to lag too far.
+  // Copy the previous Last Frame back into gf buffer if the prediction is good
+  // enough... but also don't allow it to lag too far.
   if ((twopass->sr_update_lag > 3) ||
       ((current_frame->frame_number > 0) &&
-       (twopass->this_frame_stats.pcnt_inter > 0.20) &&
-       ((twopass->this_frame_stats.intra_error /
-         DOUBLE_DIVIDE_CHECK(twopass->this_frame_stats.coded_error)) > 2.0))) {
+       (this_frame_stats->pcnt_inter > 0.20) &&
+       ((this_frame_stats->intra_error /
+         DOUBLE_DIVIDE_CHECK(this_frame_stats->coded_error)) > 2.0))) {
     if (gld_yv12 != NULL) {
       assign_frame_buffer_p(
           &cm->ref_frame_map[get_ref_frame_map_idx(cm, GOLDEN_FRAME)],

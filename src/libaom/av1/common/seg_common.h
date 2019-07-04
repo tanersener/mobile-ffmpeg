@@ -83,7 +83,7 @@ void av1_clearall_segfeatures(struct segmentation *seg);
 void av1_enable_segfeature(struct segmentation *seg, int segment_id,
                            SEG_LVL_FEATURES feature_id);
 
-void calculate_segdata(struct segmentation *seg);
+void av1_calculate_segdata(struct segmentation *seg);
 
 int av1_seg_feature_data_max(SEG_LVL_FEATURES feature_id);
 

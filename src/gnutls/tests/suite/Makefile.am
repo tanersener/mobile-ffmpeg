@@ -26,13 +26,12 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/extra/includes	\
 	-I$(top_builddir)/extra/includes	\
 	-I$(top_srcdir)/lib			\
+	-I$(top_srcdir)/tests			\
 	-I$(top_srcdir)/doc/examples	\
 	-I$(top_srcdir)/tests/suite/ecore/src/include \
 	-I$(top_srcdir)/tests/suite/ecore/src/lib
 
-EXTRA_DIST = crl/long.crl crl/long.pem data/test1.cat data/test2.cat \
-	data/test1.cat.data data/test2.cat.data \
-	data/test1.cat.out data/test2.cat.out data/ca.pem
+EXTRA_DIST = cbc-record-check.sh
 
 check_PROGRAMS = rng prime-check
 AM_LDFLAGS = -no-install
@@ -86,15 +85,15 @@ nodist_libecore_la_SOURCES = ecore/src/lib/ecore_anim.c			\
 	ecore/src/lib/eina_ustringshare.c ecore/src/lib/eina_value.c
 
 
-EXTRA_DIST += testcompat-main-polarssl testcompat-main-openssl testcompat-common \
-	testpkcs11.pkcs15 testpkcs11.softhsm testpkcs11.sc-hsm
-nodist_check_SCRIPTS = testsrn.sh chain.sh invalid-cert.sh \
-	testrng.sh testcompat-polarssl.sh testcompat-openssl.sh \
-	testrandom.sh pkcs7-cat
+EXTRA_DIST += testcompat-main-polarssl testcompat-main-openssl \
+	      testcompat-common params.dh tls-fuzzer/tls-fuzzer-common.sh
 
-if ENABLE_PKCS11
-nodist_check_SCRIPTS += testpkcs11.sh crl-test
-endif
+scripts_to_test = chain.sh \
+	testrng.sh testcompat-polarssl.sh testcompat-openssl.sh \
+	testrandom.sh tls-fuzzer/tls-fuzzer-nocert.sh \
+	tls-fuzzer/tls-fuzzer-cert.sh tls-fuzzer/tls-fuzzer-alpn.sh \
+	tls-fuzzer/tls-fuzzer-nocert-tls13.sh tls-fuzzer/tls-fuzzer-psk.sh \
+	multi-ticket-reception.sh
 
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
 	LC_ALL="C"			\
@@ -109,11 +108,16 @@ TESTS_ENVIRONMENT += ENABLE_NON_SUITEB_CURVES=1
 endif
 
 if ENABLE_SSL3
+scripts_to_test += tls-fuzzer/tls-fuzzer-nocert-ssl3.sh
 TESTS_ENVIRONMENT += ENABLE_SSL3=1
 endif
 
+if ENABLE_TLS13_INTEROP
+scripts_to_test += testcompat-tls13-openssl.sh
+endif
+
 if ENABLE_DANE
-nodist_check_SCRIPTS += testdane.sh
+scripts_to_test += testdane.sh
 endif
 
 if !MACOSX
@@ -121,16 +125,18 @@ if !WINDOWS
 noinst_LTLIBRARIES = libecore.la
 
 mini_record_timing_LDADD = -lrt $(LDADD)
-eagain_cli_LDADD = libecore.la -lrt -lm -ldl -lpthread $(LDADD)
+eagain_cli_LDADD = libecore.la -lrt -lm $(LIBDL) -lpthread $(LDADD)
 nodist_eagain_cli_SOURCES = mini-eagain2.c
 
 noinst_PROGRAMS = eagain-cli mini-record-timing
 
-nodist_check_SCRIPTS += eagain.sh
+scripts_to_test += eagain.sh
 endif
 endif
 
-TESTS = $(nodist_check_SCRIPTS) prime-check
+nodist_check_SCRIPTS = $(scripts_to_test)
+
+TESTS = $(scripts_to_test) prime-check
 
 prime_check_CPPFLAGS = $(AM_CPPFLAGS) $(NETTLE_CFLAGS)
 

@@ -29,7 +29,7 @@
 
 ;; TLS session settings.
 (define priorities
-  "NONE:+VERS-TLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH")
+  "NONE:+VERS-TLS1.2:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH")
 
 ;; Message sent by the client.
 (define %message (apply u8vector (iota 256)))

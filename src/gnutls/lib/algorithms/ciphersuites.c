@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2011-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -16,7 +17,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -29,6 +30,7 @@
 #include <auth/cert.h>
 #include <auth/anon.h>
 #include <auth/psk.h>
+#include <ext/safe_renegotiation.h>
 
 #ifndef ENABLE_SSL3
 # define GNUTLS_SSL3 GNUTLS_TLS1
@@ -36,9 +38,18 @@
 
 /* Cipher SUITES */
 #define ENTRY( name, block_algorithm, kx_algorithm, mac_algorithm, min_version, dtls_version ) \
-	{ #name, name, block_algorithm, kx_algorithm, mac_algorithm, min_version, dtls_version, GNUTLS_MAC_SHA256}
+	{ #name, name, block_algorithm, kx_algorithm, mac_algorithm, min_version, GNUTLS_TLS1_2, dtls_version, GNUTLS_DTLS1_2, GNUTLS_MAC_SHA256}
 #define ENTRY_PRF( name, block_algorithm, kx_algorithm, mac_algorithm, min_version, dtls_version, prf ) \
-	{ #name, name, block_algorithm, kx_algorithm, mac_algorithm, min_version, dtls_version, prf}
+	{ #name, name, block_algorithm, kx_algorithm, mac_algorithm, min_version, GNUTLS_TLS1_2, dtls_version, GNUTLS_DTLS1_2, prf}
+#define ENTRY_TLS13( name, block_algorithm, min_version, prf ) \
+	{ #name, name, block_algorithm, 0, GNUTLS_MAC_AEAD, min_version, GNUTLS_TLS1_3, GNUTLS_VERSION_UNKNOWN, GNUTLS_VERSION_UNKNOWN, prf}
+
+/* TLS 1.3 ciphersuites */
+#define GNUTLS_AES_128_GCM_SHA256 { 0x13, 0x01 }
+#define GNUTLS_AES_256_GCM_SHA384 { 0x13, 0x02 }
+#define GNUTLS_CHACHA20_POLY1305_SHA256 { 0x13, 0x03 }
+#define GNUTLS_AES_128_CCM_SHA256 { 0x13, 0x04 }
+#define GNUTLS_AES_128_CCM_8_SHA256 { 0x13,0x05 }
 
 /* RSA with NULL cipher and MD5 MAC
  * for test purposes.
@@ -329,6 +340,32 @@
  * available, the ciphers and MACs must be available to gnutls as well.
  */
 static const gnutls_cipher_suite_entry_st cs_algorithms[] = {
+/* TLS 1.3 */
+	ENTRY_TLS13(GNUTLS_AES_128_GCM_SHA256,
+		    GNUTLS_CIPHER_AES_128_GCM,
+		    GNUTLS_TLS1_3,
+		    GNUTLS_MAC_SHA256),
+
+	ENTRY_TLS13(GNUTLS_AES_256_GCM_SHA384,
+		    GNUTLS_CIPHER_AES_256_GCM,
+		    GNUTLS_TLS1_3,
+		    GNUTLS_MAC_SHA384),
+
+	ENTRY_TLS13(GNUTLS_CHACHA20_POLY1305_SHA256,
+		    GNUTLS_CIPHER_CHACHA20_POLY1305,
+		    GNUTLS_TLS1_3,
+		    GNUTLS_MAC_SHA256),
+
+	ENTRY_TLS13(GNUTLS_AES_128_CCM_SHA256,
+		    GNUTLS_CIPHER_AES_128_CCM,
+		    GNUTLS_TLS1_3,
+		    GNUTLS_MAC_SHA256),
+
+	ENTRY_TLS13(GNUTLS_AES_128_CCM_8_SHA256,
+		    GNUTLS_CIPHER_AES_128_CCM_8,
+		    GNUTLS_TLS1_3,
+		    GNUTLS_MAC_SHA256),
+
 	/* RSA-NULL */
 	ENTRY(GNUTLS_RSA_NULL_MD5,
 	      GNUTLS_CIPHER_NULL,
@@ -389,6 +426,8 @@ static const gnutls_cipher_suite_entry_st cs_algorithms[] = {
 	      GNUTLS_CIPHER_AES_256_CBC, GNUTLS_KX_RSA,
 	      GNUTLS_MAC_SHA256, GNUTLS_TLS1_2,
 	      GNUTLS_DTLS1_2),
+
+
 /* GCM */
 	ENTRY(GNUTLS_RSA_AES_128_GCM_SHA256,
 	      GNUTLS_CIPHER_AES_128_GCM, GNUTLS_KX_RSA,
@@ -1153,39 +1192,13 @@ const gnutls_cipher_suite_entry_st *ciphersuite_to_entry(const uint8_t suite[2])
 	return NULL;
 }
 
-const cipher_entry_st *_gnutls_cipher_suite_get_cipher_algo(const uint8_t
-							    suite[2])
-{
-	int ret = 0;
-	CIPHER_SUITE_ALG_LOOP(ret = p->block_algorithm, suite);
-	return cipher_to_entry(ret);
-}
-
 gnutls_kx_algorithm_t
 _gnutls_cipher_suite_get_kx_algo(const uint8_t suite[2])
 {
-	int ret = 0;
+	gnutls_kx_algorithm_t ret = GNUTLS_KX_UNKNOWN;
 
 	CIPHER_SUITE_ALG_LOOP(ret = p->kx_algorithm, suite);
 	return ret;
-
-}
-
-gnutls_mac_algorithm_t _gnutls_cipher_suite_get_prf(const uint8_t suite[2])
-{
-	int ret = 0;
-
-	CIPHER_SUITE_ALG_LOOP(ret = p->prf, suite);
-	return ret;
-
-}
-
-const mac_entry_st *_gnutls_cipher_suite_get_mac_algo(const uint8_t
-						      suite[2])
-{				/* In bytes */
-	int ret = 0;
-	CIPHER_SUITE_ALG_LOOP(ret = p->mac_algorithm, suite);
-	return mac_to_entry(ret);
 
 }
 
@@ -1200,7 +1213,7 @@ const char *_gnutls_cipher_suite_get_name(const uint8_t suite[2])
 }
 
 
-static const gnutls_cipher_suite_entry_st
+const gnutls_cipher_suite_entry_st
     *cipher_suite_get(gnutls_kx_algorithm_t kx_algorithm,
 		      gnutls_cipher_algorithm_t cipher_algorithm,
 		      gnutls_mac_algorithm_t mac_algorithm)
@@ -1211,7 +1224,7 @@ static const gnutls_cipher_suite_entry_st
 		if (kx_algorithm == p->kx_algorithm &&
 			      cipher_algorithm == p->block_algorithm
 			      && mac_algorithm == p->mac_algorithm) {
-			ret = p; 
+			ret = p;
 			break;
 		}
 	);
@@ -1219,48 +1232,37 @@ static const gnutls_cipher_suite_entry_st
 	return ret;
 }
 
-/* Returns 1 if the given KX has not the corresponding parameters
- * (DH or RSA) set up. Otherwise returns 0.
+/* Returns 0 if the given KX has not the corresponding parameters
+ * (DH or RSA) set up. Otherwise returns 1.
  */
-inline static int
-check_server_params(gnutls_session_t session,
-		    gnutls_kx_algorithm_t kx,
-		    gnutls_kx_algorithm_t * alg, int alg_size)
+static unsigned
+check_server_dh_params(gnutls_session_t session,
+		    unsigned cred_type,
+		    gnutls_kx_algorithm_t kx)
 {
-	int cred_type;
-	gnutls_dh_params_t dh_params = NULL;
-	int j;
+	unsigned have_dh_params = 0;
 
-	cred_type = _gnutls_map_kx_get_cred(kx, 1);
+	if (!_gnutls_kx_needs_dh_params(kx)) {
+		return 1;
+	}
+
+	if (session->internals.hsk_flags & HSK_HAVE_FFDHE) {
+		/* if the client has advertized FFDHE then it doesn't matter
+		 * whether we have server DH parameters. They are no good. */
+		gnutls_assert();
+		return 0;
+	}
 
 	/* Read the Diffie-Hellman parameters, if any.
 	 */
 	if (cred_type == GNUTLS_CRD_CERTIFICATE) {
-		int delete;
 		gnutls_certificate_credentials_t x509_cred =
 		    (gnutls_certificate_credentials_t)
 		    _gnutls_get_cred(session, cred_type);
 
-		if (x509_cred != NULL) {
-			dh_params =
-			    _gnutls_get_dh_params(x509_cred->dh_params,
-						  x509_cred->params_func,
-						  session);
+		if (x509_cred != NULL && (x509_cred->dh_params || x509_cred->params_func || x509_cred->dh_sec_param)) {
+			have_dh_params = 1;
 		}
-
-		/* Check also if the certificate supports the
-		 * KX method.
-		 */
-		delete = 1;
-		for (j = 0; j < alg_size; j++) {
-			if (alg[j] == kx) {
-				delete = 0;
-				break;
-			}
-		}
-
-		if (delete == 1)
-			return 1;
 
 #ifdef ENABLE_ANON
 	} else if (cred_type == GNUTLS_CRD_ANON) {
@@ -1268,11 +1270,8 @@ check_server_params(gnutls_session_t session,
 		    (gnutls_anon_server_credentials_t)
 		    _gnutls_get_cred(session, cred_type);
 
-		if (anon_cred != NULL) {
-			dh_params =
-			    _gnutls_get_dh_params(anon_cred->dh_params,
-						  anon_cred->params_func,
-						  session);
+		if (anon_cred != NULL && (anon_cred->dh_params || anon_cred->params_func || anon_cred->dh_sec_param)) {
+			have_dh_params = 1;
 		}
 #endif
 #ifdef ENABLE_PSK
@@ -1281,158 +1280,16 @@ check_server_params(gnutls_session_t session,
 		    (gnutls_psk_server_credentials_t)
 		    _gnutls_get_cred(session, cred_type);
 
-		if (psk_cred != NULL) {
-			dh_params =
-			    _gnutls_get_dh_params(psk_cred->dh_params,
-						  psk_cred->params_func,
-						  session);
+		if (psk_cred != NULL && (psk_cred->dh_params || psk_cred->params_func || psk_cred->dh_sec_param)) {
+			have_dh_params = 1;
 		}
 #endif
-	} else
-		return 0;	/* no need for params */
-
-	/* If the key exchange method needs DH params,
-	 * but they are not set then remove it.
-	 */
-	if (_gnutls_kx_needs_dh_params(kx) != 0) {
-		/* needs DH params. */
-		if (_gnutls_dh_params_to_mpi(dh_params) == NULL) {
-			gnutls_assert();
-			return 1;
-		}
+	} else {
+		return 1;	/* no need for params */
 	}
 
-	return 0;
+	return have_dh_params;
 }
-
-/* This function will remove algorithms that are not supported by
- * the requested authentication method. We remove an algorithm if
- * we have a certificate with keyUsage bits set.
- *
- * This does a more elaborate check than gnutls_supported_ciphersuites(),
- * by checking certificates etc.
- */
-int
-_gnutls_remove_unwanted_ciphersuites(gnutls_session_t session,
-			     uint8_t * cipher_suites,
-			     int cipher_suites_size,
-			     gnutls_pk_algorithm_t * pk_algos,
-			     size_t pk_algos_size)
-{
-
-	int ret = 0;
-	gnutls_certificate_credentials_t cert_cred;
-	gnutls_kx_algorithm_t kx;
-	int server =
-	    session->security_parameters.entity == GNUTLS_SERVER ? 1 : 0;
-	gnutls_kx_algorithm_t alg[MAX_ALGOS];
-	int alg_size = MAX_ALGOS;
-	uint8_t new_list[cipher_suites_size]; /* it's safe to use that size because it's provided by _gnutls_supported_ciphersuites() */
-	int i, new_list_size = 0;
-	const gnutls_cipher_suite_entry_st *entry;
-	const uint8_t *cp;
-
-	/* if we should use a specific certificate, 
-	 * we should remove all algorithms that are not supported
-	 * by that certificate and are on the same authentication
-	 * method (CERTIFICATE).
-	 */
-	cert_cred =
-	    (gnutls_certificate_credentials_t) _gnutls_get_cred(session,
-								GNUTLS_CRD_CERTIFICATE);
-
-	/* If there are certificate credentials, find an appropriate certificate
-	 * or disable them;
-	 */
-	if (session->security_parameters.entity == GNUTLS_SERVER
-	    && cert_cred != NULL && pk_algos_size > 0) {
-		ret =
-		    _gnutls_server_select_cert(session, pk_algos,
-					       pk_algos_size);
-		if (ret < 0) {
-			gnutls_assert();
-			_gnutls_debug_log
-			    ("Could not find an appropriate certificate: %s\n",
-			     gnutls_strerror(ret));
-		}
-	}
-
-	/* get all the key exchange algorithms that are 
-	 * supported by the X509 certificate parameters.
-	 */
-	if ((ret =
-	     _gnutls_selected_cert_supported_kx(session, alg,
-						&alg_size)) < 0) {
-		gnutls_assert();
-		return ret;
-	}
-
-	/* now remove ciphersuites based on the KX algorithm
-	 */
-	for (i = 0; i < cipher_suites_size; i += 2) {
-		entry = NULL;
-		cp = &cipher_suites[i];
-
-		CIPHER_SUITE_ALG_LOOP(entry = p, cp);
-
-		if (entry == NULL)
-			continue;
-		
-		/* finds the key exchange algorithm in
-		 * the ciphersuite
-		 */
-		kx = entry->kx_algorithm;
-
-		/* if it is defined but had no credentials 
-		 */
-		if (!session->internals.premaster_set &&
-		    _gnutls_get_kx_cred(session, kx) == NULL) {
-			continue;
-		} else {
-			if (server && check_server_params(session, kx, alg,
-							  alg_size) != 0)
-				continue;
-		}
-
-		/* If we have not agreed to a common curve with the peer don't bother
-		 * negotiating ECDH.
-		 */
-		if (server != 0 && _gnutls_kx_is_ecc(kx)) {
-			if (_gnutls_session_ecc_curve_get(session) ==
-			    GNUTLS_ECC_CURVE_INVALID) {
-				continue;
-			}
-		}
-
-		/* These two SRP kx's are marked to require a CRD_CERTIFICATE,
-		   (see cred_mappings in gnutls_algorithms.c), but it also
-		   requires a SRP credential.  Don't use SRP kx unless we have a
-		   SRP credential too.  */
-		if (kx == GNUTLS_KX_SRP_RSA || kx == GNUTLS_KX_SRP_DSS) {
-			if (!_gnutls_get_cred
-			    (session, GNUTLS_CRD_SRP)) {
-				continue;
-			}
-		}
-
-		_gnutls_handshake_log
-			    ("HSK[%p]: Keeping ciphersuite: %s (%.2X.%.2X)\n",
-			     session, entry->name,
-			     cipher_suites[i], cipher_suites[i + 1]);
-
-		memcpy(&new_list[new_list_size], &cipher_suites[i], 2);
-		new_list_size += 2;
-	}
-
-	if (new_list_size == 0) {
-		return gnutls_assert_val(GNUTLS_E_NO_CIPHER_SUITES);
-	}
-
-	memcpy(cipher_suites, new_list, new_list_size);
-
-	return new_list_size;
-}
-
 
 /**
  * gnutls_cipher_suite_get_name:
@@ -1440,8 +1297,12 @@ _gnutls_remove_unwanted_ciphersuites(gnutls_session_t session,
  * @cipher_algorithm: is a cipher algorithm
  * @mac_algorithm: is a MAC algorithm
  *
- * Note that the full cipher suite name must be prepended by TLS or
- * SSL depending of the protocol in use.
+ * This function returns the ciphersuite name under TLS1.2 or earlier
+ * versions when provided with individual algorithms. The full cipher suite
+ * name must be prepended by TLS or SSL depending of the protocol in use.
+ *
+ * To get a description of the current ciphersuite across versions, it
+ * is recommended to use gnutls_session_get_desc().
  *
  * Returns: a string that contains the name of a TLS cipher suite,
  * specified by the given algorithms, or %NULL.
@@ -1470,7 +1331,8 @@ const char *gnutls_cipher_suite_get_name(gnutls_kx_algorithm_t
  * @mac_algorithm: is a MAC algorithm
  * @suite: The id to be returned
  *
- * It fills @suite with the ID of the ciphersuite of the provided parameters.
+ * This function returns the ciphersuite ID in @suite, under TLS1.2 or earlier
+ * versions when provided with individual algorithms.
  *
  * Returns: 0 on success or a negative error code otherwise.
  -*/
@@ -1535,109 +1397,283 @@ const char *gnutls_cipher_suite_info(size_t idx,
 	return cs_algorithms[idx].name + sizeof("GNU") - 1;
 }
 
-
-static inline int _gnutls_cipher_suite_is_ok(const uint8_t suite[2])
-{
-	size_t ret;
-	const char *name = NULL;
-
-	CIPHER_SUITE_ALG_LOOP(name = p->name, suite);
-	if (name != NULL)
-		ret = 0;
-	else
-		ret = 1;
-	return ret;
-
-}
-
-/*-
- * _gnutls_supported_ciphersuites: 
- * @session: a TLS session
- * @cipher_suites: Where the ciphersuites will be stored (2bytes each)
- * @max_cipher_suite_size: the maximum size of the @cipher_suites buffer.
- *
- * Returns the supported ciphersuites by this session (based on priorities)
- * sorted by order of preference.
- *
- * Returns the size of the @cipher_suites buffer, or a negative value on error.
- *
- -*/
-int
-_gnutls_supported_ciphersuites(gnutls_session_t session,
-			       uint8_t * cipher_suites,
-			       unsigned int max_cipher_suite_size)
-{
-
-	unsigned int i, ret_count, j, z, k = 0;
-	const gnutls_cipher_suite_entry_st *ce;
-	const version_entry_st *version = get_version(session);
-	unsigned int is_dtls = IS_DTLS(session);
-
-	if (version == NULL)
-		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
-
-	for (i = 0; i < session->internals.priorities.kx.algorithms; i++)
-		for (j = 0;
-		     j < session->internals.priorities.cipher.algorithms;
-		     j++)
-			for (z = 0;
-			     z <
-			     session->internals.priorities.mac.algorithms;
-			     z++) {
-				ce = cipher_suite_get(session->internals.
-						      priorities.kx.
-						      priority[i],
-						      session->internals.
-						      priorities.cipher.
-						      priority[j],
-						      session->internals.
-						      priorities.mac.
-						      priority[z]);
-
-				if (ce == NULL)
-					continue;
-
-				if (is_dtls) {
-					if (version->id < ce->min_dtls_version)
-						continue;
-				} else {
-					if (version->id < ce->min_version)
-						continue;
-				}
-
-				if (k + 2 > max_cipher_suite_size)
-					return
-					    gnutls_assert_val
-					    (GNUTLS_E_INTERNAL_ERROR);
-
-				memcpy(&cipher_suites[k], ce->id, 2);
-				k += 2;
+#define VERSION_CHECK(entry) \
+			if (is_dtls) { \
+				if (entry->min_dtls_version == GNUTLS_VERSION_UNKNOWN || \
+				    version->id < entry->min_dtls_version || \
+				    version->id > entry->max_dtls_version) \
+					continue; \
+			} else { \
+				if (entry->min_version == GNUTLS_VERSION_UNKNOWN || \
+				    version->id < entry->min_version || \
+				    version->id > entry->max_version) \
+					continue; \
 			}
 
-	ret_count = k;
+#define CIPHER_CHECK(algo) \
+			if (session->internals.priorities->force_etm && !have_etm) { \
+				const cipher_entry_st *_cipher; \
+				_cipher = cipher_to_entry(algo); \
+				if (_cipher == NULL || _gnutls_cipher_type(_cipher) == CIPHER_BLOCK) \
+					continue; \
+			}
 
-	/* This function can no longer return 0 cipher suites.
-	 * It returns an error code instead.
-	 */
-	if (ret_count == 0) {
-		gnutls_assert();
-		return GNUTLS_E_NO_CIPHER_SUITES;
+#define KX_SRP_CHECKS(kx, action) \
+	if (kx == GNUTLS_KX_SRP_RSA || kx == GNUTLS_KX_SRP_DSS) { \
+		if (!_gnutls_get_cred(session, GNUTLS_CRD_SRP)) { \
+			action; \
+		} \
 	}
-	return ret_count;
+
+static unsigned kx_is_ok(gnutls_session_t session, gnutls_kx_algorithm_t kx, unsigned cred_type,
+			 const gnutls_group_entry_st **sgroup)
+{
+	if (_gnutls_kx_is_ecc(kx)) {
+		if (session->internals.cand_ec_group == NULL) {
+			return 0;
+		} else {
+			*sgroup = session->internals.cand_ec_group;
+		}
+	} else if (_gnutls_kx_is_dhe(kx)) {
+		if (session->internals.cand_dh_group == NULL) {
+			if (!check_server_dh_params(session, cred_type, kx)) {
+				return 0;
+			}
+		} else {
+			*sgroup = session->internals.cand_dh_group;
+		}
+	}
+	KX_SRP_CHECKS(kx, return 0);
+
+	return 1;
+}
+
+/* Called on server-side only */
+int
+_gnutls_figure_common_ciphersuite(gnutls_session_t session,
+				  const ciphersuite_list_st *peer_clist,
+				  const gnutls_cipher_suite_entry_st **ce)
+{
+
+	unsigned int i, j;
+	int ret;
+	const version_entry_st *version = get_version(session);
+	unsigned int is_dtls = IS_DTLS(session);
+	gnutls_kx_algorithm_t kx;
+	gnutls_credentials_type_t cred_type = GNUTLS_CRD_CERTIFICATE; /* default for TLS1.3 */
+	const gnutls_group_entry_st *sgroup = NULL;
+	gnutls_ext_priv_data_t epriv;
+	unsigned have_etm = 0;
+
+	if (version == NULL) {
+		return gnutls_assert_val(GNUTLS_E_NO_CIPHER_SUITES);
+	}
+
+	/* we figure whether etm is negotiated by checking the raw extension data
+	 * because we only set (security_params) EtM to true only after the ciphersuite is
+	 * negotiated. */
+	ret = _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_ETM, &epriv);
+	if (ret >= 0 && ((intptr_t)epriv) != 0)
+		have_etm = 1;
+
+	/* If we didn't receive the supported_groups extension, then
+	 * we should assume that SECP256R1 is supported; that is required
+	 * by RFC4492, probably to allow SSLv2 hellos negotiate elliptic curve
+	 * ciphersuites */
+	if (!version->tls13_sem && session->internals.cand_ec_group == NULL &&
+	    !_gnutls_hello_ext_is_present(session, GNUTLS_EXTENSION_SUPPORTED_GROUPS)) {
+		session->internals.cand_ec_group = _gnutls_id_to_group(DEFAULT_EC_GROUP);
+	}
+
+	if (session->internals.priorities->server_precedence == 0) {
+		for (i = 0; i < peer_clist->size; i++) {
+			_gnutls_debug_log("checking %.2x.%.2x (%s) for compatibility\n",
+				(unsigned)peer_clist->entry[i]->id[0],
+				(unsigned)peer_clist->entry[i]->id[1],
+				peer_clist->entry[i]->name);
+			VERSION_CHECK(peer_clist->entry[i]);
+
+			kx = peer_clist->entry[i]->kx_algorithm;
+
+			CIPHER_CHECK(peer_clist->entry[i]->block_algorithm);
+
+			if (!version->tls13_sem)
+				cred_type = _gnutls_map_kx_get_cred(kx, 1);
+
+			for (j = 0; j < session->internals.priorities->cs.size; j++) {
+				if (session->internals.priorities->cs.entry[j] == peer_clist->entry[i]) {
+					sgroup = NULL;
+					if (!kx_is_ok(session, kx, cred_type, &sgroup))
+						continue;
+
+					/* if we have selected PSK, we need a ciphersuites which matches
+					 * the selected binder */
+					if (session->internals.hsk_flags & HSK_PSK_SELECTED) {
+						if (session->key.binders[0].prf->id != session->internals.priorities->cs.entry[j]->prf)
+							continue;
+					} else if (cred_type == GNUTLS_CRD_CERTIFICATE) {
+						ret = _gnutls_select_server_cert(session, peer_clist->entry[i]);
+						if (ret < 0) {
+							/* couldn't select cert with this ciphersuite */
+							gnutls_assert();
+							break;
+						}
+					}
+
+					/* select the group based on the selected ciphersuite */
+					if (sgroup)
+						_gnutls_session_group_set(session, sgroup);
+					*ce = peer_clist->entry[i];
+					return 0;
+				}
+			}
+		}
+	} else {
+		for (j = 0; j < session->internals.priorities->cs.size; j++) {
+			VERSION_CHECK(session->internals.priorities->cs.entry[j]);
+
+			CIPHER_CHECK(session->internals.priorities->cs.entry[j]->block_algorithm);
+
+			for (i = 0; i < peer_clist->size; i++) {
+				_gnutls_debug_log("checking %.2x.%.2x (%s) for compatibility\n",
+					(unsigned)peer_clist->entry[i]->id[0],
+					(unsigned)peer_clist->entry[i]->id[1],
+					peer_clist->entry[i]->name);
+
+				if (session->internals.priorities->cs.entry[j] == peer_clist->entry[i]) {
+					sgroup = NULL;
+					kx = peer_clist->entry[i]->kx_algorithm;
+
+					if (!version->tls13_sem)
+						cred_type = _gnutls_map_kx_get_cred(kx, 1);
+
+					if (!kx_is_ok(session, kx, cred_type, &sgroup))
+						break;
+
+					/* if we have selected PSK, we need a ciphersuites which matches
+					 * the selected binder */
+					if (session->internals.hsk_flags & HSK_PSK_SELECTED) {
+						if (session->key.binders[0].prf->id != session->internals.priorities->cs.entry[j]->prf)
+							break;
+					} else if (cred_type == GNUTLS_CRD_CERTIFICATE) {
+						ret = _gnutls_select_server_cert(session, peer_clist->entry[i]);
+						if (ret < 0) {
+							/* couldn't select cert with this ciphersuite */
+							gnutls_assert();
+							break;
+						}
+					}
+
+					/* select the group based on the selected ciphersuite */
+					if (sgroup)
+						_gnutls_session_group_set(session, sgroup);
+					*ce = peer_clist->entry[i];
+					return 0;
+				}
+			}
+		}
+
+	}
+
+	/* nothing in common */
+
+	return gnutls_assert_val(GNUTLS_E_NO_CIPHER_SUITES);
+}
+
+#define CLIENT_VERSION_CHECK(minver, maxver, e) \
+			if (is_dtls) { \
+				if (e->min_dtls_version > maxver->id) \
+					continue; \
+			} else { \
+				if (e->min_version > maxver->id) \
+					continue; \
+			}
+
+#define RESERVED_CIPHERSUITES 4
+int
+_gnutls_get_client_ciphersuites(gnutls_session_t session,
+			 gnutls_buffer_st * cdata,
+			 const version_entry_st *vmin,
+			 unsigned add_scsv)
+{
+
+	unsigned int j;
+	int ret;
+	unsigned int is_dtls = IS_DTLS(session);
+	gnutls_kx_algorithm_t kx;
+	gnutls_credentials_type_t cred_type;
+	uint8_t cipher_suites[MAX_CIPHERSUITE_SIZE*2 + RESERVED_CIPHERSUITES];
+	unsigned cipher_suites_size = 0;
+	size_t init_length = cdata->length;
+	const version_entry_st *vmax;
+
+	vmax = _gnutls_version_max(session);
+	if (vmax == NULL)
+		return gnutls_assert_val(GNUTLS_E_NO_PRIORITIES_WERE_SET);
+
+	for (j = 0; j < session->internals.priorities->cs.size; j++) {
+		CLIENT_VERSION_CHECK(vmin, vmax, session->internals.priorities->cs.entry[j]);
+
+		kx = session->internals.priorities->cs.entry[j]->kx_algorithm;
+		if (kx != GNUTLS_KX_UNKNOWN) { /* In TLS 1.3 ciphersuites don't map to credentials */
+			cred_type = _gnutls_map_kx_get_cred(kx, 0);
+
+			if (!session->internals.premaster_set && _gnutls_get_cred(session, cred_type) == NULL)
+				continue;
+
+			KX_SRP_CHECKS(kx, continue);
+		}
+
+		_gnutls_debug_log("Keeping ciphersuite %.2x.%.2x (%s)\n",
+				(unsigned)session->internals.priorities->cs.entry[j]->id[0],
+				(unsigned)session->internals.priorities->cs.entry[j]->id[1],
+				session->internals.priorities->cs.entry[j]->name);
+		cipher_suites[cipher_suites_size] = session->internals.priorities->cs.entry[j]->id[0];
+		cipher_suites[cipher_suites_size + 1] = session->internals.priorities->cs.entry[j]->id[1];
+		cipher_suites_size += 2;
+
+		if (cipher_suites_size >= MAX_CIPHERSUITE_SIZE*2)
+			break;
+	}
+#ifdef ENABLE_SSL3
+	if (add_scsv) {
+		cipher_suites[cipher_suites_size] = 0x00;
+		cipher_suites[cipher_suites_size + 1] = 0xff;
+		cipher_suites_size += 2;
+
+		ret = _gnutls_ext_sr_send_cs(session);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		_gnutls_hello_ext_save_sr(session);
+	}
+#endif
+
+	if (session->internals.priorities->fallback) {
+		cipher_suites[cipher_suites_size] = GNUTLS_FALLBACK_SCSV_MAJOR;
+		cipher_suites[cipher_suites_size + 1] = GNUTLS_FALLBACK_SCSV_MINOR;
+		cipher_suites_size += 2;
+	}
+
+	ret = _gnutls_buffer_append_data_prefix(cdata, 16, cipher_suites, cipher_suites_size);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	return cdata->length - init_length;
 }
 
 /**
- * gnutls_priority_get_cipher_suite:
+ * gnutls_priority_get_cipher_suite_index:
  * @pcache: is a #gnutls_prioritity_t type.
  * @idx: is an index number.
  * @sidx: internal index of cipher suite to get information about.
  *
  * Provides the internal ciphersuite index to be used with
- * gnutls_cipher_suite_info(). The index @idx provided is an 
+ * gnutls_cipher_suite_info(). The index @idx provided is an
  * index kept at the priorities structure. It might be that a valid
- * priorities index does not correspond to a ciphersuite and in 
- * that case %GNUTLS_E_UNKNOWN_CIPHER_SUITE will be returned. 
- * Once the last available index is crossed then 
+ * priorities index does not correspond to a ciphersuite and in
+ * that case %GNUTLS_E_UNKNOWN_CIPHER_SUITE will be returned.
+ * Once the last available index is crossed then
  * %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
  *
  * Returns: On success it returns %GNUTLS_E_SUCCESS (0), or a negative error value otherwise.
@@ -1649,33 +1685,39 @@ gnutls_priority_get_cipher_suite_index(gnutls_priority_t pcache,
 				       unsigned int idx,
 				       unsigned int *sidx)
 {
-	int mac_idx, cipher_idx, kx_idx;
-	unsigned int i;
-	unsigned int total =
-	    pcache->mac.algorithms * pcache->cipher.algorithms *
-	    pcache->kx.algorithms;
+	unsigned int i, j;
+	unsigned max_tls = 0;
+	unsigned max_dtls = 0;
 
-	if (idx >= total)
+	if (idx >= pcache->cs.size)
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 
-	mac_idx = idx % pcache->mac.algorithms;
-
-	idx /= pcache->mac.algorithms;
-	cipher_idx = idx % pcache->cipher.algorithms;
-
-	idx /= pcache->cipher.algorithms;
-	kx_idx = idx % pcache->kx.algorithms;
-
-	for (i = 0; i < CIPHER_SUITES_COUNT; i++) {
-		if (cs_algorithms[i].kx_algorithm ==
-		    pcache->kx.priority[kx_idx]
-		    && cs_algorithms[i].block_algorithm ==
-		    pcache->cipher.priority[cipher_idx]
-		    && cs_algorithms[i].mac_algorithm ==
-		    pcache->mac.priority[mac_idx]) {
-			*sidx = i;
-			return 0;
+	/* find max_tls and max_dtls */
+	for (j=0;j<pcache->protocol.num_priorities;j++) {
+		if (pcache->protocol.priorities[j] <= GNUTLS_TLS_VERSION_MAX &&
+		    pcache->protocol.priorities[j] >= max_tls) {
+			max_tls = pcache->protocol.priorities[j];
+		} else if (pcache->protocol.priorities[j] <= GNUTLS_DTLS_VERSION_MAX &&
+			   pcache->protocol.priorities[j] >= max_dtls) {
+			max_dtls = pcache->protocol.priorities[j];
 		}
 	}
+
+	for (i = 0; i < CIPHER_SUITES_COUNT; i++) {
+		if (pcache->cs.entry[idx] != &cs_algorithms[i])
+			continue;
+
+		*sidx = i;
+		if (_gnutls_cipher_exists(cs_algorithms[i].block_algorithm) &&
+		    _gnutls_mac_exists(cs_algorithms[i].mac_algorithm)) {
+			if (max_tls >= cs_algorithms[i].min_version) {
+				return 0;
+			} else if (max_dtls >= cs_algorithms[i].min_dtls_version) {
+				return 0;
+			}
+		} else
+			break;
+	}
+
 	return GNUTLS_E_UNKNOWN_CIPHER_SUITE;
 }

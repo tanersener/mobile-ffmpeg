@@ -57,8 +57,9 @@ flag = {
 
 flag = {
     name      = initialize-so-pin;
-    descrip   = "Initializes/Resets a PKCS #11 token security officer PIN";
-    doc = "";
+    descrip   = "Initializes/Resets a PKCS #11 token security officer PIN.";
+    doc = "This initializes the security officer's PIN. When used non-interactively use the GNUTLS_NEW_SO_PIN
+environment variables to initialize SO's PIN.";
 };
 
 flag = {
@@ -84,19 +85,23 @@ flag = {
 flag = {
     name      = list-all;
     descrip   = "List all available objects in a token";
-    doc = "";
+    doc = "All objects available in the token will be listed. That includes
+objects which are potentially unaccessible using this tool.";
 };
 
 flag = {
     name      = list-all-certs;
     descrip   = "List all available certificates in a token";
-    doc = "";
+    doc = "That option will also provide more information on the
+certificates, for example, expand the attached extensions in a trust
+token (like p11-kit-trust).";
 };
 
 flag = {
     name      = list-certs;
     descrip   = "List all certificates that have an associated private key";
-    doc = "";
+    doc = "That option will only display certificates which have a private
+key associated with them (share the same ID).";
 };
 
 flag = {
@@ -182,10 +187,19 @@ flag = {
 };
 
 flag = {
+    name      = generate-privkey;
+    arg-type  = string;
+    descrip   = "Generate private-public key pair of given type";
+    doc = "Generates a private-public key pair in the specified token.
+Acceptable types are RSA, ECDSA, Ed25519, and DSA. Should be combined with --sec-param or --bits.";
+};
+
+flag = {
     name      = generate-rsa;
     descrip   = "Generate an RSA private-public key pair";
     doc = "Generates an RSA private-public key pair on the specified token.
 Should be combined with --sec-param or --bits.";
+    deprecated;
 };
 
 flag = {
@@ -193,6 +207,7 @@ flag = {
     descrip   = "Generate a DSA private-public key pair";
     doc = "Generates a DSA private-public key pair on the specified token.
 Should be combined with --sec-param or --bits.";
+    deprecated;
 };
 
 flag = {
@@ -200,6 +215,7 @@ flag = {
     descrip   = "Generate an ECDSA private-public key pair";
     doc = "Generates an ECDSA private-public key pair on the specified token.
 Should be combined with --curve, --sec-param or --bits.";
+    deprecated;
 };
 
 flag = {
@@ -413,6 +429,22 @@ the signed data.";
 };
 
 flag = {
+    name      = sign-params;
+    arg-type  = string;
+    descrip   = "Sign with a specific signature algorithm";
+    doc = "This option can be combined with --test-sign, to sign with
+a specific signature algorithm variant. The only option supported is 'RSA-PSS', and should be
+specified in order to use RSA-PSS signature on RSA keys.";
+};
+
+flag = {
+    name      = hash;
+    arg-type  = string;
+    descrip   = "Hash algorithm to use for signing";
+    doc = "This option can be combined with test-sign. Available hash functions are SHA1, RMD160, SHA256, SHA384, SHA512, SHA3-224, SHA3-256, SHA3-384, SHA3-512.";
+};
+
+flag = {
     name      = generate-random;
     descrip   = "Generate random data";
     arg-type  = number;
@@ -457,6 +489,15 @@ flag = {
     arg-type  = file;
     descrip   = "Specify the PKCS #11 provider library";
     doc      = "This will override the default options in /etc/gnutls/pkcs11.conf";
+};
+
+flag = {
+    name      = provider-opts;
+    arg-type  = string;
+    descrip   = "Specify parameters for the PKCS #11 provider library";
+    doc      = "This is a PKCS#11 internal option used by few modules.
+    Mainly for testing PKCS#11 modules.";
+    deprecated;
 };
 
 flag = {
@@ -514,7 +555,7 @@ and its corresponding private key.
 
 To generate an RSA private key inside the token use:
 @example
-$ p11tool --login --generate-rsa --bits 1024 --label "MyNewKey" \
+$ p11tool --login --generate-privkey rsa --bits 1024 --label "MyNewKey" \
           --outfile MyNewKey.pub "pkcs11:TOKEN-URL"
 @end example
 The bits parameter in the above example is explicitly set because some

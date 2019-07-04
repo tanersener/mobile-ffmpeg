@@ -16,7 +16,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -29,63 +29,81 @@
 #include "locks.h"
 #include <fips.h>
 
-void *gnutls_rnd_ctx;
-GNUTLS_STATIC_MUTEX(gnutls_rnd_init_mutex);
+#include "gthreads.h"
 
-#ifdef HAVE_STDATOMIC_H
-static atomic_uint rnd_initialized = 0;
+#if defined(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION)
+extern gnutls_crypto_rnd_st _gnutls_fuzz_rnd_ops;
+#endif
 
-inline static int _gnutls_rnd_init(void)
+/* Per thread context of random generator, and a flag to indicate initialization */
+static _Thread_local void *gnutls_rnd_ctx;
+static _Thread_local unsigned rnd_initialized = 0;
+
+struct rnd_ctx_list_st {
+	void *ctx;
+	struct rnd_ctx_list_st *next;
+};
+
+/* A global list of all allocated contexts - to be
+ * used during deinitialization. */
+GNUTLS_STATIC_MUTEX(gnutls_rnd_ctx_list_mutex);
+static struct rnd_ctx_list_st *head = NULL;
+
+static int append(void *ctx)
 {
-	if (unlikely(!rnd_initialized)) {
-		if (_gnutls_rnd_ops.init == NULL) {
-			rnd_initialized = 1;
-			return 0;
-		}
+	struct rnd_ctx_list_st *e = gnutls_malloc(sizeof(*e));
 
-		GNUTLS_STATIC_MUTEX_LOCK(gnutls_rnd_init_mutex);
-		if (!rnd_initialized) {
-			if (_gnutls_rnd_ops.init(&gnutls_rnd_ctx) < 0) {
-				gnutls_assert();
-				GNUTLS_STATIC_MUTEX_UNLOCK(gnutls_rnd_init_mutex);
-				return GNUTLS_E_RANDOM_FAILED;
-			}
-			rnd_initialized = 1;
-		}
-		GNUTLS_STATIC_MUTEX_UNLOCK(gnutls_rnd_init_mutex);
-	}
+	if (e == NULL)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+	e->ctx = ctx;
+	e->next = head;
+
+	head = e;
+
 	return 0;
 }
-#else
-static unsigned rnd_initialized = 0;
 
 inline static int _gnutls_rnd_init(void)
 {
-	GNUTLS_STATIC_MUTEX_LOCK(gnutls_rnd_init_mutex);
 	if (unlikely(!rnd_initialized)) {
+		int ret;
+
 		if (_gnutls_rnd_ops.init == NULL) {
 			rnd_initialized = 1;
-			GNUTLS_STATIC_MUTEX_UNLOCK(gnutls_rnd_init_mutex);
 			return 0;
 		}
 
 		if (_gnutls_rnd_ops.init(&gnutls_rnd_ctx) < 0) {
 			gnutls_assert();
-			GNUTLS_STATIC_MUTEX_UNLOCK(gnutls_rnd_init_mutex);
 			return GNUTLS_E_RANDOM_FAILED;
 		}
+
+		GNUTLS_STATIC_MUTEX_LOCK(gnutls_rnd_ctx_list_mutex);
+		ret = append(gnutls_rnd_ctx);
+		GNUTLS_STATIC_MUTEX_UNLOCK(gnutls_rnd_ctx_list_mutex);
+		if (ret < 0) {
+			gnutls_assert();
+			_gnutls_rnd_ops.deinit(gnutls_rnd_ctx);
+			return ret;
+		}
+
 		rnd_initialized = 1;
 	}
-	GNUTLS_STATIC_MUTEX_UNLOCK(gnutls_rnd_init_mutex);
 	return 0;
 }
-#endif
 
 int _gnutls_rnd_preinit(void)
 {
 	int ret;
 
-#ifdef ENABLE_FIPS140
+#if defined(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION)
+# warning Insecure PRNG is enabled
+	ret = gnutls_crypto_rnd_register(100, &_gnutls_fuzz_rnd_ops);
+	if (ret < 0)
+		return ret;
+
+#elif defined(ENABLE_FIPS140)
 	/* The FIPS140 random generator is only enabled when we are compiled
 	 * with FIPS support, _and_ the system requires FIPS140.
 	 */
@@ -107,11 +125,19 @@ int _gnutls_rnd_preinit(void)
 
 void _gnutls_rnd_deinit(void)
 {
-	if (rnd_initialized && _gnutls_rnd_ops.deinit != NULL) {
-		_gnutls_rnd_ops.deinit(gnutls_rnd_ctx);
-	}
-	rnd_initialized = 0;
+	if (_gnutls_rnd_ops.deinit != NULL) {
+		struct rnd_ctx_list_st *e = head, *next;
 
+		while(e != NULL) {
+			next = e->next;
+			_gnutls_rnd_ops.deinit(e->ctx);
+			gnutls_free(e);
+			e = next;
+		}
+		head = NULL;
+	}
+
+	rnd_initialized = 0;
 	_rnd_system_entropy_deinit();
 
 	return;

@@ -1,0 +1,15 @@
+
+
+
+
+@deftypefun {void} {gnutls_x509_crt_set_flags} (gnutls_x509_crt_t @var{cert}, unsigned int @var{flags})
+@var{cert}: A type @code{gnutls_x509_crt_t} 
+
+@var{flags}: flags from the @code{gnutls_x509_crt_flags} 
+
+This function will set flags for the specified certificate.
+Currently this is useful for the @code{GNUTLS_X509_CRT_FLAG_IGNORE_SANITY} 
+which allows importing certificates even if they have known issues.
+
+@strong{Since:} 3.6.0
+@end deftypefun

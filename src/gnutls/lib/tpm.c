@@ -19,7 +19,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -72,7 +72,6 @@ typedef TSS_RESULT (*Tspi_Context_LoadKeyByBlob_func)(TSS_HCONTEXT, TSS_HKEY, UI
 typedef TSS_RESULT (*Tspi_Policy_AssignToObject_func)(TSS_HPOLICY, TSS_HOBJECT);
 typedef TSS_RESULT (*Tspi_GetAttribData_func)(TSS_HOBJECT, TSS_FLAG, TSS_FLAG, UINT32*, BYTE**);
 typedef TSS_RESULT (*Tspi_GetAttribUint32_func)(TSS_HOBJECT, TSS_FLAG, TSS_FLAG, UINT32*);
-typedef TSS_RESULT (*Tspi_Context_GetTpmObject_func)(TSS_HCONTEXT, TSS_HTPM*);
 typedef TSS_RESULT (*Tspi_TPM_StirRandom_func)(TSS_HTPM, UINT32, BYTE*);
 typedef TSS_RESULT (*Tspi_SetAttribUint32_func)(TSS_HOBJECT, TSS_FLAG, TSS_FLAG, UINT32);
 typedef TSS_RESULT (*Tspi_EncodeDER_TssBlob_func)(UINT32, BYTE*, UINT32, UINT32*, BYTE*);
@@ -422,6 +421,7 @@ static int tpm_open_session(struct tpm_ctx_st *s, const char *_srk_password, uns
 		ret = tss_err(err);
 		goto out_srkpol;
 	}
+	gnutls_free(password);
 
 	return 0;
 
@@ -798,7 +798,11 @@ unescape_string(char *output, const char *input, size_t * size,
 		return ret;
 	}
 
-	_gnutls_buffer_pop_data(&str, output, size);
+	ret = _gnutls_buffer_pop_data(&str, output, str.length);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
 
 	_gnutls_buffer_clear(&str);
 
@@ -835,15 +839,10 @@ static int randomize_uuid(TSS_UUID * uuid)
 static int encode_tpmkey_url(char **url, const TSS_UUID * uuid,
 			     TSS_FLAG storage)
 {
-	size_t size = (UUID_SIZE * 2 + 4) * 2 + 32;
 	uint8_t u1[UUID_SIZE];
 	gnutls_buffer_st buf;
 	gnutls_datum_t dret;
 	int ret;
-
-	*url = gnutls_malloc(size);
-	if (*url == NULL)
-		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
 	_gnutls_buffer_init(&buf);
 
@@ -1600,7 +1599,7 @@ gnutls_tpm_privkey_generate(gnutls_pk_algorithm_t pk, unsigned int bits,
 
 	/* read the public key */
 	if (pubkey != NULL) {
-		size_t psize;
+		size_t psize = 0;
 
 		ret = gnutls_pubkey_init(&pub);
 		if (ret < 0) {
@@ -1641,10 +1640,8 @@ gnutls_tpm_privkey_generate(gnutls_pk_algorithm_t pk, unsigned int bits,
 	gnutls_pubkey_deinit(pub);
       privkey_cleanup:
 	gnutls_free(privkey->data);
-	privkey->data = NULL;
       cleanup:
 	gnutls_free(tmpkey.data);
-	tmpkey.data = NULL;
       err_sa:
 	pTspi_Context_CloseObject(s.tpm_ctx, key_ctx);
       err_cc:

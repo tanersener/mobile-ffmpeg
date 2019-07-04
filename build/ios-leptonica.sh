@@ -5,11 +5,6 @@ if [[ -z ${ARCH} ]]; then
     exit 1
 fi
 
-if [[ -z ${IOS_MIN_VERSION} ]]; then
-    echo -e "(*) IOS_MIN_VERSION not defined\n"
-    exit 1
-fi
-
 if [[ -z ${TARGET_SDK} ]]; then
     echo -e "(*) TARGET_SDK not defined\n"
     exit 1
@@ -26,7 +21,11 @@ if [[ -z ${BASEDIR} ]]; then
 fi
 
 # ENABLE COMMON FUNCTIONS
-. ${BASEDIR}/build/ios-common.sh
+if [[ ${APPLE_TVOS_BUILD} -eq 1 ]]; then
+    . ${BASEDIR}/build/tvos-common.sh
+else
+    . ${BASEDIR}/build/ios-common.sh
+fi
 
 # PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
 LIB_NAME="leptonica"
@@ -36,8 +35,8 @@ set_toolchain_clang_paths ${LIB_NAME}
 TARGET_HOST=$(get_target_host)
 export CFLAGS="$(get_cflags ${LIB_NAME})"
 export CXXFLAGS="$(get_cxxflags ${LIB_NAME})"
-export CPPFLAGS="-I${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/giflib/include"
-export LDFLAGS="$(get_ldflags ${LIB_NAME}) -L${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/giflib/lib -lgif"
+export CPPFLAGS="-I${BASEDIR}/prebuilt/$(get_target_build_directory)/giflib/include"
+export LDFLAGS="$(get_ldflags ${LIB_NAME}) -L${BASEDIR}/prebuilt/$(get_target_build_directory)/giflib/lib -lgif"
 export PKG_CONFIG_LIBDIR="${INSTALL_PKG_CONFIG_DIR}"
 
 export LIBPNG_CFLAGS="$(pkg-config --cflags libpng)"
@@ -65,7 +64,7 @@ if [[ ${RECONF_leptonica} -eq 1 ]]; then
 fi
 
 ./configure \
-    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/${LIB_NAME} \
+    --prefix=${BASEDIR}/prebuilt/$(get_target_build_directory)/${LIB_NAME} \
     --with-pic \
     --with-zlib \
     --with-libpng \
@@ -82,6 +81,6 @@ fi
 make -j$(get_cpu_count) || exit 1
 
 # MANUALLY COPY PKG-CONFIG FILES
-cp lept.pc ${INSTALL_PKG_CONFIG_DIR}
+cp lept.pc ${INSTALL_PKG_CONFIG_DIR} || exit 1
 
 make install || exit 1

@@ -6,9 +6,10 @@ android {
     defaultConfig {
         minSdkVersion 24
         targetSdkVersion 28
-        versionCode 240421
-        versionName "4.2.1"
+        versionCode 240422
+        versionName "4.2.2"
         project.archivesBaseName = "mobile-ffmpeg"
+        consumerProguardFiles 'proguard-rules.pro'
     }
 
     buildTypes {

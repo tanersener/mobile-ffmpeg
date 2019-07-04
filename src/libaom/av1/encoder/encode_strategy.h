@@ -29,7 +29,8 @@ extern "C" {
 int av1_encode_strategy(AV1_COMP *const cpi, size_t *const size,
                         uint8_t *const dest, unsigned int *frame_flags,
                         int64_t *const time_stamp, int64_t *const time_end,
-                        const aom_rational_t *const timebase, int flush);
+                        const aom_rational64_t *const timestamp_ratio,
+                        int flush);
 
 // Set individual buffer update flags based on frame reference type.
 // force_refresh_all is used when we have a KEY_FRAME or S_FRAME.  It forces all

@@ -118,7 +118,7 @@ fi
 # FILTERING WHICH EXTERNAL LIBRARIES WILL BE BUILT
 # NOTE THAT BUILT-IN LIBRARIES ARE FORWARDED TO FFMPEG SCRIPT WITHOUT ANY PROCESSING
 enabled_library_list=()
-for library in {1..41}
+for library in {1..42}
 do
     if [[ ${!library} -eq 1 ]]; then
         ENABLED_LIBRARY=$(get_library_name $((library - 1)))
@@ -130,6 +130,11 @@ done
 
 # BUILD CPU-FEATURES FIRST
 build_cpufeatures
+
+# BUILD LTS SUPPORT LIBRARY FOR API < 18
+if [[ ! -z ${MOBILE_FFMPEG_LTS_BUILD} ]] && [[ ${API} < 18 ]]; then
+    build_android_lts_support
+fi
 
 let completed=0
 while [ ${#enabled_library_list[@]} -gt $completed ]; do

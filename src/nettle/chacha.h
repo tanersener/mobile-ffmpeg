@@ -47,7 +47,6 @@ extern "C" {
 #define chacha_set_nonce nettle_chacha_set_nonce
 #define chacha_set_nonce96 nettle_chacha_set_nonce96
 #define chacha_crypt nettle_chacha_crypt
-#define _chacha_core _nettle_chacha_core
 
 /* Currently, only 256-bit keys are supported. */
 #define CHACHA_KEY_SIZE 32
@@ -85,9 +84,6 @@ chacha_set_nonce96(struct chacha_ctx *ctx, const uint8_t *nonce);
 void
 chacha_crypt(struct chacha_ctx *ctx, size_t length, 
              uint8_t *dst, const uint8_t *src);
-
-void
-_chacha_core(uint32_t *dst, const uint32_t *src, unsigned rounds);
 
 #ifdef __cplusplus
 }

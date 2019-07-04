@@ -83,9 +83,8 @@ const gnutls_datum_t server_key = { server_key_pem,
 	sizeof(server_key_pem)
 };
 
-void doit(void)
+static void start(const char *prio)
 {
-	int exit_code = EXIT_SUCCESS;
 	/* Server stuff. */
 	gnutls_certificate_credentials_t serverx509cred;
 	gnutls_session_t server;
@@ -94,6 +93,8 @@ void doit(void)
 	gnutls_certificate_credentials_t clientx509cred;
 	gnutls_session_t client;
 	int cret = GNUTLS_E_AGAIN;
+
+	success("running test with %s\n", prio);
 
 	/* General init. */
 	gnutls_global_set_log_function(tls_log_func);
@@ -108,9 +109,7 @@ void doit(void)
 	gnutls_init(&server, GNUTLS_SERVER);
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
 				serverx509cred);
-	gnutls_priority_set_direct(server,
-				   "NORMAL:-CIPHER-ALL:+AES-128-CBC",
-				   NULL);
+	gnutls_priority_set_direct(server, prio, NULL);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
@@ -120,7 +119,7 @@ void doit(void)
 	gnutls_init(&client, GNUTLS_CLIENT);
 	gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
 				clientx509cred);
-	gnutls_priority_set_direct(client, "NORMAL", NULL);
+	gnutls_priority_set_direct(client, prio, NULL);
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);
@@ -136,10 +135,13 @@ void doit(void)
 	gnutls_certificate_free_credentials(serverx509cred);
 	gnutls_certificate_free_credentials(clientx509cred);
 
-	if (debug > 0) {
-		if (exit_code == 0)
-			puts("Self-test successful");
-		else
-			puts("Self-test failed");
-	}
+	reset_buffers();
+}
+
+void doit(void)
+{
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.1");
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.2");
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.3");
+	start("NORMAL");
 }

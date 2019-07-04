@@ -2,10 +2,10 @@
 
 
 
-@deftypefun {int} {gnutls_ext_get_data} (gnutls_session_t @var{session}, unsigned @var{type}, gnutls_ext_priv_data_t * @var{data})
+@deftypefun {int} {gnutls_ext_get_data} (gnutls_session_t @var{session}, unsigned @var{tls_id}, gnutls_ext_priv_data_t * @var{data})
 @var{session}: a @code{gnutls_session_t}  opaque pointer
 
-@var{type}: the numeric id of the extension
+@var{tls_id}: the numeric id of the extension
 
 @var{data}: a pointer to the private data to retrieve
 

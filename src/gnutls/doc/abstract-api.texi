@@ -4,33 +4,36 @@
 @deftypefun {int} {gnutls_certificate_set_key} (gnutls_certificate_credentials_t @var{res}, const char ** @var{names}, int @var{names_size}, gnutls_pcert_st * @var{pcert_list}, int @var{pcert_list_size}, gnutls_privkey_t @var{key})
 @var{res}: is a @code{gnutls_certificate_credentials_t}  type.
 
-@var{names}: is an array of DNS name of the certificate (NULL if none)
+@var{names}: is an array of DNS names belonging to the public-key (NULL if none)
 
 @var{names_size}: holds the size of the names list
 
-@var{pcert_list}: contains a certificate list (path) for the specified private key
+@var{pcert_list}: contains a certificate list (chain) or raw public-key
 
 @var{pcert_list_size}: holds the size of the certificate list
 
-@var{key}: is a @code{gnutls_privkey_t}  key
+@var{key}: is a @code{gnutls_privkey_t}  key corresponding to the first public-key in pcert_list
 
-This function sets a certificate/private key pair in the
-gnutls_certificate_credentials_t type.  This function may be
-called more than once, in case multiple keys/certificates exist for
-the server.  For clients that want to send more than their own end-
+This function sets a public/private key pair in the
+gnutls_certificate_credentials_t type. The given public key may be encapsulated
+in a certificate or can be given as a raw key. This function may be
+called more than once, in case multiple key pairs exist for
+the server. For clients that want to send more than their own end-
 entity certificate (e.g., also an intermediate CA cert), the full
 certificate chain must be provided in  @code{pcert_list} .
 
-Note that the  @code{key} and the elements of  @code{pcert_list} will become part of the credentials 
-structure and must not be deallocated. They will be automatically deallocated 
-when the  @code{res} structure is deinitialized.
+Note that the  @code{key} will become part of the credentials structure and must
+not be deallocated. It will be automatically deallocated when the  @code{res} structure
+is deinitialized.
 
-If that function fails to load the  @code{res} structure is at an undefined state, it must
+If this function fails, the  @code{res} structure is at an undefined state and it must
 not be reused to load other keys or certificates.
 
 Note that, this function by default returns zero on success and a negative value on error.
 Since 3.5.6, when the flag @code{GNUTLS_CERTIFICATE_API_V2}  is set using @code{gnutls_certificate_set_flags()} 
-it returns an index (greater or equal to zero). That index can be used to other functions to refer to the added key-pair.
+it returns an index (greater or equal to zero). That index can be used for other functions to refer to the added key-pair.
+
+Since GnuTLS 3.6.6 this function also handles raw public keys.
 
 @strong{Returns:} On success this functions returns zero, and otherwise a negative value on error (see above for modifying that behavior).
 
@@ -85,6 +88,54 @@ takes predence.
 @strong{Since:} 3.0
 @end deftypefun
 
+@subheading gnutls_certificate_set_retrieve_function3
+@anchor{gnutls_certificate_set_retrieve_function3}
+@deftypefun {void} {gnutls_certificate_set_retrieve_function3} (gnutls_certificate_credentials_t @var{cred}, gnutls_certificate_retrieve_function3 * @var{func})
+@var{cred}: is a @code{gnutls_certificate_credentials_t}  type.
+
+@var{func}: is the callback function
+
+This function sets a callback to be called in order to retrieve the
+certificate and OCSP responses to be used in the handshake.  @code{func} will
+be called only if the peer requests a certificate either during handshake
+or during post-handshake authentication.
+
+The callback's function prototype is defined in `abstract.h':
+int (*callback)(gnutls_session_t, const struct gnutls_cert_retr_st *info,
+gnutls_pcert_st **certs, unsigned int *pcert_length,
+gnutls_datum_t **ocsp, unsigned int *ocsp_length,
+gnutls_privkey_t * pkey, unsigned int *flags);
+
+The info field of the callback contains:
+ @code{req_ca_dn} which is a list with the CA names that the server considers trusted.
+This is a hint and typically the client should send a certificate that is signed
+by one of these CAs. These names, when available, are DER encoded. To get a more
+meaningful value use the function @code{gnutls_x509_rdn_get()} .
+ @code{pk_algos} contains a list with server's acceptable public key algorithms.
+The certificate returned should support the server's given algorithms.
+
+The callback should fill-in the following values.
+
+ @code{pcert} should contain an allocated list of certificates and public keys.
+ @code{pcert_length} is the size of the previous list.
+ @code{ocsp} should contain an allocated list of OCSP responses.
+ @code{ocsp_length} is the size of the previous list.
+ @code{pkey} is the private key.
+
+If flags in the callback are set to @code{GNUTLS_CERT_RETR_DEINIT_ALL}  then
+all provided values must be allocated using @code{gnutls_malloc()} , and will
+be released by gnutls; otherwise they will not be touched by gnutls.
+
+The callback function should set the certificate and OCSP response
+list to be sent, and return 0 on success. If no certificates are available,
+the  @code{pcert_length} and  @code{ocsp_length} should be set to zero. The return
+value (-1) indicates error and the handshake will be terminated. If both
+certificates are set in the credentials and a callback is available, the
+callback takes predence.
+
+@strong{Since:} 3.6.3
+@end deftypefun
+
 @subheading gnutls_pcert_deinit
 @anchor{gnutls_pcert_deinit}
 @deftypefun {void} {gnutls_pcert_deinit} (gnutls_pcert_st * @var{pcert})
@@ -102,13 +153,9 @@ This function will deinitialize a pcert structure.
 
 @var{crt}: An initialized @code{gnutls_openpgp_crt_t} .
 
-Converts the given @code{gnutls_pcert_t}  type into a @code{gnutls_openpgp_crt_t} .
-This function only works if the type of  @code{pcert} is @code{GNUTLS_CRT_OPENPGP} .
-When successful, the value written to  @code{crt} must be freed with
-@code{gnutls_openpgp_crt_deinit()}  when no longer needed.
+This function is no-op.
 
-@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
-negative error value.
+@strong{Returns:} @code{GNUTLS_E_UNIMPLEMENTED_FEATURE} .
 
 @strong{Since:} 3.4.0
 @end deftypefun
@@ -140,19 +187,16 @@ negative error value.
 
 @var{flags}: zero for now
 
-This convenience function will import the given certificate to a
-@code{gnutls_pcert_st}  structure. The structure must be deinitialized
-afterwards using @code{gnutls_pcert_deinit()} ;
+This function is no-op.
 
-@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
-negative error value.
+@strong{Returns:} @code{GNUTLS_E_UNIMPLEMENTED_FEATURE} .
 
 @strong{Since:} 3.0
 @end deftypefun
 
 @subheading gnutls_pcert_import_openpgp_raw
 @anchor{gnutls_pcert_import_openpgp_raw}
-@deftypefun {int} {gnutls_pcert_import_openpgp_raw} (gnutls_pcert_st * @var{pcert}, const gnutls_datum_t * @var{cert}, gnutls_openpgp_crt_fmt_t @var{format}, gnutls_openpgp_keyid_t @var{keyid}, unsigned int @var{flags})
+@deftypefun {int} {gnutls_pcert_import_openpgp_raw} (gnutls_pcert_st * @var{pcert}, const gnutls_datum_t * @var{cert}, gnutls_openpgp_crt_fmt_t         @var{format}, gnutls_openpgp_keyid_t @var{keyid}, unsigned int @var{flags})
 @var{pcert}: The pcert structure
 
 @var{cert}: The raw certificate to be imported
@@ -163,14 +207,61 @@ negative error value.
 
 @var{flags}: zero for now
 
-This convenience function will import the given certificate to a
-@code{gnutls_pcert_st}  structure. The structure must be deinitialized
-afterwards using @code{gnutls_pcert_deinit()} ;
+This function is no-op.
+
+@strong{Returns:} @code{GNUTLS_E_UNIMPLEMENTED_FEATURE} .
+
+@strong{Since:} 3.0
+@end deftypefun
+
+@subheading gnutls_pcert_import_rawpk
+@anchor{gnutls_pcert_import_rawpk}
+@deftypefun {int} {gnutls_pcert_import_rawpk} (gnutls_pcert_st* @var{pcert}, gnutls_pubkey_t @var{pubkey}, unsigned int @var{flags})
+@var{pcert}: The pcert structure to import the data into.
+
+@var{pubkey}: The raw public-key in @code{gnutls_pubkey_t}  format to be imported
+
+@var{flags}: zero for now
+
+This convenience function will import (i.e. convert) the given raw
+public key  @code{pubkey} into a @code{gnutls_pcert_st}  structure. The structure
+must be deinitialized afterwards using @code{gnutls_pcert_deinit()} . The
+given  @code{pubkey} must not be deinitialized because it will be associated
+with the given  @code{pcert} structure and will be deinitialized with it.
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.
 
-@strong{Since:} 3.0
+@strong{Since:} 3.6.6
+@end deftypefun
+
+@subheading gnutls_pcert_import_rawpk_raw
+@anchor{gnutls_pcert_import_rawpk_raw}
+@deftypefun {int} {gnutls_pcert_import_rawpk_raw} (gnutls_pcert_st* @var{pcert}, const gnutls_datum_t* @var{rawpubkey}, gnutls_x509_crt_fmt_t @var{format}, unsigned int @var{key_usage}, unsigned int @var{flags})
+@var{pcert}: The pcert structure to import the data into.
+
+@var{rawpubkey}: The raw public-key in @code{gnutls_datum_t}  format to be imported.
+
+@var{format}: The format of the raw public-key. DER or PEM.
+
+@var{key_usage}: An ORed sequence of @code{GNUTLS_KEY_} * flags.
+
+@var{flags}: zero for now
+
+This convenience function will import (i.e. convert) the given raw
+public key  @code{rawpubkey} into a @code{gnutls_pcert_st}  structure. The structure
+must be deinitialized afterwards using @code{gnutls_pcert_deinit()} .
+Note that the caller is responsible for freeing  @code{rawpubkey} . All necessary
+values will be copied into  @code{pcert} .
+
+Key usage (as defined by X.509 extension (2.5.29.15)) can be explicitly
+set because there is no certificate structure around the key to define
+this value. See for more info @code{gnutls_x509_crt_get_key_usage()} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.6.6
 @end deftypefun
 
 @subheading gnutls_pcert_import_x509
@@ -194,18 +285,18 @@ negative error value.
 
 @subheading gnutls_pcert_import_x509_list
 @anchor{gnutls_pcert_import_x509_list}
-@deftypefun {int} {gnutls_pcert_import_x509_list} (gnutls_pcert_st * @var{pcert}, gnutls_x509_crt_t * @var{crt}, unsigned * @var{ncrt}, unsigned int @var{flags})
-@var{pcert}: The pcert structure
+@deftypefun {int} {gnutls_pcert_import_x509_list} (gnutls_pcert_st * @var{pcert_list}, gnutls_x509_crt_t * @var{crt}, unsigned * @var{ncrt}, unsigned int @var{flags})
+@var{pcert_list}: The structures to store the certificates; must not contain initialized @code{gnutls_pcert_st}  structures.
 
 @var{crt}: The certificates to be imported
 
-@var{ncrt}: The number of certificates
+@var{ncrt}: The number of certificates in  @code{crt} ; will be updated if necessary
 
 @var{flags}: zero or @code{GNUTLS_X509_CRT_LIST_SORT} 
 
-This convenience function will import the given certificate to a
-@code{gnutls_pcert_st}  structure. The structure must be deinitialized
-afterwards using @code{gnutls_pcert_deinit()} ;
+This convenience function will import the given certificates to an
+already allocated set of @code{gnutls_pcert_st}  structures. The structures must
+be deinitialized afterwards using @code{gnutls_pcert_deinit()} .  @code{pcert_list} should contain space for at least  @code{ncrt} elements.
 
 In the case @code{GNUTLS_X509_CRT_LIST_SORT}  is specified and that
 function cannot sort the list, @code{GNUTLS_E_CERTIFICATE_LIST_UNSORTED} 
@@ -239,12 +330,42 @@ negative error value.
 @strong{Since:} 3.0
 @end deftypefun
 
+@subheading gnutls_pcert_list_import_x509_file
+@anchor{gnutls_pcert_list_import_x509_file}
+@deftypefun {int} {gnutls_pcert_list_import_x509_file} (gnutls_pcert_st * @var{pcert_list}, unsigned * @var{pcert_list_size}, const char * @var{file}, gnutls_x509_crt_fmt_t @var{format}, gnutls_pin_callback_t @var{pin_fn}, void * @var{pin_fn_userdata}, unsigned int @var{flags})
+@var{pcert_list}: The structures to store the certificates; must not contain initialized @code{gnutls_pcert_st}  structures.
+
+@var{pcert_list_size}: Initially must hold the maximum number of certs. It will be updated with the number of certs available.
+
+@var{file}: A file or supported URI with the certificates to load
+
+@var{format}: @code{GNUTLS_X509_FMT_DER}  or @code{GNUTLS_X509_FMT_PEM}  if a file is given
+
+@var{pin_fn}: a PIN callback if not globally set
+
+@var{pin_fn_userdata}: parameter for the PIN callback
+
+@var{flags}: zero or flags from @code{gnutls_certificate_import_flags} 
+
+This convenience function will import a certificate chain from the given
+file or supported URI to @code{gnutls_pcert_st}  structures. The structures
+must be deinitialized afterwards using @code{gnutls_pcert_deinit()} .
+
+This function will always return a sorted certificate chain.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value; if the  @code{pcert} list doesn't have enough space
+@code{GNUTLS_E_SHORT_MEMORY_BUFFER}  will be returned.
+
+@strong{Since:} 3.6.3
+@end deftypefun
+
 @subheading gnutls_pcert_list_import_x509_raw
 @anchor{gnutls_pcert_list_import_x509_raw}
-@deftypefun {int} {gnutls_pcert_list_import_x509_raw} (gnutls_pcert_st * @var{pcerts}, unsigned int * @var{pcert_max}, const gnutls_datum_t * @var{data}, gnutls_x509_crt_fmt_t @var{format}, unsigned int @var{flags})
-@var{pcerts}: The structures to store the parsed certificate. Must not be initialized.
+@deftypefun {int} {gnutls_pcert_list_import_x509_raw} (gnutls_pcert_st * @var{pcert_list}, unsigned int * @var{pcert_list_size}, const gnutls_datum_t * @var{data}, gnutls_x509_crt_fmt_t @var{format}, unsigned int @var{flags})
+@var{pcert_list}: The structures to store the certificates; must not contain initialized @code{gnutls_pcert_st}  structures.
 
-@var{pcert_max}: Initially must hold the maximum number of certs. It will be updated with the number of certs available.
+@var{pcert_list_size}: Initially must hold the maximum number of certs. It will be updated with the number of certs available.
 
 @var{data}: The certificates.
 
@@ -252,14 +373,16 @@ negative error value.
 
 @var{flags}: must be (0) or an OR'd sequence of gnutls_certificate_import_flags.
 
-This function will convert the given PEM encoded certificate list
-to the native gnutls_x509_crt_t format. The output will be stored
-in  @code{certs} .  They will be automatically initialized.
+This function will import the provided DER or PEM encoded certificates to an
+already allocated set of @code{gnutls_pcert_st}  structures. The structures must
+be deinitialized afterwards using @code{gnutls_pcert_deinit()} .  @code{pcert_list} should contain space for at least  @code{pcert_list_size} elements.
 
 If the Certificate is PEM encoded it should have a header of "X509
 CERTIFICATE", or "CERTIFICATE".
 
-@strong{Returns:} the number of certificates read or a negative error value.
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value; if the  @code{pcert} list doesn't have enough space
+@code{GNUTLS_E_SHORT_MEMORY_BUFFER}  will be returned.
 
 @strong{Since:} 3.0
 @end deftypefun
@@ -282,6 +405,29 @@ supported by the private key.
 negative error value.
 
 @strong{Since:} 2.12.0
+@end deftypefun
+
+@subheading gnutls_privkey_decrypt_data2
+@anchor{gnutls_privkey_decrypt_data2}
+@deftypefun {int} {gnutls_privkey_decrypt_data2} (gnutls_privkey_t @var{key}, unsigned int @var{flags}, const gnutls_datum_t * @var{ciphertext}, unsigned char * @var{plaintext}, size_t @var{plaintext_size})
+@var{key}: Holds the key
+
+@var{flags}: zero for now
+
+@var{ciphertext}: holds the data to be decrypted
+
+@var{plaintext}: a preallocated buffer that will be filled with the plaintext
+
+@var{plaintext_size}: in/out size of the plaintext
+
+This function will decrypt the given data using the algorithm
+supported by the private key. Unlike with @code{gnutls_privkey_decrypt_data()} 
+this function operates in constant time and constant memory access.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.6.5
 @end deftypefun
 
 @subheading gnutls_privkey_deinit
@@ -318,6 +464,32 @@ in the given structure. The new parameters will be allocated using
 @strong{Since:} 3.3.0
 @end deftypefun
 
+@subheading gnutls_privkey_export_dsa_raw2
+@anchor{gnutls_privkey_export_dsa_raw2}
+@deftypefun {int} {gnutls_privkey_export_dsa_raw2} (gnutls_privkey_t @var{key}, gnutls_datum_t * @var{p}, gnutls_datum_t * @var{q}, gnutls_datum_t * @var{g}, gnutls_datum_t * @var{y}, gnutls_datum_t * @var{x}, unsigned int @var{flags})
+@var{key}: Holds the public key
+
+@var{p}: will hold the p
+
+@var{q}: will hold the q
+
+@var{g}: will hold the g
+
+@var{y}: will hold the y
+
+@var{x}: will hold the x
+
+@var{flags}: flags from @code{gnutls_abstract_export_flags_t} 
+
+This function will export the DSA private key's parameters found
+in the given structure. The new parameters will be allocated using
+@code{gnutls_malloc()}  and will be stored in the appropriate datum.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
+
+@strong{Since:} 3.6.0
+@end deftypefun
+
 @subheading gnutls_privkey_export_ecc_raw
 @anchor{gnutls_privkey_export_ecc_raw}
 @deftypefun {int} {gnutls_privkey_export_ecc_raw} (gnutls_privkey_t @var{key}, gnutls_ecc_curve_t * @var{curve}, gnutls_datum_t * @var{x}, gnutls_datum_t * @var{y}, gnutls_datum_t * @var{k})
@@ -325,9 +497,9 @@ in the given structure. The new parameters will be allocated using
 
 @var{curve}: will hold the curve
 
-@var{x}: will hold the x coordinate
+@var{x}: will hold the x-coordinate
 
-@var{y}: will hold the y coordinate
+@var{y}: will hold the y-coordinate
 
 @var{k}: will hold the private key
 
@@ -335,9 +507,70 @@ This function will export the ECC private key's parameters found
 in the given structure. The new parameters will be allocated using
 @code{gnutls_malloc()}  and will be stored in the appropriate datum.
 
+In EdDSA curves the  @code{y} parameter will be @code{NULL}  and the other parameters
+will be in the native format for the curve.
+
 @strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
 
 @strong{Since:} 3.3.0
+@end deftypefun
+
+@subheading gnutls_privkey_export_ecc_raw2
+@anchor{gnutls_privkey_export_ecc_raw2}
+@deftypefun {int} {gnutls_privkey_export_ecc_raw2} (gnutls_privkey_t @var{key}, gnutls_ecc_curve_t * @var{curve}, gnutls_datum_t * @var{x}, gnutls_datum_t * @var{y}, gnutls_datum_t * @var{k}, unsigned int @var{flags})
+@var{key}: Holds the public key
+
+@var{curve}: will hold the curve
+
+@var{x}: will hold the x-coordinate
+
+@var{y}: will hold the y-coordinate
+
+@var{k}: will hold the private key
+
+@var{flags}: flags from @code{gnutls_abstract_export_flags_t} 
+
+This function will export the ECC private key's parameters found
+in the given structure. The new parameters will be allocated using
+@code{gnutls_malloc()}  and will be stored in the appropriate datum.
+
+In EdDSA curves the  @code{y} parameter will be @code{NULL}  and the other parameters
+will be in the native format for the curve.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
+
+@strong{Since:} 3.6.0
+@end deftypefun
+
+@subheading gnutls_privkey_export_gost_raw2
+@anchor{gnutls_privkey_export_gost_raw2}
+@deftypefun {int} {gnutls_privkey_export_gost_raw2} (gnutls_privkey_t @var{key}, gnutls_ecc_curve_t * @var{curve}, gnutls_digest_algorithm_t * @var{digest}, gnutls_gost_paramset_t * @var{paramset}, gnutls_datum_t * @var{x}, gnutls_datum_t * @var{y}, gnutls_datum_t * @var{k}, unsigned int @var{flags})
+@var{key}: Holds the public key
+
+@var{curve}: will hold the curve
+
+@var{digest}: will hold the digest
+
+@var{paramset}: will hold the GOST parameter set ID
+
+@var{x}: will hold the x-coordinate
+
+@var{y}: will hold the y-coordinate
+
+@var{k}: will hold the private key
+
+@var{flags}: flags from @code{gnutls_abstract_export_flags_t} 
+
+This function will export the GOST private key's parameters found
+in the given structure. The new parameters will be allocated using
+@code{gnutls_malloc()}  and will be stored in the appropriate datum.
+
+@strong{Note:} parameters will be stored with least significant byte first. On
+version 3.6.3 this was incorrectly returned in big-endian format.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
+
+@strong{Since:} 3.6.3
 @end deftypefun
 
 @subheading gnutls_privkey_export_openpgp
@@ -347,13 +580,9 @@ in the given structure. The new parameters will be allocated using
 
 @var{key}: Location for the key to be exported.
 
-Converts the given abstract private key to a @code{gnutls_openpgp_privkey_t} 
-type. The key must be of type @code{GNUTLS_PRIVKEY_OPENPGP} . The key
-returned in  @code{key} must be deinitialized with
-@code{gnutls_openpgp_privkey_deinit()} .
+This function is no-op.
 
-@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
-negative error value.
+@strong{Returns:} @code{GNUTLS_E_UNIMPLEMENTED_FEATURE} .
 
 @strong{Since:} 3.4.0
 @end deftypefun
@@ -399,11 +628,44 @@ negative error value.
 
 This function will export the RSA private key's parameters found
 in the given structure. The new parameters will be allocated using
-@code{gnutls_malloc()}  and will be stored in the appropriate datum.
+@code{gnutls_malloc()}  and will be stored in the appropriate datum. For
+EdDSA keys, the  @code{y} value should be @code{NULL} .
 
 @strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
 
 @strong{Since:} 3.3.0
+@end deftypefun
+
+@subheading gnutls_privkey_export_rsa_raw2
+@anchor{gnutls_privkey_export_rsa_raw2}
+@deftypefun {int} {gnutls_privkey_export_rsa_raw2} (gnutls_privkey_t @var{key}, gnutls_datum_t * @var{m}, gnutls_datum_t * @var{e}, gnutls_datum_t * @var{d}, gnutls_datum_t * @var{p}, gnutls_datum_t * @var{q}, gnutls_datum_t * @var{u}, gnutls_datum_t * @var{e1}, gnutls_datum_t * @var{e2}, unsigned int @var{flags})
+@var{key}: Holds the certificate
+
+@var{m}: will hold the modulus
+
+@var{e}: will hold the public exponent
+
+@var{d}: will hold the private exponent
+
+@var{p}: will hold the first prime (p)
+
+@var{q}: will hold the second prime (q)
+
+@var{u}: will hold the coefficient
+
+@var{e1}: will hold e1 = d mod (p-1)
+
+@var{e2}: will hold e2 = d mod (q-1)
+
+@var{flags}: flags from @code{gnutls_abstract_export_flags_t} 
+
+This function will export the RSA private key's parameters found
+in the given structure. The new parameters will be allocated using
+@code{gnutls_malloc()}  and will be stored in the appropriate datum.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
+
+@strong{Since:} 3.6.0
 @end deftypefun
 
 @subheading gnutls_privkey_export_x509
@@ -414,8 +676,9 @@ in the given structure. The new parameters will be allocated using
 @var{key}: Location for the key to be exported.
 
 Converts the given abstract private key to a @code{gnutls_x509_privkey_t} 
-type. The key must be of type @code{GNUTLS_PRIVKEY_X509} . The key returned
-in  @code{key} must be deinitialized with @code{gnutls_x509_privkey_deinit()} .
+type. The abstract key must be of type @code{GNUTLS_PRIVKEY_X509} . The input
+ @code{key} must not be initialized. The key returned in  @code{key} should be deinitialized
+using @code{gnutls_x509_privkey_deinit()} .
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.
@@ -435,9 +698,13 @@ negative error value.
 @var{flags}: Must be zero or flags from @code{gnutls_privkey_flags_t} .
 
 This function will generate a random private key. Note that this
-function must be called on an empty private key. The flag @code{GNUTLS_PRIVKEY_FLAG_PROVABLE} 
-instructs the key generation process to use algorithms which generate
-provable parameters out of a seed.
+function must be called on an initialized private key.
+
+The flag @code{GNUTLS_PRIVKEY_FLAG_PROVABLE} 
+instructs the key generation process to use algorithms like Shawe-Taylor
+(from FIPS PUB186-4) which generate provable parameters out of a seed
+for RSA and DSA keys. See @code{gnutls_privkey_generate2()}  for more
+information.
 
 Note that when generating an elliptic curve key, the curve
 can be substituted in the place of the bits parameter using the
@@ -448,6 +715,8 @@ For DSA keys, if the subgroup size needs to be specified check
 the @code{GNUTLS_SUBGROUP_TO_BITS()}  macro.
 
 It is recommended to do not set the number of  @code{bits} directly, use @code{gnutls_sec_param_to_pk_bits()}  instead .
+
+See also @code{gnutls_privkey_generate2()} .
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.
@@ -471,15 +740,30 @@ negative error value.
 @var{data_size}: The number of  @code{data} available.
 
 This function will generate a random private key. Note that this
-function must be called on an empty private key. The flag @code{GNUTLS_PRIVKEY_FLAG_PROVABLE} 
+function must be called on an initialized private key.
+
+The flag @code{GNUTLS_PRIVKEY_FLAG_PROVABLE} 
 instructs the key generation process to use algorithms like Shawe-Taylor
-which generate provable parameters out of a seed.
+(from FIPS PUB186-4) which generate provable parameters out of a seed
+for RSA and DSA keys. On DSA keys the PQG parameters are generated using the
+seed, while on RSA the two primes. To specify an explicit seed
+(by default a random seed is used), use the  @code{data} with a @code{GNUTLS_KEYGEN_SEED} 
+type.
 
 Note that when generating an elliptic curve key, the curve
 can be substituted in the place of the bits parameter using the
 @code{GNUTLS_CURVE_TO_BITS()}  macro.
 
-Do not set the number of bits directly, use @code{gnutls_sec_param_to_pk_bits()} .
+To export the generated keys in memory or in files it is recommended to use the
+PKCS@code{8}  form as it can handle all key types, and can store additional parameters
+such as the seed, in case of provable RSA or DSA keys.
+Generated keys can be exported in memory using @code{gnutls_privkey_export_x509()} ,
+and then with @code{gnutls_x509_privkey_export2_pkcs8()} .
+
+If key generation is part of your application, avoid setting the number
+of bits directly, and instead use @code{gnutls_sec_param_to_pk_bits()} .
+That way the generated keys will adapt to the security levels
+of the underlying GnuTLS library.
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.
@@ -523,6 +807,24 @@ as a provable key.
 negative error value.
 
 @strong{Since:} 3.5.0
+@end deftypefun
+
+@subheading gnutls_privkey_get_spki
+@anchor{gnutls_privkey_get_spki}
+@deftypefun {int} {gnutls_privkey_get_spki} (gnutls_privkey_t @var{privkey}, gnutls_x509_spki_t @var{spki}, unsigned int @var{flags})
+@var{privkey}: a public key of type @code{gnutls_privkey_t} 
+
+@var{spki}: a SubjectPublicKeyInfo structure of type @code{gnutls_privkey_spki_t} 
+
+@var{flags}: must be zero
+
+This function will return the public key information if available.
+The provided  @code{spki} must be initialized.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.6.0
 @end deftypefun
 
 @subheading gnutls_privkey_get_type
@@ -569,15 +871,18 @@ negative error value.
 
 @var{curve}: holds the curve
 
-@var{x}: holds the x
+@var{x}: holds the x-coordinate
 
-@var{y}: holds the y
+@var{y}: holds the y-coordinate
 
-@var{k}: holds the k
+@var{k}: holds the k (private key)
 
 This function will convert the given elliptic curve parameters to the
 native @code{gnutls_privkey_t}  format.  The output will be stored
 in  @code{key} .
+
+In EdDSA curves the  @code{y} parameter should be @code{NULL}  and the  @code{x} and  @code{k} parameters
+must be in the native format for the curve.
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.
@@ -689,6 +994,94 @@ negative error value.
 @strong{Since:} 3.4.0
 @end deftypefun
 
+@subheading gnutls_privkey_import_ext4
+@anchor{gnutls_privkey_import_ext4}
+@deftypefun {int} {gnutls_privkey_import_ext4} (gnutls_privkey_t @var{pkey}, void * @var{userdata}, gnutls_privkey_sign_data_func @var{sign_data_fn}, gnutls_privkey_sign_hash_func @var{sign_hash_fn}, gnutls_privkey_decrypt_func @var{decrypt_fn}, gnutls_privkey_deinit_func @var{deinit_fn}, gnutls_privkey_info_func @var{info_fn}, unsigned int @var{flags})
+@var{pkey}: The private key
+
+@var{userdata}: private data to be provided to the callbacks
+
+@var{sign_data_fn}: callback for signature operations (may be @code{NULL} )
+
+@var{sign_hash_fn}: callback for signature operations (may be @code{NULL} )
+
+@var{decrypt_fn}: callback for decryption operations (may be @code{NULL} )
+
+@var{deinit_fn}: a deinitialization function
+
+@var{info_fn}: returns info about the public key algorithm (should not be @code{NULL} )
+
+@var{flags}: Flags for the import
+
+This function will associate the given callbacks with the
+@code{gnutls_privkey_t}  type. At least one of the callbacks
+must be non-null. If a deinitialization function is provided
+then flags is assumed to contain @code{GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE} .
+
+Note that in contrast with the signing function of
+@code{gnutls_privkey_import_ext3()} , the signing functions provided to this
+function take explicitly the signature algorithm as parameter and
+different functions are provided to sign the data and hashes.
+
+The  @code{sign_hash_fn} is to be called to sign pre-hashed data. The input
+to the callback is the output of the hash (such as SHA256) corresponding
+to the signature algorithm. For RSA PKCS@code{1}  signatures, the signature
+algorithm can be set to @code{GNUTLS_SIGN_RSA_RAW} , and in that case the data
+should be handled as if they were an RSA PKCS@code{1}  DigestInfo structure.
+
+The  @code{sign_data_fn} is to be called to sign data. The input data will be
+he data to be signed (and hashed), with the provided signature
+algorithm. This function is to be used for signature algorithms like
+Ed25519 which cannot take pre-hashed data as input.
+
+When both  @code{sign_data_fn} and  @code{sign_hash_fn} functions are provided they
+must be able to operate on all the supported signature algorithms,
+unless prohibited by the type of the algorithm (e.g., as with Ed25519).
+
+The  @code{info_fn} must provide information on the signature algorithms supported by
+this private key, and should support the flags @code{GNUTLS_PRIVKEY_INFO_PK_ALGO} ,
+@code{GNUTLS_PRIVKEY_INFO_HAVE_SIGN_ALGO}  and @code{GNUTLS_PRIVKEY_INFO_PK_ALGO_BITS} .
+It must return -1 on unknown flags.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.6.0
+@end deftypefun
+
+@subheading gnutls_privkey_import_gost_raw
+@anchor{gnutls_privkey_import_gost_raw}
+@deftypefun {int} {gnutls_privkey_import_gost_raw} (gnutls_privkey_t @var{key}, gnutls_ecc_curve_t @var{curve}, gnutls_digest_algorithm_t @var{digest}, gnutls_gost_paramset_t @var{paramset}, const gnutls_datum_t * @var{x}, const gnutls_datum_t * @var{y}, const gnutls_datum_t * @var{k})
+@var{key}: The key
+
+@var{curve}: holds the curve
+
+@var{digest}: holds the digest
+
+@var{paramset}: holds the GOST parameter set ID
+
+@var{x}: holds the x-coordinate
+
+@var{y}: holds the y-coordinate
+
+@var{k}: holds the k (private key)
+
+This function will convert the given GOST private key's parameters to the
+native @code{gnutls_privkey_t}  format.  The output will be stored
+in  @code{key} .   @code{digest} should be one of GNUTLS_DIG_GOSR_94,
+GNUTLS_DIG_STREEBOG_256 or GNUTLS_DIG_STREEBOG_512.  If  @code{paramset} is set to
+GNUTLS_GOST_PARAMSET_UNKNOWN default one will be selected depending on
+ @code{digest} .
+
+@strong{Note:} parameters should be stored with least significant byte first. On
+version 3.6.3 big-endian format was used incorrectly.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.6.3
+@end deftypefun
+
 @subheading gnutls_privkey_import_openpgp
 @anchor{gnutls_privkey_import_openpgp}
 @deftypefun {int} {gnutls_privkey_import_openpgp} (gnutls_privkey_t @var{pkey}, gnutls_openpgp_privkey_t @var{key}, unsigned int @var{flags})
@@ -698,25 +1091,16 @@ negative error value.
 
 @var{flags}: Flags for the import
 
-This function will import the given private key to the abstract
-@code{gnutls_privkey_t}  type.
+This function is no-op.
 
-The @code{gnutls_openpgp_privkey_t}  object must not be deallocated
-during the lifetime of this structure. The subkey set as
-preferred will be used, or the master key otherwise.
-
- @code{flags} might be zero or one of @code{GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE} 
-and @code{GNUTLS_PRIVKEY_IMPORT_COPY} .
-
-@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
-negative error value.
+@strong{Returns:} @code{GNUTLS_E_UNIMPLEMENTED_FEATURE} .
 
 @strong{Since:} 2.12.0
 @end deftypefun
 
 @subheading gnutls_privkey_import_openpgp_raw
 @anchor{gnutls_privkey_import_openpgp_raw}
-@deftypefun {int} {gnutls_privkey_import_openpgp_raw} (gnutls_privkey_t @var{pkey}, const gnutls_datum_t * @var{data}, gnutls_openpgp_crt_fmt_t @var{format}, const gnutls_openpgp_keyid_t @var{keyid}, const char * @var{password})
+@deftypefun {int} {gnutls_privkey_import_openpgp_raw} (gnutls_privkey_t @var{pkey}, const gnutls_datum_t * @var{data}, gnutls_openpgp_crt_fmt_t           @var{format}, const gnutls_openpgp_keyid_t           @var{keyid}, const char * @var{password})
 @var{pkey}: The private key
 
 @var{data}: The private key data to be imported
@@ -727,11 +1111,9 @@ negative error value.
 
 @var{password}: A password (optional)
 
-This function will import the given private key to the abstract
-@code{gnutls_privkey_t}  type. 
+This function is no-op.
 
-@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
-negative error value.
+@strong{Returns:} @code{GNUTLS_E_UNIMPLEMENTED_FEATURE} .
 
 @strong{Since:} 3.1.0
 @end deftypefun
@@ -984,6 +1366,24 @@ to have effect.
 @strong{Since:} 3.1.0
 @end deftypefun
 
+@subheading gnutls_privkey_set_spki
+@anchor{gnutls_privkey_set_spki}
+@deftypefun {int} {gnutls_privkey_set_spki} (gnutls_privkey_t @var{privkey}, const gnutls_x509_spki_t @var{spki}, unsigned int @var{flags})
+@var{privkey}: a public key of type @code{gnutls_privkey_t} 
+
+@var{spki}: a SubjectPublicKeyInfo structure of type @code{gnutls_privkey_spki_t} 
+
+@var{flags}: must be zero
+
+This function will set the public key information.
+The provided  @code{spki} must be initialized.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.6.0
+@end deftypefun
+
 @subheading gnutls_privkey_sign_data
 @anchor{gnutls_privkey_sign_data}
 @deftypefun {int} {gnutls_privkey_sign_data} (gnutls_privkey_t @var{signer}, gnutls_digest_algorithm_t @var{hash}, unsigned int @var{flags}, const gnutls_datum_t * @var{data}, gnutls_datum_t * @var{signature})
@@ -1011,6 +1411,30 @@ negative error value.
 @strong{Since:} 2.12.0
 @end deftypefun
 
+@subheading gnutls_privkey_sign_data2
+@anchor{gnutls_privkey_sign_data2}
+@deftypefun {int} {gnutls_privkey_sign_data2} (gnutls_privkey_t @var{signer}, gnutls_sign_algorithm_t @var{algo}, unsigned int @var{flags}, const gnutls_datum_t * @var{data}, gnutls_datum_t * @var{signature})
+@var{signer}: Holds the key
+
+@var{algo}: The signature algorithm used
+
+@var{flags}: Zero or one of @code{gnutls_privkey_flags_t} 
+
+@var{data}: holds the data to be signed
+
+@var{signature}: will contain the signature allocated with @code{gnutls_malloc()} 
+
+This function will sign the given data using the specified signature
+algorithm. This function is an enhancement of @code{gnutls_privkey_sign_data()} ,
+as it allows utilizing a alternative signature algorithm where possible
+(e.g, use an RSA key with RSA-PSS).
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.6.0
+@end deftypefun
+
 @subheading gnutls_privkey_sign_hash
 @anchor{gnutls_privkey_sign_hash}
 @deftypefun {int} {gnutls_privkey_sign_hash} (gnutls_privkey_t @var{signer}, gnutls_digest_algorithm_t @var{hash_algo}, unsigned int @var{flags}, const gnutls_datum_t * @var{hash_data}, gnutls_datum_t * @var{signature})
@@ -1032,13 +1456,51 @@ used for the RSA algorithm, but only SHA-XXX for the DSA keys.
 You may use @code{gnutls_pubkey_get_preferred_hash_algorithm()}  to determine
 the hash algorithm.
 
-Note that if @code{GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA}  flag is specified this function
-will ignore  @code{hash_algo} and perform a raw PKCS1 signature.
+The flags may be @code{GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA}  or @code{GNUTLS_PRIVKEY_SIGN_FLAG_RSA_PSS} .
+In the former case this function will ignore  @code{hash_algo} and perform a raw PKCS1 signature,
+and in the latter an RSA-PSS signature will be generated.
+
+Note that, not all algorithm support signing already hashed data. When
+signing with Ed25519, @code{gnutls_privkey_sign_data()}  should be used.
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.
 
 @strong{Since:} 2.12.0
+@end deftypefun
+
+@subheading gnutls_privkey_sign_hash2
+@anchor{gnutls_privkey_sign_hash2}
+@deftypefun {int} {gnutls_privkey_sign_hash2} (gnutls_privkey_t @var{signer}, gnutls_sign_algorithm_t @var{algo}, unsigned int @var{flags}, const gnutls_datum_t * @var{hash_data}, gnutls_datum_t * @var{signature})
+@var{signer}: Holds the signer's key
+
+@var{algo}: The signature algorithm used
+
+@var{flags}: Zero or one of @code{gnutls_privkey_flags_t} 
+
+@var{hash_data}: holds the data to be signed
+
+@var{signature}: will contain newly allocated signature
+
+This function will sign the given hashed data using a signature algorithm
+supported by the private key. Signature algorithms are always used
+together with a hash functions.  Different hash functions may be
+used for the RSA algorithm, but only SHA-XXX for the DSA keys.
+
+You may use @code{gnutls_pubkey_get_preferred_hash_algorithm()}  to determine
+the hash algorithm.
+
+The flags may be @code{GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA}  or @code{GNUTLS_PRIVKEY_SIGN_FLAG_RSA_PSS} .
+In the former case this function will ignore  @code{hash_algo} and perform a raw PKCS1 signature,
+and in the latter an RSA-PSS signature will be generated.
+
+Note that, not all algorithm support signing already hashed data. When
+signing with Ed25519, @code{gnutls_privkey_sign_data()}  should be used.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.6.0
 @end deftypefun
 
 @subheading gnutls_privkey_status
@@ -1197,6 +1659,32 @@ This function allows for @code{NULL}  parameters since 3.4.1.
 @strong{Since:} 3.3.0
 @end deftypefun
 
+@subheading gnutls_pubkey_export_dsa_raw2
+@anchor{gnutls_pubkey_export_dsa_raw2}
+@deftypefun {int} {gnutls_pubkey_export_dsa_raw2} (gnutls_pubkey_t @var{key}, gnutls_datum_t * @var{p}, gnutls_datum_t * @var{q}, gnutls_datum_t * @var{g}, gnutls_datum_t * @var{y}, unsigned @var{flags})
+@var{key}: Holds the public key
+
+@var{p}: will hold the p (may be @code{NULL} )
+
+@var{q}: will hold the q (may be @code{NULL} )
+
+@var{g}: will hold the g (may be @code{NULL} )
+
+@var{y}: will hold the y (may be @code{NULL} )
+
+@var{flags}: flags from @code{gnutls_abstract_export_flags_t} 
+
+This function will export the DSA public key's parameters found in
+the given certificate.  The new parameters will be allocated using
+@code{gnutls_malloc()}  and will be stored in the appropriate datum.
+
+This function allows for @code{NULL}  parameters since 3.4.1.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
+
+@strong{Since:} 3.6.0
+@end deftypefun
+
 @subheading gnutls_pubkey_export_ecc_raw
 @anchor{gnutls_pubkey_export_ecc_raw}
 @deftypefun {int} {gnutls_pubkey_export_ecc_raw} (gnutls_pubkey_t @var{key}, gnutls_ecc_curve_t * @var{curve}, gnutls_datum_t * @var{x}, gnutls_datum_t * @var{y})
@@ -1204,19 +1692,49 @@ This function allows for @code{NULL}  parameters since 3.4.1.
 
 @var{curve}: will hold the curve (may be @code{NULL} )
 
-@var{x}: will hold x (may be @code{NULL} )
+@var{x}: will hold x-coordinate (may be @code{NULL} )
 
-@var{y}: will hold y (may be @code{NULL} )
+@var{y}: will hold y-coordinate (may be @code{NULL} )
 
 This function will export the ECC public key's parameters found in
 the given key.  The new parameters will be allocated using
 @code{gnutls_malloc()}  and will be stored in the appropriate datum.
+
+In EdDSA curves the  @code{y} parameter will be @code{NULL}  and the other parameters
+will be in the native format for the curve.
 
 This function allows for @code{NULL}  parameters since 3.4.1.
 
 @strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
 
 @strong{Since:} 3.0
+@end deftypefun
+
+@subheading gnutls_pubkey_export_ecc_raw2
+@anchor{gnutls_pubkey_export_ecc_raw2}
+@deftypefun {int} {gnutls_pubkey_export_ecc_raw2} (gnutls_pubkey_t @var{key}, gnutls_ecc_curve_t * @var{curve}, gnutls_datum_t * @var{x}, gnutls_datum_t * @var{y}, unsigned int @var{flags})
+@var{key}: Holds the public key
+
+@var{curve}: will hold the curve (may be @code{NULL} )
+
+@var{x}: will hold x-coordinate (may be @code{NULL} )
+
+@var{y}: will hold y-coordinate (may be @code{NULL} )
+
+@var{flags}: flags from @code{gnutls_abstract_export_flags_t} 
+
+This function will export the ECC public key's parameters found in
+the given key.  The new parameters will be allocated using
+@code{gnutls_malloc()}  and will be stored in the appropriate datum.
+
+In EdDSA curves the  @code{y} parameter will be @code{NULL}  and the other parameters
+will be in the native format for the curve.
+
+This function allows for @code{NULL}  parameters since 3.4.1.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
+
+@strong{Since:} 3.6.0
 @end deftypefun
 
 @subheading gnutls_pubkey_export_ecc_x962
@@ -1237,6 +1755,35 @@ the given certificate.  The new parameters will be allocated using
 @strong{Since:} 3.3.0
 @end deftypefun
 
+@subheading gnutls_pubkey_export_gost_raw2
+@anchor{gnutls_pubkey_export_gost_raw2}
+@deftypefun {int} {gnutls_pubkey_export_gost_raw2} (gnutls_pubkey_t @var{key}, gnutls_ecc_curve_t * @var{curve}, gnutls_digest_algorithm_t * @var{digest}, gnutls_gost_paramset_t * @var{paramset}, gnutls_datum_t * @var{x}, gnutls_datum_t * @var{y}, unsigned int @var{flags})
+@var{key}: Holds the public key
+
+@var{curve}: will hold the curve (may be @code{NULL} )
+
+@var{digest}: will hold the curve (may be @code{NULL} )
+
+@var{paramset}: will hold the parameters id (may be @code{NULL} )
+
+@var{x}: will hold the x-coordinate (may be @code{NULL} )
+
+@var{y}: will hold the y-coordinate (may be @code{NULL} )
+
+@var{flags}: flags from @code{gnutls_abstract_export_flags_t} 
+
+This function will export the GOST public key's parameters found in
+the given key.  The new parameters will be allocated using
+@code{gnutls_malloc()}  and will be stored in the appropriate datum.
+
+@strong{Note:} parameters will be stored with least significant byte first. On
+version 3.6.3 this was incorrectly returned in big-endian format.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
+
+@strong{Since:} 3.6.3
+@end deftypefun
+
 @subheading gnutls_pubkey_export_rsa_raw
 @anchor{gnutls_pubkey_export_rsa_raw}
 @deftypefun {int} {gnutls_pubkey_export_rsa_raw} (gnutls_pubkey_t @var{key}, gnutls_datum_t * @var{m}, gnutls_datum_t * @var{e})
@@ -1255,6 +1802,28 @@ This function allows for @code{NULL}  parameters since 3.4.1.
 @strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
 
 @strong{Since:} 3.3.0
+@end deftypefun
+
+@subheading gnutls_pubkey_export_rsa_raw2
+@anchor{gnutls_pubkey_export_rsa_raw2}
+@deftypefun {int} {gnutls_pubkey_export_rsa_raw2} (gnutls_pubkey_t @var{key}, gnutls_datum_t * @var{m}, gnutls_datum_t * @var{e}, unsigned @var{flags})
+@var{key}: Holds the certificate
+
+@var{m}: will hold the modulus (may be @code{NULL} )
+
+@var{e}: will hold the public exponent (may be @code{NULL} )
+
+@var{flags}: flags from @code{gnutls_abstract_export_flags_t} 
+
+This function will export the RSA public key's parameters found in
+the given structure.  The new parameters will be allocated using
+@code{gnutls_malloc()}  and will be stored in the appropriate datum.
+
+This function allows for @code{NULL}  parameters since 3.4.1.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
+
+@strong{Since:} 3.6.0
 @end deftypefun
 
 @subheading gnutls_pubkey_get_key_id
@@ -1304,30 +1873,20 @@ negative error value.
 @deftypefun {int} {gnutls_pubkey_get_openpgp_key_id} (gnutls_pubkey_t @var{key}, unsigned int @var{flags}, unsigned char * @var{output_data}, size_t * @var{output_data_size}, unsigned int * @var{subkey})
 @var{key}: Holds the public key
 
-@var{flags}: should be 0 or @code{GNUTLS_PUBKEY_GET_OPENPGP_FINGERPRINT} 
+@var{flags}: should be one of the flags from @code{gnutls_keyid_flags_t} 
 
 @var{output_data}: will contain the key ID
 
 @var{output_data_size}: holds the size of output_data (and will be
 replaced by the actual size of parameters)
 
-@var{subkey}: Will be non zero if the key ID corresponds to a subkey
+@var{subkey}: ignored
 
-This function returns the OpenPGP key ID of the corresponding key.
-The key is a unique ID that depends on the public
-key parameters. 
+This function is no-op.
 
-If the flag @code{GNUTLS_PUBKEY_GET_OPENPGP_FINGERPRINT}  is specified
-this function returns the fingerprint of the master key.
+@strong{Returns:} @code{GNUTLS_E_UNIMPLEMENTED_FEATURE} .
 
-If the buffer provided is not long enough to hold the output, then
-*output_data_size is updated and @code{GNUTLS_E_SHORT_MEMORY_BUFFER}  will
-be returned.  The output is @code{GNUTLS_OPENPGP_KEYID_SIZE}  bytes long.
-
-@strong{Returns:} In case of failure a negative error code will be
-returned, and 0 on success.
-
-@strong{Since:} 3.0
+@strong{Since:} 2.12.0
 @end deftypefun
 
 @subheading gnutls_pubkey_get_pk_algorithm
@@ -1367,6 +1926,24 @@ with the algorithm of the certificate/key and the provided  @code{hash} .
 returned on error.
 
 @strong{Since:} 2.12.0
+@end deftypefun
+
+@subheading gnutls_pubkey_get_spki
+@anchor{gnutls_pubkey_get_spki}
+@deftypefun {int} {gnutls_pubkey_get_spki} (gnutls_pubkey_t @var{pubkey}, gnutls_x509_spki_t @var{spki}, unsigned int @var{flags})
+@var{pubkey}: a public key of type @code{gnutls_pubkey_t} 
+
+@var{spki}: a SubjectPublicKeyInfo structure of type @code{gnutls_pubkey_spki_t} 
+
+@var{flags}: must be zero
+
+This function will return the public key information if available.
+The provided  @code{spki} must be initialized.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.6.0
 @end deftypefun
 
 @subheading gnutls_pubkey_import
@@ -1420,12 +1997,15 @@ negative error value.
 
 @var{curve}: holds the curve
 
-@var{x}: holds the x
+@var{x}: holds the x-coordinate
 
-@var{y}: holds the y
+@var{y}: holds the y-coordinate
 
 This function will convert the given elliptic curve parameters to a
 @code{gnutls_pubkey_t} .  The output will be stored in  @code{key} .
+
+In EdDSA curves the  @code{y} parameter should be @code{NULL}  and the  @code{x} parameter must
+be the value in the native format for the curve.
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.
@@ -1451,6 +2031,36 @@ negative error value.
 @strong{Since:} 3.0
 @end deftypefun
 
+@subheading gnutls_pubkey_import_gost_raw
+@anchor{gnutls_pubkey_import_gost_raw}
+@deftypefun {int} {gnutls_pubkey_import_gost_raw} (gnutls_pubkey_t @var{key}, gnutls_ecc_curve_t @var{curve}, gnutls_digest_algorithm_t @var{digest}, gnutls_gost_paramset_t @var{paramset}, const gnutls_datum_t * @var{x}, const gnutls_datum_t * @var{y})
+@var{key}: The structure to store the parsed key
+
+@var{curve}: holds the curve
+
+@var{digest}: holds the digest
+
+@var{paramset}: holds the parameters id
+
+@var{x}: holds the x-coordinate
+
+@var{y}: holds the y-coordinate
+
+This function will convert the given GOST public key's parameters to a
+@code{gnutls_pubkey_t} .  The output will be stored in  @code{key} .   @code{digest} should be
+one of GNUTLS_DIG_GOSR_94, GNUTLS_DIG_STREEBOG_256 or
+GNUTLS_DIG_STREEBOG_512.  If  @code{paramset} is set to GNUTLS_GOST_PARAMSET_UNKNOWN
+default one will be selected depending on  @code{digest} .
+
+@strong{Note:} parameters should be stored with least significant byte first. On
+version 3.6.3 big-endian format was used incorrectly.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.6.3
+@end deftypefun
+
 @subheading gnutls_pubkey_import_openpgp
 @anchor{gnutls_pubkey_import_openpgp}
 @deftypefun {int} {gnutls_pubkey_import_openpgp} (gnutls_pubkey_t @var{key}, gnutls_openpgp_crt_t @var{crt}, unsigned int @var{flags})
@@ -1460,20 +2070,16 @@ negative error value.
 
 @var{flags}: should be zero
 
-Imports a public key from an openpgp key. This function will import
-the given public key to the abstract @code{gnutls_pubkey_t} 
-type. The subkey set as preferred will be imported or the
-master key otherwise.
+This function is no-op.
 
-@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
-negative error value.
+@strong{Returns:} @code{GNUTLS_E_UNIMPLEMENTED_FEATURE} .
 
 @strong{Since:} 2.12.0
 @end deftypefun
 
 @subheading gnutls_pubkey_import_openpgp_raw
 @anchor{gnutls_pubkey_import_openpgp_raw}
-@deftypefun {int} {gnutls_pubkey_import_openpgp_raw} (gnutls_pubkey_t @var{pkey}, const gnutls_datum_t * @var{data}, gnutls_openpgp_crt_fmt_t @var{format}, const gnutls_openpgp_keyid_t @var{keyid}, unsigned int @var{flags})
+@deftypefun {int} {gnutls_pubkey_import_openpgp_raw} (gnutls_pubkey_t @var{pkey}, const gnutls_datum_t * @var{data}, gnutls_openpgp_crt_fmt_t          @var{format}, const gnutls_openpgp_keyid_t          @var{keyid}, unsigned int @var{flags})
 @var{pkey}: The public key
 
 @var{data}: The public key data to be imported
@@ -1484,11 +2090,9 @@ negative error value.
 
 @var{flags}: Should be zero
 
-This function will import the given public key to the abstract
-@code{gnutls_pubkey_t}  type. 
+This function is no-op.
 
-@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
-negative error value.
+@strong{Returns:} @code{GNUTLS_E_UNIMPLEMENTED_FEATURE} .
 
 @strong{Since:} 3.1.3
 @end deftypefun
@@ -1748,6 +2352,24 @@ to have effect.
 @strong{Since:} 3.1.0
 @end deftypefun
 
+@subheading gnutls_pubkey_set_spki
+@anchor{gnutls_pubkey_set_spki}
+@deftypefun {int} {gnutls_pubkey_set_spki} (gnutls_pubkey_t @var{pubkey}, const gnutls_x509_spki_t @var{spki}, unsigned int @var{flags})
+@var{pubkey}: a public key of type @code{gnutls_pubkey_t} 
+
+@var{spki}: a SubjectPublicKeyInfo structure of type @code{gnutls_pubkey_spki_t} 
+
+@var{flags}: must be zero
+
+This function will set the public key information.
+The provided  @code{spki} must be initialized.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.6.0
+@end deftypefun
+
 @subheading gnutls_pubkey_verify_data2
 @anchor{gnutls_pubkey_verify_data2}
 @deftypefun {int} {gnutls_pubkey_verify_data2} (gnutls_pubkey_t @var{pubkey}, gnutls_sign_algorithm_t @var{algo}, unsigned int @var{flags}, const gnutls_datum_t * @var{data}, const gnutls_datum_t * @var{signature})
@@ -1791,7 +2413,9 @@ this function accepts a signature algorithm instead of a digest algorithm.
 You can use @code{gnutls_pk_to_sign()}  to get the appropriate value.
 
 @strong{Returns:} In case of a verification failure @code{GNUTLS_E_PK_SIG_VERIFY_FAILED}  
-is returned, and zero or positive code on success.
+is returned, and zero or positive code on success. For known to be insecure
+signatures this function will return @code{GNUTLS_E_INSUFFICIENT_SECURITY}  unless
+the flag @code{GNUTLS_VERIFY_ALLOW_BROKEN}  is specified.
 
 @strong{Since:} 3.0
 @end deftypefun
@@ -1801,7 +2425,7 @@ is returned, and zero or positive code on success.
 @deftypefun {int} {gnutls_pubkey_verify_params} (gnutls_pubkey_t @var{key})
 @var{key}: should contain a @code{gnutls_pubkey_t}  type
 
-This function will verify the private key parameters.
+This function will verify the public key parameters.
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.
@@ -1934,6 +2558,9 @@ A known limitation of this function is, that a newly-signed CRL will not
 be fully functional (e.g., for signature verification), until it
 is exported an re-imported.
 
+After GnuTLS 3.6.1 the value of  @code{dig} may be @code{GNUTLS_DIG_UNKNOWN} ,
+and in that case, a suitable but reasonable for the key algorithm will be selected.
+
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.
 
@@ -1958,6 +2585,13 @@ signed.
 
 This must be the last step in a certificate request generation
 since all the previously set parameters are now signed.
+
+A known limitation of this function is, that a newly-signed request will not
+be fully functional (e.g., for signature verification), until it
+is exported an re-imported.
+
+After GnuTLS 3.6.1 the value of  @code{dig} may be @code{GNUTLS_DIG_UNKNOWN} ,
+and in that case, a suitable but reasonable for the key algorithm will be selected.
 
 @strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
 @code{GNUTLS_E_ASN1_VALUE_NOT_FOUND}  is returned if you didn't set all
@@ -2005,6 +2639,9 @@ the previously set parameters are now signed.
 A known limitation of this function is, that a newly-signed certificate will not
 be fully functional (e.g., for signature verification), until it
 is exported an re-imported.
+
+After GnuTLS 3.6.1 the value of  @code{dig} may be @code{GNUTLS_DIG_UNKNOWN} ,
+and in that case, a suitable but reasonable for the key algorithm will be selected.
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.

@@ -1,0 +1,22 @@
+
+
+
+
+@deftypefun {int} {gnutls_encode_rs_value} (gnutls_datum_t * @var{sig_value}, const gnutls_datum_t * @var{r}, const gnutls_datum_t * @var{s})
+@var{sig_value}: will hold a Dss-Sig-Value DER encoded structure
+
+@var{r}: must contain the r value
+
+@var{s}: must contain the s value
+
+This function will encode the provided r and s values, 
+into a Dss-Sig-Value structure, used for DSA and ECDSA
+signatures.
+
+The output value should be deallocated using @code{gnutls_free()} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise
+an error code is returned.
+
+@strong{Since:} 3.6.0
+@end deftypefun

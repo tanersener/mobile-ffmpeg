@@ -1,9 +1,9 @@
 This is gnutls.info, produced by makeinfo version 6.5 from gnutls.texi.
 
-This manual is last updated 7 January 2018 for version 3.5.19 of GnuTLS.
+This manual is last updated 3 January 2019 for version 3.6.8 of GnuTLS.
 
-Copyright (C) 2001-2018 Free Software Foundation, Inc.\\ Copyright (C)
-2001-2018 Nikos Mavrogiannopoulos
+Copyright (C) 2001-2019 Free Software Foundation, Inc.\\ Copyright (C)
+2001-2019 Nikos Mavrogiannopoulos
 
      Permission is granted to copy, distribute and/or modify this
      document under the terms of the GNU Free Documentation License,
@@ -18,12 +18,12 @@ END-INFO-DIR-ENTRY
 
 INFO-DIR-SECTION System Administration
 START-INFO-DIR-ENTRY
-* certtool: (gnutls)Invoking certtool.	Manipulate certificates and keys.
-* gnutls-serv: (gnutls)Invoking gnutls-serv.	GnuTLS test server.
-* gnutls-cli: (gnutls)Invoking gnutls-cli.	GnuTLS test client.
-* gnutls-cli-debug: (gnutls)Invoking gnutls-cli-debug.	GnuTLS debug client.
-* psktool: (gnutls)Invoking psktool.	Simple TLS-Pre-Shared-Keys manager.
-* srptool: (gnutls)Invoking srptool.	Simple SRP password tool.
+* certtool: (gnutls)certtool Invocation.	Manipulate certificates and keys.
+* gnutls-serv: (gnutls)gnutls-serv Invocation.	GnuTLS test server.
+* gnutls-cli: (gnutls)gnutls-cli Invocation.	GnuTLS test client.
+* gnutls-cli-debug: (gnutls)gnutls-cli-debug Invocation.	GnuTLS debug client.
+* psktool: (gnutls)psktool Invocation.	Simple TLS-Pre-Shared-Keys manager.
+* srptool: (gnutls)srptool Invocation.	Simple SRP password tool.
 END-INFO-DIR-ENTRY
 
 
@@ -1066,8 +1066,8 @@ gnutls_x509_crl_get_extension_oid
 gnutls_x509_crl_get_issuer_dn
 -----------------------------
 
- -- Function: int gnutls_x509_crl_get_issuer_dn (const gnutls_x509_crl_t
-          CRL, char * BUF, size_t * SIZEOF_BUF)
+ -- Function: int gnutls_x509_crl_get_issuer_dn (gnutls_x509_crl_t CRL,
+          char * BUF, size_t * SIZEOF_BUF)
      CRL: should contain a gnutls_x509_crl_t type
 
      BUF: a pointer to a structure to hold the peer's name (may be null)
@@ -1250,8 +1250,11 @@ gnutls_x509_crl_get_signature_algorithm
      This function will return a value of the 'gnutls_sign_algorithm_t'
      enumeration that is the signature algorithm.
 
-     *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
-     otherwise a negative error value.
+     Since 3.6.0 this function never returns a negative error code.
+     Error cases and unknown/unsupported signature algorithms are mapped
+     to 'GNUTLS_SIGN_UNKNOWN' .
+
+     *Returns:* a 'gnutls_sign_algorithm_t' value
 
 gnutls_x509_crl_get_signature_oid
 ---------------------------------
@@ -1579,6 +1582,25 @@ gnutls_x509_crl_set_version
      *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
      otherwise a negative error value.
 
+gnutls_x509_crl_sign
+--------------------
+
+ -- Function: int gnutls_x509_crl_sign (gnutls_x509_crl_t CRL,
+          gnutls_x509_crt_t ISSUER, gnutls_x509_privkey_t ISSUER_KEY)
+     CRL: should contain a gnutls_x509_crl_t type
+
+     ISSUER: is the certificate of the certificate issuer
+
+     ISSUER_KEY: holds the issuer's private key
+
+     This function is the same a 'gnutls_x509_crl_sign2()' with no
+     flags, and an appropriate hash algorithm.  The hash algorithm used
+     may vary between versions of GnuTLS, and it is tied to the security
+     level of the issuer's public key.
+
+     *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
+     otherwise a negative error value.
+
 gnutls_x509_crl_sign2
 ---------------------
 
@@ -1605,6 +1627,10 @@ gnutls_x509_crl_sign2
      A known limitation of this function is, that a newly-signed CRL
      will not be fully functional (e.g., for signature verification),
      until it is exported an re-imported.
+
+     After GnuTLS 3.6.1 the value of 'dig' may be 'GNUTLS_DIG_UNKNOWN' ,
+     and in that case, a suitable but reasonable for the key algorithm
+     will be selected.
 
      *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
      otherwise a negative error value.
@@ -2288,8 +2314,11 @@ gnutls_x509_crq_get_signature_algorithm
      enumeration that is the signature algorithm that has been used to
      sign this certificate request.
 
-     *Returns:* a 'gnutls_sign_algorithm_t' value, or a negative error
-     code on error.
+     Since 3.6.0 this function never returns a negative error code.
+     Error cases and unknown/unsupported signature algorithms are mapped
+     to 'GNUTLS_SIGN_UNKNOWN' .
+
+     *Returns:* a 'gnutls_sign_algorithm_t' value
 
      *Since:* 3.4.0
 
@@ -2312,6 +2341,22 @@ gnutls_x509_crq_get_signature_oid
      *Returns:* zero or a negative error code on error.
 
      *Since:* 3.5.0
+
+gnutls_x509_crq_get_spki
+------------------------
+
+ -- Function: int gnutls_x509_crq_get_spki (gnutls_x509_crq_t CRQ,
+          gnutls_x509_spki_t SPKI, unsigned int FLAGS)
+     CRQ: should contain a 'gnutls_x509_crq_t' type
+
+     SPKI: a SubjectPublicKeyInfo structure of type 'gnutls_x509_spki_t'
+
+     FLAGS: must be zero
+
+     This function will return the public key information of a PKCS'10'
+     certificate request.  The provided 'spki' must be initialized.
+
+     *Returns:* Zero on success, or a negative error code on error.
 
 gnutls_x509_crq_get_subject_alt_name
 ------------------------------------
@@ -2707,6 +2752,30 @@ gnutls_x509_crq_set_private_key_usage_period
      *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
      otherwise a negative error value.
 
+gnutls_x509_crq_set_spki
+------------------------
+
+ -- Function: int gnutls_x509_crq_set_spki (gnutls_x509_crq_t CRQ, const
+          gnutls_x509_spki_t SPKI, unsigned int FLAGS)
+     CRQ: a certificate request of type 'gnutls_x509_crq_t'
+
+     SPKI: a SubjectPublicKeyInfo structure of type 'gnutls_x509_spki_t'
+
+     FLAGS: must be zero
+
+     This function will set the certificate request's subject public key
+     information explicitly.  This is intended to be used in the cases
+     where a single public key (e.g., RSA) can be used for multiple
+     signature algorithms (RSA PKCS1-1.5, and RSA-PSS).
+
+     To export the public key (i.e., the SubjectPublicKeyInfo part),
+     check 'gnutls_pubkey_import_x509()' .
+
+     *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
+     otherwise a negative error value.
+
+     *Since:* 3.6.0
+
 gnutls_x509_crq_set_subject_alt_name
 ------------------------------------
 
@@ -2793,6 +2862,27 @@ gnutls_x509_crq_set_version
      *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
      otherwise a negative error value.
 
+gnutls_x509_crq_sign
+--------------------
+
+ -- Function: int gnutls_x509_crq_sign (gnutls_x509_crq_t CRQ,
+          gnutls_x509_privkey_t KEY)
+     CRQ: should contain a 'gnutls_x509_crq_t' type
+
+     KEY: holds a private key
+
+     This function is the same a 'gnutls_x509_crq_sign2()' with no
+     flags, and an appropriate hash algorithm.  The hash algorithm used
+     may vary between versions of GnuTLS, and it is tied to the security
+     level of the issuer's public key.
+
+     A known limitation of this function is, that a newly-signed request
+     will not be fully functional (e.g., for signature verification),
+     until it is exported an re-imported.
+
+     *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
+     otherwise a negative error value.
+
 gnutls_x509_crq_sign2
 ---------------------
 
@@ -2803,7 +2893,7 @@ gnutls_x509_crq_sign2
 
      KEY: holds a private key
 
-     DIG: The message digest to use, i.e., 'GNUTLS_DIG_SHA1'
+     DIG: The message digest to use, i.e., 'GNUTLS_DIG_SHA256'
 
      FLAGS: must be 0
 
@@ -2814,6 +2904,14 @@ gnutls_x509_crq_sign2
 
      This must be the last step in a certificate request generation
      since all the previously set parameters are now signed.
+
+     A known limitation of this function is, that a newly-signed request
+     will not be fully functional (e.g., for signature verification),
+     until it is exported an re-imported.
+
+     After GnuTLS 3.6.1 the value of 'dig' may be 'GNUTLS_DIG_UNKNOWN' ,
+     and in that case, a suitable but reasonable for the key algorithm
+     will be selected.
 
      *Returns:* 'GNUTLS_E_SUCCESS' on success, otherwise a negative
      error code.  'GNUTLS_E_ASN1_VALUE_NOT_FOUND' is returned if you
@@ -2902,7 +3000,11 @@ gnutls_x509_crt_check_hostname2
      When the flag 'GNUTLS_VERIFY_DO_NOT_ALLOW_WILDCARDS' is specified
      no wildcards are considered.  Otherwise they are only considered if
      the domain name consists of three components or more, and the
-     wildcard starts at the leftmost position.
+     wildcard starts at the leftmost position.  When the flag
+     'GNUTLS_VERIFY_DO_NOT_ALLOW_IP_MATCHES' is specified, the input
+     will be treated as a DNS name, and matching of textual IP addresses
+     against the IPAddress part of the alternative name will not be
+     allowed.
 
      The function 'gnutls_x509_crt_check_ip()' is available for matching
      IP addresses.
@@ -2910,6 +3012,26 @@ gnutls_x509_crt_check_hostname2
      *Returns:* non-zero for a successful match, and zero on failure.
 
      *Since:* 3.3.0
+
+gnutls_x509_crt_check_ip
+------------------------
+
+ -- Function: unsigned gnutls_x509_crt_check_ip (gnutls_x509_crt_t CERT,
+          const unsigned char * IP, unsigned int IP_SIZE, unsigned int
+          FLAGS)
+     CERT: should contain an gnutls_x509_crt_t type
+
+     IP: A pointer to the raw IP address
+
+     IP_SIZE: the number of bytes in ip (4 or 16)
+
+     FLAGS: should be zero
+
+     This function will check if the IP allowed IP addresses in the
+     certificate's subject alternative name match the provided IP
+     address.
+
+     *Returns:* non-zero for a successful match, and zero on failure.
 
 gnutls_x509_crt_check_issuer
 ----------------------------
@@ -3012,7 +3134,7 @@ gnutls_x509_crt_equals2
 -----------------------
 
  -- Function: unsigned gnutls_x509_crt_equals2 (gnutls_x509_crt_t CERT1,
-          gnutls_datum_t * DER)
+          const gnutls_datum_t * DER)
      CERT1: The first certificate
 
      DER: A DER encoded certificate
@@ -3459,11 +3581,8 @@ gnutls_x509_crt_get_expiration_time
           (gnutls_x509_crt_t CERT)
      CERT: should contain a 'gnutls_x509_crt_t' type
 
-     This function will return the time this Certificate was or will be
+     This function will return the time this certificate was or will be
      expired.
-
-     The no well defined expiration time can be checked against with the
-     'GNUTLS_X509_NO_WELL_DEFINED_EXPIRATION' macro.
 
      *Returns:* expiration time, or (time_t)-1 on error.
 
@@ -3600,7 +3719,8 @@ gnutls_x509_crt_get_extension_info
      If the buffer provided is not long enough to hold the output, then
      'oid_size' is updated and 'GNUTLS_E_SHORT_MEMORY_BUFFER' will be
      returned.  The 'oid' returned will be null terminated, although
-     'oid_size' will not account for the trailing null.
+     'oid_size' will not account for the trailing null (the latter is
+     not true for GnuTLS prior to 3.6.0).
 
      *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
      otherwise a negative error code is returned.  If you have reached
@@ -3656,6 +3776,33 @@ gnutls_x509_crt_get_fingerprint
      *Returns:* 'GNUTLS_E_SHORT_MEMORY_BUFFER' if the provided buffer is
      not long enough, and in that case the *buf_size will be updated
      with the required size.  On success 0 is returned.
+
+gnutls_x509_crt_get_inhibit_anypolicy
+-------------------------------------
+
+ -- Function: int gnutls_x509_crt_get_inhibit_anypolicy
+          (gnutls_x509_crt_t CERT, unsigned int * SKIPCERTS, unsigned
+          int * CRITICAL)
+     CERT: should contain a 'gnutls_x509_crt_t' type
+
+     SKIPCERTS: will hold the number of certificates after which
+     anypolicy is no longer acceptable.
+
+     CRITICAL: will be non-zero if the extension is marked as critical
+
+     This function will return certificate's value of the SkipCerts,
+     i.e., the Inhibit anyPolicy X.509 extension (2.5.29.54).
+
+     The returned value is the number of additional certificates that
+     may appear in the path before the anyPolicy is no longer
+     acceptable.
+
+     *Returns:* zero on success, or a negative error code in case of
+     parsing error.  If the certificate does not contain the Inhibit
+     anyPolicy extension 'GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE' will be
+     returned.
+
+     *Since:* 3.6.0
 
 gnutls_x509_crt_get_issuer
 --------------------------
@@ -4040,10 +4187,9 @@ gnutls_x509_crt_get_key_usage
      'GNUTLS_KEY_KEY_CERT_SIGN' , 'GNUTLS_KEY_CRL_SIGN' ,
      'GNUTLS_KEY_ENCIPHER_ONLY' , 'GNUTLS_KEY_DECIPHER_ONLY' .
 
-     *Returns:* the certificate key usage, or a negative error code in
-     case of parsing error.  If the certificate does not contain the
-     keyUsage extension 'GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE' will be
-     returned.
+     *Returns:* zero on success, or a negative error code in case of
+     parsing error.  If the certificate does not contain the keyUsage
+     extension 'GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE' will be returned.
 
 gnutls_x509_crt_get_name_constraints
 ------------------------------------
@@ -4135,18 +4281,49 @@ gnutls_x509_crt_get_pk_ecc_raw
 
      CURVE: will hold the curve
 
-     X: will hold x
+     X: will hold the x-coordinate
 
-     Y: will hold y
+     Y: will hold the y-coordinate
 
      This function will export the ECC public key's parameters found in
+     the given certificate.  The new parameters will be allocated using
+     'gnutls_malloc()' and will be stored in the appropriate datum.
+
+     In EdDSA curves the 'y' parameter will be 'NULL' and the other
+     parameters will be in the native format for the curve.
+
+     *Returns:* 'GNUTLS_E_SUCCESS' on success, otherwise a negative
+     error code.
+
+     *Since:* 3.4.1
+
+gnutls_x509_crt_get_pk_gost_raw
+-------------------------------
+
+ -- Function: int gnutls_x509_crt_get_pk_gost_raw (gnutls_x509_crt_t
+          CRT, gnutls_ecc_curve_t * CURVE, gnutls_digest_algorithm_t *
+          DIGEST, gnutls_gost_paramset_t * PARAMSET, gnutls_datum_t * X,
+          gnutls_datum_t * Y)
+     CRT: Holds the certificate
+
+     CURVE: will hold the curve
+
+     DIGEST: will hold the digest
+
+     PARAMSET: will hold the GOST parameter set ID
+
+     X: will hold the x-coordinate
+
+     Y: will hold the y-coordinate
+
+     This function will export the GOST public key's parameters found in
      the given certificate.  The new parameters will be allocated using
      'gnutls_malloc()' and will be stored in the appropriate datum.
 
      *Returns:* 'GNUTLS_E_SUCCESS' on success, otherwise a negative
      error code.
 
-     *Since:* 3.4.1
+     *Since:* 3.6.3
 
 gnutls_x509_crt_get_pk_oid
 --------------------------
@@ -4342,11 +4519,11 @@ gnutls_x509_crt_get_signature_algorithm
      enumeration that is the signature algorithm that has been used to
      sign this certificate.
 
-     Unknown/unsupported signature algorithms are mapped to
-     'GNUTLS_SIGN_UNKNOWN' .
+     Since 3.6.0 this function never returns a negative error code.
+     Error cases and unknown/unsupported signature algorithms are mapped
+     to 'GNUTLS_SIGN_UNKNOWN' .
 
-     *Returns:* a 'gnutls_sign_algorithm_t' value, or a negative error
-     code on error.
+     *Returns:* a 'gnutls_sign_algorithm_t' value
 
 gnutls_x509_crt_get_signature_oid
 ---------------------------------
@@ -4367,6 +4544,22 @@ gnutls_x509_crt_get_signature_oid
      *Returns:* zero or a negative error code on error.
 
      *Since:* 3.5.0
+
+gnutls_x509_crt_get_spki
+------------------------
+
+ -- Function: int gnutls_x509_crt_get_spki (gnutls_x509_crt_t CERT,
+          gnutls_x509_spki_t SPKI, unsigned int FLAGS)
+     CERT: a certificate of type 'gnutls_x509_crt_t'
+
+     SPKI: a SubjectPublicKeyInfo structure of type 'gnutls_x509_spki_t'
+
+     FLAGS: must be zero
+
+     This function will return the public key information of an X.509
+     certificate.  The provided 'spki' must be initialized.
+
+     *Since:* 3.6.0
 
 gnutls_x509_crt_get_subject
 ---------------------------
@@ -4703,18 +4896,53 @@ gnutls_x509_crt_list_import2
 
      This function will convert the given PEM encoded certificate list
      to the native gnutls_x509_crt_t format.  The output will be stored
-     in 'certs' which will allocated and initialized.
+     in 'certs' which will be allocated and initialized.
 
      If the Certificate is PEM encoded it should have a header of "X509
      CERTIFICATE", or "CERTIFICATE".
 
      To deinitialize 'certs' , you need to deinitialize each crt
-     structure independently, and use 'gnutls_free()' at
+     structure independently, and use 'gnutls_free()' at 'certs' .
 
      *Returns:* the number of certificates read or a negative error
      value.
 
      *Since:* 3.0
+
+gnutls_x509_crt_list_import_url
+-------------------------------
+
+ -- Function: int gnutls_x509_crt_list_import_url (gnutls_x509_crt_t **
+          CERTS, unsigned int * SIZE, const char * URL,
+          gnutls_pin_callback_t PIN_FN, void * PIN_FN_USERDATA, unsigned
+          int FLAGS)
+     CERTS: Will hold the allocated certificate list.
+
+     SIZE: It will contain the size of the list.
+
+     URL: A PKCS 11 url
+
+     PIN_FN: a PIN callback if not globally set
+
+     PIN_FN_USERDATA: parameter for the PIN callback
+
+     FLAGS: One of GNUTLS_PKCS11_OBJ_* flags for PKCS'11' URLs or zero
+     otherwise
+
+     This function will import a certificate chain present in a PKCS'11'
+     token or any type of back-end that supports URLs.  The certificates
+     must be deinitialized afterwards using 'gnutls_x509_crt_deinit()'
+     and the returned pointer must be freed using 'gnutls_free()' .
+
+     The URI provided must be the first certificate in the chain;
+     subsequent certificates will be retrieved using
+     'gnutls_pkcs11_get_raw_issuer()' or equivalent functionality for
+     the supported URI.
+
+     *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
+     otherwise a negative error value.
+
+     *Since:* 3.6.3
 
 gnutls_x509_crt_list_verify
 ---------------------------
@@ -4790,7 +5018,7 @@ gnutls_x509_crt_set_activation_time
 
      ACT_TIME: The actual time
 
-     This function will set the time this Certificate was or will be
+     This function will set the time this certificate was or will be
      activated.
 
      *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
@@ -5043,8 +5271,7 @@ gnutls_x509_crt_set_expiration_time
      EXP_TIME: The actual time
 
      This function will set the time this Certificate will expire.
-     Setting an expiration time to (time_t)-1 or to
-     'GNUTLS_X509_NO_WELL_DEFINED_EXPIRATION' will set to the no
+     Setting an expiration time to (time_t)-1 will set to the no
      well-defined expiration date value.
 
      *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
@@ -5070,6 +5297,37 @@ gnutls_x509_crt_set_extension_by_oid
      This function will set an the extension, by the specified OID, in
      the certificate.  The extension data should be binary data DER
      encoded.
+
+     *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
+     otherwise a negative error value.
+
+gnutls_x509_crt_set_flags
+-------------------------
+
+ -- Function: void gnutls_x509_crt_set_flags (gnutls_x509_crt_t CERT,
+          unsigned int FLAGS)
+     CERT: A type 'gnutls_x509_crt_t'
+
+     FLAGS: flags from the 'gnutls_x509_crt_flags'
+
+     This function will set flags for the specified certificate.
+     Currently this is useful for the
+     'GNUTLS_X509_CRT_FLAG_IGNORE_SANITY' which allows importing
+     certificates even if they have known issues.
+
+     *Since:* 3.6.0
+
+gnutls_x509_crt_set_inhibit_anypolicy
+-------------------------------------
+
+ -- Function: int gnutls_x509_crt_set_inhibit_anypolicy
+          (gnutls_x509_crt_t CRT, unsigned int SKIPCERTS)
+     CRT: a certificate of type 'gnutls_x509_crt_t'
+
+     SKIPCERTS: number of certificates after which anypolicy is no
+     longer acceptable.
+
+     This function will set the Inhibit anyPolicy certificate extension.
 
      *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
      otherwise a negative error value.
@@ -5407,8 +5665,37 @@ gnutls_x509_crt_set_serial
      big-endian positive number (i.e.  it's leftmost bit should be
      zero).
 
+     The size of the serial is restricted to 20 bytes maximum by
+     RFC5280.  This function allows writing more than 20 bytes but the
+     generated certificates in that case may be rejected by other
+     implementations.
+
      *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
      otherwise a negative error value.
+
+gnutls_x509_crt_set_spki
+------------------------
+
+ -- Function: int gnutls_x509_crt_set_spki (gnutls_x509_crt_t CRT, const
+          gnutls_x509_spki_t SPKI, unsigned int FLAGS)
+     CRT: a certificate of type 'gnutls_x509_crt_t'
+
+     SPKI: a SubjectPublicKeyInfo structure of type 'gnutls_x509_spki_t'
+
+     FLAGS: must be zero
+
+     This function will set the certificate's subject public key
+     information explicitly.  This is intended to be used in the cases
+     where a single public key (e.g., RSA) can be used for multiple
+     signature algorithms (RSA PKCS1-1.5, and RSA-PSS).
+
+     To export the public key (i.e., the SubjectPublicKeyInfo part),
+     check 'gnutls_pubkey_import_x509()' .
+
+     *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
+     otherwise a negative error value.
+
+     *Since:* 3.6.0
 
 gnutls_x509_crt_set_subject_alt_name
 ------------------------------------
@@ -5586,7 +5873,9 @@ gnutls_x509_crt_sign
      ISSUER_KEY: holds the issuer's private key
 
      This function is the same a 'gnutls_x509_crt_sign2()' with no
-     flags, and SHA1 as the hash algorithm.
+     flags, and an appropriate hash algorithm.  The hash algorithm used
+     may vary between versions of GnuTLS, and it is tied to the security
+     level of the issuer's public key.
 
      *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
      otherwise a negative error value.
@@ -5617,6 +5906,10 @@ gnutls_x509_crt_sign2
      A known limitation of this function is, that a newly-signed
      certificate will not be fully functional (e.g., for signature
      verification), until it is exported an re-imported.
+
+     After GnuTLS 3.6.1 the value of 'dig' may be 'GNUTLS_DIG_UNKNOWN' ,
+     and in that case, a suitable but reasonable for the key algorithm
+     will be selected.
 
      *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
      otherwise a negative error value.
@@ -5991,6 +6284,26 @@ gnutls_x509_ext_export_crl_dist_points
 
      *Since:* 3.3.0
 
+gnutls_x509_ext_export_inhibit_anypolicy
+----------------------------------------
+
+ -- Function: int gnutls_x509_ext_export_inhibit_anypolicy (unsigned int
+          SKIPCERTS, gnutls_datum_t * EXT)
+     SKIPCERTS: number of certificates after which anypolicy is no
+     longer acceptable.
+
+     EXT: The DER-encoded extension data; must be freed using
+     'gnutls_free()' .
+
+     This function will convert the 'skipcerts' value to a DER encoded
+     Inhibit AnyPolicy PKIX extension.  The 'ext' data will be allocated
+     using 'gnutls_malloc()' .
+
+     *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
+     otherwise a negative error value.
+
+     *Since:* 3.6.0
+
 gnutls_x509_ext_export_key_purposes
 -----------------------------------
 
@@ -6003,7 +6316,7 @@ gnutls_x509_ext_export_key_purposes
 
      This function will convert the key purposes type to a DER-encoded
      PKIX ExtKeyUsageSyntax (2.5.29.37) extension.  The output data in
-     'ext' will be allocated usin 'gnutls_malloc()' .
+     'ext' will be allocated using 'gnutls_malloc()' .
 
      *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
      otherwise a negative error value.
@@ -6041,7 +6354,7 @@ gnutls_x509_ext_export_name_constraints
 
      This function will convert the provided name constraints type to a
      DER-encoded PKIX NameConstraints (2.5.29.30) extension.  The output
-     data in 'ext' will be allocated usin 'gnutls_malloc()' .
+     data in 'ext' will be allocated using 'gnutls_malloc()' .
 
      *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
      otherwise a negative error value.
@@ -6255,6 +6568,30 @@ gnutls_x509_ext_import_crl_dist_points
      otherwise a negative error value.
 
      *Since:* 3.3.0
+
+gnutls_x509_ext_import_inhibit_anypolicy
+----------------------------------------
+
+ -- Function: int gnutls_x509_ext_import_inhibit_anypolicy (const
+          gnutls_datum_t * EXT, unsigned int * SKIPCERTS)
+     EXT: the DER encoded extension data
+
+     SKIPCERTS: will hold the number of certificates after which
+     anypolicy is no longer acceptable.
+
+     This function will return certificate's value of SkipCerts, by
+     reading the DER data of the Inhibit anyPolicy X.509 extension
+     (2.5.29.54).
+
+     The 'skipcerts' value is the number of additional certificates that
+     may appear in the path before the anyPolicy
+     ('GNUTLS_X509_OID_POLICY_ANY' ) is no longer acceptable.
+
+     *Returns:* zero, or a negative error code in case of parsing error.
+     If the certificate does not contain the Inhibit anyPolicy extension
+     'GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE' will be returned.
+
+     *Since:* 3.6.0
 
 gnutls_x509_ext_import_key_purposes
 -----------------------------------
@@ -6792,6 +7129,9 @@ gnutls_x509_policies_get
      'policies' type.  The returned values should be treated as constant
      and valid for the lifetime of 'policies' .
 
+     The any policy OID is available as the 'GNUTLS_X509_OID_POLICY_ANY'
+     macro.
+
      *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
      'GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE' if the index is out of
      bounds, otherwise a negative error value.
@@ -6881,16 +7221,16 @@ gnutls_x509_privkey_export
      OUTPUT_DATA_SIZE: holds the size of output_data (and will be
      replaced by the actual size of parameters)
 
-     This function will export the private key to a PKCS1 structure for
-     RSA keys, or an integer sequence for DSA keys.  The DSA keys are in
-     the same format with the parameters used by openssl.
-
-     If the buffer provided is not long enough to hold the output, then
-     * 'output_data_size' is updated and 'GNUTLS_E_SHORT_MEMORY_BUFFER'
-     will be returned.
+     This function will export the private key to a PKCS'1' structure
+     for RSA or RSA-PSS keys, and integer sequence for DSA keys.  Other
+     keys types will be exported in PKCS'8' form.
 
      If the structure is PEM encoded, it will have a header of "BEGIN
      RSA PRIVATE KEY".
+
+     It is recommended to use 'gnutls_x509_privkey_export_pkcs8()'
+     instead of this function, when a consistent output format is
+     required.
 
      *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
      otherwise a negative error value.
@@ -6906,14 +7246,15 @@ gnutls_x509_privkey_export2
 
      OUT: will contain a private key PEM or DER encoded
 
-     This function will export the private key to a PKCS1 structure for
-     RSA keys, or an integer sequence for DSA keys.  The DSA keys are in
-     the same format with the parameters used by openssl.
+     This function will export the private key to a PKCS'1' structure
+     for RSA or RSA-PSS keys, and integer sequence for DSA keys.  Other
+     keys types will be exported in PKCS'8' form.
 
      The output buffer is allocated using 'gnutls_malloc()' .
 
-     If the structure is PEM encoded, it will have a header of "BEGIN
-     RSA PRIVATE KEY".
+     It is recommended to use 'gnutls_x509_privkey_export2_pkcs8()'
+     instead of this function, when a consistent output format is
+     required.
 
      *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
      otherwise a negative error value.
@@ -6992,9 +7333,9 @@ gnutls_x509_privkey_export_ecc_raw
 
      CURVE: will hold the curve
 
-     X: will hold the x coordinate
+     X: will hold the x-coordinate
 
-     Y: will hold the y coordinate
+     Y: will hold the y-coordinate
 
      K: will hold the private key
 
@@ -7002,10 +7343,48 @@ gnutls_x509_privkey_export_ecc_raw
      the given structure.  The new parameters will be allocated using
      'gnutls_malloc()' and will be stored in the appropriate datum.
 
+     In EdDSA curves the 'y' parameter will be 'NULL' and the other
+     parameters will be in the native format for the curve.
+
      *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
      otherwise a negative error value.
 
      *Since:* 3.0
+
+gnutls_x509_privkey_export_gost_raw
+-----------------------------------
+
+ -- Function: int gnutls_x509_privkey_export_gost_raw
+          (gnutls_x509_privkey_t KEY, gnutls_ecc_curve_t * CURVE,
+          gnutls_digest_algorithm_t * DIGEST, gnutls_gost_paramset_t *
+          PARAMSET, gnutls_datum_t * X, gnutls_datum_t * Y,
+          gnutls_datum_t * K)
+     KEY: a key
+
+     CURVE: will hold the curve
+
+     DIGEST: will hold the digest
+
+     PARAMSET: will hold the GOST parameter set ID
+
+     X: will hold the x-coordinate
+
+     Y: will hold the y-coordinate
+
+     K: will hold the private key
+
+     This function will export the GOST private key's parameters found
+     in the given structure.  The new parameters will be allocated using
+     'gnutls_malloc()' and will be stored in the appropriate datum.
+
+     *Note:* parameters will be stored with least significant byte
+     first.  On version 3.6.3 this was incorrectly returned in
+     big-endian format.
+
+     *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
+     otherwise a negative error value.
+
+     *Since:* 3.6.3
 
 gnutls_x509_privkey_export_pkcs8
 --------------------------------
@@ -7136,10 +7515,13 @@ gnutls_x509_privkey_generate
      FLAGS: Must be zero or flags from 'gnutls_privkey_flags_t' .
 
      This function will generate a random private key.  Note that this
-     function must be called on an empty private key.  The flag
-     'GNUTLS_PRIVKEY_FLAG_PROVABLE' instructs the key generation process
-     to use algorithms like Shawe-Taylor which generate provable
-     parameters out of a seed.
+     function must be called on an initialized private key.
+
+     The flag 'GNUTLS_PRIVKEY_FLAG_PROVABLE' instructs the key
+     generation process to use algorithms like Shawe-Taylor (from FIPS
+     PUB186-4) which generate provable parameters out of a seed for RSA
+     and DSA keys.  See 'gnutls_x509_privkey_generate2()' for more
+     information.
 
      Note that when generating an elliptic curve key, the curve can be
      substituted in the place of the bits parameter using the
@@ -7151,6 +7533,9 @@ gnutls_x509_privkey_generate
 
      It is recommended to do not set the number of 'bits' directly, use
      'gnutls_sec_param_to_pk_bits()' instead .
+
+     See also 'gnutls_privkey_generate()' ,
+     'gnutls_x509_privkey_generate2()' .
 
      *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
      otherwise a negative error value.
@@ -7176,19 +7561,33 @@ gnutls_x509_privkey_generate2
      DATA_SIZE: The number of 'data' available.
 
      This function will generate a random private key.  Note that this
-     function must be called on an empty private key.  The flag
-     'GNUTLS_PRIVKEY_FLAG_PROVABLE' instructs the key generation process
-     to use algorithms which generate provable parameters out of a seed.
+     function must be called on an initialized private key.
+
+     The flag 'GNUTLS_PRIVKEY_FLAG_PROVABLE' instructs the key
+     generation process to use algorithms like Shawe-Taylor (from FIPS
+     PUB186-4) which generate provable parameters out of a seed for RSA
+     and DSA keys.  On DSA keys the PQG parameters are generated using
+     the seed, while on RSA the two primes.  To specify an explicit seed
+     (by default a random seed is used), use the 'data' with a
+     'GNUTLS_KEYGEN_SEED' type.
 
      Note that when generating an elliptic curve key, the curve can be
      substituted in the place of the bits parameter using the
      'GNUTLS_CURVE_TO_BITS()' macro.
 
-     For DSA keys, if the subgroup size needs to be specified check the
-     'GNUTLS_SUBGROUP_TO_BITS()' macro.
+     To export the generated keys in memory or in files it is
+     recommended to use the PKCS'8' form as it can handle all key types,
+     and can store additional parameters such as the seed, in case of
+     provable RSA or DSA keys.  Generated keys can be exported in memory
+     using 'gnutls_privkey_export_x509()' , and then with
+     'gnutls_x509_privkey_export2_pkcs8()' .
 
-     Do not set the number of bits directly, use
-     'gnutls_sec_param_to_pk_bits()' .
+     If key generation is part of your application, avoid setting the
+     number of bits directly, and instead use
+     'gnutls_sec_param_to_pk_bits()' .  That way the generated keys will
+     adapt to the security levels of the underlying GnuTLS library.
+
+     See also 'gnutls_privkey_generate2()' .
 
      *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
      otherwise a negative error value.
@@ -7272,6 +7671,22 @@ gnutls_x509_privkey_get_seed
      otherwise a negative error value.
 
      *Since:* 3.5.0
+
+gnutls_x509_privkey_get_spki
+----------------------------
+
+ -- Function: int gnutls_x509_privkey_get_spki (gnutls_x509_privkey_t
+          KEY, gnutls_x509_spki_t SPKI, unsigned int FLAGS)
+     KEY: should contain a 'gnutls_x509_privkey_t' type
+
+     SPKI: a SubjectPublicKeyInfo structure of type 'gnutls_x509_spki_t'
+
+     FLAGS: must be zero
+
+     This function will return the public key information of a private
+     key.  The provided 'spki' must be initialized.
+
+     *Returns:* Zero on success, or a negative error code on error.
 
 gnutls_x509_privkey_import
 --------------------------
@@ -7362,20 +7777,58 @@ gnutls_x509_privkey_import_ecc_raw
 
      CURVE: holds the curve
 
-     X: holds the x
+     X: holds the x-coordinate
 
-     Y: holds the y
+     Y: holds the y-coordinate
 
      K: holds the k
 
      This function will convert the given elliptic curve parameters to
      the native 'gnutls_x509_privkey_t' format.  The output will be
-     stored in 'key' .
+     stored in 'key' .  For EdDSA keys, the 'x' and 'k' values must be
+     in the native to curve format.
 
      *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
      otherwise a negative error value.
 
      *Since:* 3.0
+
+gnutls_x509_privkey_import_gost_raw
+-----------------------------------
+
+ -- Function: int gnutls_x509_privkey_import_gost_raw
+          (gnutls_x509_privkey_t KEY, gnutls_ecc_curve_t CURVE,
+          gnutls_digest_algorithm_t DIGEST, gnutls_gost_paramset_t
+          PARAMSET, const gnutls_datum_t * X, const gnutls_datum_t * Y,
+          const gnutls_datum_t * K)
+     KEY: The data to store the parsed key
+
+     CURVE: holds the curve
+
+     DIGEST: will hold the digest
+
+     PARAMSET: will hold the GOST parameter set ID
+
+     X: holds the x-coordinate
+
+     Y: holds the y-coordinate
+
+     K: holds the k (private key)
+
+     This function will convert the given GOST private key's parameters
+     to the native 'gnutls_x509_privkey_t' format.  The output will be
+     stored in 'key' .  'digest' should be one of GNUTLS_DIG_GOSR_94,
+     GNUTLS_DIG_STREEBOG_256 or GNUTLS_DIG_STREEBOG_512.  If 'paramset'
+     is set to GNUTLS_GOST_PARAMSET_UNKNOWN default one will be selected
+     depending on 'digest' .
+
+     *Note:* parameters should be stored with least significant byte
+     first.  On version 3.6.3 big-endian format was used incorrectly.
+
+     *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
+     otherwise a negative error value.
+
+     *Since:* 3.6.3
 
 gnutls_x509_privkey_import_openssl
 ----------------------------------
@@ -7563,6 +8016,22 @@ gnutls_x509_privkey_set_pin_function
 
      *Since:* 3.4.0
 
+gnutls_x509_privkey_set_spki
+----------------------------
+
+ -- Function: int gnutls_x509_privkey_set_spki (gnutls_x509_privkey_t
+          KEY, const gnutls_x509_spki_t SPKI, unsigned int FLAGS)
+     KEY: should contain a 'gnutls_x509_privkey_t' type
+
+     SPKI: a SubjectPublicKeyInfo structure of type 'gnutls_x509_spki_t'
+
+     FLAGS: must be zero
+
+     This function will return the public key information of a private
+     key.  The provided 'spki' must be initialized.
+
+     *Returns:* Zero on success, or a negative error code on error.
+
 gnutls_x509_privkey_sign_data
 -----------------------------
 
@@ -7733,6 +8202,68 @@ gnutls_x509_rdn_get_oid
 
      *Since:* 2.4.0
 
+gnutls_x509_spki_deinit
+-----------------------
+
+ -- Function: void gnutls_x509_spki_deinit (gnutls_x509_spki_t SPKI)
+     SPKI: the SubjectPublicKeyInfo structure
+
+     This function will deinitialize a SubjectPublicKeyInfo structure.
+
+     *Since:* 3.6.0
+
+gnutls_x509_spki_get_rsa_pss_params
+-----------------------------------
+
+ -- Function: int gnutls_x509_spki_get_rsa_pss_params
+          (gnutls_x509_spki_t SPKI, gnutls_digest_algorithm_t * DIG,
+          unsigned int * SALT_SIZE)
+     SPKI: the SubjectPublicKeyInfo structure
+
+     DIG: if non-NULL, it will hold the digest algorithm
+
+     SALT_SIZE: if non-NULL, it will hold the salt size
+
+     This function will get the public key algorithm parameters of
+     RSA-PSS type.
+
+     *Returns:* zero if the parameters are present or a negative value
+     on error.
+
+     *Since:* 3.6.0
+
+gnutls_x509_spki_init
+---------------------
+
+ -- Function: int gnutls_x509_spki_init (gnutls_x509_spki_t * SPKI)
+     SPKI: A pointer to the type to be initialized
+
+     This function will initialize a SubjectPublicKeyInfo structure used
+     in PKIX. The structure is used to set additional parameters in the
+     public key information field of a certificate.
+
+     *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
+     otherwise a negative error value.
+
+     *Since:* 3.6.0
+
+gnutls_x509_spki_set_rsa_pss_params
+-----------------------------------
+
+ -- Function: void gnutls_x509_spki_set_rsa_pss_params
+          (gnutls_x509_spki_t SPKI, gnutls_digest_algorithm_t DIG,
+          unsigned int SALT_SIZE)
+     SPKI: the SubjectPublicKeyInfo structure
+
+     DIG: a digest algorithm of type 'gnutls_digest_algorithm_t'
+
+     SALT_SIZE: the size of salt string
+
+     This function will set the public key parameters for an RSA-PSS
+     algorithm, in the SubjectPublicKeyInfo structure.
+
+     *Since:* 3.6.0
+
 gnutls_x509_tlsfeatures_add
 ---------------------------
 
@@ -7831,14 +8362,23 @@ gnutls_x509_trust_list_add_cas
      FLAGS: flags from 'gnutls_trust_list_flags_t'
 
      This function will add the given certificate authorities to the
-     trusted list.  The list of CAs must not be deinitialized during
-     this structure's lifetime.
+     trusted list.  The CAs in 'clist' must not be deinitialized during
+     the lifetime of 'list' .
 
-     If the flag 'GNUTLS_TL_NO_DUPLICATES' is specified, then the
-     provided 'clist' entries that are duplicates will not be added to
-     the list and will be deinitialized.
+     If the flag 'GNUTLS_TL_NO_DUPLICATES' is specified, then this
+     function will ensure that no duplicates will be present in the
+     final trust list.
 
-     *Returns:* The number of added elements is returned.
+     If the flag 'GNUTLS_TL_NO_DUPLICATE_KEY' is specified, then this
+     function will ensure that no certificates with the same key are
+     present in the final trust list.
+
+     If either 'GNUTLS_TL_NO_DUPLICATE_KEY' or 'GNUTLS_TL_NO_DUPLICATES'
+     are given, 'gnutls_x509_trust_list_deinit()' must be called with
+     parameter 'all' being 1.
+
+     *Returns:* The number of added elements is returned; that includes
+     duplicate entries.
 
      *Since:* 3.0.0
 
@@ -7861,20 +8401,24 @@ gnutls_x509_trust_list_add_crls
      specifies GNUTLS_TL_VERIFY_CRL
 
      This function will add the given certificate revocation lists to
-     the trusted list.  The list of CRLs must not be deinitialized
-     during this structure's lifetime.
+     the trusted list.  The CRLs in 'crl_list' must not be deinitialized
+     during the lifetime of 'list' .
 
      This function must be called after
      'gnutls_x509_trust_list_add_cas()' to allow verifying the CRLs for
-     validity.  If the flag 'GNUTLS_TL_NO_DUPLICATES' is given, then any
-     provided CRLs that are a duplicate, will be deinitialized and not
-     added to the list (that assumes that
-     'gnutls_x509_trust_list_deinit()' will be called with all=1).
+     validity.  If the flag 'GNUTLS_TL_NO_DUPLICATES' is given, then the
+     final CRL list will not contain duplicate entries.
 
-     If GNUTLS_TL_VERIFY_CRL is given the CRLs will be verified before
-     being added.
+     If the flag 'GNUTLS_TL_NO_DUPLICATES' is given,
+     'gnutls_x509_trust_list_deinit()' must be called with parameter
+     'all' being 1.
 
-     *Returns:* The number of added elements is returned.
+     If flag 'GNUTLS_TL_VERIFY_CRL' is given the CRLs will be verified
+     before being added, and if verification fails, they will be
+     skipped.
+
+     *Returns:* The number of added elements is returned; that includes
+     duplicate entries.
 
      *Since:* 3.0
 
@@ -7905,8 +8449,8 @@ gnutls_x509_trust_list_add_named_crt
      certificates that are trusted by the user for that specific server
      but for no other purposes.
 
-     The certificate must not be deinitialized during the lifetime of
-     the trusted list.
+     The certificate 'cert' must not be deinitialized during the
+     lifetime of the 'list' .
 
      *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
      otherwise a negative error value.
@@ -8017,6 +8561,9 @@ gnutls_x509_trust_list_add_trust_mem
 
      This function will add the given certificate authorities to the
      trusted list.
+
+     If this function is used 'gnutls_x509_trust_list_deinit()' must be
+     called with parameter 'all' being 1.
 
      *Returns:* The number of added elements is returned.
 
@@ -8169,7 +8716,10 @@ gnutls_x509_trust_list_iter_get_ca
      'GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE' is returned and the
      iterator is reset.
 
-     After use, the iterator must be deinitialized usin
+     The iterator is deinitialized and reset to 'NULL' automatically by
+     this function after iterating through all elements until
+     'GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE' is returned.  If the
+     iteration is aborted early, it must be manually deinitialized using
      'gnutls_x509_trust_list_iter_deinit()' .
 
      *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
@@ -8321,14 +8871,14 @@ gnutls_x509_trust_list_verify_crt2
      verification flags.
 
      Additional verification parameters are possible via the 'data'
-     types; the acceptable types are 'GNUTLS_DT_DNS_HOSTNAME' and
-     'GNUTLS_DT_KEY_PURPOSE_OID' .  The former accepts as data a
-     null-terminated hostname, and the latter a null-terminated object
-     identifier (e.g., 'GNUTLS_KP_TLS_WWW_SERVER' ).  If a DNS hostname
-     is provided then this function will compare the hostname in the end
-     certificate against the given.  If names do not match the
-     'GNUTLS_CERT_UNEXPECTED_OWNER' status flag will be set.  In
-     addition it will consider certificates provided with
+     types; the acceptable types are 'GNUTLS_DT_DNS_HOSTNAME' ,
+     'GNUTLS_DT_IP_ADDRESS' and 'GNUTLS_DT_KEY_PURPOSE_OID' .  The
+     former accepts as data a null-terminated hostname, and the latter a
+     null-terminated object identifier (e.g., 'GNUTLS_KP_TLS_WWW_SERVER'
+     ).  If a DNS hostname is provided then this function will compare
+     the hostname in the end certificate against the given.  If names do
+     not match the 'GNUTLS_CERT_UNEXPECTED_OWNER' status flag will be
+     set.  In addition it will consider certificates provided with
      'gnutls_x509_trust_list_add_named_crt()' .
 
      If a key purpose OID is provided and the end-certificate contains

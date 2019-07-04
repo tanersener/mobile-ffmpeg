@@ -17,7 +17,7 @@ values of the: @code{GNUTLS_KEY_DIGITAL_SIGNATURE} ,
 @code{GNUTLS_KEY_KEY_CERT_SIGN} , @code{GNUTLS_KEY_CRL_SIGN} ,
 @code{GNUTLS_KEY_ENCIPHER_ONLY} , @code{GNUTLS_KEY_DECIPHER_ONLY} .
 
-@strong{Returns:} the certificate key usage, or a negative error code in case of
+@strong{Returns:} zero on success, or a negative error code in case of
 parsing error.  If the certificate does not contain the keyUsage
 extension @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  will be
 returned.

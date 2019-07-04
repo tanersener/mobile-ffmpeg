@@ -19,6 +19,8 @@
 
 package com.arthenica.mobileffmpeg;
 
+import android.os.Build;
+
 /**
  * <p>This class is used to detect running ABI name using Android's <code>cpufeatures</code>
  * library.
@@ -30,12 +32,21 @@ public class AbiDetect {
 
     static {
         armV7aNeonLoaded = false;
+
+        /* LOAD NOT-LOADED LIBRARIES ON API < 21 */
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            System.loadLibrary("cpufeatures");
+        }
         System.loadLibrary("mobileffmpeg-abidetect");
 
         /* ALL LIBRARIES LOADED AT STARTUP */
         Config.class.getName();
         FFmpeg.class.getName();
     }
+
+    static final String ARM_V7A = "arm-v7a";
+
+    static final String ARM_V7A_NEON = "arm-v7a-neon";
 
     private static boolean armV7aNeonLoaded;
 
@@ -56,7 +67,7 @@ public class AbiDetect {
      */
     public static String getAbi() {
         if (armV7aNeonLoaded) {
-            return "arm-v7a-neon";
+            return ARM_V7A_NEON;
         } else {
             return getNativeAbi();
         }
@@ -67,7 +78,7 @@ public class AbiDetect {
      *
      * @return loaded ABI name
      */
-    private native static String getNativeAbi();
+    public native static String getNativeAbi();
 
     /**
      * <p>Returns ABI name of the running cpu.
@@ -82,5 +93,12 @@ public class AbiDetect {
      * @return YES or NO
      */
     native static boolean isNativeLTSBuild();
+
+    /**
+     * <p>Returns build configuration for <code>FFmpeg</code>.
+     *
+     * @return build configuration string
+     */
+    native static String getNativeBuildConf();
 
 }

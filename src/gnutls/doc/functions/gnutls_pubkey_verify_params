@@ -5,7 +5,7 @@
 @deftypefun {int} {gnutls_pubkey_verify_params} (gnutls_pubkey_t @var{key})
 @var{key}: should contain a @code{gnutls_pubkey_t}  type
 
-This function will verify the private key parameters.
+This function will verify the public key parameters.
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.

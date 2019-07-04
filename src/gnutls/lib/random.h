@@ -16,19 +16,18 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
-#ifndef RANDOM_H
-#define RANDOM_H
+#ifndef GNUTLS_LIB_RANDOM_H
+#define GNUTLS_LIB_RANDOM_H
 
 #include <gnutls/crypto.h>
 #include <crypto-backend.h>
 #include "nettle/rnd-common.h"
 
 extern int crypto_rnd_prio;
-extern void *gnutls_rnd_ctx;
 extern gnutls_crypto_rnd_st _gnutls_rnd_ops;
 
 void _gnutls_rnd_deinit(void);
@@ -39,4 +38,4 @@ inline static int _gnutls_rnd_check(void)
 	return _rnd_system_entropy_check();
 }
 
-#endif
+#endif /* GNUTLS_LIB_RANDOM_H */

@@ -9,10 +9,16 @@
 
 @var{output}: where output will be stored
 
-@var{output_size}: contains the maximum size of the output and will be overwritten with actual
+@var{output_size}: contains the maximum size of the output buffer and will be
+overwritten with the actual size.
 
 This function will return information about the PKCS 11 token such
 as the label, id, etc.
+
+When output is text, a null terminated string is written to  @code{output} and its
+string length is written to  @code{output_size} (without null terminator). If the
+buffer is too small,  @code{output_size} will contain the expected buffer size
+(with null terminator for text) and return @code{GNUTLS_E_SHORT_MEMORY_BUFFER} .
 
 @strong{Returns:} @code{GNUTLS_E_SUCCESS}  (0) on success or a negative error code
 on error.

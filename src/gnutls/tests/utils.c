@@ -325,6 +325,7 @@ void delete_temp_files(void)
 		return;
 
 	while(p != NULL) {
+		remove(p->file);
 		next = p->next;
 		free(p);
 		p = next;

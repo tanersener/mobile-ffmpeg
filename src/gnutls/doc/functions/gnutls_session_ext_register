@@ -2,12 +2,12 @@
 
 
 
-@deftypefun {int} {gnutls_session_ext_register} (gnutls_session_t @var{session}, const char * @var{name}, int @var{type}, gnutls_ext_parse_type_t @var{parse_type}, gnutls_ext_recv_func @var{recv_func}, gnutls_ext_send_func @var{send_func}, gnutls_ext_deinit_data_func @var{deinit_func}, gnutls_ext_pack_func @var{pack_func}, gnutls_ext_unpack_func @var{unpack_func}, unsigned @var{flags})
+@deftypefun {int} {gnutls_session_ext_register} (gnutls_session_t @var{session}, const char * @var{name}, int @var{id}, gnutls_ext_parse_type_t @var{parse_type}, gnutls_ext_recv_func @var{recv_func}, gnutls_ext_send_func @var{send_func}, gnutls_ext_deinit_data_func @var{deinit_func}, gnutls_ext_pack_func @var{pack_func}, gnutls_ext_unpack_func @var{unpack_func}, unsigned @var{flags})
 @var{session}: the session for which this extension will be set
 
 @var{name}: the name of the extension to register
 
-@var{type}: the numeric id of the extension
+@var{id}: the numeric id of the extension
 
 @var{parse_type}: the parse type of the extension (see gnutls_ext_parse_type_t)
 
@@ -28,13 +28,17 @@ only usable within the registered session. If the extension type
 is already registered then @code{GNUTLS_E_ALREADY_REGISTERED}  will be returned,
 unless the flag @code{GNUTLS_EXT_FLAG_OVERRIDE_INTERNAL}  is specified. The latter
 flag when specified can be used to override certain extensions introduced
-after 3.5.12. It is expected to be used by applications which handle
+after 3.6.0. It is expected to be used by applications which handle
 custom extensions that are not currently supported in GnuTLS, but direct
 support for them may be added in the future.
 
 Each registered extension can store temporary data into the gnutls_session_t
 structure using @code{gnutls_ext_set_data()} , and they can be retrieved using
 @code{gnutls_ext_get_data()} .
+
+The validity of the extension registered can be given by the appropriate flags
+of @code{gnutls_ext_flags_t} . If no validity is given, then the registered extension
+will be valid for client and TLS1.2 server hello (or encrypted extensions for TLS1.3).
 
 @strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
 

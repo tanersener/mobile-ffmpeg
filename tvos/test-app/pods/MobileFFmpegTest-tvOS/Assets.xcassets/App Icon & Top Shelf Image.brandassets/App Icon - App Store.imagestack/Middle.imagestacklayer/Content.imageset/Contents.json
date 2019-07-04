@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "idiom" : "tv",
+      "filename" : "mobile-ffmpeg-icon-v5-1280x768.png"
+    }
+  ],
+  "info" : {
+    "version" : 1,
+    "author" : "xcode"
+  }
+}

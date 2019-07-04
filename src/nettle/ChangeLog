@@ -1,3 +1,199 @@
+2019-06-26  Niels Möller  <nisse@lysator.liu.se>
+
+	* Released nettle-3.5.1.
+
+	* configure.ac: Update version number to 3.5.1.
+
+	* Makefile.in (distdir): Add x86_64/sha_ni to list of distributed
+	directories.
+
+	* Released nettle-3.5.
+
+2019-06-25  Niels Möller  <nisse@lysator.liu.se>
+
+	* config.sub: Update to 2019-05-23 version, from savannah's
+	config.git.
+	* config.guess: Update to 2019-06-10 version, from savannah's
+	config.git. Adds recognition of mips R6 and riscv.
+
+2019-06-05  Niels Möller  <nisse@lysator.liu.se>
+
+	Further separation of CMAC per-message state from the
+	message-independent subkeys, analogous to the gcm implementation.
+	* cmac.h (struct cmac128_ctx): Remove key, instead a struct
+	cmac128_key should be passed separately to functions that need it.
+	(CMAC128_CTX): Include both a struct cmac128_key and a struct
+	cmac128_ctx.
+	(CMAC128_SET_KEY, CMAC128_DIGEST): Updated accordingly.
+
+	* cmac.c (cmac128_set_key): Change argument type from cmac128_ctx
+	to cmac128_key. Use a nettle_block16 for the constant zero block.
+	(cmac128_init): New function, to initialize a cmac128_ctx.
+	(cmac128_digest): Add cmac128_key argument. Move padding memset
+	into the block handling a partial block. Call cmac128_init to
+	reset state.
+
+2019-06-01  Niels Möller  <nisse@lysator.liu.se>
+
+	* cmac.h (struct cmac128_key): New struct.
+	* cmac.h (struct cmac128_ctx): Use struct cmac128_key.
+	* cmac.c (cmac128_set_key, cmac128_digest): Update accordingly.
+
+2019-05-12  Niels Möller  <nisse@lysator.liu.se>
+
+	Delete old libdes/openssl compatibility interface.
+	* des-compat.c: Delete file.
+	* des-compat.h: Delete file.
+	* testsuite/des-compat-test.c: Delete file.
+	* nettle.texinfo (Compatibility functions): Delete mention in documentation.
+
+2019-05-11  Niels Möller  <nisse@lysator.liu.se>
+
+	* NEWS: More updates for Nettle-3.5.
+
+2019-04-27  Niels Möller  <nisse@lysator.liu.se>
+
+	From Simo Sorce:
+	* x86_64/poly1305-internal.asm: Add missing EPILOGUE.
+	* x86_64/serpent-decrypt.asm: Likewise.
+	* x86_64/serpent-encrypt.asm: Likewise.
+
+2019-04-14  Niels Möller  <nisse@lysator.liu.se>
+
+	* tools/nettle-pbkdf2.c (main): Check strdup return value.
+
+2019-03-29  Niels Möller  <nisse@lysator.liu.se>
+
+	* aes.h (struct aes_ctx): Redefine using a union of key-size
+	specific contexts.
+	* aes-decrypt.c (aes_decrypt): Use switch on key_size.
+	* aes-encrypt.c (aes_encrypt): Likewise.
+	* aes-set-decrypt-key.c (aes_invert_key): Likewise.
+	* aes-set-encrypt-key.c (aes_set_encrypt_key): Likewise.
+
+2019-03-27  Niels Möller  <nisse@lysator.liu.se>
+
+	* xts.c (xts_shift): Arrange with a single write to u64[1].
+	* cmac.c (block_mulx): Rewrite to work in the same way as
+	xts_shift, with 64-bit operations. XTS and CMAC use opposite
+	endianness, but otherwise, these two functions are identical.
+
+2019-03-24  Niels Möller  <nisse@lysator.liu.se>
+
+	From Simo Sorce:
+	* xts.h: New file.
+	* xts.c: New file.
+	(BE_SHIFT): New macro.
+	(xts_shift, check_length, xts_encrypt_message)
+	(xts_decrypt_message): New functions.
+	* xts-aes128.c (xts_aes128_set_encrypt_key)
+	(xts_aes128_set_decrypt_key, xts_aes128_encrypt_message)
+	(xts_aes128_decrypt_message): New file, new functions.
+	* xts-aes256.c (xts_aes256_set_encrypt_key)
+	(xts_aes256_set_decrypt_key, xts_aes256_encrypt_message)
+	(xts_aes256_decrypt_message): New file, new functions.
+	* nettle.texinfo (XTS): Document XTS mode.
+	* Makefile.in (nettle_SOURCES): Add xts sourcce files.
+	(HEADERS): New installed header xts.h.
+	* testsuite/xts-test.c: New file.
+	* testsuite/Makefile.in (TS_NETTLE_SOURCES): Add xts-test.c.
+
+2019-02-06  Niels Möller  <nisse@lysator.liu.se>
+
+	* gosthash94.h (struct gosthash94_ctx): Move block buffer last in
+	struct.
+	* md2.h (struct md2_ctx): Likewise.
+	* md4.h (struct md4_ctx): Likewise.
+	* md5.h (struct md5_ctx): Likewise.
+	* ripemd160.h (struct ripemd160_ctx): Likewise.
+	* sha1.h (struct sha1_ctx): Likewise.
+	* sha2.h (struct sha256_ctx, struct sha512_ctx): Likewise.
+
+2019-01-19  Niels Möller  <nisse@lysator.liu.se>
+
+	* examples/Makefile.in (TARGETS): Delete eratosthenes, left over
+	from earlier change.
+
+	* fat-arm.c: Fix declarations of chacha_core functions.
+
+	From Yuriy M. Kaminskiy:
+	* fat-setup.h (chacha_core_func): New typedef.
+	* fat-arm.c (fat_init): Enable choice between
+	_nettle_chacha_core_c and _nettle_chacha_core_neon.
+	* configure.ac (asm_nettle_optional_list): Add
+	chacha-core-internal-2.asm.
+	* chacha-core-internal.c: Enable fat build with C and asm version.
+	* arm/fat/chacha-core-internal-2.asm: New file.
+
+2019-01-12  Niels Möller  <nisse@lysator.liu.se>
+
+	* examples/eratosthenes.c: Deleted program.
+	* examples/Makefile.in: Delete rule to build and distribute it.
+
+2019-01-10  Niels Möller  <nisse@lysator.liu.se>
+
+	* testsuite/rsa-compute-root-test.c (test_one): Use %u and
+	corresponding cast, when printing bit sizes.
+
+2019-01-09  Niels Möller  <nisse@lysator.liu.se>
+
+	* examples/nettle-benchmark.c (GET_CYCLE_COUNTER): Add volatile to
+	inline asm.
+
+2019-01-08  Niels Möller  <nisse@lysator.liu.se>
+
+	* sha512-compress.c: Add missing include of sha2-internal.h.
+
+2019-01-06  Niels Möller  <nisse@lysator.liu.se>
+
+	* testsuite/rsa-compute-root-test.c (generate_keypair): Fix assert
+	call with side-effects.
+
+2019-01-06  Niels Möller  <nisse@lysator.liu.se>
+
+	* nettle-types.h: Don't use nettle-stdint.h, include <stdint.h>
+	directly.
+	* nettle-write.h: Likewise.
+	* configure.ac: Delete use of AX_CREATE_STDINT_H.
+	* aclocal.m4 (AX_CREATE_STDINT_H): Delete.
+	* Makefile.in (INSTALL_HEADERS, distclean-here): Delete mention of
+	nettle-stdint.h.
+
+2018-12-26  Niels Möller  <nisse@lysator.liu.se>
+
+	* examples/hogweed-benchmark.c (make_openssl_rsa_ctx): New helper
+	function. Call openssl's RSA_generate_key_ex rather then the
+	deprecated RSA_generate_key.
+	(bench_openssl_rsa_init, bench_openssl_rsa_tr_init): Use it.
+
+	* eccdata.c (ecc_pippenger_precompute): Check that table size is
+	at least 2. Intended to silence warning from the clang static
+	analyzer.
+
+	* configure.ac: Bump package version to 3.5.
+	(LIBNETTLE_MAJOR): Bump major number, now 7.
+	(LIBHOGWEED_MAJOR): Bump major number, now 5.
+	(LIBNETTLE_MINOR, LIBHOGWEED_MINOR): Reset to zero.
+
+	* pkcs1-internal.h: New header file, moved declarations of
+	_pkcs1_sec_decrypt and _pkcs1_sec_decrypt_variable here.
+	* rsa-internal.h: ... old location.
+	* Makefile.in (DISTFILES): Added pkcs1-internal.h.
+	* pkcs1-decrypt.c: Include new file.
+	* pkcs1-sec-decrypt.c: Likewise.
+	* rsa-decrypt-tr.c: Likewise.
+	* rsa-sec-decrypt.c: Likewise.
+	* testsuite/pkcs1-sec-decrypt-test.c: Likewise.
+
+	* tools/nettle-pbkdf2.c: Add #define _GNU_SOURCE, needed for
+	strdup with gcc -std=c89.
+	* testsuite/ed25519-test.c: Add #define _GNU_SOURCE, needed for
+	getline with gcc -std=c89.
+
+	* rsa-sign-tr.c (sec_equal): Fix accidental use of C99 for loop.
+	Reported by Andreas Gustafsson.
+	* testsuite/rsa-sec-decrypt-test.c (test_main): Likewise.
+
 2018-12-04  Niels Möller  <nisse@lysator.liu.se>
 
 	* Released nettle-3.4.1.
@@ -124,36 +320,49 @@
 	(LIBNETTLE_MINOR): Bump library version to 6.5.
 	(LIBHOGWEED_MINOR): Bump library version to 4.5.
 
-2018-06-17  Niels Möller  <nisse@lysator.liu.se>
+2018-11-17  Niels Möller  <nisse@lysator.liu.se>
 
-	Backported from master branch.
-	* aclocal.m4 (NETTLE_CHECK_IFUNC): Fix quoting. Patch contributed
-	by Dmitry Eremin-Solenikov.
-	* testsuite/symbols-test: Exclude ____chkstk_darwin symbols,
-	produced by Apple's Xcode 10 compiler. Patch contributed by
-	Dominyk Tiller.
+	* examples/hogweed-benchmark.c (bench_rsa_verify)
+	(bench_openssl_rsa_tr_init): New functions.
+	(alg_list): Benchmark timing-resistant RSA functions, i.e.,
+	including RSA blinding.
+	(main): Increase width of first column, here and in other
+	printouts.
 
-2018-02-18  Niels Möller  <nisse@lysator.liu.se>
+2018-10-10  Dmitry Eremin-Solenikov  <dbaryshkov@gmail.com>
 
-	Backported from master branch.
-	* testsuite/Makefile.in (TS_NETTLE_SOURCES): Moved pss-mgf1-test.c...
-	(TS_HOGWEED_SOURCES): ...to here. Fixes link failure in builds
-	without public-key support.
-
-2018-01-16  Niels Möller  <nisse@lysator.liu.se>
-
-	Backported from master branch.
-	* tools/pkcs1-conv.c (convert_file): Add missing break statements.
+	* ctr16.c (_ctr_crypt16): Bugfix for the src == dst case, when
+	processing more than on full block of size CTR_BUFFER_LIMIT, src
+	and dst arguments to memxor3 were not properly updated.
 
 2018-10-10  Niels Möller  <nisse@lysator.liu.se>
 
-	Backported from master branch.
 	* aes-set-encrypt-key.c: Add missing include of stdlib.h.
 	* des-compat.c: Likewise.
 
+2018-09-13  Niels Möller  <nisse@lysator.liu.se>
+
+	* rsa-keygen.c (rsa_generate_keypair): Delete unlikely and
+	redundant check for p == q.
+
 2018-08-09  Niels Möller  <nisse@lysator.liu.se>
 
-	Backported from master branch.
+	* rsa-internal.h (_rsa_blind, _rsa_unblind): Mark with
+	_NETTLE_ATTRIBUTE_DEPRECATED.
+
+	* nettle-types.h (_NETTLE_ATTRIBUTE_PURE)
+	(_NETTLE_ATTRIBUTE_DEPRECATED): New macros, for gcc and
+	lookalikes.
+	* ecc-curve.h: Include nettle-types.h, and use
+	_NETTLE_ATTRIBUTE_PURE instead of local definition.
+	* nettle-meta.h: Use _NETTLE_ATTRIBUTE_PURE, instead of explicit
+	#ifdefs.
+
+	* aes.h: Mark functions using struct aes_ctx interface as
+	deprecated. Add #undef _NETTLE_ATTRIBUTE_DEPRECATED in files where
+	the functions are implemented or tested.
+	* gcm.h: Similarly mark functions using gcm_aes_ctx as deprecated.
+
 	* nettle-internal.c (des_set_key_wrapper, des3_set_key_wrapper)
 	(blowfish128_set_key_wrapper): Wrapper functions, to avoid cast
 	between incompatible function types (which gcc-8 warns about).
@@ -161,6 +370,352 @@
 
 	* des-compat.c (des_compat_des3_encrypt)
 	(des_compat_des3_decrypt): Change length argument type to size_t.
+
+2018-08-08  Niels Möller  <nisse@lysator.liu.se>
+
+	* nettle.texinfo (Compatibility): New section on ABI and API
+	compatibility.
+
+2018-07-25  Dmitry Eremin-Solenikov  <dbaryshkov@gmail.com>
+
+	* examples/nettle-benchmark.c: Add benchmarking for HMAC functions.
+
+2018-07-13  Niels Möller  <nisse@lysator.liu.se>
+
+	* examples/eratosthenes.c (vector_alloc): Add assert related to
+	overflow in the size calculation. Fixes a corner case identified
+	by static analysis.
+	(vector_init): Analogous assert.
+
+2018-07-12  Niels Möller  <nisse@lysator.liu.se>
+
+	* examples/eratosthenes.c (main): Don't allocate bitmap storage
+	for limit == 2 (early exit), closing memory leak at exit.
+	(main): Fix handling of short -q option.
+
+	* eccdata.c (output_curve): Replace mpz_init_set_ui by mpz_set_ui,
+	to fix memory leak.
+	(ecc_curve_clear): New function.
+	(main): Call it, to deallocate storage before exit.
+
+2018-07-08  Niels Möller  <nisse@lysator.liu.se>
+
+	* fat-x86_64.c (fat_init): Fix setup for nettle_sha1_compress.
+	* x86_64/fat/sha1-compress.asm: Add leading underscore to symbol name.
+	* x86_64/fat/sha1-compress-2.asm: Likewise.
+
+2018-07-07  Niels Möller  <nisse@lysator.liu.se>
+
+	From Nikos Mavrogiannopoulos.
+	* sha1-compress.c (nettle_sha1_compress): Renamed, and promoted to
+	public function, since there's known appliation usage (filezilla).
+	* sha1.h (_nettle_sha1_compress): Old name, now a preprocessor
+	alias for the new name.
+	* md5-compress.c (nettle_md5_compress): Similarly renamed (used by
+	sogo).
+	* md5.h (_nettle_md5_compress): Old name,, now a preprocessor
+	alias for the new name.
+
+	* chacha-internal.h, dsa-internal.h, eddsa-internal.h:
+	* hogweed-internal.h, ripemd160-internal.h, rsa-internal.h:
+	* salsa20-internal.h, sha2-internal.h, sha3-internal.h:
+	* umac-internal.h: Internal declarations moved to new header
+	files, which are not installed..
+	* Makefile.in (DISTFILES): Added above files.
+
+	* libnettle.map.in: Use a different symbol version for _nettle_*
+	symbols, depending on the minor release. This marks these symbols
+	explicitly not part of the public Nettle ABI.
+	* libhogweed.map.in: Analogous change.
+
+2018-06-17  Niels Möller  <nisse@lysator.liu.se>
+
+	* aclocal.m4 (NETTLE_CHECK_IFUNC): Fix quoting. Patch contributed
+	by Dmitry Eremin-Solenikov.
+
+	* testsuite/symbols-test: Exclude ____chkstk_darwin symbols,
+	produced by Apple's Xcode 10 compiler. Patch contributed by
+	Dominyk Tiller.
+
+2018-03-25  Niels Möller  <nisse@lysator.liu.se>
+
+	From Michael Weiser.
+	* configure.ac (ASM_WORDS_BIGENDIAN): New substution, set from AC_C_BIGENDIAN.
+	* config.m4.in: Use it to set WORDS_BIGENDIAN.
+	* asm.m4 (IF_BE, IF_LE): New macros.
+	* arm/memxor.asm: Support big-endian ARM.
+	* arm/memxor3.asm: Likewise.
+	* arm/neon/chacha-core-internal.asm: Likewise.
+	* arm/neon/salsa20-core-internal.asm: Likewise.
+	* arm/neon/umac-nh.asm: Likewise.
+	* arm/v6/sha1-compress.asm: Likewise.
+	* arm/v6/sha256-compress.asm: Likewise.
+	* arm/README: Document big-endian considerations.
+
+2018-03-17  Niels Möller  <nisse@lysator.liu.se>
+
+	Discourage direct access to data symbols with non-public size.
+	Direct references to these symbols may result in copy-relocations
+	like R_X86_64_COPY, which make the symbol size leak into the ABI.
+	* ecc-curve.h (_nettle_secp_192r1, _nettle_secp_224r1)
+	(_nettle_secp_256r1, _nettle_secp_384r1, _nettle_secp_521r1): Add
+	leading underscore on these data symbols.
+
+	* nettle-meta.h (_nettle_ciphers, _nettle_hashes, _nettle_aeads)
+	(_nettle_armors): Add leading underscore on these data symbols.
+	Update all internal use. Macros without leading underscore remain,
+	and expand to access via accessor functions nettle_get_ciphers and
+	similar.
+
+2018-03-10  Niels Möller  <nisse@lysator.liu.se>
+
+	* eccdata.c (ecc_table_size): New helper function.
+	(ecc_pippenger_precompute): Display warning for poor parameters.
+
+	* eccparams.c (main): New program, to list parameter alternatives
+	for Pippenger's algorithm.
+
+	* Makefile.in: Tweak parameters for ecc tables.
+	(ecc-192.h): Change parameters from k = 7, c = 6 to k = 8, c = 6.
+	Reduces table size from 15 KB to 12 KB. Modest speedup, appr. 3%
+	for ecdsa signatures.
+	(ecc-224.h): Change parameters from k = 12, c = 6 to k = 16, c =
+	7. Table size unchanged (14 KB in 32-bit platforms, 18 KB on
+	64-bit platforms. Minor speedup, appr. 1% for ecdsa signatures.
+	(ecc-256.h): Change parameters from k = 14, c = 6 to k = 11, c =
+	6. Table size unchanged, 16 KB. 14% speedup for ecdsa signatures.
+	(ecc-384.h): Changed parameters from k = 41, c = 6 to k = 32, c =
+	6. Table size unchanged. 12% speedup for ecdsa signatures.
+	(ecc-521.h): Changed parameters from k = 56, c = 6 to k 44, c = 6.
+	Table size unchanged (17 KB on 32-bit platforms, 18 KB on 64-bit
+	platforms). 15% speedup for ecdsa signatures.
+	(ecc-255.h): Change parameters from k = 14, c = 6 to k = 11, c =
+	6. Table size unchanged, 16 KB. 24% speedup for eddsa signatures.
+
+2018-03-14  Niels Möller  <nisse@lysator.liu.se>
+
+	Merge sha256 code using the x86_64 sha_ni instructions, starting
+	2018-02-21.
+
+2018-03-11  Niels Möller  <nisse@lysator.liu.se>
+
+	* x86_64/fat/sha256-compress.asm: New file.
+	* x86_64/fat/sha256-compress-2.asm: New file.
+	* fat-x86_64.c (fat_init): Select plain x86_64 assembly version or
+	sha_ni version for sha256_compress.
+
+2018-02-21  Niels Möller  <nisse@lysator.liu.se>
+
+	* x86_64/sha_ni/sha256-compress.asm: New implementation using sha_ni
+	instructions.
+
+2018-02-20  Niels Möller  <nisse@lysator.liu.se>
+
+	* testsuite/cmac-test.c (test_cmac_hash): Deallocate ctx properly.
+
+2018-02-19  Niels Möller  <nisse@lysator.liu.se>
+
+	Mostly aesthetic changes. Besides indentation:
+	* cmac.h (struct cmac128): Rename, to cmac128_ctx.
+	(CMAC128_CTX): Rename first member from data to ctx.
+
+	* cmac.c: Use const void * as the type for cipher arguments.
+	(block_mulx): Un-inline.
+	(cmac128_set_key): Make a constant function local.
+
+	* testsuite/cmac-test.c: Delete local typedefs.
+
+2018-02-19  Nikos Mavrogiannopoulos  <nmav@redhat.com>
+
+	Add support for CMAC.
+	* cmac.h: New file.
+	(struct cmac128): New struct.
+	* cmac.c (block_mulx, cmac128_set_key, cmac128_update)
+	(cmac128_digest): New file, new functions.
+	* cmac-aes128.c (cmac_aes128_set_key, cmac_aes128_update)
+	(cmac_aes128_digest): New file, new functions.
+	* cmac-aes256.c (cmac_aes256_set_key, cmac_aes256_update)
+	(cmac_aes256_digest): New file, new functions.
+	* Makefile.in (nettle_SOURCES): Added cmac.c cmac-aes128.c cmac-aes256.c.
+	(HEADERS): Added cmac.h.
+
+	* testsuite/cmac-test.c: New tests.
+	* testsuite/Makefile.in (TS_NETTLE_SOURCES): Add cmac-test.c.
+
+	* examples/nettle-benchmark.c (time_cmac): New function.
+	(main): Use it.
+
+	* nettle.texinfo: Document CMAC.
+
+2018-02-20  Niels Möller  <nisse@lysator.liu.se>
+
+	* testsuite/cbc-test.c (test_cbc_bulk): Use struct
+	aes256_ctx, instead of the deprecated struct aes_ctx.
+	* testsuite/cfb-test.c (test_cfb_bulk): Likewise.
+	* examples/rsa-session.h (struct rsa_session): Likewise.
+	* examples/rsa-encrypt.c (rsa_session_set_encrypt_key)
+	(process_file): Use aes256_* functions.
+	* examples/rsa-decrypt.c (rsa_session_set_decrypt_key)
+	(process_file): Likewise.
+
+2018-02-19  Niels Möller  <nisse@lysator.liu.se>
+
+	* nettle-internal.h: Include sha3.h, needed for the definition of
+	NETTLE_MAX_HASH_CONTEXT_SIZE.
+	(TMP_DECL_ALIGN, TMP_ALLOC_ALIGN): New macros, to support
+	allocation of context structs with alignment requirements.
+	[!HAVE_ALLOCA]: Also use assert, rather than calling abort
+	directly.
+
+	* pss.c (pss_encode_mgf1, pss_verify_mgf1): Use new macros.
+	* pss-mgf1.c (pss_mgf1): Likewise.
+
+2018-02-18  Niels Möller  <nisse@lysator.liu.se>
+
+	* testsuite/Makefile.in (TS_NETTLE_SOURCES): Moved pss-mgf1-test.c...
+	(TS_HOGWEED_SOURCES): ...to here. Fixes link failure in builds
+	without public-key support.
+
+2018-02-18  Dmitry Eremin-Solenikov  <dbaryshkov@gmail.com>
+
+	* examples/nettle-openssl.c): Move expressions with side effects
+	out of asserts.
+
+2018-02-17  Dmitry Eremin-Solenikov  <dbaryshkov@gmail.com>
+
+	(openssl_evp_set_encrypt_key, openssl_evp_set_decrypt_key): Use
+	EVP_CipherInit_ex.
+	* examples/nettle-openssl.c (nettle_openssl_gcm_aes128)
+	(nettle_openssl_gcm_aes192, nettle_openssl_gcm_aes256): New aead
+	algorithms, for benchmarking purposes, and supporting wrapper functions.
+	* nettle-internal.h: Corresponding declarations.
+	* examples/nettle-benchmark.c (main): Include openssl's gcm aes in
+	benchmark.
+
+2018-02-16  Niels Möller  <nisse@lysator.liu.se>
+
+	* nettle.texinfo: Improved index entries.
+	(Cipher functions): Update CAST128/CAST5 docs. Inconsistencies
+	spotted by Henrik Rindlöw.
+
+2018-02-10  Niels Möller  <nisse@lysator.liu.se>
+
+	* configure.ac: New configure option --enable-x86-sha-ni.
+
+2018-02-07  Niels Möller  <nisse@lysator.liu.se>
+
+	* x86_64/fat/sha1-compress.asm: New file.
+	* x86_64/fat/sha1-compress-2.asm: New file.
+	* fat-x86_64.c (fat_init): Select plain x86_64 assembly version or
+	sha_ni version for sha1_compress.
+
+2018-02-05  Niels Möller  <nisse@lysator.liu.se>
+
+	* x86_64/sha_ni/sha1-compress.asm: New implementation using sha_ni
+	instructions.
+
+	* fat-x86_64.c (get_x86_features): Check for sha_ni extension.
+
+	* x86_64/fat/cpuid.asm: Clear %ecx input to cpuid instruction.
+
+2018-02-01  Nikos Mavrogiannopoulos  <nmav@redhat.com>
+
+	* gcm.c (gcm_fill): New function, for use with _ctr_crypt16.
+	(gcm_encrypt, gcm_decrypt): Use _ctr_crypt16. 50% speedup of
+	gcm_aes128, benchmarked on x86_64 with aesni instructions.
+
+2018-02-01  Niels Möller  <nisse@lysator.liu.se>
+
+	Based on a patch contributed by Nikos Mavrogiannopoulos.
+	* ctr16.c (_ctr_crypt16): New file, renamed and generalized
+	function. New function pointer argument, used to fill a block with
+	counter values. Use nettle_block16 * as the type for the buffer to
+	be filled. Always process any final and partial block, and return
+	no value.
+	* ctr.c (ctr_crypt): ... previous, replaced, function.
+	(ctr_fill16): Updated to new argument type.
+	(ctr_crypt): Return immediately after using _ctr_crypt16.
+
+	* ctr-internal.h: New file, declaring _ctr_crypt16.
+	(nettle_fill16_func): New function typedef.
+
+	* Makefile.in (nettle_SOURCES): Added ctr16.c.
+	(DISTFILES): Added ctr-internal.h.
+
+2018-01-30  Niels Möller  <nisse@lysator.liu.se>
+
+	* Makefile.in (clean-here): Don't delete desdata.stamp.
+
+2018-01-24  Jay Foad  <jay.foad@gmail.com>
+
+	* Makefile.in (TARGETS): Delete dependencies on aesdata, desdata,
+	twofishdata, shadata and gcmdata. They are not needed for a normal
+	build.
+	(clean-here): Explicitly delete of above files.
+	(desdata.stamp): New stamp target, to avoid building desdata twice
+	in a parallell build.
+
+2018-01-23  Niels Möller  <nisse@lysator.liu.se>
+
+	* configure.ac (asm_path): Recognize "x86", in addition to "i?86",
+	for 32-bit x86 processors. Reportedly needed for x86 android builds.
+
+2018-01-20  Niels Möller  <nisse@lysator.liu.se>
+
+	CFB8 support, contributed by Dmitry Eremin-Solenikov.
+	* cfb.c (cfb8_encrypt, cfb8_decrypt): New functions.
+	* cfb.h: Declare them.
+	(CFB8_ENCRYPT, CFB8_DECRYPT): New macros.
+	* testsuite/cfb-test.c: New tests for CFB8.
+	* nettle.texinfo (CFB and CFB8): Documentation.
+
+2018-01-16  Niels Möller  <nisse@lysator.liu.se>
+
+	* tools/pkcs1-conv.c (convert_file): Add missing break statements.
+
+2018-01-09  Niels Möller  <nisse@lysator.liu.se>
+
+	* testsuite/testutils.c (test_cipher_ctr): Test operations with
+	shorter sizes.
+
+	* testsuite/ctr-test.c: Additional unofficial test vectors, to
+	exercise carry propagation in the counter, and block size
+	different from 16.
+
+2018-01-08  Niels Möller  <nisse@lysator.liu.se>
+
+	* ctr.c (ctr_crypt16): New function, with optimizations specific
+	to 16-byte block size.
+	(ctr_fill16): New helper function, definition depending on
+	WORDS_BIGENDIAN, and little endian version requiring
+	HAVE_BUILTIN_BSWAP64.
+	(ctr_crypt): Use ctr_crypt16, when appropriate.
+
+	* nettle-types.h (union nettle_block16): Add uint64_t field.
+
+	* configure.ac: Check for __builtin_bswap64, define
+	HAVE_BUILTIN_BSWAP64 if available.
+
+	* ctr.c (ctr_fill): New function. Use in ctr_crypt.
+
+	* ctr.c (ctr_crypt): For in-place operation, increase max buffer
+	size from 4 blocks to 512 bytes, similarly to CBC and CFB.
+	Improves in-place aes128 CTR performance by 25% on x86_64.
+
+	* examples/nettle-benchmark.c (time_cipher): Benchmark in-place
+	operation separately, for cbc_decrypt and ctr_crypt.
+
+	* cbc.c (cbc_decrypt): For in-place operation (src == dst case),
+	eliminate use of src variable.
+	* cfb.c (cfb_decrypt): Likewise.
+	* gcm.c (gcm_crypt): Likewise, and replace one memxor3 by memxor.
+
+2018-01-03  Niels Möller  <nisse@lysator.liu.se>
+
+	* x86_64/aesni/aes-encrypt-internal.asm: Read subkeys into xmm
+	registers before the block loop, and completely unroll the round
+	loop.
+	* x86_64/aesni/aes-decrypt-internal.asm: Likewise.
 
 2017-11-19  Niels Möller  <nisse@lysator.liu.se>
 

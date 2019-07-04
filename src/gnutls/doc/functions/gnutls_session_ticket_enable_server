@@ -8,9 +8,13 @@
 @var{key}: key to encrypt session parameters.
 
 Request that the server should attempt session resumption using
-SessionTicket.   @code{key} must be initialized with
-@code{gnutls_session_ticket_key_generate()} , and should be overwritten
-using @code{gnutls_memset()}  before being released.
+session tickets, i.e., by delegating storage to the client.
+ @code{key} must be initialized using @code{gnutls_session_ticket_key_generate()} .
+To avoid leaking that key, use @code{gnutls_memset()}  prior to
+releasing it.
+
+The default ticket expiration time can be overridden using
+@code{gnutls_db_set_cache_expiration()} .
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, or an
 error code.

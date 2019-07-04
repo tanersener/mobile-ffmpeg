@@ -34,6 +34,31 @@ DECLARE_ALIGNED(32, static const uint8_t, filt4_d4_global_avx2[]) = {
   2, 3, 4, 5, 3, 4, 5, 6, 4, 5, 6, 7, 5, 6, 7, 8,
 };
 
+DECLARE_ALIGNED(32, static const uint8_t, filt_center_global_avx2[32]) = {
+  3, 255, 4, 255, 5, 255, 6, 255, 7, 255, 8, 255, 9, 255, 10, 255,
+  3, 255, 4, 255, 5, 255, 6, 255, 7, 255, 8, 255, 9, 255, 10, 255
+};
+
+DECLARE_ALIGNED(32, static const uint8_t,
+                filt1_global_avx2[32]) = { 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5,
+                                           6, 6, 7, 7, 8, 0, 1, 1, 2, 2, 3,
+                                           3, 4, 4, 5, 5, 6, 6, 7, 7, 8 };
+
+DECLARE_ALIGNED(32, static const uint8_t,
+                filt2_global_avx2[32]) = { 2, 3, 3, 4, 4,  5, 5, 6, 6, 7, 7,
+                                           8, 8, 9, 9, 10, 2, 3, 3, 4, 4, 5,
+                                           5, 6, 6, 7, 7,  8, 8, 9, 9, 10 };
+
+DECLARE_ALIGNED(32, static const uint8_t, filt3_global_avx2[32]) = {
+  4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12,
+  4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12
+};
+
+DECLARE_ALIGNED(32, static const uint8_t, filt4_global_avx2[32]) = {
+  6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14,
+  6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14
+};
+
 #define CONVOLVE_SR_HORIZONTAL_FILTER_8TAP                                     \
   for (i = 0; i < (im_h - 2); i += 2) {                                        \
     __m256i data = _mm256_castsi128_si256(                                     \

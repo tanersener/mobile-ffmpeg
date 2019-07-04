@@ -17,7 +17,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -120,10 +120,10 @@ _nettle_write_be32(unsigned length, uint8_t * dst, uint32_t * src)
 			abort();
 		case 3:
 			dst[--j] = (word >> 8) & 0xff;
-			/* Fall through */
+			FALLTHROUGH;
 		case 2:
 			dst[--j] = (word >> 16) & 0xff;
-			/* Fall through */
+			FALLTHROUGH;
 		case 1:
 			dst[--j] = (word >> 24) & 0xff;
 		}

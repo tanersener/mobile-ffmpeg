@@ -1,5 +1,5 @@
-# po.m4 serial 24 (gettext-0.19)
-dnl Copyright (C) 1995-2014, 2016-2017 Free Software Foundation, Inc.
+# po.m4 serial 24a
+dnl Copyright (C) 1995-2014, 2016, 2018-2019 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -83,12 +83,6 @@ changequote([,])dnl
   AM_PATH_PROG_WITH_TEST(MSGMERGE, msgmerge,
     [$ac_dir/$ac_word --update -q /dev/null /dev/null >&]AS_MESSAGE_LOG_FD[ 2>&1], :)
 
-  dnl Installation directories.
-  dnl Autoconf >= 2.60 defines localedir. For older versions of autoconf, we
-  dnl have to define it here, so that it can be used in po/Makefile.
-  test -n "$localedir" || localedir='${datadir}/locale'
-  AC_SUBST([localedir])
-
   dnl Support for AM_XGETTEXT_OPTION.
   test -n "${XGETTEXT_EXTRA_OPTIONS+set}" || XGETTEXT_EXTRA_OPTIONS=
   AC_SUBST([XGETTEXT_EXTRA_OPTIONS])
@@ -130,14 +124,11 @@ changequote([,])dnl
             if test -n "$OBSOLETE_ALL_LINGUAS"; then
               test -n "$as_me" && echo "$as_me: setting ALL_LINGUAS in configure.in is obsolete" || echo "setting ALL_LINGUAS in configure.in is obsolete"
             fi
-            ALL_LINGUAS_=`sed -e "/^#/d" -e "s/#.*//" "$ac_given_srcdir/$ac_dir/LINGUAS"`
-            # Hide the ALL_LINGUAS assignment from automake < 1.5.
-            eval 'ALL_LINGUAS''=$ALL_LINGUAS_'
+            ALL_LINGUAS=`sed -e "/^#/d" -e "s/#.*//" "$ac_given_srcdir/$ac_dir/LINGUAS"`
             POMAKEFILEDEPS="$POMAKEFILEDEPS LINGUAS"
           else
             # The set of available languages was given in configure.in.
-            # Hide the ALL_LINGUAS assignment from automake < 1.5.
-            eval 'ALL_LINGUAS''=$OBSOLETE_ALL_LINGUAS'
+            ALL_LINGUAS=$OBSOLETE_ALL_LINGUAS
           fi
           # Compute POFILES
           # as      $(foreach lang, $(ALL_LINGUAS), $(srcdir)/$(lang).po)
@@ -208,9 +199,8 @@ changequote([,])dnl
       esac
     done]],
    [# Capture the value of obsolete ALL_LINGUAS because we need it to compute
-    # POFILES, UPDATEPOFILES, DUMMYPOFILES, GMOFILES, CATALOGS. But hide it
-    # from automake < 1.5.
-    eval 'OBSOLETE_ALL_LINGUAS''="$ALL_LINGUAS"'
+    # POFILES, UPDATEPOFILES, DUMMYPOFILES, GMOFILES, CATALOGS.
+    OBSOLETE_ALL_LINGUAS="$ALL_LINGUAS"
     # Capture the value of LINGUAS because we need it to compute CATALOGS.
     LINGUAS="${LINGUAS-%UNSET%}"
    ])
@@ -311,15 +301,13 @@ changequote([,])dnl
   fi
   if test -f "$ac_given_srcdir/$ac_dir/LINGUAS"; then
     # The LINGUAS file contains the set of available languages.
-    ALL_LINGUAS_=`sed -e "/^#/d" -e "s/#.*//" "$ac_given_srcdir/$ac_dir/LINGUAS"`
+    ALL_LINGUAS=`sed -e "/^#/d" -e "s/#.*//" "$ac_given_srcdir/$ac_dir/LINGUAS"`
     POMAKEFILEDEPS="$POMAKEFILEDEPS LINGUAS"
   else
     # Set ALL_LINGUAS to the value of the Makefile variable LINGUAS.
     sed_x_LINGUAS=`$gt_echo "$sed_x_variable" | sed -e '/^ *#/d' -e 's/VARIABLE/LINGUAS/g'`
-    ALL_LINGUAS_=`sed -n -e "$sed_x_LINGUAS" < "$ac_file"`
+    ALL_LINGUAS=`sed -n -e "$sed_x_LINGUAS" < "$ac_file"`
   fi
-  # Hide the ALL_LINGUAS assignment from automake < 1.5.
-  eval 'ALL_LINGUAS''=$ALL_LINGUAS_'
   # Compute POFILES
   # as      $(foreach lang, $(ALL_LINGUAS), $(srcdir)/$(lang).po)
   # Compute UPDATEPOFILES

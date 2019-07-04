@@ -39,8 +39,7 @@ unsigned _dsa_check_qp_sizes(unsigned q_bits, unsigned p_bits, unsigned generate
 {
 	switch (q_bits) {
 	case 160:
-		if (_gnutls_fips_mode_enabled() != 0 && generate != 0)
-			return 0;
+		FIPS_RULE(generate != 0, 0, "DSA 160-bit generation\n");
 
 		if (p_bits != 1024)
 			return 0;
@@ -155,7 +154,7 @@ _dsa_generate_dss_pq(struct dsa_params *params,
 	mpz_set_ui(r, 1);
 	mpz_mul_2exp(r, r, p_bits - 1);
 
-	mpz_mod_2exp(tmp, tmp, p_bits - 1);
+	mpz_fdiv_r_2exp(tmp, tmp, p_bits - 1);
 	mpz_add(tmp, tmp, r);
 
 	/* Generate candidate prime p in [2^(bits-1), 2^bits] */
@@ -422,10 +421,7 @@ _dsa_generate_dss_pqg(struct dsa_params *params,
 	if (_gnutls_fips_mode_enabled() != 0) {
 		cert->seed_length = 2 * (q_bits / 8) + 1;
 
-		if (cert->seed_length != seed_size) {
-			_gnutls_debug_log("Seed length must be %d bytes (it is %d)\n", cert->seed_length, seed_size);
-			return 0;
-		}
+		FIPS_RULE(cert->seed_length != seed_size, 0, "unsupported DSA seed length (is %d, should be %d)\n", seed_size, cert->seed_length);
 	} else {
 		cert->seed_length = seed_size;
 	}

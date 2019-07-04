@@ -5,7 +5,7 @@ SHELL = /bin/sh
 MAKE = make
 AUTOCONF = autoconf-2.69
 AUTOHEADER = autoheader-2.69
-ACLOCAL = aclocal-1.15
+ACLOCAL = aclocal-1.16
 CP = cp
 RM = rm -f
 
@@ -13,15 +13,15 @@ all : configures include/localcharset.h.build.in
 
 autoconf/aclocal.m4 : $(wildcard m4/*.m4)
 	test -d autoconf || mkdir autoconf
-	$(ACLOCAL) -I m4 --output=$@
+	$(ACLOCAL) -I m4 --output=$@ && rm -rf autom4te.cache
 
 configures : configure config.h.in
 
 configure : configure.ac autoconf/aclocal.m4
-	$(AUTOCONF) --include autoconf
+	$(AUTOCONF) --include autoconf && rm -rf autom4te.cache
 
 config.h.in : configure.ac autoconf/aclocal.m4
-	$(AUTOHEADER) --include autoconf
+	$(AUTOHEADER) --include autoconf && rm -rf autom4te.cache
 	touch config.h.in
 
 include/localcharset.h.build.in : include/localcharset.h.in include/export.h

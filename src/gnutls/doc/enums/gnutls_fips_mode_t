@@ -1,0 +1,21 @@
+
+
+@c gnutls_fips_mode_t
+@table @code
+@item GNUTLS_@-FIPS140_@-DISABLED
+The FIPS140-2 mode is disabled.
+@item GNUTLS_@-FIPS140_@-STRICT
+The default mode; all forbidden operations will cause an
+operation failure via error code.
+@item GNUTLS_@-FIPS140_@-SELFTESTS
+A transient state during library initialization. That state
+cannot be set or seen by applications.
+@item GNUTLS_@-FIPS140_@-LAX
+The library still uses the FIPS140-2 relevant algorithms but all
+forbidden by FIPS140-2 operations are allowed; this is useful when the
+application is aware of the followed security policy, and needs
+to utilize disallowed operations for other reasons (e.g., compatibility).
+@item GNUTLS_@-FIPS140_@-LOG
+Similarly to @code{GNUTLS_FIPS140_LAX} , it allows forbidden operations; any use of them results
+to a message to the audit callback functions.
+@end table

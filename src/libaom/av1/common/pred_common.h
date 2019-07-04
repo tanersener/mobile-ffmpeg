@@ -182,6 +182,7 @@ int av1_get_palette_cache(const MACROBLOCKD *const xd, int plane,
                           uint16_t *cache);
 
 static INLINE int av1_get_palette_bsize_ctx(BLOCK_SIZE bsize) {
+  assert(bsize < BLOCK_SIZES_ALL);
   return num_pels_log2_lookup[bsize] - num_pels_log2_lookup[BLOCK_8X8];
 }
 

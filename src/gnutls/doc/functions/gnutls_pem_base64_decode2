@@ -7,7 +7,7 @@
 
 @var{b64_data}: contains the encoded data
 
-@var{result}: the place where decoded data lie
+@var{result}: the location of decoded data
 
 This function will decode the given encoded data. The decoded data
 will be allocated, and stored into result.  If the header given is

@@ -61,11 +61,22 @@ void doit(void)
 	}
 	gnutls_cipher_deinit(ch);
 
+	ret =
+	    gnutls_cipher_init(&ch, GNUTLS_CIPHER_ARCFOUR_128, &key, &iv);
+	if (ret != GNUTLS_E_UNWANTED_ALGORITHM) {
+		fail("gnutls_cipher_init succeeded for arcfour\n");
+	}
+
 	ret = gnutls_hmac_init(&mh, GNUTLS_MAC_SHA1, key.data, key.size);
 	if (ret < 0) {
 		fail("gnutls_hmac_init failed\n");
 	}
 	gnutls_hmac_deinit(mh, NULL);
+
+	ret = gnutls_hmac_init(&mh, GNUTLS_MAC_MD5, key.data, key.size);
+	if (ret != GNUTLS_E_UNWANTED_ALGORITHM) {
+		fail("gnutls_hmac_init succeeded for md5\n");
+	}
 
 	ret = gnutls_rnd(GNUTLS_RND_NONCE, key16, sizeof(key16));
 	if (ret < 0) {
@@ -84,17 +95,21 @@ void doit(void)
 	}
 	gnutls_privkey_deinit(privkey);
 
-	ret = gnutls_x509_privkey_init(&xprivkey);
-	if (ret < 0) {
-		fail("gnutls_privkey_init failed\n");
-	}
-	gnutls_x509_privkey_deinit(xprivkey);
-
 	ret = gnutls_init(&session, 0);
 	if (ret < 0) {
 		fail("gnutls_init failed\n");
 	}
 	gnutls_deinit(session);
+
+	ret = gnutls_x509_privkey_init(&xprivkey);
+	if (ret < 0) {
+		fail("gnutls_privkey_init failed\n");
+	}
+	ret = gnutls_x509_privkey_generate(xprivkey, GNUTLS_PK_RSA, 512, 0);
+	if (ret != GNUTLS_E_PK_GENERATION_ERROR) {
+		fail("gnutls_x509_privkey_generate succeeded (%d) for 512-bit key\n", ret);
+	}
+	gnutls_x509_privkey_deinit(xprivkey);
 
 	/* Test when FIPS140 is set to error state */
 	_gnutls_lib_simulate_error();

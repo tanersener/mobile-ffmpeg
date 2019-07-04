@@ -1,7 +1,7 @@
 //
 // VideoViewController.m
 //
-// Copyright (c) 2018 Taner Sener
+// Copyright (c) 2018-2019 Taner Sener
 //
 // This file is part of MobileFFmpeg.
 //
@@ -82,7 +82,7 @@
     
     playerLayer.frame = rectangularFrame;
     [self.view.layer addSublayer:playerLayer];
-    
+
     alertController = nil;
     statistics = nil;
 
@@ -282,8 +282,6 @@
         return @"-b:v 2M ";
     } else if ([videoCodec isEqualToString:@"aom"]) {
         return @"-crf 30 -strict experimental ";
-    } else if ([videoCodec isEqualToString:@"kvazaar"]) {
-        return @"-preset fast ";
     } else if ([videoCodec isEqualToString:@"theora"]) {
         return @"-qscale:v 7 ";
     } else if ([videoCodec isEqualToString:@"hap"]) {

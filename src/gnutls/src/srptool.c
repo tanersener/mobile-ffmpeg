@@ -15,7 +15,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see
- * <http://www.gnu.org/licenses/>.
+ * <https://www.gnu.org/licenses/>.
  */
 
 #include <config.h>
@@ -76,7 +76,7 @@ static int generate_create_conf(const char *tpasswd_conf)
 {
 	FILE *fd;
 	char line[5 * 1024];
-	int index = 1;
+	int index = 1, srp_idx;
 	gnutls_datum_t g, n;
 	gnutls_datum_t str_g, str_n;
 
@@ -89,26 +89,31 @@ static int generate_create_conf(const char *tpasswd_conf)
 	for (index = 1; index <= 5; index++) {
 
 		if (index == 1) {
-			n = gnutls_srp_1024_group_prime;
-			g = gnutls_srp_1024_group_generator;
-		} else if (index == 2) {
+			srp_idx = 2;
 			n = gnutls_srp_1536_group_prime;
 			g = gnutls_srp_1536_group_generator;
-		} else if (index == 3) {
+		} else if (index == 2) {
+			srp_idx = 3;
 			n = gnutls_srp_2048_group_prime;
 			g = gnutls_srp_2048_group_generator;
-		} else if (index == 4) {
+		} else if (index == 3) {
+			srp_idx = 4;
 			n = gnutls_srp_3072_group_prime;
 			g = gnutls_srp_3072_group_generator;
-		} else if (index == 5) {
+		} else if (index == 4) {
+			srp_idx = 5;
 			n = gnutls_srp_4096_group_prime;
 			g = gnutls_srp_4096_group_generator;
+		} else if (index == 5) {
+			srp_idx = 7;
+			n = gnutls_srp_8192_group_prime;
+			g = gnutls_srp_8192_group_generator;
 		} else {
 			fprintf(stderr, "Unknown index: %d\n", index);
 			return -1;
 		}
 
-		printf("\nGroup %d, of %d bits:\n", index, n.size * 8);
+		printf("\nGroup %d, of %d bits:\n", srp_idx, n.size * 8);
 		print_num("Generator", &g);
 		print_num("Prime", &n);
 
@@ -124,7 +129,7 @@ static int generate_create_conf(const char *tpasswd_conf)
 			return -1;
 		}
 
-		sprintf(line, "%d:%s:%s\n", index, str_n.data, str_g.data);
+		sprintf(line, "%d:%s:%s\n", srp_idx, str_n.data, str_g.data);
 
 		gnutls_free(str_n.data);
 		gnutls_free(str_g.data);
@@ -381,7 +386,6 @@ int main(int argc, char **argv)
 {
 	const char *passwd;
 	int salt_size, ret;
-	int optct;
 	const char *fpasswd, *fpasswd_conf;
 	const char *username;
 #ifndef _WIN32
@@ -395,9 +399,7 @@ int main(int argc, char **argv)
 
 	umask(066);
 
-	optct = optionProcess(&srptoolOptions, argc, argv);
-	argc -= optct;
-	argv += optct;
+	optionProcess(&srptoolOptions, argc, argv);
 
 	gnutls_global_set_log_function(tls_log_func);
 	gnutls_global_set_log_level(OPT_VALUE_DEBUG);
@@ -574,7 +576,7 @@ crypt_int(const char *username, const char *passwd, int salt_size,
 		if (fd == NULL) {
 			fprintf(stderr, "Cannot open '%s' for write\n",
 				tpasswd);
-			remove(tmpname);
+			(void)remove(tmpname);
 			return -1;
 		}
 
@@ -582,7 +584,7 @@ crypt_int(const char *username, const char *passwd, int salt_size,
 		if (fd2 == NULL) {
 			fprintf(stderr, "Cannot open '%s' for read\n",
 				tmpname);
-			remove(tmpname);
+			(void)remove(tmpname);
 			return -1;
 		}
 
@@ -615,7 +617,7 @@ crypt_int(const char *username, const char *passwd, int salt_size,
 		fclose(fd);
 		fclose(fd2);
 
-		remove(tmpname);
+		(void)remove(tmpname);
 
 	}
 

@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2011-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -16,12 +17,12 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
-#ifndef AUTH_ECDH_COMMON
-#define AUTH_ECDH_COMMON
+#ifndef GNUTLS_LIB_AUTH_ECDHE_H
+#define GNUTLS_LIB_AUTH_ECDHE_H
 
 #include <auth.h>
 
@@ -37,15 +38,15 @@ _gnutls_gen_ecdh_common_client_kx_int(gnutls_session_t session,
 int
 _gnutls_proc_ecdh_common_client_kx(gnutls_session_t session,
 				   uint8_t * data, size_t _data_size,
-				   gnutls_ecc_curve_t curve,
+				   const struct gnutls_group_entry_st *group,
 				   gnutls_datum_t * psk_key);
 
 int _gnutls_ecdh_common_print_server_kx(gnutls_session_t,
 					gnutls_buffer_st * data,
-					gnutls_ecc_curve_t curve);
+					const struct gnutls_group_entry_st *group);
 int _gnutls_proc_ecdh_common_server_kx(gnutls_session_t session,
 				       uint8_t * data, size_t _data_size);
 
 
 
-#endif
+#endif /* GNUTLS_LIB_AUTH_ECDHE_H */

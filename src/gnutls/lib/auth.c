@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2001-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -16,7 +17,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -137,6 +138,33 @@ gnutls_credentials_set(gnutls_session_t session,
 		}
 	}
 
+	/* sanity tests */
+	if (type == GNUTLS_CRD_CERTIFICATE) {
+		gnutls_certificate_credentials_t c = cred;
+		unsigned i;
+		bool allow_tls13 = 0;
+		unsigned key_usage;
+
+		if (c != NULL && c->ncerts != 0) {
+			for (i = 0; i < c->ncerts; i++) {
+				key_usage = get_key_usage(session, c->certs[i].cert_list[0].pubkey);
+				if (key_usage == 0 || (key_usage & GNUTLS_KEY_DIGITAL_SIGNATURE)) {
+					allow_tls13 = 1;
+					break;
+				}
+			}
+
+			if (session->security_parameters.entity == GNUTLS_SERVER &&
+			    !c->tls13_ok)
+				allow_tls13 = 0;
+
+			if (!allow_tls13) {
+				/* to prevent the server random indicate TLS1.3 support */
+				session->internals.flags |= INT_FLAG_NO_TLS13;
+			}
+		}
+	}
+
 	return 0;
 }
 
@@ -168,7 +196,7 @@ int
 gnutls_credentials_get(gnutls_session_t session,
 		       gnutls_credentials_type_t type, void **cred)
 {
-const void *_cred;
+	const void *_cred;
 
 	_cred = _gnutls_get_cred(session, type);
 	if (_cred == NULL)
@@ -192,21 +220,18 @@ const void *_cred;
  * %GNUTLS_KX_RSA, %GNUTLS_KX_DHE_RSA), the same function are to be
  * used to access the authentication data.
  *
+ * Note that on resumed sessions, this function returns the schema
+ * used in the original session authentication.
+ *
  * Returns: The type of credentials for the current authentication
  *   schema, a #gnutls_credentials_type_t type.
  **/
 gnutls_credentials_type_t gnutls_auth_get_type(gnutls_session_t session)
 {
-/* This is not the credentials we must set, but the authentication data
- * we get by the peer, so it should be reversed.
- */
-	int server =
-	    session->security_parameters.entity == GNUTLS_SERVER ? 0 : 1;
-
-	return
-	    _gnutls_map_kx_get_cred(_gnutls_cipher_suite_get_kx_algo
-				    (session->security_parameters.
-				     cipher_suite), server);
+	if (session->security_parameters.entity == GNUTLS_SERVER)
+		return gnutls_auth_client_get_type(session);
+	else
+		return gnutls_auth_server_get_type(session);
 }
 
 /**
@@ -217,16 +242,16 @@ gnutls_credentials_type_t gnutls_auth_get_type(gnutls_session_t session)
  * The returned information is to be used to distinguish the function used
  * to access authentication data.
  *
+ * Note that on resumed sessions, this function returns the schema
+ * used in the original session authentication.
+ *
  * Returns: The type of credentials for the server authentication
  *   schema, a #gnutls_credentials_type_t type.
  **/
 gnutls_credentials_type_t
 gnutls_auth_server_get_type(gnutls_session_t session)
 {
-	return
-	    _gnutls_map_kx_get_cred(_gnutls_cipher_suite_get_kx_algo
-				    (session->security_parameters.
-				     cipher_suite), 1);
+	return session->security_parameters.server_auth_type;
 }
 
 /**
@@ -237,16 +262,16 @@ gnutls_auth_server_get_type(gnutls_session_t session)
  * The returned information is to be used to distinguish the function used
  * to access authentication data.
  *
+ * Note that on resumed sessions, this function returns the schema
+ * used in the original session authentication.
+ *
  * Returns: The type of credentials for the client authentication
  *   schema, a #gnutls_credentials_type_t type.
  **/
 gnutls_credentials_type_t
 gnutls_auth_client_get_type(gnutls_session_t session)
 {
-	return
-	    _gnutls_map_kx_get_cred(_gnutls_cipher_suite_get_kx_algo
-				    (session->security_parameters.
-				     cipher_suite), 0);
+	return session->security_parameters.client_auth_type;
 }
 
 
@@ -342,14 +367,17 @@ void _gnutls_free_auth_info(gnutls_session_t session)
 
 			dh_info = &info->dh;
 			for (i = 0; i < info->ncerts; i++) {
-				_gnutls_free_datum(&info->
-						   raw_certificate_list
-						   [i]);
+				_gnutls_free_datum(&info->raw_certificate_list[i]);
+			}
+
+			for (i = 0; i < info->nocsp; i++) {
+				_gnutls_free_datum(&info->raw_ocsp_list[i]);
 			}
 
 			gnutls_free(info->raw_certificate_list);
-			info->raw_certificate_list = NULL;
+			gnutls_free(info->raw_ocsp_list);
 			info->ncerts = 0;
+			info->nocsp = 0;
 
 #ifdef ENABLE_DHE
 			_gnutls_free_dh_info(dh_info);
@@ -364,7 +392,6 @@ void _gnutls_free_auth_info(gnutls_session_t session)
 	}
 
 	gnutls_free(session->key.auth_info);
-	session->key.auth_info = NULL;
 	session->key.auth_info_size = 0;
 	session->key.auth_info_type = 0;
 
@@ -377,7 +404,7 @@ void _gnutls_free_auth_info(gnutls_session_t session)
  * info structure to a different type.
  */
 int
-_gnutls_auth_info_set(gnutls_session_t session,
+_gnutls_auth_info_init(gnutls_session_t session,
 		      gnutls_credentials_type_t type, int size,
 		      int allow_change)
 {

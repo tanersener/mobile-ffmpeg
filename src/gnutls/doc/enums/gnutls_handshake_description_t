@@ -12,6 +12,10 @@ Server hello.
 DTLS Hello verify request.
 @item GNUTLS_@-HANDSHAKE_@-NEW_@-SESSION_@-TICKET
 New session ticket.
+@item GNUTLS_@-HANDSHAKE_@-END_@-OF_@-EARLY_@-DATA
+End of early data.
+@item GNUTLS_@-HANDSHAKE_@-ENCRYPTED_@-EXTENSIONS
+Encrypted extensions message.
 @item GNUTLS_@-HANDSHAKE_@-CERTIFICATE_@-PKT
 Certificate packet.
 @item GNUTLS_@-HANDSHAKE_@-SERVER_@-KEY_@-EXCHANGE
@@ -30,8 +34,12 @@ Finished.
 Certificate status (OCSP).
 @item GNUTLS_@-HANDSHAKE_@-SUPPLEMENTAL
 Supplemental.
+@item GNUTLS_@-HANDSHAKE_@-KEY_@-UPDATE
+TLS1.3 key update message.
 @item GNUTLS_@-HANDSHAKE_@-CHANGE_@-CIPHER_@-SPEC
 Change Cipher Spec.
 @item GNUTLS_@-HANDSHAKE_@-CLIENT_@-HELLO_@-V2
 SSLv2 Client Hello.
+@item GNUTLS_@-HANDSHAKE_@-HELLO_@-RETRY_@-REQUEST
+Hello retry request.
 @end table

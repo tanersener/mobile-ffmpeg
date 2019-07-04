@@ -1,0 +1,56 @@
+
+
+
+
+@deftypefun {int} {gnutls_privkey_import_ext4} (gnutls_privkey_t @var{pkey}, void * @var{userdata}, gnutls_privkey_sign_data_func @var{sign_data_fn}, gnutls_privkey_sign_hash_func @var{sign_hash_fn}, gnutls_privkey_decrypt_func @var{decrypt_fn}, gnutls_privkey_deinit_func @var{deinit_fn}, gnutls_privkey_info_func @var{info_fn}, unsigned int @var{flags})
+@var{pkey}: The private key
+
+@var{userdata}: private data to be provided to the callbacks
+
+@var{sign_data_fn}: callback for signature operations (may be @code{NULL} )
+
+@var{sign_hash_fn}: callback for signature operations (may be @code{NULL} )
+
+@var{decrypt_fn}: callback for decryption operations (may be @code{NULL} )
+
+@var{deinit_fn}: a deinitialization function
+
+@var{info_fn}: returns info about the public key algorithm (should not be @code{NULL} )
+
+@var{flags}: Flags for the import
+
+This function will associate the given callbacks with the
+@code{gnutls_privkey_t}  type. At least one of the callbacks
+must be non-null. If a deinitialization function is provided
+then flags is assumed to contain @code{GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE} .
+
+Note that in contrast with the signing function of
+@code{gnutls_privkey_import_ext3()} , the signing functions provided to this
+function take explicitly the signature algorithm as parameter and
+different functions are provided to sign the data and hashes.
+
+The  @code{sign_hash_fn} is to be called to sign pre-hashed data. The input
+to the callback is the output of the hash (such as SHA256) corresponding
+to the signature algorithm. For RSA PKCS@code{1}  signatures, the signature
+algorithm can be set to @code{GNUTLS_SIGN_RSA_RAW} , and in that case the data
+should be handled as if they were an RSA PKCS@code{1}  DigestInfo structure.
+
+The  @code{sign_data_fn} is to be called to sign data. The input data will be
+he data to be signed (and hashed), with the provided signature
+algorithm. This function is to be used for signature algorithms like
+Ed25519 which cannot take pre-hashed data as input.
+
+When both  @code{sign_data_fn} and  @code{sign_hash_fn} functions are provided they
+must be able to operate on all the supported signature algorithms,
+unless prohibited by the type of the algorithm (e.g., as with Ed25519).
+
+The  @code{info_fn} must provide information on the signature algorithms supported by
+this private key, and should support the flags @code{GNUTLS_PRIVKEY_INFO_PK_ALGO} ,
+@code{GNUTLS_PRIVKEY_INFO_HAVE_SIGN_ALGO}  and @code{GNUTLS_PRIVKEY_INFO_PK_ALGO_BITS} .
+It must return -1 on unknown flags.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.6.0
+@end deftypefun

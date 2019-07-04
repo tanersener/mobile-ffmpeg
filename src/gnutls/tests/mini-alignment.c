@@ -53,6 +53,7 @@ int main(int argc, char **argv)
 #include <nettle/aes.h>
 #include <nettle/cbc.h>
 #include <nettle/gcm.h>
+#include <assert.h>
 
 #include "utils.h"
 
@@ -215,14 +216,12 @@ static void myaes_deinit(void *_ctx)
 	free(_ctx);
 }
 
-static void client(int sd)
+static void client(int sd, const char *prio)
 {
 	int ret, ii;
 	gnutls_session_t session;
 	char buffer[MAX_BUF + 1];
 	gnutls_certificate_credentials_t xcred;
-
-	global_init();
 
 	gnutls_global_set_log_function(tls_log_func);
 	if (debug)
@@ -241,8 +240,7 @@ static void client(int sd)
 	 */
 	gnutls_init(&session, GNUTLS_CLIENT);
 
-	/* Use default priorities */
-	gnutls_priority_set_direct(session, "NORMAL:-CIPHER-ALL:+AES-128-CBC", NULL);
+	assert(gnutls_priority_set_direct(session, prio, NULL)>=0);
 
 	/* put the x509 credentials to the current session
 	 */
@@ -328,8 +326,6 @@ static void client(int sd)
 	gnutls_deinit(session);
 
 	gnutls_certificate_free_credentials(xcred);
-
-	gnutls_global_deinit();
 }
 
 /* This is a sample TLS 1.0 echo server, using X.509 authentication.
@@ -382,7 +378,7 @@ const gnutls_datum_t server_key = { server_key_pem,
 	sizeof(server_key_pem)
 };
 
-static void server(int sd)
+static void server(int sd, const char *prio)
 {
 	gnutls_certificate_credentials_t x509_cred;
 	int ret;
@@ -391,22 +387,9 @@ static void server(int sd)
 
 	/* this must be called once in the program
 	 */
-	global_init();
-
 	gnutls_global_set_log_function(tls_log_func);
 	if (debug)
 		gnutls_global_set_log_level(6);
-
-	ret = gnutls_crypto_register_cipher(GNUTLS_CIPHER_AES_128_CBC, 1,
-		myaes_init,
-		myaes_setkey,
-		myaes_setiv,
-		myaes_encrypt,
-		myaes_decrypt,
-		myaes_deinit);
-	if (ret < 0) {
-		fail("%d: cannot register cipher\n", __LINE__);
-	}
 
 	gnutls_certificate_allocate_credentials(&x509_cred);
 	gnutls_certificate_set_x509_trust_mem(x509_cred, &ca,
@@ -424,7 +407,7 @@ static void server(int sd)
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	gnutls_priority_set_direct(session, "NORMAL:-CIPHER-ALL:+AES-128-CBC", NULL);
+	assert(gnutls_priority_set_direct(session, prio, NULL)>=0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
@@ -476,14 +459,12 @@ static void server(int sd)
 
 	gnutls_certificate_free_credentials(x509_cred);
 
-	gnutls_global_deinit();
-
 	if (debug)
 		success("server: finished\n");
 }
 
-
-void doit(void)
+static
+void start(const char *prio)
 {
 	int sockets[2];
 	int err;
@@ -505,10 +486,37 @@ void doit(void)
 	if (child) {
 		int status;
 
-		server(sockets[0]);
+		server(sockets[0], prio);
 		wait(&status);
-	} else
-		client(sockets[1]);
+		check_wait_status(status);
+	} else {
+		client(sockets[1], prio);
+		exit(0);
+	}
+}
+
+void doit(void)
+{
+	int ret;
+
+	global_init();
+
+	ret = gnutls_crypto_register_cipher(GNUTLS_CIPHER_AES_128_CBC, 1,
+		myaes_init,
+		myaes_setkey,
+		myaes_setiv,
+		myaes_encrypt,
+		myaes_decrypt,
+		myaes_deinit);
+	if (ret < 0) {
+		fail("%d: cannot register cipher\n", __LINE__);
+	}
+
+
+	start("NORMAL:-CIPHER-ALL:+AES-128-CBC:-VERS-ALL:+VERS-TLS1.1");
+	start("NORMAL:-CIPHER-ALL:+AES-128-CBC:-VERS-ALL:+VERS-TLS1.2");
+
+	gnutls_global_deinit();
 }
 
 #endif				/* _WIN32 */

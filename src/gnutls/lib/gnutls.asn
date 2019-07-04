@@ -26,18 +26,14 @@ RSAPrivateKey ::= SEQUENCE {
   exponent1        INTEGER, -- (Usually large) d mod (p-1)
   exponent2        INTEGER, -- (Usually large) d mod (q-1)
   coefficient      INTEGER, -- (Usually large) (inverse of q) mod p
-  otherInfo	   RSAOtherInfo OPTIONAL
+  otherPrimeInfos  OtherPrimeInfos OPTIONAL
 }
 
 ProvableSeed ::= SEQUENCE {
-  algorithm OBJECT IDENTIFIER,
+  algorithm OBJECT IDENTIFIER, -- the hash algorithm OID used for FIPS186-4 generation
   seed OCTET STRING
 }
 
-RSAOtherInfo ::= CHOICE {
-  otherPrimeInfos	OtherPrimeInfos, -- the hash algorithm OID used for FIPS186-4 generation
-  seed		    [1] ProvableSeed
-}
 
 OtherPrimeInfos ::= SEQUENCE SIZE(1..MAX) OF OtherPrimeInfo
 
@@ -60,12 +56,10 @@ AlgorithmIdentifier ::= SEQUENCE  {
 
 DigestInfo ::= SEQUENCE {
      digestAlgorithm DigestAlgorithmIdentifier,
-     digest Digest 
+     digest OCTET STRING
 }
 
 DigestAlgorithmIdentifier ::= AlgorithmIdentifier
-
-Digest ::= OCTET STRING
 
 DSAPublicKey ::= INTEGER
 
@@ -86,8 +80,7 @@ DSAPrivateKey ::= SEQUENCE {
   q        INTEGER,
   g        INTEGER,
   Y        INTEGER, -- public
-  priv     INTEGER,
-  seed [1] ProvableSeed OPTIONAL
+  priv     INTEGER
 }
 
 -- from PKCS#3
@@ -98,8 +91,6 @@ DHParameter ::= SEQUENCE {
 }
 
 -- ECC from RFC5480
-ECPoint ::= OCTET STRING
-
 ECParameters ::= CHOICE {
   namedCurve         OBJECT IDENTIFIER
 }
@@ -121,5 +112,23 @@ KRB5PrincipalName ::= SEQUENCE {
 	realm                   [0] GeneralString,
 	principalName           [1] PrincipalName
 }
+
+-- from RFC4055
+RSAPSSParameters ::= SEQUENCE {
+	hashAlgorithm		[0] AlgorithmIdentifier OPTIONAL, -- sha1Identifier
+	maskGenAlgorithm	[1] AlgorithmIdentifier OPTIONAL, -- mgf1SHA1Identifier
+	saltLength		[2] INTEGER DEFAULT 20,
+	trailerField		[3] INTEGER DEFAULT 1
+}
+
+-- GOST R 34.10
+GOSTParameters ::= SEQUENCE {
+   publicKeyParamSet  OBJECT IDENTIFIER,
+   digestParamSet     OBJECT IDENTIFIER,
+   encryptionParamSet OBJECT IDENTIFIER OPTIONAL
+}
+
+GOSTPrivateKey ::= OCTET STRING
+GOSTPrivateKeyOld ::= INTEGER
 
 END

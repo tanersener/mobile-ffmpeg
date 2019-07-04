@@ -24,7 +24,7 @@ void av1_convolve_2d_sr_avx2(const uint8_t *src, int src_stride, uint8_t *dst,
                              int dst_stride, int w, int h,
                              const InterpFilterParams *filter_params_x,
                              const InterpFilterParams *filter_params_y,
-                             const int subpel_x_q4, const int subpel_y_q4,
+                             const int subpel_x_qn, const int subpel_y_qn,
                              ConvolveParams *conv_params) {
   const int bd = 8;
   int im_stride = 8;
@@ -54,8 +54,8 @@ void av1_convolve_2d_sr_avx2(const uint8_t *src, int src_stride, uint8_t *dst,
   filt[0] = _mm256_load_si256((__m256i const *)(filt_global_avx2));
   filt[1] = _mm256_load_si256((__m256i const *)(filt_global_avx2 + 32));
 
-  prepare_coeffs_lowbd(filter_params_x, subpel_x_q4, coeffs_h);
-  prepare_coeffs(filter_params_y, subpel_y_q4, coeffs_v);
+  prepare_coeffs_lowbd(filter_params_x, subpel_x_qn, coeffs_h);
+  prepare_coeffs(filter_params_y, subpel_y_qn, coeffs_v);
 
   // Condition for checking valid horz_filt taps
   if (!(_mm256_extract_epi32(_mm256_or_si256(coeffs_h[0], coeffs_h[3]), 0)))
@@ -214,12 +214,12 @@ void av1_convolve_2d_copy_sr_avx2(const uint8_t *src, int src_stride,
                                   uint8_t *dst, int dst_stride, int w, int h,
                                   const InterpFilterParams *filter_params_x,
                                   const InterpFilterParams *filter_params_y,
-                                  const int subpel_x_q4, const int subpel_y_q4,
+                                  const int subpel_x_qn, const int subpel_y_qn,
                                   ConvolveParams *conv_params) {
   (void)filter_params_x;
   (void)filter_params_y;
-  (void)subpel_x_q4;
-  (void)subpel_y_q4;
+  (void)subpel_x_qn;
+  (void)subpel_y_qn;
   (void)conv_params;
 
   if (w >= 16) {

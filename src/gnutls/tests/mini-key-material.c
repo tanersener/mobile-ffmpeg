@@ -317,7 +317,7 @@ static void server(int fd)
 	 * are adequate.
 	 */
 	ret = gnutls_priority_set_direct(session,
-				   "NORMAL:+ANON-DH:+ANON-ECDH", NULL);
+				   "NORMAL:+ANON-DH:+ANON-ECDH:-VERS-ALL:+VERS-TLS1.0", NULL);
 	if (ret < 0) {
 		fail("server: priority set failed (%s)\n\n",
 		     gnutls_strerror(ret));

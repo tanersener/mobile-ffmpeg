@@ -1,0 +1,49 @@
+
+
+
+
+@deftypefun {void} {gnutls_certificate_set_retrieve_function3} (gnutls_certificate_credentials_t @var{cred}, gnutls_certificate_retrieve_function3 * @var{func})
+@var{cred}: is a @code{gnutls_certificate_credentials_t}  type.
+
+@var{func}: is the callback function
+
+This function sets a callback to be called in order to retrieve the
+certificate and OCSP responses to be used in the handshake.  @code{func} will
+be called only if the peer requests a certificate either during handshake
+or during post-handshake authentication.
+
+The callback's function prototype is defined in `abstract.h':
+int (*callback)(gnutls_session_t, const struct gnutls_cert_retr_st *info,
+gnutls_pcert_st **certs, unsigned int *pcert_length,
+gnutls_datum_t **ocsp, unsigned int *ocsp_length,
+gnutls_privkey_t * pkey, unsigned int *flags);
+
+The info field of the callback contains:
+ @code{req_ca_dn} which is a list with the CA names that the server considers trusted.
+This is a hint and typically the client should send a certificate that is signed
+by one of these CAs. These names, when available, are DER encoded. To get a more
+meaningful value use the function @code{gnutls_x509_rdn_get()} .
+ @code{pk_algos} contains a list with server's acceptable public key algorithms.
+The certificate returned should support the server's given algorithms.
+
+The callback should fill-in the following values.
+
+ @code{pcert} should contain an allocated list of certificates and public keys.
+ @code{pcert_length} is the size of the previous list.
+ @code{ocsp} should contain an allocated list of OCSP responses.
+ @code{ocsp_length} is the size of the previous list.
+ @code{pkey} is the private key.
+
+If flags in the callback are set to @code{GNUTLS_CERT_RETR_DEINIT_ALL}  then
+all provided values must be allocated using @code{gnutls_malloc()} , and will
+be released by gnutls; otherwise they will not be touched by gnutls.
+
+The callback function should set the certificate and OCSP response
+list to be sent, and return 0 on success. If no certificates are available,
+the  @code{pcert_length} and  @code{ocsp_length} should be set to zero. The return
+value (-1) indicates error and the handshake will be terminated. If both
+certificates are set in the credentials and a callback is available, the
+callback takes predence.
+
+@strong{Since:} 3.6.3
+@end deftypefun

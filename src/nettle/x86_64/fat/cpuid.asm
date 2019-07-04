@@ -43,8 +43,9 @@ C output pointer: %rsi
 PROLOGUE(_nettle_cpuid)
 	W64_ENTRY(2)
 	push	%rbx
-	
+
 	movl	%edi, %eax
+	xorl	%ecx, %ecx      C Information we need use ecx = 0
 	cpuid
 	mov	%eax, (%rsi)
 	mov	%ebx, 4(%rsi)

@@ -509,6 +509,7 @@ struct _FcConfig {
      * and those directives may occur in any order
      */
     FcStrSet	*configDirs;	    /* directories to scan for fonts */
+    FcStrSet	*configMapDirs;	    /* mapped names to generate cache entries */
     /*
      * List of directories containing fonts,
      * built by recursively scanning the set
@@ -565,7 +566,6 @@ struct _FcConfig {
     FcChar8     *sysRoot;	    /* override the system root directory */
     FcStrSet	*availConfigFiles;  /* config files available */
     FcPtrList	*rulesetList;	    /* List of rulesets being installed */
-    FcHashTable *uuid_table;	    /* UUID table for cachedirs */
 };
 
 typedef struct _FcFileTime {
@@ -659,7 +659,20 @@ FcConfigAddConfigDir (FcConfig	    *config,
 
 FcPrivate FcBool
 FcConfigAddFontDir (FcConfig	    *config,
-		    const FcChar8   *d);
+		    const FcChar8   *d,
+		    const FcChar8   *m,
+		    const FcChar8   *salt);
+
+FcPrivate FcBool
+FcConfigResetFontDirs (FcConfig *config);
+
+FcPrivate FcChar8 *
+FcConfigMapFontPath(FcConfig		*config,
+		    const FcChar8	*path);
+
+FcPrivate const FcChar8 *
+FcConfigMapSalt (FcConfig      *config,
+		 const FcChar8 *path);
 
 FcPrivate FcBool
 FcConfigAddCacheDir (FcConfig	    *config,
@@ -1022,6 +1035,9 @@ enum {
 };
 
 FcPrivate FcBool
+FcNameConstantWithObjectCheck (const FcChar8 *string, const char *object, int *result);
+
+FcPrivate FcBool
 FcNameBool (const FcChar8 *v, FcBool *result);
 
 FcPrivate FcBool
@@ -1232,6 +1248,24 @@ FcStrSetAddLangs (FcStrSet *strs, const char *languages);
 
 FcPrivate void
 FcStrSetSort (FcStrSet * set);
+
+FcPrivate FcBool
+FcStrSetMemberAB (FcStrSet *set, const FcChar8 *a, FcChar8 *b, FcChar8 **ret);
+
+FcPrivate FcBool
+FcStrSetAddTriple (FcStrSet *set, const FcChar8 *a, const FcChar8 *b, const FcChar8 *c);
+
+FcPrivate const FcChar8 *
+FcStrTripleSecond (FcChar8 *s);
+
+FcPrivate const FcChar8 *
+FcStrTripleThird (FcChar8 *str);
+
+FcPrivate FcBool
+FcStrSetAddFilenamePairWithSalt (FcStrSet *strs, const FcChar8 *d, const FcChar8 *m, const FcChar8 *salt);
+
+FcPrivate FcBool
+FcStrSetDeleteAll (FcStrSet *set);
 
 FcPrivate void
 FcStrBufInit (FcStrBuf *buf, FcChar8 *init, int size);

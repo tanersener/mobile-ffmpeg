@@ -34,12 +34,17 @@
 #include "aom_ports/aom_timer.h"
 #include "aom_scale/aom_scale.h"
 
+#define EXPERIMENT_TEMPORAL_FILTER 1
+#define WINDOW_LENGTH 2
+#define WINDOW_SIZE 25
+#define SCALE 1000
+
 #define EDGE_THRESHOLD 50
 #define SQRT_PI_BY_2 1.25331413732
 
-static unsigned int index_mult[14] = {
-  0, 0, 0, 0, 49152, 39322, 32768, 28087, 24576, 21846, 19661, 17874, 0, 15124
-};
+static unsigned int index_mult[14] = { 0,     0,     0,     0,     49152,
+                                       39322, 32768, 28087, 24576, 21846,
+                                       19661, 17874, 0,     15124 };
 
 static int64_t highbd_index_mult[14] = { 0U,          0U,          0U,
                                          0U,          3221225472U, 2576980378U,
@@ -56,8 +61,8 @@ static void temporal_filter_predictors_mb_c(
   int uv_stride;
   // TODO(angiebird): change plane setting accordingly
   ConvolveParams conv_params = get_conv_params(0, 0, xd->bd);
-  const InterpFilters interp_filters =
-      av1_make_interp_filters(MULTITAP_SHARP, MULTITAP_SHARP);
+  const int_interpfilters interp_filters =
+      av1_broadcast_interp_filter(MULTITAP_SHARP);
   WarpTypesAllowed warp_types;
   memset(&warp_types, 0, sizeof(WarpTypesAllowed));
 
@@ -143,8 +148,9 @@ static void apply_temporal_filter_self(const uint8_t *pred, int buf_stride,
                                        unsigned int block_width,
                                        unsigned int block_height,
                                        int filter_weight, uint32_t *accumulator,
-                                       uint16_t *count) {
-  const int modifier = filter_weight * 16;
+                                       uint16_t *count,
+                                       int use_new_temporal_mode) {
+  const int modifier = use_new_temporal_mode ? SCALE : filter_weight * 16;
   unsigned int i, j, k = 0;
   assert(filter_weight == 2);
 
@@ -161,8 +167,8 @@ static void apply_temporal_filter_self(const uint8_t *pred, int buf_stride,
 static void highbd_apply_temporal_filter_self(
     const uint8_t *pred8, int buf_stride, unsigned int block_width,
     unsigned int block_height, int filter_weight, uint32_t *accumulator,
-    uint16_t *count) {
-  const int modifier = filter_weight * 16;
+    uint16_t *count, int use_new_temporal_mode) {
+  const int modifier = use_new_temporal_mode ? SCALE : filter_weight * 16;
   const uint16_t *pred = CONVERT_TO_SHORTPTR(pred8);
   unsigned int i, j, k = 0;
   assert(filter_weight == 2);
@@ -655,6 +661,205 @@ void av1_highbd_temporal_filter_apply_c(
   }
 }
 
+#if EXPERIMENT_TEMPORAL_FILTER
+void av1_temporal_filter_plane_c(uint8_t *frame1, unsigned int stride,
+                                 uint8_t *frame2, unsigned int stride2,
+                                 int block_width, int block_height,
+                                 int strength, double sigma, int decay_control,
+                                 const int *blk_fw, int use_32x32,
+                                 unsigned int *accumulator, uint16_t *count) {
+  (void)strength;
+  (void)blk_fw;
+  (void)use_32x32;
+  const double decay = decay_control * exp(1 - sigma);
+  const double h = decay * sigma;
+  const double beta = 1.0;
+  for (int i = 0, k = 0; i < block_height; i++) {
+    for (int j = 0; j < block_width; j++, k++) {
+      const int pixel_value = frame2[i * stride2 + j];
+
+      int diff_sse = 0;
+      for (int idy = -WINDOW_LENGTH; idy <= WINDOW_LENGTH; ++idy) {
+        for (int idx = -WINDOW_LENGTH; idx <= WINDOW_LENGTH; ++idx) {
+          int row = i + idy;
+          int col = j + idx;
+          if (row < 0) row = 0;
+          if (row >= block_height) row = block_height - 1;
+          if (col < 0) col = 0;
+          if (col >= block_width) col = block_width - 1;
+
+          int diff = frame1[row * (int)stride + col] -
+                     frame2[row * (int)stride2 + col];
+          diff_sse += diff * diff;
+        }
+      }
+      diff_sse /= WINDOW_SIZE;
+
+      double w = exp(-diff_sse / (2 * beta * h * h));
+      const int weight = (int)(w * SCALE);
+
+      count[k] += weight;
+      accumulator[k] += weight * pixel_value;
+    }
+  }
+}
+
+void av1_highbd_temporal_filter_plane_c(
+    uint8_t *frame1_8bit, unsigned int stride, uint8_t *frame2_8bit,
+    unsigned int stride2, int block_width, int block_height, int strength,
+    double sigma, int decay_control, const int *blk_fw, int use_32x32,
+    unsigned int *accumulator, uint16_t *count) {
+  (void)strength;
+  (void)blk_fw;
+  (void)use_32x32;
+  uint16_t *frame1 = CONVERT_TO_SHORTPTR(frame1_8bit);
+  uint16_t *frame2 = CONVERT_TO_SHORTPTR(frame2_8bit);
+  const double decay = decay_control * exp(1 - sigma);
+  const double h = decay * sigma;
+  const double beta = 1.0;
+  for (int i = 0, k = 0; i < block_height; i++) {
+    for (int j = 0; j < block_width; j++, k++) {
+      const int pixel_value = frame2[i * stride2 + j];
+
+      int diff_sse = 0;
+      for (int idy = -WINDOW_LENGTH; idy <= WINDOW_LENGTH; ++idy) {
+        for (int idx = -WINDOW_LENGTH; idx <= WINDOW_LENGTH; ++idx) {
+          int row = i + idy;
+          int col = j + idx;
+          if (row < 0) row = 0;
+          if (row >= block_height) row = block_height - 1;
+          if (col < 0) col = 0;
+          if (col >= block_width) col = block_width - 1;
+
+          int diff = frame1[row * (int)stride + col] -
+                     frame2[row * (int)stride2 + col];
+          diff_sse += diff * diff;
+        }
+      }
+      diff_sse /= WINDOW_SIZE;
+
+      double w = exp(-diff_sse / (2 * beta * h * h));
+      const int weight = (int)(w * SCALE);
+
+      count[k] += weight;
+      accumulator[k] += weight * pixel_value;
+    }
+  }
+}
+
+void apply_temporal_filter_block(YV12_BUFFER_CONFIG *frame, MACROBLOCKD *mbd,
+                                 int mb_y_src_offset, int mb_uv_src_offset,
+                                 int mb_uv_width, int mb_uv_height,
+                                 int num_planes, uint8_t *predictor,
+                                 int frame_height, int strength, double sigma,
+                                 int *blk_fw, int use_32x32,
+                                 unsigned int *accumulator, uint16_t *count,
+                                 int use_new_temporal_mode) {
+  const int is_hbd = is_cur_buf_hbd(mbd);
+  // High bitdepth
+  if (is_hbd) {
+    if (use_new_temporal_mode) {
+      // Apply frame size dependent non-local means filtering.
+      int decay_control;
+      // The decay is obtained empirically, subject to better tuning.
+      if (frame_height >= 720) {
+        decay_control = 7;
+      } else if (frame_height >= 480) {
+        decay_control = 5;
+      } else {
+        decay_control = 3;
+      }
+      av1_highbd_temporal_filter_plane_c(frame->y_buffer + mb_y_src_offset,
+                                         frame->y_stride, predictor, BW, BW, BH,
+                                         strength, sigma, decay_control, blk_fw,
+                                         use_32x32, accumulator, count);
+      if (num_planes > 1) {
+        av1_highbd_temporal_filter_plane_c(
+            frame->u_buffer + mb_uv_src_offset, frame->uv_stride,
+            predictor + BLK_PELS, mb_uv_width, mb_uv_width, mb_uv_height,
+            strength, sigma, decay_control, blk_fw, use_32x32,
+            accumulator + BLK_PELS, count + BLK_PELS);
+        av1_highbd_temporal_filter_plane_c(
+            frame->v_buffer + mb_uv_src_offset, frame->uv_stride,
+            predictor + (BLK_PELS << 1), mb_uv_width, mb_uv_width, mb_uv_height,
+            strength, sigma, decay_control, blk_fw, use_32x32,
+            accumulator + (BLK_PELS << 1), count + (BLK_PELS << 1));
+      }
+    } else {
+      // Apply original non-local means filtering for small resolution
+      const int adj_strength = strength + 2 * (mbd->bd - 8);
+      if (num_planes <= 1) {
+        // Single plane case
+        av1_highbd_temporal_filter_apply_c(
+            frame->y_buffer + mb_y_src_offset, frame->y_stride, predictor, BW,
+            BH, adj_strength, blk_fw, use_32x32, accumulator, count);
+      } else {
+        // Process 3 planes together.
+        av1_highbd_apply_temporal_filter(
+            frame->y_buffer + mb_y_src_offset, frame->y_stride, predictor, BW,
+            frame->u_buffer + mb_uv_src_offset,
+            frame->v_buffer + mb_uv_src_offset, frame->uv_stride,
+            predictor + BLK_PELS, predictor + (BLK_PELS << 1), mb_uv_width, BW,
+            BH, mbd->plane[1].subsampling_x, mbd->plane[1].subsampling_y,
+            adj_strength, blk_fw, use_32x32, accumulator, count,
+            accumulator + BLK_PELS, count + BLK_PELS,
+            accumulator + (BLK_PELS << 1), count + (BLK_PELS << 1));
+      }
+    }
+    return;
+  }
+
+  // Low bitdepth
+  if (use_new_temporal_mode) {
+    // Apply frame size dependent non-local means filtering.
+    int decay_control;
+    // The decay is obtained empirically, subject to better tuning.
+    if (frame_height >= 720) {
+      decay_control = 7;
+    } else if (frame_height >= 480) {
+      decay_control = 5;
+    } else {
+      decay_control = 3;
+    }
+    av1_temporal_filter_plane_c(frame->y_buffer + mb_y_src_offset,
+                                frame->y_stride, predictor, BW, BW, BH,
+                                strength, sigma, decay_control, blk_fw,
+                                use_32x32, accumulator, count);
+    if (num_planes > 1) {
+      av1_temporal_filter_plane_c(
+          frame->u_buffer + mb_uv_src_offset, frame->uv_stride,
+          predictor + BLK_PELS, mb_uv_width, mb_uv_width, mb_uv_height,
+          strength, sigma, decay_control, blk_fw, use_32x32,
+          accumulator + BLK_PELS, count + BLK_PELS);
+      av1_temporal_filter_plane_c(
+          frame->v_buffer + mb_uv_src_offset, frame->uv_stride,
+          predictor + (BLK_PELS << 1), mb_uv_width, mb_uv_width, mb_uv_height,
+          strength, sigma, decay_control, blk_fw, use_32x32,
+          accumulator + (BLK_PELS << 1), count + (BLK_PELS << 1));
+    }
+  } else {
+    // Apply original non-local means filtering for small resolution
+    if (num_planes <= 1) {
+      // Single plane case
+      av1_temporal_filter_apply_c(frame->y_buffer + mb_y_src_offset,
+                                  frame->y_stride, predictor, BW, BH, strength,
+                                  blk_fw, use_32x32, accumulator, count);
+    } else {
+      // Process 3 planes together.
+      av1_apply_temporal_filter(
+          frame->y_buffer + mb_y_src_offset, frame->y_stride, predictor, BW,
+          frame->u_buffer + mb_uv_src_offset,
+          frame->v_buffer + mb_uv_src_offset, frame->uv_stride,
+          predictor + BLK_PELS, predictor + (BLK_PELS << 1), mb_uv_width, BW,
+          BH, mbd->plane[1].subsampling_x, mbd->plane[1].subsampling_y,
+          strength, blk_fw, use_32x32, accumulator, count,
+          accumulator + BLK_PELS, count + BLK_PELS,
+          accumulator + (BLK_PELS << 1), count + (BLK_PELS << 1));
+    }
+  }
+}
+#endif  // EXPERIMENT_TEMPORAL_FILTER
+
 static int temporal_filter_find_matching_mb_c(AV1_COMP *cpi,
                                               uint8_t *arf_frame_buf,
                                               uint8_t *frame_ptr_buf,
@@ -779,7 +984,7 @@ static int temporal_filter_find_matching_mb_c(AV1_COMP *cpi,
 static void temporal_filter_iterate_c(AV1_COMP *cpi,
                                       YV12_BUFFER_CONFIG **frames,
                                       int frame_count, int alt_ref_index,
-                                      int strength,
+                                      int strength, double sigma,
                                       struct scale_factors *ref_scale_factors) {
   const AV1_COMMON *cm = &cpi->common;
   const int num_planes = av1_num_planes(cm);
@@ -802,6 +1007,14 @@ static void temporal_filter_iterate_c(AV1_COMP *cpi,
   uint8_t *predictor;
   const int mb_uv_height = BH >> mbd->plane[1].subsampling_y;
   const int mb_uv_width = BW >> mbd->plane[1].subsampling_x;
+#if EXPERIMENT_TEMPORAL_FILTER
+  const int is_screen_content_type = cm->allow_screen_content_tools != 0;
+  const int use_new_temporal_mode =
+      AOMMIN(cm->width, cm->height) >= 480 && !is_screen_content_type;
+#else
+  (void)sigma;
+  const int use_new_temporal_mode = 0;
+#endif
 
   // Save input state
   uint8_t *input_buffer[MAX_MB_PLANE];
@@ -932,10 +1145,11 @@ static void temporal_filter_iterate_c(AV1_COMP *cpi,
 
               if (is_hbd) {
                 highbd_apply_temporal_filter_self(pred, pred_stride, w, h,
-                                                  blk_fw[0], accum, cnt);
+                                                  blk_fw[0], accum, cnt,
+                                                  use_new_temporal_mode);
               } else {
                 apply_temporal_filter_self(pred, pred_stride, w, h, blk_fw[0],
-                                           accum, cnt);
+                                           accum, cnt, use_new_temporal_mode);
               }
 
               pred += BLK_PELS;
@@ -944,8 +1158,14 @@ static void temporal_filter_iterate_c(AV1_COMP *cpi,
             }
           } else {
             if (is_hbd) {
+#if EXPERIMENT_TEMPORAL_FILTER
+              apply_temporal_filter_block(
+                  f, mbd, mb_y_src_offset, mb_uv_src_offset, mb_uv_width,
+                  mb_uv_height, num_planes, predictor, cm->height, strength,
+                  sigma, blk_fw, use_32x32, accumulator, count,
+                  use_new_temporal_mode);
+#else
               const int adj_strength = strength + 2 * (mbd->bd - 8);
-
               if (num_planes <= 1) {
                 // Single plane case
                 av1_highbd_temporal_filter_apply_c(
@@ -964,7 +1184,15 @@ static void temporal_filter_iterate_c(AV1_COMP *cpi,
                     count + BLK_PELS, accumulator + (BLK_PELS << 1),
                     count + (BLK_PELS << 1));
               }
+#endif  // EXPERIMENT_TEMPORAL_FILTER
             } else {
+#if EXPERIMENT_TEMPORAL_FILTER
+              apply_temporal_filter_block(
+                  f, mbd, mb_y_src_offset, mb_uv_src_offset, mb_uv_width,
+                  mb_uv_height, num_planes, predictor, cm->height, strength,
+                  sigma, blk_fw, use_32x32, accumulator, count,
+                  use_new_temporal_mode);
+#else
               if (num_planes <= 1) {
                 // Single plane case
                 av1_temporal_filter_apply_c(
@@ -983,6 +1211,7 @@ static void temporal_filter_iterate_c(AV1_COMP *cpi,
                     count + BLK_PELS, accumulator + (BLK_PELS << 1),
                     count + (BLK_PELS << 1));
               }
+#endif  // EXPERIMENT_TEMPORAL_FILTER
             }
           }
         }
@@ -1159,7 +1388,8 @@ static double highbd_estimate_noise(const uint8_t *src8, int width, int height,
 
 // Apply buffer limits and context specific adjustments to arnr filter.
 static void adjust_arnr_filter(AV1_COMP *cpi, int distance, int group_boost,
-                               int *arnr_frames, int *arnr_strength) {
+                               int *arnr_frames, int *arnr_strength,
+                               double *sigma) {
   const AV1EncoderConfig *const oxcf = &cpi->oxcf;
   const int frames_after_arf =
       av1_lookahead_depth(cpi->lookahead) - distance - 1;
@@ -1194,10 +1424,12 @@ static void adjust_arnr_filter(AV1_COMP *cpi, int distance, int group_boost,
     noiselevel = highbd_estimate_noise(
         buf->img.y_buffer, buf->img.y_crop_width, buf->img.y_crop_height,
         buf->img.y_stride, mbd->bd, EDGE_THRESHOLD);
+    *sigma = noiselevel;
   } else {
     noiselevel = estimate_noise(buf->img.y_buffer, buf->img.y_crop_width,
                                 buf->img.y_crop_height, buf->img.y_stride,
                                 EDGE_THRESHOLD);
+    *sigma = noiselevel;
   }
   int adj_strength = oxcf->arnr_strength;
   if (noiselevel > 0) {
@@ -1247,8 +1479,9 @@ void av1_temporal_filter(AV1_COMP *cpi, int distance) {
   struct scale_factors sf;
 
   YV12_BUFFER_CONFIG *frames[MAX_LAG_BUFFERS] = { NULL };
-  const GF_GROUP *const gf_group = &cpi->twopass.gf_group;
+  const GF_GROUP *const gf_group = &cpi->gf_group;
   int rdmult = 0;
+  double sigma = 0;
 
   // Apply context specific adjustments to the arnr filter parameters.
   if (gf_group->update_type[gf_group->index] == INTNL_ARF_UPDATE) {
@@ -1258,8 +1491,8 @@ void av1_temporal_filter(AV1_COMP *cpi, int distance) {
     strength = 0;
     frames_to_blur = 1;
   } else {
-    adjust_arnr_filter(cpi, distance, rc->gfu_boost, &frames_to_blur,
-                       &strength);
+    adjust_arnr_filter(cpi, distance, rc->gfu_boost, &frames_to_blur, &strength,
+                       &sigma);
   }
 
   int which_arf = gf_group->arf_update_idx[gf_group->index];
@@ -1299,5 +1532,5 @@ void av1_temporal_filter(AV1_COMP *cpi, int distance) {
   av1_initialize_cost_tables(&cpi->common, &cpi->td.mb);
 
   temporal_filter_iterate_c(cpi, frames, frames_to_blur,
-                            frames_to_blur_backward, strength, &sf);
+                            frames_to_blur_backward, strength, sigma, &sf);
 }

@@ -39,6 +39,17 @@ typedef struct ScaleVAAPIContext {
 
     char *w_expr;      // width expression string
     char *h_expr;      // height expression string
+
+    char *colour_primaries_string;
+    char *colour_transfer_string;
+    char *colour_matrix_string;
+    int   colour_range;
+    char *chroma_location_string;
+
+    enum AVColorPrimaries colour_primaries;
+    enum AVColorTransferCharacteristic colour_transfer;
+    enum AVColorSpace colour_matrix;
+    enum AVChromaLocation chroma_location;
 } ScaleVAAPIContext;
 
 static const char *scale_vaapi_mode_name(int mode)
@@ -89,9 +100,7 @@ static int scale_vaapi_filter_frame(AVFilterLink *inlink, AVFrame *input_frame)
     VAAPIVPPContext *vpp_ctx = avctx->priv;
     ScaleVAAPIContext *ctx   = avctx->priv;
     AVFrame *output_frame    = NULL;
-    VASurfaceID input_surface, output_surface;
     VAProcPipelineParameterBuffer params;
-    VARectangle input_region;
     int err;
 
     av_log(avctx, AV_LOG_DEBUG, "Filter input: %s, %ux%u (%"PRId64").\n",
@@ -101,10 +110,6 @@ static int scale_vaapi_filter_frame(AVFilterLink *inlink, AVFrame *input_frame)
     if (vpp_ctx->va_context == VA_INVALID_ID)
         return AVERROR(EINVAL);
 
-    input_surface = (VASurfaceID)(uintptr_t)input_frame->data[3];
-    av_log(avctx, AV_LOG_DEBUG, "Using surface %#x for scale input.\n",
-           input_surface);
-
     output_frame = ff_get_video_buffer(outlink, vpp_ctx->output_width,
                                        vpp_ctx->output_height);
     if (!output_frame) {
@@ -112,38 +117,29 @@ static int scale_vaapi_filter_frame(AVFilterLink *inlink, AVFrame *input_frame)
         goto fail;
     }
 
-    output_surface = (VASurfaceID)(uintptr_t)output_frame->data[3];
-    av_log(avctx, AV_LOG_DEBUG, "Using surface %#x for scale output.\n",
-           output_surface);
+    err = av_frame_copy_props(output_frame, input_frame);
+    if (err < 0)
+        return err;
 
-    memset(&params, 0, sizeof(params));
+    if (ctx->colour_primaries != AVCOL_PRI_UNSPECIFIED)
+        output_frame->color_primaries = ctx->colour_primaries;
+    if (ctx->colour_transfer != AVCOL_TRC_UNSPECIFIED)
+        output_frame->color_trc = ctx->colour_transfer;
+    if (ctx->colour_matrix != AVCOL_SPC_UNSPECIFIED)
+        output_frame->colorspace = ctx->colour_matrix;
+    if (ctx->colour_range != AVCOL_RANGE_UNSPECIFIED)
+        output_frame->color_range = ctx->colour_range;
+    if (ctx->chroma_location != AVCHROMA_LOC_UNSPECIFIED)
+        output_frame->chroma_location = ctx->chroma_location;
 
-    input_region = (VARectangle) {
-        .x      = input_frame->crop_left,
-        .y      = input_frame->crop_top,
-        .width  = input_frame->width -
-                 (input_frame->crop_left + input_frame->crop_right),
-        .height = input_frame->height -
-                 (input_frame->crop_top + input_frame->crop_bottom),
-    };
-
-    params.surface = input_surface;
-    params.surface_region = &input_region;
-    params.surface_color_standard =
-        ff_vaapi_vpp_colour_standard(input_frame->colorspace);
-
-    params.output_region = 0;
-    params.output_background_color = VAAPI_VPP_BACKGROUND_BLACK;
-    params.output_color_standard = params.surface_color_standard;
-
-    params.pipeline_flags = 0;
-    params.filter_flags = ctx->mode;
-
-    err = ff_vaapi_vpp_render_picture(avctx, &params, output_surface);
+    err = ff_vaapi_vpp_init_params(avctx, &params,
+                                   input_frame, output_frame);
     if (err < 0)
         goto fail;
 
-    err = av_frame_copy_props(output_frame, input_frame);
+    params.filter_flags |= ctx->mode;
+
+    err = ff_vaapi_vpp_render_picture(avctx, &params, output_frame);
     if (err < 0)
         goto fail;
 
@@ -181,6 +177,24 @@ static av_cold int scale_vaapi_init(AVFilterContext *avctx)
         vpp_ctx->output_format = AV_PIX_FMT_NONE;
     }
 
+#define STRING_OPTION(var_name, func_name, default_value) do { \
+        if (ctx->var_name ## _string) { \
+            int var = av_ ## func_name ## _from_name(ctx->var_name ## _string); \
+            if (var < 0) { \
+                av_log(avctx, AV_LOG_ERROR, "Invalid %s.\n", #var_name); \
+                return AVERROR(EINVAL); \
+            } \
+            ctx->var_name = var; \
+        } else { \
+            ctx->var_name = default_value; \
+        } \
+    } while (0)
+
+    STRING_OPTION(colour_primaries, color_primaries, AVCOL_PRI_UNSPECIFIED);
+    STRING_OPTION(colour_transfer,  color_transfer,  AVCOL_TRC_UNSPECIFIED);
+    STRING_OPTION(colour_matrix,    color_space,     AVCOL_SPC_UNSPECIFIED);
+    STRING_OPTION(chroma_location,  chroma_location, AVCHROMA_LOC_UNSPECIFIED);
+
     return 0;
 }
 
@@ -204,6 +218,36 @@ static const AVOption scale_vaapi_options[] = {
           0, AV_OPT_TYPE_CONST, { .i64 = VA_FILTER_SCALING_HQ }, 0, 0, FLAGS,  "mode" },
         { "nl_anamorphic", "Use nolinear anamorphic scaling algorithm",
           0, AV_OPT_TYPE_CONST, { .i64 = VA_FILTER_SCALING_NL_ANAMORPHIC }, 0, 0, FLAGS,  "mode" },
+
+    // These colour properties match the ones of the same name in vf_scale.
+    { "out_color_matrix", "Output colour matrix coefficient set",
+      OFFSET(colour_matrix_string), AV_OPT_TYPE_STRING, { .str = NULL }, .flags = FLAGS },
+    { "out_range", "Output colour range",
+      OFFSET(colour_range), AV_OPT_TYPE_INT, { .i64 = AVCOL_RANGE_UNSPECIFIED },
+      AVCOL_RANGE_UNSPECIFIED, AVCOL_RANGE_JPEG, FLAGS, "range" },
+    { "full",    "Full range",
+      0, AV_OPT_TYPE_CONST, { .i64 = AVCOL_RANGE_JPEG }, 0, 0, FLAGS, "range" },
+    { "limited", "Limited range",
+      0, AV_OPT_TYPE_CONST, { .i64 = AVCOL_RANGE_MPEG }, 0, 0, FLAGS, "range" },
+    { "jpeg",    "Full range",
+      0, AV_OPT_TYPE_CONST, { .i64 = AVCOL_RANGE_JPEG }, 0, 0, FLAGS, "range" },
+    { "mpeg",    "Limited range",
+      0, AV_OPT_TYPE_CONST, { .i64 = AVCOL_RANGE_MPEG }, 0, 0, FLAGS, "range" },
+    { "tv",      "Limited range",
+      0, AV_OPT_TYPE_CONST, { .i64 = AVCOL_RANGE_MPEG }, 0, 0, FLAGS, "range" },
+    { "pc",      "Full range",
+      0, AV_OPT_TYPE_CONST, { .i64 = AVCOL_RANGE_JPEG }, 0, 0, FLAGS, "range" },
+    // These colour properties are new here.
+    { "out_color_primaries", "Output colour primaries",
+      OFFSET(colour_primaries_string), AV_OPT_TYPE_STRING,
+      { .str = NULL }, .flags = FLAGS },
+    { "out_color_transfer", "Output colour transfer characteristics",
+      OFFSET(colour_transfer_string),  AV_OPT_TYPE_STRING,
+      { .str = NULL }, .flags = FLAGS },
+    { "out_chroma_location", "Output chroma sample location",
+      OFFSET(chroma_location_string),  AV_OPT_TYPE_STRING,
+      { .str = NULL }, .flags = FLAGS },
+
     { NULL },
 };
 

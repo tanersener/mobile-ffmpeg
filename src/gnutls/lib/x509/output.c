@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2007-2016 Free Software Foundation, Inc.
- * Copyright (C) 2015-2016 Red Hat, Inc.
+ * Copyright (C) 2015-2017 Red Hat, Inc.
  *
  * Author: Simon Josefsson, Nikos Mavrogiannopoulos
  *
@@ -17,7 +17,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -30,8 +30,7 @@
 #include <x509_int.h>
 #include <num.h>
 #include "errors.h"
-#include <extras/randomart.h>
-#include "extensions.h"
+#include "hello_ext.h"
 #include "ip.h"
 
 #define addf _gnutls_buffer_append_printf
@@ -70,6 +69,36 @@ static void print_idn_name(gnutls_buffer_st *str, const char *prefix, const char
 	}
 }
 
+static void print_idn_email(gnutls_buffer_st *str, const char *prefix, const char *type, gnutls_datum_t *name)
+{
+	unsigned printable = 1;
+	unsigned is_printed = 0;
+	gnutls_datum_t out = {NULL, 0};
+	int ret;
+
+	if (!_gnutls_str_is_print((char*)name->data, name->size))
+		printable = 0;
+
+	is_printed = 0;
+	if (!printable) {
+		addf(str,  _("%s%s: %.*s (contains illegal chars)\n"), prefix, type, name->size, NON_NULL(name->data));
+		is_printed = 1;
+	} else if (name->data != NULL) {
+		if (strstr((char*)name->data, "xn--") != NULL) {
+			ret = _gnutls_idna_email_reverse_map((char*)name->data, name->size, &out);
+			if (ret >= 0) {
+				addf(str,  _("%s%s: %.*s (%s)\n"), prefix, type, name->size, NON_NULL(name->data), out.data);
+				is_printed = 1;
+				gnutls_free(out.data);
+			}
+		}
+	}
+
+	if (is_printed == 0) {
+		addf(str,  _("%s%s: %.*s\n"), prefix, type, name->size, NON_NULL(name->data));
+	}
+}
+
 static void
 print_name(gnutls_buffer_st *str, const char *prefix, unsigned type, gnutls_datum_t *name, unsigned ip_is_cidr)
 {
@@ -94,7 +123,7 @@ print_name(gnutls_buffer_st *str, const char *prefix, unsigned type, gnutls_datu
 		break;
 
 	case GNUTLS_SAN_RFC822NAME:
-		addf(str,  _("%sRFC822Name: %.*s\n"), prefix, name->size, NON_NULL(name->data));
+		print_idn_email(str, prefix, "RFC822Name", name);
 		break;
 
 	case GNUTLS_SAN_URI:
@@ -945,6 +974,23 @@ static void print_extension(gnutls_buffer_st * str, const char *prefix,
 			}
 		}
 		gnutls_x509_policies_deinit(policies);
+	} else if (strcmp(oid, "2.5.29.54") == 0) {
+		unsigned int skipcerts;
+
+		err = gnutls_x509_ext_import_inhibit_anypolicy(der, &skipcerts);
+		if (err < 0) {
+			addf(str,
+			     "error: certificate inhibit any policy import: %s\n",
+			     gnutls_strerror(err));
+			return;
+		}
+
+		addf(str,
+		     "%s\t\tInhibit anyPolicy skip certs: %u (%s)\n",
+			     prefix, skipcerts,
+			     critical ? _("critical") :
+			     _("not critical"));
+
 	} else if (strcmp(oid, "2.5.29.35") == 0) {
 
 		if (idx->aki) {
@@ -1157,14 +1203,27 @@ print_extensions(gnutls_buffer_st * str, const char *prefix, int type,
 	}
 }
 
+static void reverse_datum(gnutls_datum_t *d)
+{
+	unsigned int i;
+	unsigned char c;
+
+	for (i = 0; i < d->size / 2; i++) {
+		c = d->data[i];
+		d->data[i] = d->data[d->size - i - 1];
+		d->data[d->size - i - 1] = c;
+	}
+}
+
 static void
 print_pubkey(gnutls_buffer_st * str, const char *key_name,
-	     gnutls_pubkey_t pubkey,
+	     gnutls_pubkey_t pubkey, gnutls_x509_spki_st *spki,
 	     gnutls_certificate_print_formats_t format)
 {
-	int err, pk;
+	int err;
 	const char *name;
 	unsigned bits;
+	unsigned pk;
 
 	err = gnutls_pubkey_get_pk_algorithm(pubkey, &bits);
 	if (err < 0) {
@@ -1173,18 +1232,28 @@ print_pubkey(gnutls_buffer_st * str, const char *key_name,
 		return;
 	}
 
-	name = gnutls_pk_algorithm_get_name(err);
+	pk = err;
+
+	name = gnutls_pk_algorithm_get_name(pk);
 	if (name == NULL)
 		name = _("unknown");
 
-	pk = err;
-
 	addf(str, _("\t%sPublic Key Algorithm: %s\n"), key_name, name);
+
 	addf(str, _("\tAlgorithm Security Level: %s (%d bits)\n"),
 	     gnutls_sec_param_get_name(gnutls_pk_bits_to_sec_param
 				       (err, bits)), bits);
+
+	if (spki && pk == GNUTLS_PK_RSA_PSS && spki->pk == pk) {
+		addf(str, _("\t\tParameters:\n"));
+		addf(str, "\t\t\tHash Algorithm: %s\n",
+		     gnutls_digest_get_name(spki->rsa_pss_dig));
+		addf(str, "\t\t\tSalt Length: %d\n", spki->salt_size);
+	}
+
 	switch (pk) {
 	case GNUTLS_PK_RSA:
+	case GNUTLS_PK_RSA_PSS:
 		{
 			gnutls_datum_t m, e;
 
@@ -1232,7 +1301,8 @@ print_pubkey(gnutls_buffer_st * str, const char *key_name,
 		}
 		break;
 
-	case GNUTLS_PK_EC:
+	case GNUTLS_PK_EDDSA_ED25519:
+	case GNUTLS_PK_ECDSA:
 		{
 			gnutls_datum_t x, y;
 			gnutls_ecc_curve_t curve;
@@ -1240,10 +1310,10 @@ print_pubkey(gnutls_buffer_st * str, const char *key_name,
 			err =
 			    gnutls_pubkey_get_pk_ecc_raw(pubkey, &curve,
 							 &x, &y);
-			if (err < 0)
+			if (err < 0) {
 				addf(str, "error: get_pk_ecc_raw: %s\n",
 				     gnutls_strerror(err));
-			else {
+			} else {
 				addf(str, _("\t\tCurve:\t%s\n"),
 				     gnutls_ecc_curve_get_name(curve));
 				if (format ==
@@ -1253,20 +1323,24 @@ print_pubkey(gnutls_buffer_st * str, const char *key_name,
 								x.data,
 								x.size);
 					adds(str, "\n");
-					adds(str, _("\t\tY: "));
-					_gnutls_buffer_hexprint(str,
-								y.data,
-								y.size);
-					adds(str, "\n");
+					if (y.size > 0) {
+						adds(str, _("\t\tY: "));
+						_gnutls_buffer_hexprint(str,
+									y.data,
+									y.size);
+						adds(str, "\n");
+					}
 				} else {
 					adds(str, _("\t\tX:\n"));
 					_gnutls_buffer_hexdump(str, x.data,
 							       x.size,
 							       "\t\t\t");
-					adds(str, _("\t\tY:\n"));
-					_gnutls_buffer_hexdump(str, y.data,
-							       y.size,
-							       "\t\t\t");
+					if (y.size > 0) {
+						adds(str, _("\t\tY:\n"));
+						_gnutls_buffer_hexdump(str, y.data,
+								       y.size,
+								       "\t\t\t");
+					}
 				}
 
 				gnutls_free(x.data);
@@ -1342,44 +1416,147 @@ print_pubkey(gnutls_buffer_st * str, const char *key_name,
 		}
 		break;
 
+	case GNUTLS_PK_GOST_01:
+	case GNUTLS_PK_GOST_12_256:
+	case GNUTLS_PK_GOST_12_512:
+		{
+			gnutls_datum_t x, y;
+			gnutls_ecc_curve_t curve;
+			gnutls_digest_algorithm_t digest;
+			gnutls_gost_paramset_t param;
+
+			err =
+			    gnutls_pubkey_export_gost_raw2(pubkey, &curve,
+							   &digest,
+							   &param,
+							   &x, &y, 0);
+			if (err < 0)
+				addf(str, "error: get_pk_gost_raw: %s\n",
+				     gnutls_strerror(err));
+			else {
+				addf(str, _("\t\tCurve:\t%s\n"),
+				     gnutls_ecc_curve_get_name(curve));
+				addf(str, _("\t\tDigest:\t%s\n"),
+				     gnutls_digest_get_name(digest));
+				addf(str, _("\t\tParamSet: %s\n"),
+				     gnutls_gost_paramset_get_name(param));
+				reverse_datum(&x);
+				reverse_datum(&y);
+				if (format ==
+				    GNUTLS_CRT_PRINT_FULL_NUMBERS) {
+					adds(str, _("\t\tX: "));
+					_gnutls_buffer_hexprint(str,
+								x.data,
+								x.size);
+					adds(str, "\n");
+					adds(str, _("\t\tY: "));
+					_gnutls_buffer_hexprint(str,
+								y.data,
+								y.size);
+					adds(str, "\n");
+				} else {
+					adds(str, _("\t\tX:\n"));
+					_gnutls_buffer_hexdump(str, x.data,
+							       x.size,
+							       "\t\t\t");
+					adds(str, _("\t\tY:\n"));
+					_gnutls_buffer_hexdump(str, y.data,
+							       y.size,
+							       "\t\t\t");
+				}
+
+				gnutls_free(x.data);
+				gnutls_free(y.data);
+
+			}
+		}
+		break;
+
 	default:
 		break;
 	}
 }
 
 static int
+print_crt_sig_params(gnutls_buffer_st * str, gnutls_x509_crt_t crt,
+		     gnutls_certificate_print_formats_t format)
+{
+	int ret;
+	gnutls_pk_algorithm_t pk;
+	gnutls_x509_spki_st params;
+	gnutls_sign_algorithm_t sign;
+
+	sign = gnutls_x509_crt_get_signature_algorithm(crt);
+	pk = gnutls_sign_get_pk_algorithm(sign);
+	if (pk == GNUTLS_PK_RSA_PSS) {
+		ret = _gnutls_x509_read_sign_params(crt->cert,
+						    "signatureAlgorithm",
+						    &params);
+		if (ret < 0) {
+			addf(str, "error: read_pss_params: %s\n",
+			     gnutls_strerror(ret));
+		} else
+			addf(str, "\t\tSalt Length: %d\n", params.salt_size);
+	}
+
+	return 0;
+}
+
+static void print_pk_name(gnutls_buffer_st * str, gnutls_x509_crt_t crt)
+{
+	const char *p;
+	char *name = get_pk_name(crt, NULL);
+	if (name == NULL)
+		p = _("unknown");
+	else
+		p = name;
+
+	addf(str, "\tSubject Public Key Algorithm: %s\n", p);
+	gnutls_free(name);
+}
+
+static int
 print_crt_pubkey(gnutls_buffer_st * str, gnutls_x509_crt_t crt,
 		 gnutls_certificate_print_formats_t format)
 {
-	gnutls_pubkey_t pubkey;
-	int ret;
+	gnutls_pubkey_t pubkey = NULL;
+	gnutls_x509_spki_st params;
+	int ret, pk;
+
+	ret = _gnutls_x509_crt_read_spki_params(crt, &params);
+	if (ret < 0)
+		return ret;
+
+	pk = gnutls_x509_crt_get_pk_algorithm(crt, NULL);
+	if (pk < 0) {
+		gnutls_assert();
+		pk = GNUTLS_PK_UNKNOWN;
+	}
+
+	if (pk == GNUTLS_PK_UNKNOWN) {
+		print_pk_name(str, crt); /* print basic info only */
+		return 0;
+	}
 
 	ret = gnutls_pubkey_init(&pubkey);
 	if (ret < 0)
 		return ret;
 
 	ret = gnutls_pubkey_import_x509(pubkey, crt, 0);
-	if (ret < 0)
+	if (ret < 0) {
+		if (ret != GNUTLS_E_UNIMPLEMENTED_FEATURE)
+			addf(str, "error importing public key: %s\n", gnutls_strerror(ret));
+		print_pk_name(str, crt); /* print basic info only */
+		ret = 0;
 		goto cleanup;
+	}
 
-	print_pubkey(str, _("Subject "), pubkey, format);
+	print_pubkey(str, _("Subject "), pubkey, &params, format);
 	ret = 0;
 
-      cleanup:
-	gnutls_pubkey_deinit(pubkey);
-
-	if (ret < 0) { /* print only name */
-		const char *p;
-		char *name = get_pk_name(crt, NULL);
-		if (name == NULL)
-			p = _("unknown");
-		else
-			p = name;
-
-		addf(str, "\tSubject Public Key Algorithm: %s\n", p);
-		gnutls_free(name);
-		ret = 0;
-	}
+ cleanup:
+	if (pubkey)
+		gnutls_pubkey_deinit(pubkey);
 
 	return ret;
 }
@@ -1440,7 +1617,7 @@ print_cert(gnutls_buffer_st * str, gnutls_x509_crt_t cert,
 		adds(str, _("\tValidity:\n"));
 
 		tim = gnutls_x509_crt_get_activation_time(cert);
-		{
+		if (tim != -1) {
 			char s[42];
 			size_t max = sizeof(s);
 			struct tm t;
@@ -1455,10 +1632,12 @@ print_cert(gnutls_buffer_st * str, gnutls_x509_crt_t cert,
 				     (unsigned long) tim);
 			else
 				addf(str, _("\t\tNot Before: %s\n"), s);
+		} else {
+			addf(str, _("\t\tNot Before: %s\n"), _("unknown"));
 		}
 
 		tim = gnutls_x509_crt_get_expiration_time(cert);
-		{
+		if (tim != -1) {
 			char s[42];
 			size_t max = sizeof(s);
 			struct tm t;
@@ -1473,6 +1652,8 @@ print_cert(gnutls_buffer_st * str, gnutls_x509_crt_t cert,
 				     (unsigned long) tim);
 			else
 				addf(str, _("\t\tNot After: %s\n"), s);
+		} else {
+			addf(str, _("\t\tNot After: %s\n"), _("unknown"));
 		}
 	}
 
@@ -1523,7 +1704,9 @@ print_cert(gnutls_buffer_st * str, gnutls_x509_crt_t cert,
 		addf(str, _("\tSignature Algorithm: %s\n"), p);
 		gnutls_free(name);
 
-		if (err != GNUTLS_SIGN_UNKNOWN && gnutls_sign_is_secure(err) == 0) {
+		print_crt_sig_params(str, cert, format);
+
+		if (err != GNUTLS_SIGN_UNKNOWN && gnutls_sign_is_secure2(err, GNUTLS_SIGN_FLAG_SECURE_FOR_CERTS) == 0) {
 			adds(str,
 			     _("warning: signed using a broken signature "
 			       "algorithm that can be forged.\n"));
@@ -1636,21 +1819,29 @@ static void print_keyid(gnutls_buffer_st * str, gnutls_x509_crt_t cert)
 {
 	int err;
 	const char *name;
-	char *p;
 	unsigned int bits;
 	unsigned char sha1_buffer[MAX_HASH_SIZE];
 	size_t sha1_size;
-
-	print_obj_id(str, "\t", cert, (get_id_func*)gnutls_x509_crt_get_key_id);
 
 	err = gnutls_x509_crt_get_pk_algorithm(cert, &bits);
 	if (err < 0)
 		return;
 
-	if (err == GNUTLS_PK_EC) {
+	print_obj_id(str, "\t", cert, (get_id_func*)gnutls_x509_crt_get_key_id);
+
+	if (IS_EC(err)) {
 		gnutls_ecc_curve_t curve;
 
 		err = gnutls_x509_crt_get_pk_ecc_raw(cert, &curve, NULL, NULL);
+		if (err < 0)
+			return;
+
+		name = gnutls_ecc_curve_get_name(curve);
+		bits = 0;
+	} else if (IS_GOSTEC(err)) {
+		gnutls_ecc_curve_t curve;
+
+		err = gnutls_x509_crt_get_pk_gost_raw(cert, &curve, NULL, NULL, NULL, NULL);
 		if (err < 0)
 			return;
 
@@ -1667,17 +1858,6 @@ static void print_keyid(gnutls_buffer_st * str, gnutls_x509_crt_t cert)
 	err = gnutls_x509_crt_get_key_id(cert, GNUTLS_KEYID_USE_SHA1, sha1_buffer, &sha1_size);
 	if (err == GNUTLS_E_UNIMPLEMENTED_FEATURE) /* unsupported algo */
 		return;
-
-	p = _gnutls_key_fingerprint_randomart(sha1_buffer, sha1_size, name, bits,
-					      "\t\t");
-	if (p == NULL)
-		return;
-
-	adds(str, _("\tPublic key's random art:\n"));
-	adds(str, p);
-	adds(str, "\n");
-
-	gnutls_free(p);
 }
 
 static void
@@ -1762,7 +1942,7 @@ static void print_oneline(gnutls_buffer_st * str, gnutls_x509_crt_t cert)
 		else
 			p = name;
 
-		if (err != GNUTLS_SIGN_UNKNOWN && gnutls_sign_is_secure( err) == 0)
+		if (err != GNUTLS_SIGN_UNKNOWN && gnutls_sign_is_secure2(err, GNUTLS_SIGN_FLAG_SECURE_FOR_CERTS) == 0)
 			addf(str, _("signed using %s (broken!), "), p);
 		else
 			addf(str, _("signed using %s, "), p);
@@ -1842,10 +2022,7 @@ static void print_oneline(gnutls_buffer_st * str, gnutls_x509_crt_t cert)
 
 		err = gnutls_x509_crt_get_key_id(cert, GNUTLS_KEYID_USE_SHA256,
 						 buffer, &size);
-		if (err < 0) {
-			addf(str, "key PIN error (%s)",
-			     gnutls_strerror(err));
-		} else {
+		if (err >= 0) {
 			addf(str, "pin-sha256=\"");
 			_gnutls_buffer_base64print(str, buffer, size);
 			adds(str, "\"");
@@ -2182,7 +2359,7 @@ print_crl(gnutls_buffer_st * str, gnutls_x509_crl_t crl, int notsigned)
 		addf(str, _("\tSignature Algorithm: %s\n"), p);
 		gnutls_free(name);
 
-		if (err != GNUTLS_SIGN_UNKNOWN && gnutls_sign_is_secure(err) == 0) {
+		if (err != GNUTLS_SIGN_UNKNOWN && gnutls_sign_is_secure2(err, GNUTLS_SIGN_FLAG_SECURE_FOR_CERTS) == 0) {
 			adds(str,
 			     _("warning: signed using a broken signature "
 			       "algorithm that can be forged.\n"));
@@ -2249,11 +2426,41 @@ gnutls_x509_crl_print(gnutls_x509_crl_t crl,
 }
 
 static int
+print_crq_sig_params(gnutls_buffer_st * str, gnutls_x509_crq_t crt,
+		     gnutls_certificate_print_formats_t format)
+{
+	int ret;
+	gnutls_pk_algorithm_t pk;
+	gnutls_x509_spki_st params;
+	gnutls_sign_algorithm_t sign;
+
+	sign = gnutls_x509_crq_get_signature_algorithm(crt);
+	pk = gnutls_sign_get_pk_algorithm(sign);
+	if (pk == GNUTLS_PK_RSA_PSS) {
+		ret = _gnutls_x509_read_sign_params(crt->crq,
+						    "signatureAlgorithm",
+						    &params);
+		if (ret < 0) {
+			addf(str, "error: read_pss_params: %s\n",
+			     gnutls_strerror(ret));
+		} else
+			addf(str, "\t\tSalt Length: %d\n", params.salt_size);
+	}
+
+	return 0;
+}
+
+static int
 print_crq_pubkey(gnutls_buffer_st * str, gnutls_x509_crq_t crq,
 		 gnutls_certificate_print_formats_t format)
 {
 	gnutls_pubkey_t pubkey;
+	gnutls_x509_spki_st params;
 	int ret;
+
+	ret = _gnutls_x509_crq_read_spki_params(crq, &params);
+	if (ret < 0)
+		return ret;
 
 	ret = gnutls_pubkey_init(&pubkey);
 	if (ret < 0)
@@ -2263,7 +2470,7 @@ print_crq_pubkey(gnutls_buffer_st * str, gnutls_x509_crq_t crq,
 	if (ret < 0)
 		goto cleanup;
 
-	print_pubkey(str, _("Subject "), pubkey, format);
+	print_pubkey(str, _("Subject "), pubkey, &params, format);
 	ret = 0;
 
       cleanup:
@@ -2331,6 +2538,8 @@ print_crq(gnutls_buffer_st * str, gnutls_x509_crq_t cert,
 		addf(str, _("\tSignature Algorithm: %s\n"), p);
 
 		gnutls_free(name);
+
+		print_crq_sig_params(str, cert, format);
 	}
 
 	/* parse attributes */
@@ -2476,6 +2685,13 @@ print_crq(gnutls_buffer_st * str, gnutls_x509_crq_t cert,
 
 static void print_crq_other(gnutls_buffer_st * str, gnutls_x509_crq_t crq)
 {
+	int ret;
+
+	/* on unknown public key algorithms don't print the key ID */
+	ret = gnutls_x509_crq_get_pk_algorithm(crq, NULL);
+	if (ret < 0)
+		return;
+
 	print_obj_id(str, "\t", crq, (get_id_func*)gnutls_x509_crq_get_key_id);
 }
 
@@ -2536,6 +2752,11 @@ print_pubkey_other(gnutls_buffer_st * str, gnutls_pubkey_t pubkey,
 		print_key_usage2(str, "\t", pubkey->key_usage);
 	}
 
+	/* on unknown public key algorithms don't print the key ID */
+	ret = gnutls_pubkey_get_pk_algorithm(pubkey, NULL);
+	if (ret < 0)
+		return;
+
 	print_obj_id(str, "", pubkey, (get_id_func*)gnutls_pubkey_get_key_id);
 }
 
@@ -2569,7 +2790,7 @@ gnutls_pubkey_print(gnutls_pubkey_t pubkey,
 
 	_gnutls_buffer_append_str(&str, _("Public Key Information:\n"));
 
-	print_pubkey(&str, "", pubkey, format);
+	print_pubkey(&str, "", pubkey, NULL, format);
 	print_pubkey_other(&str, pubkey, format);
 
 	return _gnutls_buffer_to_datum(&str, out, 1);

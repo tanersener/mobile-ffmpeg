@@ -14,12 +14,12 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
-#ifndef SYSTEM_KEYS_H
-# define SYSTEM_KEYS_H
+#ifndef GNUTLS_LIB_SYSTEM_KEYS_H
+#define GNUTLS_LIB_SYSTEM_KEYS_H
 
 #ifdef _WIN32
 # define _gnutls_system_url_is_supported(x) 1
@@ -37,4 +37,4 @@ _gnutls_privkey_import_system_url(gnutls_privkey_t pkey,
 void _gnutls_system_key_deinit(void);
 int _gnutls_system_key_init(void);
 
-#endif
+#endif /* GNUTLS_LIB_SYSTEM_KEYS_H */

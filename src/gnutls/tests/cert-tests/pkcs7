@@ -34,12 +34,20 @@ fi
 
 OUTFILE=out-pkcs7.$$.tmp
 OUTFILE2=out2-pkcs7.$$.tmp
+TMPFILE=tmp-pkcs7.$$.tmp
 
 . ${srcdir}/../scripts/common.sh
 
 check_for_datefudge
 
-for FILE in single-ca.p7b full.p7b openssl.p7b openssl-keyid.p7b; do
+if test "${ENABLE_GOST}" = "1" && test "${GNUTLS_FORCE_FIPS_MODE}" != "1"
+then
+	GOST_P7B="rfc4490.p7b"
+else
+	GOST_P7B=""
+fi
+
+for FILE in single-ca.p7b full.p7b openssl.p7b openssl-keyid.p7b $GOST_P7B; do
 ${VALGRIND} "${CERTTOOL}" --inder --p7-info --infile "${srcdir}/data/${FILE}"|grep -v "Signing time" >"${OUTFILE}"
 rc=$?
 
@@ -55,6 +63,19 @@ if test "$?" != "0"; then
 	exit 1
 fi
 done
+
+${VALGRIND} "${CERTTOOL}" --inder --p7-info --infile "${srcdir}/data/full.p7b" --outfile "${TMPFILE}" --no-text
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "--no-text pkcs7 info failed 1"
+	exit ${rc}
+fi
+
+if grep -v '^-----BEGIN [A-Z0-9 ]\+-----$' ${TMPFILE} | grep -v '^[A-Za-z0-9/+=]\+$' | grep -v '^-----END [A-Z0-9 ]\+-----$' ; then
+	echo "--no-text pkcs7 info failed 2"
+	exit 1
+fi
 
 # check signatures
 
@@ -142,7 +163,11 @@ fi
 # Test cert combination
 
 FILE="p7-combined"
-cat "${srcdir}/../certs"/cert*.pem >"${OUTFILE2}"
+
+rm -f "${OUTFILE2}"
+for i in cert-ecc256.pem cert-ecc521.pem cert-ecc384.pem cert-ecc.pem cert-rsa-2432.pem;do
+	cat "${srcdir}/../certs"/$i >>"${OUTFILE2}"
+done
 ${VALGRIND} "${CERTTOOL}" --p7-generate --load-certificate "${OUTFILE2}" >"${OUTFILE}"
 rc=$?
 
@@ -261,7 +286,58 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
+FILE="rsa-pss-signing"
+${VALGRIND} "${CERTTOOL}" --p7-sign --load-privkey  "${srcdir}/../../doc/credentials/x509/key-rsa-pss.pem" --load-certificate "${srcdir}/../../doc/credentials/x509/cert-rsa-pss.pem" --infile "${srcdir}/data/pkcs7-detached.txt" >"${OUTFILE}"
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "${FILE}: PKCS7 struct signing failed"
+	exit ${rc}
+fi
+
+FILE="rsa-pss-signing-verify"
+${VALGRIND} "${CERTTOOL}" --p7-verify --load-certificate "${srcdir}/../../doc/credentials/x509/cert-rsa-pss.pem" <"${OUTFILE}"
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "${FILE}: PKCS7 struct signing failed verification"
+	exit ${rc}
+fi
+
+# Test BER encoding, see RFC 4134 Section 4.5
+# SHA1 signature, so --verify-allow-broken
+FILE="rfc4134-4.5"
+${VALGRIND} "${CERTTOOL}" --p7-verify --verify-allow-broken --load-ca-certificate "${srcdir}/data/rfc4134-ca-rsa.pem" --infile "${srcdir}/data/rfc4134-4.5.p7b" --inder
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "${FILE}: PKCS7 BER parsing/decoding failed"
+	exit ${rc}
+fi
+
+if test "x$ENABLE_GOST" = "x1"  && test "x${GNUTLS_FORCE_FIPS_MODE}" != "x1"
+then
+	FILE="gost01-signing"
+	${VALGRIND} "${CERTTOOL}" --p7-sign --load-privkey  "${srcdir}/../../doc/credentials/x509/key-gost01.pem" --load-certificate "${srcdir}/../../doc/credentials/x509/cert-gost01.pem" --infile "${srcdir}/data/pkcs7-detached.txt" >"${OUTFILE}"
+	rc=$?
+
+	if test "${rc}" != "0"; then
+		echo "${FILE}: PKCS7 struct signing failed"
+		exit ${rc}
+	fi
+
+	FILE="gost01-signing-verify"
+	${VALGRIND} "${CERTTOOL}" --p7-verify --load-certificate "${srcdir}/../../doc/credentials/x509/cert-gost01.pem" <"${OUTFILE}"
+	rc=$?
+
+	if test "${rc}" != "0"; then
+		echo "${FILE}: PKCS7 struct signing failed verification"
+		exit ${rc}
+	fi
+fi
+
 rm -f "${OUTFILE}"
 rm -f "${OUTFILE2}"
+rm -f "${TMPFILE}"
 
 exit 0

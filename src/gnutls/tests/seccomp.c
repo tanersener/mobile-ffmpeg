@@ -14,7 +14,7 @@
  * General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 #include <config.h>
@@ -26,6 +26,9 @@
 #include <seccomp.h>
 #include <errno.h>
 #include <string.h>
+#if defined(__linux__)
+#  include <sys/syscall.h>
+#endif
 
 int disable_system_calls(void)
 {
@@ -70,7 +73,9 @@ int disable_system_calls(void)
 
 	/* to read from /dev/urandom */
 	ADD_SYSCALL(read, 0);
+#ifdef SYS_getrandom
 	ADD_SYSCALL(getrandom, 0);
+#endif
 
 	/* we use it in select */
 	ADD_SYSCALL(sigprocmask, 0);

@@ -49,22 +49,23 @@ get_library_name() {
         28) echo "twolame" ;;
         29) echo "sdl" ;;
         30) echo "tesseract" ;;
-        31) echo "giflib" ;;
-        32) echo "jpeg" ;;
-        33) echo "libogg" ;;
-        34) echo "libpng" ;;
-        35) echo "libuuid" ;;
-        36) echo "nettle" ;;
-        37) echo "tiff" ;;
-        38) echo "expat" ;;
-        39) echo "libsndfile" ;;
-        40) echo "leptonica" ;;
-        41) echo "ios-zlib" ;;
-        42) echo "ios-audiotoolbox" ;;
-        43) echo "ios-coreimage" ;;
-        44) echo "ios-bzip2" ;;
-        45) echo "ios-videotoolbox" ;;
-        46) echo "ios-avfoundation" ;;
+        31) echo "openh264" ;;
+        32) echo "giflib" ;;
+        33) echo "jpeg" ;;
+        34) echo "libogg" ;;
+        35) echo "libpng" ;;
+        36) echo "libuuid" ;;
+        37) echo "nettle" ;;
+        38) echo "tiff" ;;
+        39) echo "expat" ;;
+        40) echo "libsndfile" ;;
+        41) echo "leptonica" ;;
+        42) echo "ios-zlib" ;;
+        43) echo "ios-audiotoolbox" ;;
+        44) echo "ios-coreimage" ;;
+        45) echo "ios-bzip2" ;;
+        46) echo "ios-videotoolbox" ;;
+        47) echo "ios-avfoundation" ;;
     esac
 }
 
@@ -81,12 +82,12 @@ get_package_config_file_name() {
         26) echo "aom" ;;
         27) echo "libchromaprint" ;;
         29) echo "sdl2" ;;
-        32) echo "libjpeg" ;;
-        33) echo "ogg" ;;
-        35) echo "uuid" ;;
-        37) echo "libtiff-4" ;;
-        39) echo "sndfile" ;;
-        40) echo "lept" ;;
+        33) echo "libjpeg" ;;
+        34) echo "ogg" ;;
+        36) echo "uuid" ;;
+        38) echo "libtiff-4" ;;
+        40) echo "sndfile" ;;
+        41) echo "lept" ;;
         *) echo $(get_library_name $1)
     esac
 }
@@ -107,12 +108,12 @@ get_static_archive_name() {
         28) echo "libtwolame.a" ;;
         29) echo "libSDL2.a" ;;
         30) echo "libtesseract.a" ;;
-        31) echo "libgif.a" ;;
-        33) echo "libogg.a" ;;
-        34) echo "libpng.a" ;;
-        35) echo "libuuid.a" ;;
-        39) echo "libsndfile.a" ;;
-        40) echo "liblept.a" ;;
+        32) echo "libgif.a" ;;
+        34) echo "libogg.a" ;;
+        35) echo "libpng.a" ;;
+        36) echo "libuuid.a" ;;
+        40) echo "libsndfile.a" ;;
+        41) echo "liblept.a" ;;
         *) echo lib$(get_library_name $1).a
     esac
 }
@@ -135,10 +136,10 @@ get_target_host() {
 get_target_build_directory() {
     case ${ARCH} in
         x86-64)
-            echo "x86_64-ios-darwin"
+            echo "ios-x86_64-apple-darwin"
         ;;
         *)
-            echo "${ARCH}-ios-darwin"
+            echo "ios-${ARCH}-apple-darwin"
         ;;
     esac
 }
@@ -329,7 +330,7 @@ get_app_specific_cflags() {
         soxr | snappy)
             APP_FLAGS="-std=gnu99 -Wno-unused-function -DPIC"
         ;;
-        x265)
+        openh264 | x265)
             APP_FLAGS="-Wno-unused-function"
         ;;
         *)
@@ -494,7 +495,7 @@ create_fontconfig_package_config() {
     local FONTCONFIG_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/fontconfig.pc" << EOF
-prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/fontconfig
+prefix=${BASEDIR}/prebuilt/$(get_target_build_directory)/fontconfig
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
@@ -519,7 +520,7 @@ create_freetype_package_config() {
     local FREETYPE_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/freetype2.pc" << EOF
-prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/freetype
+prefix=${BASEDIR}/prebuilt/$(get_target_build_directory)/freetype
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
@@ -540,7 +541,7 @@ create_giflib_package_config() {
     local GIFLIB_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/giflib.pc" << EOF
-prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/giflib
+prefix=${BASEDIR}/prebuilt/$(get_target_build_directory)/giflib
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
@@ -559,7 +560,7 @@ create_gmp_package_config() {
     local GMP_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/gmp.pc" << EOF
-prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/gmp
+prefix=${BASEDIR}/prebuilt/$(get_target_build_directory)/gmp
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
@@ -578,7 +579,7 @@ create_gnutls_package_config() {
     local GNUTLS_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/gnutls.pc" << EOF
-prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/gnutls
+prefix=${BASEDIR}/prebuilt/$(get_target_build_directory)/gnutls
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
@@ -598,7 +599,7 @@ create_libmp3lame_package_config() {
     local LAME_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/libmp3lame.pc" << EOF
-prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/lame
+prefix=${BASEDIR}/prebuilt/$(get_target_build_directory)/lame
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
@@ -617,7 +618,7 @@ create_libiconv_package_config() {
     local LIB_ICONV_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/libiconv.pc" << EOF
-prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/libiconv
+prefix=${BASEDIR}/prebuilt/$(get_target_build_directory)/libiconv
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
@@ -636,7 +637,7 @@ create_libpng_package_config() {
     local LIBPNG_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/libpng.pc" << EOF
-prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/libpng
+prefix=${BASEDIR}/prebuilt/$(get_target_build_directory)/libpng
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
@@ -654,7 +655,7 @@ create_libvorbis_package_config() {
     local LIBVORBIS_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/vorbis.pc" << EOF
-prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/libvorbis
+prefix=${BASEDIR}/prebuilt/$(get_target_build_directory)/libvorbis
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
@@ -669,7 +670,7 @@ Cflags: -I\${includedir}
 EOF
 
 cat > "${INSTALL_PKG_CONFIG_DIR}/vorbisenc.pc" << EOF
-prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/libvorbis
+prefix=${BASEDIR}/prebuilt/$(get_target_build_directory)/libvorbis
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
@@ -685,7 +686,7 @@ Cflags: -I\${includedir}
 EOF
 
 cat > "${INSTALL_PKG_CONFIG_DIR}/vorbisfile.pc" << EOF
-prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/libvorbis
+prefix=${BASEDIR}/prebuilt/$(get_target_build_directory)/libvorbis
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
@@ -705,7 +706,7 @@ create_libwebp_package_config() {
     local LIB_WEBP_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/libwebp.pc" << EOF
-prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/libwebp
+prefix=${BASEDIR}/prebuilt/$(get_target_build_directory)/libwebp
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
@@ -724,7 +725,7 @@ create_libxml2_package_config() {
     local LIBXML2_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/libxml-2.0.pc" << EOF
-prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/libxml2
+prefix=${BASEDIR}/prebuilt/$(get_target_build_directory)/libxml2
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
@@ -744,7 +745,7 @@ create_snappy_package_config() {
     local SNAPPY_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/snappy.pc" << EOF
-prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/snappy
+prefix=${BASEDIR}/prebuilt/$(get_target_build_directory)/snappy
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
@@ -763,7 +764,7 @@ create_soxr_package_config() {
     local SOXR_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/soxr.pc" << EOF
-prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/soxr
+prefix=${BASEDIR}/prebuilt/$(get_target_build_directory)/soxr
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
@@ -782,7 +783,7 @@ create_tesseract_package_config() {
     local TESSERACT_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/tesseract.pc" << EOF
-prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/tesseract
+prefix=${BASEDIR}/prebuilt/$(get_target_build_directory)/tesseract
 exec_prefix=\${prefix}
 bindir=\${exec_prefix}/bin
 datarootdir=\${prefix}/share
@@ -805,7 +806,7 @@ create_uuid_package_config() {
     local UUID_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/uuid.pc" << EOF
-prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/libuuid
+prefix=${BASEDIR}/prebuilt/$(get_target_build_directory)/libuuid
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
@@ -823,7 +824,7 @@ create_xvidcore_package_config() {
     local XVIDCORE_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/xvidcore.pc" << EOF
-prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/xvidcore
+prefix=${BASEDIR}/prebuilt/$(get_target_build_directory)/xvidcore
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
@@ -922,9 +923,9 @@ download_gpl_library_source() {
             GPL_LIB_DEST_DIR="libvidstab"
         ;;
         x264)
-            GPL_LIB_URL="ftp://ftp.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-20190328-2245-stable.tar.bz2"
-            GPL_LIB_FILE="x264-snapshot-20190328-2245-stable.tar.bz2"
-            GPL_LIB_ORIG_DIR="x264-snapshot-20190328-2245-stable"
+            GPL_LIB_URL="ftp://ftp.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-20190701-2245-stable.tar.bz2"
+            GPL_LIB_FILE="x264-snapshot-20190701-2245-stable.tar.bz2"
+            GPL_LIB_ORIG_DIR="x264-snapshot-20190701-2245-stable"
             GPL_LIB_DEST_DIR="x264"
         ;;
         x265)
@@ -1063,7 +1064,7 @@ set_toolchain_clang_paths() {
     export RANLIB="$(xcrun --sdk $(get_sdk_name) -f ranlib)"
     export STRIP="$(xcrun --sdk $(get_sdk_name) -f strip)"
 
-    export INSTALL_PKG_CONFIG_DIR="${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/pkgconfig"
+    export INSTALL_PKG_CONFIG_DIR="${BASEDIR}/prebuilt/$(get_target_build_directory)/pkgconfig"
     export ZLIB_PACKAGE_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}/zlib.pc"
     export BZIP2_PACKAGE_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}/bzip2.pc"
 

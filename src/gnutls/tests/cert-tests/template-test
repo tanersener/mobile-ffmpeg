@@ -21,7 +21,7 @@
 #set -e
 
 srcdir="${srcdir:-.}"
-ac_cv_sizeof_unsigned_long_int="${ac_cv_sizeof_unsigned_long_int:-8}"
+ac_cv_sizeof_time_t="${ac_cv_sizeof_time_t:-8}"
 CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
 DIFF="${DIFF:-diff}"
 
@@ -30,10 +30,13 @@ if ! test -x "${CERTTOOL}"; then
 fi
 
 export TZ="UTC"
+TMPFILE=tmp-tt.pem.$$.tmp
 
 . ${srcdir}/../scripts/common.sh
 
 check_for_datefudge
+
+echo "Running test for ${ac_cv_sizeof_time_t}-byte time_t"
 
 # Note that in rare cases this test may fail because the
 # time set using datefudge could have changed since the generation
@@ -43,9 +46,9 @@ datefudge -s "2007-04-22" \
 	"${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-test.tmpl" \
-		--outfile tmp-tt.pem 2>/dev/null
+		--outfile ${TMPFILE} 2>/dev/null
 
-${DIFF} "${srcdir}/data/template-test.pem" tmp-tt.pem >/dev/null 2>&1
+${DIFF} "${srcdir}/data/template-test.pem" ${TMPFILE} >/dev/null 2>&1
 rc=$?
 
 # We're done.
@@ -54,15 +57,15 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-rm -f tmp-tt.pem
+rm -f ${TMPFILE}
 
 datefudge -s "2007-04-22" \
 	"${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-utf8.tmpl" \
-		--outfile tmp-tt.pem 2>/dev/null
+		--outfile ${TMPFILE} 2>/dev/null
 
-${DIFF} "${srcdir}/data/template-utf8.pem" tmp-tt.pem >/dev/null 2>&1
+${DIFF} "${srcdir}/data/template-utf8.pem" ${TMPFILE} >/dev/null 2>&1
 rc=$?
 
 # We're done.
@@ -71,15 +74,15 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-rm -f tmp-tt.pem
+rm -f ${TMPFILE}
 
 datefudge -s "2007-04-22" \
 	"${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-dn.tmpl" \
-		--outfile tmp-tt.pem 2>/dev/null
+		--outfile ${TMPFILE} 2>/dev/null
 
-${DIFF} "${srcdir}/data/template-dn.pem" tmp-tt.pem >/dev/null 2>&1
+${DIFF} "${srcdir}/data/template-dn.pem" ${TMPFILE} >/dev/null 2>&1
 rc=$?
 
 # We're done.
@@ -88,13 +91,13 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-rm -f tmp-tt.pem
+rm -f ${TMPFILE}
 
 datefudge -s "2007-04-22" \
 	"${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-dn-err.tmpl" \
-		--outfile tmp-tt.pem 2>/dev/null
+		--outfile ${TMPFILE} 2>/dev/null
 rc=$?
 
 if test "${rc}" = "0"; then
@@ -102,15 +105,15 @@ if test "${rc}" = "0"; then
 	exit ${rc}
 fi
 
-rm -f tmp-tt.pem
+rm -f ${TMPFILE}
 
 datefudge -s "2007-04-22" \
 	"${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-overflow.tmpl" \
-		--outfile tmp-tt.pem 2>/dev/null
+		--outfile ${TMPFILE} 2>/dev/null
 
-${DIFF} "${srcdir}/data/template-overflow.pem" tmp-tt.pem >/dev/null 2>&1
+${DIFF} "${srcdir}/data/template-overflow.pem" ${TMPFILE} >/dev/null 2>&1
 rc=$?
 
 # We're done.
@@ -119,36 +122,47 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-rm -f tmp-tt.pem
+rm -f ${TMPFILE}
 
 # The following test works in 64-bit systems
-if test "${ac_cv_sizeof_unsigned_long_int}" = 8;then
 
 datefudge -s "2007-04-22" \
 	"${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-overflow2.tmpl" \
-		--outfile tmp-tt.pem 2>/dev/null
+		--outfile ${TMPFILE} 2>/dev/null
 
-${DIFF} "${srcdir}/data/template-overflow2.pem" tmp-tt.pem >/dev/null 2>&1
 rc=$?
+if test "${ac_cv_sizeof_time_t}" -lt 8;then
+	if test "$rc" = "0"; then
+		echo "Test 5-1 (overflow2) succeeded unexpectedly with 32-bit time_t"
+		exit ${rc}
+	fi
+else
+	if test "$rc" != "0"; then
+		echo "Test 5-1 (overflow2) failed"
+		exit ${rc}
+	fi
 
-# We're done.
-if test "${rc}" != "0"; then
-	echo "Test 5 (overflow2) failed"
-	exit ${rc}
-fi
+	${DIFF} "${srcdir}/data/template-overflow2.pem" ${TMPFILE} #>/dev/null 2>&1
+	rc=$?
 
-rm -f tmp-tt.pem
+	# We're done.
+	if test "${rc}" != "0"; then
+		echo "Test 5-2 (overflow2) failed"
+		exit ${rc}
+	fi
+
 fi
+rm -f ${TMPFILE}
 
 datefudge -s "2007-04-22" \
 	"${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-date.tmpl" \
-		--outfile tmp-tt.pem 2>/dev/null
+		--outfile ${TMPFILE} 2>/dev/null
 
-${DIFF} "${srcdir}/data/template-date.pem" tmp-tt.pem >/dev/null 2>&1
+${DIFF} "${srcdir}/data/template-date.pem" ${TMPFILE} >/dev/null 2>&1
 rc=$?
 
 # We're done.
@@ -157,7 +171,35 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-rm -f tmp-tt.pem
+rm -f ${TMPFILE}
+
+datefudge -s "2007-04-22" \
+	"${CERTTOOL}" --generate-self-signed \
+		--load-privkey "${srcdir}/data/template-test.key" \
+		--template "${srcdir}/templates/template-dates-after2038.tmpl" \
+		--outfile ${TMPFILE} 2>/dev/null
+rc=$?
+if test "${ac_cv_sizeof_time_t}" -lt 8;then
+	if test "$rc" = "0"; then
+		echo "Test 6-2 (explicit dates) succeeded unexpectedly with 32-bit long"
+		exit ${rc}
+	fi
+else
+	if test "$rc" != "0"; then
+		echo "Test 6-2 (explicit dates) failed"
+		exit ${rc}
+	fi
+
+	${DIFF} "${srcdir}/data/template-dates-after2038.pem" ${TMPFILE} >/dev/null 2>&1
+	rc=$?
+
+	if test "${rc}" != "0"; then
+		echo "Test 6-3 (explicit dates) failed"
+		exit ${rc}
+	fi
+fi
+
+rm -f ${TMPFILE}
 
 # Test name constraints generation
 
@@ -165,9 +207,9 @@ datefudge -s "2007-04-22" \
 	"${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-nc.tmpl" \
-		--outfile tmp-tt.pem 2>/dev/null
+		--outfile ${TMPFILE} 2>/dev/null
 
-${DIFF} "${srcdir}/data/template-nc.pem" tmp-tt.pem >/dev/null 2>&1
+${DIFF} "${srcdir}/data/template-nc.pem" ${TMPFILE} >/dev/null 2>&1
 rc=$?
 
 # We're done.
@@ -176,19 +218,19 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-rm -f tmp-tt.pem
+rm -f ${TMPFILE}
 
 
 # Test the GeneralizedTime support
-if test "${ac_cv_sizeof_unsigned_long_int}" = 8;then
+if test "${ac_cv_sizeof_time_t}" = 8;then
 	# we should test that on systems which have 64-bit time_t.
 	datefudge -s "2051-04-22" \
 			"${CERTTOOL}" --generate-self-signed \
 				--load-privkey "${srcdir}/data/template-test.key" \
 				--template "${srcdir}/templates/template-generalized.tmpl" \
-				--outfile tmp-tt.pem 2>/dev/null
+				--outfile ${TMPFILE} 2>/dev/null
 
-	${DIFF} "${srcdir}/data/template-generalized.pem" tmp-tt.pem >/dev/null 2>&1
+	${DIFF} "${srcdir}/data/template-generalized.pem" ${TMPFILE} >/dev/null 2>&1
 	rc=$?
 
 	# We're done.
@@ -198,7 +240,7 @@ if test "${ac_cv_sizeof_unsigned_long_int}" = 8;then
 	fi
 fi
 
-rm -f tmp-tt.pem
+rm -f ${TMPFILE}
 
 # Test unique ID field generation
 
@@ -206,9 +248,9 @@ datefudge -s "2007-04-22" \
 	"${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-unique.tmpl" \
-		--outfile tmp-tt.pem 2>/dev/null
+		--outfile ${TMPFILE} 2>/dev/null
 
-${DIFF} "${srcdir}/data/template-unique.pem" tmp-tt.pem >/dev/null 2>&1
+${DIFF} "${srcdir}/data/template-unique.pem" ${TMPFILE} >/dev/null 2>&1
 rc=$?
 
 # We're done.
@@ -217,6 +259,44 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-rm -f tmp-tt.pem
+rm -f ${TMPFILE}
+
+# Test generation with very long dns names
+
+datefudge -s "2007-04-22" \
+	"${CERTTOOL}" --generate-self-signed \
+		--load-privkey "${srcdir}/data/template-test.key" \
+		--template "${srcdir}/templates/template-long-dns.tmpl" \
+		--outfile ${TMPFILE} 2>/dev/null
+
+${DIFF} "${srcdir}/data/long-dns.pem" ${TMPFILE} >/dev/null 2>&1
+rc=$?
+
+# We're done.
+if test "${rc}" != "0"; then
+	echo "Test 10 (long dns) failed"
+	exit ${rc}
+fi
+
+rm -f ${TMPFILE}
+
+# Test generation with larger serial number
+
+datefudge -s "2007-04-22" \
+	"${CERTTOOL}" --generate-self-signed \
+		--load-privkey "${srcdir}/data/template-test.key" \
+		--template "${srcdir}/templates/template-long-serial.tmpl" \
+		--outfile ${TMPFILE} 2>/dev/null
+
+${DIFF} "${srcdir}/data/long-serial.pem" ${TMPFILE} >/dev/null 2>&1
+rc=$?
+
+# We're done.
+if test "${rc}" != "0"; then
+	echo "Test 11 (long serial) failed"
+	exit ${rc}
+fi
+
+rm -f ${TMPFILE}
 
 exit 0

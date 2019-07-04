@@ -139,10 +139,13 @@ NAME="AEN3759"
 ><H2
 >Description</H2
 ><P
->Set 'sysroot' as the system root directory. fontconfig prepend 'sysroot'
-to the cache directories in order to allow people to generate caches at
-the build time. Note that this causes changing current config. i.e.
-this function calls FcConfigSetCurrent() internally.
+>Set 'sysroot' as the system root directory. All file paths used or created with
+this 'config' (including file properties in patterns) will be considered or
+made relative to this 'sysroot'. This allows a host to generate caches for
+targets at build time. This also allows a cache to be re-targeted to a
+different base directory if 'FcConfigGetSysRoot' is used to resolve file paths.
+When setting this on the current config this causes changing current config
+(calls FcConfigSetCurrent()).
 	    </P
 ></DIV
 ><DIV

@@ -196,26 +196,7 @@ static void client(int fd, const char *prio)
 
 
 /* These are global */
-gnutls_anon_server_credentials_t anoncred;
-gnutls_certificate_credentials_t x509_cred;
 pid_t child;
-
-static gnutls_session_t initialize_tls_session(const char *prio)
-{
-	gnutls_session_t session;
-
-	gnutls_init(&session, GNUTLS_SERVER);
-
-	/* avoid calling all the priority functions, since the defaults
-	 * are adequate.
-	 */
-	gnutls_priority_set_direct(session, prio, NULL);
-
-	gnutls_credentials_set(session, GNUTLS_CRD_ANON, anoncred);
-	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
-
-	return session;
-}
 
 static void terminate(void)
 {
@@ -228,6 +209,8 @@ static void server(int fd, const char *prio)
 	int ret;
 	char buffer[MAX_BUF + 1];
 	gnutls_session_t session;
+	gnutls_anon_server_credentials_t anoncred;
+	gnutls_certificate_credentials_t x509_cred;
 
 	/* this must be called once in the program
 	 */
@@ -246,7 +229,15 @@ static void server(int fd, const char *prio)
 
 	gnutls_anon_allocate_server_credentials(&anoncred);
 
-	session = initialize_tls_session(prio);
+	gnutls_init(&session, GNUTLS_SERVER);
+
+	/* avoid calling all the priority functions, since the defaults
+	 * are adequate.
+	 */
+	gnutls_priority_set_direct(session, prio, NULL);
+
+	gnutls_credentials_set(session, GNUTLS_CRD_ANON, anoncred);
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
 	gnutls_transport_set_int(session, fd);
 
@@ -325,6 +316,8 @@ void doit(void)
 	signal(SIGCHLD, ch_handler);
 	signal(SIGPIPE, SIG_IGN);
 
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.2");
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.3");
 	start("NORMAL");
 }
 

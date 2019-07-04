@@ -1,0 +1,28 @@
+
+
+
+
+@deftypefun {ssize_t} {gnutls_record_recv_early_data} (gnutls_session_t @var{session}, void * @var{data}, size_t @var{data_size})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{data}: the buffer that the data will be read into
+
+@var{data_size}: the number of requested bytes
+
+This function can be used by a searver to retrieve data sent early
+in the handshake processes when resuming a session.  This is used
+to implement a zero-roundtrip (0-RTT) mode.  It has the same
+semantics as @code{gnutls_record_recv()} .
+
+This function can be called either in a handshake hook, or after
+the handshake is complete.
+
+@strong{Returns:} The number of bytes received and zero when early data
+reading is complete.  A negative error code is returned in case of
+an error.  If no early data is received during the handshake, this
+function returns @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE} .  The
+number of bytes received might be less than the requested
+ @code{data_size} .
+
+@strong{Since:} 3.6.5
+@end deftypefun

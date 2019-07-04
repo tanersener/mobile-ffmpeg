@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_encode_rs_value} (gnutls_datum_t * @var{sig_value}, const gnutls_datum_t * @var{r}, const gnutls_datum_t * @var{s})

@@ -16,7 +16,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -88,10 +88,11 @@ gnutls_sec_param_to_pk_bits(gnutls_pk_algorithm_t algo,
 	if (p->sec_param == param) {
 		if (algo == GNUTLS_PK_DSA)
 			ret = p->dsa_bits;
-		else if (IS_EC(algo))
+		else if (IS_EC(algo)||IS_GOSTEC(algo))
 			ret = p->ecc_bits;
 		else
-			ret = p->pk_bits; break;
+			ret = p->pk_bits;
+		break;
 	}
 	);
 	return ret;
@@ -131,11 +132,29 @@ unsigned int _gnutls_pk_bits_to_subgroup_bits(unsigned int pk_bits)
 	unsigned int ret = 0;
 
 	GNUTLS_SEC_PARAM_LOOP(
-		ret = p->subgroup_bits; 
+		ret = p->subgroup_bits;
 		if (p->pk_bits >= pk_bits)
 			break;
 	);
 	return ret;
+}
+
+/* Returns a corresponding SHA algorithm size for the
+ * public key bits given. It is based on the NIST mappings.
+ */
+gnutls_digest_algorithm_t _gnutls_pk_bits_to_sha_hash(unsigned int pk_bits)
+{
+	GNUTLS_SEC_PARAM_LOOP(
+		if (p->pk_bits >= pk_bits) {
+			if (p->bits <= 128)
+				return GNUTLS_DIG_SHA256;
+			else if (p->bits <= 192)
+				return GNUTLS_DIG_SHA384;
+			else
+				return GNUTLS_DIG_SHA512;
+		}
+	);
+	return GNUTLS_DIG_SHA256;
 }
 
 /**
@@ -155,7 +174,7 @@ const char *gnutls_sec_param_get_name(gnutls_sec_param_t param)
 
 	GNUTLS_SEC_PARAM_LOOP(
 		if (p->sec_param == param) {
-			ret = p->name; 
+			ret = p->name;
 			break;
 		}
 	);
@@ -184,7 +203,7 @@ gnutls_pk_bits_to_sec_param(gnutls_pk_algorithm_t algo, unsigned int bits)
 	if (bits == 0)
 		return GNUTLS_SEC_PARAM_UNKNOWN;
 
-	if (IS_EC(algo)) {
+	if (IS_EC(algo)||IS_GOSTEC(algo)) {
 		GNUTLS_SEC_PARAM_LOOP(
 			if (p->ecc_bits > bits) {
 				break;

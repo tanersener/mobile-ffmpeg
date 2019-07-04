@@ -37,7 +37,7 @@ fi
 TMPFILE1=ca-no-pathlen-$$.tmp
 TMPFILE2=no-ca-or-pathlen-$$.tmp
 ${VALGRIND} "${CERTTOOL}" --certificate-info --infile "${srcdir}/data/ca-no-pathlen.pem" \
-	|grep -v "Algorithm Security Level" > $TMPFILE1
+	|grep -v "Algorithm Security Level"|grep -v ^warning > $TMPFILE1
 rc=$?
 
 if test "${rc}" != "0"; then

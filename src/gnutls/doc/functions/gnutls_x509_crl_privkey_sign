@@ -23,6 +23,9 @@ A known limitation of this function is, that a newly-signed CRL will not
 be fully functional (e.g., for signature verification), until it
 is exported an re-imported.
 
+After GnuTLS 3.6.1 the value of  @code{dig} may be @code{GNUTLS_DIG_UNKNOWN} ,
+and in that case, a suitable but reasonable for the key algorithm will be selected.
+
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.
 

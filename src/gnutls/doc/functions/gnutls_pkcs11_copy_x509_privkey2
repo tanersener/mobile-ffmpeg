@@ -16,8 +16,10 @@
 @var{flags}: One of GNUTLS_PKCS11_OBJ_* flags
 
 This function will copy a private key into a PKCS @code{11}  token specified by
-a URL. It is highly recommended flags to contain @code{GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE} 
-unless there is a strong reason not to.
+a URL.
+
+Since 3.6.3 the objects are marked as sensitive by default unless
+@code{GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_SENSITIVE}  is specified.
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.

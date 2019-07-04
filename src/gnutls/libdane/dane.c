@@ -18,7 +18,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -851,7 +851,7 @@ dane_verify_crt_raw(dane_state_t s,
  *
  * Note that this function is designed to be run in addition to
  * PKIX - certificate chain - verification. To be run independently
- * the %DANE_VFLAG_ONLY_CHECK_EE_USAGE flag should be specified; 
+ * the %DANE_VFLAG_ONLY_CHECK_EE_USAGE flag should be specified;
  * then the function will check whether the key of the peer matches the
  * key advertized in the DANE entry.
  *
@@ -946,7 +946,6 @@ dane_verify_session_crt(dane_state_t s,
 
 	/* this list may be incomplete, try to get the self-signed CA if any */
 	if (cert_list_size > 0) {
-		gnutls_datum_t new_cert_list[cert_list_size+1];
 		gnutls_x509_crt_t crt, ca;
 		gnutls_certificate_credentials_t sc;
 
@@ -987,11 +986,21 @@ dane_verify_session_crt(dane_state_t s,
 		}
 
 		/* make the new list */
+		gnutls_datum_t *new_cert_list;
+
+		new_cert_list = gnutls_malloc((cert_list_size + 1) * sizeof(gnutls_datum_t));
+		if (new_cert_list == NULL) {
+			gnutls_assert();
+			gnutls_x509_crt_deinit(crt);
+			goto failsafe;
+		}
+
 		memcpy(new_cert_list, cert_list, cert_list_size*sizeof(gnutls_datum_t));
 
 		ret = gnutls_x509_crt_export2(ca, GNUTLS_X509_FMT_DER, &new_cert_list[cert_list_size]);
 		if (ret < 0) {
 			gnutls_assert();
+			free(new_cert_list);
 			gnutls_x509_crt_deinit(crt);
 			goto failsafe;
 		}
@@ -1003,6 +1012,7 @@ dane_verify_session_crt(dane_state_t s,
 			gnutls_assert();
 		}
 		gnutls_free(new_cert_list[cert_list_size].data);
+		free(new_cert_list);
 		return ret;
 	}
 

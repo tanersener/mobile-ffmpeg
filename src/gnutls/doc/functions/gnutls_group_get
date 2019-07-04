@@ -1,0 +1,15 @@
+
+
+
+
+@deftypefun {gnutls_group_t} {gnutls_group_get} (gnutls_session_t @var{session})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+Returns the currently used group for key exchange. Only valid
+when using an elliptic curve or DH ciphersuite.
+
+@strong{Returns:} the currently used group, a @code{gnutls_group_t} 
+type.
+
+@strong{Since:} 3.6.0
+@end deftypefun

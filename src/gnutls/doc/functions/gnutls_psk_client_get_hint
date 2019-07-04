@@ -9,7 +9,10 @@ The PSK identity hint may give the client help in deciding which
 username to use.  This should only be called in case of PSK
 authentication and in case of a client.
 
-@strong{Returns:} the identity hint of the peer, or @code{NULL}  in case of an error.
+@strong{Note:} there is no hint in TLS 1.3, so this function will return @code{NULL} 
+if TLS 1.3 has been negotiated.
+
+@strong{Returns:} the identity hint of the peer, or @code{NULL}  in case of an error or if TLS 1.3 is being used.
 
 @strong{Since:} 2.4.0
 @end deftypefun

@@ -42,7 +42,7 @@
 #include "common/video_reader.h"
 
 // Max JSON buffer size.
-const int MAX_BUFFER = 1024 * 1024 * 32;
+const int MAX_BUFFER = 1024 * 1024 * 256;
 
 typedef enum {
   ACCOUNTING_LAYER = 1,
@@ -248,9 +248,9 @@ const map_entry uv_prediction_mode_map[] = {
 
 const map_entry skip_map[] = { ENUM(SKIP), ENUM(NO_SKIP), LAST_ENUM };
 
-const map_entry intrabc_map[] = {
-  { "INTRABC", 1 }, { "NO_INTRABC", 0 }, LAST_ENUM
-};
+const map_entry intrabc_map[] = { { "INTRABC", 1 },
+                                  { "NO_INTRABC", 0 },
+                                  LAST_ENUM };
 
 const map_entry palette_map[] = {
   { "ZERO_COLORS", 0 },  { "TWO_COLORS", 2 },   { "THREE_COLORS", 3 },

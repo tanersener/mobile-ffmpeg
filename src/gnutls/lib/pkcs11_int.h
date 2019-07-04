@@ -15,11 +15,11 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  */
 
-#ifndef PKCS11_INT_H
-#define PKCS11_INT_H
+#ifndef GNUTLS_LIB_PKCS11_INT_H
+#define GNUTLS_LIB_PKCS11_INT_H
 
 #ifdef ENABLE_PKCS11
 
@@ -28,9 +28,16 @@
 #include <gnutls/pkcs11.h>
 #include <x509/x509_int.h>
 
+/* Part of PKCS#11 3.0 interface, which was added in p11-kit 0.23.14 */
+#ifdef CKM_EDDSA
+#define HAVE_CKM_EDDSA
+#endif
+
 #define PKCS11_ID_SIZE 128
 #define PKCS11_LABEL_SIZE 128
 
+#include <p11-kit/p11-kit.h>
+#include <p11-kit/pin.h>
 #include <p11-kit/uri.h>
 typedef unsigned char ck_bool_t;
 
@@ -57,6 +64,24 @@ struct gnutls_pkcs11_obj_st {
 	unsigned pubkey_size;
 	gnutls_pk_algorithm_t pk_algorithm;
 	unsigned int key_usage;
+
+	struct pin_info_st pin;
+};
+
+struct gnutls_pkcs11_privkey_st {
+	gnutls_pk_algorithm_t pk_algorithm;
+	unsigned int rsa_pss_ok; /* if it is an RSA key, it can do RSA-PSS */
+	unsigned int bits;
+
+	unsigned int flags;
+	struct p11_kit_uri *uinfo;
+	char *url;
+
+	struct pkcs11_session_info sinfo;
+	ck_object_handle_t ref;	/* the key in the session */
+	unsigned reauth; /* whether we need to login on each operation */
+
+	void *mutex; /* lock for operations requiring co-ordination */
 
 	struct pin_info_st pin;
 };
@@ -155,6 +180,7 @@ _gnutls_x509_crt_import_pkcs11_url(gnutls_x509_crt_t crt,
 #define SESSION_TRUSTED (1<<3) /* session on a marked as trusted (p11-kit) module */
 #define SESSION_FORCE_LOGIN (1<<4) /* force login even when CFK_LOGIN_REQUIRED is not set */
 #define SESSION_CONTEXT_SPECIFIC (1<<5)
+#define SESSION_NO_CLOSE (1<<6) /* don't close session on success */
 
 int pkcs11_open_session(struct pkcs11_session_info *sinfo,
 			struct pin_info_st *pin_info,
@@ -168,6 +194,7 @@ ck_object_class_t pkcs11_strtype_to_class(const char *type);
 /* Additional internal flags for gnutls_pkcs11_obj_flags */
 /* @GNUTLS_PKCS11_OBJ_FLAG_EXPECT_CERT: When importing an object, provide a hint on the type, to allow incomplete URLs
  * @GNUTLS_PKCS11_OBJ_FLAG_EXPECT_PRIVKEY: Hint for private key */
+#define GNUTLS_PKCS11_OBJ_FLAG_FIRST_CLOSE_MATCH ((unsigned int)1<<28)
 #define GNUTLS_PKCS11_OBJ_FLAG_EXPECT_CERT (1<<29)
 #define GNUTLS_PKCS11_OBJ_FLAG_EXPECT_PRIVKEY (1<<30)
 #define GNUTLS_PKCS11_OBJ_FLAG_EXPECT_PUBKEY ((unsigned int)1<<31)
@@ -179,15 +206,24 @@ int pkcs11_token_matches_info(struct p11_kit_uri *info,
 unsigned int pkcs11_obj_flags_to_int(unsigned int flags);
 
 int
-_gnutls_pkcs11_privkey_sign_hash(gnutls_pkcs11_privkey_t key,
-				 const gnutls_datum_t * hash,
-				 gnutls_datum_t * signature);
+_gnutls_pkcs11_privkey_sign(gnutls_pkcs11_privkey_t key,
+			    const gnutls_sign_entry_st *se,
+			    const gnutls_datum_t * hash,
+			    gnutls_datum_t * signature,
+			    gnutls_x509_spki_st *spki_params);
 
 int
 _gnutls_pkcs11_privkey_decrypt_data(gnutls_pkcs11_privkey_t key,
 				    unsigned int flags,
 				    const gnutls_datum_t * ciphertext,
 				    gnutls_datum_t * plaintext);
+
+int
+_gnutls_pkcs11_privkey_decrypt_data2(gnutls_pkcs11_privkey_t key,
+				     unsigned int flags,
+				     const gnutls_datum_t * ciphertext,
+			             unsigned char * plaintext,
+			             size_t plaintext_size);
 
 int
 _pkcs11_privkey_get_pubkey (gnutls_pkcs11_privkey_t pkey, gnutls_pubkey_t *pub, unsigned flags);
@@ -198,8 +234,16 @@ static inline int pk_to_mech(gnutls_pk_algorithm_t pk)
 		return CKM_DSA;
 	else if (pk == GNUTLS_PK_EC)
 		return CKM_ECDSA;
-	else
+	else if (pk == GNUTLS_PK_RSA)
 		return CKM_RSA_PKCS;
+	else if (pk == GNUTLS_PK_RSA_PSS)
+		return CKM_RSA_PKCS_PSS;
+#ifdef HAVE_CKM_EDDSA
+        else if (pk == GNUTLS_PK_EDDSA_ED25519)
+                return CKM_EDDSA;
+#endif
+	else
+		return -1;
 }
 
 static inline int pk_to_key_type(gnutls_pk_algorithm_t pk)
@@ -208,8 +252,14 @@ static inline int pk_to_key_type(gnutls_pk_algorithm_t pk)
 		return CKK_DSA;
 	else if (pk == GNUTLS_PK_EC)
 		return CKK_ECDSA;
-	else
+	else if (pk == GNUTLS_PK_RSA_PSS || pk == GNUTLS_PK_RSA)
 		return CKK_RSA;
+#ifdef HAVE_CKM_EDDSA
+        else if (pk == GNUTLS_PK_EDDSA_ED25519)
+                return CKK_EC_EDWARDS;
+#endif
+	else
+		return -1;
 }
 
 static inline gnutls_pk_algorithm_t key_type_to_pk(ck_key_type_t m)
@@ -220,6 +270,10 @@ static inline gnutls_pk_algorithm_t key_type_to_pk(ck_key_type_t m)
 		return GNUTLS_PK_DSA;
 	else if (m == CKK_ECDSA)
 		return GNUTLS_PK_EC;
+#ifdef HAVE_CKM_EDDSA
+        else if (m == CKK_EC_EDWARDS)
+                return GNUTLS_PK_EDDSA_ED25519;
+#endif
 	else
 		return GNUTLS_PK_UNKNOWN;
 }
@@ -232,11 +286,24 @@ static inline int pk_to_genmech(gnutls_pk_algorithm_t pk, ck_key_type_t *type)
 	} else if (pk == GNUTLS_PK_EC) {
 		*type = CKK_ECDSA;
 		return CKM_ECDSA_KEY_PAIR_GEN;
-	} else {
+	} else if (pk == GNUTLS_PK_RSA_PSS || pk == GNUTLS_PK_RSA) {
 		*type = CKK_RSA;
 		return CKM_RSA_PKCS_KEY_PAIR_GEN;
+#ifdef HAVE_CKM_EDDSA
+        } else if (pk == GNUTLS_PK_EDDSA_ED25519) {
+                *type = CKK_EC_EDWARDS;
+                return CKM_EDDSA;
+#endif
+	} else {
+		*type = -1;
+		return -1;
 	}
 }
+
+int
+pkcs11_retrieve_pin(struct pin_info_st *pin_info, struct p11_kit_uri *info,
+		    struct ck_token_info *token_info, int attempts,
+		    ck_user_type_t user_type, struct p11_kit_pin **pin);
 
 ck_object_class_t pkcs11_type_to_class(gnutls_pkcs11_obj_type_t type);
 
@@ -320,6 +387,12 @@ pkcs11_get_mechanism_list(struct ck_function_list *module,
 			  unsigned long *count);
 
 ck_rv_t
+pkcs11_get_mechanism_info(struct ck_function_list *module,
+			  ck_slot_id_t slot_id,
+			  ck_mechanism_type_t mechanism,
+			  struct ck_mechanism_info *ptr);
+
+ck_rv_t
 pkcs11_sign_init(struct ck_function_list *module,
 		 ck_session_handle_t sess,
 		 struct ck_mechanism *mechanism, ck_object_handle_t key);
@@ -389,4 +462,4 @@ inline static bool is_pkcs11_url_object(const char *url)
 
 #endif				/* ENABLE_PKCS11 */
 
-#endif
+#endif /* GNUTLS_LIB_PKCS11_INT_H */

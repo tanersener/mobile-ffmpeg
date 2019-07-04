@@ -18,6 +18,11 @@
  */
 
 #define CHECK(x) assert((x)>=0)
+#define LOOP_CHECK(rval, cmd) \
+        do { \
+                rval = cmd; \
+        } while(rval == GNUTLS_E_AGAIN || rval == GNUTLS_E_INTERRUPTED); \
+        assert(rval >= 0)
 
 #define MAX_BUF 1024
 #define MSG "GET / HTTP/1.0\r\n\r\n"
@@ -34,6 +39,11 @@ int main(void)
         gnutls_psk_client_credentials_t pskcred;
         const gnutls_datum_t key = { (void *) "DEADBEEF", 8 };
 
+        if (gnutls_check_version("3.6.3") == NULL) {
+                fprintf(stderr, "GnuTLS 3.6.3 or later is required for this example\n");
+                exit(1);
+        }
+
         CHECK(gnutls_global_init());
 
         CHECK(gnutls_psk_allocate_client_credentials(&pskcred));
@@ -44,11 +54,14 @@ int main(void)
          */
         CHECK(gnutls_init(&session, GNUTLS_CLIENT));
 
-        /* Use default priorities */
         ret =
-            gnutls_priority_set_direct(session,
-                                       "PERFORMANCE:+ECDHE-PSK:+DHE-PSK:+PSK",
-                                       &err);
+            gnutls_set_default_priority_append(session,
+                                         "-KX-ALL:+ECDHE-PSK:+DHE-PSK:+PSK",
+                                         &err, 0);
+
+        /* Alternative for pre-3.6.3 versions:
+         * gnutls_priority_set_direct(session, "NORMAL:+ECDHE-PSK:+DHE-PSK:+PSK", &err)
+         */
         if (ret < 0) {
                 if (ret == GNUTLS_E_INVALID_REQUEST) {
                         fprintf(stderr, "Syntax error at: %s\n", err);
@@ -87,9 +100,9 @@ int main(void)
                 gnutls_free(desc);
         }
 
-        CHECK(gnutls_record_send(session, MSG, strlen(MSG)));
+        LOOP_CHECK(ret, gnutls_record_send(session, MSG, strlen(MSG)));
 
-        ret = gnutls_record_recv(session, buffer, MAX_BUF);
+        LOOP_CHECK(ret, gnutls_record_recv(session, buffer, MAX_BUF));
         if (ret == 0) {
                 printf("- Peer has closed the TLS connection\n");
                 goto end;

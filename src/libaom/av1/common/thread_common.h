@@ -101,9 +101,9 @@ typedef struct AV1LrSyncData {
 void av1_loop_filter_dealloc(AV1LfSync *lf_sync);
 
 void av1_loop_filter_frame_mt(YV12_BUFFER_CONFIG *frame, struct AV1Common *cm,
-                              struct macroblockd *mbd, int plane_start,
+                              struct macroblockd *xd, int plane_start,
                               int plane_end, int partial_frame,
-#if LOOP_FILTER_BITMASK
+#if CONFIG_LPF_MASK
                               int is_decoding,
 #endif
                               AVxWorker *workers, int num_workers,

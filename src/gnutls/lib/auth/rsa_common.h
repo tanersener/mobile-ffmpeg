@@ -23,12 +23,12 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
-#ifndef AUTH_RSA_COMMON
-#define AUTH_RSA_COMMON
+#ifndef GNUTLS_LIB_AUTH_RSA_COMMON_H
+#define GNUTLS_LIB_AUTH_RSA_COMMON_H
 
 #include <abstract_int.h>
 
@@ -36,4 +36,4 @@ int
 _gnutls_get_public_rsa_params(gnutls_session_t session,
 			      gnutls_pk_params_st * params);
 
-#endif
+#endif /* GNUTLS_LIB_AUTH_RSA_COMMON_H */

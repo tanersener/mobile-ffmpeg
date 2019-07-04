@@ -44,6 +44,7 @@ int main()
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <signal.h>
+#include <assert.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/dtls.h>
 
@@ -72,7 +73,7 @@ push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 	return send(fd, data, len, 0);
 }
 
-static void client(int fd)
+static void client(int fd, const char *prio)
 {
 	int ret;
 	char buffer[MAX_BUF + 1];
@@ -94,10 +95,7 @@ static void client(int fd)
 	gnutls_dtls_set_mtu(session, 1500);
 	gnutls_handshake_set_timeout(session, 20 * 1000);
 
-	/* Use default priorities */
-	gnutls_priority_set_direct(session,
-				   "NORMAL:-KX-ALL:+ECDHE-RSA",
-				   NULL);
+	assert(gnutls_priority_set_direct(session, prio, NULL) >= 0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
@@ -168,7 +166,7 @@ static void terminate(void)
 	exit(1);
 }
 
-static void server(int fd)
+static void server(int fd, const char *prio)
 {
 	int ret;
 	gnutls_certificate_credentials_t xcred;
@@ -202,12 +200,7 @@ static void server(int fd)
 	gnutls_handshake_set_timeout(session, 20 * 1000);
 	gnutls_dtls_set_mtu(session, 1500);
 
-	/* avoid calling all the priority functions, since the defaults
-	 * are adequate.
-	 */
-	gnutls_priority_set_direct(session,
-				   "NORMAL:-KX-ALL:+ECDHE-RSA",
-				   NULL);
+	assert(gnutls_priority_set_direct(session, prio, NULL) >= 0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
@@ -265,11 +258,13 @@ static void server(int fd)
 		success("server: finished\n");
 }
 
-void doit(void)
+static 
+void run(const char *name, const char *prio)
 {
 	int fd[2];
 	int ret;
 
+	success("trying: %s\n", name);
 	signal(SIGPIPE, SIG_IGN);
 
 	ret = socketpair(AF_UNIX, SOCK_STREAM, 0, fd);
@@ -290,15 +285,23 @@ void doit(void)
 		/* parent */
 
 		close(fd[0]);
-		client(fd[1]);
+		client(fd[1], prio);
 
 		wait(&status);
 		check_wait_status(status);
 	} else {
 		close(fd[1]);
-		server(fd[0]);
+		server(fd[0], prio);
 		exit(0);
 	}
 }
+
+void doit(void)
+{
+	run("dtls1.0", "NORMAL:-KX-ALL:+ECDHE-RSA:-VERS-ALL:+VERS-DTLS1.0");
+	run("dtls1.2", "NORMAL:-KX-ALL:+ECDHE-RSA:-VERS-ALL:+VERS-DTLS1.2");
+	run("default", "NORMAL");
+}
+
 
 #endif				/* _WIN32 */

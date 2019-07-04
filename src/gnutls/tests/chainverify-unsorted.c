@@ -603,7 +603,7 @@ void doit(void)
 	gnutls_x509_crt_t *crts;
 	unsigned int crts_size, i;
 	gnutls_x509_trust_list_t tl;
-	unsigned int status, flags = GNUTLS_VERIFY_ALLOW_UNSORTED_CHAIN;
+	unsigned int status, flags = GNUTLS_VERIFY_ALLOW_UNSORTED_CHAIN|GNUTLS_VERIFY_ALLOW_BROKEN;
 	unsigned int not_flags = GNUTLS_VERIFY_DO_NOT_ALLOW_UNSORTED_CHAIN;
 
 	/* this must be called once in the program

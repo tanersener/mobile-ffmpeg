@@ -16,12 +16,12 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
-#ifndef GNUTLS_NUM_H
-#define GNUTLS_NUM_H
+#ifndef GNUTLS_LIB_NUM_H
+#define GNUTLS_LIB_NUM_H
 
 #include "gnutls_int.h"
 
@@ -162,4 +162,4 @@ inline static uint32_t _gnutls_uint64touint32(const gnutls_uint64 * num)
 	return ret;
 }
 
-#endif				/* GNUTLS_NUM_H */
+#endif /* GNUTLS_LIB_NUM_H */

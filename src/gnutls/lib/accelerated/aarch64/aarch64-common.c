@@ -16,7 +16,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -28,7 +28,6 @@
 #include "errors.h"
 #include "gnutls_int.h"
 #include <gnutls/crypto.h>
-#include <c-ctype.h>
 #include "errors.h"
 #ifdef HAVE_LIBNETTLE
 # include <nettle/aes.h>		/* for key generation in 192 and 256 bits */
@@ -36,6 +35,13 @@
 # include "aes-aarch64.h"
 #endif
 #include "aarch64-common.h"
+
+#ifdef HAVE_GETAUXVAL
+# include <sys/auxv.h>
+# ifdef AT_HWCAP
+#  define USE_AUXVAL
+# endif
+#endif
 
 #if defined(__GNUC__)
 __attribute__((visibility("hidden")))
@@ -59,41 +65,36 @@ static void capabilities_to_cpuid(unsigned capabilities)
 	_gnutls_arm_cpuid_s |= capabilities;
 }
 
+/* Correspond to asm/hwcap.h for aarch64 */
+#ifdef USE_AUXVAL
+#define HWCAP_ASIMD  (1 << 1)
+#define HWCAP_AES    (1 << 3)
+#define HWCAP_PMULL  (1 << 4)
+#define HWCAP_SHA1   (1 << 5)
+#define HWCAP_SHA2   (1 << 6)
+#define HWCAP_SHA3   (1 << 17)
+#define HWCAP_SHA512 (1 << 21)
+#endif
+
 static void discover_caps(unsigned int *caps)
 {
-	char line[512];
-	char *p, *savep = NULL, *p2;
-	FILE *fp = fopen("/proc/cpuinfo", "r");
+#ifdef USE_AUXVAL
+	unsigned long c;
 
-	if (fp == NULL)
-		return;
-
-	/* this is most likely linux-only */
-	while(fgets(line, sizeof(line), fp) != NULL) {
-		if (strncmp(line, "Features", 8) == 0) {
-			p = strchr(line, ':');
-			if (p) {
-				p++;
-				while (c_isspace(*p))
-					p++;
-
-				while((p2 = strtok_r(p, " ", &savep)) != NULL) {
-					if (strncmp(p2, "sha2", 4) == 0)
-						*caps |= ARMV8_SHA256;
-					else if (strncmp(p2, "sha1", 4) == 0)
-						*caps |= ARMV8_SHA1;
-					else if (strncmp(p2, "pmull", 5) == 0)
-						*caps |= ARMV8_PMULL;
-					else if (strncmp(p2, "aes", 3) == 0)
-						*caps |= ARMV8_AES;
-					p = NULL;
-				}
-			}
-			break;
-		}
-	}
-
-	fclose(fp);
+	c = getauxval(AT_HWCAP);
+	if (c & HWCAP_ASIMD)
+		*caps |= ARMV7_NEON;
+	if (c & HWCAP_AES)
+		*caps |= ARMV8_AES;
+	if (c & HWCAP_PMULL)
+		*caps |= ARMV8_PMULL;
+	if (c & HWCAP_SHA1)
+		*caps |= ARMV8_SHA1;
+	if (c & HWCAP_SHA2)
+		*caps |= ARMV8_SHA256;
+	if (c & HWCAP_SHA512)
+		*caps |= ARMV8_SHA512;
+#endif
 }
 
 static

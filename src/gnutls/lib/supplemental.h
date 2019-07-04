@@ -16,9 +16,12 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
+
+#ifndef GNUTLS_LIB_SUPPLEMENTAL_H
+#define GNUTLS_LIB_SUPPLEMENTAL_H
 
 #include "gnutls_int.h"
 
@@ -28,3 +31,5 @@ int _gnutls_gen_supplemental(gnutls_session_t session,
 			     gnutls_buffer_st * buf);
 
 void _gnutls_supplemental_deinit(void);
+
+#endif /* GNUTLS_LIB_SUPPLEMENTAL_H */

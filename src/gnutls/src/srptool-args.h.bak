@@ -19,7 +19,7 @@
  * The srptool program is copyrighted and licensed
  * under the following terms:
  *
- *  Copyright (C) 2000-2018 Free Software Foundation, and others, all rights reserved.
+ *  Copyright (C) 2000-2019 Free Software Foundation, and others, all rights reserved.
  *  This is free software. It is licensed for use, modification and
  *  redistribution under the terms of the GNU General Public License,
  *  version 3 or later <http://gnu.org/licenses/gpl.html>
@@ -81,9 +81,9 @@ typedef enum {
 /** count of all options for srptool */
 #define OPTION_CT    11
 /** srptool version */
-#define SRPTOOL_VERSION       "3.5.19"
+#define SRPTOOL_VERSION       "3.6.8"
 /** Full srptool version text */
-#define SRPTOOL_FULL_VERSION  "srptool 3.5.19"
+#define SRPTOOL_FULL_VERSION  "srptool 3.6.8"
 
 /**
  *  Interface defines for all options.  Replace "n" with the UPPER_CASED

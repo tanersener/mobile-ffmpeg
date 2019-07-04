@@ -1,0 +1,42 @@
+
+
+
+
+@deftypefun {int} {gnutls_reauth} (gnutls_session_t @var{session}, unsigned int @var{flags})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{flags}: must be zero
+
+This function performs the post-handshake authentication
+for TLS 1.3. The post-handshake authentication is initiated by the server
+by calling this function. Clients respond when @code{GNUTLS_E_REAUTH_REQUEST} 
+has been seen while receiving data.
+
+The non-fatal errors expected by this function are:
+@code{GNUTLS_E_INTERRUPTED} , @code{GNUTLS_E_AGAIN} , as well as
+@code{GNUTLS_E_GOT_APPLICATION_DATA}  when called on server side.
+
+The former two interrupt the authentication procedure due to the transport
+layer being interrupted, and the latter because there were pending data prior
+to peer initiating the re-authentication. The server should read/process that
+data as unauthenticated and retry calling @code{gnutls_reauth()} .
+
+When this function is called under TLS1.2 or earlier or the peer didn't
+advertise post-handshake auth, it always fails with
+@code{GNUTLS_E_INVALID_REQUEST} . The verification of the received peers certificate
+is delegated to the session or credentials verification callbacks. A
+server can check whether post handshake authentication is supported
+by the client by checking the session flags with @code{gnutls_session_get_flags()} .
+
+Prior to calling this function in server side, the function
+@code{gnutls_certificate_server_set_request()}  must be called setting expectations
+for the received certificate (request or require). If none are set
+this function will return with @code{GNUTLS_E_INVALID_REQUEST} .
+
+Note that post handshake authentication is available irrespective
+of the initial negotiation type (PSK or certificate). In all cases
+however, certificate credentials must be set to the session prior
+to calling this function.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on a successful authentication, otherwise a negative error code.
+@end deftypefun

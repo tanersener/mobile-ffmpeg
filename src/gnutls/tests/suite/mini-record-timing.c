@@ -45,12 +45,18 @@ int main()
 #include <unistd.h>
 #include <gnutls/gnutls.h>
 #include <signal.h>
+#include <assert.h>
 #include <errno.h>
-#include "../utils.h"
+
+//#define USE_RDTSC
+//#define TEST_ETM
 
 #include <time.h>
 #include <sys/time.h>
 #include <sys/resource.h>
+#ifdef USE_RDTSC
+#include <x86intrin.h>
+#endif
 
 #ifdef DEBUG
 static void server_log_func(int level, const char *str)
@@ -64,57 +70,28 @@ static void client_log_func(int level, const char *str)
 }
 #endif
 
-#undef REHANDSHAKE
+
+
+#ifndef _POSIX_TIMERS
+#error need posix timers
+#endif
+
+#define CLOCK_TO_USE CLOCK_MONOTONIC
+//#define CLOCK_TO_USE CLOCK_MONOTONIC_RAW
+//#define CLOCK_TO_USE CLOCK_PROCESS_CPUTIME_ID
 
 /* This program tests the robustness of record
  * decoding.
  */
-
-static unsigned char server_cert_pem[] =
-    "-----BEGIN CERTIFICATE-----\n"
-    "MIIBeTCCASWgAwIBAgIBBzANBgkqhkiG9w0BAQsFADAPMQ0wCwYDVQQDEwROb25l\n"
-    "MCIYDzIwMTMwMTE5MTA0MDAwWhgPMjA0MDA2MDUxMDQwMDBaMA8xDTALBgNVBAMT\n"
-    "BE5vbmUwWTANBgkqhkiG9w0BAQEFAANIADBFAj4Bh52/b3FNXDdICg1Obqu9ivW+\n"
-    "PGJ89mNsX3O9S/aclnx5Ozw9MC1UJuZ2UEHl27YVmm4xG/y3nKUNevZjKwIDAQAB\n"
-    "o2swaTAMBgNVHRMBAf8EAjAAMBQGA1UdEQQNMAuCCWxvY2FsaG9zdDATBgNVHSUE\n"
-    "DDAKBggrBgEFBQcDATAPBgNVHQ8BAf8EBQMDB6AAMB0GA1UdDgQWBBRhEgmVCi6c\n"
-    "hhRQvMzfEXqLKTRxcTANBgkqhkiG9w0BAQsFAAM/AADMi31wr0Tp2SJUCuQjFVCb\n"
-    "JDleomTayOWVS/afCyAUxYjqFfUFSZ8sYN3zAgnXt5DYO3VclIlax4n6iXOg\n"
-    "-----END CERTIFICATE-----\n";
-
-const gnutls_datum_t server_cert = { server_cert_pem,
-	sizeof(server_cert_pem)
-};
-
-static unsigned char server_key_pem[] =
-    "-----BEGIN RSA PRIVATE KEY-----\n"
-    "MIIBLAIBAAI+AYedv29xTVw3SAoNTm6rvYr1vjxifPZjbF9zvUv2nJZ8eTs8PTAt\n"
-    "VCbmdlBB5du2FZpuMRv8t5ylDXr2YysCAwEAAQI9EPt8Q77sFeWn0BfHoPD9pTsG\n"
-    "5uN2e9DP8Eu6l8K4AcOuEsEkqZzvxgqZPA68pw8BZ5xKINMFdRPHmrX/cQIfHsdq\n"
-    "aMDYR/moqgj8MbupqOr/48iorTk/D//2lgAMnwIfDLk3UWGvPiv6fNTlEnTgVn6o\n"
-    "TdL0mvpkixebQ5RR9QIfHDjkRGtXph+xXUBh50RZXE8nFfl/WV7diVE+DOq8pwIf\n"
-    "BxdOwjdsAH1oLBxG0sN6qBoM2NrCYoE8edydNsu55QIfEWsrlJnO/t0GzHy7qWdV\n"
-    "zi9JMPu9MTDhOGmqPQO7Xw==\n" "-----END RSA PRIVATE KEY-----\n";
-
-
-const gnutls_datum_t server_key = { server_key_pem,
-	sizeof(server_key_pem)
-};
-
-
-/* A very basic TLS client, with anonymous authentication.
- */
-
-
-#define MAX_PER_POINT (684*1024)
-#define MAX_MEASUREMENTS(np) (MAX_PER_POINT*(np))
+#define MAX_PER_POINT (8*1024)
+#define WARM_UP (2)
 #define MAX_BUF 1024
 
 struct point_st {
 	unsigned char byte1;
 	unsigned char byte2;
 	unsigned midx;
-	unsigned long *measurements;
+	unsigned taken;
 	unsigned long *smeasurements;
 };
 
@@ -125,6 +102,7 @@ struct test_st {
 	const char *file;
 	const char *name;
 	unsigned text_size;
+	uint8_t fill;
 };
 
 struct point_st *prev_point_ptr = NULL;
@@ -148,112 +126,36 @@ push_crippled(gnutls_transport_ptr_t tr, const void *_data, size_t len)
 	unsigned p_size;
 	struct test_st *test = gnutls_session_get_ptr(cli_session);
 
-	p = &test->points[point_idx];
 	p_size = test->npoints;
 
-	memcpy(&data[len - 32], data + 5, 32);
-
-/*fprintf(stderr, "sending: %d: %d\n", (unsigned)p->byte1, (int)len);*/
-	data[len - 17] ^= p->byte1;
-	data[len - 18] ^= p->byte2;
-
-	prev_point_ptr = p;
-	point_idx++;
 	if (point_idx >= p_size)
-		point_idx = 0;
+		abort();
+
+	p = &test->points[point_idx];
+
+
+	if (test->fill != 0xff) {
+		/* original lucky13 attack */
+		memmove(&data[len - 32], data + 5, 32);
+		data[len - 17] ^= p->byte1;
+		data[len - 18] ^= p->byte2;
+	} else {
+		/* a revised attack which depends on chosen-plaintext */
+		assert(len>512);
+		memmove(data+len-256-32, data+5, 256+32);
+		data[len - 257] ^= p->byte1;
+	}
 
 	return send(fd, data, len, 0);
 }
 
 
+#ifndef USE_RDTSC
 static unsigned long timespec_sub_ns(struct timespec *a,
 				     struct timespec *b)
 {
-	return (a->tv_sec * 1000 * 1000 * 1000 + a->tv_nsec -
-		(b->tv_sec * 1000 * 1000 * 1000 + b->tv_nsec));
-}
-
-static
-double calc_avg(unsigned long *diffs, unsigned int diffs_size)
-{
-	double avg = 0;
-	unsigned int i;
-	unsigned int start = diffs_size / 20;
-	unsigned int stop = diffs_size - diffs_size / 20;
-
-	for (i = start; i < stop; i++)
-		avg += diffs[i];
-
-	avg /= (stop - start);
-
-	return avg;
-}
-
-static int compar(const void *_a, const void *_b)
-{
-	unsigned long a, b;
-
-	a = *((unsigned long *) _a);
-	b = *((unsigned long *) _b);
-
-	if (a < b)
-		return -1;
-	else if (a == b)
-		return 0;
-	else
-		return 1;
-}
-
-static
-double calc_median(unsigned long *diffs, unsigned int diffs_size)
-{
-	double med;
-
-	if (diffs_size % 2 == 1)
-		med = diffs[diffs_size / 2];
-	else {
-		med = diffs[diffs_size / 2] + diffs[(diffs_size - 1) / 2];
-		med /= 2;
-	}
-
-	return med;
-}
-
-#if 0
-static
-unsigned long calc_min(unsigned long *diffs, unsigned int diffs_size)
-{
-	unsigned long min = 0, i;
-	unsigned int start = diffs_size / 20;
-	unsigned int stop = diffs_size - diffs_size / 20;
-
-
-	for (i = start; i < stop; i++) {
-		if (min == 0)
-			min = diffs[i];
-		else if (diffs[i] < min)
-			min = diffs[i];
-	}
-	return min;
-}
-
-static
-double calc_var(unsigned long *diffs, unsigned int diffs_size, double avg)
-{
-	double sum = 0, d;
-	unsigned int i;
-	unsigned int start = diffs_size / 20;
-	unsigned int stop = diffs_size - diffs_size / 20;
-
-	for (i = start; i < stop; i++) {
-		d = ((double) diffs[i] - avg);
-		d *= d;
-
-		sum += d;
-	}
-	sum /= diffs_size - 1;
-
-	return sum;
+	return (a->tv_sec - b->tv_sec) * 1000 * 1000 * 1000 + a->tv_nsec -
+		b->tv_nsec;
 }
 #endif
 
@@ -263,34 +165,35 @@ client(int fd, const char *prio, unsigned int text_size,
 {
 	int ret;
 	char buffer[MAX_BUF + 1];
-	char text[text_size];
-	gnutls_certificate_credentials_t x509_cred;
+	char *text;
+	gnutls_psk_client_credentials_t pskcred;
 	gnutls_session_t session;
-	struct timespec start, stop;
-	static unsigned long taken = 0;
 	static unsigned long measurement;
+	const gnutls_datum_t key = { (void *) "DEADBEEF", 8 };
 	const char *err;
+	unsigned j;
 
-	global_init();
+	gnutls_global_init();
+
+	text = malloc(text_size);
+	assert(text != NULL);
 
 	setpriority(PRIO_PROCESS, getpid(), -15);
 
-	memset(text, 0, text_size);
+	memset(text, test->fill, text_size);
 
 #ifdef DEBUG
 	gnutls_global_set_log_function(client_log_func);
 	gnutls_global_set_log_level(6);
 #endif
 
-	gnutls_certificate_allocate_credentials(&x509_cred);
-
-#ifdef REHANDSHAKE
-      restart:
-#endif
+	gnutls_psk_allocate_client_credentials(&pskcred);
+	gnutls_psk_set_client_credentials(pskcred, "test", &key,
+					  GNUTLS_PSK_KEY_HEX);
 
 	/* Initialize TLS session
 	 */
-	gnutls_init(&session, GNUTLS_CLIENT);
+	assert(gnutls_init(&session, GNUTLS_CLIENT) >= 0);
 	gnutls_session_set_ptr(session, test);
 	cli_session = session;
 
@@ -303,7 +206,7 @@ client(int fd, const char *prio, unsigned int text_size,
 
 	/* put the anonymous credentials to the current session
 	 */
-	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
+	gnutls_credentials_set(session, GNUTLS_CRD_PSK, pskcred);
 	gnutls_transport_set_int(session, fd);
 
 	/* Perform the TLS handshake
@@ -314,8 +217,7 @@ client(int fd, const char *prio, unsigned int text_size,
 	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
 	if (ret < 0) {
-		fprintf(stderr, "client: Handshake failed\n");
-		gnutls_perror(ret);
+		fprintf(stderr, "client: Handshake failed: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -328,111 +230,84 @@ client(int fd, const char *prio, unsigned int text_size,
 
 	gnutls_transport_set_push_function(session, push_crippled);
 
-#ifndef REHANDSHAKE
-      restart:
-#endif
+ restart:
 	do {
 		ret = gnutls_record_send(session, text, sizeof(text));
 	} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 	/* measure peer's processing time */
-	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start);
 
-#define TLS_RECV
-#ifdef TLS_RECV
 	do {
 		ret = gnutls_record_recv(session, buffer, sizeof(buffer));
 	} while (ret < 0
 		 && (ret == GNUTLS_E_AGAIN
 		     || ret == GNUTLS_E_INTERRUPTED));
-#else
-	do {
-		ret = recv(fd, buffer, sizeof(buffer), 0);
-	} while (ret == -1 && errno == EAGAIN);
-#endif
 
-	if (taken < MAX_MEASUREMENTS(test->npoints) && ret > 0) {
-		clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &stop);
-		taken++;
-		measurement = timespec_sub_ns(&stop, &start);
-		prev_point_ptr->measurements[prev_point_ptr->midx] =
-		    measurement;
+	if (ret > 0) {
+		struct point_st *point_ptr = NULL;
 
-/*fprintf(stderr, "(%u,%u): %lu\n", (unsigned) prev_point_ptr->byte1,
- (unsigned) prev_point_ptr->byte2, measurements[taken]);*/
-		memcpy(&measurement, buffer, sizeof(measurement));
-		prev_point_ptr->smeasurements[prev_point_ptr->midx] =
-		    measurement;
-		prev_point_ptr->midx++;
+		assert(ret == sizeof(measurement));
 
-		/* read server's measurement */
+		point_ptr = &test->points[point_idx];
+		point_ptr->taken++;
 
-#ifdef REHANDSHAKE
-		gnutls_deinit(session);
-#endif
+		if (point_idx == 0) {
+			printf("%s: measurement: %u / %d\r", test->name, (unsigned)point_ptr->taken+1, MAX_PER_POINT+WARM_UP);
+		}
+
+		if (point_idx == 0 && point_ptr->midx+1 >= MAX_PER_POINT) {
+			goto finish;
+		}
+
+		if (point_ptr->taken >= WARM_UP) {
+			memcpy(&measurement, buffer, sizeof(measurement));
+			if (point_ptr->midx < MAX_PER_POINT) {
+				point_ptr->smeasurements[point_ptr->midx] =
+				    measurement;
+				point_ptr->midx++;
+				point_idx++;
+
+				if (point_idx >= test->npoints)
+					point_idx = 0;
+			}
+		}
+
 		goto restart;
+	} else {
+		abort();
 	}
-#ifndef TLS_RECV
-	else if (ret < 0) {
-		fprintf(stderr, "Error in recv()\n");
-		exit(1);
-	}
-#endif
+
+finish:
+	fprintf(stderr, "\ntest completed\n");
 
 	gnutls_transport_set_push_function(session, push);
 
 	gnutls_bye(session, GNUTLS_SHUT_WR);
 
 	{
-		double avg2, med, savg, smed;
 		unsigned i;
 		FILE *fp = NULL;
 
-		if (test->file)
-			fp = fopen(test->file, "w");
+		fp = fopen(test->file, "w");
+		assert(fp != NULL);
 
-		if (fp)		/* point, avg, median */
-			fprintf(fp,
-				"Delta,TimeAvg,TimeMedian,ServerAvg,ServerMedian\n");
-
-		for (i = 0; i < test->npoints; i++) {
-			qsort(test->points[i].measurements,
-			      test->points[i].midx,
-			      sizeof(test->points[i].measurements[0]),
-			      compar);
-
-			qsort(test->points[i].smeasurements,
-			      test->points[i].midx,
-			      sizeof(test->points[i].smeasurements[0]),
-			      compar);
-
-			avg2 =
-			    calc_avg(test->points[i].measurements,
-				     test->points[i].midx);
-			/*var = calc_var( test->points[i].measurements, test->points[i].midx, avg2); */
-			med =
-			    calc_median(test->points[i].measurements,
-					test->points[i].midx);
-
-			savg =
-			    calc_avg(test->points[i].smeasurements,
-				     test->points[i].midx);
-			/*var = calc_var( test->points[i].measurements, test->points[i].midx, avg2); */
-			smed =
-			    calc_median(test->points[i].smeasurements,
-					test->points[i].midx);
-			/*min = calc_min( test->points[i].measurements, test->points[i].midx); */
-
-			if (fp)	/* point, avg, median */
-				fprintf(fp, "%u,%.2lf,%.2lf,%.2lf,%.2lf\n",
-					(unsigned) test->points[i].byte1,
-					avg2, med, savg, smed);
-
-			/*printf("(%u) Avg: %.3f nanosec, Median: %.3f, Variance: %.3f\n", (unsigned)test->points[i].byte1, 
-			   avg2, med, var); */
+		fprintf(fp, "Delta,");
+		for (j = 0; j < MAX_PER_POINT; j++) {
+			fprintf(fp, "measurement-%u%s", j, j!=(MAX_PER_POINT-1)?",":"");
 		}
+		fprintf(fp, "\n");
+		for (i = 0; i < test->npoints; i++) {
+			fprintf(fp, "%u,", (unsigned)test->points[i].byte1);
+			for (j = 0; j < MAX_PER_POINT; j++) {
+				fprintf(fp, "%u%s",
+					(unsigned) test->points[i].smeasurements[j],
+					(j!=MAX_PER_POINT-1)?",":"");
 
-		if (fp)
-			fclose(fp);
+			}
+			fprintf(fp, "\n");
+		}
+		printf("\n");
+
+		fclose(fp);
 	}
 
 	if (test->desc)
@@ -442,48 +317,53 @@ client(int fd, const char *prio, unsigned int text_size,
 
 	gnutls_deinit(session);
 
-	gnutls_certificate_free_credentials(x509_cred);
+	gnutls_psk_free_client_credentials(pskcred);
 
 	gnutls_global_deinit();
+	free(text);
 }
 
-
+static int
+pskfunc(gnutls_session_t session, const char *username,
+	gnutls_datum_t * key)
+{
+	key->data = gnutls_malloc(4);
+	key->data[0] = 0xDE;
+	key->data[1] = 0xAD;
+	key->data[2] = 0xBE;
+	key->data[3] = 0xEF;
+	key->size = 4;
+	return 0;
+}
 
 static void server(int fd, const char *prio)
 {
 	int ret;
 	char buffer[MAX_BUF + 1];
 	gnutls_session_t session;
-	gnutls_certificate_credentials_t x509_cred;
+	gnutls_psk_server_credentials_t server_pskcred;
 	const char *err;
+#ifndef USE_RDTSC
 	struct timespec start, stop;
+#else
+	uint64_t c1, c2;
+	unsigned int i1;
+#endif
 	static unsigned long measurement;
 
 	setpriority(PRIO_PROCESS, getpid(), -15);
 
-	/* this must be called once in the program
-	 */
-	global_init();
+	gnutls_global_init();
 	memset(buffer, 0, sizeof(buffer));
 
 #ifdef DEBUG
 	gnutls_global_set_log_function(server_log_func);
 	gnutls_global_set_log_level(6);
 #endif
-
-	gnutls_certificate_allocate_credentials(&x509_cred);
-	ret =
-	    gnutls_certificate_set_x509_key_mem(x509_cred, &server_cert,
-						&server_key,
-						GNUTLS_X509_FMT_PEM);
-	if (ret < 0) {
-		fprintf(stderr, "Could not set certificate\n");
-		return;
-	}
-#ifdef REHANDSHAKE
-      restart:
-#endif
-	gnutls_init(&session, GNUTLS_SERVER);
+	assert(gnutls_psk_allocate_server_credentials(&server_pskcred)>=0);
+	gnutls_psk_set_server_credentials_function(server_pskcred,
+						   pskfunc);
+	assert(gnutls_init(&session, GNUTLS_SERVER)>=0);
 
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
@@ -491,10 +371,10 @@ static void server(int fd, const char *prio)
 	if ((ret = gnutls_priority_set_direct(session, prio, &err)) < 0) {
 		fprintf(stderr, "Error in priority string %s: %s\n",
 			gnutls_strerror(ret), err);
-		return;
+		exit(1);
 	}
 
-	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
+	gnutls_credentials_set(session, GNUTLS_CRD_PSK, server_pskcred);
 	gnutls_transport_set_int(session, fd);
 
 	do {
@@ -512,24 +392,41 @@ static void server(int fd, const char *prio)
 			fprintf(stderr,
 				"server: Handshake has failed (%s)\n\n",
 				gnutls_strerror(ret));
+			exit(1);
 		}
 		goto finish;
 	}
-#ifndef REHANDSHAKE
-      restart:
+#ifdef TEST_ETM
+	assert(gnutls_session_etm_status(session)!=0);
+#else
+	assert(gnutls_session_etm_status(session)==0);
 #endif
 
-	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start);
+ restart:
+	do {
+		ret = recv(fd, buffer, 1, MSG_PEEK);
+	} while (ret == -1 && errno == EAGAIN);
+
+#ifdef USE_RDTSC
+	c1 = __rdtscp(&i1);
+#else
+	clock_gettime(CLOCK_TO_USE, &start);
+#endif
 
 	do {
 		ret = gnutls_record_recv(session, buffer, sizeof(buffer));
 	} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
-	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &stop);
+#ifdef USE_RDTSC
+	c2 = __rdtscp(&i1);
+	measurement = c2 - c1;
+#else
+	clock_gettime(CLOCK_TO_USE, &stop);
+	measurement = timespec_sub_ns(&stop, &start);
+#endif
 
 	if (ret == GNUTLS_E_DECRYPTION_FAILED) {
 		gnutls_session_force_valid(session);
-		measurement = timespec_sub_ns(&stop, &start);
 		do {
 			ret =
 			    gnutls_record_send(session, &measurement,
@@ -538,14 +435,14 @@ static void server(int fd, const char *prio)
 		} while (ret == GNUTLS_E_AGAIN
 			 || ret == GNUTLS_E_INTERRUPTED);
 
-#ifdef REHANDSHAKE
-		gnutls_deinit(session);
-#endif
-		if (ret >= 0)
+		if (ret >= 0) {
 			goto restart;
-	} else if (ret < 0)
-		fprintf(stderr, "err: %s\n", gnutls_strerror(ret));
+		}
+	} else if (ret > 0) {
+		goto restart;
+	}
 
+	assert(ret <= 0);
 
 	/* do not wait for the peer to close the connection.
 	 */
@@ -555,7 +452,7 @@ static void server(int fd, const char *prio)
 	close(fd);
 	gnutls_deinit(session);
 
-	gnutls_certificate_free_credentials(x509_cred);
+	gnutls_psk_free_server_credentials(server_pskcred);
 
 	gnutls_global_deinit();
 }
@@ -607,11 +504,9 @@ static void ch_handler(int sig)
 	return;
 }
 
-static struct point_st all_points[256];
-static struct point_st all_points_one[256];
-
-
-#define NPOINTS(points) (sizeof(points)/sizeof(points[0]))
+#define NPOINTS 256
+static struct point_st all_points[NPOINTS];
+static struct point_st all_points_one[NPOINTS];
 
 /* Test that outputs a graph of the timings
  * when manipulating the last record byte (pad)
@@ -619,10 +514,11 @@ static struct point_st all_points_one[256];
  */
 static struct test_st test_sha1 = {
 	.points = all_points,
-	.npoints = NPOINTS(all_points),
+	.npoints = NPOINTS,
 	.text_size = 18 * 16,
 	.name = "sha1",
 	.file = "out-sha1.txt",
+	.fill = 0x00,
 	.desc = NULL
 };
 
@@ -632,10 +528,31 @@ static struct test_st test_sha1 = {
  */
 static struct test_st test_sha256 = {
 	.points = all_points,
-	.npoints = NPOINTS(all_points),
+	.npoints = NPOINTS,
 	.text_size = 17 * 16,
 	.name = "sha256",
 	.file = "out-sha256.txt",
+	.fill = 0x00,
+	.desc = NULL
+};
+
+static struct test_st test_sha256_new = {
+	.points = all_points,
+	.npoints = NPOINTS,
+	.text_size = 1024 * 16,
+	.name = "sha256-new",
+	.file = "out-sha256-new.txt",
+	.fill = 0xff,
+	.desc = NULL
+};
+
+static struct test_st test_sha384 = {
+	.points = all_points,
+	.npoints = NPOINTS,
+	.text_size = 33 * 16,
+	.name = "sha384",
+	.file = "out-sha384.txt",
+	.fill = 0x00,
 	.desc = NULL
 };
 
@@ -645,10 +562,11 @@ static struct test_st test_sha256 = {
  */
 static struct test_st test_sha1_short = {
 	.points = all_points,
-	.npoints = NPOINTS(all_points),
+	.npoints = NPOINTS,
 	.text_size = 16 * 2,
 	.name = "sha1-short",
 	.file = "out-sha1-short.txt",
+	.fill = 0x00,
 	.desc = NULL
 };
 
@@ -658,10 +576,21 @@ static struct test_st test_sha1_short = {
  */
 static struct test_st test_sha256_short = {
 	.points = all_points,
-	.npoints = NPOINTS(all_points),
+	.npoints = NPOINTS,
 	.text_size = 16 * 2,
 	.name = "sha256-short",
 	.file = "out-sha256-short.txt",
+	.fill = 0x00,
+	.desc = NULL
+};
+
+static struct test_st test_sha384_short = {
+	.points = all_points,
+	.npoints = NPOINTS,
+	.text_size = 16 * 2,
+	.name = "sha384-short",
+	.file = "out-sha384-short.txt",
+	.fill = 0x00,
 	.desc = NULL
 };
 
@@ -674,10 +603,11 @@ static struct test_st test_sha256_short = {
  */
 static struct test_st test_sha1_one = {
 	.points = all_points_one,
-	.npoints = NPOINTS(all_points_one),
+	.npoints = NPOINTS,
 	.text_size = 16 * 2,
 	.name = "sha1-one",
 	.file = "out-sha1-one.txt",
+	.fill = 0x00,
 	.desc = NULL
 };
 
@@ -687,6 +617,10 @@ int main(int argc, char **argv)
 	struct test_st *test;
 	const char *hash;
 	char prio[512];
+	struct timespec res;
+
+	assert(clock_getres(CLOCK_TO_USE, &res) >= 0);
+	assert(res.tv_nsec < 100);
 
 	signal(SIGCHLD, ch_handler);
 	signal(SIGPIPE, SIG_IGN);
@@ -695,15 +629,24 @@ int main(int argc, char **argv)
 		if (strcmp(argv[1], "sha1") == 0) {
 			test = &test_sha1;
 			hash = "SHA1";
-		} else if (strncmp(argv[1], "sha2", 4) == 0) {
-			test = &test_sha256;
-			hash = "SHA256";
 		} else if (strcmp(argv[1], "sha1-short") == 0) {
 			test = &test_sha1_short;
 			hash = "SHA1";
 		} else if (strcmp(argv[1], "sha256-short") == 0) {
 			test = &test_sha256_short;
 			hash = "SHA256";
+		} else if (strcmp(argv[1], "sha256-new") == 0) {
+			test = &test_sha256_new;
+			hash = "SHA256";
+		} else if (strcmp(argv[1], "sha256") == 0) {
+			test = &test_sha256;
+			hash = "SHA256";
+		} else if (strcmp(argv[1], "sha384-short") == 0) {
+			test = &test_sha384_short;
+			hash = "SHA384";
+		} else if (strcmp(argv[1], "sha384") == 0) {
+			test = &test_sha384;
+			hash = "SHA384";
 		} else if (strcmp(argv[1], "sha1-one") == 0) {
 			test = &test_sha1_one;
 			hash = "SHA1";
@@ -720,20 +663,16 @@ int main(int argc, char **argv)
 	memset(&all_points, 0, sizeof(all_points));
 	for (i = 0; i < 256; i++) {
 		all_points[i].byte1 = i;
-		all_points[i].measurements =
-		    malloc(MAX_PER_POINT *
-			   sizeof(all_points[i].measurements[0]));
+		all_points[i].byte2 = 0;
 		all_points[i].smeasurements =
 		    malloc(MAX_PER_POINT *
-			   sizeof(all_points[i].measurements[0]));
+			   sizeof(all_points[i].smeasurements[0]));
 	}
 
 	memset(&all_points_one, 0, sizeof(all_points_one));
 	for (i = 0; i < 256; i++) {
 		all_points_one[i].byte1 = i;
 		all_points_one[i].byte2 = 1;
-		all_points_one[i].measurements =
-		    all_points[i].measurements;
 		all_points_one[i].smeasurements =
 		    all_points[i].smeasurements;
 	}
@@ -741,7 +680,11 @@ int main(int argc, char **argv)
 
 	remove(test->file);
 	snprintf(prio, sizeof(prio),
-		 "NONE:+COMP-NULL:+AES-128-CBC:+%s:+RSA:%%COMPAT:+VERS-TLS1.2:+VERS-TLS1.1",
+#ifdef TEST_ETM
+		 "NONE:+COMP-NULL:+AES-128-CBC:+AES-256-CBC:+%s:+PSK:+VERS-TLS1.2:+VERS-TLS1.1:+SIGN-ALL:+CURVE-ALL",
+#else
+		 "NONE:+COMP-NULL:+AES-128-CBC:+AES-256-CBC:+%s:+PSK:%%NO_ETM:+VERS-TLS1.2:+VERS-TLS1.1:+SIGN-ALL:+CURVE-ALL",
+#endif
 		 hash);
 
 	printf("\nAES-%s (calculating different padding timings)\n", hash);
@@ -749,57 +692,6 @@ int main(int argc, char **argv)
 
 	signal(SIGCHLD, SIG_IGN);
 
-#ifdef PDF
-	snprintf(prio, sizeof(prio),
-		 "R -e 'pdf(file=\"%s-timings-avg.pdf\");z=read.csv(\"%s\");"
-		 "plot(z$Delta,z$TimeAvg,xlab=\"Delta\",ylab=\"Average timings (ns)\");"
-		 "dev.off();'" test->name, test->file);
-	system(prio);
-
-	snprintf(prio, sizeof(prio),
-		 "R -e 'pdf(file=\"%s-timings-med.pdf\");z=read.csv(\"%s\");"
-		 "plot(z$Delta,z$TimeMedian,xlab=\"Delta\",ylab=\"Median timings (ns)\");"
-		 "dev.off();'"; test->name, test->file);
-	system(prio);
-
-	snprintf(prio, sizeof(prio),
-		 "R -e 'pdf(file=\"%s-server-timings-avg.pdf\");z=read.csv(\"%s\");"
-		 "plot(z$Delta,z$ServerAvg,xlab=\"Delta\",ylab=\"Average timings (ns)\");"
-		 "dev.off();'" test->name, test->file);
-	system(prio);
-
-	snprintf(prio, sizeof(prio),
-		 "R -e 'pdf(file=\"%s-server-timings-med.pdf\");z=read.csv(\"%s\");"
-		 "plot(z$Delta,z$ServerMedian,xlab=\"Delta\",ylab=\"Median timings (ns)\");"
-		 "dev.off();'"; test->name, test->file);
-	system(prio);
-#else
-	snprintf(prio, sizeof(prio),
-		 "R -e 'z=read.csv(\"%s\");png(filename = \"%s-timings-avg.png\",width=1024,height=1024,units=\"px\","
-		 "bg=\"white\");plot(z$Delta,z$TimeAvg,xlab=\"Delta\",ylab=\"Average timings (ns)\");dev.off();'",
-		 test->file, test->name);
-	system(prio);
-
-	snprintf(prio, sizeof(prio),
-		 "R -e 'z=read.csv(\"%s\");"
-		 "png(filename = \"%s-timings-med.png\",width=1024,height=1024,units=\"px\","
-		 "bg=\"white\");plot(z$Delta,z$TimeMedian,xlab=\"Delta\",ylab=\"Median timings (ns)\");dev.off();'",
-		 test->file, test->name);
-	system(prio);
-
-	snprintf(prio, sizeof(prio),
-		 "R -e 'z=read.csv(\"%s\");png(filename = \"%s-server-timings-avg.png\",width=1024,height=1024,units=\"px\","
-		 "bg=\"white\");plot(z$Delta,z$ServerAvg,xlab=\"Delta\",ylab=\"Average timings (ns)\");dev.off();'",
-		 test->file, test->name);
-	system(prio);
-
-	snprintf(prio, sizeof(prio),
-		 "R -e 'z=read.csv(\"%s\");"
-		 "png(filename = \"%s-server-timings-med.png\",width=1024,height=1024,units=\"px\","
-		 "bg=\"white\");plot(z$Delta,z$ServerMedian,xlab=\"Delta\",ylab=\"Median timings (ns)\");dev.off();'",
-		 test->file, test->name);
-	system(prio);
-#endif
 	return 0;
 }
 

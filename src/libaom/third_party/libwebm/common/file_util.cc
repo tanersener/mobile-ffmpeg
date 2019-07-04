@@ -24,8 +24,8 @@ namespace libwebm {
 std::string GetTempFileName() {
 #if !defined _MSC_VER && !defined __MINGW32__
   std::string temp_file_name_template_str =
-      std::string(std::getenv("TEST_TMPDIR") ? std::getenv("TEST_TMPDIR") :
-                                               ".") +
+      std::string(std::getenv("TEST_TMPDIR") ? std::getenv("TEST_TMPDIR")
+                                             : ".") +
       "/libwebm_temp.XXXXXX";
   char* temp_file_name_template =
       new char[temp_file_name_template_str.length() + 1];

@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pubkey_import_gost_raw} (gnutls_pubkey_t @var{key}, gnutls_ecc_curve_t @var{curve}, gnutls_digest_algorithm_t @var{digest}, gnutls_gost_paramset_t @var{paramset}, const gnutls_datum_t * @var{x}, const gnutls_datum_t * @var{y})

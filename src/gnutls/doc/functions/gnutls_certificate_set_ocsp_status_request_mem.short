@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_certificate_set_ocsp_status_request_mem} (gnutls_certificate_credentials_t @var{sc}, const gnutls_datum_t * @var{resp_data}, unsigned @var{idx}, gnutls_x509_crt_fmt_t @var{fmt})

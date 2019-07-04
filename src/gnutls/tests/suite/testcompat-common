@@ -27,15 +27,33 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
 # WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-DSA_CERT="${srcdir}/../key-tests/data/cert.dsa.1024.pem"
-DSA_KEY="${srcdir}/../key-tests/data/dsa.1024.pem"
-
-RSA_CERT="${srcdir}/../certs/cert-rsa-2432.pem"
-RSA_KEY="${srcdir}/../certs/rsa-2432.pem"
+DSA_CERT="${srcdir}/../cert-tests/data/cert.dsa.1024.pem"
+DSA_KEY="${srcdir}/../cert-tests/data/dsa.1024.pem"
 
 CA_CERT="${srcdir}/../../doc/credentials/x509/ca.pem"
 CLI_CERT="${srcdir}/../../doc/credentials/x509/clicert.pem"
 CLI_KEY="${srcdir}/../../doc/credentials/x509/clikey.pem"
+
+ECC_CLI_CERT="${srcdir}/../../doc/credentials/x509/clicert-ecdsa.pem"
+ECC_CLI_KEY="${srcdir}/../../doc/credentials/x509/clikey-ecdsa.pem"
+
+RSA_PSS_CLI_CERT="${srcdir}/../../doc/credentials/x509/clicert-rsa-pss.pem"
+RSA_PSS_CLI_KEY="${srcdir}/../../doc/credentials/x509/clikey-rsa-pss.pem"
+
+ED25519_CLI_CERT="${srcdir}/../../doc/credentials/x509/clicert-ed25519.pem"
+ED25519_CLI_KEY="${srcdir}/../../doc/credentials/x509/clikey-ed25519.pem"
+
+RSA_PSS_CERT="${srcdir}/../../doc/credentials/x509/cert-rsa-pss.pem"
+RSA_PSS_KEY="${srcdir}/../../doc/credentials/x509/key-rsa-pss.pem"
+
+RSA_CERT="${srcdir}/../../doc/credentials/x509/cert-rsa.pem"
+RSA_KEY="${srcdir}/../../doc/credentials/x509/key-rsa.pem"
+
+ED25519_CERT="${srcdir}/../../doc/credentials/x509/cert-ed25519.pem"
+ED25519_KEY="${srcdir}/../../doc/credentials/x509/key-ed25519.pem"
+
+ECC_CERT="${srcdir}/../../doc/credentials/x509/cert-ecc.pem"
+ECC_KEY="${srcdir}/../../doc/credentials/x509/key-ecc.pem"
 
 CA_ECC_CERT="${srcdir}/../certs/ca-cert-ecc.pem"
 ECC224_CERT="${srcdir}/../certs/cert-ecc.pem"
@@ -58,3 +76,6 @@ SERV_DSA_KEY="${srcdir}/../../doc/credentials/x509/key-dsa.pem"
 SERV_PSK="${srcdir}/../../doc/credentials/psk-passwd.txt"
 
 DH_PARAMS="${srcdir}/params.dh"
+
+PSKID=test32
+PSKKEY=8a7759b3f26983c453e448060bde89818a7759b3f26983c453e448060bde8981

@@ -7,17 +7,22 @@
 
 @var{size}: is the new size
 
-This function sets the maximum record packet size in this
-connection.  This property can only be set to clients.  The server
-may choose not to accept the requested size.
+This function sets the maximum amount of plaintext sent and
+received in a record in this connection.
 
-Acceptable values are 512(=2^9), 1024(=2^10), 2048(=2^11) and
-4096(=2^12).  The requested record size does get in effect
-immediately only while sending data. The receive part will take
-effect after a successful handshake.
+Prior to 3.6.4, this function was implemented using a TLS extension
+called 'max fragment length', which limits the acceptable values to
+512(=2^9), 1024(=2^10), 2048(=2^11) and 4096(=2^12).
 
-This function uses a TLS extension called 'max record size'.  Not
-all TLS implementations use or even understand this extension.
+Since 3.6.4, the limit is also negotiated through a new TLS
+extension called 'record size limit', which doesn't have the
+limitation, as long as the value ranges between 512 and 16384.
+Note that while the 'record size limit' extension is preferred, not
+all TLS implementations use or even understand the extension.
+
+@strong{Deprecated:} if the client can assume that the 'record size limit'
+extension is supported by the server, we recommend using
+@code{gnutls_record_set_max_recv_size()}  instead.
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned,
 otherwise a negative error code is returned.

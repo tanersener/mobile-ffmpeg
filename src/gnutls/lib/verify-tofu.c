@@ -16,7 +16,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -43,8 +43,6 @@ struct gnutls_tdb_int {
 
 static int raw_pubkey_to_base64(const gnutls_datum_t * raw,
 				gnutls_datum_t * b64);
-static int pgp_crt_to_raw_pubkey(const gnutls_datum_t * cert,
-				 gnutls_datum_t * rpubkey);
 static int verify_pubkey(const char *file, const char *host,
 			 const char *service, const gnutls_datum_t * skey);
 
@@ -79,11 +77,11 @@ struct gnutls_tdb_int default_tdb = {
  * @cert: The raw (der) data of the certificate
  * @flags: should be 0.
  *
- * This function will try to verify the provided (raw or DER-encoded) certificate 
- * using a list of stored public keys.  The @service field if non-NULL should
- * be a port number.
+ * This function will try to verify a raw public-key or a public-key provided via
+ * a raw (DER-encoded) certificate using a list of stored public keys.
+ * The @service field if non-NULL should be a port number.
  *
- * The @retrieve variable if non-null specifies a custom backend for
+ * The @db_name variable if non-null specifies a custom backend for
  * the retrieval of entries. If it is NULL then the
  * default file backend will be used. In POSIX-like systems the
  * file backend uses the $HOME/.gnutls/known_hosts file.
@@ -95,10 +93,12 @@ struct gnutls_tdb_int default_tdb = {
  * the given key is found, and 0 if it was found. The storage
  * function should return 0 on success.
  *
+ * As of GnuTLS 3.6.6 this function also verifies raw public keys.
+ *
  * Returns: If no associated public key is found
  * then %GNUTLS_E_NO_CERTIFICATE_FOUND will be returned. If a key
  * is found but does not match %GNUTLS_E_CERTIFICATE_KEY_MISMATCH
- * is returned. On success, %GNUTLS_E_SUCCESS (0) is returned, 
+ * is returned. On success, %GNUTLS_E_SUCCESS (0) is returned,
  * or a negative error value on other errors.
  *
  * Since: 3.0.13
@@ -112,15 +112,11 @@ gnutls_verify_stored_pubkey(const char *db_name,
 			    const gnutls_datum_t * cert,
 			    unsigned int flags)
 {
-	gnutls_datum_t pubkey = { NULL, 0 };
+	gnutls_datum_t pubkey = { NULL, 0 }; // Holds the pubkey in subjectPublicKeyInfo format (DER encoded)
 	int ret;
 	char local_file[MAX_FILENAME];
+	bool need_free;
 
-	if (cert_type != GNUTLS_CRT_X509
-	    && cert_type != GNUTLS_CRT_OPENPGP)
-		return
-		    gnutls_assert_val
-		    (GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE);
 
 	if (db_name == NULL && tdb == NULL) {
 		ret = find_config_file(local_file, sizeof(local_file));
@@ -132,22 +128,38 @@ gnutls_verify_stored_pubkey(const char *db_name,
 	if (tdb == NULL)
 		tdb = &default_tdb;
 
-	if (cert_type == GNUTLS_CRT_X509)
-		ret = x509_raw_crt_to_raw_pubkey(cert, &pubkey);
-	else
-		ret = pgp_crt_to_raw_pubkey(cert, &pubkey);
+	/* Import the public key depending on the provided certificate type */
+	switch (cert_type) {
+		case GNUTLS_CRT_X509:
+			/* Extract the pubkey from the cert. This function does a malloc
+			 * deep down the call chain. We are responsible for freeing. */
+			ret = _gnutls_x509_raw_crt_to_raw_pubkey(cert, &pubkey);
 
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
+			if (ret < 0) {
+				_gnutls_free_datum(&pubkey);
+				return gnutls_assert_val(ret);
+			}
+
+			need_free = true;
+			break;
+		case GNUTLS_CRT_RAWPK:
+			pubkey.data = cert->data;
+			pubkey.size = cert->size;
+			need_free = false;
+			break;
+		default:
+			return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE);
 	}
 
+	// Verify our pubkey against the database
 	ret = tdb->verify(db_name, host, service, &pubkey);
 	if (ret < 0 && ret != GNUTLS_E_CERTIFICATE_KEY_MISMATCH)
 		ret = gnutls_assert_val(GNUTLS_E_NO_CERTIFICATE_FOUND);
 
-      cleanup:
-	gnutls_free(pubkey.data);
+	if (need_free) {
+		_gnutls_free_datum(&pubkey);
+	}
+
 	return ret;
 }
 
@@ -210,7 +222,7 @@ static int parse_commitment_line(char *line,
 
 	/* hash and hex encode */
 	ret =
-	    _gnutls_hash_fast((gnutls_digest_algorithm_t)hash_algo->id, 
+	    _gnutls_hash_fast((gnutls_digest_algorithm_t)hash_algo->id,
 				skey->data, skey->size, phash);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
@@ -308,7 +320,7 @@ static int parse_line(char *line,
 	return 0;
 }
 
-/* Returns the base64 key if found 
+/* Returns the base64 key if found
  */
 static int verify_pubkey(const char *file,
 			 const char *host, const char *service,
@@ -377,78 +389,10 @@ static int raw_pubkey_to_base64(const gnutls_datum_t * raw,
 	if (b64->data == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
-	base64_encode_raw(b64->data, raw->size, raw->data);
+	base64_encode_raw((void*)b64->data, raw->size, raw->data);
 	b64->size = size;
 
 	return 0;
-}
-
-static int pgp_crt_to_raw_pubkey(const gnutls_datum_t * cert,
-				 gnutls_datum_t * rpubkey)
-{
-#ifdef ENABLE_OPENPGP
-	gnutls_openpgp_crt_t crt = NULL;
-	gnutls_pubkey_t pubkey = NULL;
-	size_t size;
-	int ret;
-
-	ret = gnutls_openpgp_crt_init(&crt);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
-	ret = gnutls_pubkey_init(&pubkey);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
-
-	ret = gnutls_openpgp_crt_import(crt, cert, GNUTLS_OPENPGP_FMT_RAW);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
-
-	ret = gnutls_pubkey_import_openpgp(pubkey, crt, 0);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
-
-	size = 0;
-	ret =
-	    gnutls_pubkey_export(pubkey, GNUTLS_X509_FMT_DER, NULL, &size);
-	if (ret < 0 && ret != GNUTLS_E_SHORT_MEMORY_BUFFER) {
-		gnutls_assert();
-		goto cleanup;
-	}
-
-	rpubkey->data = gnutls_malloc(size);
-	if (rpubkey->data == NULL) {
-		ret = GNUTLS_E_MEMORY_ERROR;
-		gnutls_assert();
-		goto cleanup;
-	}
-
-	ret =
-	    gnutls_pubkey_export(pubkey, GNUTLS_X509_FMT_DER,
-				 rpubkey->data, &size);
-	if (ret < 0) {
-		gnutls_free(rpubkey->data);
-		gnutls_assert();
-		goto cleanup;
-	}
-
-	rpubkey->size = size;
-	ret = 0;
-
-      cleanup:
-	gnutls_openpgp_crt_deinit(crt);
-	gnutls_pubkey_deinit(pubkey);
-
-	return ret;
-#else
-	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
-#endif
 }
 
 static
@@ -535,11 +479,11 @@ int store_commitment(const char *db_name, const char *host,
  * @expiration: The expiration time (use 0 to disable expiration)
  * @flags: should be 0.
  *
- * This function will store the provided (raw or DER-encoded) certificate to 
- * the list of stored public keys. The key will be considered valid until 
- * the provided expiration time.
+ * This function will store a raw public-key or a public-key provided via
+ * a raw (DER-encoded) certificate to the list of stored public keys. The key
+ * will be considered valid until the provided expiration time.
  *
- * The @store variable if non-null specifies a custom backend for
+ * The @tdb variable if non-null specifies a custom backend for
  * the storage of entries. If it is NULL then the
  * default file backend will be used.
  *
@@ -549,6 +493,8 @@ int store_commitment(const char *db_name, const char *host,
  * rest of the data applies to, the numeric port or host name, the expiration
  * time in seconds since the epoch (0 for no expiration), and a base64
  * encoding of the raw (DER) public key information (SPKI) of the peer.
+ *
+ * As of GnuTLS 3.6.6 this function also accepts raw public keys.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -564,15 +510,11 @@ gnutls_store_pubkey(const char *db_name,
 		    const gnutls_datum_t * cert,
 		    time_t expiration, unsigned int flags)
 {
-	gnutls_datum_t pubkey = { NULL, 0 };
+	gnutls_datum_t pubkey = { NULL, 0 }; // Holds the pubkey in subjectPublicKeyInfo format (DER encoded)
 	int ret;
 	char local_file[MAX_FILENAME];
+	bool need_free;
 
-	if (cert_type != GNUTLS_CRT_X509
-	    && cert_type != GNUTLS_CRT_OPENPGP)
-		return
-		    gnutls_assert_val
-		    (GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE);
 
 	if (db_name == NULL && tdb == NULL) {
 		ret =
@@ -593,25 +535,38 @@ gnutls_store_pubkey(const char *db_name,
 	if (tdb == NULL)
 		tdb = &default_tdb;
 
-	if (cert_type == GNUTLS_CRT_X509)
-		ret = x509_raw_crt_to_raw_pubkey(cert, &pubkey);
-	else
-		ret = pgp_crt_to_raw_pubkey(cert, &pubkey);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
+	/* Import the public key depending on the provided certificate type */
+	switch (cert_type) {
+		case GNUTLS_CRT_X509:
+			/* Extract the pubkey from the cert. This function does a malloc
+			 * deep down the call chain. We are responsible for freeing. */
+			ret = _gnutls_x509_raw_crt_to_raw_pubkey(cert, &pubkey);
+
+			if (ret < 0) {
+				_gnutls_free_datum(&pubkey);
+				return gnutls_assert_val(ret);
+			}
+
+			need_free = true;
+			break;
+		case GNUTLS_CRT_RAWPK:
+			pubkey.data = cert->data;
+			pubkey.size = cert->size;
+			need_free = false;
+			break;
+		default:
+			return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE);
 	}
 
 	_gnutls_debug_log("Configuration file: %s\n", db_name);
 
 	tdb->store(db_name, host, service, expiration, &pubkey);
 
-	ret = 0;
+	if (need_free) {
+		_gnutls_free_datum(&pubkey);
+	}
 
-      cleanup:
-	gnutls_free(pubkey.data);
-
-	return ret;
+	return GNUTLS_E_SUCCESS;
 }
 
 /**
@@ -625,11 +580,11 @@ gnutls_store_pubkey(const char *db_name,
  * @expiration: The expiration time (use 0 to disable expiration)
  * @flags: should be 0 or %GNUTLS_SCOMMIT_FLAG_ALLOW_BROKEN.
  *
- * This function will store the provided hash commitment to 
+ * This function will store the provided hash commitment to
  * the list of stored public keys. The key with the given
  * hash will be considered valid until the provided expiration time.
  *
- * The @store variable if non-null specifies a custom backend for
+ * The @tdb variable if non-null specifies a custom backend for
  * the storage of entries. If it is NULL then the
  * default file backend will be used.
  *
@@ -683,12 +638,10 @@ gnutls_store_commitment(const char *db_name,
 
 	_gnutls_debug_log("Configuration file: %s\n", db_name);
 
-	tdb->cstore(db_name, host, service, expiration, 
+	tdb->cstore(db_name, host, service, expiration,
 		(gnutls_digest_algorithm_t)me->id, hash);
 
-	ret = 0;
-
-	return ret;
+	return 0;
 }
 
 #define CONFIG_FILE "known_hosts"

@@ -17,12 +17,12 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
-#ifndef SYSTEM_H
-#define SYSTEM_H
+#ifndef GNUTLS_LIB_SYSTEM_H
+#define GNUTLS_LIB_SYSTEM_H
 
 #include "gnutls_int.h"
 #include <time.h>
@@ -77,7 +77,10 @@ ssize_t system_read(gnutls_transport_ptr_t ptr, void *data,
 # define HAVE_NO_LOCKS
 #endif
 
+typedef void (*gnutls_gettime_func) (struct timespec *);
+
 extern gnutls_time_func gnutls_time;
+extern gnutls_gettime_func gnutls_gettime;
 
 static inline void millisleep(unsigned int ms)
 {
@@ -93,51 +96,15 @@ static inline void millisleep(unsigned int ms)
 #endif
 }
 
-/* emulate gnulib's gettime using gettimeofday to avoid linking to
- * librt */
-inline static void gettime(struct timespec *t)
-{
-#if defined(HAVE_CLOCK_GETTIME) && defined(CLOCK_REALTIME)
-	clock_gettime(CLOCK_REALTIME, t);
-#else
-	struct timeval tv;
-	gettimeofday(&tv, NULL);
-	t->tv_sec = tv.tv_sec;
-	t->tv_nsec = tv.tv_usec * 1000;
-#endif
-}
-
 int _gnutls_find_config_path(char *path, size_t max_size);
 int _gnutls_ucs2_to_utf8(const void *data, size_t size,
 			 gnutls_datum_t * output, unsigned bigendian);
 int _gnutls_utf8_to_ucs2(const void *data, size_t size,
-			 gnutls_datum_t * output);
+			 gnutls_datum_t * output, unsigned be);
+
+void _gnutls_global_set_gettime_function(gnutls_gettime_func gettime_func);
 
 int gnutls_system_global_init(void);
 void gnutls_system_global_deinit(void);
 
-#ifndef _WIN32
-# if defined(HAVE_NETINET_IN_H)
-#  include <netinet/in.h>
-# endif
-# include <arpa/inet.h>
-#else
-# undef inet_aton
-# define inet_aton _gnutls_inet_aton
-int inet_aton(const char *cp, struct in_addr *inp);
-#endif
-
-#ifndef HAVE_INET_PTON
-# undef inet_pton
-# define inet_pton _gnutls_inet_pton
-int inet_pton(int af, const char *src, void *dst);
-#endif
-
-#ifndef HAVE_INET_NTOP
-# undef inet_ntop
-# define inet_ntop _gnutls_inet_ntop
-const char *inet_ntop(int af, const void *src,
-		      char *dst, unsigned size);
-#endif
-
-#endif				/* SYSTEM_H */
+#endif /* GNUTLS_LIB_SYSTEM_H */

@@ -18,7 +18,8 @@ is called. The provided  @code{type} must be an unassigned type in
 registered or handled by GnuTLS internally @code{GNUTLS_E_ALREADY_REGISTERED} 
 will be returned.
 
-This function is not thread safe.
+This function is not thread safe. As supplemental data are not defined under
+TLS 1.3, this function will disable TLS 1.3 support globally.
 
 @strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
 

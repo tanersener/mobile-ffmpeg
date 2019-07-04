@@ -1,5 +1,5 @@
 /* Test of vasnprintf() and asnprintf() functions.
-   Copyright (C) 2007-2016 Free Software Foundation, Inc.
+   Copyright (C) 2007-2019 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Bruno Haible <bruno@clisp.org>, 2007.  */
 
@@ -53,7 +53,34 @@ test_function (char * (*my_asnprintf) (char *, size_t *, const char *, ...))
       ASSERT (result != NULL);
       ASSERT (strcmp (result, "12345") == 0);
       ASSERT (length == 5);
-      if (size < 6)
+      if (size < 5 + 1)
+        ASSERT (result != buf);
+      ASSERT (memcmp (buf + size, &"DEADBEEF"[size], 8 - size) == 0);
+      if (result != buf)
+        free (result);
+    }
+
+  /* Note: This test assumes IEEE 754 representation of 'double' floats.  */
+  for (size = 0; size <= 8; size++)
+    {
+      size_t length;
+      char *result;
+
+      memcpy (buf, "DEADBEEF", 8);
+      length = size;
+      result = my_asnprintf (buf, &length, "%2.0f", 1.6314159265358979e+125);
+      ASSERT (result != NULL);
+      /* The exact result and the result on glibc systems is
+         163141592653589790215729350939528493057529598899734151772468186268423257777068536614838678161083520756952076273094236944990208
+         On Cygwin, the result is
+         163141592653589790215729350939528493057529600000000000000000000000000000000000000000000000000000000000000000000000000000000000
+         On HP-UX 11.31 / hppa and IRIX 6.5, the result is
+         163141592653589790000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+       */
+      ASSERT (strlen (result) == 126);
+      ASSERT (memcmp (result, "163141592653589790", 18) == 0);
+      ASSERT (length == 126);
+      if (size < 126 + 1)
         ASSERT (result != buf);
       ASSERT (memcmp (buf + size, &"DEADBEEF"[size], 8 - size) == 0);
       if (result != buf)

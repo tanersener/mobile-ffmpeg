@@ -30,4 +30,12 @@ SHA3-256 algorithm.
 SHA3-384 algorithm.
 @item GNUTLS_@-DIG_@-SHA3_@-512
 SHA3-512 algorithm.
+@item GNUTLS_@-DIG_@-MD5_@-SHA1
+Combined MD5+SHA1 algorithm.
+@item GNUTLS_@-DIG_@-GOSTR_@-94
+GOST R 34.11-94 algorithm.
+@item GNUTLS_@-DIG_@-STREEBOG_@-256
+GOST R 34.11-2001 (Streebog) algorithm, 256 bit.
+@item GNUTLS_@-DIG_@-STREEBOG_@-512
+GOST R 34.11-2001 (Streebog) algorithm, 512 bit.
 @end table

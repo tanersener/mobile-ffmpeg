@@ -15,6 +15,7 @@ var searchData=
   ['semaphore',['semaphore',['../d2/d82/_mobile_f_fmpeg_config_8m.html#aa91ec0f91afe80906264eb5dcec1bc9f',1,'MobileFFmpegConfig.m']]],
   ['sep',['sep',['../db/dd7/struct_option_group_def.html#a611c3e5d93946e4fcb00004ea3def028',1,'OptionGroupDef']]],
   ['shortest',['shortest',['../df/d77/struct_options_context.html#ae2d67d4b8daf3a4900bef1db8882b163',1,'OptionsContext::shortest()'],['../de/df2/struct_output_file.html#acfef99893985d28ae7f7f6a92e6d1bd7',1,'OutputFile::shortest()']]],
+  ['sidedata',['sidedata',['../d7/da5/_stream_information_8m.html#a5ba796ed002837a10f91f3aa96ead537',1,'StreamInformation.m']]],
   ['size',['size',['../d9/db1/_statistics_8m.html#a37363161b41c4165b98cba7abc7a9d95',1,'Statistics.m']]],
   ['source_5findex',['source_index',['../db/dde/struct_output_stream.html#a2a77c9bd86203478143c85e26e67df3d',1,'OutputStream']]],
   ['specifier',['specifier',['../dd/da5/struct_specifier_opt.html#ab83e423aec2a2d42a29daae047dcdb81',1,'SpecifierOpt']]],

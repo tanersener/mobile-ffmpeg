@@ -36,6 +36,7 @@
 #include <assert.h>
 
 #include "umac.h"
+#include "umac-internal.h"
 
 static uint64_t
 poly64_mul (uint32_t kh, uint32_t kl, uint64_t y)

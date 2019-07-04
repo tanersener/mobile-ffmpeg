@@ -24,4 +24,6 @@ Less than 42 bits of security
 192 bits of security
 @item GNUTLS_@-SEC_@-PARAM_@-FUTURE
 256 bits of security
+@item GNUTLS_@-SEC_@-PARAM_@-MAX
+-- undescribed --
 @end table

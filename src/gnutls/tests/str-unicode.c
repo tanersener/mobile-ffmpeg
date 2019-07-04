@@ -34,31 +34,31 @@
 #define MATCH_FUNC(fname, password, normalized) \
 static void fname(void **glob_state) \
 { \
+	const char *pwd_normalized = normalized; \
 	gnutls_datum_t out; \
 	int ret = gnutls_utf8_password_normalize((uint8_t*)password, strlen(password), &out, 0); \
-	if (normalized == NULL) { /* expect failure */ \
+	if (pwd_normalized == NULL) { /* expect failure */ \
 		assert_int_not_equal(ret, 0); \
-		return; \
 	} else { \
 		assert_int_equal(ret, 0); \
+		assert_int_equal(strcmp((char*)out.data, (char*)pwd_normalized), 0); \
+		gnutls_free(out.data); \
 	} \
-	assert_int_equal(strcmp((char*)out.data, (char*)normalized), 0); \
-	gnutls_free(out.data); \
 }
 
 #define INVALID_MATCH_FUNC(fname, password, normalized) \
 static void inv_##fname(void **glob_state) \
 { \
+	const char *pwd_normalized = normalized; \
 	gnutls_datum_t out; \
 	int ret = gnutls_utf8_password_normalize((uint8_t*)password, strlen(password), &out, GNUTLS_UTF8_IGNORE_ERRS); \
-	if (normalized == NULL) { \
+	if (pwd_normalized == NULL) { \
 		assert_int_not_equal(ret, 0); \
-		return; \
 	} else { \
 		assert_int_equal(ret, 0); \
+		assert_int_equal(strcmp((char*)out.data, (char*)pwd_normalized), 0); \
+		gnutls_free(out.data); \
 	} \
-	assert_int_equal(strcmp((char*)out.data, (char*)normalized), 0); \
-	gnutls_free(out.data); \
 }
 
 MATCH_FUNC(test_ascii, "correct horse battery staple", "correct horse battery staple");

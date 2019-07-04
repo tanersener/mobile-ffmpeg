@@ -1,5 +1,5 @@
-#ifndef SHA_ARM_H
-#define SHA_ARM_H
+#ifndef GNUTLS_LIB_ACCELERATED_AARCH64_SHA_AARCH64_H
+#define GNUTLS_LIB_ACCELERATED_AARCH64_SHA_AARCH64_H
 
 #include <nettle/sha.h>
 
@@ -16,4 +16,4 @@ void aarch64_sha1_update(struct sha1_ctx *ctx, size_t length, const uint8_t * da
 void aarch64_sha256_update(struct sha256_ctx *ctx, size_t length, const uint8_t * data);
 void aarch64_sha512_update(struct sha512_ctx *ctx, size_t length, const uint8_t * data);
 
-#endif
+#endif /* GNUTLS_LIB_ACCELERATED_AARCH64_SHA_AARCH64_H */

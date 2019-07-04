@@ -5,7 +5,7 @@
 @deftypefun {int} {gnutls_sign_algorithm_get} (gnutls_session_t @var{session})
 @var{session}: is a @code{gnutls_session_t}  type.
 
-Returns the signature algorithm that is (or will be) used in this 
+Returns the signature algorithm that is (or will be) used in this
 session by the server to sign data. This function should be
 used only with TLS 1.2 or later.
 

@@ -307,6 +307,7 @@ External library support:
   --enable-opengl          enable OpenGL rendering [no]
   --enable-openssl         enable openssl, needed for https support
                            if gnutls, libtls or mbedtls is not used [no]
+  --enable-pocketsphinx    enable PocketSphinx, needed for asr filter [no]
   --disable-sndio          disable sndio support [autodetect]
   --disable-schannel       disable SChannel SSP, needed for TLS support on
                            Windows if openssl and gnutls are not used [autodetect]
@@ -502,9 +503,13 @@ log(){
 }
 
 log_file(){
-    log BEGIN $1
-    pr -n -t $1 >> $logfile
-    log END $1
+    log BEGIN "$1"
+    log_file_i=1
+    while IFS= read -r log_file_line; do
+        printf '%5d\t%s\n' "$log_file_i" "$log_file_line"
+        log_file_i=$(($log_file_i+1))
+    done < "$1" >> "$logfile"
+    log END "$1"
 }
 
 warn(){
@@ -1799,6 +1804,7 @@ EXTERNAL_LIBRARY_LIST="
     mediacodec
     openal
     opengl
+    pocketsphinx
     vapoursynth
 "
 
@@ -2253,6 +2259,7 @@ TOOLCHAIN_FEATURES="
 
 TYPES_LIST="
     kCMVideoCodecType_HEVC
+    kCVPixelFormatType_420YpCbCr10BiPlanarVideoRange
     socklen_t
     struct_addrinfo
     struct_group_source_req
@@ -2712,6 +2719,7 @@ jpegls_decoder_select="mjpeg_decoder"
 jv_decoder_select="blockdsp"
 lagarith_decoder_select="llviddsp"
 ljpeg_encoder_select="idctdsp jpegtables mpegvideoenc"
+lscr_decoder_deps="zlib"
 magicyuv_decoder_select="llviddsp"
 magicyuv_encoder_select="llvidencdsp"
 mdec_decoder_select="blockdsp idctdsp mpegvideo"
@@ -2817,6 +2825,7 @@ vc1image_decoder_select="vc1_decoder"
 vorbis_decoder_select="mdct"
 vorbis_encoder_select="audio_frame_queue mdct"
 vp3_decoder_select="hpeldsp vp3dsp videodsp"
+vp4_decoder_select="vp3_decoder"
 vp5_decoder_select="h264chroma hpeldsp videodsp vp3dsp vp56dsp"
 vp6_decoder_select="h264chroma hpeldsp huffman videodsp vp3dsp vp56dsp"
 vp6a_decoder_select="vp6_decoder"
@@ -3076,6 +3085,7 @@ vc1_parser_select="vc1dsp"
 
 # bitstream_filters
 aac_adtstoasc_bsf_select="adts_header"
+av1_frame_split_bsf_select="cbs_av1"
 av1_metadata_bsf_select="cbs_av1"
 eac3_core_bsf_select="ac3_parser"
 filter_units_bsf_select="cbs"
@@ -3086,7 +3096,6 @@ hevc_metadata_bsf_select="cbs_h265"
 mjpeg2jpeg_bsf_select="jpegtables"
 mpeg2_metadata_bsf_select="cbs_mpeg2"
 trace_headers_bsf_select="cbs"
-truehd_core_bsf_select="mlp_parser"
 vp9_metadata_bsf_select="cbs_vp9"
 
 # external libraries
@@ -3398,6 +3407,7 @@ afir_filter_deps="avcodec"
 afir_filter_select="fft"
 amovie_filter_deps="avcodec avformat"
 aresample_filter_deps="swresample"
+asr_filter_deps="pocketsphinx"
 ass_filter_deps="libass"
 atempo_filter_deps="avcodec"
 atempo_filter_select="rdft"
@@ -3409,6 +3419,7 @@ bm3d_filter_select="dct"
 boxblur_filter_deps="gpl"
 boxblur_opencl_filter_deps="opencl gpl"
 bs2b_filter_deps="libbs2b"
+colorkey_opencl_filter_deps="opencl"
 colormatrix_filter_deps="gpl"
 convolution_opencl_filter_deps="opencl"
 convolve_filter_deps="avcodec"
@@ -3425,6 +3436,7 @@ deinterlace_qsv_filter_deps="libmfx"
 deinterlace_vaapi_filter_deps="vaapi"
 delogo_filter_deps="gpl"
 denoise_vaapi_filter_deps="vaapi"
+derain_filter_select="dnn"
 deshake_filter_select="pixelutils"
 dilation_opencl_filter_deps="opencl"
 drawtext_filter_deps="libfreetype"
@@ -3460,6 +3472,7 @@ mpdecimate_filter_select="pixelutils"
 minterpolate_filter_select="scene_sad"
 mptestsrc_filter_deps="gpl"
 negate_filter_deps="lut_filter"
+nlmeans_opencl_filter_deps="opencl"
 nnedi_filter_deps="gpl"
 ocr_filter_deps="libtesseract"
 ocv_filter_deps="libopencv"
@@ -3738,6 +3751,8 @@ mkdir -p ffbuild
 # find source path
 if test -f configure; then
     source_path=.
+elif test -f src/configure; then
+    source_path=src
 else
     source_path=$(cd $(dirname "$0"); pwd)
     case "$source_path" in
@@ -3828,8 +3843,22 @@ die_unknown(){
 }
 
 print_in_columns() {
-    cols=$(expr $ncols / 24)
-    cat | tr ' ' '\n' | sort | pr -r "-$cols" -w $ncols -t
+    tr ' ' '\n' | sort | tr '\r\n' '  ' | awk -v col_width=24 -v width="$ncols" '
+    {
+        num_cols = width > col_width ? int(width / col_width) : 1;
+        num_rows = int((NF + num_cols-1) / num_cols);
+        y = x = 1;
+        for (y = 1; y <= num_rows; y++) {
+            i = y;
+            for (x = 1; x <= num_cols; x++) {
+                if (i <= NF) {
+                  line = sprintf("%s%-" col_width "s", line, $i);
+                }
+                i = i + num_rows;
+            }
+            print line; line = "";
+        }
+    }' | sed 's/ *$//'
 }
 
 show_list() {
@@ -4109,22 +4138,22 @@ case "$toolchain" in
         # behaviour if the regexp was unable to match anything, since this
         # successfully parses the version number of existing supported
         # versions that require the converter (MSVC 2010 and 2012).
-        cl_major_ver=$(cl 2>&1 | sed -n 's/.*Version \([[:digit:]]\{1,\}\)\..*/\1/p')
+        cl_major_ver=$(cl.exe 2>&1 | sed -n 's/.*Version \([[:digit:]]\{1,\}\)\..*/\1/p')
         if [ -z "$cl_major_ver" ] || [ $cl_major_ver -ge 18 ]; then
-            cc_default="cl"
-            cxx_default="cl"
+            cc_default="cl.exe"
+            cxx_default="cl.exe"
         else
             die "Unsupported MSVC version (2013 or newer required)"
         fi
         ld_default="$source_path/compat/windows/mslink"
-        nm_default="dumpbin -symbols"
-        ar_default="lib"
+        nm_default="dumpbin.exe -symbols"
+        ar_default="lib.exe"
         case "$arch" in
         aarch64|arm64)
-            as_default="armasm64"
+            as_default="armasm64.exe"
             ;;
         arm*)
-            as_default="armasm"
+            as_default="armasm.exe"
             ;;
         esac
         target_os_default="win32"
@@ -5412,7 +5441,7 @@ link_name=$(mktemp -u $TMPDIR/name_XXXXXXXX)
 mkdir "$link_dest"
 $ln_s "$link_dest" "$link_name"
 touch "$link_dest/test_file"
-if [ "$source_path" != "." ] && ([ ! -d src ] || [ -L src ]) && [ -e "$link_name/test_file" ]; then
+if [ "$source_path" != "." ] && [ "$source_path" != "src" ] && ([ ! -d src ] || [ -L src ]) && [ -e "$link_name/test_file" ]; then
     # create link to source path
     [ -e src ] && rm src
     $ln_s "$source_path" src
@@ -5454,6 +5483,7 @@ probe_libc(){
             add_${pfx}cppflags -D__printf__=__gnu_printf__
         test_${pfx}cpp_condition windows.h "!defined(_WIN32_WINNT) || _WIN32_WINNT < 0x0600" &&
             add_${pfx}cppflags -D_WIN32_WINNT=0x0600
+        add_${pfx}cppflags -D_POSIX_C_SOURCE=200112 -D_XOPEN_SOURCE=600
     elif test_${pfx}cpp_condition _mingw.h "defined __MINGW_VERSION"  ||
          test_${pfx}cpp_condition _mingw.h "defined __MINGW32_VERSION"; then
         eval ${pfx}libc_type=mingw32
@@ -5467,6 +5497,7 @@ probe_libc(){
             add_${pfx}cppflags -D_WIN32_WINNT=0x0600
         eval test \$${pfx_no_}cc_type = "gcc" &&
             add_${pfx}cppflags -D__printf__=__gnu_printf__
+        add_${pfx}cppflags -D_POSIX_C_SOURCE=200112 -D_XOPEN_SOURCE=600
     elif test_${pfx}cpp_condition crtversion.h "defined _VC_CRT_MAJOR_VERSION"; then
         eval ${pfx}libc_type=msvcrt
         if test_${pfx}cpp_condition crtversion.h "_VC_CRT_MAJOR_VERSION < 14"; then
@@ -6012,6 +6043,7 @@ enabled avfoundation && {
 enabled videotoolbox && {
     check_lib coreservices CoreServices/CoreServices.h UTGetOSTypeFromString "-framework CoreServices"
     check_func_headers CoreMedia/CMFormatDescription.h kCMVideoCodecType_HEVC "-framework CoreMedia"
+    check_func_headers CoreVideo/CVPixelBuffer.h kCVPixelFormatType_420YpCbCr10BiPlanarVideoRange "-framework CoreVideo"
 }
 
 check_struct "sys/time.h sys/resource.h" "struct rusage" ru_maxrss
@@ -6290,6 +6322,7 @@ enabled openssl           && { check_pkg_config openssl openssl openssl/ssl.h OP
                                check_lib openssl openssl/ssl.h SSL_library_init -lssl32 -leay32 ||
                                check_lib openssl openssl/ssl.h SSL_library_init -lssl -lcrypto -lws2_32 -lgdi32 ||
                                die "ERROR: openssl not found"; }
+enabled pocketsphinx      && require_pkg_config pocketsphinx pocketsphinx pocketsphinx/pocketsphinx.h ps_init
 enabled rkmpp             && { require_pkg_config rkmpp rockchip_mpp  rockchip/rk_mpi.h mpp_create &&
                                require_pkg_config rockchip_mpp "rockchip_mpp >= 1.3.7" rockchip/rk_mpi.h mpp_create &&
                                { enabled libdrm ||
@@ -6500,6 +6533,14 @@ enabled crystalhd && check_lib crystalhd "stdint.h libcrystalhd/libcrystalhd_if.
 if enabled x86; then
     case $target_os in
         mingw32*|mingw64*|win32|win64|linux|cygwin*)
+            ;;
+        *)
+            disable ffnvcodec cuvid nvdec nvenc
+            ;;
+    esac
+elif enabled ppc64 && ! enabled bigendian; then
+    case $target_os in
+        linux)
             ;;
         *)
             disable ffnvcodec cuvid nvdec nvenc

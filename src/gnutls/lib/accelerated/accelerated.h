@@ -1,1 +1,6 @@
+#ifndef GNUTLS_LIB_ACCELERATED_ACCELERATED_H
+# define GNUTLS_LIB_ACCELERATED_ACCELERATED_H
+
 void _gnutls_register_accel_crypto(void);
+
+#endif /* GNUTLS_LIB_ACCELERATED_ACCELERATED_H */

@@ -90,7 +90,7 @@ Installation
 
 As usual for GNU packages:
 
-    $ ./configure --prefix=/usr/local
+    $ ./configure --prefix=[[PREFIX]]     where [[PREFIX]] is e.g. $HOME/local
     $ make
     $ make install
 
@@ -109,39 +109,22 @@ or (on systems supporting shared libraries, excluding AIX)
 Recall that before building a package for the second time, you need to erase
 the traces of the first build by running "make distclean".
 
-This library can be built and installed in two variants:
+This library installs:
+  - a library 'libiconv.so',
+  - a header file '<iconv.h>'.
 
-  - The library mode. This works on all systems, and uses a library
-    'libiconv.so' and a header file '<iconv.h>'. (Both are installed
-    through "make install".)
+To use it, simply #include <iconv.h> and use the functions.
 
-    To use it, simply #include <iconv.h> and use the functions.
-
-    To use it in an autoconfiguring package:
-    - If you don't use automake, append m4/iconv.m4 to your aclocal.m4
-      file.
-    - If you do use automake, add m4/iconv.m4 to your m4 macro repository.
-    - Add to the link command line of libraries and executables that use
-      the functions the placeholder @LIBICONV@ (or, if using libtool for
-      the link, @LTLIBICONV@). If you use automake, the right place for
-      these additions are the *_LDADD variables.
-    Note that 'iconv.m4' is also part of the GNU gettext package, which
-    installs it in /usr/local/share/aclocal/iconv.m4.
-
-  - The libc plug/override mode. This works on GNU/Linux, Solaris and OSF/1
-    systems only. It is a way to get good iconv support without having
-    glibc-2.1.
-    It installs a library 'preloadable_libiconv.so'. This library can be used
-    with LD_PRELOAD, to override the iconv* functions present in the C library.
-
-    On GNU/Linux and Solaris:
-        $ export LD_PRELOAD=/usr/local/lib/preloadable_libiconv.so
-
-    On OSF/1:
-        $ export _RLD_LIST=/usr/local/lib/preloadable_libiconv.so:DEFAULT
-
-    A program's source need not be modified, the program need not even be
-    recompiled. Just set the LD_PRELOAD environment variable, that's it!
+To use it in an autoconfiguring package:
+  - If you don't use automake, append m4/iconv.m4 to your aclocal.m4
+    file.
+  - If you do use automake, add m4/iconv.m4 to your m4 macro repository.
+  - Add to the link command line of libraries and executables that use
+    the functions the placeholder @LIBICONV@ (or, if using libtool for
+    the link, @LTLIBICONV@). If you use automake, the right place for
+    these additions are the *_LDADD variables.
+Note that 'iconv.m4' is also part of GNU gnulib, available through
+the gnulib module 'iconv'.
 
 
 Copyright
@@ -156,12 +139,12 @@ The iconv _program_ and the documentation are under GPL, see file COPYING.
 Download
 --------
 
-    http://ftp.gnu.org/gnu/libiconv/libiconv-1.15.tar.gz
+    https://ftp.gnu.org/gnu/libiconv/libiconv-1.16.tar.gz
 
 Homepage
 --------
 
-    http://www.gnu.org/software/libiconv/
+    https://www.gnu.org/software/libiconv/
 
 Bug reports to
 --------------

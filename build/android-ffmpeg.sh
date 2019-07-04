@@ -76,7 +76,7 @@ esac
 CONFIGURE_POSTFIX=""
 HIGH_PRIORITY_INCLUDES=""
 
-for library in {1..43}
+for library in {1..44}
 do
     if [[ ${!library} -eq 1 ]]; then
         ENABLED_LIBRARY=$(get_library_name $((library - 1)))
@@ -184,6 +184,11 @@ do
                 CONFIGURE_POSTFIX+=" --enable-libopencore-amrnb"
                 CONFIGURE_POSTFIX+=" --enable-libopencore-amrwb"
             ;;
+            openh264)
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags openh264)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static openh264)"
+                CONFIGURE_POSTFIX+=" --enable-libopenh264"
+            ;;
             opus)
                 CFLAGS+=" $(pkg-config --cflags opus)"
                 LDFLAGS+=" $(pkg-config --libs --static opus)"
@@ -282,13 +287,18 @@ do
         # THE FOLLOWING LIBRARIES SHOULD BE EXPLICITLY DISABLED TO PREVENT AUTODETECT
         if [[ ${library} -eq 30 ]]; then
             CONFIGURE_POSTFIX+=" --disable-sdl2"
-        elif [[ ${library} -eq 42 ]]; then
+        elif [[ ${library} -eq 43 ]]; then
             CONFIGURE_POSTFIX+=" --disable-zlib"
         fi
     fi
 done
 
 LDFLAGS+=" -L${ANDROID_NDK_ROOT}/platforms/android-${API}/arch-${TOOLCHAIN_ARCH}/usr/lib"
+
+# LINKING WITH ANDROID LTS SUPPORT LIBRARY IS NECESSARY FOR API < 18
+if [[ ! -z ${MOBILE_FFMPEG_LTS_BUILD} ]] && [[ ${API} < 18 ]]; then
+    LDFLAGS+=" -Wl,--whole-archive ${BASEDIR}/android/app/src/main/cpp/libandroidltssupport.a -Wl,--no-whole-archive"
+fi
 
 # OPTIMIZE FOR SPEED INSTEAD OF SIZE
 if [[ -z ${MOBILE_FFMPEG_OPTIMIZED_FOR_SPEED} ]]; then
@@ -299,7 +309,13 @@ fi
 
 # SET DEBUG OPTIONS
 if [[ -z ${MOBILE_FFMPEG_DEBUG} ]]; then
-    DEBUG_OPTIONS="--disable-debug --enable-lto";
+
+    # SET LTO FLAGS
+    if [[ -z ${NO_LINK_TIME_OPTIMIZATION} ]]; then
+        DEBUG_OPTIONS="--disable-debug --enable-lto";
+    else
+        DEBUG_OPTIONS="--disable-debug --disable-lto";
+    fi
 else
     DEBUG_OPTIONS="--enable-debug";
 fi
@@ -308,7 +324,10 @@ cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
 echo -n -e "\n${LIB_NAME}: "
 
-make distclean 2>/dev/null 1>/dev/null
+if [[ -z ${NO_WORKSPACE_CLEANUP_ffmpeg} ]]; then
+    echo -e "INFO: Cleaning workspace for ${LIB_NAME}" 1>>${BASEDIR}/build.log 2>&1
+    make distclean 2>/dev/null 1>/dev/null
+fi
 
 export CFLAGS="${HIGH_PRIORITY_INCLUDES} ${CFLAGS}"
 export CXXFLAGS="${CXXFLAGS}"
@@ -378,13 +397,26 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-make -j$(get_cpu_count) 1>>${BASEDIR}/build.log 2>&1
+if [[ -z ${NO_OUTPUT_REDIRECTION} ]]; then
+    make -j$(get_cpu_count) 1>>${BASEDIR}/build.log 2>&1
 
-if [ $? -ne 0 ]; then
-    echo "failed"
-    exit 1
+    if [ $? -ne 0 ]; then
+        echo "failed"
+        exit 1
+    fi
+else
+    echo -e "started\n"
+    make -j$(get_cpu_count)
+
+    if [ $? -ne 0 ]; then
+        echo -n -e "\n${LIB_NAME}: failed\n"
+        exit 1
+    else
+        echo -n -e "\n${LIB_NAME}: "
+    fi
 fi
 
+rm -rf ${BASEDIR}/prebuilt/android-$(get_target_build)/${LIB_NAME}
 make install 1>>${BASEDIR}/build.log 2>&1
 
 if [ $? -ne 0 ]; then

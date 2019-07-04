@@ -60,6 +60,7 @@ pin_callback(void *user, int attempt, const char *token_url,
                 printf("*** Wrong PIN\n");
 
         password = getpass("Enter pin: ");
+        /* FIXME: ensure that we are in UTF-8 locale */
         if (password == NULL || password[0] == 0) {
                 fprintf(stderr, "No password given\n");
                 exit(1);

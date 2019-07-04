@@ -74,9 +74,9 @@ int GetModIndex(int sum_dist, int index, int rounding, int strength,
 template <>
 int GetModIndex<uint8_t>(int sum_dist, int index, int rounding, int strength,
                          int filter_weight) {
-  unsigned int index_mult[14] = {
-    0, 0, 0, 0, 49152, 39322, 32768, 28087, 24576, 21846, 19661, 17874, 0, 15124
-  };
+  unsigned int index_mult[14] = { 0,     0,     0,     0,     49152,
+                                  39322, 32768, 28087, 24576, 21846,
+                                  19661, 17874, 0,     15124 };
 
   assert(index >= 0 && index <= 13);
   assert(index_mult[index] != 0);

@@ -15,7 +15,7 @@
 
 This function will return the certificate with the given DN, if it
 is stored in the token. By default only marked as trusted issuers
-are retuned. If any issuer should be returned specify
+are returned. If any issuer should be returned specify
 @code{GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_ANY}  in  @code{flags} .
 
 The name of the function includes issuer because it can

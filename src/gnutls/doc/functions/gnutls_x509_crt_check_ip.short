@@ -1,0 +1,1 @@
+@item @var{unsigned} @ref{gnutls_x509_crt_check_ip} (gnutls_x509_crt_t @var{cert}, const unsigned char * @var{ip}, unsigned int @var{ip_size}, unsigned int @var{flags})

@@ -36,7 +36,7 @@ if ! test -z "${VALGRIND}"; then
 fi
 
 ${VALGRIND} "${CERTTOOL}" --certificate-info --infile "${srcdir}/data/aki-cert.pem" \
-	|grep -v "Algorithm Security Level" > $TMPFILE
+	|grep -v "Algorithm Security Level"|grep -v ^warning > $TMPFILE
 rc=$?
 
 if test "${rc}" != "0"; then

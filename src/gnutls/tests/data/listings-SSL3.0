@@ -1,0 +1,14 @@
+Cipher suites for NORMAL:-VERS-ALL:+VERS-SSL3.0:+ARCFOUR-128
+TLS_ECDHE_ECDSA_AES_256_CBC_SHA1                  	0xc0, 0x0a	SSL3.0
+TLS_ECDHE_ECDSA_AES_128_CBC_SHA1                  	0xc0, 0x09	SSL3.0
+TLS_ECDHE_ECDSA_ARCFOUR_128_SHA1                  	0xc0, 0x07	SSL3.0
+TLS_ECDHE_RSA_AES_256_CBC_SHA1                    	0xc0, 0x14	SSL3.0
+TLS_ECDHE_RSA_AES_128_CBC_SHA1                    	0xc0, 0x13	SSL3.0
+TLS_ECDHE_RSA_ARCFOUR_128_SHA1                    	0xc0, 0x11	SSL3.0
+TLS_RSA_AES_256_CBC_SHA1                          	0x00, 0x35	SSL3.0
+TLS_RSA_AES_128_CBC_SHA1                          	0x00, 0x2f	SSL3.0
+TLS_RSA_ARCFOUR_128_SHA1                          	0x00, 0x05	SSL3.0
+TLS_DHE_RSA_AES_256_CBC_SHA1                      	0x00, 0x39	SSL3.0
+TLS_DHE_RSA_AES_128_CBC_SHA1                      	0x00, 0x33	SSL3.0
+
+Protocols: VERS-SSL3.0

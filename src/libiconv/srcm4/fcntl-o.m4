@@ -1,10 +1,12 @@
-# fcntl-o.m4 serial 4
-dnl Copyright (C) 2006, 2009-2017 Free Software Foundation, Inc.
+# fcntl-o.m4 serial 6
+dnl Copyright (C) 2006, 2009-2019 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
 
 dnl Written by Paul Eggert.
+
+AC_PREREQ([2.60])
 
 # Test whether the flags O_NOATIME and O_NOFOLLOW actually work.
 # Define HAVE_WORKING_O_NOATIME to 1 if O_NOATIME works, or to 0 otherwise.
@@ -12,12 +14,9 @@ dnl Written by Paul Eggert.
 AC_DEFUN([gl_FCNTL_O_FLAGS],
 [
   dnl Persuade glibc <fcntl.h> to define O_NOATIME and O_NOFOLLOW.
-  dnl AC_USE_SYSTEM_EXTENSIONS was introduced in autoconf 2.60 and obsoletes
-  dnl AC_GNU_SOURCE.
-  m4_ifdef([AC_USE_SYSTEM_EXTENSIONS],
-    [AC_REQUIRE([AC_USE_SYSTEM_EXTENSIONS])],
-    [AC_REQUIRE([AC_GNU_SOURCE])])
+  AC_REQUIRE([AC_USE_SYSTEM_EXTENSIONS])
 
+  AC_REQUIRE([AC_CANONICAL_HOST]) dnl for cross-compiles
   AC_CHECK_HEADERS_ONCE([unistd.h])
   AC_CHECK_FUNCS_ONCE([symlink])
   AC_CACHE_CHECK([for working fcntl.h], [gl_cv_header_working_fcntl_h],
@@ -116,7 +115,13 @@ AC_DEFUN([gl_FCNTL_O_FLAGS],
         68) gl_cv_header_working_fcntl_h='no (bad O_NOATIME, O_NOFOLLOW)';; #(
          *) gl_cv_header_working_fcntl_h='no';;
         esac],
-       [gl_cv_header_working_fcntl_h=cross-compiling])])
+       [case "$host_os" in
+                  # Guess 'no' on native Windows.
+          mingw*) gl_cv_header_working_fcntl_h='no' ;;
+          *)      gl_cv_header_working_fcntl_h=cross-compiling ;;
+        esac
+       ])
+    ])
 
   case $gl_cv_header_working_fcntl_h in #(
   *O_NOATIME* | no | cross-compiling) ac_val=0;; #(

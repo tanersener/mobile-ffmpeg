@@ -1,6 +1,6 @@
 /* An interface to read and write that retries after interrupts.
 
-   Copyright (C) 1993-1994, 1998, 2002-2006, 2009-2017 Free Software
+   Copyright (C) 1993-1994, 1998, 2002-2006, 2009-2019 Free Software
    Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
@@ -14,7 +14,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 
@@ -37,7 +37,7 @@
 # define IS_EINTR(x) 0
 #endif
 
-#include <limits.h>
+#include "sys-limits.h"
 
 #ifdef SAFE_WRITE
 # define safe_rw safe_write
@@ -55,12 +55,6 @@
 size_t
 safe_rw (int fd, void const *buf, size_t count)
 {
-  /* Work around a bug in Tru64 5.1.  Attempting to read more than
-     INT_MAX bytes fails with errno == EINVAL.  See
-     <http://lists.gnu.org/archive/html/bug-gnu-utils/2002-04/msg00010.html>.
-     When decreasing COUNT, keep it block-aligned.  */
-  enum { BUGGY_READ_MAXIMUM = INT_MAX & ~8191 };
-
   for (;;)
     {
       ssize_t result = rw (fd, buf, count);
@@ -69,8 +63,8 @@ safe_rw (int fd, void const *buf, size_t count)
         return result;
       else if (IS_EINTR (errno))
         continue;
-      else if (errno == EINVAL && BUGGY_READ_MAXIMUM < count)
-        count = BUGGY_READ_MAXIMUM;
+      else if (errno == EINVAL && SYS_BUFSIZE_MAX < count)
+        count = SYS_BUFSIZE_MAX;
       else
         return result;
     }

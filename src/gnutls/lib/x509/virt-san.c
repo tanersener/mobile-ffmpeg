@@ -15,7 +15,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -70,7 +70,6 @@ int _gnutls_alt_name_assign_virt_type(struct name_st *name, unsigned type, gnutl
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 		gnutls_free(san->data);
-		san->data = NULL;
 
 		if (othername_oid) {
 			name->othername_oid.data = (uint8_t *) othername_oid;

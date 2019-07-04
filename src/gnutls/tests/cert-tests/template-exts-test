@@ -52,6 +52,24 @@ fi
 
 rm -f "$OUTFILE"
 
+# Test adding critical extensions only
+datefudge -s "2007-04-22" \
+	"${CERTTOOL}" --generate-self-signed \
+		--load-privkey "${srcdir}/data/template-test.key" \
+		--template "${srcdir}/templates/crit-extensions.tmpl" \
+		--outfile $OUTFILE #2>/dev/null
+
+${DIFF} "${srcdir}/data/crit-extensions.pem" $OUTFILE #>/dev/null 2>&1
+rc=$?
+
+# We're done.
+if test "${rc}" != "0"; then
+	echo "Test with critical only failed"
+	exit ${rc}
+fi
+
+rm -f "$OUTFILE"
+
 datefudge -s "2007-04-22" \
 	"${CERTTOOL}" --generate-request \
 		--load-privkey "${srcdir}/data/template-test.key" \

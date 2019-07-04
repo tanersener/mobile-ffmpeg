@@ -74,7 +74,11 @@ while ($line=<STDIN>) {
              $line =~ m/^\s*typedef/) {
 
       next if ($line =~ m/;/);
-      $state = 2;
+      if ($line =~ m/\{/) {
+        $state = 2;
+      } else {
+        $state = 6;
+      }
       next;
     } elsif ($line =~ m/^\s*extern\s+"C"/) {
       next;
@@ -103,8 +107,8 @@ while ($line=<STDIN>) {
       $state = 0;
       next;
     }
-  } elsif ($state == 2) { #struct||enum||typedef
-    if ($line =~ m/;/) {
+  } elsif ($state == 2) { #struct||enum||typedef struct
+    if ($line =~ m/\}/) {
       $state = 0;
       next;
     }
@@ -123,6 +127,11 @@ while ($line=<STDIN>) {
     }
   } elsif ($state == 5) { # define
     if ($line !~ m/\\$/) {
+      $state = 0;
+      next;
+    }
+  } elsif ($state == 6) { #typedef (not struct)
+    if ($line =~ m/;/) {
       $state = 0;
       next;
     }

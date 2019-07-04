@@ -157,7 +157,6 @@ void doit(void)
 	pin_called = 0;
 
 	gnutls_free(sig.data);
-	sig.data = NULL;
 
 	/* call again - should re-authenticate */
 	ret = gnutls_privkey_sign_hash(key, GNUTLS_DIG_SHA1, 0, &data, &sig);
@@ -172,7 +171,6 @@ void doit(void)
 	pin_called = 0;
 
 	gnutls_free(sig.data);
-	sig.data = NULL;
 
 	if (debug)
 		printf("done\n\n\n");

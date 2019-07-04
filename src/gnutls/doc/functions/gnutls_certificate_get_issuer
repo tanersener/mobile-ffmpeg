@@ -18,7 +18,7 @@ In that case the provided  @code{issuer} must not be initialized.
 
 As with @code{gnutls_x509_trust_list_get_issuer()}  this function requires
 the @code{GNUTLS_TL_GET_COPY}  flag in order to operate with PKCS@code{11}  trust
-lists in a thread-safe way. 
+lists in a thread-safe way.
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.

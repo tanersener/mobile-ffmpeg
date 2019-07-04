@@ -86,7 +86,7 @@ static INLINE void calc_ab_fast_internal_common(
 
     for (int x = 0; x < 4; x++) {
       for (int y = 0; y < 4; y++) {
-        dst_A16[x * buf_stride + y] = x_by_xplus1[src1[x * buf_stride + y]];
+        dst_A16[x * buf_stride + y] = av1_x_by_xplus1[src1[x * buf_stride + y]];
       }
     }
     load_u16_4x4(dst_A16, buf_stride, &d0, &d1, &d2, &d3);
@@ -214,7 +214,7 @@ static INLINE void calc_ab_internal_common(
 
     for (int x = 0; x < 4; x++) {
       for (int y = 0; y < 8; y++) {
-        dst_A16[x * buf_stride + y] = x_by_xplus1[src1[x * buf_stride + y]];
+        dst_A16[x * buf_stride + y] = av1_x_by_xplus1[src1[x * buf_stride + y]];
       }
     }
     load_u16_8x4(dst_A16, buf_stride, &s16_4, &s16_5, &s16_6, &s16_7);
@@ -467,7 +467,7 @@ static INLINE void calc_ab_internal_lbd(int32_t *A, uint16_t *A16,
   const uint32_t n = (2 * r + 1) * (2 * r + 1);
   const uint32x4_t const_n_val = vdupq_n_u32(n);
   const uint16x8_t sgrproj_sgr = vdupq_n_u16(SGRPROJ_SGR);
-  const uint16x4_t one_by_n_minus_1_vec = vdup_n_u16(one_by_x[n - 1]);
+  const uint16x4_t one_by_n_minus_1_vec = vdup_n_u16(av1_one_by_x[n - 1]);
   const uint32x4_t const_val = vdupq_n_u32(255);
 
   uint16x8_t s16_0, s16_1, s16_2, s16_3, s16_4, s16_5, s16_6, s16_7;
@@ -522,7 +522,7 @@ static INLINE void calc_ab_internal_hbd(int32_t *A, uint16_t *A16,
   const int32x4_t bd_min_1_vec = vdupq_n_s32(-((bit_depth - 8) << 1));
   const uint32x4_t const_n_val = vdupq_n_u32(n);
   const uint16x8_t sgrproj_sgr = vdupq_n_u16(SGRPROJ_SGR);
-  const uint16x4_t one_by_n_minus_1_vec = vdup_n_u16(one_by_x[n - 1]);
+  const uint16x4_t one_by_n_minus_1_vec = vdup_n_u16(av1_one_by_x[n - 1]);
   const uint32x4_t const_val = vdupq_n_u32(255);
 
   int32x4_t sr0, sr1, sr2, sr3, sr4, sr5, sr6, sr7;
@@ -584,7 +584,7 @@ static INLINE void calc_ab_fast_internal_lbd(int32_t *A, uint16_t *A16,
   const uint32_t n = (2 * r + 1) * (2 * r + 1);
   const uint32x4_t const_n_val = vdupq_n_u32(n);
   const uint16x4_t sgrproj_sgr = vdup_n_u16(SGRPROJ_SGR);
-  const uint32x4_t one_by_n_minus_1_vec = vdupq_n_u32(one_by_x[n - 1]);
+  const uint32x4_t one_by_n_minus_1_vec = vdupq_n_u32(av1_one_by_x[n - 1]);
   const uint32x4_t const_val = vdupq_n_u32(255);
 
   int32x4_t sr0, sr1, sr2, sr3, sr4, sr5, sr6, sr7;
@@ -638,7 +638,7 @@ static INLINE void calc_ab_fast_internal_hbd(int32_t *A, uint16_t *A16,
   const int32x4_t bd_min_1_vec = vdupq_n_s32(-((bit_depth - 8) << 1));
   const uint32x4_t const_n_val = vdupq_n_u32(n);
   const uint16x4_t sgrproj_sgr = vdup_n_u16(SGRPROJ_SGR);
-  const uint32x4_t one_by_n_minus_1_vec = vdupq_n_u32(one_by_x[n - 1]);
+  const uint32x4_t one_by_n_minus_1_vec = vdupq_n_u32(av1_one_by_x[n - 1]);
   const uint32x4_t const_val = vdupq_n_u32(255);
 
   int32x4_t sr0, sr1, sr2, sr3, sr4, sr5, sr6, sr7;
@@ -1145,7 +1145,7 @@ static INLINE void restoration_fast_internal(uint16_t *dgd16, int width,
                                              int32_t *dst, int dst_stride,
                                              int bit_depth, int sgr_params_idx,
                                              int radius_idx) {
-  const sgr_params_type *const params = &sgr_params[sgr_params_idx];
+  const sgr_params_type *const params = &av1_sgr_params[sgr_params_idx];
   const int r = params->r[radius_idx];
   const int width_ext = width + 2 * SGRPROJ_BORDER_HORZ;
   const int height_ext = height + 2 * SGRPROJ_BORDER_VERT;
@@ -1200,7 +1200,7 @@ static INLINE void restoration_internal(uint16_t *dgd16, int width, int height,
                                         int dgd_stride, int32_t *dst,
                                         int dst_stride, int bit_depth,
                                         int sgr_params_idx, int radius_idx) {
-  const sgr_params_type *const params = &sgr_params[sgr_params_idx];
+  const sgr_params_type *const params = &av1_sgr_params[sgr_params_idx];
   const int r = params->r[radius_idx];
   const int width_ext = width + 2 * SGRPROJ_BORDER_HORZ;
   const int height_ext = height + 2 * SGRPROJ_BORDER_VERT;
@@ -1345,7 +1345,7 @@ int av1_selfguided_restoration_neon(const uint8_t *dat8, int width, int height,
                                     int stride, int32_t *flt0, int32_t *flt1,
                                     int flt_stride, int sgr_params_idx,
                                     int bit_depth, int highbd) {
-  const sgr_params_type *const params = &sgr_params[sgr_params_idx];
+  const sgr_params_type *const params = &av1_sgr_params[sgr_params_idx];
   assert(!(params->r[0] == 0 && params->r[1] == 0));
 
   uint16_t dgd16_[RESTORATION_PROC_UNIT_PELS];
@@ -1380,11 +1380,11 @@ int av1_selfguided_restoration_neon(const uint8_t *dat8, int width, int height,
   return 0;
 }
 
-void apply_selfguided_restoration_neon(const uint8_t *dat8, int width,
-                                       int height, int stride, int eps,
-                                       const int *xqd, uint8_t *dst8,
-                                       int dst_stride, int32_t *tmpbuf,
-                                       int bit_depth, int highbd) {
+void av1_apply_selfguided_restoration_neon(const uint8_t *dat8, int width,
+                                           int height, int stride, int eps,
+                                           const int *xqd, uint8_t *dst8,
+                                           int dst_stride, int32_t *tmpbuf,
+                                           int bit_depth, int highbd) {
   int32_t *flt0 = tmpbuf;
   int32_t *flt1 = flt0 + RESTORATION_UNITPELS_MAX;
   assert(width * height <= RESTORATION_UNITPELS_MAX);
@@ -1395,7 +1395,7 @@ void apply_selfguided_restoration_neon(const uint8_t *dat8, int width,
   const int width_ext = width + 2 * SGRPROJ_BORDER_HORZ;
   const int height_ext = height + 2 * SGRPROJ_BORDER_VERT;
   const int dgd_stride = stride;
-  const sgr_params_type *const params = &sgr_params[eps];
+  const sgr_params_type *const params = &av1_sgr_params[eps];
   int xq[2];
 
   assert(!(params->r[0] == 0 && params->r[1] == 0));
@@ -1422,7 +1422,7 @@ void apply_selfguided_restoration_neon(const uint8_t *dat8, int width,
     restoration_internal(dgd16, width, height, dgd16_stride, flt1, width,
                          bit_depth, eps, 1);
 
-  decode_xq(xqd, xq, params);
+  av1_decode_xq(xqd, xq, params);
 
   {
     int16_t *src_ptr;

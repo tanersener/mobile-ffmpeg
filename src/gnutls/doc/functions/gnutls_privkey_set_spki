@@ -1,0 +1,19 @@
+
+
+
+
+@deftypefun {int} {gnutls_privkey_set_spki} (gnutls_privkey_t @var{privkey}, const gnutls_x509_spki_t @var{spki}, unsigned int @var{flags})
+@var{privkey}: a public key of type @code{gnutls_privkey_t} 
+
+@var{spki}: a SubjectPublicKeyInfo structure of type @code{gnutls_privkey_spki_t} 
+
+@var{flags}: must be zero
+
+This function will set the public key information.
+The provided  @code{spki} must be initialized.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.6.0
+@end deftypefun

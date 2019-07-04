@@ -220,7 +220,7 @@ void av1_get_uniform_tile_size(const AV1_COMMON *cm, int *w, int *h) {
   }
 }
 
-int is_min_tile_width_satisfied(const AV1_COMMON *cm) {
+int av1_is_min_tile_width_satisfied(const AV1_COMMON *cm) {
   // Disable check if there is a single tile col in the frame
   if (cm->tile_cols == 1) return 1;
 

@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2012 Free Software Foundation, Inc.
+ * Copyright (C) 2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -15,9 +16,8 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with GnuTLS; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  */
 
 #ifdef HAVE_CONFIG_H
@@ -48,6 +48,7 @@ int main()
 #include <signal.h>
 
 #include "utils.h"
+#include "cert-common.h"
 
 static void terminate(void);
 
@@ -64,51 +65,6 @@ static void client_log_func(int level, const char *str)
 {
 	fprintf(stderr, "client|<%d>| %s", level, str);
 }
-
-static unsigned char server_cert_pem[] =
-    "-----BEGIN CERTIFICATE-----\n"
-    "MIICVjCCAcGgAwIBAgIERiYdMTALBgkqhkiG9w0BAQUwGTEXMBUGA1UEAxMOR251\n"
-    "VExTIHRlc3QgQ0EwHhcNMDcwNDE4MTMyOTIxWhcNMDgwNDE3MTMyOTIxWjA3MRsw\n"
-    "GQYDVQQKExJHbnVUTFMgdGVzdCBzZXJ2ZXIxGDAWBgNVBAMTD3Rlc3QuZ251dGxz\n"
-    "Lm9yZzCBnDALBgkqhkiG9w0BAQEDgYwAMIGIAoGA17pcr6MM8C6pJ1aqU46o63+B\n"
-    "dUxrmL5K6rce+EvDasTaDQC46kwTHzYWk95y78akXrJutsoKiFV1kJbtple8DDt2\n"
-    "DZcevensf9Op7PuFZKBroEjOd35znDET/z3IrqVgbtm2jFqab7a+n2q9p/CgMyf1\n"
-    "tx2S5Zacc1LWn9bIjrECAwEAAaOBkzCBkDAMBgNVHRMBAf8EAjAAMBoGA1UdEQQT\n"
-    "MBGCD3Rlc3QuZ251dGxzLm9yZzATBgNVHSUEDDAKBggrBgEFBQcDATAPBgNVHQ8B\n"
-    "Af8EBQMDB6AAMB0GA1UdDgQWBBTrx0Vu5fglyoyNgw106YbU3VW0dTAfBgNVHSME\n"
-    "GDAWgBTpPBz7rZJu5gakViyi4cBTJ8jylTALBgkqhkiG9w0BAQUDgYEAaFEPTt+7\n"
-    "bzvBuOf7+QmeQcn29kT6Bsyh1RHJXf8KTk5QRfwp6ogbp94JQWcNQ/S7YDFHglD1\n"
-    "AwUNBRXwd3riUsMnsxgeSDxYBfJYbDLeohNBsqaPDJb7XailWbMQKfAbFQ8cnOxg\n"
-    "rOKLUQRWJ0K3HyXRMhbqjdLIaQiCvQLuizo=\n" "-----END CERTIFICATE-----\n";
-
-const gnutls_datum_t server_cert = { server_cert_pem,
-	sizeof(server_cert_pem)
-};
-
-static unsigned char server_key_pem[] =
-    "-----BEGIN RSA PRIVATE KEY-----\n"
-    "MIICXAIBAAKBgQDXulyvowzwLqknVqpTjqjrf4F1TGuYvkrqtx74S8NqxNoNALjq\n"
-    "TBMfNhaT3nLvxqResm62ygqIVXWQlu2mV7wMO3YNlx696ex/06ns+4VkoGugSM53\n"
-    "fnOcMRP/PciupWBu2baMWppvtr6far2n8KAzJ/W3HZLllpxzUtaf1siOsQIDAQAB\n"
-    "AoGAYAFyKkAYC/PYF8e7+X+tsVCHXppp8AoP8TEZuUqOZz/AArVlle/ROrypg5kl\n"
-    "8YunrvUdzH9R/KZ7saNZlAPLjZyFG9beL/am6Ai7q7Ma5HMqjGU8kTEGwD7K+lbG\n"
-    "iomokKMOl+kkbY/2sI5Czmbm+/PqLXOjtVc5RAsdbgvtmvkCQQDdV5QuU8jap8Hs\n"
-    "Eodv/tLJ2z4+SKCV2k/7FXSKWe0vlrq0cl2qZfoTUYRnKRBcWxc9o92DxK44wgPi\n"
-    "oMQS+O7fAkEA+YG+K9e60sj1K4NYbMPAbYILbZxORDecvP8lcphvwkOVUqbmxOGh\n"
-    "XRmTZUuhBrJhJKKf6u7gf3KWlPl6ShKEbwJASC118cF6nurTjuLf7YKARDjNTEws\n"
-    "qZEeQbdWYINAmCMj0RH2P0mvybrsXSOD5UoDAyO7aWuqkHGcCLv6FGG+qwJAOVqq\n"
-    "tXdUucl6GjOKKw5geIvRRrQMhb/m5scb+5iw8A4LEEHPgGiBaF5NtJZLALgWfo5n\n"
-    "hmC8+G8F0F78znQtPwJBANexu+Tg5KfOnzSILJMo3oXiXhf5PqXIDmbN0BKyCKAQ\n"
-    "LfkcEcUbVfmDaHpvzwY9VEaoMOKVLitETXdNSxVpvWM=\n"
-    "-----END RSA PRIVATE KEY-----\n";
-
-const gnutls_datum_t server_key = { server_key_pem,
-	sizeof(server_key_pem)
-};
-
-
-/* A very basic TLS client, with anonymous authentication.
- */
 
 #define MAX_BUF 1024
 
@@ -226,7 +182,7 @@ static void client(int fd, const char *prio)
 			 || ret == GNUTLS_E_INTERRUPTED);
 	} while (ret > 0);
 
-	if (ret == 0) {
+	if (ret == 0 || ret == GNUTLS_E_TIMEDOUT) {
 		if (debug)
 			success
 			    ("client: Peer has closed the TLS connection\n");
@@ -326,6 +282,7 @@ static void server(int fd, const char *prio)
 	mtu = gnutls_dtls_get_mtu(session);
 
 	do {
+		usleep(10000); /* some systems like FreeBSD have their buffers full during this send */
 		do {
 			ret =
 			    gnutls_record_send(session, buffer,
@@ -343,7 +300,8 @@ static void server(int fd, const char *prio)
 	while (to_send < 64);
 
 	to_send = -1;
-	/* do not wait for the peer to close the connection.
+
+	/* wait for the peer to close the connection.
 	 */
 	gnutls_bye(session, GNUTLS_SHUT_WR);
 
@@ -359,12 +317,12 @@ static void server(int fd, const char *prio)
 		success("server: finished\n");
 }
 
-static void start(const char *prio)
+static void start(const char *name, const char *prio)
 {
 	int fd[2];
-	int ret;
+	int ret, status = 0;
 
-	ret = socketpair(AF_UNIX, SOCK_STREAM, 0, fd);
+	ret = socketpair(AF_UNIX, SOCK_DGRAM, 0, fd);
 	if (ret < 0) {
 		perror("socketpair");
 		exit(1);
@@ -379,8 +337,11 @@ static void start(const char *prio)
 
 	if (child) {
 		/* parent */
+		success("trying: %s\n", name);
 		close(fd[0]);
 		client(fd[1], prio);
+		wait(&status);
+		check_wait_status(status);
 	} else {
 		close(fd[1]);
 		server(fd[0], prio);
@@ -397,9 +358,6 @@ static void start(const char *prio)
 
 static void ch_handler(int sig)
 {
-	int status;
-	wait(&status);
-	check_wait_status(status);
 	return;
 }
 
@@ -408,14 +366,14 @@ void doit(void)
 	signal(SIGCHLD, ch_handler);
 	signal(SIGPIPE, SIG_IGN);
 
-	start(AES_CBC);
-	start(AES_CBC_SHA256);
-	start(AES_GCM);
-	start(AES_CCM);
-	start(AES_CCM_8);
-#ifndef ENABLE_FIPS140
-	start(CHACHA_POLY1305);
-#endif
+	start("aes-cbc", AES_CBC);
+	start("aes-cbc-sha256", AES_CBC_SHA256);
+	start("aes-gcm", AES_GCM);
+	start("aes-ccm", AES_CCM);
+	start("aes-ccm-8", AES_CCM_8);
+	if (!gnutls_fips140_mode_enabled()) {
+		start("chacha20", CHACHA_POLY1305);
+	}
 }
 
 #endif				/* _WIN32 */

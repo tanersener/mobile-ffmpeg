@@ -43,7 +43,7 @@ static INLINE void aom_daala_write(daala_writer *w, int bit, int prob) {
   /*int queue_r = 0;
   int frame_idx_r = 0;
   int queue_w = bitstream_queue_get_write();
-  int frame_idx_w = bitstream_queue_get_frame_write();
+  int frame_idx_w = aom_bitstream_queue_get_frame_writee();
   if (frame_idx_w == frame_idx_r && queue_w == queue_r) {
     fprintf(stderr, "\n *** bitstream queue at frame_idx_w %d queue_w %d\n",
     frame_idx_w, queue_w);
@@ -60,7 +60,7 @@ static INLINE void daala_write_symbol(daala_writer *w, int symb,
   /*int queue_r = 0;
   int frame_idx_r = 0;
   int queue_w = bitstream_queue_get_write();
-  int frame_idx_w = bitstream_queue_get_frame_write();
+  int frame_idx_w = aom_bitstream_queue_get_frame_writee();
   if (frame_idx_w == frame_idx_r && queue_w == queue_r) {
     fprintf(stderr, "\n *** bitstream queue at frame_idx_w %d queue_w %d\n",
     frame_idx_w, queue_w);

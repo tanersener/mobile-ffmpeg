@@ -14,8 +14,11 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+
+#ifndef GNUTLS_SRC_BENCHMARK_H
+#define GNUTLS_SRC_BENCHMARK_H
 
 #include <sys/time.h>
 #include <time.h>
@@ -23,6 +26,9 @@
 #if defined(_WIN32)
 #include <windows.h>
 #endif
+
+/* for uint64_t */
+# include <stdint.h>
 
 #if defined(HAVE_CLOCK_GETTIME) && defined(CLOCK_PROCESS_CPUTIME_ID)
 #undef gettime
@@ -44,7 +50,7 @@ void benchmark_tls(int debug_level, int ciphers);
 
 struct benchmark_st {
 	struct timespec start;
-	unsigned long size;
+	uint64_t size;
 	sighandler_t old_handler;
 #if defined(_WIN32)
 	HANDLE wtimer;
@@ -62,6 +68,7 @@ double stop_benchmark(struct benchmark_st *st, const char *metric,
 inline static unsigned int
 timespec_sub_ms(struct timespec *a, struct timespec *b)
 {
-	return (a->tv_sec * 1000 + a->tv_nsec / (1000 * 1000) -
-		(b->tv_sec * 1000 + b->tv_nsec / (1000 * 1000)));
+	return (a->tv_sec - b->tv_sec) * 1000 + (a->tv_nsec - b->tv_nsec) / (1000 * 1000);
 }
+
+#endif /* GNUTLS_SRC_BENCHMARK_H */

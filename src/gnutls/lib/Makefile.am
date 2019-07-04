@@ -16,7 +16,7 @@
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>
+# along with this program.  If not, see <https://www.gnu.org/licenses/>
 
 ACLOCAL_AMFLAGS = -I ../m4 -I ../gl/m4
 
@@ -45,12 +45,6 @@ AM_CPPFLAGS = \
 	$(LIBTASN1_CFLAGS)			\
 	$(P11_KIT_CFLAGS)
 
-if ENABLE_OPENPGP
-SUBDIRS += opencdk
-SUBDIRS += openpgp
-AM_CPPFLAGS += -I$(srcdir)/opencdk
-endif
-
 if !HAVE_LIBUNISTRING
 SUBDIRS += unistring
 AM_CPPFLAGS += -I$(srcdir)/unistring/ -I$(builddir)/unistring/
@@ -71,20 +65,22 @@ SRP_COBJECTS = srp.c
 
 PSK_COBJECTS = psk.c
 
-COBJECTS = range.c record.c compress.c debug.c cipher.c			\
-	mbuffers.c buffers.c handshake.c num.c errors.c dh.c kx.c	\
+COBJECTS = range.c record.c compress.c debug.c cipher.c gthreads.h handshake-tls13.c \
+	mbuffers.c buffers.c handshake.c num.c errors.c dh.c kx.c cipher-cbc.c \
 	priority.c hash_int.c cipher_int.c session.c db.c x509_b64.c	\
-	extensions.c auth.c sslv2_compat.c datum.c session_pack.c mpi.c \
-	pk.c cert.c global.c constate.c anon_cred.c pkix_asn1_tab.c gnutls_asn1_tab.c	\
-	mem.c fingerprint.c tls-sig.c ecc.c alert.c privkey_raw.c		\
+	hello_ext.c auth.c sslv2_compat.c datum.c session_pack.c mpi.c \
+	pk.c cert-cred.c global.c constate.c anon_cred.c pkix_asn1_tab.c gnutls_asn1_tab.c	\
+	mem.c fingerprint.c tls-sig.c ecc.c alert.c privkey_raw.c atomic.h	\
 	system/certs.c system/threads.c system/fastopen.c system/sockets.c	\
-	system/inet_ntop.c str-iconv.c system/vasprintf.c vasprintf.h system.c \
-	str.c str-unicode.c str-idna.c state.c x509.c file.c supplemental.c	\
-	random.c crypto-api.c privkey.c pcert.c	pubkey.c locks.c dtls.c		\
+	str-iconv.c system.c profiles.c profiles.h \
+	str.c str-unicode.c str-idna.c state.c cert-cred-x509.c file.c supplemental.c	\
+	random.c crypto-api.c crypto-api.h privkey.c pcert.c pubkey.c locks.c dtls.c \
 	system_override.c crypto-backend.c verify-tofu.c pin.c tpm.c fips.c	\
-	safe-memfuncs.c system/inet_pton.c atfork.c atfork.h randomart.c \
+	safe-memfuncs.c atfork.c atfork.h randomart.c \
 	system-keys.h urls.c urls.h prf.c auto-verify.c dh-session.c \
-	cert-session.c handshake-checks.c dtls-sw.c dh-primes.c openpgp_compat.c
+	cert-session.c handshake-checks.c dtls-sw.c dh-primes.c openpgp_compat.c \
+	crypto-selftests.c crypto-selftests-pk.c secrets.c extv.c extv.h \
+	hello_ext_lib.c hello_ext_lib.h ocsp-api.c stek.c cert-cred-rawpk.c
 
 if WINDOWS
 COBJECTS += system/keys-win.c
@@ -92,9 +88,19 @@ else
 COBJECTS += system/keys-dummy.c
 endif
 
-if ENABLE_SELF_CHECKS
-COBJECTS += crypto-selftests.c crypto-selftests-pk.c
-endif
+COBJECTS += tls13/encrypted_extensions.c tls13/encrypted_extensions.h \
+	tls13/certificate_request.c tls13/certificate_request.h \
+	tls13/certificate_verify.c tls13/certificate_verify.h \
+	tls13-sig.c tls13-sig.h \
+	tls13/finished.c tls13/finished.h \
+	tls13/key_update.c tls13/key_update.h \
+	tls13/hello_retry.c tls13/hello_retry.h \
+	tls13/session_ticket.c tls13/session_ticket.h \
+	tls13/certificate.c tls13/certificate.h \
+	tls13/early_data.c tls13/early_data.h \
+	tls13/post_handshake.c \
+	tls13/psk_ext_parser.c tls13/psk_ext_parser.h \
+	tls13/anti_replay.c tls13/anti_replay.h
 
 if ENABLE_PKCS11
 COBJECTS += pkcs11.c pkcs11x.c pkcs11_privkey.c pkcs11_write.c pkcs11_secret.c \
@@ -105,11 +111,11 @@ if ENABLE_NETTLE
 SUBDIRS += nettle
 endif
 
-HFILES = abstract_int.h debug.h compress.h cipher.h	\
-	buffers.h errors.h gnutls_int.h dtls.h	\
-	handshake.h num.h algorithms.h		\
-	dh.h kx.h hash_int.h cipher_int.h	\
-	db.h auth.h extensions.h	\
+HFILES = abstract_int.h debug.h cipher.h	 \
+	buffers.h errors.h gnutls_int.h dtls.h	 \
+	handshake.h num.h algorithms.h		 \
+	dh.h kx.h hash_int.h cipher_int.h	 \
+	db.h auth.h hello_ext.h	handshake-defs.h \
 	x509_b64.h sslv2_compat.h datum.h \
 	mpi.h pk.h record.h		\
 	constate.h global.h tls-sig.h mem.h	\
@@ -118,7 +124,7 @@ HFILES = abstract_int.h debug.h compress.h cipher.h	\
 	srp.h auth/srp_kx.h auth/srp_passwd.h	\
 	file.h supplemental.h crypto.h random.h system.h\
 	locks.h mbuffers.h ecc.h pin.h fips.h \
-	priority_options.h
+	priority_options.h secrets.h stek.h cert-cred.h
 
 if ENABLE_PKCS11
 HFILES += pkcs11_int.h pkcs11x.h
@@ -139,15 +145,11 @@ thirdparty_libadd = $(LTLIBZ) $(LTLIBINTL) $(LIBSOCKET) $(LTLIBNSL) \
 	$(P11_KIT_LIBS) $(LIB_SELECT)
 
 if HAVE_LIBIDN2
-thirdparty_libadd += -lidn2
-endif
-
-if HAVE_LIBIDN
-thirdparty_libadd += $(LIBIDN_LIBS)
+thirdparty_libadd += $(LIBIDN2_LIBS)
 endif
 
 if HAVE_LIBUNISTRING
-thirdparty_libadd += $(LTLIBUNISTRING)
+thirdparty_libadd += $(LIBUNISTRING)
 else
 libgnutls_la_LIBADD += unistring/libunistring.la
 endif
@@ -170,11 +172,6 @@ endif
 
 if ENABLE_TROUSERS
 thirdparty_libadd += $(LTLIBDL)
-endif
-
-if ENABLE_OPENPGP
-libgnutls_la_LIBADD += openpgp/libgnutls_openpgp.la
-libgnutls_la_LIBADD += opencdk/libminiopencdk.la
 endif
 
 if HAVE_LD_VERSION_SCRIPT
@@ -219,7 +216,7 @@ libgnutlsxx_la_CPPFLAGS = -I$(top_srcdir)/includes -I$(top_builddir)/includes -I
 
 AM_CXXFLAGS = \
 	-I$(srcdir)/includes	\
-	-I$(builddir)/includes	
+	-I$(builddir)/includes
 
 lib_LTLIBRARIES += libgnutlsxx.la
 
@@ -242,4 +239,3 @@ priority_options.h: $(srcdir)/priority_options.gperf
 	-gperf --global-table -t $^ > $@-tmp \
 	&& sed 's/^const struct priority_options_st \*/static const struct priority_options_st \*/' <$@-tmp >$@ \
 	&& rm -f $@-tmp
-

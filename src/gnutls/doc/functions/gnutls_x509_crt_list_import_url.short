@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_crt_list_import_url} (gnutls_x509_crt_t ** @var{certs}, unsigned int * @var{size}, const char * @var{url}, gnutls_pin_callback_t @var{pin_fn}, void * @var{pin_fn_userdata}, unsigned int @var{flags})

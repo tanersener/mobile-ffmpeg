@@ -9,7 +9,7 @@
 
 @var{type}: is PEM or DER
 
-This function adds the trusted CAs present in the directory in order to 
+This function adds the trusted CAs present in the directory in order to
 verify client or server certificates. This function is identical
 to @code{gnutls_certificate_set_x509_trust_file()}  but loads all certificates
 in a directory.

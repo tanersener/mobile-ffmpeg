@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2001-2014 Free Software Foundation, Inc.
+ * Copyright (C) 2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -16,7 +17,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -37,7 +38,34 @@
 #include <random.h>
 #include <gnutls/crypto.h>
 
-/* encodes the Dss-Sig-Value structure
+/**
+ * gnutls_encode_rs_value:
+ * @sig_value: will hold a Dss-Sig-Value DER encoded structure
+ * @r: must contain the r value
+ * @s: must contain the s value
+ *
+ * This function will encode the provided r and s values, 
+ * into a Dss-Sig-Value structure, used for DSA and ECDSA
+ * signatures.
+ *
+ * The output value should be deallocated using gnutls_free().
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
+ *   an error code is returned.
+ *
+ * Since: 3.6.0
+ *
+ **/
+int
+gnutls_encode_rs_value(gnutls_datum_t * sig_value,
+			const gnutls_datum_t * r,
+			const gnutls_datum_t * s)
+{
+	return _gnutls_encode_ber_rs_raw(sig_value, r, s);
+}
+
+/* same as gnutls_encode_rs_value(), but kept since it used
+ * to be exported for FIPS140 CAVS testing.
  */
 int
 _gnutls_encode_ber_rs_raw(gnutls_datum_t * sig_value,
@@ -161,6 +189,8 @@ _gnutls_decode_ber_rs(const gnutls_datum_t * sig_value, bigint_t * r,
 		return _gnutls_asn2err(result);
 	}
 
+	/* rfc3279 doesn't specify whether Dss-Sig-Value is encoded
+	 * as DER or BER. As such we do not restrict to the DER subset. */
 	result =
 	    asn1_der_decoding(&sig, sig_value->data, sig_value->size,
 			      NULL);
@@ -180,7 +210,7 @@ _gnutls_decode_ber_rs(const gnutls_datum_t * sig_value, bigint_t * r,
 	result = _gnutls_x509_read_int(sig, "s", s);
 	if (result < 0) {
 		gnutls_assert();
-		_gnutls_mpi_release(s);
+		_gnutls_mpi_release(r);
 		asn1_delete_structure(&sig);
 		return result;
 	}
@@ -190,6 +220,35 @@ _gnutls_decode_ber_rs(const gnutls_datum_t * sig_value, bigint_t * r,
 	return 0;
 }
 
+/**
+ * gnutls_decode_rs_value:
+ * @sig_value: holds a Dss-Sig-Value DER or BER encoded structure
+ * @r: will contain the r value
+ * @s: will contain the s value
+ *
+ * This function will decode the provided @sig_value, 
+ * into @r and @s elements. The Dss-Sig-Value is used for DSA and ECDSA
+ * signatures.
+ *
+ * The output values may be padded with a zero byte to prevent them
+ * from being interpreted as negative values. The value
+ * should be deallocated using gnutls_free().
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
+ *   an error code is returned.
+ *
+ * Since: 3.6.0
+ *
+ **/
+int gnutls_decode_rs_value(const gnutls_datum_t * sig_value, gnutls_datum_t *r,
+			   gnutls_datum_t *s)
+{
+	return _gnutls_decode_ber_rs_raw(sig_value, r, s);
+}
+
+/* same as gnutls_decode_rs_value(), but kept since it used
+ * to be exported for FIPS140 CAVS testing.
+ */
 int
 _gnutls_decode_ber_rs_raw(const gnutls_datum_t * sig_value, gnutls_datum_t *r,
 			  gnutls_datum_t *s)
@@ -205,6 +264,8 @@ _gnutls_decode_ber_rs_raw(const gnutls_datum_t * sig_value, gnutls_datum_t *r,
 		return _gnutls_asn2err(result);
 	}
 
+	/* rfc3279 doesn't specify whether Dss-Sig-Value is encoded
+	 * as DER or BER. As such we do not restrict to the DER subset. */
 	result =
 	    asn1_der_decoding(&sig, sig_value->data, sig_value->size,
 			      NULL);
@@ -234,6 +295,181 @@ _gnutls_decode_ber_rs_raw(const gnutls_datum_t * sig_value, gnutls_datum_t *r,
 	return 0;
 }
 
+int
+_gnutls_encode_gost_rs(gnutls_datum_t * sig_value, bigint_t r, bigint_t s,
+		       size_t intsize)
+{
+	uint8_t *data;
+	int result;
+
+	data = gnutls_malloc(intsize * 2);
+	if (data == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	if ((result = _gnutls_mpi_bprint_size(s, data, intsize)) < 0) {
+		gnutls_assert();
+		gnutls_free(data);
+		return result;
+	}
+
+	if ((result = _gnutls_mpi_bprint_size(r, data + intsize, intsize)) < 0) {
+		gnutls_assert();
+		gnutls_free(data);
+		return result;
+	}
+
+	sig_value->data = data;
+	sig_value->size = intsize * 2;
+
+	return 0;
+}
+
+int
+_gnutls_decode_gost_rs(const gnutls_datum_t * sig_value, bigint_t * r,
+		       bigint_t * s)
+{
+	int ret;
+	unsigned halfsize = sig_value->size >> 1;
+
+	if (sig_value->size % 2 != 0) {
+		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+	}
+
+	ret = _gnutls_mpi_init_scan(s, sig_value->data, halfsize);
+	if (ret < 0)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+	ret = _gnutls_mpi_init_scan(r, sig_value->data + halfsize, halfsize);
+	if (ret < 0) {
+		_gnutls_mpi_release(s);
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+	}
+
+	return 0;
+}
+
+/**
+ * gnutls_encode_gost_rs_value:
+ * @sig_value: will hold a GOST signature according to RFC 4491 section 2.2.2
+ * @r: must contain the r value
+ * @s: must contain the s value
+ *
+ * This function will encode the provided r and s values, into binary
+ * representation according to RFC 4491 section 2.2.2, used for GOST R
+ * 34.10-2001 (and thus also for GOST R 34.10-2012) signatures.
+ *
+ * The output value should be deallocated using gnutls_free().
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
+ *   an error code is returned.
+ *
+ * Since: 3.6.0
+ */
+int gnutls_encode_gost_rs_value(gnutls_datum_t * sig_value, const gnutls_datum_t * r, const gnutls_datum_t  *s)
+{
+	uint8_t *data;
+	size_t intsize = r->size;
+
+	if (s->size != intsize) {
+		gnutls_assert();
+		return GNUTLS_E_ILLEGAL_PARAMETER;
+	}
+
+	data = gnutls_malloc(intsize * 2);
+	if (data == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	memcpy(data, s->data, intsize);
+	memcpy(data + intsize, r->data, intsize);
+
+	sig_value->data = data;
+	sig_value->size = intsize * 2;
+
+	return 0;
+}
+
+/**
+ * gnutls_decode_gost_rs_value:
+ * @sig_value: will holds a GOST signature according to RFC 4491 section 2.2.2
+ * @r: will contain the r value
+ * @s: will contain the s value
+ *
+ * This function will decode the provided @sig_value, into @r and @s elements.
+ * See RFC 4491 section 2.2.2 for the format of signature value.
+ *
+ * The output values may be padded with a zero byte to prevent them
+ * from being interpreted as negative values. The value
+ * should be deallocated using gnutls_free().
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
+ *   an error code is returned.
+ *
+ * Since: 3.6.0
+ */
+int gnutls_decode_gost_rs_value(const gnutls_datum_t * sig_value, gnutls_datum_t * r, gnutls_datum_t * s)
+{
+	int ret;
+	unsigned halfsize = sig_value->size >> 1;
+
+	if (sig_value->size % 2 != 0)
+		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+
+	ret = _gnutls_set_datum(s, sig_value->data, halfsize);
+	if (ret != 0)
+		return gnutls_assert_val(ret);
+
+	ret = _gnutls_set_datum(r, sig_value->data + halfsize, halfsize);
+	if (ret != 0) {
+		_gnutls_free_datum(s);
+		return gnutls_assert_val(ret);
+	}
+
+	return 0;
+}
+
+gnutls_digest_algorithm_t _gnutls_gost_digest(gnutls_pk_algorithm_t pk)
+{
+	if (pk == GNUTLS_PK_GOST_01)
+		return GNUTLS_DIG_GOSTR_94;
+	else if (pk == GNUTLS_PK_GOST_12_256)
+		return GNUTLS_DIG_STREEBOG_256;
+	else if (pk == GNUTLS_PK_GOST_12_512)
+		return GNUTLS_DIG_STREEBOG_512;
+
+	gnutls_assert();
+
+	return GNUTLS_DIG_UNKNOWN;
+}
+
+gnutls_pk_algorithm_t _gnutls_digest_gost(gnutls_digest_algorithm_t digest)
+{
+	if (digest == GNUTLS_DIG_GOSTR_94)
+		return GNUTLS_PK_GOST_01;
+	else if (digest == GNUTLS_DIG_STREEBOG_256)
+		return GNUTLS_PK_GOST_12_256;
+	else if (digest == GNUTLS_DIG_STREEBOG_512)
+		return GNUTLS_PK_GOST_12_512;
+
+	gnutls_assert();
+
+	return GNUTLS_PK_UNKNOWN;
+}
+
+gnutls_gost_paramset_t _gnutls_gost_paramset_default(gnutls_pk_algorithm_t pk)
+{
+	if (pk == GNUTLS_PK_GOST_01)
+		return GNUTLS_GOST_PARAMSET_CP_A;
+	else if (pk == GNUTLS_PK_GOST_12_256 ||
+		 pk == GNUTLS_PK_GOST_12_512)
+		return GNUTLS_GOST_PARAMSET_TC26_Z;
+	else
+		return gnutls_assert_val(GNUTLS_GOST_PARAMSET_UNKNOWN);
+}
+
 /* some generic pk functions */
 
 int _gnutls_pk_params_copy(gnutls_pk_params_st * dst,
@@ -242,12 +478,15 @@ int _gnutls_pk_params_copy(gnutls_pk_params_st * dst,
 	unsigned int i, j;
 	dst->params_nr = 0;
 
-	if (src == NULL || src->params_nr == 0) {
+	if (src == NULL || (src->params_nr == 0 && src->raw_pub.size == 0)) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	dst->flags = src->flags;
+	dst->pkflags = src->pkflags;
+	dst->curve = src->curve;
+	dst->gost_params = src->gost_params;
+	dst->qbits = src->qbits;
 	dst->algo = src->algo;
 
 	for (i = 0; i < src->params_nr; i++) {
@@ -275,6 +514,8 @@ int _gnutls_pk_params_copy(gnutls_pk_params_st * dst,
 	}
 	dst->palgo = src->palgo;
 
+	memcpy(&dst->spki, &src->spki, sizeof(gnutls_x509_spki_st));
+
 	return 0;
 
 fail:
@@ -296,8 +537,6 @@ void gnutls_pk_params_release(gnutls_pk_params_st * p)
 	}
 	gnutls_free(p->raw_priv.data);
 	gnutls_free(p->raw_pub.data);
-	p->raw_priv.data = NULL;
-	p->raw_pub.data = NULL;
 
 	p->params_nr = 0;
 }
@@ -315,6 +554,34 @@ void gnutls_pk_params_clear(gnutls_pk_params_st * p)
 		gnutls_memset(p->raw_priv.data, 0, p->raw_priv.size);
 		p->raw_priv.size = 0;
 	}
+}
+
+int
+_gnutls_find_rsa_pss_salt_size(unsigned bits, const mac_entry_st *me,
+			       unsigned salt_size)
+{
+	unsigned digest_size;
+	int max_salt_size;
+	unsigned key_size;
+
+	digest_size = _gnutls_hash_get_algo_len(me);
+	key_size = (bits + 7) / 8;
+
+	if (key_size == 0) {
+		return gnutls_assert_val(GNUTLS_E_PK_INVALID_PUBKEY);
+	} else {
+		max_salt_size = key_size - digest_size - 2;
+		if (max_salt_size < 0)
+			return gnutls_assert_val(GNUTLS_E_CONSTRAINT_ERROR);
+	}
+
+	if (salt_size < digest_size)
+		salt_size = digest_size;
+
+	if (salt_size > (unsigned)max_salt_size)
+		salt_size = max_salt_size;
+
+	return salt_size;
 }
 
 /* Writes the digest information and the digest in a DER encoded
@@ -467,6 +734,8 @@ gnutls_decode_ber_digest_info(const gnutls_datum_t * info,
 		return _gnutls_asn2err(result);
 	}
 
+	/* rfc2313 required BER encoding of that field, thus
+	 * we don't restrict libtasn1 to DER subset */
 	result = asn1_der_decoding(&dinfo, info->data, info->size, NULL);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
@@ -530,22 +799,27 @@ _gnutls_params_get_rsa_raw(const gnutls_pk_params_st* params,
 				    gnutls_datum_t * d, gnutls_datum_t * p,
 				    gnutls_datum_t * q, gnutls_datum_t * u,
 				    gnutls_datum_t * e1,
-				    gnutls_datum_t * e2)
+				    gnutls_datum_t * e2,
+				    unsigned int flags)
 {
 	int ret;
+	mpi_dprint_func dprint = _gnutls_mpi_dprint_lz;
+
+	if (flags & GNUTLS_EXPORT_FLAG_NO_LZ)
+		dprint = _gnutls_mpi_dprint;
 
 	if (params == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	if (params->algo != GNUTLS_PK_RSA) {
+	if (!GNUTLS_PK_IS_RSA(params->algo)) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
 	if (m) {
-		ret = _gnutls_mpi_dprint_lz(params->params[0], m);
+		ret = dprint(params->params[0], m);
 		if (ret < 0) {
 			gnutls_assert();
 			goto error;
@@ -554,7 +828,7 @@ _gnutls_params_get_rsa_raw(const gnutls_pk_params_st* params,
 
 	/* E */
 	if (e) {
-		ret = _gnutls_mpi_dprint_lz(params->params[1], e);
+		ret = dprint(params->params[1], e);
 		if (ret < 0) {
 			gnutls_assert();
 			goto error;
@@ -563,7 +837,7 @@ _gnutls_params_get_rsa_raw(const gnutls_pk_params_st* params,
 
 	/* D */
 	if (d && params->params[2]) {
-		ret = _gnutls_mpi_dprint_lz(params->params[2], d);
+		ret = dprint(params->params[2], d);
 		if (ret < 0) {
 			gnutls_assert();
 			goto error;
@@ -575,7 +849,7 @@ _gnutls_params_get_rsa_raw(const gnutls_pk_params_st* params,
 
 	/* P */
 	if (p && params->params[3]) {
-		ret = _gnutls_mpi_dprint_lz(params->params[3], p);
+		ret = dprint(params->params[3], p);
 		if (ret < 0) {
 			gnutls_assert();
 			goto error;
@@ -587,7 +861,7 @@ _gnutls_params_get_rsa_raw(const gnutls_pk_params_st* params,
 
 	/* Q */
 	if (q && params->params[4]) {
-		ret = _gnutls_mpi_dprint_lz(params->params[4], q);
+		ret = dprint(params->params[4], q);
 		if (ret < 0) {
 			gnutls_assert();
 			goto error;
@@ -599,7 +873,7 @@ _gnutls_params_get_rsa_raw(const gnutls_pk_params_st* params,
 
 	/* U */
 	if (u && params->params[5]) {
-		ret = _gnutls_mpi_dprint_lz(params->params[5], u);
+		ret = dprint(params->params[5], u);
 		if (ret < 0) {
 			gnutls_assert();
 			goto error;
@@ -611,7 +885,7 @@ _gnutls_params_get_rsa_raw(const gnutls_pk_params_st* params,
 
 	/* E1 */
 	if (e1 && params->params[6]) {
-		ret = _gnutls_mpi_dprint_lz(params->params[6], e1);
+		ret = dprint(params->params[6], e1);
 		if (ret < 0) {
 			gnutls_assert();
 			goto error;
@@ -623,7 +897,7 @@ _gnutls_params_get_rsa_raw(const gnutls_pk_params_st* params,
 
 	/* E2 */
 	if (e2 && params->params[7]) {
-		ret = _gnutls_mpi_dprint_lz(params->params[7], e2);
+		ret = dprint(params->params[7], e2);
 		if (ret < 0) {
 			gnutls_assert();
 			goto error;
@@ -651,9 +925,13 @@ int
 _gnutls_params_get_dsa_raw(const gnutls_pk_params_st* params,
 			     gnutls_datum_t * p, gnutls_datum_t * q,
 			     gnutls_datum_t * g, gnutls_datum_t * y,
-			     gnutls_datum_t * x)
+			     gnutls_datum_t * x, unsigned int flags)
 {
 	int ret;
+	mpi_dprint_func dprint = _gnutls_mpi_dprint_lz;
+
+	if (flags & GNUTLS_EXPORT_FLAG_NO_LZ)
+		dprint = _gnutls_mpi_dprint;
 
 	if (params == NULL) {
 		gnutls_assert();
@@ -667,7 +945,7 @@ _gnutls_params_get_dsa_raw(const gnutls_pk_params_st* params,
 
 	/* P */
 	if (p) {
-		ret = _gnutls_mpi_dprint_lz(params->params[0], p);
+		ret = dprint(params->params[0], p);
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;
@@ -676,7 +954,7 @@ _gnutls_params_get_dsa_raw(const gnutls_pk_params_st* params,
 
 	/* Q */
 	if (q) {
-		ret = _gnutls_mpi_dprint_lz(params->params[1], q);
+		ret = dprint(params->params[1], q);
 		if (ret < 0) {
 			gnutls_assert();
 			_gnutls_free_datum(p);
@@ -687,7 +965,7 @@ _gnutls_params_get_dsa_raw(const gnutls_pk_params_st* params,
 
 	/* G */
 	if (g) {
-		ret = _gnutls_mpi_dprint_lz(params->params[2], g);
+		ret = dprint(params->params[2], g);
 		if (ret < 0) {
 			gnutls_assert();
 			_gnutls_free_datum(p);
@@ -699,7 +977,7 @@ _gnutls_params_get_dsa_raw(const gnutls_pk_params_st* params,
 
 	/* Y */
 	if (y) {
-		ret = _gnutls_mpi_dprint_lz(params->params[3], y);
+		ret = dprint(params->params[3], y);
 		if (ret < 0) {
 			gnutls_assert();
 			_gnutls_free_datum(p);
@@ -711,7 +989,7 @@ _gnutls_params_get_dsa_raw(const gnutls_pk_params_st* params,
 
 	/* X */
 	if (x) {
-		ret = _gnutls_mpi_dprint_lz(params->params[4], x);
+		ret = dprint(params->params[4], x);
 		if (ret < 0) {
 			gnutls_assert();
 			_gnutls_free_datum(y);
@@ -729,9 +1007,15 @@ int _gnutls_params_get_ecc_raw(const gnutls_pk_params_st* params,
 				       gnutls_ecc_curve_t * curve,
 				       gnutls_datum_t * x,
 				       gnutls_datum_t * y,
-				       gnutls_datum_t * k)
+				       gnutls_datum_t * k,
+				       unsigned int flags)
 {
 	int ret;
+	mpi_dprint_func dprint = _gnutls_mpi_dprint_lz;
+	const gnutls_ecc_curve_entry_st *e;
+
+	if (flags & GNUTLS_EXPORT_FLAG_NO_LZ)
+		dprint = _gnutls_mpi_dprint;
 
 	if (params == NULL) {
 		gnutls_assert();
@@ -739,11 +1023,40 @@ int _gnutls_params_get_ecc_raw(const gnutls_pk_params_st* params,
 	}
 
 	if (curve)
-		*curve = params->flags;
+		*curve = params->curve;
+
+	e = _gnutls_ecc_curve_get_params(params->curve);
+
+	if (_curve_is_eddsa(e)) {
+		if (x) {
+			ret = _gnutls_set_datum(x, params->raw_pub.data, params->raw_pub.size);
+			if (ret < 0) {
+				return gnutls_assert_val(ret);
+			}
+		}
+
+		if (y) {
+			y->data = NULL;
+			y->size = 0;
+		}
+
+		if (k) {
+			ret = _gnutls_set_datum(k, params->raw_priv.data, params->raw_priv.size);
+			if (ret < 0) {
+				_gnutls_free_datum(x);
+				return gnutls_assert_val(ret);
+			}
+		}
+
+		return 0;
+	}
+
+	if (unlikely(e == NULL || e->pk != GNUTLS_PK_ECDSA))
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	/* X */
 	if (x) {
-		ret = _gnutls_mpi_dprint_lz(params->params[ECC_X], x);
+		ret = dprint(params->params[ECC_X], x);
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;
@@ -752,7 +1065,7 @@ int _gnutls_params_get_ecc_raw(const gnutls_pk_params_st* params,
 
 	/* Y */
 	if (y) {
-		ret = _gnutls_mpi_dprint_lz(params->params[ECC_Y], y);
+		ret = dprint(params->params[ECC_Y], y);
 		if (ret < 0) {
 			gnutls_assert();
 			_gnutls_free_datum(x);
@@ -763,7 +1076,68 @@ int _gnutls_params_get_ecc_raw(const gnutls_pk_params_st* params,
 
 	/* K */
 	if (k) {
-		ret = _gnutls_mpi_dprint_lz(params->params[ECC_K], k);
+		ret = dprint(params->params[ECC_K], k);
+		if (ret < 0) {
+			gnutls_assert();
+			_gnutls_free_datum(x);
+			_gnutls_free_datum(y);
+			return ret;
+		}
+	}
+
+	return 0;
+
+}
+
+int _gnutls_params_get_gost_raw(const gnutls_pk_params_st* params,
+				       gnutls_ecc_curve_t * curve,
+				       gnutls_digest_algorithm_t * digest,
+				       gnutls_gost_paramset_t * paramset,
+				       gnutls_datum_t * x,
+				       gnutls_datum_t * y,
+				       gnutls_datum_t * k,
+				       unsigned int flags)
+{
+	int ret;
+	mpi_dprint_func dprint = _gnutls_mpi_dprint_le;
+
+	if (params == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	if (curve)
+		*curve = params->curve;
+
+	if (digest)
+		*digest = _gnutls_gost_digest(params->algo);
+
+	if (paramset)
+		*paramset = params->gost_params;
+
+	/* X */
+	if (x) {
+		ret = dprint(params->params[GOST_X], x);
+		if (ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
+	}
+
+	/* Y */
+	if (y) {
+		ret = dprint(params->params[GOST_Y], y);
+		if (ret < 0) {
+			gnutls_assert();
+			_gnutls_free_datum(x);
+			return ret;
+		}
+	}
+
+
+	/* K */
+	if (k) {
+		ret = dprint(params->params[GOST_K], k);
 		if (ret < 0) {
 			gnutls_assert();
 			_gnutls_free_datum(x);
@@ -833,8 +1207,13 @@ pk_prepare_hash(gnutls_pk_algorithm_t pk,
 
 		_gnutls_free_datum(&old_digest);
 		break;
+	case GNUTLS_PK_RSA_PSS:
 	case GNUTLS_PK_DSA:
-	case GNUTLS_PK_EC:
+	case GNUTLS_PK_ECDSA:
+	case GNUTLS_PK_EDDSA_ED25519:
+	case GNUTLS_PK_GOST_01:
+	case GNUTLS_PK_GOST_12_256:
+	case GNUTLS_PK_GOST_12_512:
 		break;
 	default:
 		gnutls_assert();

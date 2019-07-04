@@ -4,7 +4,7 @@
 
 @deftypefun {const gnutls_compression_method_t *} {gnutls_compression_list} ( @var{void})
 
-Get a list of compression methods.  
+Get a list of compression methods.
 
 @strong{Returns:} a zero-terminated list of @code{gnutls_compression_method_t} 
 integers indicating the available compression methods.

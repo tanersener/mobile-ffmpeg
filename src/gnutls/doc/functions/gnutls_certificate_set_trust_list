@@ -9,10 +9,10 @@
 
 @var{flags}: must be zero
 
-This function sets a trust list in the gnutls_certificate_credentials_t type. 
+This function sets a trust list in the gnutls_certificate_credentials_t type.
 
-Note that the  @code{tlist} will become part of the credentials 
-structure and must not be deallocated. It will be automatically deallocated 
+Note that the  @code{tlist} will become part of the credentials
+structure and must not be deallocated. It will be automatically deallocated
 when the  @code{res} structure is deinitialized.
 
 @strong{Returns:} @code{GNUTLS_E_SUCCESS}  (0) on success, or a negative error code.

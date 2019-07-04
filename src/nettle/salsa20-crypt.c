@@ -44,6 +44,7 @@
 #include <string.h>
 
 #include "salsa20.h"
+#include "salsa20-internal.h"
 
 #include "macros.h"
 #include "memxor.h"

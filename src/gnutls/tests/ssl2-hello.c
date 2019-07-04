@@ -27,8 +27,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-/* In this test we check the parsing of SSL 2.0 client hellos. As
- * We can only read but not generate we use a fixed hello message
+/* In this test we check the parsing of SSL 2.0 client hellos under
+ * the default protocols.
+ * As we can only read but not generate we use a fixed hello message
  * followed by an alert. That way we detect whether the handshake
  * completed hello parsing and reached the alert message.
  */
@@ -180,10 +181,15 @@ void doit(void)
 	if (child) {
 		int status;
 
+		close(sockets[1]);
 		server(sockets[0]);
 		wait(&status);
-	} else
+		check_wait_status(status);
+	} else {
+		close(sockets[0]);
 		client(sockets[1]);
+		exit(0);
+	}
 }
 
 #endif				/* _WIN32 */

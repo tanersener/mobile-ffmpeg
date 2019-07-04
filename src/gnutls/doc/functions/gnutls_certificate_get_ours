@@ -9,6 +9,11 @@ Gets the certificate as sent to the peer in the last handshake.
 The certificate is in raw (DER) format.  No certificate
 list is being returned. Only the first certificate.
 
+This function returns the certificate that was sent in the current
+handshake. In subsequent resumed sessions this function will return
+@code{NULL} . That differs from @code{gnutls_certificate_get_peers()}  which always
+returns the peer's certificate used in the original session.
+
 @strong{Returns:} a pointer to a @code{gnutls_datum_t}  containing our
 certificate, or @code{NULL}  in case of an error or if no certificate
 was used.

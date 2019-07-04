@@ -9,19 +9,19 @@ You will need reasonably recent versions of the build tools:
 
   * A C compiler. Such as GNU GCC.
     + Homepage:
-      http://gcc.gnu.org/
+      https://gcc.gnu.org/
 
   * GNU autoconf
     + Homepage:
-      http://www.gnu.org/software/autoconf/
+      https://www.gnu.org/software/autoconf/
 
   * GNU m4
     + Homepage:
-      http://www.gnu.org/software/m4/
+      https://www.gnu.org/software/m4/
 
   * Perl
     + Homepage:
-      http://www.perl.org/
+      https://www.perl.org/
 
 And, of course, the packages listed in the DEPENDENCIES file.
 

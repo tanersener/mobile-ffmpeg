@@ -19,11 +19,11 @@
 
 @var{flags}: should be 0.
 
-This function will store the provided (raw or DER-encoded) certificate to 
-the list of stored public keys. The key will be considered valid until 
-the provided expiration time.
+This function will store a raw public-key or a public-key provided via
+a raw (DER-encoded) certificate to the list of stored public keys. The key
+will be considered valid until the provided expiration time.
 
-The  @code{store} variable if non-null specifies a custom backend for
+The  @code{tdb} variable if non-null specifies a custom backend for
 the storage of entries. If it is NULL then the
 default file backend will be used.
 
@@ -33,6 +33,8 @@ the fields are a format-identifier which is set to 'g0', the hostname that the
 rest of the data applies to, the numeric port or host name, the expiration
 time in seconds since the epoch (0 for no expiration), and a base64
 encoding of the raw (DER) public key information (SPKI) of the peer.
+
+As of GnuTLS 3.6.6 this function also accepts raw public keys.
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.

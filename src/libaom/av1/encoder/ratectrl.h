@@ -27,6 +27,9 @@ extern "C" {
 // Bits Per MB at different Q (Multiplied by 512)
 #define BPER_MB_NORMBITS 9
 
+// Use this macro to turn on/off use of alt-refs in one-pass mode.
+#define USE_ALTREF_FOR_ONE_PASS 1
+
 // Threshold used to define if a KF group is static (e.g. a slide show).
 // Essentially, this means that no frame in the group has more than 1% of MBs
 // that are not marked as coded with 0,0 motion in the first pass.
@@ -142,6 +145,7 @@ typedef struct {
   float_t arf_boost_factor;
   // Q index used for ALT frame
   int arf_q;
+  int active_worst_quality;
 } RATE_CONTROL;
 
 struct AV1_COMP;
@@ -166,8 +170,6 @@ int av1_rc_get_default_max_gf_interval(double framerate, int min_gf_interval);
 // Generally at the high level, the following flow is expected
 // to be enforced for rate control:
 // First call per frame, one of:
-//   av1_rc_get_one_pass_vbr_params()
-//   av1_rc_get_one_pass_cbr_params()
 //   av1_rc_get_first_pass_params()
 //   av1_rc_get_second_pass_params()
 // depending on the usage to set the rate control encode parameters desired.
@@ -187,12 +189,6 @@ int av1_rc_get_default_max_gf_interval(double framerate, int min_gf_interval);
 // Functions to set parameters for encoding before the actual
 // encode_frame_to_data_rate() function.
 struct EncodeFrameParams;
-void av1_rc_get_one_pass_vbr_params(
-    struct AV1_COMP *cpi, uint8_t *const frame_update_type,
-    struct EncodeFrameParams *const frame_params, unsigned int frame_flags);
-void av1_rc_get_one_pass_cbr_params(
-    struct AV1_COMP *cpi, uint8_t *const frame_update_type,
-    struct EncodeFrameParams *const frame_params, unsigned int frame_flags);
 
 // Post encode update of the rate control parameters based
 // on bytes used
@@ -262,6 +258,13 @@ void av1_rc_set_gf_interval_range(const struct AV1_COMP *const cpi,
 void av1_set_target_rate(struct AV1_COMP *cpi, int width, int height);
 
 int av1_resize_one_pass_cbr(struct AV1_COMP *cpi);
+
+void av1_rc_set_frame_target(struct AV1_COMP *cpi, int target, int width,
+                             int height);
+
+int av1_estimate_q_constant_quality_two_pass(const struct AV1_COMP *cpi,
+                                             int width, int height, int *arf_q,
+                                             int gf_index);
 
 #ifdef __cplusplus
 }  // extern "C"

@@ -182,4 +182,5 @@ define(<T1>, <%rax>)
 	mov	XREG(%rax), P1305_H2 (CTX)
 	W64_EXIT(2, 0)
 	ret
+EPILOGUE(nettle_poly1305_digest)
 

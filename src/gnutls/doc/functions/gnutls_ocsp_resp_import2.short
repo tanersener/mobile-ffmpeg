@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_ocsp_resp_import2} (gnutls_ocsp_resp_t @var{resp}, const gnutls_datum_t * @var{data}, gnutls_x509_crt_fmt_t @var{fmt})

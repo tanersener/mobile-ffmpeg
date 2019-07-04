@@ -34,9 +34,6 @@ des-test$(EXEEXT): des-test.$(OBJEXT)
 des3-test$(EXEEXT): des3-test.$(OBJEXT)
 	$(LINK) des3-test.$(OBJEXT) $(TEST_OBJS) -o des3-test$(EXEEXT)
 
-des-compat-test$(EXEEXT): des-compat-test.$(OBJEXT)
-	$(LINK) des-compat-test.$(OBJEXT) $(TEST_OBJS) -o des-compat-test$(EXEEXT)
-
 md2-test$(EXEEXT): md2-test.$(OBJEXT)
 	$(LINK) md2-test.$(OBJEXT) $(TEST_OBJS) -o md2-test$(EXEEXT)
 
@@ -133,6 +130,9 @@ eax-test$(EXEEXT): eax-test.$(OBJEXT)
 ccm-test$(EXEEXT): ccm-test.$(OBJEXT)
 	$(LINK) ccm-test.$(OBJEXT) $(TEST_OBJS) -o ccm-test$(EXEEXT)
 
+cmac-test$(EXEEXT): cmac-test.$(OBJEXT)
+	$(LINK) cmac-test.$(OBJEXT) $(TEST_OBJS) -o cmac-test$(EXEEXT)
+
 poly1305-test$(EXEEXT): poly1305-test.$(OBJEXT)
 	$(LINK) poly1305-test.$(OBJEXT) $(TEST_OBJS) -o poly1305-test$(EXEEXT)
 
@@ -162,6 +162,9 @@ buffer-test$(EXEEXT): buffer-test.$(OBJEXT)
 
 yarrow-test$(EXEEXT): yarrow-test.$(OBJEXT)
 	$(LINK) yarrow-test.$(OBJEXT) $(TEST_OBJS) -o yarrow-test$(EXEEXT)
+
+xts-test$(EXEEXT): xts-test.$(OBJEXT)
+	$(LINK) xts-test.$(OBJEXT) $(TEST_OBJS) -o xts-test$(EXEEXT)
 
 pbkdf2-test$(EXEEXT): pbkdf2-test.$(OBJEXT)
 	$(LINK) pbkdf2-test.$(OBJEXT) $(TEST_OBJS) -o pbkdf2-test$(EXEEXT)

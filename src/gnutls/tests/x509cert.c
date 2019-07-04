@@ -52,6 +52,7 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "<%d>| %s", level, str);
 }
 
+static char buf[16*1024];
 
 #define LIST_SIZE 3
 void doit(void)
@@ -64,6 +65,7 @@ void doit(void)
 	char dn[128];
 	size_t dn_size;
 	unsigned int list_size;
+	size_t buf_size;
 
 	gnutls_x509_privkey_t get_key;
 	gnutls_x509_crt_t *get_crts;
@@ -157,7 +159,30 @@ void doit(void)
 		    get_datum.data, server_ca3_key.data);
 	}
 
+	if (strlen((char*)get_datum.data) != get_datum.size) {
+		fail("exported key %u vs. %u\n\n%s\n",
+		     get_datum.size, (unsigned)strlen((char*)get_datum.data),
+		     get_datum.data);
+	}
+
 	gnutls_free(get_datum.data);
+
+	buf_size = sizeof(buf);
+	ret =
+	    gnutls_x509_privkey_export(get_key,
+					GNUTLS_X509_FMT_PEM,
+					buf, &buf_size);
+	if (ret < 0)
+		fail("gnutls_x509_privkey_export");
+
+	if (buf_size != get_datum.size ||
+	    buf_size != strlen(buf) ||
+	    memcmp(buf, server_ca3_key.data, buf_size) != 0) {
+		fail(
+		    "exported key %u vs. %u\n\n%s\n\nvs.\n\n%s",
+		    (int)buf_size, server_ca3_key.size,
+		    buf, server_ca3_key.data);
+	}
 
 	ret =
 	    gnutls_certificate_get_x509_crt(x509_cred, 0, &get_crts, &n_get_crts);

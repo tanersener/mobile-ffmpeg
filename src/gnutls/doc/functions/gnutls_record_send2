@@ -1,0 +1,31 @@
+
+
+
+
+@deftypefun {ssize_t} {gnutls_record_send2} (gnutls_session_t @var{session}, const void * @var{data}, size_t @var{data_size}, size_t @var{pad}, unsigned @var{flags})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{data}: contains the data to send
+
+@var{data_size}: is the length of the data
+
+@var{pad}: padding to be added to the record
+
+@var{flags}: must be zero
+
+This function is identical to @code{gnutls_record_send()}  except that it
+takes an extra argument to specify padding to be added the record.
+To determine the maximum size of padding, use
+@code{gnutls_record_get_max_size()}  and @code{gnutls_record_overhead_size()} .
+
+Note that in order for GnuTLS to provide constant time processing
+of padding and data in TLS1.3, the flag @code{GNUTLS_SAFE_PADDING_CHECK} 
+must be used in @code{gnutls_init()} .
+
+@strong{Returns:} The number of bytes sent, or a negative error code.  The
+number of bytes sent might be less than  @code{data_size} .  The maximum
+number of bytes this function can send in a single call depends
+on the negotiated maximum record size.
+
+@strong{Since:} 3.6.3
+@end deftypefun

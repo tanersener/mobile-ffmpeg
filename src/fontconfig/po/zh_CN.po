@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: fontconfig 2.12.92\n"
 "Report-Msgid-Bugs-To: https://bugs.freedesktop.org/enter_bug.cgi?"
 "product=fontconfig\n"
-"POT-Creation-Date: 2018-08-30 08:06+0000\n"
+"POT-Creation-Date: 2019-06-10 08:20+0000\n"
 "PO-Revision-Date: 2018-02-16 01:41-0600\n"
 "Last-Translator: Mingcong Bai <jeffbai@aosc.xyz>\n"
 "Language-Team: AOSC\n"
@@ -141,71 +141,71 @@ msgstr "  -h         (help)    显示该帮助信息并退出\n"
 msgid "skipping, looped directory detected\n"
 msgstr "跳过，探测到循环目录\n"
 
-#: fc-cache/fc-cache.c:173
+#: fc-cache/fc-cache.c:182
 #, c-format
 msgid "skipping, no such directory\n"
 msgstr "跳过，无此目录\n"
 
-#: fc-cache/fc-cache.c:186
+#: fc-cache/fc-cache.c:198
 #, c-format
 msgid "\"%s\": not a directory, skipping\n"
 msgstr "“%s”：不是一个目录，跳过\n"
 
-#: fc-cache/fc-cache.c:211
+#: fc-cache/fc-cache.c:222
 #, c-format
 msgid "\"%s\": scanning error\n"
 msgstr "“%s”：扫描错误\n"
 
-#: fc-cache/fc-cache.c:220
+#: fc-cache/fc-cache.c:231
 #, c-format
 msgid "skipping, existing cache is valid: %d fonts, %d dirs\n"
 msgstr "跳过，当前缓存有效：%d 个字体，%d 个目录\n"
 
-#: fc-cache/fc-cache.c:226
+#: fc-cache/fc-cache.c:237
 #, c-format
 msgid "caching, new cache contents: %d fonts, %d dirs\n"
 msgstr "正在生成缓存，新增缓存内容：%d 个字体，%d 个目录\n"
 
-#: fc-cache/fc-cache.c:231
+#: fc-cache/fc-cache.c:242
 #, c-format
 msgid "%s: failed to write cache\n"
 msgstr "%s：无法写入缓存\n"
 
-#: fc-cache/fc-cache.c:240
+#: fc-cache/fc-cache.c:251
 #, c-format
 msgid "%s: Can't create subdir set\n"
 msgstr "%s：无法创建子目录集\n"
 
-#: fc-cache/fc-cache.c:254
+#: fc-cache/fc-cache.c:265
 #, c-format
 msgid "%s: Can't create subdir list\n"
 msgstr "%s：无法创建子目录列表\n"
 
-#: fc-cache/fc-cache.c:361 fc-cat/fc-cat.c:307
+#: fc-cache/fc-cache.c:373 fc-cat/fc-cat.c:307
 #, c-format
 msgid "%s: Can't initialize font config library\n"
 msgstr "%s：无法初始化 Fontconfig 库\n"
 
-#: fc-cache/fc-cache.c:371
+#: fc-cache/fc-cache.c:383
 #, c-format
 msgid "%s: Can't create list of directories\n"
 msgstr "%s：无法创建目录列表\n"
 
-#: fc-cache/fc-cache.c:379
+#: fc-cache/fc-cache.c:391
 #, c-format
 msgid "%s: Can't add directory\n"
 msgstr "%s：无法添加目录\n"
 
-#: fc-cache/fc-cache.c:391
+#: fc-cache/fc-cache.c:403
 #, c-format
 msgid "Out of Memory\n"
 msgstr "内存耗尽\n"
 
-#: fc-cache/fc-cache.c:423
+#: fc-cache/fc-cache.c:446
 msgid "failed"
 msgstr "缓存生成失败"
 
-#: fc-cache/fc-cache.c:423
+#: fc-cache/fc-cache.c:446
 msgid "succeeded"
 msgstr "缓存生成成功"
 
@@ -593,16 +593,16 @@ msgstr "无法初始化 FreeType 库\n"
 msgid "Unable to open %s\n"
 msgstr "无法打开 %s\n"
 
-#: fc-validate/fc-validate.c:200
+#: fc-validate/fc-validate.c:201
 #, c-format
 msgid "%s:%d Missing %d glyph(s) to satisfy the coverage for %s language\n"
 msgstr "%s:%d 尚需 %d 个字形以满足 %s 语言的覆盖需求\n"
 
-#: fc-validate/fc-validate.c:230
+#: fc-validate/fc-validate.c:231
 #, c-format
 msgid "%s:%d Satisfy the coverage for %s language\n"
 msgstr "%s:%d 完全满足 %s 语言的覆盖需求\n"
 
-#: src/fccfg.c:2701
+#: src/fccfg.c:2799
 msgid "No description"
 msgstr "无描述"

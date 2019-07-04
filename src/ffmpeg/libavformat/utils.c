@@ -1402,8 +1402,8 @@ static void compute_pkt_fields(AVFormatContext *s, AVStream *st,
         st->cur_dts = pkt->dts;
 
     if (s->debug & FF_FDEBUG_TS)
-        av_log(s, AV_LOG_DEBUG, "OUTdelayed:%d/%d pts:%s, dts:%s cur_dts:%s\n",
-            presentation_delayed, delay, av_ts2str(pkt->pts), av_ts2str(pkt->dts), av_ts2str(st->cur_dts));
+        av_log(s, AV_LOG_DEBUG, "OUTdelayed:%d/%d pts:%s, dts:%s cur_dts:%s st:%d (%d)\n",
+            presentation_delayed, delay, av_ts2str(pkt->pts), av_ts2str(pkt->dts), av_ts2str(st->cur_dts), st->index, st->id);
 
     /* update flags */
     if (st->codecpar->codec_type == AVMEDIA_TYPE_DATA || is_intra_only(st->codecpar->codec_id))
@@ -5107,7 +5107,7 @@ AVRational av_guess_frame_rate(AVFormatContext *format, AVStream *st, AVFrame *f
  *         >0 if st is a matching stream
  */
 static int match_stream_specifier(AVFormatContext *s, AVStream *st,
-                                  const char *spec, const char **indexptr)
+                                  const char *spec, const char **indexptr, AVProgram **p)
 {
     int match = 1;                      /* Stores if the specifier matches so far. */
     while (*spec) {
@@ -5162,6 +5162,8 @@ FF_DISABLE_DEPRECATION_WARNINGS
                     for (j = 0; j < s->programs[i]->nb_stream_indexes; j++) {
                         if (st->index == s->programs[i]->stream_index[j]) {
                             found = 1;
+                            if (p)
+                                *p = s->programs[i];
                             i = s->nb_programs;
                             break;
                         }
@@ -5264,8 +5266,10 @@ int avformat_match_stream_specifier(AVFormatContext *s, AVStream *st,
     int ret, index;
     char *endptr;
     const char *indexptr = NULL;
+    AVProgram *p = NULL;
+    int nb_streams;
 
-    ret = match_stream_specifier(s, st, spec, &indexptr);
+    ret = match_stream_specifier(s, st, spec, &indexptr, &p);
     if (ret < 0)
         goto error;
 
@@ -5283,11 +5287,13 @@ int avformat_match_stream_specifier(AVFormatContext *s, AVStream *st,
         return (index == st->index);
 
     /* If we requested a matching stream index, we have to ensure st is that. */
-    for (int i = 0; i < s->nb_streams && index >= 0; i++) {
-        ret = match_stream_specifier(s, s->streams[i], spec, NULL);
+    nb_streams = p ? p->nb_stream_indexes : s->nb_streams;
+    for (int i = 0; i < nb_streams && index >= 0; i++) {
+        AVStream *candidate = p ? s->streams[p->stream_index[i]] : s->streams[i];
+        ret = match_stream_specifier(s, candidate, spec, NULL, NULL);
         if (ret < 0)
             goto error;
-        if (ret > 0 && index-- == 0 && st == s->streams[i])
+        if (ret > 0 && index-- == 0 && st == candidate)
             return 1;
     }
     return 0;

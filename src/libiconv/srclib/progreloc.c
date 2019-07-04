@@ -1,5 +1,5 @@
 /* Provide relocatable programs.
-   Copyright (C) 2003-2017 Free Software Foundation, Inc.
+   Copyright (C) 2003-2019 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2003.
 
    This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 
 #define _GL_USE_STDLIB_ALLOC 1
@@ -22,6 +22,7 @@
 /* Specification.  */
 #include "progname.h"
 
+#include <errno.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -35,7 +36,7 @@
 # include <mach-o/dyld.h>
 #endif
 
-#if (defined _WIN32 || defined __WIN32__) && !defined __CYGWIN__
+#if defined _WIN32 && !defined __CYGWIN__
 # define WINDOWS_NATIVE
 #endif
 
@@ -78,7 +79,7 @@ extern char * canonicalize_file_name (const char *name);
    ISSLASH(C)           tests whether C is a directory separator character.
    IS_PATH_WITH_DIR(P)  tests whether P contains a directory specification.
  */
-#if ((defined _WIN32 || defined __WIN32__) && !defined __CYGWIN__) || defined __EMX__ || defined __DJGPP__
+#if (defined _WIN32 && !defined __CYGWIN__) || defined __EMX__ || defined __DJGPP__
   /* Native Windows, OS/2, DOS */
 # define ISSLASH(C) ((C) == '/' || (C) == '\\')
 # define HAS_DEVICE(P) \
@@ -101,6 +102,48 @@ extern char * canonicalize_file_name (const char *name);
 
 
 #if ENABLE_RELOCATABLE
+
+#ifdef __sun
+
+/* Helper function, from gnulib module 'safe-read'.  */
+static size_t
+safe_read (int fd, void *buf, size_t count)
+{
+  for (;;)
+    {
+      ssize_t result = read (fd, buf, count);
+
+      if (0 <= result || errno != EINTR)
+        return result;
+    }
+}
+
+/* Helper function, from gnulib module 'full-read'.  */
+static size_t
+full_read (int fd, void *buf, size_t count)
+{
+  size_t total = 0;
+  const char *ptr = (const char *) buf;
+
+  while (count > 0)
+    {
+      size_t n = safe_read (fd, ptr, count);
+      if (n == (size_t) -1)
+        break;
+      if (n == 0)
+        {
+          errno = 0;
+          break;
+        }
+      total += n;
+      ptr += n;
+      count -= n;
+    }
+
+  return total;
+}
+
+#endif
 
 #if defined __linux__ || defined __CYGWIN__
 /* File descriptor of the executable.
@@ -153,7 +196,7 @@ find_executable (const char *argv0)
      On Cygwin, it is better to use the Cygwin provided /proc interface, than
      to use native Windows API and cygwin_conv_to_posix_path, because it
      supports longer file names
-     (see <http://cygwin.com/ml/cygwin/2011-01/msg00410.html>).  */
+     (see <https://cygwin.com/ml/cygwin/2011-01/msg00410.html>).  */
   char location[MAX_PATH];
   int length = GetModuleFileName (NULL, location, sizeof (location));
   if (length < 0)
@@ -180,7 +223,7 @@ find_executable (const char *argv0)
 
   return xstrdup (location);
 #else /* Unix */
-# ifdef __linux__
+# if defined __linux__
   /* The executable is accessible as /proc/<pid>/exe.  In newer Linux
      versions, also as /proc/self/exe.  Linux >= 2.1 provides a symlink
      to the true pathname; older Linux versions give only device and ino,
@@ -205,7 +248,63 @@ find_executable (const char *argv0)
     }
   }
 # endif
-# ifdef __CYGWIN__
+# if defined __ANDROID__ || defined __FreeBSD_kernel__
+  /* On Android and GNU/kFreeBSD, the executable is accessible as
+     /proc/<pid>/exe and /proc/self/exe.  */
+  {
+    char *link;
+
+    link = xreadlink ("/proc/self/exe");
+    if (link != NULL)
+      return link;
+  }
+# endif
+# if defined __FreeBSD__ || defined __DragonFly__
+  /* In FreeBSD >= 5.0, the executable is accessible as /proc/<pid>/file and
+     /proc/curproc/file.  */
+  {
+    char *link;
+
+    link = xreadlink ("/proc/curproc/file");
+    if (link != NULL)
+      {
+        if (strcmp (link, "unknown") != 0)
+          return link;
+        free (link);
+      }
+  }
+# endif
+# if defined __NetBSD__
+  /* In NetBSD >= 4.0, the executable is accessible as /proc/<pid>/exe and
+     /proc/curproc/exe.  */
+  {
+    char *link;
+
+    link = xreadlink ("/proc/curproc/exe");
+    if (link != NULL)
+      return link;
+  }
+# endif
+# if defined __sun
+  /* On Solaris >= 11.4, /proc/<pid>/execname and /proc/self/execname contains
+     the name of the executable, either as an absolute file name or relative to
+     the current directory.  */
+  {
+    char namebuf[4096];
+    int fd = open ("/proc/self/execname", O_RDONLY, 0);
+    if (fd >= 0)
+      {
+        size_t len = full_read (fd, namebuf, sizeof (namebuf));
+        close (fd);
+        if (len > 0 && len < sizeof (namebuf))
+          {
+            namebuf[len] = '\0';
+            return canonicalize_file_name (namebuf);
+          }
+      }
+  }
+# endif
+# if defined __CYGWIN__
   /* The executable is accessible as /proc/<pid>/exe, at least in
      Cygwin >= 1.5.  */
   {

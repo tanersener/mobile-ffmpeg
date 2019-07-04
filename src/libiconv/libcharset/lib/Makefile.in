@@ -18,11 +18,7 @@ CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 INCLUDES = -I. -I$(srcdir) -I.. -I$(srcdir)/.. -I../include
 # -DBUILDING_LIBCHARSET: Change expansion of LIBCHARSET_DLL_EXPORTED macro.
-# -DBUILDING_DLL: Change expansion of RELOCATABLE_DLL_EXPORTED macro.
-DEFS = -DLIBDIR=\"$(libdir)\" -DBUILDING_LIBCHARSET -DBUILDING_DLL \
--DENABLE_RELOCATABLE=1 -DIN_LIBRARY -DINSTALLDIR=\"$(libdir)\" -DNO_XMALLOC \
--Dset_relocation_prefix=libcharset_set_relocation_prefix \
--Drelocate=libcharset_relocate @DEFS@
+DEFS = -DBUILDING_LIBCHARSET @DEFS@
 LIBTOOL = @LIBTOOL@
 LIBTOOL_COMPILE = $(LIBTOOL) --mode=compile
 LIBTOOL_LINK = $(LIBTOOL) --mode=link
@@ -40,7 +36,7 @@ mkinstalldirs = $(SHELL) @top_srcdir@/build-aux/mkinstalldirs
 PACKAGE = @PACKAGE@
 VERSION = @VERSION@
 
-SHELL = /bin/sh
+SHELL = @SHELL@
 
 # Before making a release, change this according to the libtool documentation,
 # section "Library interface versions".
@@ -49,11 +45,11 @@ LIBCHARSET_VERSION_INFO = 1:0:0
 # Needed by $(LIBTOOL).
 top_builddir = ..
 
-SOURCES = $(srcdir)/localcharset.c $(srcdir)/relocatable.c
+SOURCES = $(srcdir)/localcharset.c $(srcdir)/relocatable-stub.c
 
-OBJECTS = localcharset.lo relocatable.lo
+OBJECTS = localcharset.lo relocatable-stub.lo
 
-all : libcharset.la charset.alias ref-add.sed ref-del.sed
+all : libcharset.la
 
 libcharset.la : $(OBJECTS)
 	$(LIBTOOL_LINK) $(CC) $(LDFLAGS) $(CFLAGS) -o libcharset.la -rpath $(libdir) -version-info $(LIBCHARSET_VERSION_INFO) -no-undefined $(OBJECTS)
@@ -61,31 +57,14 @@ libcharset.la : $(OBJECTS)
 localcharset.lo : $(srcdir)/localcharset.c
 	$(LIBTOOL_COMPILE) $(CC) $(INCLUDES) $(CFLAGS) $(CPPFLAGS) $(DEFS) -c $(srcdir)/localcharset.c
 
-relocatable.lo : $(srcdir)/relocatable.c $(srcdir)/relocatable.h
-	$(LIBTOOL_COMPILE) $(CC) $(INCLUDES) $(CFLAGS) $(CPPFLAGS) $(DEFS) -c $(srcdir)/relocatable.c
-
-charset.alias: $(srcdir)/config.charset
-	$(SHELL) $(srcdir)/config.charset '@host@' > t-$@
-	mv t-$@ $@
-
-ref-add.sed : $(srcdir)/ref-add.sin
-	sed -e '/^#/d' -e 's/@''PACKAGE''@/@PACKAGE@/g' $(srcdir)/ref-add.sin > t-$@
-	mv t-$@ $@
-
-ref-del.sed : $(srcdir)/ref-del.sin
-	sed -e '/^#/d' -e 's/@''PACKAGE''@/@PACKAGE@/g' $(srcdir)/ref-del.sin > t-$@
-	mv t-$@ $@
+relocatable-stub.lo : $(srcdir)/relocatable-stub.c
+	$(LIBTOOL_COMPILE) $(CC) $(INCLUDES) $(CFLAGS) $(CPPFLAGS) $(DEFS) -c $(srcdir)/relocatable-stub.c
 
 # Installs the library and include files only. Typically called with only
 # $(libdir) and $(includedir) - don't use $(prefix) and $(exec_prefix) here.
 install-lib : all force
 	$(mkinstalldirs) $(libdir)
 	$(LIBTOOL_INSTALL) $(INSTALL) libcharset.la $(libdir)/libcharset.la
-	test -f $(libdir)/charset.alias && orig=$(libdir)/charset.alias \
-	                                || orig=charset.alias; \
-	sed -f ref-add.sed $$orig > $(libdir)/t-charset.alias; \
-	$(INSTALL_DATA) $(libdir)/t-charset.alias $(libdir)/charset.alias; \
-	rm -f $(libdir)/t-charset.alias
 
 # The following is needed in order to install a simple file in $(libdir)
 # which is shared with other installed packages. We use a list of referencing
@@ -95,31 +74,8 @@ install-lib : all force
 # avoid installing it.
 
 install : all force
-	if test @GLIBC21@ = no; then \
-	  case '@host_os@' in \
-	    darwin[56]*) \
-	      need_charset_alias=true ;; \
-	    darwin* | cygwin* | mingw* | pw32* | cegcc*) \
-	      need_charset_alias=false ;; \
-	    *) \
-	      need_charset_alias=true ;; \
-	  esac ; \
-	else \
-	  need_charset_alias=false ; \
-	fi ; \
 	$(mkinstalldirs) $(DESTDIR)$(libdir) ; \
 	$(LIBTOOL_INSTALL) $(INSTALL) libcharset.la $(DESTDIR)$(libdir)/libcharset.la
-	if test -f $(DESTDIR)$(libdir)/charset.alias; then \
-	  sed -f ref-add.sed $(DESTDIR)$(libdir)/charset.alias > $(DESTDIR)$(libdir)/t-charset.alias; \
-	  $(INSTALL_DATA) $(DESTDIR)$(libdir)/t-charset.alias $(DESTDIR)$(libdir)/charset.alias; \
-	  rm -f $(DESTDIR)$(libdir)/t-charset.alias; \
-	else \
-	  if $$need_charset_alias; then \
-	    sed -f ref-add.sed charset.alias > $(DESTDIR)$(libdir)/t-charset.alias; \
-	    $(INSTALL_DATA) $(DESTDIR)$(libdir)/t-charset.alias $(DESTDIR)$(libdir)/charset.alias; \
-	    rm -f $(DESTDIR)$(libdir)/t-charset.alias; \
-	  fi ; \
-	fi
 
 install-strip : install
 
@@ -128,22 +84,13 @@ installdirs : force
 
 uninstall : force
 	$(LIBTOOL_UNINSTALL) $(RM) $(DESTDIR)$(libdir)/libcharset.la
-	if test -f $(DESTDIR)$(libdir)/charset.alias; then \
-	  sed -f ref-del.sed $(DESTDIR)$(libdir)/charset.alias > $(DESTDIR)$(libdir)/t-charset.alias; \
-	  if grep '^# Packages using this file: $$' $(DESTDIR)$(libdir)/t-charset.alias > /dev/null; then \
-	    rm -f $(DESTDIR)$(libdir)/charset.alias; \
-	  else \
-	    $(INSTALL_DATA) $(DESTDIR)$(libdir)/t-charset.alias $(DESTDIR)$(libdir)/charset.alias; \
-	  fi; \
-	  rm -f $(DESTDIR)$(libdir)/t-charset.alias; \
-	fi
 
 check : all
 
 mostlyclean : clean
 
 clean : force
-	$(RM) *.o *.lo *.a *.la *.o.lock core *.stackdump charset.alias ref-add.sed ref-del.sed
+	$(RM) *.o *.lo *.a *.la *.o.lock core *.stackdump
 	$(RM) -r .libs _libs
 
 distclean : clean
@@ -153,11 +100,11 @@ maintainer-clean : distclean
 
 # List of source files.
 SOURCE_FILES = \
-  ChangeLog Makefile.in
+  ChangeLog Makefile.in \
+  relocatable-stub.c
 # List of files bidirectionally synced with gnulib.
 GNULIB_SYNCED_FILES = \
-  config.charset localcharset.c ref-add.sin ref-del.sin \
-  relocatable.h relocatable.c
+  localcharset.c
 # List of distributed files imported from other packages.
 IMPORTED_FILES =
 # List of distributed files generated by autotools or Makefile.devel.

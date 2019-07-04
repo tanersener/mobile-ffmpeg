@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Red Hat, Inc.
+ * Copyright (C) 2016-2018 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -15,9 +15,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with GnuTLS; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
+ *
  */
 
 #ifdef HAVE_CONFIG_H
@@ -26,6 +26,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+
+/* This tests gnutls_transport_set_fastopen() operation.
+ */
 
 #if defined(_WIN32)
 
@@ -48,6 +51,7 @@ int main()
 #include <gnutls/dtls.h>
 #include <gnutls/socket.h>
 #include <errno.h>
+#include <assert.h>
 #include "cert-common.h"
 #include "utils.h"
 
@@ -65,7 +69,8 @@ static void client_log_func(int level, const char *str)
 
 #define MAX_BUF 1024
 
-static void client(int fd, struct sockaddr *connect_addr, socklen_t connect_addrlen)
+static void client(int fd, struct sockaddr *connect_addr, socklen_t connect_addrlen,
+		   const char *prio)
 {
 	int ret;
 	char buffer[MAX_BUF + 1];
@@ -87,9 +92,7 @@ static void client(int fd, struct sockaddr *connect_addr, socklen_t connect_addr
 	gnutls_handshake_set_timeout(session, 20 * 1000);
 
 	/* Use default priorities */
-	gnutls_priority_set_direct(session,
-				   "NORMAL:-KX-ALL:+ECDHE-RSA",
-				   NULL);
+	assert(gnutls_priority_set_direct(session, prio, NULL) >= 0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
@@ -103,8 +106,7 @@ static void client(int fd, struct sockaddr *connect_addr, socklen_t connect_addr
 	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
 	if (ret < 0) {
-		fail("client: Handshake failed\n");
-		gnutls_perror(ret);
+		fail("client: Handshake failed: %s\n", gnutls_strerror(ret));
 		exit(1);
 	} else {
 		if (debug)
@@ -152,14 +154,11 @@ pid_t child;
 
 static void terminate(void)
 {
-	int status;
-
 	kill(child, SIGTERM);
-	wait(&status);
 	exit(1);
 }
 
-static void server(int fd)
+static void server(int fd, const char *prio)
 {
 	int ret;
 	gnutls_certificate_credentials_t xcred;
@@ -189,9 +188,7 @@ static void server(int fd)
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	gnutls_priority_set_direct(session,
-				   "NORMAL:-KX-ALL:+ECDHE-RSA",
-				   NULL);
+	assert(gnutls_priority_set_direct(session, prio, NULL) >= 0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
@@ -248,7 +245,13 @@ static void server(int fd)
 		success("server: finished\n");
 }
 
-void doit(void)
+static void ch_handler(int sig)
+{
+	return;
+}
+
+static
+void run(const char *name, const char *prio)
 {
 	int ret;
 	struct sockaddr_in saddr;
@@ -256,6 +259,9 @@ void doit(void)
 	int listener;
 	int fd;
 
+	success("running fast open test for %s\n", name);
+
+	signal(SIGCHLD, ch_handler);
 	signal(SIGPIPE, SIG_IGN);
 
 	listener = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -295,16 +301,23 @@ void doit(void)
 		if (fd == -1)
 			fail("error in accept: %s\n", strerror(errno));
 
-		server(fd);
+		server(fd, prio);
 
 		wait(&status);
 		check_wait_status(status);
 	} else {
 		fd = socket(AF_INET, SOCK_STREAM, 0);
 
-		client(fd, (struct sockaddr*)&saddr, addrlen);
+		usleep(1000000);
+		client(fd, (struct sockaddr*)&saddr, addrlen, prio);
 		exit(0);
 	}
+}
+
+void doit(void)
+{
+	run("tls1.2", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+ECDHE-RSA");
+	run("tls1.3", "NORMAL:-VERS-ALL:+VERS-TLS1.3");
 }
 
 #endif				/* _WIN32 */

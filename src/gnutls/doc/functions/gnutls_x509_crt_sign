@@ -10,7 +10,9 @@
 @var{issuer_key}: holds the issuer's private key
 
 This function is the same a @code{gnutls_x509_crt_sign2()}  with no flags,
-and SHA1 as the hash algorithm.
+and an appropriate hash algorithm. The hash algorithm used may
+vary between versions of GnuTLS, and it is tied to the security
+level of the issuer's public key.
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.

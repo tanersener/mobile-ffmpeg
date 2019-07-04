@@ -9,14 +9,14 @@
 
 @var{out}: will contain a private key PEM or DER encoded
 
-This function will export the private key to a PKCS1 structure for
-RSA keys, or an integer sequence for DSA keys.  The DSA keys are in
-the same format with the parameters used by openssl.
+This function will export the private key to a PKCS@code{1}  structure for
+RSA or RSA-PSS keys, and integer sequence for DSA keys. Other keys types
+will be exported in PKCS@code{8}  form.
 
 The output buffer is allocated using @code{gnutls_malloc()} .
 
-If the structure is PEM encoded, it will have a header
-of "BEGIN RSA PRIVATE KEY".
+It is recommended to use @code{gnutls_x509_privkey_export2_pkcs8()}  instead
+of this function, when a consistent output format is required.
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.

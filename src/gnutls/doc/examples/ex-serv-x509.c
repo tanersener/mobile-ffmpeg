@@ -22,6 +22,10 @@
 #define CRLFILE "crl.pem"
 
 #define CHECK(x) assert((x)>=0)
+#define LOOP_CHECK(rval, cmd) \
+        do { \
+                rval = cmd; \
+        } while(rval == GNUTLS_E_AGAIN || rval == GNUTLS_E_INTERRUPTED)
 
 /* The OCSP status file contains up to date information about revocation
  * of the server's certificate. That can be periodically be updated
@@ -77,8 +81,15 @@ int main(void)
                                                               OCSP_STATUS_FILE,
                                                               0));
 
-        CHECK(gnutls_priority_init(&priority_cache,
-                                   "PERFORMANCE:%SERVER_PRECEDENCE", NULL));
+        CHECK(gnutls_priority_init(&priority_cache, NULL, NULL));
+
+        /* Instead of the default options as shown above one could specify
+         * additional options such as server precedence in ciphersuite selection
+         * as follows:
+         * gnutls_priority_init2(&priority_cache,
+         *                       "%SERVER_PRECEDENCE",
+         *                       NULL, GNUTLS_PRIORITY_INIT_DEF_APPEND);
+	 */
 
 #if GNUTLS_VERSION_NUMBER >= 0x030506
         /* only available since GnuTLS 3.5.6, on previous versions see
@@ -130,11 +141,7 @@ int main(void)
 
                 gnutls_transport_set_int(session, sd);
 
-                do {
-                        ret = gnutls_handshake(session);
-                }
-                while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
-
+                LOOP_CHECK(ret, gnutls_handshake(session));
                 if (ret < 0) {
                         close(sd);
                         gnutls_deinit(session);
@@ -149,7 +156,7 @@ int main(void)
                 /* print_info(session); */
 
                 for (;;) {
-                        ret = gnutls_record_recv(session, buffer, MAX_BUF);
+                        LOOP_CHECK(ret, gnutls_record_recv(session, buffer, MAX_BUF));
 
                         if (ret == 0) {
                                 printf
@@ -173,7 +180,7 @@ int main(void)
                 printf("\n");
                 /* do not wait for the peer to close the connection.
                  */
-                CHECK(gnutls_bye(session, GNUTLS_SHUT_WR));
+                LOOP_CHECK(ret, gnutls_bye(session, GNUTLS_SHUT_WR));
 
                 close(sd);
                 gnutls_deinit(session);

@@ -36,6 +36,7 @@
 #endif
 
 #include <assert.h>
+#include <stdlib.h>
 
 #include "aes-internal.h"
 
@@ -349,9 +350,19 @@ aes_decrypt(const struct aes_ctx *ctx,
 	    size_t length, uint8_t *dst,
 	    const uint8_t *src)
 {
-  assert(!(length % AES_BLOCK_SIZE) );
-  _aes_decrypt(ctx->rounds, ctx->keys, &_aes_decrypt_table,
-	       length, dst, src);
+  switch (ctx->key_size)
+    {
+    default: abort();
+    case AES128_KEY_SIZE:
+      aes128_decrypt(&ctx->u.ctx128, length, dst, src);
+      break;
+    case AES192_KEY_SIZE:
+      aes192_decrypt(&ctx->u.ctx192, length, dst, src);
+      break;
+    case AES256_KEY_SIZE:
+      aes256_decrypt(&ctx->u.ctx256, length, dst, src);
+      break;
+    }
 }
 
 void

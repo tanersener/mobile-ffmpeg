@@ -16,7 +16,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -114,6 +114,9 @@ typedef enum gnutls_x509_crl_reason_t {
 	GNUTLS_X509_CRLREASON_AACOMPROMISE = 10
 } gnutls_x509_crl_reason_t;
 
+/* When adding a verify failure reason update:
+ * _gnutls_ocsp_verify_status_to_str()
+ */
 /**
  * gnutls_ocsp_verify_reason_t:
  * @GNUTLS_OCSP_VERIFY_SIGNER_NOT_FOUND: Signer cert not found.
@@ -196,8 +199,14 @@ void gnutls_ocsp_resp_deinit(gnutls_ocsp_resp_t resp);
 
 int gnutls_ocsp_resp_import(gnutls_ocsp_resp_t resp,
 			    const gnutls_datum_t * data);
+int gnutls_ocsp_resp_import2(gnutls_ocsp_resp_t resp,
+			     const gnutls_datum_t * data,
+			     gnutls_x509_crt_fmt_t fmt);
 int gnutls_ocsp_resp_export(gnutls_ocsp_resp_t resp,
 			    gnutls_datum_t * data);
+int gnutls_ocsp_resp_export2(gnutls_ocsp_resp_t resp,
+			     gnutls_datum_t * data,
+			     gnutls_x509_crt_fmt_t fmt);
 int gnutls_ocsp_resp_print(gnutls_ocsp_resp_t resp,
 			   gnutls_ocsp_print_formats_t format,
 			   gnutls_datum_t * out);
@@ -261,6 +270,13 @@ int gnutls_ocsp_resp_verify(gnutls_ocsp_resp_t resp,
 
 int gnutls_ocsp_resp_check_crt(gnutls_ocsp_resp_t resp,
 			       unsigned int indx, gnutls_x509_crt_t crt);
+
+int
+gnutls_ocsp_resp_list_import2(gnutls_ocsp_resp_t **ocsps,
+			     unsigned int *size,
+			     const gnutls_datum_t *resp_data,
+			     gnutls_x509_crt_fmt_t format,
+			     unsigned int flags);
 
 /* *INDENT-OFF* */
 #ifdef __cplusplus

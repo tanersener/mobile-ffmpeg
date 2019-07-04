@@ -18,6 +18,10 @@
  */
 
 /*
+ * CHANGES 04.2019
+ * --------------------------------------------------------
+ * - setNativeEnvironmentVariable method added
+ *
  * CHANGES 02.2019
  * --------------------------------------------------------
  * - JavaVM registered via av_jni_set_java_vm()
@@ -43,8 +47,8 @@
 #include "config.h"
 #include "libavcodec/jni.h"
 #include "libavutil/bprint.h"
-#include "mobileffmpeg.h"
 #include "fftools_ffmpeg.h"
+#include "mobileffmpeg.h"
 
 /** Callback data structure */
 struct CallbackData {
@@ -100,7 +104,9 @@ JNINativeMethod configMethods[] = {
     {"getNativeVersion", "()Ljava/lang/String;", (void*) Java_com_arthenica_mobileffmpeg_Config_getNativeVersion},
     {"nativeExecute", "([Ljava/lang/String;)I", (void*) Java_com_arthenica_mobileffmpeg_Config_nativeExecute},
     {"nativeCancel", "()V", (void*) Java_com_arthenica_mobileffmpeg_Config_nativeCancel},
-    {"getNativeBuildConf", "()Ljava/lang/String;", (void*) Java_com_arthenica_mobileffmpeg_Config_getNativeBuildConf}
+    {"registerNewNativeFFmpegPipe", "(Ljava/lang/String;)I", (void*) Java_com_arthenica_mobileffmpeg_Config_registerNewNativeFFmpegPipe},
+    {"getNativeBuildDate", "()Ljava/lang/String;", (void*) Java_com_arthenica_mobileffmpeg_Config_getNativeBuildDate},
+    {"setNativeEnvironmentVariable", "(Ljava/lang/String;Ljava/lang/String;)I", (void*) Java_com_arthenica_mobileffmpeg_Config_setNativeEnvironmentVariable}
 };
 
 /** Forward declaration for function defined in fftools_ffmpeg.c */
@@ -490,7 +496,7 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_FALSE;
     }
 
-    if ((*env)->RegisterNatives(env, localConfigClass, configMethods, 9) < 0) {
+    if ((*env)->RegisterNatives(env, localConfigClass, configMethods, 11) < 0) {
         LOGE("OnLoad failed to RegisterNatives for class %s.\n", configClassName);
         return JNI_FALSE;
     }
@@ -686,17 +692,6 @@ JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_Config_nativeCancel(JNIEn
 }
 
 /**
- * Returns build configuration for FFmpeg.
- *
- * @param env pointer to native method interface
- * @param object reference to the class on which this method is invoked
- * @return build configuration string
- */
-JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_Config_getNativeBuildConf(JNIEnv *env, jclass object) {
-    return (*env)->NewStringUTF(env, FFMPEG_CONFIGURATION);
-}
-
-/**
  * Creates natively a new named pipe to use in FFmpeg operations.
  *
  * @param env pointer to native method interface
@@ -721,4 +716,20 @@ JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_Config_getNativeBuildD
     char buildDate[10];
     sprintf(buildDate, "%d", MOBILE_FFMPEG_BUILD_DATE);
     return (*env)->NewStringUTF(env, buildDate);
+}
+
+/**
+ * Sets an environment variable natively
+ *
+ * @param env pointer to native method interface
+ * @param object reference to the class on which this method is invoked
+ * @param variableName environment variable name
+ * @param variableValue environment variable value
+ * @return zero on success, non-zero on error
+ */
+JNIEXPORT int JNICALL Java_com_arthenica_mobileffmpeg_Config_setNativeEnvironmentVariable(JNIEnv *env, jclass object, jstring variableName, jstring variableValue) {
+    const char *variableNameString = (*env)->GetStringUTFChars(env, variableName, 0);
+    const char *variableValueString = (*env)->GetStringUTFChars(env, variableValue, 0);
+
+    return setenv(variableNameString, variableValueString, 1);
 }

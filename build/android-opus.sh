@@ -56,12 +56,11 @@ fi
     --disable-maintainer-mode \
     --disable-doc \
     --disable-extra-programs \
-    --disable-ambisonics \
     --host=${TARGET_HOST} || exit 1
 
 make -j$(get_cpu_count) || exit 1
 
 # MANUALLY COPY PKG-CONFIG FILES
-cp ./opus.pc ${INSTALL_PKG_CONFIG_DIR}
+cp ./opus.pc ${INSTALL_PKG_CONFIG_DIR} || exit 1
 
 make install || exit 1

@@ -187,17 +187,6 @@ to use an ANSI C compiler:
 
 and if that doesn't work, install pre-built binaries of GCC for HP-UX.
 
-   On OSF/1 a.k.a. Tru64, some versions of the default C compiler cannot
-parse its `<wchar.h>' header file.  The option `-nodtk' can be used as
-a workaround.  If GNU CC is not installed, it is therefore recommended
-to try
-
-     ./configure CC="cc"
-
-and if that doesn't work, try
-
-     ./configure CC="cc -nodtk"
-
    On AIX 3, the C include files by default don't define some necessary
 prototype declarations.  If GNU CC is not installed, it is recommended to
 use the following options:

@@ -16,7 +16,7 @@
  * GNU General Public License for more details.
  *                               
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 /* This file includes all functions that were in the 0.5.x and 0.8.x

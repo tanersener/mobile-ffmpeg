@@ -27,6 +27,11 @@
  * Note that error checking is minimal to simplify the example.
  */
 
+#define LOOP_CHECK(rval, cmd) \
+        do { \
+                rval = cmd; \
+        } while(rval == GNUTLS_E_AGAIN || rval == GNUTLS_E_INTERRUPTED)
+
 #define MAX_BUFFER 1024
 #define PORT 5557
 
@@ -88,9 +93,14 @@ int main(void)
 
         gnutls_certificate_set_known_dh_params(x509_cred, GNUTLS_SEC_PARAM_MEDIUM);
 
-        gnutls_priority_init(&priority_cache,
-                             "PERFORMANCE:-VERS-TLS-ALL:+VERS-DTLS1.0:%SERVER_PRECEDENCE",
-                             NULL);
+        /* pre-3.6.3 equivalent:
+         * gnutls_priority_init(&priority_cache,
+         *                      "NORMAL:-VERS-TLS-ALL:+VERS-DTLS1.0:%SERVER_PRECEDENCE",
+         *                      NULL);
+         */
+        gnutls_priority_init2(&priority_cache,
+                              "%SERVER_PRECEDENCE",
+                              NULL, GNUTLS_PRIORITY_INIT_DEF_APPEND);
 
         gnutls_key_generate(&cookie_key, GNUTLS_COOKIE_KEY_SIZE);
 
@@ -192,11 +202,7 @@ int main(void)
                 gnutls_transport_set_pull_timeout_function(session,
                                                            pull_timeout_func);
 
-                do {
-                        ret = gnutls_handshake(session);
-                }
-                while (ret == GNUTLS_E_INTERRUPTED
-                       || ret == GNUTLS_E_AGAIN);
+                LOOP_CHECK(ret, gnutls_handshake(session));
                 /* Note that DTLS may also receive GNUTLS_E_LARGE_PACKET.
                  * In that case the MTU should be adjusted.
                  */
@@ -211,14 +217,10 @@ int main(void)
                 printf("- Handshake was completed\n");
 
                 for (;;) {
-                        do {
-                                ret =
+                        LOOP_CHECK(ret,
                                     gnutls_record_recv_seq(session, buffer,
                                                            MAX_BUFFER,
-                                                           sequence);
-                        }
-                        while (ret == GNUTLS_E_AGAIN
-                               || ret == GNUTLS_E_INTERRUPTED);
+                                                           sequence));
 
                         if (ret < 0 && gnutls_error_is_fatal(ret) == 0) {
                                 fprintf(stderr, "*** Warning: %s\n",
@@ -243,7 +245,7 @@ int main(void)
                              sequence[6], sequence[7], buffer);
 
                         /* reply back */
-                        ret = gnutls_record_send(session, buffer, ret);
+                        LOOP_CHECK(ret, gnutls_record_send(session, buffer, ret));
                         if (ret < 0) {
                                 fprintf(stderr, "Error in send(): %s\n",
                                         gnutls_strerror(ret));
@@ -251,7 +253,7 @@ int main(void)
                         }
                 }
 
-                gnutls_bye(session, GNUTLS_SHUT_WR);
+                LOOP_CHECK(ret, gnutls_bye(session, GNUTLS_SHUT_WR));
                 gnutls_deinit(session);
 
         }
@@ -303,13 +305,8 @@ static int pull_timeout_func(gnutls_transport_ptr_t ptr, unsigned int ms)
         FD_ZERO(&rfds);
         FD_SET(priv->fd, &rfds);
 
-        tv.tv_sec = 0;
-        tv.tv_usec = ms * 1000;
-
-        while (tv.tv_usec >= 1000000) {
-                tv.tv_usec -= 1000000;
-                tv.tv_sec++;
-        }
+        tv.tv_sec = ms / 1000;
+        tv.tv_usec = (ms % 1000) * 1000;
 
         ret = select(priv->fd + 1, &rfds, NULL, NULL, &tv);
 

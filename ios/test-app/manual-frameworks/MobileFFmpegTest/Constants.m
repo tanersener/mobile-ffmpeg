@@ -30,7 +30,7 @@ NSString *const VIDEO_TEST_TOOLTIP_TEXT = @"Select a video codec and press ENCOD
 NSTimeInterval const VIDEO_TEST_TOOLTIP_DURATION = 4.0;
 
 // HTTPS TEST
-NSString *const HTTPS_TEST_DEFAULT_URL = @"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/FFmpeg-Logo.svg/568px-FFmpeg-Logo.svg.png";
+NSString *const HTTPS_TEST_DEFAULT_URL = @"https://download.blender.org/peach/trailer/trailer_1080p.ogg";
 NSString *const HTTPS_TEST_TOOLTIP_TEXT = @"Enter the https url of a media file and click the button";
 NSTimeInterval const HTTPS_TEST_TOOLTIP_DURATION = 4.0;
 

@@ -85,7 +85,7 @@ static void client(int sd)
 	gnutls_init(&session, GNUTLS_CLIENT);
 
 	/* Use default priorities */
-	gnutls_priority_set_direct(session, "NORMAL:+DHE-PSK", NULL);
+	gnutls_priority_set_direct(session, "NORMAL:-VERS-ALL:+VERS-TLS1.2:+DHE-PSK", NULL);
 
 	/* put the anonymous credentials to the current session
 	 */
@@ -106,15 +106,7 @@ static void client(int sd)
 			success("client: Handshake was completed\n");
 	}
 
-	ret = gnutls_dh_get_prime_bits(session);
-	if (ret < 512) {
-		fail("server: too small prime size: %d\n", ret);
-	}
-
-	ret = gnutls_dh_get_secret_bits(session);
-	if (ret < 256) {
-		fail("server: too small secret key size: %d\n", ret);
-	}
+	print_dh_params_info(session);
 
 	gnutls_record_send(session, MSG, strlen(MSG));
 
@@ -166,8 +158,9 @@ static gnutls_session_t initialize_tls_session(void)
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	gnutls_priority_set_direct(session, "NORMAL:+DHE-PSK", NULL);
+	gnutls_priority_set_direct(session, "NORMAL:-VERS-ALL:+VERS-TLS1.2:+DHE-PSK", NULL);
 
+	gnutls_handshake_set_timeout(session, 20 * 1000);
 	gnutls_credentials_set(session, GNUTLS_CRD_PSK, server_pskcred);
 
 	return session;
@@ -240,15 +233,7 @@ static void server(int sd)
 	if (debug)
 		success("server: Handshake was completed\n");
 
-	ret = gnutls_dh_get_prime_bits(session);
-	if (ret < 512) {
-		fail("server: too small prime size: %d\n", ret);
-	}
-
-	ret = gnutls_dh_get_secret_bits(session);
-	if (ret < 256) {
-		fail("server: too small secret key size: %d\n", ret);
-	}
+	print_dh_params_info(session);
 
 	/* see the Getting peer's information example */
 	/* print_info(session); */
@@ -313,8 +298,11 @@ void doit(void)
 		/* parent */
 		server(sockets[0]);
 		wait(&status);
-	} else
+		check_wait_status(status);
+	} else {
 		client(sockets[1]);
+		exit(0);
+	}
 }
 
 #endif				/* _WIN32 */

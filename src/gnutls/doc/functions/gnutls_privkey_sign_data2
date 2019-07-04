@@ -1,0 +1,25 @@
+
+
+
+
+@deftypefun {int} {gnutls_privkey_sign_data2} (gnutls_privkey_t @var{signer}, gnutls_sign_algorithm_t @var{algo}, unsigned int @var{flags}, const gnutls_datum_t * @var{data}, gnutls_datum_t * @var{signature})
+@var{signer}: Holds the key
+
+@var{algo}: The signature algorithm used
+
+@var{flags}: Zero or one of @code{gnutls_privkey_flags_t} 
+
+@var{data}: holds the data to be signed
+
+@var{signature}: will contain the signature allocated with @code{gnutls_malloc()} 
+
+This function will sign the given data using the specified signature
+algorithm. This function is an enhancement of @code{gnutls_privkey_sign_data()} ,
+as it allows utilizing a alternative signature algorithm where possible
+(e.g, use an RSA key with RSA-PSS).
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.6.0
+@end deftypefun

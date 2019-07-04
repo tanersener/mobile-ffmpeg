@@ -1,21 +1,21 @@
 /* Memory allocation on the stack.
 
-   Copyright (C) 1995, 1999, 2001-2004, 2006-2016 Free Software Foundation,
+   Copyright (C) 1995, 1999, 2001-2004, 2006-2019 Free Software Foundation,
    Inc.
 
    This program is free software; you can redistribute it and/or modify it
-   under the terms of the GNU Lesser General Public License as published
-   by the Free Software Foundation; either version 2.1, or (at your option)
+   under the terms of the GNU General Public License as published
+   by the Free Software Foundation; either version 3, or (at your option)
    any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
+   General Public License for more details.
 
-   You should have received a copy of the GNU Lesser General Public
+   You should have received a copy of the GNU General Public
    License along with this program; if not, see
-   <http://www.gnu.org/licenses/>.
+   <https://www.gnu.org/licenses/>.
   */
 
 /* Avoid using the symbol _ALLOCA_H here, as Bison assumes _ALLOCA_H
@@ -36,6 +36,12 @@
 
 #ifndef alloca
 # ifdef __GNUC__
+   /* Some version of mingw have an <alloca.h> that causes trouble when
+      included after 'alloca' gets defined as a macro.  As a workaround, include
+      this <alloca.h> first and define 'alloca' as a macro afterwards.  */
+#  if (defined _WIN32 && ! defined __CYGWIN__) && @HAVE_ALLOCA_H@
+#   include_next <alloca.h>
+#  endif
 #  define alloca __builtin_alloca
 # elif defined _AIX
 #  define alloca __alloca

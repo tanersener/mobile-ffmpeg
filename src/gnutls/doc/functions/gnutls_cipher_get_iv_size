@@ -5,7 +5,9 @@
 @deftypefun {unsigned} {gnutls_cipher_get_iv_size} (gnutls_cipher_algorithm_t @var{algorithm})
 @var{algorithm}: is an encryption algorithm
 
-Get block size for encryption algorithm.
+This function returns the size of the initialization vector (IV) for the
+provided algorithm. For algorithms with variable size IV (e.g., AES-CCM),
+the returned size will be the one used by TLS.
 
 @strong{Returns:} block size for encryption algorithm.
 

@@ -5,28 +5,38 @@
 @deftypefun {int} {gnutls_rehandshake} (gnutls_session_t @var{session})
 @var{session}: is a @code{gnutls_session_t}  type.
 
-This function will renegotiate security parameters with the
-client.  This should only be called in case of a server.
+This function can only be called in server side, and
+instructs a TLS 1.2 or earlier client to renegotiate
+parameters (perform a handshake), by sending a 
+hello request message.
 
-This message informs the peer that we want to renegotiate
-parameters (perform a handshake).
+If this function succeeds, the calling application
+should call @code{gnutls_record_recv()}  until @code{GNUTLS_E_REHANDSHAKE} 
+is returned to clear any pending data. If the @code{GNUTLS_E_REHANDSHAKE} 
+error code is not seen, then the handshake request was
+not followed by the peer (the TLS protocol does not require
+the client to do, and such compliance should be handled
+by the application protocol).
 
-If this function succeeds (returns 0), you must call the
-@code{gnutls_handshake()}  function in order to negotiate the new
+Once the @code{GNUTLS_E_REHANDSHAKE}  error code is seen, the
+calling application should proceed to calling
+@code{gnutls_handshake()}  to negotiate the new
 parameters.
 
-Since TLS is full duplex some application data might have been
-sent during peer's processing of this message. In that case
-one should call @code{gnutls_record_recv()}  until GNUTLS_E_REHANDSHAKE
-is returned to clear any pending data. Care must be taken, if
-rehandshake is mandatory, to terminate if it does not start after
-some threshold.
-
 If the client does not wish to renegotiate parameters he 
-should reply with an alert message, thus the return code will be
-@code{GNUTLS_E_WARNING_ALERT_RECEIVED}  and the alert will be
+may reply with an alert message, and in that case the return code seen
+by subsequent @code{gnutls_record_recv()}  will be
+@code{GNUTLS_E_WARNING_ALERT_RECEIVED}  with the specific alert being
 @code{GNUTLS_A_NO_RENEGOTIATION} .  A client may also choose to ignore
-this message.
+this request.
+
+Under TLS 1.3 this function is equivalent to @code{gnutls_session_key_update()} 
+with the @code{GNUTLS_KU_PEER}  flag. In that case subsequent calls to
+@code{gnutls_record_recv()}  will not return @code{GNUTLS_E_REHANDSHAKE} , and
+calls to @code{gnutls_handshake()}  in server side are a no-op.
+
+This function always fails with @code{GNUTLS_E_INVALID_REQUEST}  when
+called in client side.
 
 @strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
 @end deftypefun

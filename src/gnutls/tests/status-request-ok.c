@@ -249,7 +249,7 @@ static void server(int fd)
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	gnutls_priority_set_direct(session, "NORMAL", NULL);
+	gnutls_priority_set_direct(session, "NORMAL:-VERS-ALL:+VERS-TLS1.2", NULL);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 

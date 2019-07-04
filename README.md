@@ -1,26 +1,26 @@
-# MobileFFmpeg ![GitHub release](https://img.shields.io/badge/release-v4.2.1-blue.svg) ![Bintray](https://img.shields.io/badge/bintray-v4.2.1-blue.svg) ![CocoaPods](https://img.shields.io/badge/pod-v4.2.1-blue.svg)
+# MobileFFmpeg ![GitHub release](https://img.shields.io/badge/release-v4.2.2-blue.svg) ![Bintray](https://img.shields.io/badge/bintray-v4.2.2-blue.svg) ![CocoaPods](https://img.shields.io/badge/pod-v4.2.2-blue.svg) [![Build Status](https://travis-ci.org/tanersener/mobile-ffmpeg.svg?branch=master)](https://travis-ci.org/tanersener/mobile-ffmpeg)
 
-FFmpeg for Android and IOS
+FFmpeg for Android, iOS and tvOS
 
 <img src="https://github.com/tanersener/mobile-ffmpeg/blob/master/docs/assets/mobile-ffmpeg-logo-v7.png" width="320">
 
 ### 1. Features
 - Use binaries available at `Github`/`JCenter`/`CocoaPods` or build your own version with external libraries you need
 - Supports
-    - Both Android and IOS
+    - Android, iOS and tvOS
     - FFmpeg `v3.4.x`, `v4.0.x`, `v4.1` and `v4.2-dev` releases
-    - 27 external libraries
+    - 28 external libraries
     
-        `chromaprint`, `fontconfig`, `freetype`, `fribidi`, `gmp`, `gnutls`, `kvazaar`, `lame`, `libaom`, `libass`, `libiconv`, `libilbc`, `libtheora`, `libvorbis`, `libvpx`, `libwebp`, `libxml2`, `opencore-amr`, `opus`, `sdl`, `shine`, `snappy`, `soxr`, `speex`, `tesseract`, `twolame`, `wavpack`
+        `chromaprint`, `fontconfig`, `freetype`, `fribidi`, `gmp`, `gnutls`, `kvazaar`, `lame`, `libaom`, `libass`, `libiconv`, `libilbc`, `libtheora`, `libvorbis`, `libvpx`, `libwebp`, `libxml2`, `opencore-amr`, `openh264`, `opus`, `sdl`, `shine`, `snappy`, `soxr`, `speex`, `tesseract`, `twolame`, `wavpack`
     
     - 4 external libraries with GPL license
     
         `vid.stab`, `x264`, `x265`, `xvidcore`
 
 - Exposes both FFmpeg library and MobileFFmpeg wrapper library capabilities
-- Includes cross-compile instructions for 43 open-source libraries
+- Includes cross-compile instructions for 44 open-source libraries
     
-    `chromaprint`, `expat`, `ffmpeg`, `fontconfig`, `freetype`, `fribidi`, `giflib`, `gmp`, `gnutls`, `kvazaar`, `lame`, `leptonica`, `libaom`, `libass`, `libiconv`, `libilbc`, `libjpeg`, `libjpeg-turbo`, `libogg`, `libpng`, `libsndfile`, `libtheora`, `libuuid`, `libvorbis`, `libvpx`, `libwebp`, `libxml2`, `nettle`, `opencore-amr`, `opus`, `sdl`, `shine`, `snappy`, `soxr`, `speex`, `tesseract`, `tiff`, `twolame`, `vid.stab`, `wavpack`, `x264`, `x265`, `xvidcore`
+    `chromaprint`, `expat`, `ffmpeg`, `fontconfig`, `freetype`, `fribidi`, `giflib`, `gmp`, `gnutls`, `kvazaar`, `lame`, `leptonica`, `libaom`, `libass`, `libiconv`, `libilbc`, `libjpeg`, `libjpeg-turbo`, `libogg`, `libpng`, `libsndfile`, `libtheora`, `libuuid`, `libvorbis`, `libvpx`, `libwebp`, `libxml2`, `nettle`, `opencore-amr`, `openh264`, `opus`, `sdl`, `shine`, `snappy`, `soxr`, `speex`, `tesseract`, `tiff`, `twolame`, `vid.stab`, `wavpack`, `x264`, `x265`, `xvidcore`
 
 - Licensed under LGPL 3.0, can be customized to support GPL v3.0
 
@@ -30,23 +30,35 @@ FFmpeg for Android and IOS
 - Camera access on [supported devices](https://developer.android.com/ndk/guides/stable_apis#camera)
 - Builds shared native libraries (.so)
 - Creates Android archive with .aar extension
+- Supports `API Level 16+`
 
-#### 1.2 IOS
+#### 1.2 iOS
 - Builds `armv7`, `armv7s`, `arm64`, `arm64e`, `i386` and `x86_64` architectures
 - Supports `bzip2`, `zlib` system libraries and `AudioToolbox`, `CoreImage`, `VideoToolbox`, `AVFoundation` system frameworks
 - Objective-C API
 - Camera access
 - `ARC` enabled library
 - Built with `-fembed-bitcode` flag
-- Creates static framework and static universal (fat) library (.a) 
-- Supports Xcode 7.3.1 or later
+- Creates static framework and static universal (fat) library (.a)
+- Supports `iOS SDK 8.0.x` or later
+ 
+#### 1.3 tvOS
+- Builds `arm64` and `x86_64` architectures
+- Supports `bzip2`, `zlib` system libraries and `AudioToolbox`, `CoreImage`, `VideoToolbox` system frameworks
+- Objective-C API
+- `ARC` enabled library
+- Built with `-fembed-bitcode` flag
+- Creates static framework and static universal (fat) library (.a)
+- Supports `tvOS SDK 9.2` or later
 
 ### 2. Using
-Binaries are available at [Github](https://github.com/tanersener/mobile-ffmpeg/releases), [JCenter](https://bintray.com/bintray/jcenter) and [CocoaPods](https://cocoapods.org). 
+Published binaries are available at [Github](https://github.com/tanersener/mobile-ffmpeg/releases), [JCenter](https://bintray.com/bintray/jcenter) and [CocoaPods](https://cocoapods.org).
 
-Refer to [Using IOS Universal Binaries](https://github.com/tanersener/mobile-ffmpeg/wiki/Using-IOS-Universal-Binaries) guide to import IOS universal binaries released at [Github](https://github.com/tanersener/mobile-ffmpeg/releases).
+Unpublished development builds can be found under the [development-snapshot](https://www.dropbox.com/sh/frzg32yjzyucmob/AADX81RhiVfk9o7Vo2J8jlH2a) directory. 
 
-There are eight different binary packages. Below you can see which system libraries and external libraries are enabled in each of them.
+There are eight different `mobile-ffmpeg` packages. Below you can see which system libraries and external libraries are enabled in each of them. 
+
+Please remember that some parts of `FFmpeg` are licensed under the `GPL` and only `GPL` licensed `mobile-ffmpeg` packages include them.
 
 <table>
 <thead>
@@ -82,6 +94,10 @@ There are eight different binary packages. Below you can see which system librar
 <td align="center"><sup>ios system libraries</sup></td>
 <td align="center" colspan=8><sup>zlib</sup><br><sup>AudioToolbox</sup><br><sup>AVFoundation</sup><br><sup>CoreImage</sup><br><sup>VideoToolbox</sup><br><sup>bzip2</sup></td>
 </tr>
+<tr>
+<td align="center"><sup>tvos system libraries</sup></td>
+<td align="center" colspan=8><sup>zlib</sup><br><sup>AudioToolbox</sup><br><sup>CoreImage</sup><br><sup>VideoToolbox</sup><br><sup>bzip2</sup></td>
+</tr>
 </tbody>
 </table>
 
@@ -91,14 +107,17 @@ There are eight different binary packages. Below you can see which system librar
 
  - `chromaprint`, `vid.stab` and `x265` are supported since `v2.1`
 
- - `sdl`, `tesseract`, `twolame` external libraries; `zlib`, `MediaCodec` Android system libraries; `bzip2`, `zlib` IOS system libraries and `AudioToolbox`, `CoreImage`, `VideoToolbox`, `AVFoundation` IOS system frameworks are supported since `v3.0`
+ - `sdl`, `tesseract`, `twolame` external libraries; `zlib`, `MediaCodec` Android system libraries; `bzip2`, `zlib` iOS system libraries and `AudioToolbox`, `CoreImage`, `VideoToolbox`, `AVFoundation` iOS system frameworks are supported since `v3.0`
+
  - Since `v4.2`, `chromaprint`, `sdl` and `tesseract` libraries are not included in binary releases. You can still build them and include in your releases
+ 
+ - `AVFoundation` is not available on `tvOS`, `VideoToolbox` is not available on `tvOS` LTS releases
 
 #### 2.1 Android
-1. Add MobileFFmpeg dependency from `jcenter()`
+1. Add MobileFFmpeg dependency to your `build.gradle` in `mobile-ffmpeg-<package name>` format
     ```
     dependencies {
-        implementation 'com.arthenica:mobile-ffmpeg-full:4.2.1'
+        implementation 'com.arthenica:mobile-ffmpeg-min:4.2.2'
     }
     ```
 
@@ -171,10 +190,17 @@ There are eight different binary packages. Below you can see which system librar
     Config.setFontDirectory(this, "<folder with fonts>", Collections.EMPTY_MAP);
     ```
 
-#### 2.2 IOS
-1. Add MobileFFmpeg pod to your `Podfile`
+#### 2.2 iOS / tvOS
+1. Add MobileFFmpeg dependency to your `Podfile` in `mobile-ffmpeg-<package name>` format
+
+    - iOS
     ```
-    pod 'mobile-ffmpeg-full', '~> 4.2.1'
+    pod 'mobile-ffmpeg-min', '~> 4.2.2'
+    ```
+
+    - tvOS
+    ```
+    pod 'mobile-ffmpeg-tv-min', '~> 4.2.2'
     ```
 
 2. Execute commands.
@@ -208,7 +234,7 @@ There are eight different binary packages. Below you can see which system librar
     MediaInformation *mediaInformation = [MobileFFmpeg getMediaInformation:@"<file path or uri>"];
     ```
 
-6. Record video and audio using IOS camera
+6. Record video and audio using iOS camera. This operation is not supported on `tvOS` since `AVFoundation` is not available on `tvOS`.
 
     ```
     [MobileFFmpeg execute: @"-f avfoundation -r 30 -video_size 1280x720 -pixel_format bgr0 -i 0:0 -vcodec h264_videotoolbox -vsync 2 -f h264 -t 00:00:05 %@", recordFilePath];
@@ -250,121 +276,202 @@ There are eight different binary packages. Below you can see which system librar
     ```
     [MobileFFmpegConfig setFontDirectory:@"<folder with fonts>" with:nil];
     ```
-    
-#### 2.3 Test Application
-You can see how MobileFFmpeg is used inside an application by running test applications provided.
-There is an Android test application under the `android/test-app` folder and an IOS test application, which requires 
-`Xcode 9.x` or later, under the `ios/test-app` folder. Both applications are identical and supports command 
-execution, video encoding, accessing https, encoding audio, burning subtitles and video stabilization.
 
-<img src="https://github.com/tanersener/mobile-ffmpeg/blob/master/docs/assets/ios_test_app.gif" width="240">
+#### 2.3 Manual Installation
+##### 2.3.1 Android
+
+You can import `MobileFFmpeg` aar packages in `Android Studio` using the `File` -> `New` -> `New Module` -> `Import .JAR/.AAR Package` menu.
+
+##### 2.3.2 iOS / tvOS
+
+iOS and tvOS frameworks can be installed manually using the [Importing Frameworks](https://github.com/tanersener/mobile-ffmpeg/wiki/Importing-Frameworks) guide. 
+If you want to use universal binaries please refer to [Using Universal Binaries](https://github.com/tanersener/mobile-ffmpeg/wiki/Using-Universal-Binaries) guide.   
+    
+#### 2.4 Test Application
+You can see how MobileFFmpeg is used inside an application by running test applications provided.
+There is an `Android` test application under the `android/test-app` folder, an `iOS` test application under the 
+`ios/test-app` folder and a `tvOS` test application under the `tvos/test-app` folder. 
+
+All applications are identical and supports command execution, video encoding, accessing https, encoding audio, 
+burning subtitles, video stabilization and pipe operations.
+
+<img src="https://github.com/tanersener/mobile-ffmpeg/blob/master/docs/assets/android_test_app.gif" width="240">
 
 ### 3. Versions
 
-`MobileFFmpeg` version number is aligned with `FFmpeg` since `v4.2`. Before that `MobileFFmpeg` version of a release and `FFmpeg` version included in that release was different.
+`MobileFFmpeg` version number is aligned with `FFmpeg` since version `4.2`. 
 
-|        | v2.0 | v2.1 | v2.2 | v3.0 | v3.1 | v4.2 |v4.2.1 |
-| :----: | :----: | :----: | :----: | :----: | :----: | :----: |:----: |
-| FFmpeg | 4.0.1 | 4.0.2 | 4.0.3 | 4.1-dev-1517 | v4.1-10 | v4.2-dev-480 | v4.2-dev-1156 |
-| Includes LTS Variant | - | - | - | - | - | X | - |
+In previous versions, `MobileFFmpeg` version of a release and `FFmpeg` version included in that release was different. 
+The following table lists `FFmpeg` versions used in `MobileFFmpeg` releases.
+  
+- `dev` part in `FFmpeg` version number indicates that `FFmpeg` source is pulled from the `FFmpeg` `master` branch. 
+Exact version number is obtained using `git describe --tags`. 
+
+|  MobileFFmpeg Version | FFmpeg Version | Release Date |
+| :----: | :----: |:----: |
+| [4.2.2](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v4.2.2) | 4.2-dev-1824 | July 3, 2019 |
+| [4.2.2.LTS](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v4.2.2.LTS) | 4.2-dev-1824 | July 3, 2019 |
+| [4.2.1](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v4.2.1) | 4.2-dev-1156 | Apr 2, 2019 |
+| [4.2](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v4.2) | 4.2-dev-480 | Jan 3, 2019 |
+| [4.2.LTS](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v4.2.LTS) | 4.2-dev-480 | Jan 3, 2019 |
+| [3.1](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v3.1) | 4.1-10 | Dec 11, 2018 |
+| [3.0](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v3.0) | 4.1-dev-1517 | Oct 25, 2018 |
+| [2.2](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v2.2) | 4.0.3 | Nov 10, 2018 |
+| [2.1.1](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v2.1.1) | 4.0.2 | Sep 19, 2018 |
+| [2.1](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v2.1) | 4.0.2 | Sep 5, 2018 |
+| [2.0](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v2.0) | 4.0.1 | Jun 30, 2018 |
+| [1.2](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v1.2) | 3.4.4 | Aug 30, 2018|
+| [1.1](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v1.1) | 3.4.2 | Jun 18, 2018 |
+| [1.0](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v1.0) | 3.4.2 | Jun 6, 2018 |
 
 ### 4. LTS Releases
 
 Starting from `v4.2`, `MobileFFmpeg` binaries are published in two different variants: `Main Release` and `LTS Release`. 
 
-- They include complete functionality of the library and support the latest SDK/API features.
+- Main releases include complete functionality of the library and support the latest SDK/API features.
 
-- These releases are customized to support a wide range of devices. They are built using older API/SDK versions, so some features are not available for them.
+- LTS releases are customized to support a wider range of devices. They are built using older API/SDK versions, so some features are not available on them.
 
 This table shows the differences between two variants.
 
 |        | Main Release | LTS Release |
 | :----: | :----: | :----: |
-| Android API Level | 24 | 21 | 
+| Android API Level | 24 | 16 | 
 | Android Camera Access | Yes | - |
 | Android Architectures | arm-v7a-neon<br/>arm64-v8a<br/>x86<br/>x86-64</br> | arm-v7a<br/>arm-v7a-neon<br/>arm64-v8a<br/>x86<br/>x86-64</br> |
-| IOS SDK | 12.1 | 9.3 |
 | Xcode Support | 10.1 | 7.3.1 |
-| IOS Architectures | arm64<br/>arm64e<br/>x86-64</br> | armv7<br/>arm64<br/>i386<br/>x86-64</br> |
+| iOS SDK | 12.1 | 9.3 |
+| iOS Architectures | arm64<br/>arm64e<br/>x86-64</br> | armv7<br/>arm64<br/>i386<br/>x86-64</br> |
+| tvOS SDK | 10.2 | 9.2 |
+| tvOS Architectures | arm64<br/>x86-64 | arm64<br/>x86-64 |
 
-### 5. Building
-#### 5.1 Prerequisites
+### 5. Development Builds
+
+Unreleased binaries built from `development` branch can be found under the [development-snapshot](https://www.dropbox.com/sh/frzg32yjzyucmob/AADX81RhiVfk9o7Vo2J8jlH2a) directory. 
+
+Please remember that these builds are provided for testing and development purposes only since they are not % 100 tested and may include minor issues. 
+
+### 6. Building
+
+Build scripts from `master` and `development` branches are tested periodically. See the latest status from the table below.
+
+| branch | status |
+| :---: | :---: |
+|  master | [![Build Status](https://travis-ci.org/tanersener/mobile-ffmpeg.svg?branch=master)](https://travis-ci.org/tanersener/mobile-ffmpeg) |
+|  development | [![Build Status](https://travis-ci.org/tanersener/mobile-ffmpeg.svg?branch=development)](https://travis-ci.org/tanersener/mobile-ffmpeg) |
+
+
+#### 6.1 Prerequisites
 1. Use your package manager (apt, yum, dnf, brew, etc.) to install the following packages.
 
     ```
     autoconf automake libtool pkg-config curl cmake gcc gperf texinfo yasm nasm bison autogen patch git
     ```
 Some of these packages are not mandatory for the default build.
-Please visit [Android Prerequisites](https://github.com/tanersener/mobile-ffmpeg/wiki/Android-Prerequisites) and
-[IOS Prerequisites](https://github.com/tanersener/mobile-ffmpeg/wiki/IOS-Prerequisites) for the details.
+Please visit [Android Prerequisites](https://github.com/tanersener/mobile-ffmpeg/wiki/Android-Prerequisites), 
+[iOS Prerequisites](https://github.com/tanersener/mobile-ffmpeg/wiki/iOS-Prerequisites) and 
+[tvOS Prerequisites](https://github.com/tanersener/mobile-ffmpeg/wiki/tvOS-Prerequisites) for the details.
 
 2. Android builds require these additional packages.
-    - **Android SDK 5.0 Lollipop (API Level 21)** or later
-    - **Android NDK r19** or later with LLDB and CMake
+    - **Android SDK 4.1 Jelly Bean (API Level 16)** or later
+    - **Android NDK r20** or later with LLDB and CMake
 
-3. IOS builds need these extra packages and tools.
-    - **IOS SDK 8.0.x** or later
+3. iOS builds need these extra packages and tools.
     - **Xcode 7.3.1** or later
+    - **iOS SDK 9.3** or later
     - **Command Line Tools**
 
-#### 5.2 Build Scripts
-Use `android.sh` and `ios.sh` to build MobileFFmpeg for each platform.
-After a successful build, compiled FFmpeg and MobileFFmpeg libraries can be found under `prebuilt` directory.
+4. tvOS builds need these extra packages and tools.
+    - **Xcode 7.3.1** or later
+    - **tvOS SDK 9.2** or later
+    - **Command Line Tools**
 
-Both `android.sh` and `ios.sh` can be customized to override default settings,
-[android.sh](https://github.com/tanersener/mobile-ffmpeg/wiki/android.sh) and
-[ios.sh](https://github.com/tanersener/mobile-ffmpeg/wiki/ios.sh) wiki pages include all available build options.
-##### 5.2.1 Android 
+#### 6.2 Build Scripts
+Use `android.sh`, `ios.sh` and `tvos.sh` to build MobileFFmpeg for each platform. 
+
+All three scripts support additional options and 
+can be customized to enable/disable specific external libraries and/or architectures. Please refer to wiki pages of
+[android.sh](https://github.com/tanersener/mobile-ffmpeg/wiki/android.sh), 
+[ios.sh](https://github.com/tanersener/mobile-ffmpeg/wiki/ios.sh) and 
+[tvos.sh](https://github.com/tanersener/mobile-ffmpeg/wiki/tvos.sh) to see all available build options.
+##### 6.2.1 Android 
 ```
+export ANDROID_HOME=<Android SDK Path>
 export ANDROID_NDK_ROOT=<Android NDK Path>
 ./android.sh
 ```
 
 <img src="https://github.com/tanersener/mobile-ffmpeg/blob/master/docs/assets/android_custom.gif" width="600">
 
-##### 5.2.2 IOS
+##### 6.2.2 iOS
 ```
-./ios.sh    
+./ios.sh
 ```
 
 <img src="https://github.com/tanersener/mobile-ffmpeg/blob/master/docs/assets/ios_custom.gif" width="600">
 
-##### 5.2.3 Building LTS Binaries
+##### 6.2.3 tvOS
+```
+./tvos.sh
+```
+
+<img src="https://github.com/tanersener/mobile-ffmpeg/blob/development/docs/assets/tvos_custom.gif" width="600">
+
+
+##### 6.2.4 Building LTS Binaries
 
 Use `--lts` option to build lts binaries for each platform.
 
-#### 5.3 GPL Support
+#### 6.3 Build Output
+
+All libraries created by the top level build scripts (`android.sh`, `ios.sh` and `tvos.sh`) can be found under 
+the `prebuilt` directory.
+
+- `Android` archive (.aar file) is located under the `android-aar` folder
+- `iOS` frameworks are located under the `ios-framework`folder
+- `iOS` universal binaries are located under the `ios-universal`folder
+- `tvOS` frameworks are located under the `tvos-framework`folder
+- `tvOS` universal binaries are located under the `tvos-universal`folder 
+
+#### 6.4 GPL Support
 It is possible to enable GPL licensed libraries `x264`, `xvidcore` since `v1.1` and `vid.stab`, `x265` since `v2.1` 
-from the top level build scripts.
-Their source code is not included in the repository and downloaded when enabled.
+from the top level build scripts. Their source code is not included in the repository and downloaded when enabled.
 
-#### 5.4 External Libraries
-`build` directory includes build scripts for external libraries. There are two scripts for each library, one for Android
-and one for IOS. They include all options/flags used to cross-compile the libraries. `ASM` is enabled by most of them, 
-exceptions are listed under the [ASM Support](https://github.com/tanersener/mobile-ffmpeg/wiki/ASM-Support) page.
+#### 6.5 External Libraries
+`build` directory includes build scripts of all external libraries. Two scripts exist for each external library, 
+one for `Android` and one for `iOS / tvOS`. Each of these two scripts contains options/flags used to cross-compile the 
+library on the specified mobile platform. 
 
-### 6. Documentation
+CPU optimizations (`ASM`) are enabled for most of the external libraries. Details and exceptions can be found under the 
+[ASM Support](https://github.com/tanersener/mobile-ffmpeg/wiki/ASM-Support) wiki page.
+
+### 7. Documentation
 
 A more detailed documentation is available at [Wiki](https://github.com/tanersener/mobile-ffmpeg/wiki).
 
-### 7. License
+### 8. License
 
 This project is licensed under the LGPL v3.0. However, if source code is built using optional `--enable-gpl` flag or 
 prebuilt binaries with `-gpl` postfix are used then MobileFFmpeg is subject to the GPL v3.0 license.
 
 Source code of FFmpeg and external libraries is included in compliance with their individual licenses.
 
+`openh264` source code included in this repository is licensed under the 2-clause BSD License but this license does 
+not cover the `MPEG LA` licensing fees. If you build `mobile-ffmpeg` with `openh264` and distribute that library, then 
+you are subject to pay `MPEG LA` licensing fees. Refer to [OpenH264 FAQ](https://www.openh264.org/faq.html) page for 
+the details. Please note that `mobile-ffmpeg` does not publish a binary with `openh264` inside.
+
 `strip-frameworks.sh` script included and distributed (until v4.x) is published under the [Apache License version 2.0](https://www.apache.org/licenses/LICENSE-2.0).
 
-In test applications, fonts embedded are licensed under the [SIL Open Font License](https://opensource.org/licenses/OFL-1.1); other digital assets are published in the public domain.
+In test applications; embedded fonts are licensed under the [SIL Open Font License](https://opensource.org/licenses/OFL-1.1), other digital assets are published in the public domain.
 
 Please visit [License](https://github.com/tanersener/mobile-ffmpeg/wiki/License) page for the details.
 
-### 8. Contributing
+### 9. Contributing
 
 If you have any recommendations or ideas to improve it, please feel free to submit issues or pull requests. Any help is appreciated.
 
-### 9. See Also
+### 10. See Also
 
 - [libav gas-preprocessor](https://github.com/libav/gas-preprocessor/raw/master/gas-preprocessor.pl)
 - [FFmpeg API Documentation](https://ffmpeg.org/doxygen/4.0/index.html)

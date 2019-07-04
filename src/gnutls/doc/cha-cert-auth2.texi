@@ -312,26 +312,52 @@ To avoid applications contacting the OCSP server directly, TLS servers
 can provide a "stapled" OCSP response in the TLS handshake. That way
 the client application needs to do nothing more. GnuTLS will automatically
 consider the stapled OCSP response during the TLS certificate verification
-(see @funcref{gnutls_certificate_verify_peers2}).
-The stapled response can be obtained using @funcref{gnutls_ocsp_status_request_get}.
+(see @funcref{gnutls_certificate_verify_peers2}). To disable the automatic
+OCSP verification the flag @code{GNUTLS_VERIFY_DISABLE_CRL_CHECKS} should be
+specified to @funcref{gnutls_certificate_set_verify_flags}.
 
-In addition, since GnuTLS 3.5.1 the client will consider the @xcite{RFC7633} OCSP-Must-staple
-certificate extension, and will consider it while checking for stapled OCSP responses. If the
-extension is present and no OCSP staple is found the certificate verification will fail
-and the status code @code{GNUTLS_CERT_MISSING_OCSP_STATUS} will returned from the verification
-function.
+Since GnuTLS 3.5.1 the client certificate verification will consider the @xcite{RFC7633}
+OCSP-Must-staple certificate extension, and will consider it while checking for stapled
+OCSP responses. If the extension is present and no OCSP staple is found, the certificate
+verification will fail and the status code @code{GNUTLS_CERT_MISSING_OCSP_STATUS} will
+returned from the verification function.
 
-GnuTLS servers can provide this response to their clients using the following functions.
+Under TLS 1.2 only one stapled response can be sent by a server, the OCSP
+response associated with the end-certificate. Under TLS 1.3 a server can
+send multiple OCSP responses, typically one for each certificate in the
+certificate chain. The following functions can be used by a client
+application to retrieve the OCSP responses as sent by the server.
 
-@showfuncC{gnutls_certificate_set_ocsp_status_request_function,gnutls_certificate_set_ocsp_status_request_file,gnutls_ocsp_status_request_is_checked}
+@showfuncB{gnutls_ocsp_status_request_get,gnutls_ocsp_status_request_get2}
 
-The simplest approach is for a server to provide the OCSP server's response using the @funcref{gnutls_certificate_set_ocsp_status_request_file}.
-The response may be updated periodically using the following command (see also @ref{ocsptool Invocation}).
+GnuTLS servers can provide OCSP responses to their clients using the following functions.
+
+@showfuncC{gnutls_certificate_set_retrieve_function3,gnutls_certificate_set_ocsp_status_request_file2,gnutls_ocsp_status_request_is_checked}
+
+A server is expected to provide the relevant certificate's OCSP responses using
+@funcref{gnutls_certificate_set_ocsp_status_request_file2}, and ensure a
+periodic reload/renew of the credentials. An estimation of the OCSP responses
+expiration can be obtained using the @funcref{gnutls_certificate_get_ocsp_expiration} function.
+
+@showfuncdesc{gnutls_certificate_get_ocsp_expiration}
+
+Prior to GnuTLS 3.6.4, the functions
+@funcref{gnutls_certificate_set_ocsp_status_request_function2}
+@funcref{gnutls_certificate_set_ocsp_status_request_file} were provided
+to set OCSP responses. These functions are still functional, but cannot be used
+to set multiple OCSP responses as allowed by TLS1.3.
+
+The responses can be updated periodically using the 'ocsptool' command
+(see also @ref{ocsptool Invocation}).
 
 @example
 ocsptool --ask --load-cert server_cert.pem --load-issuer the_issuer.pem
-         --load-signer the_issuer.pem --outfile ocsp.response
+         --load-signer the_issuer.pem --outfile ocsp.resp
 @end example
+
+In order to allow multiple OCSP responses to be concatenated, GnuTLS
+supports PEM-encoded OCSP responses. These can be generated using
+'ocsptool' with the '--no-outder' parameter.
 
 
 @node Managing encrypted keys

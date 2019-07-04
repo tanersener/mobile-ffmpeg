@@ -1,0 +1,22 @@
+
+
+
+
+@deftypefun {ssize_t} {gnutls_record_set_max_recv_size} (gnutls_session_t @var{session}, size_t @var{size})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{size}: is the new size
+
+This function sets the maximum amount of plaintext received in a
+record in this connection.
+
+The limit is also negotiated through a TLS extension called 'record
+size limit'.  Note that while the 'record size limit' extension is
+preferred, not all TLS implementations use or even understand the
+extension.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned,
+otherwise a negative error code is returned.
+
+@strong{Since:} 3.6.8
+@end deftypefun

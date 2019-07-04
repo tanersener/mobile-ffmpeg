@@ -11,9 +11,11 @@
 
 @var{flags}: one of @code{gnutls_pin_flag_t} .
 
-This function will modify or set a user's PIN for the given token. 
-If it is called to set a user pin for first time the oldpin must
-be NULL.
+This function will modify or set a user or administrator's PIN for
+the given token.  If it is called to set a PIN for first time
+the oldpin must be @code{NULL} . When setting the admin's PIN with the
+@code{GNUTLS_PIN_SO}  flag, the  @code{oldpin} value must be provided (this requirement
+is relaxed after GnuTLS 3.6.5 since which the PIN will be requested if missing).
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.

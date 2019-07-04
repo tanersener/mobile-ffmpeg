@@ -9,21 +9,23 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.3.2'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.1'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
     }
 }
 
 android {
     compileSdkVersion Integer.parseInt(releaseTargetSdk)
+
     defaultConfig {
         minSdkVersion Integer.parseInt(releaseMinSdk)
         targetSdkVersion Integer.parseInt(releaseTargetSdk)
         versionCode Integer.parseInt(releaseVersionCode)
         versionName releaseVersionName
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         project.archivesBaseName = releaseProject
+        consumerProguardFiles 'proguard-rules.pro'
     }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -37,11 +39,13 @@ android {
         }
     }
 
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+
     libraryVariants.all { variant ->
-        variant.outputs.all { output ->
-            if (outputFile != null && outputFileName.endsWith('.aar')) {
-                outputFileName = "${archivesBaseName}-${android.defaultConfig.versionName}.aar"
-            }
+        variant.outputs.all {
+            outputFileName = "${archivesBaseName}-${android.defaultConfig.versionName}.aar"
         }
     }
 }
@@ -158,18 +162,10 @@ artifacts {
     archives sourcesJar
 }
 
-afterEvaluate {
-    javadoc.classpath += files(android.libraryVariants.collect { variant ->
-        variant.javaCompile.classpath.files
-    })
-}
-
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:28.0.0'
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 }
 
 allprojects {

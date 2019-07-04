@@ -3,7 +3,7 @@
 
 
 @deftypefun {int} {gnutls_system_recv_timeout} (gnutls_transport_ptr_t @var{ptr}, unsigned int @var{ms})
-@var{ptr}: A gnutls_transport_ptr_t pointer
+@var{ptr}: A file descriptor (wrapped in a gnutls_transport_ptr_t pointer)
 
 @var{ms}: The number of milliseconds to wait.
 

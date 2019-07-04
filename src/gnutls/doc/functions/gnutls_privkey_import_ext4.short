@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_privkey_import_ext4} (gnutls_privkey_t @var{pkey}, void * @var{userdata}, gnutls_privkey_sign_data_func @var{sign_data_fn}, gnutls_privkey_sign_hash_func @var{sign_hash_fn}, gnutls_privkey_decrypt_func @var{decrypt_fn}, gnutls_privkey_deinit_func @var{deinit_fn}, gnutls_privkey_info_func @var{info_fn}, unsigned int @var{flags})

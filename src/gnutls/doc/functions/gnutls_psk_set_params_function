@@ -10,4 +10,8 @@
 This function will set a callback in order for the server to get
 the Diffie-Hellman or RSA parameters for PSK authentication.  The
 callback should return @code{GNUTLS_E_SUCCESS}  (0) on success.
+
+@strong{Deprecated:} This function is unnecessary and discouraged on GnuTLS 3.6.0
+or later. Since 3.6.0, DH parameters are negotiated
+following RFC7919.
 @end deftypefun

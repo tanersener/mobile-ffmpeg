@@ -47,7 +47,7 @@ int main()
 
 # ifndef MSG_NOSIGNAL
 
-int main()
+int main(void)
 {
 	exit(77);
 }

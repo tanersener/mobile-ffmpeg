@@ -22,10 +22,10 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 srcdir="${srcdir:-.}"
-CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
-OCSPTOOL="${OCSPTOOL:-../../src/ocsptool${EXEEXT}}"
-GNUTLS_SERV="${GNUTLS_SERV:-../../src/gnutls-serv${EXEEXT}}"
-GNUTLS_CLI="${GNUTLS_CLI:-../../src/gnutls-cli${EXEEXT}}"
+CERTTOOL="${CERTTOOL:-../src/certtool${EXEEXT}}"
+OCSPTOOL="${OCSPTOOL:-../src/ocsptool${EXEEXT}}"
+GNUTLS_SERV="${GNUTLS_SERV:-../src/gnutls-serv${EXEEXT}}"
+GNUTLS_CLI="${GNUTLS_CLI:-../src/gnutls-cli${EXEEXT}}"
 DIFF="${DIFF:-diff}"
 TEMPLATE_FILE="out.$$.tmpl.tmp"
 SERVER_CERT_FILE="cert.$$.pem.tmp"
@@ -52,7 +52,7 @@ fi
 
 export TZ="UTC"
 
-. "${srcdir}/../scripts/common.sh"
+. "${srcdir}/scripts/common.sh"
 
 eval "${GETPORT}"
 # Port for gnutls-serv
@@ -98,14 +98,15 @@ trap stop_servers 1 15 2 EXIT
 echo "=== Generating good server certificate ==="
 
 rm -f "$TEMPLATE_FILE"
-cp "${srcdir}/certs/server_good.template" "$TEMPLATE_FILE"
+cp "${srcdir}/ocsp-tests/certs/server_good.template" "$TEMPLATE_FILE"
+chmod u+w "$TEMPLATE_FILE"
 echo "ocsp_uri=http://localhost:${OCSP_PORT}/ocsp/" >>"$TEMPLATE_FILE"
 
 # Generate certificates with the random port
 datefudge -s "${CERTDATE}" ${CERTTOOL} \
-	--generate-certificate --load-ca-privkey "${srcdir}/certs/ca.key" \
-	--load-ca-certificate "${srcdir}/certs/ca.pem" \
-	--load-privkey "${srcdir}/certs/server_good.key" \
+	--generate-certificate --load-ca-privkey "${srcdir}/ocsp-tests/certs/ca.key" \
+	--load-ca-certificate "${srcdir}/ocsp-tests/certs/ca.pem" \
+	--load-privkey "${srcdir}/ocsp-tests/certs/server_good.key" \
 	--template "${TEMPLATE_FILE}" --outfile "${SERVER_CERT_FILE}" 2>/dev/null
 
 echo "=== Bringing OCSP server up ==="
@@ -118,11 +119,11 @@ echo "=== Bringing OCSP server up ==="
 PORT=${OCSP_PORT}
 launch_bare_server $$ \
 	  datefudge "${TESTDATE}" \
-	  "${OPENSSL}" ocsp -index "${srcdir}/certs/ocsp_index.txt" -text \
+	  "${OPENSSL}" ocsp -index "${srcdir}/ocsp-tests/certs/ocsp_index.txt" -text \
 	  -port "${OCSP_PORT}" \
-	  -rsigner "${srcdir}/certs/ocsp-server.pem" \
-	  -rkey "${srcdir}/certs/ocsp-server.key" \
-	  -CA "${srcdir}/certs/ca.pem"
+	  -rsigner "${srcdir}/ocsp-tests/certs/ocsp-server.pem" \
+	  -rkey "${srcdir}/ocsp-tests/certs/ocsp-server.key" \
+	  -CA "${srcdir}/ocsp-tests/certs/ca.pem"
 OCSP_PID="${!}"
 wait_server "${OCSP_PID}"
 
@@ -136,7 +137,7 @@ while test "${t}" -lt "${SERVER_START_TIMEOUT}"; do
     datefudge "${TESTDATE}" \
 	      ${VALGRIND} "${OCSPTOOL}" --ask \
 	      --load-cert "${SERVER_CERT_FILE}" \
-	      --load-issuer "${srcdir}/certs/ca.pem"
+	      --load-issuer "${srcdir}/ocsp-tests/certs/ca.pem"
     rc=$?
     if test "${rc}" = "0"; then
 	break
@@ -157,7 +158,7 @@ PORT=${TLS_SERVER_PORT}
 launch_bare_server $$ \
 	  datefudge "${TESTDATE}" \
 	  "${GNUTLS_SERV}" --echo --disable-client-cert \
-	  --x509keyfile="${srcdir}/certs/server_good.key" \
+	  --x509keyfile="${srcdir}/ocsp-tests/certs/server_good.key" \
 	  --x509certfile="${SERVER_CERT_FILE}" \
 	  --port="${TLS_SERVER_PORT}"
 TLS_SERVER_PID="${!}"
@@ -167,7 +168,7 @@ wait_for_port "${TLS_SERVER_PORT}"
 
 echo "test 123456" | \
     datefudge -s "${TESTDATE}" \
-	      "${GNUTLS_CLI}" --ocsp --x509cafile="${srcdir}/certs/ca.pem" \
+	      "${GNUTLS_CLI}" --ocsp --x509cafile="${srcdir}/ocsp-tests/certs/ca.pem" \
 	      --port="${TLS_SERVER_PORT}" localhost
 rc=$?
 
@@ -184,14 +185,14 @@ echo "=== Generating bad server certificate ==="
 
 rm -f "${SERVER_CERT_FILE}"
 rm -f "${TEMPLATE_FILE}"
-cp "${srcdir}/certs/server_bad.template" "$TEMPLATE_FILE"
+cp "${srcdir}/ocsp-tests/certs/server_bad.template" "$TEMPLATE_FILE"
 echo "ocsp_uri=http://localhost:${OCSP_PORT}/ocsp/" >>"$TEMPLATE_FILE"
 
 # Generate certificates with the random port
 datefudge -s "${CERTDATE}" ${CERTTOOL} \
-	--generate-certificate --load-ca-privkey "${srcdir}/certs/ca.key" \
-	--load-ca-certificate "${srcdir}/certs/ca.pem" \
-	--load-privkey "${srcdir}/certs/server_bad.key" \
+	--generate-certificate --load-ca-privkey "${srcdir}/ocsp-tests/certs/ca.key" \
+	--load-ca-certificate "${srcdir}/ocsp-tests/certs/ca.pem" \
+	--load-privkey "${srcdir}/ocsp-tests/certs/server_bad.key" \
 	--template "${TEMPLATE_FILE}" --outfile "${SERVER_CERT_FILE}"
 
 echo "=== Test 2: Server with revoked certificate ==="
@@ -202,7 +203,7 @@ TLS_SERVER_PORT=$PORT
 launch_bare_server $$ \
 	  datefudge "${TESTDATE}" \
 	  "${GNUTLS_SERV}" --echo --disable-client-cert \
-	  --x509keyfile="${srcdir}/certs/server_bad.key" \
+	  --x509keyfile="${srcdir}/ocsp-tests/certs/server_bad.key" \
 	  --x509certfile="${SERVER_CERT_FILE}" \
 	  --port="${TLS_SERVER_PORT}"
 TLS_SERVER_PID="${!}"
@@ -211,7 +212,7 @@ wait_for_port "${TLS_SERVER_PORT}"
 
 echo "test 123456" | \
     datefudge -s "${TESTDATE}" \
-	      "${GNUTLS_CLI}" --ocsp --x509cafile="${srcdir}/certs/ca.pem" \
+	      "${GNUTLS_CLI}" --ocsp --x509cafile="${srcdir}/ocsp-tests/certs/ca.pem" \
 	      --port="${TLS_SERVER_PORT}" localhost
 rc=$?
 

@@ -7,15 +7,31 @@
 
 @var{data}: is a pointer to a datum that will hold the session.
 
-Returns all session parameters needed to be stored to support resumption.
-The client should call this, and store the returned session data. A session
-may be resumed later by calling @code{gnutls_session_set_data()} .  
+Returns necessary parameters to support resumption. The client
+should call this function and store the returned session data. A session
+can be resumed later by calling @code{gnutls_session_set_data()}  with the returned
+data. Note that under TLS 1.3, it is recommended for clients to use
+session parameters only once, to prevent passive-observers from correlating
+the different connections.
 
 The returned  @code{data} are allocated and must be released using @code{gnutls_free()} .
 
 This function will fail if called prior to handshake completion. In
 case of false start TLS, the handshake completes only after data have
 been successfully received from the peer.
+
+Under TLS1.3 session resumption is possible only after a session ticket
+is received by the client. To ensure that such a ticket has been received use
+@code{gnutls_session_get_flags()}  and check for flag @code{GNUTLS_SFLAGS_SESSION_TICKET} ;
+if this flag is not set, this function will wait for a new ticket within
+an estimated rountrip, and if not received will return dummy data which
+cannot lead to resumption.
+
+To get notified when new tickets are received by the server
+use @code{gnutls_handshake_set_hook_function()}  to wait for @code{GNUTLS_HANDSHAKE_NEW_SESSION_TICKET} 
+messages. Each call of @code{gnutls_session_get_data2()}  after a ticket is
+received, will return session resumption data corresponding to the last
+received ticket.
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise
 an error code is returned.

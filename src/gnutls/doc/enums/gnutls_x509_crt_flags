@@ -1,0 +1,9 @@
+
+
+@c gnutls_x509_crt_flags
+@table @code
+@item GNUTLS_@-X509_@-CRT_@-FLAG_@-IGNORE_@-SANITY
+Ignore any sanity checks at the
+import of the certificate; i.e., ignore checks such as version/field
+matching and strict time field checks. Intended to be used for debugging.
+@end table

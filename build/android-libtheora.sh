@@ -43,6 +43,12 @@ if [[ ${RECONF_libtheora} -eq 1 ]]; then
     autoreconf_library ${LIB_NAME}
 fi
 
+if [[ -z ${MOBILE_FFMPEG_LTS_BUILD} ]]; then
+    ASM_FLAGS="--enable-asm"
+else
+    ASM_FLAGS="--disable-asm"
+fi
+
 ./configure \
     --prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/${LIB_NAME} \
     --with-pic \
@@ -52,14 +58,15 @@ fi
     --disable-examples \
     --disable-telemetry \
     --disable-sdltest \
+    ${ASM_FLAGS} \
     --disable-valgrind-testing \
     --host=${TARGET_HOST} || exit 1
 
 make -j$(get_cpu_count) || exit 1
 
 # MANUALLY COPY PKG-CONFIG FILES
-cp theoradec.pc ${INSTALL_PKG_CONFIG_DIR}
-cp theoraenc.pc ${INSTALL_PKG_CONFIG_DIR}
-cp theora.pc ${INSTALL_PKG_CONFIG_DIR}
+cp theoradec.pc ${INSTALL_PKG_CONFIG_DIR} || exit 1
+cp theoraenc.pc ${INSTALL_PKG_CONFIG_DIR} || exit 1
+cp theora.pc ${INSTALL_PKG_CONFIG_DIR} || exit 1
 
 make install || exit 1

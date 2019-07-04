@@ -19,7 +19,7 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-SUBDIRS = openpgp srp x509
+SUBDIRS = srp x509
 
 EXTRA_DIST = gnutls-http-serv 
 
@@ -30,7 +30,4 @@ EXTRA_DIST += params.pem
 EXTRA_DIST += srp-passwd.txt  srp-tpasswd.conf
 
 EXTRA_DIST += psk-passwd.txt
-
-EXTRA_DIST += openpgp-server.bin openpgp-server-key.bin	\
-	openpgp-server-key.txt openpgp-server.txt
 

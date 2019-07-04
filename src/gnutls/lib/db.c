@@ -16,7 +16,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -30,6 +30,7 @@
 #include <session_pack.h>
 #include <datum.h>
 #include "ext/server_name.h"
+#include <intprops.h>
 
 /**
  * gnutls_db_set_retrieve_function:
@@ -122,12 +123,18 @@ void *gnutls_db_get_ptr(gnutls_session_t session)
  * @session: is a #gnutls_session_t type.
  * @seconds: is the number of seconds.
  *
- * Set the expiration time for resumed sessions. The default is 3600
- * (one hour) at the time of this writing.
+ * Set the expiration time for resumed sessions. The default is 21600
+ * (size hours) at the time of writing.
+ *
+ * The maximum value that can be set using this function is 604800
+ * (7 days).
+ *
  **/
 void gnutls_db_set_cache_expiration(gnutls_session_t session, int seconds)
 {
 	session->internals.expire_time = seconds;
+	if (session->internals.expire_time > 604800)
+		session->internals.expire_time = 604800;
 }
 
 /**
@@ -149,6 +156,8 @@ unsigned gnutls_db_get_default_cache_expiration(void)
  *
  * Returns: Returns %GNUTLS_E_EXPIRED, if the database entry has
  *   expired or 0 otherwise.
+ *
+ * Deprecated: This function is deprecated.
  **/
 int
 gnutls_db_check_entry(gnutls_session_t session,
@@ -160,7 +169,6 @@ gnutls_db_check_entry(gnutls_session_t session,
 /**
  * gnutls_db_check_entry_time:
  * @entry: is a pointer to a #gnutls_datum_t type.
- * @t: is the time of the session handshake
  *
  * This function returns the time that this entry was active.
  * It can be used for database entry expiration.
@@ -183,6 +191,40 @@ time_t gnutls_db_check_entry_time(gnutls_datum_t * entry)
 	t = _gnutls_read_uint32(&entry->data[4]);
 
 	return t;
+}
+
+/**
+ * gnutls_db_check_entry_expire_time:
+ * @entry: is a pointer to a #gnutls_datum_t type.
+ *
+ * This function returns the time that this entry will expire.
+ * It can be used for database entry expiration.
+ *
+ * Returns: The time this entry will expire, or zero on error.
+ *
+ * Since: 3.6.5
+ **/
+time_t gnutls_db_check_entry_expire_time(gnutls_datum_t *entry)
+{
+	uint32_t t;
+	uint32_t e;
+	uint32_t magic;
+
+	if (entry->size < 12)
+		return gnutls_assert_val(0);
+
+	magic = _gnutls_read_uint32(entry->data);
+
+	if (magic != PACKED_SESSION_MAGIC)
+		return gnutls_assert_val(0);
+
+	t = _gnutls_read_uint32(&entry->data[4]);
+	e = _gnutls_read_uint32(&entry->data[8]);
+
+	if (INT_ADD_OVERFLOW(t, e))
+		return gnutls_assert_val(0);
+
+	return t + e;
 }
 
 /* Checks if both db_store and db_retrieve functions have
@@ -254,12 +296,28 @@ int _gnutls_server_register_current_session(gnutls_session_t session)
 
 int _gnutls_check_resumed_params(gnutls_session_t session)
 {
-	if (session->internals.resumed_security_parameters.ext_master_secret != 
-	    session->security_parameters.ext_master_secret)
-	    return gnutls_assert_val(GNUTLS_E_INVALID_SESSION);
+	time_t timestamp = gnutls_time(0);
+	const version_entry_st *vers;
 
-	if (!_gnutls_server_name_matches_resumed(session))
-	    return gnutls_assert_val(GNUTLS_E_INVALID_SESSION);
+	/* check whether the session is expired */
+	if (timestamp -
+	    session->internals.resumed_security_parameters.timestamp >
+	    session->internals.expire_time
+	    || session->internals.resumed_security_parameters.timestamp >
+	    timestamp)
+		return gnutls_assert_val(GNUTLS_E_EXPIRED);
+
+	/* check various parameters applicable to resumption in TLS1.2 or earlier
+	 */
+	vers = get_version(session);
+	if (!vers || !vers->tls13_sem) {
+		if (session->internals.resumed_security_parameters.ext_master_secret !=
+		    session->security_parameters.ext_master_secret)
+			return gnutls_assert_val(GNUTLS_E_INVALID_SESSION);
+
+		if (!_gnutls_server_name_matches_resumed(session))
+			return gnutls_assert_val(GNUTLS_E_INVALID_SESSION);
+	}
 
 	return 0;
 }
@@ -305,7 +363,6 @@ _gnutls_server_restore_session(gnutls_session_t session,
 		return GNUTLS_E_INVALID_SESSION;
 	}
 
-	/* expiration check is performed inside */
 	ret = gnutls_session_set_data(session, data.data, data.size);
 	gnutls_free(data.data);
 
@@ -314,6 +371,7 @@ _gnutls_server_restore_session(gnutls_session_t session,
 		return ret;
 	}
 
+	/* expiration check is performed inside */
 	ret = _gnutls_check_resumed_params(session);
 	if (ret < 0)
 		return gnutls_assert_val(ret);

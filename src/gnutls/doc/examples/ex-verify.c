@@ -55,6 +55,7 @@ verify_certificate_chain(const char *hostname,
                                               GNUTLS_TL_VERIFY_CRL, 0));
 
         cert = malloc(sizeof(*cert) * cert_chain_length);
+        assert(cert != NULL);
 
         /* Import all the certificates in the chain to
          * native certificate format.

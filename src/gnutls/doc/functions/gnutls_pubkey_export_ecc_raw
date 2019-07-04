@@ -7,13 +7,16 @@
 
 @var{curve}: will hold the curve (may be @code{NULL} )
 
-@var{x}: will hold x (may be @code{NULL} )
+@var{x}: will hold x-coordinate (may be @code{NULL} )
 
-@var{y}: will hold y (may be @code{NULL} )
+@var{y}: will hold y-coordinate (may be @code{NULL} )
 
 This function will export the ECC public key's parameters found in
 the given key.  The new parameters will be allocated using
 @code{gnutls_malloc()}  and will be stored in the appropriate datum.
+
+In EdDSA curves the  @code{y} parameter will be @code{NULL}  and the other parameters
+will be in the native format for the curve.
 
 This function allows for @code{NULL}  parameters since 3.4.1.
 

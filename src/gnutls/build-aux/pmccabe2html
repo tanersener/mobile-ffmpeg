@@ -1,6 +1,6 @@
 # pmccabe2html - AWK script to convert pmccabe output to html       -*- awk -*-
 
-# Copyright (C) 2007-2016 Free Software Foundation, Inc.
+# Copyright (C) 2007-2019 Free Software Foundation, Inc.
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 # Written by Jose E. Marchesi <jemarch@gnu.org>.
 # Adapted for gnulib by Simon Josefsson <simon@josefsson.org>.
@@ -28,8 +28,8 @@
 # 		| sort -nr \
 # 		| $(AWK) -f ${top_srcdir}/build-aux/pmccabe2html \
 # 			-v lang=html -v name="$(PACKAGE_NAME)" \
-# 			-v vcurl="http://git.savannah.gnu.org/gitweb/?p=$(PACKAGE).git;a=blob;f=%FILENAME%;hb=HEAD" \
-# 			-v url="http://www.gnu.org/software/$(PACKAGE)/" \
+# 			-v vcurl="https://git.savannah.gnu.org/gitweb/?p=$(PACKAGE).git;a=blob;f=%FILENAME%;hb=HEAD" \
+# 			-v url="https://www.gnu.org/software/$(PACKAGE)/" \
 # 			-v css=${top_srcdir}/build-aux/pmccabe.css \
 # 			-v cut_dir=${top_srcdir}/ \
 # 			> $@-tmp

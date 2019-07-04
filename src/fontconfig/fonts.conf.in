@@ -69,6 +69,17 @@
 			<string>sans-serif</string>
 		</edit>
 	</match>
+<!--
+  Accept alternate 'system ui' spelling, replacing it with 'system-ui'
+-->
+	<match target="pattern">
+		<test qual="any" name="family">
+			<string>system ui</string>
+		</test>
+		<edit name="family" mode="assign" binding="same">
+			<string>system-ui</string>
+		</edit>
+	</match>
 
 <!--
   Load local system customization file

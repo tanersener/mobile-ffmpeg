@@ -30,6 +30,7 @@
 #include <errno.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/dtls.h>
+#include <assert.h>
 #include "utils.h"
 
 #define SERVER_PUSH_ADD if (len > 512 + 5+8+32) fail("max record set to 512, len: %d\n", (int)len);
@@ -47,7 +48,8 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "%s|<%d>| %s", side, level, str);
 }
 
-void doit(void)
+static
+void run(const char *prio)
 {
 	global_init();
 
@@ -77,9 +79,9 @@ void doit(void)
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
 				serverx509cred);
 
-	gnutls_priority_set_direct(server,
-				   "NORMAL",
-				   NULL);
+	assert(gnutls_priority_set_direct(server,
+					  prio,
+					  NULL)>=0);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_pull_timeout_function(server,
@@ -105,7 +107,7 @@ void doit(void)
 	if (ret < 0)
 		exit(1);
 
-	ret = gnutls_priority_set_direct(client, "NORMAL", NULL);
+	ret = gnutls_priority_set_direct(client, prio, NULL);
 	if (ret < 0)
 		exit(1);
 
@@ -143,4 +145,9 @@ void doit(void)
 	gnutls_certificate_free_credentials(clientx509cred);
 
 	gnutls_global_deinit();
+}
+
+void doit(void)
+{
+	run("NORMAL:-VERS-ALL:+VERS-DTLS1.2");
 }

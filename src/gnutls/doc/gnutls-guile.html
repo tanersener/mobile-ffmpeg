@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<!-- This manual is last updated 28 March 2017 for version
-3.5.19 of GnuTLS.
+<!-- This manual is last updated 15 March 2019 for version
+3.6.8 of GnuTLS.
 
 Copyright (C) 2001-2012, 2014, 2016 Free Software Foundation, Inc.
 
@@ -14,10 +14,10 @@ Documentation License". -->
 <!-- Created by GNU Texinfo 6.5, http://www.gnu.org/software/texinfo/ -->
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<title>GnuTLS-Guile 3.5.19</title>
+<title>GnuTLS-Guile 3.6.8</title>
 
-<meta name="description" content="GnuTLS-Guile 3.5.19">
-<meta name="keywords" content="GnuTLS-Guile 3.5.19">
+<meta name="description" content="GnuTLS-Guile 3.6.8">
+<meta name="keywords" content="GnuTLS-Guile 3.6.8">
 <meta name="resource-type" content="document">
 <meta name="distribution" content="global">
 <meta name="Generator" content="makeinfo">
@@ -152,7 +152,7 @@ dl {
 </head>
 
 <body lang="en">
-<h1 class="settitle" align="center">GnuTLS-Guile 3.5.19</h1>
+<h1 class="settitle" align="center">GnuTLS-Guile 3.6.8</h1>
 
 
 
@@ -196,8 +196,8 @@ Next: <a href="#Preface" accesskey="n" rel="next">Preface</a>, Up: <a href="dir.
 <a name="GnuTLS_002dGuile"></a>
 <h1 class="top">GnuTLS-Guile</h1>
 
-<p>This manual is last updated 28 March 2017 for version
-3.5.19 of GnuTLS.
+<p>This manual is last updated 15 March 2019 for version
+3.6.8 of GnuTLS.
 </p>
 <p>Copyright &copy; 2001-2012, 2014, 2016 Free Software Foundation, Inc.
 </p>
@@ -241,8 +241,8 @@ Next: <a href="#Guile-Preparations" accesskey="n" rel="next">Guile Preparations<
 <a name="Preface-1"></a>
 <h2 class="chapter">1 Preface</h2>
 
-<p>This manual describes the <a href="http://www.gnu.org/software/guile/">GNU Guile</a> Scheme programming interface to GnuTLS, which is distributed
-as part of <a href="http://gnutls.org">GnuTLS</a>.  The reader is
+<p>This manual describes the <a href="https://www.gnu.org/software/guile/">GNU Guile</a> Scheme programming interface to GnuTLS, which is distributed
+as part of <a href="https://gnutls.org">GnuTLS</a>.  The reader is
 assumed to have basic knowledge of the protocol and library.  Details
 missing from this chapter may be found in Function reference,
 of the C API reference.
@@ -340,7 +340,7 @@ print the version number of the loaded library as follows:
 <pre class="example">$ guile
 scheme@(guile-user)&gt; (use-modules (gnutls))
 scheme@(guile-user)&gt; (gnutls-version)
-&quot;3.5.19&quot;
+&quot;3.6.8&quot;
 scheme@(guile-user)&gt;
 </pre></div>
 
@@ -895,7 +895,7 @@ GNU Guile Reference Manual</cite>).
 
 <dl>
 <dt><a name="index-x509_002dcertificate_002dmatches_002dhostname_003f"></a>Scheme Procedure: <strong>x509-certificate-matches-hostname?</strong> <em>cert hostname</em></dt>
-<dd><p>Return true if <var>cert</var> matches <var>hostname</var>, a string denoting a DNS host name.  This is the basic implementation of <a href="http://tools.ietf.org/html/rfc2818">RFC 2818</a> (aka. HTTPS).
+<dd><p>Return true if <var>cert</var> matches <var>hostname</var>, a string denoting a DNS host name.  This is the basic implementation of <a href="https://tools.ietf.org/html/rfc2818">RFC 2818</a> (aka. HTTPS).
 </p></dd></dl>
 
 <dl>
@@ -915,7 +915,7 @@ GNU Guile Reference Manual</cite>).
 
 <dl>
 <dt><a name="index-x509_002dcertificate_002ddn"></a>Scheme Procedure: <strong>x509-certificate-dn</strong> <em>cert</em></dt>
-<dd><p>Return the distinguished name (DN) of X.509 certificate <var>cert</var>.  The form of the DN is as described in <a href="http://tools.ietf.org/html/rfc2253">RFC 2253</a>.
+<dd><p>Return the distinguished name (DN) of X.509 certificate <var>cert</var>.  The form of the DN is as described in <a href="https://tools.ietf.org/html/rfc2253">RFC 2253</a>.
 </p></dd></dl>
 
 <dl>
@@ -1418,7 +1418,7 @@ Next: <a href="#Procedure-Index" accesskey="n" rel="next">Procedure Index</a>, P
 
 <div class="display">
 <pre class="display">Copyright &copy; 2000, 2001, 2002, 2007, 2008 Free Software Foundation, Inc.
-<a href="http://fsf.org/">http://fsf.org/</a>
+<a href="https://fsf.org/">https://fsf.org/</a>
 
 Everyone is permitted to copy and distribute verbatim copies
 of this license document, but changing it is not allowed.
@@ -1800,7 +1800,7 @@ not give you any rights to use it.
 of the GNU Free Documentation License from time to time.  Such new
 versions will be similar in spirit to the present version, but may
 differ in detail to address new problems or concerns.  See
-<a href="http://www.gnu.org/copyleft/">http://www.gnu.org/copyleft/</a>.
+<a href="https://www.gnu.org/licenses/">https://www.gnu.org/licenses/</a>.
 </p>
 <p>Each version of the License is given a distinguishing version number.
 If the Document specifies that a particular numbered version of this
@@ -1853,8 +1853,8 @@ provided the MMC is eligible for relicensing.
 the License in the document and put the following copyright and
 license notices just after the title page:
 </p>
-<div class="example">
-<pre class="example">  Copyright (C)  <var>year</var>  <var>your name</var>.
+<div class="smallexample">
+<pre class="smallexample">  Copyright (C)  <var>year</var>  <var>your name</var>.
   Permission is granted to copy, distribute and/or modify this document
   under the terms of the GNU Free Documentation License, Version 1.3
   or any later version published by the Free Software Foundation;
@@ -1866,8 +1866,8 @@ license notices just after the title page:
 <p>If you have Invariant Sections, Front-Cover Texts and Back-Cover Texts,
 replace the &ldquo;with&hellip;Texts.&rdquo; line with this:
 </p>
-<div class="example">
-<pre class="example">    with the Invariant Sections being <var>list their titles</var>, with
+<div class="smallexample">
+<pre class="smallexample">    with the Invariant Sections being <var>list their titles</var>, with
     the Front-Cover Texts being <var>list</var>, and with the Back-Cover Texts
     being <var>list</var>.
 </pre></div>
@@ -1881,7 +1881,6 @@ recommend releasing these examples in parallel under your choice of
 free software license, such as the GNU General Public License,
 to permit their use in free software.
 </p>
-
 
 
 <hr>

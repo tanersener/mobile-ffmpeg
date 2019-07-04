@@ -41,7 +41,7 @@ import com.arthenica.mobileffmpeg.LogMessage;
 import com.arthenica.mobileffmpeg.Statistics;
 import com.arthenica.mobileffmpeg.StatisticsCallback;
 import com.arthenica.mobileffmpeg.util.AsyncCatImageTask;
-import com.arthenica.mobileffmpeg.util.RunCallback;
+import com.arthenica.mobileffmpeg.util.ExecuteCallback;
 
 import java.io.File;
 import java.io.IOException;
@@ -167,10 +167,10 @@ public class PipeTabFragment extends Fragment {
 
             Log.d(TAG, String.format("FFmpeg process started with arguments\n'%s'", ffmpegCommand));
 
-            MainActivity.executeAsync(new RunCallback() {
+            MainActivity.executeAsync(new ExecuteCallback() {
 
                 @Override
-                public void apply(final int returnCode) {
+                public void apply(final int returnCode, final String commandOutput) {
                     Log.d(TAG, String.format("FFmpeg process exited with rc %d", returnCode));
 
                     hideProgressDialog();

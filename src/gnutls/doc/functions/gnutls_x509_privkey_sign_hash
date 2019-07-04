@@ -14,6 +14,10 @@ use this function directly unless you know what it is. Typical signing
 requires the data to be hashed and stored in special formats 
 (e.g. BER Digest-Info for RSA).
 
+This API is provided only for backwards compatibility, and thus
+restricted to RSA, DSA and ECDSA key types. For other key types please
+use @code{gnutls_privkey_sign_hash()}  and @code{gnutls_privkey_sign_data()} .
+
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.
 

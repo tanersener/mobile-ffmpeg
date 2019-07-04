@@ -17,7 +17,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -28,12 +28,14 @@
 #include <num.h>
 #include <tls-sig.h>
 #include <str.h>
+#include <c-strcase.h>
 #include <datum.h>
 #include "x509_int.h"
 #include <common.h>
 #include "verify-high.h"
 #include "read-file.h"
 #include <pkcs11_int.h>
+#include "urls.h"
 
 #include <dirent.h>
 
@@ -41,6 +43,10 @@
 # ifdef DT_UNKNOWN
 #  define _DIRENT_HAVE_D_TYPE
 # endif
+#endif
+
+#ifdef _WIN32
+# include <tchar.h>
 #endif
 
 /* Convenience functions for verify-high functionality 
@@ -57,6 +63,9 @@
  *
  * This function will add the given certificate authorities
  * to the trusted list. 
+ *
+ * If this function is used gnutls_x509_trust_list_deinit() must be called
+ * with parameter @all being 1.
  *
  * Returns: The number of added elements is returned.
  *
@@ -76,6 +85,9 @@ gnutls_x509_trust_list_add_trust_mem(gnutls_x509_trust_list_t list,
 	unsigned int x509_ncas, x509_ncrls;
 	unsigned int r = 0;
 
+	/* When adding CAs or CRLs, we use the GNUTLS_TL_NO_DUPLICATES flag to ensure
+	 * that unaccounted certificates/CRLs are deinitialized. */
+
 	if (cas != NULL && cas->data != NULL) {
 		ret =
 		    gnutls_x509_crt_list_import2(&x509_ca_list, &x509_ncas,
@@ -85,7 +97,7 @@ gnutls_x509_trust_list_add_trust_mem(gnutls_x509_trust_list_t list,
 
 		ret =
 		    gnutls_x509_trust_list_add_cas(list, x509_ca_list,
-						   x509_ncas, tl_flags);
+						   x509_ncas, tl_flags|GNUTLS_TL_NO_DUPLICATES);
 		gnutls_free(x509_ca_list);
 
 		if (ret < 0)
@@ -172,7 +184,6 @@ int remove_pkcs11_url(gnutls_x509_trust_list_t list, const char *ca_file)
 {
 	if (strcmp(ca_file, list->pkcs11_token) == 0) {
 		gnutls_free(list->pkcs11_token);
-		list->pkcs11_token = NULL;
 	}
 	return 0;
 }
@@ -319,7 +330,7 @@ gnutls_x509_trust_list_add_trust_file(gnutls_x509_trust_list_t list,
 
 	if (ca_file != NULL) {
 #ifdef ENABLE_PKCS11
-		if (strncmp(ca_file, "pkcs11:", 7) == 0) {
+		if (c_strncasecmp(ca_file, PKCS11_URL, PKCS11_URL_SIZE) == 0) {
 			unsigned pcrt_list_size = 0;
 
 			/* in case of a token URL import it as a PKCS #11 token,
@@ -378,21 +389,21 @@ int load_dir_certs(const char *dirname,
 			  unsigned int tl_flags, unsigned int tl_vflags,
 			  unsigned type, unsigned crl)
 {
-	DIR *dirp;
-	struct dirent *d;
 	int ret;
 	int r = 0;
 	char path[GNUTLS_PATH_MAX];
 
+#if !defined(_WIN32) || !defined(_UNICODE)
+	DIR *dirp;
+	struct dirent *d;
+
 	dirp = opendir(dirname);
 	if (dirp != NULL) {
-		do {
-			d = readdir(dirp);
-			if (d != NULL
+		while ((d = readdir(dirp)) != NULL) {
 #ifdef _DIRENT_HAVE_D_TYPE
-				&& (d->d_type == DT_REG || d->d_type == DT_LNK || d->d_type == DT_UNKNOWN)
+				if (d->d_type == DT_REG || d->d_type == DT_LNK || d->d_type == DT_UNKNOWN)
 #endif
-			) {
+			{
 				snprintf(path, sizeof(path), "%s/%s",
 					 dirname, d->d_name);
 
@@ -411,10 +422,50 @@ int load_dir_certs(const char *dirname,
 					r += ret;
 			}
 		}
-		while (d != NULL);
 		closedir(dirp);
 	}
+#else /* _WIN32 */
 
+	_TDIR *dirp;
+	struct _tdirent *d;
+	gnutls_datum_t utf16 = {NULL, 0};
+
+#ifdef WORDS_BIGENDIAN
+	r = _gnutls_utf8_to_ucs2(dirname, strlen(dirname), &utf16, 1);
+#else
+	r = _gnutls_utf8_to_ucs2(dirname, strlen(dirname), &utf16, 0);
+#endif
+	if (r < 0)
+		return gnutls_assert_val(r);
+	dirp = _topendir((_TCHAR*)utf16.data);
+	gnutls_free(utf16.data);
+	if (dirp != NULL) {
+		while ((d = _treaddir(dirp)) != NULL) {
+#ifdef _DIRENT_HAVE_D_TYPE
+			if (d->d_type == DT_REG || d->d_type == DT_LNK || d->d_type == DT_UNKNOWN)
+#endif
+			{
+				snprintf(path, sizeof(path), "%s/%ls",
+					dirname, d->d_name);
+
+				if (crl != 0) {
+					ret =
+					    gnutls_x509_trust_list_add_trust_file
+					    (list, NULL, path, type, tl_flags,
+					     tl_vflags);
+				} else {
+					ret =
+					    gnutls_x509_trust_list_add_trust_file
+					    (list, path, NULL, type, tl_flags,
+					     tl_vflags);
+				}
+				if (ret >= 0)
+					r += ret;
+			}
+		}
+		_tclosedir(dirp);
+	}
+#endif /* _WIN32 */
 	return r;
 }
 
@@ -491,7 +542,7 @@ gnutls_x509_trust_list_remove_trust_file(gnutls_x509_trust_list_t list,
 	int ret;
 
 #ifdef ENABLE_PKCS11
-	if (strncmp(ca_file, "pkcs11:", 7) == 0) {
+	if (c_strncasecmp(ca_file, PKCS11_URL, PKCS11_URL_SIZE) == 0) {
 		if (is_pkcs11_url_object(ca_file) != 0) {
 			return remove_pkcs11_object_url(list, ca_file);
 		} else { /* token */

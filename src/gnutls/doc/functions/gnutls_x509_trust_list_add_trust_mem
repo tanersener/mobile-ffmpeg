@@ -18,6 +18,9 @@
 This function will add the given certificate authorities
 to the trusted list. 
 
+If this function is used @code{gnutls_x509_trust_list_deinit()}  must be called
+with parameter  @code{all} being 1.
+
 @strong{Returns:} The number of added elements is returned.
 
 @strong{Since:} 3.1

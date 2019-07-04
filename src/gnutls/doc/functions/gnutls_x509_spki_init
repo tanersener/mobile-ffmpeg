@@ -1,0 +1,16 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_spki_init} (gnutls_x509_spki_t * @var{spki})
+@var{spki}: A pointer to the type to be initialized
+
+This function will initialize a SubjectPublicKeyInfo structure used
+in PKIX. The structure is used to set additional parameters
+in the public key information field of a certificate.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.6.0
+@end deftypefun

@@ -37,6 +37,7 @@ export TZ="UTC"
 check_for_datefudge
 
 if ! test -z "${VALGRIND}"; then
+	ORIG_VALGRIND=${VALGRIND}
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=3"
 fi
 
@@ -57,6 +58,13 @@ rc=$?
 if test "${rc}" != "0"; then
 	echo "Test 1 failed"
 	exit ${rc}
+fi
+
+# disable all parameters to valgrind, to prevent memleak checking on
+# the following tests (negative tests which have leaks in the tools).
+if ! test -z "${ORIG_VALGRIND}"; then
+	VALGRIND=$(echo ${ORIG_VALGRIND}|cut -d ' ' -f 1)
+	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=3"
 fi
 
 # Negative tests. Check against values which may cause problems

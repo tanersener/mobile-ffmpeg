@@ -32,6 +32,7 @@
 #include "utils.h"
 #include "eagain-common.h"
 #include "cert-common.h"
+#include <assert.h>
 
 const char *side;
 
@@ -50,9 +51,9 @@ static time_t mytime(time_t * t)
 	return then;
 }
 
-void doit(void)
+static
+void start(const char *prio, unsigned expect_max)
 {
-	int exit_code = EXIT_SUCCESS;
 	int ret;
 	/* Server stuff. */
 	gnutls_certificate_credentials_t serverx509cred;
@@ -62,6 +63,8 @@ void doit(void)
 	gnutls_certificate_credentials_t clientx509cred;
 	gnutls_session_t client;
 	int cret = GNUTLS_E_AGAIN;
+
+	success("trying %s\n", prio);
 
 	/* General init. */
 	global_init();
@@ -80,13 +83,7 @@ void doit(void)
 	gnutls_init(&server, GNUTLS_SERVER);
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
 				serverx509cred);
-	gnutls_priority_set_direct(server,
-#ifndef ENABLE_FIPS140
-				   "NORMAL:-CIPHER-ALL:+ARCFOUR-128",
-#else
-				   "NORMAL:-CIPHER-ALL:+AES-128-CBC",
-#endif
-				   NULL);
+	assert(gnutls_priority_set_direct(server, prio, NULL)>=0);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
@@ -109,7 +106,7 @@ void doit(void)
 	if (ret < 0)
 		exit(1);
 
-	gnutls_priority_set_direct(client, "NORMAL:+ARCFOUR-128", NULL);
+	gnutls_priority_set_direct(client, prio, NULL);
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);
@@ -126,6 +123,9 @@ void doit(void)
 			exit(1);
 		}
 	}
+
+	assert(gnutls_certificate_type_get(server)==GNUTLS_CRT_X509);
+	assert(gnutls_certificate_type_get(client)==GNUTLS_CRT_X509);
 
 	/* check the number of certificates received and verify */
 	{
@@ -225,16 +225,22 @@ void doit(void)
 		}
 	}
 
-	ret = gnutls_session_ext_master_secret_status(client);
-	if (ret != 1) {
-		fail("Extended master secret wasn't negotiated by default (client ret: %d)\n", ret);
-		exit(1);
+	if (expect_max) {
+		if (gnutls_protocol_get_version(client) != GNUTLS_TLS_VERSION_MAX) {
+			fail("The negotiated TLS protocol is not the maximum supported\n");
+		}
 	}
 
-	ret = gnutls_session_ext_master_secret_status(server);
-	if (ret != 1) {
-		fail("Extended master secret wasn't negotiated by default (server ret: %d)\n", ret);
-		exit(1);
+	if (gnutls_protocol_get_version(client) == GNUTLS_TLS1_2) {
+		ret = gnutls_session_ext_master_secret_status(client);
+		if (ret != 1) {
+			fail("Extended master secret wasn't negotiated by default (client ret: %d)\n", ret);
+		}
+
+		ret = gnutls_session_ext_master_secret_status(server);
+		if (ret != 1) {
+			fail("Extended master secret wasn't negotiated by default (server ret: %d)\n", ret);
+		}
 	}
 
 	gnutls_bye(client, GNUTLS_SHUT_RDWR);
@@ -248,10 +254,12 @@ void doit(void)
 
 	gnutls_global_deinit();
 
-	if (debug > 0) {
-		if (exit_code == 0)
-			puts("Self-test successful");
-		else
-			puts("Self-test failed");
-	}
+	reset_buffers();
+}
+
+void doit(void)
+{
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.2", 0);
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.3", 0);
+	start("NORMAL", 1);
 }

@@ -1,0 +1,4 @@
+Cipher suites for NONE:+VERS-TLS-ALL:+MAC-ALL:+RSA:+AES-128-GCM:+SIGN-ALL:+COMP-NULL
+TLS_RSA_AES_128_GCM_SHA256                        	0x00, 0x9c	TLS1.2
+
+Protocols: VERS-TLS1.2, VERS-TLS1.1, VERS-TLS1.0

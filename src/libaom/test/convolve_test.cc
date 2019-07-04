@@ -805,9 +805,9 @@ const ConvolveFunctions convolve10_c(wrap_convolve_copy_c_10,
 const ConvolveFunctions convolve12_c(wrap_convolve_copy_c_12,
                                      wrap_convolve8_horiz_c_12,
                                      wrap_convolve8_vert_c_12, 12);
-const ConvolveParam kArrayConvolve_c[] = {
-  ALL_SIZES(convolve8_c), ALL_SIZES(convolve10_c), ALL_SIZES(convolve12_c)
-};
+const ConvolveParam kArrayConvolve_c[] = { ALL_SIZES(convolve8_c),
+                                           ALL_SIZES(convolve10_c),
+                                           ALL_SIZES(convolve12_c) };
 
 INSTANTIATE_TEST_CASE_P(C, ConvolveTest, ::testing::ValuesIn(kArrayConvolve_c));
 

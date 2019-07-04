@@ -9,35 +9,35 @@ You will need reasonably recent versions of the build tools:
 
   * A C compiler. Such as GNU GCC.
     + Homepage:
-      http://gcc.gnu.org/
+      https://gcc.gnu.org/
 
   * GNU automake
     + Homepage:
-      http://www.gnu.org/software/automake/
+      https://www.gnu.org/software/automake/
 
   * GNU autoconf
     + Homepage:
-      http://www.gnu.org/software/autoconf/
+      https://www.gnu.org/software/autoconf/
 
   * GNU m4
     + Homepage:
-      http://www.gnu.org/software/m4/
+      https://www.gnu.org/software/m4/
 
   * GNU gperf
     + Homepage:
-      http://www.gnu.org/software/gperf/
+      https://www.gnu.org/software/gperf/
 
   * GNU groff 1.17 or newer
     + Homepage:
-      http://www.gnu.org/software/groff/
+      https://www.gnu.org/software/groff/
 
   * Perl
     + Homepage:
-      http://www.perl.org/
+      https://www.perl.org/
 
   * Either an internet connection or a recent copy of GNU gnulib.
     + Homepage:
-      http://www.gnu.org/software/gnulib/
+      https://www.gnu.org/software/gnulib/
 
 And, of course, the packages listed in the DEPENDENCIES file.
 
@@ -49,8 +49,14 @@ Access to the Git repository is described at
 https://savannah.gnu.org/git/?group=libiconv .
 
 After fetching the sources from the Git repository, peek at the comments in
-autogen.sh, then run "./autogen.sh"; then you can proceed with "./configure"
-as usual.
+autogen.sh, then run
+  ./gitsub.sh pull
+  ./autogen.sh
+Then you can proceed with "./configure" as usual.
+
+Each time you want to update the source, do not only "git pull".  Instead do
+  git pull && ./gitsub.sh pull
+  ./autogen.sh
 
 
 Adding new encodings

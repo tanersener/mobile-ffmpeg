@@ -6,8 +6,9 @@ detail    = "Tool to parse and generate X.509 certificates, requests and private
 It can be used interactively or non interactively by
 specifying the template command line option.
 
-The tool accepts files or URLs supported by GnuTLS. In case PIN is required for the URL
-access you can provide it using the environment variables GNUTLS_PIN and GNUTLS_SO_PIN.
+The tool accepts files or supported URIs via the --infile option. In case PIN
+is required for URI access you can provide it using the environment variables GNUTLS_PIN 
+and GNUTLS_SO_PIN.
 ";
 short-usage   = "certtool [options]\ncerttool --help for usage instructions.\n";
 explain       = "";
@@ -16,6 +17,27 @@ explain       = "";
 #define  OUTFILE_OPT   1
 #define  VERBOSE_OPT 1
 #include args-std.def
+
+//----------------------------------------
+flag = {
+    name = cert_options;
+    documentation;
+    descrip = "Certificate related options";
+};
+//----------------------------------------
+
+flag = {
+    name      = certificate-info;
+    value     = i;
+    descrip   = "Print information on the given certificate";
+    doc       = "";
+};
+
+flag = {
+    name      = pubkey-info;
+    descrip   = "Print information on a public key";
+    doc = "The option combined with --load-request, --load-pubkey, --load-privkey and --load-certificate will extract the public key of the object in question.";
+};
 
 flag = {
     name      = generate-self-signed;
@@ -38,12 +60,6 @@ flag = {
 };
 
 flag = {
-    name      = generate-crl;
-    descrip   = "Generate a CRL";
-    doc = "This option generates a CRL. When combined with --load-crl it would use the loaded CRL as base for the generated (i.e., all revoked certificates in the base will be copied to the new CRL).";
-};
-
-flag = {
     name      = update-certificate;
     value     = u;
     descrip   = "Update a signed certificate";
@@ -51,16 +67,183 @@ flag = {
 };
 
 flag = {
+    name      = fingerprint;
+    descrip   = "Print the fingerprint of the given certificate";
+    doc       = "This is a simple hash of the DER encoding of the certificate. It can be combined with the --hash parameter. However, it is recommended for identification to use the key-id which depends only on the certificate's key.";
+};
+
+flag = {
+    name      = key-id;
+    descrip   = "Print the key ID of the given certificate";
+    doc       = "This is a hash of the public key of the given certificate. It identifies the key uniquely, remains the same on a certificate renewal and depends only on signed fields of the certificate.";
+};
+
+flag = {
+    name      = certificate-pubkey;
+    descrip   = "Print certificate's public key";
+    doc       = "This option is deprecated as a duplicate of --pubkey-info";
+    deprecated;
+};
+
+flag = {
+    name      = v1;
+    descrip   = "Generate an X.509 version 1 certificate (with no extensions)";
+    doc = "";
+};
+
+flag = {
+    name      = sign-params;
+    arg-type  = string;
+    descrip   = "Sign a certificate with a specific signature algorithm";
+    doc = "This option can be combined with --generate-certificate, to sign the certificate with
+a specific signature algorithm variant. The only option supported is 'RSA-PSS', and should be
+specified when the signer does not have a certificate which is marked for RSA-PSS use only.";
+};
+
+
+//----------------------------------------
+flag = {
+    name = crq_options;
+    documentation;
+    descrip = "Certificate request related options";
+};
+//----------------------------------------
+
+flag = {
+    name      = crq-info;
+    descrip   = "Print information on the given certificate request";
+    doc       = "";
+};
+
+flag = {
+    name      = generate-request;
+    value     = q;
+    descrip   = "Generate a PKCS #10 certificate request";
+    flags_cant = infile;
+    doc = "Will generate a PKCS #10 certificate request. To specify a private key use --load-privkey.";
+};
+
+flag = {
+    name      = no-crq-extensions;
+    descrip   = "Do not use extensions in certificate requests";
+    doc       = "";
+};
+
+//----------------------------------------
+flag = {
+    name = pkcs12_options;
+    documentation;
+    descrip = "PKCS#12 file related options";
+};
+//----------------------------------------
+
+flag = {
+    name      = p12-info;
+    descrip   = "Print information on a PKCS #12 structure";
+    doc       = "This option will dump the contents and print the metadata of the provided PKCS #12 structure.";
+};
+
+flag = {
+    name      = p12-name;
+    arg-type  = string;
+    descrip   = "The PKCS #12 friendly name to use";
+    doc = "The name to be used for the primary certificate and private key in a PKCS #12 file.";
+};
+
+flag = {
+    name      = to-p12;
+    descrip   = "Generate a PKCS #12 structure";
+    doc = "It requires a certificate, a private key and possibly a CA certificate to be specified.";
+};
+
+
+//----------------------------------------
+flag = {
+    name = key_options;
+    documentation;
+    descrip = "Private key related options";
+};
+//----------------------------------------
+
+flag = {
+    name      = key-info;
+    value     = k;
+    descrip   = "Print information on a private key";
+    doc = "";
+};
+
+flag = {
+    name      = p8-info;
+    descrip   = "Print information on a PKCS #8 structure";
+    doc       = "This option will print information about encrypted PKCS #8 structures. That option does not require the decryption of the structure.";
+};
+
+flag = {
+    name      = to-rsa;
+    descrip   = "Convert an RSA-PSS key to raw RSA format";
+    doc = "It requires an RSA-PSS key as input and will output a raw RSA
+key. This command is necessary for compatibility with applications that
+cannot read RSA-PSS keys.";
+};
+
+flag = {
     name      = generate-privkey;
     value     = p;
     descrip   = "Generate a private key";
+    doc = "When generating RSA-PSS private keys, the --hash option will
+restrict the allowed hash for the key; in the same keys the --salt-size
+option is also acceptable.";
+};
+
+flag = {
+    name      = key-type;
+    arg-type  = string;
+    descrip   = "Specify the key type to use on key generation";
+    doc = "This option can be combined with --generate-privkey, to specify
+the key type to be generated. Valid options are, 'rsa', 'rsa-pss', 'dsa', 'ecdsa', and 'ed25519'.
+When combined with certificate generation it can be used to specify an
+RSA-PSS certificate when an RSA key is given.";
+};
+
+flag = {
+    name      = bits;
+    arg-type  = number;
+    descrip   = "Specify the number of bits for key generation";
+    doc      = "";
+};
+
+flag = {
+    name      = curve;
+    arg-type  = string;
+    descrip   = "Specify the curve used for EC key generation";
+    doc      = "Supported values are secp192r1, secp224r1, secp256r1, secp384r1 and secp521r1.";
+};
+
+flag = {
+    name      = sec-param;
+    arg-type  = string;
+    arg-name  = "Security parameter";
+    descrip   = "Specify the security level [low, legacy, medium, high, ultra]";
+    doc      = "This is alternative to the bits option.";
+};
+
+flag = {
+    name      = to-p8;
+    descrip   = "Convert a given key to a PKCS #8 structure";
+    doc = "This needs to be combined with --load-privkey.";
+};
+
+flag = {
+    name      = pkcs8;
+    value     = 8;
+    descrip   = "Use PKCS #8 format for private keys";
     doc = "";
 };
 
 flag = {
     name      = provable;
     descrip   = "Generate a private key or parameters from a seed using a provable method";
-    doc = "This will use the FIPS-186-4 algorithms (i.e., Shawe-Taylor) for provable key generation.
+    doc = "This will use the FIPS PUB186-4 algorithms (i.e., Shawe-Taylor) for provable key generation.
 When specified the private keys or parameters will be generated from a seed, and can be
 later validated with --verify-provable-privkey to be correctly generated from the seed. You may
 specify --seed or allow GnuTLS to generate one (recommended). This option can be combined with
@@ -80,38 +263,68 @@ flag = {
     name      = seed;
     descrip   = "When generating a private key use the given hex-encoded seed";
     arg-type  = string;
-    doc = "";
+    doc = "The seed acts as a security parameter for the private key, and
+thus a seed size which corresponds to the security level of the private key
+should be provided (e.g., 256-bits seed).";
 };
 
+
+//----------------------------------------
 flag = {
-    name      = generate-request;
-    value     = q;
-    descrip   = "Generate a PKCS #10 certificate request";
-    flags_cant = infile;
-    doc = "Will generate a PKCS #10 certificate request. To specify a private key use --load-privkey.";
+    name = crl_options;
+    documentation;
+    descrip = "CRL related options";
 };
+//----------------------------------------
+
+flag = {
+    name      = crl-info;
+    value     = l;
+    descrip   = "Print information on the given CRL structure";
+    doc       = "";
+};
+
+
+flag = {
+    name      = generate-crl;
+    descrip   = "Generate a CRL";
+    doc = "This option generates a Certificate Revocation List. When combined with --load-crl it would use the loaded CRL as base for the generated (i.e., all revoked certificates in the base will be copied to the new CRL).
+To add new certificates to the CRL use --load-certificate.";
+};
+
+
+flag = {
+    name      = verify-crl;
+    descrip   = "Verify a Certificate Revocation List using a trusted list";
+    doc = "The trusted certificate list must be loaded with --load-ca-certificate.";
+    flags-must = load-ca-certificate;
+};
+
+//----------------------------------------
+flag = {
+    name = cert_verify_options;
+    documentation;
+    descrip = "Certificate verification related options";
+};
+//----------------------------------------
 
 flag = {
     name      = verify-chain;
     value     = e;
     descrip   = "Verify a PEM encoded certificate chain";
-    doc = "The last certificate in the chain must be a self signed one. It can be combined with --verify-purpose or --verify-hostname.";
+    doc = "Verifies the validity of a certificate chain. That is, an ordered set of
+certificates where each one is the issuer of the previous, and the first is
+the end-certificate to be validated. In a proper chain the last certificate
+is a self signed one. It can be combined with --verify-purpose or --verify-hostname.";
 };
 
 flag = {
     name      = verify;
-    descrip   = "Verify a PEM encoded certificate chain using a trusted list";
+    descrip   = "Verify a PEM encoded certificate (chain) against a trusted set";
     doc = "The trusted certificate list can be loaded with --load-ca-certificate. If no
-certificate list is provided, then the system's certificate list is used. Note that
+certificate list is provided, then the system's trusted certificate list is used. Note that
 during verification multiple paths may be explored. On a successful verification
 the successful path will be the last one. It can be combined with --verify-purpose or --verify-hostname.";
-};
-
-flag = {
-    name      = verify-crl;
-    descrip   = "Verify a CRL using a trusted list";
-    doc = "The trusted certificate list must be loaded with --load-ca-certificate.";
-    flags-must = load-ca-certificate;
 };
 
 flag = {
@@ -142,186 +355,13 @@ flag = {
     doc = "This can be combined with --p7-verify, --verify or --verify-chain.";
 };
 
+//----------------------------------------
 flag = {
-    name      = generate-dh-params;
-    descrip   = "Generate PKCS #3 encoded Diffie-Hellman parameters";
-    doc = "The will generate random parameters to be used with
-Diffie-Hellman key exchange. The output parameters will be in PKCS #3
-format. Note that it is recommended to use the --get-dh-params option
-instead.";
+    name = pkcs7_options;
+    documentation;
+    descrip = "PKCS#7 structure options";
 };
-
-flag = {
-    name      = get-dh-params;
-    descrip   = "Get the included PKCS #3 encoded Diffie-Hellman parameters";
-    doc = "Returns stored DH parameters in GnuTLS. Those parameters returned
-are defined in RFC7919, and can be considered standard parameters for a TLS
-key exchange.";
-};
-
-flag = {
-    name      = dh-info;
-    descrip   = "Print information PKCS #3 encoded Diffie-Hellman parameters";
-    doc = "";
-};
-
-flag = {
-    name      = load-privkey;
-    descrip   = "Loads a private key file";
-    arg-type  = string;
-    doc = "This can be either a file or a PKCS #11 URL";
-};
-
-flag = {
-    name      = load-pubkey;
-    descrip   = "Loads a public key file";
-    arg-type  = string;
-    doc = "This can be either a file or a PKCS #11 URL";
-};
-
-flag = {
-    name      = load-request;
-    descrip   = "Loads a certificate request file";
-    arg-type  = string;
-    doc = "This option can be used with a file";
-};
-
-flag = {
-    name      = load-certificate;
-    descrip   = "Loads a certificate file";
-    arg-type  = string;
-    doc = "This option can be used with a file";
-};
-
-flag = {
-    name      = load-ca-privkey;
-    descrip   = "Loads the certificate authority's private key file";
-    arg-type  = string;
-    doc = "This can be either a file or a PKCS #11 URL";
-};
-
-flag = {
-    name      = load-ca-certificate;
-    descrip   = "Loads the certificate authority's certificate file";
-    arg-type  = string;
-    doc = "This option can be used with a file";
-};
-
-flag = {
-    name      = load-crl;
-    descrip   = "Loads the provided CRL";
-    arg-type  = string;
-    doc = "This option can be used with a file";
-};
-
-flag = {
-    name      = load-data;
-    descrip   = "Loads auxiliary data";
-    arg-type  = string;
-    doc = "This option can be used with a file";
-};
-
-flag = {
-    name      = password;
-    arg-type  = string;
-    descrip   = "Password to use";
-    doc   = "You can use this option to specify the password in the command line instead of reading it from the tty. Note, that the command line arguments are available for view in others in the system. Specifying password as '' is the same as specifying no password.";
-};
-
-flag = {
-    name      = null-password;
-    descrip   = "Enforce a NULL password";
-    doc   = "This option enforces a NULL password. This is different than the empty or no password in schemas like PKCS #8.";
-};
-
-flag = {
-    name      = empty-password;
-    descrip   = "Enforce an empty password";
-    doc   = "This option enforces an empty password. This is different than the NULL or no password in schemas like PKCS #8.";
-};
-
-
-flag = {
-    name      = hex-numbers;
-    descrip   = "Print big number in an easier format to parse";
-    doc   = "";
-};
-
-flag = {
-    name      = cprint;
-    descrip   = "In certain operations it prints the information in C-friendly format";
-    doc   = "In certain operations it prints the information in C-friendly format, suitable for including into C programs.";
-};
-
-flag = {
-    name      = certificate-info;
-    value     = i;
-    descrip   = "Print information on the given certificate";
-    doc       = "";
-};
-
-flag = {
-    name      = fingerprint;
-    descrip   = "Print the fingerprint of the given certificate";
-    doc       = "This is a simple hash of the DER encoding of the certificate. It can be combined with the --hash parameter. However, it is recommended for identification to use the key-id which depends only on the certificate's key.";
-};
-
-flag = {
-    name      = key-id;
-    descrip   = "Print the key ID of the given certificate";
-    doc       = "This is a hash of the public key of the given certificate. It identifies the key uniquely, remains the same on a certificate renewal and depends only on signed fields of the certificate.";
-};
-
-flag = {
-    name      = certificate-pubkey;
-    descrip   = "Print certificate's public key";
-    doc       = "";
-};
-
-flag = {
-    name      = pgp-certificate-info;
-    descrip   = "Print information on the given OpenPGP certificate";
-    doc       = "";
-};
-
-flag = {
-    name      = pgp-ring-info;
-    descrip   = "Print information on the given OpenPGP keyring structure";
-    doc       = "";
-};
-
-flag = {
-    name      = crl-info;
-    value     = l;
-    descrip   = "Print information on the given CRL structure";
-    doc       = "";
-};
-
-flag = {
-    name      = crq-info;
-    descrip   = "Print information on the given certificate request";
-    doc       = "";
-};
-
-
-flag = {
-    name      = no-crq-extensions;
-    descrip   = "Do not use extensions in certificate requests";
-    doc       = "";
-};
-
-flag = {
-    name      = p12-info;
-    descrip   = "Print information on a PKCS #12 structure";
-    doc       = "This option will dump the contents and print the metadata of the provided PKCS #12 structure.";
-};
-
-flag = {
-    name      = p12-name;
-    arg-type  = string;
-    descrip   = "The PKCS #12 friendly name to use";
-    doc = "The name to be used for the primary certificate and private key in a PKCS #12 file.";
-};
+//----------------------------------------
 
 flag = {
     name      = p7-generate;
@@ -379,82 +419,163 @@ flag = {
 };
 
 flag = {
-    name      = p8-info;
-    descrip   = "Print information on a PKCS #8 structure";
-    doc       = "This option will print information about encrypted PKCS #8 structures. That option does not require the decryption of the structure.";
-};
-
-flag = {
     name      = smime-to-p7;
     descrip   = "Convert S/MIME to PKCS #7 structure";
     doc       = "";
 };
 
+
+
+//----------------------------------------
 flag = {
-    name      = key-info;
-    value     = k;
-    descrip   = "Print information on a private key";
+    name = other_options;
+    documentation;
+    descrip = "Other options";
+};
+//----------------------------------------
+
+flag = {
+    name      = generate-dh-params;
+    descrip   = "Generate PKCS #3 encoded Diffie-Hellman parameters";
+    doc = "The will generate random parameters to be used with
+Diffie-Hellman key exchange. The output parameters will be in PKCS #3
+format. Note that it is recommended to use the --get-dh-params option
+instead.";
+    deprecated;
+};
+
+flag = {
+    name      = get-dh-params;
+    descrip   = "List the included PKCS #3 encoded Diffie-Hellman parameters";
+    doc = "Returns stored DH parameters in GnuTLS. Those parameters returned
+are defined in RFC7919, and can be considered standard parameters for a TLS
+key exchange. This option is provided for old applications which require
+DH parameters to be specified; modern GnuTLS applications should not require
+them.";
+};
+
+flag = {
+    name      = dh-info;
+    descrip   = "Print information PKCS #3 encoded Diffie-Hellman parameters";
     doc = "";
 };
 
 flag = {
-    name      = pgp-key-info;
-    descrip   = "Print information on an OpenPGP private key";
-    doc = "";
+    name      = load-privkey;
+    descrip   = "Loads a private key file";
+    arg-type  = string;
+    doc = "This can be either a file or a PKCS #11 URL";
 };
 
 flag = {
-    name      = pubkey-info;
-    descrip   = "Print information on a public key";
-    doc = "The option combined with --load-request, --load-pubkey, --load-privkey and --load-certificate will extract the public key of the object in question.";
+    name      = load-pubkey;
+    descrip   = "Loads a public key file";
+    arg-type  = string;
+    doc = "This can be either a file or a PKCS #11 URL";
 };
 
 flag = {
-    name      = v1;
-    descrip   = "Generate an X.509 version 1 certificate (with no extensions)";
-    doc = "";
+    name      = load-request;
+    descrip   = "Loads a certificate request file";
+    arg-type  = string;
+    doc = "This option can be used with a file";
 };
 
 flag = {
-    name      = to-p12;
-    descrip   = "Generate a PKCS #12 structure";
-    doc = "It requires a certificate, a private key and possibly a CA certificate to be specified.";
+    name      = load-certificate;
+    descrip   = "Loads a certificate file";
+    arg-type  = string;
+    doc = "This option can be used with a file";
 };
 
 flag = {
-    name      = to-p8;
-    descrip   = "Generate a PKCS #8 structure";
-    doc = "";
+    name      = load-ca-privkey;
+    descrip   = "Loads the certificate authority's private key file";
+    arg-type  = string;
+    doc = "This can be either a file or a PKCS #11 URL";
 };
 
 flag = {
-    name      = pkcs8;
-    value     = 8;
-    descrip   = "Use PKCS #8 format for private keys";
-    doc = "";
+    name      = load-ca-certificate;
+    descrip   = "Loads the certificate authority's certificate file";
+    arg-type  = string;
+    doc = "This can be either a file or a PKCS #11 URL";
+};
+
+flag = {
+    name      = load-crl;
+    descrip   = "Loads the provided CRL";
+    arg-type  = string;
+    doc = "This option can be used with a file";
+};
+
+flag = {
+    name      = load-data;
+    descrip   = "Loads auxiliary data";
+    arg-type  = string;
+    doc = "This option can be used with a file";
+};
+
+flag = {
+    name      = password;
+    arg-type  = string;
+    descrip   = "Password to use";
+    doc   = "You can use this option to specify the password in the command line instead of reading it from the tty. Note, that the command line arguments are available for view in others in the system. Specifying password as '' is the same as specifying no password.";
+};
+
+flag = {
+    name      = null-password;
+    descrip   = "Enforce a NULL password";
+    doc   = "This option enforces a NULL password. This is different than the empty or no password in schemas like PKCS #8.";
+};
+
+flag = {
+    name      = empty-password;
+    descrip   = "Enforce an empty password";
+    doc   = "This option enforces an empty password. This is different than the NULL or no password in schemas like PKCS #8.";
+};
+
+
+flag = {
+    name      = hex-numbers;
+    descrip   = "Print big number in an easier format to parse";
+    doc   = "";
+};
+
+flag = {
+    name      = cprint;
+    descrip   = "In certain operations it prints the information in C-friendly format";
+    doc   = "In certain operations it prints the information in C-friendly format, suitable for including into C programs.";
 };
 
 flag = {
     name      = rsa;
     descrip   = "Generate RSA key";
     doc = "When combined with --generate-privkey generates an RSA private key.";
+    description = "This option is equivalent to '--key-type rsa'.";
+    deprecated;
 };
 
 flag = {
     name      = dsa;
     descrip   = "Generate DSA key";
     doc = "When combined with --generate-privkey generates a DSA private key.";
+    description = "This option is equivalent to '--key-type dsa'.";
+    deprecated;
 };
 
 flag = {
     name      = ecc;
     descrip   = "Generate ECC (ECDSA) key";
     doc = "When combined with --generate-privkey generates an elliptic curve private key to be used with ECDSA.";
+    description = "This option is equivalent to '--key-type ecdsa'.";
+    deprecated;
 };
 
 flag = {
     name      = ecdsa;
     aliases   = ecc;
+    deprecated;
 };
 
 flag = {
@@ -462,6 +583,13 @@ flag = {
     arg-type  = string;
     descrip   = "Hash algorithm to use for signing";
     doc = "Available hash functions are SHA1, RMD160, SHA256, SHA384, SHA512, SHA3-224, SHA3-256, SHA3-384, SHA3-512.";
+};
+
+flag = {
+    name      = salt-size;
+    arg-type  = number;
+    descrip   = "Specify the RSA-PSS key default salt size";
+    doc = "Typical keys shouldn't set or restrict this option.";
 };
 
 flag = {
@@ -493,31 +621,10 @@ flag = {
 };
 
 flag = {
-    name      = bits;
-    arg-type  = number;
-    descrip   = "Specify the number of bits for key generate";
-    doc      = "";
-};
-
-flag = {
-    name      = curve;
-    arg-type  = string;
-    descrip   = "Specify the curve used for EC key generation";
-    doc      = "Supported values are secp192r1, secp224r1, secp256r1, secp384r1 and secp521r1.";
-};
-
-flag = {
-    name      = sec-param;
-    arg-type  = string;
-    arg-name  = "Security parameter";
-    descrip   = "Specify the security level [low, legacy, medium, high, ultra]";
-    doc      = "This is alternative to the bits option.";
-};
-
-flag = {
     name      = disable-quick-random;
     descrip   = "No effect";
     doc      = "";
+    deprecated;
 };
 
 flag = {
@@ -555,11 +662,19 @@ flag = {
     doc      = "This will override the default options in /etc/gnutls/pkcs11.conf";
 };
 
+flag = {
+    name      = text;
+    descrip   = "Output textual information before PEM-encoded certificates, private keys, etc";
+    enabled;
+    disable   = "no";
+    doc       = "Output textual information before PEM-encoded data";
+};
+
 doc-section = {
   ds-type = 'SEE ALSO';
   ds-format = 'texi';
   ds-text   = <<-_EOT_
-    p11tool (1)
+    p11tool (1), psktool (1), srptool (1)
 _EOT_;
 };
 
@@ -624,6 +739,12 @@ To view the certificate information, use:
 $ certtool --certificate-info --infile cert.pem
 @end example
 
+@subheading Changing the certificate format
+To convert the certificate from PEM to DER format, use:
+@example
+$ certtool --certificate-info --infile cert.pem --outder --outfile cert.der
+@end example
+
 @subheading PKCS #12 structure generation
 To generate a PKCS #12 structure using the previous key and certificate,
 use the command:
@@ -643,11 +764,25 @@ $ certtool --load-ca-certificate ca.pem \
   --to-p12 --outder --outfile key.p12
 @end example
 
-@subheading Diffie-Hellman parameter generation
-To generate parameters for Diffie-Hellman key exchange, use the command:
+@subheading Obtaining Diffie-Hellman parameters
+To obtain the RFC7919 parameters for Diffie-Hellman key exchange, use the command:
 @example
-$ certtool --generate-dh-params --outfile dh.pem --sec-param medium
+$ certtool --get-dh-params --outfile dh.pem --sec-param medium
 @end example
+
+@subheading Verifying a certificate
+To verify a certificate in a file against the system's CA trust store
+use the following command:
+@example
+$ certtool --verify --infile cert.pem
+@end example
+
+It is also possible to simulate hostname verification with the following
+options:
+@example
+$ certtool --verify --verify-hostname www.example.com --infile cert.pem
+@end example
+
 
 @subheading Proxy certificate generation
 Proxy certificate can be used to delegate your credential to a
@@ -759,7 +894,8 @@ cn = "Cindy Lauper"
 #dn = "cn = Nikos,st = New\, Something,C=GR,surName=Mavrogiannopoulos,2.5.4.9=Arkadias"
 
 # The serial number of the certificate
-# Comment the field for a time-based serial number.
+# The value is in decimal (i.e. 1963) or hex (i.e. 0x07ab).
+# Comment the field for a random serial number.
 serial = 007
 
 # In how many days, counting from today, this certificate will expire.
@@ -768,7 +904,7 @@ expiration_days = 700
 
 # Alternatively you may set concrete dates and time. The GNU date string 
 # formats are accepted. See:
-# http://www.gnu.org/software/tar/manual/html_node/Date-input-formats.html
+# https://www.gnu.org/software/tar/manual/html_node/Date-input-formats.html
 
 #activation_date = "2004-02-29 16:21:42"
 #expiration_date = "2025-02-29 16:24:41"
@@ -792,7 +928,7 @@ expiration_days = 700
 #krb5_principal = HTTP/user@@REALM.COM
 
 # A subject alternative name URI
-#uri = "http://www.example.com"
+#uri = "https://www.example.com"
 
 # An IP address in case of a server.
 #ip_address = "192.168.1.1"
@@ -817,7 +953,7 @@ challenge_password = 123456
 
 # An URL that has CRLs (certificate revocation lists)
 # available. Needed in CA certificates.
-#crl_dist_points = "http://www.getcrl.crl/getcrl/"
+#crl_dist_points = "https://www.getcrl.crl/getcrl/"
 
 # Whether this is a CA certificate or not
 #ca
@@ -871,12 +1007,12 @@ encryption_key
 
 
 # Whether this certificate will be used for a TLS client;
-# this sets the id-kp-serverAuth (1.3.6.1.5.5.7.3.1) of 
+# this sets the id-kp-clientAuth (1.3.6.1.5.5.7.3.2) of
 # extended key usage.
 #tls_www_client
 
 # Whether this certificate will be used for a TLS server;
-# This sets the id-kp-clientAuth (1.3.6.1.5.5.7.3.2) of 
+# this sets the id-kp-serverAuth (1.3.6.1.5.5.7.3.1) of
 # extended key usage.
 #tls_www_server
 
@@ -940,19 +1076,23 @@ encryption_key
 #path_len = 2
 
 # OCSP URI
-# ocsp_uri = http://my.ocsp.server/ocsp
+# ocsp_uri = https://my.ocsp.server/ocsp
 
 # CA issuers URI
-# ca_issuers_uri = http://my.ca.issuer
+# ca_issuers_uri = https://my.ca.issuer
 
 # Certificate policies
 #policy1 = 1.3.6.1.4.1.5484.1.10.99.1.0
 #policy1_txt = "This is a long policy to summarize"
-#policy1_url = http://www.example.com/a-policy-to-read
+#policy1_url = https://www.example.com/a-policy-to-read
 
 #policy2 = 1.3.6.1.4.1.5484.1.10.99.1.1
 #policy2_txt = "This is a short policy"
-#policy2_url = http://www.example.com/another-policy-to-read
+#policy2_url = https://www.example.com/another-policy-to-read
+
+# The number of additional certificates that may appear in a
+# path before the anyPolicy is no longer acceptable.
+#inhibit_anypolicy_skip_certs 1
 
 # Name constraints
 
@@ -986,7 +1126,15 @@ encryption_key
 #crl_next_update = 43
 
 # this is the 5th CRL by this CA
+# The value is in decimal (i.e. 1963) or hex (i.e. 0x07ab).
 # Comment the field for a time-based number.
+# Time-based CRL numbers generated in GnuTLS 3.6.3 and later
+# are significantly larger than those generated in previous
+# versions. Since CRL numbers need to be monotonic, you need
+# to specify the CRL number here manually if you intend to
+# downgrade to an earlier version than 3.6.3 after publishing
+# the CRL as it is not possible to specify CRL numbers greater
+# than 2**63-2 using hex notation in those versions.
 #crl_number = 5
 
 # Specify the update dates more precisely.

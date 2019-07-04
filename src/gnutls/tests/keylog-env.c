@@ -24,6 +24,7 @@
 #include <config.h>
 #endif
 
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -43,7 +44,7 @@
 #include "utils.h"
 #include "cert-common.h"
 
-/* Test for GNUTLS_KEYLOGFILE being functional.
+/* Test for SSLKEYLOGFILE being functional.
  *
  */
 
@@ -52,8 +53,23 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "<%d>| %s", level, str);
 }
 
-#define LSTR "CLIENT_RANDOM "
-static void search_for_str(const char *filename)
+/* In TLS 1.2, we only expect CLIENT_RANDOM.  */
+static const char *tls12_included_labels[] = { "CLIENT_RANDOM", NULL };
+static const char *tls12_excluded_labels[] = { NULL };
+
+/* In TLS 1.3, we expect secrets derived in handshake phases, but not
+ * CLIENT_RANDOM.  */
+static const char *tls13_included_labels[] = {
+	"CLIENT_HANDSHAKE_TRAFFIC_SECRET",
+	"SERVER_HANDSHAKE_TRAFFIC_SECRET",
+	"CLIENT_TRAFFIC_SECRET_0",
+	"SERVER_TRAFFIC_SECRET_0",
+	"EXPORTER_SECRET",
+	NULL
+};
+static const char *tls13_excluded_labels[] = { "CLIENT_RANDOM", NULL };
+
+static void search_for_str(const char *filename, const char *label, bool excluded)
 {
 	char line[512];
 	FILE *fp = fopen(filename, "r");
@@ -61,34 +77,36 @@ static void search_for_str(const char *filename)
 
 	while( (p = fgets(line, sizeof(line), fp)) != NULL) {
 		success("%s", line);
-		if (strncmp(line, LSTR, sizeof(LSTR)-1) == 0) {
+		if (strncmp(line, label, strlen(label)) == 0 &&
+		    line[strlen(label)] == ' ') {
 			fclose(fp);
+			if (excluded)
+				fail("file should not contain %s\n", label);
 			return;
 		}
 	}
 	fclose(fp);
-	fail("file did not contain CLIENT_RANDOM\n");
+	if (!excluded)
+		fail("file should contain %s\n", label);
 }
 
-static void run(const char *env, const char *filename)
+static void run(const char *filename, const char *prio,
+		const char **included, const char **excluded)
 {
 	gnutls_certificate_credentials_t x509_cred;
 	gnutls_certificate_credentials_t clicred;
+	const char **p;
 	int ret;
-
-	remove(filename);
 
 #ifdef _WIN32
 	{
 		char buf[512];
-		snprintf(buf, sizeof(buf), "%s=%s", env, filename);
+		snprintf(buf, sizeof(buf), "SSLKEYLOGFILE=%s", filename);
 		_putenv(buf);
 	}
 #else
-	setenv(env, filename, 1);
+	setenv("SSLKEYLOGFILE", filename, 1);
 #endif
-
-	global_init();
 
 	if (debug) {
 		gnutls_global_set_log_level(6);
@@ -112,20 +130,20 @@ static void run(const char *env, const char *filename)
 		fail("set_x509_trust_file failed: %s\n", gnutls_strerror(ret));
 
 
-	test_cli_serv(x509_cred, clicred, "NORMAL", "localhost", NULL, NULL, NULL);
+	test_cli_serv(x509_cred, clicred, prio, "localhost", NULL, NULL, NULL);
 
 	if (access(filename, R_OK) != 0) {
 		fail("keylog file was not created\n");
 		exit(1);
 	}
 
-	search_for_str(filename);
+	for (p = included; *p; p++)
+		search_for_str(filename, *p, false);
+	for (p = excluded; *p; p++)
+		search_for_str(filename, *p, true);
 
 	gnutls_certificate_free_credentials(x509_cred);
 	gnutls_certificate_free_credentials(clicred);
-
-	gnutls_global_deinit();
-	remove(filename);
 
 	if (debug)
 		success("success");
@@ -137,5 +155,23 @@ void doit(void)
 
 	assert(get_tmpname(filename)!=NULL);
 
-	run("SSLKEYLOGFILE", filename);
+	remove(filename);
+	global_init();
+
+	run(filename,
+	    "NONE:+VERS-TLS1.2:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+RSA",
+	    tls12_included_labels, tls12_excluded_labels);
+
+	/* This is needed because the SSLKEYLOGFILE envvar is checked
+	 * only once and the file is never closed until the library is
+	 * unloaded.  Truncate the file to zero length, so we can
+	 * reuse the same file for multiple tests.  */
+	truncate(filename, 0);
+
+	run(filename,
+	    "NONE:+VERS-TLS1.3:+AES-256-GCM:+AEAD:+SIGN-ALL:+GROUP-ALL",
+	    tls13_included_labels, tls13_excluded_labels);
+
+	gnutls_global_deinit();
+	remove(filename);
 }

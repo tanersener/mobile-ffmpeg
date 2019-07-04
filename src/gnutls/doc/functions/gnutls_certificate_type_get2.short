@@ -1,0 +1,1 @@
+@item @var{gnutls_certificate_type_t} @ref{gnutls_certificate_type_get2} (gnutls_session_t @var{session}, gnutls_ctype_target_t @var{target})

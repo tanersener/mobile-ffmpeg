@@ -44,7 +44,7 @@ install_sh = @install_sh@
 
 #### End of system configuration section. ####
 
-SHELL = /bin/sh
+SHELL = @SHELL@
 
 PACKAGE_VERSION = @VERSION@
 

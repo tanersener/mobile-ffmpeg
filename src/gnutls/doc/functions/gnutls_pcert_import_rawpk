@@ -1,0 +1,22 @@
+
+
+
+
+@deftypefun {int} {gnutls_pcert_import_rawpk} (gnutls_pcert_st* @var{pcert}, gnutls_pubkey_t @var{pubkey}, unsigned int @var{flags})
+@var{pcert}: The pcert structure to import the data into.
+
+@var{pubkey}: The raw public-key in @code{gnutls_pubkey_t}  format to be imported
+
+@var{flags}: zero for now
+
+This convenience function will import (i.e. convert) the given raw
+public key  @code{pubkey} into a @code{gnutls_pcert_st}  structure. The structure
+must be deinitialized afterwards using @code{gnutls_pcert_deinit()} . The
+given  @code{pubkey} must not be deinitialized because it will be associated
+with the given  @code{pcert} structure and will be deinitialized with it.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.6.6
+@end deftypefun

@@ -237,9 +237,9 @@ static int parse_sequence_header(const uint8_t *const buffer, size_t length,
   // The reader instance is local to this function, but a pointer to the
   // reader instance is used within this function and throughout this file to
   // allow use of the helper macros that reduce parse error checking verbosity.
-  struct aom_read_bit_buffer reader_instance = {
-    buffer, buffer + length, 0, &result, bitreader_error_handler
-  };
+  struct aom_read_bit_buffer reader_instance = { buffer, buffer + length, 0,
+                                                 &result,
+                                                 bitreader_error_handler };
   struct aom_read_bit_buffer *reader = &reader_instance;
 
   AV1C_READ_BITS_OR_RETURN_ERROR(seq_profile, 3);
@@ -416,9 +416,9 @@ int read_av1config(const uint8_t *buffer, size_t buffer_length,
   *bytes_read = 0;
 
   int result = 0;
-  struct aom_read_bit_buffer reader_instance = {
-    buffer, buffer + buffer_length, 0, &result, bitreader_error_handler
-  };
+  struct aom_read_bit_buffer reader_instance = { buffer, buffer + buffer_length,
+                                                 0, &result,
+                                                 bitreader_error_handler };
   struct aom_read_bit_buffer *reader = &reader_instance;
 
   memset(config, 0, sizeof(*config));

@@ -147,7 +147,6 @@ const gnutls_datum_t server_key = { server_key_pem,
 static
 void server_check(void)
 {
-	int exit_code = EXIT_SUCCESS;
 	int ret;
 	/* Server stuff. */
 	gnutls_certificate_credentials_t serverx509cred;
@@ -174,7 +173,7 @@ void server_check(void)
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
 				serverx509cred);
 	gnutls_priority_set_direct(server,
-				   "NORMAL:-KX-ALL:+RSA",
+				   "NORMAL:-KX-ALL:+RSA:-VERS-ALL:+VERS-TLS1.2",
 				   NULL);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
@@ -198,7 +197,7 @@ void server_check(void)
 	if (ret < 0)
 		exit(1);
 
-	gnutls_priority_set_direct(client, "NORMAL:+RSA", NULL);
+	gnutls_priority_set_direct(client, "NORMAL:+RSA:-VERS-ALL:+VERS-TLS1.2", NULL);
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);
@@ -215,13 +214,6 @@ void server_check(void)
 	gnutls_certificate_free_credentials(clientx509cred);
 
 	gnutls_global_deinit();
-
-	if (debug > 0) {
-		if (exit_code == 0)
-			puts("Self-test successful");
-		else
-			puts("Self-test failed");
-	}
 }
 
 static gnutls_privkey_t g_pkey = NULL;
@@ -272,7 +264,6 @@ cert_callback(gnutls_session_t session,
 static
 void client_check(void)
 {
-	int exit_code = EXIT_SUCCESS;
 	int ret;
 	/* Server stuff. */
 	gnutls_certificate_credentials_t serverx509cred;
@@ -297,7 +288,7 @@ void client_check(void)
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
 				serverx509cred);
 	gnutls_priority_set_direct(server,
-				   "NORMAL:-KX-ALL:+RSA:%DEBUG_ALLOW_KEY_USAGE_VIOLATIONS",
+				   "NORMAL:-KX-ALL:+RSA:%DEBUG_ALLOW_KEY_USAGE_VIOLATIONS:-VERS-ALL:+VERS-TLS1.2",
 				   NULL);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
@@ -321,7 +312,7 @@ void client_check(void)
 	if (ret < 0)
 		exit(1);
 
-	gnutls_priority_set_direct(client, "NORMAL:+RSA", NULL);
+	gnutls_priority_set_direct(client, "NORMAL:+RSA:-VERS-ALL:+VERS-TLS1.2", NULL);
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);
@@ -338,13 +329,6 @@ void client_check(void)
 	gnutls_certificate_free_credentials(clientx509cred);
 
 	gnutls_global_deinit();
-
-	if (debug > 0) {
-		if (exit_code == 0)
-			puts("Self-test successful");
-		else
-			puts("Self-test failed");
-	}
 }
 
 void doit(void)

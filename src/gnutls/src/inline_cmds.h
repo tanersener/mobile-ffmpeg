@@ -14,8 +14,11 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+
+#ifndef GNUTLS_SRC_INLINE_CMDS_H
+#define GNUTLS_SRC_INLINE_CMDS_H
 
 /* 
  * The inline commands is a facility that can be used optionally
@@ -40,9 +43,10 @@
  */
 typedef enum INLINE_COMMAND { INLINE_COMMAND_NONE,
 	INLINE_COMMAND_RESUME,
-	INLINE_COMMAND_RENEGOTIATE
+	INLINE_COMMAND_RENEGOTIATE,
+	INLINE_COMMAND_REKEY_LOCAL,
+	INLINE_COMMAND_REKEY_BOTH
 } inline_command_t;
-#define NUM_INLINE_COMMANDS 2
 
 #define MAX_INLINE_COMMAND_BYTES 20
 
@@ -66,5 +70,11 @@ struct inline_command_definitions {
 /* All inline commands will contain a trailing LF */
 struct inline_command_definitions inline_commands_def[] = {
 	{INLINE_COMMAND_RESUME, "^resume^\n"},
+	{INLINE_COMMAND_REKEY_LOCAL, "^rekey1^\n"},
+	{INLINE_COMMAND_REKEY_BOTH, "^rekey^\n"},
 	{INLINE_COMMAND_RENEGOTIATE, "^renegotiate^\n"},
 };
+
+#define NUM_INLINE_COMMANDS ((unsigned)(sizeof(inline_commands_def)/sizeof(inline_commands_def[0])))
+
+#endif /* GNUTLS_SRC_INLINE_CMDS_H */

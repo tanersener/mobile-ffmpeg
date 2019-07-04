@@ -30,17 +30,17 @@
 
 (define %valid-priority-strings
   ;; Valid priority strings (from the manual).
-  '("NONE:+VERS-TLS-ALL:+MAC-ALL:+RSA:+AES-128-CBC:+SIGN-ALL:+COMP-NULL"
+  '("NONE:+VERS-TLS1.2:+MAC-ALL:+RSA:+AES-128-CBC:+SIGN-ALL:+COMP-NULL"
     "NORMAL:-ARCFOUR-128"
     "SECURE128:-VERS-SSL3.0:+COMP-NULL"
-    "NONE:+VERS-TLS-ALL:+AES-128-CBC:+RSA:+SHA1:+COMP-NULL:+SIGN-RSA-SHA1"))
+    "NONE:+VERS-TLS1.2:+AES-128-CBC:+RSA:+SHA1:+COMP-NULL:+SIGN-RSA-SHA1"))
 
 (define %invalid-priority-strings
   ;; Invalid strings: the prefix and the suffix that leads to a parse error.
   '(("" . "THIS-DOES-NOT-WORK")
     ("NORMAL:" . "FAIL-HERE")
     ("SECURE128:-VERS-SSL3.0:" . "+FAIL-HERE")
-    ("NONE:+VERS-TLS-ALL:+AES-128-CBC:"
+    ("NONE:+VERS-TLS1.2:+AES-128-CBC:"
      . "+FAIL-HERE:+SHA1:+COMP-NULL:+SIGN-RSA-SHA1")))
 
 (run-test

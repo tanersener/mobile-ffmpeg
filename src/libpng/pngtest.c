@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * Copyright (c) 2018 Cosmin Truta
+ * Copyright (c) 2018-2019 Cosmin Truta
  * Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson
  * Copyright (c) 1996-1997 Andreas Dilger
  * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
@@ -957,6 +957,8 @@ test_one_file(const char *inname, const char *outname)
    if (setjmp(png_jmpbuf(write_ptr)))
    {
       fprintf(STDERR, "%s -> %s: libpng write error\n", inname, outname);
+      png_free(read_ptr, row_buf);
+      row_buf = NULL;
       if (verbose != 0)
         fprintf(STDERR, "   destroying read structs\n");
       png_destroy_read_struct(&read_ptr, &read_info_ptr, &end_info_ptr);
@@ -1436,7 +1438,7 @@ test_one_file(const char *inname, const char *outname)
    row_buf = (png_bytep)png_malloc(read_ptr,
        png_get_rowbytes(read_ptr, read_info_ptr));
 
-   pngtest_debug1("\t0x%08lx", (unsigned long)row_buf);
+   pngtest_debug1("\t%p", row_buf);
 #endif /* SINGLE_ROWBUF_ALLOC */
    pngtest_debug("Writing row data");
 
@@ -1490,7 +1492,7 @@ test_one_file(const char *inname, const char *outname)
          row_buf = (png_bytep)png_malloc(read_ptr,
              png_get_rowbytes(read_ptr, read_info_ptr));
 
-         pngtest_debug2("\t0x%08lx (%lu bytes)", (unsigned long)row_buf,
+         pngtest_debug2("\t%p (%lu bytes)", row_buf,
              (unsigned long)png_get_rowbytes(read_ptr, read_info_ptr));
 
 #endif /* !SINGLE_ROWBUF_ALLOC */
@@ -2153,4 +2155,4 @@ main(void)
 #endif
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef png_libpng_version_1_6_36 Your_png_h_is_not_version_1_6_36;
+typedef png_libpng_version_1_6_37 Your_png_h_is_not_version_1_6_37;

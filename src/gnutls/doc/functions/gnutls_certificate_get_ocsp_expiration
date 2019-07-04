@@ -1,0 +1,30 @@
+
+
+
+
+@deftypefun {time_t} {gnutls_certificate_get_ocsp_expiration} (gnutls_certificate_credentials_t @var{sc}, unsigned @var{idx}, int @var{oidx}, unsigned @var{flags})
+@var{sc}: is a credentials structure.
+
+@var{idx}: is a certificate chain index as returned by @code{gnutls_certificate_set_key()}  and friends
+
+@var{oidx}: is an OCSP response index
+
+@var{flags}: should be zero
+
+This function returns the validity of the loaded OCSP responses,
+to provide information on when to reload/refresh them.
+
+Note that the credentials structure should be read-only when in
+use, thus when reloading, either the credentials structure must not
+be in use by any sessions, or a new credentials structure should be
+allocated for new sessions.
+
+When  @code{oidx} is (-1) then the minimum refresh time for all responses
+is returned. Otherwise the index specifies the response corresponding
+to the  @code{odix} certificate in the certificate chain.
+
+@strong{Returns:} On success, the expiration time of the OCSP response. Otherwise
+(time_t)(-1) on error, or (time_t)-2 on out of bounds.
+
+@strong{Since:} 3.6.3
+@end deftypefun

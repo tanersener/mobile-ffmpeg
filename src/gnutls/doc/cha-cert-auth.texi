@@ -5,7 +5,7 @@
 The most known authentication method of @acronym{TLS} are certificates.
 The PKIX @xcite{PKIX} public key infrastructure is daily used by anyone
 using a browser today. @acronym{GnuTLS} provides a simple API to 
-use the @acronym{X.509} certificates @xcite{PKIX}.
+verify the @acronym{X.509} certificates as in @xcite{PKIX}.
 
 The key exchange algorithms supported by certificate authentication are
 shown in @ref{tab:key-exchange}.
@@ -53,6 +53,7 @@ to use this key exchange algorithm.
 @menu
 * X.509 certificates::
 * OpenPGP certificates::
+* Raw public-keys::
 * Advanced certificate verification::
 * Digital signatures::
 @end menu
@@ -279,12 +280,16 @@ A field in CA certificates that restricts the scope of the name of
 issued certificates.
 
 @item CRL distribution points @tab 2.5.29.31 @tab
-This extension is set by the CA, in order to inform about the issued
-CRLs.
+This extension is set by the CA, in order to inform about the
+location of issued Certificate Revocation Lists.
 
 @item Certificate policy @tab 2.5.29.32 @tab
 This extension is set to indicate the certificate policy as object
 identifier and may contain a descriptive string or URL.
+
+@item Extended key usage @tab 2.5.29.54 @tab
+Inhibit any policy extension. Constraints the any policy OID
+(@code{GNUTLS_X509_OID_POLICY_ANY}) use in the policy extension.
 
 @item Authority key identifier @tab 2.5.29.35 @tab
 An identifier of the key of the issuer of the certificate. That is
@@ -404,7 +409,7 @@ flags are part of the enumeration
 Some systems provide a system wide trusted certificate storage accessible using
 the PKCS #11 API. That is, the trusted certificates are queried and accessed using the
 PKCS #11 API, and trusted certificate properties, such as purpose, are marked using
-attached extensions. One example is the p11-kit trust module@footnote{see @url{http://p11-glue.freedesktop.org/trust-module.html}.}.
+attached extensions. One example is the p11-kit trust module@footnote{see @url{https://p11-glue.freedesktop.org/trust-module.html}.}.
 
 These special PKCS #11 modules can be used for GnuTLS certificate verification if marked as trust 
 policy modules, i.e., with @code{trust-policy: yes} in the p11-kit module file.
@@ -444,7 +449,7 @@ indicates that the CA is allowed to sign certificates for email users.
 @item GNUTLS_KP_OCSP_SIGNING @tab
 1.3.6.1.5.5.7.3.9 @tab
 The certificate is to be used for signing OCSP responses. When in a CA certificate, it
-indicates that the CA is allowed to sign certificates which sign OCSP reponses.
+indicates that the CA is allowed to sign certificates which sign OCSP responses.
 
 @item GNUTLS_KP_ANY @tab
 2.5.29.37.0 @tab
@@ -465,16 +470,46 @@ other verification functions which do not allow setting a purpose, would operate
 @cindex OpenPGP certificates
 
 Previous versions of GnuTLS supported limited @acronym{OpenPGP} key
-authentication. That functionality has been deprecated and although
-is still made available, it is no longer recommended to use.
-The reason is that, supporting alternative authentication
-methods, when X.509 and PKIX were new and not well established, seemed like a
-good idea, in today's internet X.509 is unquestionably the main
+authentication. That functionality has been deprecated and is no longer
+made available. The reason is that, supporting alternative authentication
+methods, when X.509 and PKIX were new on the Internet and not well established, seemed like a
+good idea, in today's Internet X.509 is unquestionably the main
 container for certificates. As such supporting more options with no clear
 use-cases, is a distraction that consumes considerable resources for
-improving and testing. For that we have decided to mark this functionality
-as deprecated, and will be dropped in one of the next GnuTLS major releases.
+improving and testing the library. For that we have decided to drop
+this functionality completely in 3.6.0.
 
+@node Raw public-keys
+@subsection Raw public-keys
+@cindex Raw public-keys
+
+There are situations in which a rather large certificate / certificate chain is undesirable or impractical.
+An example could be a resource contrained sensor network in which you do want to use authentication of and
+encryption between your devices but where your devices lack loads of memory or processing power. Furthermore,
+there are situations in which you don't want to or can't rely on a PKIX. TLS is, next to a PKIX environment,
+also commonly used with self-signed certificates in smaller deployments where the self-signed certificates
+are distributed to all involved protocol endpoints out-of-band. This practice does, however, still require
+the overhead of the certificate generation even though none of the information found in the certificate is
+actually used.
+
+With raw public-keys, only a subset of the information found in typical certificates is utilized: namely,
+the SubjectPublicKeyInfo structure (in ASN.1 format) of a PKIX certificate that carries the parameters
+necessary to describe the public-key. Other parameters found in PKIX certificates are omitted. By omitting
+various certificate-related structures, the resulting raw public-key is kept fairly small in comparison to
+the original certificate, and the code to process the keys can be simpler.
+
+It should be noted however, that the authenticity of these raw keys must be verified by an out-of-band mechanism
+or something like @acronym{TOFU}.
+
+@menu
+* Importing raw public-keys::
+@end menu
+
+@node Importing raw public-keys
+@subsubsection Importing raw public-keys
+Raw public-keys and their private counterparts can best be handled by using the abstract types
+@code{gnutls_pubkey_t} and @code{gnutls_privkey_t} respectively. To learn how to use these
+see @ref{Abstract key types}.
 
 @node Advanced certificate verification
 @subsection Advanced certificate verification
@@ -510,7 +545,7 @@ failure is not enough to compromise the system. For example a server compromise
 may be detected using OCSP, and a CA compromise can be detected using
 the trust on first use method.
 Such a hybrid system with X.509 and trust on first use authentication is 
-shown in @ref{Simple client example with SSH-style certificate verification}.
+shown in @ref{Client example with SSH-style certificate verification}.
 
 See @ref{Certificate verification} on how to use the available functionality.
 
@@ -631,6 +666,8 @@ certificate chain, you can call
 @itemize
 @item @code{GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD2}
 @item @code{GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5}
+@item @code{GNUTLS_VERIFY_ALLOW_SIGN_WITH_SHA1}
+@item @code{GNUTLS_VERIFY_ALLOW_BROKEN}
 @end itemize
 as in the following example:
 

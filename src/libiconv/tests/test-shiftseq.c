@@ -1,4 +1,4 @@
-/* Copyright (C) 2008 Free Software Foundation, Inc.
+/* Copyright (C) 2008, 2018 Free Software Foundation, Inc.
    This file is part of the GNU LIBICONV Library.
 
    The GNU LIBICONV Library is free software; you can redistribute it
@@ -13,7 +13,7 @@
 
    You should have received a copy of the GNU Library General Public
    License along with the GNU LIBICONV Library; see the file COPYING.LIB.
-   If not, see <http://www.gnu.org/licenses/>.  */
+   If not, see <https://www.gnu.org/licenses/>.  */
 
 #include "config.h"
 
@@ -26,7 +26,7 @@
    the entire buffer is passed at once, or whether it is passed in two
    subsequent calls.  Based on a bug report from
    Roman Rybalko <roman_rybalko@users.sourceforge.net>
-   at <http://savannah.gnu.org/bugs/?24216>.  */
+   at <https://savannah.gnu.org/bugs/?24216>.  */
 
 void main1 (void)
 {

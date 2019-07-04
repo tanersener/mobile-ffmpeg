@@ -1,5 +1,5 @@
 # DO NOT EDIT! GENERATED AUTOMATICALLY!
-# Copyright (C) 2002-2016 Free Software Foundation, Inc.
+# Copyright (C) 2002-2019 Free Software Foundation, Inc.
 #
 # This file is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this file.  If not, see <http://www.gnu.org/licenses/>.
+# along with this file.  If not, see <https://www.gnu.org/licenses/>.
 #
 # As a special exception to the GNU General Public License,
 # this file may be distributed as part of a program that
@@ -52,14 +52,9 @@ AC_DEFUN([ggl_EARLY],
   # Code from module clock-time:
   # Code from module close:
   # Code from module connect:
-  # Code from module dirname-lgpl:
-  # Code from module dosname:
-  # Code from module double-slash-root:
   # Code from module dup2:
   # Code from module environ:
   # Code from module errno:
-  # Code from module error:
-  # Code from module exitfail:
   # Code from module extensions:
   # Code from module extern-inline:
   # Code from module fd-hook:
@@ -77,7 +72,6 @@ AC_DEFUN([ggl_EARLY],
   # Code from module getline:
   # Code from module getpass:
   # Code from module getpeername:
-  # Code from module getprogname:
   # Code from module gettext-h:
   # Code from module gettime:
   # Code from module gettimeofday:
@@ -86,10 +80,14 @@ AC_DEFUN([ggl_EARLY],
   # Code from module inet_ntop:
   # Code from module inet_pton:
   # Code from module intprops:
+  # Code from module inttypes:
+  # Code from module inttypes-incomplete:
   # Code from module largefile:
   AC_REQUIRE([AC_SYS_LARGEFILE])
+  # Code from module libc-config:
   # Code from module limits-h:
   # Code from module listen:
+  # Code from module localtime-buffer:
   # Code from module lseek:
   # Code from module malloc-posix:
   # Code from module malloca:
@@ -102,7 +100,9 @@ AC_DEFUN([ggl_EARLY],
   # Code from module multiarch:
   # Code from module netdb:
   # Code from module netinet_in:
+  # Code from module nstrftime:
   # Code from module parse-datetime:
+  # Code from module pathmax:
   # Code from module progname:
   # Code from module read-file:
   # Code from module realloc-posix:
@@ -127,6 +127,7 @@ AC_DEFUN([ggl_EARLY],
   # Code from module sockets:
   # Code from module socklen:
   # Code from module ssize_t:
+  # Code from module stat-time:
   # Code from module stdalign:
   # Code from module stdbool:
   # Code from module stddef:
@@ -134,9 +135,6 @@ AC_DEFUN([ggl_EARLY],
   # Code from module stdio:
   # Code from module stdlib:
   # Code from module strdup-posix:
-  # Code from module strerror:
-  # Code from module strerror-override:
-  # Code from module strftime:
   # Code from module string:
   # Code from module sys_select:
   # Code from module sys_socket:
@@ -149,13 +147,12 @@ AC_DEFUN([ggl_EARLY],
   # Code from module time_rz:
   # Code from module timegm:
   # Code from module timespec:
+  # Code from module tzset:
   # Code from module unistd:
   # Code from module unsetenv:
   # Code from module vasnprintf:
   # Code from module verify:
   # Code from module wchar:
-  # Code from module xalloc:
-  # Code from module xalloc-die:
   # Code from module xalloc-oversized:
   # Code from module xsize:
 ])
@@ -202,8 +199,6 @@ AC_SUBST([LTALLOCA])
     AC_LIBOBJ([connect])
   fi
   gl_SYS_SOCKET_MODULE_INDICATOR([connect])
-  gl_DIRNAME_LGPL
-  gl_DOUBLE_SLASH_ROOT
   gl_FUNC_DUP2
   if test $HAVE_DUP2 = 0 || test $REPLACE_DUP2 = 1; then
     AC_LIBOBJ([dup2])
@@ -213,14 +208,6 @@ AC_SUBST([LTALLOCA])
   gl_ENVIRON
   gl_UNISTD_MODULE_INDICATOR([environ])
   gl_HEADER_ERRNO_H
-  gl_ERROR
-  if test $ac_cv_lib_error_at_line = no; then
-    AC_LIBOBJ([error])
-    gl_PREREQ_ERROR
-  fi
-  m4_ifdef([AM_XGETTEXT_OPTION],
-    [AM_][XGETTEXT_OPTION([--flag=error:3:c-format])
-     AM_][XGETTEXT_OPTION([--flag=error_at_line:5:c-format])])
   AC_REQUIRE([gl_EXTERN_INLINE])
   AC_C_FLEXIBLE_ARRAY_MEMBER
   gl_FLOAT_H
@@ -244,6 +231,11 @@ AC_SUBST([LTALLOCA])
   gl_FUNC_FSTAT
   if test $REPLACE_FSTAT = 1; then
     AC_LIBOBJ([fstat])
+    case "$host_os" in
+      mingw*)
+        AC_LIBOBJ([stat-w32])
+        ;;
+    esac
     gl_PREREQ_FSTAT
   fi
   gl_SYS_STAT_MODULE_INDICATOR([fstat])
@@ -279,16 +271,16 @@ AC_SUBST([LTALLOCA])
   fi
   gl_STDIO_MODULE_INDICATOR([getline])
   gl_FUNC_GETPASS
-  if test $HAVE_GETPASS = 0; then
+  if test $HAVE_GETPASS = 0 || test $REPLACE_GETPASS = 1; then
     AC_LIBOBJ([getpass])
     gl_PREREQ_GETPASS
   fi
+  gl_UNISTD_MODULE_INDICATOR([getpass])
   AC_REQUIRE([gl_HEADER_SYS_SOCKET])
   if test "$ac_cv_header_winsock2_h" = yes; then
     AC_LIBOBJ([getpeername])
   fi
   gl_SYS_SOCKET_MODULE_INDICATOR([getpeername])
-  gl_FUNC_GETPROGNAME
   AC_SUBST([LIBINTL])
   AC_SUBST([LTLIBINTL])
   gl_GETTIME
@@ -311,13 +303,18 @@ AC_SUBST([LTALLOCA])
     gl_PREREQ_INET_PTON
   fi
   gl_ARPA_INET_MODULE_INDICATOR([inet_pton])
+  gl_INTTYPES_H
+  gl_INTTYPES_INCOMPLETE
   AC_REQUIRE([gl_LARGEFILE])
+  gl___INLINE
   gl_LIMITS_H
   AC_REQUIRE([gl_HEADER_SYS_SOCKET])
   if test "$ac_cv_header_winsock2_h" = yes; then
     AC_LIBOBJ([listen])
   fi
   gl_SYS_SOCKET_MODULE_INDICATOR([listen])
+  AC_REQUIRE([gl_LOCALTIME_BUFFER_DEFAULTS])
+  AC_LIBOBJ([localtime-buffer])
   gl_FUNC_LSEEK
   if test $REPLACE_LSEEK = 1; then
     AC_LIBOBJ([lseek])
@@ -343,7 +340,7 @@ AC_SUBST([LTALLOCA])
   fi
   gl_TIME_MODULE_INDICATOR([mktime])
   gl_FUNC_MKTIME_INTERNAL
-  if test $REPLACE_MKTIME = 1; then
+  if test $WANT_MKTIME_INTERNAL = 1; then
     AC_LIBOBJ([mktime])
     gl_PREREQ_MKTIME
   fi
@@ -355,11 +352,14 @@ AC_SUBST([LTALLOCA])
   if test $HAVE_MSVC_INVALID_PARAMETER_HANDLER = 1; then
     AC_LIBOBJ([msvc-nothrow])
   fi
+  gl_MODULE_INDICATOR([msvc-nothrow])
   gl_MULTIARCH
   gl_HEADER_NETDB
   gl_HEADER_NETINET_IN
   AC_PROG_MKDIR_P
+  gl_FUNC_GNU_STRFTIME
   gl_PARSE_DATETIME
+  gl_PATHMAX
   AC_CHECK_DECLS([program_invocation_name], [], [], [#include <errno.h>])
   AC_CHECK_DECLS([program_invocation_short_name], [], [], [#include <errno.h>])
   gl_PREREQ_READ_FILE
@@ -432,6 +432,8 @@ AC_SUBST([LTALLOCA])
   AC_REQUIRE([gl_SOCKETS])
   gl_TYPE_SOCKLEN_T
   gt_TYPE_SSIZE_T
+  gl_STAT_TIME
+  gl_STAT_BIRTHTIME
   gl_STDALIGN_H
   AM_STDBOOL_H
   gl_STDDEF_H
@@ -444,21 +446,8 @@ AC_SUBST([LTALLOCA])
     gl_PREREQ_STRDUP
   fi
   gl_STRING_MODULE_INDICATOR([strdup])
-  gl_FUNC_STRERROR
-  if test $REPLACE_STRERROR = 1; then
-    AC_LIBOBJ([strerror])
-  fi
-  gl_MODULE_INDICATOR([strerror])
-  gl_STRING_MODULE_INDICATOR([strerror])
-  AC_REQUIRE([gl_HEADER_ERRNO_H])
-  AC_REQUIRE([gl_FUNC_STRERROR_0])
-  if test -n "$ERRNO_H" || test $REPLACE_STRERROR_0 = 1; then
-    AC_LIBOBJ([strerror-override])
-    gl_PREREQ_SYS_H_WINSOCK2
-  fi
-  gl_FUNC_GNU_STRFTIME
   gl_HEADER_STRING_H
-  gl_HEADER_SYS_SELECT
+  AC_REQUIRE([gl_HEADER_SYS_SELECT])
   AC_PROG_MKDIR_P
   AC_REQUIRE([gl_HEADER_SYS_SOCKET])
   AC_PROG_MKDIR_P
@@ -478,7 +467,7 @@ AC_SUBST([LTALLOCA])
   fi
   gl_TIME_MODULE_INDICATOR([time_r])
   gl_TIME_RZ
-  if test "$HAVE_TIMEZONE_T" = 0; then
+  if test $HAVE_TIMEZONE_T = 0; then
     AC_LIBOBJ([time_rz])
   fi
   gl_TIME_MODULE_INDICATOR([time_rz])
@@ -489,6 +478,11 @@ AC_SUBST([LTALLOCA])
   fi
   gl_TIME_MODULE_INDICATOR([timegm])
   gl_TIMESPEC
+  gl_FUNC_TZSET
+  if test $HAVE_TZSET = 0 || test $REPLACE_TZSET = 1; then
+    AC_LIBOBJ([tzset])
+  fi
+  gl_TIME_MODULE_INDICATOR([tzset])
   gl_UNISTD_H
   gl_FUNC_UNSETENV
   if test $HAVE_UNSETENV = 0 || test $REPLACE_UNSETENV = 1; then
@@ -498,7 +492,6 @@ AC_SUBST([LTALLOCA])
   gl_STDLIB_MODULE_INDICATOR([unsetenv])
   gl_FUNC_VASNPRINTF
   gl_WCHAR_H
-  gl_XALLOC
   gl_XSIZE
   # End of code from modules
   m4_ifval(ggl_LIBSOURCES_LIST, [
@@ -636,31 +629,23 @@ AC_DEFUN([ggltests_LIBSOURCES], [
 # This macro records the list of files which have been installed by
 # gnulib-tool and may be removed by future gnulib-tool invocations.
 AC_DEFUN([ggl_FILE_LIST], [
-  build-aux/snippet/_Noreturn.h
-  build-aux/snippet/arg-nonnull.h
-  build-aux/snippet/c++defs.h
-  build-aux/snippet/warn-on-use.h
   doc/parse-datetime.texi
+  lib/_Noreturn.h
   lib/accept.c
   lib/alloca.c
   lib/alloca.in.h
+  lib/arg-nonnull.h
   lib/arpa_inet.in.h
   lib/asnprintf.c
-  lib/basename-lgpl.c
   lib/bind.c
+  lib/c++defs.h
   lib/c-ctype.c
   lib/c-ctype.h
+  lib/cdefs.h
   lib/close.c
   lib/connect.c
-  lib/dirname-lgpl.c
-  lib/dirname.h
-  lib/dosname.h
   lib/dup2.c
   lib/errno.in.h
-  lib/error.c
-  lib/error.h
-  lib/exitfail.c
-  lib/exitfail.h
   lib/fd-hook.c
   lib/fd-hook.h
   lib/flexmember.h
@@ -679,22 +664,23 @@ AC_DEFUN([ggl_FILE_LIST], [
   lib/getpass.c
   lib/getpass.h
   lib/getpeername.c
-  lib/getprogname.c
-  lib/getprogname.h
   lib/gettext.h
   lib/gettime.c
   lib/gettimeofday.c
   lib/inet_ntop.c
   lib/inet_pton.c
   lib/intprops.h
+  lib/inttypes.in.h
   lib/itold.c
+  lib/libc-config.h
   lib/limits.in.h
   lib/listen.c
+  lib/localtime-buffer.c
+  lib/localtime-buffer.h
   lib/lseek.c
   lib/malloc.c
   lib/malloca.c
   lib/malloca.h
-  lib/malloca.valgrind
   lib/memchr.c
   lib/memchr.valgrind
   lib/minmax.h
@@ -706,8 +692,10 @@ AC_DEFUN([ggl_FILE_LIST], [
   lib/msvc-nothrow.h
   lib/netdb.in.h
   lib/netinet_in.in.h
+  lib/nstrftime.c
   lib/parse-datetime.h
   lib/parse-datetime.y
+  lib/pathmax.h
   lib/printf-args.c
   lib/printf-args.h
   lib/printf-parse.c
@@ -731,6 +719,10 @@ AC_DEFUN([ggl_FILE_LIST], [
   lib/socket.c
   lib/sockets.c
   lib/sockets.h
+  lib/stat-time.c
+  lib/stat-time.h
+  lib/stat-w32.c
+  lib/stat-w32.h
   lib/stdalign.in.h
   lib/stdbool.in.h
   lib/stddef.in.h
@@ -739,13 +731,8 @@ AC_DEFUN([ggl_FILE_LIST], [
   lib/stdio.in.h
   lib/stdlib.in.h
   lib/strdup.c
-  lib/strerror-override.c
-  lib/strerror-override.h
-  lib/strerror.c
-  lib/strftime.c
   lib/strftime.h
   lib/string.in.h
-  lib/stripslash.c
   lib/sys_select.in.h
   lib/sys_socket.c
   lib/sys_socket.in.h
@@ -760,6 +747,7 @@ AC_DEFUN([ggl_FILE_LIST], [
   lib/timegm.c
   lib/timespec.c
   lib/timespec.h
+  lib/tzset.c
   lib/unistd.c
   lib/unistd.in.h
   lib/unsetenv.c
@@ -767,27 +755,23 @@ AC_DEFUN([ggl_FILE_LIST], [
   lib/vasnprintf.h
   lib/verify.h
   lib/w32sock.h
+  lib/warn-on-use.h
   lib/wchar.in.h
-  lib/xalloc-die.c
   lib/xalloc-oversized.h
-  lib/xalloc.h
-  lib/xmalloc.c
   lib/xsize.c
   lib/xsize.h
   m4/00gnulib.m4
+  m4/__inline.m4
   m4/absolute-header.m4
   m4/alloca.m4
   m4/arpa_inet_h.m4
   m4/bison.m4
   m4/clock_time.m4
   m4/close.m4
-  m4/dirname.m4
-  m4/double-slash-root.m4
   m4/dup2.m4
   m4/eealloc.m4
   m4/environ.m4
   m4/errno_h.m4
-  m4/error.m4
   m4/exponentd.m4
   m4/extensions.m4
   m4/extern-inline.m4
@@ -802,7 +786,6 @@ AC_DEFUN([ggl_FILE_LIST], [
   m4/getdelim.m4
   m4/getline.m4
   m4/getpass.m4
-  m4/getprogname.m4
   m4/gettime.m4
   m4/gettimeofday.m4
   m4/gnulib-common.m4
@@ -811,9 +794,12 @@ AC_DEFUN([ggl_FILE_LIST], [
   m4/inet_ntop.m4
   m4/inet_pton.m4
   m4/intmax_t.m4
+  m4/inttypes-pri.m4
+  m4/inttypes.m4
   m4/inttypes_h.m4
   m4/largefile.m4
   m4/limits-h.m4
+  m4/localtime-buffer.m4
   m4/longlong.m4
   m4/lseek.m4
   m4/malloc.m4
@@ -828,8 +814,10 @@ AC_DEFUN([ggl_FILE_LIST], [
   m4/multiarch.m4
   m4/netdb_h.m4
   m4/netinet_in_h.m4
+  m4/nstrftime.m4
   m4/off_t.m4
   m4/parse-datetime.m4
+  m4/pathmax.m4
   m4/printf.m4
   m4/read-file.m4
   m4/realloc.m4
@@ -844,6 +832,7 @@ AC_DEFUN([ggl_FILE_LIST], [
   m4/socklen.m4
   m4/sockpfaf.m4
   m4/ssize_t.m4
+  m4/stat-time.m4
   m4/stdalign.m4
   m4/stdbool.m4
   m4/stddef_h.m4
@@ -852,8 +841,6 @@ AC_DEFUN([ggl_FILE_LIST], [
   m4/stdio_h.m4
   m4/stdlib_h.m4
   m4/strdup.m4
-  m4/strerror.m4
-  m4/strftime.m4
   m4/string_h.m4
   m4/sys_select_h.m4
   m4/sys_socket_h.m4
@@ -867,12 +854,12 @@ AC_DEFUN([ggl_FILE_LIST], [
   m4/timegm.m4
   m4/timespec.m4
   m4/tm_gmtoff.m4
+  m4/tzset.m4
   m4/unistd_h.m4
   m4/vasnprintf.m4
   m4/warn-on-use.m4
   m4/wchar_h.m4
   m4/wchar_t.m4
   m4/wint_t.m4
-  m4/xalloc.m4
   m4/xsize.m4
 ])

@@ -9,9 +9,6 @@
 /* Define to 1 if you have the `arc4random_buf' function. */
 #cmakedefine HAVE_ARC4RANDOM_BUF
 
-/* Define to 1 if you have the `bcopy' function. */
-#cmakedefine HAVE_BCOPY
-
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #cmakedefine HAVE_DLFCN_H
 
@@ -29,9 +26,6 @@
 
 /* Define to 1 if you have the `bsd' library (-lbsd). */
 #cmakedefine HAVE_LIBBSD
-
-/* Define to 1 if you have the `memmove' function. */
-#cmakedefine HAVE_MEMMOVE
 
 /* Define to 1 if you have the <memory.h> header file. */
 #cmakedefine HAVE_MEMORY_H

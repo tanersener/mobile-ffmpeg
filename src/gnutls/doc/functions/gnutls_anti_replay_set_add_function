@@ -1,0 +1,26 @@
+
+
+
+
+@deftypefun {void} {gnutls_anti_replay_set_add_function} (gnutls_anti_replay_t @var{anti_replay}, gnutls_db_add_func @var{add_func})
+@var{anti_replay}: is a @code{gnutls_anti_replay_t}  type.
+
+@var{add_func}: is the function.
+
+Sets the function that will be used to store an entry if it is not
+already present in the resumed sessions database.  This function returns 0
+if the entry is successfully stored, and a negative error code
+otherwise.  In particular, if the entry is found in the database,
+it returns @code{GNUTLS_E_DB_ENTRY_EXISTS} .
+
+The arguments to the  @code{add_func} are:
+- @code{ptr} : the pointer set with @code{gnutls_anti_replay_set_ptr()} 
+- @code{exp_time} : the expiration time of the entry
+- @code{key} : a pointer to the key
+- @code{data} : a pointer to data to store
+
+The data set by this function can be examined using
+@code{gnutls_db_check_entry_expire_time()}  and @code{gnutls_db_check_entry_time()} .
+
+@strong{Since:} 3.6.5
+@end deftypefun

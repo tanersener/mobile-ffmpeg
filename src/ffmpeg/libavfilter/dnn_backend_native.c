@@ -24,8 +24,9 @@
  */
 
 #include "dnn_backend_native.h"
+#include "libavutil/avassert.h"
 
-static DNNReturnType set_input_output_native(void *model, DNNData *input, DNNData *output)
+static DNNReturnType set_input_output_native(void *model, DNNInputData *input, const char *input_name, const char **output_names, uint32_t nb_output)
 {
     ConvolutionalNetwork *network = (ConvolutionalNetwork *)model;
     InputParams *input_params;
@@ -45,6 +46,7 @@ static DNNReturnType set_input_output_native(void *model, DNNData *input, DNNDat
         if (input->data){
             av_freep(&input->data);
         }
+        av_assert0(input->dt == DNN_FLOAT);
         network->layers[0].output = input->data = av_malloc(cur_height * cur_width * cur_channels * sizeof(float));
         if (!network->layers[0].output){
             return DNN_ERROR;
@@ -59,6 +61,12 @@ static DNNReturnType set_input_output_native(void *model, DNNData *input, DNNDat
                 return DNN_ERROR;
             }
             cur_channels = conv_params->output_num;
+
+            if (conv_params->padding_method == VALID) {
+                int pad_size = (conv_params->kernel_size - 1) * conv_params->dilation;
+                cur_height -= pad_size;
+                cur_width -= pad_size;
+            }
             break;
         case DEPTH_TO_SPACE:
             depth_to_space_params = (DepthToSpaceParams *)network->layers[layer].params;
@@ -75,16 +83,15 @@ static DNNReturnType set_input_output_native(void *model, DNNData *input, DNNDat
         if (network->layers[layer].output){
             av_freep(&network->layers[layer].output);
         }
+
+        if (cur_height <= 0 || cur_width <= 0)
+            return DNN_ERROR;
+
         network->layers[layer].output = av_malloc(cur_height * cur_width * cur_channels * sizeof(float));
         if (!network->layers[layer].output){
             return DNN_ERROR;
         }
     }
-
-    output->data = network->layers[network->layers_num - 1].output;
-    output->height = cur_height;
-    output->width = cur_width;
-    output->channels = cur_channels;
 
     return DNN_SUCCESS;
 }
@@ -157,13 +164,15 @@ DNNModel *ff_dnn_load_model_native(const char *model_filename)
                 ff_dnn_free_model_native(&model);
                 return NULL;
             }
+            conv_params->dilation = (int32_t)avio_rl32(model_file_context);
+            conv_params->padding_method = (int32_t)avio_rl32(model_file_context);
             conv_params->activation = (int32_t)avio_rl32(model_file_context);
             conv_params->input_num = (int32_t)avio_rl32(model_file_context);
             conv_params->output_num = (int32_t)avio_rl32(model_file_context);
             conv_params->kernel_size = (int32_t)avio_rl32(model_file_context);
             kernel_size = conv_params->input_num * conv_params->output_num *
                           conv_params->kernel_size * conv_params->kernel_size;
-            dnn_size += 16 + (kernel_size + conv_params->output_num << 2);
+            dnn_size += 24 + (kernel_size + conv_params->output_num << 2);
             if (dnn_size > file_size || conv_params->input_num <= 0 ||
                 conv_params->output_num <= 0 || conv_params->kernel_size <= 0){
                 avio_closep(&model_file_context);
@@ -221,23 +230,35 @@ DNNModel *ff_dnn_load_model_native(const char *model_filename)
 
 static void convolve(const float *input, float *output, const ConvolutionalParams *conv_params, int width, int height)
 {
-    int y, x, n_filter, ch, kernel_y, kernel_x;
     int radius = conv_params->kernel_size >> 1;
     int src_linesize = width * conv_params->input_num;
     int filter_linesize = conv_params->kernel_size * conv_params->input_num;
     int filter_size = conv_params->kernel_size * filter_linesize;
+    int pad_size = (conv_params->padding_method == VALID) ? (conv_params->kernel_size - 1) / 2 * conv_params->dilation : 0;
 
-    for (y = 0; y < height; ++y){
-        for (x = 0; x < width; ++x){
-            for (n_filter = 0; n_filter < conv_params->output_num; ++n_filter){
+    for (int y = pad_size; y < height - pad_size; ++y) {
+        for (int x = pad_size; x < width - pad_size; ++x) {
+            for (int n_filter = 0; n_filter < conv_params->output_num; ++n_filter) {
                 output[n_filter] = conv_params->biases[n_filter];
-                for (ch = 0; ch < conv_params->input_num; ++ch){
-                    for (kernel_y = 0; kernel_y < conv_params->kernel_size; ++kernel_y){
-                        for (kernel_x = 0; kernel_x < conv_params->kernel_size; ++kernel_x){
-                            output[n_filter] += input[CLAMP_TO_EDGE(y + kernel_y - radius, height) * src_linesize +
-                                                      CLAMP_TO_EDGE(x + kernel_x - radius, width) * conv_params->input_num + ch] *
-                                                conv_params->kernel[n_filter * filter_size + kernel_y * filter_linesize +
-                                                                    kernel_x * conv_params->input_num + ch];
+
+                for (int ch = 0; ch < conv_params->input_num; ++ch) {
+                    for (int kernel_y = 0; kernel_y < conv_params->kernel_size; ++kernel_y) {
+                        for (int kernel_x = 0; kernel_x < conv_params->kernel_size; ++kernel_x) {
+                            float input_pel;
+                            if (conv_params->padding_method == SAME_CLAMP_TO_EDGE) {
+                                int y_pos = CLAMP_TO_EDGE(y + (kernel_y - radius) * conv_params->dilation, height);
+                                int x_pos = CLAMP_TO_EDGE(x + (kernel_x - radius) * conv_params->dilation, width);
+                                input_pel = input[y_pos * src_linesize + x_pos * conv_params->input_num + ch];
+                            } else {
+                                int y_pos = y + (kernel_y - radius) * conv_params->dilation;
+                                int x_pos = x + (kernel_x - radius) * conv_params->dilation;
+                                input_pel = (x_pos < 0 || x_pos >= width || y_pos < 0 || y_pos >= height) ? 0.0 :
+                                                   input[y_pos * src_linesize + x_pos * conv_params->input_num + ch];
+                            }
+
+
+                            output[n_filter] += input_pel * conv_params->kernel[n_filter * filter_size + kernel_y * filter_linesize +
+                                                                                kernel_x * conv_params->input_num + ch];
                         }
                     }
                 }
@@ -250,6 +271,11 @@ static void convolve(const float *input, float *output, const ConvolutionalParam
                     break;
                 case SIGMOID:
                     output[n_filter] = 1.0f / (1.0f + exp(-output[n_filter]));
+                    break;
+                case NONE:
+                    break;
+                case LEAKY_RELU:
+                    output[n_filter] = FFMAX(output[n_filter], 0.0) + 0.2 * FFMIN(output[n_filter], 0.0);
                 }
             }
             output += conv_params->output_num;
@@ -280,7 +306,7 @@ static void depth_to_space(const float *input, float *output, int block_size, in
     }
 }
 
-DNNReturnType ff_dnn_execute_model_native(const DNNModel *model)
+DNNReturnType ff_dnn_execute_model_native(const DNNModel *model, DNNData *outputs, uint32_t nb_output)
 {
     ConvolutionalNetwork *network = (ConvolutionalNetwork *)model->model;
     int cur_width, cur_height, cur_channels;
@@ -308,6 +334,11 @@ DNNReturnType ff_dnn_execute_model_native(const DNNModel *model)
             conv_params = (ConvolutionalParams *)network->layers[layer].params;
             convolve(network->layers[layer - 1].output, network->layers[layer].output, conv_params, cur_width, cur_height);
             cur_channels = conv_params->output_num;
+            if (conv_params->padding_method == VALID) {
+                int pad_size = (conv_params->kernel_size - 1) * conv_params->dilation;
+                cur_height -= pad_size;
+                cur_width -= pad_size;
+            }
             break;
         case DEPTH_TO_SPACE:
             depth_to_space_params = (DepthToSpaceParams *)network->layers[layer].params;
@@ -321,6 +352,14 @@ DNNReturnType ff_dnn_execute_model_native(const DNNModel *model)
             return DNN_ERROR;
         }
     }
+
+    // native mode does not support multiple outputs yet
+    if (nb_output > 1)
+        return DNN_ERROR;
+    outputs[0].data = network->layers[network->layers_num - 1].output;
+    outputs[0].height = cur_height;
+    outputs[0].width = cur_width;
+    outputs[0].channels = cur_channels;
 
     return DNN_SUCCESS;
 }

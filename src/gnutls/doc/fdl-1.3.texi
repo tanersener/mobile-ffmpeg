@@ -6,7 +6,7 @@
 
 @display
 Copyright @copyright{} 2000, 2001, 2002, 2007, 2008 Free Software Foundation, Inc.
-@uref{http://fsf.org/}
+@uref{https://fsf.org/}
 
 Everyone is permitted to copy and distribute verbatim copies
 of this license document, but changing it is not allowed.
@@ -97,7 +97,7 @@ format, SGML or XML using a publicly available
 DTD, and standard-conforming simple HTML,
 PostScript or PDF designed for human modification.  Examples
 of transparent image formats include PNG, XCF and
-JPG.  Opaque formats include proprietary formats that can be
+JPG@.  Opaque formats include proprietary formats that can be
 read and edited only by proprietary word processors, SGML or
 XML for which the DTD and/or processing tools are
 not generally available, and the machine-generated HTML,
@@ -414,7 +414,7 @@ The Free Software Foundation may publish new, revised versions
 of the GNU Free Documentation License from time to time.  Such new
 versions will be similar in spirit to the present version, but may
 differ in detail to address new problems or concerns.  See
-@uref{http://www.gnu.org/copyleft/}.
+@uref{https://www.gnu.org/licenses/}.
 
 Each version of the License is given a distinguishing version number.
 If the Document specifies that a particular numbered version of this
@@ -468,7 +468,7 @@ To use this License in a document you have written, include a copy of
 the License in the document and put the following copyright and
 license notices just after the title page:
 
-@example
+@smallexample
 @group
   Copyright (C)  @var{year}  @var{your name}.
   Permission is granted to copy, distribute and/or modify this document
@@ -478,18 +478,18 @@ license notices just after the title page:
   Texts.  A copy of the license is included in the section entitled ``GNU
   Free Documentation License''.
 @end group
-@end example
+@end smallexample
 
 If you have Invariant Sections, Front-Cover Texts and Back-Cover Texts,
 replace the ``with@dots{}Texts.''@: line with this:
 
-@example
+@smallexample
 @group
     with the Invariant Sections being @var{list their titles}, with
     the Front-Cover Texts being @var{list}, and with the Back-Cover Texts
     being @var{list}.
 @end group
-@end example
+@end smallexample
 
 If you have Invariant Sections without Cover Texts, or some other
 combination of the three, merge those two alternatives to suit the
@@ -503,4 +503,3 @@ to permit their use in free software.
 @c Local Variables:
 @c ispell-local-pdict: "ispell-dict"
 @c End:
-

@@ -49,6 +49,7 @@ int main(int argc, char **argv)
 #endif
 #include <unistd.h>
 #include <signal.h>
+#include <assert.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/abstract.h>
 
@@ -64,9 +65,6 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "%s |<%d>| %s", child ? "server" : "client", level,
 		str);
 }
-
-/* A very basic TLS client, with anonymous authentication.
- */
 
 #define MAX_BUF 1024
 #define MSG "Hello TLS"
@@ -135,10 +133,10 @@ cert_callback(gnutls_session_t session,
 }
 
 
-static void client(int sd)
+static void client(int sd, const char *prio)
 {
 	int ret, ii;
-	gnutls_session_t session;
+	gnutls_session_t session = NULL;
 	char buffer[MAX_BUF + 1];
 	gnutls_certificate_credentials_t xcred;
 
@@ -165,8 +163,7 @@ static void client(int sd)
 	 */
 	gnutls_init(&session, GNUTLS_CLIENT);
 
-	/* Use default priorities */
-	gnutls_priority_set_direct(session, "NORMAL", NULL);
+	assert(gnutls_priority_set_direct(session, prio, NULL)>=0);
 
 	/* put the x509 credentials to the current session
 	 */
@@ -234,33 +231,13 @@ static void client(int sd)
  */
 
 #define MAX_BUF 1024
-#define DH_BITS 1024
 
-/* These are global */
-
-static gnutls_dh_params_t dh_params;
-
-static int generate_dh_params(void)
+static void server(int sd, const char *prio)
 {
-	const gnutls_datum_t p3 = { (void *) pkcs3, strlen(pkcs3) };
-	/* Generate Diffie-Hellman parameters - for use with DHE
-	 * kx algorithms. These should be discarded and regenerated
-	 * once a day, once a week or once a month. Depending on the
-	 * security requirements.
-	 */
-	gnutls_dh_params_init(&dh_params);
-	return gnutls_dh_params_import_pkcs3(dh_params, &p3,
-					     GNUTLS_X509_FMT_PEM);
-}
-
-
-
-static void server(int sd)
-{
-gnutls_certificate_credentials_t x509_cred;
-int ret;
-gnutls_session_t session;
-char buffer[MAX_BUF + 1];
+	gnutls_certificate_credentials_t x509_cred;
+	int ret;
+	gnutls_session_t session;
+	char buffer[MAX_BUF + 1];
 	/* this must be called once in the program
 	 */
 	global_init();
@@ -281,19 +258,9 @@ char buffer[MAX_BUF + 1];
 					    &server_ca3_key,
 					    GNUTLS_X509_FMT_PEM);
 
-	if (debug)
-		success("Launched, generating DH parameters...\n");
-
-	generate_dh_params();
-
-	gnutls_certificate_set_dh_params(x509_cred, dh_params);
-
 	gnutls_init(&session, GNUTLS_SERVER);
 
-	/* avoid calling all the priority functions, since the defaults
-	 * are adequate.
-	 */
-	gnutls_priority_set_direct(session, "NORMAL", NULL);
+	assert(gnutls_priority_set_direct(session, prio, NULL)>=0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
@@ -301,8 +268,6 @@ char buffer[MAX_BUF + 1];
 	 */
 	gnutls_certificate_server_set_request(session,
 					      GNUTLS_CERT_REQUEST);
-
-	gnutls_dh_set_prime_bits(session, DH_BITS);
 
 	gnutls_transport_set_int(session, sd);
 	gnutls_handshake_set_timeout(session, 20 * 1000);
@@ -355,19 +320,19 @@ char buffer[MAX_BUF + 1];
 
 	gnutls_certificate_free_credentials(x509_cred);
 
-	gnutls_dh_params_deinit(dh_params);
-
 	gnutls_global_deinit();
 
 	if (debug)
 		success("server: finished\n");
 }
 
-
-void doit(void)
+static
+void start(const char *prio)
 {
 	int sockets[2];
 	int err;
+
+	success("trying %s\n", prio);
 
 	signal(SIGPIPE, SIG_IGN);
 
@@ -389,13 +354,21 @@ void doit(void)
 		int status;
 		/* parent */
 		close(sockets[1]);
-		server(sockets[0]);
+		server(sockets[0], prio);
 		wait(&status);
 		check_wait_status(status);
 	} else {
 		close(sockets[0]);
-		client(sockets[1]);
+		client(sockets[1], prio);
+		exit(0);
 	}
+}
+
+void doit(void)
+{
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.2");
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.3");
+	start("NORMAL");
 }
 
 #endif				/* _WIN32 */

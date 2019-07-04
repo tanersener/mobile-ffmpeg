@@ -19,7 +19,7 @@
  * The ocsptool program is copyrighted and licensed
  * under the following terms:
  *
- *  Copyright (C) 2000-2018 Free Software Foundation, and others, all rights reserved.
+ *  Copyright (C) 2000-2019 Free Software Foundation, and others, all rights reserved.
  *  This is free software. It is licensed for use, modification and
  *  redistribution under the terms of the GNU General Public License,
  *  version 3 or later <http://gnu.org/licenses/gpl.html>
@@ -53,7 +53,7 @@ extern "C" {
 #endif
 extern FILE * option_usage_fp;
 #define zCopyright      (ocsptool_opt_strs+0)
-#define zLicenseDescrip (ocsptool_opt_strs+284)
+#define zLicenseDescrip (ocsptool_opt_strs+283)
 
 
 #ifndef NULL
@@ -63,13 +63,13 @@ extern FILE * option_usage_fp;
 /**
  *  static const strings for ocsptool options
  */
-static char const ocsptool_opt_strs[2316] =
-/*     0 */ "ocsptool 3.5.19\n"
-            "Copyright (C) 2000-2018 Free Software Foundation, and others, all rights reserved.\n"
+static char const ocsptool_opt_strs[2758] =
+/*     0 */ "ocsptool 3.6.8\n"
+            "Copyright (C) 2000-2019 Free Software Foundation, and others, all rights reserved.\n"
             "This is free software. It is licensed for use, modification and\n"
             "redistribution under the terms of the GNU General Public License,\n"
             "version 3 or later <http://gnu.org/licenses/gpl.html>\n\0"
-/*   284 */ "ocsptool is free software: you can redistribute it and/or modify it under\n"
+/*   283 */ "ocsptool is free software: you can redistribute it and/or modify it under\n"
             "the terms of the GNU General Public License as published by the Free\n"
             "Software Foundation, either version 3 of the License, or (at your option)\n"
             "any later version.\n\n"
@@ -79,87 +79,101 @@ static char const ocsptool_opt_strs[2316] =
             "details.\n\n"
             "You should have received a copy of the GNU General Public License along\n"
             "with this program.  If not, see <http://www.gnu.org/licenses/>.\n\0"
-/*   889 */ "Enable debugging\0"
-/*   906 */ "DEBUG\0"
-/*   912 */ "debug\0"
-/*   918 */ "More verbose output\0"
-/*   938 */ "VERBOSE\0"
-/*   946 */ "verbose\0"
-/*   954 */ "Input file\0"
-/*   965 */ "INFILE\0"
-/*   972 */ "infile\0"
-/*   979 */ "Output file\0"
-/*   991 */ "OUTFILE\0"
-/*   999 */ "outfile\0"
-/*  1007 */ "Ask an OCSP/HTTP server on a certificate validity\0"
-/*  1057 */ "ASK\0"
-/*  1061 */ "ask\0"
-/*  1065 */ "Verify response\0"
-/*  1081 */ "VERIFY_RESPONSE\0"
-/*  1097 */ "verify-response\0"
-/*  1113 */ "Print information on a OCSP request\0"
-/*  1149 */ "REQUEST_INFO\0"
-/*  1162 */ "request-info\0"
-/*  1175 */ "Print information on a OCSP response\0"
-/*  1212 */ "RESPONSE_INFO\0"
-/*  1226 */ "response-info\0"
-/*  1240 */ "Generate an OCSP request\0"
+/*   888 */ "Enable debugging\0"
+/*   905 */ "DEBUG\0"
+/*   911 */ "debug\0"
+/*   917 */ "More verbose output\0"
+/*   937 */ "VERBOSE\0"
+/*   945 */ "verbose\0"
+/*   953 */ "Input file\0"
+/*   964 */ "INFILE\0"
+/*   971 */ "infile\0"
+/*   978 */ "Output file\0"
+/*   990 */ "OUTFILE\0"
+/*   998 */ "outfile\0"
+/*  1006 */ "Ask an OCSP/HTTP server on a certificate validity\0"
+/*  1056 */ "ASK\0"
+/*  1060 */ "ask\0"
+/*  1064 */ "Verify response\0"
+/*  1080 */ "VERIFY_RESPONSE\0"
+/*  1096 */ "verify-response\0"
+/*  1112 */ "Print information on a OCSP request\0"
+/*  1148 */ "REQUEST_INFO\0"
+/*  1161 */ "request-info\0"
+/*  1174 */ "Print information on a OCSP response\0"
+/*  1211 */ "RESPONSE_INFO\0"
+/*  1225 */ "response-info\0"
+/*  1239 */ "Generates an OCSP request\0"
 /*  1265 */ "GENERATE_REQUEST\0"
 /*  1282 */ "generate-request\0"
 /*  1299 */ "Use (or not) a nonce to OCSP request\0"
 /*  1336 */ "NONCE\0"
 /*  1342 */ "no-nonce\0"
 /*  1351 */ "no\0"
-/*  1354 */ "Read issuer certificate from file\0"
-/*  1388 */ "LOAD_ISSUER\0"
-/*  1400 */ "load-issuer\0"
-/*  1412 */ "Read certificate to check from file\0"
-/*  1448 */ "LOAD_CERT\0"
-/*  1458 */ "load-cert\0"
-/*  1468 */ "Read OCSP trust anchors from file\0"
-/*  1502 */ "LOAD_TRUST\0"
-/*  1513 */ "load-trust\0"
-/*  1524 */ "Read OCSP response signer from file\0"
-/*  1560 */ "LOAD_SIGNER\0"
-/*  1572 */ "load-signer\0"
-/*  1584 */ "Use DER format for input certificates and private keys\0"
-/*  1639 */ "INDER\0"
-/*  1645 */ "no-inder\0"
-/*  1654 */ "Read DER encoded OCSP request from file\0"
-/*  1694 */ "LOAD_REQUEST\0"
-/*  1707 */ "load-request\0"
-/*  1720 */ "Read DER encoded OCSP response from file\0"
-/*  1761 */ "LOAD_RESPONSE\0"
-/*  1775 */ "load-response\0"
-/*  1789 */ "Ignore any verification errors\0"
-/*  1820 */ "IGNORE_ERRORS\0"
-/*  1834 */ "ignore-errors\0"
-/*  1848 */ "display extended usage information and exit\0"
-/*  1892 */ "help\0"
-/*  1897 */ "extended usage information passed thru pager\0"
-/*  1942 */ "more-help\0"
-/*  1952 */ "output version information and exit\0"
-/*  1988 */ "version\0"
-/*  1996 */ "OCSPTOOL\0"
-/*  2005 */ "ocsptool - GnuTLS OCSP tool\n"
+/*  1354 */ "Reads a set of certificates forming a chain from file\0"
+/*  1408 */ "LOAD_CHAIN\0"
+/*  1419 */ "load-chain\0"
+/*  1430 */ "Reads issuer's certificate from file\0"
+/*  1467 */ "LOAD_ISSUER\0"
+/*  1479 */ "load-issuer\0"
+/*  1491 */ "Reads the certificate to check from file\0"
+/*  1532 */ "LOAD_CERT\0"
+/*  1542 */ "load-cert\0"
+/*  1552 */ "Read OCSP trust anchors from file\0"
+/*  1586 */ "LOAD_TRUST\0"
+/*  1597 */ "load-trust\0"
+/*  1608 */ "Reads the OCSP response signer from file\0"
+/*  1649 */ "LOAD_SIGNER\0"
+/*  1661 */ "load-signer\0"
+/*  1673 */ "Use DER format for input certificates and private keys\0"
+/*  1728 */ "INDER\0"
+/*  1734 */ "no-inder\0"
+/*  1743 */ "Use DER format for output of responses (this is the default)\0"
+/*  1804 */ "OUTDER\0"
+/*  1811 */ "outder\0"
+/*  1818 */ "Use PEM format for output of responses\0"
+/*  1857 */ "OUTPEM\0"
+/*  1864 */ "outpem\0"
+/*  1871 */ "Reads the DER encoded OCSP request from file\0"
+/*  1916 */ "LOAD_REQUEST\0"
+/*  1929 */ "load-request\0"
+/*  1942 */ "Reads the DER encoded OCSP response from file\0"
+/*  1988 */ "LOAD_RESPONSE\0"
+/*  2002 */ "load-response\0"
+/*  2016 */ "Ignore any verification errors\0"
+/*  2047 */ "IGNORE_ERRORS\0"
+/*  2061 */ "ignore-errors\0"
+/*  2075 */ "Allow broken algorithms, such as MD5 for verification\0"
+/*  2129 */ "VERIFY_ALLOW_BROKEN\0"
+/*  2149 */ "verify-allow-broken\0"
+/*  2169 */ "display extended usage information and exit\0"
+/*  2213 */ "help\0"
+/*  2218 */ "extended usage information passed thru pager\0"
+/*  2263 */ "more-help\0"
+/*  2273 */ "output version information and exit\0"
+/*  2309 */ "version\0"
+/*  2317 */ "OCSPTOOL\0"
+/*  2326 */ "ocsptool - GnuTLS OCSP tool\n"
             "Usage:  %s [ -<flag> [<val>] | --<name>[{=| }<val>] ]...\n\0"
-/*  2091 */ "bugs@gnutls.org\0"
-/*  2107 */ "\n\0"
-/*  2109 */ "Ocsptool is a program that can parse and print information about OCSP\n"
-            "requests/responses, generate requests and verify responses.\n\0"
-/*  2240 */ "ocsptool 3.5.19\0"
-/*  2256 */ "ocsptool [options]\n"
+/*  2412 */ "bugs@gnutls.org\0"
+/*  2428 */ "\n\0"
+/*  2430 */ "ocsptool is a program that can parse and print information about OCSP\n"
+            "requests/responses, generate requests and verify responses.  Unlike other\n"
+            "GnuTLS applications it outputs DER encoded structures by default unless the\n"
+            "'--outpem' option is specified.\n\0"
+/*  2683 */ "ocsptool 3.6.8\0"
+/*  2698 */ "ocsptool [options]\n"
             "ocsptool --help for usage instructions.\n";
 
 /**
  *  debug option description:
  */
 /** Descriptive text for the debug option */
-#define DEBUG_DESC      (ocsptool_opt_strs+889)
+#define DEBUG_DESC      (ocsptool_opt_strs+888)
 /** Upper-cased name for the debug option */
-#define DEBUG_NAME      (ocsptool_opt_strs+906)
+#define DEBUG_NAME      (ocsptool_opt_strs+905)
 /** Name string for the debug option */
-#define DEBUG_name      (ocsptool_opt_strs+912)
+#define DEBUG_name      (ocsptool_opt_strs+911)
 /** Compiled in flag settings for the debug option */
 #define DEBUG_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_NUMERIC))
@@ -168,11 +182,11 @@ static char const ocsptool_opt_strs[2316] =
  *  verbose option description:
  */
 /** Descriptive text for the verbose option */
-#define VERBOSE_DESC      (ocsptool_opt_strs+918)
+#define VERBOSE_DESC      (ocsptool_opt_strs+917)
 /** Upper-cased name for the verbose option */
-#define VERBOSE_NAME      (ocsptool_opt_strs+938)
+#define VERBOSE_NAME      (ocsptool_opt_strs+937)
 /** Name string for the verbose option */
-#define VERBOSE_name      (ocsptool_opt_strs+946)
+#define VERBOSE_name      (ocsptool_opt_strs+945)
 /** Compiled in flag settings for the verbose option */
 #define VERBOSE_FLAGS     (OPTST_DISABLED)
 
@@ -180,11 +194,11 @@ static char const ocsptool_opt_strs[2316] =
  *  infile option description:
  */
 /** Descriptive text for the infile option */
-#define INFILE_DESC      (ocsptool_opt_strs+954)
+#define INFILE_DESC      (ocsptool_opt_strs+953)
 /** Upper-cased name for the infile option */
-#define INFILE_NAME      (ocsptool_opt_strs+965)
+#define INFILE_NAME      (ocsptool_opt_strs+964)
 /** Name string for the infile option */
-#define INFILE_name      (ocsptool_opt_strs+972)
+#define INFILE_name      (ocsptool_opt_strs+971)
 /** Compiled in flag settings for the infile option */
 #define INFILE_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_FILE))
@@ -193,29 +207,24 @@ static char const ocsptool_opt_strs[2316] =
  *  outfile option description:
  */
 /** Descriptive text for the outfile option */
-#define OUTFILE_DESC      (ocsptool_opt_strs+979)
+#define OUTFILE_DESC      (ocsptool_opt_strs+978)
 /** Upper-cased name for the outfile option */
-#define OUTFILE_NAME      (ocsptool_opt_strs+991)
+#define OUTFILE_NAME      (ocsptool_opt_strs+990)
 /** Name string for the outfile option */
-#define OUTFILE_name      (ocsptool_opt_strs+999)
+#define OUTFILE_name      (ocsptool_opt_strs+998)
 /** Compiled in flag settings for the outfile option */
 #define OUTFILE_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
 
 /**
- *  ask option description with
- *  "Must also have options" and "Incompatible options":
+ *  ask option description:
  */
 /** Descriptive text for the ask option */
-#define ASK_DESC      (ocsptool_opt_strs+1007)
+#define ASK_DESC      (ocsptool_opt_strs+1006)
 /** Upper-cased name for the ask option */
-#define ASK_NAME      (ocsptool_opt_strs+1057)
+#define ASK_NAME      (ocsptool_opt_strs+1056)
 /** Name string for the ask option */
-#define ASK_name      (ocsptool_opt_strs+1061)
-/** Other options that are required by the ask option */
-static int const aAskMustList[] = {
-    INDEX_OPT_LOAD_CERT,
-    INDEX_OPT_LOAD_ISSUER, NO_EQUIVALENT };
+#define ASK_name      (ocsptool_opt_strs+1060)
 /** Compiled in flag settings for the ask option */
 #define ASK_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING) | OPTST_ARG_OPTIONAL)
@@ -224,11 +233,11 @@ static int const aAskMustList[] = {
  *  verify-response option description:
  */
 /** Descriptive text for the verify-response option */
-#define VERIFY_RESPONSE_DESC      (ocsptool_opt_strs+1065)
+#define VERIFY_RESPONSE_DESC      (ocsptool_opt_strs+1064)
 /** Upper-cased name for the verify-response option */
-#define VERIFY_RESPONSE_NAME      (ocsptool_opt_strs+1081)
+#define VERIFY_RESPONSE_NAME      (ocsptool_opt_strs+1080)
 /** Name string for the verify-response option */
-#define VERIFY_RESPONSE_name      (ocsptool_opt_strs+1097)
+#define VERIFY_RESPONSE_name      (ocsptool_opt_strs+1096)
 /** Compiled in flag settings for the verify-response option */
 #define VERIFY_RESPONSE_FLAGS     (OPTST_DISABLED)
 
@@ -236,11 +245,11 @@ static int const aAskMustList[] = {
  *  request-info option description:
  */
 /** Descriptive text for the request-info option */
-#define REQUEST_INFO_DESC      (ocsptool_opt_strs+1113)
+#define REQUEST_INFO_DESC      (ocsptool_opt_strs+1112)
 /** Upper-cased name for the request-info option */
-#define REQUEST_INFO_NAME      (ocsptool_opt_strs+1149)
+#define REQUEST_INFO_NAME      (ocsptool_opt_strs+1148)
 /** Name string for the request-info option */
-#define REQUEST_INFO_name      (ocsptool_opt_strs+1162)
+#define REQUEST_INFO_name      (ocsptool_opt_strs+1161)
 /** Compiled in flag settings for the request-info option */
 #define REQUEST_INFO_FLAGS     (OPTST_DISABLED)
 
@@ -248,11 +257,11 @@ static int const aAskMustList[] = {
  *  response-info option description:
  */
 /** Descriptive text for the response-info option */
-#define RESPONSE_INFO_DESC      (ocsptool_opt_strs+1175)
+#define RESPONSE_INFO_DESC      (ocsptool_opt_strs+1174)
 /** Upper-cased name for the response-info option */
-#define RESPONSE_INFO_NAME      (ocsptool_opt_strs+1212)
+#define RESPONSE_INFO_NAME      (ocsptool_opt_strs+1211)
 /** Name string for the response-info option */
-#define RESPONSE_INFO_name      (ocsptool_opt_strs+1226)
+#define RESPONSE_INFO_name      (ocsptool_opt_strs+1225)
 /** Compiled in flag settings for the response-info option */
 #define RESPONSE_INFO_FLAGS     (OPTST_DISABLED)
 
@@ -260,7 +269,7 @@ static int const aAskMustList[] = {
  *  generate-request option description:
  */
 /** Descriptive text for the generate-request option */
-#define GENERATE_REQUEST_DESC      (ocsptool_opt_strs+1240)
+#define GENERATE_REQUEST_DESC      (ocsptool_opt_strs+1239)
 /** Upper-cased name for the generate-request option */
 #define GENERATE_REQUEST_NAME      (ocsptool_opt_strs+1265)
 /** Name string for the generate-request option */
@@ -285,14 +294,27 @@ static int const aAskMustList[] = {
 #define NONCE_FLAGS     (OPTST_DISABLED)
 
 /**
+ *  load-chain option description:
+ */
+/** Descriptive text for the load-chain option */
+#define LOAD_CHAIN_DESC      (ocsptool_opt_strs+1354)
+/** Upper-cased name for the load-chain option */
+#define LOAD_CHAIN_NAME      (ocsptool_opt_strs+1408)
+/** Name string for the load-chain option */
+#define LOAD_CHAIN_name      (ocsptool_opt_strs+1419)
+/** Compiled in flag settings for the load-chain option */
+#define LOAD_CHAIN_FLAGS     (OPTST_DISABLED \
+        | OPTST_SET_ARGTYPE(OPARG_TYPE_FILE))
+
+/**
  *  load-issuer option description:
  */
 /** Descriptive text for the load-issuer option */
-#define LOAD_ISSUER_DESC      (ocsptool_opt_strs+1354)
+#define LOAD_ISSUER_DESC      (ocsptool_opt_strs+1430)
 /** Upper-cased name for the load-issuer option */
-#define LOAD_ISSUER_NAME      (ocsptool_opt_strs+1388)
+#define LOAD_ISSUER_NAME      (ocsptool_opt_strs+1467)
 /** Name string for the load-issuer option */
-#define LOAD_ISSUER_name      (ocsptool_opt_strs+1400)
+#define LOAD_ISSUER_name      (ocsptool_opt_strs+1479)
 /** Compiled in flag settings for the load-issuer option */
 #define LOAD_ISSUER_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_FILE))
@@ -301,11 +323,11 @@ static int const aAskMustList[] = {
  *  load-cert option description:
  */
 /** Descriptive text for the load-cert option */
-#define LOAD_CERT_DESC      (ocsptool_opt_strs+1412)
+#define LOAD_CERT_DESC      (ocsptool_opt_strs+1491)
 /** Upper-cased name for the load-cert option */
-#define LOAD_CERT_NAME      (ocsptool_opt_strs+1448)
+#define LOAD_CERT_NAME      (ocsptool_opt_strs+1532)
 /** Name string for the load-cert option */
-#define LOAD_CERT_name      (ocsptool_opt_strs+1458)
+#define LOAD_CERT_name      (ocsptool_opt_strs+1542)
 /** Compiled in flag settings for the load-cert option */
 #define LOAD_CERT_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_FILE))
@@ -315,11 +337,11 @@ static int const aAskMustList[] = {
  *  "Must also have options" and "Incompatible options":
  */
 /** Descriptive text for the load-trust option */
-#define LOAD_TRUST_DESC      (ocsptool_opt_strs+1468)
+#define LOAD_TRUST_DESC      (ocsptool_opt_strs+1552)
 /** Upper-cased name for the load-trust option */
-#define LOAD_TRUST_NAME      (ocsptool_opt_strs+1502)
+#define LOAD_TRUST_NAME      (ocsptool_opt_strs+1586)
 /** Name string for the load-trust option */
-#define LOAD_TRUST_name      (ocsptool_opt_strs+1513)
+#define LOAD_TRUST_name      (ocsptool_opt_strs+1597)
 /** Other options that appear in conjunction with the load-trust option */
 static int const aLoad_TrustCantList[] = {
     INDEX_OPT_LOAD_SIGNER, NO_EQUIVALENT };
@@ -332,11 +354,11 @@ static int const aLoad_TrustCantList[] = {
  *  "Must also have options" and "Incompatible options":
  */
 /** Descriptive text for the load-signer option */
-#define LOAD_SIGNER_DESC      (ocsptool_opt_strs+1524)
+#define LOAD_SIGNER_DESC      (ocsptool_opt_strs+1608)
 /** Upper-cased name for the load-signer option */
-#define LOAD_SIGNER_NAME      (ocsptool_opt_strs+1560)
+#define LOAD_SIGNER_NAME      (ocsptool_opt_strs+1649)
 /** Name string for the load-signer option */
-#define LOAD_SIGNER_name      (ocsptool_opt_strs+1572)
+#define LOAD_SIGNER_name      (ocsptool_opt_strs+1661)
 /** Other options that appear in conjunction with the load-signer option */
 static int const aLoad_SignerCantList[] = {
     INDEX_OPT_LOAD_TRUST, NO_EQUIVALENT };
@@ -348,11 +370,11 @@ static int const aLoad_SignerCantList[] = {
  *  inder option description:
  */
 /** Descriptive text for the inder option */
-#define INDER_DESC      (ocsptool_opt_strs+1584)
+#define INDER_DESC      (ocsptool_opt_strs+1673)
 /** Upper-cased name for the inder option */
-#define INDER_NAME      (ocsptool_opt_strs+1639)
+#define INDER_NAME      (ocsptool_opt_strs+1728)
 /** disablement name for the inder option */
-#define NOT_INDER_name  (ocsptool_opt_strs+1645)
+#define NOT_INDER_name  (ocsptool_opt_strs+1734)
 /** disablement prefix for the inder option */
 #define NOT_INDER_PFX   (ocsptool_opt_strs+1351)
 /** Name string for the inder option */
@@ -361,14 +383,38 @@ static int const aLoad_SignerCantList[] = {
 #define INDER_FLAGS     (OPTST_DISABLED)
 
 /**
+ *  outder option description:
+ */
+/** Descriptive text for the outder option */
+#define OUTDER_DESC      (ocsptool_opt_strs+1743)
+/** Upper-cased name for the outder option */
+#define OUTDER_NAME      (ocsptool_opt_strs+1804)
+/** Name string for the outder option */
+#define OUTDER_name      (ocsptool_opt_strs+1811)
+/** Compiled in flag settings for the outder option */
+#define OUTDER_FLAGS     (OPTST_DISABLED)
+
+/**
+ *  outpem option description:
+ */
+/** Descriptive text for the outpem option */
+#define OUTPEM_DESC      (ocsptool_opt_strs+1818)
+/** Upper-cased name for the outpem option */
+#define OUTPEM_NAME      (ocsptool_opt_strs+1857)
+/** Name string for the outpem option */
+#define OUTPEM_name      (ocsptool_opt_strs+1864)
+/** Compiled in flag settings for the outpem option */
+#define OUTPEM_FLAGS     (OPTST_DISABLED)
+
+/**
  *  load-request option description:
  */
 /** Descriptive text for the load-request option */
-#define LOAD_REQUEST_DESC      (ocsptool_opt_strs+1654)
+#define LOAD_REQUEST_DESC      (ocsptool_opt_strs+1871)
 /** Upper-cased name for the load-request option */
-#define LOAD_REQUEST_NAME      (ocsptool_opt_strs+1694)
+#define LOAD_REQUEST_NAME      (ocsptool_opt_strs+1916)
 /** Name string for the load-request option */
-#define LOAD_REQUEST_name      (ocsptool_opt_strs+1707)
+#define LOAD_REQUEST_name      (ocsptool_opt_strs+1929)
 /** Compiled in flag settings for the load-request option */
 #define LOAD_REQUEST_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_FILE))
@@ -377,11 +423,11 @@ static int const aLoad_SignerCantList[] = {
  *  load-response option description:
  */
 /** Descriptive text for the load-response option */
-#define LOAD_RESPONSE_DESC      (ocsptool_opt_strs+1720)
+#define LOAD_RESPONSE_DESC      (ocsptool_opt_strs+1942)
 /** Upper-cased name for the load-response option */
-#define LOAD_RESPONSE_NAME      (ocsptool_opt_strs+1761)
+#define LOAD_RESPONSE_NAME      (ocsptool_opt_strs+1988)
 /** Name string for the load-response option */
-#define LOAD_RESPONSE_name      (ocsptool_opt_strs+1775)
+#define LOAD_RESPONSE_name      (ocsptool_opt_strs+2002)
 /** Compiled in flag settings for the load-response option */
 #define LOAD_RESPONSE_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_FILE))
@@ -390,22 +436,34 @@ static int const aLoad_SignerCantList[] = {
  *  ignore-errors option description:
  */
 /** Descriptive text for the ignore-errors option */
-#define IGNORE_ERRORS_DESC      (ocsptool_opt_strs+1789)
+#define IGNORE_ERRORS_DESC      (ocsptool_opt_strs+2016)
 /** Upper-cased name for the ignore-errors option */
-#define IGNORE_ERRORS_NAME      (ocsptool_opt_strs+1820)
+#define IGNORE_ERRORS_NAME      (ocsptool_opt_strs+2047)
 /** Name string for the ignore-errors option */
-#define IGNORE_ERRORS_name      (ocsptool_opt_strs+1834)
+#define IGNORE_ERRORS_name      (ocsptool_opt_strs+2061)
 /** Compiled in flag settings for the ignore-errors option */
 #define IGNORE_ERRORS_FLAGS     (OPTST_DISABLED)
+
+/**
+ *  verify-allow-broken option description:
+ */
+/** Descriptive text for the verify-allow-broken option */
+#define VERIFY_ALLOW_BROKEN_DESC      (ocsptool_opt_strs+2075)
+/** Upper-cased name for the verify-allow-broken option */
+#define VERIFY_ALLOW_BROKEN_NAME      (ocsptool_opt_strs+2129)
+/** Name string for the verify-allow-broken option */
+#define VERIFY_ALLOW_BROKEN_name      (ocsptool_opt_strs+2149)
+/** Compiled in flag settings for the verify-allow-broken option */
+#define VERIFY_ALLOW_BROKEN_FLAGS     (OPTST_DISABLED)
 
 /*
  *  Help/More_Help/Version option descriptions:
  */
-#define HELP_DESC       (ocsptool_opt_strs+1848)
-#define HELP_name       (ocsptool_opt_strs+1892)
+#define HELP_DESC       (ocsptool_opt_strs+2169)
+#define HELP_name       (ocsptool_opt_strs+2213)
 #ifdef HAVE_WORKING_FORK
-#define MORE_HELP_DESC  (ocsptool_opt_strs+1897)
-#define MORE_HELP_name  (ocsptool_opt_strs+1942)
+#define MORE_HELP_DESC  (ocsptool_opt_strs+2218)
+#define MORE_HELP_name  (ocsptool_opt_strs+2263)
 #define MORE_HELP_FLAGS (OPTST_IMM | OPTST_NO_INIT)
 #else
 #define MORE_HELP_DESC  HELP_DESC
@@ -418,8 +476,8 @@ static int const aLoad_SignerCantList[] = {
 #  define VER_FLAGS     (OPTST_SET_ARGTYPE(OPARG_TYPE_STRING) | \
                          OPTST_ARG_OPTIONAL | OPTST_IMM | OPTST_NO_INIT)
 #endif
-#define VER_DESC        (ocsptool_opt_strs+1952)
-#define VER_name        (ocsptool_opt_strs+1988)
+#define VER_DESC        (ocsptool_opt_strs+2273)
+#define VER_name        (ocsptool_opt_strs+2309)
 /**
  *  Declare option callback procedures
  */
@@ -430,8 +488,9 @@ extern tOptProc
     optionUnstackArg,   optionVendorOption;
 static tOptProc
     doOptDebug,         doOptInfile,        doOptLoad_Cert,
-    doOptLoad_Issuer,   doOptLoad_Request,  doOptLoad_Response,
-    doOptLoad_Signer,   doOptLoad_Trust,    doUsageOpt;
+    doOptLoad_Chain,    doOptLoad_Issuer,   doOptLoad_Request,
+    doOptLoad_Response, doOptLoad_Signer,   doOptLoad_Trust,
+    doUsageOpt;
 #define VER_PROC        optionPrintVersion
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -496,7 +555,7 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* opt state flags  */ ASK_FLAGS, 0,
      /* last opt argumnt */ { NULL }, /* --ask */
      /* arg list/cookie  */ NULL,
-     /* must/cannot opts */ aAskMustList, NULL,
+     /* must/cannot opts */ NULL, NULL,
      /* option proc      */ NULL,
      /* desc, NAME, name */ ASK_DESC, ASK_NAME, ASK_name,
      /* disablement strs */ NULL, NULL },
@@ -561,8 +620,20 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ NONCE_DESC, NONCE_NAME, NONCE_name,
      /* disablement strs */ NOT_NONCE_name, NOT_NONCE_PFX },
 
-  {  /* entry idx, value */ 10, VALUE_OPT_LOAD_ISSUER,
-     /* equiv idx, value */ 10, VALUE_OPT_LOAD_ISSUER,
+  {  /* entry idx, value */ 10, VALUE_OPT_LOAD_CHAIN,
+     /* equiv idx, value */ 10, VALUE_OPT_LOAD_CHAIN,
+     /* equivalenced to  */ NO_EQUIVALENT,
+     /* min, max, act ct */ 0, 1, 0,
+     /* opt state flags  */ LOAD_CHAIN_FLAGS, 0,
+     /* last opt argumnt */ { NULL }, /* --load-chain */
+     /* arg list/cookie  */ NULL,
+     /* must/cannot opts */ NULL, NULL,
+     /* option proc      */ doOptLoad_Chain,
+     /* desc, NAME, name */ LOAD_CHAIN_DESC, LOAD_CHAIN_NAME, LOAD_CHAIN_name,
+     /* disablement strs */ NULL, NULL },
+
+  {  /* entry idx, value */ 11, VALUE_OPT_LOAD_ISSUER,
+     /* equiv idx, value */ 11, VALUE_OPT_LOAD_ISSUER,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ LOAD_ISSUER_FLAGS, 0,
@@ -573,8 +644,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ LOAD_ISSUER_DESC, LOAD_ISSUER_NAME, LOAD_ISSUER_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 11, VALUE_OPT_LOAD_CERT,
-     /* equiv idx, value */ 11, VALUE_OPT_LOAD_CERT,
+  {  /* entry idx, value */ 12, VALUE_OPT_LOAD_CERT,
+     /* equiv idx, value */ 12, VALUE_OPT_LOAD_CERT,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ LOAD_CERT_FLAGS, 0,
@@ -585,8 +656,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ LOAD_CERT_DESC, LOAD_CERT_NAME, LOAD_CERT_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 12, VALUE_OPT_LOAD_TRUST,
-     /* equiv idx, value */ 12, VALUE_OPT_LOAD_TRUST,
+  {  /* entry idx, value */ 13, VALUE_OPT_LOAD_TRUST,
+     /* equiv idx, value */ 13, VALUE_OPT_LOAD_TRUST,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ LOAD_TRUST_FLAGS, 0,
@@ -597,8 +668,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ LOAD_TRUST_DESC, LOAD_TRUST_NAME, LOAD_TRUST_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 13, VALUE_OPT_LOAD_SIGNER,
-     /* equiv idx, value */ 13, VALUE_OPT_LOAD_SIGNER,
+  {  /* entry idx, value */ 14, VALUE_OPT_LOAD_SIGNER,
+     /* equiv idx, value */ 14, VALUE_OPT_LOAD_SIGNER,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ LOAD_SIGNER_FLAGS, 0,
@@ -609,8 +680,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ LOAD_SIGNER_DESC, LOAD_SIGNER_NAME, LOAD_SIGNER_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 14, VALUE_OPT_INDER,
-     /* equiv idx, value */ 14, VALUE_OPT_INDER,
+  {  /* entry idx, value */ 15, VALUE_OPT_INDER,
+     /* equiv idx, value */ 15, VALUE_OPT_INDER,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ INDER_FLAGS, 0,
@@ -621,8 +692,32 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ INDER_DESC, INDER_NAME, INDER_name,
      /* disablement strs */ NOT_INDER_name, NOT_INDER_PFX },
 
-  {  /* entry idx, value */ 15, VALUE_OPT_LOAD_REQUEST,
-     /* equiv idx, value */ 15, VALUE_OPT_LOAD_REQUEST,
+  {  /* entry idx, value */ 16, VALUE_OPT_OUTDER,
+     /* equiv idx, value */ 16, VALUE_OPT_OUTDER,
+     /* equivalenced to  */ NO_EQUIVALENT,
+     /* min, max, act ct */ 0, 1, 0,
+     /* opt state flags  */ OUTDER_FLAGS, 0,
+     /* last opt argumnt */ { NULL }, /* --outder */
+     /* arg list/cookie  */ NULL,
+     /* must/cannot opts */ NULL, NULL,
+     /* option proc      */ NULL,
+     /* desc, NAME, name */ OUTDER_DESC, OUTDER_NAME, OUTDER_name,
+     /* disablement strs */ NULL, NULL },
+
+  {  /* entry idx, value */ 17, VALUE_OPT_OUTPEM,
+     /* equiv idx, value */ 17, VALUE_OPT_OUTPEM,
+     /* equivalenced to  */ NO_EQUIVALENT,
+     /* min, max, act ct */ 0, 1, 0,
+     /* opt state flags  */ OUTPEM_FLAGS, 0,
+     /* last opt argumnt */ { NULL }, /* --outpem */
+     /* arg list/cookie  */ NULL,
+     /* must/cannot opts */ NULL, NULL,
+     /* option proc      */ NULL,
+     /* desc, NAME, name */ OUTPEM_DESC, OUTPEM_NAME, OUTPEM_name,
+     /* disablement strs */ NULL, NULL },
+
+  {  /* entry idx, value */ 18, VALUE_OPT_LOAD_REQUEST,
+     /* equiv idx, value */ 18, VALUE_OPT_LOAD_REQUEST,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ LOAD_REQUEST_FLAGS, 0,
@@ -633,8 +728,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ LOAD_REQUEST_DESC, LOAD_REQUEST_NAME, LOAD_REQUEST_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 16, VALUE_OPT_LOAD_RESPONSE,
-     /* equiv idx, value */ 16, VALUE_OPT_LOAD_RESPONSE,
+  {  /* entry idx, value */ 19, VALUE_OPT_LOAD_RESPONSE,
+     /* equiv idx, value */ 19, VALUE_OPT_LOAD_RESPONSE,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ LOAD_RESPONSE_FLAGS, 0,
@@ -645,8 +740,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ LOAD_RESPONSE_DESC, LOAD_RESPONSE_NAME, LOAD_RESPONSE_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 17, VALUE_OPT_IGNORE_ERRORS,
-     /* equiv idx, value */ 17, VALUE_OPT_IGNORE_ERRORS,
+  {  /* entry idx, value */ 20, VALUE_OPT_IGNORE_ERRORS,
+     /* equiv idx, value */ 20, VALUE_OPT_IGNORE_ERRORS,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ IGNORE_ERRORS_FLAGS, 0,
@@ -655,6 +750,18 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* must/cannot opts */ NULL, NULL,
      /* option proc      */ NULL,
      /* desc, NAME, name */ IGNORE_ERRORS_DESC, IGNORE_ERRORS_NAME, IGNORE_ERRORS_name,
+     /* disablement strs */ NULL, NULL },
+
+  {  /* entry idx, value */ 21, VALUE_OPT_VERIFY_ALLOW_BROKEN,
+     /* equiv idx, value */ 21, VALUE_OPT_VERIFY_ALLOW_BROKEN,
+     /* equivalenced to  */ NO_EQUIVALENT,
+     /* min, max, act ct */ 0, 1, 0,
+     /* opt state flags  */ VERIFY_ALLOW_BROKEN_FLAGS, 0,
+     /* last opt argumnt */ { NULL }, /* --verify-allow-broken */
+     /* arg list/cookie  */ NULL,
+     /* must/cannot opts */ NULL, NULL,
+     /* option proc      */ NULL,
+     /* desc, NAME, name */ VERIFY_ALLOW_BROKEN_DESC, VERIFY_ALLOW_BROKEN_NAME, VERIFY_ALLOW_BROKEN_name,
      /* disablement strs */ NULL, NULL },
 
   {  /* entry idx, value */ INDEX_OPT_VERSION, VALUE_OPT_VERSION,
@@ -699,21 +806,21 @@ static tOptDesc optDesc[OPTION_CT] = {
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 /** Reference to the upper cased version of ocsptool. */
-#define zPROGNAME       (ocsptool_opt_strs+1996)
+#define zPROGNAME       (ocsptool_opt_strs+2317)
 /** Reference to the title line for ocsptool usage. */
-#define zUsageTitle     (ocsptool_opt_strs+2005)
+#define zUsageTitle     (ocsptool_opt_strs+2326)
 /** There is no ocsptool configuration file. */
 #define zRcName         NULL
 /** There are no directories to search for ocsptool config files. */
 #define apzHomeList     NULL
 /** The ocsptool program bug email address. */
-#define zBugsAddr       (ocsptool_opt_strs+2091)
+#define zBugsAddr       (ocsptool_opt_strs+2412)
 /** Clarification/explanation of what ocsptool does. */
-#define zExplain        (ocsptool_opt_strs+2107)
+#define zExplain        (ocsptool_opt_strs+2428)
 /** Extra detail explaining what ocsptool does. */
-#define zDetail         (ocsptool_opt_strs+2109)
+#define zDetail         (ocsptool_opt_strs+2430)
 /** The full version string for ocsptool. */
-#define zFullVersion    (ocsptool_opt_strs+2240)
+#define zFullVersion    (ocsptool_opt_strs+2683)
 /* extracted from optcode.tlib near line 364 */
 
 #if defined(ENABLE_NLS)
@@ -725,7 +832,7 @@ static tOptDesc optDesc[OPTION_CT] = {
 #endif /* ENABLE_NLS */
 
 #define ocsptool_full_usage (NULL)
-#define ocsptool_short_usage (ocsptool_opt_strs+2256)
+#define ocsptool_short_usage (ocsptool_opt_strs+2698)
 
 #endif /* not defined __doxygen__ */
 
@@ -812,6 +919,30 @@ doOptInfile(tOptions* pOptions, tOptDesc* pOptDesc)
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 /**
+ * Code to handle the load-chain option.
+ *
+ * @param[in] pOptions the ocsptool options data structure
+ * @param[in,out] pOptDesc the option descriptor for this option.
+ */
+static void
+doOptLoad_Chain(tOptions* pOptions, tOptDesc* pOptDesc)
+{
+    static teOptFileType const  type =
+        FTYPE_MODE_MUST_EXIST + FTYPE_MODE_NO_OPEN;
+    static tuFileMode           mode;
+#ifndef O_CLOEXEC
+#  define O_CLOEXEC 0
+#endif
+    mode.file_flags = O_CLOEXEC;
+
+    /*
+     * This function handles special invalid values for "pOptions"
+     */
+    optionFileCheck(pOptions, pOptDesc, type, mode);
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/**
  * Code to handle the load-issuer option.
  *
  * @param[in] pOptions the ocsptool options data structure
@@ -861,7 +992,9 @@ doOptLoad_Cert(tOptions* pOptions, tOptDesc* pOptDesc)
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 /**
  * Code to handle the load-trust option.
- *
+ * When verifying an OCSP response read the trust anchors from the
+ * provided file. When this is not provided, the system's trust anchors will be
+ * used.
  * @param[in] pOptions the ocsptool options data structure
  * @param[in,out] pOptDesc the option descriptor for this option.
  */
@@ -1018,7 +1151,7 @@ tOptions ocsptoolOptions = {
       NO_EQUIVALENT, /* '-#' option index */
       NO_EQUIVALENT /* index of default opt */
     },
-    21 /* full option count */, 18 /* user option count */,
+    25 /* full option count */, 22 /* user option count */,
     ocsptool_full_usage, ocsptool_short_usage,
     NULL, NULL,
     PKGDATADIR, ocsptool_packager_info
@@ -1153,8 +1286,8 @@ static void bogus_function(void) {
      translate option names.
    */
   /* referenced via ocsptoolOptions.pzCopyright */
-  puts(_("ocsptool 3.5.19\n\
-Copyright (C) 2000-2018 Free Software Foundation, and others, all rights reserved.\n\
+  puts(_("ocsptool 3.6.8\n\
+Copyright (C) 2000-2019 Free Software Foundation, and others, all rights reserved.\n\
 This is free software. It is licensed for use, modification and\n\
 redistribution under the terms of the GNU General Public License,\n\
 version 3 or later <http://gnu.org/licenses/gpl.html>\n"));
@@ -1196,34 +1329,46 @@ with this program.  If not, see <http://www.gnu.org/licenses/>.\n"));
   puts(_("Print information on a OCSP response"));
 
   /* referenced via ocsptoolOptions.pOptDesc->pzText */
-  puts(_("Generate an OCSP request"));
+  puts(_("Generates an OCSP request"));
 
   /* referenced via ocsptoolOptions.pOptDesc->pzText */
   puts(_("Use (or not) a nonce to OCSP request"));
 
   /* referenced via ocsptoolOptions.pOptDesc->pzText */
-  puts(_("Read issuer certificate from file"));
+  puts(_("Reads a set of certificates forming a chain from file"));
 
   /* referenced via ocsptoolOptions.pOptDesc->pzText */
-  puts(_("Read certificate to check from file"));
+  puts(_("Reads issuer's certificate from file"));
+
+  /* referenced via ocsptoolOptions.pOptDesc->pzText */
+  puts(_("Reads the certificate to check from file"));
 
   /* referenced via ocsptoolOptions.pOptDesc->pzText */
   puts(_("Read OCSP trust anchors from file"));
 
   /* referenced via ocsptoolOptions.pOptDesc->pzText */
-  puts(_("Read OCSP response signer from file"));
+  puts(_("Reads the OCSP response signer from file"));
 
   /* referenced via ocsptoolOptions.pOptDesc->pzText */
   puts(_("Use DER format for input certificates and private keys"));
 
   /* referenced via ocsptoolOptions.pOptDesc->pzText */
-  puts(_("Read DER encoded OCSP request from file"));
+  puts(_("Use DER format for output of responses (this is the default)"));
 
   /* referenced via ocsptoolOptions.pOptDesc->pzText */
-  puts(_("Read DER encoded OCSP response from file"));
+  puts(_("Use PEM format for output of responses"));
+
+  /* referenced via ocsptoolOptions.pOptDesc->pzText */
+  puts(_("Reads the DER encoded OCSP request from file"));
+
+  /* referenced via ocsptoolOptions.pOptDesc->pzText */
+  puts(_("Reads the DER encoded OCSP response from file"));
 
   /* referenced via ocsptoolOptions.pOptDesc->pzText */
   puts(_("Ignore any verification errors"));
+
+  /* referenced via ocsptoolOptions.pOptDesc->pzText */
+  puts(_("Allow broken algorithms, such as MD5 for verification"));
 
   /* referenced via ocsptoolOptions.pOptDesc->pzText */
   puts(_("display extended usage information and exit"));
@@ -1242,11 +1387,13 @@ Usage:  %s [ -<flag> [<val>] | --<name>[{=| }<val>] ]...\n"));
   puts(_("\n"));
 
   /* referenced via ocsptoolOptions.pzDetail */
-  puts(_("Ocsptool is a program that can parse and print information about OCSP\n\
-requests/responses, generate requests and verify responses.\n"));
+  puts(_("ocsptool is a program that can parse and print information about OCSP\n\
+requests/responses, generate requests and verify responses.  Unlike other\n\
+GnuTLS applications it outputs DER encoded structures by default unless the\n\
+'--outpem' option is specified.\n"));
 
   /* referenced via ocsptoolOptions.pzFullVersion */
-  puts(_("ocsptool 3.5.19"));
+  puts(_("ocsptool 3.6.8"));
 
   /* referenced via ocsptoolOptions.pzFullUsage */
   puts(_("<<<NOT-FOUND>>>"));

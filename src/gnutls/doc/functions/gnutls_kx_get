@@ -5,7 +5,12 @@
 @deftypefun {gnutls_kx_algorithm_t} {gnutls_kx_get} (gnutls_session_t @var{session})
 @var{session}: is a @code{gnutls_session_t}  type.
 
-Get currently used key exchange algorithm.
+Get the currently used key exchange algorithm.
+
+This function will return @code{GNUTLS_KX_ECDHE_RSA} , or @code{GNUTLS_KX_DHE_RSA} 
+under TLS 1.3, to indicate an elliptic curve DH key exchange or
+a finite field one. The precise group used is available
+by calling @code{gnutls_group_get()}  instead.
 
 @strong{Returns:} the key exchange algorithm used in the last handshake, a
 @code{gnutls_kx_algorithm_t}  value.

@@ -12,4 +12,8 @@ certificate server to use. These parameters will be used in
 Ephemeral Diffie-Hellman cipher suites.  Note that only a pointer
 to the parameters are stored in the certificate handle, so you
 must not deallocate the parameters before the certificate is deallocated.
+
+@strong{Deprecated:} This function is unnecessary and discouraged on GnuTLS 3.6.0
+or later. Since 3.6.0, DH parameters are negotiated
+following RFC7919.
 @end deftypefun

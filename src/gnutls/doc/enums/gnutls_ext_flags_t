@@ -3,5 +3,21 @@
 @c gnutls_ext_flags_t
 @table @code
 @item GNUTLS_@-EXT_@-FLAG_@-OVERRIDE_@-INTERNAL
-If specified the extension registered will override the internal; this does not work with extensions existing prior to 3.5.12.
+If specified the extension registered will override the internal; this does not work with extensions existing prior to 3.6.0.
+@item GNUTLS_@-EXT_@-FLAG_@-CLIENT_@-HELLO
+This extension can be present in a client hello
+@item GNUTLS_@-EXT_@-FLAG_@-TLS12_@-SERVER_@-HELLO
+This extension can be present in a TLS1.2 or earlier server hello
+@item GNUTLS_@-EXT_@-FLAG_@-TLS13_@-SERVER_@-HELLO
+This extension can be present in a TLS1.3 server hello
+@item GNUTLS_@-EXT_@-FLAG_@-EE
+This extension can be present in encrypted extensions message
+@item GNUTLS_@-EXT_@-FLAG_@-HRR
+This extension can be present in hello retry request message
+@item GNUTLS_@-EXT_@-FLAG_@-IGNORE_@-CLIENT_@-REQUEST
+When flag is present, this extension will be send even if the client didn't advertise it. An extension of this type is the Cookie TLS1.3 extension.
+@item GNUTLS_@-EXT_@-FLAG_@-TLS
+This extension can be present under TLS; otherwise ignored.
+@item GNUTLS_@-EXT_@-FLAG_@-DTLS
+This extension can be present under DTLS; otherwise ignored.
 @end table

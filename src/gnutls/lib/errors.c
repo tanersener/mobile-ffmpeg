@@ -16,7 +16,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -26,7 +26,6 @@
 #ifdef STDC_HEADERS
 #include <stdarg.h>
 #endif
-#include "vasprintf.h"
 #include "str.h"
 
 #define ERROR_ENTRY(desc, name) \
@@ -64,8 +63,11 @@ static const gnutls_error_entry error_entries[] = {
 		    ("The Diffie-Hellman prime sent by the server is not acceptable (not long enough)."),
 		    GNUTLS_E_DH_PRIME_UNACCEPTABLE),
 	ERROR_ENTRY(N_
-		    ("A TLS packet with unexpected length was received."),
+		    ("Error decoding the received TLS packet."),
 		    GNUTLS_E_UNEXPECTED_PACKET_LENGTH),
+	ERROR_ENTRY(N_
+		    ("A TLS record packet with invalid length was received."),
+		    GNUTLS_E_RECORD_OVERFLOW),
 	ERROR_ENTRY(N_("The TLS connection was non-properly terminated."),
 		    GNUTLS_E_PREMATURE_TERMINATION),
 	ERROR_ENTRY(N_
@@ -78,6 +80,8 @@ static const gnutls_error_entry error_entries[] = {
 		    GNUTLS_E_INAPPROPRIATE_FALLBACK),
 	ERROR_ENTRY(N_("An illegal TLS extension was received."),
 		    GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION),
+	ERROR_ENTRY(N_("An required TLS extension was received."),
+		    GNUTLS_E_MISSING_EXTENSION),
 	ERROR_ENTRY(N_("A TLS fatal alert has been received."),
 		    GNUTLS_E_FATAL_ALERT_RECEIVED),
 	ERROR_ENTRY(N_("An unexpected TLS packet was received."),
@@ -89,6 +93,8 @@ static const gnutls_error_entry error_entries[] = {
 		    GNUTLS_E_ERROR_IN_FINISHED_PACKET),
 	ERROR_ENTRY(N_("No certificate was found."),
 		    GNUTLS_E_NO_CERTIFICATE_FOUND),
+	ERROR_ENTRY(N_("Certificate is required."),
+		    GNUTLS_E_CERTIFICATE_REQUIRED),
 	ERROR_ENTRY(N_
 		    ("The given DSA key is incompatible with the selected TLS protocol."),
 		    GNUTLS_E_INCOMPAT_DSA_KEY_WITH_TLS_PROTOCOL),
@@ -131,7 +137,7 @@ static const gnutls_error_entry error_entries[] = {
 		    GNUTLS_E_UNIMPLEMENTED_FEATURE),
 	ERROR_ENTRY(N_("Insufficient credentials for that request."),
 		    GNUTLS_E_INSUFFICIENT_CREDENTIALS),
-	ERROR_ENTRY(N_("Error in password file."), GNUTLS_E_SRP_PWD_ERROR),
+	ERROR_ENTRY(N_("Error in password/key file."), GNUTLS_E_SRP_PWD_ERROR),
 	ERROR_ENTRY(N_("Wrong padding in PKCS1 packet."),
 		    GNUTLS_E_PKCS1_WRONG_PAD),
 	ERROR_ENTRY(N_("The session or certificate has expired."),
@@ -145,7 +151,7 @@ static const gnutls_error_entry error_entries[] = {
 		    GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR),
 	ERROR_ENTRY(N_("Base64 encoding error."),
 		    GNUTLS_E_BASE64_ENCODING_ERROR),
-	ERROR_ENTRY(N_("Parsing error in password file."),
+	ERROR_ENTRY(N_("Parsing error in password/key file."),
 		    GNUTLS_E_SRP_PWD_PARSING_ERROR),
 	ERROR_ENTRY(N_("The requested data were not available."),
 		    GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE),
@@ -158,8 +164,12 @@ static const gnutls_error_entry error_entries[] = {
 		    GNUTLS_E_RECORD_LIMIT_REACHED),
 	ERROR_ENTRY(N_("Error in the certificate."),
 		    GNUTLS_E_CERTIFICATE_ERROR),
+	ERROR_ENTRY(N_("Error in the time fields of certificate."),
+		    GNUTLS_E_CERTIFICATE_TIME_ERROR),
 	ERROR_ENTRY(N_("Error in the certificate verification."),
 		    GNUTLS_E_CERTIFICATE_VERIFICATION_ERROR),
+	ERROR_ENTRY(N_("Error in the CRL verification."),
+		    GNUTLS_E_CRL_VERIFICATION_ERROR),
 	ERROR_ENTRY(N_("Error in the private key verification; seed doesn't match."),
 		    GNUTLS_E_PRIVKEY_VERIFICATION_ERROR),
 	ERROR_ENTRY(N_("Could not authenticate peer."),
@@ -184,6 +194,7 @@ static const gnutls_error_entry error_entries[] = {
 		    ("TLS Application data were received, while expecting handshake data."),
 		    GNUTLS_E_GOT_APPLICATION_DATA),
 	ERROR_ENTRY(N_("Error in Database backend."), GNUTLS_E_DB_ERROR),
+	ERROR_ENTRY(N_("The Database entry already exists."), GNUTLS_E_DB_ENTRY_EXISTS),
 	ERROR_ENTRY(N_("The certificate type is not supported."),
 		    GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE),
 	ERROR_ENTRY(N_
@@ -197,6 +208,8 @@ static const gnutls_error_entry error_entries[] = {
 	ERROR_ENTRY(N_("An illegal parameter was found."),
 		    GNUTLS_E_ILLEGAL_PARAMETER),
 	ERROR_ENTRY(N_("Error while reading file."), GNUTLS_E_FILE_ERROR),
+	ERROR_ENTRY(N_("A disallowed SNI server name has been received."),
+		    GNUTLS_E_RECEIVED_DISALLOWED_NAME),
 
 	ERROR_ENTRY(N_("ASN1 parser: Element was not found."),
 		    GNUTLS_E_ASN1_ELEMENT_NOT_FOUND),
@@ -226,6 +239,8 @@ static const gnutls_error_entry error_entries[] = {
 		    GNUTLS_E_TOO_MANY_EMPTY_PACKETS),
 	ERROR_ENTRY(N_("Too many handshake packets have been received."),
 		    GNUTLS_E_TOO_MANY_HANDSHAKE_PACKETS),
+	ERROR_ENTRY(N_("More than a single object matches the criteria."),
+		    GNUTLS_E_TOO_MANY_MATCHES),
 	ERROR_ENTRY(N_("The crypto library version is too old."),
 		    GNUTLS_E_INCOMPATIBLE_GCRYPT_LIBRARY),
 
@@ -255,7 +270,7 @@ static const gnutls_error_entry error_entries[] = {
 
 	ERROR_ENTRY(N_("The SRP username supplied is illegal."),
 		    GNUTLS_E_ILLEGAL_SRP_USERNAME),
-	ERROR_ENTRY(N_("The SRP username supplied is unknown."),
+	ERROR_ENTRY(N_("The username supplied is unknown."),
 		    GNUTLS_E_UNKNOWN_SRP_USERNAME),
 
 	ERROR_ENTRY(N_("The OpenPGP fingerprint is not supported."),
@@ -370,6 +385,8 @@ static const gnutls_error_entry error_entries[] = {
 		    GNUTLS_E_CERTIFICATE_LIST_UNSORTED),
 	ERROR_ENTRY(N_("The OCSP response is invalid"),
 		    GNUTLS_E_OCSP_RESPONSE_ERROR),
+	ERROR_ENTRY(N_("The OCSP response provided doesn't match the available certificates"),
+		    GNUTLS_E_OCSP_MISMATCH_WITH_CERTS),
 	ERROR_ENTRY(N_("There is no certificate status (OCSP)."),
 		    GNUTLS_E_NO_CERTIFICATE_STATUS),
 	ERROR_ENTRY(N_("Error in the system's randomness device."),
@@ -399,14 +416,26 @@ static const gnutls_error_entry error_entries[] = {
 		    GNUTLS_E_UNRECOGNIZED_NAME),
 	ERROR_ENTRY(N_("There was an issue converting to or from UTF8."),
 		    GNUTLS_E_IDNA_ERROR),
-	ERROR_ENTRY(N_("Cannot obtain resumption parameters while handshake is incomplete."),
+	ERROR_ENTRY(N_("Cannot perform this action while handshake is in progress."),
 		    GNUTLS_E_UNAVAILABLE_DURING_HANDSHAKE),
-	ERROR_ENTRY(N_("The obtained public key is invalid."),
+	ERROR_ENTRY(N_("The public key is invalid."),
 		    GNUTLS_E_PK_INVALID_PUBKEY),
+	ERROR_ENTRY(N_("There are no validation parameters present."),
+		    GNUTLS_E_PK_NO_VALIDATION_PARAMS),
+	ERROR_ENTRY(N_("The public key parameters are invalid."),
+		    GNUTLS_E_PK_INVALID_PUBKEY_PARAMS),
 	ERROR_ENTRY(N_("The private key is invalid."),
 		    GNUTLS_E_PK_INVALID_PRIVKEY),
+	ERROR_ENTRY(N_("The DER time encoding is invalid."),
+		    GNUTLS_E_ASN1_TIME_ERROR),
+	ERROR_ENTRY(N_("The signature is incompatible with the public key."),
+		    GNUTLS_E_INCOMPATIBLE_SIG_WITH_KEY),
 	ERROR_ENTRY(N_("One of the involved algorithms has insufficient security level."),
 		    GNUTLS_E_INSUFFICIENT_SECURITY),
+	ERROR_ENTRY(N_("No common key share with peer."),
+		    GNUTLS_E_NO_COMMON_KEY_SHARE),
+	ERROR_ENTRY(N_("The early data were rejected."),
+		    GNUTLS_E_EARLY_DATA_REJECTED),
 	{NULL, NULL, 0}
 };
 
@@ -425,6 +454,8 @@ static const gnutls_error_entry non_fatal_error_entries[] = {
 	ERROR_ENTRY(N_("Function was interrupted."), GNUTLS_E_INTERRUPTED),
 	ERROR_ENTRY(N_("Rehandshake was requested by the peer."),
 		    GNUTLS_E_REHANDSHAKE),
+	ERROR_ENTRY(N_("Re-authentication was requested by the peer."),
+		    GNUTLS_E_REAUTH_REQUEST),
 	/* Only non fatal (for handshake) errors here */
 	{NULL, NULL, 0}
 };
@@ -435,14 +466,14 @@ static const gnutls_error_entry non_fatal_error_entries[] = {
  *
  * If a GnuTLS function returns a negative error code you may feed that
  * value to this function to see if the error condition is fatal to
- * a TLS session (i.e., must be terminated). 
+ * a TLS session (i.e., must be terminated).
  *
  * Note that you may also want to check the error code manually, since some
  * non-fatal errors to the protocol (such as a warning alert or
  * a rehandshake request) may be fatal for your program.
  *
  * This function is only useful if you are dealing with errors from
- * functions that relate to a TLS session (e.g., record layer or handshake 
+ * functions that relate to a TLS session (e.g., record layer or handshake
  * layer handling functions).
  *
  * Returns: Non-zero value on fatal errors or zero on non-fatal.
@@ -560,6 +591,10 @@ const char *gnutls_strerror_name(int error)
 int _gnutls_asn2err(int asn_err)
 {
 	switch (asn_err) {
+#ifdef ASN1_TIME_ENCODING_ERROR
+	case ASN1_TIME_ENCODING_ERROR:
+		return GNUTLS_E_ASN1_TIME_ERROR;
+#endif
 	case ASN1_FILE_NOT_FOUND:
 		return GNUTLS_E_FILE_ERROR;
 	case ASN1_ELEMENT_NOT_FOUND:

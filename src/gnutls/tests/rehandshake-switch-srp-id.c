@@ -257,15 +257,15 @@ void doit(void)
 {
 	global_init();
 	/* Allow change of ID */
-	try("NORMAL:-KX-ALL:+SRP", GNUTLS_KX_SRP, 0);
+	try("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP", GNUTLS_KX_SRP, 0);
 	reset_buffers();
-	try("NORMAL:-KX-ALL:+SRP-RSA", GNUTLS_KX_SRP_RSA, 0);
+	try("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP-RSA", GNUTLS_KX_SRP_RSA, 0);
 	reset_buffers();
 
 	/* Prohibit (default) change of ID */
-	try("NORMAL:-KX-ALL:+SRP", GNUTLS_KX_SRP, 1);
+	try("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP", GNUTLS_KX_SRP, 1);
 	reset_buffers();
-	try("NORMAL:-KX-ALL:+SRP-RSA", GNUTLS_KX_SRP_RSA, 1);
+	try("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP-RSA", GNUTLS_KX_SRP_RSA, 1);
 	reset_buffers();
 	gnutls_global_deinit();
 }

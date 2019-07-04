@@ -2,12 +2,12 @@
 
 
 
-@deftypefun {void} {gnutls_handshake_set_hook_function} (gnutls_session_t @var{session}, unsigned int @var{htype}, int @var{post}, gnutls_handshake_hook_func @var{func})
+@deftypefun {void} {gnutls_handshake_set_hook_function} (gnutls_session_t @var{session}, unsigned int @var{htype}, int @var{when}, gnutls_handshake_hook_func @var{func})
 @var{session}: is a @code{gnutls_session_t}  type
 
 @var{htype}: the @code{gnutls_handshake_description_t}  of the message to hook at
 
-@var{post}: @code{GNUTLS_HOOK_} * depending on when the hook function should be called
+@var{when}: @code{GNUTLS_HOOK_} * depending on when the hook function should be called
 
 @var{func}: is the function to be called
 
@@ -15,14 +15,14 @@ This function will set a callback to be called after or before the specified
 handshake message has been received or generated. This is a
 generalization of @code{gnutls_handshake_set_post_client_hello_function()} .
 
-To call the hook function prior to the message being sent/generated use
-@code{GNUTLS_HOOK_PRE}  as  @code{post} parameter, @code{GNUTLS_HOOK_POST}  to call
+To call the hook function prior to the message being generated or processed
+use @code{GNUTLS_HOOK_PRE}  as  @code{when} parameter, @code{GNUTLS_HOOK_POST}  to call
 after, and @code{GNUTLS_HOOK_BOTH}  for both cases.
 
 This callback must return 0 on success or a gnutls error code to
 terminate the handshake.
 
-Note to hook at all handshake messages use an  @code{htype} of @code{GNUTLS_HANDSHAKE_ANY} .
+To hook at all handshake messages use an  @code{htype} of @code{GNUTLS_HANDSHAKE_ANY} .
 
 @strong{Warning:} You should not use this function to terminate the
 handshake based on client input unless you know what you are

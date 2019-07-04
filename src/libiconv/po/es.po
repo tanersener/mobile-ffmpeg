@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: GNU libiconv 1.12\n"
 "Report-Msgid-Bugs-To: bug-gnu-libiconv@gnu.org\n"
-"POT-Creation-Date: 2016-12-04 17:16+0100\n"
+"POT-Creation-Date: 2019-04-26 21:02+0200\n"
 "PO-Revision-Date: 2014-07-13 11:14+0200\n"
 "Last-Translator: Santiago Vila Doncel <sanvila@unex.es>\n"
 "Language-Team: Spanish <es@tp.org.es>\n"
@@ -15,6 +15,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8-bit\n"
+"X-Bugs: Report translation errors to the Language-Team address.\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #. TRANSLATORS: The first line of the short usage message.
@@ -150,9 +151,9 @@ msgstr "Comunicar errores a <bug-gnu-libiconv@gnu.org>.\n"
 
 # Esta cadena es para libiconv 1.14
 #: src/iconv.c:196
-#, no-wrap
+#, fuzzy, no-wrap
 msgid ""
-"License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\n"
+"License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>\n"
 "This is free software: you are free to change and redistribute it.\n"
 "There is NO WARRANTY, to the extent permitted by law.\n"
 msgstr ""
@@ -308,59 +309,58 @@ msgstr "%s: error de E/S"
 
 #. TRANSLATORS: An error message.
 #. The placeholder expands to the encoding name, specified through --from-code.
-#: src/iconv.c:1015
+#: src/iconv.c:1024
 #, c-format
 msgid "conversion from %s unsupported"
 msgstr "no se admite la conversión de %s"
 
 #. TRANSLATORS: An error message.
 #. The placeholder expands to the encoding name, specified through --to-code.
-#: src/iconv.c:1021
+#: src/iconv.c:1030
 #, c-format
 msgid "conversion to %s unsupported"
 msgstr "no se admite la conversión a %s"
 
 #. TRANSLATORS: An error message.
 #. The placeholders expand to the encoding names, specified through --from-code and --to-code, respectively.
-#: src/iconv.c:1027
+#: src/iconv.c:1036
 #, c-format
 msgid "conversion from %s to %s unsupported"
 msgstr "no se admite la conversión de %s a %s"
 
 #. TRANSLATORS: Additional advice after an error message.
 #. The %s placeholder expands to the program name.
-#: src/iconv.c:1032
+#: src/iconv.c:1041
 #, c-format
 msgid "try '%s -l' to get the list of supported encodings"
 msgstr "pruebe '%s -l' para obtener la lista de codificaciones admitidas"
 
 #. TRANSLATORS: A filename substitute denoting standard input.
-#: src/iconv.c:1089
+#: src/iconv.c:1098
 msgid "(stdin)"
 msgstr "(entrada estándar)"
 
 #. TRANSLATORS: The first part of an error message.
 #. It is followed by a colon and a detail message.
 #. The %s placeholder expands to the input file name.
-#: src/iconv.c:1101
+#: src/iconv.c:1110
 #, c-format
 msgid "%s"
 msgstr "%s"
 
 #. TRANSLATORS: An error message.
-#: src/iconv.c:1115
+#: src/iconv.c:1124
 #, c-format
 msgid "I/O error"
 msgstr "error de E/S"
 
+#, no-wrap
 #~ msgid ""
-#~ "License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl."
-#~ "html>\n"
+#~ "License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>\n"
 #~ "This is free software: you are free to change and redistribute it.\n"
 #~ "There is NO WARRANTY, to the extent permitted by law.\n"
 #~ msgstr ""
-#~ "License GPLv2+: GPL de GNU versión 2 o posterior <http://gnu.org/licenses/"
-#~ "gpl.html>\n"
+#~ "License GPLv2+: GPL de GNU versión 2 o posterior <http://gnu.org/licenses/gpl.html>\n"
 #~ "Esto es software libre: usted es libre de cambiarlo y redistribuirlo.\n"
 #~ "No hay NINGUNA GARANTÍA, hasta donde permite la ley.\n"
 

@@ -12,7 +12,7 @@
 @var{result_size}: holds the size of the result
 
 This function will decode the given encoded data.  If the header
-given is non null this function will search for "-----BEGIN header"
+given is non @code{NULL}  this function will search for "-----BEGIN header"
 and decode only this part.  Otherwise it will decode the first PEM
 packet found.
 

@@ -1,13 +1,12 @@
 /.deps/
-/Makefile
 /.libs/
 /arpa/
 /sys/
 *.o
 *.lo
+/Makefile
 /alloca.h
-/arg-nonnull.h
-/c++defs.h
+/inttypes.h
 /libgnu_gpl.la
 /limits.h
 /netdb.h
@@ -19,6 +18,4 @@
 /string.h
 /time.h
 /unistd.h
-/warn-on-use.h
 /wchar.h
-/stdalign.h

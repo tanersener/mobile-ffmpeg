@@ -5,11 +5,6 @@ if [[ -z ${ARCH} ]]; then
     exit 1
 fi
 
-if [[ -z ${IOS_MIN_VERSION} ]]; then
-    echo -e "(*) IOS_MIN_VERSION not defined\n"
-    exit 1
-fi
-
 if [[ -z ${TARGET_SDK} ]]; then
     echo -e "(*) TARGET_SDK not defined\n"
     exit 1
@@ -26,7 +21,11 @@ if [[ -z ${BASEDIR} ]]; then
 fi
 
 # ENABLE COMMON FUNCTIONS
-. ${BASEDIR}/build/ios-common.sh
+if [[ ${APPLE_TVOS_BUILD} -eq 1 ]]; then
+    . ${BASEDIR}/build/tvos-common.sh
+else
+    . ${BASEDIR}/build/ios-common.sh
+fi
 
 # PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
 LIB_NAME="libass"
@@ -49,7 +48,7 @@ if [[ ${RECONF_libass} -eq 1 ]]; then
 fi
 
 ./configure \
-    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/${LIB_NAME} \
+    --prefix=${BASEDIR}/prebuilt/$(get_target_build_directory)/${LIB_NAME} \
     --with-pic \
     --with-sysroot=${SDK_PATH} \
     --disable-libtool-lock \
@@ -65,6 +64,6 @@ fi
 make -j$(get_cpu_count) || exit 1
 
 # MANUALLY COPY PKG-CONFIG FILES
-cp ./*.pc ${INSTALL_PKG_CONFIG_DIR}
+cp ./*.pc ${INSTALL_PKG_CONFIG_DIR} || exit 1
 
 make install || exit 1

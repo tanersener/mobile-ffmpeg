@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#e74c3c</color>
-    <color name="colorPrimaryDark">#c0392b</color>
-    <color name="colorAccent">#3498db</color>
     <color name="headerColor">#e74c3c</color>
-    <color name="buttonColor">#2ecc71</color>
     <color name="editColor">#3498db</color>
-    <color name="comboColor">#9b59b6</color>
-    <color name="playerColor">#ecf0f1</color>
-    <color name="outputColor">#f1c40f</color>
-    <color name="navigationBarColor">#f39c12</color>
     <color name="navigationColor">#e67e22</color>
 </resources>

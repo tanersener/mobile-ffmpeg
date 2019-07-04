@@ -21,6 +21,7 @@ package com.arthenica.mobileffmpeg;
 
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
@@ -173,7 +174,7 @@ public class FFmpeg {
      * @since 3.0
      */
     public static MediaInformation getMediaInformation(final String path, final Long timeout) {
-        int rc = Config.systemExecute(new String[]{"-v", "info", "-hide_banner", "-i", path, "-f", "null", "-"}, Arrays.asList("Press [q] to stop, [?] for help", "No such file or directory", "Input/output error", "Conversion failed"), timeout);
+        int rc = Config.systemExecute(new String[]{"-v", "info", "-hide_banner", "-i", path}, new ArrayList<>(Arrays.asList("Press [q] to stop, [?] for help", "No such file or directory", "Input/output error", "Conversion failed", "HTTP error")), "At least one output file must be specified", timeout);
 
         if (rc == 0) {
             return MediaInformationParser.from(Config.getSystemCommandOutput());

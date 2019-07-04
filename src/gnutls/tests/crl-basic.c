@@ -92,6 +92,10 @@ static struct
   int crt_count;
   time_t next_update;
   time_t this_update;
+
+  time_t crt_revoke_time;
+  size_t crt_serial_size;
+  const char *crt_serial;
 } crl_list[] =
 {
   { .name = "crl-sha256-1", 
@@ -124,7 +128,10 @@ static struct
     .sign_oid = "1.2.840.113549.1.1.5",
     .crt_count = 1,
     .this_update = 1274996231,
-    .next_update = 1277588231
+    .next_update = 1277588231,
+    .crt_revoke_time = 1274996231,
+    .crt_serial = "\x0b\x98\x94\xf9\x7c\x6a",
+    .crt_serial_size = 6
   },
   { NULL, NULL, 0, 0}
 };
@@ -220,6 +227,27 @@ void doit(void)
 			exit(1);
 		}
 
+		if (crl_list[i].crt_count > 0) {
+			unsigned char serial[128];
+			size_t ssize = sizeof(serial);
+			time_t t = 0;
+
+			ret = gnutls_x509_crl_get_crt_serial(crl, 0, serial, &ssize, &t);
+			if (ret < 0) {
+				fail("%s: error on the extracted serial: %d\n", crl_list[i].name, ret);
+			}
+
+			if (t != crl_list[i].crt_revoke_time)
+				fail("%s: error on the extracted revocation time: %u\n", crl_list[i].name, (unsigned)t);
+
+			if (ssize != crl_list[i].crt_serial_size || memcmp(serial, crl_list[i].crt_serial, ssize) != 0) {
+				for (i=0;i<ssize;i++)
+					fprintf(stderr, "%.2x", (unsigned)serial[i]);
+				fprintf(stderr, "\n");
+				fail("%s: error on the extracted serial\n", crl_list[i].name);
+			}
+		}
+
 		ret = gnutls_x509_crl_get_this_update(crl);
 		if (ret != crl_list[i].this_update) {
 			fail("%s: error on the extracted thisUpdate: %d\n", crl_list[i].name, ret);
@@ -231,6 +259,7 @@ void doit(void)
 			fail("%s: error on the extracted nextUpdate: %d\n", crl_list[i].name, ret);
 			exit(1);
 		}
+
 
 		gnutls_x509_crl_deinit(crl);
 

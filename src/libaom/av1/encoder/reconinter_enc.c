@@ -281,7 +281,7 @@ void av1_build_inter_predictor(const uint8_t *src, int src_stride, uint8_t *dst,
                                int dst_stride, const MV *src_mv,
                                const struct scale_factors *sf, int w, int h,
                                ConvolveParams *conv_params,
-                               InterpFilters interp_filters,
+                               int_interpfilters interp_filters,
                                const WarpTypesAllowed *warp_types, int p_col,
                                int p_row, int plane, int ref,
                                mv_precision precision, int x, int y,
@@ -495,6 +495,7 @@ void av1_build_inter_predictors_for_planes_single_buf(
     MACROBLOCKD *xd, BLOCK_SIZE bsize, int plane_from, int plane_to, int mi_row,
     int mi_col, int ref, uint8_t *ext_dst[3], int ext_dst_stride[3],
     int can_use_previous) {
+  assert(bsize < BLOCK_SIZES_ALL);
   int plane;
   const int mi_x = mi_col * MI_SIZE;
   const int mi_y = mi_row * MI_SIZE;
@@ -595,6 +596,7 @@ void av1_build_wedge_inter_predictor_from_buf(MACROBLOCKD *xd, BLOCK_SIZE bsize,
                                               uint8_t *ext_dst1[3],
                                               int ext_dst_stride1[3]) {
   int plane;
+  assert(bsize < BLOCK_SIZES_ALL);
   for (plane = plane_from; plane <= plane_to; ++plane) {
     const BLOCK_SIZE plane_bsize = get_plane_block_size(
         bsize, xd->plane[plane].subsampling_x, xd->plane[plane].subsampling_y);

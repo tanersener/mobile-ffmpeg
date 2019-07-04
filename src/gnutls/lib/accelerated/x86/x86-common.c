@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2011-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2011-2018 Free Software Foundation, Inc.
+ * Copyright (C) 2018 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -16,7 +17,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -99,7 +100,7 @@ static unsigned check_4th_gen_intel_features(unsigned ecx)
 	if ((ecx & OSXSAVE_MASK) != OSXSAVE_MASK)
 		return 0;
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && !defined(__clang__)
 	xcr0 = _xgetbv(0);
 #else
 	__asm__ ("xgetbv" : "=a" (xcr0) : "c" (0) : "%edx");
@@ -306,13 +307,6 @@ void register_x86_padlock_crypto(unsigned capabilities)
 		if (ret < 0) {
 			gnutls_assert();
 		}
-#ifdef HAVE_LIBNETTLE
-		ret =
-		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_192_CBC, 80, &_gnutls_aes_padlock, 0);
-		if (ret < 0) {
-			gnutls_assert();
-		}
 
 		ret =
 		    gnutls_crypto_single_cipher_register
@@ -328,7 +322,6 @@ void register_x86_padlock_crypto(unsigned capabilities)
 		if (ret < 0) {
 			gnutls_assert();
 		}
-#endif
 	} else {
 		_gnutls_priority_update_non_aesni();
 	}

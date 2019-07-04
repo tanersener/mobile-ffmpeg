@@ -1,6 +1,6 @@
 # source this file; set up for tests
 
-# Copyright (C) 2009-2016 Free Software Foundation, Inc.
+# Copyright (C) 2009-2019 Free Software Foundation, Inc.
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 # GNU General Public License for more details.
 
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 # Using this file in a test
 # =========================
@@ -45,6 +45,9 @@
 # Running a single test, with verbose output:
 #   $ make check TESTS=test-foo.sh VERBOSE=yes
 #
+# Running a single test, keeping the temporary directory:
+#   $ make check TESTS=test-foo.sh KEEP=yes
+#
 # Running a single test, with single-stepping:
 #   1. Go into a sub-shell:
 #   $ bash
@@ -57,7 +60,23 @@
 #   4. Finally
 #   $ exit
 
+# =============================================================================
+# Elementary diagnostics
+
 ME_=`expr "./$0" : '.*/\(.*\)$'`
+
+# Prepare PATH_SEPARATOR.
+# The user is always right.
+if test "${PATH_SEPARATOR+set}" != set; then
+  # Determine PATH_SEPARATOR by trying to find /bin/sh in a PATH which
+  # contains only /bin. Note that ksh looks also at the FPATH variable,
+  # so we have to set that as well for the test.
+  PATH_SEPARATOR=:
+  (PATH='/bin;/bin'; FPATH=$PATH; sh -c :) >/dev/null 2>&1 \
+    && { (PATH='/bin:/bin'; FPATH=$PATH; sh -c :) >/dev/null 2>&1 \
+           || PATH_SEPARATOR=';'
+       }
+fi
 
 # We use a trap below for cleanup.  This requires us to go through
 # hoops to get the right exit status transported through the handler.
@@ -93,26 +112,8 @@ skip_ () { warn_ "$ME_: skipped test: $@"; Exit 77; }
 fatal_ () { warn_ "$ME_: hard error: $@"; Exit 99; }
 framework_failure_ () { warn_ "$ME_: set-up failure: $@"; Exit 99; }
 
-# This is used to simplify checking of the return value
-# which is useful when ensuring a command fails as desired.
-# I.e., just doing `command ... &&fail=1` will not catch
-# a segfault in command for example.  With this helper you
-# instead check an explicit exit code like
-#   returns_ 1 command ... || fail
-returns_ () {
-  # Disable tracing so it doesn't interfere with stderr of the wrapped command
-  { set +x; } 2>/dev/null
-
-  local exp_exit="$1"
-  shift
-  "$@"
-  test $? -eq $exp_exit && ret_=0 || ret_=1
-
-  if test "$VERBOSE" = yes && test "$gl_set_x_corrupts_stderr_" = false; then
-    set -x
-  fi
-  { return $ret_; } 2>/dev/null
-}
+# =============================================================================
+# Ensure the shell supports modern syntax.
 
 # Sanitize this shell to POSIX mode, if possible.
 DUALCASE=1; export DUALCASE
@@ -239,6 +240,9 @@ else
   fi
 fi
 
+# =============================================================================
+# Ensure the shell behaves reasonably.
+
 # If this is bash, turn off all aliases.
 test -n "$BASH_VERSION" && unalias -a
 
@@ -247,7 +251,286 @@ test -n "$BASH_VERSION" && unalias -a
 # That is part of the shell-selection test above.  Why use aliases rather
 # than functions?  Because support for hyphen-containing aliases is more
 # widespread than that for hyphen-containing function names.
-test -n "$EXEEXT" && shopt -s expand_aliases
+test -n "$EXEEXT" && test -n "$BASH_VERSION" && shopt -s expand_aliases
+
+# =============================================================================
+# Creating a temporary directory (needed by the core test framework)
+
+# Create a temporary directory, much like mktemp -d does.
+# Written by Jim Meyering.
+#
+# Usage: mktempd_ /tmp phoey.XXXXXXXXXX
+#
+# First, try to use the mktemp program.
+# Failing that, we'll roll our own mktemp-like function:
+#  - try to get random bytes from /dev/urandom
+#  - failing that, generate output from a combination of quickly-varying
+#      sources and gzip.  Ignore non-varying gzip header, and extract
+#      "random" bits from there.
+#  - given those bits, map to file-name bytes using tr, and try to create
+#      the desired directory.
+#  - make only $MAX_TRIES_ attempts
+
+# Helper function.  Print $N pseudo-random bytes from a-zA-Z0-9.
+rand_bytes_ ()
+{
+  n_=$1
+
+  # Maybe try openssl rand -base64 $n_prime_|tr '+/=\012' abcd first?
+  # But if they have openssl, they probably have mktemp, too.
+
+  chars_=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789
+  dev_rand_=/dev/urandom
+  if test -r "$dev_rand_"; then
+    # Note: 256-length($chars_) == 194; 3 copies of $chars_ is 186 + 8 = 194.
+    dd ibs=$n_ count=1 if=$dev_rand_ 2>/dev/null \
+      | LC_ALL=C tr -c $chars_ 01234567$chars_$chars_$chars_
+    return
+  fi
+
+  n_plus_50_=`expr $n_ + 50`
+  cmds_='date; date +%N; free; who -a; w; ps auxww; ps -ef'
+  data_=` (eval "$cmds_") 2>&1 | gzip `
+
+  # Ensure that $data_ has length at least 50+$n_
+  while :; do
+    len_=`echo "$data_"|wc -c`
+    test $n_plus_50_ -le $len_ && break;
+    data_=` (echo "$data_"; eval "$cmds_") 2>&1 | gzip `
+  done
+
+  echo "$data_" \
+    | dd bs=1 skip=50 count=$n_ 2>/dev/null \
+    | LC_ALL=C tr -c $chars_ 01234567$chars_$chars_$chars_
+}
+
+mktempd_ ()
+{
+  case $# in
+  2);;
+  *) fail_ "Usage: mktempd_ DIR TEMPLATE";;
+  esac
+
+  destdir_=$1
+  template_=$2
+
+  MAX_TRIES_=4
+
+  # Disallow any trailing slash on specified destdir:
+  # it would subvert the post-mktemp "case"-based destdir test.
+  case $destdir_ in
+  / | //) destdir_slash_=$destdir;;
+  */) fail_ "invalid destination dir: remove trailing slash(es)";;
+  *) destdir_slash_=$destdir_/;;
+  esac
+
+  case $template_ in
+  *XXXX) ;;
+  *) fail_ \
+       "invalid template: $template_ (must have a suffix of at least 4 X's)";;
+  esac
+
+  # First, try to use mktemp.
+  d=`unset TMPDIR; { mktemp -d -t -p "$destdir_" "$template_"; } 2>/dev/null` &&
+
+  # The resulting name must be in the specified directory.
+  case $d in "$destdir_slash_"*) :;; *) false;; esac &&
+
+  # It must have created the directory.
+  test -d "$d" &&
+
+  # It must have 0700 permissions.  Handle sticky "S" bits.
+  perms=`ls -dgo "$d" 2>/dev/null` &&
+  case $perms in drwx--[-S]---*) :;; *) false;; esac && {
+    echo "$d"
+    return
+  }
+
+  # If we reach this point, we'll have to create a directory manually.
+
+  # Get a copy of the template without its suffix of X's.
+  base_template_=`echo "$template_"|sed 's/XX*$//'`
+
+  # Calculate how many X's we've just removed.
+  template_length_=`echo "$template_" | wc -c`
+  nx_=`echo "$base_template_" | wc -c`
+  nx_=`expr $template_length_ - $nx_`
+
+  err_=
+  i_=1
+  while :; do
+    X_=`rand_bytes_ $nx_`
+    candidate_dir_="$destdir_slash_$base_template_$X_"
+    err_=`mkdir -m 0700 "$candidate_dir_" 2>&1` \
+      && { echo "$candidate_dir_"; return; }
+    test $MAX_TRIES_ -le $i_ && break;
+    i_=`expr $i_ + 1`
+  done
+  fail_ "$err_"
+}
+
+# =============================================================================
+# Core test framework
+
+# An arbitrary prefix to help distinguish test directories.
+testdir_prefix_ () { printf gt; }
+
+# Set up the environment for the test to run in.
+setup_ ()
+{
+  if test "$VERBOSE" = yes; then
+    # Test whether set -x may cause the selected shell to corrupt an
+    # application's stderr.  Many do, including zsh-4.3.10 and the /bin/sh
+    # from SunOS 5.11, OpenBSD 4.7 and Irix 5.x and 6.5.
+    # If enabling verbose output this way would cause trouble, simply
+    # issue a warning and refrain.
+    if $gl_set_x_corrupts_stderr_; then
+      warn_ "using SHELL=$SHELL with 'set -x' corrupts stderr"
+    else
+      set -x
+    fi
+  fi
+
+  initial_cwd_=$PWD
+
+  # Create and enter the temporary directory.
+  pfx_=`testdir_prefix_`
+  test_dir_=`mktempd_ "$initial_cwd_" "$pfx_-$ME_.XXXX"` \
+    || fail_ "failed to create temporary directory in $initial_cwd_"
+  cd "$test_dir_" || fail_ "failed to cd to temporary directory"
+  # Set variables srcdir, builddir, for the convenience of the test.
+  case $srcdir in
+    /* | ?:*) ;;
+    *) srcdir="../$srcdir" ;;
+  esac
+  builddir=".."
+  export srcdir builddir
+
+  # As autoconf-generated configure scripts do, ensure that IFS
+  # is defined initially, so that saving and restoring $IFS works.
+  gl_init_sh_nl_='
+'
+  IFS=" ""	$gl_init_sh_nl_"
+
+  # This trap statement, along with a trap on 0 below, ensure that the
+  # temporary directory, $test_dir_, is removed upon exit as well as
+  # upon receipt of any of the listed signals.
+  for sig_ in 1 2 3 13 15; do
+    eval "trap 'Exit $(expr $sig_ + 128)' $sig_"
+  done
+}
+
+# This is a stub function that is run upon trap (upon regular exit and
+# interrupt).  Override it with a per-test function, e.g., to unmount
+# a partition, or to undo any other global state changes.
+cleanup_ () { :; }
+
+# Run the user-overridable cleanup_ function, remove the temporary
+# directory and exit with the incoming value of $?.
+remove_tmp_ ()
+{
+  __st=$?
+  cleanup_
+  if test "$KEEP" = yes; then
+    echo "Not removing temporary directory $test_dir_"
+  else
+    # cd out of the directory we're about to remove
+    cd "$initial_cwd_" || cd / || cd /tmp
+    chmod -R u+rwx "$test_dir_"
+    # If removal fails and exit status was to be 0, then change it to 1.
+    rm -rf "$test_dir_" || { test $__st = 0 && __st=1; }
+  fi
+  exit $__st
+}
+
+# =============================================================================
+# Prepending directories to PATH
+
+# Given a directory name, DIR, if every entry in it that matches *.exe
+# contains only the specified bytes (see the case stmt below), then print
+# a space-separated list of those names and return 0.  Otherwise, don't
+# print anything and return 1.  Naming constraints apply also to DIR.
+find_exe_basenames_ ()
+{
+  feb_dir_=$1
+  feb_fail_=0
+  feb_result_=
+  feb_sp_=
+  for feb_file_ in $feb_dir_/*.exe; do
+    # If there was no *.exe file, or there existed a file named "*.exe" that
+    # was deleted between the above glob expansion and the existence test
+    # below, just skip it.
+    test "x$feb_file_" = "x$feb_dir_/*.exe" && test ! -f "$feb_file_" \
+      && continue
+    # Exempt [.exe, since we can't create a function by that name, yet
+    # we can't invoke [ by PATH search anyways due to shell builtins.
+    test "x$feb_file_" = "x$feb_dir_/[.exe" && continue
+    case $feb_file_ in
+      *[!-a-zA-Z/0-9_.+]*) feb_fail_=1; break;;
+      *) # Remove leading file name components as well as the .exe suffix.
+         feb_file_=${feb_file_##*/}
+         feb_file_=${feb_file_%.exe}
+         feb_result_="$feb_result_$feb_sp_$feb_file_";;
+    esac
+    feb_sp_=' '
+  done
+  test $feb_fail_ = 0 && printf %s "$feb_result_"
+  return $feb_fail_
+}
+
+# Consider the files in directory, $1.
+# For each file name of the form PROG.exe, create an alias named
+# PROG that simply invokes PROG.exe, then return 0.  If any selected
+# file name or the directory name, $1, contains an unexpected character,
+# define no alias and return 1.
+create_exe_shims_ ()
+{
+  case $EXEEXT in
+    '') return 0 ;;
+    .exe) ;;
+    *) echo "$0: unexpected \$EXEEXT value: $EXEEXT" 1>&2; return 1 ;;
+  esac
+
+  base_names_=`find_exe_basenames_ $1` \
+    || { echo "$0 (exe_shim): skipping directory: $1" 1>&2; return 0; }
+
+  if test -n "$base_names_"; then
+    for base_ in $base_names_; do
+      alias "$base_"="$base_$EXEEXT"
+    done
+  fi
+
+  return 0
+}
+
+# Use this function to prepend to PATH an absolute name for each
+# specified, possibly-$initial_cwd_-relative, directory.
+path_prepend_ ()
+{
+  while test $# != 0; do
+    path_dir_=$1
+    case $path_dir_ in
+      '') fail_ "invalid path dir: '$1'";;
+      /* | ?:*) abs_path_dir_=$path_dir_;;
+      *) abs_path_dir_=$initial_cwd_/$path_dir_;;
+    esac
+    case $abs_path_dir_ in
+      *$PATH_SEPARATOR*) fail_ "invalid path dir: '$abs_path_dir_'";;
+    esac
+    PATH="$abs_path_dir_$PATH_SEPARATOR$PATH"
+
+    # Create an alias, FOO, for each FOO.exe in this directory.
+    create_exe_shims_ "$abs_path_dir_" \
+      || fail_ "something failed (above): $abs_path_dir_"
+    shift
+  done
+  export PATH
+}
+
+# =============================================================================
+# Convenience environment variables for the tests
+
+# -----------------------------------------------------------------------------
 
 # Enable glibc's malloc-perturbing option.
 # This is useful for exposing code that depends on the fact that
@@ -256,10 +539,46 @@ test -n "$EXEEXT" && shopt -s expand_aliases
 : ${MALLOC_PERTURB_=87}
 export MALLOC_PERTURB_
 
-# This is a stub function that is run upon trap (upon regular exit and
-# interrupt).  Override it with a per-test function, e.g., to unmount
-# a partition, or to undo any other global state changes.
-cleanup_ () { :; }
+# -----------------------------------------------------------------------------
+
+# The interpreter for Bourne-shell scripts.
+# No special standards compatibility requirements.
+# Some environments, such as Android, don't have /bin/sh.
+if test -f /bin/sh$EXEEXT; then
+  BOURNE_SHELL=/bin/sh
+else
+  BOURNE_SHELL=sh
+fi
+
+# =============================================================================
+# Convenience functions for the tests
+
+# -----------------------------------------------------------------------------
+# Return value checking
+
+# This is used to simplify checking of the return value
+# which is useful when ensuring a command fails as desired.
+# I.e., just doing `command ... &&fail=1` will not catch
+# a segfault in command for example.  With this helper you
+# instead check an explicit exit code like
+#   returns_ 1 command ... || fail
+returns_ () {
+  # Disable tracing so it doesn't interfere with stderr of the wrapped command
+  { set +x; } 2>/dev/null
+
+  local exp_exit="$1"
+  shift
+  "$@"
+  test $? -eq $exp_exit && ret_=0 || ret_=1
+
+  if test "$VERBOSE" = yes && test "$gl_set_x_corrupts_stderr_" = false; then
+    set -x
+  fi
+  { return $ret_; } 2>/dev/null
+}
+
+# -----------------------------------------------------------------------------
+# Text file comparison
 
 # Emit a header similar to that from diff -u;  Print the simulated "diff"
 # command so that the order of arguments is clear.  Don't bother with @@ lines.
@@ -340,257 +659,15 @@ compare ()
   fi
 }
 
-# An arbitrary prefix to help distinguish test directories.
-testdir_prefix_ () { printf gt; }
-
-# Run the user-overridable cleanup_ function, remove the temporary
-# directory and exit with the incoming value of $?.
-remove_tmp_ ()
-{
-  __st=$?
-  cleanup_
-  # cd out of the directory we're about to remove
-  cd "$initial_cwd_" || cd / || cd /tmp
-  chmod -R u+rwx "$test_dir_"
-  # If removal fails and exit status was to be 0, then change it to 1.
-  rm -rf "$test_dir_" || { test $__st = 0 && __st=1; }
-  exit $__st
-}
-
-# Given a directory name, DIR, if every entry in it that matches *.exe
-# contains only the specified bytes (see the case stmt below), then print
-# a space-separated list of those names and return 0.  Otherwise, don't
-# print anything and return 1.  Naming constraints apply also to DIR.
-find_exe_basenames_ ()
-{
-  feb_dir_=$1
-  feb_fail_=0
-  feb_result_=
-  feb_sp_=
-  for feb_file_ in $feb_dir_/*.exe; do
-    # If there was no *.exe file, or there existed a file named "*.exe" that
-    # was deleted between the above glob expansion and the existence test
-    # below, just skip it.
-    test "x$feb_file_" = "x$feb_dir_/*.exe" && test ! -f "$feb_file_" \
-      && continue
-    # Exempt [.exe, since we can't create a function by that name, yet
-    # we can't invoke [ by PATH search anyways due to shell builtins.
-    test "x$feb_file_" = "x$feb_dir_/[.exe" && continue
-    case $feb_file_ in
-      *[!-a-zA-Z/0-9_.+]*) feb_fail_=1; break;;
-      *) # Remove leading file name components as well as the .exe suffix.
-         feb_file_=${feb_file_##*/}
-         feb_file_=${feb_file_%.exe}
-         feb_result_="$feb_result_$feb_sp_$feb_file_";;
-    esac
-    feb_sp_=' '
-  done
-  test $feb_fail_ = 0 && printf %s "$feb_result_"
-  return $feb_fail_
-}
-
-# Consider the files in directory, $1.
-# For each file name of the form PROG.exe, create an alias named
-# PROG that simply invokes PROG.exe, then return 0.  If any selected
-# file name or the directory name, $1, contains an unexpected character,
-# define no alias and return 1.
-create_exe_shims_ ()
-{
-  case $EXEEXT in
-    '') return 0 ;;
-    .exe) ;;
-    *) echo "$0: unexpected \$EXEEXT value: $EXEEXT" 1>&2; return 1 ;;
-  esac
-
-  base_names_=`find_exe_basenames_ $1` \
-    || { echo "$0 (exe_shim): skipping directory: $1" 1>&2; return 0; }
-
-  if test -n "$base_names_"; then
-    for base_ in $base_names_; do
-      alias "$base_"="$base_$EXEEXT"
-    done
-  fi
-
-  return 0
-}
-
-# Use this function to prepend to PATH an absolute name for each
-# specified, possibly-$initial_cwd_-relative, directory.
-path_prepend_ ()
-{
-  while test $# != 0; do
-    path_dir_=$1
-    case $path_dir_ in
-      '') fail_ "invalid path dir: '$1'";;
-      /*) abs_path_dir_=$path_dir_;;
-      *) abs_path_dir_=$initial_cwd_/$path_dir_;;
-    esac
-    case $abs_path_dir_ in
-      *:*) fail_ "invalid path dir: '$abs_path_dir_'";;
-    esac
-    PATH="$abs_path_dir_:$PATH"
-
-    # Create an alias, FOO, for each FOO.exe in this directory.
-    create_exe_shims_ "$abs_path_dir_" \
-      || fail_ "something failed (above): $abs_path_dir_"
-    shift
-  done
-  export PATH
-}
-
-setup_ ()
-{
-  if test "$VERBOSE" = yes; then
-    # Test whether set -x may cause the selected shell to corrupt an
-    # application's stderr.  Many do, including zsh-4.3.10 and the /bin/sh
-    # from SunOS 5.11, OpenBSD 4.7 and Irix 5.x and 6.5.
-    # If enabling verbose output this way would cause trouble, simply
-    # issue a warning and refrain.
-    if $gl_set_x_corrupts_stderr_; then
-      warn_ "using SHELL=$SHELL with 'set -x' corrupts stderr"
-    else
-      set -x
-    fi
-  fi
-
-  initial_cwd_=$PWD
-
-  pfx_=`testdir_prefix_`
-  test_dir_=`mktempd_ "$initial_cwd_" "$pfx_-$ME_.XXXX"` \
-    || fail_ "failed to create temporary directory in $initial_cwd_"
-  cd "$test_dir_" || fail_ "failed to cd to temporary directory"
-
-  # As autoconf-generated configure scripts do, ensure that IFS
-  # is defined initially, so that saving and restoring $IFS works.
-  gl_init_sh_nl_='
-'
-  IFS=" ""	$gl_init_sh_nl_"
-
-  # This trap statement, along with a trap on 0 below, ensure that the
-  # temporary directory, $test_dir_, is removed upon exit as well as
-  # upon receipt of any of the listed signals.
-  for sig_ in 1 2 3 13 15; do
-    eval "trap 'Exit $(expr $sig_ + 128)' $sig_"
-  done
-}
-
-# Create a temporary directory, much like mktemp -d does.
-# Written by Jim Meyering.
-#
-# Usage: mktempd_ /tmp phoey.XXXXXXXXXX
-#
-# First, try to use the mktemp program.
-# Failing that, we'll roll our own mktemp-like function:
-#  - try to get random bytes from /dev/urandom
-#  - failing that, generate output from a combination of quickly-varying
-#      sources and gzip.  Ignore non-varying gzip header, and extract
-#      "random" bits from there.
-#  - given those bits, map to file-name bytes using tr, and try to create
-#      the desired directory.
-#  - make only $MAX_TRIES_ attempts
-
-# Helper function.  Print $N pseudo-random bytes from a-zA-Z0-9.
-rand_bytes_ ()
-{
-  n_=$1
-
-  # Maybe try openssl rand -base64 $n_prime_|tr '+/=\012' abcd first?
-  # But if they have openssl, they probably have mktemp, too.
-
-  chars_=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789
-  dev_rand_=/dev/urandom
-  if test -r "$dev_rand_"; then
-    # Note: 256-length($chars_) == 194; 3 copies of $chars_ is 186 + 8 = 194.
-    dd ibs=$n_ count=1 if=$dev_rand_ 2>/dev/null \
-      | LC_ALL=C tr -c $chars_ 01234567$chars_$chars_$chars_
-    return
-  fi
-
-  n_plus_50_=`expr $n_ + 50`
-  cmds_='date; date +%N; free; who -a; w; ps auxww; ps ef; netstat -n'
-  data_=` (eval "$cmds_") 2>&1 | gzip `
-
-  # Ensure that $data_ has length at least 50+$n_
-  while :; do
-    len_=`echo "$data_"|wc -c`
-    test $n_plus_50_ -le $len_ && break;
-    data_=` (echo "$data_"; eval "$cmds_") 2>&1 | gzip `
-  done
-
-  echo "$data_" \
-    | dd bs=1 skip=50 count=$n_ 2>/dev/null \
-    | LC_ALL=C tr -c $chars_ 01234567$chars_$chars_$chars_
-}
-
-mktempd_ ()
-{
-  case $# in
-  2);;
-  *) fail_ "Usage: mktempd_ DIR TEMPLATE";;
-  esac
-
-  destdir_=$1
-  template_=$2
-
-  MAX_TRIES_=4
-
-  # Disallow any trailing slash on specified destdir:
-  # it would subvert the post-mktemp "case"-based destdir test.
-  case $destdir_ in
-  / | //) destdir_slash_=$destdir;;
-  */) fail_ "invalid destination dir: remove trailing slash(es)";;
-  *) destdir_slash_=$destdir_/;;
-  esac
-
-  case $template_ in
-  *XXXX) ;;
-  *) fail_ \
-       "invalid template: $template_ (must have a suffix of at least 4 X's)";;
-  esac
-
-  # First, try to use mktemp.
-  d=`unset TMPDIR; { mktemp -d -t -p "$destdir_" "$template_"; } 2>/dev/null` &&
-
-  # The resulting name must be in the specified directory.
-  case $d in "$destdir_slash_"*) :;; *) false;; esac &&
-
-  # It must have created the directory.
-  test -d "$d" &&
-
-  # It must have 0700 permissions.  Handle sticky "S" bits.
-  perms=`ls -dgo "$d" 2>/dev/null` &&
-  case $perms in drwx--[-S]---*) :;; *) false;; esac && {
-    echo "$d"
-    return
-  }
-
-  # If we reach this point, we'll have to create a directory manually.
-
-  # Get a copy of the template without its suffix of X's.
-  base_template_=`echo "$template_"|sed 's/XX*$//'`
-
-  # Calculate how many X's we've just removed.
-  template_length_=`echo "$template_" | wc -c`
-  nx_=`echo "$base_template_" | wc -c`
-  nx_=`expr $template_length_ - $nx_`
-
-  err_=
-  i_=1
-  while :; do
-    X_=`rand_bytes_ $nx_`
-    candidate_dir_="$destdir_slash_$base_template_$X_"
-    err_=`mkdir -m 0700 "$candidate_dir_" 2>&1` \
-      && { echo "$candidate_dir_"; return; }
-    test $MAX_TRIES_ -le $i_ && break;
-    i_=`expr $i_ + 1`
-  done
-  fail_ "$err_"
-}
+# -----------------------------------------------------------------------------
 
 # If you want to override the testdir_prefix_ function,
 # or to add more utility functions, use this file.
 test -f "$srcdir/init.cfg" \
   && . "$srcdir/init.cfg"
+
+# =============================================================================
+# Set up the environment for the test to run in.
 
 setup_ "$@"
 # This trap is here, rather than in the setup_ function, because some

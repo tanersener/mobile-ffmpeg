@@ -1,3 +1,24 @@
+2019-04-26  Bruno Haible  <bruno@clisp.org>
+
+	* cs.po: Update from Petr Pisar <petr.pisar@atlas.cz>.
+	* da.po: Update from Keld Simonsen <keld@keldix.com>.
+	* hu.po: Update from Balázs Úr <urbalazs@gmail.com>.
+	* ru.po: Update from Yuri Kozlov <yuray@komyakino.ru>.
+	* sv.po: Update from Anders Jonsson <anders.jonsson@norsjovallen.se>.
+	* zh_CN.po: Update from Boyuan Yang <073plan@gmail.com>.
+	* zh_TW.po: Update from pan93412 <pan93412@gmail.com>.
+	* lt.po: New file, from Rimas Kudelis <rq@akl.lt>.
+	* LINGUAS: Add lt.
+
+2019-01-27  Bruno Haible  <bruno@clisp.org>
+
+	Accommodate a shell that is not in /bin/sh.
+	* Makefile.in.in (SHELL): Use the value found by configure.
+
+2017-04-16  Bruno Haible  <bruno@clisp.org>
+
+	* uk.po: Fix header syntax (bug in old version of KDE Lokalize).
+
 2017-01-30  Bruno Haible  <bruno@clisp.org>
 
 	* bg.po: Update from Roumen Petrov <transl@roumenpetrov.info>.

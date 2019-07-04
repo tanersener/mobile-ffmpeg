@@ -35,6 +35,7 @@
 #include "testutils.h"
 
 #include "chacha.h"
+#include "chacha-internal.h"
 
 static void
 test_chacha(const struct tstring *key, const struct tstring *nonce,

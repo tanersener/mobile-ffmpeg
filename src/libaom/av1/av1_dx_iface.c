@@ -336,6 +336,8 @@ static aom_codec_err_t decoder_peek_si_internal(const uint8_t *data,
           if (frame_type == KEY_FRAME) {
             found_keyframe = 1;
             break;  // Stop here as no further OBUs will change the outcome.
+          } else if (frame_type == INTRA_ONLY_FRAME) {
+            intra_only_flag = 1;
           }
         }
       }
@@ -629,7 +631,7 @@ static aom_codec_err_t decoder_decode(aom_codec_alg_priv_t *ctx,
       }
       pbi->num_output_frames = 0;
     }
-    unlock_buffer_pool(ctx->buffer_pool);
+    unlock_buffer_pool(pool);
   }
 
   /* Sanity checks */
@@ -752,7 +754,6 @@ static aom_image_t *decoder_get_frame(aom_codec_alg_priv_t *ctx,
 
   if (ctx->frame_workers != NULL) {
     do {
-      YV12_BUFFER_CONFIG *sd;
       // NOTE(david.barker): This code does not support multiple worker threads
       // yet. We should probably move the iteration over threads into *iter
       // instead of using ctx->next_output_worker_id.
@@ -771,6 +772,7 @@ static aom_image_t *decoder_get_frame(aom_codec_alg_priv_t *ctx,
           frame_worker_data->received_frame = 0;
           check_resync(ctx, frame_worker_data->pbi);
         }
+        YV12_BUFFER_CONFIG *sd;
         aom_film_grain_t *grain_params;
         if (av1_get_raw_frame(frame_worker_data->pbi, *index, &sd,
                               &grain_params) == 0) {

@@ -123,6 +123,11 @@ flag = {
     doc       = "The output will be in the TPM portable DER format.";
 };
 
+flag = {
+    name      = srk-well-known;
+    descrip   = "SRK has well known password (20 bytes of zeros)";
+};
+
 doc-section = {
   ds-type = 'SEE ALSO';
   ds-format = 'texi';

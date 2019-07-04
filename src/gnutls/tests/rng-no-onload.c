@@ -32,7 +32,7 @@
 #include <gnutls/crypto.h>
 #include "utils.h"
 
-#if defined(ENABLE_FIPS140) || !defined(__linux__) || !defined(__GNUC__)
+#if !defined(__linux__) || !defined(__GNUC__)
 
 void doit(void)
 {
@@ -58,6 +58,10 @@ gnutls_rnd(gnutls_rnd_level_t level, void *data, size_t len)
 
 void doit(void)
 {
+	if (gnutls_fips140_mode_enabled()) {
+		exit(77);
+	}
+
 	global_init();
 
 	if (_rnd_called != 0)

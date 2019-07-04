@@ -16,12 +16,15 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
+#ifndef GNUTLS_LIB_X509_H
+#define GNUTLS_LIB_X509_H
+
 #include <libtasn1.h>
-#include <gnutls/abstract.h>
+
 
 int _gnutls_x509_cert_verify_peers(gnutls_session_t session,
 				   gnutls_typed_vdata_st * data,
@@ -30,9 +33,14 @@ int _gnutls_x509_cert_verify_peers(gnutls_session_t session,
 
 #define PEM_CERT_SEP2 "-----BEGIN X509 CERTIFICATE"
 #define PEM_CERT_SEP "-----BEGIN CERTIFICATE"
+#define PEM_OCSP_RESPONSE "-----BEGIN OCSP RESPONSE"
+#define BARE_PEM_OCSP_RESPONSE "OCSP RESPONSE"
 
 #define PEM_CRL_SEP "-----BEGIN X509 CRL"
+
 
 int _gnutls_x509_raw_privkey_to_gkey(gnutls_privkey_t * privkey,
 				     const gnutls_datum_t * raw_key,
 				     gnutls_x509_crt_fmt_t type);
+
+#endif /* GNUTLS_LIB_X509_H */

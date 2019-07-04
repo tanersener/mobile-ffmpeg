@@ -16,7 +16,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -74,7 +74,7 @@ static int append_elements(ASN1_TYPE asn1_struct, const char *asn1_rdn_name, gnu
 		goto cleanup;
 	}
 
-	do {		/* Move to the attibute type and values
+	do {		/* Move to the attribute type and values
 				 */
 		k2++;
 
@@ -286,6 +286,8 @@ _gnutls_x509_parse_dn(ASN1_TYPE asn1_struct,
 		goto cleanup;
 	}
 
+	assert(dn.data != NULL);
+
 	if (buf) {
 		memcpy(buf, dn.data, dn.size);
 		buf[dn.size] = 0;
@@ -357,7 +359,7 @@ _gnutls_x509_parse_dn_oid(ASN1_TYPE asn1_struct,
 
 		k2 = 0;
 
-		do {		/* Move to the attibute type and values
+		do {		/* Move to the attribute type and values
 				 */
 			k2++;
 
@@ -517,7 +519,7 @@ _gnutls_x509_get_dn_oid(ASN1_TYPE asn1_struct,
 
 		k2 = 0;
 
-		do {		/* Move to the attibute type and values
+		do {		/* Move to the attribute type and values
 				 */
 			k2++;
 
@@ -797,38 +799,20 @@ int
 gnutls_x509_rdn_get(const gnutls_datum_t * idn,
 		    char *buf, size_t * buf_size)
 {
-	int result;
-	ASN1_TYPE dn = ASN1_TYPE_EMPTY;
+	int ret;
+	gnutls_datum_t out;
 
-	if (buf_size == 0) {
+	ret = gnutls_x509_rdn_get2(idn, &out, GNUTLS_X509_DN_FLAG_COMPAT);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret = _gnutls_copy_string(&out, (void*)buf, buf_size);
+	gnutls_free(out.data);
+	if (ret < 0) {
 		gnutls_assert();
-		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	if (buf)
-		buf[0] = 0;
-
-
-	if ((result =
-	     asn1_create_element(_gnutls_get_pkix(),
-				 "PKIX1.Name", &dn)) != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-
-	result = _asn1_strict_der_decode(&dn, idn->data, idn->size, NULL);
-	if (result != ASN1_SUCCESS) {
-		/* couldn't decode DER */
-		gnutls_assert();
-		asn1_delete_structure(&dn);
-		return _gnutls_asn2err(result);
-	}
-
-	result = _gnutls_x509_parse_dn(dn, "rdnSequence", buf, buf_size, GNUTLS_X509_DN_FLAG_COMPAT);
-
-	asn1_delete_structure(&dn);
-	return result;
-
+	return ret;
 }
 
 /**
@@ -854,29 +838,29 @@ int
 gnutls_x509_rdn_get2(const gnutls_datum_t * idn,
 		     gnutls_datum_t *str, unsigned flags)
 {
-	int result;
-	ASN1_TYPE dn = ASN1_TYPE_EMPTY;
+	int ret;
+	gnutls_x509_dn_t dn;
 
-	if ((result =
-	     asn1_create_element(_gnutls_get_pkix(),
-				 "PKIX1.Name", &dn)) != ASN1_SUCCESS) {
+	ret = gnutls_x509_dn_init(&dn);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret = gnutls_x509_dn_import(dn, idn);
+	if (ret < 0) {
 		gnutls_assert();
-		return _gnutls_asn2err(result);
+		goto cleanup;
 	}
 
-	result = _asn1_strict_der_decode(&dn, idn->data, idn->size, NULL);
-	if (result != ASN1_SUCCESS) {
-		/* couldn't decode DER */
+	ret = gnutls_x509_dn_get_str2(dn, str, flags);
+	if (ret < 0) {
 		gnutls_assert();
-		asn1_delete_structure(&dn);
-		return _gnutls_asn2err(result);
+		goto cleanup;
 	}
 
-	result = _gnutls_x509_get_dn(dn, "rdnSequence", str, flags);
-
-	asn1_delete_structure(&dn);
-	return result;
-
+	ret = 0;
+ cleanup:
+	gnutls_x509_dn_deinit(dn);
+	return ret;
 }
 
 /**
@@ -1000,7 +984,6 @@ _gnutls_x509_compare_raw_dn(const gnutls_datum_t * dn1,
 {
 
 	if (dn1->size != dn2->size) {
-		gnutls_assert();
 		return 0;
 	}
 	if (memcmp(dn1->data, dn2->data, dn2->size) != 0) {

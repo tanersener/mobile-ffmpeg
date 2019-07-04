@@ -636,6 +636,18 @@ LIBOBJS
 GLIBC21
 HAVE_VISIBILITY
 CFLAG_VISIBILITY
+RELOCATABLE_STRIP
+RELOCATABLE_BUILD_DIR
+RELOCATABLE_SRC_DIR
+RELOCATABLE_CONFIG_H_DIR
+RELOCATABLE_LIBRARY_PATH
+RELOCATABLE_VIA_WRAPPER_FALSE
+RELOCATABLE_VIA_WRAPPER_TRUE
+RELOCATABLE_VIA_LD_FALSE
+RELOCATABLE_VIA_LD_TRUE
+INSTALL_PROGRAM_ENV
+RELOCATABLE_LDFLAGS
+RELOCATABLE
 LT_SYS_LIBRARY_PATH
 OTOOL64
 OTOOL
@@ -661,7 +673,6 @@ DLLTOOL
 AS
 EGREP
 GREP
-RELOCATABLE
 host_os
 host_vendor
 host_cpu
@@ -723,7 +734,6 @@ SHELL'
 ac_subst_files=''
 ac_user_opts='
 enable_option_checking
-enable_relocatable
 enable_shared
 enable_static
 with_pic
@@ -732,6 +742,7 @@ with_aix_soname
 with_gnu_ld
 with_sysroot
 enable_libtool_lock
+enable_relocatable
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1356,13 +1367,13 @@ Optional Features:
   --disable-option-checking  ignore unrecognized --enable/--with options
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
-  --enable-relocatable    install a package that can be moved in the file
-                          system
   --enable-shared[=PKGS]  build shared libraries [default=yes]
   --enable-static[=PKGS]  build static libraries [default=yes]
   --enable-fast-install[=PKGS]
                           optimize for fast installation [default=yes]
   --disable-libtool-lock  avoid locking (might break parallel builds)
+  --enable-relocatable    install a package that can be moved in the file
+                          system
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -1375,6 +1386,7 @@ Optional Packages:
   --with-gnu-ld           assume the C compiler uses GNU ld [default=no]
   --with-sysroot[=DIR]    Search for dependent libraries within DIR (or the
                           compiler's sysroot if not specified).
+  --with-gnu-ld           assume the C compiler uses GNU ld [default=no]
 
 Some influential environment variables:
   CC          C compiler command
@@ -3324,47 +3336,6 @@ shift; shift
 host_os=$*
 IFS=$ac_save_IFS
 case $host_os in *\ *) host_os=`echo "$host_os" | sed 's/ /-/g'`;; esac
-
-
-
-
-
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to activate relocatable installation" >&5
-$as_echo_n "checking whether to activate relocatable installation... " >&6; }
-  # Check whether --enable-relocatable was given.
-if test "${enable_relocatable+set}" = set; then :
-  enableval=$enable_relocatable; if test "$enableval" != no; then
-       RELOCATABLE=yes
-     else
-       RELOCATABLE=no
-     fi
-
-else
-  RELOCATABLE=no
-fi
-
-
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $RELOCATABLE" >&5
-$as_echo "$RELOCATABLE" >&6; }
-
-
-
-    if test "X$prefix" = "XNONE"; then
-    reloc_final_prefix="$ac_default_prefix"
-  else
-    reloc_final_prefix="$prefix"
-  fi
-
-cat >>confdefs.h <<_ACEOF
-#define INSTALLPREFIX "${reloc_final_prefix}"
-_ACEOF
-
-  if test $RELOCATABLE = yes; then
-
-$as_echo "#define ENABLE_RELOCATABLE 1" >>confdefs.h
-
-  fi
-
 
 
 
@@ -11635,18 +11606,398 @@ CC=$lt_save_CC
 
 
 
+# Check whether --with-gnu-ld was given.
+if test "${with_gnu_ld+set}" = set; then :
+  withval=$with_gnu_ld; test "$withval" = no || with_gnu_ld=yes
+else
+  with_gnu_ld=no
+fi
+
+# Prepare PATH_SEPARATOR.
+# The user is always right.
+if test "${PATH_SEPARATOR+set}" != set; then
+  # Determine PATH_SEPARATOR by trying to find /bin/sh in a PATH which
+  # contains only /bin. Note that ksh looks also at the FPATH variable,
+  # so we have to set that as well for the test.
+  PATH_SEPARATOR=:
+  (PATH='/bin;/bin'; FPATH=$PATH; sh -c :) >/dev/null 2>&1 \
+    && { (PATH='/bin:/bin'; FPATH=$PATH; sh -c :) >/dev/null 2>&1 \
+           || PATH_SEPARATOR=';'
+       }
+fi
+
+if test -n "$LD"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for ld" >&5
+$as_echo_n "checking for ld... " >&6; }
+elif test "$GCC" = yes; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for ld used by $CC" >&5
+$as_echo_n "checking for ld used by $CC... " >&6; }
+elif test "$with_gnu_ld" = yes; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for GNU ld" >&5
+$as_echo_n "checking for GNU ld... " >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for non-GNU ld" >&5
+$as_echo_n "checking for non-GNU ld... " >&6; }
+fi
+if test -n "$LD"; then
+  # Let the user override the test with a path.
+  :
+else
+  if ${acl_cv_path_LD+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+    acl_cv_path_LD= # Final result of this test
+    ac_prog=ld # Program to search in $PATH
+    if test "$GCC" = yes; then
+      # Check if gcc -print-prog-name=ld gives a path.
+      case $host in
+        *-*-mingw*)
+          # gcc leaves a trailing carriage return which upsets mingw
+          acl_output=`($CC -print-prog-name=ld) 2>&5 | tr -d '\015'` ;;
+        *)
+          acl_output=`($CC -print-prog-name=ld) 2>&5` ;;
+      esac
+      case $acl_output in
+        # Accept absolute paths.
+        [\\/]* | ?:[\\/]*)
+          re_direlt='/[^/][^/]*/\.\./'
+          # Canonicalize the pathname of ld
+          acl_output=`echo "$acl_output" | sed 's%\\\\%/%g'`
+          while echo "$acl_output" | grep "$re_direlt" > /dev/null 2>&1; do
+            acl_output=`echo $acl_output | sed "s%$re_direlt%/%"`
+          done
+          # Got the pathname. No search in PATH is needed.
+          acl_cv_path_LD="$acl_output"
+          ac_prog=
+          ;;
+        "")
+          # If it fails, then pretend we aren't using GCC.
+          ;;
+        *)
+          # If it is relative, then search for the first ld in PATH.
+          with_gnu_ld=unknown
+          ;;
+      esac
+    fi
+    if test -n "$ac_prog"; then
+      # Search for $ac_prog in $PATH.
+      acl_save_ifs="$IFS"; IFS=$PATH_SEPARATOR
+      for ac_dir in $PATH; do
+        IFS="$acl_save_ifs"
+        test -z "$ac_dir" && ac_dir=.
+        if test -f "$ac_dir/$ac_prog" || test -f "$ac_dir/$ac_prog$ac_exeext"; then
+          acl_cv_path_LD="$ac_dir/$ac_prog"
+          # Check to see if the program is GNU ld.  I'd rather use --version,
+          # but apparently some variants of GNU ld only accept -v.
+          # Break only if it was the GNU/non-GNU ld that we prefer.
+          case `"$acl_cv_path_LD" -v 2>&1 </dev/null` in
+            *GNU* | *'with BFD'*)
+              test "$with_gnu_ld" != no && break
+              ;;
+            *)
+              test "$with_gnu_ld" != yes && break
+              ;;
+          esac
+        fi
+      done
+      IFS="$acl_save_ifs"
+    fi
+    case $host in
+      *-*-aix*)
+        cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#if defined __powerpc64__ || defined _ARCH_PPC64
+                int ok;
+               #else
+                error fail
+               #endif
+
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  # The compiler produces 64-bit code. Add option '-b64' so that the
+           # linker groks 64-bit object files.
+           case "$acl_cv_path_LD " in
+             *" -b64 "*) ;;
+             *) acl_cv_path_LD="$acl_cv_path_LD -b64" ;;
+           esac
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+        ;;
+      sparc64-*-netbsd*)
+        cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#if defined __sparcv9 || defined __arch64__
+                int ok;
+               #else
+                error fail
+               #endif
+
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+
+else
+  # The compiler produces 32-bit code. Add option '-m elf32_sparc'
+           # so that the linker groks 32-bit object files.
+           case "$acl_cv_path_LD " in
+             *" -m elf32_sparc "*) ;;
+             *) acl_cv_path_LD="$acl_cv_path_LD -m elf32_sparc" ;;
+           esac
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+        ;;
+    esac
+
+fi
+
+  LD="$acl_cv_path_LD"
+fi
+if test -n "$LD"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $LD" >&5
+$as_echo "$LD" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+  as_fn_error $? "no acceptable ld found in \$PATH" "$LINENO" 5
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if the linker ($LD) is GNU ld" >&5
+$as_echo_n "checking if the linker ($LD) is GNU ld... " >&6; }
+if ${acl_cv_prog_gnu_ld+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  # I'd rather use --version here, but apparently some GNU lds only accept -v.
+case `$LD -v 2>&1 </dev/null` in
+*GNU* | *'with BFD'*)
+  acl_cv_prog_gnu_ld=yes
+  ;;
+*)
+  acl_cv_prog_gnu_ld=no
+  ;;
+esac
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $acl_cv_prog_gnu_ld" >&5
+$as_echo "$acl_cv_prog_gnu_ld" >&6; }
+with_gnu_ld=$acl_cv_prog_gnu_ld
+
+
+
+                              { $as_echo "$as_me:${as_lineno-$LINENO}: checking for shared library path variable" >&5
+$as_echo_n "checking for shared library path variable... " >&6; }
+if ${acl_cv_libpath+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+    LD="$LD" \
+    ${CONFIG_SHELL-/bin/sh} "$ac_aux_dir/config.libpath" "$host" > conftest.sh
+    . ./conftest.sh
+    rm -f ./conftest.sh
+    acl_cv_libpath=${acl_cv_shlibpath_var:-none}
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $acl_cv_libpath" >&5
+$as_echo "$acl_cv_libpath" >&6; }
+  shlibpath_var="$acl_cv_shlibpath_var"
+
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to activate relocatable installation" >&5
+$as_echo_n "checking whether to activate relocatable installation... " >&6; }
+  # Check whether --enable-relocatable was given.
+if test "${enable_relocatable+set}" = set; then :
+  enableval=$enable_relocatable; if test "$enableval" != no; then
+       RELOCATABLE=yes
+     else
+       RELOCATABLE=no
+     fi
+
+else
+  RELOCATABLE=no
+fi
+
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $RELOCATABLE" >&5
+$as_echo "$RELOCATABLE" >&6; }
+
+
+
+    if test "X$prefix" = "XNONE"; then
+    reloc_final_prefix="$ac_default_prefix"
+  else
+    reloc_final_prefix="$prefix"
+  fi
+
+cat >>confdefs.h <<_ACEOF
+#define INSTALLPREFIX "${reloc_final_prefix}"
+_ACEOF
+
+  if test $RELOCATABLE = yes; then
+
+$as_echo "#define ENABLE_RELOCATABLE 1" >>confdefs.h
+
+  fi
+
+
+
+
+
+
+
+
+  is_noop=no
+  use_elf_origin_trick=no
+  use_macos_tools=no
+  use_wrapper=no
+  if test $RELOCATABLE = yes; then
+    # --enable-relocatable implies --disable-rpath
+    enable_rpath=no
+    for ac_header in mach-o/dyld.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "mach-o/dyld.h" "ac_cv_header_mach_o_dyld_h" "$ac_includes_default"
+if test "x$ac_cv_header_mach_o_dyld_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_MACH_O_DYLD_H 1
+_ACEOF
+
+fi
+
+done
+
+    for ac_func in _NSGetExecutablePath
+do :
+  ac_fn_c_check_func "$LINENO" "_NSGetExecutablePath" "ac_cv_func__NSGetExecutablePath"
+if test "x$ac_cv_func__NSGetExecutablePath" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE__NSGETEXECUTABLEPATH 1
+_ACEOF
+
+fi
+done
+
+    case "$host_os" in
+      mingw*) is_noop=yes ;;
+      # For the platforms that support $ORIGIN, see
+      # <https://lekensteyn.nl/rpath.html>.
+      # glibc systems, Linux with musl libc: yes. Android: no.
+      linux*-android*) ;;
+      linux* | kfreebsd*) use_elf_origin_trick=yes ;;
+      # Hurd: <http://lists.gnu.org/archive/html/bug-hurd/2019-02/msg00049.html>
+      # only after the glibc commit from 2018-01-08
+      # <https://sourceware.org/git/?p=glibc.git;a=commitdiff;h=311ba8dc4416467947eff2ab327854f124226309>
+      gnu*)
+        # Test for a glibc version >= 2.27.
+        for ac_func in copy_file_range
+do :
+  ac_fn_c_check_func "$LINENO" "copy_file_range" "ac_cv_func_copy_file_range"
+if test "x$ac_cv_func_copy_file_range" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_COPY_FILE_RANGE 1
+_ACEOF
+
+fi
+done
+
+        if test $ac_cv_func_copy_file_range = yes; then
+          use_elf_origin_trick=yes
+        fi
+        ;;
+      # FreeBSD >= 7.3, DragonFly >= 3.0: yes.
+      freebsd | freebsd[1-7] | freebsd[1-6].* | freebsd7.[0-2]) ;;
+      dragonfly | dragonfly[1-2] | dragonfly[1-2].*) ;;
+      freebsd* | dragonfly*) use_elf_origin_trick=yes ;;
+      # NetBSD >= 8.0: yes.
+      netbsd | netbsd[1-7] | netbsd[1-7].*) ;;
+      netbsdelf | netbsdelf[1-7] | netbsdelf[1-7].*) ;;
+      netbsd*) use_elf_origin_trick=yes ;;
+      # OpenBSD >= 5.4: yes.
+      openbsd | openbsd[1-5] | openbsd[1-4].* | openbsd5.[0-3]) ;;
+      openbsd*) use_elf_origin_trick=yes ;;
+      # Solaris >= 10: yes.
+      solaris | solaris2.[1-9] | solaris2.[1-9].*) ;;
+      solaris*) use_elf_origin_trick=yes ;;
+      # Haiku: yes.
+      haiku*) use_elf_origin_trick=yes ;;
+      # On Mac OS X 10.4 or newer, use Mac OS X tools. See
+      # <https://wincent.com/wiki/@executable_path,_@load_path_and_@rpath>.
+      darwin | darwin[1-7].*) ;;
+      darwin*) use_macos_tools=yes ;;
+    esac
+    if test $is_noop = yes; then
+      RELOCATABLE_LDFLAGS=:
+
+    else
+      if test $use_elf_origin_trick = yes || test $use_macos_tools = yes; then
+                case "$ac_aux_dir" in
+          /*) reloc_ldflags="$ac_aux_dir/reloc-ldflags" ;;
+          *) reloc_ldflags="\$(top_builddir)/$ac_aux_dir/reloc-ldflags" ;;
+        esac
+        RELOCATABLE_LDFLAGS="\"$reloc_ldflags\" \"\$(host)\" \"\$(RELOCATABLE_LIBRARY_PATH)\""
+
+        if test $use_macos_tools = yes; then
+                    case "$ac_aux_dir" in
+            /*) LIBTOOL="${CONFIG_SHELL-$SHELL} $ac_aux_dir/libtool-reloc $LIBTOOL" ;;
+            *) LIBTOOL="${CONFIG_SHELL-$SHELL} \$(top_builddir)/$ac_aux_dir/libtool-reloc $LIBTOOL" ;;
+          esac
+        fi
+      else
+        use_wrapper=yes
+                                        INSTALL_PROGRAM_ENV="RELOC_LIBRARY_PATH_VAR=\"$shlibpath_var\" RELOC_LIBRARY_PATH_VALUE=\"\$(RELOCATABLE_LIBRARY_PATH)\" RELOC_PREFIX=\"\$(prefix)\" RELOC_DESTDIR=\"\$(DESTDIR)\" RELOC_COMPILE_COMMAND=\"\$(CC) \$(CPPFLAGS) \$(CFLAGS) \$(LDFLAGS)\" RELOC_SRCDIR=\"\$(RELOCATABLE_SRC_DIR)\" RELOC_BUILDDIR=\"\$(RELOCATABLE_BUILD_DIR)\" RELOC_CONFIG_H_DIR=\"\$(RELOCATABLE_CONFIG_H_DIR)\" RELOC_EXEEXT=\"\$(EXEEXT)\" RELOC_STRIP_PROG=\"\$(RELOCATABLE_STRIP)\" RELOC_INSTALL_PROG=\"$INSTALL_PROGRAM\""
+
+        case "$ac_aux_dir" in
+          /*) INSTALL_PROGRAM="$ac_aux_dir/install-reloc" ;;
+          *) INSTALL_PROGRAM="\$(top_builddir)/$ac_aux_dir/install-reloc" ;;
+        esac
+      fi
+    fi
+  fi
+   if test $is_noop = yes || test $use_elf_origin_trick = yes || test $use_macos_tools = yes; then
+  RELOCATABLE_VIA_LD_TRUE=
+  RELOCATABLE_VIA_LD_FALSE='#'
+else
+  RELOCATABLE_VIA_LD_TRUE='#'
+  RELOCATABLE_VIA_LD_FALSE=
+fi
+
+   if test $use_wrapper = yes; then
+  RELOCATABLE_VIA_WRAPPER_TRUE=
+  RELOCATABLE_VIA_WRAPPER_FALSE='#'
+else
+  RELOCATABLE_VIA_WRAPPER_TRUE='#'
+  RELOCATABLE_VIA_WRAPPER_FALSE=
+fi
+
+
+
+
+
+
+
+
+      RELOCATABLE_STRIP=':'
+
+
+
+
+
+
+
+  : ${RELOCATABLE_CONFIG_H_DIR='$(top_builddir)'}
+  RELOCATABLE_SRC_DIR="\$(top_srcdir)/$gl_source_base"
+  RELOCATABLE_BUILD_DIR="\$(top_builddir)/$gl_source_base"
+
+
+
   CFLAG_VISIBILITY=
   HAVE_VISIBILITY=0
   if test -n "$GCC"; then
                 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the -Werror option is usable" >&5
 $as_echo_n "checking whether the -Werror option is usable... " >&6; }
-    if ${gl_cv_cc_vis_werror+:} false; then :
+if ${gl_cv_cc_vis_werror+:} false; then :
   $as_echo_n "(cached) " >&6
 else
-
-      gl_save_CFLAGS="$CFLAGS"
-      CFLAGS="$CFLAGS -Werror"
-      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+  gl_save_CFLAGS="$CFLAGS"
+       CFLAGS="$CFLAGS -Werror"
+       cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
 int
@@ -11663,29 +12014,28 @@ else
   gl_cv_cc_vis_werror=no
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-      CFLAGS="$gl_save_CFLAGS"
-fi
+       CFLAGS="$gl_save_CFLAGS"
 
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $gl_cv_cc_vis_werror" >&5
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $gl_cv_cc_vis_werror" >&5
 $as_echo "$gl_cv_cc_vis_werror" >&6; }
         { $as_echo "$as_me:${as_lineno-$LINENO}: checking for simple visibility declarations" >&5
 $as_echo_n "checking for simple visibility declarations... " >&6; }
-    if ${gl_cv_cc_visibility+:} false; then :
+if ${gl_cv_cc_visibility+:} false; then :
   $as_echo_n "(cached) " >&6
 else
-
-      gl_save_CFLAGS="$CFLAGS"
-      CFLAGS="$CFLAGS -fvisibility=hidden"
-                                    if test $gl_cv_cc_vis_werror = yes; then
-        CFLAGS="$CFLAGS -Werror"
-      fi
-      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+  gl_save_CFLAGS="$CFLAGS"
+       CFLAGS="$CFLAGS -fvisibility=hidden"
+                                          if test $gl_cv_cc_vis_werror = yes; then
+         CFLAGS="$CFLAGS -Werror"
+       fi
+       cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 extern __attribute__((__visibility__("hidden"))) int hiddenvar;
-             extern __attribute__((__visibility__("default"))) int exportedvar;
-             extern __attribute__((__visibility__("hidden"))) int hiddenfunc (void);
-             extern __attribute__((__visibility__("default"))) int exportedfunc (void);
-             void dummyfunc (void) {}
+              extern __attribute__((__visibility__("default"))) int exportedvar;
+              extern __attribute__((__visibility__("hidden"))) int hiddenfunc (void);
+              extern __attribute__((__visibility__("default"))) int exportedfunc (void);
+              void dummyfunc (void) {}
 
 int
 main ()
@@ -11701,10 +12051,10 @@ else
   gl_cv_cc_visibility=no
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-      CFLAGS="$gl_save_CFLAGS"
-fi
+       CFLAGS="$gl_save_CFLAGS"
 
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $gl_cv_cc_visibility" >&5
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $gl_cv_cc_visibility" >&5
 $as_echo "$gl_cv_cc_visibility" >&6; }
     if test $gl_cv_cc_visibility = yes; then
       CFLAG_VISIBILITY="-fvisibility=hidden"
@@ -11802,7 +12152,12 @@ if ${gl_cv_header_working_fcntl_h+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   if test "$cross_compiling" = yes; then :
-  gl_cv_header_working_fcntl_h=cross-compiling
+  case "$host_os" in
+                  # Guess 'no' on native Windows.
+          mingw*) gl_cv_header_working_fcntl_h='no' ;;
+          *)      gl_cv_header_working_fcntl_h=cross-compiling ;;
+        esac
+
 else
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -11912,6 +12267,7 @@ fi
 rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
   conftest.$ac_objext conftest.beam conftest.$ac_ext
 fi
+
 
 fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $gl_cv_header_working_fcntl_h" >&5
@@ -12103,6 +12459,14 @@ LIBOBJS=$ac_libobjs
 LTLIBOBJS=$ac_ltlibobjs
 
 
+if test -z "${RELOCATABLE_VIA_LD_TRUE}" && test -z "${RELOCATABLE_VIA_LD_FALSE}"; then
+  as_fn_error $? "conditional \"RELOCATABLE_VIA_LD\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${RELOCATABLE_VIA_WRAPPER_TRUE}" && test -z "${RELOCATABLE_VIA_WRAPPER_FALSE}"; then
+  as_fn_error $? "conditional \"RELOCATABLE_VIA_WRAPPER\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 
 : "${CONFIG_STATUS=./config.status}"
 ac_write_fail=0

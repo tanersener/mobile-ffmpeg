@@ -16,4 +16,22 @@ the SECP521R1 curve
 the SECP192R1 curve
 @item GNUTLS_@-ECC_@-CURVE_@-X25519
 the X25519 curve (ECDH only)
+@item GNUTLS_@-ECC_@-CURVE_@-ED25519
+the Ed25519 curve
+@item GNUTLS_@-ECC_@-CURVE_@-GOST256CPA
+GOST R 34.10 CryptoPro 256 A curve
+@item GNUTLS_@-ECC_@-CURVE_@-GOST256CPB
+GOST R 34.10 CryptoPro 256 B curve
+@item GNUTLS_@-ECC_@-CURVE_@-GOST256CPC
+GOST R 34.10 CryptoPro 256 C curve
+@item GNUTLS_@-ECC_@-CURVE_@-GOST256CPXA
+GOST R 34.10 CryptoPro 256 XchA curve
+@item GNUTLS_@-ECC_@-CURVE_@-GOST256CPXB
+GOST R 34.10 CryptoPro 256 XchB curve
+@item GNUTLS_@-ECC_@-CURVE_@-GOST512A
+GOST R 34.10 TC26 512 A curve
+@item GNUTLS_@-ECC_@-CURVE_@-GOST512B
+GOST R 34.10 TC26 512 B curve
+@item GNUTLS_@-ECC_@-CURVE_@-MAX
+-- undescribed --
 @end table

@@ -1,0 +1,1 @@
+@item @var{const gnutls_group_t *} @ref{gnutls_group_list} ( @var{void})

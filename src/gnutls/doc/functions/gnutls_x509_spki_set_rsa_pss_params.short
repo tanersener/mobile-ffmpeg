@@ -1,0 +1,1 @@
+@item @var{void} @ref{gnutls_x509_spki_set_rsa_pss_params} (gnutls_x509_spki_t @var{spki}, gnutls_digest_algorithm_t @var{dig}, unsigned int @var{salt_size})

@@ -6,10 +6,10 @@ android {
     defaultConfig {
         minSdkVersion 24
         targetSdkVersion 28
-        versionCode 240421
-        versionName "4.2.1"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        versionCode 240422
+        versionName "4.2.2"
         project.archivesBaseName = "mobile-ffmpeg"
+        consumerProguardFiles 'proguard-rules.pro'
     }
 
     buildTypes {
@@ -28,14 +28,6 @@ android {
     testOptions {
         unitTests.returnDefaultValues = true
     }
-
-    libraryVariants.all { variant ->
-        variant.outputs.all { output ->
-            if (outputFile != null && outputFileName.endsWith('.aar')) {
-                outputFileName = "${archivesBaseName}-${android.defaultConfig.versionName}.aar"
-            }
-        }
-    }
 }
 
 task javadoc(type: Javadoc) {
@@ -45,16 +37,8 @@ task javadoc(type: Javadoc) {
     source = android.sourceSets.main.java.srcDirs
 }
 
-afterEvaluate {
-    javadoc.classpath += files(android.libraryVariants.collect { variant ->
-        variant.javaCompile.classpath.files
-    })
-}
-
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:28.0.0'
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 }

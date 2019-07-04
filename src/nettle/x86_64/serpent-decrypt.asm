@@ -713,3 +713,4 @@ PROLOGUE(nettle_serpent_decrypt)
 	pop	%rbx
 	W64_EXIT(4, 13)
 	ret
+EPILOGUE(nettle_serpent_decrypt)

@@ -42,8 +42,8 @@
 #include "utils.h"
 #include "cert-common.h"
 
-/* Test for correct operation when a client uses a DSA key when the server
- * has DSA signatures enabled but not the client.
+/* Test for correct operation when a client uses a DSA key and
+ * explicitly enables DSA signatures under TLS 1.2.
  *
  */
 
@@ -84,6 +84,7 @@ void doit(void)
 	/* test gnutls_certificate_flags() */
 	gnutls_certificate_allocate_credentials(&serv_cred);
 	gnutls_certificate_set_flags(serv_cred, GNUTLS_CERTIFICATE_SKIP_KEY_CERT_MATCH);
+	gnutls_certificate_set_verify_flags(serv_cred, GNUTLS_VERIFY_ALLOW_SIGN_WITH_SHA1);
 
 	ret = gnutls_certificate_set_x509_trust_mem(serv_cred, &ca3_cert, GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
@@ -97,7 +98,7 @@ void doit(void)
 		exit(1);
 	}
 
-	test_cli_serv_cert(serv_cred, cli_cred, "NORMAL:+DHE-DSS:+SIGN-DSA-SHA1", "NORMAL:-DHE-DSS:-SIGN-DSA-SHA1", "localhost");
+	test_cli_serv_cert(serv_cred, cli_cred, "NORMAL:+DHE-DSS:+SIGN-DSA-SHA1", "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2:-DHE-DSS:+SIGN-DSA-SHA1", "localhost");
 
 	gnutls_certificate_free_credentials(serv_cred);
 	gnutls_certificate_free_credentials(cli_cred);

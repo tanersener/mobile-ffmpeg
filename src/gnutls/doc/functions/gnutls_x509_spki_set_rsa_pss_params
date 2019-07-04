@@ -1,0 +1,16 @@
+
+
+
+
+@deftypefun {void} {gnutls_x509_spki_set_rsa_pss_params} (gnutls_x509_spki_t @var{spki}, gnutls_digest_algorithm_t @var{dig}, unsigned int @var{salt_size})
+@var{spki}: the SubjectPublicKeyInfo structure
+
+@var{dig}: a digest algorithm of type @code{gnutls_digest_algorithm_t} 
+
+@var{salt_size}: the size of salt string
+
+This function will set the public key parameters for
+an RSA-PSS algorithm, in the SubjectPublicKeyInfo structure.
+
+@strong{Since:} 3.6.0
+@end deftypefun

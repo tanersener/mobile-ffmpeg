@@ -47,6 +47,7 @@ int main()
 #include <gnutls/abstract.h>
 #include <gnutls/urls.h>
 #include <signal.h>
+#include <assert.h>
 
 #include "cert-common.h"
 #include "utils.h"
@@ -93,7 +94,7 @@ static void client(int fd)
 	gnutls_init(&session, GNUTLS_CLIENT);
 
 	/* Use default priorities */
-	gnutls_priority_set_direct(session, "NORMAL", NULL);
+	assert(gnutls_priority_set_direct(session, "NORMAL:-VERS-ALL:+VERS-TLS1.2", NULL)>=0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
@@ -170,7 +171,7 @@ static void server(int fd)
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	gnutls_priority_set_direct(session, "NORMAL", NULL);
+	assert(gnutls_priority_set_direct(session, "NORMAL:-VERS-ALL:+VERS-TLS1.2", NULL)>=0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 

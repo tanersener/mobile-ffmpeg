@@ -51,6 +51,14 @@ define(<ALIGN>,
 <.align ifelse(ALIGN_LOG,yes,<m4_log2($1)>,$1)
 >)
 
+define(<IF_BE>, <ifelse(
+WORDS_BIGENDIAN,yes,<$1>,
+WORDS_BIGENDIAN,no,<$2>,
+<errprint(<Unsupported endianness value>,WORDS_BIGENDIAN,<
+>)
+  m4exit(1)>)>)
+define(<IF_LE>, <IF_BE(<$2>, <$1>)>)
+
 dnl Struct defining macros
 
 dnl STRUCTURE(prefix) 

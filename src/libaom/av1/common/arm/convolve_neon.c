@@ -195,12 +195,12 @@ void av1_convolve_x_sr_neon(const uint8_t *src, int src_stride, uint8_t *dst,
                             int dst_stride, int w, int h,
                             const InterpFilterParams *filter_params_x,
                             const InterpFilterParams *filter_params_y,
-                            const int subpel_x_q4, const int subpel_y_q4,
+                            const int subpel_x_qn, const int subpel_y_qn,
                             ConvolveParams *conv_params) {
   const uint8_t horiz_offset = filter_params_x->taps / 2 - 1;
   const int8_t bits = FILTER_BITS - conv_params->round_0;
 
-  (void)subpel_y_q4;
+  (void)subpel_y_qn;
   (void)conv_params;
   (void)filter_params_y;
 
@@ -214,7 +214,7 @@ void av1_convolve_x_sr_neon(const uint8_t *src, int src_stride, uint8_t *dst,
          ((conv_params->round_0 + conv_params->round_1) == 2 * FILTER_BITS));
 
   const int16_t *x_filter = av1_get_interp_filter_subpel_kernel(
-      filter_params_x, subpel_x_q4 & SUBPEL_MASK);
+      filter_params_x, subpel_x_qn & SUBPEL_MASK);
 
   const int16x8_t shift_round_0 = vdupq_n_s16(-conv_params->round_0);
   const int16x8_t shift_by_bits = vdupq_n_s16(-bits);
@@ -603,14 +603,14 @@ void av1_convolve_y_sr_neon(const uint8_t *src, int src_stride, uint8_t *dst,
                             int dst_stride, int w, int h,
                             const InterpFilterParams *filter_params_x,
                             const InterpFilterParams *filter_params_y,
-                            const int subpel_x_q4, const int subpel_y_q4,
+                            const int subpel_x_qn, const int subpel_y_qn,
                             ConvolveParams *conv_params) {
   const int vert_offset = filter_params_y->taps / 2 - 1;
 
   src -= vert_offset * src_stride;
 
   (void)filter_params_x;
-  (void)subpel_x_q4;
+  (void)subpel_x_qn;
   (void)conv_params;
 
   assert(conv_params->round_0 <= FILTER_BITS);
@@ -618,7 +618,7 @@ void av1_convolve_y_sr_neon(const uint8_t *src, int src_stride, uint8_t *dst,
          ((conv_params->round_0 + conv_params->round_1) == (2 * FILTER_BITS)));
 
   const int16_t *y_filter = av1_get_interp_filter_subpel_kernel(
-      filter_params_y, subpel_y_q4 & SUBPEL_MASK);
+      filter_params_y, subpel_y_qn & SUBPEL_MASK);
 
   if (w <= 4) {
     uint8x8_t d01;
@@ -848,7 +848,7 @@ void av1_convolve_2d_sr_neon(const uint8_t *src, int src_stride, uint8_t *dst,
                              int dst_stride, int w, int h,
                              const InterpFilterParams *filter_params_x,
                              const InterpFilterParams *filter_params_y,
-                             const int subpel_x_q4, const int subpel_y_q4,
+                             const int subpel_x_qn, const int subpel_y_qn,
                              ConvolveParams *conv_params) {
   int im_dst_stride;
   int width, height;
@@ -880,7 +880,7 @@ void av1_convolve_2d_sr_neon(const uint8_t *src, int src_stride, uint8_t *dst,
   const int16x8_t vec_round_bits = vdupq_n_s16(-round_bits);
   const int offset_bits = bd + 2 * FILTER_BITS - conv_params->round_0;
   const int16_t *x_filter = av1_get_interp_filter_subpel_kernel(
-      filter_params_x, subpel_x_q4 & SUBPEL_MASK);
+      filter_params_x, subpel_x_qn & SUBPEL_MASK);
 
   int16_t x_filter_tmp[8];
   int16x8_t filter_x_coef = vld1q_s16(x_filter);
@@ -1149,7 +1149,7 @@ void av1_convolve_2d_sr_neon(const uint8_t *src, int src_stride, uint8_t *dst,
     const int32_t sub_const = (1 << (offset_bits - conv_params->round_1)) +
                               (1 << (offset_bits - conv_params->round_1 - 1));
     const int16_t *y_filter = av1_get_interp_filter_subpel_kernel(
-        filter_params_y, subpel_y_q4 & SUBPEL_MASK);
+        filter_params_y, subpel_y_qn & SUBPEL_MASK);
 
     const int32x4_t round_shift_vec = vdupq_n_s32(-(conv_params->round_1));
     const int32x4_t offset_const = vdupq_n_s32(1 << offset_bits);
@@ -1409,12 +1409,12 @@ void av1_convolve_2d_copy_sr_neon(const uint8_t *src, int src_stride,
                                   uint8_t *dst, int dst_stride, int w, int h,
                                   const InterpFilterParams *filter_params_x,
                                   const InterpFilterParams *filter_params_y,
-                                  const int subpel_x_q4, const int subpel_y_q4,
+                                  const int subpel_x_qn, const int subpel_y_qn,
                                   ConvolveParams *conv_params) {
   (void)filter_params_x;
   (void)filter_params_y;
-  (void)subpel_x_q4;
-  (void)subpel_y_q4;
+  (void)subpel_x_qn;
+  (void)subpel_y_qn;
   (void)conv_params;
 
   const uint8_t *src1;

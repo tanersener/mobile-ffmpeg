@@ -21,18 +21,35 @@ include("${AOM_ROOT}/build/cmake/compiler_flags.cmake")
 
 string(TOLOWER ${SANITIZE} SANITIZE)
 
-# Require the sanitizer requested.
-require_linker_flag("-fsanitize=${SANITIZE}")
-require_compiler_flag("-fsanitize=${SANITIZE}" YES)
+# Require the sanitizer requested. cfi sanitizer requires all the flags in order
+# for the compiler to accept it.
+if("${SANITIZE}" MATCHES "cfi" AND CMAKE_C_COMPILER_ID MATCHES "Clang")
+  require_linker_flag("-fsanitize=${SANITIZE} -flto -fno-sanitize-trap=cfi \
+    -fuse-ld=gold" YES)
+  require_compiler_flag("-fsanitize=${SANITIZE} -flto -fvisibility=hidden \
+    -fno-sanitize-trap=cfi" YES)
+else()
+  require_linker_flag("-fsanitize=${SANITIZE}")
+  require_compiler_flag("-fsanitize=${SANITIZE}" YES)
+endif()
 
 # Make callstacks accurate.
 require_compiler_flag("-fno-omit-frame-pointer -fno-optimize-sibling-calls" YES)
 
+# TODO(http://crbug.com/aomedia/2357): -fsanitize=implicit-integer-truncation
+# causes conversion warnings in many of the x86 intrinsics and elsewhere.
+if("${SANITIZE}" MATCHES "integer" AND CMAKE_C_COMPILER_ID MATCHES "Clang")
+  if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL "7.0.1")
+    require_compiler_flag("-fno-sanitize=implicit-integer-truncation" YES)
+    require_linker_flag("-fno-sanitize=implicit-integer-truncation" YES)
+  endif()
+endif()
+
 # Fix link errors due to missing rt compiler lib in 32-bit builds.
 # http://llvm.org/bugs/show_bug.cgi?id=17693
 if(CMAKE_C_COMPILER_ID MATCHES "Clang")
-  if(${CMAKE_SIZEOF_VOID_P} EQUAL 4 AND "${SANITIZE}" MATCHES
-     "integer|undefined")
+  if(${CMAKE_SIZEOF_VOID_P} EQUAL 4
+     AND "${SANITIZE}" MATCHES "integer|undefined")
     require_linker_flag("--rtlib=compiler-rt -lgcc_s")
   endif()
 endif()

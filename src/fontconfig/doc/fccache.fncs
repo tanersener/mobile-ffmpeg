@@ -95,10 +95,7 @@ to <parameter>config</parameter>.
 @TYPE3@		FcConfig *			@ARG3@		config
 @PURPOSE@	Create .uuid file at a directory
 @DESC@
-This is to create .uuid file containing an UUID at a font directory of
-<parameter>dir</parameter>.
-The UUID will be used to identify the font directory and is used to determine
-the cache filename if available.
+This function is deprecated. it doesn't take any effects.
 @SINCE@		2.12.92
 @@
 

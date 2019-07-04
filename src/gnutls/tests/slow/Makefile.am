@@ -34,13 +34,8 @@ LDADD = ../libutils.la \
 	../../gl/libgnu.la \
 	$(top_builddir)/lib/libgnutls.la $(LIBSOCKET)
 
-if !ENABLE_SELF_CHECKS
-cipher_test_CPPFLAGS = $(AM_CPPFLAGS) $(NETTLE_CFLAGS) -I$(top_builddir)/lib/
-cipher_override2_CPPFLAGS = $(AM_CPPFLAGS) $(NETTLE_CFLAGS) -I$(top_builddir)/lib/
-else
 cipher_test_CPPFLAGS = $(AM_CPPFLAGS)
 cipher_override2_CPPFLAGS = $(AM_CPPFLAGS)
-endif
 
 ctests = gendh
 
@@ -52,12 +47,13 @@ mac_override_LDFLAGS = $(NETTLE_LIBS) $(HOGWEED_LIBS) $(GMP_LIBS) $(LDADD)
 endif
 
 
-dist_check_SCRIPTS = test-ciphers.sh override-ciphers test-hash-large.sh test-ciphers-common.sh
-check_PROGRAMS = $(ctests) cipher-test cipher-override mac-override cipher-override2 hash-large
-TESTS = $(ctests) test-ciphers.sh override-ciphers test-hash-large.sh
+dist_check_SCRIPTS = test-ciphers.sh override-ciphers test-hash-large.sh test-ciphers-common.sh \
+	test-ciphers-api.sh
+check_PROGRAMS = $(ctests) cipher-test cipher-api-test cipher-override mac-override cipher-override2 hash-large crypto
+TESTS = $(ctests) test-ciphers.sh override-ciphers test-hash-large.sh crypto test-ciphers-api.sh
 
 if HAVE_LIBCRYPTO
-cipher_openssl_compat_LDFLAGS = $(LDADD) $(LIBCRYPTO)
+cipher_openssl_compat_LDADD = $(LDADD) $(LIBCRYPTO)
 
 dist_check_SCRIPTS += test-ciphers-openssl.sh
 check_PROGRAMS += cipher-openssl-compat

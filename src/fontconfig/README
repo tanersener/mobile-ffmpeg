@@ -1,11 +1,113 @@
                               Fontconfig
              Font configuration and customization library
-                            Version 2.13.1
-                              2018-08-30
+                      Version 2.13.91 (2.14 RC1)
+                              2019-06-10
 
 
 Check INSTALL for compilation and installation instructions.
 Report bugs to https://gitlab.freedesktop.org/fontconfig/fontconfig/issues/new.
+
+2.13.91 (2.14 RC1)
+
+Akira TAGOH (74):
+      Fix the build issue with --enable-static
+      Fix the issue that '~' wasn't extracted to the proper homedir
+      Add a test case for d1f48f11
+      Fix CI
+      Add more prefix support in <dir> element
+      Update fonts.dtd for last commit
+      Update docs for 1aa8b700
+      add missing the case of prefix="default" as documented
+      Fix test case
+      CI: Add more logs
+      Do not update mtime when removing .uuid file
+      Do not try updating mtime when unlink was failed
+      Do not run a test case for .uuid deletion
+      Drop Mitra Mono from 65-nonlatin.conf
+      Enable bubblewrap test case
+      Use FC_PATH_MAX instead of PATH_MAX
+      Use Rachana instead of Meera for Malayalam
+      Add doc for description element and update fonts.dtd
+      Fix FcFontList doesn't return a font with FC_COLOR=true
+      Add a test case for FcFontList
+      Warn when constant name is used for unexpected object
+      covscan fix: get rid of unnecessary condition check
+      Don't call unlink_dirs if basedir is null
+      covscan: fix compiler warnings
+      Fix a dereference of a null pointer
+      Fix a crash with invalid matrix element
+      Add system-ui generic family
+      Fix misleading summary in docs for FcStrStrIgnoreCase
+      Fix build issue on Win32.
+      autogen.sh: Make AUTORECONF_FLAGS overwritable
+      Ifdef'ed unnecessary code for Win32
+      Fix make check on cross-compiled env
+      Add build test for MinGW
+      Fix make distcheck error
+      Update requirement for gettext
+      Correct configure option to cross-compile
+      Install wine for CI on MinGW
+      Don't test bind-mount thing for MinGW
+      Reset errno to do error handling properly
+      Add FcDirCacheCreateUUID doc back to pass make check
+      Drop a line to include uuid.h
+      Fix make check fail on run-test-conf.sh
+      Add new element remap-dir instead of extending dir element
+      Trim the last slash
+      Update testcase
+      Update deps to run CI
+      Drop unnecessary line to include uuid.h
+      Fix a typo
+      Add reset-dirs element
+      Add salt attribute to dir and remap-dir elements
+      Update doc for salt
+      trivial testcase update
+      Add back if !OS_WIN32 line
+      Fix build issues on MinGW
+      Use alternative function for realpath on Win32
+      Fix make check fail on MinGW again
+      Add more data to artifacts for debugging purpose
+      Don't share fonts and cache dir for testing
+      Don't warn if path can't be converted with prefix
+      Add some debugging output
+      Oops, Terminate string
+      fc-cache: Show font directories to generate cache with -v
+      Allow overriding salt with new one coming later
+      Don't show salt in debugging message if salt is null
+      Fix unexpected cache name by double-slash in path
+      Fallback uuid-based name to read a cache if no MD5-based cache available
+      No need to remap for uuid based
+      Update the test case that is looking for uuid based on host
+      Distribute archive in xz instead of bz2
+      Update CaseFolding.txt to Unicode 12.1
+      fc-validate: returns an error code when missing some glyphs
+      Correct the comment for FC_LANG in fontconfig.h
+      Fix a typo in the description of FcWeightFromOpenTypeDouble
+      Fix endianness on generating MD5 cache name
+
+Behdad Esfahbod (1):
+      Fix name-table language code mapping for Mongolian
+
+Ben Wagner (1):
+      Better document sysroot.
+
+Chris McDonald (2):
+      Respect sysroot option for file path passed to stat
+      Lowered temporary rooted_dir variable inside loop
+
+Jon Turney (1):
+      Only use test wrapper-script if host is MinGW
+
+Keith Packard (6):
+      Do not remove UUID file when a scanned directory is empty
+      Fetch FONTCONFIG_SYSROOT in FcConfigCreate
+      Remove '-u' option from run-test-conf.sh
+      Add delays to test-bz106632, check UptoDate separately
+      Remove UUID-related tests
+      Replace UUID file mechanism with per-directory 'map' attribute [v2]
+
+Robert Yang (1):
+      src/fccache.c: Fix define for HAVE_POSIX_FADVISE
 
 2.13.1
 

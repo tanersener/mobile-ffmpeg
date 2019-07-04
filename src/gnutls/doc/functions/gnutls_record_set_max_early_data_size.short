@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_record_set_max_early_data_size} (gnutls_session_t @var{session}, size_t @var{size})

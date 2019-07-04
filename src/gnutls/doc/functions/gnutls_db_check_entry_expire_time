@@ -1,0 +1,14 @@
+
+
+
+
+@deftypefun {time_t} {gnutls_db_check_entry_expire_time} (gnutls_datum_t * @var{entry})
+@var{entry}: is a pointer to a @code{gnutls_datum_t}  type.
+
+This function returns the time that this entry will expire.
+It can be used for database entry expiration.
+
+@strong{Returns:} The time this entry will expire, or zero on error.
+
+@strong{Since:} 3.6.5
+@end deftypefun

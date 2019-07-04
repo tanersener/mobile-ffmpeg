@@ -320,7 +320,7 @@ void doit(void)
 	vdata.size = NAME_SIZE;
 	ret =
 	    gnutls_x509_trust_list_verify_crt2(tl, &server_crt, 1, &vdata, 1,
-						0, &status, NULL);
+						GNUTLS_VERIFY_ALLOW_BROKEN, &status, NULL);
 	if (ret < 0 || status != 0)
 		fail("gnutls_x509_trust_list_verify_crt2 - 1: status: %x\n", status);
 
@@ -340,7 +340,7 @@ void doit(void)
 		fail("gnutls_x509_trust_list_add_trust_dir: %d\n", ret);
 
 	ret =
-	    gnutls_x509_trust_list_verify_crt(tl, &server_crt, 1, 0,
+	    gnutls_x509_trust_list_verify_crt(tl, &server_crt, 1, GNUTLS_VERIFY_ALLOW_BROKEN,
 					      &status, NULL);
 	if (ret < 0 || status != 0)
 		fail("gnutls_x509_trust_list_verify_crt\n");

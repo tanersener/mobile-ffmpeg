@@ -76,7 +76,8 @@
 
 #define COMMON_OPTS() \
     { "reorder_queue_size", "set number of packets to buffer for handling of reordered packets", OFFSET(reordering_queue_size), AV_OPT_TYPE_INT, { .i64 = -1 }, -1, INT_MAX, DEC }, \
-    { "buffer_size",        "Underlying protocol send/receive buffer size",                  OFFSET(buffer_size),           AV_OPT_TYPE_INT, { .i64 = -1 }, -1, INT_MAX, DEC|ENC } \
+    { "buffer_size",        "Underlying protocol send/receive buffer size",                  OFFSET(buffer_size),           AV_OPT_TYPE_INT, { .i64 = -1 }, -1, INT_MAX, DEC|ENC }, \
+    { "pkt_size",           "Underlying protocol send packet size",                          OFFSET(pkt_size),              AV_OPT_TYPE_INT, { .i64 = -1 }, -1, INT_MAX, ENC } \
 
 
 const AVOption ff_rtsp_options[] = {
@@ -132,6 +133,8 @@ static AVDictionary *map_to_opts(RTSPState *rt)
 
     snprintf(buf, sizeof(buf), "%d", rt->buffer_size);
     av_dict_set(&opts, "buffer_size", buf, 0);
+    snprintf(buf, sizeof(buf), "%d", rt->pkt_size);
+    av_dict_set(&opts, "pkt_size", buf, 0);
 
     return opts;
 }
@@ -1744,6 +1747,9 @@ redirect:
         char httpname[1024];
         char sessioncookie[17];
         char headers[1024];
+        AVDictionary *options = NULL;
+
+        av_dict_set_int(&options, "timeout", rt->stimeout, 0);
 
         ff_url_join(httpname, sizeof(httpname), https_tunnel ? "https" : "http", auth, host, port, "%s", path);
         snprintf(sessioncookie, sizeof(sessioncookie), "%08x%08x",
@@ -1774,7 +1780,8 @@ redirect:
         }
 
         /* complete the connection */
-        if (ffurl_connect(rt->rtsp_hd, NULL)) {
+        if (ffurl_connect(rt->rtsp_hd, &options)) {
+            av_dict_free(&options);
             err = AVERROR(EIO);
             goto fail;
         }
@@ -1797,6 +1804,7 @@ redirect:
                  sessioncookie);
         av_opt_set(rt->rtsp_hd_out->priv_data, "headers", headers, 0);
         av_opt_set(rt->rtsp_hd_out->priv_data, "chunked_post", "0", 0);
+        av_opt_set(rt->rtsp_hd_out->priv_data, "send_expect_100", "0", 0);
 
         /* Initialize the authentication state for the POST session. The HTTP
          * protocol implementation doesn't properly handle multi-pass
@@ -1817,10 +1825,12 @@ redirect:
         ff_http_init_auth_state(rt->rtsp_hd_out, rt->rtsp_hd);
 
         /* complete the connection */
-        if (ffurl_connect(rt->rtsp_hd_out, NULL)) {
+        if (ffurl_connect(rt->rtsp_hd_out, &options)) {
+            av_dict_free(&options);
             err = AVERROR(EIO);
             goto fail;
         }
+        av_dict_free(&options);
     } else {
         int ret;
         /* open the tcp connection */

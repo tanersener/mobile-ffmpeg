@@ -137,8 +137,12 @@ PROLOGUE(_nettle_sha256_compress)
 	lsl	SHIFT, SHIFT, #3
 	mov	T0, #0
 	movne	T0, #-1
-	lsl	I1, T0, SHIFT
+IF_LE(<	lsl	I1, T0, SHIFT>)
+IF_BE(<	lsr	I1, T0, SHIFT>)
 	uadd8	T0, T0, I1		C Sets APSR.GE bits
+	C on BE rotate right by 32-SHIFT bits
+	C because there is no rotate left
+IF_BE(<	rsb	SHIFT, SHIFT, #32>)
 
 	mov	DST, sp
 	mov	ILEFT, #4
@@ -146,16 +150,16 @@ PROLOGUE(_nettle_sha256_compress)
 	ldm	INPUT!, {I1,I2,I3,I4}
 	sel	I0, I0, I1
 	ror	I0, I0, SHIFT
-	rev	I0, I0
+IF_LE(<	rev	I0, I0>)
 	sel	I1, I1, I2
 	ror	I1, I1, SHIFT
-	rev	I1, I1
+IF_LE(<	rev	I1, I1>)
 	sel	I2, I2, I3
 	ror	I2, I2, SHIFT
-	rev	I2, I2
+IF_LE(<	rev	I2, I2>)
 	sel	I3, I3, I4
 	ror	I3, I3, SHIFT
-	rev	I3, I3
+IF_LE(<	rev	I3, I3>)
 	subs	ILEFT, ILEFT, #1
 	stm	DST!, {I0,I1,I2,I3}
 	mov	I0, I4	

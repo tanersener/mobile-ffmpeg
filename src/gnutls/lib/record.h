@@ -16,12 +16,12 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
-#ifndef GNUTLS_RECORD_H
-#define GNUTLS_RECORD_H
+#ifndef GNUTLS_LIB_RECORD_H
+#define GNUTLS_LIB_RECORD_H
 
 #include <gnutls/gnutls.h>
 #include <buffers.h>
@@ -52,12 +52,13 @@ inline static unsigned max_record_recv_size(gnutls_session_t session)
 {
 	unsigned size;
 
-	size = MAX_CIPHER_BLOCK_SIZE /*iv*/ + MAX_PAD_SIZE + MAX_HASH_SIZE/*MAC*/;
-	
-	if (gnutls_compression_get(session)!=GNUTLS_COMP_NULL || session->internals.priorities.allow_large_records != 0)
-		size += EXTRA_COMP_SIZE;
-
-	size += session->security_parameters.max_record_recv_size + RECORD_HEADER_SIZE(session);
+	if (session->internals.max_recv_size == 0) {
+		size = session->security_parameters.max_record_recv_size + RECORD_HEADER_SIZE(session);
+		if (session->internals.allow_large_records != 0)
+			size += EXTRA_COMP_SIZE;
+	} else {
+		size = session->internals.max_recv_size;
+	}
 
 	return size;
 }
@@ -66,7 +67,7 @@ inline static unsigned max_decrypted_size(gnutls_session_t session)
 {
 	unsigned size = 0;
 
-	if (session->internals.priorities.allow_large_records != 0)
+	if (session->internals.allow_large_records != 0)
 		size += EXTRA_COMP_SIZE;
 
 	size += session->security_parameters.max_record_recv_size;
@@ -104,4 +105,4 @@ inline static void session_invalidate(gnutls_session_t session)
 	session->internals.invalid_connection = 1;
 }
 
-#endif
+#endif /* GNUTLS_LIB_RECORD_H */

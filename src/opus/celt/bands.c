@@ -371,14 +371,14 @@ void anti_collapse(const CELTMode *m, celt_norm *X_, unsigned char *collapse_mas
 static void compute_channel_weights(celt_ener Ex, celt_ener Ey, opus_val16 w[2])
 {
    celt_ener minE;
-#if FIXED_POINT
+#ifdef FIXED_POINT
    int shift;
 #endif
    minE = MIN32(Ex, Ey);
    /* Adjustment to make the weights a bit more conservative. */
    Ex = ADD32(Ex, minE/3);
    Ey = ADD32(Ey, minE/3);
-#if FIXED_POINT
+#ifdef FIXED_POINT
    shift = celt_ilog2(EPSILON+MAX32(Ex, Ey))-14;
 #endif
    w[0] = VSHR32(Ex, shift);

@@ -128,6 +128,11 @@ can be disabled with --no-outder.
 @end itemize
 
 The output will be in the TPM portable DER format.
+@anchor{tpmtool srk-well-known}
+@subheading srk-well-known option
+
+This is the ``srk has well known password (20 bytes of zeros)'' option.
+This option has no @samp{doc} documentation.
 @anchor{tpmtool exit status}
 @subheading tpmtool exit status
 

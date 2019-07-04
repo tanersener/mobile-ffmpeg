@@ -36,6 +36,7 @@
 #include <assert.h>
 
 #include "umac.h"
+#include "umac-internal.h"
 
 #define HI(x) (x >> 32)
 #define LO(x) (x & 0xffffffffUL)

@@ -25,7 +25,7 @@ This library fixes these flaws and provides a function
        const char * locale_charset (void);
 
 It determines the current locale's character encoding, and canonicalizes it
-into one of the canonical names listed in config.charset. The result must
+into one of the canonical names listed in localcharset.h. The result must
 not be freed; it is statically allocated. If the canonical name cannot be
 determined, the result is a non-canonical name.
 
@@ -48,7 +48,7 @@ This library is used in
 To integrate this library into your package:
 - Either from this package. See file INTEGRATE.
 - Or from gnulib. See
-  <http://www.gnu.org/software/gnulib/MODULES.html#module=localcharset>
+  <https://www.gnu.org/software/gnulib/MODULES.html#module=localcharset>
 
 
 Distribution:
@@ -56,7 +56,7 @@ Distribution:
     ftp://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.14.tar.gz
 
 Homepage:
-    http://www.haible.de/bruno/packages-libcharset.html
+    https://haible.de/bruno/packages-libcharset.html
 
 
 Bruno Haible <bruno@clisp.org>

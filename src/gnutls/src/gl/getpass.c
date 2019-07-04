@@ -1,4 +1,4 @@
-/* Copyright (C) 1992-2001, 2003-2007, 2009-2016 Free Software Foundation, Inc.
+/* Copyright (C) 1992-2001, 2003-2007, 2009-2019 Free Software Foundation, Inc.
 
    This file is part of the GNU C Library.
 
@@ -13,7 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License along
-   with this program; if not, see <http://www.gnu.org/licenses/>.  */
+   with this program; if not, see <https://www.gnu.org/licenses/>.  */
 
 #ifndef _LIBC
 # include <config.h>
@@ -23,7 +23,7 @@
 
 #include <stdio.h>
 
-#if !((defined _WIN32 || defined __WIN32__) && !defined __CYGWIN__)
+#if !(defined _WIN32 && !defined __CYGWIN__)
 
 # include <stdbool.h>
 

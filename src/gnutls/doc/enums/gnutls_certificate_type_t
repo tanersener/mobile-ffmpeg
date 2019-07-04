@@ -8,6 +8,8 @@ Unknown certificate type.
 X.509 Certificate.
 @item GNUTLS_@-CRT_@-OPENPGP
 OpenPGP certificate.
-@item GNUTLS_@-CRT_@-RAW
-Raw public key (SubjectPublicKey)
+@item GNUTLS_@-CRT_@-RAWPK
+Raw public-key (SubjectPublicKeyInfo)
+@item GNUTLS_@-CRT_@-MAX
+-- undescribed --
 @end table

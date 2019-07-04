@@ -16,7 +16,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -84,56 +84,48 @@ const char
 					   type)
 {
 	switch (type) {
+	case GNUTLS_HANDSHAKE_END_OF_EARLY_DATA:
+		return "END OF EARLY DATA";
+	case GNUTLS_HANDSHAKE_HELLO_RETRY_REQUEST:
+		return "HELLO RETRY REQUEST";
 	case GNUTLS_HANDSHAKE_HELLO_REQUEST:
 		return "HELLO REQUEST";
-		break;
 	case GNUTLS_HANDSHAKE_CLIENT_HELLO:
 		return "CLIENT HELLO";
-		break;
 #ifdef ENABLE_SSL2
 	case GNUTLS_HANDSHAKE_CLIENT_HELLO_V2:
 		return "SSL2 CLIENT HELLO";
-		break;
 #endif
 	case GNUTLS_HANDSHAKE_SERVER_HELLO:
 		return "SERVER HELLO";
-		break;
 	case GNUTLS_HANDSHAKE_HELLO_VERIFY_REQUEST:
 		return "HELLO VERIFY REQUEST";
-		break;
 	case GNUTLS_HANDSHAKE_CERTIFICATE_PKT:
 		return "CERTIFICATE";
-		break;
+	case GNUTLS_HANDSHAKE_ENCRYPTED_EXTENSIONS:
+		return "ENCRYPTED EXTENSIONS";
 	case GNUTLS_HANDSHAKE_SERVER_KEY_EXCHANGE:
 		return "SERVER KEY EXCHANGE";
-		break;
 	case GNUTLS_HANDSHAKE_CERTIFICATE_REQUEST:
 		return "CERTIFICATE REQUEST";
-		break;
 	case GNUTLS_HANDSHAKE_SERVER_HELLO_DONE:
 		return "SERVER HELLO DONE";
-		break;
 	case GNUTLS_HANDSHAKE_CERTIFICATE_VERIFY:
 		return "CERTIFICATE VERIFY";
-		break;
 	case GNUTLS_HANDSHAKE_CLIENT_KEY_EXCHANGE:
 		return "CLIENT KEY EXCHANGE";
-		break;
 	case GNUTLS_HANDSHAKE_FINISHED:
 		return "FINISHED";
-		break;
+	case GNUTLS_HANDSHAKE_KEY_UPDATE:
+		return "KEY_UPDATE";
 	case GNUTLS_HANDSHAKE_SUPPLEMENTAL:
 		return "SUPPLEMENTAL";
-		break;
 	case GNUTLS_HANDSHAKE_CERTIFICATE_STATUS:
 		return "CERTIFICATE STATUS";
-		break;
 	case GNUTLS_HANDSHAKE_NEW_SESSION_TICKET:
 		return "NEW SESSION TICKET";
-		break;
 	case GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC:
 		return "CHANGE CIPHER SPEC";
-		break;
 	default:
 		return "Unknown Handshake packet";
 	}

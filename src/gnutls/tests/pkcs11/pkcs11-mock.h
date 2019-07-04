@@ -6,7 +6,7 @@
  *  Licensing for open source projects:
  *  PKCS11-MOCK is available under the terms of the GNU Affero General 
  *  Public License version 3 as published by the Free Software Foundation.
- *  Please see <http://www.gnu.org/licenses/agpl-3.0.html> for more details.
+ *  Please see <https://www.gnu.org/licenses/agpl-3.0.html> for more details.
  *
  *  Licensing for other types of projects:
  *  PKCS11-MOCK is available under the terms of flexible commercial license.

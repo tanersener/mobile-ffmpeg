@@ -5,8 +5,8 @@
 ## By Mike Hamburg (Stanford University), 2009
 ## Public domain.
 ##
-## For details see http://shiftleft.org/papers/vector_aes/ and
-## http://crypto.stanford.edu/vpaes/.
+## For details see https://shiftleft.org/papers/vector_aes/ and
+## https://crypto.stanford.edu/vpaes/.
 #
 # *** This file is auto-generated ***
 #

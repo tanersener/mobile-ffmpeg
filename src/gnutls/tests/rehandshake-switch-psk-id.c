@@ -173,19 +173,19 @@ void doit(void)
 	global_init();
 
 	/* Allow change of ID */
-	try("NORMAL:-KX-ALL:+PSK", GNUTLS_KX_PSK, 0);
+	try("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+PSK", GNUTLS_KX_PSK, 0);
 	reset_buffers();
-	try("NORMAL:-KX-ALL:+DHE-PSK", GNUTLS_KX_DHE_PSK, 0);
+	try("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+DHE-PSK", GNUTLS_KX_DHE_PSK, 0);
 	reset_buffers();
-	try("NORMAL:-KX-ALL:+ECDHE-PSK", GNUTLS_KX_ECDHE_PSK, 0);
+	try("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+ECDHE-PSK", GNUTLS_KX_ECDHE_PSK, 0);
 	reset_buffers();
 
 	/* Prohibit (default) change of ID */
-	try("NORMAL:-KX-ALL:+PSK", GNUTLS_KX_PSK, 1);
+	try("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+PSK", GNUTLS_KX_PSK, 1);
 	reset_buffers();
-	try("NORMAL:-KX-ALL:+DHE-PSK", GNUTLS_KX_DHE_PSK, 1);
+	try("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+DHE-PSK", GNUTLS_KX_DHE_PSK, 1);
 	reset_buffers();
-	try("NORMAL:-KX-ALL:+ECDHE-PSK", GNUTLS_KX_ECDHE_PSK, 1);
+	try("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+ECDHE-PSK", GNUTLS_KX_ECDHE_PSK, 1);
 	reset_buffers();
 	gnutls_global_deinit();
 }

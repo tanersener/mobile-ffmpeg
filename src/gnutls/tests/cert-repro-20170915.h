@@ -1,3 +1,6 @@
+#ifndef GNUTLS_TESTS_CERT_REPRO_20170915_H
+#define GNUTLS_TESTS_CERT_REPRO_20170915_H
+
 static char client_cert_repro_pem[] =
 	"-----BEGIN CERTIFICATE-----\n"
 	"MIILITCCBiegAwIBAgIJAMHDrh3rcjmCMA0GCSqGSIb3DQEBCwUAMEUxCzAJBgNV\n"
@@ -376,3 +379,5 @@ static gnutls_datum_t server_repro_key = { (void*)server_key_repro_pem, sizeof(s
 static gnutls_datum_t server_repro_cert = { (void*)server_cert_repro_pem, sizeof(server_cert_repro_pem)-1 };
 static gnutls_datum_t client_repro_key = { (void*)client_key_repro_pem, sizeof(client_key_repro_pem)-1 };
 static gnutls_datum_t client_repro_cert = { (void*)client_cert_repro_pem, sizeof(client_cert_repro_pem)-1 };
+
+#endif /* GNUTLS_TESTS_CERT_REPRO_20170915_H */

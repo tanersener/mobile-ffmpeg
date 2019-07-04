@@ -28,6 +28,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <assert.h>
 #include <gnutls/gnutls.h>
 #include "utils.h"
 #include "eagain-common.h"
@@ -54,7 +55,7 @@ enum {
 	NO_CA = 3
 };
 
-static void try(unsigned expect, unsigned ca_type)
+static void try(const char *prio, unsigned expect, unsigned ca_type)
 {
 	int ret;
 	/* Server stuff. */
@@ -105,9 +106,7 @@ static void try(unsigned expect, unsigned ca_type)
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
 				serverx509cred);
 
-	gnutls_priority_set_direct(server,
-				   "NORMAL",
-				   NULL);
+	assert(gnutls_priority_set_direct(server, prio, NULL) >= 0);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
@@ -118,7 +117,7 @@ static void try(unsigned expect, unsigned ca_type)
 	if (ret < 0)
 		exit(1);
 
-	ret = gnutls_certificate_set_x509_key_mem(clientx509cred, 
+	ret = gnutls_certificate_set_x509_key_mem(clientx509cred,
 						  &cli_ca3_cert_chain, &cli_ca3_key,
 						  GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
@@ -142,7 +141,7 @@ static void try(unsigned expect, unsigned ca_type)
 	if (ret < 0)
 		exit(1);
 
-	ret = gnutls_priority_set_direct(client, "NORMAL", NULL);
+	ret = gnutls_priority_set_direct(client, prio, NULL);
 	if (ret < 0)
 		exit(1);
 
@@ -174,13 +173,22 @@ static void try(unsigned expect, unsigned ca_type)
 	gnutls_dh_params_deinit(dh_params);
 }
 
-void doit(void)
+static void start(const char *prio)
 {
 	global_init();
 
-	try(SENT, NO_CA);
-	try(SENT, CORRECT_CA);
-	try(NOT_SENT, INCORRECT_CA);
-	try(SENT, INCORRECT_CA_FORCE);
+	success("trying %s\n", prio);
+
+	try(prio, SENT, NO_CA);
+	try(prio, SENT, CORRECT_CA);
+	try(prio, NOT_SENT, INCORRECT_CA);
+	try(prio, SENT, INCORRECT_CA_FORCE);
 	gnutls_global_deinit();
+}
+
+void doit(void)
+{
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.2");
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.3");
+	start("NORMAL");
 }

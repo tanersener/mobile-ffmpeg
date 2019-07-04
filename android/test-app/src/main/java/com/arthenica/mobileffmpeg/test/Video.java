@@ -19,6 +19,8 @@
 
 package com.arthenica.mobileffmpeg.test;
 
+import java.util.Locale;
+
 /**
  * <p>Generates FFmpeg scripts to create videos from provided images.
  *
@@ -65,7 +67,7 @@ public class Video {
                         "[stream2starting][stream1ending]blend=all_expr=\'if(gte(X,(W/2)*T/1)*lte(X,W-(W/2)*T/1),B,A)\':shortest=1[stream2blended];" +
                         "[stream3starting][stream2ending]blend=all_expr=\'if(gte(X,(W/2)*T/1)*lte(X,W-(W/2)*T/1),B,A)\':shortest=1[stream3blended];" +
                         "[stream1overlaid][stream2blended][stream2overlaid][stream3blended][stream3overlaid]concat=n=5:v=1:a=0,scale=w=640:h=424,format=yuv420p[video]" +
-                        " -map [video] -vsync 2 -async 1 " + customOptions + "-c:v " + videoCodec.toLowerCase() + " -r 30 " + videoFilePath;
+                        " -map [video] -vsync 2 -async 1 " + customOptions + "-c:v " + videoCodec.toLowerCase(Locale.ENGLISH) + " -r 30 " + videoFilePath;
     }
 
     static String generateShakingVideoScript(final String image1Path, final String image2Path, final String image3Path, final String videoFilePath) {

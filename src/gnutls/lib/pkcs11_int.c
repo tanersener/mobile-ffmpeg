@@ -20,7 +20,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  */
 
 #include "gnutls_int.h"
@@ -170,6 +170,16 @@ pkcs11_get_mechanism_list(struct ck_function_list * module,
 {
 	return (module)->C_GetMechanismList(slot_id, mechanism_list,
 					    count);
+}
+
+ck_rv_t
+pkcs11_get_mechanism_info(struct ck_function_list *module,
+			  ck_slot_id_t slot_id,
+			  ck_mechanism_type_t mechanism,
+			  struct ck_mechanism_info *ptr)
+{
+	return (module)->C_GetMechanismInfo(slot_id, mechanism,
+					    ptr);
 }
 
 ck_rv_t

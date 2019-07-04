@@ -27,7 +27,7 @@ mkinstalldirs = $(SHELL) @top_srcdir@/build-aux/mkinstalldirs
 
 #### End of system configuration section. ####
 
-SHELL = /bin/sh
+SHELL = @SHELL@
 
 # Used by docdir.
 PACKAGE = @PACKAGE@

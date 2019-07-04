@@ -35,7 +35,7 @@ import android.widget.VideoView;
 import com.arthenica.mobileffmpeg.Config;
 import com.arthenica.mobileffmpeg.LogCallback;
 import com.arthenica.mobileffmpeg.LogMessage;
-import com.arthenica.mobileffmpeg.util.RunCallback;
+import com.arthenica.mobileffmpeg.util.ExecuteCallback;
 
 import java.io.File;
 import java.io.IOException;
@@ -143,10 +143,10 @@ public class VidStabTabFragment extends Fragment {
 
             android.util.Log.d(TAG, String.format("FFmpeg process started with arguments\n'%s'", ffmpegCommand));
 
-            MainActivity.executeAsync(new RunCallback() {
+            MainActivity.executeAsync(new ExecuteCallback() {
 
                 @Override
-                public void apply(final int returnCode) {
+                public void apply(final int returnCode, final String commandOutput) {
                     android.util.Log.d(TAG, String.format("FFmpeg process exited with rc %d", returnCode));
 
                     hideCreateProgressDialog();
@@ -165,10 +165,10 @@ public class VidStabTabFragment extends Fragment {
 
                                 android.util.Log.d(TAG, String.format("FFmpeg process started with arguments\n'%s'", analyzeVideoCommand));
 
-                                MainActivity.executeAsync(new RunCallback() {
+                                MainActivity.executeAsync(new ExecuteCallback() {
 
                                     @Override
-                                    public void apply(final int returnCode) {
+                                    public void apply(final int returnCode, final String commandOutput) {
                                         android.util.Log.d(TAG, String.format("FFmpeg process exited with rc %d", returnCode));
 
                                         if (returnCode == RETURN_CODE_SUCCESS) {
@@ -176,10 +176,10 @@ public class VidStabTabFragment extends Fragment {
 
                                             android.util.Log.d(TAG, String.format("FFmpeg process started with arguments\n'%s'", stabilizeVideoCommand));
 
-                                            MainActivity.executeAsync(new RunCallback() {
+                                            MainActivity.executeAsync(new ExecuteCallback() {
 
                                                 @Override
-                                                public void apply(final int returnCode) {
+                                                public void apply(final int returnCode, final String commandOutput) {
                                                     android.util.Log.d(TAG, String.format("FFmpeg process exited with rc %d", returnCode));
 
                                                     hideStabilizeProgressDialog();

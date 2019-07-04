@@ -22,6 +22,7 @@
 
 #include "libavutil/avassert.h"
 #include "libavutil/audio_fifo.h"
+#include "libavutil/avstring.h"
 #include "libavutil/opt.h"
 #include "avfilter.h"
 #include "audio.h"
@@ -29,7 +30,6 @@
 
 #include "af_anlmdndsp.h"
 
-#define MAX_DIFF         11.f
 #define WEIGHT_LUT_NBITS 20
 #define WEIGHT_LUT_SIZE  (1<<WEIGHT_LUT_NBITS)
 
@@ -41,6 +41,7 @@ typedef struct AudioNLMeansContext {
     float a;
     int64_t pd;
     int64_t rd;
+    float m;
     int om;
 
     float pdiff_lut_scale;
@@ -81,6 +82,7 @@ static const AVOption anlmdn_options[] = {
     {  "i", "input",                 0,          AV_OPT_TYPE_CONST,    {.i64=IN_MODE},   0,  0, AF, "mode" },
     {  "o", "output",                0,          AV_OPT_TYPE_CONST,    {.i64=OUT_MODE},  0,  0, AF, "mode" },
     {  "n", "noise",                 0,          AV_OPT_TYPE_CONST,    {.i64=NOISE_MODE},0,  0, AF, "mode" },
+    { "m", "set smooth factor",      OFFSET(m),  AV_OPT_TYPE_FLOAT,    {.dbl=11.},       1, 15, AF },
     { NULL }
 };
 
@@ -178,7 +180,7 @@ static int config_output(AVFilterLink *outlink)
     if (ret < 0)
         return ret;
 
-    s->pdiff_lut_scale = 1.f / MAX_DIFF * WEIGHT_LUT_SIZE;
+    s->pdiff_lut_scale = 1.f / s->m * WEIGHT_LUT_SIZE;
     for (int i = 0; i < WEIGHT_LUT_SIZE; i++) {
         float w = -i / s->pdiff_lut_scale;
 
@@ -201,6 +203,7 @@ static int filter_channel(AVFilterContext *ctx, void *arg, int ch, int nb_jobs)
     float *cache = (float *)s->cache->extended_data[ch];
     const float sw = (65536.f / (4 * K + 2)) / sqrtf(s->a);
     float *dst = (float *)out->extended_data[ch] + s->offset;
+    const float smooth = s->m;
 
     for (int i = S; i < s->H + S; i++) {
         float P = 0.f, Q = 0.f;
@@ -222,9 +225,12 @@ static int filter_channel(AVFilterContext *ctx, void *arg, int ch, int nb_jobs)
             unsigned weight_lut_idx;
             float w;
 
-            av_assert2(distance >= 0.f);
+            if (distance < 0.f) {
+                cache[j] = 0.f;
+                continue;
+            }
             w = distance * sw;
-            if (w >= MAX_DIFF)
+            if (w >= smooth)
                 continue;
             weight_lut_idx = w * s->pdiff_lut_scale;
             av_assert2(weight_lut_idx < WEIGHT_LUT_SIZE);
@@ -312,7 +318,7 @@ static int request_frame(AVFilterLink *outlink)
 
         if (s->eof_left < 0)
             s->eof_left = av_audio_fifo_size(s->fifo) - (s->S + s->K);
-        if (s->eof_left < 0)
+        if (s->eof_left <= 0)
             return AVERROR_EOF;
         in = ff_get_audio_buffer(outlink, s->H);
         if (!in)
@@ -331,6 +337,29 @@ static av_cold void uninit(AVFilterContext *ctx)
     av_audio_fifo_free(s->fifo);
     av_frame_free(&s->in);
     av_frame_free(&s->cache);
+}
+
+static int process_command(AVFilterContext *ctx, const char *cmd, const char *args,
+                           char *res, int res_len, int flags)
+{
+    AudioNLMeansContext *s = ctx->priv;
+
+    if (!strcmp(cmd, "s")) {
+        float a;
+
+        if (av_sscanf(args, "%f", &a) == 1)
+            s->a = av_clipf(a, 0.00001, 10);
+    } else if (!strcmp(cmd, "o")) {
+        if (!strcmp(args, "i")) {
+            s->om = IN_MODE;
+        } else if (!strcmp(args, "o")) {
+            s->om = OUT_MODE;
+        } else if (!strcmp(args, "n")) {
+            s->om = NOISE_MODE;
+        }
+    }
+
+    return 0;
 }
 
 static const AVFilterPad inputs[] = {
@@ -361,6 +390,7 @@ AVFilter ff_af_anlmdn = {
     .uninit        = uninit,
     .inputs        = inputs,
     .outputs       = outputs,
+    .process_command = process_command,
     .flags         = AVFILTER_FLAG_SUPPORT_TIMELINE_INTERNAL |
                      AVFILTER_FLAG_SLICE_THREADS,
 };

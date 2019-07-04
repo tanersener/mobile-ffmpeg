@@ -41,7 +41,7 @@ static const double aq_c_var_thresholds[AQ_C_STRENGTHS][AQ_C_SEGMENTS] = {
 
 static int get_aq_c_strength(int q_index, aom_bit_depth_t bit_depth) {
   // Approximate base quatizer (truncated to int)
-  const int base_quant = av1_ac_quant_Q3(q_index, 0, bit_depth) / 4;
+  const int base_quant = av1_ac_quant_QTX(q_index, 0, bit_depth) / 4;
   return (base_quant > 10) + (base_quant > 25);
 }
 

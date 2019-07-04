@@ -13,6 +13,9 @@ Eg. for CERTIFICATE ciphersuites (key exchange algorithms:
 @code{GNUTLS_KX_RSA} , @code{GNUTLS_KX_DHE_RSA} ), the same function are to be
 used to access the authentication data.
 
+Note that on resumed sessions, this function returns the schema
+used in the original session authentication.
+
 @strong{Returns:} The type of credentials for the current authentication
 schema, a @code{gnutls_credentials_type_t}  type.
 @end deftypefun

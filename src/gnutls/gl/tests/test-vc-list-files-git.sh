@@ -1,6 +1,6 @@
 #!/bin/sh
 # Unit tests for vc-list-files
-# Copyright (C) 2008-2016 Free Software Foundation, Inc.
+# Copyright (C) 2008-2019 Free Software Foundation, Inc.
 # This file is part of the GNUlib Library.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -14,10 +14,10 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 : ${srcdir=.}
-. "$srcdir/init.sh"; path_prepend_ "$abs_aux_dir" .
+. "$srcdir/init.sh"; path_prepend_ .
 
 tmpdir=vc-git-$$
 GIT_DIR= GIT_WORK_TREE=; unset GIT_DIR GIT_WORK_TREE
@@ -35,7 +35,7 @@ mkdir $tmpdir && cd $tmpdir &&
   git add . > /dev/null &&
   git commit -q -a -m log &&
   printf '%s\n' b c d/a > expected &&
-  vc-list-files > actual &&
+  $BOURNE_SHELL "$abs_aux_dir/vc-list-files" > actual &&
   compare expected actual &&
   fail=0
 

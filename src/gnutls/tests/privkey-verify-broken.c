@@ -45,21 +45,30 @@ const gnutls_datum_t raw_data = {
 	11
 };
 
-static int sign_verify_data(gnutls_x509_privkey_t pkey, unsigned algo, unsigned vflags)
+static int sign_verify_data(gnutls_x509_privkey_t pkey, gnutls_sign_algorithm_t algo, unsigned vflags)
 {
 	int ret;
 	gnutls_privkey_t privkey;
-	gnutls_pubkey_t pubkey;
+	gnutls_pubkey_t pubkey = NULL;
 	gnutls_datum_t signature;
+	gnutls_pk_algorithm_t pk;
+	gnutls_digest_algorithm_t dig;
+	unsigned sflags = 0;
 
 	/* sign arbitrary data */
 	assert(gnutls_privkey_init(&privkey) >= 0);
+
+	pk = gnutls_sign_get_pk_algorithm(algo);
+	dig = gnutls_sign_get_hash_algorithm(algo);
+
+	if (pk == GNUTLS_PK_RSA_PSS)
+		sflags |= GNUTLS_PRIVKEY_SIGN_FLAG_RSA_PSS;
 
 	ret = gnutls_privkey_import_x509(privkey, pkey, 0);
 	if (ret < 0)
 		fail("gnutls_pubkey_import_x509\n");
 
-	ret = gnutls_privkey_sign_data(privkey, algo, 0,
+	ret = gnutls_privkey_sign_data(privkey, dig, sflags,
 					&raw_data, &signature);
 	if (ret < 0) {
 		ret = -1;
@@ -73,7 +82,7 @@ static int sign_verify_data(gnutls_x509_privkey_t pkey, unsigned algo, unsigned 
 	if (ret < 0)
 		fail("gnutls_pubkey_import_privkey\n");
 
-	ret = gnutls_pubkey_verify_data2(pubkey, gnutls_pk_to_sign(gnutls_pubkey_get_pk_algorithm(pubkey, NULL),algo),
+	ret = gnutls_pubkey_verify_data2(pubkey, algo,
 				vflags, &raw_data, &signature);
 	if (ret < 0) {
 		ret = -1;
@@ -82,7 +91,8 @@ static int sign_verify_data(gnutls_x509_privkey_t pkey, unsigned algo, unsigned 
 
 	ret = 0;
  cleanup:
-	gnutls_pubkey_deinit(pubkey);
+	if (pubkey)
+		gnutls_pubkey_deinit(pubkey);
 	gnutls_privkey_deinit(privkey);
 	gnutls_free(signature.data);
 
@@ -112,28 +122,31 @@ void doit(void)
 		fail("gnutls_privkey_generate: %s\n", gnutls_strerror(ret));
 	}
 
-	if (sign_verify_data(pkey, GNUTLS_DIG_SHA1, GNUTLS_VERIFY_ALLOW_BROKEN) < 0)
-		fail("failed verification with SHA1 and override flags2!\n");
+	if (sign_verify_data(pkey, GNUTLS_SIGN_RSA_SHA1, 0) < 0)
+		fail("failed verification with SHA1!\n");
 
-	if (sign_verify_data(pkey, GNUTLS_DIG_MD5, 0) >= 0)
-		fail("succeeded verification with SHA1!\n");
+	if (sign_verify_data(pkey, GNUTLS_SIGN_RSA_MD5, 0) >= 0)
+		fail("succeeded verification with MD5!\n");
 
 	if (!gnutls_fips140_mode_enabled()) {
-		if (sign_verify_data(pkey, GNUTLS_DIG_MD5, GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5) < 0)
+		if (sign_verify_data(pkey, GNUTLS_SIGN_RSA_MD5, GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5) < 0)
 			fail("failed verification with MD5 and override flags!\n");
 
-		if (sign_verify_data(pkey, GNUTLS_DIG_MD5, GNUTLS_VERIFY_ALLOW_BROKEN) < 0)
+		if (sign_verify_data(pkey, GNUTLS_SIGN_RSA_MD5, GNUTLS_VERIFY_ALLOW_BROKEN) < 0)
 			fail("failed verification with MD5 and override flags2!\n");
 	}
 
-	if (sign_verify_data(pkey, GNUTLS_DIG_SHA256, 0) < 0)
+	if (sign_verify_data(pkey, GNUTLS_SIGN_RSA_SHA256, 0) < 0)
 		fail("failed verification with SHA256!\n");
 
-	if (sign_verify_data(pkey, GNUTLS_DIG_SHA512, 0) < 0)
+	if (sign_verify_data(pkey, GNUTLS_SIGN_RSA_SHA512, 0) < 0)
 		fail("failed verification with SHA512!\n");
 
-	if (sign_verify_data(pkey, GNUTLS_DIG_SHA3_256, 0) < 0)
+	if (sign_verify_data(pkey, GNUTLS_SIGN_RSA_SHA3_256, 0) < 0)
 		fail("failed verification with SHA3-256!\n");
+
+	if (sign_verify_data(pkey, GNUTLS_SIGN_RSA_PSS_RSAE_SHA256, 0) < 0)
+		fail("failed verification with SHA256 with PSS!\n");
 
 	gnutls_x509_privkey_deinit(pkey);
 

@@ -1,1 +1,1 @@
-@item @var{int} @ref{gnutls_record_set_state} (gnutls_session_t @var{session}, unsigned @var{read}, unsigned char @var{seq_number[8]})
+@item @var{int} @ref{gnutls_record_set_state} (gnutls_session_t @var{session}, unsigned @var{read}, const unsigned char [8] @var{seq_number})

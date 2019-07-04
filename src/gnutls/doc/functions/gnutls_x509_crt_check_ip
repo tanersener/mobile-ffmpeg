@@ -1,0 +1,19 @@
+
+
+
+
+@deftypefun {unsigned} {gnutls_x509_crt_check_ip} (gnutls_x509_crt_t @var{cert}, const unsigned char * @var{ip}, unsigned int @var{ip_size}, unsigned int @var{flags})
+@var{cert}: should contain an gnutls_x509_crt_t type
+
+@var{ip}: A pointer to the raw IP address
+
+@var{ip_size}: the number of bytes in ip (4 or 16)
+
+@var{flags}: should be zero
+
+This function will check if the IP allowed IP addresses in 
+the certificate's subject alternative name match the provided
+IP address.
+
+@strong{Returns:} non-zero for a successful match, and zero on failure.
+@end deftypefun

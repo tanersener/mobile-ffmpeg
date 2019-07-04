@@ -16,7 +16,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -108,6 +108,10 @@ gnutls_anon_allocate_client_credentials(gnutls_anon_client_credentials_t *
  * This function will set the Diffie-Hellman parameters for an
  * anonymous server to use.  These parameters will be used in
  * Anonymous Diffie-Hellman cipher suites.
+ *
+ * Deprecated: This function is unnecessary and discouraged on GnuTLS 3.6.0
+ * or later. Since 3.6.0, DH parameters are negotiated
+ * following RFC7919.
  **/
 void
 gnutls_anon_set_server_dh_params(gnutls_anon_server_credentials_t res,
@@ -120,6 +124,7 @@ gnutls_anon_set_server_dh_params(gnutls_anon_server_credentials_t res,
 	}
 
 	res->dh_params = dh_params;
+	res->dh_sec_param = gnutls_pk_bits_to_sec_param(GNUTLS_PK_DH, _gnutls_mpi_get_nbits(dh_params->params[0]));
 }
 
 /**
@@ -132,6 +137,10 @@ gnutls_anon_set_server_dh_params(gnutls_anon_server_credentials_t res,
  * Anonymous Diffie-Hellman cipher suites and will be selected from
  * the FFDHE set of RFC7919 according to the security level provided.
  *
+ * Deprecated: This function is unnecessary and discouraged on GnuTLS 3.6.0
+ * or later. Since 3.6.0, DH parameters are negotiated
+ * following RFC7919.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
@@ -141,19 +150,7 @@ int
 gnutls_anon_set_server_known_dh_params(gnutls_anon_server_credentials_t res,
 					gnutls_sec_param_t sec_param)
 {
-	int ret;
-
-	if (res->deinit_dh_params) {
-		res->deinit_dh_params = 0;
-		gnutls_dh_params_deinit(res->dh_params);
-		res->dh_params = NULL;
-	}
-
-	ret = _gnutls_set_cred_dh_params(&res->dh_params, sec_param);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
-	res->deinit_dh_params = 1;
+	res->dh_sec_param = sec_param;
 
 	return 0;
 }
@@ -166,6 +163,11 @@ gnutls_anon_set_server_known_dh_params(gnutls_anon_server_credentials_t res,
  * This function will set a callback in order for the server to get
  * the Diffie-Hellman parameters for anonymous authentication.  The
  * callback should return %GNUTLS_E_SUCCESS (0) on success.
+ *
+ * Deprecated: This function is unnecessary and discouraged on GnuTLS 3.6.0
+ * or later. Since 3.6.0, DH parameters are negotiated
+ * following RFC7919.
+ *
  **/
 void
 gnutls_anon_set_server_params_function(gnutls_anon_server_credentials_t
@@ -182,6 +184,11 @@ gnutls_anon_set_server_params_function(gnutls_anon_server_credentials_t
  * This function will set a callback in order for the server to get
  * the Diffie-Hellman or RSA parameters for anonymous authentication.
  * The callback should return %GNUTLS_E_SUCCESS (0) on success.
+ *
+ * Deprecated: This function is unnecessary and discouraged on GnuTLS 3.6.0
+ * or later. Since 3.6.0, DH parameters are negotiated
+ * following RFC7919.
+ *
  **/
 void
 gnutls_anon_set_params_function(gnutls_anon_server_credentials_t res,

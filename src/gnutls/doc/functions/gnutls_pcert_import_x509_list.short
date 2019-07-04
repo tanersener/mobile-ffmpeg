@@ -1,1 +1,1 @@
-@item @var{int} @ref{gnutls_pcert_import_x509_list} (gnutls_pcert_st * @var{pcert}, gnutls_x509_crt_t * @var{crt}, unsigned * @var{ncrt}, unsigned int @var{flags})
+@item @var{int} @ref{gnutls_pcert_import_x509_list} (gnutls_pcert_st * @var{pcert_list}, gnutls_x509_crt_t * @var{crt}, unsigned * @var{ncrt}, unsigned int @var{flags})

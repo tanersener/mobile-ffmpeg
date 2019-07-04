@@ -14,7 +14,7 @@ where a warning alert should be sent to the peer indicating that no
 renegotiation will be performed.
 
 If there is no mapping to a valid alert the alert to indicate
-internal error is returned.
+internal error (@code{GNUTLS_A_INTERNAL_ERROR} ) is returned.
 
 @strong{Returns:} the alert code to use for a particular error code.
 @end deftypefun

@@ -90,31 +90,52 @@ PROLOGUE(_nettle_chacha_core)
 	vmov	S2, X2
 	vmov	S3, X3
 
-	C Input rows:
+	C Input rows little-endian:
 	C	 0  1  2  3	X0
 	C	 4  5  6  7	X1
 	C	 8  9 10 11	X2
 	C	12 13 14 15	X3
 
+	C Input rows big-endian:
+	C	 1  0  3  2	X0
+	C	 5  4  7  6	X1
+	C	 9  8 11 10	X2
+	C	13 12 15 14	X3
+	C even and odd columns switched because
+	C vldm loads consecutive doublewords and
+	C switches words inside them to make them BE
+
 .Loop:
 	QROUND(X0, X1, X2, X3)
 
-	C Rotate rows, to get
+	C In little-endian rotate rows, to get
 	C	 0  1  2  3
 	C	 5  6  7  4  >>> 3
 	C	10 11  8  9  >>> 2
 	C	15 12 13 14  >>> 1
-	vext.32	X1, X1, X1, #1
+
+	C In big-endian rotate rows, to get
+	C	 1  0  3  2
+	C	 6  5  4  7  >>> 1
+	C	11 10  9  8  >>> 2
+	C	12 15 14 13  >>> 3
+	C different number of elements needs to be
+	C extracted on BE because of different column order
+IF_LE(<	vext.32	X1, X1, X1, #1>)
+IF_BE(<	vext.32	X1, X1, X1, #3>)
 	vext.32	X2, X2, X2, #2
-	vext.32	X3, X3, X3, #3
+IF_LE(<	vext.32	X3, X3, X3, #3>)
+IF_BE(<	vext.32	X3, X3, X3, #1>)
 
 	QROUND(X0, X1, X2, X3)
 
 	subs	ROUNDS, ROUNDS, #2
 	C Inverse rotation
-	vext.32	X1, X1, X1, #3
+IF_LE(<	vext.32	X1, X1, X1, #3>)
+IF_BE(<	vext.32	X1, X1, X1, #1>)
 	vext.32	X2, X2, X2, #2
-	vext.32	X3, X3, X3, #1
+IF_LE(<	vext.32	X3, X3, X3, #1>)
+IF_BE(<	vext.32	X3, X3, X3, #3>)
 
 	bhi	.Loop
 
@@ -122,6 +143,12 @@ PROLOGUE(_nettle_chacha_core)
 	vadd.u32	X1, X1, S1
 	vadd.u32	X2, X2, S2
 	vadd.u32	X3, X3, S3
+
+	C caller expects result little-endian
+IF_BE(<	vrev32.u8	X0, X0
+	vrev32.u8	X1, X1
+	vrev32.u8	X2, X2
+	vrev32.u8	X3, X3>)
 
 	vstm	DST, {X0,X1,X2,X3}
 	bx	lr

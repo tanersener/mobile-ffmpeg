@@ -1,22 +1,4 @@
 
-@subheading int
-@anchor{int}
-@deftypefun {typedef} {int} (* @var{gnutls_pkcs11_token_callback_t})
-@var{gnutls_pkcs11_token_callback_t}: -- undescribed --
-
-Token callback function. The callback will be used to ask the user
-to re-insert the token with given (null terminated) label.  The
-callback should return zero if token has been inserted by user and
-a negative error code otherwise.  It might be called multiple times
-if the token is not detected and the retry counter will be
-increased.
-
-@strong{Returns:} @code{GNUTLS_E_SUCCESS}  (0) on success or a negative error code
-on error.
-
-@strong{Since:} 2.12.0
-@end deftypefun
-
 
 @c gnutls_pkcs11_obj_flags
 @table @code
@@ -25,7 +7,7 @@ Force login in the token for the operation (seek+store).
 @item GNUTLS_@-PKCS11_@-OBJ_@-FLAG_@-MARK_@-TRUSTED
 object marked as trusted (seek+store).
 @item GNUTLS_@-PKCS11_@-OBJ_@-FLAG_@-MARK_@-SENSITIVE
-object marked as sensitive -unexportable (store).
+object is explicitly marked as sensitive -unexportable (store).
 @item GNUTLS_@-PKCS11_@-OBJ_@-FLAG_@-LOGIN_@-SO
 force login as a security officer in the token for the operation (seek+store).
 @item GNUTLS_@-PKCS11_@-OBJ_@-FLAG_@-MARK_@-PRIVATE
@@ -69,4 +51,6 @@ When searching, restrict to public key objects only (seek).
 When generating a keypair don't store the public key (store).
 @item GNUTLS_@-PKCS11_@-OBJ_@-FLAG_@-PRIVKEY
 When searching, restrict to private key objects only (seek).
+@item GNUTLS_@-PKCS11_@-OBJ_@-FLAG_@-MARK_@-NOT_@-SENSITIVE
+object marked as not sensitive -exportable (store).
 @end table

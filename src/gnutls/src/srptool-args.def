@@ -19,7 +19,7 @@ flag = {
     name      = index;
     value     = i;
     arg-type  = number;
-    arg-default = 1;
+    arg-default = 3;
     descrip   = "specify the index of the group parameters in tpasswd.conf to use";
     doc = "";
 };

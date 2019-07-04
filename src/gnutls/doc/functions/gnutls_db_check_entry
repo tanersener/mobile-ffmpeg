@@ -11,4 +11,6 @@ This function has no effect.
 
 @strong{Returns:} Returns @code{GNUTLS_E_EXPIRED} , if the database entry has
 expired or 0 otherwise.
+
+@strong{Deprecated:} This function is deprecated.
 @end deftypefun

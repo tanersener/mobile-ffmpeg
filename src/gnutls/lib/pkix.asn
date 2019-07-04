@@ -6,11 +6,6 @@ DEFINITIONS IMPLICIT TAGS ::=
 BEGIN
 
 -- This contains both PKIX1Implicit88 and RFC2630 ASN.1 modules.
-
-id-pkix  OBJECT IDENTIFIER  ::=
-         { iso(1) identified-organization(3) dod(6) internet(1)
-                    security(5) mechanisms(5) pkix(7) }
-
 -- ISO arc for standard certificate and CRL extensions
 
 -- authority key identifier OID and syntax
@@ -20,17 +15,15 @@ PrivateKeyUsagePeriod ::= SEQUENCE {
      notAfter        [1]     GeneralizedTime OPTIONAL }
 
 AuthorityKeyIdentifier ::= SEQUENCE {
-      keyIdentifier             [0] KeyIdentifier            OPTIONAL,
+      keyIdentifier             [0] OCTET STRING             OPTIONAL, --KeyIdentifier
       authorityCertIssuer       [1] GeneralNames             OPTIONAL,
       authorityCertSerialNumber [2] CertificateSerialNumber  OPTIONAL }
     -- authorityCertIssuer and authorityCertSerialNumber shall both
     -- be present or both be absgent
 
-KeyIdentifier ::= OCTET STRING
-
 -- subject key identifier OID and syntax
 
-SubjectKeyIdentifier ::= KeyIdentifier
+SubjectKeyIdentifier ::= OCTET STRING
 
 -- key usage extension OID and syntax
 
@@ -59,7 +52,7 @@ GeneralName ::= CHOICE {
      dNSName                         [2]     IA5String,
      x400Address                     [3]     ANY,
 -- Changed to work with the libtasn1 parser.
-     directoryName                   [4]     EXPLICIT RDNSequence, --Name,
+     directoryName                   [4]     EXPLICIT SEQUENCE OF RelativeDistinguishedName, --Name,
      ediPartyName                    [5]     ANY, --EDIPartyName replaced by ANY to save memory
      uniformResourceIdentifier       [6]     IA5String,
      iPAddress                       [7]     OCTET STRING,
@@ -101,9 +94,7 @@ ReasonFlags ::= BIT STRING
 
 -- extended key usage extension OID and syntax
 
-ExtKeyUsageSyntax ::= SEQUENCE SIZE (1..MAX) OF KeyPurposeId
-
-KeyPurposeId ::= OBJECT IDENTIFIER
+ExtKeyUsageSyntax ::= SEQUENCE SIZE (1..MAX) OF OBJECT IDENTIFIER --ExtKeyUsageSyntax
 
 -- authority info access
 
@@ -129,57 +120,26 @@ AccessDescription  ::=  SEQUENCE {
 -- attribute data types --
 
 Attribute       ::=     SEQUENCE {
-        type            AttributeType,
-        values  SET OF AttributeValue
+        type            OBJECT IDENTIFIER, -- AttributeType
+        values  SET OF ANY -- AttributeValue
                 -- at least one value is required -- 
 }
 
-AttributeType           ::=   OBJECT IDENTIFIER
+-- AttributeType           ::=   OBJECT IDENTIFIER
 
-AttributeValue          ::=   ANY DEFINED BY type
+-- AttributeValue          ::=   ANY DEFINED BY type
 
 AttributeTypeAndValue           ::=     SEQUENCE {
-        type    AttributeType,
-        value   AttributeValue }
-
--- suggested naming attributes: Definition of the following
---  information object set may be augmented to meet local
---  requirements.  Note that deleting members of the set may
---  prevent interoperability with conforming implementations.
---  presented in pairs: the AttributeType followed by the
---  type definition for the corresponding AttributeValue
-
--- Arc for standard naming attributes
-id-at           OBJECT IDENTIFIER ::= {joint-iso-ccitt(2) ds(5) 4}
-
--- Attributes of type NameDirectoryString
-
--- gnutls: Note that the Object ID (id-at*) is being set just before the
--- actual definition. This is done in order for asn1_find_structure_from_oid
--- to work (locate structure from OID).
--- Maybe this is inefficient and memory consuming. Should we replace with
--- a table that maps OIDs to structures?
-
--- PostalAddress ::= SEQUENCE OF DirectoryString
-
- -- Legacy attributes
-
-emailAddress AttributeType      ::= { iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1) 9 1 }
-
--- Pkcs9email ::= IA5String (SIZE (1..ub-emailaddress-length))
-
--- naming data types --
+        type    OBJECT IDENTIFIER, -- AttributeType
+        value   ANY } -- AttributeValue
 
 Name            ::=   CHOICE { -- only one possibility for now --
-                                 rdnSequence  RDNSequence }
+                                 rdnSequence  SEQUENCE OF RelativeDistinguishedName }
 
-RDNSequence     ::=   SEQUENCE OF RelativeDistinguishedName
-
-DistinguishedName       ::=   RDNSequence
+DistinguishedName       ::=   SEQUENCE OF RelativeDistinguishedName -- RDNSequence
 
 RelativeDistinguishedName  ::=
                     SET SIZE (1 .. MAX) OF AttributeTypeAndValue
-
 
 
 -- --------------------------------------------------------
@@ -274,51 +234,13 @@ Dss-Sig-Value ::= SEQUENCE {
      s       INTEGER  
 }
 
-DomainParameters ::= SEQUENCE {
-     p       INTEGER, -- odd prime, p=jq +1
-     g       INTEGER, -- generator, g
-     q       INTEGER, -- factor of p-1
-     j       INTEGER OPTIONAL, -- subgroup factor, j>= 2
-     validationParms  ValidationParms OPTIONAL }
-
-ValidationParms ::= SEQUENCE {
-     seed             BIT STRING,
-     pgenCounter      INTEGER }
-
 Dss-Parms  ::=  SEQUENCE  {
      p             INTEGER,
      q             INTEGER,
      g             INTEGER  }
 
--- x400 address syntax starts here
---      OR Names
-
-CountryName ::= [APPLICATION 1] CHOICE {
-   x121-dcc-code NumericString
-                (SIZE (ub-country-name-numeric-length)),
-   iso-3166-alpha2-code PrintableString
-                (SIZE (ub-country-name-alpha-length)) }
-
-OrganizationName ::= PrintableString
-                            (SIZE (1..ub-organization-name-length))
--- see also teletex-organization-name
-
-NumericUserIdentifier ::= NumericString
-                            (SIZE (1..ub-numeric-user-id-length))
-
--- see also teletex-personal-name
-
-OrganizationalUnitNames ::= SEQUENCE SIZE (1..ub-organizational-units)
-                                        OF OrganizationalUnitName
--- see also teletex-organizational-unit-names
-
-OrganizationalUnitName ::= PrintableString (SIZE
-                        (1..ub-organizational-unit-name-length))
-
 -- Extension types and attribute values
 --
-
-CommonName ::= PrintableString
 
 -- END of PKIX1Implicit88
 
@@ -385,7 +307,7 @@ SignedAttributes ::= SET SIZE (1..MAX) OF Attribute
 
 SignerIdentifier ::= CHOICE {
 	issuerAndSerialNumber IssuerAndSerialNumber,
-	subjectKeyIdentifier [0] SubjectKeyIdentifier
+	subjectKeyIdentifier [0] OCTET STRING
 }
 
 pkcs-7-SignerInfos ::= SET OF pkcs-7-SignerInfo
@@ -429,8 +351,6 @@ pkcs-8-PrivateKeyInfo ::= SEQUENCE {
   privateKey OCTET STRING,
   attributes [0] Attributes OPTIONAL }
 
-pkcs-8-Attributes ::= SET OF Attribute
-
 -- Encrypted private-key information syntax
 
 pkcs-8-EncryptedPrivateKeyInfo ::= SEQUENCE {
@@ -447,6 +367,12 @@ pkcs-5-des-EDE3-CBC-params ::= OCTET STRING (SIZE(8))
 pkcs-5-aes128-CBC-params ::= OCTET STRING (SIZE(16))
 pkcs-5-aes192-CBC-params ::= OCTET STRING (SIZE(16))
 pkcs-5-aes256-CBC-params ::= OCTET STRING (SIZE(16))
+
+-- GOST extension
+Gost28147-89-Parameters ::= SEQUENCE {
+	iv OCTET STRING, -- (SIZE (8))
+	encryptionParamSet OBJECT IDENTIFIER
+}
 
 pkcs-5-PBE-params ::= SEQUENCE {
   salt OCTET STRING,
@@ -645,7 +571,7 @@ ResponseData ::= SEQUENCE {
 
 ResponderID ::= CHOICE {
 -- Changed to work with the libtasn1 parser.
-   byName   [1] EXPLICIT RDNSequence, --Name
+   byName   [1] EXPLICIT SEQUENCE OF RelativeDistinguishedName, --Name
    byKey    [2] EXPLICIT OCTET STRING --SHA-1 hash of responder's public key 
 }
 
@@ -663,23 +589,11 @@ CertStatus ::= CHOICE {
 
 RevokedInfo ::= SEQUENCE {
     revocationTime              GeneralizedTime,
-    revocationReason    [0]     EXPLICIT CRLReason OPTIONAL }
+    revocationReason    [0]     EXPLICIT ENUMERATED { unspecified(0) } OPTIONAL }
 
 UnknownInfo ::= NULL -- this can be replaced with an enumeration
 
 -- rfc5280
-
-CRLReason ::= ENUMERATED {
-     unspecified             (0),
-     keyCompromise           (1),
-     cACompromise            (2),
-     affiliationChanged      (3),
-     superseded              (4),
-     cessationOfOperation    (5),
-     certificateHold         (6),
-     removeFromCRL           (8),
-     privilegeWithdrawn      (9),
-     aACompromise           (10) }
 
 NameConstraints ::= SEQUENCE {
      permittedSubtrees       [0]     GeneralSubtrees OPTIONAL,

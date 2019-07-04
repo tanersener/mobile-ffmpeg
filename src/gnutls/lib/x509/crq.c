@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2003-2016 Free Software Foundation, Inc.
  * Copyright (C) 2012-2016 Nikos Mavrogiannopoulos
+ * Copyright (C) 2016-2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -17,7 +18,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -36,6 +37,7 @@
 #include <gnutls/x509-ext.h>
 #include "x509_int.h"
 #include <libtasn1.h>
+#include <pk.h>
 #include "attributes.h"
 
 /**
@@ -168,15 +170,18 @@ gnutls_x509_crq_import(gnutls_x509_crq_t crq,
  * enumeration that is the signature algorithm that has been used to
  * sign this certificate request.
  *
- * Returns: a #gnutls_sign_algorithm_t value, or a negative error code on
- *   error.
+ * Since 3.6.0 this function never returns a negative error code.
+ * Error cases and unknown/unsupported signature algorithms are
+ * mapped to %GNUTLS_SIGN_UNKNOWN.
+ *
+ * Returns: a #gnutls_sign_algorithm_t value
  *
  * Since: 3.4.0
  **/
 int gnutls_x509_crq_get_signature_algorithm(gnutls_x509_crq_t crq)
 {
-	return _gnutls_x509_get_signature_algorithm(crq->crq,
-						    "signatureAlgorithm.algorithm");
+	return map_errs_to_zero(_gnutls_x509_get_signature_algorithm(crq->crq,
+						    "signatureAlgorithm"));
 }
 
 /**
@@ -657,7 +662,7 @@ gnutls_x509_crq_set_key(gnutls_x509_crq_t crq, gnutls_x509_privkey_t key)
 	result = _gnutls_x509_encode_and_copy_PKI_params
 	    (crq->crq,
 	     "certificationRequestInfo.subjectPKInfo",
-	     key->pk_algorithm, &key->params);
+	     &key->params);
 
 	if (result < 0) {
 		gnutls_assert();
@@ -775,11 +780,12 @@ gnutls_x509_crq_set_key_rsa_raw(gnutls_x509_crq_t crq,
 	}
 
 	temp_params.params_nr = RSA_PUBLIC_PARAMS;
+	temp_params.algo = GNUTLS_PK_RSA;
 
 	result = _gnutls_x509_encode_and_copy_PKI_params
 	    (crq->crq,
 	     "certificationRequestInfo.subjectPKInfo",
-	     GNUTLS_PK_RSA, &temp_params);
+	     &temp_params);
 
 	if (result < 0) {
 		gnutls_assert();
@@ -837,6 +843,8 @@ gnutls_x509_crq_set_challenge_password(gnutls_x509_crq_t crq,
 		password = (char*)out.data;
 	}
 
+	assert(password != NULL);
+
 	result = _gnutls_x509_encode_and_write_attribute
 	    ("1.2.840.113549.1.9.7", crq->crq,
 	     "certificationRequestInfo.attributes.?LAST", password,
@@ -857,7 +865,7 @@ gnutls_x509_crq_set_challenge_password(gnutls_x509_crq_t crq,
  * gnutls_x509_crq_sign2:
  * @crq: should contain a #gnutls_x509_crq_t type
  * @key: holds a private key
- * @dig: The message digest to use, i.e., %GNUTLS_DIG_SHA1
+ * @dig: The message digest to use, i.e., %GNUTLS_DIG_SHA256
  * @flags: must be 0
  *
  * This function will sign the certificate request with a private key.
@@ -867,6 +875,13 @@ gnutls_x509_crq_set_challenge_password(gnutls_x509_crq_t crq,
  *
  * This must be the last step in a certificate request generation
  * since all the previously set parameters are now signed.
+ *
+ * A known limitation of this function is, that a newly-signed request will not
+ * be fully functional (e.g., for signature verification), until it
+ * is exported an re-imported.
+ *
+ * After GnuTLS 3.6.1 the value of @dig may be %GNUTLS_DIG_UNKNOWN,
+ * and in that case, a suitable but reasonable for the key algorithm will be selected.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *   %GNUTLS_E_ASN1_VALUE_NOT_FOUND is returned if you didn't set all
@@ -918,16 +933,20 @@ gnutls_x509_crq_sign2(gnutls_x509_crq_t crq, gnutls_x509_privkey_t key,
  * @key: holds a private key
  *
  * This function is the same a gnutls_x509_crq_sign2() with no flags,
- * and SHA1 as the hash algorithm.
+ * and an appropriate hash algorithm. The hash algorithm used may
+ * vary between versions of GnuTLS, and it is tied to the security
+ * level of the issuer's public key.
+ *
+ * A known limitation of this function is, that a newly-signed request will not
+ * be fully functional (e.g., for signature verification), until it
+ * is exported an re-imported.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
- *
- * Deprecated: Use gnutls_x509_crq_privkey_sign() instead.
  */
 int gnutls_x509_crq_sign(gnutls_x509_crq_t crq, gnutls_x509_privkey_t key)
 {
-	return gnutls_x509_crq_sign2(crq, key, GNUTLS_DIG_SHA1, 0);
+	return gnutls_x509_crq_sign2(crq, key, 0, 0);
 }
 
 /**
@@ -1022,12 +1041,56 @@ gnutls_x509_crq_get_pk_algorithm(gnutls_x509_crq_t crq, unsigned int *bits)
 	}
 
 	result = _gnutls_x509_get_pk_algorithm
-	    (crq->crq, "certificationRequestInfo.subjectPKInfo", bits);
+	    (crq->crq, "certificationRequestInfo.subjectPKInfo", NULL, bits);
 	if (result < 0) {
 		gnutls_assert();
+		return result;
 	}
 
 	return result;
+}
+
+/**
+ * gnutls_x509_crq_get_spki;
+ * @crq: should contain a #gnutls_x509_crq_t type
+ * @spki: a SubjectPublicKeyInfo structure of type #gnutls_x509_spki_t
+ * @flags: must be zero
+ *
+ * This function will return the public key information of a PKCS#10
+ * certificate request. The provided @spki must be initialized.
+ *
+ * Returns: Zero on success, or a negative error code on error.
+ **/
+int
+gnutls_x509_crq_get_spki(gnutls_x509_crq_t crq,
+			 gnutls_x509_spki_t spki,
+			 unsigned int flags)
+{
+	int result;
+	gnutls_x509_spki_st params;
+
+	if (crq == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	memset(&params, 0, sizeof(params));
+
+	spki->pk = gnutls_x509_crq_get_pk_algorithm(crq, NULL);
+
+	result = _gnutls_x509_crq_read_spki_params(crq, &params);
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	if (params.pk == GNUTLS_PK_UNKNOWN)
+		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+
+	spki->rsa_pss_dig = params.rsa_pss_dig;
+	spki->salt_size = params.salt_size;
+
+	return 0;
 }
 
 /**
@@ -2452,18 +2515,12 @@ gnutls_x509_crq_get_key_id(gnutls_x509_crq_t crq, unsigned int flags,
 			   unsigned char *output_data,
 			   size_t * output_data_size)
 {
-	int pk, ret = 0;
+	int ret = 0;
 	gnutls_pk_params_st params;
 
 	if (crq == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
-	}
-
-	pk = gnutls_x509_crq_get_pk_algorithm(crq, NULL);
-	if (pk < 0) {
-		gnutls_assert();
-		return pk;
 	}
 
 	ret = _gnutls_x509_crq_get_mpis(crq, &params);
@@ -2473,7 +2530,7 @@ gnutls_x509_crq_get_key_id(gnutls_x509_crq_t crq, unsigned int flags,
 	}
 
 	ret =
-	    _gnutls_get_key_id(pk, &params, output_data, output_data_size, flags);
+	    _gnutls_get_key_id(&params, output_data, output_data_size, flags);
 
 	gnutls_pk_params_release(&params);
 
@@ -2495,6 +2552,13 @@ gnutls_x509_crq_get_key_id(gnutls_x509_crq_t crq, unsigned int flags,
  * This must be the last step in a certificate request generation
  * since all the previously set parameters are now signed.
  *
+ * A known limitation of this function is, that a newly-signed request will not
+ * be fully functional (e.g., for signature verification), until it
+ * is exported an re-imported.
+ *
+ * After GnuTLS 3.6.1 the value of @dig may be %GNUTLS_DIG_UNKNOWN,
+ * and in that case, a suitable but reasonable for the key algorithm will be selected.
+ *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *   %GNUTLS_E_ASN1_VALUE_NOT_FOUND is returned if you didn't set all
  *   information in the certificate request (e.g., the version using
@@ -2510,6 +2574,9 @@ gnutls_x509_crq_privkey_sign(gnutls_x509_crq_t crq, gnutls_privkey_t key,
 	int result;
 	gnutls_datum_t signature;
 	gnutls_datum_t tbs;
+	gnutls_pk_algorithm_t pk;
+	gnutls_x509_spki_st params;
+	const gnutls_sign_entry_st *se;
 
 	if (crq == NULL) {
 		gnutls_assert();
@@ -2526,6 +2593,40 @@ gnutls_x509_crq_privkey_sign(gnutls_x509_crq_t crq, gnutls_privkey_t key,
 		}
 	}
 
+	if (dig == 0) {
+		/* attempt to find a reasonable choice */
+		gnutls_pubkey_t pubkey;
+		int ret;
+
+		ret = gnutls_pubkey_init(&pubkey);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		ret = gnutls_pubkey_import_privkey(pubkey, key, 0, 0);
+		if (ret < 0) {
+			gnutls_pubkey_deinit(pubkey);
+			return gnutls_assert_val(ret);
+		}
+		ret = gnutls_pubkey_get_preferred_hash_algorithm(pubkey, &dig, NULL);
+		gnutls_pubkey_deinit(pubkey);
+
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+	}
+
+	result = _gnutls_privkey_get_spki_params(key, &params);
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	pk = gnutls_privkey_get_pk_algorithm(key, NULL);
+	result = _gnutls_privkey_update_spki_params(key, pk, dig, 0, &params);
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
 	/* Step 1. Self sign the request.
 	 */
 	result =
@@ -2537,7 +2638,12 @@ gnutls_x509_crq_privkey_sign(gnutls_x509_crq_t crq, gnutls_privkey_t key,
 		return result;
 	}
 
-	result = gnutls_privkey_sign_data(key, dig, 0, &tbs, &signature);
+	se = _gnutls_pk_to_sign_entry(params.pk, dig);
+	if (se == NULL)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	result = privkey_sign_and_hash_data(key, se,
+					    &tbs, &signature, &params);
 	gnutls_free(tbs.data);
 
 	if (result < 0) {
@@ -2561,9 +2667,8 @@ gnutls_x509_crq_privkey_sign(gnutls_x509_crq_t crq, gnutls_privkey_t key,
 	/* Step 3. Write the signatureAlgorithm field.
 	 */
 	result =
-	    _gnutls_x509_write_sig_params(crq->crq, "signatureAlgorithm",
-					  gnutls_privkey_get_pk_algorithm
-					  (key, NULL), dig, 0);
+	    _gnutls_x509_write_sign_params(crq->crq, "signatureAlgorithm",
+					   se, &params);
 	if (result < 0) {
 		gnutls_assert();
 		return result;
@@ -2591,7 +2696,8 @@ int gnutls_x509_crq_verify(gnutls_x509_crq_t crq, unsigned int flags)
 	gnutls_datum_t data = { NULL, 0 };
 	gnutls_datum_t signature = { NULL, 0 };
 	gnutls_pk_params_st params;
-	gnutls_digest_algorithm_t algo;
+	gnutls_x509_spki_st sign_params;
+	const gnutls_sign_entry_st *se;
 	int ret;
 
 	gnutls_pk_params_init(&params);
@@ -2607,13 +2713,18 @@ int gnutls_x509_crq_verify(gnutls_x509_crq_t crq, unsigned int flags)
 
 	ret =
 	    _gnutls_x509_get_signature_algorithm(crq->crq,
-						 "signatureAlgorithm.algorithm");
+						 "signatureAlgorithm");
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
-	algo = gnutls_sign_get_hash_algorithm(ret);
+	se = _gnutls_sign_to_entry(ret);
+	if (se == NULL) {
+		gnutls_assert();
+		ret = GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM;
+		goto cleanup;
+	}
 
 	ret =
 	    _gnutls_x509_get_signature(crq->crq, "signature", &signature);
@@ -2628,10 +2739,17 @@ int gnutls_x509_crq_verify(gnutls_x509_crq_t crq, unsigned int flags)
 		goto cleanup;
 	}
 
+	ret = _gnutls_x509_read_sign_params(crq->crq,
+					    "signatureAlgorithm",
+					    &sign_params);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
 	ret =
-	    pubkey_verify_data(gnutls_x509_crq_get_pk_algorithm(crq, NULL),
-			       hash_to_entry(algo), &data, &signature,
-			       &params);
+	    pubkey_verify_data(se, hash_to_entry(se->hash), &data, &signature,
+			       &params, &sign_params, flags);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -2740,7 +2858,7 @@ int gnutls_x509_crq_get_tlsfeatures(gnutls_x509_crq_t crq,
 				    unsigned int *critical)
 {
 	int ret;
-	gnutls_datum_t der;
+	gnutls_datum_t der = {NULL, 0};
 
 	if (crq == NULL) {
 		gnutls_assert();
@@ -2855,4 +2973,125 @@ gnutls_x509_crq_set_extension_by_oid(gnutls_x509_crq_t crq,
 
 	return 0;
 
+}
+
+/**
+ * gnutls_x509_crq_set_spki:
+ * @crq: a certificate request of type #gnutls_x509_crq_t
+ * @spki: a SubjectPublicKeyInfo structure of type #gnutls_x509_spki_t
+ * @flags: must be zero
+ *
+ * This function will set the certificate request's subject public key
+ * information explicitly. This is intended to be used in the cases
+ * where a single public key (e.g., RSA) can be used for multiple
+ * signature algorithms (RSA PKCS1-1.5, and RSA-PSS).
+ *
+ * To export the public key (i.e., the SubjectPublicKeyInfo part), check
+ * gnutls_pubkey_import_x509().
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.6.0
+ **/
+int
+gnutls_x509_crq_set_spki(gnutls_x509_crq_t crq,
+			 const gnutls_x509_spki_t spki,
+			 unsigned int flags)
+{
+	int ret;
+	gnutls_pk_algorithm_t crq_pk;
+	gnutls_x509_spki_st tpki;
+	gnutls_pk_params_st params;
+	unsigned bits;
+
+	if (crq == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	ret = _gnutls_x509_crq_get_mpis(crq, &params);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	bits = pubkey_to_bits(&params);
+	crq_pk = params.algo;
+
+	if (!_gnutls_pk_are_compat(crq_pk, spki->pk)) {
+                ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+                goto cleanup;
+	}
+
+	if (spki->pk != GNUTLS_PK_RSA_PSS) {
+		if (crq_pk == spki->pk) {
+			ret = 0;
+			goto cleanup;
+		}
+
+		gnutls_assert();
+		ret = GNUTLS_E_INVALID_REQUEST;
+		goto cleanup;
+	}
+
+	memset(&tpki, 0, sizeof(gnutls_x509_spki_st));
+
+	if (crq_pk == GNUTLS_PK_RSA) {
+		const mac_entry_st *me;
+
+		me = hash_to_entry(spki->rsa_pss_dig);
+		if (unlikely(me == NULL)) {
+			gnutls_assert();
+			ret = GNUTLS_E_INVALID_REQUEST;
+			goto cleanup;
+		}
+
+		tpki.pk = spki->pk;
+		tpki.rsa_pss_dig = spki->rsa_pss_dig;
+
+		/* If salt size is zero, find the optimal salt size. */
+		if (spki->salt_size == 0) {
+			ret =
+			    _gnutls_find_rsa_pss_salt_size(bits, me,
+							   spki->salt_size);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
+			tpki.salt_size = ret;
+		} else
+			tpki.salt_size = spki->salt_size;
+	} else if (crq_pk == GNUTLS_PK_RSA_PSS) {
+		ret = _gnutls_x509_crq_read_spki_params(crq, &tpki);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		tpki.salt_size = spki->salt_size;
+		tpki.rsa_pss_dig = spki->rsa_pss_dig;
+	}
+
+	memcpy(&params.spki, &tpki, sizeof(tpki));
+	ret = _gnutls_x509_check_pubkey_params(&params);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret = _gnutls_x509_write_spki_params(crq->crq,
+						"certificationRequestInfo."
+						"subjectPKInfo."
+						"algorithm",
+						&tpki);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret = 0;
+ cleanup:
+	gnutls_pk_params_release(&params);
+	return ret;
 }

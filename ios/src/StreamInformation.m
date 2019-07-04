@@ -75,6 +75,11 @@
      */
     NSMutableDictionary *metadata;
 
+    /**
+     * Side data map
+     */
+    NSMutableDictionary *sidedata;
+
 }
 
 - (instancetype)init {
@@ -98,7 +103,8 @@
         realFrameRate = nil;
         timeBase = nil;
         codecTimeBase = nil;
-        metadata = nil;
+        metadata = [[NSMutableDictionary alloc] init];
+        sidedata = [[NSMutableDictionary alloc] init];
     }
     
     return self;
@@ -252,8 +258,24 @@
     metadata[key] = value;
 }
 
+- (NSString*)getMetadata:(NSString*)key {
+    return metadata[key];
+}
+
 - (NSDictionary*)getMetadataEntries {
     return metadata;
+}
+
+- (void)addSidedata:(NSString*)key :(NSString*)value {
+    sidedata[key] = value;
+}
+
+- (NSString*)getSidedata:(NSString*)key {
+    return sidedata[key];
+}
+
+- (NSDictionary*)getSidedataEntries {
+    return sidedata;
 }
 
 @end

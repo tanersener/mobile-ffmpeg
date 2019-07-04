@@ -16,7 +16,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -160,6 +160,11 @@ int gnutls_x509_ext_export_key_purposes(gnutls_x509_key_purposes_t,
 int gnutls_x509_ext_import_key_usage(const gnutls_datum_t * ext,
 				  unsigned int *key_usage);
 int gnutls_x509_ext_export_key_usage(unsigned int key_usage,
+				  gnutls_datum_t * ext);
+
+int gnutls_x509_ext_import_inhibit_anypolicy(const gnutls_datum_t * ext,
+				  unsigned int *skipcerts);
+int gnutls_x509_ext_export_inhibit_anypolicy(unsigned int skipcerts,
 				  gnutls_datum_t * ext);
 
 int gnutls_x509_ext_import_proxy(const gnutls_datum_t * ext, int *pathlen,

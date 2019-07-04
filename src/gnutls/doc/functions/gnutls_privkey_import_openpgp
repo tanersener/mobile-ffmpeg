@@ -9,18 +9,9 @@
 
 @var{flags}: Flags for the import
 
-This function will import the given private key to the abstract
-@code{gnutls_privkey_t}  type.
+This function is no-op.
 
-The @code{gnutls_openpgp_privkey_t}  object must not be deallocated
-during the lifetime of this structure. The subkey set as
-preferred will be used, or the master key otherwise.
-
- @code{flags} might be zero or one of @code{GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE} 
-and @code{GNUTLS_PRIVKEY_IMPORT_COPY} .
-
-@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
-negative error value.
+@strong{Returns:} @code{GNUTLS_E_UNIMPLEMENTED_FEATURE} .
 
 @strong{Since:} 2.12.0
 @end deftypefun

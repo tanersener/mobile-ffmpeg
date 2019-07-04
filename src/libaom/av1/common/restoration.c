@@ -28,7 +28,7 @@
 // The 's' values are calculated based on original 'r' and 'e' values in the
 // spec using GenSgrprojVtable().
 // Note: Setting r = 0 skips the filter; with corresponding s = -1 (invalid).
-const sgr_params_type sgr_params[SGRPROJ_PARAMS] = {
+const sgr_params_type av1_sgr_params[SGRPROJ_PARAMS] = {
   { { 2, 1 }, { 140, 3236 } }, { { 2, 1 }, { 112, 2158 } },
   { { 2, 1 }, { 93, 1618 } },  { { 2, 1 }, { 80, 1438 } },
   { { 2, 1 }, { 70, 1295 } },  { { 2, 1 }, { 58, 1177 } },
@@ -111,7 +111,7 @@ int sgrproj_mtable[SGRPROJ_PARAMS][2];
 
 static void GenSgrprojVtable() {
   for (int i = 0; i < SGRPROJ_PARAMS; ++i) {
-    const sgr_params_type *const params = &sgr_params[i];
+    const sgr_params_type *const params = &av1_sgr_params[i];
     for (int j = 0; j < 2; ++j) {
       const int e = params->e[j];
       const int r = params->r[j];
@@ -173,8 +173,8 @@ static void extend_frame_highbd(uint16_t *data, int width, int height,
   }
 }
 
-void extend_frame(uint8_t *data, int width, int height, int stride,
-                  int border_horz, int border_vert, int highbd) {
+void av1_extend_frame(uint8_t *data, int width, int height, int stride,
+                      int border_horz, int border_vert, int highbd) {
   if (highbd)
     extend_frame_highbd(CONVERT_TO_SHORTPTR(data), width, height, stride,
                         border_horz, border_vert);
@@ -212,11 +212,10 @@ static void copy_tile(int width, int height, const uint8_t *src, int src_stride,
 // rules:
 //
 // * At a frame boundary, we copy the outermost row of CDEF pixels three times.
-//   This extension is done by a call to extend_frame() at the start of the loop
-//   restoration process, so the value of copy_above/copy_below doesn't strictly
-//   matter.
-//   However, by setting *copy_above = *copy_below = 1 whenever loop filtering
-//   across tiles is disabled, we can allow
+//   This extension is done by a call to av1_extend_frame() at the start of the
+//   loop restoration process, so the value of copy_above/copy_below doesn't
+//   strictly matter. However, by setting *copy_above = *copy_below = 1 whenever
+//   loop filtering across tiles is disabled, we can allow
 //   {setup,restore}_processing_stripe_boundary to assume that the top/bottom
 //   data has always been copied, simplifying the behaviour at the left and
 //   right edges of tiles.
@@ -620,7 +619,7 @@ static void boxsum(int32_t *src, int width, int height, int src_stride, int r,
     assert(0 && "Invalid value of r in self-guided filter");
 }
 
-void decode_xq(const int *xqd, int *xq, const sgr_params_type *params) {
+void av1_decode_xq(const int *xqd, int *xq, const sgr_params_type *params) {
   if (params->r[0] == 0) {
     xq[0] = 0;
     xq[1] = (1 << SGRPROJ_PRJ_BITS) - xqd[1];
@@ -633,7 +632,7 @@ void decode_xq(const int *xqd, int *xq, const sgr_params_type *params) {
   }
 }
 
-const int32_t x_by_xplus1[256] = {
+const int32_t av1_x_by_xplus1[256] = {
   // Special case: Map 0 -> 1 (corresponding to a value of 1/256)
   // instead of 0. See comments in selfguided_restoration_internal() for why
   1,   128, 171, 192, 205, 213, 219, 224, 228, 230, 233, 235, 236, 238, 239,
@@ -656,7 +655,7 @@ const int32_t x_by_xplus1[256] = {
   256,
 };
 
-const int32_t one_by_x[MAX_NELEM] = {
+const int32_t av1_one_by_x[MAX_NELEM] = {
   4096, 2048, 1365, 1024, 819, 683, 585, 512, 455, 410, 372, 341, 315,
   293,  273,  256,  241,  228, 216, 205, 195, 186, 178, 171, 164,
 };
@@ -665,7 +664,7 @@ static void calculate_intermediate_result(int32_t *dgd, int width, int height,
                                           int dgd_stride, int bit_depth,
                                           int sgr_params_idx, int radius_idx,
                                           int pass, int32_t *A, int32_t *B) {
-  const sgr_params_type *const params = &sgr_params[sgr_params_idx];
+  const sgr_params_type *const params = &av1_sgr_params[sgr_params_idx];
   const int r = params->r[radius_idx];
   const int width_ext = width + 2 * SGRPROJ_BORDER_HORZ;
   const int height_ext = height + 2 * SGRPROJ_BORDER_VERT;
@@ -726,7 +725,7 @@ static void calculate_intermediate_result(int32_t *dgd, int width, int height,
       // Further, in the calculation of B[k] below, if z == 0 and r == 2,
       // then A[k] "should be" 0. But then we can end up setting B[k] to a value
       // slightly above 2^(8 + bit depth), due to rounding in the value of
-      // one_by_x[25-1].
+      // av1_one_by_x[25-1].
       //
       // Thus we saturate so that, when z == 0, A[k] is set to 1 instead of 0.
       // This fixes the above issues (256 - A[k] fits in a uint8, and we can't
@@ -738,17 +737,17 @@ static void calculate_intermediate_result(int32_t *dgd, int width, int height,
       // would be a bad idea, as that corresponds to the case where the image
       // is very variable, when we want to preserve the local pixel value as
       // much as possible.
-      A[k] = x_by_xplus1[AOMMIN(z, 255)];  // in range [1, 256]
+      A[k] = av1_x_by_xplus1[AOMMIN(z, 255)];  // in range [1, 256]
 
       // SGRPROJ_SGR - A[k] < 2^8 (from above), B[k] < 2^(bit_depth) * n,
-      // one_by_x[n - 1] = round(2^12 / n)
+      // av1_one_by_x[n - 1] = round(2^12 / n)
       // => the product here is < 2^(20 + bit_depth) <= 2^32,
       // and B[k] is set to a value < 2^(8 + bit depth)
-      // This holds even with the rounding in one_by_x and in the overall
+      // This holds even with the rounding in av1_one_by_x and in the overall
       // result, as long as SGRPROJ_SGR - A[k] is strictly less than 2^8.
       B[k] = (int32_t)ROUND_POWER_OF_TWO((uint32_t)(SGRPROJ_SGR - A[k]) *
                                              (uint32_t)B[k] *
-                                             (uint32_t)one_by_x[n - 1],
+                                             (uint32_t)av1_one_by_x[n - 1],
                                          SGRPROJ_RECIP_BITS);
     }
   }
@@ -757,7 +756,7 @@ static void calculate_intermediate_result(int32_t *dgd, int width, int height,
 static void selfguided_restoration_fast_internal(
     int32_t *dgd, int width, int height, int dgd_stride, int32_t *dst,
     int dst_stride, int bit_depth, int sgr_params_idx, int radius_idx) {
-  const sgr_params_type *const params = &sgr_params[sgr_params_idx];
+  const sgr_params_type *const params = &av1_sgr_params[sgr_params_idx];
   const int r = params->r[radius_idx];
   const int width_ext = width + 2 * SGRPROJ_BORDER_HORZ;
   // Adjusting the stride of A and B here appears to avoid bad cache effects,
@@ -883,7 +882,7 @@ int av1_selfguided_restoration_c(const uint8_t *dgd8, int width, int height,
     }
   }
 
-  const sgr_params_type *const params = &sgr_params[sgr_params_idx];
+  const sgr_params_type *const params = &av1_sgr_params[sgr_params_idx];
   // If params->r == 0 we skip the corresponding filter. We only allow one of
   // the radii to be 0, as having both equal to 0 would be equivalent to
   // skipping SGR entirely.
@@ -899,11 +898,11 @@ int av1_selfguided_restoration_c(const uint8_t *dgd8, int width, int height,
   return 0;
 }
 
-void apply_selfguided_restoration_c(const uint8_t *dat8, int width, int height,
-                                    int stride, int eps, const int *xqd,
-                                    uint8_t *dst8, int dst_stride,
-                                    int32_t *tmpbuf, int bit_depth,
-                                    int highbd) {
+void av1_apply_selfguided_restoration_c(const uint8_t *dat8, int width,
+                                        int height, int stride, int eps,
+                                        const int *xqd, uint8_t *dst8,
+                                        int dst_stride, int32_t *tmpbuf,
+                                        int bit_depth, int highbd) {
   int32_t *flt0 = tmpbuf;
   int32_t *flt1 = flt0 + RESTORATION_UNITPELS_MAX;
   assert(width * height <= RESTORATION_UNITPELS_MAX);
@@ -912,9 +911,9 @@ void apply_selfguided_restoration_c(const uint8_t *dat8, int width, int height,
       dat8, width, height, stride, flt0, flt1, width, eps, bit_depth, highbd);
   (void)ret;
   assert(!ret);
-  const sgr_params_type *const params = &sgr_params[eps];
+  const sgr_params_type *const params = &av1_sgr_params[eps];
   int xq[2];
-  decode_xq(xqd, xq, params);
+  av1_decode_xq(xqd, xq, params);
   for (int i = 0; i < height; ++i) {
     for (int j = 0; j < width; ++j) {
       const int k = i * width + j;
@@ -950,9 +949,9 @@ static void sgrproj_filter_stripe(const RestorationUnitInfo *rui,
 
   for (int j = 0; j < stripe_width; j += procunit_width) {
     int w = AOMMIN(procunit_width, stripe_width - j);
-    apply_selfguided_restoration(src + j, w, stripe_height, src_stride,
-                                 rui->sgrproj_info.ep, rui->sgrproj_info.xqd,
-                                 dst + j, dst_stride, tmpbuf, bit_depth, 0);
+    av1_apply_selfguided_restoration(
+        src + j, w, stripe_height, src_stride, rui->sgrproj_info.ep,
+        rui->sgrproj_info.xqd, dst + j, dst_stride, tmpbuf, bit_depth, 0);
   }
 }
 
@@ -984,9 +983,9 @@ static void sgrproj_filter_stripe_highbd(const RestorationUnitInfo *rui,
                                          int32_t *tmpbuf, int bit_depth) {
   for (int j = 0; j < stripe_width; j += procunit_width) {
     int w = AOMMIN(procunit_width, stripe_width - j);
-    apply_selfguided_restoration(src8 + j, w, stripe_height, src_stride,
-                                 rui->sgrproj_info.ep, rui->sgrproj_info.xqd,
-                                 dst8 + j, dst_stride, tmpbuf, bit_depth, 1);
+    av1_apply_selfguided_restoration(
+        src8 + j, w, stripe_height, src_stride, rui->sgrproj_info.ep,
+        rui->sgrproj_info.xqd, dst8 + j, dst_stride, tmpbuf, bit_depth, 1);
   }
 }
 
@@ -1120,9 +1119,9 @@ void av1_loop_restoration_filter_frame_init(AV1LrStruct *lr_ctxt,
     const int plane_height = frame->crop_heights[is_uv];
     FilterFrameCtxt *lr_plane_ctxt = &lr_ctxt->ctxt[plane];
 
-    extend_frame(frame->buffers[plane], plane_width, plane_height,
-                 frame->strides[is_uv], RESTORATION_BORDER, RESTORATION_BORDER,
-                 highbd);
+    av1_extend_frame(frame->buffers[plane], plane_width, plane_height,
+                     frame->strides[is_uv], RESTORATION_BORDER,
+                     RESTORATION_BORDER, highbd);
 
     lr_plane_ctxt->rsi = rsi;
     lr_plane_ctxt->ss_x = is_uv && seq_params->subsampling_x;
@@ -1146,7 +1145,7 @@ void av1_loop_restoration_copy_planes(AV1LrStruct *loop_rest_ctxt,
   static const copy_fun copy_funs[3] = { aom_yv12_partial_coloc_copy_y,
                                          aom_yv12_partial_coloc_copy_u,
                                          aom_yv12_partial_coloc_copy_v };
-
+  assert(num_planes <= 3);
   for (int plane = 0; plane < num_planes; ++plane) {
     if (cm->rst_info[plane].frame_restoration_type == RESTORE_NONE) continue;
     AV1PixelRect tile_rect = loop_rest_ctxt->ctxt[plane].tile_rect;

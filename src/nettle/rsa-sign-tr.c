@@ -239,8 +239,9 @@ static int
 sec_equal(const mp_limb_t *a, const mp_limb_t *b, size_t limbs)
 {
   volatile mp_limb_t z = 0;
+  size_t i;
 
-  for (size_t i = 0; i < limbs; i++)
+  for (i = 0; i < limbs; i++)
     {
       z |= (a[i] ^ b[i]);
     }

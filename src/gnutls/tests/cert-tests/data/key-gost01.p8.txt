@@ -1,0 +1,33 @@
+Public Key Info:
+	Public Key Algorithm: GOST R 34.10-2001
+	Key Security Level: High (256 bits)
+
+curve:	CryptoPro-XchA
+digest:	GOSTR341194
+paramset:	CryptoPro-A
+private key:
+	0b:29:3b:e0:50:d0:08:2b:da:e7:85:63:1a:6b:ab:68
+	f3:5b:42:78:6d:6d:da:56:af:af:16:98:91:04:0f:77
+	
+
+x:
+	57:7e:32:4f:e7:0f:2b:6d:f4:5c:43:7a:03:05:e5:fd
+	2c:89:31:8c:13:cd:08:75:40:1a:02:60:75:68:95:84
+	
+
+y:
+	60:1a:ea:ca:bc:66:0f:df:b0:cb:c7:56:7e:bb:a6:ea
+	8d:e4:0f:ae:85:7c:9a:d0:03:88:95:b9:16:cc:eb:8f
+	
+
+
+Public Key PIN:
+	pin-sha256:zO1bMbwojs1uE302Tl1uAkcXYVw9AW8b3EauBIKNpM4=
+Public Key ID:
+	sha256:cced5b31bc288ecd6e137d364e5d6e024717615c3d016f1bdc46ae04828da4ce
+	sha1:1a0442de4518bb407e6ed5690046839a13fec03d
+
+-----BEGIN PRIVATE KEY-----
+MEUCAQAwHAYGKoUDAgITMBIGByqFAwICJAAGByqFAwICHgEEIgQgdw8EkZgWr69W
+2m1teEJb82iraxpjhefaKwjQUOA7KQs=
+-----END PRIVATE KEY-----

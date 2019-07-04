@@ -206,7 +206,7 @@ static INLINE void sync_write(AV1LfSync *const lf_sync, int r, int c,
 
 static void enqueue_lf_jobs(AV1LfSync *lf_sync, AV1_COMMON *cm, int start,
                             int stop,
-#if LOOP_FILTER_BITMASK
+#if CONFIG_LPF_MASK
                             int is_decoding,
 #endif
                             int plane_start, int plane_end) {
@@ -223,7 +223,7 @@ static void enqueue_lf_jobs(AV1LfSync *lf_sync, AV1_COMMON *cm, int start,
         continue;
       else if (plane == 2 && !(cm->lf.filter_level_v))
         continue;
-#if LOOP_FILTER_BITMASK
+#if CONFIG_LPF_MASK
       int step = MAX_MIB_SIZE;
       if (is_decoding) {
         step = MI_SIZE_64X64;
@@ -325,7 +325,7 @@ static int loop_filter_row_worker(void *arg1, void *arg2) {
   return 1;
 }
 
-#if LOOP_FILTER_BITMASK
+#if CONFIG_LPF_MASK
 static INLINE void thread_loop_filter_bitmask_rows(
     const YV12_BUFFER_CONFIG *const frame_buffer, AV1_COMMON *const cm,
     struct macroblockd_plane *planes, MACROBLOCKD *xd,
@@ -388,18 +388,18 @@ static int loop_filter_bitmask_row_worker(void *arg1, void *arg2) {
                                   lf_data->planes, lf_data->xd, lf_sync);
   return 1;
 }
-#endif  // LOOP_FILTER_BITMASK
+#endif  // CONFIG_LPF_MASK
 
 static void loop_filter_rows_mt(YV12_BUFFER_CONFIG *frame, AV1_COMMON *cm,
                                 MACROBLOCKD *xd, int start, int stop,
                                 int plane_start, int plane_end,
-#if LOOP_FILTER_BITMASK
+#if CONFIG_LPF_MASK
                                 int is_decoding,
 #endif
                                 AVxWorker *workers, int nworkers,
                                 AV1LfSync *lf_sync) {
   const AVxWorkerInterface *const winterface = aom_get_worker_interface();
-#if LOOP_FILTER_BITMASK
+#if CONFIG_LPF_MASK
   int sb_rows;
   if (is_decoding) {
     sb_rows =
@@ -429,7 +429,7 @@ static void loop_filter_rows_mt(YV12_BUFFER_CONFIG *frame, AV1_COMMON *cm,
   }
 
   enqueue_lf_jobs(lf_sync, cm, start, stop,
-#if LOOP_FILTER_BITMASK
+#if CONFIG_LPF_MASK
                   is_decoding,
 #endif
                   plane_start, plane_end);
@@ -439,7 +439,7 @@ static void loop_filter_rows_mt(YV12_BUFFER_CONFIG *frame, AV1_COMMON *cm,
     AVxWorker *const worker = &workers[i];
     LFWorkerData *const lf_data = &lf_sync->lfdata[i];
 
-#if LOOP_FILTER_BITMASK
+#if CONFIG_LPF_MASK
     if (is_decoding) {
       worker->hook = loop_filter_bitmask_row_worker;
     } else {
@@ -471,7 +471,7 @@ static void loop_filter_rows_mt(YV12_BUFFER_CONFIG *frame, AV1_COMMON *cm,
 void av1_loop_filter_frame_mt(YV12_BUFFER_CONFIG *frame, AV1_COMMON *cm,
                               MACROBLOCKD *xd, int plane_start, int plane_end,
                               int partial_frame,
-#if LOOP_FILTER_BITMASK
+#if CONFIG_LPF_MASK
                               int is_decoding,
 #endif
                               AVxWorker *workers, int num_workers,
@@ -488,7 +488,7 @@ void av1_loop_filter_frame_mt(YV12_BUFFER_CONFIG *frame, AV1_COMMON *cm,
   end_mi_row = start_mi_row + mi_rows_to_filter;
   av1_loop_filter_frame_init(cm, plane_start, plane_end);
 
-#if LOOP_FILTER_BITMASK
+#if CONFIG_LPF_MASK
   if (is_decoding) {
     cm->is_decoding = is_decoding;
     // TODO(chengchen): currently use one thread to build bitmasks for the

@@ -7,7 +7,8 @@ Non-predictable random number.  Fatal in parts
 of session if broken, i.e., vulnerable to statistical analysis.
 @item GNUTLS_@-RND_@-RANDOM
 Pseudo-random cryptographic random number.
-Fatal in session if broken.
+Fatal in session if broken. Example use: temporal keys.
 @item GNUTLS_@-RND_@-KEY
-Fatal in many sessions if broken.
+Fatal in many sessions if broken. Example use:
+Long-term keys.
 @end table

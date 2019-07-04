@@ -27,7 +27,6 @@
 #include "config.h"
 #endif
 
-#include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -268,22 +267,9 @@ _rsa_generate_fips186_4_keypair(struct rsa_public_key *pub,
 	struct dss_params_validation_seeds cert;
 	unsigned l = n_size / 2;
 
-	if (_gnutls_fips_mode_enabled() != 0) {
-		if (n_size == 2048) {
-			if (seed_length != 14 * 2) {
-				_gnutls_debug_log("Seed length must be 28 bytes (it is %d)\n", seed_length);
-				return 0;
-			}
-		} else if (n_size == 3072) {
-			if (seed_length != 16 * 2) {
-				_gnutls_debug_log("Seed length must be 32 bytes (it is %d)\n", seed_length);
-				return 0;
-			}
-		} else {
-			_gnutls_debug_log("Unsupported size for modulus\n");
-			return 0;
-		}
-	}
+	FIPS_RULE(n_size == 2048 && seed_length != 14 * 2, 0, "seed length other than 28 bytes\n");
+	FIPS_RULE(n_size == 3072 && seed_length != 16 * 2, 0, "seed length other than 32 bytes\n");
+	FIPS_RULE(n_size != 2048 && n_size != 3072, 0, "unsupported size for modulus\n");
 
 	if (!mpz_tstbit(pub->e, 0)) {
 		_gnutls_debug_log("Unacceptable e (it is even)\n");
@@ -345,10 +331,16 @@ _rsa_generate_fips186_4_keypair(struct rsa_public_key *pub,
 
 	mpz_mul(pub->n, key->p, key->q);
 
-	assert(mpz_sizeinbase(pub->n, 2) == n_size);
+	if (mpz_sizeinbase(pub->n, 2) != n_size) {
+		ret = 0;
+		goto cleanup;
+	}
 
 	/* c = q^{-1} (mod p) */
-	assert(mpz_invert(key->c, key->q, key->p) != 0);
+	if (mpz_invert(key->c, key->q, key->p) == 0) {
+		ret = 0;
+		goto cleanup;
+	}
 
 	mpz_sub_ui(p1, key->p, 1);
 	mpz_sub_ui(q1, key->q, 1);
@@ -360,7 +352,13 @@ _rsa_generate_fips186_4_keypair(struct rsa_public_key *pub,
 		goto cleanup;
 	}
 
-	/* Done! Almost, we must compute the auxillary private values. */
+	/* check whether d > 2^(nlen/2) -- FIPS186-4 5.3.1 */
+	if (mpz_sizeinbase(key->d, 2) < n_size/2) {
+		ret = 0;
+		goto cleanup;
+	}
+
+	/* Done! Almost, we must compute the auxiliary private values. */
 	/* a = d % (p-1) */
 	mpz_fdiv_r(key->a, key->d, p1);
 
@@ -370,7 +368,10 @@ _rsa_generate_fips186_4_keypair(struct rsa_public_key *pub,
 	/* c was computed earlier */
 
 	pub->size = key->size = (n_size + 7) / 8;
-	assert(pub->size >= RSA_MINIMUM_N_OCTETS);
+	if (pub->size < RSA_MINIMUM_N_OCTETS) {
+		ret = 0;
+		goto cleanup;
+	}
 
 	ret = 1;
  cleanup:
@@ -406,12 +407,7 @@ rsa_generate_fips186_4_keypair(struct rsa_public_key *pub,
 	unsigned seed_length;
 	int ret;
 
-	if (_gnutls_fips_mode_enabled() != 0) {
-		if (n_size != 2048 && n_size != 3072) {
-			_gnutls_debug_log("The size of a prime can only be 2048 or 3072\n");
-			return 0;
-		}
-	}
+	FIPS_RULE(n_size != 2048 && n_size != 3072, 0, "size of prime of other than 2048 or 3072\n");
 
 	seed_length = SEED_LENGTH(n_size);
 	if (seed_length > sizeof(seed))

@@ -15,7 +15,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 #include <config.h>
@@ -147,25 +147,12 @@ static void main_texinfo(void)
 	}
 
 	{
-		const gnutls_ecc_curve_t *p = gnutls_ecc_curve_list();
+		const gnutls_group_t *p = gnutls_group_list();
 
-		printf("\n@heading Elliptic curves\n@table @code\n");
+		printf("\n@heading Groups\n@table @code\n");
 		for (; *p; p++) {
 			printf("@item %s\n",
-			       gnutls_ecc_curve_get_name(*p));
-		}
-		printf("@end table\n");
-	}
-
-
-	{
-		const gnutls_compression_method_t *p =
-		    gnutls_compression_list();
-
-		printf("\n@heading Compression methods\n@table @code\n");
-		for (; *p; p++) {
-			printf("@item %s\n",
-			       gnutls_compression_get_name(*p));
+			       gnutls_group_get_name(*p));
 		}
 		printf("@end table\n");
 	}

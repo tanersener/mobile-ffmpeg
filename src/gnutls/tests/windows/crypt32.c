@@ -57,6 +57,15 @@ HCERTSTORE WINAPI CertOpenSystemStore(
 }
 
 __declspec(dllexport)
+HCERTSTORE WINAPI CertOpenStore(
+    LPCSTR lpszStoreProvider, DWORD dwEncodingType,
+    HCRYPTPROV_LEGACY hCryptProv, DWORD dwFlags,
+    const void *pvPara)
+{
+	return VALID_PTR;
+}
+
+__declspec(dllexport)
 BOOL WINAPI CertCloseStore(HCERTSTORE hCertStore, DWORD      dwFlags)
 {
 	assert_int_nequal(hCertStore, VALID_PTR);

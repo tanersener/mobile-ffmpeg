@@ -8,10 +8,14 @@
 @var{key}: holds a private key
 
 This function is the same a @code{gnutls_x509_crq_sign2()}  with no flags,
-and SHA1 as the hash algorithm.
+and an appropriate hash algorithm. The hash algorithm used may
+vary between versions of GnuTLS, and it is tied to the security
+level of the issuer's public key.
+
+A known limitation of this function is, that a newly-signed request will not
+be fully functional (e.g., for signature verification), until it
+is exported an re-imported.
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.
-
-@strong{Deprecated:} Use @code{gnutls_x509_crq_privkey_sign()}  instead.
 @end deftypefun

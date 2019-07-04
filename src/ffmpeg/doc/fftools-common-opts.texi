@@ -36,7 +36,10 @@ Possible forms of stream specifiers are:
 Matches the stream with this index. E.g. @code{-threads:1 4} would set the
 thread count for the second stream to 4. If @var{stream_index} is used as an
 additional stream specifier (see below), then it selects stream number
-@var{stream_index} from the matching streams.
+@var{stream_index} from the matching streams. Stream numbering is based on the
+order of the streams as detected by libavformat except when a program ID is
+also specified. In this case it is based on the ordering of the streams in the
+program.
 @item @var{stream_type}[:@var{additional_stream_specifier}]
 @var{stream_type} is one of following: 'v' or 'V' for video, 'a' for audio, 's'
 for subtitle, 'd' for data, and 't' for attachments. 'v' matches all video
@@ -106,6 +109,10 @@ Print detailed information about the muxer named @var{muxer_name}. Use the
 @item filter=@var{filter_name}
 Print detailed information about the filter name @var{filter_name}. Use the
 @option{-filters} option to get a list of all filters.
+
+@item bsf=@var{bitstream_filter_name}
+Print detailed information about the bitstream filter name @var{bitstream_filter_name}.
+Use the @option{-bsfs} option to get a list of all bitstream filters.
 @end table
 
 @item -version

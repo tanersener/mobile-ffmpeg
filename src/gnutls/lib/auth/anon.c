@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2000-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -16,7 +17,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -62,10 +63,7 @@ const mod_auth_st anon_auth_struct = {
 static int
 gen_anon_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
 {
-	bigint_t g, p;
-	const bigint_t *mpis;
 	int ret;
-	gnutls_dh_params_t dh_params;
 	gnutls_anon_server_credentials_t cred;
 
 	cred = (gnutls_anon_server_credentials_t)
@@ -75,30 +73,17 @@ gen_anon_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
 		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 
-	dh_params =
-	    _gnutls_get_dh_params(cred->dh_params, cred->params_func,
-				  session);
-	mpis = _gnutls_dh_params_to_mpi(dh_params);
-	if (mpis == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_NO_TEMPORARY_DH_PARAMS;
-	}
-
-	p = mpis[0];
-	g = mpis[1];
-
 	if ((ret =
-	     _gnutls_auth_info_set(session, GNUTLS_CRD_ANON,
+	     _gnutls_auth_info_init(session, GNUTLS_CRD_ANON,
 				   sizeof(anon_auth_info_st), 1)) < 0) {
 		gnutls_assert();
 		return ret;
 	}
 
-	_gnutls_dh_set_group(session, g, p);
-
-	ret = _gnutls_set_dh_pk_params(session, g, p, dh_params->q_bits);
-	if (ret < 0)
+	ret = _gnutls_figure_dh_params(session, cred->dh_params, cred->params_func, cred->dh_sec_param);
+	if (ret < 0) {
 		return gnutls_assert_val(ret);
+	}
 
 	ret =
 	    _gnutls_dh_common_print_server_kx(session, data);
@@ -114,36 +99,8 @@ static int
 proc_anon_client_kx(gnutls_session_t session, uint8_t * data,
 		    size_t _data_size)
 {
-	gnutls_anon_server_credentials_t cred;
-	int ret;
-	bigint_t p, g;
-	gnutls_dh_params_t dh_params;
-	const bigint_t *mpis;
-
-	cred = (gnutls_anon_server_credentials_t)
-	    _gnutls_get_cred(session, GNUTLS_CRD_ANON);
-	if (cred == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
-	}
-
-	dh_params =
-	    _gnutls_get_dh_params(cred->dh_params, cred->params_func,
-				  session);
-	mpis = _gnutls_dh_params_to_mpi(dh_params);
-	if (mpis == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_NO_TEMPORARY_DH_PARAMS;
-	}
-
-	p = mpis[0];
-	g = mpis[1];
-
-	ret =
-	    _gnutls_proc_dh_common_client_kx(session, data, _data_size, g,
-					     p, NULL);
-
-	return ret;
+	return
+	    _gnutls_proc_dh_common_client_kx(session, data, _data_size, NULL);
 
 }
 
@@ -156,7 +113,7 @@ proc_anon_server_kx(gnutls_session_t session, uint8_t * data,
 
 	/* set auth_info */
 	if ((ret =
-	     _gnutls_auth_info_set(session, GNUTLS_CRD_ANON,
+	     _gnutls_auth_info_init(session, GNUTLS_CRD_ANON,
 				   sizeof(anon_auth_info_st), 1)) < 0) {
 		gnutls_assert();
 		return ret;

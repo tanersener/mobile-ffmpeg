@@ -1,0 +1,1 @@
+@item @var{unsigned} @ref{gnutls_pkcs11_token_check_mechanism} (const char * @var{url}, unsigned long @var{mechanism}, void * @var{ptr}, unsigned @var{psize}, unsigned @var{flags})

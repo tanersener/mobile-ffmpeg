@@ -40,32 +40,35 @@ LIBRARY_CHROMAPRINT=27
 LIBRARY_TWOLAME=28
 LIBRARY_SDL=29
 LIBRARY_TESSERACT=30
-LIBRARY_GIFLIB=31
-LIBRARY_JPEG=32
-LIBRARY_LIBOGG=33
-LIBRARY_LIBPNG=34
-LIBRARY_LIBUUID=35
-LIBRARY_NETTLE=36
-LIBRARY_TIFF=37
-LIBRARY_EXPAT=38
-LIBRARY_SNDFILE=39
-LIBRARY_LEPTONICA=40
-LIBRARY_ZLIB=41
-LIBRARY_AUDIOTOOLBOX=42
-LIBRARY_COREIMAGE=43
-LIBRARY_BZIP2=44
-LIBRARY_VIDEOTOOLBOX=45
-LIBRARY_AVFOUNDATION=46
+LIBRARY_OPENH264=31
+LIBRARY_GIFLIB=32
+LIBRARY_JPEG=33
+LIBRARY_LIBOGG=34
+LIBRARY_LIBPNG=35
+LIBRARY_LIBUUID=36
+LIBRARY_NETTLE=37
+LIBRARY_TIFF=38
+LIBRARY_EXPAT=39
+LIBRARY_SNDFILE=40
+LIBRARY_LEPTONICA=41
+LIBRARY_ZLIB=42
+LIBRARY_AUDIOTOOLBOX=43
+LIBRARY_COREIMAGE=44
+LIBRARY_BZIP2=45
+LIBRARY_VIDEOTOOLBOX=46
+LIBRARY_AVFOUNDATION=47
 
 # ENABLE ARCH
 ENABLED_ARCHITECTURES=(1 1 1 1 1 1)
 
 # ENABLE LIBRARIES
-ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 
 export BASEDIR=$(pwd)
-
 export MOBILE_FFMPEG_TMPDIR="${BASEDIR}/.tmp"
+
+RECONF_LIBRARIES=()
+REBUILD_LIBRARIES=()
 
 # CHECKING IF XCODE IS INSTALLED
 if ! [ -x "$(command -v xcrun)" ]; then
@@ -90,9 +93,9 @@ display_help() {
     COMMAND=`echo $0 | sed -e 's/\.\///g'`
 
     if [[ -z ${MOBILE_FFMPEG_LTS_BUILD} ]]; then
-        echo -e "\n'"$COMMAND"' builds FFmpeg and MobileFFmpeg for IOS platform. By default six architectures (armv7, armv7s, arm64, arm64e, i386 and x86_64) are built without any external libraries enabled. Options can be used to disable architectures and/or enable external libraries. Please note that GPL libraries (external libraries with GPL license) need --enable-gpl flag to be set explicitly. When compilation ends universal fat binaries and IOS frameworks are created with enabled architectures inside.\n"
+        echo -e "\n'"$COMMAND"' builds FFmpeg and MobileFFmpeg for iOS platform. By default six architectures (armv7, armv7s, arm64, arm64e, i386 and x86_64) are built without any external libraries enabled. Options can be used to disable architectures and/or enable external libraries. Please note that GPL libraries (external libraries with GPL license) need --enable-gpl flag to be set explicitly. When compilation ends universal fat binaries and iOS frameworks are created with enabled architectures inside.\n"
     else
-        echo -e "\n'"$COMMAND"' builds FFmpeg and MobileFFmpeg for IOS platform. By default five architectures (armv7, armv7s, arm64, i386 and x86_64) are built without any external libraries enabled. Options can be used to disable architectures and/or enable external libraries. Please note that GPL libraries (external libraries with GPL license) need --enable-gpl flag to be set explicitly. When compilation ends universal fat binaries and IOS frameworks are created with enabled architectures inside.\n"
+        echo -e "\n'"$COMMAND"' builds FFmpeg and MobileFFmpeg for iOS platform. By default five architectures (armv7, armv7s, arm64, i386 and x86_64) are built without any external libraries enabled. Options can be used to disable architectures and/or enable external libraries. Please note that GPL libraries (external libraries with GPL license) need --enable-gpl flag to be set explicitly. When compilation ends universal fat binaries and iOS frameworks are created with enabled architectures inside.\n"
     fi
 
     echo -e "Usage: ./"$COMMAND" [OPTION]...\n"
@@ -102,7 +105,7 @@ display_help() {
     echo -e "Options:"
 
     echo -e "  -h, --help\t\t\tdisplay this help and exit"
-    echo -e "  -V, --version\t\t\tdisplay version information and exit"
+    echo -e "  -v, --version\t\t\tdisplay version information and exit"
     echo -e "  -d, --debug\t\t\tbuild with debug information"
     echo -e "  -s, --speed\t\t\toptimize for speed instead of size"
     echo -e "  -l, --lts\t\t\tbuild lts packages to support sdk 9.3+ devices, does not include arm64e architecture"
@@ -150,6 +153,7 @@ display_help() {
     echo -e "  --enable-libwebp\t\tbuild with libwebp [no]"
     echo -e "  --enable-libxml2\t\tbuild with libxml2 [no]"
     echo -e "  --enable-opencore-amr\t\tbuild with opencore-amr [no]"
+    echo -e "  --enable-openh264\t\tbuild with openh264 [no]"
     echo -e "  --enable-opus\t\t\tbuild with opus [no]"
     echo -e "  --enable-sdl\t\t\tbuild with sdl [no]"
     echo -e "  --enable-shine\t\tbuild with shine [no]"
@@ -192,6 +196,16 @@ skip_library() {
     export ${SKIP_VARIABLE}=1
 }
 
+no_output_redirection() {
+    export NO_OUTPUT_REDIRECTION=1
+}
+
+no_workspace_cleanup_library() {
+    NO_WORKSPACE_CLEANUP_VARIABLE=$(echo "NO_WORKSPACE_CLEANUP_$1" | sed "s/\-/\_/g")
+
+    export ${NO_WORKSPACE_CLEANUP_VARIABLE}=1
+}
+
 enable_debug() {
     export MOBILE_FFMPEG_DEBUG="-g"
 
@@ -205,22 +219,50 @@ optimize_for_speed() {
 enable_lts_build() {
     export MOBILE_FFMPEG_LTS_BUILD="1"
 
-    # XCODE 7.3 HAS SDK 9.3
+    # XCODE 7.3 HAS IOS SDK 9.3
     export IOS_MIN_VERSION=9.3
 
     disable_arch "arm64e"
 }
 
 reconf_library() {
-    RECONF_VARIABLE=$(echo "RECONF_$1" | sed "s/\-/\_/g")
+    local RECONF_VARIABLE=$(echo "RECONF_$1" | sed "s/\-/\_/g")
+    local library_supported=0
 
-    export ${RECONF_VARIABLE}=1
+    for library in {1..42}
+    do
+        library_name=$(get_library_name $((library - 1)))
+
+        if [[ $1 != "ffmpeg" ]] && [[ ${library_name} == $1 ]]; then
+            export ${RECONF_VARIABLE}=1
+            RECONF_LIBRARIES+=($1)
+            library_supported=1
+        fi
+    done
+
+    if [[ ${library_supported} -eq 0 ]]; then
+        echo -e "INFO: --reconf flag detected for library $1 is not supported.\n" 1>>${BASEDIR}/build.log 2>&1
+    fi
 }
 
 rebuild_library() {
-    REBUILD_VARIABLE=$(echo "REBUILD_$1" | sed "s/\-/\_/g")
+    local REBUILD_VARIABLE=$(echo "REBUILD_$1" | sed "s/\-/\_/g")
+    local library_supported=0
 
-    export ${REBUILD_VARIABLE}=1
+    for library in {1..42}
+    do
+        library_name=$(get_library_name $((library - 1)))
+
+        if [[ $1 != "ffmpeg" ]] && [[ ${library_name} == $1 ]]; then
+            export ${REBUILD_VARIABLE}=1
+            REBUILD_LIBRARIES+=($1)
+            library_supported=1
+        fi
+    done
+
+    if [[ ${library_supported} -eq 0 ]]; then
+        echo -e "INFO: --rebuild flag detected for library $1 is not supported.\n" 1>>${BASEDIR}/build.log 2>&1
+    fi
 }
 
 enable_library() {
@@ -332,6 +374,9 @@ set_library() {
         ;;
         opencore-amr)
             ENABLED_LIBRARIES[LIBRARY_OPENCOREAMR]=$2
+        ;;
+        openh264)
+            ENABLED_LIBRARIES[LIBRARY_OPENH264]=$2
         ;;
         opus)
             ENABLED_LIBRARIES[LIBRARY_OPUS]=$2
@@ -468,7 +513,7 @@ print_enabled_libraries() {
     let enabled=0;
 
     # FIRST BUILT-IN LIBRARIES
-    for library in {41..46}
+    for library in {42..47}
     do
         if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
             if [[ ${enabled} -ge 1 ]]; then
@@ -480,7 +525,7 @@ print_enabled_libraries() {
     done
 
     # THEN EXTERNAL LIBRARIES
-    for library in {0..30}
+    for library in {0..31}
     do
         if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
             if [[ ${enabled} -ge 1 ]]; then
@@ -495,6 +540,48 @@ print_enabled_libraries() {
         echo ""
     else
         echo "none"
+    fi
+}
+
+print_reconfigure_requested_libraries() {
+    local counter=0;
+
+    for RECONF_LIBRARY in "${RECONF_LIBRARIES[@]}"
+    do
+        if [[ ${counter} -eq 0 ]]; then
+            echo -n "Reconfigure: "
+        else
+            echo -n ", "
+        fi
+
+        echo -n ${RECONF_LIBRARY}
+
+        counter=$((${counter} + 1));
+    done
+
+    if [[ ${counter} -gt 0 ]]; then
+        echo ""
+    fi
+}
+
+print_rebuild_requested_libraries() {
+    local counter=0;
+
+    for REBUILD_LIBRARY in "${REBUILD_LIBRARIES[@]}"
+    do
+        if [[ ${counter} -eq 0 ]]; then
+            echo -n "Rebuild: "
+        else
+            echo -n ", "
+        fi
+
+        echo -n ${REBUILD_LIBRARY}
+
+        counter=$((${counter} + 1));
+    done
+
+    if [[ ${counter} -gt 0 ]]; then
+        echo ""
     fi
 }
 
@@ -541,6 +628,28 @@ build_info_plist() {
 EOF
 }
 
+build_modulemap() {
+    local FILE_PATH="$1"
+
+    cat > ${FILE_PATH} <<EOF
+framework module mobileffmpeg {
+
+  header "ArchDetect.h"
+  header "LogDelegate.h"
+  header "MediaInformation.h"
+  header "MediaInformationParser.h"
+  header "MobileFFmpeg.h"
+  header "MobileFFmpegConfig.h"
+  header "Statistics.h"
+  header "StatisticsDelegate.h"
+  header "StreamInformation.h"
+  header "mobileffmpeg_exception.h"
+
+  export *
+}
+EOF
+}
+
 create_static_fat_library() {
     local FAT_LIBRARY_PATH=${BASEDIR}/prebuilt/ios-universal/$2-universal
 
@@ -550,7 +659,7 @@ create_static_fat_library() {
 
     for TARGET_ARCH in "${TARGET_ARCH_LIST[@]}"
     do
-        LIPO_COMMAND+=" $(find ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-ios-darwin -name $1)"
+        LIPO_COMMAND+=" $(find ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin -name $1)"
     done
 
     LIPO_COMMAND+=" -output ${FAT_LIBRARY_PATH}/lib/$1"
@@ -585,17 +694,17 @@ get_external_library_license_path() {
         25) echo "${BASEDIR}/src/$(get_library_name $1)/COPYING.LGPL" ;;
         27) echo "${BASEDIR}/src/$(get_library_name $1)/LICENSE.md" ;;
         29) echo "${BASEDIR}/src/$(get_library_name $1)/COPYING.txt" ;;
-        32) echo "${BASEDIR}/src/$(get_library_name $1)/LICENSE.md " ;;
-        36) echo "${BASEDIR}/src/$(get_library_name $1)/COPYING.LESSERv3" ;;
-        37) echo "${BASEDIR}/src/$(get_library_name $1)/COPYRIGHT" ;;
-        40) echo "${BASEDIR}/src/$(get_library_name $1)/leptonica-license.txt" ;;
-        4 | 10 | 13 | 19 | 21 | 26 | 34) echo "${BASEDIR}/src/$(get_library_name $1)/LICENSE" ;;
+        33) echo "${BASEDIR}/src/$(get_library_name $1)/LICENSE.md " ;;
+        37) echo "${BASEDIR}/src/$(get_library_name $1)/COPYING.LESSERv3" ;;
+        38) echo "${BASEDIR}/src/$(get_library_name $1)/COPYRIGHT" ;;
+        41) echo "${BASEDIR}/src/$(get_library_name $1)/leptonica-license.txt" ;;
+        4 | 10 | 13 | 19 | 21 | 26 | 31 | 35) echo "${BASEDIR}/src/$(get_library_name $1)/LICENSE" ;;
         *) echo "${BASEDIR}/src/$(get_library_name $1)/COPYING" ;;
     esac
 }
 
 get_external_library_version() {
-    echo "$(grep Version ${BASEDIR}/prebuilt/ios-${TARGET_ARCH_LIST[0]}-ios-darwin/pkgconfig/$1.pc 2>>${BASEDIR}/build.log | sed 's/Version://g;s/\ //g')"
+    echo "$(grep Version ${BASEDIR}/prebuilt/ios-${TARGET_ARCH_LIST[0]}-apple-darwin/pkgconfig/$1.pc 2>>${BASEDIR}/build.log | sed 's/Version://g;s/\ //g')"
 }
 
 # ENABLE COMMON FUNCTIONS
@@ -616,7 +725,7 @@ do
 	    -h | --help)
             DISPLAY_HELP="1"
 	    ;;
-	    -V | --version)
+	    -v | --version)
             display_version
             exit 0
 	    ;;
@@ -625,8 +734,16 @@ do
 
             skip_library ${SKIP_LIBRARY}
 	    ;;
+	    --no-output-redirection)
+            no_output_redirection
+	    ;;
+        --no-workspace-cleanup-*)
+            NO_WORKSPACE_CLEANUP_LIBRARY=`echo $1 | sed -e 's/^--[A-Za-z]*-[A-Za-z]*-[A-Za-z]*-//g'`
+
+            no_workspace_cleanup_library ${NO_WORKSPACE_CLEANUP_LIBRARY}
+	    ;;
         -d | --debug)
-            enable_debug
+          enable_debug
 	    ;;
 	    -s | --speed)
 	        optimize_for_speed
@@ -648,7 +765,7 @@ do
             rebuild_library ${BUILD_LIBRARY}
 	    ;;
 	    --full)
-            for library in {0..46}
+            for library in {0..47}
             do
                 if [[ $library -ne 18 ]] && [[ $library -ne 19 ]] && [[ $library -ne 20 ]] && [[ $library -ne 21 ]]; then
                     enable_library $(get_library_name $library)
@@ -702,13 +819,31 @@ if [[ ! -z ${MOBILE_FFMPEG_LTS_BUILD} ]] && [[ "${DETECTED_IOS_SDK_VERSION}" != 
     fi
 fi
 
-echo -e "Building mobile-ffmpeg ${BUILD_TYPE_ID}static library for IOS\n"
+# DISABLE 32-bit architectures on newer IOS versions
+if [[ ${DETECTED_IOS_SDK_VERSION} == 11* ]] || [[ ${DETECTED_IOS_SDK_VERSION} == 12* ]]; then
+    if [[ -z ${BUILD_FORCE} ]] && [[ ${ENABLED_ARCHITECTURES[${ARCH_ARMV7}]} -eq 1 ]]; then
+        echo -e "INFO: Disabled armv7 architecture which is not supported on SDK ${DETECTED_IOS_SDK_VERSION}\n" 1>>${BASEDIR}/build.log 2>&1
+        disable_arch "armv7"
+    fi
+    if [[ -z ${BUILD_FORCE} ]] && [[ ${ENABLED_ARCHITECTURES[${ARCH_ARMV7S}]} -eq 1 ]]; then
+        echo -e "INFO: Disabled armv7s architecture which is not supported on SDK ${DETECTED_IOS_SDK_VERSION}\n" 1>>${BASEDIR}/build.log 2>&1
+        disable_arch "armv7s"
+    fi
+    if [[ -z ${BUILD_FORCE} ]] && [[ ${ENABLED_ARCHITECTURES[${ARCH_I386}]} -eq 1 ]]; then
+        echo -e "INFO: Disabled i386 architecture which is not supported on SDK ${DETECTED_IOS_SDK_VERSION}\n" 1>>${BASEDIR}/build.log 2>&1
+        disable_arch "i386"
+    fi
+fi
 
-echo -e -n "INFO: Building mobile-ffmpeg ${BUILD_VERSION} ${BUILD_TYPE_ID}for IOS: " 1>>${BASEDIR}/build.log 2>&1
+echo -e "\nBuilding mobile-ffmpeg ${BUILD_TYPE_ID}static library for iOS\n"
+
+echo -e -n "INFO: Building mobile-ffmpeg ${BUILD_VERSION} ${BUILD_TYPE_ID}for iOS: " 1>>${BASEDIR}/build.log 2>&1
 echo -e `date` 1>>${BASEDIR}/build.log 2>&1
 
 print_enabled_architectures
 print_enabled_libraries
+print_reconfigure_requested_libraries
+print_rebuild_requested_libraries
 
 # CHECKING GPL LIBRARIES
 for gpl_library in {18..21}
@@ -739,6 +874,8 @@ do
         export ARCH=$(get_arch_name $run_arch)
         export TARGET_SDK=$(get_target_sdk)
         export SDK_PATH=$(get_sdk_path)
+        export SDK_NAME=$(get_sdk_name)
+
         export LIPO="$(xcrun --sdk $(get_sdk_name) -f lipo)"
 
         . ${BASEDIR}/build/main-ios.sh "${ENABLED_LIBRARIES[@]}"
@@ -753,7 +890,7 @@ do
         TARGET_ARCH_LIST+=(${TARGET_ARCH})
 
         # CLEAR FLAGS
-        for library in {1..47}
+        for library in {1..48}
         do
             library_name=$(get_library_name $((library - 1)))
             unset $(echo "OK_${library_name}" | sed "s/\-/\_/g")
@@ -768,7 +905,7 @@ BUILD_LIBRARY_EXTENSION="a";
 
 if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
 
-    echo -e -n "\n\nCreating frameworks under prebuilt: "
+    echo -e -n "\n\nCreating frameworks and universal libraries under prebuilt: "
 
     # BUILDING UNIVERSAL LIBRARIES
     rm -rf ${BASEDIR}/prebuilt/ios-universal 1>>${BASEDIR}/build.log 2>&1
@@ -777,7 +914,7 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
     mkdir -p ${BASEDIR}/prebuilt/ios-framework 1>>${BASEDIR}/build.log 2>&1
 
     # 1. EXTERNAL LIBRARIES
-    for library in {0..40}
+    for library in {0..41}
     do
         if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
 
@@ -791,7 +928,7 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
                 exit 1
             fi
 
-            echo -e "Creating fat library for ${library_name}\n" 1>>${BASEDIR}/build.log 2>&1
+            echo -e "Creating universal library for ${library_name}\n" 1>>${BASEDIR}/build.log 2>&1
 
             if [[ ${LIBRARY_LIBICONV} == $library ]]; then
 
@@ -1203,8 +1340,8 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
     mkdir -p ${FFMPEG_UNIVERSAL}/include 1>>${BASEDIR}/build.log 2>&1
     mkdir -p ${FFMPEG_UNIVERSAL}/lib 1>>${BASEDIR}/build.log 2>&1
 
-    cp -r ${BASEDIR}/prebuilt/ios-${TARGET_ARCH_LIST[0]}-ios-darwin/ffmpeg/include/* ${FFMPEG_UNIVERSAL}/include 1>>${BASEDIR}/build.log 2>&1
-    cp ${BASEDIR}/prebuilt/ios-${TARGET_ARCH_LIST[0]}-ios-darwin/ffmpeg/include/config.h ${FFMPEG_UNIVERSAL}/include 1>>${BASEDIR}/build.log 2>&1
+    cp -r ${BASEDIR}/prebuilt/ios-${TARGET_ARCH_LIST[0]}-apple-darwin/ffmpeg/include/* ${FFMPEG_UNIVERSAL}/include 1>>${BASEDIR}/build.log 2>&1
+    cp ${BASEDIR}/prebuilt/ios-${TARGET_ARCH_LIST[0]}-apple-darwin/ffmpeg/include/config.h ${FFMPEG_UNIVERSAL}/include 1>>${BASEDIR}/build.log 2>&1
 
     for FFMPEG_LIB in ${FFMPEG_LIBS}
     do
@@ -1212,7 +1349,7 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
 
         for TARGET_ARCH in "${TARGET_ARCH_LIST[@]}"
         do
-            LIPO_COMMAND+=" ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-ios-darwin/ffmpeg/lib/${FFMPEG_LIB}.${BUILD_LIBRARY_EXTENSION}"
+            LIPO_COMMAND+=" ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/${FFMPEG_LIB}.${BUILD_LIBRARY_EXTENSION}"
         done
 
         LIPO_COMMAND+=" -output ${FFMPEG_UNIVERSAL}/lib/${FFMPEG_LIB}.${BUILD_LIBRARY_EXTENSION}"
@@ -1241,7 +1378,7 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
         cp -r ${FFMPEG_UNIVERSAL}/include/${FFMPEG_LIB}/* ${FFMPEG_LIB_FRAMEWORK_PATH}/Headers 1>>${BASEDIR}/build.log 2>&1
         cp ${FFMPEG_UNIVERSAL}/lib/${FFMPEG_LIB}.${BUILD_LIBRARY_EXTENSION} ${FFMPEG_LIB_FRAMEWORK_PATH}/${FFMPEG_LIB} 1>>${BASEDIR}/build.log 2>&1
 
-        # COPYING THE LICENSE
+        # COPY THE LICENSES
         if  [ ${GPL_ENABLED} == "yes" ]; then
 
             # GPLv3.0
@@ -1257,7 +1394,7 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
         echo -e "Created ${FFMPEG_LIB} framework successfully.\n" 1>>${BASEDIR}/build.log 2>&1
     done
 
-    # COPYING THE LICENSE
+    # COPY THE LICENSES
     if  [ ${GPL_ENABLED} == "yes" ]; then
         cp ${BASEDIR}/LICENSE.GPLv3 ${FFMPEG_UNIVERSAL}/LICENSE 1>>${BASEDIR}/build.log 2>&1
     else
@@ -1272,11 +1409,12 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
     mkdir -p ${MOBILE_FFMPEG_UNIVERSAL}/lib 1>>${BASEDIR}/build.log 2>&1
     rm -rf ${MOBILE_FFMPEG_FRAMEWORK_PATH} 1>>${BASEDIR}/build.log 2>&1
     mkdir -p ${MOBILE_FFMPEG_FRAMEWORK_PATH}/Headers 1>>${BASEDIR}/build.log 2>&1
+    mkdir -p ${MOBILE_FFMPEG_FRAMEWORK_PATH}/Modules 1>>${BASEDIR}/build.log 2>&1
 
     LIPO_COMMAND="${LIPO} -create"
     for TARGET_ARCH in "${TARGET_ARCH_LIST[@]}"
     do
-        LIPO_COMMAND+=" ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-ios-darwin/mobile-ffmpeg/lib/libmobileffmpeg.${BUILD_LIBRARY_EXTENSION}"
+        LIPO_COMMAND+=" ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/mobile-ffmpeg/lib/libmobileffmpeg.${BUILD_LIBRARY_EXTENSION}"
     done
     LIPO_COMMAND+=" -output ${MOBILE_FFMPEG_UNIVERSAL}/lib/libmobileffmpeg.${BUILD_LIBRARY_EXTENSION}"
 
@@ -1287,11 +1425,11 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
         exit 1
     fi
 
-    cp -r ${BASEDIR}/prebuilt/ios-${TARGET_ARCH_LIST[0]}-ios-darwin/mobile-ffmpeg/include/* ${MOBILE_FFMPEG_UNIVERSAL}/include 1>>${BASEDIR}/build.log 2>&1
+    cp -r ${BASEDIR}/prebuilt/ios-${TARGET_ARCH_LIST[0]}-apple-darwin/mobile-ffmpeg/include/* ${MOBILE_FFMPEG_UNIVERSAL}/include 1>>${BASEDIR}/build.log 2>&1
     cp -r ${MOBILE_FFMPEG_UNIVERSAL}/include/* ${MOBILE_FFMPEG_FRAMEWORK_PATH}/Headers 1>>${BASEDIR}/build.log 2>&1
     cp ${MOBILE_FFMPEG_UNIVERSAL}/lib/libmobileffmpeg.${BUILD_LIBRARY_EXTENSION} ${MOBILE_FFMPEG_FRAMEWORK_PATH}/mobileffmpeg 1>>${BASEDIR}/build.log 2>&1
 
-    # COPYING THE LICENSE
+    # COPY THE LICENSES
     if  [ ${GPL_ENABLED} == "yes" ]; then
         cp ${BASEDIR}/LICENSE.GPLv3 ${MOBILE_FFMPEG_UNIVERSAL}/LICENSE 1>>${BASEDIR}/build.log 2>&1
         cp ${BASEDIR}/LICENSE.GPLv3 ${MOBILE_FFMPEG_FRAMEWORK_PATH}/LICENSE 1>>${BASEDIR}/build.log 2>&1
@@ -1301,8 +1439,9 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
     fi
 
     build_info_plist "${MOBILE_FFMPEG_FRAMEWORK_PATH}/Info.plist" "mobileffmpeg" "com.arthenica.mobileffmpeg.MobileFFmpeg" "${MOBILE_FFMPEG_VERSION}" "${MOBILE_FFMPEG_VERSION}"
+    build_modulemap "${MOBILE_FFMPEG_FRAMEWORK_PATH}/Modules/module.modulemap"
 
-    echo -e "Created mobile-ffmpeg.framework successfully.\n" 1>>${BASEDIR}/build.log 2>&1
+    echo -e "Created mobile-ffmpeg.framework and universal library successfully.\n" 1>>${BASEDIR}/build.log 2>&1
 
     echo -e "ok\n"
 fi

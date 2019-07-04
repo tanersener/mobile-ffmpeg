@@ -2,12 +2,12 @@
 
 
 
-@deftypefun {int} {gnutls_record_set_state} (gnutls_session_t @var{session}, unsigned @var{read}, unsigned char @var{seq_number[8]})
+@deftypefun {int} {gnutls_record_set_state} (gnutls_session_t @var{session}, unsigned @var{read}, const unsigned char [8] @var{seq_number})
 @var{session}: is a @code{gnutls_session_t}  type
 
 @var{read}: if non-zero the read parameters are returned, otherwise the write
 
-@var{seq_number[8]}: -- undescribed --
+@var{seq_number}: A 64-bit sequence number
 
 This function will set the sequence number in the current record state.
 This function is useful if sending and receiving are offloaded from

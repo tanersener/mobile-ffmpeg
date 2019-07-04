@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_set_default_priority_append} (gnutls_session_t @var{session}, const char * @var{add_prio}, const char ** @var{err_pos}, unsigned @var{flags})

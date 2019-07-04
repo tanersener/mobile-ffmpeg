@@ -20,7 +20,7 @@ TLS or SSL3 sessions). To know whether the current session supports extra
 padding, and hence length hiding, use the @code{gnutls_record_can_use_length_hiding()} 
 function.
 
-@strong{Note:} This function currently is only limited to blocking sockets.
+@strong{Note:} This function currently is limited to blocking sockets.
 
 @strong{Returns:} The number of bytes sent (that is data_size in a successful invocation),
 or a negative error code.

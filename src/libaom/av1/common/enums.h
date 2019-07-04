@@ -73,11 +73,6 @@ extern "C" {
 #define DIST_PRECISION_BITS 4
 #define DIST_PRECISION (1 << DIST_PRECISION_BITS)  // 16
 
-// TODO(chengchen): Temporal flag serve as experimental flag for WIP
-// bitmask construction.
-// Shall be removed when bitmask code is completely checkedin
-#define LOOP_FILTER_BITMASK 0
-
 #define PROFILE_BITS 3
 // The following three profiles are currently defined.
 // Profile 0.  8-bit and 10-bit 4:2:0 and 4:0:0 only.
@@ -130,6 +125,27 @@ typedef enum ATTRIBUTE_PACKED {
 // 4X4, 8X8, 16X16, 32X32, 64X64, 128X128
 #define SQR_BLOCK_SIZES 6
 
+//  Partition types.  R: Recursive
+//
+//  NONE          HORZ          VERT          SPLIT
+//  +-------+     +-------+     +---+---+     +---+---+
+//  |       |     |       |     |   |   |     | R | R |
+//  |       |     +-------+     |   |   |     +---+---+
+//  |       |     |       |     |   |   |     | R | R |
+//  +-------+     +-------+     +---+---+     +---+---+
+//
+//  HORZ_A        HORZ_B        VERT_A        VERT_B
+//  +---+---+     +-------+     +---+---+     +---+---+
+//  |   |   |     |       |     |   |   |     |   |   |
+//  +---+---+     +---+---+     +---+   |     |   +---+
+//  |       |     |   |   |     |   |   |     |   |   |
+//  +-------+     +---+---+     +---+---+     +---+---+
+//
+//  HORZ_4        VERT_4
+//  +-----+       +-+-+-+
+//  +-----+       | | | |
+//  +-----+       | | | |
+//  +-----+       +-+-+-+
 enum {
   PARTITION_NONE,
   PARTITION_HORZ,
@@ -526,7 +542,9 @@ enum {
 
 #define DELTA_Q_SMALL 3
 #define DELTA_Q_PROBS (DELTA_Q_SMALL)
-#define DEFAULT_DELTA_Q_RES 4
+#define DEFAULT_DELTA_Q_RES_PERCEPTUAL 4
+#define DEFAULT_DELTA_Q_RES_OBJECTIVE 4
+
 #define DELTA_LF_SMALL 3
 #define DELTA_LF_PROBS (DELTA_LF_SMALL)
 #define DEFAULT_DELTA_LF_RES 2
@@ -624,6 +642,25 @@ enum {
   RESTORE_SWITCHABLE_TYPES = RESTORE_SWITCHABLE,
   RESTORE_TYPES = 4,
 } UENUM1BYTE(RestorationType);
+
+// Picture prediction structures (0-12 are predefined) in scalability metadata.
+enum {
+  SCALABILITY_L1T2 = 0,
+  SCALABILITY_L1T3 = 1,
+  SCALABILITY_L2T1 = 2,
+  SCALABILITY_L2T2 = 3,
+  SCALABILITY_L2T3 = 4,
+  SCALABILITY_S2T1 = 5,
+  SCALABILITY_S2T2 = 6,
+  SCALABILITY_S2T3 = 7,
+  SCALABILITY_L2T1h = 8,
+  SCALABILITY_L2T2h = 9,
+  SCALABILITY_L2T3h = 10,
+  SCALABILITY_S2T1h = 11,
+  SCALABILITY_S2T2h = 12,
+  SCALABILITY_S2T3h = 13,
+  SCALABILITY_SS = 14
+} UENUM1BYTE(SCALABILITY_STRUCTURES);
 
 #define SUPERRES_SCALE_BITS 3
 #define SUPERRES_SCALE_DENOMINATOR_MIN (SCALE_NUMERATOR + 1)

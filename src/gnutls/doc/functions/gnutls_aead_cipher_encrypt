@@ -9,7 +9,7 @@
 
 @var{nonce_len}: The length of the nonce
 
-@var{auth}: the data to be authenticated
+@var{auth}: additional data to be authenticated
 
 @var{auth_len}: The length of the data
 
@@ -19,7 +19,7 @@
 
 @var{ptext_len}: The length of data to encrypt
 
-@var{ctext}: the encrypted data
+@var{ctext}: the encrypted data including authentication tag
 
 @var{ctext_len}: the length of encrypted data (initially must hold the maximum available size, including space for tag)
 

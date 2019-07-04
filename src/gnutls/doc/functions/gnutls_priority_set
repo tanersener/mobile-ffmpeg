@@ -8,7 +8,10 @@
 @var{priority}: is a @code{gnutls_priority_t}  type.
 
 Sets the priorities to use on the ciphers, key exchange methods,
-macs and compression methods.
+and macs. Note that this function is expected to be called once
+per session; when called multiple times (e.g., before a re-handshake,
+the caller should make sure that any new settings are not incompatible
+with the original session).
 
-@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, or an error code.
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, or an error code on error.
 @end deftypefun

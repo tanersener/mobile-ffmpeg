@@ -216,7 +216,6 @@ void av1_copy_tree_context(PICK_MODE_CONTEXT *dst_ctx,
   dst_ctx->mbmi_ext = src_ctx->mbmi_ext;
 
   dst_ctx->num_4x4_blk = src_ctx->num_4x4_blk;
-  dst_ctx->skip = src_ctx->skip;
   dst_ctx->skippable = src_ctx->skippable;
   dst_ctx->best_mode_index = src_ctx->best_mode_index;
 
@@ -227,13 +226,10 @@ void av1_copy_tree_context(PICK_MODE_CONTEXT *dst_ctx,
   dst_ctx->comp_pred_diff = src_ctx->comp_pred_diff;
   dst_ctx->single_pred_diff = src_ctx->single_pred_diff;
 
-  dst_ctx->rate = src_ctx->rate;
-  dst_ctx->dist = src_ctx->dist;
-  dst_ctx->rdcost = src_ctx->rdcost;
+  dst_ctx->rd_stats = src_ctx->rd_stats;
   dst_ctx->rd_mode_is_ready = src_ctx->rd_mode_is_ready;
 
   memcpy(dst_ctx->pred_mv, src_ctx->pred_mv, sizeof(MV) * REF_FRAMES);
-  dst_ctx->pred_interp_filter = src_ctx->pred_interp_filter;
 
   dst_ctx->partition = src_ctx->partition;
 }

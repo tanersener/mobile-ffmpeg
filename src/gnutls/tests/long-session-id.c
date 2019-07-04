@@ -143,7 +143,7 @@ static void client(int fd, const char *prio)
 		kill(getpid(), SIGSEGV);
 	}
 
-	if (ret == GNUTLS_E_ILLEGAL_PARAMETER) {
+	if (ret == GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER) {
 		fprintf(stderr, "client: Handshake failed (expected): %s\n", gnutls_strerror(ret));
 		goto cleanup;
 	} else {
@@ -243,7 +243,7 @@ void doit(void)
 	signal(SIGCHLD, ch_handler);
 	signal(SIGPIPE, SIG_IGN);
 
-	start("NORMAL");
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.2");
 }
 
 #endif				/* _WIN32 */

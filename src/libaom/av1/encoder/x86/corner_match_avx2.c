@@ -17,9 +17,9 @@
 #include "aom_ports/mem.h"
 #include "av1/encoder/corner_match.h"
 
-DECLARE_ALIGNED(16, static const uint8_t, byte_mask[16]) = {
-  255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 0, 0
-};
+DECLARE_ALIGNED(16, static const uint8_t,
+                byte_mask[16]) = { 255, 255, 255, 255, 255, 255, 255, 255,
+                                   255, 255, 255, 255, 255, 0,   0,   0 };
 #if MATCH_SZ != 13
 #error "Need to change byte_mask in corner_match_sse4.c if MATCH_SZ != 13"
 #endif
@@ -28,9 +28,9 @@ DECLARE_ALIGNED(16, static const uint8_t, byte_mask[16]) = {
 correlation/standard deviation are taken over MATCH_SZ by MATCH_SZ windows
 of each image, centered at (x1, y1) and (x2, y2) respectively.
 */
-double compute_cross_correlation_avx2(unsigned char *im1, int stride1, int x1,
-                                      int y1, unsigned char *im2, int stride2,
-                                      int x2, int y2) {
+double av1_compute_cross_correlation_avx2(unsigned char *im1, int stride1,
+                                          int x1, int y1, unsigned char *im2,
+                                          int stride2, int x2, int y2) {
   int i, stride1_i = 0, stride2_i = 0;
   __m256i temp1, sum_vec, sumsq2_vec, cross_vec, v, v1_1, v2_1;
   const __m128i mask = _mm_load_si128((__m128i *)byte_mask);

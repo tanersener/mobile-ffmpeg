@@ -5,11 +5,6 @@ if [[ -z ${ARCH} ]]; then
     exit 1
 fi
 
-if [[ -z ${IOS_MIN_VERSION} ]]; then
-    echo -e "(*) IOS_MIN_VERSION not defined\n"
-    exit 1
-fi
-
 if [[ -z ${TARGET_SDK} ]]; then
     echo -e "(*) TARGET_SDK not defined\n"
     exit 1
@@ -26,7 +21,11 @@ if [[ -z ${BASEDIR} ]]; then
 fi
 
 # ENABLE COMMON FUNCTIONS
-. ${BASEDIR}/build/ios-common.sh
+if [[ ${APPLE_TVOS_BUILD} -eq 1 ]]; then
+    . ${BASEDIR}/build/tvos-common.sh
+else
+    . ${BASEDIR}/build/ios-common.sh
+fi
 
 # PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
 LIB_NAME="chromaprint"
@@ -55,7 +54,7 @@ cmake -Wno-dev \
     -DCMAKE_SYSROOT="${SDK_PATH}" \
     -DCMAKE_FIND_ROOT_PATH="${SDK_PATH}" \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX="${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/${LIB_NAME}" \
+    -DCMAKE_INSTALL_PREFIX="${BASEDIR}/prebuilt/$(get_target_build_directory)/${LIB_NAME}" \
     -DCMAKE_SYSTEM_NAME=Darwin \
     -DCMAKE_OSX_SYSROOT="" \
     -DCMAKE_C_COMPILER="$CC" \
@@ -69,6 +68,6 @@ cmake -Wno-dev \
 make -j$(get_cpu_count) || exit 1
 
 # MANUALLY COPY PKG-CONFIG FILES
-cp libchromaprint.pc ${INSTALL_PKG_CONFIG_DIR}
+cp libchromaprint.pc ${INSTALL_PKG_CONFIG_DIR} || exit 1
 
 make install || exit 1

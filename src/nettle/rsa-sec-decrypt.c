@@ -39,6 +39,7 @@
 #endif
 
 #include "rsa.h"
+#include "pkcs1-internal.h"
 #include "rsa-internal.h"
 
 #include "gmp-glue.h"

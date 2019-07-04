@@ -46,8 +46,10 @@ int main()
 #include <gnutls/gnutls.h>
 #include <gnutls/dtls.h>
 #include <signal.h>
+#include <assert.h>
 
 #include "utils.h"
+#include "cert-common.h"
 
 static void terminate(void);
 
@@ -63,47 +65,6 @@ static void client_log_func(int level, const char *str)
 {
 	fprintf(stderr, "client|<%d>| %s", level, str);
 }
-
-static unsigned char server_cert_pem[] =
-    "-----BEGIN CERTIFICATE-----\n"
-    "MIICVjCCAcGgAwIBAgIERiYdMTALBgkqhkiG9w0BAQUwGTEXMBUGA1UEAxMOR251\n"
-    "VExTIHRlc3QgQ0EwHhcNMDcwNDE4MTMyOTIxWhcNMDgwNDE3MTMyOTIxWjA3MRsw\n"
-    "GQYDVQQKExJHbnVUTFMgdGVzdCBzZXJ2ZXIxGDAWBgNVBAMTD3Rlc3QuZ251dGxz\n"
-    "Lm9yZzCBnDALBgkqhkiG9w0BAQEDgYwAMIGIAoGA17pcr6MM8C6pJ1aqU46o63+B\n"
-    "dUxrmL5K6rce+EvDasTaDQC46kwTHzYWk95y78akXrJutsoKiFV1kJbtple8DDt2\n"
-    "DZcevensf9Op7PuFZKBroEjOd35znDET/z3IrqVgbtm2jFqab7a+n2q9p/CgMyf1\n"
-    "tx2S5Zacc1LWn9bIjrECAwEAAaOBkzCBkDAMBgNVHRMBAf8EAjAAMBoGA1UdEQQT\n"
-    "MBGCD3Rlc3QuZ251dGxzLm9yZzATBgNVHSUEDDAKBggrBgEFBQcDATAPBgNVHQ8B\n"
-    "Af8EBQMDB6AAMB0GA1UdDgQWBBTrx0Vu5fglyoyNgw106YbU3VW0dTAfBgNVHSME\n"
-    "GDAWgBTpPBz7rZJu5gakViyi4cBTJ8jylTALBgkqhkiG9w0BAQUDgYEAaFEPTt+7\n"
-    "bzvBuOf7+QmeQcn29kT6Bsyh1RHJXf8KTk5QRfwp6ogbp94JQWcNQ/S7YDFHglD1\n"
-    "AwUNBRXwd3riUsMnsxgeSDxYBfJYbDLeohNBsqaPDJb7XailWbMQKfAbFQ8cnOxg\n"
-    "rOKLUQRWJ0K3HyXRMhbqjdLIaQiCvQLuizo=\n" "-----END CERTIFICATE-----\n";
-
-const gnutls_datum_t server_cert = { server_cert_pem,
-	sizeof(server_cert_pem)
-};
-
-static unsigned char server_key_pem[] =
-    "-----BEGIN RSA PRIVATE KEY-----\n"
-    "MIICXAIBAAKBgQDXulyvowzwLqknVqpTjqjrf4F1TGuYvkrqtx74S8NqxNoNALjq\n"
-    "TBMfNhaT3nLvxqResm62ygqIVXWQlu2mV7wMO3YNlx696ex/06ns+4VkoGugSM53\n"
-    "fnOcMRP/PciupWBu2baMWppvtr6far2n8KAzJ/W3HZLllpxzUtaf1siOsQIDAQAB\n"
-    "AoGAYAFyKkAYC/PYF8e7+X+tsVCHXppp8AoP8TEZuUqOZz/AArVlle/ROrypg5kl\n"
-    "8YunrvUdzH9R/KZ7saNZlAPLjZyFG9beL/am6Ai7q7Ma5HMqjGU8kTEGwD7K+lbG\n"
-    "iomokKMOl+kkbY/2sI5Czmbm+/PqLXOjtVc5RAsdbgvtmvkCQQDdV5QuU8jap8Hs\n"
-    "Eodv/tLJ2z4+SKCV2k/7FXSKWe0vlrq0cl2qZfoTUYRnKRBcWxc9o92DxK44wgPi\n"
-    "oMQS+O7fAkEA+YG+K9e60sj1K4NYbMPAbYILbZxORDecvP8lcphvwkOVUqbmxOGh\n"
-    "XRmTZUuhBrJhJKKf6u7gf3KWlPl6ShKEbwJASC118cF6nurTjuLf7YKARDjNTEws\n"
-    "qZEeQbdWYINAmCMj0RH2P0mvybrsXSOD5UoDAyO7aWuqkHGcCLv6FGG+qwJAOVqq\n"
-    "tXdUucl6GjOKKw5geIvRRrQMhb/m5scb+5iw8A4LEEHPgGiBaF5NtJZLALgWfo5n\n"
-    "hmC8+G8F0F78znQtPwJBANexu+Tg5KfOnzSILJMo3oXiXhf5PqXIDmbN0BKyCKAQ\n"
-    "LfkcEcUbVfmDaHpvzwY9VEaoMOKVLitETXdNSxVpvWM=\n"
-    "-----END RSA PRIVATE KEY-----\n";
-
-const gnutls_datum_t server_key = { server_key_pem,
-	sizeof(server_key_pem)
-};
 
 /* This tests whether the fallback SCSV is working as intended.
  */
@@ -131,7 +92,7 @@ static void client(int fd, const char *prio, unsigned expect_fail)
 	gnutls_init(&session, GNUTLS_CLIENT);
 
 	/* Use default priorities */
-	gnutls_priority_set_direct(session, prio, NULL);
+	assert(gnutls_priority_set_direct(session, prio, NULL)>=0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
@@ -232,7 +193,7 @@ static void server(int fd, const char *prio, unsigned expect_fail)
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	gnutls_priority_set_direct(session, prio, NULL);
+	assert(gnutls_priority_set_direct(session, prio, NULL)>=0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
@@ -343,9 +304,14 @@ void doit(void)
 	signal(SIGPIPE, SIG_IGN);
 
 	start("NORMAL", "NORMAL", 0);
+	start("NORMAL:-VERS-TLS-ALL:+VERS-TLS1.0:+VERS-TLS1.1:+VERS-TLS1.2", "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.0:+VERS-TLS1.1:+VERS-TLS1.2", 0);
+	start("NORMAL:-VERS-TLS-ALL:+VERS-TLS1.0:+VERS-TLS1.1:+VERS-TLS1.2", "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.0:+VERS-TLS1.1:+VERS-TLS1.2:%FALLBACK_SCSV", 0);
 	start("NORMAL", "NORMAL:%FALLBACK_SCSV", 0);
 	start("NORMAL:-VERS-TLS-ALL:+VERS-TLS1.1", "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.1:%FALLBACK_SCSV", 0);
 	start("NORMAL", "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.1:%FALLBACK_SCSV", 1);
+	/* Check whether a TLS1.3 server rejects a TLS1.2 client which includes the SCSV */
+	start("NORMAL:+VERS-TLS1.3:+VERS-TLS1.2", "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2:%FALLBACK_SCSV", 1);
+	start("NORMAL:+VERS-TLS1.3:+VERS-TLS1.2", "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:%FALLBACK_SCSV", 0);
 }
 
 #endif				/* _WIN32 */

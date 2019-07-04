@@ -6,13 +6,18 @@
 Unknown data type.
 @item GNUTLS_@-DT_@-DNS_@-HOSTNAME
 The data contain a null-terminated DNS hostname; the hostname will be 
-matched using the RFC6125 rules.
+matched using the RFC6125 rules. If the data contain a textual IP (v4 or v6) address it will
+be marched against the IPAddress Alternative name, unless the verification flag @code{GNUTLS_VERIFY_DO_NOT_ALLOW_IP_MATCHES} 
+is specified.
 @item GNUTLS_@-DT_@-KEY_@-PURPOSE_@-OID
 The data contain a null-terminated key purpose OID. It will be matched
 against the certificate's Extended Key Usage extension.
 @item GNUTLS_@-DT_@-RFC822NAME
 The data contain a null-terminated email address; the email will be
-matched against the RFC822Name field of the certificate, or the EMAIL DN component if the
+matched against the RFC822Name Alternative name of the certificate, or the EMAIL DN component if the
 former isn't available. Prior to matching the email address will be converted to ACE
 (ASCII-compatible-encoding).
+@item GNUTLS_@-DT_@-IP_@-ADDRESS
+The data contain a raw IP address (4 or 16 bytes). If will be matched
+against the IPAddress Alternative name; option available since 3.6.0.
 @end table

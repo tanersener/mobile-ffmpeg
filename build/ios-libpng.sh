@@ -5,11 +5,6 @@ if [[ -z ${ARCH} ]]; then
     exit 1
 fi
 
-if [[ -z ${IOS_MIN_VERSION} ]]; then
-    echo -e "(*) IOS_MIN_VERSION not defined\n"
-    exit 1
-fi
-
 if [[ -z ${TARGET_SDK} ]]; then
     echo -e "(*) TARGET_SDK not defined\n"
     exit 1
@@ -26,7 +21,11 @@ if [[ -z ${BASEDIR} ]]; then
 fi
 
 # ENABLE COMMON FUNCTIONS
-. ${BASEDIR}/build/ios-common.sh
+if [[ ${APPLE_TVOS_BUILD} -eq 1 ]]; then
+    . ${BASEDIR}/build/tvos-common.sh
+else
+    . ${BASEDIR}/build/ios-common.sh
+fi
 
 # PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
 LIB_NAME="libpng"
@@ -42,7 +41,7 @@ export LDFLAGS=$(get_ldflags ${LIB_NAME})
 CPU_SPECIFIC_OPTIONS="--enable-hardware-optimizations=yes"
 case ${ARCH} in
     x86 | x86-64)
-        CPU_SPECIFIC_OPTIONS+=" --enable-sse=yes"
+        CPU_SPECIFIC_OPTIONS+=" --enable-intel-sse=yes"
     ;;
     armv7 | armv7s | arm64 | arm64e)
         CPU_SPECIFIC_OPTIONS+=" --enable-arm-neon=yes"
@@ -59,7 +58,7 @@ if [[ ${RECONF_libpng} -eq 1 ]]; then
 fi
 
 ./configure \
-    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/${LIB_NAME} \
+    --prefix=${BASEDIR}/prebuilt/$(get_target_build_directory)/${LIB_NAME} \
     --with-pic \
     --with-sysroot=${SDK_PATH} \
     --enable-static \
@@ -73,6 +72,6 @@ fi
 make -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_libpng_package_config "1.6.36"
+create_libpng_package_config "1.6.37"
 
 make install || exit 1

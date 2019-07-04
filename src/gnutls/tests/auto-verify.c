@@ -1,7 +1,8 @@
 /*
  * Copyright (C) 2008-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2017-2018 Red Hat, Inc.
  *
- * Author: Simon Josefsson
+ * Author: Nikos Mavrogiannopoulos
  *
  * This file is part of GnuTLS.
  *
@@ -32,6 +33,7 @@
 #include <gnutls/x509.h>
 #include "utils.h"
 #include "eagain-common.h"
+#include <assert.h>
 
 /* This tests gnutls_certificate_set_x509_key() */
 
@@ -179,9 +181,8 @@ const gnutls_datum_t server_key = { server_key_pem,
 };
 
 static
-void test_failure(void)
+void test_failure(const char *name, const char *prio)
 {
-	int exit_code = EXIT_SUCCESS;
 	int ret;
 	/* Server stuff. */
 	gnutls_certificate_credentials_t serverx509cred;
@@ -197,6 +198,8 @@ void test_failure(void)
 	gnutls_typed_vdata_st vdata[2];
 	gnutls_x509_privkey_t pkey;
 	unsigned status;
+
+	success("testing cert verification failure for %s\n", name);
 
 	to_server_len = 0;
 	to_client_len = 0;
@@ -233,9 +236,9 @@ void test_failure(void)
 	gnutls_init(&server, GNUTLS_SERVER);
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
 				serverx509cred);
-	gnutls_priority_set_direct(server,
-				   "NORMAL:-CIPHER-ALL:+AES-128-GCM",
-				   NULL);
+	assert(gnutls_priority_set_direct(server,
+				   prio,
+				   NULL) >= 0);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
@@ -264,7 +267,7 @@ void test_failure(void)
 	if (ret < 0)
 		exit(1);
 
-	gnutls_priority_set_direct(client, "NORMAL", NULL);
+	assert(gnutls_priority_set_direct(client, prio, NULL) >= 0);
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);
@@ -294,19 +297,11 @@ void test_failure(void)
 
 	gnutls_certificate_free_credentials(serverx509cred);
 	gnutls_certificate_free_credentials(clientx509cred);
-
-	if (debug > 0) {
-		if (exit_code == 0)
-			fprintf(stderr, "%s: Self-test successful", __func__);
-		else
-			fprintf(stderr, "%s: Self-test failed", __func__);
-	}
 }
 
 static
-void test_success1(void)
+void test_success1(const char *name, const char *prio)
 {
-	int exit_code = EXIT_SUCCESS;
 	int ret;
 	/* Server stuff. */
 	gnutls_certificate_credentials_t serverx509cred;
@@ -322,6 +317,8 @@ void test_success1(void)
 	gnutls_typed_vdata_st vdata[2];
 	gnutls_x509_privkey_t pkey;
 	unsigned status;
+
+	success("testing cert verification success1 for %s\n", name);
 
 	to_server_len = 0;
 	to_client_len = 0;
@@ -358,9 +355,9 @@ void test_success1(void)
 	gnutls_init(&server, GNUTLS_SERVER);
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
 				serverx509cred);
-	gnutls_priority_set_direct(server,
-				   "NORMAL:-CIPHER-ALL:+AES-128-GCM",
-				   NULL);
+	assert(gnutls_priority_set_direct(server,
+				   prio,
+				   NULL) >= 0);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
@@ -389,7 +386,7 @@ void test_success1(void)
 	if (ret < 0)
 		exit(1);
 
-	gnutls_priority_set_direct(client, "NORMAL", NULL);
+	assert(gnutls_priority_set_direct(client, prio, NULL) >= 0);
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);
@@ -419,19 +416,11 @@ void test_success1(void)
 
 	gnutls_certificate_free_credentials(serverx509cred);
 	gnutls_certificate_free_credentials(clientx509cred);
-
-	if (debug > 0) {
-		if (exit_code == 0)
-			fprintf(stderr, "%s: Self-test successful", __func__);
-		else
-			fprintf(stderr, "%s: Self-test failed", __func__);
-	}
 }
 
 static
-void test_success2(void)
+void test_success2(const char *name, const char *prio)
 {
-	int exit_code = EXIT_SUCCESS;
 	int ret;
 	/* Server stuff. */
 	gnutls_certificate_credentials_t serverx509cred;
@@ -446,6 +435,8 @@ void test_success2(void)
 	unsigned i;
 	gnutls_x509_privkey_t pkey;
 	unsigned status;
+
+	success("testing cert verification success2 for %s\n", name);
 
 	to_server_len = 0;
 	to_client_len = 0;
@@ -482,9 +473,9 @@ void test_success2(void)
 	gnutls_init(&server, GNUTLS_SERVER);
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
 				serverx509cred);
-	gnutls_priority_set_direct(server,
-				   "NORMAL:-CIPHER-ALL:+AES-128-GCM",
-				   NULL);
+	assert(gnutls_priority_set_direct(server,
+				   prio,
+				   NULL)>=0);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
@@ -513,7 +504,7 @@ void test_success2(void)
 	if (ret < 0)
 		exit(1);
 
-	gnutls_priority_set_direct(client, "NORMAL", NULL);
+	assert(gnutls_priority_set_direct(client, prio, NULL)>=0);
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);
@@ -534,13 +525,6 @@ void test_success2(void)
 
 	gnutls_certificate_free_credentials(serverx509cred);
 	gnutls_certificate_free_credentials(clientx509cred);
-
-	if (debug > 0) {
-		if (exit_code == 0)
-			fprintf(stderr, "%s: Self-test successful", __func__);
-		else
-			fprintf(stderr, "%s: Self-test failed", __func__);
-	}
 }
 
 void doit(void)
@@ -552,9 +536,12 @@ void doit(void)
 	if (debug)
 		gnutls_global_set_log_level(2);
 
-	test_failure();
-	test_success1();
-	test_success2();
+	test_failure("tls1.2", "NORMAL:-VERS-ALL:+VERS-TLS1.2");
+	test_failure("tls1.3", "NORMAL:-VERS-ALL:+VERS-TLS1.3");
+	test_success1("tls1.2", "NORMAL:-VERS-ALL:+VERS-TLS1.2");
+	test_success1("tls1.3", "NORMAL:-VERS-ALL:+VERS-TLS1.3");
+	test_success2("tls1.2", "NORMAL:-VERS-ALL:+VERS-TLS1.2");
+	test_success2("tls1.3", "NORMAL:-VERS-ALL:+VERS-TLS1.3");
 
 	gnutls_global_deinit();
 

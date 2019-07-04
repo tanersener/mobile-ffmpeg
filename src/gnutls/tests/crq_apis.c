@@ -184,7 +184,7 @@ static gnutls_x509_crq_t generate_crq(void)
 
 	ret = gnutls_x509_crq_set_subject_alt_name(crq, GNUTLS_SAN_DNSNAME,
 						   "νίκο.com", strlen("νίκο.com"), GNUTLS_FSAN_APPEND);
-#if defined(HAVE_LIBIDN) || defined(HAVE_LIBIDN2)
+#if defined(HAVE_LIBIDN2)
 	if (ret != 0)
 		fail("gnutls_x509_crt_set_subject_alt_name: %s\n", gnutls_strerror(ret));
 #else
@@ -453,7 +453,7 @@ void doit(void)
 
 	assert(gnutls_x509_crq_export2(crq, GNUTLS_X509_FMT_PEM, &out) >= 0);
 
-#if defined(HAVE_LIBIDN) || defined(HAVE_LIBIDN2)
+#if defined(HAVE_LIBIDN2)
 	assert(out.size == saved_crq.size);
 	assert(memcmp(out.data, saved_crq.data, out.size)==0);
 #endif

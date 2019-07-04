@@ -110,7 +110,7 @@ ecc_192_modp (const struct ecc_modulo *m UNUSED, mp_limb_t *rp)
 #define ecc_192_modp ecc_mod
 #endif
 
-const struct ecc_curve nettle_secp_192r1 =
+const struct ecc_curve _nettle_secp_192r1 =
 {
   {
     192,
@@ -174,5 +174,5 @@ const struct ecc_curve nettle_secp_192r1 =
 
 const struct ecc_curve *nettle_get_secp_192r1(void)
 {
-  return &nettle_secp_192r1;
+  return &_nettle_secp_192r1;
 }

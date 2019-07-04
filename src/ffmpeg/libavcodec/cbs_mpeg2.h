@@ -51,7 +51,7 @@ enum {
     MPEG2_EXTENSION_PICTURE_CODING            = 0x8,
     MPEG2_EXTENSION_PICTURE_SPATIAL_SCALABLE  = 0x9,
     MPEG2_EXTENSION_PICTURE_TEMPORAL_SCALABLE = 0xa,
-    MPEG2_EXTENSION_CAMAERA_PARAMETERS        = 0xb,
+    MPEG2_EXTENSION_CAMERA_PARAMETERS         = 0xb,
     MPEG2_EXTENSION_ITU_T                     = 0xc,
 };
 
@@ -164,8 +164,8 @@ typedef struct MPEG2RawQuantMatrixExtension {
 } MPEG2RawQuantMatrixExtension;
 
 typedef struct MPEG2RawPictureDisplayExtension {
-    uint16_t frame_centre_horizontal_offset[3];
-    uint16_t frame_centre_vertical_offset[3];
+    int16_t frame_centre_horizontal_offset[3];
+    int16_t frame_centre_vertical_offset[3];
 } MPEG2RawPictureDisplayExtension;
 
 typedef struct MPEG2RawExtensionData {

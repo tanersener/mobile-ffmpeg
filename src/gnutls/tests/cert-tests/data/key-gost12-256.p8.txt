@@ -1,0 +1,33 @@
+Public Key Info:
+	Public Key Algorithm: GOST R 34.10-2012-256
+	Key Security Level: High (256 bits)
+
+curve:	CryptoPro-XchA
+digest:	STREEBOG-256
+paramset:	TC26-Z
+private key:
+	bf:cf:1d:62:3e:5c:dd:30:32:a7:c6:ea:bb:4a:92:3c
+	46:e4:3d:64:0f:fe:aa:f2:c3:ed:39:a8:fa:39:99:24
+	
+
+x:
+	97:15:66:ce:da:43:6e:e7:67:8f:7e:07:e8:4e:bb:72
+	17:40:6c:0b:47:47:aa:8f:d2:ab:14:53:c3:d0:df:ba
+	
+
+y:
+	ad:58:73:69:65:94:9f:8e:59:83:0f:8d:e2:0f:c6:c0
+	d1:77:f6:ab:59:98:74:f1:e2:e2:4f:f7:1f:9c:e6:43
+	
+
+
+Public Key PIN:
+	pin-sha256:T1yRU6smDaTNkinx7qvQTgdlWn3wf+NBoRSN0P+kZLU=
+Public Key ID:
+	sha256:4f5c9153ab260da4cd9229f1eeabd04e07655a7df07fe341a1148dd0ffa464b5
+	sha1:6af61bb89223c1fed11cd7cca8afce63112679ae
+
+-----BEGIN PRIVATE KEY-----
+MEgCAQAwHwYIKoUDBwEBAQEwEwYHKoUDAgIkAAYIKoUDBwEBAgIEIgQgJJk5+qg5
+7cPyqv4PZD3kRjySSrvqxqcyMN1cPmIdz78=
+-----END PRIVATE KEY-----

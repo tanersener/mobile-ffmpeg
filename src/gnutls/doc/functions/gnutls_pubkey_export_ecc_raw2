@@ -1,0 +1,28 @@
+
+
+
+
+@deftypefun {int} {gnutls_pubkey_export_ecc_raw2} (gnutls_pubkey_t @var{key}, gnutls_ecc_curve_t * @var{curve}, gnutls_datum_t * @var{x}, gnutls_datum_t * @var{y}, unsigned int @var{flags})
+@var{key}: Holds the public key
+
+@var{curve}: will hold the curve (may be @code{NULL} )
+
+@var{x}: will hold x-coordinate (may be @code{NULL} )
+
+@var{y}: will hold y-coordinate (may be @code{NULL} )
+
+@var{flags}: flags from @code{gnutls_abstract_export_flags_t} 
+
+This function will export the ECC public key's parameters found in
+the given key.  The new parameters will be allocated using
+@code{gnutls_malloc()}  and will be stored in the appropriate datum.
+
+In EdDSA curves the  @code{y} parameter will be @code{NULL}  and the other parameters
+will be in the native format for the curve.
+
+This function allows for @code{NULL}  parameters since 3.4.1.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
+
+@strong{Since:} 3.6.0
+@end deftypefun

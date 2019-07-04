@@ -1007,7 +1007,7 @@ static int decompress_i3(AVCodecContext *avctx, uint32_t *dst, int linesize)
         ret = decode_run_i(avctx, ptype, run, &x, &y, clr,
                            dst, linesize, &lx, &ly,
                            backstep, off, &cx, &cx1);
-        if (run < 0)
+        if (ret < 0)
             return ret;
     }
 
@@ -1038,6 +1038,9 @@ static int decompress_p3(AVCodecContext *avctx,
                          s->range_model3.freqs[1],
                          s->range_model3.cnts,
                          s->range_model3.dectab, &temp);
+    if (ret < 0)
+        return ret;
+
     min += temp << 8;
     ret |= decode_value3(s, 255, &s->range_model3.cntsum,
                          s->range_model3.freqs[0],

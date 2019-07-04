@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2010-2012 Free Software Foundation, Inc.
- * Copyright (C) 2000, 2001, 2008 Niels Möller
+ * Copyright (C) 2016-2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -17,179 +17,104 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
- */
-
-/* Here is the random generator layer. This code was based on the LSH 
- * random generator (the trivia and device source functions for POSIX)
- * and modified to fit gnutls' needs. Relicenced with permission. 
- * Original author Niels Möller.
  */
 
 #include "gnutls_int.h"
 #include "errors.h"
 #include <locks.h>
 #include <num.h>
-#include <nettle/yarrow.h>
-#include <nettle/salsa20.h>
+#include <nettle/chacha.h>
 #include <rnd-common.h>
 #include <system.h>
 #include <atfork.h>
 #include <errno.h>
+#include <minmax.h>
 
-#define NONCE_KEY_SIZE SALSA20_KEY_SIZE
-#define SOURCES 2
+#define PRNG_KEY_SIZE CHACHA_KEY_SIZE
 
-#define RND_LOCK(ctx) if (gnutls_mutex_lock(&((ctx)->mutex))!=0) abort()
-#define RND_UNLOCK(ctx) if (gnutls_mutex_unlock(&((ctx)->mutex))!=0) abort()
+/* For a high level description see the documentation and
+ * the 'Random number generation' section of chapter
+ * 'Using GnuTLS as a cryptographic library'.
+ */
 
-enum {
-	RANDOM_SOURCE_TRIVIA = 0,
-	RANDOM_SOURCE_DEVICE,
+/* We have two "refresh" operations for the PRNG:
+ *  re-seed: the random generator obtains a new key from the system or another PRNG
+ *           (occurs when a time or data-based limit is reached for the GNUTLS_RND_RANDOM
+ *            and GNUTLS_RND_KEY levels and data-based for the nonce level)
+ *  re-key:  the random generator obtains a new key by utilizing its own output.
+ *           This only happens for the GNUTLS_RND_KEY level, on every operation.
+ */
+
+/* after this number of bytes PRNG will rekey using the system RNG */
+static const unsigned prng_reseed_limits[] = {
+	[GNUTLS_RND_NONCE] = 16*1024*1024, /* 16 MB - we re-seed using the GNUTLS_RND_RANDOM output */
+	[GNUTLS_RND_RANDOM] = 2*1024*1024, /* 2MB - we re-seed by time as well */
+	[GNUTLS_RND_KEY] = 2*1024*1024 /* same as GNUTLS_RND_RANDOM - but we re-key on every operation */
 };
 
+static const time_t prng_reseed_time[] = {
+	[GNUTLS_RND_NONCE] = 14400, /* 4 hours */
+	[GNUTLS_RND_RANDOM] = 7200, /* 2 hours */
+	[GNUTLS_RND_KEY] = 7200 /* same as RANDOM */
+};
 
-struct nonce_ctx_st {
-	struct salsa20_ctx ctx;
-	unsigned int counter;
-	void *mutex;
+struct prng_ctx_st {
+	struct chacha_ctx ctx;
+	size_t counter;
 	unsigned int forkid;
+	time_t last_reseed;
 };
 
-struct rnd_ctx_st {
-	struct yarrow256_ctx yctx;
-	struct yarrow_source ysources[SOURCES];
-	struct timespec device_last_read;
-	time_t trivia_previous_time;
-	time_t trivia_time_count;
-	void *mutex;
-	unsigned forkid;
+struct generators_ctx_st {
+	struct prng_ctx_st nonce;  /* GNUTLS_RND_NONCE */
+	struct prng_ctx_st normal; /* GNUTLS_RND_RANDOM, GNUTLS_RND_KEY */
 };
 
-static struct rnd_ctx_st rnd_ctx;
 
-/* after this number of bytes salsa20 will rekey */
-#define NONCE_RESEED_BYTES (1048576)
-static struct nonce_ctx_st nonce_ctx;
-
-inline static unsigned int
-timespec_sub_sec(struct timespec *a, struct timespec *b)
+static void wrap_nettle_rnd_deinit(void *_ctx)
 {
-	return (a->tv_sec - b->tv_sec);
-}
-
-#define DEVICE_READ_INTERVAL (21600)
-/* universal functions */
-
-static int do_trivia_source(struct rnd_ctx_st *ctx, int init, struct event_st *event)
-{
-	unsigned entropy = 0;
-
-	if (init) {
-		ctx->trivia_time_count = 0;
-	} else {
-		ctx->trivia_time_count++;
-
-		if (event->now.tv_sec != ctx->trivia_previous_time) {
-			/* Count one bit of entropy if we either have more than two
-			 * invocations in one second, or more than two seconds
-			 * between invocations. */
-			if ((ctx->trivia_time_count > 2)
-			    || ((event->now.tv_sec - ctx->trivia_previous_time) > 2))
-				entropy++;
-
-			ctx->trivia_time_count = 0;
-		}
-	}
-	ctx->trivia_previous_time = event->now.tv_sec;
-
-	return yarrow256_update(&ctx->yctx, RANDOM_SOURCE_TRIVIA, entropy,
-				sizeof(*event), (void *) event);
-}
-
-#define DEVICE_READ_SIZE 16
-#define DEVICE_READ_SIZE_MAX 32
-
-static int do_device_source(struct rnd_ctx_st *ctx, int init, struct event_st *event)
-{
-	unsigned int read_size = DEVICE_READ_SIZE;
-	int ret;
-
-	if (init) {
-		memcpy(&ctx->device_last_read, &event->now,
-		       sizeof(ctx->device_last_read));
-
-		read_size = DEVICE_READ_SIZE_MAX;	/* initially read more data */
-	}
-
-	if ((init
-	     || (timespec_sub_sec(&event->now, &ctx->device_last_read) >
-		 DEVICE_READ_INTERVAL))) {
-		/* More than 20 minutes since we last read the device */
-		uint8_t buf[DEVICE_READ_SIZE_MAX];
-
-		ret = _rnd_get_system_entropy(buf, read_size);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
-
-		memcpy(&ctx->device_last_read, &event->now,
-		       sizeof(ctx->device_last_read));
-
-		return yarrow256_update(&ctx->yctx, RANDOM_SOURCE_DEVICE,
-					read_size * 8 /
-					2 /* we trust the RNG */ ,
-					read_size, buf);
-	}
-	return 0;
-}
-
-static void wrap_nettle_rnd_deinit(void *ctx)
-{
-	_rnd_system_entropy_deinit();
-
-	gnutls_mutex_deinit(&nonce_ctx.mutex);
-	nonce_ctx.mutex = NULL;
-	gnutls_mutex_deinit(&rnd_ctx.mutex);
-	rnd_ctx.mutex = NULL;
+	gnutls_free(_ctx);
 }
 
 /* Initializes the nonce level random generator.
  *
- * the @nonce_key must be provided.
+ * the @new_key must be provided.
  *
  * @init must be non zero on first initialization, and
  * zero on any subsequent reinitializations.
  */
-static int nonce_rng_init(struct nonce_ctx_st *ctx,
-			  uint8_t nonce_key[NONCE_KEY_SIZE],
-			  unsigned nonce_key_size,
-			  unsigned init)
+static int single_prng_init(struct prng_ctx_st *ctx,
+			    uint8_t new_key[PRNG_KEY_SIZE],
+			    unsigned new_key_size,
+			    unsigned init)
 {
-	uint8_t iv[8];
-	int ret;
+	uint8_t nonce[CHACHA_NONCE_SIZE];
+
+	memset(nonce, 0, sizeof(nonce)); /* to prevent valgrind from whinning */
 
 	if (init == 0) {
 		/* use the previous key to generate IV as well */
-		memset(iv, 0, sizeof(iv)); /* to prevent valgrind from whinning */
-		salsa20r12_crypt(&ctx->ctx, sizeof(iv), iv, iv);
+		chacha_crypt(&ctx->ctx, sizeof(nonce), nonce, nonce);
 
 		/* Add key continuity by XORing the new key with data generated
 		 * from the old key */
-		salsa20r12_crypt(&ctx->ctx, nonce_key_size, nonce_key, nonce_key);
+		chacha_crypt(&ctx->ctx, new_key_size, new_key, new_key);
 	} else {
+		struct timespec now; /* current time */
+
 		ctx->forkid = _gnutls_get_forkid();
 
-		/* when initializing read the IV from the system randomness source */
-		ret = _rnd_get_system_entropy(iv, sizeof(iv));
-		if (ret < 0)
-			return gnutls_assert_val(ret);
+		gnutls_gettime(&now);
+		memcpy(nonce, &now, MIN(sizeof(nonce), sizeof(now)));
+		ctx->last_reseed = now.tv_sec;
 	}
 
-	salsa20_set_key(&ctx->ctx, nonce_key_size, nonce_key);
-	salsa20_set_iv(&ctx->ctx, iv);
+	chacha_set_key(&ctx->ctx, new_key);
+	chacha_set_nonce(&ctx->ctx, nonce);
 
-	zeroize_key(nonce_key, nonce_key_size);
+	zeroize_key(new_key, new_key_size);
 
 	ctx->counter = 0;
 
@@ -198,158 +123,137 @@ static int nonce_rng_init(struct nonce_ctx_st *ctx,
 
 /* API functions */
 
-static int wrap_nettle_rnd_init(void **ctx)
+static int wrap_nettle_rnd_init(void **_ctx)
 {
 	int ret;
-	struct event_st event;
-	uint8_t nonce_key[NONCE_KEY_SIZE];
+	uint8_t new_key[PRNG_KEY_SIZE*2];
+	struct generators_ctx_st *ctx;
 
-	memset(&rnd_ctx, 0, sizeof(rnd_ctx));
-
-	ret = gnutls_mutex_init(&nonce_ctx.mutex);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
-
-	ret = gnutls_mutex_init(&rnd_ctx.mutex);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
-
-	/* initialize the main RNG */
-	yarrow256_init(&rnd_ctx.yctx, SOURCES, rnd_ctx.ysources);
-
-	_rnd_get_event(&event);
-
-	rnd_ctx.forkid = _gnutls_get_forkid();
-
-	ret = do_device_source(&rnd_ctx, 1, &event);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
-
-	ret = do_trivia_source(&rnd_ctx, 1, &event);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
-
-	yarrow256_slow_reseed(&rnd_ctx.yctx);
+	ctx = calloc(1, sizeof(*ctx));
+	if (ctx == NULL)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
 	/* initialize the nonce RNG */
-	ret = _rnd_get_system_entropy(nonce_key, sizeof(nonce_key));
-	if (ret < 0)
-		return gnutls_assert_val(ret);
+	ret = _rnd_get_system_entropy(new_key, sizeof(new_key));
+	if (ret < 0) {
+		gnutls_assert();
+		goto fail;
+	}
 
-	ret = nonce_rng_init(&nonce_ctx, nonce_key, sizeof(nonce_key), 1);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
+	ret = single_prng_init(&ctx->nonce, new_key, PRNG_KEY_SIZE, 1);
+	if (ret < 0) {
+		gnutls_assert();
+		goto fail;
+	}
+
+	/* initialize the random/key RNG */
+	ret = single_prng_init(&ctx->normal, new_key+PRNG_KEY_SIZE, PRNG_KEY_SIZE, 1);
+	if (ret < 0) {
+		gnutls_assert();
+		goto fail;
+	}
+
+	*_ctx = ctx;
 
 	return 0;
-}
-
-static int
-wrap_nettle_rnd_nonce(void *_ctx, void *data, size_t datasize)
-{
-	int ret, reseed = 0;
-	uint8_t nonce_key[NONCE_KEY_SIZE];
-
-	/* we don't really need memset here, but otherwise we
-	 * get filled with valgrind warnings */
-	memset(data, 0, datasize);
-
-	RND_LOCK(&nonce_ctx);
-
-	if (_gnutls_detect_fork(nonce_ctx.forkid)) {
-		reseed = 1;
-	}
-
-	if (reseed != 0 || nonce_ctx.counter > NONCE_RESEED_BYTES) {
-		/* reseed nonce */
-		ret = _rnd_get_system_entropy(nonce_key, sizeof(nonce_key));
-		if (ret < 0) {
-			gnutls_assert();
-			goto cleanup;
-		}
-
-		ret = nonce_rng_init(&nonce_ctx, nonce_key, sizeof(nonce_key), 0);
-		if (ret < 0) {
-			gnutls_assert();
-			goto cleanup;
-		}
-
-		nonce_ctx.forkid = _gnutls_get_forkid();
-	}
-
-	salsa20r12_crypt(&nonce_ctx.ctx, datasize, data, data);
-	nonce_ctx.counter += datasize;
-
-	ret = 0;
-
-cleanup:
-	RND_UNLOCK(&nonce_ctx);
+ fail:
+	gnutls_free(ctx);
 	return ret;
 }
-
-
 
 static int
 wrap_nettle_rnd(void *_ctx, int level, void *data, size_t datasize)
 {
+	struct generators_ctx_st *ctx = _ctx;
+	struct prng_ctx_st *prng_ctx;
 	int ret, reseed = 0;
-	struct event_st event;
+	uint8_t new_key[PRNG_KEY_SIZE];
+	time_t now;
 
-	if (level == GNUTLS_RND_NONCE)
-		return wrap_nettle_rnd_nonce(_ctx, data, datasize);
+	if (level == GNUTLS_RND_RANDOM || level == GNUTLS_RND_KEY)
+		prng_ctx = &ctx->normal;
+	else if (level == GNUTLS_RND_NONCE)
+		prng_ctx = &ctx->nonce;
+	else
+		return gnutls_assert_val(GNUTLS_E_RANDOM_FAILED);
 
-	_rnd_get_event(&event);
+	/* Two reasons for this memset():
+	 *  1. avoid getting filled with valgrind warnings
+	 *  2. avoid a cipher/PRNG failure to expose stack data
+	 */
+	memset(data, 0, datasize);
 
-	RND_LOCK(&rnd_ctx);
+	now = gnutls_time(0);
 
-	if (_gnutls_detect_fork(rnd_ctx.forkid)) {	/* fork() detected */
-		memset(&rnd_ctx.device_last_read, 0, sizeof(rnd_ctx.device_last_read));
+	/* We re-seed based on time in addition to output data. That is,
+	 * to prevent a temporal state compromise to become permanent for low
+	 * traffic sites */
+	if (unlikely(_gnutls_detect_fork(prng_ctx->forkid))) {
 		reseed = 1;
+	} else {
+		if (now > prng_ctx->last_reseed + prng_reseed_time[level])
+			reseed = 1;
 	}
 
-	/* reseed main */
-	ret = do_trivia_source(&rnd_ctx, 0, &event);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
+	if (reseed != 0 || prng_ctx->counter > prng_reseed_limits[level]) {
+		if (level == GNUTLS_RND_NONCE) {
+			ret = wrap_nettle_rnd(_ctx, GNUTLS_RND_RANDOM, new_key, sizeof(new_key));
+		} else {
+
+			/* we also use the system entropy to reduce the impact
+			 * of a temporal state compromise for these two levels. */
+			ret = _rnd_get_system_entropy(new_key, sizeof(new_key));
+		}
+
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		ret = single_prng_init(prng_ctx, new_key, sizeof(new_key), 0);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		prng_ctx->last_reseed = now;
+		prng_ctx->forkid = _gnutls_get_forkid();
 	}
 
-	ret = do_device_source(&rnd_ctx, 0, &event);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
+	chacha_crypt(&prng_ctx->ctx, datasize, data, data);
+	prng_ctx->counter += datasize;
+
+	if (level == GNUTLS_RND_KEY) { /* prevent backtracking */
+		ret = wrap_nettle_rnd(_ctx, GNUTLS_RND_RANDOM, new_key, sizeof(new_key));
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		ret = single_prng_init(prng_ctx, new_key, sizeof(new_key), 0);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
 	}
 
-	if (reseed != 0) {
-		yarrow256_slow_reseed(&rnd_ctx.yctx);
-		rnd_ctx.forkid = _gnutls_get_forkid();
-	}
-
-	yarrow256_random(&rnd_ctx.yctx, datasize, data);
 	ret = 0;
 
 cleanup:
-	RND_UNLOCK(&rnd_ctx);
 	return ret;
 }
 
 static void wrap_nettle_rnd_refresh(void *_ctx)
 {
-	uint8_t nonce_key[NONCE_KEY_SIZE];
+	struct generators_ctx_st *ctx = _ctx;
+	char tmp;
 
-	/* this call refreshes the random context */
-	wrap_nettle_rnd(&rnd_ctx, GNUTLS_RND_RANDOM, nonce_key, sizeof(nonce_key));
+	/* force reseed */
+	ctx->nonce.counter = prng_reseed_limits[GNUTLS_RND_NONCE]+1;
+	ctx->normal.counter = prng_reseed_limits[GNUTLS_RND_RANDOM]+1;
 
-	RND_LOCK(&nonce_ctx);
-	nonce_rng_init(&nonce_ctx, nonce_key, sizeof(nonce_key), 0);
-	RND_UNLOCK(&nonce_ctx);
+	wrap_nettle_rnd(_ctx, GNUTLS_RND_NONCE, &tmp, 1);
+	wrap_nettle_rnd(_ctx, GNUTLS_RND_RANDOM, &tmp, 1);
 
 	return;
 }

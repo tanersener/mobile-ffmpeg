@@ -21,10 +21,10 @@
  * MA 02111-1301, USA.
  */
  
-#ifndef DSA_FIPS_H_INCLUDED
-#define DSA_FIPS_H_INCLUDED
+#ifndef GNUTLS_LIB_NETTLE_INT_DSA_FIPS_H
+#define GNUTLS_LIB_NETTLE_INT_DSA_FIPS_H
 
-#include <gmp.h>
+#include <nettle/bignum.h> /* includes gmp.h */
 #include <nettle/dsa.h>
 #include <nettle/sha2.h>
 #include <fips.h>
@@ -125,4 +125,4 @@ hash (uint8_t digest[DIGEST_SIZE], unsigned length, void *data)
 
 unsigned mpz_seed_sizeinbase_256_u(mpz_t s, unsigned nominal);
 
-#endif /* DSA_FIPS_H_INCLUDED */
+#endif /* GNUTLS_LIB_NETTLE_INT_DSA_FIPS_H */

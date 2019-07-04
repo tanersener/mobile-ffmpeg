@@ -1,5 +1,5 @@
 /* POSIX compatible FILE stream write function.
-   Copyright (C) 2008-2017 Free Software Foundation, Inc.
+   Copyright (C) 2008-2019 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2008.
 
    This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 
@@ -30,7 +30,7 @@
    error EINVAL.  This write() function is at the basis of the function
    which flushes the buffer of a FILE stream.  */
 
-# if (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
+# if defined _WIN32 && ! defined __CYGWIN__
 
 #  include <errno.h>
 #  include <signal.h>
@@ -39,7 +39,11 @@
 #  define WIN32_LEAN_AND_MEAN  /* avoid including junk */
 #  include <windows.h>
 
-#  include "msvc-nothrow.h"
+#  if GNULIB_MSVC_NOTHROW
+#   include "msvc-nothrow.h"
+#  else
+#   include <io.h>
+#  endif
 
 #  if GNULIB_NONBLOCKING
 #   define CLEAR_ERRNO \

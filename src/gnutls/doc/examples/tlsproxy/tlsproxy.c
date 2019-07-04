@@ -24,7 +24,8 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 */
 
-#define _GNU_SOURCE
+#include "config.h"
+
 #include <errno.h>
 #include <getopt.h>
 #include <netdb.h>
@@ -49,7 +50,7 @@ static int insecure = 0;
 static int nofork = 0;
 static int server = 0;
 
-static char *defaultport = "12345";
+static const char *defaultport = "12345";
 
 static volatile sig_atomic_t rxsigquit = 0;
 
@@ -59,6 +60,9 @@ bindtoaddress (char *addrport)
   struct addrinfo hints;
   struct addrinfo *result, *rp;
   int fd, s;
+  char addr[128];
+
+  snprintf(addr, sizeof(addr), "%s", addrport);
 
   memset (&hints, 0, sizeof (struct addrinfo));
   hints.ai_flags = AI_PASSIVE;	/* For wildcard IP address */
@@ -66,9 +70,8 @@ bindtoaddress (char *addrport)
   hints.ai_socktype = SOCK_STREAM;	/* Stream socket */
   hints.ai_protocol = 0;	/* any protocol */
 
-  char *addr = strdupa (addrport);
   char *colon = strrchr (addr, ':');
-  char *port = defaultport;
+  const char *port = defaultport;
   if (colon)
     {
       *colon = 0;
@@ -126,6 +129,9 @@ connecttoaddress (char *addrport)
   struct addrinfo hints;
   struct addrinfo *result, *rp;
   int fd, s;
+  char addr[128];
+
+  snprintf(addr, sizeof(addr), "%s", addrport);
 
   memset (&hints, 0, sizeof (struct addrinfo));
   hints.ai_flags = AI_PASSIVE;	/* For wildcard IP address */
@@ -133,9 +139,8 @@ connecttoaddress (char *addrport)
   hints.ai_socktype = SOCK_STREAM;	/* Stream socket */
   hints.ai_protocol = 0;	/* any protocol */
 
-  char *addr = strdupa (addrport);
   char *colon = strrchr (addr, ':');
-  char *port = defaultport;
+  const char *port = defaultport;
   if (colon)
     {
       *colon = 0;
@@ -222,7 +227,7 @@ runproxy (int acceptfd)
 }
 
 static int
-runlistener ()
+runlistener (void)
 {
   int listenfd;
   if ((listenfd = bindtoaddress (listenaddr)) < 0)
@@ -276,7 +281,7 @@ runlistener ()
 }
 
 static void
-usage ()
+usage (void)
 {
   fprintf (stderr, "tlsproxy\n\n\
 Usage:\n\
@@ -308,7 +313,7 @@ processoptions (int argc, char **argv)
 {
   while (1)
     {
-      static struct option longopts[] = {
+      static const struct option longopts[] = {
 	{"connect", required_argument, 0, 'c'},
 	{"listen", required_argument, 0, 'l'},
 	{"key", required_argument, 0, 'K'},
@@ -323,10 +328,10 @@ processoptions (int argc, char **argv)
 	{0, 0, 0, 0}
       };
 
-      int optind = 0;
+      int optidx = 0;
 
       int c =
-	getopt_long (argc, argv, "c:l:K:C:A:H:sindh", longopts, &optind);
+	getopt_long (argc, argv, "c:l:K:C:A:H:sindh", longopts, &optidx);
       if (c == -1)
 	break;
 
@@ -411,7 +416,7 @@ handlesignal (int sig)
 }
 
 static void
-setsignalmasks ()
+setsignalmasks (void)
 {
   struct sigaction sa;
   /* Set up the structure to specify the new action. */

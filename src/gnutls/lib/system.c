@@ -17,7 +17,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -44,13 +44,33 @@ static HMODULE Crypt32_dll;
 /* System specific function wrappers for certificate stores.
  */
 gnutls_time_func gnutls_time;
+gnutls_gettime_func gnutls_gettime;
+
+/* emulate gnulib's gettime using gettimeofday to avoid linking to
+ * librt */
+static void _gnutls_gettime(struct timespec *t)
+{
+#if defined(HAVE_CLOCK_GETTIME) && defined(CLOCK_REALTIME)
+	clock_gettime(CLOCK_REALTIME, t);
+#else
+	struct timeval tv;
+	gettimeofday(&tv, NULL);
+	t->tv_sec = tv.tv_sec;
+	t->tv_nsec = tv.tv_usec * 1000;
+#endif
+}
+
+void _gnutls_global_set_gettime_function(gnutls_gettime_func gettime_func)
+{
+	gnutls_gettime = gettime_func;
+}
 
 int gnutls_system_global_init(void)
 {
 #if defined(_WIN32) && defined(NEED_CERT_ENUM_CRLS)
 	/* used in system/certs.c */
 	HMODULE crypto;
-	crypto = LoadLibraryA("Crypt32.dll");
+	crypto = LoadLibrary(TEXT("Crypt32.dll"));
 
 	if (crypto == NULL)
 		return GNUTLS_E_CRYPTO_INIT_FAILED;
@@ -66,6 +86,7 @@ int gnutls_system_global_init(void)
 	Crypt32_dll = crypto;
 #endif
 	gnutls_time = time;
+	gnutls_gettime = _gnutls_gettime;
 	return 0;
 }
 
@@ -75,6 +96,7 @@ void gnutls_system_global_deinit(void)
 	FreeLibrary(Crypt32_dll);
 #endif
 	gnutls_time = time;
+	gnutls_gettime = _gnutls_gettime;
 }
 
 

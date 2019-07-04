@@ -32,6 +32,7 @@ static NSString *MEDIA_INFORMATION_H264_2;
 static NSString *MEDIA_INFORMATION_MP4;
 static NSString *MEDIA_INFORMATION_MP4_2;
 static NSString *MEDIA_INFORMATION_OGG;
+static NSString *MEDIA_INFORMATION_RECORDING;
 
 static void initTests() {
     MEDIA_INFORMATION_MP3 = [NSString stringWithFormat:
@@ -304,6 +305,40 @@ static void initTests() {
                                  "    Last message repeated 5 times\n"
                                  "frame=  813 fps=0.0 q=-0.0 Lsize=N/A time=00:00:33.01 bitrate=N/A speed= 234x    \n"
                                  "video:426kB audio:6190kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: unknown"];
+    
+    MEDIA_INFORMATION_RECORDING = [NSString stringWithFormat:
+                                   @"Input #0, mov,mp4,m4a,3gp,3g2,mj2, from '/var/mobile/Containers/Data/Application/845A06CD-8427-4D2D-A9A8-F7738063E220/Library/Caches/video.mov':\n"
+                                   "Metadata:\n"
+                                   "    major_brand     : qt\n"
+                                   "    minor_version   : 0\n"
+                                   "    compatible_brands: qt\n"
+                                   "    creation_time   : 2019-04-18T09:53:38.000000Z\n"
+                                   "    com.apple.quicktime.location.ISO6709: +40.9761+029.0949+070.349/\n"
+                                   "    com.apple.quicktime.make: Apple\n"
+                                   "    com.apple.quicktime.model: iPhone 6\n"
+                                   "    com.apple.quicktime.software: 12.2\n"
+                                   "    com.apple.quicktime.creationdate: 2019-04-18T12:53:38+0300\n"
+                                   "Duration: 00:00:02.30, start: 0.000000, bitrate: 16658 kb/s\n"
+                                   "Stream #0:0(und): Video: h264 (avc1 / 0x31637661), yuv420p(tv, bt709), 1920x1080, 16535 kb/s, 29.98 fps, 29.97 tbr, 600 tbn, 1200 tbc (default)\n"
+                                   "Metadata:\n"
+                                   "    rotate          : 90\n"
+                                   "    creation_time   : 2019-04-18T09:53:38.000000Z\n"
+                                   "    handler_name    : Core Media Video\n"
+                                   "    encoder         : H.264\n"
+                                   "Side data:\n"
+                                   "    displaymatrix: rotation of -90.00 degrees\n"
+                                   "Stream #0:1(und): Audio: aac (mp4a / 0x6134706D), 44100 Hz, mono, fltp, 96 kb/s (default)\n"
+                                   "Metadata:\n"
+                                   "    creation_time   : 2019-04-18T09:53:38.000000Z\n"
+                                   "    handler_name    : Core Media Audio\n"
+                                   "    Stream #0:2(und): Data: none (mebx / 0x7862656D), 0 kb/s (default)\n"
+                                   "Metadata:\n"
+                                   "    creation_time   : 2019-04-18T09:53:38.000000Z\n"
+                                   "    handler_name    : Core Media Metadata\n"
+                                   "Stream #0:3(und): Data: none (mebx / 0x7862656D), 0 kb/s (default)\n"
+                                   "Metadata:\n"
+                                   "    creation_time   : 2019-04-18T09:53:38.000000Z\n"
+                                   "    handler_name    : Core Media Metadata\n"];
 }
 
 void assertNumber(NSNumber *expected, NSNumber *real) {
@@ -323,10 +358,10 @@ void assertString(NSString *expected, NSString *real) {
 }
 
 void assertVideoStream(StreamInformation *stream, NSNumber *index, NSString *codec, NSString *fullCodec, NSString *format, NSString *fullFormat, NSNumber *width, NSNumber *height, NSString *sampleAspectRatio, NSString *displayAspectRatio, NSNumber *bitrate, NSString *averageFrameRate, NSString *realFrameRate, NSString *timeBase, NSString *codecTimeBase) {
-
     assert(stream != nil);
     assertNumber(index, [stream getIndex]);
     assertString(@"video", [stream getType]);
+
     assertString(codec, [stream getCodec]);
     assertString(fullCodec, [stream getFullCodec]);
     
@@ -339,6 +374,7 @@ void assertVideoStream(StreamInformation *stream, NSNumber *index, NSString *cod
     assertString(displayAspectRatio, [stream getDisplayAspectRatio]);
 
     assertNumber(bitrate, [stream getBitrate]);
+
     assertString(averageFrameRate, [stream getAverageFrameRate]);
     assertString(realFrameRate, [stream getRealFrameRate]);
     assertString(timeBase, [stream getTimeBase]);
@@ -351,13 +387,25 @@ void parseVideoStreamBlock(NSString *input, NSNumber *index, NSString *codec, NS
     assertVideoStream(stream, index, codec, fullCodec, format, fullFormat, width, height, sampleAspectRatio, displayAspectRatio, bitrate, averageFrameRate, realFrameRate, timeBase, codecTimeBase);
 }
 
-void assertAudioStream(StreamInformation *stream, NSNumber *index, NSString *codec, NSString *fullCodec, NSNumber *sampleRate, NSString *channelLayout, NSString *sampleFormat, NSNumber *bitrate) {
+void assertStream(StreamInformation *stream, NSNumber *index, NSString *type, NSString *codec, NSString *fullCodec, NSNumber *bitrate) {
+    assert(stream != nil);
+    assertNumber(index, [stream getIndex]);
+    assertString(type, [stream getType]);
 
+    assertString(codec, [stream getCodec]);
+    assertString(fullCodec, [stream getFullCodec]);
+
+    assertNumber(bitrate, [stream getBitrate]);
+}
+
+void assertAudioStream(StreamInformation *stream, NSNumber *index, NSString *codec, NSString *fullCodec, NSNumber *sampleRate, NSString *channelLayout, NSString *sampleFormat, NSNumber *bitrate) {
     assert(stream != nil);
     assertNumber(index, [stream getIndex]);
     assertString(@"audio", [stream getType]);
+
     assertString(codec, [stream getCodec]);
     assertString(fullCodec, [stream getFullCodec]);
+
     assertNumber(sampleRate, [stream getSampleRate]);
     assertString(channelLayout, [stream getChannelLayout]);
     assertString(sampleFormat, [stream getSampleFormat]);
@@ -664,12 +712,52 @@ void assertMediaDuration(MediaInformation *mediaInformation, NSNumber *expectedD
     }
 }
 
+void assertMetadata(MediaInformation *mediaInformation, NSString *expectedKey, NSString *expectedValue) {
+    NSDictionary *metadata = [mediaInformation getMetadataEntries];
+    assertNotNull(metadata);
+    
+    NSString *value = [metadata valueForKey:expectedKey];
+    assertNotNull(value);
+    
+    assert([value isEqualToString:expectedValue]);
+}
+
+void assertStreamMetadata(StreamInformation *streamInformation, NSString *expectedKey, NSString *expectedValue) {
+    NSDictionary *metadata = [streamInformation getMetadataEntries];
+    assertNotNull(metadata);
+    
+    NSString *value = [metadata valueForKey:expectedKey];
+    assertNotNull(value);
+    
+    assert([value isEqualToString:expectedValue]);
+}
+
+void assertStreamSidedata(StreamInformation *streamInformation, NSString *expectedKey, NSString *expectedValue) {
+    NSDictionary *sidedata = [streamInformation getSidedataEntries];
+    assertNotNull(sidedata);
+    
+    NSString *value = [sidedata valueForKey:expectedKey];
+    assertNotNull(value);
+    
+    assert([value isEqualToString:expectedValue]);
+}
+
 void testMediaInformationMp3() {
     MediaInformation *mediaInformation = [MediaInformationParser from:MEDIA_INFORMATION_MP3];
     
     assertNotNull(mediaInformation);
     assertMediaInput(mediaInformation, @"mp3", @"beethoven_-_symphony_no_9.mp3");
     assertMediaDuration(mediaInformation, [[NSNumber alloc] initWithInt: 213240], [[NSNumber alloc] initWithInt: 0], [[NSNumber alloc] initWithInt: 320]);
+    
+    assertMetadata(mediaInformation, @"comment", @"");
+    assertMetadata(mediaInformation, @"album", @"Symphony No.9");
+    assertMetadata(mediaInformation, @"compilation", @"0");
+    assertMetadata(mediaInformation, @"date", @"-1");
+    assertMetadata(mediaInformation, @"title", @"Symphony No.9");
+    assertMetadata(mediaInformation, @"artist", @"Beethoven");
+    assertMetadata(mediaInformation, @"album_artist", @"Beethoven");
+    assertMetadata(mediaInformation, @"track", @"-1");
+    assertMetadata(mediaInformation, @"lyrics-XXX", @"");
     
     NSArray *streams = [mediaInformation getStreams];
     assertNotNull(streams);
@@ -713,11 +801,18 @@ void testMediaInformationH264() {
     assertMediaInput(mediaInformation, @"mov,mp4,m4a,3gp,3g2,mj2", @"transition_rotate.mp4");
     assertMediaDuration(mediaInformation, [[NSNumber alloc] initWithInt:15000], [[NSNumber alloc] initWithInt:0], [[NSNumber alloc] initWithInt:7764]);
 
+    assertMetadata(mediaInformation, @"major_brand", @"isom");
+    assertMetadata(mediaInformation, @"minor_version", @"512");
+    assertMetadata(mediaInformation, @"compatible_brands", @"isomiso2avc1mp41");
+    assertMetadata(mediaInformation, @"encoder", @"Lavf58.12.100");
+
     NSArray *streams = [mediaInformation getStreams];
     assertNotNull(streams);
     assert(1 == [streams count]);
 
     assertVideoStream([streams objectAtIndex:0], [[NSNumber alloc] initWithInt:0], @"h264", @"h264 (main) (avc1 / 0x31637661)", @"yuv420p", @"yuv420p", [[NSNumber alloc] initWithInt:1280], [[NSNumber alloc] initWithInt:720], @"1:1", @"16:9", [[NSNumber alloc] initWithInt:7762], @"25", @"30", @"15360", @"60");
+    
+    assertStreamMetadata([streams objectAtIndex:0], @"handler_name", @"VideoHandler");
 }
 
 void testMediaInformationPng() {
@@ -755,6 +850,16 @@ void testMediaInformationMp4() {
     assertMediaInput(mediaInformation, @"mov,mp4,m4a,3gp,3g2,mj2", @"http://distribution.bbb3d.renderfarming.net/video/mp4/bbb_sunflower_2160p_30fps_stereo_abl.mp4");
     assertMediaDuration(mediaInformation, [[NSNumber alloc] initWithInt:634530], [[NSNumber alloc] initWithInt:0], [[NSNumber alloc] initWithInt:10385]);
 
+    assertMetadata(mediaInformation, @"major_brand", @"isom");
+    assertMetadata(mediaInformation, @"minor_version", @"1");
+    assertMetadata(mediaInformation, @"compatible_brands", @"isomavc1");
+    assertMetadata(mediaInformation, @"creation_time", @"2013-12-16T17:21:55.000000Z");
+    assertMetadata(mediaInformation, @"title", @"Big Buck Bunny, Sunflower version");
+    assertMetadata(mediaInformation, @"artist", @"Blender Foundation 2008, Janus Bager Kristensen 2013");
+    assertMetadata(mediaInformation, @"comment", @"Creative Commons Attribution 3.0 - http://bbb3d.renderfarming.net");
+    assertMetadata(mediaInformation, @"genre", @"Animation");
+    assertMetadata(mediaInformation, @"composer", @"Sacha Goedegebure");
+
     NSArray *streams = [mediaInformation getStreams];
     assertNotNull(streams);
     assert(3 == [streams count]);
@@ -762,6 +867,15 @@ void testMediaInformationMp4() {
     assertVideoStream([streams objectAtIndex:0], [[NSNumber alloc] initWithInt:0], @"h264", @"h264 (high) (avc1 / 0x31637661)", @"yuv420p", @"yuv420p", [[NSNumber alloc] initWithInt:3840], [[NSNumber alloc] initWithInt:4320], @"1:1", @"8:9", [[NSNumber alloc] initWithInt:9902], @"30", @"30", @"30k", @"60");
     assertAudioStream([streams objectAtIndex:1], [[NSNumber alloc] initWithInt:1], @"mp3", @"mp3 (mp4a / 0x6134706d)", [[NSNumber alloc] initWithInt:48000], @"stereo", @"fltp", [[NSNumber alloc] initWithInt:160]);
     assertAudioStream([streams objectAtIndex:2], [[NSNumber alloc] initWithInt:2], @"ac3", @"ac3 (ac-3 / 0x332d6361)", [[NSNumber alloc] initWithInt:48000], @"5.1(side)", @"fltp", [[NSNumber alloc] initWithInt:320]);
+
+    assertStreamMetadata([streams objectAtIndex:0], @"creation_time", @"2013-12-16T17:21:55.000000Z");
+    assertStreamMetadata([streams objectAtIndex:0], @"handler_name", @"GPAC ISO Video Handler");
+    assertStreamMetadata([streams objectAtIndex:1], @"creation_time", @"2013-12-16T17:21:58.000000Z");
+    assertStreamMetadata([streams objectAtIndex:1], @"handler_name", @"GPAC ISO Audio Handler");
+    assertStreamMetadata([streams objectAtIndex:2], @"creation_time", @"2013-12-16T17:21:58.000000Z");
+    assertStreamMetadata([streams objectAtIndex:2], @"handler_name", @"GPAC ISO Audio Handler");
+    
+    assertStreamSidedata([streams objectAtIndex:2], @"audio service type", @"main");
 }
 
 void testMediaInformationMp42() {
@@ -771,6 +885,16 @@ void testMediaInformationMp42() {
     assertMediaInput(mediaInformation, @"mov,mp4,m4a,3gp,3g2,mj2", @"http://distribution.bbb3d.renderfarming.net/video/mp4/bbb_sunflower_1080p_30fps_stereo_arcd.mp4");
     assertMediaDuration(mediaInformation, [[NSNumber alloc] initWithInt:634530], [[NSNumber alloc] initWithInt:0], [[NSNumber alloc] initWithInt:4474]);
 
+    assertMetadata(mediaInformation, @"major_brand", @"isom");
+    assertMetadata(mediaInformation, @"minor_version", @"1");
+    assertMetadata(mediaInformation, @"compatible_brands", @"isomavc1");
+    assertMetadata(mediaInformation, @"creation_time", @"2013-12-16T17:49:59.000000Z");
+    assertMetadata(mediaInformation, @"title", @"Big Buck Bunny, Sunflower version");
+    assertMetadata(mediaInformation, @"artist", @"Blender Foundation 2008, Janus Bager Kristensen 2013");
+    assertMetadata(mediaInformation, @"comment", @"Creative Commons Attribution 3.0 - http://bbb3d.renderfarming.net");
+    assertMetadata(mediaInformation, @"genre", @"Animation");
+    assertMetadata(mediaInformation, @"composer", @"Sacha Goedegebure");
+
     NSArray *streams = [mediaInformation getStreams];
     assertNotNull(streams);
     assert(3 == [streams count]);
@@ -778,6 +902,15 @@ void testMediaInformationMp42() {
     assertVideoStream([streams objectAtIndex:0], [[NSNumber alloc] initWithInt:0], @"h264", @"h264 (high) (avc1 / 0x31637661)", @"yuv420p", @"yuv420p", [[NSNumber alloc] initWithInt:1920], [[NSNumber alloc] initWithInt:1080], @"1:1", @"16:9", [[NSNumber alloc] initWithInt:3992], @"30", @"30", @"30k", @"60");
     assertAudioStream([streams objectAtIndex:1], [[NSNumber alloc] initWithInt:1], @"mp3", @"mp3 (mp4a / 0x6134706d)", [[NSNumber alloc] initWithInt:48000], @"stereo", @"fltp", [[NSNumber alloc] initWithInt:160]);
     assertAudioStream([streams objectAtIndex:2], [[NSNumber alloc] initWithInt:2], @"ac3", @"ac3 (ac-3 / 0x332d6361)", [[NSNumber alloc] initWithInt:48000], @"5.1(side)", @"fltp", [[NSNumber alloc] initWithInt:320]);
+
+    assertStreamMetadata([streams objectAtIndex:0], @"creation_time", @"2013-12-16T17:49:59.000000Z");
+    assertStreamMetadata([streams objectAtIndex:0], @"handler_name", @"GPAC ISO Video Handler");
+    assertStreamMetadata([streams objectAtIndex:1], @"creation_time", @"2013-12-16T17:50:04.000000Z");
+    assertStreamMetadata([streams objectAtIndex:1], @"handler_name", @"GPAC ISO Audio Handler");
+    assertStreamMetadata([streams objectAtIndex:2], @"creation_time", @"2013-12-16T17:50:04.000000Z");
+    assertStreamMetadata([streams objectAtIndex:2], @"handler_name", @"GPAC ISO Audio Handler");
+    
+    assertStreamSidedata([streams objectAtIndex:2], @"audio service type", @"main");
 }
 
 void testMediaInformationOgg() {
@@ -793,6 +926,49 @@ void testMediaInformationOgg() {
 
     assertVideoStream([streams objectAtIndex:0], [[NSNumber alloc] initWithInt:0], @"theora", @"theora", @"yuv420p", @"yuv420p(bt470bg/bt470bg/bt709)", [[NSNumber alloc] initWithInt:720], [[NSNumber alloc] initWithInt:400], nil, nil, nil, @"25", @"25", @"25", @"25");
     assertAudioStream([streams objectAtIndex:1], [[NSNumber alloc] initWithInt:1], @"vorbis", @"vorbis", [[NSNumber alloc] initWithInt:48000], @"stereo", @"fltp", [[NSNumber alloc] initWithInt:80]);
+
+    assertStreamMetadata([streams objectAtIndex:0], @"ENCODER", @"ffmpeg2theora 0.19");
+    assertStreamMetadata([streams objectAtIndex:1], @"ENCODER", @"ffmpeg2theora 0.19");
+}
+
+void testMediaInformationRecording() {
+    MediaInformation *mediaInformation = [MediaInformationParser from:MEDIA_INFORMATION_RECORDING];
+    
+    assertNotNull(mediaInformation);
+    assertMediaInput(mediaInformation, @"mov,mp4,m4a,3gp,3g2,mj2", @"/var/mobile/Containers/Data/Application/845A06CD-8427-4D2D-A9A8-F7738063E220/Library/Caches/video.mov");
+    assertMediaDuration(mediaInformation, [[NSNumber alloc] initWithInt:2300], [[NSNumber alloc] initWithInt:0], [[NSNumber alloc] initWithInt:16658]);
+
+    assertMetadata(mediaInformation, @"major_brand", @"qt");
+    assertMetadata(mediaInformation, @"minor_version", @"0");
+    assertMetadata(mediaInformation, @"compatible_brands", @"qt");
+    assertMetadata(mediaInformation, @"creation_time", @"2019-04-18T09:53:38.000000Z");
+    assertMetadata(mediaInformation, @"com.apple.quicktime.location.ISO6709", @"+40.9761+029.0949+070.349/");
+    assertMetadata(mediaInformation, @"com.apple.quicktime.make", @"Apple");
+    assertMetadata(mediaInformation, @"com.apple.quicktime.model", @"iPhone 6");
+    assertMetadata(mediaInformation, @"com.apple.quicktime.software", @"12.2");
+    assertMetadata(mediaInformation, @"com.apple.quicktime.creationdate", @"2019-04-18T12:53:38+0300");
+
+    NSArray *streams = [mediaInformation getStreams];
+    assertNotNull(streams);
+    assert(4 == [streams count]);
+    
+    assertVideoStream([streams objectAtIndex:0], [[NSNumber alloc] initWithInt:0], @"h264", @"h264 (avc1 / 0x31637661)", @"yuv420p", @"yuv420p(tv, bt709)", [[NSNumber alloc] initWithInt:1920], [[NSNumber alloc] initWithInt:1080], nil, nil, [[NSNumber alloc] initWithInt:16535], @"29.98", @"29.97", @"600", @"1200");
+    assertAudioStream([streams objectAtIndex:1], [[NSNumber alloc] initWithInt:1], @"aac", @"aac (mp4a / 0x6134706d)", [[NSNumber alloc] initWithInt:44100], @"mono", @"fltp", [[NSNumber alloc] initWithInt:96]);
+    assertStream([streams objectAtIndex:2], [[NSNumber alloc] initWithInt:2], @"data", @"none", @"none (mebx / 0x7862656d)", [[NSNumber alloc] initWithInt:0]);
+    assertStream([streams objectAtIndex:3], [[NSNumber alloc] initWithInt:3], @"data", @"none", @"none (mebx / 0x7862656d)", [[NSNumber alloc] initWithInt:0]);
+
+    assertStreamMetadata([streams objectAtIndex:0], @"rotate", @"90");
+    assertStreamMetadata([streams objectAtIndex:0], @"creation_time", @"2019-04-18T09:53:38.000000Z");
+    assertStreamMetadata([streams objectAtIndex:0], @"handler_name", @"Core Media Video");
+    assertStreamMetadata([streams objectAtIndex:0], @"encoder", @"H.264");
+    assertStreamMetadata([streams objectAtIndex:1], @"creation_time", @"2019-04-18T09:53:38.000000Z");
+    assertStreamMetadata([streams objectAtIndex:1], @"handler_name", @"Core Media Audio");
+    assertStreamMetadata([streams objectAtIndex:2], @"creation_time", @"2019-04-18T09:53:38.000000Z");
+    assertStreamMetadata([streams objectAtIndex:2], @"handler_name", @"Core Media Metadata");
+    assertStreamMetadata([streams objectAtIndex:3], @"creation_time", @"2019-04-18T09:53:38.000000Z");
+    assertStreamMetadata([streams objectAtIndex:3], @"handler_name", @"Core Media Metadata");
+    
+    assertStreamSidedata([streams objectAtIndex:0], @"displaymatrix", @"rotation of -90.00 degrees");
 }
 
 /**
@@ -835,6 +1011,7 @@ void runMediaInformationParserTests() {
     testMediaInformationMp4();
     testMediaInformationMp42();
     testMediaInformationOgg();
+    testMediaInformationRecording();
     
     
     NSLog(@"MediaInformationParserTests passed.");

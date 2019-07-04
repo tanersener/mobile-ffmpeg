@@ -42,7 +42,7 @@ int _gnutls_server_name_set_raw(gnutls_session_t session,
 const char *side = NULL;
 
 /* if @host is NULL certificate check is skipped */
-static int
+int
 _test_cli_serv(gnutls_certificate_credentials_t server_cred,
 	      gnutls_certificate_credentials_t client_cred,
 	      const char *serv_prio, const char *cli_prio,
@@ -53,7 +53,6 @@ _test_cli_serv(gnutls_certificate_credentials_t server_cred,
 	      int serv_err,
 	      int cli_err)
 {
-	int exit_code = EXIT_SUCCESS;
 	int ret;
 	/* Server stuff. */
 	gnutls_session_t server;
@@ -69,7 +68,10 @@ _test_cli_serv(gnutls_certificate_credentials_t server_cred,
 	gnutls_init(&server, GNUTLS_SERVER);
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
 				server_cred);
-	gnutls_priority_set_direct(server, serv_prio, NULL);
+	ret = gnutls_priority_set_direct(server, serv_prio, NULL);
+	if (ret < 0) {
+		fail("error in server priority: %s\n", serv_prio);
+	}
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
@@ -95,7 +97,10 @@ _test_cli_serv(gnutls_certificate_credentials_t server_cred,
 	if (ret < 0)
 		exit(1);
 
-	gnutls_priority_set_direct(client, cli_prio, NULL);
+	ret = gnutls_priority_set_direct(client, cli_prio, NULL);
+	if (ret < 0) {
+		fail("error in client priority: %s\n", cli_prio);
+	}
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);
@@ -104,6 +109,7 @@ _test_cli_serv(gnutls_certificate_credentials_t server_cred,
 		HANDSHAKE(client, server);
 	} else {
 		HANDSHAKE_EXPECT(client, server, cli_err, serv_err);
+		goto cleanup;
 	}
 
 	/* check the number of certificates received and verify */
@@ -156,6 +162,11 @@ _test_cli_serv(gnutls_certificate_credentials_t server_cred,
 		}
 	}
 
+	if (cret >= 0)
+		gnutls_bye(client, GNUTLS_SHUT_RDWR);
+	if (sret >= 0)
+		gnutls_bye(server, GNUTLS_SHUT_RDWR);
+
 	ret = 0;
  cleanup:
 	if (client_cb)
@@ -163,18 +174,8 @@ _test_cli_serv(gnutls_certificate_credentials_t server_cred,
 	if (server_cb)
 		server_cb(server, priv);
 
-	gnutls_bye(client, GNUTLS_SHUT_RDWR);
-	gnutls_bye(server, GNUTLS_SHUT_RDWR);
-
 	gnutls_deinit(client);
 	gnutls_deinit(server);
-
-	if (debug > 0) {
-		if (exit_code == 0)
-			puts("Self-test successful");
-		else
-			puts("Self-test failed");
-	}
 
 	return ret;
 }
@@ -194,7 +195,6 @@ test_cli_serv_anon(gnutls_anon_server_credentials_t server_cred,
 	      gnutls_anon_client_credentials_t client_cred,
 	      const char *prio)
 {
-	int exit_code = EXIT_SUCCESS;
 	int ret;
 	/* Server stuff. */
 	gnutls_session_t server;
@@ -239,13 +239,6 @@ test_cli_serv_anon(gnutls_anon_server_credentials_t server_cred,
 	gnutls_deinit(client);
 	gnutls_deinit(server);
 
-	if (debug > 0) {
-		if (exit_code == 0)
-			puts("Self-test successful");
-		else
-			puts("Self-test failed");
-	}
-
 	return ret;
 }
 
@@ -254,7 +247,6 @@ test_cli_serv_psk(gnutls_psk_server_credentials_t server_cred,
 	      gnutls_psk_client_credentials_t client_cred,
 	      const char *prio)
 {
-	int exit_code = EXIT_SUCCESS;
 	int ret;
 	/* Server stuff. */
 	gnutls_session_t server;
@@ -299,13 +291,6 @@ test_cli_serv_psk(gnutls_psk_server_credentials_t server_cred,
 	gnutls_deinit(client);
 	gnutls_deinit(server);
 
-	if (debug > 0) {
-		if (exit_code == 0)
-			puts("Self-test successful");
-		else
-			puts("Self-test failed");
-	}
-
 	return ret;
 }
 
@@ -334,3 +319,57 @@ test_cli_serv_vf(gnutls_certificate_credentials_t server_cred,
 {
 	return _test_cli_serv(server_cred, client_cred, prio, prio, host, NULL, NULL, NULL, 1, 0, 0, 0);
 }
+
+void print_dh_params_info(gnutls_session_t session)
+{
+	unsigned i;
+	int ret;
+	gnutls_datum_t pubkey, gen, prime;
+
+	ret = gnutls_dh_get_prime_bits(session);
+	if (ret < 512) {
+		fail("client: too small prime size: %d\n", ret);
+	}
+
+	ret = gnutls_dh_get_secret_bits(session);
+	if (ret < 225) {
+		fail("client: too small secret key size: %d\n", ret);
+	}
+
+	ret = gnutls_dh_get_pubkey(session, &pubkey);
+	if (ret < 0) {
+		fail("error retrieving the public key\n");
+	}
+
+	if (pubkey.size == 0) {
+		fail("retrieved pubkey is empty!\n");
+	}
+
+	printf("pubkey: \n");
+	for (i=0;i<pubkey.size;i++) {
+		printf("%.2x", (unsigned)pubkey.data[i]);
+	}
+	printf("\n");
+
+	gnutls_free(pubkey.data);
+
+	ret = gnutls_dh_get_group(session, &gen, &prime);
+	if (ret < 0 || gen.size == 0 || prime.size == 0) {
+		fail("error retrieving the group info\n");
+	}
+
+	printf("prime: \n");
+	for (i=0;i<prime.size;i++) {
+		printf("%.2x", (unsigned)prime.data[i]);
+	}
+	printf("\n");
+
+	printf("generator: \n");
+	for (i=0;i<gen.size;i++) {
+		printf("%.2x", (unsigned)gen.data[i]);
+	}
+	printf("\n");
+	gnutls_free(gen.data);
+	gnutls_free(prime.data);
+}
+

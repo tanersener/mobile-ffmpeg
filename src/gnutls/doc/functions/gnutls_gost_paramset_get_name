@@ -1,0 +1,14 @@
+
+
+
+
+@deftypefun {const char *} {gnutls_gost_paramset_get_name} (gnutls_gost_paramset_t @var{param})
+@var{param}: is a GOST 28147 param set
+
+Convert a @code{gnutls_gost_paramset_t}  value to a string.
+
+@strong{Returns:} a string that contains the name of the specified GOST param set,
+or @code{NULL} .
+
+@strong{Since:} 3.6.3
+@end deftypefun

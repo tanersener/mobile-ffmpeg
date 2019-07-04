@@ -1,7 +1,8 @@
+/.libs/
 /.deps/
+*.o
+*.lo
 /Makefile
 /gnutls.pc
-/.libs/
-*.lo
-*.o
-*.la
+/libgnutls.la
+/libgnutlsxx.la

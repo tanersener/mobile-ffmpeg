@@ -1,8 +1,9 @@
 /.deps/
+/sys/
 /Makefile
-/arg-nonnull.h
-/c++defs.h
 /ctype.h
 /fcntl.h
 /inttypes.h
-/warn-on-use.h
+/langinfo.h
+/locale.h
+/signal.h

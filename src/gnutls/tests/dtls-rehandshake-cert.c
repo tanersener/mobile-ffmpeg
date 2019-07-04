@@ -80,7 +80,7 @@ push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 	return send(fd, data, len, 0);
 }
 
-static void client(int fd, int server_init)
+static void client(int fd, int server_init, const char *prio)
 {
 	int ret;
 	char buffer[MAX_BUF + 1];
@@ -102,9 +102,10 @@ static void client(int fd, int server_init)
 	gnutls_dtls_set_mtu(session, 1500);
 
 	/* Use default priorities */
+	snprintf(buffer, sizeof(buffer), "%s:+ECDHE-RSA", prio);
 	assert(gnutls_priority_set_direct(session,
-				   "NONE:+VERS-DTLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ECDHE-RSA:+CURVE-ALL",
-				   NULL) >= 0);
+					  buffer,
+					  NULL) >= 0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
 				clientx509cred);
@@ -206,7 +207,7 @@ static void terminate(void)
 	exit(1);
 }
 
-static void server(int fd, int server_init)
+static void server(int fd, int server_init, const char *prio)
 {
 	int ret;
 	char buffer[MAX_BUF + 1];
@@ -232,9 +233,10 @@ static void server(int fd, int server_init)
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
+	snprintf(buffer, sizeof(buffer), "%s:+ECDHE-RSA", prio);
 	assert(gnutls_priority_set_direct(session,
-				   "NONE:+VERS-DTLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ECDHE-RSA:+CURVE-ALL",
-				   NULL) >= 0);
+					  buffer,
+					  NULL) >= 0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
 				serverx509cred);
@@ -345,7 +347,7 @@ static void server(int fd, int server_init)
 		success("server: finished\n");
 }
 
-static void start(int server_initiated)
+static void start(int server_initiated, const char *prio)
 {
 	int fd[2];
 	int ret;
@@ -367,20 +369,20 @@ static void start(int server_initiated)
 		int status = 0;
 		/* parent */
 
-		server(fd[0], server_initiated);
+		server(fd[0], server_initiated, prio);
 		wait(&status);
 		check_wait_status(status);
 	} else {
 		close(fd[0]);
-		client(fd[1], server_initiated);
+		client(fd[1], server_initiated, prio);
 		exit(0);
 	}
 }
 
 void doit(void)
 {
-	start(0);
-	start(1);
+	start(0, "NONE:+VERS-DTLS1.2:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+CURVE-ALL");
+	start(1, "NONE:+VERS-DTLS1.2:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+CURVE-ALL");
 }
 
 #endif				/* _WIN32 */

@@ -7,13 +7,9 @@
 
 @var{key}: Location for the key to be exported.
 
-Converts the given abstract private key to a @code{gnutls_openpgp_privkey_t} 
-type. The key must be of type @code{GNUTLS_PRIVKEY_OPENPGP} . The key
-returned in  @code{key} must be deinitialized with
-@code{gnutls_openpgp_privkey_deinit()} .
+This function is no-op.
 
-@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
-negative error value.
+@strong{Returns:} @code{GNUTLS_E_UNIMPLEMENTED_FEATURE} .
 
 @strong{Since:} 3.4.0
 @end deftypefun

@@ -8,9 +8,9 @@
 @var{list}: will point to an integer list
 
 Get a list of available key exchange methods in the priority
-structure. 
+structure.
 
-@strong{Returns:} the number of curves, or an error code.
+@strong{Returns:} the number of items, or an error code.
 
 @strong{Since:} 3.2.3
 @end deftypefun

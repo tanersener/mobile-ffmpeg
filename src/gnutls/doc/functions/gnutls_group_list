@@ -1,0 +1,15 @@
+
+
+
+
+@deftypefun {const gnutls_group_t *} {gnutls_group_list} ( @var{void})
+
+Get the list of supported elliptic curves.
+
+This function is not thread safe.
+
+@strong{Returns:} Return a (0)-terminated list of @code{gnutls_group_t} 
+integers indicating the available groups.
+
+@strong{Since:} 3.6.0
+@end deftypefun

@@ -1,6 +1,7 @@
 /* minip12.c - A mini pkcs-12 implementation (modified for gnutls)
  *
  * Copyright (C) 2002-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2017 Red Hat, Inc.
  *
  * This file is part of GnuTLS.
  *
@@ -15,7 +16,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -27,7 +28,7 @@
 #include <algorithms.h>
 
 #define MAX_PASS_LEN 256
-
+#define MAX_V_SIZE 128
 /* ID should be:
  * 3 for MAC
  * 2 for IV
@@ -47,28 +48,44 @@ _gnutls_pkcs12_string_to_key(const mac_entry_st * me,
 	unsigned int i, j;
 	digest_hd_st md;
 	bigint_t num_b1 = NULL, num_ij = NULL;
-	bigint_t mpi512 = NULL;
+	bigint_t v_mpi = NULL;
 	unsigned int pwlen;
-	uint8_t hash[MAX_HASH_SIZE], buf_b[64], buf_i[MAX_PASS_LEN + 64], *p;
-	uint8_t d[64];
+	uint8_t hash[MAX_HASH_SIZE], buf_b[MAX_V_SIZE], buf_i[MAX_PASS_LEN + MAX_V_SIZE], *p;
+	uint8_t d[MAX_V_SIZE];
 	size_t cur_keylen;
-	size_t n, m, p_size, i_size;
+	size_t n, m, plen, i_size;
+	size_t slen;
 	gnutls_datum_t ucs2 = {NULL, 0};
 	unsigned mac_len;
-	const uint8_t buf_512[] =	/* 2^64 */
-	{ 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-		0x00, 0x00, 0x00, 0x00, 0x00
-	};
+	uint8_t v_val[MAX_V_SIZE+1];
+	unsigned v_size = 0;
+
+	switch (me->id) {
+		case GNUTLS_DIG_GOSTR_94:
+			v_size = 32;
+			break;
+		case GNUTLS_DIG_SHA1:
+		case GNUTLS_DIG_SHA224:
+		case GNUTLS_DIG_SHA256:
+		case GNUTLS_DIG_STREEBOG_256:
+		case GNUTLS_DIG_STREEBOG_512:
+			v_size = 64;
+			break;
+		case GNUTLS_DIG_SHA384:
+		case GNUTLS_DIG_SHA512:
+			v_size = 128;
+			break;
+		default:
+			break;
+	}
+
+	if (v_size == 0 || v_size > MAX_V_SIZE)
+		return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
+
+	memset(v_val, 0, sizeof(v_val));
+	v_val[0] = 0x01; /* make it be 2^64 or 2^128 */
 
 	cur_keylen = 0;
-
-	if (me->block_size != 64)
-		return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 
 	if (pw) {
 		pwlen = strlen(pw);
@@ -79,7 +96,7 @@ _gnutls_pkcs12_string_to_key(const mac_entry_st * me,
 				return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 			ucs2.size = 2;
 		} else {
-			rc = _gnutls_utf8_to_ucs2(pw, pwlen, &ucs2);
+			rc = _gnutls_utf8_to_ucs2(pw, pwlen, &ucs2, 1);
 			if (rc < 0)
 				return gnutls_assert_val(rc);
 
@@ -97,32 +114,28 @@ _gnutls_pkcs12_string_to_key(const mac_entry_st * me,
 		goto cleanup;
 	}
 
-	rc = _gnutls_mpi_init_scan(&mpi512, buf_512, sizeof(buf_512));
+	rc = _gnutls_mpi_init_scan(&v_mpi, v_val, v_size+1);
 	if (rc < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
 	/* Store salt and password in BUF_I */
-	p_size = ((pwlen / 64) * 64) + 64;
+	slen = ((salt_size+v_size-1)/v_size) * v_size;
+	plen = ((pwlen+v_size-1)/v_size) * v_size;
+	i_size = slen + plen;
 
-	if (p_size > sizeof(buf_i) - 64) {
+	if (i_size > sizeof(buf_i)) {
 		rc = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 		goto cleanup;
 	}
 
-
-	if (salt_size > 0) {
-		p = buf_i;
-		for (i = 0; i < 64; i++)
-			*p++ = salt[i % salt_size];
-	} else {
-		memset(buf_i, 0, 64);
-		p = buf_i + 64;
-	}
+	p = buf_i;
+	for (i = 0; i < slen; i++)
+		*p++ = salt[i % salt_size];
 
 	if (pw) {
-		for (i = j = 0; i < p_size; i += 2) {
+		for (i = j = 0; i < plen; i += 2) {
 			*p++ = pw[j];
 			*p++ = pw[j+1];
 			j+=2;
@@ -130,11 +143,11 @@ _gnutls_pkcs12_string_to_key(const mac_entry_st * me,
 				j = 0;
 		}
 	} else {
-		memset(p, 0, p_size);
+		memset(p, 0, plen);
 	}
 
-	i_size = 64 + p_size;
 	mac_len = _gnutls_mac_get_algo_len(me);
+	assert(mac_len != 0);
 
 	for (;;) {
 		rc = _gnutls_hash_init(&md, me);
@@ -142,9 +155,9 @@ _gnutls_pkcs12_string_to_key(const mac_entry_st * me,
 			gnutls_assert();
 			goto cleanup;
 		}
-		memset(d, id & 0xff, 64);
-		_gnutls_hash(&md, d, 64);
-		_gnutls_hash(&md, buf_i, pw ? i_size : 64);
+		memset(d, id & 0xff, v_size);
+		_gnutls_hash(&md, d, v_size);
+		_gnutls_hash(&md, buf_i, i_size);
 		_gnutls_hash_deinit(&md, hash);
 		for (i = 1; i < iter; i++) {
 			rc = _gnutls_hash_fast((gnutls_digest_algorithm_t)me->id,
@@ -162,9 +175,9 @@ _gnutls_pkcs12_string_to_key(const mac_entry_st * me,
 		}
 
 		/* need more bytes. */
-		for (i = 0; i < 64; i++)
+		for (i = 0; i < v_size; i++)
 			buf_b[i] = hash[i % mac_len];
-		n = 64;
+		n = v_size;
 		rc = _gnutls_mpi_init_scan(&num_b1, buf_b, n);
 		if (rc < 0) {
 			gnutls_assert();
@@ -177,21 +190,21 @@ _gnutls_pkcs12_string_to_key(const mac_entry_st * me,
 			goto cleanup;
 		}
 
-		for (i = 0; i < 128; i += 64) {
-			n = 64;
+		for (i = 0; i < i_size; i += v_size) {
+			n = v_size;
 			rc = _gnutls_mpi_init_scan(&num_ij, buf_i + i, n);
 			if (rc < 0) {
 				gnutls_assert();
 				goto cleanup;
 			}
 
-			rc = _gnutls_mpi_addm(num_ij, num_ij, num_b1, mpi512);
+			rc = _gnutls_mpi_addm(num_ij, num_ij, num_b1, v_mpi);
 			if (rc < 0) {
 				gnutls_assert();
 				goto cleanup;
 			}
 
-			n = 64;
+			n = v_size;
 			m = (_gnutls_mpi_get_nbits(num_ij) + 7) / 8;
 
 			memset(buf_i + i, 0, n - m);
@@ -207,7 +220,7 @@ _gnutls_pkcs12_string_to_key(const mac_entry_st * me,
       cleanup:
 	_gnutls_mpi_release(&num_ij);
 	_gnutls_mpi_release(&num_b1);
-	_gnutls_mpi_release(&mpi512);
+	_gnutls_mpi_release(&v_mpi);
 	gnutls_free(ucs2.data);
 
 	return rc;

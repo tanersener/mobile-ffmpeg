@@ -702,15 +702,15 @@ static int read_dct_coeffs(BinkContext *c, GetBitContext *gb, int32_t block[64],
     return quant_idx;
 }
 
-static void unquantize_dct_coeffs(int32_t block[64], const int32_t quant[64],
+static void unquantize_dct_coeffs(int32_t block[64], const uint32_t quant[64],
                                   int coef_count, int coef_idx[64],
                                   const uint8_t *scan)
 {
     int i;
-    block[0] = (block[0] * quant[0]) >> 11;
+    block[0] = (int)(block[0] * quant[0]) >> 11;
     for (i = 0; i < coef_count; i++) {
         int idx = coef_idx[i];
-        block[scan[idx]] = (block[scan[idx]] * quant[idx]) >> 11;
+        block[scan[idx]] = (int)(block[scan[idx]] * quant[idx]) >> 11;
     }
 }
 
@@ -1046,8 +1046,6 @@ static int bink_decode_plane(BinkContext *c, AVFrame *frame, GetBitContext *gb,
         if ((ret = read_runs(c->avctx, gb, &c->bundle[BINK_SRC_RUN])) < 0)
             return ret;
 
-        if (by == bh)
-            break;
         dst  = frame->data[plane_idx]  + 8*by*stride;
         prev = (c->last->data[plane_idx] ? c->last->data[plane_idx]
                                          : frame->data[plane_idx]) + 8*by*stride;
@@ -1335,12 +1333,12 @@ static av_cold int decode_init(AVCodecContext *avctx)
     }
     c->avctx = avctx;
 
+    if ((ret = av_image_check_size(avctx->width, avctx->height, 0, avctx)) < 0)
+        return ret;
+
     c->last = av_frame_alloc();
     if (!c->last)
         return AVERROR(ENOMEM);
-
-    if ((ret = av_image_check_size(avctx->width, avctx->height, 0, avctx)) < 0)
-        return ret;
 
     avctx->pix_fmt = c->has_alpha ? AV_PIX_FMT_YUVA420P : AV_PIX_FMT_YUV420P;
     avctx->color_range = c->version == 'k' ? AVCOL_RANGE_JPEG : AVCOL_RANGE_MPEG;

@@ -1,0 +1,12 @@
+
+
+
+
+@deftypefun {unsigned} {gnutls_sign_is_secure2} (gnutls_sign_algorithm_t @var{algorithm}, unsigned int @var{flags})
+@var{algorithm}: is a sign algorithm
+
+@var{flags}: zero or @code{GNUTLS_SIGN_FLAG_SECURE_FOR_CERTS} 
+
+
+@strong{Returns:} Non-zero if the provided signature algorithm is considered to be secure.
+@end deftypefun

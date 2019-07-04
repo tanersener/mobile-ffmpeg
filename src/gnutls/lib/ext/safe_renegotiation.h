@@ -16,14 +16,14 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
-#ifndef EXT_SAFE_RENEGOTIATION_H
-#define EXT_SAFE_RENEGOTIATION_H
+#ifndef GNUTLS_LIB_EXT_SAFE_RENEGOTIATION_H
+#define GNUTLS_LIB_EXT_SAFE_RENEGOTIATION_H
 
-#include <extensions.h>
+#include <hello_ext.h>
 
 typedef struct {
 	uint8_t client_verify_data[MAX_VERIFY_DATA_SIZE];
@@ -38,7 +38,7 @@ typedef struct {
 	unsigned int connection_using_safe_renegotiation:1;
 } sr_ext_st;
 
-extern const extension_entry_st ext_mod_sr;
+extern const hello_ext_entry_st ext_mod_sr;
 
 int _gnutls_ext_sr_finished(gnutls_session_t session, void *vdata,
 			    size_t vdata_size, int dir);
@@ -46,4 +46,4 @@ int _gnutls_ext_sr_recv_cs(gnutls_session_t session);
 int _gnutls_ext_sr_verify(gnutls_session_t session);
 int _gnutls_ext_sr_send_cs(gnutls_session_t);
 
-#endif				/* EXT_SAFE_RENEGOTIATION_H */
+#endif /* GNUTLS_LIB_EXT_SAFE_RENEGOTIATION_H */

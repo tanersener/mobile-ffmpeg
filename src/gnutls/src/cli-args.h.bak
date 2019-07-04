@@ -19,7 +19,7 @@
  * The gnutls-cli program is copyrighted and licensed
  * under the following terms:
  *
- *  Copyright (C) 2000-2018 Free Software Foundation, and others, all rights reserved.
+ *  Copyright (C) 2000-2019 Free Software Foundation, and others, all rights reserved.
  *  This is free software. It is licensed for use, modification and
  *  redistribution under the terms of the GNU General Public License,
  *  version 3 or later <http://gnu.org/licenses/gpl.html>
@@ -75,36 +75,36 @@ typedef enum {
     INDEX_OPT_CA_VERIFICATION         =  6,
     INDEX_OPT_OCSP                    =  7,
     INDEX_OPT_RESUME                  =  8,
-    INDEX_OPT_REHANDSHAKE             =  9,
-    INDEX_OPT_SNI_HOSTNAME            = 10,
-    INDEX_OPT_STARTTLS                = 11,
-    INDEX_OPT_APP_PROTO               = 12,
-    INDEX_OPT_STARTTLS_PROTO          = 13,
-    INDEX_OPT_UDP                     = 14,
-    INDEX_OPT_MTU                     = 15,
-    INDEX_OPT_CRLF                    = 16,
-    INDEX_OPT_FASTOPEN                = 17,
-    INDEX_OPT_X509FMTDER              = 18,
-    INDEX_OPT_FINGERPRINT             = 19,
-    INDEX_OPT_PRINT_CERT              = 20,
-    INDEX_OPT_SAVE_CERT               = 21,
-    INDEX_OPT_SAVE_OCSP               = 22,
-    INDEX_OPT_DH_BITS                 = 23,
-    INDEX_OPT_PRIORITY                = 24,
-    INDEX_OPT_X509CAFILE              = 25,
-    INDEX_OPT_X509CRLFILE             = 26,
-    INDEX_OPT_PGPKEYFILE              = 27,
-    INDEX_OPT_PGPKEYRING              = 28,
-    INDEX_OPT_PGPCERTFILE             = 29,
+    INDEX_OPT_EARLYDATA               =  9,
+    INDEX_OPT_REHANDSHAKE             = 10,
+    INDEX_OPT_SNI_HOSTNAME            = 11,
+    INDEX_OPT_VERIFY_HOSTNAME         = 12,
+    INDEX_OPT_STARTTLS                = 13,
+    INDEX_OPT_APP_PROTO               = 14,
+    INDEX_OPT_STARTTLS_PROTO          = 15,
+    INDEX_OPT_UDP                     = 16,
+    INDEX_OPT_MTU                     = 17,
+    INDEX_OPT_CRLF                    = 18,
+    INDEX_OPT_FASTOPEN                = 19,
+    INDEX_OPT_X509FMTDER              = 20,
+    INDEX_OPT_PRINT_CERT              = 21,
+    INDEX_OPT_SAVE_CERT               = 22,
+    INDEX_OPT_SAVE_OCSP               = 23,
+    INDEX_OPT_SAVE_SERVER_TRACE       = 24,
+    INDEX_OPT_SAVE_CLIENT_TRACE       = 25,
+    INDEX_OPT_DH_BITS                 = 26,
+    INDEX_OPT_PRIORITY                = 27,
+    INDEX_OPT_X509CAFILE              = 28,
+    INDEX_OPT_X509CRLFILE             = 29,
     INDEX_OPT_X509KEYFILE             = 30,
     INDEX_OPT_X509CERTFILE            = 31,
-    INDEX_OPT_PGPSUBKEY               = 32,
-    INDEX_OPT_SRPUSERNAME             = 33,
-    INDEX_OPT_SRPPASSWD               = 34,
-    INDEX_OPT_PSKUSERNAME             = 35,
-    INDEX_OPT_PSKKEY                  = 36,
-    INDEX_OPT_PORT                    = 37,
-    INDEX_OPT_INSECURE                = 38,
+    INDEX_OPT_SRPUSERNAME             = 32,
+    INDEX_OPT_SRPPASSWD               = 33,
+    INDEX_OPT_PSKUSERNAME             = 34,
+    INDEX_OPT_PSKKEY                  = 35,
+    INDEX_OPT_PORT                    = 36,
+    INDEX_OPT_INSECURE                = 37,
+    INDEX_OPT_VERIFY_ALLOW_BROKEN     = 38,
     INDEX_OPT_RANGES                  = 39,
     INDEX_OPT_BENCHMARK_CIPHERS       = 40,
     INDEX_OPT_BENCHMARK_TLS_KX        = 41,
@@ -118,20 +118,25 @@ typedef enum {
     INDEX_OPT_RECORDSIZE              = 49,
     INDEX_OPT_DISABLE_SNI             = 50,
     INDEX_OPT_DISABLE_EXTENSIONS      = 51,
-    INDEX_OPT_INLINE_COMMANDS         = 52,
-    INDEX_OPT_INLINE_COMMANDS_PREFIX  = 53,
-    INDEX_OPT_PROVIDER                = 54,
-    INDEX_OPT_FIPS140_MODE            = 55,
-    INDEX_OPT_VERSION                 = 56,
-    INDEX_OPT_HELP                    = 57,
-    INDEX_OPT_MORE_HELP               = 58
+    INDEX_OPT_SINGLE_KEY_SHARE        = 52,
+    INDEX_OPT_POST_HANDSHAKE_AUTH     = 53,
+    INDEX_OPT_INLINE_COMMANDS         = 54,
+    INDEX_OPT_INLINE_COMMANDS_PREFIX  = 55,
+    INDEX_OPT_PROVIDER                = 56,
+    INDEX_OPT_FIPS140_MODE            = 57,
+    INDEX_OPT_LOGFILE                 = 58,
+    INDEX_OPT_KEYMATEXPORT            = 59,
+    INDEX_OPT_KEYMATEXPORTSIZE        = 60,
+    INDEX_OPT_VERSION                 = 61,
+    INDEX_OPT_HELP                    = 62,
+    INDEX_OPT_MORE_HELP               = 63
 } teOptIndex;
 /** count of all options for gnutls-cli */
-#define OPTION_CT    59
+#define OPTION_CT    64
 /** gnutls-cli version */
-#define GNUTLS_CLI_VERSION       "3.5.19"
+#define GNUTLS_CLI_VERSION       "3.6.8"
 /** Full gnutls-cli version text */
-#define GNUTLS_CLI_FULL_VERSION  "gnutls-cli 3.5.19"
+#define GNUTLS_CLI_FULL_VERSION  "gnutls-cli 3.6.8"
 
 /**
  *  Interface defines for all options.  Replace "n" with the UPPER_CASED
@@ -193,59 +198,66 @@ typedef enum {
 #define VALUE_OPT_CA_VERIFICATION 0x1005
 #define VALUE_OPT_OCSP           0x1006
 #define VALUE_OPT_RESUME         'r'
+#define VALUE_OPT_EARLYDATA      0x1007
 #define VALUE_OPT_REHANDSHAKE    'e'
-#define VALUE_OPT_SNI_HOSTNAME   0x1007
+#define VALUE_OPT_SNI_HOSTNAME   0x1008
+#define VALUE_OPT_VERIFY_HOSTNAME 0x1009
 #define VALUE_OPT_STARTTLS       's'
-#define VALUE_OPT_APP_PROTO      0x1008
-#define VALUE_OPT_STARTTLS_PROTO 0x1009
+#define VALUE_OPT_APP_PROTO      0x100A
+#define VALUE_OPT_STARTTLS_PROTO 0x100B
 #define VALUE_OPT_UDP            'u'
-#define VALUE_OPT_MTU            0x100A
+#define VALUE_OPT_MTU            0x100C
 
 #define OPT_VALUE_MTU            (DESC(MTU).optArg.argInt)
-#define VALUE_OPT_CRLF           0x100B
-#define VALUE_OPT_FASTOPEN       0x100C
-#define VALUE_OPT_X509FMTDER     0x100D
-#define VALUE_OPT_FINGERPRINT    'f'
-#define VALUE_OPT_PRINT_CERT     0x100E
-#define VALUE_OPT_SAVE_CERT      0x100F
-#define VALUE_OPT_SAVE_OCSP      0x1010
-#define VALUE_OPT_DH_BITS        0x1011
+#define VALUE_OPT_CRLF           0x100D
+#define VALUE_OPT_FASTOPEN       0x100E
+#define VALUE_OPT_X509FMTDER     0x100F
+#define VALUE_OPT_PRINT_CERT     0x1010
+#define VALUE_OPT_SAVE_CERT      0x1011
+#define VALUE_OPT_SAVE_OCSP      0x1012
+#define VALUE_OPT_SAVE_SERVER_TRACE 0x1013
+#define VALUE_OPT_SAVE_CLIENT_TRACE 0x1014
+#define VALUE_OPT_DH_BITS        0x1015
 
 #define OPT_VALUE_DH_BITS        (DESC(DH_BITS).optArg.argInt)
-#define VALUE_OPT_PRIORITY       0x1012
-#define VALUE_OPT_X509CAFILE     0x1013
-#define VALUE_OPT_X509CRLFILE    0x1014
-#define VALUE_OPT_PGPKEYFILE     0x1015
-#define VALUE_OPT_PGPKEYRING     0x1016
-#define VALUE_OPT_PGPCERTFILE    0x1017
-#define VALUE_OPT_X509KEYFILE    0x1018
-#define VALUE_OPT_X509CERTFILE   0x1019
-#define VALUE_OPT_PGPSUBKEY      0x101A
+#define VALUE_OPT_PRIORITY       0x1016
+#define VALUE_OPT_X509CAFILE     0x1017
+#define VALUE_OPT_X509CRLFILE    0x1018
+#define VALUE_OPT_X509KEYFILE    0x1019
+#define VALUE_OPT_X509CERTFILE   0x101A
 #define VALUE_OPT_SRPUSERNAME    0x101B
 #define VALUE_OPT_SRPPASSWD      0x101C
 #define VALUE_OPT_PSKUSERNAME    0x101D
 #define VALUE_OPT_PSKKEY         0x101E
 #define VALUE_OPT_PORT           'p'
 #define VALUE_OPT_INSECURE       0x101F
-#define VALUE_OPT_RANGES         0x1020
-#define VALUE_OPT_BENCHMARK_CIPHERS 0x1021
-#define VALUE_OPT_BENCHMARK_TLS_KX 0x1022
-#define VALUE_OPT_BENCHMARK_TLS_CIPHERS 0x1023
+#define VALUE_OPT_VERIFY_ALLOW_BROKEN 0x1020
+#define VALUE_OPT_RANGES         0x1021
+#define VALUE_OPT_BENCHMARK_CIPHERS 0x1022
+#define VALUE_OPT_BENCHMARK_TLS_KX 0x1023
+#define VALUE_OPT_BENCHMARK_TLS_CIPHERS 0x1024
 #define VALUE_OPT_LIST           'l'
-#define VALUE_OPT_PRIORITY_LIST  0x1024
-#define VALUE_OPT_NOTICKET       0x1025
-#define VALUE_OPT_SRTP_PROFILES  0x1026
-#define VALUE_OPT_ALPN           0x1027
+#define VALUE_OPT_PRIORITY_LIST  0x1025
+#define VALUE_OPT_NOTICKET       0x1026
+#define VALUE_OPT_SRTP_PROFILES  0x1027
+#define VALUE_OPT_ALPN           0x1028
 #define VALUE_OPT_HEARTBEAT      'b'
-#define VALUE_OPT_RECORDSIZE     0x1028
+#define VALUE_OPT_RECORDSIZE     0x1029
 
 #define OPT_VALUE_RECORDSIZE     (DESC(RECORDSIZE).optArg.argInt)
-#define VALUE_OPT_DISABLE_SNI    0x1029
-#define VALUE_OPT_DISABLE_EXTENSIONS 0x102A
-#define VALUE_OPT_INLINE_COMMANDS 0x102B
-#define VALUE_OPT_INLINE_COMMANDS_PREFIX 0x102C
-#define VALUE_OPT_PROVIDER       0x102D
-#define VALUE_OPT_FIPS140_MODE   0x102E
+#define VALUE_OPT_DISABLE_SNI    0x102A
+#define VALUE_OPT_DISABLE_EXTENSIONS 0x102B
+#define VALUE_OPT_SINGLE_KEY_SHARE 0x102C
+#define VALUE_OPT_POST_HANDSHAKE_AUTH 0x102D
+#define VALUE_OPT_INLINE_COMMANDS 0x102E
+#define VALUE_OPT_INLINE_COMMANDS_PREFIX 0x102F
+#define VALUE_OPT_PROVIDER       0x1030
+#define VALUE_OPT_FIPS140_MODE   0x1031
+#define VALUE_OPT_LOGFILE        0x1032
+#define VALUE_OPT_KEYMATEXPORT   0x1033
+#define VALUE_OPT_KEYMATEXPORTSIZE 0x1034
+
+#define OPT_VALUE_KEYMATEXPORTSIZE (DESC(KEYMATEXPORTSIZE).optArg.argInt)
 /** option flag (value) for help-value option */
 #define VALUE_OPT_HELP          'h'
 /** option flag (value) for more-help-value option */

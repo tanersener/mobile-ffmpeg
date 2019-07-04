@@ -88,8 +88,8 @@ void aom_wb_write_uvlc(struct aom_write_bit_buffer *wb, uint32_t v) {
   aom_wb_write_unsigned_literal(wb, v, (leading_zeroes + 1) >> 1);
 }
 
-static void aom_wb_write_primitive_quniform(struct aom_write_bit_buffer *wb,
-                                            uint16_t n, uint16_t v) {
+static void wb_write_primitive_quniform(struct aom_write_bit_buffer *wb,
+                                        uint16_t n, uint16_t v) {
   if (n <= 1) return;
   const int l = get_msb(n) + 1;
   const int m = (1 << l) - n;
@@ -101,16 +101,15 @@ static void aom_wb_write_primitive_quniform(struct aom_write_bit_buffer *wb,
   }
 }
 
-static void aom_wb_write_primitive_subexpfin(struct aom_write_bit_buffer *wb,
-                                             uint16_t n, uint16_t k,
-                                             uint16_t v) {
+static void wb_write_primitive_subexpfin(struct aom_write_bit_buffer *wb,
+                                         uint16_t n, uint16_t k, uint16_t v) {
   int i = 0;
   int mk = 0;
   while (1) {
     int b = (i ? k + i - 1 : k);
     int a = (1 << b);
     if (n <= mk + 3 * a) {
-      aom_wb_write_primitive_quniform(wb, n - mk, v - mk);
+      wb_write_primitive_quniform(wb, n - mk, v - mk);
       break;
     } else {
       int t = (v >= mk + a);
@@ -126,10 +125,10 @@ static void aom_wb_write_primitive_subexpfin(struct aom_write_bit_buffer *wb,
   }
 }
 
-static void aom_wb_write_primitive_refsubexpfin(struct aom_write_bit_buffer *wb,
-                                                uint16_t n, uint16_t k,
-                                                uint16_t ref, uint16_t v) {
-  aom_wb_write_primitive_subexpfin(wb, n, k, recenter_finite_nonneg(n, ref, v));
+static void wb_write_primitive_refsubexpfin(struct aom_write_bit_buffer *wb,
+                                            uint16_t n, uint16_t k,
+                                            uint16_t ref, uint16_t v) {
+  wb_write_primitive_subexpfin(wb, n, k, recenter_finite_nonneg(n, ref, v));
 }
 
 void aom_wb_write_signed_primitive_refsubexpfin(struct aom_write_bit_buffer *wb,
@@ -138,5 +137,5 @@ void aom_wb_write_signed_primitive_refsubexpfin(struct aom_write_bit_buffer *wb,
   ref += n - 1;
   v += n - 1;
   const uint16_t scaled_n = (n << 1) - 1;
-  aom_wb_write_primitive_refsubexpfin(wb, scaled_n, k, ref, v);
+  wb_write_primitive_refsubexpfin(wb, scaled_n, k, ref, v);
 }

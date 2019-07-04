@@ -182,3 +182,85 @@ however, several deprecated functions were removed, and are listed below.
 @tab @funcref{gnutls_privkey_sign_hash} with the flag GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA
 
 @end multitable
+
+@heading Upgrading to 3.6.x from 3.5.x
+
+GnuTLS 3.6.x is source and binary compatible with GnuTLS 3.5.x releases;
+however, there are minor differences, listed below.
+
+@multitable @columnfractions .30 .60
+@headitem Old functionality @tab Replacement
+
+@item The priority strings "+COMP" are a no-op
+@tab TLS compression is no longer available.
+
+@item The SSL 3.0 protocol is a no-op
+@tab SSL 3.0 is no longer compiled in by default. It is a legacy protocol
+which is completely eliminated from public internet. As such it was removed
+to reduce the attack vector for applications using the library.
+
+@item The hash function SHA2-224 is a no-op for TLS1.2
+@tab TLS 1.3 no longer uses SHA2-224, and it was never a widespread hash
+algorithm. As such it was removed for simplicity.
+
+@item The SRP key exchange accepted parameters outside the @xcite{TLSSRP} spec
+@tab The SRP key exchange is restricted to @xcite{TLSSRP} spec parameters
+to protect clients from MitM attacks.
+
+@item The compression-related functions are deprecated
+@tab No longer use @funcintref{gnutls_compression_get},
+@funcintref{gnutls_compression_get_name}, @funcintref{gnutls_compression_list},
+and @funcintref{gnutls_compression_get_id}.
+
+@item @funcref{gnutls_x509_crt_sign}, @funcref{gnutls_x509_crl_sign}, @funcref{gnutls_x509_crq_sign}
+@tab These signing functions will no longer sign using SHA1, but with a secure hash algorithm.
+
+@item @funcref{gnutls_certificate_set_ocsp_status_request_file}
+@tab This function will return an error if the loaded response doesn't match
+any of the present certificates. To revert to previous semantics set the @code{GNUTLS_CERTIFICATE_SKIP_OCSP_RESPONSE_CHECK}
+flag using @funcref{gnutls_certificate_set_flags}.
+
+@item The callback @funcref{gnutls_privkey_import_ext3} is not flexible enough for new signature algorithms such as RSA-PSS
+@tab It is replaced with @funcref{gnutls_privkey_import_ext4}
+
+@item Re-handshake functionality is not applicable under TLS 1.3.
+@tab It is replaced by separate key update and re-authentication functionality
+which can be accessed directly via @funcref{gnutls_session_key_update} and @funcref{gnutls_reauth}.
+
+@item TLS session identifiers are not shared with the server under TLS 1.3.
+@tab The TLS session identifiers are persistent across resumption only on
+server side and can be obtained as before via @funcref{gnutls_session_get_id2}.
+
+@item @funcref{gnutls_pkcs11_privkey_generate3}, @funcref{gnutls_pkcs11_copy_secret_key}, @funcref{gnutls_pkcs11_copy_x509_privkey2}
+@tab These functions no longer create an exportable key by default; they require the flag @code{GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_SENSITIVE} to do so.
+
+@item @funcref{gnutls_db_set_retrieve_function}, @funcref{gnutls_db_set_store_function}, @funcref{gnutls_db_set_remove_function}
+@tab These functions are no longer relevant under TLS 1.3; resumption under
+TLS 1.3 is done via session tickets, c.f. @funcref{gnutls_session_ticket_enable_server}.
+
+@item @funcref{gnutls_session_get_data2}, @funcref{gnutls_session_get_data}
+@tab These functions may introduce a slight delay under TLS 1.3 for few
+milliseconds. Check output of @funcref{gnutls_session_get_flags} for GNUTLS_SFLAGS_SESSION_TICKET
+before calling this function to avoid delays.
+
+@item SRP and RSA-PSK key exchanges are not supported under TLS 1.3
+@tab SRP and RSA-PSK key exchanges are not supported in TLS 1.3, so when these key exchanges are present in a priority string, TLS 1.3 is disabled.
+
+@item Anonymous key exchange is not supported under TLS 1.3
+@tab There is no anonymous key exchange supported under TLS 1.3, so if an anonymous key exchange method is set in a priority string, and no certificate credentials are set in the client or server, TLS 1.3 will not be negotiated.
+
+@item ECDHE-PSK and DHE-PSK keywords have the same meaning under TLS 1.3
+@tab In the priority strings, both @code{ECDHE@-PSK} and @code{DHE@-PSK} indicate the intent to support an ephemeral key exchange with the pre-shared key.  The parameters of the key exchange are negotiated with the supported groups specified in the priority string.
+
+@item Authentication-only ciphersuites are not supported under TLS 1.3
+@tab Ciphersuites with the @code{NULL} cipher (i.e., authentication-only) are not supported in TLS 1.3, so when they are specified in a priority string, TLS 1.3 is disabled.
+
+@item Supplemental data is not supported under TLS 1.3
+@tab The TLS supplemental data handshake message (RFC 4680) is not supported under TLS 1.3, so if the application calls @funcref{gnutls_supplemental_register} or @funcref{gnutls_session_supplemental_register}, TLS 1.3 is disabled.
+
+@item The GNUTLS_X509_NO_WELL_DEFINED_EXPIRATION macro is a no-op
+@tab The macro was non-functional and because of the nature of the
+definition of the no-well-defined date for certificates (a real date),
+it will not be fixed or re-introduced.
+
+@end multitable

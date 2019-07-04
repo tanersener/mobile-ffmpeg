@@ -71,6 +71,8 @@ typedef struct ATRAC9BlockData {
     int cpe_base_channel;
     int is_signs[30];
 
+    int reuseable;
+
 } ATRAC9BlockData;
 
 typedef struct ATRAC9Context {
@@ -200,6 +202,8 @@ static inline int parse_band_ext(ATRAC9Context *s, ATRAC9BlockData *b,
     int ext_band = 0;
 
     if (b->has_band_ext) {
+        if (b->q_unit_cnt < 13)
+            return AVERROR_INVALIDDATA;
         ext_band = at9_tab_band_ext_group[b->q_unit_cnt - 13][2];
         if (stereo) {
             b->channel[1].band_ext = get_bits(gb, 2);
@@ -241,7 +245,7 @@ static inline int read_scalefactors(ATRAC9Context *s, ATRAC9BlockData *b,
                                     ATRAC9ChannelData *c, GetBitContext *gb,
                                     int channel_idx, int first_in_pkt)
 {
-    static const int mode_map[2][4] = { { 0, 1, 2, 3 }, { 0, 2, 3, 4 } };
+    static const uint8_t mode_map[2][4] = { { 0, 1, 2, 3 }, { 0, 2, 3, 4 } };
     const int mode = mode_map[channel_idx][get_bits(gb, 2)];
 
     memset(c->scalefactors, 0, sizeof(c->scalefactors));
@@ -668,6 +672,7 @@ static int atrac9_decode_block(ATRAC9Context *s, GetBitContext *gb,
     if (!reuse_params) {
         int stereo_band, ext_band;
         const int min_band_count = s->samplerate_idx > 7 ? 1 : 3;
+        b->reuseable = 0;
         b->band_count = get_bits(gb, 4) + min_band_count;
         b->q_unit_cnt = at9_tab_band_q_unit_map[b->band_count];
 
@@ -699,6 +704,11 @@ static int atrac9_decode_block(ATRAC9Context *s, GetBitContext *gb,
             }
             b->band_ext_q_unit = at9_tab_band_q_unit_map[ext_band];
         }
+        b->reuseable = 1;
+    }
+    if (!b->reuseable) {
+        av_log(s->avctx, AV_LOG_ERROR, "invalid block reused!\n");
+        return AVERROR_INVALIDDATA;
     }
 
     /* Calculate bit alloc gradient */

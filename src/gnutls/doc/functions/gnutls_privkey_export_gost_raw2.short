@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_privkey_export_gost_raw2} (gnutls_privkey_t @var{key}, gnutls_ecc_curve_t * @var{curve}, gnutls_digest_algorithm_t * @var{digest}, gnutls_gost_paramset_t * @var{paramset}, gnutls_datum_t * @var{x}, gnutls_datum_t * @var{y}, gnutls_datum_t * @var{k}, unsigned int @var{flags})

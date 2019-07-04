@@ -14,7 +14,8 @@
 #include "aom/aom_integer.h"
 #include "av1/common/common.h"
 
-int64_t av1_highbd_block_error_avx2(tran_low_t *coeff, tran_low_t *dqcoeff,
+int64_t av1_highbd_block_error_avx2(const tran_low_t *coeff,
+                                    const tran_low_t *dqcoeff,
                                     intptr_t block_size, int64_t *ssz,
                                     int bps) {
   int i;

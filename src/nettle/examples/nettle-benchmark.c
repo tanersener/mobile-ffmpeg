@@ -58,13 +58,16 @@
 #include "gcm.h"
 #include "memxor.h"
 #include "salsa20.h"
+#include "salsa20-internal.h"
 #include "serpent.h"
 #include "sha1.h"
 #include "sha2.h"
 #include "sha3.h"
 #include "twofish.h"
 #include "umac.h"
+#include "cmac.h"
 #include "poly1305.h"
+#include "hmac.h"
 
 #include "nettle-meta.h"
 #include "nettle-internal.h"
@@ -89,24 +92,24 @@ static double frequency = 0.0;
 #if WITH_CYCLE_COUNTER
 # if defined(__i386__)
 #define GET_CYCLE_COUNTER(hi, lo)		\
-  __asm__("xorl %%eax,%%eax\n"			\
-	  "movl %%ebx, %%edi\n"			\
-	  "cpuid\n"				\
-	  "rdtsc\n"				\
-	  "movl %%edi, %%ebx\n"			\
-	  : "=a" (lo), "=d" (hi)		\
-	  : /* No inputs. */			\
-	  : "%edi", "%ecx", "cc")
+  __asm__ volatile ("xorl %%eax,%%eax\n"	\
+		    "movl %%ebx, %%edi\n"	\
+		    "cpuid\n"			\
+		    "rdtsc\n"			\
+		    "movl %%edi, %%ebx\n"	\
+		    : "=a" (lo), "=d" (hi)	\
+		    : /* No inputs. */		\
+		    : "%edi", "%ecx", "cc")
 # elif defined(__x86_64__)
 #define GET_CYCLE_COUNTER(hi, lo)		\
-  __asm__("xorl %%eax,%%eax\n"			\
-	  "mov %%rbx, %%r10\n"			\
-	  "cpuid\n"				\
-	  "rdtsc\n"				\
-	  "mov %%r10, %%rbx\n"			\
-	  : "=a" (lo), "=d" (hi)		\
-	  : /* No inputs. */			\
-	  : "%r10", "%rcx", "cc")
+  __asm__ volatile ("xorl %%eax,%%eax\n"	\
+		    "mov %%rbx, %%r10\n"	\
+		    "cpuid\n"			\
+		    "rdtsc\n"			\
+		    "mov %%r10, %%rbx\n"	\
+		    : "=a" (lo), "=d" (hi)	\
+		    : /* No inputs. */		\
+		    : "%r10", "%rcx", "cc")
 # endif
 #define BENCH_ITERATIONS 10
 #endif
@@ -209,8 +212,9 @@ struct bench_cbc_info
   void *ctx;
   nettle_cipher_func *crypt;
  
-  uint8_t *data;
-  
+  const uint8_t *src;
+  uint8_t *dst;
+
   unsigned block_size;
   uint8_t *iv;
 };
@@ -221,7 +225,7 @@ bench_cbc_encrypt(void *arg)
   struct bench_cbc_info *info = arg;
   cbc_encrypt(info->ctx, info->crypt,
 	      info->block_size, info->iv,
-	      BENCH_BLOCK, info->data, info->data);
+	      BENCH_BLOCK, info->dst, info->src);
 }
 
 static void
@@ -230,7 +234,7 @@ bench_cbc_decrypt(void *arg)
   struct bench_cbc_info *info = arg;
   cbc_decrypt(info->ctx, info->crypt,
 	      info->block_size, info->iv,
-	      BENCH_BLOCK, info->data, info->data);
+	      BENCH_BLOCK, info->dst, info->src);
 }
 
 static void
@@ -239,7 +243,7 @@ bench_ctr(void *arg)
   struct bench_cbc_info *info = arg;
   ctr_crypt(info->ctx, info->crypt,
 	    info->block_size, info->iv,
-	    BENCH_BLOCK, info->data, info->data);
+	    BENCH_BLOCK, info->dst, info->src);
 }
 
 struct bench_aead_info
@@ -298,7 +302,7 @@ init_nonce(unsigned length,
 static void
 header(void)
 {
-  printf("%18s %11s Mbyte/s%s\n",
+  printf("%18s %12s Mbyte/s%s\n",
 	 "Algorithm", "mode", 
 	 frequency > 0.0 ? " cycles/byte cycles/block" : "");  
 }
@@ -307,7 +311,7 @@ static void
 display(const char *name, const char *mode, unsigned block_size,
 	double time)
 {
-  printf("%18s %11s %7.2f",
+  printf("%18s %12s %7.2f",
 	 name, mode,
 	 BENCH_BLOCK / (time * 1048576.0));
   if (frequency > 0.0)
@@ -402,7 +406,7 @@ time_umac(void)
   struct umac64_ctx ctx64;
   struct umac96_ctx ctx96;
   struct umac128_ctx ctx128;
-  
+
   uint8_t key[16];
 
   umac32_set_key (&ctx32, key);
@@ -439,6 +443,24 @@ time_umac(void)
 }
 
 static void
+time_cmac(void)
+{
+  static uint8_t data[BENCH_BLOCK];
+  struct bench_hash_info info;
+  struct cmac_aes128_ctx ctx;
+
+  uint8_t key[16];
+
+  cmac_aes128_set_key (&ctx, key);
+  info.ctx = &ctx;
+  info.update = (nettle_hash_update_func *) cmac_aes128_update;
+  info.data = data;
+
+  display("cmac-aes128", "update", AES_BLOCK_SIZE,
+	  time_function(bench_hash, &info));
+}
+
+static void
 time_poly1305_aes(void)
 {
   static uint8_t data[BENCH_BLOCK];
@@ -453,6 +475,147 @@ time_poly1305_aes(void)
 
   display("poly1305-aes", "update", 1024,
 	  time_function(bench_hash, &info));
+}
+
+struct bench_hmac_info
+{
+  void *ctx;
+  nettle_hash_update_func *update;
+  nettle_hash_digest_func *digest;
+  size_t length;
+  size_t digest_length;
+  const uint8_t *data;
+};
+
+static void
+bench_hmac(void *arg)
+{
+  struct bench_hmac_info *info = arg;
+  uint8_t digest[NETTLE_MAX_HASH_DIGEST_SIZE];
+  size_t pos, length;
+
+  length = info->length;
+  for (pos = 0; pos < BENCH_BLOCK; pos += length)
+    {
+      size_t single = pos + length < BENCH_BLOCK ?
+			length :
+			BENCH_BLOCK - pos;
+      info->update(info->ctx, single, info->data + pos);
+      info->digest(info->ctx, info->digest_length, digest);
+    }
+}
+
+static const struct
+{
+  size_t length;
+  const char *msg;
+} hmac_tests[] = {
+  { 64, "64 bytes" },
+  { 256, "256 bytes" },
+  { 1024, "1024 bytes" },
+  { 4096, "4096 bytes" },
+  { BENCH_BLOCK, "single msg" },
+  { 0, NULL },
+};
+
+static void
+time_hmac_md5(void)
+{
+  static uint8_t data[BENCH_BLOCK];
+  struct bench_hmac_info info;
+  struct hmac_md5_ctx md5_ctx;
+  unsigned int pos;
+
+  init_data(data);
+  info.data = data;
+
+  hmac_md5_set_key(&md5_ctx, MD5_BLOCK_SIZE, data);
+  info.ctx = &md5_ctx;
+  info.update = (nettle_hash_update_func *) hmac_md5_update;
+  info.digest = (nettle_hash_digest_func *) hmac_md5_digest;
+  info.digest_length = MD5_DIGEST_SIZE;
+
+  for (pos = 0; hmac_tests[pos].length != 0; pos++)
+    {
+      info.length = hmac_tests[pos].length;
+      display("hmac-md5", hmac_tests[pos].msg, MD5_BLOCK_SIZE,
+	      time_function(bench_hmac, &info));
+    }
+}
+
+static void
+time_hmac_sha1(void)
+{
+  static uint8_t data[BENCH_BLOCK];
+  struct bench_hmac_info info;
+  struct hmac_sha1_ctx sha1_ctx;
+  unsigned int pos;
+
+  init_data(data);
+  info.data = data;
+
+  hmac_sha1_set_key(&sha1_ctx, SHA1_BLOCK_SIZE, data);
+  info.ctx = &sha1_ctx;
+  info.update = (nettle_hash_update_func *) hmac_sha1_update;
+  info.digest = (nettle_hash_digest_func *) hmac_sha1_digest;
+  info.digest_length = SHA1_DIGEST_SIZE;
+
+  for (pos = 0; hmac_tests[pos].length != 0; pos++)
+    {
+      info.length = hmac_tests[pos].length;
+      display("hmac-sha1", hmac_tests[pos].msg, SHA1_BLOCK_SIZE,
+	      time_function(bench_hmac, &info));
+    }
+}
+
+static void
+time_hmac_sha256(void)
+{
+  static uint8_t data[BENCH_BLOCK];
+  struct bench_hmac_info info;
+  struct hmac_sha256_ctx sha256_ctx;
+  unsigned int pos;
+
+  init_data(data);
+  info.data = data;
+
+  hmac_sha256_set_key(&sha256_ctx, SHA256_BLOCK_SIZE, data);
+  info.ctx = &sha256_ctx;
+  info.update = (nettle_hash_update_func *) hmac_sha256_update;
+  info.digest = (nettle_hash_digest_func *) hmac_sha256_digest;
+  info.digest_length = SHA256_DIGEST_SIZE;
+
+  for (pos = 0; hmac_tests[pos].length != 0; pos++)
+    {
+      info.length = hmac_tests[pos].length;
+      display("hmac-sha256", hmac_tests[pos].msg, SHA256_BLOCK_SIZE,
+	      time_function(bench_hmac, &info));
+    }
+}
+
+static void
+time_hmac_sha512(void)
+{
+  static uint8_t data[BENCH_BLOCK];
+  struct bench_hmac_info info;
+  struct hmac_sha512_ctx sha512_ctx;
+  unsigned int pos;
+
+  init_data(data);
+  info.data = data;
+
+  hmac_sha512_set_key(&sha512_ctx, SHA512_BLOCK_SIZE, data);
+  info.ctx = &sha512_ctx;
+  info.update = (nettle_hash_update_func *) hmac_sha512_update;
+  info.digest = (nettle_hash_digest_func *) hmac_sha512_digest;
+  info.digest_length = SHA512_DIGEST_SIZE;
+
+  for (pos = 0; hmac_tests[pos].length != 0; pos++)
+    {
+      info.length = hmac_tests[pos].length;
+      display("hmac-sha512", hmac_tests[pos].msg, SHA512_BLOCK_SIZE,
+	      time_function(bench_hmac, &info));
+    }
 }
 
 static int
@@ -478,11 +641,13 @@ time_cipher(const struct nettle_cipher *cipher)
   void *ctx = xalloc(cipher->context_size);
   uint8_t *key = xalloc(cipher->key_size);
 
+  static uint8_t src_data[BENCH_BLOCK];
   static uint8_t data[BENCH_BLOCK];
 
   printf("\n");
   
   init_data(data);
+  init_data(src_data);
 
   {
     /* Decent initializers are a GNU extension, so don't use it here. */
@@ -520,7 +685,8 @@ time_cipher(const struct nettle_cipher *cipher)
         struct bench_cbc_info info;
 	info.ctx = ctx;
 	info.crypt = cipher->encrypt;
-	info.data = data;
+	info.src = src_data;
+	info.dst = data;
 	info.block_size = cipher->block_size;
 	info.iv = iv;
     
@@ -536,7 +702,8 @@ time_cipher(const struct nettle_cipher *cipher)
         struct bench_cbc_info info;
 	info.ctx = ctx;
 	info.crypt = cipher->decrypt;
-	info.data = data;
+	info.src = src_data;
+	info.dst = data;
 	info.block_size = cipher->block_size;
 	info.iv = iv;
     
@@ -546,6 +713,12 @@ time_cipher(const struct nettle_cipher *cipher)
 
 	display(cipher->name, "CBC decrypt", cipher->block_size,
 		time_function(bench_cbc_decrypt, &info));
+
+	memset(iv, 0, cipher->block_size);
+	info.src = data;
+
+	display(cipher->name, "  (in-place)", cipher->block_size,
+		time_function(bench_cbc_decrypt, &info));
       }
 
       /* Do CTR mode */
@@ -553,7 +726,8 @@ time_cipher(const struct nettle_cipher *cipher)
         struct bench_cbc_info info;
 	info.ctx = ctx;
 	info.crypt = cipher->encrypt;
-	info.data = data;
+	info.src = src_data;
+	info.dst = data;
 	info.block_size = cipher->block_size;
 	info.iv = iv;
     
@@ -563,6 +737,12 @@ time_cipher(const struct nettle_cipher *cipher)
 
 	display(cipher->name, "CTR", cipher->block_size,
 		time_function(bench_ctr, &info));	
+
+	memset(iv, 0, cipher->block_size);
+	info.src = data;
+
+	display(cipher->name, "  (in-place)", cipher->block_size,
+		time_function(bench_ctr, &info));
       }
       
       free(iv);
@@ -680,7 +860,7 @@ bench_sha1_compress(void)
   uint8_t data[SHA1_BLOCK_SIZE];
   double t;
 
-  TIME_CYCLES (t, _nettle_sha1_compress(state, data));
+  TIME_CYCLES (t, nettle_sha1_compress(state, data));
 
   printf("sha1_compress: %.2f cycles\n", t);  
 }
@@ -766,6 +946,9 @@ main(int argc, char **argv)
       &nettle_gcm_aes128,
       &nettle_gcm_aes192,
       &nettle_gcm_aes256,
+      OPENSSL(&nettle_openssl_gcm_aes128)
+      OPENSSL(&nettle_openssl_gcm_aes192)
+      OPENSSL(&nettle_openssl_gcm_aes256)
       &nettle_gcm_camellia128,
       &nettle_gcm_camellia256,
       &nettle_eax_aes128,
@@ -792,7 +975,7 @@ main(int argc, char **argv)
 	/* Fall through */
 
       case OPT_HELP:
-	printf("Usage: nettle-benchmark [-f clock frequency] [alg]\n");
+	printf("Usage: nettle-benchmark [-f clock frequency] [alg...]\n");
 	return EXIT_SUCCESS;
 
       case '?':
@@ -801,8 +984,6 @@ main(int argc, char **argv)
       default:
 	abort();
     }
-
-  alg = argv[optind];
 
   time_init();
   bench_sha1_compress();
@@ -813,29 +994,51 @@ main(int argc, char **argv)
 
   header();
 
-  if (!alg || strstr ("memxor", alg))
+  do
     {
-      time_memxor();
-      printf("\n");
-    }
-  
-  for (i = 0; hashes[i]; i++)
-    if (!alg || strstr(hashes[i]->name, alg))
-      time_hash(hashes[i]);
+      alg = argv[optind];
 
-  if (!alg || strstr ("umac", alg))
-    time_umac();
+      if (!alg || strstr ("memxor", alg))
+	{
+	  time_memxor();
+	  printf("\n");
+	}
 
-  if (!alg || strstr ("poly1305-aes", alg))
-    time_poly1305_aes();
+      for (i = 0; hashes[i]; i++)
+	if (!alg || strstr(hashes[i]->name, alg))
+	  time_hash(hashes[i]);
 
-  for (i = 0; ciphers[i]; i++)
-    if (!alg || strstr(ciphers[i]->name, alg))
-      time_cipher(ciphers[i]);
+      if (!alg || strstr ("umac", alg))
+	time_umac();
 
-  for (i = 0; aeads[i]; i++)
-    if (!alg || strstr(aeads[i]->name, alg))
-      time_aead(aeads[i]);
+      if (!alg || strstr ("cmac", alg))
+	time_cmac();
+
+      if (!alg || strstr ("poly1305-aes", alg))
+	time_poly1305_aes();
+
+      for (i = 0; ciphers[i]; i++)
+	if (!alg || strstr(ciphers[i]->name, alg))
+	  time_cipher(ciphers[i]);
+
+      for (i = 0; aeads[i]; i++)
+	if (!alg || strstr(aeads[i]->name, alg))
+	  time_aead(aeads[i]);
+
+      if (!alg || strstr ("hmac-md5", alg))
+	time_hmac_md5();
+
+      if (!alg || strstr ("hmac-sha1", alg))
+	time_hmac_sha1();
+
+      if (!alg || strstr ("hmac-sha256", alg))
+	time_hmac_sha256();
+
+      if (!alg || strstr ("hmac-sha512", alg))
+	time_hmac_sha512();
+
+      optind++;
+    } while (alg && argv[optind]);
 
   return 0;
 }

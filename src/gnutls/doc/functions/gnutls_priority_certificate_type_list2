@@ -1,0 +1,19 @@
+
+
+
+
+@deftypefun {int} {gnutls_priority_certificate_type_list2} (gnutls_priority_t @var{pcache}, const unsigned int ** @var{list}, gnutls_ctype_target_t @var{target})
+@var{pcache}: is a @code{gnutls_prioritity_t}  type.
+
+@var{list}: will point to an integer list.
+
+@var{target}: is a @code{gnutls_ctype_target_t}  type. Valid arguments are
+GNUTLS_CTYPE_CLIENT and GNUTLS_CTYPE_SERVER
+
+Get a list of available certificate types for the given target
+in the priority structure.
+
+@strong{Returns:} the number of certificate types, or an error code.
+
+@strong{Since:} 3.6.4
+@end deftypefun

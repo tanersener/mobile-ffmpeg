@@ -18,7 +18,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -37,6 +37,9 @@
 #include <random.h>
 #include <pk.h>
 #include <nettle/pbkdf2.h>
+#if ENABLE_GOST
+#include "../nettle/gost/pbkdf2-gost.h"
+#endif
 
 #define PBES1_DES_MD5_OID "1.2.840.113549.1.5.3"
 
@@ -63,6 +66,7 @@ static const struct pkcs_cipher_schema_st avail_pkcs_cipher_schemas[] = {
 	 .cipher_oid = PBES1_DES_MD5_OID,
 	 .write_oid = PBES1_DES_MD5_OID,
 	 .desc = NULL,
+	 .iv_name = NULL,
 	 .decrypt_only = 1},
 	{
 	 .schema = PBES2_3DES,
@@ -73,6 +77,7 @@ static const struct pkcs_cipher_schema_st avail_pkcs_cipher_schemas[] = {
 	 .cipher_oid = DES_EDE3_CBC_OID,
 	 .write_oid = PBES2_OID,
 	 .desc = "PKIX1.pkcs-5-des-EDE3-CBC-params",
+	 .iv_name = "",
 	 .decrypt_only = 0},
 	{
 	 .schema = PBES2_DES,
@@ -83,6 +88,7 @@ static const struct pkcs_cipher_schema_st avail_pkcs_cipher_schemas[] = {
 	 .cipher_oid = DES_CBC_OID,
 	 .write_oid = PBES2_OID,
 	 .desc = "PKIX1.pkcs-5-des-CBC-params",
+	 .iv_name = "",
 	 .decrypt_only = 0},
 	{
 	 .schema = PBES2_AES_128,
@@ -93,6 +99,7 @@ static const struct pkcs_cipher_schema_st avail_pkcs_cipher_schemas[] = {
 	 .cipher_oid = AES_128_CBC_OID,
 	 .write_oid = PBES2_OID,
 	 .desc = "PKIX1.pkcs-5-aes128-CBC-params",
+	 .iv_name = "",
 	 .decrypt_only = 0},
 	{
 	 .schema = PBES2_AES_192,
@@ -103,6 +110,7 @@ static const struct pkcs_cipher_schema_st avail_pkcs_cipher_schemas[] = {
 	 .cipher_oid = AES_192_CBC_OID,
 	 .write_oid = PBES2_OID,
 	 .desc = "PKIX1.pkcs-5-aes192-CBC-params",
+	 .iv_name = "",
 	 .decrypt_only = 0},
 	{
 	 .schema = PBES2_AES_256,
@@ -113,6 +121,62 @@ static const struct pkcs_cipher_schema_st avail_pkcs_cipher_schemas[] = {
 	 .cipher_oid = AES_256_CBC_OID,
 	 .write_oid = PBES2_OID,
 	 .desc = "PKIX1.pkcs-5-aes256-CBC-params",
+	 .iv_name = "",
+	 .decrypt_only = 0},
+	{
+	 .schema = PBES2_GOST28147_89_TC26Z,
+	 .name = "PBES2-GOST28147-89-TC26Z",
+	 .flag = GNUTLS_PKCS_PBES2_GOST_TC26Z,
+	 .cipher = GNUTLS_CIPHER_GOST28147_TC26Z_CFB,
+	 .pbes2 = 1,
+	 .cipher_oid = GOST28147_89_TC26Z_OID,
+	 .write_oid = PBES2_OID,
+	 .desc = "PKIX1.Gost28147-89-Parameters",
+	 .iv_name = "iv",
+	 .decrypt_only = 0},
+	{
+	 .schema = PBES2_GOST28147_89_CPA,
+	 .name = "PBES2-GOST28147-89-CPA",
+	 .flag = GNUTLS_PKCS_PBES2_GOST_CPA,
+	 .cipher = GNUTLS_CIPHER_GOST28147_CPA_CFB,
+	 .pbes2 = 1,
+	 .cipher_oid = GOST28147_89_CPA_OID,
+	 .write_oid = PBES2_OID,
+	 .desc = "PKIX1.Gost28147-89-Parameters",
+	 .iv_name = "iv",
+	 .decrypt_only = 0},
+	{
+	 .schema = PBES2_GOST28147_89_CPB,
+	 .name = "PBES2-GOST28147-89-CPB",
+	 .flag = GNUTLS_PKCS_PBES2_GOST_CPB,
+	 .cipher = GNUTLS_CIPHER_GOST28147_CPB_CFB,
+	 .pbes2 = 1,
+	 .cipher_oid = GOST28147_89_CPB_OID,
+	 .write_oid = PBES2_OID,
+	 .desc = "PKIX1.Gost28147-89-Parameters",
+	 .iv_name = "iv",
+	 .decrypt_only = 0},
+	{
+	 .schema = PBES2_GOST28147_89_CPC,
+	 .name = "PBES2-GOST28147-89-CPC",
+	 .flag = GNUTLS_PKCS_PBES2_GOST_CPC,
+	 .cipher = GNUTLS_CIPHER_GOST28147_CPC_CFB,
+	 .pbes2 = 1,
+	 .cipher_oid = GOST28147_89_CPC_OID,
+	 .write_oid = PBES2_OID,
+	 .desc = "PKIX1.Gost28147-89-Parameters",
+	 .iv_name = "iv",
+	 .decrypt_only = 0},
+	{
+	 .schema = PBES2_GOST28147_89_CPD,
+	 .name = "PBES2-GOST28147-89-CPD",
+	 .flag = GNUTLS_PKCS_PBES2_GOST_CPD,
+	 .cipher = GNUTLS_CIPHER_GOST28147_CPD_CFB,
+	 .pbes2 = 1,
+	 .cipher_oid = GOST28147_89_CPD_OID,
+	 .write_oid = PBES2_OID,
+	 .desc = "PKIX1.Gost28147-89-Parameters",
+	 .iv_name = "iv",
 	 .decrypt_only = 0},
 	{
 	 .schema = PKCS12_ARCFOUR_SHA1,
@@ -123,6 +187,7 @@ static const struct pkcs_cipher_schema_st avail_pkcs_cipher_schemas[] = {
 	 .cipher_oid = PKCS12_PBE_ARCFOUR_SHA1_OID,
 	 .write_oid = PKCS12_PBE_ARCFOUR_SHA1_OID,
 	 .desc = NULL,
+	 .iv_name = NULL,
 	 .decrypt_only = 0},
 	{
 	 .schema = PKCS12_RC2_40_SHA1,
@@ -133,6 +198,7 @@ static const struct pkcs_cipher_schema_st avail_pkcs_cipher_schemas[] = {
 	 .cipher_oid = PKCS12_PBE_RC2_40_SHA1_OID,
 	 .write_oid = PKCS12_PBE_RC2_40_SHA1_OID,
 	 .desc = NULL,
+	 .iv_name = NULL,
 	 .decrypt_only = 0},
 	{
 	 .schema = PKCS12_3DES_SHA1,
@@ -143,6 +209,7 @@ static const struct pkcs_cipher_schema_st avail_pkcs_cipher_schemas[] = {
 	 .cipher_oid = PKCS12_PBE_3DES_SHA1_OID,
 	 .write_oid = PKCS12_PBE_3DES_SHA1_OID,
 	 .desc = NULL,
+	 .iv_name = NULL,
 	 .decrypt_only = 0},
 	{0, 0, 0, 0, 0}
 };
@@ -662,7 +729,7 @@ read_pbkdf2_params(ASN1_TYPE pasn,
 		goto error;
 	}
 
-	if (params->iter_count >= INT_MAX || params->iter_count == 0) {
+	if (params->iter_count >= MAX_ITER_COUNT || params->iter_count == 0) {
 		result = gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
 		goto error;
 	}
@@ -737,7 +804,7 @@ static int read_pkcs12_kdf_params(ASN1_TYPE pasn, struct pbkdf2_params *params)
 	if (result < 0)
 		return gnutls_assert_val(result);
 
-	if (params->iter_count >= INT_MAX || params->iter_count == 0)
+	if (params->iter_count >= MAX_ITER_COUNT || params->iter_count == 0)
 		return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
 
 	_gnutls_hard_log("iterationCount: %d\n", params->iter_count);
@@ -785,31 +852,61 @@ write_pkcs12_kdf_params(ASN1_TYPE pasn, const struct pbkdf2_params *kdf_params)
 }
 
 static int
+read_pbes2_gost_oid(uint8_t *der, size_t len, char *oid, int oid_size)
+{
+	int result;
+	ASN1_TYPE pbe_asn = ASN1_TYPE_EMPTY;
+
+	if ((result =
+	     asn1_create_element(_gnutls_get_pkix(),
+				 "PKIX1.Gost28147-89-Parameters", &pbe_asn)) != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	result =
+	    _asn1_strict_der_decode(&pbe_asn, der, len, NULL);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto error;
+	}
+
+	result = asn1_read_value(pbe_asn, "encryptionParamSet",
+				 oid, &oid_size);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto error;
+	}
+
+	result = 0;
+
+ error:
+	asn1_delete_structure(&pbe_asn);
+	return result;
+}
+
+static int
 read_pbes2_enc_params(ASN1_TYPE pasn,
 		      const gnutls_datum_t * der, struct pbe_enc_params *params)
 {
 	int params_start, params_end;
 	int params_len, len, result;
 	ASN1_TYPE pbe_asn = ASN1_TYPE_EMPTY;
-	char oid[MAX_OID_SIZE];
 	const struct pkcs_cipher_schema_st *p;
 
 	memset(params, 0, sizeof(*params));
 
 	/* Check the encryption algorithm
 	 */
-	len = sizeof(oid);
-	result = asn1_read_value(pasn, "encryptionScheme.algorithm", oid, &len);
+	len = sizeof(params->pbes2_oid);
+	result = asn1_read_value(pasn, "encryptionScheme.algorithm", params->pbes2_oid, &len);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
-	_gnutls_hard_log("encryptionScheme.algorithm: %s\n", oid);
-
-	if ((result = pbes2_cipher_oid_to_algo(oid, &params->cipher)) < 0) {
-		gnutls_assert();
-		return result;
-	}
+	_gnutls_hard_log("encryptionScheme.algorithm: %s\n", params->pbes2_oid);
 
 	result =
 	    asn1_der_decoding_startEnd(pasn, der->data, der->size,
@@ -820,6 +917,22 @@ read_pbes2_enc_params(ASN1_TYPE pasn,
 		return _gnutls_asn2err(result);
 	}
 	params_len = params_end - params_start + 1;
+
+	/* For GOST we have to read params to determine actual cipher */
+	if (!strcmp(params->pbes2_oid, GOST28147_89_OID)) {
+		len = sizeof(params->pbes2_oid);
+		result = read_pbes2_gost_oid(&der->data[params_start],
+					     params_len, params->pbes2_oid, len);
+		if (result < 0) {
+			gnutls_assert();
+			return result;
+		}
+	}
+
+	if ((result = pbes2_cipher_oid_to_algo(params->pbes2_oid, &params->cipher)) < 0) {
+		gnutls_assert();
+		return result;
+	}
 
 	/* Now check the encryption parameters.
 	 */
@@ -847,7 +960,9 @@ read_pbes2_enc_params(ASN1_TYPE pasn,
 
 	/* read the IV */
 	params->iv_size = sizeof(params->iv);
-	result = asn1_read_value(pbe_asn, "", params->iv, &params->iv_size);
+	result = asn1_read_value(pbe_asn,
+			p->iv_name,
+			params->iv, &params->iv_size);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
@@ -992,6 +1107,47 @@ _gnutls_read_pkcs_schema_params(schema_id * schema, const char *password,
 	return result;
 }
 
+static int
+_gnutls_pbes2_string_to_key(unsigned int pass_len, const char *password,
+			    const struct pbkdf2_params *kdf_params,
+			    int key_size, uint8_t *key)
+{
+	int result = 0;
+
+	if (kdf_params->mac == GNUTLS_MAC_SHA1)
+		pbkdf2_hmac_sha1(pass_len, (uint8_t *) password,
+				 kdf_params->iter_count,
+				 kdf_params->salt_size,
+				 kdf_params->salt, key_size, key);
+	else if (kdf_params->mac == GNUTLS_MAC_SHA256)
+		pbkdf2_hmac_sha256(pass_len, (uint8_t *) password,
+				   kdf_params->iter_count,
+				   kdf_params->salt_size,
+				   kdf_params->salt, key_size, key);
+#if ENABLE_GOST
+	else if (kdf_params->mac == GNUTLS_MAC_GOSTR_94)
+		pbkdf2_hmac_gosthash94cp(pass_len, (uint8_t *) password,
+					 kdf_params->iter_count,
+					 kdf_params->salt_size,
+					 kdf_params->salt, key_size, key);
+	else if (kdf_params->mac == GNUTLS_MAC_STREEBOG_256)
+		pbkdf2_hmac_streebog256(pass_len, (uint8_t *) password,
+					kdf_params->iter_count,
+					kdf_params->salt_size,
+					kdf_params->salt, key_size, key);
+	else if (kdf_params->mac == GNUTLS_MAC_STREEBOG_512)
+		pbkdf2_hmac_streebog512(pass_len, (uint8_t *) password,
+					kdf_params->iter_count,
+					kdf_params->salt_size,
+					kdf_params->salt, key_size, key);
+#endif
+	else
+		result =
+		    gnutls_assert_val(GNUTLS_E_UNKNOWN_HASH_ALGORITHM);
+
+	return result;
+}
+
 int
 _gnutls_pkcs_raw_decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
 			      const char *root, const char *_password,
@@ -1057,19 +1213,11 @@ _gnutls_pkcs_raw_decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
 	 */
 	p = _gnutls_pkcs_schema_get(schema);
 	if (p != NULL && p->pbes2 != 0) {	/* PBES2 */
-		if (kdf_params->mac == GNUTLS_MAC_SHA1)
-			pbkdf2_hmac_sha1(pass_len, (uint8_t *) password,
-					 kdf_params->iter_count,
-					 kdf_params->salt_size,
-					 kdf_params->salt, key_size, key);
-		else if (kdf_params->mac == GNUTLS_MAC_SHA256)
-			pbkdf2_hmac_sha256(pass_len, (uint8_t *) password,
-					   kdf_params->iter_count,
-					   kdf_params->salt_size,
-					   kdf_params->salt, key_size, key);
-		else {
-			ret =
-			    gnutls_assert_val(GNUTLS_E_UNKNOWN_HASH_ALGORITHM);
+		ret = _gnutls_pbes2_string_to_key(pass_len, password,
+						     kdf_params,
+						     key_size, key);
+		if (ret < 0) {
+			gnutls_assert();
 			goto error;
 		}
 	} else if (p != NULL) {	/* PKCS 12 schema */
@@ -1121,7 +1269,6 @@ _gnutls_pkcs_raw_decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
 	    _gnutls_cipher_init(&ch, ce, &dkey, &d_iv, 0);
 
 	gnutls_free(key);
-	key = NULL;
 
 	if (ret < 0) {
 		gnutls_assert();
@@ -1188,6 +1335,7 @@ write_pbkdf2_params(ASN1_TYPE pasn, const struct pbkdf2_params *kdf_params)
 	int result;
 	ASN1_TYPE pbkdf2_asn = ASN1_TYPE_EMPTY;
 	uint8_t tmp[MAX_OID_SIZE];
+	const mac_entry_st *me;
 
 	/* Write the key derivation algorithm
 	 */
@@ -1250,9 +1398,22 @@ write_pbkdf2_params(ASN1_TYPE pasn, const struct pbkdf2_params *kdf_params)
 		goto error;
 	}
 
-	/* We write an emptry prf.
-	 */
-	result = asn1_write_value(pbkdf2_asn, "prf", NULL, 0);
+	me = _gnutls_mac_to_entry(kdf_params->mac);
+	if (!me || !me->mac_oid) {
+		gnutls_assert();
+		result = GNUTLS_E_INTERNAL_ERROR;
+		goto error;
+	}
+
+	result = asn1_write_value(pbkdf2_asn, "prf.algorithm",
+				  me->mac_oid, strlen(me->mac_oid));
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto error;
+	}
+
+	result = asn1_write_value(pbkdf2_asn, "prf.parameters", NULL, 0);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
@@ -1285,6 +1446,7 @@ write_pbes2_enc_params(ASN1_TYPE pasn, const struct pbe_enc_params *params)
 	int result;
 	ASN1_TYPE pbe_asn = ASN1_TYPE_EMPTY;
 	const struct pkcs_cipher_schema_st *p;
+	const char *cipher_oid;
 
 	/* Write the encryption algorithm
 	 */
@@ -1293,15 +1455,6 @@ write_pbes2_enc_params(ASN1_TYPE pasn, const struct pbe_enc_params *params)
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
-
-	result =
-	    asn1_write_value(pasn, "encryptionScheme.algorithm", p->cipher_oid,
-			     1);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		goto error;
-	}
-	_gnutls_hard_log("encryptionScheme.algorithm: %s\n", p->cipher_oid);
 
 	/* Now check the encryption parameters.
 	 */
@@ -1312,8 +1465,36 @@ write_pbes2_enc_params(ASN1_TYPE pasn, const struct pbe_enc_params *params)
 		return _gnutls_asn2err(result);
 	}
 
+	if (p->schema == PBES2_GOST28147_89_TC26Z ||
+	    p->schema == PBES2_GOST28147_89_CPA ||
+	    p->schema == PBES2_GOST28147_89_CPB ||
+	    p->schema == PBES2_GOST28147_89_CPC ||
+	    p->schema == PBES2_GOST28147_89_CPD) {
+		cipher_oid = GOST28147_89_OID;
+		result = asn1_write_value(pbe_asn, "encryptionParamSet",
+					  p->cipher_oid, 1);
+		if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			result = _gnutls_asn2err(result);
+			goto error;
+		}
+	} else {
+		cipher_oid = p->cipher_oid;
+	}
+
+	result =
+	    asn1_write_value(pasn, "encryptionScheme.algorithm",
+			     cipher_oid,
+			     1);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		goto error;
+	}
+	_gnutls_hard_log("encryptionScheme.algorithm: %s\n", cipher_oid);
+
 	/* read the salt */
-	result = asn1_write_value(pbe_asn, "", params->iv, params->iv_size);
+	result = asn1_write_value(pbe_asn, p->iv_name,
+				  params->iv, params->iv_size);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
@@ -1415,10 +1596,23 @@ _gnutls_pkcs_generate_key(schema_id schema,
 	 */
 
 	if (p->pbes2 != 0) {
-		pbkdf2_hmac_sha1(pass_len, (uint8_t *) password,
-				 kdf_params->iter_count,
-				 kdf_params->salt_size, kdf_params->salt,
-				 kdf_params->key_size, key->data);
+		if (p->schema == PBES2_GOST28147_89_TC26Z)
+			kdf_params->mac = GNUTLS_MAC_STREEBOG_256;
+		else if (p->schema == PBES2_GOST28147_89_CPA ||
+			 p->schema == PBES2_GOST28147_89_CPB ||
+			 p->schema == PBES2_GOST28147_89_CPC ||
+			 p->schema == PBES2_GOST28147_89_CPD)
+			kdf_params->mac = GNUTLS_MAC_GOSTR_94;
+		else
+			kdf_params->mac = GNUTLS_MAC_SHA1;
+		ret = _gnutls_pbes2_string_to_key(pass_len, password,
+						  kdf_params,
+						  kdf_params->key_size,
+						  key->data);
+		if (ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
 
 		if (enc_params->iv_size) {
 			ret = gnutls_rnd(GNUTLS_RND_NONCE,
@@ -1562,10 +1756,12 @@ _gnutls_pkcs_raw_encrypt_data(const gnutls_datum_t * plain,
 	cipher_hd_st ch;
 	int ch_init = 0;
 	uint8_t pad, pad_size;
+	const cipher_entry_st *ce;
 
-	pad_size = gnutls_cipher_get_block_size(enc_params->cipher);
+	ce = cipher_to_entry(enc_params->cipher);
+	pad_size = _gnutls_cipher_get_block_size(ce);
 
-	if (pad_size == 1)	/* stream */
+	if (pad_size == 1 || ce->type == CIPHER_STREAM)	/* stream */
 		pad_size = 0;
 
 	data = gnutls_malloc(plain->size + pad_size);

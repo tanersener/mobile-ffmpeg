@@ -1,5 +1,5 @@
 /* Return the canonical absolute name of a given file.
-   Copyright (C) 1996-2017 Free Software Foundation, Inc.
+   Copyright (C) 1996-2019 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #ifndef _LIBC
 /* Don't use __attribute__ __nonnull__ in this compilation unit.  Otherwise gcc
@@ -59,8 +59,10 @@
      */
 #   undef getcwd
 #  endif
-#  ifdef VMS
-    /* We want the directory in Unix syntax, not in VMS syntax.  */
+#  if defined VMS && !defined getcwd
+    /* We want the directory in Unix syntax, not in VMS syntax.
+       The gnulib override of 'getcwd' takes 2 arguments; the original VMS
+       'getcwd' takes 3 arguments.  */
 #   define __getcwd(buf, max) getcwd (buf, max, 0)
 #  else
 #   define __getcwd getcwd
@@ -93,9 +95,9 @@
 static void
 alloc_failed (void)
 {
-#if (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
+#if defined _WIN32 && ! defined __CYGWIN__
   /* Avoid errno problem without using the malloc or realloc modules; see:
-     http://lists.gnu.org/archive/html/bug-gnulib/2016-08/msg00025.html  */
+     https://lists.gnu.org/r/bug-gnulib/2016-08/msg00025.html  */
   errno = ENOMEM;
 #endif
 }
@@ -268,6 +270,8 @@ __realpath (const char *name, char *resolved)
 #endif
           *dest = '\0';
 
+          /* FIXME: if lstat fails with errno == EOVERFLOW,
+             the entry exists.  */
 #ifdef _LIBC
           if (__lxstat64 (_STAT_VER, rpath, &st) < 0)
 #else

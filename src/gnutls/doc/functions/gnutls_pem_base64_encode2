@@ -2,8 +2,8 @@
 
 
 
-@deftypefun {int} {gnutls_pem_base64_encode2} (const char * @var{msg}, const gnutls_datum_t * @var{data}, gnutls_datum_t * @var{result})
-@var{msg}: is a message to be put in the encoded header (may be @code{NULL} )
+@deftypefun {int} {gnutls_pem_base64_encode2} (const char * @var{header}, const gnutls_datum_t * @var{data}, gnutls_datum_t * @var{result})
+@var{header}: is a message to be put in the encoded header (may be @code{NULL} )
 
 @var{data}: contains the raw data
 

@@ -11,7 +11,7 @@ Connection is datagram oriented (DTLS). Since 3.0.0.
 @item GNUTLS_@-NONBLOCK
 Connection should not block. Since 3.0.0.
 @item GNUTLS_@-NO_@-EXTENSIONS
-Do not enable any TLS extensions by default (since 3.1.2).
+Do not enable any TLS extensions by default (since 3.1.2). As TLS 1.2 and later require extensions this option is considered obsolete and should not be used.
 @item GNUTLS_@-NO_@-REPLAY_@-PROTECTION
 Disable any replay protection in DTLS. This must only be used if  replay protection is achieved using other means. Since 3.2.2.
 @item GNUTLS_@-NO_@-SIGNAL
@@ -24,4 +24,48 @@ Enable the TLS false start on client side if the negotiated ciphersuites allow i
 When in client side and only a single cert is specified, send that certificate irrespective of the issuers expected by the server. Since 3.5.0.
 @item GNUTLS_@-NO_@-TICKETS
 Flag to indicate that the session should not use resumption with session tickets.
+@item GNUTLS_@-KEY_@-SHARE_@-TOP
+Generate key share for the first group which is enabled.
+For example x25519. This option is the most performant for client (less CPU spent
+generating keys), but if the server doesn't support the advertized option it may
+result to more roundtrips needed to discover the server's choice.
+@item GNUTLS_@-KEY_@-SHARE_@-TOP2
+Generate key shares for the top-2 different groups which are enabled.
+For example (ECDH + x25519). This is the default.
+@item GNUTLS_@-KEY_@-SHARE_@-TOP3
+Generate key shares for the top-3 different groups which are enabled.
+That is, as each group is associated with a key type (EC, finite field, x25519), generate
+three keys using @code{GNUTLS_PK_DH} , @code{GNUTLS_PK_EC} , @code{GNUTLS_PK_ECDH_X25519}  if all of them are enabled.
+@item GNUTLS_@-POST_@-HANDSHAKE_@-AUTH
+Enable post handshake authentication for server and client. When set and
+a server requests authentication after handshake @code{GNUTLS_E_REAUTH_REQUEST}  will be returned
+by @code{gnutls_record_recv()} . A client should then call @code{gnutls_reauth()}  to re-authenticate.
+@item GNUTLS_@-NO_@-AUTO_@-REKEY
+Disable auto-rekeying under TLS1.3. If this option is not specified
+gnutls will force a rekey after 2^24 records have been sent.
+@item GNUTLS_@-SAFE_@-PADDING_@-CHECK
+Flag to indicate that the TLS 1.3 padding check will be done in a
+safe way which doesn't leak the pad size based on GnuTLS processing time. This is of use to
+applications which hide the length of transferred data via the TLS1.3 padding mechanism and
+are already taking steps to hide the data processing time. This comes at a performance
+penalty.
+@item GNUTLS_@-ENABLE_@-EARLY_@-START
+Under TLS1.3 allow the server to return earlier than the full handshake
+finish; similarly to false start the handshake will be completed once data are received by the
+client, while the server is able to transmit sooner. This is not enabled by default as it could
+break certain existing server assumptions and use-cases. Since 3.6.4.
+@item GNUTLS_@-ENABLE_@-RAWPK
+Allows raw public-keys to be negotiated during the handshake. Since 3.6.6.
+@item GNUTLS_@-AUTO_@-REAUTH
+Enable transparent re-authentication in client side when the server
+requests to. That is, reauthentication is handled within @code{gnutls_record_recv()} , and
+the @code{GNUTLS_E_REHANDSHAKE}  or @code{GNUTLS_E_REAUTH_REQUEST}  are not returned. This must be
+enabled with @code{GNUTLS_POST_HANDSHAKE_AUTH}  for TLS1.3. Enabling this flag requires to restore
+interrupted calls to @code{gnutls_record_recv()}  based on the output of @code{gnutls_record_get_direction()} ,
+since @code{gnutls_record_recv()}  could be interrupted when sending when this flag is enabled.
+Note this flag may not be used if you are using the same session for sending and receiving
+in different threads.
+@item GNUTLS_@-ENABLE_@-EARLY_@-DATA
+Under TLS1.3 allow the server to receive early data sent as part of the initial ClientHello (0-RTT). 
+This is not enabled by default as early data has weaker security properties than other data. Since 3.6.5.
 @end table

@@ -23,7 +23,8 @@
 
 This function will export the RSA private key's parameters found
 in the given structure. The new parameters will be allocated using
-@code{gnutls_malloc()}  and will be stored in the appropriate datum.
+@code{gnutls_malloc()}  and will be stored in the appropriate datum. For
+EdDSA keys, the  @code{y} value should be @code{NULL} .
 
 @strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
 

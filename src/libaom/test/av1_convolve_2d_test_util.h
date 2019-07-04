@@ -30,7 +30,7 @@ typedef void (*convolve_2d_func)(const uint8_t *src, int src_stride,
                                  uint8_t *dst, int dst_stride, int w, int h,
                                  const InterpFilterParams *filter_params_x,
                                  const InterpFilterParams *filter_params_y,
-                                 const int subpel_x_q4, const int subpel_y_q4,
+                                 const int subpel_x_qn, const int subpel_y_qn,
                                  ConvolveParams *conv_params);
 
 typedef ::testing::tuple<convolve_2d_func, int, int, BLOCK_SIZE>
@@ -72,8 +72,8 @@ namespace AV1HighbdConvolve2D {
 typedef void (*highbd_convolve_2d_func)(
     const uint16_t *src, int src_stride, uint16_t *dst, int dst_stride, int w,
     int h, const InterpFilterParams *filter_params_x,
-    const InterpFilterParams *filter_params_y, const int subpel_x_q4,
-    const int subpel_y_q4, ConvolveParams *conv_params, int bd);
+    const InterpFilterParams *filter_params_y, const int subpel_x_qn,
+    const int subpel_y_qn, ConvolveParams *conv_params, int bd);
 
 typedef ::testing::tuple<int, highbd_convolve_2d_func, int, int, BLOCK_SIZE>
     HighbdConvolve2DParam;

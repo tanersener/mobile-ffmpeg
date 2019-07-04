@@ -1,0 +1,11 @@
+[p11-kit-object-v1]
+class: x-certificate-extension
+label: "Example CA restriction for example.com and corp.example.com"
+object-id: 2.5.29.30
+value: "%30%2e%06%03%55%1d%1e%04%27%30%25%a0%23%30%0d%82%0b%65%78%61%6d%70%6c%65%2e%63%6f%6d%30%12%82%10%63%6f%72%70%2e%65%78%61%6d%70%6c%65%2e%63%6f%6d"
+-----BEGIN PUBLIC KEY-----
+MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDRtTajie6qgC9T/RJ1PvN6ntav
++rwcYBBLJoETGlnj/kVsOAQ5J0ZX/dW8jYoQtjvUCoFaRS/sPoHw2U5Pl99LMg8I
+sSaivWlhXWY5Yy8QcDX7B4UK/1cSwfSDHfnG06S2cCuAoUB/SE7ZreuAzM+SwdGD
+ZAEjR469MZgFa2t8NwIDAQAB
+-----END PUBLIC KEY-----

@@ -17,9 +17,12 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
+
+#ifndef GNUTLS_LIB_X509_IP_IN_CIDR_H
+#define GNUTLS_LIB_X509_IP_IN_CIDR_H
 
 /*-
  * ip_in_cidr:
@@ -30,24 +33,26 @@
  * The @ip version must match the @cidr version (v4/v6),
  * (this is not checked).
  *
- * Returns: 1 if @ip lies withing @cidr, 0 otherwise
+ * Returns: 1 if @ip lies within @cidr, 0 otherwise
  -*/
 static unsigned ip_in_cidr(const gnutls_datum_t *ip, const gnutls_datum_t *cidr)
 {
+	unsigned byte;
+#ifndef BUILD_IN_TESTS
 	char str_ip[48];
 	char str_cidr[97];
-	unsigned byte;
 
 	_gnutls_hard_log("matching %.*s with CIDR constraint %.*s\n",
 					 (int) sizeof(str_ip),
 					 _gnutls_ip_to_string(ip->data, ip->size, str_ip, sizeof(str_ip)),
 					 (int) sizeof(str_cidr),
 					 _gnutls_cidr_to_string(cidr->data, cidr->size, str_cidr, sizeof(str_cidr)));
-
-	unsigned ipsize = ip->size;
-	for (byte = 0; byte < ipsize; byte++)
-		if (((ip->data[byte] ^ cidr->data[byte]) & cidr->data[ipsize+byte]) != 0)
+#endif
+	for (byte = 0; byte < ip->size; byte++)
+		if (((ip->data[byte] ^ cidr->data[byte]) & cidr->data[ip->size+byte]) != 0)
 			return 0;
 
 	return 1; /* match */
 }
+
+#endif /* GNUTLS_LIB_X509_IP_IN_CIDR_H */

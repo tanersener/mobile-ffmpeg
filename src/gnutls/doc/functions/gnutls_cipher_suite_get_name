@@ -9,8 +9,12 @@
 
 @var{mac_algorithm}: is a MAC algorithm
 
-Note that the full cipher suite name must be prepended by TLS or
-SSL depending of the protocol in use.
+This function returns the ciphersuite name under TLS1.2 or earlier
+versions when provided with individual algorithms. The full cipher suite
+name must be prepended by TLS or SSL depending of the protocol in use.
+
+To get a description of the current ciphersuite across versions, it
+is recommended to use @code{gnutls_session_get_desc()} .
 
 @strong{Returns:} a string that contains the name of a TLS cipher suite,
 specified by the given algorithms, or @code{NULL} .

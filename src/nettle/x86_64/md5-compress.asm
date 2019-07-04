@@ -79,10 +79,10 @@ define(<ROUND>,<
 
 	.file "md5-compress.asm"
 
-	C _nettle_md5_compress(uint32_t *state, uint8_t *input)
+	C nettle_md5_compress(uint32_t *state, uint8_t *input)
 	.text
 	ALIGN(16)
-PROLOGUE(_nettle_md5_compress)
+PROLOGUE(nettle_md5_compress)
 	W64_ENTRY(2,0)
 	C save all registers that need to be saved
 	push	%rbp
@@ -173,4 +173,4 @@ PROLOGUE(_nettle_md5_compress)
 	W64_EXIT(2,0)
 
 	ret
-EPILOGUE(_nettle_md5_compress)
+EPILOGUE(nettle_md5_compress)

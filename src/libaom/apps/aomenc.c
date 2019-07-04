@@ -396,7 +396,7 @@ static const arg_def_t arnr_strength =
 static const struct arg_enum_list tuning_enum[] = {
   { "psnr", AOM_TUNE_PSNR },
   { "ssim", AOM_TUNE_SSIM },
-#ifdef CONFIG_DIST_8X8
+#if CONFIG_DIST_8X8
   { "cdef-dist", AOM_TUNE_CDEF_DIST },
   { "daala-dist", AOM_TUNE_DAALA_DIST },
 #endif
@@ -421,7 +421,8 @@ static const arg_def_t tile_rows =
     ARG_DEF(NULL, "tile-rows", 1, "Number of tile rows to use, log2");
 static const arg_def_t enable_tpl_model =
     ARG_DEF(NULL, "enable-tpl-model", 1,
-            "RDO modulation based on frame temporal dependency");
+            "RDO based on frame temporal dependency "
+            "(0: off, 1: backward source based, 2: forward 2-pass");
 static const arg_def_t tile_width =
     ARG_DEF(NULL, "tile-width", 1, "Tile widths (comma separated)");
 static const arg_def_t tile_height =
@@ -432,10 +433,10 @@ static const arg_def_t enable_cdef =
     ARG_DEF(NULL, "enable-cdef", 1,
             "Enable the constrained directional enhancement filter (0: false, "
             "1: true (default))");
-static const arg_def_t enable_restoration =
-    ARG_DEF(NULL, "enable-restoration", 1,
-            "Enable the loop restoration filter (0: false, "
-            "1: true (default))");
+static const arg_def_t enable_restoration = ARG_DEF(
+    NULL, "enable-restoration", 1,
+    "Enable the loop restoration filter (0: false (default in Realtime mode), "
+    "1: true (default in Non-realtime mode))");
 static const arg_def_t enable_rect_partitions =
     ARG_DEF(NULL, "enable-rect-partitions", 1,
             "Enable rectangular partitions "
@@ -549,8 +550,9 @@ static const arg_def_t enable_angle_delta =
             "Enable intra angle delta (0: false, 1: true (default))");
 static const arg_def_t disable_trellis_quant =
     ARG_DEF(NULL, "disable-trellis-quant", 1,
-            "Disable trellis optimization of quantized coefficients (0: false ("
-            "default) 1: true  2: partial true)");
+            "Disable trellis optimization of quantized coefficients (0: false "
+            "1: true  2: true for rd search 3: true for estimate yrd serch "
+            "(default))");
 static const arg_def_t enable_qm =
     ARG_DEF(NULL, "enable-qm", 1,
             "Enable quantisation matrices (0: false (default), 1: true)");
@@ -628,9 +630,12 @@ static const arg_def_t aq_mode = ARG_DEF(
     NULL, "aq-mode", 1,
     "Adaptive quantization mode (0: off (default), 1: variance 2: complexity, "
     "3: cyclic refresh)");
-static const arg_def_t deltaq_mode = ARG_DEF(
-    NULL, "deltaq-mode", 1,
-    "Delta qindex mode (0: off (default), 1: deltaq 2: deltaq + deltalf)");
+static const arg_def_t deltaq_mode =
+    ARG_DEF(NULL, "deltaq-mode", 1,
+            "Delta qindex mode (0: off, 1: deltaq pred efficiency (default), "
+            "2: deltaq perceptual)");
+static const arg_def_t deltalf_mode = ARG_DEF(
+    NULL, "delta-lf-mode", 1, "Enable delta-lf-mode (0: off (default), 1: on)");
 static const arg_def_t frame_periodic_boost =
     ARG_DEF(NULL, "frame-boost", 1,
             "Enable frame periodic boost (0: off (default), 1: on)");
@@ -663,6 +668,11 @@ static const arg_def_t target_seq_level_idx =
             "xy: Target level index for the OP. "
             "E.g. \"0\" means target level index 0 for the 0th OP; "
             "\"1021\" means target level index 21 for the 10th OP.");
+static const arg_def_t set_min_cr =
+    ARG_DEF(NULL, "min-cr", 1,
+            "Set minimum compression ratio. Take integer values. Default is 0. "
+            "If non-zero, encoder will try to keep the compression ratio of "
+            "each frame to be higher than the given value divided by 100.");
 
 static const struct arg_enum_list color_primaries_enum[] = {
   { "bt709", AOM_CICP_CP_BT_709 },
@@ -839,6 +849,7 @@ static const arg_def_t *av1_args[] = { &cpu_used_av1,
                                        &error_resilient_mode,
                                        &aq_mode,
                                        &deltaq_mode,
+                                       &deltalf_mode,
                                        &frame_periodic_boost,
                                        &noise_sens,
                                        &tune_content,
@@ -865,6 +876,7 @@ static const arg_def_t *av1_args[] = { &cpu_used_av1,
                                        &enable_ref_frame_mvs,
                                        &target_seq_level_idx,
                                        &set_tier_mask,
+                                       &set_min_cr,
                                        &bitdeptharg,
                                        &inbitdeptharg,
                                        &input_chroma_subsampling_x,
@@ -938,6 +950,7 @@ static const int av1_arg_ctrl_map[] = { AOME_SET_CPUUSED,
                                         AV1E_SET_ERROR_RESILIENT_MODE,
                                         AV1E_SET_AQ_MODE,
                                         AV1E_SET_DELTAQ_MODE,
+                                        AV1E_SET_DELTALF_MODE,
                                         AV1E_SET_FRAME_PERIODIC_BOOST,
                                         AV1E_SET_NOISE_SENSITIVITY,
                                         AV1E_SET_TUNE_CONTENT,
@@ -964,6 +977,7 @@ static const int av1_arg_ctrl_map[] = { AOME_SET_CPUUSED,
                                         AV1E_SET_ENABLE_REF_FRAME_MVS,
                                         AV1E_SET_TARGET_SEQ_LEVEL_IDX,
                                         AV1E_SET_TIER_MASK,
+                                        AV1E_SET_MIN_CR,
                                         0 };
 #endif  // CONFIG_AV1_ENCODER
 
@@ -1537,6 +1551,11 @@ static int parse_stream_params(struct AvxEncoderConfig *global,
     } else if (arg_match(&arg, &ext_partition, argi)) {
       config->cfg.cfg.ext_partition = !!arg_parse_uint(&arg) > 0;
 #endif
+    } else if (global->usage == AOM_USAGE_REALTIME &&
+               arg_match(&arg, &enable_restoration, argi)) {
+      if (arg_parse_uint(&arg) == 1) {
+        warn("non-zero %s option ignored in realtime mode.\n", arg.name);
+      }
     } else {
       int i, match = 0;
       for (i = 0; ctrl_args[i]; i++) {

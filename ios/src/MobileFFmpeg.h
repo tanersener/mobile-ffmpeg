@@ -20,7 +20,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <Foundation/Foundation.h>
-#include "libavutil/ffversion.h"
 
 #include "MediaInformationParser.h"
 

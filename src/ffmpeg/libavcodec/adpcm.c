@@ -57,7 +57,7 @@
  */
 
 /* These are for CD-ROM XA ADPCM */
-static const int xa_adpcm_table[5][2] = {
+static const int8_t xa_adpcm_table[5][2] = {
     {   0,   0 },
     {  60,   0 },
     { 115, -52 },
@@ -65,7 +65,7 @@ static const int xa_adpcm_table[5][2] = {
     { 122, -60 }
 };
 
-static const int ea_adpcm_table[] = {
+static const int16_t ea_adpcm_table[] = {
     0,  240,  460,  392,
     0,    0, -208, -220,
     0,    1,    3,    4,
@@ -74,7 +74,7 @@ static const int ea_adpcm_table[] = {
 };
 
 // padded to zero where table size is less then 16
-static const int swf_index_tables[4][16] = {
+static const int8_t swf_index_tables[4][16] = {
     /*2*/ { -1, 2 },
     /*3*/ { -1, -1, 2, 4 },
     /*4*/ { -1, -1, -1, -1, 2, 4, 6, 8 },
@@ -175,6 +175,50 @@ static av_cold int adpcm_decode_init(AVCodecContext * avctx)
     }
 
     return 0;
+}
+
+static inline int16_t adpcm_agm_expand_nibble(ADPCMChannelStatus *c, int8_t nibble)
+{
+    int delta, pred, step, add;
+
+    pred = c->predictor;
+    delta = nibble & 7;
+    step = c->step;
+    add = (delta * 2 + 1) * step;
+    if (add < 0)
+        add = add + 7;
+
+    if ((nibble & 8) == 0)
+        pred = av_clip(pred + (add >> 3), -32767, 32767);
+    else
+        pred = av_clip(pred - (add >> 3), -32767, 32767);
+
+    switch (delta) {
+    case 7:
+        step *= 0x99;
+        break;
+    case 6:
+        c->step = av_clip(c->step * 2, 127, 24576);
+        c->predictor = pred;
+        return pred;
+    case 5:
+        step *= 0x66;
+        break;
+    case 4:
+        step *= 0x4d;
+        break;
+    default:
+        step *= 0x39;
+        break;
+    }
+
+    if (step < 0)
+        step += 0x3f;
+
+    c->step = step >> 6;
+    c->step = av_clip(c->step, 127, 24576);
+    c->predictor = pred;
+    return pred;
 }
 
 static inline int16_t adpcm_ima_expand_nibble(ADPCMChannelStatus *c, int8_t nibble, int shift)
@@ -440,7 +484,7 @@ static void adpcm_swf_decode(AVCodecContext *avctx, const uint8_t *buf, int buf_
 {
     ADPCMDecodeContext *c = avctx->priv_data;
     GetBitContext gb;
-    const int *table;
+    const int8_t *table;
     int k0, signmask, nb_bits, count;
     int size = buf_size*8;
     int i;
@@ -549,6 +593,7 @@ static int get_nb_samples(AVCodecContext *avctx, GetByteContext *gb,
     header_size = 0;
     switch (avctx->codec->id) {
         case AV_CODEC_ID_ADPCM_4XM:
+        case AV_CODEC_ID_ADPCM_AGM:
         case AV_CODEC_ID_ADPCM_IMA_DAT4:
         case AV_CODEC_ID_ADPCM_IMA_ISS:     header_size = 4 * ch;      break;
         case AV_CODEC_ID_ADPCM_IMA_AMV:     header_size = 8;           break;
@@ -861,6 +906,18 @@ static int adpcm_decode_frame(AVCodecContext *avctx, void *data,
                 *samples++ = adpcm_ima_expand_nibble(cs, v & 0x0F, 4);
                 *samples++ = adpcm_ima_expand_nibble(cs, v >> 4  , 4);
             }
+        }
+        break;
+    case AV_CODEC_ID_ADPCM_AGM:
+        for (i = 0; i < avctx->channels; i++)
+            c->status[i].predictor = sign_extend(bytestream2_get_le16u(&gb), 16);
+        for (i = 0; i < avctx->channels; i++)
+            c->status[i].step = sign_extend(bytestream2_get_le16u(&gb), 16);
+
+        for (n = 0; n < nb_samples >> (1 - st); n++) {
+            int v = bytestream2_get_byteu(&gb);
+            *samples++ = adpcm_agm_expand_nibble(&c->status[0], v & 0xF);
+            *samples++ = adpcm_agm_expand_nibble(&c->status[st], v >> 4 );
         }
         break;
     case AV_CODEC_ID_ADPCM_MS:
@@ -1729,6 +1786,7 @@ AVCodec ff_ ## name_ ## _decoder = {                        \
 /* Note: Do not forget to add new entries to the Makefile as well. */
 ADPCM_DECODER(AV_CODEC_ID_ADPCM_4XM,         sample_fmts_s16p, adpcm_4xm,         "ADPCM 4X Movie");
 ADPCM_DECODER(AV_CODEC_ID_ADPCM_AFC,         sample_fmts_s16p, adpcm_afc,         "ADPCM Nintendo Gamecube AFC");
+ADPCM_DECODER(AV_CODEC_ID_ADPCM_AGM,         sample_fmts_s16,  adpcm_agm,         "ADPCM AmuseGraphics Movie");
 ADPCM_DECODER(AV_CODEC_ID_ADPCM_AICA,        sample_fmts_s16p, adpcm_aica,        "ADPCM Yamaha AICA");
 ADPCM_DECODER(AV_CODEC_ID_ADPCM_CT,          sample_fmts_s16,  adpcm_ct,          "ADPCM Creative Technology");
 ADPCM_DECODER(AV_CODEC_ID_ADPCM_DTK,         sample_fmts_s16p, adpcm_dtk,         "ADPCM Nintendo Gamecube DTK");

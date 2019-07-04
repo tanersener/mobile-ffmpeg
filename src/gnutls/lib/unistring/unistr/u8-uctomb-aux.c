@@ -1,34 +1,41 @@
 /* Conversion UCS-4 to UTF-8.
-   Copyright (C) 2002, 2006-2007, 2009-2016 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2006-2007, 2009-2019 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2002.
 
-   This program is free software: you can redistribute it and/or modify it
-   under the terms of either:
+   This program is free software: you can redistribute it and/or
+   modify it under the terms of either:
 
-    * the GNU Lesser General Public License as published
-   by the Free Software Foundation; either version 3 of the License, or
-   (at your option) any later version.
+     * the GNU Lesser General Public License as published by the Free
+       Software Foundation; either version 3 of the License, or (at your
+       option) any later version.
 
    or
 
-   * the GNU General Public License as published by the Free
-   Software Foundation; either version 2 of the License, or
-   (at your option) any later version.
+     * the GNU General Public License as published by the Free
+       Software Foundation; either version 2 of the License, or (at your
+       option) any later version.
 
    or both in parallel, as here.
-
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 
 /* Specification.  */
 #include "unistr.h"
+
+#ifndef FALLTHROUGH
+# if __GNUC__ < 7
+#  define FALLTHROUGH ((void) 0)
+# else
+#  define FALLTHROUGH __attribute__ ((__fallthrough__))
+# endif
+#endif
 
 int
 u8_uctomb_aux (uint8_t *s, ucs4_t uc, int n)
@@ -58,9 +65,9 @@ u8_uctomb_aux (uint8_t *s, ucs4_t uc, int n)
   switch (count) /* note: code falls through cases! */
     {
     case 4: s[3] = 0x80 | (uc & 0x3f); uc = uc >> 6; uc |= 0x10000;
-      /* fallthrough */
+      FALLTHROUGH;
     case 3: s[2] = 0x80 | (uc & 0x3f); uc = uc >> 6; uc |= 0x800;
-      /* fallthrough */
+      FALLTHROUGH;
     case 2: s[1] = 0x80 | (uc & 0x3f); uc = uc >> 6; uc |= 0xc0;
   /*case 1:*/ s[0] = uc;
     }

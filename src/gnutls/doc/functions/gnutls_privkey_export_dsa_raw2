@@ -1,0 +1,27 @@
+
+
+
+
+@deftypefun {int} {gnutls_privkey_export_dsa_raw2} (gnutls_privkey_t @var{key}, gnutls_datum_t * @var{p}, gnutls_datum_t * @var{q}, gnutls_datum_t * @var{g}, gnutls_datum_t * @var{y}, gnutls_datum_t * @var{x}, unsigned int @var{flags})
+@var{key}: Holds the public key
+
+@var{p}: will hold the p
+
+@var{q}: will hold the q
+
+@var{g}: will hold the g
+
+@var{y}: will hold the y
+
+@var{x}: will hold the x
+
+@var{flags}: flags from @code{gnutls_abstract_export_flags_t} 
+
+This function will export the DSA private key's parameters found
+in the given structure. The new parameters will be allocated using
+@code{gnutls_malloc()}  and will be stored in the appropriate datum.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
+
+@strong{Since:} 3.6.0
+@end deftypefun

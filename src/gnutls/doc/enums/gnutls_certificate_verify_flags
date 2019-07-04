@@ -6,6 +6,10 @@
 If set a signer does not have to be
 a certificate authority. This flag should normally be disabled,
 unless you know what this means.
+@item GNUTLS_@-VERIFY_@-DO_@-NOT_@-ALLOW_@-IP_@-MATCHES
+When verifying a hostname
+prevent textual IP addresses from matching IP addresses in the
+certificate. Treat the input only as a DNS name.
 @item GNUTLS_@-VERIFY_@-DO_@-NOT_@-ALLOW_@-SAME
 If a certificate is not signed by
 anyone trusted but exists in the trusted CA list do not treat it
@@ -48,4 +52,10 @@ check in the verification, do not consider any wildcards.
 @item GNUTLS_@-VERIFY_@-USE_@-TLS1_@-RSA
 This indicates that a (raw) RSA signature is provided
 as in the TLS 1.0 protocol. Not all functions accept this flag.
+@item GNUTLS_@-VERIFY_@-IGNORE_@-UNKNOWN_@-CRIT_@-EXTENSIONS
+This signals the verification
+process, not to fail on unknown critical extensions.
+@item GNUTLS_@-VERIFY_@-ALLOW_@-SIGN_@-WITH_@-SHA1
+Allow certificates to be signed
+using the broken SHA1 hash algorithm.
 @end table

@@ -1,0 +1,30 @@
+
+
+
+
+@deftypefun {int} {gnutls_pubkey_export_gost_raw2} (gnutls_pubkey_t @var{key}, gnutls_ecc_curve_t * @var{curve}, gnutls_digest_algorithm_t * @var{digest}, gnutls_gost_paramset_t * @var{paramset}, gnutls_datum_t * @var{x}, gnutls_datum_t * @var{y}, unsigned int @var{flags})
+@var{key}: Holds the public key
+
+@var{curve}: will hold the curve (may be @code{NULL} )
+
+@var{digest}: will hold the curve (may be @code{NULL} )
+
+@var{paramset}: will hold the parameters id (may be @code{NULL} )
+
+@var{x}: will hold the x-coordinate (may be @code{NULL} )
+
+@var{y}: will hold the y-coordinate (may be @code{NULL} )
+
+@var{flags}: flags from @code{gnutls_abstract_export_flags_t} 
+
+This function will export the GOST public key's parameters found in
+the given key.  The new parameters will be allocated using
+@code{gnutls_malloc()}  and will be stored in the appropriate datum.
+
+@strong{Note:} parameters will be stored with least significant byte first. On
+version 3.6.3 this was incorrectly returned in big-endian format.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
+
+@strong{Since:} 3.6.3
+@end deftypefun

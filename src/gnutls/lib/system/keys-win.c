@@ -15,7 +15,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -43,6 +43,7 @@
 
 #include <wincrypt.h>
 #include <winbase.h>
+#include <winapifamily.h>
 
 #define DYN_NCRYPT
 
@@ -612,6 +613,9 @@ static int cng_info(gnutls_privkey_t key, unsigned int flags, void *userdata)
  -*/
 int _gnutls_privkey_import_system_url(gnutls_privkey_t pkey, const char *url)
 {
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP)
+    return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
+#else
 	uint8_t id[MAX_WID_SIZE];
 	HCERTSTORE store = NULL;
 	size_t id_size;
@@ -647,7 +651,7 @@ int _gnutls_privkey_import_system_url(gnutls_privkey_t pkey, const char *url)
 	blob.cbData = id_size;
 	blob.pbData = id;
 
-	store = CertOpenSystemStore(0, "MY");
+	store = CertOpenStore(CERT_STORE_PROV_SYSTEM, 0, 0, CERT_SYSTEM_STORE_CURRENT_USER, L"MY");
 	if (store == NULL) {
 		gnutls_assert();
 		ret = GNUTLS_E_FILE_ERROR;
@@ -861,6 +865,7 @@ int _gnutls_privkey_import_system_url(gnutls_privkey_t pkey, const char *url)
 
 	CertCloseStore(store, 0);
 	return ret;
+#endif
 }
 
 int _gnutls_x509_crt_import_system_url(gnutls_x509_crt_t crt, const char *url)
@@ -884,7 +889,7 @@ int _gnutls_x509_crt_import_system_url(gnutls_x509_crt_t crt, const char *url)
 	blob.cbData = id_size;
 	blob.pbData = id;
 
-	store = CertOpenSystemStore(0, "MY");
+	store = CertOpenStore(CERT_STORE_PROV_SYSTEM, 0, 0, CERT_SYSTEM_STORE_CURRENT_USER, L"MY");
 	if (store == NULL) {
 		gnutls_assert();
 		ret = GNUTLS_E_FILE_ERROR;
@@ -1132,7 +1137,7 @@ gnutls_system_key_iter_get_info(gnutls_system_key_iter_t * iter,
 		if (*iter == NULL)
 			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
-		(*iter)->store = CertOpenSystemStore(0, "MY");
+		(*iter)->store = CertOpenStore(CERT_STORE_PROV_SYSTEM, 0, 0, CERT_SYSTEM_STORE_CURRENT_USER, L"MY");
 		if ((*iter)->store == NULL) {
 			gnutls_free(*iter);
 			*iter = NULL;
@@ -1205,7 +1210,7 @@ int gnutls_system_key_delete(const char *cert_url, const char *key_url)
 	blob.cbData = id_size;
 	blob.pbData = id;
 
-	store = CertOpenSystemStore(0, "MY");
+	store = CertOpenStore(CERT_STORE_PROV_SYSTEM, 0, 0, CERT_SYSTEM_STORE_CURRENT_USER, L"MY");
 	if (store != NULL) {
 		do {
 			cert = CertFindCertificateInStore(store,
@@ -1426,7 +1431,7 @@ int _gnutls_system_key_init(void)
 	int ret;
 
 #ifdef DYN_NCRYPT
-	ncrypt_lib = LoadLibraryA("ncrypt.dll");
+	ncrypt_lib = LoadLibrary(TEXT("ncrypt.dll"));
 	if (ncrypt_lib == NULL) {
 		return gnutls_assert_val(GNUTLS_E_CRYPTO_INIT_FAILED);
 	}

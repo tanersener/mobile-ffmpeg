@@ -37,9 +37,7 @@
 
 #include "nettle-meta.h"
 
-#undef nettle_hashes
-
-const struct nettle_hash * const nettle_hashes[] = {
+const struct nettle_hash * const _nettle_hashes[] = {
   &nettle_md2,
   &nettle_md4,
   &nettle_md5,
@@ -59,5 +57,5 @@ const struct nettle_hash * const nettle_hashes[] = {
 const struct nettle_hash * const *
 nettle_get_hashes (void)
 {
-  return nettle_hashes;
+  return _nettle_hashes;
 }

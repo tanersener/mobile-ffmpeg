@@ -12,9 +12,13 @@
 @var{flags}: Must be zero or flags from @code{gnutls_privkey_flags_t} .
 
 This function will generate a random private key. Note that this
-function must be called on an empty private key. The flag @code{GNUTLS_PRIVKEY_FLAG_PROVABLE} 
+function must be called on an initialized private key.
+
+The flag @code{GNUTLS_PRIVKEY_FLAG_PROVABLE} 
 instructs the key generation process to use algorithms like Shawe-Taylor
-which generate provable parameters out of a seed.
+(from FIPS PUB186-4) which generate provable parameters out of a seed
+for RSA and DSA keys. See @code{gnutls_x509_privkey_generate2()}  for more
+information.
 
 Note that when generating an elliptic curve key, the curve
 can be substituted in the place of the bits parameter using the
@@ -25,6 +29,8 @@ For DSA keys, if the subgroup size needs to be specified check
 the @code{GNUTLS_SUBGROUP_TO_BITS()}  macro.
 
 It is recommended to do not set the number of  @code{bits} directly, use @code{gnutls_sec_param_to_pk_bits()}  instead .
+
+See also @code{gnutls_privkey_generate()} , @code{gnutls_x509_privkey_generate2()} .
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.

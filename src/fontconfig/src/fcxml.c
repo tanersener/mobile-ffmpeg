@@ -358,6 +358,8 @@ typedef enum _FcElement {
     FcElementMatch,
     FcElementAlias,
     FcElementDescription,
+    FcElementRemapDir,
+    FcElementResetDirs,
 	
     FcElementRescan,
 
@@ -421,6 +423,8 @@ static const struct {
     { "match",		FcElementMatch },
     { "alias",		FcElementAlias },
     { "description",	FcElementDescription },
+    { "remap-dir",	FcElementRemapDir },
+    { "reset-dirs",	FcElementResetDirs },
 
     { "rescan",		FcElementRescan },
 
@@ -489,6 +493,19 @@ FcElementMap (const XML_Char *name)
 	    return FcElementNone;
     return FcElementUnknown;
 }
+
+static const char *
+FcElementReverseMap (FcElement e)
+{
+    int i;
+
+    for (i = 0; i < NUM_ELEMENT_MAPS; i++)
+	if (fcElementMap[i].element == e)
+	    return fcElementMap[i].name;
+
+    return NULL;
+}
+
 
 typedef struct _FcPStack {
     struct _FcPStack   *prev;
@@ -1265,6 +1282,122 @@ FcConfigGetAttribute (FcConfigParse *parse, const char *attr)
     return 0;
 }
 
+static FcChar8 *
+_get_real_path_from_prefix(FcConfigParse *parse, const FcChar8 *path, const FcChar8 *prefix)
+{
+#ifdef _WIN32
+    const FcChar8 *data;
+    FcChar8 buffer[1000] = { 0 };
+#endif
+    FcChar8 *parent = NULL, *retval = NULL;
+
+    if (prefix)
+    {
+	if (FcStrCmp (prefix, (const FcChar8 *) "xdg") == 0)
+	{
+	    parent = FcConfigXdgDataHome ();
+	    if (!parent)
+	    {
+		/* Home directory might be disabled */
+		return NULL;
+	    }
+	}
+	else if (FcStrCmp (prefix, (const FcChar8 *) "default") == 0 ||
+		 FcStrCmp (prefix, (const FcChar8 *) "cwd") == 0)
+	{
+	    /* Nothing to do */
+	}
+	else if (FcStrCmp (prefix, (const FcChar8 *) "relative") == 0)
+	{
+	    parent = FcStrDirname (parse->name);
+	    if (!parent)
+		return NULL;
+	}
+    }
+#ifndef _WIN32
+    /* For Win32, check this later for dealing with special cases */
+    else
+    {
+	if (!FcStrIsAbsoluteFilename (path) && path[0] != '~')
+	    FcConfigMessage (parse, FcSevereWarning, "Use of ambiguous path in <%s> element. please add prefix=\"cwd\" if current behavior is desired.", FcElementReverseMap (parse->pstack->element));
+    }
+    if (parent)
+    {
+	retval = FcStrBuildFilename (parent, path, NULL);
+    }
+    else
+    {
+	retval = FcStrdup (path);
+    }
+#else
+    if (strcmp ((const char *) path, "CUSTOMFONTDIR") == 0)
+    {
+	FcChar8 *p;
+	data = buffer;
+	if (!GetModuleFileName (NULL, (LPCH) buffer, sizeof (buffer) - 20))
+	{
+	    FcConfigMessage (parse, FcSevereError, "GetModuleFileName failed");
+	    return NULL;
+	}
+	/*
+	 * Must use the multi-byte aware function to search
+	 * for backslash because East Asian double-byte code
+	 * pages have characters with backslash as the second
+	 * byte.
+	 */
+	p = _mbsrchr (data, '\\');
+	if (p) *p = '\0';
+	strcat ((char *) data, "\\fonts");
+    }
+    else if (strcmp ((const char *) path, "APPSHAREFONTDIR") == 0)
+    {
+	FcChar8 *p;
+	data = buffer;
+	if (!GetModuleFileName (NULL, (LPCH) buffer, sizeof (buffer) - 20))
+	{
+	    FcConfigMessage (parse, FcSevereError, "GetModuleFileName failed");
+	    return NULL;
+	}
+	p = _mbsrchr (data, '\\');
+	if (p) *p = '\0';
+	strcat ((char *) data, "\\..\\share\\fonts");
+    }
+    else if (strcmp ((const char *) path, "WINDOWSFONTDIR") == 0)
+    {
+	int rc;
+	data = buffer;
+	rc = pGetSystemWindowsDirectory ((LPSTR) buffer, sizeof (buffer) - 20);
+	if (rc == 0 || rc > sizeof (buffer) - 20)
+	{
+	    FcConfigMessage (parse, FcSevereError, "GetSystemWindowsDirectory failed");
+	    return NULL;
+	}
+	if (data [strlen ((const char *) data) - 1] != '\\')
+	    strcat ((char *) data, "\\");
+	strcat ((char *) data, "fonts");
+    }
+    else
+    {
+	data = path;
+	if (!prefix)
+	{
+	    if (!FcStrIsAbsoluteFilename (path) && path[0] != '~')
+		FcConfigMessage (parse, FcSevereWarning, "Use of ambiguous path in <%s> element. please add prefix=\"cwd\" if current behavior is desired.", FcElementReverseMap (parse->pstack->element));
+	}
+	if (parent)
+	{
+	    retval = FcStrBuildFilename (parent, data, NULL);
+	}
+	else
+	{
+	    retval = FcStrdup (data);
+	}
+    }
+#endif
+
+    return retval;
+}
+
 static void
 FcStartElement(void *userData, const XML_Char *name, const XML_Char **attr)
 {
@@ -1480,6 +1613,11 @@ FcParseMatrix (FcConfigParse *parse)
     m.xy = FcPopExpr (parse);
     m.xx = FcPopExpr (parse);
 
+    if (!m.yy || !m.yx || !m.xy || !m.xx)
+    {
+	FcConfigMessage (parse, FcSevereWarning, "Missing values in matrix element");
+	return;
+    }
     if (FcPopExpr (parse))
       FcConfigMessage (parse, FcSevereError, "wrong number of matrix elements");
     else
@@ -1926,6 +2064,57 @@ FcParseDescription (FcConfigParse *parse)
     FcStrFree (desc);
 }
 
+static void
+FcParseRemapDir (FcConfigParse *parse)
+{
+    const FcChar8 *path, *attr, *data, *salt;
+    FcChar8 *prefix = NULL;
+
+    data = FcStrBufDoneStatic (&parse->pstack->str);
+    if (!data)
+    {
+	FcConfigMessage (parse, FcSevereError, "out of memory");
+	return;
+    }
+    if (data[0] == 0)
+    {
+	FcConfigMessage (parse, FcSevereWarning, "empty font directory name for remap ignored");
+	return;
+    }
+    path = FcConfigGetAttribute (parse, "as-path");
+    if (!path)
+    {
+	FcConfigMessage (parse, FcSevereWarning, "Missing as-path in remap-dir");
+	return;
+    }
+    attr = FcConfigGetAttribute (parse, "prefix");
+    salt = FcConfigGetAttribute (parse, "salt");
+    prefix = _get_real_path_from_prefix (parse, data, attr);
+    if (!prefix || prefix[0] == 0)
+    {
+	/* nop */
+    }
+    else if (!parse->scanOnly && (!FcStrUsesHome (prefix) || FcConfigHome ()))
+    {
+	if (!FcConfigAddFontDir (parse->config, prefix, path, salt))
+	    FcConfigMessage (parse, FcSevereError, "out of memory; cannot create remap data for %s as %s", prefix, path);
+    }
+    FcStrBufDestroy (&parse->pstack->str);
+
+    if (prefix)
+	FcStrFree (prefix);
+}
+
+static void
+FcParseResetDirs (FcConfigParse *parse)
+{
+    if (!parse->scanOnly)
+    {
+	if (!FcConfigResetFontDirs (parse->config))
+	    FcConfigMessage (parse, FcSevereError, "Unable to reset fonts dirs");
+    }
+}
+
 static FcExpr *
 FcPopExpr (FcConfigParse *parse)
 {
@@ -2066,104 +2255,34 @@ FcParseUnary (FcConfigParse *parse, FcOp op)
 static void
 FcParseDir (FcConfigParse *parse)
 {
-    const FcChar8 *attr, *data;
-    FcChar8 *prefix = NULL, *p;
-#ifdef _WIN32
-    FcChar8         buffer[1000];
-#endif
+    const FcChar8 *attr, *data, *salt;
+    FcChar8 *prefix = NULL;
 
-    attr = FcConfigGetAttribute (parse, "prefix");
-    if (attr && FcStrCmp (attr, (const FcChar8 *)"xdg") == 0)
-    {
-	prefix = FcConfigXdgDataHome ();
-	/* home directory might be disabled.
-	 * simply ignore this element.
-	 */
-	if (!prefix)
-	    goto bail;
-    }
     data = FcStrBufDoneStatic (&parse->pstack->str);
     if (!data)
     {
 	FcConfigMessage (parse, FcSevereError, "out of memory");
-	data = prefix;
-	goto bail;
+	return;
     }
-    if (prefix)
+    if (data[0] == 0)
     {
-	size_t plen = strlen ((const char *)prefix);
-	size_t dlen = strlen ((const char *)data);
-
-	p = realloc (prefix, plen + 1 + dlen + 1);
-	if (!p)
-	{
-	    FcConfigMessage (parse, FcSevereError, "out of memory");
-	    goto bail;
-	}
-	prefix = p;
-	prefix[plen] = FC_DIR_SEPARATOR;
-	memcpy (&prefix[plen + 1], data, dlen);
-	prefix[plen + 1 + dlen] = 0;
-	data = prefix;
-    }
-#ifdef _WIN32
-    if (strcmp ((const char *) data, "CUSTOMFONTDIR") == 0)
-    {
-	FcChar8 *p;
-	data = buffer;
-	if (!GetModuleFileName (NULL, (LPCH) buffer, sizeof (buffer) - 20))
-	{
-	    FcConfigMessage (parse, FcSevereError, "GetModuleFileName failed");
-	    goto bail;
-	}
-	/*
-	 * Must use the multi-byte aware function to search
-	 * for backslash because East Asian double-byte code
-	 * pages have characters with backslash as the second
-	 * byte.
-	 */
-	p = _mbsrchr (data, '\\');
-	if (p) *p = '\0';
-	strcat ((char *) data, "\\fonts");
-    }
-    else if (strcmp ((const char *) data, "APPSHAREFONTDIR") == 0)
-    {
-	FcChar8 *p;
-	data = buffer;
-	if (!GetModuleFileName (NULL, (LPCH) buffer, sizeof (buffer) - 20))
-	{
-	    FcConfigMessage (parse, FcSevereError, "GetModuleFileName failed");
-	    goto bail;
-	}
-	p = _mbsrchr (data, '\\');
-	if (p) *p = '\0';
-	strcat ((char *) data, "\\..\\share\\fonts");
-    }
-    else if (strcmp ((const char *) data, "WINDOWSFONTDIR") == 0)
-    {
-	int rc;
-	data = buffer;
-	rc = pGetSystemWindowsDirectory ((LPSTR) buffer, sizeof (buffer) - 20);
-	if (rc == 0 || rc > sizeof (buffer) - 20)
-	{
-	    FcConfigMessage (parse, FcSevereError, "GetSystemWindowsDirectory failed");
-	    goto bail;
-	}
-	if (data [strlen ((const char *) data) - 1] != '\\')
-	    strcat ((char *) data, "\\");
-	strcat ((char *) data, "fonts");
-    }
-#endif
-    if (strlen ((char *) data) == 0)
 	FcConfigMessage (parse, FcSevereWarning, "empty font directory name ignored");
-    else if (!parse->scanOnly && (!FcStrUsesHome (data) || FcConfigHome ()))
+	return;
+    }
+    attr = FcConfigGetAttribute (parse, "prefix");
+    salt = FcConfigGetAttribute (parse, "salt");
+    prefix = _get_real_path_from_prefix (parse, data, attr);
+    if (!prefix || prefix[0] == 0)
     {
-	if (!FcConfigAddFontDir (parse->config, data))
-	    FcConfigMessage (parse, FcSevereError, "out of memory; cannot add directory %s", data);
+	/* nop */
+    }
+    else if (!parse->scanOnly && (!FcStrUsesHome (prefix) || FcConfigHome ()))
+    {
+	if (!FcConfigAddFontDir (parse->config, prefix, NULL, salt))
+	    FcConfigMessage (parse, FcSevereError, "out of memory; cannot add directory %s", prefix);
     }
     FcStrBufDestroy (&parse->pstack->str);
 
-  bail:
     if (prefix)
 	FcStrFree (prefix);
 }
@@ -2981,6 +3100,12 @@ FcEndElement(void *userData, const XML_Char *name FC_UNUSED)
     case FcElementDescription:
 	FcParseDescription (parse);
 	break;
+    case FcElementRemapDir:
+	FcParseRemapDir (parse);
+	break;
+    case FcElementResetDirs:
+	FcParseResetDirs (parse);
+	break;
 
     case FcElementRescan:
 	FcParseRescan (parse);
@@ -3234,8 +3359,8 @@ FcConfigParseAndLoadDir (FcConfig	*config,
 	/*
 	 * Add all files of the form [0-9]*.conf
 	 */
+	d_len = strlen (e->d_name);
 	if ('0' <= e->d_name[0] && e->d_name[0] <= '9' &&
-	    (d_len = strlen (e->d_name)) < FC_MAX_FILE_LEN &&
 	    d_len > TAIL_LEN &&
 	    strcmp (e->d_name + d_len - TAIL_LEN, TAIL) == 0)
 	{

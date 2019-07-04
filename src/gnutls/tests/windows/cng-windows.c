@@ -33,7 +33,7 @@
 
 #include <stdlib.h>
 
-void doit()
+void doit(void)
 {
 	exit(77);
 }

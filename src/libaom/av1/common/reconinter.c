@@ -63,7 +63,7 @@ void av1_make_inter_predictor(const uint8_t *src, int src_stride, uint8_t *dst,
                               int dst_stride, const SubpelParams *subpel_params,
                               const struct scale_factors *sf, int w, int h,
                               ConvolveParams *conv_params,
-                              InterpFilters interp_filters,
+                              int_interpfilters interp_filters,
                               const WarpTypesAllowed *warp_types, int p_col,
                               int p_row, int plane, int ref,
                               const MB_MODE_INFO *mi, int build_for_obmc,
@@ -208,7 +208,7 @@ static const wedge_code_type wedge_codebook_16_heqw[16] = {
   { WEDGE_OBLIQUE117, 2, 4 }, { WEDGE_OBLIQUE117, 6, 4 },
 };
 
-const wedge_params_type wedge_params_lookup[BLOCK_SIZES_ALL] = {
+const wedge_params_type av1_wedge_params_lookup[BLOCK_SIZES_ALL] = {
   { 0, NULL, NULL, NULL },
   { 0, NULL, NULL, NULL },
   { 0, NULL, NULL, NULL },
@@ -248,9 +248,10 @@ static const uint8_t *get_wedge_mask_inplace(int wedge_index, int neg,
   const int bh = block_size_high[sb_type];
   const int bw = block_size_wide[sb_type];
   const wedge_code_type *a =
-      wedge_params_lookup[sb_type].codebook + wedge_index;
+      av1_wedge_params_lookup[sb_type].codebook + wedge_index;
   int woff, hoff;
-  const uint8_t wsignflip = wedge_params_lookup[sb_type].signflip[wedge_index];
+  const uint8_t wsignflip =
+      av1_wedge_params_lookup[sb_type].signflip[wedge_index];
 
   assert(wedge_index >= 0 &&
          wedge_index < (1 << get_wedge_bits_lookup(sb_type)));
@@ -490,7 +491,7 @@ static void init_wedge_signs() {
   for (sb_type = BLOCK_4X4; sb_type < BLOCK_SIZES_ALL; ++sb_type) {
     const int bw = block_size_wide[sb_type];
     const int bh = block_size_high[sb_type];
-    const wedge_params_type wedge_params = wedge_params_lookup[sb_type];
+    const wedge_params_type wedge_params = av1_wedge_params_lookup[sb_type];
     const int wbits = wedge_params.bits;
     const int wtypes = 1 << wbits;
     int i, w;
@@ -526,7 +527,7 @@ static void init_wedge_masks() {
     const uint8_t *mask;
     const int bw = block_size_wide[bsize];
     const int bh = block_size_high[bsize];
-    const wedge_params_type *wedge_params = &wedge_params_lookup[bsize];
+    const wedge_params_type *wedge_params = &av1_wedge_params_lookup[bsize];
     const int wbits = wedge_params->bits;
     const int wtypes = 1 << wbits;
     int w;
@@ -581,9 +582,9 @@ static void build_masked_compound_no_round(
 void av1_make_masked_inter_predictor(
     const uint8_t *pre, int pre_stride, uint8_t *dst, int dst_stride,
     const SubpelParams *subpel_params, const struct scale_factors *sf, int w,
-    int h, ConvolveParams *conv_params, InterpFilters interp_filters, int plane,
-    const WarpTypesAllowed *warp_types, int p_col, int p_row, int ref,
-    MACROBLOCKD *xd, int can_use_previous) {
+    int h, ConvolveParams *conv_params, int_interpfilters interp_filters,
+    int plane, const WarpTypesAllowed *warp_types, int p_col, int p_row,
+    int ref, MACROBLOCKD *xd, int can_use_previous) {
   MB_MODE_INFO *mi = xd->mi[0];
   (void)dst;
   (void)dst_stride;
@@ -1036,8 +1037,8 @@ static void build_smooth_interintra_mask(uint8_t *mask, int stride,
 }
 
 static void combine_interintra(INTERINTRA_MODE mode,
-                               int8_t use_wedge_interintra, int wedge_index,
-                               int wedge_sign, BLOCK_SIZE bsize,
+                               int8_t use_wedge_interintra, int8_t wedge_index,
+                               int8_t wedge_sign, BLOCK_SIZE bsize,
                                BLOCK_SIZE plane_bsize, uint8_t *comppred,
                                int compstride, const uint8_t *interpred,
                                int interstride, const uint8_t *intrapred,
@@ -1065,8 +1066,8 @@ static void combine_interintra(INTERINTRA_MODE mode,
 }
 
 static void combine_interintra_highbd(
-    INTERINTRA_MODE mode, int8_t use_wedge_interintra, int wedge_index,
-    int wedge_sign, BLOCK_SIZE bsize, BLOCK_SIZE plane_bsize,
+    INTERINTRA_MODE mode, int8_t use_wedge_interintra, int8_t wedge_index,
+    int8_t wedge_sign, BLOCK_SIZE bsize, BLOCK_SIZE plane_bsize,
     uint8_t *comppred8, int compstride, const uint8_t *interpred8,
     int interstride, const uint8_t *intrapred8, int intrastride, int bd) {
   const int bw = block_size_wide[plane_bsize];
@@ -1122,16 +1123,15 @@ void av1_combine_interintra(MACROBLOCKD *xd, BLOCK_SIZE bsize, int plane,
   if (is_cur_buf_hbd(xd)) {
     combine_interintra_highbd(
         xd->mi[0]->interintra_mode, xd->mi[0]->use_wedge_interintra,
-        xd->mi[0]->interintra_wedge_index, xd->mi[0]->interintra_wedge_sign,
-        bsize, plane_bsize, xd->plane[plane].dst.buf,
-        xd->plane[plane].dst.stride, inter_pred, inter_stride, intra_pred,
-        intra_stride, xd->bd);
+        xd->mi[0]->interintra_wedge_index, INTERINTRA_WEDGE_SIGN, bsize,
+        plane_bsize, xd->plane[plane].dst.buf, xd->plane[plane].dst.stride,
+        inter_pred, inter_stride, intra_pred, intra_stride, xd->bd);
     return;
   }
   combine_interintra(
       xd->mi[0]->interintra_mode, xd->mi[0]->use_wedge_interintra,
-      xd->mi[0]->interintra_wedge_index, xd->mi[0]->interintra_wedge_sign,
-      bsize, plane_bsize, xd->plane[plane].dst.buf, xd->plane[plane].dst.stride,
+      xd->mi[0]->interintra_wedge_index, INTERINTRA_WEDGE_SIGN, bsize,
+      plane_bsize, xd->plane[plane].dst.buf, xd->plane[plane].dst.stride,
       inter_pred, inter_stride, intra_pred, intra_stride);
 }
 
@@ -1140,6 +1140,7 @@ void av1_build_interintra_predictors_sbp(const AV1_COMMON *cm, MACROBLOCKD *xd,
                                          uint8_t *pred, int stride,
                                          const BUFFER_SET *ctx, int plane,
                                          BLOCK_SIZE bsize) {
+  assert(bsize < BLOCK_SIZES_ALL);
   if (is_cur_buf_hbd(xd)) {
     DECLARE_ALIGNED(16, uint16_t, intrapredictor[MAX_SB_SQUARE]);
     av1_build_intra_predictors_for_interintra(

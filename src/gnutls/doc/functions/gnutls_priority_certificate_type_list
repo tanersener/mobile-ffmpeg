@@ -8,7 +8,13 @@
 @var{list}: will point to an integer list
 
 Get a list of available certificate types in the priority
-structure. 
+structure.
+
+As of version 3.6.4 this function is an alias for
+gnutls_priority_certificate_type_list2 with the target parameter
+set to:
+- GNUTLS_CTYPE_SERVER, if the @code{SERVER_PRECEDENCE}  option is set
+- GNUTLS_CTYPE_CLIENT, otherwise.
 
 @strong{Returns:} the number of certificate types, or an error code.
 

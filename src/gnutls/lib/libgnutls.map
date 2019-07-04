@@ -16,7 +16,12 @@
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>
+# along with this program.  If not, see <https://www.gnu.org/licenses/>
+
+# When new symbols are added in a release (x.y.z) they are added
+# as GNUTLS_x_y_z { global: new_symbol } GNUTLS_prev_release_version
+# That allows tools like rpm detect the correct library dependency of an application.
+# See CONTRIBUTION.md symbol versioning section for more information.
 
 GNUTLS_3_4
 {
@@ -1138,7 +1143,151 @@ GNUTLS_3_4
 	*;
 };
 
+GNUTLS_3_6_0
+{
+ global:
+	gnutls_pubkey_export_rsa_raw2;
+	gnutls_pubkey_export_dsa_raw2;
+	gnutls_pubkey_export_ecc_raw2;
+	gnutls_privkey_export_rsa_raw2;
+	gnutls_privkey_export_dsa_raw2;
+	gnutls_privkey_export_ecc_raw2;
+	gnutls_x509_crt_set_flags;
+	gnutls_x509_crt_check_ip;
+	gnutls_x509_ext_import_inhibit_anypolicy;
+	gnutls_x509_ext_export_inhibit_anypolicy;
+	gnutls_x509_crt_get_inhibit_anypolicy;
+	gnutls_x509_crt_set_inhibit_anypolicy;
+	gnutls_decode_rs_value;
+	gnutls_encode_rs_value;
+	gnutls_x509_spki_init;
+	gnutls_x509_spki_deinit;
+	gnutls_x509_spki_get_rsa_pss_params;
+	gnutls_x509_spki_set_rsa_pss_params;
+	gnutls_x509_crt_get_spki;
+	gnutls_x509_crt_set_spki;
+	gnutls_x509_crq_get_spki;
+	gnutls_x509_crq_set_spki;
+	gnutls_x509_privkey_set_spki;
+	gnutls_x509_privkey_get_spki;
+	gnutls_pubkey_set_spki;
+	gnutls_pubkey_get_spki;
+	gnutls_privkey_set_spki;
+	gnutls_privkey_get_spki;
+	gnutls_sign_supports_pk_algorithm;
+	gnutls_privkey_sign_hash2;
+	gnutls_privkey_sign_data2;
+	gnutls_sign_is_secure2;
+	gnutls_group_get_name;
+	gnutls_group_get_id;
+	gnutls_group_list;
+	gnutls_group_get;
+	gnutls_priority_group_list;
+	gnutls_pkcs11_token_check_mechanism;
+	gnutls_base64_encode2;
+	gnutls_base64_decode2;
+	gnutls_privkey_import_ext4;
+ local:
+	*;
+} GNUTLS_3_4;
+
+GNUTLS_3_6_2
+{
+ global:
+	gnutls_srp_8192_group_generator;
+	gnutls_srp_8192_group_prime;
+} GNUTLS_3_6_0;
+
+GNUTLS_3_6_3
+{
+ global:
+	gnutls_fips140_set_mode;
+	gnutls_session_key_update;
+	gnutls_ext_get_current_msg;
+	gnutls_reauth;
+	gnutls_ocsp_status_request_get2;
+	gnutls_ocsp_resp_import2;
+	gnutls_ocsp_resp_export2;
+	gnutls_ocsp_resp_list_import2;
+	gnutls_certificate_set_retrieve_function3;
+	gnutls_certificate_set_ocsp_status_request_file2;
+	gnutls_certificate_set_ocsp_status_request_mem;
+	gnutls_certificate_get_ocsp_expiration;
+	gnutls_record_send2;
+	gnutls_ext_raw_parse;
+	gnutls_x509_crt_list_import_url;
+	gnutls_pcert_list_import_x509_file;
+	gnutls_pkcs11_token_get_ptr;
+	gnutls_pkcs11_obj_get_ptr;
+	gnutls_session_ticket_send;
+	gnutls_aead_cipher_encryptv;
+	gnutls_gost_paramset_get_name;
+	gnutls_gost_paramset_get_oid;
+	gnutls_oid_to_gost_paramset;
+	gnutls_decode_gost_rs_value;
+	gnutls_encode_gost_rs_value;
+	gnutls_pubkey_export_gost_raw2;
+	gnutls_pubkey_import_gost_raw;
+	gnutls_x509_crt_get_pk_gost_raw;
+	gnutls_privkey_export_gost_raw2;
+	gnutls_privkey_import_gost_raw;
+	gnutls_x509_privkey_export_gost_raw;
+	gnutls_x509_privkey_import_gost_raw;
+	gnutls_set_default_priority_append;
+	gnutls_priority_init2;
+} GNUTLS_3_6_2;
+
+GNUTLS_3_6_4
+{
+ global:
+	gnutls_record_set_max_early_data_size;
+	gnutls_ffdhe_6144_group_prime;
+	gnutls_ffdhe_6144_group_generator;
+	gnutls_ffdhe_6144_key_bits;
+	gnutls_certificate_type_get2;
+	gnutls_priority_certificate_type_list2;
+} GNUTLS_3_6_3;
+
+GNUTLS_3_6_5
+{
+ global:
+	gnutls_record_get_max_early_data_size;
+	gnutls_record_send_early_data;
+	gnutls_record_recv_early_data;
+	gnutls_db_check_entry_expire_time;
+	gnutls_anti_replay_set_add_function;
+	gnutls_anti_replay_set_ptr;
+	gnutls_anti_replay_init;
+	gnutls_anti_replay_deinit;
+	gnutls_anti_replay_set_window;
+	gnutls_anti_replay_enable;
+	gnutls_privkey_decrypt_data2;
+} GNUTLS_3_6_4;
+
+GNUTLS_3_6_6
+{
+ global:
+	gnutls_certificate_set_rawpk_key_mem;
+	gnutls_certificate_set_rawpk_key_file;
+	gnutls_pcert_import_rawpk;
+	gnutls_pcert_import_rawpk_raw;
+} GNUTLS_3_6_5;
+
+GNUTLS_3_6_8
+{
+ global:
+	gnutls_prf_early;
+	gnutls_record_set_max_recv_size;
+	gnutls_dh_params_import_raw3;
+	gnutls_ffdhe_2048_group_q;
+	gnutls_ffdhe_3072_group_q;
+	gnutls_ffdhe_4096_group_q;
+	gnutls_ffdhe_6144_group_q;
+	gnutls_ffdhe_8192_group_q;
+} GNUTLS_3_6_6;
+
 GNUTLS_FIPS140_3_4 {
+  global:
 	gnutls_cipher_self_test;
 	gnutls_pk_self_test;
 	gnutls_mac_self_test;
@@ -1160,7 +1309,8 @@ GNUTLS_FIPS140_3_4 {
 	_gnutls_dh_generate_key;
 	_gnutls_ecdh_generate_key;
 	_gnutls_ecdh_compute_key;
-};
+	_gnutls_cipher_get_iv;
+} GNUTLS_3_4;
 
 GNUTLS_PRIVATE_3_4 {
   global:
@@ -1171,10 +1321,16 @@ GNUTLS_PRIVATE_3_4 {
 
 	# Internal symbols used by fips-test
 	_gnutls_lib_simulate_error;
+	_gnutls_lib_force_operational;
 	#symbols needed for crypto-selftests
 	_gnutls_log_level;
 	_gnutls_digest_exists;
 	_gnutls_log;
+
+	# PSK extension parser unit test
+	_gnutls13_psk_ext_parser_init;
+	_gnutls13_psk_ext_iter_next_identity;
+	_gnutls13_psk_ext_iter_next_binder;
 
 	# Internal symbols needed by gnutls-cli-debug:
 	_gnutls_rsa_pms_set_version;
@@ -1186,9 +1342,21 @@ GNUTLS_PRIVATE_3_4 {
 	_gnutls_mpi_ops;
 	_gnutls_mpi_log;
 	_gnutls_mpi_release;
+	# tests/time.c
+	_gnutls_utcTime2gtime;
+	_gnutls_x509_generalTime2gtime;
+
 	# Internal symbols needed by tests/:
+	# by tests/tls13/prf-early.c
+	_gnutls_global_version;
+	_gnutls_default_priority_string;
+	_gnutls_supplemental_deinit;
+	_gnutls_record_overhead;
+	_gnutls_cipher_to_entry;
+	_gnutls_pkcs11_token_get_url;
 	_gnutls_pkcs12_string_to_key;
 	_gnutls_bin2hex;
+	_gnutls_version_to_entry;
 	_gnutls_mac_to_entry;
 	_gnutls_resolve_priorities;
 	# Internal symbols needed by tests/name-constraints:
@@ -1200,4 +1368,10 @@ GNUTLS_PRIVATE_3_4 {
 	# Internal symbols needed by tests/name-constraints-merge:
 	_gnutls_x509_name_constraints_merge;
 	_gnutls_server_name_set_raw;
-};
+	# Internal symbols needed by tests/suite/resume-with-stek-expiration
+	_gnutls_set_session_ticket_key_rotation_callback;
+	# Internal symbols needed by tests/virt-time.h
+	_gnutls_global_set_gettime_function;
+	# Internal symbols needed by tests/tls13/anti_replay.c
+	_gnutls_anti_replay_check;
+} GNUTLS_3_4;

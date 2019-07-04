@@ -16,15 +16,15 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
-#ifndef EXT_ETM_H
-#define EXT_ETM_H
+#ifndef GNUTLS_LIB_EXT_ETM_H
+#define GNUTLS_LIB_EXT_ETM_H
 
-#include <extensions.h>
+#include <hello_ext.h>
 
-extern const extension_entry_st ext_mod_etm;
+extern const hello_ext_entry_st ext_mod_etm;
 
-#endif
+#endif /* GNUTLS_LIB_EXT_ETM_H */

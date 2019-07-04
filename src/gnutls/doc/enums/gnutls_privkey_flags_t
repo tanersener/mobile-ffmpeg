@@ -18,4 +18,10 @@ When generating a key involving prime numbers, use provable primes; a seed may b
 Keys generated or imported as provable require an extended format which cannot be read by previous versions
 of gnutls or other applications. By setting this flag the key will be exported in a backwards compatible way,
 even if the information about the seed used will be lost.
+@item GNUTLS_@-PRIVKEY_@-SIGN_@-FLAG_@-RSA_@-PSS
+Make an RSA signature on the hashed data with the PSS padding.
+@item GNUTLS_@-PRIVKEY_@-FLAG_@-REPRODUCIBLE
+Make an RSA-PSS signature on the hashed data with reproducible parameters (zero salt).
+@item GNUTLS_@-PRIVKEY_@-FLAG_@-CA
+The generated private key is going to be used as a CA (relevant for RSA-PSS keys).
 @end table

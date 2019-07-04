@@ -2,7 +2,7 @@
 
 
 
-@deftypefun {unsigned} {gnutls_x509_crt_equals2} (gnutls_x509_crt_t @var{cert1}, gnutls_datum_t * @var{der})
+@deftypefun {unsigned} {gnutls_x509_crt_equals2} (gnutls_x509_crt_t @var{cert1}, const gnutls_datum_t * @var{der})
 @var{cert1}: The first certificate
 
 @var{der}: A DER encoded certificate

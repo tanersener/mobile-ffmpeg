@@ -1,0 +1,1 @@
+@item @var{unsigned} @ref{gnutls_ext_get_current_msg} (gnutls_session_t @var{session})

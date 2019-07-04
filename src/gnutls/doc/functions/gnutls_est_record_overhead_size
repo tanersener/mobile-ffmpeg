@@ -9,7 +9,7 @@
 
 @var{mac}: is a @code{gnutls_mac_algorithm_t}  value
 
-@var{comp}: is a @code{gnutls_compression_method_t}  value
+@var{comp}: is a @code{gnutls_compression_method_t}  value (ignored)
 
 @var{flags}: must be zero
 

@@ -33,10 +33,25 @@ create_package() {
     rm -rf ${CURRENT_UNIVERSAL_PACKAGE}
     mkdir -p ${CURRENT_UNIVERSAL_PACKAGE}/include || exit 1
     mkdir -p ${CURRENT_UNIVERSAL_PACKAGE}/lib || exit 1
-    find ${UNIVERSAL_PACKAGE} -name "*.a" -exec cp {} ${CURRENT_UNIVERSAL_PACKAGE}/lib \;  || exit 1
+
+    cd ${UNIVERSAL_PACKAGE} || exit 1
+    find . -name "*.a" -exec cp {} ${CURRENT_UNIVERSAL_PACKAGE}/lib \;  || exit 1
+
+    # COPY LICENSE FILE OF EACH LIBRARY
+    LICENSE_FILES=$(find . -name LICENSE | grep -vi ffmpeg)
+
+    for LICENSE_FILE in ${LICENSE_FILES[@]}
+    do
+        LIBRARY_NAME=$(echo ${LICENSE_FILE} | sed 's/\.\///g;s/-universal\/LICENSE//g')
+        cp ${LICENSE_FILE} ${CURRENT_UNIVERSAL_PACKAGE}/LICENSE.${LIBRARY_NAME} || exit 1
+    done
+
     cp -r ${UNIVERSAL_PACKAGE}/mobile-ffmpeg-universal/include/* ${CURRENT_UNIVERSAL_PACKAGE}/include || exit 1
     cp -r ${UNIVERSAL_PACKAGE}/ffmpeg-universal/include/* ${CURRENT_UNIVERSAL_PACKAGE}/include || exit 1
     cp ${UNIVERSAL_PACKAGE}/ffmpeg-universal/LICENSE ${CURRENT_UNIVERSAL_PACKAGE}/LICENSE || exit 1
+
+    cd ${ALL_UNIVERSAL_PACKAGES} || exit 1
+    zip -r "${PACKAGE_NAME}-${PACKAGE_VERSION}-ios-static-universal.zip" ${PACKAGE_NAME}-universal || exit 1
 }
 
 if [[ $# -ne 1 ]];

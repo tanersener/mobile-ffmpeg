@@ -5,11 +5,6 @@ if [[ -z ${ARCH} ]]; then
     exit 1
 fi
 
-if [[ -z ${IOS_MIN_VERSION} ]]; then
-    echo -e "(*) IOS_MIN_VERSION not defined\n"
-    exit 1
-fi
-
 if [[ -z ${TARGET_SDK} ]]; then
     echo -e "(*) TARGET_SDK not defined\n"
     exit 1
@@ -26,7 +21,11 @@ if [[ -z ${BASEDIR} ]]; then
 fi
 
 # ENABLE COMMON FUNCTIONS
-. ${BASEDIR}/build/ios-common.sh
+if [[ ${APPLE_TVOS_BUILD} -eq 1 ]]; then
+    . ${BASEDIR}/build/tvos-common.sh
+else
+    . ${BASEDIR}/build/ios-common.sh
+fi
 
 # PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
 LIB_NAME="gnutls"
@@ -38,16 +37,16 @@ COMMON_CFLAGS=$(get_cflags ${LIB_NAME})
 COMMON_CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 COMMON_LDFLAGS=$(get_ldflags ${LIB_NAME})
 
-export CFLAGS="${COMMON_CFLAGS} -I${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/libiconv/include"
+export CFLAGS="${COMMON_CFLAGS} -I${BASEDIR}/prebuilt/$(get_target_build_directory)/libiconv/include"
 export CXXFLAGS="${COMMON_CXXFLAGS}"
-export LDFLAGS="${COMMON_LDFLAGS} -L${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/libiconv/lib"
+export LDFLAGS="${COMMON_LDFLAGS} -L${BASEDIR}/prebuilt/$(get_target_build_directory)/libiconv/lib"
 
-export NETTLE_CFLAGS="-I${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/nettle/include"
-export NETTLE_LIBS="-L${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/nettle/lib"
-export HOGWEED_CFLAGS="-I${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/nettle/include"
-export HOGWEED_LIBS="-L${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/nettle/lib"
-export GMP_CFLAGS="-I${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/gmp/include"
-export GMP_LIBS="-L${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/gmp/lib"
+export NETTLE_CFLAGS="-I${BASEDIR}/prebuilt/$(get_target_build_directory)/nettle/include"
+export NETTLE_LIBS="-L${BASEDIR}/prebuilt/$(get_target_build_directory)/nettle/lib -lnettle -L${BASEDIR}/prebuilt/$(get_target_build_directory)/gmp/lib -lgmp"
+export HOGWEED_CFLAGS="-I${BASEDIR}/prebuilt/$(get_target_build_directory)/nettle/include"
+export HOGWEED_LIBS="-L${BASEDIR}/prebuilt/$(get_target_build_directory)/nettle/lib -lhogweed -L${BASEDIR}/prebuilt/$(get_target_build_directory)/gmp/lib -lgmp"
+export GMP_CFLAGS="-I${BASEDIR}/prebuilt/$(get_target_build_directory)/gmp/include"
+export GMP_LIBS="-L${BASEDIR}/prebuilt/$(get_target_build_directory)/gmp/lib -lgmp"
 
 HARDWARE_ACCELERATION=""
 case ${ARCH} in
@@ -58,6 +57,11 @@ case ${ARCH} in
         #   elf/sha1-armv8.s:1270:1: error: unknown directive
         #  .inst 0x5e280803
         HARDWARE_ACCELERATION="--disable-hardware-acceleration"
+    ;;
+    i386)
+        # DISABLING thread_local WHICH IS NOT SUPPORTED ON i386
+        export CFLAGS+=" -D__thread="
+        HARDWARE_ACCELERATION="--enable-hardware-acceleration"
     ;;
     *)
         HARDWARE_ACCELERATION="--enable-hardware-acceleration"
@@ -74,13 +78,12 @@ if [[ ${RECONF_gnutls} -eq 1 ]]; then
 fi
 
 ./configure \
-    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/${LIB_NAME} \
+    --prefix=${BASEDIR}/prebuilt/$(get_target_build_directory)/${LIB_NAME} \
     --with-pic \
     --with-sysroot=${SDK_PATH} \
     --with-included-libtasn1 \
     --with-included-unistring \
     --without-idn \
-    --without-libidn2 \
     --without-p11-kit \
     ${HARDWARE_ACCELERATION} \
     --enable-static \
@@ -90,6 +93,7 @@ fi
     --disable-code-coverage \
     --disable-doc \
     --disable-manpages \
+    --disable-guile \
     --disable-tests \
     --disable-tools \
     --disable-maintainer-mode \
@@ -98,6 +102,6 @@ fi
 make -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_gnutls_package_config "3.5.19"
+create_gnutls_package_config "3.6.8"
 
 make install || exit 1

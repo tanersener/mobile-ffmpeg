@@ -244,28 +244,17 @@ typedef struct VAAPIEncodeContext {
 
     // Global parameters which will be applied at the start of the
     // sequence (includes rate control parameters below).
-    VAEncMiscParameterBuffer *global_params[MAX_GLOBAL_PARAMS];
+    int             global_params_type[MAX_GLOBAL_PARAMS];
+    const void     *global_params     [MAX_GLOBAL_PARAMS];
     size_t          global_params_size[MAX_GLOBAL_PARAMS];
     int          nb_global_params;
 
     // Rate control parameters.
-    struct {
-        VAEncMiscParameterBuffer misc;
-        VAEncMiscParameterRateControl rc;
-    } rc_params;
-    struct {
-        VAEncMiscParameterBuffer misc;
-        VAEncMiscParameterHRD hrd;
-    } hrd_params;
-    struct {
-        VAEncMiscParameterBuffer misc;
-        VAEncMiscParameterFrameRate fr;
-    } fr_params;
+    VAEncMiscParameterRateControl rc_params;
+    VAEncMiscParameterHRD        hrd_params;
+    VAEncMiscParameterFrameRate   fr_params;
 #if VA_CHECK_VERSION(0, 36, 0)
-    struct {
-        VAEncMiscParameterBuffer misc;
-        VAEncMiscParameterBufferQualityLevel quality;
-    } quality_params;
+    VAEncMiscParameterBufferQualityLevel quality_params;
 #endif
 
     // Per-sequence parameter structure (VAEncSequenceParameterBuffer*).
@@ -314,6 +303,10 @@ typedef struct VAAPIEncodeContext {
     int idr_counter;
     int gop_counter;
     int end_of_stream;
+
+    // The encoder does not support cropping information, so warn about
+    // it the first time we encounter any nonzero crop fields.
+    int             crop_warned;
 } VAAPIEncodeContext;
 
 enum {
@@ -404,9 +397,6 @@ typedef struct VAAPIEncodeType {
                                  char *data, size_t *data_len);
 } VAAPIEncodeType;
 
-
-int ff_vaapi_encode2(AVCodecContext *avctx, AVPacket *pkt,
-                     const AVFrame *input_image, int *got_packet);
 
 int ff_vaapi_encode_send_frame(AVCodecContext *avctx, const AVFrame *frame);
 int ff_vaapi_encode_receive_packet(AVCodecContext *avctx, AVPacket *pkt);

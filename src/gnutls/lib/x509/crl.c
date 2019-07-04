@@ -17,7 +17,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -204,7 +204,7 @@ gnutls_x509_crl_import(gnutls_x509_crl_t crl,
  *
  **/
 int
-gnutls_x509_crl_get_issuer_dn(const gnutls_x509_crl_t crl, char *buf,
+gnutls_x509_crl_get_issuer_dn(gnutls_x509_crl_t crl, char *buf,
 			      size_t * sizeof_buf)
 {
 	if (crl == NULL) {
@@ -368,37 +368,16 @@ gnutls_x509_crl_get_issuer_dn3(gnutls_x509_crl_t crl, gnutls_datum_t * dn, unsig
  * This function will return a value of the #gnutls_sign_algorithm_t
  * enumeration that is the signature algorithm.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
- *   negative error value.
+ * Since 3.6.0 this function never returns a negative error code.
+ * Error cases and unknown/unsupported signature algorithms are
+ * mapped to %GNUTLS_SIGN_UNKNOWN.
+ *
+ * Returns: a #gnutls_sign_algorithm_t value
  **/
 int gnutls_x509_crl_get_signature_algorithm(gnutls_x509_crl_t crl)
 {
-	int result;
-	gnutls_datum_t sa;
-
-	if (crl == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_INVALID_REQUEST;
-	}
-
-	/* Read the signature algorithm. Note that parameters are not
-	 * read. They will be read from the issuer's certificate if needed.
-	 */
-
-	result =
-	    _gnutls_x509_read_value(crl->crl,
-				    "signatureAlgorithm.algorithm", &sa);
-
-	if (result < 0) {
-		gnutls_assert();
-		return result;
-	}
-
-	result = gnutls_oid_to_sign((const char *) sa.data);
-
-	_gnutls_free_datum(&sa);
-
-	return result;
+	return map_errs_to_zero(_gnutls_x509_get_signature_algorithm(crl->crl,
+						    "signatureAlgorithm"));
 }
 
 /**
@@ -1397,10 +1376,13 @@ gnutls_x509_crl_list_import(gnutls_x509_crl_t * crls,
 		if (count >= *crl_max) {
 			if (!
 			    (flags &
-			     GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED))
+			     GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED)) {
 				break;
-			else
+			} else if (nocopy == 0) {
+				for (j = 0; j < count; j++)
+					gnutls_x509_crl_deinit(crls[j]);
 				nocopy = 1;
+			}
 		}
 
 		if (!nocopy) {
@@ -1413,12 +1395,12 @@ gnutls_x509_crl_list_import(gnutls_x509_crl_t * crls,
 			tmp.data = (void *) ptr;
 			tmp.size =
 			    data->size - (ptr - (char *) data->data);
-
 			ret =
 			    gnutls_x509_crl_import(crls[count], &tmp,
 						   GNUTLS_X509_FMT_PEM);
 			if (ret < 0) {
 				gnutls_assert();
+				count++;
 				goto error;
 			}
 		}

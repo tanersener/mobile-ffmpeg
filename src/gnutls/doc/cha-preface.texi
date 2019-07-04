@@ -23,4 +23,4 @@ in @xcite{STEVENS}, to public key infrastructure in @xcite{GUTPKI}
 and to security engineering in @xcite{ANDERSON}.
 
 Updated versions of the @acronym{GnuTLS} software and this document
-will be available from @url{http://www.gnutls.org/}.
+will be available from @url{https://www.gnutls.org/}.

@@ -3,7 +3,7 @@ GnuTLS README -- Important introductory notes
 
 GnuTLS implements the TLS/SSL (Transport Layer Security aka Secure
 Sockets Layer) protocol.  GnuTLS is a GNU project.  Additional
-information can be found at <http://www.gnutls.org/>.
+information can be found at <https://www.gnutls.org/>.
 
 
 README
@@ -13,7 +13,7 @@ This README is targeted for users of the library who build from
 sources but do not necessarily develop.  If you are interested
 in developing and contributing to the GnuTLS project, please
 see README-alpha and visit
-http://www.gnutls.org/manual/html_node/Contributing.html.
+https://www.gnutls.org/manual/html_node/Contributing.html.
 
 
 COMPILATION
@@ -36,16 +36,16 @@ the shared object (libgnutls.so), and additional binaries such as certtool
 and gnutls-cli.
 
 The library depends on libnettle and gmplib. 
-* gmplib: for big number arithmetic, http://gmplib.org/
-* nettle: for cryptographic algorithms, http://www.lysator.liu.se/~nisse/nettle/
+* gmplib: for big number arithmetic, https://gmplib.org/
+* nettle: for cryptographic algorithms, https://www.lysator.liu.se/~nisse/nettle/
 
 Optionally it may use the following libraries:
-* libtasn1: For ASN.1 parsing (a copy is included, if not found), http://www.gnu.org/software/libtasn1/
-* p11-kit: for smart card support, http://p11-glue.freedesktop.org/p11-kit.html
-* libtspi: for Trusted Platform Module (TPM) support, http://trousers.sourceforge.net/
-* libunbound: For DNSSEC/DANE support, http://unbound.net/
-* libz: For compression support, http://www.zlib.net/
-* libidn: For supporting internationalized DNS names (IDNA 2003), http://www.gnu.org/software/libidn/
+* libtasn1: For ASN.1 parsing (a copy is included, if not found), https://www.gnu.org/software/libtasn1/
+* p11-kit: for smart card support, https://p11-glue.github.io/p11-glue/p11-kit.html
+* libtspi: for Trusted Platform Module (TPM) support, https://trousers.sourceforge.net/
+* libunbound: For DNSSEC/DANE support, https://unbound.net/
+* libz: For compression support, https://www.zlib.net/
+* libidn: For supporting internationalized DNS names (IDNA 2003), https://www.gnu.org/software/libidn/
 * libidn2: For supporting internationalized DNS names (IDNA 2008), https://www.gnu.org/software/libidn/#libidn2
 
 To configure libnettle for installation and use by GnuTLS, a typical
@@ -74,14 +74,14 @@ DOCUMENTATION
 =============
 
 See the documentation in doc/ and online at
-http://www.gnutls.org/manual.
+https://www.gnutls.org/manual.
 
 
 EXAMPLES
 ========
 
 See the examples in doc/examples/ and online at 'How To Use GnuTLS in
-Applications' at http://www.gnutls.org/manual.
+Applications' at https://www.gnutls.org/manual.
 
 
 SECURITY ADVISORIES
@@ -91,14 +91,14 @@ The project collects and publishes information on past security
 incidents and vulnerabilities.  Open information exchange, including
 information which is [sometimes] suppressed in non-open or non-free
 projects, is one of the goals of the GnuTLS project.  Please visit
-http://www.gnutls.org/security.html.
+https://www.gnutls.org/security.html.
 
 
 MAILING LISTS
 =============
 
 The GnuTLS project maintains mailing lists for users, developers, and
-commits.  Please see http://www.gnutls.org/lists.html.
+commits.  Please see https://www.gnutls.org/lists.html.
 
 
 LICENSING
@@ -144,7 +144,7 @@ of a previous git clone.
     git format-patch
 ```
 
-For more information on use of Git, visit http://git-scm.com/
+For more information on use of Git, visit https://git-scm.com/
 
 ----------------------------------------------------------------------
 Copying and distribution of this file, with or without modification,

@@ -2,7 +2,7 @@ dnl -*- mode: shell-script; sh-indentation: 2; -*-
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([nettle], [3.4.1], [nettle-bugs@lists.lysator.liu.se])
+AC_INIT([nettle], [3.5.1], [nettle-bugs@lists.lysator.liu.se])
 AC_PREREQ(2.61)
 AC_CONFIG_SRCDIR([arcfour.c])
 # Needed to stop autoconf from looking for files in parent directories.
@@ -10,11 +10,11 @@ AC_CONFIG_AUX_DIR([.])
 
 AC_CONFIG_HEADER([config.h])
 
-LIBNETTLE_MAJOR=6
-LIBNETTLE_MINOR=5
+LIBNETTLE_MAJOR=7
+LIBNETTLE_MINOR=0
 
-LIBHOGWEED_MAJOR=4
-LIBHOGWEED_MINOR=5
+LIBHOGWEED_MAJOR=5
+LIBHOGWEED_MINOR=0
 
 dnl Note double square brackets, for extra m4 quoting.
 MAJOR_VERSION=`echo $PACKAGE_VERSION | sed 's/^\([[^.]]*\)\..*/\1/'`
@@ -84,6 +84,10 @@ AC_ARG_ENABLE(arm-neon,
 AC_ARG_ENABLE(x86-aesni,
   AC_HELP_STRING([--enable-x86-aesni], [Enable x86_64 aes instructions. (default=no)]),,
   [enable_x86_aesni=no])
+
+AC_ARG_ENABLE(x86-sha-ni,
+  AC_HELP_STRING([--enable-x86-sha-ni], [Enable x86_64 sha_ni instructions. (default=no)]),,
+  [enable_x86_sha_ni=no])
 
 AC_ARG_ENABLE(mini-gmp,
   AC_HELP_STRING([--enable-mini-gmp], [Enable mini-gmp, used instead of libgmp.]),,
@@ -201,13 +205,29 @@ LSH_FUNC_STRERROR
 # getenv_secure is used for fat overrides,
 # getline is used in the testsuite
 AC_CHECK_FUNCS(secure_getenv getline)
-AC_C_BIGENDIAN
+
+ASM_WORDS_BIGENDIAN=unknown
+AC_C_BIGENDIAN([AC_DEFINE([WORDS_BIGENDIAN], 1)
+		ASM_WORDS_BIGENDIAN=yes],
+	[ASM_WORDS_BIGENDIAN=no])
+
+AC_CACHE_CHECK([for __builtin_bswap64],
+		nettle_cv_c_builtin_bswap64,
+[AC_TRY_COMPILE([
+#include <stdint.h>
+],[
+uint64_t x = 17;
+uint64_t y = __builtin_bswap64(x);
+],
+nettle_cv_c_builtin_bswap64=yes,
+nettle_cv_c_builtin_bswap64=no)])
+
+AH_TEMPLATE([HAVE_BUILTIN_BSWAP64], [Define if __builtin_bswap64 is available])
+if test "x$nettle_cv_c_builtin_bswap64" = "xyes" ; then
+  AC_DEFINE(HAVE_BUILTIN_BSWAP64)
+fi
 
 LSH_GCC_ATTRIBUTES
-
-# According to Simon Josefsson, looking for uint32_t and friends in
-# sys/types.h is needed on some systems, in particular cygwin.
-AX_CREATE_STDINT_H([nettle-stdint.h], [sys/types.h])
 
 # Check for file locking. We (AC_PROG_CC?) have already checked for
 # sys/types.h and unistd.h.
@@ -380,7 +400,7 @@ OPT_NETTLE_SOURCES=""
 asm_path=
 if test "x$enable_assembler" = xyes ; then
   case "$host_cpu" in
-    [i?86* | k[5-8]* | pentium* | athlon])
+    [x86 | i?86* | k[5-8]* | pentium* | athlon])
       asm_path=x86
       ;;
     [x86_64 | amd64])
@@ -389,8 +409,13 @@ if test "x$enable_assembler" = xyes ; then
 	if test "x$enable_fat" = xyes ; then
 	  asm_path="x86_64/fat $asm_path"
 	  OPT_NETTLE_SOURCES="fat-x86_64.c $OPT_NETTLE_SOURCES"
-	elif test "x$enable_x86_aesni" = xyes ; then
-	  asm_path="x86_64/aesni $asm_path"
+	else
+	  if test "x$enable_x86_aesni" = xyes ; then
+	    asm_path="x86_64/aesni $asm_path"
+	  fi
+	  if test "x$enable_x86_sha_ni" = xyes ; then
+	    asm_path="x86_64/sha_ni $asm_path"
+	  fi
 	fi
       else
 	asm_path=x86
@@ -443,6 +468,7 @@ asm_replace_list="aes-encrypt-internal.asm aes-decrypt-internal.asm \
 # Assembler files which generate additional object files if they are used.
 asm_nettle_optional_list="gcm-hash8.asm cpuid.asm \
   aes-encrypt-internal-2.asm aes-decrypt-internal-2.asm memxor-2.asm \
+  chacha-core-internal-2.asm \
   salsa20-core-internal-2.asm sha1-compress-2.asm sha256-compress-2.asm \
   sha3-permute-2.asm sha512-compress-2.asm \
   umac-nh-n-2.asm umac-nh-2.asm"
@@ -544,6 +570,7 @@ AC_SUBST([IF_ASM])
 AH_VERBATIM([HAVE_NATIVE],
 [/* Define to 1 each of the following for which a native (ie. CPU specific)
     implementation of the corresponding routine exists.  */
+#undef HAVE_NATIVE_chacha_core
 #undef HAVE_NATIVE_ecc_192_modp
 #undef HAVE_NATIVE_ecc_192_redc
 #undef HAVE_NATIVE_ecc_224_modp
@@ -795,6 +822,7 @@ AC_SUBST(ASM_TYPE_PROGBITS)
 AC_SUBST(ASM_MARK_NOEXEC_STACK)
 AC_SUBST(ASM_ALIGN_LOG)
 AC_SUBST(W64_ABI)
+AC_SUBST(ASM_WORDS_BIGENDIAN)
 AC_SUBST(EMULATOR)
 
 AC_SUBST(LIBNETTLE_MAJOR)

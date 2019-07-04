@@ -1,9 +1,9 @@
 #!/bin/sh
 # Get modification time of a file or directory and pretty-print it.
 
-scriptversion=2015-04-09.19; # UTC
+scriptversion=2018-03-07.03; # UTC
 
-# Copyright (C) 1995-2014 Free Software Foundation, Inc.
+# Copyright (C) 1995-2018 Free Software Foundation, Inc.
 # written by Ulrich Drepper <drepper@gnu.ai.mit.edu>, June 1995
 #
 # This program is free software; you can redistribute it and/or modify
@@ -17,7 +17,7 @@ scriptversion=2015-04-09.19; # UTC
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 # As a special exception to the GNU General Public License, if you
 # distribute this file as part of a program that contains a
@@ -74,8 +74,8 @@ export LC_ALL
 LC_TIME=C
 export LC_TIME
 
-# Use UTC to get reproducible result
-TZ=UTC
+# Use UTC to get reproducible result.
+TZ=UTC0
 export TZ
 
 # GNU ls changes its time format in response to the TIME_STYLE
@@ -220,9 +220,9 @@ echo $day $month $year
 # Local Variables:
 # mode: shell-script
 # sh-indentation: 2
-# eval: (add-hook 'write-file-hooks 'time-stamp)
+# eval: (add-hook 'before-save-hook 'time-stamp)
 # time-stamp-start: "scriptversion="
 # time-stamp-format: "%:y-%02m-%02d.%02H"
-# time-stamp-time-zone: "UTC"
+# time-stamp-time-zone: "UTC0"
 # time-stamp-end: "; # UTC"
 # End:

@@ -65,4 +65,11 @@ JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_AbiDetect_getNativeCpu
  */
 JNIEXPORT jboolean JNICALL Java_com_arthenica_mobileffmpeg_AbiDetect_isNativeLTSBuild(JNIEnv *, jclass);
 
+/*
+ * Class:     com_arthenica_mobileffmpeg_AbiDetect
+ * Method:    getNativeBuildConf
+ * Signature: ()Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_AbiDetect_getNativeBuildConf(JNIEnv *, jclass);
+
 #endif /* MOBILE_FFMPEG_ABIDETECT_H */

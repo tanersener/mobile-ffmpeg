@@ -16,4 +16,7 @@ This function is useful in replacement push and pull functions set by
 @code{gnutls_transport_set_pull_function()}  under Windows, where the
 replacements may not have access to the same  @code{errno} variable that is used by GnuTLS (e.g., the application is linked to
 msvcr71.dll and gnutls is linked to msvcrt.dll).
+
+This function is unreliable if you are using the same
+ @code{session} in different threads for sending and receiving.
 @end deftypefun

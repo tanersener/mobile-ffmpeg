@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2000-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2016-2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -16,12 +17,12 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
-#ifndef GNUTLS_STR_H
-#define GNUTLS_STR_H
+#ifndef GNUTLS_LIB_STR_H
+#define GNUTLS_LIB_STR_H
 
 #include <config.h>
 #include "gnutls_int.h"
@@ -47,6 +48,7 @@ int gnutls_utf8_password_normalize(const uint8_t *password, unsigned password_le
 		ignore_errs?(GNUTLS_UTF8_IGNORE_ERRS):0)
 
 int _gnutls_idna_email_map(const char *input, unsigned ilen, gnutls_datum_t *output);
+int _gnutls_idna_email_reverse_map(const char *input, unsigned ilen, gnutls_datum_t *output);
 
 inline static unsigned _gnutls_str_is_print(const char *str, unsigned size)
 {
@@ -58,9 +60,17 @@ inline static unsigned _gnutls_str_is_print(const char *str, unsigned size)
 	return 1;
 }
 
+inline static unsigned _gnutls_dnsname_is_valid(const char *str, unsigned size)
+{
+	unsigned i;
+	for (i=0;i<size;i++) {
+		if (!(c_isalnum(str[i]) || str[i] == '-' || str[i] == '.'))
+			return 0;
+	}
+	return 1;
+}
+
 void _gnutls_str_cpy(char *dest, size_t dest_tot_size, const char *src);
-void _gnutls_mem_cpy(char *dest, size_t dest_tot_size, const char *src,
-		     size_t src_size);
 void _gnutls_str_cat(char *dest, size_t dest_tot_size, const char *src);
 
 typedef struct gnutls_buffer_st {
@@ -91,30 +101,52 @@ int _gnutls_buffer_append_str(gnutls_buffer_st *, const char *str);
 
 #include <num.h>
 
-void _gnutls_buffer_replace_data(gnutls_buffer_st * buf,
-				 gnutls_datum_t * data);
-
 int _gnutls_buffer_append_prefix(gnutls_buffer_st * buf, int pfx_size,
 				 size_t data_size);
 
 int _gnutls_buffer_append_mpi(gnutls_buffer_st * buf, int pfx_size,
 			      bigint_t, int lz);
 
+int _gnutls_buffer_append_fixed_mpi(gnutls_buffer_st * buf,
+				    bigint_t mpi, unsigned size);
+
 int _gnutls_buffer_append_data_prefix(gnutls_buffer_st * buf, int pfx_size,
 				      const void *data, size_t data_size);
-void _gnutls_buffer_pop_data(gnutls_buffer_st *, void *, size_t * size);
+int _gnutls_buffer_pop_data(gnutls_buffer_st *, void *, size_t size);
 void _gnutls_buffer_pop_datum(gnutls_buffer_st *, gnutls_datum_t *,
 			      size_t max_size);
 
-int _gnutls_buffer_pop_prefix(gnutls_buffer_st * buf, size_t * data_size,
-			      int check);
+int _gnutls_buffer_pop_prefix8(gnutls_buffer_st *, uint8_t *, int check);
 
-int _gnutls_buffer_pop_data_prefix(gnutls_buffer_st * buf, void *data,
-				   size_t * data_size);
+/* 32-bit prefix */
+int _gnutls_buffer_pop_prefix32(gnutls_buffer_st * buf, size_t * data_size,
+			        int check);
 
-int _gnutls_buffer_pop_datum_prefix(gnutls_buffer_st * buf,
-				    gnutls_datum_t * data);
+int _gnutls_buffer_pop_prefix24(gnutls_buffer_st * buf, size_t * data_size,
+			        int check);
+
+/* 32-bit prefix */
+int _gnutls_buffer_pop_datum_prefix32(gnutls_buffer_st * buf,
+				      gnutls_datum_t * data);
+
+/* 16-bit prefix */
+int _gnutls_buffer_pop_datum_prefix16(gnutls_buffer_st * buf,
+				      gnutls_datum_t * data);
+
+/* 8-bit prefix */
+int _gnutls_buffer_pop_datum_prefix8(gnutls_buffer_st * buf,
+				     gnutls_datum_t * data);
+
 int _gnutls_buffer_to_datum(gnutls_buffer_st * str, gnutls_datum_t * data, unsigned is_str);
+
+inline static
+void _gnutls_ro_buffer_from_datum(gnutls_buffer_st * str, gnutls_datum_t * data)
+{
+	_gnutls_buffer_init(str);
+	str->length = data->size;
+	str->max_length = data->size;
+	str->data = data->data;
+}
 
 int
 _gnutls_buffer_append_escape(gnutls_buffer_st * dest, const void *data,
@@ -201,10 +233,27 @@ int _gnutls_hostname_compare(const char *certname, size_t certnamesize,
 	} \
     }
 
+#define BUFFER_APPEND_TS(b, s) { \
+	ret = _gnutls_buffer_append_prefix(b, 32, (uint64_t) s.tv_sec >> 32); \
+	if (ret < 0) { \
+	    gnutls_assert(); \
+	    return ret; \
+	} \
+	ret = _gnutls_buffer_append_prefix(b, 32, s.tv_sec & 0xFFFFFFFF); \
+	if (ret < 0) { \
+	    gnutls_assert(); \
+	    return ret; \
+	} \
+	ret = _gnutls_buffer_append_prefix(b, 32, s.tv_nsec); \
+	if (ret < 0) { \
+	    gnutls_assert(); \
+	    return ret; \
+	} \
+    }
+
 #define BUFFER_POP(b, x, s) { \
-	size_t is = s; \
-	_gnutls_buffer_pop_data(b, x, &is); \
-	if (is != s) { \
+	ret = _gnutls_buffer_pop_data(b, x, s); \
+	if (ret < 0) { \
 	    ret = GNUTLS_E_PARSING_ERROR; \
 	    gnutls_assert(); \
 	    goto error; \
@@ -213,7 +262,7 @@ int _gnutls_hostname_compare(const char *certname, size_t certnamesize,
 
 #define BUFFER_POP_DATUM(b, o) { \
 	gnutls_datum_t d; \
-	ret = _gnutls_buffer_pop_datum_prefix(b, &d); \
+	ret = _gnutls_buffer_pop_datum_prefix32(b, &d); \
 	if (ret >= 0) \
 	    ret = _gnutls_set_datum (o, d.data, d.size); \
 	if (ret < 0) { \
@@ -224,7 +273,7 @@ int _gnutls_hostname_compare(const char *certname, size_t certnamesize,
 
 #define BUFFER_POP_NUM(b, o) { \
 	size_t s; \
-	ret = _gnutls_buffer_pop_prefix(b, &s, 0); \
+	ret = _gnutls_buffer_pop_prefix32(b, &s, 0); \
 	if (ret < 0) { \
 	    gnutls_assert(); \
 	    goto error; \
@@ -234,7 +283,7 @@ int _gnutls_hostname_compare(const char *certname, size_t certnamesize,
 
 #define BUFFER_POP_CAST_NUM(b, o) { \
 	size_t s; \
-	ret = _gnutls_buffer_pop_prefix(b, &s, 0); \
+	ret = _gnutls_buffer_pop_prefix32(b, &s, 0); \
 	if (ret < 0) { \
 	    gnutls_assert(); \
 	    goto error; \
@@ -242,4 +291,28 @@ int _gnutls_hostname_compare(const char *certname, size_t certnamesize,
 	o = (void *) (intptr_t)(s); \
     }
 
-#endif
+#define BUFFER_POP_TS(b, o) { \
+	size_t s; \
+	uint64_t v; \
+	ret = _gnutls_buffer_pop_prefix32(b, &s, 0); \
+	if (ret < 0) { \
+	    gnutls_assert(); \
+	    goto error; \
+	} \
+	v = s; \
+	ret = _gnutls_buffer_pop_prefix32(b, &s, 0); \
+	if (ret < 0) { \
+	    gnutls_assert(); \
+	    goto error; \
+	} \
+	v = (v << 32) | s; \
+	ret = _gnutls_buffer_pop_prefix32(b, &s, 0); \
+	if (ret < 0) { \
+	    gnutls_assert(); \
+	    goto error; \
+	} \
+	o.tv_sec = v; \
+	o.tv_nsec = s; \
+    }
+
+#endif /* GNUTLS_LIB_STR_H */

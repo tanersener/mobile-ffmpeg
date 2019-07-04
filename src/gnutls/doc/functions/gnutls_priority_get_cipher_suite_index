@@ -10,11 +10,11 @@
 @var{sidx}: internal index of cipher suite to get information about.
 
 Provides the internal ciphersuite index to be used with
-@code{gnutls_cipher_suite_info()} . The index  @code{idx} provided is an 
+@code{gnutls_cipher_suite_info()} . The index  @code{idx} provided is an
 index kept at the priorities structure. It might be that a valid
-priorities index does not correspond to a ciphersuite and in 
-that case @code{GNUTLS_E_UNKNOWN_CIPHER_SUITE}  will be returned. 
-Once the last available index is crossed then 
+priorities index does not correspond to a ciphersuite and in
+that case @code{GNUTLS_E_UNKNOWN_CIPHER_SUITE}  will be returned.
+Once the last available index is crossed then
 @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  will be returned.
 
 @strong{Returns:} On success it returns @code{GNUTLS_E_SUCCESS}  (0), or a negative error value otherwise.

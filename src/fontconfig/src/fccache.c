@@ -38,8 +38,6 @@
 #endif
 #if defined(_WIN32)
 #include <sys/locking.h>
-#else
-#include <uuid/uuid.h>
 #endif
 
 #ifndef O_BINARY
@@ -51,177 +49,54 @@ FcDirCacheCreateUUID (FcChar8  *dir,
 		      FcBool    force,
 		      FcConfig *config)
 {
-    const FcChar8 *sysroot = FcConfigGetSysRoot (config);
-    FcChar8 *target;
-    FcBool ret = FcTrue;
-#ifndef _WIN32
-    FcChar8 *uuidname;
-
-    if (sysroot)
-	target = FcStrBuildFilename (sysroot, dir, NULL);
-    else
-	target = FcStrdup (dir);
-    uuidname = FcStrBuildFilename (target, ".uuid", NULL);
-
-    if (!uuidname)
-    {
-	FcStrFree (target);
-	return FcFalse;
-    }
-
-    if (force || access ((const char *) uuidname, F_OK) < 0)
-    {
-	FcAtomic *atomic;
-	int fd;
-	uuid_t uuid;
-	char out[37];
-	FcBool (* hash_add) (FcHashTable *, void*, void*);
-	struct stat statb;
-	struct timeval times[2];
-
-	if (FcStat (target, &statb) != 0)
-	{
-	    ret = FcFalse;
-	    goto bail1;
-	}
-	atomic = FcAtomicCreate (uuidname);
-	if (!atomic)
-	{
-	    ret = FcFalse;
-	    goto bail1;
-	}
-	if (!FcAtomicLock (atomic))
-	{
-	    ret = FcFalse;
-	    goto bail2;
-	}
-	fd = FcOpen ((char *)FcAtomicNewFile (atomic), O_RDWR | O_CREAT, 0644);
-	if (fd == -1)
-	{
-	    ret = FcFalse;
-	    goto bail3;
-	}
-	uuid_generate_random (uuid);
-	if (force)
-	    hash_add = FcHashTableReplace;
-	else
-	    hash_add = FcHashTableAdd;
-	if (!hash_add (config->uuid_table, target, uuid))
-	{
-	    ret = FcFalse;
-	    FcAtomicDeleteNew (atomic);
-	    close (fd);
-	    goto bail3;
-	}
-	uuid_unparse (uuid, out);
-	if (FcDebug () & FC_DBG_CACHE)
-	    printf ("FcDirCacheCreateUUID %s: %s\n", uuidname, out);
-	write (fd, out, strlen (out));
-	close (fd);
-	FcAtomicReplaceOrig (atomic);
-    bail3:
-	FcAtomicUnlock (atomic);
-    bail2:
-	FcAtomicDestroy (atomic);
-
-	if (ret)
-	{
-	    /* revert mtime of the directory */
-	    times[0].tv_sec = statb.st_atime;
-	    times[1].tv_sec = statb.st_mtime;
-#ifdef HAVE_STRUCT_STAT_ST_MTIM
-	    times[0].tv_usec = statb.st_atim.tv_nsec / 1000;
-	    times[1].tv_usec = statb.st_mtim.tv_nsec / 1000;
-#else
-	    times[0].tv_usec = 0;
-	    times[1].tv_usec = 0;
-#endif
-	    if (utimes ((const  char *) target, times) != 0)
-	    {
-		fprintf (stderr, "Unable to revert mtime: %s\n", target);
-	    }
-	}
-    }
-bail1:
-    FcStrFree (uuidname);
-    FcStrFree (target);
-#endif
-
-    return ret;
+    return FcTrue;
 }
 
 FcBool
 FcDirCacheDeleteUUID (const FcChar8  *dir,
 		      FcConfig       *config)
 {
-    const FcChar8 *sysroot = FcConfigGetSysRoot (config);
-    FcChar8 *target;
     FcBool ret = FcTrue;
+#ifndef _WIN32
+    const FcChar8 *sysroot = FcConfigGetSysRoot (config);
+    FcChar8 *target, *d;
+    struct stat statb;
+    struct timeval times[2];
 
     if (sysroot)
-	target = FcStrBuildFilename (sysroot, dir, ".uuid", NULL);
+	d = FcStrBuildFilename (sysroot, dir, NULL);
     else
-	target = FcStrBuildFilename (dir, ".uuid", NULL);
-
+	d = FcStrBuildFilename (dir, NULL);
+    if (FcStat (d, &statb) != 0)
+    {
+	ret = FcFalse;
+	goto bail;
+    }
+    target = FcStrBuildFilename (d, ".uuid", NULL);
     ret = unlink ((char *) target) == 0;
-    FcHashTableRemove (config->uuid_table, target);
-    FcStrFree(target);
+    if (ret)
+    {
+	times[0].tv_sec = statb.st_atime;
+	times[1].tv_sec = statb.st_mtime;
+#ifdef HAVE_STRUCT_STAT_ST_MTIM
+	times[0].tv_usec = statb.st_atim.tv_nsec / 1000;
+	times[1].tv_usec = statb.st_mtim.tv_nsec / 1000;
+#else
+	times[0].tv_usec = 0;
+	times[1].tv_usec = 0;
+#endif
+	if (utimes ((const char *) d, times) != 0)
+	{
+	    fprintf (stderr, "Unable to revert mtime: %s\n", d);
+	}
+    }
+    FcStrFree (target);
+bail:
+    FcStrFree (d);
+#endif
 
     return ret;
 }
-
-#ifndef _WIN32
-static void
-FcDirCacheReadUUID (FcChar8  *dir,
-		    FcConfig *config)
-{
-    void *u;
-    uuid_t uuid;
-    const FcChar8 *sysroot = FcConfigGetSysRoot (config);
-    FcChar8 *target;
-
-    if (sysroot)
-	target = FcStrBuildFilename (sysroot, dir, NULL);
-    else
-	target = FcStrdup (dir);
-
-    if (!FcHashTableFind (config->uuid_table, target, &u))
-    {
-	FcChar8 *uuidname = FcStrBuildFilename (target, ".uuid", NULL);
-	int fd;
-
-	if ((fd = FcOpen ((char *) uuidname, O_RDONLY)) >= 0)
-	{
-	    char suuid[37];
-	    ssize_t len;
-
-	    memset (suuid, 0, sizeof (suuid));
-	    len = read (fd, suuid, 36);
-	    if (len != -1)
-	    {
-		suuid[len] = 0;
-		memset (uuid, 0, sizeof (uuid));
-		if (uuid_parse (suuid, uuid) == 0)
-		{
-		    if (FcDebug () & FC_DBG_CACHE)
-			printf ("FcDirCacheReadUUID %s -> %s\n", uuidname, suuid);
-		    FcHashTableAdd (config->uuid_table, target, uuid);
-		}
-	    }
-	    close (fd);
-	}
-	else
-	{
-	    if (FcDebug () & FC_DBG_CACHE)
-		printf ("FcDirCacheReadUUID Unable to read %s\n", uuidname);
-	}
-	FcStrFree (uuidname);
-    }
-    else
-	FcHashUuidFree (u);
-    FcStrFree (target);
-}
-#endif
 
 struct MD5Context {
         FcChar32 buf[4];
@@ -273,17 +148,48 @@ static const char bin2hex[] = { '0', '1', '2', '3',
 				'c', 'd', 'e', 'f' };
 
 static FcChar8 *
-FcDirCacheBasenameMD5 (const FcChar8 *dir, FcChar8 cache_base[CACHEBASE_LEN])
+FcDirCacheBasenameMD5 (FcConfig *config, const FcChar8 *dir, FcChar8 cache_base[CACHEBASE_LEN])
 {
+    FcChar8		*mapped_dir = NULL;
     unsigned char 	hash[16];
-    FcChar8		*hex_hash;
+    FcChar8		*hex_hash, *key = NULL;
     int			cnt;
     struct MD5Context 	ctx;
+    const FcChar8	*salt, *orig_dir = NULL;
 
+    salt = FcConfigMapSalt (config, dir);
+    /* Obtain a path where "dir" is mapped to.
+     * In case:
+     * <remap-dir as-path="/usr/share/fonts">/run/host/fonts</remap-dir>
+     *
+     * FcConfigMapFontPath (config, "/run/host/fonts") will returns "/usr/share/fonts".
+     */
+    mapped_dir = FcConfigMapFontPath(config, dir);
+    if (mapped_dir)
+    {
+	orig_dir = dir;
+	dir = mapped_dir;
+    }
+    if (salt)
+    {
+	size_t dl = strlen ((const char *) dir);
+	size_t sl = strlen ((const char *) salt);
+
+	key = (FcChar8 *) malloc (dl + sl + 1);
+	memcpy (key, dir, dl);
+	memcpy (key + dl, salt, sl + 1);
+	key[dl + sl] = 0;
+	if (!orig_dir)
+		orig_dir = dir;
+	dir = key;
+    }
     MD5Init (&ctx);
     MD5Update (&ctx, (const unsigned char *)dir, strlen ((const char *) dir));
 
     MD5Final (hash, &ctx);
+
+    if (key)
+	FcStrFree (key);
 
     cache_base[0] = '/';
     hex_hash = cache_base + 1;
@@ -294,32 +200,58 @@ FcDirCacheBasenameMD5 (const FcChar8 *dir, FcChar8 cache_base[CACHEBASE_LEN])
     }
     hex_hash[2*cnt] = 0;
     strcat ((char *) cache_base, "-" FC_ARCHITECTURE FC_CACHE_SUFFIX);
+    if (FcDebug() & FC_DBG_CACHE)
+    {
+	printf ("cache: %s (dir: %s%s%s%s%s%s)\n", cache_base, orig_dir ? orig_dir : dir, mapped_dir ? " (mapped to " : "", mapped_dir ? (char *)mapped_dir : "", mapped_dir ? ")" : "", salt ? ", salt: " : "", salt ? (char *)salt : "");
+    }
+
+    if (mapped_dir)
+	FcStrFree(mapped_dir);
 
     return cache_base;
 }
 
 #ifndef _WIN32
 static FcChar8 *
-FcDirCacheBasenameUUID (const FcChar8 *dir, FcChar8 cache_base[CACHEBASE_LEN], FcConfig *config)
+FcDirCacheBasenameUUID (FcConfig *config, const FcChar8 *dir, FcChar8 cache_base[CACHEBASE_LEN])
 {
-    void *u;
-    FcChar8 *target;
+    FcChar8 *target, *fuuid;
     const FcChar8 *sysroot = FcConfigGetSysRoot (config);
+    int fd;
 
+    /* We don't need to apply remapping here. because .uuid was created at that very directory
+     * to determine the cache name no matter where it was mapped to.
+     */
+    cache_base[0] = 0;
     if (sysroot)
 	target = FcStrBuildFilename (sysroot, dir, NULL);
     else
 	target = FcStrdup (dir);
-    if (FcHashTableFind (config->uuid_table, target, &u))
+    fuuid = FcStrBuildFilename (target, ".uuid", NULL);
+    if ((fd = FcOpen ((char *) fuuid, O_RDONLY)) != -1)
     {
-	uuid_unparse (u, (char *) cache_base);
+	char suuid[37];
+	ssize_t len;
+
+	memset (suuid, 0, sizeof (suuid));
+	len = read (fd, suuid, 36);
+	suuid[36] = 0;
+	close (fd);
+	if (len < 0)
+	    goto bail;
+	cache_base[0] = '/';
+	strcpy ((char *)&cache_base[1], suuid);
 	strcat ((char *) cache_base, "-" FC_ARCHITECTURE FC_CACHE_SUFFIX);
-	FcHashUuidFree (u);
-	FcStrFree (target);
-	return cache_base;
+	if (FcDebug () & FC_DBG_CACHE)
+	{
+	    printf ("cache fallbacks to: %s (dir: %s)\n", cache_base, dir);
+	}
     }
+bail:
+    FcStrFree (fuuid);
     FcStrFree (target);
-    return NULL;
+
+    return cache_base;
 }
 #endif
 
@@ -328,14 +260,17 @@ FcDirCacheUnlink (const FcChar8 *dir, FcConfig *config)
 {
     FcChar8	*cache_hashed = NULL;
     FcChar8	cache_base[CACHEBASE_LEN];
+#ifndef _WIN32
+    FcChar8     uuid_cache_base[CACHEBASE_LEN];
+#endif
     FcStrList	*list;
     FcChar8	*cache_dir;
     const FcChar8 *sysroot = FcConfigGetSysRoot (config);
 
+    FcDirCacheBasenameMD5 (config, dir, cache_base);
 #ifndef _WIN32
-    if (!FcDirCacheBasenameUUID (dir, cache_base, config))
+    FcDirCacheBasenameUUID (config, dir, uuid_cache_base);
 #endif
-	FcDirCacheBasenameMD5 (dir, cache_base);
 
     list = FcStrListCreate (config->cacheDirs);
     if (!list)
@@ -350,10 +285,23 @@ FcDirCacheUnlink (const FcChar8 *dir, FcConfig *config)
         if (!cache_hashed)
 	    break;
 	(void) unlink ((char *) cache_hashed);
-	FcDirCacheDeleteUUID (dir, config);
 	FcStrFree (cache_hashed);
+#ifndef _WIN32
+	if (uuid_cache_base[0] != 0)
+	{
+	    if (sysroot)
+		cache_hashed = FcStrBuildFilename (sysroot, cache_dir, uuid_cache_base, NULL);
+	    else
+		cache_hashed = FcStrBuildFilename (cache_dir, uuid_cache_base, NULL);
+	    if (!cache_hashed)
+		break;
+	    (void) unlink ((char *) cache_hashed);
+	    FcStrFree (cache_hashed);
+	}
+#endif
     }
     FcStrListDone (list);
+    FcDirCacheDeleteUUID (dir, config);
     /* return FcFalse if something went wrong */
     if (cache_dir)
 	return FcFalse;
@@ -412,10 +360,7 @@ FcDirCacheProcess (FcConfig *config, const FcChar8 *dir,
     }
     FcStrFree (d);
 
-#ifndef _WIN32
-    if (!FcDirCacheBasenameUUID (dir, cache_base, config))
-#endif
-	FcDirCacheBasenameMD5 (dir, cache_base);
+    FcDirCacheBasenameMD5 (config, dir, cache_base);
 
     list = FcStrListCreate (config->cacheDirs);
     if (!list)
@@ -424,7 +369,11 @@ FcDirCacheProcess (FcConfig *config, const FcChar8 *dir,
     while ((cache_dir = FcStrListNext (list)))
     {
         FcChar8	*cache_hashed;
+#ifndef _WIN32
+	FcBool retried = FcFalse;
 
+    retry:
+#endif
 	if (sysroot)
 	    cache_hashed = FcStrBuildFilename (sysroot, cache_dir, cache_base, NULL);
 	else
@@ -444,6 +393,18 @@ FcDirCacheProcess (FcConfig *config, const FcChar8 *dir,
 		break;
 	    }
 	}
+#ifndef _WIN32
+	else if (!retried)
+	{
+	    retried = FcTrue;
+	    FcDirCacheBasenameUUID (config, dir, cache_base);
+	    if (cache_base[0] != 0)
+	    {
+		FcStrFree (cache_hashed);
+		goto retry;
+	    }
+	}
+#endif
     	FcStrFree (cache_hashed);
     }
     FcStrListDone (list);
@@ -685,15 +646,18 @@ FcCacheRemoveUnlocked (FcCache *cache)
     while (fcCacheMaxLevel > 0 && fcCacheChains[fcCacheMaxLevel - 1] == NULL)
 	fcCacheMaxLevel--;
 
-    allocated = s->allocated;
-    while (allocated)
+    if (s)
     {
-	/* First element in allocated chunk is the free list */
-	next = *(void **)allocated;
-	free (allocated);
-	allocated = next;
+	allocated = s->allocated;
+	while (allocated)
+	{
+	    /* First element in allocated chunk is the free list */
+	    next = *(void **)allocated;
+	    free (allocated);
+	    allocated = next;
+	}
+	free (s);
     }
-    free (s);
 }
 
 static FcCache *
@@ -948,7 +912,7 @@ FcDirCacheMapFd (FcConfig *config, int fd, struct stat *fd_stat, struct stat *di
     {
 #if defined(HAVE_MMAP) || defined(__CYGWIN__)
 	cache = mmap (0, fd_stat->st_size, PROT_READ, MAP_SHARED, fd, 0);
-#if (HAVE_POSIX_FADVISE) && defined(POSIX_FADV_WILLNEED)
+#if defined(HAVE_POSIX_FADVISE) && defined(POSIX_FADV_WILLNEED)
 	posix_fadvise (fd, 0, fd_stat->st_size, POSIX_FADV_WILLNEED);
 #endif
 	if (cache == MAP_FAILED)
@@ -1040,9 +1004,6 @@ FcDirCacheLoad (const FcChar8 *dir, FcConfig *config, FcChar8 **cache_file)
 {
     FcCache *cache = NULL;
 
-#ifndef _WIN32
-    FcDirCacheReadUUID ((FcChar8 *) dir, config);
-#endif
     if (!FcDirCacheProcess (config, dir,
 			    FcDirCacheMapHelper,
 			    &cache, cache_file))
@@ -1079,6 +1040,7 @@ FcDirChecksum (struct stat *statb)
     source_date_epoch = getenv("SOURCE_DATE_EPOCH");
     if (source_date_epoch)
     {
+	errno = 0;
 	epoch = strtoull(source_date_epoch, &endptr, 10);
 
 	if (endptr == source_date_epoch)
@@ -1346,10 +1308,7 @@ FcDirCacheWrite (FcCache *cache, FcConfig *config)
     if (!cache_dir)
 	return FcFalse;
 
-#ifndef _WIN32
-    if (!FcDirCacheBasenameUUID (dir, cache_base, config))
-#endif
-	FcDirCacheBasenameMD5 (dir, cache_base);
+    FcDirCacheBasenameMD5 (config, dir, cache_base);
     cache_hashed = FcStrBuildFilename (cache_dir, cache_base, NULL);
     FcStrFree (cache_dir);
     if (!cache_hashed)
@@ -1546,10 +1505,7 @@ FcDirCacheLock (const FcChar8 *dir,
     const FcChar8 *sysroot = FcConfigGetSysRoot (config);
     int fd = -1;
 
-#ifndef _WIN32
-    if (!FcDirCacheBasenameUUID (dir, cache_base, config))
-#endif
-	FcDirCacheBasenameMD5 (dir, cache_base);
+    FcDirCacheBasenameMD5 (config, dir, cache_base);
     list = FcStrListCreate (config->cacheDirs);
     if (!list)
 	return -1;
@@ -1685,7 +1641,7 @@ FcCacheNumFont args1(const FcCache *c)
  * will fill a supplied 16-byte array with the digest.
  */
 
-#ifndef HIGHFIRST
+#ifndef WORDS_BIGENDIAN
 #define byteReverse(buf, len)	/* Nothing */
 #else
 /*

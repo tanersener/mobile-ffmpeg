@@ -1078,7 +1078,7 @@ int av1_add_film_grain_run(const aom_film_grain_t *params, uint8_t *luma,
 
   const int grain_center = 128 << (bit_depth - 8);
   grain_min = 0 - grain_center;
-  grain_max = (256 << (bit_depth - 8)) - 1 - grain_center;
+  grain_max = grain_center - 1;
 
   init_arrays(params, luma_stride, chroma_stride, &pred_pos_luma,
               &pred_pos_chroma, &luma_grain_block, &cb_grain_block,

@@ -211,8 +211,6 @@ void av1_cyclic_refresh_update_segment(const AV1_COMP *cpi,
       candidate_refresh_aq(cr, mbmi, rate, dist, bsize);
   // Default is to not update the refresh map.
   int new_map_value = cr->map[block_index];
-  int x = 0;
-  int y = 0;
 
   // If this block is labeled for refresh, check if we should reset the
   // segment_id.
@@ -240,8 +238,8 @@ void av1_cyclic_refresh_update_segment(const AV1_COMP *cpi,
 
   // Update entries in the cyclic refresh map with new_map_value, and
   // copy mbmi->segment_id into global segmentation map.
-  for (y = 0; y < ymis; y++)
-    for (x = 0; x < xmis; x++) {
+  for (int y = 0; y < ymis; y++)
+    for (int x = 0; x < xmis; x++) {
       int map_offset = block_index + y * cm->mi_cols + x;
       cr->map[map_offset] = new_map_value;
       cpi->segmentation_map[map_offset] = mbmi->segment_id;
@@ -253,11 +251,10 @@ void av1_cyclic_refresh_postencode(AV1_COMP *const cpi) {
   AV1_COMMON *const cm = &cpi->common;
   CYCLIC_REFRESH *const cr = cpi->cyclic_refresh;
   unsigned char *const seg_map = cpi->segmentation_map;
-  int mi_row, mi_col;
   cr->actual_num_seg1_blocks = 0;
   cr->actual_num_seg2_blocks = 0;
-  for (mi_row = 0; mi_row < cm->mi_rows; mi_row++)
-    for (mi_col = 0; mi_col < cm->mi_cols; mi_col++) {
+  for (int mi_row = 0; mi_row < cm->mi_rows; mi_row++)
+    for (int mi_col = 0; mi_col < cm->mi_cols; mi_col++) {
       if (cyclic_refresh_segment_id(seg_map[mi_row * cm->mi_cols + mi_col]) ==
           CR_SEGMENT_ID_BOOST1)
         cr->actual_num_seg1_blocks++;
@@ -276,9 +273,9 @@ void av1_cyclic_refresh_set_golden_update(AV1_COMP *const cpi) {
   // period. Depending on past encoding stats, GF flag may be reset and update
   // may not occur until next baseline_gf_interval.
   if (cr->percent_refresh > 0)
-    rc->baseline_gf_interval = 4 * (100 / cr->percent_refresh);
+    rc->baseline_gf_interval = 2 * (100 / cr->percent_refresh);
   else
-    rc->baseline_gf_interval = 40;
+    rc->baseline_gf_interval = 20;
 }
 
 // Update the segmentation map, and related quantities: cyclic refresh map,
@@ -387,7 +384,7 @@ void av1_cyclic_refresh_update_parameters(AV1_COMP *const cpi) {
     cr->rate_ratio_qdelta = 2.0;
   }
   // Adjust some parameters for low resolutions.
-  if (cm->width <= 352 && cm->height <= 288) {
+  if (cm->width * cm->height <= 352 * 288) {
     if (rc->avg_frame_bandwidth < 3000) {
       cr->motion_thresh = 16;
       cr->rate_boost_fac = 13;
@@ -432,13 +429,7 @@ void av1_cyclic_refresh_setup(AV1_COMP *const cpi) {
   int resolution_change =
       cm->prev_frame && (cm->width != cm->prev_frame->width ||
                          cm->height != cm->prev_frame->height);
-  if (resolution_change) {
-    memset(cpi->segmentation_map, 0, cm->mi_rows * cm->mi_cols);
-    av1_clearall_segfeatures(seg);
-    aom_clear_system_state();
-    av1_disable_segmentation(seg);
-    return;
-  }
+  if (resolution_change) av1_cyclic_refresh_reset_resize(cpi);
   if (cm->current_frame.frame_number == 0) cr->low_content_avg = 0.0;
   if (!cr->apply_cyclic_refresh) {
     // Set segmentation map to 0 and disable.
@@ -452,8 +443,6 @@ void av1_cyclic_refresh_setup(AV1_COMP *const cpi) {
     }
     return;
   } else {
-    int qindex_delta = 0;
-    int qindex2;
     const double q =
         av1_convert_qindex_to_q(cm->base_qindex, cm->seq_params.bit_depth);
     aom_clear_system_state();
@@ -486,12 +475,13 @@ void av1_cyclic_refresh_setup(AV1_COMP *const cpi) {
     av1_enable_segfeature(seg, CR_SEGMENT_ID_BOOST2, SEG_LVL_ALT_Q);
 
     // Set the q delta for segment BOOST1.
-    qindex_delta = compute_deltaq(cpi, cm->base_qindex, cr->rate_ratio_qdelta);
+    int qindex_delta =
+        compute_deltaq(cpi, cm->base_qindex, cr->rate_ratio_qdelta);
     cr->qindex_delta[1] = qindex_delta;
 
     // Compute rd-mult for segment BOOST1.
-    qindex2 = clamp(cm->base_qindex + cm->y_dc_delta_q + qindex_delta, 0, MAXQ);
-
+    const int qindex2 =
+        clamp(cm->base_qindex + cm->y_dc_delta_q + qindex_delta, 0, MAXQ);
     cr->rdmult = av1_compute_rd_mult(cpi, qindex2);
 
     av1_set_segdata(seg, CR_SEGMENT_ID_BOOST1, SEG_LVL_ALT_Q, qindex_delta);

@@ -4,19 +4,20 @@
 #
 # Christian Rose <menthos@menthos.com>, 2002.
 # Daniel Nylander <po@danielnylander.se>, 2006, 2007, 2008.
-# Keld Simonsen <keld@keldix.com>, 2009.
+# Keld Simonsen <keld@keldix.com>, 2009, 2017.
 msgid ""
 msgstr ""
-"Project-Id-Version: libiconv-1.12\n"
+"Project-Id-Version: libiconv-1.15-pre1\n"
 "Report-Msgid-Bugs-To: bug-gnu-libiconv@gnu.org\n"
-"POT-Creation-Date: 2016-12-04 17:16+0100\n"
-"PO-Revision-Date: 2009-12-03 16:31+0100\n"
+"POT-Creation-Date: 2019-04-26 21:02+0200\n"
+"PO-Revision-Date: 2017-12-17 16:31+0100\n"
 "Last-Translator: Keld Simonsen <keld@keldix.com>\n"
 "Language-Team: Danish <dansk@dansk-gruppen.dk>\n"
 "Language: da\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Bugs: Report translation errors to the Language-Team address.\n"
 "Plural-Forms:  nplurals=2; plural=(n != 1);\n"
 "X-Generator: KBabel 1.11.4\n"
 
@@ -32,9 +33,9 @@ msgid "or:    iconv -l"
 msgstr "eller: iconv -l"
 
 #: src/iconv.c:110
-#, fuzzy, c-format
+#, c-format
 msgid "Try '%s --help' for more information.\n"
-msgstr "Prøv \"%s --help\" for mere information.\n"
+msgstr "Prøv '%s --help' for mere information.\n"
 
 #. TRANSLATORS: The first line of the long usage message.
 #. The %s placeholder expands to the program name.
@@ -157,12 +158,12 @@ msgstr ""
 #: src/iconv.c:196
 #, fuzzy, no-wrap
 msgid ""
-"License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\n"
+"License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>\n"
 "This is free software: you are free to change and redistribute it.\n"
 "There is NO WARRANTY, to the extent permitted by law.\n"
 msgstr ""
-"Licens GPLv2+: GNU GPL version 2 eller senere <http://gnu.org/licenses/gpl.html>\n"
-"Dette er frit programmel: du kan ændre og distribuere den.\n"
+"Licens GPLv3+: GNU GPL version 3 eller senere <http://gnu.org/licenses/gpl.html>\n"
+"Dette er frit programmel: du kan ændre og distribuere det.\n"
 "Der gives INGEN GARANTI, så vidt lov tillader.\n"
 
 #. TRANSLATORS: The %s placeholder expands to an author's name.
@@ -306,47 +307,47 @@ msgstr "%s: Ind/ud-fejl"
 
 #. TRANSLATORS: An error message.
 #. The placeholder expands to the encoding name, specified through --from-code.
-#: src/iconv.c:1015
+#: src/iconv.c:1024
 #, c-format
 msgid "conversion from %s unsupported"
 msgstr "konvertering fra %s understøttes ikke"
 
 #. TRANSLATORS: An error message.
 #. The placeholder expands to the encoding name, specified through --to-code.
-#: src/iconv.c:1021
+#: src/iconv.c:1030
 #, c-format
 msgid "conversion to %s unsupported"
 msgstr "konvertering til %s understøttes ikke"
 
 #. TRANSLATORS: An error message.
 #. The placeholders expand to the encoding names, specified through --from-code and --to-code, respectively.
-#: src/iconv.c:1027
+#: src/iconv.c:1036
 #, c-format
 msgid "conversion from %s to %s unsupported"
 msgstr "konvertering fra %s til %s understøttes ikke"
 
 #. TRANSLATORS: Additional advice after an error message.
 #. The %s placeholder expands to the program name.
-#: src/iconv.c:1032
+#: src/iconv.c:1041
 #, c-format
 msgid "try '%s -l' to get the list of supported encodings"
 msgstr "prøv \"%s -l\" for at få vist listen af understøttede kodninger"
 
 #. TRANSLATORS: A filename substitute denoting standard input.
-#: src/iconv.c:1089
+#: src/iconv.c:1098
 msgid "(stdin)"
 msgstr "(standard ind)"
 
 #. TRANSLATORS: The first part of an error message.
 #. It is followed by a colon and a detail message.
 #. The %s placeholder expands to the input file name.
-#: src/iconv.c:1101
+#: src/iconv.c:1110
 #, c-format
 msgid "%s"
 msgstr "%s"
 
 #. TRANSLATORS: An error message.
-#: src/iconv.c:1115
+#: src/iconv.c:1124
 #, c-format
 msgid "I/O error"
 msgstr "Ind/ud-fejl"

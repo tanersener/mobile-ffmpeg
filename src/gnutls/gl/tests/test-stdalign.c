@@ -1,5 +1,5 @@
 /* Test of <stdalign.h>.
-   Copyright 2009-2016 Free Software Foundation, Inc.
+   Copyright 2009-2019 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Paul Eggert, inspired by Bruno Haible's test-alignof.c.  */
 
@@ -83,6 +83,11 @@ main ()
 #if defined __SUNPRO_C
   /* Avoid a test failure due to Sun Studio Developer Bug Report #2125432.  */
   fputs ("Skipping test: known Sun C compiler bug\n", stderr);
+  return 77;
+#elif defined __HP_cc && __ia64
+  /* Avoid a test failure due to HP-UX Itanium cc bug; see:
+     https://lists.gnu.org/r/bug-gnulib/2017-03/msg00078.html  */
+  fputs ("Skipping test: known HP-UX Itanium cc compiler bug\n", stderr);
   return 77;
 #else
   CHECK_ALIGNED (static_char_alignas);

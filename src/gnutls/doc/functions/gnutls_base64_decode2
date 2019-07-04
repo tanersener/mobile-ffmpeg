@@ -1,0 +1,19 @@
+
+
+
+
+@deftypefun {int} {gnutls_base64_decode2} (const gnutls_datum_t * @var{base64}, gnutls_datum_t * @var{result})
+@var{base64}: contains the encoded data
+
+@var{result}: the location of decoded data
+
+This function will decode the given base64 encoded data. The decoded data
+will be allocated, and stored into result.
+
+You should use @code{gnutls_free()}  to free the returned data.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise
+an error code is returned.
+
+@strong{Since:} 3.6.0
+@end deftypefun

@@ -16,6 +16,10 @@ accepts any kind of data as a serial number. To be consistent
 with the X.509/PKIX specifications the provided  @code{serial} should be 
 a big-endian positive number (i.e. it's leftmost bit should be zero).
 
+The size of the serial is restricted to 20 bytes maximum by RFC5280.
+This function allows writing more than 20 bytes but the generated
+certificates in that case may be rejected by other implementations.
+
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.
 @end deftypefun

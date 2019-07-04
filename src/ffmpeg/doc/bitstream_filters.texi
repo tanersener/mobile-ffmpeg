@@ -87,6 +87,9 @@ the timing info in the sequence header.
 Set the number of ticks in each picture, to indicate that the stream
 has a fixed framerate.  Ignored if @option{tick_rate} is not also set.
 
+@item delete_padding
+Deletes Padding OBUs.
+
 @end table
 
 @section chomp
@@ -117,7 +120,7 @@ add extradata to all packets
 @end table
 @end table
 
-If not specified it is assumed @samp{e}.
+If not specified it is assumed @samp{k}.
 
 For example the following @command{ffmpeg} command forces a global
 header (thus disabling individual packet headers) in the H.264 packets

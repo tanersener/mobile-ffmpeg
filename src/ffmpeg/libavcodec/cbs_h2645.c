@@ -252,18 +252,30 @@ static int cbs_write_se_golomb(CodedBitstreamContext *ctx, PutBitContext *pbc,
 
 #define u(width, name, range_min, range_max) \
         xu(width, name, current->name, range_min, range_max, 0)
-#define flag(name) u(1, name, 0, 1)
+#define ub(width, name) \
+        xu(width, name, current->name, 0, MAX_UINT_BITS(width), 0)
+#define flag(name) ub(1, name)
 #define ue(name, range_min, range_max) \
         xue(name, current->name, range_min, range_max, 0)
+#define i(width, name, range_min, range_max) \
+        xi(width, name, current->name, range_min, range_max, 0)
+#define ib(width, name) \
+        xi(width, name, current->name, MIN_INT_BITS(width), MAX_INT_BITS(width), 0)
 #define se(name, range_min, range_max) \
         xse(name, current->name, range_min, range_max, 0)
 
 #define us(width, name, range_min, range_max, subs, ...) \
         xu(width, name, current->name, range_min, range_max, subs, __VA_ARGS__)
+#define ubs(width, name, subs, ...) \
+        xu(width, name, current->name, 0, MAX_UINT_BITS(width), subs, __VA_ARGS__)
 #define flags(name, subs, ...) \
         xu(1, name, current->name, 0, 1, subs, __VA_ARGS__)
 #define ues(name, range_min, range_max, subs, ...) \
         xue(name, current->name, range_min, range_max, subs, __VA_ARGS__)
+#define is(width, name, range_min, range_max, subs, ...) \
+        xi(width, name, current->name, range_min, range_max, subs, __VA_ARGS__)
+#define ibs(width, name, subs, ...) \
+        xi(width, name, current->name, MIN_INT_BITS(width), MAX_INT_BITS(width), subs, __VA_ARGS__)
 #define ses(name, range_min, range_max, subs, ...) \
         xse(name, current->name, range_min, range_max, subs, __VA_ARGS__)
 
@@ -287,6 +299,13 @@ static int cbs_write_se_golomb(CodedBitstreamContext *ctx, PutBitContext *pbc,
 #define xue(name, var, range_min, range_max, subs, ...) do { \
         uint32_t value = range_min; \
         CHECK(cbs_read_ue_golomb(ctx, rw, #name, \
+                                 SUBSCRIPTS(subs, __VA_ARGS__), \
+                                 &value, range_min, range_max)); \
+        var = value; \
+    } while (0)
+#define xi(width, name, var, range_min, range_max, subs, ...) do { \
+        int32_t value = range_min; \
+        CHECK(ff_cbs_read_signed(ctx, rw, width, #name, \
                                  SUBSCRIPTS(subs, __VA_ARGS__), \
                                  &value, range_min, range_max)); \
         var = value; \
@@ -338,6 +357,7 @@ static int cbs_h2645_read_more_rbsp_data(GetBitContext *gbc)
 #undef READWRITE
 #undef RWContext
 #undef xu
+#undef xi
 #undef xue
 #undef xse
 #undef infer
@@ -359,6 +379,12 @@ static int cbs_h2645_read_more_rbsp_data(GetBitContext *gbc)
 #define xue(name, var, range_min, range_max, subs, ...) do { \
         uint32_t value = var; \
         CHECK(cbs_write_ue_golomb(ctx, rw, #name, \
+                                  SUBSCRIPTS(subs, __VA_ARGS__), \
+                                  value, range_min, range_max)); \
+    } while (0)
+#define xi(width, name, var, range_min, range_max, subs, ...) do { \
+        int32_t value = var; \
+        CHECK(ff_cbs_write_signed(ctx, rw, width, #name, \
                                   SUBSCRIPTS(subs, __VA_ARGS__), \
                                   value, range_min, range_max)); \
     } while (0)
@@ -402,9 +428,11 @@ static int cbs_h2645_read_more_rbsp_data(GetBitContext *gbc)
 #undef READWRITE
 #undef RWContext
 #undef xu
+#undef xi
 #undef xue
 #undef xse
 #undef u
+#undef i
 #undef flag
 #undef ue
 #undef se
@@ -430,6 +458,7 @@ static void cbs_h264_free_sei_payload(H264RawSEIPayload *payload)
     case H264_SEI_TYPE_RECOVERY_POINT:
     case H264_SEI_TYPE_DISPLAY_ORIENTATION:
     case H264_SEI_TYPE_MASTERING_DISPLAY_COLOUR_VOLUME:
+    case H264_SEI_TYPE_ALTERNATIVE_TRANSFER:
         break;
     case H264_SEI_TYPE_USER_DATA_REGISTERED:
         av_buffer_unref(&payload->payload.user_data_registered.data_ref);

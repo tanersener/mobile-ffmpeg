@@ -37,11 +37,11 @@ test_one (gmp_randstate_t *rands, struct rsa_public_key *pub,
   if (mpz_cmp (plaintext, decrypted)) {
     fprintf (stderr, "rsa_compute_root_tr failed\n");
 
-    fprintf(stderr, "Public key: size=%lu\n n:", pub->size);
+    fprintf(stderr, "Public key: size=%u\n n:", (unsigned) pub->size);
     mpz_out_str (stderr, 10, pub->n);
     fprintf(stderr, "\n e:");
     mpz_out_str (stderr, 10, pub->e);
-    fprintf(stderr, "\nPrivate key: size=%lu\n p:", key->size);
+    fprintf(stderr, "\nPrivate key: size=%u\n p:", (unsigned) key->size);
     mpz_out_str (stderr, 10, key->p);
     fprintf(stderr, "\n q:");
     mpz_out_str (stderr, 10, key->q);
@@ -55,13 +55,13 @@ test_one (gmp_randstate_t *rands, struct rsa_public_key *pub,
     mpz_out_str (stderr, 10, key->d);
     fprintf(stderr, "\n");
 
-    fprintf (stderr, "plaintext(%lu) = ", mpz_sizeinbase (plaintext, 2));
+    fprintf (stderr, "plaintext(%u) = ", (unsigned) mpz_sizeinbase (plaintext, 2));
     mpz_out_str (stderr, 10, plaintext);
     fprintf (stderr, "\n");
-    fprintf (stderr, "ciphertext(%lu) = ", mpz_sizeinbase (ciphertext, 2));
+    fprintf (stderr, "ciphertext(%u) = ", (unsigned) mpz_sizeinbase (ciphertext, 2));
     mpz_out_str (stderr, 10, ciphertext);
     fprintf (stderr, "\n");
-    fprintf (stderr, "decrypted(%lu) = ", mpz_sizeinbase (decrypted, 2));
+    fprintf (stderr, "decrypted(%u) = ", (unsigned) mpz_sizeinbase (decrypted, 2));
     mpz_out_str (stderr, 10, decrypted);
     fprintf (stderr, "\n");
     abort();
@@ -86,6 +86,7 @@ generate_keypair (gmp_randstate_t rands,
   mpz_t q1;
   mpz_t phi;
   mpz_t tmp;
+  int res;
 
   mpz_init (p1);
   mpz_init (q1);
@@ -124,7 +125,8 @@ generate_keypair (gmp_randstate_t rands,
     }
 
   mpz_mul(phi, p1, q1);
-  assert (mpz_invert(key->d, pub->e, phi));
+  res = mpz_invert(key->d, pub->e, phi);
+  assert (res);
 
   mpz_fdiv_r (key->a, key->d, p1);
   mpz_fdiv_r (key->b, key->d, q1);

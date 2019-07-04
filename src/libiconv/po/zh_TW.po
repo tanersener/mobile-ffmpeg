@@ -6,11 +6,11 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: libiconv 1.12\n"
+"Project-Id-Version: libiconv 1.15-pre1\n"
 "Report-Msgid-Bugs-To: bug-gnu-libiconv@gnu.org\n"
-"POT-Creation-Date: 2016-12-04 17:16+0100\n"
-"PO-Revision-Date: 2013-05-31 23:39+0800\n"
-"Last-Translator: Wei-Lun Chao <bluebat@member.fsf.org>\n"
+"POT-Creation-Date: 2019-04-26 21:02+0200\n"
+"PO-Revision-Date: 2018-06-16 17:18+0800\n"
+"Last-Translator: pan93412 <pan93412@gmail.com>\n"
 "Language-Team: Chinese (traditional) <zh-l10n@linux.org.tw>\n"
 "Language: zh_TW\n"
 "MIME-Version: 1.0\n"
@@ -18,6 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Bugs: Report translation errors to the Language-Team address.\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Poedit 2.0.8\n"
 
 #. TRANSLATORS: The first line of the short usage message.
 #: src/iconv.c:104
@@ -31,9 +32,9 @@ msgid "or:    iconv -l"
 msgstr "或：  iconv -l"
 
 #: src/iconv.c:110
-#, fuzzy, c-format
+#, c-format
 msgid "Try '%s --help' for more information.\n"
-msgstr "嘗試 %s --help 以獲得更多資訊。\n"
+msgstr "嘗試「%s --help」以獲得更多資訊。\n"
 
 #. TRANSLATORS: The first line of the long usage message.
 #. The %s placeholder expands to the program name.
@@ -155,11 +156,11 @@ msgstr ""
 #: src/iconv.c:196
 #, fuzzy, no-wrap
 msgid ""
-"License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\n"
+"License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>\n"
 "This is free software: you are free to change and redistribute it.\n"
 "There is NO WARRANTY, to the extent permitted by law.\n"
 msgstr ""
-"授權 GPLv2+: GNU GPL 第二版或後續版本 <http://gnu.org/licenses/gpl.html>\n"
+"授權 GPLv3+: GNU GPL 第三版或後續版本 <http://gnu.org/licenses/gpl.html>\n"
 "這是自由軟體：您可以自由變更和再次散布它。\n"
 "在法律所允許的範圍內不做任何擔保。\n"
 
@@ -296,47 +297,47 @@ msgstr "%s：輸入輸出錯誤"
 
 #. TRANSLATORS: An error message.
 #. The placeholder expands to the encoding name, specified through --from-code.
-#: src/iconv.c:1015
+#: src/iconv.c:1024
 #, c-format
 msgid "conversion from %s unsupported"
 msgstr "不支援從 %s 進行轉換"
 
 #. TRANSLATORS: An error message.
 #. The placeholder expands to the encoding name, specified through --to-code.
-#: src/iconv.c:1021
+#: src/iconv.c:1030
 #, c-format
 msgid "conversion to %s unsupported"
 msgstr "不支援轉換到 %s"
 
 #. TRANSLATORS: An error message.
 #. The placeholders expand to the encoding names, specified through --from-code and --to-code, respectively.
-#: src/iconv.c:1027
+#: src/iconv.c:1036
 #, c-format
 msgid "conversion from %s to %s unsupported"
 msgstr "不支援從 %s 轉換到 %s"
 
 #. TRANSLATORS: Additional advice after an error message.
 #. The %s placeholder expands to the program name.
-#: src/iconv.c:1032
+#: src/iconv.c:1041
 #, c-format
 msgid "try '%s -l' to get the list of supported encodings"
 msgstr "嘗試 %s -l 以獲得支援的編碼清單"
 
 #. TRANSLATORS: A filename substitute denoting standard input.
-#: src/iconv.c:1089
+#: src/iconv.c:1098
 msgid "(stdin)"
 msgstr "(標準輸入)"
 
 #. TRANSLATORS: The first part of an error message.
 #. It is followed by a colon and a detail message.
 #. The %s placeholder expands to the input file name.
-#: src/iconv.c:1101
+#: src/iconv.c:1110
 #, c-format
 msgid "%s"
 msgstr "%s"
 
 #. TRANSLATORS: An error message.
-#: src/iconv.c:1115
+#: src/iconv.c:1124
 #, c-format
 msgid "I/O error"
 msgstr "輸入輸出錯誤"

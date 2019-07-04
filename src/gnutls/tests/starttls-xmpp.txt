@@ -1,0 +1,3 @@
+TIMEOUT 10
+'<stream:stream xmlns:stream' '<?xml version\=\'1.0\'?><stream:stream id\=\'16633990255660214772\' version\=\'1.0\' xml:lang\=\'en\' xmlns:stream\=\'http://etherx.jabber.org/streams\' from\=\'schokokeks.org\' xmlns\=\'jabber:client\'><stream:features><starttls xmlns\=\'urn:ietf:params:xml:ns:xmpp-tls\'><required/></starttls></stream:features>'
+'<starttls xmlns\=\'urn:ietf:params:xml:ns:xmpp-tls\'/>' '<proceed xmlns\=\'urn:ietf:params:xml:ns:xmpp-tls\'/>'

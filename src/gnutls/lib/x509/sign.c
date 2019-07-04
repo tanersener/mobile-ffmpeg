@@ -16,7 +16,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -36,6 +36,7 @@
 #include <x509_int.h>
 #include <common.h>
 #include <gnutls/abstract.h>
+#include <pk.h>
 
 /* This is the same as the _gnutls_x509_sign, but this one will decode
  * the ASN1_TYPE given, and sign the DER data. Actually used to get the DER
@@ -46,6 +47,43 @@ _gnutls_x509_get_tbs(ASN1_TYPE cert, const char *tbs_name,
 		     gnutls_datum_t * tbs)
 {
 	return _gnutls_x509_der_encode(cert, tbs_name, tbs, 0);
+}
+
+int
+_gnutls_x509_crt_get_spki_params(gnutls_x509_crt_t crt,
+				 const gnutls_x509_spki_st *key_params,
+				 gnutls_x509_spki_st *params)
+{
+	int result;
+	gnutls_x509_spki_st crt_params;
+
+	result = _gnutls_x509_crt_read_spki_params(crt, &crt_params);
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	if (crt_params.pk == GNUTLS_PK_RSA_PSS) {
+		if (key_params->pk == GNUTLS_PK_RSA_PSS) {
+			if (crt_params.rsa_pss_dig != key_params->rsa_pss_dig) {
+				gnutls_assert();
+				return GNUTLS_E_CERTIFICATE_ERROR;
+			}
+
+			if (crt_params.salt_size < key_params->salt_size) {
+				gnutls_assert();
+				return GNUTLS_E_CERTIFICATE_ERROR;
+			}
+		} else if (key_params->pk != GNUTLS_PK_RSA && key_params->pk != GNUTLS_PK_UNKNOWN) {
+			gnutls_assert();
+			return GNUTLS_E_CERTIFICATE_ERROR;
+		}
+		memcpy(params, &crt_params, sizeof(gnutls_x509_spki_st));
+	} else {
+		memcpy(params, key_params, sizeof(gnutls_x509_spki_st));
+	}
+
+	return 0;
 }
 
 /*-
@@ -63,6 +101,7 @@ _gnutls_x509_get_tbs(ASN1_TYPE cert, const char *tbs_name,
 int
 _gnutls_x509_pkix_sign(ASN1_TYPE src, const char *src_name,
 		       gnutls_digest_algorithm_t dig,
+		       unsigned int flags,
 		       gnutls_x509_crt_t issuer,
 		       gnutls_privkey_t issuer_key)
 {
@@ -70,6 +109,32 @@ _gnutls_x509_pkix_sign(ASN1_TYPE src, const char *src_name,
 	gnutls_datum_t signature;
 	gnutls_datum_t tbs;
 	char name[128];
+	gnutls_pk_algorithm_t pk;
+	gnutls_x509_spki_st key_params, params;
+	const gnutls_sign_entry_st *se;
+
+	pk = gnutls_x509_crt_get_pk_algorithm(issuer, NULL);
+	if (pk == GNUTLS_PK_UNKNOWN)
+		pk = gnutls_privkey_get_pk_algorithm(issuer_key, NULL);
+
+	result = _gnutls_privkey_get_spki_params(issuer_key, &key_params);
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	result = _gnutls_x509_crt_get_spki_params(issuer, &key_params, &params);
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	result = _gnutls_privkey_update_spki_params(issuer_key, pk, dig, flags,
+						  &params);
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
 
 	/* Step 1. Copy the issuer's name into the certificate.
 	 */
@@ -89,9 +154,13 @@ _gnutls_x509_pkix_sign(ASN1_TYPE src, const char *src_name,
 	_gnutls_str_cpy(name, sizeof(name), src_name);
 	_gnutls_str_cat(name, sizeof(name), ".signature");
 
-	result = _gnutls_x509_write_sig_params(src, name,
-					       gnutls_privkey_get_pk_algorithm
-					       (issuer_key, NULL), dig, 0);
+	se = _gnutls_pk_to_sign_entry(params.pk, dig);
+	if (se == NULL)
+		return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM);
+
+	_gnutls_debug_log("signing structure using %s\n", se->name);
+
+	result = _gnutls_x509_write_sign_params(src, name, se, &params);
 	if (result < 0) {
 		gnutls_assert();
 		return result;
@@ -106,8 +175,12 @@ _gnutls_x509_pkix_sign(ASN1_TYPE src, const char *src_name,
 		return result;
 	}
 
-	result =
-	    gnutls_privkey_sign_data(issuer_key, dig, 0, &tbs, &signature);
+	if (_gnutls_pk_is_not_prehashed(params.pk)) {
+		result = privkey_sign_raw_data(issuer_key, se, &tbs, &signature, &params);
+	} else {
+		result = privkey_sign_and_hash_data(issuer_key, se,
+						    &tbs, &signature, &params);
+	}
 	gnutls_free(tbs.data);
 
 	if (result < 0) {
@@ -132,9 +205,8 @@ _gnutls_x509_pkix_sign(ASN1_TYPE src, const char *src_name,
 	 * the same. 
 	 */
 
-	result = _gnutls_x509_write_sig_params(src, "signatureAlgorithm",
-					       gnutls_privkey_get_pk_algorithm
-					       (issuer_key, NULL), dig, 0);
+	result = _gnutls_x509_write_sign_params(src, "signatureAlgorithm",
+						se, &params);
 	if (result < 0) {
 		gnutls_assert();
 		return result;

@@ -16,7 +16,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -50,6 +50,10 @@ _gnutls_range_max_lh_pad(gnutls_session_t session, ssize_t data_length,
 	ssize_t this_pad;
 	ssize_t block_size;
 	ssize_t tag_size, overflow;
+	const version_entry_st *vers = get_version(session);
+
+	if (unlikely(vers == NULL))
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 	ret =
 	    _gnutls_epoch_get(session, EPOCH_WRITE_CURRENT,
@@ -58,15 +62,23 @@ _gnutls_range_max_lh_pad(gnutls_session_t session, ssize_t data_length,
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
 
-	max_pad = MAX_PAD_SIZE;
-	fixed_pad = 1;
+	if (!vers->tls13_sem && record_params->write.is_aead) /* not yet ready */
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+	if (vers->tls13_sem) {
+		max_pad = max_record_send_size(session, record_params);
+		fixed_pad = 2;
+	} else {
+		max_pad = MAX_PAD_SIZE;
+		fixed_pad = 1;
+	}
 
 	this_pad = MIN(max_pad, max_frag - data_length);
 
 	block_size = _gnutls_cipher_get_block_size(record_params->cipher);
 	tag_size =
 	    _gnutls_auth_cipher_tag_len(&record_params->write.
-					cipher_state);
+					ctx.tls12);
 	switch (_gnutls_cipher_type(record_params->cipher)) {
 	case CIPHER_AEAD:
 	case CIPHER_STREAM:
@@ -91,23 +103,30 @@ _gnutls_range_max_lh_pad(gnutls_session_t session, ssize_t data_length,
  * @session: is a #gnutls_session_t type.
  *
  * If the session supports length-hiding padding, you can
- * invoke gnutls_range_send_message() to send a message whose
+ * invoke gnutls_record_send_range() to send a message whose
  * length is hidden in the given range. If the session does not
  * support length hiding padding, you can use the standard
- * gnutls_record_send() function, or gnutls_range_send_message()
+ * gnutls_record_send() function, or gnutls_record_send_range()
  * making sure that the range is the same as the length of the
  * message you are trying to send.
  *
  * Returns: true (1) if the current session supports length-hiding
  * padding, false (0) if the current session does not.
  **/
-int gnutls_record_can_use_length_hiding(gnutls_session_t session)
+unsigned gnutls_record_can_use_length_hiding(gnutls_session_t session)
 {
 	int ret;
 	record_parameters_st *record_params;
+	const version_entry_st *vers = get_version(session);
+
+	if (unlikely(vers == NULL))
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+	if (vers->tls13_sem)
+		return 1;
 
 #ifdef ENABLE_SSL3
-	if (get_num_version(session) == GNUTLS_SSL3)
+	if (vers->id == GNUTLS_SSL3)
 		return 0;
 #endif
 
@@ -163,7 +182,7 @@ gnutls_range_split(gnutls_session_t session,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	max_frag = max_user_send_size(session, record_params);
+	max_frag = max_record_send_size(session, record_params);
 
 	if (orig_high == orig_low) {
 		int length = MIN(orig_high, max_frag);
@@ -220,7 +239,7 @@ _gnutls_range_fragment(size_t data_size, gnutls_range_st cur,
  * padding, and hence length hiding, use the gnutls_record_can_use_length_hiding()
  * function.
  *
- * Note: This function currently is only limited to blocking sockets.
+ * Note: This function currently is limited to blocking sockets.
  *
  * Returns: The number of bytes sent (that is data_size in a successful invocation),
  * or a negative error code.

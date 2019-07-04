@@ -17,7 +17,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see
- * <http://www.gnu.org/licenses/>.
+ * <https://www.gnu.org/licenses/>.
  */
 
 #include <config.h>
@@ -54,9 +54,19 @@ static gnutls_x509_crt_fmt_t incert_format, outcert_format;
 static gnutls_x509_crt_fmt_t inkey_format, outkey_format;
 
 static FILE *outfile;
+static const char *outfile_name = NULL;
 static FILE *infile;
 int batch = 0;
 int ask_pass = 0;
+
+void app_exit(int val)
+{
+	if (val != 0) {
+		if (outfile_name)
+			(void)remove(outfile_name);
+	}
+	exit(val);
+}
 
 static void tls_log_func(int level, const char *str)
 {
@@ -73,13 +83,10 @@ int main(int argc, char **argv)
 
 static void cmd_parser(int argc, char **argv)
 {
-	unsigned int optct;
 	/* Note that the default sec-param is legacy because several TPMs
 	 * cannot handle larger keys.
 	 */
-	optct = optionProcess(&systemkey_toolOptions, argc, argv);
-	argc += optct;
-	argv += optct;
+	optionProcess(&systemkey_toolOptions, argc, argv);
 
 	gnutls_global_set_log_function(tls_log_func);
 
@@ -108,8 +115,9 @@ static void cmd_parser(int argc, char **argv)
 		outfile = safe_open_rw(OPT_ARG(OUTFILE), 0);
 		if (outfile == NULL) {
 			fprintf(stderr, "%s", OPT_ARG(OUTFILE));
-			exit(1);
+			app_exit(1);
 		}
+		outfile_name = OPT_ARG(OUTFILE);
 	} else
 		outfile = stdout;
 
@@ -117,7 +125,7 @@ static void cmd_parser(int argc, char **argv)
 		infile = fopen(OPT_ARG(INFILE), "rb");
 		if (infile == NULL) {
 			fprintf(stderr, "%s", OPT_ARG(INFILE));
-			exit(1);
+			app_exit(1);
 		}
 	} else
 		infile = stdin;
@@ -142,7 +150,7 @@ static void systemkey_delete(const char *url, FILE * out)
 	if (ret < 0) {
 		fprintf(stderr, "gnutls_systemkey_privkey_delete: %s",
 			gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	fprintf(out, "Key %s deleted\n", url);
@@ -162,9 +170,12 @@ static void systemkey_list(FILE * out)
 	} while(ret >= 0);
 
 	if (ret < 0 && ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
-		fprintf(stderr, "gnutls_system_key_iter_get_url: %s",
-			gnutls_strerror(ret));
-		exit(1);
+		if (ret == GNUTLS_E_UNIMPLEMENTED_FEATURE) {
+			fprintf(stderr, "Native key store is not supported, or not present on this system\n");
+		} else {
+			fprintf(stderr, "Error: %s\n", gnutls_strerror(ret));
+		}
+		app_exit(1);
 	}
 	gnutls_system_key_iter_deinit(iter);
 	fputs("\n", out);

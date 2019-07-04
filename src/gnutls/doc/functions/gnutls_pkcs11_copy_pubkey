@@ -17,8 +17,8 @@
 
 This function will copy a public key object into a PKCS @code{11}  token specified by
 a URL. Valid flags to mark the key: @code{GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED} ,
-@code{GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE} , @code{GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE} ,
-@code{GNUTLS_PKCS11_OBJ_FLAG_MARK_CA} , @code{GNUTLS_PKCS11_OBJ_FLAG_MARK_ALWAYS_AUTH} .
+@code{GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE} , @code{GNUTLS_PKCS11_OBJ_FLAG_MARK_CA} ,
+@code{GNUTLS_PKCS11_OBJ_FLAG_MARK_ALWAYS_AUTH} .
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.

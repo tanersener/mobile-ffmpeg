@@ -151,6 +151,7 @@ static void count_segs_sb(const AV1_COMMON *cm, MACROBLOCKD *xd,
     case PARTITION_SPLIT: {
       const BLOCK_SIZE subsize = get_partition_subsize(bsize, PARTITION_SPLIT);
       int n;
+      assert(subsize < BLOCK_SIZES_ALL);
 
       for (n = 0; n < 4; n++) {
         const int mi_dc = hbs * (n & 1);
@@ -177,26 +178,30 @@ void av1_choose_segmap_coding_method(AV1_COMMON *cm, MACROBLOCKD *xd) {
   unsigned no_pred_segcounts[MAX_SEGMENTS] = { 0 };
   unsigned t_unpred_seg_counts[MAX_SEGMENTS] = { 0 };
   (void)xd;
-
+  int scale_up = cm->prev_frame && (cm->width > cm->prev_frame->width ||
+                                    cm->height > cm->prev_frame->height);
   // First of all generate stats regarding how well the last segment map
   // predicts this one
-  for (tile_row = 0; tile_row < cm->tile_rows; tile_row++) {
-    TileInfo tile_info;
-    av1_tile_set_row(&tile_info, cm, tile_row);
-    for (tile_col = 0; tile_col < cm->tile_cols; tile_col++) {
-      MB_MODE_INFO **mi_ptr;
-      av1_tile_set_col(&tile_info, cm, tile_col);
-      mi_ptr = cm->mi_grid_visible + tile_info.mi_row_start * cm->mi_stride +
-               tile_info.mi_col_start;
-      for (mi_row = tile_info.mi_row_start; mi_row < tile_info.mi_row_end;
-           mi_row += cm->seq_params.mib_size,
-          mi_ptr += cm->seq_params.mib_size * cm->mi_stride) {
-        MB_MODE_INFO **mi = mi_ptr;
-        for (mi_col = tile_info.mi_col_start; mi_col < tile_info.mi_col_end;
-             mi_col += cm->seq_params.mib_size, mi += cm->seq_params.mib_size) {
-          count_segs_sb(cm, xd, &tile_info, mi, no_pred_segcounts,
-                        temporal_predictor_count, t_unpred_seg_counts, mi_row,
-                        mi_col, cm->seq_params.sb_size);
+  if (!scale_up) {
+    for (tile_row = 0; tile_row < cm->tile_rows; tile_row++) {
+      TileInfo tile_info;
+      av1_tile_set_row(&tile_info, cm, tile_row);
+      for (tile_col = 0; tile_col < cm->tile_cols; tile_col++) {
+        MB_MODE_INFO **mi_ptr;
+        av1_tile_set_col(&tile_info, cm, tile_col);
+        mi_ptr = cm->mi_grid_visible + tile_info.mi_row_start * cm->mi_stride +
+                 tile_info.mi_col_start;
+        for (mi_row = tile_info.mi_row_start; mi_row < tile_info.mi_row_end;
+             mi_row += cm->seq_params.mib_size,
+            mi_ptr += cm->seq_params.mib_size * cm->mi_stride) {
+          MB_MODE_INFO **mi = mi_ptr;
+          for (mi_col = tile_info.mi_col_start; mi_col < tile_info.mi_col_end;
+               mi_col += cm->seq_params.mib_size,
+              mi += cm->seq_params.mib_size) {
+            count_segs_sb(cm, xd, &tile_info, mi, no_pred_segcounts,
+                          temporal_predictor_count, t_unpred_seg_counts, mi_row,
+                          mi_col, cm->seq_params.sb_size);
+          }
         }
       }
     }

@@ -1,0 +1,1867 @@
+# Serbian translation of libgnutls.
+# Copyright © 2016 Free Software Foundation, Inc.
+# This file is distributed under the same license as the libgnutls package.
+# Мирослав Николић <miroslavnikolic@rocketmail.com>, 2016.
+msgid ""
+msgstr ""
+"Project-Id-Version: libgnutls-3.2.3\n"
+"Report-Msgid-Bugs-To: bug-gnutls@gnu.org\n"
+"POT-Creation-Date: 2019-05-25 22:49+0200\n"
+"PO-Revision-Date: 2016-12-11 19:10+0200\n"
+"Last-Translator: Мирослав Николић <miroslavnikolic@rocketmail.com>\n"
+"Language-Team: Serbian <(nothing)>\n"
+"Language: sr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Bugs: Report translation errors to the Language-Team address.\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Generated-By: Babel 1.0dev\n"
+
+#: lib/alert.c:39
+msgid "Close notify"
+msgstr "Затвори обавештење"
+
+#: lib/alert.c:40
+msgid "Unexpected message"
+msgstr "Неочекивана порука"
+
+#: lib/alert.c:41
+msgid "Bad record MAC"
+msgstr "Лош МАЦ записа"
+
+#: lib/alert.c:42
+msgid "Decryption failed"
+msgstr "Дешифровање није успело"
+
+#: lib/alert.c:43
+msgid "Record overflow"
+msgstr "Прекорачење записа"
+
+#: lib/alert.c:45
+msgid "Decompression failed"
+msgstr "Распакивање није успело"
+
+#: lib/alert.c:46
+msgid "Handshake failed"
+msgstr "Руковање није успело"
+
+#: lib/alert.c:47
+msgid "Certificate is bad"
+msgstr "Уверење је лоше"
+
+#: lib/alert.c:49
+msgid "Certificate is not supported"
+msgstr "Уверење није подржано"
+
+#: lib/alert.c:51
+msgid "Certificate was revoked"
+msgstr "Уверење је повучено"
+
+#: lib/alert.c:53
+msgid "Certificate is expired"
+msgstr "Уверење је истекло"
+
+#: lib/alert.c:55
+msgid "Unknown certificate"
+msgstr "Непознато уверење"
+
+#: lib/alert.c:56
+msgid "Illegal parameter"
+msgstr "Неисправан параметар"
+
+#: lib/alert.c:57
+msgid "CA is unknown"
+msgstr "Издавач уверења није познат"
+
+#: lib/alert.c:58
+msgid "Access was denied"
+msgstr "Приступ је одбијен"
+
+#: lib/alert.c:59
+msgid "Decode error"
+msgstr "Грешка декодирања"
+
+#: lib/alert.c:60
+msgid "Decrypt error"
+msgstr "Грешка дешифровања"
+
+#: lib/alert.c:61
+msgid "Export restriction"
+msgstr "Ограничење извоза"
+
+#: lib/alert.c:63
+msgid "Error in protocol version"
+msgstr "Грешка у издању протокола"
+
+#: lib/alert.c:65
+msgid "Insufficient security"
+msgstr "Недовољно безбедности"
+
+#: lib/alert.c:66
+msgid "User canceled"
+msgstr "Корисник је отказао"
+
+#: lib/alert.c:68
+msgid "No certificate (SSL 3.0)"
+msgstr "Нема уверења (ССЛ 3.0)"
+
+#: lib/alert.c:69
+msgid "Internal error"
+msgstr "Унутрашња грешка"
+
+#: lib/alert.c:71
+msgid "Inappropriate fallback"
+msgstr ""
+
+#: lib/alert.c:73
+msgid "No renegotiation is allowed"
+msgstr "Поновно преговарање није допуштено"
+
+#: lib/alert.c:75
+msgid "Could not retrieve the specified certificate"
+msgstr "Не могу да довучем наведено уверење"
+
+#: lib/alert.c:77
+msgid "An unsupported extension was sent"
+msgstr "Послато је неподржано проширење"
+
+#: lib/alert.c:79
+msgid "The server name sent was not recognized"
+msgstr "Послат назив сервера није препознат"
+
+#: lib/alert.c:81
+msgid "The SRP/PSK username is missing or not known"
+msgstr "СРП/ПСК корисничко име недостаје или није познато"
+
+#: lib/alert.c:83
+msgid "An extension was expected but was not seen"
+msgstr ""
+
+#: lib/alert.c:86
+msgid "No supported application protocol could be negotiated"
+msgstr "Ниједан подржани протокол програма не може бити преговаран"
+
+#: lib/alert.c:88
+#, fuzzy
+msgid "Certificate is required"
+msgstr "Уверење је истекло"
+
+#: lib/errors.c:43
+msgid "Could not negotiate a supported cipher suite."
+msgstr "Не могу да преговарам подржани комплет шифрера."
+
+#: lib/errors.c:45
+msgid "No or insufficient priorities were set."
+msgstr "Нису или су подешени недовољни приоритети."
+
+#: lib/errors.c:47
+msgid "The cipher type is unsupported."
+msgstr "Врста шифрера није подржана."
+
+#: lib/errors.c:49
+msgid "The certificate and the given key do not match."
+msgstr "Уверење и дати кључ се не подударају."
+
+#: lib/errors.c:52
+msgid "Could not negotiate a supported compression method."
+msgstr "Не могу да преговарам подржани начин сажимања."
+
+#: lib/errors.c:54
+msgid "An unknown public key algorithm was encountered."
+msgstr "Наиђох на непознати алгоритам јавног кључа."
+
+#: lib/errors.c:57
+msgid "An algorithm that is not enabled was negotiated."
+msgstr "Алгоритам који није укључен је преговаран."
+
+#: lib/errors.c:60
+#, fuzzy
+msgid "A packet with illegal or unsupported version was received."
+msgstr "Пакет записа са неисправним издањем је примљен."
+
+#: lib/errors.c:63
+msgid ""
+"The Diffie-Hellman prime sent by the server is not acceptable (not long "
+"enough)."
+msgstr ""
+"Дифи-Хелманов прост број који је послао сервер није прихватљив (није довољно "
+"дуг)."
+
+#: lib/errors.c:66
+msgid "Error decoding the received TLS packet."
+msgstr ""
+
+#: lib/errors.c:69
+#, fuzzy
+msgid "A TLS record packet with invalid length was received."
+msgstr "ТЛС пакет са неочекиваном дужином је примљен."
+
+#: lib/errors.c:71
+msgid "The TLS connection was non-properly terminated."
+msgstr "ТЛС вез није исправно окончана."
+
+#: lib/errors.c:74
+msgid "The specified session has been invalidated for some reason."
+msgstr "Наведена сесија је постала неисправна из неког разлога."
+
+#: lib/errors.c:77
+msgid "GnuTLS internal error."
+msgstr "Унутрашња грешка ГнуТЛС-а."
+
+#: lib/errors.c:79
+msgid "A connection with inappropriate fallback was attempted."
+msgstr ""
+
+#: lib/errors.c:81
+msgid "An illegal TLS extension was received."
+msgstr "Неисправно ТЛС проширење је примљено."
+
+#: lib/errors.c:83
+#, fuzzy
+msgid "An required TLS extension was received."
+msgstr "Неисправно ТЛС проширење је примљено."
+
+#: lib/errors.c:85
+msgid "A TLS fatal alert has been received."
+msgstr "Кобно ТЛС упозорење је примљено."
+
+#: lib/errors.c:87
+msgid "An unexpected TLS packet was received."
+msgstr "Неочекивани ТЛС пакет је примљен."
+
+#: lib/errors.c:89
+msgid "Failed to import the key into store."
+msgstr ""
+
+#: lib/errors.c:92
+msgid "An error was encountered at the TLS Finished packet calculation."
+msgstr "Дошло је до грешке при израчунавању завршеног ТЛС пакета."
+
+#: lib/errors.c:94 libdane/errors.c:67
+msgid "No certificate was found."
+msgstr "Нисам пронашао ниједно уверење."
+
+#: lib/errors.c:96
+#, fuzzy
+msgid "Certificate is required."
+msgstr "Уверење је истекло"
+
+#: lib/errors.c:99
+msgid "The given DSA key is incompatible with the selected TLS protocol."
+msgstr "Дати ДСА кључ није сагласан са изабраним ТЛС протоколом."
+
+#: lib/errors.c:102
+msgid "There is already a crypto algorithm with lower priority."
+msgstr "Већ постоји алгоритам шифровања са нижим приоритетом."
+
+#: lib/errors.c:105
+msgid "No temporary RSA parameters were found."
+msgstr "Нисам нашао привремене РСА параметре."
+
+#: lib/errors.c:107
+msgid "No temporary DH parameters were found."
+msgstr "Нисам нашао привремене ДХ параметре."
+
+#: lib/errors.c:109
+msgid "An unexpected TLS handshake packet was received."
+msgstr "Неочекивани ТЛС пакет руковања је примљен."
+
+#: lib/errors.c:111
+msgid "The scanning of a large integer has failed."
+msgstr "Прегледање великог целог броја није успело."
+
+#: lib/errors.c:113
+msgid "Could not export a large integer."
+msgstr "Не могу да извезем велики цео број."
+
+#: lib/errors.c:115
+msgid "Decryption has failed."
+msgstr "Дешифровање није успело."
+
+#: lib/errors.c:117
+msgid "Encryption has failed."
+msgstr "Шифровање није успело."
+
+#: lib/errors.c:119
+msgid "Public key decryption has failed."
+msgstr "Дешифровање јавног кључа није успело."
+
+#: lib/errors.c:121
+msgid "Public key encryption has failed."
+msgstr "Шифровање јавног кључа није успело."
+
+#: lib/errors.c:123
+msgid "Public key signing has failed."
+msgstr "Потписивање јавног кључа није успело."
+
+#: lib/errors.c:125
+msgid "Public key signature verification has failed."
+msgstr "Провера потписа јавног кључа није усела."
+
+#: lib/errors.c:128
+msgid "Decompression of the TLS record packet has failed."
+msgstr "Распакивање ТЛС пакета записа није успело."
+
+#: lib/errors.c:130
+msgid "Compression of the TLS record packet has failed."
+msgstr "Запакивање ТЛС пакета записа није успело."
+
+#: lib/errors.c:133
+msgid "Internal error in memory allocation."
+msgstr "Унутрашња грешка у додели меморије."
+
+#: lib/errors.c:136
+msgid "An unimplemented or disabled feature has been requested."
+msgstr "Непримењена или искључена функција је затражена."
+
+#: lib/errors.c:138
+msgid "Insufficient credentials for that request."
+msgstr "Недовољно уверења за овај упит."
+
+#: lib/errors.c:140
+#, fuzzy
+msgid "Error in password/key file."
+msgstr "Грешка у датотеци лозинке."
+
+#: lib/errors.c:141
+msgid "Wrong padding in PKCS1 packet."
+msgstr "Погрешно попуњавање у ПКЦС1 пакету."
+
+#: lib/errors.c:143
+#, fuzzy
+msgid "The session or certificate has expired."
+msgstr "Затражена сесија је истекла."
+
+#: lib/errors.c:145
+#, fuzzy
+msgid "The certificate is not yet activated."
+msgstr "Уверење садржи неподржане атрибуте."
+
+#: lib/errors.c:147
+msgid "Hashing has failed."
+msgstr "Хеширање није успело."
+
+#: lib/errors.c:148
+msgid "Base64 decoding error."
+msgstr "Грешка декодирања у основи 64."
+
+#: lib/errors.c:150
+msgid "Base64 unexpected header error."
+msgstr "Неочекивана грешка заглавља у основи 64."
+
+#: lib/errors.c:152
+msgid "Base64 encoding error."
+msgstr "Грешка кодирања у основи 64."
+
+#: lib/errors.c:154
+#, fuzzy
+msgid "Parsing error in password/key file."
+msgstr "Грешка обраде у датотеци лозинке."
+
+#: lib/errors.c:156
+msgid "The requested data were not available."
+msgstr "Захтевани подаци нису доступни."
+
+#: lib/errors.c:158
+msgid "There are no embedded data in the structure."
+msgstr ""
+
+#: lib/errors.c:160
+msgid "Error in the pull function."
+msgstr "Грешка у функцији повлачења."
+
+#: lib/errors.c:161
+msgid "Error in the push function."
+msgstr "Грешка у функцији гурања."
+
+#: lib/errors.c:163
+msgid ""
+"The upper limit of record packet sequence numbers has been reached. Wow!"
+msgstr "Горња граница бројева низа пакета записа је достигнута. Опа бато!"
+
+#: lib/errors.c:165
+msgid "Error in the certificate."
+msgstr "Грешка у уверењу."
+
+#: lib/errors.c:167
+#, fuzzy
+msgid "Error in the time fields of certificate."
+msgstr "Грешка у уверењу."
+
+#: lib/errors.c:169
+#, fuzzy
+msgid "Error in the certificate verification."
+msgstr "Грешка у уверењу."
+
+#: lib/errors.c:171
+#, fuzzy
+msgid "Error in the CRL verification."
+msgstr "Грешка у уверењу."
+
+#: lib/errors.c:173
+msgid "Error in the private key verification; seed doesn't match."
+msgstr ""
+
+#: lib/errors.c:175
+msgid "Could not authenticate peer."
+msgstr "Не могу да потврдим идентитет парњака."
+
+#: lib/errors.c:178
+msgid "Unknown Subject Alternative name in X.509 certificate."
+msgstr "Непознат заменски назив субјекта у Икс.509 уверењу."
+
+#: lib/errors.c:181
+msgid "CIDR name constraint is malformed in size or structure."
+msgstr ""
+
+#: lib/errors.c:185
+msgid "Unsupported critical extension in X.509 certificate."
+msgstr "Неподржано критично проширење у Икс.509 уверењу."
+
+#: lib/errors.c:187
+msgid "Unsupported extension in X.509 certificate."
+msgstr "Неподржано проширење у Икс.509 уверењу."
+
+#: lib/errors.c:190
+msgid "Key usage violation in certificate has been detected."
+msgstr "Кршење употребе кључа у уверењу је откривено."
+
+#: lib/errors.c:192 lib/errors.c:454
+msgid "Function was interrupted."
+msgstr "Функција је прекинута."
+
+#: lib/errors.c:194
+msgid "TLS Application data were received, while expecting handshake data."
+msgstr "Примљени су подаци ТЛС програма, док смо очекивали податке руковања."
+
+#: lib/errors.c:196
+msgid "Error in Database backend."
+msgstr "Грешка у позадинцу базе података."
+
+#: lib/errors.c:197
+msgid "The Database entry already exists."
+msgstr ""
+
+#: lib/errors.c:198
+msgid "The certificate type is not supported."
+msgstr "Врста уверења није подржана."
+
+#: lib/errors.c:201
+msgid "The given memory buffer is too short to hold parameters."
+msgstr "Дата међумеморија превише мала за параметре."
+
+#: lib/errors.c:203 libdane/errors.c:61
+msgid "The request is invalid."
+msgstr "Захтев није исправан."
+
+#: lib/errors.c:205
+msgid "The cookie was bad."
+msgstr "Колачић беше лош."
+
+#: lib/errors.c:206
+msgid "An illegal parameter has been received."
+msgstr "Неисправан параметар је примљен."
+
+#: lib/errors.c:208
+msgid "An illegal parameter was found."
+msgstr "Неисправан параметар је нађен."
+
+#: lib/errors.c:210
+msgid "Error while reading file."
+msgstr "Грешка при читању датотеке."
+
+#: lib/errors.c:211
+#, fuzzy
+msgid "A disallowed SNI server name has been received."
+msgstr "Неисправан параметар је примљен."
+
+#: lib/errors.c:214
+msgid "ASN1 parser: Element was not found."
+msgstr "АСН1 обрађивач: Нисам нашао елемент."
+
+#: lib/errors.c:216
+msgid "ASN1 parser: Identifier was not found"
+msgstr "АСН1 обрађивач: Нисам нашао одредник"
+
+#: lib/errors.c:218
+msgid "ASN1 parser: Error in DER parsing."
+msgstr "АСН1 обрађивач: Грешка у ДЕР обради."
+
+#: lib/errors.c:220
+msgid "ASN1 parser: Value was not found."
+msgstr "АСН1 обрађивач: Нисам нашао вредност."
+
+#: lib/errors.c:222
+msgid "ASN1 parser: Generic parsing error."
+msgstr "АСН1 обрађивач: Општа грешка обраде."
+
+#: lib/errors.c:224
+msgid "ASN1 parser: Value is not valid."
+msgstr "АСН1 обрађивач: Вредност није исправна."
+
+#: lib/errors.c:226
+msgid "ASN1 parser: Error in TAG."
+msgstr "АСН1 обрађивач: Грешка у ТАГ-у."
+
+#: lib/errors.c:228
+msgid "ASN1 parser: error in implicit tag"
+msgstr "АСН1 обрађивач: грешка у изричитој ознаци"
+
+#: lib/errors.c:230
+msgid "ASN1 parser: Error in type 'ANY'."
+msgstr "АСН1 обрађивач: Грешка у врсти „ANY“."
+
+#: lib/errors.c:232
+msgid "ASN1 parser: Syntax error."
+msgstr "АСН1 обрађивач: Грешка синтаксе."
+
+#: lib/errors.c:234
+msgid "ASN1 parser: Overflow in DER parsing."
+msgstr "АСН1 обрађивач: Прекорачење у ДЕР обради."
+
+#: lib/errors.c:238
+msgid "Too many empty record packets have been received."
+msgstr "Примљено је превише празних пакета записа."
+
+#: lib/errors.c:240
+msgid "Too many handshake packets have been received."
+msgstr "Примљено је превише пакета руковања записа."
+
+#: lib/errors.c:242
+msgid "More than a single object matches the criteria."
+msgstr ""
+
+#: lib/errors.c:244
+msgid "The crypto library version is too old."
+msgstr "Библиотека шифровања је превише стара."
+
+#: lib/errors.c:247
+msgid "The tasn1 library version is too old."
+msgstr "Библиотека „тасн1“ је превише стара."
+
+#: lib/errors.c:249
+msgid "The OpenPGP User ID is revoked."
+msgstr "ОпенПГП ИД корисника је повучен."
+
+#: lib/errors.c:251
+msgid "The OpenPGP key has not a preferred key set."
+msgstr "ОпенПГП кључ није жељени скуп кључева."
+
+#: lib/errors.c:253
+msgid "Error loading the keyring."
+msgstr "Грешка учитавања привеска кључева."
+
+#: lib/errors.c:255
+msgid "The initialization of crypto backend has failed."
+msgstr "Покретање позадинца криптографије није успело."
+
+#: lib/errors.c:258
+msgid "No supported compression algorithms have been found."
+msgstr "Нисам нашао подржане алгоритме запакивања."
+
+#: lib/errors.c:260
+msgid "No supported cipher suites have been found."
+msgstr "Нисам нашао подржане комплете шифрера."
+
+#: lib/errors.c:262
+msgid "Could not get OpenPGP key."
+msgstr "Не могу да добавим ОпенПГП кључ."
+
+#: lib/errors.c:264
+msgid "Could not find OpenPGP subkey."
+msgstr "Не могу да нађем ОпенПГП подкључ."
+
+#: lib/errors.c:266
+msgid "Safe renegotiation failed."
+msgstr "Безбедно поновно руковање није успело."
+
+#: lib/errors.c:268
+msgid "Unsafe renegotiation denied."
+msgstr "Небезбедно поновно руковање је забрањено."
+
+#: lib/errors.c:271
+msgid "The SRP username supplied is illegal."
+msgstr "Достављено СРП корисничко име није исправно."
+
+#: lib/errors.c:273
+#, fuzzy
+msgid "The username supplied is unknown."
+msgstr "Достављено СРП корисничко име није познато."
+
+#: lib/errors.c:276
+msgid "The OpenPGP fingerprint is not supported."
+msgstr "ОпенПГП отисак није подржан."
+
+#: lib/errors.c:278
+msgid "The signature algorithm is not supported."
+msgstr "Алгоритам потписа није подржан."
+
+#: lib/errors.c:280
+msgid "The certificate has unsupported attributes."
+msgstr "Уверење садржи неподржане атрибуте."
+
+#: lib/errors.c:282
+msgid "The OID is not supported."
+msgstr "ОИД није подржан."
+
+#: lib/errors.c:284
+msgid "The hash algorithm is unknown."
+msgstr "Хеш алгоритам није познат."
+
+#: lib/errors.c:286
+msgid "The PKCS structure's content type is unknown."
+msgstr "Врста садржаја ПКЦС структуре није позната."
+
+#: lib/errors.c:288
+msgid "The PKCS structure's bag type is unknown."
+msgstr "Врста грешке ПКЦС структуре није позната."
+
+#: lib/errors.c:290 lib/errors.c:296
+msgid "The given password contains invalid characters."
+msgstr "Дата лозинка садржи неисправне знаке."
+
+#: lib/errors.c:292
+#, fuzzy
+msgid "The given string contains invalid UTF-8 characters."
+msgstr "Дата лозинка садржи неисправне знаке."
+
+#: lib/errors.c:294
+#, fuzzy
+msgid "The given email string contains non-ASCII characters before '@'."
+msgstr "Дата лозинка садржи неисправне знаке."
+
+#: lib/errors.c:299
+msgid "The Message Authentication Code verification failed."
+msgstr "Провера кода потврђивања идентитета поруке није успела."
+
+#: lib/errors.c:301
+msgid "Some constraint limits were reached."
+msgstr "Неке ограничене границе су достигнуте."
+
+#: lib/errors.c:303
+msgid "Failed to acquire random data."
+msgstr "Нисам успео да прибавим насумичне податке."
+
+#: lib/errors.c:305
+msgid "Verifying TLS/IA phase checksum failed"
+msgstr "Провера провере суме ТЛС/ИА фазе није успела"
+
+#: lib/errors.c:308
+msgid "The specified algorithm or protocol is unknown."
+msgstr "Наведени алгоритам или протокол није познат."
+
+#: lib/errors.c:311
+msgid "The handshake data size is too large."
+msgstr "Величина података руковања је превелика."
+
+#: lib/errors.c:314
+msgid "Error opening /dev/crypto"
+msgstr "Грешка отварања путање „/dev/crypto“"
+
+#: lib/errors.c:317
+msgid "Error interfacing with /dev/crypto"
+msgstr "Грешка приликом сучељавања са „/dev/crypto“"
+
+#: lib/errors.c:319
+msgid "Peer has terminated the connection"
+msgstr "Парњак је окончао везу"
+
+#: lib/errors.c:321
+msgid "Channel binding data not available"
+msgstr "Подаци увезивања канала нису доступни"
+
+#: lib/errors.c:324
+msgid "TPM error."
+msgstr "ТПМ грешка."
+
+#: lib/errors.c:326
+msgid "The TPM library (trousers) cannot be found."
+msgstr ""
+
+#: lib/errors.c:328
+msgid "TPM is not initialized."
+msgstr "ТПМ није покренут."
+
+#: lib/errors.c:330
+msgid "TPM key was not found in persistent storage."
+msgstr "Нисам нашао ТПМ кључ у трајном спремишту."
+
+#: lib/errors.c:332
+msgid "Cannot initialize a session with the TPM."
+msgstr "Не могу да покренем сесију са ТПМ-ом."
+
+#: lib/errors.c:334
+msgid "PKCS #11 error."
+msgstr "Грешка ПКЦС #11."
+
+#: lib/errors.c:336
+msgid "PKCS #11 initialization error."
+msgstr "Грешка покретања ПЦС-а #11."
+
+#: lib/errors.c:338
+msgid "Error in parsing."
+msgstr "Грешка у обради."
+
+#: lib/errors.c:340
+msgid "Error in provided PIN."
+msgstr "Грешка достављеног ПИН-а."
+
+#: lib/errors.c:342
+msgid "Error in provided SRK password for TPM."
+msgstr "Грешка достављене СРК лозинке за ТПМ."
+
+#: lib/errors.c:345
+msgid "Error in provided password for key to be loaded in TPM."
+msgstr "Грешка достављене лозинке за кључ који ће бити учитан у ТПМ."
+
+#: lib/errors.c:347
+msgid "PKCS #11 error in slot"
+msgstr "Грешка ПКЦС-а #11 у урезу"
+
+#: lib/errors.c:349
+msgid "Thread locking error"
+msgstr "Грешка закључавања нити"
+
+#: lib/errors.c:351
+msgid "PKCS #11 error in attribute"
+msgstr "Грешка ПКЦС-а #11 у атрибуту"
+
+#: lib/errors.c:353
+msgid "PKCS #11 error in device"
+msgstr "Грешка ПКЦС-а #11 у уређају"
+
+#: lib/errors.c:355
+msgid "PKCS #11 error in data"
+msgstr "Грешка ПКЦС-а #11 у подацима"
+
+#: lib/errors.c:357
+msgid "PKCS #11 unsupported feature"
+msgstr "Неподржана функција ПКЦС-а #11"
+
+#: lib/errors.c:359
+msgid "PKCS #11 error in key"
+msgstr "Грешка ПКЦС-а #11 у кључу"
+
+#: lib/errors.c:361
+msgid "PKCS #11 PIN expired"
+msgstr "ПИН ПКЦС-а #11 PIN је истекао"
+
+#: lib/errors.c:363
+msgid "PKCS #11 PIN locked"
+msgstr "ПИН ПКЦС-а #11 PIN је закључан"
+
+#: lib/errors.c:365
+msgid "PKCS #11 error in session"
+msgstr "Грешка ПКЦС-а #11 у сесији"
+
+#: lib/errors.c:367
+msgid "PKCS #11 error in signature"
+msgstr "Грешка ПКЦС-а #11 у потпису"
+
+#: lib/errors.c:369
+msgid "PKCS #11 error in token"
+msgstr "Грешка ПКЦС-а #11 у прстену"
+
+#: lib/errors.c:371
+msgid "PKCS #11 user error"
+msgstr "Грешка корисника ПКЦС-а #11"
+
+#: lib/errors.c:373
+msgid "The operation timed out"
+msgstr "Радњи је истекло време"
+
+#: lib/errors.c:375
+msgid "The operation was cancelled due to user error"
+msgstr "Радња је отказана због грешке корисника"
+
+#: lib/errors.c:377
+msgid "No supported ECC curves were found"
+msgstr "Нисам нашао подржане ЕЦЦ криве"
+
+#: lib/errors.c:379
+msgid "The curve is unsupported"
+msgstr "Крива није подржана"
+
+#: lib/errors.c:381
+msgid "The requested PKCS #11 object is not available"
+msgstr "Захтевани објекат ПКЦС-а #11 није доступан"
+
+#: lib/errors.c:384
+msgid ""
+"The provided X.509 certificate list is not sorted (in subject to issuer "
+"order)"
+msgstr ""
+"Обезбеђени списак Икс.509 уверења није поређан (према поретку издаваоца)"
+
+#: lib/errors.c:386
+msgid "The OCSP response is invalid"
+msgstr "ОЦСП одговор није исправан"
+
+#: lib/errors.c:388
+msgid "The OCSP response provided doesn't match the available certificates"
+msgstr ""
+
+#: lib/errors.c:390
+msgid "There is no certificate status (OCSP)."
+msgstr "Нема стања уверења (ОЦСП)."
+
+#: lib/errors.c:392
+msgid "Error in the system's randomness device."
+msgstr "Грешка у системском уређају случајности."
+
+#: lib/errors.c:395
+msgid "No common application protocol could be negotiated."
+msgstr "Ниједан општи протокол програма не може бити преговаран."
+
+#: lib/errors.c:397
+#, fuzzy
+msgid "Error while performing self checks."
+msgstr "Грешка при читању датотеке."
+
+#: lib/errors.c:399
+msgid "There is no self test for this algorithm."
+msgstr ""
+
+#: lib/errors.c:401
+msgid ""
+"An error has been detected in the library and cannot continue operations."
+msgstr ""
+
+#: lib/errors.c:403
+#, fuzzy
+msgid "Error in sockets initialization."
+msgstr "Грешка у функцији гурања."
+
+#: lib/errors.c:405
+#, fuzzy
+msgid "Error in public key generation."
+msgstr "Грешка у функцији повлачења."
+
+#: lib/errors.c:407
+#, fuzzy
+msgid "Invalid TLS extensions length field."
+msgstr "Неисправно ТЛС проширење је примљено."
+
+#: lib/errors.c:409
+msgid "Peer's certificate or username has changed during a rehandshake."
+msgstr ""
+
+#: lib/errors.c:411
+msgid "The provided string has an embedded null."
+msgstr ""
+
+#: lib/errors.c:413
+msgid "Attempted handshake during false start."
+msgstr ""
+
+#: lib/errors.c:415
+#, fuzzy
+msgid "The SNI host name not recognised."
+msgstr "Послат назив сервера није препознат"
+
+#: lib/errors.c:417
+msgid "There was an issue converting to or from UTF8."
+msgstr ""
+
+#: lib/errors.c:419
+msgid "Cannot perform this action while handshake is in progress."
+msgstr ""
+
+#: lib/errors.c:421
+#, fuzzy
+msgid "The public key is invalid."
+msgstr "Захтев није исправан."
+
+#: lib/errors.c:423
+msgid "There are no validation parameters present."
+msgstr ""
+
+#: lib/errors.c:425
+msgid "The public key parameters are invalid."
+msgstr ""
+
+#: lib/errors.c:427
+#, fuzzy
+msgid "The private key is invalid."
+msgstr "Захтев није исправан."
+
+#: lib/errors.c:429
+#, fuzzy
+msgid "The DER time encoding is invalid."
+msgstr "Захтев није исправан."
+
+#: lib/errors.c:431
+#, fuzzy
+msgid "The signature is incompatible with the public key."
+msgstr "Дати ДСА кључ није сагласан са изабраним ТЛС протоколом."
+
+#: lib/errors.c:433
+msgid "One of the involved algorithms has insufficient security level."
+msgstr ""
+
+#: lib/errors.c:435
+msgid "No common key share with peer."
+msgstr ""
+
+#: lib/errors.c:437
+msgid "The early data were rejected."
+msgstr ""
+
+#: lib/errors.c:443 libdane/errors.c:42
+msgid "Success."
+msgstr "Успешно."
+
+#: lib/errors.c:444
+msgid "A TLS warning alert has been received."
+msgstr "Упозоравајуће ТЛС упозорење је примљено."
+
+#: lib/errors.c:446
+msgid "A heartbeat pong message was received."
+msgstr "Понг порука срчаног откуцаја је примљена."
+
+#: lib/errors.c:448
+msgid "A heartbeat ping message was received."
+msgstr "Пинг порука срчаног откуцаја је примљена."
+
+#: lib/errors.c:450
+msgid "Resource temporarily unavailable, try again."
+msgstr "Извориште је тренутно недоступно, покушајте поново."
+
+#: lib/errors.c:452
+msgid "The transmitted packet is too large (EMSGSIZE)."
+msgstr "Пренесени пакет је превелик (EMSGSIZE)."
+
+#: lib/errors.c:455
+msgid "Rehandshake was requested by the peer."
+msgstr "Парњак је затражио поновно руковање."
+
+#: lib/errors.c:457
+#, fuzzy
+msgid "Re-authentication was requested by the peer."
+msgstr "Парњак је затражио поновно руковање."
+
+#: lib/errors.c:549 libdane/errors.c:100
+msgid "(unknown error code)"
+msgstr "(непознат код грешке)"
+
+#: lib/x509/ocsp.c:2605
+#, fuzzy
+msgid "The OCSP response is trusted. "
+msgstr "ОЦСП одговор није исправан"
+
+#: lib/x509/ocsp.c:2610
+#, fuzzy
+msgid "The OCSP response's signer could not be found. "
+msgstr "ОЦСП одговор није исправан"
+
+#: lib/x509/ocsp.c:2615
+msgid "Error in the signer's key usageflags. "
+msgstr ""
+
+#: lib/x509/ocsp.c:2620
+#, fuzzy
+msgid "The OCSP response's signer is not trusted. "
+msgstr "ОЦСП одговор није исправан"
+
+#: lib/x509/ocsp.c:2625
+#, fuzzy
+msgid "The OCSP response depends on insecure algorithms. "
+msgstr "ОЦСП одговор није исправан"
+
+#: lib/x509/ocsp.c:2630
+#, fuzzy
+msgid "The OCSP response's signature cannot be validated. "
+msgstr "ОЦСП одговор није исправан"
+
+#: lib/x509/ocsp.c:2635
+msgid "The OCSP response's signer's certificate is not activated. "
+msgstr ""
+
+#: lib/x509/ocsp.c:2640
+#, fuzzy
+msgid "The OCSP response's signer's certificate is expired. "
+msgstr "ОЦСП одговор није исправан"
+
+#: lib/x509/ocsp.c:2644
+#, fuzzy
+msgid "Memory error"
+msgstr "Грешка дешифровања"
+
+#: lib/x509/ocsp_output.c:50 lib/x509/ocsp_output.c:276 lib/x509/output.c:1575
+#: lib/x509/output.c:2108 lib/x509/output.c:2506
+#, c-format
+msgid "\tVersion: %d\n"
+msgstr "\tИздање: %d\n"
+
+#: lib/x509/ocsp_output.c:136 lib/x509/ocsp_output.c:500 lib/x509/output.c:2276
+#: lib/x509/output.c:2670
+msgid "\t\t\tASCII: "
+msgstr "\t\t\tАСКРИ: "
+
+#: lib/x509/ocsp_output.c:141 lib/x509/ocsp_output.c:505 lib/x509/output.c:2280
+#: lib/x509/output.c:2675
+msgid "\t\t\tHexdump: "
+msgstr "\t\t\tХекса: "
+
+#: lib/x509/ocsp_output.c:186
+msgid "OCSP Request Information:\n"
+msgstr "Подаци ОЦСП захтева:\n"
+
+#: lib/x509/ocsp_output.c:289
+#, fuzzy
+msgid "\tResponder Key ID: "
+msgstr "\tИД одговоритеља: %.*s\n"
+
+#: lib/x509/ocsp_output.c:299
+#, fuzzy, c-format
+msgid "\tResponder ID: %s\n"
+msgstr "\tИД одговоритеља: %.*s\n"
+
+#: lib/x509/ocsp_output.c:320
+#, c-format
+msgid "\tProduced At: %s\n"
+msgstr "\tПроизведено у: %s\n"
+
+#: lib/x509/ocsp_output.c:414
+#, c-format
+msgid "\t\tRevocation time: %s\n"
+msgstr "\t\tВреме опозива: %s\n"
+
+#: lib/x509/ocsp_output.c:434
+#, c-format
+msgid "\t\tThis Update: %s\n"
+msgstr "\t\tОво освежење: %s\n"
+
+#: lib/x509/ocsp_output.c:452
+#, c-format
+msgid "\t\tNext Update: %s\n"
+msgstr "\t\tСледеће освежење: %s\n"
+
+#: lib/x509/ocsp_output.c:524 lib/x509/output.c:1239 lib/x509/output.c:1510
+#: lib/x509/output.c:1636 lib/x509/output.c:1656 lib/x509/output.c:1700
+#: lib/x509/output.c:1928 lib/x509/output.c:1941 lib/x509/output.c:2355
+#: lib/x509/output.c:2483 lib/x509/output.c:2534
+msgid "unknown"
+msgstr "непознато"
+
+#: lib/x509/ocsp_output.c:525 lib/x509/output.c:1704 lib/x509/output.c:2359
+#: lib/x509/output.c:2538
+#, c-format
+msgid "\tSignature Algorithm: %s\n"
+msgstr "\tАлгоритам потписа: %s\n"
+
+#: lib/x509/ocsp_output.c:529 lib/x509/output.c:1711 lib/x509/output.c:2364
+msgid ""
+"warning: signed using a broken signature algorithm that can be forged.\n"
+msgstr ""
+"упозорење: потписани користи оштећени алгоритам потписа који се може "
+"одрадити.\n"
+
+#: lib/x509/ocsp_output.c:543 lib/x509/output.c:1737 lib/x509/output.c:2390
+msgid "\tSignature:\n"
+msgstr "\tПотпис:\n"
+
+#: lib/x509/ocsp_output.c:651
+msgid "OCSP Response Information:\n"
+msgstr "Подаци ОЦСП одговора:\n"
+
+#: lib/x509/output.c:54 lib/x509/output.c:84
+#, c-format
+msgid "%s%s: %.*s (contains illegal chars)\n"
+msgstr ""
+
+#: lib/x509/output.c:60 lib/x509/output.c:90
+#, c-format
+msgid "%s%s: %.*s (%s)\n"
+msgstr ""
+
+#: lib/x509/output.c:68 lib/x509/output.c:98
+#, c-format
+msgid "%s%s: %.*s\n"
+msgstr ""
+
+#: lib/x509/output.c:114
+#, fuzzy
+msgid "warning: SAN contains an embedded NUL, replacing with '!'\n"
+msgstr "упозорење: „altname“ садржи угнеждено НИШТА, замењујем знаком „!“\n"
+
+#: lib/x509/output.c:130
+#, c-format
+msgid "%sURI: %.*s\n"
+msgstr ""
+
+#: lib/x509/output.c:144
+#, fuzzy, c-format
+msgid "%sdirectoryName: %.*s\n"
+msgstr "%s\t\t\tдруги назив ОИД: %.*s\n"
+
+#: lib/x509/output.c:148
+#, fuzzy, c-format
+msgid "%sXMPP Address: %.*s\n"
+msgstr "%s\t\t\tИксМПП адреса: %.*s\n"
+
+#: lib/x509/output.c:152
+#, c-format
+msgid "%sKRB5Principal: %.*s\n"
+msgstr ""
+
+#: lib/x509/output.c:156
+#, c-format
+msgid "%sUnknown name: "
+msgstr ""
+
+#: lib/x509/output.c:298
+#, c-format
+msgid "\t\t\tPath Length Constraint: %d\n"
+msgstr "\t\t\tОграничење дужине путање: %d\n"
+
+#: lib/x509/output.c:300
+#, c-format
+msgid "\t\t\tPolicy Language: %s"
+msgstr "\t\t\tЈезик политике: %s"
+
+#: lib/x509/output.c:308
+msgid ""
+"\t\t\tPolicy:\n"
+"\t\t\t\tASCII: "
+msgstr ""
+"\t\t\tПолитика:\n"
+"\t\t\t\tАСКРИ: "
+
+#: lib/x509/output.c:310
+msgid ""
+"\n"
+"\t\t\t\tHexdump: "
+msgstr ""
+"\n"
+"\t\t\t\tХекс испис: "
+
+#: lib/x509/output.c:343
+#, c-format
+msgid "%s\t\t\tPermitted:\n"
+msgstr ""
+
+#: lib/x509/output.c:355
+#, c-format
+msgid "%s\t\t\tExcluded:\n"
+msgstr ""
+
+#: lib/x509/output.c:395 lib/x509/output.c:397 lib/x509/output.c:399
+#, fuzzy, c-format
+msgid "\t\t\tAccess Method: %s (%s)\n"
+msgstr "\t\t\tНачин приступа: %.*s"
+
+#: lib/x509/output.c:503
+#, c-format
+msgid "%sDigital signature.\n"
+msgstr "%sДигитални потписи.\n"
+
+#: lib/x509/output.c:505
+#, c-format
+msgid "%sNon repudiation.\n"
+msgstr "%sНије одбијање.\n"
+
+#: lib/x509/output.c:507
+#, c-format
+msgid "%sKey encipherment.\n"
+msgstr "%sШифровање кључа.\n"
+
+#: lib/x509/output.c:509
+#, c-format
+msgid "%sData encipherment.\n"
+msgstr "%sШифровање података.\n"
+
+#: lib/x509/output.c:511
+#, c-format
+msgid "%sKey agreement.\n"
+msgstr "%sСлагање кључа.\n"
+
+#: lib/x509/output.c:513
+#, c-format
+msgid "%sCertificate signing.\n"
+msgstr "%sПотписивање уверења.\n"
+
+#: lib/x509/output.c:515
+#, c-format
+msgid "%sCRL signing.\n"
+msgstr "%sЦРЛ потписивање.\n"
+
+#: lib/x509/output.c:517
+#, c-format
+msgid "%sKey encipher only.\n"
+msgstr "%sСамо шифрер кључа.\n"
+
+#: lib/x509/output.c:519
+#, c-format
+msgid "%sKey decipher only.\n"
+msgstr "%sСамо дешифрер кључа.\n"
+
+#: lib/x509/output.c:563
+#, c-format
+msgid "\t\t\tNot Before: %s\n"
+msgstr "\t\t\tНе пре: %s\n"
+
+#: lib/x509/output.c:572
+#, c-format
+msgid "\t\t\tNot After: %s\n"
+msgstr "\t\t\tНе после: %s\n"
+
+#: lib/x509/output.c:650
+#, c-format
+msgid "%s\t\t\tTLS WWW Server.\n"
+msgstr "%s\t\t\tТЛС „WWW“ сервер.\n"
+
+#: lib/x509/output.c:652
+#, c-format
+msgid "%s\t\t\tTLS WWW Client.\n"
+msgstr "%s\t\t\tТЛС „WWW“ клијент.\n"
+
+#: lib/x509/output.c:654
+#, c-format
+msgid "%s\t\t\tCode signing.\n"
+msgstr "%s\t\t\tПотписивање кода.\n"
+
+#: lib/x509/output.c:656
+#, c-format
+msgid "%s\t\t\tEmail protection.\n"
+msgstr "%s\t\t\tЗаштита е-поште.\n"
+
+#: lib/x509/output.c:659
+#, c-format
+msgid "%s\t\t\tTime stamping.\n"
+msgstr "%s\t\t\tЗаписивање времена.\n"
+
+#: lib/x509/output.c:661
+#, c-format
+msgid "%s\t\t\tOCSP signing.\n"
+msgstr "%s\t\t\tПотписивање ОЦСП-а.\n"
+
+#: lib/x509/output.c:663
+#, c-format
+msgid "%s\t\t\tIpsec IKE.\n"
+msgstr "%s\t\t\tИпсек ИКЕ.\n"
+
+#: lib/x509/output.c:665
+#, c-format
+msgid "%s\t\t\tAny purpose.\n"
+msgstr "%s\t\t\tБило која сврха.\n"
+
+#: lib/x509/output.c:688
+#, c-format
+msgid "%s\t\t\tCertificate Authority (CA): FALSE\n"
+msgstr "%s\t\t\tИздавач уверења (ЦА): НЕТАЧНО\n"
+
+#: lib/x509/output.c:691
+#, c-format
+msgid "%s\t\t\tCertificate Authority (CA): TRUE\n"
+msgstr "%s\t\t\tИздавач уверења (ЦА): ТАЧНО\n"
+
+#: lib/x509/output.c:695
+#, c-format
+msgid "%s\t\t\tPath Length Constraint: %d\n"
+msgstr "%s\t\t\tОграничење дужине путање: %d\n"
+
+#: lib/x509/output.c:751
+#, c-format
+msgid "%s\t\t\totherName OID: %.*s\n"
+msgstr "%s\t\t\tдруги назив ОИД: %.*s\n"
+
+#: lib/x509/output.c:753
+#, c-format
+msgid "%s\t\t\totherName DER: "
+msgstr "%s\t\t\tдруги назив ДЕР: "
+
+#: lib/x509/output.c:756
+#, c-format
+msgid ""
+"\n"
+"%s\t\t\totherName ASCII: "
+msgstr ""
+"\n"
+"%s\t\t\tдруги назив АСКРИ: "
+
+#: lib/x509/output.c:896
+#, c-format
+msgid "%s\t\tBasic Constraints (%s):\n"
+msgstr "%s\t\tОсновна ограничења (%s):\n"
+
+#: lib/x509/output.c:898 lib/x509/output.c:912 lib/x509/output.c:957
+#: lib/x509/output.c:991 lib/x509/output.c:1004 lib/x509/output.c:1016
+#: lib/x509/output.c:1031 lib/x509/output.c:1043 lib/x509/output.c:1056
+#: lib/x509/output.c:1068 lib/x509/output.c:1082 lib/x509/output.c:1096
+#: lib/x509/output.c:1104 lib/x509/output.c:1115 lib/x509/output.c:1126
+#: lib/x509/output.c:1134 lib/x509/output.c:2217 lib/x509/output.c:2242
+#: lib/x509/output.c:2262
+msgid "critical"
+msgstr "критично"
+
+#: lib/x509/output.c:898 lib/x509/output.c:912 lib/x509/output.c:958
+#: lib/x509/output.c:992 lib/x509/output.c:1004 lib/x509/output.c:1016
+#: lib/x509/output.c:1031 lib/x509/output.c:1043 lib/x509/output.c:1056
+#: lib/x509/output.c:1068 lib/x509/output.c:1082 lib/x509/output.c:1096
+#: lib/x509/output.c:1104 lib/x509/output.c:1115 lib/x509/output.c:1126
+#: lib/x509/output.c:1134 lib/x509/output.c:2218 lib/x509/output.c:2243
+#: lib/x509/output.c:2263
+msgid "not critical"
+msgstr "није критично"
+
+#: lib/x509/output.c:910
+#, c-format
+msgid "%s\t\tSubject Key Identifier (%s):\n"
+msgstr "%s\t\tОдредник кључа субјекта (%s):\n"
+
+#: lib/x509/output.c:1002
+#, c-format
+msgid "%s\t\tAuthority Key Identifier (%s):\n"
+msgstr "%s\t\tОдредник кључа ауторитета (%s):\n"
+
+#: lib/x509/output.c:1015
+#, c-format
+msgid "%s\t\tKey Usage (%s):\n"
+msgstr "%s\t\tУпотреба кључа (%s):\n"
+
+#: lib/x509/output.c:1029
+#, c-format
+msgid "%s\t\tPrivate Key Usage Period (%s):\n"
+msgstr "%s\t\tРаздобље коришћења личног кључа (%s):\n"
+
+#: lib/x509/output.c:1042
+#, c-format
+msgid "%s\t\tKey Purpose (%s):\n"
+msgstr "%s\t\tСврха кључа (%s):\n"
+
+#: lib/x509/output.c:1054
+#, c-format
+msgid "%s\t\tSubject Alternative Name (%s):\n"
+msgstr "%s\t\tЗаменски назив субјекта (%s):\n"
+
+#: lib/x509/output.c:1066
+#, c-format
+msgid "%s\t\tIssuer Alternative Name (%s):\n"
+msgstr "%s\t\tЗаменски назив издавача (%s):\n"
+
+#: lib/x509/output.c:1080
+#, c-format
+msgid "%s\t\tCRL Distribution points (%s):\n"
+msgstr "%s\t\tТачке ЦРЛ расподеле (%s):\n"
+
+#: lib/x509/output.c:1094
+#, c-format
+msgid "%s\t\tProxy Certificate Information (%s):\n"
+msgstr "%s\t\tПодаци уверења посредника (%s):\n"
+
+#: lib/x509/output.c:1102
+#, c-format
+msgid "%s\t\tAuthority Information Access (%s):\n"
+msgstr "%s\t\tПриступ информацијама ауторитета (%s):\n"
+
+#: lib/x509/output.c:1114
+#, fuzzy, c-format
+msgid "%s\t\tName Constraints (%s):\n"
+msgstr "%s\t\tОсновна ограничења (%s):\n"
+
+#: lib/x509/output.c:1124
+#, fuzzy, c-format
+msgid "%s\t\tTLS Features (%s):\n"
+msgstr "%s\t\tСврха кључа (%s):\n"
+
+#: lib/x509/output.c:1132
+#, c-format
+msgid "%s\t\tUnknown extension %s (%s):\n"
+msgstr "%s\t\tНепознато проширење „%s“ (%s):\n"
+
+#: lib/x509/output.c:1136
+#, c-format
+msgid "%s\t\t\tASCII: "
+msgstr "%s\t\t\tASCII: "
+
+#: lib/x509/output.c:1140
+#, c-format
+msgid "%s\t\t\tHexdump: "
+msgstr "%s\t\t\tХекс испис: "
+
+#: lib/x509/output.c:1189
+#, c-format
+msgid "%s\tExtensions:\n"
+msgstr "%s\tПроширења:\n"
+
+#: lib/x509/output.c:1241
+#, c-format
+msgid "\t%sPublic Key Algorithm: %s\n"
+msgstr "\t%sАлгоритам јавног кључа: %s\n"
+
+#: lib/x509/output.c:1243
+#, c-format
+msgid "\tAlgorithm Security Level: %s (%d bits)\n"
+msgstr "\tНиво безбедности алгоритма: %s (%d бита)\n"
+
+#: lib/x509/output.c:1248
+msgid "\t\tParameters:\n"
+msgstr ""
+
+#: lib/x509/output.c:1268
+#, c-format
+msgid "\t\tModulus (bits %d): "
+msgstr "\t\tМодулус (бита %d): "
+
+#: lib/x509/output.c:1275
+#, c-format
+msgid "\t\tExponent (bits %d): "
+msgstr "\t\tИзложилац (бита %d): "
+
+#: lib/x509/output.c:1283
+#, c-format
+msgid "\t\tModulus (bits %d):\n"
+msgstr "\t\tМодулус (бита %d):\n"
+
+#: lib/x509/output.c:1290
+#, c-format
+msgid "\t\tExponent (bits %d):\n"
+msgstr "\t\tИзложилац (бита %d):\n"
+
+#: lib/x509/output.c:1317 lib/x509/output.c:1437
+#, c-format
+msgid "\t\tCurve:\t%s\n"
+msgstr "\t\tКрива:\t%s\n"
+
+#: lib/x509/output.c:1321 lib/x509/output.c:1447
+msgid "\t\tX: "
+msgstr "\t\tX: "
+
+#: lib/x509/output.c:1327 lib/x509/output.c:1452
+msgid "\t\tY: "
+msgstr "\t\tY: "
+
+#: lib/x509/output.c:1334 lib/x509/output.c:1458
+msgid "\t\tX:\n"
+msgstr "\t\tX:\n"
+
+#: lib/x509/output.c:1339 lib/x509/output.c:1462
+msgid "\t\tY:\n"
+msgstr "\t\tY:\n"
+
+#: lib/x509/output.c:1367
+#, c-format
+msgid "\t\tPublic key (bits %d): "
+msgstr "\t\tЈавни кључ (бита %d): "
+
+#: lib/x509/output.c:1373
+msgid "\t\tP: "
+msgstr "\t\tP: "
+
+#: lib/x509/output.c:1378
+msgid "\t\tQ: "
+msgstr "\t\tQ: "
+
+#: lib/x509/output.c:1383
+msgid "\t\tG: "
+msgstr "\t\tG: "
+
+#: lib/x509/output.c:1391
+#, c-format
+msgid "\t\tPublic key (bits %d):\n"
+msgstr "\t\tЈавни кључ (бита %d):\n"
+
+#: lib/x509/output.c:1396
+msgid "\t\tP:\n"
+msgstr "\t\tP:\n"
+
+#: lib/x509/output.c:1400
+msgid "\t\tQ:\n"
+msgstr "\t\tQ:\n"
+
+#: lib/x509/output.c:1404
+msgid "\t\tG:\n"
+msgstr "\t\tG:\n"
+
+#: lib/x509/output.c:1439
+#, fuzzy, c-format
+msgid "\t\tDigest:\t%s\n"
+msgstr "\t\tКрива:\t%s\n"
+
+#: lib/x509/output.c:1441
+#, fuzzy, c-format
+msgid "\t\tParamSet: %s\n"
+msgstr "\t\tНаправљено: %s\n"
+
+#: lib/x509/output.c:1554 lib/x509/output.c:2473
+msgid "Subject "
+msgstr "Субјект "
+
+#: lib/x509/output.c:1590
+msgid "\tSerial Number (hex): "
+msgstr "\tСеријски број (hex): "
+
+#: lib/x509/output.c:1603 lib/x509/output.c:2118
+#, fuzzy
+msgid "\tIssuer:\n"
+msgstr "\tИздавач: %s\n"
+
+#: lib/x509/output.c:1608 lib/x509/output.c:2123
+#, c-format
+msgid "\tIssuer: %s\n"
+msgstr "\tИздавач: %s\n"
+
+#: lib/x509/output.c:1617
+msgid "\tValidity:\n"
+msgstr "\tИсправност:\n"
+
+#: lib/x509/output.c:1634 lib/x509/output.c:1636
+#, c-format
+msgid "\t\tNot Before: %s\n"
+msgstr "\t\tНе пре: %s\n"
+
+#: lib/x509/output.c:1654 lib/x509/output.c:1656
+#, c-format
+msgid "\t\tNot After: %s\n"
+msgstr "\t\tНе после: %s\n"
+
+#: lib/x509/output.c:1667 lib/x509/output.c:2516
+#, fuzzy
+msgid "\tSubject:\n"
+msgstr "\tСубјект: %s\n"
+
+#: lib/x509/output.c:1672 lib/x509/output.c:2521
+#, c-format
+msgid "\tSubject: %s\n"
+msgstr "\tСубјект: %s\n"
+
+#: lib/x509/output.c:1751
+#, fuzzy
+msgid "\tFingerprint:\n"
+msgstr "отисак: "
+
+#: lib/x509/output.c:1760
+msgid "\t\tsha1:"
+msgstr ""
+
+#: lib/x509/output.c:1771
+msgid "\t\tsha256:"
+msgstr ""
+
+#: lib/x509/output.c:1805
+#, fuzzy, c-format
+msgid ""
+"%sPublic Key ID:\n"
+"%s\tsha1:"
+msgstr "ИД јавног кључа: "
+
+#: lib/x509/output.c:1811
+#, fuzzy, c-format
+msgid ""
+"%sPublic Key PIN:\n"
+"%s\tpin-sha256:"
+msgstr ""
+"\tИд јавног кључа:\n"
+"\t\t"
+
+#: lib/x509/output.c:1883
+#, fuzzy
+msgid "no subject,"
+msgstr "Субјект "
+
+#: lib/x509/output.c:1899
+msgid "no issuer,"
+msgstr ""
+
+#: lib/x509/output.c:1946
+#, c-format
+msgid "signed using %s (broken!), "
+msgstr "потписан коришћењем „%s“ (оштећено!), "
+
+#: lib/x509/output.c:1948
+#, c-format
+msgid "signed using %s, "
+msgstr "потписан коришћењем „%s“, "
+
+#: lib/x509/output.c:2084
+msgid "X.509 Certificate Information:\n"
+msgstr "Подаци Икс.509 уверења:\n"
+
+#: lib/x509/output.c:2088 lib/x509/output.c:2728
+msgid "Other Information:\n"
+msgstr "Остали подаци:\n"
+
+#: lib/x509/output.c:2103
+msgid "\tVersion: 1 (default)\n"
+msgstr "\tИздање: 1 (основно)\n"
+
+#: lib/x509/output.c:2132
+msgid "\tUpdate dates:\n"
+msgstr "\tДатуми освежавања:\n"
+
+#: lib/x509/output.c:2149
+#, c-format
+msgid "\t\tIssued: %s\n"
+msgstr "\t\tИздато: %s\n"
+
+#: lib/x509/output.c:2169
+#, c-format
+msgid "\t\tNext at: %s\n"
+msgstr "\t\tСледеће у: %s\n"
+
+#: lib/x509/output.c:2200
+msgid "\tExtensions:\n"
+msgstr "\tПроширења:\n"
+
+#: lib/x509/output.c:2216
+#, c-format
+msgid "\t\tCRL Number (%s): "
+msgstr "\t\tЦРЛ број (%s): "
+
+#: lib/x509/output.c:2241
+#, c-format
+msgid "\t\tAuthority Key Identifier (%s):\n"
+msgstr "\t\tОдредник кључа ауторитета (%s):\n"
+
+#: lib/x509/output.c:2260
+#, c-format
+msgid "\t\tUnknown extension %s (%s):\n"
+msgstr "\t\tНепознато проширење „%s“ (%s):\n"
+
+#: lib/x509/output.c:2297
+#, c-format
+msgid "\tRevoked certificates (%d):\n"
+msgstr "\tОпозвана уверења (%d):\n"
+
+#: lib/x509/output.c:2300
+msgid "\tNo revoked certificates.\n"
+msgstr "\tНема опозваних уверења.\n"
+
+#: lib/x509/output.c:2321
+msgid "\t\tSerial Number (hex): "
+msgstr "\t\tСеријски број (hex): "
+
+#: lib/x509/output.c:2339
+#, c-format
+msgid "\t\tRevoked at: %s\n"
+msgstr "\t\tОпозвано: %s\n"
+
+#: lib/x509/output.c:2421
+msgid "X.509 Certificate Revocation List Information:\n"
+msgstr "Подаци о списку опозива Икс.509 уверења:\n"
+
+#: lib/x509/output.c:2571
+msgid "\tAttributes:\n"
+msgstr "\tАтрибути:\n"
+
+#: lib/x509/output.c:2628
+#, c-format
+msgid "\t\tChallenge password: %s\n"
+msgstr "\t\tЛозинка изазова: %s\n"
+
+#: lib/x509/output.c:2638
+#, c-format
+msgid "\t\tUnknown attribute %s:\n"
+msgstr "\t\tНепознат атрибут „%s“:\n"
+
+#: lib/x509/output.c:2724
+msgid "PKCS #10 Certificate Request Information:\n"
+msgstr "Подаци захтева ПКЦС #10 уверења:\n"
+
+#: lib/x509/output.c:2751
+msgid "Public Key Usage:\n"
+msgstr "Употреба јавног кључа:\n"
+
+#: lib/x509/output.c:2791
+msgid "Public Key Information:\n"
+msgstr "Подаци о јавном кључу:\n"
+
+#: libdane/dane.c:1050
+#, fuzzy
+msgid "Certificate matches. "
+msgstr "Уверење је лоше"
+
+#: libdane/dane.c:1053
+#, fuzzy
+msgid "Verification failed. "
+msgstr "Дешифровање није успело"
+
+#: libdane/dane.c:1058
+#, fuzzy
+msgid "CA constrains were violated. "
+msgstr "Неке ограничене границе су достигнуте."
+
+#: libdane/dane.c:1062
+#, fuzzy
+msgid "The certificate differs. "
+msgstr "Уверење је лоше"
+
+#: libdane/dane.c:1067
+msgid "There were no DANE information. "
+msgstr ""
+
+#: libdane/errors.c:43
+msgid "There was error initializing the DNS query."
+msgstr ""
+
+#: libdane/errors.c:45
+msgid "There was an error while resolving."
+msgstr ""
+
+#: libdane/errors.c:47
+#, fuzzy
+msgid "No DANE data were found."
+msgstr "Нисам нашао привремене ДХ параметре."
+
+#: libdane/errors.c:49
+msgid "Unknown DANE data were found."
+msgstr ""
+
+#: libdane/errors.c:51
+#, fuzzy
+msgid "No DNSSEC signature was found."
+msgstr "Нисам пронашао ниједно уверење."
+
+#: libdane/errors.c:53
+msgid "Received corrupt data."
+msgstr ""
+
+#: libdane/errors.c:55
+#, fuzzy
+msgid "The DNSSEC signature is invalid."
+msgstr "ОЦСП одговор није исправан"
+
+#: libdane/errors.c:57
+msgid "There was a memory error."
+msgstr ""
+
+#: libdane/errors.c:59
+#, fuzzy
+msgid "The requested data are not available."
+msgstr "Захтевани подаци нису доступни."
+
+#: libdane/errors.c:63
+#, fuzzy
+msgid "There was an error in the certificate."
+msgstr "Грешка у уверењу."
+
+#: libdane/errors.c:65
+msgid "There was an error in the public key."
+msgstr ""
+
+#: libdane/errors.c:69
+#, fuzzy
+msgid "Error in file."
+msgstr "Грешка у датотеци лозинке."
+
+#~ msgid "Received a TLS/IA Intermediate Phase Finished message"
+#~ msgstr "Примих завршену поруку ТЛС/ИА средње фазе"
+
+#~ msgid "Received a TLS/IA Final Phase Finished message"
+#~ msgstr "Примих завршену поруку ТЛС/ИА завршне фазе"
+
+#~ msgid "\t\tKey Usage:\n"
+#~ msgstr "\t\tУпотреба кључа:\n"
+
+#~ msgid "error: get_key_usage: %s\n"
+#~ msgstr "грешка: добави_употребу_кључа: %s\n"
+
+#~ msgid "\t\t\tDigital signatures.\n"
+#~ msgstr "\t\t\tДигитални потписи.\n"
+
+#~ msgid "\t\t\tCommunications encipherment.\n"
+#~ msgstr "\t\t\tШифровање везе.\n"
+
+#~ msgid "\t\t\tStorage data encipherment.\n"
+#~ msgstr "\t\t\tШифровање смештајних података.\n"
+
+#~ msgid "\t\t\tAuthentication.\n"
+#~ msgstr "\t\t\tПотврђивање идентитета.\n"
+
+#~ msgid "\t\t\tCertificate signing.\n"
+#~ msgstr "\t\t\tПотписивање уверења.\n"
+
+#~ msgid "\tID (hex): "
+#~ msgstr "\tИД (хекс): "
+
+#~ msgid "\tFingerprint (hex): "
+#~ msgstr "\tОтисак (хекс): "
+
+#~ msgid "\tFingerprint's random art:\n"
+#~ msgstr "\tНасумична уметност отиска:\n"
+
+#~ msgid "\tRevoked: True\n"
+#~ msgstr "\tПовучен: Да\n"
+
+#~ msgid "\tRevoked: False\n"
+#~ msgstr "\tПовучен: Не\n"
+
+#~ msgid "\tTime stamps:\n"
+#~ msgstr "\tВременска ознака:\n"
+
+#~ msgid "\t\tExpiration: Never\n"
+#~ msgstr "\t\tИстиче: Никада\n"
+
+#~ msgid "\t\tExpiration: %s\n"
+#~ msgstr "\t\tИстиче: %s\n"
+
+#~ msgid "\tPublic Key Algorithm: %s\n"
+#~ msgstr "\tАлгоритам јавног кључа: %s\n"
+
+#~ msgid "\tKey Security Level: %s\n"
+#~ msgstr "\tНиво безбедности кључа: %s\n"
+
+#~ msgid "\t\tExponent:\n"
+#~ msgstr "\t\tИзложилац:\n"
+
+#~ msgid "\tName[%d]: %s\n"
+#~ msgstr "\tНазив[%d]: %s\n"
+
+#~ msgid "\tRevoked Name[%d]: %s\n"
+#~ msgstr "\tНазив опозваног[%d]: %s\n"
+
+#~ msgid ""
+#~ "\n"
+#~ "\tSubkey[%d]:\n"
+#~ msgstr ""
+#~ "\n"
+#~ "\tПодкључ[%d]:\n"
+
+#~ msgid "name[%d]: %s, "
+#~ msgstr "назив[%d]: %s, "
+
+#~ msgid "revoked name[%d]: %s, "
+#~ msgstr "назив опозваног[%d]: %s, "
+
+#~ msgid "created: %s, "
+#~ msgstr "направљено: %s, "
+
+#~ msgid "never expires, "
+#~ msgstr "не истиче никада, "
+
+#~ msgid "expires: %s, "
+#~ msgstr "истиче: %s, "
+
+#~ msgid "key algorithm %s (%d bits)"
+#~ msgstr "алгоритам кључа %s (%d бита)"
+
+#~ msgid "unknown key algorithm (%d)"
+#~ msgstr "непознат алгоритам кључа (%d)"
+
+#~ msgid "OpenPGP Certificate Information:\n"
+#~ msgstr "Подаци ОпенПГП уверења:\n"
+
+#~ msgid ""
+#~ "warning: distributionPoint contains an embedded NUL, replacing with '!'\n"
+#~ msgstr ""
+#~ "упозорење: тачка расподеле садржи угнеждено НИШТА, замењујем знаком „!“\n"
+
+#~ msgid ""
+#~ "\tMD5 fingerprint:\n"
+#~ "\t\t"
+#~ msgstr ""
+#~ "\tМД5 отисак:\n"
+#~ "\t\t"
+
+#~ msgid ""
+#~ "\tSHA-1 fingerprint:\n"
+#~ "\t\t"
+#~ msgstr ""
+#~ "\tСХА-1 отисак:\n"
+#~ "\t\t"
+
+#~ msgid "\tPublic key's random art:\n"
+#~ msgstr "\tНасумични јавни кључ:\n"

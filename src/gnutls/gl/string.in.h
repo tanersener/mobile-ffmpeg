@@ -1,19 +1,19 @@
 /* A GNU-like <string.h>.
 
-   Copyright (C) 1995-1996, 2001-2016 Free Software Foundation, Inc.
+   Copyright (C) 1995-1996, 2001-2019 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU Lesser General Public License as published by
-   the Free Software Foundation; either version 2.1, or (at your option)
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 3, or (at your option)
    any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU Lesser General Public License for more details.
+   GNU General Public License for more details.
 
-   You should have received a copy of the GNU Lesser General Public License
-   along with this program; if not, see <http://www.gnu.org/licenses/>.  */
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, see <https://www.gnu.org/licenses/>.  */
 
 #if __GNUC__ >= 3
 @PRAGMA_SYSTEM_HEADER@
@@ -73,6 +73,23 @@
 
 /* The definition of _GL_WARN_ON_USE is copied here.  */
 
+
+/* Clear a block of memory.  The compiler will not delete a call to
+   this function, even if the block is dead after the call.  */
+#if @GNULIB_EXPLICIT_BZERO@
+# if ! @HAVE_EXPLICIT_BZERO@
+_GL_FUNCDECL_SYS (explicit_bzero, void,
+                  (void *__dest, size_t __n) _GL_ARG_NONNULL ((1)));
+# endif
+_GL_CXXALIAS_SYS (explicit_bzero, void, (void *__dest, size_t __n));
+_GL_CXXALIASWARN (explicit_bzero);
+#elif defined GNULIB_POSIXCHECK
+# undef explicit_bzero
+# if HAVE_RAW_DECL_EXPLICIT_BZERO
+_GL_WARN_ON_USE (explicit_bzero, "explicit_bzero is unportable - "
+                 "use gnulib module explicit_bzero for portability");
+# endif
+#endif
 
 /* Find the index of the least-significant set bit.  */
 #if @GNULIB_FFSL@

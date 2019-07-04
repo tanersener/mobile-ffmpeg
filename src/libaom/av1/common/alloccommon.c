@@ -31,7 +31,7 @@ int av1_get_MBs(int width, int height) {
   return mb_rows * mb_cols;
 }
 
-#if LOOP_FILTER_BITMASK
+#if CONFIG_LPF_MASK
 static int alloc_loop_filter_mask(AV1_COMMON *cm) {
   aom_free(cm->lf.lfm);
   cm->lf.lfm = NULL;
@@ -80,7 +80,7 @@ void av1_set_mb_mi(AV1_COMMON *cm, int width, int height) {
   cm->mb_rows = (cm->mi_rows + 2) >> 2;
   cm->MBs = cm->mb_rows * cm->mb_cols;
 
-#if LOOP_FILTER_BITMASK
+#if CONFIG_LPF_MASK
   alloc_loop_filter_mask(cm);
 #endif
 }
@@ -222,7 +222,7 @@ void av1_free_context_buffers(AV1_COMMON *cm) {
 
   av1_free_above_context_buffers(cm, cm->num_allocated_above_contexts);
 
-#if LOOP_FILTER_BITMASK
+#if CONFIG_LPF_MASK
   free_loop_filter_mask(cm);
 #endif
 }

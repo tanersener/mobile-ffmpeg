@@ -195,7 +195,7 @@ with UTF8 encoded strings.
 @FUNC@		FcStrStrIgnoreCase
 @TYPE1@		const FcChar8 *			@ARG1@		s1
 @TYPE2@		const FcChar8 *			@ARG2@		s2
-@PURPOSE@	locate UTF-8 substring ignoring ASCII case
+@PURPOSE@	locate UTF-8 substring ignoring case
 @DESC@
 Returns the location of <parameter>s2</parameter> in 
 <parameter>s1</parameter>, ignoring case.  Returns NULL if

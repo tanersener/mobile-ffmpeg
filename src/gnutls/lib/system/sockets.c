@@ -17,7 +17,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -131,7 +131,7 @@ system_read(gnutls_transport_ptr_t ptr, void *data, size_t data_size)
 
 /**
  * gnutls_system_recv_timeout:
- * @ptr: A gnutls_transport_ptr_t pointer
+ * @ptr: A file descriptor (wrapped in a gnutls_transport_ptr_t pointer)
  * @ms: The number of milliseconds to wait.
  *
  * Wait for data to be received from the provided socket (@ptr) within a

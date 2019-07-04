@@ -198,6 +198,8 @@ void av1_tokenize_sb_vartx(const AV1_COMP *cpi, ThreadData *td, TOKENEXTRA **t,
   struct tokenize_b_args arg = { cpi, td, t, 0, allow_update_cdf };
   if (mi_row >= cm->mi_rows || mi_col >= cm->mi_cols) return;
 
+  assert(bsize < BLOCK_SIZES_ALL);
+
   if (mbmi->skip) {
     av1_reset_skip_context(xd, mi_row, mi_col, bsize, num_planes);
     return;
@@ -214,6 +216,7 @@ void av1_tokenize_sb_vartx(const AV1_COMP *cpi, ThreadData *td, TOKENEXTRA **t,
         scale_chroma_bsize(bsize, pd->subsampling_x, pd->subsampling_y);
     const BLOCK_SIZE plane_bsize =
         get_plane_block_size(bsizec, pd->subsampling_x, pd->subsampling_y);
+    assert(plane_bsize < BLOCK_SIZES_ALL);
     const int mi_width = block_size_wide[plane_bsize] >> tx_size_wide_log2[0];
     const int mi_height = block_size_high[plane_bsize] >> tx_size_high_log2[0];
     const TX_SIZE max_tx_size = get_vartx_max_txsize(xd, plane_bsize, plane);

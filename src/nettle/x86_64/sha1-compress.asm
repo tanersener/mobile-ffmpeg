@@ -171,11 +171,11 @@ define(<ROUND_F3>, <
 
 	.file "sha1-compress.asm"
 
-	C _nettle_sha1_compress(uint32_t *state, uint8_t *input)
+	C nettle_sha1_compress(uint32_t *state, uint8_t *input)
 	
 	.text
 	ALIGN(16)
-PROLOGUE(_nettle_sha1_compress)
+PROLOGUE(nettle_sha1_compress)
 	C save all registers that need to be saved
 	W64_ENTRY(2, 0)
 	
@@ -304,4 +304,4 @@ PROLOGUE(_nettle_sha1_compress)
 	add	$64, %rsp
 	W64_EXIT(2, 0)
 	ret
-EPILOGUE(_nettle_sha1_compress)
+EPILOGUE(nettle_sha1_compress)

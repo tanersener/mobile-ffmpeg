@@ -1,11 +1,10 @@
-/Makefile
-/.libs/
 /sys/
-*.la
+/.libs/
+/Makefile
+/libunistring.la
 /limits.h
 /stdint.h
 /unictype.h
 /uninorm.h
 /unistr.h
 /unitypes.h
-/unused-parameter.h
