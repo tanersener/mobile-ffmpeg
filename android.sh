@@ -92,7 +92,7 @@ When compilation ends an Android Archive (AAR) file is created with enabled plat
     echo -e "  -v, --version\t\t\tdisplay version information and exit"
     echo -e "  -d, --debug\t\t\tbuild with debug information"
     echo -e "  -s, --speed\t\t\toptimize for speed instead of size"
-    echo -e "  -l, --lts\t\t\tbuild lts packages to support API 21+ devices"
+    echo -e "  -l, --lts\t\t\tbuild lts packages to support API 16+ devices"
     echo -e "  -f, --force\t\t\tignore warnings\n"
 
     echo -e "Licensing options:"
