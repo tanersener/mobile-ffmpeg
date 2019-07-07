@@ -62,8 +62,6 @@ If you use this project then please consider backing me so I can continue mainta
 ### 2. Using
 Published binaries are available at [Github](https://github.com/tanersener/mobile-ffmpeg/releases), [JCenter](https://bintray.com/bintray/jcenter) and [CocoaPods](https://cocoapods.org).
 
-Unpublished development builds can be found under the [development-snapshot](https://www.dropbox.com/sh/frzg32yjzyucmob/AADX81RhiVfk9o7Vo2J8jlH2a) directory. 
-
 There are eight different `mobile-ffmpeg` packages. Below you can see which system libraries and external libraries are enabled in each of them. 
 
 Please remember that some parts of `FFmpeg` are licensed under the `GPL` and only `GPL` licensed `mobile-ffmpeg` packages include them.
