@@ -4,6 +4,14 @@ FFmpeg for Android, iOS and tvOS
 
 <img src="https://github.com/tanersener/mobile-ffmpeg/blob/master/docs/assets/mobile-ffmpeg-logo-v7.png" width="320">
 
+### 0. Support 
+
+If you use this project then please consider backing me so I can continue maintaining and evolving it.
+
+<a href="https://www.patreon.com/tanersener">
+  <img src="https://c5.patreon.com/external/logo/become_a_patron_button@2x.png" width="160">
+</a>
+
 ### 1. Features
 - Use binaries available at `Github`/`JCenter`/`CocoaPods` or build your own version with external libraries you need
 - Supports
