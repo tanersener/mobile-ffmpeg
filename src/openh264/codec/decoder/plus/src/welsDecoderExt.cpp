@@ -71,6 +71,10 @@ extern "C" {
 #include <sys/time.h>
 #endif
 
+#define _PICTURE_REORDERING_ 1
+
+static int32_t sIMinInt32 = -0x7FFFFFFF;
+
 namespace WelsDec {
 
 //////////////////////////////////////////////////////////////////////
@@ -88,7 +92,13 @@ namespace WelsDec {
 ***************************************************************************/
 CWelsDecoder::CWelsDecoder (void)
   : m_pDecContext (NULL),
-    m_pWelsTrace (NULL) {
+    m_pWelsTrace (NULL),
+    m_iPictInfoIndex (0),
+    m_iMinPOC (sIMinInt32),
+    m_iNumOfPicts (0),
+    m_iLastGOPRemainPicts (0),
+    m_LastWrittenPOC (sIMinInt32),
+    m_iLargestBufferedPicIndex (0) {
 #ifdef OUTPUT_BIT_STREAM
   char chFileName[1024] = { 0 };  //for .264
   int iBufUsed = 0;
@@ -110,12 +120,17 @@ CWelsDecoder::CWelsDecoder (void)
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, "CWelsDecoder::CWelsDecoder() entry");
   }
 
+  for (int32_t i = 0; i < 16; ++i) {
+    m_sPictInfoList[i].bLastGOP = false;
+    m_sPictInfoList[i].iPOC = sIMinInt32;
+  }
+
 #ifdef OUTPUT_BIT_STREAM
   SWelsTime sCurTime;
 
   WelsGetTimeOfDay (&sCurTime);
 
-  iCurUsed     = WelsSnprintf (chFileName,  iBufLeft,  "bs_0x%p_", (void*)this);
+  iCurUsed = WelsSnprintf (chFileName, iBufLeft, "bs_0x%p_", (void*)this);
   iCurUsedSize = WelsSnprintf (chFileNameSize, iBufLeftSize, "size_0x%p_", (void*)this);
 
   iBufUsed += iCurUsed;
@@ -151,7 +166,6 @@ CWelsDecoder::CWelsDecoder (void)
   m_pFBS = WelsFopen (chFileName, "wb");
   m_pFBSSize = WelsFopen (chFileNameSize, "wb");
 #endif//OUTPUT_BIT_STREAM
-
 }
 
 /***************************************************************************
@@ -233,7 +247,6 @@ void CWelsDecoder::UninitDecoder (void) {
 
     m_pDecContext = NULL;
   }
-
 }
 
 // the return value of this function is not suitable, it need report failure info to upper layer.
@@ -257,7 +270,7 @@ int32_t CWelsDecoder::InitDecoder (const SDecodingParam* pParam) {
   WelsDecoderDefaults (m_pDecContext, &m_pWelsTrace->m_sLogCtx);
 
   //check param and update decoder context
-  m_pDecContext->pParam = (SDecodingParam*) m_pDecContext->pMemAlign->WelsMallocz (sizeof (SDecodingParam),
+  m_pDecContext->pParam = (SDecodingParam*)m_pDecContext->pMemAlign->WelsMallocz (sizeof (SDecodingParam),
                           "SDecodingParam");
   WELS_VERIFY_RETURN_PROC_IF (cmMallocMemeError, (NULL == m_pDecContext->pParam), UninitDecoder());
   int32_t iRet = DecoderConfigParam (m_pDecContext, pParam);
@@ -282,6 +295,9 @@ int32_t CWelsDecoder::ResetDecoder() {
   } else if (m_pWelsTrace != NULL) {
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_ERROR, "ResetDecoder() failed as decoder context null");
   }
+#ifdef _PICTURE_REORDERING_
+  ResetReorderingPictureBuffers();
+#endif
   return ERR_INFO_UNINIT;
 }
 
@@ -308,14 +324,14 @@ long CWelsDecoder::SetOption (DECODER_OPTION eOptID, void* pOption) {
       return cmInitParaError;
 
     iVal = * ((int*)pOption); // int value for error concealment idc
-    iVal = WELS_CLIP3 (iVal, (int32_t) ERROR_CON_DISABLE, (int32_t) ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE);
-    if ((m_pDecContext->pParam->bParseOnly) && (iVal != (int32_t) ERROR_CON_DISABLE)) {
+    iVal = WELS_CLIP3 (iVal, (int32_t)ERROR_CON_DISABLE, (int32_t)ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE);
+    if ((m_pDecContext->pParam->bParseOnly) && (iVal != (int32_t)ERROR_CON_DISABLE)) {
       WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
                "CWelsDecoder::SetOption for ERROR_CON_IDC = %d not allowd for parse only!.", iVal);
       return cmInitParaError;
     }
 
-    m_pDecContext->pParam->eEcActiveIdc = (ERROR_CON_IDC) iVal;
+    m_pDecContext->pParam->eEcActiveIdc = (ERROR_CON_IDC)iVal;
     InitErrorCon (m_pDecContext);
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
              "CWelsDecoder::SetOption for ERROR_CON_IDC = %d.", iVal);
@@ -410,7 +426,7 @@ long CWelsDecoder::GetOption (DECODER_OPTION eOptID, void* pOption) {
     * ((int*)pOption) = iVal;
     return cmResultSuccess;
   } else if (DECODER_OPTION_ERROR_CON_IDC == eOptID) {
-    iVal = (int) m_pDecContext->pParam->eEcActiveIdc;
+    iVal = (int)m_pDecContext->pParam->eEcActiveIdc;
     * ((int*)pOption) = iVal;
     return cmResultSuccess;
   } else if (DECODER_OPTION_GET_STATISTICS == eOptID) { // get decoder statistics info for real time debugging
@@ -447,15 +463,22 @@ long CWelsDecoder::GetOption (DECODER_OPTION eOptID, void* pOption) {
     if (!m_pDecContext->pSps) {
       return cmInitExpected;
     }
-    iVal = (int) m_pDecContext->pSps->uiProfileIdc;
+    iVal = (int)m_pDecContext->pSps->uiProfileIdc;
     * ((int*)pOption) = iVal;
     return cmResultSuccess;
   } else if (DECODER_OPTION_LEVEL == eOptID) {
     if (!m_pDecContext->pSps) {
       return cmInitExpected;
     }
-    iVal = (int) m_pDecContext->pSps->uiLevelIdc;
+    iVal = (int)m_pDecContext->pSps->uiLevelIdc;
     * ((int*)pOption) = iVal;
+    return cmResultSuccess;
+  } else if (DECODER_OPTION_NUM_OF_FRAMES_REMAINING_IN_BUFFER == eOptID) {
+    if (m_pDecContext->pSps && m_pDecContext->pSps->uiProfileIdc != 66) {
+      * ((int*)pOption) = m_iNumOfPicts > 0 ? m_iNumOfPicts : 0;
+    } else {
+      * ((int*)pOption) = 0;
+    }
     return cmResultSuccess;
   }
 
@@ -469,8 +492,7 @@ DECODING_STATE CWelsDecoder::DecodeFrameNoDelay (const unsigned char* kpSrc,
   int iRet;
   //SBufferInfo sTmpBufferInfo;
   //unsigned char* ppTmpDst[3] = {NULL, NULL, NULL};
-
-  iRet = (int) DecodeFrame2 (kpSrc, kiSrcLen, ppDst, pDstInfo);
+  iRet = (int)DecodeFrame2 (kpSrc, kiSrcLen, ppDst, pDstInfo);
   //memcpy (&sTmpBufferInfo, pDstInfo, sizeof (SBufferInfo));
   //ppTmpDst[0] = ppDst[0];
   //ppTmpDst[1] = ppDst[1];
@@ -482,8 +504,7 @@ DECODING_STATE CWelsDecoder::DecodeFrameNoDelay (const unsigned char* kpSrc,
   //ppDst[1] = ppTmpDst[1];
   //ppDst[2] = ppTmpDst[2];
   //}
-
-  return (DECODING_STATE) iRet;
+  return (DECODING_STATE)iRet;
 }
 
 DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
@@ -529,21 +550,22 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
 
   int64_t iStart, iEnd;
   iStart = WelsTime();
+
   ppDst[0] = ppDst[1] = ppDst[2] = NULL;
-  m_pDecContext->iErrorCode             = dsErrorFree; //initialize at the starting of AU decoding.
+  m_pDecContext->iErrorCode = dsErrorFree; //initialize at the starting of AU decoding.
   m_pDecContext->iFeedbackVclNalInAu = FEEDBACK_UNKNOWN_NAL; //initialize
   unsigned long long uiInBsTimeStamp = pDstInfo->uiInBsTimeStamp;
   memset (pDstInfo, 0, sizeof (SBufferInfo));
   pDstInfo->uiInBsTimeStamp = uiInBsTimeStamp;
 #ifdef LONG_TERM_REF
-  m_pDecContext->bReferenceLostAtT0Flag       = false; //initialize for LTR
+  m_pDecContext->bReferenceLostAtT0Flag = false; //initialize for LTR
   m_pDecContext->bCurAuContainLtrMarkSeFlag = false;
-  m_pDecContext->iFrameNumOfAuMarkedLtr      = 0;
-  m_pDecContext->iFrameNum                       = -1; //initialize
+  m_pDecContext->iFrameNumOfAuMarkedLtr = 0;
+  m_pDecContext->iFrameNum = -1; //initialize
 #endif
 
-  m_pDecContext->iFeedbackTidInAu             = -1; //initialize
-  m_pDecContext->iFeedbackNalRefIdc           = -1; //initialize
+  m_pDecContext->iFeedbackTidInAu = -1; //initialize
+  m_pDecContext->iFeedbackNalRefIdc = -1; //initialize
   if (pDstInfo) {
     pDstInfo->uiOutYuvTimeStamp = 0;
     m_pDecContext->uiTimeStamp = pDstInfo->uiInBsTimeStamp;
@@ -558,11 +580,23 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
       NAL_UNIT_UNSPEC_0; //for NBR, IDR frames are expected to decode as followed if error decoding an IDR currently
 
     eNalType = m_pDecContext->sCurNalHead.eNalUnitType;
-
     if (m_pDecContext->iErrorCode & dsOutOfMemory) {
-      if (ResetDecoder())
+      if (ResetDecoder()) {
         return dsOutOfMemory;
-
+      }
+      return dsErrorFree;
+    }
+    if (m_pDecContext->iErrorCode & dsRefListNullPtrs) {
+      if (ResetDecoder()) {
+        return dsRefListNullPtrs;
+      }
+      return dsErrorFree;
+    }
+    if ((m_pDecContext->iErrorCode & (dsBitstreamError | dsDataErrorConcealed)) && m_pDecContext->eSliceType == B_SLICE) {
+      if (ResetDecoder()) {
+        pDstInfo->iBufferStatus = 0;
+        return (DECODING_STATE)m_pDecContext->iErrorCode;
+      }
       return dsErrorFree;
     }
     //for AVC bitstream (excluding AVC with temporal scalability, including TP), as long as error occur, SHOULD notify upper layer key frame loss.
@@ -582,7 +616,7 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
                m_pDecContext->iErrorCode);
       m_pDecContext->bPrintFrameErrorTraceFlag = false;
     } else {
-      m_pDecContext->iIgnoredErrorInfoPacketCount ++;
+      m_pDecContext->iIgnoredErrorInfoPacketCount++;
       if (m_pDecContext->iIgnoredErrorInfoPacketCount == INT_MAX) {
         WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_WARNING, "continuous error reached INT_MAX! Restart as 0.");
         m_pDecContext->iIgnoredErrorInfoPacketCount = 0;
@@ -617,7 +651,11 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
 
     OutputStatisticsLog (m_pDecContext->sDecoderStatistics);
 
-    return (DECODING_STATE) m_pDecContext->iErrorCode;
+#ifdef  _PICTURE_REORDERING_
+    ReorderPicturesInDisplay (ppDst, pDstInfo);
+#endif
+
+    return (DECODING_STATE)m_pDecContext->iErrorCode;
   }
   // else Error free, the current codec works well
 
@@ -634,8 +672,45 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
   iEnd = WelsTime();
   m_pDecContext->dDecTime += (iEnd - iStart) / 1e3;
 
+#ifdef  _PICTURE_REORDERING_
+  ReorderPicturesInDisplay (ppDst, pDstInfo);
+#endif
+  return dsErrorFree;
+}
 
-
+DECODING_STATE CWelsDecoder::FlushFrame (unsigned char** ppDst,
+    SBufferInfo* pDstInfo) {
+  if (m_pDecContext->bEndOfStreamFlag && m_iNumOfPicts > 0) {
+    m_iMinPOC = sIMinInt32;
+    for (int32_t i = 0; i <= m_iLargestBufferedPicIndex; ++i) {
+      if (m_iMinPOC == sIMinInt32 && m_sPictInfoList[i].iPOC > sIMinInt32) {
+        m_iMinPOC = m_sPictInfoList[i].iPOC;
+        m_iPictInfoIndex = i;
+      }
+      if (m_sPictInfoList[i].iPOC > sIMinInt32 && m_sPictInfoList[i].iPOC < m_iMinPOC) {
+        m_iMinPOC = m_sPictInfoList[i].iPOC;
+        m_iPictInfoIndex = i;
+      }
+    }
+  }
+  if (m_iMinPOC > sIMinInt32) {
+    m_LastWrittenPOC = m_iMinPOC;
+#if defined (_DEBUG)
+#ifdef _MOTION_VECTOR_DUMP_
+    fprintf (stderr, "Output POC: #%d\n", m_LastWrittenPOC);
+#endif
+#endif
+    memcpy (pDstInfo, &m_sPictInfoList[m_iPictInfoIndex].sBufferInfo, sizeof (SBufferInfo));
+    ppDst[0] = m_sPictInfoList[m_iPictInfoIndex].pData[0];
+    ppDst[1] = m_sPictInfoList[m_iPictInfoIndex].pData[1];
+    ppDst[2] = m_sPictInfoList[m_iPictInfoIndex].pData[2];
+    m_sPictInfoList[m_iPictInfoIndex].iPOC = sIMinInt32;
+    if (m_sPictInfoList[m_iPictInfoIndex].iPicBuffIdx < m_pDecContext->pPicBuff->iCapacity)
+      m_pDecContext->pPicBuff->ppPic[m_sPictInfoList[m_iPictInfoIndex].iPicBuffIdx]->bAvailableFlag = true;
+    m_sPictInfoList[m_iPictInfoIndex].bLastGOP = false;
+    m_iMinPOC = sIMinInt32;
+    --m_iNumOfPicts;
+  }
   return dsErrorFree;
 }
 
@@ -682,6 +757,139 @@ void CWelsDecoder::OutputStatisticsLog (SDecoderStatistics& sDecoderStatistics) 
              sDecoderStatistics.iCurrentActiveSpsId,
              sDecoderStatistics.iCurrentActivePpsId);
   }
+}
+
+DECODING_STATE CWelsDecoder::ReorderPicturesInDisplay (unsigned char** ppDst, SBufferInfo* pDstInfo) {
+  DECODING_STATE iRet = dsErrorFree;
+  if (pDstInfo->iBufferStatus == 1 && m_pDecContext->pSps->uiProfileIdc != 66
+      && m_pDecContext->pSps->uiProfileIdc != 83) {
+    /*if (m_pDecContext->pSliceHeader->iPicOrderCntLsb == 0) {
+      m_LastWrittenPOC = 0;
+      return dsErrorFree;
+    }
+    if (m_iNumOfPicts == 0 && m_pDecContext->pPreviousDecodedPictureInDpb->bNewSeqBegin
+        && m_pDecContext->eSliceType != I_SLICE) {
+      m_LastWrittenPOC = m_pDecContext->pSliceHeader->iPicOrderCntLsb;
+      return dsErrorFree;
+    }*/
+    if (m_iNumOfPicts && m_pDecContext->pPreviousDecodedPictureInDpb
+        && m_pDecContext->pPreviousDecodedPictureInDpb->bNewSeqBegin) {
+      m_iLastGOPRemainPicts = m_iNumOfPicts;
+      for (int32_t i = 0; i <= m_iLargestBufferedPicIndex; ++i) {
+        if (m_sPictInfoList[i].iPOC > sIMinInt32) {
+          m_sPictInfoList[i].bLastGOP = true;
+        }
+      }
+    } else {
+      if (m_iNumOfPicts > 0) {
+        //This can happen when decoder moves to next GOP without being able to decoder first picture PicOrderCntLsb = 0
+        bool hasGOPChanged = false;
+        for (int32_t i = 0; i <= m_iLargestBufferedPicIndex; ++i) {
+          if (m_sPictInfoList[i].iPOC == m_pDecContext->pSliceHeader->iPicOrderCntLsb) {
+            hasGOPChanged = true;
+            break;
+          }
+        }
+        if (hasGOPChanged) {
+          m_iLastGOPRemainPicts = m_iNumOfPicts;
+          for (int32_t i = 0; i <= m_iLargestBufferedPicIndex; ++i) {
+            if (m_sPictInfoList[i].iPOC > sIMinInt32) {
+              m_sPictInfoList[i].bLastGOP = true;
+            }
+          }
+        }
+      }
+    }
+    for (int32_t i = 0; i < 16; ++i) {
+      if (m_sPictInfoList[i].iPOC == sIMinInt32) {
+        memcpy (&m_sPictInfoList[i].sBufferInfo, pDstInfo, sizeof (SBufferInfo));
+        m_sPictInfoList[i].pData[0] = ppDst[0];
+        m_sPictInfoList[i].pData[1] = ppDst[1];
+        m_sPictInfoList[i].pData[2] = ppDst[2];
+        m_sPictInfoList[i].iPOC = m_pDecContext->pSliceHeader->iPicOrderCntLsb;
+        m_sPictInfoList[i].iPicBuffIdx = m_pDecContext->pPicBuff->iCurrentIdx;
+        m_pDecContext->pPicBuff->ppPic[m_sPictInfoList[i].iPicBuffIdx]->bAvailableFlag = false;
+        m_sPictInfoList[i].bLastGOP = false;
+        pDstInfo->iBufferStatus = 0;
+        ++m_iNumOfPicts;
+        if (i > m_iLargestBufferedPicIndex) {
+          m_iLargestBufferedPicIndex = i;
+        }
+        break;
+      }
+    }
+    if (m_iLastGOPRemainPicts > 0) {
+      m_iMinPOC = sIMinInt32;
+      for (int32_t i = 0; i <= m_iLargestBufferedPicIndex; ++i) {
+        if (m_iMinPOC == sIMinInt32 && m_sPictInfoList[i].iPOC > sIMinInt32 && m_sPictInfoList[i].bLastGOP) {
+          m_iMinPOC = m_sPictInfoList[i].iPOC;
+          m_iPictInfoIndex = i;
+        }
+        if (m_sPictInfoList[i].iPOC > sIMinInt32 && m_sPictInfoList[i].iPOC < m_iMinPOC && m_sPictInfoList[i].bLastGOP) {
+          m_iMinPOC = m_sPictInfoList[i].iPOC;
+          m_iPictInfoIndex = i;
+        }
+      }
+      m_LastWrittenPOC = m_iMinPOC;
+#if defined (_DEBUG)
+#ifdef _MOTION_VECTOR_DUMP_
+      fprintf (stderr, "Output POC: #%d\n", m_LastWrittenPOC);
+#endif
+#endif
+      memcpy (pDstInfo, &m_sPictInfoList[m_iPictInfoIndex].sBufferInfo, sizeof (SBufferInfo));
+      ppDst[0] = m_sPictInfoList[m_iPictInfoIndex].pData[0];
+      ppDst[1] = m_sPictInfoList[m_iPictInfoIndex].pData[1];
+      ppDst[2] = m_sPictInfoList[m_iPictInfoIndex].pData[2];
+      m_sPictInfoList[m_iPictInfoIndex].iPOC = sIMinInt32;
+      if (m_sPictInfoList[m_iPictInfoIndex].iPicBuffIdx < m_pDecContext->pPicBuff->iCapacity)
+        m_pDecContext->pPicBuff->ppPic[m_sPictInfoList[m_iPictInfoIndex].iPicBuffIdx]->bAvailableFlag = true;
+      m_sPictInfoList[m_iPictInfoIndex].bLastGOP = false;
+      m_iMinPOC = sIMinInt32;
+      --m_iNumOfPicts;
+      --m_iLastGOPRemainPicts;
+      if (m_iLastGOPRemainPicts == 0) {
+        m_LastWrittenPOC = sIMinInt32;
+      }
+      return iRet;
+    }
+    if (m_iNumOfPicts > 0) {
+      m_iMinPOC = sIMinInt32;
+      for (int32_t i = 0; i <= m_iLargestBufferedPicIndex; ++i) {
+        if (m_iMinPOC == sIMinInt32 && m_sPictInfoList[i].iPOC > sIMinInt32) {
+          m_iMinPOC = m_sPictInfoList[i].iPOC;
+          m_iPictInfoIndex = i;
+        }
+        if (m_sPictInfoList[i].iPOC > sIMinInt32 && m_sPictInfoList[i].iPOC < m_iMinPOC) {
+          m_iMinPOC = m_sPictInfoList[i].iPOC;
+          m_iPictInfoIndex = i;
+        }
+      }
+    }
+    if (m_iMinPOC > sIMinInt32) {
+      if ((m_LastWrittenPOC > sIMinInt32 && m_iMinPOC - m_LastWrittenPOC <= 1)
+          || m_iMinPOC < m_pDecContext->pSliceHeader->iPicOrderCntLsb) {
+        m_LastWrittenPOC = m_iMinPOC;
+#if defined (_DEBUG)
+#ifdef _MOTION_VECTOR_DUMP_
+        fprintf (stderr, "Output POC: #%d\n", m_LastWrittenPOC);
+#endif
+#endif
+        memcpy (pDstInfo, &m_sPictInfoList[m_iPictInfoIndex].sBufferInfo, sizeof (SBufferInfo));
+        ppDst[0] = m_sPictInfoList[m_iPictInfoIndex].pData[0];
+        ppDst[1] = m_sPictInfoList[m_iPictInfoIndex].pData[1];
+        ppDst[2] = m_sPictInfoList[m_iPictInfoIndex].pData[2];
+        m_sPictInfoList[m_iPictInfoIndex].iPOC = sIMinInt32;
+        if (m_sPictInfoList[m_iPictInfoIndex].iPicBuffIdx < m_pDecContext->pPicBuff->iCapacity)
+          m_pDecContext->pPicBuff->ppPic[m_sPictInfoList[m_iPictInfoIndex].iPicBuffIdx]->bAvailableFlag = true;
+        m_sPictInfoList[m_iPictInfoIndex].bLastGOP = false;
+        m_iMinPOC = sIMinInt32;
+        --m_iNumOfPicts;
+        return iRet;
+      }
+    }
+  }
+
+  return iRet;
 }
 
 DECODING_STATE CWelsDecoder::DecodeParser (const unsigned char* kpSrc,
@@ -806,6 +1014,18 @@ DECODING_STATE CWelsDecoder::DecodeFrameEx (const unsigned char* kpSrc,
   return state;
 }
 
+void CWelsDecoder::ResetReorderingPictureBuffers() {
+  m_iPictInfoIndex = 0;
+  m_iMinPOC = sIMinInt32;
+  m_iNumOfPicts = 0;
+  m_iLastGOPRemainPicts = 0;
+  m_LastWrittenPOC = sIMinInt32;
+  m_iLargestBufferedPicIndex = 0;
+  for (int32_t i = 0; i < 16; ++i) {
+    m_sPictInfoList[i].bLastGOP = false;
+    m_sPictInfoList[i].iPOC = sIMinInt32;
+  }
+}
 
 } // namespace WelsDec
 

@@ -57,12 +57,6 @@ ${SED_INLINE} 's/ifeq (\$(ASM_ARCH), arm64)/ifneq (\$(filter arm64%, \$(ASM_ARCH
 ${SED_INLINE} 's/ifeq (\$(ASM_ARCH), x86)/ifneq (\$(filter %86 x86-64, \$(ASM_ARCH)),)/g' ${BASEDIR}/src/${LIB_NAME}/codec/common/targets.mk
 ${SED_INLINE} 's/ifeq (\$(ASM_ARCH), arm)/ifneq (\$(filter armv%, \$(ASM_ARCH)),)/g' ${BASEDIR}/src/${LIB_NAME}/codec/common/targets.mk
 
-# USE c++_shared INSTEAD OF stlport_shared ON ANDROID
-${SED_INLINE} 's/stlport_shared/c++_shared/g' ${BASEDIR}/src/${LIB_NAME}/codec/build/android/enc/jni/Application.mk
-${SED_INLINE} 's/stlport_shared/c++_shared/g' ${BASEDIR}/src/${LIB_NAME}/codec/build/android/enc/src/com/wels/enc/WelsEncTest.java
-${SED_INLINE} 's/stlport_shared/c++_shared/g' ${BASEDIR}/src/${LIB_NAME}/codec/build/android/dec/jni/Application.mk
-${SED_INLINE} 's/stlport_shared/c++_shared/g' ${BASEDIR}/src/${LIB_NAME}/codec/build/android/dec/src/com/wels/dec/WelsDecTest.java
-
 # DO NOT USE DEFAULT ANDROID ARCH FLAGS
 ${SED_INLINE} 's/ CFLAGS +=/ #CFLAGS +=/g' ${BASEDIR}/src/${LIB_NAME}/build/platform-android.mk
 ${SED_INLINE} 's/ LDFLAGS +=/ #LDFLAGS +=/g' ${BASEDIR}/src/${LIB_NAME}/build/platform-android.mk
