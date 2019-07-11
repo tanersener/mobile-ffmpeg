@@ -900,9 +900,9 @@ download_gpl_library_source() {
             GPL_LIB_DEST_DIR="x264"
         ;;
         x265)
-            GPL_LIB_URL="https://download.videolan.org/pub/videolan/x265/x265_3.0.tar.gz"
-            GPL_LIB_FILE="x265-3.0.tar.gz"
-            GPL_LIB_ORIG_DIR="x265_3.0"
+            GPL_LIB_URL="https://download.videolan.org/pub/videolan/x265/x265_3.1.1.tar.gz"
+            GPL_LIB_FILE="x265-3.1.1.tar.gz"
+            GPL_LIB_ORIG_DIR="x265_3.1.1"
             GPL_LIB_DEST_DIR="x265"
         ;;
         xvidcore)
