@@ -95,6 +95,7 @@ int kvz_strategyselector_register(void *opaque, const char *type, const char *st
 #include "strategies/strategies-quant.h"
 #include "strategies/strategies-intra.h"
 #include "strategies/strategies-sao.h"
+#include "strategies/strategies-encode.h"
 
 static const strategy_to_select_t strategies_to_select[] = {
   STRATEGIES_NAL_EXPORTS
@@ -104,6 +105,7 @@ static const strategy_to_select_t strategies_to_select[] = {
   STRATEGIES_QUANT_EXPORTS
   STRATEGIES_INTRA_EXPORTS
   STRATEGIES_SAO_EXPORTS
+  STRATEGIES_ENCODE_EXPORTS
   { NULL, NULL },
 };
 

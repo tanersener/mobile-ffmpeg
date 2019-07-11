@@ -38,8 +38,18 @@ extern const int16_t kvz_g_inv_quant_scales[6];
 void kvz_transformskip(const encoder_control_t *encoder, int16_t *block,int16_t *coeff, int8_t block_size);
 void kvz_itransformskip(const encoder_control_t *encoder, int16_t *block,int16_t *coeff, int8_t block_size);
 
-void kvz_transform2d(const encoder_control_t *encoder, int16_t *block,int16_t *coeff, int8_t block_size, int32_t mode);
-void kvz_itransform2d(const encoder_control_t *encoder, int16_t *block,int16_t *coeff, int8_t block_size, int32_t mode);
+void kvz_transform2d(const encoder_control_t * const encoder,
+                     int16_t *block,
+                     int16_t *coeff,
+                     int8_t block_size,
+                     color_t color,
+                     cu_type_t type);
+void kvz_itransform2d(const encoder_control_t * const encoder,
+                      int16_t *block,
+                      int16_t *coeff,
+                      int8_t block_size,
+                      color_t color,
+                      cu_type_t type);
 
 int32_t kvz_get_scaled_qp(int8_t type, int8_t qp, int8_t qp_offset);
 

@@ -79,8 +79,8 @@ static double gop_allocate_bits(encoder_state_t * const state)
   int pictures_coded = MAX(0, state->frame->num - encoder->cfg.owf);
 
   int gop_offset = (state->frame->gop_offset - encoder->cfg.owf) % MAX(1, encoder->cfg.gop_len);
-  // Only take fully coded GOPs into account.
-  if (encoder->cfg.gop_len > 0 && gop_offset != encoder->cfg.gop_len - 1) {
+  
+  if (encoder->cfg.gop_len > 0 && gop_offset != encoder->cfg.gop_len - 1 && encoder->cfg.gop_lp_definition.d == 0) {
     // Subtract number of bits in the partially coded GOP.
     bits_coded -= state->frame->cur_gop_bits_coded;
     // Subtract number of pictures in the partially coded GOP.
@@ -293,7 +293,7 @@ void kvz_set_lcu_lambda_and_qp(encoder_state_t * const state,
     int dqp = ctrl->cfg.roi.dqps[roi_index];
     state->qp = CLIP_TO_QP(state->frame->QP + dqp);
     state->lambda = qp_to_lamba(state, state->qp);
-    state->lambda_sqrt = sqrt(state->frame->lambda);
+    state->lambda_sqrt = sqrt(state->lambda);
 
   } else if (ctrl->cfg.target_bitrate > 0) {
     lcu_stats_t *lcu         = kvz_get_lcu_stats(state, pos.x, pos.y);

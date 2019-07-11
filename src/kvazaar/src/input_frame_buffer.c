@@ -58,6 +58,11 @@ kvz_picture* kvz_encoder_feed_frame(input_frame_buffer_t *buf,
 
   const int gop_buf_size = 3 * cfg->gop_len;
 
+  bool is_closed_gop = false;
+
+  // Check for closed gop, we need an extra frame in the buffer in this case
+  if (!cfg->open_gop && cfg->intra_period > 0 && cfg->gop_len > 0) is_closed_gop = true;
+
   if (cfg->gop_len == 0 || cfg->gop_lowdelay) {
     // No reordering of output pictures necessary.
 
@@ -94,11 +99,11 @@ kvz_picture* kvz_encoder_feed_frame(input_frame_buffer_t *buf,
     buf->pts_buffer[buf_idx] = img_in->pts;
     buf->num_in++;
 
-    if (buf->num_in < cfg->gop_len) {
+    if (buf->num_in < cfg->gop_len + is_closed_gop ? 1 : 0) {
       // Not enough frames to start output.
       return 0;
 
-    } else if (buf->num_in == cfg->gop_len) {
+    } else if (buf->num_in == cfg->gop_len + is_closed_gop ? 1 : 0) {
       // Now we known the PTSs that are needed to compute the delay.
       buf->delay = buf->pts_buffer[gop_buf_size - 1] - img_in->pts;
     }
@@ -109,7 +114,7 @@ kvz_picture* kvz_encoder_feed_frame(input_frame_buffer_t *buf,
     return NULL;
   }
 
-  if (img_in == NULL && buf->num_in < cfg->gop_len) {
+  if (img_in == NULL && buf->num_in < cfg->gop_len + is_closed_gop ? 1 : 0) {
     // End of the sequence but we have less than a single GOP of frames. Use
     // the difference between the PTSs of the first and the last frame as the
     // delay.
@@ -137,22 +142,35 @@ kvz_picture* kvz_encoder_feed_frame(input_frame_buffer_t *buf,
 
   } else {
     gop_offset = (buf->num_out - 1) % cfg->gop_len;
+    
+    // For closed gop, calculate the gop_offset again
+    if (!cfg->open_gop && cfg->intra_period > 0) {
+      // Offset the GOP position for each extra I-frame added to the structure
+      // in closed gop case
+      int num_extra_frames = (buf->num_out - 1) / (cfg->intra_period + 1);
+      gop_offset = (buf->num_out - 1 - num_extra_frames) % cfg->gop_len;
+    }
 
     // Index of the first picture in the GOP that is being output.
     int gop_start_idx = buf->num_out - 1 - gop_offset;
 
     // Skip pictures until we find an available one.
     gop_offset += buf->gop_skipped;
-    for (;;) {
-      assert(gop_offset < cfg->gop_len);
 
-      idx_out = gop_start_idx + cfg->gop[gop_offset].poc_offset - 1;
-      if (idx_out < buf->num_in - 1) {
-        // An available picture found.
-        break;
+    // Every closed-gop IRAP handled here
+    if (is_closed_gop && (!cfg->open_gop && ((buf->num_out - 1) % (cfg->intra_period + 1)) == cfg->intra_period)) {
+      idx_out = gop_start_idx;
+    } else {
+      for (;;) {
+        assert(gop_offset < cfg->gop_len + is_closed_gop ? 1 : 0);
+        idx_out = gop_start_idx + cfg->gop[gop_offset].poc_offset - 1;
+        if (idx_out < buf->num_in - 1) {
+          // An available picture found.
+          break;
+        }
+        buf->gop_skipped++;
+        gop_offset++;
       }
-      buf->gop_skipped++;
-      gop_offset++;
     }
 
     if (buf->num_out < cfg->gop_len - 1) {

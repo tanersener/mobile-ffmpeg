@@ -40,26 +40,22 @@ typedef struct {
 
 } inter_merge_cand_t;
 
+void kvz_inter_recon_cu(const encoder_state_t * const state,
+                        lcu_t *lcu,
+                        int32_t x,
+                        int32_t y,
+                        int32_t width);
 
-void kvz_inter_recon_lcu(const encoder_state_t * const state,
-                         const kvz_picture * ref,
-                         int32_t xpos,
-                         int32_t ypos,
-                         int32_t width,
-                         int32_t height,
-                         const int16_t mv_param[2],
-                         lcu_t* lcu,
-                         hi_prec_buf_t *hi_prec_out);
+void kvz_inter_recon_bipred(const encoder_state_t * const state,
+                            const kvz_picture * ref1,
+                            const kvz_picture * ref2,
+                            int32_t xpos,
+                            int32_t ypos,
+                            int32_t width,
+                            int32_t height,
+                            int16_t mv_param[2][2],
+                            lcu_t* lcu);
 
-void kvz_inter_recon_lcu_bipred(const encoder_state_t * const state,
-                                const kvz_picture * ref1,
-                                const kvz_picture * ref2,
-                                int32_t xpos,
-                                int32_t ypos,
-                                int32_t width,
-                                int32_t height,
-                                int16_t mv_param[2][2],
-                                lcu_t* lcu);
 
 void kvz_inter_get_mv_cand(const encoder_state_t * const state,
                            int32_t x,

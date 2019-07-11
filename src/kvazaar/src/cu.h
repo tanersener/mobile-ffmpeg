@@ -123,6 +123,7 @@ typedef struct
   uint8_t skipped   : 1; //!< \brief flag to indicate this block is skipped
   uint8_t merged    : 1; //!< \brief flag to indicate this block is merged
   uint8_t merge_idx : 3; //!< \brief merge index
+  uint8_t tr_skip   : 1; //!< \brief transform skip flag
 
   uint16_t cbf;
 
@@ -137,7 +138,6 @@ typedef struct
     struct {
       int8_t mode;
       int8_t mode_chroma;
-      int8_t tr_skip;    //!< \brief transform skip flag
 #if KVZ_SEL_ENCRYPTION
       int8_t mode_encry;
 #endif
