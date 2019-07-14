@@ -441,7 +441,7 @@ get_ldflags() {
     fi
     local COMMON_LINKED_LIBS=$(get_common_linked_libraries $1)
 
-    echo "${ARCH_FLAGS} ${OPTIMIZATION_FLAGS} ${COMMON_LINKED_LIBS} -Wl,--exclude-libs,libgcc.a -Wl,--exclude-libs,libunwind.a"
+    echo "${ARCH_FLAGS} ${OPTIMIZATION_FLAGS} ${COMMON_LINKED_LIBS} -Wl,--hash-style=both -Wl,--exclude-libs,libgcc.a -Wl,--exclude-libs,libunwind.a"
 }
 
 create_chromaprint_package_config() {
@@ -1049,6 +1049,11 @@ build_cpufeatures() {
     echo -e "\nINFO: Building cpu-features for ${ARCH}\n" 1>>${BASEDIR}/build.log 2>&1
 
     set_toolchain_clang_paths "cpu-features"
+
+    TARGET_HOST=$(get_target_host)
+    export CFLAGS=$(get_cflags "cpu-features")
+    export CXXFLAGS=$(get_cxxflags "cpu-features")
+    export LDFLAGS=$(get_ldflags "cpu-features")
 
     # THEN BUILD FOR THIS ABI
     $(get_clang_target_host)-clang -c ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.c -o ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.o 1>>${BASEDIR}/build.log 2>&1
