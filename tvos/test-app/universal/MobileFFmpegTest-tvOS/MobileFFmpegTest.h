@@ -1,7 +1,7 @@
 //
-// MediaInformationParserTest.h
+// MobileFFmpegTest.h
 //
-// Copyright (c) 2018-2019 Taner Sener
+// Copyright (c) 2019 Taner Sener
 //
 // This file is part of MobileFFmpeg.
 //
@@ -19,10 +19,4 @@
 //  along with MobileFFmpeg.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-void assertNumber(NSNumber *expected, NSNumber *real);
-void assertString(NSString *expected, NSString *real);
-
-/**
- * All parser tests are initiated from this method
- */
-void testMediaInformationParser(void);
+void testMobileFFmpeg(void);

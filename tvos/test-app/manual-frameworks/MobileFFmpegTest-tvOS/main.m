@@ -1,7 +1,7 @@
 //
 // main.m
 //
-// Copyright (c) 2019 Taner Sener
+// Copyright (c) 2018-2019 Taner Sener
 //
 // This file is part of MobileFFmpeg.
 //
@@ -20,15 +20,17 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "AppDelegate.h"
 
-#import "MediaInformationParserTests.h"
+#import "AppDelegate.h"
+#import "MediaInformationParserTest.h"
+#import "MobileFFmpegTest.h"
 
 int main(int argc, char * argv[]) {
     @autoreleasepool {
-
+        
         // RUN UNIT TESTS BEFORE STARTING THE APPLICATION
-        runMediaInformationParserTests();
+        testMediaInformationParser();
+        testMobileFFmpeg();
 
         return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
     }

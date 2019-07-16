@@ -72,6 +72,8 @@ extern int const RETURN_CODE_CANCEL;
  *
  * @param command FFmpeg command
  * @param delimiter arguments delimiter
+ * @deprecated argument splitting mechanism used in this method is pretty simple and prone to errors. Consider
+ * using a more advanced method like execute or executeWithArguments
  * @return zero on successful execution, 255 on user cancel and non-zero on error
  */
 + (int)execute: (NSString*)command delimiter:(NSString*)delimiter;
@@ -121,5 +123,13 @@ extern int const RETURN_CODE_CANCEL;
  * @return MobileFFmpeg library build date
  */
 + (NSString*)getBuildDate;
+
+/**
+ * Parses the given command into arguments.
+ *
+ * @param command string command
+ * @return array of arguments
+ */
++ (NSArray*)parseArguments: (NSString*)command;
 
 @end

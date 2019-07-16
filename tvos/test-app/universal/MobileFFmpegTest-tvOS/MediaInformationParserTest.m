@@ -1,7 +1,7 @@
 //
-// MobileFFmpegConfigTest.m
+// MediaInformationParserTest.m
 //
-// Copyright (c) 2019 Taner Sener
+// Copyright (c) 2018-2019 Taner Sener
 //
 // This file is part of MobileFFmpeg.
 //
@@ -21,7 +21,7 @@
 
 #include <UIKit/UIKit.h>
 
-#include <mobileffmpeg/MediaInformationParser.h>
+#include <MediaInformationParser.h>
 
 static NSString *MEDIA_INFORMATION_MP3;
 static NSString *MEDIA_INFORMATION_JPG;
@@ -972,9 +972,9 @@ void testMediaInformationRecording() {
 }
 
 /**
- * All parsing tests are initiated from this method
+ * All parser tests are initiated from this method
  */
-void runMediaInformationParserTests(void) {
+void testMediaInformationParser(void) {
 
     initTests();
 
@@ -1014,5 +1014,5 @@ void runMediaInformationParserTests(void) {
     testMediaInformationRecording();
     
     
-    NSLog(@"MediaInformationParserTests passed.");
+    NSLog(@"MediaInformationParserTest passed.");
 }

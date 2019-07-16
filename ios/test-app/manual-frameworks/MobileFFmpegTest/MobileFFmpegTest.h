@@ -1,5 +1,5 @@
 //
-// MediaInformationParserTests.h
+// MobileFFmpegTest.h
 //
 // Copyright (c) 2019 Taner Sener
 //
@@ -19,7 +19,4 @@
 //  along with MobileFFmpeg.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-/**
- * All parsing tests are initiated from this method
- */
-void runMediaInformationParserTests();
+void testMobileFFmpeg(void);

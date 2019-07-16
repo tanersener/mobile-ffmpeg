@@ -10,9 +10,9 @@
 		340FABBE2115A17600B33CE7 /* VidStabViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 340FABBC2115A17600B33CE7 /* VidStabViewController.h */; };
 		340FABBF2115A17600B33CE7 /* VidStabViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 340FABBD2115A17600B33CE7 /* VidStabViewController.m */; };
 		342900CB22DE2BCF0071B2E4 /* MediaInformationParserTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 342900C722DE2BCF0071B2E4 /* MediaInformationParserTest.m */; };
-		342900CC22DE2BCF0071B2E4 /* MobileFFmpegConfigTest.h in Headers */ = {isa = PBXBuildFile; fileRef = 342900C822DE2BCF0071B2E4 /* MobileFFmpegConfigTest.h */; };
 		342900CD22DE2BCF0071B2E4 /* MediaInformationParserTest.h in Headers */ = {isa = PBXBuildFile; fileRef = 342900C922DE2BCF0071B2E4 /* MediaInformationParserTest.h */; };
-		342900CE22DE2BCF0071B2E4 /* MobileFFmpegConfigTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 342900CA22DE2BCF0071B2E4 /* MobileFFmpegConfigTest.m */; };
+		342900D122DE384C0071B2E4 /* MobileFFmpegTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 342900CF22DE384C0071B2E4 /* MobileFFmpegTest.m */; };
+		342900D222DE384C0071B2E4 /* MobileFFmpegTest.h in Headers */ = {isa = PBXBuildFile; fileRef = 342900D022DE384C0071B2E4 /* MobileFFmpegTest.h */; };
 		343E66B5210784BD00F95E5B /* HttpsViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 343E66B3210784BD00F95E5B /* HttpsViewController.h */; };
 		343E66B6210784BD00F95E5B /* HttpsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 343E66B4210784BD00F95E5B /* HttpsViewController.m */; };
 		343E66B9210789DE00F95E5B /* Constants.h in Headers */ = {isa = PBXBuildFile; fileRef = 343E66B7210789DE00F95E5B /* Constants.h */; };
@@ -62,9 +62,9 @@
 		340FABBC2115A17600B33CE7 /* VidStabViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VidStabViewController.h; sourceTree = "<group>"; };
 		340FABBD2115A17600B33CE7 /* VidStabViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VidStabViewController.m; sourceTree = "<group>"; };
 		342900C722DE2BCF0071B2E4 /* MediaInformationParserTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MediaInformationParserTest.m; sourceTree = "<group>"; };
-		342900C822DE2BCF0071B2E4 /* MobileFFmpegConfigTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MobileFFmpegConfigTest.h; sourceTree = "<group>"; };
 		342900C922DE2BCF0071B2E4 /* MediaInformationParserTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MediaInformationParserTest.h; sourceTree = "<group>"; };
-		342900CA22DE2BCF0071B2E4 /* MobileFFmpegConfigTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MobileFFmpegConfigTest.m; sourceTree = "<group>"; };
+		342900CF22DE384C0071B2E4 /* MobileFFmpegTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MobileFFmpegTest.m; sourceTree = "<group>"; };
+		342900D022DE384C0071B2E4 /* MobileFFmpegTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MobileFFmpegTest.h; sourceTree = "<group>"; };
 		343E66B3210784BD00F95E5B /* HttpsViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HttpsViewController.h; sourceTree = "<group>"; };
 		343E66B4210784BD00F95E5B /* HttpsViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HttpsViewController.m; sourceTree = "<group>"; };
 		343E66B7210789DE00F95E5B /* Constants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
@@ -158,10 +158,6 @@
 		34FAE212209F7DDD005CE2AE /* MobileFFmpegTest */ = {
 			isa = PBXGroup;
 			children = (
-				342900C922DE2BCF0071B2E4 /* MediaInformationParserTest.h */,
-				342900C722DE2BCF0071B2E4 /* MediaInformationParserTest.m */,
-				342900C822DE2BCF0071B2E4 /* MobileFFmpegConfigTest.h */,
-				342900CA22DE2BCF0071B2E4 /* MobileFFmpegConfigTest.m */,
 				34FAE213209F7DDD005CE2AE /* AppDelegate.h */,
 				34FAE214209F7DDD005CE2AE /* AppDelegate.m */,
 				34FAE21F209F7DDE005CE2AE /* Assets.xcassets */,
@@ -177,6 +173,10 @@
 				34FAE221209F7DDE005CE2AE /* LaunchScreen.storyboard */,
 				34FAE225209F7DDE005CE2AE /* main.m */,
 				34FAE21C209F7DDD005CE2AE /* Main.storyboard */,
+				342900C922DE2BCF0071B2E4 /* MediaInformationParserTest.h */,
+				342900C722DE2BCF0071B2E4 /* MediaInformationParserTest.m */,
+				342900D022DE384C0071B2E4 /* MobileFFmpegTest.h */,
+				342900CF22DE384C0071B2E4 /* MobileFFmpegTest.m */,
 				3487ABA4220CEAA200A40E8D /* PipeViewController.h */,
 				3487ABA3220CEAA200A40E8D /* PipeViewController.m */,
 				3457454D2113B8D300059043 /* SubtitleViewController.h */,
@@ -211,7 +211,6 @@
 			files = (
 				343E67092107C27600F95E5B /* TabBarController.h in Headers */,
 				3487ABA6220CEAA300A40E8D /* PipeViewController.h in Headers */,
-				342900CC22DE2BCF0071B2E4 /* MobileFFmpegConfigTest.h in Headers */,
 				3457454B2113B8AD00059043 /* AudioViewController.h in Headers */,
 				3457454F2113B8D300059043 /* SubtitleViewController.h in Headers */,
 				343E66B9210789DE00F95E5B /* Constants.h in Headers */,
@@ -219,6 +218,7 @@
 				342900CD22DE2BCF0071B2E4 /* MediaInformationParserTest.h in Headers */,
 				343E66B5210784BD00F95E5B /* HttpsViewController.h in Headers */,
 				340FABBE2115A17600B33CE7 /* VidStabViewController.h in Headers */,
+				342900D222DE384C0071B2E4 /* MobileFFmpegTest.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -344,6 +344,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				342900D122DE384C0071B2E4 /* MobileFFmpegTest.m in Sources */,
 				3487ABA5220CEAA300A40E8D /* PipeViewController.m in Sources */,
 				34FAE21B209F7DDD005CE2AE /* VideoViewController.m in Sources */,
 				34FAE215209F7DDD005CE2AE /* AppDelegate.m in Sources */,
@@ -354,7 +355,6 @@
 				34FAE218209F7DDD005CE2AE /* CommandViewController.m in Sources */,
 				343E670A2107C27600F95E5B /* TabBarController.m in Sources */,
 				345745502113B8D300059043 /* SubtitleViewController.m in Sources */,
-				342900CE22DE2BCF0071B2E4 /* MobileFFmpegConfigTest.m in Sources */,
 				343E67062107AD0100F95E5B /* Util.m in Sources */,
 				3457454C2113B8AD00059043 /* AudioViewController.m in Sources */,
 				34BB547C2109D44800606B7C /* Constants.m in Sources */,

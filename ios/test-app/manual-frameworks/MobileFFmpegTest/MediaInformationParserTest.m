@@ -1,7 +1,7 @@
 //
-// MediaInformationParserTests.m
+// MediaInformationParserTest.m
 //
-// Copyright (c) 2019 Taner Sener
+// Copyright (c) 2018-2019 Taner Sener
 //
 // This file is part of MobileFFmpeg.
 //
@@ -972,9 +972,9 @@ void testMediaInformationRecording() {
 }
 
 /**
- * All parsing tests are initiated from this method
+ * All parser tests are initiated from this method
  */
-void runMediaInformationParserTests() {
+void testMediaInformationParser(void) {
 
     initTests();
 
@@ -1014,5 +1014,5 @@ void runMediaInformationParserTests() {
     testMediaInformationRecording();
     
     
-    NSLog(@"MediaInformationParserTests passed.");
+    NSLog(@"MediaInformationParserTest passed.");
 }

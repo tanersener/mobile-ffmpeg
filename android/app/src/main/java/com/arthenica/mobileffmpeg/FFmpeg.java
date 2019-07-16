@@ -210,7 +210,7 @@ public class FFmpeg {
      * <p>Parses the given command into arguments.
      *
      * @param command string command
-     * @return list of arguments
+     * @return array of arguments
      */
     static String[] parseArguments(final String command) {
         final List<String> argumentList = new ArrayList<>();
