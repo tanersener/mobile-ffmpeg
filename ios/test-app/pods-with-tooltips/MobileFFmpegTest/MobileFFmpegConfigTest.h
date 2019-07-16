@@ -1,7 +1,7 @@
 //
-// MediaInformationParserTests.h
+// MobileFFmpegConfigTest.h
 //
-// Copyright (c) 2018 Taner Sener
+// Copyright (c) 2019 Taner Sener
 //
 // This file is part of MobileFFmpeg.
 //
@@ -22,4 +22,4 @@
 /**
  * All parsing tests are initiated from this method
  */
-void runMediaInformationParserTests();
+void runMediaInformationParserTests(void);

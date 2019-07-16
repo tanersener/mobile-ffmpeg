@@ -23,6 +23,7 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * <p>Main class for FFmpeg operations. Provides {@link #execute(String...)} method to execute
@@ -103,12 +104,15 @@ public class FFmpeg {
 
     /**
      * <p>Synchronously executes FFmpeg command provided. Command is split into arguments using
-     * provided delimiter.
+     * provided delimiter character.
      *
      * @param command   FFmpeg command
-     * @param delimiter delimiter used between arguments
+     * @param delimiter delimiter used to split arguments
      * @return zero on successful execution, 255 on user cancel and non-zero on error
      * @since 3.0
+     * @deprecated argument splitting mechanism used in this method is pretty simple and prone to
+     * errors. Consider using a more advanced method like {@link #execute(String)} or
+     * {@link #execute(String[])}
      */
     public static int execute(final String command, final String delimiter) {
         return execute((command == null) ? new String[]{""} : command.split((delimiter == null) ? " " : delimiter));
@@ -122,7 +126,7 @@ public class FFmpeg {
      * @return zero on successful execution, 255 on user cancel and non-zero on error
      */
     public static int execute(final String command) {
-        return execute(command, " ");
+        return execute(parseArguments(command));
     }
 
     /**
@@ -200,6 +204,63 @@ public class FFmpeg {
      */
     public static String getBuildDate() {
         return Config.getNativeBuildDate();
+    }
+
+    /**
+     * <p>Parses the given command into arguments.
+     *
+     * @param command string command
+     * @return list of arguments
+     */
+    static String[] parseArguments(final String command) {
+        final List<String> argumentList = new ArrayList<>();
+        StringBuilder currentArgument = new StringBuilder();
+
+        boolean singleQuoteStarted = false;
+        boolean doubleQuoteStarted = false;
+
+        for (int i = 0; i < command.length(); i++) {
+            final Character previousChar;
+            if (i > 0) {
+                previousChar = command.charAt(i - 1);
+            } else {
+                previousChar = null;
+            }
+            final char currentChar = command.charAt(i);
+
+            if (currentChar == ' ') {
+                if (singleQuoteStarted || doubleQuoteStarted) {
+                    currentArgument.append(currentChar);
+                } else if (currentArgument.length() > 0) {
+                    argumentList.add(currentArgument.toString());
+                    currentArgument = new StringBuilder();
+                }
+            } else if (currentChar == '\'' && (previousChar == null || previousChar != '\\')) {
+                if (singleQuoteStarted) {
+                    singleQuoteStarted = false;
+                } else if (doubleQuoteStarted) {
+                    currentArgument.append(currentChar);
+                } else {
+                    singleQuoteStarted = true;
+                }
+            } else if (currentChar == '\"' && (previousChar == null || previousChar != '\\')) {
+                if (doubleQuoteStarted) {
+                    doubleQuoteStarted = false;
+                } else if (singleQuoteStarted) {
+                    currentArgument.append(currentChar);
+                } else {
+                    doubleQuoteStarted = true;
+                }
+            } else {
+                currentArgument.append(currentChar);
+            }
+        }
+
+        if (currentArgument.length() > 0) {
+            argumentList.add(currentArgument.toString());
+        }
+
+        return argumentList.toArray(new String[0]);
     }
 
 }
