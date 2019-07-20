@@ -115,7 +115,7 @@ Please remember that some parts of `FFmpeg` are licensed under the `GPL` and onl
 1. Add MobileFFmpeg dependency to your `build.gradle` in `mobile-ffmpeg-<package name>` format
     ```
     dependencies {
-        implementation 'com.arthenica:mobile-ffmpeg-min:4.2.2'
+        implementation 'com.arthenica:mobile-ffmpeg-full:4.2.2'
     }
     ```
 
@@ -193,12 +193,12 @@ Please remember that some parts of `FFmpeg` are licensed under the `GPL` and onl
 
     - iOS
     ```
-    pod 'mobile-ffmpeg-min', '~> 4.2.2'
+    pod 'mobile-ffmpeg-full', '~> 4.2.2'
     ```
 
     - tvOS
     ```
-    pod 'mobile-ffmpeg-tv-min', '~> 4.2.2'
+    pod 'mobile-ffmpeg-tv-full', '~> 4.2.2'
     ```
 
 2. Execute commands.
