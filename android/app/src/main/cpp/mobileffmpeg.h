@@ -124,4 +124,11 @@ JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_Config_getNativeBuildD
  */
 JNIEXPORT int JNICALL Java_com_arthenica_mobileffmpeg_Config_setNativeEnvironmentVariable(JNIEnv *env, jclass object, jstring variableName, jstring variableValue);
 
+/*
+ * Class:     com_arthenica_mobileffmpeg_Config
+ * Method:    getNativeLastCommandOutput
+ * Signature: ()Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_Config_getNativeLastCommandOutput(JNIEnv *env, jclass object);
+
 #endif /* MOBILE_FFMPEG_H */

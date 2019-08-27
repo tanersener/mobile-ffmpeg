@@ -18,6 +18,10 @@
  */
 
 /*
+ * CHANGES 08.2019
+ * --------------------------------------------------------
+ * - lastCommandOutput methods introduced
+ *
  * CHANGES 04.2019
  * --------------------------------------------------------
  * - setNativeEnvironmentVariable method added
@@ -72,6 +76,10 @@ struct CallbackData {
 pthread_mutex_t lockMutex;
 pthread_mutex_t monitorMutex;
 pthread_cond_t monitorCondition;
+
+/** Last command output variables */
+pthread_mutex_t logMutex;
+static char *lastCommandOutput;
 
 pthread_t callbackThread;
 int redirectionEnabled;
@@ -203,6 +211,17 @@ void monitorInit() {
     pthread_condattr_destroy(&cattributes);
 }
 
+void logInit() {
+    pthread_mutexattr_t attributes;
+    pthread_mutexattr_init(&attributes);
+    pthread_mutexattr_settype(&attributes, PTHREAD_MUTEX_RECURSIVE_NP);
+
+    pthread_mutex_init(&logMutex, &attributes);
+    pthread_mutexattr_destroy(&attributes);
+
+    lastCommandOutput = NULL;
+}
+
 void mutexUnInit() {
     pthread_mutex_destroy(&lockMutex);
 }
@@ -212,12 +231,70 @@ void monitorUnInit() {
     pthread_cond_destroy(&monitorCondition);
 }
 
+void logUnInit() {
+    pthread_mutex_destroy(&logMutex);
+}
+
 void mutexLock() {
     pthread_mutex_lock(&lockMutex);
 }
 
+void lastCommandOutputLock() {
+    pthread_mutex_lock(&logMutex);
+}
+
 void mutexUnlock() {
     pthread_mutex_unlock(&lockMutex);
+}
+
+void lastCommandOutputUnlock() {
+    pthread_mutex_unlock(&logMutex);
+}
+
+void clearLastCommandOutput() {
+    lastCommandOutputLock();
+
+    if (lastCommandOutput != NULL) {
+        av_freep(lastCommandOutput);
+        lastCommandOutput = NULL;
+    }
+
+    lastCommandOutputUnlock();
+}
+
+void appendLastCommandOutput(const char *logMessage) {
+    size_t length = 0;
+    char *tempLastCommandOutput = NULL;
+    size_t logMessageLength = strlen(logMessage);
+
+    if (logMessageLength <= 0) {
+        return;
+    }
+
+    lastCommandOutputLock();
+
+    if (lastCommandOutput == NULL) {
+        length = logMessageLength + 1;
+
+        lastCommandOutput = (char*)malloc(length);
+        memcpy(lastCommandOutput, logMessage, length);
+    } else {
+        size_t length1 = strlen(lastCommandOutput);
+        length = length1 + logMessageLength + 1;
+
+        char *newLastCommandOutput = (char*)malloc(length);
+        memcpy(newLastCommandOutput, lastCommandOutput, length1);
+        memcpy(newLastCommandOutput + length1, logMessage, logMessageLength + 1);
+
+        tempLastCommandOutput = lastCommandOutput;
+        lastCommandOutput = newLastCommandOutput;
+    }
+
+    lastCommandOutputUnlock();
+
+    if (tempLastCommandOutput != NULL) {
+        av_freep(tempLastCommandOutput);
+    }
 }
 
 void monitorWait(int milliSeconds) {
@@ -385,12 +462,19 @@ void mobileffmpeg_log_callback_function(void *ptr, int level, const char* format
 
     avutil_log_sanitize(part[0].str);
     logCallbackDataAdd(level, part[0].str);
+    appendLastCommandOutput(part[0].str);
+
     avutil_log_sanitize(part[1].str);
     logCallbackDataAdd(level, part[1].str);
+    appendLastCommandOutput(part[1].str);
+
     avutil_log_sanitize(part[2].str);
     logCallbackDataAdd(level, part[2].str);
+    appendLastCommandOutput(part[2].str);
+
     avutil_log_sanitize(part[3].str);
     logCallbackDataAdd(level, part[3].str);
+    appendLastCommandOutput(part[3].str);
 
     av_bprint_finalize(part+3, NULL);
 }
@@ -528,6 +612,7 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
 
     mutexInit();
     monitorInit();
+    logInit();
 
     return JNI_VERSION_1_6;
 }
@@ -664,6 +749,9 @@ JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_Config_nativeExecute(JNIE
         }
     }
 
+    // LAST COMMAND OUTPUT SHOULD BE CLEARED BEFORE STARTING A NEW EXECUTION
+    clearLastCommandOutput();
+
     // RUN
     int retCode = execute(argumentCount, argv);
 
@@ -732,4 +820,15 @@ JNIEXPORT int JNICALL Java_com_arthenica_mobileffmpeg_Config_setNativeEnvironmen
     const char *variableValueString = (*env)->GetStringUTFChars(env, variableValue, 0);
 
     return setenv(variableNameString, variableValueString, 1);
+}
+
+/**
+ * Returns log output of the last executed command natively.
+ *
+ * @param env pointer to native method interface
+ * @param object reference to the class on which this method is invoked
+ * @return output of the last executed command
+ */
+JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_Config_getNativeLastCommandOutput(JNIEnv *env, jclass object) {
+    return (*env)->NewStringUTF(env, lastCommandOutput);
 }

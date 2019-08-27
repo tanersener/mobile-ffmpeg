@@ -44,8 +44,6 @@ public class FFmpeg {
 
     private static int lastReturnCode = 0;
 
-    private static StringBuffer lastCommandOutput = new StringBuffer();
-
     static {
         AbiDetect.class.getName();
         Config.class.getName();
@@ -55,15 +53,6 @@ public class FFmpeg {
      * Default constructor hidden.
      */
     private FFmpeg() {
-    }
-
-    /**
-     * <p>Appends given log output to the last command output.
-     *
-     * @param output log output
-     */
-    static void appendCommandOutput(final String output) {
-        lastCommandOutput.append(output);
     }
 
     /**
@@ -95,8 +84,6 @@ public class FFmpeg {
      * @return zero on successful execution, 255 on user cancel and non-zero on error
      */
     public static int execute(final String[] arguments) {
-        lastCommandOutput = new StringBuffer();
-
         lastReturnCode = Config.nativeExecute(arguments);
 
         return lastReturnCode;
@@ -148,14 +135,14 @@ public class FFmpeg {
     }
 
     /**
-     * <p>Returns log output of last executed command. Please note that disabling redirection using
-     * {@link Config#disableRedirection()} method also disables this functionality.
+     * <p>Returns log output of the last executed command. Please note that disabling redirection
+     * using {@link Config#disableRedirection()} method also disables this functionality.
      *
-     * @return output of last executed command
+     * @return output of the last executed command
      * @since 3.0
      */
     public static String getLastCommandOutput() {
-        return lastCommandOutput.toString();
+        return Config.getNativeLastCommandOutput();
     }
 
     /**

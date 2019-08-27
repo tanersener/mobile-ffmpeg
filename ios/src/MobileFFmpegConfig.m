@@ -175,6 +175,9 @@ void logCallbackDataAdd(int level, NSString *logData) {
     [callbackDataArray addObject:callbackData];
     [lock unlock];
 
+    // BUILDING LAST COMMAND OUTPUT AS SOON AS POSSIBLE
+    [lastCommandOutput appendString:logData];
+
     callbackNotify();
 }
 
@@ -281,10 +284,6 @@ void callbackBlockFunction() {
 
                             // LOG NEITHER PRINTED NOR FORWARDED
                         } else {
-
-                            // ALWAYS REDIRECT COMMAND OUTPUT
-                            [lastCommandOutput appendString:[callbackData getLogData]];
-
                             if (logDelegate != nil) {
 
                                 // FORWARD LOG TO DELEGATE
