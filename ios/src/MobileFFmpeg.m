@@ -82,13 +82,13 @@ extern int mobileffmpeg_system_execute(NSArray *arguments, NSMutableArray *comma
 + (int)executeWithArguments: (NSArray*)arguments {
     lastCommandOutput = [[NSMutableString alloc] init];
 
-    char **commandCharPArray = (char **)malloc(sizeof(char*) * ([arguments count] + 1));
+    char **commandCharPArray = (char **)av_malloc(sizeof(char*) * ([arguments count] + 1));
 
     /* PRESERVING CALLING FORMAT
      *
      * ffmpeg <arguments>
      */
-    commandCharPArray[0] = (char *)malloc(sizeof(char) * ([LIB_NAME length] + 1));
+    commandCharPArray[0] = (char *)av_malloc(sizeof(char) * ([LIB_NAME length] + 1));
     strcpy(commandCharPArray[0], [LIB_NAME UTF8String]);
 
     for (int i=0; i < [arguments count]; i++) {
@@ -100,8 +100,8 @@ extern int mobileffmpeg_system_execute(NSArray *arguments, NSMutableArray *comma
     lastReturnCode = execute(([arguments count] + 1), commandCharPArray);
 
     // CLEANUP
-    free(commandCharPArray[0]);
-    free(commandCharPArray);
+    av_free(commandCharPArray[0]);
+    av_free(commandCharPArray);
 
     return lastReturnCode;
 }
