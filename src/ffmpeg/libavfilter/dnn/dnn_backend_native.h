@@ -24,13 +24,13 @@
  */
 
 
-#ifndef AVFILTER_DNN_BACKEND_NATIVE_H
-#define AVFILTER_DNN_BACKEND_NATIVE_H
+#ifndef AVFILTER_DNN_DNN_BACKEND_NATIVE_H
+#define AVFILTER_DNN_DNN_BACKEND_NATIVE_H
 
-#include "dnn_interface.h"
+#include "../dnn_interface.h"
 #include "libavformat/avio.h"
 
-typedef enum {INPUT, CONV, DEPTH_TO_SPACE} DNNLayerType;
+typedef enum {INPUT, CONV, DEPTH_TO_SPACE, MIRROR_PAD} DNNLayerType;
 
 typedef enum {RELU, TANH, SIGMOID, NONE, LEAKY_RELU} DNNActivationFunc;
 

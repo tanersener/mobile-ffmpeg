@@ -34,6 +34,7 @@
 #include "libavutil/stereo3d.h"
 #include "libavutil/timestamp.h"
 #include "libavutil/timecode.h"
+#include "libavutil/mastering_display_metadata.h"
 
 #include "avfilter.h"
 #include "internal.h"
@@ -61,7 +62,7 @@ static void dump_spherical(AVFilterContext *ctx, AVFrame *frame, AVFrameSideData
 
     av_log(ctx, AV_LOG_INFO, "spherical information: ");
     if (sd->size < sizeof(*spherical)) {
-        av_log(ctx, AV_LOG_INFO, "invalid data");
+        av_log(ctx, AV_LOG_ERROR, "invalid data");
         return;
     }
 
@@ -99,7 +100,7 @@ static void dump_stereo3d(AVFilterContext *ctx, AVFrameSideData *sd)
 
     av_log(ctx, AV_LOG_INFO, "stereoscopic information: ");
     if (sd->size < sizeof(*stereo)) {
-        av_log(ctx, AV_LOG_INFO, "invalid data");
+        av_log(ctx, AV_LOG_ERROR, "invalid data");
         return;
     }
 
@@ -109,6 +110,63 @@ static void dump_stereo3d(AVFilterContext *ctx, AVFrameSideData *sd)
 
     if (stereo->flags & AV_STEREO3D_FLAG_INVERT)
         av_log(ctx, AV_LOG_INFO, " (inverted)");
+}
+
+static void dump_roi(AVFilterContext *ctx, AVFrameSideData *sd)
+{
+    int nb_rois;
+    const AVRegionOfInterest *roi;
+    uint32_t roi_size;
+
+    roi = (const AVRegionOfInterest *)sd->data;
+    roi_size = roi->self_size;
+    if (!roi_size || sd->size % roi_size != 0) {
+        av_log(ctx, AV_LOG_ERROR, "Invalid AVRegionOfInterest.self_size.");
+        return;
+    }
+    nb_rois = sd->size / roi_size;
+
+    av_log(ctx, AV_LOG_INFO, "Regions Of Interest(RoI) information: ");
+    for (int i = 0; i < nb_rois; i++) {
+        roi = (const AVRegionOfInterest *)(sd->data + roi_size * i);
+        av_log(ctx, AV_LOG_INFO, "index: %d, region: (%d, %d)/(%d, %d), qp offset: %d/%d.\n",
+               i, roi->left, roi->top, roi->right, roi->bottom, roi->qoffset.num, roi->qoffset.den);
+    }
+}
+
+static void dump_mastering_display(AVFilterContext *ctx, AVFrameSideData *sd)
+{
+    AVMasteringDisplayMetadata *mastering_display;
+
+    av_log(ctx, AV_LOG_INFO, "mastering display: ");
+    if (sd->size < sizeof(*mastering_display)) {
+        av_log(ctx, AV_LOG_ERROR, "invalid data");
+        return;
+    }
+
+    mastering_display = (AVMasteringDisplayMetadata *)sd->data;
+
+    av_log(ctx, AV_LOG_INFO, "has_primaries:%d has_luminance:%d "
+           "r(%5.4f,%5.4f) g(%5.4f,%5.4f) b(%5.4f %5.4f) wp(%5.4f, %5.4f) "
+           "min_luminance=%f, max_luminance=%f",
+           mastering_display->has_primaries, mastering_display->has_luminance,
+           av_q2d(mastering_display->display_primaries[0][0]),
+           av_q2d(mastering_display->display_primaries[0][1]),
+           av_q2d(mastering_display->display_primaries[1][0]),
+           av_q2d(mastering_display->display_primaries[1][1]),
+           av_q2d(mastering_display->display_primaries[2][0]),
+           av_q2d(mastering_display->display_primaries[2][1]),
+           av_q2d(mastering_display->white_point[0]), av_q2d(mastering_display->white_point[1]),
+           av_q2d(mastering_display->min_luminance), av_q2d(mastering_display->max_luminance));
+}
+
+static void dump_content_light_metadata(AVFilterContext *ctx, AVFrameSideData *sd)
+{
+    AVContentLightMetadata* metadata = (AVContentLightMetadata*)sd->data;
+
+    av_log(ctx, AV_LOG_INFO, "Content Light Level information: "
+           "MaxCLL=%d, MaxFALL=%d",
+           metadata->MaxCLL, metadata->MaxFALL);
 }
 
 static void dump_color_property(AVFilterContext *ctx, AVFrame *frame)
@@ -245,6 +303,15 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *frame)
             break;
         case AV_FRAME_DATA_AFD:
             av_log(ctx, AV_LOG_INFO, "afd: value of %"PRIu8, sd->data[0]);
+            break;
+        case AV_FRAME_DATA_REGIONS_OF_INTEREST:
+            dump_roi(ctx, sd);
+            break;
+        case AV_FRAME_DATA_MASTERING_DISPLAY_METADATA:
+            dump_mastering_display(ctx, sd);
+            break;
+        case AV_FRAME_DATA_CONTENT_LIGHT_LEVEL:
+            dump_content_light_metadata(ctx, sd);
             break;
         default:
             av_log(ctx, AV_LOG_WARNING, "unknown side data type %d (%d bytes)",

@@ -26,9 +26,8 @@ OBJS-$(HAVE_THREADS)                         += pthread.o
 
 # subsystems
 OBJS-$(CONFIG_QSVVPP)                        += qsvvpp.o
-DNN-OBJS-$(CONFIG_LIBTENSORFLOW)             += dnn_backend_tf.o
-OBJS-$(CONFIG_DNN)                           += dnn_interface.o dnn_backend_native.o $(DNN-OBJS-yes)
 OBJS-$(CONFIG_SCENE_SAD)                     += scene_sad.o
+include $(SRC_PATH)/libavfilter/dnn/Makefile
 
 # audio filters
 OBJS-$(CONFIG_ABENCH_FILTER)                 += f_bench.o
@@ -101,6 +100,7 @@ OBJS-$(CONFIG_COMPENSATIONDELAY_FILTER)      += af_compensationdelay.o
 OBJS-$(CONFIG_CROSSFEED_FILTER)              += af_crossfeed.o
 OBJS-$(CONFIG_CRYSTALIZER_FILTER)            += af_crystalizer.o
 OBJS-$(CONFIG_DCSHIFT_FILTER)                += af_dcshift.o
+OBJS-$(CONFIG_DEESSER_FILTER)                += af_deesser.o
 OBJS-$(CONFIG_DRMETER_FILTER)                += af_drmeter.o
 OBJS-$(CONFIG_DYNAUDNORM_FILTER)             += af_dynaudnorm.o
 OBJS-$(CONFIG_EARWAX_FILTER)                 += af_earwax.o
@@ -151,6 +151,7 @@ OBJS-$(CONFIG_SINE_FILTER)                   += asrc_sine.o
 OBJS-$(CONFIG_ANULLSINK_FILTER)              += asink_anullsink.o
 
 # video filters
+OBJS-$(CONFIG_ADDROI_FILTER)                 += vf_addroi.o
 OBJS-$(CONFIG_ALPHAEXTRACT_FILTER)           += vf_extractplanes.o
 OBJS-$(CONFIG_ALPHAMERGE_FILTER)             += vf_alphamerge.o
 OBJS-$(CONFIG_AMPLIFY_FILTER)                += vf_amplify.o
@@ -210,6 +211,8 @@ OBJS-$(CONFIG_DEINTERLACE_VAAPI_FILTER)      += vf_deinterlace_vaapi.o vaapi_vpp
 OBJS-$(CONFIG_DEJUDDER_FILTER)               += vf_dejudder.o
 OBJS-$(CONFIG_DELOGO_FILTER)                 += vf_delogo.o
 OBJS-$(CONFIG_DENOISE_VAAPI_FILTER)          += vf_misc_vaapi.o vaapi_vpp.o
+OBJS-$(CONFIG_DESHAKE_OPENCL_FILTER)        += vf_deshake_opencl.o opencl.o \
+                                                opencl/deshake.o
 OBJS-$(CONFIG_DESHAKE_FILTER)                += vf_deshake.o
 OBJS-$(CONFIG_DESPILL_FILTER)                += vf_despill.o
 OBJS-$(CONFIG_DETELECINE_FILTER)             += vf_detelecine.o
@@ -409,6 +412,7 @@ OBJS-$(CONFIG_UNSHARP_FILTER)                += vf_unsharp.o
 OBJS-$(CONFIG_UNSHARP_OPENCL_FILTER)         += vf_unsharp_opencl.o opencl.o \
                                                 opencl/unsharp.o
 OBJS-$(CONFIG_USPP_FILTER)                   += vf_uspp.o
+OBJS-$(CONFIG_V360_FILTER)                   += vf_v360.o
 OBJS-$(CONFIG_VAGUEDENOISER_FILTER)          += vf_vaguedenoiser.o
 OBJS-$(CONFIG_VECTORSCOPE_FILTER)            += vf_vectorscope.o
 OBJS-$(CONFIG_VFLIP_FILTER)                  += vf_vflip.o

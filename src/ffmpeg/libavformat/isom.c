@@ -290,6 +290,7 @@ const AVCodecTag ff_codec_movvideo_tags[] = {
     { AV_CODEC_ID_MAGICYUV, MKTAG('M', '0', 'R', 'A') },
     { AV_CODEC_ID_MAGICYUV, MKTAG('M', '0', 'R', 'G') },
     { AV_CODEC_ID_MAGICYUV, MKTAG('M', '0', 'Y', '2') },
+    { AV_CODEC_ID_MAGICYUV, MKTAG('M', '0', 'Y', '4') },
     { AV_CODEC_ID_MAGICYUV, MKTAG('M', '8', 'R', 'G') },
     { AV_CODEC_ID_MAGICYUV, MKTAG('M', '8', 'R', 'A') },
     { AV_CODEC_ID_MAGICYUV, MKTAG('M', '8', 'G', '0') },
@@ -368,6 +369,7 @@ const AVCodecTag ff_codec_movaudio_tags[] = {
     { AV_CODEC_ID_EVRC,            MKTAG('s', 'e', 'v', 'c') }, /* 3GPP2 */
     { AV_CODEC_ID_SMV,             MKTAG('s', 's', 'm', 'v') }, /* 3GPP2 */
     { AV_CODEC_ID_FLAC,            MKTAG('f', 'L', 'a', 'C') }, /* nonstandard */
+    { AV_CODEC_ID_TRUEHD,          MKTAG('m', 'l', 'p', 'a') }, /* mp4ra.org */
     { AV_CODEC_ID_OPUS,            MKTAG('O', 'p', 'u', 's') }, /* mp4ra.org */
     { AV_CODEC_ID_NONE, 0 },
 };

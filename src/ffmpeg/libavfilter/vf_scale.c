@@ -86,6 +86,7 @@ typedef struct ScaleContext {
     int in_v_chr_pos;
 
     int force_original_aspect_ratio;
+    int force_divisible_by;
 
     int nb_slices;
 
@@ -237,7 +238,8 @@ static int config_props(AVFilterLink *outlink)
         goto fail;
 
     /* Note that force_original_aspect_ratio may overwrite the previous set
-     * dimensions so that it is not divisible by the set factors anymore. */
+     * dimensions so that it is not divisible by the set factors anymore
+     * unless force_divisible_by is defined as well */
     if (scale->force_original_aspect_ratio) {
         int tmp_w = av_rescale(h, inlink->w, inlink->h);
         int tmp_h = av_rescale(w, inlink->h, inlink->w);
@@ -245,9 +247,19 @@ static int config_props(AVFilterLink *outlink)
         if (scale->force_original_aspect_ratio == 1) {
              w = FFMIN(tmp_w, w);
              h = FFMIN(tmp_h, h);
+             if (scale->force_divisible_by > 1) {
+                 // round down
+                 w = w / scale->force_divisible_by * scale->force_divisible_by;
+                 h = h / scale->force_divisible_by * scale->force_divisible_by;
+             }
         } else {
              w = FFMAX(tmp_w, w);
              h = FFMAX(tmp_h, h);
+             if (scale->force_divisible_by > 1) {
+                 // round up
+                 w = (w + scale->force_divisible_by - 1) / scale->force_divisible_by * scale->force_divisible_by;
+                 h = (h + scale->force_divisible_by - 1) / scale->force_divisible_by * scale->force_divisible_by;
+             }
         }
     }
 
@@ -572,8 +584,16 @@ static const AVOption scale_options[] = {
     { "interl", "set interlacing", OFFSET(interlaced), AV_OPT_TYPE_BOOL, {.i64 = 0 }, -1, 1, FLAGS },
     { "size",   "set video size",          OFFSET(size_str), AV_OPT_TYPE_STRING, {.str = NULL}, 0, FLAGS },
     { "s",      "set video size",          OFFSET(size_str), AV_OPT_TYPE_STRING, {.str = NULL}, 0, FLAGS },
-    {  "in_color_matrix", "set input YCbCr type",   OFFSET(in_color_matrix),  AV_OPT_TYPE_STRING, { .str = "auto" }, .flags = FLAGS },
-    { "out_color_matrix", "set output YCbCr type",  OFFSET(out_color_matrix), AV_OPT_TYPE_STRING, { .str = NULL }, .flags = FLAGS },
+    {  "in_color_matrix", "set input YCbCr type",   OFFSET(in_color_matrix),  AV_OPT_TYPE_STRING, { .str = "auto" }, .flags = FLAGS, "color" },
+    { "out_color_matrix", "set output YCbCr type",  OFFSET(out_color_matrix), AV_OPT_TYPE_STRING, { .str = NULL }, .flags = FLAGS,  "color"},
+        { "auto",        NULL, 0, AV_OPT_TYPE_CONST, { .str = "auto" },      0, 0, FLAGS, "color" },
+        { "bt601",       NULL, 0, AV_OPT_TYPE_CONST, { .str = "bt601" },     0, 0, FLAGS, "color" },
+        { "bt470",       NULL, 0, AV_OPT_TYPE_CONST, { .str = "bt470" },     0, 0, FLAGS, "color" },
+        { "smpte170m",   NULL, 0, AV_OPT_TYPE_CONST, { .str = "smpte170m" }, 0, 0, FLAGS, "color" },
+        { "bt709",       NULL, 0, AV_OPT_TYPE_CONST, { .str = "bt709" },     0, 0, FLAGS, "color" },
+        { "fcc",         NULL, 0, AV_OPT_TYPE_CONST, { .str = "fcc" },       0, 0, FLAGS, "color" },
+        { "smpte240m",   NULL, 0, AV_OPT_TYPE_CONST, { .str = "smpte240m" }, 0, 0, FLAGS, "color" },
+        { "bt2020",      NULL, 0, AV_OPT_TYPE_CONST, { .str = "bt2020" },    0, 0, FLAGS, "color" },
     {  "in_range", "set input color range",  OFFSET( in_range), AV_OPT_TYPE_INT, {.i64 = AVCOL_RANGE_UNSPECIFIED }, 0, 2, FLAGS, "range" },
     { "out_range", "set output color range", OFFSET(out_range), AV_OPT_TYPE_INT, {.i64 = AVCOL_RANGE_UNSPECIFIED }, 0, 2, FLAGS, "range" },
     { "auto",   NULL, 0, AV_OPT_TYPE_CONST, {.i64 = AVCOL_RANGE_UNSPECIFIED }, 0, 0, FLAGS, "range" },
@@ -592,6 +612,7 @@ static const AVOption scale_options[] = {
     { "disable",  NULL, 0, AV_OPT_TYPE_CONST, {.i64 = 0 }, 0, 0, FLAGS, "force_oar" },
     { "decrease", NULL, 0, AV_OPT_TYPE_CONST, {.i64 = 1 }, 0, 0, FLAGS, "force_oar" },
     { "increase", NULL, 0, AV_OPT_TYPE_CONST, {.i64 = 2 }, 0, 0, FLAGS, "force_oar" },
+    { "force_divisible_by", "enforce that the output resolution is divisible by a defined integer when force_original_aspect_ratio is used", OFFSET(force_divisible_by), AV_OPT_TYPE_INT, { .i64 = 1}, 1, 256, FLAGS },
     { "param0", "Scaler param 0",             OFFSET(param[0]),  AV_OPT_TYPE_DOUBLE, { .dbl = SWS_PARAM_DEFAULT  }, INT_MIN, INT_MAX, FLAGS },
     { "param1", "Scaler param 1",             OFFSET(param[1]),  AV_OPT_TYPE_DOUBLE, { .dbl = SWS_PARAM_DEFAULT  }, INT_MIN, INT_MAX, FLAGS },
     { "nb_slices", "set the number of slices (debug purpose only)", OFFSET(nb_slices), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, INT_MAX, FLAGS },

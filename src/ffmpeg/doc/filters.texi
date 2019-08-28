@@ -1124,25 +1124,8 @@ Return the value of imaginary part of frequency bin at location (@var{bin},@var{
 @end table
 
 @item win_size
-Set window size.
-
-It accepts the following values:
-@table @samp
-@item w16
-@item w32
-@item w64
-@item w128
-@item w256
-@item w512
-@item w1024
-@item w2048
-@item w4096
-@item w8192
-@item w16384
-@item w32768
-@item w65536
-@end table
-Default is @code{w4096}
+Set window size. Allowed range is from 16 to 131072.
+Default is @code{4096}
 
 @item win_func
 Set window function. Default is @code{hann}.
@@ -1409,8 +1392,12 @@ single-precision floating-point
 16-bit integers
 @end table
 
+@item mix
+How much to use filtered signal in output. Default is 1.
+Range is between 0 and 1.
+
 @item response
-Show IR frequency response, magnitude and phase in additional video stream.
+Show IR frequency response, magnitude(magenta), phase(green) and group delay(yellow) in additional video stream.
 By default it is disabled.
 
 @item channel
@@ -1523,6 +1510,10 @@ kHz
 @item width, w
 Specify the band-width of a filter in width_type units.
 
+@item mix, m
+How much to use filtered signal in output. Default is 1.
+Range is between 0 and 1.
+
 @item channels, c
 Specify which channels to filter, by default all available are filtered.
 @end table
@@ -1542,6 +1533,10 @@ Syntax for the command is : "@var{width_type}"
 @item width, w
 Change allpass width.
 Syntax for the command is : "@var{width}"
+
+@item mix, m
+Change allpass mix.
+Syntax for the command is : "@var{mix}"
 @end table
 
 @section aloop
@@ -2460,6 +2455,10 @@ kHz
 @item width, w
 Specify the band-width of a filter in width_type units.
 
+@item mix, m
+How much to use filtered signal in output. Default is 1.
+Range is between 0 and 1.
+
 @item channels, c
 Specify which channels to filter, by default all available are filtered.
 @end table
@@ -2479,6 +2478,10 @@ Syntax for the command is : "@var{width_type}"
 @item width, w
 Change bandpass width.
 Syntax for the command is : "@var{width}"
+
+@item mix, m
+Change bandpass mix.
+Syntax for the command is : "@var{mix}"
 @end table
 
 @section bandreject
@@ -2511,6 +2514,10 @@ kHz
 @item width, w
 Specify the band-width of a filter in width_type units.
 
+@item mix, m
+How much to use filtered signal in output. Default is 1.
+Range is between 0 and 1.
+
 @item channels, c
 Specify which channels to filter, by default all available are filtered.
 @end table
@@ -2530,6 +2537,10 @@ Syntax for the command is : "@var{width_type}"
 @item width, w
 Change bandreject width.
 Syntax for the command is : "@var{width}"
+
+@item mix, m
+Change bandreject mix.
+Syntax for the command is : "@var{mix}"
 @end table
 
 @section bass, lowshelf
@@ -2569,6 +2580,10 @@ kHz
 @item width, w
 Determine how steep is the filter's shelf transition.
 
+@item mix, m
+How much to use filtered signal in output. Default is 1.
+Range is between 0 and 1.
+
 @item channels, c
 Specify which channels to filter, by default all available are filtered.
 @end table
@@ -2592,6 +2607,10 @@ Syntax for the command is : "@var{width}"
 @item gain, g
 Change bass gain.
 Syntax for the command is : "@var{gain}"
+
+@item mix, m
+Change bass mix.
+Syntax for the command is : "@var{mix}"
 @end table
 
 @section biquad
@@ -2614,6 +2633,10 @@ This filter supports the following commands:
 @item b2
 Change biquad parameter.
 Syntax for the command is : "@var{value}"
+
+@item mix, m
+How much to use filtered signal in output. Default is 1.
+Range is between 0 and 1.
 @end table
 
 @section bs2b
@@ -3045,6 +3068,42 @@ Optional. It should have a value much less than 1 (e.g. 0.05 or 0.02) and is
 used to prevent clipping.
 @end table
 
+@section deesser
+
+Apply de-essing to the audio samples.
+
+@table @option
+@item i
+Set intensity for triggering de-essing. Allowed range is from 0 to 1.
+Default is 0.
+
+@item m
+Set amount of ducking on treble part of sound. Allowed range is from 0 to 1.
+Default is 0.5.
+
+@item f
+How much of original frequency content to keep when de-essing. Allowed range is from 0 to 1.
+Default is 0.5.
+
+@item s
+Set the output mode.
+
+It accepts the following values:
+@table @option
+@item i
+Pass input unchanged.
+
+@item o
+Pass ess filtered out.
+
+@item e
+Pass only ess.
+
+Default value is @var{o}.
+@end table
+
+@end table
+
 @section drmeter
 Measure audio dynamic range.
 
@@ -3076,7 +3135,7 @@ this goal *without* applying "dynamic range compressing". It will retain 100%
 of the dynamic range *within* each section of the audio file.
 
 @table @option
-@item f
+@item framelen, f
 Set the frame length in milliseconds. In range from 10 to 8000 milliseconds.
 Default is 500 milliseconds.
 The Dynamic Audio Normalizer processes the input audio in small chunks,
@@ -3091,7 +3150,7 @@ been found to give good results with most files.
 Note that the exact frame length, in number of samples, will be determined
 automatically, based on the sampling rate of the individual input audio file.
 
-@item g
+@item gausssize, g
 Set the Gaussian filter window size. In range from 3 to 301, must be odd
 number. Default is 31.
 Probably the most important parameter of the Dynamic Audio Normalizer is the
@@ -3108,7 +3167,7 @@ Normalizer will behave like a "traditional" normalization filter. On the
 contrary, the more you decrease this value, the more the Dynamic Audio
 Normalizer will behave like a dynamic range compressor.
 
-@item p
+@item peak, p
 Set the target peak value. This specifies the highest permissible magnitude
 level for the normalized audio input. This filter will try to approach the
 target peak magnitude as closely as possible, but at the same time it also
@@ -3117,7 +3176,7 @@ A frame's maximum local gain factor is imposed directly by the target peak
 magnitude. The default value is 0.95 and thus leaves a headroom of 5%*.
 It is not recommended to go above this value.
 
-@item m
+@item maxgain, m
 Set the maximum gain factor. In range from 1.0 to 100.0. Default is 10.0.
 The Dynamic Audio Normalizer determines the maximum possible (local) gain
 factor for each input frame, i.e. the maximum gain factor that does not
@@ -3135,7 +3194,7 @@ Instead, a "sigmoid" threshold function will be applied. This way, the
 gain factors will smoothly approach the threshold value, but never exceed that
 value.
 
-@item r
+@item targetrms, r
 Set the target RMS. In range from 0.0 to 1.0. Default is 0.0 - disabled.
 By default, the Dynamic Audio Normalizer performs "peak" normalization.
 This means that the maximum local gain factor for each frame is defined
@@ -3153,7 +3212,7 @@ factor is defined as the factor that would result in exactly that RMS value.
 Note, however, that the maximum local gain factor is still restricted by the
 frame's highest magnitude sample, in order to prevent clipping.
 
-@item n
+@item coupling, n
 Enable channels coupling. By default is enabled.
 By default, the Dynamic Audio Normalizer will amplify all channels by the same
 amount. This means the same gain factor will be applied to all channels, i.e.
@@ -3165,7 +3224,7 @@ the gain factor will be determined independently for each channel, depending
 only on the individual channel's highest magnitude sample. This allows for
 harmonizing the volume of the different channels.
 
-@item c
+@item correctdc, c
 Enable DC bias correction. By default is disabled.
 An audio signal (in the time domain) is a sequence of sample values.
 In the Dynamic Audio Normalizer these sample values are represented in the
@@ -3184,7 +3243,7 @@ are centered around 0.0 again. Also, in order to avoid "gaps" at the frame
 boundaries, the DC correction offset values will be interpolated smoothly
 between neighbouring frames.
 
-@item b
+@item altboundary, b
 Enable alternative boundary mode. By default is disabled.
 The Dynamic Audio Normalizer takes into account a certain neighbourhood
 around each frame. This includes the preceding frames as well as the
@@ -3199,7 +3258,7 @@ to deal with this situation. The default boundary mode assumes a gain factor
 of exactly 1.0 for the missing frames, resulting in a smooth "fade in" and
 "fade out" at the beginning and at the end of the input, respectively.
 
-@item s
+@item compress, s
 Set the compress factor. In range from 0.0 to 30.0. Default is 0.0.
 By default, the Dynamic Audio Normalizer does not apply "traditional"
 compression. This means that signal peaks will not be pruned and thus the
@@ -3267,6 +3326,10 @@ Specify the band-width of a filter in width_type units.
 Set the required gain or attenuation in dB.
 Beware of clipping when using a positive gain.
 
+@item mix, m
+How much to use filtered signal in output. Default is 1.
+Range is between 0 and 1.
+
 @item channels, c
 Specify which channels to filter, by default all available are filtered.
 @end table
@@ -3305,6 +3368,10 @@ Syntax for the command is : "@var{width}"
 @item gain, g
 Change equalizer gain.
 Syntax for the command is : "@var{gain}"
+
+@item mix, m
+Change equalizer mix.
+Syntax for the command is : "@var{mix}"
 @end table
 
 @section extrastereo
@@ -3728,6 +3795,10 @@ Specify the band-width of a filter in width_type units.
 Applies only to double-pole filter.
 The default is 0.707q and gives a Butterworth response.
 
+@item mix, m
+How much to use filtered signal in output. Default is 1.
+Range is between 0 and 1.
+
 @item channels, c
 Specify which channels to filter, by default all available are filtered.
 @end table
@@ -3747,6 +3818,10 @@ Syntax for the command is : "@var{width_type}"
 @item width, w
 Change highpass width.
 Syntax for the command is : "@var{width}"
+
+@item mix, m
+Change highpass mix.
+Syntax for the command is : "@var{mix}"
 @end table
 
 @section join
@@ -4036,6 +4111,10 @@ Specify the band-width of a filter in width_type units.
 Applies only to double-pole filter.
 The default is 0.707q and gives a Butterworth response.
 
+@item mix, m
+How much to use filtered signal in output. Default is 1.
+Range is between 0 and 1.
+
 @item channels, c
 Specify which channels to filter, by default all available are filtered.
 @end table
@@ -4064,6 +4143,10 @@ Syntax for the command is : "@var{width_type}"
 @item width, w
 Change lowpass width.
 Syntax for the command is : "@var{width}"
+
+@item mix, m
+Change lowpass mix.
+Syntax for the command is : "@var{mix}"
 @end table
 
 @section lv2
@@ -5104,6 +5187,10 @@ kHz
 @item width, w
 Determine how steep is the filter's shelf transition.
 
+@item mix, m
+How much to use filtered signal in output. Default is 1.
+Range is between 0 and 1.
+
 @item channels, c
 Specify which channels to filter, by default all available are filtered.
 @end table
@@ -5127,6 +5214,10 @@ Syntax for the command is : "@var{width}"
 @item gain, g
 Change treble gain.
 Syntax for the command is : "@var{gain}"
+
+@item mix, m
+Change treble mix.
+Syntax for the command is : "@var{mix}"
 @end table
 
 @section tremolo
@@ -5839,6 +5930,79 @@ The configure output will show the video filters included in your
 build.
 
 Below is a description of the currently available video filters.
+
+@section addroi
+
+Mark a region of interest in a video frame.
+
+The frame data is passed through unchanged, but metadata is attached
+to the frame indicating regions of interest which can affect the
+behaviour of later encoding.  Multiple regions can be marked by
+applying the filter multiple times.
+
+@table @option
+@item x
+Region distance in pixels from the left edge of the frame.
+@item y
+Region distance in pixels from the top edge of the frame.
+@item w
+Region width in pixels.
+@item h
+Region height in pixels.
+
+The parameters @var{x}, @var{y}, @var{w} and @var{h} are expressions,
+and may contain the following variables:
+@table @option
+@item iw
+Width of the input frame.
+@item ih
+Height of the input frame.
+@end table
+
+@item qoffset
+Quantisation offset to apply within the region.
+
+This must be a real value in the range -1 to +1.  A value of zero
+indicates no quality change.  A negative value asks for better quality
+(less quantisation), while a positive value asks for worse quality
+(greater quantisation).
+
+The range is calibrated so that the extreme values indicate the
+largest possible offset - if the rest of the frame is encoded with the
+worst possible quality, an offset of -1 indicates that this region
+should be encoded with the best possible quality anyway.  Intermediate
+values are then interpolated in some codec-dependent way.
+
+For example, in 10-bit H.264 the quantisation parameter varies between
+-12 and 51.  A typical qoffset value of -1/10 therefore indicates that
+this region should be encoded with a QP around one-tenth of the full
+range better than the rest of the frame.  So, if most of the frame
+were to be encoded with a QP of around 30, this region would get a QP
+of around 24 (an offset of approximately -1/10 * (51 - -12) = -6.3).
+An extreme value of -1 would indicate that this region should be
+encoded with the best possible quality regardless of the treatment of
+the rest of the frame - that is, should be encoded at a QP of -12.
+@item clear
+If set to true, remove any existing regions of interest marked on the
+frame before adding the new one.
+@end table
+
+@subsection Examples
+
+@itemize
+@item
+Mark the centre quarter of the frame as interesting.
+@example
+addroi=iw/4:ih/4:iw/2:ih/2:-1/10
+@end example
+@item
+Mark the 100-pixel-wide region on the left edge of the frame as very
+uninteresting (to be encoded at much lower quality than the rest of
+the frame).
+@example
+addroi=0:0:100:ih:+1/5
+@end example
+@end itemize
 
 @section alphaextract
 
@@ -6594,6 +6758,7 @@ Set color system.
 @item cie1931
 @item rec709, hdtv
 @item uhdtv, rec2020
+@item dcip3
 @end table
 
 @item cie
@@ -8275,12 +8440,27 @@ Recurrent Squeeze-and-Excitation Context Aggregation Net (RESCAN).
 See @url{http://openaccess.thecvf.com/content_ECCV_2018/papers/Xia_Li_Recurrent_Squeeze-and-Excitation_Context_ECCV_2018_paper.pdf}.
 @end itemize
 
-Training scripts as well as scripts for model generation are provided in
+Training as well as model generation scripts are provided in
 the repository at @url{https://github.com/XueweiMeng/derain_filter.git}.
+
+Native model files (.model) can be generated from TensorFlow model
+files (.pb) by using tools/python/convert.py
 
 The filter accepts the following options:
 
 @table @option
+@item filter_type
+Specify which filter to use. This option accepts the following values:
+
+@table @samp
+@item derain
+Derain filter. To conduct derain filter, you need to use a derain model.
+
+@item dehaze
+Dehaze filter. To conduct dehaze filter, you need to use a dehaze model.
+@end table
+Default value is @samp{derain}.
+
 @item dnn_backend
 Specify which DNN backend to use for model loading and execution. This option accepts
 the following values:
@@ -8288,14 +8468,19 @@ the following values:
 @table @samp
 @item native
 Native implementation of DNN loading and execution.
+
+@item tensorflow
+TensorFlow backend. To enable this backend you
+need to install the TensorFlow for C library (see
+@url{https://www.tensorflow.org/install/install_c}) and configure FFmpeg with
+@code{--enable-libtensorflow}
 @end table
 Default value is @samp{native}.
 
 @item model
 Set path to model file specifying network architecture and its parameters.
-Note that different backends use different file formats. TensorFlow backend
-can load files for both formats, while native backend can load files for only
-its format.
+Note that different backends use different file formats. TensorFlow and native
+backend can load files for only its format.
 @end table
 
 @section deshake
@@ -8966,6 +9151,17 @@ to each other, so you can for example specify @code{y=x/dar}.
 
 @item pict_type
 A one character description of the current frame's picture type.
+
+@item pkt_pos
+The current packet's position in the input file or stream
+(in bytes, from the start of the input). A value of -1 indicates
+this info is not available.
+
+@item pkt_duration
+The current packet's duration, in seconds.
+
+@item pkt_size
+The current packet's size (in bytes).
 @end table
 
 @anchor{drawtext_expansion}
@@ -14570,6 +14766,9 @@ Set the black color threshold. Default is @code{0.15}. Allowed range is @code{[0
 @item chp
 Enable checking the parity bit. In the event of a parity error, the filter will output
 @code{0x00} for that character. Default is false.
+
+@item lp
+Lowpass lines prior further proccessing. Default is disabled.
 @end table
 
 @subsection Examples
@@ -14630,6 +14829,12 @@ value for pixel will be used for destination pixel.
 Xmap and Ymap input video streams must be of same dimensions. Output video stream
 will have Xmap/Ymap video stream dimensions.
 Xmap and Ymap input video streams are 16bit depth, single channel.
+
+@table @option
+@item format
+Specify pixel format of output from this filter. Can be @code{color} or @code{gray}.
+Default is @code{color}.
+@end table
 
 @section removegrain
 
@@ -15115,6 +15320,8 @@ Set color space conforming to the United States Federal Communications
 Commission (FCC) Code of Federal Regulations (CFR) Title 47 (2003) 73.682 (a).
 
 @item bt601
+@item bt470
+@item smpte170m
 Set color space conforming to:
 
 @itemize
@@ -15131,6 +15338,9 @@ Society of Motion Picture and Television Engineers (SMPTE) ST 170:2004
 
 @item smpte240m
 Set color space conforming to SMPTE ST 240:1999.
+
+@item bt2020
+Set color space conforming to ITU-R BT.2020 non-constant luminance system.
 @end table
 
 @item in_range
@@ -15178,6 +15388,18 @@ decrease) and specifying 1280x720 to the command line makes the output
 Please note that this is a different thing than specifying -1 for @option{w}
 or @option{h}, you still need to specify the output resolution for this option
 to work.
+
+@item force_divisible_by Ensures that the output resolution is divisible by the
+given integer when used together with @option{force_original_aspect_ratio}. This
+works similar to using -n in the @option{w} and @option{h} options.
+
+This option respects the value set for @option{force_original_aspect_ratio},
+increasing or decreasing the resolution accordingly. This may slightly modify
+the video's aspect ration.
+
+This can be handy, for example, if you want to have a video fit within a defined
+resolution using the @option{force_original_aspect_ratio} option but have
+encoder restrictions when it comes to width or height.
 
 @end table
 
@@ -17689,6 +17911,177 @@ Force a constant quantization parameter. If not set, the filter will use the QP
 from the video stream (if available).
 @end table
 
+@section v360
+
+Convert 360 videos between various formats.
+
+The filter accepts the following options:
+
+@table @option
+
+@item input
+@item output
+Set format of the input/output video.
+
+Available formats:
+
+@table @samp
+
+@item e
+Equirectangular projection.
+
+@item c3x2
+@item c6x1
+Cubemap with 3x2/6x1 layout.
+
+Format specific options:
+
+@table @option
+@item in_pad
+@item out_pad
+Set padding proportion for the input/output cubemap. Values in decimals.
+
+Example values:
+@table @samp
+@item 0
+No padding.
+@item 0.01
+1% of face is padding. For example, with 1920x1280 resolution face size would be 640x640 and padding would be 3 pixels from each side. (640 * 0.01 = 6 pixels)
+@end table
+
+Default value is @b{@samp{0}}.
+
+@item in_forder
+@item out_forder
+Set order of faces for the input/output cubemap. Choose one direction for each position.
+
+Designation of directions:
+@table @samp
+@item r
+right
+@item l
+left
+@item u
+up
+@item d
+down
+@item f
+forward
+@item b
+back
+@end table
+
+Default value is @b{@samp{rludfb}}.
+
+@item in_frot
+@item out_frot
+Set rotation of faces for the input/output cubemap. Choose one angle for each position.
+
+Designation of angles:
+@table @samp
+@item 0
+0 degrees clockwise
+@item 1
+90 degrees clockwise
+@item 2
+180 degrees clockwise
+@item 4
+270 degrees clockwise
+@end table
+
+Default value is @b{@samp{000000}}.
+@end table
+
+@item eac
+Equi-Angular Cubemap.
+
+@item flat
+Regular video. @i{(output only)}
+
+Format specific options:
+@table @option
+@item h_fov
+@item v_fov
+Set horizontal/vertical field of view. Values in degrees.
+@end table
+
+@item dfisheye
+Dual fisheye. @i{(input only)}
+
+Format specific options:
+@table @option
+@item in_pad
+Set padding proportion. Values in decimals.
+
+Example values:
+@table @samp
+@item 0
+No padding.
+@item 0.01
+1% padding.
+@end table
+
+Default value is @b{@samp{0}}.
+@end table
+
+@end table
+
+@item interp
+Set interpolation method.@*
+@i{Note: more complex interpolation methods require much more memory to run.}
+
+Available methods:
+
+@table @samp
+@item near
+@item nearest
+Nearest neighbour.
+@item line
+@item linear
+Bilinear interpolation.
+@item cube
+@item cubic
+Bicubic interpolation.
+@item lanc
+@item lanczos
+Lanczos interpolation.
+@end table
+
+Default value is @b{@samp{line}}.
+
+@item w
+@item h
+Set the output video resolution.
+
+Default resolution depends on formats.
+
+@item yaw
+@item pitch
+@item roll
+Set rotation for the output video. Values in degrees.
+
+@item h_flip
+@item v_flip
+@item d_flip
+Flip the output video horizontally/vertically/in-depth. Boolean values.
+
+@end table
+
+@subsection Examples
+
+@itemize
+@item
+Convert equirectangular video to cubemap with 3x2 layout and 1% padding using bicubic interpolation:
+@example
+ffmpeg -i input.mkv -vf v360=e:c3x2:cubic:out_pad=0.01 output.mkv
+@end example
+@item
+Extract back view of Equi-Angular Cubemap:
+@example
+ffmpeg -i input.mkv -vf v360=eac:flat:yaw=180 output.mkv
+@end example
+@end itemize
+
 @section vaguedenoiser
 
 Apply a wavelet based denoiser.
@@ -19411,6 +19804,75 @@ the more similar the pixels color is to the key color.
 Make every semi-green pixel in the input transparent with some slight blending:
 @example
 -i INPUT -vf "hwupload, colorkey_opencl=green:0.3:0.1, hwdownload" OUTPUT
+@end example
+@end itemize
+
+@section deshake_opencl
+Feature-point based video stabilization filter.
+
+The filter accepts the following options:
+
+@table @option
+@item tripod
+Simulates a tripod by preventing any camera movement whatsoever from the original frame. Defaults to @code{0}.
+
+@item debug
+Whether or not additional debug info should be displayed, both in the processed output and in the console.
+
+Note that in order to see console debug output you will also need to pass @code{-v verbose} to ffmpeg.
+
+Viewing point matches in the output video is only supported for RGB input.
+
+Defaults to @code{0}.
+
+@item adaptive_crop
+Whether or not to do a tiny bit of cropping at the borders to cut down on the amount of mirrored pixels.
+
+Defaults to @code{1}.
+
+@item refine_features
+Whether or not feature points should be refined at a sub-pixel level.
+
+This can be turned off for a slight performance gain at the cost of precision.
+
+Defaults to @code{1}.
+
+@item smooth_strength
+The strength of the smoothing applied to the camera path from @code{0.0} to @code{1.0}.
+
+@code{1.0} is the maximum smoothing strength while values less than that result in less smoothing.
+
+@code{0.0} causes the filter to adaptively choose a smoothing strength on a per-frame basis.
+
+Defaults to @code{0.0}.
+
+@item smooth_window_multiplier
+Controls the size of the smoothing window (the number of frames buffered to determine motion information from).
+
+The size of the smoothing window is determined by multiplying the framerate of the video by this number.
+
+Acceptable values range from @code{0.1} to @code{10.0}.
+
+Larger values increase the amount of motion data available for determining how to smooth the camera path,
+potentially improving smoothness, but also increase latency and memory usage.
+
+Defaults to @code{2.0}.
+
+@end table
+
+@subsection Examples
+
+@itemize
+@item
+Stabilize a video with a fixed, medium smoothing strength:
+@example
+-i INPUT -vf "hwupload, deshake_opencl=smooth_strength=0.5, hwdownload" OUTPUT
+@end example
+
+@item
+Stabilize a video with debugging (both in console and in rendered video):
+@example
+-i INPUT -filter_complex "[0:v]format=rgba, hwupload, deshake_opencl=debug=1, hwdownload, format=rgba, format=yuv420p" -v verbose OUTPUT
 @end example
 @end itemize
 
@@ -22236,25 +22698,9 @@ Reverse logarithmic scale.
 Default is @code{lin}.
 
 @item win_size
-Set window size.
+Set window size. Allowed range is from 16 to 65536.
 
-It accepts the following values:
-@table @samp
-@item w16
-@item w32
-@item w64
-@item w128
-@item w256
-@item w512
-@item w1024
-@item w2048
-@item w4096
-@item w8192
-@item w16384
-@item w32768
-@item w65536
-@end table
-Default is @code{w2048}
+Default is @code{2048}
 
 @item win_func
 Set windowing function.

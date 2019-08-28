@@ -865,7 +865,7 @@ static int do_packet_auto_bsf(AVFormatContext *s, AVPacket *pkt) {
             if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF)
                 return 0;
             av_log(ctx, AV_LOG_ERROR,
-                    "Failed to send packet to filter %s for stream %d\n",
+                    "Failed to receive packet from filter %s for stream %d\n",
                     ctx->filter->name, pkt->stream_index);
             if (s->error_recognition & AV_EF_EXPLODE)
                 return ret;
@@ -917,7 +917,7 @@ int av_write_frame(AVFormatContext *s, AVPacket *pkt)
 #define CHUNK_START 0x1000
 
 int ff_interleave_add_packet(AVFormatContext *s, AVPacket *pkt,
-                             int (*compare)(AVFormatContext *, AVPacket *, AVPacket *))
+                             int (*compare)(AVFormatContext *, const AVPacket *, const AVPacket *))
 {
     int ret;
     AVPacketList **next_point, *this_pktl;
@@ -994,8 +994,8 @@ next_non_null:
     return 0;
 }
 
-static int interleave_compare_dts(AVFormatContext *s, AVPacket *next,
-                                  AVPacket *pkt)
+static int interleave_compare_dts(AVFormatContext *s, const AVPacket *next,
+                                                      const AVPacket *pkt)
 {
     AVStream *st  = s->streams[pkt->stream_index];
     AVStream *st2 = s->streams[next->stream_index];
@@ -1323,18 +1323,10 @@ int ff_write_chained(AVFormatContext *dst, int dst_stream, AVPacket *pkt,
 
     local_pkt = *pkt;
     local_pkt.stream_index = dst_stream;
-    if (pkt->pts != AV_NOPTS_VALUE)
-        local_pkt.pts = av_rescale_q(pkt->pts,
-                                     src->streams[pkt->stream_index]->time_base,
-                                     dst->streams[dst_stream]->time_base);
-    if (pkt->dts != AV_NOPTS_VALUE)
-        local_pkt.dts = av_rescale_q(pkt->dts,
-                                     src->streams[pkt->stream_index]->time_base,
-                                     dst->streams[dst_stream]->time_base);
-    if (pkt->duration)
-        local_pkt.duration = av_rescale_q(pkt->duration,
-                                          src->streams[pkt->stream_index]->time_base,
-                                          dst->streams[dst_stream]->time_base);
+
+    av_packet_rescale_ts(&local_pkt,
+                         src->streams[pkt->stream_index]->time_base,
+                         dst->streams[dst_stream]->time_base);
 
     if (interleave) ret = av_interleaved_write_frame(dst, &local_pkt);
     else            ret = av_write_frame(dst, &local_pkt);

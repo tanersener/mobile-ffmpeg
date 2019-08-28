@@ -76,18 +76,6 @@ int ff_av1_filter_obus_buf(const uint8_t *buf, uint8_t **out, int *size)
     return ret;
 }
 
-typedef struct AV1SequenceParameters {
-    uint8_t seq_profile;
-    uint8_t seq_level_idx_0;
-    uint8_t seq_tier_0;
-    uint8_t high_bitdepth;
-    uint8_t twelve_bit;
-    uint8_t monochrome;
-    uint8_t chroma_subsampling_x;
-    uint8_t chroma_subsampling_y;
-    uint8_t chroma_sample_position;
-} AV1SequenceParameters;
-
 static inline void uvlc(GetBitContext *gb)
 {
     int leading_zeros = 0;
@@ -106,49 +94,51 @@ static inline void uvlc(GetBitContext *gb)
 
 static int parse_color_config(AV1SequenceParameters *seq_params, GetBitContext *gb)
 {
-    int color_primaries, transfer_characteristics, matrix_coefficients;
+    int twelve_bit = 0;
+    int high_bitdepth = get_bits1(gb);
+    if (seq_params->profile == FF_PROFILE_AV1_PROFESSIONAL && high_bitdepth)
+        twelve_bit = get_bits1(gb);
 
-    seq_params->high_bitdepth = get_bits1(gb);
-    if (seq_params->seq_profile == FF_PROFILE_AV1_PROFESSIONAL && seq_params->high_bitdepth)
-        seq_params->twelve_bit = get_bits1(gb);
+    seq_params->bitdepth = 8 + (high_bitdepth * 2) + (twelve_bit * 2);
 
-    if (seq_params->seq_profile == FF_PROFILE_AV1_HIGH)
+    if (seq_params->profile == FF_PROFILE_AV1_HIGH)
         seq_params->monochrome = 0;
     else
         seq_params->monochrome = get_bits1(gb);
 
-    if (get_bits1(gb)) { // color_description_present_flag
-        color_primaries          = get_bits(gb, 8);
-        transfer_characteristics = get_bits(gb, 8);
-        matrix_coefficients      = get_bits(gb, 8);
+    seq_params->color_description_present_flag = get_bits1(gb);
+    if (seq_params->color_description_present_flag) {
+        seq_params->color_primaries          = get_bits(gb, 8);
+        seq_params->transfer_characteristics = get_bits(gb, 8);
+        seq_params->matrix_coefficients      = get_bits(gb, 8);
     } else {
-        color_primaries          = AVCOL_PRI_UNSPECIFIED;
-        transfer_characteristics = AVCOL_TRC_UNSPECIFIED;
-        matrix_coefficients      = AVCOL_SPC_UNSPECIFIED;
+        seq_params->color_primaries          = AVCOL_PRI_UNSPECIFIED;
+        seq_params->transfer_characteristics = AVCOL_TRC_UNSPECIFIED;
+        seq_params->matrix_coefficients      = AVCOL_SPC_UNSPECIFIED;
     }
 
     if (seq_params->monochrome) {
-        skip_bits1(gb); // color_range
+        seq_params->color_range = get_bits1(gb);
         seq_params->chroma_subsampling_x = 1;
         seq_params->chroma_subsampling_y = 1;
         seq_params->chroma_sample_position = 0;
         return 0;
-    } else if (color_primaries          == AVCOL_PRI_BT709 &&
-               transfer_characteristics == AVCOL_TRC_IEC61966_2_1 &&
-               matrix_coefficients      == AVCOL_SPC_RGB) {
+    } else if (seq_params->color_primaries          == AVCOL_PRI_BT709 &&
+               seq_params->transfer_characteristics == AVCOL_TRC_IEC61966_2_1 &&
+               seq_params->matrix_coefficients      == AVCOL_SPC_RGB) {
         seq_params->chroma_subsampling_x = 0;
         seq_params->chroma_subsampling_y = 0;
     } else {
-        skip_bits1(gb); // color_range
+        seq_params->color_range = get_bits1(gb);
 
-        if (seq_params->seq_profile == FF_PROFILE_AV1_MAIN) {
+        if (seq_params->profile == FF_PROFILE_AV1_MAIN) {
             seq_params->chroma_subsampling_x = 1;
             seq_params->chroma_subsampling_y = 1;
-        } else if (seq_params->seq_profile == FF_PROFILE_AV1_HIGH) {
+        } else if (seq_params->profile == FF_PROFILE_AV1_HIGH) {
             seq_params->chroma_subsampling_x = 0;
             seq_params->chroma_subsampling_y = 0;
         } else {
-            if (seq_params->twelve_bit) {
+            if (twelve_bit) {
                 seq_params->chroma_subsampling_x = get_bits1(gb);
                 if (seq_params->chroma_subsampling_x)
                     seq_params->chroma_subsampling_y = get_bits1(gb);
@@ -185,14 +175,14 @@ static int parse_sequence_header(AV1SequenceParameters *seq_params, const uint8_
 
     memset(seq_params, 0, sizeof(*seq_params));
 
-    seq_params->seq_profile = get_bits(&gb, 3);
+    seq_params->profile = get_bits(&gb, 3);
 
     skip_bits1(&gb); // still_picture
     reduced_still_picture_header = get_bits1(&gb);
 
     if (reduced_still_picture_header) {
-        seq_params->seq_level_idx_0 = get_bits(&gb, 5);
-        seq_params->seq_tier_0 = 0;
+        seq_params->level = get_bits(&gb, 5);
+        seq_params->tier = 0;
     } else {
         int initial_display_delay_present_flag, operating_points_cnt_minus_1;
         int decoder_model_info_present_flag, buffer_delay_length_minus_1;
@@ -242,8 +232,8 @@ static int parse_sequence_header(AV1SequenceParameters *seq_params, const uint8_
             }
 
             if (i == 0) {
-               seq_params->seq_level_idx_0 = seq_level_idx;
-               seq_params->seq_tier_0 = seq_tier;
+               seq_params->level = seq_level_idx;
+               seq_params->tier = seq_tier;
             }
         }
     }
@@ -295,6 +285,36 @@ static int parse_sequence_header(AV1SequenceParameters *seq_params, const uint8_
         return AVERROR_INVALIDDATA;
 
     return 0;
+}
+
+int ff_av1_parse_seq_header(AV1SequenceParameters *seq, const uint8_t *buf, int size)
+{
+    int64_t obu_size;
+    int start_pos, type, temporal_id, spatial_id;
+
+    if (size <= 0)
+        return AVERROR_INVALIDDATA;
+
+    while (size > 0) {
+        int len = parse_obu_header(buf, size, &obu_size, &start_pos,
+                                   &type, &temporal_id, &spatial_id);
+        if (len < 0)
+            return len;
+
+        switch (type) {
+        case AV1_OBU_SEQUENCE_HEADER:
+            if (!obu_size)
+                return AVERROR_INVALIDDATA;
+
+            return parse_sequence_header(seq, buf + start_pos, obu_size);
+        default:
+            break;
+        }
+        size -= len;
+        buf  += len;
+    }
+
+    return AVERROR_INVALIDDATA;
 }
 
 int ff_isom_write_av1c(AVIOContext *pb, const uint8_t *buf, int size)
@@ -363,11 +383,11 @@ int ff_isom_write_av1c(AVIOContext *pb, const uint8_t *buf, int size)
 
     put_bits(&pbc, 1, 1); // marker
     put_bits(&pbc, 7, 1); // version
-    put_bits(&pbc, 3, seq_params.seq_profile);
-    put_bits(&pbc, 5, seq_params.seq_level_idx_0);
-    put_bits(&pbc, 1, seq_params.seq_tier_0);
-    put_bits(&pbc, 1, seq_params.high_bitdepth);
-    put_bits(&pbc, 1, seq_params.twelve_bit);
+    put_bits(&pbc, 3, seq_params.profile);
+    put_bits(&pbc, 5, seq_params.level);
+    put_bits(&pbc, 1, seq_params.tier);
+    put_bits(&pbc, 1, seq_params.bitdepth > 8);
+    put_bits(&pbc, 1, seq_params.bitdepth == 12);
     put_bits(&pbc, 1, seq_params.monochrome);
     put_bits(&pbc, 1, seq_params.chroma_subsampling_x);
     put_bits(&pbc, 1, seq_params.chroma_subsampling_y);

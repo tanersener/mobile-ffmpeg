@@ -709,8 +709,8 @@ static int parse_manifest_segmenttimeline(AVFormatContext *s, struct representat
     return 0;
 }
 
-static int resolve_content_path(AVFormatContext *s, const char *url, int *max_url_size, xmlNodePtr *baseurl_nodes, int n_baseurl_nodes) {
-
+static int resolve_content_path(AVFormatContext *s, const char *url, int *max_url_size, xmlNodePtr *baseurl_nodes, int n_baseurl_nodes)
+{
     char *tmp_str = NULL;
     char *path = NULL;
     char *mpdName = NULL;
@@ -719,7 +719,6 @@ static int resolve_content_path(AVFormatContext *s, const char *url, int *max_ur
     char *root_url = NULL;
     char *text = NULL;
     char *tmp = NULL;
-
     int isRootHttp = 0;
     char token ='/';
     int start =  0;
@@ -1490,10 +1489,8 @@ static void move_segments(struct representation *rep_src, struct representation 
 
 static int refresh_manifest(AVFormatContext *s)
 {
-
     int ret = 0, i;
     DASHContext *c = s->priv_data;
-
     // save current context
     int n_videos = c->n_videos;
     struct representation **videos = c->videos;
@@ -1944,7 +1941,6 @@ static int reopen_demux_for_component(AVFormatContext *s, struct representation 
                 pls->ctx->streams[i]->r_frame_rate = pls->framerate;
         }
 #endif
-
         ret = avformat_find_stream_info(pls->ctx, NULL);
         if (ret < 0)
             goto fail;
@@ -1978,7 +1974,7 @@ static int open_demux_for_component(AVFormatContext *s, struct representation *p
             goto fail;
         }
         st->id = i;
-        avcodec_parameters_copy(st->codecpar, pls->ctx->streams[i]->codecpar);
+        avcodec_parameters_copy(st->codecpar, ist->codecpar);
         avpriv_set_pts_info(st, ist->pts_wrap_bits, ist->time_base.num, ist->time_base.den);
     }
 
@@ -2028,6 +2024,7 @@ static int copy_init_section(struct representation *rep_dest, struct representat
 static int dash_read_header(AVFormatContext *s)
 {
     DASHContext *c = s->priv_data;
+    struct representation *rep;
     int ret = 0;
     int stream_index = 0;
     int i;
@@ -2053,17 +2050,17 @@ static int dash_read_header(AVFormatContext *s)
 
     /* Open the demuxer for video and audio components if available */
     for (i = 0; i < c->n_videos; i++) {
-        struct representation *cur_video = c->videos[i];
+        rep = c->videos[i];
         if (i > 0 && c->is_init_section_common_video) {
-            ret = copy_init_section(cur_video,c->videos[0]);
+            ret = copy_init_section(rep, c->videos[0]);
             if (ret < 0)
                 goto fail;
         }
-        ret = open_demux_for_component(s, cur_video);
+        ret = open_demux_for_component(s, rep);
 
         if (ret)
             goto fail;
-        cur_video->stream_index = stream_index;
+        rep->stream_index = stream_index;
         ++stream_index;
     }
 
@@ -2071,17 +2068,17 @@ static int dash_read_header(AVFormatContext *s)
         c->is_init_section_common_audio = is_common_init_section_exist(c->audios, c->n_audios);
 
     for (i = 0; i < c->n_audios; i++) {
-        struct representation *cur_audio = c->audios[i];
+        rep = c->audios[i];
         if (i > 0 && c->is_init_section_common_audio) {
-            ret = copy_init_section(cur_audio,c->audios[0]);
+            ret = copy_init_section(rep, c->audios[0]);
             if (ret < 0)
                 goto fail;
         }
-        ret = open_demux_for_component(s, cur_audio);
+        ret = open_demux_for_component(s, rep);
 
         if (ret)
             goto fail;
-        cur_audio->stream_index = stream_index;
+        rep->stream_index = stream_index;
         ++stream_index;
     }
 
@@ -2089,20 +2086,19 @@ static int dash_read_header(AVFormatContext *s)
         c->is_init_section_common_audio = is_common_init_section_exist(c->subtitles, c->n_subtitles);
 
     for (i = 0; i < c->n_subtitles; i++) {
-        struct representation *cur_subtitle = c->subtitles[i];
+        rep = c->subtitles[i];
         if (i > 0 && c->is_init_section_common_audio) {
-            ret = copy_init_section(cur_subtitle,c->subtitles[0]);
+            ret = copy_init_section(rep, c->subtitles[0]);
             if (ret < 0)
                 goto fail;
         }
-        ret = open_demux_for_component(s, cur_subtitle);
+        ret = open_demux_for_component(s, rep);
 
         if (ret)
             goto fail;
-        cur_subtitle->stream_index = stream_index;
+        rep->stream_index = stream_index;
         ++stream_index;
     }
-
 
     if (!stream_index) {
         ret = AVERROR_INVALIDDATA;
@@ -2118,33 +2114,30 @@ static int dash_read_header(AVFormatContext *s)
         }
 
         for (i = 0; i < c->n_videos; i++) {
-            struct representation *pls = c->videos[i];
-
-            av_program_add_stream_index(s, 0, pls->stream_index);
-            pls->assoc_stream = s->streams[pls->stream_index];
-            if (pls->bandwidth > 0)
-                av_dict_set_int(&pls->assoc_stream->metadata, "variant_bitrate", pls->bandwidth, 0);
-            if (pls->id[0])
-                av_dict_set(&pls->assoc_stream->metadata, "id", pls->id, 0);
+            rep = c->videos[i];
+            av_program_add_stream_index(s, 0, rep->stream_index);
+            rep->assoc_stream = s->streams[rep->stream_index];
+            if (rep->bandwidth > 0)
+                av_dict_set_int(&rep->assoc_stream->metadata, "variant_bitrate", rep->bandwidth, 0);
+            if (rep->id[0])
+                av_dict_set(&rep->assoc_stream->metadata, "id", rep->id, 0);
         }
         for (i = 0; i < c->n_audios; i++) {
-            struct representation *pls = c->audios[i];
-
-            av_program_add_stream_index(s, 0, pls->stream_index);
-            pls->assoc_stream = s->streams[pls->stream_index];
-            if (pls->bandwidth > 0)
-                av_dict_set_int(&pls->assoc_stream->metadata, "variant_bitrate", pls->bandwidth, 0);
-            if (pls->id[0])
-                av_dict_set(&pls->assoc_stream->metadata, "id", pls->id, 0);
+            rep = c->audios[i];
+            av_program_add_stream_index(s, 0, rep->stream_index);
+            rep->assoc_stream = s->streams[rep->stream_index];
+            if (rep->bandwidth > 0)
+                av_dict_set_int(&rep->assoc_stream->metadata, "variant_bitrate", rep->bandwidth, 0);
+            if (rep->id[0])
+                av_dict_set(&rep->assoc_stream->metadata, "id", rep->id, 0);
         }
         for (i = 0; i < c->n_subtitles; i++) {
-            struct representation *pls = c->subtitles[i];
-            av_program_add_stream_index(s, 0, pls->stream_index);
-            pls->assoc_stream = s->streams[pls->stream_index];
-            if (pls->id[0])
-                av_dict_set(&pls->assoc_stream->metadata, "id", pls->id, 0);
+            rep = c->subtitles[i];
+            av_program_add_stream_index(s, 0, rep->stream_index);
+            rep->assoc_stream = s->streams[rep->stream_index];
+            if (rep->id[0])
+                av_dict_set(&rep->assoc_stream->metadata, "id", rep->id, 0);
         }
-
     }
 
     return 0;
@@ -2158,8 +2151,8 @@ static void recheck_discard_flags(AVFormatContext *s, struct representation **p,
 
     for (i = 0; i < n; i++) {
         struct representation *pls = p[i];
-
         int needed = !pls->assoc_stream || pls->assoc_stream->discard < AVDISCARD_ALL;
+
         if (needed && !pls->ctx) {
             pls->cur_seg_offset = 0;
             pls->init_sec_buf_read_offset = 0;
@@ -2184,37 +2177,38 @@ static int dash_read_packet(AVFormatContext *s, AVPacket *pkt)
     int ret = 0, i;
     int64_t mints = 0;
     struct representation *cur = NULL;
+    struct representation *rep = NULL;
 
     recheck_discard_flags(s, c->videos, c->n_videos);
     recheck_discard_flags(s, c->audios, c->n_audios);
     recheck_discard_flags(s, c->subtitles, c->n_subtitles);
 
     for (i = 0; i < c->n_videos; i++) {
-        struct representation *pls = c->videos[i];
-        if (!pls->ctx)
+        rep = c->videos[i];
+        if (!rep->ctx)
             continue;
-        if (!cur || pls->cur_timestamp < mints) {
-            cur = pls;
-            mints = pls->cur_timestamp;
+        if (!cur || rep->cur_timestamp < mints) {
+            cur = rep;
+            mints = rep->cur_timestamp;
         }
     }
     for (i = 0; i < c->n_audios; i++) {
-        struct representation *pls = c->audios[i];
-        if (!pls->ctx)
+        rep = c->audios[i];
+        if (!rep->ctx)
             continue;
-        if (!cur || pls->cur_timestamp < mints) {
-            cur = pls;
-            mints = pls->cur_timestamp;
+        if (!cur || rep->cur_timestamp < mints) {
+            cur = rep;
+            mints = rep->cur_timestamp;
         }
     }
 
     for (i = 0; i < c->n_subtitles; i++) {
-        struct representation *pls = c->subtitles[i];
-        if (!pls->ctx)
+        rep = c->subtitles[i];
+        if (!rep->ctx)
             continue;
-        if (!cur || pls->cur_timestamp < mints) {
-            cur = pls;
-            mints = pls->cur_timestamp;
+        if (!cur || rep->cur_timestamp < mints) {
+            cur = rep;
+            mints = rep->cur_timestamp;
         }
     }
 
@@ -2246,7 +2240,6 @@ static int dash_close(AVFormatContext *s)
     DASHContext *c = s->priv_data;
     free_audio_list(c);
     free_video_list(c);
-
     av_dict_free(&c->avio_opts);
     av_freep(&c->base_url);
     return 0;

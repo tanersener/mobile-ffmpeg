@@ -430,12 +430,12 @@ static inline int ff_vc1_pred_dc(MpegEncContext *s, int overlap, int pq, int n,
     if (c_avail && (n != 1 && n != 3)) {
         q2 = FFABS(s->current_picture.qscale_table[mb_pos - 1]);
         if (q2 && q2 != q1)
-            c = (c * s->y_dc_scale_table[q2] * ff_vc1_dqscale[dqscale_index] + 0x20000) >> 18;
+            c = (int)((unsigned)c * s->y_dc_scale_table[q2] * ff_vc1_dqscale[dqscale_index] + 0x20000) >> 18;
     }
     if (a_avail && (n != 2 && n != 3)) {
         q2 = FFABS(s->current_picture.qscale_table[mb_pos - s->mb_stride]);
         if (q2 && q2 != q1)
-            a = (a * s->y_dc_scale_table[q2] * ff_vc1_dqscale[dqscale_index] + 0x20000) >> 18;
+            a = (int)((unsigned)a * s->y_dc_scale_table[q2] * ff_vc1_dqscale[dqscale_index] + 0x20000) >> 18;
     }
     if (a_avail && c_avail && (n != 3)) {
         int off = mb_pos;
@@ -445,7 +445,7 @@ static inline int ff_vc1_pred_dc(MpegEncContext *s, int overlap, int pq, int n,
             off -= s->mb_stride;
         q2 = FFABS(s->current_picture.qscale_table[off]);
         if (q2 && q2 != q1)
-            b = (b * s->y_dc_scale_table[q2] * ff_vc1_dqscale[dqscale_index] + 0x20000) >> 18;
+            b = (int)((unsigned)b * s->y_dc_scale_table[q2] * ff_vc1_dqscale[dqscale_index] + 0x20000) >> 18;
     }
 
     if (c_avail && (!a_avail || abs(a - b) <= abs(b - c))) {
@@ -508,13 +508,15 @@ static inline int vc1_coded_block_pred(MpegEncContext * s, int n,
  * @param codingset set of VLC to decode data
  * @see 8.1.3.4
  */
-static void vc1_decode_ac_coeff(VC1Context *v, int *last, int *skip,
+static int vc1_decode_ac_coeff(VC1Context *v, int *last, int *skip,
                                 int *value, int codingset)
 {
     GetBitContext *gb = &v->s.gb;
     int index, run, level, lst, sign;
 
     index = get_vlc2(gb, ff_vc1_ac_coeff_table[codingset].table, AC_VLC_BITS, 3);
+    if (index < 0)
+        return index;
     if (index != ff_vc1_ac_sizes[codingset] - 1) {
         run   = vc1_index_decode_table[codingset][index][0];
         level = vc1_index_decode_table[codingset][index][1];
@@ -524,6 +526,8 @@ static void vc1_decode_ac_coeff(VC1Context *v, int *last, int *skip,
         int escape = decode210(gb);
         if (escape != 2) {
             index = get_vlc2(gb, ff_vc1_ac_coeff_table[codingset].table, AC_VLC_BITS, 3);
+            if (index < 0)
+                return AVERROR_INVALIDDATA;
             run   = vc1_index_decode_table[codingset][index][0];
             level = vc1_index_decode_table[codingset][index][1];
             lst   = index >= vc1_last_decode_table[codingset];
@@ -560,6 +564,8 @@ static void vc1_decode_ac_coeff(VC1Context *v, int *last, int *skip,
     *last  = lst;
     *skip  = run;
     *value = (level ^ -sign) + sign;
+
+    return 0;
 }
 
 /** Decode intra block in intra frames - should be faster than decode_intra_block
@@ -639,7 +645,9 @@ static int vc1_decode_i_block(VC1Context *v, int16_t block[64], int n,
             zz_table = v->zz_8x8[1];
 
         while (!last) {
-            vc1_decode_ac_coeff(v, &last, &skip, &value, codingset);
+            int ret = vc1_decode_ac_coeff(v, &last, &skip, &value, codingset);
+            if (ret < 0)
+                return ret;
             i += skip;
             if (i > 63)
                 break;
@@ -812,7 +820,9 @@ static int vc1_decode_i_block_adv(VC1Context *v, int16_t block[64], int n,
         }
 
         while (!last) {
-            vc1_decode_ac_coeff(v, &last, &skip, &value, codingset);
+            int ret = vc1_decode_ac_coeff(v, &last, &skip, &value, codingset);
+            if (ret < 0)
+                return ret;
             i += skip;
             if (i > 63)
                 break;
@@ -995,7 +1005,9 @@ static int vc1_decode_intra_block(VC1Context *v, int16_t block[64], int n,
         int k;
 
         while (!last) {
-            vc1_decode_ac_coeff(v, &last, &skip, &value, codingset);
+            int ret = vc1_decode_ac_coeff(v, &last, &skip, &value, codingset);
+            if (ret < 0)
+                return ret;
             i += skip;
             if (i > 63)
                 break;
@@ -1161,7 +1173,9 @@ static int vc1_decode_p_block(VC1Context *v, int16_t block[64], int n,
         i    = 0;
         last = 0;
         while (!last) {
-            vc1_decode_ac_coeff(v, &last, &skip, &value, v->codingset2);
+            int ret = vc1_decode_ac_coeff(v, &last, &skip, &value, v->codingset2);
+            if (ret < 0)
+                return ret;
             i += skip;
             if (i > 63)
                 break;
@@ -1189,7 +1203,9 @@ static int vc1_decode_p_block(VC1Context *v, int16_t block[64], int n,
             i    = 0;
             off  = (j & 1) * 4 + (j & 2) * 16;
             while (!last) {
-                vc1_decode_ac_coeff(v, &last, &skip, &value, v->codingset2);
+                int ret = vc1_decode_ac_coeff(v, &last, &skip, &value, v->codingset2);
+                if (ret < 0)
+                    return ret;
                 i += skip;
                 if (i > 15)
                     break;
@@ -1216,7 +1232,9 @@ static int vc1_decode_p_block(VC1Context *v, int16_t block[64], int n,
             i    = 0;
             off  = j * 32;
             while (!last) {
-                vc1_decode_ac_coeff(v, &last, &skip, &value, v->codingset2);
+                int ret = vc1_decode_ac_coeff(v, &last, &skip, &value, v->codingset2);
+                if (ret < 0)
+                    return ret;
                 i += skip;
                 if (i > 31)
                     break;
@@ -1243,7 +1261,9 @@ static int vc1_decode_p_block(VC1Context *v, int16_t block[64], int n,
             i    = 0;
             off  = j * 4;
             while (!last) {
-                vc1_decode_ac_coeff(v, &last, &skip, &value, v->codingset2);
+                int ret = vc1_decode_ac_coeff(v, &last, &skip, &value, v->codingset2);
+                if (ret < 0)
+                    return ret;
                 i += skip;
                 if (i > 31)
                     break;
@@ -1358,7 +1378,7 @@ static int vc1_decode_p_mb(VC1Context *v)
                     v->vc1dsp.vc1_inv_trans_8x8(v->block[v->cur_blk_idx][block_map[i]]);
                     if (v->rangeredfrm)
                         for (j = 0; j < 64; j++)
-                            v->block[v->cur_blk_idx][block_map[i]][j] <<= 1;
+                            v->block[v->cur_blk_idx][block_map[i]][j] *= 2;
                     block_cbp   |= 0xF << (i << 2);
                     block_intra |= 1 << i;
                 } else if (val) {
@@ -2582,13 +2602,13 @@ static void vc1_decode_i_blocks(VC1Context *v)
                 if (v->rangeredfrm)
                     for (k = 0; k < 6; k++)
                         for (j = 0; j < 64; j++)
-                            v->block[v->cur_blk_idx][block_map[k]][j] <<= 1;
+                            v->block[v->cur_blk_idx][block_map[k]][j] *= 2;
                 vc1_put_blocks_clamped(v, 1);
             } else {
                 if (v->rangeredfrm)
                     for (k = 0; k < 6; k++)
                         for (j = 0; j < 64; j++)
-                            v->block[v->cur_blk_idx][block_map[k]][j] = (v->block[v->cur_blk_idx][block_map[k]][j] - 64) << 1;
+                            v->block[v->cur_blk_idx][block_map[k]][j] = (v->block[v->cur_blk_idx][block_map[k]][j] - 64) * 2;
                 vc1_put_blocks_clamped(v, 0);
             }
 

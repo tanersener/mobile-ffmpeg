@@ -285,16 +285,18 @@ static int X264_frame(AVCodecContext *ctx, AVPacket *pkt, const AVFrame *frame,
     int nnal, i, ret;
     x264_picture_t pic_out = {0};
     int pict_type;
+    int bit_depth;
     int64_t *out_opaque;
     AVFrameSideData *sd;
 
     x264_picture_init( &x4->pic );
     x4->pic.img.i_csp   = x4->params.i_csp;
 #if X264_BUILD >= 153
-    if (x4->params.i_bitdepth > 8)
+    bit_depth = x4->params.i_bitdepth;
 #else
-    if (x264_bit_depth > 8)
+    bit_depth = x264_bit_depth;
 #endif
+    if (bit_depth > 8)
         x4->pic.img.i_csp |= X264_CSP_HIGH_DEPTH;
     x4->pic.img.i_plane = avfmt2_num_planes(ctx->pix_fmt);
 
@@ -359,45 +361,50 @@ static int X264_frame(AVCodecContext *ctx, AVPacket *pkt, const AVFrame *frame,
                 if (frame->interlaced_frame == 0) {
                     int mbx = (frame->width + MB_SIZE - 1) / MB_SIZE;
                     int mby = (frame->height + MB_SIZE - 1) / MB_SIZE;
+                    int qp_range = 51 + 6 * (bit_depth - 8);
                     int nb_rois;
-                    AVRegionOfInterest* roi;
-                    float* qoffsets;
+                    const AVRegionOfInterest *roi;
+                    uint32_t roi_size;
+                    float *qoffsets;
+
+                    roi = (const AVRegionOfInterest*)sd->data;
+                    roi_size = roi->self_size;
+                    if (!roi_size || sd->size % roi_size != 0) {
+                        av_log(ctx, AV_LOG_ERROR, "Invalid AVRegionOfInterest.self_size.\n");
+                        return AVERROR(EINVAL);
+                    }
+                    nb_rois = sd->size / roi_size;
+
                     qoffsets = av_mallocz_array(mbx * mby, sizeof(*qoffsets));
                     if (!qoffsets)
                         return AVERROR(ENOMEM);
 
-                    nb_rois = sd->size / sizeof(AVRegionOfInterest);
-                    roi = (AVRegionOfInterest*)sd->data;
-                    for (int count = 0; count < nb_rois; count++) {
-                        int starty = FFMIN(mby, roi->top / MB_SIZE);
-                        int endy   = FFMIN(mby, (roi->bottom + MB_SIZE - 1)/ MB_SIZE);
-                        int startx = FFMIN(mbx, roi->left / MB_SIZE);
-                        int endx   = FFMIN(mbx, (roi->right + MB_SIZE - 1)/ MB_SIZE);
+                    // This list must be iterated in reverse because the first
+                    // region in the list applies when regions overlap.
+                    for (int i = nb_rois - 1; i >= 0; i--) {
+                        int startx, endx, starty, endy;
                         float qoffset;
+
+                        roi = (const AVRegionOfInterest*)(sd->data + roi_size * i);
+
+                        starty = FFMIN(mby, roi->top / MB_SIZE);
+                        endy   = FFMIN(mby, (roi->bottom + MB_SIZE - 1)/ MB_SIZE);
+                        startx = FFMIN(mbx, roi->left / MB_SIZE);
+                        endx   = FFMIN(mbx, (roi->right + MB_SIZE - 1)/ MB_SIZE);
 
                         if (roi->qoffset.den == 0) {
                             av_free(qoffsets);
-                            av_log(ctx, AV_LOG_ERROR, "AVRegionOfInterest.qoffset.den should not be zero.\n");
+                            av_log(ctx, AV_LOG_ERROR, "AVRegionOfInterest.qoffset.den must not be zero.\n");
                             return AVERROR(EINVAL);
                         }
                         qoffset = roi->qoffset.num * 1.0f / roi->qoffset.den;
-                        qoffset = av_clipf(qoffset, -1.0f, 1.0f);
-
-                        // 25 is a number that I think it is a possible proper scale value.
-                        qoffset = qoffset * 25;
+                        qoffset = av_clipf(qoffset * qp_range, -qp_range, +qp_range);
 
                         for (int y = starty; y < endy; y++) {
                             for (int x = startx; x < endx; x++) {
                                 qoffsets[x + y*mbx] = qoffset;
                             }
                         }
-
-                        if (roi->self_size == 0) {
-                            av_free(qoffsets);
-                            av_log(ctx, AV_LOG_ERROR, "AVRegionOfInterest.self_size should be set to sizeof(AVRegionOfInterest).\n");
-                            return AVERROR(EINVAL);
-                        }
-                        roi = (AVRegionOfInterest*)((char*)roi + roi->self_size);
                     }
 
                     x4->pic.prop.quant_offsets = qoffsets;
@@ -587,6 +594,10 @@ static av_cold int X264_init(AVCodecContext *avctx)
     PARSE_X264_OPT("weightp", wpredp);
 
     if (avctx->bit_rate) {
+        if (avctx->bit_rate / 1000 > INT_MAX || avctx->rc_max_rate / 1000 > INT_MAX) {
+            av_log(avctx, AV_LOG_ERROR, "bit_rate and rc_max_rate > %d000 not supported by libx264\n", INT_MAX);
+            return AVERROR(EINVAL);
+        }
         x4->params.rc.i_bitrate   = avctx->bit_rate / 1000;
         x4->params.rc.i_rc_method = X264_RC_ABR;
     }
@@ -891,7 +902,7 @@ FF_ENABLE_DEPRECATION_WARNINGS
     if (avctx->max_b_frames < 0)
         avctx->max_b_frames = 0;
 
-    avctx->bit_rate = x4->params.rc.i_bitrate*1000;
+    avctx->bit_rate = x4->params.rc.i_bitrate*1000LL;
 
     x4->enc = x264_encoder_open(&x4->params);
     if (!x4->enc)
@@ -928,8 +939,8 @@ FF_ENABLE_DEPRECATION_WARNINGS
     if (!cpb_props)
         return AVERROR(ENOMEM);
     cpb_props->buffer_size = x4->params.rc.i_vbv_buffer_size * 1000;
-    cpb_props->max_bitrate = x4->params.rc.i_vbv_max_bitrate * 1000;
-    cpb_props->avg_bitrate = x4->params.rc.i_bitrate         * 1000;
+    cpb_props->max_bitrate = x4->params.rc.i_vbv_max_bitrate * 1000LL;
+    cpb_props->avg_bitrate = x4->params.rc.i_bitrate         * 1000LL;
 
     // Overestimate the reordered opaque buffer size, in case a runtime
     // reconfigure would increase the delay (which it shouldn't).
@@ -1184,6 +1195,7 @@ AVCodec ff_libx264rgb_encoder = {
     .priv_class     = &rgbclass,
     .defaults       = x264_defaults,
     .pix_fmts       = pix_fmts_8bit_rgb,
+    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
     .wrapper_name   = "libx264",
 };
 #endif

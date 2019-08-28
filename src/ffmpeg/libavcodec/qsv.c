@@ -60,6 +60,11 @@ int ff_qsv_codec_id_to_mfx(enum AVCodecID codec_id)
 #endif
     case AV_CODEC_ID_MJPEG:
         return MFX_CODEC_JPEG;
+#if QSV_VERSION_ATLEAST(1, 19)
+    case AV_CODEC_ID_VP9:
+        return MFX_CODEC_VP9;
+#endif
+
     default:
         break;
     }
@@ -207,7 +212,7 @@ int ff_qsv_print_warning(void *log_ctx, mfxStatus err,
     return ret;
 }
 
-static enum AVPixelFormat qsv_map_fourcc(uint32_t fourcc)
+enum AVPixelFormat ff_qsv_map_fourcc(uint32_t fourcc)
 {
     switch (fourcc) {
     case MFX_FOURCC_NV12: return AV_PIX_FMT_NV12;
@@ -243,6 +248,24 @@ int ff_qsv_find_surface_idx(QSVFramesContext *ctx, QSVFrame *frame)
             return i;
     }
     return AVERROR_BUG;
+}
+
+enum AVFieldOrder ff_qsv_map_picstruct(int mfx_pic_struct)
+{
+    enum AVFieldOrder field = AV_FIELD_UNKNOWN;
+    switch (mfx_pic_struct & 0xF) {
+    case MFX_PICSTRUCT_PROGRESSIVE:
+        field = AV_FIELD_PROGRESSIVE;
+        break;
+    case MFX_PICSTRUCT_FIELD_TFF:
+        field = AV_FIELD_TT;
+        break;
+    case MFX_PICSTRUCT_FIELD_BFF:
+        field = AV_FIELD_BB;
+        break;
+    }
+
+    return field;
 }
 
 enum AVPictureType ff_qsv_map_pictype(int mfx_pic_type)
@@ -500,7 +523,7 @@ static mfxStatus qsv_frame_alloc(mfxHDL pthis, mfxFrameAllocRequest *req,
         frames_hwctx = frames_ctx->hwctx;
 
         frames_ctx->format            = AV_PIX_FMT_QSV;
-        frames_ctx->sw_format         = qsv_map_fourcc(i->FourCC);
+        frames_ctx->sw_format         = ff_qsv_map_fourcc(i->FourCC);
         frames_ctx->width             = i->Width;
         frames_ctx->height            = i->Height;
         frames_ctx->initial_pool_size = req->NumFrameSuggested;

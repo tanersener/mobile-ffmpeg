@@ -1403,6 +1403,8 @@ static int vp4_unpack_vlcs(Vp3DecodeContext *s, GetBitContext *gb,
     int eob_run;
 
     while (!eob_tracker[coeff_i]) {
+        if (get_bits_left(gb) < 1)
+            return AVERROR_INVALIDDATA;
 
         token = get_vlc2(gb, vlc_tables[coeff_i]->table, 11, 3);
 
@@ -2957,6 +2959,10 @@ static int theora_decode_header(AVCodecContext *avctx, GetBitContext *gb)
     s->theora_header = 0;
     s->theora = get_bits_long(gb, 24);
     av_log(avctx, AV_LOG_DEBUG, "Theora bitstream version %X\n", s->theora);
+    if (!s->theora) {
+        s->theora = 1;
+        avpriv_request_sample(s->avctx, "theora 0");
+    }
 
     /* 3.2.0 aka alpha3 has the same frame orientation as original vp3
      * but previous versions have the image flipped relative to vp3 */

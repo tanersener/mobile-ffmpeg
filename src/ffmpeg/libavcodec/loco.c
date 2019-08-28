@@ -88,6 +88,8 @@ static inline int loco_get_rice(RICEContext *r)
         loco_update_rice_param(r, 0);
         return 0;
     }
+    if (get_bits_left(&r->gb) < 1)
+        return INT_MIN;
     v = get_ur_golomb_jpegls(&r->gb, loco_get_rice_param(r), INT_MAX, 0);
     loco_update_rice_param(r, (v + 1) >> 1);
     if (!v) {
@@ -159,10 +161,14 @@ static int loco_decode_plane(LOCOContext *l, uint8_t *data, int width, int heigh
     for (j = 1; j < height; j++) {
         /* restore left column */
         val = loco_get_rice(&rc);
+        if (val == INT_MIN)
+           return AVERROR_INVALIDDATA;
         data[0] = data[-stride] + val;
         /* restore all other pixels */
         for (i = 1; i < width; i++) {
             val = loco_get_rice(&rc);
+            if (val == INT_MIN)
+                return -1;
             data[i] = loco_predict(&data[i], stride) + val;
         }
         data += stride;

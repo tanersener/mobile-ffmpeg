@@ -425,6 +425,7 @@ OBJS-$(CONFIG_METASOUND_DECODER)       += metasound.o metasound_data.o \
 OBJS-$(CONFIG_MICRODVD_DECODER)        += microdvddec.o ass.o
 OBJS-$(CONFIG_MIMIC_DECODER)           += mimic.o
 OBJS-$(CONFIG_MJPEG_DECODER)           += mjpegdec.o
+OBJS-$(CONFIG_MJPEG_QSV_DECODER)       += qsvdec_other.o
 OBJS-$(CONFIG_MJPEG_ENCODER)           += mjpegenc.o mjpegenc_common.o \
                                           mjpegenc_huffman.o
 OBJS-$(CONFIG_MJPEGB_DECODER)          += mjpegbdec.o
@@ -1081,7 +1082,7 @@ OBJS-$(CONFIG_H264_METADATA_BSF)          += h264_metadata_bsf.o h264_levels.o
 OBJS-$(CONFIG_H264_MP4TOANNEXB_BSF)       += h264_mp4toannexb_bsf.o
 OBJS-$(CONFIG_H264_REDUNDANT_PPS_BSF)     += h264_redundant_pps_bsf.o
 OBJS-$(CONFIG_HAPQA_EXTRACT_BSF)          += hapqa_extract_bsf.o hap.o
-OBJS-$(CONFIG_HEVC_METADATA_BSF)          += h265_metadata_bsf.o
+OBJS-$(CONFIG_HEVC_METADATA_BSF)          += h265_metadata_bsf.o h265_profile_level.o
 OBJS-$(CONFIG_HEVC_MP4TOANNEXB_BSF)       += hevc_mp4toannexb_bsf.o
 OBJS-$(CONFIG_IMX_DUMP_HEADER_BSF)        += imx_dump_header_bsf.o
 OBJS-$(CONFIG_MJPEG2JPEG_BSF)             += mjpeg2jpeg_bsf.o
@@ -1161,6 +1162,7 @@ TESTPROGS-$(CONFIG_IIRFILTER)             += iirfilter
 TESTPROGS-$(HAVE_MMX)                     += motion
 TESTPROGS-$(CONFIG_MPEGVIDEO)             += mpeg12framerate
 TESTPROGS-$(CONFIG_H264_METADATA_BSF)     += h264_levels
+TESTPROGS-$(CONFIG_HEVC_METADATA_BSF)     += h265_levels
 TESTPROGS-$(CONFIG_RANGECODER)            += rangecoder
 TESTPROGS-$(CONFIG_SNOW_ENCODER)          += snowenc
 

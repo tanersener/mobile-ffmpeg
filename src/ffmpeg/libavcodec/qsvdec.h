@@ -56,12 +56,11 @@ typedef struct QSVContext {
     int buffered_count;
     int reinit_flag;
 
-    // the internal parser and codec context for parsing the data
-    AVCodecParserContext *parser;
-    AVCodecContext *avctx_internal;
     enum AVPixelFormat orig_pix_fmt;
     uint32_t fourcc;
     mfxFrameInfo frame_info;
+
+    int initialized;
 
     // options set by the caller
     int async_depth;

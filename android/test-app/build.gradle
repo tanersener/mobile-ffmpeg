@@ -14,8 +14,8 @@ android {
         applicationId "com.arthenica.mobileffmpeg.test"
         minSdkVersion 24
         targetSdkVersion 28
-        versionCode 240423
-        versionName "4.2.3"
+        versionCode 240430
+        versionName "4.3"
     }
     buildTypes {
         debug {

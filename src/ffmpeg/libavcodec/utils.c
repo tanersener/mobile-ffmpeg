@@ -542,6 +542,7 @@ int attribute_align_arg ff_codec_open2_recursive(AVCodecContext *avctx, const AV
 int attribute_align_arg avcodec_open2(AVCodecContext *avctx, const AVCodec *codec, AVDictionary **options)
 {
     int ret = 0;
+    int codec_init_ok = 0;
     AVDictionary *tmp = NULL;
     const AVPixFmtDescriptor *pixdesc;
 
@@ -935,6 +936,7 @@ FF_ENABLE_DEPRECATION_WARNINGS
         if (ret < 0) {
             goto free_and_end;
         }
+        codec_init_ok = 1;
     }
 
     ret=0;
@@ -1022,8 +1024,9 @@ end:
 
     return ret;
 free_and_end:
-    if (avctx->codec &&
-        (avctx->codec->caps_internal & FF_CODEC_CAP_INIT_CLEANUP))
+    if (avctx->codec && avctx->codec->close &&
+        (codec_init_ok ||
+         (avctx->codec->caps_internal & FF_CODEC_CAP_INIT_CLEANUP)))
         avctx->codec->close(avctx);
 
     if (codec->priv_class && codec->priv_data_size)
@@ -1038,6 +1041,7 @@ FF_ENABLE_DEPRECATION_WARNINGS
 
     av_dict_free(&tmp);
     av_freep(&avctx->priv_data);
+    av_freep(&avctx->subtitle_header);
     if (avctx->internal) {
         av_frame_free(&avctx->internal->to_free);
         av_frame_free(&avctx->internal->compat_decode_frame);

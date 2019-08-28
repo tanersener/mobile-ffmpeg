@@ -111,23 +111,23 @@ static const uint64_t plane8_lut[8][256] = {
     LUT8(4), LUT8(5), LUT8(6), LUT8(7),
 };
 
-#define LUT32(plane) {                                \
-             0,          0,          0,          0,   \
-             0,          0,          0, 1 << plane,   \
-             0,          0, 1 << plane,          0,   \
-             0,          0, 1 << plane, 1 << plane,   \
-             0, 1 << plane,          0,          0,   \
-             0, 1 << plane,          0, 1 << plane,   \
-             0, 1 << plane, 1 << plane,          0,   \
-             0, 1 << plane, 1 << plane, 1 << plane,   \
-    1 << plane,          0,          0,          0,   \
-    1 << plane,          0,          0, 1 << plane,   \
-    1 << plane,          0, 1 << plane,          0,   \
-    1 << plane,          0, 1 << plane, 1 << plane,   \
-    1 << plane, 1 << plane,          0,          0,   \
-    1 << plane, 1 << plane,          0, 1 << plane,   \
-    1 << plane, 1 << plane, 1 << plane,          0,   \
-    1 << plane, 1 << plane, 1 << plane, 1 << plane,   \
+#define LUT32(plane) {                                    \
+              0,           0,           0,           0,   \
+              0,           0,           0, 1U << plane,   \
+              0,           0, 1U << plane,           0,   \
+              0,           0, 1U << plane, 1U << plane,   \
+              0, 1U << plane,           0,           0,   \
+              0, 1U << plane,           0, 1U << plane,   \
+              0, 1U << plane, 1U << plane,           0,   \
+              0, 1U << plane, 1U << plane, 1U << plane,   \
+    1U << plane,           0,           0,           0,   \
+    1U << plane,           0,           0, 1U << plane,   \
+    1U << plane,           0, 1U << plane,           0,   \
+    1U << plane,           0, 1U << plane, 1U << plane,   \
+    1U << plane, 1U << plane,           0,           0,   \
+    1U << plane, 1U << plane,           0, 1U << plane,   \
+    1U << plane, 1U << plane, 1U << plane,           0,   \
+    1U << plane, 1U << plane, 1U << plane, 1U << plane,   \
 }
 
 // 32 planes * 4-bit mask * 4 lookup tables each
@@ -280,6 +280,16 @@ static int extract_header(AVCodecContext *const avctx,
         for (i = 0; i < 16; i++)
             s->tvdc[i] = bytestream_get_be16(&buf);
 
+        if (s->ham) {
+            if (s->bpp > 8) {
+                av_log(avctx, AV_LOG_ERROR, "Invalid number of hold bits for HAM: %u\n", s->ham);
+                return AVERROR_INVALIDDATA;
+            } else if (s->ham != (s->bpp > 6 ? 6 : 4)) {
+                av_log(avctx, AV_LOG_ERROR, "Invalid number of hold bits for HAM: %u, BPP: %u\n", s->ham, s->bpp);
+                return AVERROR_INVALIDDATA;
+            }
+        }
+
         if (s->masking == MASK_HAS_MASK) {
             if (s->bpp >= 8 && !s->ham) {
                 avctx->pix_fmt = AV_PIX_FMT_RGB32;
@@ -306,9 +316,6 @@ static int extract_header(AVCodecContext *const avctx,
         }
         if (!s->bpp || s->bpp > 32) {
             av_log(avctx, AV_LOG_ERROR, "Invalid number of bitplanes: %u\n", s->bpp);
-            return AVERROR_INVALIDDATA;
-        } else if (s->ham >= 8) {
-            av_log(avctx, AV_LOG_ERROR, "Invalid number of hold bits for HAM: %u\n", s->ham);
             return AVERROR_INVALIDDATA;
         }
 

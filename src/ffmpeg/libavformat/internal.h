@@ -237,7 +237,7 @@ int ff_hex_to_data(uint8_t *data, const char *p);
  * @return 0, or < 0 on error
  */
 int ff_interleave_add_packet(AVFormatContext *s, AVPacket *pkt,
-                             int (*compare)(AVFormatContext *, AVPacket *, AVPacket *));
+                             int (*compare)(AVFormatContext *, const AVPacket *, const AVPacket *));
 
 void ff_read_frame_flush(AVFormatContext *s);
 
@@ -649,9 +649,6 @@ enum AVWriteUncodedFrameFlags {
  * Copies the whilelists from one context to the other
  */
 int ff_copy_whiteblacklists(AVFormatContext *dst, const AVFormatContext *src);
-
-int ffio_open2_wrapper(struct AVFormatContext *s, AVIOContext **pb, const char *url, int flags,
-                       const AVIOInterruptCB *int_cb, AVDictionary **options);
 
 /**
  * Returned by demuxers to indicate that data was consumed but discarded

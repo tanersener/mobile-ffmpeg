@@ -763,6 +763,7 @@ extern AVCodec ff_hevc_videotoolbox_encoder;
 extern AVCodec ff_libkvazaar_encoder;
 extern AVCodec ff_mjpeg_cuvid_decoder;
 extern AVCodec ff_mjpeg_qsv_encoder;
+extern AVCodec ff_mjpeg_qsv_decoder;
 extern AVCodec ff_mjpeg_vaapi_encoder;
 extern AVCodec ff_mpeg1_cuvid_decoder;
 extern AVCodec ff_mpeg2_cuvid_decoder;
@@ -779,6 +780,7 @@ extern AVCodec ff_vp8_v4l2m2m_encoder;
 extern AVCodec ff_vp8_vaapi_encoder;
 extern AVCodec ff_vp9_cuvid_decoder;
 extern AVCodec ff_vp9_mediacodec_decoder;
+extern AVCodec ff_vp9_qsv_decoder;
 extern AVCodec ff_vp9_vaapi_encoder;
 
 // The iterate API is not usable with ossfuzz due to the excessive size of binaries created

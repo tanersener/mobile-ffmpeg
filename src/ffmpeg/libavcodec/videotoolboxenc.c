@@ -915,6 +915,22 @@ static int get_cv_transfer_function(AVCodecContext *avctx,
             *transfer_fnc = kCVImageBufferTransferFunction_SMPTE_240M_1995;
             break;
 
+#if HAVE_KCVIMAGEBUFFERTRANSFERFUNCTION_SMPTE_ST_2084_PQ
+        case AVCOL_TRC_SMPTE2084:
+            *transfer_fnc = kCVImageBufferTransferFunction_SMPTE_ST_2084_PQ;
+            break;
+#endif
+#if HAVE_KCVIMAGEBUFFERTRANSFERFUNCTION_LINEAR
+        case AVCOL_TRC_LINEAR:
+            *transfer_fnc = kCVImageBufferTransferFunction_Linear;
+            break;
+#endif
+#if HAVE_KCVIMAGEBUFFERTRANSFERFUNCTION_ITU_R_2100_HLG
+        case AVCOL_TRC_ARIB_STD_B67:
+            *transfer_fnc = kCVImageBufferTransferFunction_ITU_R_2100_HLG;
+            break;
+#endif
+
         case AVCOL_TRC_GAMMA22:
             gamma = 2.2;
             *transfer_fnc = kCVImageBufferTransferFunction_UseGamma;
@@ -933,6 +949,7 @@ static int get_cv_transfer_function(AVCodecContext *avctx,
             break;
 
         default:
+            *transfer_fnc = NULL;
             av_log(avctx, AV_LOG_ERROR, "Transfer function %s is not supported.\n", av_color_transfer_name(trc));
             return -1;
     }
@@ -2399,8 +2416,6 @@ static int vtenc_populate_extradata(AVCodecContext   *avctx,
         av_log(avctx, AV_LOG_ERROR, "Error creating frame from pool: %d\n", status);
         goto pe_cleanup;
     }
-
-    unsigned pbuftype = CVPixelBufferGetPixelFormatType(pix_buf);
 
     time = CMTimeMake(0, avctx->time_base.den);
     status = VTCompressionSessionEncodeFrame(vtctx->session,
