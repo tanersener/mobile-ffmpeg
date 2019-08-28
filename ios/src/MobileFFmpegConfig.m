@@ -175,9 +175,6 @@ void logCallbackDataAdd(int level, NSString *logData) {
     [callbackDataArray addObject:callbackData];
     [lock unlock];
 
-    // BUILDING LAST COMMAND OUTPUT AS SOON AS POSSIBLE
-    [lastCommandOutput appendString:logData];
-
     callbackNotify();
 }
 
@@ -236,6 +233,9 @@ void mobileffmpeg_log_callback_function(void *ptr, int level, const char* format
     NSString *logData = [[NSString alloc] initWithFormat:[NSString stringWithCString:format encoding:NSUTF8StringEncoding] arguments:vargs];
 
     logCallbackDataAdd(level, logData);
+
+    // BUILDING LAST COMMAND OUTPUT AS EARLY AS POSSIBLE
+    [lastCommandOutput appendString:logData];
 }
 
 /**

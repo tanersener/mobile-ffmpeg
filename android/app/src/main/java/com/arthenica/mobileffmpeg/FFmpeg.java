@@ -142,7 +142,13 @@ public class FFmpeg {
      * @since 3.0
      */
     public static String getLastCommandOutput() {
-        return Config.getNativeLastCommandOutput();
+        String nativeLastCommandOutput = Config.getNativeLastCommandOutput();
+        if (nativeLastCommandOutput != null) {
+
+            // REPLACING CH(13) WITH CH(10)
+            nativeLastCommandOutput = nativeLastCommandOutput.replace('\r', '\n');
+        }
+        return nativeLastCommandOutput;
     }
 
     /**

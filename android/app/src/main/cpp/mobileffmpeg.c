@@ -458,24 +458,19 @@ void mobileffmpeg_log_callback_function(void *ptr, int level, const char* format
     }
 
     avutil_log_format_line(ptr, level, format, vargs, part, &print_prefix);
+    avutil_log_sanitize(part[0].str);
+    avutil_log_sanitize(part[1].str);
+    avutil_log_sanitize(part[2].str);
+    avutil_log_sanitize(part[3].str);
+
     snprintf(line, sizeof(line), "%s%s%s%s", part[0].str, part[1].str, part[2].str, part[3].str);
 
-    avutil_log_sanitize(part[0].str);
-    logCallbackDataAdd(level, part[0].str);
-    appendLastCommandOutput(part[0].str);
+    logCallbackDataAdd(level, line);
+    appendLastCommandOutput(line);
 
-    avutil_log_sanitize(part[1].str);
-    logCallbackDataAdd(level, part[1].str);
-    appendLastCommandOutput(part[1].str);
-
-    avutil_log_sanitize(part[2].str);
-    logCallbackDataAdd(level, part[2].str);
-    appendLastCommandOutput(part[2].str);
-
-    avutil_log_sanitize(part[3].str);
-    logCallbackDataAdd(level, part[3].str);
-    appendLastCommandOutput(part[3].str);
-
+    av_bprint_finalize(part, NULL);
+    av_bprint_finalize(part+1, NULL);
+    av_bprint_finalize(part+2, NULL);
     av_bprint_finalize(part+3, NULL);
 }
 

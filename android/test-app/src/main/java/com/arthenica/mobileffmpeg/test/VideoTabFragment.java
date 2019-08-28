@@ -189,6 +189,17 @@ public class VideoTabFragment extends Fragment implements AdapterView.OnItemSele
                 public void apply(final int returnCode, final String commandOutput) {
                     Log.d(TAG, String.format("FFmpeg process exited with rc %d", returnCode));
 
+                    String buffer = commandOutput;
+                    do {
+                        if (buffer.length() <= 4*1024) {
+                            Log.d(TAG, buffer);
+                            buffer = "";
+                        } else {
+                            Log.d(TAG, buffer.substring(0, 4*1024));
+                            buffer = buffer.substring(4*1024);
+                        }
+                    } while(buffer.length() > 0);
+
                     hideProgressDialog();
 
                     MainActivity.addUIAction(new Callable() {
