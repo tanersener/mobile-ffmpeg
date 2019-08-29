@@ -256,4 +256,32 @@ public class FFmpeg {
         return argumentList.toArray(new String[0]);
     }
 
+    /**
+     * <p>Prints the output of the last executed command to the logcat at the specified priority.
+     *
+     * @param logPriority one of {@link Log#VERBOSE}, {@link Log#DEBUG}, {@link Log#INFO},
+     *                    {@link Log#WARN}, {@link Log#ERROR}, {@link Log#ASSERT}
+     * @since 4.3
+     */
+    public static void printLastCommandOutput(int logPriority) {
+        final int LOGGER_ENTRY_MAX_LEN = 4 * 1000;
+
+        String buffer = FFmpeg.getLastCommandOutput();
+        do {
+            if (buffer.length() <= LOGGER_ENTRY_MAX_LEN) {
+                Log.println(logPriority, Config.TAG, buffer);
+                buffer = "";
+            } else {
+                final int index = buffer.substring(0, LOGGER_ENTRY_MAX_LEN).lastIndexOf('\n');
+                if (index < 0) {
+                    Log.println(logPriority, Config.TAG, buffer.substring(0, LOGGER_ENTRY_MAX_LEN));
+                    buffer = buffer.substring(LOGGER_ENTRY_MAX_LEN);
+                } else {
+                    Log.println(logPriority, Config.TAG, buffer.substring(0, index));
+                    buffer = buffer.substring(index);
+                }
+            }
+        } while (buffer.length() > 0);
+    }
+
 }
