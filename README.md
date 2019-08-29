@@ -129,14 +129,14 @@ Please remember that some parts of `FFmpeg` are licensed under the `GPL` and onl
 3. Check execution output.
     ```
     int rc = FFmpeg.getLastReturnCode();
-    String output = FFmpeg.getLastCommandOutput();
  
     if (rc == RETURN_CODE_SUCCESS) {
         Log.i(Config.TAG, "Command execution completed successfully.");
     } else if (rc == RETURN_CODE_CANCEL) {
         Log.i(Config.TAG, "Command execution cancelled by user.");
     } else {
-        Log.i(Config.TAG, String.format("Command execution failed with rc=%d and output=%s.", rc, output));
+        Log.i(Config.TAG, String.format("Command execution failed with rc=%d and the output below.", rc));
+        FFmpeg.printLastCommandOutput(Log.INFO);
     }
     ```
 
