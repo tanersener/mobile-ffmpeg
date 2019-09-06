@@ -150,7 +150,7 @@ Please remember that some parts of `FFmpeg` are licensed under the `GPL` and onl
     MediaInformation info = FFmpeg.getMediaInformation("<file path or uri>");
     ```
 
-6. Record video and audio using Android camera.
+6. Record video using Android camera.
     ```
     FFmpeg.execute("-f android_camera -i 0:0 -r 30 -pixel_format bgr0 -t 00:00:05 <record file path>");
     ```
