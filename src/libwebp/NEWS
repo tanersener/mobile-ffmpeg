@@ -1,3 +1,15 @@
+- 7/4/2019: version 1.0.3
+  This is a binary compatible release.
+  * resize fixes for Nx1 sizes and the addition of non-opaque alpha values for
+    odd sizes (issues #418, #434)
+  * lossless encode/decode performance improvements
+  * lossy compression performance improvement at low quality levels with flat
+    content (issue #432)
+  * python swig files updated to support python 3
+  Tool updates:
+    vwebp will now preserve the aspect ratio of images that exceed monitor
+    resolution by scaling the image to fit (issue #433)
+
 - 1/14/2019: version 1.0.2
   This is a binary compatible release.
   * (Windows) unicode file support in the tools (linux and mac already had
