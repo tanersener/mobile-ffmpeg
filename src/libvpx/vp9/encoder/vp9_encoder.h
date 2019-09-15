@@ -29,7 +29,9 @@
 #include "vp9/common/vp9_thread_common.h"
 #include "vp9/common/vp9_onyxc_int.h"
 
+#if !CONFIG_REALTIME_ONLY
 #include "vp9/encoder/vp9_alt_ref_aq.h"
+#endif
 #include "vp9/encoder/vp9_aq_cyclicrefresh.h"
 #include "vp9/encoder/vp9_context_tree.h"
 #include "vp9/encoder/vp9_encodemb.h"
@@ -119,10 +121,11 @@ typedef enum {
   COMPLEXITY_AQ = 2,
   CYCLIC_REFRESH_AQ = 3,
   EQUATOR360_AQ = 4,
-  PSNR_AQ = 5,
+  PERCEPTUAL_AQ = 5,
+  PSNR_AQ = 6,
   // AQ based on lookahead temporal
   // variance (only valid for altref frames)
-  LOOKAHEAD_AQ = 6,
+  LOOKAHEAD_AQ = 7,
   AQ_MODE_COUNT  // This should always be the last member of the enum
 } AQ_MODE;
 
@@ -293,10 +296,6 @@ typedef struct TplDepStats {
 
 #if CONFIG_NON_GREEDY_MV
   int ready[3];
-  double mv_dist[3];
-  double mv_cost[3];
-  int64_t inter_cost_arr[3];
-  int64_t recon_error_arr[3];
   int64_t sse_arr[3];
   double feature_score;
 #endif
@@ -304,6 +303,12 @@ typedef struct TplDepStats {
 
 #if CONFIG_NON_GREEDY_MV
 #define SQUARE_BLOCK_SIZES 4
+
+#define ZERO_MV_MODE 0
+#define NEW_MV_MODE 1
+#define NEAREST_MV_MODE 2
+#define NEAR_MV_MODE 3
+#define MAX_MV_MODE 4
 #endif
 
 typedef struct TplDepFrame {
@@ -316,10 +321,10 @@ typedef struct TplDepFrame {
   int mi_cols;
   int base_qindex;
 #if CONFIG_NON_GREEDY_MV
-  double lambda;
-  double mv_dist_sum[3];
-  double mv_cost_sum[3];
+  int lambda;
   int_mv *pyramid_mv_arr[3][SQUARE_BLOCK_SIZES];
+  int *mv_mode_arr[3];
+  double *rd_diff_arr[3];
 #endif
 } TplDepFrame;
 
@@ -337,8 +342,7 @@ static INLINE int get_square_block_idx(BLOCK_SIZE bsize) {
   if (bsize == BLOCK_32X32) {
     return 3;
   }
-  printf("ERROR: non-square block size\n");
-  assert(0);
+  assert(0 && "ERROR: non-square block size");
   return -1;
 }
 
@@ -355,8 +359,7 @@ static INLINE BLOCK_SIZE square_block_idx_to_bsize(int square_block_idx) {
   if (square_block_idx == 3) {
     return BLOCK_32X32;
   }
-  printf("ERROR: invalid square_block_idx\n");
-  assert(0);
+  assert(0 && "ERROR: invalid square_block_idx");
   return BLOCK_INVALID;
 }
 
@@ -561,6 +564,14 @@ typedef struct FEATURE_SCORE_LOC {
 } FEATURE_SCORE_LOC;
 #endif
 
+#define MAX_KMEANS_GROUPS 8
+
+typedef struct KMEANS_DATA {
+  double value;
+  int pos;
+  int group_idx;
+} KMEANS_DATA;
+
 typedef struct VP9_COMP {
   QUANTS quants;
   ThreadData td;
@@ -584,14 +595,28 @@ typedef struct VP9_COMP {
 #endif
   YV12_BUFFER_CONFIG *raw_source_frame;
 
+  BLOCK_SIZE tpl_bsize;
   TplDepFrame tpl_stats[MAX_ARF_GOP_SIZE];
   YV12_BUFFER_CONFIG *tpl_recon_frames[REF_FRAMES];
   EncFrameBuf enc_frame_buf[REF_FRAMES];
+#if CONFIG_MULTITHREAD
+  pthread_mutex_t kmeans_mutex;
+#endif
+  int kmeans_data_arr_alloc;
+  KMEANS_DATA *kmeans_data_arr;
+  int kmeans_data_size;
+  int kmeans_data_stride;
+  double kmeans_ctr_ls[MAX_KMEANS_GROUPS];
+  double kmeans_boundary_ls[MAX_KMEANS_GROUPS];
+  int kmeans_count_ls[MAX_KMEANS_GROUPS];
+  int kmeans_ctr_num;
 #if CONFIG_NON_GREEDY_MV
+  int tpl_ready;
   int feature_score_loc_alloc;
   FEATURE_SCORE_LOC *feature_score_loc_arr;
   FEATURE_SCORE_LOC **feature_score_loc_sort;
   FEATURE_SCORE_LOC **feature_score_loc_heap;
+  int_mv *select_mv_arr;
 #endif
 
   TileDataEnc *tile_data;
@@ -618,6 +643,12 @@ typedef struct VP9_COMP {
 
   int ext_refresh_frame_context_pending;
   int ext_refresh_frame_context;
+
+  int64_t norm_wiener_variance;
+  int64_t *mb_wiener_variance;
+  int mb_wiener_var_rows;
+  int mb_wiener_var_cols;
+  double *mi_ssim_rdmult_scaling_factors;
 
   YV12_BUFFER_CONFIG last_frame_uf;
 
@@ -947,8 +978,8 @@ static INLINE RefCntBuffer *get_ref_cnt_buffer(VP9_COMMON *cm, int fb_idx) {
 }
 
 static INLINE YV12_BUFFER_CONFIG *get_ref_frame_buffer(
-    VP9_COMP *cpi, MV_REFERENCE_FRAME ref_frame) {
-  VP9_COMMON *const cm = &cpi->common;
+    const VP9_COMP *const cpi, MV_REFERENCE_FRAME ref_frame) {
+  const VP9_COMMON *const cm = &cpi->common;
   const int buf_idx = get_ref_frame_buf_idx(cpi, ref_frame);
   return buf_idx != INVALID_IDX ? &cm->buffer_pool->frame_bufs[buf_idx].buf
                                 : NULL;
@@ -1027,7 +1058,7 @@ static INLINE int is_altref_enabled(const VP9_COMP *const cpi) {
          cpi->oxcf.enable_auto_arf;
 }
 
-static INLINE void set_ref_ptrs(VP9_COMMON *cm, MACROBLOCKD *xd,
+static INLINE void set_ref_ptrs(const VP9_COMMON *const cm, MACROBLOCKD *xd,
                                 MV_REFERENCE_FRAME ref0,
                                 MV_REFERENCE_FRAME ref1) {
   xd->block_refs[0] =

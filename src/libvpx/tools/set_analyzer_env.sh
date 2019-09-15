@@ -30,7 +30,7 @@ case "${sanitizer}" in
   *)
     echo "Usage: source set_analyzer_env.sh [<sanitizer>|clear]"
     echo "  Supported sanitizers:"
-    echo "    address integer memory thread undefined"
+    echo "    address cfi integer memory thread undefined"
     return 1
     ;;
 esac
@@ -77,9 +77,20 @@ cflags="${cflags} -fno-optimize-sibling-calls"
 
 if [ "${sanitizer}" = "cfi" ]; then
   # https://clang.llvm.org/docs/ControlFlowIntegrity.html
-  cflags="${cflags} -flto -fvisibility=hidden"
-  ldflags="${ldflags} -flto -fuse-ld=gold"
+  cflags="${cflags} -fno-sanitize-trap=cfi -flto -fvisibility=hidden"
+  ldflags="${ldflags} -fno-sanitize-trap=cfi -flto -fuse-ld=gold"
   export AR="llvm-ar"
+fi
+
+# TODO(http://crbug.com/webm/1615): -fsanitize=implicit-integer-truncation
+# causes conversion warnings in many of the x86 intrinsics and elsewhere.
+if [ "${sanitizer}" = "integer" ]; then
+  major_version=$(clang --version | head -n 1 \
+    | grep -o -E "[[:digit:]]\.[[:digit:]]\.[[:digit:]]" | cut -f1 -d.)
+  if [ ${major_version} -ge 7 ]; then
+    cflags="${cflags} -fno-sanitize=implicit-integer-truncation"
+    ldflags="${ldflags} -fno-sanitize=implicit-integer-truncation"
+  fi
 fi
 
 set -x

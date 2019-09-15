@@ -189,6 +189,9 @@ typedef struct SVC {
   int64_t time_stamp_prev[VPX_SS_MAX_LAYERS];
 
   int num_encoded_top_layer;
+
+  // Every spatial layer on a superframe whose base is key is key too.
+  int simulcast_mode;
 } SVC;
 
 struct VP9_COMP;
@@ -258,10 +261,13 @@ void vp9_svc_check_spatial_layer_sync(struct VP9_COMP *const cpi);
 
 void vp9_svc_update_ref_frame_buffer_idx(struct VP9_COMP *const cpi);
 
+void vp9_svc_update_ref_frame_key_simulcast(struct VP9_COMP *const cpi);
+
 void vp9_svc_update_ref_frame(struct VP9_COMP *const cpi);
 
 void vp9_svc_adjust_frame_rate(struct VP9_COMP *const cpi);
 
+void vp9_svc_adjust_avg_frame_qindex(struct VP9_COMP *const cpi);
 #ifdef __cplusplus
 }  // extern "C"
 #endif

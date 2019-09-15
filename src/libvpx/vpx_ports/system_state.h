@@ -18,7 +18,7 @@ extern "C" {
 #endif
 
 #if (ARCH_X86 || ARCH_X86_64) && HAVE_MMX
-extern void vpx_clear_system_state();
+extern void vpx_clear_system_state(void);
 #else
 #define vpx_clear_system_state()
 #endif  // (ARCH_X86 || ARCH_X86_64) && HAVE_MMX

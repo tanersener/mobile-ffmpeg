@@ -104,10 +104,6 @@ void vp9_cyclic_refresh_update_sb_postencode(struct VP9_COMP *const cpi,
                                              int mi_row, int mi_col,
                                              BLOCK_SIZE bsize);
 
-// Update the segmentation map, and related quantities: cyclic refresh map,
-// refresh sb_index, and target number of blocks to be refreshed.
-void vp9_cyclic_refresh_update__map(struct VP9_COMP *const cpi);
-
 // From the just encoded frame: update the actual number of blocks that were
 // applied the segment delta q, and the amount of low motion in the frame.
 // Also check conditions for forcing golden update, or preventing golden

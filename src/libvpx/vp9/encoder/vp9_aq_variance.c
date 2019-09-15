@@ -109,7 +109,7 @@ static void aq_variance(const uint8_t *a, int a_stride, const uint8_t *b,
 #if CONFIG_VP9_HIGHBITDEPTH
 static void aq_highbd_variance64(const uint8_t *a8, int a_stride,
                                  const uint8_t *b8, int b_stride, int w, int h,
-                                 uint64_t *sse, uint64_t *sum) {
+                                 uint64_t *sse, int64_t *sum) {
   int i, j;
 
   uint16_t *a = CONVERT_TO_SHORTPTR(a8);
@@ -128,15 +128,6 @@ static void aq_highbd_variance64(const uint8_t *a8, int a_stride,
   }
 }
 
-static void aq_highbd_8_variance(const uint8_t *a8, int a_stride,
-                                 const uint8_t *b8, int b_stride, int w, int h,
-                                 unsigned int *sse, int *sum) {
-  uint64_t sse_long = 0;
-  uint64_t sum_long = 0;
-  aq_highbd_variance64(a8, a_stride, b8, b_stride, w, h, &sse_long, &sum_long);
-  *sse = (unsigned int)sse_long;
-  *sum = (int)sum_long;
-}
 #endif  // CONFIG_VP9_HIGHBITDEPTH
 
 static unsigned int block_variance(VP9_COMP *cpi, MACROBLOCK *x,
@@ -154,11 +145,13 @@ static unsigned int block_variance(VP9_COMP *cpi, MACROBLOCK *x,
     int avg;
 #if CONFIG_VP9_HIGHBITDEPTH
     if (xd->cur_buf->flags & YV12_FLAG_HIGHBITDEPTH) {
-      aq_highbd_8_variance(x->plane[0].src.buf, x->plane[0].src.stride,
+      uint64_t sse64 = 0;
+      int64_t sum64 = 0;
+      aq_highbd_variance64(x->plane[0].src.buf, x->plane[0].src.stride,
                            CONVERT_TO_BYTEPTR(vp9_highbd_64_zeros), 0, bw, bh,
-                           &sse, &avg);
-      sse >>= 2 * (xd->bd - 8);
-      avg >>= (xd->bd - 8);
+                           &sse64, &sum64);
+      sse = (unsigned int)(sse64 >> (2 * (xd->bd - 8)));
+      avg = (int)(sum64 >> (xd->bd - 8));
     } else {
       aq_variance(x->plane[0].src.buf, x->plane[0].src.stride, vp9_64_zeros, 0,
                   bw, bh, &sse, &avg);

@@ -478,8 +478,10 @@ void vp9_cyclic_refresh_update_parameters(VP9_COMP *const cpi) {
   int target_refresh = 0;
   double weight_segment_target = 0;
   double weight_segment = 0;
-  int thresh_low_motion = (cm->width < 720) ? 55 : 20;
-  int qp_thresh = VPXMIN(20, rc->best_quality << 1);
+  int thresh_low_motion = 20;
+  int qp_thresh = VPXMIN((cpi->oxcf.content == VP9E_CONTENT_SCREEN) ? 35 : 20,
+                         rc->best_quality << 1);
+  int qp_max_thresh = 117 * MAXQ >> 7;
   cr->apply_cyclic_refresh = 1;
   if (frame_is_intra_only(cm) || cpi->svc.temporal_layer_id > 0 ||
       is_lossless_requested(&cpi->oxcf) ||
@@ -487,7 +489,9 @@ void vp9_cyclic_refresh_update_parameters(VP9_COMP *const cpi) {
       (cpi->use_svc &&
        cpi->svc.layer_context[cpi->svc.temporal_layer_id].is_key_frame) ||
       (!cpi->use_svc && rc->avg_frame_low_motion < thresh_low_motion &&
-       rc->frames_since_key > 40)) {
+       rc->frames_since_key > 40) ||
+      (!cpi->use_svc && rc->avg_frame_qindex[INTER_FRAME] > qp_max_thresh &&
+       rc->frames_since_key > 20)) {
     cr->apply_cyclic_refresh = 0;
     return;
   }
@@ -529,9 +533,9 @@ void vp9_cyclic_refresh_update_parameters(VP9_COMP *const cpi) {
     cr->rate_boost_fac = 10;
   }
   // Adjust some parameters for low resolutions.
-  if (cm->width <= 352 && cm->height <= 288) {
+  if (cm->width * cm->height <= 352 * 288) {
     if (rc->avg_frame_bandwidth < 3000) {
-      cr->motion_thresh = 16;
+      cr->motion_thresh = 64;
       cr->rate_boost_fac = 13;
     } else {
       cr->max_qdelta_perc = 70;

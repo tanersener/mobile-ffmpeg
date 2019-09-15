@@ -201,7 +201,7 @@ static VP9_DENOISER_DECISION perform_motion_compensation(
   int i;
   struct buf_2d saved_dst[MAX_MB_PLANE];
   struct buf_2d saved_pre[MAX_MB_PLANE];
-  RefBuffer *saved_block_refs[2];
+  const RefBuffer *saved_block_refs[2];
   MV_REFERENCE_FRAME saved_frame;
 
   frame = ctx->best_reference_frame;
@@ -219,9 +219,7 @@ static VP9_DENOISER_DECISION perform_motion_compensation(
 
   // If the best reference frame uses inter-prediction and there is enough of a
   // difference in sum-squared-error, use it.
-  if (frame != INTRA_FRAME && frame != ALTREF_FRAME &&
-      (frame != GOLDEN_FRAME || num_spatial_layers == 1 ||
-       use_gf_temporal_ref) &&
+  if (frame != INTRA_FRAME && frame != ALTREF_FRAME && frame != GOLDEN_FRAME &&
       sse_diff > sse_diff_thresh(bs, increase_denoising, motion_magnitude)) {
     mi->ref_frame[0] = ctx->best_reference_frame;
     mi->mode = ctx->best_sse_inter_mode;
@@ -233,6 +231,7 @@ static VP9_DENOISER_DECISION perform_motion_compensation(
     // Bias to last reference.
     if ((num_spatial_layers > 1 && !use_gf_temporal_ref) ||
         frame == ALTREF_FRAME ||
+        (frame == GOLDEN_FRAME && use_gf_temporal_ref) ||
         (frame != LAST_FRAME &&
          ((ctx->zeromv_lastref_sse<(5 * ctx->zeromv_sse)>> 2) ||
           denoiser->denoising_level >= kDenHigh))) {
@@ -689,8 +688,8 @@ int vp9_denoiser_alloc(VP9_COMMON *cm, struct SVC *svc, VP9_DENOISER *denoiser,
   make_grayscale(&denoiser->running_avg_y[i]);
 #endif
   denoiser->frame_buffer_initialized = 1;
-  denoiser->denoising_level = kDenLow;
-  denoiser->prev_denoising_level = kDenLow;
+  denoiser->denoising_level = kDenMedium;
+  denoiser->prev_denoising_level = kDenMedium;
   denoiser->reset = 0;
   denoiser->current_denoiser_frame = 0;
   return 0;

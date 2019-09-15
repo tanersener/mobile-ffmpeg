@@ -10,6 +10,7 @@
 
 #include <assert.h>
 
+#include "./vp9_rtcd.h"
 #include "vpx_dsp/vpx_dsp_common.h"
 #include "vpx_dsp/ppc/inv_txfm_vsx.h"
 #include "vpx_dsp/ppc/bitdepth_conversion_vsx.h"

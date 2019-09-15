@@ -34,8 +34,8 @@ struct macroblock_plane {
   struct buf_2d src;
 
   // Quantizer setings
+  DECLARE_ALIGNED(16, int16_t, round_fp[8]);
   int16_t *quant_fp;
-  int16_t *round_fp;
   int16_t *quant;
   int16_t *quant_shift;
   int16_t *zbin;
@@ -93,6 +93,7 @@ struct macroblock {
   int rddiv;
   int rdmult;
   int cb_rdmult;
+  int segment_id;
   int mb_energy;
 
   // These are set to their default values at the beginning, and then adjusted
@@ -208,9 +209,7 @@ struct macroblock {
   void (*highbd_inv_txfm_add)(const tran_low_t *input, uint16_t *dest,
                               int stride, int eob, int bd);
 #endif
-#if CONFIG_ML_VAR_PARTITION
   DECLARE_ALIGNED(16, uint8_t, est_pred[64 * 64]);
-#endif  // CONFIG_ML_VAR_PARTITION
 
   struct scale_factors *me_sf;
 };

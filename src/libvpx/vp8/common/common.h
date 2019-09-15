@@ -31,15 +31,15 @@ extern "C" {
 
 /* Use this for variably-sized arrays. */
 
-#define vp8_copy_array(Dest, Src, N)       \
-  {                                        \
-    assert(sizeof(*Dest) == sizeof(*Src)); \
-    memcpy(Dest, Src, N * sizeof(*Src));   \
+#define vp8_copy_array(Dest, Src, N)           \
+  {                                            \
+    assert(sizeof(*(Dest)) == sizeof(*(Src))); \
+    memcpy(Dest, Src, (N) * sizeof(*(Src)));   \
   }
 
-#define vp8_zero(Dest) memset(&Dest, 0, sizeof(Dest));
+#define vp8_zero(Dest) memset(&(Dest), 0, sizeof(Dest));
 
-#define vp8_zero_array(Dest, N) memset(Dest, 0, N * sizeof(*Dest));
+#define vp8_zero_array(Dest, N) memset(Dest, 0, (N) * sizeof(*(Dest)));
 
 #ifdef __cplusplus
 }  // extern "C"

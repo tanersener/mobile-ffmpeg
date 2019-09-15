@@ -11,9 +11,9 @@
 #include "./vpx_config.h"
 #include "./vpx_dsp_rtcd.h"
 
-#include "vpx_dsp/ppc/types_vsx.h"
-#include "vpx_dsp/ppc/txfm_common_vsx.h"
 #include "vpx_dsp/ppc/transpose_vsx.h"
+#include "vpx_dsp/ppc/txfm_common_vsx.h"
+#include "vpx_dsp/ppc/types_vsx.h"
 
 // Returns ((a +/- b) * cospi16 + (2 << 13)) >> 14.
 static INLINE void single_butterfly(int16x8_t a, int16x8_t b, int16x8_t *add,
@@ -223,14 +223,15 @@ static INLINE int16x8_t add_round_shift_s16(const int16x8_t a) {
   return vec_sra(vec_add(vec_add(a, vec_ones_s16), sign), vec_dct_scale_log2);
 }
 
-void vpx_fdct32_vsx(const int16x8_t *in, int16x8_t *out, int pass) {
+static void fdct32_vsx(const int16x8_t *in, int16x8_t *out, int pass) {
   int16x8_t temp0[32];  // Hold stages: 1, 4, 7
   int16x8_t temp1[32];  // Hold stages: 2, 5
   int16x8_t temp2[32];  // Hold stages: 3, 6
+  int i;
 
   // Stage 1
   // Unrolling this loops actually slows down Power9 benchmarks
-  for (int i = 0; i < 16; i++) {
+  for (i = 0; i < 16; i++) {
     temp0[i] = vec_add(in[i], in[31 - i]);
     // pass through to stage 3.
     temp1[i + 16] = vec_sub(in[15 - i], in[i + 16]);
@@ -238,7 +239,7 @@ void vpx_fdct32_vsx(const int16x8_t *in, int16x8_t *out, int pass) {
 
   // Stage 2
   // Unrolling this loops actually slows down Power9 benchmarks
-  for (int i = 0; i < 8; i++) {
+  for (i = 0; i < 8; i++) {
     temp1[i] = vec_add(temp0[i], temp0[15 - i]);
     temp1[i + 8] = vec_sub(temp0[7 - i], temp0[i + 8]);
   }
@@ -461,7 +462,7 @@ void vpx_fdct32_vsx(const int16x8_t *in, int16x8_t *out, int pass) {
                    &out[3]);
 
   if (pass == 0) {
-    for (int i = 0; i < 32; i++) {
+    for (i = 0; i < 32; i++) {
       out[i] = sub_round_shift(out[i]);
     }
   }
@@ -478,16 +479,16 @@ void vpx_fdct32x32_rd_vsx(const int16_t *input, tran_low_t *out, int stride) {
 
   // Process in 8x32 columns.
   load(input, stride, temp0);
-  vpx_fdct32_vsx(temp0, temp1, 0);
+  fdct32_vsx(temp0, temp1, 0);
 
   load(input + 8, stride, temp0);
-  vpx_fdct32_vsx(temp0, temp2, 0);
+  fdct32_vsx(temp0, temp2, 0);
 
   load(input + 16, stride, temp0);
-  vpx_fdct32_vsx(temp0, temp3, 0);
+  fdct32_vsx(temp0, temp3, 0);
 
   load(input + 24, stride, temp0);
-  vpx_fdct32_vsx(temp0, temp4, 0);
+  fdct32_vsx(temp0, temp4, 0);
 
   // Generate the top row by munging the first set of 8 from each one
   // together.
@@ -496,7 +497,7 @@ void vpx_fdct32x32_rd_vsx(const int16_t *input, tran_low_t *out, int stride) {
   transpose_8x8(&temp3[0], &temp0[16]);
   transpose_8x8(&temp4[0], &temp0[24]);
 
-  vpx_fdct32_vsx(temp0, temp5, 1);
+  fdct32_vsx(temp0, temp5, 1);
 
   transpose_8x8(&temp5[0], &temp6[0]);
   transpose_8x8(&temp5[8], &temp6[8]);
@@ -511,7 +512,7 @@ void vpx_fdct32x32_rd_vsx(const int16_t *input, tran_low_t *out, int stride) {
   transpose_8x8(&temp3[8], &temp0[16]);
   transpose_8x8(&temp4[8], &temp0[24]);
 
-  vpx_fdct32_vsx(temp0, temp5, 1);
+  fdct32_vsx(temp0, temp5, 1);
 
   transpose_8x8(&temp5[0], &temp6[0]);
   transpose_8x8(&temp5[8], &temp6[8]);
@@ -526,7 +527,7 @@ void vpx_fdct32x32_rd_vsx(const int16_t *input, tran_low_t *out, int stride) {
   transpose_8x8(&temp3[16], &temp0[16]);
   transpose_8x8(&temp4[16], &temp0[24]);
 
-  vpx_fdct32_vsx(temp0, temp5, 1);
+  fdct32_vsx(temp0, temp5, 1);
 
   transpose_8x8(&temp5[0], &temp6[0]);
   transpose_8x8(&temp5[8], &temp6[8]);
@@ -541,7 +542,7 @@ void vpx_fdct32x32_rd_vsx(const int16_t *input, tran_low_t *out, int stride) {
   transpose_8x8(&temp3[24], &temp0[16]);
   transpose_8x8(&temp4[24], &temp0[24]);
 
-  vpx_fdct32_vsx(temp0, temp5, 1);
+  fdct32_vsx(temp0, temp5, 1);
 
   transpose_8x8(&temp5[0], &temp6[0]);
   transpose_8x8(&temp5[8], &temp6[8]);

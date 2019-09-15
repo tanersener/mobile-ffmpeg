@@ -32,7 +32,7 @@ typedef const bool_coder_spec c_bool_coder_spec;
 typedef const bool_writer c_bool_writer;
 typedef const bool_reader c_bool_reader;
 
-#define vp8_complement(x) (255 - x)
+#define vp8_complement(x) (255 - (x))
 
 /* We build coding trees compactly in arrays.
    Each node of the tree is a pair of vp8_tree_indices.

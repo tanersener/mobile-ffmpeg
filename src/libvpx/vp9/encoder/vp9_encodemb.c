@@ -16,6 +16,10 @@
 #include "vpx_mem/vpx_mem.h"
 #include "vpx_ports/mem.h"
 
+#if CONFIG_MISMATCH_DEBUG
+#include "vpx_util/vpx_debug_util.h"
+#endif
+
 #include "vp9/common/vp9_idct.h"
 #include "vp9/common/vp9_reconinter.h"
 #include "vp9/common/vp9_reconintra.h"
@@ -56,7 +60,7 @@ static const int plane_rd_mult[REF_TYPES][PLANE_TYPES] = {
 
 // 'num' can be negative, but 'shift' must be non-negative.
 #define RIGHT_SHIFT_POSSIBLY_NEGATIVE(num, shift) \
-  ((num) >= 0) ? (num) >> (shift) : -((-(num)) >> (shift))
+  (((num) >= 0) ? (num) >> (shift) : -((-(num)) >> (shift)))
 
 int vp9_optimize_b(MACROBLOCK *mb, int plane, int block, TX_SIZE tx_size,
                    int ctx) {
@@ -404,9 +408,11 @@ void vp9_xform_quant_fp(MACROBLOCK *x, int plane, int block, int row, int col,
                       scan_order->iscan);
       break;
     case TX_8X8:
-      vp9_fdct8x8_quant(src_diff, diff_stride, coeff, 64, x->skip_block,
-                        p->round_fp, p->quant_fp, qcoeff, dqcoeff, pd->dequant,
-                        eob, scan_order->scan, scan_order->iscan);
+      vpx_fdct8x8(src_diff, coeff, diff_stride);
+      vp9_quantize_fp(coeff, 64, x->skip_block, p->round_fp, p->quant_fp,
+                      qcoeff, dqcoeff, pd->dequant, eob, scan_order->scan,
+                      scan_order->iscan);
+
       break;
     default:
       assert(tx_size == TX_4X4);
@@ -577,6 +583,11 @@ void vp9_xform_quant(MACROBLOCK *x, int plane, int block, int row, int col,
 static void encode_block(int plane, int block, int row, int col,
                          BLOCK_SIZE plane_bsize, TX_SIZE tx_size, void *arg) {
   struct encode_b_args *const args = arg;
+#if CONFIG_MISMATCH_DEBUG
+  int mi_row = args->mi_row;
+  int mi_col = args->mi_col;
+  int output_enabled = args->output_enabled;
+#endif
   MACROBLOCK *const x = args->x;
   MACROBLOCKD *const xd = &x->e_mbd;
   struct macroblock_plane *const p = &x->plane[plane];
@@ -593,7 +604,11 @@ static void encode_block(int plane, int block, int row, int col,
   if (x->zcoeff_blk[tx_size][block] && plane == 0) {
     p->eobs[block] = 0;
     *a = *l = 0;
+#if CONFIG_MISMATCH_DEBUG
+    goto encode_block_end;
+#else
     return;
+#endif
   }
 
   if (!x->skip_recode) {
@@ -603,7 +618,11 @@ static void encode_block(int plane, int block, int row, int col,
         // skip forward transform
         p->eobs[block] = 0;
         *a = *l = 0;
+#if CONFIG_MISMATCH_DEBUG
+        goto encode_block_end;
+#else
         return;
+#endif
       } else {
         vp9_xform_quant_fp(x, plane, block, row, col, plane_bsize, tx_size);
       }
@@ -620,7 +639,11 @@ static void encode_block(int plane, int block, int row, int col,
           // skip forward transform
           p->eobs[block] = 0;
           *a = *l = 0;
+#if CONFIG_MISMATCH_DEBUG
+          goto encode_block_end;
+#else
           return;
+#endif
         }
       } else {
         vp9_xform_quant(x, plane, block, row, col, plane_bsize, tx_size);
@@ -637,7 +660,13 @@ static void encode_block(int plane, int block, int row, int col,
 
   if (p->eobs[block]) *(args->skip) = 0;
 
-  if (x->skip_encode || p->eobs[block] == 0) return;
+  if (x->skip_encode || p->eobs[block] == 0) {
+#if CONFIG_MISMATCH_DEBUG
+    goto encode_block_end;
+#else
+    return;
+#endif
+  }
 #if CONFIG_VP9_HIGHBITDEPTH
   if (xd->cur_buf->flags & YV12_FLAG_HIGHBITDEPTH) {
     uint16_t *const dst16 = CONVERT_TO_SHORTPTR(dst);
@@ -663,7 +692,11 @@ static void encode_block(int plane, int block, int row, int col,
                                xd->bd);
         break;
     }
+#if CONFIG_MISMATCH_DEBUG
+    goto encode_block_end;
+#else
     return;
+#endif
   }
 #endif  // CONFIG_VP9_HIGHBITDEPTH
 
@@ -685,6 +718,19 @@ static void encode_block(int plane, int block, int row, int col,
       x->inv_txfm_add(dqcoeff, dst, pd->dst.stride, p->eobs[block]);
       break;
   }
+#if CONFIG_MISMATCH_DEBUG
+encode_block_end:
+  if (output_enabled) {
+    int pixel_c, pixel_r;
+    int blk_w = 1 << (tx_size + TX_UNIT_SIZE_LOG2);
+    int blk_h = 1 << (tx_size + TX_UNIT_SIZE_LOG2);
+    mi_to_pixel_loc(&pixel_c, &pixel_r, mi_col, mi_row, col, row,
+                    pd->subsampling_x, pd->subsampling_y);
+    mismatch_record_block_tx(dst, pd->dst.stride, plane, pixel_c, pixel_r,
+                             blk_w, blk_h,
+                             xd->cur_buf->flags & YV12_FLAG_HIGHBITDEPTH);
+  }
+#endif
 }
 
 static void encode_block_pass1(int plane, int block, int row, int col,
@@ -718,12 +764,21 @@ void vp9_encode_sby_pass1(MACROBLOCK *x, BLOCK_SIZE bsize) {
                                          encode_block_pass1, x);
 }
 
-void vp9_encode_sb(MACROBLOCK *x, BLOCK_SIZE bsize) {
+void vp9_encode_sb(MACROBLOCK *x, BLOCK_SIZE bsize, int mi_row, int mi_col,
+                   int output_enabled) {
   MACROBLOCKD *const xd = &x->e_mbd;
   struct optimize_ctx ctx;
   MODE_INFO *mi = xd->mi[0];
-  struct encode_b_args arg = { x, 1, NULL, NULL, &mi->skip };
   int plane;
+#if CONFIG_MISMATCH_DEBUG
+  struct encode_b_args arg = { x,         1,      NULL,   NULL,
+                               &mi->skip, mi_row, mi_col, output_enabled };
+#else
+  struct encode_b_args arg = { x, 1, NULL, NULL, &mi->skip };
+  (void)mi_row;
+  (void)mi_col;
+  (void)output_enabled;
+#endif
 
   mi->skip = 1;
 
@@ -984,8 +1039,16 @@ void vp9_encode_intra_block_plane(MACROBLOCK *x, BLOCK_SIZE bsize, int plane,
                                   int enable_optimize_b) {
   const MACROBLOCKD *const xd = &x->e_mbd;
   struct optimize_ctx ctx;
+#if CONFIG_MISMATCH_DEBUG
+  // TODO(angiebird): make mismatch_debug support intra mode
+  struct encode_b_args arg = {
+    x, enable_optimize_b, ctx.ta[plane], ctx.tl[plane], &xd->mi[0]->skip, 0, 0,
+    0
+  };
+#else
   struct encode_b_args arg = { x, enable_optimize_b, ctx.ta[plane],
                                ctx.tl[plane], &xd->mi[0]->skip };
+#endif
 
   if (enable_optimize_b && x->optimize &&
       (!x->skip_recode || !x->skip_optimize)) {

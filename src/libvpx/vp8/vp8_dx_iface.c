@@ -38,7 +38,7 @@ typedef vpx_codec_stream_info_t vp8_stream_info_t;
 
 /* Structures for handling memory allocations */
 typedef enum { VP8_SEG_ALG_PRIV = 256, VP8_SEG_MAX } mem_seg_id_t;
-#define NELEMENTS(x) ((int)(sizeof(x) / sizeof(x[0])))
+#define NELEMENTS(x) ((int)(sizeof(x) / sizeof((x)[0])))
 
 struct vpx_codec_alg_priv {
   vpx_codec_priv_t base;

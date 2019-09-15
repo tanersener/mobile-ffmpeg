@@ -32,7 +32,6 @@ foreach my $arg (@ARGV) {
 
 print "@ This file was created from a .asm file\n";
 print "@  using the ads2gas.pl script.\n";
-print "\t.equ DO1STROUNDING, 0\n";
 print "\t.syntax unified\n";
 if ($thumb) {
     print "\t.thumb\n";

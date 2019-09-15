@@ -29,11 +29,6 @@
 
 // #define NEW_DIAMOND_SEARCH
 
-static INLINE const uint8_t *get_buf_from_mv(const struct buf_2d *buf,
-                                             const MV *mv) {
-  return &buf->buf[mv->row * buf->stride + mv->col];
-}
-
 void vp9_set_mv_search_range(MvLimits *mv_limits, const MV *mv) {
   int col_min = (mv->col >> 3) - MAX_FULL_PEL_VAL + (mv->col & 7 ? 1 : 0);
   int row_min = (mv->row >> 3) - MAX_FULL_PEL_VAL + (mv->row & 7 ? 1 : 0);
@@ -1646,7 +1641,7 @@ static int fast_dia_search(const MACROBLOCK *x, MV *ref_mv, int search_param,
 
 // Exhuastive motion search around a given centre position with a given
 // step size.
-static int exhuastive_mesh_search(const MACROBLOCK *x, MV *ref_mv, MV *best_mv,
+static int exhaustive_mesh_search(const MACROBLOCK *x, MV *ref_mv, MV *best_mv,
                                   int range, int step, int sad_per_bit,
                                   const vp9_variance_fn_ptr_t *fn_ptr,
                                   const MV *center_mv) {
@@ -1732,20 +1727,191 @@ static int exhuastive_mesh_search(const MACROBLOCK *x, MV *ref_mv, MV *best_mv,
   return best_sad;
 }
 
+#define MIN_RANGE 7
+#define MAX_RANGE 256
+#define MIN_INTERVAL 1
 #if CONFIG_NON_GREEDY_MV
-double vp9_nb_mvs_inconsistency(const MV *mv, const int_mv *nb_mvs,
-                                int mv_num) {
+
+#define LOG2_TABLE_SIZE 1024
+static const int log2_table[LOG2_TABLE_SIZE] = {
+  0,  // This is a dummy value
+  0,        1048576,  1661954,  2097152,  2434718,  2710530,  2943725,
+  3145728,  3323907,  3483294,  3627477,  3759106,  3880192,  3992301,
+  4096672,  4194304,  4286015,  4372483,  4454275,  4531870,  4605679,
+  4676053,  4743299,  4807682,  4869436,  4928768,  4985861,  5040877,
+  5093962,  5145248,  5194851,  5242880,  5289431,  5334591,  5378443,
+  5421059,  5462508,  5502851,  5542146,  5580446,  5617800,  5654255,
+  5689851,  5724629,  5758625,  5791875,  5824409,  5856258,  5887450,
+  5918012,  5947969,  5977344,  6006160,  6034437,  6062195,  6089453,
+  6116228,  6142538,  6168398,  6193824,  6218829,  6243427,  6267632,
+  6291456,  6314910,  6338007,  6360756,  6383167,  6405252,  6427019,
+  6448477,  6469635,  6490501,  6511084,  6531390,  6551427,  6571202,
+  6590722,  6609993,  6629022,  6647815,  6666376,  6684713,  6702831,
+  6720734,  6738427,  6755916,  6773205,  6790299,  6807201,  6823917,
+  6840451,  6856805,  6872985,  6888993,  6904834,  6920510,  6936026,
+  6951384,  6966588,  6981641,  6996545,  7011304,  7025920,  7040397,
+  7054736,  7068940,  7083013,  7096956,  7110771,  7124461,  7138029,
+  7151476,  7164804,  7178017,  7191114,  7204100,  7216974,  7229740,
+  7242400,  7254954,  7267405,  7279754,  7292003,  7304154,  7316208,
+  7328167,  7340032,  7351805,  7363486,  7375079,  7386583,  7398000,
+  7409332,  7420579,  7431743,  7442826,  7453828,  7464751,  7475595,
+  7486362,  7497053,  7507669,  7518211,  7528680,  7539077,  7549404,
+  7559660,  7569847,  7579966,  7590017,  7600003,  7609923,  7619778,
+  7629569,  7639298,  7648964,  7658569,  7668114,  7677598,  7687023,
+  7696391,  7705700,  7714952,  7724149,  7733289,  7742375,  7751407,
+  7760385,  7769310,  7778182,  7787003,  7795773,  7804492,  7813161,
+  7821781,  7830352,  7838875,  7847350,  7855777,  7864158,  7872493,
+  7880782,  7889027,  7897226,  7905381,  7913492,  7921561,  7929586,
+  7937569,  7945510,  7953410,  7961268,  7969086,  7976864,  7984602,
+  7992301,  7999960,  8007581,  8015164,  8022709,  8030217,  8037687,
+  8045121,  8052519,  8059880,  8067206,  8074496,  8081752,  8088973,
+  8096159,  8103312,  8110431,  8117516,  8124569,  8131589,  8138576,
+  8145532,  8152455,  8159347,  8166208,  8173037,  8179836,  8186605,
+  8193343,  8200052,  8206731,  8213380,  8220001,  8226593,  8233156,
+  8239690,  8246197,  8252676,  8259127,  8265550,  8271947,  8278316,
+  8284659,  8290976,  8297266,  8303530,  8309768,  8315981,  8322168,
+  8328330,  8334467,  8340579,  8346667,  8352730,  8358769,  8364784,
+  8370775,  8376743,  8382687,  8388608,  8394506,  8400381,  8406233,
+  8412062,  8417870,  8423655,  8429418,  8435159,  8440878,  8446576,
+  8452252,  8457908,  8463542,  8469155,  8474748,  8480319,  8485871,
+  8491402,  8496913,  8502404,  8507875,  8513327,  8518759,  8524171,
+  8529564,  8534938,  8540293,  8545629,  8550947,  8556245,  8561525,
+  8566787,  8572031,  8577256,  8582464,  8587653,  8592825,  8597980,
+  8603116,  8608236,  8613338,  8618423,  8623491,  8628542,  8633576,
+  8638593,  8643594,  8648579,  8653547,  8658499,  8663434,  8668354,
+  8673258,  8678145,  8683017,  8687874,  8692715,  8697540,  8702350,
+  8707145,  8711925,  8716690,  8721439,  8726174,  8730894,  8735599,
+  8740290,  8744967,  8749628,  8754276,  8758909,  8763528,  8768134,
+  8772725,  8777302,  8781865,  8786415,  8790951,  8795474,  8799983,
+  8804478,  8808961,  8813430,  8817886,  8822328,  8826758,  8831175,
+  8835579,  8839970,  8844349,  8848715,  8853068,  8857409,  8861737,
+  8866053,  8870357,  8874649,  8878928,  8883195,  8887451,  8891694,
+  8895926,  8900145,  8904353,  8908550,  8912734,  8916908,  8921069,
+  8925220,  8929358,  8933486,  8937603,  8941708,  8945802,  8949885,
+  8953957,  8958018,  8962068,  8966108,  8970137,  8974155,  8978162,
+  8982159,  8986145,  8990121,  8994086,  8998041,  9001986,  9005920,
+  9009844,  9013758,  9017662,  9021556,  9025440,  9029314,  9033178,
+  9037032,  9040877,  9044711,  9048536,  9052352,  9056157,  9059953,
+  9063740,  9067517,  9071285,  9075044,  9078793,  9082533,  9086263,
+  9089985,  9093697,  9097400,  9101095,  9104780,  9108456,  9112123,
+  9115782,  9119431,  9123072,  9126704,  9130328,  9133943,  9137549,
+  9141146,  9144735,  9148316,  9151888,  9155452,  9159007,  9162554,
+  9166092,  9169623,  9173145,  9176659,  9180165,  9183663,  9187152,
+  9190634,  9194108,  9197573,  9201031,  9204481,  9207923,  9211357,
+  9214784,  9218202,  9221613,  9225017,  9228412,  9231800,  9235181,
+  9238554,  9241919,  9245277,  9248628,  9251971,  9255307,  9258635,
+  9261956,  9265270,  9268577,  9271876,  9275169,  9278454,  9281732,
+  9285002,  9288266,  9291523,  9294773,  9298016,  9301252,  9304481,
+  9307703,  9310918,  9314126,  9317328,  9320523,  9323711,  9326892,
+  9330067,  9333235,  9336397,  9339552,  9342700,  9345842,  9348977,
+  9352106,  9355228,  9358344,  9361454,  9364557,  9367654,  9370744,
+  9373828,  9376906,  9379978,  9383043,  9386102,  9389155,  9392202,
+  9395243,  9398278,  9401306,  9404329,  9407345,  9410356,  9413360,
+  9416359,  9419351,  9422338,  9425319,  9428294,  9431263,  9434226,
+  9437184,  9440136,  9443082,  9446022,  9448957,  9451886,  9454809,
+  9457726,  9460638,  9463545,  9466446,  9469341,  9472231,  9475115,
+  9477994,  9480867,  9483735,  9486597,  9489454,  9492306,  9495152,
+  9497993,  9500828,  9503659,  9506484,  9509303,  9512118,  9514927,
+  9517731,  9520530,  9523324,  9526112,  9528895,  9531674,  9534447,
+  9537215,  9539978,  9542736,  9545489,  9548237,  9550980,  9553718,
+  9556451,  9559179,  9561903,  9564621,  9567335,  9570043,  9572747,
+  9575446,  9578140,  9580830,  9583514,  9586194,  9588869,  9591540,
+  9594205,  9596866,  9599523,  9602174,  9604821,  9607464,  9610101,
+  9612735,  9615363,  9617987,  9620607,  9623222,  9625832,  9628438,
+  9631040,  9633637,  9636229,  9638818,  9641401,  9643981,  9646556,
+  9649126,  9651692,  9654254,  9656812,  9659365,  9661914,  9664459,
+  9666999,  9669535,  9672067,  9674594,  9677118,  9679637,  9682152,
+  9684663,  9687169,  9689672,  9692170,  9694665,  9697155,  9699641,
+  9702123,  9704601,  9707075,  9709545,  9712010,  9714472,  9716930,
+  9719384,  9721834,  9724279,  9726721,  9729159,  9731593,  9734024,
+  9736450,  9738872,  9741291,  9743705,  9746116,  9748523,  9750926,
+  9753326,  9755721,  9758113,  9760501,  9762885,  9765266,  9767642,
+  9770015,  9772385,  9774750,  9777112,  9779470,  9781825,  9784175,
+  9786523,  9788866,  9791206,  9793543,  9795875,  9798204,  9800530,
+  9802852,  9805170,  9807485,  9809797,  9812104,  9814409,  9816710,
+  9819007,  9821301,  9823591,  9825878,  9828161,  9830441,  9832718,
+  9834991,  9837261,  9839527,  9841790,  9844050,  9846306,  9848559,
+  9850808,  9853054,  9855297,  9857537,  9859773,  9862006,  9864235,
+  9866462,  9868685,  9870904,  9873121,  9875334,  9877544,  9879751,
+  9881955,  9884155,  9886352,  9888546,  9890737,  9892925,  9895109,
+  9897291,  9899469,  9901644,  9903816,  9905985,  9908150,  9910313,
+  9912473,  9914629,  9916783,  9918933,  9921080,  9923225,  9925366,
+  9927504,  9929639,  9931771,  9933900,  9936027,  9938150,  9940270,
+  9942387,  9944502,  9946613,  9948721,  9950827,  9952929,  9955029,
+  9957126,  9959219,  9961310,  9963398,  9965484,  9967566,  9969645,
+  9971722,  9973796,  9975866,  9977934,  9980000,  9982062,  9984122,
+  9986179,  9988233,  9990284,  9992332,  9994378,  9996421,  9998461,
+  10000498, 10002533, 10004565, 10006594, 10008621, 10010644, 10012665,
+  10014684, 10016700, 10018713, 10020723, 10022731, 10024736, 10026738,
+  10028738, 10030735, 10032729, 10034721, 10036710, 10038697, 10040681,
+  10042662, 10044641, 10046617, 10048591, 10050562, 10052530, 10054496,
+  10056459, 10058420, 10060379, 10062334, 10064287, 10066238, 10068186,
+  10070132, 10072075, 10074016, 10075954, 10077890, 10079823, 10081754,
+  10083682, 10085608, 10087532, 10089453, 10091371, 10093287, 10095201,
+  10097112, 10099021, 10100928, 10102832, 10104733, 10106633, 10108529,
+  10110424, 10112316, 10114206, 10116093, 10117978, 10119861, 10121742,
+  10123620, 10125495, 10127369, 10129240, 10131109, 10132975, 10134839,
+  10136701, 10138561, 10140418, 10142273, 10144126, 10145976, 10147825,
+  10149671, 10151514, 10153356, 10155195, 10157032, 10158867, 10160699,
+  10162530, 10164358, 10166184, 10168007, 10169829, 10171648, 10173465,
+  10175280, 10177093, 10178904, 10180712, 10182519, 10184323, 10186125,
+  10187925, 10189722, 10191518, 10193311, 10195103, 10196892, 10198679,
+  10200464, 10202247, 10204028, 10205806, 10207583, 10209357, 10211130,
+  10212900, 10214668, 10216435, 10218199, 10219961, 10221721, 10223479,
+  10225235, 10226989, 10228741, 10230491, 10232239, 10233985, 10235728,
+  10237470, 10239210, 10240948, 10242684, 10244417, 10246149, 10247879,
+  10249607, 10251333, 10253057, 10254779, 10256499, 10258217, 10259933,
+  10261647, 10263360, 10265070, 10266778, 10268485, 10270189, 10271892,
+  10273593, 10275292, 10276988, 10278683, 10280376, 10282068, 10283757,
+  10285444, 10287130, 10288814, 10290495, 10292175, 10293853, 10295530,
+  10297204, 10298876, 10300547, 10302216, 10303883, 10305548, 10307211,
+  10308873, 10310532, 10312190, 10313846, 10315501, 10317153, 10318804,
+  10320452, 10322099, 10323745, 10325388, 10327030, 10328670, 10330308,
+  10331944, 10333578, 10335211, 10336842, 10338472, 10340099, 10341725,
+  10343349, 10344971, 10346592, 10348210, 10349828, 10351443, 10353057,
+  10354668, 10356279, 10357887, 10359494, 10361099, 10362702, 10364304,
+  10365904, 10367502, 10369099, 10370694, 10372287, 10373879, 10375468,
+  10377057, 10378643, 10380228, 10381811, 10383393, 10384973, 10386551,
+  10388128, 10389703, 10391276, 10392848, 10394418, 10395986, 10397553,
+  10399118, 10400682, 10402244, 10403804, 10405363, 10406920, 10408476,
+  10410030, 10411582, 10413133, 10414682, 10416230, 10417776, 10419320,
+  10420863, 10422404, 10423944, 10425482, 10427019, 10428554, 10430087,
+  10431619, 10433149, 10434678, 10436206, 10437731, 10439256, 10440778,
+  10442299, 10443819, 10445337, 10446854, 10448369, 10449882, 10451394,
+  10452905, 10454414, 10455921, 10457427, 10458932, 10460435, 10461936,
+  10463436, 10464935, 10466432, 10467927, 10469422, 10470914, 10472405,
+  10473895, 10475383, 10476870, 10478355, 10479839, 10481322, 10482802,
+  10484282,
+};
+
+#define LOG2_PRECISION 20
+static int64_t log2_approximation(int64_t v) {
+  assert(v > 0);
+  if (v < LOG2_TABLE_SIZE) {
+    return log2_table[v];
+  } else {
+    // use linear approximation when v >= 2^10
+    const int slope =
+        1477;  // slope = 1 / (log(2) * 1024) * (1 << LOG2_PRECISION)
+    assert(LOG2_TABLE_SIZE == 1 << 10);
+
+    return slope * (v - LOG2_TABLE_SIZE) + (10 << LOG2_PRECISION);
+  }
+}
+
+int64_t vp9_nb_mvs_inconsistency(const MV *mv, const int_mv *nb_mvs,
+                                 int mv_num) {
   int i;
   int update = 0;
-  double best_cost = 0;
+  int64_t best_cost = 0;
   vpx_clear_system_state();
   for (i = 0; i < mv_num; ++i) {
     if (nb_mvs[i].as_int != INVALID_MV) {
       MV nb_mv = nb_mvs[i].as_mv;
-      const double row_diff = mv->row - nb_mv.row;
-      const double col_diff = mv->col - nb_mv.col;
-      double cost = row_diff * row_diff + col_diff * col_diff;
-      cost = log2(1 + cost);
+      const int64_t row_diff = abs(mv->row - nb_mv.row);
+      const int64_t col_diff = abs(mv->col - nb_mv.col);
+      const int64_t cost =
+          log2_approximation(1 + row_diff * row_diff + col_diff * col_diff);
       if (update == 0) {
         best_cost = cost;
         update = 1;
@@ -1757,13 +1923,163 @@ double vp9_nb_mvs_inconsistency(const MV *mv, const int_mv *nb_mvs,
   return best_cost;
 }
 
-double vp9_diamond_search_sad_new(const MACROBLOCK *x,
-                                  const search_site_config *cfg,
-                                  const MV *init_full_mv, MV *best_full_mv,
-                                  double *best_mv_dist, double *best_mv_cost,
-                                  int search_param, double lambda, int *num00,
-                                  const vp9_variance_fn_ptr_t *fn_ptr,
-                                  const int_mv *nb_full_mvs, int full_mv_num) {
+static int64_t exhaustive_mesh_search_new(const MACROBLOCK *x, MV *best_mv,
+                                          int range, int step,
+                                          const vp9_variance_fn_ptr_t *fn_ptr,
+                                          const MV *center_mv, int lambda,
+                                          const int_mv *nb_full_mvs,
+                                          int full_mv_num) {
+  const MACROBLOCKD *const xd = &x->e_mbd;
+  const struct buf_2d *const what = &x->plane[0].src;
+  const struct buf_2d *const in_what = &xd->plane[0].pre[0];
+  MV fcenter_mv = { center_mv->row, center_mv->col };
+  int64_t best_sad;
+  int r, c, i;
+  int start_col, end_col, start_row, end_row;
+  int col_step = (step > 1) ? step : 4;
+
+  assert(step >= 1);
+
+  clamp_mv(&fcenter_mv, x->mv_limits.col_min, x->mv_limits.col_max,
+           x->mv_limits.row_min, x->mv_limits.row_max);
+  *best_mv = fcenter_mv;
+  best_sad =
+      ((int64_t)fn_ptr->sdf(what->buf, what->stride,
+                            get_buf_from_mv(in_what, &fcenter_mv),
+                            in_what->stride)
+       << LOG2_PRECISION) +
+      lambda * vp9_nb_mvs_inconsistency(&fcenter_mv, nb_full_mvs, full_mv_num);
+  start_row = VPXMAX(-range, x->mv_limits.row_min - fcenter_mv.row);
+  start_col = VPXMAX(-range, x->mv_limits.col_min - fcenter_mv.col);
+  end_row = VPXMIN(range, x->mv_limits.row_max - fcenter_mv.row);
+  end_col = VPXMIN(range, x->mv_limits.col_max - fcenter_mv.col);
+
+  for (r = start_row; r <= end_row; r += step) {
+    for (c = start_col; c <= end_col; c += col_step) {
+      // Step > 1 means we are not checking every location in this pass.
+      if (step > 1) {
+        const MV mv = { fcenter_mv.row + r, fcenter_mv.col + c };
+        int64_t sad =
+            (int64_t)fn_ptr->sdf(what->buf, what->stride,
+                                 get_buf_from_mv(in_what, &mv), in_what->stride)
+            << LOG2_PRECISION;
+        if (sad < best_sad) {
+          sad +=
+              lambda * vp9_nb_mvs_inconsistency(&mv, nb_full_mvs, full_mv_num);
+          if (sad < best_sad) {
+            best_sad = sad;
+            *best_mv = mv;
+          }
+        }
+      } else {
+        // 4 sads in a single call if we are checking every location
+        if (c + 3 <= end_col) {
+          unsigned int sads[4];
+          const uint8_t *addrs[4];
+          for (i = 0; i < 4; ++i) {
+            const MV mv = { fcenter_mv.row + r, fcenter_mv.col + c + i };
+            addrs[i] = get_buf_from_mv(in_what, &mv);
+          }
+          fn_ptr->sdx4df(what->buf, what->stride, addrs, in_what->stride, sads);
+
+          for (i = 0; i < 4; ++i) {
+            int64_t sad = (int64_t)sads[i] << LOG2_PRECISION;
+            if (sad < best_sad) {
+              const MV mv = { fcenter_mv.row + r, fcenter_mv.col + c + i };
+              sad += lambda *
+                     vp9_nb_mvs_inconsistency(&mv, nb_full_mvs, full_mv_num);
+              if (sad < best_sad) {
+                best_sad = sad;
+                *best_mv = mv;
+              }
+            }
+          }
+        } else {
+          for (i = 0; i < end_col - c; ++i) {
+            const MV mv = { fcenter_mv.row + r, fcenter_mv.col + c + i };
+            int64_t sad = (int64_t)fn_ptr->sdf(what->buf, what->stride,
+                                               get_buf_from_mv(in_what, &mv),
+                                               in_what->stride)
+                          << LOG2_PRECISION;
+            if (sad < best_sad) {
+              sad += lambda *
+                     vp9_nb_mvs_inconsistency(&mv, nb_full_mvs, full_mv_num);
+              if (sad < best_sad) {
+                best_sad = sad;
+                *best_mv = mv;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return best_sad;
+}
+
+static int64_t full_pixel_exhaustive_new(const VP9_COMP *cpi, MACROBLOCK *x,
+                                         MV *centre_mv_full,
+                                         const vp9_variance_fn_ptr_t *fn_ptr,
+                                         MV *dst_mv, int lambda,
+                                         const int_mv *nb_full_mvs,
+                                         int full_mv_num) {
+  const SPEED_FEATURES *const sf = &cpi->sf;
+  MV temp_mv = { centre_mv_full->row, centre_mv_full->col };
+  int64_t bestsme;
+  int i;
+  int interval = sf->mesh_patterns[0].interval;
+  int range = sf->mesh_patterns[0].range;
+  int baseline_interval_divisor;
+  const MV dummy_mv = { 0, 0 };
+
+  // Trap illegal values for interval and range for this function.
+  if ((range < MIN_RANGE) || (range > MAX_RANGE) || (interval < MIN_INTERVAL) ||
+      (interval > range)) {
+    printf("ERROR: invalid range\n");
+    assert(0);
+  }
+
+  baseline_interval_divisor = range / interval;
+
+  // Check size of proposed first range against magnitude of the centre
+  // value used as a starting point.
+  range = VPXMAX(range, (5 * VPXMAX(abs(temp_mv.row), abs(temp_mv.col))) / 4);
+  range = VPXMIN(range, MAX_RANGE);
+  interval = VPXMAX(interval, range / baseline_interval_divisor);
+
+  // initial search
+  bestsme =
+      exhaustive_mesh_search_new(x, &temp_mv, range, interval, fn_ptr, &temp_mv,
+                                 lambda, nb_full_mvs, full_mv_num);
+
+  if ((interval > MIN_INTERVAL) && (range > MIN_RANGE)) {
+    // Progressive searches with range and step size decreasing each time
+    // till we reach a step size of 1. Then break out.
+    for (i = 1; i < MAX_MESH_STEP; ++i) {
+      // First pass with coarser step and longer range
+      bestsme = exhaustive_mesh_search_new(
+          x, &temp_mv, sf->mesh_patterns[i].range,
+          sf->mesh_patterns[i].interval, fn_ptr, &temp_mv, lambda, nb_full_mvs,
+          full_mv_num);
+
+      if (sf->mesh_patterns[i].interval == 1) break;
+    }
+  }
+
+  bestsme = vp9_get_mvpred_var(x, &temp_mv, &dummy_mv, fn_ptr, 0);
+  *dst_mv = temp_mv;
+
+  return bestsme;
+}
+
+static double diamond_search_sad_new(const MACROBLOCK *x,
+                                     const search_site_config *cfg,
+                                     const MV *init_full_mv, MV *best_full_mv,
+                                     int search_param, int lambda, int *num00,
+                                     const vp9_variance_fn_ptr_t *fn_ptr,
+                                     const int_mv *nb_full_mvs,
+                                     int full_mv_num) {
   int i, j, step;
 
   const MACROBLOCKD *const xd = &x->e_mbd;
@@ -1799,10 +2115,14 @@ double vp9_diamond_search_sad_new(const MACROBLOCK *x,
   best_address = in_what;
 
   // Check the starting position
-  *best_mv_dist = fn_ptr->sdf(what, what_stride, in_what, in_what_stride);
-  *best_mv_cost =
-      vp9_nb_mvs_inconsistency(best_full_mv, nb_full_mvs, full_mv_num);
-  bestsad = (*best_mv_dist) + lambda * (*best_mv_cost);
+  {
+    const double mv_dist =
+        fn_ptr->sdf(what, what_stride, in_what, in_what_stride);
+    const double mv_cost =
+        vp9_nb_mvs_inconsistency(best_full_mv, nb_full_mvs, full_mv_num) /
+        (double)(1 << LOG2_PRECISION);
+    bestsad = mv_dist + lambda * mv_cost;
+  }
 
   i = 0;
 
@@ -1831,17 +2151,18 @@ double vp9_diamond_search_sad_new(const MACROBLOCK *x,
                        sad_array);
 
         for (t = 0; t < 4; t++, i++) {
-          const MV this_mv = { best_full_mv->row + ss_mv[i].row,
-                               best_full_mv->col + ss_mv[i].col };
-          const double mv_dist = sad_array[t];
-          const double mv_cost =
-              vp9_nb_mvs_inconsistency(&this_mv, nb_full_mvs, full_mv_num);
-          double thissad = mv_dist + lambda * mv_cost;
-          if (thissad < bestsad) {
-            bestsad = thissad;
-            *best_mv_dist = mv_dist;
-            *best_mv_cost = mv_cost;
-            best_site = i;
+          if (sad_array[t] < bestsad) {
+            const MV this_mv = { best_full_mv->row + ss_mv[i].row,
+                                 best_full_mv->col + ss_mv[i].col };
+            const double mv_dist = sad_array[t];
+            const double mv_cost =
+                vp9_nb_mvs_inconsistency(&this_mv, nb_full_mvs, full_mv_num) /
+                (double)(1 << LOG2_PRECISION);
+            double thissad = mv_dist + lambda * mv_cost;
+            if (thissad < bestsad) {
+              bestsad = thissad;
+              best_site = i;
+            }
           }
         }
       }
@@ -1855,14 +2176,15 @@ double vp9_diamond_search_sad_new(const MACROBLOCK *x,
           const uint8_t *const check_here = ss_os[i] + best_address;
           const double mv_dist =
               fn_ptr->sdf(what, what_stride, check_here, in_what_stride);
-          const double mv_cost =
-              vp9_nb_mvs_inconsistency(&this_mv, nb_full_mvs, full_mv_num);
-          double thissad = mv_dist + lambda * mv_cost;
-          if (thissad < bestsad) {
-            bestsad = thissad;
-            *best_mv_dist = mv_dist;
-            *best_mv_cost = mv_cost;
-            best_site = i;
+          if (mv_dist < bestsad) {
+            const double mv_cost =
+                vp9_nb_mvs_inconsistency(&this_mv, nb_full_mvs, full_mv_num) /
+                (double)(1 << LOG2_PRECISION);
+            double thissad = mv_dist + lambda * mv_cost;
+            if (thissad < bestsad) {
+              bestsad = thissad;
+              best_site = i;
+            }
           }
         }
         i++;
@@ -2269,20 +2591,22 @@ unsigned int vp9_int_pro_motion_estimation(const VP9_COMP *cpi, MACROBLOCK *x,
               point as the best match, we will do a final 1-away diamond
               refining search  */
 double vp9_full_pixel_diamond_new(const VP9_COMP *cpi, MACROBLOCK *x,
-                                  MV *mvp_full, int step_param, double lambda,
+                                  MV *mvp_full, int step_param, int lambda,
                                   int do_refine,
                                   const vp9_variance_fn_ptr_t *fn_ptr,
                                   const int_mv *nb_full_mvs, int full_mv_num,
-                                  MV *best_mv, double *best_mv_dist,
-                                  double *best_mv_cost) {
+                                  MV *best_mv) {
   int n, num00 = 0;
   double thissme;
   double bestsme;
   const int further_steps = MAX_MVSEARCH_STEPS - 1 - step_param;
+  const MV center_mv = { 0, 0 };
   vpx_clear_system_state();
-  bestsme = vp9_diamond_search_sad_new(
-      x, &cpi->ss_cfg, mvp_full, best_mv, best_mv_dist, best_mv_cost,
-      step_param, lambda, &n, fn_ptr, nb_full_mvs, full_mv_num);
+  bestsme =
+      diamond_search_sad_new(x, &cpi->ss_cfg, mvp_full, best_mv, step_param,
+                             lambda, &n, fn_ptr, nb_full_mvs, full_mv_num);
+
+  bestsme = vp9_get_mvpred_var(x, best_mv, &center_mv, fn_ptr, 0);
 
   // If there won't be more n-step search, check to see if refining search is
   // needed.
@@ -2294,19 +2618,16 @@ double vp9_full_pixel_diamond_new(const VP9_COMP *cpi, MACROBLOCK *x,
       num00--;
     } else {
       MV temp_mv;
-      double mv_dist;
-      double mv_cost;
-      thissme = vp9_diamond_search_sad_new(
-          x, &cpi->ss_cfg, mvp_full, &temp_mv, &mv_dist, &mv_cost,
-          step_param + n, lambda, &num00, fn_ptr, nb_full_mvs, full_mv_num);
+      thissme = diamond_search_sad_new(x, &cpi->ss_cfg, mvp_full, &temp_mv,
+                                       step_param + n, lambda, &num00, fn_ptr,
+                                       nb_full_mvs, full_mv_num);
+      thissme = vp9_get_mvpred_var(x, &temp_mv, &center_mv, fn_ptr, 0);
       // check to see if refining search is needed.
       if (num00 > further_steps - n) do_refine = 0;
 
       if (thissme < bestsme) {
         bestsme = thissme;
         *best_mv = temp_mv;
-        *best_mv_dist = mv_dist;
-        *best_mv_cost = mv_cost;
       }
     }
   }
@@ -2315,18 +2636,17 @@ double vp9_full_pixel_diamond_new(const VP9_COMP *cpi, MACROBLOCK *x,
   if (do_refine) {
     const int search_range = 8;
     MV temp_mv = *best_mv;
-    double mv_dist;
-    double mv_cost;
-    thissme = vp9_refining_search_sad_new(x, &temp_mv, &mv_dist, &mv_cost,
-                                          lambda, search_range, fn_ptr,
-                                          nb_full_mvs, full_mv_num);
+    thissme = vp9_refining_search_sad_new(x, &temp_mv, lambda, search_range,
+                                          fn_ptr, nb_full_mvs, full_mv_num);
+    thissme = vp9_get_mvpred_var(x, &temp_mv, &center_mv, fn_ptr, 0);
     if (thissme < bestsme) {
       bestsme = thissme;
       *best_mv = temp_mv;
-      *best_mv_dist = mv_dist;
-      *best_mv_cost = mv_cost;
     }
   }
+
+  bestsme = (double)full_pixel_exhaustive_new(cpi, x, best_mv, fn_ptr, best_mv,
+                                              lambda, nb_full_mvs, full_mv_num);
   return bestsme;
 }
 #endif  // CONFIG_NON_GREEDY_MV
@@ -2335,7 +2655,8 @@ double vp9_full_pixel_diamond_new(const VP9_COMP *cpi, MACROBLOCK *x,
 /* do_refine: If last step (1-away) of n-step search doesn't pick the center
               point as the best match, we will do a final 1-away diamond
               refining search  */
-static int full_pixel_diamond(const VP9_COMP *cpi, MACROBLOCK *x, MV *mvp_full,
+static int full_pixel_diamond(const VP9_COMP *const cpi,
+                              const MACROBLOCK *const x, MV *mvp_full,
                               int step_param, int sadpb, int further_steps,
                               int do_refine, int *cost_list,
                               const vp9_variance_fn_ptr_t *fn_ptr,
@@ -2395,13 +2716,11 @@ static int full_pixel_diamond(const VP9_COMP *cpi, MACROBLOCK *x, MV *mvp_full,
   return bestsme;
 }
 
-#define MIN_RANGE 7
-#define MAX_RANGE 256
-#define MIN_INTERVAL 1
 // Runs an limited range exhaustive mesh search using a pattern set
 // according to the encode speed profile.
-static int full_pixel_exhaustive(VP9_COMP *cpi, MACROBLOCK *x,
-                                 MV *centre_mv_full, int sadpb, int *cost_list,
+static int full_pixel_exhaustive(const VP9_COMP *const cpi,
+                                 const MACROBLOCK *const x, MV *centre_mv_full,
+                                 int sadpb, int *cost_list,
                                  const vp9_variance_fn_ptr_t *fn_ptr,
                                  const MV *ref_mv, MV *dst_mv) {
   const SPEED_FEATURES *const sf = &cpi->sf;
@@ -2427,7 +2746,7 @@ static int full_pixel_exhaustive(VP9_COMP *cpi, MACROBLOCK *x,
   interval = VPXMAX(interval, range / baseline_interval_divisor);
 
   // initial search
-  bestsme = exhuastive_mesh_search(x, &f_ref_mv, &temp_mv, range, interval,
+  bestsme = exhaustive_mesh_search(x, &f_ref_mv, &temp_mv, range, interval,
                                    sadpb, fn_ptr, &temp_mv);
 
   if ((interval > MIN_INTERVAL) && (range > MIN_RANGE)) {
@@ -2435,7 +2754,7 @@ static int full_pixel_exhaustive(VP9_COMP *cpi, MACROBLOCK *x,
     // till we reach a step size of 1. Then break out.
     for (i = 1; i < MAX_MESH_STEP; ++i) {
       // First pass with coarser step and longer range
-      bestsme = exhuastive_mesh_search(
+      bestsme = exhaustive_mesh_search(
           x, &f_ref_mv, &temp_mv, sf->mesh_patterns[i].range,
           sf->mesh_patterns[i].interval, sadpb, fn_ptr, &temp_mv);
 
@@ -2456,8 +2775,7 @@ static int full_pixel_exhaustive(VP9_COMP *cpi, MACROBLOCK *x,
 
 #if CONFIG_NON_GREEDY_MV
 double vp9_refining_search_sad_new(const MACROBLOCK *x, MV *best_full_mv,
-                                   double *best_mv_dist, double *best_mv_cost,
-                                   double lambda, int search_range,
+                                   int lambda, int search_range,
                                    const vp9_variance_fn_ptr_t *fn_ptr,
                                    const int_mv *nb_full_mvs, int full_mv_num) {
   const MACROBLOCKD *const xd = &x->e_mbd;
@@ -2468,11 +2786,14 @@ double vp9_refining_search_sad_new(const MACROBLOCK *x, MV *best_full_mv,
   double best_sad;
   int i, j;
   vpx_clear_system_state();
-  *best_mv_dist =
-      fn_ptr->sdf(what->buf, what->stride, best_address, in_what->stride);
-  *best_mv_cost =
-      vp9_nb_mvs_inconsistency(best_full_mv, nb_full_mvs, full_mv_num);
-  best_sad = (*best_mv_dist) + lambda * (*best_mv_cost);
+  {
+    const double mv_dist =
+        fn_ptr->sdf(what->buf, what->stride, best_address, in_what->stride);
+    const double mv_cost =
+        vp9_nb_mvs_inconsistency(best_full_mv, nb_full_mvs, full_mv_num) /
+        (double)(1 << LOG2_PRECISION);
+    best_sad = mv_dist + lambda * mv_cost;
+  }
 
   for (i = 0; i < search_range; i++) {
     int best_site = -1;
@@ -2494,12 +2815,11 @@ double vp9_refining_search_sad_new(const MACROBLOCK *x, MV *best_full_mv,
                         best_full_mv->col + neighbors[j].col };
         const double mv_dist = sads[j];
         const double mv_cost =
-            vp9_nb_mvs_inconsistency(&mv, nb_full_mvs, full_mv_num);
+            vp9_nb_mvs_inconsistency(&mv, nb_full_mvs, full_mv_num) /
+            (double)(1 << LOG2_PRECISION);
         const double thissad = mv_dist + lambda * mv_cost;
         if (thissad < best_sad) {
           best_sad = thissad;
-          *best_mv_dist = mv_dist;
-          *best_mv_cost = mv_cost;
           best_site = j;
         }
       }
@@ -2513,12 +2833,11 @@ double vp9_refining_search_sad_new(const MACROBLOCK *x, MV *best_full_mv,
               fn_ptr->sdf(what->buf, what->stride,
                           get_buf_from_mv(in_what, &mv), in_what->stride);
           const double mv_cost =
-              vp9_nb_mvs_inconsistency(&mv, nb_full_mvs, full_mv_num);
+              vp9_nb_mvs_inconsistency(&mv, nb_full_mvs, full_mv_num) /
+              (double)(1 << LOG2_PRECISION);
           const double thissad = mv_dist + lambda * mv_cost;
           if (thissad < best_sad) {
             best_sad = thissad;
-            *best_mv_dist = mv_dist;
-            *best_mv_cost = mv_cost;
             best_site = j;
           }
         }
@@ -2663,13 +2982,13 @@ int vp9_refining_search_8p_c(const MACROBLOCK *x, MV *ref_mv, int error_per_bit,
   return best_sad;
 }
 
-int vp9_full_pixel_search(VP9_COMP *cpi, MACROBLOCK *x, BLOCK_SIZE bsize,
-                          MV *mvp_full, int step_param, int search_method,
-                          int error_per_bit, int *cost_list, const MV *ref_mv,
-                          MV *tmp_mv, int var_max, int rd) {
+int vp9_full_pixel_search(const VP9_COMP *const cpi, const MACROBLOCK *const x,
+                          BLOCK_SIZE bsize, MV *mvp_full, int step_param,
+                          int search_method, int error_per_bit, int *cost_list,
+                          const MV *ref_mv, MV *tmp_mv, int var_max, int rd) {
   const SPEED_FEATURES *const sf = &cpi->sf;
   const SEARCH_METHODS method = (SEARCH_METHODS)search_method;
-  vp9_variance_fn_ptr_t *fn_ptr = &cpi->fn_ptr[bsize];
+  const vp9_variance_fn_ptr_t *fn_ptr = &cpi->fn_ptr[bsize];
   int var = 0;
   int run_exhaustive_search = 0;
 
@@ -2714,10 +3033,10 @@ int vp9_full_pixel_search(VP9_COMP *cpi, MACROBLOCK *x, BLOCK_SIZE bsize,
   if (method == NSTEP) {
     if (sf->exhaustive_searches_thresh < INT_MAX &&
         !cpi->rc.is_src_frame_alt_ref) {
-      const int64_t exhuastive_thr =
+      const int64_t exhaustive_thr =
           sf->exhaustive_searches_thresh >>
           (8 - (b_width_log2_lookup[bsize] + b_height_log2_lookup[bsize]));
-      if (var > exhuastive_thr) run_exhaustive_search = 1;
+      if (var > exhaustive_thr) run_exhaustive_search = 1;
     }
   } else if (method == MESH) {
     run_exhaustive_search = 1;

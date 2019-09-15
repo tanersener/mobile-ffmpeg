@@ -145,7 +145,6 @@ INSTALL-SRCS-$(CONFIG_CODEC_SRCS) += vpx_dsp/x86/bitdepth_conversion_sse2.asm
 endif
 CODEC_EXPORTS-yes += vpx/exports_com
 CODEC_EXPORTS-$(CONFIG_ENCODERS) += vpx/exports_enc
-CODEC_EXPORTS-$(CONFIG_VP9_ENCODER) += vpx/exports_spatial_svc
 CODEC_EXPORTS-$(CONFIG_DECODERS) += vpx/exports_dec
 
 INSTALL-LIBS-yes += include/vpx/vpx_codec.h
@@ -234,7 +233,7 @@ LIBS-$(if yes,$(CONFIG_STATIC)) += $(BUILD_PFX)libvpx.a $(BUILD_PFX)libvpx_g.a
 $(BUILD_PFX)libvpx_g.a: $(LIBVPX_OBJS)
 
 SO_VERSION_MAJOR := 6
-SO_VERSION_MINOR := 0
+SO_VERSION_MINOR := 1
 SO_VERSION_PATCH := 0
 ifeq ($(filter darwin%,$(TGT_OS)),$(TGT_OS))
 LIBVPX_SO               := libvpx.$(SO_VERSION_MAJOR).dylib

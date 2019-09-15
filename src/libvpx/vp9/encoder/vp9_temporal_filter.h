@@ -24,7 +24,7 @@ static const MV kZeroMv = { 0, 0 };
 #define BH_LOG2 5
 #define BW 32
 #define BW_LOG2 5
-#define BLK_PELS 1024  // Pixels in the block
+#define BLK_PELS ((BH) * (BW))  // Pixels in the block
 #define TF_SHIFT 2
 #define TF_ROUND 3
 #define THR_SHIFT 2

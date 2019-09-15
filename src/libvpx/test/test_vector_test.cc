@@ -32,9 +32,10 @@
 namespace {
 
 const int kThreads = 0;
-const int kFileName = 1;
+const int kMtMode = 1;
+const int kFileName = 2;
 
-typedef std::tuple<int, const char *> DecodeParam;
+typedef std::tuple<int, int, const char *> DecodeParam;
 
 class TestVectorTest : public ::libvpx_test::DecoderTest,
                        public ::libvpx_test::CodecTestWithParam<DecodeParam> {
@@ -56,6 +57,25 @@ class TestVectorTest : public ::libvpx_test::DecoderTest,
     ASSERT_TRUE(md5_file_ != NULL)
         << "Md5 file open failed. Filename: " << md5_file_name_;
   }
+
+#if CONFIG_VP9_DECODER
+  virtual void PreDecodeFrameHook(
+      const libvpx_test::CompressedVideoSource &video,
+      libvpx_test::Decoder *decoder) {
+    if (video.frame_number() == 0 && mt_mode_ >= 0) {
+      if (mt_mode_ == 1) {
+        decoder->Control(VP9D_SET_LOOP_FILTER_OPT, 1);
+        decoder->Control(VP9D_SET_ROW_MT, 0);
+      } else if (mt_mode_ == 2) {
+        decoder->Control(VP9D_SET_LOOP_FILTER_OPT, 0);
+        decoder->Control(VP9D_SET_ROW_MT, 1);
+      } else {
+        decoder->Control(VP9D_SET_LOOP_FILTER_OPT, 0);
+        decoder->Control(VP9D_SET_ROW_MT, 0);
+      }
+    }
+  }
+#endif
 
   virtual void DecompressedFrameHook(const vpx_image_t &img,
                                      const unsigned int frame_number) {
@@ -80,6 +100,7 @@ class TestVectorTest : public ::libvpx_test::DecoderTest,
 #if CONFIG_VP9_DECODER
   std::set<std::string> resize_clips_;
 #endif
+  int mt_mode_;
 
  private:
   FILE *md5_file_;
@@ -97,9 +118,10 @@ TEST_P(TestVectorTest, MD5Match) {
   char str[256];
 
   cfg.threads = std::get<kThreads>(input);
-
-  snprintf(str, sizeof(str) / sizeof(str[0]) - 1, "file: %s threads: %d",
-           filename.c_str(), cfg.threads);
+  mt_mode_ = std::get<kMtMode>(input);
+  snprintf(str, sizeof(str) / sizeof(str[0]) - 1,
+           "file: %s threads: %d MT mode: %d", filename.c_str(), cfg.threads,
+           mt_mode_);
   SCOPED_TRACE(str);
 
   // Open compressed video file.
@@ -134,7 +156,8 @@ TEST_P(TestVectorTest, MD5Match) {
 VP8_INSTANTIATE_TEST_CASE(
     TestVectorTest,
     ::testing::Combine(
-        ::testing::Values(1),  // Single thread.
+        ::testing::Values(1),   // Single thread.
+        ::testing::Values(-1),  // LPF opt and Row MT is not applicable
         ::testing::ValuesIn(libvpx_test::kVP8TestVectors,
                             libvpx_test::kVP8TestVectors +
                                 libvpx_test::kNumVP8TestVectors)));
@@ -147,6 +170,7 @@ INSTANTIATE_TEST_CASE_P(
             static_cast<const libvpx_test::CodecFactory *>(&libvpx_test::kVP8)),
         ::testing::Combine(
             ::testing::Range(2, 9),  // With 2 ~ 8 threads.
+            ::testing::Values(-1),   // LPF opt and Row MT is not applicable
             ::testing::ValuesIn(libvpx_test::kVP8TestVectors,
                                 libvpx_test::kVP8TestVectors +
                                     libvpx_test::kNumVP8TestVectors))));
@@ -157,7 +181,8 @@ INSTANTIATE_TEST_CASE_P(
 VP9_INSTANTIATE_TEST_CASE(
     TestVectorTest,
     ::testing::Combine(
-        ::testing::Values(1),  // Single thread.
+        ::testing::Values(1),   // Single thread.
+        ::testing::Values(-1),  // LPF opt and Row MT is not applicable
         ::testing::ValuesIn(libvpx_test::kVP9TestVectors,
                             libvpx_test::kVP9TestVectors +
                                 libvpx_test::kNumVP9TestVectors)));
@@ -169,6 +194,10 @@ INSTANTIATE_TEST_CASE_P(
             static_cast<const libvpx_test::CodecFactory *>(&libvpx_test::kVP9)),
         ::testing::Combine(
             ::testing::Range(2, 9),  // With 2 ~ 8 threads.
+            ::testing::Range(0, 3),  // With multi threads modes 0 ~ 2
+                                     // 0: LPF opt and Row MT disabled
+                                     // 1: LPF opt enabled
+                                     // 2: Row MT enabled
             ::testing::ValuesIn(libvpx_test::kVP9TestVectors,
                                 libvpx_test::kVP9TestVectors +
                                     libvpx_test::kNumVP9TestVectors))));

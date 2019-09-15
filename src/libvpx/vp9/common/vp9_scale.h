@@ -20,7 +20,7 @@ extern "C" {
 
 #define REF_SCALE_SHIFT 14
 #define REF_NO_SCALE (1 << REF_SCALE_SHIFT)
-#define REF_INVALID_SCALE -1
+#define REF_INVALID_SCALE (-1)
 
 struct scale_factors {
   int x_scale_fp;  // horizontal fixed point scale factor

@@ -56,10 +56,34 @@ static void vp9_dec_setup_mi(VP9_COMMON *cm) {
 }
 
 void vp9_dec_alloc_row_mt_mem(RowMTWorkerData *row_mt_worker_data,
-                              VP9_COMMON *cm, int num_sbs) {
+                              VP9_COMMON *cm, int num_sbs, int max_threads,
+                              int num_jobs) {
   int plane;
   const size_t dqcoeff_size = (num_sbs << DQCOEFFS_PER_SB_LOG2) *
                               sizeof(*row_mt_worker_data->dqcoeff[0]);
+  row_mt_worker_data->num_jobs = num_jobs;
+#if CONFIG_MULTITHREAD
+  {
+    int i;
+    CHECK_MEM_ERROR(
+        cm, row_mt_worker_data->recon_sync_mutex,
+        vpx_malloc(sizeof(*row_mt_worker_data->recon_sync_mutex) * num_jobs));
+    if (row_mt_worker_data->recon_sync_mutex) {
+      for (i = 0; i < num_jobs; ++i) {
+        pthread_mutex_init(&row_mt_worker_data->recon_sync_mutex[i], NULL);
+      }
+    }
+
+    CHECK_MEM_ERROR(
+        cm, row_mt_worker_data->recon_sync_cond,
+        vpx_malloc(sizeof(*row_mt_worker_data->recon_sync_cond) * num_jobs));
+    if (row_mt_worker_data->recon_sync_cond) {
+      for (i = 0; i < num_jobs; ++i) {
+        pthread_cond_init(&row_mt_worker_data->recon_sync_cond[i], NULL);
+      }
+    }
+  }
+#endif
   row_mt_worker_data->num_sbs = num_sbs;
   for (plane = 0; plane < 3; ++plane) {
     CHECK_MEM_ERROR(cm, row_mt_worker_data->dqcoeff[plane],
@@ -74,11 +98,36 @@ void vp9_dec_alloc_row_mt_mem(RowMTWorkerData *row_mt_worker_data,
                              sizeof(*row_mt_worker_data->partition)));
   CHECK_MEM_ERROR(cm, row_mt_worker_data->recon_map,
                   vpx_calloc(num_sbs, sizeof(*row_mt_worker_data->recon_map)));
+
+  // allocate memory for thread_data
+  if (row_mt_worker_data->thread_data == NULL) {
+    const size_t thread_size =
+        max_threads * sizeof(*row_mt_worker_data->thread_data);
+    CHECK_MEM_ERROR(cm, row_mt_worker_data->thread_data,
+                    vpx_memalign(32, thread_size));
+  }
 }
 
 void vp9_dec_free_row_mt_mem(RowMTWorkerData *row_mt_worker_data) {
   if (row_mt_worker_data != NULL) {
     int plane;
+#if CONFIG_MULTITHREAD
+    int i;
+    if (row_mt_worker_data->recon_sync_mutex != NULL) {
+      for (i = 0; i < row_mt_worker_data->num_jobs; ++i) {
+        pthread_mutex_destroy(&row_mt_worker_data->recon_sync_mutex[i]);
+      }
+      vpx_free(row_mt_worker_data->recon_sync_mutex);
+      row_mt_worker_data->recon_sync_mutex = NULL;
+    }
+    if (row_mt_worker_data->recon_sync_cond != NULL) {
+      for (i = 0; i < row_mt_worker_data->num_jobs; ++i) {
+        pthread_cond_destroy(&row_mt_worker_data->recon_sync_cond[i]);
+      }
+      vpx_free(row_mt_worker_data->recon_sync_cond);
+      row_mt_worker_data->recon_sync_cond = NULL;
+    }
+#endif
     for (plane = 0; plane < 3; ++plane) {
       vpx_free(row_mt_worker_data->eob[plane]);
       row_mt_worker_data->eob[plane] = NULL;
@@ -89,6 +138,8 @@ void vp9_dec_free_row_mt_mem(RowMTWorkerData *row_mt_worker_data) {
     row_mt_worker_data->partition = NULL;
     vpx_free(row_mt_worker_data->recon_map);
     row_mt_worker_data->recon_map = NULL;
+    vpx_free(row_mt_worker_data->thread_data);
+    row_mt_worker_data->thread_data = NULL;
   }
 }
 
@@ -179,8 +230,16 @@ void vp9_decoder_remove(VP9Decoder *pbi) {
 
   if (pbi->row_mt == 1) {
     vp9_dec_free_row_mt_mem(pbi->row_mt_worker_data);
+    if (pbi->row_mt_worker_data != NULL) {
+      vp9_jobq_deinit(&pbi->row_mt_worker_data->jobq);
+      vpx_free(pbi->row_mt_worker_data->jobq_buf);
+#if CONFIG_MULTITHREAD
+      pthread_mutex_destroy(&pbi->row_mt_worker_data->recon_done_mutex);
+#endif
+    }
     vpx_free(pbi->row_mt_worker_data);
   }
+
   vp9_remove_common(&pbi->common);
   vpx_free(pbi);
 }

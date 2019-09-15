@@ -992,19 +992,19 @@ static inline uint32_t vpx_mse8x(const uint8_t *src_ptr, int src_stride,
 vpx_mse8xN(16);
 vpx_mse8xN(8);
 
-#define SUBPIX_VAR(W, H)                                                     \
-  uint32_t vpx_sub_pixel_variance##W##x##H##_mmi(                            \
-      const uint8_t *src_ptr, int src_stride, int x_offset, int y_offset,    \
-      const uint8_t *ref_ptr, int ref_stride, uint32_t *sse) {               \
-    uint16_t fdata3[(H + 1) * W];                                            \
-    uint8_t temp2[H * W];                                                    \
-                                                                             \
-    var_filter_block2d_bil_first_pass(src_ptr, fdata3, src_stride, 1, H + 1, \
-                                      W, bilinear_filters[x_offset]);        \
-    var_filter_block2d_bil_second_pass(fdata3, temp2, W, W, H, W,            \
-                                       bilinear_filters[y_offset]);          \
-                                                                             \
-    return vpx_variance##W##x##H##_mmi(temp2, W, ref_ptr, ref_stride, sse);  \
+#define SUBPIX_VAR(W, H)                                                       \
+  uint32_t vpx_sub_pixel_variance##W##x##H##_mmi(                              \
+      const uint8_t *src_ptr, int src_stride, int x_offset, int y_offset,      \
+      const uint8_t *ref_ptr, int ref_stride, uint32_t *sse) {                 \
+    uint16_t fdata3[((H) + 1) * (W)];                                          \
+    uint8_t temp2[(H) * (W)];                                                  \
+                                                                               \
+    var_filter_block2d_bil_first_pass(src_ptr, fdata3, src_stride, 1, (H) + 1, \
+                                      W, bilinear_filters[x_offset]);          \
+    var_filter_block2d_bil_second_pass(fdata3, temp2, W, W, H, W,              \
+                                       bilinear_filters[y_offset]);            \
+                                                                               \
+    return vpx_variance##W##x##H##_mmi(temp2, W, ref_ptr, ref_stride, sse);    \
   }
 
 SUBPIX_VAR(64, 64)
@@ -1087,9 +1087,9 @@ static inline void var_filter_block2d_bil_16x(const uint8_t *src_ptr,
   uint32_t vpx_sub_pixel_variance16x##H##_mmi(                                 \
       const uint8_t *src_ptr, int src_stride, int x_offset, int y_offset,      \
       const uint8_t *ref_ptr, int ref_stride, uint32_t *sse) {                 \
-    uint8_t temp2[16 * H];                                                     \
+    uint8_t temp2[16 * (H)];                                                   \
     var_filter_block2d_bil_16x(src_ptr, src_stride, x_offset, y_offset, temp2, \
-                               (H - 2) / 2);                                   \
+                               ((H)-2) / 2);                                   \
                                                                                \
     return vpx_variance16x##H##_mmi(temp2, 16, ref_ptr, ref_stride, sse);      \
   }
@@ -1169,9 +1169,9 @@ static inline void var_filter_block2d_bil_8x(const uint8_t *src_ptr,
   uint32_t vpx_sub_pixel_variance8x##H##_mmi(                                 \
       const uint8_t *src_ptr, int src_stride, int x_offset, int y_offset,     \
       const uint8_t *ref_ptr, int ref_stride, uint32_t *sse) {                \
-    uint8_t temp2[8 * H];                                                     \
+    uint8_t temp2[8 * (H)];                                                   \
     var_filter_block2d_bil_8x(src_ptr, src_stride, x_offset, y_offset, temp2, \
-                              (H - 2) / 2);                                   \
+                              ((H)-2) / 2);                                   \
                                                                               \
     return vpx_variance8x##H##_mmi(temp2, 8, ref_ptr, ref_stride, sse);       \
   }
@@ -1247,9 +1247,9 @@ static inline void var_filter_block2d_bil_4x(const uint8_t *src_ptr,
   uint32_t vpx_sub_pixel_variance4x##H##_mmi(                                 \
       const uint8_t *src_ptr, int src_stride, int x_offset, int y_offset,     \
       const uint8_t *ref_ptr, int ref_stride, uint32_t *sse) {                \
-    uint8_t temp2[4 * H];                                                     \
+    uint8_t temp2[4 * (H)];                                                   \
     var_filter_block2d_bil_4x(src_ptr, src_stride, x_offset, y_offset, temp2, \
-                              (H - 2) / 2);                                   \
+                              ((H)-2) / 2);                                   \
                                                                               \
     return vpx_variance4x##H##_mmi(temp2, 4, ref_ptr, ref_stride, sse);       \
   }
@@ -1257,23 +1257,23 @@ static inline void var_filter_block2d_bil_4x(const uint8_t *src_ptr,
 SUBPIX_VAR4XN(8)
 SUBPIX_VAR4XN(4)
 
-#define SUBPIX_AVG_VAR(W, H)                                                 \
-  uint32_t vpx_sub_pixel_avg_variance##W##x##H##_mmi(                        \
-      const uint8_t *src_ptr, int src_stride, int x_offset, int y_offset,    \
-      const uint8_t *ref_ptr, int ref_stride, uint32_t *sse,                 \
-      const uint8_t *second_pred) {                                          \
-    uint16_t fdata3[(H + 1) * W];                                            \
-    uint8_t temp2[H * W];                                                    \
-    DECLARE_ALIGNED(16, uint8_t, temp3[H * W]);                              \
-                                                                             \
-    var_filter_block2d_bil_first_pass(src_ptr, fdata3, src_stride, 1, H + 1, \
-                                      W, bilinear_filters[x_offset]);        \
-    var_filter_block2d_bil_second_pass(fdata3, temp2, W, W, H, W,            \
-                                       bilinear_filters[y_offset]);          \
-                                                                             \
-    vpx_comp_avg_pred_c(temp3, second_pred, W, H, temp2, W);                 \
-                                                                             \
-    return vpx_variance##W##x##H##_mmi(temp3, W, ref_ptr, ref_stride, sse);  \
+#define SUBPIX_AVG_VAR(W, H)                                                   \
+  uint32_t vpx_sub_pixel_avg_variance##W##x##H##_mmi(                          \
+      const uint8_t *src_ptr, int src_stride, int x_offset, int y_offset,      \
+      const uint8_t *ref_ptr, int ref_stride, uint32_t *sse,                   \
+      const uint8_t *second_pred) {                                            \
+    uint16_t fdata3[((H) + 1) * (W)];                                          \
+    uint8_t temp2[(H) * (W)];                                                  \
+    DECLARE_ALIGNED(16, uint8_t, temp3[(H) * (W)]);                            \
+                                                                               \
+    var_filter_block2d_bil_first_pass(src_ptr, fdata3, src_stride, 1, (H) + 1, \
+                                      W, bilinear_filters[x_offset]);          \
+    var_filter_block2d_bil_second_pass(fdata3, temp2, W, W, H, W,              \
+                                       bilinear_filters[y_offset]);            \
+                                                                               \
+    vpx_comp_avg_pred_c(temp3, second_pred, W, H, temp2, W);                   \
+                                                                               \
+    return vpx_variance##W##x##H##_mmi(temp3, W, ref_ptr, ref_stride, sse);    \
   }
 
 SUBPIX_AVG_VAR(64, 64)

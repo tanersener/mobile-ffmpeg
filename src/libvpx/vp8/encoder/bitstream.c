@@ -1043,12 +1043,18 @@ void vp8_pack_bitstream(VP8_COMP *cpi, unsigned char *dest,
     cx_data[1] = 0x01;
     cx_data[2] = 0x2a;
 
+    /* Pack scale and frame size into 16 bits. Store it 8 bits at a time.
+     * https://tools.ietf.org/html/rfc6386
+     * 9.1. Uncompressed Data Chunk
+     * 16 bits      :     (2 bits Horizontal Scale << 14) | Width (14 bits)
+     * 16 bits      :     (2 bits Vertical Scale << 14) | Height (14 bits)
+     */
     v = (pc->horiz_scale << 14) | pc->Width;
-    cx_data[3] = v;
+    cx_data[3] = v & 0xff;
     cx_data[4] = v >> 8;
 
     v = (pc->vert_scale << 14) | pc->Height;
-    cx_data[5] = v;
+    cx_data[5] = v & 0xff;
     cx_data[6] = v >> 8;
 
     extra_bytes_packed = 7;
@@ -1262,11 +1268,30 @@ void vp8_pack_bitstream(VP8_COMP *cpi, unsigned char *dest,
 
   /* update frame tag */
   {
+    /* Pack partition size, show frame, version and frame type into to 24 bits.
+     * Store it 8 bits at a time.
+     * https://tools.ietf.org/html/rfc6386
+     * 9.1. Uncompressed Data Chunk
+     *    The uncompressed data chunk comprises a common (for key frames and
+     *    interframes) 3-byte frame tag that contains four fields, as follows:
+     *
+     *    1.  A 1-bit frame type (0 for key frames, 1 for interframes).
+     *
+     *    2.  A 3-bit version number (0 - 3 are defined as four different
+     *        profiles with different decoding complexity; other values may be
+     *        defined for future variants of the VP8 data format).
+     *
+     *    3.  A 1-bit show_frame flag (0 when current frame is not for display,
+     *        1 when current frame is for display).
+     *
+     *    4.  A 19-bit field containing the size of the first data partition in
+     *        bytes
+     */
     int v = (oh.first_partition_length_in_bytes << 5) | (oh.show_frame << 4) |
             (oh.version << 1) | oh.type;
 
-    dest[0] = v;
-    dest[1] = v >> 8;
+    dest[0] = v & 0xff;
+    dest[1] = (v >> 8) & 0xff;
     dest[2] = v >> 16;
   }
 

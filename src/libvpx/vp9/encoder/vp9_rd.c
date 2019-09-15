@@ -57,6 +57,30 @@ void vp9_rd_cost_init(RD_COST *rd_cost) {
   rd_cost->rdcost = 0;
 }
 
+int64_t vp9_calculate_rd_cost(int mult, int div, int rate, int64_t dist) {
+  assert(mult >= 0);
+  assert(div > 0);
+  if (rate >= 0 && dist >= 0) {
+    return RDCOST(mult, div, rate, dist);
+  }
+  if (rate >= 0 && dist < 0) {
+    return RDCOST_NEG_D(mult, div, rate, -dist);
+  }
+  if (rate < 0 && dist >= 0) {
+    return RDCOST_NEG_R(mult, div, -rate, dist);
+  }
+  return -RDCOST(mult, div, -rate, -dist);
+}
+
+void vp9_rd_cost_update(int mult, int div, RD_COST *rd_cost) {
+  if (rd_cost->rate < INT_MAX && rd_cost->dist < INT64_MAX) {
+    rd_cost->rdcost =
+        vp9_calculate_rd_cost(mult, div, rd_cost->rate, rd_cost->dist);
+  } else {
+    vp9_rd_cost_reset(rd_cost);
+  }
+}
+
 // The baseline rd thresholds for breaking out of the rd loop for
 // certain modes are assumed to be based on 8x8 blocks.
 // This table is used to correct for block size.
@@ -309,6 +333,15 @@ static void set_block_thresholds(const VP9_COMMON *cm, RD_OPT *rd) {
   }
 }
 
+void vp9_build_inter_mode_cost(VP9_COMP *cpi) {
+  const VP9_COMMON *const cm = &cpi->common;
+  int i;
+  for (i = 0; i < INTER_MODE_CONTEXTS; ++i) {
+    vp9_cost_tokens((int *)cpi->inter_mode_cost[i], cm->fc->inter_mode_probs[i],
+                    vp9_inter_mode_tree);
+  }
+}
+
 void vp9_initialize_rd_consts(VP9_COMP *cpi) {
   VP9_COMMON *const cm = &cpi->common;
   MACROBLOCK *const x = &cpi->td.mb;
@@ -357,10 +390,7 @@ void vp9_initialize_rd_consts(VP9_COMP *cpi) {
             x->nmvjointcost,
             cm->allow_high_precision_mv ? x->nmvcost_hp : x->nmvcost,
             &cm->fc->nmvc, cm->allow_high_precision_mv);
-
-        for (i = 0; i < INTER_MODE_CONTEXTS; ++i)
-          vp9_cost_tokens((int *)cpi->inter_mode_cost[i],
-                          cm->fc->inter_mode_probs[i], vp9_inter_mode_tree);
+        vp9_build_inter_mode_cost(cpi);
       }
     }
   }

@@ -161,7 +161,7 @@ static INLINE uint64_t xgetbv(void) {
 #define HAS_AVX2 0x080
 #define HAS_AVX512 0x100
 #ifndef BIT
-#define BIT(n) (1u << n)
+#define BIT(n) (1u << (n))
 #endif
 
 static INLINE int x86_simd_caps(void) {

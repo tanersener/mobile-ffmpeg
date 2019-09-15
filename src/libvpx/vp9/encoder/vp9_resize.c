@@ -506,10 +506,12 @@ static void highbd_interpolate(const uint16_t *const input, int inlength,
       sub_pel = (y >> (INTERP_PRECISION_BITS - SUBPEL_BITS)) & SUBPEL_MASK;
       filter = interp_filters[sub_pel];
       sum = 0;
-      for (k = 0; k < INTERP_TAPS; ++k)
+      for (k = 0; k < INTERP_TAPS; ++k) {
+        assert(int_pel - INTERP_TAPS / 2 + 1 + k < inlength);
         sum += filter[k] * input[(int_pel - INTERP_TAPS / 2 + 1 + k < 0
                                       ? 0
                                       : int_pel - INTERP_TAPS / 2 + 1 + k)];
+      }
       *optr++ = clip_pixel_highbd(ROUND_POWER_OF_TWO(sum, FILTER_BITS), bd);
     }
     // Middle part.

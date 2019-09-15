@@ -150,8 +150,9 @@ static INLINE int32x4x2_t vnegq_s32_dual(const int32x4x2_t in) {
   return out;
 }
 
-void vpx_highbd_iadst16_neon(const int32_t *input, int32_t *output,
-                             uint16_t *dest, const int stride, const int bd) {
+static void highbd_iadst16_neon(const int32_t *input, int32_t *output,
+                                uint16_t *dest, const int stride,
+                                const int bd) {
   const int32x4_t c_1_31_5_27 =
       create_s32x4_neon(cospi_1_64, cospi_31_64, cospi_5_64, cospi_27_64);
   const int32x4_t c_9_23_13_19 =
@@ -424,11 +425,11 @@ void vp9_highbd_iht16x16_256_add_neon(const tran_low_t *input, uint16_t *dest,
     static const highbd_iht_2d IHT_16[] = {
       { vpx_highbd_idct16x16_256_add_half1d,
         vpx_highbd_idct16x16_256_add_half1d },  // DCT_DCT  = 0
-      { vpx_highbd_iadst16_neon,
+      { highbd_iadst16_neon,
         vpx_highbd_idct16x16_256_add_half1d },  // ADST_DCT = 1
       { vpx_highbd_idct16x16_256_add_half1d,
-        vpx_highbd_iadst16_neon },                          // DCT_ADST = 2
-      { vpx_highbd_iadst16_neon, vpx_highbd_iadst16_neon }  // ADST_ADST = 3
+        highbd_iadst16_neon },                      // DCT_ADST = 2
+      { highbd_iadst16_neon, highbd_iadst16_neon }  // ADST_ADST = 3
     };
     const highbd_iht_2d ht = IHT_16[tx_type];
     int32_t row_output[16 * 16];

@@ -18,6 +18,9 @@
 #include "vpx_mem/vpx_mem.h"
 #include "vpx_ports/mem_ops.h"
 #include "vpx_ports/system_state.h"
+#if CONFIG_BITSTREAM_DEBUG
+#include "vpx_util/vpx_debug_util.h"
+#endif  // CONFIG_BITSTREAM_DEBUG
 
 #include "vp9/common/vp9_entropy.h"
 #include "vp9/common/vp9_entropymode.h"
@@ -39,8 +42,10 @@ static const struct vp9_token intra_mode_encodings[INTRA_MODES] = {
   { 0, 1 },  { 6, 3 },   { 28, 5 },  { 30, 5 }, { 58, 6 },
   { 59, 6 }, { 126, 7 }, { 127, 7 }, { 62, 6 }, { 2, 2 }
 };
-static const struct vp9_token switchable_interp_encodings[SWITCHABLE_FILTERS] =
-    { { 0, 1 }, { 2, 2 }, { 3, 2 } };
+static const struct vp9_token
+    switchable_interp_encodings[SWITCHABLE_FILTERS] = { { 0, 1 },
+                                                        { 2, 2 },
+                                                        { 3, 2 } };
 static const struct vp9_token partition_encodings[PARTITION_TYPES] = {
   { 0, 1 }, { 2, 2 }, { 6, 3 }, { 7, 3 }
 };
@@ -1351,10 +1356,19 @@ void vp9_pack_bitstream(VP9_COMP *cpi, uint8_t *dest, size_t *size) {
   struct vpx_write_bit_buffer wb = { data, 0 };
   struct vpx_write_bit_buffer saved_wb;
 
+#if CONFIG_BITSTREAM_DEBUG
+  bitstream_queue_reset_write();
+#endif
+
   write_uncompressed_header(cpi, &wb);
 
   // Skip the rest coding process if use show existing frame.
-  if (cpi->common.show_existing_frame) return;
+  if (cpi->common.show_existing_frame) {
+    uncompressed_hdr_size = vpx_wb_bytes_written(&wb);
+    data += uncompressed_hdr_size;
+    *size = data - dest;
+    return;
+  }
 
   saved_wb = wb;
   vpx_wb_write_literal(&wb, 0, 16);  // don't know in advance first part. size

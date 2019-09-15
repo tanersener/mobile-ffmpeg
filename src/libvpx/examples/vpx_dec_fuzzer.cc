@@ -32,8 +32,10 @@
  * Note --size-limit and VPX_MAX_ALLOCABLE_MEMORY are defined to avoid
  * Out of memory errors when running generated fuzzer binary
    $../libvpx/configure --disable-unit-tests --size-limit=12288x12288 \
-   --extra-cflags="-DVPX_MAX_ALLOCABLE_MEMORY=1073741824" \
-   --disable-webm-io --enable-debug
+   --extra-cflags="-fsanitize=fuzzer-no-link \
+   -DVPX_MAX_ALLOCABLE_MEMORY=1073741824" \
+   --disable-webm-io --enable-debug --disable-vp8-encoder \
+   --disable-vp9-encoder --disable-examples
 
  * Build libvpx
    $make -j32
@@ -42,7 +44,7 @@
    $ $CXX $CXXFLAGS -std=c++11 -DDECODER=vp9 \
    -fsanitize=fuzzer -I../libvpx -I. -Wl,--start-group \
    ../libvpx/examples/vpx_dec_fuzzer.cc -o ./vpx_dec_fuzzer_vp9 \
-   ./libvpx.a ./tools_common.c.o -Wl,--end-group
+   ./libvpx.a -Wl,--end-group
 
  * DECODER should be defined as vp9 or vp8 to enable vp9/vp8
  *
@@ -64,75 +66,23 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <algorithm>
 #include <memory>
 
-#include "./tools_common.h"
 #include "vpx/vp8dx.h"
 #include "vpx/vpx_decoder.h"
 #include "vpx_ports/mem_ops.h"
 
-#define VPX_TOSTRING(str) #str
-#define VPX_STRINGIFY(str) VPX_TOSTRING(str)
+#define IVF_FRAME_HDR_SZ (4 + 8) /* 4 byte size + 8 byte timestamp */
+#define IVF_FILE_HDR_SZ 32
 
-static void CloseFile(FILE *file) { fclose(file); }
-
-/* ReadFrame is derived from ivf_read_frame in ivfdec.c
- * This function doesn't call warn(), but instead ignores those errors.
- * This is done to minimize the prints on console when running fuzzer
- * Also if fread fails to read frame_size number of bytes, instead of
- * returning an error, this returns with partial frames.
- * This is done to ensure that partial frames are sent to decoder.
- */
-static int ReadFrame(FILE *infile, uint8_t **buffer, size_t *bytes_read,
-                     size_t *buffer_size) {
-  char raw_header[IVF_FRAME_HDR_SZ] = { 0 };
-  size_t frame_size = 0;
-
-  if (fread(raw_header, IVF_FRAME_HDR_SZ, 1, infile) == 1) {
-    frame_size = mem_get_le32(raw_header);
-
-    if (frame_size > 256 * 1024 * 1024) {
-      frame_size = 0;
-    }
-
-    if (frame_size > *buffer_size) {
-      uint8_t *new_buffer = (uint8_t *)realloc(*buffer, 2 * frame_size);
-
-      if (new_buffer) {
-        *buffer = new_buffer;
-        *buffer_size = 2 * frame_size;
-      } else {
-        frame_size = 0;
-      }
-    }
-  }
-
-  if (!feof(infile)) {
-    *bytes_read = fread(*buffer, 1, frame_size, infile);
-    return 0;
-  }
-
-  return 1;
-}
+#define VPXD_INTERFACE(name) VPXD_INTERFACE_(name)
+#define VPXD_INTERFACE_(name) vpx_codec_##name##_dx()
 
 extern "C" void usage_exit(void) { exit(EXIT_FAILURE); }
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
-  std::unique_ptr<FILE, decltype(&CloseFile)> file(
-      fmemopen((void *)data, size, "rb"), &CloseFile);
-  if (file == nullptr) {
-    return 0;
-  }
-  // Ensure input contains at least one file header and one frame header
-  if (size < IVF_FILE_HDR_SZ + IVF_FRAME_HDR_SZ) {
-    return 0;
-  }
-  char header[IVF_FILE_HDR_SZ];
-  if (fread(header, 1, IVF_FILE_HDR_SZ, file.get()) != IVF_FILE_HDR_SZ) {
-    return 0;
-  }
-  const VpxInterface *decoder = get_vpx_decoder_by_name(VPX_STRINGIFY(DECODER));
-  if (decoder == nullptr) {
+  if (size <= IVF_FILE_HDR_SZ) {
     return 0;
   }
 
@@ -140,24 +90,29 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   // Set thread count in the range [1, 64].
   const unsigned int threads = (data[IVF_FILE_HDR_SZ] & 0x3f) + 1;
   vpx_codec_dec_cfg_t cfg = { threads, 0, 0 };
-  if (vpx_codec_dec_init(&codec, decoder->codec_interface(), &cfg, 0)) {
+  if (vpx_codec_dec_init(&codec, VPXD_INTERFACE(DECODER), &cfg, 0)) {
     return 0;
   }
 
-  uint8_t *buffer = nullptr;
-  size_t buffer_size = 0;
-  size_t frame_size = 0;
+  data += IVF_FILE_HDR_SZ;
+  size -= IVF_FILE_HDR_SZ;
 
-  while (!ReadFrame(file.get(), &buffer, &frame_size, &buffer_size)) {
+  while (size > IVF_FRAME_HDR_SZ) {
+    size_t frame_size = mem_get_le32(data);
+    size -= IVF_FRAME_HDR_SZ;
+    data += IVF_FRAME_HDR_SZ;
+    frame_size = std::min(size, frame_size);
+
     const vpx_codec_err_t err =
-        vpx_codec_decode(&codec, buffer, frame_size, nullptr, 0);
+        vpx_codec_decode(&codec, data, frame_size, nullptr, 0);
     static_cast<void>(err);
     vpx_codec_iter_t iter = nullptr;
     vpx_image_t *img = nullptr;
     while ((img = vpx_codec_get_frame(&codec, &iter)) != nullptr) {
     }
+    data += frame_size;
+    size -= frame_size;
   }
   vpx_codec_destroy(&codec);
-  free(buffer);
   return 0;
 }
