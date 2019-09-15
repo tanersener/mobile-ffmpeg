@@ -9,7 +9,7 @@
 <table border=0 width=100%>
 <tr>
 <td><p class=tiny>libogg documentation</p></td>
-<td align=right><p class=tiny>libogg release 1.3.2 - 20140527</p></td>
+<td align=right><p class=tiny>libogg release 1.3.4 - 20190830</p></td>
 </tr>
 </table>
 
@@ -17,13 +17,13 @@
 
 <p><i>declared in "ogg/ogg.h";</i></p>
 
-<p>This function is used to tell the <a href="ogg_sync_state.html">ogg_sync_state</a> struct how many bytes we wrote into the buffer. 
+<p>This function is used to tell the <a href="ogg_sync_state.html">ogg_sync_state</a> struct how many bytes we wrote into the buffer.
 
 <p>
-The general proceedure is to request a pointer into an internal 
-<a href="ogg_sync_state.html">ogg_sync_state</a> buffer by calling 
+The general procedure is to request a pointer into an internal
+<a href="ogg_sync_state.html">ogg_sync_state</a> buffer by calling
 <a href="ogg_sync_buffer.html">ogg_sync_buffer()</a>. The buffer
-is then filled up to the requested size with new input, and 
+is then filled up to the requested size with new input, and
 ogg_sync_wrote() is called to advance the fill pointer by however
 much data was actually available.</p>
 
@@ -59,11 +59,11 @@ int ogg_sync_wrote(<a href="ogg_sync_state.html">ogg_sync_state</a> *oy, long by
 <hr noshade>
 <table border=0 width=100%>
 <tr valign=top>
-<td><p class=tiny>copyright &copy; 2000-2014 Xiph.Org</p></td>
+<td><p class=tiny>copyright &copy; 2000-2019 Xiph.Org Foundation</p></td>
 <td align=right><p class=tiny><a href="http://www.xiph.org/ogg/">Ogg Container Format</a></p></td>
 </tr><tr>
 <td><p class=tiny>libogg documentation</p></td>
-<td align=right><p class=tiny>libogg release 1.3.2 - 20140527</p></td>
+<td align=right><p class=tiny>libogg release 1.3.4 - 20190830</p></td>
 </tr>
 </table>
 

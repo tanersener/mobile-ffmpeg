@@ -3,12 +3,12 @@
 prefix=
 exec_prefix=
 libdir=${pcfiledir}/src
-includedir=${pcfiledir}/include
+includedir=${pcfiledir}/@top_srcdir@/include
 
 Name: ogg
 Description: ogg is a library for manipulating ogg bitstreams (not installed)
 Version: @VERSION@
 Requires:
 Conflicts:
-Libs: ${libdir}/.libs/libogg.a
+Libs: ${libdir}/.libs/libogg.la
 Cflags: -I${includedir}
