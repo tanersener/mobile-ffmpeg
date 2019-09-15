@@ -1,4 +1,4 @@
-#
+#! /usr/bin/env bash
 #                          __  __            _
 #                       ___\ \/ /_ __   __ _| |_
 #                      / _ \\  /| '_ \ / _` | __|
@@ -6,7 +6,7 @@
 #                      \___/_/\_\ .__/ \__,_|\__|
 #                               |_| XML parser
 #
-# Copyright (c) 2017 Expat development team
+# Copyright (c) 2019 Expat development team
 # Licensed under the MIT license:
 #
 # Permission is  hereby granted,  free of charge,  to any  person obtaining
@@ -28,32 +28,21 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 # USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-bin_PROGRAMS = xmlwf
+set -e
 
-xmlwf_LDADD = ../lib/libexpat.la
-xmlwf_SOURCES = \
-    xmlwf.c \
-    xmlfile.c \
-    codepage.c \
-    @FILEMAP@.c
+filename="${1:-tests/xmltest.log}"
 
-xmlwf_CPPFLAGS = -I$(srcdir)/../lib
+dos2unix "${filename}"
 
-if MINGW
-if UNICODE
-xmlwf_CPPFLAGS += -mwindows
-xmlwf_LDFLAGS = -municode
-endif
-endif
-
-EXTRA_DIST = \
-    codepage.h \
-    ct.c \
-    filemap.h \
-    readfilemap.c \
-    unixfilemap.c \
-    win32filemap.c \
-    xmlfile.h \
-    xmlmime.c \
-    xmlmime.h \
-    xmltchar.h
+tempfile="$(mktemp)"
+sed \
+        -e 's/^wine: Call .* msvcrt\.dll\._wperror, aborting$/ibm49i02.dtd: No such file or directory/' \
+        \
+        -e '/^wine: /d' \
+        -e '/^Application tried to create a window, but no driver could be loaded.$/d' \
+        -e '/^Make sure that your X server is running and that $DISPLAY is set correctly.$/d' \
+        -e '/^err:systray:initialize_systray Could not create tray window$/d' \
+        -e '/^In ibm\/invalid\/P49\/: Unhandled exception: unimplemented .\+/d' \
+        \
+        "${filename}" > "${tempfile}"
+mv "${tempfile}" "${filename}"

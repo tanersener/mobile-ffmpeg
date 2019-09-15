@@ -1,4 +1,4 @@
-#
+#! /usr/bin/env bash
 #                          __  __            _
 #                       ___\ \/ /_ __   __ _| |_
 #                      / _ \\  /| '_ \ / _` | __|
@@ -6,7 +6,7 @@
 #                      \___/_/\_\ .__/ \__,_|\__|
 #                               |_| XML parser
 #
-# Copyright (c) 2017 Expat development team
+# Copyright (c) 2019 Expat development team
 # Licensed under the MIT license:
 #
 # Permission is  hereby granted,  free of charge,  to any  person obtaining
@@ -28,32 +28,8 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 # USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-bin_PROGRAMS = xmlwf
-
-xmlwf_LDADD = ../lib/libexpat.la
-xmlwf_SOURCES = \
-    xmlwf.c \
-    xmlfile.c \
-    codepage.c \
-    @FILEMAP@.c
-
-xmlwf_CPPFLAGS = -I$(srcdir)/../lib
-
-if MINGW
-if UNICODE
-xmlwf_CPPFLAGS += -mwindows
-xmlwf_LDFLAGS = -municode
-endif
-endif
-
-EXTRA_DIST = \
-    codepage.h \
-    ct.c \
-    filemap.h \
-    readfilemap.c \
-    unixfilemap.c \
-    win32filemap.c \
-    xmlfile.h \
-    xmlmime.c \
-    xmlmime.h \
-    xmltchar.h
+./xmlwf/xmlwf_helpgen.py | sed \
+        -e 's,usage: xmlwf,usage: %s,' \
+        -e 's, \[-h | -v\],,' \
+        -e 's,^,      T(",' \
+        -e 's,$,\\n"),'

@@ -1,4 +1,3 @@
-#
 #                          __  __            _
 #                       ___\ \/ /_ __   __ _| |_
 #                      / _ \\  /| '_ \ / _` | __|
@@ -6,7 +5,7 @@
 #                      \___/_/\_\ .__/ \__,_|\__|
 #                               |_| XML parser
 #
-# Copyright (c) 2017 Expat development team
+# Copyright (c) 2019 Expat development team
 # Licensed under the MIT license:
 #
 # Permission is  hereby granted,  free of charge,  to any  person obtaining
@@ -28,32 +27,10 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 # USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-bin_PROGRAMS = xmlwf
+set(CMAKE_SYSTEM_NAME Windows)
 
-xmlwf_LDADD = ../lib/libexpat.la
-xmlwf_SOURCES = \
-    xmlwf.c \
-    xmlfile.c \
-    codepage.c \
-    @FILEMAP@.c
+set(CMAKE_C_COMPILER i686-w64-mingw32-gcc)
+set(CMAKE_CXX_COMPILER i686-w64-mingw32-g++)
 
-xmlwf_CPPFLAGS = -I$(srcdir)/../lib
-
-if MINGW
-if UNICODE
-xmlwf_CPPFLAGS += -mwindows
-xmlwf_LDFLAGS = -municode
-endif
-endif
-
-EXTRA_DIST = \
-    codepage.h \
-    ct.c \
-    filemap.h \
-    readfilemap.c \
-    unixfilemap.c \
-    win32filemap.c \
-    xmlfile.h \
-    xmlmime.c \
-    xmlmime.h \
-    xmltchar.h
+set(WIN32 ON)
+set(MINGW ON)

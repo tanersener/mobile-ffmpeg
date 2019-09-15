@@ -4,7 +4,7 @@
 ; This script was contributed by Tim Peters.
 ; It was designed for Inno Setup 2.0.19 but works with later versions as well.
 
-#define expatVer "2.2.7"
+#define expatVer "2.2.8"
 
 [Setup]
 AppName=Expat
@@ -44,31 +44,24 @@ Flags: ignoreversion; Source: doc\*.css;                    DestDir: "{app}\Doc"
 Flags: ignoreversion; Source: doc\*.png;                    DestDir: "{app}\Doc"
 Flags: ignoreversion; Source: win32\bin\Release\*.dll;      DestDir: "{app}\Bin"
 Flags: ignoreversion; Source: win32\bin\Release\*.lib;      DestDir: "{app}\Bin"
-Flags: ignoreversion; Source: expat.sln;                    DestDir: "{app}\Source"
 Flags: ignoreversion; Source: win32\README.txt;             DestDir: "{app}\Source"
+Flags: ignoreversion; Source: CMake.README;                 DestDir: "{app}\Source"
+Flags: ignoreversion; Source: CMakeLists.txt;               DestDir: "{app}\Source"
+Flags: ignoreversion; Source: ConfigureChecks.cmake;        DestDir: "{app}\Source"
+Flags: ignoreversion; Source: expat_config.h.cmake;         DestDir: "{app}\Source"
+Flags: ignoreversion; Source: cmake\expat-config.cmake.in;  DestDir: "{app}\Source\cmake"
 Flags: ignoreversion; Source: lib\*.c;                      DestDir: "{app}\Source\lib"
 Flags: ignoreversion; Source: lib\*.h;                      DestDir: "{app}\Source\lib"
 Flags: ignoreversion; Source: lib\*.def;                    DestDir: "{app}\Source\lib"
-Flags: ignoreversion; Source: lib\*.vcxproj;                DestDir: "{app}\Source\lib"
-Flags: ignoreversion; Source: lib\*.vcxproj.filters;        DestDir: "{app}\Source\lib"
 Flags: ignoreversion; Source: examples\*.c;                 DestDir: "{app}\Source\examples"
-Flags: ignoreversion; Source: examples\*.vcxproj;           DestDir: "{app}\Source\examples"
-Flags: ignoreversion; Source: examples\*.vcxproj.filters;   DestDir: "{app}\Source\examples"
 Flags: ignoreversion; Source: tests\*.c;                    DestDir: "{app}\Source\tests"
 Flags: ignoreversion; Source: tests\*.cpp;                  DestDir: "{app}\Source\tests"
 Flags: ignoreversion; Source: tests\*.h;                    DestDir: "{app}\Source\tests"
-Flags: ignoreversion; Source: tests\*.sln;                  DestDir: "{app}\Source\tests"
-Flags: ignoreversion; Source: tests\*.vcxproj;              DestDir: "{app}\Source\tests"
-Flags: ignoreversion; Source: tests\*.vcxproj.filters;      DestDir: "{app}\Source\tests"
 Flags: ignoreversion; Source: tests\README.txt;             DestDir: "{app}\Source\tests"
 Flags: ignoreversion; Source: tests\benchmark\*.c;          DestDir: "{app}\Source\tests\benchmark"
-Flags: ignoreversion; Source: tests\benchmark\*.sln;        DestDir: "{app}\Source\tests\benchmark"
-Flags: ignoreversion; Source: tests\benchmark\*.vcxproj;    DestDir: "{app}\Source\tests\benchmark"
 Flags: ignoreversion; Source: tests\benchmark\README.txt;   DestDir: "{app}\Source\tests\benchmark"
 Flags: ignoreversion; Source: xmlwf\*.c*;                   DestDir: "{app}\Source\xmlwf"
 Flags: ignoreversion; Source: xmlwf\*.h;                    DestDir: "{app}\Source\xmlwf"
-Flags: ignoreversion; Source: xmlwf\*.vcxproj;              DestDir: "{app}\Source\xmlwf"
-Flags: ignoreversion; Source: xmlwf\*.vcxproj.filters;      DestDir: "{app}\Source\xmlwf"
 
 [Messages]
 WelcomeLabel1=Welcome to the Expat XML Parser Setup Wizard

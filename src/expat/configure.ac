@@ -33,6 +33,7 @@ m4_undefine([expat_version])
 AC_CONFIG_SRCDIR([Makefile.in])
 AC_CONFIG_AUX_DIR([conftools])
 AC_CONFIG_MACRO_DIR([m4])
+AC_CANONICAL_HOST
 AM_INIT_AUTOMAKE
 
 
@@ -47,9 +48,9 @@ dnl
 dnl If the API changes incompatibly set LIBAGE back to 0
 dnl
 
-LIBCURRENT=7   # sync
-LIBREVISION=9  # with
-LIBAGE=6       # CMakeLists.txt!
+LIBCURRENT=7    # sync
+LIBREVISION=10  # with
+LIBAGE=6        # CMakeLists.txt!
 
 AX_APPEND_FLAG([-DHAVE_EXPAT_CONFIG_H], [CPPFLAGS])
 AC_CONFIG_HEADER([expat_config.h])
@@ -93,6 +94,11 @@ AC_LANG_POP([C++])
 AS_IF([test "$GCC" = yes],
   [AX_APPEND_LINK_FLAGS([-fno-strict-aliasing],[LDFLAGS])])
 
+dnl patching ${archive_cmds} to affect generation of file "libtool" to fix linking with clang (issue #312)
+AS_CASE(["$LD"],[*clang*],
+  [AS_CASE(["${host_os}"],
+     [*linux*],[archive_cmds='$CC -shared $pic_flag $libobjs $deplibs $compiler_flags $wl-soname $wl$soname -o $lib'])])
+
 EXPATCFG_COMPILER_SUPPORTS_VISIBILITY([
   AX_APPEND_FLAG([-fvisibility=hidden],       [CFLAGS])
   AX_APPEND_FLAG([-DXML_ENABLE_VISIBILITY=1], [CFLAGS])])
@@ -118,19 +124,31 @@ AC_C_CONST
 AC_TYPE_SIZE_T
 
 AC_ARG_WITH([xmlwf],
-  [AS_HELP_STRING([--without-xmlwf], [do not build xmlwf])], [],
+  [AS_HELP_STRING([--without-xmlwf], [do not build xmlwf])],
+  [],
   [with_xmlwf=yes])
 AM_CONDITIONAL([WITH_XMLWF], [test x${with_xmlwf} = xyes])
 
-AC_ARG_WITH([examples], [
-AS_HELP_STRING([--without-examples], [do not build examples @<:@default=included@:>@])], [], [with_examples=yes])
+AC_ARG_WITH([examples],
+  [AS_HELP_STRING([--without-examples], [do not build examples @<:@default=included@:>@])],
+  [],
+  [with_examples=yes])
 AM_CONDITIONAL([WITH_EXAMPLES], [test x${with_examples} = xyes])
 
-AC_ARG_WITH([tests], [
-AS_HELP_STRING([--without-tests], [do not build tests @<:@default=included@:>@])], [], [with_tests=yes])
+AC_ARG_WITH([tests],
+  [AS_HELP_STRING([--without-tests], [do not build tests @<:@default=included@:>@])],
+  [],
+  [with_tests=yes])
 AM_CONDITIONAL([WITH_TESTS], [test x${with_tests} = xyes])
 
-AM_CONDITIONAL([MINGW], [echo -- "${host}" | ${FGREP} mingw >/dev/null])
+
+AS_VAR_SET([EXPATCFG_ON_MINGW],[no])
+AS_CASE("${host_os}",
+  [mingw*],
+  [AS_VAR_SET([EXPATCFG_ON_MINGW],[yes])
+   AC_MSG_NOTICE([detected OS: MinGW])])
+AM_CONDITIONAL([MINGW], [test x${EXPATCFG_ON_MINGW} = xyes])
+
 AM_CONDITIONAL([UNICODE], [echo -- "${CPPFLAGS}${CFLAGS}" | ${FGREP} XML_UNICODE >/dev/null])
 
 
@@ -143,65 +161,85 @@ AS_IF([test "x${with_libbsd}" != xno],
      [arc4random_buf],
      [],
      [AS_IF([test "x${with_libbsd}" = xyes],
-            [AC_MSG_ERROR([Enforced use of libbsd cannot be satisfied.])])])])
+        [AC_MSG_ERROR([Enforced use of libbsd cannot be satisfied.])])])])
 AC_MSG_CHECKING([for arc4random_buf (BSD or libbsd)])
 AC_LINK_IFELSE([AC_LANG_SOURCE([
-  #include <stdlib.h>  /* for arc4random_buf on BSD, for NULL */
-  #if defined(HAVE_LIBBSD)
-  # include <bsd/stdlib.h>
-  #endif
-  int main() {
-    arc4random_buf(NULL, 0U);
-    return 0;
-  }
-])],
+    #include <stdlib.h>  /* for arc4random_buf on BSD, for NULL */
+    #if defined(HAVE_LIBBSD)
+    # include <bsd/stdlib.h>
+    #endif
+    int main() {
+      arc4random_buf(NULL, 0U);
+      return 0;
+    }
+  ])],
   [AC_DEFINE([HAVE_ARC4RANDOM_BUF], [1], [Define to 1 if you have the `arc4random_buf' function.])
    AC_MSG_RESULT([yes])],
   [AC_MSG_RESULT([no])
 
    AC_MSG_CHECKING([for arc4random (BSD, macOS or libbsd)])
    AC_LINK_IFELSE([AC_LANG_SOURCE([
-      #if defined(HAVE_LIBBSD)
-      # include <bsd/stdlib.h>
-      #else
-      # include <stdlib.h>
-      #endif
-      int main() {
+       #if defined(HAVE_LIBBSD)
+       # include <bsd/stdlib.h>
+       #else
+       # include <stdlib.h>
+       #endif
+       int main() {
           arc4random();
           return 0;
-      }
+       }
      ])],
      [AC_DEFINE([HAVE_ARC4RANDOM], [1], [Define to 1 if you have the `arc4random' function.])
       AC_MSG_RESULT([yes])],
      [AC_MSG_RESULT([no])])])
 
+AC_ARG_WITH([getrandom],
+  [AS_HELP_STRING([--with-getrandom],
+                  [enforce the use of getrandom function in the system @<:@default=check@:>@])
+AS_HELP_STRING([--without-getrandom],
+               [skip auto detect of getrandom @<:@default=check@:>@])],
+  [],
+  [with_getrandom=check])
 
-AC_MSG_CHECKING([for getrandom (Linux 3.17+, glibc 2.25+)])
-AC_LINK_IFELSE([AC_LANG_SOURCE([
-  #include <stdlib.h>  /* for NULL */
-  #include <sys/random.h>
-  int main() {
-    return getrandom(NULL, 0U, 0U);
-  }
-  ])],
-  [AC_DEFINE([HAVE_GETRANDOM], [1], [Define to 1 if you have the `getrandom' function.])
-   AC_MSG_RESULT([yes])],
-  [AC_MSG_RESULT([no])
-
-   AC_MSG_CHECKING([for syscall SYS_getrandom (Linux 3.17+)])
+AS_IF([test "x$with_getrandom" != xno],
+  [AC_MSG_CHECKING([for getrandom (Linux 3.17+, glibc 2.25+)])
    AC_LINK_IFELSE([AC_LANG_SOURCE([
-      #include <stdlib.h>  /* for NULL */
-      #include <unistd.h>  /* for syscall */
-      #include <sys/syscall.h>  /* for SYS_getrandom */
-      int main() {
-        syscall(SYS_getrandom, NULL, 0, 0);
-        return 0;
-      }
-   ])],
-   [AC_DEFINE([HAVE_SYSCALL_GETRANDOM], [1], [Define to 1 if you have `syscall' and `SYS_getrandom'.])
-    AC_MSG_RESULT([yes])],
-   [AC_MSG_RESULT([no])])])
+       #include <stdlib.h>  /* for NULL */
+       #include <sys/random.h>
+       int main() {
+         return getrandom(NULL, 0U, 0U);
+       }
+     ])],
+     [AC_DEFINE([HAVE_GETRANDOM], [1], [Define to 1 if you have the `getrandom' function.])
+      AC_MSG_RESULT([yes])],
+     [AC_MSG_RESULT([no])
+      AS_IF([test "x$with_getrandom" = xyes],
+        [AC_MSG_ERROR([enforced the use of getrandom --with-getrandom, but not detected])])])])
 
+AC_ARG_WITH([sys_getrandom],
+  [AS_HELP_STRING([--with-sys-getrandom],
+                  [enforce the use of syscall SYS_getrandom function in the system @<:@default=check@:>@])
+AS_HELP_STRING([--without-sys-getrandom],
+               [skip auto detect of syscall SYS_getrandom @<:@default=check@:>@])],
+  [],
+  [with_sys_getrandom=check])
+
+AS_IF([test "x$with_sys_getrandom" != xno],
+  [AC_MSG_CHECKING([for syscall SYS_getrandom (Linux 3.17+)])
+   AC_LINK_IFELSE([AC_LANG_SOURCE([
+       #include <stdlib.h>  /* for NULL */
+       #include <unistd.h>  /* for syscall */
+       #include <sys/syscall.h>  /* for SYS_getrandom */
+       int main() {
+         syscall(SYS_getrandom, NULL, 0, 0);
+         return 0;
+     }
+   ])],
+     [AC_DEFINE([HAVE_SYSCALL_GETRANDOM], [1], [Define to 1 if you have `syscall' and `SYS_getrandom'.])
+      AC_MSG_RESULT([yes])],
+     [AC_MSG_RESULT([no])
+      AS_IF([test "x$with_sys_getrandom" = xyes],
+        [AC_MSG_ERROR([enforced the use of syscall SYS_getrandom --with-sys-getrandom, but not detected])])])])
 
 dnl Only needed for xmlwf:
 AC_CHECK_HEADERS(fcntl.h unistd.h)
@@ -222,6 +260,15 @@ AC_DEFINE([XML_DTD], 1,
 AC_DEFINE([XML_DEV_URANDOM], 1,
           [Define to include code reading entropy from `/dev/urandom'.])
 
+AC_ARG_ENABLE([xml-attr-info],
+  [AS_HELP_STRING([--enable-xml-attr-info],
+     [Enable retrieving the byte offsets for attribute names and values @<:@default=no@:>@])],
+  [],
+  [enable_xml_attr_info=no])
+AS_IF([test "x${enable_xml_attr_info}" = "xyes"],
+      [AC_DEFINE([XML_ATTR_INFO], 1,
+         [Define to allow retrieving the byte offsets for attribute names and values.])])
+
 AC_ARG_ENABLE([xml-context],
   AS_HELP_STRING([--enable-xml-context @<:@COUNT@:>@],
     [Retain context around the current parse point;
@@ -240,8 +287,9 @@ AC_ARG_WITH([docbook],
   [AS_HELP_STRING([--with-docbook],
                   [enforce XML to man page compilation @<:@default=check@:>@])
 AS_HELP_STRING([--without-docbook],
-               [skip XML to man page compilation @<:@default=check@:>@])], [],
-               [with_docbook=check])
+               [skip XML to man page compilation @<:@default=check@:>@])],
+  [],
+  [with_docbook=check])
 
 AC_ARG_VAR([DOCBOOK_TO_MAN], [docbook2x-man command])
 AS_IF([test "x$with_docbook" != xno],
