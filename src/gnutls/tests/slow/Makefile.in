@@ -1724,8 +1724,9 @@ dist_check_SCRIPTS = test-ciphers.sh override-ciphers \
 EXTRA_DIST = README gnutls-asan.supp
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) LC_ALL="C" \
 	LSAN_OPTIONS=suppressions=gnutls-asan.supp \
-	OPENSSL_ia32cap=0x00000000 top_builddir="$(top_builddir)" \
-	srcdir="$(srcdir)" $(am__append_5)
+	GNUTLS_TEST_SUITE_RUN=1 OPENSSL_ia32cap=0x00000000 \
+	top_builddir="$(top_builddir)" srcdir="$(srcdir)" \
+	$(am__append_5)
 all: all-am
 
 .SUFFIXES:

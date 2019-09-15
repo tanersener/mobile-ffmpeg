@@ -1,5 +1,5 @@
 /* GnuTLS --- Guile bindings for GnuTLS.
-   Copyright (C) 2007-2012 Free Software Foundation, Inc.
+   Copyright (C) 2007-2012, 2019 Free Software Foundation, Inc.
 
    GnuTLS is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -25,8 +25,6 @@
 
 #include <gnutls/gnutls.h>
 #include <libguile.h>
-
-#include <alloca.h>
 
 #include "enums.h"
 #include "errors.h"

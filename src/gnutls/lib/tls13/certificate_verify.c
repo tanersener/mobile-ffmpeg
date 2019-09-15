@@ -85,7 +85,7 @@ int _gnutls13_recv_certificate_verify(gnutls_session_t session)
 	se = _gnutls_tls_aid_to_sign_entry(buf.data[0], buf.data[1], get_version(session));
 	if (se == NULL) {
 		_gnutls_handshake_log("Found unsupported signature (%d.%d)\n", (int)buf.data[0], (int)buf.data[1]);
-		ret = gnutls_assert_val(GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM);
+		ret = gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 		goto cleanup;
 	}
 

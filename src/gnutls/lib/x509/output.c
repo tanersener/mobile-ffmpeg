@@ -144,6 +144,10 @@ print_name(gnutls_buffer_st *str, const char *prefix, unsigned type, gnutls_datu
 		addf(str,  _("%sdirectoryName: %.*s\n"), prefix, name->size, NON_NULL(name->data));
 		break;
 
+	case GNUTLS_SAN_REGISTERED_ID:
+			addf(str,  _("%sRegistered ID: %.*s\n"), prefix, name->size, NON_NULL(name->data));
+			break;
+
 	case GNUTLS_SAN_OTHERNAME_XMPP:
 		addf(str,  _("%sXMPP Address: %.*s\n"), prefix, name->size, NON_NULL(name->data));
 		break;

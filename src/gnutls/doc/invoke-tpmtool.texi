@@ -35,7 +35,50 @@ with a status code of 0.
 
 @exampleindent 0
 @example
-tpmtool is unavailable - no --help
+tpmtool - GnuTLS TPM tool
+Usage:  tpmtool [ -<flag> [<val>] | --<name>[@{=| @}<val>] ]...
+
+   -d, --debug=num            Enable debugging
+                                - it must be in the range:
+                                  0 to 9999
+       --infile=file          Input file
+                                - file must pre-exist
+       --outfile=str          Output file
+       --generate-rsa         Generate an RSA private-public key pair
+       --register             Any generated key will be registered in the TPM
+                                - requires the option 'generate-rsa'
+       --signing              Any generated key will be a signing key
+                                - requires the option 'generate-rsa'
+                                -- and prohibits the option 'legacy'
+       --legacy               Any generated key will be a legacy key
+                                - requires the option 'generate-rsa'
+                                -- and prohibits the option 'signing'
+       --user                 Any registered key will be a user key
+                                - requires the option 'register'
+                                -- and prohibits the option 'system'
+       --system               Any registered key will be a system key
+                                - requires the option 'register'
+                                -- and prohibits the option 'user'
+       --pubkey=str           Prints the public key of the provided key
+       --list                 Lists all stored keys in the TPM
+       --delete=str           Delete the key identified by the given URL (UUID).
+       --test-sign=str        Tests the signature operation of the provided object
+       --sec-param=str        Specify the security level [low, legacy, medium, high, ultra].
+       --bits=num             Specify the number of bits for key generate
+       --inder                Use the DER format for keys.
+                                - disabled as '--no-inder'
+       --outder               Use DER format for output keys
+                                - disabled as '--no-outder'
+       --srk-well-known       SRK has well known password (20 bytes of zeros)
+   -v, --version[=arg]        output version information and exit
+   -h, --help                 display extended usage information and exit
+   -!, --more-help            extended usage information passed thru pager
+
+Options are specified by doubled hyphens and their name or by a single
+hyphen and the flag character.
+
+Program that allows handling cryptographic data from the TPM chip.
+
 @end example
 @exampleindent 4
 

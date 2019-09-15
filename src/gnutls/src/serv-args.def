@@ -332,6 +332,22 @@ flag = {
     doc      = "";
 };
 
+flag = {
+    name      = recordsize;
+    arg-type  = number;
+    arg-range = "0->16384";
+    descrip   = "The maximum record size to advertise";
+    doc      = "";
+};
+
+flag = {
+    name      = httpdata;
+    arg-type  = file;
+    file-exists = yes;
+    descrip   = "The data used as HTTP response";
+    doc      = "";
+};
+
 doc-section = {
   ds-type   = 'SEE ALSO'; // or anything else
   ds-format = 'texi';      // or texi or mdoc format

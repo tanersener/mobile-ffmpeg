@@ -1,7 +1,7 @@
-This is gnutls-guile.info, produced by makeinfo version 6.5 from
+This is gnutls-guile.info, produced by makeinfo version 6.6 from
 gnutls-guile.texi.
 
-This manual is last updated 15 March 2019 for version 3.6.8 of GnuTLS.
+This manual is last updated 15 March 2019 for version 3.6.9 of GnuTLS.
 
 Copyright (C) 2001-2012, 2014, 2016 Free Software Foundation, Inc.
 
@@ -22,7 +22,7 @@ File: gnutls-guile.info,  Node: Top,  Next: Preface,  Up: (dir)
 GnuTLS-Guile
 ************
 
-This manual is last updated 15 March 2019 for version 3.6.8 of GnuTLS.
+This manual is last updated 15 March 2019 for version 3.6.9 of GnuTLS.
 
 Copyright (C) 2001-2012, 2014, 2016 Free Software Foundation, Inc.
 
@@ -131,7 +131,7 @@ the version number of the loaded library as follows:
      $ guile
      scheme@(guile-user)> (use-modules (gnutls))
      scheme@(guile-user)> (gnutls-version)
-     "3.6.8"
+     "3.6.9"
      scheme@(guile-user)>
 
 
@@ -472,55 +472,55 @@ This chapter lists the GnuTLS Scheme procedures exported by the
      Use PROC (a two-argument procedure) as the global GnuTLS log
      procedure.
 
- -- Scheme Procedure: set-certificate-credentials-openpgp-keys! cred pub
-          sec
+ -- Scheme Procedure: %set-certificate-credentials-openpgp-keys! cred
+          pub sec
      Use certificate PUB and secret key SEC in certificate credentials
      CRED.
 
- -- Scheme Procedure: openpgp-keyring-contains-key-id? keyring id
+ -- Scheme Procedure: %openpgp-keyring-contains-key-id? keyring id
      Return '#f' if key ID ID is in KEYRING, '#f' otherwise.
 
  -- Scheme Procedure: import-openpgp-keyring data format
      Import DATA (a u8vector) according to FORMAT and return the
      imported keyring.
 
- -- Scheme Procedure: openpgp-certificate-usage key
+ -- Scheme Procedure: %openpgp-certificate-usage key
      Return a list of values denoting the key usage of KEY.
 
- -- Scheme Procedure: openpgp-certificate-version key
+ -- Scheme Procedure: %openpgp-certificate-version key
      Return the version of the OpenPGP message format (RFC2440) honored
      by KEY.
 
- -- Scheme Procedure: openpgp-certificate-algorithm key
+ -- Scheme Procedure: %openpgp-certificate-algorithm key
      Return two values: the certificate algorithm used by KEY and the
      number of bits used.
 
- -- Scheme Procedure: openpgp-certificate-names key
+ -- Scheme Procedure: %openpgp-certificate-names key
      Return the list of names for KEY.
 
- -- Scheme Procedure: openpgp-certificate-name key index
+ -- Scheme Procedure: %openpgp-certificate-name key index
      Return the INDEXth name of KEY.
 
- -- Scheme Procedure: openpgp-certificate-fingerprint key
+ -- Scheme Procedure: %openpgp-certificate-fingerprint key
      Return a new u8vector denoting the fingerprint of KEY.
 
- -- Scheme Procedure: openpgp-certificate-fingerprint! key fpr
+ -- Scheme Procedure: %openpgp-certificate-fingerprint! key fpr
      Store in FPR (a u8vector) the fingerprint of KEY.  Return the
      number of bytes stored in FPR.
 
- -- Scheme Procedure: openpgp-certificate-id! key id
+ -- Scheme Procedure: %openpgp-certificate-id! key id
      Store the ID (an 8 byte sequence) of certificate KEY in ID (a
      u8vector).
 
- -- Scheme Procedure: openpgp-certificate-id key
+ -- Scheme Procedure: %openpgp-certificate-id key
      Return the ID (an 8-element u8vector) of certificate KEY.
 
- -- Scheme Procedure: import-openpgp-private-key data format [pass]
+ -- Scheme Procedure: %import-openpgp-private-key data format [pass]
      Return a new OpenPGP private key object resulting from the import
      of DATA (a uniform array) according to FORMAT.  Optionally, a
      passphrase may be provided.
 
- -- Scheme Procedure: import-openpgp-certificate data format
+ -- Scheme Procedure: %import-openpgp-certificate data format
      Return a new OpenPGP certificate object resulting from the import
      of DATA (a uniform array) according to FORMAT.
 
@@ -794,6 +794,9 @@ This chapter lists the GnuTLS Scheme procedures exported by the
  -- Scheme Procedure: alert-get session
      Get an aleter from SESSION.
 
+ -- Scheme Procedure: reauthenticate session
+     Perform a re-authentication step for SESSION.
+
  -- Scheme Procedure: rehandshake session
      Perform a re-handshaking for SESSION.
 
@@ -803,9 +806,11 @@ This chapter lists the GnuTLS Scheme procedures exported by the
  -- Scheme Procedure: bye session how
      Close SESSION according to HOW.
 
- -- Scheme Procedure: make-session end
+ -- Scheme Procedure: make-session end [flags...]
      Return a new session for connection end END, either
-     'connection-end/server' or 'connection-end/client'.
+     'connection-end/server' or 'connection-end/client'.  The optional
+     FLAGS arguments are 'connection-flag' values such as
+     'connection-flag/auto-reauth'.
 
  -- Scheme Procedure: gnutls-version
      Return a string denoting the version number of the underlying
@@ -910,6 +915,9 @@ This chapter lists the GnuTLS Scheme procedures exported by the
 
  -- Scheme Procedure: alert-level->string enumval
      Return a string describing ENUMVAL, a 'alert-level' value.
+
+ -- Scheme Procedure: connection-flag->string enumval
+     Return a string describing ENUMVAL, a 'connection-flag' value.
 
  -- Scheme Procedure: connection-end->string enumval
      Return a string describing ENUMVAL, a 'connection-end' value.
@@ -1429,39 +1437,52 @@ Procedure Index
  [index ]
 * Menu:
 
-* alert-description->string:             Guile Reference.     (line 449)
+* %import-openpgp-certificate:           Guile Reference.     (line  64)
+* %import-openpgp-private-key:           Guile Reference.     (line  59)
+* %openpgp-certificate-algorithm:        Guile Reference.     (line  35)
+* %openpgp-certificate-fingerprint:      Guile Reference.     (line  45)
+* %openpgp-certificate-fingerprint!:     Guile Reference.     (line  48)
+* %openpgp-certificate-id:               Guile Reference.     (line  56)
+* %openpgp-certificate-id!:              Guile Reference.     (line  52)
+* %openpgp-certificate-name:             Guile Reference.     (line  42)
+* %openpgp-certificate-names:            Guile Reference.     (line  39)
+* %openpgp-certificate-usage:            Guile Reference.     (line  28)
+* %openpgp-certificate-version:          Guile Reference.     (line  31)
+* %openpgp-keyring-contains-key-id?:     Guile Reference.     (line  21)
+* %set-certificate-credentials-openpgp-keys!: Guile Reference.
+                                                              (line  16)
+* alert-description->string:             Guile Reference.     (line 454)
 * alert-get:                             Guile Reference.     (line 335)
-* alert-level->string:                   Guile Reference.     (line 452)
+* alert-level->string:                   Guile Reference.     (line 457)
 * alert-send:                            Guile Reference.     (line 332)
-* anonymous-client-credentials?:         Guile Reference.     (line 391)
-* anonymous-server-credentials?:         Guile Reference.     (line 388)
-* bye:                                   Guile Reference.     (line 344)
-* certificate-credentials?:              Guile Reference.     (line 382)
-* certificate-request->string:           Guile Reference.     (line 439)
-* certificate-status->string:            Guile Reference.     (line 442)
-* certificate-type->string:              Guile Reference.     (line 430)
-* certificate-verify->string:            Guile Reference.     (line 404)
-* cipher->string:                        Guile Reference.     (line 476)
+* anonymous-client-credentials?:         Guile Reference.     (line 396)
+* anonymous-server-credentials?:         Guile Reference.     (line 393)
+* bye:                                   Guile Reference.     (line 347)
+* certificate-credentials?:              Guile Reference.     (line 387)
+* certificate-request->string:           Guile Reference.     (line 444)
+* certificate-status->string:            Guile Reference.     (line 447)
+* certificate-type->string:              Guile Reference.     (line 435)
+* certificate-verify->string:            Guile Reference.     (line 409)
+* cipher->string:                        Guile Reference.     (line 484)
 * cipher-suite->string:                  Guile Reference.     (line 271)
-* close-request->string:                 Guile Reference.     (line 436)
-* compression-method->string:            Guile Reference.     (line 458)
-* connection-end->string:                Guile Reference.     (line 455)
-* credentials->string:                   Guile Reference.     (line 467)
-* dh-parameters?:                        Guile Reference.     (line 385)
-* digest->string:                        Guile Reference.     (line 461)
+* close-request->string:                 Guile Reference.     (line 441)
+* compression-method->string:            Guile Reference.     (line 466)
+* connection-end->string:                Guile Reference.     (line 463)
+* connection-flag->string:               Guile Reference.     (line 460)
+* credentials->string:                   Guile Reference.     (line 475)
+* dh-parameters?:                        Guile Reference.     (line 390)
+* digest->string:                        Guile Reference.     (line 469)
 * error->string:                         Exception Handling.  (line   6)
-* error->string <1>:                     Guile Reference.     (line 401)
-* gnutls-version:                        Guile Reference.     (line 351)
-* handshake:                             Guile Reference.     (line 341)
-* handshake-description->string:         Guile Reference.     (line 445)
-* import-openpgp-certificate:            Guile Reference.     (line  64)
+* error->string <1>:                     Guile Reference.     (line 406)
+* gnutls-version:                        Guile Reference.     (line 356)
+* handshake:                             Guile Reference.     (line 344)
+* handshake-description->string:         Guile Reference.     (line 450)
 * import-openpgp-keyring:                Guile Reference.     (line  24)
-* import-openpgp-private-key:            Guile Reference.     (line  59)
 * import-x509-certificate:               Guile Reference.     (line 134)
 * import-x509-private-key:               Guile Reference.     (line 130)
-* key-usage->string:                     Guile Reference.     (line 407)
-* kx->string:                            Guile Reference.     (line 473)
-* mac->string:                           Guile Reference.     (line 464)
+* key-usage->string:                     Guile Reference.     (line 412)
+* kx->string:                            Guile Reference.     (line 481)
+* mac->string:                           Guile Reference.     (line 472)
 * make-anonymous-client-credentials:     Guile Reference.     (line 222)
 * make-anonymous-server-credentials:     Guile Reference.     (line 225)
 * make-certificate-credentials:          Guile Reference.     (line 214)
@@ -1470,39 +1491,30 @@ Procedure Index
 * make-dh-parameters <1>:                Guile Reference.     (line 241)
 * make-psk-client-credentials:           Guile Reference.     (line 146)
 * make-psk-server-credentials:           Guile Reference.     (line 152)
-* make-session:                          Guile Reference.     (line 347)
-* openpgp-certificate-algorithm:         Guile Reference.     (line  35)
-* openpgp-certificate-fingerprint:       Guile Reference.     (line  45)
-* openpgp-certificate-fingerprint!:      Guile Reference.     (line  48)
-* openpgp-certificate-format->string:    Guile Reference.     (line 397)
-* openpgp-certificate-id:                Guile Reference.     (line  56)
-* openpgp-certificate-id!:               Guile Reference.     (line  52)
-* openpgp-certificate-name:              Guile Reference.     (line  42)
-* openpgp-certificate-names:             Guile Reference.     (line  39)
-* openpgp-certificate-usage:             Guile Reference.     (line  28)
-* openpgp-certificate-version:           Guile Reference.     (line  31)
-* openpgp-certificate?:                  Guile Reference.     (line 361)
-* openpgp-keyring-contains-key-id?:      Guile Reference.     (line  21)
-* openpgp-keyring?:                      Guile Reference.     (line 355)
-* openpgp-private-key?:                  Guile Reference.     (line 358)
-* params->string:                        Guile Reference.     (line 470)
+* make-session:                          Guile Reference.     (line 350)
+* openpgp-certificate-format->string:    Guile Reference.     (line 402)
+* openpgp-certificate?:                  Guile Reference.     (line 366)
+* openpgp-keyring?:                      Guile Reference.     (line 360)
+* openpgp-private-key?:                  Guile Reference.     (line 363)
+* params->string:                        Guile Reference.     (line 478)
 * peer-certificate-status:               Guile Reference.     (line 155)
-* pk-algorithm->string:                  Guile Reference.     (line 419)
+* pk-algorithm->string:                  Guile Reference.     (line 424)
 * pkcs3-export-dh-parameters:            Representation of Binary Data.
                                                               (line  16)
 * pkcs3-export-dh-parameters <1>:        Guile Reference.     (line 231)
 * pkcs3-import-dh-parameters:            Guile Reference.     (line 236)
 * pkcs8-import-x509-private-key:         Guile Reference.     (line 123)
-* protocol->string:                      Guile Reference.     (line 433)
-* psk-client-credentials?:               Guile Reference.     (line 370)
-* psk-key-format->string:                Guile Reference.     (line 410)
-* psk-server-credentials?:               Guile Reference.     (line 373)
+* protocol->string:                      Guile Reference.     (line 438)
+* psk-client-credentials?:               Guile Reference.     (line 375)
+* psk-key-format->string:                Guile Reference.     (line 415)
+* psk-server-credentials?:               Guile Reference.     (line 378)
+* reauthenticate:                        Guile Reference.     (line 338)
 * record-receive!:                       Input and Output.    (line  55)
 * record-receive! <1>:                   Guile Reference.     (line 255)
 * record-send:                           Input and Output.    (line  55)
 * record-send <1>:                       Guile Reference.     (line 259)
-* rehandshake:                           Guile Reference.     (line 338)
-* server-name-type->string:              Guile Reference.     (line 413)
+* rehandshake:                           Guile Reference.     (line 341)
+* server-name-type->string:              Guile Reference.     (line 418)
 * server-session-psk-username:           Guile Reference.     (line 138)
 * session-authentication-type:           Guile Reference.     (line 310)
 * session-certificate-type:              Guile Reference.     (line 317)
@@ -1519,11 +1531,10 @@ Procedure Index
 * session-record-port:                   Input and Output.    (line  28)
 * session-record-port <1>:               Guile Reference.     (line 250)
 * session-server-authentication-type:    Guile Reference.     (line 306)
-* session?:                              Guile Reference.     (line 394)
+* session?:                              Guile Reference.     (line 399)
 * set-anonymous-server-dh-parameters!:   Guile Reference.     (line 218)
 * set-certificate-credentials-dh-parameters!: Guile Reference.
                                                               (line 209)
-* set-certificate-credentials-openpgp-keys!: Guile Reference. (line  16)
 * set-certificate-credentials-verify-flags!: Guile Reference. (line 160)
 * set-certificate-credentials-verify-limits!: Guile Reference.
                                                               (line 165)
@@ -1554,13 +1565,13 @@ Procedure Index
 * set-session-transport-fd! <1>:         Guile Reference.     (line 247)
 * set-session-transport-port!:           Input and Output.    (line   6)
 * set-session-transport-port! <1>:       Guile Reference.     (line 244)
-* sign-algorithm->string:                Guile Reference.     (line 416)
-* srp-client-credentials?:               Guile Reference.     (line 376)
-* srp-server-credentials?:               Guile Reference.     (line 379)
+* sign-algorithm->string:                Guile Reference.     (line 421)
+* srp-client-credentials?:               Guile Reference.     (line 381)
+* srp-server-credentials?:               Guile Reference.     (line 384)
 * x509-certificate-authority-key-id:     Guile Reference.     (line  78)
 * x509-certificate-dn:                   Guile Reference.     (line 118)
 * x509-certificate-dn-oid:               Guile Reference.     (line 111)
-* x509-certificate-format->string:       Guile Reference.     (line 426)
+* x509-certificate-format->string:       Guile Reference.     (line 431)
 * x509-certificate-issuer-dn:            Guile Reference.     (line 115)
 * x509-certificate-issuer-dn-oid:        Guile Reference.     (line 107)
 * x509-certificate-key-id:               Guile Reference.     (line  82)
@@ -1571,9 +1582,9 @@ Procedure Index
 * x509-certificate-subject-alternative-name: Guile Reference. (line  68)
 * x509-certificate-subject-key-id:       Guile Reference.     (line  75)
 * x509-certificate-version:              Guile Reference.     (line  87)
-* x509-certificate?:                     Guile Reference.     (line 367)
-* x509-private-key?:                     Guile Reference.     (line 364)
-* x509-subject-alternative-name->string: Guile Reference.     (line 422)
+* x509-certificate?:                     Guile Reference.     (line 372)
+* x509-private-key?:                     Guile Reference.     (line 369)
+* x509-subject-alternative-name->string: Guile Reference.     (line 427)
 
 
 File: gnutls-guile.info,  Node: Concept Index,  Prev: Procedure Index,  Up: Top
@@ -1616,8 +1627,8 @@ Node: Exception Handling12454
 Node: Guile Examples14282
 Node: Anonymous Authentication Guile Example14581
 Node: Guile Reference17098
-Node: Copying Information36120
-Node: Procedure Index61308
-Node: Concept Index71976
+Node: Copying Information36472
+Node: Procedure Index61660
+Node: Concept Index72537
 
 End Tag Table

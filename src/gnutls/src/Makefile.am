@@ -272,6 +272,23 @@ libcmd_systemkey_la_LIBADD += $(LTLIBREADLINE) $(INET_PTON_LIB) $(LIB_CLOCK_GETT
 
 SUFFIXES = .stamp .def .c.bak .h.bak
 
+if NEED_LIBOPTS
+# case --enable-local-libopts: We do not call AUTOGEN unless the .bak files are missing
+.def.stamp:
+	@b=`echo $@ | sed 's/.stamp$$//'`; \
+	if ! test -f $${srcdir}$${b}.c.bak;then \
+		echo "No .bak files found; will call autogen"; \
+		$(AM_V_GEN) $(AUTOGEN) $<; \
+	else \
+		echo "Re-using .bak files"; \
+		srcdir=$(srcdir)/; \
+		rm -f $${b}.c $${b}.h; \
+		cp -p $${srcdir}$${b}.c.bak $${b}.c; \
+		cp -p $${srcdir}$${b}.h.bak $${b}.h; \
+	fi
+	touch $@
+else
+# default case. We call autogen, and if that fails we resort to the bundled files.
 .def.stamp:
 	$(AM_V_GEN) $(AUTOGEN) $< || { \
 		srcdir=''; \
@@ -281,6 +298,7 @@ SUFFIXES = .stamp .def .c.bak .h.bak
 		cp -p $${srcdir}$${b}.h.bak $${b}.h; \
 	} && \
 	touch $@
+endif
 
 .c.c.bak:
 	-@rm -f $@

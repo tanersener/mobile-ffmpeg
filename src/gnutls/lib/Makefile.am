@@ -72,11 +72,11 @@ COBJECTS = range.c record.c compress.c debug.c cipher.c gthreads.h handshake-tls
 	pk.c cert-cred.c global.c constate.c anon_cred.c pkix_asn1_tab.c gnutls_asn1_tab.c	\
 	mem.c fingerprint.c tls-sig.c ecc.c alert.c privkey_raw.c atomic.h	\
 	system/certs.c system/threads.c system/fastopen.c system/sockets.c	\
-	str-iconv.c system.c profiles.c profiles.h \
+	str-iconv.c system.c profiles.c profiles.h inih/ini.c \
 	str.c str-unicode.c str-idna.c state.c cert-cred-x509.c file.c supplemental.c	\
 	random.c crypto-api.c crypto-api.h privkey.c pcert.c pubkey.c locks.c dtls.c \
 	system_override.c crypto-backend.c verify-tofu.c pin.c tpm.c fips.c	\
-	safe-memfuncs.c atfork.c atfork.h randomart.c \
+	safe-memfuncs.c atfork.c atfork.h randomart.c name_val_array.h \
 	system-keys.h urls.c urls.h prf.c auto-verify.c dh-session.c \
 	cert-session.c handshake-checks.c dtls-sw.c dh-primes.c openpgp_compat.c \
 	crypto-selftests.c crypto-selftests-pk.c secrets.c extv.c extv.h \
@@ -117,7 +117,7 @@ HFILES = abstract_int.h debug.h cipher.h	 \
 	dh.h kx.h hash_int.h cipher_int.h	 \
 	db.h auth.h hello_ext.h	handshake-defs.h \
 	x509_b64.h sslv2_compat.h datum.h \
-	mpi.h pk.h record.h		\
+	mpi.h pk.h record.h inih/ini.h		\
 	constate.h global.h tls-sig.h mem.h	\
 	session_pack.h str.h str_array.h		\
 	state.h x509.h crypto-backend.h			\

@@ -45,10 +45,8 @@ struct x86_hash_ctx {
 		struct sha1_ctx sha1;
 		struct sha224_ctx sha224;
 		struct sha256_ctx sha256;
-#ifdef ENABLE_SHA512
 		struct sha384_ctx sha384;
 		struct sha512_ctx sha512;
-#endif
 	} ctx;
 	void *ctx_ptr;
 	gnutls_digest_algorithm_t algo;
@@ -180,7 +178,6 @@ void x86_sha256_update(struct sha256_ctx *ctx, size_t length,
 	}
 }
 
-#ifdef ENABLE_SHA512
 void x86_sha512_update(struct sha512_ctx *ctx, size_t length,
 		     const uint8_t * data)
 {
@@ -231,7 +228,6 @@ void x86_sha512_update(struct sha512_ctx *ctx, size_t length,
 		sha512_update(ctx, res, data);
 	}
 }
-#endif
 
 static int _ctx_init(gnutls_digest_algorithm_t algo,
 		     struct x86_hash_ctx *ctx)
@@ -261,7 +257,6 @@ static int _ctx_init(gnutls_digest_algorithm_t algo,
 		ctx->ctx_ptr = &ctx->ctx.sha256;
 		ctx->length = SHA256_DIGEST_SIZE;
 		break;
-#ifdef ENABLE_SHA512
 	case GNUTLS_DIG_SHA384:
 		sha384_init(&ctx->ctx.sha384);
 		ctx->update = (update_func) x86_sha512_update;
@@ -278,7 +273,6 @@ static int _ctx_init(gnutls_digest_algorithm_t algo,
 		ctx->ctx_ptr = &ctx->ctx.sha512;
 		ctx->length = SHA512_DIGEST_SIZE;
 		break;
-#endif
 	default:
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
@@ -309,6 +303,25 @@ static int wrap_x86_hash_init(gnutls_digest_algorithm_t algo, void **_ctx)
 	*_ctx = ctx;
 
 	return 0;
+}
+
+static void *
+wrap_x86_hash_copy(const void *_ctx)
+{
+	struct x86_hash_ctx *new_ctx;
+	const struct x86_hash_ctx *ctx=_ctx;
+	ptrdiff_t off = (uint8_t *)ctx->ctx_ptr - (uint8_t *)(&ctx->ctx);
+
+	new_ctx = gnutls_malloc(sizeof(struct x86_hash_ctx));
+	if (new_ctx == NULL) {
+		gnutls_assert();
+		return NULL;
+	}
+
+	memcpy(new_ctx, ctx, sizeof(*new_ctx));
+	new_ctx->ctx_ptr = (uint8_t *)&new_ctx->ctx + off;
+
+	return new_ctx;
 }
 
 static int
@@ -349,17 +362,16 @@ NN_HASH(sha224, x86_sha256_update, sha224_digest, SHA224);
 const struct nettle_hash x86_sha256 =
 NN_HASH(sha256, x86_sha256_update, sha256_digest, SHA256);
 
-#ifdef ENABLE_SHA512
 const struct nettle_hash x86_sha384 =
 NN_HASH(sha384, x86_sha512_update, sha384_digest, SHA384);
 const struct nettle_hash x86_sha512 =
 NN_HASH(sha512, x86_sha512_update, sha512_digest, SHA512);
-#endif
 
 const gnutls_crypto_digest_st _gnutls_sha_x86_ssse3 = {
 	.init = wrap_x86_hash_init,
 	.hash = wrap_x86_hash_update,
 	.output = wrap_x86_hash_output,
+	.copy = wrap_x86_hash_copy,
 	.deinit = wrap_x86_hash_deinit,
 	.fast = wrap_x86_hash_fast,
 };

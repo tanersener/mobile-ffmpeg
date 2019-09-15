@@ -1704,9 +1704,10 @@ TESTS = $(dist_check_SCRIPTS)
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) LC_ALL="C" VALGRIND="$(VALGRIND)" \
 	LIBTOOL="$(LIBTOOL)" top_builddir="$(top_builddir)" \
 	ac_cv_sizeof_time_t="$(ac_cv_sizeof_time_t)" \
-	ASAN_OPTIONS="detect_leaks=0:exitcode=6" srcdir="$(srcdir)" \
-	$(am__append_6) $(am__append_7) $(am__append_8) \
-	$(am__append_9) $(am__append_10)
+	ASAN_OPTIONS="detect_leaks=0:exitcode=6" \
+	GNUTLS_TEST_SUITE_RUN=1 srcdir="$(srcdir)" $(am__append_6) \
+	$(am__append_7) $(am__append_8) $(am__append_9) \
+	$(am__append_10)
 all: all-am
 
 .SUFFIXES:

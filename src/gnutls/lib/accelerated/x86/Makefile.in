@@ -265,66 +265,66 @@ am__libx86_la_SOURCES_DIST = x86-common.c aes-x86.h x86-common.h \
 	aes-gcm-aead.h aes-ccm-x86-aesni.c sha-padlock.c \
 	hmac-padlock.c aes-padlock.c aes-gcm-padlock.c aes-padlock.h \
 	sha-padlock.h aes-gcm-x86-pclmul.c aes-gcm-x86-pclmul-avx.c \
-	coff/aesni-x86_64.s coff/cpuid-x86_64.s coff/ghash-x86_64.s \
+	coff/aesni-x86_64.s coff/ghash-x86_64.s \
 	coff/sha1-ssse3-x86_64.s coff/sha512-ssse3-x86_64.s \
 	coff/aes-ssse3-x86_64.s coff/aesni-gcm-x86_64.s \
-	coff/e_padlock-x86_64.s macosx/aesni-x86_64.s \
-	macosx/cpuid-x86_64.s macosx/ghash-x86_64.s \
+	coff/sha256-ssse3-x86_64.s coff/e_padlock-x86_64.s \
+	macosx/aesni-x86_64.s macosx/ghash-x86_64.s \
 	macosx/sha1-ssse3-x86_64.s macosx/sha512-ssse3-x86_64.s \
 	macosx/aes-ssse3-x86_64.s macosx/aesni-gcm-x86_64.s \
-	macosx/e_padlock-x86_64.s elf/aesni-x86_64.s \
-	elf/cpuid-x86_64.s elf/ghash-x86_64.s elf/sha1-ssse3-x86_64.s \
+	macosx/sha256-ssse3-x86_64.s macosx/e_padlock-x86_64.s \
+	elf/aesni-x86_64.s elf/ghash-x86_64.s elf/sha1-ssse3-x86_64.s \
 	elf/sha512-ssse3-x86_64.s elf/aes-ssse3-x86_64.s \
-	elf/aesni-gcm-x86_64.s elf/e_padlock-x86_64.s coff/aesni-x86.s \
-	coff/cpuid-x86.s coff/sha1-ssse3-x86.s coff/sha256-ssse3-x86.s \
-	coff/sha512-ssse3-x86.s coff/aes-ssse3-x86.s \
-	coff/e_padlock-x86.s macosx/aesni-x86.s macosx/cpuid-x86.s \
+	elf/aesni-gcm-x86_64.s elf/sha256-ssse3-x86_64.s \
+	elf/e_padlock-x86_64.s coff/aesni-x86.s coff/sha1-ssse3-x86.s \
+	coff/sha256-ssse3-x86.s coff/sha512-ssse3-x86.s \
+	coff/aes-ssse3-x86.s coff/e_padlock-x86.s macosx/aesni-x86.s \
 	macosx/sha1-ssse3-x86.s macosx/sha256-ssse3-x86.s \
 	macosx/sha512-ssse3-x86.s macosx/aes-ssse3-x86.s \
-	macosx/e_padlock-x86.s elf/aesni-x86.s elf/cpuid-x86.s \
-	elf/sha1-ssse3-x86.s elf/sha256-ssse3-x86.s \
-	elf/sha512-ssse3-x86.s elf/aes-ssse3-x86.s elf/e_padlock-x86.s
+	macosx/e_padlock-x86.s elf/aesni-x86.s elf/sha1-ssse3-x86.s \
+	elf/sha256-ssse3-x86.s elf/sha512-ssse3-x86.s \
+	elf/aes-ssse3-x86.s elf/e_padlock-x86.s
 @ENABLE_PADLOCK_TRUE@am__objects_1 = sha-padlock.lo hmac-padlock.lo \
 @ENABLE_PADLOCK_TRUE@	aes-padlock.lo aes-gcm-padlock.lo
 @ASM_X86_64_TRUE@am__objects_2 = aes-gcm-x86-pclmul.lo \
 @ASM_X86_64_TRUE@	aes-gcm-x86-pclmul-avx.lo
 am__dirstamp = $(am__leading_dot)dirstamp
-am__objects_3 = coff/aesni-x86_64.lo coff/cpuid-x86_64.lo \
-	coff/ghash-x86_64.lo coff/sha1-ssse3-x86_64.lo \
-	coff/sha512-ssse3-x86_64.lo coff/aes-ssse3-x86_64.lo \
-	coff/aesni-gcm-x86_64.lo
+am__objects_3 = coff/aesni-x86_64.lo coff/ghash-x86_64.lo \
+	coff/sha1-ssse3-x86_64.lo coff/sha512-ssse3-x86_64.lo \
+	coff/aes-ssse3-x86_64.lo coff/aesni-gcm-x86_64.lo \
+	coff/sha256-ssse3-x86_64.lo
 @ASM_X86_64_TRUE@@WINDOWS_TRUE@am__objects_4 = $(am__objects_3)
 am__objects_5 = coff/e_padlock-x86_64.lo
 @ASM_X86_64_TRUE@@ENABLE_PADLOCK_TRUE@@WINDOWS_TRUE@am__objects_6 = $(am__objects_5)
-am__objects_7 = macosx/aesni-x86_64.lo macosx/cpuid-x86_64.lo \
-	macosx/ghash-x86_64.lo macosx/sha1-ssse3-x86_64.lo \
-	macosx/sha512-ssse3-x86_64.lo macosx/aes-ssse3-x86_64.lo \
-	macosx/aesni-gcm-x86_64.lo
+am__objects_7 = macosx/aesni-x86_64.lo macosx/ghash-x86_64.lo \
+	macosx/sha1-ssse3-x86_64.lo macosx/sha512-ssse3-x86_64.lo \
+	macosx/aes-ssse3-x86_64.lo macosx/aesni-gcm-x86_64.lo \
+	macosx/sha256-ssse3-x86_64.lo
 @ASM_X86_64_TRUE@@MACOSX_TRUE@am__objects_8 = $(am__objects_7)
 am__objects_9 = macosx/e_padlock-x86_64.lo
 @ASM_X86_64_TRUE@@ENABLE_PADLOCK_TRUE@@MACOSX_TRUE@am__objects_10 = $(am__objects_9)
-am__objects_11 = elf/aesni-x86_64.lo elf/cpuid-x86_64.lo \
-	elf/ghash-x86_64.lo elf/sha1-ssse3-x86_64.lo \
-	elf/sha512-ssse3-x86_64.lo elf/aes-ssse3-x86_64.lo \
-	elf/aesni-gcm-x86_64.lo
+am__objects_11 = elf/aesni-x86_64.lo elf/ghash-x86_64.lo \
+	elf/sha1-ssse3-x86_64.lo elf/sha512-ssse3-x86_64.lo \
+	elf/aes-ssse3-x86_64.lo elf/aesni-gcm-x86_64.lo \
+	elf/sha256-ssse3-x86_64.lo
 @ASM_X86_64_TRUE@@ELF_TRUE@am__objects_12 = $(am__objects_11)
 am__objects_13 = elf/e_padlock-x86_64.lo
 @ASM_X86_64_TRUE@@ELF_TRUE@@ENABLE_PADLOCK_TRUE@am__objects_14 = $(am__objects_13)
-am__objects_15 = coff/aesni-x86.lo coff/cpuid-x86.lo \
-	coff/sha1-ssse3-x86.lo coff/sha256-ssse3-x86.lo \
-	coff/sha512-ssse3-x86.lo coff/aes-ssse3-x86.lo
+am__objects_15 = coff/aesni-x86.lo coff/sha1-ssse3-x86.lo \
+	coff/sha256-ssse3-x86.lo coff/sha512-ssse3-x86.lo \
+	coff/aes-ssse3-x86.lo
 @ASM_X86_64_FALSE@@WINDOWS_TRUE@am__objects_16 = $(am__objects_15)
 am__objects_17 = coff/e_padlock-x86.lo
 @ASM_X86_64_FALSE@@ENABLE_PADLOCK_TRUE@@WINDOWS_TRUE@am__objects_18 = $(am__objects_17)
-am__objects_19 = macosx/aesni-x86.lo macosx/cpuid-x86.lo \
-	macosx/sha1-ssse3-x86.lo macosx/sha256-ssse3-x86.lo \
-	macosx/sha512-ssse3-x86.lo macosx/aes-ssse3-x86.lo
+am__objects_19 = macosx/aesni-x86.lo macosx/sha1-ssse3-x86.lo \
+	macosx/sha256-ssse3-x86.lo macosx/sha512-ssse3-x86.lo \
+	macosx/aes-ssse3-x86.lo
 @ASM_X86_64_FALSE@@MACOSX_TRUE@am__objects_20 = $(am__objects_19)
 am__objects_21 = macosx/e_padlock-x86.lo
 @ASM_X86_64_FALSE@@ENABLE_PADLOCK_TRUE@@MACOSX_TRUE@am__objects_22 = $(am__objects_21)
-am__objects_23 = elf/aesni-x86.lo elf/cpuid-x86.lo \
-	elf/sha1-ssse3-x86.lo elf/sha256-ssse3-x86.lo \
-	elf/sha512-ssse3-x86.lo elf/aes-ssse3-x86.lo
+am__objects_23 = elf/aesni-x86.lo elf/sha1-ssse3-x86.lo \
+	elf/sha256-ssse3-x86.lo elf/sha512-ssse3-x86.lo \
+	elf/aes-ssse3-x86.lo
 @ASM_X86_64_FALSE@@ELF_TRUE@am__objects_24 = $(am__objects_23)
 am__objects_25 = elf/e_padlock-x86.lo
 @ASM_X86_64_FALSE@@ELF_TRUE@@ENABLE_PADLOCK_TRUE@am__objects_26 = $(am__objects_25)
@@ -1551,12 +1551,12 @@ libx86_la_SOURCES = x86-common.c aes-x86.h x86-common.h \
 	$(am__append_10) $(am__append_12) $(am__append_13) \
 	$(am__append_14) $(am__append_15) $(am__append_16) \
 	$(am__append_17)
-X86_FILES_ELF = elf/aesni-x86.s elf/cpuid-x86.s elf/sha1-ssse3-x86.s elf/sha256-ssse3-x86.s elf/sha512-ssse3-x86.s elf/aes-ssse3-x86.s
-X86_FILES_COFF = coff/aesni-x86.s coff/cpuid-x86.s coff/sha1-ssse3-x86.s coff/sha256-ssse3-x86.s coff/sha512-ssse3-x86.s coff/aes-ssse3-x86.s
-X86_FILES_MACOSX = macosx/aesni-x86.s macosx/cpuid-x86.s macosx/sha1-ssse3-x86.s macosx/sha256-ssse3-x86.s macosx/sha512-ssse3-x86.s macosx/aes-ssse3-x86.s
-X86_64_FILES_ELF = elf/aesni-x86_64.s elf/cpuid-x86_64.s elf/ghash-x86_64.s elf/sha1-ssse3-x86_64.s elf/sha512-ssse3-x86_64.s elf/aes-ssse3-x86_64.s elf/aesni-gcm-x86_64.s
-X86_64_FILES_COFF = coff/aesni-x86_64.s coff/cpuid-x86_64.s coff/ghash-x86_64.s coff/sha1-ssse3-x86_64.s coff/sha512-ssse3-x86_64.s coff/aes-ssse3-x86_64.s coff/aesni-gcm-x86_64.s
-X86_64_FILES_MACOSX = macosx/aesni-x86_64.s macosx/cpuid-x86_64.s macosx/ghash-x86_64.s macosx/sha1-ssse3-x86_64.s macosx/sha512-ssse3-x86_64.s macosx/aes-ssse3-x86_64.s macosx/aesni-gcm-x86_64.s
+X86_FILES_ELF = elf/aesni-x86.s elf/sha1-ssse3-x86.s elf/sha256-ssse3-x86.s elf/sha512-ssse3-x86.s elf/aes-ssse3-x86.s
+X86_FILES_COFF = coff/aesni-x86.s coff/sha1-ssse3-x86.s coff/sha256-ssse3-x86.s coff/sha512-ssse3-x86.s coff/aes-ssse3-x86.s
+X86_FILES_MACOSX = macosx/aesni-x86.s macosx/sha1-ssse3-x86.s macosx/sha256-ssse3-x86.s macosx/sha512-ssse3-x86.s macosx/aes-ssse3-x86.s
+X86_64_FILES_ELF = elf/aesni-x86_64.s elf/ghash-x86_64.s elf/sha1-ssse3-x86_64.s elf/sha512-ssse3-x86_64.s elf/aes-ssse3-x86_64.s elf/aesni-gcm-x86_64.s elf/sha256-ssse3-x86_64.s
+X86_64_FILES_COFF = coff/aesni-x86_64.s coff/ghash-x86_64.s coff/sha1-ssse3-x86_64.s coff/sha512-ssse3-x86_64.s coff/aes-ssse3-x86_64.s coff/aesni-gcm-x86_64.s coff/sha256-ssse3-x86_64.s
+X86_64_FILES_MACOSX = macosx/aesni-x86_64.s macosx/ghash-x86_64.s macosx/sha1-ssse3-x86_64.s macosx/sha512-ssse3-x86_64.s macosx/aes-ssse3-x86_64.s macosx/aesni-gcm-x86_64.s macosx/sha256-ssse3-x86_64.s
 X86_PADLOCK_FILES_ELF = elf/e_padlock-x86.s
 X86_PADLOCK_FILES_COFF = coff/e_padlock-x86.s
 X86_PADLOCK_FILES_MACOSX = macosx/e_padlock-x86.s
@@ -1616,8 +1616,6 @@ coff/$(DEPDIR)/$(am__dirstamp):
 	@: > coff/$(DEPDIR)/$(am__dirstamp)
 coff/aesni-x86_64.lo: coff/$(am__dirstamp) \
 	coff/$(DEPDIR)/$(am__dirstamp)
-coff/cpuid-x86_64.lo: coff/$(am__dirstamp) \
-	coff/$(DEPDIR)/$(am__dirstamp)
 coff/ghash-x86_64.lo: coff/$(am__dirstamp) \
 	coff/$(DEPDIR)/$(am__dirstamp)
 coff/sha1-ssse3-x86_64.lo: coff/$(am__dirstamp) \
@@ -1627,6 +1625,8 @@ coff/sha512-ssse3-x86_64.lo: coff/$(am__dirstamp) \
 coff/aes-ssse3-x86_64.lo: coff/$(am__dirstamp) \
 	coff/$(DEPDIR)/$(am__dirstamp)
 coff/aesni-gcm-x86_64.lo: coff/$(am__dirstamp) \
+	coff/$(DEPDIR)/$(am__dirstamp)
+coff/sha256-ssse3-x86_64.lo: coff/$(am__dirstamp) \
 	coff/$(DEPDIR)/$(am__dirstamp)
 coff/e_padlock-x86_64.lo: coff/$(am__dirstamp) \
 	coff/$(DEPDIR)/$(am__dirstamp)
@@ -1638,8 +1638,6 @@ macosx/$(DEPDIR)/$(am__dirstamp):
 	@: > macosx/$(DEPDIR)/$(am__dirstamp)
 macosx/aesni-x86_64.lo: macosx/$(am__dirstamp) \
 	macosx/$(DEPDIR)/$(am__dirstamp)
-macosx/cpuid-x86_64.lo: macosx/$(am__dirstamp) \
-	macosx/$(DEPDIR)/$(am__dirstamp)
 macosx/ghash-x86_64.lo: macosx/$(am__dirstamp) \
 	macosx/$(DEPDIR)/$(am__dirstamp)
 macosx/sha1-ssse3-x86_64.lo: macosx/$(am__dirstamp) \
@@ -1650,6 +1648,8 @@ macosx/aes-ssse3-x86_64.lo: macosx/$(am__dirstamp) \
 	macosx/$(DEPDIR)/$(am__dirstamp)
 macosx/aesni-gcm-x86_64.lo: macosx/$(am__dirstamp) \
 	macosx/$(DEPDIR)/$(am__dirstamp)
+macosx/sha256-ssse3-x86_64.lo: macosx/$(am__dirstamp) \
+	macosx/$(DEPDIR)/$(am__dirstamp)
 macosx/e_padlock-x86_64.lo: macosx/$(am__dirstamp) \
 	macosx/$(DEPDIR)/$(am__dirstamp)
 elf/$(am__dirstamp):
@@ -1659,7 +1659,6 @@ elf/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) elf/$(DEPDIR)
 	@: > elf/$(DEPDIR)/$(am__dirstamp)
 elf/aesni-x86_64.lo: elf/$(am__dirstamp) elf/$(DEPDIR)/$(am__dirstamp)
-elf/cpuid-x86_64.lo: elf/$(am__dirstamp) elf/$(DEPDIR)/$(am__dirstamp)
 elf/ghash-x86_64.lo: elf/$(am__dirstamp) elf/$(DEPDIR)/$(am__dirstamp)
 elf/sha1-ssse3-x86_64.lo: elf/$(am__dirstamp) \
 	elf/$(DEPDIR)/$(am__dirstamp)
@@ -1669,10 +1668,11 @@ elf/aes-ssse3-x86_64.lo: elf/$(am__dirstamp) \
 	elf/$(DEPDIR)/$(am__dirstamp)
 elf/aesni-gcm-x86_64.lo: elf/$(am__dirstamp) \
 	elf/$(DEPDIR)/$(am__dirstamp)
+elf/sha256-ssse3-x86_64.lo: elf/$(am__dirstamp) \
+	elf/$(DEPDIR)/$(am__dirstamp)
 elf/e_padlock-x86_64.lo: elf/$(am__dirstamp) \
 	elf/$(DEPDIR)/$(am__dirstamp)
 coff/aesni-x86.lo: coff/$(am__dirstamp) coff/$(DEPDIR)/$(am__dirstamp)
-coff/cpuid-x86.lo: coff/$(am__dirstamp) coff/$(DEPDIR)/$(am__dirstamp)
 coff/sha1-ssse3-x86.lo: coff/$(am__dirstamp) \
 	coff/$(DEPDIR)/$(am__dirstamp)
 coff/sha256-ssse3-x86.lo: coff/$(am__dirstamp) \
@@ -1685,8 +1685,6 @@ coff/e_padlock-x86.lo: coff/$(am__dirstamp) \
 	coff/$(DEPDIR)/$(am__dirstamp)
 macosx/aesni-x86.lo: macosx/$(am__dirstamp) \
 	macosx/$(DEPDIR)/$(am__dirstamp)
-macosx/cpuid-x86.lo: macosx/$(am__dirstamp) \
-	macosx/$(DEPDIR)/$(am__dirstamp)
 macosx/sha1-ssse3-x86.lo: macosx/$(am__dirstamp) \
 	macosx/$(DEPDIR)/$(am__dirstamp)
 macosx/sha256-ssse3-x86.lo: macosx/$(am__dirstamp) \
@@ -1698,7 +1696,6 @@ macosx/aes-ssse3-x86.lo: macosx/$(am__dirstamp) \
 macosx/e_padlock-x86.lo: macosx/$(am__dirstamp) \
 	macosx/$(DEPDIR)/$(am__dirstamp)
 elf/aesni-x86.lo: elf/$(am__dirstamp) elf/$(DEPDIR)/$(am__dirstamp)
-elf/cpuid-x86.lo: elf/$(am__dirstamp) elf/$(DEPDIR)/$(am__dirstamp)
 elf/sha1-ssse3-x86.lo: elf/$(am__dirstamp) \
 	elf/$(DEPDIR)/$(am__dirstamp)
 elf/sha256-ssse3-x86.lo: elf/$(am__dirstamp) \

@@ -35,6 +35,8 @@
 # include <config.h>
 #endif
 
+#ifndef HAVE_NETTLE_GOSTHASH94CP_UPDATE
+
 #include <gnutls_int.h>
 
 #include <nettle/hmac.h>
@@ -60,3 +62,4 @@ hmac_gosthash94cp_digest(struct hmac_gosthash94cp_ctx *ctx,
 {
   HMAC_DIGEST(ctx, &nettle_gosthash94cp, length, digest);
 }
+#endif

@@ -132,6 +132,7 @@ like e.g. in lib/srp.h:
 ...
 
 #endif /* GNUTLS_LIB_SRP_H */
+```
 
 The public header files follow a similar convention but use the relative
 install directory as template, e.g. `GNUTLS_GNUTLS_H` for `gnutls/gnutls.h`.
@@ -178,7 +179,7 @@ should be introduced to enable the new behavior.
 When it is necessary, or desireable to enable the new features by default
 (e.g., TLS1.3 introduction), the "next" releases should be used (and
 introduced if necessary), to allow the modification to be tested for an
-extended amount of time.
+extended amount of time (see the [Release policy](RELEASES.md)).
 
 
 # API documentation

@@ -64,7 +64,7 @@ extern FILE * option_usage_fp;
  *  static const strings for p11tool options
  */
 static char const p11tool_opt_strs[5982] =
-/*     0 */ "p11tool 3.6.8\n"
+/*     0 */ "p11tool 3.6.9\n"
             "Copyright (C) 2000-2019 Free Software Foundation, and others, all rights reserved.\n"
             "This is free software. It is licensed for use, modification and\n"
             "redistribution under the terms of the GNU General Public License,\n"
@@ -297,7 +297,7 @@ static char const p11tool_opt_strs[5982] =
             "the form 'load=/usr/lib/opensc-pkcs11.so'.\n\n"
             "You can provide the PIN to be used for the PKCS #11 operations with the\n"
             "environment variables GNUTLS_PIN and GNUTLS_SO_PIN.\n\0"
-/*  5904 */ "p11tool 3.6.8\0"
+/*  5904 */ "p11tool 3.6.9\0"
 /*  5918 */ "p11tool [options] [url]\n"
             "p11tool --help for usage instructions.\n";
 
@@ -2714,7 +2714,7 @@ static void bogus_function(void) {
      translate option names.
    */
   /* referenced via p11toolOptions.pzCopyright */
-  puts(_("p11tool 3.6.8\n\
+  puts(_("p11tool 3.6.9\n\
 Copyright (C) 2000-2019 Free Software Foundation, and others, all rights reserved.\n\
 This is free software. It is licensed for use, modification and\n\
 redistribution under the terms of the GNU General Public License,\n\
@@ -2977,7 +2977,7 @@ the form 'load=/usr/lib/opensc-pkcs11.so'.\n\n"));
 environment variables GNUTLS_PIN and GNUTLS_SO_PIN.\n"));
 
   /* referenced via p11toolOptions.pzFullVersion */
-  puts(_("p11tool 3.6.8"));
+  puts(_("p11tool 3.6.9"));
 
   /* referenced via p11toolOptions.pzFullUsage */
   puts(_("<<<NOT-FOUND>>>"));

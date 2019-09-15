@@ -409,7 +409,7 @@ flags are part of the enumeration
 Some systems provide a system wide trusted certificate storage accessible using
 the PKCS #11 API. That is, the trusted certificates are queried and accessed using the
 PKCS #11 API, and trusted certificate properties, such as purpose, are marked using
-attached extensions. One example is the p11-kit trust module@footnote{see @url{https://p11-glue.freedesktop.org/trust-module.html}.}.
+attached extensions. One example is the p11-kit trust module@footnote{see @url{https://p11-glue.github.io/p11-glue/trust-module.html}.}.
 
 These special PKCS #11 modules can be used for GnuTLS certificate verification if marked as trust 
 policy modules, i.e., with @code{trust-policy: yes} in the p11-kit module file.

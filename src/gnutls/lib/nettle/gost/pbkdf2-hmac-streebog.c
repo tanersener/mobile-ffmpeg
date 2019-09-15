@@ -36,6 +36,7 @@
 # include "config.h"
 #endif
 
+#ifndef HAVE_NETTLE_STREEBOG512_UPDATE
 #include <gnutls_int.h>
 
 #include "pbkdf2-gost.h"
@@ -67,3 +68,4 @@ pbkdf2_hmac_streebog512 (size_t key_length, const uint8_t *key,
   PBKDF2 (&streebog512ctx, hmac_streebog512_update, hmac_streebog512_digest,
 	  STREEBOG512_DIGEST_SIZE, iterations, salt_length, salt, length, dst);
 }
+#endif

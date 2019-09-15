@@ -1,5 +1,5 @@
 ;;; GnuTLS --- Guile bindings for GnuTLS.
-;;; Copyright (C) 2007-2012, 2014, 2015, 2016 Free Software Foundation, Inc.
+;;; Copyright (C) 2007-2012, 2014, 2015, 2016, 2019 Free Software Foundation, Inc.
 ;;;
 ;;; GnuTLS is free software; you can redistribute it and/or
 ;;; modify it under the terms of the GNU Lesser General Public
@@ -25,7 +25,7 @@
 
            ;; sessions
            session?
-           make-session bye handshake rehandshake
+           make-session bye handshake rehandshake reauthenticate
            alert-get alert-send
            session-cipher session-kx session-mac session-protocol
            session-compression-method session-certificate-type
@@ -101,7 +101,8 @@
            ;; enum->string functions
            cipher->string kx->string params->string credentials->string
            mac->string digest->string compression-method->string
-           connection-end->string alert-level->string
+           connection-end->string connection-flag->string
+           alert-level->string
            alert-description->string handshake-description->string
            certificate-status->string certificate-request->string
            close-request->string
@@ -155,6 +156,25 @@
            compression-method/lzo
            connection-end/server
            connection-end/client
+           connection-flag/datagram
+           connection-flag/nonblock
+           connection-flag/no-extensions
+           connection-flag/no-replay-protection
+           connection-flag/no-signal
+           connection-flag/allow-id-change
+           connection-flag/enable-false-start
+           connection-flag/force-client-cert
+           connection-flag/no-tickets
+           connection-flag/key-share-top
+           connection-flag/key-share-top2
+           connection-flag/key-share-top3
+           connection-flag/post-handshake-auth
+           connection-flag/no-auto-rekey
+           connection-flag/safe-padding-check
+           connection-flag/enable-early-start
+           connection-flag/enable-rawpk
+           connection-flag/auto-reauth
+           connection-flag/enable-early-data
            alert-level/warning
            alert-level/fatal
            alert-description/close-notify
@@ -254,6 +274,7 @@
            ;;   sed -r -e 's|^#define GNUTLS_E_([^ ]+).*$|error/\1|' | tr A-Z_ a-z-
            error/success
            error/unsupported-version-packet
+           error/tls-packet-decoding-error
            error/unexpected-packet-length
            error/invalid-session
            error/fatal-alert-received
@@ -269,6 +290,7 @@
            error/expired
            error/db-error
            error/srp-pwd-error
+           error/keyfile-error
            error/insufficient-credentials
            error/insuficient-credentials
            error/insufficient-cred
@@ -300,6 +322,8 @@
            error/too-many-empty-packets
            error/unknown-pk-algorithm
            error/too-many-handshake-packets
+           error/received-disallowed-name
+           error/certificate-required
            error/no-temporary-rsa-params
            error/no-compression-algorithms
            error/no-cipher-suites
@@ -307,6 +331,7 @@
            error/pk-sig-verify-failed
            error/illegal-srp-username
            error/srp-pwd-parsing-error
+           error/keyfile-parsing-error
            error/no-temporary-dh-params
            error/asn1-element-not-found
            error/asn1-identifier-not-found
@@ -342,6 +367,7 @@
            error/unsafe-renegotiation-denied
            error/unknown-srp-username
            error/premature-termination
+           error/malformed-cidr
            error/base64-encoding-error
            error/incompatible-gcrypt-library
            error/incompatible-crypto-library
@@ -352,6 +378,7 @@
            error/base64-unexpected-header-error
            error/openpgp-subkey-error
            error/crypto-already-registered
+           error/already-registered
            error/handshake-too-large
            error/cryptodev-ioctl-error
            error/cryptodev-device-error
@@ -359,6 +386,10 @@
            error/bad-cookie
            error/openpgp-preferred-key-error
            error/incompat-dsa-key-with-tls-protocol
+           error/insufficient-security
+           error/heartbeat-pong-received
+           error/heartbeat-ping-received
+           error/unrecognized-name
            error/pkcs11-error
            error/pkcs11-load-error
            error/parsing-error
@@ -385,9 +416,64 @@
            error/certificate-list-unsorted
            error/illegal-parameter
            error/no-priorities-were-set
+           error/x509-unsupported-extension
+           error/session-eof
+           error/tpm-error
+           error/tpm-key-password-error
+           error/tpm-srk-password-error
+           error/tpm-session-error
+           error/tpm-key-not-found
+           error/tpm-uninitialized
+           error/tpm-no-lib
+           error/no-certificate-status
+           error/ocsp-response-error
+           error/random-device-error
+           error/auth-error
+           error/no-application-protocol
+           error/sockets-init-error
+           error/key-import-failed
+           error/inappropriate-fallback
+           error/certificate-verification-error
+           error/privkey-verification-error
+           error/unexpected-extensions-length
+           error/asn1-embedded-null-in-string
+           error/self-test-error
+           error/no-self-test
+           error/lib-in-error-state
+           error/pk-generation-error
+           error/idna-error
+           error/need-fallback
+           error/session-user-id-changed
+           error/handshake-during-false-start
+           error/unavailable-during-handshake
+           error/pk-invalid-pubkey
+           error/pk-invalid-privkey
+           error/not-yet-activated
+           error/invalid-utf8-string
+           error/no-embedded-data
+           error/invalid-utf8-email
+           error/invalid-password-string
+           error/certificate-time-error
+           error/record-overflow
+           error/asn1-time-error
+           error/incompatible-sig-with-key
+           error/pk-invalid-pubkey-params
+           error/pk-no-validation-params
+           error/ocsp-mismatch-with-certs
+           error/no-common-key-share
+           error/reauth-request
+           error/too-many-matches
+           error/crl-verification-error
+           error/missing-extension
+           error/db-entry-exists
+           error/early-data-rejected
            error/unimplemented-feature
+           error/int-ret-0
+           error/int-check-again
            error/application-error-max
            error/application-error-min
+
+           fatal-error?
 
            ;; OpenPGP keys (formerly in GnuTLS-extra)
            openpgp-certificate? openpgp-private-key?
@@ -426,6 +512,41 @@
   (load-extension (string-append %libdir "/guile-gnutls-v-2")
                   "scm_init_gnutls"))
 
+(cond-expand
+  ((not guile-2)
+   (define-macro (define-deprecated new)
+     `(define ,new ,(symbol-append '% new))))
+  (else
+   (define-syntax define-deprecated
+     (lambda (s)
+       "Define a deprecated variable or procedure, along these lines:
+
+  (define-deprecated variable alias)
+
+This defines 'variable' as an alias for 'alias', and emits a warning when
+'variable' is used."
+       (syntax-case s ()
+         ((_ variable)
+          (with-syntax ((alias (datum->syntax
+                                #'variable
+                                (symbol-append
+                                 '% (syntax->datum #'variable)))))
+            #'(define-deprecated variable alias)))
+         ((_ variable alias)
+          (identifier? #'variable)
+          #`(define-syntax variable
+              (lambda (s)
+                (issue-deprecation-warning
+                 (format #f "GnuTLS variable '~a' is deprecated"
+                         (syntax->datum #'variable)))
+                (syntax-case s ()
+                  ((_ args (... ...))
+                   #'(alias args (... ...)))
+                  (id
+                   (identifier? #'id)
+                   #'alias))))))))))
+
+
 ;; Renaming.
 (define protocol/ssl-3 protocol/ssl3)
 (define protocol/tls-1.0 protocol/tls1-0)
@@ -441,6 +562,40 @@
   certificate-verify/allow-any-x509-v1-ca-crt)
 (define certificate-verify/allow-x509-v1-ca-certificate
   certificate-verify/allow-x509-v1-ca-crt)
+
+;; Deprecated OpenPGP bindings.
+(define-deprecated certificate-type/openpgp)
+(define-deprecated error/openpgp-getkey-failed)
+(define-deprecated error/openpgp-uid-revoked)
+(define-deprecated error/openpgp-fingerprint-unsupported)
+(define-deprecated error/openpgp-keyring-error)
+(define-deprecated error/openpgp-subkey-error)
+(define-deprecated error/openpgp-preferred-key-error)
+(define-deprecated openpgp-private-key?)
+(define-deprecated import-openpgp-certificate)
+(define-deprecated import-openpgp-private-key)
+(define-deprecated openpgp-certificate-id)
+(define-deprecated openpgp-certificate-id!)
+(define-deprecated openpgp-certificate-fingerprint)
+(define-deprecated openpgp-certificate-fingerprint!)
+(define-deprecated openpgp-certificate-name)
+(define-deprecated openpgp-certificate-names)
+(define-deprecated openpgp-certificate-algorithm)
+(define-deprecated openpgp-certificate-version)
+(define-deprecated openpgp-certificate-usage)
+(define-deprecated openpgp-keyring?)
+(define-deprecated import-openpgp-keyring)
+(define-deprecated openpgp-keyring-contains-key-id?)
+(define-deprecated set-certificate-credentials-openpgp-keys!)
+
+;; XXX: The following bindings should be marked as deprecated as well, but due
+;; to the way binding names are constructed for enums and smobs, it's
+;; complicated.  Oh well.
+;;
+;; (define-deprecated openpgp-certificate?)
+;; (define-deprecated openpgp-certificate-format->string)
+;; (define-deprecated openpgp-certificate-format/raw)
+;; (define-deprecated openpgp-certificate-format/base64)
 
 ;;; Local Variables:
 ;;; mode: scheme

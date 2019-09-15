@@ -64,7 +64,7 @@ extern FILE * option_usage_fp;
  *  static const strings for gnutls-cli options
  */
 static char const gnutls_cli_opt_strs[5382] =
-/*     0 */ "gnutls-cli 3.6.8\n"
+/*     0 */ "gnutls-cli 3.6.9\n"
             "Copyright (C) 2000-2019 Free Software Foundation, and others, all rights reserved.\n"
             "This is free software. It is licensed for use, modification and\n"
             "redistribution under the terms of the GNU General Public License,\n"
@@ -278,7 +278,7 @@ static char const gnutls_cli_opt_strs[5382] =
 /*  5102 */ "Simple client program to set up a TLS connection to some other computer.  It\n"
             "sets up a TLS connection and forwards data from the standard input to the\n"
             "secured socket and vice versa.\n\0"
-/*  5285 */ "gnutls-cli 3.6.8\0"
+/*  5285 */ "gnutls-cli 3.6.9\0"
 /*  5302 */ "Usage: gnutls-cli [options] hostname\n"
             "gnutls-cli --help for usage instructions.\n";
 
@@ -2314,7 +2314,7 @@ static void bogus_function(void) {
      translate option names.
    */
   /* referenced via gnutls_cliOptions.pzCopyright */
-  puts(_("gnutls-cli 3.6.8\n\
+  puts(_("gnutls-cli 3.6.9\n\
 Copyright (C) 2000-2019 Free Software Foundation, and others, all rights reserved.\n\
 This is free software. It is licensed for use, modification and\n\
 redistribution under the terms of the GNU General Public License,\n\
@@ -2539,7 +2539,7 @@ sets up a TLS connection and forwards data from the standard input to the\n\
 secured socket and vice versa.\n"));
 
   /* referenced via gnutls_cliOptions.pzFullVersion */
-  puts(_("gnutls-cli 3.6.8"));
+  puts(_("gnutls-cli 3.6.9"));
 
   /* referenced via gnutls_cliOptions.pzFullUsage */
   puts(_("<<<NOT-FOUND>>>"));

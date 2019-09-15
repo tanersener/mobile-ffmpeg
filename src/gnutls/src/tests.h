@@ -70,9 +70,12 @@ test_code_t test_server_cas(gnutls_session_t state);
 test_code_t test_session_resume2(gnutls_session_t state);
 test_code_t test_rsa_pms_version_check(gnutls_session_t session);
 test_code_t test_version_oob(gnutls_session_t session);
+test_code_t test_send_record(gnutls_session_t session);
+test_code_t test_send_record_with_allow_small_records(gnutls_session_t session);
 int _test_srp_username_callback(gnutls_session_t session,
 				char **username, char **password);
 
+test_code_t test_rsa(gnutls_session_t session);
 test_code_t test_ecdhe_x25519(gnutls_session_t session);
 test_code_t test_ecdhe_secp521r1(gnutls_session_t session);
 test_code_t test_ecdhe_secp384r1(gnutls_session_t session);

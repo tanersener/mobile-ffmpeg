@@ -64,7 +64,7 @@ extern FILE * option_usage_fp;
  *  static const strings for danetool options
  */
 static char const danetool_opt_strs[2870] =
-/*     0 */ "danetool 3.6.8\n"
+/*     0 */ "danetool 3.6.9\n"
             "Copyright (C) 2000-2019 Free Software Foundation, and others, all rights reserved.\n"
             "This is free software. It is licensed for use, modification and\n"
             "redistribution under the terms of the GNU General Public License,\n"
@@ -172,7 +172,7 @@ static char const danetool_opt_strs[2870] =
 /*  2676 */ "bugs@gnutls.org\0"
 /*  2692 */ "\n\0"
 /*  2694 */ "Tool to generate and check DNS resource records for the DANE protocol.\n\0"
-/*  2766 */ "danetool 3.6.8\0"
+/*  2766 */ "danetool 3.6.9\0"
 /*  2781 */ "danetool --[tlsa-rr|check] [options]\n"
             "danetool --help for additional usage instructions.\n";
 
@@ -1295,7 +1295,7 @@ static void bogus_function(void) {
      translate option names.
    */
   /* referenced via danetoolOptions.pzCopyright */
-  puts(_("danetool 3.6.8\n\
+  puts(_("danetool 3.6.9\n\
 Copyright (C) 2000-2019 Free Software Foundation, and others, all rights reserved.\n\
 This is free software. It is licensed for use, modification and\n\
 redistribution under the terms of the GNU General Public License,\n\
@@ -1416,7 +1416,7 @@ Usage:  %s [ -<flag> [<val>] | --<name>[{=| }<val>] ]...\n"));
   puts(_("Tool to generate and check DNS resource records for the DANE protocol.\n"));
 
   /* referenced via danetoolOptions.pzFullVersion */
-  puts(_("danetool 3.6.8"));
+  puts(_("danetool 3.6.9"));
 
   /* referenced via danetoolOptions.pzFullUsage */
   puts(_("<<<NOT-FOUND>>>"));

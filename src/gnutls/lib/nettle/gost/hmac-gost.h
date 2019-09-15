@@ -34,26 +34,37 @@
 #ifndef GNUTLS_LIB_NETTLE_GOST_HMAC_GOST_H
 #define GNUTLS_LIB_NETTLE_GOST_HMAC_GOST_H
 
+#include "config.h"
+
 #include <nettle/hmac.h>
 
+#ifndef HAVE_NETTLE_GOSTHASH94CP_UPDATE
 #include "gosthash94.h"
+#endif
+#ifndef HAVE_NETTLE_STREEBOG512_UPDATE
 #include "streebog.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* Namespace mangling */
+#ifndef HAVE_NETTLE_GOSTHASH94CP_UPDATE
 #define hmac_gosthash94cp_set_key _gnutls_hmac_gosthash94cp_set_key
 #define hmac_gosthash94cp_update _gnutls_hmac_gosthash94cp_update
 #define hmac_gosthash94cp_digest _gnutls_hmac_gosthash94cp_digest
+#endif
+#ifndef HAVE_NETTLE_STREEBOG512_UPDATE
 #define hmac_streebog256_set_key _gnutls_hmac_streebog256_set_key
 #define hmac_streebog256_digest _gnutls_hmac_streebog256_digest
 #define hmac_streebog512_set_key _gnutls_hmac_streebog512_set_key
 #define hmac_streebog512_update _gnutls_hmac_streebog512_update
 #define hmac_streebog512_digest _gnutls_hmac_streebog512_digest
+#endif
 
 /* hmac-gosthash94 */
+#ifndef HAVE_NETTLE_GOSTHASH94CP_UPDATE
 struct hmac_gosthash94cp_ctx HMAC_CTX(struct gosthash94cp_ctx);
 
 void
@@ -67,9 +78,11 @@ hmac_gosthash94cp_update(struct hmac_gosthash94cp_ctx *ctx,
 void
 hmac_gosthash94cp_digest(struct hmac_gosthash94cp_ctx *ctx,
 			 size_t length, uint8_t *digest);
+#endif
 
 
 /* hmac-streebog */
+#ifndef HAVE_NETTLE_STREEBOG512_UPDATE
 struct hmac_streebog512_ctx HMAC_CTX(struct streebog512_ctx);
 
 void
@@ -95,6 +108,7 @@ hmac_streebog256_set_key(struct hmac_streebog256_ctx *ctx,
 void
 hmac_streebog256_digest(struct hmac_streebog256_ctx *ctx,
 		   size_t length, uint8_t *digest);
+#endif
 
 #ifdef __cplusplus
 }

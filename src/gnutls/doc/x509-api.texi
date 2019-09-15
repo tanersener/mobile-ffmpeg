@@ -4208,7 +4208,7 @@ CERTIFICATE", or "CERTIFICATE".
 To deinitialize  @code{certs} , you need to deinitialize each crt structure
 independently, and use @code{gnutls_free()}  at  @code{certs} .
 
-@strong{Returns:} the number of certificates read or a negative error value.
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
 
 @strong{Since:} 3.0
 @end deftypefun
@@ -4922,6 +4922,28 @@ negative error value.
 @strong{Since:} 3.6.0
 @end deftypefun
 
+@subheading gnutls_x509_crt_set_subject_alternative_name
+@anchor{gnutls_x509_crt_set_subject_alternative_name}
+@deftypefun {int} {gnutls_x509_crt_set_subject_alternative_name} (gnutls_x509_crt_t @var{crt}, gnutls_x509_subject_alt_name_t           @var{type}, const char * @var{data_string})
+@var{crt}: a certificate of type @code{gnutls_x509_crt_t} 
+
+@var{type}: is one of the gnutls_x509_subject_alt_name_t enumerations
+
+@var{data_string}: The data to be set, a (0) terminated string
+
+This function will set the subject alternative name certificate
+extension. This function assumes that data can be expressed as a null
+terminated string.
+
+The name of the function is unfortunate since it is inconsistent with
+@code{gnutls_x509_crt_get_subject_alt_name()} .
+
+See @code{gnutls_x509_crt_set_subject_alt_name()}  for more information.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun
+
 @subheading gnutls_x509_crt_set_subject_alt_name
 @anchor{gnutls_x509_crt_set_subject_alt_name}
 @deftypefun {int} {gnutls_x509_crt_set_subject_alt_name} (gnutls_x509_crt_t @var{crt}, gnutls_x509_subject_alt_name_t @var{type}, const void * @var{data}, unsigned int @var{data_size}, unsigned int @var{flags})
@@ -4974,28 +4996,6 @@ can be used to encode the provided data.
 negative error value.
 
 @strong{Since:} 3.5.0
-@end deftypefun
-
-@subheading gnutls_x509_crt_set_subject_alternative_name
-@anchor{gnutls_x509_crt_set_subject_alternative_name}
-@deftypefun {int} {gnutls_x509_crt_set_subject_alternative_name} (gnutls_x509_crt_t @var{crt}, gnutls_x509_subject_alt_name_t           @var{type}, const char * @var{data_string})
-@var{crt}: a certificate of type @code{gnutls_x509_crt_t} 
-
-@var{type}: is one of the gnutls_x509_subject_alt_name_t enumerations
-
-@var{data_string}: The data to be set, a (0) terminated string
-
-This function will set the subject alternative name certificate
-extension. This function assumes that data can be expressed as a null
-terminated string.
-
-The name of the function is unfortunate since it is inconsistent with
-@code{gnutls_x509_crt_get_subject_alt_name()} .
-
-See @code{gnutls_x509_crt_set_subject_alt_name()}  for more information.
-
-@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
-negative error value.
 @end deftypefun
 
 @subheading gnutls_x509_crt_set_subject_key_id

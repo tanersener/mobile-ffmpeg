@@ -81,9 +81,9 @@ typedef enum {
 /** count of all options for srptool */
 #define OPTION_CT    11
 /** srptool version */
-#define SRPTOOL_VERSION       "3.6.8"
+#define SRPTOOL_VERSION       "3.6.9"
 /** Full srptool version text */
-#define SRPTOOL_FULL_VERSION  "srptool 3.6.8"
+#define SRPTOOL_FULL_VERSION  "srptool 3.6.9"
 
 /**
  *  Interface defines for all options.  Replace "n" with the UPPER_CASED

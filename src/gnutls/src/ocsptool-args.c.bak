@@ -64,7 +64,7 @@ extern FILE * option_usage_fp;
  *  static const strings for ocsptool options
  */
 static char const ocsptool_opt_strs[2758] =
-/*     0 */ "ocsptool 3.6.8\n"
+/*     0 */ "ocsptool 3.6.9\n"
             "Copyright (C) 2000-2019 Free Software Foundation, and others, all rights reserved.\n"
             "This is free software. It is licensed for use, modification and\n"
             "redistribution under the terms of the GNU General Public License,\n"
@@ -161,7 +161,7 @@ static char const ocsptool_opt_strs[2758] =
             "requests/responses, generate requests and verify responses.  Unlike other\n"
             "GnuTLS applications it outputs DER encoded structures by default unless the\n"
             "'--outpem' option is specified.\n\0"
-/*  2683 */ "ocsptool 3.6.8\0"
+/*  2683 */ "ocsptool 3.6.9\0"
 /*  2698 */ "ocsptool [options]\n"
             "ocsptool --help for usage instructions.\n";
 
@@ -1286,7 +1286,7 @@ static void bogus_function(void) {
      translate option names.
    */
   /* referenced via ocsptoolOptions.pzCopyright */
-  puts(_("ocsptool 3.6.8\n\
+  puts(_("ocsptool 3.6.9\n\
 Copyright (C) 2000-2019 Free Software Foundation, and others, all rights reserved.\n\
 This is free software. It is licensed for use, modification and\n\
 redistribution under the terms of the GNU General Public License,\n\
@@ -1393,7 +1393,7 @@ GnuTLS applications it outputs DER encoded structures by default unless the\n\
 '--outpem' option is specified.\n"));
 
   /* referenced via ocsptoolOptions.pzFullVersion */
-  puts(_("ocsptool 3.6.8"));
+  puts(_("ocsptool 3.6.9"));
 
   /* referenced via ocsptoolOptions.pzFullUsage */
   puts(_("<<<NOT-FOUND>>>"));

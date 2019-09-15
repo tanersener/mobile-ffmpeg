@@ -110,16 +110,18 @@ typedef enum {
     INDEX_OPT_PROVIDER                     = 41,
     INDEX_OPT_KEYMATEXPORT                 = 42,
     INDEX_OPT_KEYMATEXPORTSIZE             = 43,
-    INDEX_OPT_VERSION                      = 44,
-    INDEX_OPT_HELP                         = 45,
-    INDEX_OPT_MORE_HELP                    = 46
+    INDEX_OPT_RECORDSIZE                   = 44,
+    INDEX_OPT_HTTPDATA                     = 45,
+    INDEX_OPT_VERSION                      = 46,
+    INDEX_OPT_HELP                         = 47,
+    INDEX_OPT_MORE_HELP                    = 48
 } teOptIndex;
 /** count of all options for gnutls-serv */
-#define OPTION_CT    47
+#define OPTION_CT    49
 /** gnutls-serv version */
-#define GNUTLS_SERV_VERSION       "3.6.8"
+#define GNUTLS_SERV_VERSION       "3.6.9"
 /** Full gnutls-serv version text */
-#define GNUTLS_SERV_FULL_VERSION  "gnutls-serv 3.6.8"
+#define GNUTLS_SERV_FULL_VERSION  "gnutls-serv 3.6.9"
 
 /**
  *  Interface defines for all options.  Replace "n" with the UPPER_CASED
@@ -224,6 +226,10 @@ typedef enum {
 #define VALUE_OPT_KEYMATEXPORTSIZE 0x1023
 
 #define OPT_VALUE_KEYMATEXPORTSIZE (DESC(KEYMATEXPORTSIZE).optArg.argInt)
+#define VALUE_OPT_RECORDSIZE     0x1024
+
+#define OPT_VALUE_RECORDSIZE     (DESC(RECORDSIZE).optArg.argInt)
+#define VALUE_OPT_HTTPDATA       0x1025
 /** option flag (value) for help-value option */
 #define VALUE_OPT_HELP          'h'
 /** option flag (value) for more-help-value option */

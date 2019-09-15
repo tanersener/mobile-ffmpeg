@@ -112,11 +112,12 @@ host_triplet = @host@
 @WANT_TEST_SUITE_TRUE@am__append_2 = suite
 @ENABLE_MINITASN1_TRUE@am__append_3 = -I$(srcdir)/../lib/minitasn1
 @HAVE_SECCOMP_TESTS_TRUE@am__append_4 = dtls-with-seccomp tls-with-seccomp dtls-client-with-seccomp tls-client-with-seccomp
-@HAVE_CMOCKA_TRUE@am__append_5 = dtls-sliding-window ip-utils name-constraints-ip conv-utf8 str-unicode str-idna \
+@DISABLE_SYSTEM_CONFIG_FALSE@am__append_5 = system-prio-file
+@HAVE_CMOCKA_TRUE@am__append_6 = dtls-sliding-window ip-utils name-constraints-ip conv-utf8 str-unicode str-idna \
 @HAVE_CMOCKA_TRUE@	tls10-prf tls12-prf gnutls_record_overhead eagain tls12-rehandshake-cert \
 @HAVE_CMOCKA_TRUE@	eagain-auto-auth
 
-@ENABLE_PKCS11_TRUE@@WINDOWS_FALSE@am__append_6 = libpkcs11mock1.la \
+@ENABLE_PKCS11_TRUE@@WINDOWS_FALSE@am__append_7 = libpkcs11mock1.la \
 @ENABLE_PKCS11_TRUE@@WINDOWS_FALSE@	libpkcs11mock2.la
 @ENABLE_PKCS11_FALSE@pkcs11_cert_import_url_exts_DEPENDENCIES =  \
 @ENABLE_PKCS11_FALSE@	$(COMMON_GNUTLS_LDADD) libutils.la \
@@ -141,7 +142,7 @@ host_triplet = @host@
 @WINDOWS_TRUE@pkcs11_get_raw_issuer_exts_DEPENDENCIES =  \
 @WINDOWS_TRUE@	$(COMMON_GNUTLS_LDADD) libutils.la \
 @WINDOWS_TRUE@	$(am__DEPENDENCIES_2)
-@ENABLE_PKCS11_TRUE@@WINDOWS_FALSE@am__append_7 = pkcs11-cert-import-url-exts pkcs11-get-exts pkcs11-get-raw-issuer-exts \
+@ENABLE_PKCS11_TRUE@@WINDOWS_FALSE@am__append_8 = pkcs11-cert-import-url-exts pkcs11-get-exts pkcs11-get-raw-issuer-exts \
 @ENABLE_PKCS11_TRUE@@WINDOWS_FALSE@	pkcs11-cert-import-url4-exts pkcs11/pkcs11-chainverify pkcs11/pkcs11-get-issuer pkcs11/pkcs11-is-known \
 @ENABLE_PKCS11_TRUE@@WINDOWS_FALSE@	pkcs11/pkcs11-combo pkcs11/pkcs11-privkey pkcs11/pkcs11-pubkey-import-rsa pkcs11/pkcs11-pubkey-import-ecdsa \
 @ENABLE_PKCS11_TRUE@@WINDOWS_FALSE@	pkcs11-import-url-privkey pkcs11-privkey-fork pkcs11/pkcs11-ec-privkey-test \
@@ -153,21 +154,21 @@ host_triplet = @host@
 @ENABLE_PKCS11_TRUE@@WINDOWS_FALSE@	pkcs11/pkcs11-eddsa-privkey-test \
 @ENABLE_PKCS11_TRUE@@WINDOWS_FALSE@	pkcs11-token-raw pkcs11-obj-raw
 
-@ENABLE_PKCS11_TRUE@@P11KIT_0_23_11_API_TRUE@@WINDOWS_FALSE@am__append_8 = pkcs11-import-url-privkey-caps
-@ENABLE_OCSP_TRUE@am__append_9 = ocsp
-@ENABLE_DANE_TRUE@am__append_10 = dane dane-strcodes
-@ENABLE_OPENSSL_TRUE@am__append_11 = openssl
-@HAVE_FORK_TRUE@am__append_12 = x509self x509dn anonself pskself dhepskself	\
+@ENABLE_PKCS11_TRUE@@P11KIT_0_23_11_API_TRUE@@WINDOWS_FALSE@am__append_9 = pkcs11-import-url-privkey-caps
+@ENABLE_OCSP_TRUE@am__append_10 = ocsp
+@ENABLE_DANE_TRUE@am__append_11 = dane dane-strcodes
+@ENABLE_OPENSSL_TRUE@am__append_12 = openssl
+@HAVE_FORK_TRUE@am__append_13 = x509self x509dn anonself pskself dhepskself	\
 @HAVE_FORK_TRUE@	setcredcrash tls12-resume-x509 tls12-resume-psk tls12-resume-anon \
 @HAVE_FORK_TRUE@	tls13-resume-x509 tls13-resume-psk tls13-early-data tls13-early-data-neg \
 @HAVE_FORK_TRUE@	resume-with-record-size-limit
 
-@ENABLE_PKCS11_TRUE@@WINDOWS_FALSE@am__append_13 = tls13/post-handshake-with-cert-pkcs11 pkcs11/tls-neg-pkcs11-no-key
+@ENABLE_PKCS11_TRUE@@WINDOWS_FALSE@am__append_14 = tls13/post-handshake-with-cert-pkcs11 pkcs11/tls-neg-pkcs11-no-key
 
 #
 # List of tests not available/functional under windows
 #
-@WINDOWS_FALSE@am__append_14 = dtls/dtls dtls/dtls-resume fastopen.sh \
+@WINDOWS_FALSE@am__append_15 = dtls/dtls dtls/dtls-resume fastopen.sh \
 @WINDOWS_FALSE@	pkgconfig.sh starttls.sh starttls-ftp.sh \
 @WINDOWS_FALSE@	starttls-smtp.sh starttls-lmtp.sh \
 @WINDOWS_FALSE@	starttls-pop3.sh starttls-xmpp.sh \
@@ -181,23 +182,26 @@ host_triplet = @host@
 @WINDOWS_FALSE@	sni-resume.sh ocsp-tests/ocsptool \
 @WINDOWS_FALSE@	cert-reencoding.sh pkcs7-cat.sh long-crl.sh \
 @WINDOWS_FALSE@	serv-udp.sh logfile-option.sh \
-@WINDOWS_FALSE@	gnutls-cli-resume.sh profile-tests.sh \
-@WINDOWS_FALSE@	gnutls-cli-self-signed.sh \
-@WINDOWS_FALSE@	gnutls-cli-invalid-crl.sh
-@WINDOWS_FALSE@am__append_15 = dtls-stress
-@ENABLE_PKCS11_TRUE@@WINDOWS_FALSE@am__append_16 = p11-kit-trust.sh testpkcs11.sh certtool-pkcs11.sh
-@ENABLE_PKCS11_TRUE@@HAVE_PKCS11_TRUST_STORE_TRUE@@P11KIT_0_23_11_API_TRUE@@WINDOWS_FALSE@am__append_17 = p11-kit-load.sh
-@ENABLE_PKCS11_TRUE@@HAVE_PKCS11_TRUST_STORE_TRUE@@P11KIT_0_23_11_API_TRUE@@WINDOWS_FALSE@am__append_18 = pkcs11/list-tokens
-@ENABLE_DANE_TRUE@@WINDOWS_FALSE@am__append_19 = danetool.sh
-@ENABLE_TROUSERS_TRUE@@WINDOWS_FALSE@am__append_20 = tpmtool_test.sh
-@WINDOWS_TRUE@am__append_21 = WINDOWS=1
-@WINDOWS_TRUE@am__append_22 = win32-certopenstore
-@ENABLE_CXX_TRUE@@HAVE_CMOCKA_TRUE@am__append_23 = sanity-cpp
-@WINDOWS_FALSE@am__append_24 = datefudge-check
-check_PROGRAMS = $(am__EXEEXT_2) $(am__EXEEXT_13) $(am__EXEEXT_17)
-TESTS = $(am__EXEEXT_2) $(am__EXEEXT_13) $(dist_check_SCRIPTS)
-@ENABLE_SSL3_TRUE@am__append_25 = ENABLE_SSL3=1
-@ENABLE_SSL3_FALSE@am__append_26 = ENABLE_SSL3=0
+@WINDOWS_FALSE@	gnutls-cli-resume.sh profile-tests.sh
+@WINDOWS_FALSE@am__append_16 = dtls-stress
+@DISABLE_SYSTEM_CONFIG_FALSE@@WINDOWS_FALSE@am__append_17 = system-override-sig-hash.sh system-override-versions.sh system-override-invalid.sh \
+@DISABLE_SYSTEM_CONFIG_FALSE@@WINDOWS_FALSE@	system-override-curves.sh system-override-profiles.sh system-override-tls.sh \
+@DISABLE_SYSTEM_CONFIG_FALSE@@WINDOWS_FALSE@	system-override-kx.sh
+
+@WINDOWS_FALSE@am__append_18 = gnutls-cli-self-signed.sh gnutls-cli-invalid-crl.sh
+@ENABLE_PKCS11_TRUE@@WINDOWS_FALSE@am__append_19 = p11-kit-trust.sh testpkcs11.sh certtool-pkcs11.sh
+@ENABLE_PKCS11_TRUE@@HAVE_PKCS11_TRUST_STORE_TRUE@@P11KIT_0_23_11_API_TRUE@@WINDOWS_FALSE@am__append_20 = p11-kit-load.sh
+@ENABLE_PKCS11_TRUE@@HAVE_PKCS11_TRUST_STORE_TRUE@@P11KIT_0_23_11_API_TRUE@@WINDOWS_FALSE@am__append_21 = pkcs11/list-tokens pkcs11/list-objects
+@ENABLE_DANE_TRUE@@WINDOWS_FALSE@am__append_22 = danetool.sh
+@ENABLE_TROUSERS_TRUE@@WINDOWS_FALSE@am__append_23 = tpmtool_test.sh
+@WINDOWS_TRUE@am__append_24 = WINDOWS=1
+@WINDOWS_TRUE@am__append_25 = win32-certopenstore
+@ENABLE_CXX_TRUE@@HAVE_CMOCKA_TRUE@am__append_26 = sanity-cpp
+@WINDOWS_FALSE@am__append_27 = datefudge-check
+check_PROGRAMS = $(am__EXEEXT_2) $(am__EXEEXT_14) $(am__EXEEXT_18)
+TESTS = $(am__EXEEXT_2) $(am__EXEEXT_14) $(dist_check_SCRIPTS)
+@ENABLE_SSL3_TRUE@am__append_28 = ENABLE_SSL3=1
+@ENABLE_SSL3_FALSE@am__append_29 = ENABLE_SSL3=0
 subdir = tests
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/lib/unistring/m4/gnulib-comp.m4 \
@@ -336,7 +340,8 @@ am__EXEEXT_2 = $(am__EXEEXT_1)
 @HAVE_SECCOMP_TESTS_TRUE@	tls-with-seccomp$(EXEEXT) \
 @HAVE_SECCOMP_TESTS_TRUE@	dtls-client-with-seccomp$(EXEEXT) \
 @HAVE_SECCOMP_TESTS_TRUE@	tls-client-with-seccomp$(EXEEXT)
-@HAVE_CMOCKA_TRUE@am__EXEEXT_4 = dtls-sliding-window$(EXEEXT) \
+@DISABLE_SYSTEM_CONFIG_FALSE@am__EXEEXT_4 = system-prio-file$(EXEEXT)
+@HAVE_CMOCKA_TRUE@am__EXEEXT_5 = dtls-sliding-window$(EXEEXT) \
 @HAVE_CMOCKA_TRUE@	ip-utils$(EXEEXT) \
 @HAVE_CMOCKA_TRUE@	name-constraints-ip$(EXEEXT) \
 @HAVE_CMOCKA_TRUE@	conv-utf8$(EXEEXT) str-unicode$(EXEEXT) \
@@ -346,7 +351,7 @@ am__EXEEXT_2 = $(am__EXEEXT_1)
 @HAVE_CMOCKA_TRUE@	eagain$(EXEEXT) \
 @HAVE_CMOCKA_TRUE@	tls12-rehandshake-cert$(EXEEXT) \
 @HAVE_CMOCKA_TRUE@	eagain-auto-auth$(EXEEXT)
-@ENABLE_PKCS11_TRUE@@WINDOWS_FALSE@am__EXEEXT_5 = pkcs11-cert-import-url-exts$(EXEEXT) \
+@ENABLE_PKCS11_TRUE@@WINDOWS_FALSE@am__EXEEXT_6 = pkcs11-cert-import-url-exts$(EXEEXT) \
 @ENABLE_PKCS11_TRUE@@WINDOWS_FALSE@	pkcs11-get-exts$(EXEEXT) \
 @ENABLE_PKCS11_TRUE@@WINDOWS_FALSE@	pkcs11-get-raw-issuer-exts$(EXEEXT) \
 @ENABLE_PKCS11_TRUE@@WINDOWS_FALSE@	pkcs11-cert-import-url4-exts$(EXEEXT) \
@@ -377,11 +382,11 @@ am__EXEEXT_2 = $(am__EXEEXT_1)
 @ENABLE_PKCS11_TRUE@@WINDOWS_FALSE@	pkcs11/pkcs11-eddsa-privkey-test$(EXEEXT) \
 @ENABLE_PKCS11_TRUE@@WINDOWS_FALSE@	pkcs11-token-raw$(EXEEXT) \
 @ENABLE_PKCS11_TRUE@@WINDOWS_FALSE@	pkcs11-obj-raw$(EXEEXT)
-@ENABLE_PKCS11_TRUE@@P11KIT_0_23_11_API_TRUE@@WINDOWS_FALSE@am__EXEEXT_6 = pkcs11-import-url-privkey-caps$(EXEEXT)
-@ENABLE_OCSP_TRUE@am__EXEEXT_7 = ocsp$(EXEEXT)
-@ENABLE_DANE_TRUE@am__EXEEXT_8 = dane$(EXEEXT) dane-strcodes$(EXEEXT)
-@ENABLE_OPENSSL_TRUE@am__EXEEXT_9 = openssl$(EXEEXT)
-@HAVE_FORK_TRUE@am__EXEEXT_10 = x509self$(EXEEXT) x509dn$(EXEEXT) \
+@ENABLE_PKCS11_TRUE@@P11KIT_0_23_11_API_TRUE@@WINDOWS_FALSE@am__EXEEXT_7 = pkcs11-import-url-privkey-caps$(EXEEXT)
+@ENABLE_OCSP_TRUE@am__EXEEXT_8 = ocsp$(EXEEXT)
+@ENABLE_DANE_TRUE@am__EXEEXT_9 = dane$(EXEEXT) dane-strcodes$(EXEEXT)
+@ENABLE_OPENSSL_TRUE@am__EXEEXT_10 = openssl$(EXEEXT)
+@HAVE_FORK_TRUE@am__EXEEXT_11 = x509self$(EXEEXT) x509dn$(EXEEXT) \
 @HAVE_FORK_TRUE@	anonself$(EXEEXT) pskself$(EXEEXT) \
 @HAVE_FORK_TRUE@	dhepskself$(EXEEXT) setcredcrash$(EXEEXT) \
 @HAVE_FORK_TRUE@	tls12-resume-x509$(EXEEXT) \
@@ -392,10 +397,10 @@ am__EXEEXT_2 = $(am__EXEEXT_1)
 @HAVE_FORK_TRUE@	tls13-early-data$(EXEEXT) \
 @HAVE_FORK_TRUE@	tls13-early-data-neg$(EXEEXT) \
 @HAVE_FORK_TRUE@	resume-with-record-size-limit$(EXEEXT)
-@ENABLE_PKCS11_TRUE@@WINDOWS_FALSE@am__EXEEXT_11 = tls13/post-handshake-with-cert-pkcs11$(EXEEXT) \
+@ENABLE_PKCS11_TRUE@@WINDOWS_FALSE@am__EXEEXT_12 = tls13/post-handshake-with-cert-pkcs11$(EXEEXT) \
 @ENABLE_PKCS11_TRUE@@WINDOWS_FALSE@	pkcs11/tls-neg-pkcs11-no-key$(EXEEXT)
-@WINDOWS_TRUE@am__EXEEXT_12 = win32-certopenstore$(EXEEXT)
-am__EXEEXT_13 = tls13/supported_versions$(EXEEXT) \
+@WINDOWS_TRUE@am__EXEEXT_13 = win32-certopenstore$(EXEEXT)
+am__EXEEXT_14 = tls13/supported_versions$(EXEEXT) \
 	tls13/tls12-no-tls13-exts$(EXEEXT) \
 	tls13/post-handshake-with-cert$(EXEEXT) \
 	tls13/post-handshake-without-cert$(EXEEXT) \
@@ -411,14 +416,15 @@ am__EXEEXT_13 = tls13/supported_versions$(EXEEXT) \
 	tls13/post-handshake-with-cert-auto$(EXEEXT) \
 	tls13/anti_replay$(EXEEXT) tls13/hello_retry_request$(EXEEXT) \
 	tls13/psk-ext$(EXEEXT) tls13/key_update$(EXEEXT) \
-	tls13/key_limits$(EXEEXT) tls13/multi-ocsp$(EXEEXT) \
-	tls13/ocsp-client$(EXEEXT) tls13/change_cipher_spec$(EXEEXT) \
-	tls13-cipher-neg$(EXEEXT) tls13/no-psk-exts$(EXEEXT) \
-	tls13/psk-dumbfw$(EXEEXT) tls13-early-start$(EXEEXT) \
-	mini-record-2$(EXEEXT) simple$(EXEEXT) \
-	gnutls_hmac_fast$(EXEEXT) set_pkcs12_cred$(EXEEXT) \
-	cert$(EXEEXT) certuniqueid$(EXEEXT) tls-neg-ext-key$(EXEEXT) \
-	mpi$(EXEEXT) certificate_set_x509_crl$(EXEEXT) dn$(EXEEXT) \
+	tls13/key_update_multiple$(EXEEXT) tls13/key_limits$(EXEEXT) \
+	tls13/multi-ocsp$(EXEEXT) tls13/ocsp-client$(EXEEXT) \
+	tls13/change_cipher_spec$(EXEEXT) tls13-cipher-neg$(EXEEXT) \
+	tls13/no-psk-exts$(EXEEXT) tls13/psk-dumbfw$(EXEEXT) \
+	tls13-early-start$(EXEEXT) mini-record-2$(EXEEXT) \
+	simple$(EXEEXT) gnutls_hmac_fast$(EXEEXT) \
+	set_pkcs12_cred$(EXEEXT) cert$(EXEEXT) certuniqueid$(EXEEXT) \
+	tls-neg-ext-key$(EXEEXT) mpi$(EXEEXT) \
+	certificate_set_x509_crl$(EXEEXT) dn$(EXEEXT) \
 	parse_ca$(EXEEXT) x509-dn$(EXEEXT) x509-dn-decode$(EXEEXT) \
 	record-sizes$(EXEEXT) hostname-check$(EXEEXT) \
 	cve-2008-4989$(EXEEXT) pkcs12_s2k$(EXEEXT) \
@@ -466,8 +472,9 @@ am__EXEEXT_13 = tls13/supported_versions$(EXEEXT) \
 	mini-dtls-lowmtu$(EXEEXT) set_x509_key_file-late$(EXEEXT) \
 	crlverify$(EXEEXT) mini-dtls-discard$(EXEEXT) \
 	init_fds$(EXEEXT) mini-record-failure$(EXEEXT) \
-	tls12-rehandshake-cert-2$(EXEEXT) custom-urls$(EXEEXT) \
-	set_x509_key_mem$(EXEEXT) set_x509_key_file$(EXEEXT) \
+	openconnect-dtls12$(EXEEXT) tls12-rehandshake-cert-2$(EXEEXT) \
+	custom-urls$(EXEEXT) set_x509_key_mem$(EXEEXT) \
+	set_x509_key_file$(EXEEXT) \
 	tls12-rehandshake-cert-auto$(EXEEXT) \
 	tls12-rehandshake-set-prio$(EXEEXT) \
 	mini-chain-unsorted$(EXEEXT) x509-verify-with-crl$(EXEEXT) \
@@ -496,10 +503,10 @@ am__EXEEXT_13 = tls13/supported_versions$(EXEEXT) \
 	oids$(EXEEXT) atfork$(EXEEXT) prf$(EXEEXT) psk-file$(EXEEXT) \
 	priority-init2$(EXEEXT) post-client-hello-change-prio$(EXEEXT) \
 	status-request$(EXEEXT) status-request-ok$(EXEEXT) \
-	status-request-missing$(EXEEXT) sign-verify-ext$(EXEEXT) \
+	rfc7633-missing$(EXEEXT) sign-verify-ext$(EXEEXT) \
 	fallback-scsv$(EXEEXT) pkcs8-key-decode$(EXEEXT) urls$(EXEEXT) \
-	dtls-rehandshake-cert$(EXEEXT) key-usage-rsa$(EXEEXT) \
-	key-usage-ecdhe-rsa$(EXEEXT) \
+	dtls-rehandshake-cert$(EXEEXT) rfc7633-ok$(EXEEXT) \
+	key-usage-rsa$(EXEEXT) key-usage-ecdhe-rsa$(EXEEXT) \
 	mini-session-verify-function$(EXEEXT) auto-verify$(EXEEXT) \
 	record-timeouts$(EXEEXT) mini-dtls-hello-verify-48$(EXEEXT) \
 	set-default-prio$(EXEEXT) tls12-anon-upgrade$(EXEEXT) \
@@ -515,10 +522,10 @@ am__EXEEXT_13 = tls13/supported_versions$(EXEEXT) \
 	pcert-list$(EXEEXT) session-export-funcs$(EXEEXT) \
 	handshake-false-start$(EXEEXT) version-checks$(EXEEXT) \
 	key-material-dtls$(EXEEXT) key-material-set-dtls$(EXEEXT) \
-	system-prio-file$(EXEEXT) name-constraints-merge$(EXEEXT) \
-	crl-basic$(EXEEXT) crq-basic$(EXEEXT) \
-	send-client-cert$(EXEEXT) custom-urls-override$(EXEEXT) \
-	hex$(EXEEXT) rehandshake-switch-psk-id$(EXEEXT) \
+	name-constraints-merge$(EXEEXT) crl-basic$(EXEEXT) \
+	crq-basic$(EXEEXT) send-client-cert$(EXEEXT) \
+	custom-urls-override$(EXEEXT) hex$(EXEEXT) \
+	rehandshake-switch-psk-id$(EXEEXT) \
 	rehandshake-switch-srp-id$(EXEEXT) base64$(EXEEXT) \
 	srpbase64$(EXEEXT) pkcs1-digest-info$(EXEEXT) \
 	set_x509_key$(EXEEXT) set_x509_key_file_der$(EXEEXT) \
@@ -579,15 +586,18 @@ am__EXEEXT_13 = tls13/supported_versions$(EXEEXT) \
 	tls-crt_type-neg$(EXEEXT) resume-with-stek-expiration$(EXEEXT) \
 	resume-with-previous-stek$(EXEEXT) rawpk-api$(EXEEXT) \
 	tls-record-size-limit-asym$(EXEEXT) dh-compute$(EXEEXT) \
-	ecdh-compute$(EXEEXT) $(am__EXEEXT_3) $(am__EXEEXT_4) \
+	ecdh-compute$(EXEEXT) sign-verify-data-newapi$(EXEEXT) \
+	sign-verify-newapi$(EXEEXT) $(am__EXEEXT_3) $(am__EXEEXT_4) \
 	$(am__EXEEXT_5) $(am__EXEEXT_6) $(am__EXEEXT_7) \
 	$(am__EXEEXT_8) $(am__EXEEXT_9) $(am__EXEEXT_10) \
-	$(am__EXEEXT_11) $(am__EXEEXT_12)
-@WINDOWS_FALSE@am__EXEEXT_14 = dtls-stress$(EXEEXT)
-@ENABLE_PKCS11_TRUE@@HAVE_PKCS11_TRUST_STORE_TRUE@@P11KIT_0_23_11_API_TRUE@@WINDOWS_FALSE@am__EXEEXT_15 = pkcs11/list-tokens$(EXEEXT)
-@WINDOWS_FALSE@am__EXEEXT_16 = datefudge-check$(EXEEXT)
-am__EXEEXT_17 = tls13/prf-early$(EXEEXT) $(am__EXEEXT_14) \
-	$(am__EXEEXT_15) $(am__EXEEXT_16)
+	$(am__EXEEXT_11) $(am__EXEEXT_12) $(am__EXEEXT_13)
+@WINDOWS_FALSE@am__EXEEXT_15 = dtls-stress$(EXEEXT)
+@ENABLE_PKCS11_TRUE@@HAVE_PKCS11_TRUST_STORE_TRUE@@P11KIT_0_23_11_API_TRUE@@WINDOWS_FALSE@am__EXEEXT_16 = pkcs11/list-tokens$(EXEEXT) \
+@ENABLE_PKCS11_TRUE@@HAVE_PKCS11_TRUST_STORE_TRUE@@P11KIT_0_23_11_API_TRUE@@WINDOWS_FALSE@	pkcs11/list-objects$(EXEEXT)
+@WINDOWS_FALSE@am__EXEEXT_17 = datefudge-check$(EXEEXT)
+am__EXEEXT_18 = tls13/prf-early$(EXEEXT) system-override-hash$(EXEEXT) \
+	system-override-sig$(EXEEXT) $(am__EXEEXT_15) $(am__EXEEXT_16) \
+	$(am__EXEEXT_17)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 @ENABLE_PKCS11_TRUE@@WINDOWS_FALSE@libpkcs11mock1_la_DEPENDENCIES =  \
 @ENABLE_PKCS11_TRUE@@WINDOWS_FALSE@	../gl/libgnu.la
@@ -1394,6 +1404,11 @@ oids_OBJECTS = oids.$(OBJEXT)
 oids_LDADD = $(LDADD)
 oids_DEPENDENCIES = $(COMMON_GNUTLS_LDADD) libutils.la \
 	$(am__DEPENDENCIES_2)
+openconnect_dtls12_SOURCES = openconnect-dtls12.c
+openconnect_dtls12_OBJECTS = openconnect-dtls12.$(OBJEXT)
+openconnect_dtls12_LDADD = $(LDADD)
+openconnect_dtls12_DEPENDENCIES = $(COMMON_GNUTLS_LDADD) libutils.la \
+	$(am__DEPENDENCIES_2)
 openssl_SOURCES = openssl.c
 openssl_OBJECTS = openssl.$(OBJEXT)
 @ENABLE_OPENSSL_TRUE@openssl_DEPENDENCIES =  \
@@ -1495,6 +1510,11 @@ pkcs11_gnutls_x509_crt_list_import_url_OBJECTS =  \
 pkcs11_gnutls_x509_crt_list_import_url_LDADD = $(LDADD)
 pkcs11_gnutls_x509_crt_list_import_url_DEPENDENCIES =  \
 	$(COMMON_GNUTLS_LDADD) libutils.la $(am__DEPENDENCIES_2)
+pkcs11_list_objects_SOURCES = pkcs11/list-objects.c
+pkcs11_list_objects_OBJECTS = pkcs11/list-objects.$(OBJEXT)
+pkcs11_list_objects_LDADD = $(LDADD)
+pkcs11_list_objects_DEPENDENCIES = $(COMMON_GNUTLS_LDADD) libutils.la \
+	$(am__DEPENDENCIES_2)
 pkcs11_list_tokens_SOURCES = pkcs11/list-tokens.c
 pkcs11_list_tokens_OBJECTS = pkcs11/list-tokens.$(OBJEXT)
 pkcs11_list_tokens_LDADD = $(LDADD)
@@ -1831,6 +1851,16 @@ resume_with_stek_expiration_OBJECTS =  \
 resume_with_stek_expiration_LDADD = $(LDADD)
 resume_with_stek_expiration_DEPENDENCIES = $(COMMON_GNUTLS_LDADD) \
 	libutils.la $(am__DEPENDENCIES_2)
+rfc7633_missing_SOURCES = rfc7633-missing.c
+rfc7633_missing_OBJECTS = rfc7633-missing.$(OBJEXT)
+rfc7633_missing_LDADD = $(LDADD)
+rfc7633_missing_DEPENDENCIES = $(COMMON_GNUTLS_LDADD) libutils.la \
+	$(am__DEPENDENCIES_2)
+rfc7633_ok_SOURCES = rfc7633-ok.c
+rfc7633_ok_OBJECTS = rfc7633-ok.$(OBJEXT)
+rfc7633_ok_LDADD = $(LDADD)
+rfc7633_ok_DEPENDENCIES = $(COMMON_GNUTLS_LDADD) libutils.la \
+	$(am__DEPENDENCIES_2)
 rng_fork_SOURCES = rng-fork.c
 rng_fork_OBJECTS = rng-fork.$(OBJEXT)
 rng_fork_LDADD = $(LDADD)
@@ -2104,6 +2134,11 @@ sign_verify_data_OBJECTS = sign-verify-data.$(OBJEXT)
 sign_verify_data_LDADD = $(LDADD)
 sign_verify_data_DEPENDENCIES = $(COMMON_GNUTLS_LDADD) libutils.la \
 	$(am__DEPENDENCIES_2)
+sign_verify_data_newapi_SOURCES = sign-verify-data-newapi.c
+sign_verify_data_newapi_OBJECTS = sign-verify-data-newapi.$(OBJEXT)
+sign_verify_data_newapi_LDADD = $(LDADD)
+sign_verify_data_newapi_DEPENDENCIES = $(COMMON_GNUTLS_LDADD) \
+	libutils.la $(am__DEPENDENCIES_2)
 sign_verify_ed25519_rfc8080_SOURCES = sign-verify-ed25519-rfc8080.c
 sign_verify_ed25519_rfc8080_OBJECTS =  \
 	sign-verify-ed25519-rfc8080.$(OBJEXT)
@@ -2119,6 +2154,11 @@ sign_verify_ext4_SOURCES = sign-verify-ext4.c
 sign_verify_ext4_OBJECTS = sign-verify-ext4.$(OBJEXT)
 sign_verify_ext4_LDADD = $(LDADD)
 sign_verify_ext4_DEPENDENCIES = $(COMMON_GNUTLS_LDADD) libutils.la \
+	$(am__DEPENDENCIES_2)
+sign_verify_newapi_SOURCES = sign-verify-newapi.c
+sign_verify_newapi_OBJECTS = sign-verify-newapi.$(OBJEXT)
+sign_verify_newapi_LDADD = $(LDADD)
+sign_verify_newapi_DEPENDENCIES = $(COMMON_GNUTLS_LDADD) libutils.la \
 	$(am__DEPENDENCIES_2)
 simple_SOURCES = simple.c
 simple_OBJECTS = simple.$(OBJEXT)
@@ -2178,11 +2218,6 @@ status_request_ext_OBJECTS = status-request-ext.$(OBJEXT)
 status_request_ext_LDADD = $(LDADD)
 status_request_ext_DEPENDENCIES = $(COMMON_GNUTLS_LDADD) libutils.la \
 	$(am__DEPENDENCIES_2)
-status_request_missing_SOURCES = status-request-missing.c
-status_request_missing_OBJECTS = status-request-missing.$(OBJEXT)
-status_request_missing_LDADD = $(LDADD)
-status_request_missing_DEPENDENCIES = $(COMMON_GNUTLS_LDADD) \
-	libutils.la $(am__DEPENDENCIES_2)
 status_request_ok_SOURCES = status-request-ok.c
 status_request_ok_OBJECTS = status-request-ok.$(OBJEXT)
 status_request_ok_LDADD = $(LDADD)
@@ -2194,6 +2229,16 @@ str_idna_OBJECTS = str-idna.$(OBJEXT)
 str_unicode_SOURCES = str-unicode.c
 str_unicode_OBJECTS = str-unicode.$(OBJEXT)
 @HAVE_CMOCKA_TRUE@str_unicode_DEPENDENCIES = $(am__DEPENDENCIES_4)
+system_override_hash_SOURCES = system-override-hash.c
+system_override_hash_OBJECTS = system-override-hash.$(OBJEXT)
+system_override_hash_LDADD = $(LDADD)
+system_override_hash_DEPENDENCIES = $(COMMON_GNUTLS_LDADD) libutils.la \
+	$(am__DEPENDENCIES_2)
+system_override_sig_SOURCES = system-override-sig.c
+system_override_sig_OBJECTS = system-override-sig.$(OBJEXT)
+system_override_sig_LDADD = $(LDADD)
+system_override_sig_DEPENDENCIES = $(COMMON_GNUTLS_LDADD) libutils.la \
+	$(am__DEPENDENCIES_2)
 system_prio_file_SOURCES = system-prio-file.c
 system_prio_file_OBJECTS = system-prio-file.$(OBJEXT)
 system_prio_file_LDADD = $(LDADD)
@@ -2540,6 +2585,12 @@ tls13_key_update_OBJECTS = tls13/key_update.$(OBJEXT)
 tls13_key_update_LDADD = $(LDADD)
 tls13_key_update_DEPENDENCIES = $(COMMON_GNUTLS_LDADD) libutils.la \
 	$(am__DEPENDENCIES_2)
+tls13_key_update_multiple_SOURCES = tls13/key_update_multiple.c
+tls13_key_update_multiple_OBJECTS =  \
+	tls13/key_update_multiple.$(OBJEXT)
+tls13_key_update_multiple_LDADD = $(LDADD)
+tls13_key_update_multiple_DEPENDENCIES = $(COMMON_GNUTLS_LDADD) \
+	libutils.la $(am__DEPENDENCIES_2)
 tls13_multi_ocsp_SOURCES = tls13/multi-ocsp.c
 tls13_multi_ocsp_OBJECTS = tls13/multi-ocsp.$(OBJEXT)
 tls13_multi_ocsp_LDADD = $(LDADD)
@@ -2775,9 +2826,12 @@ am__dist_check_SCRIPTS_DIST = rfc2253-escape-test \
 	gnutls-cli-debug.sh sni-resume.sh ocsp-tests/ocsptool \
 	cert-reencoding.sh pkcs7-cat.sh long-crl.sh serv-udp.sh \
 	logfile-option.sh gnutls-cli-resume.sh profile-tests.sh \
-	gnutls-cli-self-signed.sh gnutls-cli-invalid-crl.sh \
-	p11-kit-trust.sh testpkcs11.sh certtool-pkcs11.sh \
-	p11-kit-load.sh danetool.sh tpmtool_test.sh
+	system-override-sig-hash.sh system-override-versions.sh \
+	system-override-invalid.sh system-override-curves.sh \
+	system-override-profiles.sh system-override-tls.sh \
+	system-override-kx.sh gnutls-cli-self-signed.sh \
+	gnutls-cli-invalid-crl.sh p11-kit-trust.sh testpkcs11.sh \
+	certtool-pkcs11.sh p11-kit-load.sh danetool.sh tpmtool_test.sh
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -2902,9 +2956,10 @@ am__depfiles_remade = ./$(DEPDIR)/alerts.Po \
 	./$(DEPDIR)/nul-in-x509-names.Po \
 	./$(DEPDIR)/null_retrieve_function.Po \
 	./$(DEPDIR)/ocsp-filename-memleak.Po ./$(DEPDIR)/ocsp.Po \
-	./$(DEPDIR)/oids.Po ./$(DEPDIR)/openssl.Po \
-	./$(DEPDIR)/parse_ca.Po ./$(DEPDIR)/pcert-list.Po \
-	./$(DEPDIR)/pkcs1-digest-info.Po ./$(DEPDIR)/pkcs12_encode.Po \
+	./$(DEPDIR)/oids.Po ./$(DEPDIR)/openconnect-dtls12.Po \
+	./$(DEPDIR)/openssl.Po ./$(DEPDIR)/parse_ca.Po \
+	./$(DEPDIR)/pcert-list.Po ./$(DEPDIR)/pkcs1-digest-info.Po \
+	./$(DEPDIR)/pkcs12_encode.Po \
 	./$(DEPDIR)/pkcs12_s2k-pkcs12_s2k.Po \
 	./$(DEPDIR)/pkcs12_s2k_pem.Po ./$(DEPDIR)/pkcs12_simple.Po \
 	./$(DEPDIR)/pkcs7-cat-parse.Po ./$(DEPDIR)/pkcs7-gen.Po \
@@ -2934,6 +2989,7 @@ am__depfiles_remade = ./$(DEPDIR)/alerts.Po \
 	./$(DEPDIR)/resume-with-previous-stek.Po \
 	./$(DEPDIR)/resume-with-record-size-limit.Po \
 	./$(DEPDIR)/resume-with-stek-expiration.Po \
+	./$(DEPDIR)/rfc7633-missing.Po ./$(DEPDIR)/rfc7633-ok.Po \
 	./$(DEPDIR)/rng-fork.Po ./$(DEPDIR)/rng-no-onload.Po \
 	./$(DEPDIR)/rng-op-key.Po ./$(DEPDIR)/rng-op-nonce.Po \
 	./$(DEPDIR)/rng-op-random.Po ./$(DEPDIR)/rng-pthread.Po \
@@ -2969,20 +3025,22 @@ am__depfiles_remade = ./$(DEPDIR)/alerts.Po \
 	./$(DEPDIR)/set_x509_ocsp_multi_unknown.Po \
 	./$(DEPDIR)/set_x509_pkcs12_key.Po ./$(DEPDIR)/setcredcrash.Po \
 	./$(DEPDIR)/sign-is-secure.Po ./$(DEPDIR)/sign-pk-api.Po \
+	./$(DEPDIR)/sign-verify-data-newapi.Po \
 	./$(DEPDIR)/sign-verify-data.Po \
 	./$(DEPDIR)/sign-verify-ed25519-rfc8080.Po \
 	./$(DEPDIR)/sign-verify-ext.Po ./$(DEPDIR)/sign-verify-ext4.Po \
-	./$(DEPDIR)/sign-verify.Po ./$(DEPDIR)/simple.Po \
-	./$(DEPDIR)/spki-abstract.Po ./$(DEPDIR)/spki.Po \
-	./$(DEPDIR)/srp.Po ./$(DEPDIR)/srpbase64.Po \
-	./$(DEPDIR)/ssl2-hello.Po \
+	./$(DEPDIR)/sign-verify-newapi.Po ./$(DEPDIR)/sign-verify.Po \
+	./$(DEPDIR)/simple.Po ./$(DEPDIR)/spki-abstract.Po \
+	./$(DEPDIR)/spki.Po ./$(DEPDIR)/srp.Po \
+	./$(DEPDIR)/srpbase64.Po ./$(DEPDIR)/ssl2-hello.Po \
 	./$(DEPDIR)/ssl30-cert-key-exchange.Po \
 	./$(DEPDIR)/ssl30-cipher-neg.Po \
 	./$(DEPDIR)/ssl30-server-kx-neg.Po \
 	./$(DEPDIR)/status-request-ext.Po \
-	./$(DEPDIR)/status-request-missing.Po \
 	./$(DEPDIR)/status-request-ok.Po ./$(DEPDIR)/status-request.Po \
 	./$(DEPDIR)/str-idna.Po ./$(DEPDIR)/str-unicode.Po \
+	./$(DEPDIR)/system-override-hash.Po \
+	./$(DEPDIR)/system-override-sig.Po \
 	./$(DEPDIR)/system-prio-file.Po ./$(DEPDIR)/time.Po \
 	./$(DEPDIR)/tls-client-with-seccomp.Po \
 	./$(DEPDIR)/tls-crt_type-neg.Po ./$(DEPDIR)/tls-etm.Po \
@@ -3049,6 +3107,7 @@ am__depfiles_remade = ./$(DEPDIR)/alerts.Po \
 	pkcs11/$(DEPDIR)/gnutls_pcert_list_import_x509_file.Po \
 	pkcs11/$(DEPDIR)/gnutls_x509_crt_list_import_url.Po \
 	pkcs11/$(DEPDIR)/import_url_privkey_caps-pkcs11-import-url-privkey.Po \
+	pkcs11/$(DEPDIR)/list-objects.Po \
 	pkcs11/$(DEPDIR)/list-tokens.Po \
 	pkcs11/$(DEPDIR)/pkcs11-cert-import-url-exts.Po \
 	pkcs11/$(DEPDIR)/pkcs11-cert-import-url4-exts.Po \
@@ -3094,8 +3153,10 @@ am__depfiles_remade = ./$(DEPDIR)/alerts.Po \
 	tls13/$(DEPDIR)/hello_random_value.Po \
 	tls13/$(DEPDIR)/hello_retry_request.Po \
 	tls13/$(DEPDIR)/key_limits.Po tls13/$(DEPDIR)/key_share.Po \
-	tls13/$(DEPDIR)/key_update.Po tls13/$(DEPDIR)/multi-ocsp.Po \
-	tls13/$(DEPDIR)/no-psk-exts.Po tls13/$(DEPDIR)/ocsp-client.Po \
+	tls13/$(DEPDIR)/key_update.Po \
+	tls13/$(DEPDIR)/key_update_multiple.Po \
+	tls13/$(DEPDIR)/multi-ocsp.Po tls13/$(DEPDIR)/no-psk-exts.Po \
+	tls13/$(DEPDIR)/ocsp-client.Po \
 	tls13/$(DEPDIR)/post-handshake-with-cert-auto.Po \
 	tls13/$(DEPDIR)/post-handshake-with-cert-pkcs11.Po \
 	tls13/$(DEPDIR)/post-handshake-with-cert-ticket.Po \
@@ -3202,8 +3263,8 @@ SOURCES = $(libpkcs11mock1_la_SOURCES) $(libpkcs11mock2_la_SOURCES) \
 	naked-alerts.c name-constraints.c name-constraints-ip.c \
 	name-constraints-merge.c no-extensions.c no-signal.c \
 	nul-in-x509-names.c null_retrieve_function.c ocsp.c \
-	ocsp-filename-memleak.c oids.c openssl.c parse_ca.c \
-	pcert-list.c pkcs1-digest-info.c \
+	ocsp-filename-memleak.c oids.c openconnect-dtls12.c openssl.c \
+	parse_ca.c pcert-list.c pkcs1-digest-info.c \
 	$(pkcs11_cert_import_url_exts_SOURCES) \
 	$(pkcs11_cert_import_url4_exts_SOURCES) \
 	$(pkcs11_get_exts_SOURCES) \
@@ -3218,9 +3279,9 @@ SOURCES = $(libpkcs11mock1_la_SOURCES) $(libpkcs11mock2_la_SOURCES) \
 	$(pkcs11_privkey_safenet_always_auth_SOURCES) \
 	$(pkcs11_token_raw_SOURCES) \
 	pkcs11/gnutls_pcert_list_import_x509_file.c \
-	pkcs11/gnutls_x509_crt_list_import_url.c pkcs11/list-tokens.c \
-	pkcs11/pkcs11-chainverify.c pkcs11/pkcs11-combo.c \
-	pkcs11/pkcs11-ec-privkey-test.c \
+	pkcs11/gnutls_x509_crt_list_import_url.c pkcs11/list-objects.c \
+	pkcs11/list-tokens.c pkcs11/pkcs11-chainverify.c \
+	pkcs11/pkcs11-combo.c pkcs11/pkcs11-ec-privkey-test.c \
 	pkcs11/pkcs11-eddsa-privkey-test.c pkcs11/pkcs11-get-issuer.c \
 	pkcs11/pkcs11-import-with-pin.c pkcs11/pkcs11-is-known.c \
 	pkcs11/pkcs11-obj-import.c pkcs11/pkcs11-pin-func.c \
@@ -3246,10 +3307,11 @@ SOURCES = $(libpkcs11mock1_la_SOURCES) $(libpkcs11mock2_la_SOURCES) \
 	rehandshake-switch-psk-id.c rehandshake-switch-srp-id.c \
 	resume-dtls.c resume-lifetime.c resume-with-false-start.c \
 	resume-with-previous-stek.c resume-with-record-size-limit.c \
-	resume-with-stek-expiration.c rng-fork.c rng-no-onload.c \
-	rng-op-key.c rng-op-nonce.c rng-op-random.c rng-pthread.c \
-	rng-sigint.c rsa-encrypt-decrypt.c rsa-illegal-import.c \
-	rsa-psk.c rsa-psk-cb.c rsa-rsa-pss.c safe-renegotiation/srn0.c \
+	resume-with-stek-expiration.c rfc7633-missing.c rfc7633-ok.c \
+	rng-fork.c rng-no-onload.c rng-op-key.c rng-op-nonce.c \
+	rng-op-random.c rng-pthread.c rng-sigint.c \
+	rsa-encrypt-decrypt.c rsa-illegal-import.c rsa-psk.c \
+	rsa-psk-cb.c rsa-rsa-pss.c safe-renegotiation/srn0.c \
 	safe-renegotiation/srn1.c safe-renegotiation/srn2.c \
 	safe-renegotiation/srn3.c safe-renegotiation/srn4.c \
 	safe-renegotiation/srn5.c $(sanity_cpp_SOURCES) sec-params.c \
@@ -3267,21 +3329,23 @@ SOURCES = $(libpkcs11mock1_la_SOURCES) $(libpkcs11mock2_la_SOURCES) \
 	set_x509_ocsp_multi_invalid.c set_x509_ocsp_multi_pem.c \
 	set_x509_ocsp_multi_unknown.c set_x509_pkcs12_key.c \
 	setcredcrash.c sign-is-secure.c sign-pk-api.c sign-verify.c \
-	sign-verify-data.c sign-verify-ed25519-rfc8080.c \
-	sign-verify-ext.c sign-verify-ext4.c simple.c spki.c \
+	sign-verify-data.c sign-verify-data-newapi.c \
+	sign-verify-ed25519-rfc8080.c sign-verify-ext.c \
+	sign-verify-ext4.c sign-verify-newapi.c simple.c spki.c \
 	spki-abstract.c srp.c srpbase64.c ssl2-hello.c \
 	$(ssl30_cert_key_exchange_SOURCES) ssl30-cipher-neg.c \
 	ssl30-server-kx-neg.c status-request.c status-request-ext.c \
-	status-request-missing.c status-request-ok.c str-idna.c \
-	str-unicode.c system-prio-file.c time.c \
-	tls-client-with-seccomp.c tls-crt_type-neg.c tls-etm.c \
-	tls-ext-not-in-dtls.c tls-ext-register.c tls-force-etm.c \
-	tls-neg-ext-key.c tls-neg-ext4-key.c tls-pthread.c \
-	tls-record-size-limit.c tls-record-size-limit-asym.c \
-	tls-session-ext-override.c tls-session-ext-register.c \
-	tls-session-supplemental.c tls-supplemental.c \
-	tls-with-seccomp.c $(tls10_cert_key_exchange_SOURCES) \
-	tls10-cipher-neg.c tls10-prf.c tls10-server-kx-neg.c \
+	status-request-ok.c str-idna.c str-unicode.c \
+	system-override-hash.c system-override-sig.c \
+	system-prio-file.c time.c tls-client-with-seccomp.c \
+	tls-crt_type-neg.c tls-etm.c tls-ext-not-in-dtls.c \
+	tls-ext-register.c tls-force-etm.c tls-neg-ext-key.c \
+	tls-neg-ext4-key.c tls-pthread.c tls-record-size-limit.c \
+	tls-record-size-limit-asym.c tls-session-ext-override.c \
+	tls-session-ext-register.c tls-session-supplemental.c \
+	tls-supplemental.c tls-with-seccomp.c \
+	$(tls10_cert_key_exchange_SOURCES) tls10-cipher-neg.c \
+	tls10-prf.c tls10-server-kx-neg.c \
 	$(tls11_cert_key_exchange_SOURCES) \
 	$(tls11_check_rollback_val_SOURCES) tls11-cipher-neg.c \
 	$(tls11_rollback_detection_SOURCES) tls11-server-kx-neg.c \
@@ -3301,7 +3365,8 @@ SOURCES = $(libpkcs11mock1_la_SOURCES) $(libpkcs11mock2_la_SOURCES) \
 	tls13/anti_replay.c tls13/change_cipher_spec.c tls13/cookie.c \
 	tls13/hello_random_value.c tls13/hello_retry_request.c \
 	tls13/key_limits.c tls13/key_share.c tls13/key_update.c \
-	tls13/multi-ocsp.c tls13/no-psk-exts.c tls13/ocsp-client.c \
+	tls13/key_update_multiple.c tls13/multi-ocsp.c \
+	tls13/no-psk-exts.c tls13/ocsp-client.c \
 	tls13/post-handshake-with-cert.c \
 	tls13/post-handshake-with-cert-auto.c \
 	tls13/post-handshake-with-cert-pkcs11.c \
@@ -3376,8 +3441,8 @@ DIST_SOURCES = $(am__libpkcs11mock1_la_SOURCES_DIST) \
 	naked-alerts.c name-constraints.c name-constraints-ip.c \
 	name-constraints-merge.c no-extensions.c no-signal.c \
 	nul-in-x509-names.c null_retrieve_function.c ocsp.c \
-	ocsp-filename-memleak.c oids.c openssl.c parse_ca.c \
-	pcert-list.c pkcs1-digest-info.c \
+	ocsp-filename-memleak.c oids.c openconnect-dtls12.c openssl.c \
+	parse_ca.c pcert-list.c pkcs1-digest-info.c \
 	$(am__pkcs11_cert_import_url_exts_SOURCES_DIST) \
 	$(am__pkcs11_cert_import_url4_exts_SOURCES_DIST) \
 	$(am__pkcs11_get_exts_SOURCES_DIST) \
@@ -3393,9 +3458,9 @@ DIST_SOURCES = $(am__libpkcs11mock1_la_SOURCES_DIST) \
 	$(am__pkcs11_privkey_safenet_always_auth_SOURCES_DIST) \
 	$(am__pkcs11_token_raw_SOURCES_DIST) \
 	pkcs11/gnutls_pcert_list_import_x509_file.c \
-	pkcs11/gnutls_x509_crt_list_import_url.c pkcs11/list-tokens.c \
-	pkcs11/pkcs11-chainverify.c pkcs11/pkcs11-combo.c \
-	pkcs11/pkcs11-ec-privkey-test.c \
+	pkcs11/gnutls_x509_crt_list_import_url.c pkcs11/list-objects.c \
+	pkcs11/list-tokens.c pkcs11/pkcs11-chainverify.c \
+	pkcs11/pkcs11-combo.c pkcs11/pkcs11-ec-privkey-test.c \
 	pkcs11/pkcs11-eddsa-privkey-test.c pkcs11/pkcs11-get-issuer.c \
 	pkcs11/pkcs11-import-with-pin.c pkcs11/pkcs11-is-known.c \
 	pkcs11/pkcs11-obj-import.c pkcs11/pkcs11-pin-func.c \
@@ -3421,10 +3486,11 @@ DIST_SOURCES = $(am__libpkcs11mock1_la_SOURCES_DIST) \
 	rehandshake-switch-psk-id.c rehandshake-switch-srp-id.c \
 	resume-dtls.c resume-lifetime.c resume-with-false-start.c \
 	resume-with-previous-stek.c resume-with-record-size-limit.c \
-	resume-with-stek-expiration.c rng-fork.c rng-no-onload.c \
-	rng-op-key.c rng-op-nonce.c rng-op-random.c rng-pthread.c \
-	rng-sigint.c rsa-encrypt-decrypt.c rsa-illegal-import.c \
-	rsa-psk.c rsa-psk-cb.c rsa-rsa-pss.c safe-renegotiation/srn0.c \
+	resume-with-stek-expiration.c rfc7633-missing.c rfc7633-ok.c \
+	rng-fork.c rng-no-onload.c rng-op-key.c rng-op-nonce.c \
+	rng-op-random.c rng-pthread.c rng-sigint.c \
+	rsa-encrypt-decrypt.c rsa-illegal-import.c rsa-psk.c \
+	rsa-psk-cb.c rsa-rsa-pss.c safe-renegotiation/srn0.c \
 	safe-renegotiation/srn1.c safe-renegotiation/srn2.c \
 	safe-renegotiation/srn3.c safe-renegotiation/srn4.c \
 	safe-renegotiation/srn5.c $(am__sanity_cpp_SOURCES_DIST) \
@@ -3442,21 +3508,23 @@ DIST_SOURCES = $(am__libpkcs11mock1_la_SOURCES_DIST) \
 	set_x509_ocsp_multi_invalid.c set_x509_ocsp_multi_pem.c \
 	set_x509_ocsp_multi_unknown.c set_x509_pkcs12_key.c \
 	setcredcrash.c sign-is-secure.c sign-pk-api.c sign-verify.c \
-	sign-verify-data.c sign-verify-ed25519-rfc8080.c \
-	sign-verify-ext.c sign-verify-ext4.c simple.c spki.c \
+	sign-verify-data.c sign-verify-data-newapi.c \
+	sign-verify-ed25519-rfc8080.c sign-verify-ext.c \
+	sign-verify-ext4.c sign-verify-newapi.c simple.c spki.c \
 	spki-abstract.c srp.c srpbase64.c ssl2-hello.c \
 	$(ssl30_cert_key_exchange_SOURCES) ssl30-cipher-neg.c \
 	ssl30-server-kx-neg.c status-request.c status-request-ext.c \
-	status-request-missing.c status-request-ok.c str-idna.c \
-	str-unicode.c system-prio-file.c time.c \
-	tls-client-with-seccomp.c tls-crt_type-neg.c tls-etm.c \
-	tls-ext-not-in-dtls.c tls-ext-register.c tls-force-etm.c \
-	tls-neg-ext-key.c tls-neg-ext4-key.c tls-pthread.c \
-	tls-record-size-limit.c tls-record-size-limit-asym.c \
-	tls-session-ext-override.c tls-session-ext-register.c \
-	tls-session-supplemental.c tls-supplemental.c \
-	tls-with-seccomp.c $(tls10_cert_key_exchange_SOURCES) \
-	tls10-cipher-neg.c tls10-prf.c tls10-server-kx-neg.c \
+	status-request-ok.c str-idna.c str-unicode.c \
+	system-override-hash.c system-override-sig.c \
+	system-prio-file.c time.c tls-client-with-seccomp.c \
+	tls-crt_type-neg.c tls-etm.c tls-ext-not-in-dtls.c \
+	tls-ext-register.c tls-force-etm.c tls-neg-ext-key.c \
+	tls-neg-ext4-key.c tls-pthread.c tls-record-size-limit.c \
+	tls-record-size-limit-asym.c tls-session-ext-override.c \
+	tls-session-ext-register.c tls-session-supplemental.c \
+	tls-supplemental.c tls-with-seccomp.c \
+	$(tls10_cert_key_exchange_SOURCES) tls10-cipher-neg.c \
+	tls10-prf.c tls10-server-kx-neg.c \
 	$(tls11_cert_key_exchange_SOURCES) \
 	$(tls11_check_rollback_val_SOURCES) tls11-cipher-neg.c \
 	$(tls11_rollback_detection_SOURCES) tls11-server-kx-neg.c \
@@ -3476,7 +3544,8 @@ DIST_SOURCES = $(am__libpkcs11mock1_la_SOURCES_DIST) \
 	tls13/anti_replay.c tls13/change_cipher_spec.c tls13/cookie.c \
 	tls13/hello_random_value.c tls13/hello_retry_request.c \
 	tls13/key_limits.c tls13/key_share.c tls13/key_update.c \
-	tls13/multi-ocsp.c tls13/no-psk-exts.c tls13/ocsp-client.c \
+	tls13/key_update_multiple.c tls13/multi-ocsp.c \
+	tls13/no-psk-exts.c tls13/ocsp-client.c \
 	tls13/post-handshake-with-cert.c \
 	tls13/post-handshake-with-cert-auto.c \
 	tls13/post-handshake-with-cert-pkcs11.c \
@@ -4876,7 +4945,7 @@ unistringtests_LIBOBJS = @unistringtests_LIBOBJS@
 unistringtests_LTLIBOBJS = @unistringtests_LTLIBOBJS@
 unistringtests_WITNESS = @unistringtests_WITNESS@
 SUBDIRS = . cert-tests slow $(am__append_1) $(am__append_2)
-TESTS_ENVIRONMENT = $(am__append_21) CC="$(CC)" CFLAGS="$(CFLAGS)" \
+TESTS_ENVIRONMENT = $(am__append_24) CC="$(CC)" CFLAGS="$(CFLAGS)" \
 	LC_ALL="C" LSAN_OPTIONS=suppressions=gnutls-asan.supp \
 	CAFILE=$(srcdir)/cert-tests/data/ca-certs.pem \
 	P11MOCKLIB1=$(abs_builddir)/.libs/libpkcs11mock1.so \
@@ -4889,9 +4958,10 @@ TESTS_ENVIRONMENT = $(am__append_21) CC="$(CC)" CFLAGS="$(CFLAGS)" \
 	X509CERTDIR=$(srcdir)/x509cert-dir/ \
 	GNUTLS_SYSTEM_PRIORITY_FILE=$(srcdir)/system.prio \
 	PSK_FILE=$(srcdir)/psk.passwd OPENSSL_ia32cap=0x00000000 \
-	EXEEXT=$(EXEEXT) builddir="$(builddir)" \
-	top_builddir="$(top_builddir)" libdir="$(libdir)" \
-	srcdir="$(srcdir)" $(am__append_25) $(am__append_26)
+	EXEEXT=$(EXEEXT) GNUTLS_TEST_SUITE_RUN=1 \
+	builddir="$(builddir)" top_builddir="$(top_builddir)" \
+	libdir="$(libdir)" srcdir="$(srcdir)" $(am__append_28) \
+	$(am__append_29)
 EXTRA_DIST = suppressions.valgrind eagain-common.h cert-common.h test-chains.h \
 	ocsp-common.h cmocka-common.h virt-time.h \
 	certs/ca-cert-ecc.pem  certs/cert-ecc256.pem  certs/cert-ecc521.pem \
@@ -4911,9 +4981,9 @@ EXTRA_DIST = suppressions.valgrind eagain-common.h cert-common.h test-chains.h \
 	certs-interesting/README.md certs-interesting/cert1.der certs-interesting/cert1.der.err \
 	certs-interesting/cert2.der certs-interesting/cert2.der.err certs-interesting/cert3.der \
 	certs-interesting/cert3.der.err certs-interesting/cert4.der certs-interesting/cert5.der \
-	certs-interesting/cert6.der certs-interesting/cert6.der.err \
+	certs-interesting/cert5.der.err certs-interesting/cert6.der certs-interesting/cert6.der.err \
 	certs-interesting/cert7.der certs-interesting/cert8.der \
-	certs-interesting/cert9.der certs-interesting/cert5.der.err \
+	certs-interesting/cert9.der certs-interesting/cert10.der \
 	certs-interesting/cert3.der.err certs-interesting/cert4.der \
 	scripts/common.sh scripts/starttls-common.sh \
 	rng-op.c x509sign-verify-common.h common-key-tests.h \
@@ -4924,7 +4994,8 @@ EXTRA_DIST = suppressions.valgrind eagain-common.h cert-common.h test-chains.h \
 	ocsp-tests/certs/server_bad.template ocsp-tests/certs/ocsp-staple-unrelated.der ocsp-tests/suppressions.valgrind \
 	data/listings-DTLS1.0 data/listings-SSL3.0 data/listings-TLS1.0 data/listings-TLS1.1 \
 	data/listings-legacy1 data/listings-legacy2 data/listings-legacy3 data/listings-legacy4 \
-	data/listings-SSL3.0-TLS1.1 p11-kit-trust-data/Example_Root_CA.p11-kit server-kx-neg-common.c \
+	data/listings-old-SSL3.0-TLS1.1 data/listings-SSL3.0-TLS1.1 \
+	p11-kit-trust-data/Example_Root_CA.p11-kit server-kx-neg-common.c \
 	p11-kit-trust-data/Example_Root_CA.pem data/test1.cat data/test2.cat \
 	data/test1.cat.data data/test2.cat.data data/test1.cat.out data/test2.cat.out \
 	data/pkcs7-cat-ca.pem data/long.crl data/long.pem data/large-cert.pem \
@@ -4951,11 +5022,12 @@ LDADD = $(COMMON_GNUTLS_LDADD) \
 
 dane_LDADD = $(LDADD) ../libdane/libgnutls-dane.la
 dane_strcodes_LDADD = $(LDADD) ../libdane/libgnutls-dane.la
-noinst_LTLIBRARIES = libutils.la $(am__append_6)
+noinst_LTLIBRARIES = libutils.la $(am__append_7)
 libutils_la_SOURCES = utils.h utils.c seccomp.c utils-adv.c
 libutils_la_LIBADD = ../lib/libgnutls.la
-indirect_tests = tls13/prf-early $(am__append_15) $(am__append_18) \
-	$(am__append_24)
+indirect_tests = tls13/prf-early system-override-hash \
+	system-override-sig $(am__append_16) $(am__append_21) \
+	$(am__append_27)
 ctests = tls13/supported_versions tls13/tls12-no-tls13-exts \
 	tls13/post-handshake-with-cert \
 	tls13/post-handshake-without-cert tls13/cookie tls13/key_share \
@@ -4965,12 +5037,12 @@ ctests = tls13/supported_versions tls13/tls12-no-tls13-exts \
 	tls13/hello_random_value tls13/post-handshake-with-psk \
 	tls13/post-handshake-with-cert-auto tls13/anti_replay \
 	tls13/hello_retry_request tls13/psk-ext tls13/key_update \
-	tls13/key_limits tls13/multi-ocsp tls13/ocsp-client \
-	tls13/change_cipher_spec tls13-cipher-neg tls13/no-psk-exts \
-	tls13/psk-dumbfw tls13-early-start mini-record-2 simple \
-	gnutls_hmac_fast set_pkcs12_cred cert certuniqueid \
-	tls-neg-ext-key mpi certificate_set_x509_crl dn parse_ca \
-	x509-dn x509-dn-decode record-sizes hostname-check \
+	tls13/key_update_multiple tls13/key_limits tls13/multi-ocsp \
+	tls13/ocsp-client tls13/change_cipher_spec tls13-cipher-neg \
+	tls13/no-psk-exts tls13/psk-dumbfw tls13-early-start \
+	mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert \
+	certuniqueid tls-neg-ext-key mpi certificate_set_x509_crl dn \
+	parse_ca x509-dn x509-dn-decode record-sizes hostname-check \
 	cve-2008-4989 pkcs12_s2k chainverify record-sizes-range \
 	crq_key_id x509sign-verify sign-verify cve-2009-1415 \
 	cve-2009-1416 tls10-server-kx-neg tls11-server-kx-neg \
@@ -4997,8 +5069,8 @@ ctests = tls13/supported_versions tls13/tls12-no-tls13-exts \
 	x509-extensions long-session-id mini-x509-callbacks-intr \
 	mini-dtls-lowmtu set_x509_key_file-late crlverify \
 	mini-dtls-discard init_fds mini-record-failure \
-	tls12-rehandshake-cert-2 custom-urls set_x509_key_mem \
-	set_x509_key_file tls12-rehandshake-cert-auto \
+	openconnect-dtls12 tls12-rehandshake-cert-2 custom-urls \
+	set_x509_key_mem set_x509_key_file tls12-rehandshake-cert-auto \
 	tls12-rehandshake-set-prio mini-chain-unsorted \
 	x509-verify-with-crl mini-dtls-mtu privkey-verify-broken \
 	mini-dtls-record-asym key-import-export priority-set \
@@ -5015,8 +5087,8 @@ ctests = tls13/supported_versions tls13/tls12-no-tls13-exts \
 	x509sign-verify-rsa x509sign-verify-ecdsa x509sign-verify-gost \
 	mini-alignment oids atfork prf psk-file priority-init2 \
 	post-client-hello-change-prio status-request status-request-ok \
-	status-request-missing sign-verify-ext fallback-scsv \
-	pkcs8-key-decode urls dtls-rehandshake-cert key-usage-rsa \
+	rfc7633-missing sign-verify-ext fallback-scsv pkcs8-key-decode \
+	urls dtls-rehandshake-cert rfc7633-ok key-usage-rsa \
 	key-usage-ecdhe-rsa mini-session-verify-function auto-verify \
 	record-timeouts mini-dtls-hello-verify-48 set-default-prio \
 	tls12-anon-upgrade global-init-override tlsext-decoding \
@@ -5027,8 +5099,8 @@ ctests = tls13/supported_versions tls13/tls12-no-tls13-exts \
 	alpn-server-prec ocsp-filename-memleak dh-params \
 	rehandshake-ext-secret pcert-list session-export-funcs \
 	handshake-false-start version-checks key-material-dtls \
-	key-material-set-dtls system-prio-file name-constraints-merge \
-	crl-basic crq-basic send-client-cert custom-urls-override hex \
+	key-material-set-dtls name-constraints-merge crl-basic \
+	crq-basic send-client-cert custom-urls-override hex \
 	rehandshake-switch-psk-id rehandshake-switch-srp-id base64 \
 	srpbase64 pkcs1-digest-info set_x509_key set_x509_key_file_der \
 	set_x509_pkcs12_key crt_apis tls12-cert-key-exchange \
@@ -5064,10 +5136,11 @@ ctests = tls13/supported_versions tls13/tls12-no-tls13-exts \
 	key-export-pkcs8 null_retrieve_function tls-record-size-limit \
 	tls-crt_type-neg resume-with-stek-expiration \
 	resume-with-previous-stek rawpk-api tls-record-size-limit-asym \
-	dh-compute ecdh-compute $(am__append_4) $(am__append_5) \
-	$(am__append_7) $(am__append_8) $(am__append_9) \
+	dh-compute ecdh-compute sign-verify-data-newapi \
+	sign-verify-newapi $(am__append_4) $(am__append_5) \
+	$(am__append_6) $(am__append_8) $(am__append_9) \
 	$(am__append_10) $(am__append_11) $(am__append_12) \
-	$(am__append_13) $(am__append_22)
+	$(am__append_13) $(am__append_14) $(am__append_25)
 @HAVE_CMOCKA_TRUE@CMOCKA_LDADD = $(COMMON_LDADD) $(CMOCKA_LIBS)
 @HAVE_CMOCKA_TRUE@gnutls_record_overhead_LDADD = $(CMOCKA_LDADD)
 @HAVE_CMOCKA_TRUE@dtls_sliding_window_LDADD = $(CMOCKA_LDADD)
@@ -5229,15 +5302,16 @@ tls13_anti_replay_CPPFLAGS = $(AM_CPPFLAGS) \
 @ENABLE_PKCS11_TRUE@@WINDOWS_FALSE@pkcs11_tls_neg_pkcs11_no_key_LDADD = $(LDADD) $(LIBDL)
 dist_check_SCRIPTS = rfc2253-escape-test \
 	rsa-md5-collision/rsa-md5-collision.sh systemkey.sh \
-	tls13/prf-early.sh $(am__append_14) $(am__append_16) \
-	$(am__append_17) $(am__append_19) $(am__append_20)
+	tls13/prf-early.sh $(am__append_15) $(am__append_17) \
+	$(am__append_18) $(am__append_19) $(am__append_20) \
+	$(am__append_22) $(am__append_23)
 @WINDOWS_FALSE@dtls_stress_SOURCES = dtls/dtls-stress.c
 @WINDOWS_FALSE@dtls_stress_LDADD = $(COMMON_GNUTLS_LDADD) \
 @WINDOWS_FALSE@	$(COMMON_DEPS_LDADD)
 
 @WINDOWS_TRUE@win32_certopenstore_SOURCES = win-certopenstore.c
 @WINDOWS_TRUE@win32_certopenstore_LDADD = $(LDADD) -lcrypt32
-cpptests = $(am__append_23)
+cpptests = $(am__append_26)
 @ENABLE_CXX_TRUE@@HAVE_CMOCKA_TRUE@sanity_cpp_SOURCES = sanity-cpp.cpp
 @ENABLE_CXX_TRUE@@HAVE_CMOCKA_TRUE@sanity_cpp_LDADD = $(CMOCKA_LDADD) ../lib/libgnutlsxx.la
 @ENABLE_CXX_TRUE@@HAVE_CMOCKA_TRUE@sanity_cpp_CXXFLAGS = $(AM_CPPFLAGS) \
@@ -5938,6 +6012,10 @@ oids$(EXEEXT): $(oids_OBJECTS) $(oids_DEPENDENCIES) $(EXTRA_oids_DEPENDENCIES)
 	@rm -f oids$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(oids_OBJECTS) $(oids_LDADD) $(LIBS)
 
+openconnect-dtls12$(EXEEXT): $(openconnect_dtls12_OBJECTS) $(openconnect_dtls12_DEPENDENCIES) $(EXTRA_openconnect_dtls12_DEPENDENCIES) 
+	@rm -f openconnect-dtls12$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(openconnect_dtls12_OBJECTS) $(openconnect_dtls12_LDADD) $(LIBS)
+
 openssl$(EXEEXT): $(openssl_OBJECTS) $(openssl_DEPENDENCIES) $(EXTRA_openssl_DEPENDENCIES) 
 	@rm -f openssl$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(openssl_OBJECTS) $(openssl_LDADD) $(LIBS)
@@ -6049,6 +6127,12 @@ pkcs11/gnutls_x509_crt_list_import_url.$(OBJEXT):  \
 pkcs11/gnutls_x509_crt_list_import_url$(EXEEXT): $(pkcs11_gnutls_x509_crt_list_import_url_OBJECTS) $(pkcs11_gnutls_x509_crt_list_import_url_DEPENDENCIES) $(EXTRA_pkcs11_gnutls_x509_crt_list_import_url_DEPENDENCIES) pkcs11/$(am__dirstamp)
 	@rm -f pkcs11/gnutls_x509_crt_list_import_url$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(pkcs11_gnutls_x509_crt_list_import_url_OBJECTS) $(pkcs11_gnutls_x509_crt_list_import_url_LDADD) $(LIBS)
+pkcs11/list-objects.$(OBJEXT): pkcs11/$(am__dirstamp) \
+	pkcs11/$(DEPDIR)/$(am__dirstamp)
+
+pkcs11/list-objects$(EXEEXT): $(pkcs11_list_objects_OBJECTS) $(pkcs11_list_objects_DEPENDENCIES) $(EXTRA_pkcs11_list_objects_DEPENDENCIES) pkcs11/$(am__dirstamp)
+	@rm -f pkcs11/list-objects$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(pkcs11_list_objects_OBJECTS) $(pkcs11_list_objects_LDADD) $(LIBS)
 pkcs11/list-tokens.$(OBJEXT): pkcs11/$(am__dirstamp) \
 	pkcs11/$(DEPDIR)/$(am__dirstamp)
 
@@ -6330,6 +6414,14 @@ resume-with-stek-expiration$(EXEEXT): $(resume_with_stek_expiration_OBJECTS) $(r
 	@rm -f resume-with-stek-expiration$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(resume_with_stek_expiration_OBJECTS) $(resume_with_stek_expiration_LDADD) $(LIBS)
 
+rfc7633-missing$(EXEEXT): $(rfc7633_missing_OBJECTS) $(rfc7633_missing_DEPENDENCIES) $(EXTRA_rfc7633_missing_DEPENDENCIES) 
+	@rm -f rfc7633-missing$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(rfc7633_missing_OBJECTS) $(rfc7633_missing_LDADD) $(LIBS)
+
+rfc7633-ok$(EXEEXT): $(rfc7633_ok_OBJECTS) $(rfc7633_ok_DEPENDENCIES) $(EXTRA_rfc7633_ok_DEPENDENCIES) 
+	@rm -f rfc7633-ok$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(rfc7633_ok_OBJECTS) $(rfc7633_ok_LDADD) $(LIBS)
+
 rng-fork$(EXEEXT): $(rng_fork_OBJECTS) $(rng_fork_DEPENDENCIES) $(EXTRA_rng_fork_DEPENDENCIES) 
 	@rm -f rng-fork$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(rng_fork_OBJECTS) $(rng_fork_LDADD) $(LIBS)
@@ -6560,6 +6652,10 @@ sign-verify-data$(EXEEXT): $(sign_verify_data_OBJECTS) $(sign_verify_data_DEPEND
 	@rm -f sign-verify-data$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(sign_verify_data_OBJECTS) $(sign_verify_data_LDADD) $(LIBS)
 
+sign-verify-data-newapi$(EXEEXT): $(sign_verify_data_newapi_OBJECTS) $(sign_verify_data_newapi_DEPENDENCIES) $(EXTRA_sign_verify_data_newapi_DEPENDENCIES) 
+	@rm -f sign-verify-data-newapi$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(sign_verify_data_newapi_OBJECTS) $(sign_verify_data_newapi_LDADD) $(LIBS)
+
 sign-verify-ed25519-rfc8080$(EXEEXT): $(sign_verify_ed25519_rfc8080_OBJECTS) $(sign_verify_ed25519_rfc8080_DEPENDENCIES) $(EXTRA_sign_verify_ed25519_rfc8080_DEPENDENCIES) 
 	@rm -f sign-verify-ed25519-rfc8080$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(sign_verify_ed25519_rfc8080_OBJECTS) $(sign_verify_ed25519_rfc8080_LDADD) $(LIBS)
@@ -6571,6 +6667,10 @@ sign-verify-ext$(EXEEXT): $(sign_verify_ext_OBJECTS) $(sign_verify_ext_DEPENDENC
 sign-verify-ext4$(EXEEXT): $(sign_verify_ext4_OBJECTS) $(sign_verify_ext4_DEPENDENCIES) $(EXTRA_sign_verify_ext4_DEPENDENCIES) 
 	@rm -f sign-verify-ext4$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(sign_verify_ext4_OBJECTS) $(sign_verify_ext4_LDADD) $(LIBS)
+
+sign-verify-newapi$(EXEEXT): $(sign_verify_newapi_OBJECTS) $(sign_verify_newapi_DEPENDENCIES) $(EXTRA_sign_verify_newapi_DEPENDENCIES) 
+	@rm -f sign-verify-newapi$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(sign_verify_newapi_OBJECTS) $(sign_verify_newapi_LDADD) $(LIBS)
 
 simple$(EXEEXT): $(simple_OBJECTS) $(simple_DEPENDENCIES) $(EXTRA_simple_DEPENDENCIES) 
 	@rm -f simple$(EXEEXT)
@@ -6616,10 +6716,6 @@ status-request-ext$(EXEEXT): $(status_request_ext_OBJECTS) $(status_request_ext_
 	@rm -f status-request-ext$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(status_request_ext_OBJECTS) $(status_request_ext_LDADD) $(LIBS)
 
-status-request-missing$(EXEEXT): $(status_request_missing_OBJECTS) $(status_request_missing_DEPENDENCIES) $(EXTRA_status_request_missing_DEPENDENCIES) 
-	@rm -f status-request-missing$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(status_request_missing_OBJECTS) $(status_request_missing_LDADD) $(LIBS)
-
 status-request-ok$(EXEEXT): $(status_request_ok_OBJECTS) $(status_request_ok_DEPENDENCIES) $(EXTRA_status_request_ok_DEPENDENCIES) 
 	@rm -f status-request-ok$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(status_request_ok_OBJECTS) $(status_request_ok_LDADD) $(LIBS)
@@ -6631,6 +6727,14 @@ str-idna$(EXEEXT): $(str_idna_OBJECTS) $(str_idna_DEPENDENCIES) $(EXTRA_str_idna
 str-unicode$(EXEEXT): $(str_unicode_OBJECTS) $(str_unicode_DEPENDENCIES) $(EXTRA_str_unicode_DEPENDENCIES) 
 	@rm -f str-unicode$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(str_unicode_OBJECTS) $(str_unicode_LDADD) $(LIBS)
+
+system-override-hash$(EXEEXT): $(system_override_hash_OBJECTS) $(system_override_hash_DEPENDENCIES) $(EXTRA_system_override_hash_DEPENDENCIES) 
+	@rm -f system-override-hash$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(system_override_hash_OBJECTS) $(system_override_hash_LDADD) $(LIBS)
+
+system-override-sig$(EXEEXT): $(system_override_sig_OBJECTS) $(system_override_sig_DEPENDENCIES) $(EXTRA_system_override_sig_DEPENDENCIES) 
+	@rm -f system-override-sig$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(system_override_sig_OBJECTS) $(system_override_sig_LDADD) $(LIBS)
 
 system-prio-file$(EXEEXT): $(system_prio_file_OBJECTS) $(system_prio_file_DEPENDENCIES) $(EXTRA_system_prio_file_DEPENDENCIES) 
 	@rm -f system-prio-file$(EXEEXT)
@@ -6909,6 +7013,12 @@ tls13/key_update.$(OBJEXT): tls13/$(am__dirstamp) \
 tls13/key_update$(EXEEXT): $(tls13_key_update_OBJECTS) $(tls13_key_update_DEPENDENCIES) $(EXTRA_tls13_key_update_DEPENDENCIES) tls13/$(am__dirstamp)
 	@rm -f tls13/key_update$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(tls13_key_update_OBJECTS) $(tls13_key_update_LDADD) $(LIBS)
+tls13/key_update_multiple.$(OBJEXT): tls13/$(am__dirstamp) \
+	tls13/$(DEPDIR)/$(am__dirstamp)
+
+tls13/key_update_multiple$(EXEEXT): $(tls13_key_update_multiple_OBJECTS) $(tls13_key_update_multiple_DEPENDENCIES) $(EXTRA_tls13_key_update_multiple_DEPENDENCIES) tls13/$(am__dirstamp)
+	@rm -f tls13/key_update_multiple$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(tls13_key_update_multiple_OBJECTS) $(tls13_key_update_multiple_LDADD) $(LIBS)
 tls13/multi-ocsp.$(OBJEXT): tls13/$(am__dirstamp) \
 	tls13/$(DEPDIR)/$(am__dirstamp)
 
@@ -7272,6 +7382,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ocsp-filename-memleak.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ocsp.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/oids.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/openconnect-dtls12.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/openssl.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parse_ca.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pcert-list.Po@am__quote@ # am--include-marker
@@ -7319,6 +7430,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/resume-with-previous-stek.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/resume-with-record-size-limit.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/resume-with-stek-expiration.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rfc7633-missing.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rfc7633-ok.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rng-fork.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rng-no-onload.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rng-op-key.Po@am__quote@ # am--include-marker
@@ -7365,10 +7478,12 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/setcredcrash.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sign-is-secure.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sign-pk-api.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sign-verify-data-newapi.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sign-verify-data.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sign-verify-ed25519-rfc8080.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sign-verify-ext.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sign-verify-ext4.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sign-verify-newapi.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sign-verify.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/simple.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/spki-abstract.Po@am__quote@ # am--include-marker
@@ -7380,11 +7495,12 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ssl30-cipher-neg.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ssl30-server-kx-neg.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/status-request-ext.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/status-request-missing.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/status-request-ok.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/status-request.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/str-idna.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/str-unicode.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/system-override-hash.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/system-override-sig.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/system-prio-file.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/time.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tls-client-with-seccomp.Po@am__quote@ # am--include-marker
@@ -7468,6 +7584,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@pkcs11/$(DEPDIR)/gnutls_pcert_list_import_x509_file.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@pkcs11/$(DEPDIR)/gnutls_x509_crt_list_import_url.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@pkcs11/$(DEPDIR)/import_url_privkey_caps-pkcs11-import-url-privkey.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@pkcs11/$(DEPDIR)/list-objects.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@pkcs11/$(DEPDIR)/list-tokens.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@pkcs11/$(DEPDIR)/pkcs11-cert-import-url-exts.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@pkcs11/$(DEPDIR)/pkcs11-cert-import-url4-exts.Po@am__quote@ # am--include-marker
@@ -7515,6 +7632,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@tls13/$(DEPDIR)/key_limits.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@tls13/$(DEPDIR)/key_share.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@tls13/$(DEPDIR)/key_update.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@tls13/$(DEPDIR)/key_update_multiple.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@tls13/$(DEPDIR)/multi-ocsp.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@tls13/$(DEPDIR)/no-psk-exts.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@tls13/$(DEPDIR)/ocsp-client.Po@am__quote@ # am--include-marker
@@ -8282,6 +8400,13 @@ tls13/psk-ext.log: tls13/psk-ext$(EXEEXT)
 tls13/key_update.log: tls13/key_update$(EXEEXT)
 	@p='tls13/key_update$(EXEEXT)'; \
 	b='tls13/key_update'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+tls13/key_update_multiple.log: tls13/key_update_multiple$(EXEEXT)
+	@p='tls13/key_update_multiple$(EXEEXT)'; \
+	b='tls13/key_update_multiple'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
@@ -9091,6 +9216,13 @@ mini-record-failure.log: mini-record-failure$(EXEEXT)
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
+openconnect-dtls12.log: openconnect-dtls12$(EXEEXT)
+	@p='openconnect-dtls12$(EXEEXT)'; \
+	b='openconnect-dtls12'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
 tls12-rehandshake-cert-2.log: tls12-rehandshake-cert-2$(EXEEXT)
 	@p='tls12-rehandshake-cert-2$(EXEEXT)'; \
 	b='tls12-rehandshake-cert-2'; \
@@ -9490,9 +9622,9 @@ status-request-ok.log: status-request-ok$(EXEEXT)
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
-status-request-missing.log: status-request-missing$(EXEEXT)
-	@p='status-request-missing$(EXEEXT)'; \
-	b='status-request-missing'; \
+rfc7633-missing.log: rfc7633-missing$(EXEEXT)
+	@p='rfc7633-missing$(EXEEXT)'; \
+	b='rfc7633-missing'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
@@ -9528,6 +9660,13 @@ urls.log: urls$(EXEEXT)
 dtls-rehandshake-cert.log: dtls-rehandshake-cert$(EXEEXT)
 	@p='dtls-rehandshake-cert$(EXEEXT)'; \
 	b='dtls-rehandshake-cert'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+rfc7633-ok.log: rfc7633-ok$(EXEEXT)
+	@p='rfc7633-ok$(EXEEXT)'; \
+	b='rfc7633-ok'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
@@ -9731,13 +9870,6 @@ key-material-dtls.log: key-material-dtls$(EXEEXT)
 key-material-set-dtls.log: key-material-set-dtls$(EXEEXT)
 	@p='key-material-set-dtls$(EXEEXT)'; \
 	b='key-material-set-dtls'; \
-	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
-	--log-file $$b.log --trs-file $$b.trs \
-	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
-	"$$tst" $(AM_TESTS_FD_REDIRECT)
-system-prio-file.log: system-prio-file$(EXEEXT)
-	@p='system-prio-file$(EXEEXT)'; \
-	b='system-prio-file'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
@@ -10498,6 +10630,20 @@ ecdh-compute.log: ecdh-compute$(EXEEXT)
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
+sign-verify-data-newapi.log: sign-verify-data-newapi$(EXEEXT)
+	@p='sign-verify-data-newapi$(EXEEXT)'; \
+	b='sign-verify-data-newapi'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+sign-verify-newapi.log: sign-verify-newapi$(EXEEXT)
+	@p='sign-verify-newapi$(EXEEXT)'; \
+	b='sign-verify-newapi'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
 dtls-with-seccomp.log: dtls-with-seccomp$(EXEEXT)
 	@p='dtls-with-seccomp$(EXEEXT)'; \
 	b='dtls-with-seccomp'; \
@@ -10522,6 +10668,13 @@ dtls-client-with-seccomp.log: dtls-client-with-seccomp$(EXEEXT)
 tls-client-with-seccomp.log: tls-client-with-seccomp$(EXEEXT)
 	@p='tls-client-with-seccomp$(EXEEXT)'; \
 	b='tls-client-with-seccomp'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+system-prio-file.log: system-prio-file$(EXEEXT)
+	@p='system-prio-file$(EXEEXT)'; \
+	b='system-prio-file'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
@@ -11226,6 +11379,55 @@ profile-tests.sh.log: profile-tests.sh
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
+system-override-sig-hash.sh.log: system-override-sig-hash.sh
+	@p='system-override-sig-hash.sh'; \
+	b='system-override-sig-hash.sh'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+system-override-versions.sh.log: system-override-versions.sh
+	@p='system-override-versions.sh'; \
+	b='system-override-versions.sh'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+system-override-invalid.sh.log: system-override-invalid.sh
+	@p='system-override-invalid.sh'; \
+	b='system-override-invalid.sh'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+system-override-curves.sh.log: system-override-curves.sh
+	@p='system-override-curves.sh'; \
+	b='system-override-curves.sh'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+system-override-profiles.sh.log: system-override-profiles.sh
+	@p='system-override-profiles.sh'; \
+	b='system-override-profiles.sh'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+system-override-tls.sh.log: system-override-tls.sh
+	@p='system-override-tls.sh'; \
+	b='system-override-tls.sh'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+system-override-kx.sh.log: system-override-kx.sh
+	@p='system-override-kx.sh'; \
+	b='system-override-kx.sh'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
 gnutls-cli-self-signed.sh.log: gnutls-cli-self-signed.sh
 	@p='gnutls-cli-self-signed.sh'; \
 	b='gnutls-cli-self-signed.sh'; \
@@ -11563,6 +11765,7 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/ocsp-filename-memleak.Po
 	-rm -f ./$(DEPDIR)/ocsp.Po
 	-rm -f ./$(DEPDIR)/oids.Po
+	-rm -f ./$(DEPDIR)/openconnect-dtls12.Po
 	-rm -f ./$(DEPDIR)/openssl.Po
 	-rm -f ./$(DEPDIR)/parse_ca.Po
 	-rm -f ./$(DEPDIR)/pcert-list.Po
@@ -11610,6 +11813,8 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/resume-with-previous-stek.Po
 	-rm -f ./$(DEPDIR)/resume-with-record-size-limit.Po
 	-rm -f ./$(DEPDIR)/resume-with-stek-expiration.Po
+	-rm -f ./$(DEPDIR)/rfc7633-missing.Po
+	-rm -f ./$(DEPDIR)/rfc7633-ok.Po
 	-rm -f ./$(DEPDIR)/rng-fork.Po
 	-rm -f ./$(DEPDIR)/rng-no-onload.Po
 	-rm -f ./$(DEPDIR)/rng-op-key.Po
@@ -11656,10 +11861,12 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/setcredcrash.Po
 	-rm -f ./$(DEPDIR)/sign-is-secure.Po
 	-rm -f ./$(DEPDIR)/sign-pk-api.Po
+	-rm -f ./$(DEPDIR)/sign-verify-data-newapi.Po
 	-rm -f ./$(DEPDIR)/sign-verify-data.Po
 	-rm -f ./$(DEPDIR)/sign-verify-ed25519-rfc8080.Po
 	-rm -f ./$(DEPDIR)/sign-verify-ext.Po
 	-rm -f ./$(DEPDIR)/sign-verify-ext4.Po
+	-rm -f ./$(DEPDIR)/sign-verify-newapi.Po
 	-rm -f ./$(DEPDIR)/sign-verify.Po
 	-rm -f ./$(DEPDIR)/simple.Po
 	-rm -f ./$(DEPDIR)/spki-abstract.Po
@@ -11671,11 +11878,12 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/ssl30-cipher-neg.Po
 	-rm -f ./$(DEPDIR)/ssl30-server-kx-neg.Po
 	-rm -f ./$(DEPDIR)/status-request-ext.Po
-	-rm -f ./$(DEPDIR)/status-request-missing.Po
 	-rm -f ./$(DEPDIR)/status-request-ok.Po
 	-rm -f ./$(DEPDIR)/status-request.Po
 	-rm -f ./$(DEPDIR)/str-idna.Po
 	-rm -f ./$(DEPDIR)/str-unicode.Po
+	-rm -f ./$(DEPDIR)/system-override-hash.Po
+	-rm -f ./$(DEPDIR)/system-override-sig.Po
 	-rm -f ./$(DEPDIR)/system-prio-file.Po
 	-rm -f ./$(DEPDIR)/time.Po
 	-rm -f ./$(DEPDIR)/tls-client-with-seccomp.Po
@@ -11759,6 +11967,7 @@ distclean: distclean-recursive
 	-rm -f pkcs11/$(DEPDIR)/gnutls_pcert_list_import_x509_file.Po
 	-rm -f pkcs11/$(DEPDIR)/gnutls_x509_crt_list_import_url.Po
 	-rm -f pkcs11/$(DEPDIR)/import_url_privkey_caps-pkcs11-import-url-privkey.Po
+	-rm -f pkcs11/$(DEPDIR)/list-objects.Po
 	-rm -f pkcs11/$(DEPDIR)/list-tokens.Po
 	-rm -f pkcs11/$(DEPDIR)/pkcs11-cert-import-url-exts.Po
 	-rm -f pkcs11/$(DEPDIR)/pkcs11-cert-import-url4-exts.Po
@@ -11806,6 +12015,7 @@ distclean: distclean-recursive
 	-rm -f tls13/$(DEPDIR)/key_limits.Po
 	-rm -f tls13/$(DEPDIR)/key_share.Po
 	-rm -f tls13/$(DEPDIR)/key_update.Po
+	-rm -f tls13/$(DEPDIR)/key_update_multiple.Po
 	-rm -f tls13/$(DEPDIR)/multi-ocsp.Po
 	-rm -f tls13/$(DEPDIR)/no-psk-exts.Po
 	-rm -f tls13/$(DEPDIR)/ocsp-client.Po
@@ -12023,6 +12233,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/ocsp-filename-memleak.Po
 	-rm -f ./$(DEPDIR)/ocsp.Po
 	-rm -f ./$(DEPDIR)/oids.Po
+	-rm -f ./$(DEPDIR)/openconnect-dtls12.Po
 	-rm -f ./$(DEPDIR)/openssl.Po
 	-rm -f ./$(DEPDIR)/parse_ca.Po
 	-rm -f ./$(DEPDIR)/pcert-list.Po
@@ -12070,6 +12281,8 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/resume-with-previous-stek.Po
 	-rm -f ./$(DEPDIR)/resume-with-record-size-limit.Po
 	-rm -f ./$(DEPDIR)/resume-with-stek-expiration.Po
+	-rm -f ./$(DEPDIR)/rfc7633-missing.Po
+	-rm -f ./$(DEPDIR)/rfc7633-ok.Po
 	-rm -f ./$(DEPDIR)/rng-fork.Po
 	-rm -f ./$(DEPDIR)/rng-no-onload.Po
 	-rm -f ./$(DEPDIR)/rng-op-key.Po
@@ -12116,10 +12329,12 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/setcredcrash.Po
 	-rm -f ./$(DEPDIR)/sign-is-secure.Po
 	-rm -f ./$(DEPDIR)/sign-pk-api.Po
+	-rm -f ./$(DEPDIR)/sign-verify-data-newapi.Po
 	-rm -f ./$(DEPDIR)/sign-verify-data.Po
 	-rm -f ./$(DEPDIR)/sign-verify-ed25519-rfc8080.Po
 	-rm -f ./$(DEPDIR)/sign-verify-ext.Po
 	-rm -f ./$(DEPDIR)/sign-verify-ext4.Po
+	-rm -f ./$(DEPDIR)/sign-verify-newapi.Po
 	-rm -f ./$(DEPDIR)/sign-verify.Po
 	-rm -f ./$(DEPDIR)/simple.Po
 	-rm -f ./$(DEPDIR)/spki-abstract.Po
@@ -12131,11 +12346,12 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/ssl30-cipher-neg.Po
 	-rm -f ./$(DEPDIR)/ssl30-server-kx-neg.Po
 	-rm -f ./$(DEPDIR)/status-request-ext.Po
-	-rm -f ./$(DEPDIR)/status-request-missing.Po
 	-rm -f ./$(DEPDIR)/status-request-ok.Po
 	-rm -f ./$(DEPDIR)/status-request.Po
 	-rm -f ./$(DEPDIR)/str-idna.Po
 	-rm -f ./$(DEPDIR)/str-unicode.Po
+	-rm -f ./$(DEPDIR)/system-override-hash.Po
+	-rm -f ./$(DEPDIR)/system-override-sig.Po
 	-rm -f ./$(DEPDIR)/system-prio-file.Po
 	-rm -f ./$(DEPDIR)/time.Po
 	-rm -f ./$(DEPDIR)/tls-client-with-seccomp.Po
@@ -12219,6 +12435,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f pkcs11/$(DEPDIR)/gnutls_pcert_list_import_x509_file.Po
 	-rm -f pkcs11/$(DEPDIR)/gnutls_x509_crt_list_import_url.Po
 	-rm -f pkcs11/$(DEPDIR)/import_url_privkey_caps-pkcs11-import-url-privkey.Po
+	-rm -f pkcs11/$(DEPDIR)/list-objects.Po
 	-rm -f pkcs11/$(DEPDIR)/list-tokens.Po
 	-rm -f pkcs11/$(DEPDIR)/pkcs11-cert-import-url-exts.Po
 	-rm -f pkcs11/$(DEPDIR)/pkcs11-cert-import-url4-exts.Po
@@ -12266,6 +12483,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f tls13/$(DEPDIR)/key_limits.Po
 	-rm -f tls13/$(DEPDIR)/key_share.Po
 	-rm -f tls13/$(DEPDIR)/key_update.Po
+	-rm -f tls13/$(DEPDIR)/key_update_multiple.Po
 	-rm -f tls13/$(DEPDIR)/multi-ocsp.Po
 	-rm -f tls13/$(DEPDIR)/no-psk-exts.Po
 	-rm -f tls13/$(DEPDIR)/ocsp-client.Po

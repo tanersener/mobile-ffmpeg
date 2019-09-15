@@ -1,23 +1,23 @@
-# Translation of libgnutls to Ukrainian
+# Translation of gnutls to Ukrainian
 #
 # Copyright (C) 2011 Free Software Foundation, Inc.
-# This file is distributed under the same license as the libgnutls package.
+# This file is distributed under the same license as the gnutls package.
 #
-# Yuri Chornoivan <yurchor@ukr.net>, 2011, 2012, 2013.
+# Yuri Chornoivan <yurchor@ukr.net>, 2011, 2012, 2013, 2019.
 msgid ""
 msgstr ""
-"Project-Id-Version: libgnutls 3.2.1\n"
+"Project-Id-Version: gnutls 3.6.8\n"
 "Report-Msgid-Bugs-To: bug-gnutls@gnu.org\n"
-"POT-Creation-Date: 2019-05-25 22:49+0200\n"
-"PO-Revision-Date: 2013-06-13 19:14+0300\n"
+"POT-Creation-Date: 2019-07-25 20:40+0200\n"
+"PO-Revision-Date: 2019-06-06 21:38+0300\n"
 "Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
-"Language-Team: Ukrainian <translation-team-uk@lists.sourceforge.net>\n"
+"Language-Team: Ukrainian <trans-uk@lists.fedoraproject.org>\n"
 "Language: uk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Bugs: Report translation errors to the Language-Team address.\n"
-"X-Generator: Lokalize 1.5\n"
+"X-Generator: Lokalize 19.04.0\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #: lib/alert.c:39
@@ -114,7 +114,7 @@ msgstr "Внутрішня помилка"
 
 #: lib/alert.c:71
 msgid "Inappropriate fallback"
-msgstr ""
+msgstr "Неприйнятний резервний варіант"
 
 #: lib/alert.c:73
 msgid "No renegotiation is allowed"
@@ -138,16 +138,15 @@ msgstr "Не вказано імені користувача SRP/PSK або в�
 
 #: lib/alert.c:83
 msgid "An extension was expected but was not seen"
-msgstr ""
+msgstr "Мало бути розширення, але його не виявлено"
 
 #: lib/alert.c:86
 msgid "No supported application protocol could be negotiated"
 msgstr "Не вдалося узгодити підтримуваний протокол прикладного рівня"
 
 #: lib/alert.c:88
-#, fuzzy
 msgid "Certificate is required"
-msgstr "Сертифікат втратив чинність"
+msgstr "Потрібне сертифікат"
 
 #: lib/errors.c:43
 msgid "Could not negotiate a supported cipher suite."
@@ -180,9 +179,8 @@ msgid "An algorithm that is not enabled was negotiated."
 msgstr "Узгоджено алгоритм, який не було увімкнено."
 
 #: lib/errors.c:60
-#, fuzzy
 msgid "A packet with illegal or unsupported version was received."
-msgstr "Отримано пакет записів з некоректною версією."
+msgstr "Отримано пакет з некоректним або непідтримуваним записом версії."
 
 #: lib/errors.c:63
 msgid ""
@@ -194,12 +192,11 @@ msgstr ""
 
 #: lib/errors.c:66
 msgid "Error decoding the received TLS packet."
-msgstr ""
+msgstr "Помилка під час декодування отриманого пакета TLS."
 
 #: lib/errors.c:69
-#, fuzzy
 msgid "A TLS record packet with invalid length was received."
-msgstr "Було отримано пакет TLS з неочікуваною довжиною."
+msgstr "Отримано пакет запису TLS із некоректною довжиною."
 
 #: lib/errors.c:71
 msgid "The TLS connection was non-properly terminated."
@@ -216,15 +213,16 @@ msgstr "Внутрішня помилка GnuTLS."
 #: lib/errors.c:79
 msgid "A connection with inappropriate fallback was attempted."
 msgstr ""
+"Було виконано спробу встановлення з'єднання із невідповідним резервним "
+"варіантом."
 
 #: lib/errors.c:81
 msgid "An illegal TLS extension was received."
 msgstr "Отримано некоректне розширення TLS."
 
 #: lib/errors.c:83
-#, fuzzy
 msgid "An required TLS extension was received."
-msgstr "Отримано некоректне розширення TLS."
+msgstr "Отримано потрібне розширення TLS."
 
 #: lib/errors.c:85
 msgid "A TLS fatal alert has been received."
@@ -236,7 +234,7 @@ msgstr "Було отримано неочікуваний пакет TLS"
 
 #: lib/errors.c:89
 msgid "Failed to import the key into store."
-msgstr ""
+msgstr "Не вдалося імпортувати ключ до сховища."
 
 #: lib/errors.c:92
 msgid "An error was encountered at the TLS Finished packet calculation."
@@ -247,9 +245,8 @@ msgid "No certificate was found."
 msgstr "Не знайдено жодного сертифіката."
 
 #: lib/errors.c:96
-#, fuzzy
 msgid "Certificate is required."
-msgstr "Сертифікат втратив чинність"
+msgstr "Потрібен сертифікат."
 
 #: lib/errors.c:99
 msgid "The given DSA key is incompatible with the selected TLS protocol."
@@ -324,23 +321,20 @@ msgid "Insufficient credentials for that request."
 msgstr "Недостатні реєстраційні дані для цього запиту."
 
 #: lib/errors.c:140
-#, fuzzy
 msgid "Error in password/key file."
-msgstr "Помилка у файлі паролів."
+msgstr "Помилка у файлі паролів або ключа."
 
 #: lib/errors.c:141
 msgid "Wrong padding in PKCS1 packet."
 msgstr "Помилкове доповнення у пакеті PKCS1."
 
 #: lib/errors.c:143
-#, fuzzy
 msgid "The session or certificate has expired."
-msgstr "Строк дії запитаного сеансу завершено."
+msgstr "Строк дії сеансу або сертифіката вичерпано."
 
 #: lib/errors.c:145
-#, fuzzy
 msgid "The certificate is not yet activated."
-msgstr "Цей сертифікат має непідтримувані атрибути."
+msgstr "Сертифікат ще не активовано."
 
 #: lib/errors.c:147
 msgid "Hashing has failed."
@@ -359,9 +353,8 @@ msgid "Base64 encoding error."
 msgstr "Помилка кодування даних Base64."
 
 #: lib/errors.c:154
-#, fuzzy
 msgid "Parsing error in password/key file."
-msgstr "Помилка під час спроби обробки даних файла паролів."
+msgstr "Помилка під час спроби обробки даних файла паролів або ключа."
 
 #: lib/errors.c:156
 msgid "The requested data were not available."
@@ -369,7 +362,7 @@ msgstr "Запитані дані недоступні."
 
 #: lib/errors.c:158
 msgid "There are no embedded data in the structure."
-msgstr ""
+msgstr "У структурі немає вбудованих даних."
 
 #: lib/errors.c:160
 msgid "Error in the pull function."
@@ -389,23 +382,21 @@ msgid "Error in the certificate."
 msgstr "Помилка у сертифікаті."
 
 #: lib/errors.c:167
-#, fuzzy
 msgid "Error in the time fields of certificate."
-msgstr "Помилка у сертифікаті."
+msgstr "Помилка у полях часу сертифіката."
 
 #: lib/errors.c:169
-#, fuzzy
 msgid "Error in the certificate verification."
-msgstr "Помилка у сертифікаті."
+msgstr "Помилка під час спроби перевірити сертифікат."
 
 #: lib/errors.c:171
-#, fuzzy
 msgid "Error in the CRL verification."
-msgstr "Помилка у сертифікаті."
+msgstr "Помилка під час перевірки CRL."
 
 #: lib/errors.c:173
 msgid "Error in the private key verification; seed doesn't match."
 msgstr ""
+"Помилка під час перевірки закритого ключа; невідповідне початкове значення."
 
 #: lib/errors.c:175
 msgid "Could not authenticate peer."
@@ -420,6 +411,7 @@ msgstr ""
 #: lib/errors.c:181
 msgid "CIDR name constraint is malformed in size or structure."
 msgstr ""
+"Помилкове форматування обмеження на назву CIDR у розмірі або структурі."
 
 #: lib/errors.c:185
 msgid "Unsupported critical extension in X.509 certificate."
@@ -449,7 +441,7 @@ msgstr "Помилка у сервері бази даних."
 
 #: lib/errors.c:197
 msgid "The Database entry already exists."
-msgstr ""
+msgstr "Такий запис вже існує у базі даних."
 
 #: lib/errors.c:198
 msgid "The certificate type is not supported."
@@ -480,9 +472,8 @@ msgid "Error while reading file."
 msgstr "Помилка читання файла."
 
 #: lib/errors.c:211
-#, fuzzy
 msgid "A disallowed SNI server name has been received."
-msgstr "Отримано некоректний параметр."
+msgstr "Отримано заборонену назву сервера SNI."
 
 #: lib/errors.c:214
 msgid "ASN1 parser: Element was not found."
@@ -538,7 +529,7 @@ msgstr "Було отримано занадто багато пакетів в�
 
 #: lib/errors.c:242
 msgid "More than a single object matches the criteria."
-msgstr ""
+msgstr "Критеріям відповідає декілька об'єктів."
 
 #: lib/errors.c:244
 msgid "The crypto library version is too old."
@@ -593,9 +584,8 @@ msgid "The SRP username supplied is illegal."
 msgstr "Вказане ім’я користувача SRP є некоректним."
 
 #: lib/errors.c:273
-#, fuzzy
 msgid "The username supplied is unknown."
-msgstr "Вказане ім’я користувача SRP є невідомим."
+msgstr "Вказане ім’я користувача є невідомим."
 
 #: lib/errors.c:276
 msgid "The OpenPGP fingerprint is not supported."
@@ -630,14 +620,14 @@ msgid "The given password contains invalid characters."
 msgstr "У вказаному паролі містяться некоректні символи."
 
 #: lib/errors.c:292
-#, fuzzy
 msgid "The given string contains invalid UTF-8 characters."
-msgstr "У вказаному паролі містяться некоректні символи."
+msgstr "У вказаному рядку містяться некоректні символи UTF-8."
 
 #: lib/errors.c:294
-#, fuzzy
 msgid "The given email string contains non-ASCII characters before '@'."
-msgstr "У вказаному паролі містяться некоректні символи."
+msgstr ""
+"У наданому рядку електронної пошти перед символом «@» містяться символи, які "
+"не є символами ASCII."
 
 #: lib/errors.c:299
 msgid "The Message Authentication Code verification failed."
@@ -685,7 +675,7 @@ msgstr "Помилка TPM."
 
 #: lib/errors.c:326
 msgid "The TPM library (trousers) cannot be found."
-msgstr ""
+msgstr "Не вдалося знайти бібліотеку TPM (trousers)."
 
 #: lib/errors.c:328
 msgid "TPM is not initialized."
@@ -809,7 +799,7 @@ msgstr "Відповідь OCSP є некоректною"
 
 #: lib/errors.c:388
 msgid "The OCSP response provided doesn't match the available certificates"
-msgstr ""
+msgstr "Надана відповідь OCSP не відповідає доступним сертифікатам"
 
 #: lib/errors.c:390
 msgid "There is no certificate status (OCSP)."
@@ -824,98 +814,91 @@ msgid "No common application protocol could be negotiated."
 msgstr "Не вдалося узгодити загальний протокол прикладного рівня."
 
 #: lib/errors.c:397
-#, fuzzy
 msgid "Error while performing self checks."
-msgstr "Помилка читання файла."
+msgstr "Помилка під час спроби виконати самоперевірку."
 
 #: lib/errors.c:399
 msgid "There is no self test for this algorithm."
-msgstr ""
+msgstr "Не існує самоперевірки для цього алгоритму."
 
 #: lib/errors.c:401
 msgid ""
 "An error has been detected in the library and cannot continue operations."
-msgstr ""
+msgstr "Виявлено помилку у бібліотеці. Подальша обробка неможлива."
 
 #: lib/errors.c:403
-#, fuzzy
 msgid "Error in sockets initialization."
-msgstr "Помилка у функції push."
+msgstr "Помилка під час ініціалізації сокета."
 
 #: lib/errors.c:405
-#, fuzzy
 msgid "Error in public key generation."
-msgstr "Помилка у функції pull."
+msgstr "Помилка під час створення відкритого ключа."
 
 #: lib/errors.c:407
-#, fuzzy
 msgid "Invalid TLS extensions length field."
-msgstr "Отримано некоректне розширення TLS."
+msgstr "Некоректне значення поля довжини розширень TLS."
 
 #: lib/errors.c:409
 msgid "Peer's certificate or username has changed during a rehandshake."
 msgstr ""
+"Змінено сертифікат або ім'я користувача вузла під час повторного узгодження "
+"зв'язку."
 
 #: lib/errors.c:411
 msgid "The provided string has an embedded null."
-msgstr ""
+msgstr "У наданий рядок вбудовано нуль-символ."
 
 #: lib/errors.c:413
 msgid "Attempted handshake during false start."
-msgstr ""
+msgstr "Спроба узгодження зв'язку під час фіктивного запуску."
 
 #: lib/errors.c:415
-#, fuzzy
 msgid "The SNI host name not recognised."
-msgstr "Не вдалося розпізнати назву сервера"
+msgstr "Не вдалося розпізнати назву вузла SNI."
 
 #: lib/errors.c:417
 msgid "There was an issue converting to or from UTF8."
-msgstr ""
+msgstr "Помилка під час перетворення даних до UTF8 або з UTF8."
 
 #: lib/errors.c:419
 msgid "Cannot perform this action while handshake is in progress."
-msgstr ""
+msgstr "Не можна виконувати цю дію, доки триває узгодження зв'язку."
 
 #: lib/errors.c:421
-#, fuzzy
 msgid "The public key is invalid."
-msgstr "Некоректний запит."
+msgstr "Відкритий ключ є некоректним."
 
 #: lib/errors.c:423
 msgid "There are no validation parameters present."
-msgstr ""
+msgstr "Немає параметрів перевірки."
 
 #: lib/errors.c:425
 msgid "The public key parameters are invalid."
-msgstr ""
+msgstr "Параметри відкритого ключа є некоректними."
 
 #: lib/errors.c:427
-#, fuzzy
 msgid "The private key is invalid."
-msgstr "Некоректний запит."
+msgstr "Закритий ключ є некоректним."
 
 #: lib/errors.c:429
-#, fuzzy
 msgid "The DER time encoding is invalid."
-msgstr "Некоректний запит."
+msgstr "Кодування часу DER є некоректним."
 
 #: lib/errors.c:431
-#, fuzzy
 msgid "The signature is incompatible with the public key."
-msgstr "Вказаний ключ DSA key є несумісним з вибраним протоколом TLS."
+msgstr "Підпис є несумісним із відкритим ключем."
 
 #: lib/errors.c:433
 msgid "One of the involved algorithms has insufficient security level."
-msgstr ""
+msgstr "Один із використаних алгоритмів є недостатньо безпечним."
 
 #: lib/errors.c:435
 msgid "No common key share with peer."
-msgstr ""
+msgstr "Немає спільних ключів із вузлом."
 
 #: lib/errors.c:437
 msgid "The early data were rejected."
-msgstr ""
+msgstr "Попередні дані було відкинуто."
 
 #: lib/errors.c:443 libdane/errors.c:42
 msgid "Success."
@@ -947,71 +930,62 @@ msgstr ""
 "Вузол надіслав запит на повторне надсилання даних підтвердження з’єднання."
 
 #: lib/errors.c:457
-#, fuzzy
 msgid "Re-authentication was requested by the peer."
-msgstr ""
-"Вузол надіслав запит на повторне надсилання даних підтвердження з’єднання."
+msgstr "Вузол надіслав запит на повторне розпізнавання."
 
 #: lib/errors.c:549 libdane/errors.c:100
 msgid "(unknown error code)"
 msgstr "(невідомий код помилки)"
 
 #: lib/x509/ocsp.c:2605
-#, fuzzy
 msgid "The OCSP response is trusted. "
-msgstr "Відповідь OCSP є некоректною"
+msgstr "Відповідь OCSP є надійною. "
 
 #: lib/x509/ocsp.c:2610
-#, fuzzy
 msgid "The OCSP response's signer could not be found. "
-msgstr "Відповідь OCSP є некоректною"
+msgstr "Не вдалося знайти підписника відповіді OCSP. "
 
 #: lib/x509/ocsp.c:2615
 msgid "Error in the signer's key usageflags. "
-msgstr ""
+msgstr "Помилка у прапорцях використання ключа підписувача. "
 
 #: lib/x509/ocsp.c:2620
-#, fuzzy
 msgid "The OCSP response's signer is not trusted. "
-msgstr "Відповідь OCSP є некоректною"
+msgstr "Підписник відповіді OCSP не є надійним. "
 
 #: lib/x509/ocsp.c:2625
-#, fuzzy
 msgid "The OCSP response depends on insecure algorithms. "
-msgstr "Відповідь OCSP є некоректною"
+msgstr "Чинність відповіді OCSP засновано на алгоритмах, які не є безпечними. "
 
 #: lib/x509/ocsp.c:2630
-#, fuzzy
 msgid "The OCSP response's signature cannot be validated. "
-msgstr "Відповідь OCSP є некоректною"
+msgstr "Підпис відповіді OCSP не пройшов перевірки. "
 
 #: lib/x509/ocsp.c:2635
 msgid "The OCSP response's signer's certificate is not activated. "
-msgstr ""
+msgstr "Сертифікат підписника відповіді OCSP не активовано. "
 
 #: lib/x509/ocsp.c:2640
-#, fuzzy
 msgid "The OCSP response's signer's certificate is expired. "
-msgstr "Відповідь OCSP є некоректною"
+msgstr "Строк дії сертифіката підписника відповіді OCSP вичерпано."
 
 #: lib/x509/ocsp.c:2644
-#, fuzzy
 msgid "Memory error"
-msgstr "Помилка дешифрування"
+msgstr "Помилка у пам'яті"
 
-#: lib/x509/ocsp_output.c:50 lib/x509/ocsp_output.c:276 lib/x509/output.c:1575
-#: lib/x509/output.c:2108 lib/x509/output.c:2506
+#: lib/x509/ocsp_output.c:50 lib/x509/ocsp_output.c:276 lib/x509/output.c:1579
+#: lib/x509/output.c:2112 lib/x509/output.c:2510
 #, c-format
 msgid "\tVersion: %d\n"
 msgstr "\tВерсія: %d\n"
 
-#: lib/x509/ocsp_output.c:136 lib/x509/ocsp_output.c:500 lib/x509/output.c:2276
-#: lib/x509/output.c:2670
+#: lib/x509/ocsp_output.c:136 lib/x509/ocsp_output.c:500 lib/x509/output.c:2280
+#: lib/x509/output.c:2674
 msgid "\t\t\tASCII: "
 msgstr "\t\t\tASCII: "
 
-#: lib/x509/ocsp_output.c:141 lib/x509/ocsp_output.c:505 lib/x509/output.c:2280
-#: lib/x509/output.c:2675
+#: lib/x509/ocsp_output.c:141 lib/x509/ocsp_output.c:505 lib/x509/output.c:2284
+#: lib/x509/output.c:2679
 msgid "\t\t\tHexdump: "
 msgstr "\t\t\tШіст. дамп: "
 
@@ -1020,14 +994,13 @@ msgid "OCSP Request Information:\n"
 msgstr "Дані запиту OCSP:\n"
 
 #: lib/x509/ocsp_output.c:289
-#, fuzzy
 msgid "\tResponder Key ID: "
-msgstr "\tІдентифікатор відповідача: %.*s\n"
+msgstr "\tІдентифікатор ключа Responder Key ID: "
 
 #: lib/x509/ocsp_output.c:299
-#, fuzzy, c-format
+#, c-format
 msgid "\tResponder ID: %s\n"
-msgstr "\tІдентифікатор відповідача: %.*s\n"
+msgstr "\tІдентифікатор відповідача: %s\n"
 
 #: lib/x509/ocsp_output.c:320
 #, c-format
@@ -1049,27 +1022,27 @@ msgstr "\t\tЦе оновлення: %s\n"
 msgid "\t\tNext Update: %s\n"
 msgstr "\t\tНаступне оновлення: %s\n"
 
-#: lib/x509/ocsp_output.c:524 lib/x509/output.c:1239 lib/x509/output.c:1510
-#: lib/x509/output.c:1636 lib/x509/output.c:1656 lib/x509/output.c:1700
-#: lib/x509/output.c:1928 lib/x509/output.c:1941 lib/x509/output.c:2355
-#: lib/x509/output.c:2483 lib/x509/output.c:2534
+#: lib/x509/ocsp_output.c:524 lib/x509/output.c:1243 lib/x509/output.c:1514
+#: lib/x509/output.c:1640 lib/x509/output.c:1660 lib/x509/output.c:1704
+#: lib/x509/output.c:1932 lib/x509/output.c:1945 lib/x509/output.c:2359
+#: lib/x509/output.c:2487 lib/x509/output.c:2538
 msgid "unknown"
 msgstr "невідомий"
 
-#: lib/x509/ocsp_output.c:525 lib/x509/output.c:1704 lib/x509/output.c:2359
-#: lib/x509/output.c:2538
+#: lib/x509/ocsp_output.c:525 lib/x509/output.c:1708 lib/x509/output.c:2363
+#: lib/x509/output.c:2542
 #, c-format
 msgid "\tSignature Algorithm: %s\n"
 msgstr "\tАлгоритм підписування: %s\n"
 
-#: lib/x509/ocsp_output.c:529 lib/x509/output.c:1711 lib/x509/output.c:2364
+#: lib/x509/ocsp_output.c:529 lib/x509/output.c:1715 lib/x509/output.c:2368
 msgid ""
 "warning: signed using a broken signature algorithm that can be forged.\n"
 msgstr ""
 "попередження: signed використовує слабкий алгоритм підписування, який можна "
 "зламати.\n"
 
-#: lib/x509/ocsp_output.c:543 lib/x509/output.c:1737 lib/x509/output.c:2390
+#: lib/x509/ocsp_output.c:543 lib/x509/output.c:1741 lib/x509/output.c:2394
 msgid "\tSignature:\n"
 msgstr "\tПідпис:\n"
 
@@ -1080,60 +1053,64 @@ msgstr "Дані відповіді OCSP:\n"
 #: lib/x509/output.c:54 lib/x509/output.c:84
 #, c-format
 msgid "%s%s: %.*s (contains illegal chars)\n"
-msgstr ""
+msgstr "%s%s: %.*s (містить некоректні символи)\n"
 
 #: lib/x509/output.c:60 lib/x509/output.c:90
 #, c-format
 msgid "%s%s: %.*s (%s)\n"
-msgstr ""
+msgstr "%s%s: %.*s (%s)\n"
 
 #: lib/x509/output.c:68 lib/x509/output.c:98
 #, c-format
 msgid "%s%s: %.*s\n"
-msgstr ""
+msgstr "%s%s: %.*s\n"
 
 #: lib/x509/output.c:114
-#, fuzzy
 msgid "warning: SAN contains an embedded NUL, replacing with '!'\n"
 msgstr ""
-"попередження: altname містить вбудоване порожнє значення, замінюємо на '!'\n"
+"попередження: SAN містить вбудоване порожнє значення, замінюємо на '!'\n"
 
 #: lib/x509/output.c:130
 #, c-format
 msgid "%sURI: %.*s\n"
-msgstr ""
+msgstr "%sАдреса: %.*s\n"
 
 #: lib/x509/output.c:144
-#, fuzzy, c-format
+#, c-format
 msgid "%sdirectoryName: %.*s\n"
-msgstr "%s\t\t\tOID іншого імені: %.*s\n"
+msgstr "%sНазва каталогу: %.*s\n"
 
 #: lib/x509/output.c:148
 #, fuzzy, c-format
-msgid "%sXMPP Address: %.*s\n"
-msgstr "%s\t\t\tАдреса XMPP: %.*s\n"
+msgid "%sRegistered ID: %.*s\n"
+msgstr "%s\t\t\tOID іншого імені: %.*s\n"
 
 #: lib/x509/output.c:152
 #, c-format
-msgid "%sKRB5Principal: %.*s\n"
-msgstr ""
+msgid "%sXMPP Address: %.*s\n"
+msgstr "%sАдреса XMPP: %.*s\n"
 
 #: lib/x509/output.c:156
 #, c-format
-msgid "%sUnknown name: "
-msgstr ""
+msgid "%sKRB5Principal: %.*s\n"
+msgstr "%sРеєстраційні дані KRB5: %.*s\n"
 
-#: lib/x509/output.c:298
+#: lib/x509/output.c:160
+#, c-format
+msgid "%sUnknown name: "
+msgstr "%sНевідома назва: "
+
+#: lib/x509/output.c:302
 #, c-format
 msgid "\t\t\tPath Length Constraint: %d\n"
 msgstr "\t\t\tОбмеження довжини шляху: %d\n"
 
-#: lib/x509/output.c:300
+#: lib/x509/output.c:304
 #, c-format
 msgid "\t\t\tPolicy Language: %s"
 msgstr "\t\t\tМова правил: %s"
 
-#: lib/x509/output.c:308
+#: lib/x509/output.c:312
 msgid ""
 "\t\t\tPolicy:\n"
 "\t\t\t\tASCII: "
@@ -1141,7 +1118,7 @@ msgstr ""
 "\t\t\tПравила:\n"
 "\t\t\t\tASCII: "
 
-#: lib/x509/output.c:310
+#: lib/x509/output.c:314
 msgid ""
 "\n"
 "\t\t\t\tHexdump: "
@@ -1149,142 +1126,142 @@ msgstr ""
 "\n"
 "\t\t\t\tШіст. дамп: "
 
-#: lib/x509/output.c:343
+#: lib/x509/output.c:347
 #, c-format
 msgid "%s\t\t\tPermitted:\n"
-msgstr ""
+msgstr "%s\t\t\tДозволено:\n"
 
-#: lib/x509/output.c:355
+#: lib/x509/output.c:359
 #, c-format
 msgid "%s\t\t\tExcluded:\n"
-msgstr ""
+msgstr "%s\t\t\tВиключено:\n"
 
-#: lib/x509/output.c:395 lib/x509/output.c:397 lib/x509/output.c:399
-#, fuzzy, c-format
+#: lib/x509/output.c:399 lib/x509/output.c:401 lib/x509/output.c:403
+#, c-format
 msgid "\t\t\tAccess Method: %s (%s)\n"
-msgstr "\t\t\tСпосіб доступу: %.*s"
+msgstr "\t\t\tСпосіб доступу: %s (%s)\n"
 
-#: lib/x509/output.c:503
+#: lib/x509/output.c:507
 #, c-format
 msgid "%sDigital signature.\n"
 msgstr "%sЦифровий підпис.\n"
 
-#: lib/x509/output.c:505
+#: lib/x509/output.c:509
 #, c-format
 msgid "%sNon repudiation.\n"
 msgstr "%sБез анулювання.\n"
 
-#: lib/x509/output.c:507
+#: lib/x509/output.c:511
 #, c-format
 msgid "%sKey encipherment.\n"
 msgstr "%sШифрування ключа.\n"
 
-#: lib/x509/output.c:509
+#: lib/x509/output.c:513
 #, c-format
 msgid "%sData encipherment.\n"
 msgstr "%sШифрування даних.\n"
 
-#: lib/x509/output.c:511
+#: lib/x509/output.c:515
 #, c-format
 msgid "%sKey agreement.\n"
 msgstr "%sУзгодження ключів.\n"
 
-#: lib/x509/output.c:513
+#: lib/x509/output.c:517
 #, c-format
 msgid "%sCertificate signing.\n"
 msgstr "%sПідписування сертифікатом.\n"
 
-#: lib/x509/output.c:515
+#: lib/x509/output.c:519
 #, c-format
 msgid "%sCRL signing.\n"
 msgstr "%sПідписування CRL.\n"
 
-#: lib/x509/output.c:517
+#: lib/x509/output.c:521
 #, c-format
 msgid "%sKey encipher only.\n"
 msgstr "%sЛише шифрування ключа.\n"
 
-#: lib/x509/output.c:519
+#: lib/x509/output.c:523
 #, c-format
 msgid "%sKey decipher only.\n"
 msgstr "%sЛише розшифрування ключа.\n"
 
-#: lib/x509/output.c:563
+#: lib/x509/output.c:567
 #, c-format
 msgid "\t\t\tNot Before: %s\n"
 msgstr "\t\t\tНе раніше: %s\n"
 
-#: lib/x509/output.c:572
+#: lib/x509/output.c:576
 #, c-format
 msgid "\t\t\tNot After: %s\n"
 msgstr "\t\t\tНе пізніше: %s\n"
 
-#: lib/x509/output.c:650
+#: lib/x509/output.c:654
 #, c-format
 msgid "%s\t\t\tTLS WWW Server.\n"
 msgstr "%s\t\t\tІнтернет-сервер TLS.\n"
 
-#: lib/x509/output.c:652
+#: lib/x509/output.c:656
 #, c-format
 msgid "%s\t\t\tTLS WWW Client.\n"
 msgstr "%s\t\t\tІнтернет-клієнт TLS.\n"
 
-#: lib/x509/output.c:654
+#: lib/x509/output.c:658
 #, c-format
 msgid "%s\t\t\tCode signing.\n"
 msgstr "%s\t\t\tПідписування коду.\n"
 
-#: lib/x509/output.c:656
+#: lib/x509/output.c:660
 #, c-format
 msgid "%s\t\t\tEmail protection.\n"
 msgstr "%s\t\t\tЗахист електронної пошти.\n"
 
-#: lib/x509/output.c:659
+#: lib/x509/output.c:663
 #, c-format
 msgid "%s\t\t\tTime stamping.\n"
 msgstr "%s\t\t\tЧасова позначка.\n"
 
-#: lib/x509/output.c:661
+#: lib/x509/output.c:665
 #, c-format
 msgid "%s\t\t\tOCSP signing.\n"
 msgstr "%s\t\t\tПідписування OCSP.\n"
 
-#: lib/x509/output.c:663
+#: lib/x509/output.c:667
 #, c-format
 msgid "%s\t\t\tIpsec IKE.\n"
 msgstr "%s\t\t\tIpsec IKE.\n"
 
-#: lib/x509/output.c:665
+#: lib/x509/output.c:669
 #, c-format
 msgid "%s\t\t\tAny purpose.\n"
 msgstr "%s\t\t\tДовільне призначення.\n"
 
-#: lib/x509/output.c:688
+#: lib/x509/output.c:692
 #, c-format
 msgid "%s\t\t\tCertificate Authority (CA): FALSE\n"
 msgstr "%s\t\t\tСлужба сертифікації (CA): НІ\n"
 
-#: lib/x509/output.c:691
+#: lib/x509/output.c:695
 #, c-format
 msgid "%s\t\t\tCertificate Authority (CA): TRUE\n"
 msgstr "%s\t\t\tСлужба сертифікації (CA): ТАК\n"
 
-#: lib/x509/output.c:695
+#: lib/x509/output.c:699
 #, c-format
 msgid "%s\t\t\tPath Length Constraint: %d\n"
 msgstr "%s\t\t\tОбмеження довжини шляху: %d\n"
 
-#: lib/x509/output.c:751
+#: lib/x509/output.c:755
 #, c-format
 msgid "%s\t\t\totherName OID: %.*s\n"
 msgstr "%s\t\t\tOID іншого імені: %.*s\n"
 
-#: lib/x509/output.c:753
+#: lib/x509/output.c:757
 #, c-format
 msgid "%s\t\t\totherName DER: "
 msgstr "%s\t\t\tінше ім’я, DER: "
 
-#: lib/x509/output.c:756
+#: lib/x509/output.c:760
 #, c-format
 msgid ""
 "\n"
@@ -1293,470 +1270,458 @@ msgstr ""
 "\n"
 "%s\t\t\tінше ім’я, ASCII: "
 
-#: lib/x509/output.c:896
+#: lib/x509/output.c:900
 #, c-format
 msgid "%s\t\tBasic Constraints (%s):\n"
 msgstr "%s\t\tОсновні обмеження (%s):\n"
 
-#: lib/x509/output.c:898 lib/x509/output.c:912 lib/x509/output.c:957
-#: lib/x509/output.c:991 lib/x509/output.c:1004 lib/x509/output.c:1016
-#: lib/x509/output.c:1031 lib/x509/output.c:1043 lib/x509/output.c:1056
-#: lib/x509/output.c:1068 lib/x509/output.c:1082 lib/x509/output.c:1096
-#: lib/x509/output.c:1104 lib/x509/output.c:1115 lib/x509/output.c:1126
-#: lib/x509/output.c:1134 lib/x509/output.c:2217 lib/x509/output.c:2242
-#: lib/x509/output.c:2262
+#: lib/x509/output.c:902 lib/x509/output.c:916 lib/x509/output.c:961
+#: lib/x509/output.c:995 lib/x509/output.c:1008 lib/x509/output.c:1020
+#: lib/x509/output.c:1035 lib/x509/output.c:1047 lib/x509/output.c:1060
+#: lib/x509/output.c:1072 lib/x509/output.c:1086 lib/x509/output.c:1100
+#: lib/x509/output.c:1108 lib/x509/output.c:1119 lib/x509/output.c:1130
+#: lib/x509/output.c:1138 lib/x509/output.c:2221 lib/x509/output.c:2246
+#: lib/x509/output.c:2266
 msgid "critical"
 msgstr "критична"
 
-#: lib/x509/output.c:898 lib/x509/output.c:912 lib/x509/output.c:958
-#: lib/x509/output.c:992 lib/x509/output.c:1004 lib/x509/output.c:1016
-#: lib/x509/output.c:1031 lib/x509/output.c:1043 lib/x509/output.c:1056
-#: lib/x509/output.c:1068 lib/x509/output.c:1082 lib/x509/output.c:1096
-#: lib/x509/output.c:1104 lib/x509/output.c:1115 lib/x509/output.c:1126
-#: lib/x509/output.c:1134 lib/x509/output.c:2218 lib/x509/output.c:2243
-#: lib/x509/output.c:2263
+#: lib/x509/output.c:902 lib/x509/output.c:916 lib/x509/output.c:962
+#: lib/x509/output.c:996 lib/x509/output.c:1008 lib/x509/output.c:1020
+#: lib/x509/output.c:1035 lib/x509/output.c:1047 lib/x509/output.c:1060
+#: lib/x509/output.c:1072 lib/x509/output.c:1086 lib/x509/output.c:1100
+#: lib/x509/output.c:1108 lib/x509/output.c:1119 lib/x509/output.c:1130
+#: lib/x509/output.c:1138 lib/x509/output.c:2222 lib/x509/output.c:2247
+#: lib/x509/output.c:2267
 msgid "not critical"
 msgstr "не критична"
 
-#: lib/x509/output.c:910
+#: lib/x509/output.c:914
 #, c-format
 msgid "%s\t\tSubject Key Identifier (%s):\n"
 msgstr "%s\t\tІдентифікатор ключа призначення (%s):\n"
 
-#: lib/x509/output.c:1002
+#: lib/x509/output.c:1006
 #, c-format
 msgid "%s\t\tAuthority Key Identifier (%s):\n"
 msgstr "%s\t\tІдентифікатор ключа служби (%s):\n"
 
-#: lib/x509/output.c:1015
+#: lib/x509/output.c:1019
 #, c-format
 msgid "%s\t\tKey Usage (%s):\n"
 msgstr "%s\t\tВикористання ключа (%s):\n"
 
-#: lib/x509/output.c:1029
+#: lib/x509/output.c:1033
 #, c-format
 msgid "%s\t\tPrivate Key Usage Period (%s):\n"
 msgstr "%s\t\tПеріод використання закритого ключа (%s):\n"
 
-#: lib/x509/output.c:1042
+#: lib/x509/output.c:1046
 #, c-format
 msgid "%s\t\tKey Purpose (%s):\n"
 msgstr "%s\t\tПризначення ключа (%s):\n"
 
-#: lib/x509/output.c:1054
+#: lib/x509/output.c:1058
 #, c-format
 msgid "%s\t\tSubject Alternative Name (%s):\n"
 msgstr "%s\t\tІнше ім’я (назва) призначення (%s):\n"
 
-#: lib/x509/output.c:1066
+#: lib/x509/output.c:1070
 #, c-format
 msgid "%s\t\tIssuer Alternative Name (%s):\n"
 msgstr "%s\t\tІнше ім’я (назва) видавця (%s):\n"
 
-#: lib/x509/output.c:1080
+#: lib/x509/output.c:1084
 #, c-format
 msgid "%s\t\tCRL Distribution points (%s):\n"
 msgstr "%s\t\tТочки розповсюдження CRL (%s):\n"
 
-#: lib/x509/output.c:1094
+#: lib/x509/output.c:1098
 #, c-format
 msgid "%s\t\tProxy Certificate Information (%s):\n"
 msgstr "%s\t\tДані щодо проміжних сертифікатів (%s):\n"
 
-#: lib/x509/output.c:1102
+#: lib/x509/output.c:1106
 #, c-format
 msgid "%s\t\tAuthority Information Access (%s):\n"
 msgstr "%s\t\tДоступ до даних реєстратора (%s):\n"
 
-#: lib/x509/output.c:1114
-#, fuzzy, c-format
+#: lib/x509/output.c:1118
+#, c-format
 msgid "%s\t\tName Constraints (%s):\n"
-msgstr "%s\t\tОсновні обмеження (%s):\n"
+msgstr "%s\t\tОбмеження на назву (%s):\n"
 
-#: lib/x509/output.c:1124
-#, fuzzy, c-format
+#: lib/x509/output.c:1128
+#, c-format
 msgid "%s\t\tTLS Features (%s):\n"
-msgstr "%s\t\tПризначення ключа (%s):\n"
+msgstr "%s\t\tМожливості TLS (%s):\n"
 
-#: lib/x509/output.c:1132
+#: lib/x509/output.c:1136
 #, c-format
 msgid "%s\t\tUnknown extension %s (%s):\n"
 msgstr "%s\t\tНевідоме розширення %s (%s):\n"
 
-#: lib/x509/output.c:1136
+#: lib/x509/output.c:1140
 #, c-format
 msgid "%s\t\t\tASCII: "
 msgstr "%s\t\t\tASCII: "
 
-#: lib/x509/output.c:1140
+#: lib/x509/output.c:1144
 #, c-format
 msgid "%s\t\t\tHexdump: "
 msgstr "%s\t\t\tШіст. дамп: "
 
-#: lib/x509/output.c:1189
+#: lib/x509/output.c:1193
 #, c-format
 msgid "%s\tExtensions:\n"
 msgstr "%s\tРозширення:\n"
 
-#: lib/x509/output.c:1241
+#: lib/x509/output.c:1245
 #, c-format
 msgid "\t%sPublic Key Algorithm: %s\n"
 msgstr "\t%sАлгоритм відкритого ключа: %s\n"
 
-#: lib/x509/output.c:1243
+#: lib/x509/output.c:1247
 #, c-format
 msgid "\tAlgorithm Security Level: %s (%d bits)\n"
 msgstr "\tРівень захисту алгоритму: %s (%d-бітовий)\n"
 
-#: lib/x509/output.c:1248
+#: lib/x509/output.c:1252
 msgid "\t\tParameters:\n"
-msgstr ""
+msgstr "\t\tПараметри:\n"
 
-#: lib/x509/output.c:1268
+#: lib/x509/output.c:1272
 #, c-format
 msgid "\t\tModulus (bits %d): "
 msgstr "\t\tОснова (%d-бітова): "
 
-#: lib/x509/output.c:1275
+#: lib/x509/output.c:1279
 #, c-format
 msgid "\t\tExponent (bits %d): "
 msgstr "\t\tПоказник (%d-бітовий): "
 
-#: lib/x509/output.c:1283
+#: lib/x509/output.c:1287
 #, c-format
 msgid "\t\tModulus (bits %d):\n"
 msgstr "\t\tОснова (%d-бітова):\n"
 
-#: lib/x509/output.c:1290
+#: lib/x509/output.c:1294
 #, c-format
 msgid "\t\tExponent (bits %d):\n"
 msgstr "\t\tПоказник (%d-бітовий):\n"
 
-#: lib/x509/output.c:1317 lib/x509/output.c:1437
+#: lib/x509/output.c:1321 lib/x509/output.c:1441
 #, c-format
 msgid "\t\tCurve:\t%s\n"
 msgstr "\t\tКрива:\t%s\n"
 
-#: lib/x509/output.c:1321 lib/x509/output.c:1447
+#: lib/x509/output.c:1325 lib/x509/output.c:1451
 msgid "\t\tX: "
 msgstr "\t\tX: "
 
-#: lib/x509/output.c:1327 lib/x509/output.c:1452
+#: lib/x509/output.c:1331 lib/x509/output.c:1456
 msgid "\t\tY: "
 msgstr "\t\tY: "
 
-#: lib/x509/output.c:1334 lib/x509/output.c:1458
+#: lib/x509/output.c:1338 lib/x509/output.c:1462
 msgid "\t\tX:\n"
 msgstr "\t\tX:\n"
 
-#: lib/x509/output.c:1339 lib/x509/output.c:1462
+#: lib/x509/output.c:1343 lib/x509/output.c:1466
 msgid "\t\tY:\n"
 msgstr "\t\tY:\n"
 
-#: lib/x509/output.c:1367
+#: lib/x509/output.c:1371
 #, c-format
 msgid "\t\tPublic key (bits %d): "
 msgstr "\t\tВідкритий ключ (%d-бітовий): "
 
-#: lib/x509/output.c:1373
+#: lib/x509/output.c:1377
 msgid "\t\tP: "
 msgstr "\t\tP: "
 
-#: lib/x509/output.c:1378
+#: lib/x509/output.c:1382
 msgid "\t\tQ: "
 msgstr "\t\tQ: "
 
-#: lib/x509/output.c:1383
+#: lib/x509/output.c:1387
 msgid "\t\tG: "
 msgstr "\t\tG: "
 
-#: lib/x509/output.c:1391
+#: lib/x509/output.c:1395
 #, c-format
 msgid "\t\tPublic key (bits %d):\n"
 msgstr "\t\tВідкритий ключ (%d-бітовий):\n"
 
-#: lib/x509/output.c:1396
+#: lib/x509/output.c:1400
 msgid "\t\tP:\n"
 msgstr "\t\tP:\n"
 
-#: lib/x509/output.c:1400
+#: lib/x509/output.c:1404
 msgid "\t\tQ:\n"
 msgstr "\t\tQ:\n"
 
-#: lib/x509/output.c:1404
+#: lib/x509/output.c:1408
 msgid "\t\tG:\n"
 msgstr "\t\tG:\n"
 
-#: lib/x509/output.c:1439
-#, fuzzy, c-format
+#: lib/x509/output.c:1443
+#, c-format
 msgid "\t\tDigest:\t%s\n"
-msgstr "\t\tКрива:\t%s\n"
+msgstr "\t\tКонтрольна сума:\t%s\n"
 
-#: lib/x509/output.c:1441
-#, fuzzy, c-format
+#: lib/x509/output.c:1445
+#, c-format
 msgid "\t\tParamSet: %s\n"
-msgstr "\t\tСтворення: %s\n"
+msgstr "\t\tНабір параметрів: %s\n"
 
-#: lib/x509/output.c:1554 lib/x509/output.c:2473
+#: lib/x509/output.c:1558 lib/x509/output.c:2477
 msgid "Subject "
 msgstr "Призначення "
 
-#: lib/x509/output.c:1590
+#: lib/x509/output.c:1594
 msgid "\tSerial Number (hex): "
 msgstr "\tСерійний номер (шіст.): "
 
-#: lib/x509/output.c:1603 lib/x509/output.c:2118
-#, fuzzy
+#: lib/x509/output.c:1607 lib/x509/output.c:2122
 msgid "\tIssuer:\n"
-msgstr "\tВидавець: %s\n"
+msgstr "\tВидавець:\n"
 
-#: lib/x509/output.c:1608 lib/x509/output.c:2123
+#: lib/x509/output.c:1612 lib/x509/output.c:2127
 #, c-format
 msgid "\tIssuer: %s\n"
 msgstr "\tВидавець: %s\n"
 
-#: lib/x509/output.c:1617
+#: lib/x509/output.c:1621
 msgid "\tValidity:\n"
 msgstr "\tЧинність:\n"
 
-#: lib/x509/output.c:1634 lib/x509/output.c:1636
+#: lib/x509/output.c:1638 lib/x509/output.c:1640
 #, c-format
 msgid "\t\tNot Before: %s\n"
 msgstr "\t\tНе раніше: %s\n"
 
-#: lib/x509/output.c:1654 lib/x509/output.c:1656
+#: lib/x509/output.c:1658 lib/x509/output.c:1660
 #, c-format
 msgid "\t\tNot After: %s\n"
 msgstr "\t\tНе пізніше: %s\n"
 
-#: lib/x509/output.c:1667 lib/x509/output.c:2516
-#, fuzzy
+#: lib/x509/output.c:1671 lib/x509/output.c:2520
 msgid "\tSubject:\n"
-msgstr "\tПризначення: %s\n"
+msgstr "\tПризначення:\n"
 
-#: lib/x509/output.c:1672 lib/x509/output.c:2521
+#: lib/x509/output.c:1676 lib/x509/output.c:2525
 #, c-format
 msgid "\tSubject: %s\n"
 msgstr "\tПризначення: %s\n"
 
-#: lib/x509/output.c:1751
-#, fuzzy
+#: lib/x509/output.c:1755
 msgid "\tFingerprint:\n"
-msgstr "відбиток: "
+msgstr "\tВідбиток:\n"
 
-#: lib/x509/output.c:1760
+#: lib/x509/output.c:1764
 msgid "\t\tsha1:"
-msgstr ""
+msgstr "\t\tsha1:"
 
-#: lib/x509/output.c:1771
+#: lib/x509/output.c:1775
 msgid "\t\tsha256:"
-msgstr ""
+msgstr "\t\tsha256:"
 
-#: lib/x509/output.c:1805
-#, fuzzy, c-format
+#: lib/x509/output.c:1809
+#, c-format
 msgid ""
 "%sPublic Key ID:\n"
 "%s\tsha1:"
-msgstr "Ідент. відкритого ключа: "
+msgstr ""
+"%sІдент. відкритого ключа:\n"
+"%s\tsha1:"
 
-#: lib/x509/output.c:1811
-#, fuzzy, c-format
+#: lib/x509/output.c:1815
+#, c-format
 msgid ""
 "%sPublic Key PIN:\n"
 "%s\tpin-sha256:"
 msgstr ""
-"\tІдент. відкритого ключа:\n"
-"\t\t"
+"%sPIN відкритого ключа:\n"
+"%s\tpin-sha256:"
 
-#: lib/x509/output.c:1883
-#, fuzzy
+#: lib/x509/output.c:1887
 msgid "no subject,"
-msgstr "Призначення "
+msgstr "немає призначення,"
 
-#: lib/x509/output.c:1899
+#: lib/x509/output.c:1903
 msgid "no issuer,"
-msgstr ""
+msgstr "немає видавця,"
 
-#: lib/x509/output.c:1946
+#: lib/x509/output.c:1950
 #, c-format
 msgid "signed using %s (broken!), "
 msgstr "підписано за допомогою %s (слабкий!), "
 
-#: lib/x509/output.c:1948
+#: lib/x509/output.c:1952
 #, c-format
 msgid "signed using %s, "
 msgstr "підписано за допомогою %s, "
 
-#: lib/x509/output.c:2084
+#: lib/x509/output.c:2088
 msgid "X.509 Certificate Information:\n"
 msgstr "Дані щодо сертифікації X.509:\n"
 
-#: lib/x509/output.c:2088 lib/x509/output.c:2728
+#: lib/x509/output.c:2092 lib/x509/output.c:2732
 msgid "Other Information:\n"
 msgstr "Інші дані:\n"
 
-#: lib/x509/output.c:2103
+#: lib/x509/output.c:2107
 msgid "\tVersion: 1 (default)\n"
 msgstr "\tВерсія: 1 (типова)\n"
 
-#: lib/x509/output.c:2132
+#: lib/x509/output.c:2136
 msgid "\tUpdate dates:\n"
 msgstr "\tДати оновлення:\n"
 
-#: lib/x509/output.c:2149
+#: lib/x509/output.c:2153
 #, c-format
 msgid "\t\tIssued: %s\n"
 msgstr "\t\tВидано: %s\n"
 
-#: lib/x509/output.c:2169
+#: lib/x509/output.c:2173
 #, c-format
 msgid "\t\tNext at: %s\n"
 msgstr "\t\tНаступна: %s\n"
 
-#: lib/x509/output.c:2200
+#: lib/x509/output.c:2204
 msgid "\tExtensions:\n"
 msgstr "\tРозширення:\n"
 
-#: lib/x509/output.c:2216
+#: lib/x509/output.c:2220
 #, c-format
 msgid "\t\tCRL Number (%s): "
 msgstr "\t\tНомер CRL (%s): "
 
-#: lib/x509/output.c:2241
+#: lib/x509/output.c:2245
 #, c-format
 msgid "\t\tAuthority Key Identifier (%s):\n"
 msgstr "\t\tІдентифікатор ключа служби (%s):\n"
 
-#: lib/x509/output.c:2260
+#: lib/x509/output.c:2264
 #, c-format
 msgid "\t\tUnknown extension %s (%s):\n"
 msgstr "\t\tНевідоме розширення %s (%s):\n"
 
-#: lib/x509/output.c:2297
+#: lib/x509/output.c:2301
 #, c-format
 msgid "\tRevoked certificates (%d):\n"
 msgstr "\tВідкликані сертифікати (%d):\n"
 
-#: lib/x509/output.c:2300
+#: lib/x509/output.c:2304
 msgid "\tNo revoked certificates.\n"
 msgstr "\tНемає відкликаних сертифікатів.\n"
 
-#: lib/x509/output.c:2321
+#: lib/x509/output.c:2325
 msgid "\t\tSerial Number (hex): "
 msgstr "\t\tСерійний номер (шіст.): "
 
-#: lib/x509/output.c:2339
+#: lib/x509/output.c:2343
 #, c-format
 msgid "\t\tRevoked at: %s\n"
 msgstr "\t\tВідкликано: %s\n"
 
-#: lib/x509/output.c:2421
+#: lib/x509/output.c:2425
 msgid "X.509 Certificate Revocation List Information:\n"
 msgstr "Дані щодо списку відкликань сертифікатів X.509:\n"
 
-#: lib/x509/output.c:2571
+#: lib/x509/output.c:2575
 msgid "\tAttributes:\n"
 msgstr "\tАтрибути:\n"
 
-#: lib/x509/output.c:2628
+#: lib/x509/output.c:2632
 #, c-format
 msgid "\t\tChallenge password: %s\n"
 msgstr "\t\tПароль виклику: %s\n"
 
-#: lib/x509/output.c:2638
+#: lib/x509/output.c:2642
 #, c-format
 msgid "\t\tUnknown attribute %s:\n"
 msgstr "\t\tНевідомий атрибут %s:\n"
 
-#: lib/x509/output.c:2724
+#: lib/x509/output.c:2728
 msgid "PKCS #10 Certificate Request Information:\n"
 msgstr "Дані щодо запиту сертифіката PKCS #10:\n"
 
-#: lib/x509/output.c:2751
+#: lib/x509/output.c:2755
 msgid "Public Key Usage:\n"
 msgstr "Використання відкритого ключа:\n"
 
-#: lib/x509/output.c:2791
+#: lib/x509/output.c:2795
 msgid "Public Key Information:\n"
 msgstr "Дані відкритого ключа:\n"
 
 #: libdane/dane.c:1050
-#, fuzzy
 msgid "Certificate matches. "
-msgstr "Помилковий сертифікат"
+msgstr "Сертифікати є відповідними. "
 
 #: libdane/dane.c:1053
-#, fuzzy
 msgid "Verification failed. "
-msgstr "Спроба розшифрування зазнала невдачі"
+msgstr "Перевірку не пройдено. "
 
 #: libdane/dane.c:1058
-#, fuzzy
 msgid "CA constrains were violated. "
-msgstr "Досягнуто деяких граничних обмежень."
+msgstr "Порушення обмежень CA. "
 
 #: libdane/dane.c:1062
-#, fuzzy
 msgid "The certificate differs. "
-msgstr "Помилковий сертифікат"
+msgstr "Невідповідність сертифіката. "
 
 #: libdane/dane.c:1067
 msgid "There were no DANE information. "
-msgstr ""
+msgstr "Немає даних DANE. "
 
 #: libdane/errors.c:43
 msgid "There was error initializing the DNS query."
-msgstr ""
+msgstr "Помилка під час ініціалізації запису DNS."
 
 #: libdane/errors.c:45
 msgid "There was an error while resolving."
-msgstr ""
+msgstr "Помилка під час розв'язування."
 
 #: libdane/errors.c:47
-#, fuzzy
 msgid "No DANE data were found."
-msgstr "Не було виявлено тимчасових параметрів DH."
+msgstr "Не знайдено даних DANE."
 
 #: libdane/errors.c:49
 msgid "Unknown DANE data were found."
-msgstr ""
+msgstr "Виявлено невідомі дані DANE."
 
 #: libdane/errors.c:51
-#, fuzzy
 msgid "No DNSSEC signature was found."
-msgstr "Не знайдено жодного сертифіката."
+msgstr "Не знайдено підпису DNSSEC."
 
 #: libdane/errors.c:53
 msgid "Received corrupt data."
-msgstr ""
+msgstr "Отримано пошкоджені дані."
 
 #: libdane/errors.c:55
-#, fuzzy
 msgid "The DNSSEC signature is invalid."
-msgstr "Відповідь OCSP є некоректною"
+msgstr "Некоректний підпис DNSSEC."
 
 #: libdane/errors.c:57
 msgid "There was a memory error."
-msgstr ""
+msgstr "Помилка у пам'яті."
 
 #: libdane/errors.c:59
-#, fuzzy
 msgid "The requested data are not available."
 msgstr "Запитані дані недоступні."
 
 #: libdane/errors.c:63
-#, fuzzy
 msgid "There was an error in the certificate."
 msgstr "Помилка у сертифікаті."
 
 #: libdane/errors.c:65
 msgid "There was an error in the public key."
-msgstr ""
+msgstr "Помилка у відкритому ключі."
 
 #: libdane/errors.c:69
-#, fuzzy
 msgid "Error in file."
-msgstr "Помилка у файлі паролів."
+msgstr "Помилка у файлі."
 
 #~ msgid "Received a TLS/IA Intermediate Phase Finished message"
 #~ msgstr "Отримано повідомлення щодо завершення проміжної фази TLS/IA"

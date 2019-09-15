@@ -327,8 +327,8 @@ am__libgnutls_la_SOURCES_DIST = abstract_int.h debug.h cipher.h \
 	buffers.h errors.h gnutls_int.h dtls.h handshake.h num.h \
 	algorithms.h dh.h kx.h hash_int.h cipher_int.h db.h auth.h \
 	hello_ext.h handshake-defs.h x509_b64.h sslv2_compat.h datum.h \
-	mpi.h pk.h record.h constate.h global.h tls-sig.h mem.h \
-	session_pack.h str.h str_array.h state.h x509.h \
+	mpi.h pk.h record.h inih/ini.h constate.h global.h tls-sig.h \
+	mem.h session_pack.h str.h str_array.h state.h x509.h \
 	crypto-backend.h srp.h auth/srp_kx.h auth/srp_passwd.h file.h \
 	supplemental.h crypto.h random.h system.h locks.h mbuffers.h \
 	ecc.h pin.h fips.h priority_options.h secrets.h stek.h \
@@ -341,25 +341,26 @@ am__libgnutls_la_SOURCES_DIST = abstract_int.h debug.h cipher.h \
 	pkix_asn1_tab.c gnutls_asn1_tab.c mem.c fingerprint.c \
 	tls-sig.c ecc.c alert.c privkey_raw.c atomic.h system/certs.c \
 	system/threads.c system/fastopen.c system/sockets.c \
-	str-iconv.c system.c profiles.c profiles.h str.c str-unicode.c \
-	str-idna.c state.c cert-cred-x509.c file.c supplemental.c \
-	random.c crypto-api.c crypto-api.h privkey.c pcert.c pubkey.c \
-	locks.c dtls.c system_override.c crypto-backend.c \
-	verify-tofu.c pin.c tpm.c fips.c safe-memfuncs.c atfork.c \
-	atfork.h randomart.c system-keys.h urls.c urls.h prf.c \
-	auto-verify.c dh-session.c cert-session.c handshake-checks.c \
-	dtls-sw.c dh-primes.c openpgp_compat.c crypto-selftests.c \
-	crypto-selftests-pk.c secrets.c extv.c extv.h hello_ext_lib.c \
-	hello_ext_lib.h ocsp-api.c stek.c cert-cred-rawpk.c \
-	system/keys-win.c system/keys-dummy.c \
-	tls13/encrypted_extensions.c tls13/encrypted_extensions.h \
-	tls13/certificate_request.c tls13/certificate_request.h \
-	tls13/certificate_verify.c tls13/certificate_verify.h \
-	tls13-sig.c tls13-sig.h tls13/finished.c tls13/finished.h \
-	tls13/key_update.c tls13/key_update.h tls13/hello_retry.c \
-	tls13/hello_retry.h tls13/session_ticket.c \
-	tls13/session_ticket.h tls13/certificate.c tls13/certificate.h \
-	tls13/early_data.c tls13/early_data.h tls13/post_handshake.c \
+	str-iconv.c system.c profiles.c profiles.h inih/ini.c str.c \
+	str-unicode.c str-idna.c state.c cert-cred-x509.c file.c \
+	supplemental.c random.c crypto-api.c crypto-api.h privkey.c \
+	pcert.c pubkey.c locks.c dtls.c system_override.c \
+	crypto-backend.c verify-tofu.c pin.c tpm.c fips.c \
+	safe-memfuncs.c atfork.c atfork.h randomart.c name_val_array.h \
+	system-keys.h urls.c urls.h prf.c auto-verify.c dh-session.c \
+	cert-session.c handshake-checks.c dtls-sw.c dh-primes.c \
+	openpgp_compat.c crypto-selftests.c crypto-selftests-pk.c \
+	secrets.c extv.c extv.h hello_ext_lib.c hello_ext_lib.h \
+	ocsp-api.c stek.c cert-cred-rawpk.c system/keys-win.c \
+	system/keys-dummy.c tls13/encrypted_extensions.c \
+	tls13/encrypted_extensions.h tls13/certificate_request.c \
+	tls13/certificate_request.h tls13/certificate_verify.c \
+	tls13/certificate_verify.h tls13-sig.c tls13-sig.h \
+	tls13/finished.c tls13/finished.h tls13/key_update.c \
+	tls13/key_update.h tls13/hello_retry.c tls13/hello_retry.h \
+	tls13/session_ticket.c tls13/session_ticket.h \
+	tls13/certificate.c tls13/certificate.h tls13/early_data.c \
+	tls13/early_data.h tls13/post_handshake.c \
 	tls13/psk_ext_parser.c tls13/psk_ext_parser.h \
 	tls13/anti_replay.c tls13/anti_replay.h pkcs11.c pkcs11x.c \
 	pkcs11_privkey.c pkcs11_write.c pkcs11_secret.c pkcs11_int.c \
@@ -381,12 +382,13 @@ am__objects_6 = range.lo record.lo compress.lo debug.lo cipher.lo \
 	pkix_asn1_tab.lo gnutls_asn1_tab.lo mem.lo fingerprint.lo \
 	tls-sig.lo ecc.lo alert.lo privkey_raw.lo system/certs.lo \
 	system/threads.lo system/fastopen.lo system/sockets.lo \
-	str-iconv.lo system.lo profiles.lo str.lo str-unicode.lo \
-	str-idna.lo state.lo cert-cred-x509.lo file.lo supplemental.lo \
-	random.lo crypto-api.lo privkey.lo pcert.lo pubkey.lo locks.lo \
-	dtls.lo system_override.lo crypto-backend.lo verify-tofu.lo \
-	pin.lo tpm.lo fips.lo safe-memfuncs.lo atfork.lo randomart.lo \
-	urls.lo prf.lo auto-verify.lo dh-session.lo cert-session.lo \
+	str-iconv.lo system.lo profiles.lo inih/ini.lo str.lo \
+	str-unicode.lo str-idna.lo state.lo cert-cred-x509.lo file.lo \
+	supplemental.lo random.lo crypto-api.lo privkey.lo pcert.lo \
+	pubkey.lo locks.lo dtls.lo system_override.lo \
+	crypto-backend.lo verify-tofu.lo pin.lo tpm.lo fips.lo \
+	safe-memfuncs.lo atfork.lo randomart.lo urls.lo prf.lo \
+	auto-verify.lo dh-session.lo cert-session.lo \
 	handshake-checks.lo dtls-sw.lo dh-primes.lo openpgp_compat.lo \
 	crypto-selftests.lo crypto-selftests-pk.lo secrets.lo extv.lo \
 	hello_ext_lib.lo ocsp-api.lo stek.lo cert-cred-rawpk.lo \
@@ -481,10 +483,11 @@ am__depfiles_remade = ./$(DEPDIR)/alert.Plo ./$(DEPDIR)/anon_cred.Plo \
 	./$(DEPDIR)/system_override.Plo ./$(DEPDIR)/tls-sig.Plo \
 	./$(DEPDIR)/tls13-sig.Plo ./$(DEPDIR)/tpm.Plo \
 	./$(DEPDIR)/urls.Plo ./$(DEPDIR)/verify-tofu.Plo \
-	./$(DEPDIR)/x509_b64.Plo system/$(DEPDIR)/certs.Plo \
-	system/$(DEPDIR)/fastopen.Plo system/$(DEPDIR)/keys-dummy.Plo \
-	system/$(DEPDIR)/keys-win.Plo system/$(DEPDIR)/sockets.Plo \
-	system/$(DEPDIR)/threads.Plo tls13/$(DEPDIR)/anti_replay.Plo \
+	./$(DEPDIR)/x509_b64.Plo inih/$(DEPDIR)/ini.Plo \
+	system/$(DEPDIR)/certs.Plo system/$(DEPDIR)/fastopen.Plo \
+	system/$(DEPDIR)/keys-dummy.Plo system/$(DEPDIR)/keys-win.Plo \
+	system/$(DEPDIR)/sockets.Plo system/$(DEPDIR)/threads.Plo \
+	tls13/$(DEPDIR)/anti_replay.Plo \
 	tls13/$(DEPDIR)/certificate.Plo \
 	tls13/$(DEPDIR)/certificate_request.Plo \
 	tls13/$(DEPDIR)/certificate_verify.Plo \
@@ -1745,37 +1748,37 @@ COBJECTS = range.c record.c compress.c debug.c cipher.c gthreads.h \
 	gnutls_asn1_tab.c mem.c fingerprint.c tls-sig.c ecc.c alert.c \
 	privkey_raw.c atomic.h system/certs.c system/threads.c \
 	system/fastopen.c system/sockets.c str-iconv.c system.c \
-	profiles.c profiles.h str.c str-unicode.c str-idna.c state.c \
-	cert-cred-x509.c file.c supplemental.c random.c crypto-api.c \
-	crypto-api.h privkey.c pcert.c pubkey.c locks.c dtls.c \
-	system_override.c crypto-backend.c verify-tofu.c pin.c tpm.c \
-	fips.c safe-memfuncs.c atfork.c atfork.h randomart.c \
-	system-keys.h urls.c urls.h prf.c auto-verify.c dh-session.c \
-	cert-session.c handshake-checks.c dtls-sw.c dh-primes.c \
-	openpgp_compat.c crypto-selftests.c crypto-selftests-pk.c \
-	secrets.c extv.c extv.h hello_ext_lib.c hello_ext_lib.h \
-	ocsp-api.c stek.c cert-cred-rawpk.c $(am__append_5) \
-	$(am__append_6) tls13/encrypted_extensions.c \
-	tls13/encrypted_extensions.h tls13/certificate_request.c \
-	tls13/certificate_request.h tls13/certificate_verify.c \
-	tls13/certificate_verify.h tls13-sig.c tls13-sig.h \
-	tls13/finished.c tls13/finished.h tls13/key_update.c \
-	tls13/key_update.h tls13/hello_retry.c tls13/hello_retry.h \
-	tls13/session_ticket.c tls13/session_ticket.h \
-	tls13/certificate.c tls13/certificate.h tls13/early_data.c \
-	tls13/early_data.h tls13/post_handshake.c \
+	profiles.c profiles.h inih/ini.c str.c str-unicode.c \
+	str-idna.c state.c cert-cred-x509.c file.c supplemental.c \
+	random.c crypto-api.c crypto-api.h privkey.c pcert.c pubkey.c \
+	locks.c dtls.c system_override.c crypto-backend.c \
+	verify-tofu.c pin.c tpm.c fips.c safe-memfuncs.c atfork.c \
+	atfork.h randomart.c name_val_array.h system-keys.h urls.c \
+	urls.h prf.c auto-verify.c dh-session.c cert-session.c \
+	handshake-checks.c dtls-sw.c dh-primes.c openpgp_compat.c \
+	crypto-selftests.c crypto-selftests-pk.c secrets.c extv.c \
+	extv.h hello_ext_lib.c hello_ext_lib.h ocsp-api.c stek.c \
+	cert-cred-rawpk.c $(am__append_5) $(am__append_6) \
+	tls13/encrypted_extensions.c tls13/encrypted_extensions.h \
+	tls13/certificate_request.c tls13/certificate_request.h \
+	tls13/certificate_verify.c tls13/certificate_verify.h \
+	tls13-sig.c tls13-sig.h tls13/finished.c tls13/finished.h \
+	tls13/key_update.c tls13/key_update.h tls13/hello_retry.c \
+	tls13/hello_retry.h tls13/session_ticket.c \
+	tls13/session_ticket.h tls13/certificate.c tls13/certificate.h \
+	tls13/early_data.c tls13/early_data.h tls13/post_handshake.c \
 	tls13/psk_ext_parser.c tls13/psk_ext_parser.h \
 	tls13/anti_replay.c tls13/anti_replay.h $(am__append_7)
 HFILES = abstract_int.h debug.h cipher.h buffers.h errors.h \
 	gnutls_int.h dtls.h handshake.h num.h algorithms.h dh.h kx.h \
 	hash_int.h cipher_int.h db.h auth.h hello_ext.h \
 	handshake-defs.h x509_b64.h sslv2_compat.h datum.h mpi.h pk.h \
-	record.h constate.h global.h tls-sig.h mem.h session_pack.h \
-	str.h str_array.h state.h x509.h crypto-backend.h srp.h \
-	auth/srp_kx.h auth/srp_passwd.h file.h supplemental.h crypto.h \
-	random.h system.h locks.h mbuffers.h ecc.h pin.h fips.h \
-	priority_options.h secrets.h stek.h cert-cred.h \
-	$(am__append_9)
+	record.h inih/ini.h constate.h global.h tls-sig.h mem.h \
+	session_pack.h str.h str_array.h state.h x509.h \
+	crypto-backend.h srp.h auth/srp_kx.h auth/srp_passwd.h file.h \
+	supplemental.h crypto.h random.h system.h locks.h mbuffers.h \
+	ecc.h pin.h fips.h priority_options.h secrets.h stek.h \
+	cert-cred.h $(am__append_9)
 libgnutls_la_SOURCES = $(HFILES) $(COBJECTS) $(SRP_COBJECTS)	\
 	$(PSK_COBJECTS) \
 	gnutls.asn pkix.asn libgnutls.map
@@ -1894,6 +1897,13 @@ system/fastopen.lo: system/$(am__dirstamp) \
 	system/$(DEPDIR)/$(am__dirstamp)
 system/sockets.lo: system/$(am__dirstamp) \
 	system/$(DEPDIR)/$(am__dirstamp)
+inih/$(am__dirstamp):
+	@$(MKDIR_P) inih
+	@: > inih/$(am__dirstamp)
+inih/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) inih/$(DEPDIR)
+	@: > inih/$(DEPDIR)/$(am__dirstamp)
+inih/ini.lo: inih/$(am__dirstamp) inih/$(DEPDIR)/$(am__dirstamp)
 system/keys-win.lo: system/$(am__dirstamp) \
 	system/$(DEPDIR)/$(am__dirstamp)
 system/keys-dummy.lo: system/$(am__dirstamp) \
@@ -1937,6 +1947,8 @@ libgnutlsxx.la: $(libgnutlsxx_la_OBJECTS) $(libgnutlsxx_la_DEPENDENCIES) $(EXTRA
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
+	-rm -f inih/*.$(OBJEXT)
+	-rm -f inih/*.lo
 	-rm -f system/*.$(OBJEXT)
 	-rm -f system/*.lo
 	-rm -f tls13/*.$(OBJEXT)
@@ -2037,6 +2049,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/urls.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/verify-tofu.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/x509_b64.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@inih/$(DEPDIR)/ini.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@system/$(DEPDIR)/certs.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@system/$(DEPDIR)/fastopen.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@system/$(DEPDIR)/keys-dummy.Plo@am__quote@ # am--include-marker
@@ -2122,6 +2135,7 @@ mostlyclean-libtool:
 
 clean-libtool:
 	-rm -rf .libs _libs
+	-rm -rf inih/.libs inih/_libs
 	-rm -rf system/.libs system/_libs
 	-rm -rf tls13/.libs tls13/_libs
 install-defexecDATA: $(defexec_DATA)
@@ -2360,6 +2374,8 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
+	-rm -f inih/$(DEPDIR)/$(am__dirstamp)
+	-rm -f inih/$(am__dirstamp)
 	-rm -f system/$(DEPDIR)/$(am__dirstamp)
 	-rm -f system/$(am__dirstamp)
 	-rm -f tls13/$(DEPDIR)/$(am__dirstamp)
@@ -2468,6 +2484,7 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/urls.Plo
 	-rm -f ./$(DEPDIR)/verify-tofu.Plo
 	-rm -f ./$(DEPDIR)/x509_b64.Plo
+	-rm -f inih/$(DEPDIR)/ini.Plo
 	-rm -f system/$(DEPDIR)/certs.Plo
 	-rm -f system/$(DEPDIR)/fastopen.Plo
 	-rm -f system/$(DEPDIR)/keys-dummy.Plo
@@ -2623,6 +2640,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/urls.Plo
 	-rm -f ./$(DEPDIR)/verify-tofu.Plo
 	-rm -f ./$(DEPDIR)/x509_b64.Plo
+	-rm -f inih/$(DEPDIR)/ini.Plo
 	-rm -f system/$(DEPDIR)/certs.Plo
 	-rm -f system/$(DEPDIR)/fastopen.Plo
 	-rm -f system/$(DEPDIR)/keys-dummy.Plo

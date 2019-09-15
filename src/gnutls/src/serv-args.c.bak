@@ -63,8 +63,8 @@ extern FILE * option_usage_fp;
 /**
  *  static const strings for gnutls-serv options
  */
-static char const gnutls_serv_opt_strs[3668] =
-/*     0 */ "gnutls-serv 3.6.8\n"
+static char const gnutls_serv_opt_strs[3776] =
+/*     0 */ "gnutls-serv 3.6.9\n"
             "Copyright (C) 2000-2019 Free Software Foundation, and others, all rights reserved.\n"
             "This is free software. It is licensed for use, modification and\n"
             "redistribution under the terms of the GNU General Public License,\n"
@@ -205,20 +205,26 @@ static char const gnutls_serv_opt_strs[3668] =
 /*  3184 */ "Size of the exported keying material\0"
 /*  3221 */ "KEYMATEXPORTSIZE\0"
 /*  3238 */ "keymatexportsize\0"
-/*  3255 */ "display extended usage information and exit\0"
-/*  3299 */ "help\0"
-/*  3304 */ "extended usage information passed thru pager\0"
-/*  3349 */ "more-help\0"
-/*  3359 */ "output version information and exit\0"
-/*  3395 */ "version\0"
-/*  3403 */ "GNUTLS_SERV\0"
-/*  3415 */ "gnutls-serv - GnuTLS server\n"
+/*  3255 */ "The maximum record size to advertise\0"
+/*  3292 */ "RECORDSIZE\0"
+/*  3303 */ "recordsize\0"
+/*  3314 */ "The data used as HTTP response\0"
+/*  3345 */ "HTTPDATA\0"
+/*  3354 */ "httpdata\0"
+/*  3363 */ "display extended usage information and exit\0"
+/*  3407 */ "help\0"
+/*  3412 */ "extended usage information passed thru pager\0"
+/*  3457 */ "more-help\0"
+/*  3467 */ "output version information and exit\0"
+/*  3503 */ "version\0"
+/*  3511 */ "GNUTLS_SERV\0"
+/*  3523 */ "gnutls-serv - GnuTLS server\n"
             "Usage:  %s [ -<flag> [<val>] | --<name>[{=| }<val>] ]...\n\0"
-/*  3501 */ "bugs@gnutls.org\0"
-/*  3517 */ "\n\0"
-/*  3519 */ "Server program that listens to incoming TLS connections.\n\0"
-/*  3577 */ "gnutls-serv 3.6.8\0"
-/*  3595 */ "Usage: gnutls-serv [options]\n"
+/*  3609 */ "bugs@gnutls.org\0"
+/*  3625 */ "\n\0"
+/*  3627 */ "Server program that listens to incoming TLS connections.\n\0"
+/*  3685 */ "gnutls-serv 3.6.9\0"
+/*  3703 */ "Usage: gnutls-serv [options]\n"
             "gnutls-serv --help for usage instructions.\n";
 
 /**
@@ -771,14 +777,40 @@ static int const aDisable_Client_CertCantList[] = {
 #define KEYMATEXPORTSIZE_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_NUMERIC))
 
+/**
+ *  recordsize option description:
+ */
+/** Descriptive text for the recordsize option */
+#define RECORDSIZE_DESC      (gnutls_serv_opt_strs+3255)
+/** Upper-cased name for the recordsize option */
+#define RECORDSIZE_NAME      (gnutls_serv_opt_strs+3292)
+/** Name string for the recordsize option */
+#define RECORDSIZE_name      (gnutls_serv_opt_strs+3303)
+/** Compiled in flag settings for the recordsize option */
+#define RECORDSIZE_FLAGS     (OPTST_DISABLED \
+        | OPTST_SET_ARGTYPE(OPARG_TYPE_NUMERIC))
+
+/**
+ *  httpdata option description:
+ */
+/** Descriptive text for the httpdata option */
+#define HTTPDATA_DESC      (gnutls_serv_opt_strs+3314)
+/** Upper-cased name for the httpdata option */
+#define HTTPDATA_NAME      (gnutls_serv_opt_strs+3345)
+/** Name string for the httpdata option */
+#define HTTPDATA_name      (gnutls_serv_opt_strs+3354)
+/** Compiled in flag settings for the httpdata option */
+#define HTTPDATA_FLAGS     (OPTST_DISABLED \
+        | OPTST_SET_ARGTYPE(OPARG_TYPE_FILE))
+
 /*
  *  Help/More_Help/Version option descriptions:
  */
-#define HELP_DESC       (gnutls_serv_opt_strs+3255)
-#define HELP_name       (gnutls_serv_opt_strs+3299)
+#define HELP_DESC       (gnutls_serv_opt_strs+3363)
+#define HELP_name       (gnutls_serv_opt_strs+3407)
 #ifdef HAVE_WORKING_FORK
-#define MORE_HELP_DESC  (gnutls_serv_opt_strs+3304)
-#define MORE_HELP_name  (gnutls_serv_opt_strs+3349)
+#define MORE_HELP_DESC  (gnutls_serv_opt_strs+3412)
+#define MORE_HELP_name  (gnutls_serv_opt_strs+3457)
 #define MORE_HELP_FLAGS (OPTST_IMM | OPTST_NO_INIT)
 #else
 #define MORE_HELP_DESC  HELP_DESC
@@ -791,8 +823,8 @@ static int const aDisable_Client_CertCantList[] = {
 #  define VER_FLAGS     (OPTST_SET_ARGTYPE(OPARG_TYPE_STRING) | \
                          OPTST_ARG_OPTIONAL | OPTST_IMM | OPTST_NO_INIT)
 #endif
-#define VER_DESC        (gnutls_serv_opt_strs+3359)
-#define VER_name        (gnutls_serv_opt_strs+3395)
+#define VER_DESC        (gnutls_serv_opt_strs+3467)
+#define VER_name        (gnutls_serv_opt_strs+3503)
 /**
  *  Declare option callback procedures
  */
@@ -802,11 +834,12 @@ extern tOptProc
     optionStackArg,     optionTimeDate,     optionTimeVal,
     optionUnstackArg,   optionVendorOption;
 static tOptProc
-    doOptDebug,           doOptDhparams,        doOptMaxearlydata,
-    doOptMtu,             doOptPgpkeyfile,      doOptProvider,
-    doOptPskpasswd,       doOptSrppasswd,       doOptSrppasswdconf,
-    doOptX509crlfile,     doOptX509dsacertfile, doOptX509dsakeyfile,
-    doOptX509ecccertfile, doOptX509ecckeyfile,  doUsageOpt;
+    doOptDebug,           doOptDhparams,        doOptHttpdata,
+    doOptMaxearlydata,    doOptMtu,             doOptPgpkeyfile,
+    doOptProvider,        doOptPskpasswd,       doOptRecordsize,
+    doOptSrppasswd,       doOptSrppasswdconf,   doOptX509crlfile,
+    doOptX509dsacertfile, doOptX509dsakeyfile,  doOptX509ecccertfile,
+    doOptX509ecckeyfile,  doUsageOpt;
 #define VER_PROC        optionPrintVersion
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -1344,6 +1377,30 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ KEYMATEXPORTSIZE_DESC, KEYMATEXPORTSIZE_NAME, KEYMATEXPORTSIZE_name,
      /* disablement strs */ NULL, NULL },
 
+  {  /* entry idx, value */ 44, VALUE_OPT_RECORDSIZE,
+     /* equiv idx, value */ 44, VALUE_OPT_RECORDSIZE,
+     /* equivalenced to  */ NO_EQUIVALENT,
+     /* min, max, act ct */ 0, 1, 0,
+     /* opt state flags  */ RECORDSIZE_FLAGS, 0,
+     /* last opt argumnt */ { NULL }, /* --recordsize */
+     /* arg list/cookie  */ NULL,
+     /* must/cannot opts */ NULL, NULL,
+     /* option proc      */ doOptRecordsize,
+     /* desc, NAME, name */ RECORDSIZE_DESC, RECORDSIZE_NAME, RECORDSIZE_name,
+     /* disablement strs */ NULL, NULL },
+
+  {  /* entry idx, value */ 45, VALUE_OPT_HTTPDATA,
+     /* equiv idx, value */ 45, VALUE_OPT_HTTPDATA,
+     /* equivalenced to  */ NO_EQUIVALENT,
+     /* min, max, act ct */ 0, 1, 0,
+     /* opt state flags  */ HTTPDATA_FLAGS, 0,
+     /* last opt argumnt */ { NULL }, /* --httpdata */
+     /* arg list/cookie  */ NULL,
+     /* must/cannot opts */ NULL, NULL,
+     /* option proc      */ doOptHttpdata,
+     /* desc, NAME, name */ HTTPDATA_DESC, HTTPDATA_NAME, HTTPDATA_name,
+     /* disablement strs */ NULL, NULL },
+
   {  /* entry idx, value */ INDEX_OPT_VERSION, VALUE_OPT_VERSION,
      /* equiv idx value  */ NO_EQUIVALENT, VALUE_OPT_VERSION,
      /* equivalenced to  */ NO_EQUIVALENT,
@@ -1386,21 +1443,21 @@ static tOptDesc optDesc[OPTION_CT] = {
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 /** Reference to the upper cased version of gnutls-serv. */
-#define zPROGNAME       (gnutls_serv_opt_strs+3403)
+#define zPROGNAME       (gnutls_serv_opt_strs+3511)
 /** Reference to the title line for gnutls-serv usage. */
-#define zUsageTitle     (gnutls_serv_opt_strs+3415)
+#define zUsageTitle     (gnutls_serv_opt_strs+3523)
 /** There is no gnutls-serv configuration file. */
 #define zRcName         NULL
 /** There are no directories to search for gnutls-serv config files. */
 #define apzHomeList     NULL
 /** The gnutls-serv program bug email address. */
-#define zBugsAddr       (gnutls_serv_opt_strs+3501)
+#define zBugsAddr       (gnutls_serv_opt_strs+3609)
 /** Clarification/explanation of what gnutls-serv does. */
-#define zExplain        (gnutls_serv_opt_strs+3517)
+#define zExplain        (gnutls_serv_opt_strs+3625)
 /** Extra detail explaining what gnutls-serv does. */
-#define zDetail         (gnutls_serv_opt_strs+3519)
+#define zDetail         (gnutls_serv_opt_strs+3627)
 /** The full version string for gnutls-serv. */
-#define zFullVersion    (gnutls_serv_opt_strs+3577)
+#define zFullVersion    (gnutls_serv_opt_strs+3685)
 /* extracted from optcode.tlib near line 364 */
 
 #if defined(ENABLE_NLS)
@@ -1412,7 +1469,7 @@ static tOptDesc optDesc[OPTION_CT] = {
 #endif /* ENABLE_NLS */
 
 #define gnutls_serv_full_usage (NULL)
-#define gnutls_serv_short_usage (gnutls_serv_opt_strs+3595)
+#define gnutls_serv_short_usage (gnutls_serv_opt_strs+3703)
 
 #endif /* not defined __doxygen__ */
 
@@ -1774,6 +1831,65 @@ doOptProvider(tOptions* pOptions, tOptDesc* pOptDesc)
      */
     optionFileCheck(pOptions, pOptDesc, type, mode);
 }
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/**
+ * Code to handle the recordsize option.
+ *
+ * @param[in] pOptions the gnutls-serv options data structure
+ * @param[in,out] pOptDesc the option descriptor for this option.
+ */
+static void
+doOptRecordsize(tOptions* pOptions, tOptDesc* pOptDesc)
+{
+    static struct {long rmin, rmax;} const rng[1] = {
+        { 0, 16384 } };
+    int  ix;
+
+    if (pOptions <= OPTPROC_EMIT_LIMIT)
+        goto emit_ranges;
+    optionNumericVal(pOptions, pOptDesc);
+
+    for (ix = 0; ix < 1; ix++) {
+        if (pOptDesc->optArg.argInt < rng[ix].rmin)
+            continue;  /* ranges need not be ordered. */
+        if (pOptDesc->optArg.argInt == rng[ix].rmin)
+            return;
+        if (rng[ix].rmax == LONG_MIN)
+            continue;
+        if (pOptDesc->optArg.argInt <= rng[ix].rmax)
+            return;
+    }
+
+    option_usage_fp = stderr;
+
+ emit_ranges:
+optionShowRange(pOptions, pOptDesc, VOIDP(rng), 1);
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/**
+ * Code to handle the httpdata option.
+ *
+ * @param[in] pOptions the gnutls-serv options data structure
+ * @param[in,out] pOptDesc the option descriptor for this option.
+ */
+static void
+doOptHttpdata(tOptions* pOptions, tOptDesc* pOptDesc)
+{
+    static teOptFileType const  type =
+        FTYPE_MODE_MUST_EXIST + FTYPE_MODE_NO_OPEN;
+    static tuFileMode           mode;
+#ifndef O_CLOEXEC
+#  define O_CLOEXEC 0
+#endif
+    mode.file_flags = O_CLOEXEC;
+
+    /*
+     * This function handles special invalid values for "pOptions"
+     */
+    optionFileCheck(pOptions, pOptDesc, type, mode);
+}
 /* extracted from optmain.tlib near line 1250 */
 
 /**
@@ -1838,7 +1954,7 @@ tOptions gnutls_servOptions = {
       NO_EQUIVALENT, /* '-#' option index */
       NO_EQUIVALENT /* index of default opt */
     },
-    47 /* full option count */, 44 /* user option count */,
+    49 /* full option count */, 46 /* user option count */,
     gnutls_serv_full_usage, gnutls_serv_short_usage,
     NULL, NULL,
     PKGDATADIR, gnutls_serv_packager_info
@@ -1973,7 +2089,7 @@ static void bogus_function(void) {
      translate option names.
    */
   /* referenced via gnutls_servOptions.pzCopyright */
-  puts(_("gnutls-serv 3.6.8\n\
+  puts(_("gnutls-serv 3.6.9\n\
 Copyright (C) 2000-2019 Free Software Foundation, and others, all rights reserved.\n\
 This is free software. It is licensed for use, modification and\n\
 redistribution under the terms of the GNU General Public License,\n\
@@ -2124,6 +2240,12 @@ with this program.  If not, see <http://www.gnu.org/licenses/>.\n"));
   puts(_("Size of the exported keying material"));
 
   /* referenced via gnutls_servOptions.pOptDesc->pzText */
+  puts(_("The maximum record size to advertise"));
+
+  /* referenced via gnutls_servOptions.pOptDesc->pzText */
+  puts(_("The data used as HTTP response"));
+
+  /* referenced via gnutls_servOptions.pOptDesc->pzText */
   puts(_("display extended usage information and exit"));
 
   /* referenced via gnutls_servOptions.pOptDesc->pzText */
@@ -2143,7 +2265,7 @@ Usage:  %s [ -<flag> [<val>] | --<name>[{=| }<val>] ]...\n"));
   puts(_("Server program that listens to incoming TLS connections.\n"));
 
   /* referenced via gnutls_servOptions.pzFullVersion */
-  puts(_("gnutls-serv 3.6.8"));
+  puts(_("gnutls-serv 3.6.9"));
 
   /* referenced via gnutls_servOptions.pzFullUsage */
   puts(_("<<<NOT-FOUND>>>"));

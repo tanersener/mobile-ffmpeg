@@ -83,6 +83,10 @@ typedef struct {
 } TLS_TEST;
 
 static const TLS_TEST tls_tests[] = {
+	{"whether the server accepts default record size (512 bytes)",
+	 test_send_record, "yes", "no", "dunno"},
+	{"whether %ALLOW_SMALL_RECORDS is required",
+	 test_send_record_with_allow_small_records, "yes", "no", "dunno"},
 #ifdef ENABLE_SSL3
 	{"for SSL 3.0 (RFC6101) support", test_ssl3, "yes", "no", "dunno"},
 	/* The following tests will disable TLS 1.x if the server is
@@ -94,9 +98,9 @@ static const TLS_TEST tls_tests[] = {
 	 "yes", "dunno"},
 	{"whether we need to disable TLS 1.0", test_tls_disable0, "no",
 	 "yes", "dunno"},
-	{"whether \%NO_EXTENSIONS is required", test_no_extensions, "no", "yes",
+	{"whether %NO_EXTENSIONS is required", test_no_extensions, "no", "yes",
 	 "dunno"},
-	{"whether \%COMPAT is required", test_record_padding, "no", "yes",
+	{"whether %COMPAT is required", test_record_padding, "no", "yes",
 	 "dunno"},
 	{"for TLS 1.0 (RFC2246) support", test_tls1, "yes", "no", "dunno"},
 	{"for TLS 1.0 (RFC2246) support with TLS 1.0 record version", test_tls1_nossl3, "yes", "no", "dunno"},
@@ -145,6 +149,9 @@ static const TLS_TEST tls_tests[] = {
 	{"anonymous Diffie-Hellman group info", test_dhe_group, NULL, "N/A",
 	 "N/A"},
 #endif
+	{"for RSA key exchange support", test_rsa, "yes",
+	 "no",
+	 "dunno"},
 	{"for ephemeral Diffie-Hellman support", test_dhe, "yes", "no",
 	 "dunno"},
 	{"for RFC7919 Diffie-Hellman support", test_rfc7919, "yes", "no",

@@ -64,7 +64,7 @@ extern FILE * option_usage_fp;
  *  static const strings for psktool options
  */
 static char const psktool_opt_strs[1586] =
-/*     0 */ "psktool 3.6.8\n"
+/*     0 */ "psktool 3.6.9\n"
             "Copyright (C) 2000-2019 Free Software Foundation, and others, all rights reserved.\n"
             "This is free software. It is licensed for use, modification and\n"
             "redistribution under the terms of the GNU General Public License,\n"
@@ -106,7 +106,7 @@ static char const psktool_opt_strs[1586] =
 /*  1396 */ "\n\0"
 /*  1398 */ "Program that generates random keys for use with TLS-PSK.  The keys are\n"
             "stored in hexadecimal format in a key file.\n\0"
-/*  1514 */ "psktool 3.6.8\0"
+/*  1514 */ "psktool 3.6.9\0"
 /*  1528 */ "psktool [options]\n"
             "psktool --help for usage instructions.\n";
 
@@ -652,7 +652,7 @@ static void bogus_function(void) {
      translate option names.
    */
   /* referenced via psktoolOptions.pzCopyright */
-  puts(_("psktool 3.6.8\n\
+  puts(_("psktool 3.6.9\n\
 Copyright (C) 2000-2019 Free Software Foundation, and others, all rights reserved.\n\
 This is free software. It is licensed for use, modification and\n\
 redistribution under the terms of the GNU General Public License,\n\
@@ -706,7 +706,7 @@ Usage:  %s [ -<flag> [<val>] | --<name>[{=| }<val>] ]...\n"));
 stored in hexadecimal format in a key file.\n"));
 
   /* referenced via psktoolOptions.pzFullVersion */
-  puts(_("psktool 3.6.8"));
+  puts(_("psktool 3.6.9"));
 
   /* referenced via psktoolOptions.pzFullUsage */
   puts(_("<<<NOT-FOUND>>>"));

@@ -151,7 +151,7 @@ gnutls_TEXINFOS = gnutls.texi fdl-1.3.texi				\
 	cha-library.texi cha-preface.texi cha-programs.texi		\
 	sec-tls-app.texi cha-errors.texi cha-support.texi		\
 	cha-shared-key.texi cha-gtls-examples.texi cha-upgrade.texi	\
-	cha-tokens.texi cha-crypto.texi cha-auth.texi
+	cha-tokens.texi cha-crypto.texi cha-auth.texi cha-config.texi
 
 AUTOGENED_DOC = invoke-gnutls-cli.texi invoke-gnutls-cli-debug.texi \
 	invoke-gnutls-serv.texi invoke-certtool.texi invoke-srptool.texi \
@@ -1027,6 +1027,8 @@ FUNCS += functions/gnutls_fips140_mode_enabled
 FUNCS += functions/gnutls_fips140_mode_enabled.short
 FUNCS += functions/gnutls_fips140_set_mode
 FUNCS += functions/gnutls_fips140_set_mode.short
+FUNCS += functions/gnutls_get_system_config_file
+FUNCS += functions/gnutls_get_system_config_file.short
 FUNCS += functions/gnutls_global_deinit
 FUNCS += functions/gnutls_global_deinit.short
 FUNCS += functions/gnutls_global_init
@@ -1077,6 +1079,8 @@ FUNCS += functions/gnutls_handshake_set_timeout
 FUNCS += functions/gnutls_handshake_set_timeout.short
 FUNCS += functions/gnutls_hash
 FUNCS += functions/gnutls_hash.short
+FUNCS += functions/gnutls_hash_copy
+FUNCS += functions/gnutls_hash_copy.short
 FUNCS += functions/gnutls_hash_deinit
 FUNCS += functions/gnutls_hash_deinit.short
 FUNCS += functions/gnutls_hash_fast
@@ -1111,6 +1115,8 @@ FUNCS += functions/gnutls_hex_encode2
 FUNCS += functions/gnutls_hex_encode2.short
 FUNCS += functions/gnutls_hmac
 FUNCS += functions/gnutls_hmac.short
+FUNCS += functions/gnutls_hmac_copy
+FUNCS += functions/gnutls_hmac_copy.short
 FUNCS += functions/gnutls_hmac_deinit
 FUNCS += functions/gnutls_hmac_deinit.short
 FUNCS += functions/gnutls_hmac_fast

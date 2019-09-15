@@ -117,8 +117,6 @@ int _gnutls13_recv_key_update(gnutls_session_t session, gnutls_buffer_st *buf)
 			session->internals.rsend_state = RECORD_SEND_KEY_UPDATE_1;
 		else if (session->internals.rsend_state == RECORD_SEND_CORKED)
 			session->internals.rsend_state = RECORD_SEND_CORKED_TO_KU;
-		else
-			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
 		break;
 	default:

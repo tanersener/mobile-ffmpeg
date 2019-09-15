@@ -45,17 +45,17 @@ VC_LIST_ALWAYS_EXCLUDE_REGEX = ^maint.mk|gtk-doc.make|m4/pkg|doc/fdl-1.3.texi|sr
 update-copyright-env = UPDATE_COPYRIGHT_USE_INTERVALS=1
 
 # Explicit syntax-check exceptions.
-exclude_file_name_regexp--sc_error_message_period = ^src/crywrap/crywrap.c$$
 exclude_file_name_regexp--sc_error_message_uppercase = ^doc/examples/ex-cxx.cpp|guile/src/core.c|src/certtool.c|src/ocsptool.c|src/crywrap/crywrap.c|tests/pkcs12_encode.c$$
 exclude_file_name_regexp--sc_file_system = ^doc/doxygen/Doxyfile
 exclude_file_name_regexp--sc_prohibit_cvs_keyword = ^lib/nettle/.*$$
 exclude_file_name_regexp--sc_prohibit_undesirable_word_seq = ^tests/nist-pkits/gnutls-nist-tests.html$$
-exclude_file_name_regexp--sc_space_tab = ^doc/.*.(pdf|png)|\.crl|\.pdf|\.zip|tests/nist-pkits/|tests/data/|devel/|tests/suite/x509paths/.*|fuzz/.*\.repro|fuzz/.*\.in/.*$$
+exclude_file_name_regexp--sc_space_tab = ^doc/.*.(pdf|png)|\.crl|\.pdf|\.zip|tests/nist-pkits/|tests/data/|tests/system-override-curves.sh|devel/|tests/suite/x509paths/.*|fuzz/.*\.repro|fuzz/.*\.in/.*$$
 _makefile_at_at_check_exceptions = ' && !/CODE_COVERAGE_RULES/ && !/VERSION/'
 exclude_file_name_regexp--sc_m4_quote_check='lib/unistring/m4/absolute-header.m4'
 exclude_file_name_regexp--sc_makefile_at_at_check='lib/unistring/Makefile.am'
 exclude_file_name_regexp--sc_prohibit_stddef_without_use='u*-normalize.c'
 exclude_file_name_regexp--sc_prohibit_strncpy='unistr.in.h'
+exclude_file_name_regexp--sc_prohibit_strncpy='lib/inih/ini.c'
 gl_public_submodule_commit =
 
 autoreconf:
@@ -130,14 +130,13 @@ ASM_SOURCES_XXX := \
 	lib/accelerated/aarch64/XXX/sha1-armv8.s \
 	lib/accelerated/aarch64/XXX/sha256-armv8.s \
 	lib/accelerated/aarch64/XXX/sha512-armv8.s \
-	lib/accelerated/x86/XXX/cpuid-x86_64.s \
-	lib/accelerated/x86/XXX/cpuid-x86.s \
 	lib/accelerated/x86/XXX/ghash-x86_64.s \
 	lib/accelerated/x86/XXX/aesni-x86_64.s \
 	lib/accelerated/x86/XXX/aesni-x86.s \
 	lib/accelerated/x86/XXX/sha1-ssse3-x86.s \
 	lib/accelerated/x86/XXX/sha1-ssse3-x86_64.s \
 	lib/accelerated/x86/XXX/sha256-ssse3-x86.s \
+	lib/accelerated/x86/XXX/sha256-ssse3-x86_64.s \
 	lib/accelerated/x86/XXX/sha512-ssse3-x86.s \
 	lib/accelerated/x86/XXX/sha512-ssse3-x86_64.s \
 	lib/accelerated/x86/XXX/aesni-gcm-x86_64.s \
@@ -153,12 +152,12 @@ asm-sources: $(ASM_SOURCES_ELF) $(ASM_SOURCES_COFF) $(ASM_SOURCES_MACOSX) lib/ac
 asm-sources-clean:
 	rm -f $(ASM_SOURCES_ELF) $(ASM_SOURCES_COFF) $(ASM_SOURCES_MACOSX) lib/accelerated/x86/files.mk
 
-X86_FILES=XXX/aesni-x86.s XXX/cpuid-x86.s XXX/sha1-ssse3-x86.s \
+X86_FILES=XXX/aesni-x86.s XXX/sha1-ssse3-x86.s \
 	XXX/sha256-ssse3-x86.s XXX/sha512-ssse3-x86.s XXX/aes-ssse3-x86.s
 
-X86_64_FILES=XXX/aesni-x86_64.s XXX/cpuid-x86_64.s XXX/ghash-x86_64.s \
+X86_64_FILES=XXX/aesni-x86_64.s XXX/ghash-x86_64.s \
 	XXX/sha1-ssse3-x86_64.s XXX/sha512-ssse3-x86_64.s XXX/aes-ssse3-x86_64.s \
-	XXX/aesni-gcm-x86_64.s
+	XXX/aesni-gcm-x86_64.s XXX/sha256-ssse3-x86_64.s
 
 X86_PADLOCK_FILES=XXX/e_padlock-x86.s
 X86_64_PADLOCK_FILES=XXX/e_padlock-x86_64.s
@@ -194,27 +193,27 @@ lib/accelerated/x86/files.mk: $(ASM_SOURCES_ELF)
 
 # Appro's code
 lib/accelerated/x86/elf/%.s: devel/perlasm/%.pl .submodule.stamp 
-	cat $<.license > $@
-	CC=gcc perl $< elf >> $@
+	CC=gcc perl $< elf $@.tmp
+	cat $<.license $@.tmp > $@ && rm -f $@.tmp
 	echo "" >> $@
 	echo ".section .note.GNU-stack,\"\",%progbits" >> $@
 	sed -i 's/OPENSSL_ia32cap_P/_gnutls_x86_cpuid_s/g' $@
 
 lib/accelerated/x86/coff/%-x86.s: devel/perlasm/%-x86.pl .submodule.stamp 
-	cat $<.license > $@
-	CC=gcc perl $< coff >> $@
+	CC=gcc perl $< coff $@.tmp
+	cat $<.license $@.tmp > $@ && rm -f $@.tmp
 	echo "" >> $@
 	sed -i 's/OPENSSL_ia32cap_P/_gnutls_x86_cpuid_s/g' $@
 
 lib/accelerated/x86/coff/%-x86_64.s: devel/perlasm/%-x86_64.pl .submodule.stamp 
-	cat $<.license > $@
-	CC=gcc perl $< mingw64 >> $@
+	CC=gcc perl $< mingw64 $@.tmp
+	cat $<.license $@.tmp > $@ && rm -f $@.tmp
 	echo "" >> $@
 	sed -i 's/OPENSSL_ia32cap_P/_gnutls_x86_cpuid_s/g' $@
 
 lib/accelerated/x86/macosx/%.s: devel/perlasm/%.pl .submodule.stamp 
-	cat $<.license > $@
-	CC=gcc perl $< macosx >> $@
+	CC=gcc perl $< macosx $@.tmp
+	cat $<.license $@.tmp > $@ && rm -f $@.tmp
 	echo "" >> $@
 	sed -i 's/OPENSSL_ia32cap_P/_gnutls_x86_cpuid_s/g' $@
 

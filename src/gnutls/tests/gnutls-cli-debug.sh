@@ -92,6 +92,7 @@ check_text "for safe renegotiation (RFC5746) support... yes"
 check_text "for encrypt-then-MAC (RFC7366) support... yes"
 check_text "for ext master secret (RFC7627) support... yes"
 check_text "for RFC7919 Diffie-Hellman support... yes"
+check_text "for RSA key exchange support... yes"
 check_text "for curve SECP256r1 (RFC4492)... yes"
 check_text "for AES-GCM cipher (RFC5288) support... yes"
 check_text "for SHA1 MAC support... yes"
@@ -132,13 +133,39 @@ check_text "for ext master secret (RFC7627) support... yes"
 check_text "for RFC7919 Diffie-Hellman support... yes"
 check_text "for curve SECP256r1 (RFC4492)... yes"
 check_text "for AES-GCM cipher (RFC5288) support... yes"
+check_text "for RSA key exchange support... yes"
 check_text "for SHA1 MAC support... yes"
+check_text "whether the server accepts default record size (512 bytes)... yes"
+check_text "whether %ALLOW_SMALL_RECORDS is required... no"
+
 if test "${GNUTLS_FORCE_FIPS_MODE}" != 1; then
 	#these tests are not run in FIPS mode
 	check_text "for MD5 MAC support... no"
 	check_text "for ARCFOUR 128 cipher (RFC2246) support... no"
 	check_text "for CHACHA20-POLY1305 cipher (RFC7905) support... yes"
 fi
+
+rm -f ${OUTFILE}
+
+# Small records test
+echo ""
+echo "Checking output of gnutls-cli-debug for small records and no RSA"
+
+eval "${GETPORT}"
+launch_server $$ --echo --priority "NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:-RSA:%ALLOW_SMALL_RECORDS" --x509keyfile ${KEY1} --x509certfile ${CERT1} \
+	--x509keyfile ${KEY2} --x509certfile ${CERT2} --x509keyfile ${KEY3} --x509certfile ${CERT3} --recordsize=64 >/dev/null 2>&1
+PID=$!
+wait_server ${PID}
+
+timeout 1800 datefudge "2017-08-9" \
+"${DCLI}" -p "${PORT}" localhost >$OUTFILE 2>&1 || fail ${PID} "gnutls-cli-debug run should have succeeded!"
+
+kill ${PID}
+wait
+
+check_text "whether the server accepts default record size (512 bytes)... no"
+check_text "whether %ALLOW_SMALL_RECORDS is required... yes"
+check_text "for RSA key exchange support... no"
 
 rm -f ${OUTFILE}
 

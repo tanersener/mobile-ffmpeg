@@ -26,6 +26,12 @@
 
 #include "auth.h"
 
+#ifdef DISABLE_SYSTEM_CONFIG
+# define SYSTEM_CONFIG_OR_CONST const
+#else
+# define SYSTEM_CONFIG_OR_CONST
+#endif
+
 #define version_to_entry _gnutls_version_to_entry
 
 #define GNUTLS_RENEGO_PROTECTION_REQUEST_MAJOR 0x00
@@ -324,6 +330,13 @@ typedef enum hash_security_level_t {
 	_INSECURE
 } hash_security_level_t;
 
+int _gnutls_ecc_curve_mark_disabled(const char *name);
+int _gnutls_sign_mark_insecure(const char *name, hash_security_level_t);
+int _gnutls_digest_mark_insecure(const char *name);
+unsigned _gnutls_digest_is_insecure(gnutls_digest_algorithm_t dig);
+int _gnutls_version_mark_disabled(const char *name);
+gnutls_protocol_t _gnutls_protocol_get_id_if_supported(const char *name);
+
 struct gnutls_sign_entry_st {
 	const char *name;
 	const char *oid;
@@ -414,10 +427,13 @@ typedef struct gnutls_ecc_curve_entry_st {
 	unsigned size;		/* the size in bytes */
 	unsigned sig_size;	/* the size of curve signatures in bytes (EdDSA) */
 	unsigned gost_curve;
+	bool supported;
 } gnutls_ecc_curve_entry_st;
 
 const gnutls_ecc_curve_entry_st
     *_gnutls_ecc_curve_get_params(gnutls_ecc_curve_t curve);
+
+unsigned _gnutls_ecc_curve_is_supported(gnutls_ecc_curve_t);
 
 const gnutls_group_entry_st *_gnutls_tls_id_to_group(unsigned num);
 const gnutls_group_entry_st * _gnutls_id_to_group(unsigned id);

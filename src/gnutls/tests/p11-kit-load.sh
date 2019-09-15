@@ -22,6 +22,7 @@
 srcdir="${srcdir:-.}"
 builddir="${builddir:-.}"
 CERTTOOL="${CERTTOOL:-../src/certtool${EXEEXT}}"
+P11TOOL="${P11TOOL:-../src/p11tool${EXEEXT}}"
 DIFF="${DIFF:-diff}"
 PKGCONFIG="${PKG_CONFIG:-$(which pkg-config)}"
 TMP_SOFTHSM_DIR="./softhsm-load.$$.tmp"
@@ -87,6 +88,12 @@ echo "directories.tokendir = ${TMP_SOFTHSM_DIR}" >> "${SOFTHSM2_CONF}"
 softhsm2-util --init-token --slot 0 --label "GnuTLS-Test" --so-pin "${PUK}" --pin "${PIN}" >/dev/null #2>&1
 if test $? != 0; then
 	echo "failed to initialize softhsm"
+	exit 1
+fi
+
+GNUTLS_PIN="${PIN}" ${P11TOOL} --login --label GnuTLS-Test-RSA --generate-privkey rsa --provider "${SOFTHSM_MODULE}" pkcs11: --outfile /dev/null
+if test $? != 0; then
+	echo "failed to generate privkey"
 	exit 1
 fi
 
@@ -172,6 +179,22 @@ nr=$(${builddir}/pkcs11/list-tokens -o ${P11DIR} -p|${FILTERTOKEN}|sort -u|wc -l
 if test "$nr" != 2;then
 	echo "Error in test 7: did not find all modules"
 	${builddir}/pkcs11/list-tokens -o ${P11DIR} -p
+	exit 1
+fi
+
+# Check whether public key and privkey are listed.
+nr=$(GNUTLS_PIN="${PIN}" ${builddir}/pkcs11/list-objects -o ${P11DIR} -t all pkcs11:token=GnuTLS-Test|sort -u|wc -l)
+if test "$nr" != 2;then
+	echo "Error in test 8: did not find all objects"
+	${builddir}/pkcs11/list-objects -o ${P11DIR} -t all pkcs11:token=GnuTLS-Test
+	exit 1
+fi
+
+# Check whether all privkeys are listed even if trust module is registered.
+nr=$(GNUTLS_PIN="${PIN}" ${builddir}/pkcs11/list-objects -o ${P11DIR} -t privkey pkcs11:|sort -u|wc -l)
+if test "$nr" != 1;then
+	echo "Error in test 9: did not find privkey objects"
+	${builddir}/pkcs11/list-objects -o ${P11DIR} -t privkey pkcs11:
 	exit 1
 fi
 

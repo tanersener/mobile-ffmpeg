@@ -1,5 +1,5 @@
 /* GnuTLS --- Guile bindings for GnuTLS.
-   Copyright (C) 2007-2012 Free Software Foundation, Inc.
+   Copyright (C) 2007-2012, 2019 Free Software Foundation, Inc.
 
    GnuTLS is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -51,6 +51,16 @@ scm_gnutls_error (int c_err, const char *c_func)
 {
   scm_gnutls_error_with_args (c_err, c_func, SCM_EOL);
 }
+
+SCM_DEFINE (scm_gnutls_fatal_error_p, "fatal-error?", 1, 0, 0,
+	    (SCM err),
+	    "Return true if @var{error} is fatal.")
+#define FUNC_NAME s_scm_gnutls_fatal_error_p
+{
+  int c_err = scm_to_gnutls_error (err, 1, FUNC_NAME);
+  return scm_from_bool (gnutls_error_is_fatal (c_err));
+}
+#undef FUNC_NAME
 
 
 

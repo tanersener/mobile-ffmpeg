@@ -41,6 +41,7 @@
  * IPv4 server (GOST R 34.10-2001, SAN: localhost): server_ca3_gost01_cert, server_ca3_gost01_key
  * IPv4 server (GOST R 34.10-2012-256, SAN: localhost): server_ca3_gost12-256_cert, server_ca3_gost12-256_key
  * IPv4 server (GOST R 34.10-2012-512, SAN: localhost): server_ca3_gost12-512_cert, server_ca3_gost12-512_key
+ * IPv6 server: server_ca3_tlsfeat_cert, server_ca3_key
  * IPv6 server: server_ca3_localhost6_cert, server_ca3_key
  * IPv4 server: server_ca3_localhost_cert, server_ca3_key
  * IPv4 server: server_ca3_localhost_ecc_cert, server_ca3_ecc_key
@@ -1489,6 +1490,34 @@ static char server_localhost_ca3_cert_pem[] =
 	"6TXY44pCGHMFO6Kr\n"
 	"-----END CERTIFICATE-----\n";
 
+/* shares server_ca3 key with tlsfeature=5 */
+static char server_ca3_tlsfeat_cert_pem[] =
+	"-----BEGIN CERTIFICATE-----"
+	"MIIEOjCCAqKgAwIBAgIUYBRfAcvgBUU4jCb8W89sQcPLqswwDQYJKoZIhvcNAQEL"
+	"BQAwDzENMAsGA1UEAxMEQ0EtMzAgFw0xOTA2MDcyMTA4NDFaGA85OTk5MTIzMTIz"
+	"NTk1OVowIjEgMB4GA1UEAxMXR251VExTIHRlc3QgY2VydGlmaWNhdGUwggGiMA0G"
+	"CSqGSIb3DQEBAQUAA4IBjwAwggGKAoIBgQDZPXiZqiz3wLuz+B4ZnJuCphLEX7k1"
+	"5NcpamL3+9ea4gXyfeFSHbSaihPauBUcDMVbL/wfkhxYiJRCX7wqHIkJK4En5aEz"
+	"SDDa6pI/CI5lSbiXdNDGbFLh5b8Guvhfzyy8lDjFNNy3abkfU270tnzFY5mkYwYg"
+	"juN/RgPqh0b8McT+xUeN9x4PuSXXmMC1r3v7y4JuMxE8ZzGDhW2aQK5Is6QYv0WE"
+	"LS5hVvB8GdP5XQwTJw4HH5i/YES7TENV2RByzRY8hFQ9SbK5YHHGoszVJIlIuxm5"
+	"v8N2Ig1cW6t7t3HnuZbDYRDCERMiEigBz8vEZZyFsMLg5Z7JiNKSG/f+ER9CzDJX"
+	"HgxBctV9EEc2KmRT1P9JeI/xZUOl9lKljc+t8m0Um3Asx5duWm4tcZm7FecnaJiT"
+	"XD/tEG64qTKWtDuoI7+X9MjHe5lvf2gIJT3CoKW24Rn6O1fc9oCCnVAi0V6FLM4X"
+	"aG50X9NC666RVEFkXih8THA1gC9m9NJMrD0CAwEAAaN5MHcwEQYIKwYBBQUHARgE"
+	"BTADAgEFMAwGA1UdEwEB/wQCMAAwFAYDVR0RBA0wC4IJbG9jYWxob3N0MB0GA1Ud"
+	"DgQWBBQzneEn04vV/OsF/LXHgWlPXjvZ1jAfBgNVHSMEGDAWgBT5qIYZY7akFBNg"
+	"dg8BmjU27/G0rzANBgkqhkiG9w0BAQsFAAOCAYEASMVR+C1x3pBRSRaaIYbFTC0X"
+	"VXc66iQWDfpTSokLIEN/UVZzLsQw5p1PntPqnRRudDnXS77rNQSZcc4NTFYrzSqW"
+	"WwdhIXtl3igLg5HMxU80dsr3LfGkzJ1iDS1RR0EGSvFjOE9ZUK0IBdsUvINqpj+l"
+	"6qxL36yfxamuELIxvgmecIMvLzbe7tUjRXneNvLGsLAJcq5QQmNMCWiyywtHbFa0"
+	"zbpxKMJmHMk0SbgZHUuFaASlAqVez19rJdzqQcJiw/YrMbbj/b2me1duLQ64dqGL"
+	"5gKTyDMhk5td53R5uPnr7F6+1u8zRzqA6mBvTfEk4wJ6YmvqdBfC47xT+Ksba6dX"
+	"Ugz+So2iu0rQxaLEBTZJ/gTXJEUafxUN4wF1ZOnUyltoqLJymhQoceoSwjYobOal"
+	"FUZEJgFNA7j8tR7J3MtFUaJqFosuPtxhF8/CCPukKV7bRokqh7zK+F21iaQOYvJn"
+	"AfuOg2g0ZMurGyS/yg8mVsGjh4bho9zPOlhPtFNM"
+	"-----END CERTIFICATE-----";
+
 /* Marked as decrypt-only */
 static char server_localhost_ca3_rsa_decrypt_cert_pem[] =
 	"-----BEGIN CERTIFICATE-----\n"
@@ -1606,6 +1635,9 @@ const gnutls_datum_t server_ca3_localhost_rsa_decrypt_cert = { (unsigned char*)s
 
 const gnutls_datum_t server_ca3_localhost_rsa_sign_cert = { (unsigned char*)server_localhost_ca3_rsa_sign_cert_pem,
 	sizeof(server_localhost_ca3_rsa_sign_cert_pem)-1};
+
+const gnutls_datum_t server_ca3_tlsfeat_cert = { (unsigned char*)server_ca3_tlsfeat_cert_pem,
+	sizeof(server_ca3_tlsfeat_cert_pem)-1};
 
 const gnutls_datum_t server_ca3_localhost_cert_chain = {
 	(unsigned char*)server_localhost_ca3_cert_chain_pem,

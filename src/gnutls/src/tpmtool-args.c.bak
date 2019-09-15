@@ -64,7 +64,7 @@ extern FILE * option_usage_fp;
  *  static const strings for tpmtool options
  */
 static char const tpmtool_opt_strs[2255] =
-/*     0 */ "tpmtool 3.6.8\n"
+/*     0 */ "tpmtool 3.6.9\n"
             "Copyright (C) 2000-2019 Free Software Foundation, and others, all rights reserved.\n"
             "This is free software. It is licensed for use, modification and\n"
             "redistribution under the terms of the GNU General Public License,\n"
@@ -146,7 +146,7 @@ static char const tpmtool_opt_strs[2255] =
 /*  2097 */ "bugs@gnutls.org\0"
 /*  2113 */ "\n\0"
 /*  2115 */ "Program that allows handling cryptographic data from the TPM chip.\n\0"
-/*  2183 */ "tpmtool 3.6.8\0"
+/*  2183 */ "tpmtool 3.6.9\0"
 /*  2197 */ "tpmtool [options]\n"
             "tpmtool --help for usage instructions.\n";
 
@@ -1023,7 +1023,7 @@ static void bogus_function(void) {
      translate option names.
    */
   /* referenced via tpmtoolOptions.pzCopyright */
-  puts(_("tpmtool 3.6.8\n\
+  puts(_("tpmtool 3.6.9\n\
 Copyright (C) 2000-2019 Free Software Foundation, and others, all rights reserved.\n\
 This is free software. It is licensed for use, modification and\n\
 redistribution under the terms of the GNU General Public License,\n\
@@ -1115,7 +1115,7 @@ Usage:  %s [ -<flag> [<val>] | --<name>[{=| }<val>] ]...\n"));
   puts(_("Program that allows handling cryptographic data from the TPM chip.\n"));
 
   /* referenced via tpmtoolOptions.pzFullVersion */
-  puts(_("tpmtool 3.6.8"));
+  puts(_("tpmtool 3.6.9"));
 
   /* referenced via tpmtoolOptions.pzFullUsage */
   puts(_("<<<NOT-FOUND>>>"));

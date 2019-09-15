@@ -3035,6 +3035,19 @@ switches to @code{GNUTLS_FIPS140_STRICT}  mode.
 @strong{Since:} 3.6.2
 @end deftypefun
 
+@subheading gnutls_get_system_config_file
+@anchor{gnutls_get_system_config_file}
+@deftypefun {const char *} {gnutls_get_system_config_file} ( @var{void})
+
+Returns the filename of the system wide configuration
+file loaded by the library. The returned pointer is valid
+until the library is unloaded.
+
+@strong{Returns:} a constant pointer to the config file loaded, or @code{NULL}  if none
+
+@strong{Since:} 3.6.9
+@end deftypefun
+
 @subheading gnutls_global_deinit
 @anchor{gnutls_global_deinit}
 @deftypefun {void} {gnutls_global_deinit} ( @var{void})
@@ -4395,7 +4408,7 @@ must be non-null.
 
 @strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, or an error code.
 
-@strong{Since:} 3.6.6
+@strong{Since:} 3.6.8
 @end deftypefun
 
 @subheading gnutls_prf_raw

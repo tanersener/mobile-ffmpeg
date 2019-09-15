@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: libgnutls-3.2.3\n"
 "Report-Msgid-Bugs-To: bug-gnutls@gnu.org\n"
-"POT-Creation-Date: 2019-05-25 22:49+0200\n"
+"POT-Creation-Date: 2019-07-25 20:40+0200\n"
 "PO-Revision-Date: 2013-08-06 07:13+0700\n"
 "Last-Translator: Trần Ngọc Quân <vnwildman@gmail.com>\n"
 "Language-Team: Vietnamese <translation-team-vi@lists.sourceforge.net>\n"
@@ -994,19 +994,19 @@ msgstr "Đáp ứng OCSP không hợp lệ"
 msgid "Memory error"
 msgstr "Lỗi giải mật mã"
 
-#: lib/x509/ocsp_output.c:50 lib/x509/ocsp_output.c:276 lib/x509/output.c:1575
-#: lib/x509/output.c:2108 lib/x509/output.c:2506
+#: lib/x509/ocsp_output.c:50 lib/x509/ocsp_output.c:276 lib/x509/output.c:1579
+#: lib/x509/output.c:2112 lib/x509/output.c:2510
 #, c-format
 msgid "\tVersion: %d\n"
 msgstr "\tPhiên bản %d\n"
 
-#: lib/x509/ocsp_output.c:136 lib/x509/ocsp_output.c:500 lib/x509/output.c:2276
-#: lib/x509/output.c:2670
+#: lib/x509/ocsp_output.c:136 lib/x509/ocsp_output.c:500 lib/x509/output.c:2280
+#: lib/x509/output.c:2674
 msgid "\t\t\tASCII: "
 msgstr "\t\t\tASCII: "
 
-#: lib/x509/ocsp_output.c:141 lib/x509/ocsp_output.c:505 lib/x509/output.c:2280
-#: lib/x509/output.c:2675
+#: lib/x509/ocsp_output.c:141 lib/x509/ocsp_output.c:505 lib/x509/output.c:2284
+#: lib/x509/output.c:2679
 msgid "\t\t\tHexdump: "
 msgstr "\t\t\tĐổ thập lục: "
 
@@ -1044,26 +1044,26 @@ msgstr "\t\tCập nhật này: %s\n"
 msgid "\t\tNext Update: %s\n"
 msgstr "\t\tCập nhật kế tiếp: %s\n"
 
-#: lib/x509/ocsp_output.c:524 lib/x509/output.c:1239 lib/x509/output.c:1510
-#: lib/x509/output.c:1636 lib/x509/output.c:1656 lib/x509/output.c:1700
-#: lib/x509/output.c:1928 lib/x509/output.c:1941 lib/x509/output.c:2355
-#: lib/x509/output.c:2483 lib/x509/output.c:2534
+#: lib/x509/ocsp_output.c:524 lib/x509/output.c:1243 lib/x509/output.c:1514
+#: lib/x509/output.c:1640 lib/x509/output.c:1660 lib/x509/output.c:1704
+#: lib/x509/output.c:1932 lib/x509/output.c:1945 lib/x509/output.c:2359
+#: lib/x509/output.c:2487 lib/x509/output.c:2538
 msgid "unknown"
 msgstr "không rõ"
 
-#: lib/x509/ocsp_output.c:525 lib/x509/output.c:1704 lib/x509/output.c:2359
-#: lib/x509/output.c:2538
+#: lib/x509/ocsp_output.c:525 lib/x509/output.c:1708 lib/x509/output.c:2363
+#: lib/x509/output.c:2542
 #, c-format
 msgid "\tSignature Algorithm: %s\n"
 msgstr "\tThuật toán Chữ ký: %s\n"
 
-#: lib/x509/ocsp_output.c:529 lib/x509/output.c:1711 lib/x509/output.c:2364
+#: lib/x509/ocsp_output.c:529 lib/x509/output.c:1715 lib/x509/output.c:2368
 msgid ""
 "warning: signed using a broken signature algorithm that can be forged.\n"
 msgstr ""
 "cảnh báo : đã ký dùng một thuật toán chữ ký bị hỏng có thể bị giả mạo.\n"
 
-#: lib/x509/ocsp_output.c:543 lib/x509/output.c:1737 lib/x509/output.c:2390
+#: lib/x509/ocsp_output.c:543 lib/x509/output.c:1741 lib/x509/output.c:2394
 msgid "\tSignature:\n"
 msgstr "\tChữ ký:\n"
 
@@ -1105,30 +1105,35 @@ msgstr "%s\t\t\tOID tên khác: %.*s\n"
 
 #: lib/x509/output.c:148
 #, fuzzy, c-format
+msgid "%sRegistered ID: %.*s\n"
+msgstr "%s\t\t\tOID tên khác: %.*s\n"
+
+#: lib/x509/output.c:152
+#, fuzzy, c-format
 msgid "%sXMPP Address: %.*s\n"
 msgstr "%s\t\t\tĐịa chỉ XMPP: %.*s\n"
 
-#: lib/x509/output.c:152
+#: lib/x509/output.c:156
 #, c-format
 msgid "%sKRB5Principal: %.*s\n"
 msgstr ""
 
-#: lib/x509/output.c:156
+#: lib/x509/output.c:160
 #, c-format
 msgid "%sUnknown name: "
 msgstr ""
 
-#: lib/x509/output.c:298
+#: lib/x509/output.c:302
 #, c-format
 msgid "\t\t\tPath Length Constraint: %d\n"
 msgstr "\t\t\tRàng buộc Chiều dài Đường dẫn: %d\n"
 
-#: lib/x509/output.c:300
+#: lib/x509/output.c:304
 #, c-format
 msgid "\t\t\tPolicy Language: %s"
 msgstr "\t\t\tNgôn ngữ Chính sách: %s"
 
-#: lib/x509/output.c:308
+#: lib/x509/output.c:312
 msgid ""
 "\t\t\tPolicy:\n"
 "\t\t\t\tASCII: "
@@ -1136,7 +1141,7 @@ msgstr ""
 "\t\t\tChính sách:\n"
 "\t\t\t\tASCII: "
 
-#: lib/x509/output.c:310
+#: lib/x509/output.c:314
 msgid ""
 "\n"
 "\t\t\t\tHexdump: "
@@ -1144,142 +1149,142 @@ msgstr ""
 "\n"
 "\t\t\t\tĐổ thập lục: "
 
-#: lib/x509/output.c:343
+#: lib/x509/output.c:347
 #, c-format
 msgid "%s\t\t\tPermitted:\n"
 msgstr ""
 
-#: lib/x509/output.c:355
+#: lib/x509/output.c:359
 #, c-format
 msgid "%s\t\t\tExcluded:\n"
 msgstr ""
 
-#: lib/x509/output.c:395 lib/x509/output.c:397 lib/x509/output.c:399
+#: lib/x509/output.c:399 lib/x509/output.c:401 lib/x509/output.c:403
 #, fuzzy, c-format
 msgid "\t\t\tAccess Method: %s (%s)\n"
 msgstr "\t\t\tPhương thức Truy cập: %.*s"
 
-#: lib/x509/output.c:503
+#: lib/x509/output.c:507
 #, c-format
 msgid "%sDigital signature.\n"
 msgstr "%sChữ ký số.\n"
 
-#: lib/x509/output.c:505
+#: lib/x509/output.c:509
 #, c-format
 msgid "%sNon repudiation.\n"
 msgstr "%sKhông từ chối.\n"
 
-#: lib/x509/output.c:507
+#: lib/x509/output.c:511
 #, c-format
 msgid "%sKey encipherment.\n"
 msgstr "%sMã hoá khóa.\n"
 
-#: lib/x509/output.c:509
+#: lib/x509/output.c:513
 #, c-format
 msgid "%sData encipherment.\n"
 msgstr "%sMã hoá dữ liệu.\n"
 
-#: lib/x509/output.c:511
+#: lib/x509/output.c:515
 #, c-format
 msgid "%sKey agreement.\n"
 msgstr "%sChấp thuận khoá.\n"
 
-#: lib/x509/output.c:513
+#: lib/x509/output.c:517
 #, c-format
 msgid "%sCertificate signing.\n"
 msgstr "%sKý chứng nhận.\n"
 
-#: lib/x509/output.c:515
+#: lib/x509/output.c:519
 #, c-format
 msgid "%sCRL signing.\n"
 msgstr "Ký %sCRL.\n"
 
-#: lib/x509/output.c:517
+#: lib/x509/output.c:521
 #, c-format
 msgid "%sKey encipher only.\n"
 msgstr "%sChỉ mã hoá khoá.\n"
 
-#: lib/x509/output.c:519
+#: lib/x509/output.c:523
 #, c-format
 msgid "%sKey decipher only.\n"
 msgstr "%sChỉ giải mật mã khoá.\n"
 
-#: lib/x509/output.c:563
+#: lib/x509/output.c:567
 #, c-format
 msgid "\t\t\tNot Before: %s\n"
 msgstr "\t\t\tKhông trước: %s\n"
 
-#: lib/x509/output.c:572
+#: lib/x509/output.c:576
 #, c-format
 msgid "\t\t\tNot After: %s\n"
 msgstr "\t\t\tKhông sau: %s\n"
 
-#: lib/x509/output.c:650
+#: lib/x509/output.c:654
 #, c-format
 msgid "%s\t\t\tTLS WWW Server.\n"
 msgstr "%s\t\t\tỨng dụng phục vụ WWW TLS.\n"
 
-#: lib/x509/output.c:652
+#: lib/x509/output.c:656
 #, c-format
 msgid "%s\t\t\tTLS WWW Client.\n"
 msgstr "%s\t\t\tỨng dụng khách WWW TLS.\n"
 
-#: lib/x509/output.c:654
+#: lib/x509/output.c:658
 #, c-format
 msgid "%s\t\t\tCode signing.\n"
 msgstr "%s\t\t\tKý mã.\n"
 
-#: lib/x509/output.c:656
+#: lib/x509/output.c:660
 #, c-format
 msgid "%s\t\t\tEmail protection.\n"
 msgstr "%s\t\t\tBảo vệ thư điện tử.\n"
 
-#: lib/x509/output.c:659
+#: lib/x509/output.c:663
 #, c-format
 msgid "%s\t\t\tTime stamping.\n"
 msgstr "%s\t\t\tGhi thời gian.\n"
 
-#: lib/x509/output.c:661
+#: lib/x509/output.c:665
 #, c-format
 msgid "%s\t\t\tOCSP signing.\n"
 msgstr "%s\t\t\tKý OCSP.\n"
 
-#: lib/x509/output.c:663
+#: lib/x509/output.c:667
 #, c-format
 msgid "%s\t\t\tIpsec IKE.\n"
 msgstr "%s\t\t\tIpsec IKE.\n"
 
-#: lib/x509/output.c:665
+#: lib/x509/output.c:669
 #, c-format
 msgid "%s\t\t\tAny purpose.\n"
 msgstr "%s\t\t\tBất cứ mục đích nào.\n"
 
-#: lib/x509/output.c:688
+#: lib/x509/output.c:692
 #, c-format
 msgid "%s\t\t\tCertificate Authority (CA): FALSE\n"
 msgstr "%s\t\t\tNhà cầm quyền chứng nhận (CA): SAI\n"
 
-#: lib/x509/output.c:691
+#: lib/x509/output.c:695
 #, c-format
 msgid "%s\t\t\tCertificate Authority (CA): TRUE\n"
 msgstr "%s\t\t\tNhà cầm quyền chứng nhận (CA): ĐÚNG\n"
 
-#: lib/x509/output.c:695
+#: lib/x509/output.c:699
 #, c-format
 msgid "%s\t\t\tPath Length Constraint: %d\n"
 msgstr "%s\t\t\tRàng buộc Chiều dài Đường dẫn: %d\n"
 
-#: lib/x509/output.c:751
+#: lib/x509/output.c:755
 #, c-format
 msgid "%s\t\t\totherName OID: %.*s\n"
 msgstr "%s\t\t\tOID tên khác: %.*s\n"
 
-#: lib/x509/output.c:753
+#: lib/x509/output.c:757
 #, c-format
 msgid "%s\t\t\totherName DER: "
 msgstr "%s\t\t\tDER tên khác: "
 
-#: lib/x509/output.c:756
+#: lib/x509/output.c:760
 #, c-format
 msgid ""
 "\n"
@@ -1288,273 +1293,273 @@ msgstr ""
 "\n"
 "%s\t\t\tASCII tên khác: "
 
-#: lib/x509/output.c:896
+#: lib/x509/output.c:900
 #, c-format
 msgid "%s\t\tBasic Constraints (%s):\n"
 msgstr "%s\t\tRàng buộc Cơ bản (%s):\n"
 
-#: lib/x509/output.c:898 lib/x509/output.c:912 lib/x509/output.c:957
-#: lib/x509/output.c:991 lib/x509/output.c:1004 lib/x509/output.c:1016
-#: lib/x509/output.c:1031 lib/x509/output.c:1043 lib/x509/output.c:1056
-#: lib/x509/output.c:1068 lib/x509/output.c:1082 lib/x509/output.c:1096
-#: lib/x509/output.c:1104 lib/x509/output.c:1115 lib/x509/output.c:1126
-#: lib/x509/output.c:1134 lib/x509/output.c:2217 lib/x509/output.c:2242
-#: lib/x509/output.c:2262
+#: lib/x509/output.c:902 lib/x509/output.c:916 lib/x509/output.c:961
+#: lib/x509/output.c:995 lib/x509/output.c:1008 lib/x509/output.c:1020
+#: lib/x509/output.c:1035 lib/x509/output.c:1047 lib/x509/output.c:1060
+#: lib/x509/output.c:1072 lib/x509/output.c:1086 lib/x509/output.c:1100
+#: lib/x509/output.c:1108 lib/x509/output.c:1119 lib/x509/output.c:1130
+#: lib/x509/output.c:1138 lib/x509/output.c:2221 lib/x509/output.c:2246
+#: lib/x509/output.c:2266
 msgid "critical"
 msgstr "hết hạn"
 
-#: lib/x509/output.c:898 lib/x509/output.c:912 lib/x509/output.c:958
-#: lib/x509/output.c:992 lib/x509/output.c:1004 lib/x509/output.c:1016
-#: lib/x509/output.c:1031 lib/x509/output.c:1043 lib/x509/output.c:1056
-#: lib/x509/output.c:1068 lib/x509/output.c:1082 lib/x509/output.c:1096
-#: lib/x509/output.c:1104 lib/x509/output.c:1115 lib/x509/output.c:1126
-#: lib/x509/output.c:1134 lib/x509/output.c:2218 lib/x509/output.c:2243
-#: lib/x509/output.c:2263
+#: lib/x509/output.c:902 lib/x509/output.c:916 lib/x509/output.c:962
+#: lib/x509/output.c:996 lib/x509/output.c:1008 lib/x509/output.c:1020
+#: lib/x509/output.c:1035 lib/x509/output.c:1047 lib/x509/output.c:1060
+#: lib/x509/output.c:1072 lib/x509/output.c:1086 lib/x509/output.c:1100
+#: lib/x509/output.c:1108 lib/x509/output.c:1119 lib/x509/output.c:1130
+#: lib/x509/output.c:1138 lib/x509/output.c:2222 lib/x509/output.c:2247
+#: lib/x509/output.c:2267
 msgid "not critical"
 msgstr "chưa hết hạn"
 
-#: lib/x509/output.c:910
+#: lib/x509/output.c:914
 #, c-format
 msgid "%s\t\tSubject Key Identifier (%s):\n"
 msgstr "%s\tĐịnh danh Chủ thể Khoá (%s):\n"
 
-#: lib/x509/output.c:1002
+#: lib/x509/output.c:1006
 #, c-format
 msgid "%s\t\tAuthority Key Identifier (%s):\n"
 msgstr "%s\t\tĐịnh danh Nhà cầm quyền Khóa (%s):\n"
 
-#: lib/x509/output.c:1015
+#: lib/x509/output.c:1019
 #, c-format
 msgid "%s\t\tKey Usage (%s):\n"
 msgstr "%s\t\tSử dụng Khoá (%s):\n"
 
-#: lib/x509/output.c:1029
+#: lib/x509/output.c:1033
 #, c-format
 msgid "%s\t\tPrivate Key Usage Period (%s):\n"
 msgstr "%s\t\tChu kỳ Sử dụng Khóa Riêng (%s):\n"
 
-#: lib/x509/output.c:1042
+#: lib/x509/output.c:1046
 #, c-format
 msgid "%s\t\tKey Purpose (%s):\n"
 msgstr "%s\t\tMục đích Khoá (%s):\n"
 
-#: lib/x509/output.c:1054
+#: lib/x509/output.c:1058
 #, c-format
 msgid "%s\t\tSubject Alternative Name (%s):\n"
 msgstr "%s\t\tTên Xen kẽ Chủ thể (%s):\n"
 
-#: lib/x509/output.c:1066
+#: lib/x509/output.c:1070
 #, c-format
 msgid "%s\t\tIssuer Alternative Name (%s):\n"
 msgstr "%s\t\tTên Thay thế Nhà phát hành (%s):\n"
 
-#: lib/x509/output.c:1080
+#: lib/x509/output.c:1084
 #, c-format
 msgid "%s\t\tCRL Distribution points (%s):\n"
 msgstr "%s\t\tĐiểm phân phối CRL (%s):\n"
 
-#: lib/x509/output.c:1094
+#: lib/x509/output.c:1098
 #, c-format
 msgid "%s\t\tProxy Certificate Information (%s):\n"
 msgstr "%s\t\tThông tin Chứng nhận Ủy nhiệm (%s):\n"
 
-#: lib/x509/output.c:1102
+#: lib/x509/output.c:1106
 #, c-format
 msgid "%s\t\tAuthority Information Access (%s):\n"
 msgstr "%s\t\tTruy cập Thông tin Nhà chức trách (%s):\n"
 
-#: lib/x509/output.c:1114
+#: lib/x509/output.c:1118
 #, fuzzy, c-format
 msgid "%s\t\tName Constraints (%s):\n"
 msgstr "%s\t\tRàng buộc Cơ bản (%s):\n"
 
-#: lib/x509/output.c:1124
+#: lib/x509/output.c:1128
 #, fuzzy, c-format
 msgid "%s\t\tTLS Features (%s):\n"
 msgstr "%s\t\tMục đích Khoá (%s):\n"
 
-#: lib/x509/output.c:1132
+#: lib/x509/output.c:1136
 #, c-format
 msgid "%s\t\tUnknown extension %s (%s):\n"
 msgstr "%s\t\tPhần mở rộng không được nhận ra %s (%s):\n"
 
-#: lib/x509/output.c:1136
+#: lib/x509/output.c:1140
 #, c-format
 msgid "%s\t\t\tASCII: "
 msgstr "%s\t\t\tASCII: "
 
-#: lib/x509/output.c:1140
+#: lib/x509/output.c:1144
 #, c-format
 msgid "%s\t\t\tHexdump: "
 msgstr "%s\t\t\tĐổ thập lục: "
 
-#: lib/x509/output.c:1189
+#: lib/x509/output.c:1193
 #, c-format
 msgid "%s\tExtensions:\n"
 msgstr "%s\tPhần mở rộng:\n"
 
-#: lib/x509/output.c:1241
+#: lib/x509/output.c:1245
 #, c-format
 msgid "\t%sPublic Key Algorithm: %s\n"
 msgstr "\t%sThuật toán Khoá Công: %s\n"
 
-#: lib/x509/output.c:1243
+#: lib/x509/output.c:1247
 #, c-format
 msgid "\tAlgorithm Security Level: %s (%d bits)\n"
 msgstr "\tMức An ninh Thuật toán: %s (%d bít)\n"
 
-#: lib/x509/output.c:1248
+#: lib/x509/output.c:1252
 msgid "\t\tParameters:\n"
 msgstr ""
 
-#: lib/x509/output.c:1268
+#: lib/x509/output.c:1272
 #, c-format
 msgid "\t\tModulus (bits %d): "
 msgstr "\t\tGiá trị tuyệt đối (%d bit):"
 
-#: lib/x509/output.c:1275
+#: lib/x509/output.c:1279
 #, c-format
 msgid "\t\tExponent (bits %d): "
 msgstr "\t\tMũ (%d bit): "
 
-#: lib/x509/output.c:1283
+#: lib/x509/output.c:1287
 #, c-format
 msgid "\t\tModulus (bits %d):\n"
 msgstr "\t\tGiá trị tuyệt đối (%d bit):\n"
 
-#: lib/x509/output.c:1290
+#: lib/x509/output.c:1294
 #, c-format
 msgid "\t\tExponent (bits %d):\n"
 msgstr "\t\tMũ (%d bit):\n"
 
-#: lib/x509/output.c:1317 lib/x509/output.c:1437
+#: lib/x509/output.c:1321 lib/x509/output.c:1441
 #, c-format
 msgid "\t\tCurve:\t%s\n"
 msgstr "\t\tĐặc tuyến:\t%s\n"
 
-#: lib/x509/output.c:1321 lib/x509/output.c:1447
+#: lib/x509/output.c:1325 lib/x509/output.c:1451
 msgid "\t\tX: "
 msgstr "\t\tX: "
 
-#: lib/x509/output.c:1327 lib/x509/output.c:1452
+#: lib/x509/output.c:1331 lib/x509/output.c:1456
 msgid "\t\tY: "
 msgstr "\t\tY: "
 
-#: lib/x509/output.c:1334 lib/x509/output.c:1458
+#: lib/x509/output.c:1338 lib/x509/output.c:1462
 msgid "\t\tX:\n"
 msgstr "\t\tX:\n"
 
-#: lib/x509/output.c:1339 lib/x509/output.c:1462
+#: lib/x509/output.c:1343 lib/x509/output.c:1466
 msgid "\t\tY:\n"
 msgstr "\t\tY:\n"
 
-#: lib/x509/output.c:1367
+#: lib/x509/output.c:1371
 #, c-format
 msgid "\t\tPublic key (bits %d): "
 msgstr "\t\tKhoá công (%d bít): "
 
-#: lib/x509/output.c:1373
+#: lib/x509/output.c:1377
 msgid "\t\tP: "
 msgstr "\t\tP: "
 
-#: lib/x509/output.c:1378
+#: lib/x509/output.c:1382
 msgid "\t\tQ: "
 msgstr "\t\tQ: "
 
-#: lib/x509/output.c:1383
+#: lib/x509/output.c:1387
 msgid "\t\tG: "
 msgstr "\t\tG: "
 
-#: lib/x509/output.c:1391
+#: lib/x509/output.c:1395
 #, c-format
 msgid "\t\tPublic key (bits %d):\n"
 msgstr "\t\tKhoá công (%d bit):\n"
 
-#: lib/x509/output.c:1396
+#: lib/x509/output.c:1400
 msgid "\t\tP:\n"
 msgstr "\t\tP:\n"
 
-#: lib/x509/output.c:1400
+#: lib/x509/output.c:1404
 msgid "\t\tQ:\n"
 msgstr "\t\tQ:\n"
 
-#: lib/x509/output.c:1404
+#: lib/x509/output.c:1408
 msgid "\t\tG:\n"
 msgstr "\t\tG:\n"
 
-#: lib/x509/output.c:1439
+#: lib/x509/output.c:1443
 #, fuzzy, c-format
 msgid "\t\tDigest:\t%s\n"
 msgstr "\t\tĐặc tuyến:\t%s\n"
 
-#: lib/x509/output.c:1441
+#: lib/x509/output.c:1445
 #, fuzzy, c-format
 msgid "\t\tParamSet: %s\n"
 msgstr "\t\tTạo: %s\n"
 
-#: lib/x509/output.c:1554 lib/x509/output.c:2473
+#: lib/x509/output.c:1558 lib/x509/output.c:2477
 msgid "Subject "
 msgstr "Chủ thể "
 
-#: lib/x509/output.c:1590
+#: lib/x509/output.c:1594
 msgid "\tSerial Number (hex): "
 msgstr "\tSố sản xuất (thập lục): "
 
-#: lib/x509/output.c:1603 lib/x509/output.c:2118
+#: lib/x509/output.c:1607 lib/x509/output.c:2122
 #, fuzzy
 msgid "\tIssuer:\n"
 msgstr "\tNơi cấp: %s\n"
 
-#: lib/x509/output.c:1608 lib/x509/output.c:2123
+#: lib/x509/output.c:1612 lib/x509/output.c:2127
 #, c-format
 msgid "\tIssuer: %s\n"
 msgstr "\tNơi cấp: %s\n"
 
-#: lib/x509/output.c:1617
+#: lib/x509/output.c:1621
 msgid "\tValidity:\n"
 msgstr "\tCó hiệu lực:\n"
 
-#: lib/x509/output.c:1634 lib/x509/output.c:1636
+#: lib/x509/output.c:1638 lib/x509/output.c:1640
 #, c-format
 msgid "\t\tNot Before: %s\n"
 msgstr "\t\tKhông trước: %s\n"
 
-#: lib/x509/output.c:1654 lib/x509/output.c:1656
+#: lib/x509/output.c:1658 lib/x509/output.c:1660
 #, c-format
 msgid "\t\tNot After: %s\n"
 msgstr "\t\tKhông sau: %s\n"
 
-#: lib/x509/output.c:1667 lib/x509/output.c:2516
+#: lib/x509/output.c:1671 lib/x509/output.c:2520
 #, fuzzy
 msgid "\tSubject:\n"
 msgstr "\tChủ thể: %s\n"
 
-#: lib/x509/output.c:1672 lib/x509/output.c:2521
+#: lib/x509/output.c:1676 lib/x509/output.c:2525
 #, c-format
 msgid "\tSubject: %s\n"
 msgstr "\tChủ thể: %s\n"
 
-#: lib/x509/output.c:1751
+#: lib/x509/output.c:1755
 #, fuzzy
 msgid "\tFingerprint:\n"
 msgstr "dấu vân tay: "
 
-#: lib/x509/output.c:1760
+#: lib/x509/output.c:1764
 msgid "\t\tsha1:"
 msgstr ""
 
-#: lib/x509/output.c:1771
+#: lib/x509/output.c:1775
 msgid "\t\tsha256:"
 msgstr ""
 
-#: lib/x509/output.c:1805
+#: lib/x509/output.c:1809
 #, fuzzy, c-format
 msgid ""
 "%sPublic Key ID:\n"
 "%s\tsha1:"
 msgstr "Mã số ID Khoá Công: "
 
-#: lib/x509/output.c:1811
+#: lib/x509/output.c:1815
 #, fuzzy, c-format
 msgid ""
 "%sPublic Key PIN:\n"
@@ -1563,115 +1568,115 @@ msgstr ""
 "\tMã số Khoá Công:\n"
 "\t\t"
 
-#: lib/x509/output.c:1883
+#: lib/x509/output.c:1887
 #, fuzzy
 msgid "no subject,"
 msgstr "Chủ thể "
 
-#: lib/x509/output.c:1899
+#: lib/x509/output.c:1903
 msgid "no issuer,"
 msgstr ""
 
-#: lib/x509/output.c:1946
+#: lib/x509/output.c:1950
 #, c-format
 msgid "signed using %s (broken!), "
 msgstr "đã ký dùng %s (bị hỏng!), "
 
-#: lib/x509/output.c:1948
+#: lib/x509/output.c:1952
 #, c-format
 msgid "signed using %s, "
 msgstr "đã ký dùng %s, "
 
-#: lib/x509/output.c:2084
+#: lib/x509/output.c:2088
 msgid "X.509 Certificate Information:\n"
 msgstr "Thông tin Chứng nhận X.509:\n"
 
-#: lib/x509/output.c:2088 lib/x509/output.c:2728
+#: lib/x509/output.c:2092 lib/x509/output.c:2732
 msgid "Other Information:\n"
 msgstr "Thông tin khác:\n"
 
-#: lib/x509/output.c:2103
+#: lib/x509/output.c:2107
 msgid "\tVersion: 1 (default)\n"
 msgstr "\tPhiên bản: 1 (mặc định)\n"
 
-#: lib/x509/output.c:2132
+#: lib/x509/output.c:2136
 msgid "\tUpdate dates:\n"
 msgstr "\tNgày cập nhật:\n"
 
-#: lib/x509/output.c:2149
+#: lib/x509/output.c:2153
 #, c-format
 msgid "\t\tIssued: %s\n"
 msgstr "\t\tCấp: %s\n"
 
-#: lib/x509/output.c:2169
+#: lib/x509/output.c:2173
 #, c-format
 msgid "\t\tNext at: %s\n"
 msgstr "\t\tLần sau vào : %s\n"
 
-#: lib/x509/output.c:2200
+#: lib/x509/output.c:2204
 msgid "\tExtensions:\n"
 msgstr "\tPhần mở rộng:\n"
 
-#: lib/x509/output.c:2216
+#: lib/x509/output.c:2220
 #, c-format
 msgid "\t\tCRL Number (%s): "
 msgstr "\t\tSố CRL (%s): "
 
-#: lib/x509/output.c:2241
+#: lib/x509/output.c:2245
 #, c-format
 msgid "\t\tAuthority Key Identifier (%s):\n"
 msgstr "\t\tĐịnh danh Nhà cầm quyền Khoá (%s):\n"
 
-#: lib/x509/output.c:2260
+#: lib/x509/output.c:2264
 #, c-format
 msgid "\t\tUnknown extension %s (%s):\n"
 msgstr "\t\tKhông hiểu phần mở rộng %s (%s):\n"
 
-#: lib/x509/output.c:2297
+#: lib/x509/output.c:2301
 #, c-format
 msgid "\tRevoked certificates (%d):\n"
 msgstr "\tChứng nhận bị thu hồi (%d):\n"
 
-#: lib/x509/output.c:2300
+#: lib/x509/output.c:2304
 msgid "\tNo revoked certificates.\n"
 msgstr "\tKhông có chứng nhận bị thu hồi.\n"
 
-#: lib/x509/output.c:2321
+#: lib/x509/output.c:2325
 msgid "\t\tSerial Number (hex): "
 msgstr "\t\tSố sê-ri (thập lục phân): "
 
-#: lib/x509/output.c:2339
+#: lib/x509/output.c:2343
 #, c-format
 msgid "\t\tRevoked at: %s\n"
 msgstr "\t\tĐược thu hồi vào: %s\n"
 
-#: lib/x509/output.c:2421
+#: lib/x509/output.c:2425
 msgid "X.509 Certificate Revocation List Information:\n"
 msgstr "Danh sách Thu hồi Chứng nhận X.509:\n"
 
-#: lib/x509/output.c:2571
+#: lib/x509/output.c:2575
 msgid "\tAttributes:\n"
 msgstr "\tThuộc tính:\n"
 
-#: lib/x509/output.c:2628
+#: lib/x509/output.c:2632
 #, c-format
 msgid "\t\tChallenge password: %s\n"
 msgstr "\t\tMật khẩu yêu cầu: %s\n"
 
-#: lib/x509/output.c:2638
+#: lib/x509/output.c:2642
 #, c-format
 msgid "\t\tUnknown attribute %s:\n"
 msgstr "\t\tKhông nhận ra thuộc tính %s:\n"
 
-#: lib/x509/output.c:2724
+#: lib/x509/output.c:2728
 msgid "PKCS #10 Certificate Request Information:\n"
 msgstr "Thông tin Yêu cầu Chứng nhận PKCS #10:\n"
 
-#: lib/x509/output.c:2751
+#: lib/x509/output.c:2755
 msgid "Public Key Usage:\n"
 msgstr "Cách dùng Khoá Công:\n"
 
-#: lib/x509/output.c:2791
+#: lib/x509/output.c:2795
 msgid "Public Key Information:\n"
 msgstr "Thông tin Khóa Công:\n"
 

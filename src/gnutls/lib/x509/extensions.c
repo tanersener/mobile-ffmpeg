@@ -715,6 +715,9 @@ _gnutls_write_general_name(ASN1_TYPE ext, const char *ext_name,
 	case GNUTLS_SAN_IPADDRESS:
 		str = "iPAddress";
 		break;
+	case GNUTLS_SAN_REGISTERED_ID:
+		str = "registeredID";
+		break;
 	default:
 		gnutls_assert();
 		return GNUTLS_E_INTERNAL_ERROR;

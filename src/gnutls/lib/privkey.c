@@ -1207,7 +1207,8 @@ gnutls_privkey_sign_data2(gnutls_privkey_t signer,
  *
  * The flags may be %GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA or %GNUTLS_PRIVKEY_SIGN_FLAG_RSA_PSS.
  * In the former case this function will ignore @hash_algo and perform a raw PKCS1 signature,
- * and in the latter an RSA-PSS signature will be generated.
+ * and in the latter an RSA-PSS signature will be generated. Note that the flag
+ * %GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA is supported since 3.6.9.
  *
  * Note that, not all algorithm support signing already hashed data. When
  * signing with Ed25519, gnutls_privkey_sign_data() should be used.
@@ -1228,9 +1229,16 @@ gnutls_privkey_sign_hash2(gnutls_privkey_t signer,
 	gnutls_x509_spki_st params;
 	const gnutls_sign_entry_st *se;
 
-	se = _gnutls_sign_to_entry(algo);
-	if (unlikely(se == NULL))
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	if (flags & GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA) {
+		/* the corresponding signature algorithm is SIGN_RSA_RAW,
+		 * irrespective of hash algorithm. */
+		se = _gnutls_sign_to_entry(GNUTLS_SIGN_RSA_RAW);
+	} else {
+		se = _gnutls_sign_to_entry(algo);
+		if (unlikely(se == NULL))
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	}
 
 	ret = _gnutls_privkey_get_spki_params(signer, &params);
 	if (ret < 0) {

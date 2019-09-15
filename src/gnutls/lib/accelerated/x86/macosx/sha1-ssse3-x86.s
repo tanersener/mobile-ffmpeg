@@ -1,4 +1,4 @@
-# Copyright (c) 2011-2013, Andy Polyakov <appro@openssl.org>
+# Copyright (c) 2011-2016, Andy Polyakov <appro@openssl.org>
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -37,7 +37,6 @@
 #
 # *** This file is auto-generated ***
 #
-.file	"sha1-586.s"
 .text
 .globl	_sha1_block_data_order
 .align	4

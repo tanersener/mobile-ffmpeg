@@ -57,6 +57,7 @@ int ssl3_ok = 0;
 int tls1_1_ok = 0;
 int tls1_2_ok = 0;
 int tls1_3_ok = 0;
+int send_record_ok = 0;
 
 /* keep session info */
 static char *session_data = NULL;
@@ -235,6 +236,29 @@ test_code_t test_ecdhe(gnutls_session_t session)
 	sprintf(prio_str, INIT_STR
 		ALL_CIPHERS ":" ALL_COMP ":%s:" ALL_MACS
 		":+ECDHE-RSA:+ECDHE-ECDSA:+CURVE-ALL:%s", protocol_all_str,
+		rest);
+	_gnutls_priority_set_direct(session, prio_str);
+
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+
+	ret = test_do_handshake(session);
+
+	if (ret < 0)
+		return TEST_FAILED;
+
+	return ret;
+}
+
+test_code_t test_rsa(gnutls_session_t session)
+{
+	int ret;
+
+	if (tls_ext_ok == 0)
+		return TEST_IGNORE;
+
+	sprintf(prio_str, INIT_STR
+		ALL_CIPHERS ":" ALL_COMP ":%s:" ALL_MACS
+		":+RSA:%s", protocol_all_str,
 		rest);
 	_gnutls_priority_set_direct(session, prio_str);
 
@@ -1517,4 +1541,64 @@ test_code_t test_server_cas(gnutls_session_t session)
 	else
 		ext_text = "none";
 	return TEST_SUCCEED;
+}
+
+static test_code_t
+test_do_handshake_and_send_record(gnutls_session_t session)
+{
+	int ret;
+	/* This will be padded to 512 bytes. */
+	const char snd_buf[] = "GET / HTTP/1.0\r\n\r\n";
+	static char buf[5 * 1024];
+
+	ret = test_do_handshake(session);
+	if (ret != TEST_SUCCEED)
+		return ret;
+
+	gnutls_record_send(session, snd_buf, sizeof(snd_buf) - 1);
+	ret = gnutls_record_recv(session, buf, sizeof(buf) - 1);
+	if (ret < 0)
+		return TEST_FAILED;
+
+	return TEST_SUCCEED;
+}
+
+/* These tests shall be sent in this order to check if the server
+ * advertises smaller limits than our default 512. and we can work it
+ * around with %ALLOW_SMALL_RECORDS. */
+test_code_t test_send_record(gnutls_session_t session)
+{
+	int ret;
+
+	sprintf(prio_str,
+		INIT_STR ALL_CIPHERS ":" ALL_COMP ":%s:"
+		ALL_MACS ":" ALL_KX ":%s", protocol_str, rest);
+	_gnutls_priority_set_direct(session, prio_str);
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+
+	ret = test_do_handshake_and_send_record(session);
+	if (ret == TEST_SUCCEED)
+		send_record_ok = 1;
+	return ret;
+}
+
+test_code_t test_send_record_with_allow_small_records(gnutls_session_t session)
+{
+	int ret;
+
+	/* If test_send_record succeeded, we don't need to check. */
+	if (send_record_ok)
+		return TEST_FAILED;
+
+	sprintf(prio_str,
+		INIT_STR ALL_CIPHERS ":" ALL_COMP ":%s:"
+		ALL_MACS ":" ALL_KX ":%%ALLOW_SMALL_RECORDS:%s",
+		protocol_str, rest);
+	_gnutls_priority_set_direct(session, prio_str);
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+
+	ret = test_do_handshake_and_send_record(session);
+	if (ret == TEST_SUCCEED)
+		strcat(rest, ":%ALLOW_SMALL_RECORDS");
+	return ret;
 }

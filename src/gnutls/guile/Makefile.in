@@ -15,7 +15,7 @@
 @SET_MAKE@
 
 #  GnuTLS --- Guile bindings for GnuTLS.
-#  Copyright (C) 2007-2012, 2016 Free Software Foundation, Inc.
+#  Copyright (C) 2007-2012, 2016, 2019 Free Software Foundation, Inc.
 #
 #  GnuTLS is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU Lesser General Public
@@ -1685,7 +1685,7 @@ CLEANFILES = modules/gnutls.scm $(am__append_1)
 TESTS = tests/anonymous-auth.scm tests/session-record-port.scm \
 	tests/pkcs-import-export.scm tests/errors.scm \
 	tests/x509-certificates.scm tests/x509-auth.scm \
-	tests/priorities.scm $(am__append_2)
+	tests/reauth.scm tests/priorities.scm $(am__append_2)
 TESTS_ENVIRONMENT = \
   GUILE_AUTO_COMPILE=0				\
   GUILE_WARN_DEPRECATED=detailed
@@ -2095,6 +2095,13 @@ tests/x509-certificates.scm.log: tests/x509-certificates.scm
 tests/x509-auth.scm.log: tests/x509-auth.scm
 	@p='tests/x509-auth.scm'; \
 	b='tests/x509-auth.scm'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+tests/reauth.scm.log: tests/reauth.scm
+	@p='tests/reauth.scm'; \
+	b='tests/reauth.scm'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \

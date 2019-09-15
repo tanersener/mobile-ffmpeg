@@ -1,4 +1,822 @@
 Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Date:   Thu Jul 25 20:38:14 2019 +0200
+
+    bumped version for 3.6.9
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+Author: Nikos Mavrogiannopoulos <nmav@redhat.com>
+Date:   Mon Jul 22 12:43:50 2019 +0200
+
+    gnutls.h: mark AEAD ciphers as such in gnutls_cipher_algorithm_t description
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+Author: Nikos Mavrogiannopoulos <nmav@redhat.com>
+Date:   Mon Jul 22 10:00:51 2019 +0200
+
+    abi-check: correctly bail-out on errors
+    
+    Added suppressions for _MAX enumerator values.
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+Author: Karsten Ohme <k_o_@users.sourceforge.net>
+Date:   Sat Jun 22 00:39:56 2019 +0200
+
+    Support for Generalname registeredID from RFC 5280 in subject alt name
+    
+    Added test certificates (cert10.der) with registered ID
+    
+    Updated Makefile for inclusion of test certificates
+    
+    Updated SAN unknown test certificates (cert5.der)
+    
+    Signed-off-by: Karsten Ohme <k_o_@users.sourceforge.net>
+
+Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Date:   Sun Jul 21 10:18:35 2019 +0200
+
+    libgnutls.abignore: added comment linking to syntax
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Date:   Sun Jul 21 10:06:22 2019 +0200
+
+    NEWS: updated for upcoming release [ci skip]
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+Author: Tim Rühsen <tim.ruehsen@gmx.de>
+Date:   Tue Jul 16 14:41:50 2019 +0200
+
+    Fix documented params for gnutls_certificate_retrieve_function3()
+    
+    Signed-off-by: Tim Rühsen <tim.ruehsen@gmx.de>
+
+Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Date:   Sun Jul 14 22:27:50 2019 +0200
+
+    Fixed alerts returned on TLS1.3 corner cases
+    
+    This enables the tls-fuzzer tests 'test-tls13-certificate-verify.py'.
+    
+    Resolves: #682
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Sun Jul 14 12:17:18 2019 +0300
+
+    nettle/backport: fix xts-backport guarding check
+    
+    Check for nettle_xts_encrypt_message() function rather than just
+    xts_encrypt_message(). All functions in nettle are renamed to contain
+    `nettle_` prefix.
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Thu Jul 11 21:37:08 2019 +0300
+
+    nettle/gost: support building with GOST-enabled Nettle
+    
+    Nettle library starts to gain support for GOST algorithms. Support
+    building GnuTLS with GOST-enabled nettle library.
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Daiki Ueno <dueno@redhat.com>
+Date:   Sun Jun 30 08:23:41 2019 +0200
+
+    tests: remove unused destructive/p11-kit-load.sh
+    
+    This file is replaced with tests/p11-kit-load.sh and
+    tests/pkcs11/list-tokens.c.
+    
+    Signed-off-by: Daiki Ueno <dueno@redhat.com>
+
+Author: Daiki Ueno <dueno@redhat.com>
+Date:   Wed Jun 19 17:21:16 2019 +0200
+
+    pkcs11: ignore login error when traversing tokens
+    
+    If a token is a general access device, it is expected that login
+    attempt to that token returns error:
+    https://github.com/p11-glue/p11-kit/blob/master/trust/module.c#L852
+    
+    On the other hand, _pkcs11_traverse_tokens treats the error as fatal
+    and stops iteration.  This behavior prevents object search without
+    token specifier if such tokens are registered in the system.
+    
+    Reported by Stanislav Zidek in
+    https://bugzilla.redhat.com/show_bug.cgi?id=1705478
+    
+    Signed-off-by: Daiki Ueno <dueno@redhat.com>
+
+Author: Daiki Ueno <dueno@redhat.com>
+Date:   Mon Jul 8 16:54:56 2019 +0200
+
+    ext/session_ticket: avoid calling memcpy on overlapping memory areas
+    
+    In _gnutls_encrypt_session_ticket, ticket.encrypted_state is allocated
+    from ticket_data->data, thus those memory areas may overlap.  Using
+    memcpy here leads to undefined behavior.
+    
+    Spotted by valgrind run on ppc64le.
+    
+    ==95231== Source and destination overlap in memcpy(0x47ce3a2, 0x47ce3a2, 160)
+    ==95231==    at 0x408A840: memcpy (vg_replace_strmem.c:1023)
+    ==95231==    by 0x424EE9F: pack_ticket (session_ticket.c:139)
+    ==95231==    by 0x424FA4F: _gnutls_encrypt_session_ticket (session_ticket.c:335)
+    ==95231==    by 0x4199E3B: generate_session_ticket (session_ticket.c:249)
+    ==95231==    by 0x419A333: _gnutls13_send_session_ticket (session_ticket.c:307)
+    ==95231==    by 0x40F8817: _gnutls13_handshake_server (handshake-tls13.c:511)
+    ==95231==    by 0x4110DEB: handshake_server (handshake.c:3331)
+    ==95231==    by 0x410C70B: gnutls_handshake (handshake.c:2727)
+    ==95231==    by 0x10009EBF: retry_handshake (serv.c:1306)
+    ==95231==    by 0x1000AB67: tcp_server (serv.c:1500)
+    ==95231==    by 0x10009E5B: main (serv.c:1297)
+    ==95231==
+    
+    Signed-off-by: Daiki Ueno <dueno@redhat.com>
+
+Author: Nikos Mavrogiannopoulos <nmav@redhat.com>
+Date:   Tue Jul 9 10:06:47 2019 +0200
+
+    lib: mark infinite loops explicitly
+    
+    There were few infinite loop constructions which were checking
+    for an always true condition. Make sure that this construction
+    is marked explicitly as while(1) to assist static analysers, or
+    reviewers.
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+Author: Nikos Mavrogiannopoulos <nmav@redhat.com>
+Date:   Tue Jul 9 09:56:24 2019 +0200
+
+    tests: improve coverage of CRQ related functions
+    
+    That adds sanity check of crq-related functions that were not included
+    in the testsuite at all.
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+Author: Nikos Mavrogiannopoulos <nmav@redhat.com>
+Date:   Mon Jul 8 19:33:50 2019 +0200
+
+    encode_ber_digest_info: added sanity check
+    
+    Issue found using oss-fuzz:
+     https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=15665
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Date:   Wed Jul 3 21:04:23 2019 +0200
+
+    doc update [ci skip]
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+Author: Nikos Mavrogiannopoulos <nmav@redhat.com>
+Date:   Thu Jun 13 09:13:22 2019 +0200
+
+    testcompat-openssl: added interop test with DTLS 1.2
+    
+    This tests AES-CBC ciphersuites in isolation, as they are
+    prioritized lower than AES-GCM. We want to test them explicitly
+    because they have different behavior under EtM.
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Date:   Fri Jun 7 23:22:52 2019 +0200
+
+    tests: added sanity check for rfc7633 behavior
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+Author: Nikos Mavrogiannopoulos <nmav@redhat.com>
+Date:   Fri Jun 7 16:51:30 2019 +0200
+
+    tests: status-request-missing: renamed to rfc7633-missing
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+Author: Nikos Mavrogiannopoulos <nmav@redhat.com>
+Date:   Fri Jun 7 16:39:53 2019 +0200
+
+    status-request-ext: run under all TLS versions
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+Author: Nikos Mavrogiannopoulos <nmav@redhat.com>
+Date:   Fri Jun 7 16:35:11 2019 +0200
+
+    tests: status-request: cleanup
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+Author: Nikos Mavrogiannopoulos <nmav@redhat.com>
+Date:   Fri Jun 7 16:34:21 2019 +0200
+
+    tests: status-request-missing: run for all TLS versions
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Date:   Sat Jun 29 21:02:11 2019 +0200
+
+    gnutls-cli-debug: test whether RSA key exchange is supported
+    
+    Resolves: #449
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Date:   Fri Jun 28 21:08:32 2019 +0200
+
+    gnutls_session_get_desc: avoid printing a NULL value
+    
+    When gnutls_session_set_premaster() is used (under openconnect),
+    it is possible that gnutls_session_get_desc will print a string like
+    this: "(DTLS1.2)-(ECDHE-(null))-(AES-256-GCM)"
+    
+    With this change we ensure that we do not print null values.
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+Author: Daiki Ueno <dueno@redhat.com>
+Date:   Fri Jun 21 15:49:26 2019 +0200
+
+    nettle/rnd-fips: add FIPS 140-2 continuous RNG test
+    
+    This adds a continuous random number generator test as defined in FIPS
+    140-2 4.9.2, by iteratively fetching fixed sized block from the system
+    and comparing consecutive blocks.
+    
+    Signed-off-by: Daiki Ueno <dueno@redhat.com>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Fri Jun 28 16:54:30 2019 +0300
+
+    lib: document gnutls_hmac_fast vs nonce relationship
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Fri Jun 28 00:27:01 2019 +0300
+
+    tests/gnutls_hmac_fast: run test for AES-UMAC-96/-128
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Tue Jun 25 00:12:29 2019 +0300
+
+    nettle: return true for gnutls_mac_exists(AES-CMAC*)
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Fri Jun 28 16:28:58 2019 +0300
+
+    NEWS: add an entry for AES-GMAC algorithms
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Fri Jun 28 00:27:01 2019 +0300
+
+    tests/gnutls_hmac_fast: run test for AES-GMAC-128/-192/-256
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Fri Jun 28 16:19:15 2019 +0300
+
+    nettle/mac: fail mac calculation if nonce is required but not provided
+    
+    Fail _wrap_nettle_mac_set_nonce() and _wrap_nettle_mac_fast() if MAC
+    requires nonce, but it was not supplied.
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Fri Jun 28 00:27:04 2019 +0300
+
+    nettle/mac: in mac_fast call set_nonce after set_key
+    
+    Calling set_nonce before set_key is plain incorrect. For GMAC key is not
+    initialized. For UMAC set_key will reset nonce to empty.
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Mon Jun 24 20:29:31 2019 +0300
+
+    lib: add support for AES-GMAC
+    
+    Add support for computing AES-GMAC using MAC API, as requested by Samba
+    for SMB3 support.
+    
+    Resolves: #781
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Nikos Mavrogiannopoulos <nmav@redhat.com>
+Date:   Fri Jun 28 14:59:19 2019 +0200
+
+    tests: gnutls_x509_crt_list_import: verify that return code is as documented
+    
+    That checks whether the return code of gnutls_x509_crt_list_import()
+    contains the number of loaded certificates.
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+Author: Nikos Mavrogiannopoulos <nmav@redhat.com>
+Date:   Fri Jun 28 08:20:31 2019 +0200
+
+    gnutls_x509_crt_list_import2: updated doc to reflect the actual return value options
+    
+    Resolves: #794
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+Author: Nikos Mavrogiannopoulos <nmav@redhat.com>
+Date:   Mon Apr 29 15:28:28 2019 +0200
+
+    Align _gnutls_x86_cpuid_s as OPENSSL_ia32cap_P would be
+    
+    We were not setting the third array member correctly, though
+    this didn't have any impact to previous implementations as they
+    did not rely on it. This also moves away from the custom implementation
+    of cpuid (which was limited), and we now rely on the compiler's
+    version.
+    
+    This effectively enables support for SHA_NI.
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+Author: Nikos Mavrogiannopoulos <nmav@redhat.com>
+Date:   Fri Apr 26 14:43:19 2019 +0200
+
+    Updated asm files to latest version under cryptogams license
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Wed Jun 26 14:24:42 2019 +0300
+
+    NEWS: document gnutls_hash/hmac_copy addition
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Nikos Mavrogiannopoulos <nmav@redhat.com>
+Date:   Wed Jun 26 11:27:27 2019 +0200
+
+    gnutls_hash/hmac_copy: check its usability in all cases
+    
+    During the test suite run we require that all supported
+    MAC and hash algorithms implement the copy function.
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+Author: Nikos Mavrogiannopoulos <nmav@redhat.com>
+Date:   Wed Jun 26 11:20:25 2019 +0200
+
+    accelerated ciphers: implement hmac and hash copy
+    
+    This implements the new API to all internal implementations.
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Wed Jun 26 11:00:39 2019 +0300
+
+    lib: add support for gnutls_hash_copy()
+    
+    Add gnutls_hash_copy() function for copying message digest context.
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Mon Jun 24 17:42:10 2019 +0300
+
+    crypto-selftests: add test for gnutls_hmac_copy()
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Mon Jun 24 17:38:56 2019 +0300
+
+    api: add gnutls_hmac_copy() function
+    
+    Add gnutls_hmac_copy() API to duplicate MAC handler state, which is
+    necessary for SMB3 support.
+    
+    Resolves: #787
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Wed Nov 30 01:34:14 2016 +0300
+
+    Add MAC copying support to nettle backend
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Wed Nov 30 01:32:30 2016 +0300
+
+    Add MAC api to support copying of instances
+    
+    GOST ciphersuites requires continuously computing MAC of all the
+    previously sent or received data. The easies way to support that is to
+    add support for copy function, that creates MAC instance with the same
+    internal state.
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Nikos Mavrogiannopoulos <nmav@redhat.com>
+Date:   Wed May 29 10:36:24 2019 +0200
+
+    updated auto-generated files
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+Author: Nikos Mavrogiannopoulos <nmav@redhat.com>
+Date:   Thu Apr 4 16:25:37 2019 +0200
+
+    config: added ability to override and mark algorithms as disabled
+    
+    This allows the system administrator or the distributor to use
+    the gnutls configuration file to mark hashes, signature algorithms,
+    TLS versions, curves, groups, ciphers KX, and MAC algorithms as
+    insecure (the last four only in the context of a TLS session).
+    It also allows to set a minimum profile which the applications
+    cannot fall below.
+    
+    The options intentionally do not allow marking algorithms as
+    secure so that the configuration file cannot be used as an attack
+    vector. This change also makes sure that unsupported and disabled protocols
+    during compile time (e.g., SSL3.0), do not get listed by gnutls-cli.
+    
+    The configuration file feature can be disabled at compile time
+    with an empty --with-system-priority-file.
+    
+    This patch it introduces the function gnutls_get_system_config_file()
+    allowing applications to check whether a configuration file
+    was used.
+    
+    Resolves: #587
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+Author: Nikos Mavrogiannopoulos <nmav@redhat.com>
+Date:   Wed Apr 3 11:59:37 2019 +0200
+
+    Use inih to parse configuration file
+    
+    This introduces the inih copylib, and makes our configuration
+    file parsing more flexible.
+    
+    Relates: #587
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Date:   Wed Jun 19 21:38:32 2019 +0200
+
+    Marked the crypto backend registration APIs as deprecated
+    
+    This is to warn for a future conversion of these APIs to a no-op.
+    
+    Resolves: #789
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+Author: Nikos Mavrogiannopoulos <nmav@redhat.com>
+Date:   Wed Jun 19 14:20:26 2019 +0000
+
+    gnutls-cli-debug.sh: sanity check of %ALLOW_SMALL_RECORDS test
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+Author: Daiki Ueno <dueno@redhat.com>
+Date:   Fri Jun 7 11:39:53 2019 +0200
+
+    tlsfuzzer: test both with and without %ALLOW_SMALL_RECORDS
+    
+    The option changes the behavior of the server, it would make sense to
+    check both with and without %ALLOW_SMALL_RECORDS.
+    
+    Signed-off-by: Daiki Ueno <dueno@redhat.com>
+
+Author: Daiki Ueno <dueno@redhat.com>
+Date:   Fri Jun 7 15:10:36 2019 +0200
+
+    tlsfuzzer: use fixed HTTP response for record_size_limit tests
+    
+    Previously those tests assumed varying sizes of connection information
+    gnutls-serv sends.  This is too brittle and if the default algorithm
+    has changed the tests need to be updated.
+    
+    Signed-off-by: Daiki Ueno <dueno@redhat.com>
+
+Author: Daiki Ueno <dueno@redhat.com>
+Date:   Fri Jun 7 14:54:58 2019 +0200
+
+    gnutls-serv: add --httpdata option to respond with fixed sized data
+    
+    By default, the gnutls-server --http responds with the connection
+    information.  While this is useful for manual testing, fixed content
+    would be more desirable for automated testing.
+    
+    Signed-off-by: Daiki Ueno <dueno@redhat.com>
+
+Author: Daiki Ueno <dueno@redhat.com>
+Date:   Fri Jun 7 11:37:37 2019 +0200
+
+    gnutls-cli-debug: check if %ALLOW_SMALL_RECORDS is required
+    
+    This adds a new test against the server to check if
+    %ALLOW_SMALL_RECORDS is required to continue communicating with the
+    server.  The test is in two parts: one to check if the server accepts
+    records with the default size (512 bytes) and the other is to check if
+    %ALLOW_SMALL_RECORDS helps if the previuos test fails.
+    
+    Signed-off-by: Daiki Ueno <dueno@redhat.com>
+
+Author: Daiki Ueno <dueno@redhat.com>
+Date:   Wed Jun 19 14:36:31 2019 +0200
+
+    gnutls-serv: add --recordsize option
+    
+    This adds a means to set maximum record size to receive.  If the size
+    is less than our default (< 512), --priority with %ALLOW_SMALL_RECORDS
+    also needs to be specified.
+    
+    Signed-off-by: Daiki Ueno <dueno@redhat.com>
+
+Author: Karsten Ohme <k_o_@users.sourceforge.net>
+Date:   Wed Jun 19 07:51:16 2019 +0200
+
+    Corrected call for updating ABI files
+    
+    Signed-off-by: Karsten Ohme <k_o_@users.sourceforge.net>
+
+Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Date:   Sun Jun 16 14:08:54 2019 +0200
+
+    doc: updated p11-kit links [ci skip]
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+Author: Andreas Metzler <ametzler@bebt.de>
+Date:   Sat Jun 15 11:38:46 2019 +0200
+
+    CONTRIBUTING.md: Fix syntax error  [ci skip]
+    
+    Signed-off-by: Andreas Metzler <ametzler@bebt.de>
+
+Author: Ludovic Courtès <ludo@gnu.org>
+Date:   Wed Jun 12 11:37:39 2019 +0200
+
+    guile: Add support for post-handshake reauthentication.
+    
+    * guile/modules/gnutls/build/enums.scm (%connection-flag-enum): New
+    variable.
+    (%gnutls-enums): Add it.
+    * guile/modules/gnutls.in: Export 'reauthenticate',
+    'connection-flag->string', and all the 'connection-flag/' bindings.
+    * guile/src/core.c (scm_gnutls_make_session): Add rest arguments FLAGS
+    and honor it.
+    (scm_gnutls_reauthenticate): New function.
+    * guile/tests/reauth.scm: New file.
+    * guile/Makefile.am (TESTS): Add it.
+    
+    Signed-off-by: Ludovic Courtès <ludo@gnu.org>
+
+Author: Ludovic Courtès <ludo@gnu.org>
+Date:   Wed Jun 12 11:32:19 2019 +0200
+
+    guile: Loop or poll upon GNUTLS_E_AGAIN and GNUTLS_E_INTERRUPTED.
+    
+    * guile/src/core.c (do_fill_port) [USING_GUILE_BEFORE_2_2]: Loop while
+    'gnutls_record_recv' returns GNUTLS_E_AGAIN or GNUTLS_E_INTERRUPTED.
+    (read_from_session_record_port) [!USING_GUILE_BEFORE_2_2]: Likewise, and
+    return -1 if SCM_GNUTLS_SESSION_TRANSPORT_IS_FD and we got GNUTLS_E_AGAIN.
+    (session_record_port_fd) [!USING_GUILE_BEFORE_2_2]: New function.
+    (scm_init_gnutls_session_record_port_type) [!USING_GUILE_BEFORE_2_2]:
+    Call 'scm_set_port_read_wait_fd'.
+    
+    Signed-off-by: Ludovic Courtès <ludo@gnu.org>
+
+Author: Ludovic Courtès <ludo@gnu.org>
+Date:   Fri Jun 7 11:06:18 2019 +0200
+
+    guile: Add bindings for 'gnutls_error_is_fatal'.
+    
+    * guile/src/errors.c (scm_gnutls_fatal_error_p): New function.
+    * guile/modules/gnutls.in: Export 'fatal-error?'.
+    * guile/tests/errors.scm: test 'fatal-error?'.
+    
+    Signed-off-by: Ludovic Courtès <ludo@gnu.org>
+
+Author: Ludovic Courtès <ludo@gnu.org>
+Date:   Fri Jun 7 10:34:42 2019 +0200
+
+    guile: Update list of error values.
+    
+    * guile/modules/gnutls/build/enums.scm (%error-enum): Update list of
+    error constants.
+    * guile/modules/gnutls.in (gnutls): Adjust exports accordingly.
+    
+    Signed-off-by: Ludovic Courtès <ludo@gnu.org>
+
+Author: Daiki Ueno <dueno@redhat.com>
+Date:   Wed Jun 12 14:02:05 2019 +0200
+
+    fips: run selftests over overridden AES-CBC algorithm
+    
+    Previously, we only tested nettle's AES-CBC in
+    _gnutls_fips_perform_self_checks1(), which is called before the
+    implementation is overridden.  This adds an AES-CBC self-test in
+    _gnutls_fips_perform_self_checks2() so it can test the actual
+    implementation.
+    
+    Signed-off-by: Daiki Ueno <dueno@redhat.com>
+
+Author: Ludovic Courtès <ludo@gnu.org>
+Date:   Thu Jun 6 18:30:28 2019 +0200
+
+    guile: Deprecate OpenPGP bindings.
+    
+    * guile/modules/gnutls.in (define-deprecated): New macro.
+    Use it for all the *openpgp* bindings.
+    * guile/src/core.c: Rename *openpgp* bindings with a '%' prefix.
+    
+    Signed-off-by: Ludovic Courtès <ludo@gnu.org>
+
+Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Date:   Mon Jun 10 22:12:09 2019 +0200
+
+    gnutls_privkey_sign_hash2: accept the GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA flag
+    
+    Previously this flag was ignored, although documented not to.
+    This patch also enables the tests sign-verify-newapi and sign-verify-data-newapi
+    which were supposed to test this interface, but were never enabled.
+    
+    This was caught by Andreas Metzler.
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+Author: Nikos Mavrogiannopoulos <nmav@redhat.com>
+Date:   Thu May 30 13:49:22 2019 +0200
+
+    tests: removed debugging output from GETPORT
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Date:   Sat Jun 8 19:19:03 2019 +0200
+
+    .gitlab-ci.yml: include top log files in all build failures [ci skip]
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+Author: Ludovic Courtès <ludo@gnu.org>
+Date:   Fri Jun 7 10:16:02 2019 +0200
+
+    guile: Remove unbounded uses of 'alloca'.
+    
+    * guile/src/core.c (ALLOCA_MAX_SIZE, FAST_ALLOC): New macros.
+    (set_certificate_file):
+    (scm_gnutls_set_certificate_credentials_x509_key_files_x)
+    (scm_gnutls_set_srp_server_credentials_files_x)
+    (scm_gnutls_set_srp_client_credentials_x)
+    (scm_gnutls_srp_base64_encode, scm_gnutls_srp_base64_decode)
+    (scm_gnutls_set_psk_server_credentials_file_x)
+    (scm_gnutls_pkcs8_import_x509_private_key)
+    (scm_gnutls_x509_certificate_matches_hostname_p)
+    (scm_gnutls_import_openpgp_private_key): Use 'FAST_ALLOC' instead of
+    'alloca'.
+    * guile/src/utils.c: Remove unneeded <alloca.h> include.
+    
+    Signed-off-by: Ludovic Courtès <ludo@gnu.org>
+
+Author: Ludovic Courtès <ludo@gnu.org>
+Date:   Fri Jun 7 10:11:12 2019 +0200
+
+    guile: Always provide 'scm_gc_malloc_pointerless'.
+    
+    * guile/src/core.c (scm_gc_malloc_pointerless)
+    [!HAVE_SCM_GC_MALLOC_POINTERLESS]: New macro.
+    (make_session_record_port): Remove #ifdef HAVE_SCM_GC_MALLOC_POINTERLESS.
+    
+    Signed-off-by: Ludovic Courtès <ludo@gnu.org>
+
+Author: Daiki Ueno <dueno@redhat.com>
+Date:   Wed Jun 5 16:48:39 2019 +0200
+
+    tls13/key_update: ignore multiple key updates instead of error
+    
+    This fixes the multiple KeyUpdate messages handling in commit
+    65e2aa80d114d4bef095d129c2eda475e473244a, where illegal_parameter is
+    sent even if the limit doesn't exceed.
+    
+    Signed-off-by: Daiki Ueno <dueno@redhat.com>
+
+Author: Tim Rühsen <tim.ruehsen@gmx.de>
+Date:   Mon Jun 3 21:53:05 2019 +0200
+
+    Prefix gcc attributes with 'attr_'
+    
+    Signed-off-by: Tim Rühsen <tim.ruehsen@gmx.de>
+
+Author: Nikos Mavrogiannopoulos <nmav@redhat.com>
+Date:   Mon Jun 3 13:26:18 2019 +0200
+
+    gnutls_prf_early: corrected Since version [ci skip]
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+Author: Tim Rühsen <tim.ruehsen@gmx.de>
+Date:   Sun Jun 2 12:42:16 2019 +0200
+
+    Fix warn_unused_result for clang < 4
+    
+    Signed-off-by: Tim Rühsen <tim.ruehsen@gmx.de>
+
+Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Date:   Sat Jun 1 16:18:50 2019 +0200
+
+    .gitlab-ci.yml: switched fedora to latest version
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+Author: Nikos Mavrogiannopoulos <nmav@redhat.com>
+Date:   Thu May 30 14:42:52 2019 +0200
+
+    Makefile.am: do not create files when it shouldn't
+    
+    If a pdf or html file is not distributed, previously `make dist`
+    would create a file called '*.pdf' which did not make sense. This
+    addresses this problem.
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Date:   Sat May 25 21:17:27 2019 +0200
+
+    Do not regenerate autogen files if --enable-local-libopts is given
+    
+    This addresses issue on installed systems which have autogen but
+    use --enable-local-libopts. In these systems if the installed autogen
+    would not match the local libopts library version compilation would
+    fail because the auto-generated files depend on the corresponding to
+    autogen version libopts internals.
+    
+    Resolves: #772
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Date:   Mon May 27 15:16:52 2019 +0200
+
+    Remove malloc from gnutls_srp_set_server_fake_salt_seed()
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+Author: Tim Rühsen <tim.ruehsen@gmx.de>
+Date:   Mon May 20 12:49:51 2019 +0200
+
+    gnutls_session_set_data(): Check for allocation error
+    
+    Signed-off-by: Tim Rühsen <tim.ruehsen@gmx.de>
+
+Author: Tim Rühsen <tim.ruehsen@gmx.de>
+Date:   Mon May 20 12:46:54 2019 +0200
+
+    _gnutls_set_[str]datum: Cleanup, add function attributes
+    
+    _gnutls_set_datum(): Do not change output 'dat' on error
+    _gnutls_set_strdatum: Likewise, cleanup code
+    
+    Signed-off-by: Tim Rühsen <tim.ruehsen@gmx.de>
+
+Author: Tim Rühsen <tim.ruehsen@gmx.de>
+Date:   Tue May 21 11:17:39 2019 +0200
+
+    Add nonnull, nonnull_all and warn_unusd_result attributes in lib/gnutls_int.h
+    
+    Signed-off-by: Tim Rühsen <tim.ruehsen@gmx.de>
+
+Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
 Date:   Tue May 28 07:05:46 2019 +0200
 
     doc: do not distribute pdf files
@@ -26,6 +844,18 @@ Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
 Date:   Mon May 27 21:29:44 2019 +0200
 
     doc update [ci skip]
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Date:   Sun May 26 21:35:19 2019 +0200
+
+    RELEASES.md: document the releases policy [ci skip]
+    
+    This adds a file to document the policy on releases based on
+    the discussions taken place in the last face to face meeting.
+    
+    https://gitlab.com/gnutls/gnutls/wikis/face2face-meeting-fosdem2019
     
     Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
@@ -40599,38 +41429,3 @@ Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
 Date:   Fri Nov 7 21:46:58 2014 +0100
 
     tools: include arpa/inet.h in socket.c
-
-Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
-Date:   Fri Nov 7 19:18:22 2014 +0100
-
-    doc: use the same port for DTLS client and server
-
-Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
-Date:   Fri Nov 7 19:01:57 2014 +0100
-
-    pkcs11: pass the correct user type to protected authentication login
-
-Author: Nikos Mavrogiannopoulos <nmav@redhat.com>
-Date:   Fri Nov 7 10:22:11 2014 +0100
-
-    doc: corrected values for INSECURE level
-
-Author: Nikos Mavrogiannopoulos <nmav@redhat.com>
-Date:   Fri Nov 7 08:55:40 2014 +0100
-
-    pkcs11: support the CKA_EXTRACTABLE and CKA_NEVER_EXTRACTABLE flags
-
-Author: Nikos Mavrogiannopoulos <nmav@redhat.com>
-Date:   Fri Nov 7 08:44:46 2014 +0100
-
-    pkcs11: added the flag GNUTLS_PKCS11_OBJ_FLAG_MARK_ALWAYS_AUTH
-
-Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
-Date:   Fri Nov 7 07:54:41 2014 +0100
-
-    pkcs11: perform reauth at the appropriate state
-
-Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
-Date:   Fri Nov 7 07:49:54 2014 +0100
-
-    pkcs11_login: set the correct user type on reauthentication

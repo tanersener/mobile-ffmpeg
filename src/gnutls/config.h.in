@@ -57,6 +57,9 @@
 /* use the given pkcs11 uri as default trust store */
 #undef DEFAULT_TRUST_STORE_PKCS11
 
+/* Whether to disable system configuration */
+#undef DISABLE_SYSTEM_CONFIG
+
 /* enable ALPN support */
 #undef ENABLE_ALPN
 
@@ -967,8 +970,20 @@
 /* Define to 1 if you have the `nettle_cmac128_update' function. */
 #undef HAVE_NETTLE_CMAC128_UPDATE
 
+/* Define to 1 if you have the `nettle_gost28147_set_key' function. */
+#undef HAVE_NETTLE_GOST28147_SET_KEY
+
+/* Define to 1 if you have the `nettle_gosthash94cp_update' function. */
+#undef HAVE_NETTLE_GOSTHASH94CP_UPDATE
+
 /* Define to 1 if you have the `nettle_rsa_sec_decrypt' function. */
 #undef HAVE_NETTLE_RSA_SEC_DECRYPT
+
+/* Define to 1 if you have the `nettle_streebog512_update' function. */
+#undef HAVE_NETTLE_STREEBOG512_UPDATE
+
+/* Define to 1 if you have the `nettle_xts_encrypt_message' function. */
+#undef HAVE_NETTLE_XTS_ENCRYPT_MESSAGE
 
 /* Define to 1 if you have the `newlocale' function. */
 #undef HAVE_NEWLOCALE
@@ -1389,9 +1404,6 @@
 /* Define to 1 if you have the <xlocale.h> header file. */
 #undef HAVE_XLOCALE_H
 
-/* Define to 1 if you have the `xts_encrypt_message' function. */
-#undef HAVE_XTS_ENCRYPT_MESSAGE
-
 /* Define to 1 if the system has the type `_Bool'. */
 #undef HAVE__BOOL
 
@@ -1428,6 +1440,21 @@
 
 /* Define to 1 if you have the `__xpg_strerror_r' function. */
 #undef HAVE___XPG_STRERROR_R
+
+/* whether to allowin inline comments */
+#undef INI_ALLOW_INLINE_COMMENTS
+
+/* The inline comment prefixes */
+#undef INI_INLINE_COMMENT_PREFIXES
+
+/* inih maximum line size */
+#undef INI_MAX_LINE
+
+/* The comment prefixes */
+#undef INI_START_COMMENT_PREFIXES
+
+/* whether to stop on first error */
+#undef INI_STOP_ON_FIRST_ERROR
 
 /* Define to 1 if lseek does not detect pipes. */
 #undef LSEEK_PIPE_BROKEN
@@ -1574,7 +1601,7 @@
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
 
-/* The system priority file */
+/* The system-wide gnutls configuration file */
 #undef SYSTEM_PRIORITY_FILE
 
 /* Define to 1 if time_t is signed. */

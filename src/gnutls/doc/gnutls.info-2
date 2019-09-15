@@ -1,6 +1,6 @@
-This is gnutls.info, produced by makeinfo version 6.5 from gnutls.texi.
+This is gnutls.info, produced by makeinfo version 6.6 from gnutls.texi.
 
-This manual is last updated 3 January 2019 for version 3.6.8 of GnuTLS.
+This manual is last updated 27 June 2019 for version 3.6.9 of GnuTLS.
 
 Copyright (C) 2001-2019 Free Software Foundation, Inc.\\ Copyright (C)
 2001-2019 Nikos Mavrogiannopoulos
@@ -286,7 +286,50 @@ is disabled on platforms without a working 'fork(2)' function.  The
 'PAGER' environment variable is used to select the program, defaulting
 to 'more'.  Both will exit with a status code of 0.
 
-     tpmtool is unavailable - no --help
+     tpmtool - GnuTLS TPM tool
+     Usage:  tpmtool [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
+
+        -d, --debug=num            Enable debugging
+                                     - it must be in the range:
+                                       0 to 9999
+            --infile=file          Input file
+                                     - file must pre-exist
+            --outfile=str          Output file
+            --generate-rsa         Generate an RSA private-public key pair
+            --register             Any generated key will be registered in the TPM
+                                     - requires the option 'generate-rsa'
+            --signing              Any generated key will be a signing key
+                                     - requires the option 'generate-rsa'
+                                     -- and prohibits the option 'legacy'
+            --legacy               Any generated key will be a legacy key
+                                     - requires the option 'generate-rsa'
+                                     -- and prohibits the option 'signing'
+            --user                 Any registered key will be a user key
+                                     - requires the option 'register'
+                                     -- and prohibits the option 'system'
+            --system               Any registered key will be a system key
+                                     - requires the option 'register'
+                                     -- and prohibits the option 'user'
+            --pubkey=str           Prints the public key of the provided key
+            --list                 Lists all stored keys in the TPM
+            --delete=str           Delete the key identified by the given URL (UUID).
+            --test-sign=str        Tests the signature operation of the provided object
+            --sec-param=str        Specify the security level [low, legacy, medium, high, ultra].
+            --bits=num             Specify the number of bits for key generate
+            --inder                Use the DER format for keys.
+                                     - disabled as '--no-inder'
+            --outder               Use DER format for output keys
+                                     - disabled as '--no-outder'
+            --srk-well-known       SRK has well known password (20 bytes of zeros)
+        -v, --version[=arg]        output version information and exit
+        -h, --help                 display extended usage information and exit
+        -!, --more-help            extended usage information passed thru pager
+
+     Options are specified by doubled hyphens and their name or by a single
+     hyphen and the flag character.
+
+     Program that allows handling cryptographic data from the TPM chip.
+
 
 debug option (-d)
 -----------------
@@ -614,6 +657,7 @@ Variable               Purpose
                           * 0x4: Enable SSSE3
                           * 0x8: Enable PCLMUL
                           * 0x10: Enable AVX
+                          * 0x20: Enable SHA_NI
                           * 0x100000: Enable VIA padlock
                           * 0x200000: Enable VIA PHE
                           * 0x400000: Enable VIA PHE SHA512
@@ -2689,13 +2733,15 @@ compatibility with old clients and servers).
 Keyword        Description
 ------------------------------------------------------------------
 @KEYWORD       Means that a compile-time specified system
-               configuration file(1) will be used to expand the
-               provided keyword.  That is used to impose
-               system-specific policies.  It may be followed by
-               additional options that will be appended to the
-               system string (e.g., "@SYSTEM:+SRP"). The system
-               file should have the format 'KEYWORD=VALUE',
-               e.g., 'SYSTEM=NORMAL:+ARCFOUR-128'.
+               configuration file (see
+               *note System-wide configuration of the library::)
+               will be used to expand the provided keyword.
+               That is used to impose system-specific policies.
+               It may be followed by additional options that
+               will be appended to the system string (e.g.,
+               "@SYSTEM:+SRP"). The system file should have the
+               format 'KEYWORD=VALUE', e.g.,
+               'SYSTEM=NORMAL:+ARCFOUR-128'.
                
                Since version 3.5.1 it is allowed to specify
                fallback keywords such as @KEYWORD1,@KEYWORD2,
@@ -2907,7 +2953,7 @@ types          fashion (i.e.  the same for both client and
 Table 6.4: The supported algorithm keywords in priority strings.
 
 Note that the finite field groups (indicated by the FFDHE prefix) and
-DHE key exchange methods are generally slower(2) than their elliptic
+DHE key exchange methods are generally slower(1) than their elliptic
 curves counterpart (ECDHE).
 
 The available special keywords are shown in *note Table 6.5:
@@ -3113,9 +3159,7 @@ Example priority strings are:
 
    ---------- Footnotes ----------
 
-   (1) The default is '/etc/gnutls/default-priorities'.
-
-   (2) It depends on the group in use.  Groups with less bits are always
+   (1) It depends on the group in use.  Groups with less bits are always
 faster, but the number of bits ties with the security parameter.  See
 *note Selecting cryptographic key sizes:: for the acceptable security
 levels.
@@ -4142,7 +4186,7 @@ compatibility layer include:
    * Error handling is not thread safe.
 
 
-File: gnutls.info,  Node: GnuTLS application examples,  Next: Using GnuTLS as a cryptographic library,  Prev: How to use GnuTLS in applications,  Up: Top
+File: gnutls.info,  Node: GnuTLS application examples,  Next: System-wide configuration of the library,  Prev: How to use GnuTLS in applications,  Up: Top
 
 7 GnuTLS application examples
 *****************************
@@ -7060,196 +7104,6 @@ int main(void)
         gnutls_psk_free_server_credentials(psk_cred);
 
         gnutls_priority_deinit(priority_cache);
-
-        gnutls_global_deinit();
-
-        return 0;
-
-}
-
-
-File: gnutls.info,  Node: Echo server with SRP authentication,  Next: Echo server with anonymous authentication,  Prev: Echo server with PSK authentication,  Up: More advanced client and servers
-
-7.3.10 Echo server with SRP authentication
-------------------------------------------
-
-This is a server which supports SRP authentication.  It is also possible
-to combine this functionality with a certificate server.  Here it is
-separate for simplicity.
-
-/* This example code is placed in the public domain. */
-
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <string.h>
-#include <unistd.h>
-#include <gnutls/gnutls.h>
-
-#define SRP_PASSWD "tpasswd"
-#define SRP_PASSWD_CONF "tpasswd.conf"
-
-#define KEYFILE "key.pem"
-#define CERTFILE "cert.pem"
-#define CAFILE "/etc/ssl/certs/ca-certificates.crt"
-
-#define LOOP_CHECK(rval, cmd) \
-        do { \
-                rval = cmd; \
-        } while(rval == GNUTLS_E_AGAIN || rval == GNUTLS_E_INTERRUPTED)
-
-/* This is a sample TLS-SRP echo server.
- */
-
-#define SOCKET_ERR(err,s) if(err==-1) {perror(s);return(1);}
-#define MAX_BUF 1024
-#define PORT 5556               /* listen to 5556 port */
-
-int main(void)
-{
-        int err, listen_sd;
-        int sd, ret;
-        struct sockaddr_in sa_serv;
-        struct sockaddr_in sa_cli;
-        socklen_t client_len;
-        char topbuf[512];
-        gnutls_session_t session;
-        gnutls_srp_server_credentials_t srp_cred;
-        gnutls_certificate_credentials_t cert_cred;
-        char buffer[MAX_BUF + 1];
-        int optval = 1;
-        char name[256];
-
-        strcpy(name, "Echo Server");
-
-        if (gnutls_check_version("3.1.4") == NULL) {
-                fprintf(stderr, "GnuTLS 3.1.4 or later is required for this example\n");
-                exit(1);
-        }
-
-        /* for backwards compatibility with gnutls < 3.3.0 */
-        gnutls_global_init();
-
-        /* SRP_PASSWD a password file (created with the included srptool utility) 
-         */
-        gnutls_srp_allocate_server_credentials(&srp_cred);
-        gnutls_srp_set_server_credentials_file(srp_cred, SRP_PASSWD,
-                                               SRP_PASSWD_CONF);
-
-        gnutls_certificate_allocate_credentials(&cert_cred);
-        gnutls_certificate_set_x509_trust_file(cert_cred, CAFILE,
-                                               GNUTLS_X509_FMT_PEM);
-        gnutls_certificate_set_x509_key_file(cert_cred, CERTFILE, KEYFILE,
-                                             GNUTLS_X509_FMT_PEM);
-
-        /* TCP socket operations
-         */
-        listen_sd = socket(AF_INET, SOCK_STREAM, 0);
-        SOCKET_ERR(listen_sd, "socket");
-
-        memset(&sa_serv, '\0', sizeof(sa_serv));
-        sa_serv.sin_family = AF_INET;
-        sa_serv.sin_addr.s_addr = INADDR_ANY;
-        sa_serv.sin_port = htons(PORT); /* Server Port number */
-
-        setsockopt(listen_sd, SOL_SOCKET, SO_REUSEADDR, (void *) &optval,
-                   sizeof(int));
-
-        err =
-            bind(listen_sd, (struct sockaddr *) &sa_serv, sizeof(sa_serv));
-        SOCKET_ERR(err, "bind");
-        err = listen(listen_sd, 1024);
-        SOCKET_ERR(err, "listen");
-
-        printf("%s ready. Listening to port '%d'.\n\n", name, PORT);
-
-        client_len = sizeof(sa_cli);
-        for (;;) {
-                gnutls_init(&session, GNUTLS_SERVER);
-                gnutls_priority_set_direct(session,
-                                           "NORMAL"
-                                           ":-KX-ALL:+SRP:+SRP-DSS:+SRP-RSA",
-                                           NULL);
-                gnutls_credentials_set(session, GNUTLS_CRD_SRP, srp_cred);
-                /* for the certificate authenticated ciphersuites.
-                 */
-                gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
-                                       cert_cred);
-
-                /* We don't request any certificate from the client.
-                 * If we did we would need to verify it. One way of
-                 * doing that is shown in the "Verifying a certificate"
-                 * example.
-                 */
-                gnutls_certificate_server_set_request(session,
-                                                      GNUTLS_CERT_IGNORE);
-
-                sd = accept(listen_sd, (struct sockaddr *) &sa_cli,
-                            &client_len);
-
-                printf("- connection from %s, port %d\n",
-                       inet_ntop(AF_INET, &sa_cli.sin_addr, topbuf,
-                                 sizeof(topbuf)), ntohs(sa_cli.sin_port));
-
-                gnutls_transport_set_int(session, sd);
-
-                LOOP_CHECK(ret, gnutls_handshake(session));
-                if (ret < 0) {
-                        close(sd);
-                        gnutls_deinit(session);
-                        fprintf(stderr,
-                                "*** Handshake has failed (%s)\n\n",
-                                gnutls_strerror(ret));
-                        continue;
-                }
-                printf("- Handshake was completed\n");
-                printf("- User %s was connected\n",
-                       gnutls_srp_server_get_username(session));
-
-                /* print_info(session); */
-
-                for (;;) {
-                        LOOP_CHECK(ret, gnutls_record_recv(session, buffer, MAX_BUF));
-
-                        if (ret == 0) {
-                                printf
-                                    ("\n- Peer has closed the GnuTLS connection\n");
-                                break;
-                        } else if (ret < 0
-                                   && gnutls_error_is_fatal(ret) == 0) {
-                                fprintf(stderr, "*** Warning: %s\n",
-                                        gnutls_strerror(ret));
-                        } else if (ret < 0) {
-                                fprintf(stderr, "\n*** Received corrupted "
-                                        "data(%d). Closing the connection.\n\n",
-                                        ret);
-                                break;
-                        } else if (ret > 0) {
-                                /* echo data back to the client
-                                 */
-                                gnutls_record_send(session, buffer, ret);
-                        }
-                }
-                printf("\n");
-                /* do not wait for the peer to close the connection. */
-                LOOP_CHECK(ret, gnutls_bye(session, GNUTLS_SHUT_WR));
-
-                close(sd);
-                gnutls_deinit(session);
-
-        }
-        close(listen_sd);
-
-        gnutls_srp_free_server_credentials(srp_cred);
-        gnutls_certificate_free_credentials(cert_cred);
 
         gnutls_global_deinit();
 

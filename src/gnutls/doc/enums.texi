@@ -23,9 +23,9 @@ Camellia in CBC mode with 256-bit keys.
 @item GNUTLS_@-CIPHER_@-AES_@-192_@-CBC
 AES in CBC mode with 192-bit keys.
 @item GNUTLS_@-CIPHER_@-AES_@-128_@-GCM
-AES in GCM mode with 128-bit keys.
+AES in GCM mode with 128-bit keys (AEAD).
 @item GNUTLS_@-CIPHER_@-AES_@-256_@-GCM
-AES in GCM mode with 256-bit keys.
+AES in GCM mode with 256-bit keys (AEAD).
 @item GNUTLS_@-CIPHER_@-CAMELLIA_@-192_@-CBC
 Camellia in CBC mode with 192-bit keys.
 @item GNUTLS_@-CIPHER_@-SALSA20_@-256
@@ -33,21 +33,21 @@ Salsa20 with 256-bit keys.
 @item GNUTLS_@-CIPHER_@-ESTREAM_@-SALSA20_@-256
 Estream's Salsa20 variant with 256-bit keys.
 @item GNUTLS_@-CIPHER_@-CAMELLIA_@-128_@-GCM
-CAMELLIA in GCM mode with 128-bit keys.
+CAMELLIA in GCM mode with 128-bit keys (AEAD).
 @item GNUTLS_@-CIPHER_@-CAMELLIA_@-256_@-GCM
-CAMELLIA in GCM mode with 256-bit keys.
+CAMELLIA in GCM mode with 256-bit keys (AEAD).
 @item GNUTLS_@-CIPHER_@-RC2_@-40_@-CBC
 RC2 in CBC mode with 40-bit keys.
 @item GNUTLS_@-CIPHER_@-DES_@-CBC
 DES in CBC mode (56-bit keys).
 @item GNUTLS_@-CIPHER_@-AES_@-128_@-CCM
-AES in CCM mode with 128-bit keys.
+AES in CCM mode with 128-bit keys (AEAD).
 @item GNUTLS_@-CIPHER_@-AES_@-256_@-CCM
-AES in CCM mode with 256-bit keys.
+AES in CCM mode with 256-bit keys (AEAD).
 @item GNUTLS_@-CIPHER_@-AES_@-128_@-CCM_@-8
-AES in CCM mode with 64-bit tag and 128-bit keys.
+AES in CCM mode with 64-bit tag and 128-bit keys (AEAD).
 @item GNUTLS_@-CIPHER_@-AES_@-256_@-CCM_@-8
-AES in CCM mode with 64-bit tag and 256-bit keys.
+AES in CCM mode with 64-bit tag and 256-bit keys (AEAD).
 @item GNUTLS_@-CIPHER_@-CHACHA20_@-POLY1305
 The Chacha20 cipher with the Poly1305 authenticator (AEAD).
 @item GNUTLS_@-CIPHER_@-GOST28147_@-TC26Z_@-CFB
@@ -195,13 +195,19 @@ HMAC GOST R 34.11-2001 (Streebog) algorithm, 512 bit.
 @item GNUTLS_@-MAC_@-AEAD
 MAC implicit through AEAD cipher.
 @item GNUTLS_@-MAC_@-UMAC_@-96
-The UMAC-96 MAC algorithm.
+The UMAC-96 MAC algorithm (requires nonce).
 @item GNUTLS_@-MAC_@-UMAC_@-128
-The UMAC-128 MAC algorithm.
+The UMAC-128 MAC algorithm (requires nonce).
 @item GNUTLS_@-MAC_@-AES_@-CMAC_@-128
 The AES-CMAC-128 MAC algorithm.
 @item GNUTLS_@-MAC_@-AES_@-CMAC_@-256
 The AES-CMAC-256 MAC algorithm.
+@item GNUTLS_@-MAC_@-AES_@-GMAC_@-128
+The AES-GMAC-128 MAC algorithm (requires nonce).
+@item GNUTLS_@-MAC_@-AES_@-GMAC_@-192
+The AES-GMAC-192 MAC algorithm (requires nonce).
+@item GNUTLS_@-MAC_@-AES_@-GMAC_@-256
+The AES-GMAC-256 MAC algorithm (requires nonce).
 @end table
 
 @c gnutls_digest_algorithm_t
@@ -975,6 +981,8 @@ IP address SAN.
 OtherName SAN.
 @item GNUTLS_@-SAN_@-DN
 DN SAN.
+@item GNUTLS_@-SAN_@-REGISTERED_@-ID
+RegisteredID.
 @item GNUTLS_@-SAN_@-MAX
 -- undescribed --
 @item GNUTLS_@-SAN_@-OTHERNAME_@-XMPP

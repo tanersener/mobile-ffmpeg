@@ -501,7 +501,6 @@ void gnutls_srp_free_server_credentials(gnutls_srp_server_credentials_t sc)
 {
 	gnutls_free(sc->password_file);
 	gnutls_free(sc->password_conf_file);
-	_gnutls_free_datum(&sc->fake_salt_seed);
 
 	gnutls_free(sc);
 }
@@ -537,17 +536,9 @@ gnutls_srp_allocate_server_credentials(gnutls_srp_server_credentials_t *
 	if (*sc == NULL)
 		return GNUTLS_E_MEMORY_ERROR;
 
-	(*sc)->fake_salt_seed.size = DEFAULT_FAKE_SALT_SEED_SIZE;
-	(*sc)->fake_salt_seed.data = gnutls_malloc(
-					DEFAULT_FAKE_SALT_SEED_SIZE);
-	if ((*sc)->fake_salt_seed.data == NULL) {
-		ret = GNUTLS_E_MEMORY_ERROR;
-		gnutls_assert();
-		goto cleanup;
-	}
-
-	ret = gnutls_rnd(GNUTLS_RND_RANDOM, (*sc)->fake_salt_seed.data,
-				DEFAULT_FAKE_SALT_SEED_SIZE);
+	(*sc)->fake_salt_seed_size = DEFAULT_FAKE_SALT_SEED_SIZE;
+	ret = gnutls_rnd(GNUTLS_RND_RANDOM, (*sc)->fake_salt_seed,
+			 DEFAULT_FAKE_SALT_SEED_SIZE);
 
 	if (ret < 0) {
 		gnutls_assert();
@@ -558,7 +549,6 @@ gnutls_srp_allocate_server_credentials(gnutls_srp_server_credentials_t *
 	return 0;
 
 cleanup:
-	_gnutls_free_datum(&(*sc)->fake_salt_seed);
 	gnutls_free(*sc);
 	return ret;
 }
@@ -841,8 +831,14 @@ gnutls_srp_set_server_fake_salt_seed(gnutls_srp_server_credentials_t cred,
 				     const gnutls_datum_t * seed,
 				     unsigned int salt_length)
 {
-	_gnutls_free_datum(&cred->fake_salt_seed);
-	_gnutls_set_datum(&cred->fake_salt_seed, seed->data, seed->size);
+	unsigned seed_size = seed->size;
+	const unsigned char *seed_data = seed->data;
+
+	if (seed_size > sizeof(cred->fake_salt_seed))
+		seed_size = sizeof(cred->fake_salt_seed);
+
+	memcpy(cred->fake_salt_seed, seed_data, seed_size);
+	cred->fake_salt_seed_size = seed_size;
 
 	/* Cap the salt length at the output size of the MAC algorithm
 	 * we are using to generate the fake salts.

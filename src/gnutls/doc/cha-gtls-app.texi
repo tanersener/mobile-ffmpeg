@@ -199,6 +199,7 @@ CPU. The currently available options are:
 @item 0x4: Enable SSSE3
 @item 0x8: Enable PCLMUL
 @item 0x10: Enable AVX
+@item 0x20: Enable SHA_NI
 @item 0x100000: Enable VIA padlock
 @item 0x200000: Enable VIA PHE
 @item 0x400000: Enable VIA PHE SHA512
@@ -1293,7 +1294,7 @@ advances while providing compatibility with old clients and servers).
 @multitable @columnfractions .20 .70
 @headitem Keyword @tab Description
 @item @@KEYWORD @tab
-Means that a compile-time specified system configuration file@footnote{The default is @code{/etc/gnutls/default-priorities}.} 
+Means that a compile-time specified system configuration file (see @ref{System-wide configuration of the library})
 will be used to expand the provided keyword. That is used to impose system-specific policies.
 It may be followed by additional options that will be appended to the
 system string (e.g., "@@SYSTEM:+SRP"). The system file should have the

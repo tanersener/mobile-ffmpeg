@@ -139,7 +139,7 @@ const gnutls_group_entry_st * _gnutls_tls_id_to_group(unsigned num)
 {
 	GNUTLS_GROUP_LOOP(
 		if (p->tls_id == num &&
-		    (p->curve == 0 || _gnutls_pk_curve_exists(p->curve))) {
+		    (p->curve == 0 || _gnutls_ecc_curve_is_supported(p->curve))) {
 			return p;
 		}
 	);
@@ -154,7 +154,7 @@ const gnutls_group_entry_st * _gnutls_id_to_group(unsigned id)
 
 	GNUTLS_GROUP_LOOP(
 		if (p->id == id &&
-		    (p->curve == 0 || _gnutls_pk_curve_exists(p->curve))) {
+		    (p->curve == 0 || _gnutls_ecc_curve_is_supported(p->curve))) {
 			return p;
 		}
 	);
@@ -182,7 +182,7 @@ const gnutls_group_t *gnutls_group_list(void)
 		int i = 0;
 
 		GNUTLS_GROUP_LOOP(
-			if (p->curve == 0 || _gnutls_pk_curve_exists(p->curve))
+			if (p->curve == 0 || _gnutls_ecc_curve_is_supported(p->curve))
 				groups[i++] = p->id;
 		);
 		groups[i++] = 0;
@@ -208,7 +208,7 @@ gnutls_group_t gnutls_group_get_id(const char *name)
 
 	GNUTLS_GROUP_LOOP(
 		if (c_strcasecmp(p->name, name) == 0 && (
-		    p->curve == 0 ||_gnutls_pk_curve_exists(p->curve))) {
+		    p->curve == 0 ||_gnutls_ecc_curve_is_supported(p->curve))) {
 			ret = p->id;
 			break;
 		}

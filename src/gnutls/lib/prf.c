@@ -234,7 +234,7 @@ gnutls_prf_rfc5705(gnutls_session_t session,
  *
  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
  *
- * Since: 3.6.6
+ * Since: 3.6.8
  **/
 int
 gnutls_prf_early(gnutls_session_t session,

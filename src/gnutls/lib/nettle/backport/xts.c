@@ -29,7 +29,7 @@
 #include <config.h>
 #endif
 
-#ifndef HAVE_XTS_ENCRYPT_MESSAGE
+#ifndef HAVE_NETTLE_XTS_ENCRYPT_MESSAGE
 #include "xts.h"
 
 #include <assert.h>
@@ -270,4 +270,4 @@ xts_aes256_decrypt_message(struct xts_aes256_key *xts_key,
                         tweak, length, dst, src);
 }
 
-#endif /* HAVE_XTS_ENCRYPT_MESSAGE */
+#endif /* HAVE_NETTLE_XTS_ENCRYPT_MESSAGE */

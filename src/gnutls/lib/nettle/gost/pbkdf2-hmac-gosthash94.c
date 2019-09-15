@@ -36,6 +36,8 @@
 # include "config.h"
 #endif
 
+#ifndef HAVE_NETTLE_GOSTHASH94CP_UPDATE
+
 #include <gnutls_int.h>
 
 #include "pbkdf2-gost.h"
@@ -54,3 +56,4 @@ pbkdf2_hmac_gosthash94cp (size_t key_length, const uint8_t *key,
   PBKDF2 (&gosthash94cpctx, hmac_gosthash94cp_update, hmac_gosthash94cp_digest,
 	  GOSTHASH94CP_DIGEST_SIZE, iterations, salt_length, salt, length, dst);
 }
+#endif

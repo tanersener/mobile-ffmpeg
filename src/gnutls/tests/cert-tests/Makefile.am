@@ -146,6 +146,7 @@ TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
 	top_builddir="$(top_builddir)"		\
 	ac_cv_sizeof_time_t="$(ac_cv_sizeof_time_t)" \
 	ASAN_OPTIONS="detect_leaks=0:exitcode=6" \
+	GNUTLS_TEST_SUITE_RUN=1			\
 	srcdir="$(srcdir)"
 
 if ENABLE_FIPS140

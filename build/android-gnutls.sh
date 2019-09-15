@@ -78,6 +78,6 @@ fi
 make -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_gnutls_package_config "3.6.8"
+create_gnutls_package_config "3.6.9"
 
 make install || exit 1

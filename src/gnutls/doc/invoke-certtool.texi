@@ -116,50 +116,50 @@ Certificate verification related options:
 PKCS#7 structure options:
 
        --p7-generate          Generate a PKCS #7 structure
-   -!, --p7-sign              Signs using a PKCS #7 structure
-   -", --p7-detached-sign     Signs using a detached PKCS #7 structure
-   -#, --p7-include-cert      The signer's certificate will be included in the cert list.
+       --p7-sign              Signs using a PKCS #7 structure
+       --p7-detached-sign     Signs using a detached PKCS #7 structure
+       --p7-include-cert      The signer's certificate will be included in the cert list.
                                 - disabled as '--no-p7-include-cert'
                                 - enabled by default
-   -$, --p7-time              Will include a timestamp in the PKCS #7 structure
+       --p7-time              Will include a timestamp in the PKCS #7 structure
                                 - disabled as '--no-p7-time'
-   -%, --p7-show-data         Will show the embedded data in the PKCS #7 structure
+       --p7-show-data         Will show the embedded data in the PKCS #7 structure
                                 - disabled as '--no-p7-show-data'
-   -&, --p7-info              Print information on a PKCS #7 structure
-   -', --p7-verify            Verify the provided PKCS #7 structure
-   -(, --smime-to-p7          Convert S/MIME to PKCS #7 structure
+       --p7-info              Print information on a PKCS #7 structure
+       --p7-verify            Verify the provided PKCS #7 structure
+       --smime-to-p7          Convert S/MIME to PKCS #7 structure
 
 Other options:
 
-   -*, --get-dh-params        List the included PKCS #3 encoded Diffie-Hellman parameters
-   -+, --dh-info              Print information PKCS #3 encoded Diffie-Hellman parameters
-   -,, --load-privkey=str     Loads a private key file
-   --, --load-pubkey=str      Loads a public key file
-   -., --load-request=str     Loads a certificate request file
-   -/, --load-certificate=str Loads a certificate file
-   -0, --load-ca-privkey=str  Loads the certificate authority's private key file
-   -1, --load-ca-certificate=str Loads the certificate authority's certificate file
-   -2, --load-crl=str         Loads the provided CRL
-   -3, --load-data=str        Loads auxiliary data
-   -4, --password=str         Password to use
-   -5, --null-password        Enforce a NULL password
-   -6, --empty-password       Enforce an empty password
-   -7, --hex-numbers          Print big number in an easier format to parse
-   -8, --cprint               In certain operations it prints the information in C-friendly format
-   -=, --hash=str             Hash algorithm to use for signing
-   ->, --salt-size=num        Specify the RSA-PSS key default salt size
-   -?, --inder                Use DER format for input certificates, private keys, and DH parameters
+       --get-dh-params        List the included PKCS #3 encoded Diffie-Hellman parameters
+       --dh-info              Print information PKCS #3 encoded Diffie-Hellman parameters
+       --load-privkey=str     Loads a private key file
+       --load-pubkey=str      Loads a public key file
+       --load-request=str     Loads a certificate request file
+       --load-certificate=str Loads a certificate file
+       --load-ca-privkey=str  Loads the certificate authority's private key file
+       --load-ca-certificate=str Loads the certificate authority's certificate file
+       --load-crl=str         Loads the provided CRL
+       --load-data=str        Loads auxiliary data
+       --password=str         Password to use
+       --null-password        Enforce a NULL password
+       --empty-password       Enforce an empty password
+       --hex-numbers          Print big number in an easier format to parse
+       --cprint               In certain operations it prints the information in C-friendly format
+       --hash=str             Hash algorithm to use for signing
+       --salt-size=num        Specify the RSA-PSS key default salt size
+       --inder                Use DER format for input certificates, private keys, and DH parameters
                                 - disabled as '--no-inder'
-   -@@, --inraw                an alias for the 'inder' option
-   -A, --outder               Use DER format for output certificates, private keys, and DH parameters
+       --inraw                an alias for the 'inder' option
+       --outder               Use DER format for output certificates, private keys, and DH parameters
                                 - disabled as '--no-outder'
-   -B, --outraw               an alias for the 'outder' option
-   -D, --template=str         Template file to use for non-interactive operation
-   -E, --stdout-info          Print information to stdout instead of stderr
-   -F, --ask-pass             Enable interaction for entering password when in batch mode.
-   -G, --pkcs-cipher=str      Cipher to use for PKCS #8 and #12 operations
-   -H, --provider=str         Specify the PKCS #11 provider library
-   -I, --text                 Output textual information before PEM-encoded certificates, private
+       --outraw               an alias for the 'outder' option
+       --template=str         Template file to use for non-interactive operation
+       --stdout-info          Print information to stdout instead of stderr
+       --ask-pass             Enable interaction for entering password when in batch mode.
+       --pkcs-cipher=str      Cipher to use for PKCS #8 and #12 operations
+       --provider=str         Specify the PKCS #11 provider library
+       --text                 Output textual information before PEM-encoded certificates, private
 keys, etc
                                 - disabled as '--no-text'
                                 - enabled by default

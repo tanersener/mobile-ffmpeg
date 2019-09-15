@@ -50,8 +50,6 @@ int main()
 
 #include "utils.h"
 
-static void terminate(void);
-
 /* This program tests that handshakes fail if the server does not include the
  * requested certificate status with the server certificate having
  * TLS feature 5 (status request).
@@ -133,7 +131,7 @@ static int handshake_callback(gnutls_session_t session, unsigned int htype,
 
 #define MAX_BUF 1024
 
-static void client(int fd)
+static void client(int fd, const char *prio)
 {
 	int ret;
 	unsigned int status;
@@ -156,7 +154,7 @@ static void client(int fd)
 	gnutls_init(&session, GNUTLS_CLIENT);
 
 	/* Use default priorities */
-	gnutls_priority_set_direct(session, "NORMAL:-KX-ALL:+ECDHE-RSA", NULL);
+	gnutls_priority_set_direct(session, prio, NULL);
 
 	gnutls_handshake_set_hook_function(session, GNUTLS_HANDSHAKE_CERTIFICATE_STATUS,
 					   GNUTLS_HOOK_POST,
@@ -182,7 +180,6 @@ static void client(int fd)
 
 	if (ret < 0) {
 		fail("client: Handshake failed: %s\n", gnutls_strerror(ret));
-		terminate();
 	} else {
 		if (debug)
 			success("client: Handshake was completed\n");
@@ -195,13 +192,11 @@ static void client(int fd)
 
 	if (received == 1) {
 		fail("client: received certificate status when we shouldn't.\n");
-		terminate();
 	}
 
 	ret = gnutls_certificate_verify_peers2(session, &status);
 	if (ret != GNUTLS_E_SUCCESS) {
 		fail("client: Peer certificate validation failed: %s\n", gnutls_strerror(ret));
-		terminate();
 	}
 	else {
 		if (status & GNUTLS_CERT_MISSING_OCSP_STATUS) {
@@ -209,7 +204,6 @@ static void client(int fd)
 		}
 		else {
 			fail("client: Validation status does not include GNUTLS_CERT_MISSING_OCSP_STATUS. Status is %d\n", status);
-			terminate();
 		}
 	}
 
@@ -227,16 +221,7 @@ static void client(int fd)
 }
 
 
-/* These are global */
-pid_t child;
-
-static void terminate(void)
-{
-	kill(child, SIGTERM);
-	exit(1);
-}
-
-static void server(int fd)
+static void server(int fd, const char *prio)
 {
 	int ret;
 	char buffer[MAX_BUF + 1];
@@ -263,7 +248,7 @@ static void server(int fd)
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	gnutls_priority_set_direct(session, "NORMAL", NULL);
+	gnutls_priority_set_direct(session, prio, NULL);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
@@ -307,13 +292,17 @@ static void ch_handler(int sig)
 	return;
 }
 
-void doit(void)
+static void start(const char *name, const char *prio)
 {
+	pid_t child;
 	int fd[2];
 	int ret, status = 0;
 
 	signal(SIGCHLD, ch_handler);
 	signal(SIGPIPE, SIG_IGN);
+
+	received = 0;
+	success("running: %s\n", name);
 
 	ret = socketpair(AF_UNIX, SOCK_STREAM, 0, fd);
 	if (ret < 0) {
@@ -331,16 +320,23 @@ void doit(void)
 	if (child) {
 		/* parent */
 		close(fd[1]);
-		client(fd[0]);
+		client(fd[0], prio);
 		waitpid(child, &status, 0);
 		check_wait_status(status);
 	} else {
 		close(fd[0]);
-		server(fd[1]);
+		server(fd[1], prio);
 		exit(0);
 	}
 
 	return;
+}
+
+void doit(void)
+{
+	start("tls1.2", "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2");
+	start("tls1.3", "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.3");
+	start("default", "NORMAL");
 }
 
 #endif				/* _WIN32 */

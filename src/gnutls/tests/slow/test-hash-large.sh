@@ -39,21 +39,28 @@ run_test() {
 	fi
 }
 
+#0x20: SHA_NI
 #0x4: SSSE3
 #0x1: no optimizations
 #"": default optimizations
 
 SSSE3FLAG=""
+SHANIFLAG=""
 which lscpu >/dev/null 2>&1
 if test $? = 0;then
         $(which lscpu)|grep Architecture|grep x86 >/dev/null
         if test $? = 0;then
                 SSSE3FLAG="0x4"
         fi
+
+        $(which lscpu)|grep Flags|grep sha_ni >/dev/null
+        if test $? = 0;then
+                SHANIFLAG="0x20"
+        fi
 fi
 
 WAITPID=""
-for flags in "" "0x1" ${SSSE3FLAG};do
+for flags in "" "0x1" ${SSSE3FLAG} ${SHANIFLAG};do
 	run_test ${flags} &
 	WAITPID="${WAITPID} $!"
 done

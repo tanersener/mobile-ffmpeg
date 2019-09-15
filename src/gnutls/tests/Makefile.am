@@ -50,9 +50,9 @@ EXTRA_DIST = suppressions.valgrind eagain-common.h cert-common.h test-chains.h \
 	certs-interesting/README.md certs-interesting/cert1.der certs-interesting/cert1.der.err \
 	certs-interesting/cert2.der certs-interesting/cert2.der.err certs-interesting/cert3.der \
 	certs-interesting/cert3.der.err certs-interesting/cert4.der certs-interesting/cert5.der \
-	certs-interesting/cert6.der certs-interesting/cert6.der.err \
+	certs-interesting/cert5.der.err certs-interesting/cert6.der certs-interesting/cert6.der.err \
 	certs-interesting/cert7.der certs-interesting/cert8.der \
-	certs-interesting/cert9.der certs-interesting/cert5.der.err \
+	certs-interesting/cert9.der certs-interesting/cert10.der \
 	certs-interesting/cert3.der.err certs-interesting/cert4.der \
 	scripts/common.sh scripts/starttls-common.sh \
 	rng-op.c x509sign-verify-common.h common-key-tests.h \
@@ -63,7 +63,8 @@ EXTRA_DIST = suppressions.valgrind eagain-common.h cert-common.h test-chains.h \
 	ocsp-tests/certs/server_bad.template ocsp-tests/certs/ocsp-staple-unrelated.der ocsp-tests/suppressions.valgrind \
 	data/listings-DTLS1.0 data/listings-SSL3.0 data/listings-TLS1.0 data/listings-TLS1.1 \
 	data/listings-legacy1 data/listings-legacy2 data/listings-legacy3 data/listings-legacy4 \
-	data/listings-SSL3.0-TLS1.1 p11-kit-trust-data/Example_Root_CA.p11-kit server-kx-neg-common.c \
+	data/listings-old-SSL3.0-TLS1.1 data/listings-SSL3.0-TLS1.1 \
+	p11-kit-trust-data/Example_Root_CA.p11-kit server-kx-neg-common.c \
 	p11-kit-trust-data/Example_Root_CA.pem data/test1.cat data/test2.cat \
 	data/test1.cat.data data/test2.cat.data data/test1.cat.out data/test2.cat.out \
 	data/pkcs7-cat-ca.pem data/long.crl data/long.pem data/large-cert.pem \
@@ -104,7 +105,8 @@ noinst_LTLIBRARIES = libutils.la
 libutils_la_SOURCES = utils.h utils.c seccomp.c utils-adv.c
 libutils_la_LIBADD = ../lib/libgnutls.la
 
-indirect_tests = tls13/prf-early
+indirect_tests = tls13/prf-early system-override-hash system-override-sig
+
 ctests = tls13/supported_versions tls13/tls12-no-tls13-exts \
 	tls13/post-handshake-with-cert tls13/post-handshake-without-cert \
 	tls13/cookie tls13/key_share tls13/prf tls13/post-handshake-with-cert-ticket \
@@ -118,6 +120,8 @@ ctests += tls13/hello_retry_request
 ctests += tls13/psk-ext
 
 ctests += tls13/key_update
+
+ctests += tls13/key_update_multiple
 
 ctests += tls13/key_limits
 
@@ -157,7 +161,7 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 cert-status fips-mode-pthread rsa-psk global-init sec-params sign-verify-data \
 	 fips-test fips-override-test mini-global-load name-constraints x509-extensions \
 	 long-session-id mini-x509-callbacks-intr mini-dtls-lowmtu set_x509_key_file-late \
-	 crlverify mini-dtls-discard init_fds mini-record-failure \
+	 crlverify mini-dtls-discard init_fds mini-record-failure openconnect-dtls12 \
 	 tls12-rehandshake-cert-2 custom-urls set_x509_key_mem set_x509_key_file \
 	 tls12-rehandshake-cert-auto tls12-rehandshake-set-prio \
 	 mini-chain-unsorted x509-verify-with-crl mini-dtls-mtu privkey-verify-broken \
@@ -171,8 +175,8 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 server-sign-md5-rep privkey-keygen mini-tls-nonblock no-signal pkcs7-gen dtls-etm \
 	 x509sign-verify-rsa x509sign-verify-ecdsa x509sign-verify-gost \
 	 mini-alignment oids atfork prf psk-file priority-init2 post-client-hello-change-prio \
-	 status-request status-request-ok status-request-missing sign-verify-ext \
-	 fallback-scsv pkcs8-key-decode urls dtls-rehandshake-cert \
+	 status-request status-request-ok rfc7633-missing sign-verify-ext \
+	 fallback-scsv pkcs8-key-decode urls dtls-rehandshake-cert rfc7633-ok \
 	 key-usage-rsa key-usage-ecdhe-rsa mini-session-verify-function auto-verify \
 	 record-timeouts mini-dtls-hello-verify-48 set-default-prio \
 	 tls12-anon-upgrade global-init-override tlsext-decoding rsa-psk-cb \
@@ -181,7 +185,7 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 dtls-max-record tls12-max-record alpn-server-prec ocsp-filename-memleak \
 	 dh-params rehandshake-ext-secret pcert-list session-export-funcs \
 	 handshake-false-start version-checks key-material-dtls key-material-set-dtls \
-	 system-prio-file name-constraints-merge crl-basic crq-basic \
+	 name-constraints-merge crl-basic crq-basic \
 	 send-client-cert custom-urls-override hex rehandshake-switch-psk-id \
 	 rehandshake-switch-srp-id base64 srpbase64 pkcs1-digest-info set_x509_key \
 	 set_x509_key_file_der set_x509_pkcs12_key crt_apis tls12-cert-key-exchange \
@@ -209,10 +213,15 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 tls13-server-kx-neg gnutls_ext_raw_parse_dtls key-export-pkcs8 \
 	 null_retrieve_function tls-record-size-limit tls-crt_type-neg \
 	 resume-with-stek-expiration resume-with-previous-stek rawpk-api \
-	 tls-record-size-limit-asym dh-compute ecdh-compute
+	 tls-record-size-limit-asym dh-compute ecdh-compute sign-verify-data-newapi \
+	 sign-verify-newapi
 
 if HAVE_SECCOMP_TESTS
 ctests += dtls-with-seccomp tls-with-seccomp dtls-client-with-seccomp tls-client-with-seccomp
+endif
+
+if !DISABLE_SYSTEM_CONFIG
+ctests += system-prio-file
 endif
 
 if HAVE_CMOCKA
@@ -485,6 +494,12 @@ dist_check_SCRIPTS += fastopen.sh pkgconfig.sh starttls.sh starttls-ftp.sh start
 	sni-resume.sh ocsp-tests/ocsptool cert-reencoding.sh pkcs7-cat.sh long-crl.sh \
 	serv-udp.sh logfile-option.sh gnutls-cli-resume.sh profile-tests.sh
 
+if !DISABLE_SYSTEM_CONFIG
+dist_check_SCRIPTS += system-override-sig-hash.sh system-override-versions.sh system-override-invalid.sh \
+	system-override-curves.sh system-override-profiles.sh system-override-tls.sh \
+	system-override-kx.sh
+endif
+
 dist_check_SCRIPTS += gnutls-cli-self-signed.sh gnutls-cli-invalid-crl.sh
 
 if ENABLE_PKCS11
@@ -493,7 +508,7 @@ dist_check_SCRIPTS += p11-kit-trust.sh testpkcs11.sh certtool-pkcs11.sh
 if HAVE_PKCS11_TRUST_STORE
 if P11KIT_0_23_11_API
 dist_check_SCRIPTS += p11-kit-load.sh
-indirect_tests += pkcs11/list-tokens
+indirect_tests += pkcs11/list-tokens pkcs11/list-objects
 endif
 endif
 
@@ -556,6 +571,7 @@ TESTS_ENVIRONMENT +=						\
 	PSK_FILE=$(srcdir)/psk.passwd				\
 	OPENSSL_ia32cap=0x00000000				\
 	EXEEXT=$(EXEEXT)					\
+	GNUTLS_TEST_SUITE_RUN=1					\
 	builddir="$(builddir)"					\
 	top_builddir="$(top_builddir)"				\
 	libdir="$(libdir)"					\

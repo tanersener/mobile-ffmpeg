@@ -136,7 +136,11 @@ pack_ticket(const struct ticket_st *ticket, gnutls_datum_t *ticket_data)
 	_gnutls_write_uint16(ticket->encrypted_state_len, p);
 	p += 2;
 
-	memcpy(p, ticket->encrypted_state, ticket->encrypted_state_len);
+	/* We use memmove instead of memcpy here because
+	 * ticket->encrypted_state is allocated from
+	 * ticket_data->data, and thus both memory areas may overlap.
+	 */
+	memmove(p, ticket->encrypted_state, ticket->encrypted_state_len);
 	p += ticket->encrypted_state_len;
 
 	memcpy(p, ticket->mac, TICKET_MAC_SIZE);

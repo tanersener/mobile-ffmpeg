@@ -35,6 +35,10 @@
 #ifndef GNUTLS_LIB_NETTLE_GOST_GOST28147_H
 #define GNUTLS_LIB_NETTLE_GOST_GOST28147_H
 
+#include "config.h"
+
+#ifndef HAVE_NETTLE_GOST28147_SET_KEY
+
 #include <nettle/nettle-types.h>
 
 #ifdef __cplusplus
@@ -113,6 +117,8 @@ gost28147_encrypt_for_cfb(struct gost28147_ctx *ctx,
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif
 
 #endif /* GNUTLS_LIB_NETTLE_GOST_GOST28147_H */

@@ -317,6 +317,12 @@ int _gnutls_fips_perform_self_checks2(void)
 		goto error;
 	}
 
+	ret = gnutls_cipher_self_test(0, GNUTLS_CIPHER_AES_256_CBC);
+	if (ret < 0) {
+		gnutls_assert();
+		goto error;
+	}
+
 	ret = gnutls_cipher_self_test(0, GNUTLS_CIPHER_AES_256_GCM);
 	if (ret < 0) {
 		gnutls_assert();
