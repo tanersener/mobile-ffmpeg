@@ -1,4 +1,4 @@
-# MobileFFmpeg ![GitHub release](https://img.shields.io/badge/release-v4.2.2-blue.svg) ![Bintray](https://img.shields.io/badge/bintray-v4.2.2-blue.svg) ![CocoaPods](https://img.shields.io/badge/pod-v4.2.2-blue.svg) [![Build Status](https://travis-ci.org/tanersener/mobile-ffmpeg.svg?branch=master)](https://travis-ci.org/tanersener/mobile-ffmpeg)
+# MobileFFmpeg [![Financial Contributors on Open Collective](https://opencollective.com/mobile-ffmpeg/all/badge.svg?label=financial+contributors)](https://opencollective.com/mobile-ffmpeg) ![GitHub release](https://img.shields.io/badge/release-v4.2.2-blue.svg) ![Bintray](https://img.shields.io/badge/bintray-v4.2.2-blue.svg) ![CocoaPods](https://img.shields.io/badge/pod-v4.2.2-blue.svg) [![Build Status](https://travis-ci.org/tanersener/mobile-ffmpeg.svg?branch=master)](https://travis-ci.org/tanersener/mobile-ffmpeg)
 
 FFmpeg for Android, iOS and tvOS
 
@@ -452,6 +452,36 @@ CPU optimizations (`ASM`) are enabled for most of the external libraries. Detail
 ### 7. Documentation
 
 A more detailed documentation is available at [Wiki](https://github.com/tanersener/mobile-ffmpeg/wiki).
+
+## Contributors
+
+### Code Contributors
+
+This project exists thanks to all the people who contribute. [[Contribute](CONTRIBUTING.md)].
+<a href="https://github.com/tanersener/mobile-ffmpeg/graphs/contributors"><img src="https://opencollective.com/mobile-ffmpeg/contributors.svg?width=890&button=false" /></a>
+
+### Financial Contributors
+
+Become a financial contributor and help us sustain our community. [[Contribute](https://opencollective.com/mobile-ffmpeg/contribute)]
+
+#### Individuals
+
+<a href="https://opencollective.com/mobile-ffmpeg"><img src="https://opencollective.com/mobile-ffmpeg/individuals.svg?width=890"></a>
+
+#### Organizations
+
+Support this project with your organization. Your logo will show up here with a link to your website. [[Contribute](https://opencollective.com/mobile-ffmpeg/contribute)]
+
+<a href="https://opencollective.com/mobile-ffmpeg/organization/0/website"><img src="https://opencollective.com/mobile-ffmpeg/organization/0/avatar.svg"></a>
+<a href="https://opencollective.com/mobile-ffmpeg/organization/1/website"><img src="https://opencollective.com/mobile-ffmpeg/organization/1/avatar.svg"></a>
+<a href="https://opencollective.com/mobile-ffmpeg/organization/2/website"><img src="https://opencollective.com/mobile-ffmpeg/organization/2/avatar.svg"></a>
+<a href="https://opencollective.com/mobile-ffmpeg/organization/3/website"><img src="https://opencollective.com/mobile-ffmpeg/organization/3/avatar.svg"></a>
+<a href="https://opencollective.com/mobile-ffmpeg/organization/4/website"><img src="https://opencollective.com/mobile-ffmpeg/organization/4/avatar.svg"></a>
+<a href="https://opencollective.com/mobile-ffmpeg/organization/5/website"><img src="https://opencollective.com/mobile-ffmpeg/organization/5/avatar.svg"></a>
+<a href="https://opencollective.com/mobile-ffmpeg/organization/6/website"><img src="https://opencollective.com/mobile-ffmpeg/organization/6/avatar.svg"></a>
+<a href="https://opencollective.com/mobile-ffmpeg/organization/7/website"><img src="https://opencollective.com/mobile-ffmpeg/organization/7/avatar.svg"></a>
+<a href="https://opencollective.com/mobile-ffmpeg/organization/8/website"><img src="https://opencollective.com/mobile-ffmpeg/organization/8/avatar.svg"></a>
+<a href="https://opencollective.com/mobile-ffmpeg/organization/9/website"><img src="https://opencollective.com/mobile-ffmpeg/organization/9/avatar.svg"></a>
 
 ### 8. License
 
