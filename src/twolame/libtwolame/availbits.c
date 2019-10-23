@@ -2,7 +2,7 @@
  *  TwoLAME: an optimized MPEG Audio Layer Two encoder
  *
  *  Copyright (C) 2001-2004 Michael Cheng
- *  Copyright (C) 2004-2006 The TwoLAME Project
+ *  Copyright (C) 2004-2018 The TwoLAME Project
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -18,8 +18,6 @@
  *  License along with this library; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id$
- *
  */
 
 
@@ -30,49 +28,40 @@
 #include "availbits.h"
 
 
-struct slotinfo {
+
+/* function returns the number of available bits */
+int twolame_available_bits(twolame_options * glopts)
+{
+    frame_header *header = &glopts->header;
     FLOAT average;
     FLOAT frac;
     int whole;
-    FLOAT lag;
-    int extra;
-} slots;
-
-
-/* function returns the number of available bits */
-int available_bits(twolame_options * glopts)
-{
-    frame_header *header = &glopts->header;
     int adb;
 
-    slots.extra = 0;            /* be default, no extra slots */
-
-    slots.average = (1152.0 / ((FLOAT) glopts->samplerate_out / 1000.0))
-        * ((FLOAT) glopts->bitrate / 8.0);
+    average = (1152.0 / ((FLOAT) glopts->samplerate_out / 1000.0))
+              * ((FLOAT) glopts->bitrate / 8.0);
 
     // fprintf(stderr,"availbits says: sampling freq is %i. version %i. bitrateindex %i slots
-    // %f\n",header->sampling_frequency, header->version, header->bitrate_index, slots.average);
+    // %f\n",header->sampling_frequency, header->version, header->bitrate_index, average);
 
-    slots.whole = (int) slots.average;
-    slots.frac = slots.average - (FLOAT) slots.whole;
+    whole = (int) average;
+    frac = average - (FLOAT) whole;
 
     /* never allow padding for a VBR frame. Don't ask me why, I've forgotten why I set this */
-    if (slots.frac != 0 && glopts->padding && glopts->vbr == FALSE) {
-        if (slots.lag > (slots.frac - 1.0)) {   /* no padding for this frame */
-            slots.lag -= slots.frac;
-            slots.extra = 0;
+    if (frac != 0 && glopts->padding && glopts->vbr == FALSE) {
+        if (glopts->slots_lag > (frac - 1.0)) {   /* no padding for this frame */
+            glopts->slots_lag -= frac;
             header->padding = 0;
         } else {                /* padding */
-            slots.extra = 1;
             header->padding = 1;
-            slots.lag += (1 - slots.frac);
+            glopts->slots_lag += (1 - frac);
         }
     }
 
-    adb = (slots.whole + slots.extra) * 8;
+    adb = whole * 8;
 
     return adb;
 }
 
 
-// vim:ts=4:sw=4:nowrap: 
+// vim:ts=4:sw=4:nowrap:

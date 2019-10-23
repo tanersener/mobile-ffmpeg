@@ -1,6 +1,6 @@
 /*
-	twolame.css
-	Based on xhtml11.css from asciidoc version 7.0.2
+    twolame.css
+    Based on xhtml11.css from asciidoc version 7.0.2
 */
 
 
@@ -13,15 +13,15 @@ body {
 
 a
 {
-	color: #111177;
-	text-transform: inherit;
-	text-decoration: none;
+    color: #111177;
+    text-transform: inherit;
+    text-decoration: none;
 }
 a:hover
 {
-	color: #111177;
-	text-transform: inherit;
-	text-decoration: underline;
+    color: #111177;
+    text-transform: inherit;
+    text-decoration: underline;
 }
 a:visited { color: #111177; }
 
@@ -71,10 +71,10 @@ p {
 
 pre
 {
-	font-size: 10pt;
-	font-weight: normal;
-	padding: 0;
-	margin: 0 0 0 15px;
+    font-size: 10pt;
+    font-weight: normal;
+    padding: 0;
+    margin: 0 0 0 15px;
 }
 
 span#author {

@@ -2,21 +2,6 @@
  * ISO MPEG Audio Subgroup Software Simulation Group (1996)
  * ISO 13818-3 MPEG-2 Audio Encoder - Lower Sampling Frequency Extension
  *
- * $Id$
- *
- * $Log$
- * Revision 1.1  2005/11/15 16:04:26  nhumfrey
- * Changed suffix for files.
- *
- * Revision 1.1.1.1  2005/04/15 01:10:19  nhumfrey
- * Initial import.
- *
- * Revision 1.2  1997/01/19 22:28:29  rowlands
- * Layer 3 bug fixes from Seymour Shlien
- *
- * Revision 1.1  1996/02/14 04:04:23  rowlands
- * Initial revision
- *
  * Received from Mike Coleman
  **********************************************************************/
 /**********************************************************************

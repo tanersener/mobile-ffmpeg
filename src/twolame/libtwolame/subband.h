@@ -2,7 +2,7 @@
  *  TwoLAME: an optimized MPEG Audio Layer Two encoder
  *
  *  Copyright (C) 2001-2004 Michael Cheng
- *  Copyright (C) 2004-2006 The TwoLAME Project
+ *  Copyright (C) 2004-2018 The TwoLAME Project
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -18,18 +18,16 @@
  *  License along with this library; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id$
- *
  */
 
 
-#ifndef	_SUBBAND_H_
-#define	_SUBBAND_H_
+#ifndef TWOLAME_SUBBAND_H
+#define TWOLAME_SUBBAND_H
 
-int init_subband(subband_mem * smem);
-void window_filter_subband(subband_mem * smem, short *pBuffer, int ch, FLOAT s[SBLIMIT]);
+int twolame_init_subband(subband_mem * smem);
+void twolame_window_filter_subband(subband_mem * smem, short *pBuffer, int ch, FLOAT s[SBLIMIT]);
 
 #endif
 
 
-// vim:ts=4:sw=4:nowrap: 
+// vim:ts=4:sw=4:nowrap:

@@ -1,26 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
     "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.3" />
+<meta name="generator" content="AsciiDoc 8.6.10" />
 <title>What is new in TwoLAME</title>
+<link rel="stylesheet" href="./asciidoc.css" type="text/css" />
+
+
 <link rel="stylesheet" href="./twolame.css" type="text/css" />
+<script type="text/javascript" src="./asciidoc.js"></script>
 <script type="text/javascript">
 /*<![CDATA[*/
-window.onload = function(){asciidoc.footnotes();}
+asciidoc.install();
 /*]]>*/
 </script>
-<script type="text/javascript" src="./asciidoc-xhtml11.js"></script>
 </head>
 <body class="article">
 <div id="header">
 <h1>What is new in TwoLAME</h1>
-<span id="revnumber">version 0.3.13</span>
+<span id="revnumber">version 0.4.0</span>
 </div>
 <div id="content">
 <div class="sect1">
-<h2 id="_version_0_3_13_2010_01_21">Version 0.3.13 (2010-01-21)</h2>
+<h2 id="_version_0_4_0_2019_10_11">Version 0.4.0 (2019-10-11)</h2>
+<div class="sectionbody">
+<div class="ulist"><ul>
+<li>
+<p>
+Added free format encoding (now up to 450 kbps)
+</p>
+</li>
+<li>
+<p>
+Added DAB utility methods for ScF-CRC handling
+</p>
+</li>
+<li>
+<p>
+Added <code>twolame_get_original()</code> and <code>twolame_set_original()</code>
+</p>
+</li>
+<li>
+<p>
+Added <code>twolame_get_extension()</code> and <code>twolame_set_extension()</code>
+</p>
+</li>
+<li>
+<p>
+Bundled .spec file in tarball for building RPM for twolame
+</p>
+</li>
+<li>
+<p>
+Make libsndfile dependency (and therefore the frontend) optional
+</p>
+</li>
+<li>
+<p>
+Fixed VBR encoding
+</p>
+</li>
+<li>
+<p>
+Fixed setting for error protection flag
+</p>
+</li>
+<li>
+<p>
+New check for invalid bitrate/channel encoder settings
+</p>
+</li>
+<li>
+<p>
+New checks against failed memory allocations
+</p>
+</li>
+<li>
+<p>
+Fixed padding policy (now adding an empty slot)
+</p>
+</li>
+<li>
+<p>
+Fixed build when maintainer mode is disabled
+</p>
+</li>
+<li>
+<p>
+Fixed scaling of floating point input source through libsndfile
+</p>
+</li>
+<li>
+<p>
+Removed <code>slotinfo</code> global variables to fix thread safety bug
+</p>
+</li>
+<li>
+<p>
+Switched to handling reading from STDIN using libsndfile
+</p>
+</li>
+<li>
+<p>
+Fix for potential buffer overrun relating to <code>MAX_NAME_SIZE</code> in CLI tool
+</p>
+</li>
+<li>
+<p>
+Install AUTHORS, COPYING, README, NEWS in <code>$prefix/share/doc/twolame/</code>
+</p>
+</li>
+<li>
+<p>
+Zero the whole of the data structure when calling <code>twolame_init()</code>
+</p>
+</li>
+<li>
+<p>
+Prefixed all global symbols with <code>twolame_</code> to prevent symbol conflicts
+</p>
+</li>
+<li>
+<p>
+Fix for <code>twolame_get_framelength()</code> returning the correct frame size when padding is enabled
+</p>
+</li>
+<li>
+<p>
+Fix progress counter in twolame CLI
+</p>
+</li>
+<li>
+<p>
+Fix compilation on mingw or mxe cross compiler
+</p>
+</li>
+<li>
+<p>
+Fix symbols visibility on Windows
+</p>
+</li>
+<li>
+<p>
+Add <code>-no-undefined</code> for compilation on Windows
+</p>
+</li>
+<li>
+<p>
+Added <code>win32-dll</code> option to <code>LT_INIT</code>
+</p>
+</li>
+<li>
+<p>
+Compiler and Valgrind warning fixes
+</p>
+</li>
+<li>
+<p>
+Various other minor fixes
+</p>
+</li>
+</ul></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_version_0_3_13_2011_01_21">Version 0.3.13 (2011-01-21)</h2>
 <div class="sectionbody">
 <div class="ulist"><ul>
 <li>
@@ -622,8 +768,9 @@ Added toolame_encode_buffer_interleaved
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Version 0.3.13<br />
-Last updated 2011-01-21 18:15:40 GMT
+Version 0.4.0<br />
+Last updated
+ 2019-10-11 17:27:02 BST
 </div>
 </div>
 </body>

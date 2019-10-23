@@ -1,30 +1,28 @@
 /*
- *	TwoLAME: an optimized MPEG Audio Layer Two encoder
+ *  TwoLAME: an optimized MPEG Audio Layer Two encoder
  *
- *	Copyright (C) 2001-2004 Michael Cheng
- *	Copyright (C) 2004-2006 The TwoLAME Project
+ *  Copyright (C) 2001-2004 Michael Cheng
+ *  Copyright (C) 2004-2018 The TwoLAME Project
  *
- *	This library is free software; you can redistribute it and/or
- *	modify it under the terms of the GNU Lesser General Public
- *	License as published by the Free Software Foundation; either
- *	version 2.1 of the License, or (at your option) any later version.
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
  *
- *	This library is distributed in the hope that it will be useful,
- *	but WITHOUT ANY WARRANTY; without even the implied warranty of
- *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *	Lesser General Public License for more details.
+ *  This library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
  *
- *	You should have received a copy of the GNU Lesser General Public
- *	License along with this library; if not, write to the Free Software
- *	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *  $Id$
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
 
 
-#ifndef _COMMON_H
-#define _COMMON_H
+#ifndef TWOLAME_COMMON_H
+#define TWOLAME_COMMON_H
 
 #ifdef _WIN32
 # include "../win32/configwin.h"
@@ -41,63 +39,64 @@
 ****************************************************************************************/
 
 #ifndef FLOAT
-#define			FLOAT					double
+#define            FLOAT                    double
 #endif
 
-#define			NULL_CHAR				'\0'
+#define            NULL_CHAR                '\0'
 
-#define			MAX_U_32_NUM			0xFFFFFFFF
+#define            MAX_U_32_NUM             0xFFFFFFFF
 #ifndef PI
-#define			PI						3.14159265358979
+#define            PI                       3.14159265358979
 #endif
 #ifndef E
-#define			E						2.71828182845
+#define            E                        2.71828182845
 #endif
-#define			PI2						PI/2
-#define			PI4						PI/4
-#define			PI64					PI/64
-#define			LN_TO_LOG10				0.2302585093
+#define            PI2                      PI/2
+#define            PI4                      PI/4
+#define            PI64                     PI/64
+#define            LN_TO_LOG10              0.2302585093
 
-#define			BITS_IN_A_BYTE			8
-#define			WORD					16
-#define			MAX_NAME_SIZE			255
-#define			SBLIMIT					32
-#define			SSLIMIT					18
-#define			FFT_SIZE				1024
-#define			HAN_SIZE				512
-#define			SCALE_BLOCK				12
-#define			SCALE_RANGE				64
-#define			SCALE					32768
-#define			CRC16_POLYNOMIAL		0x8005
-#define			CRC8_POLYNOMIAL			0x1D
+#define            BITS_IN_A_BYTE           8
+#define            WORD                     16
+#define            MAX_NAME_SIZE            255
+#define            SBLIMIT                  32
+#define            SSLIMIT                  18
+#define            FFT_SIZE                 1024
+#define            HAN_SIZE                 512
+#define            SCALE_BLOCK              12
+#define            SCALE_RANGE              64
+#define            SCALE                    32768
+#define            CRC16_POLYNOMIAL         0x8005
+#define            CRC8_POLYNOMIAL          0x1D
+#define            FREEFORMAT_MAX_BITRATE   450
 
-#define			MIN(A, B)		((A) < (B) ? (A) : (B))
-#define			MAX(A, B)		((A) > (B) ? (A) : (B))
+#define            MIN(A, B)        ((A) < (B) ? (A) : (B))
+#define            MAX(A, B)        ((A) > (B) ? (A) : (B))
 
 
 /* This is the smallest MNR a subband can have before it is counted
    as 'noisy' by the logic which chooses the number of JS subbands */
 
-#define NOISY_MIN_MNR	0.0
+#define NOISY_MIN_MNR   0.0
 
 
 /***************************************************************************************
   Psychacoustic Model 1/3 Definitions
 ****************************************************************************************/
 
-#define NOISE			10
-#define TONE			20
-#define DBMIN			-200.0
-#define LAST			-1
-#define STOP			-100
-#define POWERNORM		90.3090 /* = 20 * log10(32768) to normalize */
+#define NOISE           10
+#define TONE            20
+#define DBMIN           -200.0
+#define LAST            -1
+#define STOP            -100
+#define POWERNORM       90.3090 /* = 20 * log10(32768) to normalize */
 /* max output power to 96 dB per spec */
 
 
 /***************************************************************************************
   Psychoacoustic Model 2/4 Definitions
 ****************************************************************************************/
-#define LXMIN			32.0
+#define LXMIN           32.0
 
 
 
@@ -114,7 +113,7 @@ typedef struct psycho_0_mem_struct {
 /***************************************************************************************
 psycho 1 mem struct
 ****************************************************************************************/
-#define DBTAB 1000
+#define DBTAB           1000
 
 typedef struct {
     int line;
@@ -163,12 +162,12 @@ typedef struct psycho_3_mem_struct {
 Psycho2 & 4 memory structure
 ****************************************************************************************/
 
-#define LOGBLKSIZE		10
-#define BLKSIZE			1024
-#define HBLKSIZE		513
-#define CBANDS			64
-#define TRIGTABLESIZE	6284
-#define TRIGTABLESCALE	2000.0
+#define LOGBLKSIZE      10
+#define BLKSIZE         1024
+#define HBLKSIZE        513
+#define CBANDS          64
+#define TRIGTABLESIZE   6284
+#define TRIGTABLESCALE  2000.0
 typedef int ICB[CBANDS];
 typedef int IHBLK[HBLKSIZE];
 typedef FLOAT F32[32];
@@ -238,7 +237,7 @@ typedef struct {
     int bitrate_index;
     int samplerate_idx;
     int padding;
-    int private_bit;
+    int private_extension;
     int mode;
     int mode_ext;
     int copyright;
@@ -257,50 +256,51 @@ typedef FLOAT sb_sample_t[2][3][SCALE_BLOCK][SBLIMIT];
 /***************************************************************************************
  twolame Global Options structure.
  Defaults shown in []
- ++ means it is an advanced option. Only use it if you know what you're doing.	  
+ ++ means it is an advanced option. Only use it if you know what you're doing.
 ****************************************************************************************/
 struct twolame_options_struct {
     // Input PCM audio File Information
-    int samplerate_in;          // mpeg1: 32000 [44100] 48000 
-    // mpeg2: 16000 22050 24000 
+    int samplerate_in;          // mpeg1: 32000 [44100] 48000
+    // mpeg2: 16000 22050 24000
     int samplerate_out;
     int num_channels_in;        // Number of channels on the input stream
     int num_channels_out;       // Number of channels on the output stream
 
     // Output MP2 File Information
-    TWOLAME_MPEG_version version;   // 0 mpeg2 [1] mpeg1 
+    TWOLAME_MPEG_version version;   // 0 mpeg2 [1] mpeg1
     int bitrate;                // for mpeg1:32, 48, 56, 64, 80, 96,112,128,160,[192], 224, 256,
-    // 320, 384 
-    // for mpeg2: 8, 16, 24, 32, 40, 48, 56, 64, 80, [96], 112, 128, 144, 160 
+    // 320, 384
+    // for mpeg2: 8, 16, 24, 32, 40, 48, 56, 64, 80, [96], 112, 128, 144, 160
     TWOLAME_MPEG_mode mode;
-    TWOLAME_Padding padding;    // [PAD_NO] 
+    TWOLAME_Padding padding;    // [PAD_NO]
     int do_energy_levels;       // Write energy level information into the end of the frame [FALSE]
     int num_ancillary_bits;     // Number of reserved ancillary bits [0] (Currently only available
     // for non-VBR modes)
+    int freeformat;             // [FALSE] TRUE
 
     // Psychoacoustic Model options
     int psymodel;               // -1, 0, 1, 2, [3], 4 Psy model number
     FLOAT athlevel;             // Adjust the Absolute Threshold of Hearing curve by [0] dB
-    int quickmode;              // Only calculate psy model ever X frames [FALSE] 
+    int quickmode;              // Only calculate psy model ever X frames [FALSE]
     int quickcount;             // Only calculate psy model every [10] frames
 
     // VBR Options
-    int vbr;                    // turn on VBR mode TRUE [FALSE] 
+    int vbr;                    // turn on VBR mode TRUE [FALSE]
     int vbr_upper_index;        // ++ [0] means no upper bitrate set for VBR mode. valid 1-15
     // depending on mode
     int vbr_max_bitrate;
     FLOAT vbrlevel;             // Set VBR quality. [0.0] (sensible range -10.0 -> 10.0)
 
     // Miscellaneous Options That Nobody Ever Uses
-    TWOLAME_Emphasis emphasis;  // [n]one, 5(50/15 microseconds), c(ccitt j.17) 
-    int copyright;              // [FALSE] 
-    int original;               // [FALSE] 
-    int private_bit;            // [0] Your very own bit in the header.
-    int error_protection;       // [FALSE] 
+    TWOLAME_Emphasis emphasis;  // [n]one, 5(50/15 microseconds), c(ccitt j.17)
+    int copyright;              // [FALSE]
+    int original;               // [FALSE]
+    int private_extension;      // [0] Your very own bit in the header.
+    int error_protection;       // [FALSE]
 
     // Digital Audio Broadcasting Extensions
-    unsigned int do_dab;        // Allocate space for the DigitalAudioBroadcasting info [FALSE] 
-    unsigned int dab_crc_len;   // Number of CRC bytes for DAB [2], 4 
+    unsigned int do_dab;        // Allocate space for the DigitalAudioBroadcasting info [FALSE]
+    unsigned int dab_crc_len;   // Number of CRC bytes for DAB [2], 4
     unsigned int dab_crc[4];    // DAB CRC bytes are inserted here. User must insert them in frame
     unsigned int dab_xpad_len;  // Number of bytes in the XPAD
 
@@ -314,7 +314,8 @@ struct twolame_options_struct {
     FLOAT scale_left;
     FLOAT scale_right;
 
-
+    // Available Bits
+    FLOAT slots_lag;
 
     // Bit allocation stuff
     int lower_index;
@@ -369,7 +370,7 @@ struct twolame_options_struct {
     int vbrstats[15];
 };
 
-#endif                          // _COMMON_H
+#endif                          // TWOLAME_COMMON_H
 
 
-// vim:ts=4:sw=4:nowrap: 
+// vim:ts=4:sw=4:nowrap:

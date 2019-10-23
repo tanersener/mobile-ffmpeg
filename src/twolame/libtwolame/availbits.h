@@ -2,7 +2,7 @@
  *  TwoLAME: an optimized MPEG Audio Layer Two encoder
  *
  *  Copyright (C) 2001-2004 Michael Cheng
- *  Copyright (C) 2004-2006 The TwoLAME Project
+ *  Copyright (C) 2004-2018 The TwoLAME Project
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -18,16 +18,14 @@
  *  License along with this library; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id$
- *
  */
 
-#ifndef	_AVAILBITS_H_
-#define	_AVAILBITS_H_
+#ifndef TWOLAME_AVAILBITS_H
+#define TWOLAME_AVAILBITS_H
 
-int available_bits(twolame_options * glopts);
+int twolame_available_bits(twolame_options * glopts);
 
 #endif
 
 
-// vim:ts=4:sw=4:nowrap: 
+// vim:ts=4:sw=4:nowrap:

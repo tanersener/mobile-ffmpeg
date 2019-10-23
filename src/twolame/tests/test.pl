@@ -4,7 +4,7 @@ use warnings;
 use strict;
 
 use Digest::MD5 qw(md5_hex);
-use Test::More tests => 77;
+use Test::More tests => 118;
 
 my $TWOLAME_CMD = $ENV{TWOLAME_CMD} || "../frontend/twolame";
 my $STWOLAME_CMD = $ENV{STWOLAME_CMD} || "../simplefrontend/stwolame";
@@ -23,6 +23,7 @@ my $encoding_parameters = [
     'mode' => 'stereo',
     'psycmode' => 3,
     'original' => 1,
+    'extension' => 0,
     'copyright' => 0,
     'padding' => 0,
     'protect' => 0,
@@ -42,6 +43,7 @@ my $encoding_parameters = [
     'mode' => 'joint',
     'psycmode' => 1,
     'original' => 0,
+    'extension' => 0,
     'copyright' => 0,
     'padding' => 1,
     'protect' => 0,
@@ -49,7 +51,7 @@ my $encoding_parameters = [
     'total_frames' => 22,
     'total_bytes' => 13792,
     'total_samples' => 25344,
-    'output_md5sum' => 'fef3bb4926978e56822d33eaa89208d2'
+    'output_md5sum' => 'b7937b5f2ea56460afaeee6f1a5dc77f'
   },
   {
     # Test Case 3 (MPEG-2 test)
@@ -61,6 +63,7 @@ my $encoding_parameters = [
     'mode' => 'mono',
     'psycmode' => 4,
     'original' => 0,
+    'extension' => 0,
     'copyright' => 1,
     'padding' => 1,
     'protect' => 0,
@@ -68,7 +71,7 @@ my $encoding_parameters = [
     'total_frames' => 11,
     'total_bytes' => 2298,
     'total_samples' => 12672,
-    'output_md5sum' => '3175f5332040aaad42b00823cd1ec913'
+    'output_md5sum' => '336027628adcfd5f0bb02863920fd6f1'
   },
   {
     # Test Case 4 (error protection test)
@@ -80,6 +83,7 @@ my $encoding_parameters = [
     'mode' => 'stereo',
     'psycmode' => 3,
     'original' => 1,
+    'extension' => 0,
     'copyright' => 0,
     'padding' => 0,
     'protect' => 1,
@@ -88,6 +92,47 @@ my $encoding_parameters = [
     'total_bytes' => 13772,
     'total_samples' => 25344,
     'output_md5sum' => '7e7aa8e3cfafdd1cd2eda53a9ab8bef3'
+  },
+  {
+    # Test Case 5 (private bit set)
+    'input_filename' => 'testcase-44100.wav',
+    'input_md5sum' => 'f50499fded70a74c810dbcadb3f28062',
+    'bitrate' => 192,
+    'samplerate' => 44100,
+    'version' => '1',
+    'mode' => 'stereo',
+    'psycmode' => 3,
+    'original' => 1,
+    'extension' => 1,
+    'copyright' => 0,
+    'padding' => 0,
+    'protect' => 0,
+    'deemphasis' => 'n',
+    'total_frames' => 22,
+    'total_bytes' => 13772,
+    'total_samples' => 25344,
+    'output_md5sum' => '695bb8ebb85e79442ff309c733e7551a'
+  },
+  {
+    # Test Case 6 (32-bit floating point input)
+    'input_filename' => 'testcase-float32.wav',
+    'input_md5sum' => '7c4f7598df7d31223463b3b1bbc03d35',
+    'bitrate' => 192,
+    'samplerate' => 44100,
+    'version' => '1',
+    'mode' => 'stereo',
+    'psycmode' => 3,
+    'original' => 1,
+    'extension' => 0,
+    'copyright' => 0,
+    'padding' => 0,
+    'protect' => 0,
+    'deemphasis' => 'n',
+    'total_frames' => 22,
+    'total_bytes' => 13772,
+    'total_samples' => 25344,
+    # Disabled because different architectures seem to give different floating point results
+    #'output_md5sum' => 'b9e7341a171c619006fa44a075d3ced5'
   },
 ];
 
@@ -107,6 +152,7 @@ foreach my $params (@$encoding_parameters) {
     '--psyc-mode', $params->{psycmode},
     $params->{copyright} ? '--copyright' : '--non-copyright',
     $params->{original} ? '--original' : '--non-original',
+    $params->{extension} ? '--private-ext' : '',
     $params->{protect} ? '--protect' : '',
     $params->{padding} ? '--padding' : '',
     '--deemphasis', $params->{deemphasis},
@@ -124,6 +170,7 @@ foreach my $params (@$encoding_parameters) {
   is($info->{bitrate}, $params->{bitrate}, "[$count] MPEG Audio Header - Bitrate");
   is($info->{copyright}, $params->{copyright}, "[$count] MPEG Audio Header - Copyright Flag");
   is($info->{original}, $params->{original}, "[$count] MPEG Audio Header - Original Flag");
+  is($info->{extension}, $params->{extension}, "[$count] MPEG Audio Header - Private Extension Bit");
   is($info->{protect}, $params->{protect}, "[$count] MPEG Audio Header - Error Protection Flag");
   is($info->{deemphasis}, $params->{deemphasis}, "[$count] MPEG Audio Header - De-emphasis");
 
@@ -134,11 +181,29 @@ foreach my $params (@$encoding_parameters) {
   is($info->{total_samples}, $params->{total_samples}, "[$count] total number of samples");
 
   is(filesize($OUTPUT_FILENAME), $params->{total_bytes}, , "[$count] file size of output file");
-  is(md5_file($OUTPUT_FILENAME), $params->{output_md5sum}, "[$count] md5sum of output file");
+
+  if ($params->{output_md5sum}) {
+    is(md5_file($OUTPUT_FILENAME), $params->{output_md5sum}, "[$count] md5sum of output file");
+  }
 
   $count++;
 }
 
+# Ensure that encoding 44khz with bitrate of '0' results in error
+{
+  my $INPUT_FILENAME = input_filepath('testcase-44100.wav');
+  my $OUTPUT_FILENAME = 'testcase-44100.mp2';
+  my $result = system("$TWOLAME_CMD --quiet -b 0 $INPUT_FILENAME $OUTPUT_FILENAME");
+  ok($result != 0, "44100 samplerate with bitrate of '0' should result in an error");
+}
+
+# Ensure that encoding 22khz with bitrate of '0' results in error
+{
+  my $INPUT_FILENAME = input_filepath('testcase-22050.wav');
+  my $OUTPUT_FILENAME = 'testcase-22050.mp2';
+  my $result = system("$TWOLAME_CMD --quiet -b 0 $INPUT_FILENAME $OUTPUT_FILENAME");
+  ok($result != 0, "22050 samplerate with bitrate of '0' should result in an error");
+}
 
 # Test encoding from STDIN
 SKIP: {
@@ -164,7 +229,7 @@ SKIP: {
 {
   my $INPUT_FILENAME = input_filepath('testcase-44100.wav');
   my $OUTPUT_FILENAME = 'testcase-simple.mp2';
-  my $result = system("../simplefrontend/stwolame $INPUT_FILENAME $OUTPUT_FILENAME");
+  my $result = system("$STWOLAME_CMD $INPUT_FILENAME $OUTPUT_FILENAME");
   is($result, 0, "converting using simplefrontend - response code");
 
   my $info = mpeg_audio_info($OUTPUT_FILENAME);
@@ -185,7 +250,7 @@ sub input_filepath {
 }
 
 sub filesize {
-  return (stat(@_))[7];
+  return (stat($_[0]))[7];
 }
 
 sub md5_file {
