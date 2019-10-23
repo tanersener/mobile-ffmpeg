@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.1.3)
 
 project(expat
     VERSION
-        2.2.8
+        2.2.9
     LANGUAGES
         C
 )
@@ -229,7 +229,7 @@ if(WIN32)
             set(_POSTFIX_DEBUG "")
         endif()
 
-        set(${postfix_var} "${_POSTFIX_WIDE}${_POSTFIX_DEBUG}${_POSTFIX_CRT}" CACHE STRING "Windows binary postfix, e.g. expat<postfix=[w][d][MD|MT]>.lib")
+        set(${postfix_var} "${_POSTFIX_WIDE}${_POSTFIX_DEBUG}${_POSTFIX_CRT}" CACHE STRING "Windows binary postfix, e.g. libexpat<postfix=[w][d][MD|MT]>.lib")
     endforeach()
 endif(WIN32)
 
@@ -257,23 +257,30 @@ else(EXPAT_SHARED_LIBS)
     endif(WIN32)
 endif(EXPAT_SHARED_LIBS)
 
-add_library(expat ${_SHARED} ${expat_SRCS})
+# Avoid colliding with Expat.dll of Perl's XML::Parser::Expat
+if(WIN32 AND NOT MINGW)
+    set(_EXPAT_TARGET libexpat)
+else()
+    set(_EXPAT_TARGET expat)
+endif()
+
+add_library(${_EXPAT_TARGET} ${_SHARED} ${expat_SRCS})
 if(EXPAT_WITH_LIBBSD)
-    target_link_libraries(expat ${LIB_BSD})
+    target_link_libraries(${_EXPAT_TARGET} ${LIB_BSD})
 endif()
 
 set(LIBCURRENT 7)    # sync
-set(LIBREVISION 10)  # with
+set(LIBREVISION 11)  # with
 set(LIBAGE 6)        # configure.ac!
 math(EXPR LIBCURRENT_MINUS_AGE "${LIBCURRENT} - ${LIBAGE}")
 
 if(NOT WIN32)
-    set_property(TARGET expat PROPERTY VERSION ${LIBCURRENT_MINUS_AGE}.${LIBAGE}.${LIBREVISION})
-    set_property(TARGET expat PROPERTY SOVERSION ${LIBCURRENT_MINUS_AGE})
-    set_property(TARGET expat PROPERTY NO_SONAME ${NO_SONAME})
+    set_property(TARGET ${_EXPAT_TARGET} PROPERTY VERSION ${LIBCURRENT_MINUS_AGE}.${LIBAGE}.${LIBREVISION})
+    set_property(TARGET ${_EXPAT_TARGET} PROPERTY SOVERSION ${LIBCURRENT_MINUS_AGE})
+    set_property(TARGET ${_EXPAT_TARGET} PROPERTY NO_SONAME ${NO_SONAME})
 endif(NOT WIN32)
 
-expat_install(TARGETS expat EXPORT expat
+expat_install(TARGETS ${_EXPAT_TARGET} EXPORT expat
                       RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
                       LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
                       ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
@@ -305,7 +312,7 @@ if(EXPAT_BUILD_TOOLS)
 
     add_executable(xmlwf ${xmlwf_SRCS})
     set_property(TARGET xmlwf PROPERTY RUNTIME_OUTPUT_DIRECTORY xmlwf)
-    target_link_libraries(xmlwf expat)
+    target_link_libraries(xmlwf ${_EXPAT_TARGET})
     expat_install(TARGETS xmlwf DESTINATION ${CMAKE_INSTALL_BINDIR})
 
     if(MINGW AND _EXPAT_UNICODE_WCHAR_T)
@@ -315,7 +322,7 @@ if(EXPAT_BUILD_TOOLS)
 
     if(EXPAT_BUILD_DOCS)
         file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/doc)
-        add_custom_command(TARGET expat PRE_BUILD COMMAND "${DOCBOOK_TO_MAN}" "${PROJECT_SOURCE_DIR}/doc/xmlwf.xml" && mv "XMLWF.1" "${PROJECT_BINARY_DIR}/doc/xmlwf.1")
+        add_custom_command(TARGET ${_EXPAT_TARGET} PRE_BUILD COMMAND "${DOCBOOK_TO_MAN}" "${PROJECT_SOURCE_DIR}/doc/xmlwf.xml" && mv "XMLWF.1" "${PROJECT_BINARY_DIR}/doc/xmlwf.1")
         expat_install(FILES "${PROJECT_BINARY_DIR}/doc/xmlwf.1" DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
     endif()
 endif()
@@ -326,11 +333,11 @@ endif()
 if(EXPAT_BUILD_EXAMPLES)
     add_executable(elements examples/elements.c)
     set_property(TARGET elements PROPERTY RUNTIME_OUTPUT_DIRECTORY examples)
-    target_link_libraries(elements expat)
+    target_link_libraries(elements ${_EXPAT_TARGET})
 
     add_executable(outline examples/outline.c)
     set_property(TARGET outline PROPERTY RUNTIME_OUTPUT_DIRECTORY examples)
-    target_link_libraries(outline expat)
+    target_link_libraries(outline ${_EXPAT_TARGET})
 endif(EXPAT_BUILD_EXAMPLES)
 
 #
@@ -365,12 +372,12 @@ if(EXPAT_BUILD_TESTS)
 
     add_executable(runtests tests/runtests.c ${test_SRCS})
     set_property(TARGET runtests PROPERTY RUNTIME_OUTPUT_DIRECTORY tests)
-    target_link_libraries(runtests expat)
+    target_link_libraries(runtests ${_EXPAT_TARGET})
     expat_add_test(runtests $<TARGET_FILE:runtests>)
 
     add_executable(runtestspp tests/runtestspp.cpp ${test_SRCS})
     set_property(TARGET runtestspp PROPERTY RUNTIME_OUTPUT_DIRECTORY tests)
-    target_link_libraries(runtestspp expat)
+    target_link_libraries(runtestspp ${_EXPAT_TARGET})
     expat_add_test(runtestspp $<TARGET_FILE:runtestspp>)
 endif(EXPAT_BUILD_TESTS)
 
@@ -491,7 +498,7 @@ write_basic_package_version_file(
 )
 export(
     TARGETS
-        expat
+        ${_EXPAT_TARGET}
     FILE
         cmake/expat-targets.cmake  # not going to be installed
 )

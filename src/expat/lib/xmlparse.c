@@ -1,4 +1,4 @@
-/* f2d0ab6d1d4422a08cf1cf3bbdfba96b49dea42fb5ff4615e03a2a25c306e769 (2.2.8+)
+/* f519f27c7c3b79fee55aeb8b1e53b7384b079d9118bf3a62eb3a60986a6742f2 (2.2.9+)
                             __  __            _
                          ___\ \/ /_ __   __ _| |_
                         / _ \\  /| '_ \ / _` | __|
@@ -36,7 +36,9 @@
 
 #ifdef _WIN32
 /* force stdlib to define rand_s() */
-#  define _CRT_RAND_S
+#  if ! defined(_CRT_RAND_S)
+#    define _CRT_RAND_S
+#  endif
 #endif
 
 #include <stddef.h>

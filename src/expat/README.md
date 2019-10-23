@@ -3,7 +3,7 @@
 [![Packaging status](https://repology.org/badge/tiny-repos/expat.svg)](https://repology.org/metapackage/expat/versions)
 
 
-# Expat, Release 2.2.8
+# Expat, Release 2.2.9
 
 This is Expat, a C library for parsing XML, started by
 [James Clark](https://en.wikipedia.org/wiki/James_Clark_(programmer)) in 1997.
@@ -133,7 +133,7 @@ distribution.
 
 
 The CMake build system is still *experimental* and will replace the primary
-build system based on GNU Autotools at some point when its ready.
+build system based on GNU Autotools at some point when it is ready.
 For an idea of the available (non-advanced) options for building with CMake:
 
 ```console
