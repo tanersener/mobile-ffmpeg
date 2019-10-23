@@ -4,7 +4,7 @@
 
 Summary:	Font configuration and customization library
 Name:		fontconfig
-Version:	2.13.91
+Version:	2.13.92
 Release:	1
 License:	MIT
 Group:		System Environment/Libraries

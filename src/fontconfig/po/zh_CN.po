@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: fontconfig 2.12.92\n"
 "Report-Msgid-Bugs-To: https://bugs.freedesktop.org/enter_bug.cgi?"
 "product=fontconfig\n"
-"POT-Creation-Date: 2019-06-10 08:20+0000\n"
+"POT-Creation-Date: 2019-08-09 11:12+0000\n"
 "PO-Revision-Date: 2018-02-16 01:41-0600\n"
 "Last-Translator: Mingcong Bai <jeffbai@aosc.xyz>\n"
 "Language-Team: AOSC\n"
@@ -146,66 +146,66 @@ msgstr "跳过，探测到循环目录\n"
 msgid "skipping, no such directory\n"
 msgstr "跳过，无此目录\n"
 
-#: fc-cache/fc-cache.c:198
+#: fc-cache/fc-cache.c:200
 #, c-format
 msgid "\"%s\": not a directory, skipping\n"
 msgstr "“%s”：不是一个目录，跳过\n"
 
-#: fc-cache/fc-cache.c:222
+#: fc-cache/fc-cache.c:224
 #, c-format
 msgid "\"%s\": scanning error\n"
 msgstr "“%s”：扫描错误\n"
 
-#: fc-cache/fc-cache.c:231
+#: fc-cache/fc-cache.c:233
 #, c-format
 msgid "skipping, existing cache is valid: %d fonts, %d dirs\n"
 msgstr "跳过，当前缓存有效：%d 个字体，%d 个目录\n"
 
-#: fc-cache/fc-cache.c:237
+#: fc-cache/fc-cache.c:239
 #, c-format
 msgid "caching, new cache contents: %d fonts, %d dirs\n"
 msgstr "正在生成缓存，新增缓存内容：%d 个字体，%d 个目录\n"
 
-#: fc-cache/fc-cache.c:242
+#: fc-cache/fc-cache.c:244
 #, c-format
 msgid "%s: failed to write cache\n"
 msgstr "%s：无法写入缓存\n"
 
-#: fc-cache/fc-cache.c:251
+#: fc-cache/fc-cache.c:253
 #, c-format
 msgid "%s: Can't create subdir set\n"
 msgstr "%s：无法创建子目录集\n"
 
-#: fc-cache/fc-cache.c:265
+#: fc-cache/fc-cache.c:267
 #, c-format
 msgid "%s: Can't create subdir list\n"
 msgstr "%s：无法创建子目录列表\n"
 
-#: fc-cache/fc-cache.c:373 fc-cat/fc-cat.c:307
+#: fc-cache/fc-cache.c:375 fc-cat/fc-cat.c:307
 #, c-format
 msgid "%s: Can't initialize font config library\n"
 msgstr "%s：无法初始化 Fontconfig 库\n"
 
-#: fc-cache/fc-cache.c:383
+#: fc-cache/fc-cache.c:385
 #, c-format
 msgid "%s: Can't create list of directories\n"
 msgstr "%s：无法创建目录列表\n"
 
-#: fc-cache/fc-cache.c:391
+#: fc-cache/fc-cache.c:393
 #, c-format
 msgid "%s: Can't add directory\n"
 msgstr "%s：无法添加目录\n"
 
-#: fc-cache/fc-cache.c:403
+#: fc-cache/fc-cache.c:405
 #, c-format
 msgid "Out of Memory\n"
 msgstr "内存耗尽\n"
 
-#: fc-cache/fc-cache.c:446
+#: fc-cache/fc-cache.c:448
 msgid "failed"
 msgstr "缓存生成失败"
 
-#: fc-cache/fc-cache.c:446
+#: fc-cache/fc-cache.c:448
 msgid "succeeded"
 msgstr "缓存生成成功"
 
