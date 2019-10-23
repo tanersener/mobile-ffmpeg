@@ -175,6 +175,8 @@ _gnutls_x509_pkix_sign(ASN1_TYPE src, const char *src_name,
 		return result;
 	}
 
+	FIX_SIGN_PARAMS(params, flags, dig);
+
 	if (_gnutls_pk_is_not_prehashed(params.pk)) {
 		result = privkey_sign_raw_data(issuer_key, se, &tbs, &signature, &params);
 	} else {

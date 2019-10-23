@@ -5,6 +5,42 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.6.10 (released 2019-09-29)
+
+** libgnutls: Added support for deterministic ECDSA/DSA (RFC6979)
+   Deterministic signing can be enabled by setting
+   GNUTLS_PRIVKEY_FLAG_REPRODUCIBLE when calling gnutls_privkey_sign_*()
+   functions (#94).
+
+** libgnutls: add gnutls_aead_cipher_encryptv2 and gnutls_aead_cipher_decryptv2
+   functions that will perform in-place encryption/decryption on data buffers (#718).
+
+** libgnutls: Corrected issue in gnutls_session_get_data2() which could fail under
+   TLS1.3, if a timeout callback was not set using gnutls_transport_set_pull_timeout_function()
+   (#823).
+
+** libgnutls: added interoperability tests with gnutls 2.12.x; addressed
+   issue with large record handling due to random padding (#811).
+
+** libgnutls: the server now selects the highest TLS protocol version,
+   if TLS 1.3 is enabled and the client advertises an older protocol version first (#837).
+
+** libgnutls: fix non-PIC assembly on i386 (#818).
+
+** libgnutls: added support for GOST 28147-89 cipher in CNT (GOST counter) mode
+   and MAC generation based on GOST 28147-89 (IMIT). For description of the
+   modes see RFC 5830. S-Box is id-tc26-gost-28147-param-Z (TC26Z) defined in
+   RFC 7836.
+
+** certtool: when outputting an encrypted private key do not insert the textual description
+   of it. This fixes a regression since 3.6.5 (#840).
+
+** API and ABI modifications:
+gnutls_aead_cipher_encryptv2: Added
+gnutls_aead_cipher_decryptv2: Added
+GNUTLS_CIPHER_GOST28147_TC26Z_CNT: Added
+GNUTLS_MAC_GOST28147_TC26Z_IMIT: Added
+
 * Version 3.6.9 (released 2019-07-25)
 
 ** libgnutls: add gnutls_hash_copy/gnutls_hmac_copy functions that will create a copy

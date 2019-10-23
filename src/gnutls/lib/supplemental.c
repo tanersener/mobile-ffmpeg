@@ -192,14 +192,14 @@ _gnutls_parse_supplemental(gnutls_session_t session,
 			   const uint8_t * data, int datalen)
 {
 	const uint8_t *p = data;
-	ssize_t dsize = datalen;
+	size_t dsize = datalen;
 	size_t total_size;
 
 	DECR_LEN(dsize, 3);
 	total_size = _gnutls_read_uint24(p);
 	p += 3;
 
-	if (dsize != (ssize_t) total_size) {
+	if (dsize != total_size) {
 		gnutls_assert();
 		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 	}

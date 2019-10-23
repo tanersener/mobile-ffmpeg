@@ -1,186 +1,186 @@
 @c Automatically generated, do not edit.
 
-@c snarfed from ../guile/src/core.c:3390
+@c snarfed from ../guile/src/core.c:3402
 @deffn {Scheme Procedure} set-log-level! level
 Enable GnuTLS logging up to @var{level} (an integer).
 @end deffn
 
-@c snarfed from ../guile/src/core.c:3370
+@c snarfed from ../guile/src/core.c:3382
 @deffn {Scheme Procedure} set-log-procedure! proc
 Use @var{proc} (a two-argument procedure) as the global GnuTLS log procedure.
 @end deffn
 
-@c snarfed from ../guile/src/core.c:3330
+@c snarfed from ../guile/src/core.c:3342
 @deffn {Scheme Procedure} %set-certificate-credentials-openpgp-keys! cred pub sec
 Use certificate @var{pub} and secret key @var{sec} in certificate credentials @var{cred}.
 @end deffn
 
-@c snarfed from ../guile/src/core.c:3292
+@c snarfed from ../guile/src/core.c:3304
 @deffn {Scheme Procedure} %openpgp-keyring-contains-key-id? keyring id
 Return @code{#f} if key ID @var{id} is in @var{keyring}, @code{#f} otherwise.
 @end deffn
 
-@c snarfed from ../guile/src/core.c:3247
+@c snarfed from ../guile/src/core.c:3259
 @deffn {Scheme Procedure} import-openpgp-keyring data format
 Import @var{data} (a u8vector) according to @var{format} and return the imported keyring.
 @end deffn
 
-@c snarfed from ../guile/src/core.c:3222
+@c snarfed from ../guile/src/core.c:3234
 @deffn {Scheme Procedure} %openpgp-certificate-usage key
 Return a list of values denoting the key usage of @var{key}.
 @end deffn
 
-@c snarfed from ../guile/src/core.c:3203
+@c snarfed from ../guile/src/core.c:3215
 @deffn {Scheme Procedure} %openpgp-certificate-version key
 Return the version of the OpenPGP message format (RFC2440) honored by @var{key}.
 @end deffn
 
-@c snarfed from ../guile/src/core.c:3182
+@c snarfed from ../guile/src/core.c:3194
 @deffn {Scheme Procedure} %openpgp-certificate-algorithm key
 Return two values: the certificate algorithm used by @var{key} and the number of bits used.
 @end deffn
 
-@c snarfed from ../guile/src/core.c:3150
+@c snarfed from ../guile/src/core.c:3162
 @deffn {Scheme Procedure} %openpgp-certificate-names key
 Return the list of names for @var{key}.
 @end deffn
 
-@c snarfed from ../guile/src/core.c:3125
+@c snarfed from ../guile/src/core.c:3137
 @deffn {Scheme Procedure} %openpgp-certificate-name key index
 Return the @var{index}th name of @var{key}.
 @end deffn
 
-@c snarfed from ../guile/src/core.c:3066
+@c snarfed from ../guile/src/core.c:3078
 @deffn {Scheme Procedure} %openpgp-certificate-fingerprint key
 Return a new u8vector denoting the fingerprint of @var{key}.
 @end deffn
 
-@c snarfed from ../guile/src/core.c:3035
+@c snarfed from ../guile/src/core.c:3047
 @deffn {Scheme Procedure} %openpgp-certificate-fingerprint! key fpr
 Store in @var{fpr} (a u8vector) the fingerprint of @var{key}.  Return the number of bytes stored in @var{fpr}.
 @end deffn
 
-@c snarfed from ../guile/src/core.c:3001
+@c snarfed from ../guile/src/core.c:3013
 @deffn {Scheme Procedure} %openpgp-certificate-id! key id
 Store the ID (an 8 byte sequence) of certificate @var{key} in @var{id} (a u8vector).
 @end deffn
 
-@c snarfed from ../guile/src/core.c:2975
+@c snarfed from ../guile/src/core.c:2987
 @deffn {Scheme Procedure} %openpgp-certificate-id key
 Return the ID (an 8-element u8vector) of certificate @var{key}.
 @end deffn
 
-@c snarfed from ../guile/src/core.c:2919
+@c snarfed from ../guile/src/core.c:2931
 @deffn {Scheme Procedure} %import-openpgp-private-key data format [pass]
 Return a new OpenPGP private key object resulting from the import of @var{data} (a uniform array) according to @var{format}.  Optionally, a passphrase may be provided.
 @end deffn
 
-@c snarfed from ../guile/src/core.c:2875
+@c snarfed from ../guile/src/core.c:2887
 @deffn {Scheme Procedure} %import-openpgp-certificate data format
 Return a new OpenPGP certificate object resulting from the import of @var{data} (a uniform array) according to @var{format}.
 @end deffn
 
-@c snarfed from ../guile/src/core.c:2807
+@c snarfed from ../guile/src/core.c:2819
 @deffn {Scheme Procedure} x509-certificate-subject-alternative-name cert index
 Return two values: the alternative name type for @var{cert} (i.e., one of the @code{x509-subject-alternative-name/} values) and the actual subject alternative name (a string) at @var{index}. Both values are @code{#f} if no alternative name is available at @var{index}.
 @end deffn
 
-@c snarfed from ../guile/src/core.c:2776
+@c snarfed from ../guile/src/core.c:2788
 @deffn {Scheme Procedure} x509-certificate-subject-key-id cert
 Return the subject key ID (a u8vector) for @var{cert}.
 @end deffn
 
-@c snarfed from ../guile/src/core.c:2744
+@c snarfed from ../guile/src/core.c:2756
 @deffn {Scheme Procedure} x509-certificate-authority-key-id cert
 Return the key ID (a u8vector) of the X.509 certificate authority of @var{cert}.
 @end deffn
 
-@c snarfed from ../guile/src/core.c:2712
+@c snarfed from ../guile/src/core.c:2724
 @deffn {Scheme Procedure} x509-certificate-key-id cert
 Return a statistically unique ID (a u8vector) for @var{cert} that depends on its public key parameters.  This is normally a 20-byte SHA-1 hash.
 @end deffn
 
-@c snarfed from ../guile/src/core.c:2694
+@c snarfed from ../guile/src/core.c:2706
 @deffn {Scheme Procedure} x509-certificate-version cert
 Return the version of @var{cert}.
 @end deffn
 
-@c snarfed from ../guile/src/core.c:2662
+@c snarfed from ../guile/src/core.c:2674
 @deffn {Scheme Procedure} x509-certificate-key-usage cert
 Return the key usage of @var{cert} (i.e., a list of @code{key-usage/} values), or the empty list if @var{cert} does not contain such information.
 @end deffn
 
-@c snarfed from ../guile/src/core.c:2639
+@c snarfed from ../guile/src/core.c:2651
 @deffn {Scheme Procedure} x509-certificate-public-key-algorithm cert
 Return two values: the public key algorithm (i.e., one of the @code{pk-algorithm/} values) of @var{cert} and the number of bits used.
 @end deffn
 
-@c snarfed from ../guile/src/core.c:2617
+@c snarfed from ../guile/src/core.c:2629
 @deffn {Scheme Procedure} x509-certificate-signature-algorithm cert
 Return the signature algorithm used by @var{cert} (i.e., one of the @code{sign-algorithm/} values).
 @end deffn
 
-@c snarfed from ../guile/src/core.c:2583
+@c snarfed from ../guile/src/core.c:2595
 @deffn {Scheme Procedure} x509-certificate-matches-hostname? cert hostname
 Return true if @var{cert} matches @var{hostname}, a string denoting a DNS host name.  This is the basic implementation of @uref{https://tools.ietf.org/html/rfc2818, RFC 2818} (aka. HTTPS).
 @end deffn
 
-@c snarfed from ../guile/src/core.c:2566
+@c snarfed from ../guile/src/core.c:2578
 @deffn {Scheme Procedure} x509-certificate-issuer-dn-oid cert index
 Return the OID (a string) at @var{index} from @var{cert}'s issuer DN.  Return @code{#f} if no OID is available at @var{index}.
 @end deffn
 
-@c snarfed from ../guile/src/core.c:2554
+@c snarfed from ../guile/src/core.c:2566
 @deffn {Scheme Procedure} x509-certificate-dn-oid cert index
 Return OID (a string) at @var{index} from @var{cert}.  Return @code{#f} if no OID is available at @var{index}.
 @end deffn
 
-@c snarfed from ../guile/src/core.c:2491
+@c snarfed from ../guile/src/core.c:2503
 @deffn {Scheme Procedure} x509-certificate-issuer-dn cert
 Return the distinguished name (DN) of X.509 certificate @var{cert}.
 @end deffn
 
-@c snarfed from ../guile/src/core.c:2478
+@c snarfed from ../guile/src/core.c:2490
 @deffn {Scheme Procedure} x509-certificate-dn cert
 Return the distinguished name (DN) of X.509 certificate @var{cert}.  The form of the DN is as described in @uref{https://tools.ietf.org/html/rfc2253, RFC 2253}.
 @end deffn
 
-@c snarfed from ../guile/src/core.c:2384
+@c snarfed from ../guile/src/core.c:2396
 @deffn {Scheme Procedure} pkcs8-import-x509-private-key data format [pass [encrypted]]
 Return a new X.509 private key object resulting from the import of @var{data} (a uniform array) according to @var{format}.  Optionally, if @var{pass} is not @code{#f}, it should be a string denoting a passphrase.  @var{encrypted} tells whether the private key is encrypted (@code{#t} by default).
 @end deffn
 
-@c snarfed from ../guile/src/core.c:2339
+@c snarfed from ../guile/src/core.c:2351
 @deffn {Scheme Procedure} import-x509-private-key data format
 Return a new X.509 private key object resulting from the import of @var{data} (a uniform array) according to @var{format}.
 @end deffn
 
-@c snarfed from ../guile/src/core.c:2294
+@c snarfed from ../guile/src/core.c:2306
 @deffn {Scheme Procedure} import-x509-certificate data format
 Return a new X.509 certificate object resulting from the import of @var{data} (a uniform array) according to @var{format}.
 @end deffn
 
-@c snarfed from ../guile/src/core.c:2266
+@c snarfed from ../guile/src/core.c:2278
 @deffn {Scheme Procedure} server-session-psk-username session
 Return the username associated with PSK server session @var{session}.
 @end deffn
 
-@c snarfed from ../guile/src/core.c:2222
+@c snarfed from ../guile/src/core.c:2234
 @deffn {Scheme Procedure} set-psk-client-credentials! cred username key key-format
 Set the client credentials for @var{cred}, a PSK client credentials object.
 @end deffn
 
-@c snarfed from ../guile/src/core.c:2205
+@c snarfed from ../guile/src/core.c:2217
 @deffn {Scheme Procedure} make-psk-client-credentials 
 Return a new PSK client credentials object.
 @end deffn
 
-@c snarfed from ../guile/src/core.c:2174
+@c snarfed from ../guile/src/core.c:2186
 @deffn {Scheme Procedure} set-psk-server-credentials-file! cred file
 Use @var{file} as the password file for PSK server credentials @var{cred}.
 @end deffn
 
-@c snarfed from ../guile/src/core.c:2157
+@c snarfed from ../guile/src/core.c:2169
 @deffn {Scheme Procedure} make-psk-server-credentials 
 Return new PSK server credentials.
 @end deffn

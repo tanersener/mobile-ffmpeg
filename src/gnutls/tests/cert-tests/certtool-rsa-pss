@@ -35,6 +35,24 @@ if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
 fi
 
+# Create an RSA-PSS private key, restricted to the use with RSA-PSS
+${VALGRIND} "${CERTTOOL}" --generate-privkey \
+        --key-type rsa-pss --outfile "$OUTFILE"
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "Could not generate an RSA-PSS key"
+	exit 1
+fi
+
+# check whether description is present
+grep 'modulus:' ${OUTFILE}
+if test $? != 0;then
+	cat ${OUTFILE}
+	echo "PKCS#8 file does not contain modulus text"
+	exit 1
+fi
+
 for i in sha256 sha384 sha512;do
 if test "${GNUTLS_FORCE_FIPS_MODE}" = 1 && test "$i" != sha384;then
 	continue

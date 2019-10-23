@@ -65,10 +65,9 @@ const hello_ext_entry_st ext_mod_max_record_size = {
 
 static int
 _gnutls_max_record_recv_params(gnutls_session_t session,
-			       const uint8_t * data, size_t _data_size)
+			       const uint8_t * data, size_t data_size)
 {
 	ssize_t new_size;
-	ssize_t data_size = _data_size;
 
 	if (session->internals.hsk_flags & HSK_RECORD_SIZE_LIMIT_NEGOTIATED)
 		return 0;

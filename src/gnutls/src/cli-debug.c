@@ -59,11 +59,6 @@ gnutls_certificate_credentials_t xcred;
 
 unsigned int verbose = 0;
 
-extern int tls1_ok;
-extern int tls1_1_ok;
-extern int tls1_2_ok;
-extern int tls1_3_ok;
-extern int ssl3_ok;
 extern const char *ext_text;
 
 static void tls_log_func(int level, const char *str)
@@ -80,6 +75,7 @@ typedef struct {
 	const char *fail_str;
 	const char *unsure_str;
 	unsigned https_only;
+	unsigned fatal_failure;
 } TLS_TEST;
 
 static const TLS_TEST tls_tests[] = {
@@ -110,6 +106,8 @@ static const TLS_TEST tls_tests[] = {
 	 "SSL 3.0"},
 	{"for TLS 1.2 (RFC5246) support", test_tls1_2, "yes", "no", "dunno"},
 	{"for TLS 1.3 (RFC8446) support", test_tls1_3, "yes", "no", "dunno"},
+	{"for known TLS or SSL protocols support", test_known_protocols, "yes", "no", "dunno", 0, 1},
+
 	{"TLS1.2 neg fallback from TLS 1.6 to", test_tls1_6_fallback, NULL,
 	 "failed (server requires fallback dance)", "dunno"},
 	{"for inappropriate fallback (RFC7507) support", test_rfc7507, "yes", "no", "dunno"},
@@ -220,6 +218,7 @@ int main(int argc, char **argv)
 	int i;
 	char portname[6];
 	socket_st hd;
+	bool socket_opened = false;
 	char app_proto[32] = "";
 
 	cmd_parser(argc, argv);
@@ -273,66 +272,53 @@ int main(int argc, char **argv)
 
 	sockets_init();
 
-	i = 0;
-
 	printf("GnuTLS debug client %s\n", gnutls_check_version(NULL));
 
 	canonicalize_host(hostname, portname, sizeof(portname));
 	printf("Checking %s:%s\n", hostname, portname);
-	do {
 
-		if (tls_tests[i].test_name == NULL)
-			break;	/* finished */
+	for (i = 0;
+	     tls_tests[i].test_name != NULL;
+	     i++) {
 
-		/* if neither of SSL3 and TLSv1 are supported, exit
-		 */
-		if (i > 11 && tls1_2_ok == 0 && tls1_1_ok == 0 && tls1_ok == 0
-		    && ssl3_ok == 0 && tls1_3_ok == 0) {
-			fprintf(stderr,
-				"\nServer does not support any of SSL 3.0, TLS 1.0, 1.1, 1.2 and 1.3\n");
+		if (strcmp(app_proto, "https") != 0 && tls_tests[i].https_only != 0) {
+			continue;
+		}
+
+		if (!socket_opened) {
+			socket_open(&hd, hostname, portname, app_proto, SOCKET_FLAG_STARTTLS|SOCKET_FLAG_RAW, NULL, NULL);
+			hd.verbose = verbose;
+			socket_opened = true;
+		}
+
+		ret = tls_tests[i].func(hd.session);
+
+		if ((ret != TEST_IGNORE && ret != TEST_IGNORE2) || verbose) {
+			printf("%58s...", tls_tests[i].test_name);
+			fflush(stdout);
+		}
+
+		if (ret == TEST_SUCCEED) {
+			if (tls_tests[i].suc_str == NULL)
+				printf(" %s\n", ext_text);
+			else
+				printf(" %s\n", tls_tests[i].suc_str);
+		} else if (ret == TEST_FAILED)
+			printf(" %s\n", tls_tests[i].fail_str);
+		else if (ret == TEST_UNSURE)
+			printf(" %s\n", tls_tests[i].unsure_str);
+		else if ((ret == TEST_IGNORE || ret == TEST_IGNORE2) && verbose) {
+			printf(" skipped\n");
+		}
+
+		if (ret != TEST_IGNORE) {
+			socket_bye(&hd, 1);
+			socket_opened = false;
+		}
+
+		if (ret == TEST_FAILED && tls_tests[i].fatal_failure)
 			break;
-		}
-
-		socket_open(&hd, hostname, portname, app_proto, SOCKET_FLAG_STARTTLS|SOCKET_FLAG_RAW, NULL, NULL);
-		hd.verbose = verbose;
-
-		do {
-			if (strcmp(app_proto, "https") != 0 && tls_tests[i].https_only != 0) {
-				i++;
-				break;
-			}
-
-			ret = tls_tests[i].func(hd.session);
-
-			if (ret != TEST_IGNORE && ret != TEST_IGNORE2) {
-				printf("%58s...", tls_tests[i].test_name);
-				fflush(stdout);
-			}
-
-			if (ret == TEST_SUCCEED) {
-				if (tls_tests[i].suc_str == NULL)
-					printf(" %s\n", ext_text);
-				else
-					printf(" %s\n", tls_tests[i].suc_str);
-			} else if (ret == TEST_FAILED)
-				printf(" %s\n", tls_tests[i].fail_str);
-			else if (ret == TEST_UNSURE)
-				printf(" %s\n", tls_tests[i].unsure_str);
-			else if (ret == TEST_IGNORE) {
-				if (tls_tests[i+1].test_name)
-					i++;
-				else
-					break;
-			}
-		}
-		while (ret == TEST_IGNORE
-		       && tls_tests[i].test_name != NULL);
-
-		socket_bye(&hd, 1);
-
-		i++;
 	}
-	while (1);
 
 #ifdef ENABLE_SRP
 	gnutls_srp_free_client_credentials(srp_cred);

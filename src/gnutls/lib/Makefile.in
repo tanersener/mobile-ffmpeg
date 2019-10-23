@@ -351,16 +351,16 @@ am__libgnutls_la_SOURCES_DIST = abstract_int.h debug.h cipher.h \
 	cert-session.c handshake-checks.c dtls-sw.c dh-primes.c \
 	openpgp_compat.c crypto-selftests.c crypto-selftests-pk.c \
 	secrets.c extv.c extv.h hello_ext_lib.c hello_ext_lib.h \
-	ocsp-api.c stek.c cert-cred-rawpk.c system/keys-win.c \
-	system/keys-dummy.c tls13/encrypted_extensions.c \
-	tls13/encrypted_extensions.h tls13/certificate_request.c \
-	tls13/certificate_request.h tls13/certificate_verify.c \
-	tls13/certificate_verify.h tls13-sig.c tls13-sig.h \
-	tls13/finished.c tls13/finished.h tls13/key_update.c \
-	tls13/key_update.h tls13/hello_retry.c tls13/hello_retry.h \
-	tls13/session_ticket.c tls13/session_ticket.h \
-	tls13/certificate.c tls13/certificate.h tls13/early_data.c \
-	tls13/early_data.h tls13/post_handshake.c \
+	ocsp-api.c stek.c cert-cred-rawpk.c iov.c iov.h \
+	system/keys-win.c system/keys-dummy.c \
+	tls13/encrypted_extensions.c tls13/encrypted_extensions.h \
+	tls13/certificate_request.c tls13/certificate_request.h \
+	tls13/certificate_verify.c tls13/certificate_verify.h \
+	tls13-sig.c tls13-sig.h tls13/finished.c tls13/finished.h \
+	tls13/key_update.c tls13/key_update.h tls13/hello_retry.c \
+	tls13/hello_retry.h tls13/session_ticket.c \
+	tls13/session_ticket.h tls13/certificate.c tls13/certificate.h \
+	tls13/early_data.c tls13/early_data.h tls13/post_handshake.c \
 	tls13/psk_ext_parser.c tls13/psk_ext_parser.h \
 	tls13/anti_replay.c tls13/anti_replay.h pkcs11.c pkcs11x.c \
 	pkcs11_privkey.c pkcs11_write.c pkcs11_secret.c pkcs11_int.c \
@@ -391,7 +391,7 @@ am__objects_6 = range.lo record.lo compress.lo debug.lo cipher.lo \
 	auto-verify.lo dh-session.lo cert-session.lo \
 	handshake-checks.lo dtls-sw.lo dh-primes.lo openpgp_compat.lo \
 	crypto-selftests.lo crypto-selftests-pk.lo secrets.lo extv.lo \
-	hello_ext_lib.lo ocsp-api.lo stek.lo cert-cred-rawpk.lo \
+	hello_ext_lib.lo ocsp-api.lo stek.lo cert-cred-rawpk.lo iov.lo \
 	$(am__objects_3) $(am__objects_4) \
 	tls13/encrypted_extensions.lo tls13/certificate_request.lo \
 	tls13/certificate_verify.lo tls13-sig.lo tls13/finished.lo \
@@ -458,10 +458,10 @@ am__depfiles_remade = ./$(DEPDIR)/alert.Plo ./$(DEPDIR)/anon_cred.Plo \
 	./$(DEPDIR)/handshake-checks.Plo \
 	./$(DEPDIR)/handshake-tls13.Plo ./$(DEPDIR)/handshake.Plo \
 	./$(DEPDIR)/hash_int.Plo ./$(DEPDIR)/hello_ext.Plo \
-	./$(DEPDIR)/hello_ext_lib.Plo ./$(DEPDIR)/kx.Plo \
-	./$(DEPDIR)/libgnutlsxx_la-gnutlsxx.Plo ./$(DEPDIR)/locks.Plo \
-	./$(DEPDIR)/mbuffers.Plo ./$(DEPDIR)/mem.Plo \
-	./$(DEPDIR)/mpi.Plo ./$(DEPDIR)/num.Plo \
+	./$(DEPDIR)/hello_ext_lib.Plo ./$(DEPDIR)/iov.Plo \
+	./$(DEPDIR)/kx.Plo ./$(DEPDIR)/libgnutlsxx_la-gnutlsxx.Plo \
+	./$(DEPDIR)/locks.Plo ./$(DEPDIR)/mbuffers.Plo \
+	./$(DEPDIR)/mem.Plo ./$(DEPDIR)/mpi.Plo ./$(DEPDIR)/num.Plo \
 	./$(DEPDIR)/ocsp-api.Plo ./$(DEPDIR)/openpgp_compat.Plo \
 	./$(DEPDIR)/pcert.Plo ./$(DEPDIR)/pin.Plo ./$(DEPDIR)/pk.Plo \
 	./$(DEPDIR)/pkcs11.Plo ./$(DEPDIR)/pkcs11_int.Plo \
@@ -1718,7 +1718,7 @@ unistringtests_LIBOBJS = @unistringtests_LIBOBJS@
 unistringtests_LTLIBOBJS = @unistringtests_LTLIBOBJS@
 unistringtests_WITNESS = @unistringtests_WITNESS@
 ACLOCAL_AMFLAGS = -I ../m4 -I ../gl/m4
-EXTRA_DIST = priority_options.gperf common.mk
+EXTRA_DIST = priority_options.gperf common.mk inih/LICENSE.txt
 BUILT_SOURCES = pkix_asn1_tab.c gnutls_asn1_tab.c priority_options.h
 SUBDIRS = includes x509 auth ext algorithms extras accelerated \
 	$(am__append_1) $(am__append_2) $(am__append_8)
@@ -1758,7 +1758,7 @@ COBJECTS = range.c record.c compress.c debug.c cipher.c gthreads.h \
 	handshake-checks.c dtls-sw.c dh-primes.c openpgp_compat.c \
 	crypto-selftests.c crypto-selftests-pk.c secrets.c extv.c \
 	extv.h hello_ext_lib.c hello_ext_lib.h ocsp-api.c stek.c \
-	cert-cred-rawpk.c $(am__append_5) $(am__append_6) \
+	cert-cred-rawpk.c iov.c iov.h $(am__append_5) $(am__append_6) \
 	tls13/encrypted_extensions.c tls13/encrypted_extensions.h \
 	tls13/certificate_request.c tls13/certificate_request.h \
 	tls13/certificate_verify.c tls13/certificate_verify.h \
@@ -1998,6 +1998,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hash_int.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hello_ext.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hello_ext_lib.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iov.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/kx.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgnutlsxx_la-gnutlsxx.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/locks.Plo@am__quote@ # am--include-marker
@@ -2433,6 +2434,7 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/hash_int.Plo
 	-rm -f ./$(DEPDIR)/hello_ext.Plo
 	-rm -f ./$(DEPDIR)/hello_ext_lib.Plo
+	-rm -f ./$(DEPDIR)/iov.Plo
 	-rm -f ./$(DEPDIR)/kx.Plo
 	-rm -f ./$(DEPDIR)/libgnutlsxx_la-gnutlsxx.Plo
 	-rm -f ./$(DEPDIR)/locks.Plo
@@ -2589,6 +2591,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/hash_int.Plo
 	-rm -f ./$(DEPDIR)/hello_ext.Plo
 	-rm -f ./$(DEPDIR)/hello_ext_lib.Plo
+	-rm -f ./$(DEPDIR)/iov.Plo
 	-rm -f ./$(DEPDIR)/kx.Plo
 	-rm -f ./$(DEPDIR)/libgnutlsxx_la-gnutlsxx.Plo
 	-rm -f ./$(DEPDIR)/locks.Plo

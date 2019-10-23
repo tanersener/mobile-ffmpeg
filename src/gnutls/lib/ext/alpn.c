@@ -51,13 +51,12 @@ const hello_ext_entry_st ext_mod_alpn = {
 
 static int
 _gnutls_alpn_recv_params(gnutls_session_t session,
-			 const uint8_t * data, size_t _data_size)
+			 const uint8_t * data, size_t data_size)
 {
 	unsigned int i;
 	int ret;
 	const uint8_t *p = data;
 	unsigned len1, len;
-	ssize_t data_size = _data_size;
 	alpn_ext_st *priv;
 	gnutls_ext_priv_data_t epriv;
 	int selected_protocol_index;

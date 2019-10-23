@@ -2532,6 +2532,8 @@ int gnutls_pkcs7_sign(gnutls_pkcs7_t pkcs7,
 		goto cleanup;
 	}
 
+	FIX_SIGN_PARAMS(params, flags, dig);
+
 	ret = privkey_sign_and_hash_data(signer_key, se,
 					 &sigdata, &signature, &params);
 	if (ret < 0) {

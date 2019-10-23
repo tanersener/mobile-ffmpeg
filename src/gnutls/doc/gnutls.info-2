@@ -1,6 +1,6 @@
 This is gnutls.info, produced by makeinfo version 6.6 from gnutls.texi.
 
-This manual is last updated 27 June 2019 for version 3.6.9 of GnuTLS.
+This manual is last updated 27 June 2019 for version 3.6.10 of GnuTLS.
 
 Copyright (C) 2001-2019 Free Software Foundation, Inc.\\ Copyright (C)
 2001-2019 Nikos Mavrogiannopoulos
@@ -1780,16 +1780,14 @@ Moreover all of the following push and pull callbacks should be set.
      ms);
 
      This callback is necessary when 'gnutls_handshake_set_timeout()' or
-     'gnutls_record_set_timeout()' are set, and for calculating the DTLS
-     mode timeouts.
+     'gnutls_record_set_timeout()' are set, under TLS1.3 and for
+     enforcing the DTLS mode timeouts when in blocking mode.
 
-     In short, this callback should be set when a custom pull function
-     is registered.  The callback will not be used when the session is
-     in TLS mode with non-blocking sockets.  That is, when
-     'GNUTLS_NONBLOCK' is specified for a TLS session in 'gnutls_init()'
-     .  For compatibility with future GnuTLS versions it is recommended
-     to always set this function when a custom pull function is
-     registered.
+     For compatibility with future GnuTLS versions this callback must be
+     set when a custom pull function is registered.  The callback will
+     not be used when the session is in TLS mode with non-blocking
+     sockets.  That is, when 'GNUTLS_NONBLOCK' is specified for a TLS
+     session in 'gnutls_init()' .
 
      The helper function 'gnutls_system_recv_timeout()' is provided to
      simplify writing callbacks.
@@ -1867,16 +1865,14 @@ be called again.
      ms);
 
      This callback is necessary when 'gnutls_handshake_set_timeout()' or
-     'gnutls_record_set_timeout()' are set, and for calculating the DTLS
-     mode timeouts.
+     'gnutls_record_set_timeout()' are set, under TLS1.3 and for
+     enforcing the DTLS mode timeouts when in blocking mode.
 
-     In short, this callback should be set when a custom pull function
-     is registered.  The callback will not be used when the session is
-     in TLS mode with non-blocking sockets.  That is, when
-     'GNUTLS_NONBLOCK' is specified for a TLS session in 'gnutls_init()'
-     .  For compatibility with future GnuTLS versions it is recommended
-     to always set this function when a custom pull function is
-     registered.
+     For compatibility with future GnuTLS versions this callback must be
+     set when a custom pull function is registered.  The callback will
+     not be used when the session is in TLS mode with non-blocking
+     sockets.  That is, when 'GNUTLS_NONBLOCK' is specified for a TLS
+     session in 'gnutls_init()' .
 
      The helper function 'gnutls_system_recv_timeout()' is provided to
      simplify writing callbacks.
@@ -2393,9 +2389,12 @@ these functions are fatal for the protocol or can be ignored.
 
      If the EINTR is returned by the internal push function then
      'GNUTLS_E_INTERRUPTED' will be returned.  If 'GNUTLS_E_INTERRUPTED'
-     or 'GNUTLS_E_AGAIN' is returned, you must call this function again,
-     with the exact same parameters; alternatively you could provide a
-     'NULL' pointer for data, and 0 for size.  cf.
+     or 'GNUTLS_E_AGAIN' is returned, you must call this function again
+     with the exact same parameters, or provide a 'NULL' pointer for
+     'data' and 0 for 'data_size' , in order to write the same data as
+     before.  If you wish to discard the previous data instead of
+     retrying, you must call 'gnutls_record_discard_queued()' before
+     calling this function with different parameters.  cf.
      'gnutls_record_get_direction()' .
 
      Note that in DTLS this function will return the

@@ -273,6 +273,8 @@ am__libcrypto_la_SOURCES_DIST = pk.c mpi.c mac.c cipher.c init.c \
 	rnd.c int/rsa-fips.h int/rsa-keygen-fips186.c \
 	int/provable-prime.c int/dsa-fips.h int/dsa-keygen-fips186.c \
 	int/dsa-validate.c int/tls1-prf.c int/tls1-prf.h \
+	int/dsa-compute-k.c int/dsa-compute-k.h int/ecdsa-compute-k.c \
+	int/ecdsa-compute-k.h int/mpn-base256.c int/mpn-base256.h \
 	sysrng-windows.c sysrng-getentropy.c sysrng-linux.c \
 	rnd-fuzzer.c rnd-fips.c int/drbg-aes-self-test.c \
 	int/drbg-aes.c int/drbg-aes.h gost/nettle-write.h \
@@ -312,6 +314,7 @@ am_libcrypto_la_OBJECTS = pk.lo mpi.lo mac.lo cipher.lo init.lo prf.lo \
 	backport/cfb8.lo backport/cmac.lo backport/xts.lo rnd.lo \
 	int/rsa-keygen-fips186.lo int/provable-prime.lo \
 	int/dsa-keygen-fips186.lo int/dsa-validate.lo int/tls1-prf.lo \
+	int/dsa-compute-k.lo int/ecdsa-compute-k.lo int/mpn-base256.lo \
 	$(am__objects_1) $(am__objects_2) $(am__objects_3) \
 	rnd-fuzzer.lo $(am__objects_4) $(am__objects_5)
 libcrypto_la_OBJECTS = $(am_libcrypto_la_OBJECTS)
@@ -357,10 +360,11 @@ am__depfiles_remade = ./$(DEPDIR)/cipher.Plo ./$(DEPDIR)/init.Plo \
 	gost/$(DEPDIR)/pbkdf2-hmac-streebog.Plo \
 	gost/$(DEPDIR)/streebog-meta.Plo gost/$(DEPDIR)/streebog.Plo \
 	int/$(DEPDIR)/drbg-aes-self-test.Plo \
-	int/$(DEPDIR)/drbg-aes.Plo \
+	int/$(DEPDIR)/drbg-aes.Plo int/$(DEPDIR)/dsa-compute-k.Plo \
 	int/$(DEPDIR)/dsa-keygen-fips186.Plo \
 	int/$(DEPDIR)/dsa-validate.Plo \
-	int/$(DEPDIR)/provable-prime.Plo \
+	int/$(DEPDIR)/ecdsa-compute-k.Plo \
+	int/$(DEPDIR)/mpn-base256.Plo int/$(DEPDIR)/provable-prime.Plo \
 	int/$(DEPDIR)/rsa-keygen-fips186.Plo \
 	int/$(DEPDIR)/tls1-prf.Plo
 am__mv = mv -f
@@ -1534,6 +1538,8 @@ libcrypto_la_SOURCES = pk.c mpi.c mac.c cipher.c init.c gnettle.h \
 	rnd.c int/rsa-fips.h int/rsa-keygen-fips186.c \
 	int/provable-prime.c int/dsa-fips.h int/dsa-keygen-fips186.c \
 	int/dsa-validate.c int/tls1-prf.c int/tls1-prf.h \
+	int/dsa-compute-k.c int/dsa-compute-k.h int/ecdsa-compute-k.c \
+	int/ecdsa-compute-k.h int/mpn-base256.c int/mpn-base256.h \
 	$(am__append_2) $(am__append_3) $(am__append_4) rnd-fuzzer.c \
 	$(am__append_5) $(am__append_6)
 all: all-am
@@ -1607,6 +1613,11 @@ int/dsa-keygen-fips186.lo: int/$(am__dirstamp) \
 	int/$(DEPDIR)/$(am__dirstamp)
 int/dsa-validate.lo: int/$(am__dirstamp) int/$(DEPDIR)/$(am__dirstamp)
 int/tls1-prf.lo: int/$(am__dirstamp) int/$(DEPDIR)/$(am__dirstamp)
+int/dsa-compute-k.lo: int/$(am__dirstamp) \
+	int/$(DEPDIR)/$(am__dirstamp)
+int/ecdsa-compute-k.lo: int/$(am__dirstamp) \
+	int/$(DEPDIR)/$(am__dirstamp)
+int/mpn-base256.lo: int/$(am__dirstamp) int/$(DEPDIR)/$(am__dirstamp)
 int/drbg-aes-self-test.lo: int/$(am__dirstamp) \
 	int/$(DEPDIR)/$(am__dirstamp)
 int/drbg-aes.lo: int/$(am__dirstamp) int/$(DEPDIR)/$(am__dirstamp)
@@ -1700,8 +1711,11 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@gost/$(DEPDIR)/streebog.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@int/$(DEPDIR)/drbg-aes-self-test.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@int/$(DEPDIR)/drbg-aes.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@int/$(DEPDIR)/dsa-compute-k.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@int/$(DEPDIR)/dsa-keygen-fips186.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@int/$(DEPDIR)/dsa-validate.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@int/$(DEPDIR)/ecdsa-compute-k.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@int/$(DEPDIR)/mpn-base256.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@int/$(DEPDIR)/provable-prime.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@int/$(DEPDIR)/rsa-keygen-fips186.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@int/$(DEPDIR)/tls1-prf.Plo@am__quote@ # am--include-marker
@@ -1911,8 +1925,11 @@ distclean: distclean-am
 	-rm -f gost/$(DEPDIR)/streebog.Plo
 	-rm -f int/$(DEPDIR)/drbg-aes-self-test.Plo
 	-rm -f int/$(DEPDIR)/drbg-aes.Plo
+	-rm -f int/$(DEPDIR)/dsa-compute-k.Plo
 	-rm -f int/$(DEPDIR)/dsa-keygen-fips186.Plo
 	-rm -f int/$(DEPDIR)/dsa-validate.Plo
+	-rm -f int/$(DEPDIR)/ecdsa-compute-k.Plo
+	-rm -f int/$(DEPDIR)/mpn-base256.Plo
 	-rm -f int/$(DEPDIR)/provable-prime.Plo
 	-rm -f int/$(DEPDIR)/rsa-keygen-fips186.Plo
 	-rm -f int/$(DEPDIR)/tls1-prf.Plo
@@ -1996,8 +2013,11 @@ maintainer-clean: maintainer-clean-am
 	-rm -f gost/$(DEPDIR)/streebog.Plo
 	-rm -f int/$(DEPDIR)/drbg-aes-self-test.Plo
 	-rm -f int/$(DEPDIR)/drbg-aes.Plo
+	-rm -f int/$(DEPDIR)/dsa-compute-k.Plo
 	-rm -f int/$(DEPDIR)/dsa-keygen-fips186.Plo
 	-rm -f int/$(DEPDIR)/dsa-validate.Plo
+	-rm -f int/$(DEPDIR)/ecdsa-compute-k.Plo
+	-rm -f int/$(DEPDIR)/mpn-base256.Plo
 	-rm -f int/$(DEPDIR)/provable-prime.Plo
 	-rm -f int/$(DEPDIR)/rsa-keygen-fips186.Plo
 	-rm -f int/$(DEPDIR)/tls1-prf.Plo

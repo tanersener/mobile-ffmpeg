@@ -53,7 +53,7 @@ extern "C" {
 #endif
 extern FILE * option_usage_fp;
 #define zCopyright      (gnutls_cli_debug_opt_strs+0)
-#define zLicenseDescrip (gnutls_cli_debug_opt_strs+291)
+#define zLicenseDescrip (gnutls_cli_debug_opt_strs+292)
 
 
 #ifndef NULL
@@ -63,13 +63,13 @@ extern FILE * option_usage_fp;
 /**
  *  static const strings for gnutls-cli-debug options
  */
-static char const gnutls_cli_debug_opt_strs[2042] =
-/*     0 */ "gnutls-cli-debug 3.6.9\n"
+static char const gnutls_cli_debug_opt_strs[2044] =
+/*     0 */ "gnutls-cli-debug 3.6.10\n"
             "Copyright (C) 2000-2019 Free Software Foundation, and others, all rights reserved.\n"
             "This is free software. It is licensed for use, modification and\n"
             "redistribution under the terms of the GNU General Public License,\n"
             "version 3 or later <http://gnu.org/licenses/gpl.html>\n\0"
-/*   291 */ "gnutls-cli-debug is free software: you can redistribute it and/or modify it\n"
+/*   292 */ "gnutls-cli-debug is free software: you can redistribute it and/or modify it\n"
             "under the terms of the GNU General Public License as published by the Free\n"
             "Software Foundation, either version 3 of the License, or (at your option)\n"
             "any later version.\n\n"
@@ -79,51 +79,51 @@ static char const gnutls_cli_debug_opt_strs[2042] =
             "for more details.\n\n"
             "You should have received a copy of the GNU General Public License along\n"
             "with this program.  If not, see <http://www.gnu.org/licenses/>.\n\0"
-/*   912 */ "Enable debugging\0"
-/*   929 */ "DEBUG\0"
-/*   935 */ "debug\0"
-/*   941 */ "More verbose output\0"
-/*   961 */ "VERBOSE\0"
-/*   969 */ "verbose\0"
-/*   977 */ "The port to connect to\0"
-/*  1000 */ "PORT\0"
-/*  1005 */ "port\0"
-/*  1010 */ "an alias for the 'starttls-proto' option\0"
-/*  1051 */ "app-proto\0"
-/*  1061 */ "The application protocol to be used to obtain the server's certificate\n"
+/*   913 */ "Enable debugging\0"
+/*   930 */ "DEBUG\0"
+/*   936 */ "debug\0"
+/*   942 */ "More verbose output\0"
+/*   962 */ "VERBOSE\0"
+/*   970 */ "verbose\0"
+/*   978 */ "The port to connect to\0"
+/*  1001 */ "PORT\0"
+/*  1006 */ "port\0"
+/*  1011 */ "an alias for the 'starttls-proto' option\0"
+/*  1052 */ "app-proto\0"
+/*  1062 */ "The application protocol to be used to obtain the server's certificate\n"
             "(https, ftp, smtp, imap, ldap, xmpp, lmtp, pop3, nntp, sieve, postgres)\0"
-/*  1204 */ "STARTTLS_PROTO\0"
-/*  1219 */ "starttls-proto\0"
-/*  1234 */ "display extended usage information and exit\0"
-/*  1278 */ "help\0"
-/*  1283 */ "extended usage information passed thru pager\0"
-/*  1328 */ "more-help\0"
-/*  1338 */ "output version information and exit\0"
-/*  1374 */ "version\0"
-/*  1382 */ "GNUTLS_CLI_DEBUG\0"
-/*  1399 */ "gnutls-cli-debug - GnuTLS debug client\n"
+/*  1205 */ "STARTTLS_PROTO\0"
+/*  1220 */ "starttls-proto\0"
+/*  1235 */ "display extended usage information and exit\0"
+/*  1279 */ "help\0"
+/*  1284 */ "extended usage information passed thru pager\0"
+/*  1329 */ "more-help\0"
+/*  1339 */ "output version information and exit\0"
+/*  1375 */ "version\0"
+/*  1383 */ "GNUTLS_CLI_DEBUG\0"
+/*  1400 */ "gnutls-cli-debug - GnuTLS debug client\n"
             "Usage:  %s [ -<flag> [<val>] | --<name>[{=| }<val>] ]... \n\0"
-/*  1497 */ "bugs@gnutls.org\0"
-/*  1513 */ "\n\0"
-/*  1515 */ "TLS debug client.  It sets up multiple TLS connections to a server and\n"
+/*  1498 */ "bugs@gnutls.org\0"
+/*  1514 */ "\n\0"
+/*  1516 */ "TLS debug client.  It sets up multiple TLS connections to a server and\n"
             "queries its capabilities.  It was created to assist in debugging GnuTLS,\n"
             "but it might be useful to extract a TLS server's capabilities.  It connects\n"
             "to a TLS server, performs tests and print the server's capabilities.  If\n"
             "called with the `-V' parameter more checks will be performed.  Can be used\n"
             "to check for servers with special needs or bugs.\n\0"
-/*  1933 */ "gnutls-cli-debug 3.6.9\0"
-/*  1956 */ "Usage: gnutls-cli-debug [options] hostname\n"
+/*  1934 */ "gnutls-cli-debug 3.6.10\0"
+/*  1958 */ "Usage: gnutls-cli-debug [options] hostname\n"
             "gnutls-cli --help for usage instructions.\n";
 
 /**
  *  debug option description:
  */
 /** Descriptive text for the debug option */
-#define DEBUG_DESC      (gnutls_cli_debug_opt_strs+912)
+#define DEBUG_DESC      (gnutls_cli_debug_opt_strs+913)
 /** Upper-cased name for the debug option */
-#define DEBUG_NAME      (gnutls_cli_debug_opt_strs+929)
+#define DEBUG_NAME      (gnutls_cli_debug_opt_strs+930)
 /** Name string for the debug option */
-#define DEBUG_name      (gnutls_cli_debug_opt_strs+935)
+#define DEBUG_name      (gnutls_cli_debug_opt_strs+936)
 /** Compiled in flag settings for the debug option */
 #define DEBUG_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_NUMERIC))
@@ -132,11 +132,11 @@ static char const gnutls_cli_debug_opt_strs[2042] =
  *  verbose option description:
  */
 /** Descriptive text for the verbose option */
-#define VERBOSE_DESC      (gnutls_cli_debug_opt_strs+941)
+#define VERBOSE_DESC      (gnutls_cli_debug_opt_strs+942)
 /** Upper-cased name for the verbose option */
-#define VERBOSE_NAME      (gnutls_cli_debug_opt_strs+961)
+#define VERBOSE_NAME      (gnutls_cli_debug_opt_strs+962)
 /** Name string for the verbose option */
-#define VERBOSE_name      (gnutls_cli_debug_opt_strs+969)
+#define VERBOSE_name      (gnutls_cli_debug_opt_strs+970)
 /** Compiled in flag settings for the verbose option */
 #define VERBOSE_FLAGS     (OPTST_DISABLED)
 
@@ -144,11 +144,11 @@ static char const gnutls_cli_debug_opt_strs[2042] =
  *  port option description:
  */
 /** Descriptive text for the port option */
-#define PORT_DESC      (gnutls_cli_debug_opt_strs+977)
+#define PORT_DESC      (gnutls_cli_debug_opt_strs+978)
 /** Upper-cased name for the port option */
-#define PORT_NAME      (gnutls_cli_debug_opt_strs+1000)
+#define PORT_NAME      (gnutls_cli_debug_opt_strs+1001)
 /** Name string for the port option */
-#define PORT_name      (gnutls_cli_debug_opt_strs+1005)
+#define PORT_name      (gnutls_cli_debug_opt_strs+1006)
 /** Compiled in flag settings for the port option */
 #define PORT_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_NUMERIC))
@@ -157,10 +157,10 @@ static char const gnutls_cli_debug_opt_strs[2042] =
  *  app-proto option description:
  */
 /** Descriptive text for the app-proto option */
-#define APP_PROTO_DESC    (gnutls_cli_debug_opt_strs+1010)
+#define APP_PROTO_DESC    (gnutls_cli_debug_opt_strs+1011)
 #define APP_PROTO_NAME    NULL
 /** Unmodified name string for the app-proto option */
-#define APP_PROTO_name    (gnutls_cli_debug_opt_strs+1051)
+#define APP_PROTO_name    (gnutls_cli_debug_opt_strs+1052)
 /** Compiled in flag settings for the app-proto option */
 #define APP_PROTO_FLAGS     (STARTTLS_PROTO_FLAGS | OPTST_ALIAS)
 
@@ -168,11 +168,11 @@ static char const gnutls_cli_debug_opt_strs[2042] =
  *  starttls-proto option description:
  */
 /** Descriptive text for the starttls-proto option */
-#define STARTTLS_PROTO_DESC      (gnutls_cli_debug_opt_strs+1061)
+#define STARTTLS_PROTO_DESC      (gnutls_cli_debug_opt_strs+1062)
 /** Upper-cased name for the starttls-proto option */
-#define STARTTLS_PROTO_NAME      (gnutls_cli_debug_opt_strs+1204)
+#define STARTTLS_PROTO_NAME      (gnutls_cli_debug_opt_strs+1205)
 /** Name string for the starttls-proto option */
-#define STARTTLS_PROTO_name      (gnutls_cli_debug_opt_strs+1219)
+#define STARTTLS_PROTO_name      (gnutls_cli_debug_opt_strs+1220)
 /** Compiled in flag settings for the starttls-proto option */
 #define STARTTLS_PROTO_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -180,11 +180,11 @@ static char const gnutls_cli_debug_opt_strs[2042] =
 /*
  *  Help/More_Help/Version option descriptions:
  */
-#define HELP_DESC       (gnutls_cli_debug_opt_strs+1234)
-#define HELP_name       (gnutls_cli_debug_opt_strs+1278)
+#define HELP_DESC       (gnutls_cli_debug_opt_strs+1235)
+#define HELP_name       (gnutls_cli_debug_opt_strs+1279)
 #ifdef HAVE_WORKING_FORK
-#define MORE_HELP_DESC  (gnutls_cli_debug_opt_strs+1283)
-#define MORE_HELP_name  (gnutls_cli_debug_opt_strs+1328)
+#define MORE_HELP_DESC  (gnutls_cli_debug_opt_strs+1284)
+#define MORE_HELP_name  (gnutls_cli_debug_opt_strs+1329)
 #define MORE_HELP_FLAGS (OPTST_IMM | OPTST_NO_INIT)
 #else
 #define MORE_HELP_DESC  HELP_DESC
@@ -197,8 +197,8 @@ static char const gnutls_cli_debug_opt_strs[2042] =
 #  define VER_FLAGS     (OPTST_SET_ARGTYPE(OPARG_TYPE_STRING) | \
                          OPTST_ARG_OPTIONAL | OPTST_IMM | OPTST_NO_INIT)
 #endif
-#define VER_DESC        (gnutls_cli_debug_opt_strs+1338)
-#define VER_name        (gnutls_cli_debug_opt_strs+1374)
+#define VER_DESC        (gnutls_cli_debug_opt_strs+1339)
+#define VER_name        (gnutls_cli_debug_opt_strs+1375)
 /**
  *  Declare option callback procedures
  */
@@ -320,21 +320,21 @@ static tOptDesc optDesc[OPTION_CT] = {
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 /** Reference to the upper cased version of gnutls-cli-debug. */
-#define zPROGNAME       (gnutls_cli_debug_opt_strs+1382)
+#define zPROGNAME       (gnutls_cli_debug_opt_strs+1383)
 /** Reference to the title line for gnutls-cli-debug usage. */
-#define zUsageTitle     (gnutls_cli_debug_opt_strs+1399)
+#define zUsageTitle     (gnutls_cli_debug_opt_strs+1400)
 /** There is no gnutls-cli-debug configuration file. */
 #define zRcName         NULL
 /** There are no directories to search for gnutls-cli-debug config files. */
 #define apzHomeList     NULL
 /** The gnutls-cli-debug program bug email address. */
-#define zBugsAddr       (gnutls_cli_debug_opt_strs+1497)
+#define zBugsAddr       (gnutls_cli_debug_opt_strs+1498)
 /** Clarification/explanation of what gnutls-cli-debug does. */
-#define zExplain        (gnutls_cli_debug_opt_strs+1513)
+#define zExplain        (gnutls_cli_debug_opt_strs+1514)
 /** Extra detail explaining what gnutls-cli-debug does. */
-#define zDetail         (gnutls_cli_debug_opt_strs+1515)
+#define zDetail         (gnutls_cli_debug_opt_strs+1516)
 /** The full version string for gnutls-cli-debug. */
-#define zFullVersion    (gnutls_cli_debug_opt_strs+1933)
+#define zFullVersion    (gnutls_cli_debug_opt_strs+1934)
 /* extracted from optcode.tlib near line 364 */
 
 #if defined(ENABLE_NLS)
@@ -346,7 +346,7 @@ static tOptDesc optDesc[OPTION_CT] = {
 #endif /* ENABLE_NLS */
 
 #define gnutls_cli_debug_full_usage (NULL)
-#define gnutls_cli_debug_short_usage (gnutls_cli_debug_opt_strs+1956)
+#define gnutls_cli_debug_short_usage (gnutls_cli_debug_opt_strs+1958)
 
 #endif /* not defined __doxygen__ */
 
@@ -657,7 +657,7 @@ static void bogus_function(void) {
      translate option names.
    */
   /* referenced via gnutls_cli_debugOptions.pzCopyright */
-  puts(_("gnutls-cli-debug 3.6.9\n\
+  puts(_("gnutls-cli-debug 3.6.10\n\
 Copyright (C) 2000-2019 Free Software Foundation, and others, all rights reserved.\n\
 This is free software. It is licensed for use, modification and\n\
 redistribution under the terms of the GNU General Public License,\n\
@@ -716,7 +716,7 @@ called with the `-V' parameter more checks will be performed.  Can be used\n\
 to check for servers with special needs or bugs.\n"));
 
   /* referenced via gnutls_cli_debugOptions.pzFullVersion */
-  puts(_("gnutls-cli-debug 3.6.9"));
+  puts(_("gnutls-cli-debug 3.6.10"));
 
   /* referenced via gnutls_cli_debugOptions.pzFullUsage */
   puts(_("<<<NOT-FOUND>>>"));

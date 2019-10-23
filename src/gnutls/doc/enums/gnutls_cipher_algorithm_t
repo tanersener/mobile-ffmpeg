@@ -74,6 +74,8 @@ Note that the XTS ciphers are message oriented.
 The whole message needs to be provided with a single call, because
 cipher-stealing requires to know where the message actually terminates
 in order to be able to compute where the stealing occurs.
+@item GNUTLS_@-CIPHER_@-GOST28147_@-TC26Z_@-CNT
+GOST 28147-89 (Magma) cipher in CNT mode with TC26 Z S-box.
 @item GNUTLS_@-CIPHER_@-IDEA_@-PGP_@-CFB
 IDEA in CFB mode (placeholder - unsupported).
 @item GNUTLS_@-CIPHER_@-3DES_@-PGP_@-CFB

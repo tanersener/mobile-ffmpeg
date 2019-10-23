@@ -97,7 +97,7 @@ EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem 
 	data/rfc4134-ca-rsa.pem data/rfc4134-4.5.p7b \
 	data/key-gost01.p8 data/key-gost01-2.p8 data/key-gost01-2-enc.p8 \
 	data/key-gost12-256.p8 data/key-gost12-256-2.p8 data/key-gost12-256-2-enc.p8 \
-	data/key-gost12-512.p8
+	data/key-gost12-512.p8 data/grfc.crt
 
 dist_check_SCRIPTS = pathlen aki invalid-sig email \
 	pkcs7 pkcs7-broken-sigs privkey-import name-constraints certtool-long-cn crl provable-privkey \

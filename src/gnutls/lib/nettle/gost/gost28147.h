@@ -65,6 +65,17 @@ extern "C" {
 #define gost28147_encrypt_for_cfb _gnutls_gost28147_encrypt_for_cfb
 #define gost28147_decrypt _gnutls_gost28147_decrypt
 
+#define gost28147_cnt_init _gnutls_gost28147_cnt_init
+#define gost28147_cnt_set_iv _gnutls_gost28147_cnt_set_iv
+#define gost28147_cnt_crypt _gnutls_gost28147_cnt_crypt
+
+#define gost28147_imit_init _gnutls_gost28147_imit_init
+#define gost28147_imit_set_key _gnutls_gost28147_imit_set_key
+#define gost28147_imit_set_nonce _gnutls_gost28147_imit_set_nonce
+#define gost28147_imit_set_param _gnutls_gost28147_imit_set_param
+#define gost28147_imit_update _gnutls_gost28147_imit_update
+#define gost28147_imit_digest _gnutls_gost28147_imit_digest
+
 #define GOST28147_KEY_SIZE 32
 #define GOST28147_BLOCK_SIZE 8
 
@@ -114,6 +125,66 @@ void
 gost28147_encrypt_for_cfb(struct gost28147_ctx *ctx,
 			  size_t length, uint8_t *dst,
 			  const uint8_t *src);
+
+struct gost28147_cnt_ctx {
+  struct gost28147_ctx ctx;
+  size_t bytes;
+  uint32_t iv[2];
+  uint8_t buffer[GOST28147_BLOCK_SIZE];
+};
+
+void
+gost28147_cnt_init(struct gost28147_cnt_ctx *ctx,
+		   const uint8_t *key,
+		   const struct gost28147_param *param);
+
+void
+gost28147_cnt_set_iv(struct gost28147_cnt_ctx *ctx,
+		     const uint8_t *iv);
+
+void
+gost28147_cnt_crypt(struct gost28147_cnt_ctx *ctx,
+		    size_t length, uint8_t *dst,
+		    const uint8_t *src);
+
+#define GOST28147_IMIT_DIGEST_SIZE 4
+#define GOST28147_IMIT_BLOCK_SIZE GOST28147_BLOCK_SIZE
+#define GOST28147_IMIT_KEY_SIZE GOST28147_KEY_SIZE
+
+struct gost28147_imit_ctx
+{
+  struct gost28147_ctx cctx;
+  uint64_t count;		/* Block count */
+  uint8_t block[GOST28147_IMIT_BLOCK_SIZE]; /* Block buffer */
+  unsigned index;               /* Into buffer */
+  uint32_t state[GOST28147_IMIT_BLOCK_SIZE/4];
+};
+
+void
+gost28147_imit_init(struct gost28147_imit_ctx *ctx);
+
+void
+gost28147_imit_set_key(struct gost28147_imit_ctx *ctx,
+		       size_t length,
+		       const uint8_t *key);
+
+void
+gost28147_imit_set_nonce(struct gost28147_imit_ctx *ctx,
+		         const uint8_t *nonce);
+
+void
+gost28147_imit_set_param(struct gost28147_imit_ctx *ctx,
+			 const struct gost28147_param *param);
+
+void
+gost28147_imit_update(struct gost28147_imit_ctx *ctx,
+		      size_t length,
+		      const uint8_t *data);
+
+void
+gost28147_imit_digest(struct gost28147_imit_ctx *ctx,
+		      size_t length,
+		      uint8_t *digest);
 
 #ifdef __cplusplus
 }

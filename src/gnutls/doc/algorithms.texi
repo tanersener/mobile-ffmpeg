@@ -573,7 +573,6 @@
 
 @heading Protocols
 @table @code
-@item SSL3.0
 @item TLS1.0
 @item TLS1.1
 @item TLS1.2
@@ -613,6 +612,7 @@
 @item AES-256-CFB8
 @item AES-128-XTS
 @item AES-256-XTS
+@item GOST28147-TC26Z-CNT
 @item 3DES-CBC
 @item DES-CBC
 @item RC2-40
@@ -633,6 +633,12 @@
 @item GOSTR341194
 @item STREEBOG-256
 @item STREEBOG-512
+@item AES-CMAC-128
+@item AES-CMAC-256
+@item AES-GMAC-128
+@item AES-GMAC-192
+@item AES-GMAC-256
+@item GOST28147-TC26Z-IMIT
 @end table
 
 @heading Key exchange methods

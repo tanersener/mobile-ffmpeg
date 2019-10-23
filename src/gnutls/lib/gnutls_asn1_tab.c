@@ -94,6 +94,11 @@ const asn1_static_node gnutls_asn1_tab[] = {
   { "digestParamSet", 1073741836, NULL },
   { "encryptionParamSet", 16396, NULL },
   { "GOSTPrivateKey", 1073741831, NULL },
-  { "GOSTPrivateKeyOld", 3, NULL },
+  { "GOSTPrivateKeyOld", 1073741827, NULL },
+  { "IssuerSignTool", 536870917, NULL },
+  { "signTool", 1073741858, NULL },
+  { "cATool", 1073741858, NULL },
+  { "signToolCert", 1073741858, NULL },
+  { "cAToolCert", 34, NULL },
   { NULL, 0, NULL }
 };

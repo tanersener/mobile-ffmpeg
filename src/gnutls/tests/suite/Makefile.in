@@ -112,10 +112,11 @@ check_PROGRAMS = rng$(EXEEXT) prime-check$(EXEEXT)
 @ENABLE_SSL3_TRUE@am__append_2 = tls-fuzzer/tls-fuzzer-nocert-ssl3.sh
 @ENABLE_SSL3_TRUE@am__append_3 = ENABLE_SSL3=1
 @ENABLE_TLS13_INTEROP_TRUE@am__append_4 = testcompat-tls13-openssl.sh
-@ENABLE_DANE_TRUE@am__append_5 = testdane.sh
+@ENABLE_OLDGNUTLS_INTEROP_TRUE@am__append_5 = testcompat-oldgnutls.sh
+@ENABLE_DANE_TRUE@am__append_6 = testdane.sh
 @MACOSX_FALSE@@WINDOWS_FALSE@noinst_PROGRAMS = eagain-cli$(EXEEXT) \
 @MACOSX_FALSE@@WINDOWS_FALSE@	mini-record-timing$(EXEEXT)
-@MACOSX_FALSE@@WINDOWS_FALSE@am__append_6 = eagain.sh
+@MACOSX_FALSE@@WINDOWS_FALSE@am__append_7 = eagain.sh
 TESTS = $(scripts_to_test) prime-check$(EXEEXT)
 subdir = tests/suite
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -1847,7 +1848,7 @@ scripts_to_test = chain.sh testrng.sh testcompat-polarssl.sh \
 	tls-fuzzer/tls-fuzzer-psk.sh tls-fuzzer/tls-fuzzer-nolimit.sh \
 	tls-fuzzer/tls-fuzzer-nolimit-tls13.sh \
 	multi-ticket-reception.sh $(am__append_2) $(am__append_4) \
-	$(am__append_5) $(am__append_6)
+	$(am__append_5) $(am__append_6) $(am__append_7)
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) LC_ALL="C" VALGRIND="$(VALGRIND)" \
 	top_builddir="$(top_builddir)" srcdir="$(srcdir)" \
 	ASAN_OPTIONS="detect_leaks=0" GNUTLS_TEST_SUITE_RUN=1 \

@@ -1,5 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-# Copyright (C) 2000-2012, 2016 Free Software Foundation, Inc.
+# Copyright (C) 2000-2012, 2016, 2019 Free Software Foundation, Inc.
 #
 # Author: Nikos Mavrogiannopoulos, Simon Josefsson
 #
@@ -23,7 +23,7 @@ dnl Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.63)
 
 dnl when updating version also update LT_REVISION in m4/hooks.m4
-AC_INIT([GnuTLS], [3.6.9], [bugs@gnutls.org])
+AC_INIT([GnuTLS], [3.6.10], [bugs@gnutls.org])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIRS([m4 src/gl/m4 src/libopts/m4 lib/unistring/m4])
 AC_CANONICAL_HOST
@@ -181,6 +181,17 @@ case $host_cpu in
   *)
   ;;
 esac
+
+# check for gcc's __get_cpuid_count functionality
+AC_MSG_CHECKING([for __get_cpuid_count])
+AC_LINK_IFELSE(
+   [AC_LANG_SOURCE([
+    #include <cpuid.h>
+    int main(void) { unsigned t1; return __get_cpuid_count(7, 0, &t1, &t1, &t1, &t1); }
+   ])],
+   [AC_DEFINE([HAVE_GET_CPUID_COUNT], [1], [use __get_cpuid_count]) AC_MSG_RESULT([yes])],
+   [AC_MSG_RESULT([no])]
+)
 
 fi
 
@@ -412,6 +423,16 @@ fi
 
 AM_CONDITIONAL(WANT_TEST_SUITE, test "$full_test_suite" = "yes")
 
+AC_ARG_ENABLE(oldgnutls-interop,
+  AS_HELP_STRING([--enable-oldgnutls-interop], [enable interoperability testing with old gnutls version]),
+    enable_oldgnutls_interop=$enableval, enable_oldgnutls_interop=no)
+
+if test "$enable_oldgnutls_interop" != "no" && test "$full_test_suite" != yes;then
+	AC_MSG_ERROR([cannot --enable-oldgnutls-interop without --enable-full-test-suite])
+fi
+
+AM_CONDITIONAL(ENABLE_OLDGNUTLS_INTEROP, test "$enable_oldgnutls_interop" != "no")
+
 dnl GCC warnings to enable
 
 AC_ARG_ENABLE([gcc-warnings],
@@ -541,7 +562,7 @@ AC_ARG_ENABLE(non-suiteb-curves,
 
 if test "$enable_non_suiteb" = "yes";then
 	dnl nettle_secp_192r1 is not really a function
-	AC_CHECK_LIB(hogweed, nettle_secp_192r1, enable_non_suiteb=yes, enable_non_suiteb=no, [$HOGWEED_LIBS $NETTLE_LIBS])
+	AC_CHECK_LIB(hogweed, nettle_get_secp_192r1, enable_non_suiteb=yes, enable_non_suiteb=no, [$HOGWEED_LIBS $NETTLE_LIBS])
 
 	if test "$enable_non_suiteb" = "yes";then
 		AC_DEFINE([ENABLE_NON_SUITEB_CURVES], 1, [Enable all curves])
@@ -647,7 +668,7 @@ AC_DEFINE_UNQUOTED([UNBOUND_ROOT_KEY_FILE],
 
 system_config_file="/etc/gnutls/config"
 AC_ARG_WITH(system-priority-file, AS_HELP_STRING([--with-system-priority-file],
-                                 [specify the system-wide config file (set empty to disable; default is $config)]),
+                                 [specify the system-wide config file (set empty to disable)]),
             system_config_file="$withval"
 )
 
@@ -889,7 +910,7 @@ if test "$opt_guile_bindings" = "yes"; then
       AC_PATH_PROG([GUILD], [guild])
       AC_SUBST([GUILD])
 
-      GUILE_PKG
+      GUILE_PKG([3.0 2.2 2.0 1.8])
       GUILE_PROGS
       GUILE_SITE_DIR
       GUILE_FLAGS

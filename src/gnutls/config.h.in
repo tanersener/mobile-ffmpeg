@@ -801,6 +801,9 @@
 /* Define to 1 if you have the `getuid' function. */
 #undef HAVE_GETUID
 
+/* use __get_cpuid_count */
+#undef HAVE_GET_CPUID_COUNT
+
 /* Define if you have the iconv() function and it works. */
 #undef HAVE_ICONV
 

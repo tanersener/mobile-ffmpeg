@@ -187,6 +187,13 @@ typedef struct gnutls_x509_spki_st {
 	/* if non-zero, the legacy value for PKCS#7 signatures will be
 	 * written for RSA signatures. */
 	unsigned int legacy;
+
+	/* the digest used by ECDSA/DSA */
+	gnutls_digest_algorithm_t dsa_dig;
+
+	/* flags may include GNUTLS_PK_FLAG_REPRODUCIBLE for
+	 * deterministic ECDSA/DSA */
+	unsigned int flags;
 } gnutls_x509_spki_st;
 
 #define GNUTLS_MAX_PK_PARAMS 16
@@ -219,9 +226,16 @@ typedef struct {
  */
 typedef enum {
 	GNUTLS_PK_FLAG_NONE = 0,
-	GNUTLS_PK_FLAG_PROVABLE = 1
+	GNUTLS_PK_FLAG_PROVABLE = 1,
+	GNUTLS_PK_FLAG_REPRODUCIBLE = 2
 } gnutls_pk_flag_t;
 
+#define FIX_SIGN_PARAMS(params, flags, dig) do {		\
+	if ((flags) & GNUTLS_PRIVKEY_FLAG_REPRODUCIBLE) {	\
+		(params).flags |= GNUTLS_PK_FLAG_REPRODUCIBLE;	\
+		(params).dsa_dig = (dig);			\
+	}							\
+} while (0)
 
 void gnutls_pk_params_release(gnutls_pk_params_st * p);
 void gnutls_pk_params_clear(gnutls_pk_params_st * p);

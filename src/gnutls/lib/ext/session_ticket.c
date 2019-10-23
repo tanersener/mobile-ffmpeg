@@ -78,7 +78,7 @@ static int
 unpack_ticket(const gnutls_datum_t *ticket_data, struct ticket_st *ticket)
 {
 	const uint8_t * data = ticket_data->data;
-	ssize_t data_size = ticket_data->size;
+	size_t data_size = ticket_data->size;
 	const uint8_t *encrypted_state;
 
 	/* Format:
@@ -371,11 +371,10 @@ unpack_session(gnutls_session_t session, const gnutls_datum_t *state)
 
 static int
 session_ticket_recv_params(gnutls_session_t session,
-			   const uint8_t * data, size_t _data_size)
+			   const uint8_t * data, size_t data_size)
 {
 	gnutls_datum_t ticket_data;
 	gnutls_datum_t state;
-	ssize_t data_size = _data_size;
 	int ret;
 
 	if (session->internals.flags & GNUTLS_NO_TICKETS)

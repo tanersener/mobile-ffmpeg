@@ -2530,16 +2530,15 @@ uninstall-am: uninstall-binPROGRAMS
 
 # case --enable-local-libopts: We do not call AUTOGEN unless the .bak files are missing
 @NEED_LIBOPTS_TRUE@.def.stamp:
-@NEED_LIBOPTS_TRUE@	@b=`echo $@ | sed 's/.stamp$$//'`; \
-@NEED_LIBOPTS_TRUE@	if ! test -f $${srcdir}$${b}.c.bak;then \
+@NEED_LIBOPTS_TRUE@	$(AM_V_GEN) b=`echo $@ | sed 's/.stamp$$//'`; \
+@NEED_LIBOPTS_TRUE@	if ! test -f $(srcdir)/$${b}.c.bak;then \
 @NEED_LIBOPTS_TRUE@		echo "No .bak files found; will call autogen"; \
-@NEED_LIBOPTS_TRUE@		$(AM_V_GEN) $(AUTOGEN) $<; \
+@NEED_LIBOPTS_TRUE@		$(AUTOGEN) $<; \
 @NEED_LIBOPTS_TRUE@	else \
 @NEED_LIBOPTS_TRUE@		echo "Re-using .bak files"; \
-@NEED_LIBOPTS_TRUE@		srcdir=$(srcdir)/; \
 @NEED_LIBOPTS_TRUE@		rm -f $${b}.c $${b}.h; \
-@NEED_LIBOPTS_TRUE@		cp -p $${srcdir}$${b}.c.bak $${b}.c; \
-@NEED_LIBOPTS_TRUE@		cp -p $${srcdir}$${b}.h.bak $${b}.h; \
+@NEED_LIBOPTS_TRUE@		cp -p $(srcdir)/$${b}.c.bak $${b}.c; \
+@NEED_LIBOPTS_TRUE@		cp -p $(srcdir)/$${b}.h.bak $${b}.h; \
 @NEED_LIBOPTS_TRUE@	fi
 @NEED_LIBOPTS_TRUE@	touch $@
 # default case. We call autogen, and if that fails we resort to the bundled files.

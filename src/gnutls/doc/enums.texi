@@ -74,6 +74,8 @@ Note that the XTS ciphers are message oriented.
 The whole message needs to be provided with a single call, because
 cipher-stealing requires to know where the message actually terminates
 in order to be able to compute where the stealing occurs.
+@item GNUTLS_@-CIPHER_@-GOST28147_@-TC26Z_@-CNT
+GOST 28147-89 (Magma) cipher in CNT mode with TC26 Z S-box.
 @item GNUTLS_@-CIPHER_@-IDEA_@-PGP_@-CFB
 IDEA in CFB mode (placeholder - unsupported).
 @item GNUTLS_@-CIPHER_@-3DES_@-PGP_@-CFB
@@ -208,6 +210,8 @@ The AES-GMAC-128 MAC algorithm (requires nonce).
 The AES-GMAC-192 MAC algorithm (requires nonce).
 @item GNUTLS_@-MAC_@-AES_@-GMAC_@-256
 The AES-GMAC-256 MAC algorithm (requires nonce).
+@item GNUTLS_@-MAC_@-GOST28147_@-TC26Z_@-IMIT
+The GOST 28147-89 working in IMIT mode with TC26 Z S-box.
 @end table
 
 @c gnutls_digest_algorithm_t
@@ -1428,7 +1432,10 @@ even if the information about the seed used will be lost.
 @item GNUTLS_@-PRIVKEY_@-SIGN_@-FLAG_@-RSA_@-PSS
 Make an RSA signature on the hashed data with the PSS padding.
 @item GNUTLS_@-PRIVKEY_@-FLAG_@-REPRODUCIBLE
-Make an RSA-PSS signature on the hashed data with reproducible parameters (zero salt).
+Make a signature on the hashed data with reproducible parameters.
+For RSA-PSS, that means to use empty salt instead of random value. For ECDSA/DSA, it uses the deterministic
+construction of random parameter according to RFC 6979. Note that
+this only supports the NIST curves and DSA subgroup bits up to 512.
 @item GNUTLS_@-PRIVKEY_@-FLAG_@-CA
 The generated private key is going to be used as a CA (relevant for RSA-PSS keys).
 @end table

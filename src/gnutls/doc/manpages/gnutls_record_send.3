@@ -26,9 +26,12 @@ You can replace the default push function which is \fBsend()\fP, by using
 If the EINTR is returned by the internal push function 
 then \fBGNUTLS_E_INTERRUPTED\fP will be returned. If
 \fBGNUTLS_E_INTERRUPTED\fP or \fBGNUTLS_E_AGAIN\fP is returned, you must
-call this function again, with the exact same parameters; alternatively
-you could provide a \fBNULL\fP pointer for data, and 0 for
-size. cf. \fBgnutls_record_get_direction()\fP. 
+call this function again with the exact same parameters, or provide a
+\fBNULL\fP pointer for  \fIdata\fP and 0 for  \fIdata_size\fP , in order to write the
+same data as before. If you wish to discard the previous data instead
+of retrying, you must call \fBgnutls_record_discard_queued()\fP before
+calling this function with different parameters.
+cf. \fBgnutls_record_get_direction()\fP. 
 
 Note that in DTLS this function will return the \fBGNUTLS_E_LARGE_PACKET\fP
 error code if the send data exceed the data MTU value \- as returned

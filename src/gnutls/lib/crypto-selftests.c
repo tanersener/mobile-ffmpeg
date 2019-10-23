@@ -511,6 +511,20 @@ const struct cipher_vectors_st gost28147_tc26z_cfb_vectors[] = {
 	},
 };
 
+const struct cipher_vectors_st gost28147_tc26z_cnt_vectors[] = {
+	{
+	 STR(key, key_size,
+	     "\x59\x9f\x84\xba\xc3\xf3\xd2\xf1\x60\xe1\xe3\xf2\x6a\x96\x1a\xf9"
+	     "\x9c\x48\xb2\x4e\xbc\xbb\xbf\x7c\xd8\xf3\xac\xcd\x96\x8d\x28\x6a"),
+	 STR(plaintext, plaintext_size,
+	     "\x90\xa2\x39\x66\xae\x01\xb9\xa3\x52\x4e\xc8\xed\x6c\xdd\x88\x30"),
+	 .ciphertext = (uint8_t *)
+		 "\xe8\xb1\x4f\xc7\x30\xdc\x25\xbb\x36\xba\x64\x3c\x17\xdb\xff\x99",
+	 STR(iv, iv_size,
+	     "\x8d\xaf\xa8\xd1\x58\xed\x05\x8d"),
+	}
+};
+
 const struct cipher_vectors_st aes128_xts_vectors[] = {
 	{
 	 STR(key, key_size,
@@ -1603,6 +1617,18 @@ const struct mac_vectors_st aes_gmac_256_vectors[] = { /* NIST test vectors */
 	},
 };
 
+const struct mac_vectors_st gost28147_tc26z_imit_vectors[] = {
+	{
+		STR(key, key_size,
+		    "\x9d\x05\xb7\x9e\x90\xca\xd0\x0a\x2c\xda\xd2\x2e\xf4\xe8\x6f\x5c"
+		    "\xf5\xdc\x37\x68\x19\x85\xb3\xbf\xaa\x18\xc1\xc3\x05\x0a\x91\xa2"),
+		STR(plaintext, plaintext_size,
+		    "\xb5\xa1\xf0\xe3\xce\x2f\x02\x1d\x67\x61\x94\x34\x5c\x41\xe3\x6e"),
+		STR(output, output_size,
+		    "\x03\xe5\x67\x66"),
+	},
+};
+
 static int test_mac(gnutls_mac_algorithm_t mac,
 		    const struct mac_vectors_st *vectors,
 		    size_t vectors_size, unsigned flags)
@@ -1790,6 +1816,9 @@ int gnutls_cipher_self_test(unsigned flags, gnutls_cipher_algorithm_t cipher)
 		FALLTHROUGH;
 		NON_FIPS_CASE(GNUTLS_CIPHER_GOST28147_TC26Z_CFB, test_cipher,
 			      gost28147_tc26z_cfb_vectors);
+		FALLTHROUGH;
+		NON_FIPS_CASE(GNUTLS_CIPHER_GOST28147_TC26Z_CNT, test_cipher,
+			      gost28147_tc26z_cnt_vectors);
 #endif
 		break;
 	default:
@@ -1837,6 +1866,8 @@ int gnutls_mac_self_test(unsigned flags, gnutls_mac_algorithm_t mac)
 		NON_FIPS_CASE(GNUTLS_MAC_STREEBOG_512, test_mac, hmac_streebog_512_vectors);
 		FALLTHROUGH;
 		NON_FIPS_CASE(GNUTLS_MAC_STREEBOG_256, test_mac, hmac_streebog_256_vectors);
+		FALLTHROUGH;
+		NON_FIPS_CASE(GNUTLS_MAC_GOST28147_TC26Z_IMIT, test_mac, gost28147_tc26z_imit_vectors);
 #endif
 		FALLTHROUGH;
 		CASE(GNUTLS_MAC_AES_CMAC_128, test_mac, aes_cmac_128_vectors);

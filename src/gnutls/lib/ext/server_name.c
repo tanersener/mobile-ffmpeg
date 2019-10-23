@@ -66,11 +66,10 @@ const hello_ext_entry_st ext_mod_server_name = {
  */
 static int
 _gnutls_server_name_recv_params(gnutls_session_t session,
-				const uint8_t * data, size_t _data_size)
+				const uint8_t * data, size_t data_size)
 {
 	const unsigned char *p;
 	uint16_t len, type;
-	ssize_t data_size = _data_size;
 	gnutls_datum_t name;
 
 	if (session->security_parameters.entity == GNUTLS_SERVER) {

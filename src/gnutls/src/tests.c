@@ -51,13 +51,13 @@ extern gnutls_certificate_credentials_t xcred;
 extern unsigned int verbose;
 
 const char *ext_text = "";
-int tls_ext_ok = 1;
-int tls1_ok = 0;
-int ssl3_ok = 0;
-int tls1_1_ok = 0;
-int tls1_2_ok = 0;
-int tls1_3_ok = 0;
-int send_record_ok = 0;
+static int tls_ext_ok = 1;
+static int tls1_ok = 0;
+static int ssl3_ok = 0;
+static int tls1_1_ok = 0;
+static int tls1_2_ok = 0;
+static int tls1_3_ok = 0;
+static int send_record_ok = 0;
 
 /* keep session info */
 static char *session_data = NULL;
@@ -951,6 +951,15 @@ test_code_t test_no_extensions(gnutls_session_t session)
 	}
 
 	return ret;
+}
+
+test_code_t test_known_protocols(gnutls_session_t session)
+{
+	if (tls1_2_ok == 0 && tls1_1_ok == 0 && tls1_ok == 0 &&
+	    ssl3_ok == 0 && tls1_3_ok == 0)
+		return TEST_FAILED;
+
+	return TEST_SUCCEED;
 }
 
 test_code_t test_tls1_2(gnutls_session_t session)

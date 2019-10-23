@@ -39,6 +39,7 @@
 #endif
 #ifndef HAVE_NETTLE_STREEBOG512_UPDATE
 #include "gost/streebog.h"
+#include "gost/gost28147.h"
 #endif
 #endif
 #ifdef HAVE_NETTLE_CMAC128_UPDATE
@@ -113,6 +114,7 @@ struct nettle_mac_ctx {
 		struct hmac_gosthash94cp_ctx gosthash94cp;
 		struct hmac_streebog256_ctx streebog256;
 		struct hmac_streebog512_ctx streebog512;
+		struct gost28147_imit_ctx gost28147_imit;
 #endif
 		struct umac96_ctx umac96;
 		struct umac128_ctx umac128;
@@ -129,6 +131,15 @@ struct nettle_mac_ctx {
 	set_key_func set_key;
 	set_nonce_func set_nonce;
 };
+
+#if ENABLE_GOST
+static void
+_wrap_gost28147_imit_set_key_tc26z(void *ctx, size_t len, const uint8_t * key)
+{
+	gost28147_imit_set_key(ctx, len, key);
+	gost28147_imit_set_param(ctx, &gost28147_param_TC26_Z);
+}
+#endif
 
 static void
 _wrap_umac96_set_key(void *ctx, size_t len, const uint8_t * key)
@@ -316,6 +327,13 @@ static int _mac_ctx_init(gnutls_mac_algorithm_t algo,
 		ctx->ctx_ptr = &ctx->ctx.streebog512;
 		ctx->length = STREEBOG512_DIGEST_SIZE;
 		break;
+	case GNUTLS_MAC_GOST28147_TC26Z_IMIT:
+		ctx->update = (update_func) gost28147_imit_update;
+		ctx->digest = (digest_func) gost28147_imit_digest;
+		ctx->set_key = _wrap_gost28147_imit_set_key_tc26z;
+		ctx->ctx_ptr = &ctx->ctx.gost28147_imit;
+		ctx->length = GOST28147_IMIT_DIGEST_SIZE;
+		break;
 #endif
 	case GNUTLS_MAC_UMAC_96:
 		ctx->update = (update_func) umac96_update;
@@ -430,6 +448,7 @@ static int wrap_nettle_mac_exists(gnutls_mac_algorithm_t algo)
 	case GNUTLS_MAC_GOSTR_94:
 	case GNUTLS_MAC_STREEBOG_256:
 	case GNUTLS_MAC_STREEBOG_512:
+	case GNUTLS_MAC_GOST28147_TC26Z_IMIT:
 #endif
 		return 1;
 	default:

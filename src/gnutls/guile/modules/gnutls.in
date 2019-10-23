@@ -222,6 +222,18 @@
            certificate-status/signer-not-found
            certificate-status/signer-not-ca
            certificate-status/insecure-algorithm
+           certificate-status/not-activated
+           certificate-status/expired
+           certificate-status/signature-failure
+           certificate-status/revocation-data-superseded
+           certificate-status/unexpected-owner
+           certificate-status/revocation-data-issued-in-future
+           certificate-status/signer-constraints-failed
+           certificate-status/mismatch
+           certificate-status/purpose-mismatch
+           certificate-status/missing-ocsp-status
+           certificate-status/invalid-ocsp-status
+           certificate-status/unknown-crit-extensions
            certificate-request/ignore
            certificate-request/request
            certificate-request/require

@@ -1457,7 +1457,7 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 	/* disable key exchanges which are globally disabled */
 	z = 0;
 	while (system_wide_disabled_kxs[z] != 0) {
-		for (i = j = 0; i < priority_cache->_supported_ecc.num_priorities; i++) {
+		for (i = j = 0; i < priority_cache->_kx.num_priorities; i++) {
 			if (priority_cache->_kx.priorities[i] != system_wide_disabled_kxs[z])
 				priority_cache->_kx.priorities[j++] = priority_cache->_kx.priorities[i];
 		}

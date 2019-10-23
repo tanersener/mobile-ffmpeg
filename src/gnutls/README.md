@@ -61,6 +61,9 @@ apt-get install -y libunbound-dev dns-root-data bison gtk-doc-tools
 apt-get install -y texinfo texlive texlive-generic-recommended texlive-extra-utils
 ```
 
+__NOTE:__ Some software versions might not be available in older releases, e.g. `nettle-dev`. 
+Available backport repos, APT-Pinning or source code compilating can be used to install these versions (and dependencies) from a newer release.
+
 Fedora/RHEL:
 ```
 yum install -y dash git autoconf libtool gettext-devel automake autogen patch
@@ -86,8 +89,14 @@ and mbedtls.
 
 Debian/Ubuntu:
 ```
-apt-get install -y valgrind libasan1 libubsan0 nodejs softhsm2 datefudge lcov libssl-dev libcmocka-dev expect
-apt-get install -y dieharder libpolarssl-runtime openssl abigail-tools socat net-tools ppp lockfile-progs
+apt-get install -y valgrind nodejs softhsm2 datefudge lcov libssl-dev libcmocka-dev expect
+apt-get install -y dieharder openssl abigail-tools socat net-tools ppp lockfile-progs
+```
+
+__NOTE:__ `libubsan0` and `libasan1` are required on older versions of Ubuntu <= 16.04. This packages must be manually added on these versions:
+
+```
+apt-get install -y v libubsan0 libasan1
 ```
 
 Fedora/RHEL:

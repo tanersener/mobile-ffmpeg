@@ -395,7 +395,12 @@ unrecognized-name unknown-psk-identity)
 (define %certificate-status-enum
   (make-enum-type 'certificate-status "gnutls_certificate_status_t"
                   '(invalid revoked signer-not-found signer-not-ca
-                    insecure-algorithm)
+                    insecure-algorithm not-activated expired
+                    signature-failure revocation-data-superseded
+                    unexpected-owner revocation-data-issued-in-future
+                    signer-constraints-failure mismatch purpose-mismatch
+                    missing-ocsp-status invalid-ocsp-status
+                    unknown-crit-extensions)
                   #f
                   "GNUTLS_CERT_"))
 

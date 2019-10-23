@@ -256,14 +256,15 @@ typedef enum record_send_state_t {
 
 #define MEMSUB(x,y) ((ssize_t)((ptrdiff_t)x-(ptrdiff_t)y))
 
-#define DECR_LEN(len, x) do { len-=x; if (len<0) {gnutls_assert(); return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;} } while (0)
+#define DECR_LEN(len, x) DECR_LENGTH_RET(len, x, GNUTLS_E_UNEXPECTED_PACKET_LENGTH)
 #define DECR_LEN_FINAL(len, x) do { \
-	len-=x; \
-	if (len != 0) \
+	if (len != x) \
 		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH); \
+	else \
+		len = 0; \
 	} while (0)
-#define DECR_LENGTH_RET(len, x, RET) do { len-=x; if (len<0) {gnutls_assert(); return RET;} } while (0)
-#define DECR_LENGTH_COM(len, x, COM) do { len-=x; if (len<0) {gnutls_assert(); COM;} } while (0)
+#define DECR_LENGTH_RET(len, x, RET) DECR_LENGTH_COM(len, x, return RET)
+#define DECR_LENGTH_COM(len, x, COM) do { if (len<x) {gnutls_assert(); COM;} else len-=x; } while (0)
 
 #define GNUTLS_POINTER_TO_INT(_) ((int) GNUTLS_POINTER_TO_INT_CAST (_))
 #define GNUTLS_INT_TO_POINTER(_) ((void*) GNUTLS_POINTER_TO_INT_CAST (_))

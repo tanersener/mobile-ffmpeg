@@ -177,6 +177,11 @@ mac_entry_st hash_algorithms[] = {
 	 .output_size = 16,
 	 .key_size = 32,
 	 .nonce_size = 12},
+	{.name = "GOST28147-TC26Z-IMIT",
+	 .id = GNUTLS_MAC_GOST28147_TC26Z_IMIT,
+	 .output_size = 4,
+	 .key_size = 32,
+	 .block_size = 8},
 	{.name = "MAC-NULL",
 	 .id = GNUTLS_MAC_NULL},
 	{0, 0, 0, 0, 0, 0, 0, 0, 0}

@@ -1,0 +1,30 @@
+
+
+
+
+@deftypefun {int} {gnutls_aead_cipher_encryptv2} (gnutls_aead_cipher_hd_t @var{handle}, const void * @var{nonce}, size_t @var{nonce_len}, const giovec_t * @var{auth_iov}, int @var{auth_iovcnt}, const giovec_t * @var{iov}, int @var{iovcnt}, void * @var{tag}, size_t * @var{tag_size})
+@var{handle}: is a @code{gnutls_aead_cipher_hd_t}  type.
+
+@var{nonce}: the nonce to set
+
+@var{nonce_len}: The length of the nonce
+
+@var{auth_iov}: additional data to be authenticated
+
+@var{auth_iovcnt}: The number of buffers in  @code{auth_iov} 
+
+@var{iov}: the data to be encrypted
+
+@var{iovcnt}: The number of buffers in  @code{iov} 
+
+@var{tag}: The authentication tag
+
+@var{tag_size}: The size of the tag to use (use zero for the default)
+
+This is similar to @code{gnutls_aead_cipher_encrypt()} , but it performs
+in-place encryption on the provided data buffers.
+
+@strong{Returns:} Zero or a negative error code on error.
+
+@strong{Since:} 3.6.10
+@end deftypefun

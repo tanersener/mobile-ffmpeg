@@ -78,9 +78,9 @@ typedef enum {
 /** count of all options for psktool */
 #define OPTION_CT    8
 /** psktool version */
-#define PSKTOOL_VERSION       "3.6.9"
+#define PSKTOOL_VERSION       "3.6.10"
 /** Full psktool version text */
-#define PSKTOOL_FULL_VERSION  "psktool 3.6.9"
+#define PSKTOOL_FULL_VERSION  "psktool 3.6.10"
 
 /**
  *  Interface defines for all options.  Replace "n" with the UPPER_CASED

@@ -118,6 +118,10 @@ if ENABLE_TLS13_INTEROP
 scripts_to_test += testcompat-tls13-openssl.sh
 endif
 
+if ENABLE_OLDGNUTLS_INTEROP
+scripts_to_test += testcompat-oldgnutls.sh
+endif
+
 if ENABLE_DANE
 scripts_to_test += testdane.sh
 endif

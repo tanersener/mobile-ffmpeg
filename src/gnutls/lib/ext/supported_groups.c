@@ -93,10 +93,9 @@ static unsigned get_min_dh(gnutls_session_t session)
  */
 static int
 _gnutls_supported_groups_recv_params(gnutls_session_t session,
-				  const uint8_t * data, size_t _data_size)
+				  const uint8_t * data, size_t data_size)
 {
 	int i;
-	ssize_t data_size = _data_size;
 	uint16_t len;
 	const uint8_t *p = data;
 	const gnutls_group_entry_st *group = NULL;

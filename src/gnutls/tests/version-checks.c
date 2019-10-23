@@ -171,6 +171,13 @@ void doit(void)
 	reset_buffers();
 	try("NORMAL:-VERS-TLS-ALL:+VERS-TLS1.3:+VERS-TLS1.2", GNUTLS_TLS1_3);
 	reset_buffers();
+	/* If TLS 1.3 is enabled in the server, prefer the latest
+	 * possible version regardless of the client's precedence.
+	 * See https://gitlab.com/gnutls/gnutls/issues/837 for the
+	 * rationale.
+	 */
+	try("NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2:+VERS-TLS1.3", GNUTLS_TLS1_3);
+	reset_buffers();
 #ifdef ENABLE_SSL3
 	try("NORMAL:-VERS-TLS-ALL:+VERS-SSL3.0", -1);
 	reset_buffers();

@@ -275,16 +275,15 @@ SUFFIXES = .stamp .def .c.bak .h.bak
 if NEED_LIBOPTS
 # case --enable-local-libopts: We do not call AUTOGEN unless the .bak files are missing
 .def.stamp:
-	@b=`echo $@ | sed 's/.stamp$$//'`; \
-	if ! test -f $${srcdir}$${b}.c.bak;then \
+	$(AM_V_GEN) b=`echo $@ | sed 's/.stamp$$//'`; \
+	if ! test -f $(srcdir)/$${b}.c.bak;then \
 		echo "No .bak files found; will call autogen"; \
-		$(AM_V_GEN) $(AUTOGEN) $<; \
+		$(AUTOGEN) $<; \
 	else \
 		echo "Re-using .bak files"; \
-		srcdir=$(srcdir)/; \
 		rm -f $${b}.c $${b}.h; \
-		cp -p $${srcdir}$${b}.c.bak $${b}.c; \
-		cp -p $${srcdir}$${b}.h.bak $${b}.h; \
+		cp -p $(srcdir)/$${b}.c.bak $${b}.c; \
+		cp -p $(srcdir)/$${b}.h.bak $${b}.h; \
 	fi
 	touch $@
 else

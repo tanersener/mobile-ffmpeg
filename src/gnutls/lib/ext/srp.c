@@ -59,10 +59,9 @@ const hello_ext_entry_st ext_mod_srp = {
 
 static int
 _gnutls_srp_recv_params(gnutls_session_t session, const uint8_t * data,
-			size_t _data_size)
+			size_t data_size)
 {
 	uint8_t len;
-	ssize_t data_size = _data_size;
 	gnutls_ext_priv_data_t epriv;
 	srp_ext_st *priv;
 

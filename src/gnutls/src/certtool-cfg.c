@@ -2550,8 +2550,8 @@ int get_cert_sign_status(void)
 	} else {
 		return
 		    read_yesno
-		    ("Will the certificate be used to sign other certificates? (y/N): ",
-		     0);
+		    ("Will the certificate be used to sign other certificates? (Y/n): ",
+		     1);
 	}
 }
 

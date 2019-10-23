@@ -187,9 +187,8 @@ _gnutls_sign_algorithm_parse_data(gnutls_session_t session,
 static int
 _gnutls_signature_algorithm_recv_params(gnutls_session_t session,
 					const uint8_t * data,
-					size_t _data_size)
+					size_t data_size)
 {
-	ssize_t data_size = _data_size;
 	int ret;
 
 	if (session->security_parameters.entity == GNUTLS_CLIENT) {

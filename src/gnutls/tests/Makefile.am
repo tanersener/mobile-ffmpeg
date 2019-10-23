@@ -154,7 +154,7 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 mini-termination mini-x509-cas mini-x509-2 pkcs12_simple tls-pthread \
 	 mini-emsgsize-dtls chainverify-unsorted mini-overhead tls12-ffdhe \
 	 mini-dtls-heartbeat mini-x509-callbacks key-openssl priorities priorities-groups	\
-	 gnutls_x509_privkey_import gnutls_x509_crt_list_import time \
+	 gnutls_x509_privkey_import gnutls_x509_crt_list_import time x509-server-verify \
 	 sign-verify-ext4 tls-neg-ext4-key resume-lifetime memset0 memset1 \
 	 mini-dtls-srtp rsa-encrypt-decrypt mini-loss-time gnutls-strcodes \
 	 mini-record mini-dtls-record handshake-timeout mini-record-range \
@@ -174,7 +174,7 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 tls13-cert-key-exchange x509-cert-callback-ocsp gnutls_ocsp_resp_list_import2 \
 	 server-sign-md5-rep privkey-keygen mini-tls-nonblock no-signal pkcs7-gen dtls-etm \
 	 x509sign-verify-rsa x509sign-verify-ecdsa x509sign-verify-gost \
-	 mini-alignment oids atfork prf psk-file priority-init2 post-client-hello-change-prio \
+	 cipher-alignment oids atfork prf psk-file priority-init2 post-client-hello-change-prio \
 	 status-request status-request-ok rfc7633-missing sign-verify-ext \
 	 fallback-scsv pkcs8-key-decode urls dtls-rehandshake-cert rfc7633-ok \
 	 key-usage-rsa key-usage-ecdhe-rsa mini-session-verify-function auto-verify \
@@ -214,7 +214,8 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 null_retrieve_function tls-record-size-limit tls-crt_type-neg \
 	 resume-with-stek-expiration resume-with-previous-stek rawpk-api \
 	 tls-record-size-limit-asym dh-compute ecdh-compute sign-verify-data-newapi \
-	 sign-verify-newapi
+	 sign-verify-newapi sign-verify-deterministic iov aead-cipher-vec \
+	 tls13-without-timeout-func
 
 if HAVE_SECCOMP_TESTS
 ctests += dtls-with-seccomp tls-with-seccomp dtls-client-with-seccomp tls-client-with-seccomp
@@ -459,6 +460,10 @@ tls13_anti_replay_CPPFLAGS = $(AM_CPPFLAGS) \
 	-I$(top_srcdir)/gl	\
 	-I$(top_builddir)/gl	\
 	$(NETTLE_CFLAGS)
+
+iov_CPPFLAGS = $(AM_CPPFLAGS) \
+	-I$(top_srcdir)/gl	\
+	-I$(top_builddir)/gl
 
 if ENABLE_PKCS11
 if !WINDOWS

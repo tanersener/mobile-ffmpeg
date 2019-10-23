@@ -109,6 +109,12 @@ gnutls_session_get_data(gnutls_session_t session,
  * received, will return session resumption data corresponding to the last
  * received ticket.
  *
+ * Note that this function under TLS1.3 requires a callback to be set with
+ * gnutls_transport_set_pull_timeout_function() for successful operation. There
+ * was a bug before 3.6.10 which could make this function fail if that callback
+ * was not set. On later versions if not set, the function will return a successful
+ * error code, but will return dummy data that cannot lead to a resumption.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.
  **/
@@ -128,10 +134,17 @@ gnutls_session_get_data2(gnutls_session_t session, gnutls_datum_t *data)
 		 * the value(s). */
 		ertt += 60;
 
-		/* wait for a message with timeout */
-		ret = _gnutls_recv_in_buffers(session, GNUTLS_APPLICATION_DATA, -1, ertt);
-		if (ret < 0 && (gnutls_error_is_fatal(ret) && ret != GNUTLS_E_TIMEDOUT)) {
-			return gnutls_assert_val(ret);
+		/* we cannot use a read with timeout if the caller has not set
+		 * a callback with gnutls_transport_set_pull_timeout_function() */
+		if (NO_TIMEOUT_FUNC_SET(session) || (session->internals.flags & GNUTLS_NONBLOCK)) {
+			if (!(session->internals.flags & GNUTLS_NONBLOCK))
+				_gnutls_debug_log("TLS1.3 works efficiently if a callback with gnutls_transport_set_pull_timeout_function() is set\n");
+		} else {
+			/* wait for a message with timeout */
+			ret = _gnutls_recv_in_buffers(session, GNUTLS_APPLICATION_DATA, -1, ertt);
+			if (ret < 0 && (gnutls_error_is_fatal(ret) && ret != GNUTLS_E_TIMEDOUT)) {
+				return gnutls_assert_val(ret);
+			}
 		}
 
 		if (!(session->internals.hsk_flags & HSK_TICKET_RECEIVED)) {

@@ -25,10 +25,10 @@
 
 struct psk_ext_parser_st {
 	const unsigned char *identities_data;
-	ssize_t identities_len;
+	size_t identities_len;
 
 	const unsigned char *binders_data;
-	ssize_t binders_len;
+	size_t binders_len;
 };
 
 typedef struct psk_ext_parser_st psk_ext_parser_st;

@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-# Copyright (C) 2000-2012 Free Software Foundation, Inc.
+# Copyright (C) 2000-2012, 2019 Free Software Foundation, Inc.
 #
 # Author: Nikos Mavrogiannopoulos
 #
@@ -1641,7 +1641,7 @@ BUILT_SOURCES = $(guile_texi)
 guile_TEXINFOS = gnutls-guile.texi $(guile_texi)
 @HAVE_GUILE_TRUE@GUILE_FOR_BUILD = \
 @HAVE_GUILE_TRUE@  GUILE_AUTO_COMPILE=0				\
-@HAVE_GUILE_TRUE@  $(GUILE) -L $(top_srcdir)/guile/modules
+@HAVE_GUILE_TRUE@  $(GUILE) -q -L $(top_srcdir)/guile/modules
 
 @HAVE_GUILE_TRUE@SNARF_CPPFLAGS = -I$(top_srcdir) -I$(top_builddir)			\
 @HAVE_GUILE_TRUE@	 -I$(top_srcdir)/lib/includes -I$(top_builddir)/lib/includes	\
@@ -1722,12 +1722,16 @@ FUNCS = functions/dane_cert_type_name \
 	functions/dane_verify_session_crt.short \
 	functions/gnutls_aead_cipher_decrypt \
 	functions/gnutls_aead_cipher_decrypt.short \
+	functions/gnutls_aead_cipher_decryptv2 \
+	functions/gnutls_aead_cipher_decryptv2.short \
 	functions/gnutls_aead_cipher_deinit \
 	functions/gnutls_aead_cipher_deinit.short \
 	functions/gnutls_aead_cipher_encrypt \
 	functions/gnutls_aead_cipher_encrypt.short \
 	functions/gnutls_aead_cipher_encryptv \
 	functions/gnutls_aead_cipher_encryptv.short \
+	functions/gnutls_aead_cipher_encryptv2 \
+	functions/gnutls_aead_cipher_encryptv2.short \
 	functions/gnutls_aead_cipher_init \
 	functions/gnutls_aead_cipher_init.short \
 	functions/gnutls_alert_get functions/gnutls_alert_get.short \

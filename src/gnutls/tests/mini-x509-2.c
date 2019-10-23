@@ -415,6 +415,24 @@ void start(const char *prio)
 			fprintf(stderr, "could not verify certificate: %.4x\n", status);
 			exit(1);
 		}
+
+		status = gnutls_ocsp_status_request_is_checked(client, 0);
+		if (status != 0) {
+			fprintf(stderr, "gnutls_ocsp_status_request_is_checked: unexpected value (%u)\n", status);
+			exit(1);
+		}
+
+		status = gnutls_ocsp_status_request_is_checked(client, GNUTLS_OCSP_SR_IS_AVAIL);
+		if (status != 0) {
+			fprintf(stderr, "gnutls_ocsp_status_request_is_checked: unexpected value (%u)\n", status);
+			exit(1);
+		}
+
+		status = gnutls_ocsp_status_request_is_checked(server, 0);
+		if (status != 0) {
+			fprintf(stderr, "gnutls_ocsp_status_request_is_checked: unexpected value (%u)\n", status);
+			exit(1);
+		}
 	}
 
 	gnutls_bye(client, GNUTLS_SHUT_RDWR);

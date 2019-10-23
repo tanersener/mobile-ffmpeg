@@ -92,6 +92,20 @@ gnutls_aead_cipher_encryptv(gnutls_aead_cipher_hd_t handle,
 			    const giovec_t *iov, int iovcnt,
 			    void *ctext, size_t *ctext_len);
 
+int
+gnutls_aead_cipher_encryptv2(gnutls_aead_cipher_hd_t handle,
+			     const void *nonce, size_t nonce_len,
+			     const giovec_t *auth_iov, int auth_iovcnt,
+			     const giovec_t *iov, int iovcnt,
+			     void *tag, size_t *tag_size);
+
+int
+gnutls_aead_cipher_decryptv2(gnutls_aead_cipher_hd_t handle,
+			     const void *nonce, size_t nonce_len,
+			     const giovec_t *auth_iov, int auth_iovcnt,
+			     const giovec_t *iov, int iovcnt,
+			     void *tag, size_t tag_size);
+
 void gnutls_aead_cipher_deinit(gnutls_aead_cipher_hd_t handle);
 
 /* Hash - MAC API */

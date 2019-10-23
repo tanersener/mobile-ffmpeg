@@ -20,7 +20,7 @@
 
 ACLOCAL_AMFLAGS = -I ../m4 -I ../gl/m4
 
-EXTRA_DIST = priority_options.gperf common.mk
+EXTRA_DIST = priority_options.gperf common.mk inih/LICENSE.txt
 BUILT_SOURCES = pkix_asn1_tab.c gnutls_asn1_tab.c priority_options.h
 
 SUBDIRS = includes x509 auth ext algorithms extras accelerated
@@ -80,7 +80,8 @@ COBJECTS = range.c record.c compress.c debug.c cipher.c gthreads.h handshake-tls
 	system-keys.h urls.c urls.h prf.c auto-verify.c dh-session.c \
 	cert-session.c handshake-checks.c dtls-sw.c dh-primes.c openpgp_compat.c \
 	crypto-selftests.c crypto-selftests-pk.c secrets.c extv.c extv.h \
-	hello_ext_lib.c hello_ext_lib.h ocsp-api.c stek.c cert-cred-rawpk.c
+	hello_ext_lib.c hello_ext_lib.h ocsp-api.c stek.c cert-cred-rawpk.c \
+	iov.c iov.h
 
 if WINDOWS
 COBJECTS += system/keys-win.c

@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnutls 3.6.8\n"
 "Report-Msgid-Bugs-To: bug-gnutls@gnu.org\n"
-"POT-Creation-Date: 2019-07-25 20:40+0200\n"
-"PO-Revision-Date: 2019-06-06 23:08+0200\n"
+"POT-Creation-Date: 2019-09-29 12:27+0200\n"
+"PO-Revision-Date: 2019-08-12 01:03+0200\n"
 "Last-Translator: Stéphane Aulery <lkppo@free.fr>\n"
 "Language-Team: French <traduc@traduc.org>\n"
 "Language: fr\n"
@@ -116,7 +116,7 @@ msgstr "Erreur interne"
 
 #: lib/alert.c:71
 msgid "Inappropriate fallback"
-msgstr ""
+msgstr "Fallback inapproprié"
 
 #: lib/alert.c:73
 msgid "No renegotiation is allowed"
@@ -140,7 +140,7 @@ msgstr "Le nom d’utilisateur SRP/PSK est absent ou inconnu"
 
 #: lib/alert.c:83
 msgid "An extension was expected but was not seen"
-msgstr ""
+msgstr "Une extension était attendue mais manque."
 
 #: lib/alert.c:86
 msgid "No supported application protocol could be negotiated"
@@ -193,7 +193,7 @@ msgstr ""
 
 #: lib/errors.c:66
 msgid "Error decoding the received TLS packet."
-msgstr ""
+msgstr "Erreur de décodage du paquet TLS reçu."
 
 #: lib/errors.c:69
 msgid "A TLS record packet with invalid length was received."
@@ -213,7 +213,7 @@ msgstr "Erreur interne de GnuTLS."
 
 #: lib/errors.c:79
 msgid "A connection with inappropriate fallback was attempted."
-msgstr ""
+msgstr "Une connexion avec un fallback inapproprié a été tentée."
 
 #: lib/errors.c:81
 msgid "An illegal TLS extension was received."
@@ -233,7 +233,7 @@ msgstr "Un paquet TLS incorrect a été reçu."
 
 #: lib/errors.c:89
 msgid "Failed to import the key into store."
-msgstr ""
+msgstr "Echec de l'import de la clef dans le magasin."
 
 #: lib/errors.c:92
 msgid "An error was encountered at the TLS Finished packet calculation."
@@ -365,7 +365,7 @@ msgstr "Les données demandées ne sont pas disponibles."
 
 #: lib/errors.c:158
 msgid "There are no embedded data in the structure."
-msgstr ""
+msgstr "Il n'y a pas de données dans la structure."
 
 #: lib/errors.c:160
 msgid "Error in the pull function."
@@ -401,6 +401,7 @@ msgstr "Erreur dans le certificat CRL."
 #: lib/errors.c:173
 msgid "Error in the private key verification; seed doesn't match."
 msgstr ""
+"Erreur de vérification de la clef privée ; la graine ne correspond pas."
 
 #: lib/errors.c:175
 msgid "Could not authenticate peer."
@@ -414,7 +415,7 @@ msgstr ""
 
 #: lib/errors.c:181
 msgid "CIDR name constraint is malformed in size or structure."
-msgstr ""
+msgstr "La structure ou la taille de la contrainte de nom CIDR est incorrect."
 
 #: lib/errors.c:185
 msgid "Unsupported critical extension in X.509 certificate."
@@ -444,7 +445,7 @@ msgstr "Erreur dans la structure de la base de données."
 
 #: lib/errors.c:197
 msgid "The Database entry already exists."
-msgstr ""
+msgstr "L'enregistrement de base de données existe déjà."
 
 #: lib/errors.c:198
 msgid "The certificate type is not supported."
@@ -533,7 +534,7 @@ msgstr "Trop de paquets de négociation ont été reçus."
 
 #: lib/errors.c:242
 msgid "More than a single object matches the criteria."
-msgstr ""
+msgstr "Plus d'un objet correspond aux critères."
 
 #: lib/errors.c:244
 msgid "The crypto library version is too old."
@@ -677,7 +678,7 @@ msgstr "Erreur TPM."
 
 #: lib/errors.c:326
 msgid "The TPM library (trousers) cannot be found."
-msgstr ""
+msgstr "La bibliothèque TPM (trousers) est introuvable."
 
 #: lib/errors.c:328
 msgid "TPM is not initialized."
@@ -801,7 +802,7 @@ msgstr "La réponse OCSP est invalide"
 
 #: lib/errors.c:388
 msgid "The OCSP response provided doesn't match the available certificates"
-msgstr ""
+msgstr "La réponse OCSP ne correspond à aucun certificat connu."
 
 #: lib/errors.c:390
 msgid "There is no certificate status (OCSP)."
@@ -821,12 +822,12 @@ msgstr "Erreur pendant l'auto-vérification."
 
 #: lib/errors.c:399
 msgid "There is no self test for this algorithm."
-msgstr ""
+msgstr "Il n'y a pas d'autotest pour cet algorithme."
 
 #: lib/errors.c:401
 msgid ""
 "An error has been detected in the library and cannot continue operations."
-msgstr ""
+msgstr "Une erreur non récupérable a été détectée dans la bibliothèque."
 
 #: lib/errors.c:403
 msgid "Error in sockets initialization."
@@ -843,14 +844,15 @@ msgstr "Champ de longueur des extensions TLS non valide."
 #: lib/errors.c:409
 msgid "Peer's certificate or username has changed during a rehandshake."
 msgstr ""
+"Le certificat ou le nom de l'autre partie a changé durant la poignée de main."
 
 #: lib/errors.c:411
 msgid "The provided string has an embedded null."
-msgstr ""
+msgstr "La chaîne contient un caractère NULL."
 
 #: lib/errors.c:413
 msgid "Attempted handshake during false start."
-msgstr ""
+msgstr "Tentative de poignée de main pendant un faux départ."
 
 #: lib/errors.c:415
 msgid "The SNI host name not recognised."
@@ -858,11 +860,11 @@ msgstr "Le nom de serveur SNI est inconnu."
 
 #: lib/errors.c:417
 msgid "There was an issue converting to or from UTF8."
-msgstr ""
+msgstr "Erreur de conversion UTF8."
 
 #: lib/errors.c:419
 msgid "Cannot perform this action while handshake is in progress."
-msgstr ""
+msgstr "Impossible de faire cette action durant une poignée de main."
 
 #: lib/errors.c:421
 msgid "The public key is invalid."
@@ -870,37 +872,35 @@ msgstr "Clef publique invalide."
 
 #: lib/errors.c:423
 msgid "There are no validation parameters present."
-msgstr ""
+msgstr "Aucun paramètre valide présent."
 
 #: lib/errors.c:425
 msgid "The public key parameters are invalid."
-msgstr ""
+msgstr "Les paramètres de la clef publique sont invalides."
 
 #: lib/errors.c:427
 msgid "The private key is invalid."
-msgstr "Clef pnivée invalide."
+msgstr "Clef privée invalide."
 
 #: lib/errors.c:429
-#, fuzzy
 msgid "The DER time encoding is invalid."
-msgstr "Requête invalide."
+msgstr "L'encodage DER time est invalide."
 
 #: lib/errors.c:431
-#, fuzzy
 msgid "The signature is incompatible with the public key."
-msgstr "La clef DSA est incompatible avec le protocole TLS sélectionné."
+msgstr "La signature est incompatible avec la clef publique."
 
 #: lib/errors.c:433
 msgid "One of the involved algorithms has insufficient security level."
-msgstr ""
+msgstr "L'un des algorithms utilisé a un niveau de sécurité insuffisant."
 
 #: lib/errors.c:435
 msgid "No common key share with peer."
-msgstr ""
+msgstr "Aucune clef commune avec l'autre partie."
 
 #: lib/errors.c:437
 msgid "The early data were rejected."
-msgstr ""
+msgstr "Données prématurées rejetées."
 
 #: lib/errors.c:443 libdane/errors.c:42
 msgid "Success."
@@ -943,55 +943,51 @@ msgid "The OCSP response is trusted. "
 msgstr "La réponse OCSP est approuvée."
 
 #: lib/x509/ocsp.c:2610
-#, fuzzy
 msgid "The OCSP response's signer could not be found. "
-msgstr "La réponse OCSP est invalide"
+msgstr "Le signataire de la réponse OCSP n'a pas pu être trouvé."
 
 #: lib/x509/ocsp.c:2615
 msgid "Error in the signer's key usageflags. "
-msgstr ""
+msgstr "Erreur dans les usageflags de la clef du signataire."
 
 #: lib/x509/ocsp.c:2620
-#, fuzzy
 msgid "The OCSP response's signer is not trusted. "
-msgstr "La réponse OCSP est invalide"
+msgstr ""
+"Le signataire de la réponse OCSP n'est pas une signataire de confiance."
 
 #: lib/x509/ocsp.c:2625
-#, fuzzy
 msgid "The OCSP response depends on insecure algorithms. "
-msgstr "La réponse OCSP est invalide"
+msgstr "La réponse OCSP dépend d'algorithemes non sécurisés."
 
 #: lib/x509/ocsp.c:2630
-#, fuzzy
 msgid "The OCSP response's signature cannot be validated. "
-msgstr "La réponse OCSP est invalide"
+msgstr "Le signataire de la réponse OCSP n'a pas pu être validé."
 
 #: lib/x509/ocsp.c:2635
 msgid "The OCSP response's signer's certificate is not activated. "
-msgstr ""
+msgstr "Le certificat du signataire de la réponse OCSP est inactif."
 
 #: lib/x509/ocsp.c:2640
-#, fuzzy
 msgid "The OCSP response's signer's certificate is expired. "
-msgstr "La réponse OCSP est invalide"
+msgstr "Le certificat du signataire de la réponse OCSP est expiré."
 
 #: lib/x509/ocsp.c:2644
 msgid "Memory error"
 msgstr "Erreur de mémoire"
 
-#: lib/x509/ocsp_output.c:50 lib/x509/ocsp_output.c:276 lib/x509/output.c:1579
-#: lib/x509/output.c:2112 lib/x509/output.c:2510
+#: lib/x509/ocsp_output.c:50 lib/x509/ocsp_output.c:276 lib/x509/output.c:1679
+#: lib/x509/output.c:2212 lib/x509/output.c:2610
 #, c-format
 msgid "\tVersion: %d\n"
 msgstr "\tVersion : %d\n"
 
-#: lib/x509/ocsp_output.c:136 lib/x509/ocsp_output.c:500 lib/x509/output.c:2280
-#: lib/x509/output.c:2674
+#: lib/x509/ocsp_output.c:136 lib/x509/ocsp_output.c:500 lib/x509/output.c:2380
+#: lib/x509/output.c:2774
 msgid "\t\t\tASCII: "
 msgstr "\t\t\tASCII : "
 
-#: lib/x509/ocsp_output.c:141 lib/x509/ocsp_output.c:505 lib/x509/output.c:2284
-#: lib/x509/output.c:2679
+#: lib/x509/ocsp_output.c:141 lib/x509/ocsp_output.c:505 lib/x509/output.c:2384
+#: lib/x509/output.c:2779
 msgid "\t\t\tHexdump: "
 msgstr "\t\t\tCode hexadécimal : "
 
@@ -1028,27 +1024,27 @@ msgstr "\t\tCette mise à jour : %s\n"
 msgid "\t\tNext Update: %s\n"
 msgstr "\t\tProchaine mise à jour : %s\n"
 
-#: lib/x509/ocsp_output.c:524 lib/x509/output.c:1243 lib/x509/output.c:1514
-#: lib/x509/output.c:1640 lib/x509/output.c:1660 lib/x509/output.c:1704
-#: lib/x509/output.c:1932 lib/x509/output.c:1945 lib/x509/output.c:2359
-#: lib/x509/output.c:2487 lib/x509/output.c:2538
+#: lib/x509/ocsp_output.c:524 lib/x509/output.c:1343 lib/x509/output.c:1614
+#: lib/x509/output.c:1740 lib/x509/output.c:1760 lib/x509/output.c:1804
+#: lib/x509/output.c:2032 lib/x509/output.c:2045 lib/x509/output.c:2459
+#: lib/x509/output.c:2587 lib/x509/output.c:2638
 msgid "unknown"
 msgstr "inconnu"
 
-#: lib/x509/ocsp_output.c:525 lib/x509/output.c:1708 lib/x509/output.c:2363
-#: lib/x509/output.c:2542
+#: lib/x509/ocsp_output.c:525 lib/x509/output.c:1808 lib/x509/output.c:2463
+#: lib/x509/output.c:2642
 #, c-format
 msgid "\tSignature Algorithm: %s\n"
 msgstr "\tAlgorithme de signature : %s\n"
 
-#: lib/x509/ocsp_output.c:529 lib/x509/output.c:1715 lib/x509/output.c:2368
+#: lib/x509/ocsp_output.c:529 lib/x509/output.c:1815 lib/x509/output.c:2468
 msgid ""
 "warning: signed using a broken signature algorithm that can be forged.\n"
 msgstr ""
 "attention : signé par un algorithme de signature compromis et "
 "potentiellement non fiable.\n"
 
-#: lib/x509/ocsp_output.c:543 lib/x509/output.c:1741 lib/x509/output.c:2394
+#: lib/x509/ocsp_output.c:543 lib/x509/output.c:1841 lib/x509/output.c:2494
 msgid "\tSignature:\n"
 msgstr "\tSignature :\n"
 
@@ -1059,28 +1055,27 @@ msgstr "Informations de la requête OCSP :\n"
 #: lib/x509/output.c:54 lib/x509/output.c:84
 #, c-format
 msgid "%s%s: %.*s (contains illegal chars)\n"
-msgstr ""
+msgstr "%s%s : %.*s (contient des caractères interdits)\n"
 
 #: lib/x509/output.c:60 lib/x509/output.c:90
 #, c-format
 msgid "%s%s: %.*s (%s)\n"
-msgstr ""
+msgstr "%s%s : %.*s (%s)\n"
 
 #: lib/x509/output.c:68 lib/x509/output.c:98
 #, c-format
 msgid "%s%s: %.*s\n"
-msgstr ""
+msgstr "%s%s : %.*s\n"
 
 #: lib/x509/output.c:114
-#, fuzzy
 msgid "warning: SAN contains an embedded NUL, replacing with '!'\n"
 msgstr ""
-"attention : le champ altname contient un caractère NUL, remplacé par « ! »\n"
+"attention : le champ SAN contient un caractère NUL, remplacé par « ! »\n"
 
 #: lib/x509/output.c:130
 #, c-format
 msgid "%sURI: %.*s\n"
-msgstr ""
+msgstr "%sURI : %.*s\n"
 
 #: lib/x509/output.c:144
 #, c-format
@@ -1100,7 +1095,7 @@ msgstr "%sAdresse XMPP : %.*s\n"
 #: lib/x509/output.c:156
 #, c-format
 msgid "%sKRB5Principal: %.*s\n"
-msgstr ""
+msgstr "%sKRB5Principal : %.*s\n"
 
 #: lib/x509/output.c:160
 #, c-format
@@ -1278,265 +1273,298 @@ msgstr ""
 "\n"
 "%s\t\t\tAutre nom ASCII :"
 
-#: lib/x509/output.c:900
-#, c-format
-msgid "%s\t\tBasic Constraints (%s):\n"
-msgstr "%s\t\tContraintes de base (%s) :\n"
-
-#: lib/x509/output.c:902 lib/x509/output.c:916 lib/x509/output.c:961
-#: lib/x509/output.c:995 lib/x509/output.c:1008 lib/x509/output.c:1020
-#: lib/x509/output.c:1035 lib/x509/output.c:1047 lib/x509/output.c:1060
-#: lib/x509/output.c:1072 lib/x509/output.c:1086 lib/x509/output.c:1100
-#: lib/x509/output.c:1108 lib/x509/output.c:1119 lib/x509/output.c:1130
-#: lib/x509/output.c:1138 lib/x509/output.c:2221 lib/x509/output.c:2246
-#: lib/x509/output.c:2266
-msgid "critical"
-msgstr "critique"
-
-#: lib/x509/output.c:902 lib/x509/output.c:916 lib/x509/output.c:962
-#: lib/x509/output.c:996 lib/x509/output.c:1008 lib/x509/output.c:1020
-#: lib/x509/output.c:1035 lib/x509/output.c:1047 lib/x509/output.c:1060
-#: lib/x509/output.c:1072 lib/x509/output.c:1086 lib/x509/output.c:1100
-#: lib/x509/output.c:1108 lib/x509/output.c:1119 lib/x509/output.c:1130
-#: lib/x509/output.c:1138 lib/x509/output.c:2222 lib/x509/output.c:2247
-#: lib/x509/output.c:2267
-msgid "not critical"
-msgstr "non critique"
-
-#: lib/x509/output.c:914
-#, c-format
-msgid "%s\t\tSubject Key Identifier (%s):\n"
-msgstr "%s\t\tIdentifiant de clef du sujet (%s) :\n"
-
-#: lib/x509/output.c:1006
-#, c-format
-msgid "%s\t\tAuthority Key Identifier (%s):\n"
-msgstr "%s\t\tIdentifiant de la clef de l’autorité (%s) :\n"
-
-#: lib/x509/output.c:1019
-#, c-format
-msgid "%s\t\tKey Usage (%s):\n"
-msgstr "%s\t\tUsages possibles de la clef (%s) :\n"
-
-#: lib/x509/output.c:1033
-#, c-format
-msgid "%s\t\tPrivate Key Usage Period (%s):\n"
-msgstr "%s\t\tUtilisation de la clef (%s) :\n"
-
-#: lib/x509/output.c:1046
-#, c-format
-msgid "%s\t\tKey Purpose (%s):\n"
-msgstr "%s\t\tUtilisation prévue de la clef (%s) :\n"
-
-#: lib/x509/output.c:1058
-#, c-format
-msgid "%s\t\tSubject Alternative Name (%s):\n"
-msgstr "%s\t\tAutre nom du sujet (%s) :\n"
-
-#: lib/x509/output.c:1070
-#, c-format
-msgid "%s\t\tIssuer Alternative Name (%s):\n"
-msgstr "%s\t\tAutre nom de l’émetteur(%s) :\n"
-
-#: lib/x509/output.c:1084
-#, c-format
-msgid "%s\t\tCRL Distribution points (%s):\n"
-msgstr "%s\t\tPoints de distribution des listes de révocation (%s) :\n"
-
-#: lib/x509/output.c:1098
-#, c-format
-msgid "%s\t\tProxy Certificate Information (%s):\n"
-msgstr "%s\t\tDétails du certificat du proxy (%s) :\n"
-
-#: lib/x509/output.c:1106
-#, c-format
-msgid "%s\t\tAuthority Information Access (%s):\n"
-msgstr "%s\t\tInformation d’accès de l’autorité (%s) :\n"
-
-#: lib/x509/output.c:1118
-#, c-format
-msgid "%s\t\tName Constraints (%s):\n"
-msgstr "%s\t\tContraintes de nom (%s) :\n"
-
-#: lib/x509/output.c:1128
-#, c-format
-msgid "%s\t\tTLS Features (%s):\n"
-msgstr "%s\t\tFonctionnalités TLS (%s) :\n"
-
-#: lib/x509/output.c:1136
-#, c-format
-msgid "%s\t\tUnknown extension %s (%s):\n"
-msgstr "%s\t\tExtension inconnue %s (%s) :\n"
-
-#: lib/x509/output.c:1140
+#: lib/x509/output.c:880 lib/x509/output.c:952 lib/x509/output.c:1240
 #, c-format
 msgid "%s\t\t\tASCII: "
 msgstr "%s\t\t\tASCII : "
 
-#: lib/x509/output.c:1144
+#: lib/x509/output.c:884 lib/x509/output.c:956 lib/x509/output.c:1244
 #, c-format
 msgid "%s\t\t\tHexdump: "
 msgstr "%s\t\t\tCode hexadécimal : "
 
-#: lib/x509/output.c:1193
+#: lib/x509/output.c:891
+#, fuzzy, c-format
+msgid "%s\t\t\t%.*s\n"
+msgstr "%s%s : %.*s\n"
+
+#: lib/x509/output.c:920
+#, c-format
+msgid "%s\t\t\tSignTool: %.*s\n"
+msgstr ""
+
+#: lib/x509/output.c:928
+#, fuzzy, c-format
+msgid "%s\t\t\tCATool: %.*s\n"
+msgstr "%s%s : %.*s\n"
+
+#: lib/x509/output.c:936
+#, fuzzy, c-format
+msgid "%s\t\t\tSignToolCert: %.*s\n"
+msgstr "%s\t\t\tAutre nom OID : %.*s\n"
+
+#: lib/x509/output.c:944
+#, fuzzy, c-format
+msgid "%s\t\t\tCAToolCert: %.*s\n"
+msgstr "%s\t\t\tAutre nom OID : %.*s\n"
+
+#: lib/x509/output.c:988
+#, c-format
+msgid "%s\t\tBasic Constraints (%s):\n"
+msgstr "%s\t\tContraintes de base (%s) :\n"
+
+#: lib/x509/output.c:990 lib/x509/output.c:1004 lib/x509/output.c:1049
+#: lib/x509/output.c:1083 lib/x509/output.c:1096 lib/x509/output.c:1108
+#: lib/x509/output.c:1123 lib/x509/output.c:1135 lib/x509/output.c:1148
+#: lib/x509/output.c:1160 lib/x509/output.c:1174 lib/x509/output.c:1188
+#: lib/x509/output.c:1196 lib/x509/output.c:1207 lib/x509/output.c:1218
+#: lib/x509/output.c:1226 lib/x509/output.c:1232 lib/x509/output.c:1238
+#: lib/x509/output.c:2321 lib/x509/output.c:2346 lib/x509/output.c:2366
+msgid "critical"
+msgstr "critique"
+
+#: lib/x509/output.c:990 lib/x509/output.c:1004 lib/x509/output.c:1050
+#: lib/x509/output.c:1084 lib/x509/output.c:1096 lib/x509/output.c:1108
+#: lib/x509/output.c:1123 lib/x509/output.c:1135 lib/x509/output.c:1148
+#: lib/x509/output.c:1160 lib/x509/output.c:1174 lib/x509/output.c:1188
+#: lib/x509/output.c:1196 lib/x509/output.c:1207 lib/x509/output.c:1218
+#: lib/x509/output.c:1226 lib/x509/output.c:1232 lib/x509/output.c:1238
+#: lib/x509/output.c:2322 lib/x509/output.c:2347 lib/x509/output.c:2367
+msgid "not critical"
+msgstr "non critique"
+
+#: lib/x509/output.c:1002
+#, c-format
+msgid "%s\t\tSubject Key Identifier (%s):\n"
+msgstr "%s\t\tIdentifiant de clef du sujet (%s) :\n"
+
+#: lib/x509/output.c:1094
+#, c-format
+msgid "%s\t\tAuthority Key Identifier (%s):\n"
+msgstr "%s\t\tIdentifiant de la clef de l’autorité (%s) :\n"
+
+#: lib/x509/output.c:1107
+#, c-format
+msgid "%s\t\tKey Usage (%s):\n"
+msgstr "%s\t\tUsages possibles de la clef (%s) :\n"
+
+#: lib/x509/output.c:1121
+#, c-format
+msgid "%s\t\tPrivate Key Usage Period (%s):\n"
+msgstr "%s\t\tUtilisation de la clef (%s) :\n"
+
+#: lib/x509/output.c:1134
+#, c-format
+msgid "%s\t\tKey Purpose (%s):\n"
+msgstr "%s\t\tUtilisation prévue de la clef (%s) :\n"
+
+#: lib/x509/output.c:1146
+#, c-format
+msgid "%s\t\tSubject Alternative Name (%s):\n"
+msgstr "%s\t\tAutre nom du sujet (%s) :\n"
+
+#: lib/x509/output.c:1158
+#, c-format
+msgid "%s\t\tIssuer Alternative Name (%s):\n"
+msgstr "%s\t\tAutre nom de l’émetteur(%s) :\n"
+
+#: lib/x509/output.c:1172
+#, c-format
+msgid "%s\t\tCRL Distribution points (%s):\n"
+msgstr "%s\t\tPoints de distribution des listes de révocation (%s) :\n"
+
+#: lib/x509/output.c:1186
+#, c-format
+msgid "%s\t\tProxy Certificate Information (%s):\n"
+msgstr "%s\t\tDétails du certificat du proxy (%s) :\n"
+
+#: lib/x509/output.c:1194
+#, c-format
+msgid "%s\t\tAuthority Information Access (%s):\n"
+msgstr "%s\t\tInformation d’accès de l’autorité (%s) :\n"
+
+#: lib/x509/output.c:1206
+#, c-format
+msgid "%s\t\tName Constraints (%s):\n"
+msgstr "%s\t\tContraintes de nom (%s) :\n"
+
+#: lib/x509/output.c:1216
+#, c-format
+msgid "%s\t\tTLS Features (%s):\n"
+msgstr "%s\t\tFonctionnalités TLS (%s) :\n"
+
+#: lib/x509/output.c:1224
+#, fuzzy, c-format
+msgid "%s\t\tSubject Signing Tool(%s):\n"
+msgstr "%s\t\tIdentifiant de clef du sujet (%s) :\n"
+
+#: lib/x509/output.c:1230
+#, fuzzy, c-format
+msgid "%s\t\tIssuer Signing Tool(%s):\n"
+msgstr "%s\t\tAutre nom de l’émetteur(%s) :\n"
+
+#: lib/x509/output.c:1236
+#, c-format
+msgid "%s\t\tUnknown extension %s (%s):\n"
+msgstr "%s\t\tExtension inconnue %s (%s) :\n"
+
+#: lib/x509/output.c:1293
 #, c-format
 msgid "%s\tExtensions:\n"
 msgstr "%s\tExtensions :\n"
 
-#: lib/x509/output.c:1245
+#: lib/x509/output.c:1345
 #, c-format
 msgid "\t%sPublic Key Algorithm: %s\n"
 msgstr "\t%sAlgorithme de clef publique : %s\n"
 
-#: lib/x509/output.c:1247
+#: lib/x509/output.c:1347
 #, c-format
 msgid "\tAlgorithm Security Level: %s (%d bits)\n"
 msgstr "\tNiveau de sécurité de l’algorithme : %s (%d bits)\n"
 
-#: lib/x509/output.c:1252
+#: lib/x509/output.c:1352
 msgid "\t\tParameters:\n"
-msgstr ""
+msgstr "\t\tParamètres:\n"
 
-#: lib/x509/output.c:1272
+#: lib/x509/output.c:1372
 #, c-format
 msgid "\t\tModulus (bits %d): "
 msgstr "\t\tModule (%d bits) : "
 
-#: lib/x509/output.c:1279
+#: lib/x509/output.c:1379
 #, c-format
 msgid "\t\tExponent (bits %d): "
 msgstr "\t\tExposant (%d bits) : "
 
-#: lib/x509/output.c:1287
+#: lib/x509/output.c:1387
 #, c-format
 msgid "\t\tModulus (bits %d):\n"
 msgstr "\t\tModule (%d bits) :\n"
 
-#: lib/x509/output.c:1294
+#: lib/x509/output.c:1394
 #, c-format
 msgid "\t\tExponent (bits %d):\n"
 msgstr "\t\tExposant (%d bits) :\n"
 
-#: lib/x509/output.c:1321 lib/x509/output.c:1441
+#: lib/x509/output.c:1421 lib/x509/output.c:1541
 #, c-format
 msgid "\t\tCurve:\t%s\n"
 msgstr "\t\tCourbe :\t%s\n"
 
-#: lib/x509/output.c:1325 lib/x509/output.c:1451
+#: lib/x509/output.c:1425 lib/x509/output.c:1551
 msgid "\t\tX: "
 msgstr "\t\tX : "
 
-#: lib/x509/output.c:1331 lib/x509/output.c:1456
+#: lib/x509/output.c:1431 lib/x509/output.c:1556
 msgid "\t\tY: "
 msgstr "\t\tY : "
 
-#: lib/x509/output.c:1338 lib/x509/output.c:1462
+#: lib/x509/output.c:1438 lib/x509/output.c:1562
 msgid "\t\tX:\n"
 msgstr "\t\tX :\n"
 
-#: lib/x509/output.c:1343 lib/x509/output.c:1466
+#: lib/x509/output.c:1443 lib/x509/output.c:1566
 msgid "\t\tY:\n"
 msgstr "\t\tY :\n"
 
-#: lib/x509/output.c:1371
+#: lib/x509/output.c:1471
 #, c-format
 msgid "\t\tPublic key (bits %d): "
 msgstr "\t\tClef publique (%d bits) :"
 
-#: lib/x509/output.c:1377
+#: lib/x509/output.c:1477
 msgid "\t\tP: "
 msgstr "\t\tP : "
 
-#: lib/x509/output.c:1382
+#: lib/x509/output.c:1482
 msgid "\t\tQ: "
 msgstr "\t\tQ : "
 
-#: lib/x509/output.c:1387
+#: lib/x509/output.c:1487
 msgid "\t\tG: "
 msgstr "\t\tG : "
 
-#: lib/x509/output.c:1395
+#: lib/x509/output.c:1495
 #, c-format
 msgid "\t\tPublic key (bits %d):\n"
 msgstr "\t\tClef publique (%d bits) :\n"
 
-#: lib/x509/output.c:1400
+#: lib/x509/output.c:1500
 msgid "\t\tP:\n"
 msgstr "\t\tP :\n"
 
-#: lib/x509/output.c:1404
+#: lib/x509/output.c:1504
 msgid "\t\tQ:\n"
 msgstr "\t\tQ :\n"
 
-#: lib/x509/output.c:1408
+#: lib/x509/output.c:1508
 msgid "\t\tG:\n"
 msgstr "\t\tG :\n"
 
-#: lib/x509/output.c:1443
+#: lib/x509/output.c:1543
 #, c-format
 msgid "\t\tDigest:\t%s\n"
 msgstr "\t\tDigest :\t%s\n"
 
-#: lib/x509/output.c:1445
-#, fuzzy, c-format
+#: lib/x509/output.c:1545
+#, c-format
 msgid "\t\tParamSet: %s\n"
-msgstr "\t\tCréation : %s\n"
+msgstr "\t\tParamètres : %s\n"
 
-#: lib/x509/output.c:1558 lib/x509/output.c:2477
+#: lib/x509/output.c:1658 lib/x509/output.c:2577
 msgid "Subject "
 msgstr "Sujet : "
 
-#: lib/x509/output.c:1594
+#: lib/x509/output.c:1694
 msgid "\tSerial Number (hex): "
 msgstr "\tNuméro de série (hexa.) : "
 
-#: lib/x509/output.c:1607 lib/x509/output.c:2122
-#, fuzzy
+#: lib/x509/output.c:1707 lib/x509/output.c:2222
 msgid "\tIssuer:\n"
-msgstr "\tÉmetteur : %s\n"
+msgstr "\tÉmetteur :\n"
 
-#: lib/x509/output.c:1612 lib/x509/output.c:2127
+#: lib/x509/output.c:1712 lib/x509/output.c:2227
 #, c-format
 msgid "\tIssuer: %s\n"
 msgstr "\tÉmetteur : %s\n"
 
-#: lib/x509/output.c:1621
+#: lib/x509/output.c:1721
 msgid "\tValidity:\n"
 msgstr "\tValidité :\n"
 
-#: lib/x509/output.c:1638 lib/x509/output.c:1640
+#: lib/x509/output.c:1738 lib/x509/output.c:1740
 #, c-format
 msgid "\t\tNot Before: %s\n"
 msgstr "\t\tPas avant : %s\n"
 
-#: lib/x509/output.c:1658 lib/x509/output.c:1660
+#: lib/x509/output.c:1758 lib/x509/output.c:1760
 #, c-format
 msgid "\t\tNot After: %s\n"
 msgstr "\t\tPas après : %s\n"
 
-#: lib/x509/output.c:1671 lib/x509/output.c:2520
-#, fuzzy
+#: lib/x509/output.c:1771 lib/x509/output.c:2620
 msgid "\tSubject:\n"
-msgstr "\tSujet : %s\n"
+msgstr "\tSujet :\n"
 
-#: lib/x509/output.c:1676 lib/x509/output.c:2525
+#: lib/x509/output.c:1776 lib/x509/output.c:2625
 #, c-format
 msgid "\tSubject: %s\n"
 msgstr "\tSujet : %s\n"
 
-#: lib/x509/output.c:1755
+#: lib/x509/output.c:1855
 msgid "\tFingerprint:\n"
 msgstr "\tEmpreinte :\n"
 
-#: lib/x509/output.c:1764
+#: lib/x509/output.c:1864
 msgid "\t\tsha1:"
 msgstr "\t\tsha1 :"
 
-#: lib/x509/output.c:1775
+#: lib/x509/output.c:1875
 msgid "\t\tsha256:"
 msgstr "\t\tsha256 :"
 
-#: lib/x509/output.c:1809
+#: lib/x509/output.c:1909
 #, c-format
 msgid ""
 "%sPublic Key ID:\n"
@@ -1545,7 +1573,7 @@ msgstr ""
 "%sIdentifiant de clef :\n"
 "%s\tsha1 :"
 
-#: lib/x509/output.c:1815
+#: lib/x509/output.c:1915
 #, c-format
 msgid ""
 "%sPublic Key PIN:\n"
@@ -1554,114 +1582,114 @@ msgstr ""
 "%sPIN de clef publique :\n"
 "%s\tpin-sha256 :"
 
-#: lib/x509/output.c:1887
+#: lib/x509/output.c:1987
 msgid "no subject,"
 msgstr "Sans sujet,"
 
-#: lib/x509/output.c:1903
+#: lib/x509/output.c:2003
 msgid "no issuer,"
-msgstr ""
+msgstr "pas d'émetteur,"
 
-#: lib/x509/output.c:1950
+#: lib/x509/output.c:2050
 #, c-format
 msgid "signed using %s (broken!), "
 msgstr "signé avec %s (cassé !), "
 
-#: lib/x509/output.c:1952
+#: lib/x509/output.c:2052
 #, c-format
 msgid "signed using %s, "
 msgstr "signé avec %s, "
 
-#: lib/x509/output.c:2088
+#: lib/x509/output.c:2188
 msgid "X.509 Certificate Information:\n"
 msgstr "Détail du certificat X.509 :\n"
 
-#: lib/x509/output.c:2092 lib/x509/output.c:2732
+#: lib/x509/output.c:2192 lib/x509/output.c:2832
 msgid "Other Information:\n"
 msgstr "Autres informations :\n"
 
-#: lib/x509/output.c:2107
+#: lib/x509/output.c:2207
 msgid "\tVersion: 1 (default)\n"
 msgstr "\tVersion : 1 (par défaut)\n"
 
-#: lib/x509/output.c:2136
+#: lib/x509/output.c:2236
 msgid "\tUpdate dates:\n"
 msgstr "\tDates de mise à jour :\n"
 
-#: lib/x509/output.c:2153
+#: lib/x509/output.c:2253
 #, c-format
 msgid "\t\tIssued: %s\n"
 msgstr "\t\tÉmis : %s\n"
 
-#: lib/x509/output.c:2173
+#: lib/x509/output.c:2273
 #, c-format
 msgid "\t\tNext at: %s\n"
 msgstr "\t\tProchainement : %s\n"
 
-#: lib/x509/output.c:2204
+#: lib/x509/output.c:2304
 msgid "\tExtensions:\n"
 msgstr "\tExtensions :\n"
 
-#: lib/x509/output.c:2220
+#: lib/x509/output.c:2320
 #, c-format
 msgid "\t\tCRL Number (%s): "
 msgstr "\t\tNuméro de liste de révocation (CRL) (%s) :"
 
-#: lib/x509/output.c:2245
+#: lib/x509/output.c:2345
 #, c-format
 msgid "\t\tAuthority Key Identifier (%s):\n"
 msgstr "\t\tIdentifiant de la clef de l’autorité (%s) :\n"
 
-#: lib/x509/output.c:2264
+#: lib/x509/output.c:2364
 #, c-format
 msgid "\t\tUnknown extension %s (%s):\n"
 msgstr "\t\tExtension inconnue %s (%s) :\n"
 
-#: lib/x509/output.c:2301
+#: lib/x509/output.c:2401
 #, c-format
 msgid "\tRevoked certificates (%d):\n"
 msgstr "\tCertificats révoqués (%d) :\n"
 
-#: lib/x509/output.c:2304
+#: lib/x509/output.c:2404
 msgid "\tNo revoked certificates.\n"
 msgstr "\tCertificats non révoqués.\n"
 
-#: lib/x509/output.c:2325
+#: lib/x509/output.c:2425
 msgid "\t\tSerial Number (hex): "
 msgstr "\t\tNuméro de série (hexa.) : "
 
-#: lib/x509/output.c:2343
+#: lib/x509/output.c:2443
 #, c-format
 msgid "\t\tRevoked at: %s\n"
 msgstr "\t\tRévoqué le : %s\n"
 
-#: lib/x509/output.c:2425
+#: lib/x509/output.c:2525
 msgid "X.509 Certificate Revocation List Information:\n"
 msgstr "Détails sur la liste de révocation du certificat X.509 :\n"
 
-#: lib/x509/output.c:2575
+#: lib/x509/output.c:2675
 msgid "\tAttributes:\n"
 msgstr "\tAttributs :\n"
 
-#: lib/x509/output.c:2632
+#: lib/x509/output.c:2732
 #, c-format
 msgid "\t\tChallenge password: %s\n"
 msgstr "\t\tMot de passe challenge : %s\n"
 
-#: lib/x509/output.c:2642
+#: lib/x509/output.c:2742
 #, c-format
 msgid "\t\tUnknown attribute %s:\n"
 msgstr "\t\tAttribut inconnu %s :\n"
 
-#: lib/x509/output.c:2728
+#: lib/x509/output.c:2828
 msgid "PKCS #10 Certificate Request Information:\n"
 msgstr "Informations de requête de certificat PKCS #10 :\n"
 
-#: lib/x509/output.c:2755
+#: lib/x509/output.c:2855
 msgid "Public Key Usage:\n"
 msgstr "Utilisation de la clef publique :\n"
 
-#: lib/x509/output.c:2795
+#: lib/x509/output.c:2895
 msgid "Public Key Information:\n"
 msgstr "Informations de clef publique :\n"
 
@@ -1678,30 +1706,28 @@ msgid "CA constrains were violated. "
 msgstr "Constrains de CA violées. "
 
 #: libdane/dane.c:1062
-#, fuzzy
 msgid "The certificate differs. "
-msgstr "Mauvais certificat. "
+msgstr "Le certificat est différent."
 
 #: libdane/dane.c:1067
 msgid "There were no DANE information. "
-msgstr ""
+msgstr "Il n'y avait pas d'information DANE."
 
 #: libdane/errors.c:43
 msgid "There was error initializing the DNS query."
-msgstr ""
+msgstr "Erreur d'initialisation de la requête DNS."
 
 #: libdane/errors.c:45
 msgid "There was an error while resolving."
-msgstr ""
+msgstr "Erreur durant la résolution."
 
 #: libdane/errors.c:47
-#, fuzzy
 msgid "No DANE data were found."
-msgstr "Paramètres temporaires DH non trouvés."
+msgstr "Données DANE introuvables."
 
 #: libdane/errors.c:49
 msgid "Unknown DANE data were found."
-msgstr ""
+msgstr "Données DANE inconnues trouvées."
 
 #: libdane/errors.c:51
 msgid "No DNSSEC signature was found."
@@ -1709,7 +1735,7 @@ msgstr "Pas de signature DNSSEC trouvée."
 
 #: libdane/errors.c:53
 msgid "Received corrupt data."
-msgstr ""
+msgstr "Réception de données corrompues."
 
 #: libdane/errors.c:55
 msgid "The DNSSEC signature is invalid."
@@ -1717,7 +1743,7 @@ msgstr "La signature DNSSEC est invalide."
 
 #: libdane/errors.c:57
 msgid "There was a memory error."
-msgstr ""
+msgstr "Erreur de mémoire."
 
 #: libdane/errors.c:59
 msgid "The requested data are not available."
@@ -1729,7 +1755,7 @@ msgstr "Il y a eu une erreur dans le certificat."
 
 #: libdane/errors.c:65
 msgid "There was an error in the public key."
-msgstr ""
+msgstr "Erreur dans la clef publique."
 
 #: libdane/errors.c:69
 msgid "Error in file."

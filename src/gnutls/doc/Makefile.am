@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# Copyright (C) 2000-2012 Free Software Foundation, Inc.
+# Copyright (C) 2000-2012, 2019 Free Software Foundation, Inc.
 #
 # Author: Nikos Mavrogiannopoulos
 #
@@ -492,7 +492,7 @@ if HAVE_GUILE
 
 GUILE_FOR_BUILD =				\
   GUILE_AUTO_COMPILE=0				\
-  $(GUILE) -L $(top_srcdir)/guile/modules
+  $(GUILE) -q -L $(top_srcdir)/guile/modules
 
 SNARF_CPPFLAGS = -I$(top_srcdir) -I$(top_builddir)			\
 	 -I$(top_srcdir)/lib/includes -I$(top_builddir)/lib/includes	\
@@ -635,12 +635,16 @@ FUNCS += functions/dane_verify_session_crt
 FUNCS += functions/dane_verify_session_crt.short
 FUNCS += functions/gnutls_aead_cipher_decrypt
 FUNCS += functions/gnutls_aead_cipher_decrypt.short
+FUNCS += functions/gnutls_aead_cipher_decryptv2
+FUNCS += functions/gnutls_aead_cipher_decryptv2.short
 FUNCS += functions/gnutls_aead_cipher_deinit
 FUNCS += functions/gnutls_aead_cipher_deinit.short
 FUNCS += functions/gnutls_aead_cipher_encrypt
 FUNCS += functions/gnutls_aead_cipher_encrypt.short
 FUNCS += functions/gnutls_aead_cipher_encryptv
 FUNCS += functions/gnutls_aead_cipher_encryptv.short
+FUNCS += functions/gnutls_aead_cipher_encryptv2
+FUNCS += functions/gnutls_aead_cipher_encryptv2.short
 FUNCS += functions/gnutls_aead_cipher_init
 FUNCS += functions/gnutls_aead_cipher_init.short
 FUNCS += functions/gnutls_alert_get

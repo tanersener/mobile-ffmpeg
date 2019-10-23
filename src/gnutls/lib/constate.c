@@ -707,10 +707,17 @@ int _gnutls_epoch_set_keys(gnutls_session_t session, uint16_t epoch, hs_stage_t 
 			return gnutls_assert_val(ret);
 	}
 
-	if (ver->tls13_sem) {
+	/* The TLS1.3 limit of 256 additional bytes is also enforced under CBC
+	 * ciphers to ensure we interoperate with gnutls 2.12.x which could add padding
+	 * data exceeding the maximum. */
+	if (ver->tls13_sem || _gnutls_cipher_type(params->cipher) == CIPHER_BLOCK) {
 		session->internals.max_recv_size = 256;
 	} else {
-		session->internals.max_recv_size = _gnutls_record_overhead(ver, params->cipher, params->mac, 1);
+		session->internals.max_recv_size = 0;
+	}
+
+	if (!ver->tls13_sem) {
+		session->internals.max_recv_size += _gnutls_record_overhead(ver, params->cipher, params->mac, 1);
 		if (session->internals.allow_large_records != 0)
 			session->internals.max_recv_size += EXTRA_COMP_SIZE;
 	}
