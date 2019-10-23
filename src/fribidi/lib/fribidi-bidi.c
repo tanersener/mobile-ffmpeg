@@ -149,7 +149,7 @@ static FriBidiRun *get_adjacent_run(FriBidiRun *list, fribidi_boolean forward, f
     {
       FriBidiCharType ppp_type = RL_TYPE (ppp);
 
-      if (ppp_type == _FRIBIDI_TYPE_SENTINEL)
+      if (ppp_type == FRIBIDI_TYPE_SENTINEL)
         break;
 
       /* Note that when sweeping forward we continue one run
@@ -289,7 +289,7 @@ static void print_pairing_nodes(FriBidiPairingNode *nodes)
  * define macros for push and pop the status in to / out of the stack
  *-------------------------------------------------------------------------*/
 
-/* There are a few little points in pushing into and poping from the status
+/* There are a few little points in pushing into and popping from the status
    stack:
    1. when the embedding level is not valid (more than
    FRIBIDI_BIDI_MAX_EXPLICIT_LEVEL=125), you must reject it, and not to push

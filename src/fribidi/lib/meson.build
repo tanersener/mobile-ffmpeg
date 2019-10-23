@@ -79,3 +79,7 @@ libfribidi = library('fribidi',
   version: libversion,
   soversion: soversion,
   install: true)
+
+libfribidi_dep = declare_dependency(link_with: libfribidi,
+  include_directories: incs,
+  sources: [fribidi_unicode_version_h, fribidi_config_h])

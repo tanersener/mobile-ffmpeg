@@ -49,7 +49,7 @@
  * The dllimport is needed here mostly for the fribidi_version_info variable,
  * for functions it's not required. Probably needs more fine-tuning if
  * someone starts building fribidi as static library with MSVC. We'll cross
- * that brige when we get there. */
+ * that bridge when we get there. */
 #  define FRIBIDI_ENTRY __declspec(dllimport) extern
 # else
 #  define FRIBIDI_ENTRY extern

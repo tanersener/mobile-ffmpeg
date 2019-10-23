@@ -5,7 +5,7 @@ tests = [
 foreach t : tests
   exe = executable(t[0],
     t[1], fribidi_unicode_version_h,
-    c_args: ['-DHAVE_CONFIG_H'],
+    c_args: ['-DHAVE_CONFIG_H'] + visibility_args,
     include_directories: incs,
     link_with: libfribidi)
   test(t[0], exe, args: files('@0@.txt'.format(t[0])))
