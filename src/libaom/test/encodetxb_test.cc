@@ -138,7 +138,7 @@ class EncodeTxbTest : public ::testing::TestWithParam<GetNzMapContextsFunc> {
     for (int c = 0; c < eob; ++c) {
       levels_[get_padded_idx(scan[c], bwl)] =
           static_cast<uint8_t>(clamp(rnd_.Rand8(), 0, INT8_MAX));
-      coeff_contexts_[scan[c]] = rnd_.Rand16() >> 1;
+      coeff_contexts_[scan[c]] = static_cast<int8_t>(rnd_.Rand16() >> 1);
     }
 
     memcpy(coeff_contexts_ref_, coeff_contexts_,

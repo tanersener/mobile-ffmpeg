@@ -130,7 +130,8 @@ void decode_tile(aom_codec_ctx_t *codec, const unsigned char *frame,
       die_codec(codec, "Failed to get the tile size");
     const unsigned int tile_width = tile_size >> 16;
     const unsigned int tile_height = tile_size & 65535;
-    const uint8_t output_frame_width_in_tiles = output_frame_width / tile_width;
+    const uint32_t output_frame_width_in_tiles =
+        output_frame_width / tile_width;
 
     // Copy the tile to the output frame.
     const int row_offset =
@@ -276,7 +277,7 @@ int main(int argc, char **argv) {
   if (output_format != YUV1D) {
     // Allocate the output frame.
     aom_img_fmt_t out_fmt = ref_fmt;
-    if (!CONFIG_LOWBITDEPTH) out_fmt |= AOM_IMG_FMT_HIGHBITDEPTH;
+    if (FORCE_HIGHBITDEPTH_DECODING) out_fmt |= AOM_IMG_FMT_HIGHBITDEPTH;
     if (!aom_img_alloc(&output, out_fmt, output_frame_width,
                        output_frame_height, 32))
       die("Failed to allocate output image.");

@@ -15,11 +15,21 @@
 #include "aom_dsp/aom_dsp_common.h"
 #include "av1/encoder/ml.h"
 
+void av1_nn_output_prec_reduce(float *const output, int num_output) {
+  const int prec_bits = 11;
+  const int prec = 1 << prec_bits;
+  const float inv_prec = (float)(1.0 / prec);
+  for (int i = 0; i < num_output; i++) {
+    output[i] = ((int)(output[i] * prec + 0.5)) * inv_prec;
+  }
+}
+
 // Calculate prediction based on the given input features and neural net config.
 // Assume there are no more than NN_MAX_NODES_PER_LAYER nodes in each hidden
 // layer.
 void av1_nn_predict_c(const float *input_nodes,
-                      const NN_CONFIG *const nn_config, float *const output) {
+                      const NN_CONFIG *const nn_config, int reduce_prec,
+                      float *const output) {
   int num_input_nodes = nn_config->num_inputs;
   int buf_index = 0;
   float buf[2][NN_MAX_NODES_PER_LAYER];
@@ -55,6 +65,7 @@ void av1_nn_predict_c(const float *input_nodes,
       val += layer_weights[node * num_input_nodes + i] * input_nodes[i];
     output[node] = val;
   }
+  if (reduce_prec) av1_nn_output_prec_reduce(output, nn_config->num_outputs);
 }
 
 #if CONFIG_NN_V2
@@ -107,7 +118,7 @@ static float *nn_fc_forward(const float *input, FC_LAYER *layer) {
 }
 
 void av1_nn_predict_v2(const float *feature, NN_CONFIG_V2 *nn_config,
-                       float *output) {
+                       int reduce_prec, float *output) {
   const float *input_nodes = feature;
 
   // Propagate the layers.
@@ -124,6 +135,7 @@ void av1_nn_predict_v2(const float *feature, NN_CONFIG_V2 *nn_config,
   assert(nn_config->layer[num_layers].num_outputs == nn_config->num_logits);
   // Copy the final layer output
   memcpy(output, input_nodes, sizeof(*input_nodes) * nn_config->num_logits);
+  if (reduce_prec) av1_nn_output_prec_reduce(output, nn_config->num_logits);
 }
 #endif  // CONFIG_NN_V2
 

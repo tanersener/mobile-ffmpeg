@@ -14,8 +14,10 @@
 using libaom_test::ACMRandom;
 using libaom_test::AV1DISTWTDCOMPAVG::AV1DISTWTDCOMPAVGTest;
 using libaom_test::AV1DISTWTDCOMPAVG::AV1DISTWTDCOMPAVGUPSAMPLEDTest;
+#if CONFIG_AV1_HIGHBITDEPTH
 using libaom_test::AV1DISTWTDCOMPAVG::AV1HighBDDISTWTDCOMPAVGTest;
 using libaom_test::AV1DISTWTDCOMPAVG::AV1HighBDDISTWTDCOMPAVGUPSAMPLEDTest;
+#endif
 using ::testing::make_tuple;
 using ::testing::tuple;
 
@@ -45,6 +47,7 @@ INSTANTIATE_TEST_CASE_P(SSSE3, AV1DISTWTDCOMPAVGUPSAMPLEDTest,
                             aom_dist_wtd_comp_avg_upsampled_pred_ssse3));
 #endif
 
+#if CONFIG_AV1_HIGHBITDEPTH
 TEST_P(AV1HighBDDISTWTDCOMPAVGTest, DISABLED_Speed) {
   RunSpeedTest(GET_PARAM(1));
 }
@@ -72,5 +75,6 @@ INSTANTIATE_TEST_CASE_P(SSE2, AV1HighBDDISTWTDCOMPAVGUPSAMPLEDTest,
                         libaom_test::AV1DISTWTDCOMPAVG::BuildParams(
                             aom_highbd_dist_wtd_comp_avg_upsampled_pred_sse2));
 #endif
+#endif  // CONFIG_AV1_HIGHBITDEPTH
 
 }  // namespace

@@ -92,7 +92,11 @@ void EncoderTest::SetMode(TestMode mode) {
   switch (mode) {
     case kOnePassGood:
     case kTwoPassGood: break;
-    case kRealTime: cfg_.g_lag_in_frames = 0; break;
+    case kRealTime: {
+      cfg_.g_lag_in_frames = 0;
+      cfg_.g_usage = AOM_USAGE_REALTIME;
+      break;
+    }
     default: ASSERT_TRUE(false) << "Unexpected mode " << mode;
   }
   mode_ = mode;
@@ -219,65 +223,69 @@ void EncoderTest::RunLoop(VideoSource *video) {
     }
 #endif
 
+    number_spatial_layers_ = GetNumSpatialLayers();
+
     bool again;
     for (again = true; again; video->Next()) {
       again = (video->img() != NULL);
 
-      PreEncodeFrameHook(video);
-      PreEncodeFrameHook(video, encoder.get());
-      encoder->EncodeFrame(video, frame_flags_);
+      for (int sl = 0; sl < number_spatial_layers_; sl++) {
+        PreEncodeFrameHook(video);
+        PreEncodeFrameHook(video, encoder.get());
+        encoder->EncodeFrame(video, frame_flags_);
 
-      CxDataIterator iter = encoder->GetCxData();
+        CxDataIterator iter = encoder->GetCxData();
 
-      bool has_cxdata = false;
-      bool has_dxdata = false;
-      while (const aom_codec_cx_pkt_t *pkt = iter.Next()) {
-        pkt = MutateEncoderOutputHook(pkt);
-        again = true;
-        switch (pkt->kind) {
-          case AOM_CODEC_CX_FRAME_PKT:
-            has_cxdata = true;
-            if (decoder.get() != NULL && DoDecode()) {
-              aom_codec_err_t res_dec;
-              if (DoDecodeInvisible()) {
-                res_dec = decoder->DecodeFrame(
-                    (const uint8_t *)pkt->data.frame.buf, pkt->data.frame.sz);
-              } else {
-                res_dec = decoder->DecodeFrame(
-                    (const uint8_t *)pkt->data.frame.buf +
-                        (pkt->data.frame.sz - pkt->data.frame.vis_frame_size),
-                    pkt->data.frame.vis_frame_size);
+        bool has_cxdata = false;
+        bool has_dxdata = false;
+        while (const aom_codec_cx_pkt_t *pkt = iter.Next()) {
+          pkt = MutateEncoderOutputHook(pkt);
+          again = true;
+          switch (pkt->kind) {
+            case AOM_CODEC_CX_FRAME_PKT:
+              has_cxdata = true;
+              if (decoder.get() != NULL && DoDecode()) {
+                aom_codec_err_t res_dec;
+                if (DoDecodeInvisible()) {
+                  res_dec = decoder->DecodeFrame(
+                      (const uint8_t *)pkt->data.frame.buf, pkt->data.frame.sz);
+                } else {
+                  res_dec = decoder->DecodeFrame(
+                      (const uint8_t *)pkt->data.frame.buf +
+                          (pkt->data.frame.sz - pkt->data.frame.vis_frame_size),
+                      pkt->data.frame.vis_frame_size);
+                }
+
+                if (!HandleDecodeResult(res_dec, decoder.get())) break;
+
+                has_dxdata = true;
               }
+              ASSERT_GE(pkt->data.frame.pts, last_pts_);
+              if (sl == number_spatial_layers_) last_pts_ = pkt->data.frame.pts;
+              FramePktHook(pkt);
+              break;
 
-              if (!HandleDecodeResult(res_dec, decoder.get())) break;
+            case AOM_CODEC_PSNR_PKT: PSNRPktHook(pkt); break;
 
-              has_dxdata = true;
-            }
-            ASSERT_GE(pkt->data.frame.pts, last_pts_);
-            last_pts_ = pkt->data.frame.pts;
-            FramePktHook(pkt);
-            break;
-
-          case AOM_CODEC_PSNR_PKT: PSNRPktHook(pkt); break;
-
-          default: break;
-        }
-      }
-
-      if (has_dxdata && has_cxdata) {
-        const aom_image_t *img_enc = encoder->GetPreviewFrame();
-        DxDataIterator dec_iter = decoder->GetDxData();
-        const aom_image_t *img_dec = dec_iter.Next();
-        if (img_enc && img_dec) {
-          const bool res =
-              compare_img(img_enc, img_dec, NULL, NULL, NULL, NULL, NULL);
-          if (!res) {  // Mismatch
-            MismatchHook(img_enc, img_dec);
+            default: break;
           }
         }
-        if (img_dec) DecompressedFrameHook(*img_dec, video->pts());
-      }
-      if (!Continue()) break;
+
+        if (has_dxdata && has_cxdata) {
+          const aom_image_t *img_enc = encoder->GetPreviewFrame();
+          DxDataIterator dec_iter = decoder->GetDxData();
+          const aom_image_t *img_dec = dec_iter.Next();
+          if (img_enc && img_dec) {
+            const bool res =
+                compare_img(img_enc, img_dec, NULL, NULL, NULL, NULL, NULL);
+            if (!res) {  // Mismatch
+              MismatchHook(img_enc, img_dec);
+            }
+          }
+          if (img_dec) DecompressedFrameHook(*img_dec, video->pts());
+        }
+        if (!Continue()) break;
+      }  // Loop over spatial layers
     }
 
     EndPassHook();

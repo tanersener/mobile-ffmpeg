@@ -21,6 +21,9 @@
 extern "C" {
 #endif
 
+// Block size used for force_integer_mv decisions
+#define FORCE_INT_MV_DECISION_BLOCK_SIZE 8
+
 // store a block's hash info.
 // x and y are the position from the top left of the picture
 // hash_value2 is used to store the second hash value
@@ -32,9 +35,13 @@ typedef struct _block_hash {
 
 typedef struct _hash_table {
   Vector **p_lookup_table;
+#if CONFIG_DEBUG
+  int has_content;
+#endif
 } hash_table;
 
 void av1_hash_table_init(hash_table *p_hash_table, struct macroblock *x);
+void av1_hash_table_clear_all(hash_table *p_hash_table);
 void av1_hash_table_destroy(hash_table *p_hash_table);
 void av1_hash_table_create(hash_table *p_hash_table);
 int32_t av1_hash_table_count(const hash_table *p_hash_table,

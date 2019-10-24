@@ -25,7 +25,7 @@
 namespace {
 typedef void (*NnPredict_Func)(const float *const input_nodes,
                                const NN_CONFIG *const nn_config,
-                               float *const output);
+                               int reduce_prec, float *const output);
 
 typedef ::testing::tuple<const NnPredict_Func> NnPredictTestParam;
 
@@ -115,8 +115,8 @@ void NnPredictTest::RunNnPredictTest(const NN_CONFIG *const shape) {
       weights[layer][node] = ((float)rng_.Rand31() - (1 << 30)) / (1u << 31);
     }
 
-    av1_nn_predict_c(inputs, &nn_config, outputs_ref);
-    target_func_(inputs, &nn_config, outputs_test);
+    av1_nn_predict_c(inputs, &nn_config, 0, outputs_ref);
+    target_func_(inputs, &nn_config, 0, outputs_test);
     libaom_test::ClearSystemState();
 
     for (int node = 0; node < shape->num_outputs; node++) {
@@ -155,13 +155,13 @@ void NnPredictTest::RunNnPredictSpeedTest(const NN_CONFIG *const shape,
   aom_usec_timer timer;
   aom_usec_timer_start(&timer);
   for (int i = 0; i < run_times; ++i) {
-    av1_nn_predict_c(inputs, &nn_config, outputs_ref);
+    av1_nn_predict_c(inputs, &nn_config, 0, outputs_ref);
   }
   aom_usec_timer_mark(&timer);
   const double time1 = static_cast<double>(aom_usec_timer_elapsed(&timer));
   aom_usec_timer_start(&timer);
   for (int i = 0; i < run_times; ++i) {
-    target_func_(inputs, &nn_config, outputs_test);
+    target_func_(inputs, &nn_config, 0, outputs_test);
   }
   aom_usec_timer_mark(&timer);
   libaom_test::ClearSystemState();

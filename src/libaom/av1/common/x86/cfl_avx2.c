@@ -147,6 +147,7 @@ static void cfl_luma_subsampling_444_lbd_avx2(const uint8_t *input,
 
 CFL_GET_SUBSAMPLE_FUNCTION_AVX2(444, lbd)
 
+#if CONFIG_AV1_HIGHBITDEPTH
 /**
  * Adds 4 pixels (in a 2x2 grid) and multiplies them by 2. Resulting in a more
  * precise version of a box filter 4:2:0 pixel subsampling in Q3.
@@ -238,6 +239,7 @@ static void cfl_luma_subsampling_444_hbd_avx2(const uint16_t *input,
 }
 
 CFL_GET_SUBSAMPLE_FUNCTION_AVX2(444, hbd)
+#endif  // CONFIG_AV1_HIGHBITDEPTH
 
 static INLINE __m256i predict_unclipped(const __m256i *input, __m256i alpha_q12,
                                         __m256i alpha_sign, __m256i dc_q0) {
@@ -300,6 +302,7 @@ cfl_predict_lbd_fn cfl_get_predict_lbd_fn_avx2(TX_SIZE tx_size) {
   return pred[tx_size % TX_SIZES_ALL];
 }
 
+#if CONFIG_AV1_HIGHBITDEPTH
 static __m256i highbd_max_epi16(int bd) {
   const __m256i neg_one = _mm256_set1_epi16(-1);
   // (1 << bd) - 1 => -(-1 << bd) -1 => -1 - (-1 << bd) => -1 ^ (-1 << bd)
@@ -372,6 +375,7 @@ cfl_predict_hbd_fn cfl_get_predict_hbd_fn_avx2(TX_SIZE tx_size) {
   // function pointer array out of bounds.
   return pred[tx_size % TX_SIZES_ALL];
 }
+#endif  // CONFIG_AV1_HIGHBITDEPTH
 
 // Returns a vector where all the (32-bits) elements are the sum of all the
 // lanes in a.

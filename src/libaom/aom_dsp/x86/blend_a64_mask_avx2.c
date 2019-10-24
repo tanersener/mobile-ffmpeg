@@ -899,6 +899,7 @@ void aom_blend_a64_mask_avx2(uint8_t *dst, uint32_t dst_stride,
   }
 }
 
+#if CONFIG_AV1_HIGHBITDEPTH
 //////////////////////////////////////////////////////////////////////////////
 // aom_highbd_blend_a64_d16_mask_avx2()
 //////////////////////////////////////////////////////////////////////////////
@@ -1370,3 +1371,4 @@ void aom_highbd_blend_a64_d16_mask_avx2(
                                     subh, conv_params, bd);
   }
 }
+#endif  // CONFIG_AV1_HIGHBITDEPTH

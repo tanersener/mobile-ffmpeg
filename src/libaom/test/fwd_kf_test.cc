@@ -23,19 +23,18 @@ typedef struct {
 } FwdKfTestParam;
 
 const FwdKfTestParam kTestParams[] = {
-  { 4, 37.3 },  { 6, 36.5 },  { 8, 35.8 },
-  { 12, 34.3 }, { 16, 34.3 }, { 18, 33.7 }
+  { 4, 37.0 },  { 6, 35.9 },  { 8, 35.0 },
+  { 12, 33.6 }, { 16, 33.5 }, { 18, 33.1 }
 };
 
-// Params: encoding mode and index into the kMaxKfDists array to control
-// kf-max-dist
 class ForwardKeyTest
-    : public ::libaom_test::CodecTestWith2Params<libaom_test::TestMode, int>,
+    : public ::libaom_test::CodecTestWith2Params<libaom_test::TestMode,
+                                                 FwdKfTestParam>,
       public ::libaom_test::EncoderTest {
  protected:
   ForwardKeyTest()
       : EncoderTest(GET_PARAM(0)), encoding_mode_(GET_PARAM(1)),
-        kf_max_dist_ind_(GET_PARAM(2)) {}
+        kf_max_dist_param_(GET_PARAM(2)) {}
   virtual ~ForwardKeyTest() {}
 
   virtual void SetUp() {
@@ -44,8 +43,8 @@ class ForwardKeyTest
     const aom_rational timebase = { 1, 30 };
     cfg_.g_timebase = timebase;
     cpu_used_ = 2;
-    kf_max_dist_ = kTestParams[kf_max_dist_ind_].max_kf_dist;
-    psnr_threshold_ = kTestParams[kf_max_dist_ind_].psnr_thresh;
+    kf_max_dist_ = kf_max_dist_param_.max_kf_dist;
+    psnr_threshold_ = kf_max_dist_param_.psnr_thresh;
     cfg_.rc_end_usage = AOM_VBR;
     cfg_.rc_target_bitrate = 200;
     cfg_.g_lag_in_frames = 10;
@@ -85,7 +84,7 @@ class ForwardKeyTest
   double GetPsnrThreshold() { return psnr_threshold_; }
 
   ::libaom_test::TestMode encoding_mode_;
-  const int kf_max_dist_ind_;
+  const FwdKfTestParam kf_max_dist_param_;
   double psnr_threshold_;
   int kf_max_dist_;
   int cpu_used_;
@@ -104,7 +103,7 @@ TEST_P(ForwardKeyTest, ForwardKeyEncodeTest) {
       << "kf max dist = " << kf_max_dist_;
 }
 
-AV1_INSTANTIATE_TEST_CASE(
-    ForwardKeyTest, ::testing::Values(::libaom_test::kTwoPassGood),
-    ::testing::Range(0, static_cast<int>(GTEST_ARRAY_SIZE_(kTestParams))));
+AV1_INSTANTIATE_TEST_CASE(ForwardKeyTest,
+                          ::testing::Values(::libaom_test::kTwoPassGood),
+                          ::testing::ValuesIn(kTestParams));
 }  // namespace

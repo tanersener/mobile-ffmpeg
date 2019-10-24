@@ -366,7 +366,7 @@ static void clear_motion(RANSAC_MOTION *motion, int num_points) {
   motion->num_inliers = 0;
   motion->variance = kInfiniteVariance;
   memset(motion->inlier_indices, 0,
-         sizeof(*motion->inlier_indices * num_points));
+         sizeof(*motion->inlier_indices) * num_points);
 }
 
 static int ransac(const int *matched_points, int npoints,

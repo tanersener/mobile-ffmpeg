@@ -56,6 +56,7 @@ static void yuvconfig2image(aom_image_t *img, const YV12_BUFFER_CONFIG *yv12,
   img->stride[AOM_PLANE_U] = yv12->uv_stride;
   img->stride[AOM_PLANE_V] = yv12->uv_stride;
   if (yv12->flags & YV12_FLAG_HIGHBITDEPTH) {
+    bps *= 2;
     // aom_image_t uses byte strides and a pointer to the first byte
     // of the image.
     img->fmt = (aom_img_fmt_t)(img->fmt | AOM_IMG_FMT_HIGHBITDEPTH);

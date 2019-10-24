@@ -22,15 +22,18 @@ typedef struct {
   tran_low_t *dqcoeff_buf[MAX_MB_PLANE];
 } PC_TREE_SHARED_BUFFERS;
 
-static void alloc_mode_context(AV1_COMMON *cm, int num_pix,
-                               PICK_MODE_CONTEXT *ctx,
-                               PC_TREE_SHARED_BUFFERS *shared_bufs) {
+static AOM_INLINE void alloc_mode_context(AV1_COMMON *cm, int num_pix,
+                                          PICK_MODE_CONTEXT *ctx,
+                                          PC_TREE_SHARED_BUFFERS *shared_bufs) {
   const int num_planes = av1_num_planes(cm);
   int i;
   const int num_blk = num_pix / 16;
   ctx->num_4x4_blk = num_blk;
 
-  CHECK_MEM_ERROR(cm, ctx->blk_skip, aom_calloc(num_blk, sizeof(uint8_t)));
+  CHECK_MEM_ERROR(cm, ctx->blk_skip,
+                  aom_calloc(num_blk, sizeof(*ctx->blk_skip)));
+  CHECK_MEM_ERROR(cm, ctx->tx_type_map,
+                  aom_calloc(num_blk, sizeof(*ctx->tx_type_map)));
   for (i = 0; i < num_planes; ++i) {
     ctx->coeff[i] = shared_bufs->coeff_buf[i];
     ctx->qcoeff[i] = shared_bufs->qcoeff_buf[i];
@@ -51,10 +54,13 @@ static void alloc_mode_context(AV1_COMMON *cm, int num_pix,
   }
 }
 
-static void free_mode_context(PICK_MODE_CONTEXT *ctx, const int num_planes) {
+static AOM_INLINE void free_mode_context(PICK_MODE_CONTEXT *ctx,
+                                         const int num_planes) {
   int i;
   aom_free(ctx->blk_skip);
   ctx->blk_skip = 0;
+  aom_free(ctx->tx_type_map);
+  ctx->tx_type_map = 0;
   for (i = 0; i < num_planes; ++i) {
     ctx->coeff[i] = 0;
     ctx->qcoeff[i] = 0;
@@ -71,9 +77,9 @@ static void free_mode_context(PICK_MODE_CONTEXT *ctx, const int num_planes) {
   }
 }
 
-static void alloc_tree_contexts(AV1_COMMON *cm, PC_TREE *tree, int num_pix,
-                                int is_leaf,
-                                PC_TREE_SHARED_BUFFERS *shared_bufs) {
+static AOM_INLINE void alloc_tree_contexts(
+    AV1_COMMON *cm, PC_TREE *tree, int num_pix, int is_leaf,
+    PC_TREE_SHARED_BUFFERS *shared_bufs) {
   alloc_mode_context(cm, num_pix, &tree->none, shared_bufs);
 
   if (is_leaf) return;
@@ -106,7 +112,7 @@ static void alloc_tree_contexts(AV1_COMMON *cm, PC_TREE *tree, int num_pix,
   }
 }
 
-static void free_tree_contexts(PC_TREE *tree, const int num_planes) {
+static AOM_INLINE void free_tree_contexts(PC_TREE *tree, const int num_planes) {
   int i;
   for (i = 0; i < 3; i++) {
     free_mode_context(&tree->horizontala[i], num_planes);
@@ -182,11 +188,15 @@ void av1_setup_pc_tree(AV1_COMMON *cm, ThreadData *td) {
   // Set up the root node for the largest superblock size
   i = MAX_MIB_SIZE_LOG2 - MIN_MIB_SIZE_LOG2;
   td->pc_root[i] = &td->pc_tree[tree_nodes - 1];
-  td->pc_root[i]->none.best_mode_index = 2;
+#if CONFIG_INTERNAL_STATS
+  td->pc_root[i]->none.best_mode_index = THR_INVALID;
+#endif  // CONFIG_INTERNAL_STATS
   // Set up the root nodes for the rest of the possible superblock sizes
   while (--i >= 0) {
     td->pc_root[i] = td->pc_root[i + 1]->split[0];
-    td->pc_root[i]->none.best_mode_index = 2;
+#if CONFIG_INTERNAL_STATS
+    td->pc_root[i]->none.best_mode_index = THR_INVALID;
+#endif  // CONFIG_INTERNAL_STATS
   }
 }
 
@@ -217,10 +227,14 @@ void av1_copy_tree_context(PICK_MODE_CONTEXT *dst_ctx,
 
   dst_ctx->num_4x4_blk = src_ctx->num_4x4_blk;
   dst_ctx->skippable = src_ctx->skippable;
+#if CONFIG_INTERNAL_STATS
   dst_ctx->best_mode_index = src_ctx->best_mode_index;
+#endif  // CONFIG_INTERNAL_STATS
 
   memcpy(dst_ctx->blk_skip, src_ctx->blk_skip,
          sizeof(uint8_t) * src_ctx->num_4x4_blk);
+  av1_copy_array(dst_ctx->tx_type_map, src_ctx->tx_type_map,
+                 src_ctx->num_4x4_blk);
 
   dst_ctx->hybrid_pred_diff = src_ctx->hybrid_pred_diff;
   dst_ctx->comp_pred_diff = src_ctx->comp_pred_diff;

@@ -90,7 +90,7 @@ static INLINE void highbd_filter_mask_dual(const __m128i *p, const __m128i *q,
 
   const __m128i zero = _mm_setzero_si128();
   const __m128i one = _mm_set1_epi16(1);
-  const __m128i ffff = _mm_set1_epi16(0xFFFF);
+  const __m128i ffff = _mm_set1_epi16((short)0xFFFF);
 
   __m128i max = _mm_subs_epu16(_mm_adds_epu16(abs_p0q0, abs_p1q1), *bl);
   max = _mm_xor_si128(_mm_cmpeq_epi16(max, zero), ffff);
@@ -112,7 +112,7 @@ static INLINE void highbd_hev_filter_mask_x_sse2(__m128i *pq, int x,
                                                  __m128i *hev, __m128i *mask) {
   const __m128i zero = _mm_setzero_si128();
   const __m128i one = _mm_set1_epi16(1);
-  const __m128i ffff = _mm_set1_epi16(0xFFFF);
+  const __m128i ffff = _mm_set1_epi16((short)0xFFFF);
   __m128i abs_p0q0_p1q1, abs_p0q0, abs_p1q1, abs_q1q0;
   __m128i max, max01, h;
 

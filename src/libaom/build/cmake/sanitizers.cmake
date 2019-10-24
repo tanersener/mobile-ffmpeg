@@ -36,15 +36,6 @@ endif()
 # Make callstacks accurate.
 require_compiler_flag("-fno-omit-frame-pointer -fno-optimize-sibling-calls" YES)
 
-# TODO(http://crbug.com/aomedia/2357): -fsanitize=implicit-integer-truncation
-# causes conversion warnings in many of the x86 intrinsics and elsewhere.
-if("${SANITIZE}" MATCHES "integer" AND CMAKE_C_COMPILER_ID MATCHES "Clang")
-  if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL "7.0.1")
-    require_compiler_flag("-fno-sanitize=implicit-integer-truncation" YES)
-    require_linker_flag("-fno-sanitize=implicit-integer-truncation" YES)
-  endif()
-endif()
-
 # Fix link errors due to missing rt compiler lib in 32-bit builds.
 # http://llvm.org/bugs/show_bug.cgi?id=17693
 if(CMAKE_C_COMPILER_ID MATCHES "Clang")

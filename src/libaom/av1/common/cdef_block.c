@@ -108,7 +108,7 @@ int cdef_find_dir_c(const uint16_t *img, int stride, int32_t *var,
 }
 
 const int cdef_pri_taps[2][2] = { { 4, 2 }, { 3, 3 } };
-const int cdef_sec_taps[2][2] = { { 2, 1 }, { 2, 1 } };
+const int cdef_sec_taps[2] = { 2, 1 };
 
 /* Smooth in the direction detected. */
 void cdef_filter_block_c(uint8_t *dst8, uint16_t *dst16, int dstride,
@@ -118,7 +118,7 @@ void cdef_filter_block_c(uint8_t *dst8, uint16_t *dst16, int dstride,
   int i, j, k;
   const int s = CDEF_BSTRIDE;
   const int *pri_taps = cdef_pri_taps[(pri_strength >> coeff_shift) & 1];
-  const int *sec_taps = cdef_sec_taps[(pri_strength >> coeff_shift) & 1];
+  const int *sec_taps = cdef_sec_taps;
   for (i = 0; i < 4 << (bsize == BLOCK_8X8 || bsize == BLOCK_4X8); i++) {
     for (j = 0; j < 4 << (bsize == BLOCK_8X8 || bsize == BLOCK_8X4); j++) {
       int16_t sum = 0;

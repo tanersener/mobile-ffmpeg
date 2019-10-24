@@ -453,11 +453,13 @@ typedef void (*intra_pred_fn)(uint8_t *dst, ptrdiff_t stride,
 static intra_pred_fn pred[INTRA_MODES][TX_SIZES_ALL];
 static intra_pred_fn dc_pred[2][2][TX_SIZES_ALL];
 
+#if CONFIG_AV1_HIGHBITDEPTH
 typedef void (*intra_high_pred_fn)(uint16_t *dst, ptrdiff_t stride,
                                    const uint16_t *above, const uint16_t *left,
                                    int bd);
 static intra_high_pred_fn pred_high[INTRA_MODES][TX_SIZES_ALL];
 static intra_high_pred_fn dc_pred_high[2][2][TX_SIZES_ALL];
+#endif
 
 static void init_intra_predictors_internal(void) {
   assert(NELEMENTS(mode_to_angle_map) == INTRA_MODES);
@@ -499,7 +501,7 @@ static void init_intra_predictors_internal(void) {
   INIT_ALL_SIZES(dc_pred[0][1], dc_top);
   INIT_ALL_SIZES(dc_pred[1][0], dc_left);
   INIT_ALL_SIZES(dc_pred[1][1], dc);
-
+#if CONFIG_AV1_HIGHBITDEPTH
   INIT_ALL_SIZES(pred_high[V_PRED], highbd_v);
   INIT_ALL_SIZES(pred_high[H_PRED], highbd_h);
   INIT_ALL_SIZES(pred_high[PAETH_PRED], highbd_paeth);
@@ -510,6 +512,7 @@ static void init_intra_predictors_internal(void) {
   INIT_ALL_SIZES(dc_pred_high[0][1], highbd_dc_top);
   INIT_ALL_SIZES(dc_pred_high[1][0], highbd_dc_left);
   INIT_ALL_SIZES(dc_pred_high[1][1], highbd_dc);
+#endif
 #undef intra_pred_allsizes
 }
 
@@ -647,6 +650,7 @@ static void dr_predictor(uint8_t *dst, ptrdiff_t stride, TX_SIZE tx_size,
   }
 }
 
+#if CONFIG_AV1_HIGHBITDEPTH
 // Directional prediction, zone 1: 0 < angle < 90
 void av1_highbd_dr_prediction_z1_c(uint16_t *dst, ptrdiff_t stride, int bw,
                                    int bh, const uint16_t *above,
@@ -785,6 +789,7 @@ static void highbd_dr_predictor(uint16_t *dst, ptrdiff_t stride,
     pred_high[H_PRED][tx_size](dst, stride, above, left, bd);
   }
 }
+#endif  // CONFIG_AV1_HIGHBITDEPTH
 
 DECLARE_ALIGNED(16, const int8_t,
                 av1_filter_intra_taps[FILTER_INTRA_MODES][8][8]) = {
@@ -888,6 +893,7 @@ void av1_filter_intra_predictor_c(uint8_t *dst, ptrdiff_t stride,
   }
 }
 
+#if CONFIG_AV1_HIGHBITDEPTH
 static void highbd_filter_intra_predictor(uint16_t *dst, ptrdiff_t stride,
                                           TX_SIZE tx_size,
                                           const uint16_t *above,
@@ -938,6 +944,7 @@ static void highbd_filter_intra_predictor(uint16_t *dst, ptrdiff_t stride,
     dst += stride;
   }
 }
+#endif  // CONFIG_AV1_HIGHBITDEPTH
 
 static int is_smooth(const MB_MODE_INFO *mbmi, int plane) {
   if (plane == 0) {
@@ -1068,6 +1075,7 @@ void av1_filter_intra_edge_high_c(uint16_t *p, int sz, int strength) {
   }
 }
 
+#if CONFIG_AV1_HIGHBITDEPTH
 static void filter_intra_edge_corner_high(uint16_t *p_above, uint16_t *p_left) {
   const int kernel[3] = { 5, 6, 5 };
 
@@ -1077,6 +1085,7 @@ static void filter_intra_edge_corner_high(uint16_t *p_above, uint16_t *p_left) {
   p_above[-1] = s;
   p_left[-1] = s;
 }
+#endif
 
 void av1_upsample_intra_edge_c(uint8_t *p, int sz) {
   // interpolate half-sample positions
@@ -1124,7 +1133,7 @@ void av1_upsample_intra_edge_high_c(uint16_t *p, int sz, int bd) {
     p[2 * i] = in[i + 2];
   }
 }
-
+#if CONFIG_AV1_HIGHBITDEPTH
 static void build_intra_predictors_high(
     const MACROBLOCKD *xd, const uint8_t *ref8, int ref_stride, uint8_t *dst8,
     int dst_stride, PREDICTION_MODE mode, int angle_delta,
@@ -1151,7 +1160,7 @@ static void build_intra_predictors_high(
   int base = 128 << (xd->bd - 8);
 
   // The default values if ref pixels are not available:
-  // base-1 base-1 base-1 .. base-1 base-1 base-1 base-1 base-1 base-1
+  // base   base-1 base-1 .. base-1 base-1 base-1 base-1 base-1 base-1
   // base+1   A      B  ..     Y      Z
   // base+1   C      D  ..     W      X
   // base+1   E      F  ..     U      V
@@ -1309,6 +1318,7 @@ static void build_intra_predictors_high(
     pred_high[mode][tx_size](dst, dst_stride, above_row, left_col, xd->bd);
   }
 }
+#endif  // CONFIG_AV1_HIGHBITDEPTH
 
 static void build_intra_predictors(const MACROBLOCKD *xd, const uint8_t *ref,
                                    int ref_stride, uint8_t *dst, int dst_stride,
@@ -1335,7 +1345,7 @@ static void build_intra_predictors(const MACROBLOCKD *xd, const uint8_t *ref,
   const int use_filter_intra = filter_intra_mode != FILTER_INTRA_MODES;
 
   // The default values if ref pixels are not available:
-  // 127 127 127 .. 127 127 127 127 127 127
+  // 128 127 127 .. 127 127 127 127 127 127
   // 129  A   B  ..  Y   Z
   // 129  C   D  ..  W   X
   // 129  E   F  ..  U   V
@@ -1377,7 +1387,10 @@ static void build_intra_predictors(const MACROBLOCKD *xd, const uint8_t *ref,
     int need_bottom = !!(extend_modes[mode] & NEED_BOTTOMLEFT);
     if (use_filter_intra) need_bottom = 0;
     if (is_dr_mode) need_bottom = p_angle > 180;
-    const int num_left_pixels_needed = txhpx + (need_bottom ? txwpx : 0);
+    // the avx2 dr_prediction_z2 may read at most 3 extra bytes,
+    // due to the avx2 mask load is with dword granularity.
+    // so we initialize 3 extra bytes to silence valgrind complain.
+    const int num_left_pixels_needed = txhpx + (need_bottom ? txwpx : 3);
     i = 0;
     if (n_left_px > 0) {
       for (; i < n_left_px; i++) left_col[i] = left_ref[i * ref_stride];
@@ -1569,6 +1582,7 @@ void av1_predict_intra_block(
       tx_size, row_off, col_off, pd->subsampling_x, pd->subsampling_y);
 
   const int disable_edge_filter = !cm->seq_params.enable_intra_edge_filter;
+#if CONFIG_AV1_HIGHBITDEPTH
   if (is_cur_buf_hbd(xd)) {
     build_intra_predictors_high(
         xd, ref, ref_stride, dst, dst_stride, mode, angle_delta,
@@ -1579,7 +1593,7 @@ void av1_predict_intra_block(
         have_bottom_left ? AOMMIN(txhpx, yd) : 0, plane);
     return;
   }
-
+#endif
   build_intra_predictors(xd, ref, ref_stride, dst, dst_stride, mode,
                          angle_delta, filter_intra_mode, tx_size,
                          disable_edge_filter,

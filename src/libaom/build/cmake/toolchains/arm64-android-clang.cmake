@@ -43,6 +43,6 @@ include("${AOM_ANDROID_NDK_PATH}/build/cmake/android.toolchain.cmake")
 set(AOM_NEON_INTRIN_FLAG "")
 
 # No runtime cpu detect for arm64-android-clang.
-set(CONFIG_RUNTIME_CPU_DETECT 0 CACHE NUMBER "")
+set(CONFIG_RUNTIME_CPU_DETECT 0 CACHE STRING "")
 
 set(CMAKE_SYSTEM_NAME "Android")

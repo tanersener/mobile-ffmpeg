@@ -119,6 +119,21 @@ class Encoder {
     ASSERT_EQ(AOM_CODEC_OK, res) << EncoderError();
   }
 
+  void Control(int ctrl_id, struct aom_svc_layer_id *arg) {
+    const aom_codec_err_t res = aom_codec_control_(&encoder_, ctrl_id, arg);
+    ASSERT_EQ(AOM_CODEC_OK, res) << EncoderError();
+  }
+
+  void Control(int ctrl_id, struct aom_svc_ref_frame_config *arg) {
+    const aom_codec_err_t res = aom_codec_control_(&encoder_, ctrl_id, arg);
+    ASSERT_EQ(AOM_CODEC_OK, res) << EncoderError();
+  }
+
+  void Control(int ctrl_id, struct aom_svc_params *arg) {
+    const aom_codec_err_t res = aom_codec_control_(&encoder_, ctrl_id, arg);
+    ASSERT_EQ(AOM_CODEC_OK, res) << EncoderError();
+  }
+
 #if CONFIG_AV1_ENCODER
   void Control(int ctrl_id, aom_active_map_t *arg) {
     const aom_codec_err_t res = aom_codec_control_(&encoder_, ctrl_id, arg);
@@ -164,7 +179,7 @@ class EncoderTest {
  protected:
   explicit EncoderTest(const CodecFactory *codec)
       : codec_(codec), abort_(false), init_flags_(0), frame_flags_(0),
-        last_pts_(0), mode_(kRealTime) {
+        last_pts_(0), mode_(kRealTime), number_spatial_layers_(1) {
     // Default to 1 thread.
     cfg_.g_threads = 1;
   }
@@ -227,6 +242,8 @@ class EncoderTest {
     return AOM_CODEC_OK == res_dec;
   }
 
+  virtual int GetNumSpatialLayers() { return 1; }
+
   // Hook that can modify the encoder's output data
   virtual const aom_codec_cx_pkt_t *MutateEncoderOutputHook(
       const aom_codec_cx_pkt_t *pkt) {
@@ -242,6 +259,7 @@ class EncoderTest {
   unsigned long frame_flags_;
   aom_codec_pts_t last_pts_;
   TestMode mode_;
+  int number_spatial_layers_;
 };
 
 }  // namespace libaom_test

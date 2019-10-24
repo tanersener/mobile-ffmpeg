@@ -19,6 +19,7 @@
 #include "aom/aom_integer.h"
 #include "aom_dsp/aom_filter.h"
 #include "aom_ports/mem.h"
+#include "av1/common/enums.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -45,6 +46,20 @@ enum {
   USE_8_TAPS,
 } UENUM1BYTE(SUBPEL_SEARCH_TYPE);
 
+enum {
+  INTERP_EVAL_LUMA_EVAL_CHROMA = 0,
+  INTERP_SKIP_LUMA_EVAL_CHROMA,
+  INTERP_EVAL_INVALID,
+  INTERP_SKIP_LUMA_SKIP_CHROMA,
+} UENUM1BYTE(INTERP_EVAL_PLANE);
+
+enum {
+  INTERP_HORZ_NEQ_VERT_NEQ = 0,
+  INTERP_HORZ_EQ_VERT_NEQ,
+  INTERP_HORZ_NEQ_VERT_EQ,
+  INTERP_HORZ_EQ_VERT_EQ,
+  INTERP_PRED_TYPE_ALL,
+} UENUM1BYTE(INTERP_PRED_TYPE);
 // Pack two InterpFilter's into a uint32_t: since there are at most 10 filters,
 // we can use 16 bits for each and have more than enough space. This reduces
 // argument passing and unifies the operation of setting a (pair of) filters.
@@ -83,6 +98,7 @@ static INLINE InterpFilter av1_unswitchable_filter(InterpFilter filter) {
 #define SWITCHABLE_FILTER_CONTEXTS ((SWITCHABLE_FILTERS + 1) * 4)
 #define INTER_FILTER_COMP_OFFSET (SWITCHABLE_FILTERS + 1)
 #define INTER_FILTER_DIR_OFFSET ((SWITCHABLE_FILTERS + 1) * 2)
+#define ALLOW_ALL_INTERP_FILT_MASK (0x01ff)
 
 typedef struct InterpFilterParams {
   const int16_t *filter_ptr;
@@ -185,6 +201,16 @@ DECLARE_ALIGNED(256, static const InterpKernel,
   { 0, 0, 4, 36, 62, 26, 0, 0 },  { 0, 0, 2, 34, 62, 30, 0, 0 }
 };
 
+static const uint16_t
+    av1_interp_dual_filt_mask[INTERP_PRED_TYPE_ALL - 2][SWITCHABLE_FILTERS] = {
+      { (1 << REG_REG) | (1 << SMOOTH_REG) | (1 << SHARP_REG),
+        (1 << REG_SMOOTH) | (1 << SMOOTH_SMOOTH) | (1 << SHARP_SMOOTH),
+        (1 << REG_SHARP) | (1 << SMOOTH_SHARP) | (1 << SHARP_SHARP) },
+      { (1 << REG_REG) | (1 << REG_SMOOTH) | (1 << REG_SHARP),
+        (1 << SMOOTH_REG) | (1 << SMOOTH_SMOOTH) | (1 << SMOOTH_SHARP),
+        (1 << SHARP_REG) | (1 << SHARP_SMOOTH) | (1 << SHARP_SHARP) }
+    };
+
 // For w<=4, MULTITAP_SHARP is the same as EIGHTTAP_REGULAR
 static const InterpFilterParams av1_interp_4tap[SWITCHABLE_FILTERS + 1] = {
   { (const int16_t *)av1_sub_pel_filters_4, SUBPEL_TAPS, SUBPEL_SHIFTS,
@@ -233,6 +259,22 @@ static INLINE const InterpFilterParams *av1_get_filter(int subpel_search) {
     case USE_8_TAPS: return &av1_interp_filter_params_list[EIGHTTAP_REGULAR];
     default: assert(0); return NULL;
   }
+}
+
+static INLINE void reset_interp_filter_allowed_mask(
+    uint16_t *allow_interp_mask, DUAL_FILTER_TYPE filt_type) {
+  uint16_t tmp = (~(1 << filt_type)) & 0xffff;
+  *allow_interp_mask &= (tmp & ALLOW_ALL_INTERP_FILT_MASK);
+}
+
+static INLINE void set_interp_filter_allowed_mask(uint16_t *allow_interp_mask,
+                                                  DUAL_FILTER_TYPE filt_type) {
+  *allow_interp_mask |= (1 << filt_type);
+}
+
+static INLINE uint8_t get_interp_filter_allowed_mask(
+    uint16_t allow_interp_mask, DUAL_FILTER_TYPE filt_type) {
+  return (allow_interp_mask >> filt_type) & 1;
 }
 
 #ifdef __cplusplus

@@ -64,7 +64,7 @@ static const int use_inter_ext_tx_for_txsize[EXT_TX_SETS_INTER]
                                               { 1, 1, 1, 1 },  // unused
                                               { 1, 1, 0, 0 },
                                               { 0, 0, 1, 0 },
-                                              { 0, 0, 0, 1 },
+                                              { 0, 1, 1, 1 },
                                             };
 
 static const int av1_ext_tx_set_idx_to_type[2][AOMMAX(EXT_TX_SETS_INTRA,
@@ -549,8 +549,9 @@ void av1_fill_coeff_costs(MACROBLOCK *x, FRAME_CONTEXT *fc,
         int br_rate[BR_CDF_SIZE];
         int prev_cost = 0;
         int i, j;
-        av1_cost_tokens_from_cdf(br_rate, fc->coeff_br_cdf[tx_size][plane][ctx],
-                                 NULL);
+        av1_cost_tokens_from_cdf(
+            br_rate, fc->coeff_br_cdf[AOMMIN(tx_size, TX_32X32)][plane][ctx],
+            NULL);
         // printf("br_rate: ");
         // for(j = 0; j < BR_CDF_SIZE; j++)
         //  printf("%4d ", br_rate[j]);
@@ -579,15 +580,21 @@ void av1_fill_coeff_costs(MACROBLOCK *x, FRAME_CONTEXT *fc,
   }
 }
 
-void av1_initialize_cost_tables(const AV1_COMMON *const cm, MACROBLOCK *x) {
-  if (cm->cur_frame_force_integer_mv) {
-    av1_build_nmv_cost_table(x->nmv_vec_cost, x->nmvcost, &cm->fc->nmvc,
+void av1_fill_mv_costs(const FRAME_CONTEXT *fc, int integer_mv, int usehp,
+                       MACROBLOCK *x) {
+  x->nmvcost[0] = &x->nmv_costs[0][MV_MAX];
+  x->nmvcost[1] = &x->nmv_costs[1][MV_MAX];
+  x->nmvcost_hp[0] = &x->nmv_costs_hp[0][MV_MAX];
+  x->nmvcost_hp[1] = &x->nmv_costs_hp[1][MV_MAX];
+  if (integer_mv) {
+    av1_build_nmv_cost_table(x->nmv_vec_cost, x->nmvcost, &fc->nmvc,
                              MV_SUBPEL_NONE);
+    x->mv_cost_stack = (int **)&x->nmvcost;
   } else {
+    int *(*src)[2] = usehp ? &x->nmvcost_hp : &x->nmvcost;
+    x->mv_cost_stack = *src;
     av1_build_nmv_cost_table(
-        x->nmv_vec_cost,
-        cm->allow_high_precision_mv ? x->nmvcost_hp : x->nmvcost, &cm->fc->nmvc,
-        cm->allow_high_precision_mv);
+        x->nmv_vec_cost, usehp ? x->nmvcost_hp : x->nmvcost, &fc->nmvc, usehp);
   }
 }
 
@@ -604,9 +611,11 @@ void av1_initialize_rd_consts(AV1_COMP *cpi) {
 
   set_block_thresholds(cm, rd);
 
-  if (!cpi->sf.use_nonrd_pick_mode || frame_is_intra_only(cm) ||
-      (cm->current_frame.frame_number & 0x07) == 1)
-    av1_initialize_cost_tables(cm, x);
+  if ((!cpi->sf.use_nonrd_pick_mode &&
+       cpi->oxcf.mv_cost_upd_freq != COST_UPD_OFF) ||
+      frame_is_intra_only(cm) || (cm->current_frame.frame_number & 0x07) == 1)
+    av1_fill_mv_costs(cm->fc, cm->cur_frame_force_integer_mv,
+                      cm->allow_high_precision_mv, x);
 
   if (frame_is_intra_only(cm) && cm->allow_screen_content_tools &&
       cpi->oxcf.pass != 1) {
@@ -1062,20 +1071,6 @@ void av1_setup_pred_block(const MACROBLOCKD *xd,
   }
 }
 
-int av1_raster_block_offset(BLOCK_SIZE plane_bsize, int raster_block,
-                            int stride) {
-  const int bw = mi_size_wide_log2[plane_bsize];
-  const int y = 4 * (raster_block >> bw);
-  const int x = 4 * (raster_block & ((1 << bw) - 1));
-  return y * stride + x;
-}
-
-int16_t *av1_raster_block_offset_int16(BLOCK_SIZE plane_bsize, int raster_block,
-                                       int16_t *base) {
-  const int stride = block_size_wide[plane_bsize];
-  return base + av1_raster_block_offset(plane_bsize, raster_block, stride);
-}
-
 YV12_BUFFER_CONFIG *av1_get_scaled_ref_frame(const AV1_COMP *cpi,
                                              int ref_frame) {
   assert(ref_frame >= LAST_FRAME && ref_frame <= ALTREF_FRAME);
@@ -1322,10 +1317,18 @@ void av1_update_rd_thresh_fact(const AV1_COMMON *const cm,
   if (rd_thresh > 0) {
     const int top_mode = MAX_MODES;
     int mode;
+    BLOCK_SIZE min_size;
+    BLOCK_SIZE max_size;
+    if (bsize <= cm->seq_params.sb_size) {
+      min_size = AOMMAX(bsize - 1, BLOCK_4X4);
+      max_size = AOMMIN(bsize + 2, (int)cm->seq_params.sb_size);
+    } else {
+      // This part handles block sizes with 1:4 and 4:1 aspect ratios
+      // TODO(any): Experiment with threshold update for parent/child blocks
+      min_size = bsize;
+      max_size = bsize;
+    }
     for (mode = 0; mode < top_mode; ++mode) {
-      const BLOCK_SIZE min_size = AOMMAX(bsize - 1, BLOCK_4X4);
-      const BLOCK_SIZE max_size =
-          AOMMIN(bsize + 2, (int)cm->seq_params.sb_size);
       BLOCK_SIZE bs;
       for (bs = min_size; bs <= max_size; ++bs) {
         int *const fact = &factor_buf[bs][mode];

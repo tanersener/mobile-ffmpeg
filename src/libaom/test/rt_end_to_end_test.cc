@@ -26,7 +26,7 @@ const int kBitrate = 500;
 
 // List of psnr thresholds for speed settings 0-8
 const double kPsnrThreshold[9] = { 37.0, 36.9, 36.8, 36.7, 36.5,
-                                   36.3, 35.8, 35.2, 34.8 };
+                                   36.3, 35.1, 35.0, 34.8 };
 
 typedef struct {
   const char *filename;
@@ -65,8 +65,6 @@ class RTEndToEndTest
     InitializeConfig();
     SetMode(::libaom_test::kRealTime);
 
-    cfg_.g_usage =
-        AOM_USAGE_REALTIME;  // TODO(kyslov): Move it to encode_test_driver.cc
     cfg_.rc_end_usage = AOM_CBR;
     cfg_.g_threads = threads_;
     cfg_.rc_buf_sz = 1000;

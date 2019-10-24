@@ -120,6 +120,7 @@ void aom_lowbd_blend_a64_d16_mask_c(
   }
 }
 
+#if CONFIG_AV1_HIGHBITDEPTH
 void aom_highbd_blend_a64_d16_mask_c(
     uint8_t *dst_8, uint32_t dst_stride, const CONV_BUF_TYPE *src0,
     uint32_t src0_stride, const CONV_BUF_TYPE *src1, uint32_t src1_stride,
@@ -219,6 +220,7 @@ void aom_highbd_blend_a64_d16_mask_c(
     }
   }
 }
+#endif  // CONFIG_AV1_HIGHBITDEPTH
 
 // Blending with alpha mask. Mask values come from the range [0, 64],
 // as described for AOM_BLEND_A64 in aom_dsp/blend.h. src0 or src1 can
@@ -281,6 +283,7 @@ void aom_blend_a64_mask_c(uint8_t *dst, uint32_t dst_stride,
   }
 }
 
+#if CONFIG_AV1_HIGHBITDEPTH
 void aom_highbd_blend_a64_mask_c(uint8_t *dst_8, uint32_t dst_stride,
                                  const uint8_t *src0_8, uint32_t src0_stride,
                                  const uint8_t *src1_8, uint32_t src1_stride,
@@ -343,3 +346,4 @@ void aom_highbd_blend_a64_mask_c(uint8_t *dst_8, uint32_t dst_stride,
     }
   }
 }
+#endif  // CONFIG_AV1_HIGHBITDEPTH

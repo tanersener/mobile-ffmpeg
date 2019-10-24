@@ -24,6 +24,22 @@ include("${AOM_ROOT}/build/cmake/compiler_flags.cmake")
 include("${AOM_ROOT}/build/cmake/compiler_tests.cmake")
 include("${AOM_ROOT}/build/cmake/util.cmake")
 
+if(DEFINED CONFIG_LOWBITDEPTH)
+  message(WARNING "CONFIG_LOWBITDEPTH has been removed. \
+    Use -DFORCE_HIGHBITDEPTH_DECODING=1 instead of -DCONFIG_LOWBITDEPTH=0 \
+    and -DFORCE_HIGHBITDEPTH_DECODING=0 instead of -DCONFIG_LOWBITDEPTH=1.")
+  if(NOT CONFIG_LOWBITDEPTH)
+    set(FORCE_HIGHBITDEPTH_DECODING
+        1
+        CACHE STRING "${cmake_cmdline_helpstring}" FORCE)
+  endif()
+endif()
+
+if(FORCE_HIGHBITDEPTH_DECODING AND NOT CONFIG_AV1_HIGHBITDEPTH)
+  change_config_and_warn(CONFIG_AV1_HIGHBITDEPTH 1
+                         "FORCE_HIGHBITDEPTH_DECODING")
+endif()
+
 # Generate the user config settings.
 list(APPEND aom_build_vars ${AOM_CONFIG_VARS} ${AOM_OPTION_VARS})
 foreach(cache_var ${aom_build_vars})
@@ -36,8 +52,9 @@ string(STRIP "${AOM_CMAKE_CONFIG}" AOM_CMAKE_CONFIG)
 
 # Detect target CPU.
 if(NOT AOM_TARGET_CPU)
-  if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "AMD64"
-     OR "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
+  string(TOLOWER "${CMAKE_SYSTEM_PROCESSOR}" cpu_lowercase)
+  if("${cpu_lowercase}" STREQUAL "amd64"
+     OR "${cpu_lowercase}" STREQUAL "x86_64")
     if(${CMAKE_SIZEOF_VOID_P} EQUAL 4)
       set(AOM_TARGET_CPU "x86")
     elseif(${CMAKE_SIZEOF_VOID_P} EQUAL 8)
@@ -49,15 +66,15 @@ if(NOT AOM_TARGET_CPU)
                     "      CMAKE_SYSTEM_PROCESSOR=${CMAKE_SYSTEM_PROCESSOR}\n"
                     "      CMAKE_GENERATOR=${CMAKE_GENERATOR}\n")
     endif()
-  elseif("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "i386"
-         OR "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86")
+  elseif("${cpu_lowercase}" STREQUAL "i386"
+         OR "${cpu_lowercase}" STREQUAL "x86")
     set(AOM_TARGET_CPU "x86")
-  elseif("${CMAKE_SYSTEM_PROCESSOR}" MATCHES "^arm"
-         OR "${CMAKE_SYSTEM_PROCESSOR}" MATCHES "^mips")
-    set(AOM_TARGET_CPU "${CMAKE_SYSTEM_PROCESSOR}")
-  elseif("${CMAKE_SYSTEM_PROCESSOR}" MATCHES "aarch64")
+  elseif("${cpu_lowercase}" MATCHES "^arm"
+         OR "${cpu_lowercase}" MATCHES "^mips")
+    set(AOM_TARGET_CPU "${cpu_lowercase}")
+  elseif("${cpu_lowercase}" MATCHES "aarch64")
     set(AOM_TARGET_CPU "arm64")
-  elseif("${CMAKE_SYSTEM_PROCESSOR}" MATCHES "^ppc")
+  elseif("${cpu_lowercase}" MATCHES "^ppc")
     set(AOM_TARGET_CPU "ppc")
   else()
     message(WARNING "The architecture ${CMAKE_SYSTEM_PROCESSOR} is not "
@@ -273,6 +290,9 @@ else()
     # providing higher stack limit than usual.
     add_c_flag_if_supported("-Wstack-usage=170000")
     add_cxx_flag_if_supported("-Wstack-usage=270000")
+  elseif(CONFIG_RD_DEBUG) # Another case where higher stack usage is expected.
+    add_c_flag_if_supported("-Wstack-usage=111000")
+    add_cxx_flag_if_supported("-Wstack-usage=240000")
   else()
     add_c_flag_if_supported("-Wstack-usage=100000")
     add_cxx_flag_if_supported("-Wstack-usage=240000")

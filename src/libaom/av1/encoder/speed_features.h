@@ -162,12 +162,16 @@ enum {
   PRUNE_2D_ACCURATE = 1,
   // similar, but applies much more aggressive pruning to get better speed-up
   PRUNE_2D_FAST = 2,
+  PRUNE_2D_MORE = 3,
 } UENUM1BYTE(TX_TYPE_PRUNE_MODE);
 
 typedef struct {
   TX_TYPE_PRUNE_MODE prune_mode;
   int fast_intra_tx_type_search;
   int fast_inter_tx_type_search;
+
+  // prune two least frequently chosen transforms for each intra mode
+  int use_reduced_intra_txset;
 
   // Use a skip flag prediction model to detect blocks with skip = 1 early
   // and avoid doing full TX type search for such blocks.
@@ -179,6 +183,9 @@ typedef struct {
   // skip remaining transform type search when we found the rdcost of skip is
   // better than applying transform
   int skip_tx_search;
+
+  // Prune tx type search using previous frame stats.
+  int prune_tx_type_using_stats;
 } TX_TYPE_SEARCH;
 
 enum {
@@ -271,12 +278,6 @@ enum {
   DIST_WTD_COMP_DISABLED,
 } UENUM1BYTE(DIST_WTD_COMP_FLAG);
 
-typedef enum {
-  FLAG_SKIP_EIGHTTAP = 1 << EIGHTTAP_REGULAR,
-  FLAG_SKIP_EIGHTTAP_SMOOTH = 1 << EIGHTTAP_SMOOTH,
-  FLAG_SKIP_EIGHTTAP_SHARP = 1 << MULTITAP_SHARP,
-} INTERP_FILTER_MASK;
-
 typedef struct SPEED_FEATURES {
   MV_SPEED_FEATURES mv;
 
@@ -290,6 +291,9 @@ typedef struct SPEED_FEATURES {
 
   // Global motion warp error threshold
   GM_ERRORADV_TYPE gm_erroradv_type;
+
+  // Disable adaptive threshold for global motion warp error
+  int disable_adaptive_warp_error_thresh;
 
   // Always set to 0. If on it enables 0 cost background transmission
   // (except for the initial transmission of the segmentation). The feature is
@@ -315,11 +319,6 @@ typedef struct SPEED_FEATURES {
   // This variable is used to cap the maximum number of times we skip testing a
   // mode to be evaluated. A high value means we will be faster.
   int adaptive_rd_thresh;
-
-  // Determine which method we use to determine transform size. We can choose
-  // between options like full rd, largest for prediction size, largest
-  // for intra and model coefs for the rest.
-  TX_SIZE_SEARCH_METHOD tx_size_search_method;
 
   // Init search depth for square and rectangular transform partitions.
   // Values:
@@ -403,11 +402,7 @@ typedef struct SPEED_FEATURES {
   MAX_PART_PRED_MODE auto_max_partition_based_on_simple_motion;
   int auto_min_partition_based_on_simple_motion;
 
-  // Ensures the rd based auto partition search will always
-  // go down at least to the specified level.
-  BLOCK_SIZE rd_auto_partition_min_limit;
-
-  // Min and max partition size we enable (block_size) as per auto
+  // Min and max square partition size we enable (block_size) as per auto
   // min max, but also used by adjust partitioning, and pick_partitioning.
   BLOCK_SIZE default_min_partition_size;
   BLOCK_SIZE default_max_partition_size;
@@ -427,11 +422,17 @@ typedef struct SPEED_FEATURES {
   // Threshold for allowing exhaistive motion search.
   int exhaustive_searches_thresh;
 
-  // Maximum number of exhaustive searches for a frame.
+  // Maximum number of exhaustive searches for a frame (except for intraBC ME).
   int max_exaustive_pct;
 
-  // Pattern to be used for any exhaustive mesh searches.
+  // Maximum number of exhaustive searches in a frame for intraBC ME.
+  int intrabc_max_exaustive_pct;
+
+  // Pattern to be used for any exhaustive mesh searches (except intraBC ME).
   MESH_PATTERN mesh_patterns[MAX_MESH_STEP];
+
+  // Pattern to be used for exhaustive mesh searches of intraBC ME.
+  MESH_PATTERN intrabc_mesh_patterns[MAX_MESH_STEP];
 
   // Adaptive prediction mode search
   int adaptive_mode_search;
@@ -507,12 +508,20 @@ typedef struct SPEED_FEATURES {
   // 1: use transform domain in tx_type search, and use image domain for
   // RD_STATS
   // 2: use transform domain
-  int use_transform_domain_distortion;
+  int tx_domain_dist_level;
+
+  // Transform domain distortion threshold level
+  int tx_domain_dist_thres_level;
 
   GM_SEARCH_TYPE gm_search_type;
 
   // whether to disable the global motion recode loop
   int gm_disable_recode;
+
+  // During global motion estimation, prune remaining reference frames in a
+  // given direction(past/future), if the evaluated ref_frame in that direction
+  // yields gm_type as INVALID/TRANSLATION/IDENTITY
+  int prune_ref_frame_for_gm_search;
 
   // Do limited interpolation filter search for dual filters, since best choice
   // usually includes EIGHTTAP_REGULAR.
@@ -536,6 +545,10 @@ typedef struct SPEED_FEATURES {
   // flag to allow skipping intra mode for inter frame prediction
   int skip_intra_in_interframe;
 
+  // variance threshold for intra mode gating when inter turned out to be skip
+  // in inter frame prediction
+  unsigned int src_var_thresh_intra_skip;
+
   // Use hash table to store intra(keyframe only) txb transform search results
   // to avoid repeated search on the same residue signal.
   int use_intra_txb_hash;
@@ -550,9 +563,6 @@ typedef struct SPEED_FEATURES {
 
   // Calculate RD cost before doing optimize_b, and skip if the cost is large.
   int optimize_b_precheck;
-
-  // Use two-loop compound search
-  int two_loop_comp_search;
 
   // Decide when and how to use joint_comp.
   DIST_WTD_COMP_FLAG use_dist_wtd_comp_flag;
@@ -605,6 +615,10 @@ typedef struct SPEED_FEATURES {
   // Enable/disable ME for interinter wedge search.
   int disable_interinter_wedge_newmv_search;
 
+  // Enable/disable ME for interinter diffwtd search. PSNR BD-rate gain of
+  // ~0.1 on the lowres test set, but ~15% slower computation.
+  int enable_interinter_diffwtd_newmv_search;
+
   // Enable/disable smooth inter-intra mode
   int disable_smooth_interintra;
 
@@ -629,6 +643,10 @@ typedef struct SPEED_FEATURES {
   // TRANSLATION and AFFINE(based on number of warp neighbors)
   int prune_warp_using_wmtype;
 
+  // The aggresiveness of pruning with simple_motion_search.
+  // Currently 0 is the lowest, and 2 the highest.
+  int simple_motion_search_prune_agg;
+
   // Perform simple_motion_search on each possible subblock and use it to prune
   // PARTITION_HORZ and PARTITION_VERT.
   int simple_motion_search_prune_rect;
@@ -649,9 +667,6 @@ typedef struct SPEED_FEATURES {
   // adaptive interp_filter search to allow skip of certain filter types.
   int adaptive_interp_filter_search;
 
-  // mask for skip evaluation of certain interp_filter type.
-  INTERP_FILTER_MASK interp_filter_search_mask;
-
   // Flag used to control the ref_best_rd based gating for chroma
   int perform_best_rd_based_gating_for_chroma;
 
@@ -666,6 +681,28 @@ typedef struct SPEED_FEATURES {
 
   // Flag used to control the extent of coeff R-D optimization
   int perform_coeff_opt;
+
+  // Flag used to control the winner mode processing for better R-D optimization
+  // of quantized coeffs
+  int enable_winner_mode_for_coeff_opt;
+
+  // Flag used to control the winner mode processing for transform size
+  // search method
+  int enable_winner_mode_for_tx_size_srch;
+
+  // Control transform size search level
+  // Eval type: Default       Mode        Winner
+  // Level 0  : FULL RD     LARGEST ALL   FULL RD
+  // Level 1  : FAST RD     LARGEST ALL   FULL RD
+  // Level 2  : LARGEST ALL LARGEST ALL   FULL RD
+  int tx_size_search_level;
+
+  // Flag used to control the winner mode processing for use transform
+  // domain distortion
+  int enable_winner_mode_for_use_tx_domain_dist;
+
+  // Flag used to enable processing of multiple winner modes
+  int enable_multiwinner_mode_process;
 
   // Flag used to control the speed of the eob selection in trellis.
   int trellis_eob_fast;
@@ -684,8 +721,8 @@ typedef struct SPEED_FEATURES {
   int use_real_time_ref_set;
 
   // Perform a full TX search on some modes while using the
-  // inter-mode RD model for others. Only enabled when
-  // inter_mode_rd_model_estimation != 0
+  // inter-mode RD model for others. Currently not in use.
+  // TODO(any): Find out when we can actually skip tx_search on some modes.
   int inter_mode_rd_model_estimation_adaptive;
 
   // Use very reduced set of inter mode checks and fast non-rd mode cost
@@ -717,6 +754,50 @@ typedef struct SPEED_FEATURES {
   // Use CNN with luma pixels on source frame on each of the 64x64 subblock to
   // perform split/no_split decision on intra-frames.
   int intra_cnn_split;
+
+  // Use modeled (currently CurvFit model) RDCost for fast non-RD mode
+  int use_modeled_non_rd_cost;
+
+  // Filter mask to allow certain interp_filter type.
+  uint16_t interp_filter_search_mask;
+
+  // Skip a number of expensive mode evaluations for blocks with very low
+  // temporal variance.
+  int short_circuit_low_temp_var;
+
+  // Use interpolation filter search in non-RD mode decision.
+  int use_nonrd_filter_search;
+
+  // Use reduced 1/8th pel mv usage, in the range 0 - 2, where
+  // 0: maximizes quality and does not reduce mv precision
+  // 1: more aggressive reduced usage of high precision MV
+  // 2: use only quarter pel motion
+  int reduce_high_precision_mv_usage;
+
+  // Whether to override and disable sb level coeff cost updates, if
+  // cpi->oxcf.coeff_cost_upd_freq = COST_UPD_SB (i.e. set at SB level)
+  int disable_sb_level_coeff_cost_upd;
+
+  // Whether to override and disable sb level mv cost updates, if
+  // cpi->oxcf.coeff_cost_upd_freq = COST_UPD_SB (i.e. set at SB level)
+  int disable_sb_level_mv_cost_upd;
+
+  // Whether to disable overlay frames for filtered Altref frames,
+  // overiding oxcf->enable_overlay flag set as 1.
+  int disable_overlay_frames;
+
+  // Enable/disable adaptively deciding whether or not to encode ALTREF overlay
+  // frame.
+  int adaptive_overlay_encoding;
+
+  // Use ALTREF frame in non-RD mode decision.
+  int use_nonrd_altref_frame;
+
+  // If set forces interpolation filter to EIGHTTAP_REGULAR
+  int skip_interp_filter_search;
+
+  // For nonrd: use block_yrd for rd cost in interpolation filter search.
+  int nonrd_use_blockyrd_interp_filter;
 } SPEED_FEATURES;
 
 struct AV1_COMP;

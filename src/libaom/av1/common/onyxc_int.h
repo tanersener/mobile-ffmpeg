@@ -72,7 +72,7 @@ extern "C" {
 // multiplication.
 #define MAX_NUM_OPERATING_POINTS \
   MAX_NUM_TEMPORAL_LAYERS * MAX_NUM_SPATIAL_LAYERS
-/* clang-format on*/
+/* clang-format on */
 
 // TODO(jingning): Turning this on to set up transform coefficient
 // processing timer.
@@ -109,13 +109,11 @@ typedef struct {
   MV_REFERENCE_FRAME ref_frame;
 } MV_REF;
 
-
 typedef struct RefCntBuffer {
   // For a RefCntBuffer, the following are reference-holding variables:
   // - cm->ref_frame_map[]
   // - cm->cur_frame
   // - cm->scaled_ref_buf[] (encoder only)
-  // - cm->next_ref_frame_map[] (decoder only)
   // - pbi->output_frame_index[] (decoder only)
   // With that definition, 'ref_count' is the number of reference-holding
   // variables that are currently referencing this buffer.
@@ -128,6 +126,13 @@ typedef struct RefCntBuffer {
 
   unsigned int order_hint;
   unsigned int ref_order_hints[INTER_REFS_PER_FRAME];
+
+  // These variables are used only in encoder and compare the absolute
+  // display order hint to compute the relative distance and overcome
+  // the limitation of get_relative_dist() which returns incorrect
+  // distance when a very old frame is used as a reference.
+  unsigned int display_order_hint;
+  unsigned int ref_display_order_hint[INTER_REFS_PER_FRAME];
 
   MV_REF *mvs;
   uint8_t *seg_map;
@@ -204,15 +209,15 @@ typedef struct {
 } DeltaQInfo;
 
 typedef struct {
-  int enable_order_hint;           // 0 - disable order hint, and related tools
-  int order_hint_bits_minus_1;     // dist_wtd_comp, ref_frame_mvs,
-                                   // frame_sign_bias
-                                   // if 0, enable_dist_wtd_comp and
-                                   // enable_ref_frame_mvs must be set as 0.
-  int enable_dist_wtd_comp;        // 0 - disable dist-wtd compound modes
-                                   // 1 - enable it
-  int enable_ref_frame_mvs;        // 0 - disable ref frame mvs
-                                   // 1 - enable it
+  int enable_order_hint;        // 0 - disable order hint, and related tools
+  int order_hint_bits_minus_1;  // dist_wtd_comp, ref_frame_mvs,
+                                // frame_sign_bias
+                                // if 0, enable_dist_wtd_comp and
+                                // enable_ref_frame_mvs must be set as 0.
+  int enable_dist_wtd_comp;     // 0 - disable dist-wtd compound modes
+                                // 1 - enable it
+  int enable_ref_frame_mvs;     // 0 - disable ref frame mvs
+                                // 1 - enable it
 } OrderHintInfo;
 
 // Sequence header structure.
@@ -275,18 +280,31 @@ typedef struct SequenceHeader {
   aom_transfer_characteristics_t transfer_characteristics;
   aom_matrix_coefficients_t matrix_coefficients;
   int color_range;
-  int subsampling_x;          // Chroma subsampling for x
-  int subsampling_y;          // Chroma subsampling for y
+  int subsampling_x;  // Chroma subsampling for x
+  int subsampling_y;  // Chroma subsampling for y
   aom_chroma_sample_position_t chroma_sample_position;
   uint8_t separate_uv_delta_q;
   uint8_t film_grain_params_present;
 } SequenceHeader;
 
 typedef struct {
-    int skip_mode_allowed;
-    int skip_mode_flag;
-    int ref_frame_idx_0;
-    int ref_frame_idx_1;
+  int frame_width;
+  int frame_height;
+  int mi_rows;
+  int mi_cols;
+  int mb_rows;
+  int mb_cols;
+  int num_mbs;
+  aom_bit_depth_t bit_depth;
+  int subsampling_x;
+  int subsampling_y;
+} FRAME_INFO;
+
+typedef struct {
+  int skip_mode_allowed;
+  int skip_mode_flag;
+  int ref_frame_idx_0;
+  int ref_frame_idx_1;
 } SkipModeInfo;
 
 typedef struct {
@@ -294,6 +312,7 @@ typedef struct {
   REFERENCE_MODE reference_mode;
 
   unsigned int order_hint;
+  unsigned int display_order_hint;
   unsigned int frame_number;
   SkipModeInfo skip_mode_info;
   int refresh_frame_flags;  // Which ref frames are overwritten by this frame
@@ -354,9 +373,6 @@ typedef struct AV1Common {
   // a pointer to the buffer in the buffer pool 'cm->buffer_pool.frame_bufs'.
   RefCntBuffer *ref_frame_map[REF_FRAMES];
 
-  // Prepare ref_frame_map for the next frame.
-  // Only used in frame parallel decode.
-  RefCntBuffer *next_ref_frame_map[REF_FRAMES];
   FRAME_TYPE last_frame_type; /* last frame's frame type for motion search.*/
 
   int show_frame;
@@ -419,24 +435,26 @@ typedef struct AV1Common {
 
   /* We allocate a MB_MODE_INFO struct for each macroblock, together with
      an extra row on top and column on the left to simplify prediction. */
-  int mi_alloc_size;
-  MB_MODE_INFO *mi;  /* Corresponds to upper left visible macroblock */
+  int mi_alloc_size, mi_grid_size;
+  MB_MODE_INFO *mi; /* Corresponds to upper left visible macroblock */
+  uint8_t *tx_type_map;
 
-  // TODO(agrange): Move prev_mi into encoder structure.
-  // prev_mi will only be allocated in encoder.
-  MB_MODE_INFO *prev_mi;  /* 'mi' from last frame */
+  // The minimum size each allocated mi can correspond to.
+  // For decoder, this is always BLOCK_4X4.
+  // For encoder, this is currently set to BLOCK_4X4 for resolution below 4k,
+  // and BLOCK_8X8 for resolution above 4k
+  BLOCK_SIZE mi_alloc_bsize;
+  int mi_alloc_rows, mi_alloc_cols, mi_alloc_stride;
 
   // Separate mi functions between encoder and decoder.
-  int (*alloc_mi)(struct AV1Common *cm, int mi_size);
+  int (*alloc_mi)(struct AV1Common *cm);
   void (*free_mi)(struct AV1Common *cm);
   void (*setup_mi)(struct AV1Common *cm);
+  void (*set_mb_mi)(struct AV1Common *cm, int height, int width);
 
   // Grid of pointers to 4x4 MB_MODE_INFO structs. Any 4x4 not in the visible
   // area will be NULL.
   MB_MODE_INFO **mi_grid_base;
-  MB_MODE_INFO **mi_grid_visible;
-  MB_MODE_INFO **prev_mi_grid_base;
-  MB_MODE_INFO **prev_mi_grid_visible;
 
   // Whether to use previous frames' motion vectors for prediction.
   int allow_ref_frame_mvs;
@@ -478,7 +496,7 @@ typedef struct AV1Common {
   MV_REFERENCE_FRAME comp_fwd_ref[FWD_REFS];
   MV_REFERENCE_FRAME comp_bwd_ref[BWD_REFS];
 
-  FRAME_CONTEXT *fc;              /* this frame entropy */
+  FRAME_CONTEXT *fc; /* this frame entropy */
   FRAME_CONTEXT *default_frame_context;
   int primary_ref_frame;
 
@@ -632,7 +650,7 @@ static INLINE RefCntBuffer *assign_cur_frame_new_fb(AV1_COMMON *const cm) {
 // Modify 'lhs_ptr' to reference the buffer at 'rhs_ptr', and update the ref
 // counts accordingly.
 static INLINE void assign_frame_buffer_p(RefCntBuffer **lhs_ptr,
-                                       RefCntBuffer *rhs_ptr) {
+                                         RefCntBuffer *rhs_ptr) {
   RefCntBuffer *const old_ptr = *lhs_ptr;
   if (old_ptr != NULL) {
     assert(old_ptr->ref_count > 0);
@@ -647,7 +665,7 @@ static INLINE void assign_frame_buffer_p(RefCntBuffer **lhs_ptr,
 
 static INLINE int frame_is_intra_only(const AV1_COMMON *const cm) {
   return cm->current_frame.frame_type == KEY_FRAME ||
-      cm->current_frame.frame_type == INTRA_ONLY_FRAME;
+         cm->current_frame.frame_type == INTRA_ONLY_FRAME;
 }
 
 static INLINE int frame_is_sframe(const AV1_COMMON *cm) {
@@ -694,9 +712,9 @@ static INLINE RefCntBuffer *get_primary_ref_frame_buf(
 // Returns 1 if this frame might allow mvs from some reference frame.
 static INLINE int frame_might_allow_ref_frame_mvs(const AV1_COMMON *cm) {
   return !cm->error_resilient_mode &&
-    cm->seq_params.order_hint_info.enable_ref_frame_mvs &&
-    cm->seq_params.order_hint_info.enable_order_hint &&
-    !frame_is_intra_only(cm);
+         cm->seq_params.order_hint_info.enable_ref_frame_mvs &&
+         cm->seq_params.order_hint_info.enable_order_hint &&
+         !frame_is_intra_only(cm);
 }
 
 // Returns 1 if this frame might use warped_motion
@@ -1115,13 +1133,15 @@ static INLINE int max_intra_block_height(const MACROBLOCKD *xd,
   return ALIGN_POWER_OF_TWO(max_blocks_high, tx_size_high_log2[tx_size]);
 }
 
-static INLINE void av1_zero_above_context(AV1_COMMON *const cm, const MACROBLOCKD *xd,
-  int mi_col_start, int mi_col_end, const int tile_row) {
+static INLINE void av1_zero_above_context(AV1_COMMON *const cm,
+                                          const MACROBLOCKD *xd,
+                                          int mi_col_start, int mi_col_end,
+                                          const int tile_row) {
   const SequenceHeader *const seq_params = &cm->seq_params;
   const int num_planes = av1_num_planes(cm);
   const int width = mi_col_end - mi_col_start;
   const int aligned_width =
-    ALIGN_POWER_OF_TWO(width, seq_params->mib_size_log2);
+      ALIGN_POWER_OF_TWO(width, seq_params->mib_size_log2);
 
   const int offset_y = mi_col_start;
   const int width_y = aligned_width;
@@ -1142,8 +1162,7 @@ static INLINE void av1_zero_above_context(AV1_COMMON *const cm, const MACROBLOCK
   av1_zero_array(cm->above_seg_context[tile_row] + mi_col_start, aligned_width);
 
   memset(cm->above_txfm_context[tile_row] + mi_col_start,
-    tx_size_wide[TX_SIZES_LARGEST],
-    aligned_width * sizeof(TXFM_CONTEXT));
+         tx_size_wide[TX_SIZES_LARGEST], aligned_width * sizeof(TXFM_CONTEXT));
 }
 
 static INLINE void av1_zero_left_context(MACROBLOCKD *const xd) {
@@ -1183,6 +1202,28 @@ static INLINE void set_txfm_ctxs(TX_SIZE tx_size, int n4_w, int n4_h, int skip,
 
   set_txfm_ctx(xd->above_txfm_context, bw, n4_w);
   set_txfm_ctx(xd->left_txfm_context, bh, n4_h);
+}
+
+static INLINE int get_mi_grid_idx(const AV1_COMMON *cm, int mi_row,
+                                  int mi_col) {
+  return mi_row * cm->mi_stride + mi_col;
+}
+
+static INLINE int get_alloc_mi_idx(const AV1_COMMON *cm, int mi_row,
+                                   int mi_col) {
+  const int mi_alloc_size_1d = mi_size_wide[cm->mi_alloc_bsize];
+  const int mi_alloc_row = mi_row / mi_alloc_size_1d;
+  const int mi_alloc_col = mi_col / mi_alloc_size_1d;
+
+  return mi_alloc_row * cm->mi_alloc_stride + mi_alloc_col;
+}
+
+static INLINE int get_mi_ext_idx(const AV1_COMMON *cm, int mi_row, int mi_col) {
+  const int mi_alloc_size_1d = mi_size_wide[cm->mi_alloc_bsize];
+  const int mi_alloc_row = mi_row / mi_alloc_size_1d;
+  const int mi_alloc_col = mi_col / mi_alloc_size_1d;
+
+  return mi_alloc_row * cm->mi_alloc_cols + mi_alloc_col;
 }
 
 static INLINE void txfm_partition_update(TXFM_CONTEXT *above_ctx,
@@ -1280,7 +1321,7 @@ static INLINE PARTITION_TYPE get_partition(const AV1_COMMON *const cm,
   if (mi_row >= cm->mi_rows || mi_col >= cm->mi_cols) return PARTITION_INVALID;
 
   const int offset = mi_row * cm->mi_stride + mi_col;
-  MB_MODE_INFO **mi = cm->mi_grid_visible + offset;
+  MB_MODE_INFO **mi = cm->mi_grid_base + offset;
   const BLOCK_SIZE subsize = mi[0]->sb_type;
 
   if (subsize == bsize) return PARTITION_NONE;
@@ -1374,7 +1415,28 @@ static INLINE int is_coded_lossless(const AV1_COMMON *cm,
 }
 
 static INLINE int is_valid_seq_level_idx(AV1_LEVEL seq_level_idx) {
-  return seq_level_idx < SEQ_LEVELS || seq_level_idx == SEQ_LEVEL_MAX;
+  return seq_level_idx == SEQ_LEVEL_MAX ||
+         (seq_level_idx < SEQ_LEVELS &&
+          // The following levels are currently undefined.
+          seq_level_idx != SEQ_LEVEL_2_2 && seq_level_idx != SEQ_LEVEL_2_3 &&
+          seq_level_idx != SEQ_LEVEL_3_2 && seq_level_idx != SEQ_LEVEL_3_3 &&
+          seq_level_idx != SEQ_LEVEL_4_2 && seq_level_idx != SEQ_LEVEL_4_3 &&
+          seq_level_idx != SEQ_LEVEL_7_0 && seq_level_idx != SEQ_LEVEL_7_1 &&
+          seq_level_idx != SEQ_LEVEL_7_2 && seq_level_idx != SEQ_LEVEL_7_3);
+}
+
+static INLINE void init_frame_info(FRAME_INFO *frame_info,
+                                   AV1_COMMON *const cm) {
+  frame_info->frame_width = cm->width;
+  frame_info->frame_height = cm->height;
+  frame_info->mi_cols = cm->mi_cols;
+  frame_info->mi_rows = cm->mi_rows;
+  frame_info->mb_cols = cm->mb_cols;
+  frame_info->mb_rows = cm->mb_rows;
+  frame_info->num_mbs = cm->MBs;
+  frame_info->bit_depth = cm->seq_params.bit_depth;
+  frame_info->subsampling_x = cm->seq_params.subsampling_x;
+  frame_info->subsampling_y = cm->seq_params.subsampling_y;
 }
 
 #ifdef __cplusplus

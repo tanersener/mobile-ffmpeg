@@ -510,7 +510,8 @@ static uint32_t read_and_decode_one_tile_list(AV1Decoder *pbi,
       cm->error.error_code = AOM_CODEC_CORRUPT_FRAME;
       return 0;
     }
-    av1_set_reference_dec(cm, 0, 1, &pbi->ext_refs.refs[ref_idx]);
+    av1_set_reference_dec(cm, cm->remapped_ref_idx[0], 1,
+                          &pbi->ext_refs.refs[ref_idx]);
 
     pbi->dec_tile_row = aom_rb_read_literal(rb, 8);
     pbi->dec_tile_col = aom_rb_read_literal(rb, 8);
@@ -825,6 +826,11 @@ int aom_decode_frame_from_obus(struct AV1Decoder *pbi, const uint8_t *data,
       case OBU_SEQUENCE_HEADER:
         decoded_payload_size = read_sequence_header_obu(pbi, &rb);
         if (cm->error.error_code != AOM_CODEC_OK) return -1;
+        // The sequence header should not change in the middle of a frame.
+        if (pbi->sequence_header_changed && pbi->seen_frame_header) {
+          cm->error.error_code = AOM_CODEC_CORRUPT_FRAME;
+          return -1;
+        }
         break;
       case OBU_FRAME_HEADER:
       case OBU_REDUNDANT_FRAME_HEADER:

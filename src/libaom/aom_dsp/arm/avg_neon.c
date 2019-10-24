@@ -21,7 +21,7 @@ unsigned int aom_avg_4x4_neon(const uint8_t *a, int a_stride) {
   const uint16x8_t c = vaddl_u8(vget_low_u8(b), vget_high_u8(b));
 #if defined(__aarch64__)
   const uint32_t d = vaddlvq_u16(c);
-  return d >> 4;
+  return (d + 8) >> 4;
 #else
   const uint32x2_t d = horizontal_add_u16x8(c);
   return vget_lane_u32(vrshr_n_u32(d, 4), 0);

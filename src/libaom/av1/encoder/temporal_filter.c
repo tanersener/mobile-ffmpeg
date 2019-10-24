@@ -12,6 +12,7 @@
 #include <math.h>
 #include <limits.h>
 
+#include "av1/common/blockd.h"
 #include "config/aom_config.h"
 
 #include "av1/common/alloccommon.h"
@@ -32,15 +33,13 @@
 #include "aom_mem/aom_mem.h"
 #include "aom_ports/mem.h"
 #include "aom_ports/aom_timer.h"
+#include "aom_ports/system_state.h"
 #include "aom_scale/aom_scale.h"
 
 #define EXPERIMENT_TEMPORAL_FILTER 1
 #define WINDOW_LENGTH 2
 #define WINDOW_SIZE 25
 #define SCALE 1000
-
-#define EDGE_THRESHOLD 50
-#define SQRT_PI_BY_2 1.25331413732
 
 static unsigned int index_mult[14] = { 0,     0,     0,     0,     49152,
                                        39322, 32768, 28087, 24576, 21846,
@@ -695,7 +694,10 @@ void av1_temporal_filter_plane_c(uint8_t *frame1, unsigned int stride,
       }
       diff_sse /= WINDOW_SIZE;
 
-      double w = exp(-diff_sse / (2 * beta * h * h));
+      double scaled_diff = -diff_sse / (2 * beta * h * h);
+      // clamp the value to avoid underflow in exp()
+      if (scaled_diff < -15) scaled_diff = -15;
+      double w = exp(scaled_diff);
       const int weight = (int)(w * SCALE);
 
       count[k] += weight;
@@ -738,7 +740,10 @@ void av1_highbd_temporal_filter_plane_c(
       }
       diff_sse /= WINDOW_SIZE;
 
-      double w = exp(-diff_sse / (2 * beta * h * h));
+      double scaled_diff = -diff_sse / (2 * beta * h * h);
+      // clamp the value to avoid underflow in exp()
+      if (scaled_diff < -20) scaled_diff = -20;
+      double w = exp(scaled_diff);
       const int weight = (int)(w * SCALE);
 
       count[k] += weight;
@@ -860,31 +865,26 @@ void apply_temporal_filter_block(YV12_BUFFER_CONFIG *frame, MACROBLOCKD *mbd,
 }
 #endif  // EXPERIMENT_TEMPORAL_FILTER
 
-static int temporal_filter_find_matching_mb_c(AV1_COMP *cpi,
-                                              uint8_t *arf_frame_buf,
-                                              uint8_t *frame_ptr_buf,
-                                              int stride, int x_pos, int y_pos,
-                                              MV *blk_mvs, int *blk_bestsme) {
+static int temporal_filter_find_matching_mb_c(
+    AV1_COMP *cpi, uint8_t *arf_frame_buf, uint8_t *frame_ptr_buf, int stride,
+    int x_pos, int y_pos, MV *blk_mvs, int *blk_bestsme, MV *best_ref_mv1,
+    int step_param) {
   MACROBLOCK *const x = &cpi->td.mb;
   MACROBLOCKD *const xd = &x->e_mbd;
   const MV_SPEED_FEATURES *const mv_sf = &cpi->sf.mv;
-  int step_param;
   int sadpb = x->sadperbit16;
   int bestsme = INT_MAX;
   int distortion;
   unsigned int sse;
   int cost_list[5];
   MvLimits tmp_mv_limits = x->mv_limits;
-
-  MV best_ref_mv1 = kZeroMv;
   MV best_ref_mv1_full; /* full-pixel value of best_ref_mv1 */
-
+  MV ref_mv = kZeroMv;
   // Save input state
   struct buf_2d src = x->plane[0].src;
   struct buf_2d pre = xd->plane[0].pre[0];
-
-  best_ref_mv1_full.col = best_ref_mv1.col >> 3;
-  best_ref_mv1_full.row = best_ref_mv1.row >> 3;
+  best_ref_mv1_full.col = best_ref_mv1->col >> 3;
+  best_ref_mv1_full.row = best_ref_mv1->row >> 3;
 
   // Setup frame pointers
   x->plane[0].src.buf = arf_frame_buf;
@@ -892,17 +892,14 @@ static int temporal_filter_find_matching_mb_c(AV1_COMP *cpi,
   xd->plane[0].pre[0].buf = frame_ptr_buf;
   xd->plane[0].pre[0].stride = stride;
 
-  step_param = mv_sf->reduce_first_step_size;
-  step_param = AOMMIN(step_param, MAX_MVSEARCH_STEPS - 2);
-
-  av1_set_mv_search_range(&x->mv_limits, &best_ref_mv1);
+  av1_set_mv_search_range(&x->mv_limits, &ref_mv);
 
   // av1_full_pixel_search() parameters: best_ref_mv1_full is the start mv, and
-  // best_ref_mv1 is for mv rate calculation. The search result is stored in
+  // ref_mv is for mv rate calculation. The search result is stored in
   // x->best_mv.
   av1_full_pixel_search(cpi, x, TF_BLOCK, &best_ref_mv1_full, step_param, NSTEP,
-                        1, sadpb, cond_cost_list(cpi, cost_list), &best_ref_mv1,
-                        0, 0, x_pos, y_pos, 0, &cpi->ss_cfg[SS_CFG_LOOKAHEAD]);
+                        1, sadpb, cond_cost_list(cpi, cost_list), &ref_mv, 0, 0,
+                        x_pos, y_pos, 0, &cpi->ss_cfg[SS_CFG_LOOKAHEAD], 0);
   x->mv_limits = tmp_mv_limits;
 
   // Ignore mv costing by sending NULL pointer instead of cost array
@@ -928,12 +925,12 @@ static int temporal_filter_find_matching_mb_c(AV1_COMP *cpi,
     return bestsme;
   }
 
-  // find_fractional_mv_step parameters: best_ref_mv1 is for mv rate cost
+  // find_fractional_mv_step parameters: ref_mv is for mv rate cost
   // calculation. The start full mv and the search result are stored in
   // x->best_mv. mi_row and mi_col are only needed for "av1_is_scaled(sf)=1"
   // case.
   bestsme = cpi->find_fractional_mv_step(
-      x, &cpi->common, 0, 0, &best_ref_mv1, cpi->common.allow_high_precision_mv,
+      x, &cpi->common, 0, 0, &ref_mv, cpi->common.allow_high_precision_mv,
       x->errorperbit, &cpi->fn_ptr[TF_BLOCK], 0, mv_sf->subpel_iters_per_step,
       cond_cost_list(cpi, cost_list), NULL, NULL, &distortion, &sse, NULL, NULL,
       0, 0, BW, BH, USE_8_TAPS, 1);
@@ -942,10 +939,10 @@ static int temporal_filter_find_matching_mb_c(AV1_COMP *cpi,
 
   // DO motion search on 4 16x16 sub_blocks.
   int i, j, k = 0;
-  best_ref_mv1.row = x->e_mbd.mi[0]->mv[0].as_mv.row;
-  best_ref_mv1.col = x->e_mbd.mi[0]->mv[0].as_mv.col;
-  best_ref_mv1_full.col = best_ref_mv1.col >> 3;
-  best_ref_mv1_full.row = best_ref_mv1.row >> 3;
+  best_ref_mv1->row = x->e_mbd.mi[0]->mv[0].as_mv.row;
+  best_ref_mv1->col = x->e_mbd.mi[0]->mv[0].as_mv.col;
+  best_ref_mv1_full.col = best_ref_mv1->col >> 3;
+  best_ref_mv1_full.row = best_ref_mv1->row >> 3;
 
   for (i = 0; i < BH; i += SUB_BH) {
     for (j = 0; j < BW; j += SUB_BW) {
@@ -955,19 +952,19 @@ static int temporal_filter_find_matching_mb_c(AV1_COMP *cpi,
       xd->plane[0].pre[0].buf = frame_ptr_buf + i * stride + j;
       xd->plane[0].pre[0].stride = stride;
 
-      av1_set_mv_search_range(&x->mv_limits, &best_ref_mv1);
+      av1_set_mv_search_range(&x->mv_limits, &ref_mv);
       av1_full_pixel_search(cpi, x, TF_SUB_BLOCK, &best_ref_mv1_full,
                             step_param, NSTEP, 1, sadpb,
-                            cond_cost_list(cpi, cost_list), &best_ref_mv1, 0, 0,
-                            x_pos, y_pos, 0, &cpi->ss_cfg[SS_CFG_LOOKAHEAD]);
+                            cond_cost_list(cpi, cost_list), &ref_mv, 0, 0,
+                            x_pos, y_pos, 0, &cpi->ss_cfg[SS_CFG_LOOKAHEAD], 0);
       x->mv_limits = tmp_mv_limits;
 
       blk_bestsme[k] = cpi->find_fractional_mv_step(
-          x, &cpi->common, 0, 0, &best_ref_mv1,
-          cpi->common.allow_high_precision_mv, x->errorperbit,
-          &cpi->fn_ptr[TF_SUB_BLOCK], 0, mv_sf->subpel_iters_per_step,
-          cond_cost_list(cpi, cost_list), NULL, NULL, &distortion, &sse, NULL,
-          NULL, 0, 0, SUB_BW, SUB_BH, USE_8_TAPS, 1);
+          x, &cpi->common, 0, 0, &ref_mv, cpi->common.allow_high_precision_mv,
+          x->errorperbit, &cpi->fn_ptr[TF_SUB_BLOCK], 0,
+          mv_sf->subpel_iters_per_step, cond_cost_list(cpi, cost_list), NULL,
+          NULL, &distortion, &sse, NULL, NULL, 0, 0, SUB_BW, SUB_BH, USE_8_TAPS,
+          1);
 
       blk_mvs[k] = x->best_mv.as_mv;
       k++;
@@ -981,18 +978,28 @@ static int temporal_filter_find_matching_mb_c(AV1_COMP *cpi,
   return bestsme;
 }
 
-static void temporal_filter_iterate_c(AV1_COMP *cpi,
-                                      YV12_BUFFER_CONFIG **frames,
-                                      int frame_count, int alt_ref_index,
-                                      int strength, double sigma,
-                                      struct scale_factors *ref_scale_factors) {
+static int get_rows(int h) { return (h + BH - 1) >> BH_LOG2; }
+static int get_cols(int w) { return (w + BW - 1) >> BW_LOG2; }
+
+typedef struct {
+  int64_t sum;
+  int64_t sse;
+} FRAME_DIFF;
+
+static FRAME_DIFF temporal_filter_iterate_c(
+    AV1_COMP *cpi, YV12_BUFFER_CONFIG **frames, int frame_count,
+    int alt_ref_index, int strength, double sigma, int is_key_frame,
+    struct scale_factors *ref_scale_factors) {
   const AV1_COMMON *cm = &cpi->common;
   const int num_planes = av1_num_planes(cm);
+  const int mb_cols = get_cols(frames[alt_ref_index]->y_crop_width);
+  const int mb_rows = get_rows(frames[alt_ref_index]->y_crop_height);
+  // TODO(any): the thresholds in this function need to adjusted based on bit_
+  // depth, so that they work better in HBD encoding.
+  const int bd_shift = cm->seq_params.bit_depth - 8;
   int byte;
   int frame;
   int mb_col, mb_row;
-  int mb_cols = (frames[alt_ref_index]->y_crop_width + BW - 1) >> BW_LOG2;
-  int mb_rows = (frames[alt_ref_index]->y_crop_height + BH - 1) >> BH_LOG2;
   int mb_y_offset = 0;
   int mb_y_src_offset = 0;
   int mb_uv_offset = 0;
@@ -1009,8 +1016,8 @@ static void temporal_filter_iterate_c(AV1_COMP *cpi,
   const int mb_uv_width = BW >> mbd->plane[1].subsampling_x;
 #if EXPERIMENT_TEMPORAL_FILTER
   const int is_screen_content_type = cm->allow_screen_content_tools != 0;
-  const int use_new_temporal_mode =
-      AOMMIN(cm->width, cm->height) >= 480 && !is_screen_content_type;
+  const int use_new_temporal_mode = AOMMIN(cm->width, cm->height) >= 480 &&
+                                    !is_screen_content_type && !is_key_frame;
 #else
   (void)sigma;
   const int use_new_temporal_mode = 0;
@@ -1026,10 +1033,24 @@ static void temporal_filter_iterate_c(AV1_COMP *cpi,
     predictor = predictor8;
   }
 
+  const unsigned int dim = AOMMIN(frames[alt_ref_index]->y_crop_width,
+                                  frames[alt_ref_index]->y_crop_height);
+  // Decide search param based on image resolution.
+  const int step_param = av1_init_search_range(dim);
+
   mbd->block_ref_scale_factors[0] = ref_scale_factors;
   mbd->block_ref_scale_factors[1] = ref_scale_factors;
 
   for (i = 0; i < num_planes; i++) input_buffer[i] = mbd->plane[i].pre[0].buf;
+
+  // Make a temporary mbmi for temporal filtering
+  MB_MODE_INFO **backup_mi_grid = mbd->mi;
+  MB_MODE_INFO mbmi;
+  memset(&mbmi, 0, sizeof(mbmi));
+  MB_MODE_INFO *mbmi_ptr = &mbmi;
+  mbd->mi = &mbmi_ptr;
+
+  FRAME_DIFF diff = { 0, 0 };
 
   for (mb_row = 0; mb_row < mb_rows; mb_row++) {
     // Source frames are extended to 16 pixels. This is different than
@@ -1051,6 +1072,7 @@ static void temporal_filter_iterate_c(AV1_COMP *cpi,
     for (mb_col = 0; mb_col < mb_cols; mb_col++) {
       int j, k;
       int stride;
+      MV best_ref_mv1 = kZeroMv;
 
       memset(accumulator, 0, BLK_PELS * 3 * sizeof(accumulator[0]));
       memset(count, 0, BLK_PELS * 3 * sizeof(count[0]));
@@ -1080,6 +1102,9 @@ static void temporal_filter_iterate_c(AV1_COMP *cpi,
         if (frame == alt_ref_index) {
           blk_fw[0] = blk_fw[1] = blk_fw[2] = blk_fw[3] = 2;
           use_32x32 = 1;
+          // Change ref_mv sign for following frames.
+          best_ref_mv1.row *= -1;
+          best_ref_mv1.col *= -1;
         } else {
           int thresh_low = 10000;
           int thresh_high = 20000;
@@ -1090,7 +1115,7 @@ static void temporal_filter_iterate_c(AV1_COMP *cpi,
               cpi, frames[alt_ref_index]->y_buffer + mb_y_src_offset,
               frames[frame]->y_buffer + mb_y_src_offset,
               frames[frame]->y_stride, mb_col * BW, mb_row * BH, blk_mvs,
-              blk_bestsme);
+              blk_bestsme, &best_ref_mv1, step_param);
 
           int err16 =
               blk_bestsme[0] + blk_bestsme[1] + blk_bestsme[2] + blk_bestsme[3];
@@ -1117,6 +1142,9 @@ static void temporal_filter_iterate_c(AV1_COMP *cpi,
                               ? 2
                               : blk_bestsme[k] < thresh_high ? 1 : 0;
           }
+
+          // Don't use previous frame's mv result if error is large.
+          if (err > (3000 << bd_shift)) best_ref_mv1 = kZeroMv;
         }
 
         if (blk_fw[0] || blk_fw[1] || blk_fw[2] || blk_fw[3]) {
@@ -1293,6 +1321,21 @@ static void temporal_filter_iterate_c(AV1_COMP *cpi,
           }
         }
       }
+
+      if (!is_key_frame && cpi->sf.adaptive_overlay_encoding) {
+        // Calculate the difference(dist) between source and filtered source.
+        dst1 = cpi->alt_ref_buffer.y_buffer + mb_y_offset;
+        stride = cpi->alt_ref_buffer.y_stride;
+        const uint8_t *src = f->y_buffer + mb_y_src_offset;
+        const int src_stride = f->y_stride;
+        const BLOCK_SIZE bsize = dims_to_size(BW, BH);
+        unsigned int sse = 0;
+        cpi->fn_ptr[bsize].vf(src, src_stride, dst1, stride, &sse);
+
+        diff.sum += sse;
+        diff.sse += sse * sse;
+      }
+
       mb_y_offset += BW;
       mb_y_src_offset += BW;
       mb_uv_offset += mb_uv_width;
@@ -1307,6 +1350,9 @@ static void temporal_filter_iterate_c(AV1_COMP *cpi,
 
   // Restore input state
   for (i = 0; i < num_planes; i++) mbd->plane[i].pre[0].buf = input_buffer[i];
+
+  mbd->mi = backup_mi_grid;
+  return diff;
 }
 
 // This is an adaptation of the mehtod in the following paper:
@@ -1316,8 +1362,8 @@ static void temporal_filter_iterate_c(AV1_COMP *cpi,
 // Signal Processing, 2008, St Julians, Malta.
 //
 // Return noise estimate, or -1.0 if there was a failure
-static double estimate_noise(const uint8_t *src, int width, int height,
-                             int stride, int edge_thresh) {
+double estimate_noise(const uint8_t *src, int width, int height, int stride,
+                      int edge_thresh) {
   int64_t sum = 0;
   int64_t num = 0;
   for (int i = 1; i < height - 1; ++i) {
@@ -1351,8 +1397,8 @@ static double estimate_noise(const uint8_t *src, int width, int height,
 }
 
 // Return noise estimate, or -1.0 if there was a failure
-static double highbd_estimate_noise(const uint8_t *src8, int width, int height,
-                                    int stride, int bd, int edge_thresh) {
+double highbd_estimate_noise(const uint8_t *src8, int width, int height,
+                             int stride, int bd, int edge_thresh) {
   uint16_t *src = CONVERT_TO_SHORTPTR(src8);
   int64_t sum = 0;
   int64_t num = 0;
@@ -1386,31 +1432,10 @@ static double highbd_estimate_noise(const uint8_t *src8, int width, int height,
   return sigma;
 }
 
-// Apply buffer limits and context specific adjustments to arnr filter.
-static void adjust_arnr_filter(AV1_COMP *cpi, int distance, int group_boost,
-                               int *arnr_frames, int *arnr_strength,
-                               double *sigma) {
-  const AV1EncoderConfig *const oxcf = &cpi->oxcf;
-  const int frames_after_arf =
-      av1_lookahead_depth(cpi->lookahead) - distance - 1;
-  int frames_fwd = (cpi->oxcf.arnr_max_frames - 1) >> 1;
-  int frames_bwd;
-  int q, frames, strength;
-
-  // Define the forward and backwards filter limits for this arnr group.
-  if (frames_fwd > frames_after_arf) frames_fwd = frames_after_arf;
-  if (frames_fwd > distance) frames_fwd = distance;
-
-  frames_bwd = frames_fwd;
-
-  // For even length filter there is one more frame backward
-  // than forward: e.g. len=6 ==> bbbAff, len=7 ==> bbbAfff.
-  if (frames_bwd < distance) frames_bwd += (oxcf->arnr_max_frames + 1) & 0x1;
-
-  // Set the baseline active filter size.
-  frames = frames_bwd + 1 + frames_fwd;
-
+static int estimate_strength(AV1_COMP *cpi, int distance, int group_boost,
+                             double *sigma) {
   // Adjust the strength based on active max q.
+  int q;
   if (cpi->common.current_frame.frame_number > 1)
     q = ((int)av1_convert_qindex_to_q(cpi->rc.avg_frame_qindex[INTER_FRAME],
                                       cpi->common.seq_params.bit_depth));
@@ -1419,6 +1444,7 @@ static void adjust_arnr_filter(AV1_COMP *cpi, int distance, int group_boost,
                                       cpi->common.seq_params.bit_depth));
   MACROBLOCKD *mbd = &cpi->td.mb.e_mbd;
   struct lookahead_entry *buf = av1_lookahead_peek(cpi->lookahead, distance);
+  int strength;
   double noiselevel;
   if (is_cur_buf_hbd(mbd)) {
     noiselevel = highbd_estimate_noise(
@@ -1431,7 +1457,7 @@ static void adjust_arnr_filter(AV1_COMP *cpi, int distance, int group_boost,
                                 EDGE_THRESHOLD);
     *sigma = noiselevel;
   }
-  int adj_strength = oxcf->arnr_strength;
+  int adj_strength = cpi->oxcf.arnr_strength;
   if (noiselevel > 0) {
     // Get 4 integer adjustment levels in [-2, 1]
     int noiselevel_adj;
@@ -1454,21 +1480,45 @@ static void adjust_arnr_filter(AV1_COMP *cpi, int distance, int group_boost,
     if (strength < 0) strength = 0;
   }
 
+  if (strength > group_boost / 300) {
+    strength = group_boost / 300;
+  }
+
+  return strength;
+}
+
+// Apply buffer limits and context specific adjustments to arnr filter.
+static void adjust_arnr_filter(AV1_COMP *cpi, int distance, int group_boost,
+                               int *arnr_frames, int *arnr_strength,
+                               double *sigma, int *frm_bwd, int *frm_fwd) {
+  int frames = cpi->oxcf.arnr_max_frames;
+
   // Adjust number of frames in filter and strength based on gf boost level.
   if (frames > group_boost / 150) {
     frames = group_boost / 150;
     frames += !(frames & 1);
   }
 
-  if (strength > group_boost / 300) {
-    strength = group_boost / 300;
-  }
+  const int frames_after_arf =
+      av1_lookahead_depth(cpi->lookahead) - distance - 1;
+  int frames_fwd = (frames - 1) >> 1;
+  int frames_bwd = frames >> 1;
+
+  // Define the forward and backwards filter limits for this arnr group.
+  if (frames_fwd > frames_after_arf) frames_fwd = frames_after_arf;
+  if (frames_bwd > distance) frames_bwd = distance;
+
+  // Set the baseline active filter size.
+  frames = frames_bwd + 1 + frames_fwd;
 
   *arnr_frames = frames;
-  *arnr_strength = strength;
+  *arnr_strength = estimate_strength(cpi, distance, group_boost, sigma);
+  *frm_bwd = frames_bwd;
+  *frm_fwd = frames_fwd;
 }
 
-void av1_temporal_filter(AV1_COMP *cpi, int distance) {
+int av1_temporal_filter(AV1_COMP *cpi, int distance,
+                        int *show_existing_alt_ref) {
   RATE_CONTROL *const rc = &cpi->rc;
   int frame;
   int frames_to_blur;
@@ -1483,6 +1533,15 @@ void av1_temporal_filter(AV1_COMP *cpi, int distance) {
   int rdmult = 0;
   double sigma = 0;
 
+  // TODO(yunqing): For INTNL_ARF_UPDATE type, the following me initialization
+  // is used somewhere unexpectedly. Should be resolved later.
+  // Initialize errorperbit, sadperbit16 and sadperbit4.
+  rdmult = av1_compute_rd_mult_based_on_qindex(cpi, ARNR_FILT_QINDEX);
+  set_error_per_bit(&cpi->td.mb, rdmult);
+  av1_initialize_me_consts(cpi, &cpi->td.mb, ARNR_FILT_QINDEX);
+  av1_fill_mv_costs(cpi->common.fc, cpi->common.cur_frame_force_integer_mv,
+                    cpi->common.allow_high_precision_mv, &cpi->td.mb);
+
   // Apply context specific adjustments to the arnr filter parameters.
   if (gf_group->update_type[gf_group->index] == INTNL_ARF_UPDATE) {
     // TODO(weitinglin): Currently, we enforce the filtering strength on
@@ -1490,33 +1549,41 @@ void av1_temporal_filter(AV1_COMP *cpi, int distance) {
     // beneficial to use non-zero strength filtering.
     strength = 0;
     frames_to_blur = 1;
-  } else {
-    adjust_arnr_filter(cpi, distance, rc->gfu_boost, &frames_to_blur, &strength,
-                       &sigma);
+    return 0;
   }
 
-  int which_arf = gf_group->arf_update_idx[gf_group->index];
+  if (distance == -1) {
+    // Apply temporal filtering on key frame.
+    strength = estimate_strength(cpi, distance, rc->gfu_boost, &sigma);
+    // Number of frames for temporal filtering, could be tuned.
+    frames_to_blur = NUM_KEY_FRAME_DENOISING;
+    frames_to_blur_backward = 0;
+    frames_to_blur_forward = frames_to_blur - 1;
+    start_frame = distance + frames_to_blur_forward;
+  } else {
+    adjust_arnr_filter(cpi, distance, rc->gfu_boost, &frames_to_blur, &strength,
+                       &sigma, &frames_to_blur_backward,
+                       &frames_to_blur_forward);
+    start_frame = distance + frames_to_blur_forward;
+  }
 
-  // Set the temporal filtering status for the corresponding OVERLAY frame
-  if (strength == 0 && frames_to_blur == 1)
-    cpi->is_arf_filter_off[which_arf] = 1;
-  else
-    cpi->is_arf_filter_off[which_arf] = 0;
-  cpi->common.showable_frame = cpi->is_arf_filter_off[which_arf];
-
-  frames_to_blur_backward = (frames_to_blur / 2);
-  frames_to_blur_forward = ((frames_to_blur - 1) / 2);
-  start_frame = distance + frames_to_blur_forward;
+  cpi->common.showable_frame =
+      (strength == 0 && frames_to_blur == 1) ||
+      (cpi->oxcf.enable_overlay == 0 || cpi->sf.disable_overlay_frames);
 
   // Setup frame pointers, NULL indicates frame not included in filter.
   for (frame = 0; frame < frames_to_blur; ++frame) {
     const int which_buffer = start_frame - frame;
     struct lookahead_entry *buf =
         av1_lookahead_peek(cpi->lookahead, which_buffer);
-    frames[frames_to_blur - 1 - frame] = &buf->img;
+    if (buf == NULL) {
+      frames[frames_to_blur - 1 - frame] = NULL;
+    } else {
+      frames[frames_to_blur - 1 - frame] = &buf->img;
+    }
   }
 
-  if (frames_to_blur > 0) {
+  if (frames_to_blur > 0 && frames[0] != NULL) {
     // Setup scaling factors. Scaling on each of the arnr frames is not
     // supported.
     // ARF is produced at the native frame size and resized when coded.
@@ -1525,12 +1592,38 @@ void av1_temporal_filter(AV1_COMP *cpi, int distance) {
         frames[0]->y_crop_width, frames[0]->y_crop_height);
   }
 
-  // Initialize errorperbit, sadperbit16 and sadperbit4.
-  rdmult = av1_compute_rd_mult_based_on_qindex(cpi, ARNR_FILT_QINDEX);
-  set_error_per_bit(&cpi->td.mb, rdmult);
-  av1_initialize_me_consts(cpi, &cpi->td.mb, ARNR_FILT_QINDEX);
-  av1_initialize_cost_tables(&cpi->common, &cpi->td.mb);
+  FRAME_DIFF diff = temporal_filter_iterate_c(cpi, frames, frames_to_blur,
+                                              frames_to_blur_backward, strength,
+                                              sigma, distance == -1, &sf);
 
-  temporal_filter_iterate_c(cpi, frames, frames_to_blur,
-                            frames_to_blur_backward, strength, sigma, &sf);
+  if (distance == -1) return 1;
+
+  if (show_existing_alt_ref != NULL && cpi->sf.adaptive_overlay_encoding) {
+    AV1_COMMON *const cm = &cpi->common;
+    int top_index = 0, bottom_index = 0;
+
+    aom_clear_system_state();
+    // TODO(yunqing): This can be combined with TPL q calculation later.
+    cpi->rc.base_frame_target = gf_group->bit_allocation[gf_group->index];
+    av1_set_target_rate(cpi, cm->width, cm->height);
+    const int q = av1_rc_pick_q_and_bounds(cpi, &cpi->rc, cpi->oxcf.width,
+                                           cpi->oxcf.height, gf_group->index,
+                                           &bottom_index, &top_index);
+    const int ac_q = av1_ac_quant_QTX(q, 0, cm->seq_params.bit_depth);
+    const int ac_q_2 = ac_q * ac_q;
+    const int mb_cols = get_cols(frames[frames_to_blur_backward]->y_crop_width);
+    const int mb_rows =
+        get_rows(frames[frames_to_blur_backward]->y_crop_height);
+    const int mbs = AOMMAX(1, mb_rows * mb_cols);
+    const float mean = (float)diff.sum / mbs;
+    const float std = (float)sqrt((float)diff.sse / mbs - mean * mean);
+    const float threshold = 0.7f;
+
+    *show_existing_alt_ref = 0;
+    if (mean / ac_q_2 < threshold && std < mean * 1.2)
+      *show_existing_alt_ref = 1;
+    cpi->common.showable_frame |= *show_existing_alt_ref;
+  }
+
+  return 1;
 }

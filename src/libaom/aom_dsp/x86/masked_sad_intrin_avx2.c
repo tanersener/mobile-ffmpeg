@@ -17,7 +17,7 @@
 #include "aom_dsp/blend.h"
 #include "aom/aom_integer.h"
 #include "aom_dsp/x86/synonyms.h"
-#include "aom_dsp/x86//masked_sad_intrin_ssse3.h"
+#include "aom_dsp/x86/masked_sad_intrin_ssse3.h"
 
 static INLINE unsigned int masked_sad32xh_avx2(
     const uint8_t *src_ptr, int src_stride, const uint8_t *a_ptr, int a_stride,

@@ -19,7 +19,7 @@
 #include "aom/aom_integer.h"
 #include "aom_dsp/x86/synonyms.h"
 
-#include "aom_dsp/x86//masked_sad_intrin_ssse3.h"
+#include "aom_dsp/x86/masked_sad_intrin_ssse3.h"
 
 // For width a multiple of 16
 static INLINE unsigned int masked_sad_ssse3(const uint8_t *src_ptr,

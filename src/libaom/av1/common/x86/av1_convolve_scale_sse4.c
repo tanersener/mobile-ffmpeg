@@ -129,8 +129,8 @@ static void vfilter8(const int16_t *src, int src_stride, uint8_t *dst,
 
   const int w0 = conv_params->fwd_offset;
   const int w1 = conv_params->bck_offset;
-  const __m128i wt0 = _mm_set1_epi16(w0);
-  const __m128i wt1 = _mm_set1_epi16(w1);
+  const __m128i wt0 = _mm_set1_epi16((short)w0);
+  const __m128i wt1 = _mm_set1_epi16((short)w1);
   const __m128i wt = _mm_unpacklo_epi16(wt0, wt1);
 
   int y_qn = subpel_y_qn;
@@ -236,8 +236,7 @@ void av1_convolve_2d_scale_sse4_1(const uint8_t *src, int src_stride,
                                   const int subpel_x_qn, const int x_step_qn,
                                   const int subpel_y_qn, const int y_step_qn,
                                   ConvolveParams *conv_params) {
-  // TODO(yaowu): remove unnecessary initializations
-  int16_t tmp[(2 * MAX_SB_SIZE + MAX_FILTER_TAP) * MAX_SB_SIZE] = { 0 };
+  int16_t tmp[(2 * MAX_SB_SIZE + MAX_FILTER_TAP) * MAX_SB_SIZE];
   int im_h = (((h - 1) * y_step_qn + subpel_y_qn) >> SCALE_SUBPEL_BITS) +
              filter_params_y->taps;
 

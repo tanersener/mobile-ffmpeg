@@ -15,6 +15,7 @@
 #include "config/av1_rtcd.h"
 
 #include "aom_ports/mem.h"
+#include "aom_ports/system_state.h"
 #include "av1/encoder/corner_match.h"
 
 DECLARE_ALIGNED(16, static const uint8_t,
@@ -75,5 +76,6 @@ double av1_compute_cross_correlation_avx2(unsigned char *im1, int stride1,
 
   int var2 = sumsq2_acc * MATCH_SZ_SQ - sum2_acc * sum2_acc;
   int cov = cross_acc * MATCH_SZ_SQ - sum1_acc * sum2_acc;
+  aom_clear_system_state();
   return cov / sqrt((double)var2);
 }

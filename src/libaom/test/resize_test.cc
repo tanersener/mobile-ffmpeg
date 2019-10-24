@@ -618,12 +618,12 @@ TEST_P(ResizeCspTest, DISABLED_TestResizeCspWorks) {
 TEST_P(ResizeCspTest, TestResizeCspWorks) {
 #endif
   const aom_img_fmt_t image_formats[] = { AOM_IMG_FMT_I420, AOM_IMG_FMT_I444 };
-  for (size_t i = 0; i < GTEST_ARRAY_SIZE_(image_formats); ++i) {
-    ResizingCspVideoSource video(image_formats[i]);
+  for (const aom_img_fmt_t &img_format : image_formats) {
+    ResizingCspVideoSource video(img_format);
     init_flags_ = AOM_CODEC_USE_PSNR;
     cfg_.rc_min_quantizer = cfg_.rc_max_quantizer = 48;
     cfg_.g_lag_in_frames = 0;
-    cfg_.g_profile = (image_formats[i] == AOM_IMG_FMT_I420) ? 0 : 1;
+    cfg_.g_profile = (img_format == AOM_IMG_FMT_I420) ? 0 : 1;
     ASSERT_NO_FATAL_FAILURE(RunLoop(&video));
 
     // Check we decoded the same number of frames as we attempted to encode

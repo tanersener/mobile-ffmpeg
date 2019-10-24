@@ -620,6 +620,7 @@ void av1_convolve_2d_facade(const uint8_t *src, int src_stride, uint8_t *dst,
   }
 }
 
+#if CONFIG_AV1_HIGHBITDEPTH
 void av1_highbd_convolve_2d_copy_sr_c(
     const uint16_t *src, int src_stride, uint16_t *dst, int dst_stride, int w,
     int h, const InterpFilterParams *filter_params_x,
@@ -1121,6 +1122,7 @@ void av1_highbd_convolve_2d_facade(const uint8_t *src8, int src_stride,
         filter_params_y, subpel_x_qn, subpel_y_qn, conv_params, bd);
   }
 }
+#endif  // CONFIG_AV1_HIGHBITDEPTH
 
 // Note: Fixed size intermediate buffers, place limits on parameters
 // of some functions. 2d filtering proceeds in 2 steps:
@@ -1142,12 +1144,14 @@ static INLINE int horz_scalar_product(const uint8_t *a, const int16_t *b) {
   return sum;
 }
 
+#if CONFIG_AV1_HIGHBITDEPTH
 static INLINE int highbd_horz_scalar_product(const uint16_t *a,
                                              const int16_t *b) {
   int sum = 0;
   for (int k = 0; k < SUBPEL_TAPS; ++k) sum += a[k] * b[k];
   return sum;
 }
+#endif
 
 static INLINE int highbd_vert_scalar_product(const uint16_t *a,
                                              ptrdiff_t a_stride,
@@ -1248,6 +1252,7 @@ void av1_wiener_convolve_add_src_c(const uint8_t *src, ptrdiff_t src_stride,
                             y_step_q4, w, h, conv_params->round_1);
 }
 
+#if CONFIG_AV1_HIGHBITDEPTH
 static void highbd_convolve_add_src_horiz_hip(
     const uint8_t *src8, ptrdiff_t src_stride, uint16_t *dst,
     ptrdiff_t dst_stride, const InterpKernel *x_filters, int x0_q4,
@@ -1326,3 +1331,4 @@ void av1_highbd_wiener_convolve_add_src_c(
       temp + MAX_SB_SIZE * (SUBPEL_TAPS / 2 - 1), MAX_SB_SIZE, dst, dst_stride,
       filters_y, y0_q4, y_step_q4, w, h, conv_params->round_1, bd);
 }
+#endif  // CONFIG_AV1_HIGHBITDEPTH

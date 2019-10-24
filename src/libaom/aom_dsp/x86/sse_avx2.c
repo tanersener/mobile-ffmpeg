@@ -45,6 +45,7 @@ static INLINE int64_t summary_all_avx2(const __m256i *sum_all) {
   return sum;
 }
 
+#if CONFIG_AV1_HIGHBITDEPTH
 static INLINE void summary_32_avx2(const __m256i *sum32, __m256i *sum) {
   const __m256i sum0_4x64 =
       _mm256_cvtepu32_epi64(_mm256_castsi256_si128(*sum32));
@@ -63,6 +64,7 @@ static INLINE int64_t summary_4x64_avx2(const __m256i sum_4x64) {
   xx_storel_64(&sum, sum_1x64);
   return sum;
 }
+#endif
 
 static INLINE void sse_w4x4_avx2(const uint8_t *a, int a_stride,
                                  const uint8_t *b, int b_stride, __m256i *sum) {
@@ -211,6 +213,7 @@ int64_t aom_sse_avx2(const uint8_t *a, int a_stride, const uint8_t *b,
   return sse;
 }
 
+#if CONFIG_AV1_HIGHBITDEPTH
 static INLINE void highbd_sse_w16_avx2(__m256i *sum, const uint16_t *a,
                                        const uint16_t *b) {
   const __m256i v_a_w = yy_loadu_256(a);
@@ -378,3 +381,4 @@ int64_t aom_highbd_sse_avx2(const uint8_t *a8, int a_stride, const uint8_t *b8,
   }
   return sse;
 }
+#endif  // CONFIG_AV1_HIGHBITDEPTH

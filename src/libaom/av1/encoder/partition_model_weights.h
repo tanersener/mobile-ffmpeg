@@ -2442,52 +2442,175 @@ static const NN_CONFIG av1_rect_partition_nnconfig_128 = {
 #undef LABEL_SIZE
 
 // Below are the models used for simple_motion_search_based_split
-// Threshold from BLOCK_128X128 to BLOCK_8X88
-// TODO(any): The thresholds on hdres are still pretty rough due to the codec
-// being slow on hdres videos. We should be able to get better tradeoff by fine
-// tuning the thresholds here.
-static const float av1_simple_motion_search_split_hdres_thresh[5] = {
-  5.839480f,  // p = 0.997098
-  1.877167f,  // p = 0.867285
-  3.073499f,  // p = 0.955783
-  1.405601f,  // p = 0.803071
-  2.555636f,  // p = 0.927951
+// Thresholds
+// The first index level is for aggresiveness, and the second is frame
+// resolution, third is bsize
+static const float av1_simple_motion_search_split_thresh[3][3][5] = {
+  // Aggressiveness = 0
+  {
+      // lowres
+      {
+          1.40402595879f,  // p = 0.8028197
+          4.72845183649f,  // p = 0.99123732
+          1.86517797783f,  // p = 0.86589934
+          1.58715223005f,  // p = 0.83021506
+          7.22695596987f,  // p = 0.9992738
+      },
+      // midres
+      {
+          5.839480f,  // p = 0.997098
+          1.877167f,  // p = 0.867285
+          3.073499f,  // p = 0.955783
+          1.405601f,  // p = 0.803071
+          2.555636f,  // p = 0.927951
+      },
+      // hdres
+      {
+          5.839480f,  // p = 0.997098
+          1.877167f,  // p = 0.867285
+          3.073499f,  // p = 0.955783
+          1.405601f,  // p = 0.803071
+          2.555636f,  // p = 0.927951
+      },
+  },
+  // Aggressiveness = 1
+  {
+      // Lowres
+      {
+          100.0000f,  // p = 1.000000
+          4.952535f,  // p = 0.992984
+          1.720880f,  // p = 0.848242
+          1.426233f,  // p = 0.806314
+          1.491905f,  // p = 0.816364
+      },
+      // Midres
+      {
+          100.0000f,  // p = 100.0000
+          3.137263f,  // p = 0.958404
+          2.703262f,  // p = 0.937219
+          1.877166f,  // p = 0.867285
+          2.221149f,  // p = 0.902133
+      },
+      // Hdres
+      {
+          4.417680f,  // p = 0.988082
+          3.086898f,  // p = 0.956349
+          3.966704f,  // p = 0.981416
+          1.532565f,  // p = 0.822381
+          3.449975f,  // p = 0.969230
+      },
+  },
+  // Aggressiveness = 2
+  {
+      // lowres
+      {
+          100.000000f,  // p = 0.998048
+          1.484020f,    // p = 0.815179
+          1.866781f,    // p = 0.866085
+          1.706711f,    // p = 0.846409
+          2.080369f,    // p = 0.888980
+      },
+      // midres
+      {
+          100.000000f,  // p = 0.0
+          3.265763f,    // p = 0.963235428881
+          2.024598f,    // p = 0.883355591569
+          1.846446f,    // p = 0.863709256976
+          2.240962f,    // p = 0.903868036126
+      },
+      // hdres
+      {
+          3.133026f,  // p = 0.958234684141
+          2.940954f,  // p = 0.949834204693
+          2.484544f,  // p = 0.923051170045
+          1.702972f,  // p = 0.845922460525
+          1.655562f,  // p = 0.839641385729
+      },
+  },
 };
 
-static const float av1_simple_motion_search_split_hdres_no_thresh[5] = {
-  -100.0f,       // p = 0
-  -100.0f,       // p = 0
-  -2.98718897f,  // p = 0.048008
-  -100.0f,       // p = 0
-  -3.33229488f,  // p = 0.03447975
-};
-
-static const float av1_simple_motion_search_split_midres_thresh[5] = {
-  5.839480f,  // p = 0.997098
-  1.877167f,  // p = 0.867285
-  3.073499f,  // p = 0.955783
-  1.405601f,  // p = 0.803071
-  2.555636f,  // p = 0.927951
-};
-
-static const float av1_simple_motion_search_split_midres_no_thresh[5] = {
-  -3.38168078f,  // p = 0.032872917
-  -4.08610739f,  // p = 0.016526795
-  -1.7830237f,   // p = 0.15270848
-  -100.0f,       // p = 0
-  -100.0f,       // p = 0
-};
-
-static const float av1_simple_motion_search_split_lowres_thresh[5] = {
-  1.40402595879f,  // 0.8028197
-  4.72845183649f,  // 0.99123732
-  1.86517797783f,  // 0.86589934
-  1.58715223005f,  // 0.83021506
-  7.22695596987f,  // 0.9992738
-};
-
-static const float av1_simple_motion_search_split_lowres_no_thresh[5] = {
-  -100.0f, -100.0f, -100.0f, -100.0f, -100.0f,
+static const float av1_simple_motion_search_no_split_thresh[3][3][5] = {
+  // Aggressiveness = 0
+  {
+      // lowres
+      {
+          -100.0f,  // p = 0.0
+          -100.0f,  // p = 0.0
+          -100.0f,  // p = 0.0
+          -100.0f,  // p = 0.0
+          -100.0f,  // p = 0.0
+      },
+      // midres
+      {
+          -3.38168078f,  // p = 0.032872917
+          -4.08610739f,  // p = 0.016526795
+          -1.78302370f,  // p = 0.15270848
+          -100.000000f,  // p = 0.0
+          -100.000000f,  // p = 0.0
+      },
+      // hdres
+      {
+          -100.000000f,  // p = 0.0
+          -100.000000f,  // p = 0.0
+          -2.98718897f,  // p = 0.048008
+          -100.000000f,  // p = 0.0
+          -3.33229488f,  // p = 0.03447975
+      },
+  },
+  // Aggressiveness = 1
+  {
+      // Lowres
+      {
+          -100.0000f,  // p = 0.0
+          -4.893793f,  // p = 0.007437
+          -3.387766f,  // p = 0.032680
+          -2.982806f,  // p = 0.048209
+          -2.330372f,  // p = 0.088639
+      },
+      // Midres
+      {
+          -100.0000f,  // p = 0.000000
+          -6.131853f,  // p = 0.002168
+          -2.346579f,  // p = 0.087338
+          -2.712849f,  // p = 0.062219
+          -3.195430f,  // p = 0.039338
+      },
+      // Hdres
+      {
+          -3.491416f,  // p = 0.029557
+          -2.192853f,  // p = 0.100394
+          -3.620180f,  // p = 0.026079
+          -2.030855f,  // p = 0.116001
+          -2.797586f,  // p = 0.057455
+      },
+  },
+  // Aggressiveness = 2
+  {
+      // lowres
+      {
+          -100.0000f,  // p = 0.0
+          -3.617350f,  // p = 0.026151
+          -5.902503f,  // p = 0.002725
+          -4.677840f,  // p = 0.009213
+          -2.168378f,  // p = 0.102626
+      },
+      // midres
+      {
+          -100.0000f,  // p = 0.0
+          -3.204195f,  // p = 0.0390081679555
+          -2.354128f,  // p = 0.0867382128969
+          -2.523326f,  // p = 0.0742390077132
+          -3.112328f,  // p = 0.0426016085803
+      },
+      // hdres
+      {
+          -5.047760f,  // p = 0.00638270448225
+          -3.414994f,  // p = 0.0318301469487
+          -5.628090f,  // p = 0.00358255438917
+          -2.122691f,  // p = 0.10691083145
+          -1.972387f,  // p = 0.122132728355
+      },
+  },
 };
 
 static const float av1_simple_motion_search_split_mean_128[17] = {
@@ -3154,65 +3277,80 @@ static const NN_CONFIG *const av1_simple_motion_search_split_nn_config[5] = {
   &av1_simple_motion_search_split_nn_config_8,
 };
 
-// Model based on simple_motion_search
-
-// Thresholds for doing a single type of partition
-// TODO(chiyotsai@google.com): Set the thresholds for PARTITION_SPLIT.
-static const float av1_simple_motion_search_prune_part_only_thresh_128[10] = {
-  1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f
-};
-
-static const float av1_simple_motion_search_prune_part_only_thresh_64[10] = {
-  1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f
-};
-
-static const float av1_simple_motion_search_prune_part_only_thresh_32[10] = {
-  1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f
-};
-
-static const float av1_simple_motion_search_prune_part_only_thresh_16[10] = {
-  1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f
-};
-
-static const float av1_simple_motion_search_prune_part_only_thresh_8[10] = {
-  1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f
-};
-
-// Thresholds for pruning a partition type
-static const float av1_simple_motion_search_prune_part_prune_thresh_128[10] = {
-  0.0f, 0.0288721601835f, 0.0288721601835f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-  0.0f
-};
-
-static const float av1_simple_motion_search_prune_part_prune_thresh_64[10] = {
-  0.0f, 0.0281573780991f, 0.0281573780991f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-  0.0f
-};
-
-static const float av1_simple_motion_search_prune_part_prune_thresh_32[10] = {
-  0.0f, 0.0225501403434f, 0.0225501403434f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-  0.0f
-};
-
-static const float av1_simple_motion_search_prune_part_prune_thresh_16[10] = {
-  0.0f,
-  0.000961189195907f,
-  0.000961189195907f,
-  0.0f,
-  0.0f,
-  0.0f,
-  0.0f,
-  0.0f,
-  0.0f,
-  0.0f
-};
-
-static const float av1_simple_motion_search_prune_part_prune_thresh_8[10] = {
-  0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f
+// Model based on simple_motion_search for pruning rect
+// Thresholds. The first idx level is aggresiveness, second is frame resolution,
+// third is bsize
+static const float av1_simple_motion_search_prune_rect_thresh[3][3][5] = {
+  // Aggressivness = 0
+  {
+      // Lowres
+      { 0.0288721601835f, 0.0281573780991f, 0.0225501403434f,
+        0.000961189195907f, 0.0f },
+      // Midres
+      { 0.0288721601835f, 0.0281573780991f, 0.0225501403434f,
+        0.000961189195907f, 0.0f },
+      // Hdres
+      { 0.0288721601835f, 0.0281573780991f, 0.0225501403434f,
+        0.000961189195907f, 0.0f },
+  },
+  // Aggressivness = 1
+  {
+      // Lowres
+      {
+          0.000000f,
+          0.116076f,
+          0.049759f,
+          0.057747f,
+          0.006001f,
+      },
+      // Midres
+      {
+          0.000000f,
+          0.017380f,
+          0.026077f,
+          0.078111f,
+          0.064477f,
+      },
+      // Hdres
+      {
+          0.002994f,
+          0.103093f,
+          0.076408f,
+          0.010456f,
+          0.187211f,
+      },
+  },
+  // Aggressiveness = 2
+  {
+      // Lowres
+      {
+          0.000000f,
+          0.003111f,
+          0.144294f,
+          0.144884f,
+          0.069924f,
+      },
+      // Midres
+      {
+          0.000000f,
+          0.013696f,
+          0.055203f,
+          0.152271f,
+          0.078886f,
+      },
+      // Hdres
+      {
+          0.030577f,
+          0.082486f,
+          0.040690f,
+          0.140924f,
+          0.067608f,
+      },
+  },
 };
 
 // Mean and std
-static const float av1_simple_motion_search_prune_part_mean_128[25] = {
+static const float av1_simple_motion_search_prune_rect_mean_128[25] = {
   13.292176f, 13.231236f, 11.098058f, 11.049944f, 10.481336f,
   10.431587f, 10.789337f, 10.732787f, 10.233817f, 10.173738f,
   12.214045f, 12.157505f, 11.863353f, 11.802220f, 12.204053f,
@@ -3220,14 +3358,14 @@ static const float av1_simple_motion_search_prune_part_mean_128[25] = {
   4.012611f,  4.052191f,  0.853365f,  3.954503f,  3.944135f,
 };
 
-static const float av1_simple_motion_search_prune_part_std_128[25] = {
+static const float av1_simple_motion_search_prune_rect_std_128[25] = {
   2.589217f, 2.559396f, 2.268402f, 2.282274f, 3.341234f, 3.341994f, 3.033007f,
   3.041550f, 3.786247f, 3.784053f, 2.523459f, 2.511275f, 3.349364f, 3.340481f,
   2.390149f, 2.384226f, 3.599467f, 3.587460f, 2.319911f, 0.428335f, 1.241087f,
   1.208679f, 0.353742f, 1.228122f, 1.211777f,
 };
 
-static const float av1_simple_motion_search_prune_part_mean_64[25] = {
+static const float av1_simple_motion_search_prune_rect_mean_64[25] = {
   11.439831f, 11.382639f, 9.647134f, 9.578121f, 9.146770f,
   9.084122f,  8.559063f,  8.499496f, 8.095865f, 8.041795f,
   10.547537f, 10.486240f, 9.362147f, 9.308391f, 10.548071f,
@@ -3235,53 +3373,69 @@ static const float av1_simple_motion_search_prune_part_mean_64[25] = {
   3.306144f,  3.351039f,  0.928582f, 3.319739f, 3.287726f,
 };
 
-static const float av1_simple_motion_search_prune_part_std_64[25] = {
+static const float av1_simple_motion_search_prune_rect_std_64[25] = {
   2.033404f, 2.050657f, 2.064671f, 2.081519f, 2.916312f, 2.914649f, 3.628949f,
   3.618760f, 4.011421f, 3.996068f, 2.087127f, 2.103106f, 3.885277f, 3.876166f,
   2.035599f, 2.052976f, 3.052501f, 3.050985f, 2.232998f, 0.303745f, 1.111161f,
   1.081292f, 0.257521f, 1.112510f, 1.089404f,
 };
 
-static const float av1_simple_motion_search_prune_part_mean_32[25] = {
+static const float av1_simple_motion_search_prune_rect_mean_32[25] = {
   9.862349f, 9.793658f, 8.043962f, 7.954083f, 8.058867f, 7.966165f, 8.046844f,
   7.956817f, 8.061414f, 7.967906f, 8.966450f, 8.890165f, 8.968315f, 8.891513f,
   8.953573f, 8.877070f, 8.974275f, 8.895363f, 4.387239f, 0.954143f, 2.701000f,
   2.751266f, 0.963302f, 2.716584f, 2.709725f,
 };
 
-static const float av1_simple_motion_search_prune_part_std_32[25] = {
+static const float av1_simple_motion_search_prune_rect_std_32[25] = {
   1.971555f, 1.985517f, 1.935986f, 1.944743f, 1.924122f, 1.932169f, 1.943151f,
   1.950612f, 1.931156f, 1.938242f, 1.987803f, 1.997670f, 2.000859f, 2.009913f,
   1.938270f, 1.949277f, 1.922999f, 1.933145f, 1.991504f, 0.209175f, 0.973824f,
   0.952221f, 0.188018f, 0.985295f, 0.946228f,
 };
 
-static const float av1_simple_motion_search_prune_part_mean_16[25] = {
+static const float av1_simple_motion_search_prune_rect_mean_16[25] = {
   8.391692f, 8.303431f, 6.590342f, 6.459725f, 6.460719f, 6.333274f, 6.592615f,
   6.461661f, 6.464787f, 6.337191f, 7.499753f, 7.395166f, 7.503220f, 7.398344f,
   7.498312f, 7.395039f, 7.353743f, 7.253139f, 3.874267f, 0.979701f, 2.087404f,
   2.131698f, 0.981005f, 2.110868f, 2.106539f,
 };
 
-static const float av1_simple_motion_search_prune_part_std_16[25] = {
+static const float av1_simple_motion_search_prune_rect_std_16[25] = {
   1.865867f, 1.870012f, 1.773885f, 1.770447f, 1.972922f, 1.961361f, 1.777224f,
   1.772864f, 1.974519f, 1.962281f, 1.831632f, 1.831837f, 1.837595f, 1.837008f,
   1.822791f, 1.822053f, 2.074991f, 2.067200f, 1.676261f, 0.141022f, 0.840297f,
   0.829935f, 0.136507f, 0.828972f, 0.808563f,
 };
 
-static const float av1_simple_motion_search_prune_part_mean_8[25] = {
+static const float av1_simple_motion_search_prune_rect_mean_8[25] = {
   6.997798f, 6.867032f, 5.134819f, 4.883330f, 5.134804f, 4.879707f, 5.140518f,
   4.886751f, 5.142186f, 4.885262f, 6.069946f, 5.896944f, 6.080442f, 5.906130f,
   6.077539f, 5.905929f, 6.083087f, 5.909298f, 3.552709f, 0.990654f, 1.497349f,
   1.531762f, 0.989606f, 1.496581f, 1.484139f,
 };
 
-static const float av1_simple_motion_search_prune_part_std_8[25] = {
+static const float av1_simple_motion_search_prune_rect_std_8[25] = {
   1.727562f, 1.725050f, 1.633396f, 1.618773f, 1.633586f, 1.620657f, 1.620798f,
   1.604892f, 1.621570f, 1.607439f, 1.691024f, 1.684225f, 1.676065f, 1.668442f,
   1.680016f, 1.672452f, 1.677775f, 1.671586f, 1.451902f, 0.096223f, 0.751190f,
   0.754040f, 0.101419f, 0.738239f, 0.729455f,
+};
+
+static const float *const av1_simple_motion_search_prune_rect_mean[5] = {
+  av1_simple_motion_search_prune_rect_mean_128,
+  av1_simple_motion_search_prune_rect_mean_64,
+  av1_simple_motion_search_prune_rect_mean_32,
+  av1_simple_motion_search_prune_rect_mean_16,
+  av1_simple_motion_search_prune_rect_mean_8,
+};
+
+static const float *const av1_simple_motion_search_prune_rect_std[5] = {
+  av1_simple_motion_search_prune_rect_std_128,
+  av1_simple_motion_search_prune_rect_std_64,
+  av1_simple_motion_search_prune_rect_std_32,
+  av1_simple_motion_search_prune_rect_std_16,
+  av1_simple_motion_search_prune_rect_std_8,
 };
 
 #define NUM_HIDDEN_LAYERS_128 1
@@ -3289,7 +3443,7 @@ static const float av1_simple_motion_search_prune_part_std_8[25] = {
 #define NUM_LAYER_0_UNITS_128 8
 #define NUM_LOGITS_128 4
 
-static const float av1_simple_motion_search_prune_part_logits_kernel_128[] = {
+static const float av1_simple_motion_search_prune_rect_logits_kernel_128[] = {
   -0.129103f, 0.457758f,  -0.489986f, 0.65462f,   -0.184312f, 3.81202f,
   -0.444407f, -0.64198f,  -0.575008f, 0.0311711f, 0.525243f,  -20.892f,
   1.08811f,   -65.0976f,  -12.3973f,  -1.38278f,  -0.264233f, 0.241636f,
@@ -3298,12 +3452,12 @@ static const float av1_simple_motion_search_prune_part_logits_kernel_128[] = {
   0.398452f,  0.696949f
 };
 
-static const float av1_simple_motion_search_prune_part_layer_0_bias_128[] = {
+static const float av1_simple_motion_search_prune_rect_layer_0_bias_128[] = {
   1.22789f, -1.34527f, 0.759048f,  0.315086f,
   1.0834f,  -1.58019f, -0.465158f, 1.20716f
 };
 
-static const float av1_simple_motion_search_prune_part_layer_0_kernel_128[] = {
+static const float av1_simple_motion_search_prune_rect_layer_0_kernel_128[] = {
   -0.668677f,  0.58694f,    -0.417094f,   0.754735f,   -0.7859f,
   0.377479f,   -0.0415929f, -0.0140585f,  -0.730001f,  0.747528f,
   -0.135247f,  0.406505f,   -0.234184f,   0.956362f,   -0.637555f,
@@ -3346,11 +3500,11 @@ static const float av1_simple_motion_search_prune_part_layer_0_kernel_128[] = {
   -0.197626f,  0.130044f,   -0.234488f,   -0.0373991f, -0.0717973f
 };
 
-static const float av1_simple_motion_search_prune_part_logits_bias_128[] = {
+static const float av1_simple_motion_search_prune_rect_logits_bias_128[] = {
   1.58571f, -4.6314f, -2.00273f, 0.543699f
 };
 
-static const NN_CONFIG av1_simple_motion_search_prune_part_nn_config_128 = {
+static const NN_CONFIG av1_simple_motion_search_prune_rect_nn_config_128 = {
   NUM_FEATURES_128,
   NUM_LOGITS_128,
   NUM_HIDDEN_LAYERS_128,
@@ -3358,12 +3512,12 @@ static const NN_CONFIG av1_simple_motion_search_prune_part_nn_config_128 = {
       NUM_LAYER_0_UNITS_128,
   },
   {
-      av1_simple_motion_search_prune_part_layer_0_kernel_128,
-      av1_simple_motion_search_prune_part_logits_kernel_128,
+      av1_simple_motion_search_prune_rect_layer_0_kernel_128,
+      av1_simple_motion_search_prune_rect_logits_kernel_128,
   },
   {
-      av1_simple_motion_search_prune_part_layer_0_bias_128,
-      av1_simple_motion_search_prune_part_logits_bias_128,
+      av1_simple_motion_search_prune_rect_layer_0_bias_128,
+      av1_simple_motion_search_prune_rect_logits_bias_128,
   },
 };
 
@@ -3377,7 +3531,7 @@ static const NN_CONFIG av1_simple_motion_search_prune_part_nn_config_128 = {
 #define NUM_LAYER_0_UNITS_64 32
 #define NUM_LOGITS_64 10
 
-static const float av1_simple_motion_search_prune_part_logits_kernel_64[] = {
+static const float av1_simple_motion_search_prune_rect_logits_kernel_64[] = {
   0.10424f,    -0.346025f,  0.534547f,   -0.385925f,  2.58341f,    -0.256414f,
   -0.232498f,  0.329823f,   -0.0777376f, -0.590939f,  0.062657f,   -0.628252f,
   0.0934588f,  2.04029f,    -0.224448f,  0.371168f,   -0.385348f,  -0.589883f,
@@ -3434,7 +3588,7 @@ static const float av1_simple_motion_search_prune_part_logits_kernel_64[] = {
   -0.359633f,  0.668108f
 };
 
-static const float av1_simple_motion_search_prune_part_layer_0_bias_64[] = {
+static const float av1_simple_motion_search_prune_rect_layer_0_bias_64[] = {
   0.0735592f, -0.045064f, -0.0114103f, 1.39246f,    -0.683467f,  0.155765f,
   -0.667652f, -0.202425f, -0.585433f,  -0.146752f,  -0.0812931f, 0.580642f,
   0.578542f,  -0.831916f, 0.610063f,   0.0101856f,  -0.235863f,  0.538141f,
@@ -3443,7 +3597,7 @@ static const float av1_simple_motion_search_prune_part_layer_0_bias_64[] = {
   0.656818f,  0.0169274f
 };
 
-static const float av1_simple_motion_search_prune_part_layer_0_kernel_64[] = {
+static const float av1_simple_motion_search_prune_rect_layer_0_kernel_64[] = {
   -0.310947f,   -0.232675f,    0.0171092f,    0.0834474f,   0.373977f,
   0.300429f,    0.215072f,     -0.454074f,    0.187565f,    0.282742f,
   0.562562f,    -0.0419322f,   0.000978486f,  -0.298267f,   0.216934f,
@@ -3606,12 +3760,12 @@ static const float av1_simple_motion_search_prune_part_layer_0_kernel_64[] = {
   -0.737297f,   -0.201515f,    -0.025122f,    -0.109854f,   0.36738f
 };
 
-static const float av1_simple_motion_search_prune_part_logits_bias_64[] = {
+static const float av1_simple_motion_search_prune_rect_logits_bias_64[] = {
   0.346819f,  0.442965f,  -0.0216032f,  0.0229235f, -0.402797f,
   -0.666074f, -0.455388f, -0.00353411f, -0.595511f, -0.845667f
 };
 
-static const NN_CONFIG av1_simple_motion_search_prune_part_nn_config_64 = {
+static const NN_CONFIG av1_simple_motion_search_prune_rect_nn_config_64 = {
   NUM_FEATURES_64,
   NUM_LOGITS_64,
   NUM_HIDDEN_LAYERS_64,
@@ -3619,12 +3773,12 @@ static const NN_CONFIG av1_simple_motion_search_prune_part_nn_config_64 = {
       NUM_LAYER_0_UNITS_64,
   },
   {
-      av1_simple_motion_search_prune_part_layer_0_kernel_64,
-      av1_simple_motion_search_prune_part_logits_kernel_64,
+      av1_simple_motion_search_prune_rect_layer_0_kernel_64,
+      av1_simple_motion_search_prune_rect_logits_kernel_64,
   },
   {
-      av1_simple_motion_search_prune_part_layer_0_bias_64,
-      av1_simple_motion_search_prune_part_logits_bias_64,
+      av1_simple_motion_search_prune_rect_layer_0_bias_64,
+      av1_simple_motion_search_prune_rect_logits_bias_64,
   },
 };
 
@@ -3638,7 +3792,7 @@ static const NN_CONFIG av1_simple_motion_search_prune_part_nn_config_64 = {
 #define NUM_LAYER_0_UNITS_32 28
 #define NUM_LOGITS_32 10
 
-static const float av1_simple_motion_search_prune_part_logits_kernel_32[] = {
+static const float av1_simple_motion_search_prune_rect_logits_kernel_32[] = {
   0.486581f,    0.340847f,   -0.109226f,   0.467224f,   -0.541561f,
   0.0943619f,   -0.429442f,  -0.207442f,   0.959963f,   0.618666f,
   -0.0636751f,  0.144508f,   -0.0278289f,  0.332293f,   -0.751493f,
@@ -3697,7 +3851,7 @@ static const float av1_simple_motion_search_prune_part_logits_kernel_32[] = {
   -0.280626f,   0.42476f,    0.157411f,    0.0358675f,  -0.192591f
 };
 
-static const float av1_simple_motion_search_prune_part_layer_0_bias_32[] = {
+static const float av1_simple_motion_search_prune_rect_layer_0_bias_32[] = {
   0.940498f,  0.15602f,   -0.234831f, 0.0268585f, 0.144769f,  0.243081f,
   0.611406f,  0.366093f,  0.361868f,  0.39668f,   0.401479f,  0.369467f,
   0.0909503f, 0.710595f,  0.032786f,  0.525891f,  -1.0232f,   0.732557f,
@@ -3705,7 +3859,7 @@ static const float av1_simple_motion_search_prune_part_layer_0_bias_32[] = {
   0.59681f,   -0.472405f, 0.0969218f, -0.250624f
 };
 
-static const float av1_simple_motion_search_prune_part_layer_0_kernel_32[] = {
+static const float av1_simple_motion_search_prune_rect_layer_0_kernel_32[] = {
   0.355607f,    0.126701f,    -0.0825159f,  0.200675f,     -0.011308f,
   -0.280057f,   0.559816f,    0.142689f,    0.0422419f,    -0.151692f,
   -0.0275637f,  -0.283101f,   -0.20822f,    -0.200394f,    0.465427f,
@@ -3848,12 +4002,12 @@ static const float av1_simple_motion_search_prune_part_layer_0_kernel_32[] = {
   -0.092764f,   0.0295707f,   -0.0462887f,  -0.00636006f,  0.0334169f
 };
 
-static const float av1_simple_motion_search_prune_part_logits_bias_32[] = {
+static const float av1_simple_motion_search_prune_rect_logits_bias_32[] = {
   0.176459f,  0.154405f, 0.281821f,  0.375264f,  -0.882863f,
   -0.240261f, -1.17075f, -0.280216f, -0.743836f, -0.317511f
 };
 
-static const NN_CONFIG av1_simple_motion_search_prune_part_nn_config_32 = {
+static const NN_CONFIG av1_simple_motion_search_prune_rect_nn_config_32 = {
   NUM_FEATURES_32,
   NUM_LOGITS_32,
   NUM_HIDDEN_LAYERS_32,
@@ -3861,12 +4015,12 @@ static const NN_CONFIG av1_simple_motion_search_prune_part_nn_config_32 = {
       NUM_LAYER_0_UNITS_32,
   },
   {
-      av1_simple_motion_search_prune_part_layer_0_kernel_32,
-      av1_simple_motion_search_prune_part_logits_kernel_32,
+      av1_simple_motion_search_prune_rect_layer_0_kernel_32,
+      av1_simple_motion_search_prune_rect_logits_kernel_32,
   },
   {
-      av1_simple_motion_search_prune_part_layer_0_bias_32,
-      av1_simple_motion_search_prune_part_logits_bias_32,
+      av1_simple_motion_search_prune_rect_layer_0_bias_32,
+      av1_simple_motion_search_prune_rect_logits_bias_32,
   },
 };
 
@@ -3880,7 +4034,7 @@ static const NN_CONFIG av1_simple_motion_search_prune_part_nn_config_32 = {
 #define NUM_LAYER_0_UNITS_16 32
 #define NUM_LOGITS_16 10
 
-static const float av1_simple_motion_search_prune_part_logits_kernel_16[] = {
+static const float av1_simple_motion_search_prune_rect_logits_kernel_16[] = {
   -0.520913f,   0.395611f,    0.0369091f,   -0.318591f,  -0.463252f,
   0.134992f,    -0.43154f,    -0.0739112f,  -0.118817f,  0.476373f,
   -0.281406f,   0.3413f,      0.456255f,    0.33307f,    0.2942f,
@@ -3947,7 +4101,7 @@ static const float av1_simple_motion_search_prune_part_logits_kernel_16[] = {
   -0.202705f,   -0.0852339f,  -0.62572f,    -0.0734234f, -0.838088f
 };
 
-static const float av1_simple_motion_search_prune_part_layer_0_bias_16[] = {
+static const float av1_simple_motion_search_prune_rect_layer_0_bias_16[] = {
   -0.0616197f, 0.939947f, 0.521161f,  0.213886f,  0.130324f,  -0.127443f,
   -0.0538715f, 0.708746f, 0.445031f,  0.418781f,  -0.114539f, 0.521941f,
   1.13719f,    0.606545f, -0.32193f,  -0.150788f, 0.158487f,  -0.224005f,
@@ -3956,7 +4110,7 @@ static const float av1_simple_motion_search_prune_part_layer_0_bias_16[] = {
   0.661496f,   0.95533f
 };
 
-static const float av1_simple_motion_search_prune_part_layer_0_kernel_16[] = {
+static const float av1_simple_motion_search_prune_rect_layer_0_kernel_16[] = {
   -0.203489f,   0.00686229f,  -0.161414f,   0.0637276f,   0.27516f,
   0.512219f,    0.164205f,    0.00326062f,  -0.41914f,    -0.400334f,
   0.554419f,    0.715772f,    -0.295569f,   -0.703503f,   0.0137744f,
@@ -4119,12 +4273,12 @@ static const float av1_simple_motion_search_prune_part_layer_0_kernel_16[] = {
   -0.0679228f,  -0.203457f,   0.131948f,    -0.0041251f,  -0.209054f
 };
 
-static const float av1_simple_motion_search_prune_part_logits_bias_16[] = {
+static const float av1_simple_motion_search_prune_rect_logits_bias_16[] = {
   0.304025f,  0.131887f, 0.259279f,  -0.561564f, -0.161729f,
   -0.208036f, 0.102206f, -0.162937f, -1.42311f,  -0.708305f
 };
 
-static const NN_CONFIG av1_simple_motion_search_prune_part_nn_config_16 = {
+static const NN_CONFIG av1_simple_motion_search_prune_rect_nn_config_16 = {
   NUM_FEATURES_16,
   NUM_LOGITS_16,
   NUM_HIDDEN_LAYERS_16,
@@ -4132,12 +4286,12 @@ static const NN_CONFIG av1_simple_motion_search_prune_part_nn_config_16 = {
       NUM_LAYER_0_UNITS_16,
   },
   {
-      av1_simple_motion_search_prune_part_layer_0_kernel_16,
-      av1_simple_motion_search_prune_part_logits_kernel_16,
+      av1_simple_motion_search_prune_rect_layer_0_kernel_16,
+      av1_simple_motion_search_prune_rect_logits_kernel_16,
   },
   {
-      av1_simple_motion_search_prune_part_layer_0_bias_16,
-      av1_simple_motion_search_prune_part_logits_bias_16,
+      av1_simple_motion_search_prune_rect_layer_0_bias_16,
+      av1_simple_motion_search_prune_rect_logits_bias_16,
   },
 };
 
@@ -4151,7 +4305,7 @@ static const NN_CONFIG av1_simple_motion_search_prune_part_nn_config_16 = {
 #define NUM_LAYER_0_UNITS_8 32
 #define NUM_LOGITS_8 4
 
-static const float av1_simple_motion_search_prune_part_logits_kernel_8[] = {
+static const float av1_simple_motion_search_prune_rect_logits_kernel_8[] = {
   -0.266303f,  -0.387676f,  0.204501f,   -0.120842f,  -0.0752326f, 0.0337739f,
   0.0243477f,  -0.356748f,  0.0143051f,  -0.16403f,   -0.139013f,  0.175003f,
   -0.206754f,  0.349059f,   0.181763f,   0.212768f,   -0.313783f,  0.182829f,
@@ -4176,7 +4330,7 @@ static const float av1_simple_motion_search_prune_part_logits_kernel_8[] = {
   -0.112242f,  0.295184f
 };
 
-static const float av1_simple_motion_search_prune_part_layer_0_bias_8[] = {
+static const float av1_simple_motion_search_prune_rect_layer_0_bias_8[] = {
   -2.16023f,  -3.12831f, -0.213206f,  -2.97875f, -1.83791f, -2.84713f,
   -0.909636f, -2.05893f, 0.00525274f, -1.51672f, -3.95017f, 1.82847f,
   -0.853224f, -3.29503f, -0.537517f,  0.923106f, -3.18665f, -1.29905f,
@@ -4185,7 +4339,7 @@ static const float av1_simple_motion_search_prune_part_layer_0_bias_8[] = {
   -0.490783f, -0.415782f
 };
 
-static const float av1_simple_motion_search_prune_part_layer_0_kernel_8[] = {
+static const float av1_simple_motion_search_prune_rect_layer_0_kernel_8[] = {
   -0.702198f,  -0.102148f,   0.0564545f,   -0.0555548f,  0.16184f,
   0.0950792f,  0.136974f,    -0.00824146f, 0.05746f,     0.0447542f,
   0.145978f,   0.0855769f,   -0.041449f,   0.301347f,    -0.0206691f,
@@ -4348,11 +4502,11 @@ static const float av1_simple_motion_search_prune_part_layer_0_kernel_8[] = {
   -0.0811161f, 0.00237994f,  0.850042f,    0.0665473f,   0.134413f
 };
 
-static const float av1_simple_motion_search_prune_part_logits_bias_8[] = {
+static const float av1_simple_motion_search_prune_rect_logits_bias_8[] = {
   1.63404f, -0.715866f, -1.0132f, -2.08745f
 };
 
-static const NN_CONFIG av1_simple_motion_search_prune_part_nn_config_8 = {
+static const NN_CONFIG av1_simple_motion_search_prune_rect_nn_config_8 = {
   NUM_FEATURES_8,
   NUM_LOGITS_8,
   NUM_HIDDEN_LAYERS_8,
@@ -4360,12 +4514,12 @@ static const NN_CONFIG av1_simple_motion_search_prune_part_nn_config_8 = {
       NUM_LAYER_0_UNITS_8,
   },
   {
-      av1_simple_motion_search_prune_part_layer_0_kernel_8,
-      av1_simple_motion_search_prune_part_logits_kernel_8,
+      av1_simple_motion_search_prune_rect_layer_0_kernel_8,
+      av1_simple_motion_search_prune_rect_logits_kernel_8,
   },
   {
-      av1_simple_motion_search_prune_part_layer_0_bias_8,
-      av1_simple_motion_search_prune_part_logits_bias_8,
+      av1_simple_motion_search_prune_rect_layer_0_bias_8,
+      av1_simple_motion_search_prune_rect_logits_bias_8,
   },
 };
 
@@ -4373,6 +4527,15 @@ static const NN_CONFIG av1_simple_motion_search_prune_part_nn_config_8 = {
 #undef NUM_FEATURES_8
 #undef NUM_LAYER_0_UNITS_8
 #undef NUM_LOGITS_8
+
+static const NN_CONFIG
+    *const av1_simple_motion_search_prune_rect_nn_config[5] = {
+      &av1_simple_motion_search_prune_rect_nn_config_128,
+      &av1_simple_motion_search_prune_rect_nn_config_64,
+      &av1_simple_motion_search_prune_rect_nn_config_32,
+      &av1_simple_motion_search_prune_rect_nn_config_16,
+      &av1_simple_motion_search_prune_rect_nn_config_8,
+    };
 
 // nn model for predicting max square partition level of a superblock
 #define NUM_HIDDEN_LAYERS 1

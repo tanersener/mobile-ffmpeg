@@ -62,6 +62,17 @@ enum {
   RATE_FACTOR_LEVELS
 } UENUM1BYTE(RATE_FACTOR_LEVEL);
 
+enum {
+  KF_UPDATE,
+  LF_UPDATE,
+  GF_UPDATE,
+  ARF_UPDATE,
+  OVERLAY_UPDATE,
+  INTNL_OVERLAY_UPDATE,  // Internal Overlay Frame
+  INTNL_ARF_UPDATE,      // Internal Altref Frame
+  FRAME_UPDATE_TYPES
+} UENUM1BYTE(FRAME_UPDATE_TYPE);
+
 typedef struct {
   // Rate targetting variables
   int base_frame_target;  // A baseline frame target before adjustment
@@ -92,7 +103,6 @@ typedef struct {
   int source_alt_ref_pending;
   int source_alt_ref_active;
   int is_src_frame_alt_ref;
-  int is_src_frame_internal_arf;
   int sframe_due;
 
   int avg_frame_bandwidth;  // Average frame size target for clip
@@ -146,6 +156,7 @@ typedef struct {
   // Q index used for ALT frame
   int arf_q;
   int active_worst_quality;
+  int base_layer_qp;
 } RATE_CONTROL;
 
 struct AV1_COMP;
@@ -212,7 +223,8 @@ void av1_rc_compute_frame_size_bounds(const struct AV1_COMP *cpi,
                                       int *frame_over_shoot_limit);
 
 // Picks q and q bounds given the target for bits
-int av1_rc_pick_q_and_bounds(struct AV1_COMP *cpi, int width, int height,
+int av1_rc_pick_q_and_bounds(const struct AV1_COMP *cpi, RATE_CONTROL *rc,
+                             int width, int height, int gf_index,
                              int *bottom_index, int *top_index);
 
 // Estimates q to achieve a target bits per frame
@@ -262,9 +274,19 @@ int av1_resize_one_pass_cbr(struct AV1_COMP *cpi);
 void av1_rc_set_frame_target(struct AV1_COMP *cpi, int target, int width,
                              int height);
 
-int av1_estimate_q_constant_quality_two_pass(const struct AV1_COMP *cpi,
-                                             int width, int height, int *arf_q,
-                                             int gf_index);
+int av1_calc_pframe_target_size_one_pass_vbr(
+    const struct AV1_COMP *const cpi, FRAME_UPDATE_TYPE frame_update_type);
+
+int av1_calc_iframe_target_size_one_pass_vbr(const struct AV1_COMP *const cpi);
+
+int av1_calc_pframe_target_size_one_pass_cbr(
+    const struct AV1_COMP *cpi, FRAME_UPDATE_TYPE frame_update_type);
+
+int av1_calc_iframe_target_size_one_pass_cbr(const struct AV1_COMP *cpi);
+
+void av1_get_one_pass_rt_params(struct AV1_COMP *cpi,
+                                struct EncodeFrameParams *const frame_params,
+                                unsigned int frame_flags);
 
 #ifdef __cplusplus
 }  // extern "C"

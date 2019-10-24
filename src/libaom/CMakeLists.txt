@@ -9,17 +9,16 @@
 # can obtain it at www.aomedia.org/license/patent.
 #
 cmake_minimum_required(VERSION 3.5)
+project(AOM C CXX)
 
 if(NOT EMSCRIPTEN)
-  if(NOT CMAKE_BUILD_TYPE)
+  if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     set(CMAKE_BUILD_TYPE
         "Release"
-        CACHE "Build type: Debug, Release, RelWithDebInfo or MinSizeRel" STRING
+        CACHE STRING "Build type: Debug, Release, RelWithDebInfo or MinSizeRel"
               FORCE)
   endif()
 endif()
-
-project(AOM C CXX)
 
 set(AOM_ROOT "${CMAKE_CURRENT_SOURCE_DIR}")
 set(AOM_CONFIG_DIR "${CMAKE_CURRENT_BINARY_DIR}")
@@ -115,6 +114,7 @@ list(APPEND AOM_SOURCES
             "${AOM_ROOT}/aom/aomcx.h"
             "${AOM_ROOT}/aom/aomdx.h"
             "${AOM_ROOT}/aom/internal/aom_codec_internal.h"
+            "${AOM_ROOT}/aom/internal/aom_image_internal.h"
             "${AOM_ROOT}/aom/src/aom_codec.c"
             "${AOM_ROOT}/aom/src/aom_decoder.c"
             "${AOM_ROOT}/aom/src/aom_encoder.c"
@@ -352,9 +352,14 @@ if(CONFIG_AV1_ENCODER)
                                     $<TARGET_OBJECTS:aom_common_app_util>
                                     $<TARGET_OBJECTS:aom_encoder_app_util>)
 
+    add_executable(svc_encoder_rtc "${AOM_ROOT}/examples/svc_encoder_rtc.c"
+                                   $<TARGET_OBJECTS:aom_common_app_util>
+                                   $<TARGET_OBJECTS:aom_encoder_app_util>)
+
     # Maintain a list of encoder example targets.
     list(APPEND AOM_ENCODER_EXAMPLE_TARGETS aomenc lossless_encoder noise_model
-                set_maps simple_encoder scalable_encoder twopass_encoder)
+                set_maps simple_encoder scalable_encoder twopass_encoder
+                svc_encoder_rtc)
   endif()
 
   if(ENABLE_TOOLS)

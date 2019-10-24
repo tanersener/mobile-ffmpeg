@@ -325,6 +325,7 @@ static unsigned int setup_center_error(
     int *mvcost[2], unsigned int *sse1, int *distortion) {
   unsigned int besterr;
   if (second_pred != NULL) {
+#if CONFIG_AV1_HIGHBITDEPTH
     if (is_cur_buf_hbd(xd)) {
       DECLARE_ALIGNED(16, uint16_t, comp_pred16[MAX_SB_SQUARE]);
       uint8_t *comp_pred = CONVERT_TO_BYTEPTR(comp_pred16);
@@ -346,6 +347,17 @@ static unsigned int setup_center_error(
       }
       besterr = vfp->vf(comp_pred, w, src, src_stride, sse1);
     }
+#else
+    (void)xd;
+    DECLARE_ALIGNED(16, uint8_t, comp_pred[MAX_SB_SQUARE]);
+    if (mask) {
+      aom_comp_mask_pred(comp_pred, second_pred, w, h, y + offset, y_stride,
+                         mask, mask_stride, invert_mask);
+    } else {
+      aom_comp_avg_pred(comp_pred, second_pred, w, h, y + offset, y_stride);
+    }
+    besterr = vfp->vf(comp_pred, w, src, src_stride, sse1);
+#endif
   } else {
     besterr = vfp->vf(y + offset, y_stride, src, src_stride, sse1);
   }
@@ -371,7 +383,8 @@ static INLINE int is_cost_list_wellbehaved(int *cost_list) {
 // x0 = 1/2 (S1 - S3)/(S1 + S3 - 2*S0),
 // y0 = 1/2 (S4 - S2)/(S4 + S2 - 2*S0).
 // The code below is an integerized version of that.
-static void get_cost_surf_min(int *cost_list, int *ir, int *ic, int bits) {
+static AOM_INLINE void get_cost_surf_min(int *cost_list, int *ir, int *ic,
+                                         int bits) {
   *ic = divide_and_round((cost_list[1] - cost_list[3]) * (1 << (bits - 1)),
                          (cost_list[1] - 2 * cost_list[0] + cost_list[3]));
   *ir = divide_and_round((cost_list[4] - cost_list[2]) * (1 << (bits - 1)),
@@ -630,6 +643,7 @@ static int upsampled_pref_error(MACROBLOCKD *xd, const AV1_COMMON *const cm,
                                 int mask_stride, int invert_mask, int w, int h,
                                 unsigned int *sse, int subpel_search) {
   unsigned int besterr;
+#if CONFIG_AV1_HIGHBITDEPTH
   if (is_cur_buf_hbd(xd)) {
     DECLARE_ALIGNED(16, uint16_t, pred16[MAX_SB_SQUARE]);
     uint8_t *pred8 = CONVERT_TO_BYTEPTR(pred16);
@@ -670,6 +684,26 @@ static int upsampled_pref_error(MACROBLOCKD *xd, const AV1_COMMON *const cm,
 
     besterr = vfp->vf(pred, w, src, src_stride, sse);
   }
+#else
+  DECLARE_ALIGNED(16, uint8_t, pred[MAX_SB_SQUARE]);
+  if (second_pred != NULL) {
+    if (mask) {
+      aom_comp_mask_upsampled_pred(xd, cm, mi_row, mi_col, mv, pred,
+                                   second_pred, w, h, subpel_x_q3, subpel_y_q3,
+                                   y, y_stride, mask, mask_stride, invert_mask,
+                                   subpel_search);
+    } else {
+      aom_comp_avg_upsampled_pred(xd, cm, mi_row, mi_col, mv, pred, second_pred,
+                                  w, h, subpel_x_q3, subpel_y_q3, y, y_stride,
+                                  subpel_search);
+    }
+  } else {
+    aom_upsampled_pred(xd, cm, mi_row, mi_col, mv, pred, w, h, subpel_x_q3,
+                       subpel_y_q3, y, y_stride, subpel_search);
+  }
+
+  besterr = vfp->vf(pred, w, src, src_stride, sse);
+#endif
   return besterr;
 }
 
@@ -1848,18 +1882,16 @@ static int full_pixel_diamond(const AV1_COMP *const cpi, MACROBLOCK *x,
 #define MIN_INTERVAL 1
 // Runs an limited range exhaustive mesh search using a pattern set
 // according to the encode speed profile.
-static int full_pixel_exhaustive(const AV1_COMP *const cpi, MACROBLOCK *x,
-                                 const MV *centre_mv_full, int sadpb,
-                                 int *cost_list,
-                                 const aom_variance_fn_ptr_t *fn_ptr,
-                                 const MV *ref_mv, MV *dst_mv) {
-  const SPEED_FEATURES *const sf = &cpi->sf;
+static int full_pixel_exhaustive(
+    MACROBLOCK *x, const MV *centre_mv_full, int sadpb, int *cost_list,
+    const aom_variance_fn_ptr_t *fn_ptr, const MV *ref_mv, MV *dst_mv,
+    const struct MESH_PATTERN *const mesh_patterns) {
   MV temp_mv = { centre_mv_full->row, centre_mv_full->col };
   MV f_ref_mv = { ref_mv->row >> 3, ref_mv->col >> 3 };
   int bestsme;
   int i;
-  int interval = sf->mesh_patterns[0].interval;
-  int range = sf->mesh_patterns[0].range;
+  int interval = mesh_patterns[0].interval;
+  int range = mesh_patterns[0].range;
   int baseline_interval_divisor;
 
   // Keep track of number of exhaustive calls (this frame in this thread).
@@ -1888,10 +1920,10 @@ static int full_pixel_exhaustive(const AV1_COMP *const cpi, MACROBLOCK *x,
     for (i = 1; i < MAX_MESH_STEP; ++i) {
       // First pass with coarser step and longer range
       bestsme = exhuastive_mesh_search(
-          x, &f_ref_mv, &temp_mv, sf->mesh_patterns[i].range,
-          sf->mesh_patterns[i].interval, sadpb, fn_ptr, &temp_mv);
+          x, &f_ref_mv, &temp_mv, mesh_patterns[i].range,
+          mesh_patterns[i].interval, sadpb, fn_ptr, &temp_mv);
 
-      if (sf->mesh_patterns[i].interval == 1) break;
+      if (mesh_patterns[i].interval == 1) break;
     }
   }
 
@@ -2070,7 +2102,8 @@ int av1_refining_search_8p_c(MACROBLOCK *x, int error_per_bit, int search_range,
 }
 
 #define MIN_EX_SEARCH_LIMIT 128
-static int is_exhaustive_allowed(const AV1_COMP *const cpi, MACROBLOCK *x) {
+static int is_exhaustive_allowed(const AV1_COMP *const cpi, MACROBLOCK *x,
+                                 int max_exaustive_pct) {
   const SPEED_FEATURES *const sf = &cpi->sf;
   int is_allowed = sf->allow_exhaustive_searches &&
                    (sf->exhaustive_searches_thresh < INT_MAX) &&
@@ -2078,7 +2111,7 @@ static int is_exhaustive_allowed(const AV1_COMP *const cpi, MACROBLOCK *x) {
   if (x->m_search_count_ptr != NULL && x->ex_search_count_ptr != NULL) {
     const int max_ex =
         AOMMAX(MIN_EX_SEARCH_LIMIT,
-               (*x->m_search_count_ptr * sf->max_exaustive_pct) / 100);
+               (*x->m_search_count_ptr * max_exaustive_pct) / 100);
     is_allowed = *x->ex_search_count_ptr <= max_ex && is_allowed;
   }
   return is_allowed;
@@ -2299,7 +2332,8 @@ int av1_full_pixel_search(const AV1_COMP *cpi, MACROBLOCK *x, BLOCK_SIZE bsize,
                           int run_mesh_search, int error_per_bit,
                           int *cost_list, const MV *ref_mv, int var_max, int rd,
                           int x_pos, int y_pos, int intra,
-                          const search_site_config *cfg) {
+                          const search_site_config *cfg,
+                          int use_intrabc_mesh_pattern) {
   const SPEED_FEATURES *const sf = &cpi->sf;
   const aom_variance_fn_ptr_t *fn_ptr = &cpi->fn_ptr[bsize];
   int var = 0;
@@ -2340,49 +2374,36 @@ int av1_full_pixel_search(const AV1_COMP *cpi, MACROBLOCK *x, BLOCK_SIZE bsize,
       var = full_pixel_diamond(cpi, x, mvp_full, step_param, error_per_bit,
                                MAX_MVSEARCH_STEPS - 1 - step_param, 1,
                                cost_list, fn_ptr, ref_mv, cfg);
-
-      // Should we allow a follow on exhaustive search?
-      if (is_exhaustive_allowed(cpi, x)) {
-        int exhuastive_thr = sf->exhaustive_searches_thresh;
-        exhuastive_thr >>=
-            10 - (mi_size_wide_log2[bsize] + mi_size_high_log2[bsize]);
-
-        // Threshold variance for an exhaustive full search.
-        if (var > exhuastive_thr) {
-          int var_ex;
-          MV tmp_mv_ex;
-          var_ex =
-              full_pixel_exhaustive(cpi, x, &x->best_mv.as_mv, error_per_bit,
-                                    cost_list, fn_ptr, ref_mv, &tmp_mv_ex);
-
-          if (var_ex < var) {
-            var = var_ex;
-            x->best_mv.as_mv = tmp_mv_ex;
-          }
-        }
-      }
       break;
     default: assert(0 && "Invalid search method.");
   }
 
   // Should we allow a follow on exhaustive search?
-  if (!run_mesh_search) {
-    if (method == NSTEP) {
-      if (is_exhaustive_allowed(cpi, x)) {
-        int exhuastive_thr = sf->exhaustive_searches_thresh;
-        exhuastive_thr >>=
-            10 - (mi_size_wide_log2[bsize] + mi_size_high_log2[bsize]);
-        // Threshold variance for an exhaustive full search.
-        if (var > exhuastive_thr) run_mesh_search = 1;
-      }
-    }
+  // Pick the threshold for decision on the evaluation of exhaustive search
+  // based on the toolset (intraBC or non-intraBC)
+  const int max_exaustive_pct = use_intrabc_mesh_pattern
+                                    ? sf->intrabc_max_exaustive_pct
+                                    : sf->max_exaustive_pct;
+  if (!run_mesh_search && method == NSTEP &&
+      is_exhaustive_allowed(cpi, x, max_exaustive_pct)) {
+    int exhuastive_thr = sf->exhaustive_searches_thresh;
+    exhuastive_thr >>=
+        10 - (mi_size_wide_log2[bsize] + mi_size_high_log2[bsize]);
+    // Threshold variance for an exhaustive full search.
+    if (var > exhuastive_thr) run_mesh_search = 1;
   }
 
   if (run_mesh_search) {
     int var_ex;
     MV tmp_mv_ex;
-    var_ex = full_pixel_exhaustive(cpi, x, &x->best_mv.as_mv, error_per_bit,
-                                   cost_list, fn_ptr, ref_mv, &tmp_mv_ex);
+    // Pick the mesh pattern for exhaustive search based on the toolset (intraBC
+    // or non-intraBC)
+    const MESH_PATTERN *const mesh_patterns = use_intrabc_mesh_pattern
+                                                  ? sf->intrabc_mesh_patterns
+                                                  : sf->mesh_patterns;
+    var_ex =
+        full_pixel_exhaustive(x, &x->best_mv.as_mv, error_per_bit, cost_list,
+                              fn_ptr, ref_mv, &tmp_mv_ex, mesh_patterns);
     if (var_ex < var) {
       var = var_ex;
       x->best_mv.as_mv = tmp_mv_ex;
@@ -2392,6 +2413,7 @@ int av1_full_pixel_search(const AV1_COMP *cpi, MACROBLOCK *x, BLOCK_SIZE bsize,
   if (method != NSTEP && rd && var < var_max)
     var = av1_get_mvpred_var(x, &x->best_mv.as_mv, ref_mv, fn_ptr, 1);
 
+  // Use hash-me for intrablock copy
   do {
     if (!intra || !av1_use_hash_me(&cpi->common)) break;
 
@@ -2409,10 +2431,7 @@ int av1_full_pixel_search(const AV1_COMP *cpi, MACROBLOCK *x, BLOCK_SIZE bsize,
         int best_hash_cost = INT_MAX;
 
         // for the hashMap
-        hash_table *ref_frame_hash =
-            intra ? &cpi->common.cur_frame->hash_table
-                  : av1_get_ref_frame_hash_map(&cpi->common,
-                                               x->e_mbd.mi[0]->ref_frame[0]);
+        hash_table *ref_frame_hash = &cpi->common.cur_frame->hash_table;
 
         av1_get_block_hash_value(what, what_stride, block_width, &hash_value1,
                                  &hash_value2, is_cur_buf_hbd(&x->e_mbd), x);
@@ -2535,6 +2554,7 @@ static int upsampled_obmc_pref_error(
   unsigned int besterr;
 
   DECLARE_ALIGNED(16, uint8_t, pred[2 * MAX_SB_SQUARE]);
+#if CONFIG_AV1_HIGHBITDEPTH
   if (is_cur_buf_hbd(xd)) {
     uint8_t *pred8 = CONVERT_TO_BYTEPTR(pred);
     aom_highbd_upsampled_pred(xd, cm, mi_row, mi_col, mv, pred8, w, h,
@@ -2547,6 +2567,12 @@ static int upsampled_obmc_pref_error(
 
     besterr = vfp->ovf(pred, w, wsrc, mask, sse);
   }
+#else
+  aom_upsampled_pred(xd, cm, mi_row, mi_col, mv, pred, w, h, subpel_x_q3,
+                     subpel_y_q3, y, y_stride, subpel_search);
+
+  besterr = vfp->ovf(pred, w, wsrc, mask, sse);
+#endif
   return besterr;
 }
 
@@ -3104,7 +3130,7 @@ void av1_simple_motion_search(AV1_COMP *const cpi, MACROBLOCK *x, int mi_row,
   var = av1_full_pixel_search(
       cpi, x, bsize, &ref_mv_full, step_param, search_methods, do_mesh_search,
       sadpb, cond_cost_list(cpi, cost_list), &ref_mv, INT_MAX, 1,
-      mi_col * MI_SIZE, mi_row * MI_SIZE, 0, &cpi->ss_cfg[SS_CFG_SRC]);
+      mi_col * MI_SIZE, mi_row * MI_SIZE, 0, &cpi->ss_cfg[SS_CFG_SRC], 0);
   // Restore
   x->mv_limits = tmp_mv_limits;
 
