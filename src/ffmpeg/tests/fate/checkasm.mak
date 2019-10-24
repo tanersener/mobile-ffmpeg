@@ -19,6 +19,7 @@ FATE_CHECKASM = fate-checkasm-aacpsdsp                                  \
                 fate-checkasm-jpeg2000dsp                               \
                 fate-checkasm-llviddsp                                  \
                 fate-checkasm-llviddspenc                               \
+                fate-checkasm-opusdsp                                   \
                 fate-checkasm-pixblockdsp                               \
                 fate-checkasm-sbrdsp                                    \
                 fate-checkasm-synth_filter                              \
@@ -27,6 +28,7 @@ FATE_CHECKASM = fate-checkasm-aacpsdsp                                  \
                 fate-checkasm-v210enc                                   \
                 fate-checkasm-vf_blend                                  \
                 fate-checkasm-vf_colorspace                             \
+                fate-checkasm-vf_eq                                     \
                 fate-checkasm-vf_gblur                                  \
                 fate-checkasm-vf_hflip                                  \
                 fate-checkasm-vf_threshold                              \

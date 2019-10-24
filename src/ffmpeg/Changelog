@@ -7,6 +7,17 @@ version <next>:
 - Intel QSV-accelerated VP9 decoding
 - support for TrueHD in mp4
 - Supoort AMD AMF encoder on Linux (via Vulkan)
+- IMM5 video decoder
+- ZeroMQ protocol
+- support Sipro ACELP.KELVIN decoding
+- streamhash muxer
+- sierpinski video source
+- scroll video filter
+- photosensitivity filter
+- anlms filter
+- arnndn filter
+- bilateral filter
+- maskedmin and maskedmax filters
 
 
 version 4.2:

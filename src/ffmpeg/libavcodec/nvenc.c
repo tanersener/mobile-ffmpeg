@@ -110,19 +110,37 @@ static int nvenc_map_error(NVENCSTATUS err, const char **desc)
     return AVERROR_UNKNOWN;
 }
 
-static int nvenc_print_error(void *log_ctx, NVENCSTATUS err,
+static int nvenc_print_error(AVCodecContext *avctx, NVENCSTATUS err,
                              const char *error_string)
 {
     const char *desc;
-    int ret;
-    ret = nvenc_map_error(err, &desc);
-    av_log(log_ctx, AV_LOG_ERROR, "%s: %s (%d)\n", error_string, desc, err);
+    const char *details = "(no details)";
+    int ret = nvenc_map_error(err, &desc);
+
+#ifdef NVENC_HAVE_GETLASTERRORSTRING
+    NvencContext *ctx = avctx->priv_data;
+    NV_ENCODE_API_FUNCTION_LIST *p_nvenc = &ctx->nvenc_dload_funcs.nvenc_funcs;
+
+    if (p_nvenc && ctx->nvencoder)
+        details = p_nvenc->nvEncGetLastErrorString(ctx->nvencoder);
+#endif
+
+    av_log(avctx, AV_LOG_ERROR, "%s: %s (%d): %s\n", error_string, desc, err, details);
+
     return ret;
 }
 
 static void nvenc_print_driver_requirement(AVCodecContext *avctx, int level)
 {
-#if NVENCAPI_CHECK_VERSION(9, 0)
+#if NVENCAPI_CHECK_VERSION(9, 2)
+    const char *minver = "(unknown)";
+#elif NVENCAPI_CHECK_VERSION(9, 1)
+# if defined(_WIN32) || defined(__CYGWIN__)
+    const char *minver = "436.15";
+# else
+    const char *minver = "435.21";
+# endif
+#elif NVENCAPI_CHECK_VERSION(9, 0)
 # if defined(_WIN32) || defined(__CYGWIN__)
     const char *minver = "418.81";
 # else
@@ -395,6 +413,19 @@ static int nvenc_check_capabilities(AVCodecContext *avctx)
     }
 #endif
 
+#ifdef NVENC_HAVE_MULTIPLE_REF_FRAMES
+    ret = nvenc_check_cap(avctx, NV_ENC_CAPS_SUPPORT_MULTIPLE_REF_FRAMES);
+    if(avctx->refs != NV_ENC_NUM_REF_FRAMES_AUTOSELECT && ret <= 0) {
+        av_log(avctx, AV_LOG_VERBOSE, "Multiple reference frames are not supported\n");
+        return AVERROR(ENOSYS);
+    }
+#else
+    if(avctx->refs != 0) {
+        av_log(avctx, AV_LOG_VERBOSE, "Multiple reference frames need SDK 9.1 at build time\n");
+        return AVERROR(ENOSYS);
+    }
+#endif
+
     ctx->support_dyn_bitrate = nvenc_check_cap(avctx, NV_ENC_CAPS_SUPPORT_DYN_BITRATE_CHANGE);
 
     return 0;
@@ -439,6 +470,7 @@ static av_cold int nvenc_check_device(AVCodecContext *avctx, int idx)
         goto fail;
 
     ctx->cu_context = ctx->cu_context_internal;
+    ctx->cu_stream = NULL;
 
     if ((ret = nvenc_pop_context(avctx)) < 0)
         goto fail2;
@@ -525,6 +557,7 @@ static av_cold int nvenc_setup_device(AVCodecContext *avctx)
 
         if (cuda_device_hwctx) {
             ctx->cu_context = cuda_device_hwctx->cuda_ctx;
+            ctx->cu_stream = cuda_device_hwctx->stream;
         }
 #if CONFIG_D3D11VA
         else if (d3d11_device_hwctx) {
@@ -941,9 +974,9 @@ static av_cold int nvenc_setup_h264_config(AVCodecContext *avctx)
     h264->repeatSPSPPS  = (avctx->flags & AV_CODEC_FLAG_GLOBAL_HEADER) ? 0 : 1;
     h264->outputAUD     = ctx->aud;
 
-    if (avctx->refs >= 0) {
+    if (ctx->dpb_size >= 0) {
         /* 0 means "let the hardware decide" */
-        h264->maxNumRefFrames = avctx->refs;
+        h264->maxNumRefFrames = ctx->dpb_size;
     }
     if (avctx->gop_size >= 0) {
         h264->idrPeriod = cc->gopLength;
@@ -1002,6 +1035,11 @@ static av_cold int nvenc_setup_h264_config(AVCodecContext *avctx)
     h264->useBFramesAsRef = ctx->b_ref_mode;
 #endif
 
+#ifdef NVENC_HAVE_MULTIPLE_REF_FRAMES
+    h264->numRefL0 = avctx->refs;
+    h264->numRefL1 = avctx->refs;
+#endif
+
     return 0;
 }
 
@@ -1033,9 +1071,9 @@ static av_cold int nvenc_setup_hevc_config(AVCodecContext *avctx)
     hevc->repeatSPSPPS  = (avctx->flags & AV_CODEC_FLAG_GLOBAL_HEADER) ? 0 : 1;
     hevc->outputAUD     = ctx->aud;
 
-    if (avctx->refs >= 0) {
+    if (ctx->dpb_size >= 0) {
         /* 0 means "let the hardware decide" */
-        hevc->maxNumRefFramesInDPB = avctx->refs;
+        hevc->maxNumRefFramesInDPB = ctx->dpb_size;
     }
     if (avctx->gop_size >= 0) {
         hevc->idrPeriod = cc->gopLength;
@@ -1084,6 +1122,11 @@ static av_cold int nvenc_setup_hevc_config(AVCodecContext *avctx)
 
 #ifdef NVENC_HAVE_HEVC_BFRAME_REF_MODE
     hevc->useBFramesAsRef = ctx->b_ref_mode;
+#endif
+
+#ifdef NVENC_HAVE_MULTIPLE_REF_FRAMES
+    hevc->numRefL0 = avctx->refs;
+    hevc->numRefL1 = avctx->refs;
 #endif
 
     return 0;
@@ -1167,7 +1210,7 @@ static av_cold int nvenc_setup_encoder(AVCodecContext *avctx)
 
     if (ctx->bluray_compat) {
         ctx->aud = 1;
-        avctx->refs = FFMIN(FFMAX(avctx->refs, 0), 6);
+        ctx->dpb_size = FFMIN(FFMAX(avctx->refs, 0), 6);
         avctx->max_b_frames = FFMIN(avctx->max_b_frames, 3);
         switch (avctx->codec->id) {
         case AV_CODEC_ID_H264:
@@ -1214,14 +1257,24 @@ static av_cold int nvenc_setup_encoder(AVCodecContext *avctx)
         return res;
 
     nv_status = p_nvenc->nvEncInitializeEncoder(ctx->nvencoder, &ctx->init_encode_params);
+    if (nv_status != NV_ENC_SUCCESS) {
+        nvenc_pop_context(avctx);
+        return nvenc_print_error(avctx, nv_status, "InitializeEncoder failed");
+    }
+
+#ifdef NVENC_HAVE_CUSTREAM_PTR
+    if (ctx->cu_context) {
+        nv_status = p_nvenc->nvEncSetIOCudaStreams(ctx->nvencoder, &ctx->cu_stream, &ctx->cu_stream);
+        if (nv_status != NV_ENC_SUCCESS) {
+            nvenc_pop_context(avctx);
+            return nvenc_print_error(avctx, nv_status, "SetIOCudaStreams failed");
+        }
+    }
+#endif
 
     res = nvenc_pop_context(avctx);
     if (res < 0)
         return res;
-
-    if (nv_status != NV_ENC_SUCCESS) {
-        return nvenc_print_error(avctx, nv_status, "InitializeEncoder failed");
-    }
 
     if (ctx->encode_config.frameIntervalP > 1)
         avctx->has_b_frames = 2;

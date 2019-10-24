@@ -25,9 +25,12 @@
 
 #include "dnn_backend_tf.h"
 #include "dnn_backend_native.h"
+#include "dnn_backend_native_layer_conv2d.h"
+#include "dnn_backend_native_layer_depth2space.h"
 #include "libavformat/avio.h"
 #include "libavutil/avassert.h"
 #include "dnn_backend_native_layer_pad.h"
+#include "dnn_backend_native_layer_maximum.h"
 
 #include <tensorflow/c/c_api.h>
 
@@ -399,6 +402,48 @@ static DNNReturnType add_pad_layer(TFModel *tf_model, TF_Operation **cur_op,
     return DNN_SUCCESS;
 }
 
+static DNNReturnType add_maximum_layer(TFModel *tf_model, TF_Operation **cur_op,
+                                       DnnLayerMaximumParams *params, const int layer)
+{
+    TF_Operation *op;
+    TF_Tensor *tensor;
+    TF_OperationDescription *op_desc;
+    TF_Output input;
+    float *y;
+
+    char name_buffer[NAME_BUFFER_SIZE];
+    snprintf(name_buffer, NAME_BUFFER_SIZE, "maximum/y%d", layer);
+
+    op_desc = TF_NewOperation(tf_model->graph, "Const", name_buffer);
+    TF_SetAttrType(op_desc, "dtype", TF_FLOAT);
+    tensor = TF_AllocateTensor(TF_FLOAT, NULL, 0, TF_DataTypeSize(TF_FLOAT));
+    y = (float *)TF_TensorData(tensor);
+    *y = params->val.y;
+    TF_SetAttrTensor(op_desc, "value", tensor, tf_model->status);
+    if (TF_GetCode(tf_model->status) != TF_OK){
+        return DNN_ERROR;
+    }
+    op = TF_FinishOperation(op_desc, tf_model->status);
+    if (TF_GetCode(tf_model->status) != TF_OK){
+        return DNN_ERROR;
+    }
+
+    snprintf(name_buffer, NAME_BUFFER_SIZE, "maximum%d", layer);
+    op_desc = TF_NewOperation(tf_model->graph, "Maximum", name_buffer);
+    input.oper = *cur_op;
+    input.index = 0;
+    TF_AddInput(op_desc, input);
+    input.oper = op;
+    TF_AddInput(op_desc, input);
+    TF_SetAttrType(op_desc, "T", TF_FLOAT);
+    *cur_op = TF_FinishOperation(op_desc, tf_model->status);
+    if (TF_GetCode(tf_model->status) != TF_OK){
+        return DNN_ERROR;
+    }
+
+    return DNN_SUCCESS;
+}
+
 static DNNReturnType load_native_model(TFModel *tf_model, const char *model_filename)
 {
     int32_t layer;
@@ -454,20 +499,24 @@ static DNNReturnType load_native_model(TFModel *tf_model, const char *model_file
 
     for (layer = 0; layer < conv_network->layers_num; ++layer){
         switch (conv_network->layers[layer].type){
-        case INPUT:
+        case DLT_INPUT:
             layer_add_res = DNN_SUCCESS;
             break;
-        case CONV:
+        case DLT_CONV2D:
             layer_add_res = add_conv_layer(tf_model, transpose_op, &op,
                                            (ConvolutionalParams *)conv_network->layers[layer].params, layer);
             break;
-        case DEPTH_TO_SPACE:
+        case DLT_DEPTH_TO_SPACE:
             layer_add_res = add_depth_to_space_layer(tf_model, &op,
                                                      (DepthToSpaceParams *)conv_network->layers[layer].params, layer);
             break;
-        case MIRROR_PAD:
+        case DLT_MIRROR_PAD:
             layer_add_res = add_pad_layer(tf_model, &op,
                                           (LayerPadParams *)conv_network->layers[layer].params, layer);
+            break;
+        case DLT_MAXIMUM:
+            layer_add_res = add_maximum_layer(tf_model, &op,
+                                          (DnnLayerMaximumParams *)conv_network->layers[layer].params, layer);
             break;
         default:
             CLEANUP_ON_ERROR(tf_model);

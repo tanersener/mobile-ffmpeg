@@ -164,9 +164,8 @@ AVFILTER_DEFINE_CLASS(bm3d);
 static int query_formats(AVFilterContext *ctx)
 {
     static const enum AVPixelFormat pix_fmts[] = {
-        AV_PIX_FMT_GRAY8,
-        AV_PIX_FMT_GRAY9,   AV_PIX_FMT_GRAY10,
-        AV_PIX_FMT_GRAY12,  AV_PIX_FMT_GRAY16,
+        AV_PIX_FMT_GRAY8, AV_PIX_FMT_GRAY9, AV_PIX_FMT_GRAY10,
+        AV_PIX_FMT_GRAY12, AV_PIX_FMT_GRAY14, AV_PIX_FMT_GRAY16,
         AV_PIX_FMT_YUV410P, AV_PIX_FMT_YUV411P,
         AV_PIX_FMT_YUV420P, AV_PIX_FMT_YUV422P,
         AV_PIX_FMT_YUV440P, AV_PIX_FMT_YUV444P,
@@ -660,7 +659,7 @@ static void do_output(BM3DContext *s, uint8_t *dst, int dst_linesize,
                 sum_den += den;
             }
 
-            dstp[j] = av_clip_uint8(sum_num / sum_den);
+            dstp[j] = av_clip_uint8(lrintf(sum_num / sum_den));
         }
     }
 }
@@ -688,7 +687,7 @@ static void do_output16(BM3DContext *s, uint8_t *dst, int dst_linesize,
                 sum_den += den;
             }
 
-            dstp[j] = av_clip_uintp2_c(sum_num / sum_den, depth);
+            dstp[j] = av_clip_uintp2_c(lrintf(sum_num / sum_den), depth);
         }
     }
 }
@@ -706,8 +705,8 @@ static int filter_slice(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs)
     const int plane = td->plane;
     const int width = s->planewidth[plane];
     const int height = s->planeheight[plane];
-    const int block_pos_bottom = height - s->block_size;
-    const int block_pos_right  = width - s->block_size;
+    const int block_pos_bottom = FFMAX(0, height - s->block_size);
+    const int block_pos_right  = FFMAX(0, width - s->block_size);
     const int slice_start = (((height + block_step - 1) / block_step) * jobnr / nb_jobs) * block_step;
     const int slice_end = (jobnr == nb_jobs - 1) ? block_pos_bottom + block_step :
                           (((height + block_step - 1) / block_step) * (jobnr + 1) / nb_jobs) * block_step;
@@ -748,7 +747,7 @@ static int filter_frame(AVFilterContext *ctx, AVFrame **out, AVFrame *in, AVFram
     av_frame_copy_props(*out, in);
 
     for (p = 0; p < s->nb_planes; p++) {
-        const int nb_jobs = FFMIN(s->nb_threads, s->planeheight[p] / s->block_step);
+        const int nb_jobs = FFMAX(1, FFMIN(s->nb_threads, s->planeheight[p] / s->block_size));
         ThreadData td;
 
         if (!((1 << p) & s->planes) || ctx->is_disabled) {
@@ -796,8 +795,8 @@ static int config_input(AVFilterLink *inlink)
     for (i = 0; i < s->nb_threads; i++) {
         SliceContext *sc = &s->slices[i];
 
-        sc->num = av_calloc(s->planewidth[0] * s->planeheight[0], sizeof(FFTSample));
-        sc->den = av_calloc(s->planewidth[0] * s->planeheight[0], sizeof(FFTSample));
+        sc->num = av_calloc(FFALIGN(s->planewidth[0], s->block_size) * FFALIGN(s->planeheight[0], s->block_size), sizeof(FFTSample));
+        sc->den = av_calloc(FFALIGN(s->planewidth[0], s->block_size) * FFALIGN(s->planeheight[0], s->block_size), sizeof(FFTSample));
         if (!sc->num || !sc->den)
             return AVERROR(ENOMEM);
 
@@ -856,6 +855,8 @@ static int activate(AVFilterContext *ctx)
         AVFrame *out = NULL;
         int ret, status;
         int64_t pts;
+
+        FF_FILTER_FORWARD_STATUS_BACK(ctx->outputs[0], ctx->inputs[0]);
 
         if ((ret = ff_inlink_consume_frame(ctx->inputs[0], &frame)) > 0) {
             ret = filter_frame(ctx, &out, frame, frame);

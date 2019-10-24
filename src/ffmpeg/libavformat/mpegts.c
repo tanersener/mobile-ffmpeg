@@ -168,6 +168,8 @@ struct MpegTSContext {
     /** filters for various streams specified by PMT + for the PAT and PMT */
     MpegTSFilter *pids[NB_PID_MAX];
     int current_pid;
+
+    AVStream *epg_stream;
 };
 
 #define MPEGTS_OPTIONS \
@@ -803,6 +805,7 @@ static const StreamType ISO_types[] = {
     { 0x24, AVMEDIA_TYPE_VIDEO, AV_CODEC_ID_HEVC       },
     { 0x42, AVMEDIA_TYPE_VIDEO, AV_CODEC_ID_CAVS       },
     { 0xd1, AVMEDIA_TYPE_VIDEO, AV_CODEC_ID_DIRAC      },
+    { 0xd2, AVMEDIA_TYPE_VIDEO, AV_CODEC_ID_AVS2       },
     { 0xea, AVMEDIA_TYPE_VIDEO, AV_CODEC_ID_VC1        },
     { 0 },
 };
@@ -1303,15 +1306,17 @@ skip:
                                             st = pst;
                                     }
                                 }
-                                if (f->last_pcr != -1 && st && st->discard != AVDISCARD_ALL) {
+                                if (f->last_pcr != -1 && !f->discard) {
                                     // teletext packets do not always have correct timestamps,
                                     // the standard says they should be handled after 40.6 ms at most,
                                     // and the pcr error to this packet should be no more than 100 ms.
                                     // TODO: we should interpolate the PCR, not just use the last one
                                     int64_t pcr = f->last_pcr / 300;
                                     pcr_found = 1;
-                                    pes->st->pts_wrap_reference = st->pts_wrap_reference;
-                                    pes->st->pts_wrap_behavior = st->pts_wrap_behavior;
+                                    if (st) {
+                                        pes->st->pts_wrap_reference = st->pts_wrap_reference;
+                                        pes->st->pts_wrap_behavior = st->pts_wrap_behavior;
+                                    }
                                     if (pes->dts == AV_NOPTS_VALUE || pes->dts < pcr) {
                                         pes->pts = pes->dts = pcr;
                                     } else if (pes->st->codecpar->codec_id == AV_CODEC_ID_DVB_TELETEXT &&
@@ -1721,6 +1726,13 @@ static void scte_data_cb(MpegTSFilter *filter, const uint8_t *section,
 
     int idx = ff_find_stream_index(ts->stream, filter->pid);
     if (idx < 0)
+        return;
+
+    /**
+     * In case we receive an SCTE-35 packet before mpegts context is fully
+     * initialized.
+     */
+    if (!ts->pkt)
         return;
 
     new_data_packet(section, section_len, ts->pkt);
@@ -2489,6 +2501,60 @@ static void pat_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
     }
 }
 
+static void eit_cb(MpegTSFilter *filter, const uint8_t *section, int section_len)
+{
+    MpegTSContext *ts = filter->u.section_filter.opaque;
+    const uint8_t *p, *p_end;
+    SectionHeader h1, *h = &h1;
+
+    /*
+     * Sometimes we receive EPG packets but SDT table do not have
+     * eit_pres_following or eit_sched turned on, so we open EPG
+     * stream directly here.
+     */
+    if (!ts->epg_stream) {
+        ts->epg_stream = avformat_new_stream(ts->stream, NULL);
+        if (!ts->epg_stream)
+            return;
+        ts->epg_stream->id = EIT_PID;
+        ts->epg_stream->codecpar->codec_type = AVMEDIA_TYPE_DATA;
+        ts->epg_stream->codecpar->codec_id = AV_CODEC_ID_EPG;
+    }
+
+    if (ts->epg_stream->discard == AVDISCARD_ALL)
+        return;
+
+    p_end = section + section_len - 4;
+    p     = section;
+
+    if (parse_section_header(h, &p, p_end) < 0)
+        return;
+    if (h->tid < EIT_TID || h->tid > OEITS_END_TID)
+        return;
+
+    av_log(ts->stream, AV_LOG_TRACE, "EIT: tid received = %.02x\n", h->tid);
+
+    /**
+     * Service_id 0xFFFF is reserved, it indicates that the current EIT table
+     * is scrambled.
+     */
+    if (h->id == 0xFFFF) {
+        av_log(ts->stream, AV_LOG_TRACE, "Scrambled EIT table received.\n");
+        return;
+    }
+
+    /**
+     * In case we receive an EPG packet before mpegts context is fully
+     * initialized.
+     */
+    if (!ts->pkt)
+        return;
+
+    new_data_packet(section, section_len, ts->pkt);
+    ts->pkt->stream_index = ts->epg_stream->index;
+    ts->stop_parse = 1;
+}
+
 static void sdt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len)
 {
     MpegTSContext *ts = filter->u.section_filter.opaque;
@@ -2975,8 +3041,8 @@ static int mpegts_read_header(AVFormatContext *s)
         seek_back(s, pb, pos);
 
         mpegts_open_section_filter(ts, SDT_PID, sdt_cb, ts, 1);
-
         mpegts_open_section_filter(ts, PAT_PID, pat_cb, ts, 1);
+        mpegts_open_section_filter(ts, EIT_PID, eit_cb, ts, 1);
 
         handle_packets(ts, probesize / ts->raw_packet_size);
         /* if could not find service, enable auto_guess */
@@ -3231,8 +3297,10 @@ MpegTSContext *avpriv_mpegts_parse_open(AVFormatContext *s)
     ts->raw_packet_size = TS_PACKET_SIZE;
     ts->stream = s;
     ts->auto_guess = 1;
+
     mpegts_open_section_filter(ts, SDT_PID, sdt_cb, ts, 1);
     mpegts_open_section_filter(ts, PAT_PID, pat_cb, ts, 1);
+    mpegts_open_section_filter(ts, EIT_PID, eit_cb, ts, 1);
 
     return ts;
 }

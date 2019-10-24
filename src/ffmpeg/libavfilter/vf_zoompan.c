@@ -245,6 +245,8 @@ static int output_single_frame(AVFilterContext *ctx, AVFrame *in, double *var_va
     }
     return ret;
 error:
+    sws_freeContext(s->sws);
+    s->sws = NULL;
     av_frame_free(&out);
     return ret;
 }
@@ -256,6 +258,8 @@ static int activate(AVFilterContext *ctx)
     AVFilterLink *outlink = ctx->outputs[0];
     int status, ret = 0;
     int64_t pts;
+
+    FF_FILTER_FORWARD_STATUS_BACK(outlink, inlink);
 
     if (s->in && ff_outlink_frame_wanted(outlink)) {
         double zoom = -1, dx = -1, dy = -1;
@@ -344,6 +348,10 @@ static av_cold void uninit(AVFilterContext *ctx)
 
     sws_freeContext(s->sws);
     s->sws = NULL;
+    av_expr_free(s->x_expr);
+    av_expr_free(s->y_expr);
+    av_expr_free(s->zoom_expr);
+    av_frame_free(&s->in);
 }
 
 static const AVFilterPad inputs[] = {

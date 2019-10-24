@@ -220,7 +220,7 @@ static inline int extend_code(GetBitContext *gb, int val, int range, int bits)
         val -= range;
     }
     if (bits)
-        val = (val << bits) | get_bits(gb, bits);
+        val = ((unsigned)val << bits) | get_bits(gb, bits);
     return val;
 }
 
@@ -234,8 +234,10 @@ static int decode_channel(RALFContext *ctx, GetBitContext *gb, int ch,
     int *dst = ctx->channel_data[ch];
 
     ctx->filter_params = get_vlc2(gb, set->filter_params.table, 9, 2);
-    ctx->filter_bits   = (ctx->filter_params - 2) >> 6;
-    ctx->filter_length = ctx->filter_params - (ctx->filter_bits << 6) - 1;
+    if (ctx->filter_params > 1) {
+        ctx->filter_bits   = (ctx->filter_params - 2) >> 6;
+        ctx->filter_length = ctx->filter_params - (ctx->filter_bits << 6) - 1;
+    }
 
     if (ctx->filter_params == FILTER_RAW) {
         for (i = 0; i < length; i++)
@@ -300,8 +302,8 @@ static int decode_channel(RALFContext *ctx, GetBitContext *gb, int ch,
         t = get_vlc2(gb, code_vlc->table, code_vlc->bits, 2);
         code1 = t / range2;
         code2 = t % range2;
-        dst[i]     = extend_code(gb, code1, range, 0) << add_bits;
-        dst[i + 1] = extend_code(gb, code2, range, 0) << add_bits;
+        dst[i]     = extend_code(gb, code1, range, 0) * (1U << add_bits);
+        dst[i + 1] = extend_code(gb, code2, range, 0) * (1U << add_bits);
         if (add_bits) {
             dst[i]     |= get_bits(gb, add_bits);
             dst[i + 1] |= get_bits(gb, add_bits);

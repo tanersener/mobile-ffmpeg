@@ -131,7 +131,8 @@ static av_cold int libdav1d_init(AVCodecContext *c)
     s.allocator.alloc_picture_callback = libdav1d_picture_allocator;
     s.allocator.release_picture_callback = libdav1d_picture_release;
     s.frame_size_limit = c->max_pixels;
-    s.apply_grain = dav1d->apply_grain;
+    if (dav1d->apply_grain >= 0)
+        s.apply_grain = dav1d->apply_grain;
 
     s.n_tile_threads = dav1d->tile_threads
                      ? dav1d->tile_threads
@@ -163,6 +164,11 @@ static void libdav1d_data_free(const uint8_t *data, void *opaque) {
     av_buffer_unref(&buf);
 }
 
+static void libdav1d_user_data_free(const uint8_t *data, void *opaque) {
+    av_assert0(data == opaque);
+    av_free(opaque);
+}
+
 static int libdav1d_receive_frame(AVCodecContext *c, AVFrame *frame)
 {
     Libdav1dContext *dav1d = c->priv_data;
@@ -190,6 +196,23 @@ static int libdav1d_receive_frame(AVCodecContext *c, AVFrame *frame)
 
             pkt.buf = NULL;
             av_packet_unref(&pkt);
+
+            if (c->reordered_opaque != AV_NOPTS_VALUE) {
+                uint8_t *reordered_opaque = av_malloc(sizeof(c->reordered_opaque));
+                if (!reordered_opaque) {
+                    dav1d_data_unref(data);
+                    return AVERROR(ENOMEM);
+                }
+
+                memcpy(reordered_opaque, &c->reordered_opaque, sizeof(c->reordered_opaque));
+                res = dav1d_data_wrap_user_data(data, reordered_opaque,
+                                                libdav1d_user_data_free, reordered_opaque);
+                if (res < 0) {
+                    av_free(reordered_opaque);
+                    dav1d_data_unref(data);
+                    return res;
+                }
+            }
         }
     }
 
@@ -258,6 +281,11 @@ static int libdav1d_receive_frame(AVCodecContext *c, AVFrame *frame)
         frame->format = c->pix_fmt = pix_fmt_rgb[p->seq_hdr->hbd];
     else
         frame->format = c->pix_fmt = pix_fmt[p->p.layout][p->seq_hdr->hbd];
+
+    if (p->m.user_data.data)
+        memcpy(&frame->reordered_opaque, p->m.user_data.data, sizeof(frame->reordered_opaque));
+    else
+        frame->reordered_opaque = AV_NOPTS_VALUE;
 
     // match timestamps and packet size
     frame->pts = frame->best_effort_timestamp = p->m.timestamp;
@@ -342,7 +370,7 @@ static av_cold int libdav1d_close(AVCodecContext *c)
 static const AVOption libdav1d_options[] = {
     { "tilethreads", "Tile threads", OFFSET(tile_threads), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, DAV1D_MAX_TILE_THREADS, VD },
     { "framethreads", "Frame threads", OFFSET(frame_threads), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, DAV1D_MAX_FRAME_THREADS, VD },
-    { "filmgrain", "Apply Film Grain", OFFSET(apply_grain), AV_OPT_TYPE_BOOL, { .i64 = 1 }, 0, 1, VD },
+    { "filmgrain", "Apply Film Grain", OFFSET(apply_grain), AV_OPT_TYPE_BOOL, { .i64 = -1 }, -1, 1, VD },
     { NULL }
 };
 

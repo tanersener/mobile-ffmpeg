@@ -396,23 +396,23 @@ static int scale_slice(AVFilterLink *link, AVFrame *out_buf, AVFrame *cur_pic, s
     int in_stride[4],out_stride[4];
     int i;
 
-    for(i=0; i<4; i++){
+    for (i=0; i<4; i++) {
         int vsub= ((i+1)&2) ? scale->vsub : 0;
          in_stride[i] = cur_pic->linesize[i] * mul;
         out_stride[i] = out_buf->linesize[i] * mul;
          in[i] = cur_pic->data[i] + ((y>>vsub)+field) * cur_pic->linesize[i];
         out[i] = out_buf->data[i] +            field  * out_buf->linesize[i];
     }
-    if(scale->input_is_pal)
+    if (scale->input_is_pal)
          in[1] = cur_pic->data[1];
-    if(scale->output_is_pal)
+    if (scale->output_is_pal)
         out[1] = out_buf->data[1];
 
     return sws_scale(sws, in, in_stride, y/mul, h,
                          out,out_stride);
 }
 
-static int filter_frame(AVFilterLink *link, AVFrame *in)
+static int scale_frame(AVFilterLink *link, AVFrame *in, AVFrame **frame_out)
 {
     ScaleContext *scale = link->dst->priv;
     AVFilterLink *outlink = link->dst->outputs[0];
@@ -421,10 +421,11 @@ static int filter_frame(AVFilterLink *link, AVFrame *in)
     char buf[32];
     int in_range;
 
+    *frame_out = NULL;
     if (in->colorspace == AVCOL_SPC_YCGCO)
         av_log(link->dst, AV_LOG_WARNING, "Detected unsupported YCgCo colorspace.\n");
 
-    if(   in->width  != link->w
+    if (  in->width  != link->w
        || in->height != link->h
        || in->format != link->format
        || in->sample_aspect_ratio.den != link->sample_aspect_ratio.den || in->sample_aspect_ratio.num != link->sample_aspect_ratio.num) {
@@ -444,13 +445,14 @@ static int filter_frame(AVFilterLink *link, AVFrame *in)
         link->dst->inputs[0]->sample_aspect_ratio.den = in->sample_aspect_ratio.den;
         link->dst->inputs[0]->sample_aspect_ratio.num = in->sample_aspect_ratio.num;
 
-
         if ((ret = config_props(outlink)) < 0)
             return ret;
     }
 
-    if (!scale->sws)
-        return ff_filter_frame(outlink, in);
+    if (!scale->sws) {
+        *frame_out = in;
+        return 0;
+    }
 
     scale->hsub = desc->log2_chroma_w;
     scale->vsub = desc->log2_chroma_h;
@@ -460,12 +462,13 @@ static int filter_frame(AVFilterLink *link, AVFrame *in)
         av_frame_free(&in);
         return AVERROR(ENOMEM);
     }
+    *frame_out = out;
 
     av_frame_copy_props(out, in);
     out->width  = outlink->w;
     out->height = outlink->h;
 
-    if(scale->output_is_pal)
+    if (scale->output_is_pal)
         avpriv_set_systematic_pal2((uint32_t*)out->data[1], outlink->format == AV_PIX_FMT_PAL8 ? AV_PIX_FMT_BGR8 : outlink->format);
 
     in_range = in->color_range;
@@ -516,10 +519,10 @@ static int filter_frame(AVFilterLink *link, AVFrame *in)
               (int64_t)in->sample_aspect_ratio.den * outlink->w * link->h,
               INT_MAX);
 
-    if(scale->interlaced>0 || (scale->interlaced<0 && in->interlaced_frame)){
+    if (scale->interlaced>0 || (scale->interlaced<0 && in->interlaced_frame)) {
         scale_slice(link, out, in, scale->isws[0], 0, (link->h+1)/2, 2, 0);
         scale_slice(link, out, in, scale->isws[1], 0,  link->h   /2, 2, 1);
-    }else if (scale->nb_slices) {
+    } else if (scale->nb_slices) {
         int i, slice_h, slice_start, slice_end = 0;
         const int nb_slices = FFMIN(scale->nb_slices, link->h);
         for (i = 0; i < nb_slices; i++) {
@@ -528,12 +531,26 @@ static int filter_frame(AVFilterLink *link, AVFrame *in)
             slice_h     = slice_end - slice_start;
             scale_slice(link, out, in, scale->sws, slice_start, slice_h, 1, 0);
         }
-    }else{
+    } else {
         scale_slice(link, out, in, scale->sws, 0, link->h, 1, 0);
     }
 
     av_frame_free(&in);
-    return ff_filter_frame(outlink, out);
+    return 0;
+}
+
+static int filter_frame(AVFilterLink *link, AVFrame *in)
+{
+    AVFilterContext *ctx = link->dst;
+    AVFilterLink *outlink = ctx->outputs[0];
+    AVFrame *out;
+    int ret;
+
+    ret = scale_frame(link, in, &out);
+    if (out)
+        return ff_filter_frame(outlink, out);
+
+    return ret;
 }
 
 static int filter_frame_ref(AVFilterLink *link, AVFrame *in)

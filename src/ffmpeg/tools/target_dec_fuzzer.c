@@ -54,6 +54,9 @@
 #include "libavcodec/bytestream.h"
 #include "libavformat/avformat.h"
 
+//For FF_SANE_NB_CHANNELS, so we dont waste energy testing things that will get instantly rejected
+#include "libavcodec/internal.h"
+
 int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size);
 
 extern AVCodec * codec_list[];
@@ -90,6 +93,9 @@ const uint32_t maxiteration = 8096;
 const uint64_t maxpixels_per_frame = 4096 * 4096;
 uint64_t maxpixels;
 
+const uint64_t maxsamples_per_frame = 256*1024*32;
+uint64_t maxsamples;
+
 static const uint64_t FUZZ_TAG = 0x4741542D5A5A5546ULL;
 
 int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
@@ -98,10 +104,12 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     const uint8_t *end = data + size;
     uint32_t it = 0;
     uint64_t ec_pixels = 0;
+    uint64_t nb_samples = 0;
     int (*decode_handler)(AVCodecContext *avctx, AVFrame *picture,
                           int *got_picture_ptr,
                           const AVPacket *avpkt) = NULL;
     AVCodecParserContext *parser = NULL;
+    uint64_t keyframes = 0;
 
 
     if (!c) {
@@ -126,16 +134,33 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     case AVMEDIA_TYPE_SUBTITLE: decode_handler = subtitle_handler     ; break;
     }
     maxpixels = maxpixels_per_frame * maxiteration;
+    maxsamples = maxsamples_per_frame * maxiteration;
     switch (c->id) {
         // Allows a small input to generate gigantic output
+    case AV_CODEC_ID_BINKVIDEO: maxpixels /= 32; break;
+    case AV_CODEC_ID_CFHD:      maxpixels /= 128; break;
     case AV_CODEC_ID_DIRAC:     maxpixels /= 8192; break;
+    case AV_CODEC_ID_DXV:       maxpixels /= 32;  break;
+    case AV_CODEC_ID_FFWAVESYNTH: maxsamples /= 16384; break;
     case AV_CODEC_ID_MSRLE:     maxpixels /= 16;  break;
     case AV_CODEC_ID_QTRLE:     maxpixels /= 16;  break;
+    case AV_CODEC_ID_SANM:      maxpixels /= 16;  break;
     case AV_CODEC_ID_GIF:       maxpixels /= 16;  break;
         // Performs slow frame rescaling in C
-    case AV_CODEC_ID_GDV:       maxpixels /= 256; break;
+    case AV_CODEC_ID_GDV:       maxpixels /= 512; break;
         // Postprocessing in C
     case AV_CODEC_ID_HNM4_VIDEO:maxpixels /= 128; break;
+        // Cliping in C, generally slow even with small input
+    case AV_CODEC_ID_INDEO4:    maxpixels /= 128; break;
+    case AV_CODEC_ID_LSCR:        maxpixels /= 16; break;
+    case AV_CODEC_ID_MOTIONPIXELS:maxpixels /= 256; break;
+    case AV_CODEC_ID_MSS2:        maxpixels /= 16384; break;
+    case AV_CODEC_ID_MSZH:        maxpixels /= 128; break;
+    case AV_CODEC_ID_SCPR:        maxpixels /= 32;    break;
+    case AV_CODEC_ID_SNOW:        maxpixels /= 128; break;
+    case AV_CODEC_ID_TGV:         maxpixels /= 32;    break;
+    case AV_CODEC_ID_TRUEMOTION2: maxpixels /= 1024; break;
+    case AV_CODEC_ID_VP7:         maxpixels /= 256;  break;
     }
 
 
@@ -148,9 +173,12 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
         ctx->max_pixels = maxpixels_per_frame; //To reduce false positive OOM and hangs
     ctx->refcounted_frames = 1; //To reduce false positive timeouts and focus testing on the refcounted API
 
+    ctx->max_samples = maxsamples_per_frame;
+
     if (size > 1024) {
         GetByteContext gbc;
         int extradata_size;
+        int flags;
         size -= 1024;
         bytestream2_init(&gbc, data + size, 1024);
         ctx->width                              = bytestream2_get_le32(&gbc);
@@ -158,10 +186,20 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
         ctx->bit_rate                           = bytestream2_get_le64(&gbc);
         ctx->bits_per_coded_sample              = bytestream2_get_le32(&gbc);
         // Try to initialize a parser for this codec, note, this may fail which just means we test without one
-        if (bytestream2_get_byte(&gbc) & 1)
+        flags = bytestream2_get_byte(&gbc);
+        if (flags & 1)
             parser = av_parser_init(c->id);
+        if (flags & 2)
+            ctx->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
 
         extradata_size = bytestream2_get_le32(&gbc);
+
+        ctx->sample_rate                        = bytestream2_get_le32(&gbc);
+        ctx->channels                           = (unsigned)bytestream2_get_le32(&gbc) % FF_SANE_NB_CHANNELS;
+        ctx->block_align                        = bytestream2_get_le32(&gbc);
+        ctx->codec_tag                          = bytestream2_get_le32(&gbc);
+        keyframes                               = bytestream2_get_le64(&gbc);
+
         if (extradata_size < size) {
             ctx->extradata = av_mallocz(extradata_size + AV_INPUT_BUFFER_PADDING_SIZE);
             if (ctx->extradata) {
@@ -191,6 +229,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     // Read very simple container
     AVPacket avpkt, parsepkt;
     av_init_packet(&avpkt);
+    av_init_packet(&parsepkt);
     while (data < end && it < maxiteration) {
         // Search for the TAG
         while (data + sizeof(fuzz_tag) < end) {
@@ -205,6 +244,8 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
         if (res < 0)
             error("Failed memory allocation");
         memcpy(parsepkt.data, last, data - last);
+        parsepkt.flags = (keyframes & 1) * AV_PKT_FLAG_DISCARD + (!!(keyframes & 2)) * AV_PKT_FLAG_KEY;
+        keyframes = (keyframes >> 2) + (keyframes<<62);
         data += sizeof(fuzz_tag);
         last = data;
 
@@ -242,10 +283,14 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
             av_frame_unref(frame);
             int ret = decode_handler(ctx, frame, &got_frame, &avpkt);
 
-            ec_pixels += ctx->width * ctx->height;
+            ec_pixels += (ctx->width + 32LL) * (ctx->height + 32LL);
             if (it > 20 || ec_pixels > 4 * ctx->max_pixels)
                 ctx->error_concealment = 0;
             if (ec_pixels > maxpixels)
+                goto maximums_reached;
+
+            nb_samples += frame->nb_samples;
+            if (nb_samples > maxsamples)
                 goto maximums_reached;
 
             if (ret <= 0 || ret > avpkt.size)
@@ -269,7 +314,7 @@ maximums_reached:
         decode_handler(ctx, frame, &got_frame, &avpkt);
     } while (got_frame == 1 && it++ < maxiteration);
 
-    fprintf(stderr, "pixels decoded: %"PRId64", iterations: %d\n", ec_pixels, it);
+    fprintf(stderr, "pixels decoded: %"PRId64", samples decoded: %"PRId64", iterations: %d\n", ec_pixels, nb_samples, it);
 
     av_frame_free(&frame);
     avcodec_free_context(&ctx);

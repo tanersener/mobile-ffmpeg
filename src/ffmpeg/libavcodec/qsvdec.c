@@ -34,9 +34,11 @@
 #include "libavutil/pixdesc.h"
 #include "libavutil/pixfmt.h"
 #include "libavutil/time.h"
+#include "libavutil/imgutils.h"
 
 #include "avcodec.h"
 #include "internal.h"
+#include "decode.h"
 #include "qsv.h"
 #include "qsv_internal.h"
 #include "qsvdec.h"
@@ -54,17 +56,58 @@ const AVCodecHWConfigInternal *ff_qsv_hw_configs[] = {
     NULL
 };
 
+static int ff_qsv_get_continuous_buffer(AVCodecContext *avctx, AVFrame *frame, AVBufferPool *pool)
+{
+    int ret = 0;
+
+    ff_decode_frame_props(avctx, frame);
+
+    frame->width       = avctx->width;
+    frame->height      = avctx->height;
+
+    switch (avctx->pix_fmt) {
+    case AV_PIX_FMT_NV12:
+        frame->linesize[0] = FFALIGN(avctx->width, 128);
+        break;
+    case AV_PIX_FMT_P010:
+        frame->linesize[0] = 2 * FFALIGN(avctx->width, 128);
+        break;
+    default:
+        av_log(avctx, AV_LOG_ERROR, "Unsupported pixel format.\n");
+        return AVERROR(ENOMEM);
+    }
+
+    frame->linesize[1] = frame->linesize[0];
+    frame->buf[0]      = av_buffer_pool_get(pool);
+    if (!frame->buf[0])
+        return AVERROR(ENOMEM);
+
+    frame->data[0] = frame->buf[0]->data;
+    frame->data[1] = frame->data[0] +
+                            frame->linesize[0] * FFALIGN(avctx->height, 64);
+
+    ret = ff_attach_decode_data(frame);
+    if (ret < 0)
+        return ret;
+
+    return 0;
+}
+
 static int qsv_init_session(AVCodecContext *avctx, QSVContext *q, mfxSession session,
                             AVBufferRef *hw_frames_ref, AVBufferRef *hw_device_ref)
 {
     int ret;
 
+    if (q->gpu_copy == MFX_GPUCOPY_ON &&
+        !(q->iopattern & MFX_IOPATTERN_OUT_SYSTEM_MEMORY))
+        av_log(avctx, AV_LOG_WARNING, "GPU-accelerated memory copy "
+                        "only works in MFX_IOPATTERN_OUT_SYSTEM_MEMORY.\n");
     if (session) {
         q->session = session;
     } else if (hw_frames_ref) {
-        if (q->internal_session) {
-            MFXClose(q->internal_session);
-            q->internal_session = NULL;
+        if (q->internal_qs.session) {
+            MFXClose(q->internal_qs.session);
+            q->internal_qs.session = NULL;
         }
         av_buffer_unref(&q->frames_ctx.hw_frames_ctx);
 
@@ -72,36 +115,37 @@ static int qsv_init_session(AVCodecContext *avctx, QSVContext *q, mfxSession ses
         if (!q->frames_ctx.hw_frames_ctx)
             return AVERROR(ENOMEM);
 
-        ret = ff_qsv_init_session_frames(avctx, &q->internal_session,
+        ret = ff_qsv_init_session_frames(avctx, &q->internal_qs.session,
                                          &q->frames_ctx, q->load_plugins,
-                                         q->iopattern == MFX_IOPATTERN_OUT_OPAQUE_MEMORY);
+                                         q->iopattern == MFX_IOPATTERN_OUT_OPAQUE_MEMORY,
+                                         q->gpu_copy);
         if (ret < 0) {
             av_buffer_unref(&q->frames_ctx.hw_frames_ctx);
             return ret;
         }
 
-        q->session = q->internal_session;
+        q->session = q->internal_qs.session;
     } else if (hw_device_ref) {
-        if (q->internal_session) {
-            MFXClose(q->internal_session);
-            q->internal_session = NULL;
+        if (q->internal_qs.session) {
+            MFXClose(q->internal_qs.session);
+            q->internal_qs.session = NULL;
         }
 
-        ret = ff_qsv_init_session_device(avctx, &q->internal_session,
-                                         hw_device_ref, q->load_plugins);
+        ret = ff_qsv_init_session_device(avctx, &q->internal_qs.session,
+                                         hw_device_ref, q->load_plugins, q->gpu_copy);
         if (ret < 0)
             return ret;
 
-        q->session = q->internal_session;
+        q->session = q->internal_qs.session;
     } else {
-        if (!q->internal_session) {
-            ret = ff_qsv_init_internal_session(avctx, &q->internal_session,
-                                               q->load_plugins);
+        if (!q->internal_qs.session) {
+            ret = ff_qsv_init_internal_session(avctx, &q->internal_qs,
+                                               q->load_plugins, q->gpu_copy);
             if (ret < 0)
                 return ret;
         }
 
-        q->session = q->internal_session;
+        q->session = q->internal_qs.session;
     }
 
     /* make sure the decoder is uninitialized */
@@ -193,6 +237,8 @@ static int qsv_decode_preinit(AVCodecContext *avctx, QSVContext *q, enum AVPixel
         iopattern = MFX_IOPATTERN_OUT_SYSTEM_MEMORY;
     q->iopattern = iopattern;
 
+    ff_qsv_print_iopattern(avctx, q->iopattern, "Decoder");
+
     ret = qsv_init_session(avctx, q, session, avctx->hw_frames_ctx, avctx->hw_device_ctx);
     if (ret < 0) {
         av_log(avctx, AV_LOG_ERROR, "Error initializing an MFX session\n");
@@ -227,6 +273,9 @@ static int qsv_decode_init(AVCodecContext *avctx, QSVContext *q, mfxVideoParam *
 
     q->frame_info = param->mfx.FrameInfo;
 
+    if (!avctx->hw_frames_ctx)
+        q->pool = av_buffer_pool_init(av_image_get_buffer_size(avctx->pix_fmt,
+                    FFALIGN(avctx->width, 128), FFALIGN(avctx->height, 64), 1), av_buffer_allocz);
     return 0;
 }
 
@@ -273,7 +322,11 @@ static int alloc_frame(AVCodecContext *avctx, QSVContext *q, QSVFrame *frame)
 {
     int ret;
 
-    ret = ff_get_buffer(avctx, frame->frame, AV_GET_BUFFER_FLAG_REF);
+    if (q->pool)
+        ret = ff_qsv_get_continuous_buffer(avctx, frame->frame, q->pool);
+    else
+        ret = ff_get_buffer(avctx, frame->frame, AV_GET_BUFFER_FLAG_REF);
+
     if (ret < 0)
         return ret;
 
@@ -529,11 +582,11 @@ int ff_qsv_decode_close(QSVContext *q)
     av_fifo_free(q->async_fifo);
     q->async_fifo = NULL;
 
-    if (q->internal_session)
-        MFXClose(q->internal_session);
+    ff_qsv_close_internal_session(&q->internal_qs);
 
     av_buffer_unref(&q->frames_ctx.hw_frames_ctx);
     av_buffer_unref(&q->frames_ctx.mids_buf);
+    av_buffer_pool_uninit(&q->pool);
 
     return 0;
 }

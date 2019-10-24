@@ -637,8 +637,10 @@ static int write_headers(AVFormatContext *avctx, AVIOContext *bc)
         if (ret < 0)
             return ret;
         ret = write_streamheader(avctx, dyn_bc, nut->avf->streams[i], i);
-        if (ret < 0)
+        if (ret < 0) {
+            ffio_free_dyn_buf(&dyn_bc);
             return ret;
+        }
         put_packet(nut, bc, dyn_bc, 1, STREAM_STARTCODE);
     }
 
@@ -653,12 +655,13 @@ static int write_headers(AVFormatContext *avctx, AVIOContext *bc)
         if (ret < 0)
             return ret;
         ret = write_streaminfo(nut, dyn_bc, i);
-        if (ret < 0)
-            return ret;
         if (ret > 0)
             put_packet(nut, bc, dyn_bc, 1, INFO_STARTCODE);
-        else
+        else {
             ffio_free_dyn_buf(&dyn_bc);
+            if (ret < 0)
+                return ret;
+        }
     }
 
     for (i = 0; i < nut->avf->nb_chapters; i++) {
@@ -1170,8 +1173,11 @@ static int nut_write_trailer(AVFormatContext *s)
     while (nut->header_count < 3)
         write_headers(s, bc);
 
+    if (!nut->sp_count)
+        return 0;
+
     ret = avio_open_dyn_buf(&dyn_bc);
-    if (ret >= 0 && nut->sp_count) {
+    if (ret >= 0) {
         av_assert1(nut->write_index); // sp_count should be 0 if no index is going to be written
         write_index(nut, dyn_bc);
         put_packet(nut, bc, dyn_bc, 1, INDEX_STARTCODE);

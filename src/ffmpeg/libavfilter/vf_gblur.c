@@ -35,7 +35,7 @@
 #include "video.h"
 
 #define OFFSET(x) offsetof(GBlurContext, x)
-#define FLAGS AV_OPT_FLAG_VIDEO_PARAM|AV_OPT_FLAG_FILTERING_PARAM
+#define FLAGS AV_OPT_FLAG_VIDEO_PARAM|AV_OPT_FLAG_FILTERING_PARAM|AV_OPT_FLAG_RUNTIME_PARAM
 
 static const AVOption gblur_options[] = {
     { "sigma",  "set sigma",            OFFSET(sigma),  AV_OPT_TYPE_FLOAT, {.dbl=0.5}, 0.0, 1024, FLAGS },
@@ -157,6 +157,7 @@ static int filter_postscale(AVFilterContext *ctx, void *arg, int jobnr, int nb_j
 {
     GBlurContext *s = ctx->priv;
     ThreadData *td = arg;
+    const float max = (1 << s->depth) - 1;
     const int height = td->height;
     const int width = td->width;
     const int64_t numpixels = width * (int64_t)height;
@@ -166,8 +167,10 @@ static int filter_postscale(AVFilterContext *ctx, void *arg, int jobnr, int nb_j
     float *buffer = s->buffer;
     unsigned i;
 
-    for (i = slice_start; i < slice_end; i++)
+    for (i = slice_start; i < slice_end; i++) {
         buffer[i] *= postscale;
+        buffer[i] = av_clipf(buffer[i], 0.f, max);
+    }
 
     return 0;
 }
@@ -236,7 +239,7 @@ static int config_input(AVFilterLink *inlink)
 
     s->nb_planes = av_pix_fmt_count_planes(inlink->format);
 
-    s->buffer = av_malloc_array(inlink->w, inlink->h * sizeof(*s->buffer));
+    s->buffer = av_malloc_array(FFALIGN(inlink->w, 16), FFALIGN(inlink->h, 16) * sizeof(*s->buffer));
     if (!s->buffer)
         return AVERROR(ENOMEM);
 
@@ -379,4 +382,5 @@ AVFilter ff_vf_gblur = {
     .inputs        = gblur_inputs,
     .outputs       = gblur_outputs,
     .flags         = AVFILTER_FLAG_SUPPORT_TIMELINE_GENERIC | AVFILTER_FLAG_SLICE_THREADS,
+    .process_command = ff_filter_process_command,
 };
