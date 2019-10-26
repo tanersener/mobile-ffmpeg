@@ -26,6 +26,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.AndroidRuntimeException;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -140,6 +141,8 @@ public class VideoTabFragment extends Fragment implements AdapterView.OnItemSele
                         return null;
                     }
                 });
+
+                throw new AndroidRuntimeException("I am test exception thrown by test application");
             }
         });
     }
