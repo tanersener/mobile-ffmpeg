@@ -241,7 +241,11 @@ public class Config {
         }
 
         if (logCallbackFunction != null) {
-            logCallbackFunction.apply(new LogMessage(level, text));
+            try {
+                logCallbackFunction.apply(new LogMessage(level, text));
+            } catch (final Exception e) {
+                Log.e(Config.TAG, "Exception thrown inside LogCallback block", e);
+            }
         } else {
             switch (level) {
                 case AV_LOG_QUIET: {
@@ -297,7 +301,11 @@ public class Config {
         lastReceivedStatistics.update(newStatistics);
 
         if (statisticsCallbackFunction != null) {
-            statisticsCallbackFunction.apply(lastReceivedStatistics);
+            try {
+                statisticsCallbackFunction.apply(lastReceivedStatistics);
+            } catch (final Exception e) {
+                Log.e(Config.TAG, "Exception thrown inside StatisticsCallback block", e);
+            }
         }
     }
 
