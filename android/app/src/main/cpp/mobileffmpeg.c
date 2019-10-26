@@ -99,8 +99,17 @@ static jmethodID logMethod;
 /** Global reference of statistics redirection method in Java */
 static jmethodID statisticsMethod;
 
+/** Global reference of String class in Java */
+static jclass stringClass;
+
+/** Global reference of String constructor in Java */
+static jmethodID stringConstructor;
+
 /** Full name of the Config class */
 const char *configClassName = "com/arthenica/mobileffmpeg/Config";
+
+/** Full name of String class */
+const char *stringClassName = "java/lang/String";
 
 /** Prototypes of native functions defined by Config class. */
 JNINativeMethod configMethods[] = {
@@ -580,18 +589,31 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_FALSE;
     }
 
+    jclass localStringClass = (*env)->FindClass(env, stringClassName);
+    if (localStringClass == NULL) {
+        LOGE("OnLoad failed to FindClass %s.\n", stringClassName);
+        return JNI_FALSE;
+    }
+
     (*env)->GetJavaVM(env, &globalVm);
 
     logMethod = (*env)->GetStaticMethodID(env, localConfigClass, "log", "(I[B)V");
     if (logMethod == NULL) {
-        LOGE("OnLoad thread failed to GetMethodID for %s.\n", "log");
+        LOGE("OnLoad thread failed to GetStaticMethodID for %s.\n", "log");
         (*globalVm)->DetachCurrentThread(globalVm);
         return JNI_FALSE;
     }
 
     statisticsMethod = (*env)->GetStaticMethodID(env, localConfigClass, "statistics", "(IFFJIDD)V");
     if (logMethod == NULL) {
-        LOGE("OnLoad thread failed to GetMethodID for %s.\n", "statistics");
+        LOGE("OnLoad thread failed to GetStaticMethodID for %s.\n", "statistics");
+        (*globalVm)->DetachCurrentThread(globalVm);
+        return JNI_FALSE;
+    }
+
+    stringConstructor = (*env)->GetMethodID(env, localStringClass, "<init>", "([BLjava/lang/String;)V");
+    if (stringConstructor == NULL) {
+        LOGE("OnLoad thread failed to GetMethodID for %s.\n", "<init>");
         (*globalVm)->DetachCurrentThread(globalVm);
         return JNI_FALSE;
     }
@@ -599,6 +621,7 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     av_jni_set_java_vm(vm, NULL);
 
     configClass = (jclass) ((*env)->NewGlobalRef(env, localConfigClass));
+    stringClass = (jclass) ((*env)->NewGlobalRef(env, localStringClass));
 
     redirectionEnabled = 0;
 
@@ -825,5 +848,14 @@ JNIEXPORT int JNICALL Java_com_arthenica_mobileffmpeg_Config_setNativeEnvironmen
  * @return output of the last executed command
  */
 JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_Config_getNativeLastCommandOutput(JNIEnv *env, jclass object) {
-    return (*env)->NewStringUTF(env, lastCommandOutput);
+    int size = strlen(lastCommandOutput);
+
+    if (size > 0) {
+        jbyteArray byteArray = (*env)->NewByteArray(env, size);
+        (*env)->SetByteArrayRegion(env, byteArray, 0, size, lastCommandOutput);
+        jstring charsetName = (*env)->NewStringUTF(env, "UTF-8");
+        return (jstring) (*env)->NewObject(env, stringClass, stringConstructor, byteArray, charsetName);
+    } else {
+        return (*env)->NewStringUTF(env, "");
+    }
 }
