@@ -24,6 +24,7 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * <p>Main class for FFmpeg operations. Provides {@link #execute(String...)} method to execute
@@ -42,7 +43,11 @@ public class FFmpeg {
 
     public static final int RETURN_CODE_CANCEL = 255;
 
+    public static final int RETURN_CODE_MULTIPLE_EXECUTIONS_NOT_ALLOWED = 300;
+
     private static int lastReturnCode = 0;
+
+    private static final AtomicBoolean started = new AtomicBoolean(false);
 
     static {
         AbiDetect.class.getName();
@@ -84,7 +89,13 @@ public class FFmpeg {
      * @return zero on successful execution, 255 on user cancel and non-zero on error
      */
     public static int execute(final String[] arguments) {
-        lastReturnCode = Config.nativeExecute(arguments);
+        if (started.compareAndSet(false, true)) {
+            lastReturnCode = Config.nativeExecute(arguments);
+            started.compareAndSet(true, false);
+        } else {
+            Log.e(Config.TAG, "execute cancelled. Multiple executions not supported.");
+            lastReturnCode = RETURN_CODE_MULTIPLE_EXECUTIONS_NOT_ALLOWED;
+        }
 
         return lastReturnCode;
     }
@@ -171,7 +182,14 @@ public class FFmpeg {
      * @since 3.0
      */
     public static MediaInformation getMediaInformation(final String path, final Long timeout) {
-        int rc = Config.systemExecute(new String[]{"-v", "info", "-hide_banner", "-i", path}, new ArrayList<>(Arrays.asList("Press [q] to stop, [?] for help", "No such file or directory", "Input/output error", "Conversion failed", "HTTP error")), "At least one output file must be specified", timeout);
+        final int rc;
+        if (started.compareAndSet(false, true)) {
+            rc = Config.systemExecute(new String[]{"-v", "info", "-hide_banner", "-i", path}, new ArrayList<>(Arrays.asList("Press [q] to stop, [?] for help", "No such file or directory", "Input/output error", "Conversion failed", "HTTP error")), "At least one output file must be specified", timeout);
+            started.compareAndSet(true, false);
+        } else {
+            Log.e(Config.TAG, "getMediaInformation cancelled. Multiple executions not supported.");
+            rc = RETURN_CODE_MULTIPLE_EXECUTIONS_NOT_ALLOWED;
+        }
 
         if (rc == 0) {
             return MediaInformationParser.from(Config.getSystemCommandOutput());

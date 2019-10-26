@@ -35,9 +35,11 @@ NSString *const MOBILE_FFMPEG_VERSION = @"4.3";
 /** Common return code values */
 int const RETURN_CODE_SUCCESS = 0;
 int const RETURN_CODE_CANCEL = 255;
+int const RETURN_CODE_MULTIPLE_EXECUTIONS_NOT_ALLOWED = 300;
 
 int lastReturnCode;
 NSMutableString *lastCommandOutput;
+BOOL started;
 
 extern NSMutableString *systemCommandOutput;
 extern int mobileffmpeg_system_execute(NSArray *arguments, NSMutableArray *commandOutputEndPatternList, NSString *successPattern, long timeout);
@@ -47,8 +49,20 @@ extern int mobileffmpeg_system_execute(NSArray *arguments, NSMutableArray *comma
 
     lastReturnCode = 0;
     lastCommandOutput = [[NSMutableString alloc] init];
+    started = FALSE;
 
     NSLog(@"Loaded mobile-ffmpeg-%@-%@-%@-%@\n", [MobileFFmpegConfig getPackageName], [ArchDetect getArch], [MobileFFmpeg getVersion], [MobileFFmpeg getBuildDate]);
+}
+
++(BOOL)compareAndSet:(BOOL)expect with:(BOOL)update {
+    @synchronized (self) {
+        if (started == expect) {
+            started = update;
+            return TRUE;
+        } else {
+            return FALSE;
+        }
+    }
 }
 
 /**
@@ -97,7 +111,13 @@ extern int mobileffmpeg_system_execute(NSArray *arguments, NSMutableArray *comma
     }
 
     // RUN
-    lastReturnCode = execute(([arguments count] + 1), commandCharPArray);
+    if ([MobileFFmpeg compareAndSet:FALSE with:TRUE]) {
+        lastReturnCode = execute(([arguments count] + 1), commandCharPArray);
+        [MobileFFmpeg compareAndSet:TRUE with:FALSE];
+    } else {
+        NSLog(@"execute cancelled. Multiple executions not supported.");
+        lastReturnCode = RETURN_CODE_MULTIPLE_EXECUTIONS_NOT_ALLOWED;
+    }
 
     // CLEANUP
     av_free(commandCharPArray[0]);
@@ -177,8 +197,16 @@ extern int mobileffmpeg_system_execute(NSArray *arguments, NSMutableArray *comma
  * @param timeout complete timeout
  * @return media information
  */
- + (MediaInformation*)getMediaInformation: (NSString*)path timeout:(long)timeout {
-    int rc = mobileffmpeg_system_execute([[NSArray alloc] initWithObjects:@"-v", @"info", @"-hide_banner", @"-i", path, nil], [NSMutableArray arrayWithObjects:@"Press [q] to stop, [?] for help", @"No such file or directory", @"Input/output error", @"Conversion failed", @"HTTP error", nil], @"At least one output file must be specified", timeout);
++ (MediaInformation*)getMediaInformation: (NSString*)path timeout:(long)timeout {
+    int rc;
+
+    if ([MobileFFmpeg compareAndSet:FALSE with:TRUE]) {
+        rc = mobileffmpeg_system_execute([[NSArray alloc] initWithObjects:@"-v", @"info", @"-hide_banner", @"-i", path, nil], [NSMutableArray arrayWithObjects:@"Press [q] to stop, [?] for help", @"No such file or directory", @"Input/output error", @"Conversion failed", @"HTTP error", nil], @"At least one output file must be specified", timeout);
+        [MobileFFmpeg compareAndSet:TRUE with:FALSE];
+    } else {
+        NSLog(@"getMediaInformation cancelled. Multiple executions not supported.");
+        rc = RETURN_CODE_MULTIPLE_EXECUTIONS_NOT_ALLOWED;
+    }
 
     if (rc == 0) {
         return [MediaInformationParser from:systemCommandOutput];
