@@ -198,15 +198,7 @@ extern int mobileffmpeg_system_execute(NSArray *arguments, NSMutableArray *comma
  * @return media information
  */
 + (MediaInformation*)getMediaInformation: (NSString*)path timeout:(long)timeout {
-    int rc;
-
-    if ([MobileFFmpeg compareAndSet:FALSE with:TRUE]) {
-        rc = mobileffmpeg_system_execute([[NSArray alloc] initWithObjects:@"-v", @"info", @"-hide_banner", @"-i", path, nil], [NSMutableArray arrayWithObjects:@"Press [q] to stop, [?] for help", @"No such file or directory", @"Input/output error", @"Conversion failed", @"HTTP error", nil], @"At least one output file must be specified", timeout);
-        [MobileFFmpeg compareAndSet:TRUE with:FALSE];
-    } else {
-        NSLog(@"getMediaInformation cancelled. Multiple executions not supported.");
-        rc = RETURN_CODE_MULTIPLE_EXECUTIONS_NOT_ALLOWED;
-    }
+    int rc = mobileffmpeg_system_execute([[NSArray alloc] initWithObjects:@"-v", @"info", @"-hide_banner", @"-i", path, nil], [NSMutableArray arrayWithObjects:@"Press [q] to stop, [?] for help", @"No such file or directory", @"Input/output error", @"Conversion failed", @"HTTP error", nil], @"At least one output file must be specified", timeout);
 
     if (rc == 0) {
         return [MediaInformationParser from:systemCommandOutput];
