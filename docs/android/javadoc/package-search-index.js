@@ -1,1 +1,0 @@
-packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"com.arthenica.mobileffmpeg"},{"l":"com.arthenica.mobileffmpeg.util"}]

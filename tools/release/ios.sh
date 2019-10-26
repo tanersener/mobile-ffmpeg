@@ -69,6 +69,7 @@ if [[ "${MOBILE_FFMPEG_VERSION}" != "$1" ]]; then
     echo "3. Update tools/release scripts' descriptions"
     echo "4. Update podspec links"
     echo "5. Update mobileffmpeg.h versions for both android and ios"
+    echo "6. Update versions in Doxyfile"
     exit 1
 fi
 

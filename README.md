@@ -1,4 +1,4 @@
-# MobileFFmpeg ![GitHub release](https://img.shields.io/badge/release-v4.2.2-blue.svg) ![Bintray](https://img.shields.io/badge/bintray-v4.2.2-blue.svg) ![CocoaPods](https://img.shields.io/badge/pod-v4.2.2-blue.svg) [![Build Status](https://travis-ci.org/tanersener/mobile-ffmpeg.svg?branch=master)](https://travis-ci.org/tanersener/mobile-ffmpeg)
+# MobileFFmpeg ![GitHub release](https://img.shields.io/badge/release-v4.3-blue.svg) ![Bintray](https://img.shields.io/badge/bintray-v4.3-blue.svg) ![CocoaPods](https://img.shields.io/badge/pod-v4.3-blue.svg) [![Build Status](https://travis-ci.org/tanersener/mobile-ffmpeg.svg?branch=master)](https://travis-ci.org/tanersener/mobile-ffmpeg)
 
 FFmpeg for Android, iOS and tvOS
 
@@ -14,7 +14,7 @@ FFmpeg for Android, iOS and tvOS
 - Use binaries available at `Github`/`JCenter`/`CocoaPods` or build your own version with external libraries you need
 - Supports
     - Android, iOS and tvOS
-    - FFmpeg `v3.4.x`, `v4.0.x`, `v4.1` and `v4.2-dev` releases
+    - FFmpeg `v3.4.x`, `v4.0.x`, `v4.1`, `v4.2-dev` and `v4.3-dev` releases
     - 28 external libraries
     
         `chromaprint`, `fontconfig`, `freetype`, `fribidi`, `gmp`, `gnutls`, `kvazaar`, `lame`, `libaom`, `libass`, `libiconv`, `libilbc`, `libtheora`, `libvorbis`, `libvpx`, `libwebp`, `libxml2`, `opencore-amr`, `openh264`, `opus`, `sdl`, `shine`, `snappy`, `soxr`, `speex`, `tesseract`, `twolame`, `wavpack`
@@ -121,7 +121,7 @@ Please remember that some parts of `FFmpeg` are licensed under the `GPL` and onl
 1. Add MobileFFmpeg dependency to your `build.gradle` in `mobile-ffmpeg-<package name>` format
     ```
     dependencies {
-        implementation 'com.arthenica:mobile-ffmpeg-full:4.2.2'
+        implementation 'com.arthenica:mobile-ffmpeg-full:4.3'
     }
     ```
 
@@ -199,12 +199,12 @@ Please remember that some parts of `FFmpeg` are licensed under the `GPL` and onl
 
     - iOS
     ```
-    pod 'mobile-ffmpeg-full', '~> 4.2.2'
+    pod 'mobile-ffmpeg-full', '~> 4.3'
     ```
 
     - tvOS
     ```
-    pod 'mobile-ffmpeg-tv-full', '~> 4.2.2'
+    pod 'mobile-ffmpeg-tv-full', '~> 4.3'
     ```
 
 2. Execute commands.
@@ -313,6 +313,7 @@ Exact version number is obtained using `git describe --tags`.
 
 |  MobileFFmpeg Version | FFmpeg Version | Release Date |
 | :----: | :----: |:----: |
+| [4.3](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v4.3) | 4.3-dev-1181 | Oct 26, 2019 |
 | [4.2.2](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v4.2.2) | 4.2-dev-1824 | July 3, 2019 |
 | [4.2.2.LTS](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v4.2.2.LTS) | 4.2-dev-1824 | July 3, 2019 |
 | [4.2.1](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v4.2.1) | 4.2-dev-1156 | Apr 2, 2019 |
