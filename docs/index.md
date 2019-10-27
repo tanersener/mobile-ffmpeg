@@ -6,7 +6,7 @@ FFmpeg for Android, iOS and tvOS
 <img src="https://github.com/tanersener/mobile-ffmpeg/raw/dev-v3.x/docs/assets/mobile-ffmpeg-logo-v7.png" width="240">
 
 ### 1. Features
-- Supports FFmpeg `v3.4.x`, `v4.0.x`, `v4.1` and `v4.2-dev` releases
+- Supports FFmpeg `v3.4.x`, `v4.0.x`, `v4.1`, `v4.2-dev` and `v4.3-dev` releases
 - Use prebuilt binaries available under `Github`/`JCenter`/`CocoaPods` or build your own version with external libraries you need
 - Includes 28 external libraries, 4 GPL libraries and 13 architectures in total
 - Exposes both FFmpeg library and MobileFFmpeg wrapper library capabilities
@@ -79,7 +79,7 @@ Please remember that some parts of `FFmpeg` are licensed under the `GPL` and onl
 1. Add MobileFFmpeg dependency to your `build.gradle` in `mobile-ffmpeg-<package name>` format
     ```
     dependencies {
-        implementation 'com.arthenica:mobile-ffmpeg-min:4.2.2'
+        implementation 'com.arthenica:mobile-ffmpeg-min:4.3'
     }
     ```
 
@@ -157,12 +157,12 @@ Please remember that some parts of `FFmpeg` are licensed under the `GPL` and onl
 
     - iOS
     ```
-    pod 'mobile-ffmpeg-min', '~> 4.2.2'
+    pod 'mobile-ffmpeg-min', '~> 4.3'
     ```
 
     - tvOS
     ```
-    pod 'mobile-ffmpeg-tv-min', '~> 4.2.2'
+    pod 'mobile-ffmpeg-tv-min', '~> 4.3'
     ```
 
 2. Execute commands.
@@ -251,6 +251,7 @@ Exact version number is obtained using `git describe --tags`.
 
 |  MobileFFmpeg Version | FFmpeg Version | Release Date |
 | :----: | :----: |:----: |
+| [4.3](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v4.3) | 4.3-dev-1181 | Oct 27, 2019 |
 | [4.2.2](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v4.2.2) | 4.2-dev-1824 | July 3, 2019 |
 | [4.2.2.LTS](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v4.2.2.LTS) | 4.2-dev-1824 | July 3, 2019 |
 | [4.2.1](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v4.2.1) | 4.2-dev-1156 | Apr 2, 2019 |
