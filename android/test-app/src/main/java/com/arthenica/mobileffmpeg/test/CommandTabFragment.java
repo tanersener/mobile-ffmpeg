@@ -126,7 +126,7 @@ public class CommandTabFragment extends Fragment {
 
         android.util.Log.d(MainActivity.TAG, String.format("FFmpeg process started with arguments\n\'%s\'", ffmpegCommand));
 
-        int result = FFmpeg.execute(ffmpegCommand, " ");
+        int result = FFmpeg.execute(ffmpegCommand);
 
         android.util.Log.d(MainActivity.TAG, String.format("FFmpeg process exited with rc %d", result));
 
