@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		344D0ED222DE40F200DC2568 /* MediaInformationParserTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 344D0ED022DE40F200DC2568 /* MediaInformationParserTest.m */; };
+		344D0ED522DE40F800DC2568 /* MobileFFmpegTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 344D0ED322DE40F800DC2568 /* MobileFFmpegTest.m */; };
 		34695E8A22AD292100889D20 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 34695E8922AD292100889D20 /* AppDelegate.m */; };
 		34695E9022AD292100889D20 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 34695E8E22AD292100889D20 /* Main.storyboard */; };
 		34695E9222AD292300889D20 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 34695E9122AD292300889D20 /* Assets.xcassets */; };
@@ -15,7 +17,6 @@
 		34695EBE22AD440800889D20 /* CommandViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 34695EBB22AD440800889D20 /* CommandViewController.m */; };
 		34695EBF22AD440800889D20 /* HttpsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 34695EBC22AD440800889D20 /* HttpsViewController.m */; };
 		34695EC022AD440800889D20 /* Constants.m in Sources */ = {isa = PBXBuildFile; fileRef = 34695EBD22AD440800889D20 /* Constants.m */; };
-		34695ECF22AD441500889D20 /* MediaInformationParserTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 34695EC222AD441400889D20 /* MediaInformationParserTests.m */; };
 		34695ED022AD441500889D20 /* SubtitleViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 34695EC322AD441400889D20 /* SubtitleViewController.m */; };
 		34695ED122AD441500889D20 /* Util.m in Sources */ = {isa = PBXBuildFile; fileRef = 34695EC522AD441400889D20 /* Util.m */; };
 		34695ED222AD441500889D20 /* TabBarController.m in Sources */ = {isa = PBXBuildFile; fileRef = 34695EC622AD441400889D20 /* TabBarController.m */; };
@@ -24,18 +25,15 @@
 		34695ED522AD441500889D20 /* PipeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 34695ECE22AD441500889D20 /* PipeViewController.m */; };
 		34C06BBE22AD61950039DF48 /* x265.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34C06B8422AD61940039DF48 /* x265.framework */; };
 		34C06BBF22AD61950039DF48 /* libopencore-amrwb.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34C06B8522AD61940039DF48 /* libopencore-amrwb.framework */; };
-		34C06BC022AD61950039DF48 /* tesseract.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34C06B8622AD61940039DF48 /* tesseract.framework */; };
 		34C06BC122AD61950039DF48 /* libhogweed.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34C06B8722AD61940039DF48 /* libhogweed.framework */; };
 		34C06BC222AD61950039DF48 /* fribidi.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34C06B8822AD61940039DF48 /* fribidi.framework */; };
 		34C06BC322AD61950039DF48 /* xvidcore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34C06B8922AD61940039DF48 /* xvidcore.framework */; };
-		34C06BC422AD61950039DF48 /* leptonica.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34C06B8A22AD61940039DF48 /* leptonica.framework */; };
 		34C06BC522AD61950039DF48 /* wavpack.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34C06B8B22AD61940039DF48 /* wavpack.framework */; };
 		34C06BC622AD61950039DF48 /* libswresample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34C06B8C22AD61940039DF48 /* libswresample.framework */; };
 		34C06BC722AD61950039DF48 /* soxr.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34C06B8D22AD61940039DF48 /* soxr.framework */; };
 		34C06BC822AD61950039DF48 /* libavutil.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34C06B8E22AD61940039DF48 /* libavutil.framework */; };
 		34C06BC922AD61950039DF48 /* twolame.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34C06B8F22AD61940039DF48 /* twolame.framework */; };
 		34C06BCA22AD61950039DF48 /* libpng.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34C06B9022AD61940039DF48 /* libpng.framework */; };
-		34C06BCB22AD61950039DF48 /* chromaprint.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34C06B9122AD61940039DF48 /* chromaprint.framework */; };
 		34C06BCC22AD61950039DF48 /* libvorbisenc.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34C06B9222AD61940039DF48 /* libvorbisenc.framework */; };
 		34C06BCD22AD61950039DF48 /* tiff.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34C06B9322AD61940039DF48 /* tiff.framework */; };
 		34C06BCE22AD61950039DF48 /* libwebpdemux.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34C06B9422AD61940039DF48 /* libwebpdemux.framework */; };
@@ -65,7 +63,6 @@
 		34C06BE622AD61950039DF48 /* libtheora.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34C06BAC22AD61940039DF48 /* libtheora.framework */; };
 		34C06BE722AD61950039DF48 /* mobileffmpeg.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34C06BAD22AD61940039DF48 /* mobileffmpeg.framework */; };
 		34C06BE822AD61950039DF48 /* libvidstab.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34C06BAE22AD61940039DF48 /* libvidstab.framework */; };
-		34C06BE922AD61950039DF48 /* sdl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34C06BAF22AD61940039DF48 /* sdl.framework */; };
 		34C06BEA22AD61950039DF48 /* libilbc.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34C06BB022AD61940039DF48 /* libilbc.framework */; };
 		34C06BEB22AD61950039DF48 /* libiconv.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34C06BB122AD61940039DF48 /* libiconv.framework */; };
 		34C06BEC22AD61950039DF48 /* jpeg.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34C06BB222AD61940039DF48 /* jpeg.framework */; };
@@ -96,6 +93,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		344D0ED022DE40F200DC2568 /* MediaInformationParserTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MediaInformationParserTest.m; sourceTree = "<group>"; };
+		344D0ED122DE40F200DC2568 /* MediaInformationParserTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MediaInformationParserTest.h; sourceTree = "<group>"; };
+		344D0ED322DE40F800DC2568 /* MobileFFmpegTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MobileFFmpegTest.m; sourceTree = "<group>"; };
+		344D0ED422DE40F800DC2568 /* MobileFFmpegTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MobileFFmpegTest.h; sourceTree = "<group>"; };
 		34695E8622AD292000889D20 /* MobileFFmpegTest-tvOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "MobileFFmpegTest-tvOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		34695E8822AD292100889D20 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		34695E8922AD292100889D20 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -112,7 +113,6 @@
 		34695EBC22AD440800889D20 /* HttpsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HttpsViewController.m; sourceTree = "<group>"; };
 		34695EBD22AD440800889D20 /* Constants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Constants.m; sourceTree = "<group>"; };
 		34695EC122AD441400889D20 /* Util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Util.h; sourceTree = "<group>"; };
-		34695EC222AD441400889D20 /* MediaInformationParserTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MediaInformationParserTests.m; sourceTree = "<group>"; };
 		34695EC322AD441400889D20 /* SubtitleViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SubtitleViewController.m; sourceTree = "<group>"; };
 		34695EC422AD441400889D20 /* TabBarController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TabBarController.h; sourceTree = "<group>"; };
 		34695EC522AD441400889D20 /* Util.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Util.m; sourceTree = "<group>"; };
@@ -121,7 +121,6 @@
 		34695EC822AD441400889D20 /* PipeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PipeViewController.h; sourceTree = "<group>"; };
 		34695EC922AD441400889D20 /* VidStabViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VidStabViewController.h; sourceTree = "<group>"; };
 		34695ECA22AD441400889D20 /* VidStabViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VidStabViewController.m; sourceTree = "<group>"; };
-		34695ECB22AD441400889D20 /* MediaInformationParserTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MediaInformationParserTests.h; sourceTree = "<group>"; };
 		34695ECC22AD441500889D20 /* VideoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VideoViewController.m; sourceTree = "<group>"; };
 		34695ECD22AD441500889D20 /* VideoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VideoViewController.h; sourceTree = "<group>"; };
 		34695ECE22AD441500889D20 /* PipeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PipeViewController.m; sourceTree = "<group>"; };
@@ -130,18 +129,15 @@
 		348439EC20B2EFAF001A3990 /* colosseum.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = colosseum.jpg; sourceTree = "<group>"; };
 		34C06B8422AD61940039DF48 /* x265.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = x265.framework; sourceTree = "<group>"; };
 		34C06B8522AD61940039DF48 /* libopencore-amrwb.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = "libopencore-amrwb.framework"; sourceTree = "<group>"; };
-		34C06B8622AD61940039DF48 /* tesseract.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = tesseract.framework; sourceTree = "<group>"; };
 		34C06B8722AD61940039DF48 /* libhogweed.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libhogweed.framework; sourceTree = "<group>"; };
 		34C06B8822AD61940039DF48 /* fribidi.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = fribidi.framework; sourceTree = "<group>"; };
 		34C06B8922AD61940039DF48 /* xvidcore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = xvidcore.framework; sourceTree = "<group>"; };
-		34C06B8A22AD61940039DF48 /* leptonica.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = leptonica.framework; sourceTree = "<group>"; };
 		34C06B8B22AD61940039DF48 /* wavpack.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = wavpack.framework; sourceTree = "<group>"; };
 		34C06B8C22AD61940039DF48 /* libswresample.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libswresample.framework; sourceTree = "<group>"; };
 		34C06B8D22AD61940039DF48 /* soxr.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = soxr.framework; sourceTree = "<group>"; };
 		34C06B8E22AD61940039DF48 /* libavutil.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libavutil.framework; sourceTree = "<group>"; };
 		34C06B8F22AD61940039DF48 /* twolame.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = twolame.framework; sourceTree = "<group>"; };
 		34C06B9022AD61940039DF48 /* libpng.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libpng.framework; sourceTree = "<group>"; };
-		34C06B9122AD61940039DF48 /* chromaprint.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = chromaprint.framework; sourceTree = "<group>"; };
 		34C06B9222AD61940039DF48 /* libvorbisenc.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libvorbisenc.framework; sourceTree = "<group>"; };
 		34C06B9322AD61940039DF48 /* tiff.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = tiff.framework; sourceTree = "<group>"; };
 		34C06B9422AD61940039DF48 /* libwebpdemux.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libwebpdemux.framework; sourceTree = "<group>"; };
@@ -171,7 +167,6 @@
 		34C06BAC22AD61940039DF48 /* libtheora.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libtheora.framework; sourceTree = "<group>"; };
 		34C06BAD22AD61940039DF48 /* mobileffmpeg.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = mobileffmpeg.framework; sourceTree = "<group>"; };
 		34C06BAE22AD61940039DF48 /* libvidstab.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libvidstab.framework; sourceTree = "<group>"; };
-		34C06BAF22AD61940039DF48 /* sdl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = sdl.framework; sourceTree = "<group>"; };
 		34C06BB022AD61940039DF48 /* libilbc.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libilbc.framework; sourceTree = "<group>"; };
 		34C06BB122AD61940039DF48 /* libiconv.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libiconv.framework; sourceTree = "<group>"; };
 		34C06BB222AD61940039DF48 /* jpeg.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = jpeg.framework; sourceTree = "<group>"; };
@@ -253,19 +248,15 @@
 				34C06BE322AD61950039DF48 /* libogg.framework in Frameworks */,
 				34C06BEE22AD61950039DF48 /* libtheoraenc.framework in Frameworks */,
 				34C06BDC22AD61950039DF48 /* libavdevice.framework in Frameworks */,
-				34C06BC422AD61950039DF48 /* leptonica.framework in Frameworks */,
 				34C06BE622AD61950039DF48 /* libtheora.framework in Frameworks */,
 				34C06BEC22AD61950039DF48 /* jpeg.framework in Frameworks */,
 				34C06BE822AD61950039DF48 /* libvidstab.framework in Frameworks */,
 				34C06BDB22AD61950039DF48 /* libvorbisfile.framework in Frameworks */,
 				34C06BD322AD61950039DF48 /* libwebp.framework in Frameworks */,
-				34C06BCB22AD61950039DF48 /* chromaprint.framework in Frameworks */,
 				34C06BCC22AD61950039DF48 /* libvorbisenc.framework in Frameworks */,
-				34C06BE922AD61950039DF48 /* sdl.framework in Frameworks */,
 				34C06BC122AD61950039DF48 /* libhogweed.framework in Frameworks */,
 				34C06BC322AD61950039DF48 /* xvidcore.framework in Frameworks */,
 				34C06BF622AD61950039DF48 /* expat.framework in Frameworks */,
-				34C06BC022AD61950039DF48 /* tesseract.framework in Frameworks */,
 				34C06BED22AD61950039DF48 /* libwebpdecoder.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -290,8 +281,10 @@
 				34695E9322AD292300889D20 /* Info.plist */,
 				34695E9422AD292300889D20 /* main.m */,
 				34695E8E22AD292100889D20 /* Main.storyboard */,
-				34695ECB22AD441400889D20 /* MediaInformationParserTests.h */,
-				34695EC222AD441400889D20 /* MediaInformationParserTests.m */,
+				344D0ED122DE40F200DC2568 /* MediaInformationParserTest.h */,
+				344D0ED022DE40F200DC2568 /* MediaInformationParserTest.m */,
+				344D0ED422DE40F800DC2568 /* MobileFFmpegTest.h */,
+				344D0ED322DE40F800DC2568 /* MobileFFmpegTest.m */,
 				34695EC822AD441400889D20 /* PipeViewController.h */,
 				34695ECE22AD441500889D20 /* PipeViewController.m */,
 				34695EC722AD441400889D20 /* SubtitleViewController.h */,
@@ -332,7 +325,6 @@
 				34C06BFC22AD70D60039DF48 /* libbz2.tbd */,
 				34C06BFA22AD70CD0039DF48 /* libc++.tbd */,
 				34C06BF822AD70C30039DF48 /* VideoToolbox.framework */,
-				34C06B9122AD61940039DF48 /* chromaprint.framework */,
 				34C06BBC22AD61950039DF48 /* expat.framework */,
 				34C06BA522AD61940039DF48 /* fontconfig.framework */,
 				34C06BA722AD61940039DF48 /* freetype.framework */,
@@ -343,7 +335,6 @@
 				34C06BB222AD61940039DF48 /* jpeg.framework */,
 				34C06B9A22AD61940039DF48 /* kvazaar.framework */,
 				34C06BB522AD61940039DF48 /* lame.framework */,
-				34C06B8A22AD61940039DF48 /* leptonica.framework */,
 				34C06BB622AD61940039DF48 /* libaom.framework */,
 				34C06B9822AD61940039DF48 /* libass.framework */,
 				34C06B9B22AD61940039DF48 /* libavcodec.framework */,
@@ -378,12 +369,10 @@
 				34C06BB822AD61940039DF48 /* libxml2.framework */,
 				34C06BAD22AD61940039DF48 /* mobileffmpeg.framework */,
 				34C06BA422AD61940039DF48 /* opus.framework */,
-				34C06BAF22AD61940039DF48 /* sdl.framework */,
 				34C06B9522AD61940039DF48 /* shine.framework */,
 				34C06BA622AD61940039DF48 /* snappy.framework */,
 				34C06B8D22AD61940039DF48 /* soxr.framework */,
 				34C06BA322AD61940039DF48 /* speex.framework */,
-				34C06B8622AD61940039DF48 /* tesseract.framework */,
 				34C06B9322AD61940039DF48 /* tiff.framework */,
 				34C06B8F22AD61940039DF48 /* twolame.framework */,
 				34C06B8B22AD61940039DF48 /* wavpack.framework */,
@@ -489,6 +478,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				344D0ED222DE40F200DC2568 /* MediaInformationParserTest.m in Sources */,
 				34695EBF22AD440800889D20 /* HttpsViewController.m in Sources */,
 				34C06C0722ADA0B10039DF48 /* TvButton.m in Sources */,
 				34695EB722AD43F900889D20 /* AudioViewController.m in Sources */,
@@ -500,9 +490,9 @@
 				34695EC022AD440800889D20 /* Constants.m in Sources */,
 				34695ED022AD441500889D20 /* SubtitleViewController.m in Sources */,
 				34695ED522AD441500889D20 /* PipeViewController.m in Sources */,
-				34695ECF22AD441500889D20 /* MediaInformationParserTests.m in Sources */,
 				34695ED422AD441500889D20 /* VideoViewController.m in Sources */,
 				34695E8A22AD292100889D20 /* AppDelegate.m in Sources */,
+				344D0ED522DE40F800DC2568 /* MobileFFmpegTest.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

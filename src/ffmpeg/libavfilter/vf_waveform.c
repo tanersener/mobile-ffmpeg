@@ -45,6 +45,7 @@ enum FilterType {
     COLOR,
     ACOLOR,
     XFLAT,
+    YFLAT,
     NB_FILTERS
 };
 
@@ -60,6 +61,14 @@ enum ScaleType {
     MILLIVOLTS,
     IRE,
     NB_SCALES
+};
+
+enum GraticuleType {
+    GRAT_NONE,
+    GRAT_GREEN,
+    GRAT_ORANGE,
+    GRAT_INVERT,
+    NB_GRATICULES
 };
 
 typedef struct GraticuleLine {
@@ -107,6 +116,11 @@ typedef struct WaveformContext {
     int (*waveform_slice)(AVFilterContext *ctx, void *arg,
                           int jobnr, int nb_jobs);
     void (*graticulef)(struct WaveformContext *s, AVFrame *out);
+    void (*blend_line)(uint8_t *dst, int size, int linesize, float o1, float o2,
+                       int v, int step);
+    void (*draw_text)(AVFrame *out, int x, int y, int mult,
+                      float o1, float o2, const char *txt,
+                      const uint8_t color[4]);
     const AVPixFmtDescriptor *desc;
     const AVPixFmtDescriptor *odesc;
 } WaveformContext;
@@ -145,11 +159,13 @@ static const AVOption waveform_options[] = {
         { "color",   NULL, 0, AV_OPT_TYPE_CONST, {.i64=COLOR},   0, 0, FLAGS, "filter" },
         { "acolor",  NULL, 0, AV_OPT_TYPE_CONST, {.i64=ACOLOR},  0, 0, FLAGS, "filter" },
         { "xflat",   NULL, 0, AV_OPT_TYPE_CONST, {.i64=XFLAT},   0, 0, FLAGS, "filter" },
-    { "graticule", "set graticule", OFFSET(graticule), AV_OPT_TYPE_INT, {.i64=0}, 0, 2, FLAGS, "graticule" },
-    { "g",         "set graticule", OFFSET(graticule), AV_OPT_TYPE_INT, {.i64=0}, 0, 2, FLAGS, "graticule" },
-        { "none",   NULL, 0, AV_OPT_TYPE_CONST, {.i64=0}, 0, 0, FLAGS, "graticule" },
-        { "green",  NULL, 0, AV_OPT_TYPE_CONST, {.i64=1}, 0, 0, FLAGS, "graticule" },
-        { "orange", NULL, 0, AV_OPT_TYPE_CONST, {.i64=2}, 0, 0, FLAGS, "graticule" },
+        { "yflat",   NULL, 0, AV_OPT_TYPE_CONST, {.i64=YFLAT},   0, 0, FLAGS, "filter" },
+    { "graticule", "set graticule", OFFSET(graticule), AV_OPT_TYPE_INT, {.i64=0}, 0, NB_GRATICULES-1, FLAGS, "graticule" },
+    { "g",         "set graticule", OFFSET(graticule), AV_OPT_TYPE_INT, {.i64=0}, 0, NB_GRATICULES-1, FLAGS, "graticule" },
+        { "none",   NULL, 0, AV_OPT_TYPE_CONST, {.i64=GRAT_NONE},   0, 0, FLAGS, "graticule" },
+        { "green",  NULL, 0, AV_OPT_TYPE_CONST, {.i64=GRAT_GREEN},  0, 0, FLAGS, "graticule" },
+        { "orange", NULL, 0, AV_OPT_TYPE_CONST, {.i64=GRAT_ORANGE}, 0, 0, FLAGS, "graticule" },
+        { "invert", NULL, 0, AV_OPT_TYPE_CONST, {.i64=GRAT_INVERT}, 0, 0, FLAGS, "graticule" },
     { "opacity", "set graticule opacity", OFFSET(opacity), AV_OPT_TYPE_FLOAT, {.dbl=0.75}, 0, 1, FLAGS },
     { "o",       "set graticule opacity", OFFSET(opacity), AV_OPT_TYPE_FLOAT, {.dbl=0.75}, 0, 1, FLAGS },
     { "flags", "set graticule flags", OFFSET(flags), AV_OPT_TYPE_FLAGS, {.i64=1}, 0, 3, FLAGS, "flags" },
@@ -290,9 +306,9 @@ static int query_formats(AVFilterContext *ctx)
     WaveformContext *s = ctx->priv;
     const enum AVPixelFormat *out_pix_fmts;
     const enum AVPixelFormat *in_pix_fmts;
-    const AVPixFmtDescriptor *desc;
-    AVFilterFormats *avff;
-    int depth, rgb, i, ret, ncomp;
+    const AVPixFmtDescriptor *desc, *desc2;
+    AVFilterFormats *avff, *avff2;
+    int depth, depth2, rgb, i, ret, ncomp, ncomp2;
 
     if (!ctx->inputs[0]->in_formats ||
         !ctx->inputs[0]->in_formats->nb_formats) {
@@ -303,6 +319,7 @@ static int query_formats(AVFilterContext *ctx)
     case LOWPASS: in_pix_fmts = in_lowpass_pix_fmts; break;
     case CHROMA:
     case XFLAT:
+    case YFLAT:
     case AFLAT:
     case FLAT:    in_pix_fmts = in_flat_pix_fmts;    break;
     case ACOLOR:
@@ -316,10 +333,16 @@ static int query_formats(AVFilterContext *ctx)
     }
 
     avff = ctx->inputs[0]->in_formats;
+    avff2 = ctx->inputs[0]->out_formats;
     desc = av_pix_fmt_desc_get(avff->formats[0]);
+    desc2 = av_pix_fmt_desc_get(avff2->formats[0]);
     ncomp = desc->nb_components;
+    ncomp2 = desc2->nb_components;
     rgb = desc->flags & AV_PIX_FMT_FLAG_RGB;
     depth = desc->comp[0].depth;
+    depth2 = desc2->comp[0].depth;
+    if (ncomp != ncomp2 || depth != depth2)
+        return AVERROR(EAGAIN);
     for (i = 1; i < avff->nb_formats; i++) {
         desc = av_pix_fmt_desc_get(avff->formats[i]);
         if (rgb != (desc->flags & AV_PIX_FMT_FLAG_RGB) ||
@@ -1118,7 +1141,7 @@ FLAT_FUNC(column,        1, 0)
 FLAT_FUNC(row_mirror,    0, 1)
 FLAT_FUNC(row,           0, 0)
 
-#define AFLAT16(name, update_cr, column, mirror)                                                                   \
+#define AFLAT16(name, update_cb, update_cr, column, mirror)                                                        \
 static int name(AVFilterContext *ctx,                                                                              \
                 void *arg, int jobnr,                                                                              \
                 int nb_jobs)                                                                                       \
@@ -1184,7 +1207,7 @@ static int name(AVFilterContext *ctx,                                           
                 update16(target, max, intensity, limit);                                                           \
                                                                                                                    \
                 target = d1 + x + d1_signed_linesize * (c0 + c1);                                                  \
-                update16(target, max, intensity, limit);                                                           \
+                update_cb(target, max, intensity, limit);                                                          \
                                                                                                                    \
                 target = d2 + x + d2_signed_linesize * (c0 + c2);                                                  \
                 update_cr(target, max, intensity, limit);                                                          \
@@ -1225,14 +1248,14 @@ static int name(AVFilterContext *ctx,                                           
                     target = d0_data - c0;                                                                         \
                     update16(target, max, intensity, limit);                                                       \
                     target = d1_data - (c0 + c1);                                                                  \
-                    update16(target, max, intensity, limit);                                                       \
+                    update_cb(target, max, intensity, limit);                                                      \
                     target = d2_data - (c0 + c2);                                                                  \
                     update_cr(target, max, intensity, limit);                                                      \
                 } else {                                                                                           \
                     target = d0_data + c0;                                                                         \
                     update16(target, max, intensity, limit);                                                       \
                     target = d1_data + (c0 + c1);                                                                  \
-                    update16(target, max, intensity, limit);                                                       \
+                    update_cb(target, max, intensity, limit);                                                      \
                     target = d2_data + (c0 + c2);                                                                  \
                     update_cr(target, max, intensity, limit);                                                      \
                 }                                                                                                  \
@@ -1252,7 +1275,7 @@ static int name(AVFilterContext *ctx,                                           
     return 0;                                                                                                      \
 }
 
-#define AFLAT(name, update_cr, column, mirror)                                                        \
+#define AFLAT(name, update_cb, update_cr, column, mirror)                                             \
 static int name(AVFilterContext *ctx,                                                                 \
                 void *arg, int jobnr,                                                                 \
                 int nb_jobs)                                                                          \
@@ -1316,7 +1339,7 @@ static int name(AVFilterContext *ctx,                                           
                 update(target, max, intensity);                                                       \
                                                                                                       \
                 target = d1 + x + d1_signed_linesize * (c0 + c1);                                     \
-                update(target, max, intensity);                                                       \
+                update_cb(target, max, intensity);                                                    \
                                                                                                       \
                 target = d2 + x + d2_signed_linesize * (c0 + c2);                                     \
                 update_cr(target, max, intensity);                                                    \
@@ -1325,8 +1348,8 @@ static int name(AVFilterContext *ctx,                                           
                     c0_data += c0_linesize;                                                           \
                 if (!c1_shift_h || (y & c1_shift_h))                                                  \
                     c1_data += c1_linesize;                                                           \
-                if (!c1_shift_h || (y & c1_shift_h))                                                  \
-                    c2_data += c1_linesize;                                                           \
+                if (!c2_shift_h || (y & c2_shift_h))                                                  \
+                    c2_data += c2_linesize;                                                           \
                 d0_data += d0_linesize;                                                               \
                 d1_data += d1_linesize;                                                               \
                 d2_data += d2_linesize;                                                               \
@@ -1357,14 +1380,14 @@ static int name(AVFilterContext *ctx,                                           
                     target = d0_data - c0;                                                            \
                     update(target, max, intensity);                                                   \
                     target = d1_data - (c0 + c1);                                                     \
-                    update(target, max, intensity);                                                   \
+                    update_cb(target, max, intensity);                                                \
                     target = d2_data - (c0 + c2);                                                     \
                     update_cr(target, max, intensity);                                                \
                 } else {                                                                              \
                     target = d0_data + c0;                                                            \
                     update(target, max, intensity);                                                   \
                     target = d1_data + (c0 + c1);                                                     \
-                    update(target, max, intensity);                                                   \
+                    update_cb(target, max, intensity);                                                \
                     target = d2_data + (c0 + c2);                                                     \
                     update_cr(target, max, intensity);                                                \
                 }                                                                                     \
@@ -1384,23 +1407,31 @@ static int name(AVFilterContext *ctx,                                           
     return 0;                                                                                         \
 }
 
-AFLAT16(aflat16_row,           update16,    0, 0)
-AFLAT16(aflat16_row_mirror,    update16,    0, 1)
-AFLAT16(aflat16_column,        update16,    1, 0)
-AFLAT16(aflat16_column_mirror, update16,    1, 1)
-AFLAT16(xflat16_row,           update16_cr, 0, 0)
-AFLAT16(xflat16_row_mirror,    update16_cr, 0, 1)
-AFLAT16(xflat16_column,        update16_cr, 1, 0)
-AFLAT16(xflat16_column_mirror, update16_cr, 1, 1)
+AFLAT16(aflat16_row,           update16, update16,    0, 0)
+AFLAT16(aflat16_row_mirror,    update16, update16,    0, 1)
+AFLAT16(aflat16_column,        update16, update16,    1, 0)
+AFLAT16(aflat16_column_mirror, update16, update16,    1, 1)
+AFLAT16(xflat16_row,           update16, update16_cr, 0, 0)
+AFLAT16(xflat16_row_mirror,    update16, update16_cr, 0, 1)
+AFLAT16(xflat16_column,        update16, update16_cr, 1, 0)
+AFLAT16(xflat16_column_mirror, update16, update16_cr, 1, 1)
+AFLAT16(yflat16_row,           update16_cr, update16_cr, 0, 0)
+AFLAT16(yflat16_row_mirror,    update16_cr, update16_cr, 0, 1)
+AFLAT16(yflat16_column,        update16_cr, update16_cr, 1, 0)
+AFLAT16(yflat16_column_mirror, update16_cr, update16_cr, 1, 1)
 
-AFLAT(aflat_row,           update,    0, 0)
-AFLAT(aflat_row_mirror,    update,    0, 1)
-AFLAT(aflat_column,        update,    1, 0)
-AFLAT(aflat_column_mirror, update,    1, 1)
-AFLAT(xflat_row,           update_cr, 0, 0)
-AFLAT(xflat_row_mirror,    update_cr, 0, 1)
-AFLAT(xflat_column,        update_cr, 1, 0)
-AFLAT(xflat_column_mirror, update_cr, 1, 1)
+AFLAT(aflat_row,           update, update,    0, 0)
+AFLAT(aflat_row_mirror,    update, update,    0, 1)
+AFLAT(aflat_column,        update, update,    1, 0)
+AFLAT(aflat_column_mirror, update, update,    1, 1)
+AFLAT(xflat_row,           update, update_cr, 0, 0)
+AFLAT(xflat_row_mirror,    update, update_cr, 0, 1)
+AFLAT(xflat_column,        update, update_cr, 1, 0)
+AFLAT(xflat_column_mirror, update, update_cr, 1, 1)
+AFLAT(yflat_row,           update_cr, update_cr, 0, 0)
+AFLAT(yflat_row_mirror,    update_cr, update_cr, 0, 1)
+AFLAT(yflat_column,        update_cr, update_cr, 1, 0)
+AFLAT(yflat_column_mirror, update_cr, update_cr, 1, 1)
 
 static av_always_inline void chroma16(WaveformContext *s,
                                       AVFrame *in, AVFrame *out,
@@ -2470,8 +2501,9 @@ static void blend_vline(uint8_t *dst, int height, int linesize, float o1, float 
     }
 }
 
-static void blend_vline16(uint16_t *dst, int height, int linesize, float o1, float o2, int v, int step)
+static void blend_vline16(uint8_t *ddst, int height, int linesize, float o1, float o2, int v, int step)
 {
+    uint16_t *dst = (uint16_t *)ddst;
     int y;
 
     for (y = 0; y < height; y += step) {
@@ -2481,7 +2513,7 @@ static void blend_vline16(uint16_t *dst, int height, int linesize, float o1, flo
     }
 }
 
-static void blend_hline(uint8_t *dst, int width, float o1, float o2, int v, int step)
+static void blend_hline(uint8_t *dst, int width, int unused, float o1, float o2, int v, int step)
 {
     int x;
 
@@ -2490,8 +2522,9 @@ static void blend_hline(uint8_t *dst, int width, float o1, float o2, int v, int 
     }
 }
 
-static void blend_hline16(uint16_t *dst, int width, float o1, float o2, int v, int step)
+static void blend_hline16(uint8_t *ddst, int width, int unused, float o1, float o2, int v, int step)
 {
+    uint16_t *dst = (uint16_t *)ddst;
     int x;
 
     for (x = 0; x < width; x += step) {
@@ -2499,7 +2532,7 @@ static void blend_hline16(uint16_t *dst, int width, float o1, float o2, int v, i
     }
 }
 
-static void draw_htext(AVFrame *out, int x, int y, float o1, float o2, const char *txt, const uint8_t color[4])
+static void draw_htext(AVFrame *out, int x, int y, int mult, float o1, float o2, const char *txt, const uint8_t color[4])
 {
     const uint8_t *font;
     int font_height;
@@ -2551,7 +2584,7 @@ static void draw_htext16(AVFrame *out, int x, int y, int mult, float o1, float o
     }
 }
 
-static void draw_vtext(AVFrame *out, int x, int y, float o1, float o2, const char *txt, const uint8_t color[4])
+static void draw_vtext(AVFrame *out, int x, int y, int mult, float o1, float o2, const char *txt, const uint8_t color[4])
 {
     const uint8_t *font;
     int font_height;
@@ -2601,6 +2634,150 @@ static void draw_vtext16(AVFrame *out, int x, int y, int mult, float o1, float o
     }
 }
 
+static void iblend_vline(uint8_t *dst, int height, int linesize, float o1, float o2, int v, int step)
+{
+    int y;
+
+    for (y = 0; y < height; y += step) {
+        dst[0] = (v - dst[0]) * o1 + dst[0] * o2;
+
+        dst += linesize * step;
+    }
+}
+
+static void iblend_vline16(uint8_t *ddst, int height, int linesize, float o1, float o2, int v, int step)
+{
+    uint16_t *dst = (uint16_t *)ddst;
+    int y;
+
+    for (y = 0; y < height; y += step) {
+        dst[0] = (v - dst[0]) * o1 + dst[0] * o2;
+
+        dst += (linesize / 2) * step;
+    }
+}
+
+static void iblend_hline(uint8_t *dst, int width, int unused, float o1, float o2, int v, int step)
+{
+    int x;
+
+    for (x = 0; x < width; x += step) {
+        dst[x] = (v - dst[x]) * o1 + dst[x] * o2;
+    }
+}
+
+static void iblend_hline16(uint8_t *ddst, int width, int unused, float o1, float o2, int v, int step)
+{
+    uint16_t *dst = (uint16_t *)ddst;
+    int x;
+
+    for (x = 0; x < width; x += step) {
+        dst[x] = (v - dst[x]) * o1 + dst[x] * o2;
+    }
+}
+
+static void idraw_htext(AVFrame *out, int x, int y, int mult, float o1, float o2, const char *txt, const uint8_t color[4])
+{
+    const uint8_t *font;
+    int font_height;
+    int i, plane;
+
+    font = avpriv_cga_font,   font_height =  8;
+
+    for (plane = 0; plane < 4 && out->data[plane]; plane++) {
+        for (i = 0; txt[i]; i++) {
+            int char_y, mask;
+            int v = color[plane];
+
+            uint8_t *p = out->data[plane] + y * out->linesize[plane] + (x + i * 8);
+            for (char_y = 0; char_y < font_height; char_y++) {
+                for (mask = 0x80; mask; mask >>= 1) {
+                    if (font[txt[i] * font_height + char_y] & mask)
+                        p[0] = p[0] * o2 + (v - p[0]) * o1;
+                    p++;
+                }
+                p += out->linesize[plane] - 8;
+            }
+        }
+    }
+}
+
+static void idraw_htext16(AVFrame *out, int x, int y, int mult, float o1, float o2, const char *txt, const uint8_t color[4])
+{
+    const uint8_t *font;
+    int font_height;
+    int i, plane;
+
+    font = avpriv_cga_font,   font_height =  8;
+
+    for (plane = 0; plane < 4 && out->data[plane]; plane++) {
+        for (i = 0; txt[i]; i++) {
+            int char_y, mask;
+            int v = color[plane] * mult;
+
+            uint16_t *p = (uint16_t *)(out->data[plane] + y * out->linesize[plane]) + (x + i * 8);
+            for (char_y = 0; char_y < font_height; char_y++) {
+                for (mask = 0x80; mask; mask >>= 1) {
+                    if (font[txt[i] * font_height + char_y] & mask)
+                        p[0] = p[0] * o2 + (v - p[0]) * o1;
+                    p++;
+                }
+                p += out->linesize[plane] / 2 - 8;
+            }
+        }
+    }
+}
+
+static void idraw_vtext(AVFrame *out, int x, int y, int mult, float o1, float o2, const char *txt, const uint8_t color[4])
+{
+    const uint8_t *font;
+    int font_height;
+    int i, plane;
+
+    font = avpriv_cga_font,   font_height =  8;
+
+    for (plane = 0; plane < 4 && out->data[plane]; plane++) {
+        for (i = 0; txt[i]; i++) {
+            int char_y, mask;
+            int v = color[plane];
+
+            for (char_y = font_height - 1; char_y >= 0; char_y--) {
+                uint8_t *p = out->data[plane] + (y + i * 10) * out->linesize[plane] + x;
+                for (mask = 0x80; mask; mask >>= 1) {
+                    if (font[txt[i] * font_height + font_height - 1 - char_y] & mask)
+                        p[char_y] = p[char_y] * o2 + (v - p[char_y]) * o1;
+                    p += out->linesize[plane];
+                }
+            }
+        }
+    }
+}
+
+static void idraw_vtext16(AVFrame *out, int x, int y, int mult, float o1, float o2, const char *txt, const uint8_t color[4])
+{
+    const uint8_t *font;
+    int font_height;
+    int i, plane;
+
+    font = avpriv_cga_font,   font_height =  8;
+
+    for (plane = 0; plane < 4 && out->data[plane]; plane++) {
+        for (i = 0; txt[i]; i++) {
+            int char_y, mask;
+            int v = color[plane] * mult;
+
+            for (char_y = 0; char_y < font_height; char_y++) {
+                uint16_t *p = (uint16_t *)(out->data[plane] + (y + i * 10) * out->linesize[plane]) + x;
+                for (mask = 0x80; mask; mask >>= 1) {
+                    if (font[txt[i] * font_height + font_height - 1 - char_y] & mask)
+                        p[char_y] = p[char_y] * o2 + (v - p[char_y]) * o1;
+                    p += out->linesize[plane] / 2;
+                }
+            }
+        }
+    }
+}
+
 static void graticule_none(WaveformContext *s, AVFrame *out)
 {
 }
@@ -2626,7 +2803,7 @@ static void graticule_row(WaveformContext *s, AVFrame *out)
                 int x = offset_x + (s->mirror ? s->size - 1 - pos : pos);
                 uint8_t *dst = out->data[p] + offset_y * out->linesize[p] + x;
 
-                blend_vline(dst, height, out->linesize[p], o1, o2, v, step);
+                s->blend_line(dst, height, out->linesize[p], o1, o2, v, step);
             }
         }
 
@@ -2638,7 +2815,7 @@ static void graticule_row(WaveformContext *s, AVFrame *out)
             if (x < 0)
                 x = 4;
 
-            draw_vtext(out, x, offset_y + 2, o1, o2, name, s->grat_yuva_color);
+            s->draw_text(out, x, offset_y + 2, 1, o1, o2, name, s->grat_yuva_color);
         }
 
         offset_x += s->size * (s->display == STACK);
@@ -2666,9 +2843,9 @@ static void graticule16_row(WaveformContext *s, AVFrame *out)
             for (l = 0; l < s->nb_glines ; l++) {
                 const uint16_t pos = s->glines[l].line[C].pos;
                 int x = offset_x + (s->mirror ? s->size - 1 - pos : pos);
-                uint16_t *dst = (uint16_t *)(out->data[p] + offset_y * out->linesize[p]) + x;
+                uint8_t *dst = (uint8_t *)(out->data[p] + offset_y * out->linesize[p]) + x * 2;
 
-                blend_vline16(dst, height, out->linesize[p], o1, o2, v, step);
+                s->blend_line(dst, height, out->linesize[p], o1, o2, v, step);
             }
         }
 
@@ -2680,7 +2857,7 @@ static void graticule16_row(WaveformContext *s, AVFrame *out)
             if (x < 0)
                 x = 4;
 
-            draw_vtext16(out, x, offset_y + 2, mult, o1, o2, name, s->grat_yuva_color);
+            s->draw_text(out, x, offset_y + 2, mult, o1, o2, name, s->grat_yuva_color);
         }
 
         offset_x += s->size * (s->display == STACK);
@@ -2709,7 +2886,7 @@ static void graticule_column(WaveformContext *s, AVFrame *out)
                 int y = offset_y + (s->mirror ? s->size - 1 - pos : pos);
                 uint8_t *dst = out->data[p] + y * out->linesize[p] + offset_x;
 
-                blend_hline(dst, width, o1, o2, v, step);
+                s->blend_line(dst, width, 1, o1, o2, v, step);
             }
         }
 
@@ -2721,7 +2898,7 @@ static void graticule_column(WaveformContext *s, AVFrame *out)
             if (y < 0)
                 y = 4;
 
-            draw_htext(out, 2 + offset_x, y, o1, o2, name, s->grat_yuva_color);
+            s->draw_text(out, 2 + offset_x, y, 1, o1, o2, name, s->grat_yuva_color);
         }
 
         offset_y += s->size * (s->display == STACK);
@@ -2749,9 +2926,9 @@ static void graticule16_column(WaveformContext *s, AVFrame *out)
             for (l = 0; l < s->nb_glines ; l++) {
                 const uint16_t pos = s->glines[l].line[C].pos;
                 int y = offset_y + (s->mirror ? s->size - 1 - pos : pos);
-                uint16_t *dst = (uint16_t *)(out->data[p] + y * out->linesize[p]) + offset_x;
+                uint8_t *dst = (uint8_t *)(out->data[p] + y * out->linesize[p]) + offset_x * 2;
 
-                blend_hline16(dst, width, o1, o2, v, step);
+                s->blend_line(dst, width, 1, o1, o2, v, step);
             }
         }
 
@@ -2763,7 +2940,7 @@ static void graticule16_column(WaveformContext *s, AVFrame *out)
             if (y < 0)
                 y = 4;
 
-            draw_htext16(out, 2 + offset_x, y, mult, o1, o2, name, s->grat_yuva_color);
+            s->draw_text(out, 2 + offset_x, y, mult, o1, o2, name, s->grat_yuva_color);
         }
 
         offset_y += s->size * (s->display == STACK);
@@ -2791,6 +2968,7 @@ static int config_input(AVFilterLink *inlink)
 
     switch (s->filter) {
     case XFLAT:
+    case YFLAT:
     case AFLAT: s->size = 256 * 2; break;
     case FLAT:  s->size = 256 * 3; break;
     default:    s->size = 256;     break;
@@ -2854,11 +3032,34 @@ static int config_input(AVFilterLink *inlink)
     case 0x1016: s->waveform_slice = xflat16_row_mirror;    break;
     case 0x0116: s->waveform_slice = xflat16_column;        break;
     case 0x0016: s->waveform_slice = xflat16_row;           break;
+    case 0x1107: s->waveform_slice = yflat_column_mirror; break;
+    case 0x1007: s->waveform_slice = yflat_row_mirror;    break;
+    case 0x0107: s->waveform_slice = yflat_column;        break;
+    case 0x0007: s->waveform_slice = yflat_row;           break;
+    case 0x1117: s->waveform_slice = yflat16_column_mirror; break;
+    case 0x1017: s->waveform_slice = yflat16_row_mirror;    break;
+    case 0x0117: s->waveform_slice = yflat16_column;        break;
+    case 0x0017: s->waveform_slice = yflat16_row;           break;
     }
 
     s->grat_yuva_color[0] = 255;
-    s->grat_yuva_color[2] = s->graticule == 2 ? 255 : 0;
+    s->grat_yuva_color[1] = s->graticule == GRAT_INVERT ? 255 : 0;
+    s->grat_yuva_color[2] = s->graticule == GRAT_ORANGE || s->graticule == GRAT_INVERT ? 255 : 0;
     s->grat_yuva_color[3] = 255;
+
+    if (s->mode == 0 && s->graticule != GRAT_INVERT) {
+        s->blend_line = s->bits <= 8 ? blend_vline : blend_vline16;
+        s->draw_text  = s->bits <= 8 ? draw_vtext  : draw_vtext16;
+    } else if (s->graticule != GRAT_INVERT) {
+        s->blend_line = s->bits <= 8 ? blend_hline : blend_hline16;
+        s->draw_text  = s->bits <= 8 ? draw_htext  : draw_htext16;
+    } else if (s->mode == 0 && s->graticule == GRAT_INVERT) {
+        s->blend_line = s->bits <= 8 ? iblend_vline : iblend_vline16;
+        s->draw_text  = s->bits <= 8 ? idraw_vtext  : idraw_vtext16;
+    } else if (s->graticule == GRAT_INVERT) {
+        s->blend_line = s->bits <= 8 ? iblend_hline : iblend_hline16;
+        s->draw_text  = s->bits <= 8 ? idraw_htext  : idraw_htext16;
+    }
 
     switch (s->filter) {
     case LOWPASS:
@@ -2867,10 +3068,11 @@ static int config_input(AVFilterLink *inlink)
     case CHROMA:
     case AFLAT:
     case XFLAT:
+    case YFLAT:
     case FLAT:
-        if (s->graticule && s->mode == 1)
+        if (s->graticule > GRAT_NONE && s->mode == 1)
             s->graticulef = s->bits > 8 ? graticule16_column : graticule_column;
-        else if (s->graticule && s->mode == 0)
+        else if (s->graticule > GRAT_NONE && s->mode == 0)
             s->graticulef = s->bits > 8 ? graticule16_row : graticule_row;
         break;
     }
@@ -2935,6 +3137,7 @@ static int config_input(AVFilterLink *inlink)
         }
         break;
     case XFLAT:
+    case YFLAT:
     case AFLAT:
         switch (s->scale) {
         case DIGITAL:
@@ -3151,6 +3354,7 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
                 break;
             case AFLAT:
             case XFLAT:
+            case YFLAT:
                 if (s->bits <= 8) {
                     envelope(s, out, plane, (plane + 0) % s->ncomp, s->mode ? offset_x : offset_y);
                     envelope(s, out, plane, (plane + 1) % s->ncomp, s->mode ? offset_x : offset_y);

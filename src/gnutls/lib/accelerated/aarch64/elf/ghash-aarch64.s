@@ -40,11 +40,10 @@
 # 1 "lib/accelerated/aarch64/elf/ghash-aarch64.s.tmp.S"
 # 1 "<built-in>"
 # 1 "<command-line>"
-# 1 "/usr/aarch64-linux-gnu/include/stdc-predef.h" 1 3
-# 1 "<command-line>" 2
 # 1 "lib/accelerated/aarch64/elf/ghash-aarch64.s.tmp.S"
 # 1 "lib/accelerated/aarch64/aarch64-common.h" 1
 # 2 "lib/accelerated/aarch64/elf/ghash-aarch64.s.tmp.S" 2
+
 
 .text
 .arch armv8-a+crypto
@@ -193,7 +192,7 @@ gcm_ghash_v8:
 
  subs x3,x3,#32
  mov x12,#16
-# 158 "lib/accelerated/aarch64/elf/ghash-aarch64.s.tmp.S"
+# 159 "lib/accelerated/aarch64/elf/ghash-aarch64.s.tmp.S"
  ld1 {v20.2d,v21.2d},[x1],#32
  movi v19.16b,#0xe1
  ld1 {v22.2d},[x1]

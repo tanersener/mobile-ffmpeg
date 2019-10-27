@@ -25,7 +25,7 @@
 #define REDUCED_TOTAL_STRENGTHS (REDUCED_PRI_STRENGTHS * CDEF_SEC_STRENGTHS)
 #define TOTAL_STRENGTHS (CDEF_PRI_STRENGTHS * CDEF_SEC_STRENGTHS)
 
-static int priconv[REDUCED_PRI_STRENGTHS] = { 0, 1, 2, 3, 5, 7, 10, 13 };
+static const int priconv[REDUCED_PRI_STRENGTHS] = { 0, 1, 2, 3, 5, 7, 10, 13 };
 
 /* Search for the best strength to add as an option, knowing we
    already selected nb_strengths options. */
@@ -165,17 +165,13 @@ static uint64_t joint_strength_search_dual(int *best_lev0, int *best_lev1,
   return best_tot_mse;
 }
 
-/* FIXME: SSE-optimize this. */
 static void copy_sb16_16(uint16_t *dst, int dstride, const uint16_t *src,
                          int src_voffset, int src_hoffset, int sstride,
                          int vsize, int hsize) {
-  int r, c;
+  int r;
   const uint16_t *base = &src[src_voffset * sstride + src_hoffset];
-  for (r = 0; r < vsize; r++) {
-    for (c = 0; c < hsize; c++) {
-      dst[r * dstride + c] = base[r * sstride + c];
-    }
-  }
+  for (r = 0; r < vsize; r++)
+    memcpy(dst + r * dstride, base + r * sstride, hsize * sizeof(*base));
 }
 
 #if CONFIG_DIST_8X8
@@ -293,7 +289,7 @@ static int sb_all_skip(const AV1_COMMON *const cm, int mi_row, int mi_col) {
   const int maxr = AOMMIN(cm->mi_rows - mi_row, MI_SIZE_64X64);
   const int maxc = AOMMIN(cm->mi_cols - mi_col, MI_SIZE_64X64);
   const int stride = cm->mi_stride;
-  MB_MODE_INFO **mbmi = cm->mi_grid_visible + mi_row * stride + mi_col;
+  MB_MODE_INFO **mbmi = cm->mi_grid_base + mi_row * stride + mi_col;
   for (int r = 0; r < maxr; ++r, mbmi += stride) {
     for (int c = 0; c < maxc; ++c) {
       if (!mbmi[c]->skip) return 0;
@@ -316,30 +312,30 @@ static void pick_cdef_from_qp(AV1_COMMON *const cm) {
   int predicted_uv_f2 = 0;
   aom_clear_system_state();
   if (!frame_is_intra_only(cm)) {
-    predicted_y_f1 = clamp((int)roundf(-q * q * 0.00000235939456f +
+    predicted_y_f1 = clamp((int)roundf(-q * q * 0.0000023593946f +
                                        q * 0.0068615186f + 0.02709886f),
                            0, 15);
-    predicted_y_f2 = clamp((int)roundf(-q * q * 0.000000576297339f +
-                                       q * 0.00139933452f + 0.03831067f),
+    predicted_y_f2 = clamp((int)roundf(-q * q * 0.00000057629734f +
+                                       q * 0.0013993345f + 0.03831067f),
                            0, 3);
-    predicted_uv_f1 = clamp((int)roundf(-q * q * 0.000000709506878f +
-                                        q * 0.00346288458f + 0.00887099f),
+    predicted_uv_f1 = clamp((int)roundf(-q * q * 0.0000007095069f +
+                                        q * 0.0034628846f + 0.00887099f),
                             0, 15);
-    predicted_uv_f2 = clamp((int)roundf(q * q * 0.000000238740853f +
-                                        q * 0.000282235851f + 0.05576307f),
+    predicted_uv_f2 = clamp((int)roundf(q * q * 0.00000023874085f +
+                                        q * 0.00028223585f + 0.05576307f),
                             0, 3);
   } else {
     predicted_y_f1 = clamp(
-        (int)roundf(q * q * 0.00000337319739f + q * 0.0080705937f + 0.0187634f),
+        (int)roundf(q * q * 0.0000033731974f + q * 0.008070594f + 0.0187634f),
         0, 15);
-    predicted_y_f2 = clamp((int)roundf(-q * q * -0.00000291673427f +
-                                       q * 0.00277986238f + 0.0079405f),
+    predicted_y_f2 = clamp((int)roundf(-q * q * -0.0000029167343f +
+                                       q * 0.0027798624f + 0.0079405f),
                            0, 3);
-    predicted_uv_f1 = clamp((int)roundf(-q * q * 0.0000130790995f +
-                                        q * 0.0128924046f - 0.00748388f),
-                            0, 15);
-    predicted_uv_f2 = clamp((int)roundf(q * q * 0.00000326517829f +
-                                        q * 0.000355201832f + 0.00228092f),
+    predicted_uv_f1 = clamp(
+        (int)roundf(-q * q * 0.0000130790995f + q * 0.012892405f - 0.00748388f),
+        0, 15);
+    predicted_uv_f2 = clamp((int)roundf(q * q * 0.0000032651783f +
+                                        q * 0.00035520183f + 0.00228092f),
                             0, 3);
   }
   cdef_info->cdef_strengths[0] =
@@ -349,7 +345,7 @@ static void pick_cdef_from_qp(AV1_COMMON *const cm) {
 
   const int nvfb = (cm->mi_rows + MI_SIZE_64X64 - 1) / MI_SIZE_64X64;
   const int nhfb = (cm->mi_cols + MI_SIZE_64X64 - 1) / MI_SIZE_64X64;
-  MB_MODE_INFO **mbmi = cm->mi_grid_visible;
+  MB_MODE_INFO **mbmi = cm->mi_grid_base;
   for (int r = 0; r < nvfb; ++r) {
     for (int c = 0; c < nhfb; ++c) {
       mbmi[MI_SIZE_64X64 * c]->cdef_strength = 0;
@@ -359,7 +355,8 @@ static void pick_cdef_from_qp(AV1_COMMON *const cm) {
 }
 
 void av1_cdef_search(YV12_BUFFER_CONFIG *frame, const YV12_BUFFER_CONFIG *ref,
-                     AV1_COMMON *cm, MACROBLOCKD *xd, int pick_method) {
+                     AV1_COMMON *cm, MACROBLOCKD *xd, int pick_method,
+                     int rdmult) {
   if (pick_method == CDEF_PICK_FROM_Q) {
     pick_cdef_from_qp(cm);
     return;
@@ -373,7 +370,6 @@ void av1_cdef_search(YV12_BUFFER_CONFIG *frame, const YV12_BUFFER_CONFIG *ref,
   const int nvfb = (cm->mi_rows + MI_SIZE_64X64 - 1) / MI_SIZE_64X64;
   const int nhfb = (cm->mi_cols + MI_SIZE_64X64 - 1) / MI_SIZE_64X64;
   int *sb_index = aom_malloc(nvfb * nhfb * sizeof(*sb_index));
-  int *selected_strength = aom_malloc(nvfb * nhfb * sizeof(*sb_index));
   const int damping = 3 + (cm->base_qindex >> 6);
   const int fast = pick_method == CDEF_FAST_SEARCH;
   const int total_strengths = fast ? REDUCED_TOTAL_STRENGTHS : TOTAL_STRENGTHS;
@@ -452,8 +448,8 @@ void av1_cdef_search(YV12_BUFFER_CONFIG *frame, const YV12_BUFFER_CONFIG *ref,
       if (sb_all_skip(cm, fbr * MI_SIZE_64X64, fbc * MI_SIZE_64X64)) continue;
 
       const MB_MODE_INFO *const mbmi =
-          cm->mi_grid_visible[MI_SIZE_64X64 * fbr * cm->mi_stride +
-                              MI_SIZE_64X64 * fbc];
+          cm->mi_grid_base[MI_SIZE_64X64 * fbr * cm->mi_stride +
+                           MI_SIZE_64X64 * fbc];
       if (((fbc & 1) &&
            (mbmi->sb_type == BLOCK_128X128 || mbmi->sb_type == BLOCK_128X64)) ||
           ((fbr & 1) &&
@@ -524,32 +520,28 @@ void av1_cdef_search(YV12_BUFFER_CONFIG *frame, const YV12_BUFFER_CONFIG *ref,
 
   /* Search for different number of signalling bits. */
   int nb_strength_bits = 0;
-  uint64_t best_tot_mse = UINT64_MAX;
-  const int quantizer =
-      av1_ac_quant_QTX(cm->base_qindex, 0, cm->seq_params.bit_depth) >>
-      (cm->seq_params.bit_depth - 8);
-  aom_clear_system_state();
-  const double lambda = .12 * quantizer * quantizer / 256.;
+  uint64_t best_rd = UINT64_MAX;
   CdefInfo *const cdef_info = &cm->cdef_info;
   for (int i = 0; i <= 3; i++) {
     int best_lev0[CDEF_MAX_STRENGTHS];
     int best_lev1[CDEF_MAX_STRENGTHS] = { 0 };
     const int nb_strengths = 1 << i;
     uint64_t tot_mse;
-    if (num_planes >= 3) {
+    if (num_planes > 1) {
       tot_mse = joint_strength_search_dual(best_lev0, best_lev1, nb_strengths,
                                            mse, sb_count, fast);
     } else {
       tot_mse = joint_strength_search(best_lev0, nb_strengths, mse[0], sb_count,
                                       fast);
     }
-    /* Count superblock signalling cost. */
-    tot_mse += (uint64_t)(sb_count * lambda * i);
-    /* Count header signalling cost. */
-    tot_mse += (uint64_t)(nb_strengths * lambda * CDEF_STRENGTH_BITS *
-                          (num_planes > 1 ? 2 : 1));
-    if (tot_mse < best_tot_mse) {
-      best_tot_mse = tot_mse;
+
+    const int total_bits = sb_count * i + nb_strengths * CDEF_STRENGTH_BITS *
+                                              (num_planes > 1 ? 2 : 1);
+    const int rate_cost = av1_cost_literal(total_bits);
+    const uint64_t dist = tot_mse * 16;
+    const uint64_t rd = RDCOST(rdmult, rate_cost, dist);
+    if (rd < best_rd) {
+      best_rd = rd;
       nb_strength_bits = i;
       memcpy(cdef_info->cdef_strengths, best_lev0,
              nb_strengths * sizeof(best_lev0[0]));
@@ -573,8 +565,7 @@ void av1_cdef_search(YV12_BUFFER_CONFIG *frame, const YV12_BUFFER_CONFIG *ref,
         best_mse = curr;
       }
     }
-    selected_strength[i] = best_gi;
-    cm->mi_grid_visible[sb_index[i]]->cdef_strength = best_gi;
+    cm->mi_grid_base[sb_index[i]]->cdef_strength = best_gi;
   }
 
   if (fast) {
@@ -599,5 +590,4 @@ void av1_cdef_search(YV12_BUFFER_CONFIG *frame, const YV12_BUFFER_CONFIG *ref,
     aom_free(ref_coeff[pli]);
   }
   aom_free(sb_index);
-  aom_free(selected_strength);
 }

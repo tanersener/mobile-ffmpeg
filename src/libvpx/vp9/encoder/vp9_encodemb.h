@@ -24,10 +24,16 @@ struct encode_b_args {
   ENTROPY_CONTEXT *ta;
   ENTROPY_CONTEXT *tl;
   int8_t *skip;
+#if CONFIG_MISMATCH_DEBUG
+  int mi_row;
+  int mi_col;
+  int output_enabled;
+#endif
 };
 int vp9_optimize_b(MACROBLOCK *mb, int plane, int block, TX_SIZE tx_size,
                    int ctx);
-void vp9_encode_sb(MACROBLOCK *x, BLOCK_SIZE bsize);
+void vp9_encode_sb(MACROBLOCK *x, BLOCK_SIZE bsize, int mi_row, int mi_col,
+                   int output_enabled);
 void vp9_encode_sby_pass1(MACROBLOCK *x, BLOCK_SIZE bsize);
 void vp9_xform_quant_fp(MACROBLOCK *x, int plane, int block, int row, int col,
                         BLOCK_SIZE plane_bsize, TX_SIZE tx_size);

@@ -75,9 +75,9 @@ const vp8_tree_index vp8_ymode_tree[8] = {
   -DC_PRED, 2, 4, 6, -V_PRED, -H_PRED, -TM_PRED, -B_PRED
 };
 
-const vp8_tree_index vp8_kf_ymode_tree[8] = {
-  -B_PRED, 2, 4, 6, -DC_PRED, -V_PRED, -H_PRED, -TM_PRED
-};
+const vp8_tree_index vp8_kf_ymode_tree[8] = { -B_PRED, 2,        4,
+                                              6,       -DC_PRED, -V_PRED,
+                                              -H_PRED, -TM_PRED };
 
 const vp8_tree_index vp8_uv_mode_tree[6] = { -DC_PRED, 2,       -V_PRED,
                                              4,        -H_PRED, -TM_PRED };

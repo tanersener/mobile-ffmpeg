@@ -265,10 +265,9 @@ int _gnutls_ext_sr_send_cs(gnutls_session_t session)
 
 static int
 _gnutls_sr_recv_params(gnutls_session_t session,
-		       const uint8_t * data, size_t _data_size)
+		       const uint8_t * data, size_t data_size)
 {
 	unsigned int len;
-	ssize_t data_size = _data_size;
 	sr_ext_st *priv;
 	gnutls_ext_priv_data_t epriv;
 	int set = 0, ret;

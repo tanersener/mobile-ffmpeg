@@ -173,9 +173,9 @@ enum aome_enc_control_id {
 
   /*!\brief Codec control function to set encoder internal speed settings.
    *
-   * Changes in this value influences, among others, the encoder's selection
-   * of motion estimation methods. Values greater than 0 will increase encoder
-   * speed at the expense of quality.
+   * Changes in this value influences the complexity of algorithms used in
+   * encoding process, values greater than 0 will increase encoder speed at
+   * the expense of quality.
    *
    * \note Valid range: 0..8
    */
@@ -218,10 +218,10 @@ enum aome_enc_control_id {
    */
   AOME_SET_TUNING = AOME_SET_ARNR_STRENGTH + 2,
 
-  /*!\brief Codec control function to set constrained quality level.
+  /*!\brief Codec control function to set constrained / constant quality level.
    *
    * \attention For this value to be used aom_codec_enc_cfg_t::rc_end_usage
-   *            must be set to #AOM_CQ.
+   *            must be set to #AOM_CQ or #AOM_Q.
    * \note Valid range: 0..63
    */
   AOME_SET_CQ_LEVEL,
@@ -327,6 +327,12 @@ enum aome_enc_control_id {
    * By default, this feature is off.
    */
   AV1E_SET_ENABLE_TPL_MODEL,
+
+  /*!\brief Codec control function to enable temporal filtering on key frame.
+   *
+   * By default, this feature is on.
+   */
+  AV1E_SET_ENABLE_KEYFRAME_FILTERING,
 
   /*!\brief Codec control function to enable frame parallel decoding feature.
    *
@@ -571,6 +577,16 @@ enum aome_enc_control_id {
    *
    */
   AV1E_SET_ENABLE_RESTORATION,
+
+  /*!\brief Codec control function to force video mode
+   *
+   *                          0 = do not force video mode
+   *                          1 = force video mode even for a single frame
+   *
+   *  By default, the encoder does not force video and allows still picture.
+   *
+   */
+  AV1E_SET_FORCE_VIDEO_MODE,
 
   /*!\brief Codec control function to predict with OBMC mode.
    *
@@ -853,6 +869,15 @@ enum aome_enc_control_id {
    */
   AV1E_SET_ENABLE_DUAL_FILTER,
 
+  /*!\brief Codec control function to turn on / off delta quantization in chroma
+   * planes usage for a sequence.
+   *
+   * This will enable or disable use of chroma deltaq.
+   * The default value is 0.
+   *
+   */
+  AV1E_SET_ENABLE_CHROMA_DELTAQ,
+
   /*!\brief Codec control function to turn on / off masked compound usage
    * for a sequence.
    *
@@ -981,6 +1006,16 @@ enum aome_enc_control_id {
    */
   AV1E_SET_ENABLE_SUPERRES,
 
+  /*!\brief Codec control function to turn on / off overlay frames for
+   * fitlered ALTREF frames.
+   *
+   * This will enable or disable coding of overlay frames for filtered ALTREF
+   * frames. When set to 0, overlay frames are not used but show existing frame
+   * is used to display the filtered ALTREF frame as is. As a result the decoded
+   * frame rate remains the same as the display frame rate. The default is 1.
+   */
+  AV1E_SET_ENABLE_OVERLAY,
+
   /*!\brief Codec control function to turn on/off palette mode */
   AV1E_SET_ENABLE_PALETTE,
 
@@ -1097,6 +1132,14 @@ enum aome_enc_control_id {
    */
   AV1E_SET_MODE_COST_UPD_FREQ,
 
+  /*!\brief Control to set frequency of the cost updates for motion vectors
+   * Possible values are:
+   * 0: Update at SB level (default)
+   * 1: Update at SB row level in tile
+   * 2: Update at tile level
+   */
+  AV1E_SET_MV_COST_UPD_FREQ,
+
   /*!\brief Control to set bit mask that specifies which tier each of the 32
    * possible operating points conforms to.
    * Bit value 0: Main Tier; 1: High Tier.
@@ -1108,7 +1151,20 @@ enum aome_enc_control_id {
    * ratio of each frame to be higher than the given value divided by 100.
    * E.g. 850 means minimum compression ratio of 8.5.
    */
-  AV1E_SET_MIN_CR
+  AV1E_SET_MIN_CR,
+
+  /*!\brief Codec control function to set the layer id.
+   */
+  AV1E_SET_SVC_LAYER_ID = 150,
+
+  /*!\brief Codec control function to set SVC paramaeters.
+   */
+  AV1E_SET_SVC_PARAMS = 151,
+
+  /*!\brief Codec control function to set reference frame config:
+   * the ref_idx and the refresh flags for each buffer slot.
+   */
+  AV1E_SET_SVC_REF_FRAME_CONFIG = 152
 };
 
 /*!\brief aom 1-D scaling mode
@@ -1198,6 +1254,39 @@ typedef enum {
   AOM_TUNE_DAALA_DIST
 } aom_tune_metric;
 
+#define AOM_MAX_LAYERS 32   /**< Max number of layers */
+#define AOM_MAX_SS_LAYERS 4 /**< Max number of spatial layers */
+#define AOM_MAX_TS_LAYERS 8 /**< Max number of temporal layers */
+
+/*!brief Struct for spatial and temporal layer ID */
+typedef struct aom_svc_layer_id {
+  int spatial_layer_id;  /**< Spatial layer ID */
+  int temporal_layer_id; /**< Temporal layer ID */
+} aom_svc_layer_id_t;
+
+/*!brief Parameter type for SVC */
+typedef struct aom_svc_params {
+  int number_spatial_layers;                 /**< Number of spatial layers */
+  int number_temporal_layers;                /**< Number of temporal layers */
+  int max_quantizers[AOM_MAX_LAYERS];        /**< Max Q for each layer */
+  int min_quantizers[AOM_MAX_LAYERS];        /**< Min Q for each layer */
+  int scaling_factor_num[AOM_MAX_SS_LAYERS]; /**< Scaling factor-numerator */
+  int scaling_factor_den[AOM_MAX_SS_LAYERS]; /**< Scaling factor-denominator */
+  /*! Target bitrate for each layer */
+  int layer_target_bitrate[AOM_MAX_LAYERS];
+  /*! Frame rate factor for each temporal layer */
+  int framerate_factor[AOM_MAX_TS_LAYERS];
+} aom_svc_params_t;
+
+/*!brief Parameters for setting ref frame config */
+typedef struct aom_svc_ref_frame_config {
+  // 7 references: LAST_FRAME (0), LAST2_FRAME(1), LAST3_FRAME(2),
+  // GOLDEN_FRAME(3), BWDREF_FRAME(4), ALTREF2_FRAME(5), ALTREF_FRAME(6).
+  /*! Buffer slot index for each of 7 references. */
+  int ref_idx[7];
+  int refresh[8]; /**< Refresh flag for each of the 8 slots. */
+} aom_svc_ref_frame_config_t;
+
 /*!\cond */
 /*!\brief Encoder control function parameter type
  *
@@ -1251,6 +1340,9 @@ AOM_CTRL_USE_TYPE(AV1E_SET_TILE_ROWS, unsigned int)
 AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_TPL_MODEL, unsigned int)
 #define AOM_CTRL_AV1E_SET_ENABLE_TPL_MODEL
 
+AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_KEYFRAME_FILTERING, unsigned int)
+#define AOM_CTRL_AV1E_SET_ENABLE_KEYFRAME_FILTERING
+
 AOM_CTRL_USE_TYPE(AOME_GET_LAST_QUANTIZER, int *)
 #define AOM_CTRL_AOME_GET_LAST_QUANTIZER
 AOM_CTRL_USE_TYPE(AOME_GET_LAST_QUANTIZER_64, int *)
@@ -1275,6 +1367,9 @@ AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_CDEF, unsigned int)
 
 AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_RESTORATION, unsigned int)
 #define AOM_CTRL_AV1E_SET_ENABLE_RESTORATION
+
+AOM_CTRL_USE_TYPE(AV1E_SET_FORCE_VIDEO_MODE, unsigned int)
+#define AOM_CTRL_AV1E_SET_FORCE_VIDEO_MODE
 
 AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_OBMC, unsigned int)
 #define AOM_CTRL_AV1E_SET_ENABLE_OBMC
@@ -1353,6 +1448,9 @@ AOM_CTRL_USE_TYPE(AV1E_SET_ALLOW_REF_FRAME_MVS, int)
 AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_DUAL_FILTER, int)
 #define AOM_CTRL_AV1E_SET_ENABLE_DUAL_FILTER
 
+AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_CHROMA_DELTAQ, int)
+#define AOM_CTRL_AV1E_SET_ENABLE_CHROMA_DELTAQ
+
 AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_MASKED_COMP, int)
 #define AOM_CTRL_AV1E_SET_ENABLE_MASKED_COMP
 
@@ -1397,6 +1495,9 @@ AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_CFL_INTRA, int)
 
 AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_SUPERRES, int)
 #define AOM_CTRL_AV1E_SET_ENABLE_SUPERRES
+
+AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_OVERLAY, int)
+#define AOM_CTRL_AV1E_SET_ENABLE_OVERLAY
 
 AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_PALETTE, int)
 #define AOM_CTRL_AV1E_SET_ENABLE_PALETTE
@@ -1524,6 +1625,9 @@ AOM_CTRL_USE_TYPE(AV1E_SET_COEFF_COST_UPD_FREQ, unsigned int)
 AOM_CTRL_USE_TYPE(AV1E_SET_MODE_COST_UPD_FREQ, unsigned int)
 #define AOM_CTRL_AV1E_SET_MODE_COST_UPD_FREQ
 
+AOM_CTRL_USE_TYPE(AV1E_SET_MV_COST_UPD_FREQ, unsigned int)
+#define AOM_CTRL_AV1E_SET_MV_COST_UPD_FREQ
+
 AOM_CTRL_USE_TYPE(AV1E_SET_TARGET_SEQ_LEVEL_IDX, int)
 #define AOM_CTRL_AV1E_SET_TARGET_SEQ_LEVEL_IDX
 
@@ -1532,6 +1636,15 @@ AOM_CTRL_USE_TYPE(AV1E_SET_TIER_MASK, unsigned int)
 
 AOM_CTRL_USE_TYPE(AV1E_SET_MIN_CR, unsigned int)
 #define AOM_CTRL_AV1E_SET_MIN_CR
+
+AOM_CTRL_USE_TYPE(AV1E_SET_SVC_LAYER_ID, aom_svc_layer_id_t *)
+#define AOME_CTRL_AV1E_SET_SVC_LAYER_ID
+
+AOM_CTRL_USE_TYPE(AV1E_SET_SVC_PARAMS, aom_svc_params_t *)
+#define AOME_CTRL_AV1E_SET_SVC_PARAMS
+
+AOM_CTRL_USE_TYPE(AV1E_SET_SVC_REF_FRAME_CONFIG, aom_svc_ref_frame_config_t *)
+#define AOME_CTRL_AV1E_SET_SVC_REF_FRAME_CONFIG
 
 /*!\endcond */
 /*! @} - end defgroup aom_encoder */

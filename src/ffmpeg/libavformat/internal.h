@@ -237,7 +237,7 @@ int ff_hex_to_data(uint8_t *data, const char *p);
  * @return 0, or < 0 on error
  */
 int ff_interleave_add_packet(AVFormatContext *s, AVPacket *pkt,
-                             int (*compare)(AVFormatContext *, AVPacket *, AVPacket *));
+                             int (*compare)(AVFormatContext *, const AVPacket *, const AVPacket *));
 
 void ff_read_frame_flush(AVFormatContext *s);
 
@@ -650,9 +650,6 @@ enum AVWriteUncodedFrameFlags {
  */
 int ff_copy_whiteblacklists(AVFormatContext *dst, const AVFormatContext *src);
 
-int ffio_open2_wrapper(struct AVFormatContext *s, AVIOContext **pb, const char *url, int flags,
-                       const AVIOInterruptCB *int_cb, AVDictionary **options);
-
 /**
  * Returned by demuxers to indicate that data was consumed but discarded
  * (ignored streams or junk data). The framework will re-call the demuxer.
@@ -766,7 +763,8 @@ void ff_format_set_url(AVFormatContext *s, char *url);
  *
  * @param head  List head element
  * @param tail  List tail element
- * @param pkt   The packet being appended
+ * @param pkt   The packet being appended. The data described in it will
+ *              be made reference counted if it isn't already.
  * @param flags Any combination of FF_PACKETLIST_FLAG_* flags
  * @return 0 on success, negative AVERROR value on failure. On failure,
            the list is unchanged
@@ -776,13 +774,16 @@ int ff_packet_list_put(AVPacketList **head, AVPacketList **tail,
 
 /**
  * Remove the oldest AVPacket in the list and return it.
+ * The behaviour is undefined if the packet list is empty.
  *
  * @note The pkt will be overwritten completely. The caller owns the
  *       packet and must unref it by itself.
  *
  * @param head List head element
  * @param tail List tail element
- * @param pkt  Pointer to an initialized AVPacket struct
+ * @param pkt  Pointer to an AVPacket struct
+ * @return 0 on success. Success is guaranteed
+ *         if the packet list is not empty.
  */
 int ff_packet_list_get(AVPacketList **head, AVPacketList **tail,
                        AVPacket *pkt);

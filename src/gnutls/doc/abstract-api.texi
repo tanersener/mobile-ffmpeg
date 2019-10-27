@@ -101,10 +101,16 @@ be called only if the peer requests a certificate either during handshake
 or during post-handshake authentication.
 
 The callback's function prototype is defined in `abstract.h':
-int (*callback)(gnutls_session_t, const struct gnutls_cert_retr_st *info,
-gnutls_pcert_st **certs, unsigned int *pcert_length,
-gnutls_datum_t **ocsp, unsigned int *ocsp_length,
-gnutls_privkey_t * pkey, unsigned int *flags);
+
+int gnutls_certificate_retrieve_function3(
+gnutls_session_t,
+const struct gnutls_cert_retr_st *info,
+gnutls_pcert_st **certs,
+unsigned int *pcert_length,
+gnutls_ocsp_data_st **ocsp,
+unsigned int *ocsp_length,
+gnutls_privkey_t *privkey,
+unsigned int *flags);
 
 The info field of the callback contains:
  @code{req_ca_dn} which is a list with the CA names that the server considers trusted.
@@ -1492,7 +1498,8 @@ the hash algorithm.
 
 The flags may be @code{GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA}  or @code{GNUTLS_PRIVKEY_SIGN_FLAG_RSA_PSS} .
 In the former case this function will ignore  @code{hash_algo} and perform a raw PKCS1 signature,
-and in the latter an RSA-PSS signature will be generated.
+and in the latter an RSA-PSS signature will be generated. Note that the flag
+@code{GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA}  is supported since 3.6.9.
 
 Note that, not all algorithm support signing already hashed data. When
 signing with Ed25519, @code{gnutls_privkey_sign_data()}  should be used.

@@ -405,7 +405,9 @@ AM_CPPFLAGS = \
 
 noinst_HEADERS = $(TARG)
 ALIAS_FILES = fcalias.h fcaliastail.h
-BUILT_SOURCES = $(ALIAS_FILES)
+#	^-------------- Add new orth files here
+BUILT_SOURCES = $(ALIAS_FILES) \
+	$(top_builddir)/conf.d/35-lang-normalize.conf
 CLEANFILES = $(ALIAS_FILES) $(TOOL)
 MAINTAINERCLEANFILES = $(TARG)
 
@@ -663,6 +665,7 @@ ORTH = \
 	und_zsye.orth \
 	und_zmth.orth
 
+DISTCLEANFILES = $(BUILT_SOURCES)
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
@@ -822,6 +825,7 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
+	-test -z "$(DISTCLEANFILES)" || rm -f $(DISTCLEANFILES)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
@@ -923,7 +927,17 @@ $(TARG): $(TMPL) $(TSRC) $(DEPS)
 
 $(ALIAS_FILES):
 	$(AM_V_GEN) touch $@
-#	^-------------- Add new orth files here
+
+$(top_builddir)/conf.d/35-lang-normalize.conf: $(ORTH) Makefile
+	$(AM_V_GEN) echo "<fontconfig>" > $@ && \
+	for i in `echo $(ORTH) | sed -e 's/ /\n/g' | grep -v _ | sed -e 's/\.orth$$//g' | sort`; do \
+		echo "  <!-- $$i* -> $$i -->" >> $@; \
+		echo "  <match>" >> $@; \
+		echo "    <test name=\"lang\" compare=\"contains\"><string>$$i</string></test>" >> $@; \
+		echo "    <edit name=\"lang\" mode=\"assign\" binding=\"same\"><string>$$i</string></edit>" >> $@; \
+		echo "  </match>" >> $@; \
+	done && \
+	echo "</fontconfig>" >> $@
 
 -include $(top_srcdir)/git.mk
 

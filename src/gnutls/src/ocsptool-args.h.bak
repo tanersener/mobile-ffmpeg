@@ -95,9 +95,9 @@ typedef enum {
 /** count of all options for ocsptool */
 #define OPTION_CT    25
 /** ocsptool version */
-#define OCSPTOOL_VERSION       "3.6.8"
+#define OCSPTOOL_VERSION       "3.6.10"
 /** Full ocsptool version text */
-#define OCSPTOOL_FULL_VERSION  "ocsptool 3.6.8"
+#define OCSPTOOL_FULL_VERSION  "ocsptool 3.6.10"
 
 /**
  *  Interface defines for all options.  Replace "n" with the UPPER_CASED

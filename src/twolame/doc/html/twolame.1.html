@@ -1,18 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
     "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.3" />
+<meta name="generator" content="AsciiDoc 8.6.10" />
 <title>TWOLAME(1)</title>
+<link rel="stylesheet" href="./asciidoc.css" type="text/css" />
+
+
 <link rel="stylesheet" href="./twolame.css" type="text/css" />
-<link rel="stylesheet" href="./twolame-manpage.css" type="text/css" />
+<script type="text/javascript" src="./asciidoc.js"></script>
 <script type="text/javascript">
 /*<![CDATA[*/
-window.onload = function(){asciidoc.footnotes();}
+asciidoc.install();
 /*]]>*/
 </script>
-<script type="text/javascript" src="./asciidoc-xhtml11.js"></script>
 </head>
 <body class="manpage">
 <div id="header">
@@ -64,9 +67,9 @@ then use - as the output filename.</p></div>
 </dt>
 <dd>
 <p>
-        Specifies that input is raw signed PCM audio.
-        If audio is stereo, than audio samples are interleaved
-        between the two channels.
+    Specifies that input is raw signed PCM audio.
+    If audio is stereo, than audio samples are interleaved
+    between the two channels.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -74,9 +77,9 @@ then use - as the output filename.</p></div>
 </dt>
 <dd>
 <p>
-        Force byte-swapping of the input. Endian detection is performed
-        automatically by libsndfile, so this option shouldn&#8217;t
-        normally be needed.
+    Force byte-swapping of the input. Endian detection is performed
+    automatically by libsndfile, so this option shouldn&#8217;t
+    normally be needed.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -84,10 +87,10 @@ then use - as the output filename.</p></div>
 </dt>
 <dd>
 <p>
-        If inputting raw PCM sound, you must specify the sample rate of
-        the audio in Hz.
-        Valid sample rates: 16000, 22050, 24000, 32000, 44100, 48000Hz.
-        Default sample rate is 44100Hz.
+    If inputting raw PCM sound, you must specify the sample rate of
+    the audio in Hz.
+    Valid sample rates: 16000, 22050, 24000, 32000, 44100, 48000Hz.
+    Default sample rate is 44100Hz.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -95,9 +98,9 @@ then use - as the output filename.</p></div>
 </dt>
 <dd>
 <p>
-        Specifies the sample size (in bits) of the raw PCM audio.
-        Valid sample sizes: 8, 16, 24, 32.
-        Default sample size is 16-bit.
+    Specifies the sample size (in bits) of the raw PCM audio.
+    Valid sample sizes: 8, 16, 24, 32.
+    Default sample size is 16-bit.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -105,8 +108,8 @@ then use - as the output filename.</p></div>
 </dt>
 <dd>
 <p>
-        If inputting raw PCM sound, you must specify the number of channels
-        in the input audio. Default number of channels is 2.
+    If inputting raw PCM sound, you must specify the number of channels
+    in the input audio. Default number of channels is 2.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -114,7 +117,7 @@ then use - as the output filename.</p></div>
 </dt>
 <dd>
 <p>
-        Swap the Left and Right channels of a stereo input file.
+    Swap the Left and Right channels of a stereo input file.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -122,10 +125,10 @@ then use - as the output filename.</p></div>
 </dt>
 <dd>
 <p>
-        Scale the input audio prior to encoding.
-        All of the input audio is multiplied by specified value.
-        Value between 0 and 1 will reduce the audio gain, and a value
-        above 1 will increase the gain of the audio.
+    Scale the input audio prior to encoding.
+    All of the input audio is multiplied by specified value.
+    Value between 0 and 1 will reduce the audio gain, and a value
+    above 1 will increase the gain of the audio.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -133,7 +136,7 @@ then use - as the output filename.</p></div>
 </dt>
 <dd>
 <p>
-        Same as --scale, but only affects the left channel.
+    Same as --scale, but only affects the left channel.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -141,7 +144,7 @@ then use - as the output filename.</p></div>
 </dt>
 <dd>
 <p>
-        Same as --scale, but only affects the right channel.
+    Same as --scale, but only affects the right channel.
 </p>
 </dd>
 </dl></div>
@@ -154,7 +157,7 @@ then use - as the output filename.</p></div>
 </dt>
 <dd>
 <p>
-        Choose the mode of the resulting audio. Default is auto.
+    Choose the mode of the resulting audio. Default is auto.
 </p>
 <div class="ulist"><ul>
 <li>
@@ -189,8 +192,8 @@ then use - as the output filename.</p></div>
 </dt>
 <dd>
 <p>
-        If the input file is stereo then, downmix the left and right
-        input channels into a single mono channel.
+    If the input file is stereo then, downmix the left and right
+    input channels into a single mono channel.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -198,13 +201,13 @@ then use - as the output filename.</p></div>
 </dt>
 <dd>
 <p>
-        Sets the total bitrate (in kbps) for the output file.
-        The default bitrate  depends on the number of
-        input channels and samplerate.
+    Sets the total bitrate (in kbps) for the output file.
+    The default bitrate  depends on the number of
+    input channels and samplerate.
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><tt>------------------------------
+<pre><code>------------------------------
 Sample Rate   Mono    Stereo
 ------------------------------
 48000         96      192
@@ -213,7 +216,7 @@ Sample Rate   Mono    Stereo
 24000         48      96
 22050         48      96
 16000         32      64
-------------------------------</tt></pre>
+------------------------------</code></pre>
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -221,12 +224,12 @@ Sample Rate   Mono    Stereo
 </dt>
 <dd>
 <p>
-        Choose the psycho-acoustic model to use (-1 to 4).
-        Model number -1 is turns off psycho-acoustic modelling and
-        uses fixed default values instead.
-        Please see the file <em>psycho</em> for a full description of
-        each of the models available.
-        Default model is 3.
+    Choose the psycho-acoustic model to use (-1 to 4).
+    Model number -1 is turns off psycho-acoustic modelling and
+    uses fixed default values instead.
+    Please see the file <em>psycho</em> for a full description of
+    each of the models available.
+    Default model is 3.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -234,8 +237,8 @@ Sample Rate   Mono    Stereo
 </dt>
 <dd>
 <p>
-        Enable VBR mode. See <em>vbr</em> documentation file for details.
-        Default VBR level is 5.0.
+    Enable VBR mode. See <em>vbr</em> documentation file for details.
+    Default VBR level is 5.0.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -243,10 +246,10 @@ Sample Rate   Mono    Stereo
 </dt>
 <dd>
 <p>
-        Enable VBR mode and set quality level.
-        The higher the number the better the quality.
-        Maximum range is -50 to 50 but useful range is -10 to 10.
-        See <em>vbr</em> documentation file for details.
+    Enable VBR mode and set quality level.
+    The higher the number the better the quality.
+    Maximum range is -50 to 50 but useful range is -10 to 10.
+    See <em>vbr</em> documentation file for details.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -254,7 +257,7 @@ Sample Rate   Mono    Stereo
 </dt>
 <dd>
 <p>
-        Set the ATH level. Default level is 0.0.
+    Set the ATH level. Default level is 0.0.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -262,8 +265,8 @@ Sample Rate   Mono    Stereo
 </dt>
 <dd>
 <p>
-        Enable quick mode. Only re-calculate psycho-acoustic
-        model every specified number of frames.
+    Enable quick mode. Only re-calculate psycho-acoustic
+    model every specified number of frames.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -271,8 +274,8 @@ Sample Rate   Mono    Stereo
 </dt>
 <dd>
 <p>
-        Enables single frame mode: only a single frame of MPEG audio
-        is output and then the program terminates.
+    Enables single frame mode: only a single frame of MPEG audio
+    is output and then the program terminates.
 </p>
 </dd>
 </dl></div>
@@ -285,7 +288,7 @@ Sample Rate   Mono    Stereo
 </dt>
 <dd>
 <p>
-        Turn on Copyright flag in output bitstream.
+    Turn on Copyright flag in output bitstream.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -293,7 +296,7 @@ Sample Rate   Mono    Stereo
 </dt>
 <dd>
 <p>
-        Turn off Original flag in output bitstream.
+    Turn off Original flag in output bitstream.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -301,7 +304,7 @@ Sample Rate   Mono    Stereo
 </dt>
 <dd>
 <p>
-        Turn on Original flag in output bitstream.
+    Turn on Original flag in output bitstream.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -309,8 +312,8 @@ Sample Rate   Mono    Stereo
 </dt>
 <dd>
 <p>
-        Enable CRC error protection in output bitstream.
-        An extra 16-bit checksum is added to frames.
+    Enable CRC error protection in output bitstream.
+    An extra 16-bit checksum is added to frames.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -318,7 +321,7 @@ Sample Rate   Mono    Stereo
 </dt>
 <dd>
 <p>
-        Turn on padding in output bitstream.
+    Turn on padding in output bitstream.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -326,8 +329,8 @@ Sample Rate   Mono    Stereo
 </dt>
 <dd>
 <p>
-        Reserve specified number of bits in the each from of the
-        output bitstream.
+    Reserve specified number of bits in the each from of the
+    output bitstream.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -335,7 +338,7 @@ Sample Rate   Mono    Stereo
 </dt>
 <dd>
 <p>
-        Set the de-emphasis type (n/c/5). Default is none.
+    Set the de-emphasis type (n/c/5). Default is none.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -343,7 +346,7 @@ Sample Rate   Mono    Stereo
 </dt>
 <dd>
 <p>
-        Turn on energy level extensions.
+    Turn on energy level extensions.
 </p>
 </dd>
 </dl></div>
@@ -356,8 +359,8 @@ Sample Rate   Mono    Stereo
 </dt>
 <dd>
 <p>
-        Set the amount of information to be displayed on stderr (0 to 10).
-        Default is 2.
+    Set the amount of information to be displayed on stderr (0 to 10).
+    Default is 2.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -365,8 +368,8 @@ Sample Rate   Mono    Stereo
 </dt>
 <dd>
 <p>
-        Don&#8217;t send any messages to stderr, unless there is an error.
-        (Same as --talkativity=0)
+    Don&#8217;t send any messages to stderr, unless there is an error.
+    (Same as --talkativity=0)
 </p>
 </dd>
 <dt class="hdlist1">
@@ -374,9 +377,9 @@ Sample Rate   Mono    Stereo
 </dt>
 <dd>
 <p>
-        Only display a minimal number of messages while encoding.
-        This setting is quieter than the default talkativity setting.
-        (Same as --talkativity=1)
+    Only display a minimal number of messages while encoding.
+    This setting is quieter than the default talkativity setting.
+    (Same as --talkativity=1)
 </p>
 </dd>
 <dt class="hdlist1">
@@ -384,9 +387,9 @@ Sample Rate   Mono    Stereo
 </dt>
 <dd>
 <p>
-        Display an increased number of messages on stderr.
-        This setting is useful to diagnose problems.
-        (Same as --talkativity=4)
+    Display an increased number of messages on stderr.
+    This setting is useful to diagnose problems.
+    (Same as --talkativity=4)
 </p>
 </dd>
 </dl></div>
@@ -431,7 +434,7 @@ However if encoding is not successful, then it will return one of the following 
 </li>
 <li>
 <p>
-12 (Error occured while encoding)
+12 (Error occurred while encoding)
 </p>
 </li>
 <li>
@@ -449,29 +452,29 @@ However if encoding is not successful, then it will return one of the following 
 and using the default psycho-acoustic model (model 3):</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>twolame sound.wav</tt></pre>
+<pre><code>twolame sound.wav</code></pre>
 </div></div>
 <div class="paragraph"><p>Constant bitrate of 160kbps and joint stereo encoding, saved to file sound_160.mp2:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>twolame -b 160 -m j sound.aiff sound_160.mp2</tt></pre>
+<pre><code>twolame -b 160 -m j sound.aiff sound_160.mp2</code></pre>
 </div></div>
 <div class="paragraph"><p>Encode sound.wav to newfile.mp2 using psycho-acoustic model 2 and encoding
 with variable bitrate:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>twolame -P 2 -v sound.wav newfile.mp2</tt></pre>
+<pre><code>twolame -P 2 -v sound.wav newfile.mp2</code></pre>
 </div></div>
 <div class="paragraph"><p>Same as example above, except that the negative value of the "-V" argument
 means that the lower bitrates will be favoured over the higher ones:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>twolame -P 2 -V -5 sound.wav newfile.mp2</tt></pre>
+<pre><code>twolame -P 2 -V -5 sound.wav newfile.mp2</code></pre>
 </div></div>
 <div class="paragraph"><p>Resample audio file using sox and pipe straight through twolame:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>sox sound_11025.aiff -t raw -r 16000 | twolame -r -s 16000 - - &gt; out.mp2</tt></pre>
+<pre><code>sox sound_11025.aiff -t raw -r 16000 | twolame -r -s 16000 - - &gt; out.mp2</code></pre>
 </div></div>
 </div>
 </div>
@@ -498,7 +501,7 @@ For a full list of authors, please see the AUTHORS file.</p></div>
 <div class="sect1">
 <h2 id="_copying">COPYING</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>Copyright &#169; 2004-2006 The TwoLAME Project. Free use of this software is
+<div class="paragraph"><p>Copyright &#169; 2004-2018 The TwoLAME Project. Free use of this software is
 granted under the terms of the GNU Lesser General Public License (LGPL).</p></div>
 </div>
 </div>
@@ -506,8 +509,9 @@ granted under the terms of the GNU Lesser General Public License (LGPL).</p></di
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Version 0.3.13<br />
-Last updated 2011-01-02 12:18:34 GMT
+Version 0.4.0<br />
+Last updated
+ 2019-10-11 17:26:25 BST
 </div>
 </div>
 </body>

@@ -104,6 +104,7 @@ void av1_setup_scale_factors_for_frame(struct scale_factors *sf, int other_w,
   sf->convolve[1][0][1] = av1_dist_wtd_convolve_x;
   // subpel_x_qn != 0 && subpel_y_qn != 0
   sf->convolve[1][1][1] = av1_dist_wtd_convolve_2d;
+#if CONFIG_AV1_HIGHBITDEPTH
   // AV1 High BD convolve functions
   // Special case convolve functions should produce the same result as
   // av1_highbd_convolve_2d.
@@ -123,4 +124,5 @@ void av1_setup_scale_factors_for_frame(struct scale_factors *sf, int other_w,
   sf->highbd_convolve[1][0][1] = av1_highbd_dist_wtd_convolve_x;
   // subpel_x_qn != 0 && subpel_y_qn != 0
   sf->highbd_convolve[1][1][1] = av1_highbd_dist_wtd_convolve_2d;
+#endif
 }

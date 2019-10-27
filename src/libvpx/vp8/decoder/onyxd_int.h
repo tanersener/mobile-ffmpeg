@@ -136,8 +136,8 @@ int vp8_remove_decoder_instances(struct frame_buffers *fb);
 #if CONFIG_DEBUG
 #define CHECK_MEM_ERROR(lval, expr)                                         \
   do {                                                                      \
-    lval = (expr);                                                          \
-    if (!lval)                                                              \
+    (lval) = (expr);                                                        \
+    if (!(lval))                                                            \
       vpx_internal_error(&pbi->common.error, VPX_CODEC_MEM_ERROR,           \
                          "Failed to allocate " #lval " at %s:%d", __FILE__, \
                          __LINE__);                                         \
@@ -145,8 +145,8 @@ int vp8_remove_decoder_instances(struct frame_buffers *fb);
 #else
 #define CHECK_MEM_ERROR(lval, expr)                               \
   do {                                                            \
-    lval = (expr);                                                \
-    if (!lval)                                                    \
+    (lval) = (expr);                                              \
+    if (!(lval))                                                  \
       vpx_internal_error(&pbi->common.error, VPX_CODEC_MEM_ERROR, \
                          "Failed to allocate " #lval);            \
   } while (0)

@@ -68,7 +68,7 @@ class TestVectorTest : public ::libaom_test::DecoderTest,
     expected_md5[32] = '\0';
 
     ::libaom_test::MD5 md5_res;
-#if !CONFIG_LOWBITDEPTH
+#if FORCE_HIGHBITDEPTH_DECODING
     const aom_img_fmt_t shifted_fmt =
         (aom_img_fmt)(img.fmt & ~AOM_IMG_FMT_HIGHBITDEPTH);
     if (img.bit_depth == 8 && shifted_fmt != img.fmt) {
@@ -82,7 +82,7 @@ class TestVectorTest : public ::libaom_test::DecoderTest,
     } else {
 #endif
       md5_res.Add(&img);
-#if !CONFIG_LOWBITDEPTH
+#if FORCE_HIGHBITDEPTH_DECODING
     }
 #endif
 
@@ -138,7 +138,7 @@ TEST_P(TestVectorTest, MD5Match) {
   OpenMD5File(md5_filename);
 
   // Set decode config and flags.
-  cfg.allow_lowbitdepth = CONFIG_LOWBITDEPTH;
+  cfg.allow_lowbitdepth = !FORCE_HIGHBITDEPTH_DECODING;
   set_cfg(cfg);
   set_flags(flags);
 

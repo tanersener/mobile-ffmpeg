@@ -58,6 +58,7 @@ class AV1HiprecConvolveTest
 
 }  // namespace AV1HiprecConvolve
 
+#if CONFIG_AV1_HIGHBITDEPTH
 namespace AV1HighbdHiprecConvolve {
 typedef void (*highbd_hiprec_convolve_func)(
     const uint8_t *src, ptrdiff_t src_stride, uint8_t *dst,
@@ -87,7 +88,7 @@ class AV1HighbdHiprecConvolveTest
 };
 
 }  // namespace AV1HighbdHiprecConvolve
-
+#endif  // CONFIG_AV1_HIGHBITDEPTH
 }  // namespace libaom_test
 
 #endif  // AOM_TEST_HIPREC_CONVOLVE_TEST_UTIL_H_

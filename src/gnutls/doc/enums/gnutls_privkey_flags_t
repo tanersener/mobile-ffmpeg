@@ -21,7 +21,10 @@ even if the information about the seed used will be lost.
 @item GNUTLS_@-PRIVKEY_@-SIGN_@-FLAG_@-RSA_@-PSS
 Make an RSA signature on the hashed data with the PSS padding.
 @item GNUTLS_@-PRIVKEY_@-FLAG_@-REPRODUCIBLE
-Make an RSA-PSS signature on the hashed data with reproducible parameters (zero salt).
+Make a signature on the hashed data with reproducible parameters.
+For RSA-PSS, that means to use empty salt instead of random value. For ECDSA/DSA, it uses the deterministic
+construction of random parameter according to RFC 6979. Note that
+this only supports the NIST curves and DSA subgroup bits up to 512.
 @item GNUTLS_@-PRIVKEY_@-FLAG_@-CA
 The generated private key is going to be used as a CA (relevant for RSA-PSS keys).
 @end table

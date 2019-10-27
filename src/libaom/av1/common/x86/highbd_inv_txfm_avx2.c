@@ -47,6 +47,47 @@ static INLINE __m256i highbd_clamp_epi16_avx2(__m256i u, int bd) {
   return clamped;
 }
 
+static INLINE void round_shift_4x4_avx2(__m256i *in, int shift) {
+  if (shift != 0) {
+    __m256i rnding = _mm256_set1_epi32(1 << (shift - 1));
+    in[0] = _mm256_add_epi32(in[0], rnding);
+    in[1] = _mm256_add_epi32(in[1], rnding);
+    in[2] = _mm256_add_epi32(in[2], rnding);
+    in[3] = _mm256_add_epi32(in[3], rnding);
+
+    in[0] = _mm256_srai_epi32(in[0], shift);
+    in[1] = _mm256_srai_epi32(in[1], shift);
+    in[2] = _mm256_srai_epi32(in[2], shift);
+    in[3] = _mm256_srai_epi32(in[3], shift);
+  }
+}
+
+static INLINE void round_shift_8x8_avx2(__m256i *in, int shift) {
+  round_shift_4x4_avx2(in, shift);
+  round_shift_4x4_avx2(in + 4, shift);
+  round_shift_4x4_avx2(in + 8, shift);
+  round_shift_4x4_avx2(in + 12, shift);
+}
+
+static void highbd_clamp_epi32_avx2(__m256i *in, __m256i *out,
+                                    const __m256i *clamp_lo,
+                                    const __m256i *clamp_hi, int size) {
+  __m256i a0, a1;
+  for (int i = 0; i < size; i += 4) {
+    a0 = _mm256_max_epi32(in[i], *clamp_lo);
+    out[i] = _mm256_min_epi32(a0, *clamp_hi);
+
+    a1 = _mm256_max_epi32(in[i + 1], *clamp_lo);
+    out[i + 1] = _mm256_min_epi32(a1, *clamp_hi);
+
+    a0 = _mm256_max_epi32(in[i + 2], *clamp_lo);
+    out[i + 2] = _mm256_min_epi32(a0, *clamp_hi);
+
+    a1 = _mm256_max_epi32(in[i + 3], *clamp_lo);
+    out[i + 3] = _mm256_min_epi32(a1, *clamp_hi);
+  }
+}
+
 static INLINE __m256i highbd_get_recon_16x8_avx2(const __m256i pred,
                                                  __m256i res0, __m256i res1,
                                                  const int bd) {
@@ -235,36 +276,6 @@ static void addsub_avx2(const __m256i in0, const __m256i in1, __m256i *out0,
   *out1 = a1;
 }
 
-static void addsub_no_clamp_avx2(const __m256i in0, const __m256i in1,
-                                 __m256i *out0, __m256i *out1) {
-  __m256i a0 = _mm256_add_epi32(in0, in1);
-  __m256i a1 = _mm256_sub_epi32(in0, in1);
-
-  *out0 = a0;
-  *out1 = a1;
-}
-
-static void addsub_shift_avx2(const __m256i in0, const __m256i in1,
-                              __m256i *out0, __m256i *out1,
-                              const __m256i *clamp_lo, const __m256i *clamp_hi,
-                              int shift) {
-  __m256i offset = _mm256_set1_epi32((1 << shift) >> 1);
-  __m256i in0_w_offset = _mm256_add_epi32(in0, offset);
-  __m256i a0 = _mm256_add_epi32(in0_w_offset, in1);
-  __m256i a1 = _mm256_sub_epi32(in0_w_offset, in1);
-
-  a0 = _mm256_sra_epi32(a0, _mm_cvtsi32_si128(shift));
-  a1 = _mm256_sra_epi32(a1, _mm_cvtsi32_si128(shift));
-
-  a0 = _mm256_max_epi32(a0, *clamp_lo);
-  a0 = _mm256_min_epi32(a0, *clamp_hi);
-  a1 = _mm256_max_epi32(a1, *clamp_lo);
-  a1 = _mm256_min_epi32(a1, *clamp_hi);
-
-  *out0 = a0;
-  *out1 = a1;
-}
-
 static INLINE void idct32_stage4_avx2(
     __m256i *bf1, const __m256i *cospim8, const __m256i *cospi56,
     const __m256i *cospi8, const __m256i *cospim56, const __m256i *cospim40,
@@ -400,63 +411,32 @@ static INLINE void idct32_stage8_avx2(__m256i *bf1, const __m256i *cospim32,
 static INLINE void idct32_stage9_avx2(__m256i *bf1, __m256i *out,
                                       const int do_cols, const int bd,
                                       const int out_shift,
-                                      const int log_range) {
-  if (do_cols) {
-    addsub_no_clamp_avx2(bf1[0], bf1[31], out + 0, out + 31);
-    addsub_no_clamp_avx2(bf1[1], bf1[30], out + 1, out + 30);
-    addsub_no_clamp_avx2(bf1[2], bf1[29], out + 2, out + 29);
-    addsub_no_clamp_avx2(bf1[3], bf1[28], out + 3, out + 28);
-    addsub_no_clamp_avx2(bf1[4], bf1[27], out + 4, out + 27);
-    addsub_no_clamp_avx2(bf1[5], bf1[26], out + 5, out + 26);
-    addsub_no_clamp_avx2(bf1[6], bf1[25], out + 6, out + 25);
-    addsub_no_clamp_avx2(bf1[7], bf1[24], out + 7, out + 24);
-    addsub_no_clamp_avx2(bf1[8], bf1[23], out + 8, out + 23);
-    addsub_no_clamp_avx2(bf1[9], bf1[22], out + 9, out + 22);
-    addsub_no_clamp_avx2(bf1[10], bf1[21], out + 10, out + 21);
-    addsub_no_clamp_avx2(bf1[11], bf1[20], out + 11, out + 20);
-    addsub_no_clamp_avx2(bf1[12], bf1[19], out + 12, out + 19);
-    addsub_no_clamp_avx2(bf1[13], bf1[18], out + 13, out + 18);
-    addsub_no_clamp_avx2(bf1[14], bf1[17], out + 14, out + 17);
-    addsub_no_clamp_avx2(bf1[15], bf1[16], out + 15, out + 16);
-  } else {
+                                      const __m256i *clamp_lo,
+                                      const __m256i *clamp_hi) {
+  addsub_avx2(bf1[0], bf1[31], out + 0, out + 31, clamp_lo, clamp_hi);
+  addsub_avx2(bf1[1], bf1[30], out + 1, out + 30, clamp_lo, clamp_hi);
+  addsub_avx2(bf1[2], bf1[29], out + 2, out + 29, clamp_lo, clamp_hi);
+  addsub_avx2(bf1[3], bf1[28], out + 3, out + 28, clamp_lo, clamp_hi);
+  addsub_avx2(bf1[4], bf1[27], out + 4, out + 27, clamp_lo, clamp_hi);
+  addsub_avx2(bf1[5], bf1[26], out + 5, out + 26, clamp_lo, clamp_hi);
+  addsub_avx2(bf1[6], bf1[25], out + 6, out + 25, clamp_lo, clamp_hi);
+  addsub_avx2(bf1[7], bf1[24], out + 7, out + 24, clamp_lo, clamp_hi);
+  addsub_avx2(bf1[8], bf1[23], out + 8, out + 23, clamp_lo, clamp_hi);
+  addsub_avx2(bf1[9], bf1[22], out + 9, out + 22, clamp_lo, clamp_hi);
+  addsub_avx2(bf1[10], bf1[21], out + 10, out + 21, clamp_lo, clamp_hi);
+  addsub_avx2(bf1[11], bf1[20], out + 11, out + 20, clamp_lo, clamp_hi);
+  addsub_avx2(bf1[12], bf1[19], out + 12, out + 19, clamp_lo, clamp_hi);
+  addsub_avx2(bf1[13], bf1[18], out + 13, out + 18, clamp_lo, clamp_hi);
+  addsub_avx2(bf1[14], bf1[17], out + 14, out + 17, clamp_lo, clamp_hi);
+  addsub_avx2(bf1[15], bf1[16], out + 15, out + 16, clamp_lo, clamp_hi);
+  if (!do_cols) {
     const int log_range_out = AOMMAX(16, bd + 6);
-    const __m256i clamp_lo_out = _mm256_set1_epi32(AOMMAX(
-        -(1 << (log_range_out - 1)), -(1 << (log_range - 1 - out_shift))));
-    const __m256i clamp_hi_out = _mm256_set1_epi32(AOMMIN(
-        (1 << (log_range_out - 1)) - 1, (1 << (log_range - 1 - out_shift))));
-
-    addsub_shift_avx2(bf1[0], bf1[31], out + 0, out + 31, &clamp_lo_out,
-                      &clamp_hi_out, out_shift);
-    addsub_shift_avx2(bf1[1], bf1[30], out + 1, out + 30, &clamp_lo_out,
-                      &clamp_hi_out, out_shift);
-    addsub_shift_avx2(bf1[2], bf1[29], out + 2, out + 29, &clamp_lo_out,
-                      &clamp_hi_out, out_shift);
-    addsub_shift_avx2(bf1[3], bf1[28], out + 3, out + 28, &clamp_lo_out,
-                      &clamp_hi_out, out_shift);
-    addsub_shift_avx2(bf1[4], bf1[27], out + 4, out + 27, &clamp_lo_out,
-                      &clamp_hi_out, out_shift);
-    addsub_shift_avx2(bf1[5], bf1[26], out + 5, out + 26, &clamp_lo_out,
-                      &clamp_hi_out, out_shift);
-    addsub_shift_avx2(bf1[6], bf1[25], out + 6, out + 25, &clamp_lo_out,
-                      &clamp_hi_out, out_shift);
-    addsub_shift_avx2(bf1[7], bf1[24], out + 7, out + 24, &clamp_lo_out,
-                      &clamp_hi_out, out_shift);
-    addsub_shift_avx2(bf1[8], bf1[23], out + 8, out + 23, &clamp_lo_out,
-                      &clamp_hi_out, out_shift);
-    addsub_shift_avx2(bf1[9], bf1[22], out + 9, out + 22, &clamp_lo_out,
-                      &clamp_hi_out, out_shift);
-    addsub_shift_avx2(bf1[10], bf1[21], out + 10, out + 21, &clamp_lo_out,
-                      &clamp_hi_out, out_shift);
-    addsub_shift_avx2(bf1[11], bf1[20], out + 11, out + 20, &clamp_lo_out,
-                      &clamp_hi_out, out_shift);
-    addsub_shift_avx2(bf1[12], bf1[19], out + 12, out + 19, &clamp_lo_out,
-                      &clamp_hi_out, out_shift);
-    addsub_shift_avx2(bf1[13], bf1[18], out + 13, out + 18, &clamp_lo_out,
-                      &clamp_hi_out, out_shift);
-    addsub_shift_avx2(bf1[14], bf1[17], out + 14, out + 17, &clamp_lo_out,
-                      &clamp_hi_out, out_shift);
-    addsub_shift_avx2(bf1[15], bf1[16], out + 15, out + 16, &clamp_lo_out,
-                      &clamp_hi_out, out_shift);
+    const __m256i clamp_lo_out = _mm256_set1_epi32(-(1 << (log_range_out - 1)));
+    const __m256i clamp_hi_out =
+        _mm256_set1_epi32((1 << (log_range_out - 1)) - 1);
+    round_shift_8x8_avx2(out, out_shift);
+    round_shift_8x8_avx2(out + 16, out_shift);
+    highbd_clamp_epi32_avx2(out, out, &clamp_lo_out, &clamp_hi_out, 32);
   }
 }
 
@@ -466,8 +446,8 @@ static void idct32_low1_avx2(__m256i *in, __m256i *out, int bit, int do_cols,
   const __m256i cospi32 = _mm256_set1_epi32(cospi[32]);
   const __m256i rounding = _mm256_set1_epi32(1 << (bit - 1));
   const int log_range = AOMMAX(16, bd + (do_cols ? 6 : 8));
-  const __m256i clamp_lo = _mm256_set1_epi32(-(1 << (log_range - 1)));
-  const __m256i clamp_hi = _mm256_set1_epi32((1 << (log_range - 1)) - 1);
+  __m256i clamp_lo = _mm256_set1_epi32(-(1 << (log_range - 1)));
+  __m256i clamp_hi = _mm256_set1_epi32((1 << (log_range - 1)) - 1);
   __m256i x;
   // stage 0
   // stage 1
@@ -483,22 +463,16 @@ static void idct32_low1_avx2(__m256i *in, __m256i *out, int bit, int do_cols,
   // stage 7
   // stage 8
   // stage 9
-  if (do_cols) {
-    x = _mm256_max_epi32(x, clamp_lo);
-    x = _mm256_min_epi32(x, clamp_hi);
-  } else {
+  if (!do_cols) {
     const int log_range_out = AOMMAX(16, bd + 6);
-    const __m256i clamp_lo_out = _mm256_set1_epi32(AOMMAX(
-        -(1 << (log_range_out - 1)), -(1 << (log_range - 1 - out_shift))));
-    const __m256i clamp_hi_out = _mm256_set1_epi32(AOMMIN(
-        (1 << (log_range_out - 1)) - 1, (1 << (log_range - 1 - out_shift))));
     __m256i offset = _mm256_set1_epi32((1 << out_shift) >> 1);
+    clamp_lo = _mm256_set1_epi32(-(1 << (log_range_out - 1)));
+    clamp_hi = _mm256_set1_epi32((1 << (log_range_out - 1)) - 1);
     x = _mm256_add_epi32(offset, x);
     x = _mm256_sra_epi32(x, _mm_cvtsi32_si128(out_shift));
-    x = _mm256_max_epi32(x, clamp_lo_out);
-    x = _mm256_min_epi32(x, clamp_hi_out);
   }
-
+  x = _mm256_max_epi32(x, clamp_lo);
+  x = _mm256_min_epi32(x, clamp_hi);
   out[0] = x;
   out[1] = x;
   out[2] = x;
@@ -642,7 +616,7 @@ static void idct32_low8_avx2(__m256i *in, __m256i *out, int bit, int do_cols,
                        &rounding, bit);
 
     // stage 9
-    idct32_stage9_avx2(bf1, out, do_cols, bd, out_shift, log_range);
+    idct32_stage9_avx2(bf1, out, do_cols, bd, out_shift, &clamp_lo, &clamp_hi);
   }
 }
 
@@ -792,7 +766,7 @@ static void idct32_low16_avx2(__m256i *in, __m256i *out, int bit, int do_cols,
                        &rounding, bit);
 
     // stage 9
-    idct32_stage9_avx2(bf1, out, do_cols, bd, out_shift, log_range);
+    idct32_stage9_avx2(bf1, out, do_cols, bd, out_shift, &clamp_lo, &clamp_hi);
   }
 }
 
@@ -1150,62 +1124,31 @@ static void idct32_avx2(__m256i *in, __m256i *out, int bit, int do_cols, int bd,
     bf0[31] = bf1[31];
 
     // stage 9
-    if (do_cols) {
-      addsub_no_clamp_avx2(bf0[0], bf0[31], out + 0, out + 31);
-      addsub_no_clamp_avx2(bf0[1], bf0[30], out + 1, out + 30);
-      addsub_no_clamp_avx2(bf0[2], bf0[29], out + 2, out + 29);
-      addsub_no_clamp_avx2(bf0[3], bf0[28], out + 3, out + 28);
-      addsub_no_clamp_avx2(bf0[4], bf0[27], out + 4, out + 27);
-      addsub_no_clamp_avx2(bf0[5], bf0[26], out + 5, out + 26);
-      addsub_no_clamp_avx2(bf0[6], bf0[25], out + 6, out + 25);
-      addsub_no_clamp_avx2(bf0[7], bf0[24], out + 7, out + 24);
-      addsub_no_clamp_avx2(bf0[8], bf0[23], out + 8, out + 23);
-      addsub_no_clamp_avx2(bf0[9], bf0[22], out + 9, out + 22);
-      addsub_no_clamp_avx2(bf0[10], bf0[21], out + 10, out + 21);
-      addsub_no_clamp_avx2(bf0[11], bf0[20], out + 11, out + 20);
-      addsub_no_clamp_avx2(bf0[12], bf0[19], out + 12, out + 19);
-      addsub_no_clamp_avx2(bf0[13], bf0[18], out + 13, out + 18);
-      addsub_no_clamp_avx2(bf0[14], bf0[17], out + 14, out + 17);
-      addsub_no_clamp_avx2(bf0[15], bf0[16], out + 15, out + 16);
-    } else {
+    addsub_avx2(bf0[0], bf0[31], out + 0, out + 31, &clamp_lo, &clamp_hi);
+    addsub_avx2(bf0[1], bf0[30], out + 1, out + 30, &clamp_lo, &clamp_hi);
+    addsub_avx2(bf0[2], bf0[29], out + 2, out + 29, &clamp_lo, &clamp_hi);
+    addsub_avx2(bf0[3], bf0[28], out + 3, out + 28, &clamp_lo, &clamp_hi);
+    addsub_avx2(bf0[4], bf0[27], out + 4, out + 27, &clamp_lo, &clamp_hi);
+    addsub_avx2(bf0[5], bf0[26], out + 5, out + 26, &clamp_lo, &clamp_hi);
+    addsub_avx2(bf0[6], bf0[25], out + 6, out + 25, &clamp_lo, &clamp_hi);
+    addsub_avx2(bf0[7], bf0[24], out + 7, out + 24, &clamp_lo, &clamp_hi);
+    addsub_avx2(bf0[8], bf0[23], out + 8, out + 23, &clamp_lo, &clamp_hi);
+    addsub_avx2(bf0[9], bf0[22], out + 9, out + 22, &clamp_lo, &clamp_hi);
+    addsub_avx2(bf0[10], bf0[21], out + 10, out + 21, &clamp_lo, &clamp_hi);
+    addsub_avx2(bf0[11], bf0[20], out + 11, out + 20, &clamp_lo, &clamp_hi);
+    addsub_avx2(bf0[12], bf0[19], out + 12, out + 19, &clamp_lo, &clamp_hi);
+    addsub_avx2(bf0[13], bf0[18], out + 13, out + 18, &clamp_lo, &clamp_hi);
+    addsub_avx2(bf0[14], bf0[17], out + 14, out + 17, &clamp_lo, &clamp_hi);
+    addsub_avx2(bf0[15], bf0[16], out + 15, out + 16, &clamp_lo, &clamp_hi);
+    if (!do_cols) {
       const int log_range_out = AOMMAX(16, bd + 6);
-      const __m256i clamp_lo_out = _mm256_set1_epi32(AOMMAX(
-          -(1 << (log_range_out - 1)), -(1 << (log_range - 1 - out_shift))));
-      const __m256i clamp_hi_out = _mm256_set1_epi32(AOMMIN(
-          (1 << (log_range_out - 1)) - 1, (1 << (log_range - 1 - out_shift))));
-
-      addsub_shift_avx2(bf0[0], bf0[31], out + 0, out + 31, &clamp_lo_out,
-                        &clamp_hi_out, out_shift);
-      addsub_shift_avx2(bf0[1], bf0[30], out + 1, out + 30, &clamp_lo_out,
-                        &clamp_hi_out, out_shift);
-      addsub_shift_avx2(bf0[2], bf0[29], out + 2, out + 29, &clamp_lo_out,
-                        &clamp_hi_out, out_shift);
-      addsub_shift_avx2(bf0[3], bf0[28], out + 3, out + 28, &clamp_lo_out,
-                        &clamp_hi_out, out_shift);
-      addsub_shift_avx2(bf0[4], bf0[27], out + 4, out + 27, &clamp_lo_out,
-                        &clamp_hi_out, out_shift);
-      addsub_shift_avx2(bf0[5], bf0[26], out + 5, out + 26, &clamp_lo_out,
-                        &clamp_hi_out, out_shift);
-      addsub_shift_avx2(bf0[6], bf0[25], out + 6, out + 25, &clamp_lo_out,
-                        &clamp_hi_out, out_shift);
-      addsub_shift_avx2(bf0[7], bf0[24], out + 7, out + 24, &clamp_lo_out,
-                        &clamp_hi_out, out_shift);
-      addsub_shift_avx2(bf0[8], bf0[23], out + 8, out + 23, &clamp_lo_out,
-                        &clamp_hi_out, out_shift);
-      addsub_shift_avx2(bf0[9], bf0[22], out + 9, out + 22, &clamp_lo_out,
-                        &clamp_hi_out, out_shift);
-      addsub_shift_avx2(bf0[10], bf0[21], out + 10, out + 21, &clamp_lo_out,
-                        &clamp_hi_out, out_shift);
-      addsub_shift_avx2(bf0[11], bf0[20], out + 11, out + 20, &clamp_lo_out,
-                        &clamp_hi_out, out_shift);
-      addsub_shift_avx2(bf0[12], bf0[19], out + 12, out + 19, &clamp_lo_out,
-                        &clamp_hi_out, out_shift);
-      addsub_shift_avx2(bf0[13], bf0[18], out + 13, out + 18, &clamp_lo_out,
-                        &clamp_hi_out, out_shift);
-      addsub_shift_avx2(bf0[14], bf0[17], out + 14, out + 17, &clamp_lo_out,
-                        &clamp_hi_out, out_shift);
-      addsub_shift_avx2(bf0[15], bf0[16], out + 15, out + 16, &clamp_lo_out,
-                        &clamp_hi_out, out_shift);
+      const __m256i clamp_lo_out =
+          _mm256_set1_epi32(-(1 << (log_range_out - 1)));
+      const __m256i clamp_hi_out =
+          _mm256_set1_epi32((1 << (log_range_out - 1)) - 1);
+      round_shift_8x8_avx2(out, out_shift);
+      round_shift_8x8_avx2(out + 16, out_shift);
+      highbd_clamp_epi32_avx2(out, out, &clamp_lo_out, &clamp_hi_out, 32);
     }
   }
 }
@@ -1215,8 +1158,8 @@ static void idct16_low1_avx2(__m256i *in, __m256i *out, int bit, int do_cols,
   const __m256i cospi32 = _mm256_set1_epi32(cospi[32]);
   const __m256i rnding = _mm256_set1_epi32(1 << (bit - 1));
   const int log_range = AOMMAX(16, bd + (do_cols ? 6 : 8));
-  const __m256i clamp_lo = _mm256_set1_epi32(-(1 << (log_range - 1)));
-  const __m256i clamp_hi = _mm256_set1_epi32((1 << (log_range - 1)) - 1);
+  __m256i clamp_lo = _mm256_set1_epi32(-(1 << (log_range - 1)));
+  __m256i clamp_hi = _mm256_set1_epi32((1 << (log_range - 1)) - 1);
 
   {
     // stage 0
@@ -1231,22 +1174,16 @@ static void idct16_low1_avx2(__m256i *in, __m256i *out, int bit, int do_cols,
     // stage 5
     // stage 6
     // stage 7
-    if (do_cols) {
-      in[0] = _mm256_max_epi32(in[0], clamp_lo);
-      in[0] = _mm256_min_epi32(in[0], clamp_hi);
-    } else {
+    if (!do_cols) {
       const int log_range_out = AOMMAX(16, bd + 6);
-      const __m256i clamp_lo_out = _mm256_set1_epi32(AOMMAX(
-          -(1 << (log_range_out - 1)), -(1 << (log_range - 1 - out_shift))));
-      const __m256i clamp_hi_out = _mm256_set1_epi32(AOMMIN(
-          (1 << (log_range_out - 1)) - 1, (1 << (log_range - 1 - out_shift))));
+      clamp_lo = _mm256_set1_epi32(-(1 << (log_range_out - 1)));
+      clamp_hi = _mm256_set1_epi32((1 << (log_range_out - 1)) - 1);
       __m256i offset = _mm256_set1_epi32((1 << out_shift) >> 1);
       in[0] = _mm256_add_epi32(in[0], offset);
       in[0] = _mm256_sra_epi32(in[0], _mm_cvtsi32_si128(out_shift));
-      in[0] = _mm256_max_epi32(in[0], clamp_lo_out);
-      in[0] = _mm256_min_epi32(in[0], clamp_hi_out);
     }
-
+    in[0] = _mm256_max_epi32(in[0], clamp_lo);
+    in[0] = _mm256_min_epi32(in[0], clamp_hi);
     out[0] = in[0];
     out[1] = in[0];
     out[2] = in[0];
@@ -1392,38 +1329,23 @@ static void idct16_low8_avx2(__m256i *in, __m256i *out, int bit, int do_cols,
     u[12] = _mm256_add_epi32(u[12], rnding);
     u[12] = _mm256_srai_epi32(u[12], bit);
     // stage 7
-    if (do_cols) {
-      addsub_no_clamp_avx2(u[0], u[15], out + 0, out + 15);
-      addsub_no_clamp_avx2(u[1], u[14], out + 1, out + 14);
-      addsub_no_clamp_avx2(u[2], u[13], out + 2, out + 13);
-      addsub_no_clamp_avx2(u[3], u[12], out + 3, out + 12);
-      addsub_no_clamp_avx2(u[4], u[11], out + 4, out + 11);
-      addsub_no_clamp_avx2(u[5], u[10], out + 5, out + 10);
-      addsub_no_clamp_avx2(u[6], u[9], out + 6, out + 9);
-      addsub_no_clamp_avx2(u[7], u[8], out + 7, out + 8);
-    } else {
-      const int log_range_out = AOMMAX(16, bd + 6);
-      const __m256i clamp_lo_out = _mm256_set1_epi32(AOMMAX(
-          -(1 << (log_range_out - 1)), -(1 << (log_range - 1 - out_shift))));
-      const __m256i clamp_hi_out = _mm256_set1_epi32(AOMMIN(
-          (1 << (log_range_out - 1)) - 1, (1 << (log_range - 1 - out_shift))));
+    addsub_avx2(u[0], u[15], out + 0, out + 15, &clamp_lo, &clamp_hi);
+    addsub_avx2(u[1], u[14], out + 1, out + 14, &clamp_lo, &clamp_hi);
+    addsub_avx2(u[2], u[13], out + 2, out + 13, &clamp_lo, &clamp_hi);
+    addsub_avx2(u[3], u[12], out + 3, out + 12, &clamp_lo, &clamp_hi);
+    addsub_avx2(u[4], u[11], out + 4, out + 11, &clamp_lo, &clamp_hi);
+    addsub_avx2(u[5], u[10], out + 5, out + 10, &clamp_lo, &clamp_hi);
+    addsub_avx2(u[6], u[9], out + 6, out + 9, &clamp_lo, &clamp_hi);
+    addsub_avx2(u[7], u[8], out + 7, out + 8, &clamp_lo, &clamp_hi);
 
-      addsub_shift_avx2(u[0], u[15], out + 0, out + 15, &clamp_lo_out,
-                        &clamp_hi_out, out_shift);
-      addsub_shift_avx2(u[1], u[14], out + 1, out + 14, &clamp_lo_out,
-                        &clamp_hi_out, out_shift);
-      addsub_shift_avx2(u[2], u[13], out + 2, out + 13, &clamp_lo_out,
-                        &clamp_hi_out, out_shift);
-      addsub_shift_avx2(u[3], u[12], out + 3, out + 12, &clamp_lo_out,
-                        &clamp_hi_out, out_shift);
-      addsub_shift_avx2(u[4], u[11], out + 4, out + 11, &clamp_lo_out,
-                        &clamp_hi_out, out_shift);
-      addsub_shift_avx2(u[5], u[10], out + 5, out + 10, &clamp_lo_out,
-                        &clamp_hi_out, out_shift);
-      addsub_shift_avx2(u[6], u[9], out + 6, out + 9, &clamp_lo_out,
-                        &clamp_hi_out, out_shift);
-      addsub_shift_avx2(u[7], u[8], out + 7, out + 8, &clamp_lo_out,
-                        &clamp_hi_out, out_shift);
+    if (!do_cols) {
+      const int log_range_out = AOMMAX(16, bd + 6);
+      const __m256i clamp_lo_out =
+          _mm256_set1_epi32(-(1 << (log_range_out - 1)));
+      const __m256i clamp_hi_out =
+          _mm256_set1_epi32((1 << (log_range_out - 1)) - 1);
+      round_shift_8x8_avx2(out, out_shift);
+      highbd_clamp_epi32_avx2(out, out, &clamp_lo_out, &clamp_hi_out, 16);
     }
   }
 }
@@ -1590,38 +1512,23 @@ static void idct16_avx2(__m256i *in, __m256i *out, int bit, int do_cols, int bd,
     v[15] = u[15];
 
     // stage 7
-    if (do_cols) {
-      addsub_no_clamp_avx2(v[0], v[15], out + 0, out + 15);
-      addsub_no_clamp_avx2(v[1], v[14], out + 1, out + 14);
-      addsub_no_clamp_avx2(v[2], v[13], out + 2, out + 13);
-      addsub_no_clamp_avx2(v[3], v[12], out + 3, out + 12);
-      addsub_no_clamp_avx2(v[4], v[11], out + 4, out + 11);
-      addsub_no_clamp_avx2(v[5], v[10], out + 5, out + 10);
-      addsub_no_clamp_avx2(v[6], v[9], out + 6, out + 9);
-      addsub_no_clamp_avx2(v[7], v[8], out + 7, out + 8);
-    } else {
-      const int log_range_out = AOMMAX(16, bd + 6);
-      const __m256i clamp_lo_out = _mm256_set1_epi32(AOMMAX(
-          -(1 << (log_range_out - 1)), -(1 << (log_range - 1 - out_shift))));
-      const __m256i clamp_hi_out = _mm256_set1_epi32(AOMMIN(
-          (1 << (log_range_out - 1)) - 1, (1 << (log_range - 1 - out_shift))));
+    addsub_avx2(v[0], v[15], out + 0, out + 15, &clamp_lo, &clamp_hi);
+    addsub_avx2(v[1], v[14], out + 1, out + 14, &clamp_lo, &clamp_hi);
+    addsub_avx2(v[2], v[13], out + 2, out + 13, &clamp_lo, &clamp_hi);
+    addsub_avx2(v[3], v[12], out + 3, out + 12, &clamp_lo, &clamp_hi);
+    addsub_avx2(v[4], v[11], out + 4, out + 11, &clamp_lo, &clamp_hi);
+    addsub_avx2(v[5], v[10], out + 5, out + 10, &clamp_lo, &clamp_hi);
+    addsub_avx2(v[6], v[9], out + 6, out + 9, &clamp_lo, &clamp_hi);
+    addsub_avx2(v[7], v[8], out + 7, out + 8, &clamp_lo, &clamp_hi);
 
-      addsub_shift_avx2(v[0], v[15], out + 0, out + 15, &clamp_lo_out,
-                        &clamp_hi_out, out_shift);
-      addsub_shift_avx2(v[1], v[14], out + 1, out + 14, &clamp_lo_out,
-                        &clamp_hi_out, out_shift);
-      addsub_shift_avx2(v[2], v[13], out + 2, out + 13, &clamp_lo_out,
-                        &clamp_hi_out, out_shift);
-      addsub_shift_avx2(v[3], v[12], out + 3, out + 12, &clamp_lo_out,
-                        &clamp_hi_out, out_shift);
-      addsub_shift_avx2(v[4], v[11], out + 4, out + 11, &clamp_lo_out,
-                        &clamp_hi_out, out_shift);
-      addsub_shift_avx2(v[5], v[10], out + 5, out + 10, &clamp_lo_out,
-                        &clamp_hi_out, out_shift);
-      addsub_shift_avx2(v[6], v[9], out + 6, out + 9, &clamp_lo_out,
-                        &clamp_hi_out, out_shift);
-      addsub_shift_avx2(v[7], v[8], out + 7, out + 8, &clamp_lo_out,
-                        &clamp_hi_out, out_shift);
+    if (!do_cols) {
+      const int log_range_out = AOMMAX(16, bd + 6);
+      const __m256i clamp_lo_out =
+          _mm256_set1_epi32(-(1 << (log_range_out - 1)));
+      const __m256i clamp_hi_out =
+          _mm256_set1_epi32((1 << (log_range_out - 1)) - 1);
+      round_shift_8x8_avx2(out, out_shift);
+      highbd_clamp_epi32_avx2(out, out, &clamp_lo_out, &clamp_hi_out, 16);
     }
   }
 }
@@ -2510,6 +2417,8 @@ static void idct8x8_low1_avx2(__m256i *in, __m256i *out, int bit, int do_cols,
   const __m256i cospi32 = _mm256_set1_epi32(cospi[32]);
   const __m256i rnding = _mm256_set1_epi32(1 << (bit - 1));
   const int log_range = AOMMAX(16, bd + (do_cols ? 6 : 8));
+  __m256i clamp_lo = _mm256_set1_epi32(-(1 << (log_range - 1)));
+  __m256i clamp_hi = _mm256_set1_epi32((1 << (log_range - 1)) - 1);
   __m256i x;
 
   // stage 0
@@ -2524,18 +2433,14 @@ static void idct8x8_low1_avx2(__m256i *in, __m256i *out, int bit, int do_cols,
   // stage 5
   if (!do_cols) {
     const int log_range_out = AOMMAX(16, bd + 6);
-    const __m256i clamp_lo_out = _mm256_set1_epi32(AOMMAX(
-        -(1 << (log_range_out - 1)), -(1 << (log_range - 1 - out_shift))));
-    const __m256i clamp_hi_out = _mm256_set1_epi32(AOMMIN(
-        (1 << (log_range_out - 1)) - 1, (1 << (log_range - 1 - out_shift))));
-
     __m256i offset = _mm256_set1_epi32((1 << out_shift) >> 1);
+    clamp_lo = _mm256_set1_epi32(-(1 << (log_range_out - 1)));
+    clamp_hi = _mm256_set1_epi32((1 << (log_range_out - 1)) - 1);
     x = _mm256_add_epi32(x, offset);
     x = _mm256_sra_epi32(x, _mm_cvtsi32_si128(out_shift));
-    x = _mm256_max_epi32(x, clamp_lo_out);
-    x = _mm256_min_epi32(x, clamp_hi_out);
   }
-
+  x = _mm256_max_epi32(x, clamp_lo);
+  x = _mm256_min_epi32(x, clamp_hi);
   out[0] = x;
   out[1] = x;
   out[2] = x;
@@ -2640,26 +2545,20 @@ static void idct8x8_avx2(__m256i *in, __m256i *out, int bit, int do_cols,
   u5 = _mm256_add_epi32(u5, rnding);
   u5 = _mm256_srai_epi32(u5, bit);
 
+  addsub_avx2(u0, u7, out + 0, out + 7, &clamp_lo, &clamp_hi);
+  addsub_avx2(u1, u6, out + 1, out + 6, &clamp_lo, &clamp_hi);
+  addsub_avx2(u2, u5, out + 2, out + 5, &clamp_lo, &clamp_hi);
+  addsub_avx2(u3, u4, out + 3, out + 4, &clamp_lo, &clamp_hi);
   // stage 5
-  if (do_cols) {
-    addsub_no_clamp_avx2(u0, u7, out + 0, out + 7);
-    addsub_no_clamp_avx2(u1, u6, out + 1, out + 6);
-    addsub_no_clamp_avx2(u2, u5, out + 2, out + 5);
-    addsub_no_clamp_avx2(u3, u4, out + 3, out + 4);
-  } else {
+  if (!do_cols) {
     const int log_range_out = AOMMAX(16, bd + 6);
-    const __m256i clamp_lo_out = _mm256_set1_epi32(AOMMAX(
-        -(1 << (log_range_out - 1)), -(1 << (log_range - 1 - out_shift))));
-    const __m256i clamp_hi_out = _mm256_set1_epi32(AOMMIN(
-        (1 << (log_range_out - 1)) - 1, (1 << (log_range - 1 - out_shift))));
-    addsub_shift_avx2(u0, u7, out + 0, out + 7, &clamp_lo_out, &clamp_hi_out,
-                      out_shift);
-    addsub_shift_avx2(u1, u6, out + 1, out + 6, &clamp_lo_out, &clamp_hi_out,
-                      out_shift);
-    addsub_shift_avx2(u2, u5, out + 2, out + 5, &clamp_lo_out, &clamp_hi_out,
-                      out_shift);
-    addsub_shift_avx2(u3, u4, out + 3, out + 4, &clamp_lo_out, &clamp_hi_out,
-                      out_shift);
+    const __m256i clamp_lo_out = _mm256_set1_epi32(-(1 << (log_range_out - 1)));
+    const __m256i clamp_hi_out =
+        _mm256_set1_epi32((1 << (log_range_out - 1)) - 1);
+
+    round_shift_4x4_avx2(out, out_shift);
+    round_shift_4x4_avx2(out + 4, out_shift);
+    highbd_clamp_epi32_avx2(out, out, &clamp_lo_out, &clamp_hi_out, 8);
   }
 }
 static void iadst8x8_low1_avx2(__m256i *in, __m256i *out, int bit, int do_cols,
@@ -3037,22 +2936,23 @@ static INLINE void idct64_stage10_avx2(__m256i *u, const __m256i *cospim32,
 
 static INLINE void idct64_stage11_avx2(__m256i *u, __m256i *out, int do_cols,
                                        int bd, int out_shift,
-                                       const int log_range) {
-  if (do_cols) {
-    for (int i = 0; i < 32; i++) {
-      addsub_no_clamp_avx2(u[i], u[63 - i], &out[(i)], &out[(63 - i)]);
-    }
-  } else {
-    const int log_range_out = AOMMAX(16, bd + 6);
-    const __m256i clamp_lo_out = _mm256_set1_epi32(AOMMAX(
-        -(1 << (log_range_out - 1)), -(1 << (log_range - 1 - out_shift))));
-    const __m256i clamp_hi_out = _mm256_set1_epi32(AOMMIN(
-        (1 << (log_range_out - 1)) - 1, (1 << (log_range - 1 - out_shift))));
+                                       const __m256i *clamp_lo,
+                                       const __m256i *clamp_hi) {
+  for (int i = 0; i < 32; i++) {
+    addsub_avx2(u[i], u[63 - i], &out[(i)], &out[(63 - i)], clamp_lo, clamp_hi);
+  }
 
-    for (int i = 0; i < 32; i++) {
-      addsub_shift_avx2(u[i], u[63 - i], &out[(i)], &out[(63 - i)],
-                        &clamp_lo_out, &clamp_hi_out, out_shift);
-    }
+  if (!do_cols) {
+    const int log_range_out = AOMMAX(16, bd + 6);
+    const __m256i clamp_lo_out = _mm256_set1_epi32(-(1 << (log_range_out - 1)));
+    const __m256i clamp_hi_out =
+        _mm256_set1_epi32((1 << (log_range_out - 1)) - 1);
+
+    round_shift_8x8_avx2(out, out_shift);
+    round_shift_8x8_avx2(out + 16, out_shift);
+    round_shift_8x8_avx2(out + 32, out_shift);
+    round_shift_8x8_avx2(out + 48, out_shift);
+    highbd_clamp_epi32_avx2(out, out, &clamp_lo_out, &clamp_hi_out, 64);
   }
 }
 
@@ -3061,8 +2961,8 @@ static void idct64_low1_avx2(__m256i *in, __m256i *out, int bit, int do_cols,
   const int32_t *cospi = cospi_arr(bit);
   const __m256i rnding = _mm256_set1_epi32(1 << (bit - 1));
   const int log_range = AOMMAX(16, bd + (do_cols ? 6 : 8));
-  const __m256i clamp_lo = _mm256_set1_epi32(-(1 << (log_range - 1)));
-  const __m256i clamp_hi = _mm256_set1_epi32((1 << (log_range - 1)) - 1);
+  __m256i clamp_lo = _mm256_set1_epi32(-(1 << (log_range - 1)));
+  __m256i clamp_hi = _mm256_set1_epi32((1 << (log_range - 1)) - 1);
 
   const __m256i cospi32 = _mm256_set1_epi32(cospi[32]);
 
@@ -3081,24 +2981,18 @@ static void idct64_low1_avx2(__m256i *in, __m256i *out, int bit, int do_cols,
     // stage 9
     // stage 10
     // stage 11
-    if (do_cols) {
-      x = _mm256_max_epi32(x, clamp_lo);
-      x = _mm256_min_epi32(x, clamp_hi);
-    } else {
+    if (!do_cols) {
       const int log_range_out = AOMMAX(16, bd + 6);
-      const __m256i clamp_lo_out = _mm256_set1_epi32(AOMMAX(
-          -(1 << (log_range_out - 1)), -(1 << (log_range - 1 - out_shift))));
-      const __m256i clamp_hi_out = _mm256_set1_epi32(AOMMIN(
-          (1 << (log_range_out - 1)) - 1, (1 << (log_range - 1 - out_shift))));
-
-      __m256i offset = _mm256_set1_epi32((1 << out_shift) >> 1);
-      x = _mm256_add_epi32(x, offset);
-      x = _mm256_sra_epi32(x, _mm_cvtsi32_si128(out_shift));
-
-      x = _mm256_max_epi32(x, clamp_lo_out);
-      x = _mm256_min_epi32(x, clamp_hi_out);
+      clamp_lo = _mm256_set1_epi32(-(1 << (log_range_out - 1)));
+      clamp_hi = _mm256_set1_epi32((1 << (log_range_out - 1)) - 1);
+      if (out_shift != 0) {
+        __m256i offset = _mm256_set1_epi32((1 << out_shift) >> 1);
+        x = _mm256_add_epi32(x, offset);
+        x = _mm256_sra_epi32(x, _mm_cvtsi32_si128(out_shift));
+      }
     }
-
+    x = _mm256_max_epi32(x, clamp_lo);
+    x = _mm256_min_epi32(x, clamp_hi);
     out[0] = x;
     out[1] = x;
     out[2] = x;
@@ -3393,7 +3287,7 @@ static void idct64_low8_avx2(__m256i *in, __m256i *out, int bit, int do_cols,
                         bit);
 
     // stage 11
-    idct64_stage11_avx2(u, out, do_cols, bd, out_shift, log_range);
+    idct64_stage11_avx2(u, out, do_cols, bd, out_shift, &clamp_lo, &clamp_hi);
   }
 }
 static void idct64_low16_avx2(__m256i *in, __m256i *out, int bit, int do_cols,
@@ -3702,7 +3596,7 @@ static void idct64_low16_avx2(__m256i *in, __m256i *out, int bit, int do_cols,
                         bit);
 
     // stage 11
-    idct64_stage11_avx2(u, out, do_cols, bd, out_shift, log_range);
+    idct64_stage11_avx2(u, out, do_cols, bd, out_shift, &clamp_lo, &clamp_hi);
   }
 }
 static void idct64_avx2(__m256i *in, __m256i *out, int bit, int do_cols, int bd,
@@ -4164,21 +4058,22 @@ static void idct64_avx2(__m256i *in, __m256i *out, int bit, int do_cols, int bd,
     for (i = 56; i < 64; i++) v[i] = u[i];
 
     // stage 11
-    if (do_cols) {
-      for (i = 0; i < 32; i++) {
-        addsub_no_clamp_avx2(v[i], v[63 - i], &out[(i)], &out[(63 - i)]);
-      }
-    } else {
+    for (i = 0; i < 32; i++) {
+      addsub_avx2(v[i], v[63 - i], &out[(i)], &out[(63 - i)], &clamp_lo,
+                  &clamp_hi);
+    }
+    if (!do_cols) {
       const int log_range_out = AOMMAX(16, bd + 6);
-      const __m256i clamp_lo_out = _mm256_set1_epi32(AOMMAX(
-          -(1 << (log_range_out - 1)), -(1 << (log_range - 1 - out_shift))));
-      const __m256i clamp_hi_out = _mm256_set1_epi32(AOMMIN(
-          (1 << (log_range_out - 1)) - 1, (1 << (log_range - 1 - out_shift))));
+      const __m256i clamp_lo_out =
+          _mm256_set1_epi32(-(1 << (log_range_out - 1)));
+      const __m256i clamp_hi_out =
+          _mm256_set1_epi32((1 << (log_range_out - 1)) - 1);
 
-      for (i = 0; i < 32; i++) {
-        addsub_shift_avx2(v[i], v[63 - i], &out[(i)], &out[(63 - i)],
-                          &clamp_lo_out, &clamp_hi_out, out_shift);
-      }
+      round_shift_8x8_avx2(out, out_shift);
+      round_shift_8x8_avx2(out + 16, out_shift);
+      round_shift_8x8_avx2(out + 32, out_shift);
+      round_shift_8x8_avx2(out + 48, out_shift);
+      highbd_clamp_epi32_avx2(out, out, &clamp_lo_out, &clamp_hi_out, 64);
     }
   }
 }

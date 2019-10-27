@@ -245,10 +245,10 @@ static void set_ppflags(const vpx_codec_alg_priv_t *ctx, vp9_ppflags_t *flags) {
     return VPX_CODEC_INVALID_PARAM; \
   } while (0)
 
-#define RANGE_CHECK(p, memb, lo, hi)                                 \
-  do {                                                               \
-    if (!(((p)->memb == lo || (p)->memb > (lo)) && (p)->memb <= hi)) \
-      ERROR(#memb " out of range [" #lo ".." #hi "]");               \
+#define RANGE_CHECK(p, memb, lo, hi)                                     \
+  do {                                                                   \
+    if (!(((p)->memb == (lo) || (p)->memb > (lo)) && (p)->memb <= (hi))) \
+      ERROR(#memb " out of range [" #lo ".." #hi "]");                   \
   } while (0)
 
 static vpx_codec_err_t init_decoder(vpx_codec_alg_priv_t *ctx) {

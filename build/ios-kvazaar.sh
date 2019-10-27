@@ -47,6 +47,8 @@ export PKG_CONFIG_LIBDIR="${INSTALL_PKG_CONFIG_DIR}"
 
 cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
+./autogen.sh || exit 1
+
 make distclean 2>/dev/null 1>/dev/null
 
 # RECONFIGURING IF REQUESTED
@@ -63,7 +65,7 @@ fi
     --disable-fast-install \
     --host=${TARGET_HOST} || exit 1
 
-make -j$(get_cpu_count) || exit 1
+make || exit 1
 
 # MANUALLY COPY PKG-CONFIG FILES
 cp ./src/kvazaar.pc ${INSTALL_PKG_CONFIG_DIR} || exit 1

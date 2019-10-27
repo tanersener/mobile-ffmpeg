@@ -13,23 +13,26 @@
 
 #include "third_party/googletest/src/googletest/include/gtest/gtest.h"
 #include "test/codec_factory.h"
+#include "test/datarate_test.h"
 #include "test/encode_test_driver.h"
 #include "test/i420_video_source.h"
 #include "test/util.h"
 #include "test/y4m_video_source.h"
 #include "aom/aom_codec.h"
 
+namespace datarate_test {
 namespace {
 
 // Params: test mode, speed, aq mode and index for bitrate array.
 class DatarateTestLarge
     : public ::libaom_test::CodecTestWith4Params<libaom_test::TestMode, int,
                                                  unsigned int, int>,
-      public ::libaom_test::EncoderTest {
+      public DatarateTest {
  public:
-  DatarateTestLarge()
-      : EncoderTest(GET_PARAM(0)), set_cpu_used_(GET_PARAM(2)),
-        aq_mode_(GET_PARAM(3)) {}
+  DatarateTestLarge() : DatarateTest(GET_PARAM(0)) {
+    set_cpu_used_ = GET_PARAM(2);
+    aq_mode_ = GET_PARAM(3);
+  }
 
  protected:
   virtual ~DatarateTestLarge() {}
@@ -38,82 +41,6 @@ class DatarateTestLarge
     InitializeConfig();
     SetMode(GET_PARAM(1));
     ResetModel();
-  }
-
-  virtual void ResetModel() {
-    last_pts_ = 0;
-    bits_in_buffer_model_ = cfg_.rc_target_bitrate * cfg_.rc_buf_initial_sz;
-    frame_number_ = 0;
-    tot_frame_number_ = 0;
-    first_drop_ = 0;
-    num_drops_ = 0;
-    // Denoiser is off by default.
-    denoiser_on_ = 0;
-    bits_total_ = 0;
-    denoiser_offon_test_ = 0;
-    denoiser_offon_period_ = -1;
-  }
-
-  virtual void PreEncodeFrameHook(::libaom_test::VideoSource *video,
-                                  ::libaom_test::Encoder *encoder) {
-    if (video->frame() == 0) {
-      encoder->Control(AOME_SET_CPUUSED, set_cpu_used_);
-      encoder->Control(AV1E_SET_AQ_MODE, aq_mode_);
-    }
-
-    if (denoiser_offon_test_) {
-      ASSERT_GT(denoiser_offon_period_, 0)
-          << "denoiser_offon_period_ is not positive.";
-      if ((video->frame() + 1) % denoiser_offon_period_ == 0) {
-        // Flip denoiser_on_ periodically
-        denoiser_on_ ^= 1;
-      }
-    }
-
-    encoder->Control(AV1E_SET_NOISE_SENSITIVITY, denoiser_on_);
-
-    const aom_rational_t tb = video->timebase();
-    timebase_ = static_cast<double>(tb.num) / tb.den;
-    duration_ = 0;
-  }
-
-  virtual void FramePktHook(const aom_codec_cx_pkt_t *pkt) {
-    // Time since last timestamp = duration.
-    aom_codec_pts_t duration = pkt->data.frame.pts - last_pts_;
-
-    if (duration > 1) {
-      // If first drop not set and we have a drop set it to this time.
-      if (!first_drop_) first_drop_ = last_pts_ + 1;
-      // Update the number of frame drops.
-      num_drops_ += static_cast<int>(duration - 1);
-      // Update counter for total number of frames (#frames input to encoder).
-      // Needed for setting the proper layer_id below.
-      tot_frame_number_ += static_cast<int>(duration - 1);
-    }
-
-    // Add to the buffer the bits we'd expect from a constant bitrate server.
-    bits_in_buffer_model_ += static_cast<int64_t>(
-        duration * timebase_ * cfg_.rc_target_bitrate * 1000);
-
-    // Buffer should not go negative.
-    ASSERT_GE(bits_in_buffer_model_, 0)
-        << "Buffer Underrun at frame " << pkt->data.frame.pts;
-
-    const size_t frame_size_in_bits = pkt->data.frame.sz * 8;
-
-    // Update the total encoded bits.
-    bits_total_ += frame_size_in_bits;
-
-    // Update the most recent pts.
-    last_pts_ = pkt->data.frame.pts;
-    ++frame_number_;
-    ++tot_frame_number_;
-  }
-
-  virtual void EndPassHook(void) {
-    duration_ = (last_pts_ + 1) * timebase_;
-    // Effective file datarate:
-    effective_datarate_ = (bits_total_ / 1000.0) / duration_;
   }
 
   virtual void BasicRateTargetingVBRTest() {
@@ -213,7 +140,7 @@ class DatarateTestLarge
       ASSERT_NO_FATAL_FAILURE(RunLoop(&video));
       ASSERT_GE(effective_datarate_, cfg_.rc_target_bitrate * 0.85)
           << " The datarate for the file is lower than target by too much!";
-      ASSERT_LE(effective_datarate_, cfg_.rc_target_bitrate * 1.15)
+      ASSERT_LE(effective_datarate_, cfg_.rc_target_bitrate * 1.16)
           << " The datarate for the file is greater than target by too much!";
       if (last_drop > 0) {
         ASSERT_LE(first_drop_, last_drop)
@@ -229,23 +156,7 @@ class DatarateTestLarge
       last_num_drops = num_drops_;
     }
   }
-
-  aom_codec_pts_t last_pts_;
-  double timebase_;
-  int frame_number_;      // Counter for number of non-dropped/encoded frames.
-  int tot_frame_number_;  // Counter for total number of input frames.
-  int64_t bits_total_;
-  double duration_;
-  double effective_datarate_;
-  int set_cpu_used_;
-  int64_t bits_in_buffer_model_;
-  aom_codec_pts_t first_drop_;
-  int num_drops_;
-  int denoiser_on_;
-  int denoiser_offon_test_;
-  int denoiser_offon_period_;
-  unsigned int aq_mode_;
-};  // namespace
+};
 
 // Check basic rate targeting for VBR mode.
 TEST_P(DatarateTestLarge, BasicRateTargetingVBR) {
@@ -298,14 +209,13 @@ TEST_P(DatarateTestRealtime, ChangingDropFrameThresh) {
 AV1_INSTANTIATE_TEST_CASE(DatarateTestLarge,
                           ::testing::Values(::libaom_test::kOnePassGood,
                                             ::libaom_test::kRealTime),
-                          ::testing::Range(2, 7),
-                          ::testing::Range<unsigned int>(0, 4),
+                          ::testing::Range(5, 7), ::testing::Values(0, 3),
                           ::testing::Values(0, 1));
 
 AV1_INSTANTIATE_TEST_CASE(DatarateTestRealtime,
                           ::testing::Values(::libaom_test::kRealTime),
-                          ::testing::Range(7, 9),
-                          ::testing::Range<unsigned int>(0, 4),
+                          ::testing::Range(7, 9), ::testing::Values(0, 3),
                           ::testing::Values(0, 1));
 
 }  // namespace
+}  // namespace datarate_test

@@ -2642,6 +2642,8 @@ gnutls_x509_crq_privkey_sign(gnutls_x509_crq_t crq, gnutls_privkey_t key,
 	if (se == NULL)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
+	FIX_SIGN_PARAMS(params, flags, dig);
+
 	result = privkey_sign_and_hash_data(key, se,
 					    &tbs, &signature, &params);
 	gnutls_free(tbs.data);

@@ -73,7 +73,6 @@ static int _gnutls_client_cert_type_recv_params(gnutls_session_t session,
 	gnutls_certificate_type_t cert_type;
 
 	uint8_t i, found = 0;
-	ssize_t len = data_size;
 	const uint8_t* pdata = data;
 
 	/* Only activate this extension if we have cert credentials set
@@ -86,7 +85,7 @@ static int _gnutls_client_cert_type_recv_params(gnutls_session_t session,
 
 		/* Compare packet length with expected packet length. For the
 		 * client this is a single byte. */
-		if (len != 1) {
+		if (data_size != 1) {
 			return
 					gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 		}
@@ -136,8 +135,8 @@ static int _gnutls_client_cert_type_recv_params(gnutls_session_t session,
 
 	} else {	// server mode
 		// Compare packet length with expected packet length.
-		DECR_LEN(len, 1);
-		if (data[0] != len) {
+		DECR_LEN(data_size, 1);
+		if (data[0] != data_size) {
 			return
 					gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 		}
@@ -145,7 +144,7 @@ static int _gnutls_client_cert_type_recv_params(gnutls_session_t session,
 
 		// Assign the contents of our data buffer to a gnutls_datum_t
 		cert_types.data = (uint8_t*)pdata; // Need casting to get rid of 'discards const qualifier' warning
-		cert_types.size = len;
+		cert_types.size = data_size;
 
 		// Store the client certificate types in our session
 		_gnutls_hello_ext_set_datum(session,

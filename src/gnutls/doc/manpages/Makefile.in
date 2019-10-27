@@ -1421,8 +1421,9 @@ APIMANS = dane_cert_type_name.3 dane_cert_usage_name.3 \
 	dane_state_init.3 dane_state_set_dlv_file.3 dane_strerror.3 \
 	dane_verification_status_print.3 dane_verify_crt.3 \
 	dane_verify_crt_raw.3 dane_verify_session_crt.3 \
-	gnutls_aead_cipher_decrypt.3 gnutls_aead_cipher_deinit.3 \
-	gnutls_aead_cipher_encrypt.3 gnutls_aead_cipher_encryptv.3 \
+	gnutls_aead_cipher_decrypt.3 gnutls_aead_cipher_decryptv2.3 \
+	gnutls_aead_cipher_deinit.3 gnutls_aead_cipher_encrypt.3 \
+	gnutls_aead_cipher_encryptv.3 gnutls_aead_cipher_encryptv2.3 \
 	gnutls_aead_cipher_init.3 gnutls_alert_get.3 \
 	gnutls_alert_get_name.3 gnutls_alert_get_strname.3 \
 	gnutls_alert_send.3 gnutls_alert_send_appropriate.3 \
@@ -1555,8 +1556,9 @@ APIMANS = dane_cert_type_name.3 dane_cert_usage_name.3 \
 	gnutls_ext_get_name.3 gnutls_ext_raw_parse.3 \
 	gnutls_ext_register.3 gnutls_ext_set_data.3 \
 	gnutls_fingerprint.3 gnutls_fips140_mode_enabled.3 \
-	gnutls_fips140_set_mode.3 gnutls_global_deinit.3 \
-	gnutls_global_init.3 gnutls_global_set_audit_log_function.3 \
+	gnutls_fips140_set_mode.3 gnutls_get_system_config_file.3 \
+	gnutls_global_deinit.3 gnutls_global_init.3 \
+	gnutls_global_set_audit_log_function.3 \
 	gnutls_global_set_log_function.3 gnutls_global_set_log_level.3 \
 	gnutls_global_set_mem_functions.3 gnutls_global_set_mutex.3 \
 	gnutls_global_set_time_function.3 \
@@ -1570,13 +1572,14 @@ APIMANS = dane_cert_type_name.3 dane_cert_usage_name.3 \
 	gnutls_handshake_set_post_client_hello_function.3 \
 	gnutls_handshake_set_private_extensions.3 \
 	gnutls_handshake_set_random.3 gnutls_handshake_set_timeout.3 \
-	gnutls_hash.3 gnutls_hash_deinit.3 gnutls_hash_fast.3 \
-	gnutls_hash_get_len.3 gnutls_hash_init.3 gnutls_hash_output.3 \
-	gnutls_heartbeat_allowed.3 gnutls_heartbeat_enable.3 \
-	gnutls_heartbeat_get_timeout.3 gnutls_heartbeat_ping.3 \
-	gnutls_heartbeat_pong.3 gnutls_heartbeat_set_timeouts.3 \
-	gnutls_hex2bin.3 gnutls_hex_decode.3 gnutls_hex_decode2.3 \
-	gnutls_hex_encode.3 gnutls_hex_encode2.3 gnutls_hmac.3 \
+	gnutls_hash.3 gnutls_hash_copy.3 gnutls_hash_deinit.3 \
+	gnutls_hash_fast.3 gnutls_hash_get_len.3 gnutls_hash_init.3 \
+	gnutls_hash_output.3 gnutls_heartbeat_allowed.3 \
+	gnutls_heartbeat_enable.3 gnutls_heartbeat_get_timeout.3 \
+	gnutls_heartbeat_ping.3 gnutls_heartbeat_pong.3 \
+	gnutls_heartbeat_set_timeouts.3 gnutls_hex2bin.3 \
+	gnutls_hex_decode.3 gnutls_hex_decode2.3 gnutls_hex_encode.3 \
+	gnutls_hex_encode2.3 gnutls_hmac.3 gnutls_hmac_copy.3 \
 	gnutls_hmac_deinit.3 gnutls_hmac_fast.3 gnutls_hmac_get_len.3 \
 	gnutls_hmac_init.3 gnutls_hmac_output.3 \
 	gnutls_hmac_set_nonce.3 gnutls_idna_map.3 \

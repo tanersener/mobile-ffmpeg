@@ -90,10 +90,15 @@ Usage:  gnutls-serv [ -<flag> [<val>] | --<name>[@{=| @}<val>] ]...
        --ignore-ocsp-response-errors  Ignore any errors when setting the OCSP response
    -p, --port=num             The port to connect to
    -l, --list                 Print a list of the supported algorithms and modes
-   -!, --provider=file        Specify the PKCS #11 provider library
+       --provider=file        Specify the PKCS #11 provider library
                                 - file must pre-exist
-   -", --keymatexport=str     Label used for exporting keying material
-   -#, --keymatexportsize=num Size of the exported keying material
+       --keymatexport=str     Label used for exporting keying material
+       --keymatexportsize=num Size of the exported keying material
+       --recordsize=num       The maximum record size to advertise
+                                - it must be in the range:
+                                  0 to 16384
+       --httpdata=file        The data used as HTTP response
+                                - file must pre-exist
    -v, --version[=arg]        output version information and exit
    -h, --help                 display extended usage information and exit
    -!, --more-help            extended usage information passed thru pager

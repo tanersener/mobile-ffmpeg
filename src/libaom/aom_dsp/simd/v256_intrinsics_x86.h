@@ -603,7 +603,7 @@ SIMD_INLINE v256 v256_shl_8(v256 a, unsigned int c) {
 }
 
 SIMD_INLINE v256 v256_shr_u8(v256 a, unsigned int c) {
-  return _mm256_and_si256(_mm256_set1_epi8(0xff >> c),
+  return _mm256_and_si256(_mm256_set1_epi8((char)(0xff >> c)),
                           _mm256_srl_epi16(a, _mm_cvtsi32_si128(c)));
 }
 

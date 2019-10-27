@@ -2,6 +2,25 @@ Entries are sorted chronologically from oldest to youngest within each release,
 releases are sorted from youngest to oldest.
 
 version <next>:
+- v360 filter
+- Intel QSV-accelerated MJPEG decoding
+- Intel QSV-accelerated VP9 decoding
+- support for TrueHD in mp4
+- Supoort AMD AMF encoder on Linux (via Vulkan)
+- IMM5 video decoder
+- ZeroMQ protocol
+- support Sipro ACELP.KELVIN decoding
+- streamhash muxer
+- sierpinski video source
+- scroll video filter
+- photosensitivity filter
+- anlms filter
+- arnndn filter
+- bilateral filter
+- maskedmin and maskedmax filters
+
+
+version 4.2:
 - tpad filter
 - AV1 decoding support through libdav1d
 - dedot filter
@@ -34,6 +53,9 @@ version <next>:
 - VP4 video decoder
 - IFV demuxer
 - derain filter
+- deesser filter
+- mov muxer writes tracks with unspecified language instead of English by default
+- add support for using clang to compile CUDA kernels
 
 
 version 4.1:

@@ -764,8 +764,8 @@ void vpx_highbd_lpf_horizontal_4_sse2(uint16_t *s, int pitch,
     limit_v = _mm_unpacklo_epi8(_mm_load_si128((const __m128i *)limit), zero);
     thresh_v = _mm_unpacklo_epi8(_mm_load_si128((const __m128i *)thresh), zero);
     t80 = _mm_set1_epi16(0x80);
-    tff80 = _mm_set1_epi16(0xff80);
-    tffe0 = _mm_set1_epi16(0xffe0);
+    tff80 = _mm_set1_epi16((int16_t)0xff80);
+    tffe0 = _mm_set1_epi16((int16_t)0xffe0);
     t1f = _mm_srli_epi16(_mm_set1_epi16(0x1fff), 8);
     t7f = _mm_srli_epi16(_mm_set1_epi16(0x7fff), 8);
   } else if (bd == 10) {
@@ -776,8 +776,8 @@ void vpx_highbd_lpf_horizontal_4_sse2(uint16_t *s, int pitch,
     thresh_v = _mm_slli_epi16(
         _mm_unpacklo_epi8(_mm_load_si128((const __m128i *)thresh), zero), 2);
     t80 = _mm_slli_epi16(_mm_set1_epi16(0x80), 2);
-    tff80 = _mm_slli_epi16(_mm_set1_epi16(0xff80), 2);
-    tffe0 = _mm_slli_epi16(_mm_set1_epi16(0xffe0), 2);
+    tff80 = _mm_slli_epi16(_mm_set1_epi16((int16_t)0xff80), 2);
+    tffe0 = _mm_slli_epi16(_mm_set1_epi16((int16_t)0xffe0), 2);
     t1f = _mm_srli_epi16(_mm_set1_epi16(0x1fff), 6);
     t7f = _mm_srli_epi16(_mm_set1_epi16(0x7fff), 6);
   } else {  // bd == 12
@@ -788,8 +788,8 @@ void vpx_highbd_lpf_horizontal_4_sse2(uint16_t *s, int pitch,
     thresh_v = _mm_slli_epi16(
         _mm_unpacklo_epi8(_mm_load_si128((const __m128i *)thresh), zero), 4);
     t80 = _mm_slli_epi16(_mm_set1_epi16(0x80), 4);
-    tff80 = _mm_slli_epi16(_mm_set1_epi16(0xff80), 4);
-    tffe0 = _mm_slli_epi16(_mm_set1_epi16(0xffe0), 4);
+    tff80 = _mm_slli_epi16(_mm_set1_epi16((int16_t)0xff80), 4);
+    tffe0 = _mm_slli_epi16(_mm_set1_epi16((int16_t)0xffe0), 4);
     t1f = _mm_srli_epi16(_mm_set1_epi16(0x1fff), 4);
     t7f = _mm_srli_epi16(_mm_set1_epi16(0x7fff), 4);
   }

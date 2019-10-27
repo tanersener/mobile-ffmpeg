@@ -72,7 +72,7 @@ _gnutls13_handshake_verify_data(gnutls_session_t session,
 	ret =
 	    _gnutls_session_sign_algo_enabled(session, se->id);
 	if (ret < 0)
-		return gnutls_assert_val(ret);
+		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
 	if (se->tls13_ok == 0) /* explicitly prohibited */
 		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);

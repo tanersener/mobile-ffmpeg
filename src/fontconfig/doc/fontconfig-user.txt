@@ -272,21 +272,16 @@ Configuration File Format
    This is the top level element for a font configuration and can contain
    <dir>, <cachedir>, <include>, <match> and <alias> elements in any order.
 
-  <dir prefix="default" salt="">
+  <dir prefix="default">
 
    This element contains a directory name which will be scanned for font
-   files to include in the set of available fonts.
-
-   If 'prefix' is set to "default" or "cwd", the current working directory
-   will be added as the path prefix prior to the value. If 'prefix' is set to
-   "xdg", the value in the XDG_DATA_HOME environment variable will be added
-   as the path prefix. please see XDG Base Directory Specification for more
-   details. If 'prefix' is set to "relative", the path of current file will
-   be added prior to the value.
-
-   'salt' property affects to determine cache filename. this is useful for
-   example when having different fonts sets on same path at container and
-   share fonts from host on different font path.
+   files to include in the set of available fonts. If 'prefix' is set to
+   "default" or "cwd", the current working directory will be added as the
+   path prefix prior to the value. If 'prefix' is set to "xdg", the value in
+   the XDG_DATA_HOME environment variable will be added as the path prefix.
+   please see XDG Base Directory Specification for more details. If 'prefix'
+   is set to "relative", the path of current file will be added prior to the
+   value.
 
   <cachedir prefix="default">
 
@@ -336,22 +331,6 @@ Configuration File Format
    Unicode characters which is supposed to be blank in an <int> element.
    Characters outside of this set which are drawn as blank will be elided
    from the set of characters supported by the font.
-
-  <remap-dir prefix="default" as-path="" salt=""<
-
-   This element contains a directory name where will be mapped as the path
-   'as-path' in cached information. This is useful if the directory name is
-   an alias (via a bind mount or symlink) to another directory in the system
-   for which cached font information is likely to exist.
-
-   'salt' property affects to determine cache filename as same as <dir>
-   element.
-
-  <reset-dirs />
-
-   This element removes all of fonts directories where added by <dir>
-   elements. This is useful to override fonts directories from system to own
-   fonts directories only.
 
   <rescan>
 
@@ -833,11 +812,11 @@ See Also
 
 Version
 
-   Fontconfig version 2.13.91
+   Fontconfig version 2.13.92
 
 References
 
    Visible links
-   1. file:///tmp/html-U7fABc#DEBUG
-   2. file:///tmp/html-U7fABc#DEBUG
+   1. file:///tmp/html-BrHZAp#DEBUG
+   2. file:///tmp/html-BrHZAp#DEBUG
    3. https://reproducible-builds.org/specs/source-date-epoch/

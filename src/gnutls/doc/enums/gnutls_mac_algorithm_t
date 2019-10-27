@@ -41,11 +41,19 @@ HMAC GOST R 34.11-2001 (Streebog) algorithm, 512 bit.
 @item GNUTLS_@-MAC_@-AEAD
 MAC implicit through AEAD cipher.
 @item GNUTLS_@-MAC_@-UMAC_@-96
-The UMAC-96 MAC algorithm.
+The UMAC-96 MAC algorithm (requires nonce).
 @item GNUTLS_@-MAC_@-UMAC_@-128
-The UMAC-128 MAC algorithm.
+The UMAC-128 MAC algorithm (requires nonce).
 @item GNUTLS_@-MAC_@-AES_@-CMAC_@-128
 The AES-CMAC-128 MAC algorithm.
 @item GNUTLS_@-MAC_@-AES_@-CMAC_@-256
 The AES-CMAC-256 MAC algorithm.
+@item GNUTLS_@-MAC_@-AES_@-GMAC_@-128
+The AES-GMAC-128 MAC algorithm (requires nonce).
+@item GNUTLS_@-MAC_@-AES_@-GMAC_@-192
+The AES-GMAC-192 MAC algorithm (requires nonce).
+@item GNUTLS_@-MAC_@-AES_@-GMAC_@-256
+The AES-GMAC-256 MAC algorithm (requires nonce).
+@item GNUTLS_@-MAC_@-GOST28147_@-TC26Z_@-IMIT
+The GOST 28147-89 working in IMIT mode with TC26 Z S-box.
 @end table

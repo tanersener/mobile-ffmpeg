@@ -32,6 +32,8 @@
 
 #include "utils.h"
 
+unsigned _gnutls_ecc_curve_is_supported(gnutls_ecc_curve_t);
+
 /* Check whether the string functions will return a non-repeated and
  * non null value.
  */
@@ -114,6 +116,9 @@ void doit(void)
 	}
 
 	for (i=GNUTLS_ECC_CURVE_INVALID+1;i<=GNUTLS_ECC_CURVE_MAX;i++) {
+		if (_gnutls_ecc_curve_is_supported(i) == 0)
+			continue;
+
 		check_unique_non_null(gnutls_ecc_curve_get_name(i));
 		if (i == GNUTLS_ECC_CURVE_X25519)
 			continue; /* no oid yet */

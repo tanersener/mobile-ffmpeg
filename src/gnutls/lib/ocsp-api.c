@@ -361,8 +361,8 @@ static int append_response(gnutls_certificate_credentials_t sc, unsigned idx,
  * If the response is already expired at the time of loading the code
  * %GNUTLS_E_EXPIRED is returned.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
- *   otherwise a negative error code is returned.
+ * Returns: On success, the number of loaded responses is returned,
+ *   otherwise a negative error code.
  *
  * Since: 3.1.3
  **/
@@ -607,6 +607,10 @@ gnutls_certificate_get_ocsp_expiration(gnutls_certificate_credentials_t sc,
  * This is a helper function when needing to decide whether to perform an
  * explicit OCSP validity check on the peer's certificate. Should be called after
  * any of gnutls_certificate_verify_peers*() are called.
+ *
+ * This function is always usable on client side, but on server side only
+ * under TLS 1.3, which is the first version of TLS that allows cliend-side OCSP
+ * responses.
  *
  * Returns: non zero if the response was valid, or a zero if it wasn't sent,
  * or sent and was invalid.

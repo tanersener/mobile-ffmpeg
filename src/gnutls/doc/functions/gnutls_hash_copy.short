@@ -1,0 +1,1 @@
+@item @var{gnutls_hash_hd_t} @ref{gnutls_hash_copy} (gnutls_hash_hd_t @var{handle})

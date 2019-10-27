@@ -211,6 +211,7 @@ static INLINE int pthread_cond_wait(pthread_cond_t *const condition,
 #endif
   return !ok;
 }
+
 #elif defined(__OS2__)
 #define INCL_DOS
 #include <os2.h>  // NOLINT

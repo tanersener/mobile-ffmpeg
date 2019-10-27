@@ -3,7 +3,8 @@ AM_CFLAGS = -I ../build/ $(WARNING_CFLAGS)
 lib_LTLIBRARIES = libtwolame.la
 include_HEADERS = twolame.h
 
-libtwolame_la_LDFLAGS  = -export-dynamic -version-info @TWOLAME_SO_VERSION@
+libtwolame_la_CPPFLAGS = -DLIBTWOLAME_BUILD
+libtwolame_la_LDFLAGS  = -export-dynamic -version-info @TWOLAME_SO_VERSION@ -no-undefined
 libtwolame_la_SOURCES = \
 	ath.c \
 	ath.h \

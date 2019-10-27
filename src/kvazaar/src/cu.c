@@ -184,9 +184,10 @@ void kvz_cu_array_free(cu_array_t **cua_ptr)
  */
 cu_array_t * kvz_cu_array_copy_ref(cu_array_t* cua)
 {
-  // The caller should have had another reference.
-  assert(cua->refcount > 0);
-  KVZ_ATOMIC_INC(&cua->refcount);
+  int32_t new_refcount = KVZ_ATOMIC_INC(&cua->refcount);
+  // The caller should have had another reference and we added one
+  // reference so refcount should be at least 2.
+  assert(new_refcount >= 2);
   return cua;
 }
 

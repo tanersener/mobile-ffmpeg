@@ -29,7 +29,7 @@ option(NATIVE_BUILD "Target the build CPU" OFF)
 option(STATIC_LINK_CRT "Statically link C runtime for release builds" OFF)
 mark_as_advanced(FPROFILE_USE FPROFILE_GENERATE NATIVE_BUILD)
 # X265_BUILD must be incremented each time the public API is changed
-set(X265_BUILD 169)
+set(X265_BUILD 176)
 configure_file("${PROJECT_SOURCE_DIR}/x265.def.in"
                "${PROJECT_BINARY_DIR}/x265.def")
 configure_file("${PROJECT_SOURCE_DIR}/x265_config.h.in"
@@ -396,6 +396,16 @@ if (ENABLE_HDR10_PLUS)
     add_subdirectory(dynamicHDR10)
     add_definitions(-DENABLE_HDR10_PLUS)
 endif(ENABLE_HDR10_PLUS)
+
+option(ENABLE_SVT_HEVC "Enable SVT HEVC Encoder" OFF)
+if(ENABLE_SVT_HEVC)
+    find_package(svthevc)
+    if(SVTHEVC_FOUND)
+        add_definitions(-DSVT_HEVC)
+        include_directories(${SVT_HEVC_INCLUDE_DIR})
+    endif(SVTHEVC_FOUND)
+endif(ENABLE_SVT_HEVC)
+
 # this option can only be used when linking multiple libx265 libraries
 # together, and some alternate API access method is implemented.
 option(EXPORT_C_API "Implement public C programming interface" ON)
@@ -550,6 +560,9 @@ endif()
 if(ENABLE_LIBVMAF)
     target_link_libraries(x265-static ${VMAF})
 endif()
+if(SVTHEVC_FOUND)
+    target_link_libraries(x265-static ${SVT_HEVC_LIBRARY})
+endif()
 install(TARGETS x265-static
     LIBRARY DESTINATION ${LIB_INSTALL_DIR}
     ARCHIVE DESTINATION ${LIB_INSTALL_DIR})
@@ -559,6 +572,14 @@ if(ENABLE_HDR10_PLUS)
         LIBRARY DESTINATION ${LIB_INSTALL_DIR}
         ARCHIVE DESTINATION ${LIB_INSTALL_DIR})
 endif()
+
+if(SVTHEVC_FOUND)
+    install(FILES "${SVT_HEVC_INCLUDE_DIR}/EbApi.h" DESTINATION include)
+    install(FILES "${SVT_HEVC_INCLUDE_DIR}/EbErrorCodes.h" DESTINATION include)
+    install(FILES "${SVT_HEVC_INCLUDE_DIR}/EbTime.h" DESTINATION include)
+    install(FILES "${SVT_HEVC_LIBRARY}" DESTINATION ${BIN_INSTALL_DIR})
+endif()
+
 install(FILES x265.h "${PROJECT_BINARY_DIR}/x265_config.h" DESTINATION include)
 if((WIN32 AND ENABLE_CLI) OR (WIN32 AND ENABLE_SHARED))
     if(MSVC_IDE)
@@ -578,7 +599,6 @@ if(CMAKE_RC_COMPILER)
     # often breaks them
     string(REPLACE "<FLAGS>" "" CMAKE_RC_COMPILE_OBJECT "${CMAKE_RC_COMPILE_OBJECT}")
     string(REPLACE "<DEFINES>" "" CMAKE_RC_COMPILE_OBJECT "${CMAKE_RC_COMPILE_OBJECT}")
-
     # convert X265_LATEST_TAG (ex: 0.7) and X265_TAG_DISTANCE (ex: 103) to
     # @X265_VERSION_MAJOR@,@X265_VERSION_MINOR@,@X265_BRANCH_ID@,@X265_TAG_DISTANCE@
     string(REGEX MATCHALL "([0-9]+)" VERSION_LIST "${X265_LATEST_TAG}")
@@ -611,7 +631,10 @@ if(ENABLE_SHARED)
     if(EXTRA_LIB)
         target_link_libraries(x265-shared ${EXTRA_LIB})
     endif()
-    target_link_libraries(x265-shared ${PLATFORM_LIBS})
+	 target_link_libraries(x265-shared ${PLATFORM_LIBS})
+    if(SVTHEVC_FOUND)
+        target_link_libraries(x265-shared ${SVT_HEVC_LIBRARY})
+    endif(SVTHEVC_FOUND)
     if(MSVC)
         set_target_properties(x265-shared PROPERTIES OUTPUT_NAME libx265)
     else()

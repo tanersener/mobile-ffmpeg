@@ -454,6 +454,7 @@ const AVCodecTag ff_codec_bmp_tags[] = {
     { AV_CODEC_ID_MAGICYUV,     MKTAG('M', '0', 'R', 'G') },
     { AV_CODEC_ID_MAGICYUV,     MKTAG('M', '0', 'G', '0') },
     { AV_CODEC_ID_MAGICYUV,     MKTAG('M', '0', 'Y', '2') },
+    { AV_CODEC_ID_MAGICYUV,     MKTAG('M', '0', 'Y', '4') },
     { AV_CODEC_ID_MAGICYUV,     MKTAG('M', '2', 'R', 'A') },
     { AV_CODEC_ID_MAGICYUV,     MKTAG('M', '2', 'R', 'G') },
     { AV_CODEC_ID_YLC,          MKTAG('Y', 'L', 'C', '0') },
@@ -487,6 +488,12 @@ const AVCodecTag ff_codec_bmp_tags[] = {
     { AV_CODEC_ID_AGM,          MKTAG('A', 'G', 'M', '6') },
     { AV_CODEC_ID_AGM,          MKTAG('A', 'G', 'M', '7') },
     { AV_CODEC_ID_LSCR,         MKTAG('L', 'S', 'C', 'R') },
+    { AV_CODEC_ID_IMM5,         MKTAG('I', 'M', 'M', '5') },
+    { AV_CODEC_ID_NONE,         0 }
+};
+
+const AVCodecTag ff_codec_bmp_tags_unofficial[] = {
+    { AV_CODEC_ID_HEVC,         MKTAG('H', 'E', 'V', 'C') },
     { AV_CODEC_ID_NONE,         0 }
 };
 
@@ -533,6 +540,7 @@ const AVCodecTag ff_codec_wav_tags[] = {
     { AV_CODEC_ID_AAC,             0x00ff },
     { AV_CODEC_ID_G723_1,          0x0111 },
     { AV_CODEC_ID_SIPR,            0x0130 },
+    { AV_CODEC_ID_ACELP_KELVIN,    0x0135 },
     { AV_CODEC_ID_WMAV1,           0x0160 },
     { AV_CODEC_ID_WMAV2,           0x0161 },
     { AV_CODEC_ID_WMAPRO,          0x0162 },

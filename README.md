@@ -1,4 +1,4 @@
-# MobileFFmpeg ![GitHub release](https://img.shields.io/badge/release-v4.2.2-blue.svg) ![Bintray](https://img.shields.io/badge/bintray-v4.2.2-blue.svg) ![CocoaPods](https://img.shields.io/badge/pod-v4.2.2-blue.svg) [![Build Status](https://travis-ci.org/tanersener/mobile-ffmpeg.svg?branch=master)](https://travis-ci.org/tanersener/mobile-ffmpeg)
+# MobileFFmpeg ![GitHub release](https://img.shields.io/badge/release-v4.3-blue.svg) ![Bintray](https://img.shields.io/badge/bintray-v4.3-blue.svg) ![CocoaPods](https://img.shields.io/badge/pod-v4.3-blue.svg) [![Build Status](https://travis-ci.org/tanersener/mobile-ffmpeg.svg?branch=master)](https://travis-ci.org/tanersener/mobile-ffmpeg)
 
 FFmpeg for Android, iOS and tvOS
 
@@ -14,7 +14,7 @@ FFmpeg for Android, iOS and tvOS
 - Use binaries available at `Github`/`JCenter`/`CocoaPods` or build your own version with external libraries you need
 - Supports
     - Android, iOS and tvOS
-    - FFmpeg `v3.4.x`, `v4.0.x`, `v4.1` and `v4.2-dev` releases
+    - FFmpeg `v3.4.x`, `v4.0.x`, `v4.1`, `v4.2-dev` and `v4.3-dev` releases
     - 28 external libraries
     
         `chromaprint`, `fontconfig`, `freetype`, `fribidi`, `gmp`, `gnutls`, `kvazaar`, `lame`, `libaom`, `libass`, `libiconv`, `libilbc`, `libtheora`, `libvorbis`, `libvpx`, `libwebp`, `libxml2`, `opencore-amr`, `openh264`, `opus`, `sdl`, `shine`, `snappy`, `soxr`, `speex`, `tesseract`, `twolame`, `wavpack`
@@ -121,7 +121,7 @@ Please remember that some parts of `FFmpeg` are licensed under the `GPL` and onl
 1. Add MobileFFmpeg dependency to your `build.gradle` in `mobile-ffmpeg-<package name>` format
     ```
     dependencies {
-        implementation 'com.arthenica:mobile-ffmpeg-full:4.2.2'
+        implementation 'com.arthenica:mobile-ffmpeg-full:4.3'
     }
     ```
 
@@ -135,14 +135,14 @@ Please remember that some parts of `FFmpeg` are licensed under the `GPL` and onl
 3. Check execution output.
     ```
     int rc = FFmpeg.getLastReturnCode();
-    String output = FFmpeg.getLastCommandOutput();
  
     if (rc == RETURN_CODE_SUCCESS) {
         Log.i(Config.TAG, "Command execution completed successfully.");
     } else if (rc == RETURN_CODE_CANCEL) {
         Log.i(Config.TAG, "Command execution cancelled by user.");
     } else {
-        Log.i(Config.TAG, String.format("Command execution failed with rc=%d and output=%s.", rc, output));
+        Log.i(Config.TAG, String.format("Command execution failed with rc=%d and the output below.", rc));
+        FFmpeg.printLastCommandOutput(Log.INFO);
     }
     ```
 
@@ -199,12 +199,12 @@ Please remember that some parts of `FFmpeg` are licensed under the `GPL` and onl
 
     - iOS
     ```
-    pod 'mobile-ffmpeg-full', '~> 4.2.2'
+    pod 'mobile-ffmpeg-full', '~> 4.3'
     ```
 
     - tvOS
     ```
-    pod 'mobile-ffmpeg-tv-full', '~> 4.2.2'
+    pod 'mobile-ffmpeg-tv-full', '~> 4.3'
     ```
 
 2. Execute commands.
@@ -313,6 +313,7 @@ Exact version number is obtained using `git describe --tags`.
 
 |  MobileFFmpeg Version | FFmpeg Version | Release Date |
 | :----: | :----: |:----: |
+| [4.3](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v4.3) | 4.3-dev-1181 | Oct 27, 2019 |
 | [4.2.2](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v4.2.2) | 4.2-dev-1824 | July 3, 2019 |
 | [4.2.2.LTS](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v4.2.2.LTS) | 4.2-dev-1824 | July 3, 2019 |
 | [4.2.1](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v4.2.1) | 4.2-dev-1156 | Apr 2, 2019 |
@@ -349,13 +350,7 @@ This table shows the differences between two variants.
 | tvOS SDK | 10.2 | 9.2 |
 | tvOS Architectures | arm64<br/>x86-64 | arm64<br/>x86-64 |
 
-### 5. Development Builds
-
-Unreleased binaries built from `development` branch can be found under the [development-snapshot](https://www.dropbox.com/sh/frzg32yjzyucmob/AADX81RhiVfk9o7Vo2J8jlH2a) directory. 
-
-Please remember that these builds are provided for testing and development purposes only since they are not % 100 tested and may include minor issues. 
-
-### 6. Building
+### 5. Building
 
 Build scripts from `master` and `development` branches are tested periodically. See the latest status from the table below.
 
@@ -365,7 +360,7 @@ Build scripts from `master` and `development` branches are tested periodically. 
 |  development | [![Build Status](https://travis-ci.org/tanersener/mobile-ffmpeg.svg?branch=development)](https://travis-ci.org/tanersener/mobile-ffmpeg) |
 
 
-#### 6.1 Prerequisites
+#### 5.1 Prerequisites
 1. Use your package manager (apt, yum, dnf, brew, etc.) to install the following packages.
 
     ```
@@ -390,7 +385,7 @@ Please visit [Android Prerequisites](https://github.com/tanersener/mobile-ffmpeg
     - **tvOS SDK 9.2** or later
     - **Command Line Tools**
 
-#### 6.2 Build Scripts
+#### 5.2 Build Scripts
 Use `android.sh`, `ios.sh` and `tvos.sh` to build MobileFFmpeg for each platform. 
 
 All three scripts support additional options and 
@@ -398,7 +393,7 @@ can be customized to enable/disable specific external libraries and/or architect
 [android.sh](https://github.com/tanersener/mobile-ffmpeg/wiki/android.sh), 
 [ios.sh](https://github.com/tanersener/mobile-ffmpeg/wiki/ios.sh) and 
 [tvos.sh](https://github.com/tanersener/mobile-ffmpeg/wiki/tvos.sh) to see all available build options.
-##### 6.2.1 Android 
+##### 5.2.1 Android 
 ```
 export ANDROID_HOME=<Android SDK Path>
 export ANDROID_NDK_ROOT=<Android NDK Path>
@@ -407,14 +402,14 @@ export ANDROID_NDK_ROOT=<Android NDK Path>
 
 <img src="https://github.com/tanersener/mobile-ffmpeg/blob/master/docs/assets/android_custom.gif" width="600">
 
-##### 6.2.2 iOS
+##### 5.2.2 iOS
 ```
 ./ios.sh
 ```
 
 <img src="https://github.com/tanersener/mobile-ffmpeg/blob/master/docs/assets/ios_custom.gif" width="600">
 
-##### 6.2.3 tvOS
+##### 5.2.3 tvOS
 ```
 ./tvos.sh
 ```
@@ -422,11 +417,11 @@ export ANDROID_NDK_ROOT=<Android NDK Path>
 <img src="https://github.com/tanersener/mobile-ffmpeg/blob/master/docs/assets/tvos_custom.gif" width="600">
 
 
-##### 6.2.4 Building LTS Binaries
+##### 5.2.4 Building LTS Binaries
 
 Use `--lts` option to build lts binaries for each platform.
 
-#### 6.3 Build Output
+#### 5.3 Build Output
 
 All libraries created by the top level build scripts (`android.sh`, `ios.sh` and `tvos.sh`) can be found under 
 the `prebuilt` directory.
@@ -437,11 +432,11 @@ the `prebuilt` directory.
 - `tvOS` frameworks are located under the `tvos-framework`folder
 - `tvOS` universal binaries are located under the `tvos-universal`folder 
 
-#### 6.4 GPL Support
+#### 5.4 GPL Support
 It is possible to enable GPL licensed libraries `x264`, `xvidcore` since `v1.1` and `vid.stab`, `x265` since `v2.1` 
 from the top level build scripts. Their source code is not included in the repository and downloaded when enabled.
 
-#### 6.5 External Libraries
+#### 5.5 External Libraries
 `build` directory includes build scripts of all external libraries. Two scripts exist for each external library, 
 one for `Android` and one for `iOS / tvOS`. Each of these two scripts contains options/flags used to cross-compile the 
 library on the specified mobile platform. 
@@ -449,11 +444,11 @@ library on the specified mobile platform.
 CPU optimizations (`ASM`) are enabled for most of the external libraries. Details and exceptions can be found under the 
 [ASM Support](https://github.com/tanersener/mobile-ffmpeg/wiki/ASM-Support) wiki page.
 
-### 7. Documentation
+### 6. Documentation
 
 A more detailed documentation is available at [Wiki](https://github.com/tanersener/mobile-ffmpeg/wiki).
 
-### 8. License
+### 7. License
 
 This project is licensed under the LGPL v3.0. However, if source code is built using optional `--enable-gpl` flag or 
 prebuilt binaries with `-gpl` postfix are used then MobileFFmpeg is subject to the GPL v3.0 license.
@@ -471,11 +466,11 @@ In test applications; embedded fonts are licensed under the [SIL Open Font Licen
 
 Please visit [License](https://github.com/tanersener/mobile-ffmpeg/wiki/License) page for the details.
 
-### 9. Contributing
+### 8. Contributing
 
 If you have any recommendations or ideas to improve it, please feel free to submit issues or pull requests. Any help is appreciated.
 
-### 10. See Also
+### 9. See Also
 
 - [libav gas-preprocessor](https://github.com/libav/gas-preprocessor/raw/master/gas-preprocessor.pl)
 - [FFmpeg API Documentation](https://ffmpeg.org/doxygen/4.0/index.html)

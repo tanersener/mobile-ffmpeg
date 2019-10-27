@@ -21,6 +21,9 @@ extern "C" {
 void av1_encode_mv(AV1_COMP *cpi, aom_writer *w, const MV *mv, const MV *ref,
                    nmv_context *mvctx, int usehp);
 
+void av1_update_mv_stats(const MV *mv, const MV *ref, nmv_context *mvctx,
+                         MvSubpelPrecision precision);
+
 void av1_build_nmv_cost_table(int *mvjoint, int *mvcost[2],
                               const nmv_context *mvctx,
                               MvSubpelPrecision precision);
@@ -41,11 +44,11 @@ void av1_find_best_ref_mvs_from_stack(int allow_hp,
                                       int is_integer);
 
 static INLINE MV_JOINT_TYPE av1_get_mv_joint(const MV *mv) {
-  if (mv->row == 0) {
-    return mv->col == 0 ? MV_JOINT_ZERO : MV_JOINT_HNZVZ;
-  } else {
-    return mv->col == 0 ? MV_JOINT_HZVNZ : MV_JOINT_HNZVNZ;
-  }
+  // row:  Z  col:  Z  | MV_JOINT_ZERO   (0)
+  // row:  Z  col: NZ  | MV_JOINT_HNZVZ  (1)
+  // row: NZ  col:  Z  | MV_JOINT_HZVNZ  (2)
+  // row: NZ  col: NZ  | MV_JOINT_HNZVNZ (3)
+  return (!!mv->col) | ((!!mv->row) << 1);
 }
 
 #ifdef __cplusplus

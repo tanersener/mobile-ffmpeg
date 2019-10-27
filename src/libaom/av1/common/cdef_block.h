@@ -32,7 +32,7 @@
   (CDEF_BSTRIDE * ((1 << MAX_SB_SIZE_LOG2) + 2 * CDEF_VBORDER))
 
 extern const int cdef_pri_taps[2][2];
-extern const int cdef_sec_taps[2][2];
+extern const int cdef_sec_taps[2];
 DECLARE_ALIGNED(16, extern const int, cdef_directions[8][2]);
 
 typedef struct {

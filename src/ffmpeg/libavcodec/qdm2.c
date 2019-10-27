@@ -408,7 +408,12 @@ static int fix_coding_method_array(int sb, int channels,
             }
             for (k = 0; k < run; k++) {
                 if (j + k < 128) {
-                    if (coding_method[ch][sb + (j + k) / 64][(j + k) % 64] > coding_method[ch][sb][j]) {
+                    int sbjk = sb + (j + k) / 64;
+                    if (sbjk > 29) {
+                        SAMPLES_NEEDED
+                        continue;
+                    }
+                    if (coding_method[ch][sbjk][(j + k) % 64] > coding_method[ch][sb][j]) {
                         if (k > 0) {
                             SAMPLES_NEEDED
                             //not debugged, almost never used
@@ -1284,6 +1289,10 @@ static void qdm2_fft_decode_tones(QDM2Context *q, int duration,
             }
             offset += (n - 2);
         } else {
+            if (local_int_10 <= 2) {
+                av_log(NULL, AV_LOG_ERROR, "qdm2_fft_decode_tones() stuck\n");
+                return;
+            }
             offset += qdm2_get_vlc(gb, &vlc_tab_fft_tone_offset[local_int_8], 1, 2);
             while (offset >= (local_int_10 - 1)) {
                 offset       += (1 - (local_int_10 - 1));
@@ -1695,8 +1704,8 @@ static av_cold int qdm2_decode_init(AVCodecContext *avctx)
     s->group_size = bytestream2_get_be32(&gb);
     s->fft_size = bytestream2_get_be32(&gb);
     s->checksum_size = bytestream2_get_be32(&gb);
-    if (s->checksum_size >= 1U << 28) {
-        av_log(avctx, AV_LOG_ERROR, "data block size too large (%u)\n", s->checksum_size);
+    if (s->checksum_size >= 1U << 28 || !s->checksum_size) {
+        av_log(avctx, AV_LOG_ERROR, "data block size invalid (%u)\n", s->checksum_size);
         return AVERROR_INVALIDDATA;
     }
 
@@ -1717,6 +1726,11 @@ static av_cold int qdm2_decode_init(AVCodecContext *avctx)
 
     s->sub_sampling = s->fft_order - 7;
     s->frequency_range = 255 / (1 << (2 - s->sub_sampling));
+
+    if (s->frame_size * 4 >> s->sub_sampling > MPA_FRAME_SIZE) {
+        avpriv_request_sample(avctx, "large frames");
+        return AVERROR_PATCHWELCOME;
+    }
 
     switch ((s->sub_sampling * 2 + s->channels - 1)) {
         case 0: tmp = 40; break;

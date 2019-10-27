@@ -18,6 +18,10 @@
  */
 
 /*
+ * CHANGES 08.2019
+ * --------------------------------------------------------
+ * - lastCommandOutput methods introduced
+ *
  * CHANGES 04.2019
  * --------------------------------------------------------
  * - setNativeEnvironmentVariable method added
@@ -73,6 +77,10 @@ pthread_mutex_t lockMutex;
 pthread_mutex_t monitorMutex;
 pthread_cond_t monitorCondition;
 
+/** Last command output variables */
+pthread_mutex_t logMutex;
+static char *lastCommandOutput;
+
 pthread_t callbackThread;
 int redirectionEnabled;
 
@@ -91,8 +99,17 @@ static jmethodID logMethod;
 /** Global reference of statistics redirection method in Java */
 static jmethodID statisticsMethod;
 
+/** Global reference of String class in Java */
+static jclass stringClass;
+
+/** Global reference of String constructor in Java */
+static jmethodID stringConstructor;
+
 /** Full name of the Config class */
 const char *configClassName = "com/arthenica/mobileffmpeg/Config";
+
+/** Full name of String class */
+const char *stringClassName = "java/lang/String";
 
 /** Prototypes of native functions defined by Config class. */
 JNINativeMethod configMethods[] = {
@@ -203,6 +220,17 @@ void monitorInit() {
     pthread_condattr_destroy(&cattributes);
 }
 
+void logInit() {
+    pthread_mutexattr_t attributes;
+    pthread_mutexattr_init(&attributes);
+    pthread_mutexattr_settype(&attributes, PTHREAD_MUTEX_RECURSIVE_NP);
+
+    pthread_mutex_init(&logMutex, &attributes);
+    pthread_mutexattr_destroy(&attributes);
+
+    lastCommandOutput = NULL;
+}
+
 void mutexUnInit() {
     pthread_mutex_destroy(&lockMutex);
 }
@@ -212,12 +240,70 @@ void monitorUnInit() {
     pthread_cond_destroy(&monitorCondition);
 }
 
+void logUnInit() {
+    pthread_mutex_destroy(&logMutex);
+}
+
 void mutexLock() {
     pthread_mutex_lock(&lockMutex);
 }
 
+void lastCommandOutputLock() {
+    pthread_mutex_lock(&logMutex);
+}
+
 void mutexUnlock() {
     pthread_mutex_unlock(&lockMutex);
+}
+
+void lastCommandOutputUnlock() {
+    pthread_mutex_unlock(&logMutex);
+}
+
+void clearLastCommandOutput() {
+    lastCommandOutputLock();
+
+    if (lastCommandOutput != NULL) {
+        av_free(lastCommandOutput);
+        lastCommandOutput = NULL;
+    }
+
+    lastCommandOutputUnlock();
+}
+
+void appendLastCommandOutput(const char *logMessage) {
+    size_t length = 0;
+    char *tempLastCommandOutput = NULL;
+    size_t logMessageLength = strlen(logMessage);
+
+    if (logMessageLength <= 0) {
+        return;
+    }
+
+    lastCommandOutputLock();
+
+    if (lastCommandOutput == NULL) {
+        length = logMessageLength + 1;
+
+        lastCommandOutput = (char*)av_malloc(length);
+        memcpy(lastCommandOutput, logMessage, length);
+    } else {
+        size_t length1 = strlen(lastCommandOutput);
+        length = length1 + logMessageLength + 1;
+
+        char *newLastCommandOutput = (char*)av_malloc(length);
+        memcpy(newLastCommandOutput, lastCommandOutput, length1);
+        memcpy(newLastCommandOutput + length1, logMessage, logMessageLength + 1);
+
+        tempLastCommandOutput = lastCommandOutput;
+        lastCommandOutput = newLastCommandOutput;
+    }
+
+    lastCommandOutputUnlock();
+
+    if (tempLastCommandOutput != NULL) {
+        av_free(tempLastCommandOutput);
+    }
 }
 
 void monitorWait(int milliSeconds) {
@@ -255,11 +341,11 @@ void monitorNotify() {
 void logCallbackDataAdd(int level, const char *data) {
 
     // CREATE DATA STRUCT FIRST
-    struct CallbackData *newData = (struct CallbackData*)malloc(sizeof(struct CallbackData));
+    struct CallbackData *newData = (struct CallbackData*)av_malloc(sizeof(struct CallbackData));
     newData->type = 1;
     newData->logLevel = level;
     size_t dataSize = strlen(data) + 1;
-    newData->logData = (char*)malloc(dataSize);
+    newData->logData = (char*)av_malloc(dataSize);
     memcpy(newData->logData, data, dataSize);
     newData->next = NULL;
 
@@ -292,7 +378,7 @@ void logCallbackDataAdd(int level, const char *data) {
 void statisticsCallbackDataAdd(int frameNumber, float fps, float quality, int64_t size, int time, double bitrate, double speed) {
 
     // CREATE DATA STRUCT FIRST
-    struct CallbackData *newData = (struct CallbackData*)malloc(sizeof(struct CallbackData));
+    struct CallbackData *newData = (struct CallbackData*)av_malloc(sizeof(struct CallbackData));
     newData->type = 2;
     newData->statisticsFrameNumber = frameNumber;
     newData->statisticsFps = fps;
@@ -381,17 +467,19 @@ void mobileffmpeg_log_callback_function(void *ptr, int level, const char* format
     }
 
     avutil_log_format_line(ptr, level, format, vargs, part, &print_prefix);
+    avutil_log_sanitize(part[0].str);
+    avutil_log_sanitize(part[1].str);
+    avutil_log_sanitize(part[2].str);
+    avutil_log_sanitize(part[3].str);
+
     snprintf(line, sizeof(line), "%s%s%s%s", part[0].str, part[1].str, part[2].str, part[3].str);
 
-    avutil_log_sanitize(part[0].str);
-    logCallbackDataAdd(level, part[0].str);
-    avutil_log_sanitize(part[1].str);
-    logCallbackDataAdd(level, part[1].str);
-    avutil_log_sanitize(part[2].str);
-    logCallbackDataAdd(level, part[2].str);
-    avutil_log_sanitize(part[3].str);
-    logCallbackDataAdd(level, part[3].str);
+    logCallbackDataAdd(level, line);
+    appendLastCommandOutput(line);
 
+    av_bprint_finalize(part, NULL);
+    av_bprint_finalize(part+1, NULL);
+    av_bprint_finalize(part+2, NULL);
     av_bprint_finalize(part+3, NULL);
 }
 
@@ -446,7 +534,7 @@ void *callbackThreadFunction() {
                 (*env)->DeleteLocalRef(env, byteArray);
 
                 // CLEAN LOG DATA
-                free(callbackData->logData);
+                av_free(callbackData->logData);
 
             } else {
 
@@ -462,7 +550,7 @@ void *callbackThreadFunction() {
 
             // CLEAN STRUCT
             callbackData->next = NULL;
-            free(callbackData);
+            av_free(callbackData);
 
         } else {
             monitorWait(100);
@@ -501,18 +589,31 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_FALSE;
     }
 
+    jclass localStringClass = (*env)->FindClass(env, stringClassName);
+    if (localStringClass == NULL) {
+        LOGE("OnLoad failed to FindClass %s.\n", stringClassName);
+        return JNI_FALSE;
+    }
+
     (*env)->GetJavaVM(env, &globalVm);
 
     logMethod = (*env)->GetStaticMethodID(env, localConfigClass, "log", "(I[B)V");
     if (logMethod == NULL) {
-        LOGE("OnLoad thread failed to GetMethodID for %s.\n", "log");
+        LOGE("OnLoad thread failed to GetStaticMethodID for %s.\n", "log");
         (*globalVm)->DetachCurrentThread(globalVm);
         return JNI_FALSE;
     }
 
     statisticsMethod = (*env)->GetStaticMethodID(env, localConfigClass, "statistics", "(IFFJIDD)V");
     if (logMethod == NULL) {
-        LOGE("OnLoad thread failed to GetMethodID for %s.\n", "statistics");
+        LOGE("OnLoad thread failed to GetStaticMethodID for %s.\n", "statistics");
+        (*globalVm)->DetachCurrentThread(globalVm);
+        return JNI_FALSE;
+    }
+
+    stringConstructor = (*env)->GetMethodID(env, localStringClass, "<init>", "([BLjava/lang/String;)V");
+    if (stringConstructor == NULL) {
+        LOGE("OnLoad thread failed to GetMethodID for %s.\n", "<init>");
         (*globalVm)->DetachCurrentThread(globalVm);
         return JNI_FALSE;
     }
@@ -520,6 +621,7 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     av_jni_set_java_vm(vm, NULL);
 
     configClass = (jclass) ((*env)->NewGlobalRef(env, localConfigClass));
+    stringClass = (jclass) ((*env)->NewGlobalRef(env, localStringClass));
 
     redirectionEnabled = 0;
 
@@ -528,6 +630,7 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
 
     mutexInit();
     monitorInit();
+    logInit();
 
     return JNI_VERSION_1_6;
 }
@@ -643,15 +746,15 @@ JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_Config_nativeExecute(JNIE
         int programArgumentCount = (*env)->GetArrayLength(env, stringArray);
         argumentCount = programArgumentCount + 1;
 
-        tempArray = (jstring *) malloc(sizeof(jstring) * programArgumentCount);
+        tempArray = (jstring *) av_malloc(sizeof(jstring) * programArgumentCount);
     }
 
     /* PRESERVE USAGE FORMAT
      *
      * ffmpeg <arguments>
      */
-    argv = (char **)malloc(sizeof(char*) * (argumentCount));
-    argv[0] = (char *)malloc(sizeof(char) * (strlen(LIB_NAME) + 1));
+    argv = (char **)av_malloc(sizeof(char*) * (argumentCount));
+    argv[0] = (char *)av_malloc(sizeof(char) * (strlen(LIB_NAME) + 1));
     strcpy(argv[0], LIB_NAME);
 
     // PREPARE
@@ -664,6 +767,9 @@ JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_Config_nativeExecute(JNIE
         }
     }
 
+    // LAST COMMAND OUTPUT SHOULD BE CLEARED BEFORE STARTING A NEW EXECUTION
+    clearLastCommandOutput();
+
     // RUN
     int retCode = execute(argumentCount, argv);
 
@@ -673,10 +779,10 @@ JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_Config_nativeExecute(JNIE
             (*env)->ReleaseStringUTFChars(env, tempArray[i], argv[i + 1]);
         }
 
-        free(tempArray);
+        av_free(tempArray);
     }
-    free(argv[0]);
-    free(argv);
+    av_free(argv[0]);
+    av_free(argv);
 
     return retCode;
 }
@@ -732,4 +838,24 @@ JNIEXPORT int JNICALL Java_com_arthenica_mobileffmpeg_Config_setNativeEnvironmen
     const char *variableValueString = (*env)->GetStringUTFChars(env, variableValue, 0);
 
     return setenv(variableNameString, variableValueString, 1);
+}
+
+/**
+ * Returns log output of the last executed command natively.
+ *
+ * @param env pointer to native method interface
+ * @param object reference to the class on which this method is invoked
+ * @return output of the last executed command
+ */
+JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_Config_getNativeLastCommandOutput(JNIEnv *env, jclass object) {
+    int size = strlen(lastCommandOutput);
+
+    if (size > 0) {
+        jbyteArray byteArray = (*env)->NewByteArray(env, size);
+        (*env)->SetByteArrayRegion(env, byteArray, 0, size, lastCommandOutput);
+        jstring charsetName = (*env)->NewStringUTF(env, "UTF-8");
+        return (jstring) (*env)->NewObject(env, stringClass, stringConstructor, byteArray, charsetName);
+    } else {
+        return (*env)->NewStringUTF(env, "");
+    }
 }

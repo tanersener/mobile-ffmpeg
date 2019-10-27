@@ -20,10 +20,6 @@
 package com.arthenica.mobileffmpeg;
 
 import android.content.Context;
-import android.hardware.camera2.CameraAccessException;
-import android.hardware.camera2.CameraCharacteristics;
-import android.hardware.camera2.CameraManager;
-import android.hardware.camera2.CameraMetadata;
 import android.os.Build;
 import android.util.Log;
 
@@ -35,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static android.content.Context.CAMERA_SERVICE;
 import static com.arthenica.mobileffmpeg.FFmpeg.getBuildDate;
 import static com.arthenica.mobileffmpeg.FFmpeg.getVersion;
 
@@ -123,7 +118,7 @@ public class Config {
                  */
 
                 try {
-                    System.loadLibrary("mobileffmpeg-armv7a-neon");
+                    System.loadLibrary("mobileffmpeg_armv7a_neon");
                     nativeLibraryLoaded = true;
                     AbiDetect.setArmV7aNeonLoaded(true);
                 } catch (final UnsatisfiedLinkError e) {
@@ -245,11 +240,12 @@ public class Config {
             return;
         }
 
-        // ALWAYS REDIRECT COMMAND OUTPUT
-        FFmpeg.appendCommandOutput(text);
-
         if (logCallbackFunction != null) {
-            logCallbackFunction.apply(new LogMessage(level, text));
+            try {
+                logCallbackFunction.apply(new LogMessage(level, text));
+            } catch (final Exception e) {
+                Log.e(Config.TAG, "Exception thrown inside LogCallback block", e);
+            }
         } else {
             switch (level) {
                 case AV_LOG_QUIET: {
@@ -305,7 +301,11 @@ public class Config {
         lastReceivedStatistics.update(newStatistics);
 
         if (statisticsCallbackFunction != null) {
-            statisticsCallbackFunction.apply(lastReceivedStatistics);
+            try {
+                statisticsCallbackFunction.apply(lastReceivedStatistics);
+            } catch (final Exception e) {
+                Log.e(Config.TAG, "Exception thrown inside StatisticsCallback block", e);
+            }
         }
     }
 
@@ -634,5 +634,12 @@ public class Config {
      * @return zero on success, non-zero on error
      */
     native static int setNativeEnvironmentVariable(final String variableName, final String variableValue);
+
+    /**
+     * <p>Returns log output of the last executed command natively.
+     *
+     * @return output of the last executed command
+     */
+    native static String getNativeLastCommandOutput();
 
 }

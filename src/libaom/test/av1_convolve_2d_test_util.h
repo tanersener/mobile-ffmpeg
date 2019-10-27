@@ -68,6 +68,7 @@ class AV1JntConvolve2DTest : public ::testing::TestWithParam<Convolve2DParam> {
 };
 }  // namespace AV1Convolve2D
 
+#if CONFIG_AV1_HIGHBITDEPTH
 namespace AV1HighbdConvolve2D {
 typedef void (*highbd_convolve_2d_func)(
     const uint16_t *src, int src_stride, uint16_t *dst, int dst_stride, int w,
@@ -111,6 +112,7 @@ class AV1HighbdJntConvolve2DTest
   libaom_test::ACMRandom rnd_;
 };
 }  // namespace AV1HighbdConvolve2D
+#endif  // CONFIG_AV1_HIGHBITDEPTH
 
 }  // namespace libaom_test
 

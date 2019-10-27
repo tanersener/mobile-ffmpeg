@@ -1,4 +1,4 @@
-# Copyright (c) 2011-2013, Andy Polyakov <appro@openssl.org>
+# Copyright (c) 2011-2016, Andy Polyakov <appro@openssl.org>
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -37,7 +37,6 @@
 #
 # *** This file is auto-generated ***
 #
-.file	"sha512-586.s"
 .text
 .globl	_sha512_block_data_order
 .def	_sha512_block_data_order;	.scl	2;	.type	32;	.endef
@@ -594,6 +593,8 @@ _sha512_block_data_order:
 .long	4234509866,1501505948
 .long	987167468,1607167915
 .long	1246189591,1816402316
+.long	67438087,66051
+.long	202182159,134810123
 .byte	83,72,65,53,49,50,32,98,108,111,99,107,32,116,114,97
 .byte	110,115,102,111,114,109,32,102,111,114,32,120,56,54,44,32
 .byte	67,82,89,80,84,79,71,65,77,83,32,98,121,32,60,97

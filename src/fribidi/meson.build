@@ -1,4 +1,4 @@
-project('fribidi', 'c', version: '1.0.5',
+project('fribidi', 'c', version: '1.0.7',
   meson_version : '>= 0.44')
 
 # New release:
@@ -80,7 +80,7 @@ cdata.set('FRIBIDI_NO_DEPRECATED', no_deprecated)
 # write config.h
 config_h = configure_file(output: 'config.h', configuration: cdata)
 
-incs = include_directories('.', 'lib')
+incs = include_directories('.', 'lib', 'gen.tab')
 
 subdir('gen.tab')
 subdir('lib')

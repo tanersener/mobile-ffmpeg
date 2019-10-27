@@ -45,7 +45,7 @@
 #define FUNC(name) cbs_jpeg_read_ ## name
 
 #define xu(width, name, range_min, range_max, subs, ...) do { \
-        uint32_t value = range_min; \
+        uint32_t value; \
         CHECK(ff_cbs_read_unsigned(ctx, rw, width, #name, \
                                    SUBSCRIPTS(subs, __VA_ARGS__), \
                                    &value, range_min, range_max)); \
@@ -82,21 +82,21 @@
 #undef xu
 
 
-static void cbs_jpeg_free_application_data(void *unit, uint8_t *content)
+static void cbs_jpeg_free_application_data(void *opaque, uint8_t *content)
 {
     JPEGRawApplicationData *ad = (JPEGRawApplicationData*)content;
     av_buffer_unref(&ad->Ap_ref);
     av_freep(&content);
 }
 
-static void cbs_jpeg_free_comment(void *unit, uint8_t *content)
+static void cbs_jpeg_free_comment(void *opaque, uint8_t *content)
 {
     JPEGRawComment *comment = (JPEGRawComment*)content;
     av_buffer_unref(&comment->Cm_ref);
     av_freep(&content);
 }
 
-static void cbs_jpeg_free_scan(void *unit, uint8_t *content)
+static void cbs_jpeg_free_scan(void *opaque, uint8_t *content)
 {
     JPEGRawScan *scan = (JPEGRawScan*)content;
     av_buffer_unref(&scan->data_ref);

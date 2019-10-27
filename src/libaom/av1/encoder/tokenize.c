@@ -130,9 +130,9 @@ void av1_tokenize_color_map(const MACROBLOCK *const x, int plane,
                         counts, map_pb_cdf);
 }
 
-static void tokenize_vartx(ThreadData *td, TOKENEXTRA **t, RUN_TYPE dry_run,
-                           TX_SIZE tx_size, BLOCK_SIZE plane_bsize, int blk_row,
-                           int blk_col, int block, int plane, void *arg) {
+static void tokenize_vartx(ThreadData *td, RUN_TYPE dry_run, TX_SIZE tx_size,
+                           BLOCK_SIZE plane_bsize, int blk_row, int blk_col,
+                           int block, int plane, void *arg) {
   MACROBLOCK *const x = &td->mb;
   MACROBLOCKD *const xd = &x->e_mbd;
   MB_MODE_INFO *const mbmi = xd->mi[0];
@@ -177,7 +177,7 @@ static void tokenize_vartx(ThreadData *td, TOKENEXTRA **t, RUN_TYPE dry_run,
 
         if (offsetr >= max_blocks_high || offsetc >= max_blocks_wide) continue;
 
-        tokenize_vartx(td, t, dry_run, sub_txs, plane_bsize, offsetr, offsetc,
+        tokenize_vartx(td, dry_run, sub_txs, plane_bsize, offsetr, offsetc,
                        block, plane, arg);
         block += step;
       }
@@ -185,7 +185,7 @@ static void tokenize_vartx(ThreadData *td, TOKENEXTRA **t, RUN_TYPE dry_run,
   }
 }
 
-void av1_tokenize_sb_vartx(const AV1_COMP *cpi, ThreadData *td, TOKENEXTRA **t,
+void av1_tokenize_sb_vartx(const AV1_COMP *cpi, ThreadData *td,
                            RUN_TYPE dry_run, int mi_row, int mi_col,
                            BLOCK_SIZE bsize, int *rate,
                            uint8_t allow_update_cdf) {
@@ -194,8 +194,7 @@ void av1_tokenize_sb_vartx(const AV1_COMP *cpi, ThreadData *td, TOKENEXTRA **t,
   MACROBLOCK *const x = &td->mb;
   MACROBLOCKD *const xd = &x->e_mbd;
   MB_MODE_INFO *const mbmi = xd->mi[0];
-  (void)t;
-  struct tokenize_b_args arg = { cpi, td, t, 0, allow_update_cdf };
+  struct tokenize_b_args arg = { cpi, td, 0, allow_update_cdf };
   if (mi_row >= cm->mi_rows || mi_col >= cm->mi_cols) return;
 
   assert(bsize < BLOCK_SIZES_ALL);
@@ -244,7 +243,7 @@ void av1_tokenize_sb_vartx(const AV1_COMP *cpi, ThreadData *td, TOKENEXTRA **t,
         const int unit_width = AOMMIN(mu_blocks_wide + idx, mi_width);
         for (blk_row = idy; blk_row < unit_height; blk_row += bh) {
           for (blk_col = idx; blk_col < unit_width; blk_col += bw) {
-            tokenize_vartx(td, t, dry_run, max_tx_size, plane_bsize, blk_row,
+            tokenize_vartx(td, dry_run, max_tx_size, plane_bsize, blk_row,
                            blk_col, block, plane, &arg);
             block += step;
           }

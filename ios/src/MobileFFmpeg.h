@@ -29,6 +29,7 @@ extern NSString *const MOBILE_FFMPEG_VERSION;
 /** Common return code values */
 extern int const RETURN_CODE_SUCCESS;
 extern int const RETURN_CODE_CANCEL;
+extern int const RETURN_CODE_MULTIPLE_EXECUTIONS_NOT_ALLOWED;
 
 /**
  * Main class for FFmpeg operations.
@@ -72,6 +73,8 @@ extern int const RETURN_CODE_CANCEL;
  *
  * @param command FFmpeg command
  * @param delimiter arguments delimiter
+ * @deprecated argument splitting mechanism used in this method is pretty simple and prone to errors. Consider
+ * using a more advanced method like execute or executeWithArguments
  * @return zero on successful execution, 255 on user cancel and non-zero on error
  */
 + (int)execute: (NSString*)command delimiter:(NSString*)delimiter;
@@ -113,7 +116,7 @@ extern int const RETURN_CODE_CANCEL;
  * @param timeout complete timeout
  * @return media information
  */
- + (MediaInformation*)getMediaInformation: (NSString*)path timeout:(long)timeout;
++ (MediaInformation*)getMediaInformation: (NSString*)path timeout:(long)timeout;
 
 /**
  * Returns MobileFFmpeg library build date.
@@ -121,5 +124,13 @@ extern int const RETURN_CODE_CANCEL;
  * @return MobileFFmpeg library build date
  */
 + (NSString*)getBuildDate;
+
+/**
+ * Parses the given command into arguments.
+ *
+ * @param command string command
+ * @return array of arguments
+ */
++ (NSArray*)parseArguments: (NSString*)command;
 
 @end

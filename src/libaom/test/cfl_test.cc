@@ -310,6 +310,7 @@ TEST_P(CFLSubsampleLBDTest, DISABLED_SubsampleLBD444SpeedTest) {
   subsampleSpeedTest(fun_444, fun_444_ref, &ACMRandom::Rand8);
 }
 
+#if CONFIG_AV1_HIGHBITDEPTH
 typedef cfl_subsample_hbd_fn (*get_subsample_hbd_fn)(TX_SIZE tx_size);
 typedef ::testing::tuple<TX_SIZE, get_subsample_hbd_fn, get_subsample_hbd_fn,
                          get_subsample_hbd_fn>
@@ -351,6 +352,7 @@ TEST_P(CFLSubsampleHBDTest, SubsampleHBD444Test) {
 TEST_P(CFLSubsampleHBDTest, DISABLED_SubsampleHBD444SpeedTest) {
   subsampleSpeedTest(fun_444, fun_444_ref, &ACMRandom::Rand12);
 }
+#endif  // CONFIG_AV1_HIGHBITDEPTH
 
 typedef cfl_predict_lbd_fn (*get_predict_fn)(TX_SIZE tx_size);
 typedef ::testing::tuple<TX_SIZE, get_predict_fn> predict_param;
@@ -398,6 +400,7 @@ TEST_P(CFLPredictTest, DISABLED_PredictSpeedTest) {
   assertFaster(ref_elapsed_time, elapsed_time);
 }
 
+#if CONFIG_AV1_HIGHBITDEPTH
 typedef cfl_predict_hbd_fn (*get_predict_fn_hbd)(TX_SIZE tx_size);
 typedef ::testing::tuple<TX_SIZE, get_predict_fn_hbd> predict_param_hbd;
 class CFLPredictHBDTest : public ::testing::TestWithParam<predict_param_hbd>,
@@ -445,6 +448,7 @@ TEST_P(CFLPredictHBDTest, DISABLED_PredictHBDSpeedTest) {
   printSpeed(ref_elapsed_time, elapsed_time, width, height);
   assertFaster(ref_elapsed_time, elapsed_time);
 }
+#endif  // CONFIG_AV1_HIGHBITDEPTH
 
 #if HAVE_SSE2
 const sub_avg_param sub_avg_sizes_sse2[] = { ALL_CFL_TX_SIZES(
@@ -462,30 +466,32 @@ const subsample_lbd_param subsample_lbd_sizes_ssse3[] = {
                              cfl_get_luma_subsampling_444_lbd_ssse3)
 };
 
+const predict_param predict_sizes_ssse3[] = { ALL_CFL_TX_SIZES(
+    cfl_get_predict_lbd_fn_ssse3) };
+
+INSTANTIATE_TEST_CASE_P(SSSE3, CFLSubsampleLBDTest,
+                        ::testing::ValuesIn(subsample_lbd_sizes_ssse3));
+
+INSTANTIATE_TEST_CASE_P(SSSE3, CFLPredictTest,
+                        ::testing::ValuesIn(predict_sizes_ssse3));
+
+#if CONFIG_AV1_HIGHBITDEPTH
 const subsample_hbd_param subsample_hbd_sizes_ssse3[] = {
   ALL_CFL_TX_SIZES_SUBSAMPLE(cfl_get_luma_subsampling_420_hbd_ssse3,
                              cfl_get_luma_subsampling_422_hbd_ssse3,
                              cfl_get_luma_subsampling_444_hbd_ssse3)
 };
 
-const predict_param predict_sizes_ssse3[] = { ALL_CFL_TX_SIZES(
-    cfl_get_predict_lbd_fn_ssse3) };
-
 const predict_param_hbd predict_sizes_hbd_ssse3[] = { ALL_CFL_TX_SIZES(
     cfl_get_predict_hbd_fn_ssse3) };
-
-INSTANTIATE_TEST_CASE_P(SSSE3, CFLSubsampleLBDTest,
-                        ::testing::ValuesIn(subsample_lbd_sizes_ssse3));
 
 INSTANTIATE_TEST_CASE_P(SSSE3, CFLSubsampleHBDTest,
                         ::testing::ValuesIn(subsample_hbd_sizes_ssse3));
 
-INSTANTIATE_TEST_CASE_P(SSSE3, CFLPredictTest,
-                        ::testing::ValuesIn(predict_sizes_ssse3));
-
 INSTANTIATE_TEST_CASE_P(SSSE3, CFLPredictHBDTest,
                         ::testing::ValuesIn(predict_sizes_hbd_ssse3));
-#endif
+#endif  // CONFIG_AV1_HIGHBITDEPTH
+#endif  // HAVE_SSSE3
 
 #if HAVE_AVX2
 const sub_avg_param sub_avg_sizes_avx2[] = { ALL_CFL_TX_SIZES(
@@ -497,17 +503,8 @@ const subsample_lbd_param subsample_lbd_sizes_avx2[] = {
                              cfl_get_luma_subsampling_444_lbd_avx2)
 };
 
-const subsample_hbd_param subsample_hbd_sizes_avx2[] = {
-  ALL_CFL_TX_SIZES_SUBSAMPLE(cfl_get_luma_subsampling_420_hbd_avx2,
-                             cfl_get_luma_subsampling_422_hbd_avx2,
-                             cfl_get_luma_subsampling_444_hbd_avx2)
-};
-
 const predict_param predict_sizes_avx2[] = { ALL_CFL_TX_SIZES(
     cfl_get_predict_lbd_fn_avx2) };
-
-const predict_param_hbd predict_sizes_hbd_avx2[] = { ALL_CFL_TX_SIZES(
-    cfl_get_predict_hbd_fn_avx2) };
 
 INSTANTIATE_TEST_CASE_P(AVX2, CFLSubAvgTest,
                         ::testing::ValuesIn(sub_avg_sizes_avx2));
@@ -515,20 +512,33 @@ INSTANTIATE_TEST_CASE_P(AVX2, CFLSubAvgTest,
 INSTANTIATE_TEST_CASE_P(AVX2, CFLSubsampleLBDTest,
                         ::testing::ValuesIn(subsample_lbd_sizes_avx2));
 
-INSTANTIATE_TEST_CASE_P(AVX2, CFLSubsampleHBDTest,
-                        ::testing::ValuesIn(subsample_hbd_sizes_avx2));
-
 INSTANTIATE_TEST_CASE_P(AVX2, CFLPredictTest,
                         ::testing::ValuesIn(predict_sizes_avx2));
 
+#if CONFIG_AV1_HIGHBITDEPTH
+const subsample_hbd_param subsample_hbd_sizes_avx2[] = {
+  ALL_CFL_TX_SIZES_SUBSAMPLE(cfl_get_luma_subsampling_420_hbd_avx2,
+                             cfl_get_luma_subsampling_422_hbd_avx2,
+                             cfl_get_luma_subsampling_444_hbd_avx2)
+};
+
+const predict_param_hbd predict_sizes_hbd_avx2[] = { ALL_CFL_TX_SIZES(
+    cfl_get_predict_hbd_fn_avx2) };
+
+INSTANTIATE_TEST_CASE_P(AVX2, CFLSubsampleHBDTest,
+                        ::testing::ValuesIn(subsample_hbd_sizes_avx2));
+
 INSTANTIATE_TEST_CASE_P(AVX2, CFLPredictHBDTest,
                         ::testing::ValuesIn(predict_sizes_hbd_avx2));
-#endif
+#endif  // CONFIG_AV1_HIGHBITDEPTH
+#endif  // HAVE_AVX2
 
 #if HAVE_NEON
-
 const sub_avg_param sub_avg_sizes_neon[] = { ALL_CFL_TX_SIZES(
     cfl_get_subtract_average_fn_neon) };
+
+const predict_param predict_sizes_neon[] = { ALL_CFL_TX_SIZES(
+    cfl_get_predict_lbd_fn_neon) };
 
 const subsample_lbd_param subsample_lbd_sizes_neon[] = {
   ALL_CFL_TX_SIZES_SUBSAMPLE(cfl_get_luma_subsampling_420_lbd_neon,
@@ -536,33 +546,32 @@ const subsample_lbd_param subsample_lbd_sizes_neon[] = {
                              cfl_get_luma_subsampling_444_lbd_neon)
 };
 
-const subsample_hbd_param subsample_hbd_sizes_neon[] = {
-  ALL_CFL_TX_SIZES_SUBSAMPLE(cfl_get_luma_subsampling_420_hbd_neon,
-                             cfl_get_luma_subsampling_422_hbd_neon,
-                             cfl_get_luma_subsampling_444_hbd_neon)
-};
-
-const predict_param predict_sizes_neon[] = { ALL_CFL_TX_SIZES(
-    cfl_get_predict_lbd_fn_neon) };
-
-const predict_param_hbd predict_sizes_hbd_neon[] = { ALL_CFL_TX_SIZES(
-    cfl_get_predict_hbd_fn_neon) };
-
 INSTANTIATE_TEST_CASE_P(NEON, CFLSubAvgTest,
                         ::testing::ValuesIn(sub_avg_sizes_neon));
 
 INSTANTIATE_TEST_CASE_P(NEON, CFLSubsampleLBDTest,
                         ::testing::ValuesIn(subsample_lbd_sizes_neon));
 
-INSTANTIATE_TEST_CASE_P(NEON, CFLSubsampleHBDTest,
-                        ::testing::ValuesIn(subsample_hbd_sizes_neon));
-
 INSTANTIATE_TEST_CASE_P(NEON, CFLPredictTest,
                         ::testing::ValuesIn(predict_sizes_neon));
 
+#if CONFIG_AV1_HIGHBITDEPTH
+const subsample_hbd_param subsample_hbd_sizes_neon[] = {
+  ALL_CFL_TX_SIZES_SUBSAMPLE(cfl_get_luma_subsampling_420_hbd_neon,
+                             cfl_get_luma_subsampling_422_hbd_neon,
+                             cfl_get_luma_subsampling_444_hbd_neon)
+};
+
+const predict_param_hbd predict_sizes_hbd_neon[] = { ALL_CFL_TX_SIZES(
+    cfl_get_predict_hbd_fn_neon) };
+
+INSTANTIATE_TEST_CASE_P(NEON, CFLSubsampleHBDTest,
+                        ::testing::ValuesIn(subsample_hbd_sizes_neon));
+
 INSTANTIATE_TEST_CASE_P(NEON, CFLPredictHBDTest,
                         ::testing::ValuesIn(predict_sizes_hbd_neon));
-#endif
+#endif  // CONFIG_AV1_HIGHBITDEPTH
+#endif  // HAVE_NEON
 
 #if HAVE_VSX
 const sub_avg_param sub_avg_sizes_vsx[] = { ALL_CFL_TX_SIZES(

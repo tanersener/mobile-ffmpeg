@@ -53,7 +53,7 @@ extern "C" {
 #endif
 extern FILE * option_usage_fp;
 #define zCopyright      (tpmtool_opt_strs+0)
-#define zLicenseDescrip (tpmtool_opt_strs+282)
+#define zLicenseDescrip (tpmtool_opt_strs+283)
 
 
 #ifndef NULL
@@ -63,13 +63,13 @@ extern FILE * option_usage_fp;
 /**
  *  static const strings for tpmtool options
  */
-static char const tpmtool_opt_strs[2255] =
-/*     0 */ "tpmtool 3.6.8\n"
+static char const tpmtool_opt_strs[2257] =
+/*     0 */ "tpmtool 3.6.10\n"
             "Copyright (C) 2000-2019 Free Software Foundation, and others, all rights reserved.\n"
             "This is free software. It is licensed for use, modification and\n"
             "redistribution under the terms of the GNU General Public License,\n"
             "version 3 or later <http://gnu.org/licenses/gpl.html>\n\0"
-/*   282 */ "tpmtool is free software: you can redistribute it and/or modify it under\n"
+/*   283 */ "tpmtool is free software: you can redistribute it and/or modify it under\n"
             "the terms of the GNU General Public License as published by the Free\n"
             "Software Foundation, either version 3 of the License, or (at your option)\n"
             "any later version.\n\n"
@@ -79,86 +79,86 @@ static char const tpmtool_opt_strs[2255] =
             "details.\n\n"
             "You should have received a copy of the GNU General Public License along\n"
             "with this program.  If not, see <http://www.gnu.org/licenses/>.\n\0"
-/*   885 */ "Enable debugging\0"
-/*   902 */ "DEBUG\0"
-/*   908 */ "debug\0"
-/*   914 */ "Input file\0"
-/*   925 */ "INFILE\0"
-/*   932 */ "infile\0"
-/*   939 */ "Output file\0"
-/*   951 */ "OUTFILE\0"
-/*   959 */ "outfile\0"
-/*   967 */ "Generate an RSA private-public key pair\0"
-/*  1007 */ "GENERATE_RSA\0"
-/*  1020 */ "generate-rsa\0"
-/*  1033 */ "Any generated key will be registered in the TPM\0"
-/*  1081 */ "REGISTER\0"
-/*  1090 */ "register\0"
-/*  1099 */ "Any generated key will be a signing key\0"
-/*  1139 */ "SIGNING\0"
-/*  1147 */ "signing\0"
-/*  1155 */ "Any generated key will be a legacy key\0"
-/*  1194 */ "LEGACY\0"
-/*  1201 */ "legacy\0"
-/*  1208 */ "Any registered key will be a user key\0"
-/*  1246 */ "USER\0"
-/*  1251 */ "user\0"
-/*  1256 */ "Any registered key will be a system key\0"
-/*  1296 */ "SYSTEM\0"
-/*  1303 */ "system\0"
-/*  1310 */ "Prints the public key of the provided key\0"
-/*  1352 */ "PUBKEY\0"
-/*  1359 */ "pubkey\0"
-/*  1366 */ "Lists all stored keys in the TPM\0"
-/*  1399 */ "LIST\0"
-/*  1404 */ "list\0"
-/*  1409 */ "Delete the key identified by the given URL (UUID).\0"
-/*  1460 */ "DELETE\0"
-/*  1467 */ "delete\0"
-/*  1474 */ "Tests the signature operation of the provided object\0"
-/*  1527 */ "TEST_SIGN\0"
-/*  1537 */ "test-sign\0"
-/*  1547 */ "Specify the security level [low, legacy, medium, high, ultra].\0"
-/*  1610 */ "SEC_PARAM\0"
-/*  1620 */ "sec-param\0"
-/*  1630 */ "Specify the number of bits for key generate\0"
-/*  1674 */ "BITS\0"
-/*  1679 */ "bits\0"
-/*  1684 */ "Use the DER format for keys.\0"
-/*  1713 */ "INDER\0"
-/*  1719 */ "no-inder\0"
-/*  1728 */ "no\0"
-/*  1731 */ "Use DER format for output keys\0"
-/*  1762 */ "OUTDER\0"
-/*  1769 */ "no-outder\0"
-/*  1779 */ "SRK has well known password (20 bytes of zeros)\0"
-/*  1827 */ "SRK_WELL_KNOWN\0"
-/*  1842 */ "srk-well-known\0"
-/*  1857 */ "display extended usage information and exit\0"
-/*  1901 */ "help\0"
-/*  1906 */ "extended usage information passed thru pager\0"
-/*  1951 */ "more-help\0"
-/*  1961 */ "output version information and exit\0"
-/*  1997 */ "version\0"
-/*  2005 */ "TPMTOOL\0"
-/*  2013 */ "tpmtool - GnuTLS TPM tool\n"
+/*   886 */ "Enable debugging\0"
+/*   903 */ "DEBUG\0"
+/*   909 */ "debug\0"
+/*   915 */ "Input file\0"
+/*   926 */ "INFILE\0"
+/*   933 */ "infile\0"
+/*   940 */ "Output file\0"
+/*   952 */ "OUTFILE\0"
+/*   960 */ "outfile\0"
+/*   968 */ "Generate an RSA private-public key pair\0"
+/*  1008 */ "GENERATE_RSA\0"
+/*  1021 */ "generate-rsa\0"
+/*  1034 */ "Any generated key will be registered in the TPM\0"
+/*  1082 */ "REGISTER\0"
+/*  1091 */ "register\0"
+/*  1100 */ "Any generated key will be a signing key\0"
+/*  1140 */ "SIGNING\0"
+/*  1148 */ "signing\0"
+/*  1156 */ "Any generated key will be a legacy key\0"
+/*  1195 */ "LEGACY\0"
+/*  1202 */ "legacy\0"
+/*  1209 */ "Any registered key will be a user key\0"
+/*  1247 */ "USER\0"
+/*  1252 */ "user\0"
+/*  1257 */ "Any registered key will be a system key\0"
+/*  1297 */ "SYSTEM\0"
+/*  1304 */ "system\0"
+/*  1311 */ "Prints the public key of the provided key\0"
+/*  1353 */ "PUBKEY\0"
+/*  1360 */ "pubkey\0"
+/*  1367 */ "Lists all stored keys in the TPM\0"
+/*  1400 */ "LIST\0"
+/*  1405 */ "list\0"
+/*  1410 */ "Delete the key identified by the given URL (UUID).\0"
+/*  1461 */ "DELETE\0"
+/*  1468 */ "delete\0"
+/*  1475 */ "Tests the signature operation of the provided object\0"
+/*  1528 */ "TEST_SIGN\0"
+/*  1538 */ "test-sign\0"
+/*  1548 */ "Specify the security level [low, legacy, medium, high, ultra].\0"
+/*  1611 */ "SEC_PARAM\0"
+/*  1621 */ "sec-param\0"
+/*  1631 */ "Specify the number of bits for key generate\0"
+/*  1675 */ "BITS\0"
+/*  1680 */ "bits\0"
+/*  1685 */ "Use the DER format for keys.\0"
+/*  1714 */ "INDER\0"
+/*  1720 */ "no-inder\0"
+/*  1729 */ "no\0"
+/*  1732 */ "Use DER format for output keys\0"
+/*  1763 */ "OUTDER\0"
+/*  1770 */ "no-outder\0"
+/*  1780 */ "SRK has well known password (20 bytes of zeros)\0"
+/*  1828 */ "SRK_WELL_KNOWN\0"
+/*  1843 */ "srk-well-known\0"
+/*  1858 */ "display extended usage information and exit\0"
+/*  1902 */ "help\0"
+/*  1907 */ "extended usage information passed thru pager\0"
+/*  1952 */ "more-help\0"
+/*  1962 */ "output version information and exit\0"
+/*  1998 */ "version\0"
+/*  2006 */ "TPMTOOL\0"
+/*  2014 */ "tpmtool - GnuTLS TPM tool\n"
             "Usage:  %s [ -<flag> [<val>] | --<name>[{=| }<val>] ]...\n\0"
-/*  2097 */ "bugs@gnutls.org\0"
-/*  2113 */ "\n\0"
-/*  2115 */ "Program that allows handling cryptographic data from the TPM chip.\n\0"
-/*  2183 */ "tpmtool 3.6.8\0"
-/*  2197 */ "tpmtool [options]\n"
+/*  2098 */ "bugs@gnutls.org\0"
+/*  2114 */ "\n\0"
+/*  2116 */ "Program that allows handling cryptographic data from the TPM chip.\n\0"
+/*  2184 */ "tpmtool 3.6.10\0"
+/*  2199 */ "tpmtool [options]\n"
             "tpmtool --help for usage instructions.\n";
 
 /**
  *  debug option description:
  */
 /** Descriptive text for the debug option */
-#define DEBUG_DESC      (tpmtool_opt_strs+885)
+#define DEBUG_DESC      (tpmtool_opt_strs+886)
 /** Upper-cased name for the debug option */
-#define DEBUG_NAME      (tpmtool_opt_strs+902)
+#define DEBUG_NAME      (tpmtool_opt_strs+903)
 /** Name string for the debug option */
-#define DEBUG_name      (tpmtool_opt_strs+908)
+#define DEBUG_name      (tpmtool_opt_strs+909)
 /** Compiled in flag settings for the debug option */
 #define DEBUG_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_NUMERIC))
@@ -167,11 +167,11 @@ static char const tpmtool_opt_strs[2255] =
  *  infile option description:
  */
 /** Descriptive text for the infile option */
-#define INFILE_DESC      (tpmtool_opt_strs+914)
+#define INFILE_DESC      (tpmtool_opt_strs+915)
 /** Upper-cased name for the infile option */
-#define INFILE_NAME      (tpmtool_opt_strs+925)
+#define INFILE_NAME      (tpmtool_opt_strs+926)
 /** Name string for the infile option */
-#define INFILE_name      (tpmtool_opt_strs+932)
+#define INFILE_name      (tpmtool_opt_strs+933)
 /** Compiled in flag settings for the infile option */
 #define INFILE_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_FILE))
@@ -180,11 +180,11 @@ static char const tpmtool_opt_strs[2255] =
  *  outfile option description:
  */
 /** Descriptive text for the outfile option */
-#define OUTFILE_DESC      (tpmtool_opt_strs+939)
+#define OUTFILE_DESC      (tpmtool_opt_strs+940)
 /** Upper-cased name for the outfile option */
-#define OUTFILE_NAME      (tpmtool_opt_strs+951)
+#define OUTFILE_NAME      (tpmtool_opt_strs+952)
 /** Name string for the outfile option */
-#define OUTFILE_name      (tpmtool_opt_strs+959)
+#define OUTFILE_name      (tpmtool_opt_strs+960)
 /** Compiled in flag settings for the outfile option */
 #define OUTFILE_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -193,11 +193,11 @@ static char const tpmtool_opt_strs[2255] =
  *  generate-rsa option description:
  */
 /** Descriptive text for the generate-rsa option */
-#define GENERATE_RSA_DESC      (tpmtool_opt_strs+967)
+#define GENERATE_RSA_DESC      (tpmtool_opt_strs+968)
 /** Upper-cased name for the generate-rsa option */
-#define GENERATE_RSA_NAME      (tpmtool_opt_strs+1007)
+#define GENERATE_RSA_NAME      (tpmtool_opt_strs+1008)
 /** Name string for the generate-rsa option */
-#define GENERATE_RSA_name      (tpmtool_opt_strs+1020)
+#define GENERATE_RSA_name      (tpmtool_opt_strs+1021)
 /** Compiled in flag settings for the generate-rsa option */
 #define GENERATE_RSA_FLAGS     (OPTST_DISABLED)
 
@@ -206,11 +206,11 @@ static char const tpmtool_opt_strs[2255] =
  *  "Must also have options" and "Incompatible options":
  */
 /** Descriptive text for the register option */
-#define REGISTER_DESC      (tpmtool_opt_strs+1033)
+#define REGISTER_DESC      (tpmtool_opt_strs+1034)
 /** Upper-cased name for the register option */
-#define REGISTER_NAME      (tpmtool_opt_strs+1081)
+#define REGISTER_NAME      (tpmtool_opt_strs+1082)
 /** Name string for the register option */
-#define REGISTER_name      (tpmtool_opt_strs+1090)
+#define REGISTER_name      (tpmtool_opt_strs+1091)
 /** Other options that are required by the register option */
 static int const aRegisterMustList[] = {
     INDEX_OPT_GENERATE_RSA, NO_EQUIVALENT };
@@ -222,11 +222,11 @@ static int const aRegisterMustList[] = {
  *  "Must also have options" and "Incompatible options":
  */
 /** Descriptive text for the signing option */
-#define SIGNING_DESC      (tpmtool_opt_strs+1099)
+#define SIGNING_DESC      (tpmtool_opt_strs+1100)
 /** Upper-cased name for the signing option */
-#define SIGNING_NAME      (tpmtool_opt_strs+1139)
+#define SIGNING_NAME      (tpmtool_opt_strs+1140)
 /** Name string for the signing option */
-#define SIGNING_name      (tpmtool_opt_strs+1147)
+#define SIGNING_name      (tpmtool_opt_strs+1148)
 /** Other options that are required by the signing option */
 static int const aSigningMustList[] = {
     INDEX_OPT_GENERATE_RSA, NO_EQUIVALENT };
@@ -241,11 +241,11 @@ static int const aSigningCantList[] = {
  *  "Must also have options" and "Incompatible options":
  */
 /** Descriptive text for the legacy option */
-#define LEGACY_DESC      (tpmtool_opt_strs+1155)
+#define LEGACY_DESC      (tpmtool_opt_strs+1156)
 /** Upper-cased name for the legacy option */
-#define LEGACY_NAME      (tpmtool_opt_strs+1194)
+#define LEGACY_NAME      (tpmtool_opt_strs+1195)
 /** Name string for the legacy option */
-#define LEGACY_name      (tpmtool_opt_strs+1201)
+#define LEGACY_name      (tpmtool_opt_strs+1202)
 /** Other options that are required by the legacy option */
 static int const aLegacyMustList[] = {
     INDEX_OPT_GENERATE_RSA, NO_EQUIVALENT };
@@ -260,11 +260,11 @@ static int const aLegacyCantList[] = {
  *  "Must also have options" and "Incompatible options":
  */
 /** Descriptive text for the user option */
-#define USER_DESC      (tpmtool_opt_strs+1208)
+#define USER_DESC      (tpmtool_opt_strs+1209)
 /** Upper-cased name for the user option */
-#define USER_NAME      (tpmtool_opt_strs+1246)
+#define USER_NAME      (tpmtool_opt_strs+1247)
 /** Name string for the user option */
-#define USER_name      (tpmtool_opt_strs+1251)
+#define USER_name      (tpmtool_opt_strs+1252)
 /** Other options that are required by the user option */
 static int const aUserMustList[] = {
     INDEX_OPT_REGISTER, NO_EQUIVALENT };
@@ -279,11 +279,11 @@ static int const aUserCantList[] = {
  *  "Must also have options" and "Incompatible options":
  */
 /** Descriptive text for the system option */
-#define SYSTEM_DESC      (tpmtool_opt_strs+1256)
+#define SYSTEM_DESC      (tpmtool_opt_strs+1257)
 /** Upper-cased name for the system option */
-#define SYSTEM_NAME      (tpmtool_opt_strs+1296)
+#define SYSTEM_NAME      (tpmtool_opt_strs+1297)
 /** Name string for the system option */
-#define SYSTEM_name      (tpmtool_opt_strs+1303)
+#define SYSTEM_name      (tpmtool_opt_strs+1304)
 /** Other options that are required by the system option */
 static int const aSystemMustList[] = {
     INDEX_OPT_REGISTER, NO_EQUIVALENT };
@@ -297,11 +297,11 @@ static int const aSystemCantList[] = {
  *  pubkey option description:
  */
 /** Descriptive text for the pubkey option */
-#define PUBKEY_DESC      (tpmtool_opt_strs+1310)
+#define PUBKEY_DESC      (tpmtool_opt_strs+1311)
 /** Upper-cased name for the pubkey option */
-#define PUBKEY_NAME      (tpmtool_opt_strs+1352)
+#define PUBKEY_NAME      (tpmtool_opt_strs+1353)
 /** Name string for the pubkey option */
-#define PUBKEY_name      (tpmtool_opt_strs+1359)
+#define PUBKEY_name      (tpmtool_opt_strs+1360)
 /** Compiled in flag settings for the pubkey option */
 #define PUBKEY_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -310,11 +310,11 @@ static int const aSystemCantList[] = {
  *  list option description:
  */
 /** Descriptive text for the list option */
-#define LIST_DESC      (tpmtool_opt_strs+1366)
+#define LIST_DESC      (tpmtool_opt_strs+1367)
 /** Upper-cased name for the list option */
-#define LIST_NAME      (tpmtool_opt_strs+1399)
+#define LIST_NAME      (tpmtool_opt_strs+1400)
 /** Name string for the list option */
-#define LIST_name      (tpmtool_opt_strs+1404)
+#define LIST_name      (tpmtool_opt_strs+1405)
 /** Compiled in flag settings for the list option */
 #define LIST_FLAGS     (OPTST_DISABLED)
 
@@ -322,11 +322,11 @@ static int const aSystemCantList[] = {
  *  delete option description:
  */
 /** Descriptive text for the delete option */
-#define DELETE_DESC      (tpmtool_opt_strs+1409)
+#define DELETE_DESC      (tpmtool_opt_strs+1410)
 /** Upper-cased name for the delete option */
-#define DELETE_NAME      (tpmtool_opt_strs+1460)
+#define DELETE_NAME      (tpmtool_opt_strs+1461)
 /** Name string for the delete option */
-#define DELETE_name      (tpmtool_opt_strs+1467)
+#define DELETE_name      (tpmtool_opt_strs+1468)
 /** Compiled in flag settings for the delete option */
 #define DELETE_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -335,11 +335,11 @@ static int const aSystemCantList[] = {
  *  test-sign option description:
  */
 /** Descriptive text for the test-sign option */
-#define TEST_SIGN_DESC      (tpmtool_opt_strs+1474)
+#define TEST_SIGN_DESC      (tpmtool_opt_strs+1475)
 /** Upper-cased name for the test-sign option */
-#define TEST_SIGN_NAME      (tpmtool_opt_strs+1527)
+#define TEST_SIGN_NAME      (tpmtool_opt_strs+1528)
 /** Name string for the test-sign option */
-#define TEST_SIGN_name      (tpmtool_opt_strs+1537)
+#define TEST_SIGN_name      (tpmtool_opt_strs+1538)
 /** Compiled in flag settings for the test-sign option */
 #define TEST_SIGN_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -348,11 +348,11 @@ static int const aSystemCantList[] = {
  *  sec-param option description:
  */
 /** Descriptive text for the sec-param option */
-#define SEC_PARAM_DESC      (tpmtool_opt_strs+1547)
+#define SEC_PARAM_DESC      (tpmtool_opt_strs+1548)
 /** Upper-cased name for the sec-param option */
-#define SEC_PARAM_NAME      (tpmtool_opt_strs+1610)
+#define SEC_PARAM_NAME      (tpmtool_opt_strs+1611)
 /** Name string for the sec-param option */
-#define SEC_PARAM_name      (tpmtool_opt_strs+1620)
+#define SEC_PARAM_name      (tpmtool_opt_strs+1621)
 /** Compiled in flag settings for the sec-param option */
 #define SEC_PARAM_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -361,11 +361,11 @@ static int const aSystemCantList[] = {
  *  bits option description:
  */
 /** Descriptive text for the bits option */
-#define BITS_DESC      (tpmtool_opt_strs+1630)
+#define BITS_DESC      (tpmtool_opt_strs+1631)
 /** Upper-cased name for the bits option */
-#define BITS_NAME      (tpmtool_opt_strs+1674)
+#define BITS_NAME      (tpmtool_opt_strs+1675)
 /** Name string for the bits option */
-#define BITS_name      (tpmtool_opt_strs+1679)
+#define BITS_name      (tpmtool_opt_strs+1680)
 /** Compiled in flag settings for the bits option */
 #define BITS_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_NUMERIC))
@@ -374,13 +374,13 @@ static int const aSystemCantList[] = {
  *  inder option description:
  */
 /** Descriptive text for the inder option */
-#define INDER_DESC      (tpmtool_opt_strs+1684)
+#define INDER_DESC      (tpmtool_opt_strs+1685)
 /** Upper-cased name for the inder option */
-#define INDER_NAME      (tpmtool_opt_strs+1713)
+#define INDER_NAME      (tpmtool_opt_strs+1714)
 /** disablement name for the inder option */
-#define NOT_INDER_name  (tpmtool_opt_strs+1719)
+#define NOT_INDER_name  (tpmtool_opt_strs+1720)
 /** disablement prefix for the inder option */
-#define NOT_INDER_PFX   (tpmtool_opt_strs+1728)
+#define NOT_INDER_PFX   (tpmtool_opt_strs+1729)
 /** Name string for the inder option */
 #define INDER_name      (NOT_INDER_name + 3)
 /** Compiled in flag settings for the inder option */
@@ -390,13 +390,13 @@ static int const aSystemCantList[] = {
  *  outder option description:
  */
 /** Descriptive text for the outder option */
-#define OUTDER_DESC      (tpmtool_opt_strs+1731)
+#define OUTDER_DESC      (tpmtool_opt_strs+1732)
 /** Upper-cased name for the outder option */
-#define OUTDER_NAME      (tpmtool_opt_strs+1762)
+#define OUTDER_NAME      (tpmtool_opt_strs+1763)
 /** disablement name for the outder option */
-#define NOT_OUTDER_name  (tpmtool_opt_strs+1769)
+#define NOT_OUTDER_name  (tpmtool_opt_strs+1770)
 /** disablement prefix for the outder option */
-#define NOT_OUTDER_PFX   (tpmtool_opt_strs+1728)
+#define NOT_OUTDER_PFX   (tpmtool_opt_strs+1729)
 /** Name string for the outder option */
 #define OUTDER_name      (NOT_OUTDER_name + 3)
 /** Compiled in flag settings for the outder option */
@@ -406,22 +406,22 @@ static int const aSystemCantList[] = {
  *  srk-well-known option description:
  */
 /** Descriptive text for the srk-well-known option */
-#define SRK_WELL_KNOWN_DESC      (tpmtool_opt_strs+1779)
+#define SRK_WELL_KNOWN_DESC      (tpmtool_opt_strs+1780)
 /** Upper-cased name for the srk-well-known option */
-#define SRK_WELL_KNOWN_NAME      (tpmtool_opt_strs+1827)
+#define SRK_WELL_KNOWN_NAME      (tpmtool_opt_strs+1828)
 /** Name string for the srk-well-known option */
-#define SRK_WELL_KNOWN_name      (tpmtool_opt_strs+1842)
+#define SRK_WELL_KNOWN_name      (tpmtool_opt_strs+1843)
 /** Compiled in flag settings for the srk-well-known option */
 #define SRK_WELL_KNOWN_FLAGS     (OPTST_DISABLED)
 
 /*
  *  Help/More_Help/Version option descriptions:
  */
-#define HELP_DESC       (tpmtool_opt_strs+1857)
-#define HELP_name       (tpmtool_opt_strs+1901)
+#define HELP_DESC       (tpmtool_opt_strs+1858)
+#define HELP_name       (tpmtool_opt_strs+1902)
 #ifdef HAVE_WORKING_FORK
-#define MORE_HELP_DESC  (tpmtool_opt_strs+1906)
-#define MORE_HELP_name  (tpmtool_opt_strs+1951)
+#define MORE_HELP_DESC  (tpmtool_opt_strs+1907)
+#define MORE_HELP_name  (tpmtool_opt_strs+1952)
 #define MORE_HELP_FLAGS (OPTST_IMM | OPTST_NO_INIT)
 #else
 #define MORE_HELP_DESC  HELP_DESC
@@ -434,8 +434,8 @@ static int const aSystemCantList[] = {
 #  define VER_FLAGS     (OPTST_SET_ARGTYPE(OPARG_TYPE_STRING) | \
                          OPTST_ARG_OPTIONAL | OPTST_IMM | OPTST_NO_INIT)
 #endif
-#define VER_DESC        (tpmtool_opt_strs+1961)
-#define VER_name        (tpmtool_opt_strs+1997)
+#define VER_DESC        (tpmtool_opt_strs+1962)
+#define VER_name        (tpmtool_opt_strs+1998)
 /**
  *  Declare option callback procedures
  */
@@ -713,21 +713,21 @@ static tOptDesc optDesc[OPTION_CT] = {
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 /** Reference to the upper cased version of tpmtool. */
-#define zPROGNAME       (tpmtool_opt_strs+2005)
+#define zPROGNAME       (tpmtool_opt_strs+2006)
 /** Reference to the title line for tpmtool usage. */
-#define zUsageTitle     (tpmtool_opt_strs+2013)
+#define zUsageTitle     (tpmtool_opt_strs+2014)
 /** There is no tpmtool configuration file. */
 #define zRcName         NULL
 /** There are no directories to search for tpmtool config files. */
 #define apzHomeList     NULL
 /** The tpmtool program bug email address. */
-#define zBugsAddr       (tpmtool_opt_strs+2097)
+#define zBugsAddr       (tpmtool_opt_strs+2098)
 /** Clarification/explanation of what tpmtool does. */
-#define zExplain        (tpmtool_opt_strs+2113)
+#define zExplain        (tpmtool_opt_strs+2114)
 /** Extra detail explaining what tpmtool does. */
-#define zDetail         (tpmtool_opt_strs+2115)
+#define zDetail         (tpmtool_opt_strs+2116)
 /** The full version string for tpmtool. */
-#define zFullVersion    (tpmtool_opt_strs+2183)
+#define zFullVersion    (tpmtool_opt_strs+2184)
 /* extracted from optcode.tlib near line 364 */
 
 #if defined(ENABLE_NLS)
@@ -739,7 +739,7 @@ static tOptDesc optDesc[OPTION_CT] = {
 #endif /* ENABLE_NLS */
 
 #define tpmtool_full_usage (NULL)
-#define tpmtool_short_usage (tpmtool_opt_strs+2197)
+#define tpmtool_short_usage (tpmtool_opt_strs+2199)
 
 #endif /* not defined __doxygen__ */
 
@@ -1023,7 +1023,7 @@ static void bogus_function(void) {
      translate option names.
    */
   /* referenced via tpmtoolOptions.pzCopyright */
-  puts(_("tpmtool 3.6.8\n\
+  puts(_("tpmtool 3.6.10\n\
 Copyright (C) 2000-2019 Free Software Foundation, and others, all rights reserved.\n\
 This is free software. It is licensed for use, modification and\n\
 redistribution under the terms of the GNU General Public License,\n\
@@ -1115,7 +1115,7 @@ Usage:  %s [ -<flag> [<val>] | --<name>[{=| }<val>] ]...\n"));
   puts(_("Program that allows handling cryptographic data from the TPM chip.\n"));
 
   /* referenced via tpmtoolOptions.pzFullVersion */
-  puts(_("tpmtool 3.6.8"));
+  puts(_("tpmtool 3.6.10"));
 
   /* referenced via tpmtoolOptions.pzFullUsage */
   puts(_("<<<NOT-FOUND>>>"));

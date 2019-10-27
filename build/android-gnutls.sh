@@ -46,6 +46,16 @@ export GMP_LIBS="-L${BASEDIR}/prebuilt/android-$(get_target_build)/gmp/lib -lgmp
 
 cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
+HARDWARE_OPTIONS=""
+case ${ARCH} in
+    x86)
+        HARDWARE_OPTIONS="--disable-hardware-acceleration"
+    ;;
+    *)
+        HARDWARE_OPTIONS="--enable-hardware-acceleration"
+    ;;
+esac
+
 make distclean 2>/dev/null 1>/dev/null
 
 # RECONFIGURING IF REQUESTED
@@ -61,7 +71,7 @@ fi
     --with-included-unistring \
     --without-idn \
     --without-p11-kit \
-    --enable-hardware-acceleration \
+    ${HARDWARE_OPTIONS} \
     --enable-static \
     --disable-openssl-compatibility \
     --disable-shared \
@@ -78,6 +88,6 @@ fi
 make -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_gnutls_package_config "3.6.8"
+create_gnutls_package_config "3.6.10"
 
 make install || exit 1

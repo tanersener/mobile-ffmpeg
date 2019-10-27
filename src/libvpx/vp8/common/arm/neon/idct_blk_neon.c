@@ -57,7 +57,6 @@ static void idct_dequant_0_2x_neon(int16_t *q, int16_t dq, unsigned char *dst,
     dst0 += stride;
     vst1_lane_s32((int32_t *)dst0, d4s32, 1);
   }
-  return;
 }
 
 static const int16_t cospi8sqrt2minus1 = 20091;
@@ -228,7 +227,6 @@ static void idct_dequant_full_2x_neon(int16_t *q, int16_t *dq,
   dst1 += stride;
   vst1_lane_s32((int32_t *)dst0, d31, 0);
   vst1_lane_s32((int32_t *)dst1, d31, 1);
-  return;
 }
 
 void vp8_dequant_idct_add_y_block_neon(short *q, short *dq, unsigned char *dst,

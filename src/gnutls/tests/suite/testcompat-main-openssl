@@ -481,6 +481,43 @@ run_client_suite() {
 		kill ${PID}
 		wait
 	fi
+
+	eval "${GETPORT}"
+	launch_bare_server $$ s_server -cipher ALL -quiet -accept "${PORT}" -keyform pem -certform pem -dtls1_2 -timeout ${OPENSSL_DH_PARAMS_OPT} -key "${RSA_KEY}" -cert "${RSA_CERT}" ${DSA_PARAMS} -Verify 1 -CAfile "${CA_CERT}" >/dev/null
+	PID=$!
+	wait_udp_server ${PID}
+
+	echo "${PREFIX}Checking DTLS 1.2 with AES-CBC..."
+	${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+AES-128-CBC:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-DTLS1.2:+RSA${ADD}" --udp --insecure --x509certfile "${CLI_CERT}" --x509keyfile "${CLI_KEY}" </dev/null >/dev/null || \
+		fail ${PID} "Failed"
+
+	kill ${PID}
+	wait
+
+	eval "${GETPORT}"
+	launch_bare_server $$ s_server -cipher ALL -quiet -accept "${PORT}" -keyform pem -certform pem -dtls1_2 -timeout ${OPENSSL_DH_PARAMS_OPT} -key "${RSA_KEY}" -cert "${RSA_CERT}" ${DSA_PARAMS} -Verify 1 -CAfile "${CA_CERT}" >/dev/null
+	PID=$!
+	wait_udp_server ${PID}
+
+	# Test DTLS 1.2 with RSA ciphersuite
+	echo "${PREFIX}Checking DTLS 1.2 with RSA..."
+	${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-DTLS1.2:+RSA${ADD}" --udp --insecure --x509certfile "${CLI_CERT}" --x509keyfile "${CLI_KEY}" </dev/null >/dev/null || \
+		fail ${PID} "Failed"
+
+	kill ${PID}
+	wait
+
+	eval "${GETPORT}"
+	launch_bare_server $$ s_server -cipher ALL -quiet -accept "${PORT}" -keyform pem -certform pem -dtls1_2 -timeout ${OPENSSL_DH_PARAMS_OPT} -key "${RSA_KEY}" -cert "${RSA_CERT}" ${DSA_PARAMS} -Verify 1 -CAfile "${CA_CERT}" >/dev/null
+	PID=$!
+	wait_udp_server ${PID}
+
+	echo "${PREFIX}Checking DTLS 1.2 with ECDHE-RSA..."
+	${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+GROUP-ALL:+MAC-ALL:+VERS-DTLS1.2:+ECDHE-RSA${ADD}" --udp --insecure --x509certfile "${CLI_CERT}" --x509keyfile "${CLI_KEY}" </dev/null >/dev/null || \
+		fail ${PID} "Failed"
+
+	kill ${PID}
+	wait
 }
 
 WAITPID=""
@@ -838,7 +875,6 @@ run_server_suite() {
 	PID=$!
 	wait_udp_server ${PID}
 
-
 	${OPENSSL_CLI} s_client -host localhost -port "${PORT}" -dtls1 -cert "${CLI_CERT}" -key "${CLI_KEY}" -CAfile "${CA_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
 		fail ${PID} "Failed"
 
@@ -859,7 +895,6 @@ run_server_suite() {
 	kill ${PID}
 	wait
 
-
 	if test "${NO_DSS}" = 0; then
 		echo "${PREFIX}Check DTLS 1.0 with DHE-DSS ciphersuite"
 		eval "${GETPORT}"
@@ -874,6 +909,58 @@ run_server_suite() {
 		kill ${PID}
 		wait
 	fi
+
+	echo "${PREFIX}Check DTLS 1.2 with AES-CBC"
+	eval "${GETPORT}"
+	launch_server $$ --priority "NONE:+AES-128-CBC:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-DTLS1.2:+RSA${ADD}" --udp --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" --dhparams "${DH_PARAMS}"
+	PID=$!
+	wait_udp_server ${PID}
+
+	${OPENSSL_CLI} s_client -host localhost -port "${PORT}" -dtls1_2 -cert "${CLI_CERT}" -key "${CLI_KEY}" -CAfile "${CA_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
+		fail ${PID} "Failed"
+
+	kill ${PID}
+	wait
+
+	echo "${PREFIX}Check DTLS 1.2 with RSA ciphersuite"
+	eval "${GETPORT}"
+	launch_server $$ --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-DTLS1.2:+RSA${ADD}" --udp --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" --dhparams "${DH_PARAMS}"
+	PID=$!
+	wait_udp_server ${PID}
+
+	${OPENSSL_CLI} s_client -host localhost -port "${PORT}" -dtls1_2 -cert "${CLI_CERT}" -key "${CLI_KEY}" -CAfile "${CA_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
+		fail ${PID} "Failed"
+
+	kill ${PID}
+	wait
+
+
+	echo "${PREFIX}Check DTLS 1.2 with DHE-RSA ciphersuite"
+	eval "${GETPORT}"
+	launch_server $$ --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-DTLS1.2:+DHE-RSA${ADD}" --udp --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" --dhparams "${DH_PARAMS}"
+	PID=$!
+	wait_udp_server ${PID}
+
+
+	${OPENSSL_CLI} s_client -cipher DHE -host localhost -port "${PORT}" -dtls1_2 -cert "${CLI_CERT}" -key "${CLI_KEY}" -CAfile "${CA_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
+		fail ${PID} "Failed"
+
+	kill ${PID}
+	wait
+
+	echo "${PREFIX}Check DTLS 1.2 with ECDHE-RSA"
+	eval "${GETPORT}"
+	launch_server $$ --priority "NONE:+GROUP-ALL:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-DTLS1.2:+ECDHE-RSA${ADD}" --udp --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}"
+	PID=$!
+	wait_udp_server ${PID}
+
+
+	${OPENSSL_CLI} s_client -cipher ECDHE -host localhost -port "${PORT}" -dtls1_2 -cert "${CLI_CERT}" -key "${CLI_KEY}" -CAfile "${CA_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
+		fail ${PID} "Failed"
+
+	kill ${PID}
+	wait
+
 }
 
 WAITPID=""

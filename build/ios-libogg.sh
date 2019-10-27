@@ -46,6 +46,9 @@ if [[ ${RECONF_libogg} -eq 1 ]]; then
     autoreconf_library ${LIB_NAME}
 fi
 
+# FIX INCLUDE PATHS
+${SED_INLINE} 's/sys\/types/stdint/g' ${BASEDIR}/src/libogg/include/ogg/os_types.h
+
 ./configure \
     --prefix=${BASEDIR}/prebuilt/$(get_target_build_directory)/${LIB_NAME} \
     --with-pic \

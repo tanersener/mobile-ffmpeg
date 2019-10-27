@@ -151,10 +151,8 @@ typedef enum {
   // Use non-fixed partitions based on source variance.
   SOURCE_VAR_BASED_PARTITION,
 
-#if CONFIG_ML_VAR_PARTITION
   // Make partition decisions with machine learning models.
   ML_BASED_PARTITION
-#endif  // CONFIG_ML_VAR_PARTITION
 } PARTITION_SEARCH_TYPE;
 
 typedef enum {
@@ -351,12 +349,6 @@ typedef struct SPEED_FEATURES {
   // Prune reference frames for rectangular partitions.
   int prune_ref_frame_for_rect_partitions;
 
-  // Threshold values used for ML based rectangular partition search pruning.
-  // If < 0, the feature is turned off.
-  // Higher values mean more aggressiveness to skip rectangular partition
-  // search that results in better encoding speed but worse coding performance.
-  int ml_prune_rect_partition_threhold[4];
-
   // Sets min and max partition sizes for this 64x64 region based on the
   // same 64x64 in last encoded frame, and the left and above neighbor.
   AUTO_MIN_MAX_MODE auto_min_max_partition_size;
@@ -511,18 +503,27 @@ typedef struct SPEED_FEATURES {
   // Partition search early breakout thresholds.
   PARTITION_SEARCH_BREAKOUT_THR partition_search_breakout_thr;
 
-  // Use ML-based partition search early breakout.
-  int use_ml_partition_search_breakout;
-  // Higher values mean more aggressiveness for partition search breakout that
-  // results in better encoding  speed but worse compression performance.
-  float ml_partition_search_breakout_thresh[3];
+  struct {
+    // Use ML-based partition search early breakout.
+    int search_breakout;
+    // Higher values mean more aggressiveness for partition search breakout that
+    // results in better encoding  speed but worse compression performance.
+    float search_breakout_thresh[3];
 
-  // Machine-learning based partition search early termination
-  int ml_partition_search_early_termination;
+    // Machine-learning based partition search early termination
+    int search_early_termination;
 
-  // Machine-learning based partition search pruning using prediction residue
-  // variance.
-  int ml_var_partition_pruning;
+    // Machine-learning based partition search pruning using prediction residue
+    // variance.
+    int var_pruning;
+
+    // Threshold values used for ML based rectangular partition search pruning.
+    // If < 0, the feature is turned off.
+    // Higher values mean more aggressiveness to skip rectangular partition
+    // search that results in better encoding speed but worse coding
+    // performance.
+    int prune_rect_thresh[4];
+  } rd_ml_partition;
 
   // Allow skipping partition search for still image frame
   int allow_partition_search_skip;
@@ -595,12 +596,26 @@ typedef struct SPEED_FEATURES {
   // Allow sub-pixel search to use interpolation filters with different taps in
   // order to achieve accurate motion search result.
   SUBPEL_SEARCH_TYPE use_accurate_subpel_search;
+
+  // Search method used by temporal filtering in full_pixel_motion_search.
+  SEARCH_METHODS temporal_filter_search_method;
+
+  // Use machine learning based partition search.
+  int nonrd_use_ml_partition;
+
+  // Multiplier for base thresold for variance partitioning.
+  int variance_part_thresh_mult;
+
+  // Force subpel motion filter to always use SMOOTH_FILTER.
+  int force_smooth_interpol;
 } SPEED_FEATURES;
 
 struct VP9_COMP;
 
-void vp9_set_speed_features_framesize_independent(struct VP9_COMP *cpi);
-void vp9_set_speed_features_framesize_dependent(struct VP9_COMP *cpi);
+void vp9_set_speed_features_framesize_independent(struct VP9_COMP *cpi,
+                                                  int speed);
+void vp9_set_speed_features_framesize_dependent(struct VP9_COMP *cpi,
+                                                int speed);
 
 #ifdef __cplusplus
 }  // extern "C"

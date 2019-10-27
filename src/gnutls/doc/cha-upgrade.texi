@@ -241,7 +241,9 @@ TLS 1.3 is done via session tickets, c.f. @funcref{gnutls_session_ticket_enable_
 @item @funcref{gnutls_session_get_data2}, @funcref{gnutls_session_get_data}
 @tab These functions may introduce a slight delay under TLS 1.3 for few
 milliseconds. Check output of @funcref{gnutls_session_get_flags} for GNUTLS_SFLAGS_SESSION_TICKET
-before calling this function to avoid delays.
+before calling this function to avoid delays. To work efficiently under
+TLS 1.3 this function requires the application setting
+@funcref{gnutls_transport_set_pull_timeout_function}.
 
 @item SRP and RSA-PSK key exchanges are not supported under TLS 1.3
 @tab SRP and RSA-PSK key exchanges are not supported in TLS 1.3, so when these key exchanges are present in a priority string, TLS 1.3 is disabled.

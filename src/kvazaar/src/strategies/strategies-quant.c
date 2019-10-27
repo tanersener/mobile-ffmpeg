@@ -30,6 +30,7 @@ quant_func *kvz_quant;
 quant_residual_func *kvz_quantize_residual;
 dequant_func *kvz_dequant;
 coeff_abs_sum_func *kvz_coeff_abs_sum;
+fast_coeff_cost_func *kvz_fast_coeff_cost;
 
 
 int kvz_strategy_register_quant(void* opaque, uint8_t bitdepth) {

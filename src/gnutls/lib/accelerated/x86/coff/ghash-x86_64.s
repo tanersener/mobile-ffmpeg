@@ -1,4 +1,4 @@
-# Copyright (c) 2011-2013, Andy Polyakov <appro@openssl.org>
+# Copyright (c) 2011-2016, Andy Polyakov <appro@openssl.org>
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -51,9 +51,21 @@ gcm_gmult_4bit:
 	movq	%rcx,%rdi
 	movq	%rdx,%rsi
 
+
 	pushq	%rbx
+
 	pushq	%rbp
+
 	pushq	%r12
+
+	pushq	%r13
+
+	pushq	%r14
+
+	pushq	%r15
+
+	subq	$280,%rsp
+
 .Lgmult_prologue:
 
 	movzbq	15(%rdi),%r8
@@ -130,12 +142,17 @@ gcm_gmult_4bit:
 	movq	%r8,8(%rdi)
 	movq	%r9,(%rdi)
 
-	movq	16(%rsp),%rbx
-	leaq	24(%rsp),%rsp
+	leaq	280+48(%rsp),%rsi
+
+	movq	-8(%rsi),%rbx
+
+	leaq	(%rsi),%rsp
+
 .Lgmult_epilogue:
 	movq	8(%rsp),%rdi
 	movq	16(%rsp),%rsi
 	.byte	0xf3,0xc3
+
 .LSEH_end_gcm_gmult_4bit:
 .globl	gcm_ghash_4bit
 .def	gcm_ghash_4bit;	.scl 2;	.type 32;	.endef
@@ -150,13 +167,21 @@ gcm_ghash_4bit:
 	movq	%r8,%rdx
 	movq	%r9,%rcx
 
+
 	pushq	%rbx
+
 	pushq	%rbp
+
 	pushq	%r12
+
 	pushq	%r13
+
 	pushq	%r14
+
 	pushq	%r15
+
 	subq	$280,%rsp
+
 .Lghash_prologue:
 	movq	%rdx,%r14
 	movq	%rcx,%r15
@@ -701,23 +726,33 @@ gcm_ghash_4bit:
 	movq	%r8,8(%rdi)
 	movq	%r9,(%rdi)
 
-	leaq	280(%rsp),%rsi
-	movq	0(%rsi),%r15
-	movq	8(%rsi),%r14
-	movq	16(%rsi),%r13
-	movq	24(%rsi),%r12
-	movq	32(%rsi),%rbp
-	movq	40(%rsi),%rbx
-	leaq	48(%rsi),%rsp
+	leaq	280+48(%rsp),%rsi
+
+	movq	-48(%rsi),%r15
+
+	movq	-40(%rsi),%r14
+
+	movq	-32(%rsi),%r13
+
+	movq	-24(%rsi),%r12
+
+	movq	-16(%rsi),%rbp
+
+	movq	-8(%rsi),%rbx
+
+	leaq	0(%rsi),%rsp
+
 .Lghash_epilogue:
 	movq	8(%rsp),%rdi
 	movq	16(%rsp),%rsi
 	.byte	0xf3,0xc3
+
 .LSEH_end_gcm_ghash_4bit:
 .globl	gcm_init_clmul
 .def	gcm_init_clmul;	.scl 2;	.type 32;	.endef
 .p2align	4
 gcm_init_clmul:
+
 .L_init_clmul:
 .LSEH_begin_gcm_init_clmul:
 
@@ -877,10 +912,12 @@ gcm_init_clmul:
 .LSEH_end_gcm_init_clmul:
 	.byte	0xf3,0xc3
 
+
 .globl	gcm_gmult_clmul
 .def	gcm_gmult_clmul;	.scl 2;	.type 32;	.endef
 .p2align	4
 gcm_gmult_clmul:
+
 .L_gmult_clmul:
 	movdqu	(%rcx),%xmm0
 	movdqa	.Lbswap_mask(%rip),%xmm5
@@ -928,10 +965,12 @@ gcm_gmult_clmul:
 	movdqu	%xmm0,(%rcx)
 	.byte	0xf3,0xc3
 
+
 .globl	gcm_ghash_clmul
 .def	gcm_ghash_clmul;	.scl 2;	.type 32;	.endef
 .p2align	5
 gcm_ghash_clmul:
+
 .L_ghash_clmul:
 	leaq	-136(%rsp),%rax
 .LSEH_begin_gcm_ghash_clmul:
@@ -1337,10 +1376,12 @@ gcm_ghash_clmul:
 .LSEH_end_gcm_ghash_clmul:
 	.byte	0xf3,0xc3
 
+
 .globl	gcm_init_avx
 .def	gcm_init_avx;	.scl 2;	.type 32;	.endef
 .p2align	5
 gcm_init_avx:
+
 .LSEH_begin_gcm_init_avx:
 
 .byte	0x48,0x83,0xec,0x18
@@ -1451,16 +1492,20 @@ gcm_init_avx:
 .LSEH_end_gcm_init_avx:
 	.byte	0xf3,0xc3
 
+
 .globl	gcm_gmult_avx
 .def	gcm_gmult_avx;	.scl 2;	.type 32;	.endef
 .p2align	5
 gcm_gmult_avx:
+
 	jmp	.L_gmult_clmul
+
 
 .globl	gcm_ghash_avx
 .def	gcm_ghash_avx;	.scl 2;	.type 32;	.endef
 .p2align	5
 gcm_ghash_avx:
+
 	leaq	-136(%rsp),%rax
 .LSEH_begin_gcm_ghash_avx:
 
@@ -1859,6 +1904,7 @@ gcm_ghash_avx:
 .LSEH_end_gcm_ghash_avx:
 	.byte	0xf3,0xc3
 
+
 .p2align	6
 .Lbswap_mask:
 .byte	15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0
@@ -1945,14 +1991,20 @@ se_handler:
 	cmpq	%r10,%rbx
 	jae	.Lin_prologue
 
-	leaq	24(%rax),%rax
+	leaq	48+280(%rax),%rax
 
 	movq	-8(%rax),%rbx
 	movq	-16(%rax),%rbp
 	movq	-24(%rax),%r12
+	movq	-32(%rax),%r13
+	movq	-40(%rax),%r14
+	movq	-48(%rax),%r15
 	movq	%rbx,144(%r8)
 	movq	%rbp,160(%r8)
 	movq	%r12,216(%r8)
+	movq	%r13,224(%r8)
+	movq	%r14,232(%r8)
+	movq	%r15,240(%r8)
 
 .Lin_prologue:
 	movq	8(%rax),%rdi

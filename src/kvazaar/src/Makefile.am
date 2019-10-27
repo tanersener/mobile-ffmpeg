@@ -124,6 +124,8 @@ libkvazaar_la_SOURCES = \
 	strategies/generic/quant-generic.h \
 	strategies/generic/sao-generic.c \
 	strategies/generic/sao-generic.h \
+	strategies/generic/encode_coding_tree-generic.c \
+	strategies/generic/encode_coding_tree-generic.h \
 	strategies/strategies-common.h \
 	strategies/strategies-dct.c \
 	strategies/strategies-dct.h \
@@ -139,6 +141,8 @@ libkvazaar_la_SOURCES = \
 	strategies/strategies-quant.h \
 	strategies/strategies-sao.c \
 	strategies/strategies-sao.h \
+	strategies/strategies-encode.c \
+	strategies/strategies-encode.h \
 	strategies/x86_asm/picture-x86-asm.c \
 	strategies/x86_asm/picture-x86-asm.h \
 	strategyselector.c \
@@ -186,7 +190,9 @@ libavx2_la_SOURCES = \
 	strategies/avx2/quant-avx2.c \
 	strategies/avx2/quant-avx2.h \
 	strategies/avx2/sao-avx2.c \
-	strategies/avx2/sao-avx2.h
+	strategies/avx2/sao-avx2.h \
+	strategies/avx2/encode_coding_tree-avx2.c \
+	strategies/avx2/encode_coding_tree-avx2.h
 
 libsse2_la_SOURCES = \
 	strategies/sse2/picture-sse2.c \
@@ -197,13 +203,17 @@ libsse41_la_SOURCES = \
 	strategies/sse41/picture-sse41.h
 
 if HAVE_PPC
+
+if HAVE_ALTIVEC
 libaltivec_la_CFLAGS = -maltivec
 endif
+
+endif #HAVE_PPC
 
 if HAVE_X86
 
 if HAVE_AVX2
-libavx2_la_CFLAGS = -mavx2
+libavx2_la_CFLAGS = -mavx2 -mbmi -mabm -mbmi2
 endif
 if HAVE_SSE4_1
 libsse41_la_CFLAGS = -msse4.1

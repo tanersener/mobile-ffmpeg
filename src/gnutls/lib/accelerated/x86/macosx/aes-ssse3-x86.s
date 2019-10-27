@@ -5,12 +5,11 @@
 ## By Mike Hamburg (Stanford University), 2009
 ## Public domain.
 ##
-## For details see https://shiftleft.org/papers/vector_aes/ and
-## https://crypto.stanford.edu/vpaes/.
+## For details see http://shiftleft.org/papers/vector_aes/ and
+## http://crypto.stanford.edu/vpaes/.
 #
 # *** This file is auto-generated ***
 #
-.file	"vpaes-x86.s"
 .text
 .align	6,0x90
 L_vpaes_consts:

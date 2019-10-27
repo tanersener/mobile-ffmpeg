@@ -27,7 +27,7 @@
  */
 
 #include "global.h" // IWYU pragma: keep
-
+#include "cu.h"
 
 typedef unsigned (dct_func)(int8_t bitdepth, const int16_t *input, int16_t *output);
 
@@ -49,8 +49,9 @@ extern dct_func * kvz_idct_32x32;
 
 
 int kvz_strategy_register_dct(void* opaque, uint8_t bitdepth);
-dct_func * kvz_get_dct_func(int8_t width, int32_t mode);
-dct_func * kvz_get_idct_func(int8_t width, int32_t mode);
+dct_func * kvz_get_dct_func(int8_t width, color_t color, cu_type_t type);
+dct_func * kvz_get_idct_func(int8_t width, color_t color, cu_type_t type);
+
 
 
 #define STRATEGIES_DCT_EXPORTS \

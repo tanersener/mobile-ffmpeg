@@ -537,6 +537,9 @@ gnutls_x509_subject_alt_name_t _gnutls_x509_san_find_type(char *str_type)
 		return GNUTLS_SAN_OTHERNAME;
 	if (strcmp(str_type, "directoryName") == 0)
 		return GNUTLS_SAN_DN;
+	if (strcmp(str_type, "registeredID") == 0)
+		return GNUTLS_SAN_REGISTERED_ID;
+
 	return (gnutls_x509_subject_alt_name_t) - 1;
 }
 
@@ -702,6 +705,8 @@ x509_read_value(ASN1_TYPE c, const char *root,
 	result = asn1_read_value_type(c, root, NULL, &len, &etype);
 	if (result == 0 && allow_null == 0 && len == 0) {
 		/* don't allow null strings */
+		return gnutls_assert_val(GNUTLS_E_ASN1_DER_ERROR);
+	} else if (result == 0 && allow_null == 0 && etype == ASN1_ETYPE_OBJECT_ID && len == 1) {
 		return gnutls_assert_val(GNUTLS_E_ASN1_DER_ERROR);
 	}
 

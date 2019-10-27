@@ -9,7 +9,7 @@
 <table border=0 width=100%>
 <tr>
 <td><p class=tiny>libogg documentation</p></td>
-<td align=right><p class=tiny>libogg release 1.3.2 - 20140527</p></td>
+<td align=right><p class=tiny>libogg release 1.3.4 - 20190830</p></td>
 </tr>
 </table>
 
@@ -23,9 +23,9 @@ an <a href="ogg_packet.html">ogg_packet</a> structure) to the
 bitstream for page encapsulation. After this is called, more packets
 can be submitted, or pages can be written out.</p>
 
-<p>In a typical encoding situation, this should be used after filling a 
+<p>In a typical encoding situation, this should be used after filling a
 packet with data.
-The data in the packet is copied into the internal storage managed by 
+The data in the packet is copied into the internal storage managed by
 the <a href="ogg_stream_state.html">ogg_stream_state</a>, so the caller
 is free to alter the contents of <i>os</i> after this call has returned.
 
@@ -49,9 +49,9 @@ int ogg_stream_iovecin(ogg_stream_state *os, ogg_iovec_t *iov, int count, long e
 <dt><i>count</i></dt>
 <dd>Length of the iov array.
 <dt><i>e_o_s</i></dt>
-<dd>End of stream flag, analagous to the e_o_s field in an <a href="ogg_packet.html">ogg_packet</a>.
+<dd>End of stream flag, analogous to the e_o_s field in an <a href="ogg_packet.html">ogg_packet</a>.
 <dt><i>granulepos</i></dt>
-<dd>Granule position value, analagous to the granpos field in an <a href="ogg_packet.html">ogg_packet</a>.
+<dd>Granule position value, analogous to the granpos field in an <a href="ogg_packet.html">ogg_packet</a>.
 </dl>
 
 
@@ -66,11 +66,11 @@ int ogg_stream_iovecin(ogg_stream_state *os, ogg_iovec_t *iov, int count, long e
 <hr noshade>
 <table border=0 width=100%>
 <tr valign=top>
-<td><p class=tiny>copyright &copy; 2000-2014 Xiph.Org</p></td>
+<td><p class=tiny>copyright &copy; 2000-2019 Xiph.Org Foundation</p></td>
 <td align=right><p class=tiny><a href="http://www.xiph.org/ogg/">Ogg Container Format</a></p></td>
 </tr><tr>
 <td><p class=tiny>libogg documentation</p></td>
-<td align=right><p class=tiny>libogg release 1.3.2 - 20140527</p></td>
+<td align=right><p class=tiny>libogg release 1.3.4 - 20190830</p></td>
 </tr>
 </table>
 

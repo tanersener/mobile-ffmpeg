@@ -17,7 +17,7 @@
 This manual is last updated @value{UPDATED} for version
 @value{VERSION} of GnuTLS.
 
-Copyright @copyright{} 2001-2012, 2014, 2016 Free Software Foundation, Inc.
+Copyright @copyright{} 2001-2012, 2014, 2016, 2019 Free Software Foundation, Inc.
 
 @quotation
 Permission is granted to copy, distribute and/or modify this document
@@ -85,8 +85,8 @@ a large subset thereof is available.
 @node Guile Preparations
 @chapter Guile Preparations
 
-The GnuTLS Guile bindings are available for Guile's 2.0 stable series,
-as well as the forthcoming 2.2 series and the legacy 1.8 series.
+The GnuTLS Guile bindings are available for the Guile 3.0 and 2.2
+series, as well as the legacy 2.0 and even 1.8 series.
 
 By default they are installed under the GnuTLS installation directory,
 typically @file{/usr/local/share/guile/site/}).  Normally Guile

@@ -22,6 +22,7 @@ if os.name == 'nt':
   os.environ['PATH'] = libpath + ';' + os.environ['PATH']
 
 try:
+  print(' '.join([test_exe, '--test', '--charset', charset, input_file]))
   output = subprocess.check_output([test_exe, '--test', '--charset', charset, input_file])
   ref_data = open(reference_file, "rb").read()
   if os.name == 'nt':

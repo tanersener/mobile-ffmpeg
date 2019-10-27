@@ -106,10 +106,9 @@ psk_ke_modes_send_params(gnutls_session_t session,
  */
 static int
 psk_ke_modes_recv_params(gnutls_session_t session,
-			 const unsigned char *data, size_t _len)
+			 const unsigned char *data, size_t len)
 {
 	uint8_t ke_modes_len;
-	ssize_t len = _len;
 	const version_entry_st *vers = get_version(session);
 	gnutls_psk_server_credentials_t cred;
 	int dhpsk_pos = MAX_POS;

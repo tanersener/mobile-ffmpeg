@@ -192,7 +192,9 @@ aom_codec_err_t aom_codec_enc_config_default(aom_codec_iface_t *iface,
 #define FLOATING_POINT_SET_EXCEPTIONS \
   const int float_excepts =           \
       feenableexcept(FE_DIVBYZERO | FE_UNDERFLOW | FE_OVERFLOW);
-#define FLOATING_POINT_RESTORE_EXCEPTIONS feenableexcept(float_excepts);
+#define FLOATING_POINT_RESTORE_EXCEPTIONS \
+  fedisableexcept(FE_ALL_EXCEPT);         \
+  feenableexcept(float_excepts);
 #else
 #define FLOATING_POINT_SET_EXCEPTIONS
 #define FLOATING_POINT_RESTORE_EXCEPTIONS

@@ -176,8 +176,8 @@ static void set_sample_rate_params(AVCodecContext *avctx)
     } else {
         shift = 0;
     }
-    s->uval           = FFALIGN(avctx->sample_rate + 511 >> 9, 4) << shift;
-    s->subframe_scale = FFALIGN(avctx->sample_rate + 511 >> 9, 4) << 1;
+    s->uval           = FFALIGN(avctx->sample_rate + 511LL >> 9, 4) << shift;
+    s->subframe_scale = FFALIGN(avctx->sample_rate + 511LL >> 9, 4) << 1;
 }
 
 static av_cold int tak_decode_init(AVCodecContext *avctx)
@@ -653,7 +653,7 @@ static int decorrelate(TAKDecContext *s, int c1, int c2, int length)
                          s->residues[i    ] * s->filter[0];
                 }
 
-                v = av_clip_intp2(v >> 10, 13) * (1 << dshift) - *p1;
+                v = av_clip_intp2(v >> 10, 13) * (1U << dshift) - *p1;
                 *p1++ = v;
             }
 

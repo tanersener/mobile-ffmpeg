@@ -101,7 +101,14 @@ const ObmcSadTest::ParamType sse4_functions[] = {
   TestFuncs(aom_obmc_sad8x8_c, aom_obmc_sad8x8_sse4_1),
   TestFuncs(aom_obmc_sad8x4_c, aom_obmc_sad8x4_sse4_1),
   TestFuncs(aom_obmc_sad4x8_c, aom_obmc_sad4x8_sse4_1),
-  TestFuncs(aom_obmc_sad4x4_c, aom_obmc_sad4x4_sse4_1)
+  TestFuncs(aom_obmc_sad4x4_c, aom_obmc_sad4x4_sse4_1),
+
+  TestFuncs(aom_obmc_sad64x16_c, aom_obmc_sad64x16_sse4_1),
+  TestFuncs(aom_obmc_sad16x64_c, aom_obmc_sad16x64_sse4_1),
+  TestFuncs(aom_obmc_sad32x8_c, aom_obmc_sad32x8_sse4_1),
+  TestFuncs(aom_obmc_sad8x32_c, aom_obmc_sad8x32_sse4_1),
+  TestFuncs(aom_obmc_sad16x4_c, aom_obmc_sad16x4_sse4_1),
+  TestFuncs(aom_obmc_sad4x16_c, aom_obmc_sad4x16_sse4_1),
 };
 
 INSTANTIATE_TEST_CASE_P(SSE4_1, ObmcSadTest,
@@ -125,12 +132,20 @@ const ObmcSadTest::ParamType avx2_functions[] = {
   TestFuncs(aom_obmc_sad8x8_c, aom_obmc_sad8x8_avx2),
   TestFuncs(aom_obmc_sad8x4_c, aom_obmc_sad8x4_avx2),
   TestFuncs(aom_obmc_sad4x8_c, aom_obmc_sad4x8_avx2),
-  TestFuncs(aom_obmc_sad4x4_c, aom_obmc_sad4x4_avx2)
+  TestFuncs(aom_obmc_sad4x4_c, aom_obmc_sad4x4_avx2),
+
+  TestFuncs(aom_obmc_sad64x16_c, aom_obmc_sad64x16_avx2),
+  TestFuncs(aom_obmc_sad16x64_c, aom_obmc_sad16x64_avx2),
+  TestFuncs(aom_obmc_sad32x8_c, aom_obmc_sad32x8_avx2),
+  TestFuncs(aom_obmc_sad8x32_c, aom_obmc_sad8x32_avx2),
+  TestFuncs(aom_obmc_sad16x4_c, aom_obmc_sad16x4_avx2),
+  TestFuncs(aom_obmc_sad4x16_c, aom_obmc_sad4x16_avx2),
 };
 
 INSTANTIATE_TEST_CASE_P(AVX2, ObmcSadTest, ::testing::ValuesIn(avx2_functions));
 #endif  // HAVE_AVX2
 
+#if CONFIG_AV1_HIGHBITDEPTH
 ////////////////////////////////////////////////////////////////////////////////
 // High bit-depth
 ////////////////////////////////////////////////////////////////////////////////
@@ -204,7 +219,14 @@ ObmcSadHBDTest::ParamType sse4_functions_hbd[] = {
   TestFuncs(aom_highbd_obmc_sad8x8_c, aom_highbd_obmc_sad8x8_sse4_1),
   TestFuncs(aom_highbd_obmc_sad8x4_c, aom_highbd_obmc_sad8x4_sse4_1),
   TestFuncs(aom_highbd_obmc_sad4x8_c, aom_highbd_obmc_sad4x8_sse4_1),
-  TestFuncs(aom_highbd_obmc_sad4x4_c, aom_highbd_obmc_sad4x4_sse4_1)
+  TestFuncs(aom_highbd_obmc_sad4x4_c, aom_highbd_obmc_sad4x4_sse4_1),
+
+  TestFuncs(aom_highbd_obmc_sad64x16_c, aom_highbd_obmc_sad64x16_sse4_1),
+  TestFuncs(aom_highbd_obmc_sad16x64_c, aom_highbd_obmc_sad16x64_sse4_1),
+  TestFuncs(aom_highbd_obmc_sad32x8_c, aom_highbd_obmc_sad32x8_sse4_1),
+  TestFuncs(aom_highbd_obmc_sad8x32_c, aom_highbd_obmc_sad8x32_sse4_1),
+  TestFuncs(aom_highbd_obmc_sad16x4_c, aom_highbd_obmc_sad16x4_sse4_1),
+  TestFuncs(aom_highbd_obmc_sad4x16_c, aom_highbd_obmc_sad4x16_sse4_1),
 };
 
 INSTANTIATE_TEST_CASE_P(SSE4_1, ObmcSadHBDTest,
@@ -228,10 +250,18 @@ ObmcSadHBDTest::ParamType avx2_functions_hbd[] = {
   TestFuncs(aom_highbd_obmc_sad8x8_c, aom_highbd_obmc_sad8x8_avx2),
   TestFuncs(aom_highbd_obmc_sad8x4_c, aom_highbd_obmc_sad8x4_avx2),
   TestFuncs(aom_highbd_obmc_sad4x8_c, aom_highbd_obmc_sad4x8_avx2),
-  TestFuncs(aom_highbd_obmc_sad4x4_c, aom_highbd_obmc_sad4x4_avx2)
+  TestFuncs(aom_highbd_obmc_sad4x4_c, aom_highbd_obmc_sad4x4_avx2),
+
+  TestFuncs(aom_highbd_obmc_sad64x16_c, aom_highbd_obmc_sad64x16_avx2),
+  TestFuncs(aom_highbd_obmc_sad16x64_c, aom_highbd_obmc_sad16x64_avx2),
+  TestFuncs(aom_highbd_obmc_sad32x8_c, aom_highbd_obmc_sad32x8_avx2),
+  TestFuncs(aom_highbd_obmc_sad8x32_c, aom_highbd_obmc_sad8x32_avx2),
+  TestFuncs(aom_highbd_obmc_sad16x4_c, aom_highbd_obmc_sad16x4_avx2),
+  TestFuncs(aom_highbd_obmc_sad4x16_c, aom_highbd_obmc_sad4x16_avx2),
 };
 
 INSTANTIATE_TEST_CASE_P(AVX2, ObmcSadHBDTest,
                         ::testing::ValuesIn(avx2_functions_hbd));
 #endif  // HAVE_AVX2
+#endif  // CONFIG_AV1_HIGHBITDEPTH
 }  // namespace

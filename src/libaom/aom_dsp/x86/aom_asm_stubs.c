@@ -49,6 +49,7 @@ filter8_1dfunction aom_filter_block1d4_h2_sse2;
 FUN_CONV_1D(horiz, x_step_q4, filter_x, h, src, , sse2);
 FUN_CONV_1D(vert, y_step_q4, filter_y, v, src - src_stride * 3, , sse2);
 
+#if CONFIG_AV1_HIGHBITDEPTH
 highbd_filter8_1dfunction aom_highbd_filter_block1d16_v8_sse2;
 highbd_filter8_1dfunction aom_highbd_filter_block1d16_h8_sse2;
 highbd_filter8_1dfunction aom_highbd_filter_block1d8_v8_sse2;
@@ -90,5 +91,5 @@ highbd_filter8_1dfunction aom_highbd_filter_block1d4_h2_sse2;
 //                                     int w, int h, int bd);
 HIGH_FUN_CONV_1D(horiz, x_step_q4, filter_x, h, src, , sse2);
 HIGH_FUN_CONV_1D(vert, y_step_q4, filter_y, v, src - src_stride * 3, , sse2);
-
+#endif
 #endif  // HAVE_SSE2

@@ -3,6 +3,7 @@
 
 #AUTOMAKE_OPTIONS = foreign 1.6 dist-zip
 AUTOMAKE_OPTIONS = foreign 1.11 dist-zip dist-xz
+ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = src include doc
 
@@ -15,7 +16,7 @@ pkgconfig_DATA = ogg.pc
 EXTRA_DIST = README.md AUTHORS CHANGES COPYING \
 	libogg.spec libogg.spec.in \
 	ogg.m4 ogg.pc.in ogg-uninstalled.pc.in \
-	macosx win32
+	macosx win32 CMakeLists.txt cmake
 
 dist-hook:
 	for item in $(EXTRA_DIST); do \
@@ -25,6 +26,17 @@ dist-hook:
 	    echo "OK"; \
 	  fi; \
 	done
+
+# Verify cmake works with the dist tarball.
+cmake_builddir = _build.cmake
+distcheck-hook:
+	$(RM) -rf $(cmake_builddir)
+	mkdir $(cmake_builddir)
+	cd $(cmake_builddir) && cmake ../$(top_distdir)
+	cd $(cmake_builddir) && cmake --build .
+	cd $(cmake_builddir) && ctest
+	$(RM) -rf $(cmake_builddir)
+
 debug:
 	$(MAKE) all CFLAGS="@DEBUG@"
 

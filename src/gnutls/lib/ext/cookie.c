@@ -53,10 +53,9 @@ const hello_ext_entry_st ext_mod_cookie = {
 /* Only client sends this extension. */
 static int
 cookie_recv_params(gnutls_session_t session,
-		   const uint8_t * data, size_t _data_size)
+		   const uint8_t * data, size_t data_size)
 {
-	ssize_t data_size = _data_size;
-	ssize_t csize;
+	size_t csize;
 	int ret;
 	gnutls_datum_t tmp;
 

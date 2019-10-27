@@ -5,8 +5,8 @@
 ## By Mike Hamburg (Stanford University), 2009
 ## Public domain.
 ##
-## For details see https://shiftleft.org/papers/vector_aes/ and
-## https://crypto.stanford.edu/vpaes/.
+## For details see http://shiftleft.org/papers/vector_aes/ and
+## http://crypto.stanford.edu/vpaes/.
 #
 # *** This file is auto-generated ***
 #
@@ -30,6 +30,7 @@
 
 .p2align	4
 _vpaes_encrypt_core:
+
 	movq	%rdx,%r9
 	movq	$16,%r11
 	movl	240(%rdx),%eax
@@ -118,8 +119,10 @@ L$enc_entry:
 
 
 
+
 .p2align	4
 _vpaes_decrypt_core:
+
 	movq	%rdx,%r9
 	movl	240(%rdx),%eax
 	movdqa	%xmm9,%xmm1
@@ -224,8 +227,10 @@ L$dec_entry:
 
 
 
+
 .p2align	4
 _vpaes_schedule_core:
+
 
 
 
@@ -409,8 +414,10 @@ L$schedule_mangle_last_dec:
 
 
 
+
 .p2align	4
 _vpaes_schedule_192_smear:
+
 	pshufd	$0x80,%xmm6,%xmm1
 	pshufd	$0xFE,%xmm7,%xmm0
 	pxor	%xmm1,%xmm6
@@ -440,8 +447,10 @@ _vpaes_schedule_192_smear:
 
 
 
+
 .p2align	4
 _vpaes_schedule_round:
+
 
 	pxor	%xmm1,%xmm1
 .byte	102,65,15,58,15,200,15
@@ -507,8 +516,10 @@ _vpaes_schedule_low_round:
 
 
 
+
 .p2align	4
 _vpaes_schedule_transform:
+
 	movdqa	%xmm9,%xmm1
 	pandn	%xmm0,%xmm1
 	psrld	$4,%xmm1
@@ -545,8 +556,10 @@ _vpaes_schedule_transform:
 
 
 
+
 .p2align	4
 _vpaes_schedule_mangle:
+
 	movdqa	%xmm0,%xmm4
 	movdqa	L$k_mc_forward(%rip),%xmm5
 	testq	%rcx,%rcx
@@ -616,10 +629,12 @@ L$schedule_mangle_both:
 
 
 
+
 .globl	_vpaes_set_encrypt_key
 
 .p2align	4
 _vpaes_set_encrypt_key:
+
 	movl	%esi,%eax
 	shrl	$5,%eax
 	addl	$5,%eax
@@ -632,10 +647,12 @@ _vpaes_set_encrypt_key:
 	.byte	0xf3,0xc3
 
 
+
 .globl	_vpaes_set_decrypt_key
 
 .p2align	4
 _vpaes_set_decrypt_key:
+
 	movl	%esi,%eax
 	shrl	$5,%eax
 	addl	$5,%eax
@@ -653,10 +670,12 @@ _vpaes_set_decrypt_key:
 	.byte	0xf3,0xc3
 
 
+
 .globl	_vpaes_encrypt
 
 .p2align	4
 _vpaes_encrypt:
+
 	movdqu	(%rdi),%xmm0
 	call	_vpaes_preheat
 	call	_vpaes_encrypt_core
@@ -664,20 +683,24 @@ _vpaes_encrypt:
 	.byte	0xf3,0xc3
 
 
+
 .globl	_vpaes_decrypt
 
 .p2align	4
 _vpaes_decrypt:
+
 	movdqu	(%rdi),%xmm0
 	call	_vpaes_preheat
 	call	_vpaes_decrypt_core
 	movdqu	%xmm0,(%rsi)
 	.byte	0xf3,0xc3
 
+
 .globl	_vpaes_cbc_encrypt
 
 .p2align	4
 _vpaes_cbc_encrypt:
+
 	xchgq	%rcx,%rdx
 	subq	$16,%rcx
 	jc	L$cbc_abort
@@ -721,8 +744,10 @@ L$cbc_abort:
 
 
 
+
 .p2align	4
 _vpaes_preheat:
+
 	leaq	L$k_s0F(%rip),%r10
 	movdqa	-32(%r10),%xmm10
 	movdqa	-16(%r10),%xmm11
@@ -732,6 +757,7 @@ _vpaes_preheat:
 	movdqa	80(%r10),%xmm15
 	movdqa	96(%r10),%xmm14
 	.byte	0xf3,0xc3
+
 
 
 

@@ -18,6 +18,7 @@
  * with Kvazaar.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 
+#include "global.h"
 #include "threadqueue.h"
 
 #include <errno.h> // ETIMEDOUT
@@ -26,7 +27,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "global.h"
 #include "threads.h"
 
 
@@ -500,9 +500,10 @@ int kvz_threadqueue_job_dep_add(threadqueue_job_t *job, threadqueue_job_t *depen
  */
 threadqueue_job_t *kvz_threadqueue_copy_ref(threadqueue_job_t *job)
 {
-  // The caller should have had another reference.
-  assert(job->refcount > 0);
-  KVZ_ATOMIC_INC(&job->refcount);
+  int32_t new_refcount = KVZ_ATOMIC_INC(&job->refcount);
+  // The caller should have had another reference and we added one
+  // reference so refcount should be at least 2.
+  assert(new_refcount >= 2);
   return job;
 }
 

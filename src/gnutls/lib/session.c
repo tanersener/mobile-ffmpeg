@@ -109,6 +109,12 @@ gnutls_session_get_data(gnutls_session_t session,
  * received, will return session resumption data corresponding to the last
  * received ticket.
  *
+ * Note that this function under TLS1.3 requires a callback to be set with
+ * gnutls_transport_set_pull_timeout_function() for successful operation. There
+ * was a bug before 3.6.10 which could make this function fail if that callback
+ * was not set. On later versions if not set, the function will return a successful
+ * error code, but will return dummy data that cannot lead to a resumption.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.
  **/
@@ -128,10 +134,17 @@ gnutls_session_get_data2(gnutls_session_t session, gnutls_datum_t *data)
 		 * the value(s). */
 		ertt += 60;
 
-		/* wait for a message with timeout */
-		ret = _gnutls_recv_in_buffers(session, GNUTLS_APPLICATION_DATA, -1, ertt);
-		if (ret < 0 && (gnutls_error_is_fatal(ret) && ret != GNUTLS_E_TIMEDOUT)) {
-			return gnutls_assert_val(ret);
+		/* we cannot use a read with timeout if the caller has not set
+		 * a callback with gnutls_transport_set_pull_timeout_function() */
+		if (NO_TIMEOUT_FUNC_SET(session) || (session->internals.flags & GNUTLS_NONBLOCK)) {
+			if (!(session->internals.flags & GNUTLS_NONBLOCK))
+				_gnutls_debug_log("TLS1.3 works efficiently if a callback with gnutls_transport_set_pull_timeout_function() is set\n");
+		} else {
+			/* wait for a message with timeout */
+			ret = _gnutls_recv_in_buffers(session, GNUTLS_APPLICATION_DATA, -1, ertt);
+			if (ret < 0 && (gnutls_error_is_fatal(ret) && ret != GNUTLS_E_TIMEDOUT)) {
+				return gnutls_assert_val(ret);
+			}
 		}
 
 		if (!(session->internals.hsk_flags & HSK_TICKET_RECEIVED)) {
@@ -305,7 +318,11 @@ gnutls_session_set_data(gnutls_session_t session,
 
 	if (session->internals.resumption_data.data != NULL)
 		gnutls_free(session->internals.resumption_data.data);
-	_gnutls_set_datum(&session->internals.resumption_data, session_data, session_data_size);
+	ret = _gnutls_set_datum(&session->internals.resumption_data, session_data, session_data_size);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
 
 	return 0;
 }
@@ -409,16 +426,16 @@ char *gnutls_session_get_desc(gnutls_session_t session)
 			return NULL;
 		}
 
-		if (kx == GNUTLS_KX_ECDHE_ECDSA || kx == GNUTLS_KX_ECDHE_RSA || 
-		    kx == GNUTLS_KX_ECDHE_PSK) {
+		if ((kx == GNUTLS_KX_ECDHE_ECDSA || kx == GNUTLS_KX_ECDHE_RSA ||
+		    kx == GNUTLS_KX_ECDHE_PSK) && group_name) {
 			if (sign_str)
 				snprintf(kx_name, sizeof(kx_name), "(ECDHE-%s)-(%s)",
 					 group_name, sign_str);
 			else
 				snprintf(kx_name, sizeof(kx_name), "(ECDHE-%s)",
 					 group_name);
-		} else if (kx == GNUTLS_KX_DHE_DSS || kx == GNUTLS_KX_DHE_RSA || 
-		    kx == GNUTLS_KX_DHE_PSK) {
+		} else if ((kx == GNUTLS_KX_DHE_DSS || kx == GNUTLS_KX_DHE_RSA ||
+		    kx == GNUTLS_KX_DHE_PSK) && group_name) {
 			if (sign_str)
 				snprintf(kx_name, sizeof(kx_name), "(DHE-%s)-(%s)", group_name, sign_str);
 			else

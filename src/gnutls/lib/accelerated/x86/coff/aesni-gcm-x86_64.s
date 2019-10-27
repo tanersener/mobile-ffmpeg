@@ -1,4 +1,4 @@
-# Copyright (c) 2011-2013, Andy Polyakov <appro@openssl.org>
+# Copyright (c) 2011-2016, Andy Polyakov <appro@openssl.org>
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -365,17 +365,25 @@ aesni_gcm_decrypt:
 	movq	40(%rsp),%r8
 	movq	48(%rsp),%r9
 
+
 	xorq	%r10,%r10
 	cmpq	$0x60,%rdx
 	jb	.Lgcm_dec_abort
 
 	leaq	(%rsp),%rax
+
 	pushq	%rbx
+
 	pushq	%rbp
+
 	pushq	%r12
+
 	pushq	%r13
+
 	pushq	%r14
+
 	pushq	%r15
+
 	leaq	-168(%rsp),%rsp
 	movaps	%xmm6,-216(%rax)
 	movaps	%xmm7,-200(%rax)
@@ -459,17 +467,25 @@ aesni_gcm_decrypt:
 	movaps	-88(%rax),%xmm14
 	movaps	-72(%rax),%xmm15
 	movq	-48(%rax),%r15
+
 	movq	-40(%rax),%r14
+
 	movq	-32(%rax),%r13
+
 	movq	-24(%rax),%r12
+
 	movq	-16(%rax),%rbp
+
 	movq	-8(%rax),%rbx
+
 	leaq	(%rax),%rsp
+
 .Lgcm_dec_abort:
 	movq	%r10,%rax
 	movq	8(%rsp),%rdi
 	movq	16(%rsp),%rsi
 	.byte	0xf3,0xc3
+
 .LSEH_end_aesni_gcm_decrypt:
 .def	_aesni_ctr32_6x;	.scl 3;	.type 32;	.endef
 .p2align	5
@@ -577,17 +593,25 @@ aesni_gcm_encrypt:
 	movq	40(%rsp),%r8
 	movq	48(%rsp),%r9
 
+
 	xorq	%r10,%r10
 	cmpq	$288,%rdx
 	jb	.Lgcm_enc_abort
 
 	leaq	(%rsp),%rax
+
 	pushq	%rbx
+
 	pushq	%rbp
+
 	pushq	%r12
+
 	pushq	%r13
+
 	pushq	%r14
+
 	pushq	%r15
+
 	leaq	-168(%rsp),%rsp
 	movaps	%xmm6,-216(%rax)
 	movaps	%xmm7,-200(%rax)
@@ -835,17 +859,25 @@ aesni_gcm_encrypt:
 	movaps	-88(%rax),%xmm14
 	movaps	-72(%rax),%xmm15
 	movq	-48(%rax),%r15
+
 	movq	-40(%rax),%r14
+
 	movq	-32(%rax),%r13
+
 	movq	-24(%rax),%r12
+
 	movq	-16(%rax),%rbp
+
 	movq	-8(%rax),%rbx
+
 	leaq	(%rax),%rsp
+
 .Lgcm_enc_abort:
 	movq	%r10,%rax
 	movq	8(%rsp),%rdi
 	movq	16(%rsp),%rsi
 	.byte	0xf3,0xc3
+
 .LSEH_end_aesni_gcm_encrypt:
 .p2align	6
 .Lbswap_mask:

@@ -114,9 +114,9 @@ class ExternalFrameBufferList {
     return 0;
   }
 
-  // Checks that the ximage data is contained within the external frame buffer
-  // private data passed back in the ximage.
-  void CheckXImageFrameBuffer(const vpx_image_t *img) {
+  // Checks that the vpx_image_t data is contained within the external frame
+  // buffer private data passed back in the vpx_image_t.
+  void CheckImageFrameBuffer(const vpx_image_t *img) {
     if (img->fb_priv != NULL) {
       const struct ExternalFrameBuffer *const ext_fb =
           reinterpret_cast<ExternalFrameBuffer *>(img->fb_priv);
@@ -342,7 +342,7 @@ class ExternalFrameBufferTest : public ::testing::Test {
 
     // Get decompressed data
     while ((img = dec_iter.Next()) != NULL) {
-      fb_list_.CheckXImageFrameBuffer(img);
+      fb_list_.CheckImageFrameBuffer(img);
     }
   }
 

@@ -33,7 +33,8 @@ gen_unicode_version = executable('gen-unicode-version',
   'gen-unicode-version.c',
   include_directories: incs,
   c_args: native_args,
-  install: false)
+  install: false,
+  native: true)
 
 fribidi_unicode_version_h = custom_target('fribidi-unicode-version.h',
   input: files('unidata/ReadMe.txt', 'unidata/BidiMirroring.txt'),
@@ -67,7 +68,8 @@ foreach tab : tabs
     gen_prog_src, 'packtab.c',
     include_directories: incs,
     c_args: native_args,
-    install: false)
+    install: false,
+    native: true)
 
   tab_inc_file = custom_target(gen_prog_name,
     input: gen_prog_inputs,

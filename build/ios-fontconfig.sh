@@ -69,6 +69,6 @@ cp ${BASEDIR}/src/${LIB_NAME}/test/test-bz106618.c ${BASEDIR}/src/${LIB_NAME}/te
 make -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_fontconfig_package_config "2.13.91"
+create_fontconfig_package_config "2.13.92"
 
 make install || exit 1

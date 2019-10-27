@@ -73,7 +73,7 @@
     NSLog(@"FFmpeg process started with arguments\n\'%@\'\n", ffmpegCommand);
     
     // EXECUTE
-    int result = [MobileFFmpeg execute:ffmpegCommand delimiter:@" "];
+    int result = [MobileFFmpeg execute:ffmpegCommand];
     
     NSLog(@"FFmpeg process exited with rc %d\n", result);
 
@@ -96,7 +96,7 @@
         NSLog(@"FFmpeg process started with arguments\n\'%@\'\n", ffmpegCommand);
         
         // EXECUTE
-        int result = [MobileFFmpeg execute:ffmpegCommand delimiter:@" "];
+        int result = [MobileFFmpeg execute:ffmpegCommand];
         
         NSLog(@"FFmpeg process exited with rc %d\n", result);
 

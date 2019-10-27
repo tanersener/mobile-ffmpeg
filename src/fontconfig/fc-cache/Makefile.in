@@ -720,8 +720,8 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
-@OS_WIN32_TRUE@uninstall-local:
 @OS_WIN32_TRUE@install-data-local:
+@OS_WIN32_TRUE@uninstall-local:
 clean: clean-am
 
 clean-am: clean-binPROGRAMS clean-generic clean-libtool mostlyclean-am

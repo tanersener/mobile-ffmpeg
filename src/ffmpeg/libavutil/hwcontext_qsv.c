@@ -1180,11 +1180,6 @@ static int qsv_device_derive_from_child(AVHWDeviceContext *ctx,
         goto fail;
     }
 
-    ret = MFXQueryVersion(hwctx->session,&ver);
-    if (ret == MFX_ERR_NONE) {
-        av_log(ctx, AV_LOG_VERBOSE, "MFX compile/runtime API: %d.%d/%d.%d\n",
-               MFX_VERSION_MAJOR, MFX_VERSION_MINOR, ver.Major, ver.Minor);
-    }
     return 0;
 
 fail:
@@ -1240,6 +1235,8 @@ static int qsv_device_create(AVHWDeviceContext *ctx, const char *device,
 
     ret = av_hwdevice_ctx_create(&priv->child_device_ctx, child_device_type,
                                  e ? e->value : NULL, child_device_opts, 0);
+
+    av_dict_free(&child_device_opts);
     if (ret < 0)
         return ret;
 

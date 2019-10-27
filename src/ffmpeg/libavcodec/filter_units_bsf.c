@@ -98,63 +98,51 @@ invalid:
     return AVERROR(EINVAL);
 }
 
-static int filter_units_filter(AVBSFContext *bsf, AVPacket *out)
+static int filter_units_filter(AVBSFContext *bsf, AVPacket *pkt)
 {
     FilterUnitsContext      *ctx = bsf->priv_data;
     CodedBitstreamFragment *frag = &ctx->fragment;
-    AVPacket *in = NULL;
     int err, i, j;
 
-    while (1) {
-        err = ff_bsf_get_packet(bsf, &in);
-        if (err < 0)
-            return err;
+    err = ff_bsf_get_packet_ref(bsf, pkt);
+    if (err < 0)
+        return err;
 
-        if (ctx->mode == NOOP) {
-            av_packet_move_ref(out, in);
-            av_packet_free(&in);
-            return 0;
-        }
+    if (ctx->mode == NOOP)
+        return 0;
 
-        err = ff_cbs_read_packet(ctx->cbc, frag, in);
-        if (err < 0) {
-            av_log(bsf, AV_LOG_ERROR, "Failed to read packet.\n");
-            goto fail;
-        }
-
-        for (i = 0; i < frag->nb_units; i++) {
-            for (j = 0; j < ctx->nb_types; j++) {
-                if (frag->units[i].type == ctx->type_list[j])
-                    break;
-            }
-            if (ctx->mode == REMOVE ? j <  ctx->nb_types
-                                    : j >= ctx->nb_types) {
-                ff_cbs_delete_unit(ctx->cbc, frag, i);
-                --i;
-            }
-        }
-
-        if (frag->nb_units > 0)
-            break;
-
-        // Don't return packets with nothing in them.
-        av_packet_free(&in);
-        ff_cbs_fragment_reset(ctx->cbc, frag);
+    err = ff_cbs_read_packet(ctx->cbc, frag, pkt);
+    if (err < 0) {
+        av_log(bsf, AV_LOG_ERROR, "Failed to read packet.\n");
+        goto fail;
     }
 
-    err = ff_cbs_write_packet(ctx->cbc, out, frag);
+    for (i = frag->nb_units - 1; i >= 0; i--) {
+        for (j = 0; j < ctx->nb_types; j++) {
+            if (frag->units[i].type == ctx->type_list[j])
+                break;
+        }
+        if (ctx->mode == REMOVE ? j <  ctx->nb_types
+                                : j >= ctx->nb_types)
+            ff_cbs_delete_unit(ctx->cbc, frag, i);
+    }
+
+    if (frag->nb_units == 0) {
+        // Don't return packets with nothing in them.
+        err = AVERROR(EAGAIN);
+        goto fail;
+    }
+
+    err = ff_cbs_write_packet(ctx->cbc, pkt, frag);
     if (err < 0) {
         av_log(bsf, AV_LOG_ERROR, "Failed to write packet.\n");
         goto fail;
     }
 
-    err = av_packet_copy_props(out, in);
-    if (err < 0)
-        goto fail;
-
 fail:
+    if (err < 0)
+        av_packet_unref(pkt);
     ff_cbs_fragment_reset(ctx->cbc, frag);
-    av_packet_free(&in);
 
     return err;
 }

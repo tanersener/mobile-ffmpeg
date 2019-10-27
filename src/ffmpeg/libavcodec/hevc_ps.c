@@ -448,10 +448,6 @@ int ff_hevc_decode_nal_vps(GetBitContext *gb, AVCodecContext *avctx,
     memcpy(vps->data, gb->buffer, vps->data_size);
 
     vps_id = get_bits(gb, 4);
-    if (vps_id >= HEVC_MAX_VPS_COUNT) {
-        av_log(avctx, AV_LOG_ERROR, "VPS id out of range: %d\n", vps_id);
-        goto err;
-    }
 
     if (get_bits(gb, 2) != 3) { // vps_reserved_three_2bits
         av_log(avctx, AV_LOG_ERROR, "vps_reserved_three_2bits is not three\n");
@@ -883,10 +879,6 @@ int ff_hevc_parse_sps(HEVCSPS *sps, GetBitContext *gb, unsigned int *sps_id,
     // Coded parameters
 
     sps->vps_id = get_bits(gb, 4);
-    if (sps->vps_id >= HEVC_MAX_VPS_COUNT) {
-        av_log(avctx, AV_LOG_ERROR, "VPS id out of range: %d\n", sps->vps_id);
-        return AVERROR_INVALIDDATA;
-    }
 
     if (vps_list && !vps_list[sps->vps_id]) {
         av_log(avctx, AV_LOG_ERROR, "VPS %d does not exist\n",
@@ -1588,14 +1580,14 @@ int ff_hevc_decode_nal_pps(GetBitContext *gb, AVCodecContext *avctx,
         int num_tile_rows_minus1    = get_ue_golomb(gb);
 
         if (num_tile_columns_minus1 < 0 ||
-            num_tile_columns_minus1 >= sps->ctb_width - 1) {
+            num_tile_columns_minus1 >= sps->ctb_width) {
             av_log(avctx, AV_LOG_ERROR, "num_tile_columns_minus1 out of range: %d\n",
                    num_tile_columns_minus1);
             ret = num_tile_columns_minus1 < 0 ? num_tile_columns_minus1 : AVERROR_INVALIDDATA;
             goto err;
         }
         if (num_tile_rows_minus1 < 0 ||
-            num_tile_rows_minus1 >= sps->ctb_height - 1) {
+            num_tile_rows_minus1 >= sps->ctb_height) {
             av_log(avctx, AV_LOG_ERROR, "num_tile_rows_minus1 out of range: %d\n",
                    num_tile_rows_minus1);
             ret = num_tile_rows_minus1 < 0 ? num_tile_rows_minus1 : AVERROR_INVALIDDATA;

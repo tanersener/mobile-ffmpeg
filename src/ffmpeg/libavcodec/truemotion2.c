@@ -619,7 +619,7 @@ static inline void tm2_null_res_block(TM2Context *ctx, AVFrame *pic, int bx, int
     ct = ctx->D[0] + ctx->D[1] + ctx->D[2] + ctx->D[3];
 
     if (bx > 0)
-        left = last[-1] - ct;
+        left = last[-1] - (unsigned)ct;
     else
         left = 0;
 
@@ -630,7 +630,7 @@ static inline void tm2_null_res_block(TM2Context *ctx, AVFrame *pic, int bx, int
     last[2] = right - (diff >> 2);
     last[3] = right;
     {
-        int tp = left;
+        unsigned tp = left;
 
         ctx->D[0] = (tp + (ct >> 2)) - left;
         left     += ctx->D[0];
@@ -764,10 +764,10 @@ static inline void tm2_motion_block(TM2Context *ctx, AVFrame *pic, int bx, int b
     }
     /* calculate deltas */
     Y -= Ystride * 4;
-    ctx->D[0] = Y[3] - last[3];
-    ctx->D[1] = Y[3 + Ystride] - Y[3];
-    ctx->D[2] = Y[3 + Ystride * 2] - Y[3 + Ystride];
-    ctx->D[3] = Y[3 + Ystride * 3] - Y[3 + Ystride * 2];
+    ctx->D[0] = (unsigned)Y[3] - last[3];
+    ctx->D[1] = (unsigned)Y[3 + Ystride] - Y[3];
+    ctx->D[2] = (unsigned)Y[3 + Ystride * 2] - Y[3 + Ystride];
+    ctx->D[3] = (unsigned)Y[3 + Ystride * 3] - Y[3 + Ystride * 2];
     for (i = 0; i < 4; i++)
         last[i] = Y[i + Ystride * 3];
 }
@@ -915,7 +915,7 @@ static int decode_frame(AVCodecContext *avctx,
         return AVERROR(ENOMEM);
     }
 
-    if ((ret = ff_reget_buffer(avctx, p)) < 0)
+    if ((ret = ff_reget_buffer(avctx, p, 0)) < 0)
         return ret;
 
     l->bdsp.bswap_buf((uint32_t *) l->buffer, (const uint32_t *) buf,

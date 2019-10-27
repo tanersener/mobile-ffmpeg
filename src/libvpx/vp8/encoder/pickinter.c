@@ -563,7 +563,7 @@ void vp8_pick_inter_mode(VP8_COMP *cpi, MACROBLOCK *x, int recon_yoffset,
   MACROBLOCKD *xd = &x->e_mbd;
   MB_MODE_INFO best_mbmode;
 
-  int_mv best_ref_mv_sb[2];
+  int_mv best_ref_mv_sb[2] = { { 0 }, { 0 } };
   int_mv mode_mv_sb[2][MB_MODE_COUNT];
   int_mv best_ref_mv;
   int_mv *mode_mv;
@@ -601,7 +601,7 @@ void vp8_pick_inter_mode(VP8_COMP *cpi, MACROBLOCK *x, int recon_yoffset,
   /* search range got from mv_pred(). It uses step_param levels. (0-7) */
   int sr = 0;
 
-  unsigned char *plane[4][3];
+  unsigned char *plane[4][3] = { { 0, 0 } };
   int ref_frame_map[4];
   int sign_bias = 0;
   int dot_artifact_candidate = 0;
@@ -630,13 +630,16 @@ void vp8_pick_inter_mode(VP8_COMP *cpi, MACROBLOCK *x, int recon_yoffset,
       }
     }
 #endif
+    assert(plane[LAST_FRAME][0] != NULL);
     dot_artifact_candidate = check_dot_artifact_candidate(
         cpi, x, target_y, stride, plane[LAST_FRAME][0], mb_row, mb_col, 0);
     // If not found in Y channel, check UV channel.
     if (!dot_artifact_candidate) {
+      assert(plane[LAST_FRAME][1] != NULL);
       dot_artifact_candidate = check_dot_artifact_candidate(
           cpi, x, target_u, stride_uv, plane[LAST_FRAME][1], mb_row, mb_col, 1);
       if (!dot_artifact_candidate) {
+        assert(plane[LAST_FRAME][2] != NULL);
         dot_artifact_candidate = check_dot_artifact_candidate(
             cpi, x, target_v, stride_uv, plane[LAST_FRAME][2], mb_row, mb_col,
             2);

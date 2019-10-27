@@ -27,7 +27,7 @@
 #ifndef _JOINING_TYPES_H
 #define _JOINING_TYPES_H
 
-#include "common.h"
+#include "fribidi-common.h"
 
 #include <fribidi-types.h>
 #include <fribidi-joining-types.h>

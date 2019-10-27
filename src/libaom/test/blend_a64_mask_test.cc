@@ -365,7 +365,7 @@ INSTANTIATE_TEST_CASE_P(
 //////////////////////////////////////////////////////////////////////////////
 // High bit-depth version
 //////////////////////////////////////////////////////////////////////////////
-
+#if CONFIG_AV1_HIGHBITDEPTH
 typedef void (*FHBD)(uint8_t *dst, uint32_t dst_stride, const uint8_t *src0,
                      uint32_t src0_stride, const uint8_t *src1,
                      uint32_t src1_stride, const uint8_t *mask,
@@ -616,4 +616,5 @@ INSTANTIATE_TEST_CASE_P(
                                    aom_highbd_blend_a64_mask_avx2)));
 #endif  // HAVE_AVX2
 #endif
+#endif  // CONFIG_AV1_HIGHBITDEPTH
 }  // namespace

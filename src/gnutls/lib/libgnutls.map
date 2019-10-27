@@ -1286,6 +1286,21 @@ GNUTLS_3_6_8
 	gnutls_ffdhe_8192_group_q;
 } GNUTLS_3_6_6;
 
+GNUTLS_3_6_9
+{
+ global:
+	gnutls_get_system_config_file;
+	gnutls_hmac_copy;
+	gnutls_hash_copy;
+} GNUTLS_3_6_8;
+
+GNUTLS_3_6_10
+{
+ global:
+	gnutls_aead_cipher_encryptv2;
+	gnutls_aead_cipher_decryptv2;
+} GNUTLS_3_6_9;
+
 GNUTLS_FIPS140_3_4 {
   global:
 	gnutls_cipher_self_test;
@@ -1374,4 +1389,9 @@ GNUTLS_PRIVATE_3_4 {
 	_gnutls_global_set_gettime_function;
 	# Internal symbols needed by tests/tls13/anti_replay.c
 	_gnutls_anti_replay_check;
+	# needed by gnutls-strcodes.c
+	_gnutls_ecc_curve_is_supported;
+	# needed by tests/iov:
+	_gnutls_iov_iter_init;
+	_gnutls_iov_iter_next;
 } GNUTLS_3_4;

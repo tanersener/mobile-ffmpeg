@@ -103,14 +103,14 @@ extern "C" {
  * @GNUTLS_CIPHER_CAMELLIA_256_CBC: Camellia in CBC mode with 256-bit keys.
  * @GNUTLS_CIPHER_RC2_40_CBC: RC2 in CBC mode with 40-bit keys.
  * @GNUTLS_CIPHER_DES_CBC: DES in CBC mode (56-bit keys).
- * @GNUTLS_CIPHER_AES_128_GCM: AES in GCM mode with 128-bit keys.
- * @GNUTLS_CIPHER_AES_256_GCM: AES in GCM mode with 256-bit keys.
- * @GNUTLS_CIPHER_AES_128_CCM: AES in CCM mode with 128-bit keys.
- * @GNUTLS_CIPHER_AES_256_CCM: AES in CCM mode with 256-bit keys.
- * @GNUTLS_CIPHER_AES_128_CCM_8: AES in CCM mode with 64-bit tag and 128-bit keys.
- * @GNUTLS_CIPHER_AES_256_CCM_8: AES in CCM mode with 64-bit tag and 256-bit keys.
- * @GNUTLS_CIPHER_CAMELLIA_128_GCM: CAMELLIA in GCM mode with 128-bit keys.
- * @GNUTLS_CIPHER_CAMELLIA_256_GCM: CAMELLIA in GCM mode with 256-bit keys.
+ * @GNUTLS_CIPHER_AES_128_GCM: AES in GCM mode with 128-bit keys (AEAD).
+ * @GNUTLS_CIPHER_AES_256_GCM: AES in GCM mode with 256-bit keys (AEAD).
+ * @GNUTLS_CIPHER_AES_128_CCM: AES in CCM mode with 128-bit keys (AEAD).
+ * @GNUTLS_CIPHER_AES_256_CCM: AES in CCM mode with 256-bit keys (AEAD).
+ * @GNUTLS_CIPHER_AES_128_CCM_8: AES in CCM mode with 64-bit tag and 128-bit keys (AEAD).
+ * @GNUTLS_CIPHER_AES_256_CCM_8: AES in CCM mode with 64-bit tag and 256-bit keys (AEAD).
+ * @GNUTLS_CIPHER_CAMELLIA_128_GCM: CAMELLIA in GCM mode with 128-bit keys (AEAD).
+ * @GNUTLS_CIPHER_CAMELLIA_256_GCM: CAMELLIA in GCM mode with 256-bit keys (AEAD).
  * @GNUTLS_CIPHER_SALSA20_256: Salsa20 with 256-bit keys.
  * @GNUTLS_CIPHER_ESTREAM_SALSA20_256: Estream's Salsa20 variant with 256-bit keys.
  * @GNUTLS_CIPHER_CHACHA20_POLY1305: The Chacha20 cipher with the Poly1305 authenticator (AEAD).
@@ -125,6 +125,7 @@ extern "C" {
  *                             The whole message needs to be provided with a single call, because
  *                             cipher-stealing requires to know where the message actually terminates
  *                             in order to be able to compute where the stealing occurs.
+ * @GNUTLS_CIPHER_GOST28147_TC26Z_CNT: GOST 28147-89 (Magma) cipher in CNT mode with TC26 Z S-box.
  * @GNUTLS_CIPHER_IDEA_PGP_CFB: IDEA in CFB mode (placeholder - unsupported).
  * @GNUTLS_CIPHER_3DES_PGP_CFB: 3DES in CFB mode (placeholder - unsupported).
  * @GNUTLS_CIPHER_CAST5_PGP_CFB: CAST5 in CFB mode (placeholder - unsupported).
@@ -172,6 +173,7 @@ typedef enum gnutls_cipher_algorithm {
 	GNUTLS_CIPHER_AES_256_CFB8 = 31,
 	GNUTLS_CIPHER_AES_128_XTS = 32,
 	GNUTLS_CIPHER_AES_256_XTS = 33,
+	GNUTLS_CIPHER_GOST28147_TC26Z_CNT = 34,
 
 	/* used only for PGP internals. Ignored in TLS/SSL
 	 */
@@ -278,14 +280,18 @@ typedef enum {
  * @GNUTLS_MAC_STREEBOG_256: HMAC GOST R 34.11-2001 (Streebog) algorithm, 256 bit.
  * @GNUTLS_MAC_STREEBOG_512: HMAC GOST R 34.11-2001 (Streebog) algorithm, 512 bit.
  * @GNUTLS_MAC_AEAD: MAC implicit through AEAD cipher.
- * @GNUTLS_MAC_UMAC_96: The UMAC-96 MAC algorithm.
- * @GNUTLS_MAC_UMAC_128: The UMAC-128 MAC algorithm.
+ * @GNUTLS_MAC_UMAC_96: The UMAC-96 MAC algorithm (requires nonce).
+ * @GNUTLS_MAC_UMAC_128: The UMAC-128 MAC algorithm (requires nonce).
  * @GNUTLS_MAC_AES_CMAC_128: The AES-CMAC-128 MAC algorithm.
  * @GNUTLS_MAC_AES_CMAC_256: The AES-CMAC-256 MAC algorithm.
+ * @GNUTLS_MAC_AES_GMAC_128: The AES-GMAC-128 MAC algorithm (requires nonce).
+ * @GNUTLS_MAC_AES_GMAC_192: The AES-GMAC-192 MAC algorithm (requires nonce).
+ * @GNUTLS_MAC_AES_GMAC_256: The AES-GMAC-256 MAC algorithm (requires nonce).
  * @GNUTLS_MAC_SHA3_224: Reserved; unimplemented.
  * @GNUTLS_MAC_SHA3_256: Reserved; unimplemented.
  * @GNUTLS_MAC_SHA3_384: Reserved; unimplemented.
  * @GNUTLS_MAC_SHA3_512: Reserved; unimplemented.
+ * @GNUTLS_MAC_GOST28147_TC26Z_IMIT: The GOST 28147-89 working in IMIT mode with TC26 Z S-box.
  *
  * Enumeration of different Message Authentication Code (MAC)
  * algorithms.
@@ -316,6 +322,10 @@ typedef enum {
 	GNUTLS_MAC_UMAC_128 = 202,
 	GNUTLS_MAC_AES_CMAC_128 = 203,
 	GNUTLS_MAC_AES_CMAC_256 = 204,
+	GNUTLS_MAC_AES_GMAC_128 = 205,
+	GNUTLS_MAC_AES_GMAC_192 = 206,
+	GNUTLS_MAC_AES_GMAC_256 = 207,
+	GNUTLS_MAC_GOST28147_TC26Z_IMIT = 208,
 } gnutls_mac_algorithm_t;
 
 /**
@@ -1684,6 +1694,8 @@ int gnutls_priority_cipher_list(gnutls_priority_t pcache,
 int gnutls_priority_mac_list(gnutls_priority_t pcache,
 			     const unsigned int **list);
 
+const char *gnutls_get_system_config_file(void);
+
 int gnutls_set_default_priority(gnutls_session_t session);
 int gnutls_set_default_priority_append(gnutls_session_t session,
 				       const char *add_prio,
@@ -2571,6 +2583,7 @@ gnutls_psk_set_server_params_function(gnutls_psk_server_credentials_t
  * @GNUTLS_SAN_IPADDRESS: IP address SAN.
  * @GNUTLS_SAN_OTHERNAME: OtherName SAN.
  * @GNUTLS_SAN_DN: DN SAN.
+ * @GNUTLS_SAN_REGISTERED_ID: RegisteredID.
  * @GNUTLS_SAN_OTHERNAME_XMPP: Virtual SAN, used by certain functions for convenience.
  * @GNUTLS_SAN_OTHERNAME_KRB5PRINCIPAL: Virtual SAN, used by certain functions for convenience.
  *
@@ -2583,7 +2596,8 @@ typedef enum gnutls_x509_subject_alt_name_t {
 	GNUTLS_SAN_IPADDRESS = 4,
 	GNUTLS_SAN_OTHERNAME = 5,
 	GNUTLS_SAN_DN = 6,
-	GNUTLS_SAN_MAX = GNUTLS_SAN_DN,
+	GNUTLS_SAN_REGISTERED_ID = 7,
+	GNUTLS_SAN_MAX = GNUTLS_SAN_REGISTERED_ID,
 	/* The following are "virtual" subject alternative name types, in
 	   that they are represented by an otherName value and an OID.
 	   Used by gnutls_x509_crt_get_subject_alt_othername_oid.  */

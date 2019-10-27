@@ -35,7 +35,11 @@
 #include <nettle/des.h>
 #include <nettle/version.h>
 #if ENABLE_GOST
+#ifndef HAVE_NETTLE_GOST28147_SET_KEY
 #include "gost/gost28147.h"
+#else
+#include <nettle/gost28147.h>
+#endif
 #endif
 #include <nettle/nettle-meta.h>
 #include <nettle/cbc.h>
@@ -192,6 +196,25 @@ _gost28147_set_key_cpd(void *ctx, const uint8_t *key)
 {
 	gost28147_set_key(ctx, key);
 	gost28147_set_param(ctx, &gost28147_param_CryptoPro_D);
+}
+
+static void
+_gost28147_cnt_set_key_tc26z(void *ctx, const uint8_t *key)
+{
+	gost28147_cnt_init(ctx, key, &gost28147_param_TC26_Z);
+}
+
+static void
+_gost28147_cnt_set_nonce (void *ctx, size_t length, const uint8_t *nonce)
+{
+	gost28147_cnt_set_iv (ctx, nonce);
+}
+
+static void
+_gost28147_cnt_crypt(struct nettle_cipher_ctx *ctx, size_t length, uint8_t * dst,
+		     const uint8_t * src)
+{
+	gost28147_cnt_crypt((void *)ctx->ctx_ptr, length, dst, src);
 }
 #endif
 
@@ -665,6 +688,20 @@ static const struct nettle_cipher_st builtin_ciphers[] = {
 	   .decrypt = _cfb_decrypt,
 	   .set_encrypt_key = _gost28147_set_key_cpd,
 	   .set_decrypt_key = _gost28147_set_key_cpd,
+	},
+	{
+	   .algo = GNUTLS_CIPHER_GOST28147_TC26Z_CNT,
+	   .block_size = GOST28147_BLOCK_SIZE,
+	   .key_size = GOST28147_KEY_SIZE,
+	   .encrypt_block = (nettle_cipher_func*)gost28147_encrypt, /* unused */
+	   .decrypt_block = (nettle_cipher_func*)gost28147_decrypt, /* unused */
+
+	   .ctx_size = sizeof(struct gost28147_cnt_ctx),
+	   .encrypt = _gost28147_cnt_crypt,
+	   .decrypt = _gost28147_cnt_crypt,
+	   .set_encrypt_key = _gost28147_cnt_set_key_tc26z,
+	   .set_decrypt_key = _gost28147_cnt_set_key_tc26z,
+	   .set_iv = (setiv_func)_gost28147_cnt_set_nonce,
 	},
 #endif
 	{  .algo = GNUTLS_CIPHER_AES_128_CFB8,

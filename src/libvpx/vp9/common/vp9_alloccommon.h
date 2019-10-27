@@ -11,7 +11,7 @@
 #ifndef VPX_VP9_COMMON_VP9_ALLOCCOMMON_H_
 #define VPX_VP9_COMMON_VP9_ALLOCCOMMON_H_
 
-#define INVALID_IDX -1  // Invalid buffer index.
+#define INVALID_IDX (-1)  // Invalid buffer index.
 
 #ifdef __cplusplus
 extern "C" {

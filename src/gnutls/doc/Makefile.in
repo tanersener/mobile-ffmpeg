@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-# Copyright (C) 2000-2012 Free Software Foundation, Inc.
+# Copyright (C) 2000-2012, 2019 Free Software Foundation, Inc.
 #
 # Author: Nikos Mavrogiannopoulos
 #
@@ -1578,7 +1578,7 @@ gnutls_TEXINFOS = gnutls.texi fdl-1.3.texi cha-bib.texi \
 	cha-preface.texi cha-programs.texi sec-tls-app.texi \
 	cha-errors.texi cha-support.texi cha-shared-key.texi \
 	cha-gtls-examples.texi cha-upgrade.texi cha-tokens.texi \
-	cha-crypto.texi cha-auth.texi stamp_functions \
+	cha-crypto.texi cha-auth.texi cha-config.texi stamp_functions \
 	examples/ex-client-anon.c examples/ex-session-info.c \
 	examples/ex-verify.c examples/ex-cert-select.c \
 	examples/ex-client-resume.c examples/ex-client-srp.c \
@@ -1641,7 +1641,7 @@ BUILT_SOURCES = $(guile_texi)
 guile_TEXINFOS = gnutls-guile.texi $(guile_texi)
 @HAVE_GUILE_TRUE@GUILE_FOR_BUILD = \
 @HAVE_GUILE_TRUE@  GUILE_AUTO_COMPILE=0				\
-@HAVE_GUILE_TRUE@  $(GUILE) -L $(top_srcdir)/guile/modules
+@HAVE_GUILE_TRUE@  $(GUILE) -q -L $(top_srcdir)/guile/modules
 
 @HAVE_GUILE_TRUE@SNARF_CPPFLAGS = -I$(top_srcdir) -I$(top_builddir)			\
 @HAVE_GUILE_TRUE@	 -I$(top_srcdir)/lib/includes -I$(top_builddir)/lib/includes	\
@@ -1722,12 +1722,16 @@ FUNCS = functions/dane_cert_type_name \
 	functions/dane_verify_session_crt.short \
 	functions/gnutls_aead_cipher_decrypt \
 	functions/gnutls_aead_cipher_decrypt.short \
+	functions/gnutls_aead_cipher_decryptv2 \
+	functions/gnutls_aead_cipher_decryptv2.short \
 	functions/gnutls_aead_cipher_deinit \
 	functions/gnutls_aead_cipher_deinit.short \
 	functions/gnutls_aead_cipher_encrypt \
 	functions/gnutls_aead_cipher_encrypt.short \
 	functions/gnutls_aead_cipher_encryptv \
 	functions/gnutls_aead_cipher_encryptv.short \
+	functions/gnutls_aead_cipher_encryptv2 \
+	functions/gnutls_aead_cipher_encryptv2.short \
 	functions/gnutls_aead_cipher_init \
 	functions/gnutls_aead_cipher_init.short \
 	functions/gnutls_alert_get functions/gnutls_alert_get.short \
@@ -2105,6 +2109,8 @@ FUNCS = functions/dane_cert_type_name \
 	functions/gnutls_fips140_mode_enabled.short \
 	functions/gnutls_fips140_set_mode \
 	functions/gnutls_fips140_set_mode.short \
+	functions/gnutls_get_system_config_file \
+	functions/gnutls_get_system_config_file.short \
 	functions/gnutls_global_deinit \
 	functions/gnutls_global_deinit.short \
 	functions/gnutls_global_init \
@@ -2151,6 +2157,7 @@ FUNCS = functions/dane_cert_type_name \
 	functions/gnutls_handshake_set_timeout \
 	functions/gnutls_handshake_set_timeout.short \
 	functions/gnutls_hash functions/gnutls_hash.short \
+	functions/gnutls_hash_copy functions/gnutls_hash_copy.short \
 	functions/gnutls_hash_deinit \
 	functions/gnutls_hash_deinit.short functions/gnutls_hash_fast \
 	functions/gnutls_hash_fast.short functions/gnutls_hash_get_len \
@@ -2175,7 +2182,8 @@ FUNCS = functions/dane_cert_type_name \
 	functions/gnutls_hex_decode2.short functions/gnutls_hex_encode \
 	functions/gnutls_hex_encode.short functions/gnutls_hex_encode2 \
 	functions/gnutls_hex_encode2.short functions/gnutls_hmac \
-	functions/gnutls_hmac.short functions/gnutls_hmac_deinit \
+	functions/gnutls_hmac.short functions/gnutls_hmac_copy \
+	functions/gnutls_hmac_copy.short functions/gnutls_hmac_deinit \
 	functions/gnutls_hmac_deinit.short functions/gnutls_hmac_fast \
 	functions/gnutls_hmac_fast.short functions/gnutls_hmac_get_len \
 	functions/gnutls_hmac_get_len.short functions/gnutls_hmac_init \

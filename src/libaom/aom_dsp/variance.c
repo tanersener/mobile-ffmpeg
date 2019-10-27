@@ -343,26 +343,21 @@ void aom_upsampled_pred_c(MACROBLOCKD *xd, const AV1_COMMON *const cm,
                                            pos_x & SCALE_SUBPEL_MASK,
                                            pos_y & SCALE_SUBPEL_MASK };
 
-      // Get warp types.
-      const WarpedMotionParams *const wm =
-          &xd->global_motion[mi->ref_frame[ref_num]];
-      const int is_global = is_global_mv_block(mi, wm->wmtype);
-      WarpTypesAllowed warp_types;
-      warp_types.global_warp_allowed = is_global;
-      warp_types.local_warp_allowed = mi->motion_mode == WARPED_CAUSAL;
-
       // Get convolve parameters.
       ConvolveParams conv_params = get_conv_params(0, plane, xd->bd);
       const int_interpfilters filters =
           av1_broadcast_interp_filter(EIGHTTAP_REGULAR);
 
+      InterPredParams inter_pred_params;
+      av1_init_inter_params(
+          &inter_pred_params, width, height, mi_y >> pd->subsampling_y,
+          mi_x >> pd->subsampling_x, pd->subsampling_x, pd->subsampling_y,
+          xd->bd, is_cur_buf_hbd(xd), mi->use_intrabc, sf);
+
       // Get the inter predictor.
-      const int build_for_obmc = 0;
       av1_make_inter_predictor(pre, pre_buf->stride, comp_pred, width,
-                               &subpel_params, sf, width, height, &conv_params,
-                               filters, &warp_types, mi_x >> pd->subsampling_x,
-                               mi_y >> pd->subsampling_y, plane, ref_num, mi,
-                               build_for_obmc, xd, cm->allow_warped_motion);
+                               &inter_pred_params, &subpel_params, &conv_params,
+                               filters);
 
       return;
     }
@@ -468,6 +463,7 @@ void aom_dist_wtd_comp_avg_upsampled_pred_c(
   }
 }
 
+#if CONFIG_AV1_HIGHBITDEPTH
 static void highbd_variance64(const uint8_t *a8, int a_stride,
                               const uint8_t *b8, int b_stride, int w, int h,
                               uint64_t *sse, int64_t *sum) {
@@ -935,26 +931,21 @@ void aom_highbd_upsampled_pred_c(MACROBLOCKD *xd,
                                            pos_x & SCALE_SUBPEL_MASK,
                                            pos_y & SCALE_SUBPEL_MASK };
 
-      // Get warp types.
-      const WarpedMotionParams *const wm =
-          &xd->global_motion[mi->ref_frame[ref_num]];
-      const int is_global = is_global_mv_block(mi, wm->wmtype);
-      WarpTypesAllowed warp_types;
-      warp_types.global_warp_allowed = is_global;
-      warp_types.local_warp_allowed = mi->motion_mode == WARPED_CAUSAL;
-
       // Get convolve parameters.
       ConvolveParams conv_params = get_conv_params(0, plane, xd->bd);
       const int_interpfilters filters =
           av1_broadcast_interp_filter(EIGHTTAP_REGULAR);
 
+      InterPredParams inter_pred_params;
+      av1_init_inter_params(
+          &inter_pred_params, width, height, mi_y >> pd->subsampling_y,
+          mi_x >> pd->subsampling_x, pd->subsampling_x, pd->subsampling_y,
+          xd->bd, is_cur_buf_hbd(xd), mi->use_intrabc, sf);
+
       // Get the inter predictor.
-      const int build_for_obmc = 0;
       av1_make_inter_predictor(pre, pre_buf->stride, comp_pred8, width,
-                               &subpel_params, sf, width, height, &conv_params,
-                               filters, &warp_types, mi_x >> pd->subsampling_x,
-                               mi_y >> pd->subsampling_y, plane, ref_num, mi,
-                               build_for_obmc, xd, cm->allow_warped_motion);
+                               &inter_pred_params, &subpel_params, &conv_params,
+                               filters);
 
       return;
     }
@@ -1070,6 +1061,7 @@ void aom_highbd_dist_wtd_comp_avg_upsampled_pred_c(
     pred += width;
   }
 }
+#endif  // CONFIG_AV1_HIGHBITDEPTH
 
 void aom_comp_mask_pred_c(uint8_t *comp_pred, const uint8_t *pred, int width,
                           int height, const uint8_t *ref, int ref_stride,
@@ -1153,6 +1145,7 @@ MASK_SUBPIX_VAR(32, 8)
 MASK_SUBPIX_VAR(16, 64)
 MASK_SUBPIX_VAR(64, 16)
 
+#if CONFIG_AV1_HIGHBITDEPTH
 void aom_highbd_comp_mask_pred_c(uint8_t *comp_pred8, const uint8_t *pred8,
                                  int width, int height, const uint8_t *ref8,
                                  int ref_stride, const uint8_t *mask,
@@ -1277,6 +1270,7 @@ HIGHBD_MASK_SUBPIX_VAR(8, 32)
 HIGHBD_MASK_SUBPIX_VAR(32, 8)
 HIGHBD_MASK_SUBPIX_VAR(16, 64)
 HIGHBD_MASK_SUBPIX_VAR(64, 16)
+#endif  // CONFIG_AV1_HIGHBITDEPTH
 
 static INLINE void obmc_variance(const uint8_t *pre, int pre_stride,
                                  const int32_t *wsrc, const int32_t *mask,
@@ -1384,6 +1378,7 @@ OBMC_SUBPIX_VAR(16, 64)
 OBMC_VAR(64, 16)
 OBMC_SUBPIX_VAR(64, 16)
 
+#if CONFIG_AV1_HIGHBITDEPTH
 static INLINE void highbd_obmc_variance64(const uint8_t *pre8, int pre_stride,
                                           const int32_t *wsrc,
                                           const int32_t *mask, int w, int h,
@@ -1575,3 +1570,4 @@ HIGHBD_OBMC_VAR(16, 64)
 HIGHBD_OBMC_SUBPIX_VAR(16, 64)
 HIGHBD_OBMC_VAR(64, 16)
 HIGHBD_OBMC_SUBPIX_VAR(64, 16)
+#endif  // CONFIG_AV1_HIGHBITDEPTH

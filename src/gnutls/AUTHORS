@@ -12,8 +12,8 @@ Alon Bar-Lev <alon.barlev at gmail.com>
 Andreas Metzler <ametzler at debian.org>
 Martin Storsjo <martin at martin.st>
 Tim Kosse <tim.kosse at filezilla-project.org>
-Simo Sorce <simo at redhat.com>
 Tom Vrancken <dev at tomvrancken.nl>
+Simo Sorce <simo at redhat.com>
 Daniel Kahn Gillmor <dkg at fifthhorseman.net>
 Fabian Keil <fk at fabiankeil.de>
 Fabio Fiorina <fiorinaf at gnutls.org>
@@ -47,6 +47,7 @@ Daniel P. Berrange <berrange at redhat.com>
 Gustavo Zacarias <gustavo at zacarias.com.ar>
 Jakub Jelen <jjelen at redhat.com>
 Jiří Klimeš <jklimes at redhat.com>
+Karsten Ohme <k_o_ at users.sourceforge.net>
 Kurt Roeckx <kurt at roeckx.be>
 Peter Wu <peter at lekensteyn.nl>
 Stefan Bühler <stbuehler at web.de>
@@ -66,6 +67,7 @@ Ke Zhao <kzhao at redhat.com>
 Mark Brand <mabrand at mabrand.nl>
 Matthias-Christian Ott <ott at mirix.org>
 Maya Rashish <coypu at sdf.org>
+Michael Catanzaro <mcatanzaro at igalia.com>
 Michał Górny <mgorny at gentoo.org>
 Petr Písař <petr.pisar at atlas.cz>
 Roman Bogorodskiy <bogorodskiy at gmail.com>
@@ -117,7 +119,7 @@ Marti Raudsepp <marti at juffo.org>
 Matt Turner <mattst88 at gmail.com>
 Matt Whitlock <matt at whitlock.name>
 Micah Anderson <micah at riseup.net>
-Michael Catanzaro <mcatanzaro at igalia.com>
+Michael Catanzaro <mcatanzaro at gnome.org>
 Nick Alcock <nick.alcock at oracle.com>
 Nicolas Dufresne <nicolas.dufresne at collabora.com>
 Nils Maier <maierman at web.de>

@@ -276,6 +276,20 @@ static double get_max_bitrate(const AV1LevelSpec *const level_spec, int tier,
   return bitrate_basis * bitrate_profile_factor;
 }
 
+double av1_get_max_bitrate_for_level(AV1_LEVEL level_index, int tier,
+                                     BITSTREAM_PROFILE profile) {
+  assert(is_valid_seq_level_idx(level_index));
+  return get_max_bitrate(&av1_level_defs[level_index], tier, profile);
+}
+
+void av1_get_max_tiles_for_level(AV1_LEVEL level_index, int *const max_tiles,
+                                 int *const max_tile_cols) {
+  assert(is_valid_seq_level_idx(level_index));
+  const AV1LevelSpec *const level_spec = &av1_level_defs[level_index];
+  *max_tiles = level_spec->max_tiles;
+  *max_tile_cols = level_spec->max_tile_cols;
+}
+
 // We assume time t to be valid if and only if t >= 0.0.
 // So INVALID_TIME can be defined as anything less than 0.
 #define INVALID_TIME (-1.0)
@@ -721,6 +735,14 @@ static double get_min_cr(const AV1LevelSpec *const level_spec, int tier,
   return AOMMAX(min_cr_basis * speed_adj, 0.8);
 }
 
+double av1_get_min_cr_for_level(AV1_LEVEL level_index, int tier,
+                                int is_still_picture) {
+  assert(is_valid_seq_level_idx(level_index));
+  const AV1LevelSpec *const level_spec = &av1_level_defs[level_index];
+  return get_min_cr(level_spec, tier, is_still_picture,
+                    level_spec->max_decode_rate);
+}
+
 static void get_temporal_parallel_params(int scalability_mode_idc,
                                          int *temporal_parallel_num,
                                          int *temporal_parallel_denom) {
@@ -747,7 +769,7 @@ static void get_temporal_parallel_params(int scalability_mode_idc,
 
 static TARGET_LEVEL_FAIL_ID check_level_constraints(
     const AV1LevelInfo *const level_info, AV1_LEVEL level, int tier,
-    int is_still_picture, BITSTREAM_PROFILE profile) {
+    int is_still_picture, BITSTREAM_PROFILE profile, int check_bitrate) {
   const DECODER_MODEL *const decoder_model = &level_info->decoder_models[level];
   const DECODER_MODEL_STATUS decoder_model_status = decoder_model->status;
   if (decoder_model_status != DECODER_MODEL_OK &&
@@ -851,11 +873,16 @@ static TARGET_LEVEL_FAIL_ID check_level_constraints(
       break;
     }
 
-    const double max_bitrate =
-        get_max_bitrate(target_level_spec, tier, profile);
-    if ((double)level_stats->max_bitrate > max_bitrate) {
-      fail_id = BITRATE_TOO_HIGH;
-      break;
+    if (check_bitrate) {
+      // Check average bitrate instead of max_bitrate.
+      const double bitrate_limit =
+          get_max_bitrate(target_level_spec, tier, profile);
+      const double avg_bitrate = level_stats->total_compressed_size * 8.0 /
+                                 level_stats->total_time_encoded;
+      if (avg_bitrate > bitrate_limit) {
+        fail_id = BITRATE_TOO_HIGH;
+        break;
+      }
     }
 
     if (target_level_spec->level > SEQ_LEVEL_5_1) {
@@ -874,15 +901,6 @@ static TARGET_LEVEL_FAIL_ID check_level_constraints(
   } while (0);
 
   return fail_id;
-}
-
-static INLINE int is_in_operating_point(int operating_point,
-                                        int temporal_layer_id,
-                                        int spatial_layer_id) {
-  if (!operating_point) return 1;
-
-  return ((operating_point >> temporal_layer_id) & 1) &&
-         ((operating_point >> (spatial_layer_id + 8)) & 1);
 }
 
 static void get_tile_stats(const AV1_COMP *const cpi, int *max_tile_size,
@@ -1083,8 +1101,8 @@ void av1_update_level_info(AV1_COMP *cpi, size_t size, int64_t ts_start,
     level_stats->min_frame_width = AOMMIN(level_stats->min_frame_width, width);
     level_stats->min_frame_height =
         AOMMIN(level_stats->min_frame_height, height);
-    if (show_frame) level_stats->total_time_encoded = total_time_encoded;
     level_stats->min_cr = AOMMIN(level_stats->min_cr, compression_ratio);
+    level_stats->total_compressed_size += (double)size;
 
     // update level_spec
     // TODO(kyslov@) update all spec fields
@@ -1108,6 +1126,7 @@ void av1_update_level_info(AV1_COMP *cpi, size_t size, int64_t ts_start,
           show_frame ? count_frames(buffer, TICKS_PER_SEC) : 0;
       scan_past_frames(buffer, encoded_frames_in_last_second, level_spec,
                        level_stats);
+      level_stats->total_time_encoded = total_time_encoded;
     }
 
     DECODER_MODEL *const decoder_models = level_info->decoder_models;
@@ -1118,9 +1137,10 @@ void av1_update_level_info(AV1_COMP *cpi, size_t size, int64_t ts_start,
     // Check whether target level is met.
     const AV1_LEVEL target_level = cpi->target_seq_level_idx[i];
     if (target_level < SEQ_LEVELS) {
+      assert(is_valid_seq_level_idx(target_level));
       const int tier = seq_params->tier[i];
       const TARGET_LEVEL_FAIL_ID fail_id = check_level_constraints(
-          level_info, target_level, tier, is_still_picture, profile);
+          level_info, target_level, tier, is_still_picture, profile, 0);
       if (fail_id != TARGET_LEVEL_OK) {
         const int target_level_major = 2 + (target_level >> 2);
         const int target_level_minor = target_level & 3;
@@ -1144,8 +1164,9 @@ aom_codec_err_t av1_get_seq_level_idx(const AV1_COMP *cpi, int *seq_level_idx) {
     const AV1LevelInfo *const level_info = cpi->level_info[op];
     assert(level_info != NULL);
     for (int level = 0; level < SEQ_LEVELS; ++level) {
+      if (!is_valid_seq_level_idx(level)) continue;
       const TARGET_LEVEL_FAIL_ID fail_id = check_level_constraints(
-          level_info, level, tier, is_still_picture, profile);
+          level_info, level, tier, is_still_picture, profile, 1);
       if (fail_id == TARGET_LEVEL_OK) {
         seq_level_idx[op] = level;
         break;

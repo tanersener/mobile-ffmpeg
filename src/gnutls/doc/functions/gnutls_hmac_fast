@@ -16,7 +16,8 @@
 @var{digest}: is the output value of the hash
 
 This convenience function will hash the given data and return output
-on a single call.
+on a single call. Note, this call will not work for MAC algorithms
+that require nonce (like UMAC or GMAC).
 
 @strong{Returns:} Zero or a negative error code on error.
 

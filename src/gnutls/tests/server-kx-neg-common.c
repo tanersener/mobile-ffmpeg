@@ -78,6 +78,14 @@ gnutls_datum_t test1_salt =
 	.size = sizeof(SALT_TEST1)-1
 };
 
+const char *side;
+#define switch_side(str) side = str
+
+static void tls_log_func(int level, const char *str)
+{
+	fprintf(stderr, "%s|<%d>| %s", side, level, str);
+}
+
 static int
 serv_srp_func(gnutls_session_t session, const char *username,
 	      gnutls_datum_t *salt, gnutls_datum_t *verifier, gnutls_datum_t *generator,
@@ -135,6 +143,11 @@ static void try(test_case_st *test)
 	}
 
 	success("Running %s...\n", test->name);
+
+	/* General init. */
+	gnutls_global_set_log_function(tls_log_func);
+	if (debug)
+		gnutls_global_set_log_level(6);
 
 	assert(gnutls_anon_allocate_client_credentials(&c_anon_cred) >= 0);
 	assert(gnutls_anon_allocate_server_credentials(&s_anon_cred) >= 0);

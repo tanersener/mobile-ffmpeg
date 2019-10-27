@@ -35,6 +35,7 @@
 # include <config.h>
 #endif
 
+#ifndef HAVE_NETTLE_STREEBOG512_UPDATE
 #include <gnutls_int.h>
 
 #include <nettle/hmac.h>
@@ -74,3 +75,4 @@ hmac_streebog256_digest(struct hmac_streebog256_ctx *ctx,
 {
   HMAC_DIGEST(ctx, &nettle_streebog256, length, digest);
 }
+#endif

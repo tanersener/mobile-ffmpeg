@@ -13,7 +13,7 @@
       <AssemblerOutput>AssemblyAndSourceCode</AssemblerOutput>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PreprocessorDefinitions>KVZ_DLL_EXPORTS;KVZ_COMPILE_ASM;WIN32_LEAN_AND_MEAN;WIN32;WIN64;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\pthreads.2\include;$(SolutionDir)..\src;$(SolutionDir)..\src\extras;$(SolutionDir)..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\src\threadwrapper\include;$(SolutionDir)..\src;$(SolutionDir)..\src\extras;$(SolutionDir)..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4244;4204;4206;4028;4152;4996;4018;4456;4389;4100;4131;4459;4706;4214;4127;4201</DisableSpecificWarnings>
       <OpenMPSupport>false</OpenMPSupport>
       <TreatSpecificWarningsAsErrors>4013;4029;4047;4716;4700;4020;4021;4133</TreatSpecificWarningsAsErrors>

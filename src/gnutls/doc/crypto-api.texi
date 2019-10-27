@@ -34,6 +34,35 @@ the tag verification fails.
 @strong{Since:} 3.4.0
 @end deftypefun
 
+@subheading gnutls_aead_cipher_decryptv2
+@anchor{gnutls_aead_cipher_decryptv2}
+@deftypefun {int} {gnutls_aead_cipher_decryptv2} (gnutls_aead_cipher_hd_t @var{handle}, const void * @var{nonce}, size_t @var{nonce_len}, const giovec_t * @var{auth_iov}, int @var{auth_iovcnt}, const giovec_t * @var{iov}, int @var{iovcnt}, void * @var{tag}, size_t @var{tag_size})
+@var{handle}: is a @code{gnutls_aead_cipher_hd_t}  type.
+
+@var{nonce}: the nonce to set
+
+@var{nonce_len}: The length of the nonce
+
+@var{auth_iov}: additional data to be authenticated
+
+@var{auth_iovcnt}: The number of buffers in  @code{auth_iov} 
+
+@var{iov}: the data to decrypt
+
+@var{iovcnt}: The number of buffers in  @code{iov} 
+
+@var{tag}: The authentication tag
+
+@var{tag_size}: The size of the tag to use (use zero for the default)
+
+This is similar to @code{gnutls_aead_cipher_decrypt()} , but it performs
+in-place encryption on the provided data buffers.
+
+@strong{Returns:} Zero or a negative error code on error.
+
+@strong{Since:} 3.6.10
+@end deftypefun
+
 @subheading gnutls_aead_cipher_deinit
 @anchor{gnutls_aead_cipher_deinit}
 @deftypefun {void} {gnutls_aead_cipher_deinit} (gnutls_aead_cipher_hd_t @var{handle})
@@ -107,6 +136,35 @@ authentication tag.
 @strong{Returns:} Zero or a negative error code on error.
 
 @strong{Since:} 3.6.3
+@end deftypefun
+
+@subheading gnutls_aead_cipher_encryptv2
+@anchor{gnutls_aead_cipher_encryptv2}
+@deftypefun {int} {gnutls_aead_cipher_encryptv2} (gnutls_aead_cipher_hd_t @var{handle}, const void * @var{nonce}, size_t @var{nonce_len}, const giovec_t * @var{auth_iov}, int @var{auth_iovcnt}, const giovec_t * @var{iov}, int @var{iovcnt}, void * @var{tag}, size_t * @var{tag_size})
+@var{handle}: is a @code{gnutls_aead_cipher_hd_t}  type.
+
+@var{nonce}: the nonce to set
+
+@var{nonce_len}: The length of the nonce
+
+@var{auth_iov}: additional data to be authenticated
+
+@var{auth_iovcnt}: The number of buffers in  @code{auth_iov} 
+
+@var{iov}: the data to be encrypted
+
+@var{iovcnt}: The number of buffers in  @code{iov} 
+
+@var{tag}: The authentication tag
+
+@var{tag_size}: The size of the tag to use (use zero for the default)
+
+This is similar to @code{gnutls_aead_cipher_encrypt()} , but it performs
+in-place encryption on the provided data buffers.
+
+@strong{Returns:} Zero or a negative error code on error.
+
+@strong{Since:} 3.6.10
 @end deftypefun
 
 @subheading gnutls_aead_cipher_init
@@ -609,6 +667,21 @@ specified by the context.
 @strong{Since:} 2.10.0
 @end deftypefun
 
+@subheading gnutls_hash_copy
+@anchor{gnutls_hash_copy}
+@deftypefun {gnutls_hash_hd_t} {gnutls_hash_copy} (gnutls_hash_hd_t @var{handle})
+@var{handle}: is a @code{gnutls_hash_hd_t}  type
+
+This function will create a copy of Message Digest context, containing all
+its current state. Copying contexts for Message Digests registered using
+@code{gnutls_crypto_register_digest()}  is not supported and will always result in
+an error.
+
+@strong{Returns:} new Message Digest context or NULL in case of an error.
+
+@strong{Since:} 3.6.9
+@end deftypefun
+
 @subheading gnutls_hash_deinit
 @anchor{gnutls_hash_deinit}
 @deftypefun {void} {gnutls_hash_deinit} (gnutls_hash_hd_t @var{handle}, void * @var{digest})
@@ -701,6 +774,21 @@ specified by the context.
 @strong{Since:} 2.10.0
 @end deftypefun
 
+@subheading gnutls_hmac_copy
+@anchor{gnutls_hmac_copy}
+@deftypefun {gnutls_hmac_hd_t} {gnutls_hmac_copy} (gnutls_hmac_hd_t @var{handle})
+@var{handle}: is a @code{gnutls_hmac_hd_t}  type
+
+This function will create a copy of MAC context, containing all its current
+state. Copying contexts for MACs registered using
+@code{gnutls_crypto_register_mac()}  is not supported and will always result in an
+error.
+
+@strong{Returns:} new MAC context or NULL in case of an error.
+
+@strong{Since:} 3.6.9
+@end deftypefun
+
 @subheading gnutls_hmac_deinit
 @anchor{gnutls_hmac_deinit}
 @deftypefun {void} {gnutls_hmac_deinit} (gnutls_hmac_hd_t @var{handle}, void * @var{digest})
@@ -730,7 +818,8 @@ the given hmac context.
 @var{digest}: is the output value of the hash
 
 This convenience function will hash the given data and return output
-on a single call.
+on a single call. Note, this call will not work for MAC algorithms
+that require nonce (like UMAC or GMAC).
 
 @strong{Returns:} Zero or a negative error code on error.
 

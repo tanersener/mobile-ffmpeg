@@ -28,6 +28,9 @@ void vp9_clear_segdata(struct segmentation *seg, int segment_id,
 
 void vp9_psnr_aq_mode_setup(struct segmentation *seg);
 
+void vp9_perceptual_aq_mode_setup(struct VP9_COMP *cpi,
+                                  struct segmentation *seg);
+
 // The values given for each segment can be either deltas (from the default
 // value chosen for the frame) or absolute values.
 //

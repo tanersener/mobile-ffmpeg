@@ -228,6 +228,7 @@ int vpx_realloc_frame_buffer(YV12_BUFFER_CONFIG *ybf, int width, int height,
       // Allocation to hold larger frame, or first allocation.
       vpx_free(ybf->buffer_alloc);
       ybf->buffer_alloc = NULL;
+      ybf->buffer_alloc_sz = 0;
 
       ybf->buffer_alloc = (uint8_t *)vpx_memalign(32, (size_t)frame_size);
       if (!ybf->buffer_alloc) return -1;

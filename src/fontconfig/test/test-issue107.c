@@ -179,8 +179,8 @@ int
 main(void)
 {
     FcConfig *cfg = FcConfigCreate ();
-    char *basedir, template[512] = "/tmp/fc107-XXXXXX";
-    char *sysroot, systempl[512] = "/tmp/fc107-XXXXXX";
+    char *basedir = NULL, template[512] = "/tmp/fc107-XXXXXX";
+    char *sysroot = NULL, systempl[512] = "/tmp/fc107-XXXXXX";
     FcChar8 *d = NULL, *dd = NULL;
     FcCache *c = NULL;
     const FcChar8 *doc = ""
@@ -257,7 +257,10 @@ main(void)
     retval = 0;
 bail:
     fprintf (stderr, "Cleaning up\n");
-    unlink_dirs (basedir);
+    if (basedir)
+	unlink_dirs (basedir);
+    if (sysroot)
+	unlink_dirs (sysroot);
     if (dd)
 	free (dd);
     FcConfigDestroy (cfg);

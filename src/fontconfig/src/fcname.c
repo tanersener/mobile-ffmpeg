@@ -445,7 +445,7 @@ FcNameParse (const FcChar8 *name)
 	name = FcNameFindNext (name, "-,:", save, &delim);
 	if (save[0])
 	{
-	    if (!FcPatternAddString (pat, FC_FAMILY, save))
+	    if (!FcPatternObjectAddString (pat, FC_FAMILY_OBJECT, save))
 		goto bail2;
 	}
 	if (delim != ',')
@@ -459,7 +459,7 @@ FcNameParse (const FcChar8 *name)
 	    d = strtod ((char *) save, (char **) &e);
 	    if (e != save)
 	    {
-		if (!FcPatternAddDouble (pat, FC_SIZE, d))
+		if (!FcPatternObjectAddDouble (pat, FC_SIZE_OBJECT, d))
 		    goto bail2;
 	    }
 	    if (delim != ',')

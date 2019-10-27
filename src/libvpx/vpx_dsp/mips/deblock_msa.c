@@ -10,7 +10,8 @@
 
 #include <stdlib.h>
 
-#include "./macros_msa.h"
+#include "./vpx_dsp_rtcd.h"
+#include "vpx_dsp/mips/macros_msa.h"
 
 extern const int16_t vpx_rv[];
 

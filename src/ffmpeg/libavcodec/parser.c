@@ -245,6 +245,9 @@ int ff_combine_frame(ParseContext *pc, int next,
     for (; pc->overread > 0; pc->overread--)
         pc->buffer[pc->index++] = pc->buffer[pc->overread_index++];
 
+    if (next > *buf_size)
+        return AVERROR(EINVAL);
+
     /* flush remaining if EOF */
     if (!*buf_size && next == END_NOT_FOUND)
         next = 0;
@@ -292,6 +295,10 @@ int ff_combine_frame(ParseContext *pc, int next,
         *buf      = pc->buffer;
     }
 
+    if (next < -8) {
+        pc->overread += -8 - next;
+        next = -8;
+    }
     /* store overread bytes */
     for (; next < 0; next++) {
         pc->state   = pc->state   << 8 | pc->buffer[pc->last_index + next];

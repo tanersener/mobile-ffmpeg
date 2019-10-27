@@ -265,8 +265,8 @@ static int raw_read_frame(FILE *infile, uint8_t **buffer, size_t *bytes_read,
   return 1;
 }
 
-static int read_frame(struct VpxDecInputContext *input, uint8_t **buf,
-                      size_t *bytes_in_buffer, size_t *buffer_size) {
+static int dec_read_frame(struct VpxDecInputContext *input, uint8_t **buf,
+                          size_t *bytes_in_buffer, size_t *buffer_size) {
   switch (input->vpx_input_ctx->file_type) {
 #if CONFIG_WEBM_IO
     case FILE_TYPE_WEBM:
@@ -806,7 +806,7 @@ static int main_loop(int argc, const char **argv_) {
 
   if (arg_skip) fprintf(stderr, "Skipping first %d frames.\n", arg_skip);
   while (arg_skip) {
-    if (read_frame(&input, &buf, &bytes_in_buffer, &buffer_size)) break;
+    if (dec_read_frame(&input, &buf, &bytes_in_buffer, &buffer_size)) break;
     arg_skip--;
   }
 
@@ -837,7 +837,7 @@ static int main_loop(int argc, const char **argv_) {
 
     frame_avail = 0;
     if (!stop_after || frame_in < stop_after) {
-      if (!read_frame(&input, &buf, &bytes_in_buffer, &buffer_size)) {
+      if (!dec_read_frame(&input, &buf, &bytes_in_buffer, &buffer_size)) {
         frame_avail = 1;
         frame_in++;
 

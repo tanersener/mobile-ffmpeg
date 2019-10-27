@@ -54,6 +54,8 @@
 #include "gost/gostdsa.h"
 #include "gost/ecc-gost-curve.h"
 #endif
+#include "int/ecdsa-compute-k.h"
+#include "int/dsa-compute-k.h"
 #include <gnettle.h>
 #include <fips.h>
 
@@ -84,6 +86,12 @@ static void rnd_nonce_func(void *_ctx, size_t length, uint8_t * data)
 	if (gnutls_rnd(GNUTLS_RND_NONCE, data, length) < 0) {
 		_gnutls_switch_lib_state(LIB_STATE_ERROR);
 	}
+}
+
+static void rnd_mpz_func(void *_ctx, size_t length, uint8_t * data)
+{
+	mpz_t *k = _ctx;
+	nettle_mpz_get_str_256 (length, data, *k);
 }
 
 static void
@@ -695,6 +703,14 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 			return gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
 	}
 
+	/* deterministic ECDSA/DSA is prohibited under FIPS except in
+	 * the selftests */
+	if (_gnutls_fips_mode_enabled() &&
+	    _gnutls_get_lib_state() != LIB_STATE_SELFTEST &&
+	    (algo == GNUTLS_PK_DSA || algo == GNUTLS_PK_ECDSA) &&
+	    (sign_params->flags & GNUTLS_PK_FLAG_REPRODUCIBLE))
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
 	switch (algo) {
 	case GNUTLS_PK_EDDSA_ED25519:	/* we do EdDSA */
 		{
@@ -782,6 +798,9 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 			struct dsa_signature sig;
 			int curve_id = pk_params->curve;
 			const struct ecc_curve *curve;
+			mpz_t k;
+			void *random_ctx;
+			nettle_random_func *random_func;
 
 			curve = get_supported_nist_curve(curve_id);
 			if (curve == NULL)
@@ -808,7 +827,24 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 				hash_len = vdata->size;
 			}
 
-			ecdsa_sign(&priv, NULL, rnd_nonce_func, hash_len,
+			mpz_init(k);
+			if (_gnutls_get_lib_state() == LIB_STATE_SELFTEST ||
+			    (sign_params->flags & GNUTLS_PK_FLAG_REPRODUCIBLE)) {
+				ret = _gnutls_ecdsa_compute_k(k,
+							      curve_id,
+							      pk_params->params[ECC_K],
+							      sign_params->dsa_dig,
+							      vdata->data,
+							      vdata->size);
+				if (ret < 0)
+					goto ecdsa_cleanup;
+				random_ctx = &k;
+				random_func = rnd_mpz_func;
+			} else {
+				random_ctx = NULL;
+				random_func = rnd_nonce_func;
+			}
+			ecdsa_sign(&priv, random_ctx, random_func, hash_len,
 				   vdata->data, &sig);
 
 			/* prevent memory leaks */
@@ -824,6 +860,7 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
  ecdsa_cleanup:
 			dsa_signature_clear(&sig);
 			ecc_scalar_zclear(&priv);
+			mpz_clear(k);
 
 			if (ret < 0) {
 				gnutls_assert();
@@ -836,6 +873,9 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 			struct dsa_params pub;
 			bigint_t priv;
 			struct dsa_signature sig;
+			mpz_t k;
+			void *random_ctx;
+			nettle_random_func *random_func;
 
 			memset(&priv, 0, sizeof(priv));
 			memset(&pub, 0, sizeof(pub));
@@ -856,8 +896,27 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 				hash_len = vdata->size;
 			}
 
+			mpz_init(k);
+			if (_gnutls_get_lib_state() == LIB_STATE_SELFTEST ||
+			    (sign_params->flags & GNUTLS_PK_FLAG_REPRODUCIBLE)) {
+				ret = _gnutls_dsa_compute_k(k,
+							    pub.q,
+							    TOMPZ(priv),
+							    sign_params->dsa_dig,
+							    vdata->data,
+							    vdata->size);
+				if (ret < 0)
+					goto dsa_fail;
+				/* cancel-out dsa_sign's addition of 1 to random data */
+				mpz_sub_ui (k, k, 1);
+				random_ctx = &k;
+				random_func = rnd_mpz_func;
+			} else {
+				random_ctx = NULL;
+				random_func = rnd_nonce_func;
+			}
 			ret =
-			    dsa_sign(&pub, TOMPZ(priv), NULL, rnd_nonce_func,
+			    dsa_sign(&pub, TOMPZ(priv), random_ctx, random_func,
 				     hash_len, vdata->data, &sig);
 			if (ret == 0 || HAVE_LIB_ERROR()) {
 				gnutls_assert();
@@ -871,6 +930,7 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 
  dsa_fail:
 			dsa_signature_clear(&sig);
+			mpz_clear(k);
 
 			if (ret < 0) {
 				gnutls_assert();
@@ -1266,16 +1326,6 @@ _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 	FAIL_IF_LIB_ERROR;
 	return ret;
 }
-
-#if !defined(NETTLE_VERSION_MAJOR) || (NETTLE_VERSION_MAJOR < 3 || (NETTLE_VERSION_MAJOR == 3 && NETTLE_VERSION_MINOR < 4))
-# ifdef ENABLE_NON_SUITEB_CURVES
-#  define nettle_get_secp_192r1() &nettle_secp_192r1
-#  define nettle_get_secp_224r1() &nettle_secp_224r1
-# endif
-# define nettle_get_secp_256r1() &nettle_secp_256r1
-# define nettle_get_secp_384r1() &nettle_secp_384r1
-# define nettle_get_secp_521r1() &nettle_secp_521r1
-#endif
 
 static inline const struct ecc_curve *get_supported_nist_curve(int curve)
 {

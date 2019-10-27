@@ -524,7 +524,7 @@ static int clv_decode_frame(AVCodecContext *avctx, void *data,
             return AVERROR_INVALIDDATA;
         }
 
-        if ((ret = ff_reget_buffer(avctx, c->pic)) < 0)
+        if ((ret = ff_reget_buffer(avctx, c->pic, 0)) < 0)
             return ret;
 
         c->pic->key_frame = 1;
@@ -558,7 +558,7 @@ static int clv_decode_frame(AVCodecContext *avctx, void *data,
         if (c->pmb_width * c->pmb_height > 8LL*(buf_size - bytestream2_tell(&gb)))
             return AVERROR_INVALIDDATA;
 
-        if ((ret = ff_reget_buffer(avctx, c->pic)) < 0)
+        if ((ret = ff_reget_buffer(avctx, c->pic, 0)) < 0)
             return ret;
 
         ret = av_frame_copy(c->pic, c->prev);
@@ -665,7 +665,7 @@ static av_cold int clv_decode_init(AVCodecContext *avctx)
     }
 
     c->tile_shift = av_log2(c->tile_size);
-    if (1 << c->tile_shift != c->tile_size) {
+    if (1U << c->tile_shift != c->tile_size) {
         av_log(avctx, AV_LOG_ERROR, "Tile size: %d, is not power of 2.\n", c->tile_size);
         return AVERROR_INVALIDDATA;
     }

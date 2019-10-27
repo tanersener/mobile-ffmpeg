@@ -101,7 +101,7 @@ set(cmake_cmdline_helpstring "No help, variable specified on the command line.")
 #
 # The names of variables defaulted through this macro are added to
 # $AOM_CONFIG_VARS to facilitate build logging and diagnostics.
-macro(set_aom_detect_var name value type helpstring)
+macro(set_aom_detect_var name value helpstring)
   unset(list_index)
   list(FIND AOM_DETECT_VARS ${name} list_index)
   if(${list_index} EQUAL -1)
@@ -113,7 +113,7 @@ macro(set_aom_detect_var name value type helpstring)
   unset(cache_helpstring)
   get_property(cache_helpstring CACHE ${name} PROPERTY HELPSTRING)
   if(NOT "${cache_helpstring}" STREQUAL "${cmake_cmdline_helpstring}")
-    set(${name} ${value} CACHE ${type} "${helpstring}")
+    set(${name} ${value} CACHE STRING "${helpstring}")
     mark_as_advanced(${name})
   else()
     message(
@@ -131,7 +131,7 @@ endmacro()
 #
 # The names of variables defaulted through this macro are added to
 # $AOM_CONFIG_VARS to facilitate build logging and diagnostics.
-macro(set_aom_config_var name value type helpstring)
+macro(set_aom_config_var name value helpstring)
   unset(list_index)
   list(FIND AOM_CONFIG_VARS ${name} list_index)
   if(${list_index} EQUAL -1)
@@ -143,7 +143,7 @@ macro(set_aom_config_var name value type helpstring)
   unset(cache_helpstring)
   get_property(cache_helpstring CACHE ${name} PROPERTY HELPSTRING)
   if(NOT "${cache_helpstring}" STREQUAL "${cmake_cmdline_helpstring}")
-    set(${name} ${value} CACHE ${type} "${helpstring}")
+    set(${name} ${value} CACHE STRING "${helpstring}")
   endif()
 endmacro()
 

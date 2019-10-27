@@ -105,11 +105,16 @@ static av_cold int adpcm_decode_init(AVCodecContext * avctx)
     case AV_CODEC_ID_ADPCM_EA_R2:
     case AV_CODEC_ID_ADPCM_EA_R3:
     case AV_CODEC_ID_ADPCM_EA_XAS:
+    case AV_CODEC_ID_ADPCM_MS:
         max_channels = 6;
         break;
     case AV_CODEC_ID_ADPCM_MTAF:
         min_channels = 2;
         max_channels = 8;
+        if (avctx->channels & 1) {
+            avpriv_request_sample(avctx, "channel count %d\n", avctx->channels);
+            return AVERROR_PATCHWELCOME;
+        }
         break;
     case AV_CODEC_ID_ADPCM_PSX:
         max_channels = 8;
@@ -168,6 +173,10 @@ static av_cold int adpcm_decode_init(AVCodecContext * avctx)
             break;
         case AV_CODEC_ID_ADPCM_IMA_WS:
             avctx->sample_fmt = c->vqa_version == 3 ? AV_SAMPLE_FMT_S16P :
+                                                      AV_SAMPLE_FMT_S16;
+            break;
+        case AV_CODEC_ID_ADPCM_MS:
+            avctx->sample_fmt = avctx->channels > 2 ? AV_SAMPLE_FMT_S16P :
                                                       AV_SAMPLE_FMT_S16;
             break;
         default:
@@ -924,42 +933,66 @@ static int adpcm_decode_frame(AVCodecContext *avctx, void *data,
     {
         int block_predictor;
 
-        block_predictor = bytestream2_get_byteu(&gb);
-        if (block_predictor > 6) {
-            av_log(avctx, AV_LOG_ERROR, "ERROR: block_predictor[0] = %d\n",
-                   block_predictor);
-            return AVERROR_INVALIDDATA;
-        }
-        c->status[0].coeff1 = ff_adpcm_AdaptCoeff1[block_predictor];
-        c->status[0].coeff2 = ff_adpcm_AdaptCoeff2[block_predictor];
-        if (st) {
+        if (avctx->channels > 2) {
+            for (channel = 0; channel < avctx->channels; channel++) {
+                samples = samples_p[channel];
+                block_predictor = bytestream2_get_byteu(&gb);
+                if (block_predictor > 6) {
+                    av_log(avctx, AV_LOG_ERROR, "ERROR: block_predictor[%d] = %d\n",
+                           channel, block_predictor);
+                    return AVERROR_INVALIDDATA;
+                }
+                c->status[channel].coeff1 = ff_adpcm_AdaptCoeff1[block_predictor];
+                c->status[channel].coeff2 = ff_adpcm_AdaptCoeff2[block_predictor];
+                c->status[channel].idelta = sign_extend(bytestream2_get_le16u(&gb), 16);
+                c->status[channel].sample1 = sign_extend(bytestream2_get_le16u(&gb), 16);
+                c->status[channel].sample2 = sign_extend(bytestream2_get_le16u(&gb), 16);
+                *samples++ = c->status[channel].sample2;
+                *samples++ = c->status[channel].sample1;
+                for(n = (nb_samples - 2) >> 1; n > 0; n--) {
+                    int byte = bytestream2_get_byteu(&gb);
+                    *samples++ = adpcm_ms_expand_nibble(&c->status[channel], byte >> 4  );
+                    *samples++ = adpcm_ms_expand_nibble(&c->status[channel], byte & 0x0F);
+                }
+            }
+        } else {
             block_predictor = bytestream2_get_byteu(&gb);
             if (block_predictor > 6) {
-                av_log(avctx, AV_LOG_ERROR, "ERROR: block_predictor[1] = %d\n",
+                av_log(avctx, AV_LOG_ERROR, "ERROR: block_predictor[0] = %d\n",
                        block_predictor);
                 return AVERROR_INVALIDDATA;
             }
-            c->status[1].coeff1 = ff_adpcm_AdaptCoeff1[block_predictor];
-            c->status[1].coeff2 = ff_adpcm_AdaptCoeff2[block_predictor];
-        }
-        c->status[0].idelta = sign_extend(bytestream2_get_le16u(&gb), 16);
-        if (st){
-            c->status[1].idelta = sign_extend(bytestream2_get_le16u(&gb), 16);
-        }
+            c->status[0].coeff1 = ff_adpcm_AdaptCoeff1[block_predictor];
+            c->status[0].coeff2 = ff_adpcm_AdaptCoeff2[block_predictor];
+            if (st) {
+                block_predictor = bytestream2_get_byteu(&gb);
+                if (block_predictor > 6) {
+                    av_log(avctx, AV_LOG_ERROR, "ERROR: block_predictor[1] = %d\n",
+                           block_predictor);
+                    return AVERROR_INVALIDDATA;
+                }
+                c->status[1].coeff1 = ff_adpcm_AdaptCoeff1[block_predictor];
+                c->status[1].coeff2 = ff_adpcm_AdaptCoeff2[block_predictor];
+            }
+            c->status[0].idelta = sign_extend(bytestream2_get_le16u(&gb), 16);
+            if (st){
+                c->status[1].idelta = sign_extend(bytestream2_get_le16u(&gb), 16);
+            }
 
-        c->status[0].sample1 = sign_extend(bytestream2_get_le16u(&gb), 16);
-        if (st) c->status[1].sample1 = sign_extend(bytestream2_get_le16u(&gb), 16);
-        c->status[0].sample2 = sign_extend(bytestream2_get_le16u(&gb), 16);
-        if (st) c->status[1].sample2 = sign_extend(bytestream2_get_le16u(&gb), 16);
+            c->status[0].sample1 = sign_extend(bytestream2_get_le16u(&gb), 16);
+            if (st) c->status[1].sample1 = sign_extend(bytestream2_get_le16u(&gb), 16);
+            c->status[0].sample2 = sign_extend(bytestream2_get_le16u(&gb), 16);
+            if (st) c->status[1].sample2 = sign_extend(bytestream2_get_le16u(&gb), 16);
 
-        *samples++ = c->status[0].sample2;
-        if (st) *samples++ = c->status[1].sample2;
-        *samples++ = c->status[0].sample1;
-        if (st) *samples++ = c->status[1].sample1;
-        for(n = (nb_samples - 2) >> (1 - st); n > 0; n--) {
-            int byte = bytestream2_get_byteu(&gb);
-            *samples++ = adpcm_ms_expand_nibble(&c->status[0 ], byte >> 4  );
-            *samples++ = adpcm_ms_expand_nibble(&c->status[st], byte & 0x0F);
+            *samples++ = c->status[0].sample2;
+            if (st) *samples++ = c->status[1].sample2;
+            *samples++ = c->status[0].sample1;
+            if (st) *samples++ = c->status[1].sample1;
+            for(n = (nb_samples - 2) >> (1 - st); n > 0; n--) {
+                int byte = bytestream2_get_byteu(&gb);
+                *samples++ = adpcm_ms_expand_nibble(&c->status[0 ], byte >> 4  );
+                *samples++ = adpcm_ms_expand_nibble(&c->status[st], byte & 0x0F);
+            }
         }
         break;
     }
@@ -1198,8 +1231,11 @@ static int adpcm_decode_frame(AVCodecContext *avctx, void *data,
                 return AVERROR_INVALIDDATA;
             }
         }
-        for (i=0; i<=st; i++)
+        for (i=0; i<=st; i++) {
             c->status[i].predictor  = bytestream2_get_le32u(&gb);
+            if (FFABS(c->status[i].predictor) > (1<<16))
+                return AVERROR_INVALIDDATA;
+        }
 
         for (n = nb_samples >> (1 - st); n > 0; n--) {
             int byte   = bytestream2_get_byteu(&gb);
@@ -1347,10 +1383,10 @@ static int adpcm_decode_frame(AVCodecContext *avctx, void *data,
 
                     for (count2=0; count2<28; count2++) {
                         if (count2 & 1)
-                            next_sample = sign_extend(byte,    4) << shift;
+                            next_sample = (unsigned)sign_extend(byte,    4) << shift;
                         else {
                             byte = bytestream2_get_byte(&gb);
-                            next_sample = sign_extend(byte >> 4, 4) << shift;
+                            next_sample = (unsigned)sign_extend(byte >> 4, 4) << shift;
                         }
 
                         next_sample += (current_sample  * coeff1) +
@@ -1810,7 +1846,7 @@ ADPCM_DECODER(AV_CODEC_ID_ADPCM_IMA_RAD,     sample_fmts_s16,  adpcm_ima_rad,   
 ADPCM_DECODER(AV_CODEC_ID_ADPCM_IMA_SMJPEG,  sample_fmts_s16,  adpcm_ima_smjpeg,  "ADPCM IMA Loki SDL MJPEG");
 ADPCM_DECODER(AV_CODEC_ID_ADPCM_IMA_WAV,     sample_fmts_s16p, adpcm_ima_wav,     "ADPCM IMA WAV");
 ADPCM_DECODER(AV_CODEC_ID_ADPCM_IMA_WS,      sample_fmts_both, adpcm_ima_ws,      "ADPCM IMA Westwood");
-ADPCM_DECODER(AV_CODEC_ID_ADPCM_MS,          sample_fmts_s16,  adpcm_ms,          "ADPCM Microsoft");
+ADPCM_DECODER(AV_CODEC_ID_ADPCM_MS,          sample_fmts_both, adpcm_ms,          "ADPCM Microsoft");
 ADPCM_DECODER(AV_CODEC_ID_ADPCM_MTAF,        sample_fmts_s16p, adpcm_mtaf,        "ADPCM MTAF");
 ADPCM_DECODER(AV_CODEC_ID_ADPCM_PSX,         sample_fmts_s16p, adpcm_psx,         "ADPCM Playstation");
 ADPCM_DECODER(AV_CODEC_ID_ADPCM_SBPRO_2,     sample_fmts_s16,  adpcm_sbpro_2,     "ADPCM Sound Blaster Pro 2-bit");

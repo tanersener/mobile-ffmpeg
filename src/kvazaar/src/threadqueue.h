@@ -26,9 +26,9 @@
  * Container for worker tasks.
  */
 
-#include <pthread.h>
-
 #include "global.h" // IWYU pragma: keep
+
+#include <pthread.h>
 
 typedef struct threadqueue_job_t threadqueue_job_t;
 typedef struct threadqueue_queue_t threadqueue_queue_t;

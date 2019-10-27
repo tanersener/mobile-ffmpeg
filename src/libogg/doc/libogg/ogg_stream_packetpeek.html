@@ -9,7 +9,7 @@
 <table border=0 width=100%>
 <tr>
 <td><p class=tiny>libogg documentation</p></td>
-<td align=right><p class=tiny>libogg release 1.3.2 - 20140527</p></td>
+<td align=right><p class=tiny>libogg release 1.3.4 - 20190830</p></td>
 </tr>
 </table>
 
@@ -23,9 +23,9 @@ it without advancing decoding.</p>
 <p>In a typical situation, this would be called
 speculatively after <a
 href="ogg_stream_pagein.html">ogg_stream_pagein()</a> to check
-the packet contents before handing it off to a codec for 
+the packet contents before handing it off to a codec for
 decompression. To advance page decoding and remove
-the packet from the sync structure, call 
+the packet from the sync structure, call
 <a href="ogg_stream_packetout.html">ogg_stream_packetout()</a>.</p>
 
 <br><br>
@@ -43,14 +43,14 @@ int ogg_stream_packetpeek(ogg_stream_state *os,ogg_packet *op);
 <h3>Parameters</h3>
 <dl>
 <dt><i>os</i></dt>
-<dd>Pointer to a previously declared 
+<dd>Pointer to a previously declared
 <a href="ogg_stream_state.html">ogg_stream_state</a> struct.  Before this
 function is called, an <a href="ogg_page.html">ogg_page</a> should be
-submitted to the stream using 
+submitted to the stream using
 <a href="ogg_stream_pagein.html">ogg_stream_pagein()</a>.</dd>
 <dt><i>op</i></dt>
 <dd>Pointer to the next packet available in the bitstream, if
-any. A NULL value may be passed in the case of a simple "is there a 
+any. A NULL value may be passed in the case of a simple "is there a
 packet?" check.</dd>
 </dl>
 
@@ -71,11 +71,11 @@ packet?" check.</dd>
 
 <table border=0 width=100%>
 <tr valign=top>
-<td><p class=tiny>copyright &copy; 2000-2014 Xiph.Org</p></td>
+<td><p class=tiny>copyright &copy; 2000-2019 Xiph.Org Foundation</p></td>
 <td align=right><p class=tiny><a href="http://www.xiph.org/ogg/">Ogg Container Format</a></p></td>
 </tr><tr>
 <td><p class=tiny>libogg documentation</p></td>
-<td align=right><p class=tiny>libogg release 1.3.2 - 20140527</p></td>
+<td align=right><p class=tiny>libogg release 1.3.4 - 20190830</p></td>
 </tr>
 </table>
 

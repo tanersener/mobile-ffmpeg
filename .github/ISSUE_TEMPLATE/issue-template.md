@@ -17,7 +17,7 @@ What happened.
 If applicable, add screenshots to help explain your problem.
 
 **Logs**
-Post logs here or paste them to [Ghostbin](https://ghostbin.com) and insert the link here.
+Post logs here or paste them to [Ghostbin](https://ghostbin.co) and insert the link here.
 
 **Environment**
  - Platform: [e.g. Android/IOS]

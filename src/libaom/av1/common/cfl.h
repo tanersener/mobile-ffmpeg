@@ -144,6 +144,7 @@ void cfl_load_dc_pred(MACROBLOCKD *const xd, uint8_t *dst, int dst_stride,
 
 // The RTCD script does not support passing in an array, so we wrap it in this
 // function.
+#if CONFIG_AV1_HIGHBITDEPTH
 #define CFL_GET_SUBSAMPLE_FUNCTION(arch)  \
   CFL_SUBSAMPLE_FUNCTIONS(arch, 420, lbd) \
   CFL_SUBSAMPLE_FUNCTIONS(arch, 422, lbd) \
@@ -151,6 +152,12 @@ void cfl_load_dc_pred(MACROBLOCKD *const xd, uint8_t *dst, int dst_stride,
   CFL_SUBSAMPLE_FUNCTIONS(arch, 420, hbd) \
   CFL_SUBSAMPLE_FUNCTIONS(arch, 422, hbd) \
   CFL_SUBSAMPLE_FUNCTIONS(arch, 444, hbd)
+#else
+#define CFL_GET_SUBSAMPLE_FUNCTION(arch)  \
+  CFL_SUBSAMPLE_FUNCTIONS(arch, 420, lbd) \
+  CFL_SUBSAMPLE_FUNCTIONS(arch, 422, lbd) \
+  CFL_SUBSAMPLE_FUNCTIONS(arch, 444, lbd)
+#endif
 
 // Declare a size-specific wrapper for the size-generic function. The compiler
 // will inline the size generic function in here, the advantage is that the size
@@ -221,6 +228,7 @@ void cfl_subtract_average_4x16_c(const uint16_t *src, int16_t *dst);
                            height);                                       \
   }
 
+#if CONFIG_AV1_HIGHBITDEPTH
 #define CFL_PREDICT_hbd(arch, width, height)                                   \
   void cfl_predict_hbd_##width##x##height##_##arch(                            \
       const int16_t *pred_buf_q3, uint16_t *dst, int dst_stride, int alpha_q3, \
@@ -228,6 +236,7 @@ void cfl_subtract_average_4x16_c(const uint16_t *src, int16_t *dst);
     cfl_predict_hbd_##arch(pred_buf_q3, dst, dst_stride, alpha_q3, bd, width,  \
                            height);                                            \
   }
+#endif
 
 // This wrapper exists because clang format does not like calling macros with
 // lowercase letters.

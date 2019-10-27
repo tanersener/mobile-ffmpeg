@@ -124,7 +124,7 @@ void *gnutls_db_get_ptr(gnutls_session_t session)
  * @seconds: is the number of seconds.
  *
  * Set the expiration time for resumed sessions. The default is 21600
- * (size hours) at the time of writing.
+ * (6 hours) at the time of writing.
  *
  * The maximum value that can be set using this function is 604800
  * (7 days).

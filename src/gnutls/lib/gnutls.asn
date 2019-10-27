@@ -131,4 +131,12 @@ GOSTParameters ::= SEQUENCE {
 GOSTPrivateKey ::= OCTET STRING
 GOSTPrivateKeyOld ::= INTEGER
 
+-- GOST x509 Extensions
+IssuerSignTool ::= SEQUENCE {
+	signTool	UTF8String, -- (SIZE (1..200))
+	cATool		UTF8String, -- (SIZE (1..200))
+	signToolCert	UTF8String, -- (SIZE (1..100))
+	cAToolCert	UTF8String  -- (SIZE (1..100))
+}
+
 END

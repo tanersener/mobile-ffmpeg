@@ -86,9 +86,8 @@ client_send(gnutls_session_t session,
 static int
 server_recv(gnutls_session_t session,
 	    status_request_ext_st * priv,
-	    const uint8_t * data, size_t size)
+	    const uint8_t * data, size_t data_size)
 {
-	ssize_t data_size = size;
 	unsigned rid_bytes = 0;
 
 	/* minimum message is type (1) + responder_id_list (2) +

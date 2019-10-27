@@ -186,7 +186,7 @@ SUITE(dct_tests)
 
   // Loop through all strategies picking out the intra sad ones and run
   // select strategies though all tests
-  for (unsigned i = 0; i < strategies.count; ++i) {
+  for (volatile unsigned i = 0; i < strategies.count; ++i) {
     const strategy_t * strategy = &strategies.strategies[i];
 
     // Select buffer width according to function name for dct function.

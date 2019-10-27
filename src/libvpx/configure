@@ -31,7 +31,6 @@ Advanced options:
   --libc=PATH                     path to alternate libc
   --size-limit=WxH                max size to allow in the decoder
   --as={yasm|nasm|auto}           use specified assembler [auto, yasm preferred]
-  --sdk-path=PATH                 path to root of sdk (android builds only)
   ${toggle_codec_srcs}            in/exclude codec library source code
   ${toggle_debug_libs}            in/exclude debug version of libraries
   ${toggle_static_msvcrt}         use static MSVCRT (VS builds only)
@@ -272,7 +271,6 @@ EXPERIMENT_LIST="
     fp_mb_stats
     emulate_hardware
     non_greedy_mv
-    ml_var_partition
 "
 CONFIG_LIST="
     dependency_tracking
@@ -329,6 +327,8 @@ CONFIG_LIST="
     experimental
     size_limit
     always_adjust_bpm
+    bitstream_debug
+    mismatch_debug
     ${EXPERIMENT_LIST}
 "
 CMDLINE_SELECT="
@@ -390,6 +390,8 @@ CMDLINE_SELECT="
     vp9_highbitdepth
     experimental
     always_adjust_bpm
+    bitstream_debug
+    mismatch_debug
 "
 
 process_cmdline() {
@@ -420,6 +422,12 @@ process_cmdline() {
 }
 
 post_process_cmdline() {
+    if enabled coefficient_range_checking; then
+      echo "coefficient-range-checking is for decoders only, disabling encoders:"
+      soft_disable vp8_encoder
+      soft_disable vp9_encoder
+    fi
+
     c=""
 
     # Enable all detected codecs, if they haven't been disabled
@@ -612,6 +620,8 @@ process_toolchain() {
         check_add_cflags -Wcast-qual
         check_add_cflags -Wvla
         check_add_cflags -Wimplicit-function-declaration
+        check_add_cflags -Wmissing-declarations
+        check_add_cflags -Wmissing-prototypes
         check_add_cflags -Wuninitialized
         check_add_cflags -Wunused
         check_add_cflags -Wextra
@@ -623,6 +633,9 @@ process_toolchain() {
         if enabled mips || [ -z "${INLINE}" ]; then
           enabled extra_warnings || check_add_cflags -Wno-unused-function
         fi
+        # Enforce c89 for c files. Don't be too strict about it though. Allow
+        # gnu extensions like "//" for comments.
+        check_cflags -std=gnu89 && add_cflags_only -std=gnu89
         # Avoid this warning for third_party C++ sources. Some reorganization
         # would be needed to apply this only to test/*.cc.
         check_cflags -Wshorten-64-to-32 && add_cflags_only -Wshorten-64-to-32
@@ -632,6 +645,14 @@ process_toolchain() {
         if enabled arm; then
           check_add_cxxflags -Wno-psabi
         fi
+
+        # disable some warnings specific to libyuv.
+        check_cxxflags -Wno-missing-declarations \
+          && LIBYUV_CXXFLAGS="${LIBYUV_CXXFLAGS} -Wno-missing-declarations"
+        check_cxxflags -Wno-missing-prototypes \
+          && LIBYUV_CXXFLAGS="${LIBYUV_CXXFLAGS} -Wno-missing-prototypes"
+        check_cxxflags -Wno-unused-parameter \
+          && LIBYUV_CXXFLAGS="${LIBYUV_CXXFLAGS} -Wno-unused-parameter"
     fi
 
     if enabled icc; then

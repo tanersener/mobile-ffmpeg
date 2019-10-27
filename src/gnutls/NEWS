@@ -5,6 +5,97 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.6.10 (released 2019-09-29)
+
+** libgnutls: Added support for deterministic ECDSA/DSA (RFC6979)
+   Deterministic signing can be enabled by setting
+   GNUTLS_PRIVKEY_FLAG_REPRODUCIBLE when calling gnutls_privkey_sign_*()
+   functions (#94).
+
+** libgnutls: add gnutls_aead_cipher_encryptv2 and gnutls_aead_cipher_decryptv2
+   functions that will perform in-place encryption/decryption on data buffers (#718).
+
+** libgnutls: Corrected issue in gnutls_session_get_data2() which could fail under
+   TLS1.3, if a timeout callback was not set using gnutls_transport_set_pull_timeout_function()
+   (#823).
+
+** libgnutls: added interoperability tests with gnutls 2.12.x; addressed
+   issue with large record handling due to random padding (#811).
+
+** libgnutls: the server now selects the highest TLS protocol version,
+   if TLS 1.3 is enabled and the client advertises an older protocol version first (#837).
+
+** libgnutls: fix non-PIC assembly on i386 (#818).
+
+** libgnutls: added support for GOST 28147-89 cipher in CNT (GOST counter) mode
+   and MAC generation based on GOST 28147-89 (IMIT). For description of the
+   modes see RFC 5830. S-Box is id-tc26-gost-28147-param-Z (TC26Z) defined in
+   RFC 7836.
+
+** certtool: when outputting an encrypted private key do not insert the textual description
+   of it. This fixes a regression since 3.6.5 (#840).
+
+** API and ABI modifications:
+gnutls_aead_cipher_encryptv2: Added
+gnutls_aead_cipher_decryptv2: Added
+GNUTLS_CIPHER_GOST28147_TC26Z_CNT: Added
+GNUTLS_MAC_GOST28147_TC26Z_IMIT: Added
+
+* Version 3.6.9 (released 2019-07-25)
+
+** libgnutls: add gnutls_hash_copy/gnutls_hmac_copy functions that will create a copy
+   of digest or MAC context. Copying contexts for externally-registered digest and MAC
+   contexts is unupported (#787).
+
+** Marked the crypto implementation override APIs as deprecated. These APIs are rarely
+   used, are for a niche use case, but have significant side effects, such as preventing
+   any internal re-organization and extension of the internal cipher API. The APIs remain
+   functional though a compiler warning will be issued, and a future minor version update
+   may transform them to a no-op while keeping ABI compatibility (#789).
+
+** libgnutls: Added support for AES-GMAC, as a separate to GCM, MAC algorithm (#781).
+
+** libgnutls: gnutls_privkey_sign_hash2 now accepts the GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA
+   flag as documented. This makes it a complete replacement of gnutls_privkey_sign_hash().
+
+** libgnutls: Added support for Generalname registeredID.
+
+** The priority configuration was enhanced to allow more elaborate
+   system-wide configuration of the library (#587).
+   The following changes were included:
+    - The file is read as an ini file with '#' indicating a comment.
+    - The section "[priorities]" or global follows the existing semantics of
+      the configuration file, and allows to specify system-wide priority strings
+      which are accessed with the '@' prefix.
+    - The section "[overrides]" is added with the parameters "insecure-hash",
+      "insecure-sig", "insecure-sig-for-cert", "disabled-curve",
+      "disabled-version", "min-verification-profile", "tls-disabled-cipher",
+      "tls-disabled-mac", "tls-disabled-group", "tls-disabled-kx", which prohibit
+      specific algorithms or options globally. Existing algorithms in the
+      library can be marked as disabled and insecure, but no hard-coded
+      insecure algorithm can be marked as secure (so that the configuration
+      cannot be abused to make the system vulnerable).
+    - Unknown sections or options are skipped with a debug message, unless
+      the GNUTLS_SYSTEM_PRIORITY_FAIL_ON_INVALID environment parameter is
+      set to 1.
+
+** libgnutls: Added new flag for GNUTLS_CPUID_OVERRIDE
+    - 0x20: Enable SHA_NI instruction set
+
+** API and ABI modifications:
+gnutls_crypto_register_cipher: Deprecated
+gnutls_crypto_register_aead_cipher: Deprecated
+gnutls_crypto_register_digest: Deprecated
+gnutls_crypto_register_mac: Deprecated
+gnutls_get_system_config_file: Added
+gnutls_hash_copy: Added
+gnutls_hmac_copy: Added
+GNUTLS_MAC_AES_GMAC_128: Added
+GNUTLS_MAC_AES_GMAC_192: Added
+GNUTLS_MAC_AES_CMAC_256: Added
+GNUTLS_SAN_REGISTERED_ID: Added
+
+
 * Version 3.6.8 (released 2019-05-28)
 
 ** libgnutls: Added gnutls_prf_early() function to retrieve early keying

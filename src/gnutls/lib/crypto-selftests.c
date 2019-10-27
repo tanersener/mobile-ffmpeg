@@ -511,6 +511,20 @@ const struct cipher_vectors_st gost28147_tc26z_cfb_vectors[] = {
 	},
 };
 
+const struct cipher_vectors_st gost28147_tc26z_cnt_vectors[] = {
+	{
+	 STR(key, key_size,
+	     "\x59\x9f\x84\xba\xc3\xf3\xd2\xf1\x60\xe1\xe3\xf2\x6a\x96\x1a\xf9"
+	     "\x9c\x48\xb2\x4e\xbc\xbb\xbf\x7c\xd8\xf3\xac\xcd\x96\x8d\x28\x6a"),
+	 STR(plaintext, plaintext_size,
+	     "\x90\xa2\x39\x66\xae\x01\xb9\xa3\x52\x4e\xc8\xed\x6c\xdd\x88\x30"),
+	 .ciphertext = (uint8_t *)
+		 "\xe8\xb1\x4f\xc7\x30\xdc\x25\xbb\x36\xba\x64\x3c\x17\xdb\xff\x99",
+	 STR(iv, iv_size,
+	     "\x8d\xaf\xa8\xd1\x58\xed\x05\x8d"),
+	}
+};
+
 const struct cipher_vectors_st aes128_xts_vectors[] = {
 	{
 	 STR(key, key_size,
@@ -1355,6 +1369,7 @@ static int test_digest(gnutls_digest_algorithm_t dig,
 	int ret;
 	size_t data_size;
 	gnutls_hash_hd_t hd;
+	gnutls_hash_hd_t copy;
 
 	if (_gnutls_digest_exists(dig) == 0)
 		return 0;
@@ -1369,6 +1384,12 @@ static int test_digest(gnutls_digest_algorithm_t dig,
 
 		ret = gnutls_hash(hd, vectors[i].plaintext, 1);
 		if (ret < 0)
+			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+
+		copy = gnutls_hash_copy(hd);
+		/* Returning NULL is not an error here for the time being, but
+		 * it might become one later */
+		if (!copy && secure_getenv("GNUTLS_TEST_SUITE_RUN"))
 			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
 
 		ret = gnutls_hash(hd,
@@ -1390,6 +1411,24 @@ static int test_digest(gnutls_digest_algorithm_t dig,
 					  gnutls_digest_get_name(dig), i);
 			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
 		}
+
+		if (copy != NULL) {
+			ret = gnutls_hash(copy,
+					  &vectors[i].plaintext[1],
+					  vectors[i].plaintext_size - 1);
+			if (ret < 0)
+				return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+
+			memset(data, 0xaa, data_size);
+			gnutls_hash_deinit(copy, data);
+
+			if (memcmp(data, vectors[i].output,
+			    vectors[i].output_size) != 0) {
+				_gnutls_debug_log("%s copy test vector %d failed!\n",
+						  gnutls_digest_get_name(dig), i);
+				return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+			}
+		}
 	}
 
 	_gnutls_debug_log("%s self check succeeded\n",
@@ -1402,6 +1441,8 @@ static int test_digest(gnutls_digest_algorithm_t dig,
 struct mac_vectors_st {
 	const uint8_t *key;
 	unsigned int key_size;
+	const uint8_t *nonce;
+	unsigned int nonce_size;
 	const uint8_t *plaintext;
 	unsigned int plaintext_size;
 	const uint8_t *output;
@@ -1535,6 +1576,59 @@ const struct mac_vectors_st aes_cmac_256_vectors[] = { /* NIST SP800-38A */
 	 },
 };
 
+const struct mac_vectors_st aes_gmac_128_vectors[] = { /* NIST test vectors */
+	{
+	 STR(key, key_size,
+	     "\x23\x70\xe3\x20\xd4\x34\x42\x08\xe0\xff\x56\x83\xf2\x43\xb2\x13"),
+	 STR(nonce, nonce_size,
+	     "\x04\xdb\xb8\x2f\x04\x4d\x30\x83\x1c\x44\x12\x28"),
+	 STR(plaintext, plaintext_size,
+	     "\xd4\x3a\x8e\x50\x89\xee\xa0\xd0\x26\xc0\x3a\x85\x17\x8b\x27\xda"),
+	 STR(output, output_size,
+	     "\x2a\x04\x9c\x04\x9d\x25\xaa\x95\x96\x9b\x45\x1d\x93\xc3\x1c\x6e"),
+	},
+};
+
+const struct mac_vectors_st aes_gmac_192_vectors[] = { /* NIST test vectors */
+	{
+	 STR(key, key_size,
+	     "\xaa\x92\x1c\xb5\xa2\x43\xab\x08\x91\x1f\x32\x89\x26\x6b\x39\xda"
+	     "\xb1\x33\xf5\xc4\x20\xa6\xc5\xcd"),
+	 STR(nonce, nonce_size,
+	     "\x8f\x73\xdb\x68\xda\xee\xed\x2d\x15\x5f\xb1\xa0"),
+	 STR(plaintext, plaintext_size,
+	     "\x48\x74\x43\xc7\xc1\x4c\xe4\x74\xcb\x3d\x29\x1f\x25\x70\x70\xa2"),
+	 STR(output, output_size,
+	     "\xb1\x26\x74\xfb\xea\xc6\x88\x9a\x24\x94\x8f\x27\x92\xe3\x0a\x50"),
+	},
+};
+
+const struct mac_vectors_st aes_gmac_256_vectors[] = { /* NIST test vectors */
+	{
+	 STR(key, key_size,
+	     "\x6d\xfd\xaf\xd6\x70\x3c\x28\x5c\x01\xf1\x4f\xd1\x0a\x60\x12\x86"
+	     "\x2b\x2a\xf9\x50\xd4\x73\x3a\xbb\x40\x3b\x2e\x74\x5b\x26\x94\x5d"),
+	 STR(nonce, nonce_size,
+	     "\x37\x49\xd0\xb3\xd5\xba\xcb\x71\xbe\x06\xad\xe6"),
+	 STR(plaintext, plaintext_size,
+	     "\xc0\xd2\x49\x87\x19\x92\xe7\x03\x02\xae\x00\x81\x93\xd1\xe8\x9f"),
+	 STR(output, output_size,
+	     "\x4a\xa4\xcc\x69\xf8\x4e\xe6\xac\x16\xd9\xbf\xb4\xe0\x5d\xe5\x00"),
+	},
+};
+
+const struct mac_vectors_st gost28147_tc26z_imit_vectors[] = {
+	{
+		STR(key, key_size,
+		    "\x9d\x05\xb7\x9e\x90\xca\xd0\x0a\x2c\xda\xd2\x2e\xf4\xe8\x6f\x5c"
+		    "\xf5\xdc\x37\x68\x19\x85\xb3\xbf\xaa\x18\xc1\xc3\x05\x0a\x91\xa2"),
+		STR(plaintext, plaintext_size,
+		    "\xb5\xa1\xf0\xe3\xce\x2f\x02\x1d\x67\x61\x94\x34\x5c\x41\xe3\x6e"),
+		STR(output, output_size,
+		    "\x03\xe5\x67\x66"),
+	},
+};
+
 static int test_mac(gnutls_mac_algorithm_t mac,
 		    const struct mac_vectors_st *vectors,
 		    size_t vectors_size, unsigned flags)
@@ -1544,6 +1638,7 @@ static int test_mac(gnutls_mac_algorithm_t mac,
 	int ret;
 	size_t data_size;
 	gnutls_hmac_hd_t hd;
+	gnutls_hmac_hd_t copy;
 
 	for (i = 0; i < vectors_size; i++) {
 		ret = gnutls_hmac_init(&hd,
@@ -1556,8 +1651,19 @@ static int test_mac(gnutls_mac_algorithm_t mac,
 			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
 		}
 
+		if (vectors[i].nonce_size)
+			gnutls_hmac_set_nonce(hd,
+					      vectors[i].nonce,
+					      vectors[i].nonce_size);
+
 		ret = gnutls_hmac(hd, vectors[i].plaintext, 1);
 		if (ret < 0)
+			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+
+		copy = gnutls_hmac_copy(hd);
+		/* Returning NULL is not an error here for the time being, but
+		 * it might become one later */
+		if (!copy && secure_getenv("GNUTLS_TEST_SUITE_RUN"))
 			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
 
 		ret = gnutls_hmac(hd,
@@ -1581,6 +1687,25 @@ static int test_mac(gnutls_mac_algorithm_t mac,
 			     gnutls_mac_get_name(mac), i);
 
 			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+		}
+
+		if (copy != NULL) {
+			ret = gnutls_hmac(copy,
+					  &vectors[i].plaintext[1],
+					  vectors[i].plaintext_size - 1);
+			if (ret < 0)
+				return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+
+			memset(data, 0xaa, data_size);
+			gnutls_hmac_deinit(copy, data);
+
+			if (memcmp(data, vectors[i].output,
+			    vectors[i].output_size) != 0) {
+				_gnutls_debug_log
+					("MAC-%s copy test vector %d failed!\n",
+					 gnutls_mac_get_name(mac), i);
+				return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+			}
 		}
 	}
 
@@ -1691,6 +1816,9 @@ int gnutls_cipher_self_test(unsigned flags, gnutls_cipher_algorithm_t cipher)
 		FALLTHROUGH;
 		NON_FIPS_CASE(GNUTLS_CIPHER_GOST28147_TC26Z_CFB, test_cipher,
 			      gost28147_tc26z_cfb_vectors);
+		FALLTHROUGH;
+		NON_FIPS_CASE(GNUTLS_CIPHER_GOST28147_TC26Z_CNT, test_cipher,
+			      gost28147_tc26z_cnt_vectors);
 #endif
 		break;
 	default:
@@ -1738,11 +1866,19 @@ int gnutls_mac_self_test(unsigned flags, gnutls_mac_algorithm_t mac)
 		NON_FIPS_CASE(GNUTLS_MAC_STREEBOG_512, test_mac, hmac_streebog_512_vectors);
 		FALLTHROUGH;
 		NON_FIPS_CASE(GNUTLS_MAC_STREEBOG_256, test_mac, hmac_streebog_256_vectors);
+		FALLTHROUGH;
+		NON_FIPS_CASE(GNUTLS_MAC_GOST28147_TC26Z_IMIT, test_mac, gost28147_tc26z_imit_vectors);
 #endif
 		FALLTHROUGH;
 		CASE(GNUTLS_MAC_AES_CMAC_128, test_mac, aes_cmac_128_vectors);
 		FALLTHROUGH;
 		CASE(GNUTLS_MAC_AES_CMAC_256, test_mac, aes_cmac_256_vectors);
+		FALLTHROUGH;
+		CASE(GNUTLS_MAC_AES_GMAC_128, test_mac, aes_gmac_128_vectors);
+		FALLTHROUGH;
+		CASE(GNUTLS_MAC_AES_GMAC_192, test_mac, aes_gmac_192_vectors);
+		FALLTHROUGH;
+		CASE(GNUTLS_MAC_AES_GMAC_256, test_mac, aes_gmac_256_vectors);
 
 		break;
 	default:

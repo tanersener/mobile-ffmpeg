@@ -155,6 +155,7 @@ static vpx_codec_err_t parse_layer_options_from_string(SvcContext *svc_ctx,
     return VPX_CODEC_INVALID_PARAM;
 
   input_string = strdup(input);
+  if (input_string == NULL) return VPX_CODEC_MEM_ERROR;
   token = strtok_r(input_string, delim, &save_ptr);
   for (i = 0; i < num_layers; ++i) {
     if (token != NULL) {
@@ -194,6 +195,7 @@ static vpx_codec_err_t parse_options(SvcContext *svc_ctx, const char *options) {
 
   if (options == NULL) return VPX_CODEC_OK;
   input_string = strdup(options);
+  if (input_string == NULL) return VPX_CODEC_MEM_ERROR;
 
   // parse option name
   option_name = strtok_r(input_string, "=", &input_ptr);
@@ -457,8 +459,7 @@ vpx_codec_err_t vpx_svc_init(SvcContext *svc_ctx, vpx_codec_ctx_t *codec_ctx,
     svc_log(svc_ctx, SVC_LOG_ERROR,
             "spatial layers * temporal layers exceeds the maximum number of "
             "allowed layers of %d\n",
-            svc_ctx->spatial_layers * svc_ctx->temporal_layers,
-            (int)VPX_MAX_LAYERS);
+            svc_ctx->spatial_layers * svc_ctx->temporal_layers, VPX_MAX_LAYERS);
     return VPX_CODEC_INVALID_PARAM;
   }
   res = assign_layer_bitrates(svc_ctx, enc_cfg);
@@ -584,10 +585,10 @@ void vpx_svc_dump_statistics(SvcContext *svc_ctx) {
   for (i = 0; i < svc_ctx->spatial_layers; ++i) {
     svc_log(svc_ctx, SVC_LOG_INFO,
             "Layer %d Average PSNR=[%2.3f, %2.3f, %2.3f, %2.3f], Bytes=[%u]\n",
-            i, (double)si->psnr_sum[i][0] / number_of_frames,
-            (double)si->psnr_sum[i][1] / number_of_frames,
-            (double)si->psnr_sum[i][2] / number_of_frames,
-            (double)si->psnr_sum[i][3] / number_of_frames, si->bytes_sum[i]);
+            i, si->psnr_sum[i][0] / number_of_frames,
+            si->psnr_sum[i][1] / number_of_frames,
+            si->psnr_sum[i][2] / number_of_frames,
+            si->psnr_sum[i][3] / number_of_frames, si->bytes_sum[i]);
     // the following psnr calculation is deduced from ffmpeg.c#print_report
     y_scale = si->width * si->height * 255.0 * 255.0 * number_of_frames;
     scale[1] = y_scale;

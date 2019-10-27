@@ -470,23 +470,17 @@ NAME="AEN67"
 ><H3
 ><TT
 CLASS="LITERAL"
->&#60;dir prefix="default" salt=""&#62;</TT
+>&#60;dir prefix="default"&#62;</TT
 ></H3
 ><P
 >This element contains a directory name which will be scanned for font files
-to include in the set of available fonts.
-  </P
-><P
->If 'prefix' is set to "default" or "cwd", the current working directory will be added as the path prefix prior to the value. If 'prefix' is set to "xdg", the value in the XDG_DATA_HOME environment variable will be added as the path prefix. please see XDG Base Directory Specification for more details. If 'prefix' is set to "relative", the path of current file will be added prior to the value.
-  </P
-><P
->'salt' property affects to determine cache filename. this is useful for example when having different fonts sets on same path at container and share fonts from host on different font path.
+to include in the set of available fonts. If 'prefix' is set to "default" or "cwd", the current working directory will be added as the path prefix prior to the value. If 'prefix' is set to "xdg", the value in the XDG_DATA_HOME environment variable will be added as the path prefix. please see XDG Base Directory Specification for more details. If 'prefix' is set to "relative", the path of current file will be added prior to the value.
   </P
 ></DIV
 ><DIV
 CLASS="REFSECT2"
 ><A
-NAME="AEN73"
+NAME="AEN71"
 ></A
 ><H3
 ><TT
@@ -520,7 +514,7 @@ version number (currently 7).
 ><DIV
 CLASS="REFSECT2"
 ><A
-NAME="AEN81"
+NAME="AEN79"
 ></A
 ><H3
 ><TT
@@ -541,7 +535,7 @@ the library.  If 'prefix' is set to "xdg", the value in the XDG_CONFIG_HOME envi
 ><DIV
 CLASS="REFSECT2"
 ><A
-NAME="AEN85"
+NAME="AEN83"
 ></A
 ><H3
 ><TT
@@ -566,7 +560,7 @@ order.
 ><DIV
 CLASS="REFSECT2"
 ><A
-NAME="AEN92"
+NAME="AEN90"
 ></A
 ><H3
 ><TT
@@ -582,7 +576,7 @@ fontconfig will tries to retrieve translations with 'domain' from gettext.
 ><DIV
 CLASS="REFSECT2"
 ><A
-NAME="AEN96"
+NAME="AEN94"
 ></A
 ><H3
 ><TT
@@ -606,49 +600,7 @@ the set of characters supported by the font.
 ><DIV
 CLASS="REFSECT2"
 ><A
-NAME="AEN102"
-></A
-><H3
-><TT
-CLASS="LITERAL"
->&#60;remap-dir prefix="default" as-path="" salt=""&#60;</TT
-></H3
-><P
->This element contains a directory name where will be mapped
-as the path 'as-path' in cached information.
-This is useful if the directory name is an alias
-(via a bind mount or symlink) to another directory in the system for
-which cached font information is likely to exist.
-  </P
-><P
->'salt' property affects to determine cache filename as same as <TT
-CLASS="LITERAL"
->&#60;dir&#62;</TT
-> element.
-  </P
-></DIV
-><DIV
-CLASS="REFSECT2"
-><A
-NAME="AEN108"
-></A
-><H3
-><TT
-CLASS="LITERAL"
->&#60;reset-dirs /&#62;</TT
-></H3
-><P
->This element removes all of fonts directories where added by <TT
-CLASS="LITERAL"
->&#60;dir&#62;</TT
-> elements.
-This is useful to override fonts directories from system to own fonts directories only.
-  </P
-></DIV
-><DIV
-CLASS="REFSECT2"
-><A
-NAME="AEN113"
+NAME="AEN100"
 ></A
 ><H3
 ><TT
@@ -671,7 +623,7 @@ automatically rebuild the internal datastructures when this interval passes.
 ><DIV
 CLASS="REFSECT2"
 ><A
-NAME="AEN119"
+NAME="AEN106"
 ></A
 ><H3
 ><TT
@@ -686,7 +638,7 @@ against.  It holds acceptfont and rejectfont elements.
 ><DIV
 CLASS="REFSECT2"
 ><A
-NAME="AEN123"
+NAME="AEN110"
 ></A
 ><H3
 ><TT
@@ -704,7 +656,7 @@ elements which are used to match fonts.
 ><DIV
 CLASS="REFSECT2"
 ><A
-NAME="AEN127"
+NAME="AEN114"
 ></A
 ><H3
 ><TT
@@ -721,7 +673,7 @@ pattern elements which are used to match fonts.
 ><DIV
 CLASS="REFSECT2"
 ><A
-NAME="AEN131"
+NAME="AEN118"
 ></A
 ><H3
 ><TT
@@ -740,7 +692,7 @@ only apply to directories, not to individual fonts.
 ><DIV
 CLASS="REFSECT2"
 ><A
-NAME="AEN135"
+NAME="AEN122"
 ></A
 ><H3
 ><TT
@@ -759,7 +711,7 @@ Pattern elements include patelt elements.
 ><DIV
 CLASS="REFSECT2"
 ><A
-NAME="AEN139"
+NAME="AEN126"
 ></A
 ><H3
 ><TT
@@ -776,7 +728,7 @@ elements.
 ><DIV
 CLASS="REFSECT2"
 ><A
-NAME="AEN143"
+NAME="AEN130"
 ></A
 ><H3
 ><TT
@@ -802,7 +754,7 @@ build the fontconfig database.
 ><DIV
 CLASS="REFSECT2"
 ><A
-NAME="AEN149"
+NAME="AEN136"
 ></A
 ><H3
 ><TT
@@ -826,7 +778,7 @@ outer &#60;match&#62; element has selected.
 ><DIV
 CLASS="REFSECT2"
 ><A
-NAME="AEN153"
+NAME="AEN140"
 ></A
 ><H3
 ><TT
@@ -873,7 +825,7 @@ CLASS="PROGRAMLISTING"
 ><DIV
 CLASS="REFSECT2"
 ><A
-NAME="AEN159"
+NAME="AEN146"
 ></A
 ><H3
 ><TT
@@ -904,7 +856,7 @@ instead of -.5).
 ><DIV
 CLASS="REFSECT2"
 ><A
-NAME="AEN167"
+NAME="AEN154"
 ></A
 ><H3
 ><TT
@@ -923,7 +875,7 @@ but they can also be more involved expressions.
 ><DIV
 CLASS="REFSECT2"
 ><A
-NAME="AEN172"
+NAME="AEN159"
 ></A
 ><H3
 ><TT
@@ -941,7 +893,7 @@ representation.
 ><DIV
 CLASS="REFSECT2"
 ><A
-NAME="AEN177"
+NAME="AEN164"
 ></A
 ><H3
 ><TT
@@ -959,7 +911,7 @@ an Unicode code point or more.
 ><DIV
 CLASS="REFSECT2"
 ><A
-NAME="AEN182"
+NAME="AEN169"
 ></A
 ><H3
 ><TT
@@ -977,7 +929,7 @@ a RFC-3066-style languages or more.
 ><DIV
 CLASS="REFSECT2"
 ><A
-NAME="AEN187"
+NAME="AEN174"
 ></A
 ><H3
 ><TT
@@ -997,7 +949,7 @@ of 'font' in a match that has target="pattern".
 ><DIV
 CLASS="REFSECT2"
 ><A
-NAME="AEN191"
+NAME="AEN178"
 ></A
 ><H3
 ><TT
@@ -1073,7 +1025,7 @@ CLASS="PROGRAMLISTING"
 ><DIV
 CLASS="REFSECT2"
 ><A
-NAME="AEN196"
+NAME="AEN183"
 ></A
 ><H3
 ><TT
@@ -1109,7 +1061,7 @@ CLASS="LITERAL"
 ><DIV
 CLASS="REFSECT2"
 ><A
-NAME="AEN207"
+NAME="AEN194"
 ></A
 ><H3
 ><TT
@@ -1144,7 +1096,7 @@ CLASS="LITERAL"
 ><DIV
 CLASS="REFSECT2"
 ><A
-NAME="AEN218"
+NAME="AEN205"
 ></A
 ><H3
 ><TT
@@ -1158,7 +1110,7 @@ CLASS="LITERAL"
 ><DIV
 CLASS="REFSECT2"
 ><A
-NAME="AEN222"
+NAME="AEN209"
 ></A
 ><H3
 ><TT
@@ -1174,7 +1126,7 @@ of the third.
 ><DIV
 CLASS="REFSECT2"
 ><A
-NAME="AEN226"
+NAME="AEN213"
 ></A
 ><H3
 ><TT
@@ -1224,7 +1176,7 @@ families to the end of the family list.
 ><DIV
 CLASS="REFSECT2"
 ><A
-NAME="AEN240"
+NAME="AEN227"
 ></A
 ><H3
 ><TT
@@ -1238,7 +1190,7 @@ CLASS="LITERAL"
 ><DIV
 CLASS="REFSECT2"
 ><A
-NAME="AEN244"
+NAME="AEN231"
 ></A
 ><H3
 ><TT
@@ -1265,14 +1217,14 @@ CLASS="LITERAL"
 ><DIV
 CLASS="REFSECT1"
 ><A
-NAME="AEN252"
+NAME="AEN239"
 ></A
 ><H2
 >EXAMPLE CONFIGURATION FILE</H2
 ><DIV
 CLASS="REFSECT2"
 ><A
-NAME="AEN254"
+NAME="AEN241"
 ></A
 ><H3
 >System configuration file</H3
@@ -1398,7 +1350,7 @@ CLASS="PROGRAMLISTING"
 ><DIV
 CLASS="REFSECT2"
 ><A
-NAME="AEN258"
+NAME="AEN245"
 ></A
 ><H3
 >User configuration file</H3
@@ -1477,7 +1429,7 @@ CLASS="PROGRAMLISTING"
 ><DIV
 CLASS="REFSECT1"
 ><A
-NAME="AEN262"
+NAME="AEN249"
 ></A
 ><H2
 >Files</H2
@@ -1548,7 +1500,7 @@ per-directory caches.  This file is automatically maintained by fontconfig. plea
 ><DIV
 CLASS="REFSECT1"
 ><A
-NAME="AEN279"
+NAME="AEN266"
 ></A
 ><H2
 >Environment variables</H2
@@ -1624,7 +1576,7 @@ CLASS="LITERAL"
 ><DIV
 CLASS="REFSECT1"
 ><A
-NAME="AEN301"
+NAME="AEN288"
 ></A
 ><H2
 >See Also</H2
@@ -1639,12 +1591,12 @@ TARGET="_top"
 ><DIV
 CLASS="REFSECT1"
 ><A
-NAME="AEN305"
+NAME="AEN292"
 ></A
 ><H2
 >Version</H2
 ><P
->Fontconfig version 2.13.91
+>Fontconfig version 2.13.92
 
 	    </P
 ></DIV

@@ -189,7 +189,7 @@ void av1_choose_segmap_coding_method(AV1_COMMON *cm, MACROBLOCKD *xd) {
       for (tile_col = 0; tile_col < cm->tile_cols; tile_col++) {
         MB_MODE_INFO **mi_ptr;
         av1_tile_set_col(&tile_info, cm, tile_col);
-        mi_ptr = cm->mi_grid_visible + tile_info.mi_row_start * cm->mi_stride +
+        mi_ptr = cm->mi_grid_base + tile_info.mi_row_start * cm->mi_stride +
                  tile_info.mi_col_start;
         for (mi_row = tile_info.mi_row_start; mi_row < tile_info.mi_row_end;
              mi_row += cm->seq_params.mib_size,

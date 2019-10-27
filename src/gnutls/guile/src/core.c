@@ -1,5 +1,5 @@
 /* GnuTLS --- Guile bindings for GnuTLS.
-   Copyright (C) 2007-2014, 2016 Free Software Foundation, Inc.
+   Copyright (C) 2007-2014, 2016, 2019 Free Software Foundation, Inc.
 
    GnuTLS is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -29,6 +29,7 @@
 #include <libguile.h>
 
 #include <alloca.h>
+#include <assert.h>
 
 #include "enums.h"
 #include "smobs.h"
@@ -36,6 +37,18 @@
 #include "utils.h"
 
 
+#ifndef HAVE_SCM_GC_MALLOC_POINTERLESS
+# define scm_gc_malloc_pointerless scm_gc_malloc
+#endif
+
+/* Maximum size allowed for 'alloca'.  */
+#define ALLOCA_MAX_SIZE  1024U
+
+/* Allocate SIZE bytes, either on the C stack or on the GC-managed heap.  */
+#define FAST_ALLOC(size)					\
+  (((size) <= ALLOCA_MAX_SIZE)					\
+   ? alloca (size)						\
+   : scm_gc_malloc_pointerless ((size), "gnutls-alloc"))
 
 /* SMOB and enums type definitions.  */
 #include "enum-map.i.c"
@@ -116,21 +129,27 @@ SCM_DEFINE (scm_gnutls_version, "gnutls-version", 0, 0, 0,
 
 #undef FUNC_NAME
 
-SCM_DEFINE (scm_gnutls_make_session, "make-session", 1, 0, 0,
-            (SCM end),
+SCM_DEFINE (scm_gnutls_make_session, "make-session", 1, 0, 1,
+            (SCM end, SCM flags),
             "Return a new session for connection end @var{end}, either "
-            "@code{connection-end/server} or @code{connection-end/client}.")
+            "@code{connection-end/server} or @code{connection-end/client}.  "
+	    "The optional @var{flags} arguments are @code{connection-flag} "
+	    "values such as @code{connection-flag/auto-reauth}.")
 #define FUNC_NAME s_scm_gnutls_make_session
 {
-  int err;
+  int err, i;
   gnutls_session_t c_session;
   gnutls_connection_end_t c_end;
+  gnutls_init_flags_t c_flags = 0;
   SCM session_data;
 
   c_end = scm_to_gnutls_connection_end (end, 1, FUNC_NAME);
 
   session_data = SCM_GNUTLS_MAKE_SESSION_DATA ();
-  err = gnutls_init (&c_session, c_end);
+  for (i = 2; scm_is_pair (flags); flags = scm_cdr (flags), i++)
+    c_flags |= scm_to_gnutls_connection_flag (scm_car (flags), i, FUNC_NAME);
+
+  err = gnutls_init (&c_session, c_end | c_flags);
 
   if (EXPECT_FALSE (err))
     scm_gnutls_error (err, FUNC_NAME);
@@ -196,7 +215,24 @@ SCM_DEFINE (scm_gnutls_rehandshake, "rehandshake", 1, 0, 0,
 
   return SCM_UNSPECIFIED;
 }
+#undef FUNC_NAME
 
+SCM_DEFINE (scm_gnutls_reauthenticate, "reauthenticate", 1, 0, 0,
+            (SCM session), "Perform a re-authentication step for @var{session}.")
+#define FUNC_NAME s_scm_gnutls_reauthenticate
+{
+  int err;
+  gnutls_session_t c_session;
+
+  c_session = scm_to_gnutls_session (session, 1, FUNC_NAME);
+
+  /* FIXME: Allow flags as an argument.  */
+  err = gnutls_reauth (c_session, 0);
+  if (EXPECT_FALSE (err))
+    scm_gnutls_error (err, FUNC_NAME);
+
+  return SCM_UNSPECIFIED;
+}
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_alert_get, "alert-get", 1, 0, 0,
@@ -869,8 +905,15 @@ do_fill_port (void *data)
   const fill_port_data_t *args = (fill_port_data_t *) data;
 
   c_port = args->c_port;
-  result = gnutls_record_recv (args->c_session,
-                               c_port->read_buf, c_port->read_buf_size);
+
+  /* We can get GNUTLS_E_AGAIN due to a "short read", which does _not_
+     correspond to an actual EAGAIN from read(2) since the underlying file
+     descriptor is blocking.  Thus, we can safely loop right away.  */
+  do
+    result = gnutls_record_recv (args->c_session,
+				 c_port->read_buf, c_port->read_buf_size);
+  while (result == GNUTLS_E_AGAIN || result == GNUTLS_E_INTERRUPTED);
+
   if (EXPECT_TRUE (result > 0))
     {
       c_port->read_pos = c_port->read_buf;
@@ -958,12 +1001,8 @@ make_session_record_port (SCM session)
   const unsigned long mode_bits = SCM_OPN | SCM_RDNG | SCM_WRTNG;
 
   c_port_buf = (unsigned char *)
-#ifdef HAVE_SCM_GC_MALLOC_POINTERLESS
-    scm_gc_malloc_pointerless
-#else
-    scm_gc_malloc
-#endif
-    (SCM_GNUTLS_SESSION_RECORD_PORT_BUFFER_SIZE, session_record_port_gc_hint);
+    scm_gc_malloc_pointerless (SCM_GNUTLS_SESSION_RECORD_PORT_BUFFER_SIZE,
+			       session_record_port_gc_hint);
 
   /* Create a new port.  */
   port = scm_new_port_table_entry (session_record_port_type);
@@ -1000,9 +1039,25 @@ read_from_session_record_port (SCM port, SCM dst, size_t start, size_t count)
 
   read_buf = (char *) SCM_BYTEVECTOR_CONTENTS (dst) + start;
 
-  /* XXX: Leave guile mode when SCM_GNUTLS_SESSION_TRANSPORT_IS_FD is
-     true?  */
-  result = gnutls_record_recv (c_session, read_buf, count);
+  /* We can get GNUTLS_E_AGAIN due to a "short read", which does _not_
+     correspond to an actual EAGAIN from read(2) if the underlying file
+     descriptor is blocking--e.g., from 'get_last_packet', returning
+     GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE.
+
+     If SESSION is backed by a file descriptor, return -1 to indicate that
+     we'd better poll; otherwise loop, which is good enough if the underlying
+     port is blocking.  */
+  do
+    result = gnutls_record_recv (c_session, read_buf, count);
+  while (result == GNUTLS_E_INTERRUPTED
+	 || (result == GNUTLS_E_AGAIN
+	     && !SCM_GNUTLS_SESSION_TRANSPORT_IS_FD (c_session)));
+
+  if (result == GNUTLS_E_AGAIN
+      && SCM_GNUTLS_SESSION_TRANSPORT_IS_FD (c_session))
+    /* Tell Guile that reading would block.  */
+    return (size_t) -1;
+
   if (EXPECT_FALSE (result < 0))
     /* FIXME: Silently swallowed! */
     scm_gnutls_error (result, FUNC_NAME);
@@ -1010,6 +1065,22 @@ read_from_session_record_port (SCM port, SCM dst, size_t start, size_t count)
   return result;
 }
 #undef FUNC_NAME
+
+/* Return the file descriptor that backs PORT.  This function is called upon a
+   blocking read--i.e., 'read_from_session_record_port' returned -1.  */
+static int
+session_record_port_fd (SCM port)
+{
+  SCM session;
+  gnutls_session_t c_session;
+
+  session = SCM_GNUTLS_SESSION_RECORD_PORT_SESSION (port);
+  c_session = scm_to_gnutls_session (session, 1, __func__);
+
+  assert (SCM_GNUTLS_SESSION_TRANSPORT_IS_FD (c_session));
+
+  return gnutls_transport_get_int (c_session);
+}
 
 static size_t
 write_to_session_record_port (SCM port, SCM src, size_t start, size_t count)
@@ -1083,6 +1154,11 @@ scm_init_gnutls_session_record_port_type (void)
                         read_from_session_record_port,
 #endif
                         write_to_session_record_port);
+
+#if !USING_GUILE_BEFORE_2_2
+  scm_set_port_read_wait_fd (session_record_port_type,
+			     session_record_port_fd);
+#endif
 
   /* Guile >= 1.9.3 doesn't need a custom mark procedure, and doesn't need a
      finalizer (since memory associated with the port is automatically
@@ -1438,7 +1514,7 @@ set_certificate_file (certificate_set_file_function_t set_file,
   c_format = scm_to_gnutls_x509_certificate_format (format, 3, FUNC_NAME);
 
   c_file_len = scm_c_string_length (file);
-  c_file = alloca (c_file_len + 1);
+  c_file = FAST_ALLOC (c_file_len + 1);
 
   (void) scm_to_locale_stringbuf (file, c_file, c_file_len + 1);
   c_file[c_file_len] = '\0';
@@ -1550,10 +1626,10 @@ SCM_DEFINE (scm_gnutls_set_certificate_credentials_x509_key_files_x,
   c_format = scm_to_gnutls_x509_certificate_format (format, 2, FUNC_NAME);
 
   c_cert_file_len = scm_c_string_length (cert_file);
-  c_cert_file = alloca (c_cert_file_len + 1);
+  c_cert_file = FAST_ALLOC (c_cert_file_len + 1);
 
   c_key_file_len = scm_c_string_length (key_file);
-  c_key_file = alloca (c_key_file_len + 1);
+  c_key_file = FAST_ALLOC (c_key_file_len + 1);
 
   (void) scm_to_locale_stringbuf (cert_file, c_cert_file,
                                   c_cert_file_len + 1);
@@ -1713,7 +1789,7 @@ SCM_DEFINE (scm_gnutls_set_certificate_credentials_x509_keys_x,
   SCM_VALIDATE_LIST_COPYLEN (2, certs, c_cert_count);
   c_key = scm_to_gnutls_x509_private_key (privkey, 3, FUNC_NAME);
 
-  c_certs = alloca (c_cert_count * sizeof (*c_certs));
+  c_certs = FAST_ALLOC (c_cert_count * sizeof (*c_certs));
   for (i = 0; scm_is_pair (certs); certs = SCM_CDR (certs), i++)
     {
       c_certs[i] = scm_to_gnutls_x509_certificate (SCM_CAR (certs),
@@ -1819,6 +1895,18 @@ SCM_DEFINE (scm_gnutls_peer_certificate_status, "peer-certificate-status",
   MATCH_STATUS (GNUTLS_CERT_SIGNER_NOT_FOUND);
   MATCH_STATUS (GNUTLS_CERT_SIGNER_NOT_CA);
   MATCH_STATUS (GNUTLS_CERT_INSECURE_ALGORITHM);
+  MATCH_STATUS (GNUTLS_CERT_NOT_ACTIVATED);
+  MATCH_STATUS (GNUTLS_CERT_EXPIRED);
+  MATCH_STATUS (GNUTLS_CERT_SIGNATURE_FAILURE);
+  MATCH_STATUS (GNUTLS_CERT_REVOCATION_DATA_SUPERSEDED);
+  MATCH_STATUS (GNUTLS_CERT_UNEXPECTED_OWNER);
+  MATCH_STATUS (GNUTLS_CERT_REVOCATION_DATA_ISSUED_IN_FUTURE);
+  MATCH_STATUS (GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE);
+  MATCH_STATUS (GNUTLS_CERT_MISMATCH);
+  MATCH_STATUS (GNUTLS_CERT_PURPOSE_MISMATCH);
+  MATCH_STATUS (GNUTLS_CERT_MISSING_OCSP_STATUS);
+  MATCH_STATUS (GNUTLS_CERT_INVALID_OCSP_STATUS);
+  MATCH_STATUS (GNUTLS_CERT_UNKNOWN_CRIT_EXTENSIONS);
 
   if (EXPECT_FALSE (c_status != 0))
     /* XXX: We failed to interpret one of the status flags.  */
@@ -1872,8 +1960,8 @@ SCM_DEFINE (scm_gnutls_set_srp_server_credentials_files_x,
   c_password_file_len = scm_c_string_length (password_file);
   c_password_conf_file_len = scm_c_string_length (password_conf_file);
 
-  c_password_file = alloca (c_password_file_len + 1);
-  c_password_conf_file = alloca (c_password_conf_file_len + 1);
+  c_password_file = FAST_ALLOC (c_password_file_len + 1);
+  c_password_conf_file = FAST_ALLOC (c_password_conf_file_len + 1);
 
   (void) scm_to_locale_stringbuf (password_file, c_password_file,
                                   c_password_file_len + 1);
@@ -1930,8 +2018,8 @@ SCM_DEFINE (scm_gnutls_set_srp_client_credentials_x,
   c_username_len = scm_c_string_length (username);
   c_password_len = scm_c_string_length (password);
 
-  c_username = alloca (c_username_len + 1);
-  c_password = alloca (c_password_len + 1);
+  c_username = FAST_ALLOC (c_username_len + 1);
+  c_password = FAST_ALLOC (c_password_len + 1);
 
   (void) scm_to_locale_stringbuf (username, c_username, c_username_len + 1);
   c_username[c_username_len] = '\0';
@@ -1987,7 +2075,7 @@ SCM_DEFINE (scm_gnutls_srp_base64_encode, "srp-base64-encode",
   SCM_VALIDATE_STRING (1, str);
 
   c_str_len = scm_c_string_length (str);
-  c_str = alloca (c_str_len + 1);
+  c_str = FAST_ALLOC (c_str_len + 1);
   (void) scm_to_locale_stringbuf (str, c_str, c_str_len + 1);
   c_str[c_str_len] = '\0';
 
@@ -2050,14 +2138,14 @@ SCM_DEFINE (scm_gnutls_srp_base64_decode, "srp-base64-decode",
   SCM_VALIDATE_STRING (1, str);
 
   c_str_len = scm_c_string_length (str);
-  c_str = alloca (c_str_len + 1);
+  c_str = FAST_ALLOC (c_str_len + 1);
   (void) scm_to_locale_stringbuf (str, c_str, c_str_len + 1);
   c_str[c_str_len] = '\0';
 
   /* We assume that the decoded string is smaller than the encoded
      string.  */
   c_result_len = c_str_len;
-  c_result = alloca (c_result_len + 1);
+  c_result = FAST_ALLOC (c_result_len + 1);
 
   c_str_d.data = (unsigned char *) c_str;
   c_str_d.size = c_str_len;
@@ -2112,7 +2200,7 @@ SCM_DEFINE (scm_gnutls_set_psk_server_credentials_file_x,
   SCM_VALIDATE_STRING (2, file);
 
   c_file_len = scm_c_string_length (file);
-  c_file = alloca (c_file_len + 1);
+  c_file = FAST_ALLOC (c_file_len + 1);
 
   (void) scm_to_locale_stringbuf (file, c_file, c_file_len + 1);
   c_file[c_file_len] = '\0';
@@ -2166,7 +2254,7 @@ SCM_DEFINE (scm_gnutls_set_psk_client_credentials_x,
   c_key_format = scm_to_gnutls_psk_key_format (key_format, 4, FUNC_NAME);
 
   c_username_len = scm_c_string_length (username);
-  c_username = alloca (c_username_len + 1);
+  c_username = FAST_ALLOC (c_username_len + 1);
 
   (void) scm_to_locale_stringbuf (username, c_username, c_username_len + 1);
   c_username[c_username_len] = '\0';
@@ -2334,7 +2422,7 @@ SCM_DEFINE (scm_gnutls_pkcs8_import_x509_private_key,
   else
     {
       c_pass_len = scm_c_string_length (pass);
-      c_pass = alloca (c_pass_len + 1);
+      c_pass = FAST_ALLOC (c_pass_len + 1);
       (void) scm_to_locale_stringbuf (pass, c_pass, c_pass_len + 1);
       c_pass[c_pass_len] = '\0';
     }
@@ -2390,7 +2478,7 @@ SCM_DEFINE (scm_gnutls_pkcs8_import_x509_private_key,
   (void) get_the_dn (c_cert, NULL, &c_dn_len);			\
 								\
   /* Get the DN itself.  */					\
-  c_dn = alloca (c_dn_len);					\
+  c_dn = FAST_ALLOC (c_dn_len);					\
   err = get_the_dn (c_cert, c_dn, &c_dn_len);			\
 								\
   if (EXPECT_FALSE (err))					\
@@ -2523,7 +2611,7 @@ SCM_DEFINE (scm_gnutls_x509_certificate_matches_hostname_p,
   SCM_VALIDATE_STRING (2, hostname);
 
   c_hostname_len = scm_c_string_length (hostname);
-  c_hostname = alloca (c_hostname_len + 1);
+  c_hostname = FAST_ALLOC (c_hostname_len + 1);
 
   (void) scm_to_locale_stringbuf (hostname, c_hostname, c_hostname_len + 1);
   c_hostname[c_hostname_len] = '\0';
@@ -2797,7 +2885,7 @@ SCM_DEFINE (scm_gnutls_x509_certificate_subject_alternative_name,
 #define GUILE_GNUTLS_MAX_OPENPGP_NAME_LENGTH  2048
 
 SCM_DEFINE (scm_gnutls_import_openpgp_certificate,
-            "import-openpgp-certificate", 2, 0, 0, (SCM data, SCM format),
+            "%import-openpgp-certificate", 2, 0, 0, (SCM data, SCM format),
             "Return a new OpenPGP certificate object resulting from the "
             "import of @var{data} (a uniform array) according to "
             "@var{format}.")
@@ -2841,7 +2929,7 @@ SCM_DEFINE (scm_gnutls_import_openpgp_certificate,
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_import_openpgp_private_key,
-            "import-openpgp-private-key", 2, 1, 0, (SCM data, SCM format,
+            "%import-openpgp-private-key", 2, 1, 0, (SCM data, SCM format,
                                                     SCM pass),
             "Return a new OpenPGP private key object resulting from the "
             "import of @var{data} (a uniform array) according to "
@@ -2864,7 +2952,7 @@ SCM_DEFINE (scm_gnutls_import_openpgp_private_key,
   else
     {
       c_pass_len = scm_c_string_length (pass);
-      c_pass = alloca (c_pass_len + 1);
+      c_pass = FAST_ALLOC (c_pass_len + 1);
       (void) scm_to_locale_stringbuf (pass, c_pass, c_pass_len + 1);
       c_pass[c_pass_len] = '\0';
     }
@@ -2896,7 +2984,7 @@ SCM_DEFINE (scm_gnutls_import_openpgp_private_key,
 
 #undef FUNC_NAME
 
-SCM_DEFINE (scm_gnutls_openpgp_certificate_id, "openpgp-certificate-id",
+SCM_DEFINE (scm_gnutls_openpgp_certificate_id, "%openpgp-certificate-id",
             1, 0, 0,
             (SCM key),
             "Return the ID (an 8-element u8vector) of certificate "
@@ -2922,7 +3010,7 @@ SCM_DEFINE (scm_gnutls_openpgp_certificate_id, "openpgp-certificate-id",
 
 #undef FUNC_NAME
 
-SCM_DEFINE (scm_gnutls_openpgp_certificate_id_x, "openpgp-certificate-id!",
+SCM_DEFINE (scm_gnutls_openpgp_certificate_id_x, "%openpgp-certificate-id!",
             2, 0, 0,
             (SCM key, SCM id),
             "Store the ID (an 8 byte sequence) of certificate "
@@ -2957,7 +3045,7 @@ SCM_DEFINE (scm_gnutls_openpgp_certificate_id_x, "openpgp-certificate-id!",
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_openpgp_certificate_fingerpint_x,
-            "openpgp-certificate-fingerprint!",
+            "%openpgp-certificate-fingerprint!",
             2, 0, 0,
             (SCM key, SCM fpr),
             "Store in @var{fpr} (a u8vector) the fingerprint of @var{key}.  "
@@ -2988,7 +3076,7 @@ SCM_DEFINE (scm_gnutls_openpgp_certificate_fingerpint_x,
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_openpgp_certificate_fingerprint,
-            "openpgp-certificate-fingerprint",
+            "%openpgp-certificate-fingerprint",
             1, 0, 0,
             (SCM key),
             "Return a new u8vector denoting the fingerprint of " "@var{key}.")
@@ -3046,7 +3134,7 @@ SCM_DEFINE (scm_gnutls_openpgp_certificate_fingerprint,
 
 #undef FUNC_NAME
 
-SCM_DEFINE (scm_gnutls_openpgp_certificate_name, "openpgp-certificate-name",
+SCM_DEFINE (scm_gnutls_openpgp_certificate_name, "%openpgp-certificate-name",
             2, 0, 0,
             (SCM key, SCM index),
             "Return the @var{index}th name of @var{key}.")
@@ -3071,7 +3159,7 @@ SCM_DEFINE (scm_gnutls_openpgp_certificate_name, "openpgp-certificate-name",
 
 #undef FUNC_NAME
 
-SCM_DEFINE (scm_gnutls_openpgp_certificate_names, "openpgp-certificate-names",
+SCM_DEFINE (scm_gnutls_openpgp_certificate_names, "%openpgp-certificate-names",
             1, 0, 0, (SCM key), "Return the list of names for @var{key}.")
 #define FUNC_NAME s_scm_gnutls_openpgp_certificate_names
 {
@@ -3104,7 +3192,7 @@ SCM_DEFINE (scm_gnutls_openpgp_certificate_names, "openpgp-certificate-names",
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_openpgp_certificate_algorithm,
-            "openpgp-certificate-algorithm",
+            "%openpgp-certificate-algorithm",
             1, 0, 0,
             (SCM key),
             "Return two values: the certificate algorithm used by "
@@ -3125,7 +3213,7 @@ SCM_DEFINE (scm_gnutls_openpgp_certificate_algorithm,
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_openpgp_certificate_version,
-            "openpgp-certificate-version",
+            "%openpgp-certificate-version",
             1, 0, 0,
             (SCM key),
             "Return the version of the OpenPGP message format (RFC2440) "
@@ -3143,7 +3231,7 @@ SCM_DEFINE (scm_gnutls_openpgp_certificate_version,
 
 #undef FUNC_NAME
 
-SCM_DEFINE (scm_gnutls_openpgp_certificate_usage, "openpgp-certificate-usage",
+SCM_DEFINE (scm_gnutls_openpgp_certificate_usage, "%openpgp-certificate-usage",
             1, 0, 0,
             (SCM key),
             "Return a list of values denoting the key usage of @var{key}.")
@@ -3214,7 +3302,7 @@ SCM_DEFINE (scm_gnutls_import_openpgp_keyring, "import-openpgp-keyring",
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_openpgp_keyring_contains_key_id_p,
-            "openpgp-keyring-contains-key-id?",
+            "%openpgp-keyring-contains-key-id?",
             2, 0, 0,
             (SCM keyring, SCM id),
             "Return @code{#f} if key ID @var{id} is in @var{keyring}, "
@@ -3252,7 +3340,7 @@ SCM_DEFINE (scm_gnutls_openpgp_keyring_contains_key_id_p,
 /* OpenPGP certificates.  */
 
 SCM_DEFINE (scm_gnutls_set_certificate_credentials_openpgp_keys_x,
-            "set-certificate-credentials-openpgp-keys!",
+            "%set-certificate-credentials-openpgp-keys!",
             3, 0, 0,
             (SCM cred, SCM pub, SCM sec),
             "Use certificate @var{pub} and secret key @var{sec} in "

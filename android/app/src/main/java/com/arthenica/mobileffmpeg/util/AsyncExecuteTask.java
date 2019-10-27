@@ -33,7 +33,7 @@ public class AsyncExecuteTask extends AsyncTask<String, Integer, Integer> {
 
     @Override
     protected Integer doInBackground(final String... arguments) {
-        return FFmpeg.execute(arguments);
+        return FFmpeg.execute(arguments[0]);
     }
 
     @Override

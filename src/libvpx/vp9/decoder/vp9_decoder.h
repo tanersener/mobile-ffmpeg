@@ -21,6 +21,7 @@
 #include "vp9/common/vp9_thread_common.h"
 #include "vp9/common/vp9_onyxc_int.h"
 #include "vp9/common/vp9_ppflags.h"
+#include "./vp9_job_queue.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -29,6 +30,14 @@ extern "C" {
 #define EOBS_PER_SB_LOG2 8
 #define DQCOEFFS_PER_SB_LOG2 12
 #define PARTITIONS_PER_SB 85
+
+typedef enum JobType { PARSE_JOB, RECON_JOB, LPF_JOB } JobType;
+
+typedef struct ThreadData {
+  struct VP9Decoder *pbi;
+  LFWorkerData *lf_data;
+  VP9LfSync *lf_sync;
+} ThreadData;
 
 typedef struct TileBuffer {
   const uint8_t *data;
@@ -49,13 +58,37 @@ typedef struct TileWorkerData {
   struct vpx_internal_error_info error_info;
 } TileWorkerData;
 
+typedef void (*process_block_fn_t)(TileWorkerData *twd,
+                                   struct VP9Decoder *const pbi, int mi_row,
+                                   int mi_col, BLOCK_SIZE bsize, int bwl,
+                                   int bhl);
+
 typedef struct RowMTWorkerData {
   int num_sbs;
   int *eob[MAX_MB_PLANE];
   PARTITION_TYPE *partition;
   tran_low_t *dqcoeff[MAX_MB_PLANE];
   int8_t *recon_map;
+  const uint8_t *data_end;
+  uint8_t *jobq_buf;
+  JobQueueRowMt jobq;
+  size_t jobq_size;
+  int num_tiles_done;
+  int num_jobs;
+#if CONFIG_MULTITHREAD
+  pthread_mutex_t recon_done_mutex;
+  pthread_mutex_t *recon_sync_mutex;
+  pthread_cond_t *recon_sync_cond;
+#endif
+  ThreadData *thread_data;
 } RowMTWorkerData;
+
+/* Structure to queue and dequeue row decode jobs */
+typedef struct Job {
+  int row_num;
+  int tile_col;
+  JobType job_type;
+} Job;
 
 typedef struct VP9Decoder {
   DECLARE_ALIGNED(16, MACROBLOCKD, mb);
@@ -128,7 +161,8 @@ struct VP9Decoder *vp9_decoder_create(BufferPool *const pool);
 void vp9_decoder_remove(struct VP9Decoder *pbi);
 
 void vp9_dec_alloc_row_mt_mem(RowMTWorkerData *row_mt_worker_data,
-                              VP9_COMMON *cm, int num_sbs);
+                              VP9_COMMON *cm, int num_sbs, int max_threads,
+                              int num_jobs);
 void vp9_dec_free_row_mt_mem(RowMTWorkerData *row_mt_worker_data);
 
 static INLINE void decrease_ref_count(int idx, RefCntBuffer *const frame_bufs,

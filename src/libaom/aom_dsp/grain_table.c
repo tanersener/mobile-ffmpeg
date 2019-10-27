@@ -203,7 +203,7 @@ int aom_film_grain_table_lookup(aom_film_grain_table_t *t, int64_t time_stamp,
                                 aom_film_grain_t *grain) {
   aom_film_grain_table_entry_t *entry = t->head;
   aom_film_grain_table_entry_t *prev_entry = 0;
-  int16_t random_seed = grain ? grain->random_seed : 0;
+  uint16_t random_seed = grain ? grain->random_seed : 0;
   if (grain) memset(grain, 0, sizeof(*grain));
 
   while (entry) {

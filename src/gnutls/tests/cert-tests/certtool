@@ -47,6 +47,13 @@ if test -n "${SETSID}";then
 		exit 1
 	fi
 
+	grep 'modulus:' ${TMPFILE1}
+	if test $? = 0;then
+		cat ${TMPFILE1}
+		echo "PKCS#8 file contains text modulus"
+		exit 1
+	fi
+
 	#check whether password is being honoured
 	#some CI runners need GNUTLS_PIN (GNUTLS_PIN=${PASS})
 	${SETSID} "${CERTTOOL}" --generate-self-signed --load-privkey ${TMPFILE1} --template ${srcdir}/templates/template-test.tmpl --ask-pass >${TMPFILE2} 2>&1 <<EOF

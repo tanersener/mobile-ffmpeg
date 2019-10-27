@@ -142,7 +142,7 @@ the last, which allows to use a PKCS #11 trust policy module. That module not on
 provides the trusted certificates, but allows the categorization of them using purpose,
 e.g., CAs can be restricted for e-mail usage only, or administrative restrictions of CAs, for
 examples by restricting a CA to only issue certificates for a given DNS domain using NameConstraints.
-A publicly available PKCS #11 trust module is p11-kit's trust module@footnote{@url{https://p11-glue.freedesktop.org/doc/p11-kit/trust-module.html}}.
+A publicly available PKCS #11 trust module is p11-kit's trust module@footnote{@url{https://p11-glue.github.io/p11-glue/trust-module.html}}.
 
 @node Document overview
 @section Overview

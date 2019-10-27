@@ -97,7 +97,9 @@ void aom_fdct8x8_c(const int16_t *input, tran_low_t *final_output, int stride) {
   }
 }
 
+#if CONFIG_AV1_HIGHBITDEPTH
 void aom_highbd_fdct8x8_c(const int16_t *input, tran_low_t *final_output,
                           int stride) {
   aom_fdct8x8_c(input, final_output, stride);
 }
+#endif

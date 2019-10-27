@@ -31,60 +31,6 @@ int av1_get_MBs(int width, int height) {
   return mb_rows * mb_cols;
 }
 
-#if CONFIG_LPF_MASK
-static int alloc_loop_filter_mask(AV1_COMMON *cm) {
-  aom_free(cm->lf.lfm);
-  cm->lf.lfm = NULL;
-
-  // Each lfm holds bit masks for all the 4x4 blocks in a max
-  // 64x64 (128x128 for ext_partitions) region.  The stride
-  // and rows are rounded up / truncated to a multiple of 16
-  // (32 for ext_partition).
-  cm->lf.lfm_stride = (cm->mi_cols + (MI_SIZE_64X64 - 1)) >> MIN_MIB_SIZE_LOG2;
-  cm->lf.lfm_num = ((cm->mi_rows + (MI_SIZE_64X64 - 1)) >> MIN_MIB_SIZE_LOG2) *
-                   cm->lf.lfm_stride;
-  cm->lf.lfm =
-      (LoopFilterMask *)aom_calloc(cm->lf.lfm_num, sizeof(*cm->lf.lfm));
-  if (!cm->lf.lfm) return 1;
-
-  unsigned int i;
-  for (i = 0; i < cm->lf.lfm_num; ++i) av1_zero(cm->lf.lfm[i]);
-
-  return 0;
-}
-
-static void free_loop_filter_mask(AV1_COMMON *cm) {
-  if (cm->lf.lfm == NULL) return;
-
-  aom_free(cm->lf.lfm);
-  cm->lf.lfm = NULL;
-  cm->lf.lfm_num = 0;
-  cm->lf.lfm_stride = 0;
-}
-#endif
-
-void av1_set_mb_mi(AV1_COMMON *cm, int width, int height) {
-  // Ensure that the decoded width and height are both multiples of
-  // 8 luma pixels (note: this may only be a multiple of 4 chroma pixels if
-  // subsampling is used).
-  // This simplifies the implementation of various experiments,
-  // eg. cdef, which operates on units of 8x8 luma pixels.
-  const int aligned_width = ALIGN_POWER_OF_TWO(width, 3);
-  const int aligned_height = ALIGN_POWER_OF_TWO(height, 3);
-
-  cm->mi_cols = aligned_width >> MI_SIZE_LOG2;
-  cm->mi_rows = aligned_height >> MI_SIZE_LOG2;
-  cm->mi_stride = calc_mi_size(cm->mi_cols);
-
-  cm->mb_cols = (cm->mi_cols + 2) >> 2;
-  cm->mb_rows = (cm->mi_rows + 2) >> 2;
-  cm->MBs = cm->mb_rows * cm->mb_cols;
-
-#if CONFIG_LPF_MASK
-  alloc_loop_filter_mask(cm);
-#endif
-}
-
 void av1_free_ref_frame_buffers(BufferPool *pool) {
   int i;
 
@@ -223,7 +169,7 @@ void av1_free_context_buffers(AV1_COMMON *cm) {
   av1_free_above_context_buffers(cm, cm->num_allocated_above_contexts);
 
 #if CONFIG_LPF_MASK
-  free_loop_filter_mask(cm);
+  av1_free_loop_filter_mask(cm);
 #endif
 }
 
@@ -272,20 +218,15 @@ int av1_alloc_above_context_buffers(AV1_COMMON *cm,
 }
 
 int av1_alloc_context_buffers(AV1_COMMON *cm, int width, int height) {
-  int new_mi_size;
+  cm->set_mb_mi(cm, width, height);
 
-  av1_set_mb_mi(cm, width, height);
-  new_mi_size = cm->mi_stride * calc_mi_size(cm->mi_rows);
-  if (cm->mi_alloc_size < new_mi_size) {
-    cm->free_mi(cm);
-    if (cm->alloc_mi(cm, new_mi_size)) goto fail;
-  }
+  if (cm->alloc_mi(cm)) goto fail;
 
   return 0;
 
 fail:
   // clear the mi_* values to force a realloc on resync
-  av1_set_mb_mi(cm, 0, 0);
+  cm->set_mb_mi(cm, 0, 0);
   av1_free_context_buffers(cm);
   return 1;
 }
@@ -300,3 +241,35 @@ void av1_remove_common(AV1_COMMON *cm) {
 }
 
 void av1_init_context_buffers(AV1_COMMON *cm) { cm->setup_mi(cm); }
+
+#if CONFIG_LPF_MASK
+int av1_alloc_loop_filter_mask(AV1_COMMON *cm) {
+  aom_free(cm->lf.lfm);
+  cm->lf.lfm = NULL;
+
+  // Each lfm holds bit masks for all the 4x4 blocks in a max
+  // 64x64 (128x128 for ext_partitions) region.  The stride
+  // and rows are rounded up / truncated to a multiple of 16
+  // (32 for ext_partition).
+  cm->lf.lfm_stride = (cm->mi_cols + (MI_SIZE_64X64 - 1)) >> MIN_MIB_SIZE_LOG2;
+  cm->lf.lfm_num = ((cm->mi_rows + (MI_SIZE_64X64 - 1)) >> MIN_MIB_SIZE_LOG2) *
+                   cm->lf.lfm_stride;
+  cm->lf.lfm =
+      (LoopFilterMask *)aom_calloc(cm->lf.lfm_num, sizeof(*cm->lf.lfm));
+  if (!cm->lf.lfm) return 1;
+
+  unsigned int i;
+  for (i = 0; i < cm->lf.lfm_num; ++i) av1_zero(cm->lf.lfm[i]);
+
+  return 0;
+}
+
+void av1_free_loop_filter_mask(AV1_COMMON *cm) {
+  if (cm->lf.lfm == NULL) return;
+
+  aom_free(cm->lf.lfm);
+  cm->lf.lfm = NULL;
+  cm->lf.lfm_num = 0;
+  cm->lf.lfm_stride = 0;
+}
+#endif

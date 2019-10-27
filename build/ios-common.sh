@@ -221,7 +221,7 @@ get_arch_specific_cflags() {
             echo "-arch arm64 -target $(get_target_host) -march=armv8-a+crc+crypto -mcpu=generic -DMOBILE_FFMPEG_ARM64"
         ;;
         arm64e)
-            echo "-arch arm64e -target $(get_target_host) -march=armv8.3-a+dotprod -mcpu=generic -DMOBILE_FFMPEG_ARM64E"
+            echo "-arch arm64e -target $(get_target_host) -march=armv8.3-a+crc+crypto -mcpu=generic -DMOBILE_FFMPEG_ARM64E"
         ;;
         i386)
             echo "-arch i386 -target $(get_target_host) -march=i386 -mtune=intel -mssse3 -mfpmath=sse -m32 -DMOBILE_FFMPEG_I386"
@@ -453,7 +453,7 @@ get_arch_specific_ldflags() {
             echo "-arch arm64 -march=armv8-a+crc+crypto -fembed-bitcode"
         ;;
         arm64e)
-            echo "-arch arm64e -march=armv8.3-a+dotprod -fembed-bitcode"
+            echo "-arch arm64e -march=armv8.3-a+crc+crypto -fembed-bitcode"
         ;;
         i386)
             echo "-arch i386 -march=i386"
@@ -923,15 +923,15 @@ download_gpl_library_source() {
             GPL_LIB_DEST_DIR="libvidstab"
         ;;
         x264)
-            GPL_LIB_URL="ftp://ftp.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-20190701-2245-stable.tar.bz2"
-            GPL_LIB_FILE="x264-snapshot-20190701-2245-stable.tar.bz2"
-            GPL_LIB_ORIG_DIR="x264-snapshot-20190701-2245-stable"
+            GPL_LIB_URL="ftp://ftp.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-20191024-2245-stable.tar.bz2"
+            GPL_LIB_FILE="x264-snapshot-20191024-2245-stable.tar.bz2"
+            GPL_LIB_ORIG_DIR="x264-snapshot-20191024-2245-stable"
             GPL_LIB_DEST_DIR="x264"
         ;;
         x265)
-            GPL_LIB_URL="https://download.videolan.org/pub/videolan/x265/x265_3.0.tar.gz"
-            GPL_LIB_FILE="x265-3.0.tar.gz"
-            GPL_LIB_ORIG_DIR="x265_3.0"
+            GPL_LIB_URL="https://bitbucket.org/multicoreware/x265/downloads/x265_3.2.tar.gz"
+            GPL_LIB_FILE="x265-3.2.tar.gz"
+            GPL_LIB_ORIG_DIR="x265_3.2"
             GPL_LIB_DEST_DIR="x265"
         ;;
         xvidcore)

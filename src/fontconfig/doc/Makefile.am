@@ -33,11 +33,25 @@ EXTRA_DIST =			\
 	confdir.sgml.in		\
 	func.sgml		\
 	$(NULL)
-MAINTAINERCLEANFILES =		\
-	$(DOC_FUNCS_SGML)	\
+if USEDOCBOOK
+maintainerdoccleanfiles =	\
+	$(NULL)
+cleandocfiles =			\
+	$(BUILT_DOCS)		\
+	$(NULL)
+else
+maintainerdoccleanfiles =	\
+	$(BUILT_DOCS)		\
+	$(NULL)
+cleandocfiles =			\
+	$(NULL)
+endif
+MAINTAINERCLEANFILES =			\
+	$(DOC_FUNCS_SGML)		\
+	$(maintainerdoccleanfiles)	\
 	$(NULL)
 CLEANFILES =			\
-	$(BUILT_DOCS)		\
+	$(cleandocfiles)	\
 	$(LOCAL_SGML_FILES)	\
 	confdir.sgml		\
 	func.refs		\

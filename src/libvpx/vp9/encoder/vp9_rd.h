@@ -27,7 +27,12 @@ extern "C" {
 #define RD_EPB_SHIFT 6
 
 #define RDCOST(RM, DM, R, D) \
-  (ROUND_POWER_OF_TWO(((int64_t)R) * (RM), VP9_PROB_COST_SHIFT) + (D << DM))
+  ROUND_POWER_OF_TWO(((int64_t)(R)) * (RM), VP9_PROB_COST_SHIFT) + ((D) << (DM))
+#define RDCOST_NEG_R(RM, DM, R, D) \
+  ((D) << (DM)) - ROUND_POWER_OF_TWO(((int64_t)(R)) * (RM), VP9_PROB_COST_SHIFT)
+#define RDCOST_NEG_D(RM, DM, R, D) \
+  ROUND_POWER_OF_TWO(((int64_t)(R)) * (RM), VP9_PROB_COST_SHIFT) - ((D) << (DM))
+
 #define QIDX_SKIP_THRESH 115
 
 #define MV_COST_WEIGHT 108
@@ -41,6 +46,9 @@ extern "C" {
 #define RD_THRESH_INIT_FACT 32
 #define RD_THRESH_MAX_FACT 64
 #define RD_THRESH_INC 1
+
+#define VP9_DIST_SCALE_LOG2 4
+#define VP9_DIST_SCALE (1 << VP9_DIST_SCALE_LOG2)
 
 // This enumerator type needs to be kept aligned with the mode order in
 // const MODE_DEFINITION vp9_mode_order[MAX_MODES] used in the rd code.
@@ -98,8 +106,8 @@ typedef enum {
 typedef struct RD_OPT {
   // Thresh_mult is used to set a threshold for the rd score. A higher value
   // means that we will accept the best mode so far more often. This number
-  // is used in combination with the current block size, and thresh_freq_fact
-  // to pick a threshold.
+  // is used in combination with the current block size, and thresh_freq_fact to
+  // pick a threshold.
   int thresh_mult[MAX_MODES];
   int thresh_mult_sub8x8[MAX_REFS];
 
@@ -128,6 +136,10 @@ typedef struct RD_COST {
 void vp9_rd_cost_reset(RD_COST *rd_cost);
 // Initialize the rate distortion cost values to zero.
 void vp9_rd_cost_init(RD_COST *rd_cost);
+// It supports negative rate and dist, which is different from RDCOST().
+int64_t vp9_calculate_rd_cost(int mult, int div, int rate, int64_t dist);
+// Update the cost value based on its rate and distortion.
+void vp9_rd_cost_update(int mult, int div, RD_COST *rd_cost);
 
 struct TileInfo;
 struct TileDataEnc;
@@ -213,6 +225,8 @@ unsigned int vp9_high_get_sby_perpixel_variance(struct VP9_COMP *cpi,
                                                 const struct buf_2d *ref,
                                                 BLOCK_SIZE bs, int bd);
 #endif
+
+void vp9_build_inter_mode_cost(struct VP9_COMP *cpi);
 
 #ifdef __cplusplus
 }  // extern "C"

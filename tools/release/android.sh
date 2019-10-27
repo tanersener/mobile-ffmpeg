@@ -41,6 +41,7 @@ if [[ "${MOBILE_FFMPEG_VERSION}" != "$2" ]]; then
     echo "2. Update android/app/build.gradle file versions"
     echo "3. Update tools/release scripts' descriptions"
     echo "4. Update mobileffmpeg.h versions for both android and ios"
+    echo "5. Update versions in Doxyfile"
     exit 1
 fi
 
@@ -50,7 +51,7 @@ cd ${BASEDIR}/../.. || exit 1
 ./android.sh ${CUSTOM_OPTIONS} || exit 1
 cd ${BASEDIR}/../../android/app || exit 1
 enable_gradle_release
-gradle -p ${BASEDIR}/../../android/app -PreleaseVersionCode=$1 -PreleaseVersionName=$2 -PreleaseMinSdk=24 -PreleaseTargetSdk=28 -PreleaseProject=mobile-ffmpeg-min -PreleaseProjectDescription='Includes FFmpeg v4.2-dev-1824 without any external libraries enabled.' clean install bintrayUpload || exit 1
+gradle -p ${BASEDIR}/../../android/app -PreleaseVersionCode=$1 -PreleaseVersionName=$2 -PreleaseMinSdk=24 -PreleaseTargetSdk=28 -PreleaseProject=mobile-ffmpeg-min -PreleaseProjectDescription='Includes FFmpeg v4.3-dev-1181 without any external libraries enabled.' clean install bintrayUpload || exit 1
 create_package "min" "$2" || exit 1
 
 # MIN-GPL RELEASE
@@ -59,7 +60,7 @@ cd ${BASEDIR}/../.. || exit 1
 ./android.sh ${CUSTOM_OPTIONS} ${GPL_PACKAGES} || exit 1
 cd ${BASEDIR}/../../android/app || exit 1
 enable_gradle_release
-gradle -p ${BASEDIR}/../../android/app -PreleaseVersionCode=$1 -PreleaseVersionName=$2 -PreleaseMinSdk=24 -PreleaseTargetSdk=28 -PreleaseProject=mobile-ffmpeg-min-gpl -PreleaseProjectDescription='Includes FFmpeg v4.2-dev-1824 with libvid.stab v1.1.0, x264 20190701-2245-stable, x265 v3.0 and xvidcore v1.3.5 libraries enabled.' -PreleaseGPL=1 clean install bintrayUpload || exit 1
+gradle -p ${BASEDIR}/../../android/app -PreleaseVersionCode=$1 -PreleaseVersionName=$2 -PreleaseMinSdk=24 -PreleaseTargetSdk=28 -PreleaseProject=mobile-ffmpeg-min-gpl -PreleaseProjectDescription='Includes FFmpeg v4.3-dev-1181 with libvid.stab v1.1.0, x264 v20191024-2245-stable, x265 v3.2 and xvidcore v1.3.5 libraries enabled.' -PreleaseGPL=1 clean install bintrayUpload || exit 1
 create_package "min-gpl" "$2" || exit 1
 
 # HTTPS RELEASE
@@ -68,7 +69,7 @@ cd ${BASEDIR}/../.. || exit 1
 ./android.sh ${CUSTOM_OPTIONS} --enable-gnutls --enable-gmp || exit 1
 cd ${BASEDIR}/../../android/app || exit 1
 enable_gradle_release
-gradle -p ${BASEDIR}/../../android/app -PreleaseVersionCode=$1 -PreleaseVersionName=$2 -PreleaseMinSdk=24 -PreleaseTargetSdk=28 -PreleaseProject=mobile-ffmpeg-https -PreleaseProjectDescription='Includes FFmpeg v4.2-dev-1824 with gmp v6.1.2 and gnutls v3.6.8 library enabled.' clean install bintrayUpload || exit 1
+gradle -p ${BASEDIR}/../../android/app -PreleaseVersionCode=$1 -PreleaseVersionName=$2 -PreleaseMinSdk=24 -PreleaseTargetSdk=28 -PreleaseProject=mobile-ffmpeg-https -PreleaseProjectDescription='Includes FFmpeg v4.3-dev-1181 with gmp v6.1.2 and gnutls v3.6.10 library enabled.' clean install bintrayUpload || exit 1
 create_package "https" "$2" || exit 1
 
 # HTTPS-GPL RELEASE
@@ -77,7 +78,7 @@ cd ${BASEDIR}/../.. || exit 1
 ./android.sh ${CUSTOM_OPTIONS} --enable-gnutls --enable-gmp ${GPL_PACKAGES} || exit 1
 cd ${BASEDIR}/../../android/app || exit 1
 enable_gradle_release
-gradle -p ${BASEDIR}/../../android/app -PreleaseVersionCode=$1 -PreleaseVersionName=$2 -PreleaseMinSdk=24 -PreleaseTargetSdk=28 -PreleaseProject=mobile-ffmpeg-https-gpl -PreleaseProjectDescription='Includes FFmpeg v4.2-dev-1824 with gmp v6.1.2, gnutls v3.6.8, libvid.stab v1.1.0, x264 20190701-2245-stable, x265 v3.0 and xvidcore v1.3.5 libraries enabled.' -PreleaseGPL=1 clean install bintrayUpload || exit 1
+gradle -p ${BASEDIR}/../../android/app -PreleaseVersionCode=$1 -PreleaseVersionName=$2 -PreleaseMinSdk=24 -PreleaseTargetSdk=28 -PreleaseProject=mobile-ffmpeg-https-gpl -PreleaseProjectDescription='Includes FFmpeg v4.3-dev-1181 with gmp v6.1.2, gnutls v3.6.10, libvid.stab v1.1.0, x264 v20191024-2245-stable, x265 v3.2 and xvidcore v1.3.5 libraries enabled.' -PreleaseGPL=1 clean install bintrayUpload || exit 1
 create_package "https-gpl" "$2" || exit 1
 
 # AUDIO RELEASE
@@ -86,7 +87,7 @@ cd ${BASEDIR}/../.. || exit 1
 ./android.sh ${CUSTOM_OPTIONS} --enable-lame --enable-libilbc --enable-libvorbis --enable-opencore-amr --enable-opus --enable-shine --enable-soxr --enable-speex --enable-twolame --enable-wavpack || exit 1
 cd ${BASEDIR}/../../android/app || exit 1
 enable_gradle_release
-gradle -p ${BASEDIR}/../../android/app -PreleaseVersionCode=$1 -PreleaseVersionName=$2 -PreleaseMinSdk=24 -PreleaseTargetSdk=28 -PreleaseProject=mobile-ffmpeg-audio -PreleaseProjectDescription='Includes FFmpeg v4.2-dev-1824 with lame v3.100, libilbc v2.0.2, libvorbis v1.3.6, opencore-amr v0.1.5, opus v1.3.1, shine v3.1.1, soxr v0.1.3, speex v1.2.0, twolame v0.3.13 and wavpack v5.1.0 libraries enabled.' clean install bintrayUpload || exit 1
+gradle -p ${BASEDIR}/../../android/app -PreleaseVersionCode=$1 -PreleaseVersionName=$2 -PreleaseMinSdk=24 -PreleaseTargetSdk=28 -PreleaseProject=mobile-ffmpeg-audio -PreleaseProjectDescription='Includes FFmpeg v4.3-dev-1181 with lame v3.100, libilbc v2.0.2, libvorbis v1.3.6, opencore-amr v0.1.5, opus v1.3.1, shine v3.1.1, soxr v0.1.3, speex v1.2.0, twolame v0.4 and wavpack v5.1.0 libraries enabled.' clean install bintrayUpload || exit 1
 create_package "audio" "$2" || exit 1
 
 # VIDEO RELEASE
@@ -95,7 +96,7 @@ cd ${BASEDIR}/../.. || exit 1
 ./android.sh ${CUSTOM_OPTIONS} --enable-fontconfig --enable-freetype --enable-fribidi --enable-kvazaar --enable-libaom --enable-libass --enable-libiconv --enable-libtheora --enable-libvpx --enable-snappy --enable-libwebp || exit 1
 cd ${BASEDIR}/../../android/app || exit 1
 enable_gradle_release
-gradle -p ${BASEDIR}/../../android/app -PreleaseVersionCode=$1 -PreleaseVersionName=$2 -PreleaseMinSdk=24 -PreleaseTargetSdk=28 -PreleaseProject=mobile-ffmpeg-video -PreleaseProjectDescription='Includes FFmpeg v4.2-dev-1824 with fontconfig v2.13.91, freetype v2.10.1, fribidi v1.0.5, kvazaar v1.2.0, libaom v1.0.0-dev-2018, libass v0.14.0, libiconv v1.16, libtheora v1.1.1, libvpx v1.8.0, snappy v1.1.7 and libwebp v1.0.2 libraries enabled.' clean install bintrayUpload || exit 1
+gradle -p ${BASEDIR}/../../android/app -PreleaseVersionCode=$1 -PreleaseVersionName=$2 -PreleaseMinSdk=24 -PreleaseTargetSdk=28 -PreleaseProject=mobile-ffmpeg-video -PreleaseProjectDescription='Includes FFmpeg v4.3-dev-1181 with fontconfig v2.13.92, freetype v2.10.1, fribidi v1.0.7, kvazaar v1.3.0, libaom v1.0.0-dev-2567, libass v0.14.0, libiconv v1.16, libtheora v1.1.1, libvpx v1.8.1, snappy v1.1.7 and libwebp v1.0.3 libraries enabled.' clean install bintrayUpload || exit 1
 create_package "video" "$2" || exit 1
 
 # FULL RELEASE
@@ -104,7 +105,7 @@ cd ${BASEDIR}/../.. || exit 1
 ./android.sh ${CUSTOM_OPTIONS} ${FULL_PACKAGES} || exit 1
 cd ${BASEDIR}/../../android/app || exit 1
 enable_gradle_release
-gradle -p ${BASEDIR}/../../android/app -PreleaseVersionCode=$1 -PreleaseVersionName=$2 -PreleaseMinSdk=24 -PreleaseTargetSdk=28 -PreleaseProject=mobile-ffmpeg-full -PreleaseProjectDescription='Includes FFmpeg v4.2-dev-1824 with fontconfig v2.13.91, freetype v2.10.1, fribidi v1.0.5, gmp v6.1.2, gnutls v3.6.8, kvazaar v1.2.0, lame v3.100, libaom v1.0.0-dev-2018, libass v0.14.0, libiconv v1.16, libilbc v2.0.2, libtheora v1.1.1, libvorbis v1.3.6, libvpx v1.8.0, libwebp v1.0.2, libxml2 v2.9.9, opencore-amr v0.1.5, opus v1.3.1, shine v3.1.1, snappy v1.1.7, soxr v0.1.3, speex v1.2.0, twolame v0.3.13 and wavpack v5.1.0 libraries enabled.' clean install bintrayUpload || exit 1
+gradle -p ${BASEDIR}/../../android/app -PreleaseVersionCode=$1 -PreleaseVersionName=$2 -PreleaseMinSdk=24 -PreleaseTargetSdk=28 -PreleaseProject=mobile-ffmpeg-full -PreleaseProjectDescription='Includes FFmpeg v4.3-dev-1181 with fontconfig v2.13.92, freetype v2.10.1, fribidi v1.0.7, gmp v6.1.2, gnutls v3.6.10, kvazaar v1.3.0, lame v3.100, libaom v1.0.0-dev-2567, libass v0.14.0, libiconv v1.16, libilbc v2.0.2, libtheora v1.1.1, libvorbis v1.3.6, libvpx v1.8.1, libwebp v1.0.3, libxml2 v2.9.9, opencore-amr v0.1.5, opus v1.3.1, shine v3.1.1, snappy v1.1.7, soxr v0.1.3, speex v1.2.0, twolame v0.4 and wavpack v5.1.0 libraries enabled.' clean install bintrayUpload || exit 1
 create_package "full" "$2" || exit 1
 
 # FULL-GPL RELEASE
@@ -113,6 +114,6 @@ cd ${BASEDIR}/../.. || exit 1
 ./android.sh ${CUSTOM_OPTIONS} ${FULL_PACKAGES} ${GPL_PACKAGES} || exit 1
 cd ${BASEDIR}/../../android/app || exit 1
 enable_gradle_release
-gradle -p ${BASEDIR}/../../android/app -PreleaseVersionCode=$1 -PreleaseVersionName=$2 -PreleaseMinSdk=24 -PreleaseTargetSdk=28 -PreleaseProject=mobile-ffmpeg-full-gpl -PreleaseProjectDescription='Includes FFmpeg v4.2-dev-1824 with fontconfig v2.13.91, freetype v2.10.1, fribidi v1.0.5, gmp v6.1.2, gnutls v3.6.8, kvazaar v1.2.0, lame v3.100, libaom v1.0.0-dev-2018, libass v0.14.0, libiconv v1.16, libilbc v2.0.2, libtheora v1.1.1, libvid.stab v1.1.0, libvorbis v1.3.6, libvpx v1.8.0, libwebp v1.0.2, libxml2 v2.9.9, opencore-amr v0.1.5, opus v1.3.1, shine v3.1.1, snappy v1.1.7, soxr v0.1.3, speex v1.2.0, twolame v0.3.13, wavpack v5.1.0, x264 20190701-2245-stable, x265 v3.0 and xvidcore v1.3.5 libraries enabled.' -PreleaseGPL=1 clean install bintrayUpload || exit 1
+gradle -p ${BASEDIR}/../../android/app -PreleaseVersionCode=$1 -PreleaseVersionName=$2 -PreleaseMinSdk=24 -PreleaseTargetSdk=28 -PreleaseProject=mobile-ffmpeg-full-gpl -PreleaseProjectDescription='Includes FFmpeg v4.3-dev-1181 with fontconfig v2.13.92, freetype v2.10.1, fribidi v1.0.7, gmp v6.1.2, gnutls v3.6.10, kvazaar v1.3.0, lame v3.100, libaom v1.0.0-dev-2567, libass v0.14.0, libiconv v1.16, libilbc v2.0.2, libtheora v1.1.1, libvid.stab v1.1.0, libvorbis v1.3.6, libvpx v1.8.1, libwebp v1.0.3, libxml2 v2.9.9, opencore-amr v0.1.5, opus v1.3.1, shine v3.1.1, snappy v1.1.7, soxr v0.1.3, speex v1.2.0, twolame v0.4, wavpack v5.1.0, x264 v20191024-2245-stable, x265 v3.2 and xvidcore v1.3.5 libraries enabled.' -PreleaseGPL=1 clean install bintrayUpload || exit 1
 create_package "full-gpl" "$2" || exit 1
 enable_gradle_build

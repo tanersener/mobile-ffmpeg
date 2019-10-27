@@ -49,8 +49,6 @@ int main()
 
 #include "utils.h"
 
-static void terminate(void);
-
 /* This program tests the status request extension and that receiving the
  * certificate status works.
  */
@@ -181,7 +179,6 @@ static void client(int fd)
 
 	if (ret < 0) {
 		fail("client: Handshake failed: %s\n", gnutls_strerror(ret));
-		terminate();
 	} else {
 		if (debug)
 			success("client: Handshake was completed\n");
@@ -194,7 +191,6 @@ static void client(int fd)
 
 	if (received == 0) {
 		fail("client: didn't receive status request\n");
-		terminate();
 	}
 
 	gnutls_bye(session, GNUTLS_SHUT_WR);
@@ -210,15 +206,6 @@ static void client(int fd)
 	gnutls_global_deinit();
 }
 
-
-/* These are global */
-pid_t child;
-
-static void terminate(void)
-{
-	kill(child, SIGTERM);
-	exit(1);
-}
 
 static void server(int fd)
 {
@@ -300,6 +287,7 @@ static void ch_handler(int sig)
 
 void doit(void)
 {
+	pid_t child;
 	int fd[2];
 	int ret, status = 0;
 

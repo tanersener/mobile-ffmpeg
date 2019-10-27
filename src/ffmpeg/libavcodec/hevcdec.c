@@ -182,6 +182,8 @@ static int pred_weight_table(HEVCContext *s, GetBitContext *gb)
     for (i = 0; i < s->sh.nb_refs[L0]; i++) {
         if (luma_weight_l0_flag[i]) {
             int delta_luma_weight_l0 = get_se_golomb(gb);
+            if ((int8_t)delta_luma_weight_l0 != delta_luma_weight_l0)
+                return AVERROR_INVALIDDATA;
             s->sh.luma_weight_l0[i] = (1 << s->sh.luma_log2_weight_denom) + delta_luma_weight_l0;
             s->sh.luma_offset_l0[i] = get_se_golomb(gb);
         }
@@ -224,6 +226,8 @@ static int pred_weight_table(HEVCContext *s, GetBitContext *gb)
         for (i = 0; i < s->sh.nb_refs[L1]; i++) {
             if (luma_weight_l1_flag[i]) {
                 int delta_luma_weight_l1 = get_se_golomb(gb);
+                if ((int8_t)delta_luma_weight_l1 != delta_luma_weight_l1)
+                    return AVERROR_INVALIDDATA;
                 s->sh.luma_weight_l1[i] = (1 << s->sh.luma_log2_weight_denom) + delta_luma_weight_l1;
                 s->sh.luma_offset_l1[i] = get_se_golomb(gb);
             }
@@ -310,9 +314,10 @@ static int decode_lt_rps(HEVCContext *s, LongTermRPS *rps, GetBitContext *gb)
     return 0;
 }
 
-static void export_stream_params(AVCodecContext *avctx, const HEVCParamSets *ps,
-                                 const HEVCSPS *sps)
+static void export_stream_params(HEVCContext *s, const HEVCSPS *sps)
 {
+    AVCodecContext *avctx = s->avctx;
+    const HEVCParamSets *ps = &s->ps;
     const HEVCVPS *vps = (const HEVCVPS*)ps->vps_list[sps->vps_id]->data;
     const HEVCWindow *ow = &sps->output_window;
     unsigned int num = 0, den = 0;
@@ -355,6 +360,12 @@ static void export_stream_params(AVCodecContext *avctx, const HEVCParamSets *ps,
     if (num != 0 && den != 0)
         av_reduce(&avctx->framerate.den, &avctx->framerate.num,
                   num, den, 1 << 30);
+
+    if (s->sei.alternative_transfer.present &&
+        av_color_transfer_name(s->sei.alternative_transfer.preferred_transfer_characteristics) &&
+        s->sei.alternative_transfer.preferred_transfer_characteristics != AVCOL_TRC_UNSPECIFIED) {
+        avctx->color_trc = s->sei.alternative_transfer.preferred_transfer_characteristics;
+    }
 }
 
 static enum AVPixelFormat get_format(HEVCContext *s, const HEVCSPS *sps)
@@ -447,7 +458,7 @@ static int set_sps(HEVCContext *s, const HEVCSPS *sps,
     if (ret < 0)
         goto fail;
 
-    export_stream_params(s->avctx, &s->ps, sps);
+    export_stream_params(s, sps);
 
     s->avctx->pix_fmt = pix_fmt;
 
@@ -497,7 +508,7 @@ static int hls_slice_header(HEVCContext *s)
     sh->first_slice_in_pic_flag = get_bits1(gb);
     if (s->ref && sh->first_slice_in_pic_flag) {
         av_log(s->avctx, AV_LOG_ERROR, "Two slices reporting being the first in the same frame.\n");
-        return 1; // This slice will be skiped later, do not corrupt state
+        return 1; // This slice will be skipped later, do not corrupt state
     }
 
     if ((IS_IDR(s) || IS_BLA(s)) && sh->first_slice_in_pic_flag) {
@@ -2778,12 +2789,6 @@ static int set_side_data(HEVCContext *s)
         s->avctx->properties |= FF_CODEC_PROPERTY_CLOSED_CAPTIONS;
     }
 
-    if (s->sei.alternative_transfer.present &&
-        av_color_transfer_name(s->sei.alternative_transfer.preferred_transfer_characteristics) &&
-        s->sei.alternative_transfer.preferred_transfer_characteristics != AVCOL_TRC_UNSPECIFIED) {
-        s->avctx->color_trc = out->color_trc = s->sei.alternative_transfer.preferred_transfer_characteristics;
-    }
-
     return 0;
 }
 
@@ -3179,7 +3184,7 @@ static int hevc_decode_extradata(HEVCContext *s, uint8_t *buf, int length, int f
     for (i = 0; i < FF_ARRAY_ELEMS(s->ps.sps_list); i++) {
         if (first && s->ps.sps_list[i]) {
             const HEVCSPS *sps = (const HEVCSPS*)s->ps.sps_list[i]->data;
-            export_stream_params(s->avctx, &s->ps, sps);
+            export_stream_params(s, sps);
             break;
         }
     }
@@ -3330,6 +3335,8 @@ static av_cold int hevc_decode_free(AVCodecContext *avctx)
     av_freep(&s->HEVClcList[0]);
 
     ff_h2645_packet_uninit(&s->pkt);
+
+    ff_hevc_reset_sei(&s->sei);
 
     return 0;
 }
@@ -3524,6 +3531,7 @@ static void hevc_decode_flush(AVCodecContext *avctx)
 {
     HEVCContext *s = avctx->priv_data;
     ff_hevc_flush_dpb(s);
+    ff_hevc_reset_sei(&s->sei);
     s->max_ra = INT_MAX;
     s->eos = 1;
 }

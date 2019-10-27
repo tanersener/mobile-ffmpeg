@@ -258,6 +258,18 @@ gnutls_client_fuzzer_DEPENDENCIES = ../gl/libgnu.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
+am_gnutls_client_rawpk_fuzzer_OBJECTS =  \
+	gnutls_client_rawpk_fuzzer.$(OBJEXT) main.$(OBJEXT)
+gnutls_client_rawpk_fuzzer_OBJECTS =  \
+	$(am_gnutls_client_rawpk_fuzzer_OBJECTS)
+gnutls_client_rawpk_fuzzer_LDADD = $(LDADD)
+gnutls_client_rawpk_fuzzer_DEPENDENCIES = ../gl/libgnu.la \
+	../lib/libgnutls.la $(LIBOBJS) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1)
 am_gnutls_dn_parser_fuzzer_OBJECTS =  \
 	gnutls_dn_parser_fuzzer.$(OBJEXT) main.$(OBJEXT)
 gnutls_dn_parser_fuzzer_OBJECTS =  \
@@ -401,6 +413,18 @@ gnutls_server_fuzzer_DEPENDENCIES = ../gl/libgnu.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
+am_gnutls_server_rawpk_fuzzer_OBJECTS =  \
+	gnutls_server_rawpk_fuzzer.$(OBJEXT) main.$(OBJEXT)
+gnutls_server_rawpk_fuzzer_OBJECTS =  \
+	$(am_gnutls_server_rawpk_fuzzer_OBJECTS)
+gnutls_server_rawpk_fuzzer_LDADD = $(LDADD)
+gnutls_server_rawpk_fuzzer_DEPENDENCIES = ../gl/libgnu.la \
+	../lib/libgnutls.la $(LIBOBJS) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1)
 am_gnutls_set_trust_file_fuzzer_OBJECTS =  \
 	gnutls_set_trust_file_fuzzer.$(OBJEXT) main.$(OBJEXT)
 gnutls_set_trust_file_fuzzer_OBJECTS =  \
@@ -479,6 +503,7 @@ am__maybe_remake_depfiles = depfiles
 am__depfiles_remade = ./$(DEPDIR)/gnutls_base64_decoder_fuzzer.Po \
 	./$(DEPDIR)/gnutls_base64_encoder_fuzzer.Po \
 	./$(DEPDIR)/gnutls_client_fuzzer.Po \
+	./$(DEPDIR)/gnutls_client_rawpk_fuzzer.Po \
 	./$(DEPDIR)/gnutls_dn_parser_fuzzer.Po \
 	./$(DEPDIR)/gnutls_idna_parser_fuzzer.Po \
 	./$(DEPDIR)/gnutls_ocsp_req_parser_fuzzer.Po \
@@ -491,6 +516,7 @@ am__depfiles_remade = ./$(DEPDIR)/gnutls_base64_decoder_fuzzer.Po \
 	./$(DEPDIR)/gnutls_psk_server_fuzzer.Po \
 	./$(DEPDIR)/gnutls_reverse_idna_parser_fuzzer.Po \
 	./$(DEPDIR)/gnutls_server_fuzzer.Po \
+	./$(DEPDIR)/gnutls_server_rawpk_fuzzer.Po \
 	./$(DEPDIR)/gnutls_set_trust_file_fuzzer.Po \
 	./$(DEPDIR)/gnutls_srp_client_fuzzer.Po \
 	./$(DEPDIR)/gnutls_srp_server_fuzzer.Po \
@@ -518,6 +544,7 @@ am__v_CCLD_1 =
 SOURCES = $(gnutls_base64_decoder_fuzzer_SOURCES) \
 	$(gnutls_base64_encoder_fuzzer_SOURCES) \
 	$(gnutls_client_fuzzer_SOURCES) \
+	$(gnutls_client_rawpk_fuzzer_SOURCES) \
 	$(gnutls_dn_parser_fuzzer_SOURCES) \
 	$(gnutls_idna_parser_fuzzer_SOURCES) \
 	$(gnutls_ocsp_req_parser_fuzzer_SOURCES) \
@@ -530,6 +557,7 @@ SOURCES = $(gnutls_base64_decoder_fuzzer_SOURCES) \
 	$(gnutls_psk_server_fuzzer_SOURCES) \
 	$(gnutls_reverse_idna_parser_fuzzer_SOURCES) \
 	$(gnutls_server_fuzzer_SOURCES) \
+	$(gnutls_server_rawpk_fuzzer_SOURCES) \
 	$(gnutls_set_trust_file_fuzzer_SOURCES) \
 	$(gnutls_srp_client_fuzzer_SOURCES) \
 	$(gnutls_srp_server_fuzzer_SOURCES) \
@@ -538,6 +566,7 @@ SOURCES = $(gnutls_base64_decoder_fuzzer_SOURCES) \
 DIST_SOURCES = $(gnutls_base64_decoder_fuzzer_SOURCES) \
 	$(gnutls_base64_encoder_fuzzer_SOURCES) \
 	$(gnutls_client_fuzzer_SOURCES) \
+	$(gnutls_client_rawpk_fuzzer_SOURCES) \
 	$(gnutls_dn_parser_fuzzer_SOURCES) \
 	$(gnutls_idna_parser_fuzzer_SOURCES) \
 	$(gnutls_ocsp_req_parser_fuzzer_SOURCES) \
@@ -550,6 +579,7 @@ DIST_SOURCES = $(gnutls_base64_decoder_fuzzer_SOURCES) \
 	$(gnutls_psk_server_fuzzer_SOURCES) \
 	$(gnutls_reverse_idna_parser_fuzzer_SOURCES) \
 	$(gnutls_server_fuzzer_SOURCES) \
+	$(gnutls_server_rawpk_fuzzer_SOURCES) \
 	$(gnutls_set_trust_file_fuzzer_SOURCES) \
 	$(gnutls_srp_client_fuzzer_SOURCES) \
 	$(gnutls_srp_server_fuzzer_SOURCES) \
@@ -1909,6 +1939,7 @@ FUZZERS = \
  gnutls_base64_decoder_fuzzer$(EXEEXT) \
  gnutls_base64_encoder_fuzzer$(EXEEXT) \
  gnutls_client_fuzzer$(EXEEXT) \
+ gnutls_client_rawpk_fuzzer$(EXEEXT) \
  gnutls_dn_parser_fuzzer$(EXEEXT) \
  gnutls_idna_parser_fuzzer$(EXEEXT) \
  gnutls_ocsp_req_parser_fuzzer$(EXEEXT) \
@@ -1921,6 +1952,7 @@ FUZZERS = \
  gnutls_psk_server_fuzzer$(EXEEXT) \
  gnutls_reverse_idna_parser_fuzzer$(EXEEXT) \
  gnutls_server_fuzzer$(EXEEXT) \
+ gnutls_server_rawpk_fuzzer$(EXEEXT) \
  gnutls_srp_client_fuzzer$(EXEEXT) \
  gnutls_srp_server_fuzzer$(EXEEXT) \
  gnutls_set_trust_file_fuzzer$(EXEEXT) \
@@ -1931,6 +1963,7 @@ gnutls_x509_verify_fuzzer_SOURCES = gnutls_x509_verify_fuzzer.c main.c fuzzer.h
 gnutls_base64_decoder_fuzzer_SOURCES = gnutls_base64_decoder_fuzzer.c main.c fuzzer.h
 gnutls_base64_encoder_fuzzer_SOURCES = gnutls_base64_encoder_fuzzer.c main.c fuzzer.h
 gnutls_client_fuzzer_SOURCES = gnutls_client_fuzzer.c main.c fuzzer.h mem.h certs.h
+gnutls_client_rawpk_fuzzer_SOURCES = gnutls_client_rawpk_fuzzer.c main.c fuzzer.h mem.h certs.h
 gnutls_dn_parser_fuzzer_SOURCES = gnutls_dn_parser_fuzzer.c main.c fuzzer.h
 gnutls_idna_parser_fuzzer_SOURCES = gnutls_idna_parser_fuzzer.c main.c fuzzer.h
 gnutls_ocsp_req_parser_fuzzer_SOURCES = gnutls_ocsp_req_parser_fuzzer.c main.c fuzzer.h
@@ -1943,6 +1976,7 @@ gnutls_psk_client_fuzzer_SOURCES = gnutls_psk_client_fuzzer.c main.c fuzzer.h me
 gnutls_psk_server_fuzzer_SOURCES = gnutls_psk_server_fuzzer.c main.c fuzzer.h mem.h psk.h
 gnutls_reverse_idna_parser_fuzzer_SOURCES = gnutls_reverse_idna_parser_fuzzer.c main.c fuzzer.h
 gnutls_server_fuzzer_SOURCES = gnutls_server_fuzzer.c main.c fuzzer.h mem.h certs.h
+gnutls_server_rawpk_fuzzer_SOURCES = gnutls_server_rawpk_fuzzer.c main.c fuzzer.h mem.h certs.h
 gnutls_srp_client_fuzzer_SOURCES = gnutls_srp_client_fuzzer.c main.c fuzzer.h mem.h srp.h
 gnutls_srp_server_fuzzer_SOURCES = gnutls_srp_server_fuzzer.c main.c fuzzer.h mem.h srp.h
 gnutls_set_trust_file_fuzzer_SOURCES = gnutls_set_trust_file_fuzzer.c main.c fuzzer.h
@@ -2005,6 +2039,10 @@ gnutls_client_fuzzer$(EXEEXT): $(gnutls_client_fuzzer_OBJECTS) $(gnutls_client_f
 	@rm -f gnutls_client_fuzzer$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(gnutls_client_fuzzer_OBJECTS) $(gnutls_client_fuzzer_LDADD) $(LIBS)
 
+gnutls_client_rawpk_fuzzer$(EXEEXT): $(gnutls_client_rawpk_fuzzer_OBJECTS) $(gnutls_client_rawpk_fuzzer_DEPENDENCIES) $(EXTRA_gnutls_client_rawpk_fuzzer_DEPENDENCIES) 
+	@rm -f gnutls_client_rawpk_fuzzer$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(gnutls_client_rawpk_fuzzer_OBJECTS) $(gnutls_client_rawpk_fuzzer_LDADD) $(LIBS)
+
 gnutls_dn_parser_fuzzer$(EXEEXT): $(gnutls_dn_parser_fuzzer_OBJECTS) $(gnutls_dn_parser_fuzzer_DEPENDENCIES) $(EXTRA_gnutls_dn_parser_fuzzer_DEPENDENCIES) 
 	@rm -f gnutls_dn_parser_fuzzer$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(gnutls_dn_parser_fuzzer_OBJECTS) $(gnutls_dn_parser_fuzzer_LDADD) $(LIBS)
@@ -2053,6 +2091,10 @@ gnutls_server_fuzzer$(EXEEXT): $(gnutls_server_fuzzer_OBJECTS) $(gnutls_server_f
 	@rm -f gnutls_server_fuzzer$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(gnutls_server_fuzzer_OBJECTS) $(gnutls_server_fuzzer_LDADD) $(LIBS)
 
+gnutls_server_rawpk_fuzzer$(EXEEXT): $(gnutls_server_rawpk_fuzzer_OBJECTS) $(gnutls_server_rawpk_fuzzer_DEPENDENCIES) $(EXTRA_gnutls_server_rawpk_fuzzer_DEPENDENCIES) 
+	@rm -f gnutls_server_rawpk_fuzzer$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(gnutls_server_rawpk_fuzzer_OBJECTS) $(gnutls_server_rawpk_fuzzer_LDADD) $(LIBS)
+
 gnutls_set_trust_file_fuzzer$(EXEEXT): $(gnutls_set_trust_file_fuzzer_OBJECTS) $(gnutls_set_trust_file_fuzzer_DEPENDENCIES) $(EXTRA_gnutls_set_trust_file_fuzzer_DEPENDENCIES) 
 	@rm -f gnutls_set_trust_file_fuzzer$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(gnutls_set_trust_file_fuzzer_OBJECTS) $(gnutls_set_trust_file_fuzzer_LDADD) $(LIBS)
@@ -2082,6 +2124,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gnutls_base64_decoder_fuzzer.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gnutls_base64_encoder_fuzzer.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gnutls_client_fuzzer.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gnutls_client_rawpk_fuzzer.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gnutls_dn_parser_fuzzer.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gnutls_idna_parser_fuzzer.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gnutls_ocsp_req_parser_fuzzer.Po@am__quote@ # am--include-marker
@@ -2094,6 +2137,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gnutls_psk_server_fuzzer.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gnutls_reverse_idna_parser_fuzzer.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gnutls_server_fuzzer.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gnutls_server_rawpk_fuzzer.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gnutls_set_trust_file_fuzzer.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gnutls_srp_client_fuzzer.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gnutls_srp_server_fuzzer.Po@am__quote@ # am--include-marker
@@ -2358,6 +2402,13 @@ gnutls_client_fuzzer.log: gnutls_client_fuzzer$(EXEEXT)
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
+gnutls_client_rawpk_fuzzer.log: gnutls_client_rawpk_fuzzer$(EXEEXT)
+	@p='gnutls_client_rawpk_fuzzer$(EXEEXT)'; \
+	b='gnutls_client_rawpk_fuzzer'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
 gnutls_dn_parser_fuzzer.log: gnutls_dn_parser_fuzzer$(EXEEXT)
 	@p='gnutls_dn_parser_fuzzer$(EXEEXT)'; \
 	b='gnutls_dn_parser_fuzzer'; \
@@ -2438,6 +2489,13 @@ gnutls_reverse_idna_parser_fuzzer.log: gnutls_reverse_idna_parser_fuzzer$(EXEEXT
 gnutls_server_fuzzer.log: gnutls_server_fuzzer$(EXEEXT)
 	@p='gnutls_server_fuzzer$(EXEEXT)'; \
 	b='gnutls_server_fuzzer'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+gnutls_server_rawpk_fuzzer.log: gnutls_server_rawpk_fuzzer$(EXEEXT)
+	@p='gnutls_server_rawpk_fuzzer$(EXEEXT)'; \
+	b='gnutls_server_rawpk_fuzzer'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
@@ -2569,6 +2627,7 @@ distclean: distclean-am
 		-rm -f ./$(DEPDIR)/gnutls_base64_decoder_fuzzer.Po
 	-rm -f ./$(DEPDIR)/gnutls_base64_encoder_fuzzer.Po
 	-rm -f ./$(DEPDIR)/gnutls_client_fuzzer.Po
+	-rm -f ./$(DEPDIR)/gnutls_client_rawpk_fuzzer.Po
 	-rm -f ./$(DEPDIR)/gnutls_dn_parser_fuzzer.Po
 	-rm -f ./$(DEPDIR)/gnutls_idna_parser_fuzzer.Po
 	-rm -f ./$(DEPDIR)/gnutls_ocsp_req_parser_fuzzer.Po
@@ -2581,6 +2640,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/gnutls_psk_server_fuzzer.Po
 	-rm -f ./$(DEPDIR)/gnutls_reverse_idna_parser_fuzzer.Po
 	-rm -f ./$(DEPDIR)/gnutls_server_fuzzer.Po
+	-rm -f ./$(DEPDIR)/gnutls_server_rawpk_fuzzer.Po
 	-rm -f ./$(DEPDIR)/gnutls_set_trust_file_fuzzer.Po
 	-rm -f ./$(DEPDIR)/gnutls_srp_client_fuzzer.Po
 	-rm -f ./$(DEPDIR)/gnutls_srp_server_fuzzer.Po
@@ -2635,6 +2695,7 @@ maintainer-clean: maintainer-clean-am
 		-rm -f ./$(DEPDIR)/gnutls_base64_decoder_fuzzer.Po
 	-rm -f ./$(DEPDIR)/gnutls_base64_encoder_fuzzer.Po
 	-rm -f ./$(DEPDIR)/gnutls_client_fuzzer.Po
+	-rm -f ./$(DEPDIR)/gnutls_client_rawpk_fuzzer.Po
 	-rm -f ./$(DEPDIR)/gnutls_dn_parser_fuzzer.Po
 	-rm -f ./$(DEPDIR)/gnutls_idna_parser_fuzzer.Po
 	-rm -f ./$(DEPDIR)/gnutls_ocsp_req_parser_fuzzer.Po
@@ -2647,6 +2708,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/gnutls_psk_server_fuzzer.Po
 	-rm -f ./$(DEPDIR)/gnutls_reverse_idna_parser_fuzzer.Po
 	-rm -f ./$(DEPDIR)/gnutls_server_fuzzer.Po
+	-rm -f ./$(DEPDIR)/gnutls_server_rawpk_fuzzer.Po
 	-rm -f ./$(DEPDIR)/gnutls_set_trust_file_fuzzer.Po
 	-rm -f ./$(DEPDIR)/gnutls_srp_client_fuzzer.Po
 	-rm -f ./$(DEPDIR)/gnutls_srp_server_fuzzer.Po

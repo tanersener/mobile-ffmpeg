@@ -1074,15 +1074,15 @@ void vpx_idct16x16_256_add_vsx(const tran_low_t *input, uint8_t *dest,
   PIXEL_ADD(in3, d_ul, add, shift6);                       \
   vec_vsx_st(vec_packsu(d_uh, d_ul), (step)*stride + 16, dest);
 
-#define ADD_STORE_BLOCK(in, offset)                                      \
-  PIXEL_ADD_STORE32(in[0][0], in[1][0], in[2][0], in[3][0], offset + 0); \
-  PIXEL_ADD_STORE32(in[0][1], in[1][1], in[2][1], in[3][1], offset + 1); \
-  PIXEL_ADD_STORE32(in[0][2], in[1][2], in[2][2], in[3][2], offset + 2); \
-  PIXEL_ADD_STORE32(in[0][3], in[1][3], in[2][3], in[3][3], offset + 3); \
-  PIXEL_ADD_STORE32(in[0][4], in[1][4], in[2][4], in[3][4], offset + 4); \
-  PIXEL_ADD_STORE32(in[0][5], in[1][5], in[2][5], in[3][5], offset + 5); \
-  PIXEL_ADD_STORE32(in[0][6], in[1][6], in[2][6], in[3][6], offset + 6); \
-  PIXEL_ADD_STORE32(in[0][7], in[1][7], in[2][7], in[3][7], offset + 7);
+#define ADD_STORE_BLOCK(in, offset)                                        \
+  PIXEL_ADD_STORE32(in[0][0], in[1][0], in[2][0], in[3][0], (offset) + 0); \
+  PIXEL_ADD_STORE32(in[0][1], in[1][1], in[2][1], in[3][1], (offset) + 1); \
+  PIXEL_ADD_STORE32(in[0][2], in[1][2], in[2][2], in[3][2], (offset) + 2); \
+  PIXEL_ADD_STORE32(in[0][3], in[1][3], in[2][3], in[3][3], (offset) + 3); \
+  PIXEL_ADD_STORE32(in[0][4], in[1][4], in[2][4], in[3][4], (offset) + 4); \
+  PIXEL_ADD_STORE32(in[0][5], in[1][5], in[2][5], in[3][5], (offset) + 5); \
+  PIXEL_ADD_STORE32(in[0][6], in[1][6], in[2][6], in[3][6], (offset) + 6); \
+  PIXEL_ADD_STORE32(in[0][7], in[1][7], in[2][7], in[3][7], (offset) + 7);
 
 void vpx_idct32x32_1024_add_vsx(const tran_low_t *input, uint8_t *dest,
                                 int stride) {

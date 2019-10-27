@@ -418,8 +418,9 @@ static void HandleDisplay(void) {
 }
 
 static void StartDisplay(void) {
-  const int width = kParams.canvas_width;
-  const int height = kParams.canvas_height;
+  int width = kParams.canvas_width;
+  int height = kParams.canvas_height;
+  int screen_width, screen_height;
   // TODO(webp:365) GLUT_DOUBLE results in flickering / old frames to be
   // partially displayed with animated webp + alpha.
 #if defined(__APPLE__) || defined(_WIN32)
@@ -427,6 +428,18 @@ static void StartDisplay(void) {
 #else
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
 #endif
+  screen_width = glutGet(GLUT_SCREEN_WIDTH);
+  screen_height = glutGet(GLUT_SCREEN_HEIGHT);
+  if (width > screen_width || height > screen_height) {
+    if (width > screen_width) {
+      height = (height * screen_width + width - 1) / width;
+      width = screen_width;
+    }
+    if (height > screen_height) {
+      width = (width * screen_height + height - 1) / height;
+      height = screen_height;
+    }
+  }
   glutInitWindowSize(width, height);
   glutCreateWindow("WebP viewer");
   glutDisplayFunc(HandleDisplay);
