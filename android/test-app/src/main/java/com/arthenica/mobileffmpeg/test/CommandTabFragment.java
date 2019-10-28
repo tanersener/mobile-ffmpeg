@@ -78,6 +78,8 @@ public class CommandTabFragment extends Fragment {
             outputText = getView().findViewById(R.id.outputText);
             outputText.setMovementMethod(new ScrollingMovementMethod());
         }
+
+        android.util.Log.d(MainActivity.TAG, "Last command output was: " + FFmpeg.getLastCommandOutput());
     }
 
     @Override

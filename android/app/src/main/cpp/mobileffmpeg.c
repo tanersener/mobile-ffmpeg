@@ -848,14 +848,16 @@ JNIEXPORT int JNICALL Java_com_arthenica_mobileffmpeg_Config_setNativeEnvironmen
  * @return output of the last executed command
  */
 JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_Config_getNativeLastCommandOutput(JNIEnv *env, jclass object) {
-    int size = strlen(lastCommandOutput);
+    if (lastCommandOutput != NULL) {
+        int size = strlen(lastCommandOutput);
 
-    if (size > 0) {
-        jbyteArray byteArray = (*env)->NewByteArray(env, size);
-        (*env)->SetByteArrayRegion(env, byteArray, 0, size, lastCommandOutput);
-        jstring charsetName = (*env)->NewStringUTF(env, "UTF-8");
-        return (jstring) (*env)->NewObject(env, stringClass, stringConstructor, byteArray, charsetName);
-    } else {
-        return (*env)->NewStringUTF(env, "");
+        if (size > 0) {
+            jbyteArray byteArray = (*env)->NewByteArray(env, size);
+            (*env)->SetByteArrayRegion(env, byteArray, 0, size, lastCommandOutput);
+            jstring charsetName = (*env)->NewStringUTF(env, "UTF-8");
+            return (jstring) (*env)->NewObject(env, stringClass, stringConstructor, byteArray, charsetName);
+        }
     }
+
+    return (*env)->NewStringUTF(env, "");
 }
