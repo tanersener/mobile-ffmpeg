@@ -172,7 +172,7 @@ function usage()
 	WScript.Echo(txt);
 }
 
-/* Discovers the version we are working with by reading the apropriate
+/* Discovers the version we are working with by reading the appropriate
    configuration file. Despite its name, this also writes the configuration
    file included by our makefile. */
 function discoverVersion()

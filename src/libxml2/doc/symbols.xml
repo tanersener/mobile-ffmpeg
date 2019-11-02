@@ -1658,27 +1658,27 @@
   </release>
   <release version="2.6.21">
     <symbol file="xmlautomata">xmlAutomataNewNegTrans</symbol>
-    <symbol file="xmlregexp">emptyExp</symbol>
-    <symbol file="xmlregexp">forbiddenExp</symbol>
-    <symbol file="xmlregexp">xmlExpCtxtNbCons</symbol>
-    <symbol file="xmlregexp">xmlExpCtxtNbNodes</symbol>
-    <symbol file="xmlregexp">xmlExpDump</symbol>
-    <symbol file="xmlregexp">xmlExpExpDerive</symbol>
-    <symbol file="xmlregexp">xmlExpFreeCtxt</symbol>
-    <symbol file="xmlregexp">xmlExpFree</symbol>
-    <symbol file="xmlregexp">xmlExpGetLanguage</symbol>
-    <symbol file="xmlregexp">xmlExpGetStart</symbol>
-    <symbol file="xmlregexp">xmlExpIsNillable</symbol>
-    <symbol file="xmlregexp">xmlExpMaxToken</symbol>
-    <symbol file="xmlregexp">xmlExpNewAtom</symbol>
-    <symbol file="xmlregexp">xmlExpNewCtxt</symbol>
-    <symbol file="xmlregexp">xmlExpNewOr</symbol>
-    <symbol file="xmlregexp">xmlExpNewRange</symbol>
-    <symbol file="xmlregexp">xmlExpNewSeq</symbol>
-    <symbol file="xmlregexp">xmlExpParse</symbol>
-    <symbol file="xmlregexp">xmlExpRef</symbol>
-    <symbol file="xmlregexp">xmlExpStringDerive</symbol>
-    <symbol file="xmlregexp">xmlExpSubsume</symbol>
+    <symbol removed="2.9.10" file="xmlregexp">emptyExp</symbol>
+    <symbol removed="2.9.10" file="xmlregexp">forbiddenExp</symbol>
+    <symbol removed="2.9.10" file="xmlregexp">xmlExpCtxtNbCons</symbol>
+    <symbol removed="2.9.10" file="xmlregexp">xmlExpCtxtNbNodes</symbol>
+    <symbol removed="2.9.10" file="xmlregexp">xmlExpDump</symbol>
+    <symbol removed="2.9.10" file="xmlregexp">xmlExpExpDerive</symbol>
+    <symbol removed="2.9.10" file="xmlregexp">xmlExpFreeCtxt</symbol>
+    <symbol removed="2.9.10" file="xmlregexp">xmlExpFree</symbol>
+    <symbol removed="2.9.10" file="xmlregexp">xmlExpGetLanguage</symbol>
+    <symbol removed="2.9.10" file="xmlregexp">xmlExpGetStart</symbol>
+    <symbol removed="2.9.10" file="xmlregexp">xmlExpIsNillable</symbol>
+    <symbol removed="2.9.10" file="xmlregexp">xmlExpMaxToken</symbol>
+    <symbol removed="2.9.10" file="xmlregexp">xmlExpNewAtom</symbol>
+    <symbol removed="2.9.10" file="xmlregexp">xmlExpNewCtxt</symbol>
+    <symbol removed="2.9.10" file="xmlregexp">xmlExpNewOr</symbol>
+    <symbol removed="2.9.10" file="xmlregexp">xmlExpNewRange</symbol>
+    <symbol removed="2.9.10" file="xmlregexp">xmlExpNewSeq</symbol>
+    <symbol removed="2.9.10" file="xmlregexp">xmlExpParse</symbol>
+    <symbol removed="2.9.10" file="xmlregexp">xmlExpRef</symbol>
+    <symbol removed="2.9.10" file="xmlregexp">xmlExpStringDerive</symbol>
+    <symbol removed="2.9.10" file="xmlregexp">xmlExpSubsume</symbol>
     <symbol file="parser">xmlHasFeature</symbol>
     <symbol file="uri">xmlParseURIRaw</symbol>
     <symbol file="pattern">xmlPatternMinDepth</symbol>

@@ -149,7 +149,7 @@ The content of this structure is not made public by the API.
 <div class="variablelist"><table border="0"><col align="left"/><tbody><tr><td><span class="term"><i><tt>schema</tt></i>:</span></td><td>a precompiled XML Schematrons</td></tr><tr><td><span class="term"><i><tt>options</tt></i>:</span></td><td>a set of <a href="libxml2-schematron.html#xmlSchematronValidOptions">xmlSchematronValidOptions</a></td></tr><tr><td><span class="term"><i><tt>Returns</tt></i>:</span></td><td>the validation context or NULL in case of error</td></tr></tbody></table></div></div>
         <hr/>
         <div class="refsect2" lang="en"><h3><a name="xmlSchematronParse"/>xmlSchematronParse ()</h3><pre class="programlisting"><a href="libxml2-schematron.html#xmlSchematronPtr">xmlSchematronPtr</a>	xmlSchematronParse	(<a href="libxml2-schematron.html#xmlSchematronParserCtxtPtr">xmlSchematronParserCtxtPtr</a> ctxt)<br/>
-</pre><p>parse a schema definition resource and build an internal XML Shema struture which can be used to validate instances.</p>
+</pre><p>parse a schema definition resource and build an internal XML Schema structure which can be used to validate instances.</p>
 <div class="variablelist"><table border="0"><col align="left"/><tbody><tr><td><span class="term"><i><tt>ctxt</tt></i>:</span></td><td>a schema validation context</td></tr><tr><td><span class="term"><i><tt>Returns</tt></i>:</span></td><td>the internal XML Schematron structure built from the resource or NULL in case of error</td></tr></tbody></table></div></div>
         <hr/>
         <div class="refsect2" lang="en"><h3><a name="xmlSchematronSetValidStructuredErrors"/>xmlSchematronSetValidStructuredErrors ()</h3><pre class="programlisting">void	xmlSchematronSetValidStructuredErrors	(<a href="libxml2-schematron.html#xmlSchematronValidCtxtPtr">xmlSchematronValidCtxtPtr</a> ctxt, <br/>						 <a href="libxml2-xmlerror.html#xmlStructuredErrorFunc">xmlStructuredErrorFunc</a> serror, <br/>						 void * ctx)<br/>
@@ -158,7 +158,7 @@ The content of this structure is not made public by the API.
         <hr/>
         <div class="refsect2" lang="en"><h3><a name="xmlSchematronValidateDoc"/>xmlSchematronValidateDoc ()</h3><pre class="programlisting">int	xmlSchematronValidateDoc	(<a href="libxml2-schematron.html#xmlSchematronValidCtxtPtr">xmlSchematronValidCtxtPtr</a> ctxt, <br/>					 <a href="libxml2-tree.html#xmlDocPtr">xmlDocPtr</a> instance)<br/>
 </pre><p>Validate a tree instance against the schematron</p>
-<div class="variablelist"><table border="0"><col align="left"/><tbody><tr><td><span class="term"><i><tt>ctxt</tt></i>:</span></td><td>the schema validation context</td></tr><tr><td><span class="term"><i><tt>instance</tt></i>:</span></td><td>the document instace tree</td></tr><tr><td><span class="term"><i><tt>Returns</tt></i>:</span></td><td>0 in case of success, -1 in case of internal error and an error count otherwise.</td></tr></tbody></table></div></div>
+<div class="variablelist"><table border="0"><col align="left"/><tbody><tr><td><span class="term"><i><tt>ctxt</tt></i>:</span></td><td>the schema validation context</td></tr><tr><td><span class="term"><i><tt>instance</tt></i>:</span></td><td>the document instance tree</td></tr><tr><td><span class="term"><i><tt>Returns</tt></i>:</span></td><td>0 in case of success, -1 in case of internal error and an error count otherwise.</td></tr></tbody></table></div></div>
         <hr/>
       </div>
     </div>

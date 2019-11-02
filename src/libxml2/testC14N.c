@@ -18,6 +18,9 @@
 #define STDOUT_FILENO fileno(stdout)
 #endif /* HAVE_UNISTD_H */
 #endif
+#ifdef _WIN32
+#include <io.h>
+#endif
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h>
 #endif

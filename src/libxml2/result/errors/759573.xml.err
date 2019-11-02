@@ -13,19 +13,20 @@ T t (A)><!ENTITY % xx '&#37;<![INCLUDE[000&#37;&#3000;000&#37;z;'><!ENTITYz>%xx;
 Entity: line 1: 
 %<![INCLUDE[000%ஸ000%z;
  ^
-./test/errors/759573.xml:1: parser error : Content error in the external subset
+./test/errors/759573.xml:1: parser error : internal error: xmlParseInternalSubset: error detected in Markup declaration
+
 T t (A)><!ENTITY % xx '&#37;<![INCLUDE[000&#37;&#3000;000&#37;z;'><!ENTITYz>%xx;
                                                                                ^
 Entity: line 1: 
 %<![INCLUDE[000%ஸ000%z;
-            ^
+ ^
 ./test/errors/759573.xml:1: parser error : internal error: xmlParseInternalSubset: error detected in Markup declaration
 
-
-^
+T t (A)><!ENTITY % xx '&#37;<![INCLUDE[000&#37;&#3000;000&#37;z;'><!ENTITYz>%xx;
+                                                                               ^
 ./test/errors/759573.xml:1: parser error : DOCTYPE improperly terminated
-
-^
+T t (A)><!ENTITY % xx '&#37;<![INCLUDE[000&#37;&#3000;000&#37;z;'><!ENTITYz>%xx;
+                                                                               ^
 ./test/errors/759573.xml:1: parser error : Start tag expected, '<' not found
-
-^
+T t (A)><!ENTITY % xx '&#37;<![INCLUDE[000&#37;&#3000;000&#37;z;'><!ENTITYz>%xx;
+                                                                               ^

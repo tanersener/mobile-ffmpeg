@@ -52,7 +52,7 @@ examples using both C and the Python bindings:</p>
 
 <p>Libxml2 <a href="http://xmlsoft.org/html/libxml-tree.html">main API is
 tree based</a>, where the parsing operation results in a document loaded
-completely in memory, and expose it as a tree of nodes all availble at the
+completely in memory, and expose it as a tree of nodes all available at the
 same time. This is very simple and quite powerful, but has the major
 limitation that the size of the document that can be hamdled is limited by
 the size of the memory available. Libxml2 also provide a <a
@@ -156,7 +156,7 @@ href="http://dotgnu.org/pnetlib-doc/System/Xml/XmlTextReader.html">xmlTextReader
 is abstracted as a class like in C#</a> with the same method names (but the
 properties are currently accessed with methods) and that one doesn't need to
 free the reader at the end of the processing. It will get garbage collected
-once all references have disapeared.</p>
+once all references have disappeared.</p>
 
 <h2><a name="Extracting">Extracting information for the current node</a></h2>
 
@@ -299,7 +299,7 @@ their content the API has special instructions. Basically two kinds of operation
 are possible:</p>
 <ol>
   <li>to move the reader to the attribute nodes of the current element, in
-    that case the cursor is positionned on the attribute node</li>
+    that case the cursor is positioned on the attribute node</li>
   <li>to directly query the element node for the attribute value</li>
 </ol>
 
@@ -383,7 +383,7 @@ and set the values of those parser properties of the reader. For example</p>
 
 <p>This routine will parse and validate the file. Error messages can be
 captured by registering an error handler. See python/tests/reader2.py for
-more complete Python examples. At the C level the equivalent call to cativate
+more complete Python examples. At the C level the equivalent call to ativate
 the validation feature is just:</p>
 <pre>ret = xmlTextReaderSetParserProp(reader, XML_PARSER_VALIDATE, 1)</pre>
 
@@ -392,7 +392,7 @@ the validation feature is just:</p>
 <h2><a name="Entities">Entities substitution</a></h2>
 
 <p>By default the xmlReader will report entities as such and not replace them
-with their content. This default behaviour can however be overriden using:</p>
+with their content. This default behaviour can however be overridden using:</p>
 
 <p><code>reader.SetParserProp(libxml2.PARSER_SUBST_ENTITIES,1)</code></p>
 
@@ -404,7 +404,7 @@ with their content. This default behaviour can however be overriden using:</p>
 Relax-NG schemas. While the Relax NG validator can't always work in a
 streamable mode, only subsets which cannot be reduced to regular expressions
 need to have their subtree expanded for validation. In practice it means
-that, unless the schemas for the top level element content is not expressable
+that, unless the schemas for the top level element content is not expressible
 as a regexp, only chunk of the document needs to be parsed while
 validating.</p>
 

@@ -44,7 +44,7 @@ typedef int (*functest) (const char *filename, const char *result,
 typedef struct testDesc testDesc;
 typedef testDesc *testDescPtr;
 struct testDesc {
-    const char *desc; /* descripton of the test */
+    const char *desc; /* description of the test */
     functest    func; /* function implementing the test */
     const char *in;   /* glob to path for input files */
     const char *out;  /* output directory */
@@ -632,8 +632,8 @@ static char *resultFilename(const char *filename, const char *out,
       suffixbuff[0]='_';
 #endif
 
-    snprintf(res, 499, "%s%s%s", out, base, suffixbuff);
-    res[499] = 0;
+    if (snprintf(res, 499, "%s%s%s", out, base, suffixbuff) >= 499)
+        res[499] = 0;
     return(strdup(res));
 }
 

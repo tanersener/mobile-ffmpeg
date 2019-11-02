@@ -143,7 +143,6 @@ EXTRA_DIST = \
 	html/libxml-xpath.html \
 	html/libxml-xpathInternals.html \
 	html/libxml-xpointer.html \
-	html/libxml-xzlib.html \
 	html/right.png \
 	html/up.png \
 	index.html \

@@ -62,14 +62,17 @@ if WITH_PYTHON
 tests: $(PYTESTS)
 	@for f in $(XMLS) ; do test -f $$f || $(LN_S) $(srcdir)/$$f . ; done
 	@echo "## running Python regression tests"
-	-@(PYTHONPATH="..:../.libs:$(srcdir)/..:$$PYTHONPATH" ; \
-	   export PYTHONPATH; \
-	   LD_LIBRARY_PATH="$(top_builddir)/.libs:$$LD_LIBRARY_PATH" ; \
-	   export LD_LIBRARY_PATH; \
-	   for test in $(PYTESTS) ; \
-	   do log=`$(PYTHON) $(srcdir)/$$test` ; \
-	   if [ "`echo $$log | grep OK`" = "" ] ; then \
-	   echo "-- $$test" ; echo "$$log" ; fi ; done)
+	@(export PYTHONPATH="..:../.libs:$(srcdir)/..:$$PYTHONPATH" ; \
+	  export LD_LIBRARY_PATH="$(top_builddir)/.libs:$$LD_LIBRARY_PATH" ; \
+	  export PATH="$(top_builddir)/.libs:$$PATH" ; \
+	  for test in $(PYTESTS) ; do \
+	    log=`$(PYTHON) $(srcdir)/$$test` ; \
+	    if [ "$$?" -ne 0 ] ; then \
+	      echo "-- $$test" ; \
+	      echo "$$log" ; \
+	      exit 1 ; \
+	    fi ; \
+	  done)
 else
 tests:
 endif

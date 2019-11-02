@@ -2,6 +2,6 @@
 Bytes: 0xEE 0x5D 0x5D 0x3E
 <d><![CDATA[0000000000000î]]>
                          ^
-./test/errors/754947.xml:1: parser error : Premature end of data in tag d line 1
+./test/errors/754947.xml:1: parser error : EndTag: '</' not found
 <d><![CDATA[0000000000000î]]>
                              ^

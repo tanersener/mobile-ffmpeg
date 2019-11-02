@@ -92,7 +92,7 @@
 
 /*
  * In ANSI/IEEE 754-1985 64-bits double format numbers have the
- * following properties (amoungst others)
+ * following properties (amongst others)
  *
  *   o FLT_RADIX == 2: binary encoding
  *   o DBL_MAX_EXP == 1024: 11 bits exponent, where one bit is used

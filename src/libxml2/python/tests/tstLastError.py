@@ -68,8 +68,8 @@ class TestCase(unittest.TestCase):
                         (s,len(s),"dummy.xml",None,0),
                         libxml2.treeError,
                         domain=libxml2.XML_FROM_PARSER,
-                        code=libxml2.XML_ERR_TAG_NOT_FINISHED,
-                        message='Premature end of data in tag x line 1\n',
+                        code=libxml2.XML_ERR_LTSLASH_REQUIRED,
+                        message='EndTag: \'</\' not found\n',
                         level=libxml2.XML_ERR_FATAL,
                         file='dummy.xml',
                         line=3)

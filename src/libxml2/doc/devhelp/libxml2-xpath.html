@@ -145,7 +145,7 @@ int	<a href="#xmlXPathCastToBoolean">xmlXPathCastToBoolean</a>		(<a href="libxml
         <div class="refsect2" lang="en"><h3><a name="xmlNodeSet">Structure </a>xmlNodeSet</h3><pre class="programlisting">struct _xmlNodeSet {
     int	nodeNr	: number of nodes in the set
     int	nodeMax	: size of the array as allocated
-    <a href="libxml2-tree.html#xmlNodePtr">xmlNodePtr</a> *	nodeTab	: array of nodes in no particular order @@ with_ns to check wether name
+    <a href="libxml2-tree.html#xmlNodePtr">xmlNodePtr</a> *	nodeTab	: array of nodes in no particular order @@ with_ns to check whether nam
 } xmlNodeSet;
 </pre><p/>
 </div>
@@ -214,7 +214,12 @@ The content of this structure is not made public by the API.
     <a href="libxml2-tree.html#xmlNodePtr">xmlNodePtr</a>	debugNode	: the source node XSLT dictionary
     <a href="libxml2-dict.html#xmlDictPtr">xmlDictPtr</a>	dict	: dictionary if any
     int	flags	: flags to control compilation Cache for reusal of XPath objects
-    void *	cache
+    void *	cache	: Resource limits
+    unsigned long	opLimit
+    unsigned long	opCount
+    int	depth
+    int	maxDepth
+    int	maxParserDepth
 } xmlXPathContext;
 </pre><p/>
 </div>
@@ -249,6 +254,8 @@ The content of this structure is not made public by the API.
     <a name="XPATH_INVALID_CTXT">XPATH_INVALID_CTXT</a> = 22
     <a name="XPATH_STACK_ERROR">XPATH_STACK_ERROR</a> = 23
     <a name="XPATH_FORBID_VARIABLE_ERROR">XPATH_FORBID_VARIABLE_ERROR</a> = 24
+    <a name="XPATH_OP_LIMIT_EXCEEDED">XPATH_OP_LIMIT_EXCEEDED</a> = 25
+    <a name="XPATH_RECURSION_LIMIT_EXCEEDED">XPATH_RECURSION_LIMIT_EXCEEDED</a> = 26
 };
 </pre><p/>
 </div>
@@ -450,7 +457,7 @@ The content of this structure is not made public by the API.
         <hr/>
         <div class="refsect2" lang="en"><h3><a name="xmlXPathContextSetCache"/>xmlXPathContextSetCache ()</h3><pre class="programlisting">int	xmlXPathContextSetCache		(<a href="libxml2-xpath.html#xmlXPathContextPtr">xmlXPathContextPtr</a> ctxt, <br/>					 int active, <br/>					 int value, <br/>					 int options)<br/>
 </pre><p>Creates/frees an object cache on the XPath context. If activates XPath objects (xmlXPathObject) will be cached internally to be reused. @options: 0: This will set the XPath object caching: @value: This will set the maximum number of XPath objects to be cached per slot There are 5 slots for: node-set, string, number, boolean, and misc objects. Use &lt;0 for the default number (100). Other values for @options have currently no effect.</p>
-<div class="variablelist"><table border="0"><col align="left"/><tbody><tr><td><span class="term"><i><tt>ctxt</tt></i>:</span></td><td>the XPath context</td></tr><tr><td><span class="term"><i><tt>active</tt></i>:</span></td><td>enables/disables (creates/frees) the cache</td></tr><tr><td><span class="term"><i><tt>value</tt></i>:</span></td><td>a value with semantics dependant on @options</td></tr><tr><td><span class="term"><i><tt>options</tt></i>:</span></td><td>options (currently only the value 0 is used)</td></tr><tr><td><span class="term"><i><tt>Returns</tt></i>:</span></td><td>0 if the setting succeeded, and -1 on API or internal errors.</td></tr></tbody></table></div></div>
+<div class="variablelist"><table border="0"><col align="left"/><tbody><tr><td><span class="term"><i><tt>ctxt</tt></i>:</span></td><td>the XPath context</td></tr><tr><td><span class="term"><i><tt>active</tt></i>:</span></td><td>enables/disables (creates/frees) the cache</td></tr><tr><td><span class="term"><i><tt>value</tt></i>:</span></td><td>a value with semantics dependent on @options</td></tr><tr><td><span class="term"><i><tt>options</tt></i>:</span></td><td>options (currently only the value 0 is used)</td></tr><tr><td><span class="term"><i><tt>Returns</tt></i>:</span></td><td>0 if the setting succeeded, and -1 on API or internal errors.</td></tr></tbody></table></div></div>
         <hr/>
         <div class="refsect2" lang="en"><h3><a name="xmlXPathConvertBoolean"/>xmlXPathConvertBoolean ()</h3><pre class="programlisting"><a href="libxml2-xpath.html#xmlXPathObjectPtr">xmlXPathObjectPtr</a>	xmlXPathConvertBoolean	(<a href="libxml2-xpath.html#xmlXPathObjectPtr">xmlXPathObjectPtr</a> val)<br/>
 </pre><p>Converts an existing object to its boolean() equivalent</p>
@@ -501,7 +508,7 @@ The content of this structure is not made public by the API.
 <div class="variablelist"><table border="0"><col align="left"/><tbody><tr><td><span class="term"><i><tt>obj</tt></i>:</span></td><td>the object to free</td></tr></tbody></table></div></div>
         <hr/>
         <div class="refsect2" lang="en"><h3><a name="xmlXPathInit"/>xmlXPathInit ()</h3><pre class="programlisting">void	xmlXPathInit			(void)<br/>
-</pre><p>Initialize the XPath environment Does nothing but must be kept as public function.</p>
+</pre><p>Initialize the XPath environment</p>
 </div>
         <hr/>
         <div class="refsect2" lang="en"><h3><a name="xmlXPathIsInf"/>xmlXPathIsInf ()</h3><pre class="programlisting">int	xmlXPathIsInf			(double val)<br/>

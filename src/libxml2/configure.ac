@@ -9,7 +9,7 @@ AC_CANONICAL_HOST
 
 LIBXML_MAJOR_VERSION=2
 LIBXML_MINOR_VERSION=9
-LIBXML_MICRO_VERSION=9
+LIBXML_MICRO_VERSION=10
 LIBXML_MICRO_VERSION_SUFFIX=
 LIBXML_VERSION=$LIBXML_MAJOR_VERSION.$LIBXML_MINOR_VERSION.$LIBXML_MICRO_VERSION$LIBXML_MICRO_VERSION_SUFFIX
 LIBXML_VERSION_INFO=`expr $LIBXML_MAJOR_VERSION + $LIBXML_MINOR_VERSION`:$LIBXML_MICRO_VERSION:$LIBXML_MINOR_VERSION
@@ -217,7 +217,7 @@ fi
 AM_CONDITIONAL([REBUILD_DOCS], [test "$enable_rebuild_docs" = "yes" -o "$USER" = "veillard"])
 
 dnl
-dnl hard dependancies on options
+dnl hard dependencies on options
 dnl
 if test "$with_schemas" = "yes"
 then
@@ -396,7 +396,7 @@ else
         # Try pkg-config first so that static linking works.
         PKG_CHECK_MODULES([Z],[zlib],
             [WITH_ZLIB=1],
-            [ ])
+            [:])
     fi
 
     if test "$WITH_ZLIB" = "0"; then
@@ -435,7 +435,7 @@ else
         # Try pkg-config first so that static linking works.
         PKG_CHECK_MODULES([LZMA],[liblzma],
             [WITH_LZMA=1],
-            [ ])
+            [:])
     fi
 
     # If pkg-config failed, fall back to AC_CHECK_LIB. This
@@ -771,7 +771,7 @@ else
     # warnings we'd like to see
     EXTRA_CFLAGS="${EXTRA_CFLAGS} -pedantic -Wall -Wextra -Wshadow -Wpointer-arith -Wcast-align -Wwrite-strings -Waggregate-return -Wstrict-prototypes -Wmissing-prototypes -Wnested-externs -Winline -Wredundant-decls"
     # warnings we'd like to supress
-    EXTRA_CFLAGS="${EXTRA_CFLAGS} -Wno-long-long -Wno-format-extra-args -Wno-array-bounds"
+    EXTRA_CFLAGS="${EXTRA_CFLAGS} -Wno-long-long -Wno-format-extra-args"
     case "${host}" in
           alpha*-*-linux* )
 	       EXTRA_CFLAGS="${EXTRA_CFLAGS} -mieee"
@@ -1533,7 +1533,8 @@ else
         WITH_ICU=1
     fi
 fi
-XML_LIBS="-lxml2 $Z_LIBS $LZMA_LIBS $THREAD_LIBS $ICONV_LIBS $ICU_LIBS $M_LIBS $LIBS"
+XML_LIBS="-lxml2"
+XML_PRIVATE_LIBS="$Z_LIBS $LZMA_LIBS $THREAD_LIBS $ICONV_LIBS $ICU_LIBS $M_LIBS $LIBS"
 XML_LIBTOOLLIBS="libxml2.la"
 AC_SUBST(WITH_ICU)
 
@@ -1620,7 +1621,14 @@ case "$host" in
  WIN32_EXTRA_LDFLAGS="-no-undefined"
  if test "${PYTHON}" != ""
  then
-   WIN32_EXTRA_PYTHON_LIBADD="-L${pythondir}/../../libs -lpython$(echo ${PYTHON_VERSION} | tr -d .)"
+   case "$host" in
+     *-w64-mingw*)
+       WIN32_EXTRA_PYTHON_LIBADD="-shrext .pyd -L${pythondir}/../../lib -lpython${PYTHON_VERSION}"
+       ;;
+     *)
+       WIN32_EXTRA_PYTHON_LIBADD="-L${pythondir}/../../libs -lpython$(echo ${PYTHON_VERSION} | tr -d .)"
+       ;;
+   esac
  fi
  ;;
  *-*-cygwin*)
@@ -1671,6 +1679,7 @@ AC_SUBST(XML_CFLAGS)
 
 AC_SUBST(XML_LIBDIR)
 AC_SUBST(XML_LIBS)
+AC_SUBST(XML_PRIVATE_LIBS)
 AC_SUBST(XML_LIBTOOLLIBS)
 AC_SUBST(ICONV_LIBS)
 AC_SUBST(ICU_LIBS)

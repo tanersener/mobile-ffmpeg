@@ -236,7 +236,7 @@ libxml_xmlDumpMemory(ATTRIBUTE_UNUSED PyObject * self,
 /************************************************************************
  *									*
  *		Handling Python FILE I/O at the C level			*
- *	The raw I/O attack diectly the File objects, while the		*
+ *	The raw I/O attack directly the File objects, while the		*
  *	other routines address the ioWrapper instance instead		*
  *									*
  ************************************************************************/
@@ -1435,7 +1435,7 @@ static xmlSAXHandler pythonSaxHandler = {
     pythonCdataBlock,
     pythonExternalSubset,
     1,
-    NULL,			/* TODO mograte to SAX2 */
+    NULL,			/* TODO migrate to SAX2 */
     NULL,
     NULL,
     NULL
@@ -3327,7 +3327,7 @@ libxml_xmlSchemaValidityGenericErrorFuncHandler(void *ctx, char *str)
 	xmlSchemaValidCtxtPyCtxtPtr pyCtxt;
 
 #ifdef DEBUG_ERROR
-	printf("libxml_xmlSchemaValiditiyGenericErrorFuncHandler(%p, %s, ...) called\n", ctx, str);
+	printf("libxml_xmlSchemaValidityGenericErrorFuncHandler(%p, %s, ...) called\n", ctx, str);
 #endif
 
 	pyCtxt = (xmlSchemaValidCtxtPyCtxtPtr) ctx;
@@ -3911,7 +3911,7 @@ void initlibxml2mod(void)
 #if PY_MAJOR_VERSION >= 3
     module = PyModule_Create(&moduledef);
 #else
-    /* intialize the python extension module */
+    /* initialize the python extension module */
     module = Py_InitModule((char *) "libxml2mod", libxmlMethods);
 #endif
     if (module == NULL)

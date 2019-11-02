@@ -8,51 +8,67 @@
   </vendor>
   <product id="libxml2">
     <name>libxml2</name>
-    <version>v2.9.8</version>
-    <last-release> Mar 05 2018</last-release>
+    <version>v2.9.9</version>
+    <last-release> Jan 03 2019</last-release>
     <info-url>http://xmlsoft.org/</info-url>
-    <changes>   - Portability:
-  python: remove single use of _PyVerify_fd (Patrick Welche),
-  Build more test executables on Windows/MSVC (Nick Wellnhofer),
-  Stop including ansidecl.h (Nick Wellnhofer),
-  Fix libz and liblzma detection (Nick Wellnhofer),
-  Revert "Compile testapi with -Wno-unused-function" (Nick Wellnhofer)
+    <changes>   - Security:
+  CVE-2018-9251 CVE-2018-14567 Fix infinite loop in LZMA decompression (Nick Wellnhofer),
+  CVE-2018-14404 Fix nullptr deref with XPath logic ops (Nick Wellnhofer),
+  
+   - Documentation:
+  reader: Fix documentation comment (Mohammed Sadiq)
+  
+   - Portability:
+  Fix MSVC build with lzma (Nick Wellnhofer),
+  Variables need 'extern' in static lib on Cygwin (Michael Haubenwallner),
+  Really declare dllexport/dllimport for Cygwin (Michael Haubenwallner),
+  Merge branch 'patch-2' into 'master' (Nick Wellnhofer),
+  Change dir to $THEDIR after ACLOCAL_PATH check autoreconf creates aclocal.m4 in $srcdir (Vitaly Buka),
+  Improve error message if pkg.m4 couldn't be found (Nick Wellnhofer),
+  NaN and Inf fixes for pre-C99 compilers (Nick Wellnhofer)
   
    - Bug Fixes:
-  Fix xmlParserEntityCheck (Nick Wellnhofer),
-  Halt parser in case of encoding error (Nick Wellnhofer),
-  Clear entity content in case of errors (Nick Wellnhofer),
-  Change calls to xmlCharEncInput to set flush false when not final call. Having flush incorrectly set to true causes errors for ICU. (Joel Hockey),
-  Fix buffer over-read in xmlParseNCNameComplex (Nick Wellnhofer),
-  Fix ICU library filenames on Windows/MSVC (Nick Wellnhofer),
-  Fix xmlXPathIsNaN broken by recent commit (Nick Wellnhofer),
-  Fix -Wenum-compare warnings (Nick Wellnhofer),
-  Fix callback signature in testapi.c (Nick Wellnhofer),
-  Fix unused parameter warning without ICU (Nick Wellnhofer),
-  Fix IO callback signatures (Nick Wellnhofer),
-  Fix misc callback signatures (Nick Wellnhofer),
-  Fix list callback signatures (Nick Wellnhofer),
-  Fix hash callback signatures (Nick Wellnhofer),
-  Refactor name and type signature for xmlNop (Vlad Tsyrklevich),
-  Fixed ICU to set flush correctly and provide pivot buffer. (Joel Hockey),
-  Skip EBCDIC tests if EBCDIC isn't supported (Nick Wellnhofer)
+  Revert "Support xmlTextReaderNextSibling w/o preparsed doc" (Nick Wellnhofer),
+  Fix building relative URIs (Thomas Holder),
+  Problem with data in interleave in RelaxNG validation (Nikolai Weibull),
+  Fix memory leak in xmlSwitchInputEncodingInt error path (Nick Wellnhofer),
+  Set doc on element obtained from freeElems (Nick Wellnhofer),
+  Fix HTML serialization with UTF-8 encoding (Nick Wellnhofer),
+  Use actual doc in xmlTextReaderRead*Xml (Nick Wellnhofer),
+  Unlink node before freeing it in xmlSAX2StartElement (Nick Wellnhofer),
+  Check return value of nodePush in xmlSAX2StartElement (Nick Wellnhofer),
+  Free input buffer in xmlHaltParser (Nick Wellnhofer),
+  Reset HTML parser input pointers on encoding failure (Nick Wellnhofer),
+  Don't run icu_parse_test if EUC-JP is unsupported (Nick Wellnhofer),
+  Fix xmlSchemaValidCtxtPtr reuse memory leak (Greg Hildstrom),
+  Fix xmlTextReaderNext with preparsed document (Felix Bünemann),
+  Remove stray character from comment (Nick Wellnhofer),
+  Remove a misleading line from xmlCharEncOutput (Andrey Bienkowski),
+  HTML noscript should not close p (Daniel Veillard),
+  Don't change context node in xmlXPathRoot (Nick Wellnhofer),
+  Stop using XPATH_OP_RESET (Nick Wellnhofer),
+  Revert "Change calls to xmlCharEncInput to set flush false" (Nick Wellnhofer)
   
    - Improvements:
-  Disable pointer-overflow UBSan checks under Travis (Nick Wellnhofer),
-  Improve handling of context input_id (Daniel Veillard),
-  Add resource file to Windows DLL (ccpaging),
-  Run Travis tests with -Werror (Nick Wellnhofer),
-  Build with "-Wall -Wextra" (Nick Wellnhofer),
-  Fix -Wtautological-pointer-compare warnings (Nick Wellnhofer),
-  Remove unused AC_CHECKs (Nick Wellnhofer),
-  Update information about contributing (Nick Wellnhofer),
-  Fix -Wmisleading-indentation warnings (Nick Wellnhofer),
-  Don't touch CFLAGS in configure.ac (Nick Wellnhofer),
-  Ignore function pointer cast warnings (Nick Wellnhofer),
-  Simplify XPath NaN, inf and -0 handling (Nick Wellnhofer),
-  Introduce xmlPosixStrdup and update xmlMemStrdup (Nick Wellnhofer),
-  Add test for ICU flush and pivot buffer (Nick Wellnhofer),
-  Compile testapi with -Wno-unused-function (Nick Wellnhofer)
+  Fix "Problem with data in interleave in RelaxNG validation" (Nikolai Weibull),
+  cleanup: remove some unreachable code (Thomas Holder),
+  add --relative to testURI (Thomas Holder),
+  Remove redefined starts and defines inside include elements (Nikolai Weibull),
+  Allow choice within choice in nameClass in RELAX NG (Nikolai Weibull),
+  Look inside divs for starts and defines inside include (Nikolai Weibull),
+  Add compile and libxml2-config.cmake to .gitignore (Nikolai Weibull),
+  Stop using doc-&gt;charset outside parser code (Nick Wellnhofer),
+  Add newlines to 'xmllint --xpath' output (Nick Wellnhofer),
+  Don't include SAX.h from globals.h (Nick Wellnhofer),
+  Support xmlTextReaderNextSibling w/o preparsed doc (Felix Bünemann),
+  Don't instruct user to run make when autogen.sh failed (林博仁(Buo-ren Lin)),
+  Run Travis ASan tests with "sudo: required" (Nick Wellnhofer),
+  Improve restoring of context size and position (Nick Wellnhofer),
+  Simplify and harden nodeset filtering (Nick Wellnhofer),
+  Avoid unnecessary backups of the context node (Nick Wellnhofer),
+  Fix inconsistency in xmlXPathIsInf (Nick Wellnhofer)
+  
+   - Cleanups:
   
 
 </changes>

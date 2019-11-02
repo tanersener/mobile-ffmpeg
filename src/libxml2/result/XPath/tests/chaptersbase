@@ -138,3 +138,31 @@ Set contains 0 nodes:
 Expression: //p[-100000000000000000000]
 Object is a Node Set :
 Set contains 0 nodes:
+
+========================
+Expression: //chapter[true()][position() mod 2 = 1][true()][2]
+Object is a Node Set :
+Set contains 1 nodes:
+1  ELEMENT chapter
+    ATTRIBUTE id
+      TEXT
+        content=chapter3
+
+========================
+Expression: //chapter[true()][2][true()]
+Object is a Node Set :
+Set contains 1 nodes:
+1  ELEMENT chapter
+    ATTRIBUTE id
+      TEXT
+        content=chapter2
+
+========================
+Expression: //node()[false()]
+Object is a Node Set :
+Set contains 0 nodes:
+
+========================
+Expression: (//node())[false()]
+Object is a Node Set :
+Set contains 0 nodes:
