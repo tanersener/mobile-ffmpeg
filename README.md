@@ -1,4 +1,4 @@
-# MobileFFmpeg ![GitHub release](https://img.shields.io/badge/release-v4.3-blue.svg) ![Bintray](https://img.shields.io/badge/bintray-v4.3-blue.svg) ![CocoaPods](https://img.shields.io/badge/pod-v4.3-blue.svg) [![Build Status](https://travis-ci.org/tanersener/mobile-ffmpeg.svg?branch=master)](https://travis-ci.org/tanersener/mobile-ffmpeg)
+# MobileFFmpeg [![Financial Contributors on Open Collective](https://opencollective.com/mobile-ffmpeg/all/badge.svg?label=financial+contributors)](https://opencollective.com/mobile-ffmpeg) ![GitHub release](https://img.shields.io/badge/release-v4.3-blue.svg) ![Bintray](https://img.shields.io/badge/bintray-v4.3-blue.svg) ![CocoaPods](https://img.shields.io/badge/pod-v4.3-blue.svg) [![Build Status](https://travis-ci.org/tanersener/mobile-ffmpeg.svg?branch=master)](https://travis-ci.org/tanersener/mobile-ffmpeg)
 
 FFmpeg for Android, iOS and tvOS
 
@@ -448,7 +448,37 @@ CPU optimizations (`ASM`) are enabled for most of the external libraries. Detail
 
 A more detailed documentation is available at [Wiki](https://github.com/tanersener/mobile-ffmpeg/wiki).
 
-### 7. License
+### 7. Contributors
+
+#### 7.1 Code Contributors
+
+This project exists thanks to all the people who contribute. [[Contribute](CONTRIBUTING.md)].
+<a href="https://github.com/tanersener/mobile-ffmpeg/graphs/contributors"><img src="https://opencollective.com/mobile-ffmpeg/contributors.svg?width=890&button=false" /></a>
+
+#### 7.2 Financial Contributors
+
+Become a financial contributor and help us sustain our community. [[Contribute](https://opencollective.com/mobile-ffmpeg/contribute)]
+
+##### 7.2.1 Individuals
+
+<a href="https://opencollective.com/mobile-ffmpeg"><img src="https://opencollective.com/mobile-ffmpeg/individuals.svg?width=890"></a>
+
+##### 7.2.2 Organizations
+
+Support this project with your organization. Your logo will show up here with a link to your website. [[Contribute](https://opencollective.com/mobile-ffmpeg/contribute)]
+
+<a href="https://opencollective.com/mobile-ffmpeg/organization/0/website"><img src="https://opencollective.com/mobile-ffmpeg/organization/0/avatar.svg"></a>
+<a href="https://opencollective.com/mobile-ffmpeg/organization/1/website"><img src="https://opencollective.com/mobile-ffmpeg/organization/1/avatar.svg"></a>
+<a href="https://opencollective.com/mobile-ffmpeg/organization/2/website"><img src="https://opencollective.com/mobile-ffmpeg/organization/2/avatar.svg"></a>
+<a href="https://opencollective.com/mobile-ffmpeg/organization/3/website"><img src="https://opencollective.com/mobile-ffmpeg/organization/3/avatar.svg"></a>
+<a href="https://opencollective.com/mobile-ffmpeg/organization/4/website"><img src="https://opencollective.com/mobile-ffmpeg/organization/4/avatar.svg"></a>
+<a href="https://opencollective.com/mobile-ffmpeg/organization/5/website"><img src="https://opencollective.com/mobile-ffmpeg/organization/5/avatar.svg"></a>
+<a href="https://opencollective.com/mobile-ffmpeg/organization/6/website"><img src="https://opencollective.com/mobile-ffmpeg/organization/6/avatar.svg"></a>
+<a href="https://opencollective.com/mobile-ffmpeg/organization/7/website"><img src="https://opencollective.com/mobile-ffmpeg/organization/7/avatar.svg"></a>
+<a href="https://opencollective.com/mobile-ffmpeg/organization/8/website"><img src="https://opencollective.com/mobile-ffmpeg/organization/8/avatar.svg"></a>
+<a href="https://opencollective.com/mobile-ffmpeg/organization/9/website"><img src="https://opencollective.com/mobile-ffmpeg/organization/9/avatar.svg"></a>
+
+### 8. License
 
 This project is licensed under the LGPL v3.0. However, if source code is built using optional `--enable-gpl` flag or 
 prebuilt binaries with `-gpl` postfix are used then MobileFFmpeg is subject to the GPL v3.0 license.
@@ -466,11 +496,11 @@ In test applications; embedded fonts are licensed under the [SIL Open Font Licen
 
 Please visit [License](https://github.com/tanersener/mobile-ffmpeg/wiki/License) page for the details.
 
-### 8. Contributing
+### 9. Contributing
 
 If you have any recommendations or ideas to improve it, please feel free to submit issues or pull requests. Any help is appreciated.
 
-### 9. See Also
+### 10. See Also
 
 - [libav gas-preprocessor](https://github.com/libav/gas-preprocessor/raw/master/gas-preprocessor.pl)
 - [FFmpeg API Documentation](https://ffmpeg.org/doxygen/4.0/index.html)
