@@ -310,13 +310,9 @@ following structure:
 This is the top level element for a font configuration and can contain
 <literal>&lt;dir&gt;</literal>, <literal>&lt;cachedir&gt;</literal>, <literal>&lt;include&gt;</literal>, <literal>&lt;match&gt;</literal> and <literal>&lt;alias&gt;</literal> elements in any order.
   </para></refsect2>
-  <refsect2><title><literal>&lt;dir prefix="default" salt=""&gt;</literal></title><para>
+  <refsect2><title><literal>&lt;dir prefix="default"&gt;</literal></title><para>
 This element contains a directory name which will be scanned for font files
-to include in the set of available fonts.
-  </para><para>
-If 'prefix' is set to "default" or "cwd", the current working directory will be added as the path prefix prior to the value. If 'prefix' is set to "xdg", the value in the XDG_DATA_HOME environment variable will be added as the path prefix. please see XDG Base Directory Specification for more details. If 'prefix' is set to "relative", the path of current file will be added prior to the value.
-  </para><para>
-'salt' property affects to determine cache filename. this is useful for example when having different fonts sets on same path at container and share fonts from host on different font path.
+to include in the set of available fonts. If 'prefix' is set to "default" or "cwd", the current working directory will be added as the path prefix prior to the value. If 'prefix' is set to "xdg", the value in the XDG_DATA_HOME environment variable will be added as the path prefix. please see XDG Base Directory Specification for more details. If 'prefix' is set to "relative", the path of current file will be added prior to the value.
   </para></refsect2>
   <refsect2><title><literal>&lt;cachedir prefix="default"&gt;</literal></title><para>
 This element contains a directory name that is supposed to be stored or read
@@ -355,19 +351,6 @@ drawn as blanks on the screen.  Within the <literal>&lt;blank&gt;</literal> elem
 Unicode characters which is supposed to be blank in an <literal>&lt;int&gt;</literal> element.
 Characters outside of this set which are drawn as blank will be elided from
 the set of characters supported by the font.
-  </para></refsect2>
-  <refsect2><title><literal>&lt;remap-dir prefix="default" as-path="" salt=""&lt;</literal></title><para>
-This element contains a directory name where will be mapped
-as the path 'as-path' in cached information.
-This is useful if the directory name is an alias
-(via a bind mount or symlink) to another directory in the system for
-which cached font information is likely to exist.
-  </para><para>
-'salt' property affects to determine cache filename as same as <literal>&lt;dir&gt;</literal> element.
-  </para></refsect2>
-  <refsect2><title><literal>&lt;reset-dirs /&gt;</literal></title><para>
-This element removes all of fonts directories where added by <literal>&lt;dir&gt;</literal> elements.
-This is useful to override fonts directories from system to own fonts directories only.
   </para></refsect2>
   <refsect2><title><literal>&lt;rescan&gt;</literal></title><para>
 The <literal>&lt;rescan&gt;</literal> element holds an <literal>&lt;int&gt;</literal> element which indicates the default

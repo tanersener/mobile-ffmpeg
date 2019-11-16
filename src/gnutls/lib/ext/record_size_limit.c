@@ -48,10 +48,9 @@ const hello_ext_entry_st ext_mod_record_size_limit = {
 
 static int
 _gnutls_record_size_limit_recv_params(gnutls_session_t session,
-				      const uint8_t * data, size_t _data_size)
+				      const uint8_t * data, size_t data_size)
 {
 	ssize_t new_size;
-	ssize_t data_size = _data_size;
 	const version_entry_st *vers;
 
 	DECR_LEN(data_size, 2);

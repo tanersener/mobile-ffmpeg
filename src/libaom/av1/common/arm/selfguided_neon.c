@@ -509,6 +509,7 @@ static INLINE void calc_ab_internal_lbd(int32_t *A, uint16_t *A16,
   } while (h > 0);
 }
 
+#if CONFIG_AV1_HIGHBITDEPTH
 static INLINE void calc_ab_internal_hbd(int32_t *A, uint16_t *A16,
                                         uint16_t *B16, int32_t *B,
                                         const int buf_stride, const int width,
@@ -573,6 +574,7 @@ static INLINE void calc_ab_internal_hbd(int32_t *A, uint16_t *A16,
     h -= (ht_inc * 4);
   } while (h > 0);
 }
+#endif  // CONFIG_AV1_HIGHBITDEPTH
 
 static INLINE void calc_ab_fast_internal_lbd(int32_t *A, uint16_t *A16,
                                              int32_t *B, const int buf_stride,
@@ -626,6 +628,7 @@ static INLINE void calc_ab_fast_internal_lbd(int32_t *A, uint16_t *A16,
   } while (h > 0);
 }
 
+#if CONFIG_AV1_HIGHBITDEPTH
 static INLINE void calc_ab_fast_internal_hbd(int32_t *A, uint16_t *A16,
                                              int32_t *B, const int buf_stride,
                                              const int width, const int height,
@@ -679,6 +682,7 @@ static INLINE void calc_ab_fast_internal_hbd(int32_t *A, uint16_t *A16,
     h -= (ht_inc * 4);
   } while (h > 0);
 }
+#endif  // CONFIG_AV1_HIGHBITDEPTH
 
 static INLINE void boxsum1(int16_t *src, const int src_stride, uint16_t *dst1,
                            int32_t *dst2, const int dst_stride, const int width,
@@ -1181,17 +1185,25 @@ static INLINE void restoration_fast_internal(uint16_t *dgd16, int width,
   // Calculation of a, b. a output is in 16bit tmp_buf which is in range of
   // [1, 256] for all bit depths. b output is kept in 32bit buffer.
 
-  if (8 == bit_depth) {
-    calc_ab_fast_internal_lbd(
-        (square_sum_buf - buf_stride - 1), (tmp16_buf - buf_stride - 1),
-        (sum_buf - buf_stride - 1), buf_stride * 2, width + 2, height + 2, r,
-        params->s[radius_idx], 2);
-  } else {
+#if CONFIG_AV1_HIGHBITDEPTH
+  if (bit_depth > 8) {
     calc_ab_fast_internal_hbd(
         (square_sum_buf - buf_stride - 1), (tmp16_buf - buf_stride - 1),
         (sum_buf - buf_stride - 1), buf_stride * 2, width + 2, height + 2,
         bit_depth, r, params->s[radius_idx], 2);
+  } else {
+    calc_ab_fast_internal_lbd(
+        (square_sum_buf - buf_stride - 1), (tmp16_buf - buf_stride - 1),
+        (sum_buf - buf_stride - 1), buf_stride * 2, width + 2, height + 2, r,
+        params->s[radius_idx], 2);
   }
+#else
+  (void)bit_depth;
+  calc_ab_fast_internal_lbd((square_sum_buf - buf_stride - 1),
+                            (tmp16_buf - buf_stride - 1),
+                            (sum_buf - buf_stride - 1), buf_stride * 2,
+                            width + 2, height + 2, r, params->s[radius_idx], 2);
+#endif
   final_filter_fast_internal(tmp16_buf, sum_buf, buf_stride, (int16_t *)dgd16,
                              dgd_stride, dst, dst_stride, width, height);
 }
@@ -1235,19 +1247,27 @@ static INLINE void restoration_internal(uint16_t *dgd16, int width, int height,
   A16 += SGRPROJ_BORDER_VERT * buf_stride + SGRPROJ_BORDER_HORZ;
   sum_buf += SGRPROJ_BORDER_VERT * buf_stride + SGRPROJ_BORDER_HORZ;
 
+#if CONFIG_AV1_HIGHBITDEPTH
   // Calculation of a, b. a output is in 16bit tmp_buf which is in range of
   // [1, 256] for all bit depths. b output is kept in 32bit buffer.
-  if (8 == bit_depth) {
-    calc_ab_internal_lbd((square_sum_buf - buf_stride - 1),
-                         (A16 - buf_stride - 1), (sum_buf - buf_stride - 1),
-                         (B - buf_stride - 1), buf_stride, width + 2,
-                         height + 2, r, params->s[radius_idx], 1);
-  } else {
+  if (bit_depth > 8) {
     calc_ab_internal_hbd((square_sum_buf - buf_stride - 1),
                          (A16 - buf_stride - 1), (sum_buf - buf_stride - 1),
                          (B - buf_stride - 1), buf_stride, width + 2,
                          height + 2, bit_depth, r, params->s[radius_idx], 1);
+  } else {
+    calc_ab_internal_lbd((square_sum_buf - buf_stride - 1),
+                         (A16 - buf_stride - 1), (sum_buf - buf_stride - 1),
+                         (B - buf_stride - 1), buf_stride, width + 2,
+                         height + 2, r, params->s[radius_idx], 1);
   }
+#else
+  (void)bit_depth;
+  calc_ab_internal_lbd((square_sum_buf - buf_stride - 1),
+                       (A16 - buf_stride - 1), (sum_buf - buf_stride - 1),
+                       (B - buf_stride - 1), buf_stride, width + 2, height + 2,
+                       r, params->s[radius_idx], 1);
+#endif
   final_filter_internal(A16, B, buf_stride, (int16_t *)dgd16, dgd_stride, dst,
                         dst_stride, width, height);
 }
@@ -1301,6 +1321,7 @@ static INLINE void src_convert_u8_to_u16(const uint8_t *src,
   }
 }
 
+#if CONFIG_AV1_HIGHBITDEPTH
 static INLINE void src_convert_hbd_copy(const uint16_t *src, int src_stride,
                                         uint16_t *dst, const int dst_stride,
                                         int width, int height) {
@@ -1340,6 +1361,7 @@ static INLINE void src_convert_hbd_copy(const uint16_t *src, int src_stride,
            sizeof(uint16_t) * width);
   }
 }
+#endif  // CONFIG_AV1_HIGHBITDEPTH
 
 int av1_selfguided_restoration_neon(const uint8_t *dat8, int width, int height,
                                     int stride, int32_t *flt0, int32_t *flt1,
@@ -1356,6 +1378,7 @@ int av1_selfguided_restoration_neon(const uint8_t *dat8, int width, int height,
   const int height_ext = height + 2 * SGRPROJ_BORDER_VERT;
   const int dgd_stride = stride;
 
+#if CONFIG_AV1_HIGHBITDEPTH
   if (highbd) {
     const uint16_t *dgd16_tmp = CONVERT_TO_SHORTPTR(dat8);
     src_convert_hbd_copy(
@@ -1370,6 +1393,13 @@ int av1_selfguided_restoration_neon(const uint8_t *dat8, int width, int height,
         dgd16 - SGRPROJ_BORDER_VERT * dgd16_stride - SGRPROJ_BORDER_HORZ,
         dgd16_stride, width_ext, height_ext);
   }
+#else
+  (void)highbd;
+  src_convert_u8_to_u16(
+      dat8 - SGRPROJ_BORDER_VERT * dgd_stride - SGRPROJ_BORDER_HORZ, dgd_stride,
+      dgd16 - SGRPROJ_BORDER_VERT * dgd16_stride - SGRPROJ_BORDER_HORZ,
+      dgd16_stride, width_ext, height_ext);
+#endif
 
   if (params->r[0] > 0)
     restoration_fast_internal(dgd16, width, height, dgd16_stride, flt0,
@@ -1400,6 +1430,7 @@ void av1_apply_selfguided_restoration_neon(const uint8_t *dat8, int width,
 
   assert(!(params->r[0] == 0 && params->r[1] == 0));
 
+#if CONFIG_AV1_HIGHBITDEPTH
   if (highbd) {
     const uint16_t *dgd16_tmp = CONVERT_TO_SHORTPTR(dat8);
     src_convert_hbd_copy(
@@ -1414,7 +1445,13 @@ void av1_apply_selfguided_restoration_neon(const uint8_t *dat8, int width,
         dgd16 - SGRPROJ_BORDER_VERT * dgd16_stride - SGRPROJ_BORDER_HORZ,
         dgd16_stride, width_ext, height_ext);
   }
-
+#else
+  (void)highbd;
+  src_convert_u8_to_u16(
+      dat8 - SGRPROJ_BORDER_VERT * dgd_stride - SGRPROJ_BORDER_HORZ, dgd_stride,
+      dgd16 - SGRPROJ_BORDER_VERT * dgd16_stride - SGRPROJ_BORDER_HORZ,
+      dgd16_stride, width_ext, height_ext);
+#endif
   if (params->r[0] > 0)
     restoration_fast_internal(dgd16, width, height, dgd16_stride, flt0, width,
                               bit_depth, eps, 0);
@@ -1485,6 +1522,7 @@ void av1_apply_selfguided_restoration_neon(const uint8_t *dat8, int width,
 
         r4 = vreinterpretq_u16_s16(vmaxq_s16(r0, zero));
 
+#if CONFIG_AV1_HIGHBITDEPTH
         if (highbd) {
           r4 = vminq_u16(r4, max);
           vst1q_u16(dst16_ptr, r4);
@@ -1492,6 +1530,11 @@ void av1_apply_selfguided_restoration_neon(const uint8_t *dat8, int width,
           t0 = vqmovn_u16(r4);
           vst1_u8(dst_ptr, t0);
         }
+#else
+        (void)max;
+        t0 = vqmovn_u16(r4);
+        vst1_u8(dst_ptr, t0);
+#endif
         w -= 8;
         count += 8;
         dst_ptr += 8;

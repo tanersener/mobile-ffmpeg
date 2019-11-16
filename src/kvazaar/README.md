@@ -11,6 +11,29 @@ http://ultravideo.cs.tut.fi/#encoder for more information.
 - Linux/Mac [![Build Status](https://travis-ci.org/ultravideo/kvazaar.svg?branch=master)](https://travis-ci.org/ultravideo/kvazaar)
 - Windows [![Build status](https://ci.appveyor.com/api/projects/status/88sg1h25lp0k71pu?svg=true)](https://ci.appveyor.com/project/Ultravideo/kvazaar)
 
+## Table of Contents
+
+- [Using Kvazaar](#using-kvazaar)
+  - [Example:](#example)
+  - [Parameters](#parameters)
+  - [LP-GOP syntax](#lp-gop-syntax)
+- [Presets](#presets)
+- [Kvazaar library](#kvazaar-library)
+- [Compiling Kvazaar](#compiling-kvazaar)
+  - [Required libraries](#required-libraries)
+  - [Autotools](#autotools)
+  - [OS X](#os-x)
+  - [Visual Studio](#visual-studio)
+  - [Docker](#docker)
+  - [Visualization (Windows only)](#visualization-windows-only)
+- [Paper](#paper)
+- [Contributing to Kvazaar](#contributing-to-kvazaar)
+  - [Code documentation](#code-documentation)
+  - [For version control we try to follow these conventions:](#for-version-control-we-try-to-follow-these-conventions)
+  - [Testing](#testing)
+  - [Unit tests](#unit-tests)
+  - [Code style](#code-style)
+
 ## Using Kvazaar
 
 ### Example:
@@ -31,14 +54,14 @@ Usage:
 kvazaar -i <input> --input-res <width>x<height> -o <output>
 
 Required:
-  -i, --input                : Input file
+  -i, --input <filename>     : Input file
       --input-res <res>      : Input resolution [auto]
-                               auto: detect from file name
-                               <int>x<int>: width times height
-  -o, --output               : Output file
+                                   - auto: Detect from file name.
+                                   - <int>x<int>: width times height
+  -o, --output <filename>    : Output file
 
 Presets:
-      --preset=<preset>      : Set options to a preset [medium]
+      --preset <preset>      : Set options to a preset [medium]
                                    - ultrafast, superfast, veryfast, faster,
                                      fast, medium, slow, slower, veryslow
                                      placebo
@@ -46,144 +69,190 @@ Presets:
 Input:
   -n, --frames <integer>     : Number of frames to code [all]
       --seek <integer>       : First frame to code [0]
-      --input-fps <num>/<denom> : Framerate of the input video [25.0]
-      --source-scan-type <string> : Set source scan type [progressive].
-                                   - progressive: progressive scan
-                                   - tff: top field first
-                                   - bff: bottom field first
-      --input-format         : P420 or P400
-      --input-bitdepth       : 8-16
-      --loop-input           : Re-read input file forever
+      --input-fps <num>[/<denom>] : Frame rate of the input video [25]
+      --source-scan-type <string> : Source scan type [progressive]
+                                   - progressive: Progressive scan
+                                   - tff: Top field first
+                                   - bff: Bottom field first
+      --input-format <string> : P420 or P400 [P420]
+      --input-bitdepth <int> : 8-16 [8]
+      --loop-input           : Re-read input file forever.
 
 Options:
-      --help                 : Print this help message and exit
-      --version              : Print version information and exit
-      --aud                  : Use access unit delimiters
-      --debug <string>       : Output encoders reconstruction.
-      --cpuid <integer>      : Disable runtime cpu optimizations with value 0.
-      --hash                 : Decoded picture hash [checksum]
+      --help                 : Print this help message and exit.
+      --version              : Print version information and exit.
+      --(no-)aud             : Use access unit delimiters. [disabled]
+      --debug <filename>     : Output internal reconstruction.
+      --(no-)cpuid           : Enable runtime CPU optimizations. [enabled]
+      --hash <string>        : Decoded picture hash [checksum]
                                    - none: 0 bytes
                                    - checksum: 18 bytes
                                    - md5: 56 bytes
-      --no-psnr              : Don't calculate PSNR for frames
-      --no-info              : Don't add encoder info SEI.
+      --(no-)psnr            : Calculate PSNR for frames. [enabled]
+      --(no-)info            : Add encoder info SEI. [enabled]
+      --crypto <string>      : Selective encryption. Crypto support must be
+                               enabled at compile-time. Can be 'on' or 'off' or
+                               a list of features separated with a '+'. [off]
+                                   - on: Enable all encryption features.
+                                   - off: Disable selective encryption.
+                                   - mvs: Motion vector magnitudes.
+                                   - mv_signs: Motion vector signs.
+                                   - trans_coeffs: Coefficient magnitudes.
+                                   - trans_coeff_signs: Coefficient signs.
+                                   - intra_pred_modes: Intra prediction modes.
+      --key <string>         : Encryption key [16,213,27,56,255,127,242,112,
+                                               97,126,197,204,25,59,38,30]
 
 Video structure:
-  -q, --qp <integer>         : Quantization Parameter [32]
-  -p, --period <integer>     : Period of intra pictures [0]
-                               - 0: only first picture is intra
-                               - 1: all pictures are intra
-                               - 2-N: every Nth picture is intra
-      --vps-period <integer> : Specify how often the video parameter set is
-                               re-sent. [0]
-                                   - 0: only send VPS with the first frame
-                                   - N: send VPS with every Nth intra frame
-  -r, --ref <integer>        : Reference frames, range 1..15 [3]
-      --gop <string>         : Definition of GOP structure [0]
-                                   - 0: disabled
+  -q, --qp <integer>         : Quantization parameter [22]
+  -p, --period <integer>     : Period of intra pictures [64]
+                                   - 0: Only first picture is intra.
+                                   - 1: All pictures are intra.
+                                   - N: Every Nth picture is intra.
+      --vps-period <integer> : How often the video parameter set is re-sent [0]
+                                   - 0: Only send VPS with the first frame.
+                                   - N: Send VPS with every Nth intra frame.
+  -r, --ref <integer>        : Number of reference frames, in range 1..15 [4]
+      --gop <string>         : GOP structure [8]
+                                   - 0: Disabled
                                    - 8: B-frame pyramid of length 8
-                                   - lp-<string>: lp-gop definition
-                                         (e.g. lp-g8d4t2, see README)
-      --cqmfile <string>     : Custom Quantization Matrices from a file
-      --bitrate <integer>    : Target bitrate. [0]
-                                   - 0: disable rate-control
-                                   - N: target N bits per second
-      --lossless             : Use lossless coding
-      --mv-constraint        : Constrain movement vectors
-                                   - none: no constraint
-                                   - frametile: constrain within the tile
-                                   - frametilemargin: constrain even more
-      --roi <string>         : Use a delta QP map for region of interest
-                                   Read an array of delta QP values from
-                                   a file, where the first two values are the
-                                   width and height, followed by width*height
-                                   delta QP values in raster order.
-                                   The delta QP map can be any size or aspect
-                                   ratio, and will be mapped to LCU's.
-      --(no-)erp-aqp         : Use adaptive QP for 360 video with
-                               equirectangular projection
+                                   - lp-<string>: Low-delay P-frame GOP
+                                     (e.g. lp-g8d4t2, see README)
+      --(no-)open-gop        : Use open GOP configuration. [enabled]
+      --cqmfile <filename>   : Read custom quantization matrices from a file.
+      --scaling-list <string>: Set scaling list mode. [off]
+                                   - off: Disable scaling lists.
+                                   - custom: use custom list (with --cqmfile).
+                                   - default: Use default lists.
+      --bitrate <integer>    : Target bitrate [0]
+                                   - 0: Disable rate control.
+                                   - N: Target N bits per second.
+      --(no-)lossless        : Use lossless coding. [disabled]
+      --mv-constraint <string> : Constrain movement vectors. [none]
+                                   - none: No constraint
+                                   - frametile: Constrain within the tile.
+                                   - frametilemargin: Constrain even more.
+      --roi <filename>       : Use a delta QP map for region of interest.
+                               Reads an array of delta QP values from a text
+                               file. The file format is: width and height of
+                               the QP delta map followed by width*height delta
+                               QP values in raster order. The map can be of any
+                               size and will be scaled to the video size.
+      --set-qp-in-cu         : Set QP at CU level keeping pic_init_qp_minus26.
+                               in PPS and slice_qp_delta in slize header zero.
+      --(no-)erp-aqp         : Use adaptive QP for 360 degree video with
+                               equirectangular projection. [disabled]
+      --level <number>       : Use the given HEVC level in the output and give
+                               an error if level limits are exceeded. [6.2]
+                                   - 1, 2, 2.1, 3, 3.1, 4, 4.1, 5, 5.1, 5.2, 6,
+                                     6.1, 6.2
+      --force-level <number> : Same as --level but warnings instead of errors.
+      --high-tier            : Used with --level. Use high tier bitrate limits
+                               instead of the main tier limits during encoding.
+                               High tier requires level 4 or higher.
 
 Compression tools:
-      --deblock [<beta:tc>]  : Deblocking
-                                     - beta: between -6 and 6
-                                     - tc: between -6 and 6
-      --(no-)sao             : Sample Adaptive Offset
-      --(no-)rdoq            : Rate-Distortion Optimized Quantization
-      --(no-)signhide        : Sign Hiding
-      --(no-)smp             : Symmetric Motion Partition
-      --(no-)amp             : Asymmetric Motion Partition
-      --rd <integer>         : Intra mode search complexity
-                                   - 0: skip intra if inter is good enough
-                                   - 1: rough intra mode search with SATD
-                                   - 2: refine intra mode search with SSE
-      --(no-)mv-rdo          : Rate-Distortion Optimized motion vector costs
-      --(no-)full-intra-search
-                             : Try all intra modes during rough search.
-      --(no-)transform-skip  : Transform skip
-      --me <string>          : Integer motion estimation
+      --(no-)deblock <beta:tc> : Deblocking filter. [0:0]
+                                   - beta: Between -6 and 6
+                                   - tc: Between -6 and 6
+      --sao <string>         : Sample Adaptive Offset [full]
+                                   - off: SAO disabled
+                                   - band: Band offset only
+                                   - edge: Edge offset only
+                                   - full: Full SAO
+      --(no-)rdoq            : Rate-distortion optimized quantization [enabled]
+      --(no-)rdoq-skip       : Skip RDOQ for 4x4 blocks. [disabled]
+      --(no-)signhide        : Sign hiding [disabled]
+      --(no-)smp             : Symmetric motion partition [disabled]
+      --(no-)amp             : Asymmetric motion partition [disabled]
+      --rd <integer>         : Intra mode search complexity [0]
+                                   - 0: Skip intra if inter is good enough.
+                                   - 1: Rough intra mode search with SATD.
+                                   - 2: Refine intra mode search with SSE.
+                                   - 3: Try all intra modes and enable intra
+                                        chroma mode search.
+      --(no-)mv-rdo          : Rate-distortion optimized motion vector costs
+                               [disabled]
+      --(no-)full-intra-search : Try all intra modes during rough search.
+                               [disabled]
+      --(no-)transform-skip  : Try transform skip [disabled]
+      --me <string>          : Integer motion estimation algorithm [hexbs]
                                    - hexbs: Hexagon Based Search
                                    - tz:    Test Zone Search
                                    - full:  Full Search
                                    - full8, full16, full32, full64
-      --subme <integer>      : Set fractional pixel motion estimation level
-                                   - 0: only integer motion estimation
+                                   - dia:   Diamond Search
+      --me-steps <integer>   : Motion estimation search step limit. Only
+                               affects 'hexbs' and 'dia'. [-1]
+      --subme <integer>      : Fractional pixel motion estimation level [4]
+                                   - 0: Integer motion estimation only
                                    - 1: + 1/2-pixel horizontal and vertical
                                    - 2: + 1/2-pixel diagonal
                                    - 3: + 1/4-pixel horizontal and vertical
                                    - 4: + 1/4-pixel diagonal
-      --pu-depth-inter <int>-<int>
-                             : Range for sizes for inter predictions
+      --pu-depth-inter <int>-<int> : Inter prediction units sizes [0-3]
                                    - 0, 1, 2, 3: from 64x64 to 8x8
-      --pu-depth-intra <int>-<int> : Range for sizes for intra predictions
+      --pu-depth-intra <int>-<int> : Intra prediction units sizes [1-4]
                                    - 0, 1, 2, 3, 4: from 64x64 to 4x4
-      --(no-)bipred          : Bi-prediction
-      --(no-)cu-split-termination
-                             : CU split search termination condition
-                                   - off: Never terminate cu-split search
-                                   - zero: Terminate with zero residual
-      --(no-)me-early-termination : ME early termination condition
-                                   - off: Don't terminate early
-                                   - on: Terminate early
-                                   - sensitive: Terminate even earlier
-      --(no-)implicit-rdpcm  : Implicit residual DPCM
-                               Currently only supported with lossless coding.
-      --(no-)tmvp            : Temporal Motion Vector Prediction
-      --(no-)rdoq-skip       : Skips RDOQ for 4x4 blocks
+      --tr-depth-intra <int> : Transform split depth for intra blocks [0]
+      --(no-)bipred          : Bi-prediction [disabled]
+      --cu-split-termination <string> : CU split search termination [zero]
+                                   - off: Don't terminate early.
+                                   - zero: Terminate when residual is zero.
+      --me-early-termination <string> : Motion estimation termination [on]
+                                   - off: Don't terminate early.
+                                   - on: Terminate early.
+                                   - sensitive: Terminate even earlier.
+      --fast-residual-cost <int> : Skip CABAC cost for residual coefficients
+                                   when QP is below the limit. [0]
+      --(no-)intra-rdo-et    : Check intra modes in rdo stage only until
+                               a zero coefficient CU is found. [disabled]
+      --(no-)early-skip      : Try to find skip cu from merge candidates.
+                               Perform no further search if skip is found.
+                               For rd=0..1: Try the first candidate.
+                               For rd=2.. : Try the best candidate based
+                                            on luma satd cost. [enabled]
+      --max-merge <integer>  : Maximum number of merge candidates, 1..5 [5]
+      --(no-)implicit-rdpcm  : Implicit residual DPCM. Currently only supported
+                               with lossless coding. [disabled]
+      --(no-)tmvp            : Temporal motion vector prediction [enabled]
 
 Parallel processing:
       --threads <integer>    : Number of threads to use [auto]
-                                   - 0: process everything with main thread
-                                   - N: use N threads for encoding
-                                   - auto: select based on number of cores
-      --owf <integer>        : Frame parallelism [auto]
-                                   - N: Process N-1 frames at a time
-                                   - auto: Select automatically
-      --(no-)wpp             : Wavefront parallel processing [enabled]
+                                   - 0: Process everything with main thread.
+                                   - N: Use N threads for encoding.
+                                   - auto: Select automatically.
+      --owf <integer>        : Frame-level parallelism [auto]
+                                   - N: Process N+1 frames at a time.
+                                   - auto: Select automatically.
+      --(no-)wpp             : Wavefront parallel processing. [enabled]
                                Enabling tiles automatically disables WPP.
                                To enable WPP with tiles, re-enable it after
-                               enabling tiles.
+                               enabling tiles. Enabling wpp with tiles is,
+                               however, an experimental feature since it is
+                               not supported in any HEVC profile.
       --tiles <int>x<int>    : Split picture into width x height uniform tiles.
       --tiles-width-split <string>|u<int> :
-                               Specifies a comma separated list of pixel
-                               positions of tiles columns separation coordinates.
-                               Can also be u followed by and a single int n,
-                               in which case it produces columns of uniform width.
+                                   - <string>: A comma-separated list of tile
+                                               column pixel coordinates.
+                                   - u<int>: Number of tile columns of uniform
+                                             width.
       --tiles-height-split <string>|u<int> :
-                               Specifies a comma separated list of pixel
-                               positions of tiles rows separation coordinates.
-                               Can also be u followed by and a single int n,
-                               in which case it produces rows of uniform height.
-      --slices <string>      : Control how slices are used
-                                   - tiles: put tiles in independent slices
-                                   - wpp: put rows in dependent slices
-                                   - tiles+wpp: do both
+                                   - <string>: A comma-separated list of tile row
+                                               column pixel coordinates.
+                                   - u<int>: Number of tile rows of uniform
+                                             height.
+      --slices <string>      : Control how slices are used.
+                                   - tiles: Put tiles in independent slices.
+                                   - wpp: Put rows in dependent slices.
+                                   - tiles+wpp: Do both.
 
 Video Usability Information:
-      --sar <width:height>   : Specify Sample Aspect Ratio
+      --sar <width:height>   : Specify sample aspect ratio
       --overscan <string>    : Specify crop overscan setting [undef]
                                    - undef, show, crop
       --videoformat <string> : Specify video format [undef]
-                                   - component, pal, ntsc, secam, mac, undef
+                                   - undef, component, pal, ntsc, secam, mac
       --range <string>       : Specify color range [tv]
                                    - tv, pc
       --colorprim <string>   : Specify color primaries [undef]
@@ -200,8 +269,8 @@ Video Usability Information:
       --chromaloc <integer>  : Specify chroma sample location (0 to 5) [0]
 
 Deprecated parameters: (might be removed at some point)
-  -w, --width                 : Use --input-res
-  -h, --height                : Use --input-res
+  -w, --width <integer>       : Use --input-res.
+  -h, --height <integer>      : Use --input-res.
 ```
 [comment]: # (END KVAZAAR HELP MESSAGE)
 
@@ -230,24 +299,30 @@ where the names have been abbreviated to fit the layout in GitHub.
 
 |                      | 0-uf  | 1-sf  | 2-vf  | 3-fr  | 4-f   | 5-m   | 6-s   | 7-sr  | 8-vs  | 9-p   |
 | -------------------- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- |
-| rd                   | 0     | 0     | 0     | 1     | 1     | 1     | 1     | 1     | 1     | 1     |
-| pu-depth-intra       | 2-3   | 2-3   | 2-3   | 2-3   | 2-3   | 1-3   | 1-3   | 1-3   | 1-4   | 1-4   |
-| pu-depth-inter       | 2-3   | 2-3   | 2-3   | 1-3   | 1-3   | 1-3   | 1-3   | 0-3   | 0-3   | 0-3   |
+| rd                   | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 2     | 2     | 2     |
+| pu-depth-intra       | 2-3   | 2-3   | 2-3   | 2-3   | 1-3   | 1-4   | 1-4   | 1-4   | 1-4   | 1-4   |
+| pu-depth-inter       | 2-3   | 2-3   | 1-3   | 1-3   | 1-3   | 0-3   | 0-3   | 0-3   | 0-3   | 0-3   |
 | me                   | hexbs | hexbs | hexbs | hexbs | hexbs | hexbs | hexbs | hexbs | hexbs | tz    |
-| ref                  | 1     | 1     | 1     | 1     | 1     | 1     | 2     | 2     | 3     | 4     |
+| gop                  | g4d4t1| g4d4t1| g4d4t1| g4d4t1| g4d4t1| 8     | 8     | 8     | 8     | 8     |
+| ref                  | 1     | 1     | 1     | 1     | 2     | 4     | 4     | 4     | 4     | 4     |
+| bipred               | 0     | 0     | 0     | 0     | 0     | 0     | 1     | 1     | 1     | 1     |
 | deblock              | 1     | 1     | 1     | 1     | 1     | 1     | 1     | 1     | 1     | 1     |
-| signhide             | 0     | 0     | 0     | 0     | 0     | 0     | 1     | 1     | 1     | 1     |
-| subme                | 0     | 0     | 2     | 2     | 4     | 4     | 4     | 4     | 4     | 4     |
-| sao                  | 0     | 1     | 1     | 1     | 1     | 1     | 1     | 1     | 1     | 1     |
+| signhide             | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 1     | 1     | 1     |
+| subme                | 2     | 2     | 2     | 4     | 4     | 4     | 4     | 4     | 4     | 4     |
+| sao                  | off   | full  | full  | full  | full  | full  | full  | full  | full  | full  |
 | rdoq                 | 0     | 0     | 0     | 0     | 0     | 1     | 1     | 1     | 1     | 1     |
-| rdoq-skip            | 1     | 1     | 1     | 1     | 1     | 1     | 1     | 1     | 1     | 0     |
+| rdoq-skip            | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     |
 | transform-skip       | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 1     |
 | mv-rdo               | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 1     |
 | full-intra-search    | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     |
-| smp                  | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 1     |
+| smp                  | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 1     | 1     |
 | amp                  | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 1     |
 | cu-split-termination | zero  | zero  | zero  | zero  | zero  | zero  | zero  | zero  | zero  | off   |
-| me-early-termination | sens. | sens. | sens. | sens. | on    | on    | on    | on    | on    | off   |
+| me-early-termination | sens. | sens. | sens. | sens. | sens. | on    | on    | off   | off   | off   |
+| intra-rdo-et         | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     |
+| early-skip           | 1     | 1     | 1     | 1     | 1     | 1     | 1     | 1     | 1     | 1     |
+| fast-residual-cost   | 28    | 28    | 28    | 0     | 0     | 0     | 0     | 0     | 0     | 0     |
+| max-merge            | 5     | 5     | 5     | 5     | 5     | 5     | 5     | 5     | 5     | 5     |
 
 
 ## Kvazaar library
@@ -266,16 +341,6 @@ If you have trouble regarding compiling the source code, please make an
 Others might encounter the same problem and there is probably much to
 improve in the build process. We want to make this as simple as
 possible.
-
-
-### Required libraries
-- For Visual Studio, the pthreads-w32 library is required. Platforms
-  with native POSIX thread support don't need anything.
-  - The project file expects the library to be in ../pthreads.2/
-    relative to Kvazaar. You can just extract the pre-built library
-    there.
-  - The executable needs pthreadVC2.dll to be present. Either install it
-    somewhere or ship it with the executable.
 
 
 ### Autotools
@@ -300,7 +365,7 @@ See `./configure --help` for more options.
 
 
 ### Visual Studio
-- At least VisualStudio 2013 is required.
+- At least VisualStudio 2015 is required.
 - Project files can be found under build/.
 - Requires external [vsyasm.exe](http://yasm.tortall.net/Download.html)
   in %PATH%
@@ -314,18 +379,37 @@ For other examples, see [Dockerfile](./Dockerfile)
 
 
 ### Visualization (Windows only)
-Branch `visualizer` has a visual studio project, which can be compiled to enable visualization feature in Kvazaar.
+Compiling `kvazaar_cli` project in the `visualizer` branch results in a Kvazaar executable with visualization enabled.
 
 Additional Requirements: [`SDL2`](https://www.libsdl.org/download-2.0.php), [`SDL2-ttf`](https://www.libsdl.org/projects/SDL_ttf/).
 
-Directory `visualizer_extras` is expected to be found from the same directory level as the kvazaar project directory. Inside should be directories `include` and `lib` found from the development library zip packages.
+Directory `visualizer_extras` has to be added into the same directory level as the kvazaar project directory. Inside should be directories `include` and `lib` found from the development library zip packages.
 
-`SDL2.dll`, `SDL2_ttf.dll`, `libfreetype-6.dll`, `zlib1.dll`, and `pthreadVC2.dll` should be placed in the working directory (i.e. the folder the `kvazaar.exe` is in after compiling the `kvazaar_cli` project/solution) when running the visualizer. The required `.dll` can be found in the aforementioned `lib`-folder (`lib\x64`) and the dll folder inside the pthreads folder (see `Required libraries`).
+`SDL2.dll`, `SDL2_ttf.dll`, `libfreetype-6.dll`, and `zlib1.dll` should be placed in the working directory (i.e. the folder the `kvazaar.exe` is in after compiling the `kvazaar_cli` project/solution) when running the visualizer. The required `.dll` can be found in the aforementioned `lib`-folder (`lib\x64`).
 
 Note: The solution should be compiled on the x64 platform in visual studio.
 
 Optional font file `arial.ttf` is to be placed in the working directory, if block info tool is used.
 
+## Paper
+
+Please cite [this paper](https://dl.acm.org/citation.cfm?doid=2964284.2973796) for Kvazaar:
+
+```M. Viitanen, A. Koivula, A. Lemmetti, A. Ylä-Outinen, J. Vanne, and T. D. Hämäläinen, “Kvazaar: open-source HEVC/H.265 encoder,” in Proc. ACM Int. Conf. Multimedia, Amsterdam, The Netherlands, Oct. 2016.```
+
+Or in BibTex:
+
+```
+@inproceedings{Kvazaar2016,
+ author = {Viitanen, Marko and Koivula, Ari and Lemmetti, Ari and Yl\"{a}-Outinen, Arttu and Vanne, Jarno and H\"{a}m\"{a}l\"{a}inen, Timo D.},
+ title = {Kvazaar: Open-Source HEVC/H.265 Encoder},
+ booktitle = {Proceedings of the 24th ACM International Conference on Multimedia},
+ year = {2016},
+ isbn = {978-1-4503-3603-1},
+ location = {Amsterdam, The Netherlands},
+ url = {http://doi.acm.org/10.1145/2964284.2973796},
+}
+```
 
 ## Contributing to Kvazaar
 We are happy to look at pull requests in Github. There is still lots of work to be done.
@@ -353,7 +437,7 @@ You can generate Doxygen documentation pages by running the command
   - Uninitialized variables and such are checked with Valgrind.
   - Bitstream validity is checked with HM.
   - Compilation is checked on GCC and Clang on Linux, and Clang on OSX.
-- Windows msys2 build is checked automatically on Appveyor.
+- Windows msys2 and msvc builds are checked automatically on Appveyor.
 - If your changes change the bitstream, decode with HM to check that
   it doesn't throw checksum errors or asserts.
 - If your changes shouldn't alter the bitstream, check that they don't.
@@ -377,7 +461,7 @@ You can generate Doxygen documentation pages by running the command
 
 ### Code style
 We try to follow the following conventions:
-- C99 without features not supported by Visual Studio 2013 (VLAs).
+- C99 without features not supported by Visual Studio 2015 (VLAs).
  - // comments allowed and encouraged.
 - Follow overall conventions already established in the code.
 - Indent by 2 spaces. (no tabs)

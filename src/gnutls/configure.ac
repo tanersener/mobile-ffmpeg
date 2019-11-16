@@ -1,5 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-# Copyright (C) 2000-2012, 2016 Free Software Foundation, Inc.
+# Copyright (C) 2000-2012, 2016, 2019 Free Software Foundation, Inc.
 #
 # Author: Nikos Mavrogiannopoulos, Simon Josefsson
 #
@@ -23,7 +23,7 @@ dnl Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.63)
 
 dnl when updating version also update LT_REVISION in m4/hooks.m4
-AC_INIT([GnuTLS], [3.6.8], [bugs@gnutls.org])
+AC_INIT([GnuTLS], [3.6.10], [bugs@gnutls.org])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIRS([m4 src/gl/m4 src/libopts/m4 lib/unistring/m4])
 AC_CANONICAL_HOST
@@ -181,6 +181,17 @@ case $host_cpu in
   *)
   ;;
 esac
+
+# check for gcc's __get_cpuid_count functionality
+AC_MSG_CHECKING([for __get_cpuid_count])
+AC_LINK_IFELSE(
+   [AC_LANG_SOURCE([
+    #include <cpuid.h>
+    int main(void) { unsigned t1; return __get_cpuid_count(7, 0, &t1, &t1, &t1, &t1); }
+   ])],
+   [AC_DEFINE([HAVE_GET_CPUID_COUNT], [1], [use __get_cpuid_count]) AC_MSG_RESULT([yes])],
+   [AC_MSG_RESULT([no])]
+)
 
 fi
 
@@ -412,6 +423,16 @@ fi
 
 AM_CONDITIONAL(WANT_TEST_SUITE, test "$full_test_suite" = "yes")
 
+AC_ARG_ENABLE(oldgnutls-interop,
+  AS_HELP_STRING([--enable-oldgnutls-interop], [enable interoperability testing with old gnutls version]),
+    enable_oldgnutls_interop=$enableval, enable_oldgnutls_interop=no)
+
+if test "$enable_oldgnutls_interop" != "no" && test "$full_test_suite" != yes;then
+	AC_MSG_ERROR([cannot --enable-oldgnutls-interop without --enable-full-test-suite])
+fi
+
+AM_CONDITIONAL(ENABLE_OLDGNUTLS_INTEROP, test "$enable_oldgnutls_interop" != "no")
+
 dnl GCC warnings to enable
 
 AC_ARG_ENABLE([gcc-warnings],
@@ -541,7 +562,7 @@ AC_ARG_ENABLE(non-suiteb-curves,
 
 if test "$enable_non_suiteb" = "yes";then
 	dnl nettle_secp_192r1 is not really a function
-	AC_CHECK_LIB(hogweed, nettle_secp_192r1, enable_non_suiteb=yes, enable_non_suiteb=no, [$HOGWEED_LIBS $NETTLE_LIBS])
+	AC_CHECK_LIB(hogweed, nettle_get_secp_192r1, enable_non_suiteb=yes, enable_non_suiteb=no, [$HOGWEED_LIBS $NETTLE_LIBS])
 
 	if test "$enable_non_suiteb" = "yes";then
 		AC_DEFINE([ENABLE_NON_SUITEB_CURVES], 1, [Enable all curves])
@@ -573,9 +594,26 @@ LIBS=$save_LIBS
 # Check if nettle has XTS support
 save_LIBS=$LIBS
 LIBS="$LIBS $NETTLE_LIBS"
-AC_CHECK_FUNCS(xts_encrypt_message)
+AC_CHECK_FUNCS(nettle_xts_encrypt_message)
 LIBS=$save_LIBS
 
+# Check for Gosthash94 with CryptoPro S-box support
+save_LIBS=$LIBS
+LIBS="$LIBS $NETTLE_LIBS"
+AC_CHECK_FUNCS(nettle_gosthash94cp_update)
+LIBS=$save_LIBS
+
+# Check for GOST28147
+save_LIBS=$LIBS
+LIBS="$LIBS $NETTLE_LIBS"
+AC_CHECK_FUNCS(nettle_gost28147_set_key)
+LIBS=$save_LIBS
+
+# Check for Streebog support
+save_LIBS=$LIBS
+LIBS="$LIBS $NETTLE_LIBS"
+AC_CHECK_FUNCS(nettle_streebog512_update)
+LIBS=$save_LIBS
 
 AC_MSG_CHECKING([whether to build libdane])
 AC_ARG_ENABLE(libdane,
@@ -628,17 +666,23 @@ fi
 AC_DEFINE_UNQUOTED([UNBOUND_ROOT_KEY_FILE],
   ["$unbound_root_key_file"], [The DNSSEC root key file])
 
+system_config_file="/etc/gnutls/config"
 AC_ARG_WITH(system-priority-file, AS_HELP_STRING([--with-system-priority-file],
-                                 [specify the system priority file]),
-            system_priority_file="$withval", 
-system_priority_file="/etc/gnutls/default-priorities"
+                                 [specify the system-wide config file (set empty to disable)]),
+            system_config_file="$withval"
 )
 
+AM_CONDITIONAL(DISABLE_SYSTEM_CONFIG, test -z "${system_config_file}")
+
+if test -z "${system_config_file}";then
+	AC_DEFINE([DISABLE_SYSTEM_CONFIG], 1, [Whether to disable system configuration])
+fi
+
 AC_DEFINE_UNQUOTED([SYSTEM_PRIORITY_FILE],
-  ["$system_priority_file"], [The system priority file])
+  ["$system_config_file"], [The system-wide gnutls configuration file])
 
 AC_ARG_WITH(default-priority-string, AS_HELP_STRING([--with-default-priority-string],
-                                 [specify the default priority string (e.g. @SYSTEM)]),
+                                 [specify the default priority string used by gnutls_set_default_priority (default is NORMAL)]),
             prio_string="$withval", 
             prio_string="NORMAL")
 
@@ -735,7 +779,7 @@ if test "$enable_tools" != "no" || test "$enable_doc" != "no"; then
 *** autogen not found. Will not link against system libopts.
 *** ]])
 		dnl simulate specifying option on the command line
-		enable_local_libopts=yes
+		included_libopts=yes
 	fi
 	LIBOPTS_CHECK([src/libopts])
 	if test "$NEED_LIBOPTS_DIR" = "true";then
@@ -866,7 +910,7 @@ if test "$opt_guile_bindings" = "yes"; then
       AC_PATH_PROG([GUILD], [guild])
       AC_SUBST([GUILD])
 
-      GUILE_PKG
+      GUILE_PKG([3.0 2.2 2.0 1.8])
       GUILE_PROGS
       GUILE_SITE_DIR
       GUILE_FLAGS
@@ -949,6 +993,13 @@ AC_DEFINE([read_binary_file], [_gnutls_read_binary_file], [static lib rename])
 dnl Some variables needed in makefiles
 YEAR=`date +%Y`
 AC_SUBST([YEAR], $YEAR)
+
+dnl configuration options for config file parsing (inih)
+AC_DEFINE([INI_MAX_LINE], 2048, [inih maximum line size])
+AC_DEFINE([INI_ALLOW_INLINE_COMMENTS], 1, [whether to allowin inline comments])
+AC_DEFINE([INI_STOP_ON_FIRST_ERROR], 1, [whether to stop on first error])
+AC_DEFINE_UNQUOTED([INI_INLINE_COMMENT_PREFIXES], [";#"], [The inline comment prefixes])
+AC_DEFINE_UNQUOTED([INI_START_COMMENT_PREFIXES], [";#"], [The comment prefixes])
 
 AC_CONFIG_FILES([guile/pre-inst-guile], [chmod +x guile/pre-inst-guile])
 AC_CONFIG_FILES([
@@ -1072,7 +1123,7 @@ AC_MSG_NOTICE([System files:
   Trust store file:     $with_default_trust_store_file
   Blacklist file:       $with_default_blacklist_file
   CRL file:             $with_default_crl_file
-  Priority file:        $system_priority_file
+  Configuration file:   $system_config_file
   DNSSEC root key file: $unbound_root_key_file
 ])
 

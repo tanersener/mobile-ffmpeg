@@ -38,6 +38,7 @@ vpx_tsvc_encoder() {
   local output_file="${VPX_TEST_OUTPUT_DIR}/${output_file_base}"
   local timebase_num="1"
   local timebase_den="1000"
+  local timebase_den_y4m="30"
   local speed="6"
   local frame_drop_thresh="30"
   local max_threads="4"
@@ -56,6 +57,12 @@ vpx_tsvc_encoder() {
       eval "${VPX_TEST_PREFIX}" "${encoder}" "${YUV_RAW_INPUT}" \
         "${output_file}" "${codec}" "${YUV_RAW_INPUT_WIDTH}" \
         "${YUV_RAW_INPUT_HEIGHT}" "${timebase_num}" "${timebase_den}" \
+        "${speed}" "${frame_drop_thresh}" "${error_resilient}" "${threads}" \
+        "$@" ${devnull}
+      # Test for y4m input.
+      eval "${VPX_TEST_PREFIX}" "${encoder}" "${Y4M_720P_INPUT}" \
+        "${output_file}" "${codec}" "${Y4M_720P_INPUT_WIDTH}" \
+        "${Y4M_720P_INPUT_HEIGHT}" "${timebase_num}" "${timebase_den_y4m}" \
         "${speed}" "${frame_drop_thresh}" "${error_resilient}" "${threads}" \
         "$@" ${devnull}
     else

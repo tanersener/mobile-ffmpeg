@@ -1535,7 +1535,7 @@ static void json_print_section_header(WriterContext *wctx)
             if (parent_section && parent_section->id == SECTION_ID_PACKETS_AND_FRAMES) {
                 if (!json->compact)
                     JSON_INDENT();
-                printf("\"type\": \"%s\"%s", section->name, json->item_sep);
+                printf("\"type\": \"%s\"", section->name);
             }
         }
         av_bprint_finalize(&buf, NULL);
@@ -1579,8 +1579,10 @@ static inline void json_print_item_str(WriterContext *wctx,
 static void json_print_str(WriterContext *wctx, const char *key, const char *value)
 {
     JSONContext *json = wctx->priv;
+    const struct section *parent_section = wctx->level ?
+        wctx->section[wctx->level-1] : NULL;
 
-    if (wctx->nb_item[wctx->level])
+    if (wctx->nb_item[wctx->level] || (parent_section && parent_section->id == SECTION_ID_PACKETS_AND_FRAMES))
         printf("%s", json->item_sep);
     if (!json->compact)
         JSON_INDENT();
@@ -1590,9 +1592,11 @@ static void json_print_str(WriterContext *wctx, const char *key, const char *val
 static void json_print_int(WriterContext *wctx, const char *key, long long int value)
 {
     JSONContext *json = wctx->priv;
+    const struct section *parent_section = wctx->level ?
+        wctx->section[wctx->level-1] : NULL;
     AVBPrint buf;
 
-    if (wctx->nb_item[wctx->level])
+    if (wctx->nb_item[wctx->level] || (parent_section && parent_section->id == SECTION_ID_PACKETS_AND_FRAMES))
         printf("%s", json->item_sep);
     if (!json->compact)
         JSON_INDENT();
@@ -3471,7 +3475,7 @@ static int opt_sections(void *optctx, const char *opt, const char *arg)
     return 0;
 }
 
-static int opt_show_versions(const char *opt, const char *arg)
+static int opt_show_versions(void *optctx, const char *opt, const char *arg)
 {
     mark_section_show_entries(SECTION_ID_PROGRAM_VERSION, 1, NULL);
     mark_section_show_entries(SECTION_ID_LIBRARY_VERSION, 1, NULL);
@@ -3479,7 +3483,7 @@ static int opt_show_versions(const char *opt, const char *arg)
 }
 
 #define DEFINE_OPT_SHOW_SECTION(section, target_section_id)             \
-    static int opt_show_##section(const char *opt, const char *arg)     \
+    static int opt_show_##section(void *optctx, const char *opt, const char *arg) \
     {                                                                   \
         mark_section_show_entries(SECTION_ID_##target_section_id, 1, NULL); \
         return 0;                                                       \
@@ -3514,9 +3518,9 @@ static const OptionDef real_options[] = {
     { "sections", OPT_EXIT, {.func_arg = opt_sections}, "print sections structure and section information, and exit" },
     { "show_data",    OPT_BOOL, {(void*)&do_show_data}, "show packets data" },
     { "show_data_hash", OPT_STRING | HAS_ARG, {(void*)&show_data_hash}, "show packets data hash" },
-    { "show_error",   0, {(void*)&opt_show_error},  "show probing error" },
-    { "show_format",  0, {(void*)&opt_show_format}, "show format/container info" },
-    { "show_frames",  0, {(void*)&opt_show_frames}, "show frames info" },
+    { "show_error",   0, { .func_arg = &opt_show_error },  "show probing error" },
+    { "show_format",  0, { .func_arg = &opt_show_format }, "show format/container info" },
+    { "show_frames",  0, { .func_arg = &opt_show_frames }, "show frames info" },
     { "show_format_entry", HAS_ARG, {.func_arg = opt_show_format_entry},
       "show a particular entry from the format/container info", "entry" },
     { "show_entries", HAS_ARG, {.func_arg = opt_show_entries},
@@ -3524,16 +3528,16 @@ static const OptionDef real_options[] = {
 #if HAVE_THREADS
     { "show_log", OPT_INT|HAS_ARG, {(void*)&do_show_log}, "show log" },
 #endif
-    { "show_packets", 0, {(void*)&opt_show_packets}, "show packets info" },
-    { "show_programs", 0, {(void*)&opt_show_programs}, "show programs info" },
-    { "show_streams", 0, {(void*)&opt_show_streams}, "show streams info" },
-    { "show_chapters", 0, {(void*)&opt_show_chapters}, "show chapters info" },
+    { "show_packets", 0, { .func_arg = &opt_show_packets }, "show packets info" },
+    { "show_programs", 0, { .func_arg = &opt_show_programs }, "show programs info" },
+    { "show_streams", 0, { .func_arg = &opt_show_streams }, "show streams info" },
+    { "show_chapters", 0, { .func_arg = &opt_show_chapters }, "show chapters info" },
     { "count_frames", OPT_BOOL, {(void*)&do_count_frames}, "count the number of frames per stream" },
     { "count_packets", OPT_BOOL, {(void*)&do_count_packets}, "count the number of packets per stream" },
-    { "show_program_version",  0, {(void*)&opt_show_program_version},  "show ffprobe version" },
-    { "show_library_versions", 0, {(void*)&opt_show_library_versions}, "show library versions" },
-    { "show_versions",         0, {(void*)&opt_show_versions}, "show program and library versions" },
-    { "show_pixel_formats", 0, {(void*)&opt_show_pixel_formats}, "show pixel format descriptions" },
+    { "show_program_version",  0, { .func_arg = &opt_show_program_version },  "show ffprobe version" },
+    { "show_library_versions", 0, { .func_arg = &opt_show_library_versions }, "show library versions" },
+    { "show_versions",         0, { .func_arg = &opt_show_versions }, "show program and library versions" },
+    { "show_pixel_formats", 0, { .func_arg = &opt_show_pixel_formats }, "show pixel format descriptions" },
     { "show_private_data", OPT_BOOL, {(void*)&show_private_data}, "show private data" },
     { "private",           OPT_BOOL, {(void*)&show_private_data}, "same as show_private_data" },
     { "bitexact", OPT_BOOL, {&do_bitexact}, "force bitexact output" },

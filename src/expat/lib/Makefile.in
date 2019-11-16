@@ -173,8 +173,7 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(docdir)" \
 	"$(DESTDIR)$(includedir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libexpat_la_LIBADD =
-am_libexpat_la_OBJECTS = loadlibrary.lo xmlparse.lo xmltok.lo \
-	xmlrole.lo
+am_libexpat_la_OBJECTS = xmlparse.lo xmltok.lo xmlrole.lo
 libexpat_la_OBJECTS = $(am_libexpat_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -198,8 +197,7 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/conftools/depcomp
 am__maybe_remake_depfiles = depfiles
-am__depfiles_remade = ./$(DEPDIR)/loadlibrary.Plo \
-	./$(DEPDIR)/xmlparse.Plo ./$(DEPDIR)/xmlrole.Plo \
+am__depfiles_remade = ./$(DEPDIR)/xmlparse.Plo ./$(DEPDIR)/xmlrole.Plo \
 	./$(DEPDIR)/xmltok.Plo
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
@@ -388,7 +386,6 @@ libexpat_la_LDFLAGS = \
     -version-info @LIBCURRENT@:@LIBREVISION@:@LIBAGE@
 
 libexpat_la_SOURCES = \
-    loadlibrary.c \
     xmlparse.c \
     xmltok.c \
     xmlrole.c
@@ -495,7 +492,6 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/loadlibrary.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xmlparse.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xmlrole.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xmltok.Plo@am__quote@ # am--include-marker
@@ -703,8 +699,7 @@ clean-am: clean-generic clean-libLTLIBRARIES clean-libtool \
 	mostlyclean-am
 
 distclean: distclean-am
-		-rm -f ./$(DEPDIR)/loadlibrary.Plo
-	-rm -f ./$(DEPDIR)/xmlparse.Plo
+		-rm -f ./$(DEPDIR)/xmlparse.Plo
 	-rm -f ./$(DEPDIR)/xmlrole.Plo
 	-rm -f ./$(DEPDIR)/xmltok.Plo
 	-rm -f Makefile
@@ -753,8 +748,7 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-		-rm -f ./$(DEPDIR)/loadlibrary.Plo
-	-rm -f ./$(DEPDIR)/xmlparse.Plo
+		-rm -f ./$(DEPDIR)/xmlparse.Plo
 	-rm -f ./$(DEPDIR)/xmlrole.Plo
 	-rm -f ./$(DEPDIR)/xmltok.Plo
 	-rm -f Makefile

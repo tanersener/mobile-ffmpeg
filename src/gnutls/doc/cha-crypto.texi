@@ -27,18 +27,20 @@ are listed in the sections below. The supported algorithms are the algorithms re
 They are listed in @ref{gnutls_cipher_algorithm_t}. Note that there two
 types of ciphers, the ones providing an authenticated-encryption with
 associated data (AEAD), and the legacy ciphers which provide raw access
-to the ciphers. We recommend the use of the AEAD APIs for new applications
-as it is designed to minimize misuse of cryptography.
+to the ciphers. We recommend the use of the AEAD ciphers under the AEAD APIs
+for new applications as they are designed to minimize the misuse of
+cryptographic primitives.
 
 @showenumdesc{gnutls_cipher_algorithm_t,The supported ciphers.}
 
 @subheading Authenticated-encryption API
 
 The AEAD API provides access to all ciphers supported by GnuTLS which support
-authenticated encryption with associated data. That is particularly suitable
-for message or packet-encryption as it provides authentication and
-encryption on the same API. See @code{RFC5116} for more information on
-authenticated encryption.
+authenticated encryption with associated data; these ciphers are marked with
+the AEAD keyword on the table above. The AEAD cipher API is
+particularly suitable for message or packet-encryption as it provides
+authentication and encryption on the same API. See @code{RFC5116} for more
+information on authenticated encryption.
 
 @showfuncD{gnutls_aead_cipher_init,gnutls_aead_cipher_encrypt,gnutls_aead_cipher_decrypt,gnutls_aead_cipher_deinit}
 

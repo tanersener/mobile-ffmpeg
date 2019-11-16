@@ -5,49 +5,49 @@ MY_FFMPEG_LIB := ../../../../prebuilt/android-$(TARGET_ARCH)/neon/ffmpeg/lib
 
 include $(CLEAR_VARS)
 LOCAL_ARM_MODE := $(MY_ARM_MODE)
-LOCAL_MODULE := libavcodec-neon
+LOCAL_MODULE := libavcodec_neon
 LOCAL_MODULE_FILENAME := $(LOCAL_MODULE)
 LOCAL_SRC_FILES := $(MY_FFMPEG_LIB)/libavcodec.so
 include $(PREBUILT_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_ARM_MODE := $(MY_ARM_MODE)
-LOCAL_MODULE := libavfilter-neon
+LOCAL_MODULE := libavfilter_neon
 LOCAL_MODULE_FILENAME := $(LOCAL_MODULE)
 LOCAL_SRC_FILES := $(MY_FFMPEG_LIB)/libavfilter.so
 include $(PREBUILT_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_ARM_MODE := $(MY_ARM_MODE)
-LOCAL_MODULE := libavdevice-neon
+LOCAL_MODULE := libavdevice_neon
 LOCAL_MODULE_FILENAME := $(LOCAL_MODULE)
 LOCAL_SRC_FILES := $(MY_FFMPEG_LIB)/libavdevice.so
 include $(PREBUILT_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_ARM_MODE := $(MY_ARM_MODE)
-LOCAL_MODULE := libavformat-neon
+LOCAL_MODULE := libavformat_neon
 LOCAL_MODULE_FILENAME := $(LOCAL_MODULE)
 LOCAL_SRC_FILES := $(MY_FFMPEG_LIB)/libavformat.so
 include $(PREBUILT_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_ARM_MODE := $(MY_ARM_MODE)
-LOCAL_MODULE := libavutil-neon
+LOCAL_MODULE := libavutil_neon
 LOCAL_MODULE_FILENAME := $(LOCAL_MODULE)
 LOCAL_SRC_FILES := $(MY_FFMPEG_LIB)/libavutil.so
 include $(PREBUILT_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_ARM_MODE := $(MY_ARM_MODE)
-LOCAL_MODULE := libswresample-neon
+LOCAL_MODULE := libswresample_neon
 LOCAL_MODULE_FILENAME := $(LOCAL_MODULE)
 LOCAL_SRC_FILES := $(MY_FFMPEG_LIB)/libswresample.so
 include $(PREBUILT_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_ARM_MODE := $(MY_ARM_MODE)
-LOCAL_MODULE := libswscale-neon
+LOCAL_MODULE := libswscale_neon
 LOCAL_MODULE_FILENAME := $(LOCAL_MODULE)
 LOCAL_SRC_FILES := $(MY_FFMPEG_LIB)/libswscale.so
 include $(PREBUILT_SHARED_LIBRARY)

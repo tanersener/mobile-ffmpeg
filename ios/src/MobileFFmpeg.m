@@ -30,14 +30,16 @@ int execute(int argc, char **argv);
 @implementation MobileFFmpeg
 
 /** Global library version */
-NSString *const MOBILE_FFMPEG_VERSION = @"4.2.2";
+NSString *const MOBILE_FFMPEG_VERSION = @"4.3";
 
 /** Common return code values */
 int const RETURN_CODE_SUCCESS = 0;
 int const RETURN_CODE_CANCEL = 255;
+int const RETURN_CODE_MULTIPLE_EXECUTIONS_NOT_ALLOWED = 300;
 
 int lastReturnCode;
 NSMutableString *lastCommandOutput;
+BOOL started;
 
 extern NSMutableString *systemCommandOutput;
 extern int mobileffmpeg_system_execute(NSArray *arguments, NSMutableArray *commandOutputEndPatternList, NSString *successPattern, long timeout);
@@ -47,8 +49,20 @@ extern int mobileffmpeg_system_execute(NSArray *arguments, NSMutableArray *comma
 
     lastReturnCode = 0;
     lastCommandOutput = [[NSMutableString alloc] init];
+    started = FALSE;
 
     NSLog(@"Loaded mobile-ffmpeg-%@-%@-%@-%@\n", [MobileFFmpegConfig getPackageName], [ArchDetect getArch], [MobileFFmpeg getVersion], [MobileFFmpeg getBuildDate]);
+}
+
++(BOOL)compareAndSet:(BOOL)expect with:(BOOL)update {
+    @synchronized (self) {
+        if (started == expect) {
+            started = update;
+            return TRUE;
+        } else {
+            return FALSE;
+        }
+    }
 }
 
 /**
@@ -82,13 +96,13 @@ extern int mobileffmpeg_system_execute(NSArray *arguments, NSMutableArray *comma
 + (int)executeWithArguments: (NSArray*)arguments {
     lastCommandOutput = [[NSMutableString alloc] init];
 
-    char **commandCharPArray = (char **)malloc(sizeof(char*) * ([arguments count] + 1));
+    char **commandCharPArray = (char **)av_malloc(sizeof(char*) * ([arguments count] + 1));
 
     /* PRESERVING CALLING FORMAT
      *
      * ffmpeg <arguments>
      */
-    commandCharPArray[0] = (char *)malloc(sizeof(char) * ([LIB_NAME length] + 1));
+    commandCharPArray[0] = (char *)av_malloc(sizeof(char) * ([LIB_NAME length] + 1));
     strcpy(commandCharPArray[0], [LIB_NAME UTF8String]);
 
     for (int i=0; i < [arguments count]; i++) {
@@ -97,11 +111,17 @@ extern int mobileffmpeg_system_execute(NSArray *arguments, NSMutableArray *comma
     }
 
     // RUN
-    lastReturnCode = execute(([arguments count] + 1), commandCharPArray);
+    if ([MobileFFmpeg compareAndSet:FALSE with:TRUE]) {
+        lastReturnCode = execute(([arguments count] + 1), commandCharPArray);
+        [MobileFFmpeg compareAndSet:TRUE with:FALSE];
+    } else {
+        NSLog(@"execute cancelled. Multiple executions not supported.");
+        lastReturnCode = RETURN_CODE_MULTIPLE_EXECUTIONS_NOT_ALLOWED;
+    }
 
     // CLEANUP
-    free(commandCharPArray[0]);
-    free(commandCharPArray);
+    av_free(commandCharPArray[0]);
+    av_free(commandCharPArray);
 
     return lastReturnCode;
 }
@@ -114,7 +134,7 @@ extern int mobileffmpeg_system_execute(NSArray *arguments, NSMutableArray *comma
  * @return zero on successful execution, 255 on user cancel and non-zero on error
  */
 + (int)execute: (NSString*)command {
-    return [self execute:command delimiter:@" "];
+    return [self executeWithArguments: [self parseArguments: command]];
 }
 
 /**
@@ -177,7 +197,7 @@ extern int mobileffmpeg_system_execute(NSArray *arguments, NSMutableArray *comma
  * @param timeout complete timeout
  * @return media information
  */
- + (MediaInformation*)getMediaInformation: (NSString*)path timeout:(long)timeout {
++ (MediaInformation*)getMediaInformation: (NSString*)path timeout:(long)timeout {
     int rc = mobileffmpeg_system_execute([[NSArray alloc] initWithObjects:@"-v", @"info", @"-hide_banner", @"-i", path, nil], [NSMutableArray arrayWithObjects:@"Press [q] to stop, [?] for help", @"No such file or directory", @"Input/output error", @"Conversion failed", @"HTTP error", nil], @"At least one output file must be specified", timeout);
 
     if (rc == 0) {
@@ -201,6 +221,63 @@ extern int mobileffmpeg_system_execute(NSArray *arguments, NSMutableArray *comma
     char buildDate[10];
     sprintf(buildDate, "%d", MOBILE_FFMPEG_BUILD_DATE);
     return [NSString stringWithUTF8String:buildDate];
+}
+
+/**
+ * Parses the given command into arguments.
+ *
+ * @param command string command
+ * @return array of arguments
+ */
++ (NSArray*)parseArguments: (NSString*)command {
+    NSMutableArray *argumentArray = [[NSMutableArray alloc] init];
+    NSMutableString *currentArgument = [[NSMutableString alloc] init];
+
+    bool singleQuoteStarted = false;
+    bool doubleQuoteStarted = false;
+
+    for (int i = 0; i < command.length; i++) {
+        unichar previousChar;
+        if (i > 0) {
+            previousChar = [command characterAtIndex:(i - 1)];
+        } else {
+            previousChar = 0;
+        }
+        char currentChar = [command characterAtIndex:i];
+
+        if (currentChar == ' ') {
+            if (singleQuoteStarted || doubleQuoteStarted) {
+                [currentArgument appendFormat: @"%c", currentChar];
+            } else if ([currentArgument length] > 0) {
+                [argumentArray addObject: currentArgument];
+                currentArgument = [[NSMutableString alloc] init];
+            }
+        } else if (currentChar == '\'' && (previousChar == 0 || previousChar != '\\')) {
+            if (singleQuoteStarted) {
+                singleQuoteStarted = false;
+            } else if (doubleQuoteStarted) {
+                [currentArgument appendFormat: @"%c", currentChar];
+            } else {
+                singleQuoteStarted = true;
+            }
+        } else if (currentChar == '\"' && (previousChar == 0 || previousChar != '\\')) {
+            if (doubleQuoteStarted) {
+                doubleQuoteStarted = false;
+            } else if (singleQuoteStarted) {
+                [currentArgument appendFormat: @"%c", currentChar];
+            } else {
+                doubleQuoteStarted = true;
+            }
+        } else {
+            [currentArgument appendFormat: @"%c", currentChar];
+        }
+    }
+
+    if ([currentArgument length] > 0) {
+        [argumentArray addObject: currentArgument];
+    }
+
+    return argumentArray;
 }
 
 @end

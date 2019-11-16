@@ -74,7 +74,7 @@ int vp8_lookahead_push(struct lookahead_ctx *ctx, YV12_BUFFER_CONFIG *src,
 struct lookahead_entry *vp8_lookahead_pop(struct lookahead_ctx *ctx, int drain);
 
 #define PEEK_FORWARD 1
-#define PEEK_BACKWARD -1
+#define PEEK_BACKWARD (-1)
 /**\brief Get a future source buffer to encode
  *
  * \param[in] ctx       Pointer to the lookahead context

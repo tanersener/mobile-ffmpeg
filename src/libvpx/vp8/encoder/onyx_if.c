@@ -218,6 +218,8 @@ static void save_layer_context(VP8_COMP *cpi) {
   lc->frames_since_last_drop_overshoot = cpi->frames_since_last_drop_overshoot;
   lc->force_maxqp = cpi->force_maxqp;
   lc->last_frame_percent_intra = cpi->last_frame_percent_intra;
+  lc->last_q[0] = cpi->last_q[0];
+  lc->last_q[1] = cpi->last_q[1];
 
   memcpy(lc->count_mb_ref_frame_usage, cpi->mb.count_mb_ref_frame_usage,
          sizeof(cpi->mb.count_mb_ref_frame_usage));
@@ -255,6 +257,8 @@ static void restore_layer_context(VP8_COMP *cpi, const int layer) {
   cpi->frames_since_last_drop_overshoot = lc->frames_since_last_drop_overshoot;
   cpi->force_maxqp = lc->force_maxqp;
   cpi->last_frame_percent_intra = lc->last_frame_percent_intra;
+  cpi->last_q[0] = lc->last_q[0];
+  cpi->last_q[1] = lc->last_q[1];
 
   memcpy(cpi->mb.count_mb_ref_frame_usage, lc->count_mb_ref_frame_usage,
          sizeof(cpi->mb.count_mb_ref_frame_usage));
@@ -683,8 +687,8 @@ static void set_default_lf_deltas(VP8_COMP *cpi) {
 /* Convenience macros for mapping speed and mode into a continuous
  * range
  */
-#define GOOD(x) (x + 1)
-#define RT(x) (x + 7)
+#define GOOD(x) ((x) + 1)
+#define RT(x) ((x) + 7)
 
 static int speed_map(int speed, const int *map) {
   int res;
@@ -737,9 +741,9 @@ static const int mode_check_freq_map_zn2[] = {
   0, RT(10), 1 << 1, RT(11), 1 << 2, RT(12), 1 << 3, INT_MAX
 };
 
-static const int mode_check_freq_map_vhbpred[] = {
-  0, GOOD(5), 2, RT(0), 0, RT(3), 2, RT(5), 4, INT_MAX
-};
+static const int mode_check_freq_map_vhbpred[] = { 0, GOOD(5), 2, RT(0),
+                                                   0, RT(3),   2, RT(5),
+                                                   4, INT_MAX };
 
 static const int mode_check_freq_map_near2[] = {
   0,      GOOD(5), 2,      RT(0),  0,      RT(3),  2,
@@ -755,13 +759,13 @@ static const int mode_check_freq_map_new2[] = { 0,      GOOD(5), 4,      RT(0),
                                                 1 << 3, RT(11),  1 << 4, RT(12),
                                                 1 << 5, INT_MAX };
 
-static const int mode_check_freq_map_split1[] = {
-  0, GOOD(2), 2, GOOD(3), 7, RT(1), 2, RT(2), 7, INT_MAX
-};
+static const int mode_check_freq_map_split1[] = { 0, GOOD(2), 2, GOOD(3),
+                                                  7, RT(1),   2, RT(2),
+                                                  7, INT_MAX };
 
-static const int mode_check_freq_map_split2[] = {
-  0, GOOD(1), 2, GOOD(2), 4, GOOD(3), 15, RT(1), 4, RT(2), 15, INT_MAX
-};
+static const int mode_check_freq_map_split2[] = { 0, GOOD(1), 2,  GOOD(2),
+                                                  4, GOOD(3), 15, RT(1),
+                                                  4, RT(2),   15, INT_MAX };
 
 void vp8_set_speed_features(VP8_COMP *cpi) {
   SPEED_FEATURES *sf = &cpi->sf;
@@ -1527,6 +1531,8 @@ void vp8_change_config(VP8_COMP *cpi, VP8_CONFIG *oxcf) {
       cpi->oxcf.gold_q = q_trans[oxcf->gold_q];
     }
   }
+
+  cpi->ext_refresh_frame_flags_pending = 0;
 
   cpi->baseline_gf_interval =
       cpi->oxcf.alt_freq ? cpi->oxcf.alt_freq : DEFAULT_GF_INTERVAL;
@@ -2410,6 +2416,7 @@ int vp8_update_reference(VP8_COMP *cpi, int ref_frame_flags) {
 
   if (ref_frame_flags & VP8_ALTR_FRAME) cpi->common.refresh_alt_ref_frame = 1;
 
+  cpi->ext_refresh_frame_flags_pending = 1;
   return 0;
 }
 
@@ -3508,6 +3515,7 @@ static void encode_frame_to_data_rate(VP8_COMP *cpi, size_t *size,
 
       cm->current_video_frame++;
       cpi->frames_since_key++;
+      cpi->ext_refresh_frame_flags_pending = 0;
       // We advance the temporal pattern for dropped frames.
       cpi->temporal_pattern_counter++;
 
@@ -3549,6 +3557,7 @@ static void encode_frame_to_data_rate(VP8_COMP *cpi, size_t *size,
 #endif
     cm->current_video_frame++;
     cpi->frames_since_key++;
+    cpi->ext_refresh_frame_flags_pending = 0;
     // We advance the temporal pattern for dropped frames.
     cpi->temporal_pattern_counter++;
     return;
@@ -3950,6 +3959,9 @@ static void encode_frame_to_data_rate(VP8_COMP *cpi, size_t *size,
 
     if (cpi->pass == 0 && cpi->oxcf.end_usage == USAGE_STREAM_FROM_SERVER) {
       if (vp8_drop_encodedframe_overshoot(cpi, Q)) return;
+      if (cm->frame_type != KEY_FRAME)
+        cpi->last_pred_err_mb =
+            (int)(cpi->mb.prediction_error / cpi->common.MBs);
     }
 
     cpi->projected_frame_size -= vp8_estimate_entropy_savings(cpi);
@@ -4232,6 +4244,7 @@ static void encode_frame_to_data_rate(VP8_COMP *cpi, size_t *size,
     cpi->common.current_video_frame++;
     cpi->frames_since_key++;
     cpi->drop_frame_count++;
+    cpi->ext_refresh_frame_flags_pending = 0;
     // We advance the temporal pattern for dropped frames.
     cpi->temporal_pattern_counter++;
     return;
@@ -4340,8 +4353,10 @@ static void encode_frame_to_data_rate(VP8_COMP *cpi, size_t *size,
   /* For inter frames the current default behavior is that when
    * cm->refresh_golden_frame is set we copy the old GF over to the ARF buffer
    * This is purely an encoder decision at present.
+   * Avoid this behavior when refresh flags are set by the user.
    */
-  if (!cpi->oxcf.error_resilient_mode && cm->refresh_golden_frame) {
+  if (!cpi->oxcf.error_resilient_mode && cm->refresh_golden_frame &&
+      !cpi->ext_refresh_frame_flags_pending) {
     cm->copy_buffer_to_arf = 2;
   } else {
     cm->copy_buffer_to_arf = 0;
@@ -4647,6 +4662,8 @@ static void encode_frame_to_data_rate(VP8_COMP *cpi, size_t *size,
     }
 
 #endif
+
+  cpi->ext_refresh_frame_flags_pending = 0;
 
   if (cm->refresh_golden_frame == 1) {
     cm->frame_flags = cm->frame_flags | FRAMEFLAGS_GOLDEN;

@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
     s.version           = "VERSION"
     s.summary           = "Mobile FFmpeg tvOS Min Static Framework"
     s.description       = <<-DESC
-    Includes FFmpeg v4.2-dev-1824 without any external libraries enabled.
+    Includes FFmpeg v4.3-dev-1181 without any external libraries enabled.
     DESC
 
     s.homepage          = "https://github.com/tanersener/mobile-ffmpeg"

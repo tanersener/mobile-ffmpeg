@@ -345,13 +345,18 @@ static int find_next_start_code(const uint8_t *buf, const uint8_t *next_avc)
 
 static void alloc_rbsp_buffer(H2645RBSP *rbsp, unsigned int size, int use_ref)
 {
+    int min_size = size;
+
     if (size > INT_MAX - AV_INPUT_BUFFER_PADDING_SIZE)
         goto fail;
     size += AV_INPUT_BUFFER_PADDING_SIZE;
 
     if (rbsp->rbsp_buffer_alloc_size >= size &&
-        (!rbsp->rbsp_buffer_ref || av_buffer_is_writable(rbsp->rbsp_buffer_ref)))
+        (!rbsp->rbsp_buffer_ref || av_buffer_is_writable(rbsp->rbsp_buffer_ref))) {
+        av_assert0(rbsp->rbsp_buffer);
+        memset(rbsp->rbsp_buffer + min_size, 0, AV_INPUT_BUFFER_PADDING_SIZE);
         return;
+    }
 
     size = FFMIN(size + size / 16 + 32, INT_MAX);
 
@@ -360,7 +365,7 @@ static void alloc_rbsp_buffer(H2645RBSP *rbsp, unsigned int size, int use_ref)
     else
         av_free(rbsp->rbsp_buffer);
 
-    rbsp->rbsp_buffer = av_malloc(size);
+    rbsp->rbsp_buffer = av_mallocz(size);
     if (!rbsp->rbsp_buffer)
         goto fail;
     rbsp->rbsp_buffer_alloc_size = size;
@@ -450,14 +455,17 @@ int ff_h2645_packet_split(H2645Packet *pkt, const uint8_t *buf, int length,
 
         if (pkt->nals_allocated < pkt->nb_nals + 1) {
             int new_size = pkt->nals_allocated + 1;
-            void *tmp = av_realloc_array(pkt->nals, new_size, sizeof(*pkt->nals));
+            void *tmp;
 
+            if (new_size >= INT_MAX / sizeof(*pkt->nals))
+                return AVERROR(ENOMEM);
+
+            tmp = av_fast_realloc(pkt->nals, &pkt->nal_buffer_size, new_size * sizeof(*pkt->nals));
             if (!tmp)
                 return AVERROR(ENOMEM);
 
             pkt->nals = tmp;
-            memset(pkt->nals + pkt->nals_allocated, 0,
-                   (new_size - pkt->nals_allocated) * sizeof(*pkt->nals));
+            memset(pkt->nals + pkt->nals_allocated, 0, sizeof(*pkt->nals));
 
             nal = &pkt->nals[pkt->nb_nals];
             nal->skipped_bytes_pos_size = 1024; // initial buffer size
@@ -516,7 +524,7 @@ void ff_h2645_packet_uninit(H2645Packet *pkt)
         av_freep(&pkt->nals[i].skipped_bytes_pos);
     }
     av_freep(&pkt->nals);
-    pkt->nals_allocated = 0;
+    pkt->nals_allocated = pkt->nal_buffer_size = 0;
     if (pkt->rbsp.rbsp_buffer_ref) {
         av_buffer_unref(&pkt->rbsp.rbsp_buffer_ref);
         pkt->rbsp.rbsp_buffer = NULL;

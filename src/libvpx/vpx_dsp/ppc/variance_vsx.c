@@ -243,7 +243,7 @@ static INLINE void variance(const uint8_t *src_ptr, int src_stride,
                                        uint32_t *sse) {                        \
     int sum;                                                                   \
     variance(src_ptr, src_stride, ref_ptr, ref_stride, W, H, sse, &sum);       \
-    return *sse - (uint32_t)(((int64_t)sum * sum) / (W * H));                  \
+    return *sse - (uint32_t)(((int64_t)sum * sum) / ((W) * (H)));              \
   }
 
 #define VARIANCES(W, H) VAR(W, H)

@@ -424,7 +424,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame_ptr,
     if ((ret = ff_get_buffer(avctx, frame, 0)) < 0)
         return ret;
 
-    if (buf_size % (G729_8K_BLOCK_SIZE * avctx->channels) == 0) {
+    if (buf_size % ((G729_8K_BLOCK_SIZE + (avctx->codec_id == AV_CODEC_ID_ACELP_KELVIN)) * avctx->channels) == 0) {
         packet_type = FORMAT_G729_8K;
         format = &format_g729_8k;
         //Reset voice decision
@@ -445,6 +445,11 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame_ptr,
         int bad_pitch = 0;     ///< parity check failed
         int is_periodic = 0;   ///< whether one of the subframes is declared as periodic or not
         out_frame = (int16_t*)frame->data[c];
+        if (avctx->codec_id == AV_CODEC_ID_ACELP_KELVIN) {
+            if (*buf != ((avctx->channels - 1 - c) * 0x80 | 2))
+                avpriv_request_sample(avctx, "First byte value %x for channel %d", *buf, c);
+            buf++;
+        }
 
         for (i = 0; i < buf_size; i++)
             frame_erasure |= buf[i];
@@ -552,12 +557,13 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame_ptr,
               fc_v[i] = <
                          \ fc_v[i] + gain_pitch * fc_v[i-pitch_delay], i >= pitch_delay
             */
-            ff_acelp_weighted_vector_sum(fc + pitch_delay_int[i],
-                                         fc + pitch_delay_int[i],
-                                         fc, 1 << 14,
-                                         av_clip(ctx->past_gain_pitch[0], SHARP_MIN, SHARP_MAX),
-                                         0, 14,
-                                         SUBFRAME_SIZE - pitch_delay_int[i]);
+            if (SUBFRAME_SIZE > pitch_delay_int[i])
+                ff_acelp_weighted_vector_sum(fc + pitch_delay_int[i],
+                                             fc + pitch_delay_int[i],
+                                             fc, 1 << 14,
+                                             av_clip(ctx->past_gain_pitch[0], SHARP_MIN, SHARP_MAX),
+                                             0, 14,
+                                             SUBFRAME_SIZE - pitch_delay_int[i]);
 
             memmove(ctx->past_gain_pitch+1, ctx->past_gain_pitch, 5 * sizeof(int16_t));
             ctx->past_gain_code[1] = ctx->past_gain_code[0];
@@ -727,7 +733,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame_ptr,
     }
 
     *got_frame_ptr = 1;
-    return packet_type == FORMAT_G729_8K ? G729_8K_BLOCK_SIZE * avctx->channels : G729D_6K4_BLOCK_SIZE * avctx->channels;
+    return packet_type == FORMAT_G729_8K ? (G729_8K_BLOCK_SIZE + (avctx->codec_id == AV_CODEC_ID_ACELP_KELVIN)) * avctx->channels : G729D_6K4_BLOCK_SIZE * avctx->channels;
 }
 
 static av_cold int decode_close(AVCodecContext *avctx)
@@ -743,6 +749,18 @@ AVCodec ff_g729_decoder = {
     .long_name      = NULL_IF_CONFIG_SMALL("G.729"),
     .type           = AVMEDIA_TYPE_AUDIO,
     .id             = AV_CODEC_ID_G729,
+    .priv_data_size = sizeof(G729Context),
+    .init           = decoder_init,
+    .decode         = decode_frame,
+    .close          = decode_close,
+    .capabilities   = AV_CODEC_CAP_SUBFRAMES | AV_CODEC_CAP_DR1,
+};
+
+AVCodec ff_acelp_kelvin_decoder = {
+    .name           = "acelp.kelvin",
+    .long_name      = NULL_IF_CONFIG_SMALL("Sipro ACELP.KELVIN"),
+    .type           = AVMEDIA_TYPE_AUDIO,
+    .id             = AV_CODEC_ID_ACELP_KELVIN,
     .priv_data_size = sizeof(G729Context),
     .init           = decoder_init,
     .decode         = decode_frame,

@@ -3,9 +3,6 @@
 
 #include <nettle/sha.h>
 
-/* nettle's SHA512 is faster than openssl's */
-#undef ENABLE_SHA512
-
 extern const struct nettle_hash x86_sha1;
 extern const struct nettle_hash x86_sha224;
 extern const struct nettle_hash x86_sha256;

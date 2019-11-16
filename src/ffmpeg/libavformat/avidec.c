@@ -117,8 +117,8 @@ static const AVMetadataConv avi_metadata_conv[] = {
 static int avi_load_index(AVFormatContext *s);
 static int guess_ni_flag(AVFormatContext *s);
 
-#define print_tag(str, tag, size)                                      \
-    av_log(NULL, AV_LOG_TRACE, "pos:%"PRIX64" %s: tag=%s size=0x%x\n", \
+#define print_tag(s, str, tag, size)                                      \
+    av_log(s, AV_LOG_TRACE, "pos:%"PRIX64" %s: tag=%s size=0x%x\n", \
            avio_tell(pb), str, av_fourcc2str(tag), size)                  \
 
 static inline int get_duration(AVIStream *ast, int len)
@@ -306,8 +306,10 @@ static int avi_read_tag(AVFormatContext *s, AVStream *st, uint32_t tag,
     value = av_malloc(size + 1);
     if (!value)
         return AVERROR(ENOMEM);
-    if (avio_read(pb, value, size) != size)
+    if (avio_read(pb, value, size) != size) {
+        av_freep(&value);
         return AVERROR_INVALIDDATA;
+    }
     value[size] = 0;
 
     AV_WL32(key, tag);
@@ -502,7 +504,7 @@ static int avi_read_header(AVFormatContext *s)
         tag  = avio_rl32(pb);
         size = avio_rl32(pb);
 
-        print_tag("tag", tag, size);
+        print_tag(s, "tag", tag, size);
 
         switch (tag) {
         case MKTAG('L', 'I', 'S', 'T'):
@@ -510,7 +512,7 @@ static int avi_read_header(AVFormatContext *s)
             /* Ignored, except at start of video packets. */
             tag1 = avio_rl32(pb);
 
-            print_tag("list", tag1, 0);
+            print_tag(s, "list", tag1, 0);
 
             if (tag1 == MKTAG('m', 'o', 'v', 'i')) {
                 avi->movi_list = avio_tell(pb) - 4;
@@ -518,7 +520,7 @@ static int avi_read_header(AVFormatContext *s)
                     avi->movi_end = avi->movi_list + size + (size & 1);
                 else
                     avi->movi_end = avi->fsize;
-                av_log(NULL, AV_LOG_TRACE, "movi end=%"PRIx64"\n", avi->movi_end);
+                av_log(s, AV_LOG_TRACE, "movi end=%"PRIx64"\n", avi->movi_end);
                 goto end_of_header;
             } else if (tag1 == MKTAG('I', 'N', 'F', 'O'))
                 ff_read_riff_info(s, size - 4);
@@ -582,7 +584,7 @@ static int avi_read_header(AVFormatContext *s)
                 tag1 = stream_index ? MKTAG('a', 'u', 'd', 's')
                                     : MKTAG('v', 'i', 'd', 's');
 
-            print_tag("strh", tag1, -1);
+            print_tag(s, "strh", tag1, -1);
 
             if (tag1 == MKTAG('i', 'a', 'v', 's') ||
                 tag1 == MKTAG('i', 'v', 'a', 's')) {
@@ -800,7 +802,7 @@ FF_ENABLE_DEPRECATION_WARNINGS
                         ast->has_pal = 1;
                     }
 
-                    print_tag("video", tag1, 0);
+                    print_tag(s, "video", tag1, 0);
 
                     st->codecpar->codec_type = AVMEDIA_TYPE_VIDEO;
                     st->codecpar->codec_tag  = tag1;
@@ -815,6 +817,9 @@ FF_ENABLE_DEPRECATION_WARNINGS
                                   "mov tag found in avi (fourcc %s)\n",
                                   av_fourcc2str(tag1));
                     }
+                    if (!st->codecpar->codec_id)
+                        st->codecpar->codec_id = ff_codec_get_id(ff_codec_bmp_tags_unofficial, tag1);
+
                     /* This is needed to get the pict type which is necessary
                      * for generating correct pts. */
                     st->need_parsing = AVSTREAM_PARSE_HEADERS;

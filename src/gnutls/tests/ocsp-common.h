@@ -580,6 +580,97 @@ static gnutls_datum_t ocsp_subca3_unknown_pem = {
 	(void *)_ocsp_subca3_unknown_pem, sizeof(_ocsp_subca3_unknown_pem)-1
 };
 
+/* ocsp response with good status for
+ * cli_ca3_cert. Signed with
+ * RSA-SHA256.
+ */
+
+const char _ocsp_cli_ca3_good_pem[] =
+	"-----BEGIN OCSP RESPONSE-----"
+	"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"
+	"aPA0fD9yskUMFPBhfj8BvXg="
+	"-----END OCSP RESPONSE-----";
+
+static gnutls_datum_t ocsp_cli_ca3_good_pem = {
+	(void *)_ocsp_cli_ca3_good_pem, sizeof(_ocsp_cli_ca3_good_pem)
+};
+
+const char _ocsp_cli_ca3_bad_pem[] =
+	"-----BEGIN OCSP RESPONSE-----"
+	"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"
+	"-----END OCSP RESPONSE-----";
+
+static gnutls_datum_t ocsp_cli_ca3_bad_pem = {
+	(void *)_ocsp_cli_ca3_bad_pem, sizeof(_ocsp_cli_ca3_bad_pem)
+};
+
+
+
 #if defined __clang__ || __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5)
 #  pragma GCC diagnostic pop
 #endif

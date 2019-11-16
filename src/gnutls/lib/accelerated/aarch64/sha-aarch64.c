@@ -305,6 +305,25 @@ static int wrap_aarch64_hash_init(gnutls_digest_algorithm_t algo, void **_ctx)
 	return 0;
 }
 
+static void *
+wrap_aarch64_hash_copy(const void *_ctx)
+{
+	struct aarch64_hash_ctx *new_ctx;
+	const struct aarch64_hash_ctx *ctx=_ctx;
+	ptrdiff_t off = (uint8_t *)ctx->ctx_ptr - (uint8_t *)(&ctx->ctx);
+
+	new_ctx = gnutls_malloc(sizeof(struct aarch64_hash_ctx));
+	if (new_ctx == NULL) {
+		gnutls_assert();
+		return NULL;
+	}
+
+	memcpy(new_ctx, ctx, sizeof(*new_ctx));
+	new_ctx->ctx_ptr = (uint8_t *)&new_ctx->ctx + off;
+
+	return new_ctx;
+}
+
 static int
 wrap_aarch64_hash_output(void *src_ctx, void *digest, size_t digestsize)
 {
@@ -352,6 +371,7 @@ const gnutls_crypto_digest_st _gnutls_sha_aarch64 = {
 	.init = wrap_aarch64_hash_init,
 	.hash = wrap_aarch64_hash_update,
 	.output = wrap_aarch64_hash_output,
+	.copy = wrap_aarch64_hash_copy,
 	.deinit = wrap_aarch64_hash_deinit,
 	.fast = wrap_aarch64_hash_fast,
 };

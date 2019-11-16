@@ -40,8 +40,6 @@
 # 1 "lib/accelerated/aarch64/elf/sha1-armv8.s.tmp.S"
 # 1 "<built-in>"
 # 1 "<command-line>"
-# 1 "/usr/aarch64-linux-gnu/include/stdc-predef.h" 1 3
-# 1 "<command-line>" 2
 # 1 "lib/accelerated/aarch64/elf/sha1-armv8.s.tmp.S"
 # 1 "lib/accelerated/aarch64/aarch64-common.h" 1
 # 2 "lib/accelerated/aarch64/elf/sha1-armv8.s.tmp.S" 2

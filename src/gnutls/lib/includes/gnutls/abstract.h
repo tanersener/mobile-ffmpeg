@@ -371,7 +371,10 @@ int gnutls_privkey_status(gnutls_privkey_t key);
  * gnutls_privkey_flags:
  * @GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA: Make an RSA signature on the hashed data as in the TLS protocol.
  * @GNUTLS_PRIVKEY_SIGN_FLAG_RSA_PSS: Make an RSA signature on the hashed data with the PSS padding.
- * @GNUTLS_PRIVKEY_FLAG_REPRODUCIBLE: Make an RSA-PSS signature on the hashed data with reproducible parameters (zero salt).
+ * @GNUTLS_PRIVKEY_FLAG_REPRODUCIBLE: Make a signature on the hashed data with reproducible parameters.
+ *   For RSA-PSS, that means to use empty salt instead of random value. For ECDSA/DSA, it uses the deterministic
+ *   construction of random parameter according to RFC 6979. Note that
+ *   this only supports the NIST curves and DSA subgroup bits up to 512.
  * @GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE: When importing a private key, automatically
  *   release it when the structure it was imported is released.
  * @GNUTLS_PRIVKEY_IMPORT_COPY: Copy required values during import.

@@ -1,0 +1,88 @@
+X.509 Certificate Information:
+	Version: 3
+	Serial Number (hex): 0c8c4093bbe693bd430bf51826031d05
+	Issuer: CN=УЦ ФГУП \"ГРЧЦ\",O=ФГУП \"ГРЧЦ\",L=Москва,ST=77 г. Москва,C=RU,EMAIL=pki-grfc@grfc.ru,street=Дербеневская наб. д. 7 стр. 15,INN=007706228218,OGRN=1027739334479
+	Validity:
+		Not Before: Tue Mar 12 07:38:26 UTC 2013
+		Not After: Sun Mar 12 07:46:00 UTC 2028
+	Subject: CN=УЦ ФГУП \"ГРЧЦ\",O=ФГУП \"ГРЧЦ\",L=Москва,ST=77 г. Москва,C=RU,EMAIL=pki-grfc@grfc.ru,street=Дербеневская наб. д. 7 стр. 15,INN=007706228218,OGRN=1027739334479
+	Subject Public Key Algorithm: GOST R 34.10-2001
+	Algorithm Security Level: High (256 bits)
+		Curve:	CryptoPro-A
+		Digest:	GOSTR341194
+		ParamSet: CryptoPro-A
+		X:
+			3c:be:60:cc:c2:77:02:f6:ef:c0:fc:2c:71:69:99:61
+			c0:55:d0:b9:e8:27:1d:4b:7f:1f:98:90:27:b6:53:96
+		Y:
+			f5:df:19:10:28:26:33:cf:0c:ad:a4:f7:5c:e4:22:f0
+			45:78:d6:de:78:3d:c2:bf:9c:c5:30:8a:63:34:ff:c8
+	Extensions:
+		Subject Signing Tool(not critical):
+			"КриптоПро CSP" (версия 3.6)
+		Issuer Signing Tool(not critical):
+			SignTool: "КриптоПро CSP" (версия 3.6)
+			CATool: "Удостоверяющий центр "КриптоПро УЦ" версии 1.5
+			SignToolCert: Сертификат соответствия № СФ/121-1859 от 17.06.2012
+			CAToolCert: Сертификат соответствия № СФ/128-1822 от 01.06.2012
+		Key Usage (not critical):
+			Digital signature.
+			Certificate signing.
+			CRL signing.
+		Basic Constraints (critical):
+			Certificate Authority (CA): TRUE
+		Subject Key Identifier (not critical):
+			6b00868389d200cf56b86be4e336101e1f72aec3
+		Unknown extension 1.3.6.1.4.1.311.21.1 (not critical):
+			ASCII: ...
+			Hexdump: 020100
+		Certificate Policies (not critical):
+			1.2.643.100.113.1
+			1.2.643.100.113.2
+			2.5.29.32.0
+	Signature Algorithm: GOSTR341001
+	Signature:
+		bd:95:dd:5f:3a:2b:74:a5:29:62:20:c2:24:a8:8b:a0
+		13:1a:21:f5:4a:d6:2e:b1:3f:f5:50:e9:96:a0:a2:c9
+		79:09:15:a2:41:c0:60:e1:1d:3f:25:8d:88:f4:4c:60
+		f3:0f:4e:e3:29:6e:b8:6e:01:b4:03:2c:07:8f:27:37
+Other Information:
+	Fingerprint:
+		sha1:c2040cc02f1d7e50abfdd1b597213579be2d0573
+		sha256:d9e6a4abdce8ac2ca7d394be7dce745e0565f0da1de382538ccc32b21a86d73c
+	Public Key ID:
+		sha1:6b00868389d200cf56b86be4e336101e1f72aec3
+		sha256:1e6b34a93b04a67bfb05270b3f26b9c945f095f24ab7fc2fe8ca4cce01a45682
+	Public Key PIN:
+		pin-sha256:Hms0qTsEpnv7BScLPya5yUXwlfJKt/wv6MpMzgGkVoI=
+
+-----BEGIN CERTIFICATE-----
+MIIFGDCCBMegAwIBAgIQDIxAk7vmk71DC/UYJgMdBTAIBgYqhQMCAgMwggEWMRgw
+FgYFKoUDZAESDTEwMjc3MzkzMzQ0NzkxGjAYBggqhQMDgQMBARIMMDA3NzA2MjI4
+MjE4MTowOAYDVQQJDDHQlNC10YDQsdC10L3QtdCy0YHQutCw0Y8g0L3QsNCxLiDQ
+tC4gNyDRgdGC0YAuIDE1MR8wHQYJKoZIhvcNAQkBFhBwa2ktZ3JmY0BncmZjLnJ1
+MQswCQYDVQQGEwJSVTEcMBoGA1UECAwTNzcg0LMuINCc0L7RgdC60LLQsDEVMBMG
+A1UEBwwM0JzQvtGB0LrQstCwMRwwGgYDVQQKDBPQpNCT0KPQnyAi0JPQoNCn0KYi
+MSEwHwYDVQQDDBjQo9CmINCk0JPQo9CfICLQk9Cg0KfQpiIwHhcNMTMwMzEyMDcz
+ODI2WhcNMjgwMzEyMDc0NjAwWjCCARYxGDAWBgUqhQNkARINMTAyNzczOTMzNDQ3
+OTEaMBgGCCqFAwOBAwEBEgwwMDc3MDYyMjgyMTgxOjA4BgNVBAkMMdCU0LXRgNCx
+0LXQvdC10LLRgdC60LDRjyDQvdCw0LEuINC0LiA3INGB0YLRgC4gMTUxHzAdBgkq
+hkiG9w0BCQEWEHBraS1ncmZjQGdyZmMucnUxCzAJBgNVBAYTAlJVMRwwGgYDVQQI
+DBM3NyDQsy4g0JzQvtGB0LrQstCwMRUwEwYDVQQHDAzQnNC+0YHQutCy0LAxHDAa
+BgNVBAoME9Ck0JPQo9CfICLQk9Cg0KfQpiIxITAfBgNVBAMMGNCj0KYg0KTQk9Cj
+0J8gItCT0KDQp9CmIjBjMBwGBiqFAwICEzASBgcqhQMCAiMBBgcqhQMCAh4BA0MA
+BECWU7YnkJgff0sdJ+i50FXAYZlpcSz8wO/2AnfCzGC+PMj/NGOKMMWcv8I9eN7W
+eEXwIuRc96StDM8zJigQGd/1o4IB6TCCAeUwNgYFKoUDZG8ELQwrItCa0YDQuNC/
+0YLQvtCf0YDQviBDU1AiICjQstC10YDRgdC40Y8gMy42KTCCATMGBSqFA2RwBIIB
+KDCCASQMKyLQmtGA0LjQv9GC0L7Qn9GA0L4gQ1NQIiAo0LLQtdGA0YHQuNGPIDMu
+NikMUyLQo9C00L7RgdGC0L7QstC10YDRj9GO0YnQuNC5INGG0LXQvdGC0YAgItCa
+0YDQuNC/0YLQvtCf0YDQviDQo9CmIiDQstC10YDRgdC40LggMS41DE/QodC10YDR
+gtC40YTQuNC60LDRgiDRgdC+0L7RgtCy0LXRgtGB0YLQstC40Y8g4oSWINCh0KQv
+MTIxLTE4NTkg0L7RgiAxNy4wNi4yMDEyDE/QodC10YDRgtC40YTQuNC60LDRgiDR
+gdC+0L7RgtCy0LXRgtGB0YLQstC40Y8g4oSWINCh0KQvMTI4LTE4MjIg0L7RgiAw
+MS4wNi4yMDEyMAsGA1UdDwQEAwIBhjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQW
+BBRrAIaDidIAz1a4a+TjNhAeH3KuwzAQBgkrBgEEAYI3FQEEAwIBADAlBgNVHSAE
+HjAcMAgGBiqFA2RxATAIBgYqhQNkcQIwBgYEVR0gADAIBgYqhQMCAgMDQQC9ld1f
+Oit0pSliIMIkqIugExoh9UrWLrE/9VDplqCiyXkJFaJBwGDhHT8ljYj0TGDzD07j
+KW64bgG0AywHjyc3
+-----END CERTIFICATE-----

@@ -43,76 +43,80 @@ static const H265ProfileDescriptor h265_profiles[] = {
     // profile_idc   8bit       one-picture
     //   HT-profile  | 422chroma    | lower-bit-rate
     //   |  14bit    |  | 420chroma |  | CpbVclFactor     MinCrScaleFactor
-    //   |  |  12bit |  |  | monochrome|    | CpbNalFactor    |
+    //   |  |  12bit |  |  | monochrome|    | CpbNalFactor    | maxDpbPicBuf
     //   |  |  |  10bit |  |  | intra  |    |     | FormatCapabilityFactor
-    { "Monochrome", //  |  |  |  |  |  |    |     |     |     |
-      4, 0, 2, 1, 1, 1, 1, 1, 1, 0, 0, 1,  667,  733, 1.000, 1.0 },
+    { "Monochrome", //  |  |  |  |  |  |    |     |     |     |   |
+      4, 0, 2, 1, 1, 1, 1, 1, 1, 0, 0, 1,  667,  733, 1.000, 1.0, 6 },
+    { "Monochrome 10",
+      4, 0, 2, 1, 1, 0, 1, 1, 1, 0, 0, 1,  833,  917, 1.250, 1.0, 6 },
     { "Monochrome 12",
-      4, 0, 2, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1000, 1100, 1.500, 1.0 },
+      4, 0, 2, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1000, 1100, 1.500, 1.0, 6 },
     { "Monochrome 16",
-      4, 0, 2, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1333, 1467, 2.000, 1.0 },
+      4, 0, 2, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1333, 1467, 2.000, 1.0, 6 },
     { "Main",
-      1, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1000, 1100, 1.500, 1.0 },
+      1, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1000, 1100, 1.500, 1.0, 6 },
     { "Screen-Extended Main",
-      9, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1000, 1100, 1.500, 1.0 },
+      9, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1000, 1100, 1.500, 1.0, 7 },
     { "Main 10",
-      2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1000, 1100, 1.875, 1.0 },
+      2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 0, 2, 1000, 1100, 1.875, 1.0, 6 },
     { "Screen-Extended Main 10",
-      9, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 1000, 1100, 1.875, 1.0 },
+      9, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 1000, 1100, 1.875, 1.0, 7 },
     { "Main 12",
-      4, 0, 2, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1500, 1650, 2.250, 1.0 },
+      4, 0, 2, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1500, 1650, 2.250, 1.0, 6 },
     { "Main Still Picture",
-      3, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1000, 1100, 1.500, 1.0 },
+      3, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1000, 1100, 1.500, 1.0, 6 },
+    { "Main 10 Still Picture",
+      2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 1000, 1100, 1.875, 1.0, 6 },
     { "Main 4:2:2 10",
-      4, 0, 2, 1, 1, 0, 1, 0, 0, 0, 0, 1, 1667, 1833, 2.500, 0.5 },
+      4, 0, 2, 1, 1, 0, 1, 0, 0, 0, 0, 1, 1667, 1833, 2.500, 0.5, 6 },
     { "Main 4:2:2 12",
-      4, 0, 2, 1, 0, 0, 1, 0, 0, 0, 0, 1, 2000, 2200, 3.000, 0.5 },
+      4, 0, 2, 1, 0, 0, 1, 0, 0, 0, 0, 1, 2000, 2200, 3.000, 0.5, 6 },
     { "Main 4:4:4",
-      4, 0, 2, 1, 1, 1, 0, 0, 0, 0, 0, 1, 2000, 2200, 3.000, 0.5 },
+      4, 0, 2, 1, 1, 1, 0, 0, 0, 0, 0, 1, 2000, 2200, 3.000, 0.5, 6 },
     { "High Throughput 4:4:4",
-      5, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 2000, 2200, 3.000, 0.5 },
+      5, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 2000, 2200, 3.000, 0.5, 6 },
     { "Screen-Extended Main 4:4:4",
-      9, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 2000, 2200, 3.000, 0.5 },
+      9, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 2000, 2200, 3.000, 0.5, 7 },
     { "Screen-Extended High Throughput 4:4:4",
-      9, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 2000, 2200, 3.000, 0.5 },
+      9, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 2000, 2200, 3.000, 0.5, 7 },
     { "Main 4:4:4 10",
-      4, 0, 2, 1, 1, 0, 0, 0, 0, 0, 0, 1, 2500, 2750, 3.750, 0.5 },
+      4, 0, 2, 1, 1, 0, 0, 0, 0, 0, 0, 1, 2500, 2750, 3.750, 0.5, 6 },
     { "High Throughput 4:4:4 10",
-      5, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 2500, 2750, 3.750, 0.5 },
+      5, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 2500, 2750, 3.750, 0.5, 6 },
     { "Screen-Extended Main 4:4:4 10",
-      9, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 2500, 2750, 3.750, 0.5 },
+      9, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 2500, 2750, 3.750, 0.5, 7 },
     { "Screen-Extended High Throughput 4:4:4 10",
-      9, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 2500, 2750, 3.750, 0.5 },
+      9, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 2500, 2750, 3.750, 0.5, 7 },
     { "Main 4:4:4 12",
-      4, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 1, 3000, 3300, 4.500, 0.5 },
+      4, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 1, 3000, 3300, 4.500, 0.5, 6 },
     { "High Throughput 4:4:4 14",
-      5, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3500, 3850, 5.250, 0.5 },
+      5, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3500, 3850, 5.250, 0.5, 6 },
     { "Screen-Extended High Throughput 4:4:4 14",
-      9, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3500, 3850, 5.250, 0.5 },
+      9, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3500, 3850, 5.250, 0.5, 7 },
     { "Main Intra",
-      4, 0, 2, 1, 1, 1, 1, 1, 0, 1, 0, 2, 1000, 1100, 1.500, 1.0 },
+      4, 0, 2, 1, 1, 1, 1, 1, 0, 1, 0, 2, 1000, 1100, 1.500, 1.0, 6 },
     { "Main 10 Intra",
-      4, 0, 2, 1, 1, 0, 1, 1, 0, 1, 0, 2, 1000, 1100, 1.875, 1.0 },
+      4, 0, 2, 1, 1, 0, 1, 1, 0, 1, 0, 2, 1000, 1100, 1.875, 1.0, 6 },
     { "Main 12 Intra",
-      4, 0, 2, 1, 0, 0, 1, 1, 0, 1, 0, 2, 1500, 1650, 2.250, 1.0 },
+      4, 0, 2, 1, 0, 0, 1, 1, 0, 1, 0, 2, 1500, 1650, 2.250, 1.0, 6 },
     { "Main 4:2:2 10 Intra",
-      4, 0, 2, 1, 1, 0, 1, 0, 0, 1, 0, 2, 1667, 1833, 2.500, 0.5 },
+      4, 0, 2, 1, 1, 0, 1, 0, 0, 1, 0, 2, 1667, 1833, 2.500, 0.5, 6 },
     { "Main 4:2:2 12 Intra",
-      4, 0, 2, 1, 0, 0, 1, 0, 0, 1, 0, 2, 2000, 2200, 3.000, 0.5 },
+      4, 0, 2, 1, 0, 0, 1, 0, 0, 1, 0, 2, 2000, 2200, 3.000, 0.5, 6 },
     { "Main 4:4:4 Intra",
-      4, 0, 2, 1, 1, 1, 0, 0, 0, 1, 0, 2, 2000, 2200, 3.000, 0.5 },
+      4, 0, 2, 1, 1, 1, 0, 0, 0, 1, 0, 2, 2000, 2200, 3.000, 0.5, 6 },
     { "Main 4:4:4 10 Intra",
-      4, 0, 2, 1, 1, 0, 0, 0, 0, 1, 0, 2, 2500, 2750, 3.750, 0.5 },
+      4, 0, 2, 1, 1, 0, 0, 0, 0, 1, 0, 2, 2500, 2750, 3.750, 0.5, 6 },
     { "Main 4:4:4 12 Intra",
-      4, 0, 2, 1, 0, 0, 0, 0, 0, 1, 0, 2, 3000, 3300, 4.500, 0.5 },
+      4, 0, 2, 1, 0, 0, 0, 0, 0, 1, 0, 2, 3000, 3300, 4.500, 0.5, 6 },
     { "Main 4:4:4 16 Intra",
-      4, 0, 2, 0, 0, 0, 0, 0, 0, 1, 0, 2, 4000, 4400, 6.000, 0.5 },
+      4, 0, 2, 0, 0, 0, 0, 0, 0, 1, 0, 2, 4000, 4400, 6.000, 0.5, 6 },
     { "Main 4:4:4 Still Picture",
-      4, 0, 2, 1, 1, 1, 0, 0, 0, 1, 1, 2, 2000, 2200, 3.000, 0.5 },
+      4, 0, 2, 1, 1, 1, 0, 0, 0, 1, 1, 2, 2000, 2200, 3.000, 0.5, 6 },
     { "Main 4:4:4 16 Still Picture",
-      4, 0, 2, 0, 0, 0, 0, 0, 0, 1, 1, 2, 4000, 4400, 6.000, 0.5 },
+      4, 0, 2, 0, 0, 0, 0, 0, 0, 1, 1, 2, 4000, 4400, 6.000, 0.5, 6 },
     { "High Throughput 4:4:4 16 Intra",
-      5, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 2, 4000, 4400, 6.000, 0.5 },
+      5, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 2, 4000, 4400, 6.000, 0.5, 6 },
 };
 
 
@@ -175,7 +179,7 @@ const H265LevelDescriptor *ff_h265_guess_level(const H265RawProfileTierLevel *pt
                                                int max_dec_pic_buffering)
 {
     const H265ProfileDescriptor *profile;
-    int pic_size, lbr_flag, hbr_factor;
+    int pic_size, tier_flag, lbr_flag, hbr_factor;
     int i;
 
     if (ptl)
@@ -189,10 +193,13 @@ const H265LevelDescriptor *ff_h265_guess_level(const H265RawProfileTierLevel *pt
 
     pic_size = width * height;
 
-    if (ptl)
-        lbr_flag = ptl->general_lower_bit_rate_constraint_flag;
-    else
-        lbr_flag = profile->lower_bit_rate > 0;
+    if (ptl) {
+        tier_flag = ptl->general_tier_flag;
+        lbr_flag  = ptl->general_lower_bit_rate_constraint_flag;
+    } else {
+        tier_flag = 0;
+        lbr_flag  = profile->lower_bit_rate > 0;
+    }
     if (profile->profile_idc == 1 || profile->profile_idc == 2) {
         hbr_factor = 1;
     } else if (profile->high_throughput) {
@@ -208,6 +215,9 @@ const H265LevelDescriptor *ff_h265_guess_level(const H265RawProfileTierLevel *pt
         const H265LevelDescriptor *level = &h265_levels[i];
         int max_br, max_dpb_size;
 
+        if (tier_flag && !level->max_br_high)
+            continue;
+
         if (pic_size > level->max_luma_ps)
             continue;
         if (width  * width  > 8 * level->max_luma_ps)
@@ -222,7 +232,7 @@ const H265LevelDescriptor *ff_h265_guess_level(const H265RawProfileTierLevel *pt
         if (tile_cols > level->max_tile_cols)
             continue;
 
-        if (ptl && ptl->general_tier_flag)
+        if (tier_flag)
             max_br = level->max_br_high;
         else
             max_br = level->max_br_main;
@@ -231,14 +241,14 @@ const H265LevelDescriptor *ff_h265_guess_level(const H265RawProfileTierLevel *pt
         if (bitrate > (int64_t)profile->cpb_nal_factor * hbr_factor * max_br)
             continue;
 
-        if (pic_size < (level->max_luma_ps >> 2))
-            max_dpb_size = 16;
-        else if (pic_size < (level->max_luma_ps >> 1))
-            max_dpb_size = 14;
-        else if (pic_size < (3 * level->max_luma_ps >> 2))
-            max_dpb_size = 9;
+        if (pic_size <= (level->max_luma_ps >> 2))
+            max_dpb_size = FFMIN(4 * profile->max_dpb_pic_buf, 16);
+        else if (pic_size <= (level->max_luma_ps >> 1))
+            max_dpb_size = FFMIN(2 * profile->max_dpb_pic_buf, 16);
+        else if (pic_size <= (3 * level->max_luma_ps >> 2))
+            max_dpb_size = FFMIN(4 * profile->max_dpb_pic_buf / 3, 16);
         else
-            max_dpb_size = 7;
+            max_dpb_size = profile->max_dpb_pic_buf;
         if (max_dec_pic_buffering > max_dpb_size)
             continue;
 

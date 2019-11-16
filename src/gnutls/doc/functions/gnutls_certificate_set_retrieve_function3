@@ -13,10 +13,16 @@ be called only if the peer requests a certificate either during handshake
 or during post-handshake authentication.
 
 The callback's function prototype is defined in `abstract.h':
-int (*callback)(gnutls_session_t, const struct gnutls_cert_retr_st *info,
-gnutls_pcert_st **certs, unsigned int *pcert_length,
-gnutls_datum_t **ocsp, unsigned int *ocsp_length,
-gnutls_privkey_t * pkey, unsigned int *flags);
+
+int gnutls_certificate_retrieve_function3(
+gnutls_session_t,
+const struct gnutls_cert_retr_st *info,
+gnutls_pcert_st **certs,
+unsigned int *pcert_length,
+gnutls_ocsp_data_st **ocsp,
+unsigned int *ocsp_length,
+gnutls_privkey_t *privkey,
+unsigned int *flags);
 
 The info field of the callback contains:
  @code{req_ca_dn} which is a list with the CA names that the server considers trusted.

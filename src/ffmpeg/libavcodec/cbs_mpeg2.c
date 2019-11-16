@@ -48,17 +48,26 @@
         xui(width, name, current->name, 0, MAX_UINT_BITS(width), subs, __VA_ARGS__)
 #define uirs(width, name, subs, ...) \
         xui(width, name, current->name, 1, MAX_UINT_BITS(width), subs, __VA_ARGS__)
+#define xui(width, name, var, range_min, range_max, subs, ...) \
+        xuia(width, #name, var, range_min, range_max, subs, __VA_ARGS__)
 #define sis(width, name, subs, ...) \
         xsi(width, name, current->name, subs, __VA_ARGS__)
+
+#define marker_bit() \
+        bit("marker_bit", 1)
+#define bit(string, value) do { \
+        av_unused uint32_t bit = value; \
+        xuia(1, string, bit, value, value, 0); \
+    } while (0)
 
 
 #define READ
 #define READWRITE read
 #define RWContext GetBitContext
 
-#define xui(width, name, var, range_min, range_max, subs, ...) do { \
-        uint32_t value = 0; \
-        CHECK(ff_cbs_read_unsigned(ctx, rw, width, #name, \
+#define xuia(width, string, var, range_min, range_max, subs, ...) do { \
+        uint32_t value; \
+        CHECK(ff_cbs_read_unsigned(ctx, rw, width, string, \
                                    SUBSCRIPTS(subs, __VA_ARGS__), \
                                    &value, range_min, range_max)); \
         var = value; \
@@ -73,32 +82,31 @@
         var = value; \
     } while (0)
 
-#define marker_bit() do { \
-        av_unused uint32_t one; \
-        CHECK(ff_cbs_read_unsigned(ctx, rw, 1, "marker_bit", NULL, &one, 1, 1)); \
-    } while (0)
-
 #define nextbits(width, compare, var) \
     (get_bits_left(rw) >= width && \
      (var = show_bits(rw, width)) == (compare))
+
+#define infer(name, value) do { \
+        current->name = value; \
+    } while (0)
 
 #include "cbs_mpeg2_syntax_template.c"
 
 #undef READ
 #undef READWRITE
 #undef RWContext
-#undef xui
+#undef xuia
 #undef xsi
-#undef marker_bit
 #undef nextbits
+#undef infer
 
 
 #define WRITE
 #define READWRITE write
 #define RWContext PutBitContext
 
-#define xui(width, name, var, range_min, range_max, subs, ...) do { \
-        CHECK(ff_cbs_write_unsigned(ctx, rw, width, #name, \
+#define xuia(width, string, var, range_min, range_max, subs, ...) do { \
+        CHECK(ff_cbs_write_unsigned(ctx, rw, width, string, \
                                     SUBSCRIPTS(subs, __VA_ARGS__), \
                                     var, range_min, range_max)); \
     } while (0)
@@ -110,34 +118,46 @@
                                   MAX_INT_BITS(width))); \
     } while (0)
 
-#define marker_bit() do { \
-        CHECK(ff_cbs_write_unsigned(ctx, rw, 1, "marker_bit", NULL, 1, 1, 1)); \
-    } while (0)
-
 #define nextbits(width, compare, var) (var)
+
+#define infer(name, value) do { \
+        if (current->name != (value)) { \
+            av_log(ctx->log_ctx, AV_LOG_WARNING, "Warning: " \
+                   "%s does not match inferred value: " \
+                   "%"PRId64", but should be %"PRId64".\n", \
+                   #name, (int64_t)current->name, (int64_t)(value)); \
+        } \
+    } while (0)
 
 #include "cbs_mpeg2_syntax_template.c"
 
 #undef WRITE
 #undef READWRITE
 #undef RWContext
-#undef xui
+#undef xuia
 #undef xsi
-#undef marker_bit
 #undef nextbits
+#undef infer
 
 
-static void cbs_mpeg2_free_user_data(void *unit, uint8_t *content)
+static void cbs_mpeg2_free_picture_header(void *opaque, uint8_t *content)
+{
+    MPEG2RawPictureHeader *picture = (MPEG2RawPictureHeader*)content;
+    av_buffer_unref(&picture->extra_information_picture.extra_information_ref);
+    av_freep(&content);
+}
+
+static void cbs_mpeg2_free_user_data(void *opaque, uint8_t *content)
 {
     MPEG2RawUserData *user = (MPEG2RawUserData*)content;
     av_buffer_unref(&user->user_data_ref);
     av_freep(&content);
 }
 
-static void cbs_mpeg2_free_slice(void *unit, uint8_t *content)
+static void cbs_mpeg2_free_slice(void *opaque, uint8_t *content)
 {
     MPEG2RawSlice *slice = (MPEG2RawSlice*)content;
-    av_buffer_unref(&slice->header.extra_information_ref);
+    av_buffer_unref(&slice->header.extra_information_slice.extra_information_ref);
     av_buffer_unref(&slice->data_ref);
     av_freep(&content);
 }
@@ -147,41 +167,54 @@ static int cbs_mpeg2_split_fragment(CodedBitstreamContext *ctx,
                                     int header)
 {
     const uint8_t *start, *end;
-    uint8_t *unit_data;
-    uint32_t start_code = -1, next_start_code = -1;
+    CodedBitstreamUnitType unit_type;
+    uint32_t start_code = -1;
     size_t unit_size;
-    int err, i, unit_type;
+    int err, i, final = 0;
 
     start = avpriv_find_start_code(frag->data, frag->data + frag->data_size,
                                    &start_code);
-    for (i = 0;; i++) {
-        end = avpriv_find_start_code(start, frag->data + frag->data_size,
-                                     &next_start_code);
+    if (start_code >> 8 != 0x000001) {
+        // No start code found.
+        return AVERROR_INVALIDDATA;
+    }
 
+    for (i = 0;; i++) {
         unit_type = start_code & 0xff;
 
-        // The start and end pointers point at to the byte following the
-        // start_code_identifier in the start code that they found.
-        if (end == frag->data + frag->data_size) {
-            // We didn't find a start code, so this is the final unit.
-            unit_size = end - (start - 1);
-        } else {
-            // Unit runs from start to the beginning of the start code
-            // pointed to by end (including any padding zeroes).
-            unit_size = (end - 4) - (start - 1);
+        if (start == frag->data + frag->data_size) {
+            // The last four bytes form a start code which constitutes
+            // a unit of its own.  In this situation avpriv_find_start_code
+            // won't modify start_code at all so modify start_code so that
+            // the next unit will be treated as the last unit.
+            start_code = 0;
         }
 
-        unit_data = (uint8_t *)start - 1;
+        end = avpriv_find_start_code(start--, frag->data + frag->data_size,
+                                     &start_code);
 
-        err = ff_cbs_insert_unit_data(ctx, frag, i, unit_type,
-                                      unit_data, unit_size, frag->data_ref);
+        // start points to the byte containing the start_code_identifier
+        // (may be the last byte of fragment->data); end points to the byte
+        // following the byte containing the start code identifier (or to
+        // the end of fragment->data).
+        if (start_code >> 8 == 0x000001) {
+            // Unit runs from start to the beginning of the start code
+            // pointed to by end (including any padding zeroes).
+            unit_size = (end - 4) - start;
+        } else {
+           // We didn't find a start code, so this is the final unit.
+           unit_size = end - start;
+           final     = 1;
+        }
+
+        err = ff_cbs_insert_unit_data(ctx, frag, i, unit_type, (uint8_t*)start,
+                                      unit_size, frag->data_ref);
         if (err < 0)
             return err;
 
-        if (end == frag->data + frag->data_size)
+        if (final)
             break;
 
-        start_code = next_start_code;
         start = end;
     }
 
@@ -240,7 +273,7 @@ static int cbs_mpeg2_read_unit(CodedBitstreamContext *ctx,
             } \
             break;
             START(MPEG2_START_PICTURE,   MPEG2RawPictureHeader,
-                  picture_header,           NULL);
+                  picture_header,           &cbs_mpeg2_free_picture_header);
             START(MPEG2_START_USER_DATA, MPEG2RawUserData,
                   user_data,                &cbs_mpeg2_free_user_data);
             START(MPEG2_START_SEQUENCE_HEADER, MPEG2RawSequenceHeader,
@@ -249,6 +282,8 @@ static int cbs_mpeg2_read_unit(CodedBitstreamContext *ctx,
                   extension_data,           NULL);
             START(MPEG2_START_GROUP,     MPEG2RawGroupOfPicturesHeader,
                   group_of_pictures_header, NULL);
+            START(MPEG2_START_SEQUENCE_END, MPEG2RawSequenceEnd,
+                  sequence_end,             NULL);
 #undef START
         default:
             return AVERROR(ENOSYS);
@@ -275,6 +310,7 @@ static int cbs_mpeg2_write_header(CodedBitstreamContext *ctx,
         START(MPEG2_START_EXTENSION,       MPEG2RawExtensionData,  extension_data);
         START(MPEG2_START_GROUP,           MPEG2RawGroupOfPicturesHeader,
                                                          group_of_pictures_header);
+        START(MPEG2_START_SEQUENCE_END,    MPEG2RawSequenceEnd,    sequence_end);
 #undef START
     default:
         av_log(ctx->log_ctx, AV_LOG_ERROR, "Write unimplemented for start "

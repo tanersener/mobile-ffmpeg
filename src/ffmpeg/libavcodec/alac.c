@@ -171,12 +171,12 @@ static inline int sign_only(int v)
     return v ? FFSIGN(v) : 0;
 }
 
-static void lpc_prediction(int32_t *error_buffer, int32_t *buffer_out,
+static void lpc_prediction(int32_t *error_buffer, uint32_t *buffer_out,
                            int nb_samples, int bps, int16_t *lpc_coefs,
                            int lpc_order, int lpc_quant)
 {
     int i;
-    int32_t *pred = buffer_out;
+    uint32_t *pred = buffer_out;
 
     /* first sample always copies */
     *buffer_out = *error_buffer;
@@ -208,21 +208,21 @@ static void lpc_prediction(int32_t *error_buffer, int32_t *buffer_out,
     for (; i < nb_samples; i++) {
         int j;
         int val = 0;
-        int error_val = error_buffer[i];
+        unsigned error_val = error_buffer[i];
         int error_sign;
         int d = *pred++;
 
         /* LPC prediction */
         for (j = 0; j < lpc_order; j++)
             val += (pred[j] - d) * lpc_coefs[j];
-        val = (val + (1 << (lpc_quant - 1))) >> lpc_quant;
+        val = (val + (1LL << (lpc_quant - 1))) >> lpc_quant;
         val += d + error_val;
         buffer_out[i] = sign_extend(val, bps);
 
         /* adapt LPC coefficients */
         error_sign = sign_only(error_val);
         if (error_sign) {
-            for (j = 0; j < lpc_order && error_val * error_sign > 0; j++) {
+            for (j = 0; j < lpc_order && (int)(error_val * error_sign) > 0; j++) {
                 int sign;
                 val  = d - pred[j];
                 sign = sign_only(val) * error_sign;
@@ -250,10 +250,12 @@ static int decode_element(AVCodecContext *avctx, AVFrame *frame, int ch_index,
 
     alac->extra_bits = get_bits(&alac->gb, 2) << 3;
     bps = alac->sample_size - alac->extra_bits + channels - 1;
-    if (bps > 32U) {
+    if (bps > 32) {
         avpriv_report_missing_feature(avctx, "bps %d", bps);
         return AVERROR_PATCHWELCOME;
     }
+    if (bps < 1)
+        return AVERROR_INVALIDDATA;
 
     /* whether the frame is compressed */
     is_compressed = !get_bits1(&alac->gb);
@@ -306,7 +308,7 @@ static int decode_element(AVCodecContext *avctx, AVFrame *frame, int ch_index,
             rice_history_mult[ch] = get_bits(&alac->gb, 3);
             lpc_order[ch]         = get_bits(&alac->gb, 5);
 
-            if (lpc_order[ch] >= alac->max_samples_per_frame)
+            if (lpc_order[ch] >= alac->max_samples_per_frame || !lpc_quant[ch])
                 return AVERROR_INVALIDDATA;
 
             /* read the predictor table */
@@ -395,13 +397,13 @@ static int decode_element(AVCodecContext *avctx, AVFrame *frame, int ch_index,
     case 20: {
         for (ch = 0; ch < channels; ch++) {
             for (i = 0; i < alac->nb_samples; i++)
-                alac->output_samples_buffer[ch][i] <<= 12;
+                alac->output_samples_buffer[ch][i] *= 1 << 12;
         }}
         break;
     case 24: {
         for (ch = 0; ch < channels; ch++) {
             for (i = 0; i < alac->nb_samples; i++)
-                alac->output_samples_buffer[ch][i] <<= 8;
+                alac->output_samples_buffer[ch][i] *= 1 << 8;
         }}
         break;
     }

@@ -284,6 +284,7 @@ INSTANTIATE_TEST_CASE_P(AVX2, WienerTest,
 
 }  // namespace wiener_lowbd
 
+#if CONFIG_AV1_HIGHBITDEPTH
 // High bit-depth tests:
 namespace wiener_highbd {
 
@@ -582,3 +583,4 @@ INSTANTIATE_TEST_CASE_P(AVX2, WienerTestHighbd,
 #endif  // HAVE_AVX2
 
 }  // namespace wiener_highbd
+#endif  // CONFIG_AV1_HIGHBITDEPTH

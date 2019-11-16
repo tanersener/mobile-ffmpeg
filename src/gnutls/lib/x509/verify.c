@@ -566,7 +566,6 @@ static unsigned is_level_acceptable(
 			break;
 		case GNUTLS_PROFILE_UNKNOWN: /* already checked; avoid compiler warnings */
 			_gnutls_debug_log("An unknown profile (%d) was encountered\n", (int)profile);
-			return gnutls_assert_val(0);
 		}
 	}
 

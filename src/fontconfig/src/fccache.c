@@ -371,8 +371,6 @@ FcDirCacheProcess (FcConfig *config, const FcChar8 *dir,
         FcChar8	*cache_hashed;
 #ifndef _WIN32
 	FcBool retried = FcFalse;
-
-    retry:
 #endif
 	if (sysroot)
 	    cache_hashed = FcStrBuildFilename (sysroot, cache_dir, cache_base, NULL);
@@ -380,6 +378,9 @@ FcDirCacheProcess (FcConfig *config, const FcChar8 *dir,
 	    cache_hashed = FcStrBuildFilename (cache_dir, cache_base, NULL);
         if (!cache_hashed)
 	    break;
+#ifndef _WIN32
+      retry:
+#endif
         fd = FcDirCacheOpenFile (cache_hashed, &file_stat);
         if (fd >= 0) {
 	    ret = (*callback) (config, fd, &file_stat, &dir_stat, closure);
@@ -396,11 +397,19 @@ FcDirCacheProcess (FcConfig *config, const FcChar8 *dir,
 #ifndef _WIN32
 	else if (!retried)
 	{
+	    FcChar8	uuid_cache_base[CACHEBASE_LEN];
+
 	    retried = FcTrue;
-	    FcDirCacheBasenameUUID (config, dir, cache_base);
-	    if (cache_base[0] != 0)
+	    FcDirCacheBasenameUUID (config, dir, uuid_cache_base);
+	    if (uuid_cache_base[0] != 0)
 	    {
 		FcStrFree (cache_hashed);
+		if (sysroot)
+		    cache_hashed = FcStrBuildFilename (sysroot, cache_dir, uuid_cache_base, NULL);
+		else
+		    cache_hashed = FcStrBuildFilename (cache_dir, uuid_cache_base, NULL);
+		if (!cache_hashed)
+		    break;
 		goto retry;
 	    }
 	}

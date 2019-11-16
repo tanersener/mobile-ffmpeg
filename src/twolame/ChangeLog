@@ -1,172 +1,2840 @@
-What is new in TwoLAME 
-======================
+commit bec4069996479aa1aa9d9e7fa32c33135b3a2047
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Fri Oct 11 17:25:40 2019 +0100
 
-Version 0.3.13 (2010-01-21)
----------------------------
+    Set release date for 0.4.0
 
-- Fixed documentation location (--docdir in configure)
-   * thanks to Chris Mayo for patch
-- Moved source code control to Github
-- Improvements to build system
-- Updated to autoconf 2.60, libtool 2.2, automake 1.10 and Doxygen 1.7.3
-- Fix problem with 'extern inline' by changing them to 'static inline'
-- Wrote perl script to test output of the frontend
-- Changed all debugging messages, writing to stdout to write to stderr
-- Removed calls to exit() from libtwolame.
-- Added --non-copyright option (which is enabled by default)
-- Fix for bad copy/paste of variable assignment.
-- Manpage correction
-- Changed fopen() options to wb to fix Windows
+commit c7473b8e4959af779b43c0715604a4adb705df4e
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Thu Oct 10 19:45:44 2019 +0100
 
+    Reviewed and updated the news for version 0.4.0
 
-Version 0.3.12 (2008-01-09)
----------------------------
+commit 650f1d6d11a8b19a4ab479f1efb82c5a0252dc9d
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Mon Oct 7 19:48:17 2019 +0100
 
-- Fixed 'inline' for the forthcoming gcc-4.3
-   * thanks to Martin Michlmayr for patch
+    Disabled XML validation when creating manpage
 
+commit 77a8e7c6ad4e4fb7011ffd849726632a503ef868
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Mon Oct 7 18:10:52 2019 +0100
 
-Version 0.3.11 (2007-07-02)
----------------------------
+    Added Mac OS build config to Travis CI
 
-- Fixed energy levels bug for mono audio
-   * thanks to Staale Helleberg for patch
-- Fixed STDIN support in twolame frontend
+commit 7cf0a8ac456f69e4b9c40e8cdfd6db2f35114876
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Mon Oct 7 09:24:55 2019 +0100
 
+    Renamed `TWOLAME_BUILD` define to `LIBTWOLAME_BUILD`
 
-Version 0.3.10 (2007-03-20)
----------------------------
+commit e52373e545e3a6b6addba258223310a427046594
+Author: vtorri <vincent.torri@gmail.com>
+Date:   Mon Oct 7 10:01:59 2019 +0200
 
-- Added win32/winutil.h to tarball - fixes bug #1629945
-- Fixed presentation of --enable-debug in configure script
-- Added twolame_encode_buffer_float32_interleaved()
-- Fixed bug that was loosing stereo in twolame_encode_buffer_float32()
-- Fixed twolame_set_mode() to accept TWOLAME_AUTO_MODE
-- Added source file Ids to the top of every file
-- Added -pedantic to CFLAGS for debug build
+    Fix symbols visibility on Windows (#90)
+    
+    * add -no-undefined for compilation on Windows
+    * fix symbols visibility on Windows
 
+commit 42d1fb99e769cddf2f7969d8d25d31241e01a8de
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Sun Oct 6 23:40:44 2019 +0100
 
+    Added 'xmlto' to Travis CI package dependencies
 
-Version 0.3.9 (2006-12-31)
---------------------------
+commit 0423b36f93748b3263e821ae77458aeb848f8e24
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Sun Oct 6 23:35:42 2019 +0100
 
-- Fix for Windows in simple frontend: open files in binary mode
-   * thanks to Kurien Mathew
-- (libtwolame) Fixed energy level support
-   * thanks to Staale Helleberg
-- Nows displays the version number of libsndfile in frontend
-   * as suggested by Elio Blanca
-- Changed documentation build system, so you have to run it manually
-- Buffer overrun fix in new_extension()
-- (libtwolame) Added warning that DAB support is still broken
-- (libtwolame) Added twolame_get_framelength() to return number of bytes per frame
-- Added TWOLAME_SAMPLES_PER_FRAME macro, clarifying that there are 
-  always 1152 samples per frame in Layer 2
-- Frontend now displays extra information
-   * Duration of input file (if known)
-   * Total number of frames to be encoded and percentage complete
-   * The filesize of the output file
- - Cleaned up source files so that it is consistent and all uses tabs (tab width 4)  
+    Fix for potential buffer overrun relating to MAX_NAME_SIZE
 
+commit 273a420b48ff66559148f8840f9a25d194c58660
+Author: vtorri <vincent.torri@gmail.com>
+Date:   Tue Jun 25 16:00:24 2019 +0200
 
+    add -no-undefined for compilation on Windows (#84)
 
-Version 0.3.8 (2006-06-19)
---------------------------
+commit 3e1720f4718b84c9744c0be936192ef74f2ad573
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Sun Mar 3 23:55:35 2019 +0000
 
-- (libtwolame) Fixed CRC protection
-- More code tidying
-- pkg-config is no-longer required (but is recommended)
-- frontend now has the exectuable suffix appended to filename
-- added -std=c99 to the compiler options
+    Added win32-dll option to LT_INIT
 
+commit b43d721ff5fe45ca683b8e06fcac5f37067945e3
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Sun Mar 3 23:52:22 2019 +0000
 
-Version 0.3.7 (2006-05-07)
---------------------------
+    Deleted duplicate LT_INIT in configure.ac
 
-- (libtwolame) Added twolame_encode_buffer_float32() function
-- (libtwolame) Fix NAN bug for AMD64 processors
-- Checks type sizes of short and float
+commit 3fc06cfacd5bbc6f8e9f0ab32e3a38a7952d20dd
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Thu Nov 15 11:25:50 2018 +0000
 
+    Upgraded to Doxygen 1.8.14
 
-Version 0.3.6 (2006-12-25)
---------------------------
+commit 96cb48a4894997be6047afa47d708bf15d5e7065
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Wed Nov 14 20:56:11 2018 +0000
 
-- Removed comma which was causing problems with -pedantic
-   * Thanks to Akos Maroy
-- (libtwolame) Added libtool library versioning
+    Updated copyright year to 2018
 
+commit 620920198e857c330e8dfbb991303218b7a3f1f0
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Wed Nov 14 20:34:05 2018 +0000
 
-Version 0.3.5 (2005-11-29)
---------------------------
+    Added Elio Blanca to the list of authors
 
-- (libtwolame) Added back twolame_get_VBR_q/twolame_set_VBR_q
-- More documentation is installed
+commit 8af11d1bf1b6b30ae05df9311f4339e98691458b
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Wed Nov 14 20:32:54 2018 +0000
 
+    Corrected release date for 0.3.13
 
-Version 0.3.4 (2005-11-19)
---------------------------
+commit 4258d8e92a5637fa091186df54e706bc29336e7b
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Wed Nov 14 20:11:38 2018 +0000
 
-- (libtwolame) Checks parameters a bit better
-- (libtwolame) Removed lots of exit() calls
-- (libtwolame) added twolame_print_config() API call
-- (libtwolame) Fixed twolame.h so that it works with C++ code
-- Rewrote frontend and now (only) uses libsndfile
-- Changed behavior in frontend and backend for verbosity setting
-- Rewrote manpage for frontend
-- (libtwolame) Fixed bug with setting MPEG version
-- (libtwolame) Removed default samplerate - must choose one
-- (libtwolame) 'Original' flag is now turned on by default
-- (libtwolame) Default bitrate is automatically chosen based on the samplerate/channels
-- (libtwolame) Default mode is automatically chosen based on the number of channels
-- Documentation improvements and corrections
-- (libtwolame) made some of VBR debugging send to stderr instead of stdout
+    Install AUTHORS, COPYING, README, NEWS in $prefix/share/doc/twolame/
 
+commit 838f8596100d5d3f929d8a200f2c949b390f5536
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Mon Nov 12 21:28:29 2018 +0000
 
-Version 0.3.3 (2005-04-19)
---------------------------
+    Updated NEWS
 
-- Added Debian package description
-- Now installs documentation
-- Removed old unused tables.c and tables.h sources
+commit 6abd7c2b1fbe2d88ed2a112d1ea7728a782f9a69
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Mon Nov 12 21:28:11 2018 +0000
 
+    Zero the whole of the data structure when calling twolame_init()
 
-Version 0.3.2 (2005-04-10)
---------------------------
+commit 2cca8d26da8aee0c177c8726c2353c62cd4eb492
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Mon Nov 12 21:27:12 2018 +0000
 
-- Added scaling of input samples
-- Added downmixing/upmixing of samples
-- Applied patch from Christophe Massiot to make TwoLAME thread-safe
+    Prefixed all global symbols with twolame_
+    To avoid conflicts when linking with libraries that have the same function names
+    (see #81)
 
+commit 86648c78e40c836012f9925aae947be854c4a5d5
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Mon Nov 12 20:27:45 2018 +0000
 
-Version 0.3.1 (2004-09-17)
---------------------------
+    Removed global variables in the slotinfo structure
+    (fixes possible thread safety problem)
 
-- Frontend displays information about the input file format
-- Fixed bug with audio_get_samples reading more than buffer size
-- Added asciidoc documentation
-- Added doxygen documentation
+commit 44ea171ccac71b659b55d3513a27f08f6021dbca
+Author: Elio Blanca <eblanca76@users.sourceforge.net>
+Date:   Mon Jul 2 11:11:41 2018 +0200
 
+    Updated NEWS for 0.4.0 release
 
-Version 0.3.0 (2004-09-14)
---------------------------
+commit 8d0479379aefe58ce8e875f4be65c3dfcddd8a47
+Author: Elio Blanca <eblanca76@users.sourceforge.net>
+Date:   Tue Jan 9 20:47:23 2018 +0100
 
-- Based on tooLAME 0.2m beta 8
-- changed build system to use automake/libtool
-- now builds shared library
-- restructured lots of code
-   * Removed some dead code and unused files
-- should now be close to being thread safe
-- removed memory leaks / static variables
-- changed library API so that it is almost the same as LAMEs
-   * hopefully not too many people have been using the old API
-   * not too many big differences
-   * will hopefully add resampling support to next release
-   * API is ready for resampling support to be added
-   * ready for downmixing to be added to libtoolame
-- Added libsndfile support to toolame frontend (if you have it)
-- moved set/get functions into get_set.c
-- I have broken energy levels support (sorry !) - will try and fix
-- Added LGPL header to the top of all the files
-- Added toolame_encode_buffer_interleaved
+    Check for freeform bitrate validity (#78)
 
+commit 9c36b6be0379587466086948662d9cc2cba48853
+Author: Stephen Hutchinson <qyot27@gmail.com>
+Date:   Fri Aug 4 21:35:33 2017 -0400
 
+    twolame.pc.in: use Cflags.private to pass -DLIBTWOLAME_STATIC
+
+commit 996a41d87871409585bd73c35f4aeee3fe2d9c6d
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Wed Nov 29 17:47:32 2017 +0000
+
+    Removed 'audioin' shim as the frontend only uses libsndfile now
+
+commit 89553077b07c702ce0266711b54559e58983a515
+Author: eblanca <eblanca76@users.sourceforge.net>
+Date:   Tue Nov 28 22:10:05 2017 +0100
+
+    remove disabled code
+
+commit efd74fe1660955875c86ea4261684cf41cb63e12
+Author: eblanca <eblanca76@users.sourceforge.net>
+Date:   Mon Oct 9 20:18:28 2017 +0200
+
+    Handle stdin using libsndfile
+
+commit a63de69bf83c53242a7fb783ff7e42537d28e430
+Author: eblanca <eblanca76@users.sourceforge.net>
+Date:   Sat Oct 7 00:08:10 2017 +0200
+
+    only use sndfile input module
+
+commit 3c701f5cdee5595ad5caf6e4c0b1100174000149
+Author: eblanca <eblanca76@users.sourceforge.net>
+Date:   Sat Oct 7 00:01:54 2017 +0200
+
+    remove audioin_raw
+
+commit d218b204aebd78b0ef1e39589a06f2fc9c655941
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Tue Nov 28 20:42:16 2017 +0000
+
+    Added test for encoding 22050 samplerate with bitrate of '0'
+    Verifying that the fix in #77 was successful
+
+commit 3a62e0f0c94905c1977fd176942598f0d4f741af
+Author: Elio Blanca <eblanca76@users.sourceforge.net>
+Date:   Tue Nov 28 21:36:54 2017 +0100
+
+    better fix for not allowed bitrate (#77)
+
+commit 7f46d44967632df2e57651333f29f57ecb51304d
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Tue Nov 28 20:19:54 2017 +0000
+
+    Fix for the NEWS file not being created before the news.html rule is triggered
+
+commit 1aaed88821958830972d18c0c3742b802ce657c8
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Tue Nov 28 20:19:15 2017 +0000
+
+    autogen.sh doesn't need to be in the distribution
+    It should create all the required files itself, so a tarball shouldn't need to be re-run
+
+commit d31d75aafdff0be9e241628338faef11bd13f4e6
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Tue Nov 28 12:20:36 2017 +0000
+
+    Added first version of a .spec file for twolame
+
+commit 86a2b5d6bef6e49574c0b70d903a3d77b1142e4a
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Mon Nov 27 23:08:08 2017 +0000
+
+    Ensure that twolame.1 is included in .tar.gz even outside of maintainer mode
+
+commit aec2c0e405af9012d283595838dfce890d989348
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Mon Nov 27 23:05:16 2017 +0000
+
+    Don't create empty NEWS / README files
+
+commit b801491a842b5e78d5d1be086a39c5bb462ca896
+Author: Elio Blanca <eblanca76@users.sourceforge.net>
+Date:   Mon Nov 27 22:30:40 2017 +0100
+
+    return exact frame size (#60)
+
+commit e5483241e514d50a9caa39408df916114360519b
+Author: Elio Blanca <eblanca76@users.sourceforge.net>
+Date:   Mon Nov 27 21:29:29 2017 +0100
+
+    protect against failed alloc (#67)
+
+commit b6ec24ddda827668baf3563fd80db6115a2e35f1
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Mon Nov 27 20:27:48 2017 +0000
+
+    Revert "Simplify loop in twolame_get_bitrate_index"
+    It is causing tests to fail.
+    
+    This reverts commit f66efb84cf7a3ac630c7cfb7f542891da33e7d2e.
+
+commit 4b1ae38b5fe223e4d64de64ca2d4cead7b068c5a
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Mon Nov 27 20:24:28 2017 +0000
+
+    Added test for checking that a bitrate of '0' returns an error status
+    (see #61)
+
+commit f66efb84cf7a3ac630c7cfb7f542891da33e7d2e
+Author: Elio Blanca <eblanca76@users.sourceforge.net>
+Date:   Mon Nov 27 21:26:00 2017 +0100
+
+    Simplify loop in twolame_get_bitrate_index
+
+commit 2b43d743b85a95cc97be5136b596620f56dbd5e6
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Mon Nov 27 19:52:37 2017 +0000
+
+    Tidied up whitespace in the copyright statement at start of files
+
+commit 0c741703f1471153e520eabbc08137ceab901d6d
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Mon Nov 27 19:48:54 2017 +0000
+
+    Tidied up whitespace alignment in twolame.h docblocks
+
+commit 47c9dd21f8c4c28e0104b50d1a0dacdc8d30d44e
+Author: Elio Blanca <eblanca76@users.sourceforge.net>
+Date:   Mon Nov 27 20:58:28 2017 +0100
+
+    avoid allocating 1kb (#69)
+
+commit 1085c88d29abaa7bd87843bd6663b51c66af579b
+Author: Elio Blanca <eblanca76@users.sourceforge.net>
+Date:   Mon Nov 27 20:24:11 2017 +0100
+
+    Another memory allocation removed (#70)
+    
+    * save memory with macros
+    
+    * safer allocation
+    
+    * avoid alloc in case of few bytes
+
+commit e65a97a31fdb5517ef13fe042a25e6781b8d4807
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Mon Nov 27 19:09:13 2017 +0000
+
+    Disabled output_md5sum for float32 test case
+    It was passing on some (Intel?) machines but failing on Travis
+
+commit b78d3c36a9d6f2f2ae93a2883f39070bb06b9f9a
+Author: James Almer <jamrial@gmail.com>
+Date:   Thu Oct 19 19:15:26 2017 -0300
+
+    Add Libs.Private to twolame.pc for static builds (#72)
+    
+    This is needed to properly resolve dependencies like libm
+    when linking to static builds of twolame.
+
+commit 57ff0760743fe3a2bb832ef856ba3d6627cb0774
+Author: Elio Blanca <eblanca76@users.sourceforge.net>
+Date:   Wed Oct 4 12:08:58 2017 +0200
+
+    unsafe alloc in parse_args (#68)
+
+commit 977c8ac55d8ca6d5f35d1d413a119dac2b3b0333
+Author: Elio Blanca <eblanca76@users.sourceforge.net>
+Date:   Wed Sep 27 10:28:55 2017 +0200
+
+    tiny aesthetic modifications (#62)
+
+commit 477393c9aad60b2b0db282ce7a65d56061f2e655
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Mon Sep 11 22:37:52 2017 +0100
+
+    Added test for encoding from float 32 WAV file
+
+commit 8510d54d9ca6a81168c3dc6b6f573c13aed61103
+Author: Elio Blanca <eblanca76@users.sourceforge.net>
+Date:   Mon Sep 11 23:06:41 2017 +0200
+
+    set libsndfile for auto scaling floating point input source (#59)
+
+commit b6a2fffa380fdfc3f9b95d3f27b2bec48d23499f
+Author: Sebastian Ramacher <sebastian+dev@ramacher.at>
+Date:   Wed Aug 30 00:46:27 2017 +0200
+
+    Fix spelling of 'occurred' (#57)
+    
+    Signed-off-by: Sebastian Ramacher <sramacher@debian.org>
+
+commit fb60b2ed8aa926e30c6a38c613fd4f6b3567a630
+Author: Aleksander Morgado <aleksander@aleksander.es>
+Date:   Sun Aug 6 17:05:29 2017 +0200
+
+    build: remove unneeded MAINTAINERCLEANFILES (#55)
+    
+    Otherwise build won't work when --enable-maintainer-mode used:
+        doc/Makefile.am:24: MAINTAINERCLEANFILES was already defined in condition TRUE, which includes condition MAINTAINER_MODE ...
+        doc/Makefile.am:10: ... `MAINTAINERCLEANFILES' previously defined here
+        frontend/Makefile.am: installing `build-scripts/depcomp'
+        Makefile.am: installing `./INSTALL'
+    
+    Fixes: 4554d1b32d04595f5fd11b99f0ca14779632ca1a
+
+commit ac1e61d24ba3cefc49138512ec4610d900a9c300
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Fri Aug 4 22:45:22 2017 +0100
+
+    Renamed NEWS to NEWS.md and changelog.html to news.html
+
+commit feac2d079e37acf6528bab7503c1234d6f01d60a
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Sat Apr 22 18:14:46 2017 +0100
+
+    Renamed ChangeLog file to NEWS
+
+commit 4554d1b32d04595f5fd11b99f0ca14779632ca1a
+Author: Aleksander Morgado <aleksander@aleksander.es>
+Date:   Fri Aug 4 23:25:17 2017 +0200
+
+    build: fix when maintainer mode disabled (#54)
+    
+    If maintainer mode is disabled explicitly, the build should succeed
+    skipping man pages and doxygen documentation. Currently this was
+    breaking because there were rules referencing built files out of the
+    MAINTAINER_MODE block.
+    
+    In doc/html, there shouldn't be rules requiring doxygen.css or any
+    other generated file out of the MAINTAINER_MODE block:
+    
+        make[2]: Entering directory '/home/aleksander/Development/clients/azimut/twolame/doc/html'
+        make[2]: *** No rule to make target 'doxygen.css', needed by 'all-am'.  Stop.
+        make[2]: Leaving directory '/home/aleksander/Development/clients/azimut/twolame/doc/html'
+        make[1]: *** [Makefile:480: all-recursive] Error 1
+        make[1]: Leaving directory '/home/aleksander/Development/clients/azimut/twolame/doc'
+        make: *** [Makefile:468: all-recursive] Error 1
+    
+    In doc/, there shouldn't be rules requiring twolame.1 or any other
+    generated file out of the MAINTAINER_MODE block:
+    
+        make[2]: Entering directory '/home/aleksander/Development/clients/azimut/twolame/doc'
+        make[2]: *** No rule to make target 'twolame.1', needed by 'all-am'.  Stop.
+        make[2]: Leaving directory '/home/aleksander/Development/clients/azimut/twolame/doc'
+        make[1]: *** [Makefile:480: all-recursive] Error 1
+        make[1]: Leaving directory '/home/aleksander/Development/clients/azimut/twolame/doc'
+        make: *** [Makefile:468: all-recursive] Error 1
+
+commit 45d63e093d23baf01fef5bab1d662c4d5d0cc76a
+Author: Elio Blanca <eblanca76@users.sourceforge.net>
+Date:   Fri Apr 21 23:56:49 2017 +0200
+
+    Fix padding (#48)
+    
+    * padding frames only when requested AND really needed
+    
+    * fix default for padding bit
+    
+    * better description for padding option
+    
+    * fix md5sum for encoding test
+
+commit ffb1c79014134f8cf6b78ab458ce564139b5f148
+Author: Elio Blanca <eblanca76@users.sourceforge.net>
+Date:   Mon Apr 10 12:01:24 2017 +0200
+
+    Add protection against failed alloc (#50)
+    
+    * avoid out-of-bound write
+    
+    * protect against failed alloc
+
+commit 5588681ddf82b7536e4c93ef02572cb34c9a8b6a
+Author: Elio Blanca <eblanca76@users.sourceforge.net>
+Date:   Tue Apr 4 14:55:03 2017 +0200
+
+    avoid out-of-bound write (#49)
+
+commit 0f6fc9c54ad40e3bd14dc2634612fd9bcae91861
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Sat Mar 25 20:07:15 2017 +0000
+
+    API doc corrections
+
+commit 6a4c35df95ac36822d4230086963fafcfd1277b5
+Author: Darrell Walisser <darrell.walisser@gmail.com>
+Date:   Sat Mar 25 15:59:02 2017 -0400
+
+    Fix compilation on mingw or mxe cross compiler (#47)
+    
+    * Fix compilation on mingw when static lib enabled
+    
+    * Add PACKAGE_URL for win32 build
+
+commit 3fc5a910b2cefd94e5f2dc2483dd35fc7586961f
+Author: Elio Blanca <eblanca76@users.sourceforge.net>
+Date:   Thu Mar 9 13:09:56 2017 +0100
+
+    allocate memory when needed (#46)
+
+commit 841346a138c15addd6d8d6964ec6f429d30a4b10
+Author: Elio Blanca <eblanca76@users.sourceforge.net>
+Date:   Mon Feb 27 19:51:40 2017 +0100
+
+    add table selection for freeformat encodings (#42)
+
+commit 6f36e6dd3f19a9159df73514d03dc4f011470c24
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Thu Feb 16 19:17:09 2017 +0000
+
+    Added —private-ext to twolame tool
+
+commit b859610b2eed995c7cc317f2679126cf41737a64
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Thu Feb 16 19:16:04 2017 +0000
+
+    Added twolame_get_original() and twolame_set_original()
+
+commit 2d1f76a729b76f42da35725c18d579e9527032d5
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Thu Feb 16 19:08:07 2017 +0000
+
+    Throw error if documentation tools aren’t available, if in maintainer mode
+
+commit ab63687dbd675ac8030f8e2a6b84a86a202b8138
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Wed Feb 15 21:19:31 2017 +0000
+
+    Applied default astyle changes
+    This will uses the default bracket style, 4 spaces per indent, and no formatting changes.
+    This will break the brackets for one line blocks and will break one line statements.
+
+commit 1f895f9abf13cccb2a01373c65b08b41a8957c84
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Wed Feb 15 21:04:50 2017 +0000
+
+    Converted tabs to 4 spaces
+
+commit d82deb36ad75a5cff919da4970582768f9ef06f3
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Wed Feb 15 20:34:39 2017 +0000
+
+    Removed $Id$ and $Log$ lines
+
+commit 72fbe051c30b73d430ac7390f0b246c629311505
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Wed Feb 15 20:31:19 2017 +0000
+
+    Updated copyright years to 2017
+
+commit e17eef941f47fd0fccd3d2beec9804112eda679a
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Wed Feb 15 20:28:26 2017 +0000
+
+    Removed $Id$ lines
+
+commit 2cdcd064aa340b30209d8a0e86cef5a22394b4d5
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Wed Feb 15 19:33:55 2017 +0000
+
+    Removed trailing whitespace
+
+commit 55af1a65187acff05520d7e0668303fba033c1fe
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Wed Feb 15 12:42:12 2017 +0000
+
+    Bumped version number up to 0.4.0
+
+commit f77da9c0a70eddddd81d1f35e7fff0cd3aaac4f9
+Merge: 98c323b 9ced21e
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Wed Feb 15 12:41:08 2017 +0000
+
+    Merge branch 'master' of github.com:njh/twolame
+
+commit 98c323b7fc68135d7aa3296e14dfa897e9b99117
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Wed Feb 15 12:34:14 2017 +0000
+
+    Defined PACKAGE_URL macro, and used it in the get_twolame_url() function (fixes #40)
+
+commit 9ced21e2ee3624657e1684456d717d21f48618c6
+Author: Elio Blanca <eblanca76@users.sourceforge.net>
+Date:   Sun Feb 12 13:17:40 2017 +0100
+
+    Fixed progress counter (#29)
+
+commit 470fd9f6537b326bbd610dce5da4f2e0b7ba1c45
+Merge: e884f0e f711af8
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Fri Feb 10 12:15:13 2017 +0000
+
+    Merge pull request #34 from eblanca/vbr_encoding_fixed
+    
+    Get VBR encoding work
+
+commit e884f0eb2f712c88f5452fec28d58a168a1dfa65
+Merge: 9941e41 5df31b2
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Fri Feb 10 12:14:16 2017 +0000
+
+    Merge pull request #30 from eblanca/faster_alloc
+    
+    Faster twolame_malloc
+
+commit 9941e417a041b9ced472b60c19a113745de31405
+Merge: 507bfb5 b72349c
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Fri Feb 10 12:11:22 2017 +0000
+
+    Merge pull request #32 from eblanca/cbr_bitrate_checks
+    
+    Check for invalid bitrate/channel usage
+
+commit 507bfb5fe361d0046672c7a131a38dfe9742f517
+Merge: bdc668f 2b85a73
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Fri Feb 10 12:10:15 2017 +0000
+
+    Merge pull request #31 from eblanca/faster_init_subband
+    
+    Faster init_subband
+
+commit bdc668f0e2ed177039bbada31d4a382790d25c1f
+Merge: 03a1a97 73dd2da
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Fri Feb 10 12:09:32 2017 +0000
+
+    Merge pull request #36 from eblanca/faster_sample_copy
+    
+    Faster sample copy
+
+commit 03a1a976470ef022ad8c7599d51c38ea37ce6e03
+Merge: 105228a eb83e9e
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Fri Feb 10 12:07:52 2017 +0000
+
+    Merge pull request #39 from eblanca/simple_write_bit_alloc
+    
+    Make operation clear
+
+commit 105228aa7f2cb928419796d5356ade5e1b5fd8c9
+Merge: aa41d43 4bfad36
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Fri Feb 10 10:16:37 2017 +0000
+
+    Merge pull request #38 from eblanca/better_warning
+    
+    Better warning about wrong channels
+
+commit aa41d43ec989e5f2c086a032e4d7861effcd56b9
+Merge: 483c138 cfda9ce
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Fri Feb 10 10:14:54 2017 +0000
+
+    Merge pull request #37 from eblanca/save_a_file
+    
+    Check library setup before creating file
+
+commit eb83e9eba51e26223cc71f1c76d162edd0ef1def
+Author: eblanca <eblanca76@users.sourceforge.net>
+Date:   Thu Feb 9 23:46:04 2017 +0100
+
+    make operation clear
+
+commit 4bfad3646f22c4d304fe883bf35f220f2d14ca60
+Author: eblanca <eblanca76@users.sourceforge.net>
+Date:   Thu Feb 9 23:43:23 2017 +0100
+
+    better warning about wrong channels
+
+commit cfda9ce33f72dba5c96eb9514c415eac4c72fa52
+Author: eblanca <eblanca76@users.sourceforge.net>
+Date:   Thu Feb 9 23:39:00 2017 +0100
+
+    check setup before creating file
+
+commit 483c138bbd55f48a082c3697f1672a681c31ecce
+Merge: 2acfc8d 1cae46e
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Tue Jan 31 23:02:50 2017 +0000
+
+    Merge pull request #35 from eblanca/tiny_status_fix
+    
+    better log message for VBR bitrate
+
+commit 2acfc8df0ce4132b4e16dfb5465aac50bbffb5b5
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Tue Jan 31 22:59:57 2017 +0000
+
+    Fixed asciidoc theme/stylesheet problem
+
+commit d6568640cb6c281069e8366f9c3aa01295ee4e20
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Tue Jan 31 22:59:38 2017 +0000
+
+    Use PATH_ASCIIDOC
+
+commit 18c47469dc96565730c6b52e5d11e2eab15022f7
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Tue Jan 31 22:59:20 2017 +0000
+
+    Corrected autoconf version number typo
+
+commit 7fff084310a3fb15ad1301b4ee6175da51bb4b36
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Tue Jan 31 09:51:27 2017 +0000
+
+    README is generated from README.md
+
+commit 35e338b0d00bb19556e04db77e5992e4a15391f6
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Tue Jan 31 09:21:46 2017 +0000
+
+    Added docs for mp2buffer_size in twolame_set_DAB_scf_crc()
+
+commit d047284140c1c40fe1a1549799154dccb3060aa7
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Tue Jan 31 09:21:22 2017 +0000
+
+    Updated Doxyfile using Doxygen version 1.8.13
+
+commit dba5e2add3175863c57ef111c6be88c7d53aeffc
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Mon Jan 30 22:49:23 2017 +0000
+
+    Added Travis build status badge
+
+commit 8fe36ade66ceb8675dfcadca38a5d65c2cbf90b6
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Mon Jan 30 22:42:41 2017 +0000
+
+    Added doxygen and asciidoc as dependencies to Travis
+
+commit df0a7592e9b637e48d1b4d73b37052db406f4275
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Mon Jan 30 22:38:39 2017 +0000
+
+    Travis only has autoconf version 2.68
+
+commit e7ef688b3cfe0044d9f884a9ed12324053a05663
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Mon Jan 30 22:12:04 2017 +0000
+
+    Added Travis file
+
+commit bda852c94fd2f84872b452b8547678e9f6e4e980
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Mon Jan 30 22:09:36 2017 +0000
+
+    Changed readme.html to depend on README
+
+commit 4ca471f7a1c393edb38e4ae8df3ef473376eac12
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Mon Jan 30 22:01:54 2017 +0000
+
+    Fix for README.md not existing once the tarsal has been made
+
+commit fc910e8f2a60233e15d0c8256193a7370068e0bc
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Mon Jan 30 21:44:42 2017 +0000
+
+    Fixes for running 'make check'
+
+commit df7fda0a06d79f06ac2c164667ed1037bf67139f
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Mon Jan 30 19:10:58 2017 +0000
+
+    Removed reference to todo.html
+
+commit 52b2f719d2d22a074fe3d682ba6a272eb07bfc11
+Merge: 1bab6d7 264534c
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Mon Jan 30 19:06:49 2017 +0000
+
+    Merge branch 'master' of github.com:njh/twolame
+
+commit 1bab6d727602c933affc1e691f10dc9a92bb0a0f
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Mon Jan 30 19:01:24 2017 +0000
+
+    Removed unhelpful TODO list
+
+commit 0bab42911d9a18f35bc66f4c9d3ebfeb24fce88a
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Mon Jan 30 18:57:49 2017 +0000
+
+    Added additional build-scripts files to .gitignore
+
+commit bbd8c3d13a38aec284155d3a0cc652966007c892
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Mon Jan 30 18:55:52 2017 +0000
+
+    Modernised configure.ac
+
+commit 0826d4d85554d9df96020147a1a9e661cbc825eb
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Mon Jan 30 18:42:36 2017 +0000
+
+    Fix for glopts->version being negative when not set
+
+commit 6add653da9511887d5043a52a9dfec6050d4b805
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Mon Jan 30 18:41:42 2017 +0000
+
+    Updated autogen.sh
+    https://github.com/dajobe/librdf/commits/master/autogen.sh
+
+commit 73dd2da5678749aa1943319f537679cbd665739e
+Author: eblanca <eblanca76@users.sourceforge.net>
+Date:   Sun Dec 25 23:39:27 2016 +0100
+
+    longer code but faster
+
+commit 264534c69dd45a14d74081630c8c5cc752afa901
+Merge: d7cfca4 34ea2f6
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Sat Dec 24 21:56:13 2016 +0000
+
+    Merge pull request #33 from eblanca/saving_integer
+    
+    An integer saved into twolame_get_bitrate_index
+
+commit 1cae46e867caa147701578b861f1b3126e1c9a38
+Author: eblanca <eblanca76@users.sourceforge.net>
+Date:   Sat Dec 24 01:26:52 2016 +0100
+
+    better log message
+
+commit f711af815f88d64cef299377e1e5b490352ccdab
+Author: eblanca <eblanca76@users.sourceforge.net>
+Date:   Sat Dec 24 01:23:08 2016 +0100
+
+    Get VBR encoding work
+
+commit 34ea2f64673b5be94c92233b843b412f20839049
+Author: eblanca <eblanca76@users.sourceforge.net>
+Date:   Sat Dec 24 01:13:05 2016 +0100
+
+    An integer saved into twolame_get_bitrate_index
+
+commit b72349cc91acc227e68ed603314756383c9d3bd0
+Author: eblanca <eblanca76@users.sourceforge.net>
+Date:   Sat Dec 24 01:08:22 2016 +0100
+
+    Check for invalid bitrate/channel usage
+
+commit 2b85a731eadb83241d390756ebd0a26c8c19e5c4
+Author: eblanca <eblanca76@users.sourceforge.net>
+Date:   Sat Dec 24 01:03:30 2016 +0100
+
+    Faster init_subband
+
+commit 5df31b2fea2d3459743dc334c13edd43e802a53f
+Author: eblanca <eblanca76@users.sourceforge.net>
+Date:   Sat Dec 24 01:00:21 2016 +0100
+
+    Faster twolame_malloc
+
+commit d7cfca4e8c7b6b2a47ecbd5c314733170edbff9c
+Merge: fed047a 63e7237
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Sat Nov 5 13:46:27 2016 +0000
+
+    Merge branch 'eblanca-master'
+
+commit 63e7237f6deef27c25babf55aae04d28b7a6aac3
+Merge: fed047a f0a758d
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Sat Nov 5 13:46:09 2016 +0000
+
+    Merge branch 'master' of git://github.com/eblanca/twolame into eblanca-master
+    
+    # Conflicts:
+    #       libtwolame/twolame.c
+
+commit f0a758ddbad50043f2f0f591197ba50c64ccc2d9
+Author: topolinik <eblanca76@users.sourceforge.net>
+Date:   Fri Nov 4 10:04:20 2016 +0100
+
+    Update frontend.c
+
+commit fed047af2eca370185d7a6b4d87a12df3157a063
+Merge: 420ddf5 c68ca8c
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Thu Nov 3 19:40:54 2016 +0000
+
+    Merge branch 'master' of github.com:njh/twolame
+
+commit 420ddf58f64f1c5bcc88f2c1a751cecd059ffe3e
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Thu Nov 3 19:40:49 2016 +0000
+
+    Added build-scripts/ar-lib to .gitignore
+
+commit 245bfc8e19bac998dda90495ecd92dc99f98ec5b
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Thu Nov 3 19:39:44 2016 +0000
+
+    Removed trailing whitespace from c/h files
+
+commit 58661aa4909caf73d9877ffa89745669d17873c3
+Author: eblanca <elioblanca@yahoo.it>
+Date:   Thu Nov 3 19:04:02 2016 +0100
+
+    Add free format encoding
+
+commit c68ca8c5e568cbcc123ddcd04f943542920688cd
+Merge: ea4ba37 abcfdfd
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Thu Nov 3 18:02:25 2016 +0100
+
+    Merge pull request #24 from eblanca/master
+    
+    Update get_set.c
+
+commit abcfdfd51ce97841d1d34a82cb2b7f708fa21616
+Author: topolinik <eblanca76@users.sourceforge.net>
+Date:   Thu Nov 3 17:12:26 2016 +0100
+
+    Update get_set.c
+    
+    Set error protection flag in any case.
+
+commit ea4ba37d1a493b7ce7b44a9f4744dde600037fba
+Merge: 34b4885 68f3a56
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Thu Nov 3 16:08:51 2016 +0100
+
+    Merge pull request #23 from eblanca/master
+    
+    Silence a gcc warning raised as an error
+
+commit 68f3a56b09e3f6217eb3de7ff7017a7d9923c007
+Author: topolinik <eblanca76@users.sourceforge.net>
+Date:   Thu Nov 3 15:56:24 2016 +0100
+
+    Update audio_wave.c
+    
+    Check wave read, use returned values from "fread" and make gcc happy.
+
+commit 34b4885b823427b7798a11f7b811fcabe23946f8
+Merge: cdec632 eba1e28
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Mon Oct 24 17:21:11 2016 +0200
+
+    Merge pull request #22 from lfam/master
+    
+    tests: Don't pass an array to stat.
+
+commit eba1e286f10e5ce15a08bd9fd556779ce9cce98b
+Author: Leo Famulari <leo@famulari.name>
+Date:   Mon Oct 24 01:51:33 2016 -0400
+
+    tests: Don't pass an array to stat.
+    
+    This fixes a test failure with Perl 5.24.
+
+commit cdec632252092f4ad424949686227c453c87b8db
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Thu Jul 7 13:58:39 2016 +0100
+
+    README formatting improvements
+
+commit 2443ec31c6f075325a1f8cf1dbc43761df02858a
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Sun May 15 10:11:12 2016 +0100
+
+    Changed source of HTML to README.md
+
+commit 728b08847cbc280dd118e0b164aae7ade3aa077c
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Sat May 14 23:51:04 2016 +0100
+
+    Added Makefile rule to copy README.md to README
+
+commit 48d2c58639dda257a29426a73c03f5abd4baa8f8
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Tue May 10 22:20:11 2016 +0100
+
+    Converted README to markdown
+
+commit 3fc98162e96de7b914e9f27543fae46eaf71a098
+Merge: 40c31af 29a88b5
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Mon May 12 21:32:56 2014 +0100
+
+    Merge pull request #19 from raspine/master
+    
+    Fixed return value
+
+commit 29a88b5c9385c0a5283c21d8bcada1a8eed81d8d
+Author: Jörgen Scott <jorgen.scott@factum.se>
+Date:   Mon May 12 08:01:03 2014 +0200
+
+    Added DAB utility methods for ScF-CRC handling
+
+commit 40c31afcf1f22c8a8bb778023004fa29137a3149
+Merge: c0b6b26 10853c4
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Sat May 10 23:56:16 2014 +0100
+
+    Merge pull request #18 from raspine/master
+    
+    Added DAB utility methods
+
+commit c0b6b267bdecc52b4271950408287169b6f8b47d
+Merge: f2e75ba fe2770b
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Sat May 10 23:55:15 2014 +0100
+
+    Merge pull request #11 from impulze/master
+    
+    Added --enable-sndfile option to configure script
+
+commit 10853c4a4c6981d48f185c064d6e9b292b3dabd6
+Author: Jörgen Scott <jorgen.scott@factum.se>
+Date:   Fri May 9 11:29:18 2014 +0200
+
+    Added DAB utility methods for ScF-CRC handling
+
+commit 96d49851f6d0c6dd39c5c44097c92bcfa5884a80
+Author: Jörgen Scott <jorgen.scott@factum.se>
+Date:   Fri May 9 11:25:17 2014 +0200
+
+    Added DAB utility methods for ScF-CRC handling
+
+commit f2e75ba4d75186a53dbb6fcaa6fd1d9c0d6996aa
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sun Aug 12 18:27:53 2012 +0100
+
+    Fixed gcc 4.7 compiler warnings - removed unused variables and type punning.
+
+commit 3c53c8509a8a88f35b5f6b0bd0cf777bf8cf1d2f
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sun Aug 12 18:14:19 2012 +0100
+
+    Added JavaScript files to the list of ignored files in HTML documentation.
+
+commit 988180a910bc668ca090071966573edd8cbf6bce
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sun Aug 12 18:05:43 2012 +0100
+
+    Fix for using STWOLAME_CMD environment variable, if set.
+
+commit 7fc83f0a95684913c81f17489ab402187556aff7
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sun Aug 12 17:24:33 2012 +0100
+
+    Removed unused but declared/set variables from encode.c
+
+commit f0b07be4f20950e4a9ee71536148342471e9608e
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sun Aug 12 17:23:06 2012 +0100
+
+    Fixes for newer versions of autoconf/automake
+
+commit 4431137466297ce4acb2fb3489106f8625dbdbe7
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Thu Mar 1 09:01:26 2012 +0000
+
+    Change to static initialisation tables flag, that might cause the tables to get re-initialised after repeated encodings.
+
+commit 3a78d2753a8c83db14db07d6d6ff3cc980d6261a
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Wed Jan 4 17:48:27 2012 +0000
+
+    Removed '_' from the Header Guard definitions.
+    https://www.securecoding.cert.org/confluence/display/seccode/DCL37-C.+Do+not+declare+or+define+a+reserved+identifier#DCL37-C.Donotdeclareordefineareservedidentifier-NoncompliantCodeExample%28HeaderGuard%29
+
+commit 59486e2f585a1e1655a6e59f9e0d57dc41b1038c
+Merge: 995a1f1 7f46f4d
+Author: Nicholas Humfrey <njh@aelius.com>
+Date:   Fri Aug 12 10:05:09 2011 -0700
+
+    Merge pull request #14 from kierank/master
+    
+    Valgrind warning fixes
+
+commit 7f46f4db0ed19773e9fbe2c81054acda4ae1caf8
+Author: Kieran Kunhya <kieran@kunhya.com>
+Date:   Sun Jul 24 14:49:15 2011 +0100
+
+    Silence valgrind warnings.
+
+commit 995a1f1fbeb1316879c43fc1165ec5f3ecb72c2f
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Wed Mar 23 22:38:32 2011 +0000
+
+    Prefixed the malloc() in the frontend with casts.
+
+commit da12846309ecdc6eda7682ab097447a522e058bf
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Wed Mar 23 22:47:14 2011 +0000
+
+    Moved assignment after declaration.
+
+commit fe2770bffb9da10b7a26c82a340c81299ff82c76
+Author: Daniel Mierswa <impulze@impulze.org>
+Date:   Wed Feb 9 00:16:25 2011 +0100
+
+    make sndfile dependency (and therefore the frontend) optional
+
+commit 212d6b801593b1ee0240fac88e7ae35488d8520f
+Author: Daniel Mierswa <impulze@impulze.org>
+Date:   Wed Feb 9 00:14:44 2011 +0100
+
+    use _LDADD instead of AM_LDFLAGS to fix dependency detection
+
+commit 53864e2041c47515f8424e2f205d4227f0525ca4
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Fri Jan 21 18:16:22 2011 +0000
+
+    Updated ChangeLog ready for 0.3.13 release.
+
+commit fb40e1c85dc145417ea23b92792654c79437f9e6
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Fri Jan 21 17:58:04 2011 +0000
+
+    Removed calls to exit() from libtwolame.
+
+commit e12f2fb2dbbd39fd23df4861a173048bbd4c8c9b
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Fri Jan 21 17:37:32 2011 +0000
+
+    Changed all debugging messages, writing to stdout to write to stderr instead, so that if there is an error while writing to STDOUT the data isn't corrupted further.
+
+commit 455b157d1d941e353f6532b17ab500b230401aed
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Fri Jan 21 17:09:48 2011 +0000
+
+    This is TwoLame, not toolame.
+
+commit 79c2813b983f462ce1c10a634087d6716ea73786
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Fri Jan 21 09:23:39 2011 +0000
+
+    Changed method that compiler warnings are set in maintainer mode. No-longer touches the CFLAGS variable, which is for users use only.
+
+commit a421713cd96403e9eac928e75e6aa81697be2b40
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Thu Jan 20 19:59:06 2011 +0000
+
+    Upgraded to Doxygen 1.7.3
+
+commit ae1798ff5747f08de4583850fae4878f7665bec3
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Thu Jan 20 09:51:15 2011 +0000
+
+    Removed debug message.
+
+commit 36ff6fc6914fe02e852e3da563628dcc3a7a3bf1
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Thu Jan 20 09:43:55 2011 +0000
+
+    Fixes for 'make distcheck' due to looking for binaries in the wrong directory.
+
+commit c2a0c64c9677cb26bc792b014886f17846dfa70d
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Thu Jan 20 09:38:19 2011 +0000
+
+    Explicitly list the files that should be in doc/dist10-text
+
+commit 1dc3ad162e1a184f3c9fa52705af097d431edd9f
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Thu Jan 20 08:49:28 2011 +0000
+
+    Updated HTML build system, so that it only builds in Maintainer Mode.
+    Moved build rules for HTML into doc/html/Makefile.am
+
+commit 2592fa88cfae06c704df445eb73bd67d5b3c9fbb
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Wed Jan 19 22:45:05 2011 +0000
+
+    whitespace and minor change to the Authors file.
+
+commit 58f19ecfd86bdded0e9d1383d6bc49d898358251
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Mon Jan 17 08:53:10 2011 +0000
+
+    Added trailing slash in link to the TwoLame homepage.
+
+commit 12b52c8e74f26fef0d155d15ab1bd124a70934fd
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Fri Jan 14 09:10:47 2011 +0000
+
+    Having problems with "extern inline" again. Decided to turn them into "static inline" and move them to a seperate header file which is included where required.
+
+commit 26844b47691bbb0cb82221e58e37281e576e0174
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Fri Jan 14 08:39:01 2011 +0000
+
+    Renamed the --enable-debug configure option to the more standard --enable-maintainer-mode
+
+commit 84fa912ed122b50162464d00a4b76f743589d202
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Thu Jan 13 23:20:23 2011 +0000
+
+    Moved compiler options to the end of the configure script, so that they don't interfere with autoconf tests.
+
+commit ed02fcb24a2272cfdbd9b2431dd8f52f0cd5a7d0
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Wed Jan 12 19:10:35 2011 +0000
+
+    Added test for the simple frontend
+
+commit ab7912fc1ee6b0b820e67536472711c084e8fd1d
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Wed Jan 12 19:09:56 2011 +0000
+
+    Changed the default encode settings for the simple frontend to be the same as the main frontent.
+
+commit 30932754518f67815591821b434e4cb9f5f3c463
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Wed Jan 12 18:56:50 2011 +0000
+
+    Write all console messages to STDOUT for the simplefrontend
+
+commit ec0d82f75e79fef0bdd74f40687739d52db49acf
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Wed Jan 12 18:51:39 2011 +0000
+
+    Added tests for turning on Error Protection
+
+commit ae550c13a959536dd76ecfb09fd3ad6dd66c3f9c
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Wed Jan 12 18:51:23 2011 +0000
+
+    Updated TODO list
+
+commit 211ea30cdd859552ec3245bd3a6ebd25f82e3298
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Tue Jan 11 23:23:49 2011 +0000
+
+    Added MP2 and raw files to .gitignore
+
+commit 4808ff269d08ef49053b99f877d7988d19557f5e
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Tue Jan 11 23:20:33 2011 +0000
+
+    Added a 22kHz testcase file.
+    Fixed bug in sample count calculation for MPEG-2 layer 2.
+
+commit 1b82dcbfeacbe7c8d32bbd2c7b5996e94cf854f2
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Tue Jan 11 19:36:07 2011 +0000
+
+    Added a test for encoding from STDIN
+
+commit 9802c3b024e60820fed2a98bbda226e1728afe96
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Tue Jan 11 09:49:44 2011 +0000
+
+    Added whole-file frame count / sample count checks.
+    Fixed whitespace issues.
+
+commit 4e7b81a131c4692e1b1e63d2ebe89c6aa285ca11
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Mon Jan 10 22:34:04 2011 +0000
+
+    Wrote a perl script to test the frontend tool.
+
+commit c8665f86ff2c20ea5cb056b0e954d6b5a5ed766e
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Mon Jan 10 18:59:52 2011 +0000
+
+    Added --non-copyright option, which is enabled by default, but makes command line option more complete.
+
+commit d74669864b6769eb7734c0a2ad7436d56932ce0e
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sun Jan 9 18:03:01 2011 +0000
+
+    Updated to autoconf 2.60, libtool 2.2 and automake 1.10.
+    Stole new autogen.sh script from Redland.
+    Now checking for C99 using autoconf.
+
+commit fdd95b2331e180372d8fb5e7115ddba65cdc5d1c
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Mon Jan 3 13:03:45 2011 +0000
+
+    Removing debian packaging - this is now down downstream by the debian project
+
+commit 85981c3552519b098e9037588537f68baa4ee953
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sun Jan 2 13:31:57 2011 +0000
+
+    Fix for bad copy/paste of variable assignment.
+
+commit c631491997bf224aced3d582ab1f491478f43ac4
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sun Jan 2 13:14:12 2011 +0000
+
+    Added check for malloc() returning NULL in format_duration_string()
+
+commit 9a1add73cd23ee6822361bab6ec4c3a8093a2bd2
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sun Jan 2 13:13:19 2011 +0000
+
+    Fix for autogen.sh script failing when build-scripts directory is missing
+
+commit 706d1edeb15700e2fa93b21f6945ac4b3e485082
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sun Jan 2 12:19:11 2011 +0000
+
+    Documentation correctation, thanks to http://sourceforge.net/users/ferd617/
+    http://sourceforge.net/tracker/?func=detail&aid=2998118&group_id=136040&atid=735435
+
+commit f14345868ecafa5bb45dd1415fb5cd4e9c54b721
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sat Jan 1 23:02:23 2011 +0000
+
+    Moved the build scripts into 'build-scripts' instead of 'build'
+
+commit bc7541a4fdbcb1fd923e3b2b6f93208cbc5fb936
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sat Jan 1 23:02:00 2011 +0000
+
+    Added a .gitignore file
+
+commit b391b47413106aac5d585724e9cd1937c302abc9
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sat Jan 1 22:53:14 2011 +0000
+
+    Changed formatting of text, so that it doesn't look like an asciidoc instruction.
+
+commit 8804d1654c0688618bf5596709c6291ad15af522
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Tue Sep 21 20:59:18 2010 +0000
+
+    Removed half written Mac OS X app
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@179 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit d965f05795fe5452cd352be746e7123f555de048
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Tue Sep 21 20:58:45 2010 +0000
+
+    Gave myself a middle initial
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@178 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit d7b6f39b19a5059fc1a811f53d126e15daccbe54
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Tue Sep 21 20:54:22 2010 +0000
+
+    Updated my email address
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@177 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 454ab65572eb6cd9ad1442788132e9fde410e169
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sat Mar 13 12:21:20 2010 +0000
+
+    Re-indented codebase.
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@176 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 11d2fdd5b73c4f34f91846d8cbbc02cb5aa32f3d
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Mon Mar 8 22:53:23 2010 +0000
+
+    Fixes for compiler warnings.
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@175 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 5a34862a718a33ece3f309318cca675745cde7bc
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Mon Mar 8 22:52:25 2010 +0000
+
+    Modernised configure script a little bit.
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@174 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 1a99e8d7692fee90380238755dd770a13bfe90aa
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Tue Sep 29 21:11:23 2009 +0000
+
+    Autoconf fixes
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@173 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit d8982ba78c83abb5e4062916a4a53707f60955bd
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sun Mar 2 23:47:44 2008 +0000
+
+    typo fix
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@172 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit e2635af6822053d71c7e381529efb7775a7cf4a8
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sun Mar 2 23:46:33 2008 +0000
+
+    Changed fopen options to wb to fix Windows
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@171 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 5727586e637dbfcc46a76379591cb603dcb296cd
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Wed Jan 9 17:41:18 2008 +0000
+
+    - Fixed documentation location (--docdir in configure)
+       * thanks to Chris Mayo for patch
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@170 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 5063c0fab737532bb270bede7a9a48b57896e711
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Wed Jan 9 15:21:22 2008 +0000
+
+    - Don't disable frontend if libsndfile isn't available?
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@169 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 49df3a6c684e91b420a985366906e7df34bba331
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Wed Jan 9 15:18:00 2008 +0000
+
+    Bumped up version number to 0.3.12
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@167 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 873be0ca0dedaae1c2a05f4f49173bb1ea409419
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Wed Jan 9 11:10:30 2008 +0000
+
+    Forgot to add frontend.h to distribution.
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@166 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 1ec7916a5cfc278a9f5331c9f1685af8d8b03078
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Tue Jan 8 01:45:43 2008 +0000
+
+    Bumped version number.
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@165 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 8ddc64227bc3d0f58615e93cadbab7a200c199cf
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Tue Jan 8 01:43:36 2008 +0000
+
+    Added brackets round macro for concistency and to help prevent wierd macro problems.
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@164 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 4e714f67d84ae8a412cdc736833996059a5cf712
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Tue Jan 8 01:41:52 2008 +0000
+
+    This patch from Matthew Sachs resolves the extern inline issue in
+    libtwolame for OS X Leopard and GCC >= 4.3. It builds correctly on linux
+    and GCC 4.1.2 as well.
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@163 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 1b71b38bb6c5d73d610785c68119f9271c39aefb
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Mon Jul 2 00:39:55 2007 +0000
+
+    Bug fix for twolame_get_mode_name() getting things wrong
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@162 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit a2020e1ed9b90370f50b2257a0132ca3dc9c35d9
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Mon Jul 2 00:36:01 2007 +0000
+
+    Cleaned things up a bit
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@161 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit b6698bd2183539394af5f579181ebf6729f72c52
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sun Jul 1 23:19:13 2007 +0000
+
+    Did some work on the frontend to make STDIN behave
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@160 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 64b76da3e9e2e6cca8c992a7d55faca648905dc3
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sun Jul 1 21:05:16 2007 +0000
+
+    Fix for the forthcoming gcc-4.3 (thanks to Martin Michlmayr)
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@159 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit afd138d3a0b43ee0bf19b70dbcbe162dad163887
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Thu Apr 12 13:51:11 2007 +0000
+
+    - Fixed energy levels bug for mono audio
+       * thanks to Staale Helleberg for patch
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@158 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 4b8ab613e214396d4c5de7e35f8fe475167da8da
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Tue Mar 20 23:57:35 2007 +0000
+
+    Changing to C89 caused all sorts of problems I didn't think about, so rolled back to old version.
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@156 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit c86cf6bbcab753b627c067b5fd83f617daaf25af
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Tue Mar 20 23:27:26 2007 +0000
+
+    Changed standards compliance from C99 to C89 to make it more portable
+    Added -pedantic to CFLAGS for debug build
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@155 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit d8d4a9a233e444d8c8aabe9bf40b83ff66cf1502
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Tue Mar 20 22:29:45 2007 +0000
+
+    Added an Id block to the top of all the source files.
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@154 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 2bae9c6fd04cc820dedcb4b2fc79280f4b1f6752
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Tue Mar 20 22:17:51 2007 +0000
+
+    Added Id: thingy
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@153 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit ca2dc75d83768b3899ee5b84b82bb614f6df7b9f
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Tue Mar 20 00:32:04 2007 +0000
+
+    A small contribution of the VLC team to fix the linking of libtwolame under Mac OS X.
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@152 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit de0c2bfade228123f62ea2e2a1fa62c8d1a755f2
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Mon Mar 12 20:19:04 2007 +0000
+
+    Fixed twolame_set_mode() to accept TWOLAME_AUTO_MODE
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@151 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit ef7dc68c5910222ab217e5d6b4e8a3ebeb34340c
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sat Mar 10 23:27:18 2007 +0000
+
+    Added twolame_encode_buffer_float32_interleaved()
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@150 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 9978b6cf3a5f15e2386ff0659306cba4b025b9b4
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sun Jan 7 21:33:17 2007 +0000
+
+    Fixed presentation of --enable-debug in configure script
+    Bumped version number up to 0.3.10
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@149 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit bf856987ccb5d536bf66db328bdd5fb2d512e809
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sun Jan 7 21:31:58 2007 +0000
+
+    Added win32/winutil.h to tarball - fixes bug #1629945
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@148 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 41f38295ddb2e62af6e79eed201784c26997a4bb
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sun Dec 31 03:20:51 2006 +0000
+
+    Credit myself as the current maintainer
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@147 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 85845d9f5b03efc63ed5c9cc7bca703bd6abfee3
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sun Dec 31 03:11:36 2006 +0000
+
+    Only specific files in win32 directory, so that svn files aren't put in dist archive
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@145 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 4a83345ece52929e2270ab447f067a0ffde0283b
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sun Dec 31 03:11:00 2006 +0000
+
+    Removed strdup because Linux doesn't like it (?)
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@144 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit e5a7317a9b90290ae9327790950cc4eb8e7aaabd
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sun Dec 31 02:54:11 2006 +0000
+
+    Cleaned up source code so that it uses tabs consistently (width=4)
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@143 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit d4f7ca952a8656547441ad7c38f889e389681cd2
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sat Dec 30 17:12:02 2006 +0000
+
+    There is still a problem with 44.1Khz and 22Khz and padding
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@142 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit f4f12b6cb2f2efb1c7e688c917bd35cf8776619b
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sat Dec 30 17:08:57 2006 +0000
+
+    Cleaned up doxygen documentation a bit.
+    Incremented copyright year.
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@141 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit b1ddea163962075be04c65cad2ba8db083f09806
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sat Dec 30 17:05:40 2006 +0000
+
+    MP2BUFSIZE -> MP2_BUF_SIZE
+    AUDIOBUFSIZE -> AUDIO_BUF_SIZE
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@140 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit aae7561f5e4eda29dbdded90e6a5655978c3db7b
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sat Dec 30 17:01:06 2006 +0000
+
+    Now using the new TWOLAME_SAMPLES_PER_FRAME macro
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@139 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 4b55bd757e5e03acd51f49dda75b87d9ebb0a712
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sat Dec 30 17:00:31 2006 +0000
+
+    Cosmetic changes
+     - displays duration of input file
+     - file size of output file
+     - total number of frames to be encoded
+     - percentage complete while encoding
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@138 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 9800bd979f9099e4ac1c6f18600b87991c6dee00
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sat Dec 30 16:55:44 2006 +0000
+
+    Incremented copyright year
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@137 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit f16a2d18f849e52ea61b854484890d577f93daf0
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sat Dec 30 16:53:39 2006 +0000
+
+    Added TWOLAME_SAMPLES_PER_FRAME to the public header.
+    Moved setting number of ancillary bits for energy levels to init_params
+    Added function twolame_get_framelength() to return length of generated frames in bytes.
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@136 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 0a31431bcf64b7cb058ab17d591a22c5e2d65891
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Wed Dec 27 22:14:03 2006 +0000
+
+    Stricter checks when calling twolame_init_params
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@135 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 2d962ae1aed05ae33c0d124f21d552466d8d1398
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Wed Dec 27 15:13:18 2006 +0000
+
+    Fix for energy level support - thanks to Staale Helleberg.
+    Changed the way the number of ancillary bits are set when using energy level extension.
+    Have also added a warning that DAB support is still broken.
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@134 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 1c52ba8ca7caad579f84aaa2e479cee529a65e10
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Wed Dec 27 15:01:11 2006 +0000
+
+    Now displays version of libsndfile when encoding.
+    Fix for potential buffer overrun in new_extension()
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@133 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 0f0fb8c92ef7ddf7c8e1eda69a5cb449be073776
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Wed Dec 27 13:11:39 2006 +0000
+
+    Modified the documentation Makefile so that it doesn't attempt to rebuild documentation automatically.
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@132 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 7d87ffe2af204b5e35823b86f867ebe16c81f36b
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Thu Oct 19 14:11:15 2006 +0000
+
+    Patch to add support for Win32 DLLs from Markus Meyer
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@131 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit ad7e331cf10151c5bf5fc3fa711aee881ec5e9d7
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Thu Oct 19 13:52:04 2006 +0000
+
+    Bug fix for Buffer overrun from Markus Meyer
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@130 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 5bf1fe405c3fc658df73665c1a64b541cea56d39
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Fri Sep 22 11:35:05 2006 +0000
+
+    Fix for Windows in simple frontend: open files in binary mode
+       * thanks to Kurien Mathew
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@129 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 50e85518e10b42fd638b5ac0f9f25673fcd8fa02
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Fri Sep 22 11:34:32 2006 +0000
+
+    psycho_2.h doesn't need to be here
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@128 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 4d30b5447cd6018e1ac24235472fc725fca8cec9
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Tue Aug 15 21:20:08 2006 +0000
+
+    Started XCode project for MacTwoLame
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@127 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 9a0bb1fa026d9e22bc77959953c455a4778ad516
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Wed Jul 12 19:16:54 2006 +0000
+
+    - Fixes for deferencing type-punned pointers problems.
+    - Changed memory allocation to macros (and file name and line)
+    - Bumped up version number.
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@126 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 607e45cb5de31eeb3e4efff2a91e733c74c84fdc
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Wed Jul 12 19:03:08 2006 +0000
+
+    Added samplesize to man page
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@125 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 09084be01db660a71db998396c0ee661d72611fa
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Wed Jul 12 19:00:18 2006 +0000
+
+    Old code - shouldn't be here
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@124 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 171f629fff7a96f570d0e50c21184733e7634f5f
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Wed Jul 12 17:29:15 2006 +0000
+
+    Changed that way Input format defaults are set
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@123 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit e4dfc75c0a52649e5c5fd17d88f11ec83bf8212f
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Wed Jul 12 17:12:28 2006 +0000
+
+    Added support for 8, 24, and 32 bit input samples.
+    Changed way STDIN is handled ('-' is just passed to libsndfile)
+    Now displays sub-type of input file.
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@122 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 320a5e6ed092d622583ac8bec489d18500f235f2
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Thu Jun 22 02:21:52 2006 +0000
+
+    pkg-config is no-longer required (but is recommended)
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@120 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 0cde7dff2d7c8828ea5e0b267d72ec120dd6501d
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Thu Jun 22 02:19:36 2006 +0000
+
+    pkg-config is no-longer required (but is still recommended) to build twolame frontend
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@119 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit c675c7e80574b6d8ae003983c889b990a705e7d9
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Wed Jun 21 00:41:02 2006 +0000
+
+    Changed from using fileno( stdin ) to macro STDIN_FILENO
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@118 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit d090dd50450b02f61f4670fd5c56bf367b11b91b
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Wed Jun 21 00:34:38 2006 +0000
+
+    Renamed configure.in to configure.ac and also fixed bug for OSes that have extensions on their binaries
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@117 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 49b5901e23ff6ba33b8c9ea43c926c10de3c1b1b
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Wed Jun 21 00:20:13 2006 +0000
+
+    Added -std=c99 to compile flags (thought I had done this already)
+    Also turned off optimizations when debugging
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@116 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 82152a79a5dacf177778ad184633a6872b55578c
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Mon Jun 19 19:53:47 2006 +0000
+
+    I did some tidying up too
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@115 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit ba00e96c4a5336e17eb44b9ab1dfd354e94256fa
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Mon Jun 19 19:34:47 2006 +0000
+
+    Simplified code by removing frame_info data structure, other minor cleanups
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@114 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 2904c79275c2d1b8d611e0062408441acc07f641
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Mon Jun 19 18:37:07 2006 +0000
+
+    Fixed CRC, yay!
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@113 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 6d512784d852255d1861576290f63a9d5e6f65e2
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Mon Jun 19 15:15:25 2006 +0000
+
+    Applied patch from "Mean"
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@112 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 4e357acb7a40108ce9f1b2c87e79e9e858213b0f
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Mon Jun 19 01:25:32 2006 +0000
+
+    Added variable names to prototype.
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@111 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 54f4de623667c8107991d084fc52237cdf221ce2
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Mon Jun 5 23:41:52 2006 +0000
+
+    Bumped up version number
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@110 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit e0e888f6c7a43643a44b0d75f88cf38fcd02a034
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Mon Jun 5 23:35:45 2006 +0000
+
+    The debian directory is no longer included in the source distribution.
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@109 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit aac91ccb6cf2e9d7abad42d2afe9f98704c22893
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sun May 7 17:53:54 2006 +0000
+
+    Bumped up to version number 0.3.7
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@106 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit ac316eb5db36a228aee5a63bc5b2a71e95ddcb2d
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sun May 7 04:00:18 2006 +0000
+
+    Added float32 support
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@105 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 66d4164e28e8f0a5095c284bf3cc96420f547e2a
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sun May 7 03:59:33 2006 +0000
+
+    Fix for AMD64 crash from MeanX
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@104 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit a229af5fc165330429d0f39fa3cc6dd289c5789d
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Thu Jan 26 10:46:37 2006 +0000
+
+    Added library versioning.
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@103 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 5e06be195f4a55973bf9455b3bd433a0f4ceab2a
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Wed Jan 25 23:04:33 2006 +0000
+
+    Bumped up version number to 0.3.6. Minor changes to build system.
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@102 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit b2cc3233c776e42a9080b428f6bcb8f2198f2080
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Wed Jan 25 22:33:33 2006 +0000
+
+    Fix for bug #1414982, reported by Akos Maroy
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@101 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 132c9571c77a8ff99a4b4bd404859b4672afb7cc
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Wed Jan 25 19:47:12 2006 +0000
+
+    Removed some whitespace to fix some autoconfs
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@100 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit d36a5eba5b0baef697ea592592a882aa43b44c33
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Thu Dec 1 15:52:00 2005 +0000
+
+    arg! And forgot to change version number in main ChangeLog too :(
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@99 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit d55cb534fef446fa5dc465479644e0784eb8577a
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Thu Dec 1 15:31:49 2005 +0000
+
+    Why do I aways forget to update the Debian changelog ? :(
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@98 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 62db19fc1973797f9c186c1d53405e23ed4d9092
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Tue Nov 29 01:12:02 2005 +0000
+
+    Don't install twolame.1.txt after all.
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@97 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 3257202b60e1b045ecaed799cb56702e51dc67f8
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Tue Nov 29 01:05:56 2005 +0000
+
+    Install more of documentation
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@96 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 26707497f7d058658b2b3d1ee786987e688482ab
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Tue Nov 29 00:45:06 2005 +0000
+
+    Bumped version number.
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@95 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit f0bb47f6864b97ccc5b3bc5b9276c6181488432e
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Tue Nov 29 00:42:32 2005 +0000
+
+    oops
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@94 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit a92c03b56d4d5161cba91fc88f0b2c4730a9be1c
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Mon Nov 28 23:57:11 2005 +0000
+
+    Added back twolame_set_VBR_q/twolame_get_VBR_q which were removed accidentally (but they are deprecated).
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@93 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 0f2aa70f81200b3085d05428cc6939ae8fb43b91
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Mon Nov 21 12:53:05 2005 +0000
+
+    Don't include CVS dir in distribution
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@92 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit a64b92ed07eb5e770916be64c733ff90c5b2a388
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Mon Nov 21 12:39:13 2005 +0000
+
+    Install HTML is right place
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@91 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 2c08a8c70047d9a5573f8ab02ce0c4918562f902
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Mon Nov 21 12:35:56 2005 +0000
+
+    Install twolame CSS files
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@90 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 501f64837a4c676805dcbda8eef0fee5e79c8b70
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Mon Nov 21 12:30:30 2005 +0000
+
+    Remove junk from packages
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@89 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 5c96067d4f769a26bac55be27513db8b636bc929
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Mon Nov 21 12:27:56 2005 +0000
+
+    hm
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@88 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 2bed645b8f29aa00be85ccee02a72a480b4522ce
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Mon Nov 21 12:14:28 2005 +0000
+
+    Updates to debian package for new release
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@87 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit f5beee0346cc41ae8bf53d5c452cb5f5ceeed10c
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Mon Nov 21 11:59:12 2005 +0000
+
+    asciitext.conf is no-longer needed
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@86 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit c05480d82980e0bb7452b661a6a503445c2ef0c8
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Mon Nov 21 11:55:18 2005 +0000
+
+    twolame_globals.h was merged into common.h
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@85 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 8aac212c51d6cbad0b32d72f14346a8f304481df
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Mon Nov 21 11:50:59 2005 +0000
+
+    bootstrap.sh is now autogen.sh
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@84 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit a380ffb6c73440e0bfa6f2b684d0594533d1827e
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Mon Nov 21 10:53:30 2005 +0000
+
+    Don't allow twolame_set_* after twolame_init_params() has been called
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@83 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit ca478497f10ebcbd23ad4a95121749fb36751df0
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Mon Nov 21 10:52:38 2005 +0000
+
+    Final few adjustments to code order and commandline options.
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@82 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit b05fbe83d4aa99019a6e59118e0121edeb22e3da
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Mon Nov 21 10:51:26 2005 +0000
+
+    correction after changing vbr_level api call
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@81 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 893393129de6e780fe4450d14dcba1a55027707b
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Mon Nov 21 10:48:06 2005 +0000
+
+    Manpage is ready for release.
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@80 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit e1873244e91ca54b69886c6f7fcf54b1f04aaaed
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sun Nov 20 23:37:20 2005 +0000
+
+    Renamed VBR level API call. Changed the default VBR level to 5.0. Documented recommended range.
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@79 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 29520d52954cf5a6a6377fd331c8842219823f76
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sun Nov 20 23:36:07 2005 +0000
+
+    made some of VBR debugging send to stderr instead of stdout
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@78 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 4ea5b05c3961889d8caab4acff26a39f84ce121c
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sun Nov 20 00:56:14 2005 +0000
+
+    Checks for errors when calling init_params
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@77 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit b059cb9616eed0c1f2dd7317683381e66f20dda3
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sun Nov 20 00:53:14 2005 +0000
+
+    Refinements to the frontend - some code moved to libtwolame
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@76 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit fd462769e096344408e4916b733ad4688de35521
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sun Nov 20 00:52:35 2005 +0000
+
+    Made the default configuration option more dynamic - they change depending on the input settings.
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@75 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit d179a7a7797497b5d7ddfa09fad886dfd39c2189
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Fri Nov 18 16:58:49 2005 +0000
+
+    Typographics corrections.
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@74 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit bdf45d133ad426315516ce9a25c0c825b894bfa7
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Fri Nov 18 16:56:49 2005 +0000
+
+    Frontend man page is making progress...
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@73 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 47a520131054fabcf3fa4f2c05fa07519115832d
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Fri Nov 18 01:26:20 2005 +0000
+
+    Added to documentation of the changes in version 0.3.4
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@72 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit e80983842a8d69286e7b4246880f96c695cff52e
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Thu Nov 17 19:28:35 2005 +0000
+
+    Updated documentation for twolame_print_config()
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@71 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 84731833feb75a1ad185fcdcf0fc32b4bfa096ca
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Thu Nov 17 17:21:09 2005 +0000
+
+    Frontend is now complete - just needs documented.
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@70 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 9ead9bca3eef62570c8cd7fa0c0cdacb03539f46
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Thu Nov 17 17:20:08 2005 +0000
+
+    Display different amounts of information in twolame_print_config() depending on the verbosity
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@69 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 9e150e23bdc088088a32d1a3082026b86268d4de
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Thu Nov 17 17:16:11 2005 +0000
+
+    Adjusted which messages get deplayed with default verbosity
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@68 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 53953fd1fd5f6abba06e7ca4fbe2e206d6afd768
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Thu Nov 17 17:14:11 2005 +0000
+
+    Check more parameters
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@67 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 3291c98bab289433364f64b10732c7efbe642a72
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Thu Nov 17 17:13:41 2005 +0000
+
+    * Add more feedback to frontend
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@66 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 15437c2e01eb9c4bc47d390b2e29329a03dc9fe6
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Thu Nov 17 12:04:13 2005 +0000
+
+    news.html renamed changelog.html
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@65 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 90a57c04939e348a6b0158a1810caeb2ba557e18
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Tue Nov 15 17:13:36 2005 +0000
+
+    Updates to TwoLame documentation
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@64 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 3711c574765ca2e655009e69200cc05a50ea1efa
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Tue Nov 15 17:13:17 2005 +0000
+
+    Added range to documentation
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@63 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 387aaa3231c081a5be9f51d3040fd3a75da17384
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Tue Nov 15 16:06:28 2005 +0000
+
+    Ooops dist10 sources wern't actually getting distrubuted
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@62 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 28391ed1c2d4cd051f280d1d20225cee8742ecdb
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Tue Nov 15 16:04:26 2005 +0000
+
+    Changed suffix for files.
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@61 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit a281adadc9b13a3bc3d854263961006fbd741e26
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Tue Nov 15 15:33:01 2005 +0000
+
+    mkdir isn't needed because html directory has files in it down
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@60 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 66ddeb7e3d9335fe08adf6c8f1722f9e775694e9
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Tue Nov 15 15:27:42 2005 +0000
+
+    New build system, using asciidoc version 7.
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@59 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 9132cce010d86858d78e712f93ab615ec7a4aa0b
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sun Nov 13 15:43:59 2005 +0000
+
+    Sorted out the command line options a bit more.
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@58 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 648be94ad54b29ba78f09730b058ddfb1afec002
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sun Nov 13 15:11:14 2005 +0000
+
+    Original by default.
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@57 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 5138e77cacf275f3ef41184e363d2bf86c456ddc
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sun Nov 13 14:38:08 2005 +0000
+
+    Version 1.7 of automake is recommended
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@56 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 15bc01f5f205ec5ddf3ac85293f2bec7cb0c877d
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sun Nov 6 23:51:30 2005 +0000
+
+    New frontend is making good progress. Moved some checking code to libtwolame.
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@55 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 1313f17a8ab2b2242af4418153814847b4e7d823
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sun Nov 6 00:54:13 2005 +0000
+
+    oops
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@54 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 13545e0317aae8c6d94ca0532070f9e7c801f416
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sun Nov 6 00:47:59 2005 +0000
+
+    Sanetised configure.in a bit and added check for version 1.7 of automake
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@53 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 122e3bbd2cc6c508680d6f64a9367d3939514209
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sun Nov 6 00:45:16 2005 +0000
+
+    Enable debugging by default when running autogen.sh
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@52 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 5fc827b293df53c412dd14930ee6bef1583f5b9a
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sun Nov 6 00:44:02 2005 +0000
+
+    Check for pkg-config in autogen.sh
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@51 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit b8b37d8466ebd98529eda4394ef183a888c9a85b
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Fri Nov 4 15:17:56 2005 +0000
+
+    Made a few changes to verbosity, and did more to getopt
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@50 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 91dcc14c4b481d57949de60e20d85395f1560809
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Mon Oct 31 01:19:12 2005 +0000
+
+    Started work on getopt_long support.
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@49 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit dde499a64d7e17321dd4db65887278675f1f0742
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Mon Oct 31 01:18:38 2005 +0000
+
+    Don't compile frontend unless getopt.h is available
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@48 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 961d507e45b25a2ee9dc588d9942959674a3cded
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sun Oct 30 18:15:28 2005 +0000
+
+    It encodes again!
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@47 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 1f04a4a9cbf8b4b42f6518d15a8d99a07df73374
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sun Oct 30 18:15:07 2005 +0000
+
+    Errors should be caught, not just terminate the program.
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@46 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 4bff9681f742709141fc9c7583d6afacd5f14ef3
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sun Oct 30 18:13:14 2005 +0000
+
+    Changed message to say LibTwolame
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@45 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 157d122c9eb0b6b4623501b3f2797220e601e4ea
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sun Oct 30 01:53:40 2005 +0000
+
+    Got new file opening functions working.
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@44 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit ac4a595880e01df5399a7c27a92ca06ca158e44e
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Fri Oct 28 18:09:15 2005 +0000
+
+    Frontend doesn't work, but it does compile now
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@43 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 59fb25765b8fdcae04454390f35e0e31cec8ee09
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Fri Oct 28 18:08:52 2005 +0000
+
+    Updated website address
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@42 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit aa2325559fe52d595d45ac7c19188405c47208e0
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Fri Oct 28 18:06:29 2005 +0000
+
+    Changed website URL
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@41 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit cb6658aa12fb4ddb4f2a9d7a88c1ac74fac38267
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Fri Oct 28 17:50:39 2005 +0000
+
+    Temporary file
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@40 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 57ab408f7f4a1a3f3f62e13c179a8b91ed0bdc44
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Fri Oct 28 17:14:41 2005 +0000
+
+    Couple of minor changes to fix compile errors
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@39 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 83e527435af9a3147fae18261e4c8eadda5cfb18
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Fri Oct 28 16:43:06 2005 +0000
+
+    Corrections that were causing warnings in GCC 4
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@38 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 6372db8e19044649ba6b712d757d3e2ff2218e1a
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Fri Oct 28 16:11:53 2005 +0000
+
+    Added comment
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@37 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 0cbe13855780112172a0309d0ceed87b27a22768
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Wed Oct 26 21:05:55 2005 +0000
+
+    Copied accross from /src/libtwolame/Makefile.am
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@36 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 41b032cf9db351bf70f8675e316733a6e16c07aa
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Wed Oct 26 20:56:17 2005 +0000
+
+    Moving simple frontend from /src to /
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@35 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 8f0f5e0b159509a8fa350af6b547258b0c8b2c52
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Wed Oct 26 20:49:16 2005 +0000
+
+    I'm not sure that these generated files should really be here.
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@34 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit ed0e021711d1c5f286eb399a440ecd6936f25ef5
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Wed Oct 26 20:45:37 2005 +0000
+
+    Removing files from old src location
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@33 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit dfbf3c3022b519b6c1389bec86d93cc44be313db
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Wed Oct 26 20:45:19 2005 +0000
+
+    Removing files from old location
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@32 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 7cf72150d5eb7f4dd98e757a1e9de07c4c1bfe1e
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Wed Oct 26 20:33:37 2005 +0000
+
+    Moved libtwolame from src to /
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@31 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit e8acef8a10f56be26803f5228ab460cd8440fdb8
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Wed Oct 26 20:01:40 2005 +0000
+
+    Frontend source code moved to root directory.
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@30 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit daf951e1555ed7ce8d3ebe5e5a480ff40bacde4c
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Wed Oct 26 19:57:01 2005 +0000
+
+    New location for frontend source code.
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@29 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 14b56a9bd178e3bb472c0894c017c6a28431eed0
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Wed Oct 26 19:50:36 2005 +0000
+
+    Commiting changes I was working on a while ago.
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@28 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 798cab57900a284216d30e8adda737bc24f677d8
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Thu Aug 11 13:49:58 2005 +0000
+
+    Renamed bootstrap.sh to autogen.sh  and added a few extra checks
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@27 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit a0035b377f32889e05f000f715915a1ce2f212d3
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Thu Aug 11 11:57:10 2005 +0000
+
+    Oops - corrected URL in copyright file.
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@26 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 0f72e9a9611d1c03b4032fab1dd9d41a84e09613
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Thu Aug 11 11:52:10 2005 +0000
+
+    Renamed NEWS to ChangeLog
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@25 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit ae9de2717ad5654a1a6312b49dc7c086ca0740c6
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Thu Aug 11 11:48:19 2005 +0000
+
+    Only use libsndfile for frontend (none of our own audio file format code)
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@24 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit baf5754caa96a549a8ec39cbbada7080779c0146
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Thu Aug 11 11:47:18 2005 +0000
+
+    Only build frontend if libsndfile is available
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@23 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit b348ae3a2689301420b074ab0958b0da99a68679
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Thu Aug 11 11:45:03 2005 +0000
+
+    Small textual change: sndfile -> libsndfile
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@22 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 85ed6ab34405d273068e56854226c5b454958621
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Thu Aug 11 11:43:39 2005 +0000
+
+    Doesn't actually say anything useful
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@21 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 34a33d2092dbe48d7a933e83d05c393e2fe2acf1
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Thu Aug 11 11:42:34 2005 +0000
+
+    Be less strict about the files in the distribution
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@20 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 43cebc54fb7258215c9adcb89ba13d78dc28605c
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Thu Aug 11 11:40:54 2005 +0000
+
+    Create the (empty) build directory if it doesn't exist
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@19 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 9006b5ead3010f71bad0434e04fa6a75f885aa5f
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Thu Aug 11 11:34:55 2005 +0000
+
+    Removed common.h merge (done)
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@18 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 34a919619ee7f50436d7f180e04b915569228909
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Thu Aug 11 11:33:48 2005 +0000
+
+    Incremented version number ready for next release
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@17 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 7308b54fe835d1c330c45f60dd41421c4327dfbc
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Wed Aug 10 19:27:49 2005 +0000
+
+    Fix for compiling against C++ code
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@16 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 88f4b8d8c86865cd10ce36338deca47c20144c88
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Mon May 23 16:09:37 2005 +0000
+
+    Removed lots of exit() and replaced with functions returning -1
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@15 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit b0764c0e429660787b6ce32472d3e373590db3a7
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sat May 21 22:24:27 2005 +0000
+
+    Bug reported by Gianluigi Tiesi - wrong symbol names in get_set.c
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@14 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit af8ae0d8f3c7965da380ee1c15be60971e4b7668
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Mon May 9 16:42:53 2005 +0000
+
+    Merged twolame_globals.h into common.h
+    Moved version.c and some functions in twolame.c into utils.c
+    Checking parameters a bit better.
+    Added twolame_print_config
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@13 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit fc25f3c9e6f709aaf4bc4f053ee630414f300076
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Mon May 9 15:45:51 2005 +0000
+
+    Merged into common.h
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@12 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 30e1827f11075dba5ed721c27b4b2e695697d839
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Mon May 9 15:03:12 2005 +0000
+
+    Merged into twolame.c
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@11 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit c36bfa98ed7e91ba60550b178c0adbd509e45496
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Tue Apr 19 17:15:02 2005 +0000
+
+    Added MAN page to EXTRA_DIST
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@10 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 5b7e29bdc90c2c4dbfef9d27b9a672ed71b68e4b
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Tue Apr 19 16:50:36 2005 +0000
+
+    ChangeLog is included automatically anyway
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@9 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 4b5b11d6e0473b1d3b050c90d0dea6a065594846
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Tue Apr 19 16:41:04 2005 +0000
+
+    Finished making Debian package and documentation build changes.
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@8 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 3dade9d4c0506e84b9c52a74e4dab6e1f4223ef5
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Tue Apr 19 13:34:08 2005 +0000
+
+    Minor Debian package fix.
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@7 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 7d86fa79fae0f11d0949b22588990840eb4a562d
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Tue Apr 19 13:08:15 2005 +0000
+
+    Updated Debian package and "make install" installs HTML documentation
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@6 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 75c0f85adfb082ec86cd85204a4de29d286d8d31
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Tue Apr 19 12:31:44 2005 +0000
+
+    Added starts of a Debian package, and a manpage.
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@5 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit a1ff0a3d699a240dfb2e3a272c84d1185bb13971
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sat Apr 16 17:10:12 2005 +0000
+
+    Completed removal of old tables.c and tables.h code
+    Added new get_alloc_table_bits() function to encode.c, for use by crc.c.
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@4 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 27b990e880ecf6ec7c5d11f570e2c5734b6084c8
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Sat Apr 16 01:13:01 2005 +0000
+
+    Minor typographical fix.
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@3 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 5f3700de03bdf33884411af90275dab92fa11403
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Fri Apr 15 01:10:16 2005 +0000
+
+    Initial revision
+    
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@2 24616d55-7714-0410-b2f5-c000b2ba9aa2
+
+commit 2f17a10a8549bfc14e22b8d103f06454b9938b25
+Author: Nicholas J Humfrey <njh@aelius.com>
+Date:   Fri Apr 15 01:10:16 2005 +0000
+
+    New repository initialized by cvs2svn.
+    
+    git-svn-id: https://twolame.svn.sourceforge.net/svnroot/twolame/trunk@1 24616d55-7714-0410-b2f5-c000b2ba9aa2

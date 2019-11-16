@@ -1,3 +1,21 @@
+2019-07-15 v1.8.1 "Orpington Duck"
+  This release collects incremental improvements to many aspects of the library.
+
+  - Upgrading:
+    VP8E_SET_CPUUSED now accepts values up to 9 for vp9.
+    VPX_CTRL_VP9E_SET_MAX_INTER_BITRATE_PCT had a spelling fix (was VP8E).
+    The --sdk-path option has been removed. If you were using it to build for
+      Android please read build/make/Android.mk for alternatives.
+    All PPC optimizations have been disabled:
+      https://bugs.chromium.org/p/webm/issues/detail?id=1522.
+
+  - Enhancements:
+    Various changes to improve encoder rate control, quality and speed
+      for practically every use case.
+
+  - Bug fixes:
+    vp9-rtc: Fix color artifacts for speed >= 8.
+
 2019-01-31 v1.8.0 "Northern Shoveler Duck"
   This release focused on encoding performance for realtime and VOD use cases.
 

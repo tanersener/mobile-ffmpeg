@@ -918,7 +918,7 @@ static void get_tree_codes(uint32_t *codes, Node *nodes, int idx, uint32_t pfx, 
         codes[idx] = pfx;
     } else if (idx >= 0) {
         get_tree_codes(codes, nodes, nodes[idx].child[0], pfx + (0 << bitpos), bitpos + 1);
-        get_tree_codes(codes, nodes, nodes[idx].child[1], pfx + (1 << bitpos), bitpos + 1);
+        get_tree_codes(codes, nodes, nodes[idx].child[1], pfx + (1U << bitpos), bitpos + 1);
     }
 }
 
@@ -1117,6 +1117,13 @@ static int decode_frame(AVCodecContext *avctx, void *data,
     frame->key_frame = s->key_frame;
     frame->pict_type = s->key_frame ? AV_PICTURE_TYPE_I : AV_PICTURE_TYPE_P;
 
+    if (!s->key_frame) {
+        if (!s->prev_frame->data[0]) {
+            av_log(avctx, AV_LOG_ERROR, "Missing reference frame.\n");
+            return AVERROR_INVALIDDATA;
+        }
+    }
+
     if (header) {
         if (avctx->codec_tag == MKTAG('A', 'G', 'M', '0') ||
             avctx->codec_tag == MKTAG('A', 'G', 'M', '1'))
@@ -1186,10 +1193,6 @@ static int decode_frame(AVCodecContext *avctx, void *data,
         else
             ret = decode_intra(avctx, gb, frame);
     } else {
-        if (!s->prev_frame->data[0]) {
-            av_log(avctx, AV_LOG_ERROR, "Missing reference frame.\n");
-            return AVERROR_INVALIDDATA;
-        }
         if (s->prev_frame-> width != frame->width ||
             s->prev_frame->height != frame->height)
             return AVERROR_INVALIDDATA;

@@ -300,4 +300,69 @@ static const uint8_t kEd25519PrivateKeyDER[] = {
 	0xe5, 0xb4, 0x5f, 0x9b, 0xd7, 0xa6, 0xf8, 0x36, 0x0c, 0x92, 0x59, 0x70
 };
 
+/* Raw public-key key material for testing */
+static char rawpk_public_key_pem1[] =
+	"-----BEGIN PUBLIC KEY-----\n"
+	"MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAyAeBq7Ti7oVExeVT1PqH\n"
+	"GBXzC+johdeVnZgZRLhDTIaIGODV5F5JhE4NNb1O/DYLlAy5IIO8tfAE2KIxlarN\n"
+	"H/+AcfV6ZJQSG4SSmhoIGzfdcdjuBmFfdfhO+z/cgqiewh53/fFCQlaJweHhpmim\n"
+	"/LVL/M/1Rd6Urskv/5jXGG4FVUNfhXKQag0uzWsqcztCPX7Lrqr2BSOmkA1nWzdo\n"
+	"h5oBuxdooaH9/kwphqJAp03LwtaSStX/yz6Mh+ZqEbBuM4mWw/xKzbEbs7zA+d8s\n"
+	"ryHXkC8nsdA+h+IRd8bPa/KuWQNfjxXKNPzgmsZddHmHtYtWvAcoIMvtyO23Y2Nh\n"
+	"N4V0/7fwFLbZtfUBg4pqUl2ktkdwsNguTT1qzJCsYhsHXaqqvHy+5HR2D0w07y2X\n"
+	"1qCVmfHzBZCM5OhxoeoauE+xu+5nvYrgsgPE0y5Nty0y2MrApg3digaiKUXrI+mE\n"
+	"VKn9vsQeaVvw9D6PgNQM99HkbGhRMGPOzcHjS/ZeLd1zAgMBAAE=\n"
+	"-----END PUBLIC KEY-----";
+
+const gnutls_datum_t rawpk_public_key1 = {
+	(unsigned char*)rawpk_public_key_pem1,
+	sizeof(rawpk_public_key_pem1) - 1
+};
+
+static char rawpk_private_key_pem1[] =
+	"-----BEGIN RSA PRIVATE KEY-----\n"
+	"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\n"
+	"-----END RSA PRIVATE KEY-----\n";
+
+const gnutls_datum_t rawpk_private_key1 = {
+	(unsigned char*)rawpk_private_key_pem1,
+	sizeof(rawpk_private_key_pem1) - 1
+};
+
 #endif

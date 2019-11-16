@@ -32,17 +32,19 @@
 #include "inter.h"
 #include "kvazaar.h"
 
-#define FILTER_SIZE 8
-#define HALF_FILTER (FILTER_SIZE>>1)
+#define KVZ_LUMA_FILTER_TAPS 8
+#define KVZ_LUMA_FILTER_OFFSET 3
+#define KVZ_CHROMA_FILTER_TAPS 4
+#define KVZ_CHROMA_FILTER_OFFSET 1
 
-// Maximum extra width a block needs to filter 
-// a fractional pixel with positive fractional mv.x and mv.y
-#define KVZ_EXT_PADDING (FILTER_SIZE - 1)
+ // Maximum extra width a block needs to filter 
+ // a fractional pixel with positive fractional mv.x and mv.y
+#define KVZ_EXT_PADDING_LUMA (KVZ_LUMA_FILTER_TAPS - 1)
+#define KVZ_EXT_PADDING_CHROMA (KVZ_CHROMA_FILTER_TAPS - 1)
 
-// Maximum block width for extended block
-#define KVZ_EXT_BLOCK_W (LCU_WIDTH + KVZ_EXT_PADDING)
-
-typedef kvz_pixel frac_search_block[(LCU_WIDTH + 1) * (LCU_WIDTH + 1)];
+ // Maximum block width for extended block
+#define KVZ_EXT_BLOCK_W_LUMA (LCU_WIDTH + KVZ_EXT_PADDING_LUMA)
+#define KVZ_EXT_BLOCK_W_CHROMA (LCU_WIDTH_C + KVZ_EXT_PADDING_CHROMA)
 
 enum hpel_position {
   HPEL_POS_HOR = 0,

@@ -205,7 +205,7 @@ void av1_convolve_2d_sr_sse2(const uint8_t *src, int src_stride, uint8_t *dst,
         __m128i *const p = (__m128i *)&dst[i * dst_stride + j];
 
         if (w == 2) {
-          *(uint16_t *)p = _mm_cvtsi128_si32(res);
+          *(uint16_t *)p = (uint16_t)_mm_cvtsi128_si32(res);
         } else if (w == 4) {
           *(uint32_t *)p = _mm_cvtsi128_si32(res);
         } else {

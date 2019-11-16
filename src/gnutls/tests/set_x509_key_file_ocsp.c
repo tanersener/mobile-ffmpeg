@@ -274,6 +274,17 @@ static void check_response(gnutls_session_t session, void *priv)
 	if (resp.size != exp_resp->size || memcmp(resp.data, exp_resp->data, resp.size) != 0) {
 		fail("did not receive the expected response\n");
 	}
+
+	/* we provide a response, but an invalid one */
+	ret = gnutls_ocsp_status_request_is_checked(session, 0);
+	if (ret != 0) {
+		fail("did not receive the expected value (%d)\n", ret);
+	}
+
+	ret = gnutls_ocsp_status_request_is_checked(session, GNUTLS_OCSP_SR_IS_AVAIL);
+	if (ret == 0) {
+		fail("did not receive the expected value (%d)\n", ret);
+	}
 }
 
 void doit(void)

@@ -187,6 +187,8 @@ scanDirs (FcStrList *list, FcConfig *config, FcBool force, FcBool really_force, 
 		ret++;
 		break;
 	    }
+	    FcStrFree (rooted_dir);
+	    rooted_dir = NULL;
 	    continue;
 	}
 

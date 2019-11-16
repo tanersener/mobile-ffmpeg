@@ -53,7 +53,7 @@ static int ivf_write_header(AVFormatContext *s)
     avio_wl16(pb, par->height);
     avio_wl32(pb, s->streams[0]->time_base.den);
     avio_wl32(pb, s->streams[0]->time_base.num);
-    avio_wl64(pb, 0xFFFFFFFFFFFFFFFFULL);
+    avio_wl64(pb, 0xFFFFFFFFFFFFFFFFULL); // length is overwritten at the end of muxing
 
     return 0;
 }
@@ -83,7 +83,9 @@ static int ivf_write_trailer(AVFormatContext *s)
         size_t end = avio_tell(pb);
 
         avio_seek(pb, 24, SEEK_SET);
-        avio_wl64(pb, ctx->frame_cnt * ctx->sum_delta_pts / (ctx->frame_cnt - 1));
+        // overwrite the "length" field (duration)
+        avio_wl32(pb, ctx->frame_cnt * ctx->sum_delta_pts / (ctx->frame_cnt - 1));
+        avio_wl32(pb, 0); // zero out unused bytes
         avio_seek(pb, end, SEEK_SET);
     }
 

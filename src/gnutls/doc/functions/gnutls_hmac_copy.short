@@ -1,0 +1,1 @@
+@item @var{gnutls_hmac_hd_t} @ref{gnutls_hmac_copy} (gnutls_hmac_hd_t @var{handle})

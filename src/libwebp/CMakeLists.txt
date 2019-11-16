@@ -17,6 +17,8 @@ option(WEBP_BUILD_WEBP_JS "Emscripten build of webp.js." OFF)
 option(WEBP_NEAR_LOSSLESS "Enable near-lossless encoding" ON)
 option(WEBP_ENABLE_SWAP_16BIT_CSP "Enable byte swap for 16 bit colorspaces."
        OFF)
+set(WEBP_BITTRACE "0" CACHE STRING "Bit trace mode (0=none, 1=bit, 2=bytes)")
+set_property(CACHE WEBP_BITTRACE PROPERTY STRINGS 0 1 2)
 
 # Option needed for handling Unicode file names on Windows.
 if(WIN32)
@@ -55,6 +57,10 @@ if(WEBP_ENABLE_SWAP_16BIT_CSP)
   add_definitions(-DWEBP_SWAP_16BIT_CSP=1)
 endif()
 
+if(NOT WEBP_BITTRACE STREQUAL "0")
+  add_definitions(-DBITTRACE=${WEBP_BITTRACE})
+endif()
+
 if(WEBP_UNICODE)
   # Windows recommends setting both UNICODE and _UNICODE.
   add_definitions(-DUNICODE -D_UNICODE)
@@ -65,6 +71,7 @@ set(exec_prefix "\$\{prefix\}")
 set(libdir "\$\{prefix\}/lib")
 set(includedir "\$\{prefix\}/include")
 set(PTHREAD_LIBS ${CMAKE_THREAD_LIBS_INIT})
+set(INSTALLED_LIBRARIES)
 
 # ##############################################################################
 # Android only.
@@ -72,6 +79,7 @@ if(ANDROID)
   include_directories(${ANDROID_NDK}/sources/android/cpufeatures)
   add_library(cpufeatures STATIC
               ${ANDROID_NDK}/sources/android/cpufeatures/cpu-features.c)
+  list(APPEND INSTALLED_LIBRARIES cpufeatures)
   target_link_libraries(cpufeatures dl)
   set(WEBP_DEP_LIBRARIES ${WEBP_DEP_LIBRARIES} cpufeatures)
   set(WEBP_DEP_INCLUDE_DIRS ${WEBP_DEP_INCLUDE_DIRS}
@@ -306,7 +314,7 @@ string(REGEX MATCH
              ${TMP})
 
 # Define the libraries to install.
-set(INSTALLED_LIBRARIES webpdecoder webp webpdemux)
+list(APPEND INSTALLED_LIBRARIES webpdecoder webp webpdemux)
 
 # Deal with SIMD. Change the compile flags for SIMD files we use.
 list(LENGTH WEBP_SIMD_FILES_TO_INCLUDE WEBP_SIMD_FILES_TO_INCLUDE_LENGTH)
@@ -556,7 +564,7 @@ if(WEBP_BUILD_WEBP_JS)
   target_include_directories(webp_wasm PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
   set_target_properties(
     webp_wasm
-    PROPERTIES LINK_FLAGS "-s WASM=1 -s 'BINARYEN_METHOD=\"native-wasm\"' \
+    PROPERTIES LINK_FLAGS "-s WASM=1 \
        -s EXPORTED_FUNCTIONS='[\"_WebpToSDL\"]' -s INVOKE_RUN=0 \
        -s EXTRA_EXPORTED_RUNTIME_METHODS='[\"cwrap\"]'")
   target_compile_definitions(webp_wasm PUBLIC EMSCRIPTEN WEBP_HAVE_SDL)

@@ -38,6 +38,12 @@ typedef void (*distwtdcompavgupsampled_func)(
     int height, int subpel_x_q3, int subpel_y_q3, const uint8_t *ref,
     int ref_stride, const DIST_WTD_COMP_PARAMS *jcp_param, int subpel_search);
 
+typedef ::testing::tuple<distwtdcompavg_func, BLOCK_SIZE> DISTWTDCOMPAVGParam;
+
+typedef ::testing::tuple<distwtdcompavgupsampled_func, BLOCK_SIZE>
+    DISTWTDCOMPAVGUPSAMPLEDParam;
+
+#if CONFIG_AV1_HIGHBITDEPTH
 typedef void (*highbddistwtdcompavgupsampled_func)(
     MACROBLOCKD *xd, const struct AV1Common *const cm, int mi_row, int mi_col,
     const MV *const mv, uint8_t *comp_pred8, const uint8_t *pred8, int width,
@@ -45,28 +51,11 @@ typedef void (*highbddistwtdcompavgupsampled_func)(
     int ref_stride, int bd, const DIST_WTD_COMP_PARAMS *jcp_param,
     int subpel_search);
 
-typedef ::testing::tuple<distwtdcompavg_func, BLOCK_SIZE> DISTWTDCOMPAVGParam;
-
-typedef ::testing::tuple<distwtdcompavgupsampled_func, BLOCK_SIZE>
-    DISTWTDCOMPAVGUPSAMPLEDParam;
-
-typedef ::testing::tuple<int, distwtdcompavg_func, BLOCK_SIZE>
-    HighbdDISTWTDCOMPAVGParam;
-
 typedef ::testing::tuple<int, highbddistwtdcompavgupsampled_func, BLOCK_SIZE>
     HighbdDISTWTDCOMPAVGUPSAMPLEDParam;
 
-::testing::internal::ParamGenerator<DISTWTDCOMPAVGParam> BuildParams(
-    distwtdcompavg_func filter) {
-  return ::testing::Combine(::testing::Values(filter),
-                            ::testing::Range(BLOCK_4X4, BLOCK_SIZES_ALL));
-}
-
-::testing::internal::ParamGenerator<DISTWTDCOMPAVGUPSAMPLEDParam> BuildParams(
-    distwtdcompavgupsampled_func filter) {
-  return ::testing::Combine(::testing::Values(filter),
-                            ::testing::Range(BLOCK_4X4, BLOCK_SIZES_ALL));
-}
+typedef ::testing::tuple<int, distwtdcompavg_func, BLOCK_SIZE>
+    HighbdDISTWTDCOMPAVGParam;
 
 ::testing::internal::ParamGenerator<HighbdDISTWTDCOMPAVGParam> BuildParams(
     distwtdcompavg_func filter, int is_hbd) {
@@ -80,6 +69,19 @@ typedef ::testing::tuple<int, highbddistwtdcompavgupsampled_func, BLOCK_SIZE>
 BuildParams(highbddistwtdcompavgupsampled_func filter) {
   return ::testing::Combine(::testing::Range(8, 13, 2),
                             ::testing::Values(filter),
+                            ::testing::Range(BLOCK_4X4, BLOCK_SIZES_ALL));
+}
+#endif  // CONFIG_AV1_HIGHBITDEPTH
+
+::testing::internal::ParamGenerator<DISTWTDCOMPAVGParam> BuildParams(
+    distwtdcompavg_func filter) {
+  return ::testing::Combine(::testing::Values(filter),
+                            ::testing::Range(BLOCK_4X4, BLOCK_SIZES_ALL));
+}
+
+::testing::internal::ParamGenerator<DISTWTDCOMPAVGUPSAMPLEDParam> BuildParams(
+    distwtdcompavgupsampled_func filter) {
+  return ::testing::Combine(::testing::Values(filter),
                             ::testing::Range(BLOCK_4X4, BLOCK_SIZES_ALL));
 }
 
@@ -315,6 +317,7 @@ class AV1DISTWTDCOMPAVGUPSAMPLEDTest
   libaom_test::ACMRandom rnd_;
 };  // class AV1DISTWTDCOMPAVGUPSAMPLEDTest
 
+#if CONFIG_AV1_HIGHBITDEPTH
 class AV1HighBDDISTWTDCOMPAVGTest
     : public ::testing::TestWithParam<HighbdDISTWTDCOMPAVGParam> {
  public:
@@ -555,7 +558,8 @@ class AV1HighBDDISTWTDCOMPAVGUPSAMPLEDTest
   }
 
   libaom_test::ACMRandom rnd_;
-};  // class AV1HighBDDISTWTDCOMPAVGUPSAMPLEDTest
+};      // class AV1HighBDDISTWTDCOMPAVGUPSAMPLEDTest
+#endif  // CONFIG_AV1_HIGHBITDEPTH
 
 }  // namespace AV1DISTWTDCOMPAVG
 }  // namespace libaom_test

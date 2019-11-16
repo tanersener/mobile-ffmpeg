@@ -16,7 +16,7 @@
 #include "av1/encoder/rdopt.h"
 #include "aom_dsp/aom_dsp_common.h"
 
-static void accumulate_rd_opt(ThreadData *td, ThreadData *td_t) {
+static AOM_INLINE void accumulate_rd_opt(ThreadData *td, ThreadData *td_t) {
   for (int i = 0; i < REFERENCE_MODES; i++)
     td->rd_counts.comp_pred_diff[i] += td_t->rd_counts.comp_pred_diff[i];
 
@@ -27,9 +27,17 @@ static void accumulate_rd_opt(ThreadData *td, ThreadData *td_t) {
   td->rd_counts.compound_ref_used_flag |=
       td_t->rd_counts.compound_ref_used_flag;
   td->rd_counts.skip_mode_used_flag |= td_t->rd_counts.skip_mode_used_flag;
+
+  for (int i = 0; i < FRAME_UPDATE_TYPES; i++) {
+    for (int j = 0; j < TX_SIZES_ALL; j++) {
+      for (int k = 0; k < TX_TYPES; k++)
+        td->rd_counts.tx_type_used[i][j][k] +=
+            td_t->rd_counts.tx_type_used[i][j][k];
+    }
+  }
 }
 
-static void update_delta_lf_for_row_mt(AV1_COMP *cpi) {
+static AOM_INLINE void update_delta_lf_for_row_mt(AV1_COMP *cpi) {
   AV1_COMMON *cm = &cpi->common;
   MACROBLOCKD *xd = &cpi->td.mb.e_mbd;
   const int mib_size = cm->seq_params.mib_size;
@@ -46,7 +54,7 @@ static void update_delta_lf_for_row_mt(AV1_COMP *cpi) {
         for (int mi_col = tile_info->mi_col_start;
              mi_col < tile_info->mi_col_end; mi_col += mib_size) {
           const int idx_str = cm->mi_stride * mi_row + mi_col;
-          MB_MODE_INFO **mi = cm->mi_grid_visible + idx_str;
+          MB_MODE_INFO **mi = cm->mi_grid_base + idx_str;
           MB_MODE_INFO *mbmi = mi[0];
           if (mbmi->skip == 1 && (mbmi->sb_type == cm->seq_params.sb_size)) {
             for (int lf_id = 0; lf_id < frame_lf_count; ++lf_id)
@@ -194,8 +202,8 @@ void av1_row_mt_sync_mem_dealloc(AV1RowMTSync *row_mt_sync) {
   }
 }
 
-static void assign_tile_to_thread(MultiThreadHandle *multi_thread_ctxt,
-                                  int num_tiles, int num_workers) {
+static AOM_INLINE void assign_tile_to_thread(
+    MultiThreadHandle *multi_thread_ctxt, int num_tiles, int num_workers) {
   int tile_id = 0;
   int i;
 
@@ -220,9 +228,10 @@ static int get_next_job(AV1_COMP *const cpi, int *current_mi_row,
   return 0;
 }
 
-static void switch_tile_and_get_next_job(AV1_COMP *const cpi, int *cur_tile_id,
-                                         int *current_mi_row,
-                                         int *end_of_frame) {
+static AOM_INLINE void switch_tile_and_get_next_job(AV1_COMP *const cpi,
+                                                    int *cur_tile_id,
+                                                    int *current_mi_row,
+                                                    int *end_of_frame) {
   AV1_COMMON *const cm = &cpi->common;
   const int tile_cols = cm->tile_cols;
   const int tile_rows = cm->tile_rows;
@@ -374,9 +383,10 @@ static int enc_worker_hook(void *arg1, void *unused) {
   return 1;
 }
 
-static void create_enc_workers(AV1_COMP *cpi, int num_workers) {
+static AOM_INLINE void create_enc_workers(AV1_COMP *cpi, int num_workers) {
   AV1_COMMON *const cm = &cpi->common;
   const AVxWorkerInterface *const winterface = aom_get_worker_interface();
+  int sb_mi_size = av1_get_sb_mi_size(cm);
 
   CHECK_MEM_ERROR(cm, cpi->workers,
                   aom_malloc(num_workers * sizeof(*cpi->workers)));
@@ -467,6 +477,10 @@ static void create_enc_workers(AV1_COMP *cpi, int num_workers) {
                                  sizeof(*thread_data->td->tmp_obmc_bufs[j])));
       }
 
+      CHECK_MEM_ERROR(
+          cm, thread_data->td->mbmi_ext,
+          aom_calloc(sb_mi_size, sizeof(*thread_data->td->mbmi_ext)));
+
       // Create threads
       if (!winterface->reset(worker))
         aom_internal_error(&cm->error, AOM_CODEC_ERROR,
@@ -483,7 +497,7 @@ static void create_enc_workers(AV1_COMP *cpi, int num_workers) {
   }
 }
 
-static void launch_enc_workers(AV1_COMP *cpi, int num_workers) {
+static AOM_INLINE void launch_enc_workers(AV1_COMP *cpi, int num_workers) {
   const AVxWorkerInterface *const winterface = aom_get_worker_interface();
   // Encode a frame
   for (int i = num_workers - 1; i >= 0; i--) {
@@ -500,7 +514,7 @@ static void launch_enc_workers(AV1_COMP *cpi, int num_workers) {
   }
 }
 
-static void sync_enc_workers(AV1_COMP *cpi, int num_workers) {
+static AOM_INLINE void sync_enc_workers(AV1_COMP *cpi, int num_workers) {
   const AVxWorkerInterface *const winterface = aom_get_worker_interface();
   int had_error = 0;
 
@@ -515,7 +529,8 @@ static void sync_enc_workers(AV1_COMP *cpi, int num_workers) {
                        "Failed to encode tile data");
 }
 
-static void accumulate_counters_enc_workers(AV1_COMP *cpi, int num_workers) {
+static AOM_INLINE void accumulate_counters_enc_workers(AV1_COMP *cpi,
+                                                       int num_workers) {
   for (int i = num_workers - 1; i >= 0; i--) {
     AVxWorker *const worker = &cpi->workers[i];
     EncWorkerData *const thread_data = (EncWorkerData *)worker->data1;
@@ -534,8 +549,8 @@ static void accumulate_counters_enc_workers(AV1_COMP *cpi, int num_workers) {
   }
 }
 
-static void prepare_enc_workers(AV1_COMP *cpi, AVxWorkerHook hook,
-                                int num_workers) {
+static AOM_INLINE void prepare_enc_workers(AV1_COMP *cpi, AVxWorkerHook hook,
+                                           int num_workers) {
   for (int i = num_workers - 1; i >= 0; i--) {
     AVxWorker *const worker = &cpi->workers[i];
     EncWorkerData *const thread_data = &cpi->tile_thr_data[i];
@@ -567,6 +582,7 @@ static void prepare_enc_workers(AV1_COMP *cpi, AVxWorkerHook hook,
         }
       }
       thread_data->td->mb.mask_buf = thread_data->td->mask_buf;
+      thread_data->td->mb.mbmi_ext = thread_data->td->mbmi_ext;
     }
     if (thread_data->td->counts != &cpi->counts) {
       memcpy(thread_data->td->counts, &cpi->counts, sizeof(cpi->counts));

@@ -2,7 +2,7 @@
  *  TwoLAME: an optimized MPEG Audio Layer Two encoder
  *
  *  Copyright (C) 2001-2004 Michael Cheng
- *  Copyright (C) 2004-2006 The TwoLAME Project
+ *  Copyright (C) 2004-2018 The TwoLAME Project
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -18,8 +18,6 @@
  *  License along with this library; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id$
- *
  */
 
 
@@ -33,26 +31,26 @@
 #include "psycho_0.h"
 
 /* MFC Mar 03
-   It's almost obscene how well this psycho model works for the amount of 
+   It's almost obscene how well this psycho model works for the amount of
    computational effort that's put in.
 
    I got the idea from:
    Hyen-O Oh et al "Low power mpeg audio encoders using simplified psychoacoustic model
-					and fast bit allocation"
-					IEEE Trans on Consumer Electronics v47 n3 August 2001. p613
+                    and fast bit allocation"
+                    IEEE Trans on Consumer Electronics v47 n3 August 2001. p613
 
    All this model does is look at the lowest ATH value within the subband, and then looks
    at the scalefactors. It combines the two in a real dodgy way to get the SMRs.
 
-   Although the output values aren't really close to any of the other psycho models, 
+   Although the output values aren't really close to any of the other psycho models,
    the spread of values and the relative sizes of the values for the different subbands
-   is about right 
+   is about right
 
    Feel free to make any sort of generic change you want. Add or subtract numbers, take
    logs, whatever. Fiddle with the numbers until we get a good SMR output */
 
 
-static psycho_0_mem *psycho_0_init(twolame_options * glopts, int sfreq)
+static psycho_0_mem *twolame_psycho_0_init(twolame_options * glopts, int sfreq)
 {
     FLOAT freqperline = (FLOAT) sfreq / 1024.0;
     psycho_0_mem *mem = (psycho_0_mem *) TWOLAME_MALLOC(sizeof(psycho_0_mem));
@@ -65,7 +63,7 @@ static psycho_0_mem *psycho_0_init(twolame_options * glopts, int sfreq)
     /* Find the minimum ATH in each subband */
     for (i = 0; i < 512; i++) {
         FLOAT thisfreq = i * freqperline;
-        FLOAT ath_val = ath_db(thisfreq, 0);
+        FLOAT ath_val = twolame_ath_db(thisfreq, 0);
         if (ath_val < mem->ath_min[i >> 4])
             mem->ath_min[i >> 4] = ath_val;
     }
@@ -75,7 +73,7 @@ static psycho_0_mem *psycho_0_init(twolame_options * glopts, int sfreq)
 
 
 
-void psycho_0(twolame_options * glopts, FLOAT SMR[2][SBLIMIT], unsigned int scalar[2][3][SBLIMIT])
+void twolame_psycho_0(twolame_options * glopts, FLOAT SMR[2][SBLIMIT], unsigned int scalar[2][3][SBLIMIT])
 {
     psycho_0_mem *mem;
     int nch = glopts->num_channels_out;
@@ -84,7 +82,7 @@ void psycho_0(twolame_options * glopts, FLOAT SMR[2][SBLIMIT], unsigned int scal
     unsigned int minscaleindex[2][SBLIMIT]; /* Smaller scale indexes mean bigger scalefactors */
 
     if (!glopts->p0mem) {
-        glopts->p0mem = psycho_0_init(glopts, sfreq);
+        glopts->p0mem = twolame_psycho_0_init(glopts, sfreq);
     }
     mem = glopts->p0mem;
 
@@ -110,7 +108,7 @@ void psycho_0(twolame_options * glopts, FLOAT SMR[2][SBLIMIT], unsigned int scal
                 if (minscaleindex[ch][sb] > scalar[ch][gr][sb])
                     minscaleindex[ch][sb] = scalar[ch][gr][sb];
 
-    /* Oh yeah. Fudge the hell out of the SMR calculations by combining the scalefactor table index 
+    /* Oh yeah. Fudge the hell out of the SMR calculations by combining the scalefactor table index
        and the min ATH in that subband There are probably more elegant/correct ways of combining
        these values, but who cares? It works pretty well MFC Mar 03 */
     for (ch = 0; ch < nch; ch++)
@@ -119,7 +117,7 @@ void psycho_0(twolame_options * glopts, FLOAT SMR[2][SBLIMIT], unsigned int scal
 }
 
 
-void psycho_0_deinit(psycho_0_mem ** mem)
+void twolame_psycho_0_deinit(psycho_0_mem ** mem)
 {
 
     if (mem == NULL || *mem == NULL)
@@ -130,4 +128,4 @@ void psycho_0_deinit(psycho_0_mem ** mem)
 
 
 
-// vim:ts=4:sw=4:nowrap: 
+// vim:ts=4:sw=4:nowrap:

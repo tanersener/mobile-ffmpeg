@@ -1,3 +1,54 @@
+2ad0916d update NEWS
+1287362b bump version to 1.0.3
+7b968cc2 update AUTHORS
+9d6988f4 Fix the oscillating prediction problem at low quality
+312f74d0 makefile.unix: allow *_LIBS to be overridden w/EXTRA_LIBS
+92dbf237 filters_sse2,cosmetics: shorten some long lines
+a277d197 filters_sse2.c: quiet integer sanitizer warnings
+804540f1 Fix cpufeatures in CMake.
+bf00c15b Add CMake option for bittrace.
+a788b498 filters_sse2.c: quiet integer sanitizer warnings
+e6a92c5e filters.c: quiet integer sanitizer warnings
+ec1cc40a lossless.c: remove U32 -> S8 conversion warnings
+1106478f remove conversion U32 -> S8 warnings
+812a6b49 lossless_enc: fix some conversion warning
+4627c1c9 lossless_enc,TransformColorBlue: quiet uint32_t conv warning
+c84673a6 lossless_enc_sse{2,41}: quiet signed conv warnings
+776a7757 dec_sse2: quiet signed conv warnings
+bd39c063 Merge "thread_utils: release mutex before signaling"
+0550576f Merge "(alpha_processing,enc}_sse2: quiet signed conv warnings"
+6682f2c4 thread_utils: release mutex before signaling
+e78dea75 (alpha_processing,enc}_sse2: quiet signed conv warnings
+9acf18ba iosbuild.sh: add WebP{Demux,Mux}.framework
+b9be7e65 vwebp: remove the -fit option (and make it default)
+1394a2bb Merge "README.webp_js: update Emscripten.cmake note"
+dd3e7f8a README.webp_js: update Emscripten.cmake note
+32cf8801 predictor_enc,GetBestGreenRedToBlue: quiet implicit conv warnings
+e1c8acb5 Merge "vwebp: add a -fit option"
+cbd23dd5 vwebp: add a -fit option
+2e672351 bit_writer_utils,Flush: quiet implicit conversion warnings
+1326988d swig: update libwebp_python_wrap.c
+0e7f8548 update generated swig files
+17ed1438 Merge "PutLE{16,24}: quiet implicit conversion warnings"
+24686538 PutLE{16,24}: quiet implicit conversion warnings
+153bb3a0 fix some clang-7 warnings:
+ab2dc893 Rescaler: fix rounding error
+aa65f89a HistogramCombineStochastic: fix free of uninit value
+af0bac64 Merge "encode.h: mention 'exact' default in WebPEncodeLossless*"
+6d2e11ec encode.h: mention 'exact' default in WebPEncodeLossless*
+8c3f04fe AndroidCPUInfo: reorder terms in conditional
+fcfd9c71 BitTrace: if BITTRACE is > 0, record and print syntax bits used
+067031ea Speedups for unused Huffman groups.
+01ac46ba libwebp: Display "libjpeg error:" in imageio/jpegdec
+d9a662e1 WebPRescalerGetScaledDimensions: round scaled dimension up
+62eb3f08 libwebp: Fix missing '{' in README
+e05f785a Merge "unicode,INIT_WARGV: add missing cast"
+63c9a69f tag the VP8LHashPix() function for potential uint roll-over
+2b7214ab unicode,INIT_WARGV: add missing cast
+bf424b46 tag the GetPixPairHash64() function for potential uint roll-over
+7d05d6ca Have the color cache computation be u32-bit only.
+6bcf8769 Remove BINARYEN_METHOD in wasm settings.
+2b98df90 update ChangeLog (tag: v1.0.2-rc1, tag: v1.0.2)
 61e372b7 update NEWS
 7ae658a0 bump version to 1.0.2
 51c4907d update AUTHORS
@@ -16,7 +67,7 @@ f435de95 IsFlat: return int
 9f4d4a3f neon: GetResidualCost
 0fd7514b neon: SetResidualCoeffs
 f95a996c Simpler histogram clustering.
-e85d3313 update ChangeLog (tag: v1.0.1-rc2, tag: v1.0.1, origin/1.0.1, 1.0.1)
+e85d3313 update ChangeLog (tag: v1.0.1-rc2, tag: v1.0.1)
 fa8210e4 Fix pair update in stochastic entropy merging.
 fd198f73 add codereview.settings
 825389ac README.mux: add a reference to the AnimDecoder API
@@ -485,7 +536,7 @@ dcf9d82a imageio: add limited PNM support for reading
 6524fcd6 vwebp_sdl: simple viewer based on SDL
 6cf24a24 get_disto: fix reference file read
 43d472aa Merge tag 'v0.6.0'
-50d1a848 update ChangeLog (tag: v0.6.0, origin/0.6.0, 0.6.0)
+50d1a848 update ChangeLog (tag: v0.6.0, origin/0.6.0)
 20a7fea0 extras/Makefile.am: fix libwebpextras.la reference
 415f3ffe update ChangeLog (tag: v0.6.0-rc3)
 3c6d1224 update NEWS
@@ -562,7 +613,7 @@ b016cb91 NEON: faster fancy upsampling
 f04eb376 Merge tag 'v0.5.2'
 341d711c NEON: 5% faster conversion to RGB565 and RGBA4444
 abb54827 remove Clang warnings with unused arch arguments.
-ece9684f update ChangeLog (tag: v0.5.2-rc2, tag: v0.5.2, origin/0.5.2, 0.5.2)
+ece9684f update ChangeLog (tag: v0.5.2-rc2, tag: v0.5.2, origin/0.5.2)
 aa7744ca anim_util: quiet implicit conv warnings in 32-bit
 d9120271 jpegdec: correct ContextFill signature
 24eb3940 Remove some errors when compiling the code as C++.
@@ -849,7 +900,7 @@ bbb6ecd9 Merge "Add MSA optimized distortion functions"
 c0991a14 io,EmitRescaledAlphaYUV: factor out a common expr
 48bf5ed1 build.gradle: remove tab
 bfef6c9f Merge tag 'v0.5.1'
-3d97bb75 update ChangeLog (tag: v0.5.1, origin/0.5.1, 0.5.1)
+3d97bb75 update ChangeLog (tag: v0.5.1, origin/0.5.1)
 deb54d91 Clarify the expected 'config' lifespan in WebPIDecode()
 435308e0 Add MSA optimized encoder transform functions
 dce64bfa Add MSA optimized alpha filter functions
@@ -1043,7 +1094,7 @@ b74657fb configure: fix builtin detection w/-Werror
 6c1d7631 avoid Yoda style for comparison
 8ce975ac SSE optimization for vector mismatch.
 7db53831 Merge tag 'v0.5.0'
-37f04949 update ChangeLog (tag: v0.5.0-rc1, tag: v0.5.0, origin/0.5.0, 0.5.0)
+37f04949 update ChangeLog (tag: v0.5.0-rc1, tag: v0.5.0, origin/0.5.0)
 7e7b6ccc faster rgb565/rgb4444/argb output
 4c7f565f update NEWS
 1f62b6b2 update AUTHORS
@@ -1827,7 +1878,7 @@ b5a36cc9 add -near_lossless [0..100] experimental option
 0524d9e5 dsp: detect mips64 & disable mips32 code
 d3485d96 cwebp.1: fix quality description placement
 29a9fe22 Merge tag 'v0.4.1'
-8af27718 update ChangeLog (tag: v0.4.1, origin/0.4.1, 0.4.1)
+8af27718 update ChangeLog (tag: v0.4.1, origin/0.4.1)
 e09e9ff6 Record & log the image pre-processing time.
 f59c0b4b iosbuild.sh: specify optimization flags
 8d34ea3e update ChangeLog (tag: v0.4.1-rc1)
@@ -2212,7 +2263,7 @@ ea59a8e9 Merge "Merge tag 'v0.4.0'"
 effcb0fd Merge tag 'v0.4.0'
 7c76255d autoconf: update ax_pthread.m4
 fff2a11b make -short work with -print_ssim, -print_psnr, etc.
-68e7901d update ChangeLog (tag: v0.4.0-rc1, tag: v0.4.0, origin/0.4.0, 0.4.0)
+68e7901d update ChangeLog (tag: v0.4.0-rc1, tag: v0.4.0, origin/0.4.0)
 256e4333 update NEWS description with new general features
 29625340 Merge "gif2webp: don't use C99 %zu" into 0.4.0
 3b9f9dd0 gif2webp: don't use C99 %zu
@@ -2988,7 +3039,7 @@ a61a824b Merge "Add NULL check in chunk APIs"
 a0770727 mux struct naming
 6c66dde8 Merge "Tune Lossless encoder"
 ab5ea217 Tune Lossless encoder
-74fefc8c Update ChangeLog (tag: v0.2.1, origin/0.2.0, 0.2.0)
+74fefc8c Update ChangeLog (tag: v0.2.1, origin/0.2.0)
 92f8059c Rename some chunks:
 3bb4bbeb Merge "Mux API change:"
 d0c79f05 Mux API change:

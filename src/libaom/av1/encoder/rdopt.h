@@ -27,10 +27,6 @@ extern "C" {
 #endif
 
 #define MAX_REF_MV_SEARCH 3
-#define DEFAULT_LUMA_INTERP_SKIP_FLAG 1
-#define DEFAULT_CHROMA_INTERP_SKIP_FLAG 2
-#define DEFAULT_INTERP_SKIP_FLAG \
-  (DEFAULT_LUMA_INTERP_SKIP_FLAG | DEFAULT_CHROMA_INTERP_SKIP_FLAG)
 #define INTER_INTRA_RD_THRESH_SCALE 9
 #define INTER_INTRA_RD_THRESH_SHIFT 4
 #define COMP_TYPE_RD_THRESH_SCALE 11
@@ -121,13 +117,11 @@ unsigned int av1_high_get_sby_perpixel_variance(const struct AV1_COMP *cpi,
                                                 const struct buf_2d *ref,
                                                 BLOCK_SIZE bs, int bd);
 
-#if !CONFIG_REALTIME_ONLY
 void av1_rd_pick_inter_mode_sb(struct AV1_COMP *cpi,
                                struct TileDataEnc *tile_data,
                                struct macroblock *x, int mi_row, int mi_col,
                                struct RD_STATS *rd_cost, BLOCK_SIZE bsize,
                                PICK_MODE_CONTEXT *ctx, int64_t best_rd_so_far);
-#endif
 
 void av1_fast_nonrd_pick_inter_mode_sb(struct AV1_COMP *cpi,
                                        struct TileDataEnc *tile_data,
@@ -188,6 +182,271 @@ typedef int64_t (*pick_interinter_mask_type)(
     const uint8_t *const p0, const uint8_t *const p1,
     const int16_t *const residual1, const int16_t *const diff10);
 
+static INLINE int av1_encoder_get_relative_dist(const OrderHintInfo *oh, int a,
+                                                int b) {
+  if (!oh->enable_order_hint) return 0;
+
+  assert(a >= 0 && b >= 0);
+  return (a - b);
+}
+
+// This function will return number of mi's in a superblock.
+static INLINE int av1_get_sb_mi_size(const AV1_COMMON *const cm) {
+  const int mi_alloc_size_1d = mi_size_wide[cm->mi_alloc_bsize];
+  int sb_mi_rows =
+      (mi_size_wide[cm->seq_params.sb_size] + mi_alloc_size_1d - 1) /
+      mi_alloc_size_1d;
+  assert(mi_size_wide[cm->seq_params.sb_size] ==
+         mi_size_high[cm->seq_params.sb_size]);
+  int sb_mi_size = sb_mi_rows * sb_mi_rows;
+
+  return sb_mi_size;
+}
+
+// This function will copy usable ref_mv_stack[ref_frame][4] and
+// weight[ref_frame][4] information from ref_mv_stack[ref_frame][8] and
+// weight[ref_frame][8].
+static INLINE void av1_copy_usable_ref_mv_stack_and_weight(
+    const MACROBLOCKD *xd, MB_MODE_INFO_EXT *const mbmi_ext,
+    MV_REFERENCE_FRAME ref_frame) {
+  memcpy(mbmi_ext->weight[ref_frame], xd->weight[ref_frame],
+         USABLE_REF_MV_STACK_SIZE * sizeof(xd->weight[0][0]));
+  memcpy(mbmi_ext->ref_mv_stack[ref_frame], xd->ref_mv_stack[ref_frame],
+         USABLE_REF_MV_STACK_SIZE * sizeof(xd->ref_mv_stack[0][0]));
+}
+
+static TX_MODE select_tx_mode(
+    const AV1_COMP *cpi, const TX_SIZE_SEARCH_METHOD tx_size_search_method) {
+  if (cpi->common.coded_lossless) return ONLY_4X4;
+  if (tx_size_search_method == USE_LARGESTALL)
+    return TX_MODE_LARGEST;
+  else if (tx_size_search_method == USE_FULL_RD ||
+           tx_size_search_method == USE_FAST_RD)
+    return TX_MODE_SELECT;
+  else
+    return cpi->common.tx_mode;
+}
+
+static INLINE TX_MODE get_eval_tx_mode(const AV1_COMP *cpi,
+                                       MODE_EVAL_TYPE eval_type) {
+  TX_MODE tx_mode;
+  if (cpi->sf.enable_winner_mode_for_tx_size_srch)
+    tx_mode = select_tx_mode(cpi, cpi->tx_size_search_methods[eval_type]);
+  else
+    tx_mode = select_tx_mode(cpi, cpi->tx_size_search_methods[DEFAULT_EVAL]);
+
+  return tx_mode;
+}
+
+static INLINE void set_tx_size_search_method(
+    const struct AV1_COMP *cpi, MACROBLOCK *x,
+    int enable_winner_mode_for_tx_size_srch, int is_winner_mode) {
+  // Populate transform size search method/transform mode appropriately
+  x->tx_size_search_method = cpi->tx_size_search_methods[DEFAULT_EVAL];
+  if (enable_winner_mode_for_tx_size_srch) {
+    if (is_winner_mode)
+      x->tx_size_search_method = cpi->tx_size_search_methods[WINNER_MODE_EVAL];
+    else
+      x->tx_size_search_method = cpi->tx_size_search_methods[MODE_EVAL];
+  }
+  x->tx_mode = select_tx_mode(cpi, x->tx_size_search_method);
+}
+
+static INLINE void set_tx_domain_dist_params(
+    const struct AV1_COMP *cpi, MACROBLOCK *x,
+    int enable_winner_mode_for_tx_domain_dist, int is_winner_mode) {
+  if (!enable_winner_mode_for_tx_domain_dist) {
+    x->use_transform_domain_distortion =
+        cpi->use_transform_domain_distortion[DEFAULT_EVAL];
+    x->tx_domain_dist_threshold = cpi->tx_domain_dist_threshold[DEFAULT_EVAL];
+    return;
+  }
+
+  if (is_winner_mode) {
+    x->use_transform_domain_distortion =
+        cpi->use_transform_domain_distortion[WINNER_MODE_EVAL];
+    x->tx_domain_dist_threshold =
+        cpi->tx_domain_dist_threshold[WINNER_MODE_EVAL];
+  } else {
+    x->use_transform_domain_distortion =
+        cpi->use_transform_domain_distortion[MODE_EVAL];
+    x->tx_domain_dist_threshold = cpi->tx_domain_dist_threshold[MODE_EVAL];
+  }
+}
+
+// Checks the conditions to enable winner mode processing
+static INLINE int is_winner_mode_processing_enabled(
+    const struct AV1_COMP *cpi, MB_MODE_INFO *const mbmi,
+    const PREDICTION_MODE best_mode) {
+  const SPEED_FEATURES *sf = &cpi->sf;
+
+  // TODO(any): Move block independent condition checks to frame level
+  if (is_inter_block(mbmi)) {
+    if (is_inter_mode(best_mode) &&
+        sf->tx_type_search.fast_inter_tx_type_search &&
+        !cpi->oxcf.use_inter_dct_only)
+      return 1;
+  } else {
+    if (sf->tx_type_search.fast_intra_tx_type_search &&
+        !cpi->oxcf.use_intra_default_tx_only && !cpi->oxcf.use_intra_dct_only)
+      return 1;
+  }
+
+  // Check speed feature related to winner mode processing
+  if (sf->enable_winner_mode_for_coeff_opt &&
+      cpi->optimize_seg_arr[mbmi->segment_id] != NO_TRELLIS_OPT &&
+      cpi->optimize_seg_arr[mbmi->segment_id] != FINAL_PASS_TRELLIS_OPT)
+    return 1;
+  if (sf->enable_winner_mode_for_tx_size_srch) return 1;
+
+  return 0;
+}
+
+// This function sets mode parameters for different mode evaluation stages
+static INLINE void set_mode_eval_params(const struct AV1_COMP *cpi,
+                                        MACROBLOCK *x,
+                                        MODE_EVAL_TYPE mode_eval_type) {
+  const SPEED_FEATURES *sf = &cpi->sf;
+
+  switch (mode_eval_type) {
+    case DEFAULT_EVAL:
+      x->use_default_inter_tx_type = 0;
+      x->use_default_intra_tx_type = 0;
+      // Set default transform domain distortion type
+      set_tx_domain_dist_params(cpi, x, 0, 0);
+
+      // Get default threshold for R-D optimization of coefficients
+      x->coeff_opt_dist_threshold =
+          get_rd_opt_coeff_thresh(cpi->coeff_opt_dist_threshold, 0, 0);
+      // Set default transform size search method
+      set_tx_size_search_method(cpi, x, 0, 0);
+      break;
+    case MODE_EVAL:
+      x->use_default_intra_tx_type =
+          (cpi->sf.tx_type_search.fast_intra_tx_type_search ||
+           cpi->oxcf.use_intra_default_tx_only);
+      x->use_default_inter_tx_type =
+          cpi->sf.tx_type_search.fast_inter_tx_type_search;
+
+      // Set transform domain distortion type for mode evaluation
+      set_tx_domain_dist_params(
+          cpi, x, sf->enable_winner_mode_for_use_tx_domain_dist, 0);
+
+      // Get threshold for R-D optimization of coefficients during mode
+      // evaluation
+      x->coeff_opt_dist_threshold =
+          get_rd_opt_coeff_thresh(cpi->coeff_opt_dist_threshold,
+                                  sf->enable_winner_mode_for_coeff_opt, 0);
+      // Set the transform size search method for mode evaluation
+      set_tx_size_search_method(cpi, x, sf->enable_winner_mode_for_tx_size_srch,
+                                0);
+      break;
+    case WINNER_MODE_EVAL:
+      x->use_default_inter_tx_type = 0;
+      x->use_default_intra_tx_type = 0;
+
+      // Set transform domain distortion type for winner mode evaluation
+      set_tx_domain_dist_params(
+          cpi, x, sf->enable_winner_mode_for_use_tx_domain_dist, 1);
+
+      // Get threshold for R-D optimization of coefficients for winner mode
+      // evaluation
+      x->coeff_opt_dist_threshold =
+          get_rd_opt_coeff_thresh(cpi->coeff_opt_dist_threshold,
+                                  sf->enable_winner_mode_for_coeff_opt, 1);
+      // Set the transform size search method for winner mode evaluation
+      set_tx_size_search_method(cpi, x, sf->enable_winner_mode_for_tx_size_srch,
+                                1);
+      break;
+    default: assert(0);
+  }
+}
+
+static INLINE int prune_ref_by_selective_ref_frame(
+    const AV1_COMP *const cpi, const MV_REFERENCE_FRAME *const ref_frame,
+    const unsigned int *const ref_display_order_hint,
+    const unsigned int cur_frame_display_order_hint) {
+  const SPEED_FEATURES *const sf = &cpi->sf;
+  if (sf->selective_ref_frame) {
+    const AV1_COMMON *const cm = &cpi->common;
+    const OrderHintInfo *const order_hint_info =
+        &cm->seq_params.order_hint_info;
+    const int comp_pred = ref_frame[1] > INTRA_FRAME;
+    if (sf->selective_ref_frame >= 2 ||
+        (sf->selective_ref_frame == 1 && comp_pred)) {
+      if (ref_frame[0] == LAST3_FRAME || ref_frame[1] == LAST3_FRAME) {
+        if (av1_encoder_get_relative_dist(
+                order_hint_info,
+                ref_display_order_hint[LAST3_FRAME - LAST_FRAME],
+                ref_display_order_hint[GOLDEN_FRAME - LAST_FRAME]) <= 0)
+          return 1;
+      }
+      if (ref_frame[0] == LAST2_FRAME || ref_frame[1] == LAST2_FRAME) {
+        if (av1_encoder_get_relative_dist(
+                order_hint_info,
+                ref_display_order_hint[LAST2_FRAME - LAST_FRAME],
+                ref_display_order_hint[GOLDEN_FRAME - LAST_FRAME]) <= 0)
+          return 1;
+      }
+    }
+
+    // One-sided compound is used only when all reference frames are one-sided.
+    if (sf->selective_ref_frame >= 2 && comp_pred && !cpi->all_one_sided_refs) {
+      unsigned int ref_offsets[2];
+      for (int i = 0; i < 2; ++i) {
+        const RefCntBuffer *const buf = get_ref_frame_buf(cm, ref_frame[i]);
+        assert(buf != NULL);
+        ref_offsets[i] = buf->display_order_hint;
+      }
+      const int ref0_dist = av1_encoder_get_relative_dist(
+          order_hint_info, ref_offsets[0], cur_frame_display_order_hint);
+      const int ref1_dist = av1_encoder_get_relative_dist(
+          order_hint_info, ref_offsets[1], cur_frame_display_order_hint);
+      if ((ref0_dist <= 0 && ref1_dist <= 0) ||
+          (ref0_dist > 0 && ref1_dist > 0)) {
+        return 1;
+      }
+    }
+
+    if (sf->selective_ref_frame >= 3) {
+      if (ref_frame[0] == ALTREF2_FRAME || ref_frame[1] == ALTREF2_FRAME)
+        if (av1_encoder_get_relative_dist(
+                order_hint_info,
+                ref_display_order_hint[ALTREF2_FRAME - LAST_FRAME],
+                cur_frame_display_order_hint) < 0)
+          return 1;
+      if (ref_frame[0] == BWDREF_FRAME || ref_frame[1] == BWDREF_FRAME)
+        if (av1_encoder_get_relative_dist(
+                order_hint_info,
+                ref_display_order_hint[BWDREF_FRAME - LAST_FRAME],
+                cur_frame_display_order_hint) < 0)
+          return 1;
+    }
+
+    if (sf->selective_ref_frame >= 4 && comp_pred) {
+      // Check if one of the reference is ALTREF2_FRAME and BWDREF_FRAME is a
+      // valid reference.
+      if ((ref_frame[0] == ALTREF2_FRAME || ref_frame[1] == ALTREF2_FRAME) &&
+          (cpi->ref_frame_flags & av1_ref_frame_flag_list[BWDREF_FRAME])) {
+        // Check if both ALTREF2_FRAME and BWDREF_FRAME are future references.
+        const int arf2_dist = av1_encoder_get_relative_dist(
+            order_hint_info, ref_display_order_hint[ALTREF2_FRAME - LAST_FRAME],
+            cur_frame_display_order_hint);
+        const int bwd_dist = av1_encoder_get_relative_dist(
+            order_hint_info, ref_display_order_hint[BWDREF_FRAME - LAST_FRAME],
+            cur_frame_display_order_hint);
+        if (arf2_dist > 0 && bwd_dist > 0 && bwd_dist <= arf2_dist) {
+          // Drop ALTREF2_FRAME as a reference if BWDREF_FRAME is a closer
+          // reference to the current frame than ALTREF2_FRAME
+          assert(get_ref_frame_buf(cm, ALTREF2_FRAME) != NULL);
+          assert(get_ref_frame_buf(cm, BWDREF_FRAME) != NULL);
+          return 1;
+        }
+      }
+    }
+  }
+  return 0;
+}
 #ifdef __cplusplus
 }  // extern "C"
 #endif

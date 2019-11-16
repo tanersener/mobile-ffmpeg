@@ -63,13 +63,17 @@ struct NN_CONFIG_V2 {
 // Assume there are no more than NN_MAX_NODES_PER_LAYER nodes in each hidden
 // layer.
 void av1_nn_predict_v2(const float *features, NN_CONFIG_V2 *nn_config,
-                       float *output);
+                       int reduce_prec, float *output);
 #endif  // CONFIG_NN_V2
 
 // Applies the softmax normalization function to the input
 // to get a valid probability distribution in the output:
 // output[i] = exp(input[i]) / sum_{k \in [0,n)}(exp(input[k]))
 void av1_nn_softmax(const float *input, float *output, int n);
+
+// Applies a precision reduction to output of av1_nn_predict to prevent
+// mismatches between C and SIMD implementations.
+void av1_nn_output_prec_reduce(float *const output, int num_output);
 
 #ifdef __cplusplus
 }  // extern "C"

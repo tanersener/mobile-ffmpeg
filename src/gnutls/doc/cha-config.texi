@@ -1,0 +1,158 @@
+@node System-wide configuration of the library
+@chapter System-wide configuration of the library
+@cindex System-wide configuration
+
+@acronym{GnuTLS} 3.6.9 introduced a system-wide configuration of the library
+which can be used to disable or mark algorithms and protocols as insecure
+system-wide, overriding the library defaults. The format of this
+configuration file is of an INI file, with the hash ('#') allowed for
+commenting. It intentionally does not allow switching algorithms or protocols
+which were disabled or marked as insecure during compile time to the secure
+set. This is to prevent the feature from being used to attack the system.
+Unknown options or sections in the configuration file are skipped unless
+the environment variable @code{GNUTLS_SYSTEM_PRIORITY_FAIL_ON_INVALID} is
+set to 1, where it would cause the library to exit on unknown options.
+
+The location of the default configuration file is @code{/etc/gnutls/config},
+but its actual location may be overriden during compile time or at run-time
+using the @code{GNUTLS_SYSTEM_PRIORITY_FILE} environment variable. The file
+used can be queried using @funcref{gnutls_get_system_config_file}.
+
+@showfuncdesc{gnutls_get_system_config_file}
+
+@menu
+* Application-specific priority strings::
+* Disabling algorithms and protocols::
+* Querying for disabled algorithms and protocols::
+* Overriding the parameter verification profile::
+@end menu
+
+@node Application-specific priority strings
+@section Application-specific priority strings
+
+It is possible to specify custom cipher priority strings, in addition to the
+default priority strings (@code{NORMAL}, @code{PERFORMANCE}, etc.). These can
+be used either by individual applications, or even as the default option if
+the library is compiled with the configuration option
+@code{--with-default-priority-string}. In the latter case the defined
+priority string will be used for applications using @funcref{gnutls_set_default_priority}
+or @funcref{gnutls_set_default_priority_append}.
+
+The priority strings can be specified in the global section of the
+configuration file, or in the section named @code{[priorities]}.
+The format is '@code{KEYWORD = VALUE}', e.g.,
+
+When used they may be followed by additional options that will be appended to the
+system string (e.g., '@code{@@EXAMPLE-PRIORITY:+SRP}'). '@code{EXAMPLE-PRIORITY=NORMAL:+ARCFOUR-128}'.
+Since version 3.5.1 applications are allowed to specify fallback keywords such as
+@@KEYWORD1,@@KEYWORD2, and the first valid keyword will be used.
+
+The following example configuration defines a priority string called @code{@@SYSTEM}.
+When set, its full settings can be queried using @code{gnutls-cli --priority @@SYSTEM --list}.
+
+@example
+[priorities]
+SYSTEM = NORMAL:-AES-128-CBC:-AES-256-CBC
+@end example
+
+
+@node Disabling algorithms and protocols
+@section Disabling algorithms and protocols
+
+The approach above works well to create consistent system-wide settings
+for cooperative GnuTLS applications. When an application however does not
+use the @funcref{gnutls_set_default_priority} or @funcref{gnutls_set_default_priority_append}
+functions, the method is not sufficient to prevent applications from using
+protocols or algorithms forbidden by a local policy.
+The override method described below enables the deprecation of algorithms and
+protocols system-wide for all applications.
+
+The available options must be set in the @code{[overrides]} section of the
+configuration file and can be
+@itemize
+@item @code{insecure-sig-for-cert}: to mark the signature algorithm as insecure when used in certificates.
+@item @code{insecure-sig}: to mark the signature algorithm as insecure for any use.
+@item @code{insecure-hash}: to mark the hash algorithm as insecure for digital signature use (provides a more generic way to disable digital signatures for broken hash algorithms).
+@item @code{disabled-version}: to disable the specified TLS versions.
+@item @code{tls-disabled-cipher}: to disable the specified ciphers for use in the TLS or DTLS protocols.
+@item @code{tls-disabled-mac}: to disable the specified MAC algorithms for use in the TLS or DTLS protocols.
+@item @code{tls-disabled-group}: to disable the specified group for use in the TLS or DTLS protocols.
+@item @code{tls-disabled-kx}: to disable the specified key exchange algorithms for use in the TLS or DTLS protocols (applies to TLS1.2 or earlier).
+@end itemize
+
+Each of the options can be repeated multiple times when multiple values need
+to be disabled.
+
+The valid values for the options above can be found in the 'Protocols', 'Digests'
+'PK-signatures', 'Protocols', 'Ciphrers', and 'MACs' fields of the output of @code{gnutls-cli --list}.
+
+@subsection Examples
+
+The following example marks as insecure all digital signature algorithms
+which depend on SHA384, as well as the RSA-SHA1 signature algorithm.
+
+@example
+[overrides]
+insecure-hash = sha384
+insecure-sig = rsa-sha1
+@end example
+
+The following example marks RSA-SHA256 as insecure for use in certificates
+and disables the TLS1.0 and TLS1.1 protocols.
+
+@example
+[overrides]
+insecure-sig-for-cert = rsa-sha256
+disabled-version = tls1.0
+disabled-version = tls1.1
+@end example
+
+The following example disables the @code{AES-128-CBC} and @code{AES-256-CBC}
+ciphers, the @code{HMAC-SHA1} MAC algorithm and the @code{GROUP-FFDHE8192}
+group for TLS and DTLS protocols.
+
+@example
+[overrides]
+tls-disabled-cipher = aes-128-cbc
+tls-disabled-cipher = aes-256-cbc
+tls-disabled-mac = sha1
+tls-disabled-group = group-ffdhe8192
+@end example
+
+@node Querying for disabled algorithms and protocols
+@section Querying for disabled algorithms and protocols
+
+When necessary applications can query whether a particular algorithm
+or protocol has been marked as insecure or disabled system-wide.
+Digital signatures can be queried using the following algorithms.
+@showfuncB{gnutls_sign_is_secure,gnutls_sign_is_secure2}
+
+Any disabled protocol versions or elliptic curves will not show up in the
+lists provided by the following functions.
+
+@showfuncC{gnutls_protocol_list,gnutls_group_list,gnutls_ecc_curve_list}
+
+It is not possible to query for insecure hash algorithms directly
+(only indirectly through the signature API).
+
+
+@node Overriding the parameter verification profile
+@section Overriding the parameter verification profile
+
+When verifying a certificate or TLS session parameters, GnuTLS uses a set
+of profiles associated with the session to determine whether the parameters
+seen in the session are acceptable. For example, whether the RSA public key
+size as seen on the wire, or the Diffie-Hellman parameters for the session.
+These profiles are normally set using the @code{%PROFILE} priority string
+(see @ref{Priority Strings} and @ref{Selecting cryptographic key sizes}).
+
+It is possible to set the low bar profile that applications cannot override
+using the following.
+
+@example
+[overrides]
+
+# do not allow applications use the LOW or VERY-WEAK profiles.
+min-verification-profile = legacy
+
+@end example

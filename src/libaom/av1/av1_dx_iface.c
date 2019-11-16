@@ -16,6 +16,7 @@
 #include "config/aom_version.h"
 
 #include "aom/internal/aom_codec_internal.h"
+#include "aom/internal/aom_image_internal.h"
 #include "aom/aomdx.h"
 #include "aom/aom_decoder.h"
 #include "aom_dsp/bitreader_buffer.h"
@@ -65,7 +66,9 @@ struct aom_codec_alg_priv {
   int num_frame_workers;
   int next_output_worker_id;
 
-  aom_image_t *image_with_grain[MAX_NUM_SPATIAL_LAYERS];
+  aom_image_t image_with_grain;
+  aom_codec_frame_buffer_t grain_image_frame_buffers[MAX_NUM_SPATIAL_LAYERS];
+  size_t num_grain_image_frame_buffers;
   int need_resync;  // wait for key/intra-only frame
   // BufferPool that holds all reference frames. Shared by all the FrameWorkers.
   BufferPool *buffer_pool;
@@ -98,14 +101,14 @@ static aom_codec_err_t decoder_init(aom_codec_ctx_t *ctx,
     priv->flushed = 0;
 
     // TODO(tdaede): this should not be exposed to the API
-    priv->cfg.allow_lowbitdepth = CONFIG_LOWBITDEPTH;
+    priv->cfg.allow_lowbitdepth = !FORCE_HIGHBITDEPTH_DECODING;
     if (ctx->config.dec) {
       priv->cfg = *ctx->config.dec;
       ctx->config.dec = &priv->cfg;
       // default values
       priv->cfg.cfg.ext_partition = 1;
     }
-    av1_zero(priv->image_with_grain);
+    priv->num_grain_image_frame_buffers = 0;
     // Turn row_mt on by default.
     priv->row_mt = 1;
 
@@ -141,15 +144,16 @@ static aom_codec_err_t decoder_destroy(aom_codec_alg_priv_t *ctx) {
   }
 
   if (ctx->buffer_pool) {
+    for (size_t i = 0; i < ctx->num_grain_image_frame_buffers; i++) {
+      ctx->buffer_pool->release_fb_cb(ctx->buffer_pool->cb_priv,
+                                      &ctx->grain_image_frame_buffers[i]);
+    }
     av1_free_ref_frame_buffers(ctx->buffer_pool);
     av1_free_internal_frame_buffers(&ctx->buffer_pool->int_frame_buffers);
   }
 
   aom_free(ctx->frame_workers);
   aom_free(ctx->buffer_pool);
-  for (int i = 0; i < MAX_NUM_SPATIAL_LAYERS; i++) {
-    if (ctx->image_with_grain[i]) aom_img_free(ctx->image_with_grain[i]);
-  }
   aom_free(ctx);
   return AOM_CODEC_OK;
 }
@@ -578,6 +582,7 @@ static aom_codec_err_t decoder_inspect(aom_codec_alg_priv_t *ctx,
                                        void *user_priv) {
   aom_codec_err_t res = AOM_CODEC_OK;
 
+  const uint8_t *const data_end = data + data_sz;
   Av1DecodeReturn *data2 = (Av1DecodeReturn *)user_priv;
 
   if (ctx->frame_workers == NULL) {
@@ -595,6 +600,13 @@ static aom_codec_err_t decoder_inspect(aom_codec_alg_priv_t *ctx,
 
   if (ctx->frame_workers->had_error)
     return update_error_state(ctx, &frame_worker_data->pbi->common.error);
+
+  // Allow extra zero bytes after the frame end
+  while (data < data_end) {
+    const uint8_t marker = data[0];
+    if (marker) break;
+    ++data;
+  }
 
   data2->idx = -1;
   for (int i = 0; i < REF_FRAMES; ++i)
@@ -632,6 +644,13 @@ static aom_codec_err_t decoder_decode(aom_codec_alg_priv_t *ctx,
       pbi->num_output_frames = 0;
     }
     unlock_buffer_pool(pool);
+    for (size_t j = 0; j < ctx->num_grain_image_frame_buffers; j++) {
+      pool->release_fb_cb(pool->cb_priv, &ctx->grain_image_frame_buffers[j]);
+      ctx->grain_image_frame_buffers[j].data = NULL;
+      ctx->grain_image_frame_buffers[j].size = 0;
+      ctx->grain_image_frame_buffers[j].priv = NULL;
+    }
+    ctx->num_grain_image_frame_buffers = 0;
   }
 
   /* Sanity checks */
@@ -699,45 +718,50 @@ static aom_codec_err_t decoder_decode(aom_codec_alg_priv_t *ctx,
   return res;
 }
 
+typedef struct {
+  BufferPool *pool;
+  aom_codec_frame_buffer_t *fb;
+} AllocCbParam;
+
+static void *AllocWithGetFrameBufferCb(void *priv, size_t size) {
+  AllocCbParam *param = (AllocCbParam *)priv;
+  if (param->pool->get_fb_cb(param->pool->cb_priv, size, param->fb) < 0)
+    return NULL;
+  if (param->fb->data == NULL || param->fb->size < size) return NULL;
+  return param->fb->data;
+}
+
 // If grain_params->apply_grain is false, returns img. Otherwise, adds film
-// grain to img, saves the result in *grain_img_ptr (allocating *grain_img_ptr
-// if necessary), and returns *grain_img_ptr.
-static aom_image_t *add_grain_if_needed(aom_image_t *img,
-                                        aom_image_t **grain_img_ptr,
+// grain to img, saves the result in grain_img, and returns grain_img.
+static aom_image_t *add_grain_if_needed(aom_codec_alg_priv_t *ctx,
+                                        aom_image_t *img,
+                                        aom_image_t *grain_img,
                                         aom_film_grain_t *grain_params) {
   if (!grain_params->apply_grain) return img;
-
-  aom_image_t *grain_img_buf = *grain_img_ptr;
 
   const int w_even = ALIGN_POWER_OF_TWO(img->d_w, 1);
   const int h_even = ALIGN_POWER_OF_TWO(img->d_h, 1);
 
-  if (grain_img_buf) {
-    const int alloc_w = ALIGN_POWER_OF_TWO(grain_img_buf->d_w, 1);
-    const int alloc_h = ALIGN_POWER_OF_TWO(grain_img_buf->d_h, 1);
-    if (w_even != alloc_w || h_even != alloc_h ||
-        img->fmt != grain_img_buf->fmt) {
-      aom_img_free(grain_img_buf);
-      grain_img_buf = NULL;
-      *grain_img_ptr = NULL;
-    }
-  }
-  if (!grain_img_buf) {
-    grain_img_buf = aom_img_alloc(NULL, img->fmt, w_even, h_even, 16);
-    *grain_img_ptr = grain_img_buf;
+  BufferPool *const pool = ctx->buffer_pool;
+  aom_codec_frame_buffer_t *fb =
+      &ctx->grain_image_frame_buffers[ctx->num_grain_image_frame_buffers];
+  AllocCbParam param;
+  param.pool = pool;
+  param.fb = fb;
+  if (!aom_img_alloc_with_cb(grain_img, img->fmt, w_even, h_even, 16,
+                             AllocWithGetFrameBufferCb, &param)) {
+    return NULL;
   }
 
-  if (grain_img_buf) {
-    grain_img_buf->user_priv = img->user_priv;
-    grain_img_buf->fb_priv = img->fb_priv;
-    if (av1_add_film_grain(grain_params, img, grain_img_buf)) {
-      aom_img_free(grain_img_buf);
-      grain_img_buf = NULL;
-      *grain_img_ptr = NULL;
-    }
+  grain_img->user_priv = img->user_priv;
+  grain_img->fb_priv = fb->priv;
+  if (av1_add_film_grain(grain_params, img, grain_img)) {
+    pool->release_fb_cb(pool->cb_priv, fb);
+    return NULL;
   }
 
-  return grain_img_buf;
+  ctx->num_grain_image_frame_buffers++;
+  return grain_img;
 }
 
 static aom_image_t *decoder_get_frame(aom_codec_alg_priv_t *ctx,
@@ -834,7 +858,7 @@ static aom_image_t *decoder_get_frame(aom_codec_alg_priv_t *ctx,
           img->spatial_id = cm->spatial_layer_id;
           if (cm->skip_film_grain) grain_params->apply_grain = 0;
           aom_image_t *res = add_grain_if_needed(
-              img, &ctx->image_with_grain[*index], grain_params);
+              ctx, img, &ctx->image_with_grain, grain_params);
           if (!res) {
             aom_internal_error(&pbi->common.error, AOM_CODEC_CORRUPT_FRAME,
                                "Grain systhesis failed\n");

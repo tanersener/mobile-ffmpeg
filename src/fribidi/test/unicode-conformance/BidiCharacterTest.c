@@ -289,8 +289,9 @@ main (int argc, char **argv)
 	die ("Failed opening %s\n", filename);
 
     while (!feof(channel)) {
+      int len;
       fgets(line, LINE_SIZE, channel);
-      int len = strlen(line);
+      len = strlen(line);
       if (len == LINE_SIZE-1)
         die("LINE_SIZE=%d too small at line %d!\n", LINE_SIZE, line_no);
 

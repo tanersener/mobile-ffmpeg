@@ -35,7 +35,7 @@ static int is_8x8_block_skip(MB_MODE_INFO **grid, int mi_row, int mi_col,
 
 int av1_cdef_compute_sb_list(const AV1_COMMON *const cm, int mi_row, int mi_col,
                              cdef_list *dlist, BLOCK_SIZE bs) {
-  MB_MODE_INFO **grid = cm->mi_grid_visible;
+  MB_MODE_INFO **grid = cm->mi_grid_base;
   int maxc = cm->mi_cols - mi_col;
   int maxr = cm->mi_rows - mi_row;
 
@@ -169,10 +169,10 @@ void av1_cdef_frame(YV12_BUFFER_CONFIG *frame, AV1_COMMON *cm,
       int nhb, nvb;
       int cstart = 0;
       curr_row_cdef[fbc] = 0;
-      if (cm->mi_grid_visible[MI_SIZE_64X64 * fbr * cm->mi_stride +
-                              MI_SIZE_64X64 * fbc] == NULL ||
-          cm->mi_grid_visible[MI_SIZE_64X64 * fbr * cm->mi_stride +
-                              MI_SIZE_64X64 * fbc]
+      if (cm->mi_grid_base[MI_SIZE_64X64 * fbr * cm->mi_stride +
+                           MI_SIZE_64X64 * fbc] == NULL ||
+          cm->mi_grid_base[MI_SIZE_64X64 * fbr * cm->mi_stride +
+                           MI_SIZE_64X64 * fbc]
                   ->cdef_strength == -1) {
         cdef_left = 0;
         continue;
@@ -207,8 +207,8 @@ void av1_cdef_frame(YV12_BUFFER_CONFIG *frame, AV1_COMMON *cm,
         frame_right = 1;
 
       const int mbmi_cdef_strength =
-          cm->mi_grid_visible[MI_SIZE_64X64 * fbr * cm->mi_stride +
-                              MI_SIZE_64X64 * fbc]
+          cm->mi_grid_base[MI_SIZE_64X64 * fbr * cm->mi_stride +
+                           MI_SIZE_64X64 * fbc]
               ->cdef_strength;
       level =
           cdef_info->cdef_strengths[mbmi_cdef_strength] / CDEF_SEC_STRENGTHS;

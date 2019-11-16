@@ -23,6 +23,8 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * <p>Main class for FFmpeg operations. Provides {@link #execute(String...)} method to execute
@@ -41,9 +43,11 @@ public class FFmpeg {
 
     public static final int RETURN_CODE_CANCEL = 255;
 
+    public static final int RETURN_CODE_MULTIPLE_EXECUTIONS_NOT_ALLOWED = 300;
+
     private static int lastReturnCode = 0;
 
-    private static StringBuffer lastCommandOutput = new StringBuffer();
+    private static final AtomicBoolean started = new AtomicBoolean(false);
 
     static {
         AbiDetect.class.getName();
@@ -54,15 +58,6 @@ public class FFmpeg {
      * Default constructor hidden.
      */
     private FFmpeg() {
-    }
-
-    /**
-     * <p>Appends given log output to the last command output.
-     *
-     * @param output log output
-     */
-    static void appendCommandOutput(final String output) {
-        lastCommandOutput.append(output);
     }
 
     /**
@@ -94,21 +89,28 @@ public class FFmpeg {
      * @return zero on successful execution, 255 on user cancel and non-zero on error
      */
     public static int execute(final String[] arguments) {
-        lastCommandOutput = new StringBuffer();
-
-        lastReturnCode = Config.nativeExecute(arguments);
+        if (started.compareAndSet(false, true)) {
+            lastReturnCode = Config.nativeExecute(arguments);
+            started.compareAndSet(true, false);
+        } else {
+            Log.e(Config.TAG, "execute cancelled. Multiple executions not supported.");
+            lastReturnCode = RETURN_CODE_MULTIPLE_EXECUTIONS_NOT_ALLOWED;
+        }
 
         return lastReturnCode;
     }
 
     /**
      * <p>Synchronously executes FFmpeg command provided. Command is split into arguments using
-     * provided delimiter.
+     * provided delimiter character.
      *
      * @param command   FFmpeg command
-     * @param delimiter delimiter used between arguments
+     * @param delimiter delimiter used to split arguments
      * @return zero on successful execution, 255 on user cancel and non-zero on error
      * @since 3.0
+     * @deprecated argument splitting mechanism used in this method is pretty simple and prone to
+     * errors. Consider using a more advanced method like {@link #execute(String)} or
+     * {@link #execute(String[])}
      */
     public static int execute(final String command, final String delimiter) {
         return execute((command == null) ? new String[]{""} : command.split((delimiter == null) ? " " : delimiter));
@@ -122,7 +124,7 @@ public class FFmpeg {
      * @return zero on successful execution, 255 on user cancel and non-zero on error
      */
     public static int execute(final String command) {
-        return execute(command, " ");
+        return execute(parseArguments(command));
     }
 
     /**
@@ -144,14 +146,20 @@ public class FFmpeg {
     }
 
     /**
-     * <p>Returns log output of last executed command. Please note that disabling redirection using
-     * {@link Config#disableRedirection()} method also disables this functionality.
+     * <p>Returns log output of the last executed command. Please note that disabling redirection
+     * using {@link Config#disableRedirection()} method also disables this functionality.
      *
-     * @return output of last executed command
+     * @return output of the last executed command
      * @since 3.0
      */
     public static String getLastCommandOutput() {
-        return lastCommandOutput.toString();
+        String nativeLastCommandOutput = Config.getNativeLastCommandOutput();
+        if (nativeLastCommandOutput != null) {
+
+            // REPLACING CH(13) WITH CH(10)
+            nativeLastCommandOutput = nativeLastCommandOutput.replace('\r', '\n');
+        }
+        return nativeLastCommandOutput;
     }
 
     /**
@@ -174,7 +182,14 @@ public class FFmpeg {
      * @since 3.0
      */
     public static MediaInformation getMediaInformation(final String path, final Long timeout) {
-        int rc = Config.systemExecute(new String[]{"-v", "info", "-hide_banner", "-i", path}, new ArrayList<>(Arrays.asList("Press [q] to stop, [?] for help", "No such file or directory", "Input/output error", "Conversion failed", "HTTP error")), "At least one output file must be specified", timeout);
+        final int rc;
+        if (started.compareAndSet(false, true)) {
+            rc = Config.systemExecute(new String[]{"-v", "info", "-hide_banner", "-i", path}, new ArrayList<>(Arrays.asList("Press [q] to stop, [?] for help", "No such file or directory", "Input/output error", "Conversion failed", "HTTP error")), "At least one output file must be specified", timeout);
+            started.compareAndSet(true, false);
+        } else {
+            Log.e(Config.TAG, "getMediaInformation cancelled. Multiple executions not supported.");
+            rc = RETURN_CODE_MULTIPLE_EXECUTIONS_NOT_ALLOWED;
+        }
 
         if (rc == 0) {
             return MediaInformationParser.from(Config.getSystemCommandOutput());
@@ -200,6 +215,91 @@ public class FFmpeg {
      */
     public static String getBuildDate() {
         return Config.getNativeBuildDate();
+    }
+
+    /**
+     * <p>Parses the given command into arguments.
+     *
+     * @param command string command
+     * @return array of arguments
+     */
+    static String[] parseArguments(final String command) {
+        final List<String> argumentList = new ArrayList<>();
+        StringBuilder currentArgument = new StringBuilder();
+
+        boolean singleQuoteStarted = false;
+        boolean doubleQuoteStarted = false;
+
+        for (int i = 0; i < command.length(); i++) {
+            final Character previousChar;
+            if (i > 0) {
+                previousChar = command.charAt(i - 1);
+            } else {
+                previousChar = null;
+            }
+            final char currentChar = command.charAt(i);
+
+            if (currentChar == ' ') {
+                if (singleQuoteStarted || doubleQuoteStarted) {
+                    currentArgument.append(currentChar);
+                } else if (currentArgument.length() > 0) {
+                    argumentList.add(currentArgument.toString());
+                    currentArgument = new StringBuilder();
+                }
+            } else if (currentChar == '\'' && (previousChar == null || previousChar != '\\')) {
+                if (singleQuoteStarted) {
+                    singleQuoteStarted = false;
+                } else if (doubleQuoteStarted) {
+                    currentArgument.append(currentChar);
+                } else {
+                    singleQuoteStarted = true;
+                }
+            } else if (currentChar == '\"' && (previousChar == null || previousChar != '\\')) {
+                if (doubleQuoteStarted) {
+                    doubleQuoteStarted = false;
+                } else if (singleQuoteStarted) {
+                    currentArgument.append(currentChar);
+                } else {
+                    doubleQuoteStarted = true;
+                }
+            } else {
+                currentArgument.append(currentChar);
+            }
+        }
+
+        if (currentArgument.length() > 0) {
+            argumentList.add(currentArgument.toString());
+        }
+
+        return argumentList.toArray(new String[0]);
+    }
+
+    /**
+     * <p>Prints the output of the last executed command to the logcat at the specified priority.
+     *
+     * @param logPriority one of {@link Log#VERBOSE}, {@link Log#DEBUG}, {@link Log#INFO},
+     *                    {@link Log#WARN}, {@link Log#ERROR}, {@link Log#ASSERT}
+     * @since 4.3
+     */
+    public static void printLastCommandOutput(int logPriority) {
+        final int LOGGER_ENTRY_MAX_LEN = 4 * 1000;
+
+        String buffer = FFmpeg.getLastCommandOutput();
+        do {
+            if (buffer.length() <= LOGGER_ENTRY_MAX_LEN) {
+                Log.println(logPriority, Config.TAG, buffer);
+                buffer = "";
+            } else {
+                final int index = buffer.substring(0, LOGGER_ENTRY_MAX_LEN).lastIndexOf('\n');
+                if (index < 0) {
+                    Log.println(logPriority, Config.TAG, buffer.substring(0, LOGGER_ENTRY_MAX_LEN));
+                    buffer = buffer.substring(LOGGER_ENTRY_MAX_LEN);
+                } else {
+                    Log.println(logPriority, Config.TAG, buffer.substring(0, index));
+                    buffer = buffer.substring(index);
+                }
+            }
+        } while (buffer.length() > 0);
     }
 
 }

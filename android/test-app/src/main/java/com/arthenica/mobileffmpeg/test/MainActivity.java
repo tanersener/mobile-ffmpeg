@@ -160,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
      */
     public static void executeAsync(final ExecuteCallback executeCallback, final String arguments) {
         final AsyncExecuteTask asyncCommandTask = new AsyncExecuteTask(executeCallback);
-        asyncCommandTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, arguments.split(" "));
+        asyncCommandTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, arguments);
     }
 
     public static void waitForUIAction() {

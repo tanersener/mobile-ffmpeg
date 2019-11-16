@@ -144,6 +144,10 @@ print_name(gnutls_buffer_st *str, const char *prefix, unsigned type, gnutls_datu
 		addf(str,  _("%sdirectoryName: %.*s\n"), prefix, name->size, NON_NULL(name->data));
 		break;
 
+	case GNUTLS_SAN_REGISTERED_ID:
+			addf(str,  _("%sRegistered ID: %.*s\n"), prefix, name->size, NON_NULL(name->data));
+			break;
+
 	case GNUTLS_SAN_OTHERNAME_XMPP:
 		addf(str,  _("%sXMPP Address: %.*s\n"), prefix, name->size, NON_NULL(name->data));
 		break;
@@ -866,6 +870,94 @@ cleanup:
 	gnutls_x509_tlsfeatures_deinit(features);
 }
 
+static void print_subject_sign_tool(gnutls_buffer_st * str, const char *prefix, const gnutls_datum_t *der)
+{
+	int ret;
+	gnutls_datum_t tmp = {NULL, 0};
+
+	ret = _gnutls_x509_decode_string(ASN1_ETYPE_UTF8_STRING, der->data, der->size, &tmp, 0);
+	if (ret < 0) {
+		addf(str, _("%s\t\t\tASCII: "), prefix);
+		_gnutls_buffer_asciiprint(str, (char*)der->data, der->size);
+
+		addf(str, "\n");
+		addf(str, _("%s\t\t\tHexdump: "), prefix);
+		_gnutls_buffer_hexprint(str, (char*)der->data, der->size);
+		adds(str, "\n");
+
+		return;
+	}
+
+	addf(str, _("%s\t\t\t%.*s\n"), prefix, tmp.size, NON_NULL(tmp.data));
+	_gnutls_free_datum(&tmp);
+}
+
+static void print_issuer_sign_tool(gnutls_buffer_st * str, const char *prefix, const gnutls_datum_t *der)
+{
+	int ret, result;
+	ASN1_TYPE tmpasn = ASN1_TYPE_EMPTY;
+	char asn1_err[ASN1_MAX_ERROR_DESCRIPTION_SIZE] = "";
+	gnutls_datum_t tmp;
+
+	if ((result = asn1_create_element(_gnutls_get_gnutls_asn(), "GNUTLS.IssuerSignTool",
+				 &tmpasn)) != ASN1_SUCCESS) {
+		gnutls_assert();
+		goto hexdump;
+	}
+
+	if ((result = _asn1_strict_der_decode(&tmpasn, der->data, der->size, asn1_err)) != ASN1_SUCCESS) {
+		gnutls_assert();
+		_gnutls_debug_log("_asn1_strict_der_decode: %s\n", asn1_err);
+		asn1_delete_structure(&tmpasn);
+		goto hexdump;
+	}
+
+	ret = _gnutls_x509_read_value(tmpasn, "signTool", &tmp);
+	if (ret < 0) {
+		gnutls_assert();
+		goto hexdump;
+	}
+	addf(str, _("%s\t\t\tSignTool: %.*s\n"), prefix, tmp.size, NON_NULL(tmp.data));
+	_gnutls_free_datum(&tmp);
+
+	ret = _gnutls_x509_read_value(tmpasn, "cATool", &tmp);
+	if (ret < 0) {
+		gnutls_assert();
+		goto hexdump;
+	}
+	addf(str, _("%s\t\t\tCATool: %.*s\n"), prefix, tmp.size, NON_NULL(tmp.data));
+	_gnutls_free_datum(&tmp);
+
+	ret = _gnutls_x509_read_value(tmpasn, "signToolCert", &tmp);
+	if (ret < 0) {
+		gnutls_assert();
+		goto hexdump;
+	}
+	addf(str, _("%s\t\t\tSignToolCert: %.*s\n"), prefix, tmp.size, NON_NULL(tmp.data));
+	_gnutls_free_datum(&tmp);
+
+	ret = _gnutls_x509_read_value(tmpasn, "cAToolCert", &tmp);
+	if (ret < 0) {
+		gnutls_assert();
+		goto hexdump;
+	}
+	addf(str, _("%s\t\t\tCAToolCert: %.*s\n"), prefix, tmp.size, NON_NULL(tmp.data));
+	_gnutls_free_datum(&tmp);
+
+	asn1_delete_structure(&tmpasn);
+
+	return;
+
+hexdump:
+	addf(str, _("%s\t\t\tASCII: "), prefix);
+	_gnutls_buffer_asciiprint(str, (char*)der->data, der->size);
+
+	addf(str, "\n");
+	addf(str, _("%s\t\t\tHexdump: "), prefix);
+	_gnutls_buffer_hexprint(str, (char*)der->data, der->size);
+	adds(str, "\n");
+}
+
 struct ext_indexes_st {
 	int san;
 	int ian;
@@ -1128,6 +1220,18 @@ static void print_extension(gnutls_buffer_st * str, const char *prefix,
 		print_tlsfeatures(str, prefix, der);
 
 		idx->tlsfeatures++;
+	} else if (strcmp(oid, "1.2.643.100.111") == 0) {
+		addf(str, _("%s\t\tSubject Signing Tool(%s):\n"),
+			 prefix,
+			 critical ? _("critical") : _("not critical"));
+
+		print_subject_sign_tool(str, prefix, der);
+	} else if (strcmp(oid, "1.2.643.100.112") == 0) {
+		addf(str, _("%s\t\tIssuer Signing Tool(%s):\n"),
+			 prefix,
+			 critical ? _("critical") : _("not critical"));
+
+		print_issuer_sign_tool(str, prefix, der);
 	} else {
 		addf(str, _("%s\t\tUnknown extension %s (%s):\n"),
 		     prefix, oid,

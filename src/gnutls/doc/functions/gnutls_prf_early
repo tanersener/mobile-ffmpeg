@@ -40,5 +40,5 @@ must be non-null.
 
 @strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, or an error code.
 
-@strong{Since:} 3.6.6
+@strong{Since:} 3.6.8
 @end deftypefun

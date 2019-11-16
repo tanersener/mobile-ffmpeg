@@ -14,6 +14,8 @@ IP address SAN.
 OtherName SAN.
 @item GNUTLS_@-SAN_@-DN
 DN SAN.
+@item GNUTLS_@-SAN_@-REGISTERED_@-ID
+RegisteredID.
 @item GNUTLS_@-SAN_@-MAX
 -- undescribed --
 @item GNUTLS_@-SAN_@-OTHERNAME_@-XMPP

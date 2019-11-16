@@ -25,8 +25,8 @@ extern "C" {
 #define VPX_SWAP(type, a, b) \
   do {                       \
     type c = (b);            \
-    b = a;                   \
-    a = c;                   \
+    (b) = a;                 \
+    (a) = c;                 \
   } while (0)
 
 #if CONFIG_VP9_HIGHBITDEPTH
@@ -54,6 +54,10 @@ static INLINE int clamp(int value, int low, int high) {
 }
 
 static INLINE double fclamp(double value, double low, double high) {
+  return value < low ? low : (value > high ? high : value);
+}
+
+static INLINE int64_t lclamp(int64_t value, int64_t low, int64_t high) {
   return value < low ? low : (value > high ? high : value);
 }
 

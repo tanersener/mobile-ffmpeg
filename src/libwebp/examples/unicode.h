@@ -28,7 +28,8 @@
 // Create a wchar_t array containing Unicode parameters.
 #define INIT_WARGV(ARGC, ARGV)                                                \
   int wargc;                                                                  \
-  const W_CHAR** const wargv = CommandLineToArgvW(GetCommandLineW(), &wargc); \
+  const W_CHAR** const wargv =                                                \
+      (const W_CHAR**)CommandLineToArgvW(GetCommandLineW(), &wargc);          \
   do {                                                                        \
     if (wargv == NULL || wargc != (ARGC)) {                                   \
       fprintf(stderr, "Error: Unable to get Unicode arguments.\n");           \

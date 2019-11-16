@@ -42,7 +42,9 @@ typedef struct {
 
 const TestVideoParam kTestVideoVectors[] = {
   { "park_joy_90p_8_420.y4m", AOM_IMG_FMT_I420, AOM_BITS_8, 0, 5, 0, 26.0 },
+#if CONFIG_AV1_HIGHBITDEPTH
   { "park_joy_90p_10_444.y4m", AOM_IMG_FMT_I44416, AOM_BITS_10, 1, 5, 0, 28.0 },
+#endif
   { "screendata.y4m", AOM_IMG_FMT_I420, AOM_BITS_8, 0, 4, 1, 20.0 },
   // Image coding (single frame).
   { "niklas_1280_720_30.y4m", AOM_IMG_FMT_I420, AOM_BITS_8, 0, 1, 0, 32.0 },

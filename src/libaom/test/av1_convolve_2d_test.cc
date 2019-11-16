@@ -15,8 +15,10 @@
 using libaom_test::ACMRandom;
 using libaom_test::AV1Convolve2D::AV1Convolve2DSrTest;
 using libaom_test::AV1Convolve2D::AV1JntConvolve2DTest;
+#if CONFIG_AV1_HIGHBITDEPTH
 using libaom_test::AV1HighbdConvolve2D::AV1HighbdConvolve2DSrTest;
 using libaom_test::AV1HighbdConvolve2D::AV1HighbdJntConvolve2DTest;
+#endif
 using ::testing::make_tuple;
 using ::testing::tuple;
 
@@ -158,6 +160,7 @@ INSTANTIATE_TEST_CASE_P(NEON_Y, AV1JntConvolve2DTest,
                             av1_dist_wtd_convolve_y_neon, 0, 1));
 #endif  // HAVE_NEON
 
+#if CONFIG_AV1_HIGHBITDEPTH
 TEST_P(AV1HighbdConvolve2DSrTest, CheckOutput) { RunCheckOutput(GET_PARAM(1)); }
 TEST_P(AV1HighbdConvolve2DSrTest, DISABLED_Speed) {
   RunSpeedTest(GET_PARAM(1));
@@ -251,4 +254,5 @@ INSTANTIATE_TEST_CASE_P(AVX2_Y, AV1HighbdJntConvolve2DTest,
                             av1_highbd_dist_wtd_convolve_y_avx2, 0, 1));
 #endif  // HAVE_AVX2
 #endif  // HAVE_SSE4_1
+#endif  // CONFIG_AV1_HIGHBITDEPTH
 }  // namespace

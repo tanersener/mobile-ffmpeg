@@ -147,7 +147,14 @@ const ObmcVarianceTest::ParamType sse4_functions[] = {
   TestFuncs(aom_obmc_variance8x8_c, aom_obmc_variance8x8_sse4_1),
   TestFuncs(aom_obmc_variance8x4_c, aom_obmc_variance8x4_sse4_1),
   TestFuncs(aom_obmc_variance4x8_c, aom_obmc_variance4x8_sse4_1),
-  TestFuncs(aom_obmc_variance4x4_c, aom_obmc_variance4x4_sse4_1)
+  TestFuncs(aom_obmc_variance4x4_c, aom_obmc_variance4x4_sse4_1),
+
+  TestFuncs(aom_obmc_variance64x16_c, aom_obmc_variance64x16_sse4_1),
+  TestFuncs(aom_obmc_variance16x64_c, aom_obmc_variance16x64_sse4_1),
+  TestFuncs(aom_obmc_variance32x8_c, aom_obmc_variance32x8_sse4_1),
+  TestFuncs(aom_obmc_variance8x32_c, aom_obmc_variance8x32_sse4_1),
+  TestFuncs(aom_obmc_variance16x4_c, aom_obmc_variance16x4_sse4_1),
+  TestFuncs(aom_obmc_variance4x16_c, aom_obmc_variance4x16_sse4_1),
 };
 
 INSTANTIATE_TEST_CASE_P(SSE4_1, ObmcVarianceTest,
@@ -170,8 +177,15 @@ const ObmcVarianceTest::ParamType avx2_functions[] = {
   TestFuncs(aom_obmc_variance8x16_c, aom_obmc_variance8x16_avx2),
   TestFuncs(aom_obmc_variance8x8_c, aom_obmc_variance8x8_avx2),
   TestFuncs(aom_obmc_variance8x4_c, aom_obmc_variance8x4_avx2),
-  TestFuncs(aom_obmc_variance4x8_c, aom_obmc_variance4x8_sse4_1),
-  TestFuncs(aom_obmc_variance4x4_c, aom_obmc_variance4x4_sse4_1)
+  TestFuncs(aom_obmc_variance4x8_c, aom_obmc_variance4x8_avx2),
+  TestFuncs(aom_obmc_variance4x4_c, aom_obmc_variance4x4_avx2),
+
+  TestFuncs(aom_obmc_variance64x16_c, aom_obmc_variance64x16_avx2),
+  TestFuncs(aom_obmc_variance16x64_c, aom_obmc_variance16x64_avx2),
+  TestFuncs(aom_obmc_variance32x8_c, aom_obmc_variance32x8_avx2),
+  TestFuncs(aom_obmc_variance8x32_c, aom_obmc_variance8x32_avx2),
+  TestFuncs(aom_obmc_variance16x4_c, aom_obmc_variance16x4_avx2),
+  TestFuncs(aom_obmc_variance4x16_c, aom_obmc_variance4x16_avx2),
 };
 
 INSTANTIATE_TEST_CASE_P(AVX2, ObmcVarianceTest,
@@ -181,7 +195,7 @@ INSTANTIATE_TEST_CASE_P(AVX2, ObmcVarianceTest,
 ////////////////////////////////////////////////////////////////////////////////
 // High bit-depth
 ////////////////////////////////////////////////////////////////////////////////
-
+#if CONFIG_AV1_HIGHBITDEPTH
 class ObmcVarianceHBDTest : public FunctionEquivalenceTest<ObmcVarF> {};
 
 TEST_P(ObmcVarianceHBDTest, RandomValues) {
@@ -336,10 +350,48 @@ ObmcVarianceHBDTest::ParamType sse4_functions_hbd[] = {
   TestFuncs(aom_highbd_12_obmc_variance4x8_c,
             aom_highbd_12_obmc_variance4x8_sse4_1, 12),
   TestFuncs(aom_highbd_12_obmc_variance4x4_c,
-            aom_highbd_12_obmc_variance4x4_sse4_1, 12)
+            aom_highbd_12_obmc_variance4x4_sse4_1, 12),
+
+  TestFuncs(aom_highbd_obmc_variance64x16_c,
+            aom_highbd_obmc_variance64x16_sse4_1, 8),
+  TestFuncs(aom_highbd_obmc_variance16x64_c,
+            aom_highbd_obmc_variance16x64_sse4_1, 8),
+  TestFuncs(aom_highbd_obmc_variance32x8_c, aom_highbd_obmc_variance32x8_sse4_1,
+            8),
+  TestFuncs(aom_highbd_obmc_variance8x32_c, aom_highbd_obmc_variance8x32_sse4_1,
+            8),
+  TestFuncs(aom_highbd_obmc_variance16x4_c, aom_highbd_obmc_variance16x4_sse4_1,
+            8),
+  TestFuncs(aom_highbd_obmc_variance4x16_c, aom_highbd_obmc_variance4x16_sse4_1,
+            8),
+  TestFuncs(aom_highbd_10_obmc_variance64x16_c,
+            aom_highbd_10_obmc_variance64x16_sse4_1, 10),
+  TestFuncs(aom_highbd_10_obmc_variance16x64_c,
+            aom_highbd_10_obmc_variance16x64_sse4_1, 10),
+  TestFuncs(aom_highbd_10_obmc_variance32x8_c,
+            aom_highbd_10_obmc_variance32x8_sse4_1, 10),
+  TestFuncs(aom_highbd_10_obmc_variance8x32_c,
+            aom_highbd_10_obmc_variance8x32_sse4_1, 10),
+  TestFuncs(aom_highbd_10_obmc_variance16x4_c,
+            aom_highbd_10_obmc_variance16x4_sse4_1, 10),
+  TestFuncs(aom_highbd_10_obmc_variance4x16_c,
+            aom_highbd_10_obmc_variance4x16_sse4_1, 10),
+  TestFuncs(aom_highbd_12_obmc_variance64x16_c,
+            aom_highbd_12_obmc_variance64x16_sse4_1, 12),
+  TestFuncs(aom_highbd_12_obmc_variance16x64_c,
+            aom_highbd_12_obmc_variance16x64_sse4_1, 12),
+  TestFuncs(aom_highbd_12_obmc_variance32x8_c,
+            aom_highbd_12_obmc_variance32x8_sse4_1, 12),
+  TestFuncs(aom_highbd_12_obmc_variance8x32_c,
+            aom_highbd_12_obmc_variance8x32_sse4_1, 12),
+  TestFuncs(aom_highbd_12_obmc_variance16x4_c,
+            aom_highbd_12_obmc_variance16x4_sse4_1, 12),
+  TestFuncs(aom_highbd_12_obmc_variance4x16_c,
+            aom_highbd_12_obmc_variance4x16_sse4_1, 12),
 };
 
 INSTANTIATE_TEST_CASE_P(SSE4_1, ObmcVarianceHBDTest,
                         ::testing::ValuesIn(sse4_functions_hbd));
 #endif  // HAVE_SSE4_1
+#endif  // CONFIG_AV1_HIGHBITDEPTH
 }  // namespace

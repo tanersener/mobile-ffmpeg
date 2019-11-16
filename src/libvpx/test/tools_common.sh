@@ -412,6 +412,8 @@ YUV_RAW_INPUT_HEIGHT=288
 
 Y4M_NOSQ_PAR_INPUT="${LIBVPX_TEST_DATA_PATH}/park_joy_90p_8_420_a10-1.y4m"
 Y4M_720P_INPUT="${LIBVPX_TEST_DATA_PATH}/niklas_1280_720_30.y4m"
+Y4M_720P_INPUT_WIDTH=1280
+Y4M_720P_INPUT_HEIGHT=720
 
 # Setup a trap function to clean up after tests complete.
 trap cleanup EXIT

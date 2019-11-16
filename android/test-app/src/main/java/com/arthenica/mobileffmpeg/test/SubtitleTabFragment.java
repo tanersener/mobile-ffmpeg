@@ -48,6 +48,7 @@ import java.math.BigDecimal;
 import java.util.concurrent.Callable;
 
 import static com.arthenica.mobileffmpeg.FFmpeg.RETURN_CODE_CANCEL;
+import static com.arthenica.mobileffmpeg.FFmpeg.RETURN_CODE_MULTIPLE_EXECUTIONS_NOT_ALLOWED;
 import static com.arthenica.mobileffmpeg.FFmpeg.RETURN_CODE_SUCCESS;
 import static com.arthenica.mobileffmpeg.test.MainActivity.TAG;
 
@@ -178,7 +179,9 @@ public class SubtitleTabFragment extends Fragment {
                 public void apply(final int returnCode, final String commandOutput) {
                     Log.d(TAG, String.format("FFmpeg process exited with rc %d", returnCode));
 
-                    state = State.IDLE;
+                    if (returnCode != RETURN_CODE_MULTIPLE_EXECUTIONS_NOT_ALLOWED) {
+                        state = State.IDLE;
+                    }
 
                     hideCreateProgressDialog();
 
@@ -204,7 +207,9 @@ public class SubtitleTabFragment extends Fragment {
                                     public void apply(final int returnCode, final String commandOutput) {
                                         Log.d(TAG, String.format("FFmpeg process exited with rc %d", returnCode));
 
-                                        state = State.IDLE;
+                                        if (returnCode != RETURN_CODE_MULTIPLE_EXECUTIONS_NOT_ALLOWED) {
+                                            state = State.IDLE;
+                                        }
 
                                         hideBurnProgressDialog();
 
@@ -217,10 +222,13 @@ public class SubtitleTabFragment extends Fragment {
                                                     playVideo();
                                                 } else if (returnCode == RETURN_CODE_CANCEL) {
                                                     Popup.show(mainActivity, "Burn subtitles operation cancelled.");
-                                                    Log.d(TAG, "Burn subtitles operation cancelled");
+                                                    Log.e(TAG, "Burn subtitles operation cancelled");
+                                                } else if (returnCode == RETURN_CODE_MULTIPLE_EXECUTIONS_NOT_ALLOWED) {
+                                                    Popup.show(mainActivity, "Multiple burn subtitles operations not allowed.");
+                                                    Log.e(TAG, "Multiple burn subtitles operations not allowed");
                                                 } else {
                                                     Popup.show(mainActivity, "Burn subtitles failed. Please check log for the details.");
-                                                    Log.d(TAG, String.format("Burn subtitles failed with rc=%d", returnCode));
+                                                    Log.e(TAG, String.format("Burn subtitles failed with rc=%d", returnCode));
                                                 }
 
                                                 return null;
@@ -231,10 +239,13 @@ public class SubtitleTabFragment extends Fragment {
 
                             } else if (returnCode == RETURN_CODE_CANCEL) {
                                 Popup.show(mainActivity, "Create operation cancelled.");
-                                Log.d(TAG, "Create operation cancelled");
+                                Log.e(TAG, "Create operation cancelled");
+                            } else if (returnCode == RETURN_CODE_MULTIPLE_EXECUTIONS_NOT_ALLOWED) {
+                                Popup.show(mainActivity, "Multiple create operations not allowed.");
+                                Log.e(TAG, "Multiple create operations not allowed");
                             } else {
                                 Popup.show(mainActivity, "Create video failed. Please check log for the details.");
-                                Log.d(TAG, String.format("Create failed with rc=%d", returnCode));
+                                Log.e(TAG, String.format("Create failed with rc=%d", returnCode));
                             }
 
                             return null;

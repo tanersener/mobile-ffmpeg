@@ -22,6 +22,9 @@ extern "C" {
 struct AV1_COMP;
 struct EncodeFrameParams;
 
+#define MIN_ARF_GF_BOOST 240
+#define NORMAL_BOOST 100
+
 // Set up the Group-Of-Pictures structure for this GF_GROUP.  This involves
 // deciding where to place the various FRAME_UPDATE_TYPEs in the group.  It does
 // this primarily by setting the contents of
@@ -29,6 +32,9 @@ struct EncodeFrameParams;
 void av1_gop_setup_structure(
     struct AV1_COMP *cpi, const struct EncodeFrameParams *const frame_params);
 
+int av1_calc_arf_boost(const TWO_PASS *twopass, const RATE_CONTROL *rc,
+                       FRAME_INFO *frame_info, int offset, int f_frames,
+                       int b_frames);
 #ifdef __cplusplus
 }  // extern "C"
 #endif

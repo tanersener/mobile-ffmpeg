@@ -30,6 +30,7 @@
 #include "imagelist.h"
 #include "inter.h"
 #include "scalinglist.h"
+#include "strategyselector.h"
 #include "tables.h"
 #include "transform.h"
 
@@ -40,8 +41,6 @@
 #define SCAN_SET_SIZE        16
 #define LOG2_SCAN_SET_SIZE    4
 #define SBH_THRESHOLD         4
-
-static const double COEFF_SUM_MULTIPLIER = 1.9;
 
 const uint32_t kvz_g_go_rice_range[5] = { 7, 14, 26, 46, 78 };
 const uint32_t kvz_g_go_rice_prefix_len[5] = { 8, 7, 6, 5, 4 };
@@ -195,7 +194,6 @@ static INLINE uint32_t get_coeff_cabac_cost(
   return (23 - cabac_copy.bits_left) + (cabac_copy.num_buffered_bytes << 3);
 }
 
-
 /**
  * \brief Estimate bitcost for coding coefficients.
  *
@@ -211,14 +209,16 @@ uint32_t kvz_get_coeff_cost(const encoder_state_t * const state,
                             int32_t type,
                             int8_t scan_mode)
 {
-  if (state->encoder_control->cfg.rdo > 0) {
+  if (state->qp >= state->encoder_control->cfg.fast_residual_cost_limit) {
     return get_coeff_cabac_cost(state, coeff, width, type, scan_mode);
 
   } else {
-    return COEFF_SUM_MULTIPLIER * kvz_coeff_abs_sum(coeff, width * width) + 0.5;
+    // Estimate coeff coding cost based on QP and sum of absolute coeffs.
+    // const uint32_t sum = kvz_coeff_abs_sum(coeff, width * width);
+    // return (uint32_t)(sum * (state->qp * COEFF_COST_QP_FACTOR + COEFF_COST_BIAS) + 0.5);
+    return kvz_fast_coeff_cost(coeff, width, state->qp);
   }
 }
-
 
 #define COEF_REMAIN_BIN_REDUCTION 3
 /** Calculates the cost for specific absolute transform level
@@ -879,52 +879,23 @@ void kvz_rdoq(encoder_state_t * const state, coeff_t *coef, coeff_t *dest_coeff,
   }
 }
 
-/** MVD cost calculation with CABAC
-* \returns int
-* Calculates cost of actual motion vectors using CABAC coding
-*/
+/**
+ * Calculate cost of actual motion vectors using CABAC coding
+ */
 uint32_t kvz_get_mvd_coding_cost_cabac(const encoder_state_t *state,
-                                       vector2d_t *mvd,
-                                       const cabac_data_t* real_cabac)
+                                       const cabac_data_t* cabac,
+                                       const int32_t mvd_hor,
+                                       const int32_t mvd_ver)
 {
-  uint32_t bitcost = 0;
-  const int32_t mvd_hor = mvd->x;
-  const int32_t mvd_ver = mvd->y;
-  const int8_t hor_abs_gr0 = mvd_hor != 0;
-  const int8_t ver_abs_gr0 = mvd_ver != 0;
-  const uint32_t mvd_hor_abs = abs(mvd_hor);
-  const uint32_t mvd_ver_abs = abs(mvd_ver);
+  cabac_data_t cabac_copy = *cabac;
+  cabac_copy.only_count = 1;
 
-  cabac_data_t cabac_copy;
-  memcpy(&cabac_copy, real_cabac, sizeof(cabac_data_t));
-  cabac_data_t *cabac = &cabac_copy;
-  cabac->only_count = 1;
+  // It is safe to drop const here because cabac->only_count is set.
+  kvz_encode_mvd((encoder_state_t*) state, &cabac_copy, mvd_hor, mvd_ver);
 
-  cabac->cur_ctx = &(cabac->ctx.cu_mvd_model[0]);
-  CABAC_BIN(cabac, (mvd_hor != 0), "abs_mvd_greater0_flag_hor");
-  CABAC_BIN(cabac, (mvd_ver != 0), "abs_mvd_greater0_flag_ver");
-  cabac->cur_ctx = &(cabac->ctx.cu_mvd_model[1]);
-  if (hor_abs_gr0) {
-    CABAC_BIN(cabac, (mvd_hor_abs > 1), "abs_mvd_greater1_flag_hor");
-  }
-  if (ver_abs_gr0) {
-    CABAC_BIN(cabac, (mvd_ver_abs > 1), "abs_mvd_greater1_flag_ver");
-  }
-  if (hor_abs_gr0) {
-    if (mvd_hor_abs > 1) {
-      // It is safe to drop const here because cabac->only_count is set.
-      kvz_cabac_write_ep_ex_golomb((encoder_state_t*)state, cabac, mvd_hor_abs - 2, 1);
-    }
-    CABAC_BIN_EP(cabac, (mvd_hor > 0) ? 0 : 1, "mvd_sign_flag_hor");
-  }
-  if (ver_abs_gr0) {
-    if (mvd_ver_abs > 1) {
-      // It is safe to drop const here because cabac->only_count is set.
-      kvz_cabac_write_ep_ex_golomb((encoder_state_t*)state, cabac, mvd_ver_abs - 2, 1);
-    }
-    CABAC_BIN_EP(cabac, (mvd_ver > 0) ? 0 : 1, "mvd_sign_flag_ver");
-  }
-  bitcost = ((23 - cabac->bits_left) + (cabac->num_buffered_bytes << 3)) - ((23 - real_cabac->bits_left) + (real_cabac->num_buffered_bytes << 3));
+  uint32_t bitcost =
+    ((23 - cabac_copy.bits_left) + (cabac_copy.num_buffered_bytes << 3)) -
+    ((23 - cabac->bits_left)     + (cabac->num_buffered_bytes << 3));
 
   return bitcost;
 }
@@ -946,8 +917,7 @@ uint32_t kvz_calc_mvd_cost_cabac(const encoder_state_t * state,
   cabac_data_t state_cabac_copy;
   cabac_data_t* cabac;
   uint32_t merge_idx;
-  int cand1_cost, cand2_cost;
-  vector2d_t mvd_temp1, mvd_temp2, mvd = { 0, 0 };
+  vector2d_t mvd = { 0, 0 };
   int8_t merged = 0;
   int8_t cur_mv_cand = 0;
 
@@ -979,27 +949,30 @@ uint32_t kvz_calc_mvd_cost_cabac(const encoder_state_t * state,
   cabac = &state_cabac_copy;
 
   if (!merged) {
-    mvd_temp1.x = x - mv_cand[0][0];
-    mvd_temp1.y = y - mv_cand[0][1];
-    cand1_cost = kvz_get_mvd_coding_cost_cabac(state, &mvd_temp1, cabac);
-
-    mvd_temp2.x = x - mv_cand[1][0];
-    mvd_temp2.y = y - mv_cand[1][1];
-    cand2_cost = kvz_get_mvd_coding_cost_cabac(state, &mvd_temp2, cabac);
+    vector2d_t mvd1 = {
+      x - mv_cand[0][0],
+      y - mv_cand[0][1],
+    };
+    vector2d_t mvd2 = {
+      x - mv_cand[1][0],
+      y - mv_cand[1][1],
+    };
+    uint32_t cand1_cost = kvz_get_mvd_coding_cost_cabac(state, cabac, mvd1.x, mvd1.y);
+    uint32_t cand2_cost = kvz_get_mvd_coding_cost_cabac(state, cabac, mvd2.x, mvd2.y);
 
     // Select candidate 1 if it has lower cost
     if (cand2_cost < cand1_cost) {
       cur_mv_cand = 1;
-      mvd = mvd_temp2;
+      mvd = mvd2;
     } else {
-      mvd = mvd_temp1;
+      mvd = mvd1;
     }
   }
 
   cabac->cur_ctx = &(cabac->ctx.cu_merge_flag_ext_model);
 
   CABAC_BIN(cabac, merged, "MergeFlag");
-  num_cand = MRG_MAX_NUM_CANDS;
+  num_cand = state->encoder_control->cfg.max_merge;
   if (merged) {
     if (num_cand > 1) {
       int32_t ui;
@@ -1058,51 +1031,18 @@ uint32_t kvz_calc_mvd_cost_cabac(const encoder_state_t * state,
 
         // ToDo: Bidir vector support
         if (!(state->frame->ref_list == REF_PIC_LIST_1 && /*cur_cu->inter.mv_dir == 3*/ 0)) {
-          const int32_t mvd_hor = mvd.x;
-          const int32_t mvd_ver = mvd.y;
-          const int8_t hor_abs_gr0 = mvd_hor != 0;
-          const int8_t ver_abs_gr0 = mvd_ver != 0;
-          const uint32_t mvd_hor_abs = abs(mvd_hor);
-          const uint32_t mvd_ver_abs = abs(mvd_ver);
-
-          cabac->cur_ctx = &(cabac->ctx.cu_mvd_model[0]);
-          CABAC_BIN(cabac, (mvd_hor != 0), "abs_mvd_greater0_flag_hor");
-          CABAC_BIN(cabac, (mvd_ver != 0), "abs_mvd_greater0_flag_ver");
-
-          cabac->cur_ctx = &(cabac->ctx.cu_mvd_model[1]);
-
-          if (hor_abs_gr0) {
-            CABAC_BIN(cabac, (mvd_hor_abs > 1), "abs_mvd_greater1_flag_hor");
-          }
-
-          if (ver_abs_gr0) {
-            CABAC_BIN(cabac, (mvd_ver_abs > 1), "abs_mvd_greater1_flag_ver");
-          }
-
-          if (hor_abs_gr0) {
-            if (mvd_hor_abs > 1) {
-              // It is safe to drop const because cabac->only_count is set.
-              kvz_cabac_write_ep_ex_golomb((encoder_state_t*)state, cabac, mvd_hor_abs - 2, 1);
-            }
-
-            CABAC_BIN_EP(cabac, (mvd_hor > 0) ? 0 : 1, "mvd_sign_flag_hor");
-          }
-
-          if (ver_abs_gr0) {
-            if (mvd_ver_abs > 1) {
-              // It is safe to drop const because cabac->only_count is set.
-              kvz_cabac_write_ep_ex_golomb((encoder_state_t*)state, cabac, mvd_ver_abs - 2, 1);
-            }
-
-            CABAC_BIN_EP(cabac, (mvd_ver > 0) ? 0 : 1, "mvd_sign_flag_ver");
-          }
+          // It is safe to drop const here because cabac->only_count is set.
+          kvz_encode_mvd((encoder_state_t*) state, cabac, mvd.x, mvd.y);
         }
 
         // Signal which candidate MV to use
-        kvz_cabac_write_unary_max_symbol(cabac, cabac->ctx.mvp_idx_model, cur_mv_cand, 1,
-          AMVP_MAX_NUM_CANDS - 1);
+        kvz_cabac_write_unary_max_symbol(
+            cabac,
+            cabac->ctx.mvp_idx_model,
+            cur_mv_cand,
+            1,
+            AMVP_MAX_NUM_CANDS - 1);
       }
-
     }
   }
 

@@ -23,8 +23,6 @@
 /****************************************************************************
  *
  ****************************************************************************/
-#define yv12_align_addr(addr, align) \
-  (void *)(((size_t)(addr) + ((align)-1)) & (size_t) - (align))
 
 // TODO(jkoleszar): Maybe replace this with struct aom_image
 int aom_free_frame_buffer(YV12_BUFFER_CONFIG *ybf) {
@@ -87,7 +85,7 @@ static int realloc_frame_buffer_aligned(
       if (fb->data == NULL || fb->size < external_frame_size)
         return AOM_CODEC_MEM_ERROR;
 
-      ybf->buffer_alloc = (uint8_t *)yv12_align_addr(fb->data, 32);
+      ybf->buffer_alloc = (uint8_t *)aom_align_addr(fb->data, 32);
 
 #if defined(__has_feature)
 #if __has_feature(memory_sanitizer)
@@ -142,15 +140,15 @@ static int realloc_frame_buffer_aligned(
       ybf->flags = 0;
     }
 
-    ybf->y_buffer = (uint8_t *)yv12_align_addr(
+    ybf->y_buffer = (uint8_t *)aom_align_addr(
         buf + (border * y_stride) + border, aom_byte_align);
-    ybf->u_buffer = (uint8_t *)yv12_align_addr(
+    ybf->u_buffer = (uint8_t *)aom_align_addr(
         buf + yplane_size + (uv_border_h * uv_stride) + uv_border_w,
         aom_byte_align);
     ybf->v_buffer =
-        (uint8_t *)yv12_align_addr(buf + yplane_size + uvplane_size +
-                                       (uv_border_h * uv_stride) + uv_border_w,
-                                   aom_byte_align);
+        (uint8_t *)aom_align_addr(buf + yplane_size + uvplane_size +
+                                      (uv_border_h * uv_stride) + uv_border_w,
+                                  aom_byte_align);
 
     ybf->use_external_reference_buffers = 0;
 

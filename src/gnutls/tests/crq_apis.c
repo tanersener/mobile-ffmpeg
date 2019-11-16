@@ -40,18 +40,19 @@ static void tls_log_func(int level, const char *str)
 
 static unsigned char saved_crq_pem[] =
 	"-----BEGIN NEW CERTIFICATE REQUEST-----\n"
-	"MIICHTCCAYYCAQAwKzEOMAwGA1UEAxMFbmlrb3MxGTAXBgNVBAoTEG5vbmUgdG8s\n"
+	"MIICSjCCAbMCAQAwKzEOMAwGA1UEAxMFbmlrb3MxGTAXBgNVBAoTEG5vbmUgdG8s\n"
 	"IG1lbnRpb24wgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBALtmQ/Xyxde2jMzF\n"
 	"3/WIO7HJS2oOoa0gUEAIgKFPXKPQ+GzP5jz37AR2ExeLZIkiW8DdU3w77XwEu4C5\n"
 	"KL6Om8aOoKUSy/VXHqLnu7czSZ/ju0quak1o/8kR4jKNzj2AC41179gAgY8oBAOg\n"
-	"Io1hBAf6tjd9IQdJ0glhaZiQo1ipAgMBAAGggbEwEgYJKoZIhvcNAQkHMQUTA2Zv\n"
-	"bzCBmgYJKoZIhvcNAQkOMYGMMIGJMA8GA1UdEwEB/wQFMAMCAQAwDwYDVR0PAQH/\n"
+	"Io1hBAf6tjd9IQdJ0glhaZiQo1ipAgMBAAGggd4wEgYJKoZIhvcNAQkHMQUTA2Zv\n"
+	"bzCBxwYJKoZIhvcNAQkOMYG5MIG2MA8GA1UdEwEB/wQFMAMCAQAwDwYDVR0PAQH/\n"
 	"BAUDAwcAADAjBgNVHREEHDAaggNhcGGCA2Zvb4IOeG4tLWt4YXdoay5jb20wHQYD\n"
 	"VR0lBBYwFAYIKwYBBQUHAwEGCCsGAQUFBwMCMAsGBCoDBAUEA8r+/zAUBggtA4KI\n"
-	"9LkXBQEB/wQFyv7/+v4wDQYJKoZIhvcNAQELBQADgYEAlspSTGu5KPL7iEQObEvs\n"
-	"+FMZpXnPDXyeJyiJFEfDaTDCpeHfZfMXUpPQEAxLjk5t8gPUxepQCjOizOuMD70k\n"
-	"jg8x97E8crA2mZ9Bk/eRhxvdXGN1hBdNzY6BGuPWifN/8dfE6O8wQkZDIZFcYxyr\n"
-	"V1VQd3moq0ge+tR9+xpPVWg=\n"
+	"9LkXBQEB/wQFyv7/+v4wKwYDVR0QBCQwIoAPMjAxOTA3MDkwNDI4MjZagQ8yMDE5\n"
+	"MDcwOTA3MTUwNlowDQYJKoZIhvcNAQELBQADgYEAE7r9ujv9pIO7SnYRg69eQsyo\n"
+	"3cnBi1efkH2OguYe6JT+a+1DA/0tO4GlT9PjAOX2yD2OicIHLVXWYzV8eX6exQma\n"
+	"skdRMZurcSSMZm2VgdQmHU0Rv7o7mQSKGfcOD2fRiDMwNB35ZSY7tkPAe7ARp+zr\n"
+	"lPY8cDpo1i570jttSQ4=\n"
 	"-----END NEW CERTIFICATE REQUEST-----\n";
 
 const gnutls_datum_t saved_crq = { saved_crq_pem, sizeof(saved_crq_pem)-1 };
@@ -83,6 +84,11 @@ static time_t mytime(time_t * t)
 
 	return then;
 }
+
+#define TIME1 1562646506
+#define TIME2 1562656506
+#define CPASS "foo"
+#define CPASS_OID "1.2.840.113549.1.9.7"
 
 static gnutls_x509_crq_t generate_crq(void)
 {
@@ -138,7 +144,7 @@ static gnutls_x509_crq_t generate_crq(void)
 		fail("gnutls_x509_crq_set_dn: %s, %s\n", gnutls_strerror(ret), err);
 	}
 
-	ret = gnutls_x509_crq_set_challenge_password(crq, "foo");
+	ret = gnutls_x509_crq_set_challenge_password(crq, CPASS);
 	if (ret != 0)
 		fail("gnutls_x509_crq_set_challenge_password %d\n", ret);
 
@@ -163,22 +169,22 @@ static gnutls_x509_crq_t generate_crq(void)
 		fail("gnutls_x509_crq_get_extension_data\n");
 
 	ret = gnutls_x509_crq_set_subject_alt_name(crq, GNUTLS_SAN_DNSNAME,
-						   "foo", 3, 1);
+						   "foo", 3, GNUTLS_FSAN_APPEND);
 	if (ret != 0)
 		fail("gnutls_x509_crq_set_subject_alt_name\n");
 
 	ret = gnutls_x509_crq_set_subject_alt_name(crq, GNUTLS_SAN_DNSNAME,
-						   "bar", 3, 1);
+						   "bar", 3, GNUTLS_FSAN_APPEND);
 	if (ret != 0)
 		fail("gnutls_x509_crq_set_subject_alt_name\n");
 
 	ret = gnutls_x509_crq_set_subject_alt_name(crq, GNUTLS_SAN_DNSNAME,
-						   "apa", 3, 0);
+						   "apa", 3, GNUTLS_FSAN_SET);
 	if (ret != 0)
 		fail("gnutls_x509_crq_set_subject_alt_name\n");
 
 	ret = gnutls_x509_crq_set_subject_alt_name(crq, GNUTLS_SAN_DNSNAME,
-						   "foo", 3, 1);
+						   "foo", 3, GNUTLS_FSAN_APPEND);
 	if (ret != 0)
 		fail("gnutls_x509_crq_set_subject_alt_name\n");
 
@@ -231,6 +237,10 @@ static gnutls_x509_crq_t generate_crq(void)
 	if (ret != 0)
 		fail("gnutls_x509_crq_set_extension_by_oid %s\n", gnutls_strerror(ret));
 
+	ret = gnutls_x509_crq_set_private_key_usage_period(crq, TIME1, TIME2);
+	if (ret != 0)
+		fail("gnutls_x509_crq_set_private_key_usage_period\n");
+
 	ret = gnutls_x509_crq_print(crq, GNUTLS_CRT_PRINT_FULL, &out);
 	if (ret != 0)
 		fail("gnutls_x509_crq_print\n");
@@ -273,6 +283,80 @@ static gnutls_x509_crq_t generate_crq(void)
 	gnutls_free(out.data);
 
 	return crq;
+}
+
+/* Tests parameters from the generated CRQ */
+static void test_crq(gnutls_x509_crq_t crq)
+{
+	int ret, pathlen;
+	size_t s = 0;
+	char buf[64];
+	gnutls_datum_t out;
+	time_t t1, t2;
+	unsigned crit, ca, type;
+
+	ret = gnutls_x509_crq_get_dn2(crq, &out);
+	assert(ret == 0);
+	assert(out.size == 28);
+	assert(memcmp(out.data, "CN=nikos,O=none to\\, mention", out.size)==0);
+
+	gnutls_free(out.data);
+
+	ret = gnutls_x509_crq_get_dn3(crq, &out, GNUTLS_X509_DN_FLAG_COMPAT);
+	assert(ret == 0);
+	assert(out.size == 28);
+	assert(memcmp(out.data, "CN=nikos,O=none to\\, mention", out.size)==0);
+
+	gnutls_free(out.data);
+
+	ret = gnutls_x509_crq_get_dn3(crq, &out, 0);
+	assert(ret == 0);
+	assert(out.size == 28);
+	assert(memcmp(out.data, "O=none to\\, mention,CN=nikos", out.size)==0);
+
+	gnutls_free(out.data);
+
+	ret = gnutls_x509_crq_get_basic_constraints(crq, &crit, &ca, &pathlen);
+	assert(ret == 0);
+	assert(ca == 0);
+	assert(pathlen == 0);
+
+	s = sizeof(buf);
+	ret = gnutls_x509_crq_get_subject_alt_name(crq, 0, buf, &s, &type, &crit);
+	assert(ret >= 0);
+	assert(s == 3);
+	assert(memcmp(buf, "apa", s) == 0);
+	assert(type == GNUTLS_SAN_DNSNAME);
+	assert(crit == 0);
+
+	s = sizeof(buf);
+	ret = gnutls_x509_crq_get_subject_alt_name(crq, 1, buf, &s, &type, &crit);
+	assert(ret >= 0);
+	assert(s == 3);
+	assert(memcmp(buf, "foo", s) == 0);
+	assert(type == GNUTLS_SAN_DNSNAME);
+	assert(crit == 0);
+
+	ret = gnutls_x509_crq_get_private_key_usage_period(crq, &t1, &t2, &crit);
+	if (ret < 0)
+		fail("gnutls_x509_crq_get_private_key_usage_period: %s\n", gnutls_strerror(ret));
+	assert(t1 == TIME1);
+	assert(t2 == TIME2);
+	assert(crit == 0);
+
+	/* check the challenge password using the attribute APIs */
+	s = sizeof(buf);
+	ret = gnutls_x509_crq_get_attribute_info(crq, 1, buf, &s);
+	assert(ret >= 0);
+	assert(s == sizeof(CPASS_OID));
+	assert(memcmp(buf, CPASS_OID, s) == 0);
+
+	/* check the contents */
+	s = sizeof(buf);
+	ret = gnutls_x509_crq_get_attribute_data(crq, 1, buf, &s);
+	assert(ret >= 0);
+	assert(s == sizeof(CPASS)-1+2);
+	assert(memcmp(buf, "\x13\x03"CPASS, s) == 0);
 }
 
 static void run_set_extensions(gnutls_x509_crq_t crq)
@@ -447,6 +531,8 @@ void doit(void)
 	gnutls_global_set_time_function(mytime);
 
 	crq = generate_crq();
+
+	test_crq(crq);
 
 	run_set_extensions(crq);
 	run_set_extension_by_oid(crq);

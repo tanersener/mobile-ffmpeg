@@ -213,7 +213,7 @@ unsigned kvz_satd_4x4_subblock_generic(const kvz_pixel * buf1,
 }
 
 void kvz_satd_4x4_subblock_quad_generic(const kvz_pixel *preds[4],
-                                       const int strides[4],
+                                       const int stride,
                                        const kvz_pixel *orig,
                                        const int orig_stride,
                                        unsigned costs[4])
@@ -221,10 +221,10 @@ void kvz_satd_4x4_subblock_quad_generic(const kvz_pixel *preds[4],
   int32_t diff[4][4 * 4];
   for (int y = 0; y < 4; y++) {
     for (int x = 0; x < 4; x++) {
-      diff[0][x + y * 4] = orig[x + y * orig_stride] - preds[0][x + y * strides[0]];
-      diff[1][x + y * 4] = orig[x + y * orig_stride] - preds[1][x + y * strides[1]];
-      diff[2][x + y * 4] = orig[x + y * orig_stride] - preds[2][x + y * strides[2]];
-      diff[3][x + y * 4] = orig[x + y * orig_stride] - preds[3][x + y * strides[3]];
+      diff[0][x + y * 4] = orig[x + y * orig_stride] - preds[0][x + y * stride];
+      diff[1][x + y * 4] = orig[x + y * orig_stride] - preds[1][x + y * stride];
+      diff[2][x + y * 4] = orig[x + y * orig_stride] - preds[2][x + y * stride];
+      diff[3][x + y * 4] = orig[x + y * orig_stride] - preds[3][x + y * stride];
     }
   }
 
@@ -328,15 +328,15 @@ static unsigned satd_8x8_subblock_generic(const kvz_pixel * piOrg, const int32_t
 }
 
 static void satd_8x8_subblock_quad_generic(const kvz_pixel **preds,
-                                       const int *strides,
+                                       const int stride,
                                        const kvz_pixel *orig,
                                        const int orig_stride,
                                        unsigned *costs)
 {
-  costs[0] = satd_8x8_subblock_generic(orig, orig_stride, preds[0], strides[0]);
-  costs[1] = satd_8x8_subblock_generic(orig, orig_stride, preds[1], strides[1]);
-  costs[2] = satd_8x8_subblock_generic(orig, orig_stride, preds[2], strides[2]);
-  costs[3] = satd_8x8_subblock_generic(orig, orig_stride, preds[3], strides[3]);
+  costs[0] = satd_8x8_subblock_generic(orig, orig_stride, preds[0], stride);
+  costs[1] = satd_8x8_subblock_generic(orig, orig_stride, preds[1], stride);
+  costs[2] = satd_8x8_subblock_generic(orig, orig_stride, preds[2], stride);
+  costs[3] = satd_8x8_subblock_generic(orig, orig_stride, preds[3], stride);
 }
 
 // These macros define sadt_16bit_NxN for N = 8, 16, 32, 64
@@ -394,7 +394,7 @@ SATD_DUAL_NXN(64, kvz_pixel)
   static void satd_any_size_ ## suffix ( \
       int width, int height, \
       const kvz_pixel **preds, \
-      const int *strides, \
+      const int stride, \
       const kvz_pixel *orig, \
       const int orig_stride, \
       unsigned num_modes, \
@@ -408,7 +408,7 @@ SATD_DUAL_NXN(64, kvz_pixel)
     if (width % 8 != 0) { \
       /* Process the first column using 4x4 blocks. */ \
       for (int y = 0; y < height; y += 4) { \
-        kvz_satd_4x4_subblock_ ## suffix(preds, strides, orig, orig_stride, sums); \
+        kvz_satd_4x4_subblock_ ## suffix(preds, stride, orig, orig_stride, sums); \
             } \
       orig_ptr += 4; \
       for(int blk = 0; blk < num_parallel_blocks; ++blk){\
@@ -419,23 +419,23 @@ SATD_DUAL_NXN(64, kvz_pixel)
     if (height % 8 != 0) { \
       /* Process the first row using 4x4 blocks. */ \
       for (int x = 0; x < width; x += 4 ) { \
-        kvz_satd_4x4_subblock_ ## suffix(pred_ptrs, strides, orig_ptr, orig_stride, sums); \
+        kvz_satd_4x4_subblock_ ## suffix(pred_ptrs, stride, orig_ptr, orig_stride, sums); \
             } \
       orig_ptr += 4 * orig_stride; \
       for(int blk = 0; blk < num_parallel_blocks; ++blk){\
-        pred_ptrs[blk] += 4 * strides[blk]; \
+        pred_ptrs[blk] += 4 * stride; \
             }\
       height -= 4; \
         } \
     /* The rest can now be processed with 8x8 blocks. */ \
     for (int y = 0; y < height; y += 8) { \
       orig_ptr = &orig[y * orig_stride]; \
-      pred_ptrs[0] = &preds[0][y * strides[0]]; \
-      pred_ptrs[1] = &preds[1][y * strides[1]]; \
-      pred_ptrs[2] = &preds[2][y * strides[2]]; \
-      pred_ptrs[3] = &preds[3][y * strides[3]]; \
+      pred_ptrs[0] = &preds[0][y * stride]; \
+      pred_ptrs[1] = &preds[1][y * stride]; \
+      pred_ptrs[2] = &preds[2][y * stride]; \
+      pred_ptrs[3] = &preds[3][y * stride]; \
       for (int x = 0; x < width; x += 8) { \
-        satd_8x8_subblock_ ## suffix(pred_ptrs, strides, orig_ptr, orig_stride, sums); \
+        satd_8x8_subblock_ ## suffix(pred_ptrs, stride, orig_ptr, orig_stride, sums); \
         orig_ptr += 8; \
         pred_ptrs[0] += 8; \
         pred_ptrs[1] += 8; \
@@ -535,6 +535,141 @@ static unsigned pixels_calc_ssd_generic(const kvz_pixel *const ref, const kvz_pi
   return ssd >> (2*(KVZ_BIT_DEPTH-8));
 }
 
+static void inter_recon_bipred_generic(const int hi_prec_luma_rec0,
+	const int hi_prec_luma_rec1,
+	const int hi_prec_chroma_rec0,
+	const int hi_prec_chroma_rec1,
+	int32_t height,
+	int32_t width,
+	int32_t ypos,
+	int32_t xpos,
+	const hi_prec_buf_t*high_precision_rec0,
+	const hi_prec_buf_t*high_precision_rec1,
+	lcu_t* lcu,
+	kvz_pixel* temp_lcu_y,
+	kvz_pixel* temp_lcu_u,
+	kvz_pixel* temp_lcu_v) {
+
+	int shift = 15 - KVZ_BIT_DEPTH;
+	int offset = 1 << (shift - 1);
+
+	int y_in_lcu;
+	int x_in_lcu;
+
+	//After reconstruction, merge the predictors by taking an average of each pixel
+	for (int temp_y = 0; temp_y < height; ++temp_y) {
+
+
+		for (int temp_x = 0; temp_x < width; ++temp_x) {
+			y_in_lcu = ((ypos + temp_y) & ((LCU_WIDTH)-1));
+			x_in_lcu = ((xpos + temp_x) & ((LCU_WIDTH)-1));
+
+			int16_t sample0_y = (hi_prec_luma_rec0 ? high_precision_rec0->y[y_in_lcu * LCU_WIDTH + x_in_lcu] : (temp_lcu_y[y_in_lcu * LCU_WIDTH + x_in_lcu] << (14 - KVZ_BIT_DEPTH)));
+			int16_t sample1_y = (hi_prec_luma_rec1 ? high_precision_rec1->y[y_in_lcu * LCU_WIDTH + x_in_lcu] : (lcu->rec.y[y_in_lcu * LCU_WIDTH + x_in_lcu] << (14 - KVZ_BIT_DEPTH)));
+
+			lcu->rec.y[y_in_lcu * LCU_WIDTH + x_in_lcu] = (kvz_pixel)kvz_fast_clip_32bit_to_pixel((sample0_y + sample1_y + offset) >> shift);
+
+			if (temp_x < width >> 1 && temp_y < height >> 1) {
+
+				y_in_lcu = (((ypos >> 1) + temp_y) & (LCU_WIDTH_C - 1));
+				x_in_lcu = (((xpos >> 1) + temp_x) & (LCU_WIDTH_C - 1));
+
+				int16_t sample0_u = (hi_prec_chroma_rec0 ? high_precision_rec0->u[y_in_lcu * LCU_WIDTH_C + x_in_lcu] : (temp_lcu_u[y_in_lcu * LCU_WIDTH_C + x_in_lcu] << (14 - KVZ_BIT_DEPTH)));
+				int16_t sample1_u = (hi_prec_chroma_rec1 ? high_precision_rec1->u[y_in_lcu * LCU_WIDTH_C + x_in_lcu] : (lcu->rec.u[y_in_lcu * LCU_WIDTH_C + x_in_lcu] << (14 - KVZ_BIT_DEPTH)));
+				lcu->rec.u[y_in_lcu * LCU_WIDTH_C + x_in_lcu] = (kvz_pixel)kvz_fast_clip_32bit_to_pixel((sample0_u + sample1_u + offset) >> shift);
+
+				int16_t sample0_v = (hi_prec_chroma_rec0 ? high_precision_rec0->v[y_in_lcu * LCU_WIDTH_C + x_in_lcu] : (temp_lcu_v[y_in_lcu * LCU_WIDTH_C + x_in_lcu] << (14 - KVZ_BIT_DEPTH)));
+				int16_t sample1_v = (hi_prec_chroma_rec1 ? high_precision_rec1->v[y_in_lcu * LCU_WIDTH_C + x_in_lcu] : (lcu->rec.v[y_in_lcu * LCU_WIDTH_C + x_in_lcu] << (14 - KVZ_BIT_DEPTH)));
+				lcu->rec.v[y_in_lcu * LCU_WIDTH_C + x_in_lcu] = (kvz_pixel)kvz_fast_clip_32bit_to_pixel((sample0_v + sample1_v + offset) >> shift);
+			}
+		}
+	}
+
+}
+
+
+static optimized_sad_func_ptr_t get_optimized_sad_generic(int32_t width)
+{
+  return NULL;
+}
+
+/**
+ * \brief Vertically interpolate SAD outside the frame.
+ *
+ * \param data1   Starting point of the first picture.
+ * \param data2   Starting point of the second picture.
+ * \param width   Width of the region for which SAD is calculated.
+ * \param height  Height of the region for which SAD is calculated.
+ * \param width  Width of the pixel array.
+ *
+ * \returns Sum of Absolute Differences
+ */
+static uint32_t ver_sad_generic(const kvz_pixel *pic_data, const kvz_pixel *ref_data,
+                                int block_width, int block_height, unsigned pic_stride)
+{
+  int x, y;
+  unsigned sad = 0;
+
+  for (y = 0; y < block_height; ++y) {
+    for (x = 0; x < block_width; ++x) {
+      sad += abs(pic_data[y * pic_stride + x] - ref_data[x]);
+    }
+  }
+
+  return sad;
+}
+
+/**
+ * \brief Horizontally interpolate SAD outside the frame.
+ *
+ * \param data1   Starting point of the first picture.
+ * \param data2   Starting point of the second picture.
+ * \param width   Width of the region for which SAD is calculated.
+ * \param height  Height of the region for which SAD is calculated.
+ * \param width   Width of the pixel array.
+ *
+ * \returns Sum of Absolute Differences
+ */
+static unsigned hor_sad(const kvz_pixel *pic_data, const kvz_pixel *ref_data,
+                        int block_width, int block_height, unsigned pic_stride, unsigned ref_stride)
+{
+  int x, y;
+  unsigned sad = 0;
+
+  for (y = 0; y < block_height; ++y) {
+    for (x = 0; x < block_width; ++x) {
+      sad += abs(pic_data[y * pic_stride + x] - ref_data[y * ref_stride]);
+    }
+  }
+
+  return sad;
+}
+
+
+static uint32_t hor_sad_generic(const kvz_pixel *pic_data, const kvz_pixel *ref_data,
+                                int32_t width, int32_t height, uint32_t pic_stride,
+                                uint32_t ref_stride, uint32_t left, uint32_t right)
+{
+  uint32_t result = 0;
+  if (left) {
+    result += hor_sad    (pic_data, ref_data + left, left,
+                          height, pic_stride, ref_stride);
+
+    result += kvz_reg_sad(pic_data + left, ref_data + left, width - left,
+                          height, pic_stride, ref_stride);
+  } else if (right) {
+    result += kvz_reg_sad(pic_data, ref_data, width - right,
+                          height, pic_stride, ref_stride);
+
+    result += hor_sad    (pic_data + width - right,
+                          ref_data + width - right - 1,
+                          right, height, pic_stride, ref_stride);
+  } else {
+    result += kvz_reg_sad(pic_data, ref_data, width,
+                          height, pic_stride, ref_stride);
+  }
+  return result;
+}
 
 int kvz_strategy_register_picture_generic(void* opaque, uint8_t bitdepth)
 {
@@ -569,6 +704,11 @@ int kvz_strategy_register_picture_generic(void* opaque, uint8_t bitdepth)
   success &= kvz_strategyselector_register(opaque, "satd_any_size_quad", "generic", 0, &satd_any_size_quad_generic);
 
   success &= kvz_strategyselector_register(opaque, "pixels_calc_ssd", "generic", 0, &pixels_calc_ssd_generic);
+  success &= kvz_strategyselector_register(opaque, "inter_recon_bipred", "generic", 0, &inter_recon_bipred_generic);
+
+  success &= kvz_strategyselector_register(opaque, "get_optimized_sad", "generic", 0, &get_optimized_sad_generic);
+  success &= kvz_strategyselector_register(opaque, "ver_sad", "generic", 0, &ver_sad_generic);
+  success &= kvz_strategyselector_register(opaque, "hor_sad", "generic", 0, &hor_sad_generic);
 
   return success;
 }

@@ -22,27 +22,28 @@
     <ProjectGuid>{EEA3BDD1-8A08-41C1-BA57-E05D5C2CD8FF}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>kvazaar_lib</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -78,20 +79,26 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <YASM />
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\..\pthreads.2\lib\x64</AdditionalLibraryDirectories>
-      <AdditionalDependencies>pthreadVC2.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
     </Lib>
     <YASM>
       <Defines>ARCH_X86_64=1;%(Defines)</Defines>
+      <IncludePaths>$(SolutionDir)..\src\extras;%(IncludePaths);$(SolutionDir)..\src\strategies\x86-asm;</IncludePaths>
     </YASM>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <YASM>
       <Defines>ARCH_X86_64=0;PREFIX</Defines>
+      <IncludePaths>$(SolutionDir)..\src\extras;%(IncludePaths);$(SolutionDir)..\src\strategies\x86-asm;</IncludePaths>
     </YASM>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\..\pthreads.2\lib\x86</AdditionalLibraryDirectories>
-      <AdditionalDependencies>pthreadVC2.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
     </Lib>
     <ClCompile>
       <UndefinePreprocessorDefinitions>
@@ -101,10 +108,13 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <YASM>
       <Defines>ARCH_X86_64=0;PREFIX</Defines>
+      <IncludePaths>$(SolutionDir)..\src\extras;%(IncludePaths);$(SolutionDir)..\src\strategies\x86-asm;</IncludePaths>
     </YASM>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\..\pthreads.2\lib\x86</AdditionalLibraryDirectories>
-      <AdditionalDependencies>pthreadVC2.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
     </Lib>
     <ClCompile>
       <UndefinePreprocessorDefinitions>
@@ -114,10 +124,13 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <YASM>
       <Defines>ARCH_X86_64=1;%(Defines)</Defines>
+      <IncludePaths>$(SolutionDir)..\src\extras;%(IncludePaths);$(SolutionDir)..\src\strategies\x86-asm;</IncludePaths>
     </YASM>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\..\pthreads.2\lib\x64</AdditionalLibraryDirectories>
-      <AdditionalDependencies>pthreadVC2.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
     </Lib>
     <ClCompile>
       <UndefinePreprocessorDefinitions>
@@ -154,6 +167,12 @@
     <ClCompile Include="..\..\src\search.c" />
     <ClCompile Include="..\..\src\search_inter.c" />
     <ClCompile Include="..\..\src\search_intra.c" />
+    <ClCompile Include="..\..\src\strategies\avx2\encode_coding_tree-avx2.c">
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+    </ClCompile>
     <ClCompile Include="..\..\src\strategies\avx2\intra-avx2.c">
       <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
@@ -172,9 +191,11 @@
       <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
+    <ClCompile Include="..\..\src\strategies\generic\encode_coding_tree-generic.c" />
     <ClCompile Include="..\..\src\strategies\generic\intra-generic.c" />
     <ClCompile Include="..\..\src\strategies\generic\quant-generic.c" />
     <ClCompile Include="..\..\src\strategies\generic\sao-generic.c" />
+    <ClCompile Include="..\..\src\strategies\strategies-encode.c" />
     <ClCompile Include="..\..\src\strategies\strategies-intra.c" />
     <ClCompile Include="..\..\src\strategies\strategies-quant.c" />
     <ClInclude Include="..\..\src\checkpoint.h" />
@@ -214,6 +235,18 @@
     <ClCompile Include="..\..\src\strategies\strategies-picture.c" />
     <ClCompile Include="..\..\src\strategies\strategies-sao.c" />
     <ClCompile Include="..\..\src\strategies\x86_asm\picture-x86-asm.c" />
+    <ClCompile Include="..\..\src\threadwrapper\src\pthread.cpp">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
+    </ClCompile>
+    <ClCompile Include="..\..\src\threadwrapper\src\semaphore.cpp">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
+    </ClCompile>
     <ClCompile Include="..\..\src\videoframe.c" />
     <ClInclude Include="..\..\src\encoder_state-bitstream.h" />
     <ClInclude Include="..\..\src\encoder_state-ctors_dtors.h" />
@@ -228,13 +261,19 @@
     <ClInclude Include="..\..\src\kvz_math.h" />
     <ClInclude Include="..\..\src\search_inter.h" />
     <ClInclude Include="..\..\src\search_intra.h" />
+    <ClInclude Include="..\..\src\strategies\avx2\avx2_common_functions.h" />
+    <ClInclude Include="..\..\src\strategies\avx2\encode_coding_tree-avx2.h" />
     <ClInclude Include="..\..\src\strategies\avx2\intra-avx2.h" />
+    <ClInclude Include="..\..\src\strategies\avx2\reg_sad_pow2_widths-avx2.h" />
     <ClInclude Include="..\..\src\strategies\avx2\sao-avx2.h" />
+    <ClInclude Include="..\..\src\strategies\generic\encode_coding_tree-generic.h" />
     <ClInclude Include="..\..\src\strategies\generic\intra-generic.h" />
     <ClInclude Include="..\..\src\strategies\generic\sao-generic.h" />
+    <ClInclude Include="..\..\src\strategies\sse41\reg_sad_pow2_widths-sse41.h" />
     <ClInclude Include="..\..\src\strategies\strategies-common.h" />
     <ClInclude Include="..\..\src\strategies\avx2\quant-avx2.h" />
     <ClInclude Include="..\..\src\strategies\generic\quant-generic.h" />
+    <ClInclude Include="..\..\src\strategies\strategies-encode.h" />
     <ClInclude Include="..\..\src\strategies\strategies-intra.h" />
     <ClInclude Include="..\..\src\strategies\strategies-quant.h" />
   </ItemGroup>
@@ -279,6 +318,8 @@
     <ClInclude Include="..\..\src\tables.h" />
     <ClInclude Include="..\..\src\threadqueue.h" />
     <ClInclude Include="..\..\src\threads.h" />
+    <ClInclude Include="..\..\src\threadwrapper\include\pthread.h" />
+    <ClInclude Include="..\..\src\threadwrapper\include\semaphore.h" />
     <ClInclude Include="..\..\src\transform.h" />
     <ClInclude Include="..\..\src\videoframe.h" />
   </ItemGroup>

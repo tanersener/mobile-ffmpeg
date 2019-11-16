@@ -310,10 +310,6 @@ static void vpx_filter_block1d16_v4_ssse3(const uint8_t *src_ptr,
   const ptrdiff_t dst_stride_unrolled = dst_stride << 1;
   int h;
 
-  // We only need to go num_taps/2 - 1 row above the souce, so we move
-  // 3 - (num_taps/2 - 1) = 4 - num_taps/2 = 2 back down
-  src_ptr += src_stride_unrolled;
-
   // Load Kernel
   kernel_reg = _mm_loadu_si128((const __m128i *)kernel);
   kernel_reg = _mm_srai_epi16(kernel_reg, 1);
@@ -483,10 +479,6 @@ static void vpx_filter_block1d8_v4_ssse3(const uint8_t *src_ptr,
   const ptrdiff_t dst_stride_unrolled = dst_stride << 1;
   int h;
 
-  // We only need to go num_taps/2 - 1 row above the souce, so we move
-  // 3 - (num_taps/2 - 1) = 4 - num_taps/2 = 2 back down
-  src_ptr += src_stride_unrolled;
-
   // Load Kernel
   kernel_reg = _mm_loadu_si128((const __m128i *)kernel);
   kernel_reg = _mm_srai_epi16(kernel_reg, 1);
@@ -627,10 +619,6 @@ static void vpx_filter_block1d4_v4_ssse3(const uint8_t *src_ptr,
   const ptrdiff_t dst_stride_unrolled = dst_stride << 1;
   int h;
 
-  // We only need to go num_taps/2 - 1 row above the souce, so we move
-  // 3 - (num_taps/2 - 1) = 4 - num_taps/2 = 2 back down
-  src_ptr += src_stride_unrolled;
-
   // Load Kernel
   kernel_reg = _mm_loadu_si128((const __m128i *)kernel);
   kernel_reg = _mm_srai_epi16(kernel_reg, 1);
@@ -743,10 +731,12 @@ filter8_1dfunction vpx_filter_block1d4_h2_avg_ssse3;
 //                                   const InterpKernel *filter, int x0_q4,
 //                                   int32_t x_step_q4, int y0_q4,
 //                                   int y_step_q4, int w, int h);
-FUN_CONV_1D(horiz, x0_q4, x_step_q4, h, src, , ssse3);
-FUN_CONV_1D(vert, y0_q4, y_step_q4, v, src - src_stride * 3, , ssse3);
-FUN_CONV_1D(avg_horiz, x0_q4, x_step_q4, h, src, avg_, ssse3);
-FUN_CONV_1D(avg_vert, y0_q4, y_step_q4, v, src - src_stride * 3, avg_, ssse3);
+FUN_CONV_1D(horiz, x0_q4, x_step_q4, h, src, , ssse3, 0);
+FUN_CONV_1D(vert, y0_q4, y_step_q4, v, src - src_stride * (num_taps / 2 - 1), ,
+            ssse3, 0);
+FUN_CONV_1D(avg_horiz, x0_q4, x_step_q4, h, src, avg_, ssse3, 1);
+FUN_CONV_1D(avg_vert, y0_q4, y_step_q4, v,
+            src - src_stride * (num_taps / 2 - 1), avg_, ssse3, 1);
 
 static void filter_horiz_w8_ssse3(const uint8_t *const src,
                                   const ptrdiff_t src_stride,
@@ -1093,5 +1083,5 @@ void vpx_scaled_2d_ssse3(const uint8_t *src, ptrdiff_t src_stride, uint8_t *dst,
 //                              const InterpKernel *filter, int x0_q4,
 //                              int32_t x_step_q4, int y0_q4, int y_step_q4,
 //                              int w, int h);
-FUN_CONV_2D(, ssse3);
-FUN_CONV_2D(avg_, ssse3);
+FUN_CONV_2D(, ssse3, 0);
+FUN_CONV_2D(avg_, ssse3, 1);

@@ -345,6 +345,7 @@ const QuantizeParam kQParamArrayAvx2[] = {
              static_cast<TX_SIZE>(TX_64X16), TYPE_FP, AOM_BITS_8),
   make_tuple(&av1_quantize_fp_64x64_c, &av1_quantize_fp_64x64_avx2,
              static_cast<TX_SIZE>(TX_64X64), TYPE_FP, AOM_BITS_8),
+#if CONFIG_AV1_HIGHBITDEPTH
   make_tuple(&highbd_quan16x16_wrapper<av1_highbd_quantize_fp_c>,
              &highbd_quan16x16_wrapper<av1_highbd_quantize_fp_avx2>,
              static_cast<TX_SIZE>(TX_16X16), TYPE_FP, AOM_BITS_8),
@@ -378,12 +379,6 @@ const QuantizeParam kQParamArrayAvx2[] = {
              static_cast<TX_SIZE>(TX_16X16), TYPE_B, AOM_BITS_10),
   make_tuple(&aom_highbd_quantize_b_c, &aom_highbd_quantize_b_avx2,
              static_cast<TX_SIZE>(TX_16X16), TYPE_B, AOM_BITS_12),
-  make_tuple(&aom_quantize_b_adaptive_c, &aom_quantize_b_adaptive_avx2,
-             static_cast<TX_SIZE>(TX_16X16), TYPE_B, AOM_BITS_8),
-  make_tuple(&aom_quantize_b_adaptive_c, &aom_quantize_b_adaptive_avx2,
-             static_cast<TX_SIZE>(TX_8X8), TYPE_B, AOM_BITS_8),
-  make_tuple(&aom_quantize_b_adaptive_c, &aom_quantize_b_adaptive_avx2,
-             static_cast<TX_SIZE>(TX_4X4), TYPE_B, AOM_BITS_8),
   make_tuple(&aom_highbd_quantize_b_adaptive_c,
              &aom_highbd_quantize_b_adaptive_avx2,
              static_cast<TX_SIZE>(TX_16X16), TYPE_B, AOM_BITS_8),
@@ -401,7 +396,14 @@ const QuantizeParam kQParamArrayAvx2[] = {
              static_cast<TX_SIZE>(TX_32X32), TYPE_B, AOM_BITS_10),
   make_tuple(&aom_highbd_quantize_b_32x32_adaptive_c,
              &aom_highbd_quantize_b_32x32_adaptive_avx2,
-             static_cast<TX_SIZE>(TX_32X32), TYPE_B, AOM_BITS_12)
+             static_cast<TX_SIZE>(TX_32X32), TYPE_B, AOM_BITS_12),
+#endif
+  make_tuple(&aom_quantize_b_adaptive_c, &aom_quantize_b_adaptive_avx2,
+             static_cast<TX_SIZE>(TX_16X16), TYPE_B, AOM_BITS_8),
+  make_tuple(&aom_quantize_b_adaptive_c, &aom_quantize_b_adaptive_avx2,
+             static_cast<TX_SIZE>(TX_8X8), TYPE_B, AOM_BITS_8),
+  make_tuple(&aom_quantize_b_adaptive_c, &aom_quantize_b_adaptive_avx2,
+             static_cast<TX_SIZE>(TX_4X4), TYPE_B, AOM_BITS_8)
 };
 
 INSTANTIATE_TEST_CASE_P(AVX2, QuantizeTest,
@@ -422,6 +424,7 @@ const QuantizeParam kQParamArraySSE2[] = {
              static_cast<TX_SIZE>(TX_32X8), TYPE_FP, AOM_BITS_8),
   make_tuple(&aom_quantize_b_c, &aom_quantize_b_sse2,
              static_cast<TX_SIZE>(TX_16X16), TYPE_B, AOM_BITS_8),
+#if CONFIG_AV1_HIGHBITDEPTH
   make_tuple(&aom_highbd_quantize_b_c, &aom_highbd_quantize_b_sse2,
              static_cast<TX_SIZE>(TX_16X16), TYPE_B, AOM_BITS_8),
   make_tuple(&aom_highbd_quantize_b_c, &aom_highbd_quantize_b_sse2,
@@ -467,6 +470,7 @@ const QuantizeParam kQParamArraySSE2[] = {
   make_tuple(&aom_highbd_quantize_b_64x64_adaptive_c,
              &aom_highbd_quantize_b_64x64_adaptive_sse2,
              static_cast<TX_SIZE>(TX_64X64), TYPE_B, AOM_BITS_12),
+#endif
   make_tuple(&aom_quantize_b_adaptive_c, &aom_quantize_b_adaptive_sse2,
              static_cast<TX_SIZE>(TX_16X16), TYPE_B, AOM_BITS_8),
   make_tuple(&aom_quantize_b_adaptive_c, &aom_quantize_b_adaptive_sse2,
@@ -495,6 +499,24 @@ const QuantizeParam kQParamArraySSE2[] = {
 
 INSTANTIATE_TEST_CASE_P(SSE2, QuantizeTest,
                         ::testing::ValuesIn(kQParamArraySSE2));
+#endif
+
+#if HAVE_NEON
+const QuantizeParam kQParamArrayNEON[] = {
+  make_tuple(&av1_quantize_fp_c, &av1_quantize_fp_neon,
+             static_cast<TX_SIZE>(TX_16X16), TYPE_FP, AOM_BITS_8),
+  make_tuple(&av1_quantize_fp_c, &av1_quantize_fp_neon,
+             static_cast<TX_SIZE>(TX_4X16), TYPE_FP, AOM_BITS_8),
+  make_tuple(&av1_quantize_fp_c, &av1_quantize_fp_neon,
+             static_cast<TX_SIZE>(TX_16X4), TYPE_FP, AOM_BITS_8),
+  make_tuple(&av1_quantize_fp_c, &av1_quantize_fp_neon,
+             static_cast<TX_SIZE>(TX_8X32), TYPE_FP, AOM_BITS_8),
+  make_tuple(&av1_quantize_fp_c, &av1_quantize_fp_neon,
+             static_cast<TX_SIZE>(TX_32X8), TYPE_FP, AOM_BITS_8)
+};
+
+INSTANTIATE_TEST_CASE_P(NEON, QuantizeTest,
+                        ::testing::ValuesIn(kQParamArrayNEON));
 #endif
 
 #if HAVE_SSSE3 && ARCH_X86_64

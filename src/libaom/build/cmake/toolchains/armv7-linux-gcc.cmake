@@ -37,4 +37,4 @@ set(CMAKE_SYSTEM_PROCESSOR "armv7")
 set(AOM_NEON_INTRIN_FLAG "-mfpu=neon")
 
 # No runtime cpu detect for armv7-linux-gcc.
-set(CONFIG_RUNTIME_CPU_DETECT 0 CACHE NUMBER "")
+set(CONFIG_RUNTIME_CPU_DETECT 0 CACHE STRING "")

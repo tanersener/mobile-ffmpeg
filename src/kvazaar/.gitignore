@@ -1,6 +1,55 @@
-/Makefile
+# Build files
+/bin
+/build/*
+!/build/kvazaar_lib
+/build/kvazaar_lib/*
+!/build/kvazaar_lib/kvazaar_lib.vcxproj
+!/build/kvazaar_lib/kvazaar_lib.vcxproj.filters
+/scons_build_*
+
+# Generated documentation
+/doxygen_html
+/doxygen
+
+# Autotools generated
+.deps
+.dirstamp
+.libs
+Makefile
+Makefile.in
+/aclocal.m4
+/autom4te.cache
+/build-aux
 /config.h
+/config.h.in*
 /config.status
+/configure
 /libtool
+/m4/libtool.m4
+/m4/ltoptions.m4
+/m4/ltsugar.m4
+/m4/ltversion.m4
+/m4/lt~obsolete.m4
 /stamp-h1
-/autom4te.cache/
+
+# Other files
+*.a
+*.d
+*.dll
+*.dylib
+*.exe
+*.la
+*.lo
+*.o
+*.trs
+.*.swp
+
+*.log
+.kdev4
+configure.scan
+src/kvazaar
+src/libkvazaar.so.*
+src/kvazaar.pc
+tests/kvazaar_tests
+tests/kvazaar_tests.trs
+/configure.tmp

@@ -147,15 +147,6 @@ static INLINE int error_measure(int err) {
   return error_measure_lut[255 + err];
 }
 
-// Returns the error between the result of applying motion 'wm' to the frame
-// described by 'ref' and the frame described by 'dst'.
-int64_t av1_warp_error(WarpedMotionParams *wm, int use_hbd, int bd,
-                       const uint8_t *ref, int width, int height, int stride,
-                       uint8_t *dst, int p_col, int p_row, int p_width,
-                       int p_height, int p_stride, int subsampling_x,
-                       int subsampling_y, int64_t best_error,
-                       uint8_t *segment_map, int segment_map_stride);
-
 // Returns the error between the frame described by 'ref' and the frame
 // described by 'dst'.
 int64_t av1_frame_error(int use_hbd, int bd, const uint8_t *ref, int stride,
@@ -165,6 +156,21 @@ int64_t av1_segmented_frame_error(int use_hbd, int bd, const uint8_t *ref,
                                   int stride, uint8_t *dst, int p_width,
                                   int p_height, int p_stride,
                                   uint8_t *segment_map, int segment_map_stride);
+
+int64_t av1_calc_highbd_frame_error(const uint16_t *const ref, int stride,
+                                    const uint16_t *const dst, int p_width,
+                                    int p_height, int p_stride, int bd);
+
+void highbd_warp_plane(WarpedMotionParams *wm, const uint16_t *const ref,
+                       int width, int height, int stride, uint16_t *const pred,
+                       int p_col, int p_row, int p_width, int p_height,
+                       int p_stride, int subsampling_x, int subsampling_y,
+                       int bd, ConvolveParams *conv_params);
+
+void warp_plane(WarpedMotionParams *wm, const uint8_t *const ref, int width,
+                int height, int stride, uint8_t *pred, int p_col, int p_row,
+                int p_width, int p_height, int p_stride, int subsampling_x,
+                int subsampling_y, ConvolveParams *conv_params);
 
 void av1_warp_plane(WarpedMotionParams *wm, int use_hbd, int bd,
                     const uint8_t *ref, int width, int height, int stride,

@@ -15,6 +15,7 @@
 
 #include "config/av1_rtcd.h"
 
+#include "aom_ports/system_state.h"
 #include "av1/encoder/corner_match.h"
 
 #define SEARCH_SZ 9
@@ -65,6 +66,7 @@ double av1_compute_cross_correlation_c(unsigned char *im1, int stride1, int x1,
     }
   var2 = sumsq2 * MATCH_SZ_SQ - sum2 * sum2;
   cov = cross * MATCH_SZ_SQ - sum1 * sum2;
+  aom_clear_system_state();
   return cov / sqrt((double)var2);
 }
 

@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# Copyright (C) 2000-2012 Free Software Foundation, Inc.
+# Copyright (C) 2000-2012, 2019 Free Software Foundation, Inc.
 #
 # Author: Nikos Mavrogiannopoulos
 #
@@ -151,7 +151,7 @@ gnutls_TEXINFOS = gnutls.texi fdl-1.3.texi				\
 	cha-library.texi cha-preface.texi cha-programs.texi		\
 	sec-tls-app.texi cha-errors.texi cha-support.texi		\
 	cha-shared-key.texi cha-gtls-examples.texi cha-upgrade.texi	\
-	cha-tokens.texi cha-crypto.texi cha-auth.texi
+	cha-tokens.texi cha-crypto.texi cha-auth.texi cha-config.texi
 
 AUTOGENED_DOC = invoke-gnutls-cli.texi invoke-gnutls-cli-debug.texi \
 	invoke-gnutls-serv.texi invoke-certtool.texi invoke-srptool.texi \
@@ -492,7 +492,7 @@ if HAVE_GUILE
 
 GUILE_FOR_BUILD =				\
   GUILE_AUTO_COMPILE=0				\
-  $(GUILE) -L $(top_srcdir)/guile/modules
+  $(GUILE) -q -L $(top_srcdir)/guile/modules
 
 SNARF_CPPFLAGS = -I$(top_srcdir) -I$(top_builddir)			\
 	 -I$(top_srcdir)/lib/includes -I$(top_builddir)/lib/includes	\
@@ -635,12 +635,16 @@ FUNCS += functions/dane_verify_session_crt
 FUNCS += functions/dane_verify_session_crt.short
 FUNCS += functions/gnutls_aead_cipher_decrypt
 FUNCS += functions/gnutls_aead_cipher_decrypt.short
+FUNCS += functions/gnutls_aead_cipher_decryptv2
+FUNCS += functions/gnutls_aead_cipher_decryptv2.short
 FUNCS += functions/gnutls_aead_cipher_deinit
 FUNCS += functions/gnutls_aead_cipher_deinit.short
 FUNCS += functions/gnutls_aead_cipher_encrypt
 FUNCS += functions/gnutls_aead_cipher_encrypt.short
 FUNCS += functions/gnutls_aead_cipher_encryptv
 FUNCS += functions/gnutls_aead_cipher_encryptv.short
+FUNCS += functions/gnutls_aead_cipher_encryptv2
+FUNCS += functions/gnutls_aead_cipher_encryptv2.short
 FUNCS += functions/gnutls_aead_cipher_init
 FUNCS += functions/gnutls_aead_cipher_init.short
 FUNCS += functions/gnutls_alert_get
@@ -1027,6 +1031,8 @@ FUNCS += functions/gnutls_fips140_mode_enabled
 FUNCS += functions/gnutls_fips140_mode_enabled.short
 FUNCS += functions/gnutls_fips140_set_mode
 FUNCS += functions/gnutls_fips140_set_mode.short
+FUNCS += functions/gnutls_get_system_config_file
+FUNCS += functions/gnutls_get_system_config_file.short
 FUNCS += functions/gnutls_global_deinit
 FUNCS += functions/gnutls_global_deinit.short
 FUNCS += functions/gnutls_global_init
@@ -1077,6 +1083,8 @@ FUNCS += functions/gnutls_handshake_set_timeout
 FUNCS += functions/gnutls_handshake_set_timeout.short
 FUNCS += functions/gnutls_hash
 FUNCS += functions/gnutls_hash.short
+FUNCS += functions/gnutls_hash_copy
+FUNCS += functions/gnutls_hash_copy.short
 FUNCS += functions/gnutls_hash_deinit
 FUNCS += functions/gnutls_hash_deinit.short
 FUNCS += functions/gnutls_hash_fast
@@ -1111,6 +1119,8 @@ FUNCS += functions/gnutls_hex_encode2
 FUNCS += functions/gnutls_hex_encode2.short
 FUNCS += functions/gnutls_hmac
 FUNCS += functions/gnutls_hmac.short
+FUNCS += functions/gnutls_hmac_copy
+FUNCS += functions/gnutls_hmac_copy.short
 FUNCS += functions/gnutls_hmac_deinit
 FUNCS += functions/gnutls_hmac_deinit.short
 FUNCS += functions/gnutls_hmac_fast

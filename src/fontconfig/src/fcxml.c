@@ -1286,7 +1286,6 @@ static FcChar8 *
 _get_real_path_from_prefix(FcConfigParse *parse, const FcChar8 *path, const FcChar8 *prefix)
 {
 #ifdef _WIN32
-    const FcChar8 *data;
     FcChar8 buffer[1000] = { 0 };
 #endif
     FcChar8 *parent = NULL, *retval = NULL;
@@ -1321,19 +1320,11 @@ _get_real_path_from_prefix(FcConfigParse *parse, const FcChar8 *path, const FcCh
 	if (!FcStrIsAbsoluteFilename (path) && path[0] != '~')
 	    FcConfigMessage (parse, FcSevereWarning, "Use of ambiguous path in <%s> element. please add prefix=\"cwd\" if current behavior is desired.", FcElementReverseMap (parse->pstack->element));
     }
-    if (parent)
-    {
-	retval = FcStrBuildFilename (parent, path, NULL);
-    }
-    else
-    {
-	retval = FcStrdup (path);
-    }
 #else
     if (strcmp ((const char *) path, "CUSTOMFONTDIR") == 0)
     {
 	FcChar8 *p;
-	data = buffer;
+	path = buffer;
 	if (!GetModuleFileName (NULL, (LPCH) buffer, sizeof (buffer) - 20))
 	{
 	    FcConfigMessage (parse, FcSevereError, "GetModuleFileName failed");
@@ -1345,55 +1336,55 @@ _get_real_path_from_prefix(FcConfigParse *parse, const FcChar8 *path, const FcCh
 	 * pages have characters with backslash as the second
 	 * byte.
 	 */
-	p = _mbsrchr (data, '\\');
+	p = _mbsrchr (path, '\\');
 	if (p) *p = '\0';
-	strcat ((char *) data, "\\fonts");
+	strcat ((char *) path, "\\fonts");
     }
     else if (strcmp ((const char *) path, "APPSHAREFONTDIR") == 0)
     {
 	FcChar8 *p;
-	data = buffer;
+	path = buffer;
 	if (!GetModuleFileName (NULL, (LPCH) buffer, sizeof (buffer) - 20))
 	{
 	    FcConfigMessage (parse, FcSevereError, "GetModuleFileName failed");
 	    return NULL;
 	}
-	p = _mbsrchr (data, '\\');
+	p = _mbsrchr (path, '\\');
 	if (p) *p = '\0';
-	strcat ((char *) data, "\\..\\share\\fonts");
+	strcat ((char *) path, "\\..\\share\\fonts");
     }
     else if (strcmp ((const char *) path, "WINDOWSFONTDIR") == 0)
     {
 	int rc;
-	data = buffer;
+	path = buffer;
 	rc = pGetSystemWindowsDirectory ((LPSTR) buffer, sizeof (buffer) - 20);
 	if (rc == 0 || rc > sizeof (buffer) - 20)
 	{
 	    FcConfigMessage (parse, FcSevereError, "GetSystemWindowsDirectory failed");
 	    return NULL;
 	}
-	if (data [strlen ((const char *) data) - 1] != '\\')
-	    strcat ((char *) data, "\\");
-	strcat ((char *) data, "fonts");
+	if (path [strlen ((const char *) path) - 1] != '\\')
+	    strcat ((char *) path, "\\");
+	strcat ((char *) path, "fonts");
     }
     else
     {
-	data = path;
 	if (!prefix)
 	{
 	    if (!FcStrIsAbsoluteFilename (path) && path[0] != '~')
 		FcConfigMessage (parse, FcSevereWarning, "Use of ambiguous path in <%s> element. please add prefix=\"cwd\" if current behavior is desired.", FcElementReverseMap (parse->pstack->element));
 	}
-	if (parent)
-	{
-	    retval = FcStrBuildFilename (parent, data, NULL);
-	}
-	else
-	{
-	    retval = FcStrdup (data);
-	}
     }
 #endif
+    if (parent)
+    {
+	retval = FcStrBuildFilename (parent, path, NULL);
+	FcStrFree (parent);
+    }
+    else
+    {
+	retval = FcStrdup (path);
+    }
 
     return retval;
 }
@@ -3630,7 +3621,7 @@ bail0:
 	    FcConfigMessage (0, FcSevereError, "Cannot %s default config file", load ? "load" : "scan");
 	return FcFalse;
     }
-    return FcTrue;
+    return ret;
 }
 
 FcBool

@@ -87,14 +87,13 @@ _gnutls_handshake_select_v2_suite(gnutls_session_t session,
  */
 int
 _gnutls_read_client_hello_v2(gnutls_session_t session, uint8_t * data,
-			     unsigned int datalen)
+			     unsigned int len)
 {
 	uint16_t session_id_len = 0;
 	int pos = 0;
 	int ret = 0, sret = 0;
 	uint16_t sizeOfSuites;
 	uint8_t rnd[GNUTLS_RANDOM_SIZE], major, minor;
-	int len = datalen;
 	int neg_version;
 	const version_entry_st *vers;
 	uint16_t challenge;

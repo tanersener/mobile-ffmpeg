@@ -21,9 +21,12 @@ You can replace the default push function which is @code{send()} , by using
 If the EINTR is returned by the internal push function 
 then @code{GNUTLS_E_INTERRUPTED}  will be returned. If
 @code{GNUTLS_E_INTERRUPTED}  or @code{GNUTLS_E_AGAIN}  is returned, you must
-call this function again, with the exact same parameters; alternatively
-you could provide a @code{NULL}  pointer for data, and 0 for
-size. cf. @code{gnutls_record_get_direction()} . 
+call this function again with the exact same parameters, or provide a
+@code{NULL}  pointer for  @code{data} and 0 for  @code{data_size} , in order to write the
+same data as before. If you wish to discard the previous data instead
+of retrying, you must call @code{gnutls_record_discard_queued()}  before
+calling this function with different parameters.
+cf. @code{gnutls_record_get_direction()} . 
 
 Note that in DTLS this function will return the @code{GNUTLS_E_LARGE_PACKET} 
 error code if the send data exceed the data MTU value - as returned

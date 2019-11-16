@@ -27,6 +27,10 @@
 
 #include "common.h"
 
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
+
 #ifdef HAVE_STDLIB_H
 # include <stdlib.h>
 #endif
@@ -84,6 +88,26 @@ comp_PairMap (const void *pa, const void *pb)
 	   0;
 }
 
+static void *
+fribidi_bsearch (const void *key, const void *base,
+                 unsigned int nmemb, unsigned int size,
+                 int (*compar)(const void *_key, const void *_item))
+{
+  int min = 0, max = (int) nmemb - 1;
+  while (min <= max)
+  {
+    int mid = ((unsigned int) min + (unsigned int) max) / 2;
+    const void *p = (const void *) (((const char *) base) + (mid * size));
+    int c = compar (key, p);
+    if (c < 0)
+      max = mid - 1;
+    else if (c > 0)
+      min = mid + 1;
+    else
+      return (void *) p;
+  }
+  return NULL;
+}
 
 static FriBidiChar
 find_pair_match (const PairMap *table, int size, FriBidiChar first, FriBidiChar second)
@@ -93,7 +117,7 @@ find_pair_match (const PairMap *table, int size, FriBidiChar first, FriBidiChar 
   x.pair[0] = first;
   x.pair[1] = second;
   x.to = 0;
-  match = bsearch (&x, table, size, sizeof (table[0]), comp_PairMap);
+  match = fribidi_bsearch (&x, table, size, sizeof (table[0]), comp_PairMap);
   return match ? match->to : 0;
 }
 

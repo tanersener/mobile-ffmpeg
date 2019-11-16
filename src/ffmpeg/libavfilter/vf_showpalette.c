@@ -96,7 +96,7 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
     int ret;
     AVFrame *out;
     AVFilterContext *ctx = inlink->dst;
-    const ShowPaletteContext *s= ctx->priv;
+    const ShowPaletteContext *s = ctx->priv;
     AVFilterLink *outlink = ctx->outputs[0];
 
     out = ff_get_video_buffer(outlink, outlink->w, outlink->h);
@@ -136,5 +136,4 @@ AVFilter ff_vf_showpalette = {
     .inputs        = showpalette_inputs,
     .outputs       = showpalette_outputs,
     .priv_class    = &showpalette_class,
-    .flags         = AVFILTER_FLAG_SUPPORT_TIMELINE_GENERIC,
 };

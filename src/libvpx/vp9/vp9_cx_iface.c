@@ -15,6 +15,7 @@
 #include "vpx/vpx_encoder.h"
 #include "vpx_ports/vpx_once.h"
 #include "vpx_ports/system_state.h"
+#include "vpx_util/vpx_timestamp.h"
 #include "vpx/internal/vpx_codec_internal.h"
 #include "./vpx_version.h"
 #include "vp9/encoder/vp9_encoder.h"
@@ -94,6 +95,9 @@ struct vpx_codec_alg_priv {
   vpx_codec_priv_t base;
   vpx_codec_enc_cfg_t cfg;
   struct vp9_extracfg extra_cfg;
+  vpx_rational64_t timestamp_ratio;
+  vpx_codec_pts_t pts_offset;
+  unsigned char pts_offset_initialized;
   VP9EncoderConfig oxcf;
   VP9_COMP *cpi;
   unsigned char *cx_data;
@@ -130,10 +134,10 @@ static vpx_codec_err_t update_error_state(
     return VPX_CODEC_INVALID_PARAM; \
   } while (0)
 
-#define RANGE_CHECK(p, memb, lo, hi)                                 \
-  do {                                                               \
-    if (!(((p)->memb == lo || (p)->memb > (lo)) && (p)->memb <= hi)) \
-      ERROR(#memb " out of range [" #lo ".." #hi "]");               \
+#define RANGE_CHECK(p, memb, lo, hi)                                     \
+  do {                                                                   \
+    if (!(((p)->memb == (lo) || (p)->memb > (lo)) && (p)->memb <= (hi))) \
+      ERROR(#memb " out of range [" #lo ".." #hi "]");                   \
   } while (0)
 
 #define RANGE_CHECK_HI(p, memb, hi)                                     \
@@ -150,6 +154,22 @@ static vpx_codec_err_t update_error_state(
   do {                                                                \
     if (!!((p)->memb) != (p)->memb) ERROR(#memb " expected boolean"); \
   } while (0)
+
+#if defined(_MSC_VER)
+#define COMPILE_TIME_ASSERT(boolexp)              \
+  do {                                            \
+    char compile_time_assert[(boolexp) ? 1 : -1]; \
+    (void)compile_time_assert;                    \
+  } while (0)
+#else  // !_MSC_VER
+#define COMPILE_TIME_ASSERT(boolexp)                         \
+  do {                                                       \
+    struct {                                                 \
+      unsigned int compile_time_assert : (boolexp) ? 1 : -1; \
+    } compile_time_assert;                                   \
+    (void)compile_time_assert;                               \
+  } while (0)
+#endif  // _MSC_VER
 
 static vpx_codec_err_t validate_config(vpx_codec_alg_priv_t *ctx,
                                        const vpx_codec_enc_cfg_t *cfg,
@@ -262,10 +282,6 @@ static vpx_codec_err_t validate_config(vpx_codec_alg_priv_t *ctx,
   RANGE_CHECK(cfg, g_input_bit_depth, 8, 12);
   RANGE_CHECK(extra_cfg, content, VP9E_CONTENT_DEFAULT,
               VP9E_CONTENT_INVALID - 1);
-
-  // TODO(yaowu): remove this when ssim tuning is implemented for vp9
-  if (extra_cfg->tuning == VP8_TUNE_SSIM)
-    ERROR("Option --tune=ssim is not currently supported in VP9.");
 
 #if !CONFIG_REALTIME_ONLY
   if (cfg->g_pass == VPX_RC_LAST_PASS) {
@@ -698,7 +714,10 @@ static vpx_codec_err_t update_extra_cfg(vpx_codec_alg_priv_t *ctx,
 static vpx_codec_err_t ctrl_set_cpuused(vpx_codec_alg_priv_t *ctx,
                                         va_list args) {
   struct vp9_extracfg extra_cfg = ctx->extra_cfg;
+  // Use fastest speed setting (speed 9 or -9) if it's set beyond the range.
   extra_cfg.cpu_used = CAST(VP8E_SET_CPUUSED, args);
+  extra_cfg.cpu_used = VPXMIN(9, extra_cfg.cpu_used);
+  extra_cfg.cpu_used = VPXMAX(-9, extra_cfg.cpu_used);
   return update_extra_cfg(ctx, &extra_cfg);
 }
 
@@ -798,7 +817,7 @@ static vpx_codec_err_t ctrl_set_rc_max_inter_bitrate_pct(
     vpx_codec_alg_priv_t *ctx, va_list args) {
   struct vp9_extracfg extra_cfg = ctx->extra_cfg;
   extra_cfg.rc_max_inter_bitrate_pct =
-      CAST(VP8E_SET_MAX_INTER_BITRATE_PCT, args);
+      CAST(VP9E_SET_MAX_INTER_BITRATE_PCT, args);
   return update_extra_cfg(ctx, &extra_cfg);
 }
 
@@ -915,6 +934,12 @@ static vpx_codec_err_t encoder_init(vpx_codec_ctx_t *ctx,
     res = validate_config(priv, &priv->cfg, &priv->extra_cfg);
 
     if (res == VPX_CODEC_OK) {
+      priv->pts_offset_initialized = 0;
+      priv->timestamp_ratio.den = priv->cfg.g_timebase.den;
+      priv->timestamp_ratio.num = (int64_t)priv->cfg.g_timebase.num;
+      priv->timestamp_ratio.num *= TICKS_PER_SEC;
+      reduce_ratio(&priv->timestamp_ratio);
+
       set_encoder_config(&priv->oxcf, &priv->cfg, &priv->extra_cfg);
 #if CONFIG_VP9_HIGHBITDEPTH
       priv->oxcf.use_highbitdepth =
@@ -951,12 +976,14 @@ static void pick_quickcompress_mode(vpx_codec_alg_priv_t *ctx,
   switch (ctx->cfg.g_pass) {
     case VPX_RC_ONE_PASS:
       if (deadline > 0) {
-        const vpx_codec_enc_cfg_t *const cfg = &ctx->cfg;
-
         // Convert duration parameter from stream timebase to microseconds.
-        const uint64_t duration_us = (uint64_t)duration * 1000000 *
-                                     (uint64_t)cfg->g_timebase.num /
-                                     (uint64_t)cfg->g_timebase.den;
+        uint64_t duration_us;
+
+        COMPILE_TIME_ASSERT(TICKS_PER_SEC > 1000000 &&
+                            (TICKS_PER_SEC % 1000000) == 0);
+
+        duration_us = duration * (uint64_t)ctx->timestamp_ratio.num /
+                      (ctx->timestamp_ratio.den * (TICKS_PER_SEC / 1000000));
 
         // If the deadline is more that the duration this frame is to be shown,
         // use good quality mode. Otherwise use realtime mode.
@@ -1040,15 +1067,16 @@ static int write_superframe_index(vpx_codec_alg_priv_t *ctx) {
   return index_sz;
 }
 
-static int64_t timebase_units_to_ticks(const vpx_rational_t *timebase,
+static int64_t timebase_units_to_ticks(const vpx_rational64_t *timestamp_ratio,
                                        int64_t n) {
-  return n * TICKS_PER_SEC * timebase->num / timebase->den;
+  return n * timestamp_ratio->num / timestamp_ratio->den;
 }
 
-static int64_t ticks_to_timebase_units(const vpx_rational_t *timebase,
+static int64_t ticks_to_timebase_units(const vpx_rational64_t *timestamp_ratio,
                                        int64_t n) {
-  const int64_t round = (int64_t)TICKS_PER_SEC * timebase->num / 2 - 1;
-  return (n * timebase->den + round) / timebase->num / TICKS_PER_SEC;
+  int64_t round = timestamp_ratio->num / 2;
+  if (round > 0) --round;
+  return (n * timestamp_ratio->den + round) / timestamp_ratio->num;
 }
 
 static vpx_codec_frame_flags_t get_frame_pkt_flags(const VP9_COMP *cpi,
@@ -1071,14 +1099,15 @@ static vpx_codec_frame_flags_t get_frame_pkt_flags(const VP9_COMP *cpi,
 const size_t kMinCompressedSize = 8192;
 static vpx_codec_err_t encoder_encode(vpx_codec_alg_priv_t *ctx,
                                       const vpx_image_t *img,
-                                      vpx_codec_pts_t pts,
+                                      vpx_codec_pts_t pts_val,
                                       unsigned long duration,
                                       vpx_enc_frame_flags_t enc_flags,
                                       unsigned long deadline) {
   volatile vpx_codec_err_t res = VPX_CODEC_OK;
   volatile vpx_enc_frame_flags_t flags = enc_flags;
+  volatile vpx_codec_pts_t pts = pts_val;
   VP9_COMP *const cpi = ctx->cpi;
-  const vpx_rational_t *const timebase = &ctx->cfg.g_timebase;
+  const vpx_rational64_t *const timestamp_ratio = &ctx->timestamp_ratio;
   size_t data_sz;
 
   if (cpi == NULL) return VPX_CODEC_INVALID_PARAM;
@@ -1112,6 +1141,12 @@ static vpx_codec_err_t encoder_encode(vpx_codec_alg_priv_t *ctx,
     }
   }
 
+  if (!ctx->pts_offset_initialized) {
+    ctx->pts_offset = pts;
+    ctx->pts_offset_initialized = 1;
+  }
+  pts -= ctx->pts_offset;
+
   pick_quickcompress_mode(ctx, duration, deadline);
   vpx_codec_pkt_list_init(&ctx->pkt_list);
 
@@ -1144,13 +1179,13 @@ static vpx_codec_err_t encoder_encode(vpx_codec_alg_priv_t *ctx,
   if (res == VPX_CODEC_OK) {
     unsigned int lib_flags = 0;
     YV12_BUFFER_CONFIG sd;
-    int64_t dst_time_stamp = timebase_units_to_ticks(timebase, pts);
+    int64_t dst_time_stamp = timebase_units_to_ticks(timestamp_ratio, pts);
     int64_t dst_end_time_stamp =
-        timebase_units_to_ticks(timebase, pts + duration);
+        timebase_units_to_ticks(timestamp_ratio, pts + duration);
     size_t size, cx_data_sz;
     unsigned char *cx_data;
 
-    cpi->svc.timebase_fac = timebase_units_to_ticks(timebase, 1);
+    cpi->svc.timebase_fac = timebase_units_to_ticks(timestamp_ratio, 1);
     cpi->svc.time_stamp_superframe = dst_time_stamp;
 
     // Set up internal flags
@@ -1213,9 +1248,10 @@ static vpx_codec_err_t encoder_encode(vpx_codec_alg_priv_t *ctx,
           if (ctx->output_cx_pkt_cb.output_cx_pkt) {
             pkt.kind = VPX_CODEC_CX_FRAME_PKT;
             pkt.data.frame.pts =
-                ticks_to_timebase_units(timebase, dst_time_stamp);
+                ticks_to_timebase_units(timestamp_ratio, dst_time_stamp) +
+                ctx->pts_offset;
             pkt.data.frame.duration = (unsigned long)ticks_to_timebase_units(
-                timebase, dst_end_time_stamp - dst_time_stamp);
+                timestamp_ratio, dst_end_time_stamp - dst_time_stamp);
             pkt.data.frame.flags = get_frame_pkt_flags(cpi, lib_flags);
             pkt.data.frame.buf = ctx->pending_cx_data;
             pkt.data.frame.sz = size;
@@ -1231,9 +1267,11 @@ static vpx_codec_err_t encoder_encode(vpx_codec_alg_priv_t *ctx,
 
         // Add the frame packet to the list of returned packets.
         pkt.kind = VPX_CODEC_CX_FRAME_PKT;
-        pkt.data.frame.pts = ticks_to_timebase_units(timebase, dst_time_stamp);
+        pkt.data.frame.pts =
+            ticks_to_timebase_units(timestamp_ratio, dst_time_stamp) +
+            ctx->pts_offset;
         pkt.data.frame.duration = (unsigned long)ticks_to_timebase_units(
-            timebase, dst_end_time_stamp - dst_time_stamp);
+            timestamp_ratio, dst_end_time_stamp - dst_time_stamp);
         pkt.data.frame.flags = get_frame_pkt_flags(cpi, lib_flags);
         pkt.data.frame.width[cpi->svc.spatial_layer_id] = cpi->common.width;
         pkt.data.frame.height[cpi->svc.spatial_layer_id] = cpi->common.height;

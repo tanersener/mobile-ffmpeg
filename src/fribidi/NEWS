@@ -1,3 +1,19 @@
+Overview of changes between 1.0.6 and 1.0.7
+=============================================
+
+* This is a minor bugfix that removes symlinks and updates the meson version.
+
+Overview of changes between 1.0.5 and 1.0.6
+=============================================
+
+* This is a minor bugfix release that fixes a list of minor issues that have turned up during the last year.
+
+* Various compilation and cross compilation issues.
+
+* Various minor header cleanups.
+
+* Removed libc's bsearch for performance and portability reasons
+
 Overview of changes between 1.0.4 and 1.0.5
 =============================================
 
@@ -39,7 +55,7 @@ Overview of changes between 0.19.7 and 1.0
   `fribidi_get_par_embedding_levels()` must be replaced with calls to
   `fribidi_get_par_embedding_levels_ex()`. These function are not API
   compatible. Calling the older function will use default values for
-  the new bracket properties and will sometimes yield non-complient
+  the new bracket properties and will sometimes yield non-compliant
   results.
 
 Overview of changes between 0.19.6 and 0.19.7

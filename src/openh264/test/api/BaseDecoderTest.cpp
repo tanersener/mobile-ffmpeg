@@ -5,7 +5,7 @@
 #include "utils/BufferedData.h"
 #include "BaseDecoderTest.h"
 
-static void ReadFrame (std::ifstream* file, BufferedData* buf) {
+static bool ReadFrame (std::ifstream* file, BufferedData* buf) {
   // start code of a frame is {0, 0, 0, 1}
   int zeroCount = 0;
   char b;
@@ -14,10 +14,11 @@ static void ReadFrame (std::ifstream* file, BufferedData* buf) {
   for (;;) {
     file->read (&b, 1);
     if (file->gcount() != 1) { // end of file
-      return;
+      return true;
     }
     if (!buf->PushBack (b)) {
-      FAIL() << "unable to allocate memory";
+      std::cout << "unable to allocate memory" << std::endl;
+      return false;
     }
 
     if (buf->Length() <= 4) {
@@ -29,10 +30,12 @@ static void ReadFrame (std::ifstream* file, BufferedData* buf) {
     } else {
       if (b == 1) {
         if (file->seekg (-4, file->cur).good()) {
-          buf->SetLength (buf->Length() - 4);
-          return;
+          if (-1 == buf->SetLength(buf->Length() - 4))
+            return false;
+          return true;
         } else {
-          FAIL() << "unable to seek file";
+          std::cout << "unable to seek file" << std::endl;
+          return false;
         }
       } else if (b == 0) {
         zeroCount = 3;
@@ -109,22 +112,60 @@ void BaseDecoderTest::DecodeFrame (const uint8_t* src, size_t sliceSize, Callbac
     cbk->onDecodeFrame (frame);
   }
 }
-void BaseDecoderTest::DecodeFile (const char* fileName, Callback* cbk) {
+void BaseDecoderTest::FlushFrame (Callback* cbk) {
+  uint8_t* data[3];
+  SBufferInfo bufInfo;
+  memset (data, 0, sizeof (data));
+  memset (&bufInfo, 0, sizeof (SBufferInfo));
+
+  DECODING_STATE rv = decoder_->FlushFrame (data, &bufInfo);
+  ASSERT_TRUE (rv == dsErrorFree);
+
+  if (bufInfo.iBufferStatus == 1 && cbk != NULL) {
+    const Frame frame = {
+      {
+        // y plane
+        data[0],
+        bufInfo.UsrData.sSystemBuffer.iWidth,
+        bufInfo.UsrData.sSystemBuffer.iHeight,
+        bufInfo.UsrData.sSystemBuffer.iStride[0]
+      },
+      {
+        // u plane
+        data[1],
+        bufInfo.UsrData.sSystemBuffer.iWidth / 2,
+        bufInfo.UsrData.sSystemBuffer.iHeight / 2,
+        bufInfo.UsrData.sSystemBuffer.iStride[1]
+      },
+      {
+        // v plane
+        data[2],
+        bufInfo.UsrData.sSystemBuffer.iWidth / 2,
+        bufInfo.UsrData.sSystemBuffer.iHeight / 2,
+        bufInfo.UsrData.sSystemBuffer.iStride[1]
+      },
+    };
+    cbk->onDecodeFrame (frame);
+  }
+}
+bool BaseDecoderTest::DecodeFile (const char* fileName, Callback* cbk) {
   std::ifstream file (fileName, std::ios::in | std::ios::binary);
-  ASSERT_TRUE (file.is_open());
+  if (!file.is_open())
+    return false;
 
   BufferedData buf;
   while (true) {
-    ReadFrame (&file, &buf);
+    if (false == ReadFrame(&file, &buf))
+      return false;
     if (::testing::Test::HasFatalFailure()) {
-      return;
+      return false;
     }
     if (buf.Length() == 0) {
       break;
     }
     DecodeFrame (buf.data(), buf.Length(), cbk);
     if (::testing::Test::HasFatalFailure()) {
-      return;
+      return false;
     }
   }
 
@@ -133,6 +174,13 @@ void BaseDecoderTest::DecodeFile (const char* fileName, Callback* cbk) {
 
   // Get pending last frame
   DecodeFrame (NULL, 0, cbk);
+  // Flush out last frames in decoder buffer
+  int32_t num_of_frames_in_buffer = 0;
+  decoder_->GetOption (DECODER_OPTION_NUM_OF_FRAMES_REMAINING_IN_BUFFER, &num_of_frames_in_buffer);
+  for (int32_t i = 0; i < num_of_frames_in_buffer; ++i) {
+    FlushFrame (cbk);
+  }
+  return true;
 }
 
 bool BaseDecoderTest::Open (const char* fileName) {
@@ -149,7 +197,8 @@ bool BaseDecoderTest::Open (const char* fileName) {
 bool BaseDecoderTest::DecodeNextFrame (Callback* cbk) {
   switch (decodeStatus_) {
   case Decoding:
-    ReadFrame (&file_, &buf_);
+    if (false == ReadFrame(&file_, &buf_))
+      return false;
     if (::testing::Test::HasFatalFailure()) {
       return false;
     }

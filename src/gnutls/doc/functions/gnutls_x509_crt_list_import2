@@ -23,7 +23,7 @@ CERTIFICATE", or "CERTIFICATE".
 To deinitialize  @code{certs} , you need to deinitialize each crt structure
 independently, and use @code{gnutls_free()}  at  @code{certs} .
 
-@strong{Returns:} the number of certificates read or a negative error value.
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
 
 @strong{Since:} 3.0
 @end deftypefun

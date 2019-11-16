@@ -117,7 +117,7 @@ static int encode_frame(aom_codec_ctx_t *ctx, const aom_image_t *img,
 
 static void get_raw_image(aom_image_t **frame_to_encode, aom_image_t *raw,
                           aom_image_t *raw_shift) {
-  if (!CONFIG_LOWBITDEPTH) {
+  if (FORCE_HIGHBITDEPTH_DECODING) {
     // Need to allocate larger buffer to use hbd internal.
     int input_shift = 0;
     aom_img_upshift(raw_shift, raw, input_shift);
@@ -283,7 +283,7 @@ static void pass1(aom_image_t *raw, FILE *infile, const char *outfile_name,
                         reference_image_num - 1))
     die_codec(&codec, "Failed to set max gf interval");
   aom_img_fmt_t ref_fmt = AOM_IMG_FMT_I420;
-  if (!CONFIG_LOWBITDEPTH) ref_fmt |= AOM_IMG_FMT_HIGHBITDEPTH;
+  if (FORCE_HIGHBITDEPTH_DECODING) ref_fmt |= AOM_IMG_FMT_HIGHBITDEPTH;
   // Allocate memory with the border so that it can be used as a reference.
   int border_in_pixels =
       (codec.config.enc->rc_resize_mode || codec.config.enc->rc_superres_mode)
@@ -467,7 +467,7 @@ int main(int argc, char **argv) {
   if (!aom_img_alloc(&raw, AOM_IMG_FMT_I420, w, h, 32)) {
     die("Failed to allocate image.");
   }
-  if (!CONFIG_LOWBITDEPTH) {
+  if (FORCE_HIGHBITDEPTH_DECODING) {
     // Need to allocate larger buffer to use hbd internal.
     aom_img_alloc(&raw_shift, AOM_IMG_FMT_I420 | AOM_IMG_FMT_HIGHBITDEPTH, w, h,
                   32);
@@ -489,7 +489,7 @@ int main(int argc, char **argv) {
   cfg.kf_mode = AOM_KF_DISABLED;
   cfg.large_scale_tile = 0;  // Only set it to 1 for camera frame encoding.
   cfg.g_bit_depth = AOM_BITS_8;
-  flags |= (cfg.g_bit_depth > AOM_BITS_8 || !CONFIG_LOWBITDEPTH)
+  flags |= (cfg.g_bit_depth > AOM_BITS_8 || FORCE_HIGHBITDEPTH_DECODING)
                ? AOM_CODEC_USE_HIGHBITDEPTH
                : 0;
 
@@ -509,7 +509,7 @@ int main(int argc, char **argv) {
         lf_blocksize, flags, &raw_shift);
   free(stats.buf);
 
-  if (!CONFIG_LOWBITDEPTH) aom_img_free(&raw_shift);
+  if (FORCE_HIGHBITDEPTH_DECODING) aom_img_free(&raw_shift);
   aom_img_free(&raw);
   fclose(infile);
 

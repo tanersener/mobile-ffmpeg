@@ -24,6 +24,7 @@
 #include "libavutil/avassert.h"
 #include "libavutil/bprint.h"
 #include "libavutil/imgutils.h"
+#include "libavutil/intreadwrite.h"
 #include "libavutil/stereo3d.h"
 #include "libavutil/mastering_display_metadata.h"
 
@@ -423,7 +424,7 @@ static int png_decode_idat(PNGDecContext *s, int length)
             s->zstream.next_out  = s->crow_buf;
         }
         if (ret == Z_STREAM_END && s->zstream.avail_in > 0) {
-            av_log(NULL, AV_LOG_WARNING,
+            av_log(s->avctx, AV_LOG_WARNING,
                    "%d undecompressed bytes left in buffer\n", s->zstream.avail_in);
             return 0;
         }
@@ -1367,15 +1368,35 @@ exit_loop:
         for (y = 0; y < s->height; ++y) {
             uint8_t *row = &s->image_buf[s->image_linesize * y];
 
-            /* since we're updating in-place, we have to go from right to left */
-            for (x = s->width; x > 0; --x) {
-                uint8_t *pixel = &row[s->bpp * (x - 1)];
-                memmove(pixel, &row[raw_bpp * (x - 1)], raw_bpp);
+            if (s->bpp == 2 && byte_depth == 1) {
+                uint8_t *pixel = &row[2 * s->width - 1];
+                uint8_t *rowp  = &row[1 * s->width - 1];
+                int tcolor = s->transparent_color_be[0];
+                for (x = s->width; x > 0; --x) {
+                    *pixel-- = *rowp == tcolor ? 0 : 0xff;
+                    *pixel-- = *rowp--;
+                }
+            } else if (s->bpp == 4 && byte_depth == 1) {
+                uint8_t *pixel = &row[4 * s->width - 1];
+                uint8_t *rowp  = &row[3 * s->width - 1];
+                int tcolor = AV_RL24(s->transparent_color_be);
+                for (x = s->width; x > 0; --x) {
+                    *pixel-- = AV_RL24(rowp-2) == tcolor ? 0 : 0xff;
+                    *pixel-- = *rowp--;
+                    *pixel-- = *rowp--;
+                    *pixel-- = *rowp--;
+                }
+            } else {
+                /* since we're updating in-place, we have to go from right to left */
+                for (x = s->width; x > 0; --x) {
+                    uint8_t *pixel = &row[s->bpp * (x - 1)];
+                    memmove(pixel, &row[raw_bpp * (x - 1)], raw_bpp);
 
-                if (!memcmp(pixel, s->transparent_color_be, raw_bpp)) {
-                    memset(&pixel[raw_bpp], 0, byte_depth);
-                } else {
-                    memset(&pixel[raw_bpp], 0xff, byte_depth);
+                    if (!memcmp(pixel, s->transparent_color_be, raw_bpp)) {
+                        memset(&pixel[raw_bpp], 0, byte_depth);
+                    } else {
+                        memset(&pixel[raw_bpp], 0xff, byte_depth);
+                    }
                 }
             }
         }
@@ -1391,6 +1412,9 @@ exit_loop:
             if (CONFIG_PNG_DECODER && avctx->codec_id != AV_CODEC_ID_APNG)
                 handle_p_frame_png(s, p);
             else if (CONFIG_APNG_DECODER &&
+                     s->previous_picture.f->width == p->width  &&
+                     s->previous_picture.f->height== p->height &&
+                     s->previous_picture.f->format== p->format &&
                      avctx->codec_id == AV_CODEC_ID_APNG &&
                      (ret = handle_p_frame_apng(avctx, s, p)) < 0)
                 goto fail;
@@ -1544,7 +1568,7 @@ static int decode_frame_lscr(AVCodecContext *avctx,
         return ret;
 
     nb_blocks = bytestream2_get_le16(gb);
-    if (bytestream2_get_bytes_left(gb) < 2 + nb_blocks * 12)
+    if (bytestream2_get_bytes_left(gb) < 2 + nb_blocks * (12 + 8))
         return AVERROR_INVALIDDATA;
 
     if (s->last_picture.f->data[0]) {

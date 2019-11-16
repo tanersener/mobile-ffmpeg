@@ -130,6 +130,9 @@ static const struct {
     #if CONFIG_LLVIDENCDSP
         { "llviddspenc", checkasm_check_llviddspenc },
     #endif
+    #if CONFIG_OPUS_DECODER
+        { "opusdsp", checkasm_check_opusdsp },
+    #endif
     #if CONFIG_PIXBLOCKDSP
         { "pixblockdsp", checkasm_check_pixblockdsp },
     #endif
@@ -161,6 +164,9 @@ static const struct {
     #endif
     #if CONFIG_COLORSPACE_FILTER
         { "vf_colorspace", checkasm_check_colorspace },
+    #endif
+    #if CONFIG_EQ_FILTER
+        { "vf_eq", checkasm_check_vf_eq },
     #endif
     #if CONFIG_GBLUR_FILTER
         { "vf_gblur", checkasm_check_vf_gblur },

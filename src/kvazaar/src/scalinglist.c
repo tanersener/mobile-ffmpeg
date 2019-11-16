@@ -102,6 +102,7 @@ void kvz_scalinglist_init(scaling_list_t * const scaling_list)
   }
   
   scaling_list->enable = 0;
+  scaling_list->use_default_list = 0;
 }
 
 /**
@@ -397,9 +398,9 @@ void kvz_scalinglist_process(scaling_list_t * const scaling_list, uint8_t bitdep
 
   for (size = 0; size < SCALING_LIST_SIZE_NUM; size++) {
     for (list = 0; list < kvz_g_scaling_list_num[size]; list++) {
-      const int32_t * const list_ptr = scaling_list->enable ?
-                                       scaling_list->scaling_list_coeff[size][list] :
-                                       kvz_scalinglist_get_default(size, list);
+      const int32_t * const list_ptr = scaling_list->use_default_list ?
+                                       kvz_scalinglist_get_default(size, list) :
+                                       scaling_list->scaling_list_coeff[size][list];
 
       for (qp = 0; qp < SCALING_LIST_REM_NUM; qp++) {
         kvz_scalinglist_set(scaling_list, list_ptr, list, size, qp);

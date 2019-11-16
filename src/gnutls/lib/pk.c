@@ -598,6 +598,10 @@ encode_ber_digest_info(const mac_entry_st * e,
 	uint8_t *tmp_output;
 	int tmp_output_size;
 
+	/* prevent asn1_write_value() treating input as string */
+	if (digest->size == 0)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
 	algo = _gnutls_x509_mac_to_oid(e);
 	if (algo == NULL) {
 		gnutls_assert();

@@ -50,236 +50,16 @@ extern "C" {
 // Factor to weigh the rate for switchable interp filters.
 #define SWITCHABLE_INTERP_RATE_FACTOR 1
 
-// This enumerator type needs to be kept aligned with the mode order in
-// const MODE_DEFINITION av1_mode_order[MAX_MODES] used in the rd code.
 enum {
-  THR_NEARESTMV,
-  THR_NEARESTL2,
-  THR_NEARESTL3,
-  THR_NEARESTB,
-  THR_NEARESTA2,
-  THR_NEARESTA,
-  THR_NEARESTG,
-
-  THR_NEWMV,
-  THR_NEWL2,
-  THR_NEWL3,
-  THR_NEWB,
-  THR_NEWA2,
-  THR_NEWA,
-  THR_NEWG,
-
-  THR_NEARMV,
-  THR_NEARL2,
-  THR_NEARL3,
-  THR_NEARB,
-  THR_NEARA2,
-  THR_NEARA,
-  THR_NEARG,
-
-  THR_GLOBALMV,
-  THR_GLOBALL2,
-  THR_GLOBALL3,
-  THR_GLOBALB,
-  THR_GLOBALA2,
-  THR_GLOBALG,
-  THR_GLOBALA,
-
-  THR_COMP_NEAREST_NEARESTLA,
-  THR_COMP_NEAREST_NEARESTL2A,
-  THR_COMP_NEAREST_NEARESTL3A,
-  THR_COMP_NEAREST_NEARESTGA,
-  THR_COMP_NEAREST_NEARESTLB,
-  THR_COMP_NEAREST_NEARESTL2B,
-  THR_COMP_NEAREST_NEARESTL3B,
-  THR_COMP_NEAREST_NEARESTGB,
-  THR_COMP_NEAREST_NEARESTLA2,
-  THR_COMP_NEAREST_NEARESTL2A2,
-  THR_COMP_NEAREST_NEARESTL3A2,
-  THR_COMP_NEAREST_NEARESTGA2,
-  THR_COMP_NEAREST_NEARESTLL2,
-  THR_COMP_NEAREST_NEARESTLL3,
-  THR_COMP_NEAREST_NEARESTLG,
-  THR_COMP_NEAREST_NEARESTBA,
-
-  THR_COMP_NEAR_NEARLA,
-  THR_COMP_NEW_NEARESTLA,
-  THR_COMP_NEAREST_NEWLA,
-  THR_COMP_NEW_NEARLA,
-  THR_COMP_NEAR_NEWLA,
-  THR_COMP_NEW_NEWLA,
-  THR_COMP_GLOBAL_GLOBALLA,
-
-  THR_COMP_NEAR_NEARL2A,
-  THR_COMP_NEW_NEARESTL2A,
-  THR_COMP_NEAREST_NEWL2A,
-  THR_COMP_NEW_NEARL2A,
-  THR_COMP_NEAR_NEWL2A,
-  THR_COMP_NEW_NEWL2A,
-  THR_COMP_GLOBAL_GLOBALL2A,
-
-  THR_COMP_NEAR_NEARL3A,
-  THR_COMP_NEW_NEARESTL3A,
-  THR_COMP_NEAREST_NEWL3A,
-  THR_COMP_NEW_NEARL3A,
-  THR_COMP_NEAR_NEWL3A,
-  THR_COMP_NEW_NEWL3A,
-  THR_COMP_GLOBAL_GLOBALL3A,
-
-  THR_COMP_NEAR_NEARGA,
-  THR_COMP_NEW_NEARESTGA,
-  THR_COMP_NEAREST_NEWGA,
-  THR_COMP_NEW_NEARGA,
-  THR_COMP_NEAR_NEWGA,
-  THR_COMP_NEW_NEWGA,
-  THR_COMP_GLOBAL_GLOBALGA,
-
-  THR_COMP_NEAR_NEARLB,
-  THR_COMP_NEW_NEARESTLB,
-  THR_COMP_NEAREST_NEWLB,
-  THR_COMP_NEW_NEARLB,
-  THR_COMP_NEAR_NEWLB,
-  THR_COMP_NEW_NEWLB,
-  THR_COMP_GLOBAL_GLOBALLB,
-
-  THR_COMP_NEAR_NEARL2B,
-  THR_COMP_NEW_NEARESTL2B,
-  THR_COMP_NEAREST_NEWL2B,
-  THR_COMP_NEW_NEARL2B,
-  THR_COMP_NEAR_NEWL2B,
-  THR_COMP_NEW_NEWL2B,
-  THR_COMP_GLOBAL_GLOBALL2B,
-
-  THR_COMP_NEAR_NEARL3B,
-  THR_COMP_NEW_NEARESTL3B,
-  THR_COMP_NEAREST_NEWL3B,
-  THR_COMP_NEW_NEARL3B,
-  THR_COMP_NEAR_NEWL3B,
-  THR_COMP_NEW_NEWL3B,
-  THR_COMP_GLOBAL_GLOBALL3B,
-
-  THR_COMP_NEAR_NEARGB,
-  THR_COMP_NEW_NEARESTGB,
-  THR_COMP_NEAREST_NEWGB,
-  THR_COMP_NEW_NEARGB,
-  THR_COMP_NEAR_NEWGB,
-  THR_COMP_NEW_NEWGB,
-  THR_COMP_GLOBAL_GLOBALGB,
-
-  THR_COMP_NEAR_NEARLA2,
-  THR_COMP_NEW_NEARESTLA2,
-  THR_COMP_NEAREST_NEWLA2,
-  THR_COMP_NEW_NEARLA2,
-  THR_COMP_NEAR_NEWLA2,
-  THR_COMP_NEW_NEWLA2,
-  THR_COMP_GLOBAL_GLOBALLA2,
-
-  THR_COMP_NEAR_NEARL2A2,
-  THR_COMP_NEW_NEARESTL2A2,
-  THR_COMP_NEAREST_NEWL2A2,
-  THR_COMP_NEW_NEARL2A2,
-  THR_COMP_NEAR_NEWL2A2,
-  THR_COMP_NEW_NEWL2A2,
-  THR_COMP_GLOBAL_GLOBALL2A2,
-
-  THR_COMP_NEAR_NEARL3A2,
-  THR_COMP_NEW_NEARESTL3A2,
-  THR_COMP_NEAREST_NEWL3A2,
-  THR_COMP_NEW_NEARL3A2,
-  THR_COMP_NEAR_NEWL3A2,
-  THR_COMP_NEW_NEWL3A2,
-  THR_COMP_GLOBAL_GLOBALL3A2,
-
-  THR_COMP_NEAR_NEARGA2,
-  THR_COMP_NEW_NEARESTGA2,
-  THR_COMP_NEAREST_NEWGA2,
-  THR_COMP_NEW_NEARGA2,
-  THR_COMP_NEAR_NEWGA2,
-  THR_COMP_NEW_NEWGA2,
-  THR_COMP_GLOBAL_GLOBALGA2,
-
-  THR_COMP_NEAR_NEARLL2,
-  THR_COMP_NEW_NEARESTLL2,
-  THR_COMP_NEAREST_NEWLL2,
-  THR_COMP_NEW_NEARLL2,
-  THR_COMP_NEAR_NEWLL2,
-  THR_COMP_NEW_NEWLL2,
-  THR_COMP_GLOBAL_GLOBALLL2,
-
-  THR_COMP_NEAR_NEARLL3,
-  THR_COMP_NEW_NEARESTLL3,
-  THR_COMP_NEAREST_NEWLL3,
-  THR_COMP_NEW_NEARLL3,
-  THR_COMP_NEAR_NEWLL3,
-  THR_COMP_NEW_NEWLL3,
-  THR_COMP_GLOBAL_GLOBALLL3,
-
-  THR_COMP_NEAR_NEARLG,
-  THR_COMP_NEW_NEARESTLG,
-  THR_COMP_NEAREST_NEWLG,
-  THR_COMP_NEW_NEARLG,
-  THR_COMP_NEAR_NEWLG,
-  THR_COMP_NEW_NEWLG,
-  THR_COMP_GLOBAL_GLOBALLG,
-
-  THR_COMP_NEAR_NEARBA,
-  THR_COMP_NEW_NEARESTBA,
-  THR_COMP_NEAREST_NEWBA,
-  THR_COMP_NEW_NEARBA,
-  THR_COMP_NEAR_NEWBA,
-  THR_COMP_NEW_NEWBA,
-  THR_COMP_GLOBAL_GLOBALBA,
-
-  THR_DC,
-  THR_PAETH,
-  THR_SMOOTH,
-  THR_SMOOTH_V,
-  THR_SMOOTH_H,
-  THR_H_PRED,
-  THR_V_PRED,
-  THR_D135_PRED,
-  THR_D203_PRED,
-  THR_D157_PRED,
-  THR_D67_PRED,
-  THR_D113_PRED,
-  THR_D45_PRED,
-
-  MAX_MODES,
-
-  LAST_SINGLE_REF_MODES = THR_GLOBALG,
-  MAX_SINGLE_REF_MODES = LAST_SINGLE_REF_MODES + 1,
-  LAST_COMP_REF_MODES = THR_COMP_GLOBAL_GLOBALBA,
-  MAX_COMP_REF_MODES = LAST_COMP_REF_MODES + 1
-} UENUM1BYTE(THR_MODES);
-
-enum {
-  THR_LAST,
-  THR_LAST2,
-  THR_LAST3,
-  THR_BWDR,
-  THR_ALTR2,
-  THR_GOLD,
-  THR_ALTR,
-
-  THR_COMP_LA,
-  THR_COMP_L2A,
-  THR_COMP_L3A,
-  THR_COMP_GA,
-
-  THR_COMP_LB,
-  THR_COMP_L2B,
-  THR_COMP_L3B,
-  THR_COMP_GB,
-
-  THR_COMP_LA2,
-  THR_COMP_L2A2,
-  THR_COMP_L3A2,
-  THR_COMP_GA2,
-
-  THR_INTRA,
-
-  MAX_REFS
-} UENUM1BYTE(THR_MODES_SUB8X8);
+  // Default initialization
+  DEFAULT_EVAL = 0,
+  // Initialization for default mode evaluation
+  MODE_EVAL,
+  // Initialization for winner mode evaluation
+  WINNER_MODE_EVAL,
+  // All mode evaluation types
+  MODE_EVAL_TYPES,
+} UENUM1BYTE(MODE_EVAL_TYPE);
 
 typedef struct RD_OPT {
   // Thresh_mult is used to set a threshold for the rd score. A higher value
@@ -290,12 +70,12 @@ typedef struct RD_OPT {
 
   int threshes[MAX_SEGMENTS][BLOCK_SIZES_ALL][MAX_MODES];
 
-  int64_t prediction_type_threshes[REF_FRAMES][REFERENCE_MODES];
-
   int RDMULT;
 
   double r0, arf_r0;
+#if !USE_TPL_CLASSIC_MODEL
   double mc_saved_base, mc_count_base;
+#endif  // !USE_TPL_CLASSIC_MODEL
 } RD_OPT;
 
 static INLINE void av1_init_rd_stats(RD_STATS *rd_stats) {
@@ -379,6 +159,17 @@ static INLINE void av1_merge_rd_stats(RD_STATS *rd_stats_dst,
 #endif
 }
 
+static INLINE void av1_accumulate_rd_stats(RD_STATS *rd_stats, int64_t dist,
+                                           int rate, int skip, int64_t sse,
+                                           int zero_rate) {
+  assert(rd_stats->rate != INT_MAX && rate != INT_MAX);
+  rd_stats->rate += rate;
+  if (!rd_stats->zero_rate) rd_stats->zero_rate = zero_rate;
+  rd_stats->dist += dist;
+  rd_stats->skip &= skip;
+  rd_stats->sse += sse;
+}
+
 static INLINE int64_t av1_calculate_rd_cost(int mult, int rate, int64_t dist) {
   assert(mult >= 0);
   if (rate >= 0) {
@@ -422,8 +213,6 @@ int av1_compute_rd_mult(const struct AV1_COMP *cpi, int qindex);
 
 void av1_initialize_rd_consts(struct AV1_COMP *cpi);
 
-void av1_initialize_cost_tables(const AV1_COMMON *const cm, MACROBLOCK *x);
-
 void av1_initialize_me_consts(const struct AV1_COMP *cpi, MACROBLOCK *x,
                               int qindex);
 
@@ -437,12 +226,6 @@ void av1_model_rd_surffit(BLOCK_SIZE bsize, double sse_norm, double xm,
 
 int av1_get_switchable_rate(const AV1_COMMON *const cm, MACROBLOCK *x,
                             const MACROBLOCKD *xd);
-
-int av1_raster_block_offset(BLOCK_SIZE plane_bsize, int raster_block,
-                            int stride);
-
-int16_t *av1_raster_block_offset_int16(BLOCK_SIZE plane_bsize, int raster_block,
-                                       int16_t *base);
 
 YV12_BUFFER_CONFIG *av1_get_scaled_ref_frame(const struct AV1_COMP *cpi,
                                              int ref_frame);
@@ -476,6 +259,29 @@ static INLINE void set_error_per_bit(MACROBLOCK *x, int rdmult) {
   x->errorperbit += (x->errorperbit == 0);
 }
 
+// Get the threshold for R-D optimization of coefficients depending upon mode
+// decision/winner mode processing
+static INLINE uint32_t get_rd_opt_coeff_thresh(
+    const uint32_t *const coeff_opt_dist_threshold,
+    int enable_winner_mode_for_coeff_opt, int is_winner_mode) {
+  // Default initialization of threshold
+  uint32_t coeff_opt_thresh = coeff_opt_dist_threshold[DEFAULT_EVAL];
+  // TODO(any): Experiment with coeff_opt_dist_threshold values when
+  // enable_winner_mode_for_coeff_opt is ON
+  // TODO(any): Skip the winner mode processing for blocks with lower residual
+  // energy as R-D optimization of coefficients would have been enabled during
+  // mode decision
+  if (enable_winner_mode_for_coeff_opt) {
+    // Use conservative threshold during mode decision and perform R-D
+    // optimization of coeffs always for winner modes
+    if (is_winner_mode)
+      coeff_opt_thresh = coeff_opt_dist_threshold[WINNER_MODE_EVAL];
+    else
+      coeff_opt_thresh = coeff_opt_dist_threshold[MODE_EVAL];
+  }
+  return coeff_opt_thresh;
+}
+
 void av1_setup_pred_block(const MACROBLOCKD *xd,
                           struct buf_2d dst[MAX_MB_PLANE],
                           const YV12_BUFFER_CONFIG *src, int mi_row, int mi_col,
@@ -491,6 +297,9 @@ void av1_fill_mode_rates(AV1_COMMON *const cm, MACROBLOCK *x,
 
 void av1_fill_coeff_costs(MACROBLOCK *x, FRAME_CONTEXT *fc,
                           const int num_planes);
+
+void av1_fill_mv_costs(const FRAME_CONTEXT *fc, int integer_mv, int usehp,
+                       MACROBLOCK *x);
 
 int av1_get_adaptive_rdmult(const struct AV1_COMP *cpi, double beta);
 

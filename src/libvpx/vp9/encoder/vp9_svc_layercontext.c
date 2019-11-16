@@ -54,6 +54,7 @@ void vp9_init_layer_context(VP9_COMP *const cpi) {
   svc->superframe_has_layer_sync = 0;
   svc->use_set_ref_frame_config = 0;
   svc->num_encoded_top_layer = 0;
+  svc->simulcast_mode = 0;
 
   for (i = 0; i < REF_FRAMES; ++i) {
     svc->fb_idx_spatial_layer_id[i] = -1;
@@ -474,6 +475,17 @@ static void reset_fb_idx_unused(VP9_COMP *const cpi) {
   }
 }
 
+// Never refresh any reference frame buffers on top temporal layers in
+// simulcast mode, which has interlayer prediction disabled.
+static void non_reference_frame_simulcast(VP9_COMP *const cpi) {
+  if (cpi->svc.temporal_layer_id == cpi->svc.number_temporal_layers - 1 &&
+      cpi->svc.temporal_layer_id > 0) {
+    cpi->ext_refresh_last_frame = 0;
+    cpi->ext_refresh_golden_frame = 0;
+    cpi->ext_refresh_alt_ref_frame = 0;
+  }
+}
+
 // The function sets proper ref_frame_flags, buffer indices, and buffer update
 // variables for temporal layering mode 3 - that does 0-2-1-2 temporal layering
 // scheme.
@@ -578,6 +590,8 @@ static void set_flags_and_fb_idx_for_temporal_mode3(VP9_COMP *const cpi) {
     cpi->alt_fb_idx = cpi->svc.number_spatial_layers + spatial_id;
   }
 
+  if (cpi->svc.simulcast_mode) non_reference_frame_simulcast(cpi);
+
   reset_fb_idx_unused(cpi);
 }
 
@@ -639,6 +653,8 @@ static void set_flags_and_fb_idx_for_temporal_mode2(VP9_COMP *const cpi) {
     cpi->alt_fb_idx = cpi->svc.number_spatial_layers + spatial_id;
   }
 
+  if (cpi->svc.simulcast_mode) non_reference_frame_simulcast(cpi);
+
   reset_fb_idx_unused(cpi);
 }
 
@@ -672,6 +688,8 @@ static void set_flags_and_fb_idx_for_temporal_mode_noLayering(
   } else {
     cpi->gld_fb_idx = 0;
   }
+
+  if (cpi->svc.simulcast_mode) non_reference_frame_simulcast(cpi);
 
   reset_fb_idx_unused(cpi);
 }
@@ -714,6 +732,7 @@ void vp9_copy_flags_ref_update_idx(VP9_COMP *const cpi) {
         svc->update_buffer_slot[sl] |= (1 << ref);
     }
   }
+
   // TODO(jianj): Remove these 3, deprecated.
   svc->update_last[sl] = (uint8_t)cpi->refresh_last_frame;
   svc->update_golden[sl] = (uint8_t)cpi->refresh_golden_frame;
@@ -732,6 +751,16 @@ int vp9_one_pass_cbr_svc_start_layer(VP9_COMP *const cpi) {
   SVC *const svc = &cpi->svc;
   LAYER_CONTEXT *lc = NULL;
   svc->skip_enhancement_layer = 0;
+
+  if (svc->disable_inter_layer_pred == INTER_LAYER_PRED_OFF &&
+      svc->number_spatial_layers > 1 && svc->number_spatial_layers <= 3 &&
+      svc->number_temporal_layers <= 3 &&
+      !(svc->temporal_layering_mode == VP9E_TEMPORAL_LAYERING_MODE_BYPASS &&
+        svc->use_set_ref_frame_config))
+    svc->simulcast_mode = 1;
+  else
+    svc->simulcast_mode = 0;
+
   if (svc->number_spatial_layers > 1) {
     svc->use_base_mv = 1;
     svc->use_partition_reuse = 1;
@@ -989,6 +1018,7 @@ void vp9_svc_check_reset_layer_rc_flag(VP9_COMP *const cpi) {
 void vp9_svc_constrain_inter_layer_pred(VP9_COMP *const cpi) {
   VP9_COMMON *const cm = &cpi->common;
   SVC *const svc = &cpi->svc;
+  const int sl = svc->spatial_layer_id;
   // Check for disabling inter-layer (spatial) prediction, if
   // svc.disable_inter_layer_pred is set. If the previous spatial layer was
   // dropped then disable the prediction from this (scaled) reference.
@@ -998,7 +1028,7 @@ void vp9_svc_constrain_inter_layer_pred(VP9_COMP *const cpi) {
        !svc->layer_context[svc->temporal_layer_id].is_key_frame &&
        !svc->superframe_has_layer_sync) ||
       svc->disable_inter_layer_pred == INTER_LAYER_PRED_OFF ||
-      svc->drop_spatial_layer[svc->spatial_layer_id - 1]) {
+      svc->drop_spatial_layer[sl - 1]) {
     MV_REFERENCE_FRAME ref_frame;
     static const int flag_list[4] = { 0, VP9_LAST_FLAG, VP9_GOLD_FLAG,
                                       VP9_ALT_FLAG };
@@ -1007,8 +1037,16 @@ void vp9_svc_constrain_inter_layer_pred(VP9_COMP *const cpi) {
       if (yv12 != NULL && (cpi->ref_frame_flags & flag_list[ref_frame])) {
         const struct scale_factors *const scale_fac =
             &cm->frame_refs[ref_frame - 1].sf;
-        if (vp9_is_scaled(scale_fac))
+        if (vp9_is_scaled(scale_fac)) {
           cpi->ref_frame_flags &= (~flag_list[ref_frame]);
+          // Point golden/altref frame buffer index to last.
+          if (!svc->simulcast_mode) {
+            if (ref_frame == GOLDEN_FRAME)
+              cpi->gld_fb_idx = cpi->lst_fb_idx;
+            else if (ref_frame == ALTREF_FRAME)
+              cpi->alt_fb_idx = cpi->lst_fb_idx;
+          }
+        }
       }
     }
   }
@@ -1036,7 +1074,6 @@ void vp9_svc_constrain_inter_layer_pred(VP9_COMP *const cpi) {
         int fb_idx =
             ref_frame == LAST_FRAME ? cpi->lst_fb_idx : cpi->gld_fb_idx;
         int ref_flag = ref_frame == LAST_FRAME ? VP9_LAST_FLAG : VP9_GOLD_FLAG;
-        int sl = svc->spatial_layer_id;
         int disable = 1;
         if (fb_idx < 0) continue;
         if ((fb_idx == svc->lst_fb_idx[sl - 1] &&
@@ -1192,7 +1229,7 @@ void vp9_svc_update_ref_frame(VP9_COMP *const cpi) {
   if (svc->temporal_layering_mode == VP9E_TEMPORAL_LAYERING_MODE_BYPASS &&
       svc->use_set_ref_frame_config) {
     vp9_svc_update_ref_frame_bypass_mode(cpi);
-  } else if (cm->frame_type == KEY_FRAME) {
+  } else if (cm->frame_type == KEY_FRAME && !svc->simulcast_mode) {
     // Keep track of frame index for each reference frame.
     int i;
     // On key frame update all reference frame slots.
@@ -1226,4 +1263,27 @@ void vp9_svc_adjust_frame_rate(VP9_COMP *const cpi) {
   int64_t this_duration =
       cpi->svc.timebase_fac * cpi->svc.duration[cpi->svc.spatial_layer_id];
   vp9_new_framerate(cpi, 10000000.0 / this_duration);
+}
+
+void vp9_svc_adjust_avg_frame_qindex(VP9_COMP *const cpi) {
+  VP9_COMMON *const cm = &cpi->common;
+  SVC *const svc = &cpi->svc;
+  RATE_CONTROL *const rc = &cpi->rc;
+  // On key frames in CBR mode: reset the avg_frame_index for base layer
+  // (to level closer to worst_quality) if the overshoot is significant.
+  // Reset it for all temporal layers on base spatial layer.
+  if (cm->frame_type == KEY_FRAME && cpi->oxcf.rc_mode == VPX_CBR &&
+      !svc->simulcast_mode &&
+      rc->projected_frame_size > 3 * rc->avg_frame_bandwidth) {
+    int tl;
+    rc->avg_frame_qindex[INTER_FRAME] =
+        VPXMAX(rc->avg_frame_qindex[INTER_FRAME],
+               (cm->base_qindex + rc->worst_quality) >> 1);
+    for (tl = 0; tl < svc->number_temporal_layers; ++tl) {
+      const int layer = LAYER_IDS_TO_IDX(0, tl, svc->number_temporal_layers);
+      LAYER_CONTEXT *lc = &svc->layer_context[layer];
+      RATE_CONTROL *lrc = &lc->rc;
+      lrc->avg_frame_qindex[INTER_FRAME] = rc->avg_frame_qindex[INTER_FRAME];
+    }
+  }
 }

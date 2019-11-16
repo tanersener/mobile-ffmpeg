@@ -37,7 +37,8 @@
 # define SHA1_SECURE_VAL _INSECURE_FOR_CERTS
 #endif
 
-static const gnutls_sign_entry_st sign_algorithms[] = {
+static SYSTEM_CONFIG_OR_CONST
+gnutls_sign_entry_st sign_algorithms[] = {
 	 /* RSA-PKCS#1 1.5: must be before PSS,
 	  * so that gnutls_pk_to_sign() will return
 	  * these first for backwards compatibility. */
@@ -437,10 +438,31 @@ unsigned gnutls_sign_is_secure(gnutls_sign_algorithm_t algorithm)
 
 bool _gnutls_sign_is_secure2(const gnutls_sign_entry_st *se, unsigned int flags)
 {
+	if (se->hash != GNUTLS_DIG_UNKNOWN && _gnutls_digest_is_insecure(se->hash))
+		return gnutls_assert_val(0);
+
 	if (flags & GNUTLS_SIGN_FLAG_SECURE_FOR_CERTS)
 		return (se->slevel==_SECURE)?1:0;
 	else
 		return (se->slevel==_SECURE || se->slevel == _INSECURE_FOR_CERTS)?1:0;
+}
+
+int _gnutls_sign_mark_insecure(const char *name, hash_security_level_t level)
+{
+#ifndef DISABLE_SYSTEM_CONFIG
+	gnutls_sign_entry_st *p;
+
+	if (unlikely(level == _SECURE))
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	for(p = sign_algorithms; p->name != NULL; p++) {
+		if (c_strcasecmp(p->name, name) == 0) {
+				p->slevel = level;
+			return 0;
+		}
+	}
+#endif
+	return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 }
 
 /**

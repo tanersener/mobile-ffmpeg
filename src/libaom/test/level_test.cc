@@ -88,7 +88,10 @@ TEST_P(LevelTest, TestTargetLevelApi) {
   for (int operating_point = 0; operating_point <= 32; ++operating_point) {
     for (int level = 0; level <= 32; ++level) {
       const int target_level = operating_point * 100 + level;
-      if ((level >= 0 && level <= 24) || level == 31 || operating_point > 31) {
+      if ((level <= 24 && level != 2 && level != 3 && level != 6 &&
+           level != 7 && level != 10 && level != 11 && level != 20 &&
+           level != 21 && level != 22 && level != 23) ||
+          level == 31 || operating_point > 31) {
         EXPECT_EQ(AOM_CODEC_OK,
                   aom_codec_control(&enc, AV1E_SET_TARGET_SEQ_LEVEL_IDX,
                                     target_level));
@@ -129,9 +132,22 @@ TEST_P(LevelTest, TestLevelMonitoringHighBitrate) {
     libaom_test::I420VideoSource video("hantro_collage_w352h288.yuv", 352, 288,
                                        30, 1, 0, 40);
     target_level_ = kLevelKeepStats;
-    cfg_.rc_target_bitrate = 3000;
+    cfg_.rc_target_bitrate = 4000;
     ASSERT_NO_FATAL_FAILURE(RunLoop(&video));
     ASSERT_EQ(level_[0], 1);
+  }
+}
+
+TEST_P(LevelTest, TestTargetLevel0) {
+  // To save run time, we only test speed 4.
+  if (cpu_used_ == 4) {
+    libaom_test::I420VideoSource video("hantro_collage_w352h288.yuv", 352, 288,
+                                       30, 1, 0, 50);
+    const int target_level = 0;
+    target_level_ = target_level;
+    cfg_.rc_target_bitrate = 4000;
+    ASSERT_NO_FATAL_FAILURE(RunLoop(&video));
+    ASSERT_EQ(level_[0], target_level);
   }
 }
 

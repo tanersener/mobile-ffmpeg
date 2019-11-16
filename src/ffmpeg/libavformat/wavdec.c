@@ -233,9 +233,9 @@ static inline int wav_parse_bext_string(AVFormatContext *s, const char *key,
     char temp[257];
     int ret;
 
-    av_assert0(length <= sizeof(temp));
-    if ((ret = avio_read(s->pb, temp, length)) < 0)
-        return ret;
+    av_assert0(length < sizeof(temp));
+    if ((ret = avio_read(s->pb, temp, length)) != length)
+        return ret < 0 ? ret : AVERROR_INVALIDDATA;
 
     temp[length] = 0;
 
@@ -304,8 +304,10 @@ static int wav_parse_bext_tag(AVFormatContext *s, int64_t size)
         if (!(coding_history = av_malloc(size + 1)))
             return AVERROR(ENOMEM);
 
-        if ((ret = avio_read(s->pb, coding_history, size)) < 0)
-            return ret;
+        if ((ret = avio_read(s->pb, coding_history, size)) != size) {
+            av_free(coding_history);
+            return ret < 0 ? ret : AVERROR_INVALIDDATA;
+        }
 
         coding_history[size] = 0;
         if ((ret = av_dict_set(&s->metadata, "coding_history", coding_history,
@@ -588,6 +590,8 @@ break_loop:
     } else if (st->codecpar->codec_id == AV_CODEC_ID_XMA1 ||
                st->codecpar->codec_id == AV_CODEC_ID_XMA2) {
         st->codecpar->block_align = 2048;
+    } else if (st->codecpar->codec_id == AV_CODEC_ID_ADPCM_MS && st->codecpar->channels > 2) {
+        st->codecpar->block_align *= st->codecpar->channels;
     }
 
     ff_metadata_conv_ctx(s, NULL, wav_metadata_conv);

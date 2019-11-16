@@ -28,10 +28,8 @@
  * are present, or 0, on success.
  */
 int _gnutls13_psk_ext_parser_init(psk_ext_parser_st *p,
-				  const unsigned char *data, size_t _len)
+				  const unsigned char *data, size_t len)
 {
-	ssize_t len = _len;
-
 	if (!p || !data || !len)
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 

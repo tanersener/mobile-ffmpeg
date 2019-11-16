@@ -54,7 +54,7 @@ typedef struct {
 // decoder implementation modules critically rely on the defined entry values
 // specified herein. They should be refactored concurrently.
 
-#define NONE -1
+#define NONE (-1)
 #define INTRA_FRAME 0
 #define LAST_FRAME 1
 #define GOLDEN_FRAME 2
@@ -176,7 +176,7 @@ typedef struct macroblockd {
   FRAME_CONTEXT *fc;
 
   /* pointers to reference frames */
-  RefBuffer *block_refs[2];
+  const RefBuffer *block_refs[2];
 
   /* pointer to current frame */
   const YV12_BUFFER_CONFIG *cur_buf;
@@ -285,6 +285,28 @@ void vp9_foreach_transformed_block(const MACROBLOCKD *const xd,
 void vp9_set_contexts(const MACROBLOCKD *xd, struct macroblockd_plane *pd,
                       BLOCK_SIZE plane_bsize, TX_SIZE tx_size, int has_eob,
                       int aoff, int loff);
+
+#if CONFIG_MISMATCH_DEBUG
+#define TX_UNIT_SIZE_LOG2 2
+static INLINE void mi_to_pixel_loc(int *pixel_c, int *pixel_r, int mi_col,
+                                   int mi_row, int tx_blk_col, int tx_blk_row,
+                                   int subsampling_x, int subsampling_y) {
+  *pixel_c = ((mi_col << MI_SIZE_LOG2) >> subsampling_x) +
+             (tx_blk_col << TX_UNIT_SIZE_LOG2);
+  *pixel_r = ((mi_row << MI_SIZE_LOG2) >> subsampling_y) +
+             (tx_blk_row << TX_UNIT_SIZE_LOG2);
+}
+
+static INLINE int get_block_width(BLOCK_SIZE bsize) {
+  const int num_4x4_w = num_4x4_blocks_wide_lookup[bsize];
+  return 4 * num_4x4_w;
+}
+
+static INLINE int get_block_height(BLOCK_SIZE bsize) {
+  const int num_4x4_h = num_4x4_blocks_high_lookup[bsize];
+  return 4 * num_4x4_h;
+}
+#endif
 
 #ifdef __cplusplus
 }  // extern "C"

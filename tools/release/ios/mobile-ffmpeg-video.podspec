@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
     s.version           = "VERSION"
     s.summary           = "Mobile FFmpeg Video Static Framework"
     s.description       = <<-DESC
-    Includes FFmpeg v4.2-dev-1824 with fontconfig v2.13.91, freetype v2.10.1, fribidi v1.0.5, kvazaar v1.2.0, libaom v1.0.0-dev-2018, libass v0.14.0, libiconv v1.16, libtheora v1.1.1, libvpx v1.8.0, snappy v1.1.7 and libwebp v1.0.2 libraries enabled.
+    Includes FFmpeg v4.3-dev-1181 with fontconfig v2.13.92, freetype v2.10.1, fribidi v1.0.7, kvazaar v1.3.0, libaom v1.0.0-dev-2567, libass v0.14.0, libiconv v1.16, libtheora v1.1.1, libvpx v1.8.1, snappy v1.1.7 and libwebp v1.0.3 libraries enabled.
     DESC
 
     s.homepage          = "https://github.com/tanersener/mobile-ffmpeg"

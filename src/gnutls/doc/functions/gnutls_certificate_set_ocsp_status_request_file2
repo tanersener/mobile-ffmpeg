@@ -27,8 +27,8 @@ in the chain, the code @code{GNUTLS_E_OCSP_MISMATCH_WITH_CERTS}  is returned.
 If the response is already expired at the time of loading the code
 @code{GNUTLS_E_EXPIRED}  is returned.
 
-@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned,
-otherwise a negative error code is returned.
+@strong{Returns:} On success, the number of loaded responses is returned,
+otherwise a negative error code.
 
 @strong{Since:} 3.1.3
 @end deftypefun

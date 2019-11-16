@@ -76,9 +76,9 @@ TEST_P (DecoderOutputTest, CompareOutput) {
   FileParam p = GetParam();
 #if defined(ANDROID_NDK)
   std::string filename = std::string ("/sdcard/") + p.fileName;
-  DecodeFile (filename.c_str(), this);
+  ASSERT_TRUE ( DecodeFile (filename.c_str(), this));
 #else
-  DecodeFile (p.fileName, this);
+  ASSERT_TRUE (DecodeFile(p.fileName, this));
 #endif
 
   unsigned char digest[SHA_DIGEST_LENGTH];
@@ -130,6 +130,15 @@ static const FileParam kFileParamArray[] = {
   {"res/test_scalinglist_jm.264", "f690a3af2896a53360215fb5d35016bfd41499b3"},
   {"res/test_vd_1d.264", "5827d2338b79ff82cd091c707823e466197281d3"},
   {"res/test_vd_rc.264", "eea02e97bfec89d0418593a8abaaf55d02eaa1ca"},
+  {"res/Cisco_Men_whisper_640x320_CABAC_Bframe_9.264", "88b8864a69cee7656202bc54d2ffa8b7b6f1f6c5"},
+  {"res/Cisco_Men_whisper_640x320_CAVLC_Bframe_9.264", "270a500d2f91c9e2c8ffabc03f62e0dc0b3a24ed"},
+  {"res/Cisco_Adobe_PDF_sample_a_1024x768_CAVLC_Bframe_9.264", "d3b2b986178ce3eafa806cd984543d0da830f408"},
+  {"res/VID_1280x544_cabac_temporal_direct.264", "8d946d46a8cb248269c4294203397daed8dace1d"},
+  {"res/VID_1280x720_cabac_temporal_direct.264", "419faadd8362918e6d908addd3e92fddb925624a"},
+  {"res/VID_1920x1080_cabac_temporal_direct.264", "2c93dc4ea4617636d2554c68896ce3ba16d678e7"},
+  {"res/VID_1280x544_cavlc_temporal_direct.264", "c89756e76e57c6a84cc55146b18845d4d24e4cd5"},
+  {"res/VID_1280x720_cavlc_temporal_direct.264", "be1af190f5eba34102a9de42917c8ec50073c5a0"},
+  {"res/VID_1920x1080_cavlc_temporal_direct.264", "6c58378bc51beb909381e634700706737fd17be2"},
 };
 
 INSTANTIATE_TEST_CASE_P (DecodeFile, DecoderOutputTest,

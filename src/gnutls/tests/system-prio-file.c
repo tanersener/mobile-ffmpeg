@@ -28,6 +28,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <gnutls/gnutls.h>
+#include <assert.h>
 
 #include "utils.h"
 
@@ -50,6 +51,8 @@ try_prio(const char *prio, const char *expected_str)
 	p = _gnutls_resolve_priorities(prio);
 	if (p == NULL && expected_str == NULL)
 		goto ok;
+
+	assert(strstr(gnutls_get_system_config_file(), "system.prio") != NULL);
 
 	if (p == NULL || expected_str == NULL || strcmp(p, expected_str) != 0) {
 		fail("test: %s: error; got: %s, expected: %s\n", prio, p, expected_str);

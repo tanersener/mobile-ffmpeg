@@ -9,8 +9,10 @@
 /* Begin PBXBuildFile section */
 		340FABBE2115A17600B33CE7 /* VidStabViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 340FABBC2115A17600B33CE7 /* VidStabViewController.h */; };
 		340FABBF2115A17600B33CE7 /* VidStabViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 340FABBD2115A17600B33CE7 /* VidStabViewController.m */; };
-		3423D267217F7CC100C3C7ED /* MediaInformationParserTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3423D266217F7CC100C3C7ED /* MediaInformationParserTests.m */; };
-		3423D269217F7D4E00C3C7ED /* MediaInformationParserTests.h in Headers */ = {isa = PBXBuildFile; fileRef = 3423D268217F7D4E00C3C7ED /* MediaInformationParserTests.h */; };
+		342900D422DE3AAB0071B2E4 /* MediaInformationParserTest.h in Headers */ = {isa = PBXBuildFile; fileRef = 342900D322DE3AAB0071B2E4 /* MediaInformationParserTest.h */; };
+		342900D722DE3AB30071B2E4 /* MobileFFmpegTest.h in Headers */ = {isa = PBXBuildFile; fileRef = 342900D522DE3AB30071B2E4 /* MobileFFmpegTest.h */; };
+		342900D822DE3AB30071B2E4 /* MobileFFmpegTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 342900D622DE3AB30071B2E4 /* MobileFFmpegTest.m */; };
+		342900DA22DE3AB70071B2E4 /* MediaInformationParserTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 342900D922DE3AB70071B2E4 /* MediaInformationParserTest.m */; };
 		343165D121D136FC001A7185 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 343165D021D136FC001A7185 /* libz.tbd */; };
 		343165D321D13704001A7185 /* libbz2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 343165D221D13704001A7185 /* libbz2.tbd */; };
 		3431662B21D13B0A001A7185 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3431662A21D13B0A001A7185 /* libc++.tbd */; };
@@ -43,7 +45,6 @@
 		34AE894122AE598900742D95 /* libnettle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34AE890722AE598600742D95 /* libnettle.framework */; };
 		34AE894222AE598900742D95 /* snappy.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34AE890822AE598600742D95 /* snappy.framework */; };
 		34AE894322AE598900742D95 /* libavutil.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34AE890922AE598600742D95 /* libavutil.framework */; };
-		34AE894422AE598900742D95 /* chromaprint.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34AE890A22AE598700742D95 /* chromaprint.framework */; };
 		34AE894522AE598900742D95 /* libtheoradec.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34AE890B22AE598700742D95 /* libtheoradec.framework */; };
 		34AE894622AE598900742D95 /* libvorbis.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34AE890C22AE598700742D95 /* libvorbis.framework */; };
 		34AE894722AE598900742D95 /* libpng.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34AE890D22AE598700742D95 /* libpng.framework */; };
@@ -54,7 +55,6 @@
 		34AE894C22AE598900742D95 /* libxml2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34AE891222AE598700742D95 /* libxml2.framework */; };
 		34AE894D22AE598A00742D95 /* libavdevice.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34AE891322AE598700742D95 /* libavdevice.framework */; };
 		34AE894E22AE598A00742D95 /* libtheora.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34AE891422AE598700742D95 /* libtheora.framework */; };
-		34AE894F22AE598A00742D95 /* leptonica.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34AE891522AE598700742D95 /* leptonica.framework */; };
 		34AE895022AE598A00742D95 /* kvazaar.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34AE891622AE598700742D95 /* kvazaar.framework */; };
 		34AE895122AE598A00742D95 /* libuuid.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34AE891722AE598700742D95 /* libuuid.framework */; };
 		34AE895222AE598A00742D95 /* libswscale.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34AE891822AE598700742D95 /* libswscale.framework */; };
@@ -80,9 +80,7 @@
 		34AE896622AE598A00742D95 /* libswresample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34AE892C22AE598900742D95 /* libswresample.framework */; };
 		34AE896722AE598A00742D95 /* libwebpdecoder.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34AE892D22AE598900742D95 /* libwebpdecoder.framework */; };
 		34AE896822AE598A00742D95 /* opus.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34AE892E22AE598900742D95 /* opus.framework */; };
-		34AE896922AE598A00742D95 /* sdl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34AE892F22AE598900742D95 /* sdl.framework */; };
 		34AE896A22AE598A00742D95 /* libaom.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34AE893022AE598900742D95 /* libaom.framework */; };
-		34AE896B22AE598A00742D95 /* tesseract.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34AE893122AE598900742D95 /* tesseract.framework */; };
 		34AE896C22AE598A00742D95 /* lame.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34AE893222AE598900742D95 /* lame.framework */; };
 		34AE896D22AE598A00742D95 /* x264.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34AE893322AE598900742D95 /* x264.framework */; };
 		34AE896E22AE598A00742D95 /* speex.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34AE893422AE598900742D95 /* speex.framework */; };
@@ -121,8 +119,10 @@
 /* Begin PBXFileReference section */
 		340FABBC2115A17600B33CE7 /* VidStabViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VidStabViewController.h; sourceTree = "<group>"; };
 		340FABBD2115A17600B33CE7 /* VidStabViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VidStabViewController.m; sourceTree = "<group>"; };
-		3423D266217F7CC100C3C7ED /* MediaInformationParserTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MediaInformationParserTests.m; sourceTree = "<group>"; };
-		3423D268217F7D4E00C3C7ED /* MediaInformationParserTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MediaInformationParserTests.h; sourceTree = "<group>"; };
+		342900D322DE3AAB0071B2E4 /* MediaInformationParserTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MediaInformationParserTest.h; sourceTree = "<group>"; };
+		342900D522DE3AB30071B2E4 /* MobileFFmpegTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MobileFFmpegTest.h; sourceTree = "<group>"; };
+		342900D622DE3AB30071B2E4 /* MobileFFmpegTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MobileFFmpegTest.m; sourceTree = "<group>"; };
+		342900D922DE3AB70071B2E4 /* MediaInformationParserTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MediaInformationParserTest.m; sourceTree = "<group>"; };
 		343165D021D136FC001A7185 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		343165D221D13704001A7185 /* libbz2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libbz2.tbd; path = usr/lib/libbz2.tbd; sourceTree = SDKROOT; };
 		3431662A21D13B0A001A7185 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
@@ -158,7 +158,6 @@
 		34AE890722AE598600742D95 /* libnettle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libnettle.framework; sourceTree = "<group>"; };
 		34AE890822AE598600742D95 /* snappy.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = snappy.framework; sourceTree = "<group>"; };
 		34AE890922AE598600742D95 /* libavutil.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libavutil.framework; sourceTree = "<group>"; };
-		34AE890A22AE598700742D95 /* chromaprint.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = chromaprint.framework; sourceTree = "<group>"; };
 		34AE890B22AE598700742D95 /* libtheoradec.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libtheoradec.framework; sourceTree = "<group>"; };
 		34AE890C22AE598700742D95 /* libvorbis.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libvorbis.framework; sourceTree = "<group>"; };
 		34AE890D22AE598700742D95 /* libpng.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libpng.framework; sourceTree = "<group>"; };
@@ -169,7 +168,6 @@
 		34AE891222AE598700742D95 /* libxml2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libxml2.framework; sourceTree = "<group>"; };
 		34AE891322AE598700742D95 /* libavdevice.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libavdevice.framework; sourceTree = "<group>"; };
 		34AE891422AE598700742D95 /* libtheora.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libtheora.framework; sourceTree = "<group>"; };
-		34AE891522AE598700742D95 /* leptonica.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = leptonica.framework; sourceTree = "<group>"; };
 		34AE891622AE598700742D95 /* kvazaar.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = kvazaar.framework; sourceTree = "<group>"; };
 		34AE891722AE598700742D95 /* libuuid.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libuuid.framework; sourceTree = "<group>"; };
 		34AE891822AE598700742D95 /* libswscale.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libswscale.framework; sourceTree = "<group>"; };
@@ -195,9 +193,7 @@
 		34AE892C22AE598900742D95 /* libswresample.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libswresample.framework; sourceTree = "<group>"; };
 		34AE892D22AE598900742D95 /* libwebpdecoder.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libwebpdecoder.framework; sourceTree = "<group>"; };
 		34AE892E22AE598900742D95 /* opus.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = opus.framework; sourceTree = "<group>"; };
-		34AE892F22AE598900742D95 /* sdl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = sdl.framework; sourceTree = "<group>"; };
 		34AE893022AE598900742D95 /* libaom.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libaom.framework; sourceTree = "<group>"; };
-		34AE893122AE598900742D95 /* tesseract.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = tesseract.framework; sourceTree = "<group>"; };
 		34AE893222AE598900742D95 /* lame.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = lame.framework; sourceTree = "<group>"; };
 		34AE893322AE598900742D95 /* x264.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = x264.framework; sourceTree = "<group>"; };
 		34AE893422AE598900742D95 /* speex.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = speex.framework; sourceTree = "<group>"; };
@@ -230,11 +226,9 @@
 				34AE897122AE5A4600742D95 /* GameController.framework in Frameworks */,
 				34AE897022AE5A3500742D95 /* VideoToolbox.framework in Frameworks */,
 				34AE896F22AE5A2E00742D95 /* CoreMotion.framework in Frameworks */,
-				34AE894F22AE598A00742D95 /* leptonica.framework in Frameworks */,
 				34AE893822AE598900742D95 /* twolame.framework in Frameworks */,
 				34AE896D22AE598A00742D95 /* x264.framework in Frameworks */,
 				34AE895F22AE598A00742D95 /* libiconv.framework in Frameworks */,
-				34AE896B22AE598A00742D95 /* tesseract.framework in Frameworks */,
 				34AE896322AE598A00742D95 /* gmp.framework in Frameworks */,
 				34AE895922AE598A00742D95 /* libwebpdemux.framework in Frameworks */,
 				34AE896722AE598A00742D95 /* libwebpdecoder.framework in Frameworks */,
@@ -245,7 +239,6 @@
 				34AE893922AE598900742D95 /* libvpx.framework in Frameworks */,
 				34AE895022AE598A00742D95 /* kvazaar.framework in Frameworks */,
 				34AE894122AE598900742D95 /* libnettle.framework in Frameworks */,
-				34AE896922AE598A00742D95 /* sdl.framework in Frameworks */,
 				34AE893D22AE598900742D95 /* wavpack.framework in Frameworks */,
 				34AE894722AE598900742D95 /* libpng.framework in Frameworks */,
 				34AE893E22AE598900742D95 /* libilbc.framework in Frameworks */,
@@ -277,7 +270,6 @@
 				34AE893722AE598900742D95 /* x265.framework in Frameworks */,
 				34AE895422AE598A00742D95 /* libavfilter.framework in Frameworks */,
 				34AE894922AE598900742D95 /* libhogweed.framework in Frameworks */,
-				34AE894422AE598900742D95 /* chromaprint.framework in Frameworks */,
 				34AE895D22AE598A00742D95 /* libogg.framework in Frameworks */,
 				343165D321D13704001A7185 /* libbz2.tbd in Frameworks */,
 				34AE895322AE598A00742D95 /* giflib.framework in Frameworks */,
@@ -314,7 +306,6 @@
 		3498DC65209F7F1C005F5883 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				34AE890A22AE598700742D95 /* chromaprint.framework */,
 				34AE891D22AE598800742D95 /* expat.framework */,
 				34AE890022AE598600742D95 /* fontconfig.framework */,
 				34AE88FB22AE598600742D95 /* freetype.framework */,
@@ -325,7 +316,6 @@
 				34AE890122AE598600742D95 /* jpeg.framework */,
 				34AE891622AE598700742D95 /* kvazaar.framework */,
 				34AE893222AE598900742D95 /* lame.framework */,
-				34AE891522AE598700742D95 /* leptonica.framework */,
 				34AE893022AE598900742D95 /* libaom.framework */,
 				34AE892A22AE598900742D95 /* libass.framework */,
 				34AE892622AE598800742D95 /* libavcodec.framework */,
@@ -360,12 +350,10 @@
 				34AE891222AE598700742D95 /* libxml2.framework */,
 				34AE891B22AE598800742D95 /* mobileffmpeg.framework */,
 				34AE892E22AE598900742D95 /* opus.framework */,
-				34AE892F22AE598900742D95 /* sdl.framework */,
 				34AE88FC22AE598600742D95 /* shine.framework */,
 				34AE890822AE598600742D95 /* snappy.framework */,
 				34AE892122AE598800742D95 /* soxr.framework */,
 				34AE893422AE598900742D95 /* speex.framework */,
-				34AE893122AE598900742D95 /* tesseract.framework */,
 				34AE890222AE598600742D95 /* tiff.framework */,
 				34AE88FE22AE598600742D95 /* twolame.framework */,
 				34AE890322AE598600742D95 /* wavpack.framework */,
@@ -403,8 +391,6 @@
 		34FAE212209F7DDD005CE2AE /* MobileFFmpegTest */ = {
 			isa = PBXGroup;
 			children = (
-				34D0596A220DC4D900E44C62 /* PipeViewController.h */,
-				34D0596B220DC4D900E44C62 /* PipeViewController.m */,
 				34FAE213209F7DDD005CE2AE /* AppDelegate.h */,
 				34FAE214209F7DDD005CE2AE /* AppDelegate.m */,
 				34FAE21F209F7DDE005CE2AE /* Assets.xcassets */,
@@ -420,8 +406,12 @@
 				34FAE221209F7DDE005CE2AE /* LaunchScreen.storyboard */,
 				34FAE225209F7DDE005CE2AE /* main.m */,
 				34FAE21C209F7DDD005CE2AE /* Main.storyboard */,
-				3423D268217F7D4E00C3C7ED /* MediaInformationParserTests.h */,
-				3423D266217F7CC100C3C7ED /* MediaInformationParserTests.m */,
+				342900D322DE3AAB0071B2E4 /* MediaInformationParserTest.h */,
+				342900D922DE3AB70071B2E4 /* MediaInformationParserTest.m */,
+				342900D522DE3AB30071B2E4 /* MobileFFmpegTest.h */,
+				342900D622DE3AB30071B2E4 /* MobileFFmpegTest.m */,
+				34D0596A220DC4D900E44C62 /* PipeViewController.h */,
+				34D0596B220DC4D900E44C62 /* PipeViewController.m */,
 				3457454D2113B8D300059043 /* SubtitleViewController.h */,
 				3457454E2113B8D300059043 /* SubtitleViewController.m */,
 				343E67072107C27600F95E5B /* TabBarController.h */,
@@ -443,15 +433,16 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				342900D422DE3AAB0071B2E4 /* MediaInformationParserTest.h in Headers */,
 				343E67092107C27600F95E5B /* TabBarController.h in Headers */,
 				34D0596C220DC4D900E44C62 /* PipeViewController.h in Headers */,
-				3423D269217F7D4E00C3C7ED /* MediaInformationParserTests.h in Headers */,
 				3457454B2113B8AD00059043 /* AudioViewController.h in Headers */,
 				3457454F2113B8D300059043 /* SubtitleViewController.h in Headers */,
 				343E66B9210789DE00F95E5B /* Constants.h in Headers */,
 				343E67052107AD0100F95E5B /* Util.h in Headers */,
 				343E66B5210784BD00F95E5B /* HttpsViewController.h in Headers */,
 				340FABBE2115A17600B33CE7 /* VidStabViewController.h in Headers */,
+				342900D722DE3AB30071B2E4 /* MobileFFmpegTest.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -536,6 +527,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				342900DA22DE3AB70071B2E4 /* MediaInformationParserTest.m in Sources */,
 				34D0596D220DC4D900E44C62 /* PipeViewController.m in Sources */,
 				34FAE21B209F7DDD005CE2AE /* VideoViewController.m in Sources */,
 				34FAE215209F7DDD005CE2AE /* AppDelegate.m in Sources */,
@@ -543,10 +535,10 @@
 				343E66B6210784BD00F95E5B /* HttpsViewController.m in Sources */,
 				340FABBF2115A17600B33CE7 /* VidStabViewController.m in Sources */,
 				34FAE218209F7DDD005CE2AE /* CommandViewController.m in Sources */,
-				3423D267217F7CC100C3C7ED /* MediaInformationParserTests.m in Sources */,
 				343E670A2107C27600F95E5B /* TabBarController.m in Sources */,
 				345745502113B8D300059043 /* SubtitleViewController.m in Sources */,
 				343E67062107AD0100F95E5B /* Util.m in Sources */,
+				342900D822DE3AB30071B2E4 /* MobileFFmpegTest.m in Sources */,
 				3457454C2113B8AD00059043 /* AudioViewController.m in Sources */,
 				34BB547C2109D44800606B7C /* Constants.m in Sources */,
 			);

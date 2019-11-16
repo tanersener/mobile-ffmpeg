@@ -16,3 +16,4 @@ valgrind_test 264x130 10 $common_args -r2 --owf=1 --threads=2 --tiles-height-spl
 valgrind_test 264x130 10 $common_args -r2 --owf=0 --threads=2 --tiles-height-split=u2 --no-wpp
 valgrind_test 512x512  3 $common_args -r2 --owf=1 --threads=2 --tiles=2x2 --no-wpp
 valgrind_test 512x512  3 $common_args -r2 --owf=0 --threads=2 --tiles=2x2 --no-wpp
+if [ ! -z ${GITLAB_CI+x} ];then valgrind_test 512x512 30 $common_args -r2 --owf=0 --threads=2 --tiles=2x2 --no-wpp --bipred; fi

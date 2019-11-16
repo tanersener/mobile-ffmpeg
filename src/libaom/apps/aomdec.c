@@ -451,7 +451,7 @@ static int main_loop(int argc, const char **argv_) {
   int opt_yv12 = 0;
   int opt_i420 = 0;
   int opt_raw = 0;
-  aom_codec_dec_cfg_t cfg = { 0, 0, 0, CONFIG_LOWBITDEPTH, { 1 } };
+  aom_codec_dec_cfg_t cfg = { 0, 0, 0, !FORCE_HIGHBITDEPTH_DECODING, { 1 } };
   unsigned int fixed_output_bit_depth = 0;
   unsigned int is_annexb = 0;
   int frames_corrupted = 0;

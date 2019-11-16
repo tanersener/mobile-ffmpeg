@@ -136,7 +136,7 @@ HIGH_GET_VAR(8);
     highbd_8_variance_sse2(                                                \
         src, src_stride, ref, ref_stride, w, h, sse, &sum,                 \
         vpx_highbd_calc##block_size##x##block_size##var_sse2, block_size); \
-    return *sse - (uint32_t)(((int64_t)sum * sum) >> shift);               \
+    return *sse - (uint32_t)(((int64_t)sum * sum) >> (shift));             \
   }                                                                        \
                                                                            \
   uint32_t vpx_highbd_10_variance##w##x##h##_sse2(                         \
@@ -149,7 +149,7 @@ HIGH_GET_VAR(8);
     highbd_10_variance_sse2(                                               \
         src, src_stride, ref, ref_stride, w, h, sse, &sum,                 \
         vpx_highbd_calc##block_size##x##block_size##var_sse2, block_size); \
-    var = (int64_t)(*sse) - (((int64_t)sum * sum) >> shift);               \
+    var = (int64_t)(*sse) - (((int64_t)sum * sum) >> (shift));             \
     return (var >= 0) ? (uint32_t)var : 0;                                 \
   }                                                                        \
                                                                            \
@@ -163,7 +163,7 @@ HIGH_GET_VAR(8);
     highbd_12_variance_sse2(                                               \
         src, src_stride, ref, ref_stride, w, h, sse, &sum,                 \
         vpx_highbd_calc##block_size##x##block_size##var_sse2, block_size); \
-    var = (int64_t)(*sse) - (((int64_t)sum * sum) >> shift);               \
+    var = (int64_t)(*sse) - (((int64_t)sum * sum) >> (shift));             \
     return (var >= 0) ? (uint32_t)var : 0;                                 \
   }
 

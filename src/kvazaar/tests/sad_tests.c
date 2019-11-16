@@ -31,7 +31,7 @@
 
 //////////////////////////////////////////////////////////////////////////
 // DEFINES
-#define TEST_SAD(X, Y) kvz_image_calc_sad(g_pic, g_ref, 0, 0, (X), (Y), 8, 8)
+#define TEST_SAD(X, Y) kvz_image_calc_sad(g_pic, g_ref, 0, 0, (X), (Y), 8, 8, NULL)
 
 //////////////////////////////////////////////////////////////////////////
 // GLOBALS
@@ -329,7 +329,7 @@ SUITE(sad_tests)
 
   setup_tests();
 
-  for (unsigned i = 0; i < strategies.count; ++i) {
+  for (volatile unsigned i = 0; i < strategies.count; ++i) {
     if (strcmp(strategies.strategies[i].type, "reg_sad") != 0) {
       continue;
     }

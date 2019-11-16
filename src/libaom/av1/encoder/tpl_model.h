@@ -16,10 +16,31 @@
 extern "C" {
 #endif
 
+static INLINE BLOCK_SIZE convert_length_to_bsize(int length) {
+  switch (length) {
+    case 64: return BLOCK_64X64;
+    case 32: return BLOCK_32X32;
+    case 16: return BLOCK_16X16;
+    case 8: return BLOCK_8X8;
+    case 4: return BLOCK_4X4;
+    default:
+      assert(0 && "Invalid block size for tpl model");
+      return BLOCK_16X16;
+  }
+}
+
 void av1_tpl_setup_stats(AV1_COMP *cpi,
+                         const EncodeFrameParams *const frame_params,
                          const EncodeFrameInput *const frame_input);
 
 void av1_tpl_setup_forward_stats(AV1_COMP *cpi);
+
+int av1_tpl_ptr_pos(AV1_COMP *cpi, int mi_row, int mi_col, int stride);
+
+void av1_tpl_rdmult_setup(AV1_COMP *cpi);
+
+void av1_tpl_rdmult_setup_sb(AV1_COMP *cpi, MACROBLOCK *const x,
+                             BLOCK_SIZE sb_size, int mi_row, int mi_col);
 
 #ifdef __cplusplus
 }  // extern "C"

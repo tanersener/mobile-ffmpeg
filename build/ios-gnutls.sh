@@ -51,12 +51,7 @@ export GMP_LIBS="-L${BASEDIR}/prebuilt/$(get_target_build_directory)/gmp/lib -lg
 HARDWARE_ACCELERATION=""
 case ${ARCH} in
     arm64 | arm64e)
-
-        # HARDWARE ACCELERATION IS DISABLED DUE TO THE FOLLOWING ERROR
-        #
-        #   elf/sha1-armv8.s:1270:1: error: unknown directive
-        #  .inst 0x5e280803
-        HARDWARE_ACCELERATION="--disable-hardware-acceleration"
+        HARDWARE_ACCELERATION="--enable-hardware-acceleration"
     ;;
     i386)
         # DISABLING thread_local WHICH IS NOT SUPPORTED ON i386
@@ -67,6 +62,10 @@ case ${ARCH} in
         HARDWARE_ACCELERATION="--enable-hardware-acceleration"
     ;;
 esac
+
+# PATCH AARCH64 ASM FILES USING https://gitlab.com/gnutls/gnutls/merge_requests/661
+rm -rf ${BASEDIR}/src/gnutls/lib/accelerated/aarch64/macosx
+cp -r ${BASEDIR}/tools/make/gnutls/ios/macosx ${BASEDIR}/src/gnutls/lib/accelerated/aarch64
 
 cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
@@ -102,6 +101,6 @@ fi
 make -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_gnutls_package_config "3.6.8"
+create_gnutls_package_config "3.6.10"
 
 make install || exit 1

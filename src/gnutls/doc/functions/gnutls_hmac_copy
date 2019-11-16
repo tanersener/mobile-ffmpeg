@@ -1,0 +1,16 @@
+
+
+
+
+@deftypefun {gnutls_hmac_hd_t} {gnutls_hmac_copy} (gnutls_hmac_hd_t @var{handle})
+@var{handle}: is a @code{gnutls_hmac_hd_t}  type
+
+This function will create a copy of MAC context, containing all its current
+state. Copying contexts for MACs registered using
+@code{gnutls_crypto_register_mac()}  is not supported and will always result in an
+error.
+
+@strong{Returns:} new MAC context or NULL in case of an error.
+
+@strong{Since:} 3.6.9
+@end deftypefun

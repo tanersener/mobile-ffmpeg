@@ -27,7 +27,7 @@
 #ifndef _BIDI_TYPES_H
 #define _BIDI_TYPES_H
 
-#include "common.h"
+#include "fribidi-common.h"
 
 #include <fribidi-types.h>
 #include <fribidi-bidi-types.h>

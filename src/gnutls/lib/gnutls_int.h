@@ -57,27 +57,45 @@ typedef int ssize_t;
 
 #define ENABLE_ALIGN16
 
-#ifdef __GNUC__
-#ifndef _GNUTLS_GCC_VERSION
-#define _GNUTLS_GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
-#endif
-#if _GNUTLS_GCC_VERSION >= 30100
-#define likely(x)      __builtin_expect((x), 1)
-#define unlikely(x)    __builtin_expect((x), 0)
-#endif
-#if _GNUTLS_GCC_VERSION >= 70100
-#define FALLTHROUGH      __attribute__ ((fallthrough))
-#endif
+#ifdef __clang_major
+# define _GNUTLS_CLANG_VERSION (__clang_major__ * 10000 + __clang_minor__ * 100 + __clang_patchlevel__)
+#else
+# define _GNUTLS_CLANG_VERSION 0
 #endif
 
-#ifndef FALLTHROUGH
+/* clang also defines __GNUC__. It promotes a GCC version of 4.2.1. */
+#ifdef __GNUC__
+# define _GNUTLS_GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
+#endif
+
+#if _GNUTLS_GCC_VERSION >= 30100
+# define likely(x)      __builtin_expect((x), 1)
+# define unlikely(x)    __builtin_expect((x), 0)
+#else
+# define likely
+# define unlikely
+#endif
+
+#if _GNUTLS_GCC_VERSION >= 30300
+# define attr_nonnull_all __attribute__ ((nonnull))
+# define attr_nonnull(a)  __attribute__ ((nonnull a))
+#else
+# define attr_nonnull_all
+# define attr_nonnull(a)
+#endif
+
+#if _GNUTLS_GCC_VERSION >= 30400 && (_GNUTLS_CLANG_VERSION == 0 || _GNUTLS_CLANG_VERSION >= 40000)
+# define attr_warn_unused_result __attribute__((warn_unused_result))
+#else
+# define attr_warn_unused_result
+#endif
+
+#if _GNUTLS_GCC_VERSION >= 70100
+# define FALLTHROUGH __attribute__ ((fallthrough))
+#else
 # define FALLTHROUGH
 #endif
 
-#ifndef likely
-#define likely
-#define unlikely
-#endif
 
 /* some systems had problems with long long int, thus,
  * it is not used.
@@ -238,14 +256,15 @@ typedef enum record_send_state_t {
 
 #define MEMSUB(x,y) ((ssize_t)((ptrdiff_t)x-(ptrdiff_t)y))
 
-#define DECR_LEN(len, x) do { len-=x; if (len<0) {gnutls_assert(); return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;} } while (0)
+#define DECR_LEN(len, x) DECR_LENGTH_RET(len, x, GNUTLS_E_UNEXPECTED_PACKET_LENGTH)
 #define DECR_LEN_FINAL(len, x) do { \
-	len-=x; \
-	if (len != 0) \
+	if (len != x) \
 		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH); \
+	else \
+		len = 0; \
 	} while (0)
-#define DECR_LENGTH_RET(len, x, RET) do { len-=x; if (len<0) {gnutls_assert(); return RET;} } while (0)
-#define DECR_LENGTH_COM(len, x, COM) do { len-=x; if (len<0) {gnutls_assert(); COM;} } while (0)
+#define DECR_LENGTH_RET(len, x, RET) DECR_LENGTH_COM(len, x, return RET)
+#define DECR_LENGTH_COM(len, x, COM) do { if (len<x) {gnutls_assert(); COM;} else len-=x; } while (0)
 
 #define GNUTLS_POINTER_TO_INT(_) ((int) GNUTLS_POINTER_TO_INT_CAST (_))
 #define GNUTLS_INT_TO_POINTER(_) ((void*) GNUTLS_POINTER_TO_INT_CAST (_))

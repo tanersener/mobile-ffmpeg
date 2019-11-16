@@ -38,6 +38,12 @@
 # include <sha-padlock.h>
 #endif
 #include <aes-padlock.h>
+#ifdef HAVE_CPUID_H
+# include <cpuid.h>
+#else
+# define __get_cpuid(...) 0
+# define __get_cpuid_count(...) 0
+#endif
 
 /* ebx, ecx, edx 
  * This is a format compatible with openssl's CPUID detection.
@@ -49,11 +55,21 @@ __hidden
 #endif
 unsigned int _gnutls_x86_cpuid_s[4];
 
+#ifndef bit_SHA
+# define bit_SHA (1<<29)
+#endif
+
+/* ecx */
+#ifndef bit_AVX512BITALG
+# define bit_AVX512BITALG 0x4000
+#endif
+
 #ifndef bit_PCLMUL
 # define bit_PCLMUL 0x2
 #endif
 
 #ifndef bit_SSSE3
+/* ecx */
 # define bit_SSSE3 0x0000200
 #endif
 
@@ -85,9 +101,41 @@ unsigned int _gnutls_x86_cpuid_s[4];
 #define INTEL_SSSE3 (1<<2)
 #define INTEL_PCLMUL (1<<3)
 #define INTEL_AVX (1<<4)
+#define INTEL_SHA (1<<5)
 #define VIA_PADLOCK (1<<20)
 #define VIA_PADLOCK_PHE (1<<21)
 #define VIA_PADLOCK_PHE_SHA512 (1<<22)
+
+#ifndef HAVE_GET_CPUID_COUNT
+static inline void
+get_cpuid_level7(unsigned int *eax, unsigned int *ebx,
+		 unsigned int *ecx, unsigned int *edx)
+{
+	/* we avoid using __get_cpuid_count, because it is not available with gcc 4.8 */
+	if (__get_cpuid_max(7, 0) < 7)
+		return;
+
+	__cpuid_count(7, 0, *eax, *ebx, *ecx, *edx);
+	return;
+}
+#else
+# define get_cpuid_level7(a,b,c,d) __get_cpuid_count(7, 0, a, b, c, d)
+#endif
+
+static unsigned read_cpuid_vals(unsigned int vals[4])
+{
+	unsigned t1, t2, t3;
+	vals[0] = vals[1] = vals[2] = vals[3] = 0;
+
+	if (!__get_cpuid(1, &t1, &vals[0], &vals[1], &t2))
+		return 0;
+	/* suppress AVX512; it works conditionally on certain CPUs on the original code */
+	vals[1] &= 0xfffff7ff;
+
+	get_cpuid_level7(&t1, &vals[2], &t2, &t3);
+
+	return 1;
+}
 
 /* Based on the example in "How to detect New Instruction support in
  * the 4th generation Intel Core processor family.
@@ -111,18 +159,17 @@ static unsigned check_4th_gen_intel_features(unsigned ecx)
 
 static void capabilities_to_intel_cpuid(unsigned capabilities)
 {
-	unsigned a,b,c,t;
-
-	memset(_gnutls_x86_cpuid_s, 0, sizeof(_gnutls_x86_cpuid_s));
+	unsigned a[4];
 
 	if (capabilities & EMPTY_SET) {
 		return;
 	}
 
-	gnutls_cpuid(1, &t, &a, &b, &c);
+	if (!read_cpuid_vals(a))
+		return;
 
 	if (capabilities & INTEL_AES_NI) {
-		if (b & bit_AES) {
+		if (a[1] & bit_AES) {
 			_gnutls_x86_cpuid_s[1] |= bit_AES;
 		} else {
 			_gnutls_debug_log
@@ -131,7 +178,7 @@ static void capabilities_to_intel_cpuid(unsigned capabilities)
 	}
 
 	if (capabilities & INTEL_SSSE3) {
-		if (b & bit_SSSE3) {
+		if (a[1] & bit_SSSE3) {
 			_gnutls_x86_cpuid_s[1] |= bit_SSSE3;
 		} else {
 			_gnutls_debug_log
@@ -140,7 +187,7 @@ static void capabilities_to_intel_cpuid(unsigned capabilities)
 	}
 
 	if (capabilities & INTEL_AVX) {
-		if ((b & bit_AVX) && check_4th_gen_intel_features(b)) {
+		if ((a[1] & bit_AVX) && check_4th_gen_intel_features(a[1])) {
 			_gnutls_x86_cpuid_s[1] |= bit_AVX|bit_MOVBE;
 		} else {
 			_gnutls_debug_log
@@ -149,7 +196,7 @@ static void capabilities_to_intel_cpuid(unsigned capabilities)
 	}
 
 	if (capabilities & INTEL_PCLMUL) {
-		if (b & bit_PCLMUL) {
+		if (a[1] & bit_PCLMUL) {
 			_gnutls_x86_cpuid_s[1] |= bit_PCLMUL;
 		} else {
 			_gnutls_debug_log
@@ -157,6 +204,14 @@ static void capabilities_to_intel_cpuid(unsigned capabilities)
 		}
 	}
 
+	if (capabilities & INTEL_SHA) {
+		if (a[2] & bit_SHA) {
+			_gnutls_x86_cpuid_s[2] |= bit_SHA;
+		} else {
+			_gnutls_debug_log
+			    ("SHA acceleration requested but not available\n");
+		}
+	}
 }
 
 
@@ -168,6 +223,11 @@ static unsigned check_optimized_aes(void)
 static unsigned check_ssse3(void)
 {
 	return (_gnutls_x86_cpuid_s[1] & bit_SSSE3);
+}
+
+static unsigned check_sha(void)
+{
+	return (_gnutls_x86_cpuid_s[2] & bit_SHA);
 }
 
 #ifdef ASM_X86_64
@@ -196,8 +256,8 @@ static unsigned capabilities_to_via_edx(unsigned capabilities)
 		return 0;
 	}
 
-	gnutls_cpuid(1, &t, &a, &b, &c);
-
+	if (!__get_cpuid(1, &t, &a, &b, &c))
+		return 0;
 	if (capabilities & VIA_PADLOCK) {
 		if (c & via_bit_PADLOCK) {
 			_gnutls_x86_cpuid_s[2] |= via_bit_PADLOCK;
@@ -265,7 +325,9 @@ static int check_phe_partial(void)
 static unsigned check_via(void)
 {
 	unsigned int a, b, c, d;
-	gnutls_cpuid(0, &a, &b, &c, &d);
+
+	if (!__get_cpuid(0, &a, &b, &c, &d))
+		return 0;
 
 	if ((memcmp(&b, "Cent", 4) == 0 &&
 	     memcmp(&d, "aurH", 4) == 0 && memcmp(&c, "auls", 4) == 0)) {
@@ -455,7 +517,9 @@ void register_x86_padlock_crypto(unsigned capabilities)
 static unsigned check_intel_or_amd(void)
 {
 	unsigned int a, b, c, d;
-	gnutls_cpuid(0, &a, &b, &c, &d);
+
+	if (!__get_cpuid(0, &a, &b, &c, &d))
+		return 0;
 
 	if ((memcmp(&b, "Genu", 4) == 0 &&
 	     memcmp(&d, "ineI", 4) == 0 &&
@@ -472,14 +536,15 @@ static
 void register_x86_intel_crypto(unsigned capabilities)
 {
 	int ret;
-	unsigned t;
+
+	memset(_gnutls_x86_cpuid_s, 0, sizeof(_gnutls_x86_cpuid_s));
 
 	if (check_intel_or_amd() == 0)
 		return;
 
 	if (capabilities == 0) {
-		gnutls_cpuid(1, &t, &_gnutls_x86_cpuid_s[0], 
-			&_gnutls_x86_cpuid_s[1], &_gnutls_x86_cpuid_s[2]);
+		if (!read_cpuid_vals(_gnutls_x86_cpuid_s))
+			return;
 	} else {
 		capabilities_to_intel_cpuid(capabilities);
 	}
@@ -523,6 +588,11 @@ void register_x86_intel_crypto(unsigned capabilities)
 		if (ret < 0) {
 			gnutls_assert();
 		}
+	}
+
+	if (check_sha() || check_ssse3()) {
+		if (check_sha())
+			_gnutls_debug_log("Intel SHA was detected\n");
 
 		ret =
 		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA1,
@@ -570,7 +640,6 @@ void register_x86_intel_crypto(unsigned capabilities)
 		if (ret < 0)
 			gnutls_assert();
 
-#ifdef ENABLE_SHA512
 		ret =
 		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA384,
 							 80,
@@ -597,7 +666,6 @@ void register_x86_intel_crypto(unsigned capabilities)
 							 &_gnutls_hmac_sha_x86_ssse3, 0);
 		if (ret < 0)
 			gnutls_assert();
-#endif
 	}
 
 	if (check_optimized_aes()) {

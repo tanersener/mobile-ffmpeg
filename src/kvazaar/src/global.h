@@ -78,6 +78,12 @@
  * Stuff related to multi-threading using pthreads
  */
 
+ // Pthreads-win32 tries to define timespec even if it has already been defined.
+ // In Visual Studio 2015 timespec is defined in time.h so we may need to define
+ // HAVE_STRUCT_TIMESPEC.
+#if _MSC_VER >= 1900 && !defined(HAVE_STRUCT_TIMESPEC)
+#   define HAVE_STRUCT_TIMESPEC
+#endif
 
 #if defined(_MSC_VER) && defined(_M_AMD64)
   #define X86_64
@@ -200,7 +206,7 @@ typedef int16_t coeff_t;
 // NOTE: When making a release, check to see if incrementing libversion in 
 // configure.ac is necessary.
 #ifndef KVZ_VERSION
-#define KVZ_VERSION 1.2.0
+#define KVZ_VERSION 1.3.0
 #endif
 #define VERSION_STRING QUOTE_EXPAND(KVZ_VERSION)
 
@@ -233,8 +239,10 @@ typedef int16_t coeff_t;
 #ifdef _MSC_VER
 // Buggy VS2010 throws intellisense warnings if void* is not casted.
   #define MALLOC(type, num) (type *)malloc(sizeof(type) * (num))
+  #define MALLOC_SIMD_PADDED(type, num, padding) (type *)malloc(sizeof(type) * (num) + (padding))
 #else
   #define MALLOC(type, num) malloc(sizeof(type) * (num))
+  #define MALLOC_SIMD_PADDED(type, num, padding) malloc(sizeof(type) * (num) + (padding))
 #endif
 
 // Use memset through FILL and FILL_ARRAY when appropriate, such as when

@@ -23,15 +23,13 @@ for data.
 int (*gnutls_pull_timeout_func)(gnutls_transport_ptr_t, unsigned int ms);
 
 This callback is necessary when @code{gnutls_handshake_set_timeout()}  or 
-@code{gnutls_record_set_timeout()}  are set, and for calculating the DTLS mode
-timeouts.
+@code{gnutls_record_set_timeout()}  are set, under TLS1.3 and for enforcing the DTLS
+mode timeouts when in blocking mode.
 
-In short, this callback should be set when a custom pull function is
-registered. The callback will not be used when the session is in TLS mode with
-non-blocking sockets. That is, when @code{GNUTLS_NONBLOCK}  is specified for a TLS
-session in @code{gnutls_init()} . For compatibility with future GnuTLS versions
-it is recommended to always set this function when a custom pull function
-is registered.
+For compatibility with future GnuTLS versions this callback must be set when
+a custom pull function is registered. The callback will not be used when the
+session is in TLS mode with non-blocking sockets. That is, when @code{GNUTLS_NONBLOCK} 
+is specified for a TLS session in @code{gnutls_init()} .
 
 The helper function @code{gnutls_system_recv_timeout()}  is provided to
 simplify writing callbacks. 

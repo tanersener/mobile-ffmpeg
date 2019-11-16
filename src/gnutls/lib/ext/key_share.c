@@ -504,11 +504,10 @@ client_use_key_share(gnutls_session_t session, const gnutls_group_entry_st *grou
 
 static int
 key_share_recv_params(gnutls_session_t session,
-		      const uint8_t * data, size_t _data_size)
+		      const uint8_t * data, size_t data_size)
 {
 	int ret;
-	ssize_t data_size = _data_size;
-	ssize_t size;
+	size_t size;
 	unsigned gid;
 	const version_entry_st *ver;
 	const gnutls_group_entry_st *group;

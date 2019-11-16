@@ -53,12 +53,12 @@ void av1_simple_motion_search_based_split(
 // Performs a simple_motion_search with two reference frames and extract
 // the variance of residues. Then use the features to determine whether we want
 // to prune some partitions.
-void av1_simple_motion_search_prune_part(
-    AV1_COMP *const cpi, MACROBLOCK *x, PC_TREE *pc_tree, int mi_row,
-    int mi_col, BLOCK_SIZE bsize, int *partition_none_allowed,
-    int *partition_horz_allowed, int *partition_vert_allowed,
-    int *do_square_split, int *do_rectangular_split, int *prune_horz,
-    int *prune_vert);
+void av1_simple_motion_search_prune_rect(AV1_COMP *const cpi, MACROBLOCK *x,
+                                         PC_TREE *pc_tree, int mi_row,
+                                         int mi_col, BLOCK_SIZE bsize,
+                                         int *partition_horz_allowed,
+                                         int *partition_vert_allowed,
+                                         int *prune_horz, int *prune_vert);
 
 #if !CONFIG_REALTIME_ONLY
 // Early terminates PARTITION_NONE using simple_motion_search features and the

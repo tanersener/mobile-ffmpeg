@@ -285,4 +285,19 @@ ORTH = \
 	und_zmth.orth
 #	^-------------- Add new orth files here
 
+BUILT_SOURCES += $(top_builddir)/conf.d/35-lang-normalize.conf
+
+DISTCLEANFILES = $(BUILT_SOURCES)
+
+$(top_builddir)/conf.d/35-lang-normalize.conf: $(ORTH) Makefile
+	$(AM_V_GEN) echo "<fontconfig>" > $@ && \
+	for i in `echo $(ORTH) | sed -e 's/ /\n/g' | grep -v _ | sed -e 's/\.orth$$//g' | sort`; do \
+		echo "  <!-- $$i* -> $$i -->" >> $@; \
+		echo "  <match>" >> $@; \
+		echo "    <test name=\"lang\" compare=\"contains\"><string>$$i</string></test>" >> $@; \
+		echo "    <edit name=\"lang\" mode=\"assign\" binding=\"same\"><string>$$i</string></edit>" >> $@; \
+		echo "  </match>" >> $@; \
+	done && \
+	echo "</fontconfig>" >> $@
+
 -include $(top_srcdir)/git.mk

@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
     s.version           = "VERSION"
     s.summary           = "Mobile FFmpeg tvOS Full Static Framework"
     s.description       = <<-DESC
-    Includes FFmpeg v4.2-dev-1824 with fontconfig v2.13.91, freetype v2.10.1, fribidi v1.0.5, gmp v6.1.2, gnutls v3.6.8, kvazaar v1.2.0, lame v3.100, libaom v1.0.0-dev-2018, libass v0.14.0, libiconv v1.16, libilbc v2.0.2, libtheora v1.1.1, libvorbis v1.3.6, libvpx v1.8.0, libwebp v1.0.2, libxml2 v2.9.9, opencore-amr v0.1.5, opus v1.3.1, shine v3.1.1, snappy v1.1.7, soxr v0.1.3, speex v1.2.0, twolame v0.3.13 and wavpack v5.1.0 libraries enabled.
+    Includes FFmpeg v4.3-dev-1181 with fontconfig v2.13.92, freetype v2.10.1, fribidi v1.0.7, gmp v6.1.2, gnutls v3.6.10, kvazaar v1.3.0, lame v3.100, libaom v1.0.0-dev-2567, libass v0.14.0, libiconv v1.16, libilbc v2.0.2, libtheora v1.1.1, libvorbis v1.3.6, libvpx v1.8.1, libwebp v1.0.3, libxml2 v2.9.9, opencore-amr v0.1.5, opus v1.3.1, shine v3.1.1, snappy v1.1.7, soxr v0.1.3, speex v1.2.0, twolame v0.4 and wavpack v5.1.0 libraries enabled.
     DESC
 
     s.homepage          = "https://github.com/tanersener/mobile-ffmpeg"

@@ -33,6 +33,7 @@
 # include "config.h"
 #endif
 
+#ifndef HAVE_NETTLE_STREEBOG512_UPDATE
 #include <gnutls_int.h>
 
 #include <nettle/nettle-meta.h>
@@ -44,3 +45,4 @@ const struct nettle_hash nettle_streebog512
 
 const struct nettle_hash nettle_streebog256
 = _NETTLE_HASH(streebog256, STREEBOG256);
+#endif

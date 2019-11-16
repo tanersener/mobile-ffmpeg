@@ -1,24 +1,22 @@
 /*
- *	TwoLAME: an optimized MPEG Audio Layer Two encoder
+ *  TwoLAME: an optimized MPEG Audio Layer Two encoder
  *
- *	Copyright (C) 2001-2004 Michael Cheng
- *	Copyright (C) 2004-2006 The TwoLAME Project
+ *  Copyright (C) 2001-2004 Michael Cheng
+ *  Copyright (C) 2004-2018 The TwoLAME Project
  *
- *	This library is free software; you can redistribute it and/or
- *	modify it under the terms of the GNU Lesser General Public
- *	License as published by the Free Software Foundation; either
- *	version 2.1 of the License, or (at your option) any later version.
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
  *
- *	This library is distributed in the hope that it will be useful,
- *	but WITHOUT ANY WARRANTY; without even the implied warranty of
- *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *	Lesser General Public License for more details.
+ *  This library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
  *
- *	You should have received a copy of the GNU Lesser General Public
- *	License along with this library; if not, write to the Free Software
- *	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *  $Id$
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
 
@@ -49,23 +47,16 @@ static void create_dct_matrix(FLOAT filter[16][32])
         }
 }
 
-int init_subband(subband_mem * smem)
+int twolame_init_subband(subband_mem * smem)
 {
-    register int i, j;
-    smem->off[0] = 0;
-    smem->off[1] = 0;
-    smem->half[0] = 0;
-    smem->half[1] = 0;
-    for (i = 0; i < 2; i++)
-        for (j = 0; j < 512; j++)
-            smem->x[i][j] = 0;
+    memset(smem, 0, sizeof(subband_mem));
     create_dct_matrix(smem->m);
 
     return 0;
 }
 
 
-void window_filter_subband(subband_mem * smem, short *pBuffer, int ch, FLOAT s[SBLIMIT])
+void twolame_window_filter_subband(subband_mem * smem, short *pBuffer, int ch, FLOAT s[SBLIMIT])
 {
     register int i, j;
     int pa, pb, pc, pd, pe, pf, pg, ph;
@@ -160,4 +151,4 @@ void window_filter_subband(subband_mem * smem, short *pBuffer, int ch, FLOAT s[S
 }
 
 
-// vim:ts=4:sw=4:nowrap: 
+// vim:ts=4:sw=4:nowrap:

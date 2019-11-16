@@ -45,9 +45,11 @@ unsigned kvz_satd_4x4_subblock_generic(const kvz_pixel * buf1,
                                        const int32_t     stride2);
 
 void kvz_satd_4x4_subblock_quad_generic(const kvz_pixel *preds[4],
-                                        const int strides[4],
+                                        const int stride,
                                         const kvz_pixel *orig,
                                         const int orig_stride,
                                         unsigned costs[4]);
+
+
 
 #endif //STRATEGIES_PICTURE_GENERIC_H_

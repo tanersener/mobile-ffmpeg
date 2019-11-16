@@ -115,7 +115,7 @@ SAD64(64);
   unsigned int vpx_sad16x##height##_avg_vsx(                                  \
       const uint8_t *src, int src_stride, const uint8_t *ref, int ref_stride, \
       const uint8_t *second_pred) {                                           \
-    DECLARE_ALIGNED(16, uint8_t, comp_pred[16 * height]);                     \
+    DECLARE_ALIGNED(16, uint8_t, comp_pred[16 * (height)]);                   \
     vpx_comp_avg_pred_vsx(comp_pred, second_pred, 16, height, ref,            \
                           ref_stride);                                        \
                                                                               \
@@ -126,7 +126,7 @@ SAD64(64);
   unsigned int vpx_sad32x##height##_avg_vsx(                                  \
       const uint8_t *src, int src_stride, const uint8_t *ref, int ref_stride, \
       const uint8_t *second_pred) {                                           \
-    DECLARE_ALIGNED(32, uint8_t, comp_pred[32 * height]);                     \
+    DECLARE_ALIGNED(32, uint8_t, comp_pred[32 * (height)]);                   \
     vpx_comp_avg_pred_vsx(comp_pred, second_pred, 32, height, ref,            \
                           ref_stride);                                        \
                                                                               \
@@ -137,7 +137,7 @@ SAD64(64);
   unsigned int vpx_sad64x##height##_avg_vsx(                                  \
       const uint8_t *src, int src_stride, const uint8_t *ref, int ref_stride, \
       const uint8_t *second_pred) {                                           \
-    DECLARE_ALIGNED(64, uint8_t, comp_pred[64 * height]);                     \
+    DECLARE_ALIGNED(64, uint8_t, comp_pred[64 * (height)]);                   \
     vpx_comp_avg_pred_vsx(comp_pred, second_pred, 64, height, ref,            \
                           ref_stride);                                        \
     return vpx_sad64x##height##_vsx(src, src_stride, comp_pred, 64);          \

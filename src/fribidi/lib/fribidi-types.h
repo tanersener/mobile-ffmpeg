@@ -27,10 +27,6 @@
 #ifndef _FRIBIDI_TYPES_H
 #define _FRIBIDI_TYPES_H
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
-
 #include "fribidi-common.h"
 
 #include "fribidi-begindecls.h"

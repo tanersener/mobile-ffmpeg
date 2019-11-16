@@ -26,63 +26,66 @@
 #include "av1/encoder/gop_structure.h"
 
 // Set parameters for frames between 'start' and 'end' (excluding both).
-static void set_multi_layer_params(GF_GROUP *const gf_group, int start, int end,
-                                   int *frame_ind, int arf_ind, int level) {
-  assert(level >= MIN_PYRAMID_LVL);
+static void set_multi_layer_params(const TWO_PASS *twopass,
+                                   GF_GROUP *const gf_group, RATE_CONTROL *rc,
+                                   FRAME_INFO *frame_info, int start, int end,
+                                   int *frame_ind, int arf_ind,
+                                   int layer_depth) {
   const int num_frames_to_process = end - start - 1;
   assert(num_frames_to_process >= 0);
   if (num_frames_to_process == 0) return;
 
   // Either we are at the last level of the pyramid, or we don't have enough
   // frames between 'l' and 'r' to create one more level.
-  if (level == MIN_PYRAMID_LVL || num_frames_to_process < 3) {
+  if (layer_depth > gf_group->max_layer_depth_allowed ||
+      num_frames_to_process < 3) {
     // Leaf nodes.
     while (++start < end) {
       gf_group->update_type[*frame_ind] = LF_UPDATE;
       gf_group->arf_src_offset[*frame_ind] = 0;
-      gf_group->arf_pos_in_gf[*frame_ind] = 0;
-      gf_group->arf_update_idx[*frame_ind] = arf_ind;
       gf_group->frame_disp_idx[*frame_ind] = start;
-      gf_group->pyramid_level[*frame_ind] = MIN_PYRAMID_LVL;
-      ++gf_group->pyramid_lvl_nodes[MIN_PYRAMID_LVL];
+      gf_group->layer_depth[*frame_ind] = MAX_ARF_LAYERS;
+      gf_group->arf_boost[*frame_ind] = NORMAL_BOOST;
+      gf_group->max_layer_depth =
+          AOMMAX(gf_group->max_layer_depth, layer_depth);
       ++(*frame_ind);
     }
   } else {
     const int m = (start + end) / 2;
-    const int arf_pos_in_gf = *frame_ind;
 
     // Internal ARF.
     gf_group->update_type[*frame_ind] = INTNL_ARF_UPDATE;
     gf_group->arf_src_offset[*frame_ind] = m - start - 1;
-    gf_group->arf_pos_in_gf[*frame_ind] = 0;
-    gf_group->arf_update_idx[*frame_ind] = 1;  // mark all internal ARF 1
     gf_group->frame_disp_idx[*frame_ind] = m;
-    gf_group->pyramid_level[*frame_ind] = level;
-    ++gf_group->pyramid_lvl_nodes[level];
+    gf_group->layer_depth[*frame_ind] = layer_depth;
+
+    // Get the boost factor for intermediate ARF frames.
+    gf_group->arf_boost[*frame_ind] =
+        av1_calc_arf_boost(twopass, rc, frame_info, m, end - m, m - start);
     ++(*frame_ind);
 
     // Frames displayed before this internal ARF.
-    set_multi_layer_params(gf_group, start, m, frame_ind, 1, level - 1);
+    set_multi_layer_params(twopass, gf_group, rc, frame_info, start, m,
+                           frame_ind, 1, layer_depth + 1);
 
     // Overlay for internal ARF.
     gf_group->update_type[*frame_ind] = INTNL_OVERLAY_UPDATE;
     gf_group->arf_src_offset[*frame_ind] = 0;
-    gf_group->arf_pos_in_gf[*frame_ind] = arf_pos_in_gf;  // For bit allocation.
-    gf_group->arf_update_idx[*frame_ind] = 1;
     gf_group->frame_disp_idx[*frame_ind] = m;
-    gf_group->pyramid_level[*frame_ind] = MIN_PYRAMID_LVL;
+    gf_group->arf_boost[*frame_ind] = 0;
+    gf_group->layer_depth[*frame_ind] = layer_depth;
     ++(*frame_ind);
 
     // Frames displayed after this internal ARF.
-    set_multi_layer_params(gf_group, m, end, frame_ind, arf_ind, level - 1);
+    set_multi_layer_params(twopass, gf_group, rc, frame_info, m, end, frame_ind,
+                           arf_ind, layer_depth + 1);
   }
 }
 
 static int construct_multi_layer_gf_structure(
-    GF_GROUP *const gf_group, int gf_interval, int pyr_height,
+    AV1_COMP *cpi, TWO_PASS *twopass, GF_GROUP *const gf_group,
+    RATE_CONTROL *rc, FRAME_INFO *const frame_info, int gf_interval,
     FRAME_UPDATE_TYPE first_frame_update_type) {
-  gf_group->pyramid_height = pyr_height;
-  av1_zero_array(gf_group->pyramid_lvl_nodes, MAX_PYRAMID_LVL);
   int frame_index = 0;
 
   // Keyframe / Overlay frame / Golden frame.
@@ -90,31 +93,34 @@ static int construct_multi_layer_gf_structure(
   assert(first_frame_update_type == KF_UPDATE ||
          first_frame_update_type == OVERLAY_UPDATE ||
          first_frame_update_type == GF_UPDATE);
+
   gf_group->update_type[frame_index] = first_frame_update_type;
   gf_group->arf_src_offset[frame_index] = 0;
-  gf_group->arf_pos_in_gf[frame_index] = 0;
-  gf_group->arf_update_idx[frame_index] = 0;
-  gf_group->pyramid_level[frame_index] = MIN_PYRAMID_LVL;
+  gf_group->layer_depth[frame_index] =
+      first_frame_update_type == OVERLAY_UPDATE ? MAX_ARF_LAYERS + 1 : 0;
+  gf_group->max_layer_depth = 0;
   ++frame_index;
 
   // ALTREF.
-  const int use_altref = (gf_group->pyramid_height > 0);
+  const int use_altref = gf_group->max_layer_depth_allowed > 0;
   if (use_altref) {
     gf_group->update_type[frame_index] = ARF_UPDATE;
     gf_group->arf_src_offset[frame_index] = gf_interval - 1;
-    gf_group->arf_pos_in_gf[frame_index] = 0;
-    gf_group->arf_update_idx[frame_index] = 0;
     gf_group->frame_disp_idx[frame_index] = gf_interval;
-    gf_group->pyramid_level[frame_index] = gf_group->pyramid_height;
+    gf_group->layer_depth[frame_index] = 1;
+    gf_group->arf_boost[frame_index] = cpi->rc.gfu_boost;
+    gf_group->max_layer_depth = 1;
     ++frame_index;
   }
 
   // Rest of the frames.
-  const int next_height =
-      use_altref ? gf_group->pyramid_height - 1 : gf_group->pyramid_height;
-  assert(next_height >= MIN_PYRAMID_LVL);
-  set_multi_layer_params(gf_group, 0, gf_interval, &frame_index, 0,
-                         next_height);
+  set_multi_layer_params(twopass, gf_group, rc, frame_info, 0, gf_interval,
+                         &frame_index, 0, use_altref + 1);
+
+  // The end frame will be Overlay frame for an ARF GOP; otherwise set it to
+  // be GF, for consistency, which will be updated in the next GOP.
+  gf_group->update_type[frame_index] = use_altref ? OVERLAY_UPDATE : GF_UPDATE;
+  gf_group->arf_src_offset[frame_index] = 0;
   return frame_index;
 }
 
@@ -144,30 +150,6 @@ void check_frame_params(GF_GROUP *const gf_group, int gf_interval) {
   fclose(fid);
 }
 #endif  // CHECK_GF_PARAMETER
-
-static INLINE int max_pyramid_height_from_width(int pyramid_width) {
-  if (pyramid_width > 12) return 4;
-  if (pyramid_width > 6) return 3;
-  if (pyramid_width > 3) return 2;
-  if (pyramid_width > 1) return 1;
-  return 0;
-}
-
-static int get_pyramid_height(const AV1_COMP *const cpi) {
-  const RATE_CONTROL *const rc = &cpi->rc;
-  assert(IMPLIES(cpi->oxcf.gf_max_pyr_height == MIN_PYRAMID_LVL,
-                 !rc->source_alt_ref_pending));  // define_gf_group() enforced.
-  if (!rc->source_alt_ref_pending) {
-    return MIN_PYRAMID_LVL;
-  }
-  assert(cpi->oxcf.gf_max_pyr_height > MIN_PYRAMID_LVL);
-  if (!cpi->internal_altref_allowed) {
-    assert(MIN_PYRAMID_LVL + 1 <= cpi->oxcf.gf_max_pyr_height);
-    return MIN_PYRAMID_LVL + 1;
-  }
-  return AOMMIN(max_pyramid_height_from_width(rc->baseline_gf_interval),
-                cpi->oxcf.gf_max_pyr_height);
-}
 
 #define REF_IDX(ref) ((ref)-LAST_FRAME)
 
@@ -303,12 +285,14 @@ void av1_gop_setup_structure(AV1_COMP *cpi,
                              const EncodeFrameParams *const frame_params) {
   RATE_CONTROL *const rc = &cpi->rc;
   GF_GROUP *const gf_group = &cpi->gf_group;
+  TWO_PASS *const twopass = &cpi->twopass;
+  FRAME_INFO *const frame_info = &cpi->frame_info;
   const int key_frame = (frame_params->frame_type == KEY_FRAME);
   const FRAME_UPDATE_TYPE first_frame_update_type =
       key_frame ? KF_UPDATE
                 : rc->source_alt_ref_active ? OVERLAY_UPDATE : GF_UPDATE;
   gf_group->size = construct_multi_layer_gf_structure(
-      gf_group, rc->baseline_gf_interval, get_pyramid_height(cpi),
+      cpi, twopass, gf_group, rc, frame_info, rc->baseline_gf_interval,
       first_frame_update_type);
 
   set_gop_ref_frame_map(gf_group);

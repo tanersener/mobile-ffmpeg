@@ -65,6 +65,7 @@ EXTRA_DIST = README gnutls-asan.supp
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
 	LC_ALL="C"						\
 	LSAN_OPTIONS=suppressions=gnutls-asan.supp		\
+	GNUTLS_TEST_SUITE_RUN=1					\
 	OPENSSL_ia32cap=0x00000000				\
 	top_builddir="$(top_builddir)"				\
 	srcdir="$(srcdir)"

@@ -81,6 +81,57 @@ void doit(void)
 		}
 	}
 
+	err =
+	    gnutls_hmac_fast(GNUTLS_MAC_AES_GMAC_128, "keykeykeykeykeyk", 16, "abcdefghabc", 8,
+			     digest);
+	if (err >= 0)
+		fail("gnutls_hmac_fast(GMAC-128) succeeded unexpectedly: %d\n", err);
+	else if (err != GNUTLS_E_INVALID_REQUEST)
+		fail("gnutls_hmac_fast(GMAC-128) failure: %d\n", err);
+	else if (debug)
+		success("gnutls_hmac_fast(GMAC-128) OK\n");
+
+	err =
+	    gnutls_hmac_fast(GNUTLS_MAC_AES_GMAC_192, "keykeykeykeykeykeykeykey", 24,
+			     "abcdefghabc", 8,
+			     digest);
+	if (err >= 0)
+		fail("gnutls_hmac_fast(GMAC-192) succeeded unexpectedly: %d\n", err);
+	else if (err != GNUTLS_E_INVALID_REQUEST)
+		fail("gnutls_hmac_fast(GMAC-192) failure: %d\n", err);
+	else if (debug)
+		success("gnutls_hmac_fast(GMAC-192) OK\n");
+
+	err =
+	    gnutls_hmac_fast(GNUTLS_MAC_AES_GMAC_256, "keykeykeykeykeykeykeykeykeykeyke", 32,
+			     "abcdefghabc", 8,
+			     digest);
+	if (err >= 0)
+		fail("gnutls_hmac_fast(GMAC-256) succeeded unexpectedly: %d\n", err);
+	else if (err != GNUTLS_E_INVALID_REQUEST)
+		fail("gnutls_hmac_fast(GMAC-256) failure: %d\n", err);
+	else if (debug)
+		success("gnutls_hmac_fast(GMAC-256) OK\n");
+
+	err =
+	    gnutls_hmac_fast(GNUTLS_MAC_UMAC_96, "keykeykeykeykeyk", 16, "abcdefghabc", 8,
+			     digest);
+	if (err >= 0)
+		fail("gnutls_hmac_fast(UMAC-96) succeeded unexpectedly: %d\n", err);
+	else if (err != GNUTLS_E_INVALID_REQUEST)
+		fail("gnutls_hmac_fast(UMAC-96) failure: %d\n", err);
+	else if (debug)
+		success("gnutls_hmac_fast(UMAC-96) OK\n");
+
+	err =
+	    gnutls_hmac_fast(GNUTLS_MAC_UMAC_128, "keykeykeykeykeyk", 16, "abcdefghabc", 8,
+			     digest);
+	if (err >= 0)
+		fail("gnutls_hmac_fast(UMAC-128) succeeded unexpectedly: %d\n", err);
+	else if (err != GNUTLS_E_INVALID_REQUEST)
+		fail("gnutls_hmac_fast(UMAC-128) failure: %d\n", err);
+	else if (debug)
+		success("gnutls_hmac_fast(UMAC-128) OK\n");
 
 	gnutls_global_deinit();
 }

@@ -201,8 +201,8 @@ static int init_out_pool(AVFilterContext *ctx,
     out_frames_hwctx = out_frames_ctx->hwctx;
 
     out_frames_ctx->format            = AV_PIX_FMT_QSV;
-    out_frames_ctx->width             = FFALIGN(out_width,  32);
-    out_frames_ctx->height            = FFALIGN(out_height, 32);
+    out_frames_ctx->width             = FFALIGN(out_width,  16);
+    out_frames_ctx->height            = FFALIGN(out_height, 16);
     out_frames_ctx->sw_format         = out_format;
     out_frames_ctx->initial_pool_size = 4;
 
@@ -541,7 +541,7 @@ static int qsvscale_config_props(AVFilterLink *outlink)
     return 0;
 
 fail:
-    av_log(NULL, AV_LOG_ERROR,
+    av_log(ctx, AV_LOG_ERROR,
            "Error when evaluating the expression '%s'\n", expr);
     return ret;
 }

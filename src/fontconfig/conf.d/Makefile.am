@@ -21,7 +21,11 @@
 #  TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 #  PERFORMANCE OF THIS SOFTWARE.
 
-BUILT_SOURCES = README
+NULL =
+BUILT_SOURCES = 		\
+	README			\
+	35-lang-normalize.conf	\
+	$(NULL)
 DOC_SOURCES = README.in
 DOC_FILES = $(DOC_SOURCES:.in=)
 
@@ -53,6 +57,7 @@ config_DATA = $(DOC_FILES)
 templatedir = $(TEMPLATEDIR)
 template_DATA =				\
 	05-reset-dirs-sample.conf	\
+	09-autohint-if-no-hinting.conf	\
 	10-autohint.conf		\
 	10-hinting-full.conf		\
 	10-hinting-medium.conf		\
@@ -71,6 +76,7 @@ template_DATA =				\
 	20-unhint-small-vera.conf	\
 	25-unhint-nonlatin.conf		\
 	30-metric-aliases.conf		\
+	35-lang-normalize.conf		\
 	40-nonlatin.conf		\
 	45-generic.conf			\
 	45-latin.conf			\
@@ -90,6 +96,9 @@ template_DATA =				\
 
 README: $(srcdir)/README.in
 	sed "s|\@TEMPLATEDIR\@|$(templatedir)|" $< > $@
+
+35-lang-normalize.conf: ../fc-lang/Makefile.am
+	cd ../fc-lang && $(MAKE) $(AM_MAKEFLAGS) $(top_builddir)/conf.d/35-lang-normalize.conf
 
 install-data-hook:
 	mkdir -p $(DESTDIR)$(configdir)

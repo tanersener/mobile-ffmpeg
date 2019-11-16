@@ -33,7 +33,6 @@ struct FRAME_COUNTS;
 struct tokenize_b_args {
   const struct AV1_COMP *cpi;
   struct ThreadData *td;
-  TOKENEXTRA **tp;
   int this_rate;
   uint8_t allow_update_cdf;
 };
@@ -48,8 +47,8 @@ enum {
 // with the coefficient token cost only if dry_run = DRY_RUN_COSTCOEFS,
 // otherwise rate is not incremented.
 void av1_tokenize_sb_vartx(const struct AV1_COMP *cpi, struct ThreadData *td,
-                           TOKENEXTRA **t, RUN_TYPE dry_run, int mi_row,
-                           int mi_col, BLOCK_SIZE bsize, int *rate,
+                           RUN_TYPE dry_run, int mi_row, int mi_col,
+                           BLOCK_SIZE bsize, int *rate,
                            uint8_t allow_update_cdf);
 
 int av1_cost_color_map(const MACROBLOCK *const x, int plane, BLOCK_SIZE bsize,

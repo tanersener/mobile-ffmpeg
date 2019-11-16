@@ -105,7 +105,7 @@ unpack_ticket(gnutls_session_t session, gnutls_datum_t *packed, tls13_ticket_st 
 	gnutls_mac_algorithm_t kdf;
 	const mac_entry_st *prf;
 	uint8_t *p;
-	ssize_t len;
+	size_t len;
 	uint64_t v;
 	int ret;
 

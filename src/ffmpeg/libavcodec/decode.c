@@ -300,7 +300,6 @@ static int bsfs_poll(AVCodecContext *avctx, AVPacket *pkt)
         ret = av_bsf_receive_packet(s->bsfs[idx], pkt);
         if (ret == AVERROR(EAGAIN)) {
             /* no packets available, try the next filter up the chain */
-            ret = 0;
             idx--;
             continue;
         } else if (ret < 0 && ret != AVERROR_EOF) {
@@ -786,7 +785,7 @@ int attribute_align_arg avcodec_receive_frame(AVCodecContext *avctx, AVFrame *fr
         if (avctx->frame_number > 1) {
             changed = avci->initial_format != frame->format;
 
-           switch(avctx->codec_type) {
+            switch(avctx->codec_type) {
             case AVMEDIA_TYPE_VIDEO:
                 changed |= avci->initial_width  != frame->width ||
                            avci->initial_height != frame->height;
@@ -1925,6 +1924,11 @@ static int get_buffer_internal(AVCodecContext *avctx, AVFrame *frame, int flags)
             av_log(avctx, AV_LOG_ERROR, "pic->data[*]!=NULL in get_buffer_internal\n");
             return AVERROR(EINVAL);
         }
+    } else if (avctx->codec_type == AVMEDIA_TYPE_AUDIO) {
+        if (frame->nb_samples > avctx->max_samples) {
+            av_log(avctx, AV_LOG_ERROR, "samples per frame %d, exceeds max_samples %"PRId64"\n", frame->nb_samples, avctx->max_samples);
+            return AVERROR(EINVAL);
+        }
     }
     ret = ff_decode_frame_props(avctx, frame);
     if (ret < 0)
@@ -1971,7 +1975,7 @@ int ff_get_buffer(AVCodecContext *avctx, AVFrame *frame, int flags)
     return ret;
 }
 
-static int reget_buffer_internal(AVCodecContext *avctx, AVFrame *frame)
+static int reget_buffer_internal(AVCodecContext *avctx, AVFrame *frame, int flags)
 {
     AVFrame *tmp;
     int ret;
@@ -1987,7 +1991,7 @@ static int reget_buffer_internal(AVCodecContext *avctx, AVFrame *frame)
     if (!frame->data[0])
         return ff_get_buffer(avctx, frame, AV_GET_BUFFER_FLAG_REF);
 
-    if (av_frame_is_writable(frame))
+    if ((flags & FF_REGET_BUFFER_FLAG_READONLY) || av_frame_is_writable(frame))
         return ff_decode_frame_props(avctx, frame);
 
     tmp = av_frame_alloc();
@@ -2008,9 +2012,9 @@ static int reget_buffer_internal(AVCodecContext *avctx, AVFrame *frame)
     return 0;
 }
 
-int ff_reget_buffer(AVCodecContext *avctx, AVFrame *frame)
+int ff_reget_buffer(AVCodecContext *avctx, AVFrame *frame, int flags)
 {
-    int ret = reget_buffer_internal(avctx, frame);
+    int ret = reget_buffer_internal(avctx, frame, flags);
     if (ret < 0)
         av_log(avctx, AV_LOG_ERROR, "reget_buffer() failed\n");
     return ret;

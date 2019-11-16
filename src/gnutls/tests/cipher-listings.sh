@@ -75,11 +75,15 @@ fi
 # This is a unit test for gnutls_priority_get_cipher_suite_index
 
 if test "${ENABLE_SSL3}" = "1";then
+echo "Running with SSL3.0 enabled"
 check SSL3.0 "NORMAL:-VERS-ALL:+VERS-SSL3.0:+ARCFOUR-128"
+check old-SSL3.0-TLS1.1 "NORMAL:-VERS-ALL:+VERS-TLS1.0:+VERS-SSL3.0:+VERS-TLS1.1"
+else
+echo "Running without support for SSL3.0"
+check SSL3.0-TLS1.1 "NORMAL:-VERS-ALL:+VERS-TLS1.0:+VERS-SSL3.0:+VERS-TLS1.1"
 fi
 check TLS1.0 "NORMAL:-VERS-ALL:+VERS-TLS1.0"
 check TLS1.1 "NORMAL:-VERS-ALL:+VERS-TLS1.1"
-check SSL3.0-TLS1.1 "NORMAL:-VERS-ALL:+VERS-TLS1.0:+VERS-SSL3.0:+VERS-TLS1.1"
 check DTLS1.0 "NORMAL:-VERS-ALL:+VERS-DTLS1.0"
 # Priority strings prior to 3.6.x did not require the +GROUP option; here we
 # test whether these work as expected.

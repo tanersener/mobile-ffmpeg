@@ -53,17 +53,19 @@ void kvz_quant_generic(const encoder_state_t * const state, coeff_t *coef, coeff
   uint32_t ac_sum = 0;
 
   for (int32_t n = 0; n < width * height; n++) {
-    int32_t level;
+    int32_t level = coef[n];
+    int64_t abs_level = (int64_t)abs(level);
     int32_t  sign;
 
-    level = coef[n];
     sign = (level < 0 ? -1 : 1);
 
-    level = ((int64_t)abs(level) * quant_coeff[n] + add) >> q_bits;
+    int32_t curr_quant_coeff = quant_coeff[n];
+    level = (abs_level * curr_quant_coeff + add) >> q_bits;
     ac_sum += level;
 
     level *= sign;
     q_coef[n] = (coeff_t)(CLIP(-32768, 32767, level));
+
   }
 
   if (!encoder->cfg.signhide_enable || ac_sum < 2) return;
@@ -71,10 +73,12 @@ void kvz_quant_generic(const encoder_state_t * const state, coeff_t *coef, coeff
   int32_t delta_u[LCU_WIDTH*LCU_WIDTH >> 2];
 
   for (int32_t n = 0; n < width * height; n++) {
-    int32_t level;
-    level = coef[n];
-    level = ((int64_t)abs(level) * quant_coeff[n] + add) >> q_bits;
-    delta_u[n] = (int32_t)(((int64_t)abs(coef[n]) * quant_coeff[n] - (level << q_bits)) >> q_bits8);
+    int32_t level = coef[n];
+    int64_t abs_level = (int64_t)abs(level);
+    int32_t curr_quant_coeff = quant_coeff[n];
+
+    level = (abs_level * curr_quant_coeff + add) >> q_bits;
+    delta_u[n] = (int32_t)((abs_level * curr_quant_coeff - (level << q_bits)) >> q_bits8);
   }
 
   if (ac_sum >= 2) {
@@ -208,7 +212,7 @@ int kvz_quantize_residual_generic(encoder_state_t *const state,
     kvz_transformskip(state->encoder_control, residual, coeff, width);
   }
   else {
-    kvz_transform2d(state->encoder_control, residual, coeff, width, (color == COLOR_Y ? 0 : 65535));
+    kvz_transform2d(state->encoder_control, residual, coeff, width, color, cur_cu->type);
   }
 
   // Quantize coeffs. (coeff -> coeff_out)
@@ -246,7 +250,7 @@ int kvz_quantize_residual_generic(encoder_state_t *const state,
       kvz_itransformskip(state->encoder_control, residual, coeff, width);
     }
     else {
-      kvz_itransform2d(state->encoder_control, residual, coeff, width, (color == COLOR_Y ? 0 : 65535));
+      kvz_itransform2d(state->encoder_control, residual, coeff, width, color, cur_cu->type);
     }
 
     // Get quantized reconstruction. (residual + pred_in -> rec_out)
@@ -329,6 +333,48 @@ static uint32_t coeff_abs_sum_generic(const coeff_t *coeffs, size_t length)
   return sum;
 }
 
+static INLINE int16_t to_q88(float f)
+{
+  return (int16_t)(f * 256.0f);
+}
+
+static uint32_t fast_coeff_cost_generic(const coeff_t *coeff, int32_t width, int32_t qp)
+{
+  uint32_t sum = 0;
+#define NUM_BUCKETS 5
+  const int16_t wt_m[NUM_BUCKETS] = {
+    to_q88(-0.004916),
+    to_q88(0.010806),
+    to_q88(0.055562),
+    to_q88(0.033436),
+    to_q88(-0.007690),
+  };
+  const int16_t wt_c[NUM_BUCKETS] = {
+    to_q88(0.172024),
+    to_q88(3.421462),
+    to_q88(2.879506),
+    to_q88(5.585471),
+    to_q88(0.256772),
+  };
+
+  int16_t wt[NUM_BUCKETS];
+  for (int32_t i = 0; i < NUM_BUCKETS; i++)
+    wt[i] = wt_m[i] * qp + wt_c[i];
+
+  for (int32_t i = 0; i < width * width; i++) {
+    int16_t curr = coeff[i];
+    int16_t signmask = curr >> 15;
+    int16_t curr_abs = (curr ^ signmask) - signmask;
+    if (curr_abs > 3)
+      curr_abs = 3;
+
+    sum += wt[curr_abs];
+  }
+  sum += wt[NUM_BUCKETS - 1] * width;
+  return sum >> 8;
+#undef NUM_BUCKETS
+}
+
 int kvz_strategy_register_quant_generic(void* opaque, uint8_t bitdepth)
 {
   bool success = true;
@@ -337,6 +383,7 @@ int kvz_strategy_register_quant_generic(void* opaque, uint8_t bitdepth)
   success &= kvz_strategyselector_register(opaque, "quantize_residual", "generic", 0, &kvz_quantize_residual_generic);
   success &= kvz_strategyselector_register(opaque, "dequant", "generic", 0, &kvz_dequant_generic);
   success &= kvz_strategyselector_register(opaque, "coeff_abs_sum", "generic", 0, &coeff_abs_sum_generic);
+  success &= kvz_strategyselector_register(opaque, "fast_coeff_cost", "generic", 0, &fast_coeff_cost_generic);
 
   return success;
 }

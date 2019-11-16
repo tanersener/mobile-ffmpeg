@@ -224,6 +224,7 @@ void aom_hadamard_32x32_avx2(const int16_t *src_diff, ptrdiff_t src_stride,
   }
 }
 
+#if CONFIG_AV1_HIGHBITDEPTH
 static void highbd_hadamard_col8_avx2(__m256i *in, int iter) {
   __m256i a0 = in[0];
   __m256i a1 = in[1];
@@ -424,6 +425,7 @@ void aom_highbd_hadamard_32x32_avx2(const int16_t *src_diff,
     t_coeff += 8;
   }
 }
+#endif  // CONFIG_AV1_HIGHBITDEPTH
 
 int aom_satd_avx2(const tran_low_t *coeff, int length) {
   __m256i accum = _mm256_setzero_si256();

@@ -24,6 +24,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.method.ScrollingMovementMethod;
+import android.util.AndroidRuntimeException;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -77,6 +78,8 @@ public class CommandTabFragment extends Fragment {
             outputText = getView().findViewById(R.id.outputText);
             outputText.setMovementMethod(new ScrollingMovementMethod());
         }
+
+        android.util.Log.d(MainActivity.TAG, "Last command output was: " + FFmpeg.getLastCommandOutput());
     }
 
     @Override
@@ -110,6 +113,8 @@ public class CommandTabFragment extends Fragment {
                         return null;
                     }
                 });
+
+                throw new AndroidRuntimeException("I am test exception thrown by test application");
             }
         });
     }
@@ -123,7 +128,7 @@ public class CommandTabFragment extends Fragment {
 
         android.util.Log.d(MainActivity.TAG, String.format("FFmpeg process started with arguments\n\'%s\'", ffmpegCommand));
 
-        int result = FFmpeg.execute(ffmpegCommand, " ");
+        int result = FFmpeg.execute(ffmpegCommand);
 
         android.util.Log.d(MainActivity.TAG, String.format("FFmpeg process exited with rc %d", result));
 

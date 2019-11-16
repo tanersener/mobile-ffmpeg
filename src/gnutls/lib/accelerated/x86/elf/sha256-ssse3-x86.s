@@ -1,4 +1,4 @@
-# Copyright (c) 2011-2013, Andy Polyakov <appro@openssl.org>
+# Copyright (c) 2011-2016, Andy Polyakov <appro@openssl.org>
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -37,7 +37,6 @@
 #
 # *** This file is auto-generated ***
 #
-.file	"sha512-586.s"
 .text
 .globl	sha256_block_data_order
 .type	sha256_block_data_order,@function
@@ -64,20 +63,6 @@ sha256_block_data_order:
 	movl	%edi,4(%esp)
 	movl	%eax,8(%esp)
 	movl	%ebx,12(%esp)
-	leal	_gnutls_x86_cpuid_s-.L001K256(%ebp),%edx
-	movl	(%edx),%ecx
-	movl	4(%edx),%edx
-	testl	$1048576,%ecx
-	jnz	.L002loop
-	testl	$2048,%edx
-	andl	$1073741824,%ecx
-	andl	$268435456,%edx
-	orl	%edx,%ecx
-	cmpl	$1342177280,%ecx
-	je	.L003loop_shrd
-	subl	%edi,%eax
-	cmpl	$256,%eax
-	jae	.L004unrolled
 	jmp	.L002loop
 .align	16
 .L002loop:
@@ -149,7 +134,7 @@ sha256_block_data_order:
 	movl	%ecx,28(%esp)
 	movl	%edi,32(%esp)
 .align	16
-.L00500_15:
+.L00300_15:
 	movl	%edx,%ecx
 	movl	24(%esp),%esi
 	rorl	$14,%ecx
@@ -187,11 +172,11 @@ sha256_block_data_order:
 	addl	$4,%ebp
 	addl	%ebx,%eax
 	cmpl	$3248222580,%esi
-	jne	.L00500_15
+	jne	.L00300_15
 	movl	156(%esp),%ecx
-	jmp	.L00616_63
+	jmp	.L00416_63
 .align	16
-.L00616_63:
+.L00416_63:
 	movl	%ecx,%ebx
 	movl	104(%esp),%esi
 	rorl	$11,%ecx
@@ -246,7 +231,7 @@ sha256_block_data_order:
 	addl	$4,%ebp
 	addl	%ebx,%eax
 	cmpl	$3329325298,%esi
-	jne	.L00616_63
+	jne	.L00416_63
 	movl	356(%esp),%esi
 	movl	8(%esp),%ebx
 	movl	16(%esp),%ecx
@@ -280,8 +265,8 @@ sha256_block_data_order:
 	popl	%ebx
 	popl	%ebp
 	ret
-.align	16
-.L003loop_shrd:
+.align	32
+.L005loop_shrd:
 	movl	(%edi),%eax
 	movl	4(%edi),%ebx
 	movl	8(%edi),%ecx
@@ -350,7 +335,7 @@ sha256_block_data_order:
 	movl	%ecx,28(%esp)
 	movl	%edi,32(%esp)
 .align	16
-.L00700_15_shrd:
+.L00600_15_shrd:
 	movl	%edx,%ecx
 	movl	24(%esp),%esi
 	shrdl	$14,%ecx,%ecx
@@ -388,11 +373,11 @@ sha256_block_data_order:
 	addl	$4,%ebp
 	addl	%ebx,%eax
 	cmpl	$3248222580,%esi
-	jne	.L00700_15_shrd
+	jne	.L00600_15_shrd
 	movl	156(%esp),%ecx
-	jmp	.L00816_63_shrd
+	jmp	.L00716_63_shrd
 .align	16
-.L00816_63_shrd:
+.L00716_63_shrd:
 	movl	%ecx,%ebx
 	movl	104(%esp),%esi
 	shrdl	$11,%ecx,%ecx
@@ -447,7 +432,7 @@ sha256_block_data_order:
 	addl	$4,%ebp
 	addl	%ebx,%eax
 	cmpl	$3329325298,%esi
-	jne	.L00816_63_shrd
+	jne	.L00716_63_shrd
 	movl	356(%esp),%esi
 	movl	8(%esp),%ebx
 	movl	16(%esp),%ecx
@@ -474,7 +459,7 @@ sha256_block_data_order:
 	leal	356(%esp),%esp
 	subl	$256,%ebp
 	cmpl	8(%esp),%edi
-	jb	.L003loop_shrd
+	jb	.L005loop_shrd
 	movl	12(%esp),%esp
 	popl	%edi
 	popl	%esi
@@ -485,8 +470,13 @@ sha256_block_data_order:
 .L001K256:
 .long	1116352408,1899447441,3049323471,3921009573,961987163,1508970993,2453635748,2870763221,3624381080,310598401,607225278,1426881987,1925078388,2162078206,2614888103,3248222580,3835390401,4022224774,264347078,604807628,770255983,1249150122,1555081692,1996064986,2554220882,2821834349,2952996808,3210313671,3336571891,3584528711,113926993,338241895,666307205,773529912,1294757372,1396182291,1695183700,1986661051,2177026350,2456956037,2730485921,2820302411,3259730800,3345764771,3516065817,3600352804,4094571909,275423344,430227734,506948616,659060556,883997877,958139571,1322822218,1537002063,1747873779,1955562222,2024104815,2227730452,2361852424,2428436474,2756734187,3204031479,3329325298
 .long	66051,67438087,134810123,202182159
+.byte	83,72,65,50,53,54,32,98,108,111,99,107,32,116,114,97
+.byte	110,115,102,111,114,109,32,102,111,114,32,120,56,54,44,32
+.byte	67,82,89,80,84,79,71,65,77,83,32,98,121,32,60,97
+.byte	112,112,114,111,64,111,112,101,110,115,115,108,46,111,114,103
+.byte	62,0
 .align	16
-.L004unrolled:
+.L008unrolled:
 	leal	-96(%esp),%esp
 	movl	(%esi),%eax
 	movl	4(%esi),%ebp
@@ -3393,14 +3383,5 @@ sha256_block_data_order:
 	popl	%ebp
 	ret
 .size	sha256_block_data_order,.-.L_sha256_block_data_order_begin
-.byte	83,72,65,50,53,54,32,98,108,111,99,107,32,116,114,97
-.byte	110,115,102,111,114,109,32,102,111,114,32,120,56,54,44,32
-.byte	67,82,89,80,84,79,71,65,77,83,32,98,121,32,60,97
-.byte	112,112,114,111,64,111,112,101,110,115,115,108,46,111,114,103
-.byte	62,0
-.comm	_gnutls_x86_cpuid_s,16,4
-
 
 .section .note.GNU-stack,"",%progbits
-
-

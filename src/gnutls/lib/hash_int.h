@@ -41,12 +41,14 @@ typedef int (*nonce_func) (void *handle, const void *text, size_t size);
 typedef int (*output_func) (void *src_ctx, void *digest,
 			    size_t digestsize);
 typedef void (*hash_deinit_func) (void *handle);
+typedef void *(*copy_func) (const void *handle);
 
 typedef struct {
 	const mac_entry_st *e;
 	hash_func hash;
 	output_func output;
 	hash_deinit_func deinit;
+	copy_func copy;
 
 	const void *key;	/* esoteric use by SSL3 MAC functions */
 	int keysize;
@@ -62,6 +64,7 @@ typedef struct {
 	nonce_func setnonce;
 	output_func output;
 	hash_deinit_func deinit;
+	copy_func copy;
 
 	void *handle;
 } mac_hd_st;
@@ -72,6 +75,8 @@ int _gnutls_digest_exists(gnutls_digest_algorithm_t algo);
 int _gnutls_mac_exists(gnutls_mac_algorithm_t algorithm);
 int _gnutls_mac_init(mac_hd_st *, const mac_entry_st * e,
 		     const void *key, int keylen);
+
+int _gnutls_mac_copy(const mac_hd_st * handle, mac_hd_st * dst);
 
 int _gnutls_mac_fast(gnutls_mac_algorithm_t algorithm, const void *key,
 		     int keylen, const void *text, size_t textlen,
@@ -121,6 +126,8 @@ _gnutls_hash(digest_hd_st * handle, const void *text, size_t textlen)
   (h)->output((h)->handle, d, _gnutls_hash_get_algo_len((h)->e))
 
 void _gnutls_hash_deinit(digest_hd_st * handle, void *digest);
+
+int _gnutls_hash_copy(const digest_hd_st * handle, digest_hd_st * dst);
 
 int
 _gnutls_hash_fast(gnutls_digest_algorithm_t algorithm,

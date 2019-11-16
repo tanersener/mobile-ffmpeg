@@ -53,8 +53,8 @@
 #define NCOUNT_INTRA_THRESH 8192
 #define NCOUNT_INTRA_FACTOR 3
 
-static void output_stats(FIRSTPASS_STATS *stats,
-                         struct aom_codec_pkt_list *pktlist) {
+static AOM_INLINE void output_stats(FIRSTPASS_STATS *stats,
+                                    struct aom_codec_pkt_list *pktlist) {
   struct aom_codec_cx_pkt pkt;
   pkt.kind = AOM_CODEC_STATS_PKT;
   pkt.data.twopass_stats.buf = stats;
@@ -109,8 +109,8 @@ void av1_twopass_zero_stats(FIRSTPASS_STATS *section) {
   section->duration = 1.0;
 }
 
-static void accumulate_stats(FIRSTPASS_STATS *section,
-                             const FIRSTPASS_STATS *frame) {
+static AOM_INLINE void accumulate_stats(FIRSTPASS_STATS *section,
+                                        const FIRSTPASS_STATS *frame) {
   section->frame += frame->frame;
   section->weight += frame->weight;
   section->intra_error += frame->intra_error;
@@ -162,6 +162,7 @@ static unsigned int get_prediction_error(BLOCK_SIZE bsize,
   return sse;
 }
 
+#if CONFIG_AV1_HIGHBITDEPTH
 static aom_variance_fn_t highbd_get_block_variance_fn(BLOCK_SIZE bsize,
                                                       int bd) {
   switch (bd) {
@@ -201,6 +202,7 @@ static unsigned int highbd_get_prediction_error(BLOCK_SIZE bsize,
   fn(src->buf, src->stride, ref->buf, ref->stride, &sse);
   return sse;
 }
+#endif  // CONFIG_AV1_HIGHBITDEPTH
 
 // Refine the motion search range according to the frame dimension
 // for first pass test.
@@ -212,9 +214,9 @@ static int get_search_range(const AV1_COMP *cpi) {
   return sr;
 }
 
-static void first_pass_motion_search(AV1_COMP *cpi, MACROBLOCK *x,
-                                     const MV *ref_mv, MV *best_mv,
-                                     int *best_motion_err) {
+static AOM_INLINE void first_pass_motion_search(AV1_COMP *cpi, MACROBLOCK *x,
+                                                const MV *ref_mv, MV *best_mv,
+                                                int *best_motion_err) {
   MACROBLOCKD *const xd = &x->e_mbd;
   MV tmp_mv = kZeroMv;
   MV ref_mv_full = { ref_mv->row >> 3, ref_mv->col >> 3 };
@@ -231,10 +233,11 @@ static void first_pass_motion_search(AV1_COMP *cpi, MACROBLOCK *x,
 
   // Override the default variance function to use MSE.
   v_fn_ptr.vf = get_block_variance_fn(bsize);
+#if CONFIG_AV1_HIGHBITDEPTH
   if (is_cur_buf_hbd(xd)) {
     v_fn_ptr.vf = highbd_get_block_variance_fn(bsize, xd->bd);
   }
-
+#endif
   // Center the initial step/diamond search on best mv.
   tmp_err = cpi->diamond_search_sad(x, &cpi->ss_cfg[SS_CFG_SRC], &ref_mv_full,
                                     &tmp_mv, step_param, x->sadperbit16, &num00,
@@ -387,7 +390,7 @@ void av1_first_pass(AV1_COMP *cpi, const int64_t ts_duration) {
   av1_setup_frame_size(cpi);
   aom_clear_system_state();
 
-  xd->mi = cm->mi_grid_visible;
+  xd->mi = cm->mi_grid_base;
   xd->mi[0] = cm->mi;
   x->e_mbd.mi[0]->sb_type = BLOCK_16X16;
 
@@ -412,7 +415,7 @@ void av1_first_pass(AV1_COMP *cpi, const int64_t ts_duration) {
     av1_setup_pre_planes(xd, 0, lst_yv12, 0, 0, NULL, num_planes);
   }
 
-  xd->mi = cm->mi_grid_visible;
+  xd->mi = cm->mi_grid_base;
   xd->mi[0] = cm->mi;
 
   // Don't store luma on the fist pass since chroma is not computed
@@ -463,9 +466,14 @@ void av1_first_pass(AV1_COMP *cpi, const int64_t ts_duration) {
 
       aom_clear_system_state();
 
-      const int idx_str = xd->mi_stride * mb_row * mb_scale + mb_col * mb_scale;
-      xd->mi = cm->mi_grid_visible + idx_str;
-      xd->mi[0] = cm->mi + idx_str;
+      const int grid_idx =
+          get_mi_grid_idx(cm, mb_row * mb_scale, mb_col * mb_scale);
+      const int mi_idx =
+          get_alloc_mi_idx(cm, mb_row * mb_scale, mb_col * mb_scale);
+      xd->mi = cm->mi_grid_base + grid_idx;
+      xd->mi[0] = cm->mi + mi_idx;
+      xd->tx_type_map = cm->tx_type_map + grid_idx;
+      xd->tx_type_map_stride = cm->mi_stride;
       xd->plane[0].dst.buf = new_yv12->y_buffer + recon_yoffset;
       xd->plane[1].dst.buf = new_yv12->u_buffer + recon_uvoffset;
       xd->plane[2].dst.buf = new_yv12->v_buffer + recon_uvoffset;
@@ -557,6 +565,7 @@ void av1_first_pass(AV1_COMP *cpi, const int64_t ts_duration) {
         struct buf_2d unscaled_last_source_buf_2d;
 
         xd->plane[0].pre[0].buf = lst_yv12->y_buffer + recon_yoffset;
+#if CONFIG_AV1_HIGHBITDEPTH
         if (is_cur_buf_hbd(xd)) {
           motion_error = highbd_get_prediction_error(
               bsize, &x->plane[0].src, &xd->plane[0].pre[0], xd->bd);
@@ -564,6 +573,10 @@ void av1_first_pass(AV1_COMP *cpi, const int64_t ts_duration) {
           motion_error = get_prediction_error(bsize, &x->plane[0].src,
                                               &xd->plane[0].pre[0]);
         }
+#else
+        motion_error =
+            get_prediction_error(bsize, &x->plane[0].src, &xd->plane[0].pre[0]);
+#endif
 
         // Compute the motion error of the 0,0 motion using the last source
         // frame as the reference. Skip the further motion search on
@@ -572,6 +585,7 @@ void av1_first_pass(AV1_COMP *cpi, const int64_t ts_duration) {
             cpi->unscaled_last_source->y_buffer + src_yoffset;
         unscaled_last_source_buf_2d.stride =
             cpi->unscaled_last_source->y_stride;
+#if CONFIG_AV1_HIGHBITDEPTH
         if (is_cur_buf_hbd(xd)) {
           raw_motion_error = highbd_get_prediction_error(
               bsize, &x->plane[0].src, &unscaled_last_source_buf_2d, xd->bd);
@@ -579,7 +593,10 @@ void av1_first_pass(AV1_COMP *cpi, const int64_t ts_duration) {
           raw_motion_error = get_prediction_error(bsize, &x->plane[0].src,
                                                   &unscaled_last_source_buf_2d);
         }
-
+#else
+        raw_motion_error = get_prediction_error(bsize, &x->plane[0].src,
+                                                &unscaled_last_source_buf_2d);
+#endif
         // TODO(pengchong): Replace the hard-coded threshold
         if (raw_motion_error > 25) {
           // Test last reference frame using the previous best mv as the
@@ -603,6 +620,7 @@ void av1_first_pass(AV1_COMP *cpi, const int64_t ts_duration) {
           if ((current_frame->frame_number > 1) && gld_yv12 != NULL) {
             // Assume 0,0 motion with no mv overhead.
             xd->plane[0].pre[0].buf = gld_yv12->y_buffer + recon_yoffset;
+#if CONFIG_AV1_HIGHBITDEPTH
             if (is_cur_buf_hbd(xd)) {
               gf_motion_error = highbd_get_prediction_error(
                   bsize, &x->plane[0].src, &xd->plane[0].pre[0], xd->bd);
@@ -610,7 +628,10 @@ void av1_first_pass(AV1_COMP *cpi, const int64_t ts_duration) {
               gf_motion_error = get_prediction_error(bsize, &x->plane[0].src,
                                                      &xd->plane[0].pre[0]);
             }
-
+#else
+            gf_motion_error = get_prediction_error(bsize, &x->plane[0].src,
+                                                   &xd->plane[0].pre[0]);
+#endif
             first_pass_motion_search(cpi, x, &kZeroMv, &tmp_mv,
                                      &gf_motion_error);
 
@@ -641,6 +662,7 @@ void av1_first_pass(AV1_COMP *cpi, const int64_t ts_duration) {
             xd->plane[0].pre[0].buf = alt_yv12->y_buffer + alt_yv12_yoffset;
             xd->plane[0].pre[0].stride = alt_yv12->y_stride;
             int alt_motion_error;
+#if CONFIG_AV1_HIGHBITDEPTH
             if (is_cur_buf_hbd(xd)) {
               alt_motion_error = highbd_get_prediction_error(
                   bsize, &x->plane[0].src, &xd->plane[0].pre[0], xd->bd);
@@ -648,7 +670,10 @@ void av1_first_pass(AV1_COMP *cpi, const int64_t ts_duration) {
               alt_motion_error = get_prediction_error(bsize, &x->plane[0].src,
                                                       &xd->plane[0].pre[0]);
             }
-
+#else
+            alt_motion_error = get_prediction_error(bsize, &x->plane[0].src,
+                                                    &xd->plane[0].pre[0]);
+#endif
             first_pass_motion_search(cpi, x, &kZeroMv, &tmp_mv,
                                      &alt_motion_error);
 

@@ -12,6 +12,8 @@
 #ifndef AOM_AV1_ENCODER_CONTEXT_TREE_H_
 #define AOM_AV1_ENCODER_CONTEXT_TREE_H_
 
+#include "config/aom_config.h"
+
 #include "av1/common/blockd.h"
 #include "av1/encoder/block.h"
 
@@ -35,12 +37,15 @@ typedef struct {
   tran_low_t *dqcoeff[MAX_MB_PLANE];
   uint16_t *eobs[MAX_MB_PLANE];
   uint8_t *txb_entropy_ctx[MAX_MB_PLANE];
+  uint8_t *tx_type_map;
 
   int num_4x4_blk;
   // For current partition, only if all Y, U, and V transform blocks'
   // coefficients are quantized to 0, skippable is set to 1.
   int skippable;
-  int best_mode_index;
+#if CONFIG_INTERNAL_STATS
+  THR_MODES best_mode_index;
+#endif  // CONFIG_INTERNAL_STATS
   int hybrid_pred_diff;
   int comp_pred_diff;
   int single_pred_diff;

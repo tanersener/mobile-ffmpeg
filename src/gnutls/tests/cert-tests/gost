@@ -97,6 +97,17 @@ if [ $? != 0 ]; then
 	exit 1
 fi
 
+"${CERTTOOL}" -i < "${srcdir}"/data/grfc.crt --outfile $TMPFILE
+if [ $? != 0 ]; then
+	cat $TMPFILE
+	exit 1
+fi
+
+if ! cmp "${srcdir}"/data/grfc.crt $TMPFILE ; then
+	cat $TMPFILE
+	exit 1
+fi
+
 rm -f $VERIFYOUT $TMPUSER $TMPCA $TMPSUBCA $TMPTEMPL $TMPFILE
 rm -f $TMPSUBCAKEY $TMPCAKEY $TMPKEY
 

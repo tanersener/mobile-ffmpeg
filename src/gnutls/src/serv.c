@@ -88,6 +88,8 @@ unsigned alpn_protos_size = 0;
 
 gnutls_datum_t session_ticket_key;
 gnutls_anti_replay_t anti_replay;
+int record_max_size;
+const char *http_data_file = NULL;
 static void tcp_server(const char *name, int port);
 
 /* end of globals */
@@ -477,6 +479,17 @@ gnutls_session_t initialize_session(int dtls)
 							      GNUTLS_CERT_REQUEST);
 	}
 
+	/* use the record size limit extension */
+	if (record_max_size > 0) {
+		if (gnutls_record_set_max_recv_size(session, record_max_size) <
+		    0) {
+			fprintf(stderr,
+				"Cannot set the maximum record receive size to %d.\n",
+				record_max_size);
+			exit(1);
+		}
+	}
+
 	if (HAVE_OPT(HEARTBEAT))
 		gnutls_heartbeat_enable(session,
 					GNUTLS_HB_PEER_ALLOWED_TO_SEND);
@@ -738,6 +751,45 @@ static char *peer_print_info(gnutls_session_t session, int *ret_length,
 	return http_buffer;
 }
 
+static char *peer_print_data(gnutls_session_t session, int *ret_length)
+{
+	gnutls_datum_t data;
+	char *http_buffer;
+	size_t len;
+	int ret;
+
+	ret = gnutls_load_file(http_data_file, &data);
+	if (ret < 0) {
+		ret = asprintf(&http_buffer,
+			       "HTTP/1.0 404 Not Found\r\n"
+			       "Content-type: text/html\r\n"
+			       "\r\n"
+			       "<HTML><HEAD><TITLE>404 Not Found</TITLE></HEAD>\n"
+			       "<BODY><H1>Couldn't read %s</H1></BODY></HTML>\n\n",
+			       http_data_file);
+		if (ret < 0)
+			return NULL;
+
+		*ret_length = strlen(http_buffer);
+		return http_buffer;
+	}
+
+	ret = asprintf(&http_buffer,
+		       "HTTP/1.0 200 OK\r\n"
+		       "Content-Type: application/octet-stream\r\n"
+		       "Content-Length: %u\r\n"
+		       "\r\n",
+		       data.size);
+	if (ret < 0)
+		return NULL;
+	len = ret;
+	http_buffer = realloc(http_buffer, len + data.size);
+	memcpy(&http_buffer[len], data.data, data.size);
+	gnutls_free(data.data);
+	*ret_length = len + data.size;
+	return http_buffer;
+}
+
 const char *human_addr(const struct sockaddr *sa, socklen_t salen,
 		       char *buf, size_t buflen)
 {
@@ -979,7 +1031,10 @@ get_response(gnutls_session_t session, char *request,
 	}
 /*    *response = peer_print_info(session, request+4, h, response_length); */
 	if (http != 0) {
-		*response = peer_print_info(session, response_length, h);
+		if (http_data_file == NULL)
+			*response = peer_print_info(session, response_length, h);
+		else
+			*response = peer_print_data(session, response_length);
 	} else {
 		int ret;
 		strip(request);
@@ -1723,6 +1778,8 @@ static void cmd_parser(int argc, char **argv)
 	else
 		http = 1;
 
+	record_max_size = OPT_VALUE_RECORDSIZE;
+
 	if (HAVE_OPT(X509FMTDER))
 		x509ctype = GNUTLS_X509_FMT_DER;
 	else
@@ -1776,6 +1833,9 @@ static void cmd_parser(int argc, char **argv)
 
 	if (HAVE_OPT(SNI_HOSTNAME_FATAL))
 		sni_hostname_fatal = 1;
+
+	if (HAVE_OPT(HTTPDATA))
+		http_data_file = OPT_ARG(HTTPDATA);
 
 }
 

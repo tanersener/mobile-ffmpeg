@@ -105,7 +105,7 @@ int gnutls_ext_raw_parse(void *ctx, gnutls_ext_raw_process_func cb,
 			 const gnutls_datum_t *data, unsigned int flags)
 {
 	if (flags & GNUTLS_EXT_RAW_FLAG_TLS_CLIENT_HELLO) {
-		ssize_t size = data->size;
+		size_t size = data->size;
 		size_t len;
 		uint8_t *p = data->data;
 
@@ -137,12 +137,12 @@ int gnutls_ext_raw_parse(void *ctx, gnutls_ext_raw_process_func cb,
 		DECR_LEN(size, len);
 		p += len;
 
-		if (size <= 0)
+		if (size == 0)
 			return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 
 		return _gnutls_extv_parse(ctx, cb, p, size);
 	} else if (flags & GNUTLS_EXT_RAW_FLAG_DTLS_CLIENT_HELLO) {
-		ssize_t size = data->size;
+		size_t size = data->size;
 		size_t len;
 		uint8_t *p = data->data;
 
@@ -181,7 +181,7 @@ int gnutls_ext_raw_parse(void *ctx, gnutls_ext_raw_process_func cb,
 		DECR_LEN(size, len);
 		p += len;
 
-		if (size <= 0)
+		if (size == 0)
 			return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 
 		return _gnutls_extv_parse(ctx, cb, p, size);

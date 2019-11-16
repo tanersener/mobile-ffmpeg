@@ -27,13 +27,14 @@ static const uint8_t bilinear_filters_msa[8][2] = {
     HSUB_UB2_SH(src_l0_m, src_l1_m, res_l0_m, res_l1_m);            \
     DPADD_SH2_SW(res_l0_m, res_l1_m, res_l0_m, res_l1_m, var, var); \
                                                                     \
-    sub += res_l0_m + res_l1_m;                                     \
+    (sub) += res_l0_m + res_l1_m;                                   \
   }
 
-#define VARIANCE_WxH(sse, diff, shift) sse - (((uint32_t)diff * diff) >> shift)
+#define VARIANCE_WxH(sse, diff, shift) \
+  (sse) - (((uint32_t)(diff) * (diff)) >> (shift))
 
 #define VARIANCE_LARGE_WxH(sse, diff, shift) \
-  sse - (((int64_t)diff * diff) >> shift)
+  (sse) - (((int64_t)(diff) * (diff)) >> (shift))
 
 static uint32_t avg_sse_diff_4width_msa(const uint8_t *src_ptr,
                                         int32_t src_stride,

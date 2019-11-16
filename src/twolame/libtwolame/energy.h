@@ -3,7 +3,7 @@
  *  TwoLAME: an optimized MPEG Audio Layer Two encoder
  *
  *  Copyright (C) 2001-2004 Michael Cheng
- *  Copyright (C) 2004-2006 The TwoLAME Project
+ *  Copyright (C) 2004-2018 The TwoLAME Project
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -19,18 +19,16 @@
  *  License along with this library; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id$
- *
  */
 
 
-#ifndef	_ENERGY_H_
-#define	_ENERGY_H_
+#ifndef TWOLAME_ENERGY_H
+#define TWOLAME_ENERGY_H
 
-int get_required_energy_bits(twolame_options * glopts);
-void do_energy_levels(twolame_options * glopts, bit_stream * bs);
+int twolame_get_required_energy_bits(twolame_options * glopts);
+void twolame_do_energy_levels(twolame_options * glopts, bit_stream * bs);
 
 #endif
 
 
-// vim:ts=4:sw=4:nowrap: 
+// vim:ts=4:sw=4:nowrap:

@@ -1726,6 +1726,13 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .long_name = NULL_IF_CONFIG_SMALL("On2 VP4"),
         .props     = AV_CODEC_PROP_LOSSY,
     },
+    {
+        .id        = AV_CODEC_ID_IMM5,
+        .type      = AVMEDIA_TYPE_VIDEO,
+        .name      = "imm5",
+        .long_name = NULL_IF_CONFIG_SMALL("Infinity IMM5"),
+        .props     = AV_CODEC_PROP_LOSSY,
+    },
 
     /* various PCM "codecs" */
     {
@@ -2985,6 +2992,12 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .long_name = NULL_IF_CONFIG_SMALL("HCOM Audio"),
         .props     = AV_CODEC_PROP_LOSSY,
     },
+    {
+        .id        = AV_CODEC_ID_ACELP_KELVIN,
+        .name      = "acelp.kelvin",
+        .long_name = NULL_IF_CONFIG_SMALL("Sipro ACELP.KELVIN"),
+        .props     = AV_CODEC_PROP_LOSSY,
+    },
 
     /* subtitle codecs */
     {
@@ -3183,6 +3196,12 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .type      = AVMEDIA_TYPE_DATA,
         .name      = "scte_35",
         .long_name = NULL_IF_CONFIG_SMALL("SCTE 35 Message Queue"),
+    },
+    {
+        .id        = AV_CODEC_ID_EPG,
+        .type      = AVMEDIA_TYPE_DATA,
+        .name      = "epg",
+        .long_name = NULL_IF_CONFIG_SMALL("Electronic Program Guide"),
     },
     {
         .id        = AV_CODEC_ID_BINTEXT,

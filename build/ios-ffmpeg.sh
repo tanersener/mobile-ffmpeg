@@ -396,6 +396,8 @@ if [[ -z ${NO_WORKSPACE_CLEANUP_ffmpeg} ]]; then
     make distclean 2>/dev/null 1>/dev/null
 fi
 
+${SED_INLINE} 's/check_cflags -mdynamic-no-pic && add_asflags -mdynamic-no-pic;/check_cflags -mdynamic-no-pic;/g' ./configure
+
 ./configure \
     --sysroot=${SDK_PATH} \
     --prefix=${BASEDIR}/prebuilt/$(get_target_build_directory)/${LIB_NAME} \
@@ -466,7 +468,7 @@ if [[ -z ${NO_OUTPUT_REDIRECTION} ]]; then
     fi
 else
     echo -e "started\n"
-    make -j$(get_cpu_count)
+    make -j$(get_cpu_count) 1>>${BASEDIR}/build.log 2>&1
 
     if [ $? -ne 0 ]; then
         echo -n -e "\n${LIB_NAME}: failed\n"

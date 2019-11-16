@@ -93,6 +93,7 @@ scripts_to_test = chain.sh \
 	testrandom.sh tls-fuzzer/tls-fuzzer-nocert.sh \
 	tls-fuzzer/tls-fuzzer-cert.sh tls-fuzzer/tls-fuzzer-alpn.sh \
 	tls-fuzzer/tls-fuzzer-nocert-tls13.sh tls-fuzzer/tls-fuzzer-psk.sh \
+	tls-fuzzer/tls-fuzzer-nolimit.sh tls-fuzzer/tls-fuzzer-nolimit-tls13.sh \
 	multi-ticket-reception.sh
 
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
@@ -101,6 +102,7 @@ TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
 	top_builddir="$(top_builddir)"	\
 	srcdir="$(srcdir)"		\
 	ASAN_OPTIONS="detect_leaks=0"	\
+	GNUTLS_TEST_SUITE_RUN=1		\
 	OPENSSL_ia32cap=0x00000000
 
 if ENABLE_NON_SUITEB_CURVES
@@ -114,6 +116,10 @@ endif
 
 if ENABLE_TLS13_INTEROP
 scripts_to_test += testcompat-tls13-openssl.sh
+endif
+
+if ENABLE_OLDGNUTLS_INTEROP
+scripts_to_test += testcompat-oldgnutls.sh
 endif
 
 if ENABLE_DANE

@@ -63,6 +63,7 @@ class AV1WarpFilterTest : public ::testing::TestWithParam<WarpTestParams> {
 
 }  // namespace AV1WarpFilter
 
+#if CONFIG_AV1_HIGHBITDEPTH
 namespace AV1HighbdWarpFilter {
 typedef void (*highbd_warp_affine_func)(const int32_t *mat, const uint16_t *ref,
                                         int width, int height, int stride,
@@ -97,6 +98,7 @@ class AV1HighbdWarpFilterTest
 };
 
 }  // namespace AV1HighbdWarpFilter
+#endif  // CONFIG_AV1_HIGHBITDEPTH
 
 }  // namespace libaom_test
 

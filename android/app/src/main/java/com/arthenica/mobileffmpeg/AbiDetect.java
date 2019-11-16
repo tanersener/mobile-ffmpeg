@@ -37,7 +37,7 @@ public class AbiDetect {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             System.loadLibrary("cpufeatures");
         }
-        System.loadLibrary("mobileffmpeg-abidetect");
+        System.loadLibrary("mobileffmpeg_abidetect");
 
         /* ALL LIBRARIES LOADED AT STARTUP */
         Config.class.getName();

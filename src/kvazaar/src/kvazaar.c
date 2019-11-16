@@ -142,8 +142,8 @@ static void set_frame_info(kvz_frame_info *const info, const encoder_state_t *co
   info->nal_unit_type = state->frame->pictype;
   info->slice_type = state->frame->slicetype;
 
-  memset(info->ref_list[0], 0, 16);
-  memset(info->ref_list[1], 0, 16);
+  memset(info->ref_list[0], 0, 16 * sizeof(int));
+  memset(info->ref_list[1], 0, 16 * sizeof(int));
 
   for (size_t i = 0; i < state->frame->ref_LX_size[0]; i++) {
     info->ref_list[0][i] = state->frame->ref->pocs[state->frame->ref_LX[0][i]];

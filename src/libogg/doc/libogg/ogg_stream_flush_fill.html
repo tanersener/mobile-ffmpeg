@@ -9,7 +9,7 @@
 <table border=0 width=100%>
 <tr>
 <td><p class=tiny>libogg documentation</p></td>
-<td align=right><p class=tiny>libogg release 1.3.2 - 20140527</p></td>
+<td align=right><p class=tiny>libogg release 1.3.4 - 20190830</p></td>
 </tr>
 </table>
 
@@ -23,7 +23,7 @@ allows applications to explicitly request a specific page spill
 size.</p>
 
 <p>This function checks for remaining packets inside the stream and forces remaining packets into pages of approximately the requested size.
-This should be used when you want to flush all remaining data from a stream. <a href="ogg_stream_flush.html">ogg_stream_flush</a> may be used instead if a particular page size isn't important. 
+This should be used when you want to flush all remaining data from a stream. <a href="ogg_stream_flush.html">ogg_stream_flush</a> may be used instead if a particular page size isn't important.
 <p>This function can be used to verify that all packets have been flushed.  If the return value is 0, all packets have been placed into a page. Generally speaking, it should be called in a loop until all packets are flushed, since even a single packet may span multiple pages.
 
 <br><br>
@@ -60,11 +60,11 @@ Nonzero means that remaining packets have successfully been flushed into the pag
 <hr noshade>
 <table border=0 width=100%>
 <tr valign=top>
-<td><p class=tiny>copyright &copy; 2000-2014 Xiph.Org</p></td>
+<td><p class=tiny>copyright &copy; 2000-2019 Xiph.Org Foundation</p></td>
 <td align=right><p class=tiny><a href="http://www.xiph.org/ogg/">Ogg Container Format</a></p></td>
 </tr><tr>
 <td><p class=tiny>libogg documentation</p></td>
-<td align=right><p class=tiny>libogg release 1.3.2 - 20140527</p></td>
+<td align=right><p class=tiny>libogg release 1.3.4 - 20190830</p></td>
 </tr>
 </table>
 

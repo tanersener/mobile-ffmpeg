@@ -73,7 +73,7 @@
     NSLog(@"FFmpeg process started with arguments\n\'%@\'\n", ffmpegCommand);
     
     // EXECUTE
-    int result = [MobileFFmpeg execute:ffmpegCommand delimiter:@" "];
+    int result = [MobileFFmpeg execute:ffmpegCommand];
     
     NSLog(@"FFmpeg process exited with rc %d\n", result);
 
@@ -96,7 +96,7 @@
         NSLog(@"FFmpeg process started with arguments\n\'%@\'\n", ffmpegCommand);
         
         // EXECUTE
-        int result = [MobileFFmpeg execute:ffmpegCommand delimiter:@" "];
+        int result = [MobileFFmpeg execute:ffmpegCommand];
         
         NSLog(@"FFmpeg process exited with rc %d\n", result);
 
@@ -118,7 +118,7 @@
     self.outputText.text = [self.outputText.text stringByAppendingString:message];
     
     if (self.outputText.text.length > 0 ) {
-        NSRange bottom = NSMakeRange(self.outputText.text.length - 1, 1);
+        // NSRange bottom = NSMakeRange(self.outputText.text.length - 1, 1);
         // [self.outputText scrollRangeToVisible:bottom];
     }
 }

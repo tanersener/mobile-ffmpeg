@@ -73,6 +73,17 @@ if test $ret != 0; then
 	exit $ret
 fi
 
+#SHANI
+$(which lscpu)|grep Flags|grep sha_ni >/dev/null
+if test $? = 0;then
+	GNUTLS_CPUID_OVERRIDE=0x20 ${PROG}
+	ret=$?
+	if test $ret != 0; then
+		echo "SHANI cipher tests failed"
+		exit $ret
+	fi
+fi
+
 GNUTLS_CPUID_OVERRIDE=0x100000 ${PROG}
 ret=$?
 if test $ret != 0; then

@@ -441,7 +441,7 @@ get_ldflags() {
     fi
     local COMMON_LINKED_LIBS=$(get_common_linked_libraries $1)
 
-    echo "${ARCH_FLAGS} ${OPTIMIZATION_FLAGS} ${COMMON_LINKED_LIBS} -Wl,--exclude-libs,libgcc.a -Wl,--exclude-libs,libunwind.a"
+    echo "${ARCH_FLAGS} ${OPTIMIZATION_FLAGS} ${COMMON_LINKED_LIBS} -Wl,--hash-style=both -Wl,--exclude-libs,libgcc.a -Wl,--exclude-libs,libunwind.a"
 }
 
 create_chromaprint_package_config() {
@@ -913,15 +913,15 @@ download_gpl_library_source() {
             GPL_LIB_DEST_DIR="libvidstab"
         ;;
         x264)
-            GPL_LIB_URL="ftp://ftp.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-20190701-2245-stable.tar.bz2"
-            GPL_LIB_FILE="x264-snapshot-20190701-2245-stable.tar.bz2"
-            GPL_LIB_ORIG_DIR="x264-snapshot-20190701-2245-stable"
+            GPL_LIB_URL="ftp://ftp.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-20191024-2245-stable.tar.bz2"
+            GPL_LIB_FILE="x264-snapshot-20191024-2245-stable.tar.bz2"
+            GPL_LIB_ORIG_DIR="x264-snapshot-20191024-2245-stable"
             GPL_LIB_DEST_DIR="x264"
         ;;
         x265)
-            GPL_LIB_URL="https://download.videolan.org/pub/videolan/x265/x265_3.0.tar.gz"
-            GPL_LIB_FILE="x265-3.0.tar.gz"
-            GPL_LIB_ORIG_DIR="x265_3.0"
+            GPL_LIB_URL="https://bitbucket.org/multicoreware/x265/downloads/x265_3.2.tar.gz"
+            GPL_LIB_FILE="x265-3.2.tar.gz"
+            GPL_LIB_ORIG_DIR="x265_3.2"
             GPL_LIB_DEST_DIR="x265"
         ;;
         xvidcore)
@@ -1049,6 +1049,11 @@ build_cpufeatures() {
     echo -e "\nINFO: Building cpu-features for ${ARCH}\n" 1>>${BASEDIR}/build.log 2>&1
 
     set_toolchain_clang_paths "cpu-features"
+
+    TARGET_HOST=$(get_target_host)
+    export CFLAGS=$(get_cflags "cpu-features")
+    export CXXFLAGS=$(get_cxxflags "cpu-features")
+    export LDFLAGS=$(get_ldflags "cpu-features")
 
     # THEN BUILD FOR THIS ABI
     $(get_clang_target_host)-clang -c ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.c -o ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.o 1>>${BASEDIR}/build.log 2>&1

@@ -80,6 +80,9 @@ static void load_list(const char *name, const gnutls_datum_t *txt,
 	if (max != ncerts)
 		testfail("imported number (%d) doesn't match expected (%d)\n", max, ncerts);
 
+	if (ret != (int)ncerts)
+		testfail("imported number (%d) doesn't match return value (%d)\n", ncerts, ret);
+
 	return;
 }
 

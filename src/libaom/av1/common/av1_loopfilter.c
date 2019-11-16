@@ -64,7 +64,7 @@ uint8_t av1_get_filter_level(const AV1_COMMON *cm,
                              int plane, const MB_MODE_INFO *mbmi) {
   const int segment_id = mbmi->segment_id;
   if (cm->delta_q_info.delta_lf_present_flag) {
-    int delta_lf;
+    int8_t delta_lf;
     if (cm->delta_q_info.delta_lf_multi) {
       const int delta_lf_idx = delta_lf_id_lut[plane][dir_idx];
       delta_lf = mbmi->delta_lf[delta_lf_idx];
@@ -256,7 +256,7 @@ static TX_SIZE set_lpf_parameters(
   // and mi_col should be odd number for chroma plane.
   const int mi_row = scale_vert | ((y << scale_vert) >> MI_SIZE_LOG2);
   const int mi_col = scale_horz | ((x << scale_horz) >> MI_SIZE_LOG2);
-  MB_MODE_INFO **mi = cm->mi_grid_visible + mi_row * cm->mi_stride + mi_col;
+  MB_MODE_INFO **mi = cm->mi_grid_base + mi_row * cm->mi_stride + mi_col;
   const MB_MODE_INFO *mbmi = mi[0];
   // If current mbmi is not correctly setup, return an invalid value to stop
   // filtering. One example is that if this tile is not coded, then its mbmi
@@ -352,8 +352,6 @@ void av1_filter_block_plane_vert(const AV1_COMMON *const cm,
   const int dst_stride = plane_ptr->dst.stride;
   const int y_range = (MAX_MIB_SIZE >> scale_vert);
   const int x_range = (MAX_MIB_SIZE >> scale_horz);
-  const int use_highbitdepth = cm->seq_params.use_highbitdepth;
-  const aom_bit_depth_t bit_depth = cm->seq_params.bit_depth;
   for (int y = 0; y < y_range; y++) {
     uint8_t *p = dst_ptr + y * MI_SIZE * dst_stride;
     for (int x = 0; x < x_range;) {
@@ -376,6 +374,9 @@ void av1_filter_block_plane_vert(const AV1_COMMON *const cm,
         tx_size = TX_4X4;
       }
 
+#if CONFIG_AV1_HIGHBITDEPTH
+      const int use_highbitdepth = cm->seq_params.use_highbitdepth;
+      const aom_bit_depth_t bit_depth = cm->seq_params.bit_depth;
       switch (params.filter_length) {
         // apply 4-tap filtering
         case 4:
@@ -420,6 +421,32 @@ void av1_filter_block_plane_vert(const AV1_COMMON *const cm,
         // no filtering
         default: break;
       }
+#else
+      switch (params.filter_length) {
+        // apply 4-tap filtering
+        case 4:
+          aom_lpf_vertical_4(p, dst_stride, params.mblim, params.lim,
+                             params.hev_thr);
+          break;
+        case 6:  // apply 6-tap filter for chroma plane only
+          assert(plane != 0);
+          aom_lpf_vertical_6(p, dst_stride, params.mblim, params.lim,
+                             params.hev_thr);
+          break;
+        // apply 8-tap filtering
+        case 8:
+          aom_lpf_vertical_8(p, dst_stride, params.mblim, params.lim,
+                             params.hev_thr);
+          break;
+        // apply 14-tap filtering
+        case 14:
+          aom_lpf_vertical_14(p, dst_stride, params.mblim, params.lim,
+                              params.hev_thr);
+          break;
+        // no filtering
+        default: break;
+      }
+#endif  // CONFIG_AV1_HIGHBITDEPTH
       // advance the destination pointer
       advance_units = tx_size_wide_unit[tx_size];
       x += advance_units;
@@ -438,8 +465,6 @@ void av1_filter_block_plane_horz(const AV1_COMMON *const cm,
   const int dst_stride = plane_ptr->dst.stride;
   const int y_range = (MAX_MIB_SIZE >> scale_vert);
   const int x_range = (MAX_MIB_SIZE >> scale_horz);
-  const int use_highbitdepth = cm->seq_params.use_highbitdepth;
-  const aom_bit_depth_t bit_depth = cm->seq_params.bit_depth;
   for (int x = 0; x < x_range; x++) {
     uint8_t *p = dst_ptr + x * MI_SIZE;
     for (int y = 0; y < y_range;) {
@@ -462,6 +487,9 @@ void av1_filter_block_plane_horz(const AV1_COMMON *const cm,
         tx_size = TX_4X4;
       }
 
+#if CONFIG_AV1_HIGHBITDEPTH
+      const int use_highbitdepth = cm->seq_params.use_highbitdepth;
+      const aom_bit_depth_t bit_depth = cm->seq_params.bit_depth;
       switch (params.filter_length) {
         // apply 4-tap filtering
         case 4:
@@ -507,6 +535,33 @@ void av1_filter_block_plane_horz(const AV1_COMMON *const cm,
         // no filtering
         default: break;
       }
+#else
+      switch (params.filter_length) {
+        // apply 4-tap filtering
+        case 4:
+          aom_lpf_horizontal_4(p, dst_stride, params.mblim, params.lim,
+                               params.hev_thr);
+          break;
+        // apply 6-tap filtering
+        case 6:
+          assert(plane != 0);
+          aom_lpf_horizontal_6(p, dst_stride, params.mblim, params.lim,
+                               params.hev_thr);
+          break;
+        // apply 8-tap filtering
+        case 8:
+          aom_lpf_horizontal_8(p, dst_stride, params.mblim, params.lim,
+                               params.hev_thr);
+          break;
+        // apply 14-tap filtering
+        case 14:
+          aom_lpf_horizontal_14(p, dst_stride, params.mblim, params.lim,
+                                params.hev_thr);
+          break;
+        // no filtering
+        default: break;
+      }
+#endif  // CONFIG_AV1_HIGHBITDEPTH
 
       // advance the destination pointer
       advance_units = tx_size_high_unit[tx_size];

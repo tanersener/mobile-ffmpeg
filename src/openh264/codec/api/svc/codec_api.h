@@ -61,7 +61,7 @@ typedef unsigned char bool;
   *   * This page is for openh264 codec API usage.
   *   * For how to use the encoder,please refer to page UsageExampleForEncoder
   *   * For how to use the decoder,please refer to page UsageExampleForDecoder
-  *   * For more detail about ISVEncoder,please refer to page ISVCEnoder
+  *   * For more detail about ISVEncoder,please refer to page ISVCEncoder
   *   * For more detail about ISVDecoder,please refer to page ISVCDecoder
 */
 
@@ -94,7 +94,7 @@ typedef unsigned char bool;
   *
   * Step 2:decoder creation
   * @code
-  *  CreateDecoder(pSvcDecoder);
+  *  WelsCreateDecoder(&pSvcDecoder);
   * @endcode
   *
   * Step 3:declare required parameter, used to differentiate Decoding only and Parsing only
@@ -107,44 +107,44 @@ typedef unsigned char bool;
   *
   * Step 4:initialize the parameter and decoder context, allocate memory
   * @code
-  *  Initialize(&sDecParam);
+  *  pSvcDecoder->Initialize(&sDecParam);
   * @endcode
   *
   * Step 5:do actual decoding process in slice level;
   *        this can be done in a loop until data ends
   * @code
   *  //for Decoding only
-  *  iRet = DecodeFrameNoDelay(pBuf, iSize, pData, &sDstBufInfo);
+  *  iRet = pSvcDecoder->DecodeFrameNoDelay(pBuf, iSize, pData, &sDstBufInfo);
   *  //or
-  *  iRet = DecodeFrame2(pBuf, iSize, pData, &sDstBufInfo);
+  *  iRet = pSvcDecoder->DecodeFrame2(pBuf, iSize, pData, &sDstBufInfo);
   *  //for Parsing only
-  *  iRet = DecodeParser(pBuf, iSize, &sDstParseInfo);
+  *  iRet = pSvcDecoder->DecodeParser(pBuf, iSize, &sDstParseInfo);
   *  //decode failed
   *  If (iRet != 0){
-  *      RequestIDR or something like that.
+  *      //error handling (RequestIDR or something like that)
   *  }
   *  //for Decoding only, pData can be used for render.
   *  if (sDstBufInfo.iBufferStatus==1){
-  *      output pData[0], pData[1], pData[2];
+  *      //output handling (pData[0], pData[1], pData[2])
   *  }
   * //for Parsing only, sDstParseInfo can be used for, e.g., HW decoding
   *  if (sDstBufInfo.iNalNum > 0){
-  *      Hardware decoding sDstParseInfo;
+  *      //Hardware decoding sDstParseInfo;
   *  }
   *  //no-delay decoding can be realized by directly calling DecodeFrameNoDelay(), which is the recommended usage.
   *  //no-delay decoding can also be realized by directly calling DecodeFrame2() again with NULL input, as in the following. In this case, decoder would immediately reconstruct the input data. This can also be used similarly for Parsing only. Consequent decoding error and output indication should also be considered as above.
-  *  iRet = DecodeFrame2(NULL, 0, pData, &sDstBufInfo);
-  *  judge iRet, sDstBufInfo.iBufferStatus ...
+  *  iRet = pSvcDecoder->DecodeFrame2(NULL, 0, pData, &sDstBufInfo);
+  *  //judge iRet, sDstBufInfo.iBufferStatus ...
   * @endcode
   *
   * Step 6:uninitialize the decoder and memory free
   * @code
-  *  Uninitialize();
+  *  pSvcDecoder->Uninitialize();
   * @endcode
   *
   * Step 7:destroy the decoder
   * @code
-  *  DestroyDecoder();
+  *  DestroyDecoder(pSvcDecoder);
   * @endcode
   *
 */
@@ -157,16 +157,17 @@ typedef unsigned char bool;
   *
   * Step1:setup encoder
   * @code
+  *  ISVCEncoder*  encoder_;
   *  int rv = WelsCreateSVCEncoder (&encoder_);
-  *  ASSERT_EQ (0, rv);
-  *  ASSERT_TRUE (encoder_ != NULL);
+  *  assert (rv == 0);
+  *  assert (encoder_ != NULL);
   * @endcode
   *
   * Step2:initilize with basic parameter
   * @code
   *  SEncParamBase param;
   *  memset (&param, 0, sizeof (SEncParamBase));
-  *  param.iUsageType = usageType;
+  *  param.iUsageType = usageType; //from EUsageType enum
   *  param.fMaxFrameRate = frameRate;
   *  param.iPicWidth = width;
   *  param.iPicHeight = height;
@@ -186,7 +187,7 @@ typedef unsigned char bool;
   *  int frameSize = width * height * 3 / 2;
   *  BufferedData buf;
   *  buf.SetLength (frameSize);
-  *  ASSERT_TRUE (buf.Length() == (size_t)frameSize);
+  *  assert (buf.Length() == (size_t)frameSize);
   *  SFrameBSInfo info;
   *  memset (&info, 0, sizeof (SFrameBSInfo));
   *  SSourcePicture pic;
@@ -202,9 +203,9 @@ typedef unsigned char bool;
   *  for(int num = 0;num<total_num;num++) {
   *     //prepare input data
   *     rv = encoder_->EncodeFrame (&pic, &info);
-  *     ASSERT_TRUE (rv == cmResultSuccess);
-  *     if (info.eFrameType != videoFrameTypeSkip && cbk != NULL) {
-  *      //output bitstream
+  *     assert (rv == cmResultSuccess);
+  *     if (info.eFrameType != videoFrameTypeSkip) {
+  *      //output bitstream handling
   *     }
   *  }
   * @endcode
@@ -229,7 +230,7 @@ typedef unsigned char bool;
   * Step 2:initialize with extension parameter
   * @code
   *  SEncParamExt param;
-  *  encoder->GetDefaultParams (&param);
+  *  encoder_->GetDefaultParams (&param);
   *  param.iUsageType = usageType;
   *  param.fMaxFrameRate = frameRate;
   *  param.iPicWidth = width;
@@ -319,7 +320,7 @@ class ISVCEncoder {
   * @param  bIDR true: force encoder to encode frame as IDR frame;false, return 1 and nothing to do
   * @return 0 - success; otherwise - failed;
   */
-  virtual int EXTAPI ForceIntraFrame (bool bIDR,int iLayerId = -1) = 0;
+  virtual int EXTAPI ForceIntraFrame (bool bIDR, int iLayerId = -1) = 0;
 
   /**
   * @brief   Set option for encoder, detail option type, please refer to enumurate ENCODER_OPTION.
@@ -329,7 +330,7 @@ class ISVCEncoder {
   virtual int EXTAPI SetOption (ENCODER_OPTION eOptionId, void* pOption) = 0;
 
   /**
-  * @brief   Set option for encoder, detail option type, please refer to enumurate ENCODER_OPTION.
+  * @brief   Get option for encoder, detail option type, please refer to enumurate ENCODER_OPTION.
   * @param   pOption option for encoder such as InDataFormat, IDRInterval, SVC Encode Param, Frame Rate, Bitrate,...
   * @return  CM_RETURN: 0 - success; otherwise - failed;
   */
@@ -372,18 +373,18 @@ class ISVCDecoder {
       int& iWidth,
       int& iHeight) = 0;
 
-/**
-  * @brief    For slice level DecodeFrameNoDelay() (4 parameters input),
-  *           whatever the function return value is, the output data
-  *           of I420 format will only be available when pDstInfo->iBufferStatus == 1,.
-  *           This function will parse and reconstruct the input frame immediately if it is complete
-  *           It is recommended as the main decoding function for H.264/AVC format input
-  * @param   pSrc the h264 stream to be decoded
-  * @param   iSrcLen the length of h264 stream
-  * @param   ppDst buffer pointer of decoded data (YUV)
-  * @param   pDstInfo information provided to API(width, height, etc.)
-  * @return  0 - success; otherwise -failed;
-  */
+  /**
+    * @brief    For slice level DecodeFrameNoDelay() (4 parameters input),
+    *           whatever the function return value is, the output data
+    *           of I420 format will only be available when pDstInfo->iBufferStatus == 1,.
+    *           This function will parse and reconstruct the input frame immediately if it is complete
+    *           It is recommended as the main decoding function for H.264/AVC format input
+    * @param   pSrc the h264 stream to be decoded
+    * @param   iSrcLen the length of h264 stream
+    * @param   ppDst buffer pointer of decoded data (YUV)
+    * @param   pDstInfo information provided to API(width, height, etc.)
+    * @return  0 - success; otherwise -failed;
+    */
   virtual DECODING_STATE EXTAPI DecodeFrameNoDelay (const unsigned char* pSrc,
       const int iSrcLen,
       unsigned char** ppDst,
@@ -404,6 +405,18 @@ class ISVCDecoder {
   virtual DECODING_STATE EXTAPI DecodeFrame2 (const unsigned char* pSrc,
       const int iSrcLen,
       unsigned char** ppDst,
+      SBufferInfo* pDstInfo) = 0;
+
+
+  /**
+  * @brief   This function gets a decoded ready frame remaining in buffers after the last frame has been decoded.
+  * Use GetOption with option DECODER_OPTION_NUM_OF_FRAMES_REMAINING_IN_BUFFER to get the number of frames remaining in buffers.
+  * Note that it is only applicable for profile_idc != 66
+  * @param   ppDst buffer pointer of decoded data (YUV)
+  * @param   pDstInfo information provided to API(width, height, etc.)
+  * @return  0 - success; otherwise -failed;
+  */
+  virtual DECODING_STATE EXTAPI FlushFrame (unsigned char** ppDst,
       SBufferInfo* pDstInfo) = 0;
 
   /**
@@ -493,14 +506,17 @@ DECODING_STATE (*DecodeFrame) (ISVCDecoder*, const unsigned char* pSrc,
                                int* iHeight);
 
 DECODING_STATE (*DecodeFrameNoDelay) (ISVCDecoder*, const unsigned char* pSrc,
-                                const int iSrcLen,
-                                unsigned char** ppDst,
-                                SBufferInfo* pDstInfo);
+                                      const int iSrcLen,
+                                      unsigned char** ppDst,
+                                      SBufferInfo* pDstInfo);
 
 DECODING_STATE (*DecodeFrame2) (ISVCDecoder*, const unsigned char* pSrc,
                                 const int iSrcLen,
                                 unsigned char** ppDst,
                                 SBufferInfo* pDstInfo);
+
+DECODING_STATE (*FlushFrame) (ISVCDecoder*, unsigned char** ppDst,
+                              SBufferInfo* pDstInfo);
 
 DECODING_STATE (*DecodeParser) (ISVCDecoder*, const unsigned char* pSrc,
                                 const int iSrcLen,
@@ -567,7 +583,7 @@ OpenH264Version WelsGetCodecVersion (void);
 /** @brief   Get codec version
  *  @param   pVersion  struct to fill in with the version
 */
-void WelsGetCodecVersionEx (OpenH264Version *pVersion);
+void WelsGetCodecVersionEx (OpenH264Version* pVersion);
 
 #ifdef __cplusplus
 }

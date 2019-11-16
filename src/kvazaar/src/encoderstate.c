@@ -37,9 +37,6 @@
 #include "tables.h"
 #include "threadqueue.h"
 
-#define SAO_BUF_WIDTH (LCU_WIDTH + SAO_DELAY_PX + 2)
-#define SAO_BUF_WIDTH_C (SAO_BUF_WIDTH / 2)
-
 
 int kvz_encoder_state_match_children_of_previous_frame(encoder_state_t * const state) {
   int i;
@@ -250,10 +247,18 @@ static void encoder_sao_reconstruct(const encoder_state_t *const state,
 {
   videoframe_t *const frame = state->tile->frame;
 
-  // Temporary buffers for SAO input pixels.
-  kvz_pixel sao_buf_y_array[SAO_BUF_WIDTH * SAO_BUF_WIDTH];
-  kvz_pixel sao_buf_u_array[SAO_BUF_WIDTH_C * SAO_BUF_WIDTH_C];
-  kvz_pixel sao_buf_v_array[SAO_BUF_WIDTH_C * SAO_BUF_WIDTH_C];
+
+  // Temporary buffers for SAO input pixels. The buffers cover the pixels
+  // inside the LCU (LCU_WIDTH x LCU_WIDTH), SAO_DELAY_PX wide bands to the
+  // left and above the LCU, and one pixel border on the left and top
+  // sides. We add two extra pixels to the buffers because the AVX2 SAO
+  // reconstruction reads up to two extra bytes when using edge SAO in the
+  // horizontal direction.
+#define SAO_BUF_WIDTH   (1 + SAO_DELAY_PX   + LCU_WIDTH)
+#define SAO_BUF_WIDTH_C (1 + SAO_DELAY_PX/2 + LCU_WIDTH_C)
+  kvz_pixel sao_buf_y_array[SAO_BUF_WIDTH   * SAO_BUF_WIDTH   + 2];
+  kvz_pixel sao_buf_u_array[SAO_BUF_WIDTH_C * SAO_BUF_WIDTH_C + 2];
+  kvz_pixel sao_buf_v_array[SAO_BUF_WIDTH_C * SAO_BUF_WIDTH_C + 2];
 
   // Pointers to the top-left pixel of the LCU in the buffers.
   kvz_pixel *const sao_buf_y = &sao_buf_y_array[(SAO_DELAY_PX + 1) * (SAO_BUF_WIDTH + 1)];
@@ -526,68 +531,81 @@ static void encode_sao(encoder_state_t * const state,
 /**
  * \brief Sets the QP for each CU in state->tile->frame->cu_array.
  *
- * The QPs are used in deblocking.
+ * The QPs are used in deblocking and QP prediction.
  *
- * The delta QP for an LCU is coded when the first CU with coded block flag
- * set is encountered. Hence, for the purposes of deblocking, all CUs
- * before the first one with cbf set use state->ref_qp and all CUs after
- * that use state->qp.
+ * The QP delta for a quantization group is coded when the first CU with
+ * coded block flag set is encountered. Hence, for the purposes of
+ * deblocking and QP prediction, all CUs in before the first one that has
+ * cbf set use the QP predictor and all CUs after that use (QP predictor
+ * + QP delta).
  *
  * \param state           encoder state
  * \param x               x-coordinate of the left edge of the root CU
  * \param y               y-coordinate of the top edge of the root CU
  * \param depth           depth in the CU quadtree
- * \param coeffs_coded    Used for tracking whether a CU with a residual
- *                        has been encountered. Should be set to false at
- *                        the top level.
- * \return Whether there were any CUs with residual or not.
+ * \param last_qp         QP of the last CU in the last quantization group
+ * \param prev_qp         -1 if QP delta has not been coded in current QG,
+ *                        otherwise the QP of the current QG
  */
-static bool set_cu_qps(encoder_state_t *state, int x, int y, int depth, bool coeffs_coded)
+static void set_cu_qps(encoder_state_t *state, int x, int y, int depth, int *last_qp, int *prev_qp)
 {
-  if (state->qp == state->ref_qp) {
-    // If the QPs are equal there is no need to care about the residuals.
-    coeffs_coded = true;
-  }
+
+  // Stop recursion if the CU is completely outside the frame.
+  if (x >= state->tile->frame->width || y >= state->tile->frame->height) return;
 
   cu_info_t *cu = kvz_cu_array_at(state->tile->frame->cu_array, x, y);
   const int cu_width = LCU_WIDTH >> depth;
-  coeffs_coded = coeffs_coded || cbf_is_set_any(cu->cbf, cu->depth);
 
-  if (!coeffs_coded && cu->depth > depth) {
+  if (depth <= state->encoder_control->max_qp_delta_depth) {
+    *prev_qp = -1;
+  }
+
+  if (cu->depth > depth) {
     // Recursively process sub-CUs.
     const int d = cu_width >> 1;
-    coeffs_coded = set_cu_qps(state, x,     y,     depth + 1, coeffs_coded);
-    coeffs_coded = set_cu_qps(state, x + d, y,     depth + 1, coeffs_coded);
-    coeffs_coded = set_cu_qps(state, x,     y + d, depth + 1, coeffs_coded);
-    coeffs_coded = set_cu_qps(state, x + d, y + d, depth + 1, coeffs_coded);
+    set_cu_qps(state, x,     y,     depth + 1, last_qp, prev_qp);
+    set_cu_qps(state, x + d, y,     depth + 1, last_qp, prev_qp);
+    set_cu_qps(state, x,     y + d, depth + 1, last_qp, prev_qp);
+    set_cu_qps(state, x + d, y + d, depth + 1, last_qp, prev_qp);
 
   } else {
-    if (!coeffs_coded && cu->tr_depth > depth) {
+    bool cbf_found = *prev_qp >= 0;
+
+    if (cu->tr_depth > depth) {
       // The CU is split into smaller transform units. Check whether coded
       // block flag is set for any of the TUs.
       const int tu_width = LCU_WIDTH >> cu->tr_depth;
-      for (int y_scu = y; y_scu < y + cu_width; y_scu += tu_width) {
-        for (int x_scu = x; x_scu < x + cu_width; x_scu += tu_width) {
+      for (int y_scu = y; !cbf_found && y_scu < y + cu_width; y_scu += tu_width) {
+        for (int x_scu = x; !cbf_found && x_scu < x + cu_width; x_scu += tu_width) {
           cu_info_t *tu = kvz_cu_array_at(state->tile->frame->cu_array, x_scu, y_scu);
           if (cbf_is_set_any(tu->cbf, cu->depth)) {
-            coeffs_coded = true;
+            cbf_found = true;
           }
         }
       }
+    } else if (cbf_is_set_any(cu->cbf, cu->depth)) {
+      cbf_found = true;
+    }
+
+    int8_t qp;
+    if (cbf_found) {
+      *prev_qp = qp = cu->qp;
+    } else {
+      qp = kvz_get_cu_ref_qp(state, x, y, *last_qp);
     }
 
     // Set the correct QP for all state->tile->frame->cu_array elements in
     // the area covered by the CU.
-    const int8_t qp = coeffs_coded ? state->qp : state->ref_qp;
-
     for (int y_scu = y; y_scu < y + cu_width; y_scu += SCU_WIDTH) {
       for (int x_scu = x; x_scu < x + cu_width; x_scu += SCU_WIDTH) {
         kvz_cu_array_at(state->tile->frame->cu_array, x_scu, y_scu)->qp = qp;
       }
     }
-  }
 
-  return coeffs_coded;
+    if (is_last_cu_in_qg(state, x, y, depth)) {
+      *last_qp = cu->qp;
+    }
+  }
 }
 
 
@@ -608,11 +626,13 @@ static void encoder_state_worker_encode_lcu(void * opaque)
 
   encoder_state_recdata_to_bufs(state, lcu, state->tile->hor_buf_search, state->tile->ver_buf_search);
 
-  if (encoder->cfg.deblock_enable) {
-    if (encoder->lcu_dqp_enabled) {
-      set_cu_qps(state, lcu->position_px.x, lcu->position_px.y, 0, false);
-    }
+  if (encoder->max_qp_delta_depth >= 0) {
+    int last_qp = state->last_qp;
+    int prev_qp = -1;
+    set_cu_qps(state, lcu->position_px.x, lcu->position_px.y, 0, &last_qp, &prev_qp);
+  }
 
+  if (encoder->cfg.deblock_enable) {
     kvz_filter_deblock_lcu(state, lcu->position_px.x, lcu->position_px.y);
   }
 
@@ -634,9 +654,6 @@ static void encoder_state_worker_encode_lcu(void * opaque)
   if (encoder->cfg.sao_type) {
     encode_sao(state, lcu->position.x, lcu->position.y, &frame->sao_luma[lcu->position.y * frame->width_in_lcu + lcu->position.x], &frame->sao_chroma[lcu->position.y * frame->width_in_lcu + lcu->position.x]);
   }
-
-  // QP delta is not used when rate control is turned off.
-  state->must_code_qp_delta = encoder->lcu_dqp_enabled;
 
   //Encode coding tree
   kvz_encode_coding_tree(state, lcu->position.x * LCU_WIDTH, lcu->position.y * LCU_WIDTH, 0);
@@ -709,7 +726,8 @@ static void encoder_state_encode_leaf(encoder_state_t * const state)
   const encoder_control_t *ctrl = state->encoder_control;
   const kvz_config *cfg = &ctrl->cfg;
 
-  state->ref_qp = state->frame->QP;
+  // Signaled slice QP may be different to frame QP with set-qp-in-cu enabled.
+  state->last_qp = ctrl->cfg.set_qp_in_cu ? 26 : state->frame->QP;
 
   if (cfg->crypto_features) {
     state->crypto_hdl = kvz_crypto_create(cfg);
@@ -784,6 +802,21 @@ static void encoder_state_encode_leaf(encoder_state_t * const state)
             dep_lcu = dep_lcu->right;
           }
           kvz_threadqueue_job_dep_add(job[0], ref_state->tile->wf_jobs[dep_lcu->id]);
+
+          // Very spesific bug that happens when owf length is longer than the
+          // gop length. Takes care of that.
+          if(!state->encoder_control->cfg.gop_lowdelay &&
+             state->encoder_control->cfg.open_gop &&
+             state->encoder_control->cfg.gop_len != 0 &&
+             state->encoder_control->cfg.owf > state->encoder_control->cfg.gop_len &&
+             ref_state->frame->slicetype == KVZ_SLICE_I &&
+             ref_state->frame->num != 0){
+
+            while (ref_state->frame->poc != state->frame->poc - state->encoder_control->cfg.gop_len){
+              ref_state = ref_state->previous_encoder_state;
+            }
+            kvz_threadqueue_job_dep_add(job[0], ref_state->tile->wf_jobs[dep_lcu->id]);
+          }
         }
 
         // Add local WPP dependancy to the LCU on the left.
@@ -945,13 +978,19 @@ static void encoder_state_encode(encoder_state_t * const main_state) {
 }
 
 
-static void encoder_ref_insertion_sort(const encoder_state_t *const state, uint8_t reflist[16], uint8_t length) {
+static void encoder_ref_insertion_sort(const encoder_state_t *const state,
+                                       uint8_t reflist[16],
+                                       uint8_t length,
+                                       bool reverse)
+{
 
   for (uint8_t i = 1; i < length; ++i) {
     const uint8_t cur_idx = reflist[i];
     const int32_t cur_poc = state->frame->ref->pocs[cur_idx];
     int8_t j = i;
-    while (j > 0 && cur_poc > state->frame->ref->pocs[reflist[j - 1]]) {
+    while ((j > 0 && !reverse && cur_poc > state->frame->ref->pocs[reflist[j - 1]]) ||
+           (j > 0 &&  reverse && cur_poc < state->frame->ref->pocs[reflist[j - 1]]))
+    {
       reflist[j] = reflist[j - 1];
       --j;
     }
@@ -966,29 +1005,54 @@ static void encoder_ref_insertion_sort(const encoder_state_t *const state, uint8
  */
 void kvz_encoder_create_ref_lists(const encoder_state_t *const state)
 {
-  // TODO check possibility to add L0 references to L1 list also
-  
+  const kvz_config *cfg = &state->encoder_control->cfg;
+
   FILL_ARRAY(state->frame->ref_LX_size, 0, 2);
 
-  // List all pocs of lists
-  int j = 0;
-  for (j = 0; j < state->frame->ref->used_size; j++) {
-    if (state->frame->ref->pocs[j] < state->frame->poc) {
-      state->frame->ref_LX[0][state->frame->ref_LX_size[0]] = j;
-      state->frame->ref_LX_size[0] += 1;
-    } else {
-      state->frame->ref_LX[1][state->frame->ref_LX_size[1]] = j;
+  int num_negative = 0;
+  int num_positive = 0;
+
+  // Add positive references to L1 list
+  for (int i = 0; i < state->frame->ref->used_size; i++) {
+    if (state->frame->ref->pocs[i] > state->frame->poc) {
+      state->frame->ref_LX[1][state->frame->ref_LX_size[1]] = i;
       state->frame->ref_LX_size[1] += 1;
+      num_positive++;
     }
   }
 
-  // Fill the rest with -1s.
-  for (; j < 16; j++) {
-    state->frame->ref_LX[0][j] = (uint8_t) -1;
-    state->frame->ref_LX[1][j] = (uint8_t) -1;
+  // Add negative references to L1 list when bipred is enabled and GOP is
+  // either disabled or does not use picture reordering.
+  bool l1_negative_refs =
+    (cfg->bipred && (cfg->gop_len == 0 || cfg->gop_lowdelay));
+
+  // Add negative references to L0 and L1 lists.
+  for (int i = 0; i < state->frame->ref->used_size; i++) {
+    if (state->frame->ref->pocs[i] < state->frame->poc) {
+      state->frame->ref_LX[0][state->frame->ref_LX_size[0]] = i;
+      state->frame->ref_LX_size[0] += 1;
+      if (l1_negative_refs) {
+        state->frame->ref_LX[1][state->frame->ref_LX_size[1]] = i;
+        state->frame->ref_LX_size[1] += 1;
+      }
+      num_negative++;
+    }
   }
 
-  encoder_ref_insertion_sort(state, state->frame->ref_LX[0], state->frame->ref_LX_size[0]);
+  // Fill the rest with -1.
+  for (int i = state->frame->ref_LX_size[0]; i < 16; i++) {
+    state->frame->ref_LX[0][i] = 0xff;
+  }
+  for (int i = state->frame->ref_LX_size[1]; i < 16; i++) {
+    state->frame->ref_LX[1][i] = 0xff;
+  }
+
+  // Sort reference lists.
+  encoder_ref_insertion_sort(state, state->frame->ref_LX[0], num_negative, false);
+  encoder_ref_insertion_sort(state, state->frame->ref_LX[1], num_positive, true);
+  if (l1_negative_refs) {
+    encoder_ref_insertion_sort(state, state->frame->ref_LX[1] + num_positive, num_negative, false);
+  }
 }
 
 /**
@@ -1092,7 +1156,7 @@ static void encoder_state_init_children(encoder_state_t * const state) {
   if (state->is_leaf) {
     //Leaf states have cabac and context
     kvz_cabac_start(&state->cabac);
-    kvz_init_contexts(state, state->frame->QP, state->frame->slicetype);
+    kvz_init_contexts(state, state->encoder_control->cfg.set_qp_in_cu ? 26 : state->frame->QP, state->frame->slicetype);
   }
 
   //Clear the jobs
@@ -1133,14 +1197,38 @@ static void encoder_state_init_new_frame(encoder_state_t * const state, kvz_pict
       state->tile->frame->height
   );
 
+  // Use this flag to handle closed gop irap picture selection.
+  // If set to true, irap is already set and we avoid
+  // setting it based on the intra period
+  bool is_closed_normal_gop = false;
+
   // Set POC.
   if (state->frame->num == 0) {
     state->frame->poc = 0;
   } else if (cfg->gop_len && !cfg->gop_lowdelay) {
-    // Calculate POC according to the global frame counter and GOP structure
-    int32_t poc = state->frame->num - 1;
-    int32_t poc_offset = cfg->gop[state->frame->gop_offset].poc_offset;
-    state->frame->poc = poc - poc % cfg->gop_len + poc_offset;
+
+    int32_t framenum = state->frame->num - 1;
+    // Handle closed GOP
+    // Closed GOP structure has an extra IDR between the GOPs
+    if (cfg->intra_period > 0 && !cfg->open_gop) {
+      is_closed_normal_gop = true;
+      if (framenum % (cfg->intra_period + 1) == cfg->intra_period) {
+        // Insert IDR before each new GOP after intra period in closed GOP configuration
+        state->frame->poc = 0;
+      } else {
+        // Calculate frame number again and use that for the POC
+        framenum = framenum % (cfg->intra_period + 1);
+        int32_t poc_offset = cfg->gop[state->frame->gop_offset].poc_offset;
+        state->frame->poc = framenum - framenum % cfg->gop_len + poc_offset;
+        // This should not be an irap picture in closed GOP
+        state->frame->is_irap = false;
+      }
+    } else { // Open GOP
+      // Calculate POC according to the global frame counter and GOP structure
+      int32_t poc_offset = cfg->gop[state->frame->gop_offset].poc_offset;
+      state->frame->poc = framenum - framenum % cfg->gop_len + poc_offset;
+    }
+    
     kvz_videoframe_set_poc(state->tile->frame, state->frame->poc);
   } else if (cfg->intra_period > 0) {
     state->frame->poc = state->frame->num % cfg->intra_period;
@@ -1149,9 +1237,9 @@ static void encoder_state_init_new_frame(encoder_state_t * const state, kvz_pict
   }
 
   // Check whether the frame is a keyframe or not.
-  if (state->frame->num == 0) {
+  if (state->frame->num == 0 || state->frame->poc == 0) {
     state->frame->is_irap = true;
-  } else {
+  } else if(!is_closed_normal_gop) { // In closed-GOP IDR frames are poc==0 so skip this check
     state->frame->is_irap =
       cfg->intra_period > 0 &&
       (state->frame->poc % cfg->intra_period) == 0;
@@ -1165,7 +1253,8 @@ static void encoder_state_init_new_frame(encoder_state_t * const state, kvz_pict
     if (state->frame->num == 0 ||
         cfg->intra_period == 1 ||
         cfg->gop_len == 0 ||
-        cfg->gop_lowdelay)
+        cfg->gop_lowdelay ||
+        !cfg->open_gop) // Closed GOP uses IDR pictures
     {
       state->frame->pictype = KVZ_NAL_IDR_W_RADL;
     } else {
@@ -1330,4 +1419,28 @@ lcu_stats_t* kvz_get_lcu_stats(encoder_state_t *state, int lcu_x, int lcu_y)
                     (lcu_y + state->tile->lcu_offset_y) *
                     state->encoder_control->in.width_in_lcu;
   return &state->frame->lcu_stats[index];
+}
+
+int kvz_get_cu_ref_qp(const encoder_state_t *state, int x, int y, int last_qp)
+{
+  const encoder_control_t *ctrl = state->encoder_control;
+  const cu_array_t *cua = state->tile->frame->cu_array;
+  // Quantization group width
+  const int qg_width = LCU_WIDTH >> MIN(ctrl->max_qp_delta_depth, kvz_cu_array_at_const(cua, x, y)->depth);
+
+  // Coordinates of the top-left corner of the quantization group
+  const int x_qg = x & ~(qg_width - 1);
+  const int y_qg = y & ~(qg_width - 1);
+
+  int qp_pred_a = last_qp;
+  if (x_qg % LCU_WIDTH > 0) {
+    qp_pred_a = kvz_cu_array_at_const(cua, x_qg - 1, y_qg)->qp;
+  }
+
+  int qp_pred_b = last_qp;
+  if (y_qg % LCU_WIDTH > 0) {
+    qp_pred_b = kvz_cu_array_at_const(cua, x_qg, y_qg - 1)->qp;
+  }
+
+  return ((qp_pred_a + qp_pred_b + 1) >> 1);
 }

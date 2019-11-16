@@ -70,7 +70,7 @@ FRIBIDI_ENTRY FriBidiStrIndex fribidi_charset_to_unicode (
  * Returns: The length of the new string.
  */
 FRIBIDI_ENTRY FriBidiStrIndex fribidi_unicode_to_charset (
-  FriBidiCharSet char_set,	/* character set to conver to */
+  FriBidiCharSet char_set,	/* character set to convert to */
   const FriBidiChar *us,	/* input Unicode string */
   FriBidiStrIndex len,		/* input string length */
   char *s			/* output string encoded in char_set */

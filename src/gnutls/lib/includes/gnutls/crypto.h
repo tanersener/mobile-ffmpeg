@@ -92,6 +92,20 @@ gnutls_aead_cipher_encryptv(gnutls_aead_cipher_hd_t handle,
 			    const giovec_t *iov, int iovcnt,
 			    void *ctext, size_t *ctext_len);
 
+int
+gnutls_aead_cipher_encryptv2(gnutls_aead_cipher_hd_t handle,
+			     const void *nonce, size_t nonce_len,
+			     const giovec_t *auth_iov, int auth_iovcnt,
+			     const giovec_t *iov, int iovcnt,
+			     void *tag, size_t *tag_size);
+
+int
+gnutls_aead_cipher_decryptv2(gnutls_aead_cipher_hd_t handle,
+			     const void *nonce, size_t nonce_len,
+			     const giovec_t *auth_iov, int auth_iovcnt,
+			     const giovec_t *iov, int iovcnt,
+			     void *tag, size_t tag_size);
+
 void gnutls_aead_cipher_deinit(gnutls_aead_cipher_hd_t handle);
 
 /* Hash - MAC API */
@@ -112,6 +126,7 @@ unsigned gnutls_hmac_get_len(gnutls_mac_algorithm_t algorithm) __GNUTLS_CONST__;
 int gnutls_hmac_fast(gnutls_mac_algorithm_t algorithm,
 		     const void *key, size_t keylen,
 		     const void *text, size_t textlen, void *digest);
+gnutls_hmac_hd_t gnutls_hmac_copy(gnutls_hmac_hd_t handle);
 
 int gnutls_hash_init(gnutls_hash_hd_t * dig,
 		     gnutls_digest_algorithm_t algorithm);
@@ -121,6 +136,7 @@ void gnutls_hash_deinit(gnutls_hash_hd_t handle, void *digest);
 unsigned gnutls_hash_get_len(gnutls_digest_algorithm_t algorithm) __GNUTLS_CONST__;
 int gnutls_hash_fast(gnutls_digest_algorithm_t algorithm,
 		     const void *text, size_t textlen, void *digest);
+gnutls_hash_hd_t gnutls_hash_copy(gnutls_hash_hd_t handle);
 
 /* register ciphers */
 
@@ -186,7 +202,8 @@ gnutls_crypto_register_cipher(gnutls_cipher_algorithm_t algorithm,
 			      gnutls_cipher_setiv_func setiv,
 			      gnutls_cipher_encrypt_func encrypt,
 			      gnutls_cipher_decrypt_func decrypt,
-			      gnutls_cipher_deinit_func deinit);
+			      gnutls_cipher_deinit_func deinit)
+			      _GNUTLS_GCC_ATTR_DEPRECATED;
 
 int
 gnutls_crypto_register_aead_cipher(gnutls_cipher_algorithm_t algorithm,
@@ -195,7 +212,8 @@ gnutls_crypto_register_aead_cipher(gnutls_cipher_algorithm_t algorithm,
 			      gnutls_cipher_setkey_func setkey,
 			      gnutls_cipher_aead_encrypt_func aead_encrypt,
 			      gnutls_cipher_aead_decrypt_func aead_decrypt,
-			      gnutls_cipher_deinit_func deinit);
+			      gnutls_cipher_deinit_func deinit)
+			      _GNUTLS_GCC_ATTR_DEPRECATED;
 
 typedef int (*gnutls_mac_init_func) (gnutls_mac_algorithm_t, void **ctx);
 typedef int (*gnutls_mac_setkey_func) (void *ctx, const void *key, size_t keysize);
@@ -206,6 +224,7 @@ typedef void (*gnutls_mac_deinit_func) (void *ctx);
 typedef int (*gnutls_mac_fast_func) (gnutls_mac_algorithm_t, const void *nonce,
 		     size_t nonce_size, const void *key, size_t keysize,
 		     const void *text, size_t textsize, void *digest);
+typedef void *(*gnutls_mac_copy_func) (const void *ctx);
 
 int
 gnutls_crypto_register_mac(gnutls_mac_algorithm_t mac,
@@ -216,7 +235,8 @@ gnutls_crypto_register_mac(gnutls_mac_algorithm_t mac,
 			   gnutls_mac_hash_func hash,
 			   gnutls_mac_output_func output,
 			   gnutls_mac_deinit_func deinit,
-			   gnutls_mac_fast_func hash_fast);
+			   gnutls_mac_fast_func hash_fast)
+			   _GNUTLS_GCC_ATTR_DEPRECATED;
 
 typedef int (*gnutls_digest_init_func) (gnutls_digest_algorithm_t, void **ctx);
 typedef int (*gnutls_digest_hash_func) (void *ctx, const void *text, size_t textsize);
@@ -224,6 +244,7 @@ typedef int (*gnutls_digest_output_func) (void *src_ctx, void *digest, size_t di
 typedef void (*gnutls_digest_deinit_func) (void *ctx);
 typedef int (*gnutls_digest_fast_func) (gnutls_digest_algorithm_t,
 		     const void *text, size_t textsize, void *digest);
+typedef void *(*gnutls_digest_copy_func) (const void *ctx);
 
 int
 gnutls_crypto_register_digest(gnutls_digest_algorithm_t digest,
@@ -232,7 +253,8 @@ gnutls_crypto_register_digest(gnutls_digest_algorithm_t digest,
 			   gnutls_digest_hash_func hash,
 			   gnutls_digest_output_func output,
 			   gnutls_digest_deinit_func deinit,
-			   gnutls_digest_fast_func hash_fast);
+			   gnutls_digest_fast_func hash_fast)
+			   _GNUTLS_GCC_ATTR_DEPRECATED;
 
 /* RSA-PKCS#1 1.5 helper functions */
 int

@@ -189,6 +189,7 @@ INSTANTIATE_TEST_CASE_P(AVX2, PixelProjErrorTest,
 
 }  // namespace pickrst_test_lowbd
 
+#if CONFIG_AV1_HIGHBITDEPTH
 namespace pickrst_test_highbd {
 static const int kIterations = 100;
 
@@ -355,3 +356,4 @@ INSTANTIATE_TEST_CASE_P(AVX2, PixelProjHighbdErrorTest,
 #endif  // HAVE_AVX2
 
 }  // namespace pickrst_test_highbd
+#endif  // CONFIG_AV1_HIGHBITDEPTH

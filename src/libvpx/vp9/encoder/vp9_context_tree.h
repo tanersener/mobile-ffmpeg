@@ -91,6 +91,9 @@ typedef struct PC_TREE {
     struct PC_TREE *split[4];
     PICK_MODE_CONTEXT *leaf_split[4];
   };
+  // Obtained from a simple motion search. Used by the ML based partition search
+  // speed feature.
+  MV mv;
 } PC_TREE;
 
 void vp9_setup_pc_tree(struct VP9Common *cm, struct ThreadData *td);

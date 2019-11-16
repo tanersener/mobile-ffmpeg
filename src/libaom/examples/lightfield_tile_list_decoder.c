@@ -55,7 +55,7 @@ static void write_tile_yuv1d(aom_codec_ctx_t *codec, const aom_image_t *img,
     die_codec(codec, "Failed to get the tile size");
   const unsigned int tile_width = tile_size >> 16;
   const unsigned int tile_height = tile_size & 65535;
-  const uint8_t output_frame_width_in_tiles = img->d_w / tile_width;
+  const uint32_t output_frame_width_in_tiles = img->d_w / tile_width;
 
   unsigned int tile_count = 0;
   if (aom_codec_control(codec, AV1D_GET_TILE_COUNT, &tile_count))

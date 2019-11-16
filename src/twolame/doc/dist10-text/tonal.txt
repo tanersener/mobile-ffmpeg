@@ -2,18 +2,6 @@
  * ISO MPEG Audio Subgroup Software Simulation Group (1996)
  * ISO 13818-3 MPEG-2 Audio Encoder - Lower Sampling Frequency Extension
  *
- * $Id$
- *
- * $Log$
- * Revision 1.1  2005/11/15 16:04:26  nhumfrey
- * Changed suffix for files.
- *
- * Revision 1.1.1.1  2005/04/15 01:10:20  nhumfrey
- * Initial import.
- *
- * Revision 1.1  1996/02/14 04:04:23  rowlands
- * Initial revision
- *
  * Received from Mike Coleman
  **********************************************************************/
 /**********************************************************************
@@ -50,11 +38,11 @@
  * 2/12/92  Masahiro Iwadare    Fixed some potential bugs in          *
  *          Davis Pan           subsampling()                         *
  * 2/25/92  Masahiro Iwadare    Fixed some more potential bugs        *
- * 6/24/92  Tan Ah Peng         Modified window for FFT               * 
+ * 6/24/92  Tan Ah Peng         Modified window for FFT               *
  *                              (denominator N-1 to N)                *
  *                              Updated all critical band rate &      *
  *                              absolute threshold tables and critical*
- *                              boundaries for use with Layer I & II  *  
+ *                              boundaries for use with Layer I & II  *
  *                              Corrected boundary limits for tonal   *
  *                              component computation                 *
  *                              Placement of non-tonal component at   *

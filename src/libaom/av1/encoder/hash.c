@@ -14,9 +14,9 @@
 static void crc_calculator_process_data(CRC_CALCULATOR *p_crc_calculator,
                                         uint8_t *pData, uint32_t dataLength) {
   for (uint32_t i = 0; i < dataLength; i++) {
-    const uint8_t index =
+    const uint8_t index = (uint8_t)(
         (p_crc_calculator->remainder >> (p_crc_calculator->bits - 8)) ^
-        pData[i];
+        pData[i]);
     p_crc_calculator->remainder <<= 8;
     p_crc_calculator->remainder ^= p_crc_calculator->table[index];
   }

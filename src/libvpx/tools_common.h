@@ -145,8 +145,6 @@ const VpxInterface *get_vpx_decoder_by_index(int i);
 const VpxInterface *get_vpx_decoder_by_name(const char *name);
 const VpxInterface *get_vpx_decoder_by_fourcc(uint32_t fourcc);
 
-// TODO(dkovalev): move this function to vpx_image.{c, h}, so it will be part
-// of vpx_image_t support
 int vpx_img_plane_width(const vpx_image_t *img, int plane);
 int vpx_img_plane_height(const vpx_image_t *img, int plane);
 void vpx_img_write(const vpx_image_t *img, FILE *file);
@@ -154,11 +152,28 @@ int vpx_img_read(vpx_image_t *img, FILE *file);
 
 double sse_to_psnr(double samples, double peak, double mse);
 
+#if CONFIG_ENCODERS
+int read_frame(struct VpxInputContext *input_ctx, vpx_image_t *img);
+int file_is_y4m(const char detect[4]);
+int fourcc_is_ivf(const char detect[4]);
+void open_input_file(struct VpxInputContext *input);
+void close_input_file(struct VpxInputContext *input);
+#endif
+
 #if CONFIG_VP9_HIGHBITDEPTH
 void vpx_img_upshift(vpx_image_t *dst, vpx_image_t *src, int input_shift);
 void vpx_img_downshift(vpx_image_t *dst, vpx_image_t *src, int down_shift);
 void vpx_img_truncate_16_to_8(vpx_image_t *dst, vpx_image_t *src);
 #endif
+
+int compare_img(const vpx_image_t *const img1, const vpx_image_t *const img2);
+#if CONFIG_VP9_HIGHBITDEPTH
+void find_mismatch_high(const vpx_image_t *const img1,
+                        const vpx_image_t *const img2, int yloc[4], int uloc[4],
+                        int vloc[4]);
+#endif
+void find_mismatch(const vpx_image_t *const img1, const vpx_image_t *const img2,
+                   int yloc[4], int uloc[4], int vloc[4]);
 
 #ifdef __cplusplus
 } /* extern "C" */

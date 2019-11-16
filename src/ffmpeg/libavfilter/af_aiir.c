@@ -57,6 +57,7 @@ typedef struct AudioIIRContext {
     const AVClass *class;
     char *a_str, *b_str, *g_str;
     double dry_gain, wet_gain;
+    double mix;
     int format;
     int process;
     int precision;
@@ -124,6 +125,7 @@ static int iir_ch_## name(AVFilterContext *ctx, void *arg, int ch, int nb_jobs) 
     AudioIIRContext *s = ctx->priv;                                     \
     const double ig = s->dry_gain;                                      \
     const double og = s->wet_gain;                                      \
+    const double mix = s->mix;                                          \
     ThreadData *td = arg;                                               \
     AVFrame *in = td->in, *out = td->out;                               \
     const type *src = (const type *)in->extended_data[ch];              \
@@ -133,6 +135,7 @@ static int iir_ch_## name(AVFilterContext *ctx, void *arg, int ch, int nb_jobs) 
     const int nb_b = s->iir[ch].nb_ab[1];                               \
     const double *a = s->iir[ch].ab[0];                                 \
     const double *b = s->iir[ch].ab[1];                                 \
+    const double g = s->iir[ch].g;                                      \
     int *clippings = &s->iir[ch].clippings;                             \
     type *dst = (type *)out->extended_data[ch];                         \
     int n;                                                              \
@@ -151,7 +154,8 @@ static int iir_ch_## name(AVFilterContext *ctx, void *arg, int ch, int nb_jobs) 
             sample -= a[x] * oc[x];                                     \
                                                                         \
         oc[0] = sample;                                                 \
-        sample *= og;                                                   \
+        sample *= og * g;                                               \
+        sample = sample * mix + ic[0] * (1. - mix);                     \
         if (need_clipping && sample < min) {                            \
             (*clippings)++;                                             \
             dst[n] = min;                                               \
@@ -177,11 +181,13 @@ static int iir_ch_serial_## name(AVFilterContext *ctx, void *arg, int ch, int nb
     AudioIIRContext *s = ctx->priv;                                     \
     const double ig = s->dry_gain;                                      \
     const double og = s->wet_gain;                                      \
+    const double mix = s->mix;                                          \
     ThreadData *td = arg;                                               \
     AVFrame *in = td->in, *out = td->out;                               \
     const type *src = (const type *)in->extended_data[ch];              \
     type *dst = (type *)out->extended_data[ch];                         \
     IIRChannel *iir = &s->iir[ch];                                      \
+    const double g = iir->g;                                            \
     int *clippings = &iir->clippings;                                   \
     int nb_biquads = (FFMAX(iir->nb_ab[0], iir->nb_ab[1]) + 1) / 2;     \
     int n, i;                                                           \
@@ -205,8 +211,9 @@ static int iir_ch_serial_## name(AVFilterContext *ctx, void *arg, int ch, int nb
             i1 = src[n];                                                \
             o2 = o1;                                                    \
             o1 = o0;                                                    \
-            o0 *= og;                                                   \
+            o0 *= og * g;                                               \
                                                                         \
+            o0 = o0 * mix + (1. - mix) * sample;                        \
             if (need_clipping && o0 < min) {                            \
                 (*clippings)++;                                         \
                 dst[n] = min;                                           \
@@ -714,8 +721,9 @@ static void draw_line(AVFrame *out, int x0, int y0, int x1, int y1, uint32_t col
 static void draw_response(AVFilterContext *ctx, AVFrame *out)
 {
     AudioIIRContext *s = ctx->priv;
-    float *mag, *phase, min = FLT_MAX, max = FLT_MIN;
-    int prev_ymag = -1, prev_yphase = -1;
+    float *mag, *phase, *delay, min = FLT_MAX, max = FLT_MIN;
+    float min_delay = FLT_MAX, max_delay = FLT_MIN;
+    int prev_ymag = -1, prev_yphase = -1, prev_ydelay = -1;
     char text[32];
     int ch, i, x;
 
@@ -723,7 +731,8 @@ static void draw_response(AVFilterContext *ctx, AVFrame *out)
 
     phase = av_malloc_array(s->w, sizeof(*phase));
     mag = av_malloc_array(s->w, sizeof(*mag));
-    if (!mag || !phase)
+    delay = av_malloc_array(s->w, sizeof(*delay));
+    if (!mag || !phase || !delay)
         goto end;
 
     ch = av_clip(s->ir_channel, 0, s->channels - 1);
@@ -788,23 +797,39 @@ static void draw_response(AVFilterContext *ctx, AVFrame *out)
         max = fmaxf(max, mag[i]);
     }
 
+    for (i = 0; i < s->w - 1; i++) {
+        float dw =  M_PI / (s->w - 1);
+
+        delay[i] = -(phase[i + 1] - phase[i]) / dw;
+        min_delay = fminf(min_delay, delay[i]);
+        max_delay = fmaxf(max_delay, delay[i]);
+    }
+
+    delay[i] = delay[i - 1];
+
     for (i = 0; i < s->w; i++) {
         int ymag = mag[i] / max * (s->h - 1);
+        int ydelay = (delay[i] - min_delay) / (max_delay - min_delay) * (s->h - 1);
         int yphase = (0.5 * (1. + phase[i] / M_PI)) * (s->h - 1);
 
         ymag = s->h - 1 - av_clip(ymag, 0, s->h - 1);
         yphase = s->h - 1 - av_clip(yphase, 0, s->h - 1);
+        ydelay = s->h - 1 - av_clip(ydelay, 0, s->h - 1);
 
         if (prev_ymag < 0)
             prev_ymag = ymag;
         if (prev_yphase < 0)
             prev_yphase = yphase;
+        if (prev_ydelay < 0)
+            prev_ydelay = ydelay;
 
         draw_line(out, i,   ymag, FFMAX(i - 1, 0),   prev_ymag, 0xFFFF00FF);
         draw_line(out, i, yphase, FFMAX(i - 1, 0), prev_yphase, 0xFF00FF00);
+        draw_line(out, i, ydelay, FFMAX(i - 1, 0), prev_ydelay, 0xFF00FFFF);
 
         prev_ymag   = ymag;
         prev_yphase = yphase;
+        prev_ydelay = ydelay;
     }
 
     if (s->w > 400 && s->h > 100) {
@@ -815,9 +840,18 @@ static void draw_response(AVFilterContext *ctx, AVFrame *out)
         drawtext(out, 2, 12, "Min Magnitude:", 0xDDDDDDDD);
         snprintf(text, sizeof(text), "%.2f", min);
         drawtext(out, 15 * 8 + 2, 12, text, 0xDDDDDDDD);
+
+        drawtext(out, 2, 22, "Max Delay:", 0xDDDDDDDD);
+        snprintf(text, sizeof(text), "%.2f", max_delay);
+        drawtext(out, 11 * 8 + 2, 22, text, 0xDDDDDDDD);
+
+        drawtext(out, 2, 32, "Min Delay:", 0xDDDDDDDD);
+        snprintf(text, sizeof(text), "%.2f", min_delay);
+        drawtext(out, 11 * 8 + 2, 32, text, 0xDDDDDDDD);
     }
 
 end:
+    av_free(delay);
     av_free(phase);
     av_free(mag);
 }
@@ -1074,6 +1108,7 @@ static const AVOption aiir_options[] = {
     { "flt", "single-precision floating-point",    0,                AV_OPT_TYPE_CONST,  {.i64=1},     0, 0, AF, "precision" },
     { "i32", "32-bit integers",                    0,                AV_OPT_TYPE_CONST,  {.i64=2},     0, 0, AF, "precision" },
     { "i16", "16-bit integers",                    0,                AV_OPT_TYPE_CONST,  {.i64=3},     0, 0, AF, "precision" },
+    { "mix", "set mix",                            OFFSET(mix),      AV_OPT_TYPE_DOUBLE, {.dbl=1},     0, 1, AF },
     { "response", "show IR frequency response",    OFFSET(response), AV_OPT_TYPE_BOOL,   {.i64=0},     0, 1, VF },
     { "channel", "set IR channel to display frequency response", OFFSET(ir_channel), AV_OPT_TYPE_INT, {.i64=0}, 0, 1024, VF },
     { "size",   "set video size",                  OFFSET(w),        AV_OPT_TYPE_IMAGE_SIZE, {.str = "hd720"}, 0, 0, VF },

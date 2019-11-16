@@ -625,12 +625,27 @@ EXTRA_DIST = \
 	func.sgml		\
 	$(NULL)
 
+@USEDOCBOOK_FALSE@maintainerdoccleanfiles = \
+@USEDOCBOOK_FALSE@	$(BUILT_DOCS)		\
+@USEDOCBOOK_FALSE@	$(NULL)
+
+@USEDOCBOOK_TRUE@maintainerdoccleanfiles = \
+@USEDOCBOOK_TRUE@	$(NULL)
+
+@USEDOCBOOK_FALSE@cleandocfiles = \
+@USEDOCBOOK_FALSE@	$(NULL)
+
+@USEDOCBOOK_TRUE@cleandocfiles = \
+@USEDOCBOOK_TRUE@	$(BUILT_DOCS)		\
+@USEDOCBOOK_TRUE@	$(NULL)
+
 MAINTAINERCLEANFILES = \
-	$(DOC_FUNCS_SGML)	\
+	$(DOC_FUNCS_SGML)		\
+	$(maintainerdoccleanfiles)	\
 	$(NULL)
 
 CLEANFILES = \
-	$(BUILT_DOCS)		\
+	$(cleandocfiles)	\
 	$(LOCAL_SGML_FILES)	\
 	confdir.sgml		\
 	func.refs		\

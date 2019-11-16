@@ -212,12 +212,15 @@ INSTANTIATE_TEST_CASE_P(
     ::testing::Values(av1_apply_selfguided_restoration_avx2));
 #endif
 
-#if HAVE_NEON
+// TODO(b/141858830,b/141859709): neon is currently disabled due to use of
+// uninitialized memory.
+#if 0  // HAVE_NEON
 INSTANTIATE_TEST_CASE_P(
     NEON, AV1SelfguidedFilterTest,
     ::testing::Values(av1_apply_selfguided_restoration_neon));
 #endif
 
+#if CONFIG_AV1_HIGHBITDEPTH
 // Test parameter list:
 //  <tst_fun_, bit_depth>
 typedef tuple<SgrFunc, int> HighbdFilterTestParam;
@@ -406,11 +409,14 @@ INSTANTIATE_TEST_CASE_P(
     ::testing::Combine(::testing::Values(av1_apply_selfguided_restoration_avx2),
                        ::testing::ValuesIn(highbd_params_avx2)));
 #endif
-#if HAVE_NEON
+// TODO(b/141858830,b/141859709): neon is currently disabled due to use of
+// uninitialized memory.
+#if 0  // HAVE_NEON
 const int highbd_params_neon[] = { 8, 10, 12 };
 INSTANTIATE_TEST_CASE_P(
     NEON, AV1HighbdSelfguidedFilterTest,
     ::testing::Combine(::testing::Values(av1_apply_selfguided_restoration_neon),
                        ::testing::ValuesIn(highbd_params_neon)));
 #endif
+#endif  // CONFIG_AV1_HIGHBITDEPTH
 }  // namespace

@@ -26,6 +26,11 @@ if ! test -z "${VALGRIND}"; then
 fi
 PROG=./cipher-override${EXEEXT}
 
+# we are explicitly unsetting this variable, because we want
+# the "production" checks to be triggered, not the ones in the
+# test suite.
+
+unset GNUTLS_TEST_SUITE_RUN
 GNUTLS_NO_EXPLICIT_INIT=1 ${VALGRIND} ${PROG}
 ret=$?
 if test $ret != 0; then

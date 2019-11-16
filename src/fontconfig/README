@@ -1,11 +1,36 @@
                               Fontconfig
              Font configuration and customization library
-                      Version 2.13.91 (2.14 RC1)
-                              2019-06-10
+                      Version 2.13.92 (2.14 RC2)
+                              2019-08-09
 
 
 Check INSTALL for compilation and installation instructions.
 Report bugs to https://gitlab.freedesktop.org/fontconfig/fontconfig/issues/new.
+
+2.13.92 (2.14 RC2)
+
+Akira TAGOH (18):
+      Fix a typo on masking face id
+      Don't clean up pre-built docs if no docbook installed.
+      Fix obtaining real path from pre-defined names for Win32
+      Fix a crash when running with FC_DEBUG=256
+      Improve the performance a bit
+      Fix a typo
+      Add English name first into a cache
+      FcConfigParseAndLoad*() should returns false on config errors
+      Clean up temporary directory for tests
+      Add docs for missing properties
+      Fix the fail on fc-cache
+      Fix memory leaks
+      Fix a memory leak in FcFreeTypeQuery*()
+      Add 35-lang-normalize.conf
+      Add FC_FONT_HAS_HINT property to see if font has hinting or not.
+      Fix failing the check of prep table in some fonts
+      Fix the fails of make check when SOURCE_DATE_EPOCH is set
+      Improve the performance a bit
+
+Egmont Koblinger (1):
+      Fix the linear interpolation during weight mapping
 
 2.13.91 (2.14 RC1)
 

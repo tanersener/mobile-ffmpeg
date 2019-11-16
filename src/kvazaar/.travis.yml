@@ -1,0 +1,53 @@
+language: c
+
+# Use container based infrastructure.
+sudo: false
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - autoconf
+      - gcc-4.8
+      - libtool
+      - valgrind
+      - yasm
+
+matrix:
+  fast_finish: true
+
+  include:
+    - compiler: clang
+      env: KVZ_TEST_VALGRIND=1
+
+    - compiler: clang
+      env: CFLAGS='-fsanitize=thread'
+
+    - compiler: clang
+      env: CFLAGS='-fsanitize=undefined -fno-sanitize-recover=all -fno-sanitize=alignment'
+
+    - compiler: gcc-4.8
+      env: CFLAGS='-fsanitize=address'
+
+    # We have some Mac specific code and Mac sometimes has odd build issues.
+    - os: osx
+      compiler: clang  # gcc is actually clang on Travis OS X
+      install: true
+      script:
+        - ./autogen.sh
+        - ./configure --enable-werror || (cat config.log && false)
+        - make --jobs=2 V=1
+        - make check TESTS=kvazaar_tests
+
+install: bash .travis-install.bash
+
+script:
+  - ./autogen.sh
+  - ./configure --enable-werror || (cat config.log && false)
+  - make --jobs=2 V=1
+  - make check VERBOSE=1
+
+after_script:
+  # Disable errors to work around Travis not knowing how to fix their stuff.
+  - set +e

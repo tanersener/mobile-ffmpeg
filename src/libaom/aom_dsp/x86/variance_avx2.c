@@ -28,7 +28,7 @@ static INLINE __m128i mm256_add_hi_lo_epi32(const __m256i val) {
 static INLINE void variance_kernel_avx2(const __m256i src, const __m256i ref,
                                         __m256i *const sse,
                                         __m256i *const sum) {
-  const __m256i adj_sub = _mm256_set1_epi16(0xff01);  // (1,-1)
+  const __m256i adj_sub = _mm256_set1_epi16((short)0xff01);  // (1,-1)
 
   // unpack into pairs of source and reference values
   const __m256i src_ref0 = _mm256_unpacklo_epi8(src, ref);
