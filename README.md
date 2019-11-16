@@ -453,22 +453,22 @@ CPU optimizations (`ASM`) are enabled for most of the external libraries. Detail
 
 A more detailed documentation is available at [Wiki](https://github.com/tanersener/mobile-ffmpeg/wiki).
 
-## Contributors
+### 8. Contributors
 
-### Code Contributors
+#### 8.1 Code Contributors
 
 This project exists thanks to all the people who contribute. [[Contribute](CONTRIBUTING.md)].
 <a href="https://github.com/tanersener/mobile-ffmpeg/graphs/contributors"><img src="https://opencollective.com/mobile-ffmpeg/contributors.svg?width=890&button=false" /></a>
 
-### Financial Contributors
+#### 8.2 Financial Contributors
 
 Become a financial contributor and help us sustain our community. [[Contribute](https://opencollective.com/mobile-ffmpeg/contribute)]
 
-#### Individuals
+##### 8.2.1 Individuals
 
 <a href="https://opencollective.com/mobile-ffmpeg"><img src="https://opencollective.com/mobile-ffmpeg/individuals.svg?width=890"></a>
 
-#### Organizations
+##### 8.2.2 Organizations
 
 Support this project with your organization. Your logo will show up here with a link to your website. [[Contribute](https://opencollective.com/mobile-ffmpeg/contribute)]
 
@@ -483,7 +483,7 @@ Support this project with your organization. Your logo will show up here with a 
 <a href="https://opencollective.com/mobile-ffmpeg/organization/8/website"><img src="https://opencollective.com/mobile-ffmpeg/organization/8/avatar.svg"></a>
 <a href="https://opencollective.com/mobile-ffmpeg/organization/9/website"><img src="https://opencollective.com/mobile-ffmpeg/organization/9/avatar.svg"></a>
 
-### 8. License
+### 9. License
 
 This project is licensed under the LGPL v3.0. However, if source code is built using optional `--enable-gpl` flag or 
 prebuilt binaries with `-gpl` postfix are used then MobileFFmpeg is subject to the GPL v3.0 license.
@@ -501,11 +501,11 @@ In test applications; embedded fonts are licensed under the [SIL Open Font Licen
 
 Please visit [License](https://github.com/tanersener/mobile-ffmpeg/wiki/License) page for the details.
 
-### 9. Contributing
+### 10. Contributing
 
 If you have any recommendations or ideas to improve it, please feel free to submit issues or pull requests. Any help is appreciated.
 
-### 10. See Also
+### 11. See Also
 
 - [libav gas-preprocessor](https://github.com/libav/gas-preprocessor/raw/master/gas-preprocessor.pl)
 - [FFmpeg API Documentation](https://ffmpeg.org/doxygen/4.0/index.html)
