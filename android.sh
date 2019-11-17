@@ -826,14 +826,14 @@ if [[ ! -z ${ANDROID_ARCHITECTURES} ]]; then
 
     echo -e -n "\n\nCreating Android archive under prebuilt/android-aar: "
 
-    ./gradlew clean build 1>>${BASEDIR}/build.log 2>&1
+    ./gradlew clean app:assembleRelease app:testReleaseUnitTest 1>>${BASEDIR}/build.log 2>&1
 
     if [ $? -ne 0 ]; then
         echo -e "failed\n"
         exit 1
     fi
 
-    cp ${BASEDIR}/android/app/build/outputs/aar/mobile-ffmpeg.aar ${MOBILE_FFMPEG_AAR}/mobile-ffmpeg.aar 1>>${BASEDIR}/build.log 2>&1
+    cp ${BASEDIR}/android/app/build/outputs/aar/mobile-ffmpeg-release.aar ${MOBILE_FFMPEG_AAR}/mobile-ffmpeg.aar 1>>${BASEDIR}/build.log 2>&1
 
     if [ $? -ne 0 ]; then
         echo -e "failed\n"
