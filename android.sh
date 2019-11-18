@@ -82,7 +82,7 @@ without any external libraries enabled. Options can be used to disable ABIs and/
 Please note that GPL libraries (external libraries with GPL license) need --enable-gpl flag to be set explicitly. \
 When compilation ends an Android Archive (AAR) file is created with enabled platforms inside.\n"
 
-    echo -e "Usage: ./"$COMMAND" [OPTION]...\n"   
+    echo -e "Usage: ./"$COMMAND" [OPTION]...\n"
 
     echo -e "Specify environment variables as VARIABLE=VALUE to override default build options.\n"
 
@@ -826,7 +826,7 @@ if [[ ! -z ${ANDROID_ARCHITECTURES} ]]; then
 
     echo -e -n "\n\nCreating Android archive under prebuilt/android-aar: "
 
-    ./gradlew clean app:assembleRelease app:testReleaseUnitTest 1>>${BASEDIR}/build.log 2>&1
+    ./gradlew app:clean app:assembleRelease app:testReleaseUnitTest 1>>${BASEDIR}/build.log 2>&1
 
     if [ $? -ne 0 ]; then
         echo -e "failed\n"
