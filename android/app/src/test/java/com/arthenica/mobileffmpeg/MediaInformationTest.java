@@ -22,8 +22,7 @@ package com.arthenica.mobileffmpeg;
 import com.arthenica.mobileffmpeg.util.Pair;
 import com.arthenica.mobileffmpeg.util.Trio;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 public class MediaInformationTest {
@@ -82,16 +81,16 @@ public class MediaInformationTest {
 
     @Test
     public void parseVideoStreamDisplayAspectRatio() {
-        Assert.assertEquals(null, MediaInformationParser.parseVideoStreamDisplayAspectRatio(""));
-        Assert.assertEquals(null, MediaInformationParser.parseVideoStreamDisplayAspectRatio("544x184"));
+        Assert.assertNull(MediaInformationParser.parseVideoStreamDisplayAspectRatio(""));
+        Assert.assertNull(MediaInformationParser.parseVideoStreamDisplayAspectRatio("544x184"));
         Assert.assertEquals("640:427", MediaInformationParser.parseVideoStreamDisplayAspectRatio("2560x1708 [SAR 1:1 DAR 640:427]"));
         Assert.assertEquals("8:9", MediaInformationParser.parseVideoStreamDisplayAspectRatio("3840x4320 [SAR 1:1 DAR 8:9]"));
     }
 
     @Test
     public void parseVideoStreamSampleAspectRatio() {
-        Assert.assertEquals(null, MediaInformationParser.parseVideoStreamSampleAspectRatio(""));
-        Assert.assertEquals(null, MediaInformationParser.parseVideoStreamSampleAspectRatio("544x184"));
+        Assert.assertNull(MediaInformationParser.parseVideoStreamSampleAspectRatio(""));
+        Assert.assertNull(MediaInformationParser.parseVideoStreamSampleAspectRatio("544x184"));
         Assert.assertEquals("1:1", MediaInformationParser.parseVideoStreamSampleAspectRatio("2560x1708 [SAR 1:1 DAR 640:427]"));
         Assert.assertEquals("1:1", MediaInformationParser.parseVideoStreamSampleAspectRatio("3840x4320 [SAR 1:1 DAR 8:9]"));
     }
