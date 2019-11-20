@@ -30,7 +30,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 
-import androidx.appcompat.app.ActionBar;
 import androidx.core.app.ActivityCompat;
 import androidx.viewpager.widget.PagerTabStrip;
 import androidx.viewpager.widget.ViewPager;
@@ -96,12 +95,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
-
-        ActionBar supportActionBar = getSupportActionBar();
-        if (supportActionBar != null) {
-            supportActionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-            supportActionBar.setCustomView(R.layout.action_bar);
-        }
 
         PagerTabStrip pagerTabStrip = findViewById(R.id.pagerTabStrip);
         if (pagerTabStrip != null) {
