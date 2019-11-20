@@ -40,7 +40,9 @@ import com.arthenica.mobileffmpeg.LogCallback;
 import com.arthenica.mobileffmpeg.LogMessage;
 import com.arthenica.mobileffmpeg.Statistics;
 import com.arthenica.mobileffmpeg.StatisticsCallback;
+import com.arthenica.mobileffmpeg.util.DialogUtil;
 import com.arthenica.mobileffmpeg.util.ExecuteCallback;
+import com.arthenica.mobileffmpeg.util.ResourcesUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -60,54 +62,42 @@ public class SubtitleTabFragment extends Fragment {
         BURNING
     }
 
-    private MainActivity mainActivity;
     private VideoView videoView;
     private AlertDialog createProgressDialog;
     private AlertDialog burnProgressDialog;
     private Statistics statistics;
     private State state;
 
-    @Override
-    public View onCreateView(@NonNull final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_subtitle_tab, container, false);
+    public SubtitleTabFragment() {
+        super(R.layout.fragment_subtitle_tab);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if (getView() != null) {
-            View burnSubtitlesButton = getView().findViewById(R.id.burnSubtitlesButton);
-            burnSubtitlesButton.setOnClickListener(new View.OnClickListener() {
+        View burnSubtitlesButton = view.findViewById(R.id.burnSubtitlesButton);
+        burnSubtitlesButton.setOnClickListener(new View.OnClickListener() {
 
-                @Override
-                public void onClick(View v) {
-                    burnSubtitles();
-                }
-            });
+            @Override
+            public void onClick(View v) {
+                burnSubtitles();
+            }
+        });
 
-            videoView = getView().findViewById(R.id.videoPlayerFrame);
-        }
+        videoView = view.findViewById(R.id.videoPlayerFrame);
 
         state = State.IDLE;
     }
 
     @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-        if (isVisibleToUser) {
-            setActive();
-        }
+    public void onResume() {
+        super.onResume();
+        setActive();
     }
 
-    public void setMainActivity(MainActivity mainActivity) {
-        this.mainActivity = mainActivity;
-    }
-
-    public static SubtitleTabFragment newInstance(final MainActivity mainActivity) {
-        final SubtitleTabFragment fragment = new SubtitleTabFragment();
-        fragment.setMainActivity(mainActivity);
-        return fragment;
+    public static SubtitleTabFragment newInstance() {
+        return new SubtitleTabFragment();
     }
 
     public void enableLogCallback() {
@@ -139,9 +129,9 @@ public class SubtitleTabFragment extends Fragment {
     }
 
     public void burnSubtitles() {
-        final File image1File = new File(mainActivity.getCacheDir(), "colosseum.jpg");
-        final File image2File = new File(mainActivity.getCacheDir(), "pyramid.jpg");
-        final File image3File = new File(mainActivity.getCacheDir(), "tajmahal.jpg");
+        final File image1File = new File(requireContext().getCacheDir(), "colosseum.jpg");
+        final File image2File = new File(requireContext().getCacheDir(), "pyramid.jpg");
+        final File image3File = new File(requireContext().getCacheDir(), "tajmahal.jpg");
         final File videoFile = getVideoFile();
         final File videoWithSubtitlesFile = getVideoWithSubtitlesFile();
 
@@ -162,10 +152,10 @@ public class SubtitleTabFragment extends Fragment {
 
             showCreateProgressDialog();
 
-            mainActivity.resourceToFile(R.drawable.colosseum, image1File);
-            mainActivity.resourceToFile(R.drawable.pyramid, image2File);
-            mainActivity.resourceToFile(R.drawable.tajmahal, image3File);
-            mainActivity.rawResourceToFile(R.raw.subtitle, getSubtitleFile());
+            ResourcesUtil.resourceToFile(getResources(), R.drawable.colosseum, image1File);
+            ResourcesUtil.resourceToFile(getResources(), R.drawable.pyramid, image2File);
+            ResourcesUtil.resourceToFile(getResources(), R.drawable.tajmahal, image3File);
+            ResourcesUtil.rawResourceToFile(getResources(), R.raw.subtitle, getSubtitleFile());
 
             final String ffmpegCommand = Video.generateEncodeVideoScript(image1File.getAbsolutePath(), image2File.getAbsolutePath(), image3File.getAbsolutePath(), videoFile.getAbsolutePath(), "mpeg4", "");
 
@@ -221,13 +211,13 @@ public class SubtitleTabFragment extends Fragment {
                                                     Log.d(TAG, "Burn subtitles completed successfully; playing video.");
                                                     playVideo();
                                                 } else if (returnCode == RETURN_CODE_CANCEL) {
-                                                    Popup.show(mainActivity, "Burn subtitles operation cancelled.");
+                                                    Popup.show(requireContext(), "Burn subtitles operation cancelled.");
                                                     Log.e(TAG, "Burn subtitles operation cancelled");
                                                 } else if (returnCode == RETURN_CODE_MULTIPLE_EXECUTIONS_NOT_ALLOWED) {
-                                                    Popup.show(mainActivity, "Multiple burn subtitles operations not allowed.");
+                                                    Popup.show(requireContext(), "Multiple burn subtitles operations not allowed.");
                                                     Log.e(TAG, "Multiple burn subtitles operations not allowed");
                                                 } else {
-                                                    Popup.show(mainActivity, "Burn subtitles failed. Please check log for the details.");
+                                                    Popup.show(requireContext(), "Burn subtitles failed. Please check log for the details.");
                                                     Log.e(TAG, String.format("Burn subtitles failed with rc=%d", returnCode));
                                                 }
 
@@ -238,13 +228,13 @@ public class SubtitleTabFragment extends Fragment {
                                 }, burnSubtitlesCommand);
 
                             } else if (returnCode == RETURN_CODE_CANCEL) {
-                                Popup.show(mainActivity, "Create operation cancelled.");
+                                Popup.show(requireContext(), "Create operation cancelled.");
                                 Log.e(TAG, "Create operation cancelled");
                             } else if (returnCode == RETURN_CODE_MULTIPLE_EXECUTIONS_NOT_ALLOWED) {
-                                Popup.show(mainActivity, "Multiple create operations not allowed.");
+                                Popup.show(requireContext(), "Multiple create operations not allowed.");
                                 Log.e(TAG, "Multiple create operations not allowed");
                             } else {
-                                Popup.show(mainActivity, "Create video failed. Please check log for the details.");
+                                Popup.show(requireContext(), "Create video failed. Please check log for the details.");
                                 Log.e(TAG, String.format("Create failed with rc=%d", returnCode));
                             }
 
@@ -256,12 +246,12 @@ public class SubtitleTabFragment extends Fragment {
 
         } catch (IOException e) {
             Log.e(TAG, "Burn subtitles failed", e);
-            Popup.show(mainActivity, "Burn subtitles failed");
+            Popup.show(requireContext(), "Burn subtitles failed");
         }
     }
 
     protected void playVideo() {
-        MediaController mediaController = new MediaController(mainActivity);
+        MediaController mediaController = new MediaController(requireContext());
         mediaController.setAnchorView(videoView);
         videoView.setVideoURI(Uri.parse("file://" + getVideoWithSubtitlesFile().getAbsolutePath()));
         videoView.setMediaController(mediaController);
@@ -285,22 +275,22 @@ public class SubtitleTabFragment extends Fragment {
     }
 
     public File getSubtitleFile() {
-        return new File(mainActivity.getCacheDir(), "subtitle.srt");
+        return new File(requireContext().getCacheDir(), "subtitle.srt");
     }
 
     public File getVideoFile() {
-        return new File(mainActivity.getFilesDir(), "video.mp4");
+        return new File(requireContext().getFilesDir(), "video.mp4");
     }
 
     public File getVideoWithSubtitlesFile() {
-        return new File(mainActivity.getFilesDir(), "video-with-subtitles.mp4");
+        return new File(requireContext().getFilesDir(), "video-with-subtitles.mp4");
     }
 
     public void setActive() {
         Log.i(MainActivity.TAG, "Subtitle Tab Activated");
         enableLogCallback();
         enableStatisticsCallback();
-        Popup.show(mainActivity, Tooltip.SUBTITLE_TEST_TOOLTIP_TEXT);
+        Popup.show(requireContext(), Tooltip.SUBTITLE_TEST_TOOLTIP_TEXT);
     }
 
     protected void showCreateProgressDialog() {
@@ -309,7 +299,7 @@ public class SubtitleTabFragment extends Fragment {
         statistics = null;
         Config.resetStatistics();
 
-        createProgressDialog = mainActivity.createCancellableProgressDialog("Creating video", new View.OnClickListener() {
+        createProgressDialog = DialogUtil.createCancellableProgressDialog(requireContext(), "Creating video", new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
@@ -353,7 +343,7 @@ public class SubtitleTabFragment extends Fragment {
         statistics = null;
         Config.resetStatistics();
 
-        burnProgressDialog = mainActivity.createCancellableProgressDialog("Burning subtitles", new View.OnClickListener() {
+        burnProgressDialog = DialogUtil.createCancellableProgressDialog(requireContext(), "Burning subtitles", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 FFmpeg.cancel();

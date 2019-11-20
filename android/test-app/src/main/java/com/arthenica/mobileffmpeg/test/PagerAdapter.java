@@ -19,44 +19,45 @@
 
 package com.arthenica.mobileffmpeg.test;
 
+import android.content.Context;
+
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 
 public class PagerAdapter extends FragmentPagerAdapter {
-    private final MainActivity mainActivity;
-    private int numberOfTabs;
+    private static final int NUMBER_OF_TABS = 7;
 
-    PagerAdapter(final FragmentManager fragmentManager, final MainActivity mainActivity, final int numberOfTabs) {
-        super(fragmentManager, BEHAVIOR_SET_USER_VISIBLE_HINT);
+    private final Context context;
 
-        this.mainActivity = mainActivity;
-        this.numberOfTabs = numberOfTabs;
+    PagerAdapter(FragmentManager fragmentManager, Context context) {
+        super(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
+        this.context = context;
     }
 
     @Override
     public Fragment getItem(final int position) {
         switch (position) {
             case 0: {
-                return CommandTabFragment.newInstance(mainActivity);
+                return CommandTabFragment.newInstance();
             }
             case 1: {
-                return VideoTabFragment.newInstance(mainActivity);
+                return VideoTabFragment.newInstance();
             }
             case 2: {
-                return HttpsTabFragment.newInstance(mainActivity);
+                return HttpsTabFragment.newInstance();
             }
             case 3: {
-                return AudioTabFragment.newInstance(mainActivity);
+                return AudioTabFragment.newInstance();
             }
             case 4: {
-                return SubtitleTabFragment.newInstance(mainActivity);
+                return SubtitleTabFragment.newInstance();
             }
             case 5: {
-                return VidStabTabFragment.newInstance(mainActivity);
+                return VidStabTabFragment.newInstance();
             }
             case 6: {
-                return PipeTabFragment.newInstance(mainActivity);
+                return PipeTabFragment.newInstance();
             }
             default: {
                 return null;
@@ -66,32 +67,32 @@ public class PagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        return numberOfTabs;
+        return NUMBER_OF_TABS;
     }
 
     @Override
     public CharSequence getPageTitle(final int position) {
         switch (position) {
             case 0: {
-                return mainActivity.getString(R.string.command_tab);
+                return context.getString(R.string.command_tab);
             }
             case 1: {
-                return mainActivity.getString(R.string.video_tab);
+                return context.getString(R.string.video_tab);
             }
             case 2: {
-                return mainActivity.getString(R.string.https_tab);
+                return context.getString(R.string.https_tab);
             }
             case 3: {
-                return mainActivity.getString(R.string.audio_tab);
+                return context.getString(R.string.audio_tab);
             }
             case 4: {
-                return mainActivity.getString(R.string.subtitle_tab);
+                return context.getString(R.string.subtitle_tab);
             }
             case 5: {
-                return mainActivity.getString(R.string.vidstab_tab);
+                return context.getString(R.string.vidstab_tab);
             }
             case 6: {
-                return mainActivity.getString(R.string.pipe_tab);
+                return context.getString(R.string.pipe_tab);
             }
             default: {
                 return null;
