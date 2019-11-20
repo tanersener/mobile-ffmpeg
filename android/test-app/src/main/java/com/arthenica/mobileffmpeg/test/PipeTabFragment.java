@@ -24,9 +24,11 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,7 +43,9 @@ import com.arthenica.mobileffmpeg.LogMessage;
 import com.arthenica.mobileffmpeg.Statistics;
 import com.arthenica.mobileffmpeg.StatisticsCallback;
 import com.arthenica.mobileffmpeg.util.AsyncCatImageTask;
+import com.arthenica.mobileffmpeg.util.DialogUtil;
 import com.arthenica.mobileffmpeg.util.ExecuteCallback;
+import com.arthenica.mobileffmpeg.util.ResourcesUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -53,54 +57,42 @@ import static com.arthenica.mobileffmpeg.test.MainActivity.TAG;
 
 public class PipeTabFragment extends Fragment {
 
-    private MainActivity mainActivity;
     private VideoView videoView;
     private AlertDialog progressDialog;
     private Statistics statistics;
 
-    @Override
-    public View onCreateView(@NonNull final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_pipe_tab, container, false);
+    public PipeTabFragment() {
+        super(R.layout.fragment_pipe_tab);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if (getView() != null) {
-            View createButton = getView().findViewById(R.id.createButton);
-            if (createButton != null) {
-                createButton.setOnClickListener(new View.OnClickListener() {
+        View createButton = view.findViewById(R.id.createButton);
+        if (createButton != null) {
+            createButton.setOnClickListener(new View.OnClickListener() {
 
-                    @Override
-                    public void onClick(View v) {
-                        createVideo();
-                    }
-                });
-            }
-
-            videoView = getView().findViewById(R.id.videoPlayerFrame);
+                @Override
+                public void onClick(View v) {
+                    createVideo();
+                }
+            });
         }
 
-        progressDialog = mainActivity.createProgressDialog("Creating video");
+        videoView = view.findViewById(R.id.videoPlayerFrame);
+
+        progressDialog = DialogUtil.createProgressDialog(requireContext(), "Creating video");
     }
 
     @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-        if (isVisibleToUser) {
-            setActive();
-        }
+    public void onResume() {
+        super.onResume();
+        setActive();
     }
 
-    public void setMainActivity(MainActivity mainActivity) {
-        this.mainActivity = mainActivity;
-    }
-
-    public static PipeTabFragment newInstance(final MainActivity mainActivity) {
-        final PipeTabFragment fragment = new PipeTabFragment();
-        fragment.setMainActivity(mainActivity);
-        return fragment;
+    public static PipeTabFragment newInstance() {
+        return new PipeTabFragment();
     }
 
     public void enableLogCallback() {
@@ -137,14 +129,14 @@ public class PipeTabFragment extends Fragment {
     }
 
     public void createVideo() {
-        final File image1File = new File(mainActivity.getCacheDir(), "colosseum.jpg");
-        final File image2File = new File(mainActivity.getCacheDir(), "pyramid.jpg");
-        final File image3File = new File(mainActivity.getCacheDir(), "tajmahal.jpg");
+        final File image1File = new File(requireContext().getCacheDir(), "colosseum.jpg");
+        final File image2File = new File(requireContext().getCacheDir(), "pyramid.jpg");
+        final File image3File = new File(requireContext().getCacheDir(), "tajmahal.jpg");
         final File videoFile = getVideoFile();
 
-        String pipe1 = Config.registerNewFFmpegPipe(mainActivity);
-        String pipe2 = Config.registerNewFFmpegPipe(mainActivity);
-        String pipe3 = Config.registerNewFFmpegPipe(mainActivity);
+        String pipe1 = Config.registerNewFFmpegPipe(requireContext());
+        String pipe2 = Config.registerNewFFmpegPipe(requireContext());
+        String pipe3 = Config.registerNewFFmpegPipe(requireContext());
 
         try {
 
@@ -159,9 +151,9 @@ public class PipeTabFragment extends Fragment {
 
             showProgressDialog();
 
-            mainActivity.resourceToFile(R.drawable.colosseum, image1File);
-            mainActivity.resourceToFile(R.drawable.pyramid, image2File);
-            mainActivity.resourceToFile(R.drawable.tajmahal, image3File);
+            ResourcesUtil.resourceToFile(getResources(), R.drawable.colosseum, image1File);
+            ResourcesUtil.resourceToFile(getResources(), R.drawable.pyramid, image2File);
+            ResourcesUtil.resourceToFile(getResources(), R.drawable.tajmahal, image3File);
 
             final String ffmpegCommand = Video.generateCreateVideoWithPipesScript(pipe1, pipe2, pipe3, videoFile.getAbsolutePath());
 
@@ -183,7 +175,7 @@ public class PipeTabFragment extends Fragment {
                                 Log.d(TAG, "Create completed successfully; playing video.");
                                 playVideo();
                             } else {
-                                Popup.show(mainActivity, "Create failed. Please check log for the details.");
+                                Popup.show(requireContext(), "Create failed. Please check log for the details.");
                                 Log.d(TAG, String.format("Create failed with rc=%d", returnCode));
                             }
 
@@ -200,12 +192,12 @@ public class PipeTabFragment extends Fragment {
 
         } catch (IOException e) {
             Log.e(TAG, "Create video failed", e);
-            Popup.show(mainActivity, "Create video failed");
+            Popup.show(requireContext(), "Create video failed");
         }
     }
 
     protected void playVideo() {
-        MediaController mediaController = new MediaController(mainActivity);
+        MediaController mediaController = new MediaController(requireContext());
         mediaController.setAnchorView(videoView);
         videoView.setVideoURI(Uri.parse("file://" + getVideoFile().getAbsolutePath()));
         videoView.setMediaController(mediaController);
@@ -229,14 +221,14 @@ public class PipeTabFragment extends Fragment {
     }
 
     protected File getVideoFile() {
-        return new File(mainActivity.getFilesDir(), "video.mp4");
+        return new File(requireContext().getFilesDir(), "video.mp4");
     }
 
     public void setActive() {
         Log.i(MainActivity.TAG, "Pipe Tab Activated");
         enableLogCallback();
         enableStatisticsCallback();
-        Popup.show(mainActivity, Tooltip.PIPE_TEST_TOOLTIP_TEXT);
+        Popup.show(requireContext(), Tooltip.PIPE_TEST_TOOLTIP_TEXT);
     }
 
     protected void showProgressDialog() {
@@ -273,7 +265,7 @@ public class PipeTabFragment extends Fragment {
 
             @Override
             public Object call() {
-                PipeTabFragment.this.progressDialog = mainActivity.createProgressDialog("Creating video");
+                PipeTabFragment.this.progressDialog = DialogUtil.createProgressDialog(requireContext(), "Creating video");
                 return null;
             }
         });

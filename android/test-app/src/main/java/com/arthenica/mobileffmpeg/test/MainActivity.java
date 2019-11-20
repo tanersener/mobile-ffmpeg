@@ -20,34 +20,25 @@
 package com.arthenica.mobileffmpeg.test;
 
 import android.Manifest;
-import android.app.AlertDialog;
-import android.content.Context;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.viewpager.widget.PagerTabStrip;
 import androidx.viewpager.widget.ViewPager;
-import androidx.appcompat.app.AppCompatActivity;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
 
 import com.arthenica.mobileffmpeg.Config;
 import com.arthenica.mobileffmpeg.util.AsyncExecuteTask;
 import com.arthenica.mobileffmpeg.util.ExecuteCallback;
+import com.arthenica.mobileffmpeg.util.ResourcesUtil;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Queue;
@@ -104,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         final ViewPager viewPager = findViewById(R.id.pager);
-        viewPager.setAdapter(new PagerAdapter(getSupportFragmentManager(), this, 7));
+        viewPager.setAdapter(new PagerAdapter(getSupportFragmentManager(), this));
 
         waitForUIAction();
 
@@ -165,84 +156,12 @@ public class MainActivity extends AppCompatActivity {
         actionQueue.add(callable);
     }
 
-    public AlertDialog createProgressDialog(final String text) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        if (inflater != null) {
-            View dialogView = inflater.inflate(R.layout.progress_dialog_layout, null);
-            builder.setView(dialogView);
-
-            TextView textView = dialogView.findViewById(R.id.progressDialogText);
-            if (textView != null) {
-                textView.setText(text);
-            }
-        }
-        builder.setCancelable(false);
-        return builder.create();
-    }
-
-    public AlertDialog createCancellableProgressDialog(final String text, final View.OnClickListener onClickListener) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        if (inflater != null) {
-            View dialogView = inflater.inflate(R.layout.cancellable_progress_dialog_layout, null);
-            builder.setView(dialogView);
-
-            TextView textView = dialogView.findViewById(R.id.progressDialogText);
-            if (textView != null) {
-                textView.setText(text);
-            }
-            Button cancelButton = dialogView.findViewById(R.id.cancelButton);
-            if (cancelButton != null) {
-                cancelButton.setOnClickListener(onClickListener);
-            }
-        }
-        builder.setCancelable(false);
-        return builder.create();
-    }
-
-    protected void resourceToFile(final int resourceId, final File file) throws IOException {
-        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), resourceId);
-
-        if (file.exists()) {
-            file.delete();
-        }
-
-        FileOutputStream outputStream = new FileOutputStream(file);
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
-        outputStream.flush();
-        outputStream.close();
-    }
-
-    protected void rawResourceToFile(final int resourceId, final File file) throws IOException {
-        final InputStream inputStream = getResources().openRawResource(resourceId);
-        if (file.exists()) {
-            file.delete();
-        }
-        final FileOutputStream outputStream = new FileOutputStream(file);
-
-        try {
-            final byte[] buffer = new byte[1024];
-            int readSize;
-
-            while ((readSize = inputStream.read(buffer)) > 0) {
-                outputStream.write(buffer, 0, readSize);
-            }
-        } catch (final IOException e) {
-            Log.e(TAG, "Saving raw resource failed.", e);
-        } finally {
-            inputStream.close();
-            outputStream.flush();
-            outputStream.close();
-        }
-    }
-
     protected void registerAppFont() throws IOException {
         final File cacheDirectory = getCacheDir();
 
         // SAVE FONTS
-        rawResourceToFile(R.raw.doppioone_regular, new File(cacheDirectory, "doppioone_regular.ttf"));
-        rawResourceToFile(R.raw.truenorg, new File(cacheDirectory, "truenorg.otf"));
+        ResourcesUtil.rawResourceToFile(getResources(), R.raw.doppioone_regular, new File(cacheDirectory, "doppioone_regular.ttf"));
+        ResourcesUtil.rawResourceToFile(getResources(), R.raw.truenorg, new File(cacheDirectory, "truenorg.otf"));
 
         final HashMap<String, String> fontNameMapping = new HashMap<>();
         fontNameMapping.put("MyFontName", "Doppio One");

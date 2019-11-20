@@ -25,6 +25,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import android.text.method.ScrollingMovementMethod;
 import android.util.AndroidRuntimeException;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,63 +42,51 @@ import java.util.concurrent.Callable;
 
 public class CommandTabFragment extends Fragment {
 
-    private MainActivity mainActivity;
     private EditText commandText;
     private TextView outputText;
 
-    @Override
-    public View onCreateView(@NonNull final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_command_tab, container, false);
+    public CommandTabFragment() {
+        super(R.layout.fragment_command_tab);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if (getView() != null) {
-            commandText = getView().findViewById(R.id.commandText);
+        commandText = view.findViewById(R.id.commandText);
 
-            View runButton = getView().findViewById(R.id.runButton);
-            runButton.setOnClickListener(new View.OnClickListener() {
+        View runButton = view.findViewById(R.id.runButton);
+        runButton.setOnClickListener(new View.OnClickListener() {
 
-                @Override
-                public void onClick(View v) {
-                    runFFmpeg();
-                }
-            });
+            @Override
+            public void onClick(View v) {
+                runFFmpeg();
+            }
+        });
 
-            View runAsyncButton = getView().findViewById(R.id.runAsyncButton);
-            runAsyncButton.setOnClickListener(new View.OnClickListener() {
+        View runAsyncButton = view.findViewById(R.id.runAsyncButton);
+        runAsyncButton.setOnClickListener(new View.OnClickListener() {
 
-                @Override
-                public void onClick(View v) {
-                    runFFmpegAsync();
-                }
-            });
+            @Override
+            public void onClick(View v) {
+                runFFmpegAsync();
+            }
+        });
 
-            outputText = getView().findViewById(R.id.outputText);
-            outputText.setMovementMethod(new ScrollingMovementMethod());
-        }
+        outputText = view.findViewById(R.id.outputText);
+        outputText.setMovementMethod(new ScrollingMovementMethod());
 
-        android.util.Log.d(MainActivity.TAG, "Last command output was: " + FFmpeg.getLastCommandOutput());
+        Log.d(MainActivity.TAG, "Last command output was: " + FFmpeg.getLastCommandOutput());
     }
 
     @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-        if (isVisibleToUser) {
-            setActive();
-        }
+    public void onResume() {
+        super.onResume();
+        setActive();
     }
 
-    public void setMainActivity(MainActivity mainActivity) {
-        this.mainActivity = mainActivity;
-    }
-
-    public static CommandTabFragment newInstance(final MainActivity mainActivity) {
-        final CommandTabFragment fragment = new CommandTabFragment();
-        fragment.setMainActivity(mainActivity);
-        return fragment;
+    public static CommandTabFragment newInstance() {
+        return new CommandTabFragment();
     }
 
     public void enableLogCallback() {
@@ -133,7 +122,7 @@ public class CommandTabFragment extends Fragment {
         android.util.Log.d(MainActivity.TAG, String.format("FFmpeg process exited with rc %d", result));
 
         if (result != 0) {
-            Popup.show(mainActivity, "Command failed. Please check output for the details.");
+            Popup.show(requireContext(), "Command failed. Please check output for the details.");
         }
     }
 
@@ -157,7 +146,7 @@ public class CommandTabFragment extends Fragment {
                     MainActivity.addUIAction(new Callable() {
                         @Override
                         public Object call() {
-                            Popup.show(mainActivity, "Command failed. Please check output for the details.");
+                            Popup.show(requireContext(), "Command failed. Please check output for the details.");
                             return null;
                         }
                     });
@@ -167,10 +156,10 @@ public class CommandTabFragment extends Fragment {
         }, ffmpegCommand);
     }
 
-    public void setActive() {
-        android.util.Log.i(MainActivity.TAG, "Command Tab Activated");
+    private void setActive() {
+        Log.i(MainActivity.TAG, "Command Tab Activated");
         enableLogCallback();
-        Popup.show(mainActivity, Tooltip.COMMAND_TEST_TOOLTIP_TEXT);
+        Popup.show(requireContext(), Tooltip.COMMAND_TEST_TOOLTIP_TEXT);
     }
 
     public void appendLog(final String logMessage) {
