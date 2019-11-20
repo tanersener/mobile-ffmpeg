@@ -19,16 +19,16 @@
 
 package com.arthenica.mobileffmpeg.test;
 
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentPagerAdapter;
 
 public class PagerAdapter extends FragmentPagerAdapter {
     private final MainActivity mainActivity;
     private int numberOfTabs;
 
     PagerAdapter(final FragmentManager fragmentManager, final MainActivity mainActivity, final int numberOfTabs) {
-        super(fragmentManager);
+        super(fragmentManager, BEHAVIOR_SET_USER_VISIBLE_HINT);
 
         this.mainActivity = mainActivity;
         this.numberOfTabs = numberOfTabs;

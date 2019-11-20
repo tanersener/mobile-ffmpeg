@@ -23,9 +23,11 @@ import android.app.AlertDialog;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -289,7 +291,7 @@ public class VidStabTabFragment extends Fragment {
     }
 
     public void setActive() {
-        android.util.Log.i(MainActivity.TAG, "VidStab Tab Activated");
+        Log.i(MainActivity.TAG, "VidStab Tab Activated");
         enableLogCallback();
         Popup.show(mainActivity, Tooltip.VIDSTAB_TEST_TOOLTIP_TEXT);
     }
