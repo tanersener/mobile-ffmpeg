@@ -198,7 +198,7 @@ Please remember that some parts of `FFmpeg` are licensed under the `GPL` and onl
 
     - tvOS
     ```
-    pod 'mobile-ffmpeg-tv-full', '~> 4.3'
+    pod 'mobile-ffmpeg-tvos-full', '~> 4.3'
     ```
 
 2. Execute commands.
