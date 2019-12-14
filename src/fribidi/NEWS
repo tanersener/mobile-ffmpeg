@@ -1,3 +1,11 @@
+Overview of changes between 1.0.7 and 1.0.8
+=============================================
+
+* A bug fix in the fribidi unicode algorithm for multiple isolate sequences.
+
+* Fixed a potential buffer overflow for a long sequence of isolate overrides characters
+
+
 Overview of changes between 1.0.6 and 1.0.7
 =============================================
 
