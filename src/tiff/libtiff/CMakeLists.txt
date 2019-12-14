@@ -104,7 +104,7 @@ set(tiffxx_HEADERS
 set(tiffxx_SOURCES
   tif_stream.cxx)
 
-if(WIN32_IO)
+if(USE_WIN32_FILEIO)
   extra_dist(tif_unix.c)
   list(APPEND tiff_SOURCES tif_win32.c)
 else()

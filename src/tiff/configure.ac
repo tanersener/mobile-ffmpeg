@@ -25,7 +25,7 @@ dnl OF THIS SOFTWARE.
 dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.64)
-AC_INIT([LibTIFF Software],[4.0.10],[tiff@lists.maptools.org],[tiff])
+AC_INIT([LibTIFF Software],[4.1.0],[tiff@lists.maptools.org],[tiff])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_MACRO_DIR(m4)
 AC_LANG(C)
@@ -40,8 +40,8 @@ AM_MAINTAINER_MODE
 dnl Versioning.
 dnl Don't fill the ALPHA_VERSION field, if not applicable.
 LIBTIFF_MAJOR_VERSION=4
-LIBTIFF_MINOR_VERSION=0
-LIBTIFF_MICRO_VERSION=10
+LIBTIFF_MINOR_VERSION=1
+LIBTIFF_MICRO_VERSION=0
 LIBTIFF_ALPHA_VERSION=
 LIBTIFF_VERSION=$LIBTIFF_MAJOR_VERSION.$LIBTIFF_MINOR_VERSION.$LIBTIFF_MICRO_VERSION$LIBTIFF_ALPHA_VERSION
 dnl This will be used with the 'make release' target
@@ -76,9 +76,9 @@ dnl  5. If any interfaces have been added since the last public release, then
 dnl     increment age.
 dnl  6. If any interfaces have been removed since the last public release,
 dnl     then set age to 0.                                
-LIBTIFF_CURRENT=9
+LIBTIFF_CURRENT=10
 LIBTIFF_REVISION=0
-LIBTIFF_AGE=4
+LIBTIFF_AGE=5
 LIBTIFF_VERSION_INFO=$LIBTIFF_CURRENT:$LIBTIFF_REVISION:$LIBTIFF_AGE
 
 # This is a special hack for OpenBSD and MirOS systems. The dynamic linker
@@ -365,15 +365,15 @@ AC_DEFINE_UNQUOTED([TIFF_SIZE_FORMAT],[$SIZE_FORMAT],[Size type formatter])
 AC_MSG_CHECKING(for signed size type)
 SSIZE_T='unknown'
 SSIZE_FORMAT='unknown'
-if test $ac_cv_sizeof_signed_int -eq $ac_cv_sizeof_unsigned_char_p
+if test $ac_cv_sizeof_signed_int -eq $ac_cv_sizeof_size_t
 then
   SSIZE_T='signed int'
   SSIZE_FORMAT='"%d"'
-elif test $ac_cv_sizeof_signed_long -eq $ac_cv_sizeof_unsigned_char_p
+elif test $ac_cv_sizeof_signed_long -eq $ac_cv_sizeof_size_t
 then
   SSIZE_T='signed long'
   SSIZE_FORMAT='"%ld"'
-elif test $ac_cv_sizeof_signed_long_long -eq $ac_cv_sizeof_unsigned_char_p
+elif test $ac_cv_sizeof_signed_long_long -eq $ac_cv_sizeof_size_t
 then
   SSIZE_T='signed long long'
   case "${host_os}" in
@@ -1070,17 +1070,16 @@ fi
 
 dnl ---------------------------------------------------------------------------
 dnl Should we try to defer loading of strip/tile offsets and sizes to 
-dnl optimize directory scanning?  These is an experimental feature for 
-dnl libtiff 4.0.
+dnl optimize directory scanning?
 dnl ---------------------------------------------------------------------------
 
 AC_ARG_ENABLE(defer-strile-load,
 	      AS_HELP_STRING([--enable-defer-strile-load],
-			     [enable deferred strip/tile offset/size loading (experimental)]),
+			     [enable deferred strip/tile offset/size loading (also available at runtime with the 'D' flag of TIFFOpen()]),
 	      [HAVE_DEFER_STRILE_LOAD=$enableval], [HAVE_DEFER_STRILE_LOAD=no])
 
 if test "$HAVE_DEFER_STRILE_LOAD" = "yes" ; then
-  AC_DEFINE(DEFER_STRILE_LOAD,1,[enable deferred strip/tile offset/size loading (experimental)])
+  AC_DEFINE(DEFER_STRILE_LOAD,1,[enable deferred strip/tile offset/size loading])
 
 fi
 

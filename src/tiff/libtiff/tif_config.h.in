@@ -21,7 +21,7 @@
    packages produce RGBA files but don't mark the alpha properly. */
 #undef DEFAULT_EXTRASAMPLE_AS_ALPHA
 
-/* enable deferred strip/tile offset/size loading (experimental) */
+/* enable deferred strip/tile offset/size loading */
 #undef DEFER_STRILE_LOAD
 
 /* Define to 1 if you have the <assert.h> header file. */

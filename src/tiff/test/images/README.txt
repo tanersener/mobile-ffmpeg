@@ -27,3 +27,6 @@ PNM files:
   minisblack-1c-8b.pgm
   miniswhite-1c-1b.pbm
   rgb-3c-8b.ppm
+
+G3 Fax files :
+  miniswhite-1c-1b.g3

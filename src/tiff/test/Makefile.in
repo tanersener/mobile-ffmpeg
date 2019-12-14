@@ -117,7 +117,9 @@ TESTS = $(check_PROGRAMS) $(am__EXEEXT_3)
 XFAIL_TESTS =
 check_PROGRAMS = ascii_tag$(EXEEXT) long_tag$(EXEEXT) \
 	short_tag$(EXEEXT) strip_rw$(EXEEXT) rewrite$(EXEEXT) \
-	custom_dir$(EXEEXT) $(am__EXEEXT_1)
+	custom_dir$(EXEEXT) defer_strile_loading$(EXEEXT) \
+	defer_strile_writing$(EXEEXT) testtypes$(EXEEXT) \
+	$(am__EXEEXT_1)
 subdir = test
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/acinclude.m4 \
@@ -144,6 +146,12 @@ am__v_lt_1 =
 am_custom_dir_OBJECTS = custom_dir.$(OBJEXT)
 custom_dir_OBJECTS = $(am_custom_dir_OBJECTS)
 custom_dir_DEPENDENCIES = $(LIBTIFF)
+am_defer_strile_loading_OBJECTS = defer_strile_loading.$(OBJEXT)
+defer_strile_loading_OBJECTS = $(am_defer_strile_loading_OBJECTS)
+defer_strile_loading_DEPENDENCIES = $(LIBTIFF)
+am_defer_strile_writing_OBJECTS = defer_strile_writing.$(OBJEXT)
+defer_strile_writing_OBJECTS = $(am_defer_strile_writing_OBJECTS)
+defer_strile_writing_DEPENDENCIES = $(LIBTIFF)
 am_long_tag_OBJECTS = long_tag.$(OBJEXT) check_tag.$(OBJEXT)
 long_tag_OBJECTS = $(am_long_tag_OBJECTS)
 long_tag_DEPENDENCIES = $(LIBTIFF)
@@ -160,6 +168,9 @@ am_strip_rw_OBJECTS = strip_rw.$(OBJEXT) strip.$(OBJEXT) \
 	test_arrays.$(OBJEXT)
 strip_rw_OBJECTS = $(am_strip_rw_OBJECTS)
 strip_rw_DEPENDENCIES = $(LIBTIFF)
+testtypes_SOURCES = testtypes.c
+testtypes_OBJECTS = testtypes.$(OBJEXT)
+testtypes_LDADD = $(LDADD)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -177,10 +188,12 @@ depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__maybe_remake_depfiles = depfiles
 am__depfiles_remade = ./$(DEPDIR)/ascii_tag.Po \
 	./$(DEPDIR)/check_tag.Po ./$(DEPDIR)/custom_dir.Po \
-	./$(DEPDIR)/long_tag.Po ./$(DEPDIR)/raw_decode.Po \
-	./$(DEPDIR)/rewrite_tag.Po ./$(DEPDIR)/short_tag.Po \
-	./$(DEPDIR)/strip.Po ./$(DEPDIR)/strip_rw.Po \
-	./$(DEPDIR)/test_arrays.Po
+	./$(DEPDIR)/defer_strile_loading.Po \
+	./$(DEPDIR)/defer_strile_writing.Po ./$(DEPDIR)/long_tag.Po \
+	./$(DEPDIR)/raw_decode.Po ./$(DEPDIR)/rewrite_tag.Po \
+	./$(DEPDIR)/short_tag.Po ./$(DEPDIR)/strip.Po \
+	./$(DEPDIR)/strip_rw.Po ./$(DEPDIR)/test_arrays.Po \
+	./$(DEPDIR)/testtypes.Po
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -201,11 +214,15 @@ am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
 SOURCES = $(ascii_tag_SOURCES) $(custom_dir_SOURCES) \
-	$(long_tag_SOURCES) $(raw_decode_SOURCES) $(rewrite_SOURCES) \
-	$(short_tag_SOURCES) $(strip_rw_SOURCES)
+	$(defer_strile_loading_SOURCES) \
+	$(defer_strile_writing_SOURCES) $(long_tag_SOURCES) \
+	$(raw_decode_SOURCES) $(rewrite_SOURCES) $(short_tag_SOURCES) \
+	$(strip_rw_SOURCES) testtypes.c
 DIST_SOURCES = $(ascii_tag_SOURCES) $(custom_dir_SOURCES) \
-	$(long_tag_SOURCES) $(raw_decode_SOURCES) $(rewrite_SOURCES) \
-	$(short_tag_SOURCES) $(strip_rw_SOURCES)
+	$(defer_strile_loading_SOURCES) \
+	$(defer_strile_writing_SOURCES) $(long_tag_SOURCES) \
+	$(raw_decode_SOURCES) $(rewrite_SOURCES) $(short_tag_SOURCES) \
+	$(strip_rw_SOURCES) testtypes.c
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -417,7 +434,7 @@ RECHECK_LOGS = $(TEST_LOGS)
 AM_RECURSIVE_TARGETS = check recheck
 @HAVE_JPEG_TRUE@am__EXEEXT_2 = tiff2rgba-quad-tile.jpg.sh
 am__EXEEXT_3 = ppm2tiff_pbm.sh ppm2tiff_pgm.sh ppm2tiff_ppm.sh \
-	tiffcp-g3.sh tiffcp-g3-1d.sh tiffcp-g3-1d-fill.sh \
+	fax2tiff.sh tiffcp-g3.sh tiffcp-g3-1d.sh tiffcp-g3-1d-fill.sh \
 	tiffcp-g3-2d.sh tiffcp-g3-2d-fill.sh tiffcp-g4.sh \
 	tiffcp-logluv.sh tiffcp-thumbnail.sh tiffcp-lzw-compat.sh \
 	tiffcp-lzw-scanline-decode.sh tiffdump.sh tiffinfo.sh \
@@ -646,6 +663,7 @@ TESTS_ENVIRONMENT = \
 	MEMCHECK="$(MEMCHECK)"
 
 EXTRA_DIST = \
+	$(REFFILES) \
 	$(TESTSCRIPTS) \
 	$(IMAGES_EXTRA_DIST) \
 	CMakeLists.txt \
@@ -669,6 +687,7 @@ TESTSCRIPTS = \
 	ppm2tiff_pbm.sh \
 	ppm2tiff_pgm.sh \
 	ppm2tiff_ppm.sh \
+	fax2tiff.sh \
 	tiffcp-g3.sh \
 	tiffcp-g3-1d.sh \
 	tiffcp-g3-1d-fill.sh \
@@ -744,6 +763,15 @@ TESTSCRIPTS = \
 	$(JPEG_DEPENDENT_TESTSCRIPTS)
 
 
+# This list should contain the references files
+# from the 'refs' subdirectory
+REFFILES = \
+	refs/o-tiff2ps-EPS1.ps \
+	refs/o-tiff2ps-PS1.ps \
+	refs/o-tiff2ps-PS2.ps \
+	refs/o-tiff2ps-PS3.ps
+
+
 # This list should contain all of the TIFF files in the 'images'
 # subdirectory which are intended to be used as input images for
 # tests.  All of these files should use the extension ".tiff".
@@ -773,6 +801,7 @@ PNMIMAGES = \
 # files which are not currently used by the tests.
 IMAGES_EXTRA_DIST = \
 	images/README.txt \
+	images/miniswhite-1c-1b.g3 \
 	$(PNMIMAGES) \
 	$(TIFFIMAGES)
 
@@ -791,6 +820,10 @@ raw_decode_SOURCES = raw_decode.c
 raw_decode_LDADD = $(LIBTIFF)
 custom_dir_SOURCES = custom_dir.c
 custom_dir_LDADD = $(LIBTIFF)
+defer_strile_loading_SOURCES = defer_strile_loading.c
+defer_strile_loading_LDADD = $(LIBTIFF)
+defer_strile_writing_SOURCES = defer_strile_writing.c
+defer_strile_writing_LDADD = $(LIBTIFF)
 AM_CPPFLAGS = -I$(top_srcdir)/libtiff
 all: all-am
 
@@ -843,6 +876,14 @@ custom_dir$(EXEEXT): $(custom_dir_OBJECTS) $(custom_dir_DEPENDENCIES) $(EXTRA_cu
 	@rm -f custom_dir$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(custom_dir_OBJECTS) $(custom_dir_LDADD) $(LIBS)
 
+defer_strile_loading$(EXEEXT): $(defer_strile_loading_OBJECTS) $(defer_strile_loading_DEPENDENCIES) $(EXTRA_defer_strile_loading_DEPENDENCIES) 
+	@rm -f defer_strile_loading$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(defer_strile_loading_OBJECTS) $(defer_strile_loading_LDADD) $(LIBS)
+
+defer_strile_writing$(EXEEXT): $(defer_strile_writing_OBJECTS) $(defer_strile_writing_DEPENDENCIES) $(EXTRA_defer_strile_writing_DEPENDENCIES) 
+	@rm -f defer_strile_writing$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(defer_strile_writing_OBJECTS) $(defer_strile_writing_LDADD) $(LIBS)
+
 long_tag$(EXEEXT): $(long_tag_OBJECTS) $(long_tag_DEPENDENCIES) $(EXTRA_long_tag_DEPENDENCIES) 
 	@rm -f long_tag$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(long_tag_OBJECTS) $(long_tag_LDADD) $(LIBS)
@@ -863,6 +904,10 @@ strip_rw$(EXEEXT): $(strip_rw_OBJECTS) $(strip_rw_DEPENDENCIES) $(EXTRA_strip_rw
 	@rm -f strip_rw$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(strip_rw_OBJECTS) $(strip_rw_LDADD) $(LIBS)
 
+testtypes$(EXEEXT): $(testtypes_OBJECTS) $(testtypes_DEPENDENCIES) $(EXTRA_testtypes_DEPENDENCIES) 
+	@rm -f testtypes$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(testtypes_OBJECTS) $(testtypes_LDADD) $(LIBS)
+
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
 
@@ -872,6 +917,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ascii_tag.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/check_tag.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/custom_dir.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/defer_strile_loading.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/defer_strile_writing.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/long_tag.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/raw_decode.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rewrite_tag.Po@am__quote@ # am--include-marker
@@ -879,6 +926,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/strip.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/strip_rw.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_arrays.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testtypes.Po@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
 	@$(MKDIR_P) $(@D)
@@ -1148,6 +1196,27 @@ custom_dir.log: custom_dir$(EXEEXT)
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
+defer_strile_loading.log: defer_strile_loading$(EXEEXT)
+	@p='defer_strile_loading$(EXEEXT)'; \
+	b='defer_strile_loading'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+defer_strile_writing.log: defer_strile_writing$(EXEEXT)
+	@p='defer_strile_writing$(EXEEXT)'; \
+	b='defer_strile_writing'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+testtypes.log: testtypes$(EXEEXT)
+	@p='testtypes$(EXEEXT)'; \
+	b='testtypes'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
 raw_decode.log: raw_decode$(EXEEXT)
 	@p='raw_decode$(EXEEXT)'; \
 	b='raw_decode'; \
@@ -1172,6 +1241,13 @@ ppm2tiff_pgm.sh.log: ppm2tiff_pgm.sh
 ppm2tiff_ppm.sh.log: ppm2tiff_ppm.sh
 	@p='ppm2tiff_ppm.sh'; \
 	b='ppm2tiff_ppm.sh'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+fax2tiff.sh.log: fax2tiff.sh
+	@p='fax2tiff.sh'; \
+	b='fax2tiff.sh'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
@@ -1784,6 +1860,8 @@ distclean: distclean-am
 		-rm -f ./$(DEPDIR)/ascii_tag.Po
 	-rm -f ./$(DEPDIR)/check_tag.Po
 	-rm -f ./$(DEPDIR)/custom_dir.Po
+	-rm -f ./$(DEPDIR)/defer_strile_loading.Po
+	-rm -f ./$(DEPDIR)/defer_strile_writing.Po
 	-rm -f ./$(DEPDIR)/long_tag.Po
 	-rm -f ./$(DEPDIR)/raw_decode.Po
 	-rm -f ./$(DEPDIR)/rewrite_tag.Po
@@ -1791,6 +1869,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/strip.Po
 	-rm -f ./$(DEPDIR)/strip_rw.Po
 	-rm -f ./$(DEPDIR)/test_arrays.Po
+	-rm -f ./$(DEPDIR)/testtypes.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -1839,6 +1918,8 @@ maintainer-clean: maintainer-clean-am
 		-rm -f ./$(DEPDIR)/ascii_tag.Po
 	-rm -f ./$(DEPDIR)/check_tag.Po
 	-rm -f ./$(DEPDIR)/custom_dir.Po
+	-rm -f ./$(DEPDIR)/defer_strile_loading.Po
+	-rm -f ./$(DEPDIR)/defer_strile_writing.Po
 	-rm -f ./$(DEPDIR)/long_tag.Po
 	-rm -f ./$(DEPDIR)/raw_decode.Po
 	-rm -f ./$(DEPDIR)/rewrite_tag.Po
@@ -1846,6 +1927,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/strip.Po
 	-rm -f ./$(DEPDIR)/strip_rw.Po
 	-rm -f ./$(DEPDIR)/test_arrays.Po
+	-rm -f ./$(DEPDIR)/testtypes.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

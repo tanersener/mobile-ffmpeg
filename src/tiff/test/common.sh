@@ -7,6 +7,7 @@ SRCDIR=`cd $SRCDIR && pwd`
 TOPSRCDIR=`cd $srcdir/.. && pwd`
 TOOLS=`cd ../tools && pwd`
 IMAGES="${SRCDIR}/images"
+REFS="${SRCDIR}/refs"
 
 # Aliases for built tools
 FAX2PS=${TOOLS}/fax2ps

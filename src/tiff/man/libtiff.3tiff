@@ -342,7 +342,7 @@ WhitePoint	318	R/W
 XPosition	286	R/W
 XResolution	282	R/W
 YCbCrCoefficients	529	R/W	used by TIFFRGBAImage support
-YCbCrPositioning	531	R/W	tile/strip size calulcations
+YCbCrPositioning	531	R/W	tile/strip size calculations
 YCbCrSubsampling	530	R/W
 YPosition	286	R/W
 YResolution	283	R/W	used by Group 3 codec
@@ -354,7 +354,7 @@ tags whose values lie in a range outside the valid range of
 .SM TIFF
 tags.
 These tags are termed
-.I pseud-tags
+.I pseudo-tags
 and are used to control various codec-specific functions within the library.
 The table below summarizes the defined pseudo-tags.
 .sp
@@ -408,7 +408,7 @@ The default value is a pointer to a builtin function that images
 packed bilevel data.
 .TP
 .B TIFFTAG_IPTCNEWSPHOTO
-Tag contaings image metadata per the IPTC newsphoto spec: Headline, 
+Tag contains image metadata per the IPTC newsphoto spec: Headline, 
 captioning, credit, etc... Used by most wire services. 
 .TP
 .B TIFFTAG_PHOTOSHOP
