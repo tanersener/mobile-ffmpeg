@@ -39,7 +39,8 @@ const hello_ext_entry_st ext_mod_etm = {
 	.name = "Encrypt-then-MAC",
 	.tls_id = 22,
 	.gid = GNUTLS_EXTENSION_ETM,
-	.parse_type = GNUTLS_EXT_MANDATORY,
+	.client_parse_point = GNUTLS_EXT_MANDATORY,
+	.server_parse_point = GNUTLS_EXT_MANDATORY,
 	.validity = GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_DTLS | GNUTLS_EXT_FLAG_CLIENT_HELLO |
 		    GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
 	.recv_func = _gnutls_ext_etm_recv_params,

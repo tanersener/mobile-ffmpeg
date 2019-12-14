@@ -242,6 +242,7 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo,
 				  gnutls_datum_t * out,
 				  const gnutls_pk_params_st * priv,
 				  const gnutls_pk_params_st * pub,
+				  const gnutls_datum_t * nonce,
 				  unsigned int flags)
 {
 	int ret;
@@ -251,6 +252,9 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo,
 		bigint_t f, x, q, prime;
 		bigint_t k = NULL, ff = NULL, r = NULL;
 		unsigned int bits;
+
+		if (nonce != NULL)
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 		f = pub->params[DH_Y];
 		x = priv->params[DH_X];
@@ -343,6 +347,9 @@ dh_cleanup:
 
 			out->data = NULL;
 
+			if (nonce != NULL)
+				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
 			curve = get_supported_nist_curve(priv->curve);
 			if (curve == NULL)
 				return
@@ -384,6 +391,9 @@ dh_cleanup:
 		{
 			unsigned size = gnutls_ecc_curve_get_size(priv->curve);
 
+			if (nonce != NULL)
+				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
 			/* The point is in pub, while the private part (scalar) in priv. */
 
 			if (size == 0 || priv->raw_priv.size != size)
@@ -407,6 +417,57 @@ dh_cleanup:
 			}
 			break;
 		}
+#if ENABLE_GOST
+	case GNUTLS_PK_GOST_01:
+	case GNUTLS_PK_GOST_12_256:
+	case GNUTLS_PK_GOST_12_512:
+	{
+		struct ecc_scalar ecc_priv;
+		struct ecc_point ecc_pub;
+		const struct ecc_curve *curve;
+
+		out->data = NULL;
+
+		curve = get_supported_gost_curve(priv->curve);
+		if (curve == NULL)
+			return
+			    gnutls_assert_val
+			    (GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+
+		if (nonce == NULL)
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+		ret = _gost_params_to_pubkey(pub, &ecc_pub, curve);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		ret = _gost_params_to_privkey(priv, &ecc_priv, curve);
+		if (ret < 0) {
+			ecc_point_clear(&ecc_pub);
+			return gnutls_assert_val(ret);
+		}
+
+		out->size = 2 * gnutls_ecc_curve_get_size(priv->curve);
+		out->data = gnutls_malloc(out->size);
+		if (out->data == NULL) {
+			ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+			goto gost_cleanup;
+		}
+
+		out->size = gostdsa_vko(&ecc_priv, &ecc_pub,
+					nonce->size, nonce->data,
+					out->size, out->data);
+		if (out->size == 0)
+			ret = GNUTLS_E_INVALID_REQUEST;
+
+	      gost_cleanup:
+		ecc_point_clear(&ecc_pub);
+		ecc_scalar_zclear(&ecc_priv);
+		if (ret < 0)
+			goto cleanup;
+		break;
+	}
+#endif
 	default:
 		gnutls_assert();
 		ret = GNUTLS_E_INTERNAL_ERROR;
@@ -1357,6 +1418,8 @@ static inline const struct ecc_curve *get_supported_gost_curve(int curve)
 		return nettle_get_gost_256cpa();
 	case GNUTLS_ECC_CURVE_GOST512A:
 		return nettle_get_gost_512a();
+	case GNUTLS_ECC_CURVE_GOST256B:
+		return nettle_get_gost_256cpa();
 #endif
 	default:
 		return NULL;

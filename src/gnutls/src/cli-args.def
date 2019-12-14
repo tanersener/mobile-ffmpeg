@@ -239,6 +239,31 @@ flag = {
 };
 
 flag = {
+    name      = rawpkkeyfile;
+    arg-type  = string;
+    descrip   = "Private key file (PKCS #8 or PKCS #12) or PKCS #11 URL to use";
+    doc       = "In order to instruct the application to negotiate raw public keys one
+must enable the respective certificate types via the priority strings (i.e. CTYPE-CLI-*
+and CTYPE-SRV-* flags).
+
+Check  the  GnuTLS  manual  on  section  ``Priority strings'' for more
+information on how to set certificate types.";
+};
+
+flag = {
+    name      = rawpkfile;
+    arg-type  = string;
+    descrip   = "Raw public-key file to use";
+    doc       = "In order to instruct the application to negotiate raw public keys one
+must enable the respective certificate types via the priority strings (i.e. CTYPE-CLI-*
+and CTYPE-SRV-* flags).
+
+Check  the  GnuTLS  manual  on  section  ``Priority strings'' for more
+information on how to set certificate types.";
+    flags-must = rawpkkeyfile;
+};
+
+flag = {
     name      = srpusername;
     arg-type  = string;
     descrip   = "SRP username to use";
@@ -420,7 +445,7 @@ flag = {
     name      = logfile;
     arg-type  = string;
     descrip   = "Redirect informational messages to a specific file.";
-    doc       = "";
+    doc       = "Redirect informational messages to a specific file. The file may be /dev/null also to make the gnutls client quiet to use it in piped server connections where only the server communication may appear on stdout.";
 };
 
 flag = {
@@ -467,7 +492,29 @@ Connecting to '127.0.0.1:5556'...
     
 - Simple Client Mode:
 @end example
-By keeping the --pskusername parameter and removing the --pskkey parameter, it will query only for the password during the handshake. 
+By keeping the --pskusername parameter and removing the --pskkey parameter, it will query only for the password during the handshake.
+
+@subheading Connecting using raw public-key authentication
+To connect to a server using raw public-key authentication, you need to enable the option to negotiate raw public-keys via the priority strings such as in the example below. 
+@example
+$ ./gnutls-cli -p 5556 localhost --priority NORMAL:-CTYPE-CLI-ALL:+CTYPE-CLI-RAWPK \
+    --rawpkkeyfile cli.key.pem \
+    --rawpkfile cli.rawpk.pem
+Processed 1 client raw public key pair...
+Resolving 'localhost'...
+Connecting to '127.0.0.1:5556'...
+- Successfully sent 1 certificate(s) to server.
+- Server has requested a certificate.
+- Certificate type: X.509
+- Got a certificate list of 1 certificates.
+- Certificate[0] info:
+ - skipped
+- Description: (TLS1.3-Raw Public Key-X.509)-(ECDHE-SECP256R1)-(RSA-PSS-RSAE-SHA256)-(AES-256-GCM)
+- Options:
+- Handshake was completed
+    
+- Simple Client Mode:
+@end example
 
 @subheading Connecting to STARTTLS services
 

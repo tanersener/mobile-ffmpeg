@@ -54,7 +54,12 @@ const hello_ext_entry_st ext_mod_session_ticket = {
 	.gid = GNUTLS_EXTENSION_SESSION_TICKET,
 	.validity = GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_DTLS | GNUTLS_EXT_FLAG_CLIENT_HELLO |
 		    GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
-	.parse_type = GNUTLS_EXT_TLS,
+	/* This extension must be parsed on session resumption as well; see
+	 * https://gitlab.com/gnutls/gnutls/issues/841 */
+	.client_parse_point = GNUTLS_EXT_MANDATORY,
+	/* on server side we want this parsed after normal handshake resumption
+	 * actions are complete */
+	.server_parse_point = GNUTLS_EXT_TLS,
 	.recv_func = session_ticket_recv_params,
 	.send_func = session_ticket_send_params,
 	.pack_func = session_ticket_pack,

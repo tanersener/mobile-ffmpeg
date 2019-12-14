@@ -58,7 +58,7 @@
 struct tls_record_st {
 	uint16_t header_size;
 	uint8_t version[2];
-	gnutls_uint64 sequence;	/* DTLS */
+	uint64_t sequence;	/* DTLS */
 	uint16_t length;
 	uint16_t packet_size;	/* header_size + length */
 	content_type_t type;
@@ -70,7 +70,7 @@ struct tls_record_st {
 };
 
 /**
- * gnutls_record_disable_padding:  
+ * gnutls_record_disable_padding:
  * @session: is a #gnutls_session_t type.
  *
  * Used to disabled padding in TLS 1.0 and above.  Normally you do not
@@ -95,7 +95,7 @@ void gnutls_record_disable_padding(gnutls_session_t session)
  * Used to set the first argument of the transport function (for push
  * and pull callbacks). In berkeley style sockets this function will set the
  * connection descriptor.
- * 
+ *
  **/
 void
 gnutls_transport_set_ptr(gnutls_session_t session,
@@ -166,7 +166,7 @@ gnutls_transport_set_int2(gnutls_session_t session,
  * with the descriptor, but requires no casts.
  *
  * Since: 3.1.9
- * 
+ *
  **/
 void gnutls_transport_set_int(gnutls_session_t session, int fd)
 {
@@ -273,8 +273,8 @@ int gnutls_transport_get_int(gnutls_session_t session)
  * Note that not all implementations will properly terminate a TLS
  * connection.  Some of them, usually for performance reasons, will
  * terminate only the underlying transport layer, and thus not
- * distinguishing between a malicious party prematurely terminating 
- * the connection and normal termination. 
+ * distinguishing between a malicious party prematurely terminating
+ * the connection and normal termination.
  *
  * This function may also return %GNUTLS_E_AGAIN or
  * %GNUTLS_E_INTERRUPTED; cf.  gnutls_record_get_direction().
@@ -354,7 +354,7 @@ inline static int session_is_valid(gnutls_session_t session)
 	return 0;
 }
 
-/* Copies the record version into the headers. The 
+/* Copies the record version into the headers. The
  * version must have 2 bytes at least.
  */
 inline static int
@@ -390,19 +390,34 @@ copy_record_version(gnutls_session_t session,
 /* Increments the sequence value
  */
 inline static int
-sequence_increment(gnutls_session_t session, gnutls_uint64 * value)
+sequence_increment(gnutls_session_t session, uint64_t * value)
 {
+	uint64_t snmax = UINT64_C(0xffffffffffffffff);
+
 	if (IS_DTLS(session)) {
-		return _gnutls_uint48pp(value);
+		uint64_t mask;
+
+		snmax = UINT64_C(0xffffffffffff);
+		mask = snmax;
+
+		if ((*value & mask) == snmax)
+			return -1;
+
+		*value = ((*value & mask) + 1) | (*value & ~mask);
 	} else {
-		return _gnutls_uint64pp(value);
+		if (*value == snmax)
+			return -1;
+
+		(*value)++;
 	}
+
+	return 0;
 }
 
 /* This function behaves exactly like write(). The only difference is
  * that it accepts, the gnutls_session_t and the content_type_t of data to
  * send (if called by the user the Content is specific)
- * It is intended to transfer data, under the current session.    
+ * It is intended to transfer data, under the current session.
  *
  * @type: The content type to send
  * @htype: If this is a handshake message then the handshake type
@@ -477,7 +492,7 @@ _gnutls_send_tlen_int(gnutls_session_t session, content_type_t type,
 	} else
 		send_data_size = data_size;
 
-	/* Only encrypt if we don't have data to send 
+	/* Only encrypt if we don't have data to send
 	 * from the previous run. - probably interrupted.
 	 */
 	if (mflags != 0
@@ -497,7 +512,7 @@ _gnutls_send_tlen_int(gnutls_session_t session, content_type_t type,
 		 */
 		cipher_size = MAX_RECORD_SEND_SIZE(session);
 
-		bufel = _mbuffer_alloc_align16(cipher_size + CIPHER_SLACK_SIZE, 
+		bufel = _mbuffer_alloc_align16(cipher_size + CIPHER_SLACK_SIZE,
 			get_total_headers2(session, record_params));
 		if (bufel == NULL)
 			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
@@ -516,8 +531,7 @@ _gnutls_send_tlen_int(gnutls_session_t session, content_type_t type,
 
 		/* Adjust header length and add sequence for DTLS */
 		if (IS_DTLS(session))
-			memcpy(&headers[3],
-			       record_state->sequence_number.i, 8);
+			_gnutls_write_uint64(record_state->sequence_number, &headers[3]);
 
 		_gnutls_record_log
 		    ("REC[%p]: Preparing Packet %s(%d) with length: %d and min pad: %d\n",
@@ -577,17 +591,14 @@ _gnutls_send_tlen_int(gnutls_session_t session, content_type_t type,
 	session->internals.record_send_buffer_user_size = 0;
 
 	_gnutls_record_log
-	    ("REC[%p]: Sent Packet[%d] %s(%d) in epoch %d and length: %d\n",
-	     session, (unsigned int)
-	     _gnutls_uint64touint32(&record_state->sequence_number),
+	    ("REC[%p]: Sent Packet[%ld] %s(%d) in epoch %d and length: %d\n",
+	     session, (unsigned long)(record_state->sequence_number),
 	     _gnutls_packet2str(type), type, (int) record_params->epoch,
 	     (int) cipher_size);
 
 	if (vers->tls13_sem && !(session->internals.flags & GNUTLS_NO_AUTO_REKEY) &&
-	    !(record_params->cipher->no_rekey)) {
-		if (unlikely(record_state->sequence_number.i[7] == 0xfd &&
-		    record_state->sequence_number.i[6] == 0xff &&
-		    record_state->sequence_number.i[5] == 0xff)) {
+	    !(record_params->cipher->flags & GNUTLS_CIPHER_FLAG_NO_REKEY)) {
+		if (unlikely((record_state->sequence_number & UINT64_C(0xffffff)) == UINT64_C(0xfffffd))) {
 			/* After we have sent 2^24 messages, mark the session
 			 * as needing a key update. */
 			session->internals.rsend_state = RECORD_SEND_KEY_UPDATE_1;
@@ -798,7 +809,7 @@ static int
 record_add_to_buffers(gnutls_session_t session,
 		      struct tls_record_st *recv, content_type_t type,
 		      gnutls_handshake_description_t htype,
-		      gnutls_uint64 * seq, mbuffer_st * bufel)
+		      uint64_t seq, mbuffer_st * bufel)
 {
 
 	int ret;
@@ -837,7 +848,7 @@ record_add_to_buffers(gnutls_session_t session,
 		 * deactivate the async timer */
 		_dtls_async_timer_delete(session);
 	} else {
-		/* if the expected type is different than the received 
+		/* if the expected type is different than the received
 		 */
 		switch (recv->type) {
 		case GNUTLS_ALERT:
@@ -868,7 +879,7 @@ record_add_to_buffers(gnutls_session_t session,
 			 */
 			if (bufel->msg.data[1] == GNUTLS_A_CLOSE_NOTIFY
 			    && bufel->msg.data[0] != GNUTLS_AL_FATAL) {
-				/* If we have been expecting for an alert do 
+				/* If we have been expecting for an alert do
 				 */
 				session->internals.read_eof = 1;
 				ret = GNUTLS_E_SESSION_EOF;
@@ -1075,8 +1086,8 @@ record_read_headers(gnutls_session_t session,
 		    struct tls_record_st *record)
 {
 
-	/* Read the first two bytes to determine if this is a 
-	 * version 2 message 
+	/* Read the first two bytes to determine if this is a
+	 * version 2 message
 	 */
 
 #ifdef ENABLE_SSL2
@@ -1085,7 +1096,7 @@ record_read_headers(gnutls_session_t session,
 	    && !(IS_DTLS(session))) {
 
 		/* if msb set and expecting handshake message
-		 * it should be SSL 2 hello 
+		 * it should be SSL 2 hello
 		 */
 		record->version[0] = 3;	/* assume SSL 3.0 */
 		record->version[1] = 0;
@@ -1122,10 +1133,9 @@ record_read_headers(gnutls_session_t session,
 		record->version[1] = headers[2];
 
 		if (IS_DTLS(session)) {
-			memcpy(record->sequence.i, &headers[3], 8);
+			record->sequence = _gnutls_read_uint64(&headers[3]);
 			record->length = _gnutls_read_uint16(&headers[11]);
-			record->epoch =
-			    _gnutls_read_uint16(record->sequence.i);
+			record->epoch = record->sequence >> 48;
 		} else {
 			memset(&record->sequence, 0,
 			       sizeof(record->sequence));
@@ -1146,7 +1156,7 @@ record_read_headers(gnutls_session_t session,
 }
 
 
-static int recv_headers(gnutls_session_t session, 
+static int recv_headers(gnutls_session_t session,
 			record_parameters_st *record_params,
 			content_type_t type,
 			gnutls_handshake_description_t htype,
@@ -1173,7 +1183,7 @@ static int recv_headers(gnutls_session_t session,
 		return gnutls_assert_val(ret);
 	}
 
-	ret = _mbuffer_linearize_align16(&session->internals.record_recv_buffer, 
+	ret = _mbuffer_linearize_align16(&session->internals.record_recv_buffer,
 		get_total_headers2(session, record_params));
 	if (ret < 0)
 		return gnutls_assert_val(ret);
@@ -1190,14 +1200,9 @@ static int recv_headers(gnutls_session_t session,
 	if (IS_DTLS(session)) {
 		if (_gnutls_epoch_is_valid(session, record->epoch) == 0) {
 			_gnutls_audit_log(session,
-					  "Discarded message[%u] with invalid epoch %u.\n",
-					  (unsigned int)
-					  _gnutls_uint64touint32(&record->
-								 sequence),
-					  (unsigned int) record->sequence.
-					  i[0] * 256 +
-					  (unsigned int) record->sequence.
-					  i[1]);
+					  "Discarded message[%lu] with invalid epoch %u.\n",
+					  (unsigned long)record->sequence,
+					  (unsigned int) (record->sequence >> 48));
 			gnutls_assert();
 			/* doesn't matter, just a fatal error */
 			return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
@@ -1205,7 +1210,7 @@ static int recv_headers(gnutls_session_t session,
 	}
 
 	/* Here we check if the Type of the received packet is
-	 * ok. 
+	 * ok.
 	 */
 	if ((ret = check_recv_type(session, record->type)) < 0)
 		return gnutls_assert_val(ret);
@@ -1249,7 +1254,7 @@ static int recv_headers(gnutls_session_t session,
 
 /* @ms: is the number of milliseconds to wait for data. Use zero for indefinite.
  *
- * This will receive record layer packets and add them to 
+ * This will receive record layer packets and add them to
  * application_data_buffer and handshake_data_buffer.
  *
  * If the htype is not -1 then handshake timeouts
@@ -1260,7 +1265,7 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 			gnutls_handshake_description_t htype,
 			unsigned int ms)
 {
-	gnutls_uint64 *packet_sequence;
+	uint64_t packet_sequence;
 	gnutls_datum_t ciphertext;
 	mbuffer_st *bufel = NULL, *decrypted = NULL;
 	gnutls_datum_t t;
@@ -1306,9 +1311,9 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 	}
 
 	if (IS_DTLS(session))
-		packet_sequence = &record.sequence;
+		packet_sequence = record.sequence;
 	else
-		packet_sequence = &record_state->sequence_number;
+		packet_sequence = record_state->sequence_number;
 
 	/* Read the packet data and insert it to record_recv_buffer.
 	 */
@@ -1323,7 +1328,7 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 	/* ok now we are sure that we have read all the data - so
 	 * move on !
 	 */
-	ret = _mbuffer_linearize_align16(&session->internals.record_recv_buffer, 
+	ret = _mbuffer_linearize_align16(&session->internals.record_recv_buffer,
 		get_total_headers2(session, record_params));
 	if (ret < 0)
 		return gnutls_assert_val(ret);
@@ -1368,7 +1373,7 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 	    (uint8_t *) _mbuffer_get_udata_ptr(bufel) + record.header_size;
 	ciphertext.size = record.length;
 
-	/* decrypt the data we got. 
+	/* decrypt the data we got.
 	 */
 	t.data = _mbuffer_get_udata_ptr(decrypted);
 	t.size = _mbuffer_get_udata_size(decrypted);
@@ -1451,10 +1456,9 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 					goto sanity_check_error;
 				}
 
-				_gnutls_record_log("REC[%p]: Discarded early data[%u] due to invalid decryption, length: %u\n",
+				_gnutls_record_log("REC[%p]: Discarded early data[%lu] due to invalid decryption, length: %u\n",
 						   session,
-						   (unsigned int)
-						   _gnutls_uint64touint32(packet_sequence),
+						   (unsigned long)packet_sequence,
 						   (unsigned int)
 						   record.length);
 				session->internals.early_data_received += record.length;
@@ -1470,9 +1474,8 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 	if (ret < 0) {
 		gnutls_assert();
 		_gnutls_audit_log(session,
-				  "Discarded message[%u] due to invalid decryption\n",
-				  (unsigned int)
-				  _gnutls_uint64touint32(packet_sequence));
+				  "Discarded message[%lu] due to invalid decryption\n",
+				  (unsigned long)packet_sequence);
 		goto sanity_check_error;
 	}
 
@@ -1484,36 +1487,31 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 			ret = _dtls_record_check(record_params, packet_sequence);
 			if (ret < 0) {
 				_gnutls_record_log
-				    ("REC[%p]: Discarded duplicate message[%u.%u]: %s\n",
+				    ("REC[%p]: Discarded duplicate message[%u.%lu]: %s\n",
 				     session,
-				     (unsigned int) record.sequence.i[0] * 256 +
-				     (unsigned int) record.sequence.i[1],
-				     (unsigned int)
-				     _gnutls_uint64touint32(packet_sequence),
+				     (unsigned int) (record.sequence >> 48),
+				     (unsigned long) (packet_sequence),
 				     _gnutls_packet2str(record.type));
 				goto sanity_check_error;
 			}
 		}
 
 		_gnutls_record_log
-		    ("REC[%p]: Decrypted Packet[%u.%u] %s(%d) with length: %d\n",
+		    ("REC[%p]: Decrypted Packet[%u.%lu] %s(%d) with length: %d\n",
 		     session,
-		     (unsigned int) record.sequence.i[0] * 256 +
-		     (unsigned int) record.sequence.i[1],
-		     (unsigned int)
-		     _gnutls_uint64touint32(packet_sequence),
+		     (unsigned int) (record.sequence >> 48),
+		     (unsigned long) packet_sequence,
 		     _gnutls_packet2str(record.type), record.type,
 		     (int) _mbuffer_get_udata_size(decrypted));
 
 		/* store the last valid sequence number. We don't use that internally but
 		 * callers of gnutls_record_get_state() could take advantage of it. */
-		memcpy(&record_state->sequence_number, packet_sequence, 8);
+		record_state->sequence_number = record.sequence;
 	} else {
 		_gnutls_record_log
-		    ("REC[%p]: Decrypted Packet[%u] %s(%d) with length: %d\n",
+		    ("REC[%p]: Decrypted Packet[%lu] %s(%d) with length: %d\n",
 		     session,
-		     (unsigned int)
-		     _gnutls_uint64touint32(packet_sequence),
+		     (unsigned long) packet_sequence,
 		     _gnutls_packet2str(record.type), record.type,
 		     (int) _mbuffer_get_udata_size(decrypted));
 
@@ -1530,7 +1528,7 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 		goto sanity_check_error;
 	}
 
-/* (originally for) TLS 1.0 CBC protection. 
+/* (originally for) TLS 1.0 CBC protection.
  * Actually this code is called if we just received
  * an empty packet. An empty TLS packet is usually
  * sent to protect some vulnerabilities in the CBC mode.
@@ -1805,7 +1803,7 @@ void gnutls_packet_get(gnutls_packet_t packet, gnutls_datum_t *data, unsigned ch
 	assert(packet != NULL);
 
 	if (sequence) {
-		memcpy(sequence, packet->record_sequence.i, 8);
+		_gnutls_write_uint64(packet->record_sequence, sequence);
 	}
 
 	if (data) {
@@ -1832,8 +1830,12 @@ void gnutls_packet_deinit(gnutls_packet_t packet)
  * gnutls_record_discard_queued:
  * @session: is a #gnutls_session_t type.
  *
- * This function discards all queued to be sent packets in a TLS or DTLS session.
+ * This function discards all queued to be sent packets in a DTLS session.
  * These are the packets queued after an interrupted gnutls_record_send().
+ *
+ * This function can only be used with transports where send() is
+ * an all-or-nothing operation (e.g., UDP). When partial writes are allowed
+ * this function will cause session errors.
  *
  * Returns: The number of bytes discarded.
  *
@@ -1857,17 +1859,17 @@ gnutls_record_discard_queued(gnutls_session_t session)
  * memory copy, and is intended to be used by applications seeking high
  * performance.
  *
- * The received packet is accessed using gnutls_packet_get() and 
+ * The received packet is accessed using gnutls_packet_get() and
  * must be deinitialized using gnutls_packet_deinit(). The returned
  * packet will be %NULL if the return value is zero (EOF).
  *
  * Returns: The number of bytes received and zero on EOF (for stream
- * connections).  A negative error code is returned in case of an error.  
+ * connections).  A negative error code is returned in case of an error.
  *
  * Since: 3.3.5
  **/
 ssize_t
-gnutls_record_recv_packet(gnutls_session_t session, 
+gnutls_record_recv_packet(gnutls_session_t session,
 			  gnutls_packet_t *packet)
 {
 	int ret;
@@ -1923,25 +1925,26 @@ ssize_t append_data_to_corked(gnutls_session_t session, const void *data, size_t
  * difference is that it accepts a GnuTLS session, and uses different
  * error codes.
  * Note that if the send buffer is full, send() will block this
- * function.  See the send() documentation for more information.  
+ * function.  See the send() documentation for more information.
  *
  * You can replace the default push function which is send(), by using
  * gnutls_transport_set_push_function().
  *
- * If the EINTR is returned by the internal push function 
+ * If the EINTR is returned by the internal push function
  * then %GNUTLS_E_INTERRUPTED will be returned. If
  * %GNUTLS_E_INTERRUPTED or %GNUTLS_E_AGAIN is returned, you must
  * call this function again with the exact same parameters, or provide a
  * %NULL pointer for @data and 0 for @data_size, in order to write the
  * same data as before. If you wish to discard the previous data instead
  * of retrying, you must call gnutls_record_discard_queued() before
- * calling this function with different parameters.
- * cf. gnutls_record_get_direction(). 
+ * calling this function with different parameters. Note that the latter
+ * works only on special transports (e.g., UDP).
+ * cf. gnutls_record_get_direction().
  *
  * Note that in DTLS this function will return the %GNUTLS_E_LARGE_PACKET
  * error code if the send data exceed the data MTU value - as returned
  * by gnutls_dtls_get_data_mtu(). The errno value EMSGSIZE
- * also maps to %GNUTLS_E_LARGE_PACKET. 
+ * also maps to %GNUTLS_E_LARGE_PACKET.
  * Note that since 3.2.13 this function can be called under cork in DTLS
  * mode, and will refuse to send data over the MTU size by returning
  * %GNUTLS_E_LARGE_PACKET.
@@ -2190,8 +2193,8 @@ void gnutls_record_cork(gnutls_session_t session)
  * errors will be returned. To obtain the data left in the corked
  * buffer use gnutls_record_check_corked().
  *
- * Returns: On success the number of transmitted data is returned, or 
- * otherwise a negative error code. 
+ * Returns: On success the number of transmitted data is returned, or
+ * otherwise a negative error code.
  *
  * Since: 3.1.9
  **/
@@ -2268,7 +2271,7 @@ int gnutls_record_uncork(gnutls_session_t session, unsigned int flags)
  * gnutls_record_get_direction().
  *
  * Returns: The number of bytes received and zero on EOF (for stream
- * connections).  A negative error code is returned in case of an error.  
+ * connections).  A negative error code is returned in case of an error.
  * The number of bytes received might be less than the requested @data_size.
  **/
 ssize_t
@@ -2300,7 +2303,7 @@ gnutls_record_recv(gnutls_session_t session, void *data, size_t data_size)
  * This is useful in DTLS where record packets might be received
  * out-of-order. The returned 8-byte sequence number is an
  * integer in big-endian format and should be
- * treated as a unique message identification. 
+ * treated as a unique message identification.
  *
  * Returns: The number of bytes received and zero on EOF.  A negative
  *   error code is returned in case of an error.  The number of bytes

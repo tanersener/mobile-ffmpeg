@@ -1,6 +1,0 @@
-/.deps/
-/.libs/
-*.o
-*.lo
-/Makefile
-/libcrypto.la

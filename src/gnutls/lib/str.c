@@ -231,7 +231,7 @@ _gnutls_buffer_pop_datum(gnutls_buffer_st * str, gnutls_datum_t * data,
 	return;
 }
 
-/* converts the buffer to a datum if possible. After this call 
+/* converts the buffer to a datum if possible. After this call
  * (failed or not) the buffer should be considered deinitialized.
  */
 int _gnutls_buffer_to_datum(gnutls_buffer_st * str, gnutls_datum_t * data, unsigned is_str)
@@ -399,20 +399,17 @@ int _gnutls_buffer_unescape(gnutls_buffer_st * dest)
 
 	while (pos < dest->length) {
 		if (dest->data[pos] == '%') {
-			char b[3];
-			unsigned int u;
-			unsigned char x;
+			if (pos + 1 < dest->length && dest->data[pos + 1] == '%') {
+				// %% -> %
+				_gnutls_buffer_delete_data(dest, pos, 1);
+			} else if (pos + 2 < dest->length && c_isxdigit(dest->data[pos + 1]) && c_isxdigit(dest->data[pos + 2])) {
+				unsigned char x;
 
-			b[0] = dest->data[pos + 1];
-			b[1] = dest->data[pos + 2];
-			b[2] = 0;
+				hex_decode((char *) dest->data + pos + 1, 2, &x, 1);
 
-			sscanf(b, "%02x", &u);
-
-			x = u;
-
-			_gnutls_buffer_delete_data(dest, pos, 3);
-			_gnutls_buffer_insert_data(dest, pos, &x, 1);
+				_gnutls_buffer_delete_data(dest, pos, 3);
+				_gnutls_buffer_insert_data(dest, pos, &x, 1);
+			}
 		}
 		pos++;
 	}
@@ -656,7 +653,7 @@ gnutls_hex_encode2(const gnutls_datum_t * data, gnutls_datum_t *result)
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	ret = hex_encode((char*)data->data, data->size, (char*)result->data, size); 
+	ret = hex_encode((char*)data->data, data->size, (char*)result->data, size);
 	if (ret == 0) {
 		gnutls_free(result->data);
 		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);

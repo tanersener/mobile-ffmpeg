@@ -1972,6 +1972,19 @@ int _gnutls_pubkey_compatible_with_sig(gnutls_session_t session,
 						  hash_size);
 		}
 
+	} else if (pubkey->params.algo == GNUTLS_PK_GOST_01 ||
+		   pubkey->params.algo == GNUTLS_PK_GOST_12_256 ||
+		   pubkey->params.algo == GNUTLS_PK_GOST_12_512) {
+		if (_gnutls_version_has_selectable_sighash(ver)
+		    && se != NULL) {
+			if (_gnutls_gost_digest(pubkey->params.algo) != se->hash) {
+				_gnutls_audit_log(session,
+						  "The hash algo used in signature (%u) is not expected (%u)\n",
+						  se->hash, _gnutls_gost_digest(pubkey->params.algo));
+				return gnutls_assert_val(GNUTLS_E_CONSTRAINT_ERROR);
+			}
+		}
+
 	} else if (pubkey->params.algo == GNUTLS_PK_RSA_PSS) {
 		if (!_gnutls_version_has_selectable_sighash(ver))
 			/* this should not have happened */

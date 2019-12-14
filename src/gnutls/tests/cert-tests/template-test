@@ -93,6 +93,27 @@ fi
 
 rm -f ${TMPFILE}
 
+echo "Running test for certificate generation with --generate-self-signed"
+
+datefudge -s "2007-04-22" \
+	"${CERTTOOL}" --generate-certificate \
+		--load-privkey "${srcdir}/data/template-test.key" \
+		--load-ca-privkey "${srcdir}/../../doc/credentials/x509/ca-key.pem" \
+		--load-ca-certificate "${srcdir}/../../doc/credentials/x509/ca.pem" \
+		--template "${srcdir}/templates/template-dn.tmpl" \
+		--outfile ${TMPFILE} 2>/dev/null
+
+${DIFF} "${srcdir}/data/template-sgenerate.pem" ${TMPFILE} >/dev/null 2>&1
+rc=$?
+
+# We're done.
+if test "${rc}" != "0"; then
+	echo "Test 3-a non-self-signed generation failed"
+	exit ${rc}
+fi
+
+rm -f ${TMPFILE}
+
 datefudge -s "2007-04-22" \
 	"${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/data/template-test.key" \

@@ -5,6 +5,33 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.6.11 (released 2019-12-01)
+
+** libgnutls: Use KERN_ARND for the system random number generator on NetBSD.
+   This syscall provides an endless stream of random numbers from the kernel's
+   ChaCha20-based random number generator, without blocking or requiring an open file
+   descriptor.
+
+** libgnutls: Corrected issue with TLS 1.2 session ticket handling as client
+   during resumption (#841).
+
+** libgnutls: gnutls_base64_decode2() succeeds decoding the empty string to
+   the empty string. This is a behavioral change of the API but it conforms
+   to the RFC4648 expectations (#834).
+
+** libgnutls: Fixed AES-CFB8 implementation, when input is shorter than
+   the block size. Fix backported from nettle.
+
+** certtool: CRL distribution points will be set in CA certificates even when
+   non self-signed (#765).
+
+** gnutls-cli/serv: added raw public-key handling capabilities (RFC7250).
+   Key material can be set via the --rawpkkeyfile and --rawpkfile flags.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.6.10 (released 2019-09-29)
 
 ** libgnutls: Added support for deterministic ECDSA/DSA (RFC6979)

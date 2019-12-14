@@ -39,7 +39,8 @@ const hello_ext_entry_st ext_mod_ext_master_secret = {
 	.name = "Extended Master Secret",
 	.tls_id = 23,
 	.gid = GNUTLS_EXTENSION_EXT_MASTER_SECRET,
-	.parse_type = GNUTLS_EXT_MANDATORY,
+	.client_parse_point = GNUTLS_EXT_MANDATORY,
+	.server_parse_point = GNUTLS_EXT_MANDATORY,
 	.validity = GNUTLS_EXT_FLAG_TLS|GNUTLS_EXT_FLAG_DTLS | GNUTLS_EXT_FLAG_CLIENT_HELLO |
 		    GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
 	.recv_func = _gnutls_ext_master_secret_recv_params,

@@ -1,8 +1,0 @@
-/.libs/
-/.deps/
-*.o
-*.lo
-/Makefile
-/gnutls.pc
-/libgnutls.la
-/libgnutlsxx.la

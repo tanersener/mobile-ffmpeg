@@ -211,6 +211,9 @@ typedef struct {
 #ifdef ENABLE_SSL3
 	unsigned int ssl_hmac:1;
 #endif
+#ifdef ENABLE_GOST
+	unsigned int continuous_mac:1;
+#endif
 	unsigned int non_null:1;
 	unsigned int etm:1;
 	size_t tag_size;
@@ -241,11 +244,11 @@ int _gnutls_auth_cipher_decrypt2(auth_cipher_hd_st * handle,
 int _gnutls_auth_cipher_tag(auth_cipher_hd_st * handle, void *tag,
 			    int tag_size);
 
-inline static void _gnutls_auth_cipher_setiv(const auth_cipher_hd_st *
+inline static int _gnutls_auth_cipher_setiv(const auth_cipher_hd_st *
 					     handle, const void *iv,
 					     size_t ivlen)
 {
-	_gnutls_cipher_setiv(&handle->cipher, iv, ivlen);
+	return _gnutls_cipher_setiv(&handle->cipher, iv, ivlen);
 }
 
 inline static size_t _gnutls_auth_cipher_tag_len(auth_cipher_hd_st *

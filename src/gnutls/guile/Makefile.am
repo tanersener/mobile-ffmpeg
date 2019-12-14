@@ -69,6 +69,12 @@ AM_V_GUILEC = $(AM_V_GUILEC_$(V))
 AM_V_GUILEC_ = $(AM_V_GUILEC_$(AM_DEFAULT_VERBOSITY))
 AM_V_GUILEC_0 = @echo "  GUILEC  " $@;
 
+if CROSS_COMPILING
+CROSS_COMPILING_VARIABLE = GNUTLS_GUILE_CROSS_COMPILING=yes
+else
+CROSS_COMPILING_VARIABLE =
+endif
+
 # Make sure 'gnutls.scm' is built first.
 # Unset 'GUILE_LOAD_COMPILED_PATH' so we can be sure that any .go file that we
 # load comes from the build directory.
@@ -78,6 +84,7 @@ AM_V_GUILEC_0 = @echo "  GUILEC  " $@;
 	$(AM_V_GUILEC)$(MKDIR_P) "`dirname "$@"`" ;			\
 	$(AM_V_P) && out=1 || out=- ;					\
 	unset GUILE_LOAD_COMPILED_PATH ; LC_ALL=C			\
+	GUILE_AUTO_COMPILE=0 $(CROSS_COMPILING_VARIABLE)		\
 	GNUTLS_GUILE_EXTENSION_DIR="$(abs_top_builddir)/guile/src"	\
 	$(GUILD) compile --target="$(host)"				\
 	  -L "$(top_builddir)/guile/modules"				\

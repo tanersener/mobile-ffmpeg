@@ -1,4 +1,873 @@
 Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Date:   Mon Dec 2 17:32:16 2019 +0100
+
+    Revert "Released 3.6.11.1 including missing files"
+    
+    This reverts commit 1e9c9ba0c0798b5566902e6c5ab83418826dd7f5.
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Date:   Mon Dec 2 17:08:43 2019 +0100
+
+    Released 3.6.11.1 including missing files
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Date:   Mon Dec 2 08:56:05 2019 +0100
+
+    libopts: include new files into dist
+    
+    This also includes --enable-local-libopts flag to make dist
+    to catch future regressions.
+    
+    Resolves: #867
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Date:   Sun Dec 1 22:39:01 2019 +0100
+
+    released 3.6.11
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+Author: Fiona Klute <fiona.klute@gmx.de>
+Date:   Sun Dec 1 19:20:17 2019 +0100
+
+    Write OCSP status request debug information to logfile, if set
+    
+    The status information not part of the payload data and should be
+    separate when using --logfile.
+    
+    Signed-off-by: Fiona Klute <fiona.klute@gmx.de>
+
+Author: Fiona Klute <fiona.klute@gmx.de>
+Date:   Sun Dec 1 18:45:28 2019 +0100
+
+    Send log messages about loading client credentials to logfile, if set
+    
+    Signed-off-by: Fiona Klute <fiona.klute@gmx.de>
+
+Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Date:   Fri Nov 29 20:30:26 2019 +0100
+
+    .travis.yml: explicitly install openssl to address build issue
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Date:   Fri Nov 29 16:19:07 2019 +0100
+
+    NEWS: documented AES-CFB8 fix [ci skip]
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Date:   Fri Nov 29 13:06:41 2019 +0100
+
+    bumped version
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Date:   Thu Nov 28 09:08:28 2019 +0100
+
+    .travis.yml: update submodules [ci skip]
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Date:   Fri Nov 29 09:40:55 2019 +0100
+
+    base64: minor improvements in OOM handling and test suite
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Date:   Thu Nov 28 15:05:17 2019 +0100
+
+    gnutls_base64_decode2() succeeds decoding the empty string
+    
+    This is a behavioral change of the API but it conforms to
+    the RFC4648 expectations.
+    
+    Resolves: #834
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Date:   Wed Nov 27 16:13:06 2019 +0100
+
+    Revert "tests: ignore datefudge-check check when running on command line"
+    
+    This commit was breaking CI on FreeBSD systems.
+    
+    This reverts commit 1fe4f8e289d666979618fbb909983ac05aad11ac.
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Date:   Mon Nov 25 22:36:22 2019 +0100
+
+    certtool: always include the CRL distribution points on CAs
+    
+    Previously we would omit the CRL distribution points from a non-self
+    signed CA certificate, even if contained in the template.
+    
+    Resolves: #765
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Date:   Mon Nov 25 22:38:05 2019 +0100
+
+    tests: ignore datefudge-check check when running on command line
+    
+    That allows running the tests individually without make or setting
+    top_builddir variable.
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Fri Nov 22 17:21:19 2019 +0300
+
+    tests: make tests pass with disabled GOST  algorithms
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Fri Nov 22 16:43:49 2019 +0300
+
+    gitlab-ci: enable running make check on minimal build
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Ludovic Courtès <ludo@gnu.org>
+Date:   Mon Nov 11 21:36:22 2019 +0100
+
+    guile: Silence auto-compilation warning for 'guild'.
+    
+    Reported by Helmut Grohne <helmut@subdivi.de>
+    and Andreas Metzler <ametzler@bebt.de>
+    at <https://bugs.debian.org/943905>.
+    
+    * guile/Makefile.am (%.go): Pass "GUILE_AUTO_COMPILE=0" to avoid
+    warnings about 'guild' needing to be compiled.
+    
+    Signed-off-by: Ludovic Courtès <ludo@gnu.org>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Sun Nov 10 14:06:58 2019 +0300
+
+    vko: fix possible unitilized scalar access
+    
+    Fix error path in _gnutls_gost_keytrans_decrypt. If
+    _asn1_strict_der_decode() fails, cleanup path will try to
+    gnutls_pk_params_release(&pub), which will access unitialized pub
+    variable. Fix by deleting asn1 sctructure directly.
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Ludovic Courtès <ludo@gnu.org>
+Date:   Mon Nov 11 21:30:48 2019 +0100
+
+    guile: Do not attempt to load shared object when cross-compiling.
+    
+    Reported by Helmut Grohne <helmut@subdivi.de>
+    and Andreas Metzler <ametzler@bebt.de>
+    at <https://bugs.debian.org/943905>.
+    
+    * configure.ac: Add 'CROSS_COMPILING' conditional.
+    * guile/Makefile.am (CROSS_COMPILING_VARIABLE): New variable.
+    (%.go): Use it.
+    * guile/modules/gnutls.in <top level>: Do not call 'load-extension'
+    when "GNUTLS_GUILE_CROSS_COMPILING" is defined.
+    
+    Signed-off-by: Ludovic Courtès <ludo@gnu.org>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Thu Oct 27 03:30:34 2016 +0300
+
+    Add support for VKO GOST key exchange
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Daiki Ueno <ueno@gnu.org>
+Date:   Thu Nov 7 18:25:01 2019 +0100
+
+    .gitlab-ci.yml: bump configure cache version
+    
+    Signed-off-by: Daiki Ueno <dueno@redhat.com>
+
+Author: Günther Deschner <gd@samba.org>
+Date:   Wed Nov 6 13:17:57 2019 +0100
+
+    crypto-selftests: test CFB8 ciphers with different chunksizes
+    
+    Signed-off-by: Guenther Deschner <gd@samba.org>
+    Signed-off-by: Daiki Ueno <dueno@redhat.com>
+
+Author: Daiki Ueno <ueno@gnu.org>
+Date:   Fri Nov 8 10:10:09 2019 +0100
+
+    nettle: use included CFB8 implementation if nettle is 3.5
+    
+    Signed-off-by: Daiki Ueno <dueno@redhat.com>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Sun Feb 10 02:38:43 2019 +0300
+
+    groups: add function to return group by curve
+    
+    Two GOST groups will have two curves attached. Add function to retrieve
+    group by curve, rather than by group id.
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Tue May 7 18:01:33 2019 +0300
+
+    ecc: define curve->group relationship
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Tue Aug 29 11:09:31 2017 +0300
+
+    Declare groups corresponding to GOST curves
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Fri Dec 2 06:26:55 2016 +0300
+
+    Add GOST key transport support
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Thu Jun 7 13:19:55 2018 +0300
+
+    nettle: add support for GOST key derivation
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Thu Oct 27 18:58:12 2016 +0300
+
+    _gnutls_pk_derive: add argument for nonce
+    
+    GOST VKO key derivation needs another opaque argument (called UKM).
+    Add an argument to _gnutls_pk_derive to accomodate that keying material.
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Thu Jun 14 15:39:39 2018 +0300
+
+    nettle/gost: add support for GOST VKO algorithm
+    
+    GOST VKO is a variant of ECDHE algorithm.
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Thu Jun 14 15:39:19 2018 +0300
+
+    nettle/gost: provide GOST keywrapping support
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Miroslav Lichvar <mlichvar@redhat.com>
+Date:   Wed Nov 6 11:37:10 2019 +0100
+
+    prf: don't crash when called before handshake completion
+    
+    If a gnutls_prf*() function is called before the handshake is completed,
+    return GNUTLS_E_INVALID_REQUEST instead of crashing.
+    
+    Signed-off-by: Miroslav Lichvar <mlichvar@redhat.com>
+
+Author: Daiki Ueno <ueno@gnu.org>
+Date:   Wed Nov 6 12:07:24 2019 +0100
+
+    nettle: backport fixes to cfb8_decrypt
+    
+    cfb8: don't truncate output IV if input is shorter than block size:
+    https://git.lysator.liu.se/nettle/nettle/commit/f4a9c842621baf5d71aa9cc3989851f44dc46861
+    
+    Signed-off-by: Daiki Ueno <dueno@redhat.com>
+
+Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Date:   Tue Nov 5 16:47:17 2019 +0100
+
+    gnutls_privkey_sign_data2: removed unnecessary text [ci skip]
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Date:   Fri Nov 1 14:04:27 2019 +0100
+
+    .gitlab-ci.yml: do not inline strcmp in valgrind build
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Date:   Fri Nov 1 10:24:24 2019 +0100
+
+    .gitlab-ci.yml: removed unnecessary use of --enable-valgrind-tests
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+Author: nia <nia@NetBSD.org>
+Date:   Thu Oct 31 18:36:49 2019 +0000
+
+    Add NEWS entry for the NetBSD KERN_ARND change.
+    
+    Signed-off-by: Nia Alarie <nia@NetBSD.org>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Thu May 18 05:36:49 2017 +0300
+
+    tls-sig: reverse bytes in TLS signatures for GOST signatures
+    
+    GOST TLS suites have one peculiarity: CertificateVerify message uses
+    byte order opposite to the rest of GOST signature usage (BE instead of
+    LE). So, reverse byte order in signatures in TLS code. For now this
+    applies only to TLS 1.2 code. GOST TLS 1.3 ciphersuites will also follow
+    this approach. Legacy TLS 1.0 ciphersuites also had this peculiarity.
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Date:   Wed Oct 30 10:39:49 2019 +0100
+
+    .gitlab-ci.yml: updated CI environment to F31
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Date:   Fri Oct 11 20:46:41 2019 +0200
+
+    tests: include config.h in rawpk-api.c
+    
+    This seems to have impacted windows compilation.
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Date:   Fri Oct 11 15:57:43 2019 +0200
+
+    tests: global-init-override do not run in windows
+    
+    It cannot be compiled in f30.
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Date:   Fri Oct 11 14:44:39 2019 +0200
+
+    updated to libopts 5.18.16
+    
+    This fixes compilation in Fedora 30 which ships with this
+    version of autogen.
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Sun Oct 27 03:12:45 2019 +0300
+
+    serv: move closing TABLE tag after actual table end
+    
+    Move closing TABLE tag after printing information on cipher and MAC.
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Sun Oct 27 03:08:33 2019 +0300
+
+    ecc: fix curve sizes for TC26-256 gost curves
+    
+    Fix curve size being incorrectly set to 64 instead of 32 for several
+    GOST curves.
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: nia <nia@NetBSD.org>
+Date:   Sat Oct 26 20:58:49 2019 +0100
+
+    nettle: Support sysctl(KERN_ARND) for RNG on NetBSD.
+    
+    This system call will never block and does not require a file
+    descriptor to be opened. It provides an endless stream of random
+    numbers from the kernel's ChaCha20-based random number generator.
+    
+    Signed-off-by: Nia Alarie <nia@NetBSD.org>
+
+Author: Björn Jacke <bjacke@samba.org>
+Date:   Fri Oct 25 17:25:39 2019 +0200
+
+    doc: describe how to make gnutls-cli quiet for pipe usage
+    
+    Signed-off-by: Bjoern Jacke <bjacke@samba.org>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Thu Oct 24 18:01:55 2019 +0300
+
+    lib: simplify uint24 handling
+    
+    Drop separate uint24 type and functions to convert between it and
+    uint32_t. This makes _gnutls_read/_write_uint24 simpler and easier to
+    understand. And with faster assembly code.
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Sun Oct 20 18:49:41 2019 +0300
+
+    lib: drop gnutls_uint64 usage as sequence number
+    
+    GnuTLS is depending already on uint64_t being a properly defined type.
+    So there is no need to have a special byte-array type for 8-byte
+    integers. Use uint64_t instead, thus simplifying a code quite heavily.
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Mon Oct 21 15:55:47 2019 +0300
+
+    sign: convert tls13_ok to flags field
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Mon Oct 21 18:55:26 2019 +0300
+
+    tls-sig: split TLS 1.0/1.1 CertificateVerify code
+    
+    For the symmetry split the TLS 1.[01] CertificateVerify code, so that
+    main functions work as pure multiplexors.
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Mon Oct 21 14:08:00 2019 +0300
+
+    mac: mark GOST28147-TC26Z-IMIT as using CONTINUOUS_MAC
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Thu May 18 04:09:51 2017 +0300
+
+    Support GOST cipher suite MAC calculation
+    
+    GOST ciphersuites require that MAC is calculated over _all_ packets,
+    rather than just current packet. Add flag to auth_cipher_hd_st
+    controlling this behaviour.
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Mon Oct 21 13:57:55 2019 +0300
+
+    mac: change preimage_insecure to be a flag
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Fri Oct 18 13:19:04 2019 +0300
+
+    cipher: replace several bools with single flags instance
+    
+    Replace bools in cipher_entry_st with flags field.
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Thu Jun 21 19:34:45 2018 +0300
+
+    lib: pubkey vs TLS signature compatibility for GOST algorithms
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Fri Oct 18 13:22:06 2019 +0300
+
+    src: fix noreturn-related warning
+    
+    Recent autogen started adding '#include <stdnoreturn.h>' into -args.h
+    files. However in GnuTLS tools code this results in the following
+    warnings, because stdnoreturn.h unconditionally redefines 'noreturn' to
+    _Noreturn:
+    
+    warning: '_Noreturn' attribute directive ignored
+    
+    Use __noreturn__ attribute instead as does Gnulib.
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Fri Dec 2 08:28:34 2016 +0300
+
+    Allow using implicit IV for stream ciphers with TLS
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Tue Aug 29 11:10:33 2017 +0300
+
+    prf: add Streebog (GOST R 34.11-2012) PRF support
+    
+    Add support and tests for PRF generated using both Streebog versions.
+    This is necessary for adding GOST TLS ciphersuites support.
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Tim Rühsen <tim.ruehsen@gmx.de>
+Date:   Sat Oct 12 20:59:22 2019 +0200
+
+    Add const to several read-only packet sequence params
+    
+    Signed-off-by: Tim Rühsen <tim.ruehsen@gmx.de>
+
+Author: Tim Rühsen <tim.ruehsen@gmx.de>
+Date:   Sun Oct 13 12:04:20 2019 +0200
+
+    tests/buffer.c: Add unit test for _gnutls_buffer_unescape()
+    
+    Signed-off-by: Tim Rühsen <tim.ruehsen@gmx.de>
+
+Author: Tim Rühsen <tim.ruehsen@gmx.de>
+Date:   Wed Oct 9 18:54:12 2019 +0200
+
+    lib/x509/x509.c: Check before pointer dereference in get_alt_name()
+    
+    Fixes Coverity issue 1361513
+    
+    Signed-off-by: Tim Rühsen <tim.ruehsen@gmx.de>
+
+Author: Tim Rühsen <tim.ruehsen@gmx.de>
+Date:   Wed Oct 9 18:44:35 2019 +0200
+
+    cipher: Let _gnutls_auth_cipher_setiv() return int
+    
+    Fixes Coverity issue 1454646
+    
+    Signed-off-by: Tim Rühsen <tim.ruehsen@gmx.de>
+
+Author: Tim Rühsen <tim.ruehsen@gmx.de>
+Date:   Wed Oct 9 18:34:22 2019 +0200
+
+    lib/record.c: Use assignment instead of memcpy()
+    
+    Fixes Coverity issue 1454647
+    
+    Signed-off-by: Tim Rühsen <tim.ruehsen@gmx.de>
+
+Author: Tim Rühsen <tim.ruehsen@gmx.de>
+Date:   Wed Oct 9 18:27:11 2019 +0200
+
+    lib/sslv2_compat.c: Check return value of _gnutls_generate_session_id()
+    
+    Fixes Coverity issue 1454649
+    
+    Signed-off-by: Tim Rühsen <tim.ruehsen@gmx.de>
+
+Author: Tim Rühsen <tim.ruehsen@gmx.de>
+Date:   Wed Oct 9 18:11:10 2019 +0200
+
+    lib/x509/output.c: Remove unneeded NULL check in print_crt_pubkey()
+    
+    Fixes Coverity issue 1454670
+    
+    Signed-off-by: Tim Rühsen <tim.ruehsen@gmx.de>
+
+Author: Tim Rühsen <tim.ruehsen@gmx.de>
+Date:   Wed Oct 9 18:04:44 2019 +0200
+
+    lib/auth/srp_passwd.c: Fix NULL dereference in _gnutls_srp_pwd_read_entry()
+    
+    Fixes Coverity issue 1454652
+    
+    Signed-off-by: Tim Rühsen <tim.ruehsen@gmx.de>
+
+Author: Tim Rühsen <tim.ruehsen@gmx.de>
+Date:   Wed Oct 9 17:53:54 2019 +0200
+
+    lib/str.c: Replace sscanf() in _gnutls_buffer_unescape()
+    
+    Fixes Coverity issue 1454651
+    
+    Signed-off-by: Tim Rühsen <tim.ruehsen@gmx.de>
+
+Author: Tim Rühsen <tim.ruehsen@gmx.de>
+Date:   Wed Oct 9 17:39:24 2019 +0200
+
+    lib/handshake.c: Check return value of _gnutls_version_max()
+    
+    Fixes Coverity issue 1454674
+    Fixes Coverity issue 1454658
+    
+    Signed-off-by: Tim Rühsen <tim.ruehsen@gmx.de>
+
+Author: Tim Rühsen <tim.ruehsen@gmx.de>
+Date:   Wed Oct 9 17:37:42 2019 +0200
+
+    Remove trailing spaces in several files
+    
+    Signed-off-by: Tim Rühsen <tim.ruehsen@gmx.de>
+
+Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Date:   Thu Oct 10 17:49:01 2019 +0200
+
+    .gitlab-ci.yml: removed coverity build [ci skip]
+    
+    The coverity run is subject to several restrictions by the service,
+    and thus it is not really useful in the main CI runs as it cannot reasonably
+    be run on MRs or master. As such we simplify the main CI file by moving the
+    coverity to the coverage sub-project and running it weekly.
+    
+    The new location is at:
+    https://gitlab.com/gnutls/coverage
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Date:   Sat Oct 5 03:30:32 2019 +0200
+
+    crq APIs: fix typos [ci skip]
+    
+    Resolves: #842
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Date:   Wed Sep 25 07:04:04 2019 +0200
+
+    document limitations of gnutls_record_discard_queued() [ci skip]
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+Author: Ricardo M. Correia <rcorreia@wizy.org>
+Date:   Wed Oct 9 17:37:22 2019 +0200
+
+    README.md: document lscpu/util-linux dependency for make check
+    
+    Closes #764
+    
+    Signed-off-by: Ricardo M. Correia <rcorreia@wizy.org>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Wed Oct 9 01:29:07 2019 +0300
+
+    testpkcs11.sh: test that we output mechanism flags correctly
+    
+    Verify some of PKCS#11 mechanism flags.
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Wed Sep 25 21:11:09 2019 +0300
+
+    p11tool: print mechanism info in list-mechanisms
+    
+    Print key size range and flags in mechanisms list.
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Wed Oct 9 00:10:09 2019 +0300
+
+    tests/psk-file: fix heizenbug in last test
+    
+    Currently last test case in psk-file expects that the server will
+    terminate connection with fatal error and close connection. Client will
+    receive GNUTLS_E_PUSH_ERROR error. However on slow boxes (or under qemu)
+    client is able to receive server's fatal alert thus returning unexpected
+    error. To make this behaviour predictable make server wait for client to
+    read all data and actually close connection on it's own.
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Date:   Tue Oct 8 07:23:31 2019 +0200
+
+    session tickets: parse extension during session resumption on client side
+    
+    It is possible for a server to send a new session ticket during
+    TLS1.2 resumption. To be able to parse it as client we need to
+    check the extension during resumption as well.
+    
+    Resolves: #841
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Mon Jun 24 01:37:31 2019 +0300
+
+    ext/supported_groups: don't consider non-EC groups for EC
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Fri Aug 2 02:08:00 2019 +0300
+
+    tests: correct gost server certificates
+    
+    Correct GOST server certificates:
+     - use only Digital Signature Key Usage,
+     - use new format for 512-bit curve key and certificate.
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Date:   Tue Oct 8 06:48:44 2019 +0200
+
+    .gitlab-ci.yml: only run coverity task on 3_6_x tags [ci skip]
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Wed Oct 2 17:05:10 2019 +0300
+
+    cert-tests/gost: add certificate with new GOSTParameters struct
+    
+    Add certificate example using simplified (new) GOSTParameters structure.
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Date:   Mon Oct 7 20:59:34 2019 +0200
+
+    .gitlab-ci.yml: include an automated coverity build on tags
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Wed Sep 25 18:13:37 2019 +0300
+
+    lib: implement support for updated GOST PublicKeyParameters
+    
+    Recomendation for standardization R 1323565.1.023-2018 has made changes
+    to PublicKeyParameters for GOST R 34.10-2012 keys. It has removed
+    encryptionParamSet (since now S-BOX is basically fixed as TC26-Z) and
+    made digestParamSet OPTIONAL (as it can be concluded from public key
+    OID). Implement these requirements.
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Thu Apr 25 15:06:58 2019 +0300
+
+    nettle/pk: add support for "new" TC26 256 B curve
+    
+    TC26 likes aliases. Thus "new" TC26 256 B curve is the same as old
+    CryptoPro-256-A curve (but with limitation to use GOST R 34.10-2012).
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Sat Sep 28 21:40:30 2019 +0300
+
+    lib/ecc: add documentation for GOST-related curves
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Tue May 7 15:24:53 2019 +0300
+
+    lib: define more GOST curves
+    
+    Declare GOST curves from GOST R 34.10-2001 and GOST R 34.10-2012 (test
+    curves) and GOST curves defined by TC26 itself.
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Daiki Ueno <ueno@gnu.org>
+Date:   Tue Oct 1 18:15:19 2019 +0200
+
+    gnutls_aead_cipher_{en,de}cryptv2: write back cached data to buffers
+    
+    Previously, those functions failed to write the output to the buffers
+    if the buffer length is not multiple of cipher block size.  This makes
+    sure that the cached data is always flushed.
+    
+    Signed-off-by: Daiki Ueno <dueno@redhat.com>
+
+Author: Daiki Ueno <ueno@gnu.org>
+Date:   Tue Oct 1 18:14:48 2019 +0200
+
+    iov: add _gnutls_iov_iter_sync to write back cached data to iov
+    
+    Signed-off-by: Daiki Ueno <dueno@redhat.com>
+
+Author: Daiki Ueno <ueno@gnu.org>
+Date:   Thu Oct 3 10:34:18 2019 +0200
+
+    iov: _gnutls_iov_iter_next: return bytes instead of blocks
+    
+    This eliminates the need of special handling of final block.  Also
+    adds more tests in exceptional cases.
+    
+    Signed-off-by: Daiki Ueno <dueno@redhat.com>
+
+Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Date:   Sat Oct 5 03:27:01 2019 +0200
+
+    NEWS: added entry for 3.6.11
+    
+    Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+Author: Tom Vrancken <dev@tomvrancken.nl>
+Date:   Fri Oct 4 20:50:19 2019 +0200
+
+    Updated NEWS to reflect the added raw public-key handling functionality for gnutls-cli/serv tools.
+    
+    Signed-off-by: Tom Vrancken <dev@tomvrancken.nl>
+
+Author: Tom Vrancken <dev@tomvrancken.nl>
+Date:   Mon Sep 30 21:22:59 2019 +0200
+
+    Added functional regression tests for rawpk functionality in gnutls-cli and gnutls-serv.
+    
+    Signed-off-by: Tom Vrancken <dev@tomvrancken.nl>
+
+Author: Tom Vrancken <dev@tomvrancken.nl>
+Date:   Tue Aug 27 17:10:04 2019 +0200
+
+    Implemented raw public key support for gnutls-serv application.
+    
+    Signed-off-by: Tom Vrancken <dev@tomvrancken.nl>
+
+Author: Tom Vrancken <dev@tomvrancken.nl>
+Date:   Mon Aug 26 17:12:40 2019 +0200
+
+    Implemented raw public key support for gnutls-cli application.
+    
+    Signed-off-by: Tom Vrancken <dev@tomvrancken.nl>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Wed Oct 2 14:47:44 2019 +0300
+
+    nettle/mac: add missing ifdef
+    
+    Add an ifdef guarding gost28147 include.
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Andreas Metzler <ametzler@debian.org>
+Date:   Sun Sep 29 18:55:18 2019 +0200
+
+    cipher-alignment: migrate LDADD/CFLAGS after rename
+    
+    Test was renamed from mini-alignment to cipher-alignment.
+    
+    Signed-off-by: Andreas Metzler <ametzler@bebt.de>
+
+Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
 Date:   Sun Sep 29 12:24:02 2019 +0200
 
     bumped versions
@@ -46,6 +915,13 @@ Date:   Fri Aug 2 13:55:18 2019 +0300
     tests: add verbose logging to server-kx-neg tests
     
     Add support for verbose logging to tls*-server-kx-neg tests.
+    
+    Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Author: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date:   Tue Jun 19 17:42:53 2018 +0300
+
+    lib/algorithms: add AID values assigned by IANA
     
     Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
 

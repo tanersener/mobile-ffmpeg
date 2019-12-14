@@ -73,6 +73,58 @@ static const gnutls_group_entry_st supported_groups[] = {
 	 .tls_id = 29,
 	 .pk = GNUTLS_PK_ECDH_X25519
 	},
+#ifdef ENABLE_GOST
+	/* draft-smyshlyaev-tls12-gost-suites-06, Section 6 */
+	{
+	 .name = "GC256A",
+	 .id = GNUTLS_GROUP_GC256A,
+	 .curve = GNUTLS_ECC_CURVE_GOST256A,
+	 .pk = GNUTLS_PK_GOST_12_256,
+	 .tls_id = 34,
+	},
+	{
+	 .name = "GC256B",
+	 .id = GNUTLS_GROUP_GC256B,
+	 .curve = GNUTLS_ECC_CURVE_GOST256B,
+	 .pk = GNUTLS_PK_GOST_12_256,
+	 .tls_id = 35,
+	},
+	{
+	 .name = "GC256C",
+	 .id = GNUTLS_GROUP_GC256C,
+	 .curve = GNUTLS_ECC_CURVE_GOST256C,
+	 .pk = GNUTLS_PK_GOST_12_256,
+	 .tls_id = 36,
+	},
+	{
+	 .name = "GC256D",
+	 .id = GNUTLS_GROUP_GC256D,
+	 .curve = GNUTLS_ECC_CURVE_GOST256D,
+	 .pk = GNUTLS_PK_GOST_12_256,
+	 .tls_id = 37,
+	},
+	{
+	 .name = "GC512A",
+	 .id = GNUTLS_GROUP_GC512A,
+	 .curve = GNUTLS_ECC_CURVE_GOST512A,
+	 .pk = GNUTLS_PK_GOST_12_512,
+	 .tls_id = 38,
+	},
+	{
+	 .name = "GC512B",
+	 .id = GNUTLS_GROUP_GC512B,
+	 .curve = GNUTLS_ECC_CURVE_GOST512B,
+	 .pk = GNUTLS_PK_GOST_12_512,
+	 .tls_id = 39,
+	},
+	{
+	 .name = "GC512C",
+	 .id = GNUTLS_GROUP_GC512C,
+	 .curve = GNUTLS_ECC_CURVE_GOST512C,
+	 .pk = GNUTLS_PK_GOST_12_512,
+	 .tls_id = 40,
+	},
+#endif
 #ifdef ENABLE_DHE
 	{
 	 .name = "FFDHE2048",

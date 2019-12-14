@@ -12,7 +12,7 @@
 /*
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
- *  AutoOpts is Copyright (C) 1992-2015 by Bruce Korb - all rights reserved
+ *  AutoOpts is Copyright (C) 1992-2018 by Bruce Korb - all rights reserved
  *
  *  AutoOpts is available under any one of two licenses.  The license
  *  in use must be one of these two and the choice is under the control
@@ -30,26 +30,6 @@
  *  4379e7444a0e2ce2b12dd6f5a52a27a4d02d39d247901d3285c88cf0d37f477b  COPYING.lgplv3
  *  13aa749a5b0a454917a944ed8fffc530b784f5ead522b1aacaf4ec8aa55a6239  COPYING.mbsd
  */
-
-/* = = = START-STATIC-FORWARD = = = */
-static bool
-get_realpath(char * buf, size_t b_sz);
-
-static bool
-add_prog_path(char * buf, int b_sz, char const * fname, char const * prg_path);
-
-static bool
-add_env_val(char * buf, int buf_sz, char const * name);
-
-static char *
-assemble_arg_val(char * txt, tOptionLoadMode mode);
-
-static char *
-trim_quotes(char * arg);
-
-static bool
-direction_ok(opt_state_mask_t f, int dir);
-/* = = = END-STATIC-FORWARD = = = */
 
 static bool
 get_realpath(char * buf, size_t b_sz)
@@ -314,7 +294,7 @@ add_env_val(char * buf, int buf_sz, char const * name)
  * @param[in,out] txt  the input and output string
  * @param[in]     mode the handling mode (cooking method)
  */
-LOCAL void
+static void
 munge_str(char * txt, tOptionLoadMode mode)
 {
     char * end;
@@ -445,7 +425,7 @@ direction_ok(opt_state_mask_t f, int dir)
         if (PRESETTING(dir)) {
             /*
              *  We are in the presetting direction with an option we handle
-             *  immediately for disablement, but normally for disablement.
+             *  immediately for disablement, but normally for handling.
              *  Therefore, skip if NOT disabled.
              */
             if ((f & OPTST_DISABLED) != 0)
@@ -453,7 +433,7 @@ direction_ok(opt_state_mask_t f, int dir)
         } else {
             /*
              *  We are in the processing direction with an option we handle
-             *  immediately for disablement, but normally for disablement.
+             *  immediately for disablement, but normally for handling.
              *  Therefore, skip if disabled.
              */
             if ((f & OPTST_DISABLED) == 0)
@@ -486,7 +466,7 @@ direction_ok(opt_state_mask_t f, int dir)
  * @param[in]     direction  current processing direction (preset or not)
  * @param[in]     load_mode  option loading mode (OPTION_LOAD_*)
  */
-LOCAL void
+static void
 load_opt_line(tOptions * opts, tOptState * opt_state, char * line,
               tDirection direction, tOptionLoadMode load_mode )
 {

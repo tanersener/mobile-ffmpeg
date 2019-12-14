@@ -23,7 +23,7 @@ dnl Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.63)
 
 dnl when updating version also update LT_REVISION in m4/hooks.m4
-AC_INIT([GnuTLS], [3.6.10], [bugs@gnutls.org])
+AC_INIT([GnuTLS], [3.6.11], [bugs@gnutls.org])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIRS([m4 src/gl/m4 src/libopts/m4 lib/unistring/m4])
 AC_CANONICAL_HOST
@@ -260,6 +260,23 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([
 		   AC_DEFINE([HAVE_GETRANDOM], 1, [Enable the Linux getrandom function])
 		   rnd_variant=getrandom],
 		  [AC_MSG_RESULT(no)])
+
+AC_MSG_CHECKING([for KERN_ARND])
+AC_LINK_IFELSE([AC_LANG_PROGRAM([
+	   #include <sys/sysctl.h>
+           #ifdef __linux__
+           #error 1
+           #endif
+           static int name[] = {CTL_KERN, KERN_ARND};
+	   ],[
+		   sysctl(0, 0, 0, 0, 0, 0);
+		  ])],
+		  [AC_MSG_RESULT(yes)
+		   AC_DEFINE([HAVE_KERN_ARND], 1, [Enable the BSD sysctl(KERN_ARND) function])
+		   rnd_variant=kern_arnd],
+		  [AC_MSG_RESULT(no)])
+
+AM_CONDITIONAL(HAVE_KERN_ARND, test "$rnd_variant" = "kern_arnd")
 
 AC_MSG_CHECKING([for getentropy])
 AC_LINK_IFELSE([AC_LANG_PROGRAM([
@@ -580,6 +597,14 @@ AC_CHECK_FUNCS(nettle_rsa_sec_decrypt,
 LIBS=$save_LIBS
 
 # Check if nettle has CFB8 support
+if test -z "$ac_cv_func_nettle_cfb8_encrypt"; then
+	# nettle_cfb8_decrypt in nettle 3.5 is known to be broken
+	ver=`$PKG_CONFIG --modversion nettle`
+	if expr "$ver" : '^3\.5\b' >/dev/null; then
+		ac_cv_func_nettle_cfb8_encrypt=no
+	fi
+fi
+
 save_LIBS=$LIBS
 LIBS="$LIBS $NETTLE_LIBS"
 AC_CHECK_FUNCS(nettle_cfb8_encrypt)
@@ -975,6 +1000,7 @@ fi
 
 AM_CONDITIONAL([HAVE_GUILE], [test "$opt_guile_bindings" = "yes"])
 AM_CONDITIONAL([HAVE_GUILD], [test "x$GUILD" != "x"])
+AM_CONDITIONAL([CROSS_COMPILING], [test "x$cross_compiling" = "xyes"])
 
 LIBGNUTLS_LIBS="-L${libdir} -lgnutls $LIBS"
 LIBGNUTLS_CFLAGS="-I${includedir}"

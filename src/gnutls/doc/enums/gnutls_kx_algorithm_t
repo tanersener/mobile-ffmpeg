@@ -34,4 +34,6 @@ ECDHE-ECDSA key-exchange algorithm.
 ECDHE-PSK key-exchange algorithm.
 @item GNUTLS_@-KX_@-RSA_@-PSK
 RSA-PSK key-exchange algorithm.
+@item GNUTLS_@-KX_@-VKO_@-GOST_@-12
+VKO GOST R 34.10-2012 key-exchange algorithm.
 @end table

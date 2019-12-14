@@ -34,7 +34,6 @@ struct iov_iter_st {
 	uint8_t block[MAX_CIPHER_BLOCK_SIZE]; /* incomplete block for reading */
 	size_t block_size;	/* actual block size of the cipher */
 	size_t block_offset;	/* offset in block */
-
 };
 
 int _gnutls_iov_iter_init(struct iov_iter_st *iter,
@@ -42,5 +41,8 @@ int _gnutls_iov_iter_init(struct iov_iter_st *iter,
 			  size_t block_size);
 
 ssize_t _gnutls_iov_iter_next(struct iov_iter_st *iter, uint8_t **data);
+
+int _gnutls_iov_iter_sync(struct iov_iter_st *iter, const uint8_t *data,
+			  size_t data_size);
 
 #endif /* GNUTLS_LIB_IOV_H */

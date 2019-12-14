@@ -351,6 +351,34 @@ _gnutls_handshake_verify_data(gnutls_session_t session,
 /* Client certificate verify calculations
  */
 
+static void
+_gnutls_reverse_datum(gnutls_datum_t * d)
+{
+	unsigned i;
+
+	for (i = 0; i < d->size / 2; i ++) {
+		uint8_t t = d->data[i];
+		d->data[i] = d->data[d->size - 1 - i];
+		d->data[d->size - 1 - i] = t;
+	}
+}
+
+static int
+_gnutls_create_reverse(const gnutls_datum_t *src, gnutls_datum_t *dst)
+{
+	unsigned int i;
+
+	dst->size = src->size;
+	dst->data = gnutls_malloc(dst->size);
+	if (!dst->data)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+	for (i = 0; i < dst->size; i++)
+		dst->data[i] = src->data[dst->size - 1 - i];
+
+	return 0;
+}
+
 /* this is _gnutls_handshake_verify_crt_vrfy for TLS 1.2
  */
 static int
@@ -363,6 +391,7 @@ _gnutls_handshake_verify_crt_vrfy12(gnutls_session_t session,
 	int ret;
 	gnutls_datum_t dconcat;
 	const gnutls_sign_entry_st *se = _gnutls_sign_to_entry(sign_algo);
+	gnutls_datum_t sig_rev = {NULL, 0};
 
 	ret = _gnutls_session_sign_algo_enabled(session, sign_algo);
 	if (ret < 0)
@@ -374,6 +403,12 @@ _gnutls_handshake_verify_crt_vrfy12(gnutls_session_t session,
 		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 	}
 
+	if (se->flags & GNUTLS_SIGN_FLAG_CRT_VRFY_REVERSE) {
+		ret = _gnutls_create_reverse(signature, &sig_rev);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+	}
+
 	dconcat.data = session->internals.handshake_hash_buffer.data;
 	dconcat.size = session->internals.handshake_hash_buffer_prev_len;
 
@@ -381,7 +416,9 @@ _gnutls_handshake_verify_crt_vrfy12(gnutls_session_t session,
 	 * because we have checked whether the currently used signature
 	 * algorithm is allowed in the session. */
 	ret = gnutls_pubkey_verify_data2(cert->pubkey, sign_algo, verify_flags|GNUTLS_VERIFY_ALLOW_BROKEN,
-					 &dconcat, signature);
+					 &dconcat,
+					 sig_rev.data ? &sig_rev : signature);
+	_gnutls_free_datum(&sig_rev);
 	if (ret < 0)
 		gnutls_assert();
 
@@ -470,6 +507,54 @@ _gnutls_handshake_verify_crt_vrfy3(gnutls_session_t session,
 }
 #endif
 
+static int
+_gnutls_handshake_verify_crt_vrfy10(gnutls_session_t session,
+				    unsigned verify_flags,
+				    gnutls_pcert_st * cert,
+				    gnutls_datum_t * signature,
+				    gnutls_sign_algorithm_t sign_algo)
+{
+	int ret;
+	uint8_t concat[MAX_SIG_SIZE];
+	digest_hd_st td_sha;
+	gnutls_datum_t dconcat;
+	gnutls_pk_algorithm_t pk_algo;
+	const mac_entry_st *me;
+
+	/* TLS 1.0 and TLS 1.1 */
+	pk_algo = gnutls_pubkey_get_pk_algorithm(cert->pubkey, NULL);
+	if (pk_algo == GNUTLS_PK_RSA) {
+		me = hash_to_entry(GNUTLS_DIG_MD5_SHA1);
+		verify_flags |= GNUTLS_PUBKEY_VERIFY_FLAG_TLS1_RSA;
+		sign_algo = GNUTLS_SIGN_UNKNOWN;
+	} else {
+		me = hash_to_entry(GNUTLS_DIG_SHA1);
+		sign_algo = gnutls_pk_to_sign(pk_algo, GNUTLS_DIG_SHA1);
+	}
+	ret = _gnutls_hash_init(&td_sha, me);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	_gnutls_hash(&td_sha,
+		     session->internals.handshake_hash_buffer.data,
+		     session->internals.handshake_hash_buffer_prev_len);
+
+	_gnutls_hash_deinit(&td_sha, concat);
+
+	dconcat.data = concat;
+	dconcat.size = _gnutls_hash_get_algo_len(me);
+
+	ret = gnutls_pubkey_verify_hash2(cert->pubkey, sign_algo,
+					 GNUTLS_VERIFY_ALLOW_SIGN_WITH_SHA1|verify_flags,
+					 &dconcat, signature);
+	if (ret < 0)
+		gnutls_assert();
+
+	return ret;
+}
+
 /* Verifies a TLS signature (like the one in the client certificate
  * verify message). 
  */
@@ -481,12 +566,7 @@ _gnutls_handshake_verify_crt_vrfy(gnutls_session_t session,
 				  gnutls_sign_algorithm_t sign_algo)
 {
 	int ret;
-	uint8_t concat[MAX_SIG_SIZE];
-	digest_hd_st td_sha;
-	gnutls_datum_t dconcat;
 	const version_entry_st *ver = get_version(session);
-	gnutls_pk_algorithm_t pk_algo;
-	const mac_entry_st *me;
 	unsigned key_usage;
 
 	if (cert == NULL) {
@@ -526,37 +606,11 @@ _gnutls_handshake_verify_crt_vrfy(gnutls_session_t session,
 #endif
 
 	/* TLS 1.0 and TLS 1.1 */
-	pk_algo = gnutls_pubkey_get_pk_algorithm(cert->pubkey, NULL);
-	if (pk_algo == GNUTLS_PK_RSA) {
-		me = hash_to_entry(GNUTLS_DIG_MD5_SHA1);
-		verify_flags |= GNUTLS_PUBKEY_VERIFY_FLAG_TLS1_RSA;
-		sign_algo = GNUTLS_SIGN_UNKNOWN;
-	} else {
-		me = hash_to_entry(GNUTLS_DIG_SHA1);
-		sign_algo = gnutls_pk_to_sign(pk_algo, GNUTLS_DIG_SHA1);
-	}
-	ret = _gnutls_hash_init(&td_sha, me);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
-
-	_gnutls_hash(&td_sha,
-		     session->internals.handshake_hash_buffer.data,
-		     session->internals.handshake_hash_buffer_prev_len);
-
-	_gnutls_hash_deinit(&td_sha, concat);
-
-	dconcat.data = concat;
-	dconcat.size = _gnutls_hash_get_algo_len(me);
-
-	ret = gnutls_pubkey_verify_hash2(cert->pubkey, sign_algo,
-					 GNUTLS_VERIFY_ALLOW_SIGN_WITH_SHA1|verify_flags,
-					 &dconcat, signature);
-	if (ret < 0)
-		gnutls_assert();
-
-	return ret;
+	return _gnutls_handshake_verify_crt_vrfy10(session,
+						   verify_flags,
+						   cert,
+						   signature,
+						   sign_algo);
 }
 
 /* the same as _gnutls_handshake_sign_crt_vrfy except that it is made for TLS 1.2.
@@ -570,6 +624,7 @@ _gnutls_handshake_sign_crt_vrfy12(gnutls_session_t session,
 {
 	gnutls_datum_t dconcat;
 	gnutls_sign_algorithm_t sign_algo;
+	const gnutls_sign_entry_st *se;
 	int ret;
 
 	sign_algo = _gnutls_session_get_sign_algo(session, cert, pkey, 1);
@@ -577,6 +632,10 @@ _gnutls_handshake_sign_crt_vrfy12(gnutls_session_t session,
 		gnutls_assert();
 		return GNUTLS_E_UNWANTED_ALGORITHM;
 	}
+
+	se = _gnutls_sign_to_entry(sign_algo);
+	if (se == NULL)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	gnutls_sign_algorithm_set_client(session, sign_algo);
 
@@ -596,6 +655,9 @@ _gnutls_handshake_sign_crt_vrfy12(gnutls_session_t session,
 		return ret;
 	}
 
+	if (se->flags & GNUTLS_SIGN_FLAG_CRT_VRFY_REVERSE)
+		_gnutls_reverse_datum(signature);
+
 	return sign_algo;
 }
 
@@ -603,6 +665,7 @@ _gnutls_handshake_sign_crt_vrfy12(gnutls_session_t session,
 static int
 _gnutls_handshake_sign_crt_vrfy3(gnutls_session_t session,
 				 gnutls_pcert_st * cert,
+				 const version_entry_st *ver,
 				 gnutls_privkey_t pkey,
 				 gnutls_datum_t * signature)
 {
@@ -612,6 +675,13 @@ _gnutls_handshake_sign_crt_vrfy3(gnutls_session_t session,
 	digest_hd_st td_sha;
 	gnutls_pk_algorithm_t pk =
 	    gnutls_privkey_get_pk_algorithm(pkey, NULL);
+
+	/* ensure 1024 bit DSA keys are used */
+	ret =
+	    _gnutls_pubkey_compatible_with_sig(session, cert->pubkey, ver,
+					       GNUTLS_SIGN_UNKNOWN);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 	ret = _gnutls_generate_master(session, 1);
 	if (ret < 0) {
@@ -676,45 +746,20 @@ _gnutls_handshake_sign_crt_vrfy3(gnutls_session_t session,
 }
 #endif
 
-/* Generates a signature of all the previous sent packets in the
- * handshake procedure.
- * 20040227: now it works for SSL 3.0 as well
- * 20091031: works for TLS 1.2 too!
- *
- * For TLS1.x, x<2 returns negative for failure and zero or unspecified for success.
- * For TLS1.2 returns the signature algorithm used on success, or a negative error code;
- *
- * Returns the used signature algorithm, or a negative error code.
- */
-int
-_gnutls_handshake_sign_crt_vrfy(gnutls_session_t session,
-				gnutls_pcert_st * cert,
-				gnutls_privkey_t pkey,
-				gnutls_datum_t * signature)
+static int
+_gnutls_handshake_sign_crt_vrfy10(gnutls_session_t session,
+				  gnutls_pcert_st * cert,
+				  const version_entry_st *ver,
+				  gnutls_privkey_t pkey,
+				  gnutls_datum_t * signature)
 {
 	gnutls_datum_t dconcat;
 	int ret;
 	uint8_t concat[MAX_SIG_SIZE];
 	digest_hd_st td_sha;
-	const version_entry_st *ver = get_version(session);
 	gnutls_pk_algorithm_t pk =
 	    gnutls_privkey_get_pk_algorithm(pkey, NULL);
 	const mac_entry_st *me;
-	unsigned key_usage = 0;
-
-	if (unlikely(ver == NULL))
-		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
-
-	gnutls_pubkey_get_key_usage(cert->pubkey, &key_usage);
-
-	ret = _gnutls_check_key_usage_for_sig(session, key_usage, 1);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
-	/* TLS 1.2 */
-	if (_gnutls_version_has_selectable_sighash(ver))
-		return _gnutls_handshake_sign_crt_vrfy12(session, cert,
-							 pkey, signature);
 
 	/* ensure 1024 bit DSA keys are used */
 	ret =
@@ -722,13 +767,6 @@ _gnutls_handshake_sign_crt_vrfy(gnutls_session_t session,
 					       GNUTLS_SIGN_UNKNOWN);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
-
-	/* TLS 1.1 or earlier */
-#ifdef ENABLE_SSL3
-	if (ver->id == GNUTLS_SSL3)
-		return _gnutls_handshake_sign_crt_vrfy3(session, cert,
-							pkey, signature);
-#endif
 
 	if (pk == GNUTLS_PK_RSA)
 		me = hash_to_entry(GNUTLS_DIG_MD5_SHA1);
@@ -760,4 +798,47 @@ _gnutls_handshake_sign_crt_vrfy(gnutls_session_t session,
 	return GNUTLS_SIGN_UNKNOWN;
 }
 
+/* Generates a signature of all the previous sent packets in the
+ * handshake procedure.
+ * 20040227: now it works for SSL 3.0 as well
+ * 20091031: works for TLS 1.2 too!
+ *
+ * For TLS1.x, x<2 returns negative for failure and zero or unspecified for success.
+ * For TLS1.2 returns the signature algorithm used on success, or a negative error code;
+ *
+ * Returns the used signature algorithm, or a negative error code.
+ */
+int
+_gnutls_handshake_sign_crt_vrfy(gnutls_session_t session,
+				gnutls_pcert_st * cert,
+				gnutls_privkey_t pkey,
+				gnutls_datum_t * signature)
+{
+	int ret;
+	const version_entry_st *ver = get_version(session);
+	unsigned key_usage = 0;
 
+	if (unlikely(ver == NULL))
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+	gnutls_pubkey_get_key_usage(cert->pubkey, &key_usage);
+
+	ret = _gnutls_check_key_usage_for_sig(session, key_usage, 1);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	/* TLS 1.2 */
+	if (_gnutls_version_has_selectable_sighash(ver))
+		return _gnutls_handshake_sign_crt_vrfy12(session, cert,
+							 pkey, signature);
+
+	/* TLS 1.1 or earlier */
+#ifdef ENABLE_SSL3
+	if (ver->id == GNUTLS_SSL3)
+		return _gnutls_handshake_sign_crt_vrfy3(session, cert, ver,
+							pkey, signature);
+#endif
+
+	return _gnutls_handshake_sign_crt_vrfy10(session, cert, ver,
+						 pkey, signature);
+}

@@ -86,11 +86,12 @@ and mbedtls.
 * [softhsm](https://www.opendnssec.org/softhsm/) (for testing smart card support)
 * [dieharder](https://www.phy.duke.edu/~rgb/General/dieharder.php) (for testing PRNG)
 * [lcov](https://linux-test-project.github.io/) (for code coverage)
+* [util-linux](https://github.com/karelzak/util-linux) or just [lscpu](https://github.com/NanXiao/lscpu) (for CPU feature detection)
 
 Debian/Ubuntu:
 ```
 apt-get install -y valgrind nodejs softhsm2 datefudge lcov libssl-dev libcmocka-dev expect
-apt-get install -y dieharder openssl abigail-tools socat net-tools ppp lockfile-progs
+apt-get install -y dieharder openssl abigail-tools socat net-tools ppp lockfile-progs util-linux
 ```
 
 __NOTE:__ `libubsan0` and `libasan1` are required on older versions of Ubuntu <= 16.04. This packages must be manually added on these versions:
@@ -102,7 +103,7 @@ apt-get install -y v libubsan0 libasan1
 Fedora/RHEL:
 ```
 yum install -y valgrind libasan libasan-static libubsan nodejs softhsm datefudge lcov openssl-devel expect
-yum install -y dieharder mbedtls-utils openssl libabigail libcmocka-devel socat lockfile-progs
+yum install -y dieharder mbedtls-utils openssl libabigail libcmocka-devel socat lockfile-progs util-linux
 ```
 
 

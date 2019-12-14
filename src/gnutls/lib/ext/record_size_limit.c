@@ -39,7 +39,8 @@ const hello_ext_entry_st ext_mod_record_size_limit = {
 	.name = "Record Size Limit",
 	.tls_id = 28,
 	.gid = GNUTLS_EXTENSION_RECORD_SIZE_LIMIT,
-	.parse_type = GNUTLS_EXT_MANDATORY,
+	.client_parse_point = GNUTLS_EXT_MANDATORY,
+	.server_parse_point = GNUTLS_EXT_MANDATORY,
 	.validity = GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_DTLS | GNUTLS_EXT_FLAG_CLIENT_HELLO |
 		    GNUTLS_EXT_FLAG_EE | GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
 	.recv_func = _gnutls_record_size_limit_recv_params,

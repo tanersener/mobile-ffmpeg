@@ -215,7 +215,16 @@ static void server(int sd, const char *prio, const char *user, bool no_cred,
 	gnutls_transport_set_int(session, sd);
 	ret = gnutls_handshake(session);
 	if (ret < 0) {
+		unsigned char seq[8], buf[16];
 		gnutls_alert_send_appropriate(session, ret);
+
+		/* We have to make sure that we do not close connection till
+		 * test client reads our fatal alert, otherwise it migh exit
+		 * with GNUTLS_E_PUSH_ERROR instead */
+		gnutls_session_force_valid(session);
+		while ((gnutls_record_recv_seq(session, buf, sizeof(buf), seq)) >= 0)
+			;
+
 		if (expect_fail) {
 			if (ret != expect_fail) {
 				fail("expected error %d (%s), got %d (%s)\n", expect_fail,
@@ -410,7 +419,7 @@ void doit(void)
 	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-ALL:+GROUP-FFDHE2048:+GROUP-FFDHE4096", "NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-ALL:+GROUP-FFDHE4096", "jas", &key, 0, GNUTLS_KX_DHE_PSK, 0, 0);
 
 	/* try without server credentials */
-	run_test3("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK:+DHE-PSK", NULL, "jas", &key, 1, 0, 0, GNUTLS_E_PUSH_ERROR, GNUTLS_E_INSUFFICIENT_CREDENTIALS);
+	run_test3("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK:+DHE-PSK", NULL, "jas", &key, 1, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_INSUFFICIENT_CREDENTIALS);
 }
 
 #endif				/* _WIN32 */

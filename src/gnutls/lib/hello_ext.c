@@ -120,7 +120,7 @@ gid_to_ext_entry(gnutls_session_t session, extensions_t id)
 }
 
 static const hello_ext_entry_st *
-tls_id_to_ext_entry(gnutls_session_t session, uint16_t tls_id, gnutls_ext_parse_type_t parse_type)
+tls_id_to_ext_entry(gnutls_session_t session, uint16_t tls_id, gnutls_ext_parse_type_t parse_point)
 {
 	unsigned i;
 	const hello_ext_entry_st *e;
@@ -144,7 +144,8 @@ tls_id_to_ext_entry(gnutls_session_t session, uint16_t tls_id, gnutls_ext_parse_
 
 	return NULL;
 done:
-	if (parse_type == GNUTLS_EXT_ANY || e->parse_type == parse_type) {
+	if (parse_point == GNUTLS_EXT_ANY || (IS_SERVER(session) && e->server_parse_point == parse_point) ||
+	    (!IS_SERVER(session) && e->client_parse_point == parse_point)) {
 		return e;
 	} else {
 		return NULL;
@@ -201,7 +202,7 @@ static unsigned tls_id_to_gid(gnutls_session_t session, unsigned tls_id)
 typedef struct hello_ext_ctx_st {
 	gnutls_session_t session;
 	gnutls_ext_flags_t msg;
-	gnutls_ext_parse_type_t parse_type;
+	gnutls_ext_parse_type_t parse_point;
 	const hello_ext_entry_st *ext; /* used during send */
 	unsigned seen_pre_shared_key;
 } hello_ext_ctx_st;
@@ -222,7 +223,7 @@ int hello_ext_parse(void *_ctx, unsigned tls_id, const uint8_t *data, unsigned d
 		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 	}
 
-	ext = tls_id_to_ext_entry(session, tls_id, ctx->parse_type);
+	ext = tls_id_to_ext_entry(session, tls_id, ctx->parse_point);
 	if (ext == NULL || ext->recv_func == NULL) {
 		goto ignore;
 	}
@@ -288,7 +289,7 @@ int hello_ext_parse(void *_ctx, unsigned tls_id, const uint8_t *data, unsigned d
 int
 _gnutls_parse_hello_extensions(gnutls_session_t session,
 			       gnutls_ext_flags_t msg,
-			       gnutls_ext_parse_type_t parse_type,
+			       gnutls_ext_parse_type_t parse_point,
 			       const uint8_t * data, int data_size)
 {
 	int ret;
@@ -298,7 +299,7 @@ _gnutls_parse_hello_extensions(gnutls_session_t session,
 
 	ctx.session = session;
 	ctx.msg = msg;
-	ctx.parse_type = parse_type;
+	ctx.parse_point = parse_point;
 	ctx.seen_pre_shared_key = 0;
 
 	ret = _gnutls_extv_parse(&ctx, hello_ext_parse, data, data_size);
@@ -321,8 +322,9 @@ int hello_ext_send(void *_ctx, gnutls_buffer_st *buf)
 	if (unlikely(p->send_func == NULL))
 		return 0;
 
-	if (ctx->parse_type != GNUTLS_EXT_ANY
-	    && p->parse_type != ctx->parse_type) {
+	if (ctx->parse_point != GNUTLS_EXT_ANY &&
+	    ((IS_SERVER(session) && p->server_parse_point != ctx->parse_point) ||
+	     (!IS_SERVER(session) && p->client_parse_point != ctx->parse_point))) {
 		return 0;
 	}
 
@@ -392,7 +394,7 @@ int
 _gnutls_gen_hello_extensions(gnutls_session_t session,
 			     gnutls_buffer_st * buf,
 			     gnutls_ext_flags_t msg,
-			     gnutls_ext_parse_type_t parse_type)
+			     gnutls_ext_parse_type_t parse_point)
 {
 	int pos, ret;
 	size_t i;
@@ -402,7 +404,7 @@ _gnutls_gen_hello_extensions(gnutls_session_t session,
 
 	ctx.session = session;
 	ctx.msg = msg;
-	ctx.parse_type = parse_type;
+	ctx.parse_point = parse_point;
 
 	ret = _gnutls_extv_append_init(buf);
 	if (ret < 0)
@@ -742,7 +744,7 @@ _gnutls_hello_ext_get_resumed_priv(gnutls_session_t session,
  * gnutls_ext_register:
  * @name: the name of the extension to register
  * @id: the numeric TLS id of the extension
- * @parse_type: the parse type of the extension (see gnutls_ext_parse_type_t)
+ * @parse_point: the parse type of the extension (see gnutls_ext_parse_type_t)
  * @recv_func: a function to receive the data
  * @send_func: a function to send the data
  * @deinit_func: a function deinitialize any private data
@@ -767,7 +769,7 @@ _gnutls_hello_ext_get_resumed_priv(gnutls_session_t session,
  * Since: 3.4.0
  **/
 int
-gnutls_ext_register(const char *name, int id, gnutls_ext_parse_type_t parse_type,
+gnutls_ext_register(const char *name, int id, gnutls_ext_parse_type_t parse_point,
 		    gnutls_ext_recv_func recv_func, gnutls_ext_send_func send_func,
 		    gnutls_ext_deinit_data_func deinit_func, gnutls_ext_pack_func pack_func,
 		    gnutls_ext_unpack_func unpack_func)
@@ -798,7 +800,8 @@ gnutls_ext_register(const char *name, int id, gnutls_ext_parse_type_t parse_type
 	tmp_mod->free_struct = 1;
 	tmp_mod->tls_id = id;
 	tmp_mod->gid = gid;
-	tmp_mod->parse_type = parse_type;
+	tmp_mod->client_parse_point = parse_point;
+	tmp_mod->server_parse_point = parse_point;
 	tmp_mod->recv_func = recv_func;
 	tmp_mod->send_func = send_func;
 	tmp_mod->deinit_func = deinit_func;
@@ -822,7 +825,7 @@ gnutls_ext_register(const char *name, int id, gnutls_ext_parse_type_t parse_type
  * @session: the session for which this extension will be set
  * @name: the name of the extension to register
  * @id: the numeric id of the extension
- * @parse_type: the parse type of the extension (see gnutls_ext_parse_type_t)
+ * @parse_point: the parse type of the extension (see gnutls_ext_parse_type_t)
  * @recv_func: a function to receive the data
  * @send_func: a function to send the data
  * @deinit_func: a function deinitialize any private data
@@ -853,7 +856,7 @@ gnutls_ext_register(const char *name, int id, gnutls_ext_parse_type_t parse_type
  **/
 int
 gnutls_session_ext_register(gnutls_session_t session,
-			    const char *name, int id, gnutls_ext_parse_type_t parse_type,
+			    const char *name, int id, gnutls_ext_parse_type_t parse_point,
 			    gnutls_ext_recv_func recv_func, gnutls_ext_send_func send_func,
 			    gnutls_ext_deinit_data_func deinit_func, gnutls_ext_pack_func pack_func,
 			    gnutls_ext_unpack_func unpack_func, unsigned flags)
@@ -898,7 +901,8 @@ gnutls_session_ext_register(gnutls_session_t session,
 	tmp_mod.free_struct = 1;
 	tmp_mod.tls_id = id;
 	tmp_mod.gid = gid;
-	tmp_mod.parse_type = parse_type;
+	tmp_mod.client_parse_point = parse_point;
+	tmp_mod.server_parse_point = parse_point;
 	tmp_mod.recv_func = recv_func;
 	tmp_mod.send_func = send_func;
 	tmp_mod.deinit_func = deinit_func;

@@ -2,12 +2,12 @@
 
 
 
-@deftypefun {int} {gnutls_ext_register} (const char * @var{name}, int @var{id}, gnutls_ext_parse_type_t @var{parse_type}, gnutls_ext_recv_func @var{recv_func}, gnutls_ext_send_func @var{send_func}, gnutls_ext_deinit_data_func @var{deinit_func}, gnutls_ext_pack_func @var{pack_func}, gnutls_ext_unpack_func @var{unpack_func})
+@deftypefun {int} {gnutls_ext_register} (const char * @var{name}, int @var{id}, gnutls_ext_parse_type_t @var{parse_point}, gnutls_ext_recv_func @var{recv_func}, gnutls_ext_send_func @var{send_func}, gnutls_ext_deinit_data_func @var{deinit_func}, gnutls_ext_pack_func @var{pack_func}, gnutls_ext_unpack_func @var{unpack_func})
 @var{name}: the name of the extension to register
 
 @var{id}: the numeric TLS id of the extension
 
-@var{parse_type}: the parse type of the extension (see gnutls_ext_parse_type_t)
+@var{parse_point}: the parse type of the extension (see gnutls_ext_parse_type_t)
 
 @var{recv_func}: a function to receive the data
 

@@ -20,11 +20,11 @@
  *
  */
 
-/* 
+/*
  * This file holds all the buffering code used in gnutls.
  * The buffering code works as:
  *
- * RECORD LAYER: 
+ * RECORD LAYER:
  *  1. uses a buffer to hold data (application/handshake),
  *    we got but they were not requested, yet.
  *  (see gnutls_record_buffer_put(), gnutls_record_buffer_get_size() etc.)
@@ -32,7 +32,7 @@
  *  2. uses a buffer to hold data that were incomplete (ie the read/write
  *    was interrupted)
  *  (see _gnutls_io_read_buffered(), _gnutls_io_write_buffered() etc.)
- * 
+ *
  * HANDSHAKE LAYER:
  *  1. Uses buffer to hold the last received handshake message.
  *  (see _gnutls_handshake_hash_buffer_put() etc.)
@@ -67,12 +67,12 @@
  */
 void
 _gnutls_record_buffer_put(gnutls_session_t session,
-			  content_type_t type, gnutls_uint64 * seq,
+			  content_type_t type, uint64_t seq,
 			  mbuffer_st * bufel)
 {
 
 	bufel->type = type;
-	memcpy(&bufel->record_sequence, seq, sizeof(*seq));
+	bufel->record_sequence = seq;
 
 	_mbuffer_enqueue(&session->internals.record_buffer, bufel);
 	_gnutls_buffers_log("BUF[REC]: Inserted %d bytes of Data(%d)\n",
@@ -102,7 +102,7 @@ size_t gnutls_record_check_pending(gnutls_session_t session)
  * @session: is a #gnutls_session_t type.
  *
  * This function checks if there pending corked
- * data in the gnutls buffers --see gnutls_record_cork(). 
+ * data in the gnutls buffers --see gnutls_record_cork().
  *
  * Returns: Returns the size of the corked data or zero.
  *
@@ -155,7 +155,7 @@ _gnutls_record_buffer_get(content_type_t type,
 		length = msg.size;
 
 	if (seq)
-		memcpy(seq, bufel->record_sequence.i, 8);
+		_gnutls_write_uint64(bufel->record_sequence, seq);
 
 	memcpy(data, msg.data, length);
 	_mbuffer_head_remove_bytes(&session->internals.record_buffer,
@@ -517,13 +517,13 @@ _gnutls_writev(gnutls_session_t session, const giovec_t * giovec,
 	return i;
 }
 
-/* 
+/*
  * @ms: a pointer to the number of milliseconds to wait for data. Use zero or NULL for indefinite.
  *
  * This function is like recv(with MSG_PEEK). But it does not return -1 on error.
  * It does return gnutls_errno instead.
  * This function reads data from the socket and keeps them in a buffer, of up to
- * max_record_recv_size. 
+ * max_record_recv_size.
  *
  * This is not a general purpose function. It returns EXACTLY the data requested,
  * which are stored in a local (in the session) buffer.
@@ -763,7 +763,7 @@ int _gnutls_io_check_recv(gnutls_session_t session, unsigned int ms)
 		return GNUTLS_E_TIMEDOUT;
 }
 
-/* HANDSHAKE buffers part 
+/* HANDSHAKE buffers part
  */
 
 /* This function writes the data that are left in the
@@ -823,7 +823,7 @@ ssize_t _gnutls_handshake_io_write_flush(gnutls_session_t session)
 }
 
 
-/* This is a send function for the gnutls handshake 
+/* This is a send function for the gnutls handshake
  * protocol. Just makes sure that all data have been sent.
  *
  */
@@ -1173,7 +1173,7 @@ static int get_last_packet(gnutls_session_t session,
 	RETURN_DTLS_EAGAIN_OR_TIMEOUT(session, 0);
 }
 
-/* This is a receive function for the gnutls handshake 
+/* This is a receive function for the gnutls handshake
  * protocol. Makes sure that we have received all data.
  *
  * htype is the next handshake packet expected.
@@ -1303,7 +1303,7 @@ int _gnutls_parse_record_buffered_msgs(gnutls_session_t session)
 		handshake_buffer_st tmp;
 
 		do {
-			/* we now 
+			/* we now
 			 * 0. parse headers
 			 * 1. insert to handshake_recv_buffer
 			 * 2. sort handshake_recv_buffer on sequence numbers
@@ -1391,7 +1391,7 @@ int _gnutls_parse_record_buffered_msgs(gnutls_session_t session)
 	}
 }
 
-/* This is a receive function for the gnutls handshake 
+/* This is a receive function for the gnutls handshake
  * protocol. Makes sure that we have received all data.
  */
 ssize_t
@@ -1437,7 +1437,7 @@ _gnutls_handshake_io_recv_int(gnutls_session_t session,
 	}
 
 	do {
-		/* if we don't have a complete message waiting for us, try 
+		/* if we don't have a complete message waiting for us, try
 		 * receiving more */
 		ret =
 		    _gnutls_recv_in_buffers(session, GNUTLS_HANDSHAKE, htype,

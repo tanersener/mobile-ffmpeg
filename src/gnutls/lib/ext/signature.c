@@ -53,7 +53,8 @@ const hello_ext_entry_st ext_mod_sig = {
 	.tls_id = 13,
 	.gid = GNUTLS_EXTENSION_SIGNATURE_ALGORITHMS,
 	.validity = GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_DTLS | GNUTLS_EXT_FLAG_CLIENT_HELLO,
-	.parse_type = GNUTLS_EXT_TLS,
+	.client_parse_point = GNUTLS_EXT_TLS,
+	.server_parse_point = GNUTLS_EXT_TLS,
 	.recv_func = _gnutls_signature_algorithm_recv_params,
 	.send_func = _gnutls_signature_algorithm_send_params,
 	.pack_func = signature_algorithms_pack,
@@ -360,7 +361,7 @@ _gnutls_session_sign_algo_enabled(gnutls_session_t session,
 		const gnutls_sign_entry_st *se;
 
 		se = _gnutls_sign_to_entry(sig);
-		if (se == NULL || (se->tls13_ok == 0)) {
+		if (se == NULL || (se->flags & GNUTLS_SIGN_FLAG_TLS13_OK) == 0) {
 			gnutls_assert();
 			goto disallowed;
 		}

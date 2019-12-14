@@ -6,7 +6,7 @@
 @var{session}: is a @code{gnutls_session_t}  type.
 
 This function checks if there pending corked
-data in the gnutls buffers --see @code{gnutls_record_cork()} . 
+data in the gnutls buffers --see @code{gnutls_record_cork()} .
 
 @strong{Returns:} Returns the size of the corked data or zero.
 

@@ -455,8 +455,8 @@ connection you should wait for an EOF from the peer.
 Note that not all implementations will properly terminate a TLS
 connection.  Some of them, usually for performance reasons, will
 terminate only the underlying transport layer, and thus not
-distinguishing between a malicious party prematurely terminating 
-the connection and normal termination. 
+distinguishing between a malicious party prematurely terminating
+the connection and normal termination.
 
 This function may also return @code{GNUTLS_E_AGAIN}  or
 @code{GNUTLS_E_INTERRUPTED} ; cf.  @code{gnutls_record_get_direction()} .
@@ -2917,12 +2917,12 @@ flags it returns @code{GNUTLS_E_INVALID_REQUEST} .
 
 @subheading gnutls_ext_register
 @anchor{gnutls_ext_register}
-@deftypefun {int} {gnutls_ext_register} (const char * @var{name}, int @var{id}, gnutls_ext_parse_type_t @var{parse_type}, gnutls_ext_recv_func @var{recv_func}, gnutls_ext_send_func @var{send_func}, gnutls_ext_deinit_data_func @var{deinit_func}, gnutls_ext_pack_func @var{pack_func}, gnutls_ext_unpack_func @var{unpack_func})
+@deftypefun {int} {gnutls_ext_register} (const char * @var{name}, int @var{id}, gnutls_ext_parse_type_t @var{parse_point}, gnutls_ext_recv_func @var{recv_func}, gnutls_ext_send_func @var{send_func}, gnutls_ext_deinit_data_func @var{deinit_func}, gnutls_ext_pack_func @var{pack_func}, gnutls_ext_unpack_func @var{unpack_func})
 @var{name}: the name of the extension to register
 
 @var{id}: the numeric TLS id of the extension
 
-@var{parse_type}: the parse type of the extension (see gnutls_ext_parse_type_t)
+@var{parse_point}: the parse type of the extension (see gnutls_ext_parse_type_t)
 
 @var{recv_func}: a function to receive the data
 
@@ -3260,7 +3260,7 @@ This function performs the handshake of the TLS/SSL protocol, and
 initializes the TLS session parameters.
 
 The non-fatal errors expected by this function are:
-@code{GNUTLS_E_INTERRUPTED} , @code{GNUTLS_E_AGAIN} , 
+@code{GNUTLS_E_INTERRUPTED} , @code{GNUTLS_E_AGAIN} ,
 @code{GNUTLS_E_WARNING_ALERT_RECEIVED} . When this function is called
 for re-handshake under TLS 1.2 or earlier, the non-fatal error code
 @code{GNUTLS_E_GOT_APPLICATION_DATA}  may also be returned.
@@ -5253,7 +5253,7 @@ padding, false (0) if the current session does not.
 @var{session}: is a @code{gnutls_session_t}  type.
 
 This function checks if there pending corked
-data in the gnutls buffers --see @code{gnutls_record_cork()} . 
+data in the gnutls buffers --see @code{gnutls_record_cork()} .
 
 @strong{Returns:} Returns the size of the corked data or zero.
 
@@ -5305,8 +5305,12 @@ by default unless requested using @code{gnutls_record_send_range()} .
 @deftypefun {size_t} {gnutls_record_discard_queued} (gnutls_session_t @var{session})
 @var{session}: is a @code{gnutls_session_t}  type.
 
-This function discards all queued to be sent packets in a TLS or DTLS session.
+This function discards all queued to be sent packets in a DTLS session.
 These are the packets queued after an interrupted @code{gnutls_record_send()} .
+
+This function can only be used with transports where @code{send()}  is
+an all-or-nothing operation (e.g., UDP). When partial writes are allowed
+this function will cause session errors.
 
 @strong{Returns:} The number of bytes discarded.
 
@@ -5426,7 +5430,7 @@ call this function again to get the data.  See also
 @code{gnutls_record_get_direction()} .
 
 @strong{Returns:} The number of bytes received and zero on EOF (for stream
-connections).  A negative error code is returned in case of an error.  
+connections).  A negative error code is returned in case of an error.
 The number of bytes received might be less than the requested  @code{data_size} .
 @end deftypefun
 
@@ -5469,12 +5473,12 @@ to directly receive the whole decrypted packet. That avoids a
 memory copy, and is intended to be used by applications seeking high
 performance.
 
-The received packet is accessed using @code{gnutls_packet_get()}  and 
+The received packet is accessed using @code{gnutls_packet_get()}  and
 must be deinitialized using @code{gnutls_packet_deinit()} . The returned
 packet will be @code{NULL}  if the return value is zero (EOF).
 
 @strong{Returns:} The number of bytes received and zero on EOF (for stream
-connections).  A negative error code is returned in case of an error.  
+connections).  A negative error code is returned in case of an error.
 
 @strong{Since:} 3.3.5
 @end deftypefun
@@ -5495,7 +5499,7 @@ it returns in addition to data, the sequence number of the data.
 This is useful in DTLS where record packets might be received
 out-of-order. The returned 8-byte sequence number is an
 integer in big-endian format and should be
-treated as a unique message identification. 
+treated as a unique message identification.
 
 @strong{Returns:} The number of bytes received and zero on EOF.  A negative
 error code is returned in case of an error.  The number of bytes
@@ -5517,25 +5521,26 @@ This function has the similar semantics with @code{send()} .  The only
 difference is that it accepts a GnuTLS session, and uses different
 error codes.
 Note that if the send buffer is full, @code{send()}  will block this
-function.  See the @code{send()}  documentation for more information.  
+function.  See the @code{send()}  documentation for more information.
 
 You can replace the default push function which is @code{send()} , by using
 @code{gnutls_transport_set_push_function()} .
 
-If the EINTR is returned by the internal push function 
+If the EINTR is returned by the internal push function
 then @code{GNUTLS_E_INTERRUPTED}  will be returned. If
 @code{GNUTLS_E_INTERRUPTED}  or @code{GNUTLS_E_AGAIN}  is returned, you must
 call this function again with the exact same parameters, or provide a
 @code{NULL}  pointer for  @code{data} and 0 for  @code{data_size} , in order to write the
 same data as before. If you wish to discard the previous data instead
 of retrying, you must call @code{gnutls_record_discard_queued()}  before
-calling this function with different parameters.
-cf. @code{gnutls_record_get_direction()} . 
+calling this function with different parameters. Note that the latter
+works only on special transports (e.g., UDP).
+cf. @code{gnutls_record_get_direction()} .
 
 Note that in DTLS this function will return the @code{GNUTLS_E_LARGE_PACKET} 
 error code if the send data exceed the data MTU value - as returned
 by @code{gnutls_dtls_get_data_mtu()} . The errno value EMSGSIZE
-also maps to @code{GNUTLS_E_LARGE_PACKET} . 
+also maps to @code{GNUTLS_E_LARGE_PACKET} .
 Note that since 3.2.13 this function can be called under cork in DTLS
 mode, and will refuse to send data over the MTU size by returning
 @code{GNUTLS_E_LARGE_PACKET} .
@@ -5750,8 +5755,8 @@ is interrupted then the @code{GNUTLS_E_AGAIN}  or @code{GNUTLS_E_INTERRUPTED}
 errors will be returned. To obtain the data left in the corked
 buffer use @code{gnutls_record_check_corked()} .
 
-@strong{Returns:} On success the number of transmitted data is returned, or 
-otherwise a negative error code. 
+@strong{Returns:} On success the number of transmitted data is returned, or
+otherwise a negative error code.
 
 @strong{Since:} 3.1.9
 @end deftypefun
@@ -5763,7 +5768,7 @@ otherwise a negative error code.
 
 This function can only be called in server side, and
 instructs a TLS 1.2 or earlier client to renegotiate
-parameters (perform a handshake), by sending a 
+parameters (perform a handshake), by sending a
 hello request message.
 
 If this function succeeds, the calling application
@@ -5779,7 +5784,7 @@ calling application should proceed to calling
 @code{gnutls_handshake()}  to negotiate the new
 parameters.
 
-If the client does not wish to renegotiate parameters he 
+If the client does not wish to renegotiate parameters he
 may reply with an alert message, and in that case the return code seen
 by subsequent @code{gnutls_record_recv()}  will be
 @code{GNUTLS_E_WARNING_ALERT_RECEIVED}  with the specific alert being
@@ -5982,14 +5987,14 @@ available to the more generic @code{gnutls_session_get_flags()} .
 
 @subheading gnutls_session_ext_register
 @anchor{gnutls_session_ext_register}
-@deftypefun {int} {gnutls_session_ext_register} (gnutls_session_t @var{session}, const char * @var{name}, int @var{id}, gnutls_ext_parse_type_t @var{parse_type}, gnutls_ext_recv_func @var{recv_func}, gnutls_ext_send_func @var{send_func}, gnutls_ext_deinit_data_func @var{deinit_func}, gnutls_ext_pack_func @var{pack_func}, gnutls_ext_unpack_func @var{unpack_func}, unsigned @var{flags})
+@deftypefun {int} {gnutls_session_ext_register} (gnutls_session_t @var{session}, const char * @var{name}, int @var{id}, gnutls_ext_parse_type_t @var{parse_point}, gnutls_ext_recv_func @var{recv_func}, gnutls_ext_send_func @var{send_func}, gnutls_ext_deinit_data_func @var{deinit_func}, gnutls_ext_pack_func @var{pack_func}, gnutls_ext_unpack_func @var{unpack_func}, unsigned @var{flags})
 @var{session}: the session for which this extension will be set
 
 @var{name}: the name of the extension to register
 
 @var{id}: the numeric id of the extension
 
-@var{parse_type}: the parse type of the extension (see gnutls_ext_parse_type_t)
+@var{parse_point}: the parse type of the extension (see gnutls_ext_parse_type_t)
 
 @var{recv_func}: a function to receive the data
 

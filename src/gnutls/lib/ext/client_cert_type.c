@@ -48,7 +48,8 @@ const hello_ext_entry_st ext_mod_client_cert_type = {
 	.name = "Client Certificate Type",
 	.tls_id = 19,
 	.gid = GNUTLS_EXTENSION_CLIENT_CERT_TYPE,
-	.parse_type = GNUTLS_EXT_TLS,
+	.client_parse_point = GNUTLS_EXT_TLS,
+	.server_parse_point = GNUTLS_EXT_TLS,
 	.validity = GNUTLS_EXT_FLAG_TLS |
 		GNUTLS_EXT_FLAG_DTLS |
 		GNUTLS_EXT_FLAG_CLIENT_HELLO |

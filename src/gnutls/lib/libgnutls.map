@@ -1394,4 +1394,9 @@ GNUTLS_PRIVATE_3_4 {
 	# needed by tests/iov:
 	_gnutls_iov_iter_init;
 	_gnutls_iov_iter_next;
+	_gnutls_iov_iter_sync;
+	# needed by tests/buffer:
+	_gnutls_buffer_unescape;
+	_gnutls_buffer_pop_datum;
+	_gnutls_buffer_clear;
 } GNUTLS_3_4;

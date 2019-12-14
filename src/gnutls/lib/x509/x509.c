@@ -357,7 +357,7 @@ static int compare_sig_algorithm(gnutls_x509_crt_t cert)
 		_gnutls_free_datum(&sp2);
 	}
 
-	if (empty1 != empty2 || 
+	if (empty1 != empty2 ||
 	    sp1.size != sp2.size || safe_memcmp(sp1.data, sp2.data, sp1.size) != 0) {
 		gnutls_assert();
 		ret = GNUTLS_E_CERTIFICATE_ERROR;
@@ -622,7 +622,7 @@ gnutls_x509_crt_import(gnutls_x509_crt_t cert,
  * "C=xxxx,O=yyyy,CN=zzzz" as described in RFC4514. The output string
  * will be ASCII or UTF-8 encoded, depending on the certificate data.
  *
- * If @buf is null then only the size will be filled. 
+ * If @buf is null then only the size will be filled.
  *
  * This function does not output a fully RFC4514 compliant string, if
  * that is required see gnutls_x509_crt_get_issuer_dn3().
@@ -736,7 +736,7 @@ gnutls_x509_crt_get_issuer_dn3(gnutls_x509_crt_t cert, gnutls_datum_t *dn, unsig
  *
  * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not
  *   long enough, and in that case the @buf_size will be updated with
- *   the required size. %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE if there 
+ *   the required size. %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE if there
  *   are no data in the current index. On success 0 is returned.
  **/
 int
@@ -778,7 +778,7 @@ gnutls_x509_crt_get_issuer_dn_by_oid(gnutls_x509_crt_t cert,
  *
  * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not
  *   long enough, and in that case the @buf_size will be updated with
- *   the required size. %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE if there 
+ *   the required size. %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE if there
  *   are no data in the current index. On success 0 is returned.
  **/
 int
@@ -806,7 +806,7 @@ gnutls_x509_crt_get_issuer_dn_oid(gnutls_x509_crt_t cert,
  * described in RFC4514. The output string will be ASCII or UTF-8
  * encoded, depending on the certificate data.
  *
- * If @buf is null then only the size will be filled. 
+ * If @buf is null then only the size will be filled.
  *
  * This function does not output a fully RFC4514 compliant string, if
  * that is required see gnutls_x509_crt_get_dn3().
@@ -918,7 +918,7 @@ int gnutls_x509_crt_get_dn3(gnutls_x509_crt_t cert, gnutls_datum_t *dn, unsigned
  *
  * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not
  *   long enough, and in that case the @buf_size will be updated with
- *   the required size. %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE if there 
+ *   the required size. %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE if there
  *   are no data in the current index. On success 0 is returned.
  **/
 int
@@ -959,7 +959,7 @@ gnutls_x509_crt_get_dn_by_oid(gnutls_x509_crt_t cert, const char *oid,
  *
  * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not
  *   long enough, and in that case the @buf_size will be updated with
- *   the required size. %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE if there 
+ *   the required size. %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE if there
  *   are no data in the current index. On success 0 is returned.
  **/
 int
@@ -1362,11 +1362,11 @@ inline static int is_type_printable(int type)
  * @critical: will be non-zero if the extension is marked as critical (may be null)
  *
  * This function will return the X.509 authority key
- * identifier when stored as a general name (authorityCertIssuer) 
+ * identifier when stored as a general name (authorityCertIssuer)
  * and serial number.
  *
  * Because more than one general names might be stored
- * @seq can be used as a counter to request them all until 
+ * @seq can be used as a counter to request them all until
  * %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE is returned.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
@@ -1634,7 +1634,7 @@ gnutls_x509_crt_get_spki(gnutls_x509_crt_t cert, gnutls_x509_spki_t spki, unsign
  */
 int
 _gnutls_parse_general_name2(ASN1_TYPE src, const char *src_name,
-			   int seq, gnutls_datum_t *dname, 
+			   int seq, gnutls_datum_t *dname,
 			   unsigned int *ret_type, int othername_oid)
 {
 	int len, ret;
@@ -1817,7 +1817,7 @@ get_alt_name(gnutls_subject_alt_names_t san,
 		goto cleanup;
 	}
 
-	if (othername_oid && type == GNUTLS_SAN_OTHERNAME) {
+	if (othername_oid && type == GNUTLS_SAN_OTHERNAME && ooid.data) {
 		unsigned vtype;
 		ret = gnutls_x509_othername_to_virtual((char*)ooid.data, &oname, &vtype, &virt);
 		if (ret >= 0) {
@@ -2369,8 +2369,8 @@ void gnutls_x509_policy_release(struct gnutls_x509_policy_st *policy)
  * @policy: A pointer to a policy structure.
  * @critical: will be non-zero if the extension is marked as critical
  *
- * This function will extract the certificate policy (extension 2.5.29.32) 
- * specified by the given index. 
+ * This function will extract the certificate policy (extension 2.5.29.32)
+ * specified by the given index.
  *
  * The policy returned by this function must be deinitialized by using
  * gnutls_x509_policy_release().
@@ -2523,7 +2523,7 @@ gnutls_x509_crt_get_extension_by_oid2(gnutls_x509_crt_t cert,
 				     unsigned int *critical)
 {
 	int ret;
-	
+
 	if (cert == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
@@ -2599,7 +2599,7 @@ gnutls_x509_crt_get_extension_oid(gnutls_x509_crt_t cert, unsigned indx,
  *
  * If the buffer provided is not long enough to hold the output, then
  * @oid_size is updated and %GNUTLS_E_SHORT_MEMORY_BUFFER will be
- * returned. The @oid returned will be null terminated, although 
+ * returned. The @oid returned will be null terminated, although
  * @oid_size will not account for the trailing null (the latter is not
  * true for GnuTLS prior to 3.6.0).
  *
@@ -2786,9 +2786,9 @@ get_dn(gnutls_x509_crt_t cert, const char *whom, gnutls_x509_dn_t * dn, unsigned
  * @dn: output variable with pointer to uint8_t DN.
  *
  * Return the Certificate's Subject DN as a %gnutls_x509_dn_t data type,
- * that can be decoded using gnutls_x509_dn_get_rdn_ava(). 
+ * that can be decoded using gnutls_x509_dn_get_rdn_ava().
  *
- * Note that @dn should be treated as constant. Because it points 
+ * Note that @dn should be treated as constant. Because it points
  * into the @cert object, you should not use @dn after @cert is
  * deallocated.
  *
@@ -2806,9 +2806,9 @@ gnutls_x509_crt_get_subject(gnutls_x509_crt_t cert, gnutls_x509_dn_t * dn)
  * @dn: output variable with pointer to uint8_t DN
  *
  * Return the Certificate's Issuer DN as a %gnutls_x509_dn_t data type,
- * that can be decoded using gnutls_x509_dn_get_rdn_ava(). 
+ * that can be decoded using gnutls_x509_dn_get_rdn_ava().
  *
- * Note that @dn should be treated as constant. Because it points 
+ * Note that @dn should be treated as constant. Because it points
  * into the @cert object, you should not use @dn after @cert is
  * deallocated.
  *
@@ -3243,13 +3243,13 @@ gnutls_x509_crt_get_preferred_hash_algorithm(gnutls_x509_crt_t crt,
 		return gnutls_assert_val(ret);
 
 	ret = gnutls_pubkey_import_x509(pubkey, crt, 0);
-	if (ret < 0) {  
+	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
 	ret = gnutls_pubkey_get_preferred_hash_algorithm(pubkey, hash, mand);
-	if (ret < 0) {  
+	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
@@ -3461,13 +3461,13 @@ gnutls_x509_crt_get_pk_rsa_raw(gnutls_x509_crt_t crt,
 		return gnutls_assert_val(ret);
 
 	ret = gnutls_pubkey_import_x509(pubkey, crt, 0);
-	if (ret < 0) {  
+	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
 	ret = gnutls_pubkey_export_rsa_raw(pubkey, m, e);
-	if (ret < 0) {  
+	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
@@ -3513,13 +3513,13 @@ gnutls_x509_crt_get_pk_ecc_raw(gnutls_x509_crt_t crt,
 		return gnutls_assert_val(ret);
 
 	ret = gnutls_pubkey_import_x509(pubkey, crt, 0);
-	if (ret < 0) {  
+	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
 	ret = gnutls_pubkey_export_ecc_raw(pubkey, curve, x, y);
-	if (ret < 0) {  
+	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
@@ -3615,13 +3615,13 @@ gnutls_x509_crt_get_pk_dsa_raw(gnutls_x509_crt_t crt,
 		return gnutls_assert_val(ret);
 
 	ret = gnutls_pubkey_import_x509(pubkey, crt, 0);
-	if (ret < 0) {  
+	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
 	ret = gnutls_pubkey_export_dsa_raw(pubkey, p, q, g, y);
-	if (ret < 0) {  
+	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
@@ -3801,7 +3801,7 @@ gnutls_x509_crt_list_import(gnutls_x509_crt_t * certs,
 			copied++;
 		}
 
-		/* now we move ptr after the pem header 
+		/* now we move ptr after the pem header
 		 */
 		ptr++;
 		/* find the next certificate (if any)
@@ -4071,7 +4071,7 @@ legacy_parse_aia(ASN1_TYPE src,
  *
  * Note that a simpler API to access the authority info data is provided
  * by gnutls_x509_aia_get() and gnutls_x509_ext_import_aia().
- * 
+ *
  * This function extracts the Authority Information Access (AIA)
  * extension, see RFC 5280 section 4.2.2.1 for more information.  The
  * AIA extension holds a sequence of AccessDescription (AD) data.
@@ -4093,7 +4093,7 @@ legacy_parse_aia(ASN1_TYPE src,
  *
  * If @what is %GNUTLS_IA_URI, @data will hold the accessLocation URI
  * data.  Requesting this @what value leads to an error if the
- * accessLocation is not of the "uniformResourceIdentifier" type. 
+ * accessLocation is not of the "uniformResourceIdentifier" type.
  *
  * If @what is %GNUTLS_IA_OCSP_URI, @data will hold the OCSP URI.
  * Requesting this @what value leads to an error if the accessMethod
@@ -4189,7 +4189,7 @@ gnutls_x509_crt_get_authority_info_access(gnutls_x509_crt_t crt,
  * @userdata: data associated with the callback
  *
  * This function will set a callback function to be used when
- * it is required to access a protected object. This function overrides 
+ * it is required to access a protected object. This function overrides
  * the global function set using gnutls_pkcs11_set_pin_function().
  *
  * Note that this callback is currently used only during the import
@@ -4370,7 +4370,7 @@ gnutls_x509_crt_list_import_url(gnutls_x509_crt_t **certs,
  * This function will verify the given signed data, using the
  * parameters from the certificate.
  *
- * Returns: In case of a verification failure %GNUTLS_E_PK_SIG_VERIFY_FAILED 
+ * Returns: In case of a verification failure %GNUTLS_E_PK_SIG_VERIFY_FAILED
  * is returned, %GNUTLS_E_EXPIRED or %GNUTLS_E_NOT_YET_ACTIVATED on expired
  * or not yet activated certificate and zero or positive code on success.
  *
@@ -4452,7 +4452,7 @@ gnutls_x509_crt_verify_data3(gnutls_x509_crt_t crt,
  * This function will verify the given signed data, using the
  * parameters from the certificate.
  *
- * Returns: In case of a verification failure %GNUTLS_E_PK_SIG_VERIFY_FAILED 
+ * Returns: In case of a verification failure %GNUTLS_E_PK_SIG_VERIFY_FAILED
  * is returned, %GNUTLS_E_EXPIRED or %GNUTLS_E_NOT_YET_ACTIVATED on expired
  * or not yet activated certificate and zero or positive code on success.
  *

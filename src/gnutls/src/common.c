@@ -182,6 +182,56 @@ print_x509_info(gnutls_session_t session, FILE *out, int flag, int print_cert, i
 	}
 }
 
+static void
+print_rawpk_info(gnutls_session_t session, FILE *out, int flag, int print_cert, int print_crt_status)
+{
+	gnutls_pcert_st pk_cert;
+	gnutls_pk_algorithm_t pk_algo;
+	const gnutls_datum_t *cert_list;
+	unsigned int cert_list_size = 0;
+	int ret;
+
+	cert_list = gnutls_certificate_get_peers(session, &cert_list_size);
+	if (cert_list_size == 0) {
+		if (print_crt_status)
+			fprintf(stderr, "No certificates found!\n");
+		return;
+	}
+
+	log_msg(out, "- Certificate type: Raw Public Key\n");
+	log_msg(out, "- Got %d Raw public-key(s).\n",
+	       cert_list_size);
+
+
+	ret = gnutls_pcert_import_rawpk_raw(&pk_cert, cert_list, GNUTLS_X509_FMT_DER, 0, 0);
+	if (ret < 0) {
+		fprintf(stderr, "Decoding error: %s\n",
+			gnutls_strerror(ret));
+		return;
+	}
+
+	pk_algo = gnutls_pubkey_get_pk_algorithm(pk_cert.pubkey, NULL);
+
+	log_msg(out, "- Raw pk info:\n");
+	log_msg(out, " - PK algo: %s\n", gnutls_pk_algorithm_get_name(pk_algo));
+
+	if (print_cert) {
+		gnutls_datum_t pem;
+
+		ret = gnutls_pubkey_export2(pk_cert.pubkey, GNUTLS_X509_FMT_PEM, &pem);
+		if (ret < 0) {
+			fprintf(stderr, "Encoding error: %s\n",
+				gnutls_strerror(ret));
+			return;
+		}
+
+		log_msg(out, "\n%s\n", (char*)pem.data);
+
+		gnutls_free(pem.data);
+	}
+
+}
+
 /* returns false (0) if not verified, or true (1) otherwise 
  */
 int cert_verify(gnutls_session_t session, const char *hostname, const char *purpose)
@@ -543,9 +593,12 @@ void print_cert_info2(gnutls_session_t session, int verbose, FILE *out, int prin
 		print_crt_status = 1;
 	}
 
-	switch (gnutls_certificate_type_get(session)) {
+	switch (gnutls_certificate_type_get2(session, GNUTLS_CTYPE_PEERS)) {
 	case GNUTLS_CRT_X509:
 		print_x509_info(session, out, flag, print_cert, print_crt_status);
+		break;
+	case GNUTLS_CRT_RAWPK:
+		print_rawpk_info(session, out, flag, print_cert, print_crt_status);
 		break;
 	default:
 		break;

@@ -173,7 +173,7 @@ static int tls12_resume_copy_required_vals(gnutls_session_t session, unsigned ti
 	       client_random, session->security_parameters.client_random,
 	       GNUTLS_RANDOM_SIZE);
 
-	/* keep the ciphersuite and compression 
+	/* keep the ciphersuite and compression
 	 * That is because the client must see these in our
 	 * hello message.
 	 */
@@ -295,6 +295,8 @@ int _gnutls_gen_server_random(gnutls_session_t session, int version)
 	}
 
 	max = _gnutls_version_max(session);
+	if (max == NULL)
+		return gnutls_assert_val(GNUTLS_E_NO_CIPHER_SUITES);
 
 	if (!IS_DTLS(session) && max->id >= GNUTLS_TLS1_3 &&
 	    version <= GNUTLS_TLS1_2) {
@@ -584,7 +586,7 @@ static int set_auth_types(gnutls_session_t session)
 	return 0;
 }
 
-/* Read a client hello packet. 
+/* Read a client hello packet.
  * A client hello must be a known version client hello
  * or version 2.0 client hello (only for compatibility
  * since SSL version 2.0 is not supported).
@@ -640,7 +642,7 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 	DECR_LEN(len, 1);
 	session_id_len = data[pos++];
 
-	/* RESUME SESSION 
+	/* RESUME SESSION
 	 */
 	if (session_id_len > GNUTLS_MAX_SESSION_ID_SIZE) {
 		gnutls_assert();
@@ -931,7 +933,7 @@ int _gnutls_send_finished(gnutls_session_t session, int again)
 }
 
 /* This is to be called after sending our finished message. If everything
- * went fine we have negotiated a secure connection 
+ * went fine we have negotiated a secure connection
  */
 int _gnutls_recv_finished(gnutls_session_t session)
 {
@@ -1150,7 +1152,7 @@ check_if_null_comp_present(gnutls_session_t session,
 
 /* This function sends an empty handshake packet. (like hello request).
  * If the previous _gnutls_send_empty_handshake() returned
- * GNUTLS_E_AGAIN or GNUTLS_E_INTERRUPTED, then it must be called again 
+ * GNUTLS_E_AGAIN or GNUTLS_E_INTERRUPTED, then it must be called again
  * (until it returns ok), with NULL parameters.
  */
 static int
@@ -1219,7 +1221,7 @@ _gnutls_send_handshake(gnutls_session_t session, mbuffer_st * bufel,
 
 /* This function sends a handshake message of type 'type' containing the
  * data specified here. If the previous _gnutls_send_handshake() returned
- * GNUTLS_E_AGAIN or GNUTLS_E_INTERRUPTED, then it must be called again 
+ * GNUTLS_E_AGAIN or GNUTLS_E_INTERRUPTED, then it must be called again
  * (until it returns ok), with NULL parameters.
  */
 int
@@ -2036,7 +2038,7 @@ read_server_hello(gnutls_session_t session,
 	return 0;
 }
 
-/* This function copies the appropriate compression methods, to a locally allocated buffer 
+/* This function copies the appropriate compression methods, to a locally allocated buffer
  * Needed in hello messages. Returns the new data length.
  */
 static int
@@ -2161,7 +2163,7 @@ static int send_client_hello(gnutls_session_t session, int again)
 		 */
 		session->security_parameters.timestamp = gnutls_time(NULL);
 
-		/* Generate random data 
+		/* Generate random data
 		 */
 		if (!(session->internals.hsk_flags & HSK_HRR_RECEIVED) &&
 		    !(IS_DTLS(session) && session->internals.dtls.hsk_hello_verify_requests == 0)) {
@@ -2200,7 +2202,7 @@ static int send_client_hello(gnutls_session_t session, int again)
 
 		/* Copy the Session ID - if any
 		 */
-		ret = _gnutls_buffer_append_data_prefix(&extdata, 8, 
+		ret = _gnutls_buffer_append_data_prefix(&extdata, 8,
 							session->internals.resumed_security_parameters.session_id,
 							session_id_len);
 		if (ret < 0) {
@@ -2485,7 +2487,7 @@ recv_hello_verify_request(gnutls_session_t session,
  *				   <--------	     Finished
  *     [ChangeCipherSpec]
  *     Finished		      -------->
- * 
+ *
  */
 
 /**
@@ -2494,7 +2496,7 @@ recv_hello_verify_request(gnutls_session_t session,
  *
  * This function can only be called in server side, and
  * instructs a TLS 1.2 or earlier client to renegotiate
- * parameters (perform a handshake), by sending a 
+ * parameters (perform a handshake), by sending a
  * hello request message.
  *
  * If this function succeeds, the calling application
@@ -2510,7 +2512,7 @@ recv_hello_verify_request(gnutls_session_t session,
  * gnutls_handshake() to negotiate the new
  * parameters.
  *
- * If the client does not wish to renegotiate parameters he 
+ * If the client does not wish to renegotiate parameters he
  * may reply with an alert message, and in that case the return code seen
  * by subsequent gnutls_record_recv() will be
  * %GNUTLS_E_WARNING_ALERT_RECEIVED with the specific alert being
@@ -2633,7 +2635,7 @@ static int _gnutls_recv_supplemental(gnutls_session_t session)
  * initializes the TLS session parameters.
  *
  * The non-fatal errors expected by this function are:
- * %GNUTLS_E_INTERRUPTED, %GNUTLS_E_AGAIN, 
+ * %GNUTLS_E_INTERRUPTED, %GNUTLS_E_AGAIN,
  * %GNUTLS_E_WARNING_ALERT_RECEIVED. When this function is called
  * for re-handshake under TLS 1.2 or earlier, the non-fatal error code
  * %GNUTLS_E_GOT_APPLICATION_DATA may also be returned.
@@ -2874,7 +2876,7 @@ static bool can_send_false_start(gnutls_session_t session)
 }
 
 /*
- * handshake_client 
+ * handshake_client
  * This function performs the client side of the handshake of the TLS/SSL protocol.
  */
 static int handshake_client(gnutls_session_t session)
@@ -2980,7 +2982,7 @@ static int handshake_client(gnutls_session_t session)
 		IMED_RET("recv server kx message", ret, 1);
 		FALLTHROUGH;
 	case STATE10:
-		/* receive the server certificate request - if any 
+		/* receive the server certificate request - if any
 		 */
 
 		if (session->internals.resumed == RESUME_FALSE)	/* if we are not resuming */
@@ -3101,7 +3103,7 @@ static int handshake_client(gnutls_session_t session)
 
 
 
-/* This function is to be called if the handshake was successfully 
+/* This function is to be called if the handshake was successfully
  * completed. This sends a Change Cipher Spec packet to the peer.
  */
 ssize_t _gnutls_send_change_cipher_spec(gnutls_session_t session, int again)
@@ -3172,7 +3174,7 @@ ssize_t _gnutls_send_change_cipher_spec(gnutls_session_t session, int again)
 	return 0;
 }
 
-/* This function sends the final handshake packets and initializes connection 
+/* This function sends the final handshake packets and initializes connection
  */
 static int send_handshake_final(gnutls_session_t session, int init)
 {
@@ -3190,7 +3192,7 @@ static int send_handshake_final(gnutls_session_t session, int init)
 			gnutls_assert();
 			return ret;
 		}
-		/* Initialize the connection session (start encryption) - in case of client 
+		/* Initialize the connection session (start encryption) - in case of client
 		 */
 		if (init == TRUE) {
 			ret = _gnutls_connection_state_init(session);
@@ -3225,7 +3227,7 @@ static int send_handshake_final(gnutls_session_t session, int init)
 	return 0;
 }
 
-/* This function receives the final handshake packets 
+/* This function receives the final handshake packets
  * And executes the appropriate function to initialize the
  * read session.
  */

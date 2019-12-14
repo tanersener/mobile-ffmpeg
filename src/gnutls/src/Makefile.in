@@ -439,9 +439,11 @@ ocsptool_OBJECTS = $(am_ocsptool_OBJECTS)
 am__p11tool_SOURCES_DIST = p11tool-args.def p11tool.c pkcs11.c \
 	certtool-common.c certtool-extras.c p11tool.h common.c \
 	mech-list.h
-@ENABLE_PKCS11_TRUE@am_p11tool_OBJECTS = p11tool.$(OBJEXT) \
-@ENABLE_PKCS11_TRUE@	pkcs11.$(OBJEXT) certtool-common.$(OBJEXT) \
-@ENABLE_PKCS11_TRUE@	certtool-extras.$(OBJEXT) common.$(OBJEXT)
+@ENABLE_PKCS11_TRUE@am_p11tool_OBJECTS = p11tool-p11tool.$(OBJEXT) \
+@ENABLE_PKCS11_TRUE@	p11tool-pkcs11.$(OBJEXT) \
+@ENABLE_PKCS11_TRUE@	p11tool-certtool-common.$(OBJEXT) \
+@ENABLE_PKCS11_TRUE@	p11tool-certtool-extras.$(OBJEXT) \
+@ENABLE_PKCS11_TRUE@	p11tool-common.$(OBJEXT)
 p11tool_OBJECTS = $(am_p11tool_OBJECTS)
 @ENABLE_PKCS11_TRUE@p11tool_DEPENDENCIES = ../lib/libgnutls.la \
 @ENABLE_PKCS11_TRUE@	libcmd-p11tool.la ../gl/libgnu.la \
@@ -498,14 +500,16 @@ am__depfiles_remade = ./$(DEPDIR)/benchmark-cipher.Po \
 	./$(DEPDIR)/danetool-args.Plo ./$(DEPDIR)/danetool.Po \
 	./$(DEPDIR)/ocsptool-args.Plo ./$(DEPDIR)/ocsptool-common.Po \
 	./$(DEPDIR)/ocsptool.Po ./$(DEPDIR)/p11tool-args.Plo \
-	./$(DEPDIR)/p11tool.Po ./$(DEPDIR)/pkcs11.Po \
-	./$(DEPDIR)/psk.Po ./$(DEPDIR)/psktool-args.Plo \
-	./$(DEPDIR)/serv-args.Plo ./$(DEPDIR)/serv.Po \
-	./$(DEPDIR)/socket.Po ./$(DEPDIR)/srptool-args.Plo \
-	./$(DEPDIR)/srptool.Po ./$(DEPDIR)/systemkey-args.Plo \
-	./$(DEPDIR)/systemkey.Po ./$(DEPDIR)/tests.Po \
-	./$(DEPDIR)/tpmtool-args.Plo ./$(DEPDIR)/tpmtool.Po \
-	./$(DEPDIR)/udp-serv.Po
+	./$(DEPDIR)/p11tool-certtool-common.Po \
+	./$(DEPDIR)/p11tool-certtool-extras.Po \
+	./$(DEPDIR)/p11tool-common.Po ./$(DEPDIR)/p11tool-p11tool.Po \
+	./$(DEPDIR)/p11tool-pkcs11.Po ./$(DEPDIR)/psk.Po \
+	./$(DEPDIR)/psktool-args.Plo ./$(DEPDIR)/serv-args.Plo \
+	./$(DEPDIR)/serv.Po ./$(DEPDIR)/socket.Po \
+	./$(DEPDIR)/srptool-args.Plo ./$(DEPDIR)/srptool.Po \
+	./$(DEPDIR)/systemkey-args.Plo ./$(DEPDIR)/systemkey.Po \
+	./$(DEPDIR)/tests.Po ./$(DEPDIR)/tpmtool-args.Plo \
+	./$(DEPDIR)/tpmtool.Po ./$(DEPDIR)/udp-serv.Po
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -1875,6 +1879,7 @@ libcmd_danetool_la_LIBADD = ../lib/libgnutls.la gl/libgnu_gpl.la \
 @ENABLE_PKCS11_TRUE@p11tool_SOURCES = p11tool-args.def p11tool.c pkcs11.c certtool-common.c \
 @ENABLE_PKCS11_TRUE@	certtool-extras.c p11tool.h common.c mech-list.h
 
+@ENABLE_PKCS11_TRUE@p11tool_CPPFLAGS = $(AM_CPPFLAGS) $(P11_KIT_CFLAGS)
 @ENABLE_PKCS11_TRUE@p11tool_LDADD = ../lib/libgnutls.la \
 @ENABLE_PKCS11_TRUE@	libcmd-p11tool.la ../gl/libgnu.la \
 @ENABLE_PKCS11_TRUE@	gl/libgnu_gpl.la $(COMMON_LIBS)
@@ -2117,8 +2122,11 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ocsptool-common.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ocsptool.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/p11tool-args.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/p11tool.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pkcs11.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/p11tool-certtool-common.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/p11tool-certtool-extras.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/p11tool-common.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/p11tool-p11tool.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/p11tool-pkcs11.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/psk.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/psktool-args.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/serv-args.Plo@am__quote@ # am--include-marker
@@ -2162,6 +2170,76 @@ am--depfiles: $(am__depfiles_remade)
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LTCOMPILE) -c -o $@ $<
+
+p11tool-p11tool.o: p11tool.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(p11tool_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT p11tool-p11tool.o -MD -MP -MF $(DEPDIR)/p11tool-p11tool.Tpo -c -o p11tool-p11tool.o `test -f 'p11tool.c' || echo '$(srcdir)/'`p11tool.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/p11tool-p11tool.Tpo $(DEPDIR)/p11tool-p11tool.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='p11tool.c' object='p11tool-p11tool.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(p11tool_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o p11tool-p11tool.o `test -f 'p11tool.c' || echo '$(srcdir)/'`p11tool.c
+
+p11tool-p11tool.obj: p11tool.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(p11tool_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT p11tool-p11tool.obj -MD -MP -MF $(DEPDIR)/p11tool-p11tool.Tpo -c -o p11tool-p11tool.obj `if test -f 'p11tool.c'; then $(CYGPATH_W) 'p11tool.c'; else $(CYGPATH_W) '$(srcdir)/p11tool.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/p11tool-p11tool.Tpo $(DEPDIR)/p11tool-p11tool.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='p11tool.c' object='p11tool-p11tool.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(p11tool_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o p11tool-p11tool.obj `if test -f 'p11tool.c'; then $(CYGPATH_W) 'p11tool.c'; else $(CYGPATH_W) '$(srcdir)/p11tool.c'; fi`
+
+p11tool-pkcs11.o: pkcs11.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(p11tool_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT p11tool-pkcs11.o -MD -MP -MF $(DEPDIR)/p11tool-pkcs11.Tpo -c -o p11tool-pkcs11.o `test -f 'pkcs11.c' || echo '$(srcdir)/'`pkcs11.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/p11tool-pkcs11.Tpo $(DEPDIR)/p11tool-pkcs11.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='pkcs11.c' object='p11tool-pkcs11.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(p11tool_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o p11tool-pkcs11.o `test -f 'pkcs11.c' || echo '$(srcdir)/'`pkcs11.c
+
+p11tool-pkcs11.obj: pkcs11.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(p11tool_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT p11tool-pkcs11.obj -MD -MP -MF $(DEPDIR)/p11tool-pkcs11.Tpo -c -o p11tool-pkcs11.obj `if test -f 'pkcs11.c'; then $(CYGPATH_W) 'pkcs11.c'; else $(CYGPATH_W) '$(srcdir)/pkcs11.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/p11tool-pkcs11.Tpo $(DEPDIR)/p11tool-pkcs11.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='pkcs11.c' object='p11tool-pkcs11.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(p11tool_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o p11tool-pkcs11.obj `if test -f 'pkcs11.c'; then $(CYGPATH_W) 'pkcs11.c'; else $(CYGPATH_W) '$(srcdir)/pkcs11.c'; fi`
+
+p11tool-certtool-common.o: certtool-common.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(p11tool_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT p11tool-certtool-common.o -MD -MP -MF $(DEPDIR)/p11tool-certtool-common.Tpo -c -o p11tool-certtool-common.o `test -f 'certtool-common.c' || echo '$(srcdir)/'`certtool-common.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/p11tool-certtool-common.Tpo $(DEPDIR)/p11tool-certtool-common.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='certtool-common.c' object='p11tool-certtool-common.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(p11tool_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o p11tool-certtool-common.o `test -f 'certtool-common.c' || echo '$(srcdir)/'`certtool-common.c
+
+p11tool-certtool-common.obj: certtool-common.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(p11tool_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT p11tool-certtool-common.obj -MD -MP -MF $(DEPDIR)/p11tool-certtool-common.Tpo -c -o p11tool-certtool-common.obj `if test -f 'certtool-common.c'; then $(CYGPATH_W) 'certtool-common.c'; else $(CYGPATH_W) '$(srcdir)/certtool-common.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/p11tool-certtool-common.Tpo $(DEPDIR)/p11tool-certtool-common.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='certtool-common.c' object='p11tool-certtool-common.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(p11tool_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o p11tool-certtool-common.obj `if test -f 'certtool-common.c'; then $(CYGPATH_W) 'certtool-common.c'; else $(CYGPATH_W) '$(srcdir)/certtool-common.c'; fi`
+
+p11tool-certtool-extras.o: certtool-extras.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(p11tool_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT p11tool-certtool-extras.o -MD -MP -MF $(DEPDIR)/p11tool-certtool-extras.Tpo -c -o p11tool-certtool-extras.o `test -f 'certtool-extras.c' || echo '$(srcdir)/'`certtool-extras.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/p11tool-certtool-extras.Tpo $(DEPDIR)/p11tool-certtool-extras.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='certtool-extras.c' object='p11tool-certtool-extras.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(p11tool_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o p11tool-certtool-extras.o `test -f 'certtool-extras.c' || echo '$(srcdir)/'`certtool-extras.c
+
+p11tool-certtool-extras.obj: certtool-extras.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(p11tool_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT p11tool-certtool-extras.obj -MD -MP -MF $(DEPDIR)/p11tool-certtool-extras.Tpo -c -o p11tool-certtool-extras.obj `if test -f 'certtool-extras.c'; then $(CYGPATH_W) 'certtool-extras.c'; else $(CYGPATH_W) '$(srcdir)/certtool-extras.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/p11tool-certtool-extras.Tpo $(DEPDIR)/p11tool-certtool-extras.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='certtool-extras.c' object='p11tool-certtool-extras.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(p11tool_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o p11tool-certtool-extras.obj `if test -f 'certtool-extras.c'; then $(CYGPATH_W) 'certtool-extras.c'; else $(CYGPATH_W) '$(srcdir)/certtool-extras.c'; fi`
+
+p11tool-common.o: common.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(p11tool_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT p11tool-common.o -MD -MP -MF $(DEPDIR)/p11tool-common.Tpo -c -o p11tool-common.o `test -f 'common.c' || echo '$(srcdir)/'`common.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/p11tool-common.Tpo $(DEPDIR)/p11tool-common.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='common.c' object='p11tool-common.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(p11tool_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o p11tool-common.o `test -f 'common.c' || echo '$(srcdir)/'`common.c
+
+p11tool-common.obj: common.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(p11tool_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT p11tool-common.obj -MD -MP -MF $(DEPDIR)/p11tool-common.Tpo -c -o p11tool-common.obj `if test -f 'common.c'; then $(CYGPATH_W) 'common.c'; else $(CYGPATH_W) '$(srcdir)/common.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/p11tool-common.Tpo $(DEPDIR)/p11tool-common.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='common.c' object='p11tool-common.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(p11tool_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o p11tool-common.obj `if test -f 'common.c'; then $(CYGPATH_W) 'common.c'; else $(CYGPATH_W) '$(srcdir)/common.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -2394,8 +2472,11 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/ocsptool-common.Po
 	-rm -f ./$(DEPDIR)/ocsptool.Po
 	-rm -f ./$(DEPDIR)/p11tool-args.Plo
-	-rm -f ./$(DEPDIR)/p11tool.Po
-	-rm -f ./$(DEPDIR)/pkcs11.Po
+	-rm -f ./$(DEPDIR)/p11tool-certtool-common.Po
+	-rm -f ./$(DEPDIR)/p11tool-certtool-extras.Po
+	-rm -f ./$(DEPDIR)/p11tool-common.Po
+	-rm -f ./$(DEPDIR)/p11tool-p11tool.Po
+	-rm -f ./$(DEPDIR)/p11tool-pkcs11.Po
 	-rm -f ./$(DEPDIR)/psk.Po
 	-rm -f ./$(DEPDIR)/psktool-args.Plo
 	-rm -f ./$(DEPDIR)/serv-args.Plo
@@ -2473,8 +2554,11 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/ocsptool-common.Po
 	-rm -f ./$(DEPDIR)/ocsptool.Po
 	-rm -f ./$(DEPDIR)/p11tool-args.Plo
-	-rm -f ./$(DEPDIR)/p11tool.Po
-	-rm -f ./$(DEPDIR)/pkcs11.Po
+	-rm -f ./$(DEPDIR)/p11tool-certtool-common.Po
+	-rm -f ./$(DEPDIR)/p11tool-certtool-extras.Po
+	-rm -f ./$(DEPDIR)/p11tool-common.Po
+	-rm -f ./$(DEPDIR)/p11tool-p11tool.Po
+	-rm -f ./$(DEPDIR)/p11tool-pkcs11.Po
 	-rm -f ./$(DEPDIR)/psk.Po
 	-rm -f ./$(DEPDIR)/psktool-args.Plo
 	-rm -f ./$(DEPDIR)/serv-args.Plo

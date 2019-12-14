@@ -289,8 +289,10 @@ int check_privkey_import_export(void)
 	gnutls_datum_t p, q, g, y, x;
 	gnutls_datum_t m, e, u, e1, e2, d;
 	gnutls_ecc_curve_t curve;
+#ifdef ENABLE_GOST
 	gnutls_digest_algorithm_t digest;
 	gnutls_gost_paramset_t paramset;
+#endif
 	int ret;
 
 	global_init();
@@ -473,6 +475,7 @@ int check_privkey_import_export(void)
 	gnutls_privkey_deinit(key);
 
 	/* GOST */
+#ifdef ENABLE_GOST
 	ret = gnutls_privkey_init(&key);
 	if (ret < 0)
 		fail("error\n");
@@ -527,6 +530,7 @@ int check_privkey_import_export(void)
 	gnutls_free(y.data);
 	gnutls_free(p.data);
 	gnutls_privkey_deinit(key);
+#endif
 
 	return 0;
 }
@@ -891,6 +895,7 @@ int check_ed25519(void)
 static
 int check_gost(void)
 {
+#ifdef ENABLE_GOST
 	gnutls_privkey_t key;
 	gnutls_pubkey_t pub;
 	gnutls_datum_t y, x, k;
@@ -993,6 +998,7 @@ int check_gost(void)
 	gnutls_privkey_deinit(key);
 
 	gnutls_pubkey_deinit(pub);
+#endif
 
 	return 0;
 }

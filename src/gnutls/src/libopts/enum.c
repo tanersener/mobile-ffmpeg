@@ -14,7 +14,7 @@
  *
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
- *  AutoOpts is Copyright (C) 1992-2015 by Bruce Korb - all rights reserved
+ *  AutoOpts is Copyright (C) 1992-2018 by Bruce Korb - all rights reserved
  *
  *  AutoOpts is available under any one of two licenses.  The license
  *  in use must be one of these two and the choice is under the control
@@ -32,31 +32,6 @@
  *  4379e7444a0e2ce2b12dd6f5a52a27a4d02d39d247901d3285c88cf0d37f477b  COPYING.lgplv3
  *  13aa749a5b0a454917a944ed8fffc530b784f5ead522b1aacaf4ec8aa55a6239  COPYING.mbsd
  */
-
-/* = = = START-STATIC-FORWARD = = = */
-static void
-enum_err(tOptions * pOpts, tOptDesc * pOD,
-         char const * const * paz_names, int name_ct);
-
-static uintptr_t
-find_name(char const * name, tOptions * pOpts, tOptDesc * pOD,
-          char const * const *  paz_names, unsigned int name_ct);
-
-static void
-set_memb_shell(tOptions * pOpts, tOptDesc * pOD, char const * const * paz_names,
-               unsigned int name_ct);
-
-static void
-set_memb_names(tOptions * opts, tOptDesc * od, char const * const * nm_list,
-               unsigned int nm_ct);
-
-static uintptr_t
-check_membership_start(tOptDesc * od, char const ** argp, bool * invert);
-
-static uintptr_t
-find_member_bit(tOptions * opts, tOptDesc * od, char const * pz, int len,
-                char const * const * nm_list, unsigned int nm_ct);
-/* = = = END-STATIC-FORWARD = = = */
 
 static void
 enum_err(tOptions * pOpts, tOptDesc * pOD,

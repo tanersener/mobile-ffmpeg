@@ -206,6 +206,7 @@ typedef enum gnutls_cipher_algorithm {
  * @GNUTLS_KX_DHE_PSK: DHE-PSK key-exchange algorithm.
  * @GNUTLS_KX_ECDHE_PSK: ECDHE-PSK key-exchange algorithm.
  * @GNUTLS_KX_RSA_PSK: RSA-PSK key-exchange algorithm.
+ * @GNUTLS_KX_VKO_GOST_12: VKO GOST R 34.10-2012 key-exchange algorithm.
  *
  * Enumeration of different key exchange algorithms.
  */
@@ -225,7 +226,8 @@ typedef enum {
 	GNUTLS_KX_ECDHE_RSA = 12,
 	GNUTLS_KX_ECDHE_ECDSA = 13,
 	GNUTLS_KX_ECDHE_PSK = 14,
-	GNUTLS_KX_RSA_PSK = 15
+	GNUTLS_KX_RSA_PSK = 15,
+	GNUTLS_KX_VKO_GOST_12 = 16
 } gnutls_kx_algorithm_t;
 
 /**
@@ -986,6 +988,11 @@ typedef enum {
  * @GNUTLS_ECC_CURVE_GOST256CPXB: GOST R 34.10 CryptoPro 256 XchB curve
  * @GNUTLS_ECC_CURVE_GOST512A: GOST R 34.10 TC26 512 A curve
  * @GNUTLS_ECC_CURVE_GOST512B: GOST R 34.10 TC26 512 B curve
+ * @GNUTLS_ECC_CURVE_GOST512C: GOST R 34.10 TC26 512 C curve
+ * @GNUTLS_ECC_CURVE_GOST256A: GOST R 34.10 TC26 256 A curve
+ * @GNUTLS_ECC_CURVE_GOST256B: GOST R 34.10 TC26 256 B curve
+ * @GNUTLS_ECC_CURVE_GOST256C: GOST R 34.10 TC26 256 C curve
+ * @GNUTLS_ECC_CURVE_GOST256D: GOST R 34.10 TC26 256 D curve
  *
  * Enumeration of ECC curves.
  */
@@ -1005,7 +1012,12 @@ typedef enum {
 	GNUTLS_ECC_CURVE_GOST256CPXB,
 	GNUTLS_ECC_CURVE_GOST512A,
 	GNUTLS_ECC_CURVE_GOST512B,
-	GNUTLS_ECC_CURVE_MAX = GNUTLS_ECC_CURVE_GOST512B
+	GNUTLS_ECC_CURVE_GOST512C,
+	GNUTLS_ECC_CURVE_GOST256A,
+	GNUTLS_ECC_CURVE_GOST256B,
+	GNUTLS_ECC_CURVE_GOST256C,
+	GNUTLS_ECC_CURVE_GOST256D,
+	GNUTLS_ECC_CURVE_MAX = GNUTLS_ECC_CURVE_GOST256D
 } gnutls_ecc_curve_t;
 
 /**
@@ -1017,6 +1029,13 @@ typedef enum {
  * @GNUTLS_GROUP_SECP384R1: the SECP384R1 curve group
  * @GNUTLS_GROUP_SECP521R1: the SECP521R1 curve group
  * @GNUTLS_GROUP_X25519: the X25519 curve group
+ * @GNUTLS_GROUP_GC256A: the GOST R 34.10 TC26 256 A curve group
+ * @GNUTLS_GROUP_GC256B: the GOST R 34.10 TC26 256 B curve group
+ * @GNUTLS_GROUP_GC256C: the GOST R 34.10 TC26 256 C curve group
+ * @GNUTLS_GROUP_GC256D: the GOST R 34.10 TC26 256 D curve group
+ * @GNUTLS_GROUP_GC512A: the GOST R 34.10 TC26 512 A curve group
+ * @GNUTLS_GROUP_GC512B: the GOST R 34.10 TC26 512 B curve group
+ * @GNUTLS_GROUP_GC512C: the GOST R 34.10 TC26 512 C curve group
  * @GNUTLS_GROUP_FFDHE2048: the FFDHE2048 group
  * @GNUTLS_GROUP_FFDHE3072: the FFDHE3072 group
  * @GNUTLS_GROUP_FFDHE4096: the FFDHE4096 group
@@ -1035,6 +1054,14 @@ typedef enum {
 	GNUTLS_GROUP_SECP384R1 = GNUTLS_ECC_CURVE_SECP384R1,
 	GNUTLS_GROUP_SECP521R1 = GNUTLS_ECC_CURVE_SECP521R1,
 	GNUTLS_GROUP_X25519 = GNUTLS_ECC_CURVE_X25519,
+
+	GNUTLS_GROUP_GC256A = GNUTLS_ECC_CURVE_GOST256A,
+	GNUTLS_GROUP_GC256B = GNUTLS_ECC_CURVE_GOST256B,
+	GNUTLS_GROUP_GC256C = GNUTLS_ECC_CURVE_GOST256C,
+	GNUTLS_GROUP_GC256D = GNUTLS_ECC_CURVE_GOST256D,
+	GNUTLS_GROUP_GC512A = GNUTLS_ECC_CURVE_GOST512A,
+	GNUTLS_GROUP_GC512B = GNUTLS_ECC_CURVE_GOST512B,
+	GNUTLS_GROUP_GC512C = GNUTLS_ECC_CURVE_GOST512C,
 
 	GNUTLS_GROUP_FFDHE2048 = 256,
 	GNUTLS_GROUP_FFDHE3072,
@@ -3023,12 +3050,12 @@ typedef enum {
 
 /* Register a custom tls extension
  */
-int gnutls_ext_register(const char *name, int type, gnutls_ext_parse_type_t parse_type,
+int gnutls_ext_register(const char *name, int type, gnutls_ext_parse_type_t parse_point,
 				gnutls_ext_recv_func recv_func, gnutls_ext_send_func send_func, 
 				gnutls_ext_deinit_data_func deinit_func, gnutls_ext_pack_func pack_func,
 				gnutls_ext_unpack_func unpack_func);
 
-int gnutls_session_ext_register(gnutls_session_t, const char *name, int type, gnutls_ext_parse_type_t parse_type,
+int gnutls_session_ext_register(gnutls_session_t, const char *name, int type, gnutls_ext_parse_type_t parse_point,
 				gnutls_ext_recv_func recv_func, gnutls_ext_send_func send_func, 
 				gnutls_ext_deinit_data_func deinit_func, gnutls_ext_pack_func pack_func,
 				gnutls_ext_unpack_func unpack_func, unsigned flags);

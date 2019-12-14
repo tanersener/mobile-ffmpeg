@@ -58,8 +58,8 @@ _gnutls_iov_iter_init(struct iov_iter_st *iter,
  * @data: the return location of extracted data
  *
  * Retrieve block(s) pointed by @iter and advance it to the next
- * position.  It returns the number of consecutive blocks in @data.
- * At the end of iteration, 0 is returned.
+ * position.  It returns the number of bytes in @data.  At the end of
+ * iteration, 0 is returned.
  *
  * If the data stored in @iter is not multiple of the block size, the
  * remaining data is stored in the "block" field of @iter with the
@@ -88,25 +88,30 @@ _gnutls_iov_iter_next(struct iov_iter_st *iter, uint8_t **data)
 			if ((len % iter->block_size) == 0) {
 				iter->iov_index++;
 				iter->iov_offset = 0;
-			} else
-				iter->iov_offset +=
-					len - (len % iter->block_size);
+			} else {
+				len -= (len % iter->block_size);
+				iter->iov_offset += len;
+			}
 
 			/* Return the blocks. */
 			*data = p;
-			return len / iter->block_size;
+			return len;
 		}
 
 		/* We can complete one full block to return. */
 		block_left = iter->block_size - iter->block_offset;
 		if (len >= block_left) {
 			memcpy(iter->block + iter->block_offset, p, block_left);
-			iter->iov_offset += block_left;
+			if (len == block_left) {
+				iter->iov_index++;
+				iter->iov_offset = 0;
+			} else
+				iter->iov_offset += block_left;
 			iter->block_offset = 0;
 
 			/* Return the filled block. */
 			*data = iter->block;
-			return 1;
+			return iter->block_size;
 		}
 
 		/* Not enough data for a full block, store in temp
@@ -116,5 +121,74 @@ _gnutls_iov_iter_next(struct iov_iter_st *iter, uint8_t **data)
 		iter->iov_index++;
 		iter->iov_offset = 0;
 	}
+
+	if (iter->block_offset > 0) {
+		size_t len = iter->block_offset;
+
+		/* Return the incomplete block. */
+		*data = iter->block;
+		iter->block_offset = 0;
+		return len;
+	}
+
+	return 0;
+}
+
+/**
+ * _gnutls_iov_iter_sync:
+ * @iter: the iterator
+ * @data: data returned by _gnutls_iov_iter_next
+ * @data_size: size of @data
+ *
+ * Flush the content of temp buffer (if any) to the data buffer.
+ */
+int
+_gnutls_iov_iter_sync(struct iov_iter_st *iter, const uint8_t *data,
+		      size_t data_size)
+{
+	size_t iov_index;
+	size_t iov_offset;
+
+	/* We didn't return the cached block. */
+	if (data != iter->block)
+		return 0;
+
+	iov_index = iter->iov_index;
+	iov_offset = iter->iov_offset;
+
+	/* When syncing a cache block we walk backwards because we only have a
+	 * pointer to were the block ends in the iovec, walking backwards is
+	 * fine as we are always writing a full block, so the whole content
+	 * is written in the right places:
+	 * iovec:     |--0--|---1---|--2--|-3-|
+	 * block:     |-----------------------|
+	 * 1st write                      |---|
+	 * 2nd write                |-----
+	 * 3rd write        |-------
+	 * last write |-----
+	 */
+	while (data_size > 0) {
+		const giovec_t *iov;
+		uint8_t *p;
+		size_t to_write;
+
+		while (iov_offset == 0) {
+			if (unlikely(iov_index == 0))
+				return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+			iov_index--;
+			iov_offset = iter->iov[iov_index].iov_len;
+		}
+
+		iov = &iter->iov[iov_index];
+		p = iov->iov_base;
+		to_write = MIN(data_size, iov_offset);
+
+		iov_offset -= to_write;
+		data_size -= to_write;
+
+		memcpy(p + iov_offset, &iter->block[data_size], to_write);
+	}
+
 	return 0;
 }

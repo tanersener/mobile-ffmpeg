@@ -453,6 +453,8 @@ _gnutls_x509_read_gost_params(uint8_t * der, int dersize,
 	gnutls_gost_paramset_t param;
 
 	if ((ret = asn1_create_element(_gnutls_get_gnutls_asn(),
+				       algo == GNUTLS_PK_GOST_01 ?
+				       "GNUTLS.GOSTParametersOld" :
 				       "GNUTLS.GOSTParameters",
 				       &spk)) != ASN1_SUCCESS) {
 		gnutls_assert();
@@ -487,7 +489,8 @@ _gnutls_x509_read_gost_params(uint8_t * der, int dersize,
 	/* Read the digest */
 	oid_size = sizeof(oid);
 	ret = asn1_read_value(spk, "digestParamSet", oid, &oid_size);
-	if (ret != ASN1_SUCCESS) {
+	if (ret != ASN1_SUCCESS &&
+	    ret != ASN1_ELEMENT_NOT_FOUND) {
 		gnutls_assert();
 		ret = _gnutls_asn2err(ret);
 		goto cleanup;

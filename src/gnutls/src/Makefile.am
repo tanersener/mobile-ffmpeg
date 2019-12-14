@@ -229,6 +229,7 @@ if ENABLE_PKCS11
 BUILT_SOURCES += mech-list.h
 p11tool_SOURCES = p11tool-args.def p11tool.c pkcs11.c certtool-common.c \
 	certtool-extras.c p11tool.h common.c mech-list.h
+p11tool_CPPFLAGS = $(AM_CPPFLAGS) $(P11_KIT_CFLAGS)
 p11tool_LDADD = ../lib/libgnutls.la
 p11tool_LDADD += libcmd-p11tool.la ../gl/libgnu.la gl/libgnu_gpl.la
 p11tool_LDADD += $(COMMON_LIBS)

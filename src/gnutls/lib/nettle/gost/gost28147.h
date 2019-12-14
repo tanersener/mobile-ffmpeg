@@ -69,6 +69,10 @@ extern "C" {
 #define gost28147_cnt_set_iv _gnutls_gost28147_cnt_set_iv
 #define gost28147_cnt_crypt _gnutls_gost28147_cnt_crypt
 
+#define gost28147_kdf_cryptopro _gnutls_gost28147_kdf_cryptopro
+#define gost28147_key_wrap_cryptopro _gnutls_gost28147_key_wrap_cryptopro
+#define gost28147_key_unwrap_cryptopro _gnutls_gost28147_key_unwrap_cryptopro
+
 #define gost28147_imit_init _gnutls_gost28147_imit_init
 #define gost28147_imit_set_key _gnutls_gost28147_imit_set_key
 #define gost28147_imit_set_nonce _gnutls_gost28147_imit_set_nonce
@@ -146,6 +150,27 @@ void
 gost28147_cnt_crypt(struct gost28147_cnt_ctx *ctx,
 		    size_t length, uint8_t *dst,
 		    const uint8_t *src);
+
+void
+gost28147_kdf_cryptopro(const struct gost28147_param *param,
+		       const uint8_t *in,
+		       const uint8_t *ukm,
+		       uint8_t *out);
+void
+gost28147_key_wrap_cryptopro(const struct gost28147_param *param,
+			     const uint8_t *kek,
+			     const uint8_t *ukm, size_t ukm_size,
+			     const uint8_t *cek,
+			     uint8_t *enc,
+			     uint8_t *imit);
+
+int
+gost28147_key_unwrap_cryptopro(const struct gost28147_param *param,
+			       const uint8_t *kek,
+			       const uint8_t *ukm, size_t ukm_size,
+			       const uint8_t *enc,
+			       const uint8_t *imit,
+			       uint8_t *cek);
 
 #define GOST28147_IMIT_DIGEST_SIZE 4
 #define GOST28147_IMIT_BLOCK_SIZE GOST28147_BLOCK_SIZE

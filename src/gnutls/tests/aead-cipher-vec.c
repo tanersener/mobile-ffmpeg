@@ -43,9 +43,9 @@ static void start(const char *name, int algo)
 	uint8_t key16[64];
 	uint8_t iv16[32];
 	uint8_t auth[128];
-	uint8_t data[128+64];
+	uint8_t data[64+56+36];
 	gnutls_datum_t key, iv;
-	giovec_t iov[2];
+	giovec_t iov[3];
 	giovec_t auth_iov[2];
 	uint8_t tag[64];
 	size_t tag_size = 0;
@@ -60,13 +60,15 @@ static void start(const char *name, int algo)
 
 	memset(iv.data, 0xff, iv.size);
 	memset(key.data, 0xfe, key.size);
-	memset(data, 0xfa, 128);
+	memset(data, 0xfa, sizeof(data));
 	memset(auth, 0xaa, sizeof(auth));
 
 	iov[0].iov_base = data;
 	iov[0].iov_len = 64;
 	iov[1].iov_base = data + 64;
-	iov[1].iov_len = 64;
+	iov[1].iov_len = 56;
+	iov[2].iov_base = data + 64 + 56;
+	iov[2].iov_len = 36;
 
 	auth_iov[0].iov_base = auth;
 	auth_iov[0].iov_len = 64;
@@ -83,7 +85,7 @@ static void start(const char *name, int algo)
 	ret = gnutls_aead_cipher_encryptv2(ch,
 					   iv.data, iv.size,
 					   auth_iov, 2,
-					   iov, 2,
+					   iov, 3,
 					   tag, &tag_size);
 	if (ret < 0)
 		fail("could not encrypt data: %s\n", gnutls_strerror(ret));
@@ -91,7 +93,7 @@ static void start(const char *name, int algo)
 	ret = gnutls_aead_cipher_decryptv2(ch,
 					   iv.data, iv.size,
 					   auth_iov, 2,
-					   iov, 2,
+					   iov, 3,
 					   tag, tag_size);
 	if (ret < 0)
 		fail("could not decrypt data: %s\n", gnutls_strerror(ret));

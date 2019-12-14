@@ -1082,6 +1082,34 @@ if test $? = 0;then
 	have_ed25519=1
 fi
 
+${P11TOOL} ${ADDITIONAL_PARAM} --list-mechanisms ${TOKEN} > ${TMPFILE}
+
+# Verify that we output flags correctly
+if grep AES_CTR ${TMPFILE} | grep -v "keysize range (16, 32)" ; then
+	echo "Keysize range error"
+	exit_error
+fi
+
+if grep AES_CTR ${TMPFILE} | grep -v "encrypt decrypt" ; then
+	echo "Error with encrypt/decrypt flags"
+	exit_error
+fi
+
+if grep KEY_WRAP ${TMPFILE} | grep -v "wrap.unwrap" ; then
+	echo "Error with wrap/unwrap flags"
+	exit_error
+fi
+
+if grep AES_CMAC ${TMPFILE} | grep -v "sign verify" ; then
+	echo "Error with sign/verify flags"
+	exit_error
+fi
+
+if grep "CKM_SHA256 " ${TMPFILE} | grep -v "digest" ; then
+	echo "Error with digest flags"
+	exit_error
+fi
+
 reset_pins "${TOKEN}" "${TEST_PIN}" "${TEST_SO_PIN}"
 
 #write a given privkey

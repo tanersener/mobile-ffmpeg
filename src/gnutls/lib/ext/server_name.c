@@ -46,7 +46,8 @@ const hello_ext_entry_st ext_mod_server_name = {
 	.gid = GNUTLS_EXTENSION_SERVER_NAME,
 	.validity = GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_DTLS | GNUTLS_EXT_FLAG_CLIENT_HELLO |
 		    GNUTLS_EXT_FLAG_EE | GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
-	.parse_type = GNUTLS_EXT_MANDATORY,
+	.client_parse_point = GNUTLS_EXT_MANDATORY,
+	.server_parse_point = GNUTLS_EXT_MANDATORY,
 	.recv_func = _gnutls_server_name_recv_params,
 	.send_func = _gnutls_server_name_send_params,
 	.pack_func = _gnutls_hello_ext_default_pack,

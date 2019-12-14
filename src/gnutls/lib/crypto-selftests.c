@@ -710,6 +710,107 @@ static int test_cipher(gnutls_cipher_algorithm_t cipher,
 	return 0;
 }
 
+static int test_cipher_all_block_sizes(gnutls_cipher_algorithm_t cipher,
+				       const struct cipher_vectors_st *vectors,
+				       size_t vectors_size, unsigned flags)
+{
+	gnutls_cipher_hd_t hd;
+	int ret;
+	unsigned int i;
+	uint8_t tmp[384];
+	gnutls_datum_t key, iv = {NULL, 0};
+	size_t block;
+	size_t offset;
+
+	for (i = 0; i < vectors_size; i++) {
+		for (block = 1; block <= vectors[i].plaintext_size; block++) {
+			key.data = (void *) vectors[i].key;
+			key.size = vectors[i].key_size;
+
+			iv.data = (void *) vectors[i].iv;
+			iv.size = gnutls_cipher_get_iv_size(cipher);
+
+			if (iv.size != vectors[i].iv_size)
+				return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+
+			ret = gnutls_cipher_init(&hd, cipher, &key, &iv);
+			if (ret < 0) {
+				_gnutls_debug_log("error initializing: %s\n",
+						  gnutls_cipher_get_name(cipher));
+				return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+			}
+
+			for (offset = 0;
+			     offset < vectors[i].plaintext_size;
+			     offset += block) {
+				ret =
+				    gnutls_cipher_encrypt2(hd,
+							   vectors[i].plaintext + offset,
+							   MIN(block, vectors[i].plaintext_size - offset),
+							   tmp + offset,
+							   sizeof(tmp) - offset);
+				if (ret < 0)
+					return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+			}
+
+			if (memcmp
+			    (tmp, vectors[i].ciphertext,
+			     vectors[i].plaintext_size) != 0) {
+				_gnutls_debug_log("%s encryption of test vector %d failed with block size %d/%d!\n",
+						  gnutls_cipher_get_name(cipher),
+						  i, (int)block, (int)vectors[i].plaintext_size);
+				return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+			}
+
+			gnutls_cipher_deinit(hd);
+		}
+	}
+
+	for (i = 0; i < vectors_size; i++) {
+		for (block = 1; block <= vectors[i].plaintext_size; block++) {
+			key.data = (void *) vectors[i].key;
+			key.size = vectors[i].key_size;
+
+			iv.data = (void *) vectors[i].iv;
+			iv.size = gnutls_cipher_get_iv_size(cipher);
+
+			ret = gnutls_cipher_init(&hd, cipher, &key, &iv);
+			if (ret < 0)
+				return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+
+			for (offset = 0;
+			     offset + block <= vectors[i].plaintext_size;
+			     offset += block) {
+				ret =
+				    gnutls_cipher_decrypt2(hd,
+							   vectors[i].ciphertext + offset,
+							   MIN(block, vectors[i].plaintext_size - offset),
+							   tmp + offset,
+							   sizeof(tmp) - offset);
+				if (ret < 0)
+					return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+			}
+
+			if (memcmp
+			    (tmp, vectors[i].plaintext,
+			     vectors[i].plaintext_size) != 0) {
+				_gnutls_debug_log("%s decryption of test vector %d failed with block size %d!\n",
+						  gnutls_cipher_get_name(cipher),
+						  i, (int)block);
+				return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+			}
+
+			gnutls_cipher_deinit(hd);
+		}
+	}
+
+	_gnutls_debug_log
+	    ("%s self check succeeded\n",
+	     gnutls_cipher_get_name(cipher));
+
+	return 0;
+}
+
 /* AEAD modes (compat APIs) */
 static int test_cipher_aead_compat(gnutls_cipher_algorithm_t cipher,
 			    const struct cipher_aead_vectors_st *vectors,
@@ -1721,6 +1822,14 @@ static int test_mac(gnutls_mac_algorithm_t mac,
 			if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL) || ret < 0) \
 				return ret
 
+#define CASE2(x, func, func2, vectors) case x:	  \
+			ret = func(x, V(vectors), flags); \
+			if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL) || ret < 0) \
+				return ret; \
+			ret = func2(x, V(vectors), flags); \
+			if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL) || ret < 0) \
+				return ret
+
 #define NON_FIPS_CASE(x, func, vectors) case x: \
 			if (_gnutls_fips_mode_enabled() == 0) { \
 				ret = func(x, V(vectors), flags); \
@@ -1786,14 +1895,17 @@ int gnutls_cipher_self_test(unsigned flags, gnutls_cipher_algorithm_t cipher)
 		NON_FIPS_CASE(GNUTLS_CIPHER_CHACHA20_POLY1305, test_cipher_aead,
 		     chacha_poly1305_vectors);
 		FALLTHROUGH;
-		CASE(GNUTLS_CIPHER_AES_128_CFB8, test_cipher,
-		     aes128_cfb8_vectors);
+		CASE2(GNUTLS_CIPHER_AES_128_CFB8, test_cipher,
+		      test_cipher_all_block_sizes,
+		      aes128_cfb8_vectors);
 		FALLTHROUGH;
-		CASE(GNUTLS_CIPHER_AES_192_CFB8, test_cipher,
-		     aes192_cfb8_vectors);
+		CASE2(GNUTLS_CIPHER_AES_192_CFB8, test_cipher,
+		      test_cipher_all_block_sizes,
+		      aes192_cfb8_vectors);
 		FALLTHROUGH;
-		CASE(GNUTLS_CIPHER_AES_256_CFB8, test_cipher,
-		     aes256_cfb8_vectors);
+		CASE2(GNUTLS_CIPHER_AES_256_CFB8, test_cipher,
+		      test_cipher_all_block_sizes,
+		      aes256_cfb8_vectors);
 		FALLTHROUGH;
 		CASE(GNUTLS_CIPHER_AES_128_XTS, test_cipher,
 		     aes128_xts_vectors);

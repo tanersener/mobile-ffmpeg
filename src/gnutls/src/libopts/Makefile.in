@@ -1418,7 +1418,7 @@ EXTRA_DIST = $(srcdir)/compat/_Noreturn.h stdnoreturn.in.h \
 	option-xat-attribute.h parse-duration.c parse-duration.h \
 	pgusage.c proto.h putshell.c reset.c restore.c save.c sort.c \
 	stack.c stdnoreturn.in.h streqvcmp.c text_mmap.c time.c \
-	tokenize.c usage.c version.c
+	tokenize.c usage.c version.c save-flags.c save-flags.h
 BUILT_SOURCES = $(STDNORETURN_H)
 MOSTLYCLEANFILES = stdnoreturn.h stdnoreturn.h-t
 

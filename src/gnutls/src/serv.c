@@ -76,6 +76,10 @@ const char *x509_cafile = NULL;
 const char *dh_params_file = NULL;
 const char *x509_crlfile = NULL;
 const char *priorities = NULL;
+const char **rawpk_keyfile = NULL;
+const char **rawpk_file = NULL;
+unsigned rawpk_keyfile_size = 0;
+unsigned rawpk_file_size = 0;
 
 const char **ocsp_responses = NULL;
 unsigned ocsp_responses_size = 0;
@@ -382,7 +386,7 @@ gnutls_session_t initialize_session(int dtls)
 	const char *err;
 	gnutls_datum_t alpn[MAX_ALPN_PROTOCOLS];
 	unsigned alpn_size;
-	unsigned flags = GNUTLS_SERVER | GNUTLS_POST_HANDSHAKE_AUTH;
+	unsigned flags = GNUTLS_SERVER | GNUTLS_POST_HANDSHAKE_AUTH | GNUTLS_ENABLE_RAWPK;
 
 	if (dtls)
 		flags |= GNUTLS_DATAGRAM;
@@ -556,7 +560,7 @@ static char *peer_print_info(gnutls_session_t session, int *ret_length,
 		return http_buffer;
 	}
 
-	if (gnutls_certificate_type_get(session) == GNUTLS_CRT_X509) {
+	if (gnutls_certificate_type_get2(session, GNUTLS_CTYPE_CLIENT) == GNUTLS_CRT_X509) {
 		const gnutls_datum_t *cert_list;
 		unsigned int cert_list_size = 0;
 
@@ -675,10 +679,10 @@ static char *peer_print_info(gnutls_session_t session, int *ret_length,
 	}
 
 	if (gnutls_auth_get_type(session) == GNUTLS_CRD_CERTIFICATE &&
-	    gnutls_certificate_type_get(session) != GNUTLS_CRT_X509) {
+	    gnutls_certificate_type_get2(session, GNUTLS_CTYPE_CLIENT) != GNUTLS_CRT_X509) {
 		tmp =
 		    gnutls_certificate_type_get_name
-		    (gnutls_certificate_type_get(session));
+		    (gnutls_certificate_type_get2(session, GNUTLS_CTYPE_CLIENT));
 		if (tmp == NULL)
 			tmp = str_unknown;
 		snprintf(tmp_buffer, tmp_buffer_size,
@@ -719,7 +723,7 @@ static char *peer_print_info(gnutls_session_t session, int *ret_length,
 		if (tmp == NULL)
 			tmp = str_unknown;
 		snprintf(tmp_buffer, tmp_buffer_size,
-			 "<TR><TD>Ciphersuite</TD><TD>%s</TD></TR></p></TABLE>\n",
+			 "<TR><TD>Ciphersuite</TD><TD>%s</TD></TR>\n",
 			 tmp);
 	}
 
@@ -735,6 +739,8 @@ static char *peer_print_info(gnutls_session_t session, int *ret_length,
 	snprintf(tmp_buffer, tmp_buffer_size,
 		 "<TR><TD>MAC</TD><TD>%s</TD></TR>\n", tmp);
 
+	snprintf(tmp_buffer, tmp_buffer_size,
+		 "</TABLE></P>\n");
 
 	if (crtinfo) {
 		snprintf(tmp_buffer, tmp_buffer_size,
@@ -1066,7 +1072,7 @@ get_response(gnutls_session_t session, char *request,
 	*response_length = ((*response) ? strlen(*response) : 0);
 }
 
-static void terminate(int sig) __attribute__ ((noreturn));
+static void terminate(int sig) __attribute__ ((__noreturn__));
 
 static void terminate(int sig)
 {
@@ -1178,6 +1184,7 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 
+	/* X509 credentials */
 	if (x509_cafile != NULL) {
 		if ((ret = gnutls_certificate_set_x509_trust_file
 		     (cert_cred, x509_cafile, x509ctype)) < 0) {
@@ -1213,6 +1220,25 @@ int main(int argc, char **argv)
 				exit(1);
 			} else
 				cert_set = 1;
+		}
+	}
+	
+	/* Raw public-key credentials */
+	if (rawpk_file_size > 0 && rawpk_keyfile_size > 0) {
+		for (i = 0; i < rawpk_keyfile_size; i++) {
+			ret = gnutls_certificate_set_rawpk_key_file(cert_cred, rawpk_file[i],
+			                                            rawpk_keyfile[i],
+			                                            x509ctype,
+			                                            NULL, 0, NULL, 0,
+			                                            0, 0);
+			if (ret < 0) {
+				fprintf(stderr,	"Error reading '%s' or '%s'\n",
+				        rawpk_file[i], rawpk_keyfile[i]);
+					GERR(ret);
+					exit(1);
+			} else {
+				cert_set = 1;
+			}
 		}
 	}
 
@@ -1808,12 +1834,29 @@ static void cmd_parser(int argc, char **argv)
 	if (x509_certfile_size != x509_keyfile_size) {
 		fprintf(stderr, "The certificate number provided (%u) doesn't match the keys (%u)\n",
 			x509_certfile_size, x509_keyfile_size);
+			exit(1);
 	}
 
 	if (HAVE_OPT(X509CAFILE))
 		x509_cafile = OPT_ARG(X509CAFILE);
 	if (HAVE_OPT(X509CRLFILE))
 		x509_crlfile = OPT_ARG(X509CRLFILE);
+		
+	if (HAVE_OPT(RAWPKKEYFILE)) {
+		rawpk_keyfile = STACKLST_OPT(RAWPKKEYFILE);
+		rawpk_keyfile_size = STACKCT_OPT(RAWPKKEYFILE);
+	}
+
+	if (HAVE_OPT(RAWPKFILE)) {
+		rawpk_file = STACKLST_OPT(RAWPKFILE);
+		rawpk_file_size = STACKCT_OPT(RAWPKFILE);
+	}
+
+	if (rawpk_file_size != rawpk_keyfile_size) {
+		fprintf(stderr, "The number of raw public-keys provided (%u) doesn't match the number of corresponding private keys (%u)\n",
+			rawpk_file_size, rawpk_keyfile_size);
+			exit(1);
+	}
 
 	if (HAVE_OPT(SRPPASSWD))
 		srp_passwd = OPT_ARG(SRPPASSWD);

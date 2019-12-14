@@ -95,31 +95,31 @@ changed
    -p, --port=str             The port or service to connect to
        --insecure             Don't abort program if server certificate can't be validated
        --verify-allow-broken  Allow broken algorithms, such as MD5 for certificate verification
-   -", --benchmark-ciphers    Benchmark individual ciphers
-   -#, --benchmark-tls-kx     Benchmark TLS key exchange methods
-   -$, --benchmark-tls-ciphers  Benchmark TLS ciphers
+       --benchmark-ciphers    Benchmark individual ciphers
+       --benchmark-tls-kx     Benchmark TLS key exchange methods
+       --benchmark-tls-ciphers  Benchmark TLS ciphers
    -l, --list                 Print a list of the supported algorithms and modes
                                 - prohibits the option 'port'
-   -%, --priority-list        Print a list of the supported priority strings
-   -&, --noticket             Don't allow session tickets
-   -', --srtp-profiles=str    Offer SRTP profiles
-   -(, --alpn=str             Application layer protocol
+       --priority-list        Print a list of the supported priority strings
+       --noticket             Don't allow session tickets
+       --srtp-profiles=str    Offer SRTP profiles
+       --alpn=str             Application layer protocol
                                 - may appear multiple times
    -b, --heartbeat            Activate heartbeat support
-   -), --recordsize=num       The maximum record size to advertize
+       --recordsize=num       The maximum record size to advertize
                                 - it must be in the range:
                                   0 to 4096
-   -*, --disable-sni          Do not send a Server Name Indication (SNI)
-   -,, --single-key-share     Send a single key share under TLS1.3
-   --, --post-handshake-auth  Enable post-handshake authentication under TLS1.3
-   -., --inline-commands      Inline commands of the form ^<cmd>^
-   -/, --inline-commands-prefix=str Change the default delimiter for inline commands.
-   -0, --provider=file        Specify the PKCS #11 provider library
+       --disable-sni          Do not send a Server Name Indication (SNI)
+       --single-key-share     Send a single key share under TLS1.3
+       --post-handshake-auth  Enable post-handshake authentication under TLS1.3
+       --inline-commands      Inline commands of the form ^<cmd>^
+       --inline-commands-prefix=str Change the default delimiter for inline commands.
+       --provider=file        Specify the PKCS #11 provider library
                                 - file must pre-exist
-   -1, --fips140-mode         Reports the status of the FIPS140-2 mode in gnutls library
-   -2, --logfile=str          Redirect informational messages to a specific file.
-   -3, --keymatexport=str     Label used for exporting keying material
-   -4, --keymatexportsize=num Size of the exported keying material
+       --fips140-mode         Reports the status of the FIPS140-2 mode in gnutls library
+       --logfile=str          Redirect informational messages to a specific file.
+       --keymatexport=str     Label used for exporting keying material
+       --keymatexportsize=num Size of the exported keying material
    -v, --version[=arg]        output version information and exit
    -h, --help                 display extended usage information and exit
    -!, --more-help            extended usage information passed thru pager
@@ -292,6 +292,37 @@ NORMAL, PFS, SECURE128, SECURE256. The default is NORMAL.
 
 Check  the  GnuTLS  manual  on  section  ``Priority strings'' for more
 information on the allowed keywords
+@anchor{gnutls-cli rawpkkeyfile}
+@subheading rawpkkeyfile option
+
+This is the ``private key file (pkcs #8 or pkcs #12) or pkcs #11 url to use'' option.
+This option takes a string argument.
+In order to instruct the application to negotiate raw public keys one
+must enable the respective certificate types via the priority strings (i.e. CTYPE-CLI-*
+and CTYPE-SRV-* flags).
+
+Check  the  GnuTLS  manual  on  section  ``Priority strings'' for more
+information on how to set certificate types.
+@anchor{gnutls-cli rawpkfile}
+@subheading rawpkfile option
+
+This is the ``raw public-key file to use'' option.
+This option takes a string argument.
+
+@noindent
+This option has some usage constraints.  It:
+@itemize @bullet
+@item
+must appear in combination with the following options:
+rawpkkeyfile.
+@end itemize
+
+In order to instruct the application to negotiate raw public keys one
+must enable the respective certificate types via the priority strings (i.e. CTYPE-CLI-*
+and CTYPE-SRV-* flags).
+
+Check  the  GnuTLS  manual  on  section  ``Priority strings'' for more
+information on how to set certificate types.
 @anchor{gnutls-cli ranges}
 @subheading ranges option
 
@@ -382,6 +413,12 @@ Change the default delimiter (^) used for inline commands. The delimiter is expe
 This is the ``specify the pkcs #11 provider library'' option.
 This option takes a file argument.
 This will override the default options in /etc/gnutls/pkcs11.conf
+@anchor{gnutls-cli logfile}
+@subheading logfile option
+
+This is the ``redirect informational messages to a specific file.'' option.
+This option takes a string argument.
+Redirect informational messages to a specific file. The file may be /dev/null also to make the gnutls client quiet to use it in piped server connections where only the server communication may appear on stdout.
 @anchor{gnutls-cli exit status}
 @subheading gnutls-cli exit status
 
@@ -415,7 +452,29 @@ Connecting to '127.0.0.1:5556'...
     
 - Simple Client Mode:
 @end example
-By keeping the --pskusername parameter and removing the --pskkey parameter, it will query only for the password during the handshake. 
+By keeping the --pskusername parameter and removing the --pskkey parameter, it will query only for the password during the handshake.
+
+@subheading Connecting using raw public-key authentication
+To connect to a server using raw public-key authentication, you need to enable the option to negotiate raw public-keys via the priority strings such as in the example below. 
+@example
+$ ./gnutls-cli -p 5556 localhost --priority NORMAL:-CTYPE-CLI-ALL:+CTYPE-CLI-RAWPK \
+    --rawpkkeyfile cli.key.pem \
+    --rawpkfile cli.rawpk.pem
+Processed 1 client raw public key pair...
+Resolving 'localhost'...
+Connecting to '127.0.0.1:5556'...
+- Successfully sent 1 certificate(s) to server.
+- Server has requested a certificate.
+- Certificate type: X.509
+- Got a certificate list of 1 certificates.
+- Certificate[0] info:
+ - skipped
+- Description: (TLS1.3-Raw Public Key-X.509)-(ECDHE-SECP256R1)-(RSA-PSS-RSAE-SHA256)-(AES-256-GCM)
+- Options:
+- Handshake was completed
+    
+- Simple Client Mode:
+@end example
 
 @subheading Connecting to STARTTLS services
 

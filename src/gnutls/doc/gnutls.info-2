@@ -1,6 +1,6 @@
-This is gnutls.info, produced by makeinfo version 6.6 from gnutls.texi.
+This is gnutls.info, produced by makeinfo version 6.7 from gnutls.texi.
 
-This manual is last updated 27 June 2019 for version 3.6.10 of GnuTLS.
+This manual is last updated 27 June 2019 for version 3.6.11 of GnuTLS.
 
 Copyright (C) 2001-2019 Free Software Foundation, Inc.\\ Copyright (C)
 2001-2019 Nikos Mavrogiannopoulos
@@ -2394,7 +2394,8 @@ these functions are fatal for the protocol or can be ignored.
      'data' and 0 for 'data_size' , in order to write the same data as
      before.  If you wish to discard the previous data instead of
      retrying, you must call 'gnutls_record_discard_queued()' before
-     calling this function with different parameters.  cf.
+     calling this function with different parameters.  Note that the
+     latter works only on special transports (e.g., UDP). cf.
      'gnutls_record_get_direction()' .
 
      Note that in DTLS this function will return the
