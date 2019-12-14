@@ -18,6 +18,16 @@ version <next>:
 - arnndn filter
 - bilateral filter
 - maskedmin and maskedmax filters
+- VDPAU VP9 hwaccel
+- median filter
+- QSV-accelerated VP9 encoding
+- AV1 encoding support via librav1e
+- AV1 frame merge bitstream filter
+- AV1 Annex B demuxer
+- axcorrelate filter
+- mvdv decoder
+- mvha decoder
+- MPEG-H 3D Audio support in mp4
 
 
 version 4.2:

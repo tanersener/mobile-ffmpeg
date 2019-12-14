@@ -26,6 +26,7 @@
 #include "libavcodec/put_bits.h"
 #include "av1.h"
 #include "avio.h"
+#include "avio_internal.h"
 
 int ff_av1_filter_obus(AVIOContext *pb, const uint8_t *buf, int size)
 {
@@ -67,8 +68,10 @@ int ff_av1_filter_obus_buf(const uint8_t *buf, uint8_t **out, int *size)
         return ret;
 
     ret = ff_av1_filter_obus(pb, buf, *size);
-    if (ret < 0)
+    if (ret < 0) {
+        ffio_free_dyn_buf(&pb);
         return ret;
+    }
 
     av_freep(out);
     *size = avio_close_dyn_buf(pb, out);
@@ -254,7 +257,7 @@ static int parse_sequence_header(AV1SequenceParameters *seq_params, const uint8_
     if (!reduced_still_picture_header) {
         int enable_order_hint, seq_force_screen_content_tools;
 
-        skip_bits(&gb, 4); // enable_intraintra_compound (1), enable_masked_compound (1)
+        skip_bits(&gb, 4); // enable_interintra_compound (1), enable_masked_compound (1)
                            // enable_warped_motion (1), enable_dual_filter (1)
 
         enable_order_hint = get_bits1(&gb);
@@ -323,7 +326,7 @@ int ff_isom_write_av1c(AVIOContext *pb, const uint8_t *buf, int size)
     AV1SequenceParameters seq_params;
     PutBitContext pbc;
     uint8_t header[4];
-    uint8_t *seq = NULL, *meta = NULL;
+    uint8_t *seq, *meta;
     int64_t obu_size;
     int start_pos, type, temporal_id, spatial_id;
     int ret, nb_seq = 0, seq_size, meta_size;
@@ -373,7 +376,7 @@ int ff_isom_write_av1c(AVIOContext *pb, const uint8_t *buf, int size)
         buf  += len;
     }
 
-    seq_size  = avio_close_dyn_buf(seq_pb, &seq);
+    seq_size  = avio_get_dyn_buf(seq_pb, &seq);
     if (!seq_size) {
         ret = AVERROR_INVALIDDATA;
         goto fail;
@@ -398,17 +401,13 @@ int ff_isom_write_av1c(AVIOContext *pb, const uint8_t *buf, int size)
     avio_write(pb, header, sizeof(header));
     avio_write(pb, seq, seq_size);
 
-    meta_size = avio_close_dyn_buf(meta_pb, &meta);
+    meta_size = avio_get_dyn_buf(meta_pb, &meta);
     if (meta_size)
         avio_write(pb, meta, meta_size);
 
 fail:
-    if (!seq)
-        avio_close_dyn_buf(seq_pb, &seq);
-    if (!meta)
-        avio_close_dyn_buf(meta_pb, &meta);
-    av_free(seq);
-    av_free(meta);
+    ffio_free_dyn_buf(&seq_pb);
+    ffio_free_dyn_buf(&meta_pb);
 
     return ret;
 }

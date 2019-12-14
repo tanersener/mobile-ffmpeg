@@ -254,6 +254,7 @@ External library support:
   --enable-libopenmpt      enable decoding tracked files via libopenmpt [no]
   --enable-libopus         enable Opus de/encoding via libopus [no]
   --enable-libpulse        enable Pulseaudio input via libpulse [no]
+  --enable-librav1e        enable AV1 encoding via rav1e [no]
   --enable-librsvg         enable SVG rasterization via librsvg [no]
   --enable-librubberband   enable rubberband needed for rubberband filter [no]
   --enable-librtmp         enable RTMP[E] support via librtmp [no]
@@ -1784,6 +1785,7 @@ EXTERNAL_LIBRARY_LIST="
     libopenmpt
     libopus
     libpulse
+    librav1e
     librsvg
     librtmp
     libshine
@@ -2192,6 +2194,7 @@ SYSTEM_FUNCS="
     getaddrinfo
     gethrtime
     getopt
+    GetModuleHandle
     GetProcessAffinityMask
     GetProcessMemoryInfo
     GetProcessTimes
@@ -2221,6 +2224,7 @@ SYSTEM_FUNCS="
     SecItemImport
     SetConsoleTextAttribute
     SetConsoleCtrlHandler
+    SetDllDirectory
     setmode
     setrlimit
     Sleep
@@ -2635,6 +2639,7 @@ ac3_decoder_select="ac3_parser ac3dsp bswapdsp fmtconvert mdct"
 ac3_fixed_decoder_select="ac3_parser ac3dsp bswapdsp mdct"
 ac3_encoder_select="ac3dsp audiodsp mdct me_cmp"
 ac3_fixed_encoder_select="ac3dsp audiodsp mdct me_cmp"
+acelp_kelvin_decoder_select="audiodsp"
 adpcm_g722_decoder_select="g722dsp"
 adpcm_g722_encoder_select="g722dsp"
 aic_decoder_select="golomb idctdsp"
@@ -2658,7 +2663,9 @@ asv2_decoder_select="blockdsp bswapdsp idctdsp"
 asv2_encoder_select="aandcttables bswapdsp fdctdsp pixblockdsp"
 atrac1_decoder_select="mdct sinewin"
 atrac3_decoder_select="mdct"
+atrac3al_decoder_select="mdct"
 atrac3p_decoder_select="mdct sinewin"
+atrac3pal_decoder_select="mdct sinewin"
 atrac9_decoder_select="mdct"
 avrn_decoder_select="exif jpegtables"
 bink_decoder_select="blockdsp hpeldsp"
@@ -2672,6 +2679,7 @@ cook_decoder_select="audiodsp mdct sinewin"
 cscd_decoder_select="lzo"
 cscd_decoder_suggest="zlib"
 dca_decoder_select="mdct"
+dca_encoder_select="mdct"
 dds_decoder_select="texturedsp"
 dirac_decoder_select="dirac_parse dwt golomb videodsp mpegvideoenc"
 dnxhd_decoder_select="blockdsp idctdsp"
@@ -2723,6 +2731,7 @@ huffyuv_encoder_select="bswapdsp huffman huffyuvencdsp llvidencdsp"
 hymt_decoder_select="huffyuv_decoder"
 iac_decoder_select="imc_decoder"
 imc_decoder_select="bswapdsp fft mdct sinewin"
+imm4_decoder_select="bswapdsp"
 imm5_decoder_select="h264_decoder hevc_decoder"
 indeo3_decoder_select="hpeldsp"
 indeo4_decoder_select="ividsp"
@@ -2735,7 +2744,7 @@ ljpeg_encoder_select="idctdsp jpegtables mpegvideoenc"
 lscr_decoder_deps="zlib"
 magicyuv_decoder_select="llviddsp"
 magicyuv_encoder_select="llvidencdsp"
-mdec_decoder_select="blockdsp idctdsp mpegvideo"
+mdec_decoder_select="blockdsp bswapdsp idctdsp mpegvideo"
 metasound_decoder_select="lsp mdct sinewin"
 mimic_decoder_select="blockdsp bswapdsp hpeldsp idctdsp"
 mjpeg_decoder_select="blockdsp hpeldsp exif idctdsp jpegtables"
@@ -2772,6 +2781,7 @@ msmpeg4v3_decoder_select="h263_decoder"
 msmpeg4v3_encoder_select="h263_encoder"
 mss2_decoder_select="mpegvideo qpeldsp vc1_decoder"
 mts2_decoder_select="mss34dsp"
+mvha_decoder_deps="zlib"
 mwsc_decoder_deps="zlib"
 mxpeg_decoder_select="mjpeg_decoder"
 nellymoser_decoder_select="mdct sinewin"
@@ -2864,6 +2874,7 @@ wmv3_decoder_select="vc1_decoder"
 wmv3image_decoder_select="wmv3_decoder"
 xma1_decoder_select="wmapro_decoder"
 xma2_decoder_select="wmapro_decoder"
+ylc_decoder_select="bswapdsp"
 zerocodec_decoder_deps="zlib"
 zlib_decoder_deps="zlib"
 zlib_encoder_deps="zlib"
@@ -2979,6 +2990,8 @@ vp9_nvdec_hwaccel_deps="nvdec"
 vp9_nvdec_hwaccel_select="vp9_decoder"
 vp9_vaapi_hwaccel_deps="vaapi VADecPictureParameterBufferVP9_bit_depth"
 vp9_vaapi_hwaccel_select="vp9_decoder"
+vp9_vdpau_hwaccel_deps="vdpau VdpPictureInfoVP9"
+vp9_vdpau_hwaccel_select="vp9_decoder"
 wmv3_d3d11va_hwaccel_select="vc1_d3d11va_hwaccel"
 wmv3_d3d11va2_hwaccel_select="vc1_d3d11va2_hwaccel"
 wmv3_dxva2_hwaccel_select="vc1_dxva2_hwaccel"
@@ -3088,6 +3101,8 @@ vp9_qsv_decoder_select="qsvdec"
 vp9_rkmpp_decoder_deps="rkmpp"
 vp9_vaapi_encoder_deps="VAEncPictureParameterBufferVP9"
 vp9_vaapi_encoder_select="vaapi_encode"
+vp9_qsv_encoder_deps="libmfx MFX_CODEC_VP9"
+vp9_qsv_encoder_select="qsvenc"
 vp9_v4l2m2m_decoder_deps="v4l2_m2m vp9_v4l2_m2m"
 wmv3_crystalhd_decoder_select="crystalhd"
 
@@ -3103,6 +3118,7 @@ vc1_parser_select="vc1dsp"
 
 # bitstream_filters
 aac_adtstoasc_bsf_select="adts_header"
+av1_frame_merge_bsf_select="cbs_av1"
 av1_frame_split_bsf_select="cbs_av1"
 av1_metadata_bsf_select="cbs_av1"
 eac3_core_bsf_select="ac3_parser"
@@ -3139,6 +3155,7 @@ mp2_at_decoder_select="mpegaudioheader"
 mp3_at_decoder_select="mpegaudioheader"
 pcm_alaw_at_decoder_deps="audiotoolbox"
 pcm_mulaw_at_decoder_deps="audiotoolbox"
+qdmc_decoder_select="fft"
 qdmc_at_decoder_deps="audiotoolbox"
 qdm2_at_decoder_deps="audiotoolbox"
 aac_at_encoder_deps="audiotoolbox"
@@ -3192,6 +3209,8 @@ libopenmpt_demuxer_deps="libopenmpt"
 libopus_decoder_deps="libopus"
 libopus_encoder_deps="libopus"
 libopus_encoder_select="audio_frame_queue"
+librav1e_encoder_deps="librav1e"
+librav1e_encoder_select="extract_extradata_bsf"
 librsvg_decoder_deps="librsvg"
 libshine_encoder_deps="libshine"
 libshine_encoder_select="audio_frame_queue"
@@ -3228,11 +3247,13 @@ videotoolbox_encoder_deps="videotoolbox VTCompressionSessionPrepareToEncodeFrame
 
 # demuxers / muxers
 ac3_demuxer_select="ac3_parser"
+act_demuxer_select="riffdec"
 aiff_muxer_select="iso_media"
 asf_demuxer_select="riffdec"
 asf_o_demuxer_select="riffdec"
 asf_muxer_select="riffenc"
 asf_stream_muxer_select="asf_muxer"
+av1_demuxer_select="av1_frame_merge_bsf av1_parser"
 avi_demuxer_select="iso_media riffdec exif"
 avi_muxer_select="riffenc"
 caf_demuxer_select="iso_media riffdec"
@@ -3271,6 +3292,7 @@ mp4_muxer_select="mov_muxer"
 mpegts_demuxer_select="iso_media"
 mpegts_muxer_select="adts_muxer latm_muxer"
 mpegtsraw_demuxer_select="mpegts_demuxer"
+mxf_muxer_select="golomb"
 mxf_d10_muxer_select="mxf_muxer"
 mxf_opatom_muxer_select="mxf_muxer"
 nut_muxer_select="riffenc"
@@ -3281,7 +3303,7 @@ ogv_muxer_select="ogg_muxer"
 opus_muxer_select="ogg_muxer"
 psp_muxer_select="mov_muxer"
 rtp_demuxer_select="sdp_demuxer"
-rtp_muxer_select="golomb"
+rtp_muxer_select="golomb jpegtables"
 rtpdec_select="asf_demuxer jpegtables mov_demuxer mpegts_demuxer rm_demuxer rtp_protocol srtp"
 rtsp_demuxer_select="http_protocol rtpdec"
 rtsp_muxer_select="rtp_muxer http_protocol rtp_protocol rtpenc_chain"
@@ -3424,7 +3446,7 @@ afftdn_filter_select="fft"
 afftfilt_filter_deps="avcodec"
 afftfilt_filter_select="fft"
 afir_filter_deps="avcodec"
-afir_filter_select="fft"
+afir_filter_select="rdft"
 amovie_filter_deps="avcodec avformat"
 aresample_filter_deps="swresample"
 asr_filter_deps="pocketsphinx"
@@ -3460,6 +3482,7 @@ derain_filter_select="dnn"
 deshake_filter_select="pixelutils"
 deshake_opencl_filter_deps="opencl"
 dilation_opencl_filter_deps="opencl"
+dnn_processing_filter_select="dnn"
 drawtext_filter_deps="libfreetype"
 drawtext_filter_suggest="libfontconfig libfribidi"
 elbg_filter_deps="avcodec"
@@ -3479,6 +3502,7 @@ frei0r_filter_deps="frei0r libdl"
 frei0r_src_filter_deps="frei0r libdl"
 fspp_filter_deps="gpl"
 geq_filter_deps="gpl"
+headphone_filter_select="fft"
 histeq_filter_deps="gpl"
 hqdn3d_filter_deps="gpl"
 interlace_filter_deps="gpl"
@@ -3527,11 +3551,13 @@ showcqt_filter_suggest="libfontconfig libfreetype"
 showcqt_filter_select="fft"
 showfreqs_filter_deps="avcodec"
 showfreqs_filter_select="fft"
+showspatial_filter_select="fft"
 showspectrum_filter_deps="avcodec"
 showspectrum_filter_select="fft"
 showspectrumpic_filter_deps="avcodec"
 showspectrumpic_filter_select="fft"
 signature_filter_deps="gpl avcodec avformat"
+sinc_filter_select="rdft"
 smartblur_filter_deps="gpl swscale"
 sobel_opencl_filter_deps="opencl"
 sofalizer_filter_deps="libmysofa avcodec"
@@ -3546,6 +3572,8 @@ stereo3d_filter_deps="gpl"
 subtitles_filter_deps="avformat avcodec libass"
 super2xsai_filter_deps="gpl"
 pixfmts_super2xsai_test_deps="super2xsai_filter"
+superequalizer_filter_select="rdft"
+surround_filter_select="rdft"
 tinterlace_filter_deps="gpl"
 tinterlace_merge_test_deps="tinterlace_filter"
 tinterlace_pad_test_deps="tinterlace_filter"
@@ -6006,6 +6034,7 @@ check_func_headers mach/mach_time.h mach_absolute_time
 check_func_headers stdlib.h getenv
 check_func_headers sys/stat.h lstat
 
+check_func_headers windows.h GetModuleHandle
 check_func_headers windows.h GetProcessAffinityMask
 check_func_headers windows.h GetProcessTimes
 check_func_headers windows.h GetSystemTimeAsFileTime
@@ -6014,6 +6043,7 @@ check_func_headers windows.h MapViewOfFile
 check_func_headers windows.h PeekNamedPipe
 check_func_headers windows.h SetConsoleTextAttribute
 check_func_headers windows.h SetConsoleCtrlHandler
+check_func_headers windows.h SetDllDirectory
 check_func_headers windows.h Sleep
 check_func_headers windows.h VirtualAlloc
 check_func_headers glob.h glob
@@ -6093,6 +6123,7 @@ check_type "windows.h d3d11.h" "ID3D11VideoContext"
 check_type "d3d9.h dxva2api.h" DXVA2_ConfigPictureDecode -D_WIN32_WINNT=0x0602
 
 check_type "vdpau/vdpau.h" "VdpPictureInfoHEVC"
+check_type "vdpau/vdpau.h" "VdpPictureInfoVP9"
 
 if [ -z "$nvccflags" ]; then
     nvccflags=$nvccflags_default
@@ -6113,10 +6144,10 @@ fi
 
 if ! disabled ffnvcodec; then
     ffnv_hdr_list="ffnvcodec/nvEncodeAPI.h ffnvcodec/dynlink_cuda.h ffnvcodec/dynlink_cuviddec.h ffnvcodec/dynlink_nvcuvid.h"
-    check_pkg_config ffnvcodec "ffnvcodec >= 9.0.18.0" "$ffnv_hdr_list" "" || \
-      check_pkg_config ffnvcodec "ffnvcodec >= 8.2.15.8 ffnvcodec < 8.3" "$ffnv_hdr_list" "" || \
-      check_pkg_config ffnvcodec "ffnvcodec >= 8.1.24.9 ffnvcodec < 8.2" "$ffnv_hdr_list" "" || \
-      check_pkg_config ffnvcodec "ffnvcodec >= 8.0.14.9 ffnvcodec < 8.1" "$ffnv_hdr_list" ""
+    check_pkg_config ffnvcodec "ffnvcodec >= 9.1.23.1" "$ffnv_hdr_list" "" || \
+      check_pkg_config ffnvcodec "ffnvcodec >= 9.0.18.3 ffnvcodec < 9.1" "$ffnv_hdr_list" "" || \
+      check_pkg_config ffnvcodec "ffnvcodec >= 8.2.15.10 ffnvcodec < 8.3" "$ffnv_hdr_list" "" || \
+      check_pkg_config ffnvcodec "ffnvcodec >= 8.1.24.11 ffnvcodec < 8.2" "$ffnv_hdr_list" ""
 fi
 
 check_cpp_condition winrt windows.h "!WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)"
@@ -6239,6 +6270,10 @@ enabled liblensfun        && require_pkg_config liblensfun lensfun lensfun.h lf_
 # can find the libraries and headers through other means.
 enabled libmfx            && { check_pkg_config libmfx libmfx "mfx/mfxvideo.h" MFXInit ||
                                { require libmfx "mfx/mfxvideo.h" MFXInit "-llibmfx $advapi32_extralibs" && warn "using libmfx without pkg-config"; } }
+if enabled libmfx; then
+   check_cc MFX_CODEC_VP9 "mfx/mfxvp9.h mfx/mfxstructures.h" "MFX_CODEC_VP9"
+fi
+
 enabled libmodplug        && require_pkg_config libmodplug libmodplug libmodplug/modplug.h ModPlug_Load
 enabled libmp3lame        && require "libmp3lame >= 3.98.3" lame/lame.h lame_set_VBR_quality -lmp3lame $libm_extralibs
 enabled libmysofa         && { check_pkg_config libmysofa libmysofa mysofa.h mysofa_neighborhood_init_withstepdefine ||
@@ -6265,6 +6300,7 @@ enabled libopus           && {
     }
 }
 enabled libpulse          && require_pkg_config libpulse libpulse pulse/pulseaudio.h pa_context_new
+enabled librav1e          && require_pkg_config librav1e "rav1e >= 0.1.0" rav1e.h rav1e_context_new
 enabled librsvg           && require_pkg_config librsvg librsvg-2.0 librsvg-2.0/librsvg/rsvg.h rsvg_handle_render_cairo
 enabled librtmp           && require_pkg_config librtmp librtmp librtmp/rtmp.h RTMP_Socket
 enabled librubberband     && require_pkg_config librubberband "rubberband >= 1.8.1" rubberband/rubberband-c.h rubberband_new -lstdc++ && append librubberband_extralibs "-lstdc++"
@@ -6371,6 +6407,7 @@ enabled omx_rpi           && { test_code cc OMX_Core.h OMX_IndexConfigBrcmVideoR
 enabled omx               && require_headers OMX_Core.h
 enabled openssl           && { check_pkg_config openssl openssl openssl/ssl.h OPENSSL_init_ssl ||
                                check_pkg_config openssl openssl openssl/ssl.h SSL_library_init ||
+                               check_lib openssl openssl/ssl.h OPENSSL_init_ssl -lssl -lcrypto ||
                                check_lib openssl openssl/ssl.h SSL_library_init -lssl -lcrypto ||
                                check_lib openssl openssl/ssl.h SSL_library_init -lssl32 -leay32 ||
                                check_lib openssl openssl/ssl.h SSL_library_init -lssl -lcrypto -lws2_32 -lgdi32 ||

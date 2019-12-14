@@ -38,6 +38,9 @@
 #define QSV_HAVE_CO3 QSV_VERSION_ATLEAST(1, 11)
 #define QSV_HAVE_CO_VPS  QSV_VERSION_ATLEAST(1, 17)
 
+#define QSV_HAVE_EXT_HEVC_TILES QSV_VERSION_ATLEAST(1, 13)
+#define QSV_HAVE_EXT_VP9_PARAM QSV_VERSION_ATLEAST(1, 26)
+
 #define QSV_HAVE_TRELLIS QSV_VERSION_ATLEAST(1, 8)
 #define QSV_HAVE_MAX_SLICE_SIZE QSV_VERSION_ATLEAST(1, 9)
 #define QSV_HAVE_BREF_TYPE      QSV_VERSION_ATLEAST(1, 8)
@@ -122,6 +125,13 @@ typedef struct QSVEncContext {
     mfxExtMultiFrameParam   extmfp;
     mfxExtMultiFrameControl extmfc;
 #endif
+#if QSV_HAVE_EXT_HEVC_TILES
+    mfxExtHEVCTiles exthevctiles;
+#endif
+#if QSV_HAVE_EXT_VP9_PARAM
+    mfxExtVP9Param  extvp9param;
+#endif
+
     mfxExtOpaqueSurfaceAlloc opaque_alloc;
     mfxFrameSurface1       **opaque_surfaces;
     AVBufferRef             *opaque_alloc_buf;
@@ -154,6 +164,9 @@ typedef struct QSVEncContext {
     int rdo;
     int max_frame_size;
     int max_slice_size;
+
+    int tile_cols;
+    int tile_rows;
 
     int aud;
 

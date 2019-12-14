@@ -908,14 +908,10 @@ static int flv_write_packet(AVFormatContext *s, AVPacket *pkt)
         int side_size = 0;
         uint8_t *side = av_packet_get_side_data(pkt, AV_PKT_DATA_NEW_EXTRADATA, &side_size);
         if (side && side_size > 0 && (side_size != par->extradata_size || memcmp(side, par->extradata, side_size))) {
-            av_free(par->extradata);
-            par->extradata = av_mallocz(side_size + AV_INPUT_BUFFER_PADDING_SIZE);
-            if (!par->extradata) {
-                par->extradata_size = 0;
-                return AVERROR(ENOMEM);
-            }
+            ret = ff_alloc_extradata(par, side_size);
+            if (ret < 0)
+                return ret;
             memcpy(par->extradata, side, side_size);
-            par->extradata_size = side_size;
             flv_write_codec_header(s, par, pkt->dts);
         }
     }
@@ -927,6 +923,12 @@ static int flv_write_packet(AVFormatContext *s, AVPacket *pkt)
         av_log(s, AV_LOG_WARNING,
                "Packets are not in the proper order with respect to DTS\n");
         return AVERROR(EINVAL);
+    }
+    if (par->codec_id == AV_CODEC_ID_H264 || par->codec_id == AV_CODEC_ID_MPEG4) {
+        if (pkt->pts == AV_NOPTS_VALUE) {
+            av_log(s, AV_LOG_ERROR, "Packet is missing PTS\n");
+            return AVERROR(EINVAL);
+        }
     }
 
     ts = pkt->dts;
@@ -970,10 +972,10 @@ static int flv_write_packet(AVFormatContext *s, AVPacket *pkt)
     } else if (par->codec_id == AV_CODEC_ID_AAC && pkt->size > 2 &&
                (AV_RB16(pkt->data) & 0xfff0) == 0xfff0) {
         if (!s->streams[pkt->stream_index]->nb_frames) {
-        av_log(s, AV_LOG_ERROR, "Malformed AAC bitstream detected: "
-               "use the audio bitstream filter 'aac_adtstoasc' to fix it "
-               "('-bsf:a aac_adtstoasc' option with ffmpeg)\n");
-        return AVERROR_INVALIDDATA;
+            av_log(s, AV_LOG_ERROR, "Malformed AAC bitstream detected: "
+                   "use the audio bitstream filter 'aac_adtstoasc' to fix it "
+                   "('-bsf:a aac_adtstoasc' option with ffmpeg)\n");
+            return AVERROR_INVALIDDATA;
         }
         av_log(s, AV_LOG_WARNING, "aac bitstream error\n");
     }

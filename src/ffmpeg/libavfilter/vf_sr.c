@@ -41,7 +41,7 @@ typedef struct SRContext {
     DNNBackendType backend_type;
     DNNModule *dnn_module;
     DNNModel *model;
-    DNNInputData input;
+    DNNData input;
     DNNData output;
     int scale_factor;
     struct SwsContext *sws_contexts[3];
@@ -317,5 +317,4 @@ AVFilter ff_vf_sr = {
     .inputs        = sr_inputs,
     .outputs       = sr_outputs,
     .priv_class    = &sr_class,
-    .flags         = AVFILTER_FLAG_SUPPORT_TIMELINE_GENERIC,
 };

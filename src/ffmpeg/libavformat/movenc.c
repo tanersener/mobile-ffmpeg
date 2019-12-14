@@ -2493,6 +2493,7 @@ static int mov_write_stbl_tag(AVFormatContext *s, AVIOContext *pb, MOVMuxContext
     mov_write_stts_tag(pb, track);
     if ((track->par->codec_type == AVMEDIA_TYPE_VIDEO ||
          track->par->codec_id == AV_CODEC_ID_TRUEHD ||
+         track->par->codec_id == AV_CODEC_ID_MPEGH_3D_AUDIO ||
          track->par->codec_tag == MKTAG('r','t','p',' ')) &&
         track->has_keyframes && track->has_keyframes < track->entry)
         mov_write_stss_tag(pb, track, MOV_SYNC_SAMPLE);
@@ -3145,12 +3146,12 @@ static int mov_write_track_udta_tag(AVIOContext *pb, MOVMuxContext *mov,
     if (mov->mode & (MODE_MP4|MODE_MOV))
         mov_write_track_metadata(pb_buf, st, "name", "title");
 
-    if ((size = avio_close_dyn_buf(pb_buf, &buf)) > 0) {
+    if ((size = avio_get_dyn_buf(pb_buf, &buf)) > 0) {
         avio_wb32(pb, size + 8);
         ffio_wfourcc(pb, "udta");
         avio_write(pb, buf, size);
     }
-    av_free(buf);
+    ffio_free_dyn_buf(&pb_buf);
 
     return 0;
 }
@@ -3820,12 +3821,12 @@ static int mov_write_udta_tag(AVIOContext *pb, MOVMuxContext *mov,
     if (s->nb_chapters && !(mov->flags & FF_MOV_FLAG_DISABLE_CHPL))
         mov_write_chpl_tag(pb_buf, s);
 
-    if ((size = avio_close_dyn_buf(pb_buf, &buf)) > 0) {
+    if ((size = avio_get_dyn_buf(pb_buf, &buf)) > 0) {
         avio_wb32(pb, size + 8);
         ffio_wfourcc(pb, "udta");
         avio_write(pb, buf, size);
     }
-    av_free(buf);
+    ffio_free_dyn_buf(&pb_buf);
 
     return 0;
 }
@@ -5033,12 +5034,11 @@ static int mov_flush_fragment_interleaving(AVFormatContext *s, MOVTrack *track)
         if ((ret = avio_open_dyn_buf(&mov->mdat_buf)) < 0)
             return ret;
     }
-    buf_size = avio_close_dyn_buf(track->mdat_buf, &buf);
-    track->mdat_buf = NULL;
+    buf_size = avio_get_dyn_buf(track->mdat_buf, &buf);
 
     offset = avio_tell(mov->mdat_buf);
     avio_write(mov->mdat_buf, buf, buf_size);
-    av_free(buf);
+    ffio_free_dyn_buf(&track->mdat_buf);
 
     for (i = track->entries_flushed; i < track->entry; i++)
         track->cluster[i].pos += offset;
@@ -5135,12 +5135,11 @@ static int mov_flush_fragment(AVFormatContext *s, int force)
             return 0;
         }
 
-        buf_size = avio_close_dyn_buf(mov->mdat_buf, &buf);
-        mov->mdat_buf = NULL;
+        buf_size = avio_get_dyn_buf(mov->mdat_buf, &buf);
         avio_wb32(s->pb, buf_size + 8);
         ffio_wfourcc(s->pb, "mdat");
         avio_write(s->pb, buf, buf_size);
-        av_free(buf);
+        ffio_free_dyn_buf(&mov->mdat_buf);
 
         if (mov->flags & FF_MOV_FLAG_GLOBAL_SIDX)
             mov->reserved_header_pos = avio_tell(s->pb);
@@ -6846,38 +6845,39 @@ static const AVCodecTag codec_3gp_tags[] = {
 };
 
 const AVCodecTag codec_mp4_tags[] = {
-    { AV_CODEC_ID_MPEG4       , MKTAG('m', 'p', '4', 'v') },
-    { AV_CODEC_ID_H264        , MKTAG('a', 'v', 'c', '1') },
-    { AV_CODEC_ID_H264        , MKTAG('a', 'v', 'c', '3') },
-    { AV_CODEC_ID_HEVC        , MKTAG('h', 'e', 'v', '1') },
-    { AV_CODEC_ID_HEVC        , MKTAG('h', 'v', 'c', '1') },
-    { AV_CODEC_ID_MPEG2VIDEO  , MKTAG('m', 'p', '4', 'v') },
-    { AV_CODEC_ID_MPEG1VIDEO  , MKTAG('m', 'p', '4', 'v') },
-    { AV_CODEC_ID_MJPEG       , MKTAG('m', 'p', '4', 'v') },
-    { AV_CODEC_ID_PNG         , MKTAG('m', 'p', '4', 'v') },
-    { AV_CODEC_ID_JPEG2000    , MKTAG('m', 'p', '4', 'v') },
-    { AV_CODEC_ID_VC1         , MKTAG('v', 'c', '-', '1') },
-    { AV_CODEC_ID_DIRAC       , MKTAG('d', 'r', 'a', 'c') },
-    { AV_CODEC_ID_TSCC2       , MKTAG('m', 'p', '4', 'v') },
-    { AV_CODEC_ID_VP9         , MKTAG('v', 'p', '0', '9') },
-    { AV_CODEC_ID_AV1         , MKTAG('a', 'v', '0', '1') },
-    { AV_CODEC_ID_AAC         , MKTAG('m', 'p', '4', 'a') },
-    { AV_CODEC_ID_MP4ALS      , MKTAG('m', 'p', '4', 'a') },
-    { AV_CODEC_ID_MP3         , MKTAG('m', 'p', '4', 'a') },
-    { AV_CODEC_ID_MP2         , MKTAG('m', 'p', '4', 'a') },
-    { AV_CODEC_ID_AC3         , MKTAG('a', 'c', '-', '3') },
-    { AV_CODEC_ID_EAC3        , MKTAG('e', 'c', '-', '3') },
-    { AV_CODEC_ID_DTS         , MKTAG('m', 'p', '4', 'a') },
-    { AV_CODEC_ID_TRUEHD      , MKTAG('m', 'l', 'p', 'a') },
-    { AV_CODEC_ID_FLAC        , MKTAG('f', 'L', 'a', 'C') },
-    { AV_CODEC_ID_OPUS        , MKTAG('O', 'p', 'u', 's') },
-    { AV_CODEC_ID_VORBIS      , MKTAG('m', 'p', '4', 'a') },
-    { AV_CODEC_ID_QCELP       , MKTAG('m', 'p', '4', 'a') },
-    { AV_CODEC_ID_EVRC        , MKTAG('m', 'p', '4', 'a') },
-    { AV_CODEC_ID_DVD_SUBTITLE, MKTAG('m', 'p', '4', 's') },
-    { AV_CODEC_ID_MOV_TEXT    , MKTAG('t', 'x', '3', 'g') },
-    { AV_CODEC_ID_BIN_DATA    , MKTAG('g', 'p', 'm', 'd') },
-    { AV_CODEC_ID_NONE        ,    0 },
+    { AV_CODEC_ID_MPEG4,           MKTAG('m', 'p', '4', 'v') },
+    { AV_CODEC_ID_H264,            MKTAG('a', 'v', 'c', '1') },
+    { AV_CODEC_ID_H264,            MKTAG('a', 'v', 'c', '3') },
+    { AV_CODEC_ID_HEVC,            MKTAG('h', 'e', 'v', '1') },
+    { AV_CODEC_ID_HEVC,            MKTAG('h', 'v', 'c', '1') },
+    { AV_CODEC_ID_MPEG2VIDEO,      MKTAG('m', 'p', '4', 'v') },
+    { AV_CODEC_ID_MPEG1VIDEO,      MKTAG('m', 'p', '4', 'v') },
+    { AV_CODEC_ID_MJPEG,           MKTAG('m', 'p', '4', 'v') },
+    { AV_CODEC_ID_PNG,             MKTAG('m', 'p', '4', 'v') },
+    { AV_CODEC_ID_JPEG2000,        MKTAG('m', 'p', '4', 'v') },
+    { AV_CODEC_ID_VC1,             MKTAG('v', 'c', '-', '1') },
+    { AV_CODEC_ID_DIRAC,           MKTAG('d', 'r', 'a', 'c') },
+    { AV_CODEC_ID_TSCC2,           MKTAG('m', 'p', '4', 'v') },
+    { AV_CODEC_ID_VP9,             MKTAG('v', 'p', '0', '9') },
+    { AV_CODEC_ID_AV1,             MKTAG('a', 'v', '0', '1') },
+    { AV_CODEC_ID_AAC,             MKTAG('m', 'p', '4', 'a') },
+    { AV_CODEC_ID_MP4ALS,          MKTAG('m', 'p', '4', 'a') },
+    { AV_CODEC_ID_MP3,             MKTAG('m', 'p', '4', 'a') },
+    { AV_CODEC_ID_MP2,             MKTAG('m', 'p', '4', 'a') },
+    { AV_CODEC_ID_AC3,             MKTAG('a', 'c', '-', '3') },
+    { AV_CODEC_ID_EAC3,            MKTAG('e', 'c', '-', '3') },
+    { AV_CODEC_ID_DTS,             MKTAG('m', 'p', '4', 'a') },
+    { AV_CODEC_ID_TRUEHD,          MKTAG('m', 'l', 'p', 'a') },
+    { AV_CODEC_ID_FLAC,            MKTAG('f', 'L', 'a', 'C') },
+    { AV_CODEC_ID_OPUS,            MKTAG('O', 'p', 'u', 's') },
+    { AV_CODEC_ID_VORBIS,          MKTAG('m', 'p', '4', 'a') },
+    { AV_CODEC_ID_QCELP,           MKTAG('m', 'p', '4', 'a') },
+    { AV_CODEC_ID_EVRC,            MKTAG('m', 'p', '4', 'a') },
+    { AV_CODEC_ID_DVD_SUBTITLE,    MKTAG('m', 'p', '4', 's') },
+    { AV_CODEC_ID_MOV_TEXT,        MKTAG('t', 'x', '3', 'g') },
+    { AV_CODEC_ID_BIN_DATA,        MKTAG('g', 'p', 'm', 'd') },
+    { AV_CODEC_ID_MPEGH_3D_AUDIO,  MKTAG('m', 'h', 'm', '1') },
+    { AV_CODEC_ID_NONE,               0 },
 };
 
 const AVCodecTag codec_ism_tags[] = {

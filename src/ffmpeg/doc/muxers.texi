@@ -1582,11 +1582,12 @@ Advanced Codec Digital HDTV service.
 @end table
 
 @item mpegts_pmt_start_pid @var{integer}
-Set the first PID for PMT. Default is @code{0x1000}. Max is @code{0x1f00}.
+Set the first PID for PMTs. Default is @code{0x1000}, minimum is @code{0x0020},
+maximum is @code{0x1ffa}.
 
 @item mpegts_start_pid @var{integer}
-Set the first PID for data packets. Default is @code{0x0100}. Max is
-@code{0x0f00}.
+Set the first PID for elementary streams. Default is @code{0x0100}, minimum is
+@code{0x0020}, maximum is @code{0x1ffa}.
 
 @item mpegts_m2ts_mode @var{boolean}
 Enable m2ts mode if set to @code{1}. Default value is @code{-1} which
@@ -2084,7 +2085,7 @@ but supports several other algorithms.
 The output of the muxer consists of one line per stream of the form:
 @var{streamindex},@var{streamtype},@var{algo}=@var{hash}, where
 @var{streamindex} is the index of the mapped stream, @var{streamtype} is a
-single characer indicating the type of stream, @var{algo} is a short string
+single character indicating the type of stream, @var{algo} is a short string
 representing the hash function used, and @var{hash} is a hexadecimal number
 representing the computed hash.
 

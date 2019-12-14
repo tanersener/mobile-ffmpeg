@@ -116,7 +116,10 @@ struct playlist {
     int n_segments;
     struct segment **segments;
     int needed;
+    int broken;
     int cur_seq_no;
+    int last_seq_no;
+    int m3u8_hold_counters;
     int64_t cur_seg_offset;
     int64_t last_load_time;
 
@@ -197,6 +200,7 @@ typedef struct HLSContext {
     struct rendition **renditions;
 
     int cur_seq_no;
+    int m3u8_hold_counters;
     int live_start_index;
     int first_packet;
     int64_t first_timestamp;
@@ -476,20 +480,20 @@ static struct rendition *new_rendition(HLSContext *c, struct rendition_info *inf
         return NULL;
 
     if (type == AVMEDIA_TYPE_UNKNOWN) {
-        av_log(c, AV_LOG_WARNING, "Can't support the type: %s\n", info->type);
+        av_log(c->ctx, AV_LOG_WARNING, "Can't support the type: %s\n", info->type);
         return NULL;
     }
 
     /* URI is mandatory for subtitles as per spec */
     if (type == AVMEDIA_TYPE_SUBTITLE && !info->uri[0]) {
-        av_log(c, AV_LOG_ERROR, "The URI tag is REQUIRED for subtitle.\n");
+        av_log(c->ctx, AV_LOG_ERROR, "The URI tag is REQUIRED for subtitle.\n");
         return NULL;
     }
 
     /* TODO: handle subtitles (each segment has to parsed separately) */
     if (c->ctx->strict_std_compliance > FF_COMPLIANCE_EXPERIMENTAL)
         if (type == AVMEDIA_TYPE_SUBTITLE) {
-            av_log(c, AV_LOG_WARNING, "Can't support the subtitle(uri: %s)\n", info->uri);
+            av_log(c->ctx, AV_LOG_WARNING, "Can't support the subtitle(uri: %s)\n", info->uri);
             return NULL;
         }
 
@@ -1067,7 +1071,7 @@ static void handle_id3(AVIOContext *pb, struct playlist *pls)
 
     } else {
         if (!pls->id3_changed && id3_has_changed_values(pls, metadata, apic)) {
-            avpriv_report_missing_feature(pls->ctx, "Changing ID3 metadata in HLS audio elementary stream");
+            avpriv_report_missing_feature(pls->parent, "Changing ID3 metadata in HLS audio elementary stream");
             pls->id3_changed = 1;
         }
         av_dict_free(&metadata);
@@ -1118,7 +1122,7 @@ static void intercept_id3(struct playlist *pls, uint8_t *buf,
             int remaining = taglen - tag_got_bytes;
 
             if (taglen > maxsize) {
-                av_log(pls->ctx, AV_LOG_ERROR, "Too large HLS ID3 tag (%d > %"PRId64" bytes)\n",
+                av_log(pls->parent, AV_LOG_ERROR, "Too large HLS ID3 tag (%d > %"PRId64" bytes)\n",
                        taglen, maxsize);
                 break;
             }
@@ -1139,14 +1143,14 @@ static void intercept_id3(struct playlist *pls, uint8_t *buf,
             /* strip the intercepted bytes */
             *len -= tag_got_bytes;
             memmove(buf, buf + tag_got_bytes, *len);
-            av_log(pls->ctx, AV_LOG_DEBUG, "Stripped %d HLS ID3 bytes\n", tag_got_bytes);
+            av_log(pls->parent, AV_LOG_DEBUG, "Stripped %d HLS ID3 bytes\n", tag_got_bytes);
 
             if (remaining > 0) {
                 /* read the rest of the tag in */
                 if (read_from_url(pls, seg, pls->id3_buf + id3_buf_pos, remaining) != remaining)
                     break;
                 id3_buf_pos += remaining;
-                av_log(pls->ctx, AV_LOG_DEBUG, "Stripped additional %d HLS ID3 bytes\n", remaining);
+                av_log(pls->parent, AV_LOG_DEBUG, "Stripped additional %d HLS ID3 bytes\n", remaining);
             }
 
         } else {
@@ -1426,6 +1430,17 @@ reload:
                    "skipping %d segments ahead, expired from playlists\n",
                    v->start_seq_no - v->cur_seq_no);
             v->cur_seq_no = v->start_seq_no;
+        }
+        if (v->cur_seq_no > v->last_seq_no) {
+            v->last_seq_no = v->cur_seq_no;
+            v->m3u8_hold_counters = 0;
+        } else if (v->last_seq_no == v->cur_seq_no) {
+            v->m3u8_hold_counters++;
+            if (v->m3u8_hold_counters >= c->m3u8_hold_counters) {
+                return AVERROR_EOF;
+            }
+        } else {
+            av_log(v->parent, AV_LOG_WARNING, "maybe the m3u8 list sequence have been wraped.\n");
         }
         if (v->cur_seq_no >= v->start_seq_no + v->n_segments) {
             if (v->finished)
@@ -1815,15 +1830,22 @@ static int hls_read_header(AVFormatContext *s)
     if (c->n_playlists > 1 || c->playlists[0]->n_segments == 0) {
         for (i = 0; i < c->n_playlists; i++) {
             struct playlist *pls = c->playlists[i];
-            if ((ret = parse_playlist(c, pls->url, pls, NULL)) < 0)
+            pls->m3u8_hold_counters = 0;
+            if ((ret = parse_playlist(c, pls->url, pls, NULL)) < 0) {
+                av_log(s, AV_LOG_WARNING, "parse_playlist error %s [%s]\n", av_err2str(ret), pls->url);
+                pls->broken = 1;
+                if (c->n_playlists > 1)
+                    continue;
                 goto fail;
+            }
         }
     }
 
-    if (c->variants[0]->playlists[0]->n_segments == 0) {
-        av_log(s, AV_LOG_WARNING, "Empty segment\n");
-        ret = AVERROR_EOF;
-        goto fail;
+    for (i = 0; i < c->n_variants; i++) {
+        if (c->variants[i]->playlists[0]->n_segments == 0) {
+            av_log(s, AV_LOG_WARNING, "Empty segment [%s]\n", c->variants[i]->playlists[0]->url);
+            c->variants[i]->playlists[0]->broken = 1;
+        }
     }
 
     /* If this isn't a live stream, calculate the total duration of the
@@ -1907,6 +1929,8 @@ static int hls_read_header(AVFormatContext *s)
         }
         ffio_init_context(&pls->pb, pls->read_buffer, INITIAL_BUFFER_SIZE, 0, pls,
                           read_data, NULL, NULL);
+        pls->ctx->probesize = s->probesize > 0 ? s->probesize : 1024 * 4;
+        pls->ctx->max_analyze_duration = s->max_analyze_duration > 0 ? s->max_analyze_duration : 4 * AV_TIME_BASE;
         ret = av_probe_input_buffer(&pls->pb, &in_fmt, pls->segments[0]->url,
                                     NULL, 0, 0);
         if (ret < 0) {
@@ -1992,6 +2016,9 @@ static int recheck_discard_flags(AVFormatContext *s, int first)
 
         cur_needed = playlist_needed(c->playlists[i]);
 
+        if (pls->broken) {
+            continue;
+        }
         if (cur_needed && !pls->needed) {
             pls->needed = 1;
             changed = 1;
@@ -2305,6 +2332,8 @@ static const AVOption hls_options[] = {
         INT_MIN, INT_MAX, FLAGS},
     {"max_reload", "Maximum number of times a insufficient list is attempted to be reloaded",
         OFFSET(max_reload), AV_OPT_TYPE_INT, {.i64 = 1000}, 0, INT_MAX, FLAGS},
+    {"m3u8_hold_counters", "The maximum number of times to load m3u8 when it refreshes without new segments",
+        OFFSET(m3u8_hold_counters), AV_OPT_TYPE_INT, {.i64 = 1000}, 0, INT_MAX, FLAGS},
     {"http_persistent", "Use persistent HTTP connections",
         OFFSET(http_persistent), AV_OPT_TYPE_BOOL, {.i64 = 1}, 0, 1, FLAGS },
     {"http_multiple", "Use multiple HTTP connections for fetching segments",
@@ -2326,7 +2355,7 @@ AVInputFormat ff_hls_demuxer = {
     .long_name      = NULL_IF_CONFIG_SMALL("Apple HTTP Live Streaming"),
     .priv_class     = &hls_class,
     .priv_data_size = sizeof(HLSContext),
-    .flags          = AVFMT_NOGENSEARCH,
+    .flags          = AVFMT_NOGENSEARCH | AVFMT_TS_DISCONT,
     .read_probe     = hls_probe,
     .read_header    = hls_read_header,
     .read_packet    = hls_read_packet,

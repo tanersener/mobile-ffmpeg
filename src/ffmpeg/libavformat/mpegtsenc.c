@@ -719,7 +719,7 @@ static int64_t get_pcr(const MpegTSWrite *ts, AVIOContext *pb)
            ts->first_pcr;
 }
 
-static void mpegts_prefix_m2ts_header(AVFormatContext *s)
+static void write_packet(AVFormatContext *s, const uint8_t *packet)
 {
     MpegTSWrite *ts = s->priv_data;
     if (ts->m2ts_mode) {
@@ -729,13 +729,13 @@ static void mpegts_prefix_m2ts_header(AVFormatContext *s)
         avio_write(s->pb, (unsigned char *) &tp_extra_header,
                    sizeof(tp_extra_header));
     }
+    avio_write(s->pb, packet, TS_PACKET_SIZE);
 }
 
 static void section_write_packet(MpegTSSection *s, const uint8_t *packet)
 {
     AVFormatContext *ctx = s->opaque;
-    mpegts_prefix_m2ts_header(ctx);
-    avio_write(ctx->pb, packet, TS_PACKET_SIZE);
+    write_packet(ctx, packet);
 }
 
 static MpegTSService *mpegts_add_service(AVFormatContext *s, int sid,
@@ -850,6 +850,14 @@ static int mpegts_init(AVFormatContext *s)
     int *pids;
     int ret;
 
+    if (ts->m2ts_mode == -1) {
+        if (av_match_ext(s->url, "m2ts")) {
+            ts->m2ts_mode = 1;
+        } else {
+            ts->m2ts_mode = 0;
+        }
+    }
+
     if (s->max_delay < 0) /* Not set by the caller */
         s->max_delay = 0;
 
@@ -914,17 +922,24 @@ static int mpegts_init(AVFormatContext *s)
          * this range are assigned a calculated pid. */
         if (st->id < 16) {
             ts_st->pid = ts->start_pid + i;
-        } else if (st->id < 0x1FFF) {
-            ts_st->pid = st->id;
         } else {
+            ts_st->pid = st->id;
+        }
+        if (ts_st->pid >= 0x1FFF) {
             av_log(s, AV_LOG_ERROR,
                    "Invalid stream id %d, must be less than 8191\n", st->id);
             ret = AVERROR(EINVAL);
             goto fail;
         }
         for (j = 0; j < ts->nb_services; j++) {
+            if (ts->services[j]->pmt.pid > LAST_OTHER_PID) {
+                av_log(s, AV_LOG_ERROR,
+                       "Invalid PMT PID %d, must be less than %d\n", ts->services[j]->pmt.pid, LAST_OTHER_PID + 1);
+                ret = AVERROR(EINVAL);
+                goto fail;
+            }
             if (ts_st->pid == ts->services[j]->pmt.pid) {
-                av_log(s, AV_LOG_ERROR, "Duplicate stream id %d\n", ts_st->pid);
+                av_log(s, AV_LOG_ERROR, "PID %d cannot be both elementary and PMT PID\n", ts_st->pid);
                 ret = AVERROR(EINVAL);
                 goto fail;
             }
@@ -995,14 +1010,6 @@ static int mpegts_init(AVFormatContext *s)
            av_rescale(ts->sdt_period, 1000, PCR_TIME_BASE),
            av_rescale(ts->pat_period, 1000, PCR_TIME_BASE));
 
-    if (ts->m2ts_mode == -1) {
-        if (av_match_ext(s->url, "m2ts")) {
-            ts->m2ts_mode = 1;
-        } else {
-            ts->m2ts_mode = 0;
-        }
-    }
-
     return 0;
 
 fail:
@@ -1061,8 +1068,7 @@ static void mpegts_insert_null_packet(AVFormatContext *s)
     *q++ = 0xff;
     *q++ = 0x10;
     memset(q, 0x0FF, TS_PACKET_SIZE - (q - buf));
-    mpegts_prefix_m2ts_header(s);
-    avio_write(s->pb, buf, TS_PACKET_SIZE);
+    write_packet(s, buf);
 }
 
 /* Write a single transport stream packet with a PCR and no payload */
@@ -1091,8 +1097,7 @@ static void mpegts_insert_pcr_only(AVFormatContext *s, AVStream *st)
 
     /* stuffing bytes */
     memset(q, 0xFF, TS_PACKET_SIZE - (q - buf));
-    mpegts_prefix_m2ts_header(s);
-    avio_write(s->pb, buf, TS_PACKET_SIZE);
+    write_packet(s, buf);
 }
 
 static void write_pts(uint8_t *q, int fourbits, int64_t pts)
@@ -1230,6 +1235,8 @@ static void mpegts_write_pes(AVFormatContext *s, AVStream *st,
         q    = buf;
         *q++ = 0x47;
         val  = ts_st->pid >> 8;
+        if (ts->m2ts_mode && st->codecpar->codec_id == AV_CODEC_ID_AC3)
+            val |= 0x20;
         if (is_start)
             val |= 0x40;
         *q++      = val;
@@ -1432,8 +1439,7 @@ static void mpegts_write_pes(AVFormatContext *s, AVStream *st,
 
         payload      += len;
         payload_size -= len;
-        mpegts_prefix_m2ts_header(s);
-        avio_write(s->pb, buf, TS_PACKET_SIZE);
+        write_packet(s, buf);
     }
     ts_st->prev_payload_key = key;
 }
@@ -1611,7 +1617,7 @@ static int mpegts_write_packet_internal(AVFormatContext *s, AVPacket *pkt)
 
             ret = avio_open_dyn_buf(&ts_st->amux->pb);
             if (ret < 0)
-                return AVERROR(ENOMEM);
+                return ret;
 
             ret = av_write_frame(ts_st->amux, &pkt2);
             if (ret < 0) {
@@ -1642,7 +1648,7 @@ static int mpegts_write_packet_internal(AVFormatContext *s, AVPacket *pkt)
         } while (p < buf_end && (state & 0x7e) != 2*35 &&
                  (state & 0x7e) >= 2*32);
 
-        if ((state & 0x7e) < 2*16 && (state & 0x7e) >= 2*24)
+        if ((state & 0x7e) < 2*16 || (state & 0x7e) >= 2*24)
             extradd = 0;
         if ((state & 0x7e) != 2*35) { // AUD NAL
             data = av_malloc(pkt->size + 7 + extradd);
@@ -1768,6 +1774,7 @@ static int mpegts_write_packet_internal(AVFormatContext *s, AVPacket *pkt)
 
 static void mpegts_write_flush(AVFormatContext *s)
 {
+    MpegTSWrite *ts = s->priv_data;
     int i;
 
     /* flush current packets */
@@ -1781,6 +1788,12 @@ static void mpegts_write_flush(AVFormatContext *s)
             ts_st->payload_size = 0;
             ts_st->opus_queued_samples = 0;
         }
+    }
+
+    if (ts->m2ts_mode) {
+        int packets = (avio_tell(s->pb) / (TS_PACKET_SIZE + 4)) % 32;
+        while (packets++ < 32)
+            mpegts_insert_null_packet(s);
     }
 }
 
@@ -1888,10 +1901,10 @@ static const AVOption options[] = {
       AV_OPT_FLAG_ENCODING_PARAM, "mpegts_service_type" },
     { "mpegts_pmt_start_pid", "Set the first pid of the PMT.",
       offsetof(MpegTSWrite, pmt_start_pid), AV_OPT_TYPE_INT,
-      { .i64 = 0x1000 }, 0x0010, 0x1f00, AV_OPT_FLAG_ENCODING_PARAM },
+      { .i64 = 0x1000 }, FIRST_OTHER_PID, LAST_OTHER_PID, AV_OPT_FLAG_ENCODING_PARAM },
     { "mpegts_start_pid", "Set the first pid.",
       offsetof(MpegTSWrite, start_pid), AV_OPT_TYPE_INT,
-      { .i64 = 0x0100 }, 0x0010, 0x0f00, AV_OPT_FLAG_ENCODING_PARAM },
+      { .i64 = 0x0100 }, FIRST_OTHER_PID, LAST_OTHER_PID, AV_OPT_FLAG_ENCODING_PARAM },
     { "mpegts_m2ts_mode", "Enable m2ts mode.",
       offsetof(MpegTSWrite, m2ts_mode), AV_OPT_TYPE_BOOL,
       { .i64 = -1 }, -1, 1, AV_OPT_FLAG_ENCODING_PARAM },

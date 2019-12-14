@@ -160,6 +160,8 @@ static int denoise_depth(HQDN3DContext *s,
             case  8: ret = denoise_depth(__VA_ARGS__,  8); break;             \
             case  9: ret = denoise_depth(__VA_ARGS__,  9); break;             \
             case 10: ret = denoise_depth(__VA_ARGS__, 10); break;             \
+            case 12: ret = denoise_depth(__VA_ARGS__, 12); break;             \
+            case 14: ret = denoise_depth(__VA_ARGS__, 14); break;             \
             case 16: ret = denoise_depth(__VA_ARGS__, 16); break;             \
         }                                                                     \
         if (ret < 0) {                                                        \
@@ -170,13 +172,10 @@ static int denoise_depth(HQDN3DContext *s,
         }                                                                     \
     } while (0)
 
-static int16_t *precalc_coefs(double dist25, int depth)
+static void precalc_coefs(double dist25, int depth, int16_t *ct)
 {
     int i;
     double gamma, simil, C;
-    int16_t *ct = av_malloc((512<<LUT_BITS)*sizeof(int16_t));
-    if (!ct)
-        return NULL;
 
     gamma = log(0.25) / log(1.0 - FFMIN(dist25,252.0)/255.0 - 0.00001);
 
@@ -188,7 +187,6 @@ static int16_t *precalc_coefs(double dist25, int depth)
     }
 
     ct[0] = !!dist25;
-    return ct;
 }
 
 #define PARAM1_DEFAULT 4.0
@@ -234,25 +232,16 @@ static av_cold void uninit(AVFilterContext *ctx)
 static int query_formats(AVFilterContext *ctx)
 {
     static const enum AVPixelFormat pix_fmts[] = {
-        AV_PIX_FMT_YUV420P,
-        AV_PIX_FMT_YUV422P,
-        AV_PIX_FMT_YUV444P,
-        AV_PIX_FMT_YUV410P,
-        AV_PIX_FMT_YUV411P,
-        AV_PIX_FMT_YUV440P,
-        AV_PIX_FMT_YUVJ420P,
-        AV_PIX_FMT_YUVJ422P,
-        AV_PIX_FMT_YUVJ444P,
-        AV_PIX_FMT_YUVJ440P,
-        AV_PIX_FMT_YUV420P9,
-        AV_PIX_FMT_YUV422P9,
-        AV_PIX_FMT_YUV444P9,
-        AV_PIX_FMT_YUV420P10,
-        AV_PIX_FMT_YUV422P10,
-        AV_PIX_FMT_YUV444P10,
-        AV_PIX_FMT_YUV420P16,
-        AV_PIX_FMT_YUV422P16,
-        AV_PIX_FMT_YUV444P16,
+        AV_PIX_FMT_YUV420P, AV_PIX_FMT_YUV422P, AV_PIX_FMT_YUV444P,
+        AV_PIX_FMT_YUV410P, AV_PIX_FMT_YUV411P, AV_PIX_FMT_YUV440P,
+        AV_PIX_FMT_YUVJ420P, AV_PIX_FMT_YUVJ422P, AV_PIX_FMT_YUVJ444P, AV_PIX_FMT_YUVJ440P,
+        AV_PIX_FMT_YUV420P9, AV_PIX_FMT_YUV422P9, AV_PIX_FMT_YUV444P9,
+        AV_PIX_FMT_YUV420P10, AV_PIX_FMT_YUV422P10, AV_PIX_FMT_YUV444P10,
+        AV_PIX_FMT_YUV440P10,
+        AV_PIX_FMT_YUV444P12, AV_PIX_FMT_YUV422P12, AV_PIX_FMT_YUV420P12,
+        AV_PIX_FMT_YUV440P12,
+        AV_PIX_FMT_YUV444P14, AV_PIX_FMT_YUV422P14, AV_PIX_FMT_YUV420P14,
+        AV_PIX_FMT_YUV420P16, AV_PIX_FMT_YUV422P16, AV_PIX_FMT_YUV444P16,
         AV_PIX_FMT_NONE
     };
     AVFilterFormats *fmts_list = ff_make_format_list(pix_fmts);
@@ -261,17 +250,26 @@ static int query_formats(AVFilterContext *ctx)
     return ff_set_common_formats(ctx, fmts_list);
 }
 
+static void calc_coefs(AVFilterContext *ctx)
+{
+    HQDN3DContext *s = ctx->priv;
+
+    for (int i = 0; i < 4; i++)
+        precalc_coefs(s->strength[i], s->depth, s->coefs[i]);
+}
+
 static int config_input(AVFilterLink *inlink)
 {
+    AVFilterContext *ctx = inlink->dst;
     HQDN3DContext *s = inlink->dst->priv;
     const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(inlink->format);
-    int i;
+    int i, depth;
 
     uninit(inlink->dst);
 
     s->hsub  = desc->log2_chroma_w;
     s->vsub  = desc->log2_chroma_h;
-    s->depth = desc->comp[0].depth;
+    s->depth = depth = desc->comp[0].depth;
 
     for (i = 0; i < 3; i++) {
         s->line[i] = av_malloc_array(inlink->w, sizeof(*s->line[i]));
@@ -280,10 +278,12 @@ static int config_input(AVFilterLink *inlink)
     }
 
     for (i = 0; i < 4; i++) {
-        s->coefs[i] = precalc_coefs(s->strength[i], s->depth);
+        s->coefs[i] = av_malloc((512<<LUT_BITS) * sizeof(int16_t));
         if (!s->coefs[i])
             return AVERROR(ENOMEM);
     }
+
+    calc_coefs(ctx);
 
     if (ARCH_X86)
         ff_hqdn3d_init_x86(s);
@@ -353,8 +353,22 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
     return ff_filter_frame(outlink, out);
 }
 
+static int process_command(AVFilterContext *ctx, const char *cmd, const char *args,
+                           char *res, int res_len, int flags)
+{
+    int ret;
+
+    ret = ff_filter_process_command(ctx, cmd, args, res, res_len, flags);
+    if (ret < 0)
+        return ret;
+
+    calc_coefs(ctx);
+
+    return 0;
+}
+
 #define OFFSET(x) offsetof(HQDN3DContext, x)
-#define FLAGS AV_OPT_FLAG_VIDEO_PARAM | AV_OPT_FLAG_FILTERING_PARAM
+#define FLAGS AV_OPT_FLAG_VIDEO_PARAM | AV_OPT_FLAG_FILTERING_PARAM | AV_OPT_FLAG_RUNTIME_PARAM
 static const AVOption hqdn3d_options[] = {
     { "luma_spatial",   "spatial luma strength",    OFFSET(strength[LUMA_SPATIAL]),   AV_OPT_TYPE_DOUBLE, { .dbl = 0.0 }, 0, DBL_MAX, FLAGS },
     { "chroma_spatial", "spatial chroma strength",  OFFSET(strength[CHROMA_SPATIAL]), AV_OPT_TYPE_DOUBLE, { .dbl = 0.0 }, 0, DBL_MAX, FLAGS },
@@ -395,4 +409,5 @@ AVFilter ff_vf_hqdn3d = {
     .inputs        = avfilter_vf_hqdn3d_inputs,
     .outputs       = avfilter_vf_hqdn3d_outputs,
     .flags         = AVFILTER_FLAG_SUPPORT_TIMELINE_INTERNAL | AVFILTER_FLAG_SLICE_THREADS,
+    .process_command = process_command,
 };

@@ -23,7 +23,6 @@
 
 #include "libavutil/avassert.h"
 #include "libavutil/avstring.h"
-#include "libavutil/bswap.h"
 #include "libavutil/opt.h"
 #include "libavutil/dict.h"
 #include "libavutil/internal.h"
@@ -771,10 +770,11 @@ FF_ENABLE_DEPRECATION_WARNINGS
                             st->codecpar->extradata_size =  size - 10 * 4;
                         if (st->codecpar->extradata) {
                             av_log(s, AV_LOG_WARNING, "New extradata in strf chunk, freeing previous one.\n");
-                            av_freep(&st->codecpar->extradata);
                         }
-                        if (ff_get_extradata(s, st->codecpar, pb, st->codecpar->extradata_size) < 0)
-                            return AVERROR(ENOMEM);
+                        ret = ff_get_extradata(s, st->codecpar, pb,
+                                               st->codecpar->extradata_size);
+                        if (ret < 0)
+                            return ret;
                     }
 
                     // FIXME: check if the encoder really did this correctly
@@ -931,10 +931,9 @@ FF_ENABLE_DEPRECATION_WARNINGS
                 if (size<(1<<30)) {
                     if (st->codecpar->extradata) {
                         av_log(s, AV_LOG_WARNING, "New extradata in strd chunk, freeing previous one.\n");
-                        av_freep(&st->codecpar->extradata);
                     }
-                    if (ff_get_extradata(s, st->codecpar, pb, size) < 0)
-                        return AVERROR(ENOMEM);
+                    if ((ret = ff_get_extradata(s, st->codecpar, pb, size)) < 0)
+                        return ret;
                 }
 
                 if (st->codecpar->extradata_size & 1) //FIXME check if the encoder really did this correctly

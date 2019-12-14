@@ -1547,6 +1547,10 @@ Range is between 0 and 1.
 
 @item channels, c
 Specify which channels to filter, by default all available are filtered.
+
+@item normalize, n
+Normalize biquad coefficients, by default is disabled.
+Enabling it will normalize magnitude response at DC to 0dB.
 @end table
 
 @subsection Commands
@@ -2527,6 +2531,39 @@ ffmpeg -i INPUT -af atrim=end_sample=1000
 
 @end itemize
 
+@section axcorrelate
+Calculate normalized cross-correlation between two input audio streams.
+
+Resulted samples are always between -1 and 1 inclusive.
+If result is 1 it means two input samples are highly correlated in that selected segment.
+Result 0 means they are not correlated at all.
+If result is -1 it means two input samples are out of phase, which means they cancel each
+other.
+
+The filter accepts the following options:
+
+@table @option
+@item size
+Set size of segment over which cross-correlation is calculated.
+Default is 256. Allowed range is from 2 to 131072.
+
+@item algo
+Set algorithm for cross-correlation. Can be @code{slow} or @code{fast}.
+Default is @code{slow}. Fast algorithm assumes mean values over any given segment
+are always zero and thus need much less calculations to make.
+This is generally not true, but is valid for typical audio streams.
+@end table
+
+@subsection Examples
+
+@itemize
+@item
+Calculate correlation between channels in stereo audio stream:
+@example
+ffmpeg -i stereo.wav -af channelsplit,axcorrelate=size=1024:algo=fast correlation.wav
+@end example
+@end itemize
+
 @section bandpass
 
 Apply a two-pole Butterworth band-pass filter with central
@@ -2568,6 +2605,10 @@ Range is between 0 and 1.
 
 @item channels, c
 Specify which channels to filter, by default all available are filtered.
+
+@item normalize, n
+Normalize biquad coefficients, by default is disabled.
+Enabling it will normalize magnitude response at DC to 0dB.
 @end table
 
 @subsection Commands
@@ -2627,6 +2668,10 @@ Range is between 0 and 1.
 
 @item channels, c
 Specify which channels to filter, by default all available are filtered.
+
+@item normalize, n
+Normalize biquad coefficients, by default is disabled.
+Enabling it will normalize magnitude response at DC to 0dB.
 @end table
 
 @subsection Commands
@@ -2693,6 +2738,10 @@ Range is between 0 and 1.
 
 @item channels, c
 Specify which channels to filter, by default all available are filtered.
+
+@item normalize, n
+Normalize biquad coefficients, by default is disabled.
+Enabling it will normalize magnitude response at DC to 0dB.
 @end table
 
 @subsection Commands
@@ -2744,6 +2793,13 @@ Syntax for the command is : "@var{value}"
 @item mix, m
 How much to use filtered signal in output. Default is 1.
 Range is between 0 and 1.
+
+@item channels, c
+Specify which channels to filter, by default all available are filtered.
+
+@item normalize, n
+Normalize biquad coefficients, by default is disabled.
+Enabling it will normalize magnitude response at DC to 0dB.
 @end table
 
 @section bs2b
@@ -3439,6 +3495,10 @@ Range is between 0 and 1.
 
 @item channels, c
 Specify which channels to filter, by default all available are filtered.
+
+@item normalize, n
+Normalize biquad coefficients, by default is disabled.
+Enabling it will normalize magnitude response at DC to 0dB.
 @end table
 
 @subsection Examples
@@ -3908,6 +3968,10 @@ Range is between 0 and 1.
 
 @item channels, c
 Specify which channels to filter, by default all available are filtered.
+
+@item normalize, n
+Normalize biquad coefficients, by default is disabled.
+Enabling it will normalize magnitude response at DC to 0dB.
 @end table
 
 @subsection Commands
@@ -4224,6 +4288,10 @@ Range is between 0 and 1.
 
 @item channels, c
 Specify which channels to filter, by default all available are filtered.
+
+@item normalize, n
+Normalize biquad coefficients, by default is disabled.
+Enabling it will normalize magnitude response at DC to 0dB.
 @end table
 
 @subsection Examples
@@ -5332,6 +5400,10 @@ Range is between 0 and 1.
 
 @item channels, c
 Specify which channels to filter, by default all available are filtered.
+
+@item normalize, n
+Normalize biquad coefficients, by default is disabled.
+Enabling it will normalize magnitude response at DC to 0dB.
 @end table
 
 @subsection Commands
@@ -6863,6 +6935,13 @@ Literal colors like "green" or "red" don't make sense with this enabled anymore.
 This can be used to pass exact YUV values as hexadecimal numbers.
 @end table
 
+@subsection Commands
+This filter supports same @ref{commands} as options.
+The command accepts the same syntax of the corresponding option.
+
+If the specified expression is not valid, it is kept at its current
+value.
+
 @section chromakey
 YUV colorspace color/chroma keying.
 
@@ -6891,6 +6970,13 @@ Signals that the color passed is already in YUV instead of RGB.
 Literal colors like "green" or "red" don't make sense with this enabled anymore.
 This can be used to pass exact YUV values as hexadecimal numbers.
 @end table
+
+@subsection Commands
+This filter supports same @ref{commands} as options.
+The command accepts the same syntax of the corresponding option.
+
+If the specified expression is not valid, it is kept at its current
+value.
 
 @subsection Examples
 
@@ -6924,6 +7010,10 @@ Set amount to shift chroma-red vertically.
 @item edge
 Set edge mode, can be @var{smear}, default, or @var{warp}.
 @end table
+
+@subsection Commands
+
+This filter supports the all above options as @ref{commands}.
 
 @section ciescope
 
@@ -7080,6 +7170,9 @@ Adjust red, green and blue midtones (medium pixels).
 Adjust red, green and blue highlights (brightest pixels).
 
 Allowed ranges for options are @code{[-1.0, 1.0]}. Defaults are @code{0}.
+
+@item pl
+Preserve lightness when changing color balance. Default is disabled.
 @end table
 
 @subsection Examples
@@ -7091,6 +7184,10 @@ Add red color cast to shadows:
 colorbalance=rs=.3
 @end example
 @end itemize
+
+@subsection Commands
+
+This filter supports the all above options as @ref{commands}.
 
 @section colorchannelmixer
 
@@ -8257,6 +8354,9 @@ Draw rows and columns numbers on left and top of video.
 
 @item opacity
 Set background opacity.
+
+@item format
+Set display number format. Can be @code{hex}, or @code{dec}. Default is @code{hex}.
 @end table
 
 @section dctdnoiz
@@ -8928,6 +9028,50 @@ ffmpeg -i INPUT -f lavfi -i nullsrc=hd720,geq='r=128+80*(sin(sqrt((X-W/2)*(X-W/2
 @end example
 @end itemize
 
+@section dnn_processing
+
+Do image processing with deep neural networks. Currently only AVFrame with RGB24
+and BGR24 are supported, more formats will be added later.
+
+The filter accepts the following options:
+
+@table @option
+@item dnn_backend
+Specify which DNN backend to use for model loading and execution. This option accepts
+the following values:
+
+@table @samp
+@item native
+Native implementation of DNN loading and execution.
+
+@item tensorflow
+TensorFlow backend. To enable this backend you
+need to install the TensorFlow for C library (see
+@url{https://www.tensorflow.org/install/install_c}) and configure FFmpeg with
+@code{--enable-libtensorflow}
+@end table
+
+Default value is @samp{native}.
+
+@item model
+Set path to model file specifying network architecture and its parameters.
+Note that different backends use different file formats. TensorFlow and native
+backend can load files for only its format.
+
+Native model file (.model) can be generated from TensorFlow model file (.pb) by using tools/python/convert.py
+
+@item input
+Set the input name of the dnn network.
+
+@item output
+Set the output name of the dnn network.
+
+@item fmt
+Set the pixel format for the Frame. Allowed values are @code{AV_PIX_FMT_RGB24}, and @code{AV_PIX_FMT_BGR24}.
+Default value is @code{AV_PIX_FMT_RGB24}.
+
+@end table
+
 @section drawbox
 
 Draw a colored box on the input image.
@@ -9036,6 +9180,111 @@ The command accepts the same syntax of the corresponding option.
 
 If the specified expression is not valid, it is kept at its current
 value.
+
+@anchor{drawgraph}
+@section drawgraph
+Draw a graph using input video metadata.
+
+It accepts the following parameters:
+
+@table @option
+@item m1
+Set 1st frame metadata key from which metadata values will be used to draw a graph.
+
+@item fg1
+Set 1st foreground color expression.
+
+@item m2
+Set 2nd frame metadata key from which metadata values will be used to draw a graph.
+
+@item fg2
+Set 2nd foreground color expression.
+
+@item m3
+Set 3rd frame metadata key from which metadata values will be used to draw a graph.
+
+@item fg3
+Set 3rd foreground color expression.
+
+@item m4
+Set 4th frame metadata key from which metadata values will be used to draw a graph.
+
+@item fg4
+Set 4th foreground color expression.
+
+@item min
+Set minimal value of metadata value.
+
+@item max
+Set maximal value of metadata value.
+
+@item bg
+Set graph background color. Default is white.
+
+@item mode
+Set graph mode.
+
+Available values for mode is:
+@table @samp
+@item bar
+@item dot
+@item line
+@end table
+
+Default is @code{line}.
+
+@item slide
+Set slide mode.
+
+Available values for slide is:
+@table @samp
+@item frame
+Draw new frame when right border is reached.
+
+@item replace
+Replace old columns with new ones.
+
+@item scroll
+Scroll from right to left.
+
+@item rscroll
+Scroll from left to right.
+
+@item picture
+Draw single picture.
+@end table
+
+Default is @code{frame}.
+
+@item size
+Set size of graph video. For the syntax of this option, check the
+@ref{video size syntax,,"Video size" section in the ffmpeg-utils manual,ffmpeg-utils}.
+The default value is @code{900x256}.
+
+The foreground color expressions can use the following variables:
+@table @option
+@item MIN
+Minimal value of metadata value.
+
+@item MAX
+Maximal value of metadata value.
+
+@item VAL
+Current metadata key value.
+@end table
+
+The color is defined as 0xAABBGGRR.
+@end table
+
+Example using metadata from @ref{signalstats} filter:
+@example
+signalstats,drawgraph=lavfi.signalstats.YAVG:min=0:max=255
+@end example
+
+Example using metadata from @ref{ebur128} filter:
+@example
+ebur128=metadata=1,adrawgraph=lavfi.r128.M:min=-120:max=5
+@end example
 
 @section drawgrid
 
@@ -10589,6 +10838,13 @@ Default is @var{smear}.
 Set color for pixels in fixed mode. Default is @var{black}.
 @end table
 
+@subsection Commands
+This filter supports same @ref{commands} as options.
+The command accepts the same syntax of the corresponding option.
+
+If the specified expression is not valid, it is kept at its current
+value.
+
 @section find_rect
 
 Find a rectangular object
@@ -11202,7 +11458,8 @@ gradfun=radius=8
 
 @end itemize
 
-@section graphmonitor, agraphmonitor
+@anchor{graphmonitor}
+@section graphmonitor
 Show various filtergraph stats.
 
 With this filter one can debug complete filtergraph.
@@ -11510,6 +11767,13 @@ A floating point number which specifies luma temporal strength. It defaults to
 A floating point number which specifies chroma temporal strength. It defaults to
 @var{luma_tmp}*@var{chroma_spatial}/@var{luma_spatial}.
 @end table
+
+@subsection Commands
+This filter supports same @ref{commands} as options.
+The command accepts the same syntax of the corresponding option.
+
+If the specified expression is not valid, it is kept at its current
+value.
 
 @anchor{hwdownload}
 @section hwdownload
@@ -12223,7 +12487,7 @@ The filter has following options:
 @table @option
 @item model_path
 Set the model path which is to be used for SVM.
-Default value: @code{"vmaf_v0.6.1.pkl"}
+Default value: @code{"/usr/local/share/model/vmaf_v0.6.1.pkl"}
 
 @item log_path
 Set the file path to be used to store logs.
@@ -12239,31 +12503,42 @@ Default value: @code{false}
 @item phone_model
 Invokes the phone model which will generate VMAF scores higher than in the
 regular model, which is more suitable for laptop, TV, etc. viewing conditions.
+Default value: @code{false}
 
 @item psnr
 Enables computing psnr along with vmaf.
+Default value: @code{false}
 
 @item ssim
 Enables computing ssim along with vmaf.
+Default value: @code{false}
 
 @item ms_ssim
 Enables computing ms_ssim along with vmaf.
+Default value: @code{false}
 
 @item pool
-Set the pool method (mean, min or harmonic mean) to be used for computing vmaf.
+Set the pool method to be used for computing vmaf.
+Options are @code{min}, @code{harmonic_mean} or @code{mean} (default).
 
 @item n_threads
 Set number of threads to be used when computing vmaf.
+Default value: @code{0}, which makes use of all available logical processors.
 
 @item n_subsample
 Set interval for frame subsampling used when computing vmaf.
+Default value: @code{1}
 
 @item enable_conf_interval
 Enables confidence interval.
+Default value: @code{false}
 @end table
 
 This filter also supports the @ref{framesync} options.
 
+@subsection Examples
+@itemize
+@item
 On the below examples the input file @file{main.mpg} being processed is
 compared with the reference file @file{ref.mpg}.
 
@@ -12271,10 +12546,18 @@ compared with the reference file @file{ref.mpg}.
 ffmpeg -i main.mpg -i ref.mpg -lavfi libvmaf -f null -
 @end example
 
+@item
 Example with options:
 @example
 ffmpeg -i main.mpg -i ref.mpg -lavfi libvmaf="psnr=1:log_fmt=json" -f null -
 @end example
+
+@item
+Example with options and different containers:
+@example
+ffmpeg -i main.mpg -i ref.mkv -lavfi "[0:v]settb=AVTB,setpts=PTS-STARTPTS[main];[1:v]settb=AVTB,setpts=PTS-STARTPTS[ref];[main][ref]libvmaf=psnr=1:log_fmt=json" -f null -
+@end example
+@end itemize
 
 @section limiter
 
@@ -12422,12 +12705,19 @@ Default value is @code{0}.
 
 @item tolerance
 Set the range of luma values to be keyed out.
-Default value is @code{0}.
+Default value is @code{0.01}.
 
 @item softness
 Set the range of softness. Default value is @code{0}.
 Use this to control gradual transition from zero to full transparency.
 @end table
+
+@subsection Commands
+This filter supports same @ref{commands} as options.
+The command accepts the same syntax of the corresponding option.
+
+If the specified expression is not valid, it is kept at its current
+value.
 
 @section lut, lutrgb, lutyuv
 
@@ -12793,6 +13083,33 @@ encoder.
 Higher values should result in a smoother motion vector field but less
 optimal individual vectors. Default value is 1.
 @end table
+
+@section median
+
+Pick median pixel from certain rectangle defined by radius.
+
+This filter accepts the following options:
+
+@table @option
+@item radius
+Set horizontal radius size. Default value is @code{1}.
+Allowed range is integer from 1 to 127.
+
+@item planes
+Set which planes to process. Default is @code{15}, which is all available planes.
+
+@item radiusV
+Set vertical radius size. Default value is @code{0}.
+Allowed range is integer from 0 to 127.
+If it is 0, value will be picked from horizontal @code{radius} option.
+@end table
+
+@subsection Commands
+This filter supports same @ref{commands} as options.
+The command accepts the same syntax of the corresponding option.
+
+If the specified expression is not valid, it is kept at its current
+value.
 
 @section mergeplanes
 
@@ -13362,6 +13679,13 @@ expensive no-op. Defaults to 1.0 (full strength).
 
 @end table
 
+@subsection Commands
+This filter supports same @ref{commands} as options, excluding @var{smoothing} option.
+The command accepts the same syntax of the corresponding option.
+
+If the specified expression is not valid, it is kept at its current
+value.
+
 @subsection Examples
 
 Stretch video contrast to use the full dynamic range, with no temporal
@@ -13574,6 +13898,13 @@ Draw some statistics. By default is enabled.
 @item sc
 Draw scope. By default is enabled.
 @end table
+
+@subsection Commands
+This filter supports same @ref{commands} as options.
+The command accepts the same syntax of the corresponding option.
+
+If the specified expression is not valid, it is kept at its current
+value.
 
 @subsection Examples
 
@@ -14857,6 +15188,9 @@ Maximum allowed value for each channel, and average over all
 channels.
 @end table
 
+@subsection Examples
+@itemize
+@item
 For example:
 @example
 movie=ref_movie.mpg, setpts=PTS-STARTPTS [main];
@@ -14866,6 +15200,13 @@ movie=ref_movie.mpg, setpts=PTS-STARTPTS [main];
 On this example the input file being processed is compared with the
 reference file @file{ref_movie.mpg}. The PSNR of each individual frame
 is stored in @file{stats.log}.
+
+@item
+Another example with different containers:
+@example
+ffmpeg -i main.mpg -i ref.mkv -lavfi  "[0:v]settb=AVTB,setpts=PTS-STARTPTS[main];[1:v]settb=AVTB,setpts=PTS-STARTPTS[ref];[main][ref]psnr" -f null -
+@end example
+@end itemize
 
 @anchor{pullup}
 @section pullup
@@ -15290,6 +15631,10 @@ Set amount to shift alpha vertically.
 @item edge
 Set edge mode, can be @var{smear}, default, or @var{warp}.
 @end table
+
+@subsection Commands
+
+This filter supports the all above options as @ref{commands}.
 
 @section roberts
 Apply roberts cross operator to input video stream.
@@ -15867,6 +16212,46 @@ Supersampling
 
 @item lanczos
 @end table
+
+@item force_original_aspect_ratio
+Enable decreasing or increasing output video width or height if necessary to
+keep the original aspect ratio. Possible values:
+
+@table @samp
+@item disable
+Scale the video as specified and disable this feature.
+
+@item decrease
+The output video dimensions will automatically be decreased if needed.
+
+@item increase
+The output video dimensions will automatically be increased if needed.
+
+@end table
+
+One useful instance of this option is that when you know a specific device's
+maximum allowed resolution, you can use this to limit the output video to
+that, while retaining the aspect ratio. For example, device A allows
+1280x720 playback, and your video is 1920x800. Using this option (set it to
+decrease) and specifying 1280x720 to the command line makes the output
+1280x533.
+
+Please note that this is a different thing than specifying -1 for @option{w}
+or @option{h}, you still need to specify the output resolution for this option
+to work.
+
+@item force_divisible_by
+Ensures that both the output dimensions, width and height, are divisible by the
+given integer when used together with @option{force_original_aspect_ratio}. This
+works similar to using @code{-n} in the @option{w} and @option{h} options.
+
+This option respects the value set for @option{force_original_aspect_ratio},
+increasing or decreasing the resolution accordingly. The video's aspect ratio
+may be slightly modified.
+
+This option can be handy if you need to have a video fit within or exceed
+a defined resolution using @option{force_original_aspect_ratio} but also have
+encoder restrictions on width or height divisibility.
 
 @end table
 
@@ -16908,6 +17293,9 @@ Same as above but in dB representation.
 
 This filter also supports the @ref{framesync} options.
 
+@subsection Examples
+@itemize
+@item
 For example:
 @example
 movie=ref_movie.mpg, setpts=PTS-STARTPTS [main];
@@ -16918,10 +17306,18 @@ On this example the input file being processed is compared with the
 reference file @file{ref_movie.mpg}. The SSIM of each individual frame
 is stored in @file{stats.log}.
 
+@item
 Another example with both psnr and ssim at same time:
 @example
 ffmpeg -i main.mpg -i ref.mpg -lavfi  "ssim;[0:v][1:v]psnr" -f null -
 @end example
+
+@item
+Another example with different containers:
+@example
+ffmpeg -i main.mpg -i ref.mkv -lavfi  "[0:v]settb=AVTB,setpts=PTS-STARTPTS[main];[1:v]settb=AVTB,setpts=PTS-STARTPTS[ref];[main][ref]ssim" -f null -
+@end example
+@end itemize
 
 @section stereo3d
 
@@ -18899,8 +19295,8 @@ This filter tries to detect if the input is variable or constant frame rate.
 
 At end it will output number of frames detected as having variable delta pts,
 and ones with constant delta pts.
-If there was frames with variable delta, than it will also show min and max delta
-encountered.
+If there was frames with variable delta, than it will also show min, max and
+average delta encountered.
 
 @section vibrance
 
@@ -19048,16 +19444,23 @@ vignette='PI/4+random(1)*PI/50':eval=frame
 
 @section vmafmotion
 
-Obtain the average vmaf motion score of a video.
-It is one of the component filters of VMAF.
+Obtain the average VMAF motion score of a video.
+It is one of the component metrics of VMAF.
 
 The obtained average motion score is printed through the logging system.
 
-In the below example the input file @file{ref.mpg} is being processed and score
-is computed.
+The filter accepts the following options:
 
+@table @option
+@item stats_file
+If specified, the filter will use the named file to save the motion score of
+each frame with respect to the previous frame.
+When filename equals "-" the data is sent to standard output.
+@end table
+
+Example:
 @example
-ffmpeg -i ref.mpg -lavfi vmafmotion -f null -
+ffmpeg -i ref.mpg -vf vmafmotion -f null -
 @end example
 
 @section vstack
@@ -19557,6 +19960,28 @@ Only deinterlace frames marked as interlaced.
 
 The default value is @code{all}.
 @end table
+
+@section yaepblur
+
+Apply blur filter while preserving edges ("yaepblur" means "yet another edge preserving blur filter").
+The algorithm is described in
+"J. S. Lee, Digital image enhancement and noise filtering by use of local statistics, IEEE Trans. Pattern Anal. Mach. Intell. PAMI-2, 1980."
+
+It accepts the following parameters:
+
+@table @option
+@item radius, r
+Set the window radius. Default value is 3.
+
+@item planes, p
+Set which planes to filter. Default is only the first plane.
+
+@item sigma, s
+Set blur strength. Default value is 128.
+@end table
+
+@subsection Commands
+This filter supports same @ref{commands} as options.
 
 @section zoompan
 
@@ -20350,7 +20775,7 @@ Set the x coordinate of the overlaid video on the main video.
 Default value is @code{0}.
 
 @item y
-Set the x coordinate of the overlaid video on the main video.
+Set the y coordinate of the overlaid video on the main video.
 Default value is @code{0}.
 
 @end table
@@ -21450,6 +21875,15 @@ draw channels. Unrecognized or missing colors will be replaced
 by white color.
 @end table
 
+@section adrawgraph
+Draw a graph using input audio metadata.
+
+See @ref{drawgraph}
+
+@section agraphmonitor
+
+See @ref{graphmonitor}.
+
 @section ahistogram
 
 Convert input audio to a video output, displaying the volume histogram.
@@ -21810,111 +22244,6 @@ This filter supports the following commands:
 @item next
 Close the current segment and step to the next one
 @end table
-
-@section drawgraph, adrawgraph
-
-Draw a graph using input video or audio metadata.
-
-It accepts the following parameters:
-
-@table @option
-@item m1
-Set 1st frame metadata key from which metadata values will be used to draw a graph.
-
-@item fg1
-Set 1st foreground color expression.
-
-@item m2
-Set 2nd frame metadata key from which metadata values will be used to draw a graph.
-
-@item fg2
-Set 2nd foreground color expression.
-
-@item m3
-Set 3rd frame metadata key from which metadata values will be used to draw a graph.
-
-@item fg3
-Set 3rd foreground color expression.
-
-@item m4
-Set 4th frame metadata key from which metadata values will be used to draw a graph.
-
-@item fg4
-Set 4th foreground color expression.
-
-@item min
-Set minimal value of metadata value.
-
-@item max
-Set maximal value of metadata value.
-
-@item bg
-Set graph background color. Default is white.
-
-@item mode
-Set graph mode.
-
-Available values for mode is:
-@table @samp
-@item bar
-@item dot
-@item line
-@end table
-
-Default is @code{line}.
-
-@item slide
-Set slide mode.
-
-Available values for slide is:
-@table @samp
-@item frame
-Draw new frame when right border is reached.
-
-@item replace
-Replace old columns with new ones.
-
-@item scroll
-Scroll from right to left.
-
-@item rscroll
-Scroll from left to right.
-
-@item picture
-Draw single picture.
-@end table
-
-Default is @code{frame}.
-
-@item size
-Set size of graph video. For the syntax of this option, check the
-@ref{video size syntax,,"Video size" section in the ffmpeg-utils manual,ffmpeg-utils}.
-The default value is @code{900x256}.
-
-The foreground color expressions can use the following variables:
-@table @option
-@item MIN
-Minimal value of metadata value.
-
-@item MAX
-Maximal value of metadata value.
-
-@item VAL
-Current metadata key value.
-@end table
-
-The color is defined as 0xAABBGGRR.
-@end table
-
-Example using metadata from @ref{signalstats} filter:
-@example
-signalstats,drawgraph=lavfi.signalstats.YAVG:min=0:max=255
-@end example
-
-Example using metadata from @ref{ebur128} filter:
-@example
-ebur128=metadata=1,adrawgraph=lavfi.r128.M:min=-120:max=5
-@end example
 
 @anchor{ebur128}
 @section ebur128

@@ -187,7 +187,7 @@ static inline void calc_precision(ATRAC9Context *s, ATRAC9BlockData *b,
     for (int i = 0; i < b->q_unit_cnt; i++) {
         c->precision_fine[i] = 0;
         if (c->precision_coarse[i] > 15) {
-            c->precision_fine[i] = c->precision_coarse[i] - 15;
+            c->precision_fine[i] = FFMIN(c->precision_coarse[i], 30) - 15;
             c->precision_coarse[i] = 15;
         }
     }
@@ -199,7 +199,7 @@ static inline int parse_band_ext(ATRAC9Context *s, ATRAC9BlockData *b,
     int ext_band = 0;
 
     if (b->has_band_ext) {
-        if (b->q_unit_cnt < 13)
+        if (b->q_unit_cnt < 13 || b->q_unit_cnt > 20)
             return AVERROR_INVALIDDATA;
         ext_band = at9_tab_band_ext_group[b->q_unit_cnt - 13][2];
         if (stereo) {

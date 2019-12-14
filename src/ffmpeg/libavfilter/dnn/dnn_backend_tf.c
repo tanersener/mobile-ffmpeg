@@ -83,7 +83,7 @@ static TF_Buffer *read_graph(const char *model_filename)
     return graph_buf;
 }
 
-static TF_Tensor *allocate_input_tensor(const DNNInputData *input)
+static TF_Tensor *allocate_input_tensor(const DNNData *input)
 {
     TF_DataType dt;
     size_t size;
@@ -105,7 +105,38 @@ static TF_Tensor *allocate_input_tensor(const DNNInputData *input)
                              input_dims[1] * input_dims[2] * input_dims[3] * size);
 }
 
-static DNNReturnType set_input_output_tf(void *model, DNNInputData *input, const char *input_name, const char **output_names, uint32_t nb_output)
+static DNNReturnType get_input_tf(void *model, DNNData *input, const char *input_name)
+{
+    TFModel *tf_model = (TFModel *)model;
+    TF_Status *status;
+    int64_t dims[4];
+
+    TF_Output tf_output;
+    tf_output.oper = TF_GraphOperationByName(tf_model->graph, input_name);
+    if (!tf_output.oper)
+        return DNN_ERROR;
+
+    tf_output.index = 0;
+    input->dt = TF_OperationOutputType(tf_output);
+
+    status = TF_NewStatus();
+    TF_GraphGetTensorShape(tf_model->graph, tf_output, dims, 4, status);
+    if (TF_GetCode(status) != TF_OK){
+        TF_DeleteStatus(status);
+        return DNN_ERROR;
+    }
+    TF_DeleteStatus(status);
+
+    // currently only NHWC is supported
+    av_assert0(dims[0] == 1);
+    input->height = dims[1];
+    input->width = dims[2];
+    input->channels = dims[3];
+
+    return DNN_SUCCESS;
+}
+
+static DNNReturnType set_input_output_tf(void *model, DNNData *input, const char *input_name, const char **output_names, uint32_t nb_output)
 {
     TFModel *tf_model = (TFModel *)model;
     TF_SessionOptions *sess_opts;
@@ -568,6 +599,7 @@ DNNModel *ff_dnn_load_model_tf(const char *model_filename)
 
     model->model = (void *)tf_model;
     model->set_input_output = &set_input_output_tf;
+    model->get_input = &get_input_tf;
 
     return model;
 }
@@ -603,6 +635,7 @@ DNNReturnType ff_dnn_execute_model_tf(const DNNModel *model, DNNData *outputs, u
         outputs[i].width = TF_Dim(tf_model->output_tensors[i], 2);
         outputs[i].channels = TF_Dim(tf_model->output_tensors[i], 3);
         outputs[i].data = TF_TensorData(tf_model->output_tensors[i]);
+        outputs[i].dt = TF_TensorType(tf_model->output_tensors[i]);
     }
 
     return DNN_SUCCESS;
