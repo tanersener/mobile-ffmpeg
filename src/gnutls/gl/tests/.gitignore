@@ -1,0 +1,8 @@
+/sys/
+/Makefile
+/ctype.h
+/fcntl.h
+/inttypes.h
+/langinfo.h
+/locale.h
+/signal.h

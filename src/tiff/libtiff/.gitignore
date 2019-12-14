@@ -1,0 +1,9 @@
+*.o
+*.lo
+*.la
+/Makefile
+/mkg3states
+/stamp-h1
+/stamp-h2
+/tif_config.h
+/tiffconf.h

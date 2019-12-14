@@ -1,0 +1,8 @@
+/.deps/
+/.libs/
+*.o
+/fribidi
+/fribidi-benchmark
+/fribidi-bidi-types
+/fribidi-caprtl2utf8
+/Makefile

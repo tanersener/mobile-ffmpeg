@@ -1,0 +1,5 @@
+*.o
+*.lo
+*.la
+/Makefile
+/gnutls.pc

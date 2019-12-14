@@ -4,3 +4,5 @@
 /libtiff-4.pc
 /libtool
 /autom4te.cache/
+.libs
+.deps

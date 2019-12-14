@@ -1,0 +1,4 @@
+*.lo
+*.o
+*.la
+/Makefile
