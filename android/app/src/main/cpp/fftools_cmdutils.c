@@ -117,7 +117,7 @@ void uninit_opts(void)
 
 void init_dynload(void)
 {
-#ifdef _WIN32
+#if HAVE_SETDLLDIRECTORY
     /* Calling SetDllDirectory with the empty string (but not NULL) removes the
      * current working directory from the DLL search path as a security pre-caution. */
     SetDllDirectory("");
@@ -856,8 +856,8 @@ do {                                                                           \
     }
 
     if (octx->cur_group.nb_opts || codec_opts || format_opts || resample_opts)
-        av_log(NULL, AV_LOG_WARNING, "Trailing options were found on the "
-               "commandline.\n");
+        av_log(NULL, AV_LOG_WARNING, "Trailing option(s) found in the "
+               "command: may be ignored.\n");
 
     av_log(NULL, AV_LOG_DEBUG, "Finished splitting the commandline.\n");
 
@@ -988,6 +988,7 @@ static int init_report(const char *env)
     char *filename_template = NULL;
     char *key, *val;
     int ret, count = 0;
+    int prog_loglevel, envlevel = 0;
     time_t now;
     struct tm *tm;
     AVBPrint filename;
@@ -1019,6 +1020,7 @@ static int init_report(const char *env)
                 av_log(NULL, AV_LOG_FATAL, "Invalid report file level\n");
                 exit_program(1);
             }
+            envlevel = 1;
         } else {
             av_log(NULL, AV_LOG_ERROR, "Unknown key '%s' in FFREPORT\n", key);
         }
@@ -1035,6 +1037,10 @@ static int init_report(const char *env)
         return AVERROR(ENOMEM);
     }
 
+    prog_loglevel = av_log_get_level();
+    if (!envlevel)
+        report_file_level = FFMAX(report_file_level, prog_loglevel);
+
     report_file = fopen(filename.str, "w");
     if (!report_file) {
         int ret = AVERROR(errno);
@@ -1045,16 +1051,17 @@ static int init_report(const char *env)
     av_log_set_callback(mobileffmpeg_log_callback_function);
     av_log(NULL, AV_LOG_INFO,
            "%s started on %04d-%02d-%02d at %02d:%02d:%02d\n"
-           "Report written to \"%s\"\n",
+           "Report written to \"%s\"\n"
+           "Log level: %d\n",
            program_name,
            tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday,
            tm->tm_hour, tm->tm_min, tm->tm_sec,
-           filename.str);
+           filename.str, report_file_level);
     av_bprint_finalize(&filename, NULL);
     return 0;
 }
 
-int opt_report(const char *opt)
+int opt_report(void *optctx, const char *opt, const char *arg)
 {
     return init_report(NULL);
 }
@@ -2038,7 +2045,7 @@ FILE *get_preset_file(char *filename, size_t filename_size,
         av_strlcpy(filename, preset_name, filename_size);
         f = fopen(filename, "r");
     } else {
-#ifdef _WIN32
+#if HAVE_GETMODULEHANDLE
         char datadir[MAX_PATH], *ls;
         base[2] = NULL;
 
