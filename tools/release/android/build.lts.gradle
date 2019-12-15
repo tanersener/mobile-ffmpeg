@@ -1,13 +1,13 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
 
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 28
-        versionCode 160430
-        versionName "4.3.LTS"
+        targetSdkVersion 29
+        versionCode 160431
+        versionName "4.3.1.LTS"
         project.archivesBaseName = "mobile-ffmpeg"
         consumerProguardFiles 'proguard-rules.pro'
     }
