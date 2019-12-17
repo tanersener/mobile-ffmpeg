@@ -24,7 +24,6 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * <p>Main class for FFmpeg operations. Provides {@link #execute(String...)} method to execute
@@ -43,11 +42,7 @@ public class FFmpeg {
 
     public static final int RETURN_CODE_CANCEL = 255;
 
-    public static final int RETURN_CODE_MULTIPLE_EXECUTIONS_NOT_ALLOWED = 300;
-
     private static int lastReturnCode = 0;
-
-    private static final AtomicBoolean started = new AtomicBoolean(false);
 
     static {
         AbiDetect.class.getName();
@@ -89,14 +84,7 @@ public class FFmpeg {
      * @return zero on successful execution, 255 on user cancel and non-zero on error
      */
     public static int execute(final String[] arguments) {
-        if (started.compareAndSet(false, true)) {
-            lastReturnCode = Config.nativeExecute(arguments);
-            started.compareAndSet(true, false);
-        } else {
-            Log.e(Config.TAG, "execute cancelled. Multiple executions not supported.");
-            lastReturnCode = RETURN_CODE_MULTIPLE_EXECUTIONS_NOT_ALLOWED;
-        }
-
+        lastReturnCode = Config.nativeExecute(arguments);
         return lastReturnCode;
     }
 
@@ -146,8 +134,13 @@ public class FFmpeg {
     }
 
     /**
-     * <p>Returns log output of the last executed command. Please note that disabling redirection
-     * using {@link Config#disableRedirection()} method also disables this functionality.
+     * <p>Returns log output of last executed single command.
+     *
+     * <p>This method does not support executing multiple concurrent commands. If you execute
+     * multiple commands at the same time, this method will return output from all executions.
+     *
+     * <p>Please note that disabling redirection using {@link Config#disableRedirection()} method
+     * also disables this functionality.
      *
      * @return output of the last executed command
      * @since 3.0
@@ -165,6 +158,10 @@ public class FFmpeg {
     /**
      * <p>Returns media information for given file.
      *
+     * <p>This method does not support executing multiple concurrent operations. If you execute
+     * multiple operations (execute or getMediaInformation) at the same time, the response of this
+     * method is not predictable.
+     *
      * @param path path or uri of media file
      * @return media information
      * @since 3.0
@@ -176,20 +173,17 @@ public class FFmpeg {
     /**
      * <p>Returns media information for given file.
      *
+     * <p>This method does not support executing multiple concurrent operations. If you execute
+     * multiple operations (execute or getMediaInformation) at the same time, the response of this
+     * method is not predictable.
+     *
      * @param path    path or uri of media file
      * @param timeout complete timeout
      * @return media information
      * @since 3.0
      */
     public static MediaInformation getMediaInformation(final String path, final Long timeout) {
-        final int rc;
-        if (started.compareAndSet(false, true)) {
-            rc = Config.systemExecute(new String[]{"-v", "info", "-hide_banner", "-i", path}, new ArrayList<>(Arrays.asList("Press [q] to stop, [?] for help", "No such file or directory", "Input/output error", "Conversion failed", "HTTP error")), "At least one output file must be specified", timeout);
-            started.compareAndSet(true, false);
-        } else {
-            Log.e(Config.TAG, "getMediaInformation cancelled. Multiple executions not supported.");
-            rc = RETURN_CODE_MULTIPLE_EXECUTIONS_NOT_ALLOWED;
-        }
+        final int rc = Config.systemExecute(new String[]{"-v", "info", "-hide_banner", "-i", path}, new ArrayList<>(Arrays.asList("Press [q] to stop, [?] for help", "No such file or directory", "Input/output error", "Conversion failed", "HTTP error")), "At least one output file must be specified", timeout);
 
         if (rc == 0) {
             return MediaInformationParser.from(Config.getSystemCommandOutput());

@@ -23,16 +23,15 @@ import android.app.AlertDialog;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.VideoView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 import com.arthenica.mobileffmpeg.Config;
 import com.arthenica.mobileffmpeg.FFmpeg;
@@ -50,7 +49,6 @@ import java.math.BigDecimal;
 import java.util.concurrent.Callable;
 
 import static com.arthenica.mobileffmpeg.FFmpeg.RETURN_CODE_CANCEL;
-import static com.arthenica.mobileffmpeg.FFmpeg.RETURN_CODE_MULTIPLE_EXECUTIONS_NOT_ALLOWED;
 import static com.arthenica.mobileffmpeg.FFmpeg.RETURN_CODE_SUCCESS;
 import static com.arthenica.mobileffmpeg.test.MainActivity.TAG;
 
@@ -169,10 +167,6 @@ public class SubtitleTabFragment extends Fragment {
                 public void apply(final int returnCode, final String commandOutput) {
                     Log.d(TAG, String.format("FFmpeg process exited with rc %d", returnCode));
 
-                    if (returnCode != RETURN_CODE_MULTIPLE_EXECUTIONS_NOT_ALLOWED) {
-                        state = State.IDLE;
-                    }
-
                     hideCreateProgressDialog();
 
                     MainActivity.addUIAction(new Callable() {
@@ -197,10 +191,6 @@ public class SubtitleTabFragment extends Fragment {
                                     public void apply(final int returnCode, final String commandOutput) {
                                         Log.d(TAG, String.format("FFmpeg process exited with rc %d", returnCode));
 
-                                        if (returnCode != RETURN_CODE_MULTIPLE_EXECUTIONS_NOT_ALLOWED) {
-                                            state = State.IDLE;
-                                        }
-
                                         hideBurnProgressDialog();
 
                                         MainActivity.addUIAction(new Callable() {
@@ -213,9 +203,6 @@ public class SubtitleTabFragment extends Fragment {
                                                 } else if (returnCode == RETURN_CODE_CANCEL) {
                                                     Popup.show(requireContext(), "Burn subtitles operation cancelled.");
                                                     Log.e(TAG, "Burn subtitles operation cancelled");
-                                                } else if (returnCode == RETURN_CODE_MULTIPLE_EXECUTIONS_NOT_ALLOWED) {
-                                                    Popup.show(requireContext(), "Multiple burn subtitles operations not allowed.");
-                                                    Log.e(TAG, "Multiple burn subtitles operations not allowed");
                                                 } else {
                                                     Popup.show(requireContext(), "Burn subtitles failed. Please check log for the details.");
                                                     Log.e(TAG, String.format("Burn subtitles failed with rc=%d", returnCode));
@@ -230,9 +217,6 @@ public class SubtitleTabFragment extends Fragment {
                             } else if (returnCode == RETURN_CODE_CANCEL) {
                                 Popup.show(requireContext(), "Create operation cancelled.");
                                 Log.e(TAG, "Create operation cancelled");
-                            } else if (returnCode == RETURN_CODE_MULTIPLE_EXECUTIONS_NOT_ALLOWED) {
-                                Popup.show(requireContext(), "Multiple create operations not allowed.");
-                                Log.e(TAG, "Multiple create operations not allowed");
                             } else {
                                 Popup.show(requireContext(), "Create video failed. Please check log for the details.");
                                 Log.e(TAG, String.format("Create failed with rc=%d", returnCode));

@@ -29,7 +29,6 @@ extern NSString *const MOBILE_FFMPEG_VERSION;
 /** Common return code values */
 extern int const RETURN_CODE_SUCCESS;
 extern int const RETURN_CODE_CANCEL;
-extern int const RETURN_CODE_MULTIPLE_EXECUTIONS_NOT_ALLOWED;
 
 /**
  * Main class for FFmpeg operations.

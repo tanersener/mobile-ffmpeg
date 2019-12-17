@@ -20,4 +20,4 @@
 #include "mobileffmpeg_exception.h"
 
 /** Holds information to implement exception handling. */
-jmp_buf ex_buf__;
+__thread jmp_buf ex_buf__;

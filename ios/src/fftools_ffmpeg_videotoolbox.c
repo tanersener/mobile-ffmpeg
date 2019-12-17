@@ -31,7 +31,7 @@ typedef struct VTContext {
     AVFrame *tmp_frame;
 } VTContext;
 
-char *videotoolbox_pixfmt;
+__thread char *videotoolbox_pixfmt;
 
 static int videotoolbox_retrieve_data(AVCodecContext *s, AVFrame *frame)
 {

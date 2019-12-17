@@ -20,6 +20,9 @@
  */
 
 /*
+ * CHANGES 12.2019
+ * - Concurrent execution support
+ *
  * CHANGES 08.2018
  * --------------------------------------------------------
  * - fftools_ prefix added to file name and parent header
@@ -86,14 +89,14 @@
 static int init_report(const char *env);
 extern void mobileffmpeg_log_callback_function(void *ptr, int level, const char* format, va_list vargs);
 
-AVDictionary *sws_dict;
-AVDictionary *swr_opts;
-AVDictionary *format_opts, *codec_opts, *resample_opts;
+__thread AVDictionary *sws_dict;
+__thread AVDictionary *swr_opts;
+__thread AVDictionary *format_opts, *codec_opts, *resample_opts;
 
-static FILE *report_file;
-static int report_file_level = AV_LOG_DEBUG;
-int hide_banner = 0;
-int longjmp_value = 0;
+__thread FILE *report_file;
+__thread int report_file_level = AV_LOG_DEBUG;
+__thread int hide_banner = 0;
+__thread int longjmp_value = 0;
 
 enum show_muxdemuxers {
     SHOW_DEFAULT,
@@ -1103,7 +1106,7 @@ void print_error(const char *filename, int err)
     av_log(NULL, AV_LOG_ERROR, "%s: %s\n", filename, errbuf_ptr);
 }
 
-static int warned_cfg = 0;
+__thread int warned_cfg = 0;
 
 #define INDENT        1
 #define SHOW_VERSION  2
