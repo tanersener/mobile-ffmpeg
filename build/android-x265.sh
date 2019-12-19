@@ -65,6 +65,9 @@ fi
 mkdir cmake-build || exit 1
 cd cmake-build || exit 1
 
+# FIX static_assert ERRORS
+${SED_INLINE} 's/gnu++98/c++11/g' ${BASEDIR}/src/${LIB_NAME}/source/CMakeLists.txt
+
 cmake -Wno-dev \
     -DCMAKE_VERBOSE_MAKEFILE=0 \
     -DCMAKE_C_FLAGS="${CFLAGS}" \
