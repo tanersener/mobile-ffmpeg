@@ -51,7 +51,7 @@ fi
 # ld: -force_cpusubtype_ALL and -bitcode_bundle (Xcode setting ENABLE_BITCODE=YES) cannot be used together
 ${SED_INLINE} 's/-force_cpusubtype_ALL//g' ${BASEDIR}/src/${LIB_NAME}/configure
 
-./configure \
+PKG_CONFIG= ./configure \
     --prefix=${BASEDIR}/prebuilt/$(get_target_build_directory)/${LIB_NAME} \
     --with-pic \
     --with-sysroot=${SDK_PATH} \
