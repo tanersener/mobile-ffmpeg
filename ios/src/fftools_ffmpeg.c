@@ -180,7 +180,7 @@ __thread int         nb_output_files   = 0;
 __thread FilterGraph **filtergraphs;
 __thread int        nb_filtergraphs;
 
-static void (*report_callback)(int, float, float, int64_t, int, double, double) = NULL;
+void (*report_callback)(int, float, float, int64_t, int, double, double) = NULL;
 
 extern __thread int file_overwrite;
 extern __thread int no_file_overwrite;
