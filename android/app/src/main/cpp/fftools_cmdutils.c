@@ -20,6 +20,10 @@
  */
 
 /*
+ * CHANGES 12.2019
+ * - Concurrent execution support
+ * - log_callback_report method re-added to fix -report option issues
+ *
  * CHANGES 08.2018
  * --------------------------------------------------------
  * - fftools_ prefix added to file name and parent header
@@ -85,15 +89,16 @@
 
 static int init_report(const char *env);
 extern void mobileffmpeg_log_callback_function(void *ptr, int level, const char* format, va_list vargs);
+extern void (*report_callback)(int, float, float, int64_t, int, double, double);
 
-AVDictionary *sws_dict;
-AVDictionary *swr_opts;
-AVDictionary *format_opts, *codec_opts, *resample_opts;
+__thread AVDictionary *sws_dict;
+__thread AVDictionary *swr_opts;
+__thread AVDictionary *format_opts, *codec_opts, *resample_opts;
 
-static FILE *report_file;
-static int report_file_level = AV_LOG_DEBUG;
-int hide_banner = 0;
-int longjmp_value = 0;
+FILE *report_file;
+int report_file_level = AV_LOG_DEBUG;
+__thread int hide_banner = 0;
+__thread int longjmp_value = 0;
 
 enum show_muxdemuxers {
     SHOW_DEFAULT,
@@ -113,6 +118,26 @@ void uninit_opts(void)
     av_dict_free(&format_opts);
     av_dict_free(&codec_opts);
     av_dict_free(&resample_opts);
+}
+
+void log_callback_report(void *ptr, int level, const char *fmt, va_list vl)
+{
+    va_list vl2;
+    char line[1024];
+    static int print_prefix = 1;
+
+    va_copy(vl2, vl);
+    if (report_callback == NULL) {
+        av_log_default_callback(ptr, level, fmt, vl);
+    } else {
+        mobileffmpeg_log_callback_function(ptr, level, fmt, vl);
+    }
+    av_log_format_line(ptr, level, fmt, vl2, line, sizeof(line), &print_prefix);
+    va_end(vl2);
+    if (report_file_level >= level) {
+        fputs(line, report_file);
+        fflush(report_file);
+    }
 }
 
 void init_dynload(void)
@@ -473,7 +498,7 @@ int locate_option(int argc, char **argv, const OptionDef *options,
     return 0;
 }
 
-static void dump_argument(const char *a)
+void dump_argument(const char *a)
 {
     const unsigned char *p;
 
@@ -983,7 +1008,7 @@ static void expand_filename_template(AVBPrint *bp, const char *template,
     }
 }
 
-static int init_report(const char *env)
+int init_report(const char *env)
 {
     char *filename_template = NULL;
     char *key, *val;
@@ -1048,7 +1073,7 @@ static int init_report(const char *env)
                filename.str, strerror(errno));
         return ret;
     }
-    av_log_set_callback(mobileffmpeg_log_callback_function);
+    av_log_set_callback(log_callback_report);
     av_log(NULL, AV_LOG_INFO,
            "%s started on %04d-%02d-%02d at %02d:%02d:%02d\n"
            "Report written to \"%s\"\n"
@@ -1103,7 +1128,7 @@ void print_error(const char *filename, int err)
     av_log(NULL, AV_LOG_ERROR, "%s: %s\n", filename, errbuf_ptr);
 }
 
-static int warned_cfg = 0;
+__thread int warned_cfg = 0;
 
 #define INDENT        1
 #define SHOW_VERSION  2
@@ -1203,7 +1228,6 @@ void show_banner(int argc, char **argv, const OptionDef *options)
 
 int show_version(void *optctx, const char *opt, const char *arg)
 {
-    av_log_set_callback(mobileffmpeg_log_callback_function);
     print_program_info (SHOW_COPYRIGHT, AV_LOG_INFO);
     print_all_libs_info(SHOW_VERSION, AV_LOG_INFO);
 
@@ -1212,7 +1236,6 @@ int show_version(void *optctx, const char *opt, const char *arg)
 
 int show_buildconf(void *optctx, const char *opt, const char *arg)
 {
-    av_log_set_callback(mobileffmpeg_log_callback_function);
     print_buildconf      (INDENT|0, AV_LOG_INFO);
 
     return 0;
@@ -1987,7 +2010,6 @@ static void show_help_bsf(const char *name)
 int show_help(void *optctx, const char *opt, const char *arg)
 {
     char *topic, *par;
-    av_log_set_callback(mobileffmpeg_log_callback_function);
 
     topic = av_strdup(arg ? arg : "");
     if (!topic)

@@ -633,7 +633,7 @@ public class Config {
      * @param variableValue environment variable value
      * @return zero on success, non-zero on error
      */
-    native static int setNativeEnvironmentVariable(final String variableName, final String variableValue);
+    public native static int setNativeEnvironmentVariable(final String variableName, final String variableValue);
 
     /**
      * <p>Returns log output of the last executed command natively.

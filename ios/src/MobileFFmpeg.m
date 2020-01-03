@@ -35,11 +35,9 @@ NSString *const MOBILE_FFMPEG_VERSION = @"4.3.1";
 /** Common return code values */
 int const RETURN_CODE_SUCCESS = 0;
 int const RETURN_CODE_CANCEL = 255;
-int const RETURN_CODE_MULTIPLE_EXECUTIONS_NOT_ALLOWED = 300;
 
 int lastReturnCode;
 NSMutableString *lastCommandOutput;
-BOOL started;
 
 extern NSMutableString *systemCommandOutput;
 extern int mobileffmpeg_system_execute(NSArray *arguments, NSMutableArray *commandOutputEndPatternList, NSString *successPattern, long timeout);
@@ -49,20 +47,8 @@ extern int mobileffmpeg_system_execute(NSArray *arguments, NSMutableArray *comma
 
     lastReturnCode = 0;
     lastCommandOutput = [[NSMutableString alloc] init];
-    started = FALSE;
 
     NSLog(@"Loaded mobile-ffmpeg-%@-%@-%@-%@\n", [MobileFFmpegConfig getPackageName], [ArchDetect getArch], [MobileFFmpeg getVersion], [MobileFFmpeg getBuildDate]);
-}
-
-+(BOOL)compareAndSet:(BOOL)expect with:(BOOL)update {
-    @synchronized (self) {
-        if (started == expect) {
-            started = update;
-            return TRUE;
-        } else {
-            return FALSE;
-        }
-    }
 }
 
 /**
@@ -111,13 +97,7 @@ extern int mobileffmpeg_system_execute(NSArray *arguments, NSMutableArray *comma
     }
 
     // RUN
-    if ([MobileFFmpeg compareAndSet:FALSE with:TRUE]) {
-        lastReturnCode = execute(([arguments count] + 1), commandCharPArray);
-        [MobileFFmpeg compareAndSet:TRUE with:FALSE];
-    } else {
-        NSLog(@"execute cancelled. Multiple executions not supported.");
-        lastReturnCode = RETURN_CODE_MULTIPLE_EXECUTIONS_NOT_ALLOWED;
-    }
+    lastReturnCode = execute(([arguments count] + 1), commandCharPArray);
 
     // CLEANUP
     av_free(commandCharPArray[0]);
@@ -171,8 +151,13 @@ extern int mobileffmpeg_system_execute(NSArray *arguments, NSMutableArray *comma
 }
 
 /**
- * Returns log output of last executed command. Please note that disabling redirection using
- * MobileFFmpegConfig.disableRedirection() method also disables this functionality.
+ * Returns log output of last executed single command.
+ *
+ * This method does not support executing multiple concurrent commands. If you execute
+ * multiple commands at the same time, this method will return output from all executions.
+ *
+ * Please note that disabling redirection using MobileFFmpegConfig.disableRedirection() method
+ * also disables this functionality.
  *
  * @return output of last executed command
  */
@@ -183,6 +168,10 @@ extern int mobileffmpeg_system_execute(NSArray *arguments, NSMutableArray *comma
 /**
  * Returns media information for given file.
  *
+ * This method does not support executing multiple concurrent operations. If you execute
+ * multiple operations (execute or getMediaInformation) at the same time, the response of this
+ * method is not predictable.
+ *
  * @param path or uri of media file
  * @return media information
  */
@@ -192,6 +181,10 @@ extern int mobileffmpeg_system_execute(NSArray *arguments, NSMutableArray *comma
 
 /**
  * Returns media information for given file.
+ *
+ * This method does not support executing multiple concurrent operations. If you execute
+ * multiple operations (execute or getMediaInformation) at the same time, the response of this
+ * method is not predictable.
  *
  * @param path path or uri of media file
  * @param timeout complete timeout
