@@ -21,6 +21,7 @@
  * CHANGES 08.2019
  * --------------------------------------------------------
  * - lastCommandOutput methods introduced
+ * - AV_LOG_STDERR introduced
  *
  * CHANGES 04.2019
  * --------------------------------------------------------
@@ -53,6 +54,7 @@
 #include "libavutil/bprint.h"
 #include "fftools_ffmpeg.h"
 #include "mobileffmpeg.h"
+#include "mobileffprobe.h"
 
 /** Callback data structure */
 struct CallbackData {
@@ -119,21 +121,24 @@ JNINativeMethod configMethods[] = {
     {"getNativeLogLevel", "()I", (void*) Java_com_arthenica_mobileffmpeg_Config_getNativeLogLevel},
     {"getNativeFFmpegVersion", "()Ljava/lang/String;", (void*) Java_com_arthenica_mobileffmpeg_Config_getNativeFFmpegVersion},
     {"getNativeVersion", "()Ljava/lang/String;", (void*) Java_com_arthenica_mobileffmpeg_Config_getNativeVersion},
-    {"nativeExecute", "([Ljava/lang/String;)I", (void*) Java_com_arthenica_mobileffmpeg_Config_nativeExecute},
-    {"nativeCancel", "()V", (void*) Java_com_arthenica_mobileffmpeg_Config_nativeCancel},
+    {"nativeFFmpegExecute", "([Ljava/lang/String;)I", (void*) Java_com_arthenica_mobileffmpeg_Config_nativeFFmpegExecute},
+    {"nativeFFmpegCancel", "()V", (void*) Java_com_arthenica_mobileffmpeg_Config_nativeFFmpegCancel},
+    {"nativeFFprobeExecute", "([Ljava/lang/String;)I", (void*) Java_com_arthenica_mobileffmpeg_Config_nativeFFprobeExecute},
     {"registerNewNativeFFmpegPipe", "(Ljava/lang/String;)I", (void*) Java_com_arthenica_mobileffmpeg_Config_registerNewNativeFFmpegPipe},
     {"getNativeBuildDate", "()Ljava/lang/String;", (void*) Java_com_arthenica_mobileffmpeg_Config_getNativeBuildDate},
     {"setNativeEnvironmentVariable", "(Ljava/lang/String;Ljava/lang/String;)I", (void*) Java_com_arthenica_mobileffmpeg_Config_setNativeEnvironmentVariable}
 };
 
 /** Forward declaration for function defined in fftools_ffmpeg.c */
-int execute(int argc, char **argv);
+int ffmpeg_execute(int argc, char **argv);
 
 /** DEFINES LINE SIZE USED FOR LOGGING */
 #define LOG_LINE_SIZE 1024
 
 static const char *avutil_log_get_level_str(int level) {
     switch (level) {
+    case AV_LOG_STDERR:
+        return "stderr";
     case AV_LOG_QUIET:
         return "quiet";
     case AV_LOG_DEBUG:
@@ -462,7 +467,9 @@ void mobileffmpeg_log_callback_function(void *ptr, int level, const char* format
         level &= 0xff;
     }
     int activeLogLevel = av_log_get_level();
-    if ((activeLogLevel == AV_LOG_QUIET) || (level > activeLogLevel)) {
+
+    // AV_LOG_STDERR logs are always redirected
+    if ((activeLogLevel == AV_LOG_QUIET && level != AV_LOG_STDERR) || (level > activeLogLevel)) {
         return;
     }
 
@@ -584,7 +591,7 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_FALSE;
     }
 
-    if ((*env)->RegisterNatives(env, localConfigClass, configMethods, 11) < 0) {
+    if ((*env)->RegisterNatives(env, localConfigClass, configMethods, 12) < 0) {
         LOGE("OnLoad failed to RegisterNatives for class %s.\n", configClassName);
         return JNI_FALSE;
     }
@@ -730,14 +737,14 @@ JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_Config_getNativeVersio
 }
 
 /**
- * Synchronously executes FFmpeg command natively with arguments provided.
+ * Synchronously executes FFmpeg natively with arguments provided.
  *
  * @param env pointer to native method interface
  * @param object reference to the class on which this method is invoked
  * @param stringArray reference to the object holding FFmpeg command arguments
  * @return zero on successful execution, non-zero on error
  */
-JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_Config_nativeExecute(JNIEnv *env, jclass object, jobjectArray stringArray) {
+JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_Config_nativeFFmpegExecute(JNIEnv *env, jclass object, jobjectArray stringArray) {
     jstring *tempArray = NULL;
     int argumentCount = 1;
     char **argv = NULL;
@@ -771,7 +778,7 @@ JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_Config_nativeExecute(JNIE
     clearLastCommandOutput();
 
     // RUN
-    int retCode = execute(argumentCount, argv);
+    int retCode = ffmpeg_execute(argumentCount, argv);
 
     // CLEANUP
     if (tempArray != NULL) {
@@ -788,12 +795,12 @@ JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_Config_nativeExecute(JNIE
 }
 
 /**
- * Cancels an ongoing operation natively.
+ * Cancels an ongoing FFmpeg operation natively.
  *
  * @param env pointer to native method interface
  * @param object reference to the class on which this method is invoked
  */
-JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_Config_nativeCancel(JNIEnv *env, jclass object) {
+JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_Config_nativeFFmpegCancel(JNIEnv *env, jclass object) {
     cancel_operation();
 }
 

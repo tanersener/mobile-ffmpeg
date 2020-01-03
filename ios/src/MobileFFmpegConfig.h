@@ -24,6 +24,10 @@
 #include "LogDelegate.h"
 #include "StatisticsDelegate.h"
 
+/** Common return code values */
+extern int const RETURN_CODE_SUCCESS;
+extern int const RETURN_CODE_CANCEL;
+
 /** Identifier used for IOS logging. */
 extern NSString *const LIB_NAME;
 
@@ -74,35 +78,36 @@ extern NSString *const LIB_NAME;
 /**
  * This class is used to configure MobileFFmpeg library utilities/tools.
  *
- * 1. LogDelegate: By default this class redirects FFmpeg output to NSLog. As another
- * option, it is possible not to print messages to NSLog and pass them to a LogDelegate
- * function. This function can decide whether to print these logs, show them inside another
- * container or ignore them.
+ * 1. LogDelegate: This class redirects FFmpeg/FFprobe output to NSLog by default. As
+ * an alternative, it is possible not to print messages to NSLog and pass them to a
+ * LogDelegate function. This function can decide whether to print these logs, show them
+ * inside another container or ignore them.
  *
- * 2. setLogLevel:/getLogLevel: Use this methods to see/control FFmpeg
- * log severity.
+ * 2. setLogLevel:/getLogLevel: Use this methods to set/get
+ * FFmpeg/FFprobe log severity.
  *
- * 3. StatsDelegate: It is possible to receive statistics about ongoing operation by
- * defining a StatsDelegate or by calling getLastReceivedStats
- * method.
+ * 3. StatsDelegate: It is possible to receive statistics about ongoing
+ * operation by defining a StatsDelegate or by calling
+ * getLastReceivedStats method.
  *
  * 4. Font configuration: It is possible to register custom fonts with
  * setFontconfigConfigurationPath: and
  * setFontDirectory:with: methods.
  *
- * PS: This class is introduced in v2.1 as an enhanced version of older Log class.
  */
 @interface MobileFFmpegConfig : NSObject
 
 /**
  * Enables log and statistics redirection.
- * When redirection is not enabled FFmpeg logs are printed to stderr. By enabling redirection, they are routed to
- * NSLog and can be routed further to a log delegate.
- * Statistics redirection behaviour is similar. Statistics are not printed at all if redirection is not enabled.
- * If it is enabled then it is possible to define a statistics delegate but if you don't, they are not printed
- * anywhere and only saved as 'lastReceivedStatistics' data which can be polled with 'getLastReceivedStatistics()'.
- * Note that redirection is enabled by default. If you do not want to use its functionality please use
- * 'disableRedirection()' to disable it.
+ * When redirection is not enabled FFmpeg/FFprobe logs are printed to stderr. By enabling
+ * redirection, they are routed to NSLog and can be routed further to a log delegate.
+ * Statistics redirection behaviour is similar. Statistics are not printed at all if
+ * redirection is not enabled. If it is enabled then it is possible to define a statistics
+ * delegate but if you don't, they are not printed anywhere and only saved as
+ * 'lastReceivedStatistics' data which can be polled with
+ * '{@link #'getLastReceivedStatistics()'.
+ * Note that redirection is enabled by default. If you do not want to use its functionality
+ * please use 'disableRedirection()' to disable it.
  */
 + (void)enableRedirection;
 
@@ -206,5 +211,46 @@ extern NSString *const LIB_NAME;
  * @param ffmpegPipePath full path of ffmpeg pipe
  */
 + (void)closeFFmpegPipe: (NSString*)ffmpegPipePath;
+
+/**
+ * Returns FFmpeg version bundled within the library.
+ *
+ * @return FFmpeg version
+ */
++ (NSString*)getFFmpegVersion;
+
+/**
+ * Returns MobileFFmpeg library version.
+ *
+ * @return MobileFFmpeg version
+ */
++ (NSString*)getVersion;
+
+/**
+ * Returns MobileFFmpeg library build date.
+ *
+ * @return MobileFFmpeg library build date
+ */
++ (NSString*)getBuildDate;
+
+/**
+ * Returns return code of last executed command.
+ *
+ * @return return code of last executed command
+ */
++ (int)getLastReturnCode;
+
+/**
+ * Returns log output of last executed single FFmpeg/FFprobe command.
+ *
+ * This method does not support executing multiple concurrent commands. If you execute
+ * multiple commands at the same time, this method will return output from all executions.
+ *
+ * Please note that disabling redirection using MobileFFmpegConfig.disableRedirection() method
+ * also disables this functionality.
+ *
+ * @return output of last executed command
+ */
++ (NSString*)getLastCommandOutput;
 
 @end

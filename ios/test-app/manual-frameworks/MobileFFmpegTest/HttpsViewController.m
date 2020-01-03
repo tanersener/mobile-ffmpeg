@@ -20,7 +20,7 @@
 //
 
 #import <mobileffmpeg/MobileFFmpegConfig.h>
-#import <mobileffmpeg/MobileFFmpeg.h>
+#import <mobileffmpeg/MobileFFprobe.h>
 #import "HttpsViewController.h"
 
 @interface HttpsViewController ()
@@ -71,7 +71,7 @@
         NSLog(@"Testing HTTPS with default url \'%@\'\n", testUrl);
     }
     
-    MediaInformation* information = [MobileFFmpeg getMediaInformation:testUrl];
+    MediaInformation* information = [MobileFFprobe getMediaInformation:testUrl];
 
     if (information == nil) {
         NSLog(@"Get media information failed\n");

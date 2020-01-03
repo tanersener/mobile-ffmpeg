@@ -21,27 +21,27 @@ package com.arthenica.mobileffmpeg.util;
 
 import android.os.AsyncTask;
 
+import com.arthenica.mobileffmpeg.Config;
 import com.arthenica.mobileffmpeg.FFprobe;
-import com.arthenica.mobileffmpeg.MediaInformation;
 
-public class AsyncSingleGetMediaInformationTask extends AsyncTask<String, MediaInformation, MediaInformation> {
-    private final String path;
-    private final SingleGetMediaInformationCallback singleGetMediaInformationCallback;
+public class AsyncSingleFFprobeExecuteTask extends AsyncTask<String, Integer, Integer> {
+    private final String command;
+    private final SingleExecuteCallback singleExecuteCallback;
 
-    public AsyncSingleGetMediaInformationTask(final String path, final SingleGetMediaInformationCallback singleGetMediaInformationCallback) {
-        this.path = path;
-        this.singleGetMediaInformationCallback = singleGetMediaInformationCallback;
+    public AsyncSingleFFprobeExecuteTask(final String command, final SingleExecuteCallback singleExecuteCallback) {
+        this.command = command;
+        this.singleExecuteCallback = singleExecuteCallback;
     }
 
     @Override
-    protected MediaInformation doInBackground(final String... arguments) {
-        return FFprobe.getMediaInformation(path);
+    protected Integer doInBackground(final String... arguments) {
+        return FFprobe.execute(command);
     }
 
     @Override
-    protected void onPostExecute(final MediaInformation mediaInformation) {
-        if (singleGetMediaInformationCallback != null) {
-            singleGetMediaInformationCallback.apply(mediaInformation);
+    protected void onPostExecute(final Integer rc) {
+        if (singleExecuteCallback != null) {
+            singleExecuteCallback.apply(rc, Config.getLastCommandOutput());
         }
     }
 

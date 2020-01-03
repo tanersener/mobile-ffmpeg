@@ -40,16 +40,16 @@ import com.arthenica.mobileffmpeg.LogMessage;
 import com.arthenica.mobileffmpeg.Statistics;
 import com.arthenica.mobileffmpeg.StatisticsCallback;
 import com.arthenica.mobileffmpeg.util.DialogUtil;
-import com.arthenica.mobileffmpeg.util.SingleExecuteCallback;
 import com.arthenica.mobileffmpeg.util.ResourcesUtil;
+import com.arthenica.mobileffmpeg.util.SingleExecuteCallback;
 
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.concurrent.Callable;
 
-import static com.arthenica.mobileffmpeg.FFmpeg.RETURN_CODE_CANCEL;
-import static com.arthenica.mobileffmpeg.FFmpeg.RETURN_CODE_SUCCESS;
+import static com.arthenica.mobileffmpeg.Config.RETURN_CODE_CANCEL;
+import static com.arthenica.mobileffmpeg.Config.RETURN_CODE_SUCCESS;
 import static com.arthenica.mobileffmpeg.test.MainActivity.TAG;
 
 public class SubtitleTabFragment extends Fragment {

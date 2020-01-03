@@ -640,6 +640,7 @@ framework module mobileffmpeg {
   header "MediaInformationParser.h"
   header "MobileFFmpeg.h"
   header "MobileFFmpegConfig.h"
+  header "MobileFFprobe.h"
   header "Statistics.h"
   header "StatisticsDelegate.h"
   header "StreamInformation.h"

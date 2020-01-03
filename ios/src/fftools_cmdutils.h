@@ -20,6 +20,10 @@
  */
 
 /*
+ * CHANGES 01.2020
+ * - ffprobe support changes
+ * - AV_LOG_STDERR introduced
+ *
  * CHANGES 12.2019
  * - Concurrent execution support
  *
@@ -52,14 +56,19 @@
 #endif
 
 /**
+ * Defines logs printed to stderr by ffmpeg. They are not filtered and always redirected.
+ */
+#define AV_LOG_STDERR    -16
+
+/**
  * program name, defined by the program for show_version().
  */
-extern const char program_name[];
+extern __thread char *program_name;
 
 /**
  * program birth year, defined by the program for show_banner()
  */
-extern const int program_birth_year;
+extern __thread int program_birth_year;
 
 extern __thread AVCodecContext *avcodec_opts[AVMEDIA_TYPE_NB];
 extern __thread AVFormatContext *avformat_opts;
@@ -67,6 +76,7 @@ extern __thread AVDictionary *sws_dict;
 extern __thread AVDictionary *swr_opts;
 extern __thread AVDictionary *format_opts, *codec_opts, *resample_opts;
 extern __thread int hide_banner;
+extern __thread int find_stream_info;
 
 /**
  * Register a program-specific cleanup routine.
@@ -225,10 +235,11 @@ void show_help_options(const OptionDef *options, const char *msg, int req_flags,
 void show_help_children(const AVClass *class, int flags);
 
 /**
- * Per-fftool specific help handler. Implemented in each
+ * Per-fftool specific help handlers. Implemented in each
  * fftool, called by show_help().
  */
-void show_help_default(const char *opt, const char *arg);
+void show_help_default_ffmpeg(const char *opt, const char *arg);
+void show_help_default_ffprobe(const char *opt, const char *arg);
 
 /**
  * Generic -h handler common to all fftools.

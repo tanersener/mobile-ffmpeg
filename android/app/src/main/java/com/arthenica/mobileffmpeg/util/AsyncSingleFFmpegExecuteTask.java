@@ -21,13 +21,14 @@ package com.arthenica.mobileffmpeg.util;
 
 import android.os.AsyncTask;
 
+import com.arthenica.mobileffmpeg.Config;
 import com.arthenica.mobileffmpeg.FFmpeg;
 
-public class AsyncSingleExecuteTask extends AsyncTask<String, Integer, Integer> {
+public class AsyncSingleFFmpegExecuteTask extends AsyncTask<String, Integer, Integer> {
     private final String command;
     private final SingleExecuteCallback singleExecuteCallback;
 
-    public AsyncSingleExecuteTask(final String command, final SingleExecuteCallback singleExecuteCallback) {
+    public AsyncSingleFFmpegExecuteTask(final String command, final SingleExecuteCallback singleExecuteCallback) {
         this.command = command;
         this.singleExecuteCallback = singleExecuteCallback;
     }
@@ -40,7 +41,7 @@ public class AsyncSingleExecuteTask extends AsyncTask<String, Integer, Integer> 
     @Override
     protected void onPostExecute(final Integer rc) {
         if (singleExecuteCallback != null) {
-            singleExecuteCallback.apply(rc, FFmpeg.getLastCommandOutput());
+            singleExecuteCallback.apply(rc, Config.getLastCommandOutput());
         }
     }
 

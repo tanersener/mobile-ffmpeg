@@ -19,6 +19,9 @@
  */
 
 /*
+ * CHANGES 01.2020
+ * - ffprobe support changes
+ *
  * CHANGES 12.2019
  * - Concurrent execution support
  *
@@ -135,11 +138,11 @@ __thread int ignore_unknown_streams = 0;
 __thread int copy_unknown_streams = 0;
 __thread int find_stream_info = 1;
 
-extern __thread OptionDef *global_options;
+extern __thread OptionDef *ffmpeg_options;
 
 void uninit_options(OptionsContext *o)
 {
-    const OptionDef *po = global_options;
+    const OptionDef *po = ffmpeg_options;
     int i;
 
     /* all OPT_SPEC and OPT_STRING can be freed in generic way */
@@ -188,13 +191,13 @@ int show_hwaccels(void *optctx, const char *opt, const char *arg)
     enum AVHWDeviceType type = AV_HWDEVICE_TYPE_NONE;
     int i;
 
-    av_log(NULL, AV_LOG_INFO, "Hardware acceleration methods:\n");
+    av_log(NULL, AV_LOG_STDERR, "Hardware acceleration methods:\n");
     while ((type = av_hwdevice_iterate_types(type)) !=
            AV_HWDEVICE_TYPE_NONE)
-        av_log(NULL, AV_LOG_INFO, "%s\n", av_hwdevice_get_type_name(type));
+        av_log(NULL, AV_LOG_STDERR, "%s\n", av_hwdevice_get_type_name(type));
     for (i = 0; hwaccels[i].name; i++)
-        av_log(NULL, AV_LOG_INFO, "%s\n", hwaccels[i].name);
-    av_log(NULL, AV_LOG_INFO, "\n");
+        av_log(NULL, AV_LOG_STDERR, "%s\n", hwaccels[i].name);
+    av_log(NULL, AV_LOG_STDERR, "\n");
     return 0;
 }
 
@@ -258,25 +261,25 @@ int opt_video_standard(void *optctx, const char *opt, const char *arg)
 int opt_audio_codec(void *optctx, const char *opt, const char *arg)
 {
     OptionsContext *o = optctx;
-    return parse_option(o, "codec:a", arg, global_options);
+    return parse_option(o, "codec:a", arg, ffmpeg_options);
 }
 
 int opt_video_codec(void *optctx, const char *opt, const char *arg)
 {
     OptionsContext *o = optctx;
-    return parse_option(o, "codec:v", arg, global_options);
+    return parse_option(o, "codec:v", arg, ffmpeg_options);
 }
 
 int opt_subtitle_codec(void *optctx, const char *opt, const char *arg)
 {
     OptionsContext *o = optctx;
-    return parse_option(o, "codec:s", arg, global_options);
+    return parse_option(o, "codec:s", arg, ffmpeg_options);
 }
 
 int opt_data_codec(void *optctx, const char *opt, const char *arg)
 {
     OptionsContext *o = optctx;
-    return parse_option(o, "codec:d", arg, global_options);
+    return parse_option(o, "codec:d", arg, ffmpeg_options);
 }
 
 int opt_map(void *optctx, const char *opt, const char *arg)
@@ -514,11 +517,11 @@ int opt_init_hw_device(void *optctx, const char *opt, const char *arg)
 {
     if (!strcmp(arg, "list")) {
         enum AVHWDeviceType type = AV_HWDEVICE_TYPE_NONE;
-        av_log(NULL, AV_LOG_INFO, "Supported hardware device types:\n");
+        av_log(NULL, AV_LOG_STDERR, "Supported hardware device types:\n");
         while ((type = av_hwdevice_iterate_types(type)) !=
                AV_HWDEVICE_TYPE_NONE)
-            av_log(NULL, AV_LOG_INFO, "%s\n", av_hwdevice_get_type_name(type));
-        av_log(NULL, AV_LOG_INFO, "\n");
+            av_log(NULL, AV_LOG_STDERR, "%s\n", av_hwdevice_get_type_name(type));
+        av_log(NULL, AV_LOG_STDERR, "\n");
         exit_program(0);
     } else {
         return hw_device_init_from_string(arg, NULL);
@@ -671,7 +674,7 @@ int opt_recording_timestamp(void *optctx, const char *opt, const char *arg)
     struct tm time = *gmtime((time_t*)&recording_timestamp);
     if (!strftime(buf, sizeof(buf), "creation_time=%Y-%m-%dT%H:%M:%S%z", &time))
         return -1;
-    parse_option(o, "metadata", buf, global_options);
+    parse_option(o, "metadata", buf, ffmpeg_options);
 
     av_log(NULL, AV_LOG_WARNING, "%s is deprecated, set the 'creation_time' metadata "
                                  "tag instead.\n", opt);
@@ -2768,7 +2771,7 @@ loop_end:
 
 int opt_target(void *optctx, const char *opt, const char *arg)
 {
-    const OptionDef *options = global_options;
+    const OptionDef *options = ffmpeg_options;
     OptionsContext *o = optctx;
     enum { PAL, NTSC, FILM, UNKNOWN } norm = UNKNOWN;
     const char *const frame_rates[] = { "25", "30000/1001", "24000/1001" };
@@ -2936,19 +2939,19 @@ int opt_vstats(void *optctx, const char *opt, const char *arg)
 int opt_video_frames(void *optctx, const char *opt, const char *arg)
 {
     OptionsContext *o = optctx;
-    return parse_option(o, "frames:v", arg, global_options);
+    return parse_option(o, "frames:v", arg, ffmpeg_options);
 }
 
 int opt_audio_frames(void *optctx, const char *opt, const char *arg)
 {
     OptionsContext *o = optctx;
-    return parse_option(o, "frames:a", arg, global_options);
+    return parse_option(o, "frames:a", arg, ffmpeg_options);
 }
 
 int opt_data_frames(void *optctx, const char *opt, const char *arg)
 {
     OptionsContext *o = optctx;
-    return parse_option(o, "frames:d", arg, global_options);
+    return parse_option(o, "frames:d", arg, ffmpeg_options);
 }
 
 int opt_default_new(OptionsContext *o, const char *opt, const char *arg)
@@ -3026,7 +3029,7 @@ int opt_old2new(void *optctx, const char *opt, const char *arg)
     char *s = av_asprintf("%s:%c", opt + 1, *opt);
     if (!s)
         return AVERROR(ENOMEM);
-    ret = parse_option(o, s, arg, global_options);
+    ret = parse_option(o, s, arg, ffmpeg_options);
     av_free(s);
     return ret;
 }
@@ -3049,7 +3052,7 @@ int opt_bitrate(void *optctx, const char *opt, const char *arg)
 
 int opt_qscale(void *optctx, const char *opt, const char *arg)
 {
-    OptionDef *options = global_options;
+    OptionDef *options = ffmpeg_options;
     OptionsContext *o = optctx;
     char *s;
     int ret;
@@ -3080,13 +3083,13 @@ int opt_profile(void *optctx, const char *opt, const char *arg)
 int opt_video_filters(void *optctx, const char *opt, const char *arg)
 {
     OptionsContext *o = optctx;
-    return parse_option(o, "filter:v", arg, global_options);
+    return parse_option(o, "filter:v", arg, ffmpeg_options);
 }
 
 int opt_audio_filters(void *optctx, const char *opt, const char *arg)
 {
     OptionsContext *o = optctx;
-    return parse_option(o, "filter:a", arg, global_options);
+    return parse_option(o, "filter:a", arg, ffmpeg_options);
 }
 
 int opt_vsync(void *optctx, const char *opt, const char *arg)
@@ -3108,7 +3111,7 @@ int opt_timecode(void *optctx, const char *opt, const char *arg)
     char *tcr = av_asprintf("timecode=%s", arg);
     if (!tcr)
         return AVERROR(ENOMEM);
-    ret = parse_option(o, "metadata:g", tcr, global_options);
+    ret = parse_option(o, "metadata:g", tcr, ffmpeg_options);
     if (ret >= 0)
         ret = av_dict_set(&o->g->codec_opts, "gop_timecode", arg, 0);
     av_free(tcr);
@@ -3145,7 +3148,7 @@ int opt_channel_layout(void *optctx, const char *opt, const char *arg)
     av_strlcpy(ac_str, "ac", 3);
     if (stream_str)
         av_strlcat(ac_str, stream_str, ac_str_size);
-    ret = parse_option(o, ac_str, layout_str, global_options);
+    ret = parse_option(o, ac_str, layout_str, ffmpeg_options);
     av_free(ac_str);
 
     return ret;
@@ -3154,7 +3157,7 @@ int opt_channel_layout(void *optctx, const char *opt, const char *arg)
 int opt_audio_qscale(void *optctx, const char *opt, const char *arg)
 {
     OptionsContext *o = optctx;
-    return parse_option(o, "q:a", arg, global_options);
+    return parse_option(o, "q:a", arg, ffmpeg_options);
 }
 
 int opt_filter_complex(void *optctx, const char *opt, const char *arg)
@@ -3189,9 +3192,9 @@ int opt_filter_complex_script(void *optctx, const char *opt, const char *arg)
     return 0;
 }
 
-void show_help_default(const char *opt, const char *arg)
+void show_help_default_ffmpeg(const char *opt, const char *arg)
 {
-    OptionDef *options = global_options;
+    OptionDef *options = ffmpeg_options;
     /* per-file options have at least one of those set */
     const int per_file = OPT_SPEC | OPT_OFFSET | OPT_PERFILE;
     int show_advanced = 0, show_avoptions = 0;
@@ -3207,7 +3210,7 @@ void show_help_default(const char *opt, const char *arg)
 
     show_usage();
 
-    av_log(NULL, AV_LOG_INFO, "Getting help:\n"
+    av_log(NULL, AV_LOG_STDERR, "Getting help:\n"
            "    -h      -- print basic options\n"
            "    -h long -- print more options\n"
            "    -h full -- print all options (including all format and codec specific options, very long)\n"
@@ -3245,7 +3248,7 @@ void show_help_default(const char *opt, const char *arg)
                           OPT_EXPERT | OPT_AUDIO, OPT_VIDEO, 0);
     show_help_options(options, "Subtitle options:",
                       OPT_SUBTITLE, 0, 0);
-    av_log(NULL, AV_LOG_INFO, "\n");
+    av_log(NULL, AV_LOG_STDERR, "\n");
 
     if (show_avoptions) {
         int flags = AV_OPT_FLAG_DECODING_PARAM | AV_OPT_FLAG_ENCODING_PARAM;
@@ -3321,7 +3324,7 @@ int ffmpeg_parse_options(int argc, char **argv)
     memset(&octx, 0, sizeof(octx));
 
     /* split the commandline into an internal representation */
-    ret = split_commandline(&octx, argc, argv, global_options, groups,
+    ret = split_commandline(&octx, argc, argv, ffmpeg_options, groups,
                             FF_ARRAY_ELEMS(groups));
     if (ret < 0) {
         av_log(NULL, AV_LOG_FATAL, "Error splitting the argument list: ");

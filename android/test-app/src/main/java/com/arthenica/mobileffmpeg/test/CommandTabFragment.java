@@ -20,9 +20,6 @@
 package com.arthenica.mobileffmpeg.test;
 
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import android.text.method.ScrollingMovementMethod;
 import android.util.AndroidRuntimeException;
 import android.util.Log;
@@ -30,11 +27,15 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
 import com.arthenica.mobileffmpeg.Config;
 import com.arthenica.mobileffmpeg.FFmpeg;
+import com.arthenica.mobileffmpeg.FFprobe;
 import com.arthenica.mobileffmpeg.LogCallback;
 import com.arthenica.mobileffmpeg.LogMessage;
-import com.arthenica.mobileffmpeg.util.SingleExecuteCallback;
 
 import java.util.concurrent.Callable;
 
@@ -53,8 +54,8 @@ public class CommandTabFragment extends Fragment {
 
         commandText = view.findViewById(R.id.commandText);
 
-        View runButton = view.findViewById(R.id.runButton);
-        runButton.setOnClickListener(new View.OnClickListener() {
+        View runFFmpegButton = view.findViewById(R.id.runFFmpegButton);
+        runFFmpegButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
@@ -62,19 +63,19 @@ public class CommandTabFragment extends Fragment {
             }
         });
 
-        View runAsyncButton = view.findViewById(R.id.runAsyncButton);
-        runAsyncButton.setOnClickListener(new View.OnClickListener() {
+        View runFFprobeButton = view.findViewById(R.id.runFFprobeButton);
+        runFFprobeButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                runFFmpegAsync();
+                runFFprobe();
             }
         });
 
         outputText = view.findViewById(R.id.outputText);
         outputText.setMovementMethod(new ScrollingMovementMethod());
 
-        Log.d(MainActivity.TAG, "Last command output was: " + FFmpeg.getLastCommandOutput());
+        Log.d(MainActivity.TAG, "Last command output was: " + Config.getLastCommandOutput());
     }
 
     @Override
@@ -109,9 +110,9 @@ public class CommandTabFragment extends Fragment {
     public void runFFmpeg() {
         clearLog();
 
-        final String ffmpegCommand = String.format("-hide_banner %s", commandText.getText().toString());
+        final String ffmpegCommand = String.format("%s", commandText.getText().toString());
 
-        android.util.Log.d(MainActivity.TAG, "Testing COMMAND synchronously.");
+        android.util.Log.d(MainActivity.TAG, "Testing FFmpeg COMMAND synchronously.");
 
         android.util.Log.d(MainActivity.TAG, String.format("FFmpeg process started with arguments\n\'%s\'", ffmpegCommand));
 
@@ -124,34 +125,22 @@ public class CommandTabFragment extends Fragment {
         }
     }
 
-    public void runFFmpegAsync() {
+    public void runFFprobe() {
         clearLog();
 
-        final String ffmpegCommand = String.format("-hide_banner %s", commandText.getText().toString());
+        final String ffprobeCommand = String.format("%s", commandText.getText().toString());
 
-        android.util.Log.d(MainActivity.TAG, "Testing COMMAND asynchronously.");
+        android.util.Log.d(MainActivity.TAG, "Testing FFprobe COMMAND synchronously.");
 
-        android.util.Log.d(MainActivity.TAG, String.format("FFmpeg process started with arguments\n\'%s\'", ffmpegCommand));
+        android.util.Log.d(MainActivity.TAG, String.format("FFprobe process started with arguments\n\'%s\'", ffprobeCommand));
 
-        MainActivity.executeAsync(new SingleExecuteCallback() {
+        int result = FFprobe.execute(ffprobeCommand);
 
-            @Override
-            public void apply(int result, final String commandOutput) {
+        android.util.Log.d(MainActivity.TAG, String.format("FFprobe process exited with rc %d", result));
 
-                android.util.Log.d(MainActivity.TAG, String.format("FFmpeg process exited with rc %d", result));
-
-                if (result != 0) {
-                    MainActivity.addUIAction(new Callable() {
-                        @Override
-                        public Object call() {
-                            Popup.show(requireContext(), "Command failed. Please check output for the details.");
-                            return null;
-                        }
-                    });
-                }
-
-            }
-        }, ffmpegCommand);
+        if (result != 0) {
+            Popup.show(requireContext(), "Command failed. Please check output for the details.");
+        }
     }
 
     private void setActive() {

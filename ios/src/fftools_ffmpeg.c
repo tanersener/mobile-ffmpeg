@@ -24,6 +24,9 @@
  */
 
 /*
+ * CHANGES 01.2020
+ * - ffprobe support changes
+ *
  * CHANGES 12.2019
  * - Concurrent execution support
  *
@@ -38,10 +41,10 @@
  *
  * CHANGES 07.2018
  * --------------------------------------------------------
- * - main() function renamed as execute()
+ * - main() function renamed as ffmpeg_execute()
  * - exit_program() implemented with setjmp
  * - extern longjmp_value added to access exit code stored in exit_program()
- * - cleanup() method added
+ * - ffmpeg_var_cleanup() method added
  */
 
 #include "config.h"
@@ -129,9 +132,6 @@
 
 #include "libavutil/avassert.h"
 
-const char program_name[] = "ffmpeg";
-const int program_birth_year = 2000;
-
 static FILE *vstats_file;
 
 const char *const forced_keyframes_const_names[] = {
@@ -199,7 +199,6 @@ extern int opt_profile(void *optctx, const char *opt, const char *arg);
 extern int opt_filter_complex(void *optctx, const char *opt, const char *arg);
 extern int opt_filter_complex_script(void *optctx, const char *opt, const char *arg);
 extern int opt_attach(void *optctx, const char *opt, const char *arg);
-extern __thread int find_stream_info;
 extern int opt_video_frames(void *optctx, const char *opt, const char *arg);
 extern __thread int intra_only;
 extern int opt_video_codec(void *optctx, const char *opt, const char *arg);
@@ -407,7 +406,7 @@ __thread volatile int received_sigterm = 0;
 __thread volatile int received_nb_signals = 0;
 __thread atomic_int transcode_init_done = ATOMIC_VAR_INIT(0);
 __thread volatile int ffmpeg_exited = 0;
-__thread int main_return_code = 0;
+__thread int main_ffmpeg_return_code = 0;
 extern __thread int longjmp_value;
 
 static void
@@ -891,7 +890,7 @@ static void write_packet(OutputFile *of, AVPacket *pkt, OutputStream *ost, int u
     ret = av_interleaved_write_frame(s, pkt);
     if (ret < 0) {
         print_error("av_interleaved_write_frame()", ret);
-        main_return_code = 1;
+        main_ffmpeg_return_code = 1;
         close_all_output_streams(ost, MUXER_FINISHED | ENCODER_FINISHED, ENCODER_FINISHED);
     }
     av_packet_unref(pkt);
@@ -2933,7 +2932,7 @@ static void print_sdp(void)
     av_sdp_create(avc, j, sdp, sizeof(sdp));
 
     if (!sdp_filename) {
-        av_log(NULL, AV_LOG_INFO, "SDP:\n%s\n", sdp);
+        av_log(NULL, AV_LOG_STDERR, "SDP:\n%s\n", sdp);
         fflush(stdout);
     } else {
         if (avio_open2(&sdp_pb, sdp_filename, AVIO_FLAG_WRITE, &int_cb, NULL) < 0) {
@@ -4995,8 +4994,8 @@ static void log_callback_null(void *ptr, int level, const char *fmt, va_list vl)
 {
 }
 
-void cleanup() {
-    main_return_code = 0;
+void ffmpeg_var_cleanup() {
+    main_ffmpeg_return_code = 0;
     longjmp_value = 0;
     received_sigterm = 0;
     received_nb_signals = 0;
@@ -5035,10 +5034,14 @@ void cancel_operation()
     sigterm_handler(SIGINT);
 }
 
-__thread OptionDef *global_options = NULL;
+__thread OptionDef *ffmpeg_options = NULL;
 
-int execute(int argc, char **argv)
+int ffmpeg_execute(int argc, char **argv)
 {
+    char _program_name[] = "ffmpeg";
+    program_name = (char*)&_program_name;
+    program_birth_year = 2000;
+
     #define OFFSET(x) offsetof(OptionsContext, x)
     OptionDef options[] = {
 
@@ -5465,7 +5468,7 @@ int execute(int argc, char **argv)
         { NULL, },
     };
 
-    global_options = options;
+    ffmpeg_options = options;
 
     int i, ret;
     BenchmarkTimeStamps ti;
@@ -5473,7 +5476,7 @@ int execute(int argc, char **argv)
     int savedCode = setjmp(ex_buf__);
     if (savedCode == 0) {
 
-        cleanup();
+        ffmpeg_var_cleanup();
 
         init_dynload();
 
@@ -5538,11 +5541,11 @@ int execute(int argc, char **argv)
         if ((decode_error_stat[0] + decode_error_stat[1]) * max_error_rate < decode_error_stat[1])
             exit_program(69);
 
-        exit_program(received_nb_signals ? 255 : main_return_code);
+        exit_program(received_nb_signals ? 255 : main_ffmpeg_return_code);
 
     } else {
-        main_return_code = longjmp_value;
+        main_ffmpeg_return_code = longjmp_value;
     }
 
-    return main_return_code;
+    return main_ffmpeg_return_code;
 }

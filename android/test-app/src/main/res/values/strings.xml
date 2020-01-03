@@ -8,8 +8,8 @@
     <string name="vidstab_tab">VID.STAB</string>
     <string name="pipe_tab">PIPE</string>
     <string name="command_text_input_placeholder">Enter command</string>
-    <string name="command_run_async_button_text">RUN ASYNC</string>
-    <string name="command_run_button_text">RUN</string>
+    <string name="command_run_ffmpeg_button_text">RUN FFMPEG</string>
+    <string name="command_run_ffprobe_button_text">RUN FFPROBE</string>
     <string name="video_encode_button_text">ENCODE</string>
     <string name="video_create_button_text">CREATE</string>
     <string name="https_get_info_button_text">GET INFO</string>

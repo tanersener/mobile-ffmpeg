@@ -33,7 +33,7 @@ import androidx.viewpager.widget.PagerTabStrip;
 import androidx.viewpager.widget.ViewPager;
 
 import com.arthenica.mobileffmpeg.Config;
-import com.arthenica.mobileffmpeg.util.AsyncSingleExecuteTask;
+import com.arthenica.mobileffmpeg.util.AsyncSingleFFmpegExecuteTask;
 import com.arthenica.mobileffmpeg.util.ResourcesUtil;
 import com.arthenica.mobileffmpeg.util.SingleExecuteCallback;
 
@@ -144,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
      * @param command               FFmpeg command
      */
     public static void executeAsync(final SingleExecuteCallback singleExecuteCallback, final String command) {
-        final AsyncSingleExecuteTask asyncCommandTask = new AsyncSingleExecuteTask(command, singleExecuteCallback);
+        final AsyncSingleFFmpegExecuteTask asyncCommandTask = new AsyncSingleFFmpegExecuteTask(command, singleExecuteCallback);
         asyncCommandTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 

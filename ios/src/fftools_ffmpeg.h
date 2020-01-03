@@ -17,6 +17,9 @@
  */
 
 /*
+ * CHANGES 01.2020
+ * - ffprobe support changes
+ *
  * CHANGES 12.2019
  * - Concurrent execution support
  *
@@ -636,7 +639,6 @@ extern __thread AVBufferRef *hw_device_ctx;
 extern __thread char *qsv_device;
 #endif
 extern __thread HWDevice *filter_hw_device;
-
 
 void term_init(void);
 void term_exit(void);

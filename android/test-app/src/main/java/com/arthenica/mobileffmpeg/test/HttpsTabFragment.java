@@ -20,19 +20,18 @@
 package com.arthenica.mobileffmpeg.test;
 
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
 import com.arthenica.mobileffmpeg.Config;
-import com.arthenica.mobileffmpeg.FFmpeg;
+import com.arthenica.mobileffmpeg.FFprobe;
 import com.arthenica.mobileffmpeg.LogCallback;
 import com.arthenica.mobileffmpeg.LogMessage;
 import com.arthenica.mobileffmpeg.MediaInformation;
@@ -112,7 +111,7 @@ public class HttpsTabFragment extends Fragment {
         }
 
         // HTTPS COMMAND ARGUMENTS
-        MediaInformation information = FFmpeg.getMediaInformation(testUrl);
+        MediaInformation information = FFprobe.getMediaInformation(testUrl);
         if (information == null) {
             appendLog("Get media information failed\n");
         } else {
