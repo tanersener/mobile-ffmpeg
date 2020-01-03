@@ -40,7 +40,7 @@ import com.arthenica.mobileffmpeg.LogMessage;
 import com.arthenica.mobileffmpeg.Statistics;
 import com.arthenica.mobileffmpeg.StatisticsCallback;
 import com.arthenica.mobileffmpeg.util.DialogUtil;
-import com.arthenica.mobileffmpeg.util.ExecuteCallback;
+import com.arthenica.mobileffmpeg.util.SingleExecuteCallback;
 import com.arthenica.mobileffmpeg.util.ResourcesUtil;
 
 import java.io.File;
@@ -161,7 +161,7 @@ public class SubtitleTabFragment extends Fragment {
 
             state = State.CREATING;
 
-            MainActivity.executeAsync(new ExecuteCallback() {
+            MainActivity.executeAsync(new SingleExecuteCallback() {
 
                 @Override
                 public void apply(final int returnCode, final String commandOutput) {
@@ -185,7 +185,7 @@ public class SubtitleTabFragment extends Fragment {
 
                                 state = State.BURNING;
 
-                                MainActivity.executeAsync(new ExecuteCallback() {
+                                MainActivity.executeAsync(new SingleExecuteCallback() {
 
                                     @Override
                                     public void apply(final int returnCode, final String commandOutput) {

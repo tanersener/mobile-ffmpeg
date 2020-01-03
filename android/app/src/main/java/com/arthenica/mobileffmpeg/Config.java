@@ -636,9 +636,9 @@ public class Config {
     public native static int setNativeEnvironmentVariable(final String variableName, final String variableValue);
 
     /**
-     * <p>Returns log output of the last executed command natively.
+     * <p>Returns log output of the last executed single command natively.
      *
-     * @return output of the last executed command
+     * @return output of the last executed single command
      */
     native static String getNativeLastCommandOutput();
 

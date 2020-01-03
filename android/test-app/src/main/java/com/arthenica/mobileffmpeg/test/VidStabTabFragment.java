@@ -29,9 +29,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.MediaController;
 import android.widget.VideoView;
 
@@ -39,7 +37,7 @@ import com.arthenica.mobileffmpeg.Config;
 import com.arthenica.mobileffmpeg.LogCallback;
 import com.arthenica.mobileffmpeg.LogMessage;
 import com.arthenica.mobileffmpeg.util.DialogUtil;
-import com.arthenica.mobileffmpeg.util.ExecuteCallback;
+import com.arthenica.mobileffmpeg.util.SingleExecuteCallback;
 import com.arthenica.mobileffmpeg.util.ResourcesUtil;
 
 import java.io.File;
@@ -136,7 +134,7 @@ public class VidStabTabFragment extends Fragment {
 
             android.util.Log.d(TAG, String.format("FFmpeg process started with arguments\n'%s'", ffmpegCommand));
 
-            MainActivity.executeAsync(new ExecuteCallback() {
+            MainActivity.executeAsync(new SingleExecuteCallback() {
 
                 @Override
                 public void apply(final int returnCode, final String commandOutput) {
@@ -158,7 +156,7 @@ public class VidStabTabFragment extends Fragment {
 
                                 android.util.Log.d(TAG, String.format("FFmpeg process started with arguments\n'%s'", analyzeVideoCommand));
 
-                                MainActivity.executeAsync(new ExecuteCallback() {
+                                MainActivity.executeAsync(new SingleExecuteCallback() {
 
                                     @Override
                                     public void apply(final int returnCode, final String commandOutput) {
@@ -169,7 +167,7 @@ public class VidStabTabFragment extends Fragment {
 
                                             android.util.Log.d(TAG, String.format("FFmpeg process started with arguments\n'%s'", stabilizeVideoCommand));
 
-                                            MainActivity.executeAsync(new ExecuteCallback() {
+                                            MainActivity.executeAsync(new SingleExecuteCallback() {
 
                                                 @Override
                                                 public void apply(final int returnCode, final String commandOutput) {

@@ -24,23 +24,24 @@ import android.os.AsyncTask;
 import com.arthenica.mobileffmpeg.FFmpeg;
 import com.arthenica.mobileffmpeg.MediaInformation;
 
-public class AsyncGetMediaInformationTask extends AsyncTask<String, MediaInformation, MediaInformation> {
+public class AsyncSingleGetMediaInformationTask extends AsyncTask<String, MediaInformation, MediaInformation> {
+    private final String path;
+    private final SingleGetMediaInformationCallback singleGetMediaInformationCallback;
 
-    private final GetMediaInformationCallback getMediaInformationCallback;
-
-    public AsyncGetMediaInformationTask(final GetMediaInformationCallback getMediaInformationCallback) {
-        this.getMediaInformationCallback = getMediaInformationCallback;
+    public AsyncSingleGetMediaInformationTask(final String path, final SingleGetMediaInformationCallback singleGetMediaInformationCallback) {
+        this.path = path;
+        this.singleGetMediaInformationCallback = singleGetMediaInformationCallback;
     }
 
     @Override
     protected MediaInformation doInBackground(final String... arguments) {
-        return FFmpeg.getMediaInformation(arguments[0]);
+        return FFmpeg.getMediaInformation(path);
     }
 
     @Override
     protected void onPostExecute(final MediaInformation mediaInformation) {
-        if (getMediaInformationCallback != null) {
-            getMediaInformationCallback.apply(mediaInformation);
+        if (singleGetMediaInformationCallback != null) {
+            singleGetMediaInformationCallback.apply(mediaInformation);
         }
     }
 

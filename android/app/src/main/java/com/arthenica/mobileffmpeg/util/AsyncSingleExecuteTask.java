@@ -23,23 +23,24 @@ import android.os.AsyncTask;
 
 import com.arthenica.mobileffmpeg.FFmpeg;
 
-public class AsyncExecuteTask extends AsyncTask<String, Integer, Integer> {
+public class AsyncSingleExecuteTask extends AsyncTask<String, Integer, Integer> {
+    private final String command;
+    private final SingleExecuteCallback singleExecuteCallback;
 
-    private final ExecuteCallback executeCallback;
-
-    public AsyncExecuteTask(final ExecuteCallback executeCallback) {
-        this.executeCallback = executeCallback;
+    public AsyncSingleExecuteTask(final String command, final SingleExecuteCallback singleExecuteCallback) {
+        this.command = command;
+        this.singleExecuteCallback = singleExecuteCallback;
     }
 
     @Override
     protected Integer doInBackground(final String... arguments) {
-        return FFmpeg.execute(arguments[0]);
+        return FFmpeg.execute(command);
     }
 
     @Override
     protected void onPostExecute(final Integer rc) {
-        if (executeCallback != null) {
-            executeCallback.apply(rc, FFmpeg.getLastCommandOutput());
+        if (singleExecuteCallback != null) {
+            singleExecuteCallback.apply(rc, FFmpeg.getLastCommandOutput());
         }
     }
 

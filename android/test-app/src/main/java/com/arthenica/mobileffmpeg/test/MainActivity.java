@@ -33,9 +33,9 @@ import androidx.viewpager.widget.PagerTabStrip;
 import androidx.viewpager.widget.ViewPager;
 
 import com.arthenica.mobileffmpeg.Config;
-import com.arthenica.mobileffmpeg.util.AsyncExecuteTask;
-import com.arthenica.mobileffmpeg.util.ExecuteCallback;
+import com.arthenica.mobileffmpeg.util.AsyncSingleExecuteTask;
 import com.arthenica.mobileffmpeg.util.ResourcesUtil;
+import com.arthenica.mobileffmpeg.util.SingleExecuteCallback;
 
 import java.io.File;
 import java.io.IOException;
@@ -138,14 +138,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * <p>Starts a new asynchronous FFmpeg operation with arguments provided.
+     * <p>Starts a new asynchronous FFmpeg operation with command provided.
      *
-     * @param executeCallback callback function to receive result of this execution
-     * @param arguments       FFmpeg command options/arguments
+     * @param singleExecuteCallback callback function to receive result of this execution
+     * @param command               FFmpeg command
      */
-    public static void executeAsync(final ExecuteCallback executeCallback, final String arguments) {
-        final AsyncExecuteTask asyncCommandTask = new AsyncExecuteTask(executeCallback);
-        asyncCommandTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, arguments);
+    public static void executeAsync(final SingleExecuteCallback singleExecuteCallback, final String command) {
+        final AsyncSingleExecuteTask asyncCommandTask = new AsyncSingleExecuteTask(command, singleExecuteCallback);
+        asyncCommandTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     public static void waitForUIAction() {

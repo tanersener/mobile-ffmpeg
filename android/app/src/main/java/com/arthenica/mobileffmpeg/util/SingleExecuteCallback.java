@@ -20,13 +20,13 @@
 package com.arthenica.mobileffmpeg.util;
 
 /**
- * <p>Represents a callback function to receive execution result.
+ * <p>Represents a callback function to receive a single execution result.
  *
  * @author Taner Sener
  * @since v2.1
  */
 @FunctionalInterface
-public interface ExecuteCallback {
+public interface SingleExecuteCallback {
 
     void apply(int returnCode, String executeOutput);
 

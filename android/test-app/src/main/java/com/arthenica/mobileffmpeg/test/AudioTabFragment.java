@@ -28,9 +28,7 @@ import androidx.fragment.app.Fragment;
 
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -42,7 +40,7 @@ import com.arthenica.mobileffmpeg.FFmpeg;
 import com.arthenica.mobileffmpeg.LogCallback;
 import com.arthenica.mobileffmpeg.LogMessage;
 import com.arthenica.mobileffmpeg.util.DialogUtil;
-import com.arthenica.mobileffmpeg.util.ExecuteCallback;
+import com.arthenica.mobileffmpeg.util.SingleExecuteCallback;
 
 import java.io.File;
 import java.util.concurrent.Callable;
@@ -150,7 +148,7 @@ public class AudioTabFragment extends Fragment implements AdapterView.OnItemSele
 
         android.util.Log.d(TAG, String.format("FFmpeg process started with arguments\n'%s'", ffmpegCommand));
 
-        MainActivity.executeAsync(new ExecuteCallback() {
+        MainActivity.executeAsync(new SingleExecuteCallback() {
 
             @Override
             public void apply(final int returnCode, final String commandOutput) {

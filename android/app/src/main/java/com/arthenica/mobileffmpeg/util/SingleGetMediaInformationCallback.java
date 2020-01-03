@@ -22,12 +22,12 @@ package com.arthenica.mobileffmpeg.util;
 import com.arthenica.mobileffmpeg.MediaInformation;
 
 /**
- * <p>Represents a callback function to receive getMediaInformation result.
+ * <p>Represents a callback function to receive a single getMediaInformation result.
  *
  * @author Taner Sener
  */
 @FunctionalInterface
-public interface GetMediaInformationCallback {
+public interface SingleGetMediaInformationCallback {
 
     void apply(MediaInformation mediaInformation);
 

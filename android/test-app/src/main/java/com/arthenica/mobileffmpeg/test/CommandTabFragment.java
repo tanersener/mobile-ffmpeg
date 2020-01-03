@@ -26,9 +26,7 @@ import androidx.fragment.app.Fragment;
 import android.text.method.ScrollingMovementMethod;
 import android.util.AndroidRuntimeException;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -36,7 +34,7 @@ import com.arthenica.mobileffmpeg.Config;
 import com.arthenica.mobileffmpeg.FFmpeg;
 import com.arthenica.mobileffmpeg.LogCallback;
 import com.arthenica.mobileffmpeg.LogMessage;
-import com.arthenica.mobileffmpeg.util.ExecuteCallback;
+import com.arthenica.mobileffmpeg.util.SingleExecuteCallback;
 
 import java.util.concurrent.Callable;
 
@@ -135,7 +133,7 @@ public class CommandTabFragment extends Fragment {
 
         android.util.Log.d(MainActivity.TAG, String.format("FFmpeg process started with arguments\n\'%s\'", ffmpegCommand));
 
-        MainActivity.executeAsync(new ExecuteCallback() {
+        MainActivity.executeAsync(new SingleExecuteCallback() {
 
             @Override
             public void apply(int result, final String commandOutput) {
