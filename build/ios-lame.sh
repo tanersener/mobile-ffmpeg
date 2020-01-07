@@ -51,7 +51,7 @@ fi
     --prefix=${BASEDIR}/prebuilt/$(get_target_build_directory)/${LIB_NAME} \
     --with-pic \
     --with-sysroot=${SDK_PATH} \
-    --with-libiconv-prefix=${BASEDIR}/prebuilt/$(get_target_build_directory)/libiconv \
+    --with-libiconv-prefix=${SDK_PATH}/usr \
     --enable-static \
     --disable-shared \
     --disable-fast-install \

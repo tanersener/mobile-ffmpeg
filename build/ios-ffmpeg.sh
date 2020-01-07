@@ -152,11 +152,6 @@ do
                 FFMPEG_LDFLAGS+=" $(pkg-config --libs --static libass)"
                 CONFIGURE_POSTFIX+=" --enable-libass"
             ;;
-            libiconv)
-                FFMPEG_CFLAGS+=" $(pkg-config --cflags libiconv)"
-                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static libiconv)"
-                CONFIGURE_POSTFIX+=" --enable-iconv"
-            ;;
             libilbc)
                 FFMPEG_CFLAGS+=" $(pkg-config --cflags libilbc)"
                 FFMPEG_LDFLAGS+=" $(pkg-config --libs --static libilbc)"
@@ -315,28 +310,31 @@ do
                     *-zlib)
                         CONFIGURE_POSTFIX+=" --enable-zlib"
                     ;;
+                    *-libiconv)
+                        CONFIGURE_POSTFIX+=" --enable-iconv"
+                    ;;
                 esac
             ;;
         esac
     else
 
         # THE FOLLOWING LIBRARIES SHOULD BE EXPLICITLY DISABLED TO PREVENT AUTODETECT
-        if [[ ${library} -eq 8 ]]; then
-            CONFIGURE_POSTFIX+=" --disable-iconv"
-        elif [[ ${library} -eq 30 ]]; then
+        if [[ ${library} -eq 29 ]]; then
             CONFIGURE_POSTFIX+=" --disable-sdl2"
-        elif [[ ${library} -eq 43 ]]; then
+        elif [[ ${library} -eq 42 ]]; then
             CONFIGURE_POSTFIX+=" --disable-zlib"
-        elif [[ ${library} -eq 44 ]]; then
+        elif [[ ${library} -eq 43 ]]; then
             CONFIGURE_POSTFIX+=" --disable-audiotoolbox"
-        elif [[ ${library} -eq 45 ]]; then
+        elif [[ ${library} -eq 44 ]]; then
             CONFIGURE_POSTFIX+=" --disable-coreimage"
-        elif [[ ${library} -eq 46 ]]; then
+        elif [[ ${library} -eq 45 ]]; then
             CONFIGURE_POSTFIX+=" --disable-bzlib"
-        elif [[ ${library} -eq 47 ]]; then
+        elif [[ ${library} -eq 46 ]]; then
             CONFIGURE_POSTFIX+=" --disable-videotoolbox"
-        elif [[ ${library} -eq 48 ]]; then
+        elif [[ ${library} -eq 47 ]]; then
             CONFIGURE_POSTFIX+=" --disable-avfoundation"
+        elif [[ ${library} -eq 48 ]]; then
+            CONFIGURE_POSTFIX+=" --disable-iconv"
         fi
     fi
 
