@@ -195,6 +195,8 @@ void av1_encode_mv(AV1_COMP *cpi, aom_writer *w, const MV *mv, const MV *ref,
                    nmv_context *mvctx, int usehp) {
   const MV diff = { mv->row - ref->row, mv->col - ref->col };
   const MV_JOINT_TYPE j = av1_get_mv_joint(&diff);
+  // If the mv_diff is zero, then we should have used near or nearest instead.
+  assert(j != MV_JOINT_ZERO);
   if (cpi->common.cur_frame_force_integer_mv) {
     usehp = MV_SUBPEL_NONE;
   }
@@ -207,7 +209,7 @@ void av1_encode_mv(AV1_COMP *cpi, aom_writer *w, const MV *mv, const MV *ref,
 
   // If auto_mv_step_size is enabled then keep track of the largest
   // motion vector component used.
-  if (cpi->sf.mv.auto_mv_step_size) {
+  if (cpi->sf.mv_sf.auto_mv_step_size) {
     unsigned int maxv = AOMMAX(abs(mv->row), abs(mv->col)) >> 3;
     cpi->max_mv_magnitude = AOMMAX(maxv, cpi->max_mv_magnitude);
   }

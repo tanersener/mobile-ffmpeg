@@ -105,8 +105,6 @@ static aom_codec_err_t decoder_init(aom_codec_ctx_t *ctx,
     if (ctx->config.dec) {
       priv->cfg = *ctx->config.dec;
       ctx->config.dec = &priv->cfg;
-      // default values
-      priv->cfg.cfg.ext_partition = 1;
     }
     priv->num_grain_image_frame_buffers = 0;
     // Turn row_mt on by default.
@@ -154,6 +152,7 @@ static aom_codec_err_t decoder_destroy(aom_codec_alg_priv_t *ctx) {
 
   aom_free(ctx->frame_workers);
   aom_free(ctx->buffer_pool);
+  aom_img_free(&ctx->img);
   aom_free(ctx);
   return AOM_CODEC_OK;
 }
@@ -482,7 +481,6 @@ static aom_codec_err_t init_decoder(aom_codec_alg_priv_t *ctx) {
       set_error_detail(ctx, "Failed to allocate frame_worker_data");
       return AOM_CODEC_MEM_ERROR;
     }
-    frame_worker_data->pbi->common.options = &ctx->cfg.cfg;
     frame_worker_data->worker_id = i;
     frame_worker_data->frame_context_ready = 0;
     frame_worker_data->received_frame = 0;
@@ -764,6 +762,15 @@ static aom_image_t *add_grain_if_needed(aom_codec_alg_priv_t *ctx,
   return grain_img;
 }
 
+// Copies and clears the metadata from AV1Decoder.
+static void move_decoder_metadata_to_img(AV1Decoder *pbi, aom_image_t *img) {
+  if (pbi->metadata && img) {
+    assert(!img->metadata);
+    img->metadata = pbi->metadata;
+    pbi->metadata = NULL;
+  }
+}
+
 static aom_image_t *decoder_get_frame(aom_codec_alg_priv_t *ctx,
                                       aom_codec_iter_t *iter) {
   aom_image_t *img = NULL;
@@ -803,12 +810,15 @@ static aom_image_t *decoder_get_frame(aom_codec_alg_priv_t *ctx,
           RefCntBuffer *const output_frame_buf = pbi->output_frames[*index];
           ctx->last_show_frame = output_frame_buf;
           if (ctx->need_resync) return NULL;
+          aom_img_remove_metadata(&ctx->img);
           yuvconfig2image(&ctx->img, sd, frame_worker_data->user_priv);
+          move_decoder_metadata_to_img(pbi, &ctx->img);
 
           if (!pbi->ext_tile_debug && cm->large_scale_tile) {
             *index += 1;  // Advance the iterator to point to the next image
-
+            aom_img_remove_metadata(&ctx->img);
             yuvconfig2image(&ctx->img, &pbi->tile_list_outbuf, NULL);
+            move_decoder_metadata_to_img(pbi, &ctx->img);
             img = &ctx->img;
             return img;
           }

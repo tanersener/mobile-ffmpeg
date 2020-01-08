@@ -36,11 +36,6 @@
 #include "aom_ports/system_state.h"
 #include "aom_scale/aom_scale.h"
 
-#define EXPERIMENT_TEMPORAL_FILTER 1
-#define WINDOW_LENGTH 2
-#define WINDOW_SIZE 25
-#define SCALE 1000
-
 static unsigned int index_mult[14] = { 0,     0,     0,     0,     49152,
                                        39322, 32768, 28087, 24576, 21846,
                                        19661, 17874, 0,     15124 };
@@ -51,47 +46,57 @@ static int64_t highbd_index_mult[14] = { 0U,          0U,          0U,
                                          1431655766U, 1288490189U, 1171354718U,
                                          0U,          991146300U };
 
-static void temporal_filter_predictors_mb_c(
-    MACROBLOCKD *xd, uint8_t *y_mb_ptr, uint8_t *u_mb_ptr, uint8_t *v_mb_ptr,
-    int stride, int uv_block_width, int uv_block_height, int mv_row, int mv_col,
-    uint8_t *pred, struct scale_factors *scale, int x, int y,
-    int can_use_previous, int num_planes, MV *blk_mvs, int use_32x32) {
-  mv_precision mv_precision_uv;
-  int uv_stride;
-  // TODO(angiebird): change plane setting accordingly
-  ConvolveParams conv_params = get_conv_params(0, 0, xd->bd);
+static void temporal_filter_predictors_mb_c(YV12_BUFFER_CONFIG *ref_frame,
+                                            MACROBLOCKD *xd, int uv_block_width,
+                                            int uv_block_height, int mv_row,
+                                            int mv_col, uint8_t *pred,
+                                            struct scale_factors *scale, int x,
+                                            int y, int num_planes, MV *blk_mvs,
+                                            int use_32x32) {
   const int_interpfilters interp_filters =
       av1_broadcast_interp_filter(MULTITAP_SHARP);
   WarpTypesAllowed warp_types;
   memset(&warp_types, 0, sizeof(WarpTypesAllowed));
 
-  const int ssx = (uv_block_width == (BW >> 1)) ? 1 : 0;
-  if (ssx) {
-    uv_stride = (stride + 1) >> 1;
-    mv_precision_uv = MV_PRECISION_Q4;
-  } else {
-    uv_stride = stride;
-    mv_precision_uv = MV_PRECISION_Q3;
-  }
+  InterPredParams inter_pred_params;
+  struct buf_2d ref_buf_y = { NULL, ref_frame->y_buffer, ref_frame->y_width,
+                              ref_frame->y_height, ref_frame->y_stride };
+
+  av1_init_inter_params(&inter_pred_params, BW, BH, y, x, 0, 0, xd->bd,
+                        is_cur_buf_hbd(xd), 0, scale, &ref_buf_y,
+                        interp_filters);
+  inter_pred_params.conv_params = get_conv_params(0, 0, xd->bd);
 
   if (use_32x32) {
     assert(mv_row >= INT16_MIN && mv_row <= INT16_MAX && mv_col >= INT16_MIN &&
            mv_col <= INT16_MAX);
     const MV mv = { (int16_t)mv_row, (int16_t)mv_col };
 
-    av1_build_inter_predictor(y_mb_ptr, stride, &pred[0], BW, &mv, scale, BW,
-                              BH, &conv_params, interp_filters, &warp_types, x,
-                              y, 0, 0, MV_PRECISION_Q3, x, y, xd,
-                              can_use_previous);
+    av1_build_inter_predictor(&pred[0], BW, &mv, &inter_pred_params);
+
     if (num_planes > 1) {
-      av1_build_inter_predictor(
-          u_mb_ptr, uv_stride, &pred[BLK_PELS], uv_block_width, &mv, scale,
-          uv_block_width, uv_block_height, &conv_params, interp_filters,
-          &warp_types, x, y, 1, 0, mv_precision_uv, x, y, xd, can_use_previous);
-      av1_build_inter_predictor(
-          v_mb_ptr, uv_stride, &pred[(BLK_PELS << 1)], uv_block_width, &mv,
-          scale, uv_block_width, uv_block_height, &conv_params, interp_filters,
-          &warp_types, x, y, 2, 0, mv_precision_uv, x, y, xd, can_use_previous);
+      struct buf_2d ref_buf_uv = { NULL, ref_frame->u_buffer,
+                                   ref_frame->uv_width, ref_frame->uv_height,
+                                   ref_frame->uv_stride };
+
+      av1_init_inter_params(
+          &inter_pred_params, uv_block_width, uv_block_height,
+          y >> xd->plane[1].subsampling_y, x >> xd->plane[1].subsampling_x,
+          xd->plane[1].subsampling_x, xd->plane[1].subsampling_y, xd->bd,
+          is_cur_buf_hbd(xd), 0, scale, &ref_buf_uv, interp_filters);
+      inter_pred_params.conv_params = get_conv_params(0, 1, xd->bd);
+      av1_build_inter_predictor(&pred[BLK_PELS], uv_block_width, &mv,
+                                &inter_pred_params);
+
+      ref_buf_uv.buf0 = ref_frame->v_buffer;
+      av1_init_inter_params(
+          &inter_pred_params, uv_block_width, uv_block_height,
+          y >> xd->plane[1].subsampling_y, x >> xd->plane[1].subsampling_x,
+          xd->plane[1].subsampling_x, xd->plane[1].subsampling_y, xd->bd,
+          is_cur_buf_hbd(xd), 0, scale, &ref_buf_uv, interp_filters);
+      inter_pred_params.conv_params = get_conv_params(0, 2, xd->bd);
+      av1_build_inter_predictor(&pred[(BLK_PELS << 1)], uv_block_width, &mv,
+                                &inter_pred_params);
     }
 
     return;
@@ -104,13 +109,14 @@ static void temporal_filter_predictors_mb_c(
   for (i = 0; i < BH; i += ys) {
     for (j = 0; j < BW; j += xs) {
       const MV mv = blk_mvs[k];
-      const int y_offset = i * stride + j;
       const int p_offset = i * BW + j;
 
-      av1_build_inter_predictor(y_mb_ptr + y_offset, stride, &pred[p_offset],
-                                BW, &mv, scale, xs, ys, &conv_params,
-                                interp_filters, &warp_types, x, y, 0, 0,
-                                MV_PRECISION_Q3, x, y, xd, can_use_previous);
+      av1_init_inter_params(&inter_pred_params, xs, ys, y + i, x + j, 0, 0,
+                            xd->bd, is_cur_buf_hbd(xd), 0, scale, &ref_buf_y,
+                            interp_filters);
+      inter_pred_params.conv_params = get_conv_params(0, 0, xd->bd);
+
+      av1_build_inter_predictor(&pred[p_offset], BW, &mv, &inter_pred_params);
       k++;
     }
   }
@@ -124,19 +130,31 @@ static void temporal_filter_predictors_mb_c(
     for (i = 0; i < uv_block_height; i += ys) {
       for (j = 0; j < uv_block_width; j += xs) {
         const MV mv = blk_mvs[k];
-        const int uv_offset = i * uv_stride + j;
         const int p_offset = i * uv_block_width + j;
 
-        av1_build_inter_predictor(u_mb_ptr + uv_offset, uv_stride,
-                                  &pred[BLK_PELS + p_offset], uv_block_width,
-                                  &mv, scale, xs, ys, &conv_params,
-                                  interp_filters, &warp_types, x, y, 1, 0,
-                                  mv_precision_uv, x, y, xd, can_use_previous);
-        av1_build_inter_predictor(
-            v_mb_ptr + uv_offset, uv_stride, &pred[(BLK_PELS << 1) + p_offset],
-            uv_block_width, &mv, scale, xs, ys, &conv_params, interp_filters,
-            &warp_types, x, y, 2, 0, mv_precision_uv, x, y, xd,
-            can_use_previous);
+        struct buf_2d ref_buf_uv = { NULL, ref_frame->u_buffer,
+                                     ref_frame->uv_width, ref_frame->uv_height,
+                                     ref_frame->uv_stride };
+
+        av1_init_inter_params(
+            &inter_pred_params, xs, ys, (y >> xd->plane[1].subsampling_y) + i,
+            (x >> xd->plane[1].subsampling_x) + j, xd->plane[1].subsampling_x,
+            xd->plane[1].subsampling_y, xd->bd, is_cur_buf_hbd(xd), 0, scale,
+            &ref_buf_uv, interp_filters);
+        inter_pred_params.conv_params = get_conv_params(0, 1, xd->bd);
+        av1_build_inter_predictor(&pred[BLK_PELS + p_offset], uv_block_width,
+                                  &mv, &inter_pred_params);
+
+        ref_buf_uv.buf0 = ref_frame->v_buffer;
+        av1_init_inter_params(
+            &inter_pred_params, xs, ys, (y >> xd->plane[1].subsampling_y) + i,
+            (x >> xd->plane[1].subsampling_x) + j, xd->plane[1].subsampling_x,
+            xd->plane[1].subsampling_y, xd->bd, is_cur_buf_hbd(xd), 0, scale,
+            &ref_buf_uv, interp_filters);
+
+        inter_pred_params.conv_params = get_conv_params(0, 2, xd->bd);
+        av1_build_inter_predictor(&pred[(BLK_PELS << 1) + p_offset],
+                                  uv_block_width, &mv, &inter_pred_params);
         k++;
       }
     }
@@ -151,7 +169,6 @@ static void apply_temporal_filter_self(const uint8_t *pred, int buf_stride,
                                        int use_new_temporal_mode) {
   const int modifier = use_new_temporal_mode ? SCALE : filter_weight * 16;
   unsigned int i, j, k = 0;
-  assert(filter_weight == 2);
 
   for (i = 0; i < block_height; i++) {
     for (j = 0; j < block_width; j++) {
@@ -170,7 +187,6 @@ static void highbd_apply_temporal_filter_self(
   const int modifier = use_new_temporal_mode ? SCALE : filter_weight * 16;
   const uint16_t *pred = CONVERT_TO_SHORTPTR(pred8);
   unsigned int i, j, k = 0;
-  assert(filter_weight == 2);
 
   for (i = 0; i < block_height; i++) {
     for (j = 0; j < block_width; j++) {
@@ -670,8 +686,7 @@ void av1_temporal_filter_plane_c(uint8_t *frame1, unsigned int stride,
   (void)strength;
   (void)blk_fw;
   (void)use_32x32;
-  const double decay = decay_control * exp(1 - sigma);
-  const double h = decay * sigma;
+  const double h = decay_control * (0.7 + log(sigma + 0.5));
   const double beta = 1.0;
   for (int i = 0, k = 0; i < block_height; i++) {
     for (int j = 0; j < block_width; j++, k++) {
@@ -716,8 +731,7 @@ void av1_highbd_temporal_filter_plane_c(
   (void)use_32x32;
   uint16_t *frame1 = CONVERT_TO_SHORTPTR(frame1_8bit);
   uint16_t *frame2 = CONVERT_TO_SHORTPTR(frame2_8bit);
-  const double decay = decay_control * exp(1 - sigma);
-  const double h = decay * sigma;
+  const double h = decay_control * (0.7 + log(sigma + 0.5));
   const double beta = 1.0;
   for (int i = 0, k = 0; i < block_height; i++) {
     for (int j = 0; j < block_width; j++, k++) {
@@ -768,9 +782,9 @@ void apply_temporal_filter_block(YV12_BUFFER_CONFIG *frame, MACROBLOCKD *mbd,
       int decay_control;
       // The decay is obtained empirically, subject to better tuning.
       if (frame_height >= 720) {
-        decay_control = 7;
+        decay_control = 4;
       } else if (frame_height >= 480) {
-        decay_control = 5;
+        decay_control = 4;
       } else {
         decay_control = 3;
       }
@@ -820,23 +834,23 @@ void apply_temporal_filter_block(YV12_BUFFER_CONFIG *frame, MACROBLOCKD *mbd,
     int decay_control;
     // The decay is obtained empirically, subject to better tuning.
     if (frame_height >= 720) {
-      decay_control = 7;
+      decay_control = 4;
     } else if (frame_height >= 480) {
-      decay_control = 5;
+      decay_control = 4;
     } else {
       decay_control = 3;
     }
-    av1_temporal_filter_plane_c(frame->y_buffer + mb_y_src_offset,
-                                frame->y_stride, predictor, BW, BW, BH,
-                                strength, sigma, decay_control, blk_fw,
-                                use_32x32, accumulator, count);
+    av1_temporal_filter_plane(frame->y_buffer + mb_y_src_offset,
+                              frame->y_stride, predictor, BW, BW, BH, strength,
+                              sigma, decay_control, blk_fw, use_32x32,
+                              accumulator, count);
     if (num_planes > 1) {
-      av1_temporal_filter_plane_c(
+      av1_temporal_filter_plane(
           frame->u_buffer + mb_uv_src_offset, frame->uv_stride,
           predictor + BLK_PELS, mb_uv_width, mb_uv_width, mb_uv_height,
           strength, sigma, decay_control, blk_fw, use_32x32,
           accumulator + BLK_PELS, count + BLK_PELS);
-      av1_temporal_filter_plane_c(
+      av1_temporal_filter_plane(
           frame->v_buffer + mb_uv_src_offset, frame->uv_stride,
           predictor + (BLK_PELS << 1), mb_uv_width, mb_uv_width, mb_uv_height,
           strength, sigma, decay_control, blk_fw, use_32x32,
@@ -871,7 +885,7 @@ static int temporal_filter_find_matching_mb_c(
     int step_param) {
   MACROBLOCK *const x = &cpi->td.mb;
   MACROBLOCKD *const xd = &x->e_mbd;
-  const MV_SPEED_FEATURES *const mv_sf = &cpi->sf.mv;
+  const MV_SPEED_FEATURES *const mv_sf = &cpi->sf.mv_sf;
   int sadpb = x->sadperbit16;
   int bestsme = INT_MAX;
   int distortion;
@@ -897,9 +911,10 @@ static int temporal_filter_find_matching_mb_c(
   // av1_full_pixel_search() parameters: best_ref_mv1_full is the start mv, and
   // ref_mv is for mv rate calculation. The search result is stored in
   // x->best_mv.
-  av1_full_pixel_search(cpi, x, TF_BLOCK, &best_ref_mv1_full, step_param, NSTEP,
-                        1, sadpb, cond_cost_list(cpi, cost_list), &ref_mv, 0, 0,
-                        x_pos, y_pos, 0, &cpi->ss_cfg[SS_CFG_LOOKAHEAD], 0);
+  av1_full_pixel_search(cpi, x, TF_BLOCK, &best_ref_mv1_full, step_param, 1,
+                        NSTEP, 1, sadpb, cond_cost_list(cpi, cost_list),
+                        &ref_mv, 0, 0, x_pos, y_pos, 0,
+                        &cpi->ss_cfg[SS_CFG_LOOKAHEAD], 0);
   x->mv_limits = tmp_mv_limits;
 
   // Ignore mv costing by sending NULL pointer instead of cost array
@@ -954,7 +969,7 @@ static int temporal_filter_find_matching_mb_c(
 
       av1_set_mv_search_range(&x->mv_limits, &ref_mv);
       av1_full_pixel_search(cpi, x, TF_SUB_BLOCK, &best_ref_mv1_full,
-                            step_param, NSTEP, 1, sadpb,
+                            step_param, 1, NSTEP, 1, sadpb,
                             cond_cost_list(cpi, cost_list), &ref_mv, 0, 0,
                             x_pos, y_pos, 0, &cpi->ss_cfg[SS_CFG_LOOKAHEAD], 0);
       x->mv_limits = tmp_mv_limits;
@@ -989,7 +1004,7 @@ typedef struct {
 static FRAME_DIFF temporal_filter_iterate_c(
     AV1_COMP *cpi, YV12_BUFFER_CONFIG **frames, int frame_count,
     int alt_ref_index, int strength, double sigma, int is_key_frame,
-    struct scale_factors *ref_scale_factors) {
+    struct scale_factors *ref_scale_factors, int second_alt_ref) {
   const AV1_COMMON *cm = &cpi->common;
   const int num_planes = av1_num_planes(cm);
   const int mb_cols = get_cols(frames[alt_ref_index]->y_crop_width);
@@ -1016,8 +1031,8 @@ static FRAME_DIFF temporal_filter_iterate_c(
   const int mb_uv_width = BW >> mbd->plane[1].subsampling_x;
 #if EXPERIMENT_TEMPORAL_FILTER
   const int is_screen_content_type = cm->allow_screen_content_tools != 0;
-  const int use_new_temporal_mode = AOMMIN(cm->width, cm->height) >= 480 &&
-                                    !is_screen_content_type && !is_key_frame;
+  const int use_new_temporal_mode =
+      !is_screen_content_type && AOMMIN(cm->width, cm->height) >= 480;
 #else
   (void)sigma;
   const int use_new_temporal_mode = 0;
@@ -1100,14 +1115,15 @@ static FRAME_DIFF temporal_filter_iterate_c(
         blk_mvs[3] = kZeroMv;
 
         if (frame == alt_ref_index) {
-          blk_fw[0] = blk_fw[1] = blk_fw[2] = blk_fw[3] = 2;
+          const int weight = second_alt_ref ? 4 : 2;
+          blk_fw[0] = blk_fw[1] = blk_fw[2] = blk_fw[3] = weight;
           use_32x32 = 1;
           // Change ref_mv sign for following frames.
           best_ref_mv1.row *= -1;
           best_ref_mv1.col *= -1;
         } else {
-          int thresh_low = 10000;
-          int thresh_high = 20000;
+          int thresh_low = 10000 >> second_alt_ref;
+          int thresh_high = 20000 >> second_alt_ref;
           int blk_bestsme[4] = { INT_MAX, INT_MAX, INT_MAX, INT_MAX };
 
           // Find best match in this frame by MC
@@ -1150,13 +1166,10 @@ static FRAME_DIFF temporal_filter_iterate_c(
         if (blk_fw[0] || blk_fw[1] || blk_fw[2] || blk_fw[3]) {
           // Construct the predictors
           temporal_filter_predictors_mb_c(
-              mbd, frames[frame]->y_buffer + mb_y_src_offset,
-              frames[frame]->u_buffer + mb_uv_src_offset,
-              frames[frame]->v_buffer + mb_uv_src_offset,
-              frames[frame]->y_stride, mb_uv_width, mb_uv_height,
+              frames[frame], mbd, mb_uv_width, mb_uv_height,
               mbd->mi[0]->mv[0].as_mv.row, mbd->mi[0]->mv[0].as_mv.col,
               predictor, ref_scale_factors, mb_col * BW, mb_row * BH,
-              cm->allow_warped_motion, num_planes, blk_mvs, use_32x32);
+              num_planes, blk_mvs, use_32x32);
 
           // Apply the filter (YUV)
           if (frame == alt_ref_index) {
@@ -1322,7 +1335,7 @@ static FRAME_DIFF temporal_filter_iterate_c(
         }
       }
 
-      if (!is_key_frame && cpi->sf.adaptive_overlay_encoding) {
+      if (!is_key_frame && cpi->sf.hl_sf.adaptive_overlay_encoding) {
         // Calculate the difference(dist) between source and filtered source.
         dst1 = cpi->alt_ref_buffer.y_buffer + mb_y_offset;
         stride = cpi->alt_ref_buffer.y_stride;
@@ -1443,7 +1456,8 @@ static int estimate_strength(AV1_COMP *cpi, int distance, int group_boost,
     q = ((int)av1_convert_qindex_to_q(cpi->rc.avg_frame_qindex[KEY_FRAME],
                                       cpi->common.seq_params.bit_depth));
   MACROBLOCKD *mbd = &cpi->td.mb.e_mbd;
-  struct lookahead_entry *buf = av1_lookahead_peek(cpi->lookahead, distance);
+  struct lookahead_entry *buf =
+      av1_lookahead_peek(cpi->lookahead, distance, cpi->compressor_stage);
   int strength;
   double noiselevel;
   if (is_cur_buf_hbd(mbd)) {
@@ -1490,8 +1504,12 @@ static int estimate_strength(AV1_COMP *cpi, int distance, int group_boost,
 // Apply buffer limits and context specific adjustments to arnr filter.
 static void adjust_arnr_filter(AV1_COMP *cpi, int distance, int group_boost,
                                int *arnr_frames, int *arnr_strength,
-                               double *sigma, int *frm_bwd, int *frm_fwd) {
+                               double *sigma, int *frm_bwd, int *frm_fwd,
+                               int second_alt_ref) {
   int frames = cpi->oxcf.arnr_max_frames;
+
+  // Only use the 2 nearest frames in second alt ref's temporal filtering.
+  if (second_alt_ref) frames = AOMMIN(frames, 3);
 
   // Adjust number of frames in filter and strength based on gf boost level.
   if (frames > group_boost / 150) {
@@ -1500,7 +1518,7 @@ static void adjust_arnr_filter(AV1_COMP *cpi, int distance, int group_boost,
   }
 
   const int frames_after_arf =
-      av1_lookahead_depth(cpi->lookahead) - distance - 1;
+      av1_lookahead_depth(cpi->lookahead, cpi->compressor_stage) - distance - 1;
   int frames_fwd = (frames - 1) >> 1;
   int frames_bwd = frames >> 1;
 
@@ -1533,6 +1551,12 @@ int av1_temporal_filter(AV1_COMP *cpi, int distance,
   int rdmult = 0;
   double sigma = 0;
 
+  // Temporal filter 1 more alt ref if its distance >= 7. This frame is always
+  // a show existing frame.
+  const int second_alt_ref =
+      (gf_group->update_type[gf_group->index] == INTNL_ARF_UPDATE) &&
+      (distance >= 7) && cpi->sf.hl_sf.second_alt_ref_filtering;
+
   // TODO(yunqing): For INTNL_ARF_UPDATE type, the following me initialization
   // is used somewhere unexpectedly. Should be resolved later.
   // Initialize errorperbit, sadperbit16 and sadperbit4.
@@ -1543,7 +1567,8 @@ int av1_temporal_filter(AV1_COMP *cpi, int distance,
                     cpi->common.allow_high_precision_mv, &cpi->td.mb);
 
   // Apply context specific adjustments to the arnr filter parameters.
-  if (gf_group->update_type[gf_group->index] == INTNL_ARF_UPDATE) {
+  if (gf_group->update_type[gf_group->index] == INTNL_ARF_UPDATE &&
+      !second_alt_ref) {
     // TODO(weitinglin): Currently, we enforce the filtering strength on
     // internal ARFs to be zeros. We should investigate in which case it is more
     // beneficial to use non-zero strength filtering.
@@ -1552,30 +1577,40 @@ int av1_temporal_filter(AV1_COMP *cpi, int distance,
     return 0;
   }
 
-  if (distance == -1) {
-    // Apply temporal filtering on key frame.
-    strength = estimate_strength(cpi, distance, rc->gfu_boost, &sigma);
-    // Number of frames for temporal filtering, could be tuned.
+  if (distance < 0) {
     frames_to_blur = NUM_KEY_FRAME_DENOISING;
-    frames_to_blur_backward = 0;
-    frames_to_blur_forward = frames_to_blur - 1;
-    start_frame = distance + frames_to_blur_forward;
+    if (distance == -1) {
+      // Apply temporal filtering on key frame.
+      strength = estimate_strength(cpi, distance, rc->gfu_boost, &sigma);
+      // Number of frames for temporal filtering, could be tuned.
+      frames_to_blur_backward = 0;
+      frames_to_blur_forward = frames_to_blur - 1;
+      start_frame = distance + frames_to_blur_forward;
+    } else {
+      // Apply temporal filtering on forward key frame. This requires filtering
+      // backwards rather than forwards.
+      strength = estimate_strength(cpi, -1 * distance, rc->gfu_boost, &sigma);
+      // Number of frames for temporal filtering, could be tuned.
+      frames_to_blur_backward = frames_to_blur - 1;
+      frames_to_blur_forward = 0;
+      start_frame = -1 * distance;
+    }
   } else {
     adjust_arnr_filter(cpi, distance, rc->gfu_boost, &frames_to_blur, &strength,
                        &sigma, &frames_to_blur_backward,
-                       &frames_to_blur_forward);
+                       &frames_to_blur_forward, second_alt_ref);
     start_frame = distance + frames_to_blur_forward;
-  }
 
-  cpi->common.showable_frame =
-      (strength == 0 && frames_to_blur == 1) ||
-      (cpi->oxcf.enable_overlay == 0 || cpi->sf.disable_overlay_frames);
+    cpi->common.showable_frame =
+        (strength == 0 && frames_to_blur == 1) || second_alt_ref ||
+        (cpi->oxcf.enable_overlay == 0 || cpi->sf.hl_sf.disable_overlay_frames);
+  }
 
   // Setup frame pointers, NULL indicates frame not included in filter.
   for (frame = 0; frame < frames_to_blur; ++frame) {
     const int which_buffer = start_frame - frame;
     struct lookahead_entry *buf =
-        av1_lookahead_peek(cpi->lookahead, which_buffer);
+        av1_lookahead_peek(cpi->lookahead, which_buffer, cpi->compressor_stage);
     if (buf == NULL) {
       frames[frames_to_blur - 1 - frame] = NULL;
     } else {
@@ -1592,13 +1627,15 @@ int av1_temporal_filter(AV1_COMP *cpi, int distance,
         frames[0]->y_crop_width, frames[0]->y_crop_height);
   }
 
-  FRAME_DIFF diff = temporal_filter_iterate_c(cpi, frames, frames_to_blur,
-                                              frames_to_blur_backward, strength,
-                                              sigma, distance == -1, &sf);
+  FRAME_DIFF diff = temporal_filter_iterate_c(
+      cpi, frames, frames_to_blur, frames_to_blur_backward, strength, sigma,
+      distance < 0, &sf, second_alt_ref);
 
-  if (distance == -1) return 1;
+  if (distance < 0) return 1;
 
-  if (show_existing_alt_ref != NULL && cpi->sf.adaptive_overlay_encoding) {
+  if ((show_existing_alt_ref != NULL &&
+       cpi->sf.hl_sf.adaptive_overlay_encoding) ||
+      second_alt_ref) {
     AV1_COMMON *const cm = &cpi->common;
     int top_index = 0, bottom_index = 0;
 
@@ -1619,10 +1656,15 @@ int av1_temporal_filter(AV1_COMP *cpi, int distance,
     const float std = (float)sqrt((float)diff.sse / mbs - mean * mean);
     const float threshold = 0.7f;
 
-    *show_existing_alt_ref = 0;
-    if (mean / ac_q_2 < threshold && std < mean * 1.2)
-      *show_existing_alt_ref = 1;
-    cpi->common.showable_frame |= *show_existing_alt_ref;
+    if (!second_alt_ref) {
+      *show_existing_alt_ref = 0;
+      if (mean / ac_q_2 < threshold && std < mean * 1.2)
+        *show_existing_alt_ref = 1;
+      cpi->common.showable_frame |= *show_existing_alt_ref;
+    } else {
+      // Use source frame if the filtered frame becomes very different.
+      if (!(mean / ac_q_2 < threshold && std < mean * 1.2)) return 0;
+    }
   }
 
   return 1;

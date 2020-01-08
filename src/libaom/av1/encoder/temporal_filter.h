@@ -34,6 +34,11 @@ extern "C" {
 #define EDGE_THRESHOLD 50
 #define SQRT_PI_BY_2 1.25331413732
 
+#define EXPERIMENT_TEMPORAL_FILTER 1
+#define WINDOW_LENGTH 2
+#define WINDOW_SIZE 25
+#define SCALE 1000
+
 static INLINE BLOCK_SIZE dims_to_size(int w, int h) {
   if (w != h) return -1;
   switch (w) {

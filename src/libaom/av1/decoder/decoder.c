@@ -247,18 +247,18 @@ void av1_decoder_remove(AV1Decoder *pbi) {
   aom_accounting_clear(&pbi->accounting);
 #endif
   av1_free_mc_tmp_buf(&pbi->td);
-
+  aom_img_metadata_array_free(pbi->metadata);
   aom_free(pbi);
 }
 
-void av1_visit_palette(AV1Decoder *const pbi, MACROBLOCKD *const xd, int mi_row,
-                       int mi_col, aom_reader *r, BLOCK_SIZE bsize,
+void av1_visit_palette(AV1Decoder *const pbi, MACROBLOCKD *const xd,
+                       aom_reader *r, BLOCK_SIZE bsize,
                        palette_visitor_fn_t visit) {
   if (!is_inter_block(xd->mi[0])) {
     for (int plane = 0; plane < AOMMIN(2, av1_num_planes(&pbi->common));
          ++plane) {
       const struct macroblockd_plane *const pd = &xd->plane[plane];
-      if (is_chroma_reference(mi_row, mi_col, bsize, pd->subsampling_x,
+      if (is_chroma_reference(xd->mi_row, xd->mi_col, bsize, pd->subsampling_x,
                               pd->subsampling_y)) {
         if (xd->mi[0]->palette_mode_info.palette_size[plane])
           visit(xd, plane, r);

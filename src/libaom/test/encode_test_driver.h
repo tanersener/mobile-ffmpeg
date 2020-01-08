@@ -82,7 +82,7 @@ class TwopassStatsStore {
 // level of abstraction will be fleshed out as more tests are written.
 class Encoder {
  public:
-  Encoder(aom_codec_enc_cfg_t cfg, const uint32_t init_flags,
+  Encoder(aom_codec_enc_cfg_t cfg, const aom_codec_flags_t init_flags,
           TwopassStatsStore *stats)
       : cfg_(cfg), init_flags_(init_flags), stats_(stats) {
     memset(&encoder_, 0, sizeof(encoder_));
@@ -164,7 +164,7 @@ class Encoder {
 
   aom_codec_ctx_t encoder_;
   aom_codec_enc_cfg_t cfg_;
-  unsigned long init_flags_;
+  aom_codec_flags_t init_flags_;
   TwopassStatsStore *stats_;
 };
 
@@ -193,9 +193,7 @@ class EncoderTest {
   void SetMode(TestMode mode);
 
   // Set encoder flag.
-  void set_init_flags(unsigned long flag) {  // NOLINT(runtime/int)
-    init_flags_ = flag;
-  }
+  void set_init_flags(aom_codec_flags_t flag) { init_flags_ = flag; }
 
   // Main loop
   virtual void RunLoop(VideoSource *video);
@@ -255,7 +253,7 @@ class EncoderTest {
   aom_codec_enc_cfg_t cfg_;
   unsigned int passes_;
   TwopassStatsStore stats_;
-  unsigned long init_flags_;
+  aom_codec_flags_t init_flags_;
   unsigned long frame_flags_;
   aom_codec_pts_t last_pts_;
   TestMode mode_;

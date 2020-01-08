@@ -41,7 +41,7 @@ extern "C" {
  * fields to structures
  */
 #define AOM_ENCODER_ABI_VERSION \
-  (5 + AOM_CODEC_ABI_VERSION) /**<\hideinitializer*/
+  (7 + AOM_CODEC_ABI_VERSION) /**<\hideinitializer*/
 
 /*! \brief Encoder capabilities bitfield
  *
@@ -77,13 +77,6 @@ typedef struct aom_fixed_buf {
   void *buf;       /**< Pointer to the data. Does NOT own the data! */
   size_t sz;       /**< Length of the buffer, in chars */
 } aom_fixed_buf_t; /**< alias for struct aom_fixed_buf */
-
-/*!\brief Time Stamp Type
- *
- * An integer, which when multiplied by the stream's time base, provides
- * the absolute time of a sample.
- */
-typedef int64_t aom_codec_pts_t;
 
 /*!\brief Compressed Frame Flags
  *
@@ -208,6 +201,154 @@ enum aom_kf_mode {
   AOM_KF_AUTO,        /**< Encoder determines optimal placement automatically */
   AOM_KF_DISABLED = 0 /**< Encoder does not place keyframes. */
 };
+
+/*!\brief Encoder Config Options
+ *
+ * This type allows to enumerate and control flags defined for encoder control
+ * via config file at runtime.
+ */
+typedef struct cfg_options {
+  /*!\brief Indicate init by cfg file
+   * 0 or 1
+   */
+  unsigned int init_by_cfg_file;
+  /*!\brief Superblock size
+   * 0, 64 or 128
+   */
+  unsigned int super_block_size;
+  /*!\brief max partition size
+   * 8, 16, 32, 64, 128
+   */
+  unsigned int max_partition_size;
+  /*!\brief min partition size
+   * 8, 16, 32, 64, 128
+   */
+  unsigned int min_partition_size;
+  /*!\brief disable AB Shape partition type
+   *
+   */
+  unsigned int disable_ab_partition_type;
+  /*!\brief disable rectangular partition type
+   *
+   */
+  unsigned int disable_rect_partition_type;
+  /*!\brief disable 1:4/4:1 partition type
+   *
+   */
+  unsigned int disable_1to4_partition_type;
+  /*!\brief disable flip and identity transform type
+   *
+   */
+  unsigned int disable_flip_idtx;
+  /*!\brief disable CDEF filter
+   *
+   */
+  unsigned int disable_cdef;
+  /*!\brief disable Loop Restoration Filter
+   *
+   */
+  unsigned int disable_lr;
+  /*!\brief disable OBMC
+   *
+   */
+  unsigned int disable_obmc;
+  /*!\brief disable Warped Motion
+   *
+   */
+  unsigned int disable_warp_motion;
+  /*!\brief disable global motion
+   *
+   */
+  unsigned int disable_global_motion;
+  /*!\brief disable dist weighted compound
+   *
+   */
+  unsigned int disable_dist_wtd_comp;
+  /*!\brief disable diff weighted compound
+   *
+   */
+  unsigned int disable_diff_wtd_comp;
+  /*!\brief disable inter/intra compound
+   *
+   */
+  unsigned int disable_inter_intra_comp;
+  /*!\brief disable masked compound
+   *
+   */
+  unsigned int disable_masked_comp;
+  /*!\brief disable one sided compound
+   *
+   */
+  unsigned int disable_one_sided_comp;
+  /*!\brief disable Palette
+   *
+   */
+  unsigned int disable_palette;
+  /*!\brief disable Intra Block Copy
+   *
+   */
+  unsigned int disable_intrabc;
+  /*!\brief disable chroma from luma
+   *
+   */
+  unsigned int disable_cfl;
+  /*!\brief disable intra smooth mode
+   *
+   */
+  unsigned int disable_smooth_intra;
+  /*!\brief disable filter intra
+   *
+   */
+  unsigned int disable_filter_intra;
+  /*!\brief disable dual filter
+   *
+   */
+  unsigned int disable_dual_filter;
+  /*!\brief disable intra angle delta
+   *
+   */
+  unsigned int disable_intra_angle_delta;
+  /*!\brief disable intra edge filter
+   *
+   */
+  unsigned int disable_intra_edge_filter;
+  /*!\brief disable 64x64 transform
+   *
+   */
+  unsigned int disable_tx_64x64;
+  /*!\brief disable smooth inter/intra
+   *
+   */
+  unsigned int disable_smooth_inter_intra;
+  /*!\brief disable inter/inter wedge comp
+   *
+   */
+  unsigned int disable_inter_inter_wedge;
+  /*!\brief disable inter/intra wedge comp
+   *
+   */
+  unsigned int disable_inter_intra_wedge;
+  /*!\brief disable paeth intra
+   *
+   */
+  unsigned int disable_paeth_intra;
+  /*!\brief disable trellis quantization
+   *
+   */
+  unsigned int disable_trellis_quant;
+  /*!\brief disable ref frame MV
+   *
+   */
+  unsigned int disable_ref_frame_mv;
+  /*!\brief use reduced reference frame set
+   *
+   */
+  unsigned int reduced_reference_set;
+  /*!\brief use reduced transform type set
+   *
+   */
+  unsigned int reduced_tx_type_set;
+} cfg_options_t;
 
 /*!\brief Encoded Frame Flags
  *
@@ -727,7 +868,7 @@ typedef struct aom_codec_enc_cfg {
   /*!\brief Options defined per config file
    *
    */
-  cfg_options_t cfg;
+  cfg_options_t encoder_cfg;
 } aom_codec_enc_cfg_t; /**< alias for struct aom_codec_enc_cfg */
 
 /*!\brief Initialize an encoder instance

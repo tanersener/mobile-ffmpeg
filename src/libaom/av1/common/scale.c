@@ -37,7 +37,7 @@ static INLINE int scaled_y(int val, const struct scale_factors *sf) {
 // Note: Expect val to be in q4 precision
 static int unscaled_value(int val, const struct scale_factors *sf) {
   (void)sf;
-  return val << SCALE_EXTRA_BITS;
+  return val * (1 << SCALE_EXTRA_BITS);
 }
 
 static int get_fixed_point_scale_factor(int other_size, int this_size) {

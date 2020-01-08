@@ -56,23 +56,21 @@ void av1_set_contexts(const MACROBLOCKD *xd, struct macroblockd_plane *pd,
     memset(l, has_eob, sizeof(*l) * txs_high);
   }
 }
-void av1_reset_skip_context(MACROBLOCKD *xd, int mi_row, int mi_col,
-                            BLOCK_SIZE bsize, const int num_planes) {
-  int i;
-  int nplanes;
-  int chroma_ref;
+void av1_reset_skip_context(MACROBLOCKD *xd, BLOCK_SIZE bsize,
+                            const int num_planes) {
   assert(bsize < BLOCK_SIZES_ALL);
-
-  chroma_ref =
+  const int mi_row = xd->mi_row;
+  const int mi_col = xd->mi_col;
+  const int chroma_ref =
       is_chroma_reference(mi_row, mi_col, bsize, xd->plane[1].subsampling_x,
                           xd->plane[1].subsampling_y);
-  nplanes = 1 + (num_planes - 1) * chroma_ref;
-  for (i = 0; i < nplanes; i++) {
+  const int nplanes = 1 + (num_planes - 1) * chroma_ref;
+  for (int i = 0; i < nplanes; i++) {
     struct macroblockd_plane *const pd = &xd->plane[i];
     const BLOCK_SIZE plane_bsize =
         get_plane_block_size(bsize, pd->subsampling_x, pd->subsampling_y);
-    const int txs_wide = block_size_wide[plane_bsize] >> tx_size_wide_log2[0];
-    const int txs_high = block_size_high[plane_bsize] >> tx_size_high_log2[0];
+    const int txs_wide = mi_size_wide[plane_bsize];
+    const int txs_high = mi_size_high[plane_bsize];
     memset(pd->above_context, 0, sizeof(ENTROPY_CONTEXT) * txs_wide);
     memset(pd->left_context, 0, sizeof(ENTROPY_CONTEXT) * txs_high);
   }

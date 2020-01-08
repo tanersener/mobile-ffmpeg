@@ -59,7 +59,7 @@ static AOM_INLINE void output_stats(FIRSTPASS_STATS *stats,
   pkt.kind = AOM_CODEC_STATS_PKT;
   pkt.data.twopass_stats.buf = stats;
   pkt.data.twopass_stats.sz = sizeof(FIRSTPASS_STATS);
-  aom_codec_pkt_list_add(pktlist, &pkt);
+  if (pktlist != NULL) aom_codec_pkt_list_add(pktlist, &pkt);
 
 // TEMP debug code
 #if OUTPUT_FPF
@@ -218,62 +218,28 @@ static AOM_INLINE void first_pass_motion_search(AV1_COMP *cpi, MACROBLOCK *x,
                                                 const MV *ref_mv, MV *best_mv,
                                                 int *best_motion_err) {
   MACROBLOCKD *const xd = &x->e_mbd;
-  MV tmp_mv = kZeroMv;
   MV ref_mv_full = { ref_mv->row >> 3, ref_mv->col >> 3 };
-  int num00, tmp_err, n;
+  int tmp_err;
   const BLOCK_SIZE bsize = xd->mi[0]->sb_type;
   aom_variance_fn_ptr_t v_fn_ptr = cpi->fn_ptr[bsize];
   const int new_mv_mode_penalty = NEW_MV_MODE_PENALTY;
-
-  int step_param = 3;
-  int further_steps = (MAX_MVSEARCH_STEPS - 1) - step_param;
   const int sr = get_search_range(cpi);
-  step_param += sr;
-  further_steps -= sr;
+  int step_param = 3 + sr;
+  int cost_list[5];
 
-  // Override the default variance function to use MSE.
-  v_fn_ptr.vf = get_block_variance_fn(bsize);
-#if CONFIG_AV1_HIGHBITDEPTH
-  if (is_cur_buf_hbd(xd)) {
-    v_fn_ptr.vf = highbd_get_block_variance_fn(bsize, xd->bd);
-  }
-#endif
-  // Center the initial step/diamond search on best mv.
-  tmp_err = cpi->diamond_search_sad(x, &cpi->ss_cfg[SS_CFG_SRC], &ref_mv_full,
-                                    &tmp_mv, step_param, x->sadperbit16, &num00,
-                                    &v_fn_ptr, ref_mv);
+  tmp_err = av1_full_pixel_search(
+      cpi, x, bsize, &ref_mv_full, step_param, 0, NSTEP, 0, x->sadperbit16,
+      cond_cost_list(cpi, cost_list), ref_mv, INT_MAX, 0,
+      (MI_SIZE * xd->mi_col), (MI_SIZE * xd->mi_row), 0,
+      &cpi->ss_cfg[SS_CFG_FPF], 0);
+
   if (tmp_err < INT_MAX)
-    tmp_err = av1_get_mvpred_var(x, &tmp_mv, ref_mv, &v_fn_ptr, 1);
-  if (tmp_err < INT_MAX - new_mv_mode_penalty) tmp_err += new_mv_mode_penalty;
+    tmp_err = av1_get_mvpred_var(x, &x->best_mv.as_mv, ref_mv, &v_fn_ptr, 0) +
+              new_mv_mode_penalty;
 
   if (tmp_err < *best_motion_err) {
     *best_motion_err = tmp_err;
-    *best_mv = tmp_mv;
-  }
-
-  // Carry out further step/diamond searches as necessary.
-  n = num00;
-  num00 = 0;
-
-  while (n < further_steps) {
-    ++n;
-
-    if (num00) {
-      --num00;
-    } else {
-      tmp_err = cpi->diamond_search_sad(
-          x, &cpi->ss_cfg[SS_CFG_SRC], &ref_mv_full, &tmp_mv, step_param + n,
-          x->sadperbit16, &num00, &v_fn_ptr, ref_mv);
-      if (tmp_err < INT_MAX)
-        tmp_err = av1_get_mvpred_var(x, &tmp_mv, ref_mv, &v_fn_ptr, 1);
-      if (tmp_err < INT_MAX - new_mv_mode_penalty)
-        tmp_err += new_mv_mode_penalty;
-
-      if (tmp_err < *best_motion_err) {
-        *best_motion_err = tmp_err;
-        *best_mv = tmp_mv;
-      }
-    }
+    *best_mv = x->best_mv.as_mv;
   }
 }
 
@@ -367,7 +333,7 @@ void av1_first_pass(AV1_COMP *cpi, const int64_t ts_duration) {
   const int alt_offset = 16 - (current_frame->frame_number % 16);
   if (alt_offset < 16) {
     const struct lookahead_entry *const alt_buf =
-        av1_lookahead_peek(cpi->lookahead, alt_offset);
+        av1_lookahead_peek(cpi->lookahead, alt_offset, cpi->compressor_stage);
     if (alt_buf != NULL) {
       alt_yv12 = &alt_buf->img;
     }
@@ -492,7 +458,7 @@ void av1_first_pass(AV1_COMP *cpi, const int64_t ts_duration) {
       xd->mi[0]->mode = DC_PRED;
       xd->mi[0]->tx_size =
           use_dc_pred ? (bsize >= BLOCK_16X16 ? TX_16X16 : TX_8X8) : TX_4X4;
-      av1_encode_intra_block_plane(cpi, x, bsize, 0, 0, mb_row * 2, mb_col * 2);
+      av1_encode_intra_block_plane(cpi, x, bsize, 0, 0);
       this_intra_error = aom_get_mb_ss(x->plane[0].src_diff);
 
       if (this_intra_error < UL_INTRA_THRESH) {
@@ -819,8 +785,7 @@ void av1_first_pass(AV1_COMP *cpi, const int64_t ts_duration) {
         AOMMAX(0, intra_skip_count - (image_data_start_row * cm->mb_cols * 2));
   }
 
-  FIRSTPASS_STATS *this_frame_stats =
-      &twopass->frame_stats_arr[twopass->frame_stats_next_idx];
+  FIRSTPASS_STATS *this_frame_stats = twopass->stats_buf_ctx->stats_in_end;
   {
     FIRSTPASS_STATS fps;
     // The minimum error here insures some bit allocation to frames even
@@ -887,9 +852,14 @@ void av1_first_pass(AV1_COMP *cpi, const int64_t ts_duration) {
     *this_frame_stats = fps;
     output_stats(this_frame_stats, cpi->output_pkt_list);
     accumulate_stats(&twopass->total_stats, &fps);
-    // Update circular index.
-    twopass->frame_stats_next_idx =
-        (twopass->frame_stats_next_idx + 1) % MAX_LAG_BUFFERS;
+    /*In the case of two pass, first pass uses it as a circular buffer,
+     * when LAP is enabled it is used as a linear buffer*/
+    twopass->stats_buf_ctx->stats_in_end++;
+    if ((cpi->oxcf.pass == 1) && (twopass->stats_buf_ctx->stats_in_end >=
+                                  twopass->stats_buf_ctx->stats_in_buf_end)) {
+      twopass->stats_buf_ctx->stats_in_end =
+          twopass->stats_buf_ctx->stats_in_start;
+    }
   }
 
   // Copy the previous Last Frame back into gf buffer if the prediction is good

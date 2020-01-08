@@ -30,7 +30,7 @@ uint32_t av1_write_sequence_header_obu(AV1_COMP *cpi, uint8_t *const dst);
 uint32_t av1_write_obu_header(AV1_COMP *const cpi, OBU_TYPE obu_type,
                               int obu_extension, uint8_t *const dst);
 
-int av1_write_uleb_obu_size(uint32_t obu_header_size, uint32_t obu_payload_size,
+int av1_write_uleb_obu_size(size_t obu_header_size, size_t obu_payload_size,
                             uint8_t *dest);
 
 int av1_pack_bitstream(AV1_COMP *const cpi, uint8_t *dst, size_t *size,

@@ -93,6 +93,13 @@ void av1_print_uncompressed_frame_header(const uint8_t *data, int size,
                                          const char *filename) {
   FILE *hdrFile = fopen(filename, "w");
   fwrite(data, size, sizeof(uint8_t), hdrFile);
+
+  // Reset order hints(7bit + a previous bit) to 0, so that all camera frame
+  // headers are identical in large scale coding.
+  uint8_t zero = 0;
+  fseek(hdrFile, 1, SEEK_SET);
+  // Reset second byte.
+  fwrite(&zero, 1, sizeof(uint8_t), hdrFile);
   fclose(hdrFile);
 }
 

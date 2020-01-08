@@ -171,12 +171,13 @@ list(APPEND AOM_AV1_ENCODER_SOURCES
             "${AOM_ROOT}/av1/encoder/level.h"
             "${AOM_ROOT}/av1/encoder/lookahead.c"
             "${AOM_ROOT}/av1/encoder/lookahead.h"
-            "${AOM_ROOT}/av1/encoder/mbgraph.c"
-            "${AOM_ROOT}/av1/encoder/mbgraph.h"
             "${AOM_ROOT}/av1/encoder/mcomp.c"
             "${AOM_ROOT}/av1/encoder/mcomp.h"
             "${AOM_ROOT}/av1/encoder/ml.c"
             "${AOM_ROOT}/av1/encoder/ml.h"
+            "${AOM_ROOT}/av1/encoder/model_rd.h"
+            "${AOM_ROOT}/av1/encoder/mv_prec.c"
+            "${AOM_ROOT}/av1/encoder/mv_prec.h"
             "${AOM_ROOT}/av1/encoder/palette.c"
             "${AOM_ROOT}/av1/encoder/palette.h"
             "${AOM_ROOT}/av1/encoder/partition_strategy.h"
@@ -197,6 +198,8 @@ list(APPEND AOM_AV1_ENCODER_SOURCES
             "${AOM_ROOT}/av1/encoder/rdopt.c"
             "${AOM_ROOT}/av1/encoder/nonrd_pickmode.c"
             "${AOM_ROOT}/av1/encoder/rdopt.h"
+            "${AOM_ROOT}/av1/encoder/rdopt_data_defs.h"
+            "${AOM_ROOT}/av1/encoder/rdopt_utils.h"
             "${AOM_ROOT}/av1/encoder/reconinter_enc.c"
             "${AOM_ROOT}/av1/encoder/reconinter_enc.h"
             "${AOM_ROOT}/av1/encoder/segmentation.c"
@@ -222,6 +225,11 @@ list(APPEND AOM_AV1_ENCODER_SOURCES
             "${AOM_ROOT}/third_party/vector/vector.h"
             "${AOM_ROOT}/av1/encoder/dwt.c"
             "${AOM_ROOT}/av1/encoder/dwt.h")
+
+if(CONFIG_TUNE_VMAF)
+  list(APPEND AOM_AV1_ENCODER_SOURCES "${AOM_ROOT}/av1/encoder/tune_vmaf.c"
+              "${AOM_ROOT}/av1/encoder/tune_vmaf.h")
+endif()
 
 list(APPEND AOM_AV1_COMMON_INTRIN_SSE2
             "${AOM_ROOT}/av1/common/cdef_block_sse2.c"
@@ -307,6 +315,7 @@ list(APPEND AOM_AV1_ENCODER_INTRIN_SSE2
             "${AOM_ROOT}/av1/encoder/x86/av1_quantize_sse2.c"
             "${AOM_ROOT}/av1/encoder/x86/encodetxb_sse2.c"
             "${AOM_ROOT}/av1/encoder/x86/highbd_block_error_intrin_sse2.c"
+            "${AOM_ROOT}/av1/encoder/x86/temporal_filter_sse2.c"
             "${AOM_ROOT}/av1/encoder/x86/wedge_utils_sse2.c")
 
 if(NOT CONFIG_AV1_HIGHBITDEPTH)
@@ -345,6 +354,7 @@ list(APPEND AOM_AV1_ENCODER_INTRIN_AVX2
             "${AOM_ROOT}/av1/encoder/x86/wedge_utils_avx2.c"
             "${AOM_ROOT}/av1/encoder/x86/encodetxb_avx2.c"
             "${AOM_ROOT}/av1/encoder/x86/rdopt_avx2.c"
+            "${AOM_ROOT}/av1/encoder/x86/temporal_filter_avx2.c"
             "${AOM_ROOT}/av1/encoder/x86/pickrst_avx2.c")
 
 if(NOT CONFIG_AV1_HIGHBITDEPTH)
@@ -407,8 +417,6 @@ if(CONFIG_REALTIME_ONLY)
                    "${AOM_ROOT}/av1/encoder/firstpass.h"
                    "${AOM_ROOT}/av1/encoder/gop_structure.c"
                    "${AOM_ROOT}/av1/encoder/gop_structure.h"
-                   "${AOM_ROOT}/av1/encoder/mbgraph.c"
-                   "${AOM_ROOT}/av1/encoder/mbgraph.h"
                    "${AOM_ROOT}/av1/encoder/partition_cnn_weights.h"
                    "${AOM_ROOT}/av1/encoder/partition_model_weights.h"
                    "${AOM_ROOT}/av1/encoder/pass2_strategy.c"

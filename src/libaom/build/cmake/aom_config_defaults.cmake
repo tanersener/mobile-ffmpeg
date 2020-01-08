@@ -96,7 +96,6 @@ set_aom_config_var(CONFIG_COEFFICIENT_RANGE_CHECKING 0
                    "Coefficient range check.")
 set_aom_config_var(CONFIG_DENOISE 1
                    "Denoise/noise modeling support in encoder.")
-set_aom_config_var(CONFIG_FILEOPTIONS 1 "Enables encoder config file support.")
 set_aom_config_var(CONFIG_INSPECTION 0 "Enables bitstream inspection.")
 set_aom_config_var(CONFIG_INTERNAL_STATS 0 "Enables internal encoder stats.")
 set_aom_config_var(FORCE_HIGHBITDEPTH_DECODING 0
@@ -109,6 +108,7 @@ set_aom_config_var(CONFIG_SIZE_LIMIT 0 "Limit max decode width/height.")
 set_aom_config_var(CONFIG_SPATIAL_RESAMPLING 1 "Spatial resampling.")
 set_aom_config_var(DECODE_HEIGHT_LIMIT 0 "Set limit for decode height.")
 set_aom_config_var(DECODE_WIDTH_LIMIT 0 "Set limit for decode width.")
+set_aom_config_var(CONFIG_TUNE_VMAF 0 "Enable encoding tuning for VMAF.")
 
 # AV1 experiment flags.
 set_aom_config_var(CONFIG_SPEED_STATS 0 "AV1 experiment flag.")

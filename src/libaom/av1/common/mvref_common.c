@@ -790,8 +790,9 @@ void av1_find_mv_refs(const AV1_COMMON *cm, const MACROBLOCKD *xd,
                       CANDIDATE_MV ref_mv_stack[][MAX_REF_MV_STACK_SIZE],
                       uint16_t ref_mv_weight[][MAX_REF_MV_STACK_SIZE],
                       int_mv mv_ref_list[][MAX_MV_REF_CANDIDATES],
-                      int_mv *global_mvs, int mi_row, int mi_col,
-                      int16_t *mode_context) {
+                      int_mv *global_mvs, int16_t *mode_context) {
+  const int mi_row = xd->mi_row;
+  const int mi_col = xd->mi_col;
   int_mv gm_mv[2];
 
   if (ref_frame == INTRA_FRAME) {
@@ -1112,8 +1113,8 @@ uint8_t av1_selectSamples(MV *mv, int *pts, int *pts_inref, int len,
 // Note: Samples returned are at 1/8-pel precision
 // Sample are the neighbor block center point's coordinates relative to the
 // left-top pixel of current block.
-uint8_t av1_findSamples(const AV1_COMMON *cm, MACROBLOCKD *xd, int mi_row,
-                        int mi_col, int *pts, int *pts_inref) {
+uint8_t av1_findSamples(const AV1_COMMON *cm, MACROBLOCKD *xd, int *pts,
+                        int *pts_inref) {
   const MB_MODE_INFO *const mbmi0 = xd->mi[0];
   const int ref_frame = mbmi0->ref_frame[0];
   const int up_available = xd->up_available;
@@ -1123,6 +1124,8 @@ uint8_t av1_findSamples(const AV1_COMMON *cm, MACROBLOCKD *xd, int mi_row,
   int do_tl = 1;
   int do_tr = 1;
   const int mi_stride = xd->mi_stride;
+  const int mi_row = xd->mi_row;
+  const int mi_col = xd->mi_col;
 
   // scan the nearest above rows
   if (up_available) {

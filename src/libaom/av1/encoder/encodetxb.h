@@ -52,9 +52,9 @@ typedef struct TxbInfo {
 
 void av1_alloc_txb_buf(AV1_COMP *cpi);
 void av1_free_txb_buf(AV1_COMP *cpi);
-int av1_cost_coeffs_txb(const AV1_COMMON *const cm, const MACROBLOCK *x,
-                        const int plane, const int block, const TX_SIZE tx_size,
-                        const TX_TYPE tx_type, const TXB_CTX *const txb_ctx);
+int av1_cost_coeffs_txb(const MACROBLOCK *x, const int plane, const int block,
+                        const TX_SIZE tx_size, const TX_TYPE tx_type,
+                        const TXB_CTX *const txb_ctx, int reduced_tx_set_used);
 void av1_write_coeffs_txb(const AV1_COMMON *const cm, MACROBLOCK *const x,
                           aom_writer *w, int blk_row, int blk_col, int plane,
                           int block, TX_SIZE tx_size);
@@ -63,13 +63,8 @@ void av1_write_coeffs_mb(const AV1_COMMON *const cm, MACROBLOCK *x, int mi_row,
 int av1_get_txb_entropy_context(const tran_low_t *qcoeff,
                                 const SCAN_ORDER *scan_order, int eob);
 void av1_update_txb_context(const AV1_COMP *cpi, ThreadData *td,
-                            RUN_TYPE dry_run, BLOCK_SIZE bsize, int *rate,
-                            int mi_row, int mi_col, uint8_t allow_update_cdf);
-
-void av1_update_txb_context_b(int plane, int block, int blk_row, int blk_col,
-                              BLOCK_SIZE plane_bsize, TX_SIZE tx_size,
-                              void *arg);
-
+                            RUN_TYPE dry_run, BLOCK_SIZE bsize,
+                            uint8_t allow_update_cdf);
 void av1_update_and_record_txb_context(int plane, int block, int blk_row,
                                        int blk_col, BLOCK_SIZE plane_bsize,
                                        TX_SIZE tx_size, void *arg);

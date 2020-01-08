@@ -35,7 +35,6 @@ static INLINE unsigned int masked_sad(const uint8_t *src, int src_stride,
     b += b_stride;
     m += m_stride;
   }
-  sad = (sad + 31) >> 6;
   return sad;
 }
 
@@ -101,7 +100,6 @@ MASKSADMxN(64, 16)
     b += b_stride;
     m += m_stride;
   }
-  sad = (sad + 31) >> 6;
 
   return sad;
 }

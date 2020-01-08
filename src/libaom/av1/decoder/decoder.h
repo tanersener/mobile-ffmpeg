@@ -41,7 +41,6 @@ typedef void (*decode_block_visitor_fn_t)(const AV1_COMMON *const cm,
 
 typedef void (*predict_inter_block_visitor_fn_t)(AV1_COMMON *const cm,
                                                  MACROBLOCKD *const xd,
-                                                 int mi_row, int mi_col,
                                                  BLOCK_SIZE bsize);
 
 typedef void (*cfl_store_inter_block_visitor_fn_t)(AV1_COMMON *const cm,
@@ -244,6 +243,7 @@ typedef struct AV1Decoder {
 #endif
 
   AV1DecRowMTInfo frame_row_mt_info;
+  aom_metadata_array_t *metadata;
 } AV1Decoder;
 
 // Returns 0 on success. Sets pbi->common.error.error_code to a nonzero error
@@ -311,8 +311,8 @@ static INLINE int av1_read_uniform(aom_reader *r, int n) {
 typedef void (*palette_visitor_fn_t)(MACROBLOCKD *const xd, int plane,
                                      aom_reader *r);
 
-void av1_visit_palette(AV1Decoder *const pbi, MACROBLOCKD *const xd, int mi_row,
-                       int mi_col, aom_reader *r, BLOCK_SIZE bsize,
+void av1_visit_palette(AV1Decoder *const pbi, MACROBLOCKD *const xd,
+                       aom_reader *r, BLOCK_SIZE bsize,
                        palette_visitor_fn_t visit);
 
 typedef void (*block_visitor_fn_t)(AV1Decoder *const pbi, ThreadData *const td,

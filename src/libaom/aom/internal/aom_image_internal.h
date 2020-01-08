@@ -23,6 +23,31 @@
 extern "C" {
 #endif
 
+/*!\brief Array of aom_metadata structs for an image. */
+struct aom_metadata_array {
+  size_t sz;                       /* Number of metadata structs in the list */
+  aom_metadata_t **metadata_array; /* Array of metadata structs */
+};
+
+/*!\brief Alloc memory for aom_metadata_array struct.
+ *
+ * Allocate memory for aom_metadata_array struct.
+ * If sz is 0 the aom_metadata_array structs internal buffer list will be NULL,
+ * but the aom_metadata_array struct itself will still be allocated.
+ * Returns a pointer to the allocated struct or NULL on failure.
+ *
+ * \param[in]    sz       Size of internal metadata list buffer
+ */
+aom_metadata_array_t *aom_img_metadata_array_alloc(size_t sz);
+
+/*!\brief Free metadata array struct.
+ *
+ * Free metadata array struct and all metadata structs inside.
+ *
+ * \param[in]    arr       Metadata array struct pointer
+ */
+void aom_img_metadata_array_free(aom_metadata_array_t *arr);
+
 typedef void *(*aom_alloc_img_data_cb_fn_t)(void *priv, size_t size);
 
 /*!\brief Open a descriptor, allocating storage for the underlying image by

@@ -289,6 +289,11 @@ if(CONFIG_AV1_ENCODER)
                 "${AOM_ROOT}/aom_dsp/psnrhvs.c" "${AOM_ROOT}/aom_dsp/ssim.c"
                 "${AOM_ROOT}/aom_dsp/ssim.h")
   endif()
+
+  if(CONFIG_TUNE_VMAF)
+    list(APPEND AOM_DSP_ENCODER_SOURCES "${AOM_ROOT}/aom_dsp/vmaf.c"
+                "${AOM_ROOT}/aom_dsp/vmaf.h")
+  endif()
 endif()
 
 # Creates aom_dsp build targets. Must not be called until after libaom target

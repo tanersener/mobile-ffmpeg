@@ -28,12 +28,19 @@ static AOM_INLINE void accumulate_rd_opt(ThreadData *td, ThreadData *td_t) {
       td_t->rd_counts.compound_ref_used_flag;
   td->rd_counts.skip_mode_used_flag |= td_t->rd_counts.skip_mode_used_flag;
 
-  for (int i = 0; i < FRAME_UPDATE_TYPES; i++) {
-    for (int j = 0; j < TX_SIZES_ALL; j++) {
-      for (int k = 0; k < TX_TYPES; k++)
-        td->rd_counts.tx_type_used[i][j][k] +=
-            td_t->rd_counts.tx_type_used[i][j][k];
+  for (int i = 0; i < TX_SIZES_ALL; i++) {
+    for (int j = 0; j < TX_TYPES; j++)
+      td->rd_counts.tx_type_used[i][j] += td_t->rd_counts.tx_type_used[i][j];
+  }
+
+  for (int i = 0; i < BLOCK_SIZES_ALL; i++) {
+    for (int j = 0; j < 2; j++) {
+      td->rd_counts.obmc_used[i][j] += td_t->rd_counts.obmc_used[i][j];
     }
+  }
+
+  for (int i = 0; i < 2; i++) {
+    td->rd_counts.warped_used[i] += td_t->rd_counts.warped_used[i];
   }
 }
 

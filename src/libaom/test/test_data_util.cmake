@@ -25,6 +25,7 @@ list(APPEND AOM_TEST_DATA_FILE_NAMES
             "park_joy_90p_8_420_vertical_csp.y4m"
             "park_joy_90p_8_422.y4m"
             "park_joy_90p_8_444.y4m"
+            "pixel_capture_w320h240.yuv"
             "desktop_credits.y4m"
             "niklas_1280_720_30.y4m"
             "rush_hour_444.y4m"

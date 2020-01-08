@@ -274,8 +274,6 @@ if (aom_config("CONFIG_AV1_ENCODER") eq "yes") {
   #
   # Motion search
   #
-  add_proto qw/int av1_diamond_search_sad/, "struct macroblock *x, const struct search_site_config *cfg,  MV *ref_mv, MV *best_mv, int search_param, int sad_per_bit, int *num00, const struct aom_variance_vtable *fn_ptr, const MV *center_mv";
-
   add_proto qw/int av1_full_range_search/, "const struct macroblock *x, const struct search_site_config *cfg, MV *ref_mv, MV *best_mv, int search_param, int sad_per_bit, int *num00, const struct aom_variance_vtable *fn_ptr, const MV *center_mv";
 
   if (aom_config("CONFIG_REALTIME_ONLY") ne "yes") {
@@ -283,6 +281,10 @@ if (aom_config("CONFIG_AV1_ENCODER") eq "yes") {
     specialize qw/av1_apply_temporal_filter sse4_1/;
   }
 
+  if (aom_config("CONFIG_REALTIME_ONLY") ne "yes") {
+    add_proto qw/void av1_temporal_filter_plane/, "uint8_t *frame1, unsigned int stride, uint8_t *frame2, unsigned int stride2, int block_width, int block_height, int strength, double sigma, int decay_control, const int *blk_fw, int use_32x32, unsigned int *accumulator, uint16_t *count";
+    specialize qw/av1_temporal_filter_plane sse2 avx2/;
+  }
   add_proto qw/void av1_quantize_b/, "const tran_low_t *coeff_ptr, intptr_t n_coeffs, const int16_t *zbin_ptr, const int16_t *round_ptr, const int16_t *quant_ptr, const int16_t *quant_shift_ptr, tran_low_t *qcoeff_ptr, tran_low_t *dqcoeff_ptr, const int16_t *dequant_ptr, uint16_t *eob_ptr, const int16_t *scan, const int16_t *iscan, const qm_val_t * qm_ptr, const qm_val_t * iqm_ptr, int log_scale";
 
   # ENCODEMB INVOKE
@@ -329,6 +331,10 @@ if (aom_config("CONFIG_AV1_ENCODER") eq "yes") {
     add_proto qw/void av1_compute_stats_highbd/,  "int wiener_win, const uint8_t *dgd8, const uint8_t *src8, int h_start, int h_end, int v_start, int v_end, int dgd_stride, int src_stride, int64_t *M, int64_t *H, aom_bit_depth_t bit_depth";
     specialize qw/av1_compute_stats_highbd sse4_1 avx2/;
   }
+
+  add_proto qw/void av1_calc_proj_params/, " const uint8_t *src8, int width, int height, int src_stride, const uint8_t *dat8, int dat_stride, int32_t *flt0, int flt0_stride, int32_t *flt1, int flt1_stride, int64_t H[2][2], int64_t C[2], const sgr_params_type *params";
+  specialize qw/av1_calc_proj_params avx2/;
+
   add_proto qw/int64_t av1_lowbd_pixel_proj_error/, " const uint8_t *src8, int width, int height, int src_stride, const uint8_t *dat8, int dat_stride, int32_t *flt0, int flt0_stride, int32_t *flt1, int flt1_stride, int xq[2], const sgr_params_type *params";
   specialize qw/av1_lowbd_pixel_proj_error sse4_1 avx2/;
 

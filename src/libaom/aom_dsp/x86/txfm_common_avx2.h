@@ -114,58 +114,85 @@ static INLINE void load_buffer_32bit_to_16bit_w16_avx2(const int32_t *in,
   }
 }
 
+static INLINE void transpose2_8x8_avx2(const __m256i *const in,
+                                       __m256i *const out) {
+  __m256i t[16], u[16];
+  // (1st, 2nd) ==> (lo, hi)
+  //   (0, 1)   ==>  (0, 1)
+  //   (2, 3)   ==>  (2, 3)
+  //   (4, 5)   ==>  (4, 5)
+  //   (6, 7)   ==>  (6, 7)
+  for (int i = 0; i < 4; i++) {
+    t[2 * i] = _mm256_unpacklo_epi16(in[2 * i], in[2 * i + 1]);
+    t[2 * i + 1] = _mm256_unpackhi_epi16(in[2 * i], in[2 * i + 1]);
+  }
+
+  // (1st, 2nd) ==> (lo, hi)
+  //   (0, 2)   ==>  (0, 2)
+  //   (1, 3)   ==>  (1, 3)
+  //   (4, 6)   ==>  (4, 6)
+  //   (5, 7)   ==>  (5, 7)
+  for (int i = 0; i < 2; i++) {
+    u[i] = _mm256_unpacklo_epi32(t[i], t[i + 2]);
+    u[i + 2] = _mm256_unpackhi_epi32(t[i], t[i + 2]);
+
+    u[i + 4] = _mm256_unpacklo_epi32(t[i + 4], t[i + 6]);
+    u[i + 6] = _mm256_unpackhi_epi32(t[i + 4], t[i + 6]);
+  }
+
+  // (1st, 2nd) ==> (lo, hi)
+  //   (0, 4)   ==>  (0, 1)
+  //   (1, 5)   ==>  (4, 5)
+  //   (2, 6)   ==>  (2, 3)
+  //   (3, 7)   ==>  (6, 7)
+  for (int i = 0; i < 2; i++) {
+    out[2 * i] = _mm256_unpacklo_epi64(u[2 * i], u[2 * i + 4]);
+    out[2 * i + 1] = _mm256_unpackhi_epi64(u[2 * i], u[2 * i + 4]);
+
+    out[2 * i + 4] = _mm256_unpacklo_epi64(u[2 * i + 1], u[2 * i + 5]);
+    out[2 * i + 5] = _mm256_unpackhi_epi64(u[2 * i + 1], u[2 * i + 5]);
+  }
+}
+
 static INLINE void transpose_16bit_16x16_avx2(const __m256i *const in,
                                               __m256i *const out) {
-  // Unpack 16 bit elements. Goes from:
-  // in[0]: 00 01 02 03  08 09 0a 0b  04 05 06 07  0c 0d 0e 0f
-  // in[1]: 10 11 12 13  18 19 1a 1b  14 15 16 17  1c 1d 1e 1f
-  // in[2]: 20 21 22 23  28 29 2a 2b  24 25 26 27  2c 2d 2e 2f
-  // in[3]: 30 31 32 33  38 39 3a 3b  34 35 36 37  3c 3d 3e 3f
-  // in[4]: 40 41 42 43  48 49 4a 4b  44 45 46 47  4c 4d 4e 4f
-  // in[5]: 50 51 52 53  58 59 5a 5b  54 55 56 57  5c 5d 5e 5f
-  // in[6]: 60 61 62 63  68 69 6a 6b  64 65 66 67  6c 6d 6e 6f
-  // in[7]: 70 71 72 73  78 79 7a 7b  74 75 76 77  7c 7d 7e 7f
-  // in[8]: 80 81 82 83  88 89 8a 8b  84 85 86 87  8c 8d 8e 8f
-  // to:
-  // a0:    00 10 01 11  02 12 03 13  04 14 05 15  06 16 07 17
-  // a1:    20 30 21 31  22 32 23 33  24 34 25 35  26 36 27 37
-  // a2:    40 50 41 51  42 52 43 53  44 54 45 55  46 56 47 57
-  // a3:    60 70 61 71  62 72 63 73  64 74 65 75  66 76 67 77
-  // ...
-  __m256i a[16];
-  for (int i = 0; i < 16; i += 2) {
-    a[i / 2 + 0] = _mm256_unpacklo_epi16(in[i], in[i + 1]);
-    a[i / 2 + 8] = _mm256_unpackhi_epi16(in[i], in[i + 1]);
-  }
-  __m256i b[16];
-  for (int i = 0; i < 16; i += 2) {
-    b[i / 2 + 0] = _mm256_unpacklo_epi32(a[i], a[i + 1]);
-    b[i / 2 + 8] = _mm256_unpackhi_epi32(a[i], a[i + 1]);
-  }
-  __m256i c[16];
-  for (int i = 0; i < 16; i += 2) {
-    c[i / 2 + 0] = _mm256_unpacklo_epi64(b[i], b[i + 1]);
-    c[i / 2 + 8] = _mm256_unpackhi_epi64(b[i], b[i + 1]);
-  }
-  out[0 + 0] = _mm256_permute2x128_si256(c[0], c[1], 0x20);
-  out[1 + 0] = _mm256_permute2x128_si256(c[8], c[9], 0x20);
-  out[2 + 0] = _mm256_permute2x128_si256(c[4], c[5], 0x20);
-  out[3 + 0] = _mm256_permute2x128_si256(c[12], c[13], 0x20);
+  __m256i t[16];
 
-  out[0 + 8] = _mm256_permute2x128_si256(c[0], c[1], 0x31);
-  out[1 + 8] = _mm256_permute2x128_si256(c[8], c[9], 0x31);
-  out[2 + 8] = _mm256_permute2x128_si256(c[4], c[5], 0x31);
-  out[3 + 8] = _mm256_permute2x128_si256(c[12], c[13], 0x31);
+#define LOADL(idx)                                                            \
+  t[idx] = _mm256_castsi128_si256(_mm_load_si128((__m128i const *)&in[idx])); \
+  t[idx] = _mm256_inserti128_si256(                                           \
+      t[idx], _mm_load_si128((__m128i const *)&in[idx + 8]), 1);
 
-  out[4 + 0] = _mm256_permute2x128_si256(c[0 + 2], c[1 + 2], 0x20);
-  out[5 + 0] = _mm256_permute2x128_si256(c[8 + 2], c[9 + 2], 0x20);
-  out[6 + 0] = _mm256_permute2x128_si256(c[4 + 2], c[5 + 2], 0x20);
-  out[7 + 0] = _mm256_permute2x128_si256(c[12 + 2], c[13 + 2], 0x20);
+#define LOADR(idx)                                                           \
+  t[8 + idx] =                                                               \
+      _mm256_castsi128_si256(_mm_load_si128((__m128i const *)&in[idx] + 1)); \
+  t[8 + idx] = _mm256_inserti128_si256(                                      \
+      t[8 + idx], _mm_load_si128((__m128i const *)&in[idx + 8] + 1), 1);
 
-  out[4 + 8] = _mm256_permute2x128_si256(c[0 + 2], c[1 + 2], 0x31);
-  out[5 + 8] = _mm256_permute2x128_si256(c[8 + 2], c[9 + 2], 0x31);
-  out[6 + 8] = _mm256_permute2x128_si256(c[4 + 2], c[5 + 2], 0x31);
-  out[7 + 8] = _mm256_permute2x128_si256(c[12 + 2], c[13 + 2], 0x31);
+  // load left 8x16
+  LOADL(0)
+  LOADL(1)
+  LOADL(2)
+  LOADL(3)
+  LOADL(4)
+  LOADL(5)
+  LOADL(6)
+  LOADL(7)
+
+  // load right 8x16
+  LOADR(0)
+  LOADR(1)
+  LOADR(2)
+  LOADR(3)
+  LOADR(4)
+  LOADR(5)
+  LOADR(6)
+  LOADR(7)
+
+  // get the top 16x8 result
+  transpose2_8x8_avx2(t, out);
+  // get the bottom 16x8 result
+  transpose2_8x8_avx2(&t[8], &out[8]);
 }
 
 static INLINE void transpose_16bit_16x8_avx2(const __m256i *const in,

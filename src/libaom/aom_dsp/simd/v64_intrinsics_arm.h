@@ -71,7 +71,11 @@ SIMD_INLINE void u32_store_unaligned(void *p, uint32_t a) {
 #elif defined(__CC_ARM)
   *(__packed uint32_t *)p) = a;
 #elif defined(__GNUC__)
-  *((__attribute((packed)) uint32_t *)p) = a;
+  struct Unaligned32Struct {
+    uint32_t value;
+    uint8_t dummy;  // To make the size non-power-of-two.
+  } __attribute__((__packed__));
+  ((struct Unaligned32Struct *)p)->value = a;
 #else
   vst1_lane_u32((uint32_t *)p, vreinterpret_u32_s64((uint64x1_t)(uint64_t)a),
                 0);
