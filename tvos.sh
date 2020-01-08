@@ -12,46 +12,46 @@ LIBRARY_GMP=3
 LIBRARY_GNUTLS=4
 LIBRARY_LAME=5
 LIBRARY_LIBASS=6
-LIBRARY_LIBICONV=7
-LIBRARY_LIBTHEORA=8
-LIBRARY_LIBVORBIS=9
-LIBRARY_LIBVPX=10
-LIBRARY_LIBWEBP=11
-LIBRARY_LIBXML2=12
-LIBRARY_OPENCOREAMR=13
-LIBRARY_SHINE=14
-LIBRARY_SPEEX=15
-LIBRARY_WAVPACK=16
-LIBRARY_KVAZAAR=17
-LIBRARY_X264=18
-LIBRARY_XVIDCORE=19
-LIBRARY_X265=20
-LIBRARY_LIBVIDSTAB=21
-LIBRARY_LIBILBC=22
-LIBRARY_OPUS=23
-LIBRARY_SNAPPY=24
-LIBRARY_SOXR=25
-LIBRARY_LIBAOM=26
-LIBRARY_CHROMAPRINT=27
-LIBRARY_TWOLAME=28
-LIBRARY_SDL=29
-LIBRARY_TESSERACT=30
-LIBRARY_OPENH264=31
-LIBRARY_GIFLIB=32
-LIBRARY_JPEG=33
-LIBRARY_LIBOGG=34
-LIBRARY_LIBPNG=35
-LIBRARY_LIBUUID=36
-LIBRARY_NETTLE=37
-LIBRARY_TIFF=38
-LIBRARY_EXPAT=39
-LIBRARY_SNDFILE=40
-LIBRARY_LEPTONICA=41
-LIBRARY_ZLIB=42
-LIBRARY_AUDIOTOOLBOX=43
-LIBRARY_COREIMAGE=44
-LIBRARY_BZIP2=45
-LIBRARY_VIDEOTOOLBOX=46
+LIBRARY_LIBTHEORA=7
+LIBRARY_LIBVORBIS=8
+LIBRARY_LIBVPX=9
+LIBRARY_LIBWEBP=10
+LIBRARY_LIBXML2=11
+LIBRARY_OPENCOREAMR=12
+LIBRARY_SHINE=13
+LIBRARY_SPEEX=14
+LIBRARY_WAVPACK=15
+LIBRARY_KVAZAAR=16
+LIBRARY_X264=17
+LIBRARY_XVIDCORE=18
+LIBRARY_X265=19
+LIBRARY_LIBVIDSTAB=20
+LIBRARY_LIBILBC=21
+LIBRARY_OPUS=22
+LIBRARY_SNAPPY=23
+LIBRARY_SOXR=24
+LIBRARY_LIBAOM=25
+LIBRARY_CHROMAPRINT=26
+LIBRARY_TWOLAME=27
+LIBRARY_SDL=28
+LIBRARY_TESSERACT=29
+LIBRARY_OPENH264=30
+LIBRARY_GIFLIB=31
+LIBRARY_JPEG=32
+LIBRARY_LIBOGG=33
+LIBRARY_LIBPNG=34
+LIBRARY_LIBUUID=35
+LIBRARY_NETTLE=36
+LIBRARY_TIFF=37
+LIBRARY_EXPAT=38
+LIBRARY_SNDFILE=39
+LIBRARY_LEPTONICA=40
+LIBRARY_ZLIB=41
+LIBRARY_AUDIOTOOLBOX=42
+LIBRARY_COREIMAGE=43
+LIBRARY_BZIP2=44
+LIBRARY_VIDEOTOOLBOX=45
+LIBRARY_LIBICONV=46
 
 # ENABLE ARCH
 ENABLED_ARCHITECTURES=(1 1)
@@ -123,6 +123,7 @@ display_help() {
         echo -e "  --enable-tvos-videotoolbox\tbuild with built-in Apple VideoToolbox support[no]"
     fi
     echo -e "  --enable-tvos-zlib\t\tbuild with built-in zlib [no]"
+    echo -e "  --enable-tvos-libiconv\tbuild with built-in libiconv [no]"
     echo -e "  --enable-chromaprint\t\tbuild with chromaprint [no]"
     echo -e "  --enable-fontconfig\t\tbuild with fontconfig [no]"
     echo -e "  --enable-freetype\t\tbuild with freetype [no]"
@@ -133,7 +134,6 @@ display_help() {
     echo -e "  --enable-lame\t\t\tbuild with lame [no]"
     echo -e "  --enable-libaom\t\tbuild with libaom [no]"
     echo -e "  --enable-libass\t\tbuild with libass [no]"
-    echo -e "  --enable-libiconv\t\tbuild with libiconv [no]"
     echo -e "  --enable-libilbc\t\tbuild with libilbc [no]"
     echo -e "  --enable-libtheora\t\tbuild with libtheora [no]"
     echo -e "  --enable-libvorbis\t\tbuild with libvorbis [no]"
@@ -218,7 +218,7 @@ reconf_library() {
     local RECONF_VARIABLE=$(echo "RECONF_$1" | sed "s/\-/\_/g")
     local library_supported=0
 
-    for library in {1..42}
+    for library in {1..41}
     do
         library_name=$(get_library_name $((library - 1)))
 
@@ -238,7 +238,7 @@ rebuild_library() {
     local REBUILD_VARIABLE=$(echo "REBUILD_$1" | sed "s/\-/\_/g")
     local library_supported=0
 
-    for library in {1..42}
+    for library in {1..41}
     do
         library_name=$(get_library_name $((library - 1)))
 
@@ -275,6 +275,9 @@ set_library() {
         tvos-videotoolbox)
             ENABLED_LIBRARIES[LIBRARY_VIDEOTOOLBOX]=$2
         ;;
+        tvos-libiconv)
+            ENABLED_LIBRARIES[LIBRARY_LIBICONV]=$2
+        ;;
         chromaprint)
             ENABLED_LIBRARIES[LIBRARY_CHROMAPRINT]=$2
         ;;
@@ -301,14 +304,14 @@ set_library() {
             ENABLED_LIBRARIES[LIBRARY_ZLIB]=$2
             set_library "nettle" $2
             set_library "gmp" $2
-            set_library "libiconv" $2
+            set_library "tvos-libiconv" $2
         ;;
         kvazaar)
             ENABLED_LIBRARIES[LIBRARY_KVAZAAR]=$2
         ;;
         lame)
             ENABLED_LIBRARIES[LIBRARY_LAME]=$2
-            set_library "libiconv" $2
+            set_library "tvos-libiconv" $2
         ;;
         libaom)
             ENABLED_LIBRARIES[LIBRARY_LIBAOM]=$2
@@ -320,10 +323,7 @@ set_library() {
             set_library "freetype" $2
             set_library "fribidi" $2
             set_library "fontconfig" $2
-            set_library "libiconv" $2
-        ;;
-        libiconv)
-            ENABLED_LIBRARIES[LIBRARY_LIBICONV]=$2
+            set_library "tvos-libiconv" $2
         ;;
         libilbc)
             ENABLED_LIBRARIES[LIBRARY_LIBILBC]=$2
@@ -356,7 +356,7 @@ set_library() {
         ;;
         libxml2)
             ENABLED_LIBRARIES[LIBRARY_LIBXML2]=$2
-            set_library "libiconv" $2
+            set_library "tvos-libiconv" $2
         ;;
         opencore-amr)
             ENABLED_LIBRARIES[LIBRARY_OPENCOREAMR]=$2
@@ -487,7 +487,7 @@ print_enabled_libraries() {
     let enabled=0;
 
     # FIRST BUILT-IN LIBRARIES
-    for library in {42..46}
+    for library in {41..46}
     do
         if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
             if [[ ${enabled} -ge 1 ]]; then
@@ -499,7 +499,7 @@ print_enabled_libraries() {
     done
 
     # THEN EXTERNAL LIBRARIES
-    for library in {0..31}
+    for library in {0..30}
     do
         if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
             if [[ ${enabled} -ge 1 ]]; then
@@ -665,15 +665,14 @@ get_external_library_license_path() {
     case $1 in
         1) echo "${BASEDIR}/src/$(get_library_name $1)/docs/LICENSE.TXT" ;;
         3) echo "${BASEDIR}/src/$(get_library_name $1)/COPYING.LESSERv3" ;;
-        7) echo "${BASEDIR}/src/$(get_library_name $1)/COPYING.LIB" ;;
-        25) echo "${BASEDIR}/src/$(get_library_name $1)/COPYING.LGPL" ;;
-        27) echo "${BASEDIR}/src/$(get_library_name $1)/LICENSE.md" ;;
-        29) echo "${BASEDIR}/src/$(get_library_name $1)/COPYING.txt" ;;
-        33) echo "${BASEDIR}/src/$(get_library_name $1)/LICENSE.md " ;;
-        37) echo "${BASEDIR}/src/$(get_library_name $1)/COPYING.LESSERv3" ;;
-        38) echo "${BASEDIR}/src/$(get_library_name $1)/COPYRIGHT" ;;
-        41) echo "${BASEDIR}/src/$(get_library_name $1)/leptonica-license.txt" ;;
-        4 | 10 | 13 | 19 | 21 | 26 | 31 | 35) echo "${BASEDIR}/src/$(get_library_name $1)/LICENSE" ;;
+        24) echo "${BASEDIR}/src/$(get_library_name $1)/COPYING.LGPL" ;;
+        26) echo "${BASEDIR}/src/$(get_library_name $1)/LICENSE.md" ;;
+        28) echo "${BASEDIR}/src/$(get_library_name $1)/COPYING.txt" ;;
+        32) echo "${BASEDIR}/src/$(get_library_name $1)/LICENSE.md " ;;
+        36) echo "${BASEDIR}/src/$(get_library_name $1)/COPYING.LESSERv3" ;;
+        37) echo "${BASEDIR}/src/$(get_library_name $1)/COPYRIGHT" ;;
+        40) echo "${BASEDIR}/src/$(get_library_name $1)/leptonica-license.txt" ;;
+        4 | 9 | 12 | 18 | 20 | 25 | 30 | 34) echo "${BASEDIR}/src/$(get_library_name $1)/LICENSE" ;;
         *) echo "${BASEDIR}/src/$(get_library_name $1)/COPYING" ;;
     esac
 }
@@ -742,7 +741,7 @@ do
 	    --full)
             for library in {0..46}
             do
-                if [[ $library -ne 18 ]] && [[ $library -ne 19 ]] && [[ $library -ne 20 ]] && [[ $library -ne 21 ]]; then
+                if [[ $library -ne 17 ]] && [[ $library -ne 18 ]] && [[ $library -ne 19 ]] && [[ $library -ne 20 ]]; then
                     enable_library $(get_library_name $library)
                 fi
             done
@@ -805,7 +804,7 @@ print_reconfigure_requested_libraries
 print_rebuild_requested_libraries
 
 # CHECKING GPL LIBRARIES
-for gpl_library in {18..21}
+for gpl_library in {17..20}
 do
     if [[ ${ENABLED_LIBRARIES[$gpl_library]} -eq 1 ]]; then
         library_name=$(get_library_name ${gpl_library})
@@ -834,6 +833,7 @@ do
         export TARGET_SDK=$(get_target_sdk)
         export SDK_PATH=$(get_sdk_path)
         export SDK_NAME=$(get_sdk_name)
+
         export LIPO="$(xcrun --sdk $(get_sdk_name) -f lipo)"
 
         . ${BASEDIR}/build/main-tvos.sh "${ENABLED_LIBRARIES[@]}"
@@ -872,7 +872,7 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
     mkdir -p ${BASEDIR}/prebuilt/tvos-framework 1>>${BASEDIR}/build.log 2>&1
 
     # 1. EXTERNAL LIBRARIES
-    for library in {0..41}
+    for library in {0..40}
     do
         if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
 
@@ -888,57 +888,7 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
 
             echo -e "Creating universal library for ${library_name}\n" 1>>${BASEDIR}/build.log 2>&1
 
-            if [[ ${LIBRARY_LIBICONV} == $library ]]; then
-
-                LIBRARY_CREATED=$(create_static_fat_library "libiconv.a" "libiconv")
-                if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
-                    echo -e "failed\n"
-                    exit 1
-                fi
-
-                LIBRARY_CREATED=$(create_static_fat_library "libcharset.a" "libcharset")
-                if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
-                    echo -e "failed\n"
-                    exit 1
-                fi
-
-                FRAMEWORK_CREATED=$(create_static_framework "libiconv" "libiconv.a" $library_version)
-                if [[ ${FRAMEWORK_CREATED} -ne 0 ]]; then
-                    echo -e "failed\n"
-                    exit 1
-                fi
-
-                FRAMEWORK_CREATED=$(create_static_framework "libcharset" "libcharset.a" $library_version)
-                if [[ ${FRAMEWORK_CREATED} -ne 0 ]]; then
-                    echo -e "failed\n"
-                    exit 1
-                fi
-
-                $(cp $(get_external_library_license_path ${library}) ${BASEDIR}/prebuilt/tvos-universal/libiconv-universal/LICENSE 1>>${BASEDIR}/build.log 2>&1)
-                if [ $? -ne 0 ]; then
-                    echo -e "failed\n"
-                    exit 1
-                fi
-
-                $(cp $(get_external_library_license_path ${library}) ${BASEDIR}/prebuilt/tvos-universal/libcharset-universal/LICENSE 1>>${BASEDIR}/build.log 2>&1)
-                if [ $? -ne 0 ]; then
-                    echo -e "failed\n"
-                    exit 1
-                fi
-
-                $(cp $(get_external_library_license_path ${library}) ${BASEDIR}/prebuilt/tvos-framework/libiconv.framework/LICENSE 1>>${BASEDIR}/build.log 2>&1)
-                if [ $? -ne 0 ]; then
-                    echo -e "failed\n"
-                    exit 1
-                fi
-
-                $(cp $(get_external_library_license_path ${library}) ${BASEDIR}/prebuilt/tvos-framework/libcharset.framework/LICENSE 1>>${BASEDIR}/build.log 2>&1)
-                if [ $? -ne 0 ]; then
-                    echo -e "failed\n"
-                    exit 1
-                fi
-
-            elif [[ ${LIBRARY_LIBTHEORA} == $library ]]; then
+            if [[ ${LIBRARY_LIBTHEORA} == $library ]]; then
 
                 LIBRARY_CREATED=$(create_static_fat_library "libtheora.a" "libtheora")
                 if [[ ${LIBRARY_CREATED} -ne 0 ]]; then

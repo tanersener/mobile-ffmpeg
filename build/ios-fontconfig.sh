@@ -50,7 +50,7 @@ fi
 ./configure \
     --prefix=${BASEDIR}/prebuilt/$(get_target_build_directory)/${LIB_NAME} \
     --with-pic \
-    --with-libiconv-prefix=${BASEDIR}/prebuilt/$(get_target_build_directory)/libiconv \
+    --with-libiconv-prefix=${SDK_PATH}/usr \
     --with-expat=${BASEDIR}/prebuilt/$(get_target_build_directory)/expat \
     --without-libintl-prefix \
     --enable-static \

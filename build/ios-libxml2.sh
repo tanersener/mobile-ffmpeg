@@ -50,7 +50,7 @@ autoreconf_library ${LIB_NAME}
     --with-pic \
     --with-sysroot=${SDK_PATH} \
     --with-zlib \
-    --with-iconv=${BASEDIR}/prebuilt/$(get_target_build_directory)/libiconv \
+    --with-iconv=${SDK_PATH}/usr \
     --with-sax1 \
     --without-python \
     --without-debug \
