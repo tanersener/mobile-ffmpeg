@@ -171,7 +171,7 @@ static int decomp(unsigned char *srcBuf, unsigned char **jpegBuf,
   }
   /* Set the destination buffer to gray so we know whether the decompressor
      attempted to write to it */
-  memset(dstBuf, 127, pitch * scaledh);
+  memset(dstBuf, 127, (size_t)pitch * scaledh);
 
   if (doYUV) {
     int width = doTile ? tilew : scaledw;
@@ -193,7 +193,7 @@ static int decomp(unsigned char *srcBuf, unsigned char **jpegBuf,
     double start = getTime();
 
     for (row = 0, dstPtr = dstBuf; row < ntilesh;
-         row++, dstPtr += pitch * tileh) {
+         row++, dstPtr += (size_t)pitch * tileh) {
       for (col = 0, dstPtr2 = dstPtr; col < ntilesw;
            col++, tile++, dstPtr2 += ps * tilew) {
         int width = doTile ? min(tilew, w - col * tilew) : scaledw;
@@ -486,7 +486,7 @@ static int fullTest(unsigned char *srcBuf, int w, int h, int subsamp,
       if (decomp(srcBuf, jpegBuf, jpegSize, tmpBuf, w, h, subsamp, jpegQual,
                  fileName, tilew, tileh) == -1)
         goto bailout;
-    }
+    } else if (quiet == 1) printf("N/A\n");
 
     for (i = 0; i < ntilesw * ntilesh; i++) {
       if (jpegBuf[i]) tjFree(jpegBuf[i]);
