@@ -485,7 +485,7 @@ static vpx_codec_err_t vp8_decode(vpx_codec_alg_priv_t *ctx,
     pbi->restart_threads = 0;
 #endif
     ctx->user_priv = user_priv;
-    if (vp8dx_receive_compressed_data(pbi, data_sz, data, deadline)) {
+    if (vp8dx_receive_compressed_data(pbi, deadline)) {
       res = update_error_state(ctx, &pbi->common.error);
     }
 

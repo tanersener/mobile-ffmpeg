@@ -13,6 +13,7 @@
 
 #include <assert.h>
 
+#include "vp9/common/vp9_onyxc_int.h"
 #include "vp9/encoder/vp9_lookahead.h"
 #include "vp9/encoder/vp9_ratectrl.h"
 
@@ -147,6 +148,30 @@ typedef struct {
 } GF_GROUP;
 
 typedef struct {
+  const FIRSTPASS_STATS *stats;
+  int num_frames;
+} FIRST_PASS_INFO;
+
+static INLINE void fps_init_first_pass_info(FIRST_PASS_INFO *first_pass_info,
+                                            const FIRSTPASS_STATS *stats,
+                                            int num_frames) {
+  first_pass_info->stats = stats;
+  first_pass_info->num_frames = num_frames;
+}
+
+static INLINE int fps_get_num_frames(const FIRST_PASS_INFO *first_pass_info) {
+  return first_pass_info->num_frames;
+}
+
+static INLINE const FIRSTPASS_STATS *fps_get_frame_stats(
+    const FIRST_PASS_INFO *first_pass_info, int show_idx) {
+  if (show_idx < 0 || show_idx >= first_pass_info->num_frames) {
+    return NULL;
+  }
+  return &first_pass_info->stats[show_idx];
+}
+
+typedef struct {
   unsigned int section_intra_rating;
   unsigned int key_frame_section_intra_rating;
   FIRSTPASS_STATS total_stats;
@@ -154,6 +179,7 @@ typedef struct {
   const FIRSTPASS_STATS *stats_in;
   const FIRSTPASS_STATS *stats_in_start;
   const FIRSTPASS_STATS *stats_in_end;
+  FIRST_PASS_INFO first_pass_info;
   FIRSTPASS_STATS total_left_stats;
   int first_pass_done;
   int64_t bits_left;
@@ -192,6 +218,7 @@ typedef struct {
   int extend_maxq;
   int extend_minq_fast;
   int arnr_strength_adjustment;
+  int last_qindex_of_arf_layer[MAX_ARF_LAYERS];
 
   GF_GROUP gf_group;
 } TWO_PASS;
@@ -218,6 +245,21 @@ void vp9_twopass_postencode_update(struct VP9_COMP *cpi);
 
 void calculate_coded_size(struct VP9_COMP *cpi, int *scaled_frame_width,
                           int *scaled_frame_height);
+
+struct VP9EncoderConfig;
+int vp9_get_frames_to_next_key(const struct VP9EncoderConfig *oxcf,
+                               const FRAME_INFO *frame_info,
+                               const FIRST_PASS_INFO *first_pass_info,
+                               int kf_show_idx, int min_gf_interval);
+#if CONFIG_RATE_CTRL
+int vp9_get_coding_frame_num(const struct VP9EncoderConfig *oxcf,
+                             const FRAME_INFO *frame_info,
+                             const FIRST_PASS_INFO *first_pass_info,
+                             int multi_layer_arf, int allow_alt_ref);
+#endif
+
+FIRSTPASS_STATS vp9_get_frame_stats(const TWO_PASS *two_pass);
+FIRSTPASS_STATS vp9_get_total_stats(const TWO_PASS *two_pass);
 
 #ifdef __cplusplus
 }  // extern "C"

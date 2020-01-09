@@ -22,7 +22,7 @@
 namespace libvpx_test {
 namespace {
 
-#if ARCH_ARM || (ARCH_MIPS && !HAVE_MIPS64) || ARCH_X86
+#if VPX_ARCH_ARM || (VPX_ARCH_MIPS && !HAVE_MIPS64) || VPX_ARCH_X86
 // Avoid OOM failures on 32-bit platforms.
 const int kNumSizesToTest = 7;
 #else

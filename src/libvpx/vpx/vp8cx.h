@@ -231,10 +231,10 @@ enum vp8e_enc_control_id {
    */
   VP8E_SET_TUNING,
 
-  /*!\brief Codec control function to set constrained quality level.
+  /*!\brief Codec control function to set constrained / constant quality level.
    *
    * \attention For this value to be used vpx_codec_enc_cfg_t::rc_end_usage must
-   *            be set to #VPX_CQ
+   *            be set to #VPX_CQ or #VPX_Q
    * \note Valid range: 0..63
    *
    * Supported in codecs: VP8, VP9
@@ -839,6 +839,8 @@ typedef enum {
   /**< Upper layers are constrained to drop if current layer drops. */
   LAYER_DROP,           /**< Any spatial layer can drop. */
   FULL_SUPERFRAME_DROP, /**< Only full superframe can drop. */
+  CONSTRAINED_FROM_ABOVE_DROP,
+  /**< Lower layers are constrained to drop if current layer drops. */
 } SVC_LAYER_DROP_MODE;
 
 /*!\brief vp9 svc frame dropping parameters.

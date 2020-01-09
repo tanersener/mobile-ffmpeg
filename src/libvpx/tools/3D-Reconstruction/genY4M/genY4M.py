@@ -57,7 +57,7 @@ if __name__ == "__main__":
       else:
         frames.append((idx, img))
   if len(frames) == 0:
-    print "No frames in directory: " + args.frame_path
+    print("No frames in directory: " + args.frame_path)
     sys.exit()
   print("----------------------Y4M Info----------------------")
   print("width:  %d" % frames[0][1].width)

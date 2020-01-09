@@ -77,7 +77,12 @@ class VP9QuantizeBase : public AbstractBench {
         coeff_(Buffer<tran_low_t>(max_size_, max_size_, 0, 16)),
         qcoeff_(Buffer<tran_low_t>(max_size_, max_size_, 0, 32)),
         dqcoeff_(Buffer<tran_low_t>(max_size_, max_size_, 0, 32)) {
+    // TODO(jianj): SSSE3 and AVX2 tests fail on extreme values.
+#if HAVE_NEON
+    max_value_ = (1 << (7 + bit_depth_)) - 1;
+#else
     max_value_ = (1 << bit_depth_) - 1;
+#endif
     zbin_ptr_ =
         reinterpret_cast<int16_t *>(vpx_memalign(16, 8 * sizeof(*zbin_ptr_)));
     round_fp_ptr_ = reinterpret_cast<int16_t *>(
@@ -209,12 +214,15 @@ inline void quant_fp_nz(const tran_low_t *coeff_ptr, intptr_t n_coeffs,
         tmp = clamp(abs_coeff[y] + _round, INT16_MIN, INT16_MAX);
         tmp = (tmp * quant_ptr[rc != 0]) >> (16 - is_32x32);
         qcoeff_ptr[rc] = (tmp ^ coeff_sign[y]) - coeff_sign[y];
-        dqcoeff_ptr[rc] = qcoeff_ptr[rc] * dequant_ptr[rc != 0];
+        dqcoeff_ptr[rc] =
+            static_cast<tran_low_t>(qcoeff_ptr[rc] * dequant_ptr[rc != 0]);
 
         if (is_32x32) {
-          dqcoeff_ptr[rc] = qcoeff_ptr[rc] * dequant_ptr[rc != 0] / 2;
+          dqcoeff_ptr[rc] = static_cast<tran_low_t>(qcoeff_ptr[rc] *
+                                                    dequant_ptr[rc != 0] / 2);
         } else {
-          dqcoeff_ptr[rc] = qcoeff_ptr[rc] * dequant_ptr[rc != 0];
+          dqcoeff_ptr[rc] =
+              static_cast<tran_low_t>(qcoeff_ptr[rc] * dequant_ptr[rc != 0]);
         }
       } else {
         qcoeff_ptr[rc] = 0;
@@ -497,7 +505,7 @@ INSTANTIATE_TEST_CASE_P(
 #endif  // HAVE_SSE2
 
 #if HAVE_SSSE3
-#if ARCH_X86_64
+#if VPX_ARCH_X86_64
 INSTANTIATE_TEST_CASE_P(
     SSSE3, VP9QuantizeTest,
     ::testing::Values(make_tuple(&vpx_quantize_b_ssse3, &vpx_quantize_b_c,
@@ -520,7 +528,7 @@ INSTANTIATE_TEST_CASE_P(
                                  &vpx_quantize_b_32x32_c, VPX_BITS_8, 32,
                                  false)));
 
-#endif  // ARCH_X86_64
+#endif  // VPX_ARCH_X86_64
 #endif  // HAVE_SSSE3
 
 #if HAVE_AVX
@@ -533,7 +541,7 @@ INSTANTIATE_TEST_CASE_P(AVX, VP9QuantizeTest,
                                                      VPX_BITS_8, 32, false)));
 #endif  // HAVE_AVX
 
-#if ARCH_X86_64 && HAVE_AVX2
+#if VPX_ARCH_X86_64 && HAVE_AVX2
 INSTANTIATE_TEST_CASE_P(
     AVX2, VP9QuantizeTest,
     ::testing::Values(make_tuple(&QuantFPWrapper<vp9_quantize_fp_avx2>,

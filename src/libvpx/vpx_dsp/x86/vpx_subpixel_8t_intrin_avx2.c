@@ -894,21 +894,21 @@ static void vpx_filter_block1d4_v4_avx2(const uint8_t *src_ptr,
 
 #if HAVE_AVX2 && HAVE_SSSE3
 filter8_1dfunction vpx_filter_block1d4_v8_ssse3;
-#if ARCH_X86_64
+#if VPX_ARCH_X86_64
 filter8_1dfunction vpx_filter_block1d8_v8_intrin_ssse3;
 filter8_1dfunction vpx_filter_block1d8_h8_intrin_ssse3;
 filter8_1dfunction vpx_filter_block1d4_h8_intrin_ssse3;
 #define vpx_filter_block1d8_v8_avx2 vpx_filter_block1d8_v8_intrin_ssse3
 #define vpx_filter_block1d8_h8_avx2 vpx_filter_block1d8_h8_intrin_ssse3
 #define vpx_filter_block1d4_h8_avx2 vpx_filter_block1d4_h8_intrin_ssse3
-#else  // ARCH_X86
+#else  // VPX_ARCH_X86
 filter8_1dfunction vpx_filter_block1d8_v8_ssse3;
 filter8_1dfunction vpx_filter_block1d8_h8_ssse3;
 filter8_1dfunction vpx_filter_block1d4_h8_ssse3;
 #define vpx_filter_block1d8_v8_avx2 vpx_filter_block1d8_v8_ssse3
 #define vpx_filter_block1d8_h8_avx2 vpx_filter_block1d8_h8_ssse3
 #define vpx_filter_block1d4_h8_avx2 vpx_filter_block1d4_h8_ssse3
-#endif  // ARCH_X86_64
+#endif  // VPX_ARCH_X86_64
 filter8_1dfunction vpx_filter_block1d8_v8_avg_ssse3;
 filter8_1dfunction vpx_filter_block1d8_h8_avg_ssse3;
 filter8_1dfunction vpx_filter_block1d4_v8_avg_ssse3;

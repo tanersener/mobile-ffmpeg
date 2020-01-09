@@ -83,6 +83,7 @@ sadMxNx4D(32, 64)
 
 // 32x32
 sadMxN(32, 32)
+sadMxNxK(32, 32, 8)
 sadMxNx4D(32, 32)
 
 // 32x16

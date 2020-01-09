@@ -187,7 +187,8 @@ void vp9_cyclic_refresh_update_segment(VP9_COMP *const cpi, MODE_INFO *const mi,
 
   // If this block is labeled for refresh, check if we should reset the
   // segment_id.
-  if (cyclic_refresh_segment_id_boosted(mi->segment_id)) {
+  if (cpi->sf.use_nonrd_pick_mode &&
+      cyclic_refresh_segment_id_boosted(mi->segment_id)) {
     mi->segment_id = refresh_this_block;
     // Reset segment_id if it will be skipped.
     if (skip) mi->segment_id = CR_SEGMENT_ID_BASE;

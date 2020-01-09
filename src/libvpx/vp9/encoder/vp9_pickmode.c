@@ -1501,7 +1501,8 @@ static void search_filter_ref(VP9_COMP *cpi, MACROBLOCK *x, RD_COST *this_rdc,
   int best_early_term = 0;
   int best_flag_preduv_computed[2] = { 0 };
   INTERP_FILTER filter_start = force_smooth_filter ? EIGHTTAP_SMOOTH : EIGHTTAP;
-  for (filter = filter_start; filter <= EIGHTTAP_SMOOTH; ++filter) {
+  INTERP_FILTER filter_end = EIGHTTAP_SMOOTH;
+  for (filter = filter_start; filter <= filter_end; ++filter) {
     int64_t cost;
     mi->interp_filter = filter;
     vp9_build_inter_predictors_sby(xd, mi_row, mi_col, bsize);
@@ -1531,9 +1532,11 @@ static void search_filter_ref(VP9_COMP *cpi, MACROBLOCK *x, RD_COST *this_rdc,
           free_pred_buffer(*this_mode_pred);
           *this_mode_pred = current_pred;
         }
-        current_pred = &tmp[get_pred_buffer(tmp, 3)];
-        pd->dst.buf = current_pred->data;
-        pd->dst.stride = bw;
+        if (filter != filter_end) {
+          current_pred = &tmp[get_pred_buffer(tmp, 3)];
+          pd->dst.buf = current_pred->data;
+          pd->dst.stride = bw;
+        }
       }
     }
   }
@@ -1554,6 +1557,9 @@ static void search_filter_ref(VP9_COMP *cpi, MACROBLOCK *x, RD_COST *this_rdc,
   if (reuse_inter_pred) {
     pd->dst.buf = (*this_mode_pred)->data;
     pd->dst.stride = (*this_mode_pred)->stride;
+  } else if (best_filter < filter_end) {
+    mi->interp_filter = best_filter;
+    vp9_build_inter_predictors_sby(xd, mi_row, mi_col, bsize);
   }
 }
 
@@ -1713,9 +1719,9 @@ void vp9_pick_inter_mode(VP9_COMP *cpi, MACROBLOCK *x, TileDataEnc *tile_data,
   // process.
   // tmp[3] points to dst buffer, and the other 3 point to allocated buffers.
   PRED_BUFFER tmp[4];
-  DECLARE_ALIGNED(16, uint8_t, pred_buf[3 * 64 * 64]);
+  DECLARE_ALIGNED(16, uint8_t, pred_buf[3 * 64 * 64] VPX_UNINITIALIZED);
 #if CONFIG_VP9_HIGHBITDEPTH
-  DECLARE_ALIGNED(16, uint16_t, pred_buf_16[3 * 64 * 64]);
+  DECLARE_ALIGNED(16, uint16_t, pred_buf_16[3 * 64 * 64] VPX_UNINITIALIZED);
 #endif
   struct buf_2d orig_dst = pd->dst;
   PRED_BUFFER *this_mode_pred = NULL;
@@ -2552,6 +2558,10 @@ void vp9_pick_inter_mode(VP9_COMP *cpi, MACROBLOCK *x, TileDataEnc *tile_data,
       }
 
       if (!((1 << this_mode) & cpi->sf.intra_y_mode_bsize_mask[bsize]))
+        continue;
+
+      if (cpi->sf.rt_intra_dc_only_low_content && this_mode != DC_PRED &&
+          x->content_state_sb != kVeryHighSad)
         continue;
 
       if ((cpi->sf.adaptive_rd_thresh_row_mt &&

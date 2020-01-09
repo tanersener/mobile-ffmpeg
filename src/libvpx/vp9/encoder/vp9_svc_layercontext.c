@@ -57,8 +57,8 @@ void vp9_init_layer_context(VP9_COMP *const cpi) {
   svc->simulcast_mode = 0;
 
   for (i = 0; i < REF_FRAMES; ++i) {
-    svc->fb_idx_spatial_layer_id[i] = -1;
-    svc->fb_idx_temporal_layer_id[i] = -1;
+    svc->fb_idx_spatial_layer_id[i] = 0xff;
+    svc->fb_idx_temporal_layer_id[i] = 0xff;
     svc->fb_idx_base[i] = 0;
   }
   for (sl = 0; sl < oxcf->ss_number_layers; ++sl) {
@@ -74,6 +74,7 @@ void vp9_init_layer_context(VP9_COMP *const cpi) {
     svc->fb_idx_upd_tl0[sl] = -1;
     svc->drop_count[sl] = 0;
     svc->spatial_layer_sync[sl] = 0;
+    svc->force_drop_constrained_from_above[sl] = 0;
   }
   svc->max_consec_drop = INT_MAX;
 
@@ -769,6 +770,32 @@ int vp9_one_pass_cbr_svc_start_layer(VP9_COMP *const cpi) {
   svc->mi_stride[svc->spatial_layer_id] = cpi->common.mi_stride;
   svc->mi_rows[svc->spatial_layer_id] = cpi->common.mi_rows;
   svc->mi_cols[svc->spatial_layer_id] = cpi->common.mi_cols;
+
+  // For constrained_from_above drop mode: before encoding superframe (i.e.,
+  // at SL0 frame) check all spatial layers (starting from top) for possible
+  // drop, and if so, set a flag to force drop of that layer and all its lower
+  // layers.
+  if (svc->spatial_layer_to_encode == svc->first_spatial_layer_to_encode) {
+    int sl;
+    for (sl = 0; sl < svc->number_spatial_layers; sl++)
+      svc->force_drop_constrained_from_above[sl] = 0;
+    if (svc->framedrop_mode == CONSTRAINED_FROM_ABOVE_DROP) {
+      for (sl = svc->number_spatial_layers - 1;
+           sl >= svc->first_spatial_layer_to_encode; sl--) {
+        int layer = sl * svc->number_temporal_layers + svc->temporal_layer_id;
+        LAYER_CONTEXT *const lc = &svc->layer_context[layer];
+        cpi->rc = lc->rc;
+        cpi->oxcf.target_bandwidth = lc->target_bandwidth;
+        if (vp9_test_drop(cpi)) {
+          int sl2;
+          // Set flag to force drop in encoding for this mode.
+          for (sl2 = sl; sl2 >= svc->first_spatial_layer_to_encode; sl2--)
+            svc->force_drop_constrained_from_above[sl2] = 1;
+          break;
+        }
+      }
+    }
+  }
 
   if (svc->temporal_layering_mode == VP9E_TEMPORAL_LAYERING_MODE_0212) {
     set_flags_and_fb_idx_for_temporal_mode3(cpi);

@@ -608,6 +608,10 @@ typedef struct SPEED_FEATURES {
 
   // Force subpel motion filter to always use SMOOTH_FILTER.
   int force_smooth_interpol;
+
+  // For real-time mode: force DC only under intra search when content
+  // does not have high souce SAD.
+  int rt_intra_dc_only_low_content;
 } SPEED_FEATURES;
 
 struct VP9_COMP;

@@ -25,7 +25,7 @@ void vp9_quantize_fp_sse2(const tran_low_t *coeff_ptr, intptr_t n_coeffs,
                           const int16_t *iscan) {
   __m128i zero;
   __m128i thr;
-  int16_t nzflag;
+  int nzflag;
   __m128i eob;
   __m128i round, quant, dequant;
 

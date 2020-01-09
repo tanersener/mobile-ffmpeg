@@ -28,7 +28,7 @@
 //   See platform implementations of RegisterStateCheckXXX for details.
 //
 
-#if defined(_WIN64) && ARCH_X86_64
+#if defined(_WIN64) && VPX_ARCH_X86_64
 
 #undef NOMINMAX
 #define NOMINMAX
@@ -138,9 +138,9 @@ class RegisterStateCheck {};
 
 }  // namespace libvpx_test
 
-#endif  // _WIN64 && ARCH_X86_64
+#endif  // _WIN64 && VPX_ARCH_X86_64
 
-#if ARCH_X86 || ARCH_X86_64
+#if VPX_ARCH_X86 || VPX_ARCH_X86_64
 #if defined(__GNUC__)
 
 namespace libvpx_test {
@@ -178,7 +178,7 @@ class RegisterStateCheckMMX {
 }  // namespace libvpx_test
 
 #endif  // __GNUC__
-#endif  // ARCH_X86 || ARCH_X86_64
+#endif  // VPX_ARCH_X86 || VPX_ARCH_X86_64
 
 #ifndef API_REGISTER_STATE_CHECK
 #define API_REGISTER_STATE_CHECK ASM_REGISTER_STATE_CHECK
