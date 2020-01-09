@@ -925,8 +925,8 @@ download_gpl_library_source() {
             GPL_LIB_DEST_DIR="x265"
         ;;
         xvidcore)
-            GPL_LIB_URL="https://downloads.xvid.com/downloads/xvidcore-1.3.6.tar.gz"
-            GPL_LIB_FILE="xvidcore-1.3.6.tar.gz"
+            GPL_LIB_URL="https://downloads.xvid.com/downloads/xvidcore-1.3.7.tar.gz"
+            GPL_LIB_FILE="xvidcore-1.3.7.tar.gz"
             GPL_LIB_ORIG_DIR="xvidcore"
             GPL_LIB_DEST_DIR="xvidcore"
         ;;
