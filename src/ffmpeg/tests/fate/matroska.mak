@@ -1,6 +1,11 @@
 FATE_MATROSKA-$(call ALLYES, MATROSKA_DEMUXER ZLIB) += fate-matroska-prores-zlib
 fate-matroska-prores-zlib: CMD = framecrc -i $(TARGET_SAMPLES)/mkv/prores_zlib.mkv -c:v copy
 
+# This tests that the matroska demuxer correctly adds the icpf header atom
+# upon demuxing; it also tests bz2 decompression and unknown-length cluster.
+FATE_MATROSKA-$(call ALLYES, MATROSKA_DEMUXER BZLIB) += fate-matroska-prores-header-insertion-bz2
+fate-matroska-prores-header-insertion-bz2: CMD = framecrc -i $(TARGET_SAMPLES)/mkv/prores_bz2.mkv -map 0 -c copy
+
 # This tests that the matroska demuxer supports modifying the colorspace
 # properties in remuxing (-c:v copy)
 # It also tests automatic insertion of the vp9_superframe bitstream filter
@@ -16,6 +21,10 @@ fate-matroska-xiph-lacing: CMD = framecrc -i $(TARGET_SAMPLES)/mkv/xiph_lacing.m
 # zlib compressed tracks (both the CodecPrivate as well as the actual frames).
 FATE_MATROSKA-$(call ALLYES, MATROSKA_DEMUXER ZLIB) += fate-matroska-zlib-decompression
 fate-matroska-zlib-decompression: CMD = framecrc -i $(TARGET_SAMPLES)/mkv/subtitle_zlib.mks -c:s copy
+
+# This tests that the matroska demuxer can decompress lzo compressed tracks.
+FATE_MATROSKA-$(call ALLYES, MATROSKA_DEMUXER LZO) += fate-matroska-lzo-decompression
+fate-matroska-lzo-decompression: CMD = framecrc -i $(TARGET_SAMPLES)/mkv/lzo.mka -c copy
 
 # This tests that the matroska demuxer correctly propagates
 # the channel layout contained in vorbis comments in the CodecPrivate

@@ -887,7 +887,7 @@ static int flv_write_packet(AVFormatContext *s, AVPacket *pkt)
     unsigned ts;
     int size = pkt->size;
     uint8_t *data = NULL;
-    int flags = -1, flags_size, ret;
+    int flags = -1, flags_size, ret = 0;
     int64_t cur_offset = avio_tell(pb);
 
     if (par->codec_type == AVMEDIA_TYPE_AUDIO && !pkt->size) {
@@ -992,7 +992,8 @@ static int flv_write_packet(AVFormatContext *s, AVPacket *pkt)
     if (size + flags_size >= 1<<24) {
         av_log(s, AV_LOG_ERROR, "Too large packet with size %u >= %u\n",
                size + flags_size, 1<<24);
-        return AVERROR(EINVAL);
+        ret = AVERROR(EINVAL);
+        goto fail;
     }
 
     avio_wb24(pb, size + flags_size);
@@ -1057,15 +1058,17 @@ static int flv_write_packet(AVFormatContext *s, AVPacket *pkt)
             case AVMEDIA_TYPE_VIDEO:
                 flv->videosize += (avio_tell(pb) - cur_offset);
                 flv->lasttimestamp = flv->acurframeindex / flv->framerate;
+                flv->acurframeindex++;
                 if (pkt->flags & AV_PKT_FLAG_KEY) {
-                    double ts = flv->acurframeindex / flv->framerate;
+                    double ts = flv->lasttimestamp;
                     int64_t pos = cur_offset;
 
-                    flv->lastkeyframetimestamp = flv->acurframeindex / flv->framerate;
+                    flv->lastkeyframetimestamp = ts;
                     flv->lastkeyframelocation = pos;
-                    flv_append_keyframe_info(s, flv, ts, pos);
+                    ret = flv_append_keyframe_info(s, flv, ts, pos);
+                    if (ret < 0)
+                        goto fail;
                 }
-                flv->acurframeindex++;
                 break;
 
             case AVMEDIA_TYPE_AUDIO:
@@ -1077,10 +1080,10 @@ static int flv_write_packet(AVFormatContext *s, AVPacket *pkt)
                 break;
         }
     }
-
+fail:
     av_free(data);
 
-    return pb->error;
+    return ret;
 }
 
 static int flv_check_bitstream(struct AVFormatContext *s, const AVPacket *pkt)

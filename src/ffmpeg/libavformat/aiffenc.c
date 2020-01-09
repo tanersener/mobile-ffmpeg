@@ -199,9 +199,6 @@ static int aiff_write_header(AVFormatContext *s)
     avpriv_set_pts_info(s->streams[aiff->audio_stream_idx], 64, 1,
                         s->streams[aiff->audio_stream_idx]->codecpar->sample_rate);
 
-    /* Data is starting here */
-    avio_flush(pb);
-
     return 0;
 }
 
@@ -266,8 +263,6 @@ static int aiff_write_trailer(AVFormatContext *s)
         file_size = avio_tell(pb);
         avio_seek(pb, aiff->form, SEEK_SET);
         avio_wb32(pb, file_size - aiff->form - 4);
-
-        avio_flush(pb);
     }
 
     return ret;

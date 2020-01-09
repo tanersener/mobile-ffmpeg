@@ -34,7 +34,7 @@ typedef struct CrystalizerContext {
 } CrystalizerContext;
 
 #define OFFSET(x) offsetof(CrystalizerContext, x)
-#define A AV_OPT_FLAG_AUDIO_PARAM|AV_OPT_FLAG_FILTERING_PARAM
+#define A AV_OPT_FLAG_AUDIO_PARAM|AV_OPT_FLAG_FILTERING_PARAM|AV_OPT_FLAG_RUNTIME_PARAM
 
 static const AVOption crystalizer_options[] = {
     { "i", "set intensity",    OFFSET(mult), AV_OPT_TYPE_FLOAT, {.dbl=2.0}, 0, 10, A },
@@ -212,7 +212,7 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
     }
 
     s->filter((void **)out->extended_data, (void **)s->prev->extended_data, (const void **)in->extended_data,
-              in->nb_samples, in->channels, s->mult, s->clip);
+              in->nb_samples, in->channels, ctx->is_disabled ? 0.f : s->mult, s->clip);
 
     if (out != in)
         av_frame_free(&in);
@@ -254,4 +254,6 @@ AVFilter ff_af_crystalizer = {
     .uninit         = uninit,
     .inputs         = inputs,
     .outputs        = outputs,
+    .flags          = AVFILTER_FLAG_SUPPORT_TIMELINE_INTERNAL,
+    .process_command = ff_filter_process_command,
 };

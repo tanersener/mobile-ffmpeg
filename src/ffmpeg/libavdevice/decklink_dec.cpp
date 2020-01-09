@@ -1005,9 +1005,6 @@ av_cold int ff_decklink_read_header(AVFormatContext *avctx)
     class decklink_input_callback *input_callback;
     AVStream *st;
     HRESULT result;
-    char fname[1024];
-    char *tmp;
-    int mode_num = 0;
     int ret;
 
     ctx = (struct decklink_ctx *) av_mallocz(sizeof(struct decklink_ctx));
@@ -1053,24 +1050,12 @@ av_cold int ff_decklink_read_header(AVFormatContext *avctx)
 
     /* List available devices. */
     if (ctx->list_devices) {
+        av_log(avctx, AV_LOG_WARNING, "The -list_devices option is deprecated and will be removed. Please use ffmpeg -sources decklink instead.\n");
         ff_decklink_list_devices_legacy(avctx, 1, 0);
         return AVERROR_EXIT;
     }
 
-    if (cctx->v210) {
-        av_log(avctx, AV_LOG_WARNING, "The bm_v210 option is deprecated and will be removed. Please use the -raw_format yuv422p10.\n");
-        cctx->raw_format = MKBETAG('v','2','1','0');
-    }
-
-    av_strlcpy(fname, avctx->url, sizeof(fname));
-    tmp=strchr (fname, '@');
-    if (tmp != NULL) {
-        av_log(avctx, AV_LOG_WARNING, "The @mode syntax is deprecated and will be removed. Please use the -format_code option.\n");
-        mode_num = atoi (tmp+1);
-        *tmp = 0;
-    }
-
-    ret = ff_decklink_init_device(avctx, fname);
+    ret = ff_decklink_init_device(avctx, avctx->url);
     if (ret < 0)
         return ret;
 
@@ -1111,7 +1096,7 @@ av_cold int ff_decklink_read_header(AVFormatContext *avctx)
         goto error;
     }
 
-    if (mode_num == 0 && !cctx->format_code) {
+    if (!cctx->format_code) {
         if (decklink_autodetect(cctx) < 0) {
             av_log(avctx, AV_LOG_ERROR, "Cannot Autodetect input stream or No signal\n");
             ret = AVERROR(EIO);
@@ -1119,9 +1104,9 @@ av_cold int ff_decklink_read_header(AVFormatContext *avctx)
         }
         av_log(avctx, AV_LOG_INFO, "Autodetected the input mode\n");
     }
-    if (ff_decklink_set_format(avctx, DIRECTION_IN, mode_num) < 0) {
-        av_log(avctx, AV_LOG_ERROR, "Could not set mode number %d or format code %s for %s\n",
-            mode_num, (cctx->format_code) ? cctx->format_code : "(unset)", fname);
+    if (ff_decklink_set_format(avctx, DIRECTION_IN) < 0) {
+        av_log(avctx, AV_LOG_ERROR, "Could not set format code %s for %s\n",
+            cctx->format_code ? cctx->format_code : "(unset)", avctx->url);
         ret = AVERROR(EIO);
         goto error;
     }

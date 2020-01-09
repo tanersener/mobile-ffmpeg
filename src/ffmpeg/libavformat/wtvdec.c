@@ -290,7 +290,7 @@ static AVIOContext * wtvfile_open2(AVFormatContext *s, const uint8_t *buf, int b
 
         buf += dir_length;
     }
-    return 0;
+    return NULL;
 }
 
 #define wtvfile_open(s, buf, buf_size, filename) \
@@ -904,10 +904,10 @@ static int parse_chunks(AVFormatContext *s, int mode, int64_t seekts, int *len_p
                     wtv->last_valid_pts = wtv->pts;
                     if (wtv->epoch == AV_NOPTS_VALUE || wtv->pts < wtv->epoch)
                         wtv->epoch = wtv->pts;
-                if (mode == SEEK_TO_PTS && wtv->pts >= seekts) {
-                    avio_skip(pb, WTV_PAD8(len) - consumed);
-                    return 0;
-                }
+                    if (mode == SEEK_TO_PTS && wtv->pts >= seekts) {
+                        avio_skip(pb, WTV_PAD8(len) - consumed);
+                        return 0;
+                    }
                 }
             }
         } else if (!ff_guidcmp(g, ff_data_guid)) {
@@ -993,8 +993,10 @@ static int read_header(AVFormatContext *s)
     }
 
     ret = parse_chunks(s, SEEK_TO_DATA, 0, 0);
-    if (ret < 0)
+    if (ret < 0) {
+        wtvfile_close(wtv->pb);
         return ret;
+    }
     avio_seek(wtv->pb, -32, SEEK_CUR);
 
     timeline_pos = avio_tell(s->pb); // save before opening another file

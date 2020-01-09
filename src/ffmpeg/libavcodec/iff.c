@@ -322,6 +322,8 @@ static int extract_header(AVCodecContext *const avctx,
             av_log(avctx, AV_LOG_ERROR, "Invalid number of bitplanes: %u\n", s->bpp);
             return AVERROR_INVALIDDATA;
         }
+        if (s->video_size && s->planesize * s->bpp * avctx->height > s->video_size)
+            return AVERROR_INVALIDDATA;
 
         av_freep(&s->ham_buf);
         av_freep(&s->ham_palbuf);
@@ -1359,6 +1361,8 @@ static void decode_delta_d(uint8_t *dst,
             bytestream2_seek_p(&pb, (offset / planepitch_byte) * pitch + (offset % planepitch_byte) + k * planepitch, SEEK_SET);
             if (opcode >= 0) {
                 uint32_t x = bytestream2_get_be32(&gb);
+                if (opcode && 4 + (opcode - 1LL) * pitch > bytestream2_get_bytes_left_p(&pb))
+                    continue;
                 while (opcode && bytestream2_get_bytes_left_p(&pb) > 0) {
                     bytestream2_put_be32(&pb, x);
                     bytestream2_skip_p(&pb, pitch - 4);

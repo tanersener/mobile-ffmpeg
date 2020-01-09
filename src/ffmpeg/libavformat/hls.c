@@ -1663,7 +1663,7 @@ static int save_avio_options(AVFormatContext *s)
 {
     HLSContext *c = s->priv_data;
     static const char * const opts[] = {
-        "headers", "http_proxy", "user_agent", "cookies", "referer", "rw_timeout", NULL };
+        "headers", "http_proxy", "user_agent", "cookies", "referer", "rw_timeout", "icy", NULL };
     const char * const * opt = opts;
     uint8_t *buf;
     int ret = 0;
@@ -2201,9 +2201,8 @@ static int hls_read_packet(AVFormatContext *s, AVPacket *pkt)
         ist = pls->ctx->streams[pls->pkt.stream_index];
         st = pls->main_streams[pls->pkt.stream_index];
 
-        *pkt = pls->pkt;
+        av_packet_move_ref(pkt, &pls->pkt);
         pkt->stream_index = st->index;
-        reset_packet(&c->playlists[minplaylist]->pkt);
 
         if (pkt->dts != AV_NOPTS_VALUE)
             c->cur_timestamp = av_rescale_q(pkt->dts,

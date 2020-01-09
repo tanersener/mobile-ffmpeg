@@ -311,7 +311,6 @@ static int au_write_header(AVFormatContext *s)
     } else {
         avio_wb64(pb, 0); /* annotation field */
     }
-    avio_flush(pb);
 
     return 0;
 }
@@ -327,7 +326,6 @@ static int au_write_trailer(AVFormatContext *s)
         avio_seek(pb, 8, SEEK_SET);
         avio_wb32(pb, (uint32_t)(file_size - au->header_size));
         avio_seek(pb, file_size, SEEK_SET);
-        avio_flush(pb);
     }
 
     return 0;

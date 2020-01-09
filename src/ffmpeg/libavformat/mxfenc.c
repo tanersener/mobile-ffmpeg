@@ -1936,7 +1936,7 @@ static int mxf_write_partition(AVFormatContext *s, int bodysid,
     }
 
     if(key)
-        avio_flush(pb);
+        avio_write_marker(pb, AV_NOPTS_VALUE, AVIO_DATA_MARKER_FLUSH_POINT);
 
     return 0;
 }
@@ -2799,7 +2799,6 @@ static int mxf_write_opatom_packet(AVFormatContext *s, AVPacket *pkt, MXFIndexEn
     mxf->edit_units_count++;
     avio_write(pb, pkt->data, pkt->size);
     mxf->body_offset += pkt->size;
-    avio_flush(pb);
 
     return 0;
 }
@@ -2936,8 +2935,6 @@ static int mxf_write_packet(AVFormatContext *s, AVPacket *pkt)
         avio_write(pb, pkt->data, pkt->size);
         mxf->body_offset += 16+4+pkt->size + klv_fill_size(16+4+pkt->size);
     }
-
-    avio_flush(pb);
 
     return 0;
 }

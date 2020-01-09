@@ -443,6 +443,10 @@ How much to use compressed signal in output. Default is 1.
 Range is between 0 and 1.
 @end table
 
+@subsection Commands
+
+This filter supports the all above options as @ref{commands}.
+
 @section acontrast
 Simple audio dynamic range compression/expansion filter.
 
@@ -1281,13 +1285,13 @@ negotiate the most appropriate format to minimize conversions.
 It accepts the following parameters:
 @table @option
 
-@item sample_fmts
+@item sample_fmts, f
 A '|'-separated list of requested sample formats.
 
-@item sample_rates
+@item sample_rates, r
 A '|'-separated list of requested sample rates.
 
-@item channel_layouts
+@item channel_layouts, cl
 A '|'-separated list of requested channel layouts.
 
 See @ref{channel layout syntax,,the Channel Layout section in the ffmpeg-utils(1) manual,ffmpeg-utils}
@@ -3213,6 +3217,10 @@ Sets the intensity of effect (default: 2.0). Must be in range between 0.0
 Enable clipping. By default is enabled.
 @end table
 
+@subsection Commands
+
+This filter supports the all above options as @ref{commands}.
+
 @section dcshift
 Apply a DC shift to the audio.
 
@@ -3438,7 +3446,19 @@ value. Instead, the threshold value will be adjusted for each individual
 frame.
 In general, smaller parameters result in stronger compression, and vice versa.
 Values below 3.0 are not recommended, because audible distortion may appear.
+
+@item threshold, t
+Set the target threshold value. This specifies the lowest permissible
+magnitude level for the audio input which will be normalized.
+If input frame volume is above this value frame will be normalized.
+Otherwise frame may not be normalized at all. The default value is set
+to 0, which means all input frames will be normalized.
+This option is mostly useful if digital noise is not wanted to be amplified.
 @end table
+
+@subsection Commands
+
+This filter supports the all above options as @ref{commands}.
 
 @section earwax
 
@@ -3557,6 +3577,10 @@ Sets the difference coefficient (default: 2.5). 0.0 means mono sound
 @item c
 Enable clipping. By default is enabled.
 @end table
+
+@subsection Commands
+
+This filter supports the all above options as @ref{commands}.
 
 @section firequalizer
 Apply FIR Equalization using arbitrary frequency response.
@@ -4660,6 +4684,10 @@ How much to use compressed signal in output. Default is 1.
 Range is between 0 and 1.
 @end table
 
+@subsection Commands
+
+This filter supports the all above options as @ref{commands}.
+
 @subsection Examples
 
 @itemize
@@ -5167,6 +5195,10 @@ channels. Default is 0.3.
 Set level of input signal of original channel. Default is 0.8.
 @end table
 
+@subsection Commands
+
+This filter supports the all above options except @code{delay} as @ref{commands}.
+
 @section superequalizer
 Apply 18 band equalizer.
 
@@ -5522,6 +5554,11 @@ Pre-amplification gain in dB to apply to the selected replaygain gain.
 
 Default value for @var{replaygain_preamp} is 0.0.
 
+@item replaygain_noclip
+Prevent clipping by limiting the gain applied.
+
+Default value for @var{replaygain_noclip} is 1.
+
 @item eval
 Set when the volume expression is evaluated.
 
@@ -5581,11 +5618,6 @@ The command accepts the same syntax of the corresponding option.
 
 If the specified expression is not valid, it is kept at its current
 value.
-@item replaygain_noclip
-Prevent clipping by limiting the gain applied.
-
-Default value for @var{replaygain_noclip} is 1.
-
 @end table
 
 @subsection Examples
@@ -8632,6 +8664,10 @@ Limit the maximum change for each plane, default is 65535.
 If 0, plane will remain unchanged.
 @end table
 
+@subsection Commands
+
+This filter supports the all above options as @ref{commands}.
+
 @section deflicker
 
 Remove temporal frame luminance variations.
@@ -8973,6 +9009,10 @@ Flags to local 3x3 coordinates maps like this:
     6 7 8
 @end table
 
+@subsection Commands
+
+This filter supports the all above options as @ref{commands}.
+
 @section displace
 
 Displace pixels as indicated by second and third input stream.
@@ -9030,8 +9070,8 @@ ffmpeg -i INPUT -f lavfi -i nullsrc=hd720,geq='r=128+80*(sin(sqrt((X-W/2)*(X-W/2
 
 @section dnn_processing
 
-Do image processing with deep neural networks. Currently only AVFrame with RGB24
-and BGR24 are supported, more formats will be added later.
+Do image processing with deep neural networks. It works together with another filter
+which converts the pixel format of the Frame to what the dnn network requires.
 
 The filter accepts the following options:
 
@@ -9066,11 +9106,22 @@ Set the input name of the dnn network.
 @item output
 Set the output name of the dnn network.
 
-@item fmt
-Set the pixel format for the Frame. Allowed values are @code{AV_PIX_FMT_RGB24}, and @code{AV_PIX_FMT_BGR24}.
-Default value is @code{AV_PIX_FMT_RGB24}.
-
 @end table
+
+@itemize
+@item
+Halve the red channle of the frame with format rgb24:
+@example
+ffmpeg -i input.jpg -vf format=rgb24,dnn_processing=model=halve_first_channel.model:input=dnn_in:output=dnn_out:dnn_backend=native out.native.png
+@end example
+
+@item
+Halve the pixel value of the frame with format gray32f:
+@example
+ffmpeg -i input.jpg -vf format=grayf32,dnn_processing=model=halve_gray_float.model:input=dnn_in:output=dnn_out:dnn_backend=native -y out.native.png
+@end example
+
+@end itemize
 
 @section drawbox
 
@@ -10120,6 +10171,10 @@ Flags to local 3x3 coordinates maps like this:
     4   5
     6 7 8
 @end table
+
+@subsection Commands
+
+This filter supports the all above options as @ref{commands}.
 
 @section extractplanes
 
@@ -11674,6 +11729,7 @@ the histogram. Possible values are @code{none}, @code{weak} or
 @code{strong}. It defaults to @code{none}.
 @end table
 
+@anchor{histogram}
 @section histogram
 
 Compute and draw a color distribution histogram for the input video.
@@ -12168,6 +12224,10 @@ Default value is @code{none}.
 Swap luma/chroma/alpha fields. Exchange even & odd lines. Default value is @code{0}.
 @end table
 
+@subsection Commands
+
+This filter supports the all above options as @ref{commands}.
+
 @section inflate
 
 Apply inflate effect to the video.
@@ -12185,6 +12245,10 @@ It accepts the following options:
 Limit the maximum change for each plane, default is 65535.
 If 0, plane will remain unchanged.
 @end table
+
+@subsection Commands
+
+This filter supports the all above options as @ref{commands}.
 
 @section interlace
 
@@ -15348,42 +15412,16 @@ Set the line to start scanning for EIA-608 data. Default is @code{0}.
 @item scan_max
 Set the line to end scanning for EIA-608 data. Default is @code{29}.
 
-@item mac
-Set minimal acceptable amplitude change for sync codes detection.
-Default is @code{0.2}. Allowed range is @code{[0.001 - 1]}.
-
 @item spw
 Set the ratio of width reserved for sync code detection.
-Default is @code{0.27}. Allowed range is @code{[0.01 - 0.7]}.
-
-@item mhd
-Set the max peaks height difference for sync code detection.
-Default is @code{0.1}. Allowed range is @code{[0.0 - 0.5]}.
-
-@item mpd
-Set max peaks period difference for sync code detection.
-Default is @code{0.1}. Allowed range is @code{[0.0 - 0.5]}.
-
-@item msd
-Set the first two max start code bits differences.
-Default is @code{0.02}. Allowed range is @code{[0.0 - 0.5]}.
-
-@item bhd
-Set the minimum ratio of bits height compared to 3rd start code bit.
-Default is @code{0.75}. Allowed range is @code{[0.01 - 1]}.
-
-@item th_w
-Set the white color threshold. Default is @code{0.35}. Allowed range is @code{[0.1 - 1]}.
-
-@item th_b
-Set the black color threshold. Default is @code{0.15}. Allowed range is @code{[0.0 - 0.5]}.
+Default is @code{0.27}. Allowed range is @code{[0.1 - 0.7]}.
 
 @item chp
 Enable checking the parity bit. In the event of a parity error, the filter will output
 @code{0x00} for that character. Default is false.
 
 @item lp
-Lowpass lines prior to further processing. Default is disabled.
+Lowpass lines prior to further processing. Default is enabled.
 @end table
 
 @subsection Examples
@@ -16302,6 +16340,19 @@ Scale a logo to 1/10th the height of a video, while preserving its display aspec
 @end example
 @end itemize
 
+@subsection Commands
+
+This filter supports the following commands:
+@table @option
+@item width, w
+@item height, h
+Set the output video dimension expression.
+The command accepts the same syntax of the corresponding option.
+
+If the specified expression is not valid, it is kept at its current
+value.
+@end table
+
 @section scroll
 Scroll input video horizontally and/or vertically by constant speed.
 
@@ -16726,6 +16777,15 @@ The Adler-32 checksum (printed in hexadecimal) of all the planes of the input fr
 @item plane_checksum
 The Adler-32 checksum (printed in hexadecimal) of each plane of the input frame,
 expressed in the form "[@var{c0} @var{c1} @var{c2} @var{c3}]".
+
+@item mean
+The mean value of pixels in each plane of the input frame, expressed in the form
+"[@var{mean0} @var{mean1} @var{mean2} @var{mean3}]".
+
+@item stdev
+The standard deviation of pixel values in each plane of the input frame, expressed
+in the form "[@var{stdev0} @var{stdev1} @var{stdev2} @var{stdev3}]".
+
 @end table
 
 @section showpalette
@@ -17743,6 +17803,61 @@ PAL output (25i):
 16p: 33333334
 @end example
 
+@section thistogram
+
+Compute and draw a color distribution histogram for the input video across time.
+
+Unlike @ref{histogram} video filter which only shows histogram of single input frame
+at certain time, this filter shows also past histograms of number of frames defined
+by @code{width} option.
+
+The computed histogram is a representation of the color component
+distribution in an image.
+
+The filter accepts the following options:
+
+@table @option
+@item width, w
+Set width of single color component output. Default value is @code{0}.
+Value of @code{0} means width will be picked from input video.
+This also set number of passed histograms to keep.
+Allowed range is [0, 8192].
+
+@item display_mode, d
+Set display mode.
+It accepts the following values:
+@table @samp
+@item stack
+Per color component graphs are placed below each other.
+
+@item parade
+Per color component graphs are placed side by side.
+
+@item overlay
+Presents information identical to that in the @code{parade}, except
+that the graphs representing color components are superimposed directly
+over one another.
+@end table
+Default is @code{stack}.
+
+@item levels_mode, m
+Set mode. Can be either @code{linear}, or @code{logarithmic}.
+Default is @code{linear}.
+
+@item components, c
+Set what color components to display.
+Default is @code{7}.
+
+@item bgopacity, b
+Set background opacity. Default is @code{0.9}.
+
+@item envelope, e
+Show envelope. Default is disabled.
+
+@item ecolor, ec
+Set envelope color. Default is @code{gold}.
+@end table
+
 @section threshold
 
 Apply threshold effect to video stream.
@@ -18122,10 +18237,12 @@ Enable complex vertical low-pass filtering.
 This will slightly less reduce interlace 'twitter' and Moire
 patterning but better retain detail and subjective sharpness impression.
 
+@item bypass_il
+Bypass already interlaced frames, only adjust the frame rate.
 @end table
 
-Vertical low-pass filtering can only be enabled for @option{mode}
-@var{interleave_top} and @var{interleave_bottom}.
+Vertical low-pass filtering and bypassing already interlaced frames can only be
+enabled for @option{mode} @var{interleave_top} and @var{interleave_bottom}.
 
 @end table
 
@@ -18941,6 +19058,7 @@ Set vectorscope mode.
 It accepts the following values:
 @table @samp
 @item gray
+@item tint
 Gray values are displayed on graph, higher brightness means more pixels have
 same component color value on location in graph. This is the default mode.
 
@@ -18999,6 +19117,7 @@ Set what kind of graticule to draw.
 @item none
 @item green
 @item color
+@item invert
 @end table
 
 @item opacity, o
@@ -19043,6 +19162,11 @@ Set what kind of colorspace to use when drawing graticule.
 @item 709
 @end table
 Default is auto.
+
+@item tint0, t0
+@item tint1, t1
+Set color tint for gray/tint vectorscope mode. By default both options are zero.
+This means no tint, and output will remain gray.
 @end table
 
 @anchor{vidstabdetect}
@@ -19330,6 +19454,10 @@ Set the blue luma coefficient.
 If @code{intensity} is negative and this is set to 1, colors will change,
 otherwise colors will be less saturated, more towards gray.
 @end table
+
+@subsection Commands
+
+This filter supports the all above options as @ref{commands}.
 
 @anchor{vignette}
 @section vignette
@@ -19674,6 +19802,12 @@ Default is digital.
 
 @item bgopacity, b
 Set background opacity.
+
+@item tint0, t0
+@item tint1, t1
+Set tint for output.
+Only used with lowpass filter and when display is not overlay and input
+pixel formats are not RGB.
 @end table
 
 @section weave, doubleweave
@@ -20347,7 +20481,17 @@ horizontal and vertical output chroma subsample values. For example for the
 pixel format "yuv422p" @var{hsub} is 2 and @var{vsub} is 1.
 @end table
 
+@subsection Commands
+
+This filter supports the following commands:
 @table @option
+@item width, w
+@item height, h
+Set the output video dimension expression.
+The command accepts the same syntax of the corresponding option.
+
+If the specified expression is not valid, it is kept at its current
+value.
 @end table
 
 @c man end VIDEO FILTERS
@@ -21037,6 +21181,65 @@ Apply a strong blur of both luma and chroma parameters:
 
 @c man end OPENCL VIDEO FILTERS
 
+@chapter VAAPI Video Filters
+@c man begin VAAPI VIDEO FILTERS
+
+VAAPI Video filters are usually used with VAAPI decoder and VAAPI encoder. Below is a description of VAAPI video filters.
+
+To enable compilation of these filters you need to configure FFmpeg with
+@code{--enable-vaapi}.
+
+To use vaapi filters, you need to setup the vaapi device correctly. For more information, please read @url{https://trac.ffmpeg.org/wiki/Hardware/VAAPI}
+
+@section tonemap_vappi
+
+Perform HDR(High Dynamic Range) to SDR(Standard Dynamic Range) conversion with tone-mapping.
+It maps the dynamic range of HDR10 content to the SDR content.
+It currently only accepts HDR10 as input.
+
+It accepts the following parameters:
+
+@table @option
+@item format
+Specify the output pixel format.
+
+Currently supported formats are:
+@table @var
+@item p010
+@item nv12
+@end table
+
+Default is nv12.
+
+@item primaries, p
+Set the output color primaries.
+
+Default is same as input.
+
+@item transfer, t
+Set the output transfer characteristics.
+
+Default is bt709.
+
+@item matrix, m
+Set the output colorspace matrix.
+
+Default is same as input.
+
+@end table
+
+@subsection Example
+
+@itemize
+@item
+Convert HDR(HDR10) video to bt2020-transfer-characteristic p010 format
+@example
+tonemap_vaapi=format=p010:t=bt2020-10
+@end example
+@end itemize
+
+@c man end VAAPI VIDEO FILTERS
+
 @chapter Video Sources
 @c man begin VIDEO SOURCES
 
@@ -21079,9 +21282,9 @@ Specify the frame rate expected for the video stream.
 The sample (pixel) aspect ratio of the input video.
 
 @item sws_param
-Specify the optional parameters to be used for the scale filter which
-is automatically inserted when an input change is detected in the
-input size or format.
+This option is deprecated and ignored. Prepend @code{sws_flags=@var{flags};}
+to the filtergraph description to specify swscale flags for automatically
+inserted scalers. See @ref{Filtergraph syntax}.
 
 @item hw_frames_ctx
 When using a hardware pixel format, this should be a reference to an
@@ -21106,7 +21309,7 @@ buffer=size=320x240:pixfmt=6:time_base=1/24:pixel_aspect=1/1
 Alternatively, the options can be specified as a flat string, but this
 syntax is deprecated:
 
-@var{width}:@var{height}:@var{pix_fmt}:@var{time_base.num}:@var{time_base.den}:@var{pixel_aspect.num}:@var{pixel_aspect.den}[:@var{sws_param}]
+@var{width}:@var{height}:@var{pix_fmt}:@var{time_base.num}:@var{time_base.den}:@var{pixel_aspect.num}:@var{pixel_aspect.den}
 
 @section cellauto
 

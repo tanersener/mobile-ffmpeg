@@ -76,8 +76,8 @@ static int decode_nal_sei_mastering_display_info(HEVCSEIMasteringDisplay *s, Get
 static int decode_nal_sei_content_light_info(HEVCSEIContentLight *s, GetBitContext *gb)
 {
     // Max and average light levels
-    s->max_content_light_level     = get_bits_long(gb, 16);
-    s->max_pic_average_light_level = get_bits_long(gb, 16);
+    s->max_content_light_level     = get_bits(gb, 16);
+    s->max_pic_average_light_level = get_bits(gb, 16);
     // As this SEI message comes before the first frame that references it,
     // initialize the flag to 2 and decrement on IRAP access unit so it
     // persists for the coded video sequence (e.g., between two IRAPs)
@@ -177,7 +177,8 @@ static int decode_registered_user_data_closed_caption(HEVCSEIA53Caption *s, GetB
             size -= 2;
 
             if (cc_count && size >= cc_count * 3) {
-                const uint64_t new_size = (s->a53_caption_size + cc_count
+                int old_size = s->buf_ref ? s->buf_ref->size : 0;
+                const uint64_t new_size = (old_size + cc_count
                                            * UINT64_C(3));
                 int i, ret;
 
@@ -185,14 +186,14 @@ static int decode_registered_user_data_closed_caption(HEVCSEIA53Caption *s, GetB
                     return AVERROR(EINVAL);
 
                 /* Allow merging of the cc data from two fields. */
-                ret = av_reallocp(&s->a53_caption, new_size);
+                ret = av_buffer_realloc(&s->buf_ref, new_size);
                 if (ret < 0)
                     return ret;
 
                 for (i = 0; i < cc_count; i++) {
-                    s->a53_caption[s->a53_caption_size++] = get_bits(gb, 8);
-                    s->a53_caption[s->a53_caption_size++] = get_bits(gb, 8);
-                    s->a53_caption[s->a53_caption_size++] = get_bits(gb, 8);
+                    s->buf_ref->data[old_size++] = get_bits(gb, 8);
+                    s->buf_ref->data[old_size++] = get_bits(gb, 8);
+                    s->buf_ref->data[old_size++] = get_bits(gb, 8);
                 }
                 skip_bits(gb, 8); // marker_bits
             }
@@ -363,6 +364,5 @@ int ff_hevc_decode_nal_sei(GetBitContext *gb, void *logctx, HEVCSEI *s,
 
 void ff_hevc_reset_sei(HEVCSEI *s)
 {
-    s->a53_caption.a53_caption_size = 0;
-    av_freep(&s->a53_caption.a53_caption);
+    av_buffer_unref(&s->a53_caption.buf_ref);
 }

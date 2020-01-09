@@ -133,14 +133,13 @@ static int ogg_write_page(AVFormatContext *s, OGGPage *page, int extra_flags)
     avio_write(pb, page->data, page->size);
 
     ogg_update_checksum(s, pb, crc_offset);
-    avio_flush(pb);
 
     size = avio_close_dyn_buf(pb, &buf);
     if (size < 0)
         return size;
 
     avio_write(s->pb, buf, size);
-    avio_flush(s->pb);
+    avio_write_marker(s->pb, AV_NOPTS_VALUE, AVIO_DATA_MARKER_FLUSH_POINT);
     av_free(buf);
     oggstream->page_count--;
     return 0;

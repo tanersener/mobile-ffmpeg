@@ -801,8 +801,6 @@ static int asf_write_header(AVFormatContext *s)
         return -1;
     }
 
-    avio_flush(s->pb);
-
     asf->packet_nb_payloads     = 0;
     asf->packet_timestamp_start = -1;
     asf->packet_timestamp_end   = -1;
@@ -894,7 +892,8 @@ static void flush_packet(AVFormatContext *s)
 
     avio_write(s->pb, asf->packet_buf, s->packet_size - packet_hdr_size);
 
-    avio_flush(s->pb);
+    avio_write_marker(s->pb, AV_NOPTS_VALUE, AVIO_DATA_MARKER_FLUSH_POINT);
+
     asf->nb_packets++;
     asf->packet_nb_payloads     = 0;
     asf->packet_timestamp_start = -1;
@@ -1132,7 +1131,6 @@ static int asf_write_trailer(AVFormatContext *s)
             return ret;
         asf_write_index(s, asf->index_ptr, asf->maximum_packet, asf->next_start_sec);
     }
-    avio_flush(s->pb);
 
     if (asf->is_streamed || !(s->pb->seekable & AVIO_SEEKABLE_NORMAL)) {
         put_chunk(s, 0x4524, 0, 0); /* end of stream */

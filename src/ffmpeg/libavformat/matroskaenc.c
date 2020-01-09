@@ -218,7 +218,7 @@ static int ebml_num_size(uint64_t num)
  * Write a number in EBML variable length format.
  *
  * @param bytes The number of bytes that need to be used to write the number.
- *              If zero, any number of bytes can be used.
+ *              If zero, the minimal number of bytes will be used.
  */
 static void put_ebml_num(AVIOContext *pb, uint64_t num, int bytes)
 {
@@ -228,10 +228,9 @@ static void put_ebml_num(AVIOContext *pb, uint64_t num, int bytes)
     av_assert0(num < (1ULL << 56) - 1);
 
     if (bytes == 0)
-        // don't care how many bytes are used, so use the min
         bytes = needed_bytes;
-    // the bytes needed to write the given size would exceed the bytes
-    // that we need to use, so write unknown size. This shouldn't happen.
+    // The bytes needed to write the given size must not exceed
+    // the bytes that we ought to use.
     av_assert0(bytes >= needed_bytes);
 
     num |= 1ULL << bytes * 7;
@@ -749,9 +748,8 @@ static int mkv_write_native_codecprivate(AVFormatContext *s, AVIOContext *pb,
         return ff_isom_write_avcc(dyn_cp, par->extradata,
                                   par->extradata_size);
     case AV_CODEC_ID_HEVC:
-        ff_isom_write_hvcc(dyn_cp, par->extradata,
-                           par->extradata_size, 0);
-        return 0;
+        return ff_isom_write_hvcc(dyn_cp, par->extradata,
+                                  par->extradata_size, 0);
     case AV_CODEC_ID_AV1:
         if (par->extradata_size)
             return ff_isom_write_av1c(dyn_cp, par->extradata,
@@ -2002,8 +2000,6 @@ static int mkv_write_header(AVFormatContext *s)
     mkv->cur_audio_pkt.size = 0;
     mkv->cluster_pos = -1;
 
-    avio_flush(pb);
-
     // start a new cluster every 5 MB or 5 sec, or 32k / 1 sec for streaming or
     // after 4k and on a keyframe
     if (pb->seekable & AVIO_SEEKABLE_NORMAL) {
@@ -2239,7 +2235,7 @@ static void mkv_end_cluster(AVFormatContext *s)
 
     end_ebml_master_crc32(s->pb, &mkv->cluster_bc, mkv);
     mkv->cluster_pos = -1;
-    avio_flush(s->pb);
+    avio_write_marker(s->pb, AV_NOPTS_VALUE, AVIO_DATA_MARKER_FLUSH_POINT);
 }
 
 static int mkv_check_new_extra_data(AVFormatContext *s, AVPacket *pkt)
