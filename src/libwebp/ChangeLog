@@ -1,3 +1,31 @@
+7f006436 Makefile.vc: fix webp_quality.exe link
+c074c653 update NEWS
+30f09551 bump version to 1.1.0
+a76694a1 update AUTHORS
+6e3ef7b3 extras: fix WEBP_SWAP_16BIT_CSP check
+47178dbd extras: add WebPUnmultiplyARGB() convenience function
+22cbae33 idec_dec: fix 0 offset of NULL pointer
+290dd0b4 muxread: fix 0 offset of NULL pointer
+0df474ac Merge "lossless_(enc_|)sse2: avoid offsetting a NULL pointer"
+c6b75a19 lossless_(enc_|)sse2: avoid offsetting a NULL pointer
+295e5e38 fix UBSAN warning
+e2575e05 DC8_NEON,aarch64: use vaddv
+b0e09e34 dec_neon: Fix build failure under some toolchains
+cf0e903c dsp/lossless: Fix non gcc ARM builds
+bb7bc40b Remove ubsan errors.
+78881b76 CMake: fix GLUT library link
+9f750f7a cmake: fix BUILD_SHARED_LIBS build on mac
+17850e74 libwebp: Remove char-subscripts warning in pnmdec.c
+2fa2552d Merge "Expose WebPMalloc() in addition to WebPFree()"
+a4df4aae Expose WebPMalloc() in addition to WebPFree()
+853ea3d8 imageio/tiff: Return error before allocating bad tile size
+af650c0b Fix a Wxor-used-as-pow false positive
+601ef17c libwebp.py: update to swig 3.0.12
+0e48d889 bugfix: last alpha rows were incorrectly decoded
+24d2ccb4 webp: Fix imageio ReadPNM() TUPLTYPE
+fab8f9cf cosmetics: normalize '*' association
+94138e0e update .gitignore
+0fe1a89d update ChangeLog (tag: v1.0.3-rc1, tag: v1.0.3)
 2ad0916d update NEWS
 1287362b bump version to 1.0.3
 7b968cc2 update AUTHORS

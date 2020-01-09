@@ -132,7 +132,7 @@ static uint8_t* AllocateExternalBuffer(WebPDecoderConfig* config,
                      format == RGB_565) ? 2
                   : 4;
     uint32_t stride = bpp * w + 7;   // <- just for exercising
-    external_buffer = (uint8_t*)malloc(stride * h);
+    external_buffer = (uint8_t*)WebPMalloc(stride * h);
     if (external_buffer == NULL) return NULL;
     output_buffer->u.RGBA.stride = stride;
     output_buffer->u.RGBA.size = stride * h;
@@ -145,7 +145,7 @@ static uint8_t* AllocateExternalBuffer(WebPDecoderConfig* config,
     uint32_t total_size = stride * h * (has_alpha ? 2 : 1)
                         + 2 * uv_stride * (h + 1) / 2;
     assert(format >= YUV && format <= YUVA);
-    external_buffer = (uint8_t*)malloc(total_size);
+    external_buffer = (uint8_t*)WebPMalloc(total_size);
     if (external_buffer == NULL) return NULL;
     tmp = external_buffer;
     output_buffer->u.YUVA.y = tmp;
@@ -176,10 +176,10 @@ static uint8_t* AllocateExternalBuffer(WebPDecoderConfig* config,
   return external_buffer;
 }
 
-int main(int argc, const char *argv[]) {
+int main(int argc, const char* argv[]) {
   int ok = 0;
-  const char *in_file = NULL;
-  const char *out_file = NULL;
+  const char* in_file = NULL;
+  const char* out_file = NULL;
 
   WebPDecoderConfig config;
   WebPDecBuffer* const output_buffer = &config.output;
@@ -412,8 +412,8 @@ int main(int argc, const char *argv[]) {
   }
  Exit:
   WebPFreeDecBuffer(output_buffer);
-  free((void*)external_buffer);
-  free((void*)data);
+  WebPFree((void*)external_buffer);
+  WebPFree((void*)data);
   FREE_WARGV_AND_RETURN(ok ? 0 : -1);
 }
 

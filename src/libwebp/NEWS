@@ -1,3 +1,14 @@
+- 12/18/2019: version 1.1.0
+  * API changes:
+    - libwebp:
+      WebPMalloc (issue #442)
+    - extras:
+      WebPUnmultiplyARGB
+  * alpha decode fix (issue #439)
+  * toolchain updates and bug fixes
+    (chromium: #1026858, #1027136, #1027409, #1028620, #1028716, #995200)
+    (oss-fuzz: #19430, #19447)
+
 - 7/4/2019: version 1.0.3
   This is a binary compatible release.
   * resize fixes for Nx1 sizes and the addition of non-opaque alpha values for

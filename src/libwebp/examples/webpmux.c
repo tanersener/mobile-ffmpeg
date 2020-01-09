@@ -1045,7 +1045,7 @@ static int Process(const Config* config) {
         int* durations = NULL;
         WebPMux* new_mux = DuplicateMuxHeader(mux);
         if (new_mux == NULL) goto Err2;
-        durations = (int*)malloc((size_t)num_frames * sizeof(*durations));
+        durations = (int*)WebPMalloc((size_t)num_frames * sizeof(*durations));
         if (durations == NULL) goto Err2;
         for (i = 0; i < num_frames; ++i) durations[i] = -1;
 
@@ -1103,7 +1103,7 @@ static int Process(const Config* config) {
         new_mux = NULL;
 
  Err3:
-        free(durations);
+        WebPFree(durations);
         WebPMuxDelete(new_mux);
         if (!ok) goto Err2;
       }

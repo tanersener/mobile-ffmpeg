@@ -97,6 +97,6 @@ cmake -Wno-dev \
 make -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_libwebp_package_config "1.0.3"
+create_libwebp_package_config "1.1.0"
 
 make install || exit 1
