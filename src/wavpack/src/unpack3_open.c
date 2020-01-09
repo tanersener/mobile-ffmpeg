@@ -11,7 +11,7 @@
 // This module provides an extension to the open_utils.c module for handling
 // WavPack files prior to version 4.0, not including "raw" files. As these
 // modes are all obsolete and are no longer written, this code will not be
-// fully documented other than the global functions. However, full documenation
+// fully documented other than the global functions. However, full documentation
 // is provided in the version 3.97 source code. Note that this module only
 // provides the functionality of opening the files and obtaining information
 // from them; the actual audio decoding is located in the unpack3.c module.
@@ -53,7 +53,7 @@ WavpackContext *open_file3 (WavpackContext *wpc, char *error)
     if (!strncmp (RiffChunkHeader.ckID, "RIFF", 4) && !strncmp (RiffChunkHeader.formType, "WAVE", 4)) {
 
         if (wpc->open_flags & OPEN_WRAPPER) {
-            wpc->wrapper_data = malloc (wpc->wrapper_bytes = sizeof (RiffChunkHeader));
+            wpc->wrapper_data = (unsigned char *)malloc (wpc->wrapper_bytes = sizeof (RiffChunkHeader));
             memcpy (wpc->wrapper_data, &RiffChunkHeader, sizeof (RiffChunkHeader));
         }
 
@@ -71,7 +71,7 @@ WavpackContext *open_file3 (WavpackContext *wpc, char *error)
             }
             else {
                 if (wpc->open_flags & OPEN_WRAPPER) {
-                    wpc->wrapper_data = realloc (wpc->wrapper_data, wpc->wrapper_bytes + sizeof (ChunkHeader));
+                    wpc->wrapper_data = (unsigned char *)realloc (wpc->wrapper_data, wpc->wrapper_bytes + sizeof (ChunkHeader));
                     memcpy (wpc->wrapper_data + wpc->wrapper_bytes, &ChunkHeader, sizeof (ChunkHeader));
                     wpc->wrapper_bytes += sizeof (ChunkHeader);
                 }
@@ -86,7 +86,7 @@ WavpackContext *open_file3 (WavpackContext *wpc, char *error)
                             return WavpackCloseFile (wpc);
                     }
                     else if (wpc->open_flags & OPEN_WRAPPER) {
-                        wpc->wrapper_data = realloc (wpc->wrapper_data, wpc->wrapper_bytes + sizeof (wavhdr));
+                        wpc->wrapper_data = (unsigned char *)realloc (wpc->wrapper_data, wpc->wrapper_bytes + sizeof (wavhdr));
                         memcpy (wpc->wrapper_data + wpc->wrapper_bytes, &wavhdr, sizeof (wavhdr));
                         wpc->wrapper_bytes += sizeof (wavhdr);
                     }
@@ -102,12 +102,12 @@ WavpackContext *open_file3 (WavpackContext *wpc, char *error)
                         }
 
                         if (wpc->open_flags & OPEN_WRAPPER) {
-                            wpc->wrapper_data = realloc (wpc->wrapper_data, wpc->wrapper_bytes + bytes_to_skip);
+                            wpc->wrapper_data = (unsigned char *)realloc (wpc->wrapper_data, wpc->wrapper_bytes + bytes_to_skip);
                             wpc->reader->read_bytes (wpc->wv_in, wpc->wrapper_data + wpc->wrapper_bytes, bytes_to_skip);
                             wpc->wrapper_bytes += bytes_to_skip;
                         }
                         else {
-                            unsigned char *temp = malloc (bytes_to_skip);
+                            unsigned char *temp = (unsigned char *)malloc (bytes_to_skip);
                             wpc->reader->read_bytes (wpc->wv_in, temp, bytes_to_skip);
                             free (temp);
                         }
@@ -124,12 +124,12 @@ WavpackContext *open_file3 (WavpackContext *wpc, char *error)
                     }
 
                     if (wpc->open_flags & OPEN_WRAPPER) {
-                        wpc->wrapper_data = realloc (wpc->wrapper_data, wpc->wrapper_bytes + bytes_to_skip);
+                        wpc->wrapper_data = (unsigned char *)realloc (wpc->wrapper_data, wpc->wrapper_bytes + bytes_to_skip);
                         wpc->reader->read_bytes (wpc->wv_in, wpc->wrapper_data + wpc->wrapper_bytes, bytes_to_skip);
                         wpc->wrapper_bytes += bytes_to_skip;
                     }
                     else {
-                        unsigned char *temp = malloc (bytes_to_skip);
+                        unsigned char *temp = (unsigned char *)malloc (bytes_to_skip);
                         wpc->reader->read_bytes (wpc->wv_in, temp, bytes_to_skip);
                         free (temp);
                     }

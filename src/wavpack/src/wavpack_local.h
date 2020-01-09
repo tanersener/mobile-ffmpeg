@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////
 //                           **** WAVPACK ****                            //
 //                  Hybrid Lossless Wavefile Compressor                   //
-//              Copyright (c) 1998 - 2013 Conifer Software.               //
+//                Copyright (c) 1998 - 2019 David Bryant.                 //
 //                          All Rights Reserved.                          //
 //      Distributed under the BSD Software License (see license.txt)      //
 ////////////////////////////////////////////////////////////////////////////
@@ -10,6 +10,8 @@
 
 #ifndef WAVPACK_LOCAL_H
 #define WAVPACK_LOCAL_H
+
+#include "wavpack.h"
 
 #if defined(_WIN32)
 #define strdup(x) _strdup(x)
@@ -97,121 +99,8 @@ typedef struct {
     unsigned char *ape_tag_data;
 } M_Tag;
 
-// RIFF / wav header formats (these occur at the beginning of both wav files
-// and pre-4.0 WavPack files that are not in the "raw" mode)
-
-typedef struct {
-    char ckID [4];
-    uint32_t ckSize;
-    char formType [4];
-} RiffChunkHeader;
-
-typedef struct {
-    char ckID [4];
-    uint32_t ckSize;
-} ChunkHeader;
-
-#define ChunkHeaderFormat "4L"
-
-typedef struct {
-    uint16_t FormatTag, NumChannels;
-    uint32_t SampleRate, BytesPerSecond;
-    uint16_t BlockAlign, BitsPerSample;
-    uint16_t cbSize, ValidBitsPerSample;
-    int32_t ChannelMask;
-    uint16_t SubFormat;
-    char GUID [14];
-} WaveHeader;
-
-#define WaveHeaderFormat "SSLLSSSSLS"
-
-////////////////////////////// WavPack Header /////////////////////////////////
-
-// Note that this is the ONLY structure that is written to (or read from)
-// WavPack 4.0 files, and is the preamble to every block in both the .wv
-// and .wvc files.
-
-typedef struct {
-    char ckID [4];
-    uint32_t ckSize;
-    int16_t version;
-    unsigned char block_index_u8;
-    unsigned char total_samples_u8;
-    uint32_t total_samples, block_index, block_samples, flags, crc;
-} WavpackHeader;
-
-#define WavpackHeaderFormat "4LS2LLLLL"
-
-// Macros to access the 40-bit block_index field
-
-#define GET_BLOCK_INDEX(hdr) ( (int64_t) (hdr).block_index + ((int64_t) (hdr).block_index_u8 << 32) )
-
-#define SET_BLOCK_INDEX(hdr,value) do { \
-    int64_t tmp = (value);              \
-    (hdr).block_index = (uint32_t) tmp; \
-    (hdr).block_index_u8 =              \
-        (unsigned char) (tmp >> 32);    \
-} while (0)
-
-// Macros to access the 40-bit total_samples field, which is complicated by the fact that
-// all 1's in the lower 32 bits indicates "unknown" (regardless of upper 8 bits)
-
-#define GET_TOTAL_SAMPLES(hdr) ( ((hdr).total_samples == (uint32_t) -1) ? -1 : \
-    (int64_t) (hdr).total_samples + ((int64_t) (hdr).total_samples_u8 << 32) - (hdr).total_samples_u8 )
-
-#define SET_TOTAL_SAMPLES(hdr,value) do {       \
-    int64_t tmp = (value);                      \
-    if (tmp < 0)                                \
-        (hdr).total_samples = (uint32_t) -1;    \
-    else {                                      \
-        tmp += (tmp / (int64_t) 0xffffffff);    \
-        (hdr).total_samples = (uint32_t) tmp;   \
-        (hdr).total_samples_u8 =                \
-            (unsigned char) (tmp >> 32);        \
-    }                                           \
-} while (0)
-
 // or-values for "flags"
 
-#define BYTES_STORED    3       // 1-4 bytes/sample
-#define MONO_FLAG       4       // not stereo
-#define HYBRID_FLAG     8       // hybrid mode
-#define JOINT_STEREO    0x10    // joint stereo
-#define CROSS_DECORR    0x20    // no-delay cross decorrelation
-#define HYBRID_SHAPE    0x40    // noise shape (hybrid mode only)
-#define FLOAT_DATA      0x80    // ieee 32-bit floating point data
-
-#define INT32_DATA      0x100   // special extended int handling
-#define HYBRID_BITRATE  0x200   // bitrate noise (hybrid mode only)
-#define HYBRID_BALANCE  0x400   // balance noise (hybrid stereo mode only)
-
-#define INITIAL_BLOCK   0x800   // initial block of multichannel segment
-#define FINAL_BLOCK     0x1000  // final block of multichannel segment
-
-#define SHIFT_LSB       13
-#define SHIFT_MASK      (0x1fL << SHIFT_LSB)
-
-#define MAG_LSB         18
-#define MAG_MASK        (0x1fL << MAG_LSB)
-
-#define SRATE_LSB       23
-#define SRATE_MASK      (0xfL << SRATE_LSB)
-
-#define FALSE_STEREO    0x40000000      // block is stereo, but data is mono
-#define NEW_SHAPING     0x20000000      // use IIR filter for negative shaping
-
-#define MONO_DATA (MONO_FLAG | FALSE_STEREO)
-
-// Introduced in WavPack 5.0:
-#define HAS_CHECKSUM    0x10000000      // block contains a trailing checksum
-#define DSD_FLAG        0x80000000      // block is encoded DSD (1-bit PCM)
-
-#define IGNORED_FLAGS   0x08000000      // reserved, but ignore if encountered
-#define UNKNOWN_FLAGS   0x00000000      // we no longer have any of these spares
-
-#define MIN_STREAM_VERS     0x402       // lowest stream version we'll decode
-#define MAX_STREAM_VERS     0x410       // highest stream version we'll decode or encode
-                                        // (only stream version to support mono optimization)
 #define CUR_STREAM_VERS     0x407       // universally compatible stream version
 
 
@@ -259,52 +148,12 @@ typedef struct {
 #define ID_CHANNEL_IDENTITIES   (ID_OPTIONAL_DATA | 0xb)
 #define ID_BLOCK_CHECKSUM       (ID_OPTIONAL_DATA | 0xf)
 
-///////////////////////// WavPack Configuration ///////////////////////////////
-
-// This internal structure is used during encode to provide configuration to
-// the encoding engine and during decoding to provide fle information back to
-// the higher level functions. Not all fields are used in both modes.
-
-typedef struct {
-    float bitrate, shaping_weight;
-    int bits_per_sample, bytes_per_sample;
-    int qmode, flags, xmode, num_channels, float_norm_exp;
-    int32_t block_samples, extra_flags, sample_rate, channel_mask;
-    unsigned char md5_checksum [16], md5_read;
-    int num_tag_strings;
-    char **tag_strings;
-} WavpackConfig;
-
 #define CONFIG_BYTES_STORED     3       // 1-4 bytes/sample
 #define CONFIG_MONO_FLAG        4       // not stereo
-#define CONFIG_HYBRID_FLAG      8       // hybrid mode
-#define CONFIG_JOINT_STEREO     0x10    // joint stereo
-#define CONFIG_CROSS_DECORR     0x20    // no-delay cross decorrelation
-#define CONFIG_HYBRID_SHAPE     0x40    // noise shape (hybrid mode only)
 #define CONFIG_FLOAT_DATA       0x80    // ieee 32-bit floating point data
 
-#define CONFIG_FAST_FLAG        0x200   // fast mode
-#define CONFIG_HIGH_FLAG        0x800   // high quality mode
-#define CONFIG_VERY_HIGH_FLAG   0x1000  // very high
-#define CONFIG_BITRATE_KBPS     0x2000  // bitrate is kbps, not bits / sample
 #define CONFIG_AUTO_SHAPING     0x4000  // automatic noise shaping
-#define CONFIG_SHAPE_OVERRIDE   0x8000  // shaping mode specified
-#define CONFIG_JOINT_OVERRIDE   0x10000 // joint-stereo mode specified
-#define CONFIG_DYNAMIC_SHAPING  0x20000 // dynamic noise shaping
-#define CONFIG_CREATE_EXE       0x40000 // create executable
-#define CONFIG_CREATE_WVC       0x80000 // create correction file
-#define CONFIG_OPTIMIZE_WVC     0x100000 // maximize bybrid compression
-#define CONFIG_COMPATIBLE_WRITE 0x400000 // write files for decoders < 4.3
-#define CONFIG_CALC_NOISE       0x800000 // calc noise in hybrid mode
 #define CONFIG_LOSSY_MODE       0x1000000 // obsolete (for information)
-#define CONFIG_EXTRA_MODE       0x2000000 // extra processing mode
-#define CONFIG_SKIP_WVX         0x4000000 // no wvx stream w/ floats & big ints
-#define CONFIG_MD5_CHECKSUM     0x8000000 // compute & store MD5 signature
-#define CONFIG_MERGE_BLOCKS     0x10000000 // merge blocks of equal redundancy (for lossyWAV)
-#define CONFIG_PAIR_UNDEF_CHANS 0x20000000 // encode undefined channels in stereo pairs
-#define CONFIG_OPTIMIZE_MONO    0x80000000 // optimize for mono streams posing as stereo
-
-#define QMODE_DSD_AUDIO         0x30    // if either of these is set in qmode (version 5.0)
 
 /*
  * These config flags were never actually used, or are no longer used, or are
@@ -361,6 +210,14 @@ typedef struct bs {
 #define OLD_MAX_STREAMS 8
 #define MAX_NTERMS 16
 #define MAX_TERM 8
+
+// DSD-specific definitions
+
+#define MAX_HISTORY_BITS    5       // maximum number of history bits in DSD "fast" mode
+                                    // note that 5 history bits requires 32 history bins
+#define MAX_BYTES_PER_BIN   1280    // maximum bytes for the value lookup array (per bin)
+                                    //  such that the total storage per bin = 2K (also
+                                    //  counting probabilities and summed_probabilities)
 
 // Note that this structure is directly accessed in assembly files, so modify with care
 
@@ -420,7 +277,7 @@ typedef struct {
     const WavpackDecorrSpec *decorr_specs;
 
     struct {
-        unsigned char *byteptr, *endptr, (*probabilities) [256], **value_lookup, mode, ready;
+        unsigned char *byteptr, *endptr, (*probabilities) [256], *lookup_buffer, **value_lookup, mode, ready;
         int history_bins, p0, p1;
         int16_t (*summed_probabilities) [256];
         uint32_t low, high, value;
@@ -445,38 +302,7 @@ typedef struct {
 // files. It is recommended that direct access to this structure be minimized
 // and the provided utilities used instead.
 
-typedef struct {
-    int32_t (*read_bytes)(void *id, void *data, int32_t bcount);
-    uint32_t (*get_pos)(void *id);
-    int (*set_pos_abs)(void *id, uint32_t pos);
-    int (*set_pos_rel)(void *id, int32_t delta, int mode);
-    int (*push_back_byte)(void *id, int c);
-    uint32_t (*get_length)(void *id);
-    int (*can_seek)(void *id);
-
-    // this callback is for writing edited tags only
-    int32_t (*write_bytes)(void *id, void *data, int32_t bcount);
-} WavpackStreamReader;
-
-// Extended version of structure for handling large files and added
-// functionality for truncating and closing files
-
-typedef struct {
-    int32_t (*read_bytes)(void *id, void *data, int32_t bcount);
-    int32_t (*write_bytes)(void *id, void *data, int32_t bcount);
-    int64_t (*get_pos)(void *id);                               // new signature for large files
-    int (*set_pos_abs)(void *id, int64_t pos);                  // new signature for large files
-    int (*set_pos_rel)(void *id, int64_t delta, int mode);      // new signature for large files
-    int (*push_back_byte)(void *id, int c);
-    int64_t (*get_length)(void *id);                            // new signature for large files
-    int (*can_seek)(void *id);
-    int (*truncate_here)(void *id);                             // new function to truncate file at current position
-    int (*close)(void *id);                                     // new function to close file
-} WavpackStreamReader64;
-
-typedef int (*WavpackBlockOutput)(void *id, void *data, int32_t bcount);
-
-typedef struct {
+struct WavpackContext {
     WavpackConfig config;
 
     WavpackMetadata *metadata;
@@ -509,8 +335,9 @@ typedef struct {
     void *decimation_context;
     char file_extension [8];
 
+    void (*close_callback)(void *wpc);
     char error_message [80];
-} WavpackContext;
+};
 
 //////////////////////// function prototypes and macros //////////////////////
 
@@ -748,7 +575,7 @@ int FASTCALL wp_log2 (uint32_t avalue);
 
 #ifdef OPT_ASM_X86
 #define LOG2BUFFER log2buffer_x86
-#elif defined(OPT_ASM_X64) && (defined (_WIN64) || defined(__CYGWIN__) || defined(__MINGW64__))
+#elif defined(OPT_ASM_X64) && (defined (_WIN64) || defined(__CYGWIN__) || defined(__MINGW64__) || defined(__midipix__))
 #define LOG2BUFFER log2buffer_x64win
 #elif defined(OPT_ASM_X64)
 #define LOG2BUFFER log2buffer_x64
@@ -792,21 +619,6 @@ WavpackContext *WavpackOpenFileInput (const char *infilename, char *error, int f
 #define OPEN_NO_CHECKSUM 0x800  // don't verify block checksums before decoding
 
 int WavpackGetMode (WavpackContext *wpc);
-
-#define MODE_WVC        0x1
-#define MODE_LOSSLESS   0x2
-#define MODE_HYBRID     0x4
-#define MODE_FLOAT      0x8
-#define MODE_VALID_TAG  0x10
-#define MODE_HIGH       0x20
-#define MODE_FAST       0x40
-#define MODE_EXTRA      0x80    // extra mode used, see MODE_XMODE for possible level
-#define MODE_APETAG     0x100
-#define MODE_SFX        0x200
-#define MODE_VERY_HIGH  0x400
-#define MODE_MD5        0x800
-#define MODE_XMODE      0x7000  // mask for extra level (1-6, 0=unknown)
-#define MODE_DNS        0x8000
 
 int WavpackGetQualifyMode (WavpackContext *wpc);
 int WavpackGetVersion (WavpackContext *wpc);
@@ -869,6 +681,8 @@ void WavpackNativeToLittleEndian (void *data, char *format);
 void WavpackBigEndianToNative (void *data, char *format);
 void WavpackNativeToBigEndian (void *data, char *format);
 
+void install_close_callback (WavpackContext *wpc, void cb_func (void *wpc));
+void free_dsd_tables (WavpackStream *wps);
 void free_streams (WavpackContext *wpc);
 
 /////////////////////////////////// tag utilities ////////////////////////////////////

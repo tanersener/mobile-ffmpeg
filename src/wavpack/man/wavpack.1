@@ -2,12 +2,12 @@
 .\"     Title: wavpack
 .\"    Author: Sebastian Dröge <slomo@debian.org>
 .\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
-.\"      Date: 2017-01-13
+.\"      Date: 2019-12-14
 .\"    Manual: WavPack Executable Programs
-.\"    Source: WavPack 5.1.0
+.\"    Source: WavPack 5.2.0
 .\"  Language: English
 .\"
-.TH "WAVPACK" "1" "2017\-01\-13" "WavPack 5\&.1\&.0" "WavPack Executable Programs"
+.TH "WAVPACK" "1" "2019\-12\-14" "WavPack 5\&.2\&.0" "WavPack Executable Programs"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -220,11 +220,11 @@ ignore length in wav header (no pipe output allowed)
 .PP
 \fB\-\-import\-id3\fR
 .RS 4
-import applicable tag items from ID3v2\&.3 tag present in DSF files into APEv2 tag (if there are > 1 MB cover images present add
+import applicable tag items from ID3v2\&.3 tag present in DSF (and other) files into APEv2 tag (if there are > 1 MB cover images present add
 \fB\-\-allow\-huge\-tags\fR
 to include them, and
 \fB\-r\fR
-if you do not want large images appearing twice in the WavPack file, although this will remove the entire ID3 tag wrapper)
+if you do not want large images appearing twice in the WavPack file, although this will remove the entire original ID3v2 tag)
 .RE
 .PP
 \fB\-j\fR\fB\fIn\fR\fR
@@ -409,5 +409,5 @@ Updates
 .br
 Copyright \(co 2005 Sebastian Dröge
 .br
-Copyright \(co 2017 David Bryant
+Copyright \(co 2019 David Bryant
 .br

@@ -22,7 +22,7 @@
     #define DECORR_STEREO_PASS_CONT unpack_decorr_stereo_pass_cont_x86
     #define DECORR_STEREO_PASS_CONT_AVAILABLE unpack_cpu_has_feature_x86(CPU_FEATURE_MMX)
     #define DECORR_MONO_PASS_CONT unpack_decorr_mono_pass_cont_x86
-#elif defined(OPT_ASM_X64) && (defined (_WIN64) || defined(__CYGWIN__) || defined(__MINGW64__))
+#elif defined(OPT_ASM_X64) && (defined (_WIN64) || defined(__CYGWIN__) || defined(__MINGW64__) || defined(__midipix__))
     #define DECORR_STEREO_PASS_CONT unpack_decorr_stereo_pass_cont_x64win
     #define DECORR_STEREO_PASS_CONT_AVAILABLE 1
     #define DECORR_MONO_PASS_CONT unpack_decorr_mono_pass_cont_x64win
@@ -52,7 +52,7 @@ extern void DECORR_MONO_PASS_CONT (struct decorr_pass *dpp, int32_t *buffer, int
 ///////////////////////////// executable code ////////////////////////////////
 
 // This monster actually unpacks the WavPack bitstream(s) into the specified
-// buffer as 32-bit integers or floats (depending on orignal data). Lossy
+// buffer as 32-bit integers or floats (depending on original data). Lossy
 // samples will be clipped to their original limits (i.e. 8-bit samples are
 // clipped to -128/+127) but are still returned in longs. It is up to the
 // caller to potentially reformat this for the final output including any
@@ -83,7 +83,7 @@ int32_t unpack_samples (WavpackContext *wpc, int32_t *buffer, uint32_t sample_co
     // don't attempt to decode past the end of the block, but watch out for overflow!
 
     if (wps->sample_index + sample_count > GET_BLOCK_INDEX (wps->wphdr) + wps->wphdr.block_samples &&
-        GET_BLOCK_INDEX (wps->wphdr) + wps->wphdr.block_samples - wps->sample_index < sample_count)
+        (uint32_t) (GET_BLOCK_INDEX (wps->wphdr) + wps->wphdr.block_samples - wps->sample_index) < sample_count)
             sample_count = (uint32_t) (GET_BLOCK_INDEX (wps->wphdr) + wps->wphdr.block_samples - wps->sample_index);
 
     if (GET_BLOCK_INDEX (wps->wphdr) > wps->sample_index || wps->wphdr.block_samples < sample_count)

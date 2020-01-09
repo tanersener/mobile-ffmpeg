@@ -247,7 +247,7 @@ WavpackContext *WavpackOpenFileInput (const char *infilename, char *error, int f
         return NULL;
     }
 
-    if (wv_id != stdin && (flags & OPEN_WVC)) {
+    if (*infilename != '-' && (flags & OPEN_WVC)) {
         char *in2filename = malloc (strlen (infilename) + 10);
 
         strcpy (in2filename, infilename);
@@ -287,7 +287,7 @@ static FILE *fopen_utf8(const char *filename_utf8, const char *mode_utf8)
 	FILE *ret = NULL;
 	wchar_t *filename_utf16 = utf8_to_utf16(filename_utf8);
 	wchar_t *mode_utf16 = utf8_to_utf16(mode_utf8);
-	
+
 	if(filename_utf16 && mode_utf16)
 	{
 		ret = _wfopen(filename_utf16, mode_utf16);

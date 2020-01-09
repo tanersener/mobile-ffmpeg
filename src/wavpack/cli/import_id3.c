@@ -16,6 +16,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <stdio.h>
+#include <ctype.h>
 
 #include "wavpack.h"
 
@@ -23,18 +24,37 @@ static struct {
     char *id3_item, *ape_item;
 } text_tag_table [] = {
     { "TALB", "Album" },
-    { "TIT2", "Title" },
     { "TPE1", "Artist" },
+    { "TPE2", "AlbumArtist" },
+    { "TPE3", "Conductor" },
+    { "TIT1", "Grouping" },
+    { "TIT2", "Title" },
+    { "TIT3", "Subtitle" },
+    { "TSST", "DiscSubtitle" },
+    { "TSOA", "AlbumSort" },
+    { "TSOT", "TitleSort" },
+    { "TSO2", "AlbumArtistSort" },
+    { "TSOP", "ArtistSort" },
+    { "TPOS", "Disc" },
+    { "TRCK", "Track" },
     { "TCON", "Genre" },
     { "TYER", "Year" },
-    { "TRCK", "Track" },
     { "TCOM", "Composer" },
-    { "TPE3", "Conductor" }
+    { "TPUB", "Publisher" },
+    { "TCMP", "Compilation" },
+    { "TENC", "EncodedBy" },
+    { "TEXT", "Lyricist" },
+    { "TCOP", "Copyright" },
+    { "TLAN", "Language" },
+    { "TSRC", "ISRC" },
+    { "TMED", "Media" },
+    { "TMOO", "Mood" },
+    { "TBPM", "BPM" }
 };
 
 #define NUM_TEXT_TAG_ITEMS (sizeof (text_tag_table) / sizeof (text_tag_table [0]))
 
-static int WideCharToUTF8 (const wchar_t *Wide, unsigned char *pUTF8, int len);
+static int WideCharToUTF8 (const uint16_t *Wide, unsigned char *pUTF8, int len);
 static void Latin1ToUTF8 (void *string, int len);
 
 // Import specified ID3v2.3 tag. The WavPack context accepts the tag items, and can be
@@ -44,7 +64,7 @@ static void Latin1ToUTF8 (void *string, int len);
 // zero in the case of no applicable tags. An optional integer pointer can be provided
 // to accept the total number of bytes consumed by the tag (name and value).
 
-int ImportID3v2 (WavpackContext *wpc, unsigned char *tag_data, int tag_size, char *error, int32_t *bytes_used)
+static int ImportID3v2_syncsafe (WavpackContext *wpc, unsigned char *tag_data, int tag_size, char *error, int32_t *bytes_used, int syncsafe)
 {
     int tag_size_from_header, items_imported = 0, done_cover = 0;
     unsigned char id3_header [10];
@@ -125,57 +145,67 @@ int ImportID3v2 (WavpackContext *wpc, unsigned char *tag_data, int tag_size, cha
             return -1;
         }
 
-        frame_size = frame_header [7] + (frame_header [6] << 8) + (frame_header [5] << 16) + (frame_header [4] << 24);
+        if (syncsafe)
+            frame_size = frame_header [7] + (frame_header [6] << 7) + (frame_header [5] << 14) + (frame_header [4] << 21);
+        else
+            frame_size = frame_header [7] + (frame_header [6] << 8) + (frame_header [5] << 16) + (frame_header [4] << 24);
 
         if (!frame_size) {
             strcpy (error, "empty frame not allowed");
             return -1;
         }
 
-        frame_body = malloc (frame_size + 4);
-
         if (frame_size > tag_size) {
             strcpy (error, "can't read frame body");
             return -1;
         }
 
+        frame_body = malloc (frame_size + 4);
+
         memcpy (frame_body, tag_data, frame_size);
         tag_size -= frame_size;
         tag_data += frame_size;
 
-        if (frame_header [0] == 'T' && strncmp ((char *) frame_header, "TXXX", 4)) {
-            unsigned char *utf8_string = NULL;
+        if (frame_header [0] == 'T') {
+            int txxx_mode = !strncmp ((char *) frame_header, "TXXX", 4), si = 0;
+            unsigned char *utf8_strings [2];
 
             if (frame_body [0] == 0) {
-                int nchars = frame_size - 1;
-                unsigned char *fp = frame_body + 1;
+                unsigned char *fp = frame_body + 1, *fe = frame_body + frame_size;
 
-                utf8_string = malloc ((nchars + 1) * 3);
+                while (si < 2 && fp < fe && *fp) {
+                    utf8_strings [si] = malloc (frame_size * 3);
 
-                for (i = 0; i < nchars; ++i)
-                    if (!(utf8_string [i] = *fp++))
-                        break;
+                    for (i = 0; fp < fe; ++i)
+                        if (!(utf8_strings [si] [i] = *fp++))
+                            break;
 
-                if (i == nchars)
-                    utf8_string [nchars] = 0;
+                    if (fp == fe)
+                        utf8_strings [si] [i] = 0;
 
-                Latin1ToUTF8 (utf8_string, (nchars + 1) * 3);
+                    Latin1ToUTF8 (utf8_strings [si++], frame_size * 3);
+                }
             }
-            else if (frame_body [0] == 1 && frame_size > 2 && frame_body [1] == 0xFF && frame_body [2] == 0xFE) {
-                int nchars = (frame_size - 3) / 2;
-                wchar_t *wide_string = malloc ((nchars + 1) * sizeof (wchar_t));
-                unsigned char *fp = frame_body + 3;
+            else if (frame_body [0] == 1) {
+                unsigned char *fp = frame_body + 1, *fe = frame_body + frame_size - (frame_size & 1);
+                uint16_t *wide_string = malloc (frame_size);
 
-                utf8_string = malloc ((nchars + 1) * 3);
+                while (si < 2 && fp < fe - 2 && fp [0] == 0xFF && fp [1] == 0xFE) {
+                    utf8_strings [si] = malloc (frame_size * 2);
+                    fp += 2;
 
-                for (i = 0; i < nchars; ++i, fp += 2)
-                    if (!(wide_string [i] = fp [0] | (fp [1] << 8)))
-                        break;
+                    for (i = 0; fp < fe; ++i, fp += 2)
+                        if (!(wide_string [i] = fp [0] | (fp [1] << 8))) {
+                            fp += 2;
+                            break;
+                        }
 
-                if (i == nchars)
-                    wide_string [nchars] = 0;
+                    if (fp == fe)
+                        wide_string [i] = 0;
 
-                WideCharToUTF8 (wide_string, utf8_string, (nchars + 1) * 3);
+                    WideCharToUTF8 (wide_string, utf8_strings [si++], frame_size * 2);
+                }
+
                 free (wide_string);
             }
             else {
@@ -183,26 +213,56 @@ int ImportID3v2 (WavpackContext *wpc, unsigned char *tag_data, int tag_size, cha
                 return -1;
             }
 
-            // if we got a text string, look through the table and find an equivalent APEv2 tag item
+            // if we got a text string (or a TXXX and two text strings) store them here
 
-            if (utf8_string) {
-                for (i = 0; i < NUM_TEXT_TAG_ITEMS; ++i)
-                    if (!strncmp ((char *) frame_header, text_tag_table [i].id3_item, 4)) {
-                        if (wpc && !WavpackAppendTagItem (wpc, text_tag_table [i].ape_item, (char *) utf8_string, (int) strlen ((char *) utf8_string))) {
-                            strcpy (error, WavpackGetErrorMessage (wpc));
-                            return -1;
-                        }
+            if (si) {
+                if (txxx_mode && si == 2) {
+                    unsigned char *cptr = utf8_strings [0];
 
-                        items_imported++;
-                        if (bytes_used) *bytes_used += (int) (strlen ((char *) utf8_string) + strlen (text_tag_table [i].ape_item) + 1);
+                    // if all single-byte UTF8, format TXXX description to match case of regular APEv2 descriptions (e.g., Performer)
+
+                    while (*cptr)
+                        if (*cptr & 0x80)
+                            break;
+                        else
+                            cptr++;
+
+                    if (!*cptr && isupper (*utf8_strings [0])) {
+                        cptr = utf8_strings [0];
+
+                        while (*++cptr)
+                            if (isupper (*cptr))
+                                *cptr = tolower (*cptr);
                     }
 
-                free (utf8_string);
+                    if (wpc && !WavpackAppendTagItem (wpc, (char *) utf8_strings [0], (char *) utf8_strings [1], (int) strlen ((char *) utf8_strings [1]))) {
+                        strcpy (error, WavpackGetErrorMessage (wpc));
+                        return -1;
+                    }
+
+                    items_imported++;
+                    if (bytes_used) *bytes_used += (int) (strlen ((char *) utf8_strings [0]) + strlen ((char *) utf8_strings [1]) + 1);
+                }
+                else    // if not TXXX, look up item in the table to find APEv2 item name
+                    for (i = 0; i < NUM_TEXT_TAG_ITEMS; ++i)
+                        if (!strncmp ((char *) frame_header, text_tag_table [i].id3_item, 4)) {
+                            if (wpc && !WavpackAppendTagItem (wpc, text_tag_table [i].ape_item, (char *) utf8_strings [0], (int) strlen ((char *) utf8_strings [0]))) {
+                                strcpy (error, WavpackGetErrorMessage (wpc));
+                                return -1;
+                            }
+
+                            items_imported++;
+                            if (bytes_used) *bytes_used += (int) (strlen ((char *) utf8_strings [0]) + strlen (text_tag_table [i].ape_item) + 1);
+                        }
+
+                do
+                    free (utf8_strings [--si]);
+                while (si);
             }
         }
         else if (!strncmp ((char *) frame_header, "APIC", 4)) {
             if (frame_body [0] == 0) {
-                char *mime_type, *description, *extension, *item = NULL;
+                char *mime_type, *extension, *item = NULL;
                 unsigned char *frame_ptr = frame_body + 1;
                 int frame_bytes = frame_size - 1;
                 unsigned char picture_type;
@@ -223,8 +283,6 @@ int ImportID3v2 (WavpackContext *wpc, unsigned char *tag_data, int tag_size, cha
 
                 picture_type = *frame_ptr++;
                 frame_bytes--;
-
-                description = (char *) frame_ptr;
 
                 while (frame_bytes-- && *frame_ptr++);
 
@@ -290,6 +348,44 @@ int ImportID3v2 (WavpackContext *wpc, unsigned char *tag_data, int tag_size, cha
     return items_imported;
 }
 
+int ImportID3v2 (WavpackContext *wpc, unsigned char *tag_data, int tag_size, char *error, int32_t *bytes_used)
+{
+    int res, res_ss;
+
+    if (bytes_used)
+        *bytes_used = 0;
+
+    // look for the ID3 tag in case it's not first thing in the wrapper (like in WAV or DSDIFF files)
+
+    if (tag_size >= 10) {
+        unsigned char *cp = tag_data, *ce = cp + tag_size;
+
+        while (cp < ce - 10)
+            if (cp [0] == 'I' && cp [1] == 'D' && cp [2] == '3' && cp [3] == 3) {
+                tag_size = (int)(ce - cp);
+                tag_data = cp;
+                break;
+            }
+            else
+                cp++;
+
+        if (cp == ce - 10)      // no tag found is NOT an error
+            return 0;
+    }
+
+    res = ImportID3v2_syncsafe (NULL, tag_data, tag_size, error, bytes_used, 0);
+
+    if (res > 0)
+        return wpc ? ImportID3v2_syncsafe (wpc, tag_data, tag_size, error, bytes_used, 0) : res;
+
+    res_ss = ImportID3v2_syncsafe (NULL, tag_data, tag_size, error, bytes_used, 1);
+
+    if (res_ss > 0)
+        return wpc ? ImportID3v2_syncsafe (wpc, tag_data, tag_size, error, bytes_used, 1) : res_ss;
+
+    return res;
+}
+
 // Convert the Unicode wide-format string into a UTF-8 string using no more
 // than the specified buffer length. The wide-format string must be NULL
 // terminated and the resulting string will be NULL terminated. The actual
@@ -297,9 +393,9 @@ int ImportID3v2 (WavpackContext *wpc, unsigned char *tag_data, int tag_size, cha
 // may be less than the number of characters in the wide string if the buffer
 // length is exceeded.
 
-static int WideCharToUTF8 (const wchar_t *Wide, unsigned char *pUTF8, int len)
+static int WideCharToUTF8 (const uint16_t *Wide, unsigned char *pUTF8, int len)
 {
-    const wchar_t *pWide = Wide;
+    const uint16_t *pWide = Wide;
     int outndx = 0;
 
     while (*pWide) {
@@ -335,7 +431,7 @@ static int WideCharToUTF8 (const wchar_t *Wide, unsigned char *pUTF8, int len)
 static void Latin1ToUTF8 (void *string, int len)
 {
     int max_chars = (int) strlen (string);
-    wchar_t *temp = (wchar_t *) malloc ((max_chars + 1) * 2);
+    uint16_t *temp = (uint16_t *) malloc ((max_chars + 1) * sizeof (uint16_t));
 
     MultiByteToWideChar (28591, 0, string, -1, temp, max_chars + 1);
     WideCharToUTF8 (temp, (unsigned char *) string, len);

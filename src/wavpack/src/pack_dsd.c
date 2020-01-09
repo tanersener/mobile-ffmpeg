@@ -167,7 +167,6 @@ int pack_dsd_block (WavpackContext *wpc, int32_t *buffer)
 // #define DSD_BYTE_READY(low,high) (!(((low) ^ (high)) >> 24))
 #define DSD_BYTE_READY(low,high) (!(((low) ^ (high)) & 0xff000000))
 
-#define MAX_HISTORY_BITS    5
 #define MAX_PROBABILITY     0xa0    // set to 0xff to disable RLE encoding for probabilities table
 
 #if (MAX_PROBABILITY < 0xff)
@@ -353,7 +352,7 @@ static int encode_buffer_fast (WavpackStream *wps, int32_t *buffer, int num_samp
     // normally only happen with large blocks or poorly compressible data. The target is to guarantee that the total memory
     // required for all three decode tables will be 2K bytes per history bin.
 
-    while (total_summed_probabilities > history_bins * 1280) {
+    while (total_summed_probabilities > history_bins * MAX_BYTES_PER_BIN) {
         int max_sum = 0, sum_values = 0, largest_bin = 0;
 
         for (p0 = 0; p0 < history_bins; ++p0)

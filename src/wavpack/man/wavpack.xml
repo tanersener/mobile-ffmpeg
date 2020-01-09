@@ -21,16 +21,16 @@
       <holder>Sebastian Dröge</holder>
     </copyright>
     <copyright>
-      <year>2017</year>
+      <year>2019</year>
       <holder>David Bryant</holder>
     </copyright>
-    <date>2017-01-13</date>
+    <date>2019-12-14</date>
   </refentryinfo>
   <refmeta>
     <refentrytitle>wavpack</refentrytitle>
     <refmiscinfo class="source">WavPack</refmiscinfo>
     <refmiscinfo class="manual">WavPack Executable Programs</refmiscinfo>
-    <refmiscinfo class="version">5.1.0</refmiscinfo>
+    <refmiscinfo class="version">5.2.0</refmiscinfo>
     <manvolnum>1</manvolnum>
   </refmeta>
   <refnamediv>
@@ -174,9 +174,9 @@
         </varlistentry>
         <varlistentry>
           <term> <option>--import-id3</option> </term>
-          <listitem> <para>import applicable tag items from ID3v2.3 tag present in DSF files into APEv2 tag (if there are > 1 MB cover images present add
-            <option>--allow-huge-tags</option> to include them, and <option>-r</option> if you do not want large images appearing twice in the WavPack file,
-            although this will remove the entire ID3 tag wrapper)
+          <listitem> <para>import applicable tag items from ID3v2.3 tag present in DSF (and other) files into APEv2 tag (if there are > 1 MB cover
+            images present add <option>--allow-huge-tags</option> to include them, and <option>-r</option> if you do not want large images appearing
+            twice in the WavPack file, although this will remove the entire original ID3v2 tag)
           </para> </listitem>
         </varlistentry>
         <varlistentry>

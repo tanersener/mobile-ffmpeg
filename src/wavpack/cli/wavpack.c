@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////
 //                           **** WAVPACK ****                            //
 //                  Hybrid Lossless Wavefile Compressor                   //
-//                Copyright (c) 1998 - 2017 David Bryant.                 //
+//                Copyright (c) 1998 - 2019 David Bryant.                 //
 //                          All Rights Reserved.                          //
 //      Distributed under the BSD Software License (see license.txt)      //
 ////////////////////////////////////////////////////////////////////////////
@@ -65,7 +65,7 @@
 
 static const char *sign_on = "\n"
 " WAVPACK  Hybrid Lossless Audio Compressor  %s Version %s\n"
-" Copyright (c) 1998 - 2017 David Bryant.  All Rights Reserved.\n\n";
+" Copyright (c) 1998 - 2019 David Bryant.  All Rights Reserved.\n\n";
 
 static const char *version_warning = "\n"
 " WARNING: WAVPACK using libwavpack version %s, expected %s (see README)\n\n";
@@ -78,6 +78,10 @@ static const char *usage =
 " Usage:   WAVPACK [-options] infile[.wav]|infile.ext|- [...] [-o outfile[.wv]|outpath|-]\n"
 "             (default is lossless; multiple input files allowed)\n\n"
 #endif
+" Utils:   WAVPACK:  create or transcode WavPack files\n"
+"          WVUNPACK: unpack or verify existing WavPack files\n"
+"          WVGAIN:   apply ReplayGain to WavPack files\n"
+"          WVTAG:    apply or edit metadata tags on WavPack files\n\n"
 " Formats: .wav (default, bwf/rf64 okay)  .wv (transcode, with tags)\n"
 "          .w64 (Sony Wave64)             .caf (Core Audio Format)\n"
 "          .dff (Philips DSDIFF)          .dsf (Sony DSD stream)\n\n"
@@ -105,6 +109,10 @@ static const char *help =
 "    and the source file type is automatically determined (see accepted formats\n"
 "    below). Raw PCM data may also be used (see --raw-pcm option).\n\n"
 #endif
+" All Utilities:             WAVPACK:  create or transcode WavPack files\n"
+"                            WVUNPACK: unpack or verify existing WavPack files\n"
+"                            WVGAIN:   apply ReplayGain to WavPack files\n"
+"                            WVTAG:    apply or edit metadata tags on WavPack files\n\n"
 " Input Formats:             .wav (default, includes bwf/rf64 varients)\n"
 "                            .wv  (transcode operation, tags copied)\n"
 "                            .caf (Core Audio Format)\n"
@@ -144,7 +152,8 @@ static const char *help =
 "                             and NOT recommended for portable hardware use)\n"
 "    --help                  this extended help display\n"
 "    -i                      ignore length in file header (no pipe output allowed)\n"
-"    --import-id3            import ID3v2 tags from the trailer of DSF files only\n"
+"    --import-id3            attempt to import ID3v2 tags from the trailer of files\n"
+"                             (standard on DSF, optional on WAV and DSDIFF)\n"
 "    -jn                     joint-stereo override (0 = left/right, 1 = mid/side)\n"
 #if defined (_WIN32) || defined (__OS2__)
 "    -l                      run at lower priority for smoother multitasking\n"
@@ -313,29 +322,23 @@ int main (int argc, char **argv)
     char selfname [MAX_PATH];
 
     if (GetModuleFileName (NULL, selfname, sizeof (selfname)) && filespec_name (selfname) &&
-        _strupr (filespec_name (selfname)) && strstr (filespec_name (selfname), "DEBUG")) {
-            char **argv_t = argv;
-            int argc_t = argc;
-
+        _strupr (filespec_name (selfname)) && strstr (filespec_name (selfname), "DEBUG"))
             debug_logging_mode = TRUE;
-
-            while (--argc_t)
-                error_line ("arg %d: %s", argc - argc_t, *++argv_t);
-    }
 
     strcpy (selfname, *argv);
 #else
-    if (filespec_name (*argv))
-        if (strstr (filespec_name (*argv), "ebug") || strstr (filespec_name (*argv), "DEBUG")) {
-            char **argv_t = argv;
-            int argc_t = argc;
-
+    if (filespec_name (*argv) &&
+        (strstr (filespec_name (*argv), "ebug") || strstr (filespec_name (*argv), "DEBUG")))
             debug_logging_mode = TRUE;
-
-            while (--argc_t)
-                error_line ("arg %d: %s", argc - argc_t, *++argv_t);
-    }
 #endif
+
+    if (debug_logging_mode) {
+        char **argv_t = argv;
+        int argc_t = argc;
+
+        while (--argc_t)
+            error_line ("arg %d: %s", argc - argc_t, *++argv_t);
+    }
 
 #if defined (_WIN32)
     set_console_title = 1;      // on Windows, we default to messing with the console title
@@ -1939,7 +1942,7 @@ static int pack_file (char *infilename, char *outfilename, char *out2filename, c
         // if we're supposed to try to import ID3 tags, check for and do that now
         // (but only error on a bad tag, not just a missing one or one with no applicable items)
 
-        if (result == WAVPACK_NO_ERROR && import_id3 && wrapper_size > 10 && !strncmp ((char *) buffer, "ID3", 3)) {
+        if (result == WAVPACK_NO_ERROR && import_id3 && wrapper_size > 10) {
             int32_t bytes_used, id3_res;
             char error [80];
 
@@ -2013,7 +2016,36 @@ static int pack_file (char *infilename, char *outfilename, char *out2filename, c
                 DoReadFile (wv_file.file, block_buff, wv_file.first_block_size, &bcount) &&
                 bcount == wv_file.first_block_size && !strncmp (block_buff, "wvpk", 4)) {
 
+                    // If we got the RIFF header from the source file, we try to update it here if it's a simple
+                    // header (not RF64) and the audio data length is appropriate. Note that this means we're no
+                    // longer strictly lossless, but the user essentially told us the length in the header was
+                    // wrong, so we're fixing it.
+
+                    if (!(loc_config.qmode & (QMODE_NO_STORE_WRAPPER | QMODE_RAW_PCM)) && WavpackGetWrapperLocation (block_buff, NULL)) {
+                        uint32_t wrapper_size;
+                        unsigned char *wrapper_location = WavpackGetWrapperLocation (block_buff, &wrapper_size);
+                        int64_t data_size = WavpackGetSampleIndex64 (wpc) * WavpackGetNumChannels (wpc) * WavpackGetBytesPerSample (wpc);
+                        ChunkHeader chunk_header;
+
+                        memcpy (&chunk_header, wrapper_location, sizeof (ChunkHeader));
+
+                        if (data_size <= 0xff000000 && !strncmp (chunk_header.ckID, "RIFF", 4)) {
+                            chunk_header.ckSize = (uint32_t) (wrapper_size + data_size - 8);
+                            WavpackNativeToLittleEndian (&chunk_header, ChunkHeaderFormat);
+                            memcpy (wrapper_location, &chunk_header, sizeof (ChunkHeader));
+                            memcpy (&chunk_header, wrapper_location + wrapper_size - sizeof (ChunkHeader), sizeof (ChunkHeader));
+
+                            if (!strncmp (chunk_header.ckID, "data", 4)) {
+                                chunk_header.ckSize = (uint32_t) data_size;
+                                WavpackNativeToLittleEndian (&chunk_header, ChunkHeaderFormat);
+                            }
+
+                            memcpy (wrapper_location + wrapper_size - sizeof (ChunkHeader), &chunk_header, sizeof (ChunkHeader));
+                        }
+                    }
+
                     // this call will take care of the initial WavPack header and any RIFF header the library made
+                    // (and also make sure the block checksum is correct)
 
                     WavpackUpdateNumSamples (wpc, block_buff);
 
@@ -2265,7 +2297,7 @@ static int pack_audio (WavpackContext *wpc, FILE *infile, int qmode, unsigned ch
         input_samples >>= 1;
 
     if (md5_digest_source)
-        MD5Init (&md5_context);
+        MD5_Init (&md5_context);
 
     WavpackPackInit (wpc);
     bytes_per_sample = WavpackGetBytesPerSample (wpc) * WavpackGetNumChannels (wpc);
@@ -2305,11 +2337,11 @@ static int pack_audio (WavpackContext *wpc, FILE *infile, int qmode, unsigned ch
                 sample_count, WavpackGetBytesPerSample (wpc));
 
         if (md5_digest_source && quantize_bit_mask == 0)
-            MD5Update (&md5_context, input_buffer, sample_count * bytes_per_sample);
+            MD5_Update (&md5_context, input_buffer, sample_count * bytes_per_sample);
 
         // if we have reordering to do because this is a CAF channel layout that is not in Microsoft
         // order, then we do the reordering AFTER the MD5 because we will be unreordering them at
-        // decode time, and so we want the MD5 to match the orginal order
+        // decode time, and so we want the MD5 to match the original order
 
         if (new_order && (qmode & QMODE_REORDERED_CHANS))
             reorder_channels (input_buffer, new_order, WavpackGetNumChannels (wpc),
@@ -2346,7 +2378,7 @@ static int pack_audio (WavpackContext *wpc, FILE *infile, int qmode, unsigned ch
 
                 if (md5_digest_source) {
                     store_samples (input_buffer, sample_buffer, qmode, bps, sample_count * WavpackGetNumChannels (wpc));
-                    MD5Update (&md5_context, input_buffer, WavpackGetBytesPerSample (wpc) * l);
+                    MD5_Update (&md5_context, input_buffer, WavpackGetBytesPerSample (wpc) * l);
                 }
             }
         }
@@ -2394,7 +2426,7 @@ static int pack_audio (WavpackContext *wpc, FILE *infile, int qmode, unsigned ch
     }
 
     if (md5_digest_source)
-        MD5Final (md5_digest_source, &md5_context);
+        MD5_Final (md5_digest_source, &md5_context);
 
     return WAVPACK_NO_ERROR;
 }
@@ -2430,7 +2462,7 @@ static int pack_dsd_audio (WavpackContext *wpc, FILE *infile, int qmode, unsigne
     MD5_CTX md5_context;
 
     if (md5_digest_source)
-        MD5Init (&md5_context);
+        MD5_Init (&md5_context);
 
     WavpackPackInit (wpc);
     num_channels = WavpackGetNumChannels (wpc);
@@ -2477,7 +2509,7 @@ static int pack_dsd_audio (WavpackContext *wpc, FILE *infile, int qmode, unsigne
         }
 
         if (md5_digest_source)
-            MD5Update (&md5_context, input_buffer, bytes_read);
+            MD5_Update (&md5_context, input_buffer, bytes_read);
 
         if (!sample_count)
             break;
@@ -2552,7 +2584,7 @@ static int pack_dsd_audio (WavpackContext *wpc, FILE *infile, int qmode, unsigne
     }
 
     if (md5_digest_source)
-        MD5Final (md5_digest_source, &md5_context);
+        MD5_Final (md5_digest_source, &md5_context);
 
     return WAVPACK_NO_ERROR;
 }
@@ -3193,7 +3225,7 @@ static int repack_file (char *infilename, char *outfilename, char *out2filename,
 // NULL, then a MD5 sum is calculated on the audio data during the transcoding
 // and stored there at the completion. Note that the md5 requires a conversion
 // to the native data format (endianness and bytes per sample) that is not
-// required overwise.
+// required otherwise.
 
 static int repack_audio (WavpackContext *outfile, WavpackContext *infile, unsigned char *md5_digest_source)
 {
@@ -3218,7 +3250,7 @@ static int repack_audio (WavpackContext *outfile, WavpackContext *infile, unsign
 
     if (md5_digest_source) {
         format_buffer = malloc (input_samples * bps * WavpackGetNumChannels (outfile));
-        MD5Init (&md5_context);
+        MD5_Init (&md5_context);
 
         if (qmode & QMODE_REORDERED_CHANS) {
             int layout = WavpackGetChannelLayout (infile, NULL), i;
@@ -3315,7 +3347,7 @@ static int repack_audio (WavpackContext *outfile, WavpackContext *infile, unsign
             else
                 store_samples (format_buffer, sample_buffer, qmode, bps, sample_count * num_channels);
 
-            MD5Update (&md5_context, format_buffer, bps * sample_count * num_channels);
+            MD5_Update (&md5_context, format_buffer, bps * sample_count * num_channels);
         }
 
         if (check_break ()) {
@@ -3355,7 +3387,7 @@ static int repack_audio (WavpackContext *outfile, WavpackContext *infile, unsign
     }
 
     if (md5_digest_source) {
-        MD5Final (md5_digest_source, &md5_context);
+        MD5_Final (md5_digest_source, &md5_context);
         free (format_buffer);
     }
 
@@ -3447,7 +3479,7 @@ static int verify_audio (char *infilename, unsigned char *md5_digest_source)
     }
 
     if (md5_digest_source)
-        MD5Init (&md5_context);
+        MD5_Init (&md5_context);
 
     qmode = WavpackGetQualifyMode (wpc);
     num_channels = WavpackGetNumChannels (wpc);
@@ -3507,12 +3539,12 @@ static int verify_audio (char *infilename, unsigned char *md5_digest_source)
                             *dptr++ = *sptr++;
                     }
 
-                    MD5Update (&md5_context, dsd_buffer, samples_unpacked * num_channels);
+                    MD5_Update (&md5_context, dsd_buffer, samples_unpacked * num_channels);
                     free (dsd_buffer);
                 }
                 else {
                     store_samples (temp_buffer, temp_buffer, qmode, bps, samples_unpacked * num_channels);
-                    MD5Update (&md5_context, (unsigned char *) temp_buffer, bps * samples_unpacked * num_channels);
+                    MD5_Update (&md5_context, (unsigned char *) temp_buffer, bps * samples_unpacked * num_channels);
                 }
             }
         }
@@ -3554,7 +3586,7 @@ static int verify_audio (char *infilename, unsigned char *md5_digest_source)
     // definitive verification.
 
     if (result == WAVPACK_NO_ERROR && md5_digest_source) {
-        MD5Final (md5_digest_result, &md5_context);
+        MD5_Final (md5_digest_result, &md5_context);
 
         if (memcmp (md5_digest_result, md5_digest_source, 16)) {
             char md5_string1 [] = "00000000000000000000000000000000";

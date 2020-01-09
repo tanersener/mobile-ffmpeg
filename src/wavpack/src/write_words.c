@@ -569,20 +569,18 @@ int32_t nosend_word (WavpackStream *wps, int32_t value, int chan)
 }
 
 // This function is used to scan some number of samples to set the variables
-// "slow_level" and the "median" array. In pure symetrical encoding mode this
+// "slow_level" and the "median" array. In pure symmetrical encoding mode this
 // would not be needed because these values would simply be continued from the
 // previous block. However, in the -X modes and the 32-bit modes we cannot do
 // this because parameters may change between blocks and the variables might
 // not apply. This function can work in mono or stereo and can scan a block
 // in either direction.
 
-void scan_word (WavpackStream *wps, int32_t *samples, uint32_t num_samples, int dir)
+static void scan_word_pass (WavpackStream *wps, int32_t *samples, uint32_t num_samples, int dir)
 {
     uint32_t flags = wps->wphdr.flags, value, low;
     struct entropy_data *c = wps->w.c;
     int chan;
-
-    init_words (wps);
 
     if (flags & MONO_DATA) {
         if (dir < 0) {
@@ -669,6 +667,22 @@ void scan_word (WavpackStream *wps, int32_t *samples, uint32_t num_samples, int 
         }
 
         samples += dir;
+    }
+}
+
+// Wrapper for scan_word_pass() than ensures that at least 2048 samples are processed by
+// potentially making multiple passes through the data. See description of scan_word_pass()
+// for more details.
+
+void scan_word (WavpackStream *wps, int32_t *samples, uint32_t num_samples, int dir)
+{
+    init_words (wps);
+
+    if (num_samples) {
+        int passes = (2048 + num_samples - 1) / num_samples;    // i.e., ceil (2048.0 / num_samples)
+
+        while (passes--)
+            scan_word_pass (wps, samples, num_samples, dir);
     }
 }
 

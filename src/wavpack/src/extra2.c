@@ -39,7 +39,7 @@
     #define PACK_DECORR_STEREO_PASS_CONT pack_decorr_stereo_pass_cont_x86
     #define PACK_DECORR_STEREO_PASS_CONT_REV pack_decorr_stereo_pass_cont_rev_x86
     #define PACK_DECORR_STEREO_PASS_CONT_AVAILABLE pack_cpu_has_feature_x86(CPU_FEATURE_MMX)
-#elif defined(OPT_ASM_X64) && (defined (_WIN64) || defined(__CYGWIN__) || defined(__MINGW64__))
+#elif defined(OPT_ASM_X64) && (defined (_WIN64) || defined(__CYGWIN__) || defined(__MINGW64__) || defined(__midipix__))
     #define PACK_DECORR_STEREO_PASS_CONT pack_decorr_stereo_pass_cont_x64win
     #define PACK_DECORR_STEREO_PASS_CONT_REV pack_decorr_stereo_pass_cont_rev_x64win
     #define PACK_DECORR_STEREO_PASS_CONT_AVAILABLE 1
