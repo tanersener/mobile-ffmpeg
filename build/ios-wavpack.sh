@@ -46,11 +46,22 @@ if [[ ${RECONF_wavpack} -eq 1 ]]; then
     autoreconf_library ${LIB_NAME}
 fi
 
+ASM_FLAGS=""
+case ${ARCH} in
+    armv7 | armv7s | arm64 | arm64e)
+        ASM_FLAGS="--disable-asm"
+    ;;
+    *)
+        ASM_FLAGS="--enable-asm"
+    ;;
+esac
+
 ./configure \
     --prefix=${BASEDIR}/prebuilt/$(get_target_build_directory)/${LIB_NAME} \
     --with-pic \
     --with-sysroot=${SDK_PATH} \
     --without-iconv \
+    ${ASM_FLAGS} \
     --enable-static \
     --disable-shared \
     --disable-apps \
