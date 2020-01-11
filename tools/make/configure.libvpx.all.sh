@@ -836,22 +836,15 @@ process_common_toolchain() {
   # Shared library framework builds are only possible on iOS 8 and later.
   if enabled shared; then
     IOS_VERSION_OPTIONS="--enable-shared"
-    IOS_VERSION_MIN="8.0"
   else
     IOS_VERSION_OPTIONS=""
-    IOS_VERSION_MIN="7.0"
   fi
 
   # Handle darwin variants. Newer SDKs allow targeting older
   # platforms, so use the newest one available.
   case ${toolchain} in
     arm*-darwin*)
-      add_cflags "-miphoneos-version-min=${IOS_VERSION_MIN}"
       iphoneos_sdk_dir="$(show_darwin_sdk_path iphoneos)"
-      if [ -d "${iphoneos_sdk_dir}" ]; then
-        add_cflags  "-isysroot ${iphoneos_sdk_dir}"
-        add_ldflags "-isysroot ${iphoneos_sdk_dir}"
-      fi
       ;;
     x86*-darwin*)
       osx_sdk_dir="$(show_darwin_sdk_path macosx)"
@@ -907,15 +900,6 @@ process_common_toolchain() {
       add_cflags  "-mmacosx-version-min=10.14"
       add_ldflags "-mmacosx-version-min=10.14"
       ;;
-    *-iphonesimulator-*)
-      add_cflags  "-miphoneos-version-min=${IOS_VERSION_MIN}"
-      add_ldflags "-miphoneos-version-min=${IOS_VERSION_MIN}"
-      iossim_sdk_dir="$(show_darwin_sdk_path iphonesimulator)"
-      if [ -d "${iossim_sdk_dir}" ]; then
-        add_cflags  "-isysroot ${iossim_sdk_dir}"
-        add_ldflags "-isysroot ${iossim_sdk_dir}"
-      fi
-      ;;
   esac
 
   # Handle Solaris variants. Solaris 10 needs -lposix4
@@ -956,28 +940,6 @@ process_common_toolchain() {
           arch_int=${tgt_isa##armv}
           arch_int=${arch_int%%te}
           tune_cflags="-mtune="
-          if [ ${tgt_isa} = "armv7" ] || [ ${tgt_isa} = "armv7s" ]; then
-            if [ -z "${float_abi}" ]; then
-              check_cpp <<EOF && float_abi=hard || float_abi=softfp
-#ifndef __ARM_PCS_VFP
-#error "not hardfp"
-#endif
-EOF
-            fi
-            check_add_cflags  -march=armv7-a -mfloat-abi=${float_abi}
-            check_add_asflags -march=armv7-a -mfloat-abi=${float_abi}
-
-            if enabled neon || enabled neon_asm; then
-              check_add_cflags -mfpu=neon #-ftree-vectorize
-              check_add_asflags -mfpu=neon
-            fi
-          elif [ ${tgt_isa} = "arm64" ] || [ ${tgt_isa} = "armv8" ]; then
-            check_add_cflags -march=armv8-a
-            check_add_asflags -march=armv8-a
-          else
-            check_add_cflags -march=${tgt_isa}
-            check_add_asflags -march=${tgt_isa}
-          fi
 
           enabled debug && add_asflags -g
           asm_conversion_cmd="${source_path}/build/make/ads2gas.pl"
@@ -1106,12 +1068,6 @@ EOF
               add_cflags -isysroot ${alt_libc}
             fi
 
-            if [ "${LD}" = "${CXX}" ]; then
-              add_ldflags -miphoneos-version-min="${IOS_VERSION_MIN}"
-            else
-              add_ldflags -ios_version_min "${IOS_VERSION_MIN}"
-            fi
-
             for d in lib usr/lib usr/lib/system; do
               try_dir="${alt_libc}/${d}"
               [ -d "${try_dir}" ] && add_ldflags -L"${try_dir}"
@@ -1210,8 +1166,6 @@ EOF
         check_add_ldflags -march=loongson3a
       fi
 
-      check_add_cflags -march=${tgt_isa}
-      check_add_asflags -march=${tgt_isa}
       check_add_asflags -KPIC
       ;;
     ppc64le*)
@@ -1266,14 +1220,10 @@ EOF
               tune_cflags="-x"
               tune_cpu="SSE3_ATOM"
               ;;
-            *)
-              tune_cflags="-march="
-              ;;
           esac
           ;;
         gcc*)
           link_with_cc=gcc
-          tune_cflags="-march="
           setup_gnu_toolchain
           #for 32 bit x86 builds, -O3 did not turn on this flag
           enabled optimizations && disabled gprof && check_add_cflags -fomit-frame-pointer
