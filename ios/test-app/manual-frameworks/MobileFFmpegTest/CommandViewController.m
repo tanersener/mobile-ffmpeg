@@ -21,14 +21,15 @@
 
 #import <mobileffmpeg/MobileFFmpegConfig.h>
 #import <mobileffmpeg/MobileFFmpeg.h>
+#import <mobileffmpeg/MobileFFprobe.h>
 #import "CommandViewController.h"
 
 @interface CommandViewController ()
 
 @property (strong, nonatomic) IBOutlet UILabel *header;
 @property (strong, nonatomic) IBOutlet UITextField *commandText;
-@property (strong, nonatomic) IBOutlet UIButton *runButton;
-@property (strong, nonatomic) IBOutlet UIButton *runAsyncButton;
+@property (strong, nonatomic) IBOutlet UIButton *runFFmpegButton;
+@property (strong, nonatomic) IBOutlet UIButton *runFFprobeButton;
 @property (strong, nonatomic) IBOutlet UITextView *outputText;
 
 @end
@@ -41,8 +42,8 @@
 
     // STYLE UPDATE
     [Util applyEditTextStyle: self.commandText];
-    [Util applyButtonStyle: self.runButton];
-    [Util applyButtonStyle: self.runAsyncButton];
+    [Util applyButtonStyle: self.runFFmpegButton];
+    [Util applyButtonStyle: self.runFFprobeButton];
     [Util applyOutputTextStyle: self.outputText];
     [Util applyHeaderStyle: self.header];
 
@@ -61,7 +62,7 @@
     });
 }
 
-- (IBAction)runAction:(id)sender {
+- (IBAction)runFFmpegAction:(id)sender {
     [self clearOutput];
     
     [[self commandText] endEditing:TRUE];
@@ -82,7 +83,7 @@
     }
 }
 
-- (IBAction)runAsyncAction:(id)sender {
+- (IBAction)runFFprobeAction:(id)sender {
     [self clearOutput];
     
     [[self commandText] endEditing:TRUE];
