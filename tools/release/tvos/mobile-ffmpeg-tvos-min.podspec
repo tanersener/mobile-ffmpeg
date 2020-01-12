@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
     s.version           = "VERSION"
     s.summary           = "Mobile FFmpeg tvOS Min Static Framework"
     s.description       = <<-DESC
-    Includes FFmpeg v4.3-dev-1181 without any external libraries enabled.
+    Includes FFmpeg v4.3-dev-1944 without any external libraries enabled.
     DESC
 
     s.homepage          = "https://github.com/tanersener/mobile-ffmpeg"
@@ -13,7 +13,7 @@ Pod::Spec.new do |s|
 
     s.platform          = :tvos
     s.requires_arc      = true
-    s.libraries         = 'z', 'bz2', 'c++'
+    s.libraries         = 'z', 'bz2', 'c++', 'iconv'
 
     s.source            = { :http => "https://github.com/tanersener/mobile-ffmpeg/releases/download/vVERSION/mobile-ffmpeg-min-VERSION-tvos-framework.zip" }
 

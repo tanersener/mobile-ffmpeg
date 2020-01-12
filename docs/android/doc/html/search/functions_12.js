@@ -1,7 +1,11 @@
 var searchData=
 [
-  ['uninit_5foptions_1199',['uninit_options',['../da/d66/fftools__ffmpeg__opt_8c.html#ae608ef017008a121f8c4ec879b64e8ab',1,'fftools_ffmpeg_opt.c']]],
-  ['uninit_5fopts_1200',['uninit_opts',['../d7/dcc/fftools__cmdutils_8c.html#ac58552bde3a215ae94a3bd114577cbee',1,'uninit_opts(void):&#160;fftools_cmdutils.c'],['../d8/d4e/fftools__cmdutils_8h.html#ac58552bde3a215ae94a3bd114577cbee',1,'uninit_opts(void):&#160;fftools_cmdutils.c']]],
-  ['uninit_5fparse_5fcontext_1201',['uninit_parse_context',['../d7/dcc/fftools__cmdutils_8c.html#a8bcd5cd3628e5864fa94431d8eb08fad',1,'uninit_parse_context(OptionParseContext *octx):&#160;fftools_cmdutils.c'],['../d8/d4e/fftools__cmdutils_8h.html#a8bcd5cd3628e5864fa94431d8eb08fad',1,'uninit_parse_context(OptionParseContext *octx):&#160;fftools_cmdutils.c']]],
-  ['update_5fbenchmark_1202',['update_benchmark',['../d7/d48/fftools__ffmpeg_8c.html#ab8ed239c7a9be61521f08c4adaa9d4f3',1,'fftools_ffmpeg.c']]]
+  ['term_5fexit_1632',['term_exit',['../d7/d48/fftools__ffmpeg_8c.html#a19c97d7729be97389faaf4aaac8c3e88',1,'term_exit(void):&#160;fftools_ffmpeg.c'],['../d7/db3/fftools__ffmpeg_8h.html#a19c97d7729be97389faaf4aaac8c3e88',1,'term_exit(void):&#160;fftools_ffmpeg.c']]],
+  ['term_5fexit_5fsigsafe_1633',['term_exit_sigsafe',['../d7/d48/fftools__ffmpeg_8c.html#a9ff329d05aff252a944b937bb80d16e1',1,'fftools_ffmpeg.c']]],
+  ['term_5finit_1634',['term_init',['../d7/d48/fftools__ffmpeg_8c.html#ac7072b9c76dd77ce9900197d0133b0ba',1,'term_init(void):&#160;fftools_ffmpeg.c'],['../d7/db3/fftools__ffmpeg_8h.html#ac7072b9c76dd77ce9900197d0133b0ba',1,'term_init(void):&#160;fftools_ffmpeg.c']]],
+  ['transcode_1635',['transcode',['../d7/d48/fftools__ffmpeg_8c.html#a0bbbd61fe097505cf12be11e60f07ca8',1,'fftools_ffmpeg.c']]],
+  ['transcode_5ffrom_5ffilter_1636',['transcode_from_filter',['../d7/d48/fftools__ffmpeg_8c.html#a38de3252b4bb6ea13e22238efe42c015',1,'fftools_ffmpeg.c']]],
+  ['transcode_5finit_1637',['transcode_init',['../d7/d48/fftools__ffmpeg_8c.html#aa4af1fda1a5fc33ec74e4ae2c0dbc122',1,'fftools_ffmpeg.c']]],
+  ['transcode_5fstep_1638',['transcode_step',['../d7/d48/fftools__ffmpeg_8c.html#abd1ff9b1a508070a11a26c9c3f3f455b',1,'fftools_ffmpeg.c']]],
+  ['transcode_5fsubtitles_1639',['transcode_subtitles',['../d7/d48/fftools__ffmpeg_8c.html#a0c4f43b9ed5f99a30210c6ef7191a89e',1,'fftools_ffmpeg.c']]]
 ];

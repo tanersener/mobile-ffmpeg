@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
     s.version           = "VERSION"
     s.summary           = "Mobile FFmpeg Https Static Framework"
     s.description       = <<-DESC
-    Includes FFmpeg v4.3-dev-1181 with gmp v6.1.2 and gnutls v3.6.10 library enabled.
+    Includes FFmpeg v4.3-dev-1944 with gmp v6.1.2 and gnutls v3.6.11.1 library enabled.
     DESC
 
     s.homepage          = "https://github.com/tanersener/mobile-ffmpeg"
@@ -13,12 +13,12 @@ Pod::Spec.new do |s|
 
     s.platform          = :ios
     s.requires_arc      = true
-    s.libraries         = 'z', 'bz2', 'c++'
+    s.libraries         = 'z', 'bz2', 'c++', 'iconv'
 
     s.source            = { :http => "https://github.com/tanersener/mobile-ffmpeg/releases/download/vVERSION/mobile-ffmpeg-https-VERSION-ios-framework.zip" }
 
     s.ios.deployment_target = '9.3'
     s.ios.frameworks    = 'AudioToolbox','AVFoundation','CoreMedia','VideoToolbox'
-    s.ios.vendored_frameworks = 'mobileffmpeg.framework', 'libavcodec.framework', 'libavdevice.framework', 'libavfilter.framework', 'libavformat.framework', 'libavutil.framework', 'libswresample.framework', 'libswscale.framework', 'gmp.framework', 'gnutls.framework', 'libcharset.framework', 'libhogweed.framework', 'libiconv.framework', 'libnettle.framework'
+    s.ios.vendored_frameworks = 'mobileffmpeg.framework', 'libavcodec.framework', 'libavdevice.framework', 'libavfilter.framework', 'libavformat.framework', 'libavutil.framework', 'libswresample.framework', 'libswscale.framework', 'gmp.framework', 'gnutls.framework', 'libhogweed.framework', 'libnettle.framework'
 
 end  

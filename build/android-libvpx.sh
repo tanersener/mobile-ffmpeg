@@ -34,7 +34,7 @@ export LDFLAGS="$(get_ldflags ${LIB_NAME}) -L${ANDROID_NDK_ROOT}/sources/android
 
 # RECOVER configure.sh
 rm -f ${BASEDIR}/src/${LIB_NAME}/build/make/configure.sh
-cp ${BASEDIR}/tools/make/configure.libvpx.all.sh ${BASEDIR}/src/${LIB_NAME}/build/make/configure.sh
+cp ${BASEDIR}/tools/make/configure.libvpx.android.sh ${BASEDIR}/src/${LIB_NAME}/build/make/configure.sh
 
 TARGET_CPU=""
 DISABLE_NEON_FLAG=""

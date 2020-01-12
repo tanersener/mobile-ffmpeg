@@ -1,17 +1,14 @@
 var searchData=
 [
-  ['packets_5fwritten_1519',['packets_written',['../db/dde/struct_output_stream.html#a5a6eb3819ace72b542142a7082ceced3',1,'OutputStream']]],
-  ['pass_1520',['pass',['../df/d77/struct_options_context.html#a1cdd2a22cff6d812f00a5fb06664f134',1,'OptionsContext']]],
-  ['passlogfiles_1521',['passlogfiles',['../df/d77/struct_options_context.html#a964798ad981fce4fa7f38a4c281a23fa',1,'OptionsContext']]],
-  ['pict_5ftype_1522',['pict_type',['../db/dde/struct_output_stream.html#a606467e84f8cc1c55a33fe253accc581',1,'OutputStream']]],
-  ['pix_5ffmt_1523',['pix_fmt',['../df/d37/struct_h_w_accel.html#a379aaf6aad89d4c2036baf423e3bbb5e',1,'HWAccel']]],
-  ['presets_1524',['presets',['../df/d77/struct_options_context.html#ae4626f848474b1ce5648eb4936074020',1,'OptionsContext']]],
-  ['prev_5fsub_1525',['prev_sub',['../d3/d6e/struct_input_stream.html#a64b033c0e4f7e540880f3c8d84c42158',1,'InputStream']]],
-  ['print_5fstats_1526',['print_stats',['../d7/db3/fftools__ffmpeg_8h.html#a21a0be842e8fa2c780fa87f45bd5d17e',1,'print_stats():&#160;fftools_ffmpeg_opt.c'],['../da/d66/fftools__ffmpeg__opt_8c.html#a21a0be842e8fa2c780fa87f45bd5d17e',1,'print_stats():&#160;fftools_ffmpeg_opt.c']]],
-  ['program_1527',['program',['../df/d77/struct_options_context.html#ad5b2e0fb210c4bb546852fc813af0797',1,'OptionsContext']]],
-  ['program_5fbirth_5fyear_1528',['program_birth_year',['../d8/d4e/fftools__cmdutils_8h.html#adb047c8ef284577de88f3a64fe7638e0',1,'program_birth_year():&#160;fftools_ffmpeg.c'],['../d7/d48/fftools__ffmpeg_8c.html#adb047c8ef284577de88f3a64fe7638e0',1,'program_birth_year():&#160;fftools_ffmpeg.c']]],
-  ['program_5fexit_1529',['program_exit',['../d7/dcc/fftools__cmdutils_8c.html#a6486289e138d09a056be8c93111fd39d',1,'fftools_cmdutils.c']]],
-  ['program_5fname_1530',['program_name',['../d8/d4e/fftools__cmdutils_8h.html#a01a73e823e0892841a4fd2f900b85688',1,'program_name():&#160;fftools_ffmpeg.c'],['../d7/d48/fftools__ffmpeg_8c.html#a01a73e823e0892841a4fd2f900b85688',1,'program_name():&#160;fftools_ffmpeg.c']]],
-  ['progress_5favio_1531',['progress_avio',['../d7/d48/fftools__ffmpeg_8c.html#a07200fa0b8654967cb39c207a6170862',1,'progress_avio():&#160;fftools_ffmpeg.c'],['../d7/db3/fftools__ffmpeg_8h.html#a07200fa0b8654967cb39c207a6170862',1,'progress_avio():&#160;fftools_ffmpeg.c']]],
-  ['pts_1532',['pts',['../d3/d6e/struct_input_stream.html#a5e77505bdc5afbc6ab5cf613894925b4',1,'InputStream']]]
+  ['off_2060',['off',['../dc/d1e/struct_option_def.html#a1c25e8faf0036e9b0292fa0db6682d6c',1,'OptionDef']]],
+  ['ofile_5fidx_2061',['ofile_idx',['../d6/d2c/struct_audio_channel_map.html#a8174d989c9c3c6bacd2ff229900e3edf',1,'AudioChannelMap']]],
+  ['opt_2062',['opt',['../d3/d1d/struct_option.html#a3b25df629d81a005daeb930f12560edc',1,'Option']]],
+  ['opts_2063',['opts',['../d6/d69/struct_option_group.html#ab9bf148a556ccce86462e948dd1dc856',1,'OptionGroup::opts()'],['../de/df2/struct_output_file.html#aac74ddf07f90ad30cd5ddf80583468ec',1,'OutputFile::opts()']]],
+  ['ost_2064',['ost',['../d0/d0f/struct_output_filter.html#a2d283eee3e140f822b5eb381890ba035',1,'OutputFilter']]],
+  ['ost_5findex_2065',['ost_index',['../de/df2/struct_output_file.html#ac09855bfd066c44eb761f84e28f00dce',1,'OutputFile']]],
+  ['ostream_5fidx_2066',['ostream_idx',['../d6/d2c/struct_audio_channel_map.html#a3e51062d85dde52c40982e5af3b4bc03',1,'AudioChannelMap']]],
+  ['out_5ftmp_2067',['out_tmp',['../d0/d0f/struct_output_filter.html#a1571021ae59382241c925f7ee613cd7d',1,'OutputFilter']]],
+  ['output_5ffiles_2068',['output_files',['../d7/d48/fftools__ffmpeg_8c.html#a22c5e53407c3f14a8111e898dff42904',1,'output_files():&#160;fftools_ffmpeg.c'],['../d7/db3/fftools__ffmpeg_8h.html#a22c5e53407c3f14a8111e898dff42904',1,'output_files():&#160;fftools_ffmpeg.c']]],
+  ['output_5fstreams_2069',['output_streams',['../d7/d48/fftools__ffmpeg_8c.html#a205ff61315f3766dae7c5e1552de2ccf',1,'output_streams():&#160;fftools_ffmpeg.c'],['../d7/db3/fftools__ffmpeg_8h.html#a205ff61315f3766dae7c5e1552de2ccf',1,'output_streams():&#160;fftools_ffmpeg.c']]],
+  ['outputs_2070',['outputs',['../d9/de7/struct_filter_graph.html#aa078de74cae0940747ba826567b74aef',1,'FilterGraph']]]
 ];
