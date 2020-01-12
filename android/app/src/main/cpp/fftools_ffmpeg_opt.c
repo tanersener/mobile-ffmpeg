@@ -576,7 +576,7 @@ void parse_meta_type(char *arg, char *type, int *index, const char **stream_spec
         *type = 'g';
 }
 
-int copy_metadata(char *outspec, char *inspec, AVFormatContext *oc, AVFormatContext *ic, OptionsContext *o)
+int fftools_copy_metadata(char *outspec, char *inspec, AVFormatContext *oc, AVFormatContext *ic, OptionsContext *o)
 {
     AVDictionary **meta_in = NULL;
     AVDictionary **meta_out = NULL;
@@ -1605,7 +1605,7 @@ void parse_matrix_coeffs(uint16_t *dest, const char *str)
 }
 
 /* read file contents into a string */
-uint8_t *read_file(const char *filename)
+uint8_t *fftools_read_file(const char *filename)
 {
     AVIOContext *pb      = NULL;
     AVIOContext *dyn_buf = NULL;
@@ -1645,7 +1645,7 @@ char *get_ost_filters(OptionsContext *o, AVFormatContext *oc,
     }
 
     if (ost->filters_script)
-        return read_file(ost->filters_script);
+        return fftools_read_file(ost->filters_script);
     else if (ost->filters)
         return av_strdup(ost->filters);
 
@@ -1822,7 +1822,7 @@ OutputStream *new_video_stream(OptionsContext *o, AVFormatContext *oc, int sourc
                 av_dict_set(&ost->encoder_opts, "stats", logfilename, AV_DICT_DONT_OVERWRITE);
             } else {
                 if (video_enc->flags & AV_CODEC_FLAG_PASS2) {
-                    char  *logbuffer = read_file(logfilename);
+                    char  *logbuffer = fftools_read_file(logfilename);
 
                     if (!logbuffer) {
                         av_log(NULL, AV_LOG_FATAL, "Error reading log file '%s' for pass-2 encoding\n",
@@ -2594,7 +2594,7 @@ loop_end:
             av_log(NULL, AV_LOG_FATAL, "Invalid input file index %d while processing metadata maps\n", in_file_index);
             exit_program(1);
         }
-        copy_metadata(o->metadata_map[i].specifier, *p ? p + 1 : p, oc,
+        fftools_copy_metadata(o->metadata_map[i].specifier, *p ? p + 1 : p, oc,
                       in_file_index >= 0 ?
                       input_files[in_file_index]->ctx : NULL, o);
     }
@@ -3177,7 +3177,7 @@ int opt_filter_complex(void *optctx, const char *opt, const char *arg)
 
 int opt_filter_complex_script(void *optctx, const char *opt, const char *arg)
 {
-    uint8_t *graph_desc = read_file(arg);
+    uint8_t *graph_desc = fftools_read_file(arg);
     if (!graph_desc)
         return AVERROR(EINVAL);
 

@@ -734,7 +734,7 @@ void uninit_options(OptionsContext *o);
 void init_options(OptionsContext *o);
 AVDictionary *strip_specifiers(AVDictionary *dict);
 void parse_meta_type(char *arg, char *type, int *index, const char **stream_spec);
-int copy_metadata(char *outspec, char *inspec, AVFormatContext *oc, AVFormatContext *ic, OptionsContext *o);
+int fftools_copy_metadata(char *outspec, char *inspec, AVFormatContext *oc, AVFormatContext *ic, OptionsContext *o);
 AVCodec *find_codec_or_die(const char *name, enum AVMediaType type, int encoder);
 AVCodec *choose_decoder(OptionsContext *o, AVFormatContext *s, AVStream *st);
 int open_input_file(OptionsContext *o, const char *filename);
@@ -742,7 +742,7 @@ int get_preset_file_2(const char *preset_name, const char *codec_name, AVIOConte
 int choose_encoder(OptionsContext *o, AVFormatContext *s, OutputStream *ost);
 OutputStream *new_output_stream(OptionsContext *o, AVFormatContext *oc, enum AVMediaType type, int source_index);
 void parse_matrix_coeffs(uint16_t *dest, const char *str);
-uint8_t *read_file(const char *filename);
+uint8_t *fftools_read_file(const char *filename);
 char *get_ost_filters(OptionsContext *o, AVFormatContext *oc, OutputStream *ost);
 void check_streamcopy_filters(OptionsContext *o, AVFormatContext *oc, const OutputStream *ost, enum AVMediaType type);
 OutputStream *new_video_stream(OptionsContext *o, AVFormatContext *oc, int source_index);
