@@ -56,7 +56,7 @@ extern NSString *const MOBILE_FFMPEG_VERSION;
  * using a more advanced method like execute or executeWithArguments
  * @return zero on successful execution, 255 on user cancel and non-zero on error
  */
-+ (int)execute: (NSString*)command delimiter:(NSString*)delimiter;
++ (int)execute: (NSString*)command delimiter:(NSString*)delimiter __attribute__((deprecated));
 
 /**
  * Cancels an ongoing operation.
