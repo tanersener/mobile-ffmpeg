@@ -434,10 +434,12 @@ void parse_options(void *optctx, int argc, char **argv, const OptionDef *options
             }
             opt++;
             if (optindex >= argc) {
-                argv[optindex] = NULL;
+                if ((ret = parse_option(optctx, opt, NULL, options)) < 0)
+                    exit_program(1);
+            } else {
+                if ((ret = parse_option(optctx, opt, argv[optindex], options)) < 0)
+                    exit_program(1);
             }
-            if ((ret = parse_option(optctx, opt, argv[optindex], options)) < 0)
-                exit_program(1);
             optindex += ret;
         } else {
             if (parse_arg_function)
