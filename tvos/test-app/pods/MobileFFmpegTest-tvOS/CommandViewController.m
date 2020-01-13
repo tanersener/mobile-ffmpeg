@@ -27,8 +27,8 @@
 
 @property (strong, nonatomic) IBOutlet UILabel *header;
 @property (strong, nonatomic) IBOutlet UITextField *commandText;
-@property (strong, nonatomic) IBOutlet UIButton *runButton;
-@property (strong, nonatomic) IBOutlet UIButton *runAsyncButton;
+@property (strong, nonatomic) IBOutlet UIButton *runFFmpegButton;
+@property (strong, nonatomic) IBOutlet UIButton *runFFprobeButton;
 @property (strong, nonatomic) IBOutlet UITextView *outputText;
 
 @end
@@ -41,8 +41,8 @@
 
     // STYLE UPDATE
     [Util applyEditTextStyle: self.commandText];
-    [Util applyButtonStyle: self.runButton];
-    [Util applyButtonStyle: self.runAsyncButton];
+    [Util applyButtonStyle: self.runFFmpegButton];
+    [Util applyButtonStyle: self.runFFprobeButton];
     [Util applyOutputTextStyle: self.outputText];
     [Util applyHeaderStyle: self.header];
 
@@ -61,14 +61,14 @@
     });
 }
 
-- (IBAction)runAction:(id)sender {
+- (IBAction)runFFmpegAction:(id)sender {
     [self clearOutput];
     
     [[self commandText] endEditing:TRUE];
     
     NSString *ffmpegCommand = [NSString stringWithFormat:@"-hide_banner %@", [[self commandText] text]];
     
-    NSLog(@"Testing COMMAND synchronously.\n");
+    NSLog(@"Testing FFmpeg COMMAND synchronously.\n");
     
     NSLog(@"FFmpeg process started with arguments\n\'%@\'\n", ffmpegCommand);
     
@@ -82,28 +82,25 @@
     }
 }
 
-- (IBAction)runAsyncAction:(id)sender {
+- (IBAction)runFFprobeAction:(id)sender {
     [self clearOutput];
     
     [[self commandText] endEditing:TRUE];
-
-    NSString *ffmpegCommand = [NSString stringWithFormat:@"-hide_banner %@", [[self commandText] text]];
     
-    NSLog(@"Testing COMMAND asynchronously.\n");
+    NSString *ffprobeCommand = [NSString stringWithFormat:@"-hide_banner %@", [[self commandText] text]];
     
-    dispatch_async(dispatch_get_main_queue(), ^{
-        
-        NSLog(@"FFmpeg process started with arguments\n\'%@\'\n", ffmpegCommand);
-        
-        // EXECUTE
-        int result = [MobileFFmpeg execute:ffmpegCommand];
-        
-        NSLog(@"FFmpeg process exited with rc %d\n", result);
+    NSLog(@"Testing FFprobe COMMAND synchronously.\n");
+    
+    NSLog(@"FFprobe process started with arguments\n\'%@\'\n", ffprobeCommand);
+    
+    // EXECUTE
+    int result = [MobileFFprobe execute:ffprobeCommand];
+    
+    NSLog(@"FFprobe process exited with rc %d\n", result);
 
-        if (result != RETURN_CODE_SUCCESS) {
-            [Util alert:self withTitle:@"Error" message:@"Command failed. Please check output for the details." andButtonText:@"OK"];
-        }
-    });
+    if (result != RETURN_CODE_SUCCESS) {
+        [Util alert:self withTitle:@"Error" message:@"Command failed. Please check output for the details." andButtonText:@"OK"];
+    }
 }
 
 - (void)setActive {

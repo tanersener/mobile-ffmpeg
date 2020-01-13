@@ -18,6 +18,8 @@ FFmpeg for Android, iOS and tvOS
     
         `vid.stab`, `x264`, `x265`, `xvidcore`
 
+    - Concurrent execution
+
 - Exposes both FFmpeg library and MobileFFmpeg wrapper library capabilities
 - Includes cross-compile instructions for 44 open-source libraries
     
