@@ -402,8 +402,8 @@ void term_exit(void)
     term_exit_sigsafe();
 }
 
-__thread volatile int received_sigterm = 0;
-__thread volatile int received_nb_signals = 0;
+volatile int received_sigterm = 0;
+volatile int received_nb_signals = 0;
 __thread atomic_int transcode_init_done = ATOMIC_VAR_INIT(0);
 __thread volatile int ffmpeg_exited = 0;
 __thread int main_ffmpeg_return_code = 0;
