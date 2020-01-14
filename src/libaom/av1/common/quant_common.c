@@ -227,11 +227,15 @@ int av1_get_qindex(const struct segmentation *seg, int segment_id,
 
 const qm_val_t *av1_iqmatrix(AV1_COMMON *cm, int qmlevel, int plane,
                              TX_SIZE tx_size) {
-  return &cm->giqmatrix[qmlevel][plane][tx_size][0];
+  assert(cm->giqmatrix[qmlevel][plane][tx_size] != NULL ||
+         qmlevel == NUM_QM_LEVELS - 1);
+  return cm->giqmatrix[qmlevel][plane][tx_size];
 }
 const qm_val_t *av1_qmatrix(AV1_COMMON *cm, int qmlevel, int plane,
                             TX_SIZE tx_size) {
-  return &cm->gqmatrix[qmlevel][plane][tx_size][0];
+  assert(cm->gqmatrix[qmlevel][plane][tx_size] != NULL ||
+         qmlevel == NUM_QM_LEVELS - 1);
+  return cm->gqmatrix[qmlevel][plane][tx_size];
 }
 
 #define QM_TOTAL_SIZE 3344
@@ -254,6 +258,7 @@ void av1_qm_init(AV1_COMMON *cm) {
           cm->gqmatrix[q][c][t] = NULL;
           cm->giqmatrix[q][c][t] = NULL;
         } else if (t != qm_tx_size) {  // Reuse matrices for 'qm_tx_size'
+          assert(t > qm_tx_size);
           cm->gqmatrix[q][c][t] = cm->gqmatrix[q][c][qm_tx_size];
           cm->giqmatrix[q][c][t] = cm->giqmatrix[q][c][qm_tx_size];
         } else {

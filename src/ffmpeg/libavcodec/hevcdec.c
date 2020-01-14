@@ -2778,14 +2778,14 @@ static int set_side_data(HEVCContext *s)
                metadata->MaxCLL, metadata->MaxFALL);
     }
 
-    if (s->sei.a53_caption.a53_caption) {
-        AVFrameSideData* sd = av_frame_new_side_data(out,
-                                                     AV_FRAME_DATA_A53_CC,
-                                                     s->sei.a53_caption.a53_caption_size);
-        if (sd)
-            memcpy(sd->data, s->sei.a53_caption.a53_caption, s->sei.a53_caption.a53_caption_size);
-        av_freep(&s->sei.a53_caption.a53_caption);
-        s->sei.a53_caption.a53_caption_size = 0;
+    if (s->sei.a53_caption.buf_ref) {
+        HEVCSEIA53Caption *a53 = &s->sei.a53_caption;
+
+        AVFrameSideData *sd = av_frame_new_side_data_from_buf(out, AV_FRAME_DATA_A53_CC, a53->buf_ref);
+        if (!sd)
+            av_buffer_unref(&a53->buf_ref);
+        a53->buf_ref = NULL;
+
         s->avctx->properties |= FF_CODEC_PROPERTY_CLOSED_CAPTIONS;
     }
 
@@ -3461,6 +3461,13 @@ static int hevc_update_thread_context(AVCodecContext *dst,
     if (s0->eos) {
         s->seq_decode = (s->seq_decode + 1) & 0xff;
         s->max_ra = INT_MAX;
+    }
+
+    av_buffer_unref(&s->sei.a53_caption.buf_ref);
+    if (s0->sei.a53_caption.buf_ref) {
+        s->sei.a53_caption.buf_ref = av_buffer_ref(s0->sei.a53_caption.buf_ref);
+        if (!s->sei.a53_caption.buf_ref)
+            return AVERROR(ENOMEM);
     }
 
     s->sei.frame_packing        = s0->sei.frame_packing;

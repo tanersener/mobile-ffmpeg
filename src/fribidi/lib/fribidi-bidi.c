@@ -506,7 +506,6 @@ fribidi_get_par_embedding_levels_ex (
   FriBidiLevel *embedding_levels
 )
 {
-  FriBidiLevel base_level_per_iso_level[FRIBIDI_BIDI_MAX_EXPLICIT_LEVEL];
   FriBidiLevel base_level, max_level = 0;
   FriBidiParType base_dir;
   FriBidiRun *main_run_list = NULL, *explicits_list = NULL, *pp;
@@ -564,8 +563,6 @@ fribidi_get_par_embedding_levels_ex (
   base_dir = FRIBIDI_LEVEL_TO_DIR (base_level);
   DBG2 ("  base level : %c", fribidi_char_from_level (base_level));
   DBG2 ("  base dir   : %s", fribidi_get_bidi_type_name (base_dir));
-
-  base_level_per_iso_level[0] = base_level;
 
 # if DEBUG
   if UNLIKELY
@@ -747,8 +744,9 @@ fribidi_get_par_embedding_levels_ex (
             }
 
 	  RL_LEVEL (pp) = level;
-          RL_ISOLATE_LEVEL (pp) = isolate_level++;
-          base_level_per_iso_level[isolate_level] = new_level;
+          RL_ISOLATE_LEVEL (pp) = isolate_level;
+          if (isolate_level < FRIBIDI_BIDI_MAX_EXPLICIT_LEVEL-1)
+              isolate_level++;
 
 	  if (!FRIBIDI_IS_NEUTRAL (override))
 	    RL_TYPE (pp) = override;
@@ -1098,8 +1096,7 @@ fribidi_get_par_embedding_levels_ex (
       FriBidiPairingNode *ppairs = pairing_nodes;
       while (ppairs)
         {
-          int iso_level = ppairs->open->isolate_level;
-          int embedding_level = base_level_per_iso_level[iso_level];
+          int embedding_level = ppairs->open->level; 
 
           /* Find matching strong. */
           fribidi_boolean found = false;
@@ -1151,7 +1148,6 @@ fribidi_get_par_embedding_levels_ex (
                          compare with the preceding strong to establish whether
                          to apply N0c1 (opposite) or N0c2 embedding */
                       RL_TYPE(ppairs->open) = RL_TYPE(ppairs->close) = prec_strong_level % 2 ? FRIBIDI_TYPE_RTL : FRIBIDI_TYPE_LTR;
-                      RL_LEVEL(ppairs->open) = RL_LEVEL(ppairs->close) = prec_strong_level;
                       found = true;
                       break;
                     }

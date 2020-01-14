@@ -507,6 +507,7 @@ AS_SFX    = ${AS_SFX:-.asm}
 EXE_SFX   = ${EXE_SFX}
 VCPROJ_SFX = ${VCPROJ_SFX}
 RTCD_OPTIONS = ${RTCD_OPTIONS}
+LIBYUV_CXXFLAGS = ${LIBYUV_CXXFLAGS}
 EOF
 
   if enabled rvct; then cat >> $1 << EOF
@@ -517,10 +518,10 @@ fmt_deps = sed -e 's;^\([a-zA-Z0-9_]*\)\.o;\${@:.d=.o} \$@;'
 EOF
   fi
 
-  print_config_mk ARCH   "${1}" ${ARCH_LIST}
-  print_config_mk HAVE   "${1}" ${HAVE_LIST}
-  print_config_mk CONFIG "${1}" ${CONFIG_LIST}
-  print_config_mk HAVE   "${1}" gnu_strip
+  print_config_mk VPX_ARCH "${1}" ${ARCH_LIST}
+  print_config_mk HAVE     "${1}" ${HAVE_LIST}
+  print_config_mk CONFIG   "${1}" ${CONFIG_LIST}
+  print_config_mk HAVE     "${1}" gnu_strip
 
   enabled msvs && echo "CONFIG_VS_VERSION=${vs_version}" >> "${1}"
 
@@ -537,10 +538,10 @@ write_common_target_config_h() {
 #define RESTRICT    ${RESTRICT}
 #define INLINE      ${INLINE}
 EOF
-  print_config_h ARCH   "${TMP_H}" ${ARCH_LIST}
-  print_config_h HAVE   "${TMP_H}" ${HAVE_LIST}
-  print_config_h CONFIG "${TMP_H}" ${CONFIG_LIST}
-  print_config_vars_h   "${TMP_H}" ${VAR_LIST}
+  print_config_h VPX_ARCH "${TMP_H}" ${ARCH_LIST}
+  print_config_h HAVE     "${TMP_H}" ${HAVE_LIST}
+  print_config_h CONFIG   "${TMP_H}" ${CONFIG_LIST}
+  print_config_vars_h     "${TMP_H}" ${VAR_LIST}
   echo "#endif /* VPX_CONFIG_H */" >> ${TMP_H}
   mkdir -p `dirname "$1"`
   cmp "$1" ${TMP_H} >/dev/null 2>&1 || mv ${TMP_H} "$1"
@@ -646,11 +647,7 @@ process_common_cmdline() {
       --libdir=*)
         libdir="${optval}"
         ;;
-      --sdk-path=*)
-        [ -d "${optval}" ] || die "Not a directory: ${optval}"
-        sdk_path="${optval}"
-        ;;
-      --libc|--as|--prefix|--libdir|--sdk-path)
+      --libc|--as|--prefix|--libdir)
         die "Option ${opt} requires argument"
         ;;
       --help|-h)
@@ -770,37 +767,9 @@ process_common_toolchain() {
 
     # detect tgt_os
     case "$gcctarget" in
-      *darwin10*)
+      *darwin1[0-8]*)
         tgt_isa=x86_64
-        tgt_os=darwin10
-        ;;
-      *darwin11*)
-        tgt_isa=x86_64
-        tgt_os=darwin11
-        ;;
-      *darwin12*)
-        tgt_isa=x86_64
-        tgt_os=darwin12
-        ;;
-      *darwin13*)
-        tgt_isa=x86_64
-        tgt_os=darwin13
-        ;;
-      *darwin14*)
-        tgt_isa=x86_64
-        tgt_os=darwin14
-        ;;
-      *darwin15*)
-        tgt_isa=x86_64
-        tgt_os=darwin15
-        ;;
-      *darwin16*)
-        tgt_isa=x86_64
-        tgt_os=darwin16
-        ;;
-      *darwin17*)
-        tgt_isa=x86_64
-        tgt_os=darwin17
+        tgt_os=`echo $gcctarget | sed 's/.*\(darwin1[0-8]\).*/\1/'`
         ;;
       x86_64*mingw32*)
         tgt_os=win64
@@ -873,8 +842,18 @@ process_common_toolchain() {
 
   # Handle darwin variants. Newer SDKs allow targeting older
   # platforms, so use the newest one available.
-  add_cflags  "-isysroot ${SDK_PATH}"
-  add_ldflags "-isysroot ${SDK_PATH}"
+  case ${toolchain} in
+    arm*-darwin*)
+      iphoneos_sdk_dir="$(show_darwin_sdk_path iphoneos)"
+      ;;
+    x86*-darwin*)
+      osx_sdk_dir="$(show_darwin_sdk_path macosx)"
+      if [ -d "${osx_sdk_dir}" ]; then
+        add_cflags  "-isysroot ${osx_sdk_dir}"
+        add_ldflags "-isysroot ${osx_sdk_dir}"
+      fi
+      ;;
+  esac
 
   case ${toolchain} in
     *-darwin8-*)
@@ -917,6 +896,10 @@ process_common_toolchain() {
       add_cflags  "-mmacosx-version-min=10.13"
       add_ldflags "-mmacosx-version-min=10.13"
       ;;
+    *-darwin18-*)
+      add_cflags  "-mmacosx-version-min=10.14"
+      add_ldflags "-mmacosx-version-min=10.14"
+      ;;
   esac
 
   # Handle Solaris variants. Solaris 10 needs -lposix4
@@ -957,28 +940,6 @@ process_common_toolchain() {
           arch_int=${tgt_isa##armv}
           arch_int=${arch_int%%te}
           tune_cflags="-mtune="
-          if [ ${tgt_isa} = "armv7" ] || [ ${tgt_isa} = "armv7s" ]; then
-            if [ -z "${float_abi}" ]; then
-              check_cpp <<EOF && float_abi=hard || float_abi=softfp
-#ifndef __ARM_PCS_VFP
-#error "not hardfp"
-#endif
-EOF
-            fi
-            check_add_cflags  -march=armv7-a -mfloat-abi=${float_abi}
-            check_add_asflags -march=armv7-a -mfloat-abi=${float_abi}
-
-            if enabled neon || enabled neon_asm; then
-              check_add_cflags -mfpu=neon #-ftree-vectorize
-              check_add_asflags -mfpu=neon
-            fi
-          elif [ ${tgt_isa} = "arm64" ] || [ ${tgt_isa} = "armv8" ]; then
-            check_add_cflags -march=armv8-a
-            check_add_asflags -march=armv8-a
-          else
-            check_add_cflags -march=${tgt_isa}
-            check_add_asflags -march=${tgt_isa}
-          fi
 
           enabled debug && add_asflags -g
           asm_conversion_cmd="${source_path}/build/make/ads2gas.pl"
@@ -989,9 +950,6 @@ EOF
               AS="$CC -c"
               EXE_SFX=.exe
               enable_feature thumb
-              ;;
-            *)
-              check_add_asflags --defsym ARCHITECTURE=${arch_int}
               ;;
           esac
 
@@ -1064,7 +1022,6 @@ EOF
           fi
           arch_int=${tgt_isa##armv}
           arch_int=${arch_int%%te}
-          check_add_asflags --pd "\"ARCHITECTURE SETA ${arch_int}\""
           enabled debug && add_asflags -g
           add_cflags --gnu
           add_cflags --enum_is_int
@@ -1079,100 +1036,64 @@ EOF
           ;;
 
         android*)
-          if [ -n "${sdk_path}" ]; then
-            SDK_PATH=${sdk_path}
-            COMPILER_LOCATION=`find "${SDK_PATH}" \
-              -name "arm-linux-androideabi-gcc*" -print -quit`
-            TOOLCHAIN_PATH=${COMPILER_LOCATION%/*}/arm-linux-androideabi-
-            CC=${TOOLCHAIN_PATH}gcc
-            CXX=${TOOLCHAIN_PATH}g++
-            AR=${TOOLCHAIN_PATH}ar
-            LD=${TOOLCHAIN_PATH}gcc
-            AS=${TOOLCHAIN_PATH}as
-            STRIP=${TOOLCHAIN_PATH}strip
-            NM=${TOOLCHAIN_PATH}nm
-
-            if [ -z "${alt_libc}" ]; then
-              alt_libc=`find "${SDK_PATH}" -name arch-arm -print | \
-                awk '{n = split($0,a,"/"); \
-                split(a[n-1],b,"-"); \
-                print $0 " " b[2]}' | \
-                sort -g -k 2 | \
-                awk '{ print $1 }' | tail -1`
-            fi
-
-            if [ -d "${alt_libc}" ]; then
-              add_cflags "--sysroot=${alt_libc}"
-              add_ldflags "--sysroot=${alt_libc}"
-            fi
-
-            # linker flag that routes around a CPU bug in some
-            # Cortex-A8 implementations (NDK Dev Guide)
-            add_ldflags "-Wl,--fix-cortex-a8"
-
-            enable_feature pic
-            soft_enable realtime_only
-            if [ ${tgt_isa} = "armv7" ]; then
-              soft_enable runtime_cpu_detect
-            fi
-            if enabled runtime_cpu_detect; then
-              add_cflags "-I${SDK_PATH}/sources/android/cpufeatures"
-            fi
-          else
-            echo "Assuming standalone build with NDK toolchain."
-            echo "See build/make/Android.mk for details."
-            check_add_ldflags -static
-            soft_enable unit_tests
-          fi
+          echo "Assuming standalone build with NDK toolchain."
+          echo "See build/make/Android.mk for details."
+          check_add_ldflags -static
+          soft_enable unit_tests
           ;;
 
         darwin*)
-          XCRUN_FIND="xcrun --sdk ${SDK_NAME} --find"
-          CXX="$(${XCRUN_FIND} clang++)"
-          CC="$(${XCRUN_FIND} clang)"
-          AR="$(${XCRUN_FIND} ar)"
-          AS="$(${XCRUN_FIND} as)"
-          STRIP="$(${XCRUN_FIND} strip)"
-          NM="$(${XCRUN_FIND} nm)"
-          RANLIB="$(${XCRUN_FIND} ranlib)"
-          AS_SFX=.S
-          LD="${CXX:-$(${XCRUN_FIND} ld)}"
+          if ! enabled external_build; then
+            XCRUN_FIND="xcrun --sdk iphoneos --find"
+            CXX="$(${XCRUN_FIND} clang++)"
+            CC="$(${XCRUN_FIND} clang)"
+            AR="$(${XCRUN_FIND} ar)"
+            AS="$(${XCRUN_FIND} as)"
+            STRIP="$(${XCRUN_FIND} strip)"
+            NM="$(${XCRUN_FIND} nm)"
+            RANLIB="$(${XCRUN_FIND} ranlib)"
+            AS_SFX=.S
+            LD="${CXX:-$(${XCRUN_FIND} ld)}"
 
-          # ASFLAGS is written here instead of using check_add_asflags
-          # because we need to overwrite all of ASFLAGS and purge the
-          # options that were put in above
-          ASFLAGS=" -g"
+            # ASFLAGS is written here instead of using check_add_asflags
+            # because we need to overwrite all of ASFLAGS and purge the
+            # options that were put in above
+            ASFLAGS="-g"
 
-          alt_libc="$(show_darwin_sdk_path ${SDK_NAME})"
-          if [ -d "${alt_libc}" ]; then
-            add_cflags -isysroot ${alt_libc}
-          fi
+            # add_cflags -arch ${tgt_isa}
+            # add_ldflags -arch ${tgt_isa}
 
-          for d in lib usr/lib usr/lib/system; do
-            try_dir="${alt_libc}/${d}"
-            [ -d "${try_dir}" ] && add_ldflags -L"${try_dir}"
-          done
+            alt_libc="$(show_darwin_sdk_path iphoneos)"
+            if [ -d "${alt_libc}" ]; then
+              add_cflags -isysroot ${alt_libc}
+            fi
 
-          case ${tgt_isa} in
-            armv7|armv7s|armv8|arm64)
-              if enabled neon && ! check_xcode_minimum_version; then
-                soft_disable neon
-                log_echo "  neon disabled: upgrade Xcode (need v6.3+)."
-                if enabled neon_asm; then
-                  soft_disable neon_asm
-                  log_echo "  neon_asm disabled: upgrade Xcode (need v6.3+)."
+            for d in lib usr/lib usr/lib/system; do
+              try_dir="${alt_libc}/${d}"
+              [ -d "${try_dir}" ] && add_ldflags -L"${try_dir}"
+            done
+
+            case ${tgt_isa} in
+              armv7|armv7s|armv8|arm64)
+                if enabled neon && ! check_xcode_minimum_version; then
+                  soft_disable neon
+                  log_echo "  neon disabled: upgrade Xcode (need v6.3+)."
+                  if enabled neon_asm; then
+                    soft_disable neon_asm
+                    log_echo "  neon_asm disabled: upgrade Xcode (need v6.3+)."
+                  fi
                 fi
-              fi
-              ;;
-          esac
+                ;;
+            esac
+
+            if [ "$(show_darwin_sdk_major_version iphoneos)" -gt 8 ]; then
+              check_add_cflags -fembed-bitcode
+              check_add_asflags -fembed-bitcode
+              check_add_ldflags -fembed-bitcode
+            fi
+          fi
 
           asm_conversion_cmd="${source_path}/build/make/ads2gas_apple.pl"
-
-          if [ "$(show_darwin_sdk_major_version ${SDK_NAME})" -gt 8 ]; then
-            check_add_cflags -fembed-bitcode
-            check_add_asflags -fembed-bitcode
-            check_add_ldflags -fembed-bitcode
-          fi
           ;;
 
         linux*)
@@ -1245,14 +1166,14 @@ EOF
         check_add_ldflags -march=loongson3a
       fi
 
-      check_add_cflags -march=${tgt_isa}
-      check_add_asflags -march=${tgt_isa}
       check_add_asflags -KPIC
       ;;
     ppc64le*)
       link_with_cc=gcc
       setup_gnu_toolchain
-      check_gcc_machine_option "vsx"
+      # Do not enable vsx by default.
+      # https://bugs.chromium.org/p/webm/issues/detail?id=1522
+      enabled vsx || RTCD_OPTIONS="${RTCD_OPTIONS}--disable-vsx "
       if [ -n "${tune_cpu}" ]; then
         case ${tune_cpu} in
           power?)
@@ -1299,14 +1220,10 @@ EOF
               tune_cflags="-x"
               tune_cpu="SSE3_ATOM"
               ;;
-            *)
-              tune_cflags="-march="
-              ;;
           esac
           ;;
         gcc*)
           link_with_cc=gcc
-          tune_cflags="-march="
           setup_gnu_toolchain
           #for 32 bit x86 builds, -O3 did not turn on this flag
           enabled optimizations && disabled gprof && check_add_cflags -fomit-frame-pointer
@@ -1414,20 +1331,6 @@ EOF
           # code that still relies on inline assembly.
           # enabled icc && ! enabled pic && add_cflags -fno-pic -mdynamic-no-pic
           enabled icc && ! enabled pic && add_cflags -fno-pic
-          ;;
-        iphonesimulator)
-          add_asflags -f macho${bits}
-          enabled x86 && sim_arch="-arch i386" || sim_arch="-arch x86_64"
-          add_cflags  ${sim_arch}
-          add_ldflags ${sim_arch}
-
-          if [ "$(disabled external_build)" ] &&
-              [ "$(show_darwin_sdk_major_version iphonesimulator)" -gt 8 ]; then
-            # yasm v1.3.0 doesn't know what -fembed-bitcode means, so turning it
-            # on is pointless (unless building a C-only lib). Warn the user, but
-            # do nothing here.
-            log "Warning: Bitcode embed disabled for simulator targets."
-          fi
           ;;
         os2)
           add_asflags -f aout

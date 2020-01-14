@@ -846,9 +846,7 @@ int main(int argc, char **argv) {
       die_codec(&codec, "Failed to set ROI map");
     vpx_codec_control(&codec, VP9E_SET_AQ_MODE, 0);
 #endif
-    // TODO(marpan/jianj): There is an issue with row-mt for low resolutons at
-    // high speed settings, disable its use for those cases for now.
-    if (cfg.g_threads > 1 && ((cfg.g_w > 320 && cfg.g_h > 240) || speed < 7))
+    if (cfg.g_threads > 1)
       vpx_codec_control(&codec, VP9E_SET_ROW_MT, 1);
     else
       vpx_codec_control(&codec, VP9E_SET_ROW_MT, 0);

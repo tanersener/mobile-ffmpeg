@@ -55,6 +55,9 @@
 extern "C" {
 #endif
 
+#undef cfb8_encrypt
+#undef cfb8_decrypt
+
 /* Name mangling */
 #define cfb8_encrypt _gnutls_backport_nettle_cfb8_encrypt
 #define cfb8_decrypt _gnutls_backport_nettle_cfb8_decrypt

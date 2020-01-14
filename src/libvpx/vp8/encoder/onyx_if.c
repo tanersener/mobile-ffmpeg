@@ -38,7 +38,7 @@
 #include "vpx_ports/system_state.h"
 #include "vpx_ports/vpx_timer.h"
 #include "vpx_util/vpx_write_yuv_frame.h"
-#if ARCH_ARM
+#if VPX_ARCH_ARM
 #include "vpx_ports/arm.h"
 #endif
 #if CONFIG_MULTI_RES_ENCODING
@@ -62,9 +62,6 @@
 extern int vp8_update_coef_context(VP8_COMP *cpi);
 #endif
 
-extern void vp8_deblock_frame(YV12_BUFFER_CONFIG *source,
-                              YV12_BUFFER_CONFIG *post, int filt_lvl,
-                              int low_var_thresh, int flag);
 extern unsigned int vp8_get_processor_freq();
 
 int vp8_calc_ss_err(YV12_BUFFER_CONFIG *source, YV12_BUFFER_CONFIG *dest);
@@ -2043,7 +2040,7 @@ struct VP8_COMP *vp8_create_compressor(VP8_CONFIG *oxcf) {
   cpi->fn_ptr[BLOCK_4X4].sdx8f = vpx_sad4x4x8;
   cpi->fn_ptr[BLOCK_4X4].sdx4df = vpx_sad4x4x4d;
 
-#if ARCH_X86 || ARCH_X86_64
+#if VPX_ARCH_X86 || VPX_ARCH_X86_64
   cpi->fn_ptr[BLOCK_16X16].copymem = vp8_copy32xn;
   cpi->fn_ptr[BLOCK_16X8].copymem = vp8_copy32xn;
   cpi->fn_ptr[BLOCK_8X16].copymem = vp8_copy32xn;
@@ -2772,13 +2769,8 @@ static int decide_key_frame(VP8_COMP *cpi) {
   return code_key_frame;
 }
 
-static void Pass1Encode(VP8_COMP *cpi, size_t *size, unsigned char *dest,
-                        unsigned int *frame_flags) {
-  (void)size;
-  (void)dest;
-  (void)frame_flags;
+static void Pass1Encode(VP8_COMP *cpi) {
   vp8_set_quantizer(cpi, 26);
-
   vp8_first_pass(cpi);
 }
 #endif
@@ -3791,8 +3783,7 @@ static void encode_frame_to_data_rate(VP8_COMP *cpi, size_t *size,
   // (temporal denoising) mode.
   if (cpi->oxcf.noise_sensitivity >= 3) {
     if (cpi->denoiser.denoise_pars.spatial_blur != 0) {
-      vp8_de_noise(cm, cpi->Source, cpi->Source,
-                   cpi->denoiser.denoise_pars.spatial_blur, 1, 0, 0);
+      vp8_de_noise(cm, cpi->Source, cpi->denoiser.denoise_pars.spatial_blur, 1);
     }
   }
 #endif
@@ -3813,9 +3804,9 @@ static void encode_frame_to_data_rate(VP8_COMP *cpi, size_t *size,
     }
 
     if (cm->frame_type == KEY_FRAME) {
-      vp8_de_noise(cm, cpi->Source, cpi->Source, l, 1, 0, 1);
+      vp8_de_noise(cm, cpi->Source, l, 1);
     } else {
-      vp8_de_noise(cm, cpi->Source, cpi->Source, l, 1, 0, 1);
+      vp8_de_noise(cm, cpi->Source, l, 1);
 
       src = cpi->Source->y_buffer;
 
@@ -3958,7 +3949,10 @@ static void encode_frame_to_data_rate(VP8_COMP *cpi, size_t *size,
     vp8_encode_frame(cpi);
 
     if (cpi->pass == 0 && cpi->oxcf.end_usage == USAGE_STREAM_FROM_SERVER) {
-      if (vp8_drop_encodedframe_overshoot(cpi, Q)) return;
+      if (vp8_drop_encodedframe_overshoot(cpi, Q)) {
+        vpx_clear_system_state();
+        return;
+      }
       if (cm->frame_type != KEY_FRAME)
         cpi->last_pred_err_mb =
             (int)(cpi->mb.prediction_error / cpi->common.MBs);
@@ -5067,7 +5061,7 @@ int vp8_get_compressed_data(VP8_COMP *cpi, unsigned int *frame_flags,
   }
   switch (cpi->pass) {
 #if !CONFIG_REALTIME_ONLY
-    case 1: Pass1Encode(cpi, size, dest, frame_flags); break;
+    case 1: Pass1Encode(cpi); break;
     case 2: Pass2Encode(cpi, size, dest, dest_end, frame_flags); break;
 #endif  // !CONFIG_REALTIME_ONLY
     default:
@@ -5186,7 +5180,7 @@ int vp8_get_compressed_data(VP8_COMP *cpi, unsigned int *frame_flags,
           double weight = 0;
 
           vp8_deblock(cm, cm->frame_to_show, &cm->post_proc_buffer,
-                      cm->filter_level * 10 / 6, 1, 0);
+                      cm->filter_level * 10 / 6);
           vpx_clear_system_state();
 
           ye = calc_plane_error(orig->y_buffer, orig->y_stride, pp->y_buffer,

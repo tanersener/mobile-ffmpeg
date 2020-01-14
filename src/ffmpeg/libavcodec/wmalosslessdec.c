@@ -628,7 +628,7 @@ static void mclms_update(WmallDecodeCtx *s, int icoef, int *pred)
     int range        = 1 << (s->bits_per_sample - 1);
 
     for (ich = 0; ich < num_channels; ich++) {
-        pred_error = s->channel_residues[ich][icoef] - pred[ich];
+        pred_error = s->channel_residues[ich][icoef] - (unsigned)pred[ich];
         if (pred_error > 0) {
             for (i = 0; i < order * num_channels; i++)
                 s->mclms_coeffs[i + ich * order * num_channels] +=
@@ -678,9 +678,9 @@ static void mclms_predict(WmallDecodeCtx *s, int icoef, int *pred)
         for (i = 0; i < ich; i++)
             pred[ich] += (uint32_t)s->channel_residues[i][icoef] *
                          s->mclms_coeffs_cur[i + num_channels * ich];
-        pred[ich] += 1 << s->mclms_scaling - 1;
+        pred[ich] += (1 << s->mclms_scaling) >> 1;
         pred[ich] >>= s->mclms_scaling;
-        s->channel_residues[ich][icoef] += pred[ich];
+        s->channel_residues[ich][icoef] += (unsigned)pred[ich];
     }
 }
 
@@ -766,7 +766,7 @@ static void revert_cdlms ## bits (WmallDecodeCtx *s, int ch, \
     for (ilms = num_lms - 1; ilms >= 0; ilms--) { \
         for (icoef = coef_begin; icoef < coef_end; icoef++) { \
             int##bits##_t *prevvalues = (int##bits##_t *)s->cdlms[ch][ilms].lms_prevvalues; \
-            pred = 1 << (s->cdlms[ch][ilms].scaling - 1); \
+            pred = (1 << s->cdlms[ch][ilms].scaling) >> 1; \
             residue = s->channel_residues[ch][icoef]; \
             pred += s->dsp.scalarproduct_and_madd_int## bits (s->cdlms[ch][ilms].coefs, \
                                                         prevvalues + s->cdlms[ch][ilms].recent, \
@@ -811,19 +811,19 @@ static void revert_acfilter(WmallDecodeCtx *s, int tile_size)
             pred = 0;
             for (j = 0; j < order; j++) {
                 if (i <= j)
-                    pred += filter_coeffs[j] * prevvalues[j - i];
+                    pred += (uint32_t)filter_coeffs[j] * prevvalues[j - i];
                 else
-                    pred += s->channel_residues[ich][i - j - 1] * filter_coeffs[j];
+                    pred += (uint32_t)s->channel_residues[ich][i - j - 1] * filter_coeffs[j];
             }
             pred >>= scaling;
-            s->channel_residues[ich][i] += pred;
+            s->channel_residues[ich][i] += (unsigned)pred;
         }
         for (i = order; i < tile_size; i++) {
             pred = 0;
             for (j = 0; j < order; j++)
                 pred += (uint32_t)s->channel_residues[ich][i - j - 1] * filter_coeffs[j];
             pred >>= scaling;
-            s->channel_residues[ich][i] += pred;
+            s->channel_residues[ich][i] += (unsigned)pred;
         }
         for (j = 0; j < order; j++)
             prevvalues[j] = s->channel_residues[ich][tile_size - j - 1];
@@ -950,6 +950,8 @@ static int decode_subframe(WmallDecodeCtx *s)
             for (j = 0; j < subframe_len; j++)
                 s->channel_residues[i][j] = get_sbits_long(&s->gb, bits);
     } else {
+        if (s->bits_per_sample < padding_zeroes)
+            return AVERROR_INVALIDDATA;
         for (i = 0; i < s->num_channels; i++) {
             if (s->is_channel_coded[i]) {
                 decode_channel_residues(s, i, subframe_len);
@@ -977,7 +979,7 @@ static int decode_subframe(WmallDecodeCtx *s)
         if (s->quant_stepsize != 1)
             for (i = 0; i < s->num_channels; i++)
                 for (j = 0; j < subframe_len; j++)
-                    s->channel_residues[i][j] *= s->quant_stepsize;
+                    s->channel_residues[i][j] *= (unsigned)s->quant_stepsize;
     }
 
     /* Write to proper output buffer depending on bit-depth */
@@ -987,9 +989,9 @@ static int decode_subframe(WmallDecodeCtx *s)
 
         for (j = 0; j < subframe_len; j++) {
             if (s->bits_per_sample == 16) {
-                *s->samples_16[c]++ = (int16_t) s->channel_residues[c][j] << padding_zeroes;
+                *s->samples_16[c]++ = (int16_t) s->channel_residues[c][j] * (1 << padding_zeroes);
             } else {
-                *s->samples_32[c]++ = s->channel_residues[c][j] << (padding_zeroes + 8);
+                *s->samples_32[c]++ = s->channel_residues[c][j] * (256 << padding_zeroes);
             }
         }
     }
@@ -1327,6 +1329,7 @@ AVCodec ff_wmalossless_decoder = {
     .decode         = decode_packet,
     .flush          = flush,
     .capabilities   = AV_CODEC_CAP_SUBFRAMES | AV_CODEC_CAP_DR1 | AV_CODEC_CAP_DELAY,
+    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
     .sample_fmts    = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_S16P,
                                                       AV_SAMPLE_FMT_S32P,
                                                       AV_SAMPLE_FMT_NONE },

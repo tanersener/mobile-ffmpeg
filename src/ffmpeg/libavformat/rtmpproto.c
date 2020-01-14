@@ -48,7 +48,6 @@
 #endif
 
 #define APP_MAX_LENGTH 1024
-#define PLAYPATH_MAX_LENGTH 512
 #define TCURL_MAX_LENGTH 1024
 #define FLASHVER_MAX_LENGTH 64
 #define RTMP_PKTDATA_DEFAULT_SIZE 4096
@@ -1112,7 +1111,7 @@ static int rtmp_calc_swfhash(URLContext *s)
     RTMPContext *rt = s->priv_data;
     uint8_t *in_data = NULL, *out_data = NULL, *swfdata;
     int64_t in_size;
-    URLContext *stream;
+    URLContext *stream = NULL;
     char swfhash[32];
     int swfsize;
     int ret = 0;
@@ -2746,7 +2745,10 @@ reconnect:
     }
 
     if (!rt->playpath) {
-        rt->playpath = av_malloc(PLAYPATH_MAX_LENGTH);
+        int max_len = 1;
+        if (fname)
+            max_len = strlen(fname) + 5; // add prefix "mp4:"
+        rt->playpath = av_malloc(max_len);
         if (!rt->playpath) {
             ret = AVERROR(ENOMEM);
             goto fail;
@@ -2763,7 +2765,7 @@ reconnect:
                     fname[len - 4] = '\0';
                 rt->playpath[0] = 0;
             }
-            av_strlcat(rt->playpath, fname, PLAYPATH_MAX_LENGTH);
+            av_strlcat(rt->playpath, fname, max_len);
         } else {
             rt->playpath[0] = '\0';
         }
@@ -2880,6 +2882,9 @@ reconnect:
     return 0;
 
 fail:
+    av_freep(&rt->playpath);
+    av_freep(&rt->tcurl);
+    av_freep(&rt->flashver);
     av_dict_free(opts);
     rtmp_close(s);
     return ret;

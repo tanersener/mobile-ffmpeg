@@ -406,7 +406,7 @@
       <li><a href="http://sourceforge.net/projects/libxml2-pas/">Pascal bindings</a></li>
       <li><a href="http://libxml.rubyforge.org/">Ruby bindings</a></li>
       <li><a href="http://tclxml.sourceforge.net/">Tcl bindings</a></li>
-      <li><a href="http://bugzilla.gnome.org/buglist.cgi?product=libxml2">Bug Tracker</a></li>
+      <li><a href="https://gitlab.gnome.org/GNOME/libxml2/issues">Bug Tracker</a></li>
     </ul>
   </xsl:variable>
   <xsl:template name="toc">

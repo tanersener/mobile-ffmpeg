@@ -136,6 +136,14 @@ Expression: substring("12345",-1 div 0,5)
 Object is a string : 
 
 ========================
+Expression: substring("12345",-0.7,4)
+Object is a string : 12
+
+========================
+Expression: substring("12345",-5000000000,5000000004)
+Object is a string : 123
+
+========================
 Expression: string-length("")
 Object is a number : 0
 

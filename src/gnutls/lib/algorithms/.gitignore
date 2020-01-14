@@ -1,6 +1,4 @@
-/.deps/
-/.libs/
-*.lo
 *.o
+*.lo
+*.la
 /Makefile
-/libgnutls_alg.la

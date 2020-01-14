@@ -11,3 +11,7 @@
 //p[0 div 0]
 //p[100000000000000000000]
 //p[-100000000000000000000]
+//chapter[true()][position() mod 2 = 1][true()][2]
+//chapter[true()][2][true()]
+//node()[false()]
+(//node())[false()]

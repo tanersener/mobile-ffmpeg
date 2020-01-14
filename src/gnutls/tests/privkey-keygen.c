@@ -125,12 +125,20 @@ void doit(void)
 			    algorithm == GNUTLS_PK_ECDH_X25519)
 				continue;
 
-			if (gnutls_fips140_mode_enabled() &&
-			    (algorithm == GNUTLS_PK_GOST_01 ||
-			     algorithm == GNUTLS_PK_GOST_12_256 ||
-			     algorithm == GNUTLS_PK_GOST_12_512))
+			if (algorithm == GNUTLS_PK_GOST_01 ||
+			    algorithm == GNUTLS_PK_GOST_12_256 ||
+			    algorithm == GNUTLS_PK_GOST_12_512) {
+				/* Skip GOST algorithms:
+				 * - If they are disabled by ./configure option
+				 * - Or in FIPS140 mode
+				 */
+#ifdef ENABLE_GOST
+				if (gnutls_fips140_mode_enabled())
+					continue;
+#else
 				continue;
-
+#endif
+			}
 
 			ret = gnutls_x509_privkey_init(&pkey);
 			if (ret < 0) {

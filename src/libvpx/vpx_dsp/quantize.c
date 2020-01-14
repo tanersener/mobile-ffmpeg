@@ -156,7 +156,7 @@ void vpx_quantize_b_c(const tran_low_t *coeff_ptr, intptr_t n_coeffs,
              quant_shift_ptr[rc != 0]) >>
             16;  // quantization
       qcoeff_ptr[rc] = (tmp ^ coeff_sign) - coeff_sign;
-      dqcoeff_ptr[rc] = qcoeff_ptr[rc] * dequant_ptr[rc != 0];
+      dqcoeff_ptr[rc] = (tran_low_t)(qcoeff_ptr[rc] * dequant_ptr[rc != 0]);
 
       if (tmp) eob = i;
     }
@@ -260,7 +260,7 @@ void vpx_quantize_b_32x32_c(const tran_low_t *coeff_ptr, intptr_t n_coeffs,
           15;
 
     qcoeff_ptr[rc] = (tmp ^ coeff_sign) - coeff_sign;
-#if (ARCH_X86 || ARCH_X86_64) && !CONFIG_VP9_HIGHBITDEPTH
+#if (VPX_ARCH_X86 || VPX_ARCH_X86_64) && !CONFIG_VP9_HIGHBITDEPTH
     // When tran_low_t is only 16 bits dqcoeff can outrange it. Rather than
     // truncating with a cast, saturate the value. This is easier to implement
     // on x86 and preserves the sign of the value.
@@ -268,7 +268,7 @@ void vpx_quantize_b_32x32_c(const tran_low_t *coeff_ptr, intptr_t n_coeffs,
         clamp(qcoeff_ptr[rc] * dequant_ptr[rc != 0] / 2, INT16_MIN, INT16_MAX);
 #else
     dqcoeff_ptr[rc] = qcoeff_ptr[rc] * dequant_ptr[rc != 0] / 2;
-#endif  // ARCH_X86 && CONFIG_VP9_HIGHBITDEPTH
+#endif  // VPX_ARCH_X86 && CONFIG_VP9_HIGHBITDEPTH
 
     if (tmp) eob = idx_arr[i];
   }

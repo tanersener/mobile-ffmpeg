@@ -356,4 +356,179 @@ INSTANTIATE_TEST_CASE_P(AVX2, PixelProjHighbdErrorTest,
 #endif  // HAVE_AVX2
 
 }  // namespace pickrst_test_highbd
+
+////////////////////////////////////////////////////////////////////////////////
+// Get_proj_subspace_Test
+////////////////////////////////////////////////////////////////////////////////
+
+namespace get_proj_subspace_test_lowbd {
+static const int kIterations = 100;
+
+typedef void (*set_get_proj_subspace)(const uint8_t *src8, int width,
+                                      int height, int src_stride,
+                                      const uint8_t *dat8, int dat_stride,
+                                      int32_t *flt0, int flt0_stride,
+                                      int32_t *flt1, int flt1_stride,
+                                      int64_t H[2][2], int64_t C[2],
+                                      const sgr_params_type *params);
+
+typedef ::testing::tuple<const set_get_proj_subspace> GetProjSubspaceTestParam;
+
+class GetProjSubspaceTest
+    : public ::testing::TestWithParam<GetProjSubspaceTestParam> {
+ public:
+  virtual void SetUp() {
+    target_func_ = GET_PARAM(0);
+    src_ = (uint8_t *)(aom_malloc(MAX_DATA_BLOCK * MAX_DATA_BLOCK *
+                                  sizeof(*src_)));
+    ASSERT_NE(src_, nullptr);
+    dgd_ = (uint8_t *)(aom_malloc(MAX_DATA_BLOCK * MAX_DATA_BLOCK *
+                                  sizeof(*dgd_)));
+    ASSERT_NE(dgd_, nullptr);
+    flt0_ = (int32_t *)(aom_malloc(MAX_DATA_BLOCK * MAX_DATA_BLOCK *
+                                   sizeof(*flt0_)));
+    ASSERT_NE(flt0_, nullptr);
+    flt1_ = (int32_t *)(aom_malloc(MAX_DATA_BLOCK * MAX_DATA_BLOCK *
+                                   sizeof(*flt1_)));
+    ASSERT_NE(flt1_, nullptr);
+  }
+  virtual void TearDown() {
+    aom_free(src_);
+    aom_free(dgd_);
+    aom_free(flt0_);
+    aom_free(flt1_);
+  }
+  void RunGetProjSubspaceTest(int32_t run_times);
+  void RunGetProjSubspaceTest_ExtremeValues();
+
+ private:
+  set_get_proj_subspace target_func_;
+  libaom_test::ACMRandom rng_;
+  uint8_t *src_;
+  uint8_t *dgd_;
+  int32_t *flt0_;
+  int32_t *flt1_;
+};
+
+void GetProjSubspaceTest::RunGetProjSubspaceTest(int32_t run_times) {
+  int h_end = run_times != 1
+                  ? 128
+                  : ((rng_.Rand16() % MAX_DATA_BLOCK) &
+                     2147483640);  // We test for widths divisible by 8.
+  int v_end =
+      run_times != 1 ? 128 : ((rng_.Rand16() % MAX_DATA_BLOCK) & 2147483640);
+  const int dgd_stride = MAX_DATA_BLOCK;
+  const int src_stride = MAX_DATA_BLOCK;
+  const int flt0_stride = MAX_DATA_BLOCK;
+  const int flt1_stride = MAX_DATA_BLOCK;
+  sgr_params_type params;
+  const int iters = run_times == 1 ? kIterations : 4;
+  for (int iter = 0; iter < iters && !HasFatalFailure(); ++iter) {
+    int64_t C_ref[2] = { 0 }, C_test[2] = { 0 };
+    int64_t H_ref[2][2] = { { 0, 0 }, { 0, 0 } };
+    int64_t H_test[2][2] = { { 0, 0 }, { 0, 0 } };
+    for (int i = 0; i < MAX_DATA_BLOCK * MAX_DATA_BLOCK; ++i) {
+      dgd_[i] = rng_.Rand8();
+      src_[i] = rng_.Rand8();
+      flt0_[i] = rng_.Rand15Signed();
+      flt1_[i] = rng_.Rand15Signed();
+    }
+
+    params.r[0] = run_times == 1 ? (rng_.Rand8() % MAX_RADIUS) : 1;
+    params.r[1] = run_times == 1 ? (rng_.Rand8() % MAX_RADIUS) : 1;
+    params.s[0] = run_times == 1 ? (rng_.Rand8() % MAX_RADIUS) : (iter % 2);
+    params.s[1] = run_times == 1 ? (rng_.Rand8() % MAX_RADIUS) : (iter / 2);
+    uint8_t *dgd = dgd_;
+    uint8_t *src = src_;
+
+    aom_usec_timer timer;
+    aom_usec_timer_start(&timer);
+    for (int i = 0; i < run_times; ++i) {
+      av1_calc_proj_params_c(src, v_end, h_end, src_stride, dgd, dgd_stride,
+                             flt0_, flt0_stride, flt1_, flt1_stride, H_ref,
+                             C_ref, &params);
+    }
+    aom_usec_timer_mark(&timer);
+    const double time1 = static_cast<double>(aom_usec_timer_elapsed(&timer));
+    aom_usec_timer_start(&timer);
+    for (int i = 0; i < run_times; ++i) {
+      target_func_(src, v_end, h_end, src_stride, dgd, dgd_stride, flt0_,
+                   flt0_stride, flt1_, flt1_stride, H_test, C_test, &params);
+    }
+    aom_usec_timer_mark(&timer);
+    const double time2 = static_cast<double>(aom_usec_timer_elapsed(&timer));
+    if (run_times > 10) {
+      printf("r0 %d r1 %d %3dx%-3d:%7.2f/%7.2fns (%3.2f)\n", params.r[0],
+             params.r[1], h_end, v_end, time1, time2, time1 / time2);
+    } else {
+      ASSERT_EQ(H_ref[0][0], H_test[0][0]);
+      ASSERT_EQ(H_ref[0][1], H_test[0][1]);
+      ASSERT_EQ(H_ref[1][0], H_test[1][0]);
+      ASSERT_EQ(H_ref[1][1], H_test[1][1]);
+      ASSERT_EQ(C_ref[0], C_test[0]);
+      ASSERT_EQ(C_ref[1], C_test[1]);
+    }
+  }
+}
+
+void GetProjSubspaceTest::RunGetProjSubspaceTest_ExtremeValues() {
+  const int h_start = 0;
+  int h_end = MAX_DATA_BLOCK;
+  const int v_start = 0;
+  int v_end = MAX_DATA_BLOCK;
+  const int dgd_stride = MAX_DATA_BLOCK;
+  const int src_stride = MAX_DATA_BLOCK;
+  const int flt0_stride = MAX_DATA_BLOCK;
+  const int flt1_stride = MAX_DATA_BLOCK;
+  sgr_params_type params;
+  const int iters = kIterations;
+  for (int iter = 0; iter < iters && !HasFatalFailure(); ++iter) {
+    int64_t C_ref[2] = { 0 }, C_test[2] = { 0 };
+    int64_t H_ref[2][2] = { { 0, 0 }, { 0, 0 } };
+    int64_t H_test[2][2] = { { 0, 0 }, { 0, 0 } };
+    for (int i = 0; i < MAX_DATA_BLOCK * MAX_DATA_BLOCK; ++i) {
+      dgd_[i] = 0;
+      src_[i] = 255;
+      flt0_[i] = rng_.Rand15Signed();
+      flt1_[i] = rng_.Rand15Signed();
+    }
+    params.r[0] = 1;
+    params.r[1] = 1;
+    params.s[0] = rng_.Rand8() % MAX_RADIUS;
+    params.s[1] = rng_.Rand8() % MAX_RADIUS;
+    uint8_t *dgd = dgd_;
+    uint8_t *src = src_;
+
+    av1_calc_proj_params_c(src, h_end - h_start, v_end - v_start, src_stride,
+                           dgd, dgd_stride, flt0_, flt0_stride, flt1_,
+                           flt1_stride, H_ref, C_ref, &params);
+
+    target_func_(src, h_end - h_start, v_end - v_start, src_stride, dgd,
+                 dgd_stride, flt0_, flt0_stride, flt1_, flt1_stride, H_test,
+                 C_test, &params);
+
+    ASSERT_EQ(H_ref[0][0], H_test[0][0]);
+    ASSERT_EQ(H_ref[0][1], H_test[0][1]);
+    ASSERT_EQ(H_ref[1][0], H_test[1][0]);
+    ASSERT_EQ(H_ref[1][1], H_test[1][1]);
+    ASSERT_EQ(C_ref[0], C_test[0]);
+    ASSERT_EQ(C_ref[1], C_test[1]);
+  }
+}
+
+TEST_P(GetProjSubspaceTest, RandomValues) { RunGetProjSubspaceTest(1); }
+
+TEST_P(GetProjSubspaceTest, ExtremeValues) {
+  RunGetProjSubspaceTest_ExtremeValues();
+}
+
+TEST_P(GetProjSubspaceTest, DISABLED_Speed) { RunGetProjSubspaceTest(200000); }
+
+#if HAVE_AVX2
+
+INSTANTIATE_TEST_CASE_P(AVX2, GetProjSubspaceTest,
+                        ::testing::Values(av1_calc_proj_params_avx2));
+#endif  // HAVE_AVX2
+
+}  // namespace get_proj_subspace_test_lowbd
 #endif  // CONFIG_AV1_HIGHBITDEPTH

@@ -25,47 +25,47 @@ get_library_name() {
         4) echo "gnutls" ;;
         5) echo "lame" ;;
         6) echo "libass" ;;
-        7) echo "libiconv" ;;
-        8) echo "libtheora" ;;
-        9) echo "libvorbis" ;;
-        10) echo "libvpx" ;;
-        11) echo "libwebp" ;;
-        12) echo "libxml2" ;;
-        13) echo "opencore-amr" ;;
-        14) echo "shine" ;;
-        15) echo "speex" ;;
-        16) echo "wavpack" ;;
-        17) echo "kvazaar" ;;
-        18) echo "x264" ;;
-        19) echo "xvidcore" ;;
-        20) echo "x265" ;;
-        21) echo "libvidstab" ;;
-        22) echo "libilbc" ;;
-        23) echo "opus" ;;
-        24) echo "snappy" ;;
-        25) echo "soxr" ;;
-        26) echo "libaom" ;;
-        27) echo "chromaprint" ;;
-        28) echo "twolame" ;;
-        29) echo "sdl" ;;
-        30) echo "tesseract" ;;
-        31) echo "openh264" ;;
-        32) echo "giflib" ;;
-        33) echo "jpeg" ;;
-        34) echo "libogg" ;;
-        35) echo "libpng" ;;
-        36) echo "libuuid" ;;
-        37) echo "nettle" ;;
-        38) echo "tiff" ;;
-        39) echo "expat" ;;
-        40) echo "libsndfile" ;;
-        41) echo "leptonica" ;;
-        42) echo "ios-zlib" ;;
-        43) echo "ios-audiotoolbox" ;;
-        44) echo "ios-coreimage" ;;
-        45) echo "ios-bzip2" ;;
-        46) echo "ios-videotoolbox" ;;
-        47) echo "ios-avfoundation" ;;
+        7) echo "libtheora" ;;
+        8) echo "libvorbis" ;;
+        9) echo "libvpx" ;;
+        10) echo "libwebp" ;;
+        11) echo "libxml2" ;;
+        12) echo "opencore-amr" ;;
+        13) echo "shine" ;;
+        14) echo "speex" ;;
+        15) echo "wavpack" ;;
+        16) echo "kvazaar" ;;
+        17) echo "x264" ;;
+        18) echo "xvidcore" ;;
+        19) echo "x265" ;;
+        20) echo "libvidstab" ;;
+        21) echo "libilbc" ;;
+        22) echo "opus" ;;
+        23) echo "snappy" ;;
+        24) echo "soxr" ;;
+        25) echo "libaom" ;;
+        26) echo "chromaprint" ;;
+        27) echo "twolame" ;;
+        28) echo "sdl" ;;
+        29) echo "tesseract" ;;
+        30) echo "openh264" ;;
+        31) echo "giflib" ;;
+        32) echo "jpeg" ;;
+        33) echo "libogg" ;;
+        34) echo "libpng" ;;
+        35) echo "libuuid" ;;
+        36) echo "nettle" ;;
+        37) echo "tiff" ;;
+        38) echo "expat" ;;
+        39) echo "libsndfile" ;;
+        40) echo "leptonica" ;;
+        41) echo "ios-zlib" ;;
+        42) echo "ios-audiotoolbox" ;;
+        43) echo "ios-coreimage" ;;
+        44) echo "ios-bzip2" ;;
+        45) echo "ios-videotoolbox" ;;
+        46) echo "ios-avfoundation" ;;
+        47) echo "ios-libiconv" ;;
     esac
 }
 
@@ -73,21 +73,21 @@ get_package_config_file_name() {
     case $1 in
         1) echo "freetype2" ;;
         5) echo "libmp3lame" ;;
-        8) echo "theora" ;;
-        9) echo "vorbis" ;;
-        10) echo "vpx" ;;
-        12) echo "libxml-2.0" ;;
-        13) echo "opencore-amrnb" ;;
-        21) echo "vidstab" ;;
-        26) echo "aom" ;;
-        27) echo "libchromaprint" ;;
-        29) echo "sdl2" ;;
-        33) echo "libjpeg" ;;
-        34) echo "ogg" ;;
-        36) echo "uuid" ;;
-        38) echo "libtiff-4" ;;
-        40) echo "sndfile" ;;
-        41) echo "lept" ;;
+        7) echo "theora" ;;
+        8) echo "vorbis" ;;
+        9) echo "vpx" ;;
+        11) echo "libxml-2.0" ;;
+        12) echo "opencore-amrnb" ;;
+        20) echo "vidstab" ;;
+        25) echo "aom" ;;
+        26) echo "libchromaprint" ;;
+        28) echo "sdl2" ;;
+        32) echo "libjpeg" ;;
+        33) echo "ogg" ;;
+        35) echo "uuid" ;;
+        37) echo "libtiff-4" ;;
+        39) echo "sndfile" ;;
+        40) echo "lept" ;;
         *) echo $(get_library_name $1)
     esac
 }
@@ -100,20 +100,20 @@ get_static_archive_name() {
     case $1 in
         5) echo "libmp3lame.a" ;;
         6) echo "libass.a" ;;
-        10) echo "libvpx.a" ;;
-        12) echo "libxml2.a" ;;
-        21) echo "libvidstab.a" ;;
-        22) echo "libilbc.a" ;;
-        26) echo "libaom.a" ;;
-        28) echo "libtwolame.a" ;;
-        29) echo "libSDL2.a" ;;
-        30) echo "libtesseract.a" ;;
-        32) echo "libgif.a" ;;
-        34) echo "libogg.a" ;;
-        35) echo "libpng.a" ;;
-        36) echo "libuuid.a" ;;
-        40) echo "libsndfile.a" ;;
-        41) echo "liblept.a" ;;
+        9) echo "libvpx.a" ;;
+        11) echo "libxml2.a" ;;
+        20) echo "libvidstab.a" ;;
+        21) echo "libilbc.a" ;;
+        25) echo "libaom.a" ;;
+        27) echo "libtwolame.a" ;;
+        28) echo "libSDL2.a" ;;
+        29) echo "libtesseract.a" ;;
+        31) echo "libgif.a" ;;
+        33) echo "libogg.a" ;;
+        34) echo "libpng.a" ;;
+        35) echo "libuuid.a" ;;
+        39) echo "libsndfile.a" ;;
+        40) echo "liblept.a" ;;
         *) echo lib$(get_library_name $1).a
     esac
 }
@@ -615,10 +615,10 @@ EOF
 }
 
 create_libiconv_package_config() {
-    local LIB_ICONV_VERSION="$1"
+    local LIB_ICONV_VERSION=$(grep '_LIBICONV_VERSION' ${SDK_PATH}/usr/include/iconv.h | grep -Eo '0x.*' | grep -Eo '.*    ')
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/libiconv.pc" << EOF
-prefix=${BASEDIR}/prebuilt/$(get_target_build_directory)/libiconv
+prefix=${SDK_PATH}/usr
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
@@ -923,20 +923,20 @@ download_gpl_library_source() {
             GPL_LIB_DEST_DIR="libvidstab"
         ;;
         x264)
-            GPL_LIB_URL="ftp://ftp.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-20191024-2245-stable.tar.bz2"
-            GPL_LIB_FILE="x264-snapshot-20191024-2245-stable.tar.bz2"
-            GPL_LIB_ORIG_DIR="x264-snapshot-20191024-2245-stable"
+            GPL_LIB_URL="https://code.videolan.org/videolan/x264/-/archive/1771b556ee45207f8711744ccbd5d42a3949b14c/x264-1771b556ee45207f8711744ccbd5d42a3949b14c.tar.bz2"
+            GPL_LIB_FILE="x264-1771b556ee45207f8711744ccbd5d42a3949b14c.tar.bz2"
+            GPL_LIB_ORIG_DIR="x264-1771b556ee45207f8711744ccbd5d42a3949b14c"
             GPL_LIB_DEST_DIR="x264"
         ;;
         x265)
-            GPL_LIB_URL="https://bitbucket.org/multicoreware/x265/downloads/x265_3.2.tar.gz"
+            GPL_LIB_URL="https://bitbucket.org/multicoreware/x265/downloads/x265_3.2.1.tar.gz"
             GPL_LIB_FILE="x265-3.2.tar.gz"
-            GPL_LIB_ORIG_DIR="x265_3.2"
+            GPL_LIB_ORIG_DIR="x265_3.2.1"
             GPL_LIB_DEST_DIR="x265"
         ;;
         xvidcore)
-            GPL_LIB_URL="https://downloads.xvid.com/downloads/xvidcore-1.3.5.tar.gz"
-            GPL_LIB_FILE="xvidcore-1.3.5.tar.gz"
+            GPL_LIB_URL="https://downloads.xvid.com/downloads/xvidcore-1.3.7.tar.gz"
+            GPL_LIB_FILE="xvidcore-1.3.7.tar.gz"
             GPL_LIB_ORIG_DIR="xvidcore"
             GPL_LIB_DEST_DIR="xvidcore"
         ;;
@@ -1067,6 +1067,7 @@ set_toolchain_clang_paths() {
     export INSTALL_PKG_CONFIG_DIR="${BASEDIR}/prebuilt/$(get_target_build_directory)/pkgconfig"
     export ZLIB_PACKAGE_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}/zlib.pc"
     export BZIP2_PACKAGE_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}/bzip2.pc"
+    export LIB_ICONV_PACKAGE_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}/libiconv.pc"
 
     if [ ! -d ${INSTALL_PKG_CONFIG_DIR} ]; then
         mkdir -p ${INSTALL_PKG_CONFIG_DIR}
@@ -1074,6 +1075,10 @@ set_toolchain_clang_paths() {
 
     if [ ! -f ${ZLIB_PACKAGE_CONFIG_PATH} ]; then
         create_zlib_package_config
+    fi
+
+    if [ ! -f ${LIB_ICONV_PACKAGE_CONFIG_PATH} ]; then
+        create_libiconv_package_config
     fi
 
     if [ ! -f ${BZIP2_PACKAGE_CONFIG_PATH} ]; then

@@ -15,7 +15,7 @@
 #include "imageio/imageio_util.h"
 #include "../examples/unicode.h"
 
-int main(int argc, const char *argv[]) {
+int main(int argc, const char* argv[]) {
   int c;
   int quiet = 0;
   int ok = 1;

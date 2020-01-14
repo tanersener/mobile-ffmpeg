@@ -682,8 +682,8 @@ isCCITTCompression(TIFF* tif)
 
 static	tsize_t tf_bytesperrow;
 static	tsize_t ps_bytesperrow;
-static	tsize_t	tf_rowsperstrip;
-static	tsize_t	tf_numberstrips;
+static	uint32	tf_rowsperstrip;
+static	uint32	tf_numberstrips;
 static	char *hex = "0123456789abcdef";
 
 /*
@@ -1798,7 +1798,7 @@ PS_Lvl2ImageDict(FILE* fd, TIFF* tif, uint32 w, uint32 h)
 	int use_rawdata;
 	uint32 tile_width, tile_height;
 	uint16 predictor, minsamplevalue, maxsamplevalue;
-	int repeat_count;
+	uint32 repeat_count;
 	char im_h[64], im_x[64], im_y[64];
 	char * imageOp = "image";
 
@@ -1850,7 +1850,7 @@ PS_Lvl2ImageDict(FILE* fd, TIFF* tif, uint32 w, uint32 h)
 	fputs("{ % exec\n", fd);
 
 	if (repeat_count > 1)
-		fprintf(fd, "%d { %% repeat\n", repeat_count);
+		fprintf(fd, "%u { %% repeat\n", repeat_count);
 
 	/*
 	 * Output filter options and image dictionary.
@@ -2264,7 +2264,7 @@ PS_Lvl2page(FILE* fd, TIFF* tif, uint32 w, uint32 h)
 		if (alpha) {
 			int adjust, i, j = 0;
 			int ncomps = samplesperpixel - extrasamples;
-			for (i = 0; i < byte_count; i+=samplesperpixel) {
+			for (i = 0; (i + ncomps) < byte_count; i+=samplesperpixel) {
 				adjust = 255 - buf_data[i + ncomps];
 				switch (ncomps) {
 					case 1:
@@ -2444,9 +2444,9 @@ PSDataColorContig(FILE* fd, TIFF* tif, uint32 w, uint32 h, int nc)
 	unsigned char *cp, c;
 
 	(void) w;
-        if( es <= 0 )
+        if( es < 0 )
         {
-            TIFFError(filename, "Inconsistent value of es: %d", es);
+            TIFFError(filename, "Inconsistent value of es: %d (samplesperpixel=%u, nc=%d)", es, samplesperpixel, nc);
             return;
         }
 	tf_buf = (unsigned char *) _TIFFmalloc(tf_bytesperrow);
@@ -2468,7 +2468,7 @@ PSDataColorContig(FILE* fd, TIFF* tif, uint32 w, uint32 h, int nc)
 		if (alpha) {
 			int adjust;
 			cc = 0;
-			for (; cc < tf_bytesperrow; cc += samplesperpixel) {
+			for (; (cc + nc) <= tf_bytesperrow; cc += samplesperpixel) {
 				DOBREAK(breaklen, nc, fd);
 				/*
 				 * For images with alpha, matte against
@@ -2487,7 +2487,7 @@ PSDataColorContig(FILE* fd, TIFF* tif, uint32 w, uint32 h, int nc)
 			}
 		} else {
 			cc = 0;
-			for (; cc < tf_bytesperrow; cc += samplesperpixel) {
+			for (; (cc + nc) <= tf_bytesperrow; cc += samplesperpixel) {
 				DOBREAK(breaklen, nc, fd);
 				switch (nc) {
 				case 4: c = *cp++; PUTHEX(c,fd);
@@ -2766,7 +2766,7 @@ PSRawDataBW(FILE* fd, TIFF* tif, uint32 w, uint32 h)
 
 	bufsize = (uint32) bc[0];
 
-	for ( s = 0; ++s < (tstrip_t)tf_numberstrips; ) {
+	for ( s = 0; ++s < tf_numberstrips; ) {
 		if ( bc[s] > bufsize )
 			bufsize = (uint32) bc[s];
 	}
@@ -2799,7 +2799,7 @@ PSRawDataBW(FILE* fd, TIFF* tif, uint32 w, uint32 h)
 	}
 #endif
 
-	for (s = 0; s < (tstrip_t) tf_numberstrips; s++) {
+	for (s = 0; s < tf_numberstrips; s++) {
 		cc = TIFFReadRawStrip(tif, s, tf_buf, (tmsize_t) bc[s]);
 		if (cc < 0) {
 			TIFFError(filename, "Can't read strip");
@@ -2966,10 +2966,10 @@ tsize_t Ascii85EncodeBlock( uint8 * ascii85_p, unsigned f_eod, const uint8 * raw
 
         for ( ; raw_l > 3; raw_l -= 4 )
         {
-            val32  = *(++raw_p) << 24;
-            val32 += *(++raw_p) << 16;
-            val32 += *(++raw_p) <<  8;
-            val32 += *(++raw_p);
+            val32  = (uint32)*(++raw_p) << 24;
+            val32 += (uint32)*(++raw_p) << 16;
+            val32 += (uint32)*(++raw_p) <<  8;
+            val32 += (uint32)*(++raw_p);
     
             if ( val32 == 0 )                   /* Special case */
             {

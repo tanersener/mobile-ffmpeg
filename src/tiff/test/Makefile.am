@@ -34,6 +34,7 @@ TESTS_ENVIRONMENT = \
 	MEMCHECK="$(MEMCHECK)"
 
 EXTRA_DIST = \
+	$(REFFILES) \
 	$(TESTSCRIPTS) \
 	$(IMAGES_EXTRA_DIST) \
 	CMakeLists.txt \
@@ -63,6 +64,7 @@ endif
 # Executable programs which need to be built in order to support tests
 check_PROGRAMS = \
 	ascii_tag long_tag short_tag strip_rw rewrite custom_dir \
+	defer_strile_loading defer_strile_writing testtypes \
 	$(JPEG_DEPENDENT_CHECK_PROG)
 
 # Test scripts to execute
@@ -70,6 +72,7 @@ TESTSCRIPTS = \
 	ppm2tiff_pbm.sh \
 	ppm2tiff_pgm.sh \
 	ppm2tiff_ppm.sh \
+	fax2tiff.sh \
 	tiffcp-g3.sh \
 	tiffcp-g3-1d.sh \
 	tiffcp-g3-1d-fill.sh \
@@ -144,6 +147,14 @@ TESTSCRIPTS = \
 	tiff2rgba-rgb-3c-8b.sh \
 	$(JPEG_DEPENDENT_TESTSCRIPTS)
 
+# This list should contain the references files
+# from the 'refs' subdirectory
+REFFILES = \
+	refs/o-tiff2ps-EPS1.ps \
+	refs/o-tiff2ps-PS1.ps \
+	refs/o-tiff2ps-PS2.ps \
+	refs/o-tiff2ps-PS3.ps
+
 # This list should contain all of the TIFF files in the 'images'
 # subdirectory which are intended to be used as input images for
 # tests.  All of these files should use the extension ".tiff".
@@ -172,6 +183,7 @@ PNMIMAGES = \
 # files which are not currently used by the tests.
 IMAGES_EXTRA_DIST = \
 	images/README.txt \
+	images/miniswhite-1c-1b.g3 \
 	$(PNMIMAGES) \
 	$(TIFFIMAGES)
 
@@ -191,6 +203,10 @@ raw_decode_SOURCES = raw_decode.c
 raw_decode_LDADD = $(LIBTIFF)
 custom_dir_SOURCES = custom_dir.c
 custom_dir_LDADD = $(LIBTIFF)
+defer_strile_loading_SOURCES = defer_strile_loading.c
+defer_strile_loading_LDADD = $(LIBTIFF)
+defer_strile_writing_SOURCES = defer_strile_writing.c
+defer_strile_writing_LDADD = $(LIBTIFF)
 
 AM_CPPFLAGS = -I$(top_srcdir)/libtiff
 

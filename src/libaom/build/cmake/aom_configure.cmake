@@ -291,7 +291,7 @@ else()
     add_c_flag_if_supported("-Wstack-usage=170000")
     add_cxx_flag_if_supported("-Wstack-usage=270000")
   elseif(CONFIG_RD_DEBUG) # Another case where higher stack usage is expected.
-    add_c_flag_if_supported("-Wstack-usage=111000")
+    add_c_flag_if_supported("-Wstack-usage=117000")
     add_cxx_flag_if_supported("-Wstack-usage=240000")
   else()
     add_c_flag_if_supported("-Wstack-usage=100000")

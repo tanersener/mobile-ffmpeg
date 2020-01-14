@@ -382,6 +382,15 @@ if(CONFIG_AV1_ENCODER)
   # Add encoder examples and tools to the targets list.
   list(APPEND AOM_APP_TARGETS ${AOM_ENCODER_EXAMPLE_TARGETS}
               ${AOM_ENCODER_TOOL_TARGETS})
+
+  if(CONFIG_TUNE_VMAF)
+    find_library(VMAF libvmaf.a vmaf)
+    if(NOT VMAF)
+      message(FATAL_ERROR "VMAF library not found.")
+    endif()
+    message("-- Found VMAF library: " ${VMAF})
+    target_link_libraries(aom PRIVATE ${VMAF} -static)
+  endif()
 endif()
 
 if(ENABLE_EXAMPLES)

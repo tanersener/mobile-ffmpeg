@@ -451,7 +451,7 @@ static int main_loop(int argc, const char **argv_) {
   int opt_yv12 = 0;
   int opt_i420 = 0;
   int opt_raw = 0;
-  aom_codec_dec_cfg_t cfg = { 0, 0, 0, !FORCE_HIGHBITDEPTH_DECODING, { 1 } };
+  aom_codec_dec_cfg_t cfg = { 0, 0, 0, !FORCE_HIGHBITDEPTH_DECODING };
   unsigned int fixed_output_bit_depth = 0;
   unsigned int is_annexb = 0;
   int frames_corrupted = 0;
@@ -628,6 +628,7 @@ static int main_loop(int argc, const char **argv_) {
 #if !CONFIG_WEBM_IO
     fprintf(stderr, "aomdec was built without WebM container support.\n");
 #endif
+    free(argv);
     return EXIT_FAILURE;
   }
 

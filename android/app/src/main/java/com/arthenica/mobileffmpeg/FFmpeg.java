@@ -19,18 +19,14 @@
 
 package com.arthenica.mobileffmpeg;
 
-import android.util.Log;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * <p>Main class for FFmpeg operations. Provides {@link #execute(String...)} method to execute
  * FFmpeg commands.
  * <pre>
- *      int rc = FFmpeg.execute("-i", "file1.mp4", "-c:v", "libxvid", "file1.avi");
+ *      int rc = FFmpeg.execute("-i file1.mp4 -c:v libxvid file1.avi");
  *      Log.i(Config.TAG, String.format("Command execution %s.", (rc == 0?"completed successfully":"failed with rc=" + rc));
  * </pre>
  *
@@ -38,16 +34,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @since v1.0
  */
 public class FFmpeg {
-
-    public static final int RETURN_CODE_SUCCESS = 0;
-
-    public static final int RETURN_CODE_CANCEL = 255;
-
-    public static final int RETURN_CODE_MULTIPLE_EXECUTIONS_NOT_ALLOWED = 300;
-
-    private static int lastReturnCode = 0;
-
-    private static final AtomicBoolean started = new AtomicBoolean(false);
 
     static {
         AbiDetect.class.getName();
@@ -61,41 +47,15 @@ public class FFmpeg {
     }
 
     /**
-     * <p>Returns FFmpeg version bundled within the library.
-     *
-     * @return FFmpeg version
-     */
-    public static String getFFmpegVersion() {
-        return Config.getNativeFFmpegVersion();
-    }
-
-    /**
-     * <p>Returns MobileFFmpeg library version.
-     *
-     * @return MobileFFmpeg version
-     */
-    public static String getVersion() {
-        if (AbiDetect.isNativeLTSBuild()) {
-            return String.format("%s-lts", Config.getNativeVersion());
-        } else {
-            return Config.getNativeVersion();
-        }
-    }
-
-    /**
      * <p>Synchronously executes FFmpeg with arguments provided.
      *
      * @param arguments FFmpeg command options/arguments as string array
      * @return zero on successful execution, 255 on user cancel and non-zero on error
      */
     public static int execute(final String[] arguments) {
-        if (started.compareAndSet(false, true)) {
-            lastReturnCode = Config.nativeExecute(arguments);
-            started.compareAndSet(true, false);
-        } else {
-            Log.e(Config.TAG, "execute cancelled. Multiple executions not supported.");
-            lastReturnCode = RETURN_CODE_MULTIPLE_EXECUTIONS_NOT_ALLOWED;
-        }
+        final int lastReturnCode = Config.nativeFFmpegExecute(arguments);
+
+        Config.setLastReturnCode(lastReturnCode);
 
         return lastReturnCode;
     }
@@ -118,7 +78,8 @@ public class FFmpeg {
 
     /**
      * <p>Synchronously executes FFmpeg command provided. Space character is used to split command
-     * into arguments.
+     * into arguments. You can use single and double quote characters to specify arguments inside
+     * your command.
      *
      * @param command FFmpeg command
      * @return zero on successful execution, 255 on user cancel and non-zero on error
@@ -132,89 +93,7 @@ public class FFmpeg {
      * returns immediately.
      */
     public static void cancel() {
-        Config.nativeCancel();
-    }
-
-    /**
-     * <p>Returns return code of last executed command.
-     *
-     * @return return code of last executed command
-     * @since 3.0
-     */
-    public static int getLastReturnCode() {
-        return lastReturnCode;
-    }
-
-    /**
-     * <p>Returns log output of the last executed command. Please note that disabling redirection
-     * using {@link Config#disableRedirection()} method also disables this functionality.
-     *
-     * @return output of the last executed command
-     * @since 3.0
-     */
-    public static String getLastCommandOutput() {
-        String nativeLastCommandOutput = Config.getNativeLastCommandOutput();
-        if (nativeLastCommandOutput != null) {
-
-            // REPLACING CH(13) WITH CH(10)
-            nativeLastCommandOutput = nativeLastCommandOutput.replace('\r', '\n');
-        }
-        return nativeLastCommandOutput;
-    }
-
-    /**
-     * <p>Returns media information for given file.
-     *
-     * @param path path or uri of media file
-     * @return media information
-     * @since 3.0
-     */
-    public static MediaInformation getMediaInformation(final String path) {
-        return getMediaInformation(path, 10000L);
-    }
-
-    /**
-     * <p>Returns media information for given file.
-     *
-     * @param path    path or uri of media file
-     * @param timeout complete timeout
-     * @return media information
-     * @since 3.0
-     */
-    public static MediaInformation getMediaInformation(final String path, final Long timeout) {
-        final int rc;
-        if (started.compareAndSet(false, true)) {
-            rc = Config.systemExecute(new String[]{"-v", "info", "-hide_banner", "-i", path}, new ArrayList<>(Arrays.asList("Press [q] to stop, [?] for help", "No such file or directory", "Input/output error", "Conversion failed", "HTTP error")), "At least one output file must be specified", timeout);
-            started.compareAndSet(true, false);
-        } else {
-            Log.e(Config.TAG, "getMediaInformation cancelled. Multiple executions not supported.");
-            rc = RETURN_CODE_MULTIPLE_EXECUTIONS_NOT_ALLOWED;
-        }
-
-        if (rc == 0) {
-            return MediaInformationParser.from(Config.getSystemCommandOutput());
-        } else {
-            Log.i(Config.TAG, Config.getSystemCommandOutput());
-            return null;
-        }
-    }
-
-    /**
-     * <p>Returns whether MobileFFmpeg release is a long term release or not.
-     *
-     * @return YES or NO
-     */
-    public static boolean isLTSBuild() {
-        return AbiDetect.isNativeLTSBuild();
-    }
-
-    /**
-     * <p>Returns MobileFFmpeg library build date.
-     *
-     * @return MobileFFmpeg library build date
-     */
-    public static String getBuildDate() {
-        return Config.getNativeBuildDate();
+        Config.nativeFFmpegCancel();
     }
 
     /**
@@ -272,34 +151,6 @@ public class FFmpeg {
         }
 
         return argumentList.toArray(new String[0]);
-    }
-
-    /**
-     * <p>Prints the output of the last executed command to the logcat at the specified priority.
-     *
-     * @param logPriority one of {@link Log#VERBOSE}, {@link Log#DEBUG}, {@link Log#INFO},
-     *                    {@link Log#WARN}, {@link Log#ERROR}, {@link Log#ASSERT}
-     * @since 4.3
-     */
-    public static void printLastCommandOutput(int logPriority) {
-        final int LOGGER_ENTRY_MAX_LEN = 4 * 1000;
-
-        String buffer = FFmpeg.getLastCommandOutput();
-        do {
-            if (buffer.length() <= LOGGER_ENTRY_MAX_LEN) {
-                Log.println(logPriority, Config.TAG, buffer);
-                buffer = "";
-            } else {
-                final int index = buffer.substring(0, LOGGER_ENTRY_MAX_LEN).lastIndexOf('\n');
-                if (index < 0) {
-                    Log.println(logPriority, Config.TAG, buffer.substring(0, LOGGER_ENTRY_MAX_LEN));
-                    buffer = buffer.substring(LOGGER_ENTRY_MAX_LEN);
-                } else {
-                    Log.println(logPriority, Config.TAG, buffer.substring(0, index));
-                    buffer = buffer.substring(index);
-                }
-            }
-        } while (buffer.length() > 0);
     }
 
 }

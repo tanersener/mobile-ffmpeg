@@ -37,7 +37,7 @@ CYCLIC_REFRESH *av1_cyclic_refresh_alloc(int mi_rows, int mi_cols) {
   }
   assert(MAXQ <= 255);
   memset(cr->last_coded_q_map, MAXQ, last_coded_q_map_size);
-
+  cr->avg_frame_low_motion = 0.0;
   return cr;
 }
 
@@ -206,36 +206,49 @@ void av1_cyclic_refresh_update_segment(const AV1_COMP *cpi,
     }
 }
 
-// Update the actual number of blocks that were applied the segment delta q.
+// Update the some stats after encode frame is done.
 void av1_cyclic_refresh_postencode(AV1_COMP *const cpi) {
   AV1_COMMON *const cm = &cpi->common;
   CYCLIC_REFRESH *const cr = cpi->cyclic_refresh;
   unsigned char *const seg_map = cpi->segmentation_map;
+  cr->cnt_zeromv = 0;
   cr->actual_num_seg1_blocks = 0;
   cr->actual_num_seg2_blocks = 0;
-  for (int mi_row = 0; mi_row < cm->mi_rows; mi_row++)
+  for (int mi_row = 0; mi_row < cm->mi_rows; mi_row++) {
     for (int mi_col = 0; mi_col < cm->mi_cols; mi_col++) {
-      if (cyclic_refresh_segment_id(seg_map[mi_row * cm->mi_cols + mi_col]) ==
-          CR_SEGMENT_ID_BOOST1)
-        cr->actual_num_seg1_blocks++;
-      else if (cyclic_refresh_segment_id(
-                   seg_map[mi_row * cm->mi_cols + mi_col]) ==
-               CR_SEGMENT_ID_BOOST2)
-        cr->actual_num_seg2_blocks++;
+      MB_MODE_INFO **mi = cm->mi_grid_base + mi_row * cm->mi_stride + mi_col;
+      MV mv = mi[0]->mv[0].as_mv;
+      if (cm->seg.enabled) {
+        int map_index = mi_row * cm->mi_cols + mi_col;
+        if (cyclic_refresh_segment_id(seg_map[map_index]) ==
+            CR_SEGMENT_ID_BOOST1)
+          cr->actual_num_seg1_blocks++;
+        else if (cyclic_refresh_segment_id(seg_map[map_index]) ==
+                 CR_SEGMENT_ID_BOOST2)
+          cr->actual_num_seg2_blocks++;
+      }
+      // Accumulate low_content_frame.
+      if (is_inter_block(mi[0]) && abs(mv.row) < 16 && abs(mv.col) < 16)
+        cr->cnt_zeromv++;
     }
+  }
+  cr->cnt_zeromv = 100 * cr->cnt_zeromv / (cm->mi_rows * cm->mi_cols);
+  cr->avg_frame_low_motion =
+      (3 * cr->avg_frame_low_motion + (double)cr->cnt_zeromv) / 4;
 }
 
 // Set golden frame update interval, for 1 pass CBR mode.
 void av1_cyclic_refresh_set_golden_update(AV1_COMP *const cpi) {
   RATE_CONTROL *const rc = &cpi->rc;
   CYCLIC_REFRESH *const cr = cpi->cyclic_refresh;
-  // Set minimum gf_interval for GF update to a multiple (== 2) of refresh
-  // period. Depending on past encoding stats, GF flag may be reset and update
-  // may not occur until next baseline_gf_interval.
+  // Set minimum gf_interval for GF update to a multiple of the refresh period,
+  // with some max limit. Depending on past encoding stats, GF flag may be
+  // reset and update may not occur until next baseline_gf_interval.
   if (cr->percent_refresh > 0)
-    rc->baseline_gf_interval = 2 * (100 / cr->percent_refresh);
+    rc->baseline_gf_interval = AOMMIN(2 * (100 / cr->percent_refresh), 40);
   else
     rc->baseline_gf_interval = 20;
+  if (cr->avg_frame_low_motion < 40) rc->baseline_gf_interval = 8;
 }
 
 // Update the segmentation map, and related quantities: cyclic refresh map,
@@ -332,7 +345,8 @@ void av1_cyclic_refresh_update_parameters(AV1_COMP *const cpi) {
       cpi->svc.temporal_layer_id > 0 ||
       rc->avg_frame_qindex[INTER_FRAME] < qp_thresh ||
       (rc->frames_since_key > 20 &&
-       rc->avg_frame_qindex[INTER_FRAME] > qp_max_thresh)) {
+       rc->avg_frame_qindex[INTER_FRAME] > qp_max_thresh) ||
+      (cr->avg_frame_low_motion < 45 && rc->frames_since_key > 40)) {
     cr->apply_cyclic_refresh = 0;
     return;
   }

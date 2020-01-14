@@ -286,6 +286,7 @@ int main(int argc, char **argv) {
   printf("Decoding tile list from file.\n");
   char line[1024];
   FILE *tile_list_fptr = fopen(tile_list_file, "r");
+  if (!tile_list_fptr) die_codec(&codec, "Failed to open tile list file.");
   int tile_list_cnt = 0;
   int tile_list_writes = 0;
   int tile_idx = 0;

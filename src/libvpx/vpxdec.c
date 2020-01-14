@@ -722,6 +722,7 @@ static int main_loop(int argc, const char **argv_) {
 #if !CONFIG_WEBM_IO
     fprintf(stderr, "vpxdec was built without WebM container support.\n");
 #endif
+    free(argv);
     return EXIT_FAILURE;
   }
 

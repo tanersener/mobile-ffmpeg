@@ -1,7 +1,6 @@
 /sys/
-/.libs/
+*.la
 /Makefile
-/libunistring.la
 /limits.h
 /stdint.h
 /unictype.h

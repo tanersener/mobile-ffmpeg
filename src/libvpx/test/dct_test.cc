@@ -514,7 +514,7 @@ INSTANTIATE_TEST_CASE_P(
         ::testing::Values(VPX_BITS_8, VPX_BITS_10, VPX_BITS_12)));
 #endif  // HAVE_SSE2
 
-#if HAVE_SSSE3 && !CONFIG_VP9_HIGHBITDEPTH && ARCH_X86_64
+#if HAVE_SSSE3 && !CONFIG_VP9_HIGHBITDEPTH && VPX_ARCH_X86_64
 // vpx_fdct8x8_ssse3 is only available in 64 bit builds.
 static const FuncInfo dct_ssse3_func_info = {
   &fdct_wrapper<vpx_fdct8x8_ssse3>, &idct_wrapper<vpx_idct8x8_64_add_sse2>, 8, 1
@@ -524,7 +524,7 @@ static const FuncInfo dct_ssse3_func_info = {
 INSTANTIATE_TEST_CASE_P(SSSE3, TransDCT,
                         ::testing::Values(make_tuple(0, &dct_ssse3_func_info, 0,
                                                      VPX_BITS_8)));
-#endif  // HAVE_SSSE3 && !CONFIG_VP9_HIGHBITDEPTH && ARCH_X86_64
+#endif  // HAVE_SSSE3 && !CONFIG_VP9_HIGHBITDEPTH && VPX_ARCH_X86_64
 
 #if HAVE_AVX2 && !CONFIG_VP9_HIGHBITDEPTH
 static const FuncInfo dct_avx2_func_info = {

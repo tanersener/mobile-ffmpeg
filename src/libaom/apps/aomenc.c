@@ -158,11 +158,7 @@ static const arg_def_t verbosearg =
     ARG_DEF("v", "verbose", 0, "Show encoder parameters");
 static const arg_def_t psnrarg =
     ARG_DEF(NULL, "psnr", 0, "Show PSNR in status line");
-#if CONFIG_FILEOPTIONS
 static const arg_def_t use_cfg = ARG_DEF("c", "cfg", 1, "Config file to use");
-static const arg_def_t ext_partition =
-    ARG_DEF(NULL, "ext-partition", 1, "corresponds to extended partitions");
-#endif
 
 static const struct arg_enum_list test_decode_enum[] = {
   { "off", TEST_DECODE_OFF },
@@ -205,9 +201,7 @@ static const arg_def_t input_chroma_subsampling_y = ARG_DEF(
     NULL, "input-chroma-subsampling-y", 1, "chroma subsampling y value.");
 
 static const arg_def_t *main_args[] = { &help,
-#if CONFIG_FILEOPTIONS
                                         &use_cfg,
-#endif
                                         &debugmode,
                                         &outputfile,
                                         &codecarg,
@@ -240,9 +234,9 @@ static const arg_def_t profile =
 static const arg_def_t width = ARG_DEF("w", "width", 1, "Frame width");
 static const arg_def_t height = ARG_DEF("h", "height", 1, "Frame height");
 static const arg_def_t forced_max_frame_width = ARG_DEF(
-    NULL, "forced_max_frame_width", 0, "Maximum frame width value to force");
+    NULL, "forced_max_frame_width", 1, "Maximum frame width value to force");
 static const arg_def_t forced_max_frame_height = ARG_DEF(
-    NULL, "forced_max_frame_height", 0, "Maximum frame height value to force");
+    NULL, "forced_max_frame_height", 1, "Maximum frame height value to force");
 #if CONFIG_WEBM_IO
 static const struct arg_enum_list stereo_mode_enum[] = {
   { "mono", STEREO_FORMAT_MONO },
@@ -400,6 +394,8 @@ static const struct arg_enum_list tuning_enum[] = {
   { "cdef-dist", AOM_TUNE_CDEF_DIST },
   { "daala-dist", AOM_TUNE_DAALA_DIST },
 #endif
+  { "vmaf_with_preprocessing", AOM_TUNE_VMAF_WITH_PREPROCESSING },
+  { "vmaf_without_preprocessing", AOM_TUNE_VMAF_WITHOUT_PREPROCESSING },
   { NULL, 0 }
 };
 static const arg_def_t tune_metric =
@@ -422,7 +418,8 @@ static const arg_def_t tile_rows =
 static const arg_def_t enable_tpl_model =
     ARG_DEF(NULL, "enable-tpl-model", 1,
             "RDO based on frame temporal dependency "
-            "(0: off, 1: backward source based, 2: forward 2-pass");
+            "(0: off, 1: backward source based, 2: forward 2-pass). "
+            "This is required for deltaq mode.");
 static const arg_def_t enable_keyframe_filtering =
     ARG_DEF(NULL, "enable-keyframe-filtering", 1,
             "Apply temporal filtering on key frame "
@@ -455,7 +452,7 @@ static const arg_def_t enable_1to4_partitions =
 static const arg_def_t min_partition_size =
     ARG_DEF(NULL, "min-partition-size", 4,
             "Set min partition size "
-            "(4:4x4, 8:8x8, 16:16x16, 32:32x32, 64:64x64, 128:128x128)."
+            "(4:4x4, 8:8x8, 16:16x16, 32:32x32, 64:64x64, 128:128x128). "
             "On frame with 4k+ resolutions or higher speed settings, the min "
             "partition size will have a minimum of 8.");
 static const arg_def_t max_partition_size =
@@ -481,10 +478,6 @@ static const arg_def_t enable_order_hint =
 static const arg_def_t enable_tx64 =
     ARG_DEF(NULL, "enable-tx64", 1,
             "Enable 64-pt transform (0: false, 1: true (default))");
-static const arg_def_t tx_size_search_method =
-    ARG_DEF(NULL, "tx-size-search-method", 1,
-            "Set transform block size search method "
-            "(0: Full RD (default), 1: Fast RD, 2: use largest allowed)");
 static const arg_def_t enable_flip_idtx =
     ARG_DEF(NULL, "enable-flip-idtx", 1,
             "Enable extended transform type (0: false, 1: true (default)) "
@@ -621,6 +614,10 @@ static const arg_def_t timing_info =
                  "Signal timing info in the bitstream (model unly works for no "
                  "hidden frames, no super-res yet):",
                  timing_info_enum);
+#if CONFIG_TUNE_VMAF
+static const arg_def_t vmaf_model_path =
+    ARG_DEF(NULL, "vmaf-model-path", 1, "Path to the VMAF model file");
+#endif
 static const arg_def_t film_grain_test =
     ARG_DEF(NULL, "film-grain-test", 1,
             "Film grain test vectors (0: none (default), 1: test-1  2: test-2, "
@@ -652,8 +649,9 @@ static const arg_def_t aq_mode = ARG_DEF(
     "3: cyclic refresh)");
 static const arg_def_t deltaq_mode =
     ARG_DEF(NULL, "deltaq-mode", 1,
-            "Delta qindex mode (0: off, 1: deltaq pred efficiency (default), "
-            "2: deltaq perceptual)");
+            "Delta qindex mode (0: off, 1: deltaq objective (default), "
+            "2: deltaq perceptual). "
+            "Currently this requires enable-tpl-model as a prerequisite.");
 static const arg_def_t deltalf_mode = ARG_DEF(
     NULL, "delta-lf-mode", 1, "Enable delta-lf-mode (0: off (default), 1: on)");
 static const arg_def_t frame_periodic_boost =
@@ -833,7 +831,6 @@ static const arg_def_t *av1_args[] = { &cpu_used_av1,
                                        &enable_intra_edge_filter,
                                        &enable_order_hint,
                                        &enable_tx64,
-                                       &tx_size_search_method,
                                        &enable_flip_idtx,
                                        &enable_dist_wtd_comp,
                                        &enable_masked_comp,
@@ -909,6 +906,9 @@ static const arg_def_t *av1_args[] = { &cpu_used_av1,
                                        &sframe_dist,
                                        &sframe_mode,
                                        &save_as_annexb,
+#if CONFIG_TUNE_VMAF
+                                       &vmaf_model_path,
+#endif
                                        NULL };
 static const int av1_arg_ctrl_map[] = { AOME_SET_CPUUSED,
                                         AOME_SET_ENABLEAUTOALTREF,
@@ -939,7 +939,6 @@ static const int av1_arg_ctrl_map[] = { AOME_SET_CPUUSED,
                                         AV1E_SET_ENABLE_INTRA_EDGE_FILTER,
                                         AV1E_SET_ENABLE_ORDER_HINT,
                                         AV1E_SET_ENABLE_TX64,
-                                        AV1E_SET_TX_SIZE_SEARCH_METHOD,
                                         AV1E_SET_ENABLE_FLIP_IDTX,
                                         AV1E_SET_ENABLE_DIST_WTD_COMP,
                                         AV1E_SET_ENABLE_MASKED_COMP,
@@ -1008,6 +1007,9 @@ static const int av1_arg_ctrl_map[] = { AOME_SET_CPUUSED,
                                         AV1E_SET_TARGET_SEQ_LEVEL_IDX,
                                         AV1E_SET_TIER_MASK,
                                         AV1E_SET_MIN_CR,
+#if CONFIG_TUNE_VMAF
+                                        AV1E_SET_VMAF_MODEL_PATH,
+#endif
                                         0 };
 #endif  // CONFIG_AV1_ENCODER
 
@@ -1082,6 +1084,9 @@ struct stream_config {
   int write_ivf;
   // whether to use 16bit internal buffers
   int use_16bit_internal;
+#if CONFIG_TUNE_VMAF
+  const char *vmaf_model_path;
+#endif
 };
 
 struct stream_state {
@@ -1120,18 +1125,22 @@ static void validate_positive_rational(const char *msg,
   if (!rat->den) die("Error: %s has zero denominator\n", msg);
 }
 
+static void init_config(cfg_options_t *config) {
+  memset(config, 0, sizeof(cfg_options_t));
+  config->super_block_size = 0;  // Dynamic
+  config->max_partition_size = 128;
+  config->min_partition_size = 4;
+  config->disable_trellis_quant = 3;
+}
+
 /* Parses global config arguments into the AvxEncoderConfig. Note that
  * argv is modified and overwrites all parsed arguments.
  */
-static void parse_global_config(struct AvxEncoderConfig *global, int argc,
-                                char ***argv) {
+static void parse_global_config(struct AvxEncoderConfig *global, char ***argv) {
   char **argi, **argj;
   struct arg arg;
   const int num_encoder = get_aom_encoder_count();
   char **argv_local = (char **)*argv;
-#if CONFIG_FILEOPTIONS
-  int argc_local = argc;
-#endif
   if (num_encoder < 1) die("Error: no valid encoder available\n");
 
   /* Initialize default parameters */
@@ -1141,27 +1150,18 @@ static void parse_global_config(struct AvxEncoderConfig *global, int argc,
   global->color_type = I420;
   global->csp = AOM_CSP_UNKNOWN;
 
-#if CONFIG_FILEOPTIONS
-  const char *cfg = NULL;
   int cfg_included = 0;
-#endif
+  init_config(&global->encoder_config);
+
   for (argi = argj = argv_local; (*argj = *argi); argi += arg.argv_step) {
     arg.argv_step = 1;
 
-#if CONFIG_FILEOPTIONS
     if (arg_match(&arg, &use_cfg, argi)) {
       if (cfg_included) continue;
-      cfg = arg.val;
-
-      arg_cfg(&argc_local, &argv_local, cfg);
-
-      *argj = *argi = *argv_local;
-      argj = argi = argv_local;
-      *argv = argv_local;
+      parse_cfg(arg.val, &global->encoder_config);
       cfg_included = 1;
       continue;
     }
-#endif
     if (arg_match(&arg, &help, argi)) {
       show_help(stdout, 0);
       exit(EXIT_SUCCESS);
@@ -1353,6 +1353,8 @@ static struct stream_state *new_stream(struct AvxEncoderConfig *global,
 
     /* Allows removal of the application version from the EBML tags */
     stream->webm_ctx.debug = global->debug;
+    memcpy(&stream->config.cfg.encoder_cfg, &global->encoder_config,
+           sizeof(stream->config.cfg.encoder_cfg));
   }
 
   /* Output files must be specified for each stream */
@@ -1577,9 +1579,9 @@ static int parse_stream_params(struct AvxEncoderConfig *global,
     } else if (arg_match(&arg, &tile_height, argi)) {
       config->cfg.tile_height_count =
           arg_parse_list(&arg, config->cfg.tile_heights, MAX_TILE_HEIGHTS);
-#if CONFIG_FILEOPTIONS
-    } else if (arg_match(&arg, &ext_partition, argi)) {
-      config->cfg.cfg.ext_partition = !!arg_parse_uint(&arg) > 0;
+#if CONFIG_TUNE_VMAF
+    } else if (arg_match(&arg, &vmaf_model_path, argi)) {
+      config->vmaf_model_path = arg.val;
 #endif
     } else if (global->usage == AOM_USAGE_REALTIME &&
                arg_match(&arg, &enable_restoration, argi)) {
@@ -1744,6 +1746,44 @@ static void show_stream_config(struct stream_state *stream,
   SHOW(kf_mode);
   SHOW(kf_min_dist);
   SHOW(kf_max_dist);
+
+#define SHOW_PARAMS(field)                    \
+  fprintf(stderr, "    %-28s = %d\n", #field, \
+          stream->config.cfg.encoder_cfg.field)
+  SHOW_PARAMS(super_block_size);
+  SHOW_PARAMS(max_partition_size);
+  SHOW_PARAMS(min_partition_size);
+  SHOW_PARAMS(disable_ab_partition_type);
+  SHOW_PARAMS(disable_rect_partition_type);
+  SHOW_PARAMS(disable_1to4_partition_type);
+  SHOW_PARAMS(disable_flip_idtx);
+  SHOW_PARAMS(disable_cdef);
+  SHOW_PARAMS(disable_lr);
+  SHOW_PARAMS(disable_obmc);
+  SHOW_PARAMS(disable_warp_motion);
+  SHOW_PARAMS(disable_global_motion);
+  SHOW_PARAMS(disable_dist_wtd_comp);
+  SHOW_PARAMS(disable_diff_wtd_comp);
+  SHOW_PARAMS(disable_inter_intra_comp);
+  SHOW_PARAMS(disable_masked_comp);
+  SHOW_PARAMS(disable_one_sided_comp);
+  SHOW_PARAMS(disable_palette);
+  SHOW_PARAMS(disable_intrabc);
+  SHOW_PARAMS(disable_cfl);
+  SHOW_PARAMS(disable_smooth_intra);
+  SHOW_PARAMS(disable_filter_intra);
+  SHOW_PARAMS(disable_dual_filter);
+  SHOW_PARAMS(disable_intra_angle_delta);
+  SHOW_PARAMS(disable_intra_edge_filter);
+  SHOW_PARAMS(disable_tx_64x64);
+  SHOW_PARAMS(disable_smooth_inter_intra);
+  SHOW_PARAMS(disable_inter_inter_wedge);
+  SHOW_PARAMS(disable_inter_intra_wedge);
+  SHOW_PARAMS(disable_paeth_intra);
+  SHOW_PARAMS(disable_trellis_quant);
+  SHOW_PARAMS(disable_ref_frame_mv);
+  SHOW_PARAMS(reduced_reference_set);
+  SHOW_PARAMS(reduced_tx_type_set);
 }
 
 static void open_output_file(struct stream_state *stream,
@@ -1849,6 +1889,14 @@ static void initialize_encoder(struct stream_state *stream,
 
     ctx_exit_on_error(&stream->encoder, "Failed to control codec");
   }
+
+#if CONFIG_TUNE_VMAF
+  if (stream->config.vmaf_model_path) {
+    aom_codec_control_(&stream->encoder, AV1E_SET_VMAF_MODEL_PATH,
+                       stream->config.vmaf_model_path);
+  }
+#endif
+
   if (stream->config.film_grain_filename) {
     aom_codec_control_(&stream->encoder, AV1E_SET_FILM_GRAIN_TABLE,
                        stream->config.film_grain_filename);
@@ -1857,7 +1905,7 @@ static void initialize_encoder(struct stream_state *stream,
 #if CONFIG_AV1_DECODER
   if (global->test_decode != TEST_DECODE_OFF) {
     const AvxInterface *decoder = get_aom_decoder_by_name(global->codec->name);
-    aom_codec_dec_cfg_t cfg = { 0, 0, 0, !FORCE_HIGHBITDEPTH_DECODING, { 1 } };
+    aom_codec_dec_cfg_t cfg = { 0, 0, 0, !FORCE_HIGHBITDEPTH_DECODING };
     aom_codec_dec_init(&stream->decoder, decoder->codec_interface(), &cfg, 0);
 
     if (strcmp(global->codec->name, "av1") == 0) {
@@ -2195,13 +2243,9 @@ int main(int argc, const char **argv_) {
    * codec.
    */
   argv = argv_dup(argc - 1, argv_ + 1);
-  parse_global_config(&global, argc, &argv);
+  parse_global_config(&global, &argv);
 
-#if CONFIG_FILEOPTIONS
   if (argc < 2) usage_exit();
-#else
-  if (argc < 3) usage_exit();
-#endif
 
   switch (global.color_type) {
     case I420: input.fmt = AOM_IMG_FMT_I420; break;

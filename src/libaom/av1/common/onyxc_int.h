@@ -569,7 +569,6 @@ typedef struct AV1Common {
   int64_t txcoeff_cost_timer;
   int64_t txcoeff_cost_count;
 #endif
-  const cfg_options_t *options;
   int is_decoding;
 } AV1_COMMON;
 
@@ -845,6 +844,9 @@ static INLINE void set_mi_row_col(MACROBLOCKD *xd, const TileInfo *const tile,
   xd->mb_to_left_edge = -((mi_col * MI_SIZE) * 8);
   xd->mb_to_right_edge = ((mi_cols - bw - mi_col) * MI_SIZE) * 8;
 
+  xd->mi_row = mi_row;
+  xd->mi_col = mi_col;
+
   // Are edges available for intra prediction?
   xd->up_available = (mi_row > tile->mi_row_start);
 
@@ -938,57 +940,6 @@ static INLINE int is_chroma_reference(int mi_row, int mi_col, BLOCK_SIZE bsize,
   int ref_pos = ((mi_row & 0x01) || !(bh & 0x01) || !subsampling_y) &&
                 ((mi_col & 0x01) || !(bw & 0x01) || !subsampling_x);
   return ref_pos;
-}
-
-static INLINE BLOCK_SIZE scale_chroma_bsize(BLOCK_SIZE bsize, int subsampling_x,
-                                            int subsampling_y) {
-  assert(subsampling_x >= 0 && subsampling_x < 2);
-  assert(subsampling_y >= 0 && subsampling_y < 2);
-  BLOCK_SIZE bs = bsize;
-  switch (bsize) {
-    case BLOCK_4X4:
-      if (subsampling_x == 1 && subsampling_y == 1)
-        bs = BLOCK_8X8;
-      else if (subsampling_x == 1)
-        bs = BLOCK_8X4;
-      else if (subsampling_y == 1)
-        bs = BLOCK_4X8;
-      break;
-    case BLOCK_4X8:
-      if (subsampling_x == 1 && subsampling_y == 1)
-        bs = BLOCK_8X8;
-      else if (subsampling_x == 1)
-        bs = BLOCK_8X8;
-      else if (subsampling_y == 1)
-        bs = BLOCK_4X8;
-      break;
-    case BLOCK_8X4:
-      if (subsampling_x == 1 && subsampling_y == 1)
-        bs = BLOCK_8X8;
-      else if (subsampling_x == 1)
-        bs = BLOCK_8X4;
-      else if (subsampling_y == 1)
-        bs = BLOCK_8X8;
-      break;
-    case BLOCK_4X16:
-      if (subsampling_x == 1 && subsampling_y == 1)
-        bs = BLOCK_8X16;
-      else if (subsampling_x == 1)
-        bs = BLOCK_8X16;
-      else if (subsampling_y == 1)
-        bs = BLOCK_4X16;
-      break;
-    case BLOCK_16X4:
-      if (subsampling_x == 1 && subsampling_y == 1)
-        bs = BLOCK_16X8;
-      else if (subsampling_x == 1)
-        bs = BLOCK_16X4;
-      else if (subsampling_y == 1)
-        bs = BLOCK_16X8;
-      break;
-    default: break;
-  }
-  return bs;
 }
 
 static INLINE aom_cdf_prob cdf_element_prob(const aom_cdf_prob *cdf,
@@ -1096,32 +1047,34 @@ static INLINE int max_block_wide(const MACROBLOCKD *xd, BLOCK_SIZE bsize,
                                  int plane) {
   assert(bsize < BLOCK_SIZES_ALL);
   int max_blocks_wide = block_size_wide[bsize];
-  const struct macroblockd_plane *const pd = &xd->plane[plane];
 
-  if (xd->mb_to_right_edge < 0)
+  if (xd->mb_to_right_edge < 0) {
+    const struct macroblockd_plane *const pd = &xd->plane[plane];
     max_blocks_wide += xd->mb_to_right_edge >> (3 + pd->subsampling_x);
+  }
 
   // Scale the width in the transform block unit.
-  return max_blocks_wide >> tx_size_wide_log2[0];
+  return max_blocks_wide >> MI_SIZE_LOG2;
 }
 
 static INLINE int max_block_high(const MACROBLOCKD *xd, BLOCK_SIZE bsize,
                                  int plane) {
   int max_blocks_high = block_size_high[bsize];
-  const struct macroblockd_plane *const pd = &xd->plane[plane];
 
-  if (xd->mb_to_bottom_edge < 0)
+  if (xd->mb_to_bottom_edge < 0) {
+    const struct macroblockd_plane *const pd = &xd->plane[plane];
     max_blocks_high += xd->mb_to_bottom_edge >> (3 + pd->subsampling_y);
+  }
 
   // Scale the height in the transform block unit.
-  return max_blocks_high >> tx_size_high_log2[0];
+  return max_blocks_high >> MI_SIZE_LOG2;
 }
 
 static INLINE int max_intra_block_width(const MACROBLOCKD *xd,
                                         BLOCK_SIZE plane_bsize, int plane,
                                         TX_SIZE tx_size) {
   const int max_blocks_wide = max_block_wide(xd, plane_bsize, plane)
-                              << tx_size_wide_log2[0];
+                              << MI_SIZE_LOG2;
   return ALIGN_POWER_OF_TWO(max_blocks_wide, tx_size_wide_log2[tx_size]);
 }
 
@@ -1129,7 +1082,7 @@ static INLINE int max_intra_block_height(const MACROBLOCKD *xd,
                                          BLOCK_SIZE plane_bsize, int plane,
                                          TX_SIZE tx_size) {
   const int max_blocks_high = max_block_high(xd, plane_bsize, plane)
-                              << tx_size_high_log2[0];
+                              << MI_SIZE_LOG2;
   return ALIGN_POWER_OF_TWO(max_blocks_high, tx_size_high_log2[tx_size]);
 }
 

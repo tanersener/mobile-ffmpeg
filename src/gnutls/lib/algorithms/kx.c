@@ -41,6 +41,7 @@ extern mod_auth_st dhe_psk_auth_struct;
 extern mod_auth_st rsa_psk_auth_struct;
 extern mod_auth_st srp_rsa_auth_struct;
 extern mod_auth_st srp_dss_auth_struct;
+extern mod_auth_st vko_gost_auth_struct;
 
 
 /* Cred type mappings to KX algorithms
@@ -73,6 +74,7 @@ static const gnutls_cred_map cred_mappings[] = {
 	{GNUTLS_KX_SRP_DSS, GNUTLS_CRD_SRP, GNUTLS_CRD_CERTIFICATE},
 	{GNUTLS_KX_ANON_DH, GNUTLS_CRD_ANON, GNUTLS_CRD_ANON},
 	{GNUTLS_KX_ANON_ECDH, GNUTLS_CRD_ANON, GNUTLS_CRD_ANON},
+	{GNUTLS_KX_VKO_GOST_12, GNUTLS_CRD_CERTIFICATE, GNUTLS_CRD_CERTIFICATE},
 	{0, 0, 0}
 };
 
@@ -121,6 +123,9 @@ static const gnutls_kx_algo_entry _gnutls_kx_algorithms[] = {
 #endif
 #if defined(ENABLE_ANON) && defined(ENABLE_ECDHE)
 	{"ANON-ECDH", GNUTLS_KX_ANON_ECDH, &anon_ecdh_auth_struct, 0, 0},
+#endif
+#ifdef ENABLE_GOST
+	{"VKO-GOST-12", GNUTLS_KX_VKO_GOST_12, &vko_gost_auth_struct, 0, 0},
 #endif
 	/* for deprecated and legacy algorithms no longer supported, use
 	 * GNUTLS_KX_INVALID as an entry. This will make them available

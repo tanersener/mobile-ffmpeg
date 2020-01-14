@@ -8,9 +8,9 @@ wavpack_CFLAGS = $(AM_CFLAGS) $(ICONV_CFLAGS) -I$(top_srcdir)/include
 if ENABLE_RPATH
 wavpack_LDFLAGS = -rpath $(libdir)
 endif
-wavpack_LDADD = $(AM_LDADD) $(top_builddir)/src/.libs/libwavpack.la $(LIBM) $(ICONV_LIBS)
+wavpack_LDADD = $(AM_LDADD) $(top_builddir)/src/libwavpack.la $(LIBM) $(ICONV_LIBS)
 
-wvunpack_SOURCES = wvunpack.c riff.c wave64.c caff.c dsdiff.c dsf.c utils.c md5.c
+wvunpack_SOURCES = wvunpack.c riff_write.c wave64_write.c caff_write.c dsdiff_write.c dsf_write.c utils.c md5.c
 if WINDOWS_HOST
 wvunpack_SOURCES += win32_unicode_support.c
 endif
@@ -18,7 +18,7 @@ wvunpack_CFLAGS = $(AM_CFLAGS) $(ICONV_CFLAGS) -I$(top_srcdir)/include
 if ENABLE_RPATH
 wvunpack_LDFLAGS = -rpath $(libdir)
 endif
-wvunpack_LDADD = $(AM_LDADD) $(top_builddir)/src/.libs/libwavpack.la $(LIBM) $(ICONV_LIBS)
+wvunpack_LDADD = $(AM_LDADD) $(top_builddir)/src/libwavpack.la $(LIBM) $(ICONV_LIBS)
 
 wvgain_SOURCES = wvgain.c utils.c
 if WINDOWS_HOST
@@ -28,7 +28,7 @@ wvgain_CFLAGS = $(AM_CFLAGS) -I$(top_srcdir)/include
 if ENABLE_RPATH
 wvgain_LDFLAGS = -rpath $(libdir)
 endif
-wvgain_LDADD = $(AM_LDADD) $(top_builddir)/src/.libs/libwavpack.la $(LIBM)
+wvgain_LDADD = $(AM_LDADD) $(top_builddir)/src/libwavpack.la $(LIBM)
 
 wvtag_SOURCES = wvtag.c utils.c import_id3.c
 if WINDOWS_HOST
@@ -38,7 +38,7 @@ wvtag_CFLAGS = $(AM_CFLAGS) -I$(top_srcdir)/include
 if ENABLE_RPATH
 wvtag_LDFLAGS = -rpath $(libdir)
 endif
-wvtag_LDADD = $(AM_LDADD) $(top_builddir)/src/.libs/libwavpack.la $(LIBM) $(ICONV_LIBS)
+wvtag_LDADD = $(AM_LDADD) $(top_builddir)/src/libwavpack.la $(LIBM) $(ICONV_LIBS)
 
 if ENABLE_TESTS
 bin_PROGRAMS += wvtest
@@ -47,7 +47,7 @@ wvtest_CFLAGS = $(AM_CFLAGS) -I$(top_srcdir)/include
 if ENABLE_RPATH
 wvtest_LDFLAGS = -rpath $(libdir)
 endif
-wvtest_LDADD = $(AM_LDADD) $(top_builddir)/src/.libs/libwavpack.la $(LIBM) -lpthread
+wvtest_LDADD = $(AM_LDADD) $(top_builddir)/src/libwavpack.la $(LIBM) -lpthread
 endif
 
 noinst_HEADERS = \

@@ -21,6 +21,7 @@ extern "C" {
 #include "aom/aom_codec.h"
 #include "aom/aom_frame_buffer.h"
 #include "aom/aom_integer.h"
+#include "aom/internal/aom_image_internal.h"
 
 #define AOMINNERBORDERINPIXELS 160
 #define AOM_INTERP_EXTEND 4
@@ -105,6 +106,7 @@ typedef struct yv12_buffer_config {
 
   int corrupted;
   int flags;
+  aom_metadata_array_t *metadata;
 } YV12_BUFFER_CONFIG;
 
 #define YV12_FLAG_HIGHBITDEPTH 8
@@ -134,6 +136,29 @@ int aom_realloc_lookahead_buffer(YV12_BUFFER_CONFIG *ybf, int width, int height,
                                  void *cb_priv);
 
 int aom_free_frame_buffer(YV12_BUFFER_CONFIG *ybf);
+
+/*!\brief Removes metadata from YUV_BUFFER_CONFIG struct.
+ *
+ * Frees metadata in frame buffer.
+ * Frame buffer metadata pointer will be set to NULL.
+ *
+ * \param[in]    ybf       Frame buffer struct pointer
+ */
+void aom_remove_metadata_from_frame_buffer(YV12_BUFFER_CONFIG *ybf);
+
+/*!\brief Copy metadata to YUV_BUFFER_CONFIG struct.
+ *
+ * Copies metadata in frame buffer.
+ * Frame buffer will clear any previous metadata and will reallocate the
+ * metadata array to the new metadata size. Then, it will copy the new metadata
+ * array into it.
+ * Returns 0 on success or -1 on failure.
+ *
+ * \param[in]    ybf       Frame buffer struct pointer
+ * \param[in]    arr       Metadata array struct pointer
+ */
+int aom_copy_metadata_to_frame_buffer(YV12_BUFFER_CONFIG *ybf,
+                                      const aom_metadata_array_t *arr);
 
 #ifdef __cplusplus
 }

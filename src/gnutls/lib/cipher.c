@@ -54,14 +54,14 @@ static int decrypt_packet(gnutls_session_t session,
 			    gnutls_datum_t * plain,
 			    content_type_t type,
 			    record_parameters_st * params,
-			    gnutls_uint64 * sequence);
+			    uint64_t sequence);
 
 static int
 decrypt_packet_tls13(gnutls_session_t session,
 		     gnutls_datum_t * ciphertext,
 		     gnutls_datum_t * plain,
 		     content_type_t *type, record_parameters_st * params,
-		     gnutls_uint64 * sequence);
+		     uint64_t sequence);
 
 static int
 encrypt_packet_tls13(gnutls_session_t session,
@@ -73,7 +73,7 @@ encrypt_packet_tls13(gnutls_session_t session,
 
 /* returns ciphertext which contains the headers too. This also
  * calculates the size in the header field.
- * 
+ *
  */
 int
 _gnutls_encrypt(gnutls_session_t session,
@@ -138,7 +138,7 @@ _gnutls_decrypt(gnutls_session_t session,
 		gnutls_datum_t *output,
 		content_type_t *type,
 		record_parameters_st *params,
-		gnutls_uint64 *sequence)
+		uint64_t sequence)
 {
 	int ret;
 	const version_entry_st *vers = get_version(session);
@@ -213,7 +213,7 @@ calc_enc_length_stream(gnutls_session_t session, int data_size,
  * and are not to be sent). Returns their size.
  */
 int
-_gnutls_make_preamble(uint8_t * uint64_data, uint8_t type, unsigned int length,
+_gnutls_make_preamble(uint64_t uint64_data, uint8_t type, unsigned int length,
 		      const version_entry_st * ver, uint8_t preamble[MAX_PREAMBLE_SIZE])
 {
 	uint8_t *p = preamble;
@@ -221,7 +221,7 @@ _gnutls_make_preamble(uint8_t * uint64_data, uint8_t type, unsigned int length,
 
 	c_length = _gnutls_conv_uint16(length);
 
-	memcpy(p, uint64_data, 8);
+	_gnutls_write_uint64(uint64_data, p);
 	p += 8;
 	*p = type;
 	p++;
@@ -239,7 +239,7 @@ _gnutls_make_preamble(uint8_t * uint64_data, uint8_t type, unsigned int length,
 	return p - preamble;
 }
 
-/* This is the actual encryption 
+/* This is the actual encryption
  * Encrypts the given plaintext datum, and puts the result to cipher_data,
  * which has cipher_size size.
  * return the actual encrypted data length.
@@ -322,15 +322,17 @@ encrypt_packet(gnutls_session_t session,
 			/* copy the random IV.
 			 */
 			memcpy(data_ptr, nonce, blocksize);
-			_gnutls_auth_cipher_setiv(&params->write.
+			ret = _gnutls_auth_cipher_setiv(&params->write.
 						  ctx.tls12, data_ptr,
 						  blocksize);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
 
 			/*data_ptr += blocksize;*/
 			cipher_data += blocksize;
 		}
 	} else { /* AEAD */
-		if (params->cipher->xor_nonce == 0) {
+		if ((params->cipher->flags & GNUTLS_CIPHER_FLAG_XOR_NONCE) == 0) {
 			/* Values in AEAD are pretty fixed in TLS 1.2 for 128-bit block
 			 */
 			 if (params->write.iv_size != imp_iv_size)
@@ -343,9 +345,7 @@ encrypt_packet(gnutls_session_t session,
 			 */
 			memcpy(nonce, params->write.iv,
 			       params->write.iv_size);
-			memcpy(&nonce[imp_iv_size],
-			       UINT64DATA(params->write.sequence_number),
-			       8);
+			_gnutls_write_uint64(params->write.sequence_number, &nonce[imp_iv_size]);
 
 			memcpy(data_ptr, &nonce[imp_iv_size],
 			       exp_iv_size);
@@ -357,8 +357,7 @@ encrypt_packet(gnutls_session_t session,
 				return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 			memset(nonce, 0, 4);
-			memcpy(&nonce[4],
-			       UINT64DATA(params->write.sequence_number), 8);
+			_gnutls_write_uint64(params->write.sequence_number, &nonce[4]);
 
 			memxor(nonce, params->write.iv, 12);
 		}
@@ -370,7 +369,7 @@ encrypt_packet(gnutls_session_t session,
 		ret = plain->size;
 
 	preamble_size =
-	    _gnutls_make_preamble(UINT64DATA(params->write.sequence_number),
+	    _gnutls_make_preamble(params->write.sequence_number,
 				  type, ret, ver, preamble);
 
 	if (algo_type == CIPHER_BLOCK || algo_type == CIPHER_STREAM) {
@@ -451,8 +450,9 @@ encrypt_packet_tls13(gnutls_session_t session,
 	if (unlikely(iv_size < 8))
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-	memcpy(nonce, params->write.iv, iv_size);
-	memxor(&nonce[iv_size-8], UINT64DATA(params->write.sequence_number), 8);
+	memset(nonce, 0, iv_size - 8);
+	_gnutls_write_uint64(params->write.sequence_number, &nonce[iv_size-8]);
+	memxor(nonce, params->write.iv, iv_size);
 
 	max = MAX_RECORD_SEND_SIZE(session);
 
@@ -524,7 +524,7 @@ decrypt_packet(gnutls_session_t session,
 		gnutls_datum_t * ciphertext,
 		gnutls_datum_t * plain,
 		content_type_t type, record_parameters_st * params,
-		gnutls_uint64 * sequence)
+		uint64_t sequence)
 {
 	uint8_t tag[MAX_HASH_SIZE];
 	uint8_t nonce[MAX_CIPHER_IV_SIZE];
@@ -558,7 +558,7 @@ decrypt_packet(gnutls_session_t session,
 		if (unlikely(ciphertext->size < tag_size))
 			return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
-		preamble_size = _gnutls_make_preamble(UINT64DATA(*sequence),
+		preamble_size = _gnutls_make_preamble(sequence,
 						      type, ciphertext->size-tag_size,
 						      ver, preamble);
 
@@ -578,7 +578,7 @@ decrypt_packet(gnutls_session_t session,
 		ret = _gnutls_auth_cipher_tag(&params->read.ctx.tls12, tag, tag_size);
 		if (unlikely(ret < 0))
 			return gnutls_assert_val(ret);
-		
+
 		if (unlikely(gnutls_memcmp(tag, &ciphertext->data[ciphertext->size-tag_size], tag_size) != 0)) {
 			/* HMAC was not the same. */
 			return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
@@ -600,7 +600,7 @@ decrypt_packet(gnutls_session_t session,
 		if (unlikely(ciphertext->size < (tag_size + exp_iv_size)))
 			return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
 
-		if (params->cipher->xor_nonce == 0) {
+		if ((params->cipher->flags & GNUTLS_CIPHER_FLAG_XOR_NONCE) == 0) {
 			/* Values in AEAD are pretty fixed in TLS 1.2 for 128-bit block
 			 */
 			 if (unlikely(params->read.iv_size != 4))
@@ -620,7 +620,7 @@ decrypt_packet(gnutls_session_t session,
 				return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
 
 			memset(nonce, 0, 4);
-			memcpy(&nonce[4], UINT64DATA(*sequence), 8);
+			_gnutls_write_uint64(sequence, &nonce[4]);
 
 			memxor(nonce, params->read.iv, 12);
 		}
@@ -634,7 +634,7 @@ decrypt_packet(gnutls_session_t session,
 		 * MAC.
 		 */
 		preamble_size =
-		    _gnutls_make_preamble(UINT64DATA(*sequence), type,
+		    _gnutls_make_preamble(sequence, type,
 					  length, ver, preamble);
 
 
@@ -674,7 +674,7 @@ decrypt_packet(gnutls_session_t session,
 		 * MAC.
 		 */
 		preamble_size =
-		    _gnutls_make_preamble(UINT64DATA(*sequence), type,
+		    _gnutls_make_preamble(sequence, type,
 					  length, ver, preamble);
 
 		ret =
@@ -734,10 +734,12 @@ decrypt_packet(gnutls_session_t session,
 		/* ignore the IV in TLS 1.1+
 		 */
 		if (explicit_iv) {
-			_gnutls_auth_cipher_setiv(&params->read.
+			ret = _gnutls_auth_cipher_setiv(&params->read.
 						  ctx.tls12,
 						  ciphertext->data,
 						  blocksize);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
 
 			memcpy(nonce, ciphertext->data, blocksize);
 			ciphertext->size -= blocksize;
@@ -786,7 +788,7 @@ decrypt_packet(gnutls_session_t session,
 
 			pad = plain->data[ciphertext->size - tag_size - 1]; /* pad */
 			length = ciphertext->size - tag_size - pad - 1;
-			
+
 			if (unlikely(length < 0))
 				return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
 		}
@@ -804,7 +806,7 @@ decrypt_packet_tls13(gnutls_session_t session,
 		     gnutls_datum_t *ciphertext,
 		     gnutls_datum_t *plain,
 		     content_type_t *type, record_parameters_st *params,
-		     gnutls_uint64 *sequence)
+		     uint64_t sequence)
 {
 	uint8_t nonce[MAX_CIPHER_IV_SIZE];
 	size_t length, length_to_decrypt;
@@ -840,8 +842,9 @@ decrypt_packet_tls13(gnutls_session_t session,
 	if (unlikely(params->read.iv_size != iv_size || iv_size < 8))
 		return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
 
-	memcpy(nonce, params->read.iv, params->read.iv_size);
-	memxor(&nonce[iv_size-8], UINT64DATA(*sequence), 8);
+	memset(nonce, 0, iv_size - 8);
+	_gnutls_write_uint64(sequence, &nonce[iv_size-8]);
+	memxor(nonce, params->read.iv, params->read.iv_size);
 
 	length =
 	    ciphertext->size - tag_size;

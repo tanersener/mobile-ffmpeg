@@ -63,6 +63,7 @@ static int scc_read_header(AVFormatContext *s)
     SCCContext *scc = s->priv_data;
     AVStream *st = avformat_new_stream(s, NULL);
     char line[4096], line2[4096];
+    int64_t ts_start, ts_end;
     int count = 0, ret = 0;
     ptrdiff_t len2, len;
     uint8_t out[4096];
@@ -77,14 +78,14 @@ static int scc_read_header(AVFormatContext *s)
     st->codecpar->codec_id   = AV_CODEC_ID_EIA_608;
 
     while (!ff_text_eof(&tr)) {
-        const int64_t pos = ff_text_pos(&tr);
+        int64_t current_pos, next_pos;
         char *saveptr = NULL, *lline;
         int hh1, mm1, ss1, fs1, i;
         int hh2, mm2, ss2, fs2;
-        int64_t ts_start, ts_end;
         AVPacket *sub;
 
         if (count == 0) {
+            current_pos = ff_text_pos(&tr);
             while (!ff_text_eof(&tr)) {
                 len = ff_subtitles_read_line(&tr, line, sizeof(line));
                 if (len > 13)
@@ -99,6 +100,7 @@ static int scc_read_header(AVFormatContext *s)
 
         ts_start = (hh1 * 3600LL + mm1 * 60LL + ss1) * 1000LL + fs1 * 33;
 
+        next_pos = ff_text_pos(&tr);
         while (!ff_text_eof(&tr)) {
             len2 = ff_subtitles_read_line(&tr, line2, sizeof(line2));
             if (len2 > 13)
@@ -135,15 +137,19 @@ try_again:
         if (!sub)
             return AVERROR(ENOMEM);
 
-        sub->pos = pos;
+        sub->pos = current_pos;
         sub->pts = ts_start;
-        sub->duration = FFMAX(1200, ts_end - ts_start);
+        sub->duration = ts_end - ts_start;
         memmove(line, line2, sizeof(line));
+        current_pos = next_pos;
         line2[0] = 0;
     }
 
-    if (line[0])
+    if (line[0]) {
+        ts_start = ts_end;
+        ts_end += 1200;
         goto try_again;
+    }
 
     ff_subtitles_queue_finalize(s, &scc->q);
 

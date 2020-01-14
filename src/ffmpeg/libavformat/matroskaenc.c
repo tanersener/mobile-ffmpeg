@@ -218,7 +218,7 @@ static int ebml_num_size(uint64_t num)
  * Write a number in EBML variable length format.
  *
  * @param bytes The number of bytes that need to be used to write the number.
- *              If zero, any number of bytes can be used.
+ *              If zero, the minimal number of bytes will be used.
  */
 static void put_ebml_num(AVIOContext *pb, uint64_t num, int bytes)
 {
@@ -228,10 +228,9 @@ static void put_ebml_num(AVIOContext *pb, uint64_t num, int bytes)
     av_assert0(num < (1ULL << 56) - 1);
 
     if (bytes == 0)
-        // don't care how many bytes are used, so use the min
         bytes = needed_bytes;
-    // the bytes needed to write the given size would exceed the bytes
-    // that we need to use, so write unknown size. This shouldn't happen.
+    // The bytes needed to write the given size must not exceed
+    // the bytes that we ought to use.
     av_assert0(bytes >= needed_bytes);
 
     num |= 1ULL << bytes * 7;
@@ -389,6 +388,8 @@ static void put_xiph_size(AVIOContext *pb, int size)
 static void mkv_deinit(AVFormatContext *s)
 {
     MatroskaMuxContext *mkv = s->priv_data;
+
+    av_packet_unref(&mkv->cur_audio_pkt);
 
     ffio_free_dyn_buf(&mkv->cluster_bc);
     ffio_free_dyn_buf(&mkv->info_bc);
@@ -747,9 +748,8 @@ static int mkv_write_native_codecprivate(AVFormatContext *s, AVIOContext *pb,
         return ff_isom_write_avcc(dyn_cp, par->extradata,
                                   par->extradata_size);
     case AV_CODEC_ID_HEVC:
-        ff_isom_write_hvcc(dyn_cp, par->extradata,
-                           par->extradata_size, 0);
-        return 0;
+        return ff_isom_write_hvcc(dyn_cp, par->extradata,
+                                  par->extradata_size, 0);
     case AV_CODEC_ID_AV1:
         if (par->extradata_size)
             return ff_isom_write_av1c(dyn_cp, par->extradata,
@@ -843,11 +843,11 @@ static int mkv_write_codecprivate(AVFormatContext *s, AVIOContext *pb,
         ff_put_wav_header(s, dyn_cp, par, FF_PUT_WAV_HEADER_FORCE_WAVEFORMATEX);
     }
 
-    codecpriv_size = avio_close_dyn_buf(dyn_cp, &codecpriv);
+    codecpriv_size = avio_get_dyn_buf(dyn_cp, &codecpriv);
     if (codecpriv_size)
         put_ebml_binary(pb, MATROSKA_ID_CODECPRIVATE, codecpriv,
                         codecpriv_size);
-    av_free(codecpriv);
+    ffio_free_dyn_buf(&dyn_cp);
     return ret;
 }
 
@@ -931,13 +931,13 @@ static int mkv_write_video_color(AVIOContext *pb, AVCodecParameters *par, AVStre
         end_ebml_master(dyn_cp, meta_element);
     }
 
-    colorinfo_size = avio_close_dyn_buf(dyn_cp, &colorinfo_ptr);
+    colorinfo_size = avio_get_dyn_buf(dyn_cp, &colorinfo_ptr);
     if (colorinfo_size) {
         ebml_master colorinfo = start_ebml_master(pb, MATROSKA_ID_VIDEOCOLOR, colorinfo_size);
         avio_write(pb, colorinfo_ptr, colorinfo_size);
         end_ebml_master(pb, colorinfo);
     }
-    av_free(colorinfo_ptr);
+    ffio_free_dyn_buf(&dyn_cp);
     return 0;
 }
 
@@ -2000,8 +2000,6 @@ static int mkv_write_header(AVFormatContext *s)
     mkv->cur_audio_pkt.size = 0;
     mkv->cluster_pos = -1;
 
-    avio_flush(pb);
-
     // start a new cluster every 5 MB or 5 sec, or 32k / 1 sec for streaming or
     // after 4k and on a keyframe
     if (pb->seekable & AVIO_SEEKABLE_NORMAL) {
@@ -2237,7 +2235,7 @@ static void mkv_end_cluster(AVFormatContext *s)
 
     end_ebml_master_crc32(s->pb, &mkv->cluster_bc, mkv);
     mkv->cluster_pos = -1;
-    avio_flush(s->pb);
+    avio_write_marker(s->pb, AV_NOPTS_VALUE, AVIO_DATA_MARKER_FLUSH_POINT);
 }
 
 static int mkv_check_new_extra_data(AVFormatContext *s, AVPacket *pkt)
@@ -2262,7 +2260,6 @@ static int mkv_check_new_extra_data(AVFormatContext *s, AVPacket *pkt)
                 return ret;
             if (!output_sample_rate)
                 output_sample_rate = track->sample_rate; // Space is already reserved, so it's this or a void element.
-            av_freep(&par->extradata);
             ret = ff_alloc_extradata(par, side_data_size);
             if (ret < 0)
                 return ret;
@@ -2452,8 +2449,6 @@ static int mkv_write_packet(AVFormatContext *s, AVPacket *pkt)
         cluster_time = pkt->pts - mkv->cluster_pts;
     cluster_time += mkv->tracks[pkt->stream_index].ts_offset;
 
-    // start a new cluster every 5 MB or 5 sec, or 32k / 1 sec for streaming or
-    // after 4k and on a keyframe
     cluster_size = avio_tell(mkv->cluster_bc);
 
     if (mkv->is_dash && codec_type == AVMEDIA_TYPE_VIDEO) {
@@ -2534,7 +2529,6 @@ static int mkv_write_trailer(AVFormatContext *s)
     // check if we have an audio packet cached
     if (mkv->cur_audio_pkt.size > 0) {
         ret = mkv_write_packet_internal(s, &mkv->cur_audio_pkt, 0);
-        av_packet_unref(&mkv->cur_audio_pkt);
         if (ret < 0) {
             av_log(s, AV_LOG_ERROR,
                    "Could not write cached audio packet ret:%d\n", ret);

@@ -226,7 +226,7 @@ static void Help(void) {
           " Also handles PNG, JPG and TIFF files, in addition to WebP.\n");
 }
 
-int main(int argc, const char *argv[]) {
+int main(int argc, const char* argv[]) {
   WebPPicture pic1, pic2;
   size_t size1 = 0, size2 = 0;
   int ret = 1;

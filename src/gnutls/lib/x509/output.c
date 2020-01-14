@@ -373,7 +373,7 @@ static void print_aia(gnutls_buffer_st * str, const gnutls_datum_t *der)
 	gnutls_datum_t san = { NULL, 0 }, oid = {NULL, 0};
 	gnutls_x509_aia_t aia;
 	unsigned int san_type;
-	
+
 	err = gnutls_x509_aia_init(&aia);
 	if (err < 0)
 		return;
@@ -491,7 +491,7 @@ static void print_aki(gnutls_buffer_st * str, gnutls_datum_t *der)
 		     gnutls_strerror(err));
 		goto cleanup;
 	}
-	
+
 	adds(str, "\t\t\t");
 	_gnutls_buffer_hexprint(str, id.data, id.size);
 	adds(str, "\n");
@@ -624,7 +624,7 @@ print_key_purpose(gnutls_buffer_st * str, const char *prefix, gnutls_datum_t *de
 	char *p;
 	int err;
 	gnutls_x509_key_purposes_t purposes;
-	
+
 	err = gnutls_x509_key_purpose_init(&purposes);
 	if (err < 0) {
 		addf(str, "error: gnutls_x509_key_purpose_init: %s\n",
@@ -1659,8 +1659,7 @@ print_crt_pubkey(gnutls_buffer_st * str, gnutls_x509_crt_t crt,
 	ret = 0;
 
  cleanup:
-	if (pubkey)
-		gnutls_pubkey_deinit(pubkey);
+	gnutls_pubkey_deinit(pubkey);
 
 	return ret;
 }
@@ -2907,7 +2906,7 @@ gnutls_pubkey_print(gnutls_pubkey_t pubkey,
  * @format: Indicate the format to use
  * @out: Newly allocated datum with null terminated string.
  *
- * This function will pretty print X.509 certificate extensions, 
+ * This function will pretty print X.509 certificate extensions,
  * suitable for display to a human.
  *
  * The output @out needs to be deallocated using gnutls_free().

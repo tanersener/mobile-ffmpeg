@@ -1,13 +1,10 @@
-/.deps/
-/.libs/
-/arpa/
 /sys/
+/arpa/
 *.o
 *.lo
+*.la
 /Makefile
 /alloca.h
-/byteswap.h
-/libgnu.la
 /limits.h
 /netdb.h
 /stddef.h
@@ -19,3 +16,4 @@
 /time.h
 /unistd.h
 /wchar.h
+/byteswap.h

@@ -24,9 +24,6 @@
 		34695ED422AD441500889D20 /* VideoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 34695ECC22AD441500889D20 /* VideoViewController.m */; };
 		34695ED522AD441500889D20 /* PipeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 34695ECE22AD441500889D20 /* PipeViewController.m */; };
 		34C06BF922AD70C40039DF48 /* VideoToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34C06BF822AD70C30039DF48 /* VideoToolbox.framework */; };
-		34C06BFB22AD70CD0039DF48 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 34C06BFA22AD70CD0039DF48 /* libc++.tbd */; };
-		34C06BFD22AD70D60039DF48 /* libbz2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 34C06BFC22AD70D60039DF48 /* libbz2.tbd */; };
-		34C06BFF22AD70E40039DF48 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 34C06BFE22AD70E40039DF48 /* libz.tbd */; };
 		34C06C0122AD71090039DF48 /* GameController.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34C06C0022AD71090039DF48 /* GameController.framework */; };
 		34C06C0722ADA0B10039DF48 /* TvButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 34C06C0622ADA0B10039DF48 /* TvButton.m */; };
 		34C06C0822ADAA4E0039DF48 /* colosseum.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 348439EC20B2EFAF001A3990 /* colosseum.jpg */; };
@@ -96,9 +93,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				34C06C0122AD71090039DF48 /* GameController.framework in Frameworks */,
-				34C06BFF22AD70E40039DF48 /* libz.tbd in Frameworks */,
-				34C06BFD22AD70D60039DF48 /* libbz2.tbd in Frameworks */,
-				34C06BFB22AD70CD0039DF48 /* libc++.tbd in Frameworks */,
 				34C06BF922AD70C40039DF48 /* VideoToolbox.framework in Frameworks */,
 				8300A9F1BC4406077B47F574 /* Pods_MobileFFmpegTest_tvOS.framework in Frameworks */,
 			);
@@ -344,7 +338,7 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_TEAM = 98GD5J4999;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -370,7 +364,7 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_TEAM = 98GD5J4999;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",

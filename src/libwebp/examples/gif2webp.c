@@ -96,12 +96,12 @@ static void Help(void) {
 
 //------------------------------------------------------------------------------
 
-int main(int argc, const char *argv[]) {
+int main(int argc, const char* argv[]) {
   int verbose = 0;
   int gif_error = GIF_ERROR;
   WebPMuxError err = WEBP_MUX_OK;
   int ok = 0;
-  const W_CHAR *in_file = NULL, *out_file = NULL;
+  const W_CHAR* in_file = NULL, *out_file = NULL;
   GifFileType* gif = NULL;
   int frame_duration = 0;
   int frame_timestamp = 0;
@@ -379,7 +379,7 @@ int main(int argc, const char *argv[]) {
       }
       case EXTENSION_RECORD_TYPE: {
         int extension;
-        GifByteType *data = NULL;
+        GifByteType* data = NULL;
         if (DGifGetExtension(gif, &extension, &data) == GIF_ERROR) {
           goto End;
         }
@@ -593,7 +593,7 @@ int main(int argc, const char *argv[]) {
 
 #else  // !WEBP_HAVE_GIF
 
-int main(int argc, const char *argv[]) {
+int main(int argc, const char* argv[]) {
   fprintf(stderr, "GIF support not enabled in %s.\n", argv[0]);
   (void)argc;
   return 0;

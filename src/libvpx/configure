@@ -137,6 +137,7 @@ all_platforms="${all_platforms} x86-solaris-gcc"
 all_platforms="${all_platforms} x86-win32-gcc"
 all_platforms="${all_platforms} x86-win32-vs14"
 all_platforms="${all_platforms} x86-win32-vs15"
+all_platforms="${all_platforms} x86-win32-vs16"
 all_platforms="${all_platforms} x86_64-android-gcc"
 all_platforms="${all_platforms} x86_64-darwin9-gcc"
 all_platforms="${all_platforms} x86_64-darwin10-gcc"
@@ -147,6 +148,7 @@ all_platforms="${all_platforms} x86_64-darwin14-gcc"
 all_platforms="${all_platforms} x86_64-darwin15-gcc"
 all_platforms="${all_platforms} x86_64-darwin16-gcc"
 all_platforms="${all_platforms} x86_64-darwin17-gcc"
+all_platforms="${all_platforms} x86_64-darwin18-gcc"
 all_platforms="${all_platforms} x86_64-iphonesimulator-gcc"
 all_platforms="${all_platforms} x86_64-linux-gcc"
 all_platforms="${all_platforms} x86_64-linux-icc"
@@ -154,6 +156,7 @@ all_platforms="${all_platforms} x86_64-solaris-gcc"
 all_platforms="${all_platforms} x86_64-win64-gcc"
 all_platforms="${all_platforms} x86_64-win64-vs14"
 all_platforms="${all_platforms} x86_64-win64-vs15"
+all_platforms="${all_platforms} x86_64-win64-vs16"
 all_platforms="${all_platforms} generic-gnu"
 
 # all_targets is a list of all targets that can be configured
@@ -271,6 +274,7 @@ EXPERIMENT_LIST="
     fp_mb_stats
     emulate_hardware
     non_greedy_mv
+    rate_ctrl
 "
 CONFIG_LIST="
     dependency_tracking

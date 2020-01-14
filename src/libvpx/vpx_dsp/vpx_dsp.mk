@@ -87,7 +87,7 @@ ifeq ($(CONFIG_VP9),yes)
 DSP_SRCS-yes += vpx_convolve.c
 DSP_SRCS-yes += vpx_convolve.h
 
-DSP_SRCS-$(ARCH_X86)$(ARCH_X86_64) += x86/convolve.h
+DSP_SRCS-$(VPX_ARCH_X86)$(VPX_ARCH_X86_64) += x86/convolve.h
 
 DSP_SRCS-$(HAVE_SSE2) += x86/convolve_sse2.h
 DSP_SRCS-$(HAVE_SSSE3) += x86/convolve_ssse3.h
@@ -205,7 +205,7 @@ DSP_SRCS-$(HAVE_SSE2)   += x86/fwd_txfm_sse2.h
 DSP_SRCS-$(HAVE_SSE2)   += x86/fwd_txfm_sse2.c
 DSP_SRCS-$(HAVE_SSE2)   += x86/fwd_txfm_impl_sse2.h
 DSP_SRCS-$(HAVE_SSE2)   += x86/fwd_dct32x32_impl_sse2.h
-ifeq ($(ARCH_X86_64),yes)
+ifeq ($(VPX_ARCH_X86_64),yes)
 DSP_SRCS-$(HAVE_SSSE3)  += x86/fwd_txfm_ssse3_x86_64.asm
 endif
 DSP_SRCS-$(HAVE_AVX2)   += x86/fwd_txfm_avx2.c
@@ -316,7 +316,7 @@ DSP_SRCS-$(HAVE_AVX2)  += x86/avg_intrin_avx2.c
 DSP_SRCS-$(HAVE_NEON)  += arm/avg_neon.c
 DSP_SRCS-$(HAVE_NEON)  += arm/hadamard_neon.c
 DSP_SRCS-$(HAVE_MSA)   += mips/avg_msa.c
-ifeq ($(ARCH_X86_64),yes)
+ifeq ($(VPX_ARCH_X86_64),yes)
 DSP_SRCS-$(HAVE_SSSE3) += x86/avg_ssse3_x86_64.asm
 endif
 DSP_SRCS-$(HAVE_VSX)   += ppc/hadamard_vsx.c
@@ -384,9 +384,9 @@ DSP_SRCS-$(HAVE_SSE2)   += x86/variance_sse2.c  # Contains SSE2 and SSSE3
 DSP_SRCS-$(HAVE_AVX2)   += x86/variance_avx2.c
 DSP_SRCS-$(HAVE_VSX)    += ppc/variance_vsx.c
 
-ifeq ($(ARCH_X86_64),yes)
+ifeq ($(VPX_ARCH_X86_64),yes)
 DSP_SRCS-$(HAVE_SSE2)   += x86/ssim_opt_x86_64.asm
-endif  # ARCH_X86_64
+endif  # VPX_ARCH_X86_64
 
 DSP_SRCS-$(HAVE_SSE2)   += x86/subpel_variance_sse2.asm  # Contains SSE2 and SSSE3
 

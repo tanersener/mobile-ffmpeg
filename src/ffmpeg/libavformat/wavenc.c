@@ -141,7 +141,7 @@ static void bwf_write_bext_chunk(AVFormatContext *s)
     ff_end_tag(s->pb, bext);
 }
 
-static av_cold void peak_free_buffers(AVFormatContext *s)
+static av_cold void wav_deinit(AVFormatContext *s)
 {
     WAVMuxContext *wav = s->priv_data;
 
@@ -185,7 +185,6 @@ static av_cold int peak_init_writer(AVFormatContext *s)
 
 nomem:
     av_log(s, AV_LOG_ERROR, "Out of memory\n");
-    peak_free_buffers(s);
     return AVERROR(ENOMEM);
 }
 
@@ -362,8 +361,6 @@ static int wav_write_header(AVFormatContext *s)
         wav->data = ff_start_tag(pb, "data");
     }
 
-    avio_flush(pb);
-
     return 0;
 }
 
@@ -414,17 +411,13 @@ static int wav_write_trailer(AVFormatContext *s)
     int rf64 = 0;
     int ret = 0;
 
-    avio_flush(pb);
-
     if (s->pb->seekable & AVIO_SEEKABLE_NORMAL) {
         if (wav->write_peak != PEAK_ONLY && avio_tell(pb) - wav->data < UINT32_MAX) {
             ff_end_tag(pb, wav->data);
-            avio_flush(pb);
         }
 
         if (wav->write_peak && wav->peak_output) {
             ret = peak_write_chunk(s);
-            avio_flush(pb);
         }
 
         /* update file size */
@@ -436,8 +429,6 @@ static int wav_write_trailer(AVFormatContext *s)
             avio_seek(pb, 4, SEEK_SET);
             avio_wl32(pb, (uint32_t)(file_size - 8));
             avio_seek(pb, file_size, SEEK_SET);
-
-            avio_flush(pb);
         } else {
             av_log(s, AV_LOG_ERROR,
                    "Filesize %"PRId64" invalid for wav, output file will be broken\n",
@@ -457,7 +448,6 @@ static int wav_write_trailer(AVFormatContext *s)
             } else {
                 avio_wl32(pb, number_of_samples);
                 avio_seek(pb, file_size, SEEK_SET);
-                avio_flush(pb);
             }
         }
 
@@ -481,12 +471,8 @@ static int wav_write_trailer(AVFormatContext *s)
             avio_wl32(pb, -1);
 
             avio_seek(pb, file_size, SEEK_SET);
-            avio_flush(pb);
         }
     }
-
-    if (wav->write_peak)
-        peak_free_buffers(s);
 
     return ret;
 }
@@ -527,6 +513,7 @@ AVOutputFormat ff_wav_muxer = {
     .write_header      = wav_write_header,
     .write_packet      = wav_write_packet,
     .write_trailer     = wav_write_trailer,
+    .deinit            = wav_deinit,
     .flags             = AVFMT_TS_NONSTRICT,
     .codec_tag         = (const AVCodecTag* const []){ ff_codec_wav_tags, 0 },
     .priv_class        = &wav_muxer_class,
@@ -610,7 +597,6 @@ static int w64_write_trailer(AVFormatContext *s)
         }
 
         avio_seek(pb, file_size, SEEK_SET);
-        avio_flush(pb);
     }
 
     return 0;

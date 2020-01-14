@@ -121,7 +121,8 @@ typedef struct hello_ext_entry_st {
 	uint16_t tls_id;
 	unsigned gid; /* gnutls internal ID */
 
-	gnutls_ext_parse_type_t parse_type;
+	gnutls_ext_parse_type_t client_parse_point;
+	gnutls_ext_parse_type_t server_parse_point;
 	unsigned validity; /* multiple items of gnutls_ext_flags_t */
 
 	/* this function must return 0 when Not Applicable

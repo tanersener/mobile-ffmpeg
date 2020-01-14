@@ -54,7 +54,7 @@
 # decorr_pass structure contains separate arrays for each channel while the
 # MMX code wants there to be a single array of dual samples. The fix for
 # this is to convert the data in the arrays on entry and exit, and this is
-# made easy by the fact that the 8 MMX regsiters hold exactly the required
+# made easy by the fact that the 8 MMX registers hold exactly the required
 # amount of data (64 bytes)!
 #
 # This is written to work on an IA-32 processor. The arguments are on the
@@ -69,7 +69,7 @@
 #
 #   edi         buffer pointer
 #   esi         termination buffer pointer
-#   eax,ebx,edx used in default term to reduce calculation         
+#   eax,ebx,edx used in default term to reduce calculation
 #   ebp         decorr_pass pointer
 #   mm0, mm1    scratch
 #   mm2         original sample values
@@ -494,7 +494,7 @@ bdone:  pslld   mm5, 16                     # sign-extend 16-bit weights back to
 #   int32_t *out_buffer,
 #   int32_t sample_count);
 #
-# It performs a single pass of stereo decorrelation, transfering from the
+# It performs a single pass of stereo decorrelation, transferring from the
 # input buffer to the output buffer. Note that this version of the function
 # requires that the up to 8 previous (depending on dpp->term) stereo samples
 # are visible and correct. In other words, it ignores the "samples_*"
@@ -952,7 +952,7 @@ done:   pop     edi
 # they are to be used somewhere else. The magnitude of the output samples is
 # accumulated and returned (see scan_max_magnitude() for more details). By
 # using the overflow detection of the multiply instruction, this detects
-# when the "long_math" varient is required.
+# when the "long_math" variant is required.
 #
 # For the fastest possible operation with the four "common" decorrelation
 # filters (i.e, fast, normal, high and very high) this function can be
@@ -1068,7 +1068,7 @@ done:   pop     edi
 
 _pack_decorr_mono_buffer_x86:
 pack_decorr_mono_buffer_x86:
-        push    ebp                         # save the resgister that we need to
+        push    ebp                         # save the register that we need to
         push    ebx
         push    esi
         push    edi
@@ -1288,7 +1288,7 @@ nxterm: mov     edx, [ebp]
 domult: mov     eax, [ebp+8]
         mov     edx, eax
         imul    eax, ebx
-        jo      multov                      # on overflow, jump to use 64-bit imul varient
+        jo      multov                      # on overflow, jump to use 64-bit imul variant
         sar     eax, 10
         sbb     ecx, eax
         je      2f
@@ -1362,7 +1362,7 @@ mexit:  pop     eax
 #                             struct decorr_pass *dpp,
 #                             int32_t sample_count);
 #
-# It performs a single pass of mono decorrelation, transfering from the
+# It performs a single pass of mono decorrelation, transferring from the
 # input buffer to the output buffer. Note that this version of the function
 # requires that the up to 8 previous (depending on dpp->term) mono samples
 # are visible and correct. In other words, it ignores the "samples_*"
@@ -1371,7 +1371,7 @@ mexit:  pop     eax
 # samples to the decorr_pass structure before returning.
 #
 # By using the overflow detection of the multiply instruction, it detects
-# when the "long_math" varient is required and automatically does it.
+# when the "long_math" variant is required and automatically does it.
 #
 # This is written to work on an IA-32 processor. The arguments on entry:
 #
@@ -1761,9 +1761,9 @@ limit_loop:
         bsr     ecx, edx                    # ecx = MSB set in sample (0 - 31)
         lea     eax, [ecx+1]                # eax = number used bits in sample (1 - 32)
         sub     ecx, 8                      # ecx = shift right amount (-8 to 23)
-        ror     edx, cl                     # use rotate to do "signed" shift 
+        ror     edx, cl                     # use rotate to do "signed" shift
         shl     eax, 8                      # move nbits to integer portion of log
-        movzx   edx, dl                     # dl = mantissa, look up log fraction in table 
+        movzx   edx, dl                     # dl = mantissa, look up log fraction in table
         mov     al, [ebp+edx]               # eax = combined integer and fraction for full log
         add     edi, eax                    # add to running sum and compare to limit
         cmp     eax, [esp+28]
@@ -1787,9 +1787,9 @@ no_limit_loop:
         bsr     ecx, edx                    # ecx = MSB set in sample (0 - 31)
         lea     eax, [ecx+1]                # eax = number used bits in sample (1 - 32)
         sub     ecx, 8                      # ecx = shift right amount (-8 to 23)
-        ror     edx, cl                     # use rotate to do "signed" shift 
+        ror     edx, cl                     # use rotate to do "signed" shift
         shl     eax, 8                      # move nbits to integer portion of log
-        movzx   edx, dl                     # dl = mantissa, look up log fraction in table 
+        movzx   edx, dl                     # dl = mantissa, look up log fraction in table
         mov     al, [ebp+edx]               # eax = combined integer and fraction for full log
         add     edi, eax                    # add to running sum
 L45:    sub     ebx, 1                      # loop back if more samples
@@ -1820,7 +1820,7 @@ pack_cpu_has_feature_x86:
         pop     eax                         # and pop back into eax
         xor     eax, [esp]                  # compare to original pushed eflags
         popfd                               # restore original eflags
-        and     eax, 0x200000               # eax = 1 if eflags ID bit was changable
+        and     eax, 0x200000               # eax = 1 if eflags ID bit was changeable
         jz      oldcpu                      # return zero if CPUID is not available (wow!)
 
         push    ebx                         # we must save ebx

@@ -283,6 +283,14 @@ static void client(int fd)
 	gnutls_handshake_set_random(session, &hrnd);
 	gnutls_transport_set_int(session, fd);
 
+	if (gnutls_prf(session, 4, "aaaa", 0, 0, NULL, sizeof(err), (char *)&err) !=
+			GNUTLS_E_INVALID_REQUEST ||
+	    gnutls_prf_rfc5705(session, 4, "aaaa", 0, NULL, sizeof(err), (char *)&err) !=
+			GNUTLS_E_INVALID_REQUEST) {
+		fprintf(stderr, "unexpected prf error code\n");
+		exit(1);
+	}
+
 	/* Perform the TLS handshake
 	 */
 	do {

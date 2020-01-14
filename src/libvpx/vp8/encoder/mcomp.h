@@ -36,7 +36,7 @@ void vp8_init3smotion_compensation(MACROBLOCK *x, int stride);
 int vp8_hex_search(MACROBLOCK *x, BLOCK *b, BLOCKD *d, int_mv *ref_mv,
                    int_mv *best_mv, int search_param, int sad_per_bit,
                    const vp8_variance_fn_ptr_t *vfp, int *mvsadcost[2],
-                   int *mvcost[2], int_mv *center_mv);
+                   int_mv *center_mv);
 
 typedef int(fractional_mv_step_fp)(MACROBLOCK *x, BLOCK *b, BLOCKD *d,
                                    int_mv *bestmv, int_mv *ref_mv,

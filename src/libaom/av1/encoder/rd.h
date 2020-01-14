@@ -51,9 +51,10 @@ extern "C" {
 #define SWITCHABLE_INTERP_RATE_FACTOR 1
 
 enum {
-  // Default initialization
+  // Default initialization when we are not using winner mode framework. e.g.
+  // intrabc
   DEFAULT_EVAL = 0,
-  // Initialization for default mode evaluation
+  // Initialization for selecting winner mode
   MODE_EVAL,
   // Initialization for winner mode evaluation
   WINNER_MODE_EVAL,
@@ -122,7 +123,7 @@ static INLINE void av1_invalid_rd_stats(RD_STATS *rd_stats) {
       int r, c;
       for (r = 0; r < TXB_COEFF_COST_MAP_SIZE; ++r)
         for (c = 0; c < TXB_COEFF_COST_MAP_SIZE; ++c)
-          rd_stats->txb_coeff_cost_map[plane][r][c] = INT_MAX;
+          rd_stats->txb_coeff_cost_map[plane][r][c] = INT16_MAX;
     }
   }
 #endif
@@ -234,7 +235,7 @@ void av1_init_me_luts(void);
 
 void av1_set_mvcost(MACROBLOCK *x, int ref, int ref_mv_idx);
 
-void av1_get_entropy_contexts(BLOCK_SIZE bsize,
+void av1_get_entropy_contexts(BLOCK_SIZE plane_bsize,
                               const struct macroblockd_plane *pd,
                               ENTROPY_CONTEXT t_above[MAX_MIB_SIZE],
                               ENTROPY_CONTEXT t_left[MAX_MIB_SIZE]);
@@ -282,9 +283,41 @@ static INLINE uint32_t get_rd_opt_coeff_thresh(
   return coeff_opt_thresh;
 }
 
+// Used to reset the state of tx/mb rd hash information
+static INLINE void reset_hash_records(MACROBLOCK *const x,
+                                      int use_inter_txb_hash) {
+  int32_t record_idx;
+
+  // Reset the state for use_inter_txb_hash
+  if (use_inter_txb_hash) {
+    for (record_idx = 0;
+         record_idx < ((MAX_MIB_SIZE >> 1) * (MAX_MIB_SIZE >> 1)); record_idx++)
+      x->txb_rd_record_8X8[record_idx].num =
+          x->txb_rd_record_8X8[record_idx].index_start = 0;
+    for (record_idx = 0;
+         record_idx < ((MAX_MIB_SIZE >> 2) * (MAX_MIB_SIZE >> 2)); record_idx++)
+      x->txb_rd_record_16X16[record_idx].num =
+          x->txb_rd_record_16X16[record_idx].index_start = 0;
+    for (record_idx = 0;
+         record_idx < ((MAX_MIB_SIZE >> 3) * (MAX_MIB_SIZE >> 3)); record_idx++)
+      x->txb_rd_record_32X32[record_idx].num =
+          x->txb_rd_record_32X32[record_idx].index_start = 0;
+    for (record_idx = 0;
+         record_idx < ((MAX_MIB_SIZE >> 4) * (MAX_MIB_SIZE >> 4)); record_idx++)
+      x->txb_rd_record_64X64[record_idx].num =
+          x->txb_rd_record_64X64[record_idx].index_start = 0;
+  }
+
+  // Reset the state for use_intra_txb_hash
+  x->txb_rd_record_intra.num = x->txb_rd_record_intra.index_start = 0;
+
+  // Reset the state for use_mb_rd_hash
+  x->mb_rd_record.num = x->mb_rd_record.index_start = 0;
+}
+
 void av1_setup_pred_block(const MACROBLOCKD *xd,
                           struct buf_2d dst[MAX_MB_PLANE],
-                          const YV12_BUFFER_CONFIG *src, int mi_row, int mi_col,
+                          const YV12_BUFFER_CONFIG *src,
                           const struct scale_factors *scale,
                           const struct scale_factors *scale_uv,
                           const int num_planes);

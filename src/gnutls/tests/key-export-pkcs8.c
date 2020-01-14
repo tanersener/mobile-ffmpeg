@@ -172,6 +172,7 @@ int check_ed25519(void)
 static
 int check_gost(void)
 {
+#ifdef ENABLE_GOST
 	gnutls_x509_privkey_t key;
 	gnutls_datum_t out;
 	int ret;
@@ -193,6 +194,7 @@ int check_gost(void)
 	gnutls_free(out.data);
 
 	gnutls_x509_privkey_deinit(key);
+#endif
 
 	return 0;
 }

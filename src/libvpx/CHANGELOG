@@ -1,3 +1,9 @@
+2019-12-09 v1.8.2 "Pekin Duck"
+  This release collects incremental improvements to many aspects of the library.
+
+  - Upgrading:
+    ARCH_* defines have been removed in favor of VPX_ARCH_*.
+
 2019-07-15 v1.8.1 "Orpington Duck"
   This release collects incremental improvements to many aspects of the library.
 

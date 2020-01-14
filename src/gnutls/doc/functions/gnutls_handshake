@@ -9,7 +9,7 @@ This function performs the handshake of the TLS/SSL protocol, and
 initializes the TLS session parameters.
 
 The non-fatal errors expected by this function are:
-@code{GNUTLS_E_INTERRUPTED} , @code{GNUTLS_E_AGAIN} , 
+@code{GNUTLS_E_INTERRUPTED} , @code{GNUTLS_E_AGAIN} ,
 @code{GNUTLS_E_WARNING_ALERT_RECEIVED} . When this function is called
 for re-handshake under TLS 1.2 or earlier, the non-fatal error code
 @code{GNUTLS_E_GOT_APPLICATION_DATA}  may also be returned.

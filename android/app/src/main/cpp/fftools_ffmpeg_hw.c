@@ -17,6 +17,9 @@
  */
 
 /*
+ * CHANGES 12.2019
+ * - Concurrent execution support
+ *
  * CHANGES 08.2018
  * --------------------------------------------------------
  * - fftools_ prefix added to file name and parent header
@@ -28,8 +31,8 @@
 
 #include "fftools_ffmpeg.h"
 
-static int nb_hw_devices;
-static HWDevice **hw_devices;
+__thread int nb_hw_devices;
+__thread HWDevice **hw_devices;
 
 static HWDevice *hw_device_get_by_type(enum AVHWDeviceType type)
 {
@@ -105,7 +108,7 @@ int hw_device_init_from_string(const char *arg, HWDevice **dev_out)
     // -> av_hwdevice_ctx_create_derived()
 
     AVDictionary *options = NULL;
-    char *type_name = NULL, *name = NULL, *device = NULL;
+    const char *type_name = NULL, *name = NULL, *device = NULL;
     enum AVHWDeviceType type;
     HWDevice *dev, *src;
     AVBufferRef *device_ref = NULL;
@@ -161,10 +164,12 @@ int hw_device_init_from_string(const char *arg, HWDevice **dev_out)
         ++p;
         q = strchr(p, ',');
         if (q) {
+            if (q - p > 0) {
             device = av_strndup(p, q - p);
             if (!device) {
                 err = AVERROR(ENOMEM);
                 goto fail;
+            }
             }
             err = av_dict_parse_string(&options, q + 1, "=", ",", 0);
             if (err < 0) {
@@ -174,7 +179,8 @@ int hw_device_init_from_string(const char *arg, HWDevice **dev_out)
         }
 
         err = av_hwdevice_ctx_create(&device_ref, type,
-                                     device ? device : p, options, 0);
+                                     q ? device : p[0] ? p : NULL,
+                                     options, 0);
         if (err < 0)
             goto fail;
 

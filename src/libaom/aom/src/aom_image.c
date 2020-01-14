@@ -267,6 +267,7 @@ void aom_img_flip(aom_image_t *img) {
 
 void aom_img_free(aom_image_t *img) {
   if (img) {
+    aom_img_remove_metadata(img);
     if (img->img_data && img->img_data_owner) aom_free(img->img_data);
 
     if (img->self_allocd) free(img);
@@ -285,4 +286,107 @@ int aom_img_plane_height(const aom_image_t *img, int plane) {
     return (img->d_h + 1) >> img->y_chroma_shift;
   else
     return img->d_h;
+}
+
+aom_metadata_t *aom_img_metadata_alloc(uint32_t type, const uint8_t *data,
+                                       size_t sz) {
+  if (!data || sz == 0) return NULL;
+  aom_metadata_t *metadata = (aom_metadata_t *)malloc(sizeof(aom_metadata_t));
+  if (!metadata) return NULL;
+  metadata->type = type;
+  metadata->payload = (uint8_t *)malloc(sz);
+  if (!metadata->payload) {
+    free(metadata);
+    return NULL;
+  }
+  memcpy(metadata->payload, data, sz);
+  metadata->sz = sz;
+  return metadata;
+}
+
+void aom_img_metadata_free(aom_metadata_t *metadata) {
+  if (metadata) {
+    if (metadata->payload) free(metadata->payload);
+    free(metadata);
+  }
+}
+
+aom_metadata_array_t *aom_img_metadata_array_alloc(size_t sz) {
+  aom_metadata_array_t *arr =
+      (aom_metadata_array_t *)calloc(1, sizeof(aom_metadata_array_t));
+  if (!arr) return NULL;
+  if (sz > 0) {
+    arr->metadata_array =
+        (aom_metadata_t **)calloc(sz, sizeof(aom_metadata_t *));
+    if (!arr->metadata_array) {
+      aom_img_metadata_array_free(arr);
+      return NULL;
+    }
+    arr->sz = sz;
+  }
+  return arr;
+}
+
+void aom_img_metadata_array_free(aom_metadata_array_t *arr) {
+  if (arr) {
+    if (arr->metadata_array) {
+      for (size_t i = 0; i < arr->sz; i++) {
+        aom_img_metadata_free(arr->metadata_array[i]);
+      }
+      free(arr->metadata_array);
+    }
+    free(arr);
+  }
+}
+
+int aom_img_add_metadata(aom_image_t *img, uint32_t type, const uint8_t *data,
+                         size_t sz) {
+  if (!img) return -1;
+  if (!img->metadata) {
+    img->metadata = aom_img_metadata_array_alloc(0);
+    if (!img->metadata) return -1;
+  }
+  aom_metadata_t *metadata = aom_img_metadata_alloc(type, data, sz);
+  if (!metadata) goto fail;
+  if (!img->metadata->metadata_array) {
+    img->metadata->metadata_array =
+        (aom_metadata_t **)calloc(1, sizeof(metadata));
+    if (!img->metadata->metadata_array || img->metadata->sz != 0) {
+      aom_img_metadata_free(metadata);
+      goto fail;
+    }
+  } else {
+    img->metadata->metadata_array =
+        (aom_metadata_t **)realloc(img->metadata->metadata_array,
+                                   (img->metadata->sz + 1) * sizeof(metadata));
+  }
+  img->metadata->metadata_array[img->metadata->sz] = metadata;
+  img->metadata->sz++;
+  return 0;
+fail:
+  aom_img_metadata_array_free(img->metadata);
+  img->metadata = NULL;
+  return -1;
+}
+
+void aom_img_remove_metadata(aom_image_t *img) {
+  if (img && img->metadata) {
+    aom_img_metadata_array_free(img->metadata);
+    img->metadata = NULL;
+  }
+}
+
+const aom_metadata_t *aom_img_get_metadata(const aom_image_t *img,
+                                           size_t index) {
+  if (!img) return NULL;
+  const aom_metadata_array_t *array = img->metadata;
+  if (array && index < array->sz) {
+    return array->metadata_array[index];
+  }
+  return NULL;
+}
+
+size_t aom_img_num_metadata(const aom_image_t *img) {
+  if (!img || !img->metadata) return 0;
+  return img->metadata->sz;
 }

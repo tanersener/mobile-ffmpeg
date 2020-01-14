@@ -27,7 +27,7 @@ static void processDoc(xmlTextReaderPtr readerPtr) {
     }
 
     /*
-     * One can obtain the document pointer to get insteresting
+     * One can obtain the document pointer to get interesting
      * information about the document like the URL, but one must also
      * be sure to clean it up at the end (see below).
      */

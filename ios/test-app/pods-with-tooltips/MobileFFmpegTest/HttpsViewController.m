@@ -89,7 +89,7 @@
         NSLog(@"Testing HTTPS with default url \'%@\'\n", testUrl);
     }
     
-    MediaInformation* information = [MobileFFmpeg getMediaInformation:testUrl];
+    MediaInformation* information = [MobileFFprobe getMediaInformation:testUrl];
 
     if (information == nil) {
         NSLog(@"Get media information failed\n");

@@ -118,12 +118,14 @@ main(int argc, char* argv[])
 	    shortv != PHOTOMETRIC_PALETTE) {
 		fprintf(stderr, "%s: Expecting a palette image.\n",
 		    argv[optind]);
+		(void) TIFFClose(in);
 		return (-1);
 	}
 	if (!TIFFGetField(in, TIFFTAG_COLORMAP, &rmap, &gmap, &bmap)) {
 		fprintf(stderr,
 		    "%s: No colormap (not a valid palette image).\n",
 		    argv[optind]);
+		(void) TIFFClose(in);
 		return (-1);
 	}
 	bitspersample = 0;
@@ -131,11 +133,14 @@ main(int argc, char* argv[])
 	if (bitspersample != 8) {
 		fprintf(stderr, "%s: Sorry, can only handle 8-bit images.\n",
 		    argv[optind]);
+		(void) TIFFClose(in);
 		return (-1);
 	}
 	out = TIFFOpen(argv[optind+1], "w");
-	if (out == NULL)
+	if (out == NULL) {
+		(void) TIFFClose(in);
 		return (-2);
+	}
 	cpTags(in, out);
 	TIFFGetField(in, TIFFTAG_IMAGEWIDTH, &imagewidth);
 	TIFFGetField(in, TIFFTAG_IMAGELENGTH, &imagelength);

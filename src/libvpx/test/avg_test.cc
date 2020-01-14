@@ -425,10 +425,10 @@ TEST_P(SatdLowbdTest, MaxValue) {
 TEST_P(SatdLowbdTest, Random) {
   int expected;
   switch (satd_size_) {
-    case 16: expected = 263252; break;
-    case 64: expected = 1105420; break;
-    case 256: expected = 4252250; break;
-    case 1024: expected = 16876840; break;
+    case 16: expected = 261036; break;
+    case 64: expected = 991732; break;
+    case 256: expected = 4136358; break;
+    case 1024: expected = 16677592; break;
     default:
       FAIL() << "Invalid satd size (" << satd_size_
              << ") valid: 16/64/256/1024";

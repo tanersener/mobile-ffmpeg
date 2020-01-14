@@ -112,32 +112,34 @@ host_triplet = @host@
 @HAVE_LIBUNISTRING_FALSE@am__append_2 = unistring
 @HAVE_LIBUNISTRING_FALSE@am__append_3 = -I$(srcdir)/unistring/ -I$(builddir)/unistring/
 @ENABLE_MINITASN1_TRUE@am__append_4 = -I$(srcdir)/minitasn1
-@WINDOWS_TRUE@am__append_5 = system/keys-win.c
-@WINDOWS_FALSE@am__append_6 = system/keys-dummy.c
-@ENABLE_PKCS11_TRUE@am__append_7 = pkcs11.c pkcs11x.c pkcs11_privkey.c pkcs11_write.c pkcs11_secret.c \
+@ENABLE_GOST_TRUE@am__append_5 = vko.c
+@WINDOWS_TRUE@am__append_6 = system/keys-win.c
+@WINDOWS_FALSE@am__append_7 = system/keys-dummy.c
+@ENABLE_PKCS11_TRUE@am__append_8 = pkcs11.c pkcs11x.c pkcs11_privkey.c pkcs11_write.c pkcs11_secret.c \
 @ENABLE_PKCS11_TRUE@	pkcs11_int.c
 
-@ENABLE_NETTLE_TRUE@am__append_8 = nettle
-@ENABLE_PKCS11_TRUE@am__append_9 = pkcs11_int.h pkcs11x.h
-@HAVE_LIBIDN2_TRUE@am__append_10 = $(LIBIDN2_LIBS)
-@HAVE_LIBUNISTRING_TRUE@am__append_11 = $(LIBUNISTRING)
-@HAVE_LIBUNISTRING_FALSE@am__append_12 = unistring/libunistring.la
-@ENABLE_NETTLE_TRUE@am__append_13 = accelerated/libaccelerated.la
-@WINDOWS_FALSE@am__append_14 = $(LTLIBPTHREAD)
-@NEEDS_LIBRT_TRUE@am__append_15 = $(LTLIBRT)
-@ENABLE_FIPS140_TRUE@am__append_16 = $(FIPS140_LIBS) $(LTLIBDL)
-@ENABLE_TROUSERS_TRUE@am__append_17 = $(LTLIBDL)
-@HAVE_LD_VERSION_SCRIPT_TRUE@am__append_18 = -Wl,--version-script=$(srcdir)/libgnutls.map
-@HAVE_LD_VERSION_SCRIPT_FALSE@am__append_19 = -export-symbols-regex '^(gnutls|_gnutls).*'
-@ENABLE_MINITASN1_TRUE@am__append_20 = minitasn1/libminitasn1.la
-@ENABLE_MINITASN1_FALSE@am__append_21 = $(LIBTASN1_LIBS)
-@ENABLE_NETTLE_TRUE@am__append_22 = $(NETTLE_LIBS) $(HOGWEED_LIBS) $(GMP_LIBS)
-@ENABLE_NETTLE_TRUE@am__append_23 = nettle/libcrypto.la
-@HAVE_LD_OUTPUT_DEF_TRUE@am__append_24 = -Wl,--output-def,libgnutls-$(DLL_VERSION).def
-@HAVE_LD_OUTPUT_DEF_TRUE@am__append_25 = $(defexec_DATA)
-@WINDOWS_TRUE@am__append_26 = -lcrypt32
-@MACOSX_TRUE@am__append_27 = -framework Security -framework CoreFoundation
-@ENABLE_CXX_TRUE@am__append_28 = libgnutlsxx.la
+@ENABLE_NETTLE_TRUE@am__append_9 = nettle
+@ENABLE_PKCS11_TRUE@am__append_10 = pkcs11_int.h pkcs11x.h
+@ENABLE_GOST_TRUE@am__append_11 = vko.h
+@HAVE_LIBIDN2_TRUE@am__append_12 = $(LIBIDN2_LIBS)
+@HAVE_LIBUNISTRING_TRUE@am__append_13 = $(LIBUNISTRING)
+@HAVE_LIBUNISTRING_FALSE@am__append_14 = unistring/libunistring.la
+@ENABLE_NETTLE_TRUE@am__append_15 = accelerated/libaccelerated.la
+@WINDOWS_FALSE@am__append_16 = $(LTLIBPTHREAD)
+@NEEDS_LIBRT_TRUE@am__append_17 = $(LTLIBRT)
+@ENABLE_FIPS140_TRUE@am__append_18 = $(FIPS140_LIBS) $(LTLIBDL)
+@ENABLE_TROUSERS_TRUE@am__append_19 = $(LTLIBDL)
+@HAVE_LD_VERSION_SCRIPT_TRUE@am__append_20 = -Wl,--version-script=$(srcdir)/libgnutls.map
+@HAVE_LD_VERSION_SCRIPT_FALSE@am__append_21 = -export-symbols-regex '^(gnutls|_gnutls).*'
+@ENABLE_MINITASN1_TRUE@am__append_22 = minitasn1/libminitasn1.la
+@ENABLE_MINITASN1_FALSE@am__append_23 = $(LIBTASN1_LIBS)
+@ENABLE_NETTLE_TRUE@am__append_24 = $(NETTLE_LIBS) $(HOGWEED_LIBS) $(GMP_LIBS)
+@ENABLE_NETTLE_TRUE@am__append_25 = nettle/libcrypto.la
+@HAVE_LD_OUTPUT_DEF_TRUE@am__append_26 = -Wl,--output-def,libgnutls-$(DLL_VERSION).def
+@HAVE_LD_OUTPUT_DEF_TRUE@am__append_27 = $(defexec_DATA)
+@WINDOWS_TRUE@am__append_28 = -lcrypt32
+@MACOSX_TRUE@am__append_29 = -framework Security -framework CoreFoundation
+@ENABLE_CXX_TRUE@am__append_30 = libgnutlsxx.la
 subdir = lib
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/lib/unistring/m4/gnulib-comp.m4 \
@@ -321,8 +323,8 @@ am__DEPENDENCIES_10 = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 libgnutls_la_DEPENDENCIES = ../gl/libgnu.la x509/libgnutls_x509.la \
 	ext/libgnutls_ext.la auth/libgnutls_auth.la \
 	algorithms/libgnutls_alg.la extras/libgnutls_extras.la \
-	$(am__append_12) $(am__append_13) $(am__append_20) \
-	$(am__append_23) $(am__DEPENDENCIES_10)
+	$(am__append_14) $(am__append_15) $(am__append_22) \
+	$(am__append_25) $(am__DEPENDENCIES_10)
 am__libgnutls_la_SOURCES_DIST = abstract_int.h debug.h cipher.h \
 	buffers.h errors.h gnutls_int.h dtls.h handshake.h num.h \
 	algorithms.h dh.h kx.h hash_int.h cipher_int.h db.h auth.h \
@@ -332,27 +334,27 @@ am__libgnutls_la_SOURCES_DIST = abstract_int.h debug.h cipher.h \
 	crypto-backend.h srp.h auth/srp_kx.h auth/srp_passwd.h file.h \
 	supplemental.h crypto.h random.h system.h locks.h mbuffers.h \
 	ecc.h pin.h fips.h priority_options.h secrets.h stek.h \
-	cert-cred.h pkcs11_int.h pkcs11x.h range.c record.c compress.c \
-	debug.c cipher.c gthreads.h handshake-tls13.c mbuffers.c \
-	buffers.c handshake.c num.c errors.c dh.c kx.c cipher-cbc.c \
-	priority.c hash_int.c cipher_int.c session.c db.c x509_b64.c \
-	hello_ext.c auth.c sslv2_compat.c datum.c session_pack.c mpi.c \
-	pk.c cert-cred.c global.c constate.c anon_cred.c \
-	pkix_asn1_tab.c gnutls_asn1_tab.c mem.c fingerprint.c \
-	tls-sig.c ecc.c alert.c privkey_raw.c atomic.h system/certs.c \
-	system/threads.c system/fastopen.c system/sockets.c \
-	str-iconv.c system.c profiles.c profiles.h inih/ini.c str.c \
-	str-unicode.c str-idna.c state.c cert-cred-x509.c file.c \
-	supplemental.c random.c crypto-api.c crypto-api.h privkey.c \
-	pcert.c pubkey.c locks.c dtls.c system_override.c \
-	crypto-backend.c verify-tofu.c pin.c tpm.c fips.c \
-	safe-memfuncs.c atfork.c atfork.h randomart.c name_val_array.h \
-	system-keys.h urls.c urls.h prf.c auto-verify.c dh-session.c \
-	cert-session.c handshake-checks.c dtls-sw.c dh-primes.c \
-	openpgp_compat.c crypto-selftests.c crypto-selftests-pk.c \
-	secrets.c extv.c extv.h hello_ext_lib.c hello_ext_lib.h \
-	ocsp-api.c stek.c cert-cred-rawpk.c iov.c iov.h \
-	system/keys-win.c system/keys-dummy.c \
+	cert-cred.h pkcs11_int.h pkcs11x.h vko.h range.c record.c \
+	compress.c debug.c cipher.c gthreads.h handshake-tls13.c \
+	mbuffers.c buffers.c handshake.c errors.c dh.c kx.c \
+	cipher-cbc.c priority.c hash_int.c cipher_int.c session.c db.c \
+	x509_b64.c hello_ext.c auth.c sslv2_compat.c datum.c \
+	session_pack.c mpi.c pk.c cert-cred.c global.c constate.c \
+	anon_cred.c pkix_asn1_tab.c gnutls_asn1_tab.c mem.c \
+	fingerprint.c tls-sig.c ecc.c alert.c privkey_raw.c atomic.h \
+	system/certs.c system/threads.c system/fastopen.c \
+	system/sockets.c str-iconv.c system.c profiles.c profiles.h \
+	inih/ini.c str.c str-unicode.c str-idna.c state.c \
+	cert-cred-x509.c file.c supplemental.c random.c crypto-api.c \
+	crypto-api.h privkey.c pcert.c pubkey.c locks.c dtls.c \
+	system_override.c crypto-backend.c verify-tofu.c pin.c tpm.c \
+	fips.c safe-memfuncs.c atfork.c atfork.h randomart.c \
+	name_val_array.h system-keys.h urls.c urls.h prf.c \
+	auto-verify.c dh-session.c cert-session.c handshake-checks.c \
+	dtls-sw.c dh-primes.c openpgp_compat.c crypto-selftests.c \
+	crypto-selftests-pk.c secrets.c extv.c extv.h hello_ext_lib.c \
+	hello_ext_lib.h ocsp-api.c stek.c cert-cred-rawpk.c iov.c \
+	iov.h vko.c system/keys-win.c system/keys-dummy.c \
 	tls13/encrypted_extensions.c tls13/encrypted_extensions.h \
 	tls13/certificate_request.c tls13/certificate_request.h \
 	tls13/certificate_verify.c tls13/certificate_verify.h \
@@ -366,15 +368,16 @@ am__libgnutls_la_SOURCES_DIST = abstract_int.h debug.h cipher.h \
 	pkcs11_privkey.c pkcs11_write.c pkcs11_secret.c pkcs11_int.c \
 	srp.c psk.c gnutls.asn pkix.asn libgnutls.map
 am__objects_1 =
-am__objects_2 = $(am__objects_1)
+am__objects_2 = $(am__objects_1) $(am__objects_1)
 am__dirstamp = $(am__leading_dot)dirstamp
-@WINDOWS_TRUE@am__objects_3 = system/keys-win.lo
-@WINDOWS_FALSE@am__objects_4 = system/keys-dummy.lo
-@ENABLE_PKCS11_TRUE@am__objects_5 = pkcs11.lo pkcs11x.lo \
+@ENABLE_GOST_TRUE@am__objects_3 = vko.lo
+@WINDOWS_TRUE@am__objects_4 = system/keys-win.lo
+@WINDOWS_FALSE@am__objects_5 = system/keys-dummy.lo
+@ENABLE_PKCS11_TRUE@am__objects_6 = pkcs11.lo pkcs11x.lo \
 @ENABLE_PKCS11_TRUE@	pkcs11_privkey.lo pkcs11_write.lo \
 @ENABLE_PKCS11_TRUE@	pkcs11_secret.lo pkcs11_int.lo
-am__objects_6 = range.lo record.lo compress.lo debug.lo cipher.lo \
-	handshake-tls13.lo mbuffers.lo buffers.lo handshake.lo num.lo \
+am__objects_7 = range.lo record.lo compress.lo debug.lo cipher.lo \
+	handshake-tls13.lo mbuffers.lo buffers.lo handshake.lo \
 	errors.lo dh.lo kx.lo cipher-cbc.lo priority.lo hash_int.lo \
 	cipher_int.lo session.lo db.lo x509_b64.lo hello_ext.lo \
 	auth.lo sslv2_compat.lo datum.lo session_pack.lo mpi.lo pk.lo \
@@ -392,17 +395,17 @@ am__objects_6 = range.lo record.lo compress.lo debug.lo cipher.lo \
 	handshake-checks.lo dtls-sw.lo dh-primes.lo openpgp_compat.lo \
 	crypto-selftests.lo crypto-selftests-pk.lo secrets.lo extv.lo \
 	hello_ext_lib.lo ocsp-api.lo stek.lo cert-cred-rawpk.lo iov.lo \
-	$(am__objects_3) $(am__objects_4) \
+	$(am__objects_3) $(am__objects_4) $(am__objects_5) \
 	tls13/encrypted_extensions.lo tls13/certificate_request.lo \
 	tls13/certificate_verify.lo tls13-sig.lo tls13/finished.lo \
 	tls13/key_update.lo tls13/hello_retry.lo \
 	tls13/session_ticket.lo tls13/certificate.lo \
 	tls13/early_data.lo tls13/post_handshake.lo \
-	tls13/psk_ext_parser.lo tls13/anti_replay.lo $(am__objects_5)
-am__objects_7 = srp.lo
-am__objects_8 = psk.lo
-am_libgnutls_la_OBJECTS = $(am__objects_2) $(am__objects_6) \
-	$(am__objects_7) $(am__objects_8)
+	tls13/psk_ext_parser.lo tls13/anti_replay.lo $(am__objects_6)
+am__objects_8 = srp.lo
+am__objects_9 = psk.lo
+am_libgnutls_la_OBJECTS = $(am__objects_2) $(am__objects_7) \
+	$(am__objects_8) $(am__objects_9)
 libgnutls_la_OBJECTS = $(am_libgnutls_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -461,7 +464,7 @@ am__depfiles_remade = ./$(DEPDIR)/alert.Plo ./$(DEPDIR)/anon_cred.Plo \
 	./$(DEPDIR)/hello_ext_lib.Plo ./$(DEPDIR)/iov.Plo \
 	./$(DEPDIR)/kx.Plo ./$(DEPDIR)/libgnutlsxx_la-gnutlsxx.Plo \
 	./$(DEPDIR)/locks.Plo ./$(DEPDIR)/mbuffers.Plo \
-	./$(DEPDIR)/mem.Plo ./$(DEPDIR)/mpi.Plo ./$(DEPDIR)/num.Plo \
+	./$(DEPDIR)/mem.Plo ./$(DEPDIR)/mpi.Plo \
 	./$(DEPDIR)/ocsp-api.Plo ./$(DEPDIR)/openpgp_compat.Plo \
 	./$(DEPDIR)/pcert.Plo ./$(DEPDIR)/pin.Plo ./$(DEPDIR)/pk.Plo \
 	./$(DEPDIR)/pkcs11.Plo ./$(DEPDIR)/pkcs11_int.Plo \
@@ -483,11 +486,11 @@ am__depfiles_remade = ./$(DEPDIR)/alert.Plo ./$(DEPDIR)/anon_cred.Plo \
 	./$(DEPDIR)/system_override.Plo ./$(DEPDIR)/tls-sig.Plo \
 	./$(DEPDIR)/tls13-sig.Plo ./$(DEPDIR)/tpm.Plo \
 	./$(DEPDIR)/urls.Plo ./$(DEPDIR)/verify-tofu.Plo \
-	./$(DEPDIR)/x509_b64.Plo inih/$(DEPDIR)/ini.Plo \
-	system/$(DEPDIR)/certs.Plo system/$(DEPDIR)/fastopen.Plo \
-	system/$(DEPDIR)/keys-dummy.Plo system/$(DEPDIR)/keys-win.Plo \
-	system/$(DEPDIR)/sockets.Plo system/$(DEPDIR)/threads.Plo \
-	tls13/$(DEPDIR)/anti_replay.Plo \
+	./$(DEPDIR)/vko.Plo ./$(DEPDIR)/x509_b64.Plo \
+	inih/$(DEPDIR)/ini.Plo system/$(DEPDIR)/certs.Plo \
+	system/$(DEPDIR)/fastopen.Plo system/$(DEPDIR)/keys-dummy.Plo \
+	system/$(DEPDIR)/keys-win.Plo system/$(DEPDIR)/sockets.Plo \
+	system/$(DEPDIR)/threads.Plo tls13/$(DEPDIR)/anti_replay.Plo \
 	tls13/$(DEPDIR)/certificate.Plo \
 	tls13/$(DEPDIR)/certificate_request.Plo \
 	tls13/$(DEPDIR)/certificate_verify.Plo \
@@ -1721,7 +1724,7 @@ ACLOCAL_AMFLAGS = -I ../m4 -I ../gl/m4
 EXTRA_DIST = priority_options.gperf common.mk inih/LICENSE.txt
 BUILT_SOURCES = pkix_asn1_tab.c gnutls_asn1_tab.c priority_options.h
 SUBDIRS = includes x509 auth ext algorithms extras accelerated \
-	$(am__append_1) $(am__append_2) $(am__append_8)
+	$(am__append_1) $(am__append_2) $(am__append_9)
 AM_CFLAGS = $(WERROR_CFLAGS) $(WSTACK_CFLAGS) $(WARN_CFLAGS) $(NETTLE_CFLAGS) \
   $(LIBTASN1_CFLAGS) $(LIBIDN2_CFLAGS) $(P11_KIT_CFLAGS) $(CODE_COVERAGE_CFLAGS)
 
@@ -1735,30 +1738,30 @@ AM_CPPFLAGS = -DLOCALEDIR=\"$(localedir)\" -I$(srcdir)/../gl \
 # Pkg-config script.
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = gnutls.pc
-DISTCLEANFILES = $(pkgconfig_DATA) $(am__append_25)
-lib_LTLIBRARIES = libgnutls.la $(am__append_28)
+DISTCLEANFILES = $(pkgconfig_DATA) $(am__append_27)
+lib_LTLIBRARIES = libgnutls.la $(am__append_30)
 SRP_COBJECTS = srp.c
 PSK_COBJECTS = psk.c
 COBJECTS = range.c record.c compress.c debug.c cipher.c gthreads.h \
-	handshake-tls13.c mbuffers.c buffers.c handshake.c num.c \
-	errors.c dh.c kx.c cipher-cbc.c priority.c hash_int.c \
-	cipher_int.c session.c db.c x509_b64.c hello_ext.c auth.c \
-	sslv2_compat.c datum.c session_pack.c mpi.c pk.c cert-cred.c \
-	global.c constate.c anon_cred.c pkix_asn1_tab.c \
-	gnutls_asn1_tab.c mem.c fingerprint.c tls-sig.c ecc.c alert.c \
-	privkey_raw.c atomic.h system/certs.c system/threads.c \
-	system/fastopen.c system/sockets.c str-iconv.c system.c \
-	profiles.c profiles.h inih/ini.c str.c str-unicode.c \
-	str-idna.c state.c cert-cred-x509.c file.c supplemental.c \
-	random.c crypto-api.c crypto-api.h privkey.c pcert.c pubkey.c \
-	locks.c dtls.c system_override.c crypto-backend.c \
-	verify-tofu.c pin.c tpm.c fips.c safe-memfuncs.c atfork.c \
-	atfork.h randomart.c name_val_array.h system-keys.h urls.c \
-	urls.h prf.c auto-verify.c dh-session.c cert-session.c \
-	handshake-checks.c dtls-sw.c dh-primes.c openpgp_compat.c \
-	crypto-selftests.c crypto-selftests-pk.c secrets.c extv.c \
-	extv.h hello_ext_lib.c hello_ext_lib.h ocsp-api.c stek.c \
-	cert-cred-rawpk.c iov.c iov.h $(am__append_5) $(am__append_6) \
+	handshake-tls13.c mbuffers.c buffers.c handshake.c errors.c \
+	dh.c kx.c cipher-cbc.c priority.c hash_int.c cipher_int.c \
+	session.c db.c x509_b64.c hello_ext.c auth.c sslv2_compat.c \
+	datum.c session_pack.c mpi.c pk.c cert-cred.c global.c \
+	constate.c anon_cred.c pkix_asn1_tab.c gnutls_asn1_tab.c mem.c \
+	fingerprint.c tls-sig.c ecc.c alert.c privkey_raw.c atomic.h \
+	system/certs.c system/threads.c system/fastopen.c \
+	system/sockets.c str-iconv.c system.c profiles.c profiles.h \
+	inih/ini.c str.c str-unicode.c str-idna.c state.c \
+	cert-cred-x509.c file.c supplemental.c random.c crypto-api.c \
+	crypto-api.h privkey.c pcert.c pubkey.c locks.c dtls.c \
+	system_override.c crypto-backend.c verify-tofu.c pin.c tpm.c \
+	fips.c safe-memfuncs.c atfork.c atfork.h randomart.c \
+	name_val_array.h system-keys.h urls.c urls.h prf.c \
+	auto-verify.c dh-session.c cert-session.c handshake-checks.c \
+	dtls-sw.c dh-primes.c openpgp_compat.c crypto-selftests.c \
+	crypto-selftests-pk.c secrets.c extv.c extv.h hello_ext_lib.c \
+	hello_ext_lib.h ocsp-api.c stek.c cert-cred-rawpk.c iov.c \
+	iov.h $(am__append_5) $(am__append_6) $(am__append_7) \
 	tls13/encrypted_extensions.c tls13/encrypted_extensions.h \
 	tls13/certificate_request.c tls13/certificate_request.h \
 	tls13/certificate_verify.c tls13/certificate_verify.h \
@@ -1768,7 +1771,7 @@ COBJECTS = range.c record.c compress.c debug.c cipher.c gthreads.h \
 	tls13/session_ticket.h tls13/certificate.c tls13/certificate.h \
 	tls13/early_data.c tls13/early_data.h tls13/post_handshake.c \
 	tls13/psk_ext_parser.c tls13/psk_ext_parser.h \
-	tls13/anti_replay.c tls13/anti_replay.h $(am__append_7)
+	tls13/anti_replay.c tls13/anti_replay.h $(am__append_8)
 HFILES = abstract_int.h debug.h cipher.h buffers.h errors.h \
 	gnutls_int.h dtls.h handshake.h num.h algorithms.h dh.h kx.h \
 	hash_int.h cipher_int.h db.h auth.h hello_ext.h \
@@ -1778,25 +1781,25 @@ HFILES = abstract_int.h debug.h cipher.h buffers.h errors.h \
 	crypto-backend.h srp.h auth/srp_kx.h auth/srp_passwd.h file.h \
 	supplemental.h crypto.h random.h system.h locks.h mbuffers.h \
 	ecc.h pin.h fips.h priority_options.h secrets.h stek.h \
-	cert-cred.h $(am__append_9)
+	cert-cred.h $(am__append_10) $(am__append_11)
 libgnutls_la_SOURCES = $(HFILES) $(COBJECTS) $(SRP_COBJECTS)	\
 	$(PSK_COBJECTS) \
 	gnutls.asn pkix.asn libgnutls.map
 
 libgnutls_la_LDFLAGS = -no-undefined -version-info \
 	$(LT_CURRENT):$(LT_REVISION):$(LT_AGE) $(COMMON_LINK_FLAGS) \
-	$(am__append_18) $(am__append_19) $(am__append_24) \
-	$(am__append_27)
+	$(am__append_20) $(am__append_21) $(am__append_26) \
+	$(am__append_29)
 libgnutls_la_LIBADD = ../gl/libgnu.la x509/libgnutls_x509.la \
 	ext/libgnutls_ext.la auth/libgnutls_auth.la \
 	algorithms/libgnutls_alg.la extras/libgnutls_extras.la \
-	$(am__append_12) $(am__append_13) $(am__append_20) \
-	$(am__append_23) $(thirdparty_libadd)
+	$(am__append_14) $(am__append_15) $(am__append_22) \
+	$(am__append_25) $(thirdparty_libadd)
 thirdparty_libadd = $(LTLIBZ) $(LTLIBINTL) $(LIBSOCKET) $(LTLIBNSL) \
-	$(P11_KIT_LIBS) $(LIB_SELECT) $(am__append_10) \
-	$(am__append_11) $(am__append_14) $(am__append_15) \
-	$(am__append_16) $(am__append_17) $(am__append_21) \
-	$(am__append_22) $(am__append_26)
+	$(P11_KIT_LIBS) $(LIB_SELECT) $(am__append_12) \
+	$(am__append_13) $(am__append_16) $(am__append_17) \
+	$(am__append_18) $(am__append_19) $(am__append_23) \
+	$(am__append_24) $(am__append_28)
 @HAVE_LD_OUTPUT_DEF_TRUE@defexecdir = $(libdir)
 @HAVE_LD_OUTPUT_DEF_TRUE@defexec_DATA = libgnutls-$(DLL_VERSION).def
 
@@ -2005,7 +2008,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mbuffers.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mem.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mpi.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/num.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ocsp-api.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/openpgp_compat.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pcert.Plo@am__quote@ # am--include-marker
@@ -2049,6 +2051,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tpm.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/urls.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/verify-tofu.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/vko.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/x509_b64.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@inih/$(DEPDIR)/ini.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@system/$(DEPDIR)/certs.Plo@am__quote@ # am--include-marker
@@ -2441,7 +2444,6 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/mbuffers.Plo
 	-rm -f ./$(DEPDIR)/mem.Plo
 	-rm -f ./$(DEPDIR)/mpi.Plo
-	-rm -f ./$(DEPDIR)/num.Plo
 	-rm -f ./$(DEPDIR)/ocsp-api.Plo
 	-rm -f ./$(DEPDIR)/openpgp_compat.Plo
 	-rm -f ./$(DEPDIR)/pcert.Plo
@@ -2485,6 +2487,7 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/tpm.Plo
 	-rm -f ./$(DEPDIR)/urls.Plo
 	-rm -f ./$(DEPDIR)/verify-tofu.Plo
+	-rm -f ./$(DEPDIR)/vko.Plo
 	-rm -f ./$(DEPDIR)/x509_b64.Plo
 	-rm -f inih/$(DEPDIR)/ini.Plo
 	-rm -f system/$(DEPDIR)/certs.Plo
@@ -2598,7 +2601,6 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/mbuffers.Plo
 	-rm -f ./$(DEPDIR)/mem.Plo
 	-rm -f ./$(DEPDIR)/mpi.Plo
-	-rm -f ./$(DEPDIR)/num.Plo
 	-rm -f ./$(DEPDIR)/ocsp-api.Plo
 	-rm -f ./$(DEPDIR)/openpgp_compat.Plo
 	-rm -f ./$(DEPDIR)/pcert.Plo
@@ -2642,6 +2644,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/tpm.Plo
 	-rm -f ./$(DEPDIR)/urls.Plo
 	-rm -f ./$(DEPDIR)/verify-tofu.Plo
+	-rm -f ./$(DEPDIR)/vko.Plo
 	-rm -f ./$(DEPDIR)/x509_b64.Plo
 	-rm -f inih/$(DEPDIR)/ini.Plo
 	-rm -f system/$(DEPDIR)/certs.Plo

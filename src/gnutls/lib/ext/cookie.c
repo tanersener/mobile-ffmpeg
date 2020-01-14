@@ -41,7 +41,8 @@ const hello_ext_entry_st ext_mod_cookie = {
 	.gid = GNUTLS_EXTENSION_COOKIE,
 	.validity = GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_CLIENT_HELLO |
 		    GNUTLS_EXT_FLAG_HRR | GNUTLS_EXT_FLAG_IGNORE_CLIENT_REQUEST,
-	.parse_type = GNUTLS_EXT_MANDATORY, /* force parsing prior to EXT_TLS extensions */
+	.client_parse_point = GNUTLS_EXT_MANDATORY, /* force parsing prior to EXT_TLS extensions */
+	.server_parse_point = GNUTLS_EXT_MANDATORY, /* force parsing prior to EXT_TLS extensions */
 	.recv_func = cookie_recv_params,
 	.send_func = cookie_send_params,
 	.pack_func = NULL,

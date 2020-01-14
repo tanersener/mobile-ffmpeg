@@ -92,7 +92,7 @@ int main(int argc, char* argv[]) {
 
 #else  // !WEBP_HAVE_SDL
 
-int main(int argc, const char *argv[]) {
+int main(int argc, const char* argv[]) {
   fprintf(stderr, "SDL support not enabled in %s.\n", argv[0]);
   (void)argc;
   return 0;

@@ -250,6 +250,45 @@ flag = {
 };
 
 flag = {
+    name      = rawpkkeyfile;
+    arg-type  = string;
+    descrip   = "Private key file (PKCS #8 or PKCS #12) or PKCS #11 URL to use";
+    doc       = "Specify the private key file or URI to use; it must correspond to
+the raw public-key specified in --rawpkfile. Multiple key pairs
+can be specified with this option and in that case each occurrence of keyfile
+must be followed by the corresponding rawpkfile or vice-versa.
+
+In order to instruct the application to negotiate raw public keys one
+must enable the respective certificate types via the priority strings (i.e. CTYPE-CLI-*
+and CTYPE-SRV-* flags).
+
+Check  the  GnuTLS  manual  on  section  ``Priority strings'' for more
+information on how to set certificate types.";
+    stack-arg;
+    max       = NOLIMIT;
+};
+
+flag = {
+    name      = rawpkfile;
+    arg-type  = string;
+    descrip   = "Raw public-key file to use";
+    doc       = "Specify the raw public-key file to use; it must correspond to
+the private key specified in --rawpkkeyfile. Multiple key pairs
+can be specified with this option and in that case each occurrence of keyfile
+must be followed by the corresponding rawpkfile or vice-versa.
+
+In order to instruct the application to negotiate raw public keys one
+must enable the respective certificate types via the priority strings (i.e. CTYPE-CLI-*
+and CTYPE-SRV-* flags).
+
+Check  the  GnuTLS  manual  on  section  ``Priority strings'' for more
+information on how to set certificate types.";
+    stack-arg;
+    max       = NOLIMIT;
+    flags-must = rawpkkeyfile;
+};
+
+flag = {
     name      = srppasswd;
     arg-type  = file;
     file-exists = yes;
@@ -478,11 +517,24 @@ gnutls-serv --http --priority NORMAL:+ECDHE-PSK:+PSK \
             --pskpasswd psk-passwd.txt
 @end example
 
+If you want a server with support for raw public-keys we can also add these
+credentials. Note however that there is no identity information linked to these
+keys as is the case with regular x509 certificates. Authentication must be done
+via different means. Also we need to explicitly enable raw public-key certificates
+via the priority strings.
+
+@example
+gnutls-serv --http --priority NORMAL:+CTYPE-CLI-RAWPK:+CTYPE-SRV-RAWPK \
+            --rawpkfile srv.rawpk.pem \
+            --rawpkkeyfile srv.key.pem
+@end example
+
+
 Finally, we start the server with all the earlier parameters and you
 get this command:
 
 @example
-gnutls-serv --http --priority NORMAL:+PSK:+SRP \
+gnutls-serv --http --priority NORMAL:+PSK:+SRP:+CTYPE-CLI-RAWPK:+CTYPE-SRV-RAWPK \
             --x509cafile x509-ca.pem \
             --x509keyfile x509-server-key.pem \
             --x509certfile x509-server.pem \
@@ -490,7 +542,9 @@ gnutls-serv --http --priority NORMAL:+PSK:+SRP \
             --x509certfile x509-server-ecc.pem \
             --srppasswdconf srp-tpasswd.conf \
             --srppasswd srp-passwd.txt \
-            --pskpasswd psk-passwd.txt
+            --pskpasswd psk-passwd.txt \
+            --rawpkfile srv.rawpk.pem \
+            --rawpkkeyfile srv.key.pem
 @end example
 _EOF_;
 };

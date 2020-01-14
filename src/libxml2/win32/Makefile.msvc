@@ -274,9 +274,7 @@ UTILS = $(BINDIR)\xmllint.exe\
 	$(BINDIR)\testlimits.exe\
 	$(BINDIR)\testrecurse.exe
 	
-!if "$(WITH_THREADS)" == "yes" || "$(WITH_THREADS)" == "ctls" || "$(WITH_THREADS)" == "native"
-UTILS = $(UTILS) $(BINDIR)\testThreadsWin32.exe
-!else if "$(WITH_THREADS)" == "posix"
+!if "$(WITH_THREADS)" != "no"
 UTILS = $(UTILS) $(BINDIR)\testThreads.exe
 !endif
 

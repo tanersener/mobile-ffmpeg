@@ -139,7 +139,7 @@ unsigned int aom_avg_4x4_sse2(const uint8_t *s, int p) {
   return (avg + 8) >> 4;
 }
 
-static void hadamard_col8_sse2(__m128i *in, int iter) {
+static INLINE void hadamard_col8_sse2(__m128i *in, int iter) {
   __m128i a0 = in[0];
   __m128i a1 = in[1];
   __m128i a2 = in[2];

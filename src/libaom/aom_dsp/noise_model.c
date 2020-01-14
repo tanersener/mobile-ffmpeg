@@ -636,10 +636,12 @@ int aom_flat_block_finder_run(const aom_flat_block_finder_t *block_finder,
         //    [{var}, {ratio}, {trace}, {norm}, offset]
         // with one of the most discriminative being simply the variance.
         const double weights[5] = { -6682, -0.2056, 13087, -12434, 2.5694 };
-        const float score =
-            (float)(1.0 / (1 + exp(-(weights[0] * var + weights[1] * ratio +
-                                     weights[2] * trace + weights[3] * norm +
-                                     weights[4]))));
+        double sum_weights = weights[0] * var + weights[1] * ratio +
+                             weights[2] * trace + weights[3] * norm +
+                             weights[4];
+        // clamp the value to [-25.0, 100.0] to prevent overflow
+        sum_weights = fclamp(sum_weights, -25.0, 100.0);
+        const float score = (float)(1.0 / (1 + exp(-sum_weights)));
         flat_blocks[by * num_blocks_w + bx] = is_flat ? 255 : 0;
         scores[by * num_blocks_w + bx].score = var > kVarThreshold ? score : 0;
         scores[by * num_blocks_w + bx].index = by * num_blocks_w + bx;

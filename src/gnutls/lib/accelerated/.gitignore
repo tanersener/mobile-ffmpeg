@@ -1,6 +1,4 @@
-/.deps/
-/.libs/
 *.o
 *.lo
+*.la
 /Makefile
-/libaccelerated.la

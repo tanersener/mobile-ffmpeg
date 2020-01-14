@@ -521,8 +521,9 @@
     (or (getenv "GNUTLS_GUILE_EXTENSION_DIR")
         "@guileextensiondir@"))
 
-  (load-extension (string-append %libdir "/guile-gnutls-v-2")
-                  "scm_init_gnutls"))
+  (unless (getenv "GNUTLS_GUILE_CROSS_COMPILING")
+    (load-extension (string-append %libdir "/guile-gnutls-v-2")
+                    "scm_init_gnutls")))
 
 (cond-expand
   ((not guile-2)

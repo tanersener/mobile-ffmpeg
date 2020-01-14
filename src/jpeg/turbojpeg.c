@@ -368,9 +368,9 @@ static int getSubsamp(j_decompress_ptr dinfo)
           D_MAX_BLOCKS_IN_MCU / pixelsize[i] && i == TJSAMP_444) {
         int match = 0;
         for (k = 1; k < dinfo->num_components; k++) {
-          if (dinfo->comp_info[i].h_samp_factor ==
+          if (dinfo->comp_info[k].h_samp_factor ==
               dinfo->comp_info[0].h_samp_factor &&
-              dinfo->comp_info[i].v_samp_factor ==
+              dinfo->comp_info[k].v_samp_factor ==
               dinfo->comp_info[0].v_samp_factor)
             match++;
           if (match == dinfo->num_components - 1) {
@@ -1648,10 +1648,8 @@ DLLEXPORT int tjDecompressToYUVPlanes(tjhandle handle,
 
     iw[i] = compptr->width_in_blocks * dctsize;
     ih = compptr->height_in_blocks * dctsize;
-    pw[i] = PAD(dinfo->output_width, dinfo->max_h_samp_factor) *
-            compptr->h_samp_factor / dinfo->max_h_samp_factor;
-    ph[i] = PAD(dinfo->output_height, dinfo->max_v_samp_factor) *
-            compptr->v_samp_factor / dinfo->max_v_samp_factor;
+    pw[i] = tjPlaneWidth(i, dinfo->output_width, jpegSubsamp);
+    ph[i] = tjPlaneHeight(i, dinfo->output_height, jpegSubsamp);
     if (iw[i] != pw[i] || ih != ph[i]) usetmpbuf = 1;
     th[i] = compptr->v_samp_factor * dctsize;
     tmpbufsize += iw[i] * th[i];
@@ -1908,10 +1906,11 @@ DLLEXPORT int tjTransform(tjhandle handle, const unsigned char *jpegBuf,
     if (xinfo[i].crop) {
       if ((t[i].r.x % xinfo[i].iMCU_sample_width) != 0 ||
           (t[i].r.y % xinfo[i].iMCU_sample_height) != 0) {
-        snprintf(errStr, JMSG_LENGTH_MAX,
+        snprintf(this->errStr, JMSG_LENGTH_MAX,
                  "To crop this JPEG image, x must be a multiple of %d\n"
                  "and y must be a multiple of %d.\n",
                  xinfo[i].iMCU_sample_width, xinfo[i].iMCU_sample_height);
+        this->isInstanceError = TRUE;
         retval = -1;  goto bailout;
       }
     }

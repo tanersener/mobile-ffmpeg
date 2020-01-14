@@ -20,6 +20,7 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "avassert.h"
 #include "buffer_internal.h"
 #include "common.h"
 #include "mem.h"
@@ -116,7 +117,7 @@ static void buffer_replace(AVBufferRef **dst, AVBufferRef **src)
     } else
         av_freep(dst);
 
-    if (atomic_fetch_add_explicit(&b->refcount, -1, memory_order_acq_rel) == 1) {
+    if (atomic_fetch_sub_explicit(&b->refcount, 1, memory_order_acq_rel) == 1) {
         b->free(b->opaque, b->data);
         av_freep(&b);
     }
@@ -281,7 +282,7 @@ void av_buffer_pool_uninit(AVBufferPool **ppool)
     pool   = *ppool;
     *ppool = NULL;
 
-    if (atomic_fetch_add_explicit(&pool->refcount, -1, memory_order_acq_rel) == 1)
+    if (atomic_fetch_sub_explicit(&pool->refcount, 1, memory_order_acq_rel) == 1)
         buffer_pool_free(pool);
 }
 
@@ -298,7 +299,7 @@ static void pool_release_buffer(void *opaque, uint8_t *data)
     pool->pool = buf;
     ff_mutex_unlock(&pool->mutex);
 
-    if (atomic_fetch_add_explicit(&pool->refcount, -1, memory_order_acq_rel) == 1)
+    if (atomic_fetch_sub_explicit(&pool->refcount, 1, memory_order_acq_rel) == 1)
         buffer_pool_free(pool);
 }
 
@@ -354,4 +355,11 @@ AVBufferRef *av_buffer_pool_get(AVBufferPool *pool)
         atomic_fetch_add_explicit(&pool->refcount, 1, memory_order_relaxed);
 
     return ret;
+}
+
+void *av_buffer_pool_buffer_get_opaque(AVBufferRef *ref)
+{
+    BufferPoolEntry *buf = ref->buffer->opaque;
+    av_assert0(buf);
+    return buf->opaque;
 }

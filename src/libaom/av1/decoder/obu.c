@@ -548,32 +548,60 @@ static uint32_t read_and_decode_one_tile_list(AV1Decoder *pbi,
   return tile_list_payload_size;
 }
 
-// Reads the country code as specified in Recommendation ITU-T T.35. On
-// success, returns the number of bytes read from 'data'. On failure, calls
+// Returns the last nonzero byte index in 'data'. If there is no nonzero byte in
+// 'data', returns -1.
+static int get_last_nonzero_byte_index(const uint8_t *data, size_t sz) {
+  // Scan backward and return on the first nonzero byte.
+  int i = (int)sz - 1;
+  while (i >= 0 && data[i] == 0) {
+    --i;
+  }
+  return i;
+}
+
+// On success, returns the number of bytes read from 'data'. On failure, calls
 // aom_internal_error() and does not return.
-//
-// Note: This function does not read itu_t_t35_payload_bytes because the exact
-// syntax of itu_t_t35_payload_bytes is not defined in the spec.
-static size_t read_metadata_itut_t35(AV1_COMMON *const cm, const uint8_t *data,
+static size_t read_metadata_itut_t35(AV1Decoder *const pbi, const uint8_t *data,
                                      size_t sz) {
-  size_t i = 0;
-  // itu_t_t35_country_code f(8)
-  if (i >= sz) {
+  AV1_COMMON *const cm = &pbi->common;
+  if (sz == 0) {
     aom_internal_error(&cm->error, AOM_CODEC_CORRUPT_FRAME,
                        "itu_t_t35_country_code is missing");
   }
-  const int itu_t_t35_country_code = data[i];
-  ++i;
-  if (itu_t_t35_country_code == 0xFF) {
-    // itu_t_t35_country_code_extension_byte f(8)
-    if (i >= sz) {
-      aom_internal_error(&cm->error, AOM_CODEC_CORRUPT_FRAME,
-                         "itu_t_t35_country_code_extension_byte is missing");
-    }
-    ++i;
+  if (*data == 0xFF && sz < 2) {
+    aom_internal_error(&cm->error, AOM_CODEC_CORRUPT_FRAME,
+                       "itu_t_t35_country_code_extension_byte is missing");
   }
-  // itu_t_t35_payload_bytes
-  return i;
+  int bytes_read = get_last_nonzero_byte_index(data, sz);
+  if (bytes_read < 0) {
+    aom_internal_error(&cm->error, AOM_CODEC_CORRUPT_FRAME,
+                       "No trailing bits found on metadata");
+  }
+  aom_metadata_t *metadata = aom_img_metadata_alloc(OBU_METADATA_TYPE_ITUT_T35,
+                                                    data, (size_t)bytes_read);
+  if (!metadata) {
+    aom_internal_error(&cm->error, AOM_CODEC_MEM_ERROR,
+                       "Error allocating metadata");
+  }
+  if (!pbi->metadata) {
+    pbi->metadata = aom_img_metadata_array_alloc(1);
+    if (!pbi->metadata) {
+      aom_internal_error(&cm->error, AOM_CODEC_MEM_ERROR,
+                         "Failed to allocate metadata array");
+    }
+  } else {
+    aom_metadata_t **metadata_array =
+        (aom_metadata_t **)realloc(pbi->metadata->metadata_array,
+                                   (pbi->metadata->sz + 1) * sizeof(metadata));
+    if (!metadata_array) {
+      aom_internal_error(&cm->error, AOM_CODEC_MEM_ERROR,
+                         "Error allocating metadata");
+    }
+    pbi->metadata->metadata_array = metadata_array;
+    pbi->metadata->sz++;
+  }
+  pbi->metadata->metadata_array[pbi->metadata->sz - 1] = metadata;
+  return (size_t)bytes_read;
 }
 
 static void read_metadata_hdr_cll(struct aom_read_bit_buffer *rb) {
@@ -709,7 +737,7 @@ static size_t read_metadata(AV1Decoder *pbi, const uint8_t *data, size_t sz) {
   if (metadata_type == OBU_METADATA_TYPE_ITUT_T35) {
     size_t bytes_read =
         type_length +
-        read_metadata_itut_t35(cm, data + type_length, sz - type_length);
+        read_metadata_itut_t35(pbi, data + type_length, sz - type_length);
     // Ignore itu_t_t35_payload_bytes and check trailing bits. Section 6.7.2
     // of the spec says:
     //   itu_t_t35_payload_bytes shall be bytes containing data registered as
@@ -740,6 +768,24 @@ static size_t read_metadata(AV1Decoder *pbi, const uint8_t *data, size_t sz) {
   }
   assert((rb.bit_offset & 7) == 0);
   return type_length + (rb.bit_offset >> 3);
+}
+
+// On success, returns 'sz'. On failure, sets pbi->common.error.error_code and
+// returns 0.
+static size_t read_padding(AV1_COMMON *const cm, const uint8_t *data,
+                           size_t sz) {
+  // The spec allows a padding OBU to be header-only (i.e., obu_size = 0). So
+  // check trailing bits only if sz > 0.
+  if (sz > 0) {
+    // The payload of a padding OBU is byte aligned. Therefore the first
+    // trailing byte should be 0x80. See https://crbug.com/aomedia/2393.
+    const uint8_t last_nonzero_byte = get_last_nonzero_byte(data, sz);
+    if (last_nonzero_byte != 0x80) {
+      cm->error.error_code = AOM_CODEC_CORRUPT_FRAME;
+      return 0;
+    }
+  }
+  return sz;
 }
 
 // On success, returns a boolean that indicates whether the decoding of the
@@ -939,8 +985,8 @@ int aom_decode_frame_from_obus(struct AV1Decoder *pbi, const uint8_t *data,
         if (cm->error.error_code != AOM_CODEC_OK) return -1;
         break;
       case OBU_PADDING:
-        // TODO(wtc): Check trailing bits.
-        decoded_payload_size = payload_size;
+        decoded_payload_size = read_padding(&pbi->common, data, payload_size);
+        if (cm->error.error_code != AOM_CODEC_OK) return -1;
         break;
       default:
         // Skip unrecognized OBUs

@@ -1,5 +1,2 @@
-/.deps/
 /Makefile
-/.libs/
 /macosx/
-/libaarch64.la

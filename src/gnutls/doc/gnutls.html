@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <!-- This manual is last updated 27 June 2019 for version
-3.6.10 of GnuTLS.
+3.6.11 of GnuTLS.
 
 Copyright (C) 2001-2019 Free Software Foundation, Inc.\\
 Copyright (C) 2001-2019 Nikos Mavrogiannopoulos
@@ -12,20 +12,19 @@ any later version published by the Free Software Foundation; with no
 Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
 copy of the license is included in the section entitled "GNU Free
 Documentation License". -->
-<!-- Created by GNU Texinfo 6.6, http://www.gnu.org/software/texinfo/ -->
+<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<title>GnuTLS 3.6.10</title>
+<title>GnuTLS 3.6.11</title>
 
-<meta name="description" content="GnuTLS 3.6.10">
-<meta name="keywords" content="GnuTLS 3.6.10">
+<meta name="description" content="GnuTLS 3.6.11">
+<meta name="keywords" content="GnuTLS 3.6.11">
 <meta name="resource-type" content="document">
 <meta name="distribution" content="global">
 <meta name="Generator" content="makeinfo">
 <link href="#Top" rel="start" title="Top">
 <link href="#Function-and-Data-Index" rel="index" title="Function and Data Index">
 <link href="#SEC_Contents" rel="contents" title="Table of Contents">
-<link href="dir.html#Top" rel="up" title="(dir)">
 <style type="text/css">
 <!--
 a.summary-letter {text-decoration: none}
@@ -144,7 +143,7 @@ dl {
 </head>
 
 <body lang="en">
-<h1 class="settitle" align="center">GnuTLS 3.6.10</h1>
+<h1 class="settitle" align="center">GnuTLS 3.6.11</h1>
 
 
 
@@ -490,20 +489,20 @@ dl {
   </ul></li>
   <li><a id="toc-Copying-Information-1" href="#Copying-Information">Appendix F Copying Information</a></li>
   <li><a id="toc-Bibliography-1" href="#Bibliography">Bibliography</a></li>
-  <li><a id="toc-Function-and-Data-Index-1" href="#Function-and-Data-Index">Function and Data Index</a></li>
-  <li><a id="toc-Concept-Index-1" href="#Concept-Index">Concept Index</a></li>
+  <li><a id="toc-Function-and-Data-Index-1" href="#Function-and-Data-Index" rel="index">Function and Data Index</a></li>
+  <li><a id="toc-Concept-Index-1" href="#Concept-Index" rel="index">Concept Index</a></li>
 </ul>
 </div>
 
 
 <span id="Top"></span><div class="header">
 <p>
-Next: <a href="#Preface" accesskey="n" rel="next">Preface</a>, Up: <a href="dir.html#Top" accesskey="u" rel="up">(dir)</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Function-and-Data-Index" title="Index" rel="index">Index</a>]</p>
+Next: <a href="#Preface" accesskey="n" rel="next">Preface</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Function-and-Data-Index" title="Index" rel="index">Index</a>]</p>
 </div>
 <span id="GnuTLS"></span><h1 class="top">GnuTLS</h1>
 
 <p>This manual is last updated 27 June 2019 for version
-3.6.10 of GnuTLS.
+3.6.11 of GnuTLS.
 </p>
 <p>Copyright &copy; 2001-2019 Free Software Foundation, Inc.\\
 Copyright &copy; 2001-2019 Nikos Mavrogiannopoulos
@@ -554,9 +553,9 @@ Documentation License&rdquo;.
 </td></tr>
 <tr><td align="left" valign="top">&bull; <a href="#Bibliography">Bibliography</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
 </td></tr>
-<tr><td align="left" valign="top">&bull; <a href="#Function-and-Data-Index">Function and Data Index</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+<tr><td align="left" valign="top">&bull; <a href="#Function-and-Data-Index" rel="index">Function and Data Index</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
 </td></tr>
-<tr><td align="left" valign="top">&bull; <a href="#Concept-Index">Concept Index</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+<tr><td align="left" valign="top">&bull; <a href="#Concept-Index" rel="index">Concept Index</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
 </td></tr>
 </table>
 
@@ -10707,7 +10706,7 @@ exchange.
 initializes the TLS session parameters.
 </p>
 <p>The non-fatal errors expected by this function are:
-<code>GNUTLS_E_INTERRUPTED</code> , <code>GNUTLS_E_AGAIN</code> , 
+<code>GNUTLS_E_INTERRUPTED</code> , <code>GNUTLS_E_AGAIN</code> ,
 <code>GNUTLS_E_WARNING_ALERT_RECEIVED</code> . When this function is called
 for re-handshake under TLS 1.2 or earlier, the non-fatal error code
 <code>GNUTLS_E_GOT_APPLICATION_DATA</code>  may also be returned.
@@ -10804,25 +10803,26 @@ fatal for the protocol or can be ignored.
 difference is that it accepts a GnuTLS session, and uses different
 error codes.
 Note that if the send buffer is full, <code>send()</code>  will block this
-function.  See the <code>send()</code>  documentation for more information.  
+function.  See the <code>send()</code>  documentation for more information.
 </p>
 <p>You can replace the default push function which is <code>send()</code> , by using
 <code>gnutls_transport_set_push_function()</code> .
 </p>
-<p>If the EINTR is returned by the internal push function 
+<p>If the EINTR is returned by the internal push function
 then <code>GNUTLS_E_INTERRUPTED</code>  will be returned. If
 <code>GNUTLS_E_INTERRUPTED</code>  or <code>GNUTLS_E_AGAIN</code>  is returned, you must
 call this function again with the exact same parameters, or provide a
 <code>NULL</code>  pointer for  <code>data</code> and 0 for  <code>data_size</code> , in order to write the
 same data as before. If you wish to discard the previous data instead
 of retrying, you must call <code>gnutls_record_discard_queued()</code>  before
-calling this function with different parameters.
-cf. <code>gnutls_record_get_direction()</code> . 
+calling this function with different parameters. Note that the latter
+works only on special transports (e.g., UDP).
+cf. <code>gnutls_record_get_direction()</code> .
 </p>
 <p>Note that in DTLS this function will return the <code>GNUTLS_E_LARGE_PACKET</code> 
 error code if the send data exceed the data MTU value - as returned
 by <code>gnutls_dtls_get_data_mtu()</code> . The errno value EMSGSIZE
-also maps to <code>GNUTLS_E_LARGE_PACKET</code> . 
+also maps to <code>GNUTLS_E_LARGE_PACKET</code> .
 Note that since 3.2.13 this function can be called under cork in DTLS
 mode, and will refuse to send data over the MTU size by returning
 <code>GNUTLS_E_LARGE_PACKET</code> .
@@ -10862,7 +10862,7 @@ call this function again to get the data.  See also
 <code>gnutls_record_get_direction()</code> .
 </p>
 <p><strong>Returns:</strong> The number of bytes received and zero on EOF (for stream
-connections).  A negative error code is returned in case of an error.  
+connections).  A negative error code is returned in case of an error.
 The number of bytes received might be less than the requested  <code>data_size</code> .
 </p></dd></dl>
 
@@ -10917,7 +10917,7 @@ it returns in addition to data, the sequence number of the data.
 This is useful in DTLS where record packets might be received
 out-of-order. The returned 8-byte sequence number is an
 integer in big-endian format and should be
-treated as a unique message identification. 
+treated as a unique message identification.
 </p>
 <p><strong>Returns:</strong> The number of bytes received and zero on EOF.  A negative
 error code is returned in case of an error.  The number of bytes
@@ -10986,8 +10986,8 @@ connection you should wait for an EOF from the peer.
 <p>Note that not all implementations will properly terminate a TLS
 connection.  Some of them, usually for performance reasons, will
 terminate only the underlying transport layer, and thus not
-distinguishing between a malicious party prematurely terminating 
-the connection and normal termination. 
+distinguishing between a malicious party prematurely terminating
+the connection and normal termination.
 </p>
 <p>This function may also return <code>GNUTLS_E_AGAIN</code>  or
 <code>GNUTLS_E_INTERRUPTED</code> ; cf.  <code>gnutls_record_get_direction()</code> .
@@ -11058,8 +11058,8 @@ is interrupted then the <code>GNUTLS_E_AGAIN</code>  or <code>GNUTLS_E_INTERRUPT
 errors will be returned. To obtain the data left in the corked
 buffer use <code>gnutls_record_check_corked()</code> .
 </p>
-<p><strong>Returns:</strong> On success the number of transmitted data is returned, or 
-otherwise a negative error code. 
+<p><strong>Returns:</strong> On success the number of transmitted data is returned, or
+otherwise a negative error code.
 </p>
 <p><strong>Since:</strong> 3.1.9
 </p></dd></dl>
@@ -12284,7 +12284,7 @@ even drop the connection.
 </p>
 <p>This function can only be called in server side, and
 instructs a TLS 1.2 or earlier client to renegotiate
-parameters (perform a handshake), by sending a 
+parameters (perform a handshake), by sending a
 hello request message.
 </p>
 <p>If this function succeeds, the calling application
@@ -12300,7 +12300,7 @@ calling application should proceed to calling
 <code>gnutls_handshake()</code>  to negotiate the new
 parameters.
 </p>
-<p>If the client does not wish to renegotiate parameters he 
+<p>If the client does not wish to renegotiate parameters he
 may reply with an alert message, and in that case the return code seen
 by subsequent <code>gnutls_record_recv()</code>  will be
 <code>GNUTLS_E_WARNING_ALERT_RECEIVED</code>  with the specific alert being
@@ -18031,31 +18031,31 @@ changed
    -p, --port=str             The port or service to connect to
        --insecure             Don't abort program if server certificate can't be validated
        --verify-allow-broken  Allow broken algorithms, such as MD5 for certificate verification
-   -&quot;, --benchmark-ciphers    Benchmark individual ciphers
-   -#, --benchmark-tls-kx     Benchmark TLS key exchange methods
-   -$, --benchmark-tls-ciphers  Benchmark TLS ciphers
+       --benchmark-ciphers    Benchmark individual ciphers
+       --benchmark-tls-kx     Benchmark TLS key exchange methods
+       --benchmark-tls-ciphers  Benchmark TLS ciphers
    -l, --list                 Print a list of the supported algorithms and modes
                                 - prohibits the option 'port'
-   -%, --priority-list        Print a list of the supported priority strings
-   -&amp;, --noticket             Don't allow session tickets
-   -', --srtp-profiles=str    Offer SRTP profiles
-   -(, --alpn=str             Application layer protocol
+       --priority-list        Print a list of the supported priority strings
+       --noticket             Don't allow session tickets
+       --srtp-profiles=str    Offer SRTP profiles
+       --alpn=str             Application layer protocol
                                 - may appear multiple times
    -b, --heartbeat            Activate heartbeat support
-   -), --recordsize=num       The maximum record size to advertize
+       --recordsize=num       The maximum record size to advertize
                                 - it must be in the range:
                                   0 to 4096
-   -*, --disable-sni          Do not send a Server Name Indication (SNI)
-   -,, --single-key-share     Send a single key share under TLS1.3
-   --, --post-handshake-auth  Enable post-handshake authentication under TLS1.3
-   -., --inline-commands      Inline commands of the form ^&lt;cmd&gt;^
-   -/, --inline-commands-prefix=str Change the default delimiter for inline commands.
-   -0, --provider=file        Specify the PKCS #11 provider library
+       --disable-sni          Do not send a Server Name Indication (SNI)
+       --single-key-share     Send a single key share under TLS1.3
+       --post-handshake-auth  Enable post-handshake authentication under TLS1.3
+       --inline-commands      Inline commands of the form ^&lt;cmd&gt;^
+       --inline-commands-prefix=str Change the default delimiter for inline commands.
+       --provider=file        Specify the PKCS #11 provider library
                                 - file must pre-exist
-   -1, --fips140-mode         Reports the status of the FIPS140-2 mode in gnutls library
-   -2, --logfile=str          Redirect informational messages to a specific file.
-   -3, --keymatexport=str     Label used for exporting keying material
-   -4, --keymatexportsize=num Size of the exported keying material
+       --fips140-mode         Reports the status of the FIPS140-2 mode in gnutls library
+       --logfile=str          Redirect informational messages to a specific file.
+       --keymatexport=str     Label used for exporting keying material
+       --keymatexportsize=num Size of the exported keying material
    -v, --version[=arg]        output version information and exit
    -h, --help                 display extended usage information and exit
    -!, --more-help            extended usage information passed thru pager
@@ -18196,6 +18196,33 @@ NORMAL, PFS, SECURE128, SECURE256. The default is NORMAL.
 </p>
 <p>Check  the  GnuTLS  manual  on  section  &ldquo;Priority strings&rdquo; for more
 information on the allowed keywords
+<span id="gnutls_002dcli-rawpkkeyfile"></span></p><span id="rawpkkeyfile-option"></span><h4 class="subheading">rawpkkeyfile option</h4>
+
+<p>This is the &ldquo;private key file (pkcs #8 or pkcs #12) or pkcs #11 url to use&rdquo; option.
+This option takes a string argument.
+In order to instruct the application to negotiate raw public keys one
+must enable the respective certificate types via the priority strings (i.e. CTYPE-CLI-*
+and CTYPE-SRV-* flags).
+</p>
+<p>Check  the  GnuTLS  manual  on  section  &ldquo;Priority strings&rdquo; for more
+information on how to set certificate types.
+<span id="gnutls_002dcli-rawpkfile"></span></p><span id="rawpkfile-option"></span><h4 class="subheading">rawpkfile option</h4>
+
+<p>This is the &ldquo;raw public-key file to use&rdquo; option.
+This option takes a string argument.
+</p>
+<p>This option has some usage constraints.  It:
+</p><ul>
+<li> must appear in combination with the following options:
+rawpkkeyfile.
+</li></ul>
+
+<p>In order to instruct the application to negotiate raw public keys one
+must enable the respective certificate types via the priority strings (i.e. CTYPE-CLI-*
+and CTYPE-SRV-* flags).
+</p>
+<p>Check  the  GnuTLS  manual  on  section  &ldquo;Priority strings&rdquo; for more
+information on how to set certificate types.
 <span id="gnutls_002dcli-ranges"></span></p><span id="ranges-option"></span><h4 class="subheading">ranges option</h4>
 
 <p>This is the &ldquo;use length-hiding padding to prevent traffic analysis&rdquo; option.
@@ -18269,6 +18296,11 @@ Change the default delimiter (^) used for inline commands. The delimiter is expe
 <p>This is the &ldquo;specify the pkcs #11 provider library&rdquo; option.
 This option takes a file argument.
 This will override the default options in /etc/gnutls/pkcs11.conf
+<span id="gnutls_002dcli-logfile"></span></p><span id="logfile-option"></span><h4 class="subheading">logfile option</h4>
+
+<p>This is the &ldquo;redirect informational messages to a specific file.&rdquo; option.
+This option takes a string argument.
+Redirect informational messages to a specific file. The file may be /dev/null also to make the gnutls client quiet to use it in piped server connections where only the server communication may appear on stdout.
 <span id="gnutls_002dcli-exit-status"></span></p><span id="gnutls_002dcli-exit-status-1"></span><h4 class="subheading">gnutls-cli exit status</h4>
 
 <p>One of the following exit values will be returned:
@@ -18301,8 +18333,30 @@ Connecting to '127.0.0.1:5556'...
     
 - Simple Client Mode:
 </pre></div>
-<p>By keeping the &ndash;pskusername parameter and removing the &ndash;pskkey parameter, it will query only for the password during the handshake. 
+<p>By keeping the &ndash;pskusername parameter and removing the &ndash;pskkey parameter, it will query only for the password during the handshake.
 </p>
+<span id="Connecting-using-raw-public_002dkey-authentication"></span><h4 class="subheading">Connecting using raw public-key authentication</h4>
+<p>To connect to a server using raw public-key authentication, you need to enable the option to negotiate raw public-keys via the priority strings such as in the example below. 
+</p><div class="example">
+<pre class="example">$ ./gnutls-cli -p 5556 localhost --priority NORMAL:-CTYPE-CLI-ALL:+CTYPE-CLI-RAWPK \
+    --rawpkkeyfile cli.key.pem \
+    --rawpkfile cli.rawpk.pem
+Processed 1 client raw public key pair...
+Resolving 'localhost'...
+Connecting to '127.0.0.1:5556'...
+- Successfully sent 1 certificate(s) to server.
+- Server has requested a certificate.
+- Certificate type: X.509
+- Got a certificate list of 1 certificates.
+- Certificate[0] info:
+ - skipped
+- Description: (TLS1.3-Raw Public Key-X.509)-(ECDHE-SECP256R1)-(RSA-PSS-RSAE-SHA256)-(AES-256-GCM)
+- Options:
+- Handshake was completed
+    
+- Simple Client Mode:
+</pre></div>
+
 <span id="Connecting-to-STARTTLS-services"></span><h4 class="subheading">Connecting to STARTTLS services</h4>
 
 <p>You could also use the client to connect to services with starttls capability.
@@ -18557,7 +18611,51 @@ see <a href="#gnutls_002dserv-x509keyfile">the x509keyfile option documentation<
 <p>This is an alias for the <code>x509certfile</code> option,
 see <a href="#gnutls_002dserv-x509certfile">the x509certfile option documentation</a>.
 </p>
-<span id="gnutls_002dserv-ocsp_002dresponse"></span><span id="ocsp_002dresponse-option"></span><h4 class="subheading">ocsp-response option</h4>
+<span id="gnutls_002dserv-rawpkkeyfile"></span><span id="rawpkkeyfile-option-1"></span><h4 class="subheading">rawpkkeyfile option</h4>
+
+<p>This is the &ldquo;private key file (pkcs #8 or pkcs #12) or pkcs #11 url to use&rdquo; option.
+This option takes a string argument.
+</p>
+<p>This option has some usage constraints.  It:
+</p><ul>
+<li> may appear an unlimited number of times.
+</li></ul>
+
+<p>Specify the private key file or URI to use; it must correspond to
+the raw public-key specified in &ndash;rawpkfile. Multiple key pairs
+can be specified with this option and in that case each occurrence of keyfile
+must be followed by the corresponding rawpkfile or vice-versa.
+</p>
+<p>In order to instruct the application to negotiate raw public keys one
+must enable the respective certificate types via the priority strings (i.e. CTYPE-CLI-*
+and CTYPE-SRV-* flags).
+</p>
+<p>Check  the  GnuTLS  manual  on  section  &ldquo;Priority strings&rdquo; for more
+information on how to set certificate types.
+<span id="gnutls_002dserv-rawpkfile"></span></p><span id="rawpkfile-option-1"></span><h4 class="subheading">rawpkfile option</h4>
+
+<p>This is the &ldquo;raw public-key file to use&rdquo; option.
+This option takes a string argument.
+</p>
+<p>This option has some usage constraints.  It:
+</p><ul>
+<li> may appear an unlimited number of times.
+</li><li> must appear in combination with the following options:
+rawpkkeyfile.
+</li></ul>
+
+<p>Specify the raw public-key file to use; it must correspond to
+the private key specified in &ndash;rawpkkeyfile. Multiple key pairs
+can be specified with this option and in that case each occurrence of keyfile
+must be followed by the corresponding rawpkfile or vice-versa.
+</p>
+<p>In order to instruct the application to negotiate raw public keys one
+must enable the respective certificate types via the priority strings (i.e. CTYPE-CLI-*
+and CTYPE-SRV-* flags).
+</p>
+<p>Check  the  GnuTLS  manual  on  section  &ldquo;Priority strings&rdquo; for more
+information on how to set certificate types.
+<span id="gnutls_002dserv-ocsp_002dresponse"></span></p><span id="ocsp_002dresponse-option"></span><h4 class="subheading">ocsp-response option</h4>
 
 <p>This is the &ldquo;the ocsp response to send to client&rdquo; option.
 This option takes a string argument.
@@ -18713,11 +18811,24 @@ a password file created with <code>psktool</code>.
             --pskpasswd psk-passwd.txt
 </pre></div>
 
+<p>If you want a server with support for raw public-keys we can also add these
+credentials. Note however that there is no identity information linked to these
+keys as is the case with regular x509 certificates. Authentication must be done
+via different means. Also we need to explicitly enable raw public-key certificates
+via the priority strings.
+</p>
+<div class="example">
+<pre class="example">gnutls-serv --http --priority NORMAL:+CTYPE-CLI-RAWPK:+CTYPE-SRV-RAWPK \
+            --rawpkfile srv.rawpk.pem \
+            --rawpkkeyfile srv.key.pem
+</pre></div>
+
+
 <p>Finally, we start the server with all the earlier parameters and you
 get this command:
 </p>
 <div class="example">
-<pre class="example">gnutls-serv --http --priority NORMAL:+PSK:+SRP \
+<pre class="example">gnutls-serv --http --priority NORMAL:+PSK:+SRP:+CTYPE-CLI-RAWPK:+CTYPE-SRV-RAWPK \
             --x509cafile x509-ca.pem \
             --x509keyfile x509-server-key.pem \
             --x509certfile x509-server.pem \
@@ -18725,7 +18836,9 @@ get this command:
             --x509certfile x509-server-ecc.pem \
             --srppasswdconf srp-tpasswd.conf \
             --srppasswd srp-passwd.txt \
-            --pskpasswd psk-passwd.txt
+            --pskpasswd psk-passwd.txt \
+            --rawpkfile srv.rawpk.pem \
+            --rawpkkeyfile srv.key.pem
 </pre></div>
 <hr>
 <span id="gnutls_002dcli_002ddebug-Invocation"></span><div class="header">
@@ -21099,8 +21212,8 @@ connection you should wait for an EOF from the peer.
 <p>Note that not all implementations will properly terminate a TLS
 connection.  Some of them, usually for performance reasons, will
 terminate only the underlying transport layer, and thus not
-distinguishing between a malicious party prematurely terminating 
-the connection and normal termination. 
+distinguishing between a malicious party prematurely terminating
+the connection and normal termination.
 </p>
 <p>This function may also return <code>GNUTLS_E_AGAIN</code>  or
 <code>GNUTLS_E_INTERRUPTED</code> ; cf.  <code>gnutls_record_get_direction()</code> .
@@ -23561,12 +23674,12 @@ flags it returns <code>GNUTLS_E_INVALID_REQUEST</code> .
 
 <span id="gnutls_005fext_005fregister-1"></span><h4 class="subheading">gnutls_ext_register</h4>
 <span id="gnutls_005fext_005fregister"></span><dl>
-<dt id="index-gnutls_005fext_005fregister">Function: <em>int</em> <strong>gnutls_ext_register</strong> <em>(const char * <var>name</var>, int <var>id</var>, gnutls_ext_parse_type_t <var>parse_type</var>, gnutls_ext_recv_func <var>recv_func</var>, gnutls_ext_send_func <var>send_func</var>, gnutls_ext_deinit_data_func <var>deinit_func</var>, gnutls_ext_pack_func <var>pack_func</var>, gnutls_ext_unpack_func <var>unpack_func</var>)</em></dt>
+<dt id="index-gnutls_005fext_005fregister">Function: <em>int</em> <strong>gnutls_ext_register</strong> <em>(const char * <var>name</var>, int <var>id</var>, gnutls_ext_parse_type_t <var>parse_point</var>, gnutls_ext_recv_func <var>recv_func</var>, gnutls_ext_send_func <var>send_func</var>, gnutls_ext_deinit_data_func <var>deinit_func</var>, gnutls_ext_pack_func <var>pack_func</var>, gnutls_ext_unpack_func <var>unpack_func</var>)</em></dt>
 <dd><p><var>name</var>: the name of the extension to register
 </p>
 <p><var>id</var>: the numeric TLS id of the extension
 </p>
-<p><var>parse_type</var>: the parse type of the extension (see gnutls_ext_parse_type_t)
+<p><var>parse_point</var>: the parse type of the extension (see gnutls_ext_parse_type_t)
 </p>
 <p><var>recv_func</var>: a function to receive the data
 </p>
@@ -23904,7 +24017,7 @@ integers indicating the available groups.
 initializes the TLS session parameters.
 </p>
 <p>The non-fatal errors expected by this function are:
-<code>GNUTLS_E_INTERRUPTED</code> , <code>GNUTLS_E_AGAIN</code> , 
+<code>GNUTLS_E_INTERRUPTED</code> , <code>GNUTLS_E_AGAIN</code> ,
 <code>GNUTLS_E_WARNING_ALERT_RECEIVED</code> . When this function is called
 for re-handshake under TLS 1.2 or earlier, the non-fatal error code
 <code>GNUTLS_E_GOT_APPLICATION_DATA</code>  may also be returned.
@@ -25897,7 +26010,7 @@ padding, false (0) if the current session does not.
 <dd><p><var>session</var>: is a <code>gnutls_session_t</code>  type.
 </p>
 <p>This function checks if there pending corked
-data in the gnutls buffers &ndash;see <code>gnutls_record_cork()</code> . 
+data in the gnutls buffers &ndash;see <code>gnutls_record_cork()</code> .
 </p>
 <p><strong>Returns:</strong> Returns the size of the corked data or zero.
 </p>
@@ -25949,8 +26062,12 @@ by default unless requested using <code>gnutls_record_send_range()</code> .
 <dt id="index-gnutls_005frecord_005fdiscard_005fqueued">Function: <em>size_t</em> <strong>gnutls_record_discard_queued</strong> <em>(gnutls_session_t <var>session</var>)</em></dt>
 <dd><p><var>session</var>: is a <code>gnutls_session_t</code>  type.
 </p>
-<p>This function discards all queued to be sent packets in a TLS or DTLS session.
+<p>This function discards all queued to be sent packets in a DTLS session.
 These are the packets queued after an interrupted <code>gnutls_record_send()</code> .
+</p>
+<p>This function can only be used with transports where <code>send()</code>  is
+an all-or-nothing operation (e.g., UDP). When partial writes are allowed
+this function will cause session errors.
 </p>
 <p><strong>Returns:</strong> The number of bytes discarded.
 </p>
@@ -26070,7 +26187,7 @@ call this function again to get the data.  See also
 <code>gnutls_record_get_direction()</code> .
 </p>
 <p><strong>Returns:</strong> The number of bytes received and zero on EOF (for stream
-connections).  A negative error code is returned in case of an error.  
+connections).  A negative error code is returned in case of an error.
 The number of bytes received might be less than the requested  <code>data_size</code> .
 </p></dd></dl>
 
@@ -26113,12 +26230,12 @@ to directly receive the whole decrypted packet. That avoids a
 memory copy, and is intended to be used by applications seeking high
 performance.
 </p>
-<p>The received packet is accessed using <code>gnutls_packet_get()</code>  and 
+<p>The received packet is accessed using <code>gnutls_packet_get()</code>  and
 must be deinitialized using <code>gnutls_packet_deinit()</code> . The returned
 packet will be <code>NULL</code>  if the return value is zero (EOF).
 </p>
 <p><strong>Returns:</strong> The number of bytes received and zero on EOF (for stream
-connections).  A negative error code is returned in case of an error.  
+connections).  A negative error code is returned in case of an error.
 </p>
 <p><strong>Since:</strong> 3.3.5
 </p></dd></dl>
@@ -26139,7 +26256,7 @@ it returns in addition to data, the sequence number of the data.
 This is useful in DTLS where record packets might be received
 out-of-order. The returned 8-byte sequence number is an
 integer in big-endian format and should be
-treated as a unique message identification. 
+treated as a unique message identification.
 </p>
 <p><strong>Returns:</strong> The number of bytes received and zero on EOF.  A negative
 error code is returned in case of an error.  The number of bytes
@@ -26161,25 +26278,26 @@ received might be less than  <code>data_size</code> .
 difference is that it accepts a GnuTLS session, and uses different
 error codes.
 Note that if the send buffer is full, <code>send()</code>  will block this
-function.  See the <code>send()</code>  documentation for more information.  
+function.  See the <code>send()</code>  documentation for more information.
 </p>
 <p>You can replace the default push function which is <code>send()</code> , by using
 <code>gnutls_transport_set_push_function()</code> .
 </p>
-<p>If the EINTR is returned by the internal push function 
+<p>If the EINTR is returned by the internal push function
 then <code>GNUTLS_E_INTERRUPTED</code>  will be returned. If
 <code>GNUTLS_E_INTERRUPTED</code>  or <code>GNUTLS_E_AGAIN</code>  is returned, you must
 call this function again with the exact same parameters, or provide a
 <code>NULL</code>  pointer for  <code>data</code> and 0 for  <code>data_size</code> , in order to write the
 same data as before. If you wish to discard the previous data instead
 of retrying, you must call <code>gnutls_record_discard_queued()</code>  before
-calling this function with different parameters.
-cf. <code>gnutls_record_get_direction()</code> . 
+calling this function with different parameters. Note that the latter
+works only on special transports (e.g., UDP).
+cf. <code>gnutls_record_get_direction()</code> .
 </p>
 <p>Note that in DTLS this function will return the <code>GNUTLS_E_LARGE_PACKET</code> 
 error code if the send data exceed the data MTU value - as returned
 by <code>gnutls_dtls_get_data_mtu()</code> . The errno value EMSGSIZE
-also maps to <code>GNUTLS_E_LARGE_PACKET</code> . 
+also maps to <code>GNUTLS_E_LARGE_PACKET</code> .
 Note that since 3.2.13 this function can be called under cork in DTLS
 mode, and will refuse to send data over the MTU size by returning
 <code>GNUTLS_E_LARGE_PACKET</code> .
@@ -26394,8 +26512,8 @@ is interrupted then the <code>GNUTLS_E_AGAIN</code>  or <code>GNUTLS_E_INTERRUPT
 errors will be returned. To obtain the data left in the corked
 buffer use <code>gnutls_record_check_corked()</code> .
 </p>
-<p><strong>Returns:</strong> On success the number of transmitted data is returned, or 
-otherwise a negative error code. 
+<p><strong>Returns:</strong> On success the number of transmitted data is returned, or
+otherwise a negative error code.
 </p>
 <p><strong>Since:</strong> 3.1.9
 </p></dd></dl>
@@ -26407,7 +26525,7 @@ otherwise a negative error code.
 </p>
 <p>This function can only be called in server side, and
 instructs a TLS 1.2 or earlier client to renegotiate
-parameters (perform a handshake), by sending a 
+parameters (perform a handshake), by sending a
 hello request message.
 </p>
 <p>If this function succeeds, the calling application
@@ -26423,7 +26541,7 @@ calling application should proceed to calling
 <code>gnutls_handshake()</code>  to negotiate the new
 parameters.
 </p>
-<p>If the client does not wish to renegotiate parameters he 
+<p>If the client does not wish to renegotiate parameters he
 may reply with an alert message, and in that case the return code seen
 by subsequent <code>gnutls_record_recv()</code>  will be
 <code>GNUTLS_E_WARNING_ALERT_RECEIVED</code>  with the specific alert being
@@ -26626,14 +26744,14 @@ available to the more generic <code>gnutls_session_get_flags()</code> .
 
 <span id="gnutls_005fsession_005fext_005fregister-1"></span><h4 class="subheading">gnutls_session_ext_register</h4>
 <span id="gnutls_005fsession_005fext_005fregister"></span><dl>
-<dt id="index-gnutls_005fsession_005fext_005fregister">Function: <em>int</em> <strong>gnutls_session_ext_register</strong> <em>(gnutls_session_t <var>session</var>, const char * <var>name</var>, int <var>id</var>, gnutls_ext_parse_type_t <var>parse_type</var>, gnutls_ext_recv_func <var>recv_func</var>, gnutls_ext_send_func <var>send_func</var>, gnutls_ext_deinit_data_func <var>deinit_func</var>, gnutls_ext_pack_func <var>pack_func</var>, gnutls_ext_unpack_func <var>unpack_func</var>, unsigned <var>flags</var>)</em></dt>
+<dt id="index-gnutls_005fsession_005fext_005fregister">Function: <em>int</em> <strong>gnutls_session_ext_register</strong> <em>(gnutls_session_t <var>session</var>, const char * <var>name</var>, int <var>id</var>, gnutls_ext_parse_type_t <var>parse_point</var>, gnutls_ext_recv_func <var>recv_func</var>, gnutls_ext_send_func <var>send_func</var>, gnutls_ext_deinit_data_func <var>deinit_func</var>, gnutls_ext_pack_func <var>pack_func</var>, gnutls_ext_unpack_func <var>unpack_func</var>, unsigned <var>flags</var>)</em></dt>
 <dd><p><var>session</var>: the session for which this extension will be set
 </p>
 <p><var>name</var>: the name of the extension to register
 </p>
 <p><var>id</var>: the numeric id of the extension
 </p>
-<p><var>parse_type</var>: the parse type of the extension (see gnutls_ext_parse_type_t)
+<p><var>parse_point</var>: the parse type of the extension (see gnutls_ext_parse_type_t)
 </p>
 <p><var>recv_func</var>: a function to receive the data
 </p>
@@ -44601,7 +44719,7 @@ Syntax&quot;, June 1999, Available from <a href="https://www.rsa.com">https://ww
 </p>
 </dd>
 <dt><span id="PKCS11"></span>[PKCS11]</dt>
-<dd><p>RSA Laboratories, &quot;PKCS #11 Base Functionality v2.30: Cryptoki â Draft 4&quot;,
+<dd><p>RSA Laboratories, &quot;PKCS #11 Base Functionality v2.30: Cryptoki – Draft 4&quot;,
 July 2009, Available from <a href="https://www.rsa.com">https://www.rsa.com</a>.
 </p>
 </dd>
@@ -46293,77 +46411,77 @@ Previous: <a href="#Function-and-Data-Index" accesskey="p" rel="prev">Function a
 <hr>
 <h4 class="footnotes-heading">Footnotes</h4>
 
-<h3><a id="FOOT1" href="#DOCF1">(1)</a></h3>
+<h5><a id="FOOT1" href="#DOCF1">(1)</a></h3>
 <p>Needed
 to use RFC6125 name comparison in internationalized domains.</p>
-<h3><a id="FOOT2" href="#DOCF2">(2)</a></h3>
+<h5><a id="FOOT2" href="#DOCF2">(2)</a></h3>
 <p><a href="https://p11-glue.github.io/p11-glue/trust-module.html">https://p11-glue.github.io/p11-glue/trust-module.html</a></p>
-<h3><a id="FOOT3" href="#DOCF3">(3)</a></h3>
+<h5><a id="FOOT3" href="#DOCF3">(3)</a></h3>
 <p>IETF, or Internet Engineering Task Force,
 is a large open international community of network designers,
 operators, vendors, and researchers concerned with the evolution of
 the Internet architecture and the smooth operation of the Internet.
 It is open to any interested individual.</p>
-<h3><a id="FOOT4" href="#DOCF4">(4)</a></h3>
+<h5><a id="FOOT4" href="#DOCF4">(4)</a></h3>
 <p>In early versions of TLS compression was optionally
 available as well. This is no longer the case in recent versions of the
 protocol.</p>
-<h3><a id="FOOT5" href="#DOCF5">(5)</a></h3>
+<h5><a id="FOOT5" href="#DOCF5">(5)</a></h3>
 <p>MAC stands for Message Authentication Code. It can be described as a keyed hash algorithm. See RFC2104.</p>
-<h3><a id="FOOT6" href="#DOCF6">(6)</a></h3>
+<h5><a id="FOOT6" href="#DOCF6">(6)</a></h3>
 <p>See also the Server Name Indication extension on
 <a href="#serverind">serverind</a>.</p>
-<h3><a id="FOOT7" href="#DOCF7">(7)</a></h3>
+<h5><a id="FOOT7" href="#DOCF7">(7)</a></h3>
 <p>See LDAP, IMAP etc.</p>
-<h3><a id="FOOT8" href="#DOCF8">(8)</a></h3>
+<h5><a id="FOOT8" href="#DOCF8">(8)</a></h3>
 <p>see <a href="https://p11-glue.github.io/p11-glue/trust-module.html">https://p11-glue.github.io/p11-glue/trust-module.html</a>.</p>
-<h3><a id="FOOT9" href="#DOCF9">(9)</a></h3>
+<h5><a id="FOOT9" href="#DOCF9">(9)</a></h3>
 <p>For example, OpenSC-supported cards.</p>
-<h3><a id="FOOT10" href="#DOCF10">(10)</a></h3>
+<h5><a id="FOOT10" href="#DOCF10">(10)</a></h3>
 <p><a href="https://p11-glue.github.io/p11-glue/p11-kit.html">https://p11-glue.github.io/p11-glue/p11-kit.html</a></p>
-<h3><a id="FOOT11" href="#DOCF11">(11)</a></h3>
+<h5><a id="FOOT11" href="#DOCF11">(11)</a></h3>
 <p>For
 example when an open session is to be reinitialized, but the PIN is not available
 to GnuTLS (e.g., it was entered at a pinpad).</p>
-<h3><a id="FOOT12" href="#DOCF12">(12)</a></h3>
+<h5><a id="FOOT12" href="#DOCF12">(12)</a></h3>
 <p><a href="https://p11-glue.github.io/p11-glue/trust-module.html">https://p11-glue.github.io/p11-glue/trust-module.html</a></p>
-<h3><a id="FOOT13" href="#DOCF13">(13)</a></h3>
+<h5><a id="FOOT13" href="#DOCF13">(13)</a></h3>
 <p>See
 the &rsquo;Restricting the scope of CA certificates&rsquo; post at <a href="https://nmav.gnutls.org/2016/06/restricting-scope-of-ca-certificates.html">https://nmav.gnutls.org/2016/06/restricting-scope-of-ca-certificates.html</a></p>
-<h3><a id="FOOT14" href="#DOCF14">(14)</a></h3>
+<h5><a id="FOOT14" href="#DOCF14">(14)</a></h3>
 <p><a href="https://github.com/google/chaps-linux">https://github.com/google/chaps-linux</a></p>
-<h3><a id="FOOT15" href="#DOCF15">(15)</a></h3>
+<h5><a id="FOOT15" href="#DOCF15">(15)</a></h3>
 <p><a href="https://sourceforge.net/projects/opencryptoki/">https://sourceforge.net/projects/opencryptoki/</a></p>
-<h3><a id="FOOT16" href="#DOCF16">(16)</a></h3>
+<h5><a id="FOOT16" href="#DOCF16">(16)</a></h3>
 <p>The first message in a <acronym>TLS</acronym> handshake</p>
-<h3><a id="FOOT17" href="#DOCF17">(17)</a></h3>
+<h5><a id="FOOT17" href="#DOCF17">(17)</a></h3>
 <p>On special systems
 you could manually specify the locking system using
 the function <a href="#gnutls_005fglobal_005fset_005fmutex">gnutls_global_set_mutex</a> before calling any other
 GnuTLS function. Setting mutexes manually is not recommended.</p>
-<h3><a id="FOOT18" href="#DOCF18">(18)</a></h3>
+<h5><a id="FOOT18" href="#DOCF18">(18)</a></h3>
 <p>The original behavior of requiring explicit initialization can obtained by setting the
 GNUTLS_NO_EXPLICIT_INIT environment variable to 1, or by using the macro GNUTLS_SKIP_GLOBAL_INIT
 in a global section of your program &ndash;the latter works in systems with
 support for weak symbols only.</p>
-<h3><a id="FOOT19" href="#DOCF19">(19)</a></h3>
+<h5><a id="FOOT19" href="#DOCF19">(19)</a></h3>
 <p>A key of 128 bits or 16 bytes should be sufficient for this purpose.</p>
-<h3><a id="FOOT20" href="#DOCF20">(20)</a></h3>
+<h5><a id="FOOT20" href="#DOCF20">(20)</a></h3>
 <p>It depends on the group in use.  Groups with
 less bits are always faster, but the number of bits ties with the security
 parameter.  See <a href="#Selecting-cryptographic-key-sizes">Selecting cryptographic key sizes</a>
 for the acceptable security levels.</p>
-<h3><a id="FOOT21" href="#DOCF21">(21)</a></h3>
+<h5><a id="FOOT21" href="#DOCF21">(21)</a></h3>
 <p>See <a href="https://www.lysator.liu.se/~nisse/nettle/">https://www.lysator.liu.se/~nisse/nettle/</a>.</p>
-<h3><a id="FOOT22" href="#DOCF22">(22)</a></h3>
+<h5><a id="FOOT22" href="#DOCF22">(22)</a></h3>
 <p>See the nettle manual <a href="https://www.lysator.liu.se/~nisse/nettle/nettle.html">https://www.lysator.liu.se/~nisse/nettle/nettle.html</a></p>
-<h3><a id="FOOT23" href="#DOCF23">(23)</a></h3>
+<h5><a id="FOOT23" href="#DOCF23">(23)</a></h3>
 <p>such as the
 <code>gnutls_certificate_credentials_t</code> structures</p>
-<h3><a id="FOOT24" href="#DOCF24">(24)</a></h3>
+<h5><a id="FOOT24" href="#DOCF24">(24)</a></h3>
 <p>See
 <a href="https://lists.gnu.org/archive/html/gnutls-devel/2011-02/msg00079.html">https://lists.gnu.org/archive/html/gnutls-devel/2011-02/msg00079.html</a>.</p>
-<h3><a id="FOOT25" href="#DOCF25">(25)</a></h3>
+<h5><a id="FOOT25" href="#DOCF25">(25)</a></h3>
 <p>Check <a href="https://home.gna.org/cryptodev-linux/">https://home.gna.org/cryptodev-linux/</a>
 for the Linux kernel implementation of <code>/dev/crypto</code>.</p>
 </div>

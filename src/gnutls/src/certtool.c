@@ -306,7 +306,6 @@ static void verify_provable_privkey(common_info_st * cinfo)
 	return;
 }
 
-
 static gnutls_x509_crt_t
 generate_certificate(gnutls_privkey_t * ret_key,
 		     gnutls_x509_crt_t ca_crt, int proxy,
@@ -579,6 +578,7 @@ generate_certificate(gnutls_privkey_t * ret_key,
 					app_exit(1);
 				}
 			}
+
 		} else if (ca_status) {
 			/* CAs always sign */
 			if (get_sign_status(server))
@@ -776,6 +776,15 @@ generate_certificate(gnutls_privkey_t * ret_key,
 		gnutls_x509_spki_deinit(spki);
 	}
 
+	/* always set CRL distribution points on CAs, but also on certificates
+	 * generated with --generate-self-signed. The latter is to retain
+	 * compatibility with previous versions of certtool. */
+	if (ca_status || (!proxy && ca_crt == NULL)) {
+		get_crl_dist_point_set(crt);
+	} else if (!proxy && ca_crt != NULL) {
+		gnutls_x509_crt_cpy_crl_dist_points(crt, ca_crt);
+	}
+
 	*ret_key = key;
 	return crt;
 
@@ -956,8 +965,6 @@ void generate_self_signed(common_info_st * cinfo)
 	if (!key)
 		key = load_private_key(1, cinfo);
 
-	get_crl_dist_point_set(crt);
-
 	print_certificate_info(crt, stdlog, 0);
 
 	fprintf(stdlog, "\n\nSigning certificate...\n");
@@ -1002,12 +1009,6 @@ static void generate_signed_certificate(common_info_st * cinfo)
 	ca_crt = load_ca_cert(1, cinfo);
 
 	crt = generate_certificate(&key, ca_crt, 0, cinfo);
-
-	/* Copy the CRL distribution points.
-	 */
-	gnutls_x509_crt_cpy_crl_dist_points(crt, ca_crt);
-	/* it doesn't matter if we couldn't copy the CRL dist points.
-	 */
 
 	print_certificate_info(crt, stdlog, 0);
 

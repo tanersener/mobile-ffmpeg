@@ -56,7 +56,11 @@ else
 if HAVE_GETENTROPY
 libcrypto_la_SOURCES += sysrng-getentropy.c
 else
+if HAVE_KERN_ARND
+libcrypto_la_SOURCES += sysrng-netbsd.c
+else
 libcrypto_la_SOURCES += sysrng-linux.c
+endif
 endif
 endif
 
@@ -70,7 +74,7 @@ endif
 if ENABLE_GOST
 libcrypto_la_SOURCES += \
 	gost/nettle-write.h \
-	gost/gost28147.c gost/gost28147.h \
+	gost/gost28147.c gost/gost28147.h gost/gost-wrap.c \
 	gost/gosthash94.c gost/gosthash94.h gost/gosthash94-meta.c \
 	gost/streebog.c gost/streebog.h gost/streebog-meta.c \
 	gost/hmac-gosthash94.c gost/hmac-streebog.c gost/hmac-gost.h
@@ -88,6 +92,8 @@ libcrypto_la_SOURCES += \
 	gost/ecc-gost512a.c gost/ecc-gost512a-32.h gost/ecc-gost512a-64.h \
 	gost/ecc-internal.h gost/gmp-glue.h \
 	gost/ecc-gostdsa-sign.c gost/ecc-gostdsa-verify.c \
-	gost/gostdsa-mask.c gost/gostdsa-sign.c gost/gostdsa-verify.c \
+	gost/gostdsa-mask.c gost/gostdsa-sign.c gost/gostdsa-verify.c gost/gostdsa-vko.c \
 	gost/gostdsa.h gost/ecc-gost-curve.h gost/ecc-gost-hash.c
+
+libcrypto_la_SOURCES += gost_keywrap.c
 endif

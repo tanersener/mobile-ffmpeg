@@ -74,7 +74,7 @@ static int ff_qsv_get_continuous_buffer(AVCodecContext *avctx, AVFrame *frame, A
         break;
     default:
         av_log(avctx, AV_LOG_ERROR, "Unsupported pixel format.\n");
-        return AVERROR(ENOMEM);
+        return AVERROR(EINVAL);
     }
 
     frame->linesize[1] = frame->linesize[0];
@@ -99,9 +99,11 @@ static int qsv_init_session(AVCodecContext *avctx, QSVContext *q, mfxSession ses
     int ret;
 
     if (q->gpu_copy == MFX_GPUCOPY_ON &&
-        !(q->iopattern & MFX_IOPATTERN_OUT_SYSTEM_MEMORY))
+        !(q->iopattern & MFX_IOPATTERN_OUT_SYSTEM_MEMORY)) {
         av_log(avctx, AV_LOG_WARNING, "GPU-accelerated memory copy "
-                        "only works in MFX_IOPATTERN_OUT_SYSTEM_MEMORY.\n");
+                        "only works in system memory mode.\n");
+        q->gpu_copy = MFX_GPUCOPY_OFF;
+    }
     if (session) {
         q->session = session;
     } else if (hw_frames_ref) {
@@ -162,33 +164,6 @@ static inline unsigned int qsv_fifo_item_size(void)
 static inline unsigned int qsv_fifo_size(const AVFifoBuffer* fifo)
 {
     return av_fifo_size(fifo) / qsv_fifo_item_size();
-}
-
-static int check_dec_param(AVCodecContext *avctx, QSVContext *q, mfxVideoParam *param_in)
-{
-    mfxVideoParam param_out = { .mfx.CodecId = param_in->mfx.CodecId };
-    mfxStatus ret;
-
-#define CHECK_MATCH(x) \
-    do { \
-      if (param_out.mfx.x != param_in->mfx.x) {   \
-          av_log(avctx, AV_LOG_WARNING, "Required "#x" %d is unsupported\n", \
-          param_in->mfx.x); \
-      } \
-    } while (0)
-
-    ret = MFXVideoDECODE_Query(q->session, param_in, &param_out);
-
-    if (ret < 0) {
-        CHECK_MATCH(CodecId);
-        CHECK_MATCH(CodecProfile);
-        CHECK_MATCH(CodecLevel);
-        CHECK_MATCH(FrameInfo.Width);
-        CHECK_MATCH(FrameInfo.Height);
-#undef CHECK_MATCH
-        return 0;
-    }
-    return 1;
 }
 
 static int qsv_decode_preinit(AVCodecContext *avctx, QSVContext *q, enum AVPixelFormat pix_fmt, mfxVideoParam *param)

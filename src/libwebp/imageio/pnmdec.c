@@ -26,7 +26,7 @@ typedef enum {
   DEPTH_FLAG      = 1 << 2,
   MAXVAL_FLAG     = 1 << 3,
   TUPLE_FLAG      = 1 << 4,
-  ALL_NEEDED_FLAGS = 0x1f
+  ALL_NEEDED_FLAGS = WIDTH_FLAG | HEIGHT_FLAG | DEPTH_FLAG | MAXVAL_FLAG
 } PNMFlags;
 
 typedef struct {
@@ -74,6 +74,7 @@ static size_t ReadPAMFields(PNMInfo* const info, size_t off) {
   char out[MAX_LINE_SIZE + 1];
   size_t out_size;
   int tmp;
+  int expected_depth = -1;
   assert(info != NULL);
   while (1) {
     off = ReadLine(info->data, off, info->data_size, out, &out_size);
@@ -95,13 +96,13 @@ static size_t ReadPAMFields(PNMInfo* const info, size_t off) {
       info->seen_flags |= MAXVAL_FLAG;
       info->max_value = tmp;
     } else if (!strcmp(out, "TUPLTYPE RGB_ALPHA")) {
-      info->bytes_per_px = 4;
+      expected_depth = 4;
       info->seen_flags |= TUPLE_FLAG;
     } else if (!strcmp(out, "TUPLTYPE RGB")) {
-      info->bytes_per_px = 3;
+      expected_depth = 3;
       info->seen_flags |= TUPLE_FLAG;
     } else if (!strcmp(out, "TUPLTYPE GRAYSCALE")) {
-      info->bytes_per_px = 1;
+      expected_depth = 1;
       info->seen_flags |= TUPLE_FLAG;
     } else if (!strcmp(out, "ENDHDR")) {
       break;
@@ -110,23 +111,24 @@ static size_t ReadPAMFields(PNMInfo* const info, size_t off) {
       int i;
       if (out_size > 20) sprintf(out + 20 - strlen(kEllipsis), kEllipsis);
       for (i = 0; i < (int)strlen(out); ++i) {
-        if (!isprint(out[i])) out[i] = ' ';
+        // isprint() might trigger a "char-subscripts" warning if given a char.
+        if (!isprint((int)out[i])) out[i] = ' ';
       }
       fprintf(stderr, "PAM header error: unrecognized entry [%s]\n", out);
       return 0;
     }
   }
-  if (!(info->seen_flags & TUPLE_FLAG)) {
-    if (info->depth > 0 && info->depth <= 4 && info->depth != 2) {
-      info->seen_flags |= TUPLE_FLAG;
-      info->bytes_per_px = info->depth * (info->max_value > 255 ? 2 : 1);
-    } else {
-      fprintf(stderr, "PAM: invalid bitdepth (%d).\n", info->depth);
-      return 0;
-    }
+  if (!(info->seen_flags & ALL_NEEDED_FLAGS)) {
+    fprintf(stderr, "PAM header error: missing tags%s%s%s%s\n",
+            (info->seen_flags & WIDTH_FLAG) ? "" : " WIDTH",
+            (info->seen_flags & HEIGHT_FLAG) ? "" : " HEIGHT",
+            (info->seen_flags & DEPTH_FLAG) ? "" : " DEPTH",
+            (info->seen_flags & MAXVAL_FLAG) ? "" : " MAXVAL");
+    return 0;
   }
-  if (info->seen_flags != ALL_NEEDED_FLAGS) {
-    fprintf(stderr, "PAM: incomplete header.\n");
+  if (expected_depth != -1 && info->depth != expected_depth) {
+    fprintf(stderr, "PAM header error: expected DEPTH %d but got DEPTH %d\n",
+            expected_depth, info->depth);
     return 0;
   }
   return off;
@@ -160,16 +162,15 @@ static size_t ReadHeader(PNMInfo* const info) {
 
     // finish initializing missing fields
     info->depth = (info->type == 5) ? 1 : 3;
-    info->bytes_per_px = info->depth * (info->max_value > 255 ? 2 : 1);
   }
   // perform some basic numerical validation
   if (info->width <= 0 || info->height <= 0 ||
       info->type <= 0 || info->type >= 9 ||
       info->depth <= 0 || info->depth == 2 || info->depth > 4 ||
-      info->bytes_per_px < info->depth ||
       info->max_value <= 0 || info->max_value >= 65536) {
     return 0;
   }
+  info->bytes_per_px = info->depth * (info->max_value > 255 ? 2 : 1);
   return off;
 }
 

@@ -91,7 +91,7 @@ int main(int argc, char **argv) {
     doc = extractFile(filename, (const xmlChar *) pattern);
     if (doc != NULL) {
         /*
-	 * ouptut the result.
+	 * output the result.
 	 */
         xmlDocDump(stdout, doc);
 	/*

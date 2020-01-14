@@ -46,7 +46,8 @@ const hello_ext_entry_st ext_mod_supported_groups = {
 	.name = "Supported Groups",
 	.tls_id = 10,
 	.gid = GNUTLS_EXTENSION_SUPPORTED_GROUPS,
-	.parse_type = GNUTLS_EXT_TLS,
+	.client_parse_point = GNUTLS_EXT_TLS,
+	.server_parse_point = GNUTLS_EXT_TLS,
 	.validity = GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_DTLS | GNUTLS_EXT_FLAG_CLIENT_HELLO |
 		    GNUTLS_EXT_FLAG_EE | GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
 	.recv_func = _gnutls_supported_groups_recv_params,
@@ -159,7 +160,7 @@ _gnutls_supported_groups_recv_params(gnutls_session_t session,
 								break;
 							serv_dh_idx = j;
 							cli_dh_pos = i;
-						} else {
+						} else if (IS_EC(group->pk)) {
 							if (serv_ec_idx != -1 && (int)j > serv_ec_idx)
 								break;
 							serv_ec_idx = j;
@@ -171,7 +172,7 @@ _gnutls_supported_groups_recv_params(gnutls_session_t session,
 								break;
 							cli_dh_pos = i;
 							serv_dh_idx = j;
-						} else {
+						} else if (IS_EC(group->pk)) {
 							if (cli_ec_pos != -1)
 								break;
 							cli_ec_pos = i;

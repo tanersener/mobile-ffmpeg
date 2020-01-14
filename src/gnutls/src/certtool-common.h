@@ -113,7 +113,7 @@ const char *get_pass(void);
 const char *get_confirmed_pass(bool empty_ok);
 void app_exit(int val)
 #ifdef __GNUC__
-__attribute__ ((noreturn))
+__attribute__ ((__noreturn__))
 #endif
 ;
 int cipher_to_flags(const char *cipher);

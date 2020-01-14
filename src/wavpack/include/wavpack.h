@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////
 //                           **** WAVPACK ****                            //
 //                  Hybrid Lossless Wavefile Compressor                   //
-//                Copyright (c) 1998 - 2016 David Bryant.                 //
+//                Copyright (c) 1998 - 2019 David Bryant.                 //
 //                          All Rights Reserved.                          //
 //      Distributed under the BSD Software License (see license.txt)      //
 ////////////////////////////////////////////////////////////////////////////
@@ -280,7 +280,7 @@ typedef int (*WavpackBlockOutput)(void *id, void *data, int32_t bcount);
 
 //////////////////////////// function prototypes /////////////////////////////
 
-typedef void WavpackContext;
+typedef struct WavpackContext WavpackContext;
 
 #ifdef __cplusplus
 extern "C" {

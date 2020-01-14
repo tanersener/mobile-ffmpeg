@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////
 //                           **** WAVPACK ****                            //
 //                  Hybrid Lossless Wavefile Compressor                   //
-//                Copyright (c) 1998 - 2016 David Bryant.                 //
+//                Copyright (c) 1998 - 2019 David Bryant.                 //
 //                          All Rights Reserved.                          //
 //      Distributed under the BSD Software License (see license.txt)      //
 ////////////////////////////////////////////////////////////////////////////
@@ -86,7 +86,7 @@ static int raw_push_back_byte (void *id, int c)
     WavpackRawContext *rcxt = id;
     rcxt->ungetc_char = c;
     rcxt->ungetc_flag = 1;
-    return c; 
+    return c;
 }
 
 static int64_t raw_get_length (void *id)
@@ -156,8 +156,6 @@ WavpackContext *WavpackOpenRawDecoder (
         }
 
         while (main_bytes >= 12) {
-            WavpackHeader *wphdr = malloc (sizeof (WavpackHeader));
-
             if (!msi) {
                 block_samples = *mcp++;
                 block_samples += *mcp++ << 8;
@@ -199,32 +197,32 @@ WavpackContext *WavpackOpenRawDecoder (
                 raw_close_stream (raw_wv);
                 raw_close_stream (raw_wvc);
                 return NULL;
-            } 
+            }
+            else {
+                WavpackHeader *wphdr = malloc (sizeof (WavpackHeader));
+                memset (wphdr, 0, sizeof (WavpackHeader));
+                memcpy (wphdr->ckID, "wvpk", 4);
+                wphdr->ckSize = sizeof (WavpackHeader) - 8 + block_size;
+                SET_TOTAL_SAMPLES (*wphdr, block_samples);
+                wphdr->block_samples = block_samples;
+                wphdr->version = version;
+                wphdr->flags = wphdr_flags;
+                wphdr->crc = crc;
+                WavpackLittleEndianToNative (wphdr, WavpackHeaderFormat);
 
-            memset (wphdr, 0, sizeof (WavpackHeader));
-            memcpy (wphdr->ckID, "wvpk", 4);
-            wphdr->ckSize = sizeof (WavpackHeader) - 8 + block_size;
-            SET_TOTAL_SAMPLES (*wphdr, block_samples);
-            wphdr->block_samples = block_samples;
-            wphdr->version = version;
-            wphdr->flags = wphdr_flags;
-            wphdr->crc = crc;
-            WavpackLittleEndianToNative (wphdr, WavpackHeaderFormat);
-
-            raw_wv->num_segments += 2;
-            raw_wv->segments = realloc (raw_wv->segments, sizeof (RawSegment) * raw_wv->num_segments);
-            raw_wv->segments [msi].dptr = raw_wv->segments [msi].sptr = (unsigned char *) wphdr;
-            raw_wv->segments [msi].eptr = raw_wv->segments [msi].dptr + sizeof (WavpackHeader);
-            raw_wv->segments [msi++].free_required = 1;
-            raw_wv->segments [msi].dptr = raw_wv->segments [msi].sptr = mcp;
-            raw_wv->segments [msi].eptr = raw_wv->segments [msi].dptr + block_size;
-            raw_wv->segments [msi++].free_required = 0;
-            main_bytes -= block_size;
-            mcp += block_size;
+                raw_wv->num_segments += 2;
+                raw_wv->segments = realloc (raw_wv->segments, sizeof (RawSegment) * raw_wv->num_segments);
+                raw_wv->segments [msi].dptr = raw_wv->segments [msi].sptr = (unsigned char *) wphdr;
+                raw_wv->segments [msi].eptr = raw_wv->segments [msi].dptr + sizeof (WavpackHeader);
+                raw_wv->segments [msi++].free_required = 1;
+                raw_wv->segments [msi].dptr = raw_wv->segments [msi].sptr = mcp;
+                raw_wv->segments [msi].eptr = raw_wv->segments [msi].dptr + block_size;
+                raw_wv->segments [msi++].free_required = 0;
+                main_bytes -= block_size;
+                mcp += block_size;
+            }
 
             if (corr_data && corr_bytes >= 4) {
-                wphdr = malloc (sizeof (WavpackHeader));
-
                 crc = *ccp++;
                 crc += *ccp++ << 8;
                 crc += *ccp++ << 16;
@@ -246,28 +244,30 @@ WavpackContext *WavpackOpenRawDecoder (
                     raw_close_stream (raw_wv);
                     raw_close_stream (raw_wvc);
                     return NULL;
-                } 
+                }
+                else {
+                    WavpackHeader *wphdr = malloc (sizeof (WavpackHeader));
+                    memset (wphdr, 0, sizeof (WavpackHeader));
+                    memcpy (wphdr->ckID, "wvpk", 4);
+                    wphdr->ckSize = sizeof (WavpackHeader) - 8 + block_size;
+                    SET_TOTAL_SAMPLES (*wphdr, block_samples);
+                    wphdr->block_samples = block_samples;
+                    wphdr->version = version;
+                    wphdr->flags = wphdr_flags;
+                    wphdr->crc = crc;
+                    WavpackLittleEndianToNative (wphdr, WavpackHeaderFormat);
 
-                memset (wphdr, 0, sizeof (WavpackHeader));
-                memcpy (wphdr->ckID, "wvpk", 4);
-                wphdr->ckSize = sizeof (WavpackHeader) - 8 + block_size;
-                SET_TOTAL_SAMPLES (*wphdr, block_samples);
-                wphdr->block_samples = block_samples;
-                wphdr->version = version;
-                wphdr->flags = wphdr_flags;
-                wphdr->crc = crc;
-                WavpackLittleEndianToNative (wphdr, WavpackHeaderFormat);
-
-                raw_wvc->num_segments += 2;
-                raw_wvc->segments = realloc (raw_wvc->segments, sizeof (RawSegment) * raw_wvc->num_segments);
-                raw_wvc->segments [csi].dptr = raw_wvc->segments [csi].sptr = (unsigned char *) wphdr;
-                raw_wvc->segments [csi].eptr = raw_wvc->segments [csi].dptr + sizeof (WavpackHeader);
-                raw_wvc->segments [csi++].free_required = 1;
-                raw_wvc->segments [csi].dptr = raw_wvc->segments [csi].sptr = ccp;
-                raw_wvc->segments [csi].eptr = raw_wvc->segments [csi].dptr + block_size;
-                raw_wvc->segments [csi++].free_required = 0;
-                corr_bytes -= block_size;
-                ccp += block_size;
+                    raw_wvc->num_segments += 2;
+                    raw_wvc->segments = realloc (raw_wvc->segments, sizeof (RawSegment) * raw_wvc->num_segments);
+                    raw_wvc->segments [csi].dptr = raw_wvc->segments [csi].sptr = (unsigned char *) wphdr;
+                    raw_wvc->segments [csi].eptr = raw_wvc->segments [csi].dptr + sizeof (WavpackHeader);
+                    raw_wvc->segments [csi++].free_required = 1;
+                    raw_wvc->segments [csi].dptr = raw_wvc->segments [csi].sptr = ccp;
+                    raw_wvc->segments [csi].eptr = raw_wvc->segments [csi].dptr + block_size;
+                    raw_wvc->segments [csi++].free_required = 0;
+                    corr_bytes -= block_size;
+                    ccp += block_size;
+                }
             }
         }
 

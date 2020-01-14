@@ -436,7 +436,7 @@ void vp9_rc_init(const VP9EncoderConfig *oxcf, int pass, RATE_CONTROL *rc) {
   rc->use_post_encode_drop = 0;
   rc->ext_use_post_encode_drop = 0;
   rc->arf_active_best_quality_adjustment_factor = 1.0;
-
+  rc->arf_increase_active_best_quality = 0;
   rc->preserve_arf_as_gld = 0;
   rc->preserve_next_arf_as_gld = 0;
   rc->show_arf_as_gld = 0;
@@ -504,7 +504,7 @@ static int check_buffer_below_thresh(VP9_COMP *cpi, int drop_mark) {
   }
 }
 
-static int drop_frame(VP9_COMP *cpi) {
+int vp9_test_drop(VP9_COMP *cpi) {
   const VP9EncoderConfig *oxcf = &cpi->oxcf;
   RATE_CONTROL *const rc = &cpi->rc;
   SVC *svc = &cpi->svc;
@@ -609,13 +609,15 @@ int vp9_rc_drop_frame(VP9_COMP *cpi) {
   SVC *svc = &cpi->svc;
   int svc_prev_layer_dropped = 0;
   // In the constrained or full_superframe framedrop mode for svc
-  // (framedrop_mode !=  LAYER_DROP), if the previous spatial layer was
-  // dropped, drop the current spatial layer.
+  // (framedrop_mode != (LAYER_DROP && CONSTRAINED_FROM_ABOVE)),
+  // if the previous spatial layer was dropped, drop the current spatial layer.
   if (cpi->use_svc && svc->spatial_layer_id > 0 &&
       svc->drop_spatial_layer[svc->spatial_layer_id - 1])
     svc_prev_layer_dropped = 1;
-  if ((svc_prev_layer_dropped && svc->framedrop_mode != LAYER_DROP) ||
-      drop_frame(cpi)) {
+  if ((svc_prev_layer_dropped && svc->framedrop_mode != LAYER_DROP &&
+       svc->framedrop_mode != CONSTRAINED_FROM_ABOVE_DROP) ||
+      svc->force_drop_constrained_from_above[svc->spatial_layer_id] ||
+      vp9_test_drop(cpi)) {
     vp9_rc_postencode_update_drop_frame(cpi);
     cpi->ext_refresh_frame_flags_pending = 0;
     cpi->last_frame_dropped = 1;
@@ -625,14 +627,17 @@ int vp9_rc_drop_frame(VP9_COMP *cpi) {
       svc->drop_count[svc->spatial_layer_id]++;
       svc->skip_enhancement_layer = 1;
       if (svc->framedrop_mode == LAYER_DROP ||
+          (svc->framedrop_mode == CONSTRAINED_FROM_ABOVE_DROP &&
+           svc->force_drop_constrained_from_above[svc->number_spatial_layers -
+                                                  1] == 0) ||
           svc->drop_spatial_layer[0] == 0) {
-        // For the case of constrained drop mode where the base is dropped
-        // (drop_spatial_layer[0] == 1), which means full superframe dropped,
-        // we don't increment the svc frame counters. In particular temporal
-        // layer counter (which is incremented in vp9_inc_frame_in_layer())
-        // won't be incremented, so on a dropped frame we try the same
-        // temporal_layer_id on next incoming frame. This is to avoid an
-        // issue with temporal alignement with full superframe dropping.
+        // For the case of constrained drop mode where full superframe is
+        // dropped, we don't increment the svc frame counters.
+        // In particular temporal layer counter (which is incremented in
+        // vp9_inc_frame_in_layer()) won't be incremented, so on a dropped
+        // frame we try the same temporal_layer_id on next incoming frame.
+        // This is to avoid an issue with temporal alignement with full
+        // superframe dropping.
         vp9_inc_frame_in_layer(cpi);
       }
       if (svc->spatial_layer_id == svc->number_spatial_layers - 1) {
@@ -1420,8 +1425,8 @@ static int rc_pick_q_and_bounds_two_pass(const VP9_COMP *cpi, int *bottom_index,
   int active_worst_quality = cpi->twopass.active_worst_quality;
   int q;
   int *inter_minq;
-  int arf_active_best_quality_adjustment, arf_active_best_quality_max;
-  int *arfgf_high_motion_minq;
+  int arf_active_best_quality_hl;
+  int *arfgf_high_motion_minq, *arfgf_low_motion_minq;
   const int boost_frame =
       !rc->is_src_frame_alt_ref &&
       (cpi->refresh_golden_frame || cpi->refresh_alt_ref_frame);
@@ -1448,14 +1453,20 @@ static int rc_pick_q_and_bounds_two_pass(const VP9_COMP *cpi, int *bottom_index,
       if (q < cq_level) q = cq_level;
     }
     active_best_quality = get_gf_active_quality(cpi, q, cm->bit_depth);
+    arf_active_best_quality_hl = active_best_quality;
 
-    ASSIGN_MINQ_TABLE(cm->bit_depth, arfgf_high_motion_minq);
-    arf_active_best_quality_max = arfgf_high_motion_minq[q];
-    arf_active_best_quality_adjustment =
-        arf_active_best_quality_max - active_best_quality;
-    active_best_quality = arf_active_best_quality_max -
-                          (int)(arf_active_best_quality_adjustment *
-                                rc->arf_active_best_quality_adjustment_factor);
+    if (rc->arf_increase_active_best_quality == 1) {
+      ASSIGN_MINQ_TABLE(cm->bit_depth, arfgf_high_motion_minq);
+      arf_active_best_quality_hl = arfgf_high_motion_minq[q];
+    } else if (rc->arf_increase_active_best_quality == -1) {
+      ASSIGN_MINQ_TABLE(cm->bit_depth, arfgf_low_motion_minq);
+      arf_active_best_quality_hl = arfgf_low_motion_minq[q];
+    }
+    active_best_quality =
+        (int)((double)active_best_quality *
+                  rc->arf_active_best_quality_adjustment_factor +
+              (double)arf_active_best_quality_hl *
+                  (1.0 - rc->arf_active_best_quality_adjustment_factor));
 
     // Modify best quality for second level arfs. For mode VPX_Q this
     // becomes the baseline frame q.
@@ -1480,17 +1491,30 @@ static int rc_pick_q_and_bounds_two_pass(const VP9_COMP *cpi, int *bottom_index,
   // Extension to max or min Q if undershoot or overshoot is outside
   // the permitted range.
   if (frame_is_intra_only(cm) || boost_frame) {
+    const int layer_depth = gf_group->layer_depth[gf_group_index];
     active_best_quality -=
         (cpi->twopass.extend_minq + cpi->twopass.extend_minq_fast);
     active_worst_quality += (cpi->twopass.extend_maxq / 2);
+
+    if (gf_group->rf_level[gf_group_index] == GF_ARF_LOW) {
+      assert(layer_depth > 1);
+      active_best_quality =
+          VPXMAX(active_best_quality,
+                 cpi->twopass.last_qindex_of_arf_layer[layer_depth - 1]);
+    }
   } else {
+    const int max_layer_depth = gf_group->max_layer_depth;
+    assert(max_layer_depth > 0);
+
     active_best_quality -=
         (cpi->twopass.extend_minq + cpi->twopass.extend_minq_fast) / 2;
     active_worst_quality += cpi->twopass.extend_maxq;
 
     // For normal frames do not allow an active minq lower than the q used for
     // the last boosted frame.
-    active_best_quality = VPXMAX(active_best_quality, rc->last_boosted_qindex);
+    active_best_quality =
+        VPXMAX(active_best_quality,
+               cpi->twopass.last_qindex_of_arf_layer[max_layer_depth - 1]);
   }
 
 #if LIMIT_QRANGE_FOR_ALTREF_AND_KEY
@@ -1789,6 +1813,9 @@ void vp9_rc_postencode_update(VP9_COMP *cpi, uint64_t bytes_used) {
   RATE_CONTROL *const rc = &cpi->rc;
   SVC *const svc = &cpi->svc;
   const int qindex = cm->base_qindex;
+  const GF_GROUP *gf_group = &cpi->twopass.gf_group;
+  const int gf_group_index = cpi->twopass.gf_group.index;
+  const int layer_depth = gf_group->layer_depth[gf_group_index];
 
   // Update rate control heuristics
   rc->projected_frame_size = (int)(bytes_used << 3);
@@ -1843,6 +1870,15 @@ void vp9_rc_postencode_update(VP9_COMP *cpi, uint64_t bytes_used) {
         (cpi->refresh_golden_frame && !rc->is_src_frame_alt_ref)))) {
     rc->last_boosted_qindex = qindex;
   }
+
+  if ((qindex < cpi->twopass.last_qindex_of_arf_layer[layer_depth]) ||
+      (cm->frame_type == KEY_FRAME) ||
+      (!rc->constrained_gf_group &&
+       (cpi->refresh_alt_ref_frame ||
+        (cpi->refresh_golden_frame && !rc->is_src_frame_alt_ref)))) {
+    cpi->twopass.last_qindex_of_arf_layer[layer_depth] = qindex;
+  }
+
   if (frame_is_intra_only(cm)) rc->last_kf_qindex = qindex;
 
   update_buffer_level_postencode(cpi, rc->projected_frame_size);
@@ -2441,12 +2477,23 @@ void vp9_rc_set_gf_interval_range(const VP9_COMP *const cpi,
     // Set Maximum gf/arf interval
     rc->max_gf_interval = oxcf->max_gf_interval;
     rc->min_gf_interval = oxcf->min_gf_interval;
+#if CONFIG_RATE_CTRL
+    if (rc->min_gf_interval == 0) {
+      rc->min_gf_interval = vp9_rc_get_default_min_gf_interval(
+          oxcf->width, oxcf->height, oxcf->init_framerate);
+    }
+    if (rc->max_gf_interval == 0) {
+      rc->max_gf_interval = vp9_rc_get_default_max_gf_interval(
+          oxcf->init_framerate, rc->min_gf_interval);
+    }
+#else
     if (rc->min_gf_interval == 0)
       rc->min_gf_interval = vp9_rc_get_default_min_gf_interval(
           oxcf->width, oxcf->height, cpi->framerate);
     if (rc->max_gf_interval == 0)
       rc->max_gf_interval = vp9_rc_get_default_max_gf_interval(
           cpi->framerate, rc->min_gf_interval);
+#endif
 
     // Extended max interval for genuinely static scenes like slide shows.
     rc->static_scene_max_gf_interval = MAX_STATIC_GF_GROUP_LENGTH;

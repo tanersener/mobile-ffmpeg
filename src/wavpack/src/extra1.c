@@ -36,7 +36,7 @@
 
 #ifdef OPT_ASM_X86
     #define PACK_DECORR_MONO_PASS_CONT pack_decorr_mono_pass_cont_x86
-#elif defined(OPT_ASM_X64) && (defined (_WIN64) || defined(__CYGWIN__) || defined(__MINGW64__))
+#elif defined(OPT_ASM_X64) && (defined (_WIN64) || defined(__CYGWIN__) || defined(__MINGW64__) || defined(__midipix__))
     #define PACK_DECORR_MONO_PASS_CONT pack_decorr_mono_pass_cont_x64win
 #elif defined(OPT_ASM_X64)
     #define PACK_DECORR_MONO_PASS_CONT pack_decorr_mono_pass_cont_x64

@@ -575,6 +575,7 @@ static int query_formats(AVFilterContext *ctx)
         AV_PIX_FMT_YUVA420P10, AV_PIX_FMT_YUVA422P10, AV_PIX_FMT_YUVA444P10,
         AV_PIX_FMT_GBRP10, AV_PIX_FMT_GBRAP10, AV_PIX_FMT_GRAY10,
         AV_PIX_FMT_YUV420P12, AV_PIX_FMT_YUV422P12, AV_PIX_FMT_YUV444P12, AV_PIX_FMT_YUV440P12,
+        AV_PIX_FMT_YUVA422P12, AV_PIX_FMT_YUVA444P12,
         AV_PIX_FMT_GBRP12, AV_PIX_FMT_GBRAP12, AV_PIX_FMT_GRAY12,
         AV_PIX_FMT_YUV420P16, AV_PIX_FMT_YUV422P16, AV_PIX_FMT_YUV444P16,
         AV_PIX_FMT_YUVA420P16, AV_PIX_FMT_YUVA422P16, AV_PIX_FMT_YUVA444P16,
@@ -600,44 +601,44 @@ static av_cold void uninit(AVFilterContext *ctx)
         av_expr_free(s->params[i].e);
 }
 
-#define DEFINE_INIT_BLEND_FUNC(depth, nbits)                                              \
-static av_cold void init_blend_func_##depth##_##nbits##bit(FilterParams *param)           \
-{                                                                                         \
-    switch (param->mode) {                                                                \
-        case BLEND_ADDITION:   param->blend = blend_addition_##depth##bit;   break;       \
-        case BLEND_GRAINMERGE: param->blend = blend_grainmerge_##depth##bit; break;       \
-        case BLEND_AND:        param->blend = blend_and_##depth##bit;        break;       \
-        case BLEND_AVERAGE:    param->blend = blend_average_##depth##bit;    break;       \
-        case BLEND_BURN:       param->blend = blend_burn_##depth##bit;       break;       \
-        case BLEND_DARKEN:     param->blend = blend_darken_##depth##bit;     break;       \
-        case BLEND_DIFFERENCE: param->blend = blend_difference_##depth##bit; break;       \
-        case BLEND_GRAINEXTRACT: param->blend = blend_grainextract_##depth##bit; break;   \
-        case BLEND_DIVIDE:     param->blend = blend_divide_##depth##bit;     break;       \
-        case BLEND_DODGE:      param->blend = blend_dodge_##depth##bit;      break;       \
-        case BLEND_EXCLUSION:  param->blend = blend_exclusion_##depth##bit;  break;       \
-        case BLEND_EXTREMITY:  param->blend = blend_extremity_##depth##bit;  break;       \
-        case BLEND_FREEZE:     param->blend = blend_freeze_##depth##bit;     break;       \
-        case BLEND_GLOW:       param->blend = blend_glow_##depth##bit;       break;       \
-        case BLEND_HARDLIGHT:  param->blend = blend_hardlight_##depth##bit;  break;       \
-        case BLEND_HARDMIX:    param->blend = blend_hardmix_##depth##bit;    break;       \
-        case BLEND_HEAT:       param->blend = blend_heat_##depth##bit;       break;       \
-        case BLEND_LIGHTEN:    param->blend = blend_lighten_##depth##bit;    break;       \
-        case BLEND_LINEARLIGHT:param->blend = blend_linearlight_##depth##bit;break;       \
-        case BLEND_MULTIPLY:   param->blend = blend_multiply_##depth##bit;   break;       \
-        case BLEND_MULTIPLY128:param->blend = blend_multiply128_##depth##bit;break;       \
-        case BLEND_NEGATION:   param->blend = blend_negation_##depth##bit;   break;       \
-        case BLEND_NORMAL:     param->blend = blend_normal_##nbits##bit;     break;       \
-        case BLEND_OR:         param->blend = blend_or_##depth##bit;         break;       \
-        case BLEND_OVERLAY:    param->blend = blend_overlay_##depth##bit;    break;       \
-        case BLEND_PHOENIX:    param->blend = blend_phoenix_##depth##bit;    break;       \
-        case BLEND_PINLIGHT:   param->blend = blend_pinlight_##depth##bit;   break;       \
-        case BLEND_REFLECT:    param->blend = blend_reflect_##depth##bit;    break;       \
-        case BLEND_SCREEN:     param->blend = blend_screen_##depth##bit;     break;       \
-        case BLEND_SOFTLIGHT:  param->blend = blend_softlight_##depth##bit;  break;       \
-        case BLEND_SUBTRACT:   param->blend = blend_subtract_##depth##bit;   break;       \
-        case BLEND_VIVIDLIGHT: param->blend = blend_vividlight_##depth##bit; break;       \
-        case BLEND_XOR:        param->blend = blend_xor_##depth##bit;        break;       \
-    }                                                                                     \
+#define DEFINE_INIT_BLEND_FUNC(depth, nbits)                                          \
+static av_cold void init_blend_func_##depth##_##nbits##bit(FilterParams *param)       \
+{                                                                                     \
+    switch (param->mode) {                                                            \
+    case BLEND_ADDITION:     param->blend = blend_addition_##depth##bit;     break;   \
+    case BLEND_GRAINMERGE:   param->blend = blend_grainmerge_##depth##bit;   break;   \
+    case BLEND_AND:          param->blend = blend_and_##depth##bit;          break;   \
+    case BLEND_AVERAGE:      param->blend = blend_average_##depth##bit;      break;   \
+    case BLEND_BURN:         param->blend = blend_burn_##depth##bit;         break;   \
+    case BLEND_DARKEN:       param->blend = blend_darken_##depth##bit;       break;   \
+    case BLEND_DIFFERENCE:   param->blend = blend_difference_##depth##bit;   break;   \
+    case BLEND_GRAINEXTRACT: param->blend = blend_grainextract_##depth##bit; break;   \
+    case BLEND_DIVIDE:       param->blend = blend_divide_##depth##bit;       break;   \
+    case BLEND_DODGE:        param->blend = blend_dodge_##depth##bit;        break;   \
+    case BLEND_EXCLUSION:    param->blend = blend_exclusion_##depth##bit;    break;   \
+    case BLEND_EXTREMITY:    param->blend = blend_extremity_##depth##bit;    break;   \
+    case BLEND_FREEZE:       param->blend = blend_freeze_##depth##bit;       break;   \
+    case BLEND_GLOW:         param->blend = blend_glow_##depth##bit;         break;   \
+    case BLEND_HARDLIGHT:    param->blend = blend_hardlight_##depth##bit;    break;   \
+    case BLEND_HARDMIX:      param->blend = blend_hardmix_##depth##bit;      break;   \
+    case BLEND_HEAT:         param->blend = blend_heat_##depth##bit;         break;   \
+    case BLEND_LIGHTEN:      param->blend = blend_lighten_##depth##bit;      break;   \
+    case BLEND_LINEARLIGHT:  param->blend = blend_linearlight_##depth##bit;  break;   \
+    case BLEND_MULTIPLY:     param->blend = blend_multiply_##depth##bit;     break;   \
+    case BLEND_MULTIPLY128:  param->blend = blend_multiply128_##depth##bit;  break;   \
+    case BLEND_NEGATION:     param->blend = blend_negation_##depth##bit;     break;   \
+    case BLEND_NORMAL:       param->blend = blend_normal_##nbits##bit;       break;   \
+    case BLEND_OR:           param->blend = blend_or_##depth##bit;           break;   \
+    case BLEND_OVERLAY:      param->blend = blend_overlay_##depth##bit;      break;   \
+    case BLEND_PHOENIX:      param->blend = blend_phoenix_##depth##bit;      break;   \
+    case BLEND_PINLIGHT:     param->blend = blend_pinlight_##depth##bit;     break;   \
+    case BLEND_REFLECT:      param->blend = blend_reflect_##depth##bit;      break;   \
+    case BLEND_SCREEN:       param->blend = blend_screen_##depth##bit;       break;   \
+    case BLEND_SOFTLIGHT:    param->blend = blend_softlight_##depth##bit;    break;   \
+    case BLEND_SUBTRACT:     param->blend = blend_subtract_##depth##bit;     break;   \
+    case BLEND_VIVIDLIGHT:   param->blend = blend_vividlight_##depth##bit;   break;   \
+    case BLEND_XOR:          param->blend = blend_xor_##depth##bit;          break;   \
+    }                                                                                 \
 }
 DEFINE_INIT_BLEND_FUNC(8, 8)
 DEFINE_INIT_BLEND_FUNC(9, 16)

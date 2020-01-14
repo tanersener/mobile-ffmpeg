@@ -192,8 +192,11 @@ typedef struct RD_STATS {
   int zero_rate;
 #if CONFIG_RD_DEBUG
   int txb_coeff_cost[MAX_MB_PLANE];
-  int txb_coeff_cost_map[MAX_MB_PLANE][TXB_COEFF_COST_MAP_SIZE]
-                        [TXB_COEFF_COST_MAP_SIZE];
+  // TODO(jingning): Temporary solution to silence stack over-size warning
+  // in handle_inter_mode. This should be fixed after rate-distortion
+  // optimization refactoring.
+  int16_t txb_coeff_cost_map[MAX_MB_PLANE][TXB_COEFF_COST_MAP_SIZE]
+                            [TXB_COEFF_COST_MAP_SIZE];
 #endif  // CONFIG_RD_DEBUG
 } RD_STATS;
 
@@ -358,9 +361,9 @@ static INLINE void mi_to_pixel_loc(int *pixel_c, int *pixel_r, int mi_col,
                                    int mi_row, int tx_blk_col, int tx_blk_row,
                                    int subsampling_x, int subsampling_y) {
   *pixel_c = ((mi_col >> subsampling_x) << MI_SIZE_LOG2) +
-             (tx_blk_col << tx_size_wide_log2[0]);
+             (tx_blk_col << MI_SIZE_LOG2);
   *pixel_r = ((mi_row >> subsampling_y) << MI_SIZE_LOG2) +
-             (tx_blk_row << tx_size_high_log2[0]);
+             (tx_blk_row << MI_SIZE_LOG2);
 }
 #endif
 
@@ -411,8 +414,7 @@ typedef struct macroblockd_plane {
   qm_val_t *seg_qmatrix[MAX_SEGMENTS][TX_SIZES_ALL];
 } MACROBLOCKD_PLANE;
 
-#define BLOCK_OFFSET(i) \
-  ((i) * (1 << (tx_size_wide_log2[0] + tx_size_high_log2[0])))
+#define BLOCK_OFFSET(i) ((i) << 4)
 
 typedef struct {
   DECLARE_ALIGNED(16, InterpKernel, vfilter);
@@ -505,6 +507,9 @@ typedef struct macroblockd {
   int mb_to_right_edge;
   int mb_to_top_edge;
   int mb_to_bottom_edge;
+
+  int mi_row;
+  int mi_col;
 
   /* pointers to reference frame scale factors */
   const struct scale_factors *block_ref_scale_factors[2];
@@ -793,7 +798,7 @@ static INLINE TX_TYPE get_default_tx_type(PLANE_TYPE plane_type,
 static INLINE BLOCK_SIZE get_plane_block_size(BLOCK_SIZE bsize,
                                               int subsampling_x,
                                               int subsampling_y) {
-  if (bsize == BLOCK_INVALID) return BLOCK_INVALID;
+  assert(bsize < BLOCK_SIZES_ALL);
   assert(subsampling_x >= 0 && subsampling_x < 2);
   assert(subsampling_y >= 0 && subsampling_y < 2);
   return ss_size_lookup[bsize][subsampling_x][subsampling_y];
@@ -993,8 +998,8 @@ static INLINE TX_SIZE av1_get_tx_size(int plane, const MACROBLOCKD *xd) {
                                pd->subsampling_y);
 }
 
-void av1_reset_skip_context(MACROBLOCKD *xd, int mi_row, int mi_col,
-                            BLOCK_SIZE bsize, const int num_planes);
+void av1_reset_skip_context(MACROBLOCKD *xd, BLOCK_SIZE bsize,
+                            const int num_planes);
 
 void av1_reset_loop_filter_delta(MACROBLOCKD *xd, int num_planes);
 

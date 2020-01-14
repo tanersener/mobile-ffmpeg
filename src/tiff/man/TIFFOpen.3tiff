@@ -207,6 +207,21 @@ Disable the use of strip chopping when reading images.
 Read TIFF header only, do not load the first image directory. That could be
 useful in case of the broken first directory. We can open the file and proceed
 to the other directories.
+.TP
+.B 4
+ClassicTIFF for creating a file (default)
+.TP
+.B 8
+BigTIFF for creating a file.
+.TP
+.B D
+Enable use of deferred strip/tile offset/bytecount array loading. They will
+be loaded the first time they are accessed to. This loading will be done in
+its entirety unless the O flag is also specified.
+.TP
+.B O
+On-demand loading of values of the strip/tile offset/bytecount arrays, limited
+to the requested strip/tile, instead of whole array loading (implies D)
 .SH "BYTE ORDER"
 The 
 .SM TIFF

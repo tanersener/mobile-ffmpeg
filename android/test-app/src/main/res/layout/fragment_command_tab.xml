@@ -22,15 +22,15 @@
         tools:targetApi="cupcake" />
 
     <Button
-        android:id="@+id/runButton"
-        android:layout_width="80dp"
+        android:id="@+id/runFFmpegButton"
+        android:layout_width="140dp"
         android:layout_height="36dp"
-        android:layout_marginBottom="10dp"
         android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
         android:background="@drawable/rounded_button"
         android:fontFamily="sans-serif"
         android:gravity="center"
-        android:text="@string/command_run_button_text"
+        android:text="@string/command_run_ffmpeg_button_text"
         android:textAlignment="center"
         android:textColor="@android:color/white"
         android:textSize="16sp"
@@ -38,15 +38,15 @@
         tools:targetApi="jelly_bean" />
 
     <Button
-        android:id="@+id/runAsyncButton"
+        android:id="@+id/runFFprobeButton"
         android:layout_width="140dp"
         android:layout_height="36dp"
-        android:layout_marginBottom="10dp"
         android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
         android:background="@drawable/rounded_button"
         android:fontFamily="sans-serif"
         android:gravity="center"
-        android:text="@string/command_run_async_button_text"
+        android:text="@string/command_run_ffprobe_button_text"
         android:textAlignment="center"
         android:textColor="@android:color/white"
         android:textSize="16sp"

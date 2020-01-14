@@ -1,13 +1,11 @@
-/.deps/
-/.libs/
 /arpa/
 /sys/
-*.o
 *.lo
+*.o
+*.la
 /Makefile
 /alloca.h
 /inttypes.h
-/libgnu_gpl.la
 /limits.h
 /netdb.h
 /signal.h

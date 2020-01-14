@@ -7,7 +7,7 @@
 
 This function can only be called in server side, and
 instructs a TLS 1.2 or earlier client to renegotiate
-parameters (perform a handshake), by sending a 
+parameters (perform a handshake), by sending a
 hello request message.
 
 If this function succeeds, the calling application
@@ -23,7 +23,7 @@ calling application should proceed to calling
 @code{gnutls_handshake()}  to negotiate the new
 parameters.
 
-If the client does not wish to renegotiate parameters he 
+If the client does not wish to renegotiate parameters he
 may reply with an alert message, and in that case the return code seen
 by subsequent @code{gnutls_record_recv()}  will be
 @code{GNUTLS_E_WARNING_ALERT_RECEIVED}  with the specific alert being

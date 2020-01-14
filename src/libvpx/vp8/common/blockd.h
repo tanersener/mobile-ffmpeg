@@ -292,7 +292,7 @@ typedef struct macroblockd {
 
   struct vpx_internal_error_info error_info;
 
-#if ARCH_X86 || ARCH_X86_64
+#if VPX_ARCH_X86 || VPX_ARCH_X86_64
   /* This is an intermediate buffer currently used in sub-pixel motion search
    * to keep a copy of the reference area. This buffer can be used for other
    * purpose.

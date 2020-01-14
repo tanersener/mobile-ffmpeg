@@ -39,7 +39,8 @@ const hello_ext_entry_st ext_mod_alpn = {
 	.tls_id = 16,
 	.gid = GNUTLS_EXTENSION_ALPN,
 	/* this extension must be parsed even on resumption */
-	.parse_type = GNUTLS_EXT_MANDATORY,
+	.client_parse_point = GNUTLS_EXT_MANDATORY,
+	.server_parse_point = GNUTLS_EXT_MANDATORY,
 	.validity = GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_DTLS |
 		    GNUTLS_EXT_FLAG_CLIENT_HELLO | GNUTLS_EXT_FLAG_EE |
 		    GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,

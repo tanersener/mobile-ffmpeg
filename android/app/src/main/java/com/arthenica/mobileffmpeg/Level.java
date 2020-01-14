@@ -28,6 +28,14 @@ package com.arthenica.mobileffmpeg;
 public enum Level {
 
     /**
+     * This log level is defined by MobileFFmpeg. It is used to specify logs printed to stderr by
+     * ffmpeg. Logs that has this level are not filtered and always redirected.
+     *
+     * @since 4.3.1
+     */
+    AV_LOG_STDERR(-16),
+
+    /**
      * Print no output.
      */
     AV_LOG_QUIET(-8),
@@ -85,7 +93,9 @@ public enum Level {
      * @return enumeration defined by value
      */
     public static Level from(final int value) {
-        if (value == AV_LOG_QUIET.getValue()) {
+        if (value == AV_LOG_STDERR.getValue()) {
+            return AV_LOG_STDERR;
+        } else if (value == AV_LOG_QUIET.getValue()) {
             return AV_LOG_QUIET;
         } else if (value == AV_LOG_PANIC.getValue()) {
             return AV_LOG_PANIC;

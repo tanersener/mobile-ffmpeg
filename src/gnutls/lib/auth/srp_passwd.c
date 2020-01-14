@@ -368,8 +368,10 @@ cleanup:
 	_gnutls_srp_entry_free(entry);
 
 found:
-	zeroize_key(line, line_size);
-	free(line);
+	if (line) {
+		zeroize_key(line, line_size);
+		free(line);
+	}
 	if (fd)
 		fclose(fd);
 	return ret;

@@ -881,7 +881,7 @@ void	<a href="#xmlResetError">xmlResetError</a>			(<a href="libxml2-xmlerror.htm
         <hr/>
         <div class="refsect2" lang="en"><h3><a name="xmlGenericErrorFunc"/>Function type xmlGenericErrorFunc</h3><pre class="programlisting">void	xmlGenericErrorFunc		(void * ctx, <br/>					 const char * msg, <br/>					 ... ...)<br/>
 </pre><p>Signature of the function to use when there is an error and no parsing or validity context available .</p>
-<div class="variablelist"><table border="0"><col align="left"/><tbody><tr><td><span class="term"><i><tt>ctx</tt></i>:</span></td><td>a parsing context</td></tr><tr><td><span class="term"><i><tt>msg</tt></i>:</span></td><td>the message</td></tr><tr><td><span class="term"><i><tt>...</tt></i>:</span></td><td>the extra arguments of the varags to format the message</td></tr></tbody></table></div></div>
+<div class="variablelist"><table border="0"><col align="left"/><tbody><tr><td><span class="term"><i><tt>ctx</tt></i>:</span></td><td>a parsing context</td></tr><tr><td><span class="term"><i><tt>msg</tt></i>:</span></td><td>the message</td></tr><tr><td><span class="term"><i><tt>...</tt></i>:</span></td><td>the extra arguments of the varargs to format the message</td></tr></tbody></table></div></div>
         <hr/>
         <div class="refsect2" lang="en"><h3><a name="xmlStructuredErrorFunc"/>Function type xmlStructuredErrorFunc</h3><pre class="programlisting">void	xmlStructuredErrorFunc		(void * userData, <br/>					 <a href="libxml2-xmlerror.html#xmlErrorPtr">xmlErrorPtr</a> error)<br/>
 </pre><p>Signature of the function to use when there is an error and the module handles the new error reporting mechanism.</p>

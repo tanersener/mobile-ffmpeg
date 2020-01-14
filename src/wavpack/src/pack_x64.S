@@ -67,7 +67,7 @@
 # decorr_pass structure contains separate arrays for each channel while the
 # MMX code wants there to be a single array of dual samples. The fix for
 # this is to convert the data in the arrays on entry and exit, and this is
-# made easy by the fact that the 8 MMX regsiters hold exactly the required
+# made easy by the fact that the 8 MMX registers hold exactly the required
 # amount of data (64 bytes)!
 #
 # This version has entry points for both the System V ABI and the Windows
@@ -77,7 +77,7 @@
 # provide unwind data for the Windows ABI (the unpack_x64.asm module for
 # MSVC does). The arguments are passed in registers:
 #
-#                             System V  Windows  
+#                             System V  Windows
 #   struct decorr_pass *dpp     rdi       rcx
 #   int32_t *buffer             rsi       rdx
 #   int32_t sample_count        edx       r8d
@@ -86,7 +86,7 @@
 #
 #   rdi         buffer pointer
 #   rsi         termination buffer pointer
-#   rax,rbx,rdx used in default term to reduce calculation         
+#   rax,rbx,rdx used in default term to reduce calculation
 #   rbp         decorr_pass pointer
 #   mm0, mm1    scratch
 #   mm2         original sample values
@@ -527,7 +527,7 @@ bdone:  pslld   mm5, 16                     # sign-extend 16-bit weights back to
 #   int32_t *out_buffer,
 #   int32_t sample_count);
 #
-# It performs a single pass of stereo decorrelation, transfering from the
+# It performs a single pass of stereo decorrelation, transferring from the
 # input buffer to the output buffer. Note that this version of the function
 # requires that the up to 8 previous (depending on dpp->term) stereo samples
 # are visible and correct. In other words, it ignores the "samples_*"
@@ -548,7 +548,7 @@ bdone:  pslld   mm5, 16                     # sign-extend 16-bit weights back to
 # provide unwind data for the Windows ABI (the unpack_x64.asm module for
 # MSVC does). The arguments are passed in registers:
 #
-#                             System V  Windows  
+#                             System V  Windows
 #   struct decorr_pass *dpp     rdi       rcx
 #   int32_t *in_buffer          rsi       rdx
 #   int32_t *out_buffer         rdx       r8
@@ -1011,7 +1011,7 @@ done:   add     rsp, 8
 # they are to be used somewhere else. The magnitude of the output samples is
 # accumulated and returned (see scan_max_magnitude() for more details). By
 # using the overflow detection of the multiply instruction, this detects
-# when the "long_math" varient is required.
+# when the "long_math" variant is required.
 #
 # For the fastest possible operation with the four "common" decorrelation
 # filters (i.e, fast, normal, high and very high) this function can be
@@ -1031,7 +1031,7 @@ done:   add     rsp, 8
 # that it does NOT provide unwind data for the Windows ABI (the unpack_x64.asm
 # module for MSVC does). The arguments are passed in registers:
 #
-#                             System V  Windows  
+#                             System V  Windows
 #   int32_t *buffer             rdi       rcx
 #   struct decorr_pass *dpp     rsi       rdx
 #   int32_t num_terms           rdx       r8
@@ -1374,7 +1374,7 @@ nxterm: mov     edx, [rbp]
 domult: mov     eax, [rbp+8]
         mov     edx, eax
         imul    eax, ebx
-        jo      multov                      # on overflow, jump to use 64-bit imul varient
+        jo      multov                      # on overflow, jump to use 64-bit imul variant
         sar     eax, 10
         sbb     ecx, eax
         je      2f
@@ -1450,7 +1450,7 @@ mexit:  mov     rax, r8                     # return max magnitude
 #                             struct decorr_pass *dpp,
 #                             int32_t sample_count);
 #
-# It performs a single pass of mono decorrelation, transfering from the
+# It performs a single pass of mono decorrelation, transferring from the
 # input buffer to the output buffer. Note that this version of the function
 # requires that the up to 8 previous (depending on dpp->term) mono samples
 # are visible and correct. In other words, it ignores the "samples_*"
@@ -1459,7 +1459,7 @@ mexit:  mov     rax, r8                     # return max magnitude
 # samples to the decorr_pass structure before returning.
 #
 # By using the overflow detection of the multiply instruction, it detects
-# when the "long_math" varient is required and automatically does it.
+# when the "long_math" variant is required and automatically does it.
 #
 # This version has entry points for both the System V ABI and the Windows
 # X64 ABI. It does not use the "red zone" or the "shadow area"; it saves the
@@ -1468,7 +1468,7 @@ mexit:  mov     rax, r8                     # return max magnitude
 # provide unwind data for the Windows ABI (the pack_x64.asm module for
 # MSVC does). The arguments are passed in registers:
 #
-#                             System V  Windows  
+#                             System V  Windows
 #   int32_t *out_buffer         rdi       rcx
 #   int32_t *in_buffer          rsi       rdx
 #   struct decorr_pass *dpp     rdx       r8
@@ -1807,7 +1807,7 @@ noleft: mov     eax, ebx                    # move magnitude to eax for return
 # Note that it does NOT provide unwind data for the Windows ABI (but the
 # unpack_x64.asm module for MSVC does). The arguments are passed in registers:
 #
-#                             System V  Windows  
+#                             System V  Windows
 #   int32_t *samples            rdi       rcx
 #   uint32_t num_samples        esi       rdx
 #   int limit                   edx       r8
@@ -1889,9 +1889,9 @@ limit_loop:
         bsr     ecx, edx                    # ecx = MSB set in sample (0 - 31)
         lea     eax, [ecx+1]                # eax = number used bits in sample (1 - 32)
         sub     ecx, 8                      # ecx = shift right amount (-8 to 23)
-        ror     edx, cl                     # use rotate to do "signed" shift 
+        ror     edx, cl                     # use rotate to do "signed" shift
         shl     eax, 8                      # move nbits to integer portion of log
-        movzx   edx, dl                     # dl = mantissa, look up log fraction in table 
+        movzx   edx, dl                     # dl = mantissa, look up log fraction in table
         mov     al, [r8+rdx]                # eax = combined integer and fraction for full log
         add     edi, eax                    # add to running sum and compare to limit
         cmp     eax, ebp
@@ -1915,9 +1915,9 @@ no_limit_loop:
         bsr     ecx, edx                    # ecx = MSB set in sample (0 - 31)
         lea     eax, [ecx+1]                # eax = number used bits in sample (1 - 32)
         sub     ecx, 8                      # ecx = shift right amount (-8 to 23)
-        ror     edx, cl                     # use rotate to do "signed" shift 
+        ror     edx, cl                     # use rotate to do "signed" shift
         shl     eax, 8                      # move nbits to integer portion of log
-        movzx   edx, dl                     # dl = mantissa, look up log fraction in table 
+        movzx   edx, dl                     # dl = mantissa, look up log fraction in table
         mov     al, [r8+rdx]                # eax = combined integer and fraction for full log
         add     edi, eax                    # add to running sum
 L45:    sub     ebx, 1
@@ -1939,3 +1939,46 @@ normal_exit:
         .section .note.GNU-stack,"",@progbits
 #endif
 
+#ifdef __midipix__
+	.section .got$log2buffer_x64win,"r"
+	.global __imp_log2buffer_x64win
+__imp_log2buffer_x64win:
+	.quad	log2buffer_x64win
+	.linkonce discard
+
+	.section .got$pack_decorr_mono_pass_cont_x64win,"r"
+	.global __imp_pack_decorr_mono_pass_cont_x64win
+__imp_pack_decorr_mono_pass_cont_x64win:
+	.quad	pack_decorr_mono_pass_cont_x64win
+	.linkonce discard
+
+	.section .got$pack_decorr_stereo_pass_cont_x64win,"r"
+	.global __imp_pack_decorr_stereo_pass_cont_x64win
+__imp_pack_decorr_stereo_pass_cont_x64win:
+	.quad	pack_decorr_stereo_pass_cont_x64win
+	.linkonce discard
+
+	.section .got$pack_decorr_stereo_pass_cont_rev_x64win,"r"
+	.global __imp_pack_decorr_stereo_pass_cont_rev_x64win
+__imp_pack_decorr_stereo_pass_cont_rev_x64win:
+	.quad	pack_decorr_stereo_pass_cont_rev_x64win
+	.linkonce discard
+
+	.section .got$pack_decorr_stereo_pass_x64win,"r"
+	.global __imp_pack_decorr_stereo_pass_x64win
+__imp_pack_decorr_stereo_pass_x64win:
+	.quad	pack_decorr_stereo_pass_x64win
+	.linkonce discard
+
+	.section .got$scan_max_magnitude_x64win,"r"
+	.global __imp_scan_max_magnitude_x64win
+__imp_scan_max_magnitude_x64win:
+	.quad scan_max_magnitude_x64win
+	.linkonce discard
+
+	.section .got$pack_decorr_mono_buffer_x64win,"r"
+	.global __imp_pack_decorr_mono_buffer_x64win
+__imp_pack_decorr_mono_buffer_x64win:
+	.quad pack_decorr_mono_buffer_x64win
+	.linkonce discard
+#endif

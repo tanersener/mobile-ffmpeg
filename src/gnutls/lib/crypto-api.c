@@ -67,7 +67,7 @@ gnutls_cipher_init(gnutls_cipher_hd_t * handle,
 		return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
 
 	e = cipher_to_entry(cipher);
-	if (e == NULL || e->only_aead)
+	if (e == NULL || (e->flags & GNUTLS_CIPHER_FLAG_ONLY_AEAD))
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	*handle = gnutls_calloc(1, sizeof(api_cipher_hd_st));
@@ -992,9 +992,9 @@ gnutls_aead_cipher_encryptv(gnutls_aead_cipher_hd_t handle,
 	uint8_t *dst;
 	size_t dst_size, total = 0;
 	uint8_t *p;
+	size_t len;
 	size_t blocksize = handle->ctx_enc.e->blocksize;
 	struct iov_iter_st iter;
-	size_t blocks;
 
 	/* Limitation: this function provides an optimization under the internally registered
 	 * AEAD ciphers. When an AEAD cipher is used registered with gnutls_crypto_register_aead_cipher(),
@@ -1006,7 +1006,7 @@ gnutls_aead_cipher_encryptv(gnutls_aead_cipher_hd_t handle,
 	else if (tag_size > (unsigned)_gnutls_cipher_get_tag_size(h->ctx_enc.e))
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	if (handle->ctx_enc.e->only_aead || handle->ctx_enc.encrypt == NULL) {
+	if ((handle->ctx_enc.e->flags & GNUTLS_CIPHER_FLAG_ONLY_AEAD) || handle->ctx_enc.encrypt == NULL) {
 		/* ciphertext cannot be produced in a piecemeal approach */
 		struct iov_store_st auth;
 		struct iov_store_st ptext;
@@ -1045,15 +1045,7 @@ gnutls_aead_cipher_encryptv(gnutls_aead_cipher_hd_t handle,
 			return gnutls_assert_val(ret);
 		if (ret == 0)
 			break;
-		blocks = ret;
-		ret = _gnutls_cipher_auth(&handle->ctx_enc, p,
-					  blocksize * blocks);
-		if (unlikely(ret < 0))
-			return gnutls_assert_val(ret);
-	}
-	if (iter.block_offset > 0) {
-		ret = _gnutls_cipher_auth(&handle->ctx_enc,
-					  iter.block, iter.block_offset);
+		ret = _gnutls_cipher_auth(&handle->ctx_enc, p, ret);
 		if (unlikely(ret < 0))
 			return gnutls_assert_val(ret);
 	}
@@ -1070,29 +1062,15 @@ gnutls_aead_cipher_encryptv(gnutls_aead_cipher_hd_t handle,
 			return gnutls_assert_val(ret);
 		if (ret == 0)
 			break;
-		blocks = ret;
-		if (unlikely(dst_size < blocksize * blocks))
-			return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
-		ret = _gnutls_cipher_encrypt2(&handle->ctx_enc, p,
-					      blocksize * blocks,
-					      dst, dst_size);
-		if (unlikely(ret < 0))
-			return gnutls_assert_val(ret);
-		DECR_LEN(dst_size, blocksize * blocks);
-		dst += blocksize * blocks;
-		total += blocksize * blocks;
-	}
-	if (iter.block_offset > 0) {
-		if (unlikely(dst_size < iter.block_offset))
-			return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
+		len = ret;
 		ret = _gnutls_cipher_encrypt2(&handle->ctx_enc,
-					      iter.block, iter.block_offset,
+					      p, len,
 					      dst, dst_size);
 		if (unlikely(ret < 0))
 			return gnutls_assert_val(ret);
-		DECR_LEN(dst_size, iter.block_offset);
-		dst += iter.block_offset;
-		total += iter.block_offset;
+		DECR_LEN(dst_size, len);
+		dst += len;
+		total += len;
 	}
 
 	if (dst_size < tag_size)
@@ -1135,9 +1113,9 @@ gnutls_aead_cipher_encryptv2(gnutls_aead_cipher_hd_t handle,
 	api_aead_cipher_hd_st *h = handle;
 	ssize_t ret;
 	uint8_t *p;
+	size_t len;
 	ssize_t blocksize = handle->ctx_enc.e->blocksize;
 	struct iov_iter_st iter;
-	size_t blocks;
 	size_t _tag_size;
 
 	if (tag_size == NULL || *tag_size == 0)
@@ -1152,7 +1130,7 @@ gnutls_aead_cipher_encryptv2(gnutls_aead_cipher_hd_t handle,
 	 * AEAD ciphers. When an AEAD cipher is used registered with gnutls_crypto_register_aead_cipher(),
 	 * then this becomes a convenience function as it missed the lower-level primitives
 	 * necessary for piecemeal encryption. */
-	if (handle->ctx_enc.e->only_aead || handle->ctx_enc.encrypt == NULL) {
+	if ((handle->ctx_enc.e->flags & GNUTLS_CIPHER_FLAG_ONLY_AEAD) || handle->ctx_enc.encrypt == NULL) {
 		/* ciphertext cannot be produced in a piecemeal approach */
 		struct iov_store_st auth;
 		struct iov_store_st ptext;
@@ -1220,15 +1198,7 @@ gnutls_aead_cipher_encryptv2(gnutls_aead_cipher_hd_t handle,
 			return gnutls_assert_val(ret);
 		if (ret == 0)
 			break;
-		blocks = ret;
-		ret = _gnutls_cipher_auth(&handle->ctx_enc, p,
-					  blocksize * blocks);
-		if (unlikely(ret < 0))
-			return gnutls_assert_val(ret);
-	}
-	if (iter.block_offset > 0) {
-		ret = _gnutls_cipher_auth(&handle->ctx_enc,
-					  iter.block, iter.block_offset);
+		ret = _gnutls_cipher_auth(&handle->ctx_enc, p, ret);
 		if (unlikely(ret < 0))
 			return gnutls_assert_val(ret);
 	}
@@ -1242,17 +1212,13 @@ gnutls_aead_cipher_encryptv2(gnutls_aead_cipher_hd_t handle,
 			return gnutls_assert_val(ret);
 		if (ret == 0)
 			break;
-		blocks = ret;
-		ret = _gnutls_cipher_encrypt2(&handle->ctx_enc,
-					      p, blocksize * blocks,
-					      p, blocksize * blocks);
+
+		len = ret;
+		ret = _gnutls_cipher_encrypt2(&handle->ctx_enc, p, len, p, len);
 		if (unlikely(ret < 0))
 			return gnutls_assert_val(ret);
-	}
-	if (iter.block_offset > 0) {
-		ret = _gnutls_cipher_encrypt2(&handle->ctx_enc,
-					      iter.block, iter.block_offset,
-					      iter.block, iter.block_offset);
+
+		ret = _gnutls_iov_iter_sync(&iter, p, len);
 		if (unlikely(ret < 0))
 			return gnutls_assert_val(ret);
 	}
@@ -1294,9 +1260,9 @@ gnutls_aead_cipher_decryptv2(gnutls_aead_cipher_hd_t handle,
 	api_aead_cipher_hd_st *h = handle;
 	ssize_t ret;
 	uint8_t *p;
+	size_t len;
 	ssize_t blocksize = handle->ctx_enc.e->blocksize;
 	struct iov_iter_st iter;
-	size_t blocks;
 	uint8_t _tag[MAX_HASH_SIZE];
 
 	if (tag_size == 0)
@@ -1308,7 +1274,7 @@ gnutls_aead_cipher_decryptv2(gnutls_aead_cipher_hd_t handle,
 	 * AEAD ciphers. When an AEAD cipher is used registered with gnutls_crypto_register_aead_cipher(),
 	 * then this becomes a convenience function as it missed the lower-level primitives
 	 * necessary for piecemeal encryption. */
-	if (handle->ctx_enc.e->only_aead || handle->ctx_enc.encrypt == NULL) {
+	if ((handle->ctx_enc.e->flags & GNUTLS_CIPHER_FLAG_ONLY_AEAD) || handle->ctx_enc.encrypt == NULL) {
 		/* ciphertext cannot be produced in a piecemeal approach */
 		struct iov_store_st auth;
 		struct iov_store_st ctext;
@@ -1370,15 +1336,7 @@ gnutls_aead_cipher_decryptv2(gnutls_aead_cipher_hd_t handle,
 			return gnutls_assert_val(ret);
 		if (ret == 0)
 			break;
-		blocks = ret;
-		ret = _gnutls_cipher_auth(&handle->ctx_enc, p,
-					  blocksize * blocks);
-		if (unlikely(ret < 0))
-			return gnutls_assert_val(ret);
-	}
-	if (iter.block_offset > 0) {
-		ret = _gnutls_cipher_auth(&handle->ctx_enc,
-					  iter.block, iter.block_offset);
+		ret = _gnutls_cipher_auth(&handle->ctx_enc, p, ret);
 		if (unlikely(ret < 0))
 			return gnutls_assert_val(ret);
 	}
@@ -1392,17 +1350,13 @@ gnutls_aead_cipher_decryptv2(gnutls_aead_cipher_hd_t handle,
 			return gnutls_assert_val(ret);
 		if (ret == 0)
 			break;
-		blocks = ret;
-		ret = _gnutls_cipher_decrypt2(&handle->ctx_enc,
-					      p, blocksize * blocks,
-					      p, blocksize * blocks);
+
+		len = ret;
+		ret = _gnutls_cipher_decrypt2(&handle->ctx_enc, p, len, p, len);
 		if (unlikely(ret < 0))
 			return gnutls_assert_val(ret);
-	}
-	if (iter.block_offset > 0) {
-		ret = _gnutls_cipher_decrypt2(&handle->ctx_enc,
-					      iter.block, iter.block_offset,
-					      iter.block, iter.block_offset);
+
+		ret = _gnutls_iov_iter_sync(&iter, p, len);
 		if (unlikely(ret < 0))
 			return gnutls_assert_val(ret);
 	}

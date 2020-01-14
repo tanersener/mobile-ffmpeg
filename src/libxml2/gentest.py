@@ -399,14 +399,20 @@ def type_convert(str, name, info, module, function, pos):
 
 known_param_types = []
 
-def is_known_param_type(name, rtype):
-    global test
+def is_known_param_type(name):
     for type in known_param_types:
         if type == name:
 	    return 1
+    return name[-3:] == 'Ptr' or name[-4:] == '_ptr'
+
+def generate_param_type(name, rtype):
+    global test
+    for type in known_param_types:
+        if type == name:
+	    return
     for type in generated_param_types:
         if type == name:
-	    return 1
+	    return
 
     if name[-3:] == 'Ptr' or name[-4:] == '_ptr':
         if rtype[0:6] == 'const ':
@@ -429,9 +435,6 @@ static void des_%s(int no ATTRIBUTE_UNUSED, %s val ATTRIBUTE_UNUSED, int nr ATTR
         if define == 1:
 	    test.write("#endif\n\n")
         add_generated_param_type(name)
-        return 1
-
-    return 0
 
 #
 # Provide the type destructors for the return values
@@ -546,7 +549,7 @@ for enum in enums:
         continue;
     define = 0
 
-    if argtypes.has_key(name) and is_known_param_type(name, name) == 0:
+    if argtypes.has_key(name) and is_known_param_type(name) == 0:
 	values = ctxt.xpathEval("/api/symbols/enum[@type='%s']" % name)
 	i = 0
 	vals = []
@@ -689,7 +692,7 @@ def generate_test(module, node):
 	info = arg.xpathEval("string(@info)")
 	nam = arg.xpathEval("string(@name)")
         type = type_convert(rtype, nam, info, module, name, n)
-	if is_known_param_type(type, rtype) == 0:
+	if is_known_param_type(type) == 0:
 	    add_missing_type(type, name);
 	    no_gen = 1
         if (type[-3:] == 'Ptr' or type[-4:] == '_ptr') and \
@@ -715,6 +718,11 @@ def generate_test(module, node):
 	    no_gen = 1
 	t_ret = (type, rtype, info)
 	break
+
+    if no_gen == 0:
+        for t_arg in t_args:
+            (nam, type, rtype, crtype, info) = t_arg
+            generate_param_type(type, rtype)
 
     test.write("""
 static int

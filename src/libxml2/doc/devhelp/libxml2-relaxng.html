@@ -209,7 +209,7 @@ The content of this structure is not made public by the API.
 <div class="variablelist"><table border="0"><col align="left"/><tbody><tr><td><span class="term"><i><tt>ctxt</tt></i>:</span></td><td>a Relax-NG validation context</td></tr><tr><td><span class="term"><i><tt>err</tt></i>:</span></td><td>the error function result</td></tr><tr><td><span class="term"><i><tt>warn</tt></i>:</span></td><td>the warning function result</td></tr><tr><td><span class="term"><i><tt>ctx</tt></i>:</span></td><td>the functions context result</td></tr><tr><td><span class="term"><i><tt>Returns</tt></i>:</span></td><td>-1 in case of error and 0 otherwise</td></tr></tbody></table></div></div>
         <hr/>
         <div class="refsect2" lang="en"><h3><a name="xmlRelaxNGInitTypes"/>xmlRelaxNGInitTypes ()</h3><pre class="programlisting">int	xmlRelaxNGInitTypes		(void)<br/>
-</pre><p>Initilize the default type libraries.</p>
+</pre><p>Initialize the default type libraries.</p>
 <div class="variablelist"><table border="0"><col align="left"/><tbody><tr><td><span class="term"><i><tt>Returns</tt></i>:</span></td><td>0 in case of success and -1 in case of error.</td></tr></tbody></table></div></div>
         <hr/>
         <div class="refsect2" lang="en"><h3><a name="xmlRelaxNGNewDocParserCtxt"/>xmlRelaxNGNewDocParserCtxt ()</h3><pre class="programlisting"><a href="libxml2-relaxng.html#xmlRelaxNGParserCtxtPtr">xmlRelaxNGParserCtxtPtr</a>	xmlRelaxNGNewDocParserCtxt	(<a href="libxml2-tree.html#xmlDocPtr">xmlDocPtr</a> doc)<br/>
@@ -229,7 +229,7 @@ The content of this structure is not made public by the API.
 <div class="variablelist"><table border="0"><col align="left"/><tbody><tr><td><span class="term"><i><tt>schema</tt></i>:</span></td><td>a precompiled XML RelaxNGs</td></tr><tr><td><span class="term"><i><tt>Returns</tt></i>:</span></td><td>the validation context or NULL in case of error</td></tr></tbody></table></div></div>
         <hr/>
         <div class="refsect2" lang="en"><h3><a name="xmlRelaxNGParse"/>xmlRelaxNGParse ()</h3><pre class="programlisting"><a href="libxml2-relaxng.html#xmlRelaxNGPtr">xmlRelaxNGPtr</a>	xmlRelaxNGParse		(<a href="libxml2-relaxng.html#xmlRelaxNGParserCtxtPtr">xmlRelaxNGParserCtxtPtr</a> ctxt)<br/>
-</pre><p>parse a schema definition resource and build an internal XML Shema struture which can be used to validate instances.</p>
+</pre><p>parse a schema definition resource and build an internal XML Schema structure which can be used to validate instances.</p>
 <div class="variablelist"><table border="0"><col align="left"/><tbody><tr><td><span class="term"><i><tt>ctxt</tt></i>:</span></td><td>a Relax-NG parser context</td></tr><tr><td><span class="term"><i><tt>Returns</tt></i>:</span></td><td>the internal XML RelaxNG structure built from the resource or NULL in case of error</td></tr></tbody></table></div></div>
         <hr/>
         <div class="refsect2" lang="en"><h3><a name="xmlRelaxNGSetParserErrors"/>xmlRelaxNGSetParserErrors ()</h3><pre class="programlisting">void	xmlRelaxNGSetParserErrors	(<a href="libxml2-relaxng.html#xmlRelaxNGParserCtxtPtr">xmlRelaxNGParserCtxtPtr</a> ctxt, <br/>					 <a href="libxml2-relaxng.html#xmlRelaxNGValidityErrorFunc">xmlRelaxNGValidityErrorFunc</a> err, <br/>					 <a href="libxml2-relaxng.html#xmlRelaxNGValidityWarningFunc">xmlRelaxNGValidityWarningFunc</a> warn, <br/>					 void * ctx)<br/>

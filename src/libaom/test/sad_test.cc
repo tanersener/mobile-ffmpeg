@@ -1703,13 +1703,16 @@ const SadMxNAvgParam avg_avx2_tests[] = {
 INSTANTIATE_TEST_CASE_P(AVX2, SADavgTest, ::testing::ValuesIn(avg_avx2_tests));
 
 const SadMxNx4Param x4d_avx2_tests[] = {
-  make_tuple(64, 128, &aom_sad64x128x4d_avx2, -1),
-  make_tuple(128, 64, &aom_sad128x64x4d_avx2, -1),
-  make_tuple(128, 128, &aom_sad128x128x4d_avx2, -1),
-  make_tuple(64, 64, &aom_sad64x64x4d_avx2, -1),
   make_tuple(32, 64, &aom_sad32x64x4d_avx2, -1),
-  make_tuple(64, 32, &aom_sad64x32x4d_avx2, -1),
   make_tuple(32, 32, &aom_sad32x32x4d_avx2, -1),
+  make_tuple(32, 16, &aom_sad32x16x4d_avx2, -1),
+  make_tuple(32, 8, &aom_sad32x8x4d_avx2, -1),
+  make_tuple(64, 128, &aom_sad64x128x4d_avx2, -1),
+  make_tuple(64, 64, &aom_sad64x64x4d_avx2, -1),
+  make_tuple(64, 32, &aom_sad64x32x4d_avx2, -1),
+  make_tuple(64, 16, &aom_sad64x16x4d_avx2, -1),
+  make_tuple(128, 128, &aom_sad128x128x4d_avx2, -1),
+  make_tuple(128, 64, &aom_sad128x64x4d_avx2, -1),
 #if CONFIG_AV1_HIGHBITDEPTH
   make_tuple(128, 128, &aom_highbd_sad128x128x4d_avx2, 8),
   make_tuple(128, 128, &aom_highbd_sad128x128x4d_avx2, 10),

@@ -1,14 +1,15 @@
-# MobileFFmpeg [![Financial Contributors on Open Collective](https://opencollective.com/mobile-ffmpeg/all/badge.svg?label=financial+contributors)](https://opencollective.com/mobile-ffmpeg) ![GitHub release](https://img.shields.io/badge/release-v4.3-blue.svg) ![Bintray](https://img.shields.io/badge/bintray-v4.3-blue.svg) ![CocoaPods](https://img.shields.io/badge/pod-v4.3-blue.svg) [![Build Status](https://travis-ci.org/tanersener/mobile-ffmpeg.svg?branch=master)](https://travis-ci.org/tanersener/mobile-ffmpeg)
+# MobileFFmpeg [![Financial Contributors on Open Collective](https://opencollective.com/mobile-ffmpeg/all/badge.svg?label=financial+contributors)](https://opencollective.com/mobile-ffmpeg) ![GitHub release](https://img.shields.io/badge/release-v4.3.1-blue.svg) ![Bintray](https://img.shields.io/badge/bintray-v4.3.1-blue.svg) ![CocoaPods](https://img.shields.io/badge/pod-v4.3.1-blue.svg) [![Build Status](https://travis-ci.org/tanersener/mobile-ffmpeg.svg?branch=master)](https://travis-ci.org/tanersener/mobile-ffmpeg)
 
 FFmpeg for Android, iOS and tvOS
 
 <img src="https://github.com/tanersener/mobile-ffmpeg/blob/master/docs/assets/mobile-ffmpeg-logo-v7.png" width="320">
 
 ### 1. Features
+- Includes both `FFmpeg` and `FFprobe`
 - Use binaries available at `Github`/`JCenter`/`CocoaPods` or build your own version with external libraries you need
 - Supports
     - Android, iOS and tvOS
-    - FFmpeg `v3.4.x`, `v4.0.x`, `v4.1`, `v4.2-dev` and `v4.3-dev` releases
+    - FFmpeg `v3.4.x`, `v4.0.x`, `v4.1`, `v4.2` and `v4.3-dev` releases
     - 28 external libraries
     
         `chromaprint`, `fontconfig`, `freetype`, `fribidi`, `gmp`, `gnutls`, `kvazaar`, `lame`, `libaom`, `libass`, `libiconv`, `libilbc`, `libtheora`, `libvorbis`, `libvpx`, `libwebp`, `libxml2`, `opencore-amr`, `openh264`, `opus`, `sdl`, `shine`, `snappy`, `soxr`, `speex`, `tesseract`, `twolame`, `wavpack`
@@ -16,6 +17,8 @@ FFmpeg for Android, iOS and tvOS
     - 4 external libraries with GPL license
     
         `vid.stab`, `x264`, `x265`, `xvidcore`
+
+    - Concurrent execution
 
 - Exposes both FFmpeg library and MobileFFmpeg wrapper library capabilities
 - Includes cross-compile instructions for 44 open-source libraries
@@ -34,7 +37,7 @@ FFmpeg for Android, iOS and tvOS
 
 #### 1.2 iOS
 - Builds `armv7`, `armv7s`, `arm64`, `arm64e`, `i386` and `x86_64` architectures
-- Supports `bzip2`, `zlib` system libraries and `AudioToolbox`, `CoreImage`, `VideoToolbox`, `AVFoundation` system frameworks
+- Supports `bzip2`, `zlib`, `iconv` system libraries and `AudioToolbox`, `CoreImage`, `VideoToolbox`, `AVFoundation` system frameworks
 - Objective-C API
 - Camera access
 - `ARC` enabled library
@@ -44,7 +47,7 @@ FFmpeg for Android, iOS and tvOS
  
 #### 1.3 tvOS
 - Builds `arm64` and `x86_64` architectures
-- Supports `bzip2`, `zlib` system libraries and `AudioToolbox`, `CoreImage`, `VideoToolbox` system frameworks
+- Supports `bzip2`, `zlib`, `iconv` system libraries and `AudioToolbox`, `CoreImage`, `VideoToolbox` system frameworks
 - Objective-C API
 - `ARC` enabled library
 - Built with `-fembed-bitcode` flag
@@ -90,11 +93,11 @@ Please remember that some parts of `FFmpeg` are licensed under the `GPL` and onl
 </tr>
 <tr>
 <td align="center"><sup>ios system libraries</sup></td>
-<td align="center" colspan=8><sup>zlib</sup><br><sup>AudioToolbox</sup><br><sup>AVFoundation</sup><br><sup>CoreImage</sup><br><sup>VideoToolbox</sup><br><sup>bzip2</sup></td>
+<td align="center" colspan=8><sup>zlib</sup><br><sup>AudioToolbox</sup><br><sup>AVFoundation</sup><br><sup>CoreImage</sup><br><sup>iconv</sup><br><sup>VideoToolbox</sup><br><sup>bzip2</sup></td>
 </tr>
 <tr>
 <td align="center"><sup>tvos system libraries</sup></td>
-<td align="center" colspan=8><sup>zlib</sup><br><sup>AudioToolbox</sup><br><sup>CoreImage</sup><br><sup>VideoToolbox</sup><br><sup>bzip2</sup></td>
+<td align="center" colspan=8><sup>zlib</sup><br><sup>AudioToolbox</sup><br><sup>CoreImage</sup><br><sup>iconv</sup><br><sup>VideoToolbox</sup><br><sup>bzip2</sup></td>
 </tr>
 </tbody>
 </table>
@@ -110,25 +113,52 @@ Please remember that some parts of `FFmpeg` are licensed under the `GPL` and onl
  - Since `v4.2`, `chromaprint`, `sdl` and `tesseract` libraries are not included in binary releases. You can still build them and include in your releases
  
  - `AVFoundation` is not available on `tvOS`, `VideoToolbox` is not available on `tvOS` LTS releases
+ 
+ - Since `v4.3.1`, `iOS` and `tvOS` releases started to use `iconv` system library instead of `iconv` external library 
 
 #### 2.1 Android
 1. Add MobileFFmpeg dependency to your `build.gradle` in `mobile-ffmpeg-<package name>` format
     ```
     dependencies {
-        implementation 'com.arthenica:mobile-ffmpeg-full:4.3'
+        implementation 'com.arthenica:mobile-ffmpeg-full:4.3.1'
     }
     ```
 
-2. Execute commands.
+2. Execute FFmpeg commands.
     ```
+    import com.arthenica.mobileffmpeg.Config;
     import com.arthenica.mobileffmpeg.FFmpeg;
 
-    FFmpeg.execute("-i file1.mp4 -c:v mpeg4 file2.mp4");
+    int rc = FFmpeg.execute("-i file1.mp4 -c:v mpeg4 file2.mp4");
+   
+    if (rc == RETURN_CODE_SUCCESS) {
+        Log.i(Config.TAG, "Command execution completed successfully.");
+    } else if (rc == RETURN_CODE_CANCEL) {
+        Log.i(Config.TAG, "Command execution cancelled by user.");
+    } else {
+        Log.i(Config.TAG, String.format("Command execution failed with rc=%d and the output below.", rc));
+        Config.printLastCommandOutput(Log.INFO);
+    }
     ```
 
-3. Check execution output.
+3. Execute FFprobe commands.
     ```
-    int rc = FFmpeg.getLastReturnCode();
+    import com.arthenica.mobileffmpeg.Config;
+    import com.arthenica.mobileffmpeg.FFprobe;
+
+    int rc = FFprobe.execute("-i file1.mp4");
+   
+    if (rc == RETURN_CODE_SUCCESS) {
+        Log.i(Config.TAG, "Command execution completed successfully.");
+    } else {
+        Log.i(Config.TAG, String.format("Command execution failed with rc=%d and the output below.", rc));
+        Config.printLastCommandOutput(Log.INFO);
+    }
+    ```
+
+4. Check execution output later.
+    ```
+    int rc = Config.getLastReturnCode();
  
     if (rc == RETURN_CODE_SUCCESS) {
         Log.i(Config.TAG, "Command execution completed successfully.");
@@ -136,31 +166,31 @@ Please remember that some parts of `FFmpeg` are licensed under the `GPL` and onl
         Log.i(Config.TAG, "Command execution cancelled by user.");
     } else {
         Log.i(Config.TAG, String.format("Command execution failed with rc=%d and the output below.", rc));
-        FFmpeg.printLastCommandOutput(Log.INFO);
+        Config.printLastCommandOutput(Log.INFO);
     }
     ```
 
-4. Stop an ongoing operation.
+5. Stop an ongoing FFmpeg operation.
     ```
     FFmpeg.cancel();
     ```
 
-5. Get media information for a file.
+6. Get media information for a file.
     ```
-    MediaInformation info = FFmpeg.getMediaInformation("<file path or uri>");
+    MediaInformation info = FFprobe.getMediaInformation("<file path or uri>");
     ```
 
-6. Record video using Android camera.
+7. Record video using Android camera.
     ```
     FFmpeg.execute("-f android_camera -i 0:0 -r 30 -pixel_format bgr0 -t 00:00:05 <record file path>");
     ```
 
-7. List enabled external libraries.
+8. List enabled external libraries.
     ```
     List<String> externalLibraries = Config.getExternalLibraries();
     ```
 
-8. Enable log callback.
+9. Enable log callback.
     ```
     Config.enableLogCallback(new LogCallback() {
         public void apply(LogMessage message) {
@@ -169,7 +199,7 @@ Please remember that some parts of `FFmpeg` are licensed under the `GPL` and onl
     });
     ```
 
-9. Enable statistics callback.
+10. Enable statistics callback.
     ```
     Config.enableStatisticsCallback(new StatisticsCallback() {
         public void apply(Statistics newStatistics) {
@@ -178,12 +208,12 @@ Please remember that some parts of `FFmpeg` are licensed under the `GPL` and onl
     });
     ```
 
-10. Set log level.
+11. Set log level.
     ```
     Config.setLogLevel(Level.AV_LOG_FATAL);
     ```
 
-11. Register custom fonts directory.
+12. Register custom fonts directory.
     ```
     Config.setFontDirectory(this, "<folder with fonts>", Collections.EMPTY_MAP);
     ```
@@ -193,25 +223,50 @@ Please remember that some parts of `FFmpeg` are licensed under the `GPL` and onl
 
     - iOS
     ```
-    pod 'mobile-ffmpeg-full', '~> 4.3'
+    pod 'mobile-ffmpeg-full', '~> 4.3.1'
     ```
 
     - tvOS
     ```
-    pod 'mobile-ffmpeg-tvos-full', '~> 4.3'
+    pod 'mobile-ffmpeg-tvos-full', '~> 4.3.1'
     ```
 
-2. Execute commands.
+2. Execute FFmpeg commands.
     ```
+    #import <mobileffmpeg/MobileFFmpegConfig.h>
     #import <mobileffmpeg/MobileFFmpeg.h>
 
-    [MobileFFmpeg execute: @"-i file1.mp4 -c:v mpeg4 file2.mp4"];
+    int rc = [MobileFFmpeg execute: @"-i file1.mp4 -c:v mpeg4 file2.mp4"];
+   
+    if (rc == RETURN_CODE_SUCCESS) {
+        NSLog(@"Command execution completed successfully.\n");
+    } else if (rc == RETURN_CODE_CANCEL) {
+        NSLog(@"Command execution cancelled by user.\n");
+    } else {
+        NSLog(@"Command execution failed with rc=%d and output=%@.\n", rc, [MobileFFmpegConfig getLastCommandOutput]);
+    }
     ```
     
-3. Check execution output.
+3. Execute FFprobe commands.
     ```
-    int rc = [MobileFFmpeg getLastReturnCode];
-    NSString *output = [MobileFFmpeg getLastCommandOutput];
+    #import <mobileffmpeg/MobileFFmpegConfig.h>
+    #import <mobileffmpeg/MobileFFprobe.h>
+
+    int rc = [MobileFFprobe execute: @"-i file1.mp4"];
+   
+    if (rc == RETURN_CODE_SUCCESS) {
+        NSLog(@"Command execution completed successfully.\n");
+    } else if (rc == RETURN_CODE_CANCEL) {
+        NSLog(@"Command execution cancelled by user.\n");
+    } else {
+        NSLog(@"Command execution failed with rc=%d and output=%@.\n", rc, [MobileFFmpegConfig getLastCommandOutput]);
+    }
+    ```
+    
+4. Check execution output later.
+    ```
+    int rc = [MobileFFmpegConfig getLastReturnCode];
+    NSString *output = [MobileFFmpegConfig getLastCommandOutput];
 
     if (rc == RETURN_CODE_SUCCESS) {
         NSLog(@"Command execution completed successfully.\n");
@@ -222,28 +277,28 @@ Please remember that some parts of `FFmpeg` are licensed under the `GPL` and onl
     }
     ```
 
-4. Stop an ongoing operation.
+5. Stop an ongoing FFmpeg operation.
     ```
     [MobileFFmpeg cancel];
     ```
 
-5. Get media information for a file.
+6. Get media information for a file.
     ```
-    MediaInformation *mediaInformation = [MobileFFmpeg getMediaInformation:@"<file path or uri>"];
+    MediaInformation *mediaInformation = [MobileFFprobe getMediaInformation:@"<file path or uri>"];
     ```
 
-6. Record video and audio using iOS camera. This operation is not supported on `tvOS` since `AVFoundation` is not available on `tvOS`.
+7. Record video and audio using iOS camera. This operation is not supported on `tvOS` since `AVFoundation` is not available on `tvOS`.
 
     ```
     [MobileFFmpeg execute: @"-f avfoundation -r 30 -video_size 1280x720 -pixel_format bgr0 -i 0:0 -vcodec h264_videotoolbox -vsync 2 -f h264 -t 00:00:05 %@", recordFilePath];
     ```
 
-7. List enabled external libraries.
+8. List enabled external libraries.
     ```
     NSArray *externalLibraries = [MobileFFmpegConfig getExternalLibraries];
     ```
 
-8. Enable log callback.
+9. Enable log callback.
     ```
     [MobileFFmpegConfig setLogDelegate:self];
 
@@ -254,7 +309,7 @@ Please remember that some parts of `FFmpeg` are licensed under the `GPL` and onl
     }
     ```
 
-9. Enable statistics callback.
+10. Enable statistics callback.
     ```
     [MobileFFmpegConfig setStatisticsDelegate:self];
 
@@ -265,12 +320,12 @@ Please remember that some parts of `FFmpeg` are licensed under the `GPL` and onl
     }
     ```
 
-10. Set log level.
+11. Set log level.
     ```
     [MobileFFmpegConfig setLogLevel:AV_LOG_FATAL];
     ```
 
-11. Register custom fonts directory.
+12. Register custom fonts directory.
     ```
     [MobileFFmpegConfig setFontDirectory:@"<folder with fonts>" with:nil];
     ```
@@ -307,6 +362,8 @@ Exact version number is obtained using `git describe --tags`.
 
 |  MobileFFmpeg Version | FFmpeg Version | Release Date |
 | :----: | :----: |:----: |
+| [4.3.1](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v4.3.1) | 4.3-dev-1944 | Jan 13, 2020 |
+| [4.3.1.LTS](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v4.3.1.LTS) | 4.3-dev-1944 | Jan 13, 2020 |
 | [4.3](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v4.3) | 4.3-dev-1181 | Oct 27, 2019 |
 | [4.2.2](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v4.2.2) | 4.2-dev-1824 | July 3, 2019 |
 | [4.2.2.LTS](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v4.2.2.LTS) | 4.2-dev-1824 | July 3, 2019 |

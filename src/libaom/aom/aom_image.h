@@ -30,7 +30,7 @@ extern "C" {
  * types, removing or reassigning enums, adding/removing/rearranging
  * fields to structures
  */
-#define AOM_IMAGE_ABI_VERSION (5) /**<\hideinitializer*/
+#define AOM_IMAGE_ABI_VERSION (7) /**<\hideinitializer*/
 
 #define AOM_IMG_FMT_PLANAR 0x100  /**< Image is a planar format. */
 #define AOM_IMG_FMT_UV_FLIP 0x200 /**< V plane precedes U in memory. */
@@ -137,6 +137,16 @@ typedef enum aom_chroma_sample_position {
   AOM_CSP_RESERVED = 3          /**< Reserved value */
 } aom_chroma_sample_position_t; /**< alias for enum aom_transfer_function */
 
+/*!\brief Array of aom_metadata structs for an image. */
+typedef struct aom_metadata_array aom_metadata_array_t;
+
+/*!\brief Metadata payload. */
+typedef struct aom_metadata {
+  uint32_t type;    /**< Metadata type */
+  uint8_t *payload; /**< Metadata payload data */
+  size_t sz;        /**< Metadata payload size */
+} aom_metadata_t;
+
 /**\brief Image Descriptor */
 typedef struct aom_image {
   aom_img_fmt_t fmt;                 /**< Image Format */
@@ -187,6 +197,9 @@ typedef struct aom_image {
   unsigned char *img_data; /**< private */
   int img_data_owner;      /**< private */
   int self_allocd;         /**< private */
+
+  aom_metadata_array_t
+      *metadata; /**< Metadata payloads associated with the image. */
 
   void *fb_priv; /**< Frame buffer data associated with the image. */
 } aom_image_t;   /**< alias for struct aom_image */
@@ -323,6 +336,77 @@ int aom_img_plane_width(const aom_image_t *img, int plane);
  * \param[in]    plane     Plane index
  */
 int aom_img_plane_height(const aom_image_t *img, int plane);
+
+/*!\brief Add metadata to image.
+ *
+ * Adds metadata to aom_image_t.
+ * Function makes a copy of the provided data parameter.
+ * Currently, only ITUT T35 metadata support is implemented.
+ *
+ * \param[in]    img       Image descriptor
+ * \param[in]    type      Metadata type
+ * \param[in]    data      Metadata contents
+ * \param[in]    sz        Metadata contents size
+ */
+int aom_img_add_metadata(aom_image_t *img, uint32_t type, const uint8_t *data,
+                         size_t sz);
+
+/*!\brief Return a metadata payload stored within the image metadata array.
+ *
+ * Gets the metadata (aom_metadata_t) at the indicated index in the image
+ * metadata array.
+ *
+ * \param[in] img          Pointer to image descriptor to get metadata from
+ * \param[in] index        Metadata index to get from metadata array
+ *
+ * \return Returns a const pointer to the selected metadata, if img and/or index
+ * is invalid, it returns NULL.
+ */
+const aom_metadata_t *aom_img_get_metadata(const aom_image_t *img,
+                                           size_t index);
+
+/*!\brief Return the number of metadata blocks within the image.
+ *
+ * Gets the number of metadata blocks contained within the provided image
+ * metadata array.
+ *
+ * \param[in] img          Pointer to image descriptor to get metadata number
+ * from.
+ *
+ * \return Returns the size of the metadata array. If img or metadata is NULL,
+ * it returns 0.
+ */
+size_t aom_img_num_metadata(const aom_image_t *img);
+
+/*!\brief Remove metadata from image.
+ *
+ * Removes all metadata in image metadata list and sets metadata list pointer
+ * to NULL.
+ *
+ * \param[in]    img       Image descriptor
+ */
+void aom_img_remove_metadata(aom_image_t *img);
+
+/*!\brief Allocate memory for aom_metadata struct.
+ *
+ * Allocates storage for the metadata payload, sets its type and copies the
+ * payload data into the aom_metadata struct. A metadata payload buffer of size
+ * sz is allocated and sz bytes are copied from data into the payload buffer.
+ *
+ * \param[in]    type      Metadata type
+ * \param[in]    data      Metadata data pointer
+ * \param[in]    sz        Metadata size
+ */
+aom_metadata_t *aom_img_metadata_alloc(uint32_t type, const uint8_t *data,
+                                       size_t sz);
+
+/*!\brief Free metadata struct.
+ *
+ * Free metadata struct and its buffer.
+ *
+ * \param[in]    metadata       Metadata struct pointer
+ */
+void aom_img_metadata_free(aom_metadata_t *metadata);
 
 #ifdef __cplusplus
 }  // extern "C"

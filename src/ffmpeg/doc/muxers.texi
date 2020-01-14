@@ -1169,6 +1169,32 @@ The pattern "img%%-%d.jpg" will specify a sequence of filenames of the
 form @file{img%-1.jpg}, @file{img%-2.jpg}, ..., @file{img%-10.jpg},
 etc.
 
+The image muxer supports the .Y.U.V image file format. This format is
+special in that that each image frame consists of three files, for
+each of the YUV420P components. To read or write this image file format,
+specify the name of the '.Y' file. The muxer will automatically open the
+'.U' and '.V' files as required.
+
+@subsection Options
+
+@table @option
+@item frame_pts
+If set to 1, expand the filename with pts from pkt->pts.
+Default value is 0.
+
+@item start_number
+Start the sequence from the specified number. Default value is 1.
+
+@item update
+If set to 1, the filename will always be interpreted as just a
+filename, not a pattern, and the corresponding file will be continuously
+overwritten with new images. Default value is 0.
+
+@item strftime
+If set to 1, expand the filename with date and time information from
+@code{strftime()}. Default value is 0.
+@end table
+
 @subsection Examples
 
 The following example shows how to use @command{ffmpeg} for creating a
@@ -1208,32 +1234,6 @@ You can set the file name with current frame's PTS:
 @example
 ffmpeg -f v4l2 -r 1 -i /dev/video0 -copyts -f image2 -frame_pts true %d.jpg"
 @end example
-
-@subsection Options
-
-@table @option
-@item frame_pts
-If set to 1, expand the filename with pts from pkt->pts.
-Default value is 0.
-
-@item start_number
-Start the sequence from the specified number. Default value is 1.
-
-@item update
-If set to 1, the filename will always be interpreted as just a
-filename, not a pattern, and the corresponding file will be continuously
-overwritten with new images. Default value is 0.
-
-@item strftime
-If set to 1, expand the filename with date and time information from
-@code{strftime()}. Default value is 0.
-@end table
-
-The image muxer supports the .Y.U.V image file format. This format is
-special in that that each image frame consists of three files, for
-each of the YUV420P components. To read or write this image file format,
-specify the name of the '.Y' file. The muxer will automatically open the
-'.U' and '.V' files as required.
 
 @section matroska
 
@@ -1582,11 +1582,12 @@ Advanced Codec Digital HDTV service.
 @end table
 
 @item mpegts_pmt_start_pid @var{integer}
-Set the first PID for PMT. Default is @code{0x1000}. Max is @code{0x1f00}.
+Set the first PID for PMTs. Default is @code{0x1000}, minimum is @code{0x0020},
+maximum is @code{0x1ffa}.
 
 @item mpegts_start_pid @var{integer}
-Set the first PID for data packets. Default is @code{0x0100}. Max is
-@code{0x0f00}.
+Set the first PID for elementary streams. Default is @code{0x0100}, minimum is
+@code{0x0020}, maximum is @code{0x1ffa}.
 
 @item mpegts_m2ts_mode @var{boolean}
 Enable m2ts mode if set to @code{1}. Default value is @code{-1} which
@@ -2084,7 +2085,7 @@ but supports several other algorithms.
 The output of the muxer consists of one line per stream of the form:
 @var{streamindex},@var{streamtype},@var{algo}=@var{hash}, where
 @var{streamindex} is the index of the mapped stream, @var{streamtype} is a
-single characer indicating the type of stream, @var{algo} is a short string
+single character indicating the type of stream, @var{algo} is a short string
 representing the hash function used, and @var{hash} is a hexadecimal number
 representing the computed hash.
 

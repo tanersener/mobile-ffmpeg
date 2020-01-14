@@ -49,6 +49,9 @@
 # define FALLTHROUGH
 #endif
 
+/* number of elements within an array */
+#define countof(a) (sizeof(a)/sizeof(*(a)))
+
 inline static int global_init(void)
 {
 #ifdef ENABLE_PKCS11

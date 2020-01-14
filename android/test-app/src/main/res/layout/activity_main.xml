@@ -1,33 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<androidx.viewpager.widget.ViewPager xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/pager"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:minHeight="207dp"
-    tools:context="com.arthenica.mobileffmpeg.test.MainActivity"
-    tools:layout_editor_absoluteY="81dp">
+    tools:context="com.arthenica.mobileffmpeg.test.MainActivity">
 
-    <android.support.v4.view.ViewPager
-        android:id="@+id/pager"
-        android:layout_width="0dp"
+    <androidx.viewpager.widget.PagerTabStrip
+        android:id="@+id/pagerTabStrip"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        android:layout_gravity="top"/>
 
-        <android.support.v4.view.PagerTabStrip
-            android:id="@+id/pagerTabStrip"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_gravity="top"
-            android:layout_marginBottom="30dp"
-            android:layout_marginTop="0dp"
-            android:padding="0dp" />
-
-    </android.support.v4.view.ViewPager>
-
-</android.support.constraint.ConstraintLayout>
+</androidx.viewpager.widget.ViewPager>

@@ -912,8 +912,8 @@ static vpx_codec_err_t vp8e_encode(vpx_codec_alg_priv_t *ctx,
 
     dst_time_stamp =
         pts_val * ctx->timestamp_ratio.num / ctx->timestamp_ratio.den;
-    dst_end_time_stamp = (pts_val + duration) * ctx->timestamp_ratio.num /
-                         ctx->timestamp_ratio.den;
+    dst_end_time_stamp = (pts_val + (int64_t)duration) *
+                         ctx->timestamp_ratio.num / ctx->timestamp_ratio.den;
 
     if (img != NULL) {
       res = image2yuvconfig(img, &sd);

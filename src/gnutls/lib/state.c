@@ -1479,7 +1479,7 @@ gnutls_record_get_state(gnutls_session_t session,
 	}
 
 	if (seq_number)
-		memcpy(seq_number, UINT64DATA(record_state->sequence_number), 8);
+		_gnutls_write_uint64(record_state->sequence_number, seq_number);
 	return 0;
 }
 
@@ -1523,7 +1523,7 @@ gnutls_record_set_state(gnutls_session_t session,
 	else
 		record_state = &record_params->write;
 
-	memcpy(UINT64DATA(record_state->sequence_number), seq_number, 8);
+	record_state->sequence_number = _gnutls_read_uint64(seq_number);
 
 	if (IS_DTLS(session)) {
 		_dtls_reset_window(record_params);

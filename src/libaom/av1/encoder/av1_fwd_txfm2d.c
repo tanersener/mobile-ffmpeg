@@ -416,8 +416,8 @@ void av1_get_fwd_txfm_cfg(TX_TYPE tx_type, TX_SIZE tx_size,
   set_flip_cfg(tx_type, cfg);
   const TX_TYPE_1D tx_type_1d_col = vtx_tab[tx_type];
   const TX_TYPE_1D tx_type_1d_row = htx_tab[tx_type];
-  const int txw_idx = tx_size_wide_log2[tx_size] - tx_size_wide_log2[0];
-  const int txh_idx = tx_size_high_log2[tx_size] - tx_size_high_log2[0];
+  const int txw_idx = get_txw_idx(tx_size);
+  const int txh_idx = get_txh_idx(tx_size);
   cfg->shift = av1_fwd_txfm_shift_ls[tx_size];
   cfg->cos_bit_col = av1_fwd_cos_bit_col[txw_idx][txh_idx];
   cfg->cos_bit_row = av1_fwd_cos_bit_row[txw_idx][txh_idx];

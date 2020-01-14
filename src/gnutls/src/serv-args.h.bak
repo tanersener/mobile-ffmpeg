@@ -6,7 +6,7 @@
  *  From the definitions    serv-args.def
  *  and the template file   options
  *
- * Generated from AutoOpts 41:1:16 templates.
+ * Generated from AutoOpts 42:1:17 templates.
  *
  *  AutoOpts is a copyrighted work.  This header file is not encumbered
  *  by AutoOpts licensing, but is provided under the licensing terms chosen
@@ -47,6 +47,8 @@
 #define AUTOOPTS_SERV_ARGS_H_GUARD 1
 #include "config.h"
 #include <autoopts/options.h>
+#include <stdarg.h>
+#include <stdnoreturn.h>
 
 /**
  *  Ensure that the library used for compiling this generated header is at
@@ -55,11 +57,17 @@
  *  tolerable version is at least as old as what was current when the header
  *  template was released.
  */
-#define AO_TEMPLATE_VERSION 167937
+#define AO_TEMPLATE_VERSION 172033
 #if (AO_TEMPLATE_VERSION < OPTIONS_MINIMUM_VERSION) \
  || (AO_TEMPLATE_VERSION > OPTIONS_STRUCT_VERSION)
 # error option template version mismatches autoopts/options.h header
   Choke Me.
+#endif
+
+#if GCC_VERSION > 40400
+#define NOT_REACHED __builtin_unreachable();
+#else
+#define NOT_REACHED
 #endif
 
 /**
@@ -99,29 +107,31 @@ typedef enum {
     INDEX_OPT_X509DSACERTFILE              = 30,
     INDEX_OPT_X509ECCKEYFILE               = 31,
     INDEX_OPT_X509ECCCERTFILE              = 32,
-    INDEX_OPT_SRPPASSWD                    = 33,
-    INDEX_OPT_SRPPASSWDCONF                = 34,
-    INDEX_OPT_PSKPASSWD                    = 35,
-    INDEX_OPT_PSKHINT                      = 36,
-    INDEX_OPT_OCSP_RESPONSE                = 37,
-    INDEX_OPT_IGNORE_OCSP_RESPONSE_ERRORS  = 38,
-    INDEX_OPT_PORT                         = 39,
-    INDEX_OPT_LIST                         = 40,
-    INDEX_OPT_PROVIDER                     = 41,
-    INDEX_OPT_KEYMATEXPORT                 = 42,
-    INDEX_OPT_KEYMATEXPORTSIZE             = 43,
-    INDEX_OPT_RECORDSIZE                   = 44,
-    INDEX_OPT_HTTPDATA                     = 45,
-    INDEX_OPT_VERSION                      = 46,
-    INDEX_OPT_HELP                         = 47,
-    INDEX_OPT_MORE_HELP                    = 48
+    INDEX_OPT_RAWPKKEYFILE                 = 33,
+    INDEX_OPT_RAWPKFILE                    = 34,
+    INDEX_OPT_SRPPASSWD                    = 35,
+    INDEX_OPT_SRPPASSWDCONF                = 36,
+    INDEX_OPT_PSKPASSWD                    = 37,
+    INDEX_OPT_PSKHINT                      = 38,
+    INDEX_OPT_OCSP_RESPONSE                = 39,
+    INDEX_OPT_IGNORE_OCSP_RESPONSE_ERRORS  = 40,
+    INDEX_OPT_PORT                         = 41,
+    INDEX_OPT_LIST                         = 42,
+    INDEX_OPT_PROVIDER                     = 43,
+    INDEX_OPT_KEYMATEXPORT                 = 44,
+    INDEX_OPT_KEYMATEXPORTSIZE             = 45,
+    INDEX_OPT_RECORDSIZE                   = 46,
+    INDEX_OPT_HTTPDATA                     = 47,
+    INDEX_OPT_VERSION                      = 48,
+    INDEX_OPT_HELP                         = 49,
+    INDEX_OPT_MORE_HELP                    = 50
 } teOptIndex;
 /** count of all options for gnutls-serv */
-#define OPTION_CT    49
+#define OPTION_CT    51
 /** gnutls-serv version */
-#define GNUTLS_SERV_VERSION       "3.6.10"
+#define GNUTLS_SERV_VERSION       "3.6.11"
 /** Full gnutls-serv version text */
-#define GNUTLS_SERV_FULL_VERSION  "gnutls-serv 3.6.10"
+#define GNUTLS_SERV_FULL_VERSION  "gnutls-serv 3.6.11"
 
 /**
  *  Interface defines for all options.  Replace "n" with the UPPER_CASED
@@ -211,25 +221,27 @@ typedef enum {
 #define VALUE_OPT_X509DSACERTFILE 0x1018
 #define VALUE_OPT_X509ECCKEYFILE 0x1019
 #define VALUE_OPT_X509ECCCERTFILE 0x101A
-#define VALUE_OPT_SRPPASSWD      0x101B
-#define VALUE_OPT_SRPPASSWDCONF  0x101C
-#define VALUE_OPT_PSKPASSWD      0x101D
-#define VALUE_OPT_PSKHINT        0x101E
-#define VALUE_OPT_OCSP_RESPONSE  0x101F
-#define VALUE_OPT_IGNORE_OCSP_RESPONSE_ERRORS 0x1020
+#define VALUE_OPT_RAWPKKEYFILE   0x101B
+#define VALUE_OPT_RAWPKFILE      0x101C
+#define VALUE_OPT_SRPPASSWD      0x101D
+#define VALUE_OPT_SRPPASSWDCONF  0x101E
+#define VALUE_OPT_PSKPASSWD      0x101F
+#define VALUE_OPT_PSKHINT        0x1020
+#define VALUE_OPT_OCSP_RESPONSE  0x1021
+#define VALUE_OPT_IGNORE_OCSP_RESPONSE_ERRORS 0x1022
 #define VALUE_OPT_PORT           'p'
 
 #define OPT_VALUE_PORT           (DESC(PORT).optArg.argInt)
 #define VALUE_OPT_LIST           'l'
-#define VALUE_OPT_PROVIDER       0x1021
-#define VALUE_OPT_KEYMATEXPORT   0x1022
-#define VALUE_OPT_KEYMATEXPORTSIZE 0x1023
+#define VALUE_OPT_PROVIDER       0x1023
+#define VALUE_OPT_KEYMATEXPORT   0x1024
+#define VALUE_OPT_KEYMATEXPORTSIZE 0x1025
 
 #define OPT_VALUE_KEYMATEXPORTSIZE (DESC(KEYMATEXPORTSIZE).optArg.argInt)
-#define VALUE_OPT_RECORDSIZE     0x1024
+#define VALUE_OPT_RECORDSIZE     0x1026
 
 #define OPT_VALUE_RECORDSIZE     (DESC(RECORDSIZE).optArg.argInt)
-#define VALUE_OPT_HTTPDATA       0x1025
+#define VALUE_OPT_HTTPDATA       0x1027
 /** option flag (value) for help-value option */
 #define VALUE_OPT_HELP          'h'
 /** option flag (value) for more-help-value option */
@@ -304,6 +316,7 @@ static inline char* aoGetsText(char const* pz) {
 #   define _(_s)  _s
 # endif
 #endif  /* ENABLE_NLS */
+
 
 #ifdef  __cplusplus
 }

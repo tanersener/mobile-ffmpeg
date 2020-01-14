@@ -207,6 +207,12 @@ struct decode_tests_st {
 
 struct decode_tests_st decode_tests[] = {
 	{
+		.name = "empty",
+		.pem = "",
+		.raw = {(void*)"", 0},
+		.res = 0
+	},
+	{
 		.name = "dec-rnd1",
 		.pem = "9ppGioRpeiiD2lLNYC85eA==",
 		.raw = {(void*)"\xf6\x9a\x46\x8a\x84\x69\x7a\x28\x83\xda\x52\xcd\x60\x2f\x39\x78", 16},
@@ -225,15 +231,15 @@ struct decode_tests_st decode_tests[] = {
 		.res = 0
 	},
 	{
-		.name = "dec-invalid-data",
-		.pem = "XLJ/7hUZ3TtPIz2dlc5+YvELe+Q==",
-		.raw = {(void*)"\x2c\x9f\xfb\x85\x46\x77\x4e\xd3\xc8\xcf\x67\x65\x73\x9f\x98\xbc\x42\xde\xf9", 19},
+		.name = "dec-spaces",
+		.pem = "  ",
+		.raw = {(void*)"", 0},
 		.res = GNUTLS_E_BASE64_DECODING_ERROR
 	},
 	{
-		.name = "dec-empty",
-		.pem =	"",
-		.raw = {(void*)"", 1},
+		.name = "dec-invalid-data",
+		.pem = "XLJ/7hUZ3TtPIz2dlc5+YvELe+Q==",
+		.raw = {(void*)"\x2c\x9f\xfb\x85\x46\x77\x4e\xd3\xc8\xcf\x67\x65\x73\x9f\x98\xbc\x42\xde\xf9", 19},
 		.res = GNUTLS_E_BASE64_DECODING_ERROR
 	},
 	{

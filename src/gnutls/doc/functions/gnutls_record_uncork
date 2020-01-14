@@ -18,8 +18,8 @@ is interrupted then the @code{GNUTLS_E_AGAIN}  or @code{GNUTLS_E_INTERRUPTED}
 errors will be returned. To obtain the data left in the corked
 buffer use @code{gnutls_record_check_corked()} .
 
-@strong{Returns:} On success the number of transmitted data is returned, or 
-otherwise a negative error code. 
+@strong{Returns:} On success the number of transmitted data is returned, or
+otherwise a negative error code.
 
 @strong{Since:} 3.1.9
 @end deftypefun

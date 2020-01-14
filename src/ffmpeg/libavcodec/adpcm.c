@@ -140,8 +140,8 @@ static av_cold int adpcm_decode_init(AVCodecContext * avctx)
         break;
     case AV_CODEC_ID_ADPCM_IMA_APC:
         if (avctx->extradata && avctx->extradata_size >= 8) {
-            c->status[0].predictor = AV_RL32(avctx->extradata);
-            c->status[1].predictor = AV_RL32(avctx->extradata + 4);
+            c->status[0].predictor = av_clip_intp2(AV_RL32(avctx->extradata    ), 18);
+            c->status[1].predictor = av_clip_intp2(AV_RL32(avctx->extradata + 4), 18);
         }
         break;
     case AV_CODEC_ID_ADPCM_IMA_WS:
@@ -342,7 +342,7 @@ static inline int16_t adpcm_ima_oki_expand_nibble(ADPCMChannelStatus *c, int nib
     c->predictor = av_clip_intp2(predictor, 11);
     c->step_index = step_index;
 
-    return c->predictor << 4;
+    return c->predictor * 16;
 }
 
 static inline int16_t adpcm_ct_expand_nibble(ADPCMChannelStatus *c, int8_t nibble)
@@ -441,7 +441,7 @@ static int xa_decode(AVCodecContext *avctx, int16_t *out0, int16_t *out1,
             d = in[16+i+j*4];
 
             t = sign_extend(d, 4);
-            s = ( t<<shift ) + ((s_1*f0 + s_2*f1+32)>>6);
+            s = t*(1<<shift) + ((s_1*f0 + s_2*f1+32)>>6);
             s_2 = s_1;
             s_1 = av_clip_int16(s);
             out0[j] = s_1;
@@ -468,7 +468,7 @@ static int xa_decode(AVCodecContext *avctx, int16_t *out0, int16_t *out1,
             d = in[16+i+j*4];
 
             t = sign_extend(d >> 4, 4);
-            s = ( t<<shift ) + ((s_1*f0 + s_2*f1+32)>>6);
+            s = t*(1<<shift) + ((s_1*f0 + s_2*f1+32)>>6);
             s_2 = s_1;
             s_1 = av_clip_int16(s);
             out1[j] = s_1;
@@ -1723,7 +1723,7 @@ static int adpcm_decode_frame(AVCodecContext *avctx, void *data,
                     else
                         sampledat = sign_extend(byte >> 4, 4);
 
-                    sampledat = (((sampledat << 12) >> (header & 0xf)) << 6) + prev;
+                    sampledat = ((sampledat * (1 << 12)) >> (header & 0xf)) * (1 << 6) + prev;
                     *samples++ = av_clip_int16(sampledat >> 6);
                     c->status[channel].sample2 = c->status[channel].sample1;
                     c->status[channel].sample1 = sampledat;

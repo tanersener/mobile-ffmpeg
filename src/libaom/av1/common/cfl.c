@@ -327,7 +327,7 @@ static void cfl_store(CFL_CTX *cfl, const uint8_t *input, int input_stride,
                       int row, int col, TX_SIZE tx_size, int use_hbd) {
   const int width = tx_size_wide[tx_size];
   const int height = tx_size_high[tx_size];
-  const int tx_off_log2 = tx_size_wide_log2[0];
+  const int tx_off_log2 = MI_SIZE_LOG2;
   const int sub_x = cfl->subsampling_x;
   const int sub_y = cfl->subsampling_y;
   const int store_row = row << (tx_off_log2 - sub_y);
@@ -391,8 +391,7 @@ void cfl_store_tx(MACROBLOCKD *const xd, int row, int col, TX_SIZE tx_size,
                   BLOCK_SIZE bsize) {
   CFL_CTX *const cfl = &xd->cfl;
   struct macroblockd_plane *const pd = &xd->plane[AOM_PLANE_Y];
-  uint8_t *dst =
-      &pd->dst.buf[(row * pd->dst.stride + col) << tx_size_wide_log2[0]];
+  uint8_t *dst = &pd->dst.buf[(row * pd->dst.stride + col) << MI_SIZE_LOG2];
 
   if (block_size_high[bsize] == 4 || block_size_wide[bsize] == 4) {
     // Only dimensions of size 4 can have an odd offset.

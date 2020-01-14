@@ -24,6 +24,6 @@
 #include <setjmp.h>
 
 /** Holds information to implement exception handling. */
-jmp_buf ex_buf__;
+extern __thread jmp_buf ex_buf__;
 
 #endif // MOBILE_FFMPEG_EXCEPTION_H

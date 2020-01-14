@@ -105,8 +105,7 @@ void AV1CompMaskVarianceTest::RunCheckOutput(comp_mask_pred_func test_impl,
                                              BLOCK_SIZE bsize, int inv) {
   const int w = block_size_wide[bsize];
   const int h = block_size_high[bsize];
-
-  int wedge_types = (1 << get_wedge_bits_lookup(bsize));
+  const int wedge_types = get_wedge_types_lookup(bsize);
   for (int wedge_index = 0; wedge_index < wedge_types; ++wedge_index) {
     const uint8_t *mask = av1_get_contiguous_soft_mask(wedge_index, 1, bsize);
 
@@ -123,8 +122,7 @@ void AV1CompMaskVarianceTest::RunSpeedTest(comp_mask_pred_func test_impl,
                                            BLOCK_SIZE bsize) {
   const int w = block_size_wide[bsize];
   const int h = block_size_high[bsize];
-
-  int wedge_types = (1 << get_wedge_bits_lookup(bsize));
+  const int wedge_types = get_wedge_types_lookup(bsize);
   int wedge_index = wedge_types / 2;
   const uint8_t *mask = av1_get_contiguous_soft_mask(wedge_index, 1, bsize);
   const int num_loops = 1000000000 / (w + h);
@@ -189,7 +187,7 @@ void AV1CompMaskUpVarianceTest::RunCheckOutput(comp_mask_pred_func test_impl,
                                                BLOCK_SIZE bsize, int inv) {
   const int w = block_size_wide[bsize];
   const int h = block_size_high[bsize];
-  int wedge_types = (1 << get_wedge_bits_lookup(bsize));
+  const int wedge_types = get_wedge_types_lookup(bsize);
   int subpel_search;
   for (subpel_search = USE_4_TAPS; subpel_search <= USE_8_TAPS;
        ++subpel_search) {
@@ -224,8 +222,7 @@ void AV1CompMaskUpVarianceTest::RunSpeedTest(comp_mask_pred_func test_impl,
   const int h = block_size_high[bsize];
   const int subx = havSub ? 3 : 0;
   const int suby = havSub ? 4 : 0;
-
-  int wedge_types = (1 << get_wedge_bits_lookup(bsize));
+  const int wedge_types = get_wedge_types_lookup(bsize);
   int wedge_index = wedge_types / 2;
   const uint8_t *mask = av1_get_contiguous_soft_mask(wedge_index, 1, bsize);
 
@@ -348,11 +345,9 @@ void AV1HighbdCompMaskVarianceTest::TearDown() {
 void AV1HighbdCompMaskVarianceTest::RunCheckOutput(
     highbd_comp_mask_pred_func test_impl, BLOCK_SIZE bsize, int inv) {
   int bd_ = GET_PARAM(2);
-
   const int w = block_size_wide[bsize];
   const int h = block_size_high[bsize];
-
-  int wedge_types = (1 << get_wedge_bits_lookup(bsize));
+  const int wedge_types = get_wedge_types_lookup(bsize);
 
   for (int i = 0; i < MAX_SB_SQUARE; ++i) {
     pred_[i] = rnd_.Rand16() & ((1 << bd_) - 1);
@@ -382,8 +377,7 @@ void AV1HighbdCompMaskVarianceTest::RunSpeedTest(
 
   const int w = block_size_wide[bsize];
   const int h = block_size_high[bsize];
-
-  int wedge_types = (1 << get_wedge_bits_lookup(bsize));
+  const int wedge_types = get_wedge_types_lookup(bsize);
   int wedge_index = wedge_types / 2;
 
   for (int i = 0; i < MAX_SB_SQUARE; ++i) {
@@ -464,7 +458,7 @@ void AV1HighbdCompMaskUpVarianceTest::RunCheckOutput(
   int bd_ = GET_PARAM(2);
   const int w = block_size_wide[bsize];
   const int h = block_size_high[bsize];
-  int wedge_types = (1 << get_wedge_bits_lookup(bsize));
+  const int wedge_types = get_wedge_types_lookup(bsize);
 
   for (int i = 0; i < MAX_SB_SQUARE; ++i) {
     pred_[i] = rnd_.Rand16() & ((1 << bd_) - 1);
@@ -516,8 +510,7 @@ void AV1HighbdCompMaskUpVarianceTest::RunSpeedTest(
   const int h = block_size_high[bsize];
   const int subx = havSub ? 3 : 0;
   const int suby = havSub ? 4 : 0;
-
-  int wedge_types = (1 << get_wedge_bits_lookup(bsize));
+  const int wedge_types = get_wedge_types_lookup(bsize);
   int wedge_index = wedge_types / 2;
   const uint8_t *mask = av1_get_contiguous_soft_mask(wedge_index, 1, bsize);
 

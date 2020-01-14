@@ -92,7 +92,7 @@ static void vp8_encode_bool(BOOL_CODER *bc, int bit, int probability) {
     }
 
     validate_buffer(bc->buffer + bc->pos, 1, bc->buffer_end, bc->error);
-    bc->buffer[bc->pos++] = (lowvalue >> (24 - offset));
+    bc->buffer[bc->pos++] = (lowvalue >> (24 - offset) & 0xff);
 
     lowvalue <<= offset;
     shift = count;

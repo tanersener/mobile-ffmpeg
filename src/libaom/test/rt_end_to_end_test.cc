@@ -10,6 +10,8 @@
  */
 
 #include <memory>
+#include <string>
+#include <unordered_map>
 
 #include "third_party/googletest/src/googletest/include/gtest/gtest.h"
 
@@ -24,9 +26,22 @@ namespace {
 const unsigned int kFrames = 10;
 const int kBitrate = 500;
 
-// List of psnr thresholds for speed settings 0-8
-const double kPsnrThreshold[9] = { 37.0, 36.9, 36.8, 36.7, 36.5,
-                                   36.3, 35.1, 35.0, 34.8 };
+// List of psnr thresholds for speed settings 6-8
+// keys: video, speed, aq mode.
+std::unordered_map<std::string,
+                   std::unordered_map<int, std::unordered_map<int, double>>>
+    kPsnrThreshold = { { "park_joy_90p_8_420.y4m",
+                         { { 6, { { 0, 35.4 }, { 3, 36.2 } } },
+                           { 7, { { 0, 34.9 }, { 3, 35.8 } } },
+                           { 8, { { 0, 35.0 }, { 3, 35.8 } } } } },
+                       { "paris_352_288_30.y4m",
+                         { { 6, { { 0, 36.2 }, { 3, 36.7 } } },
+                           { 7, { { 0, 35.5 }, { 3, 36.0 } } },
+                           { 8, { { 0, 36.0 }, { 3, 36.5 } } } } },
+                       { "niklas_1280_720_30.y4m",
+                         { { 6, { { 0, 34.2 }, { 3, 34.2 } } },
+                           { 7, { { 0, 33.7 }, { 3, 33.9 } } },
+                           { 8, { { 0, 33.7 }, { 3, 33.5 } } } } } };
 
 typedef struct {
   const char *filename;
@@ -43,21 +58,23 @@ std::ostream &operator<<(std::ostream &os, const TestVideoParam &test_arg) {
             << " profile:" << test_arg.profile << "}";
 }
 
-// TODO(kyslov): Add more test vectors
 const TestVideoParam kTestVectors[] = {
   { "park_joy_90p_8_420.y4m", 8, AOM_IMG_FMT_I420, AOM_BITS_8, 0 },
   { "paris_352_288_30.y4m", 8, AOM_IMG_FMT_I420, AOM_BITS_8, 0 },
+  { "niklas_1280_720_30.y4m", 8, AOM_IMG_FMT_I420, AOM_BITS_8, 0 },
 };
 
+// Params: test video, speed, aq mode, threads, tile columns.
 class RTEndToEndTest
-    : public ::libaom_test::CodecTestWith4Params<TestVideoParam, int,
-                                                 unsigned int, int>,
+    : public ::libaom_test::CodecTestWith5Params<TestVideoParam, int,
+                                                 unsigned int, int, int>,
       public ::libaom_test::EncoderTest {
  protected:
   RTEndToEndTest()
       : EncoderTest(GET_PARAM(0)), test_video_param_(GET_PARAM(1)),
         cpu_used_(GET_PARAM(2)), psnr_(0.0), nframes_(0),
-        aq_mode_(GET_PARAM(3)), threads_(GET_PARAM(4)) {}
+        aq_mode_(GET_PARAM(3)), threads_(GET_PARAM(4)),
+        tile_columns_(GET_PARAM(5)) {}
 
   virtual ~RTEndToEndTest() {}
 
@@ -86,7 +103,7 @@ class RTEndToEndTest
                                   ::libaom_test::Encoder *encoder) {
     if (video->frame() == 0) {
       encoder->Control(AV1E_SET_FRAME_PARALLEL_DECODING, 1);
-      encoder->Control(AV1E_SET_TILE_COLUMNS, threads_);
+      encoder->Control(AV1E_SET_TILE_COLUMNS, tile_columns_);
       encoder->Control(AOME_SET_CPUUSED, cpu_used_);
       encoder->Control(AV1E_SET_TUNE_CONTENT, AOM_CONTENT_DEFAULT);
       encoder->Control(AV1E_SET_AQ_MODE, aq_mode_);
@@ -99,7 +116,9 @@ class RTEndToEndTest
     return 0.0;
   }
 
-  double GetPsnrThreshold() { return kPsnrThreshold[cpu_used_]; }
+  double GetPsnrThreshold() {
+    return kPsnrThreshold[test_video_param_.filename][cpu_used_][aq_mode_];
+  }
 
   void DoTest() {
     cfg_.rc_target_bitrate = kBitrate;
@@ -128,44 +147,24 @@ class RTEndToEndTest
   double psnr_;
   unsigned int nframes_;
   unsigned int aq_mode_;
-  unsigned int threads_;
+  int threads_;
+  int tile_columns_;
 };
 
-// *Threaded* and *Large* tests are used to simplify test filtering.
-class RTEndToEndTestLarge : public RTEndToEndTest {};
-
-class RTEndToEndTestThreadedLarge : public RTEndToEndTest {};
-
 class RTEndToEndTestThreaded : public RTEndToEndTest {};
-
-TEST_P(RTEndToEndTestLarge, EndtoEndPSNRTest) { DoTest(); }
-
-TEST_P(RTEndToEndTestThreadedLarge, EndtoEndPSNRTest) { DoTest(); }
 
 TEST_P(RTEndToEndTest, EndtoEndPSNRTest) { DoTest(); }
 
 TEST_P(RTEndToEndTestThreaded, EndtoEndPSNRTest) { DoTest(); }
 
-AV1_INSTANTIATE_TEST_CASE(RTEndToEndTestLarge,
-                          ::testing::ValuesIn(kTestVectors),
-                          ::testing::Range(0, 7),
-                          ::testing::Values<unsigned int>(0),
-                          ::testing::Values(1));
-
-AV1_INSTANTIATE_TEST_CASE(RTEndToEndTestThreadedLarge,
-                          ::testing::ValuesIn(kTestVectors),
-                          ::testing::Range(0, 7),
-                          ::testing::Values<unsigned int>(0),
-                          ::testing::Values(2, 5));
-
-AV1_INSTANTIATE_TEST_CASE(RTEndToEndTest, ::testing::Values(kTestVectors[0]),
-                          ::testing::Range(7, 9),
-                          ::testing::Range<unsigned int>(0, 4),
-                          ::testing::Values(1));
+AV1_INSTANTIATE_TEST_CASE(RTEndToEndTest, ::testing::ValuesIn(kTestVectors),
+                          ::testing::Range(6, 9),
+                          ::testing::Values<unsigned int>(0, 3),
+                          ::testing::Values(1), ::testing::Values(1));
 
 AV1_INSTANTIATE_TEST_CASE(RTEndToEndTestThreaded,
-                          ::testing::Values(kTestVectors[1]),
-                          ::testing::Range(7, 9),
-                          ::testing::Range<unsigned int>(0, 4),
-                          ::testing::Range(2, 5));
+                          ::testing::ValuesIn(kTestVectors),
+                          ::testing::Range(6, 9),
+                          ::testing::Values<unsigned int>(0, 3),
+                          ::testing::Range(2, 5), ::testing::Range(2, 5));
 }  // namespace

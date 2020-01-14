@@ -95,9 +95,11 @@ const char *x509_certfile = NULL;
 const char *x509_cafile = NULL;
 const char *x509_crlfile = NULL;
 static int x509ctype;
+const char *rawpk_keyfile = NULL;
+const char *rawpk_file = NULL;
 static int disable_extensions;
 static int disable_sni;
-static unsigned int init_flags = GNUTLS_CLIENT;
+static unsigned int init_flags = GNUTLS_CLIENT | GNUTLS_ENABLE_RAWPK;
 static const char *priorities = NULL;
 static const char *inline_commands_prefix;
 
@@ -121,10 +123,60 @@ static int cert_verify_ocsp(gnutls_session_t session);
 static unsigned int x509_crt_size;
 static gnutls_pcert_st x509_crt[MAX_CRT];
 static gnutls_privkey_t x509_key = NULL;
+static gnutls_pcert_st rawpk;
+static gnutls_privkey_t rawpk_key = NULL;
 
-/* Load the certificate and the private key.
+
+/* Load a PKCS #8, PKCS #12 private key or PKCS #11 URL
  */
-static void load_keys(void)
+static void load_priv_key(gnutls_privkey_t* privkey, const char* key_source)
+{
+	int ret;
+	gnutls_datum_t data = { NULL, 0 };
+
+	ret = gnutls_privkey_init(privkey);
+
+	if (ret < 0) {
+		fprintf(stderr, "*** Error initializing key: %s\n",
+			gnutls_strerror(ret));
+		exit(1);
+	}
+
+	gnutls_privkey_set_pin_function(*privkey, pin_callback,
+					NULL);
+
+	if (gnutls_url_is_supported(key_source) != 0) {
+		ret = gnutls_privkey_import_url(*privkey, key_source, 0);
+		if (ret < 0) {
+			fprintf(stderr,
+				"*** Error loading url: %s\n",
+				gnutls_strerror(ret));
+			exit(1);
+		}
+	} else {
+		ret = gnutls_load_file(key_source, &data);
+		if (ret < 0) {
+			fprintf(stderr,
+				"*** Error loading key file.\n");
+			exit(1);
+		}
+
+		ret = gnutls_privkey_import_x509_raw(*privkey, &data,
+		                                     x509ctype, NULL, 0);
+		if (ret < 0) {
+			fprintf(stderr,
+				"*** Error importing key: %s\n",
+				gnutls_strerror(ret));
+			exit(1);
+		}
+
+		gnutls_free(data.data);
+	}
+}
+
+/* Load the X509 certificate and the private key.
+ */
+static void load_x509_keys(void)
 {
 	unsigned int crt_num;
 	int ret;
@@ -209,51 +261,45 @@ static void load_keys(void)
 
 		gnutls_free(data.data);
 
-		ret = gnutls_privkey_init(&x509_key);
+		load_priv_key(&x509_key, x509_keyfile);
+
+		log_msg(stdout,
+			"Processed %d client X.509 certificates...\n",
+			x509_crt_size);
+	}
+}
+
+/* Load the raw public key and corresponding private key.
+ */
+static void load_rawpk_keys(void)
+{
+	int ret;
+	gnutls_datum_t data = { NULL, 0 };
+
+	if (rawpk_file != NULL && rawpk_keyfile != NULL) {
+		// First we load the raw public key
+		ret = gnutls_load_file(rawpk_file, &data);
 		if (ret < 0) {
-			fprintf(stderr, "*** Error initializing key: %s\n",
-				gnutls_strerror(ret));
+			fprintf(stderr,
+				"*** Error loading cert file.\n");
 			exit(1);
 		}
 
-		gnutls_privkey_set_pin_function(x509_key, pin_callback,
-						NULL);
-
-		if (gnutls_url_is_supported(x509_keyfile) != 0) {
-			ret =
-			    gnutls_privkey_import_url(x509_key,
-						      x509_keyfile, 0);
-			if (ret < 0) {
-				fprintf(stderr,
-					"*** Error loading url: %s\n",
-					gnutls_strerror(ret));
-				exit(1);
-			}
-		} else {
-			ret = gnutls_load_file(x509_keyfile, &data);
-			if (ret < 0) {
-				fprintf(stderr,
-					"*** Error loading key file.\n");
-				exit(1);
-			}
-
-			ret =
-			    gnutls_privkey_import_x509_raw(x509_key, &data,
-							   x509ctype, NULL,
-							   0);
-			if (ret < 0) {
-				fprintf(stderr,
-					"*** Error loading url: %s\n",
-					gnutls_strerror(ret));
-				exit(1);
-			}
-
-			gnutls_free(data.data);
+		ret = gnutls_pcert_import_rawpk_raw(&rawpk, &data, x509ctype, 0, 0);
+		if (ret < 0) {
+			fprintf(stderr,
+			        "*** Error importing rawpk to pcert: %s\n",
+			        gnutls_strerror(ret));
+			exit(1);
 		}
 
-		fprintf(stdout,
-			"Processed %d client X.509 certificates...\n",
-			x509_crt_size);
+		gnutls_free(data.data);
+
+		// Secondly, we load the private key corresponding to the raw pk
+		load_priv_key(&rawpk_key, rawpk_keyfile);
+
+		log_msg(stdout,
+			"Processed %d client raw public key pair...\n",	1);
 	}
 }
 
@@ -541,23 +587,40 @@ cert_callback(gnutls_session_t session,
 	 * supported by the server.
 	 */
 
-	cert_type = gnutls_certificate_type_get(session);
+	cert_type = gnutls_certificate_type_get2(session, GNUTLS_CTYPE_CLIENT);
 
 	*pcert_length = 0;
 
-	if (cert_type == GNUTLS_CRT_X509) {
-		if (x509_crt_size > 0) {
-			if (x509_key != NULL) {
-				*pkey = x509_key;
-			} else {
+	switch (cert_type) {
+		case GNUTLS_CRT_X509:
+			if (x509_crt_size > 0) {
+				if (x509_key != NULL) {
+					*pkey = x509_key;
+				} else {
+					log_msg
+					      (stdout, "- Could not find a suitable key to send to server\n");
+					return -1;
+				}
+
+				*pcert_length = x509_crt_size;
+				*pcert = x509_crt;
+			}
+			break;
+		case GNUTLS_CRT_RAWPK:
+			if (rawpk_key == NULL || rawpk.type != GNUTLS_CRT_RAWPK) {
 				log_msg
-				    (stdout, "- Could not find a suitable key to send to server\n");
+				      (stdout, "- Could not find a suitable key to send to server\n");
 				return -1;
 			}
 
-			*pcert_length = x509_crt_size;
-			*pcert = x509_crt;
-		}
+			*pkey = rawpk_key;
+			*pcert = &rawpk;
+			*pcert_length = 1;
+			break;
+		default:
+			log_msg(stdout, "- Could not retrieve unsupported certificate type %s.\n",
+	       gnutls_certificate_type_get_name(cert_type));
+	    return -1;
 	}
 
 	log_msg(stdout, "- Successfully sent %u certificate(s) to server.\n",
@@ -1108,7 +1171,7 @@ print_other_info(gnutls_session_t session)
 		    gnutls_ocsp_resp_print(r, flag, &p);
 		gnutls_ocsp_resp_deinit(r);
 		if (ret>=0) {
-			fputs((char*)p.data, stdout);
+			log_msg(stdout, "%s", (char*) p.data);
 			gnutls_free(p.data);
 		}
 	}
@@ -1570,6 +1633,12 @@ static void cmd_parser(int argc, char **argv)
 	if (HAVE_OPT(X509CERTFILE))
 		x509_certfile = OPT_ARG(X509CERTFILE);
 
+	if (HAVE_OPT(RAWPKKEYFILE))
+		rawpk_keyfile = OPT_ARG(RAWPKKEYFILE);
+
+	if (HAVE_OPT(RAWPKFILE))
+		rawpk_file = OPT_ARG(RAWPKFILE);
+
 	if (HAVE_OPT(PSKUSERNAME))
 		psk_username = OPT_ARG(PSKUSERNAME);
 
@@ -1841,7 +1910,8 @@ static void init_global_tls_stuff(void)
 		}
 	}
 
-	load_keys();
+	load_x509_keys();
+	load_rawpk_keys();
 
 #ifdef ENABLE_SRP
 	if (srp_username && srp_passwd) {

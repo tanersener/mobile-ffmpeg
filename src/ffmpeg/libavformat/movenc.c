@@ -2493,6 +2493,7 @@ static int mov_write_stbl_tag(AVFormatContext *s, AVIOContext *pb, MOVMuxContext
     mov_write_stts_tag(pb, track);
     if ((track->par->codec_type == AVMEDIA_TYPE_VIDEO ||
          track->par->codec_id == AV_CODEC_ID_TRUEHD ||
+         track->par->codec_id == AV_CODEC_ID_MPEGH_3D_AUDIO ||
          track->par->codec_tag == MKTAG('r','t','p',' ')) &&
         track->has_keyframes && track->has_keyframes < track->entry)
         mov_write_stss_tag(pb, track, MOV_SYNC_SAMPLE);
@@ -3145,12 +3146,12 @@ static int mov_write_track_udta_tag(AVIOContext *pb, MOVMuxContext *mov,
     if (mov->mode & (MODE_MP4|MODE_MOV))
         mov_write_track_metadata(pb_buf, st, "name", "title");
 
-    if ((size = avio_close_dyn_buf(pb_buf, &buf)) > 0) {
+    if ((size = avio_get_dyn_buf(pb_buf, &buf)) > 0) {
         avio_wb32(pb, size + 8);
         ffio_wfourcc(pb, "udta");
         avio_write(pb, buf, size);
     }
-    av_free(buf);
+    ffio_free_dyn_buf(&pb_buf);
 
     return 0;
 }
@@ -3820,12 +3821,12 @@ static int mov_write_udta_tag(AVIOContext *pb, MOVMuxContext *mov,
     if (s->nb_chapters && !(mov->flags & FF_MOV_FLAG_DISABLE_CHPL))
         mov_write_chpl_tag(pb_buf, s);
 
-    if ((size = avio_close_dyn_buf(pb_buf, &buf)) > 0) {
+    if ((size = avio_get_dyn_buf(pb_buf, &buf)) > 0) {
         avio_wb32(pb, size + 8);
         ffio_wfourcc(pb, "udta");
         avio_write(pb, buf, size);
     }
-    av_free(buf);
+    ffio_free_dyn_buf(&pb_buf);
 
     return 0;
 }
@@ -4740,27 +4741,11 @@ static int mov_write_mdat_tag(AVIOContext *pb, MOVMuxContext *mov)
     return 0;
 }
 
-/* TODO: This needs to be more general */
-static int mov_write_ftyp_tag(AVIOContext *pb, AVFormatContext *s)
+static void mov_write_ftyp_tag_internal(AVIOContext *pb, AVFormatContext *s,
+                                        int has_h264, int has_video, int write_minor)
 {
     MOVMuxContext *mov = s->priv_data;
-    int64_t pos = avio_tell(pb);
-    int has_h264 = 0, has_video = 0;
     int minor = 0x200;
-    int i;
-
-    for (i = 0; i < s->nb_streams; i++) {
-        AVStream *st = s->streams[i];
-        if (is_cover_image(st))
-            continue;
-        if (st->codecpar->codec_type == AVMEDIA_TYPE_VIDEO)
-            has_video = 1;
-        if (st->codecpar->codec_id == AV_CODEC_ID_H264)
-            has_h264 = 1;
-    }
-
-    avio_wb32(pb, 0); /* size */
-    ffio_wfourcc(pb, "ftyp");
 
     if (mov->major_brand && strlen(mov->major_brand) >= 4)
         ffio_wfourcc(pb, mov->major_brand);
@@ -4772,6 +4757,9 @@ static int mov_write_ftyp_tag(AVIOContext *pb, AVFormatContext *s)
         minor =     has_h264 ? 0x20000 : 0x10000;
     } else if (mov->mode == MODE_PSP)
         ffio_wfourcc(pb, "MSNV");
+    else if (mov->mode == MODE_MP4 && mov->flags & FF_MOV_FLAG_FRAGMENT &&
+                                      mov->flags & FF_MOV_FLAG_NEGATIVE_CTS_OFFSETS)
+        ffio_wfourcc(pb, "iso6"); // Required when using signed CTS offsets in trun boxes
     else if (mov->mode == MODE_MP4 && mov->flags & FF_MOV_FLAG_DEFAULT_BASE_MOOF)
         ffio_wfourcc(pb, "iso5"); // Required when using default-base-is-moof
     else if (mov->mode == MODE_MP4 && mov->flags & FF_MOV_FLAG_NEGATIVE_CTS_OFFSETS)
@@ -4787,31 +4775,66 @@ static int mov_write_ftyp_tag(AVIOContext *pb, AVFormatContext *s)
     else
         ffio_wfourcc(pb, "qt  ");
 
-    avio_wb32(pb, minor);
+    if (write_minor)
+        avio_wb32(pb, minor);
+}
 
-    if (mov->mode == MODE_MOV)
-        ffio_wfourcc(pb, "qt  ");
-    else if (mov->mode == MODE_ISM) {
-        ffio_wfourcc(pb, "piff");
-    } else if (!(mov->flags & FF_MOV_FLAG_DEFAULT_BASE_MOOF)) {
-        ffio_wfourcc(pb, "isom");
-        ffio_wfourcc(pb, "iso2");
-        if (has_h264)
-            ffio_wfourcc(pb, "avc1");
+static int mov_write_ftyp_tag(AVIOContext *pb, AVFormatContext *s)
+{
+    MOVMuxContext *mov = s->priv_data;
+    int64_t pos = avio_tell(pb);
+    int has_h264 = 0, has_video = 0;
+    int i;
+
+    for (i = 0; i < s->nb_streams; i++) {
+        AVStream *st = s->streams[i];
+        if (is_cover_image(st))
+            continue;
+        if (st->codecpar->codec_type == AVMEDIA_TYPE_VIDEO)
+            has_video = 1;
+        if (st->codecpar->codec_id == AV_CODEC_ID_H264)
+            has_h264 = 1;
     }
 
-    // We add tfdt atoms when fragmenting, signal this with the iso6 compatible
-    // brand. This is compatible with users that don't understand tfdt.
-    if (mov->flags & FF_MOV_FLAG_FRAGMENT && mov->mode != MODE_ISM)
-        ffio_wfourcc(pb, "iso6");
+    avio_wb32(pb, 0); /* size */
+    ffio_wfourcc(pb, "ftyp");
 
-    if (mov->mode == MODE_3GP)
-        ffio_wfourcc(pb, has_h264 ? "3gp6":"3gp4");
-    else if (mov->mode & MODE_3G2)
-        ffio_wfourcc(pb, has_h264 ? "3g2b":"3g2a");
-    else if (mov->mode == MODE_PSP)
-        ffio_wfourcc(pb, "MSNV");
-    else if (mov->mode == MODE_MP4)
+    // Write major brand
+    mov_write_ftyp_tag_internal(pb, s, has_h264, has_video, 1);
+    // Write the major brand as the first compatible brand as well
+    mov_write_ftyp_tag_internal(pb, s, has_h264, has_video, 0);
+
+    // Write compatible brands, ensuring that we don't write the major brand as a
+    // compatible brand a second time.
+    if (mov->mode == MODE_ISM) {
+        ffio_wfourcc(pb, "piff");
+    } else if (mov->mode != MODE_MOV) {
+        // We add tfdt atoms when fragmenting, signal this with the iso6 compatible
+        // brand, if not already the major brand. This is compatible with users that
+        // don't understand tfdt.
+        if (mov->mode == MODE_MP4) {
+            if (mov->flags & FF_MOV_FLAG_FRAGMENT && !(mov->flags & FF_MOV_FLAG_NEGATIVE_CTS_OFFSETS))
+                ffio_wfourcc(pb, "iso6");
+        } else {
+            if (mov->flags & FF_MOV_FLAG_FRAGMENT)
+                ffio_wfourcc(pb, "iso6");
+            if (mov->flags & FF_MOV_FLAG_DEFAULT_BASE_MOOF)
+                ffio_wfourcc(pb, "iso5");
+            else if (mov->flags & FF_MOV_FLAG_NEGATIVE_CTS_OFFSETS)
+                ffio_wfourcc(pb, "iso4");
+        }
+        // Brands prior to iso5 can't be signaled when using default-base-is-moof
+        if (!(mov->flags & FF_MOV_FLAG_DEFAULT_BASE_MOOF)) {
+            // write isom for mp4 only if it it's not the major brand already.
+            if (mov->mode != MODE_MP4 || mov->flags & FF_MOV_FLAG_NEGATIVE_CTS_OFFSETS)
+                ffio_wfourcc(pb, "isom");
+            ffio_wfourcc(pb, "iso2");
+            if (has_h264)
+                ffio_wfourcc(pb, "avc1");
+        }
+    }
+
+    if (mov->mode == MODE_MP4)
         ffio_wfourcc(pb, "mp41");
 
     if (mov->flags & FF_MOV_FLAG_DASH && mov->flags & FF_MOV_FLAG_GLOBAL_SIDX)
@@ -5033,12 +5056,11 @@ static int mov_flush_fragment_interleaving(AVFormatContext *s, MOVTrack *track)
         if ((ret = avio_open_dyn_buf(&mov->mdat_buf)) < 0)
             return ret;
     }
-    buf_size = avio_close_dyn_buf(track->mdat_buf, &buf);
-    track->mdat_buf = NULL;
+    buf_size = avio_get_dyn_buf(track->mdat_buf, &buf);
 
     offset = avio_tell(mov->mdat_buf);
     avio_write(mov->mdat_buf, buf, buf_size);
-    av_free(buf);
+    ffio_free_dyn_buf(&track->mdat_buf);
 
     for (i = track->entries_flushed; i < track->entry; i++)
         track->cluster[i].pos += offset;
@@ -5130,17 +5152,16 @@ static int mov_flush_fragment(AVFormatContext *s, int force)
         if (mov->flags & FF_MOV_FLAG_DELAY_MOOV) {
             if (mov->flags & FF_MOV_FLAG_GLOBAL_SIDX)
                 mov->reserved_header_pos = avio_tell(s->pb);
-            avio_flush(s->pb);
+            avio_write_marker(s->pb, AV_NOPTS_VALUE, AVIO_DATA_MARKER_FLUSH_POINT);
             mov->moov_written = 1;
             return 0;
         }
 
-        buf_size = avio_close_dyn_buf(mov->mdat_buf, &buf);
-        mov->mdat_buf = NULL;
+        buf_size = avio_get_dyn_buf(mov->mdat_buf, &buf);
         avio_wb32(s->pb, buf_size + 8);
         ffio_wfourcc(s->pb, "mdat");
         avio_write(s->pb, buf, buf_size);
-        av_free(buf);
+        ffio_free_dyn_buf(&mov->mdat_buf);
 
         if (mov->flags & FF_MOV_FLAG_GLOBAL_SIDX)
             mov->reserved_header_pos = avio_tell(s->pb);
@@ -5155,7 +5176,7 @@ static int mov_flush_fragment(AVFormatContext *s, int force)
             mov->tracks[i].entry = 0;
             mov->tracks[i].end_reliable = 0;
         }
-        avio_flush(s->pb);
+        avio_write_marker(s->pb, AV_NOPTS_VALUE, AVIO_DATA_MARKER_FLUSH_POINT);
         return 0;
     }
 
@@ -5220,7 +5241,7 @@ static int mov_flush_fragment(AVFormatContext *s, int force)
         }
 
         if (write_moof) {
-            avio_flush(s->pb);
+            avio_write_marker(s->pb, AV_NOPTS_VALUE, AVIO_DATA_MARKER_FLUSH_POINT);
 
             mov_write_moof_tag(s->pb, mov, moof_tracks, mdat_size);
             mov->fragments++;
@@ -5252,7 +5273,7 @@ static int mov_flush_fragment(AVFormatContext *s, int force)
 
     mov->mdat_size = 0;
 
-    avio_flush(s->pb);
+    avio_write_marker(s->pb, AV_NOPTS_VALUE, AVIO_DATA_MARKER_FLUSH_POINT);
     return 0;
 }
 
@@ -6558,7 +6579,6 @@ static int mov_write_header(AVFormatContext *s)
         !(mov->flags & FF_MOV_FLAG_DELAY_MOOV)) {
         if ((ret = mov_write_moov_tag(pb, mov, s)) < 0)
             return ret;
-        avio_flush(pb);
         mov->moov_written = 1;
         if (mov->flags & FF_MOV_FLAG_GLOBAL_SIDX)
             mov->reserved_header_pos = avio_tell(pb);
@@ -6846,38 +6866,39 @@ static const AVCodecTag codec_3gp_tags[] = {
 };
 
 const AVCodecTag codec_mp4_tags[] = {
-    { AV_CODEC_ID_MPEG4       , MKTAG('m', 'p', '4', 'v') },
-    { AV_CODEC_ID_H264        , MKTAG('a', 'v', 'c', '1') },
-    { AV_CODEC_ID_H264        , MKTAG('a', 'v', 'c', '3') },
-    { AV_CODEC_ID_HEVC        , MKTAG('h', 'e', 'v', '1') },
-    { AV_CODEC_ID_HEVC        , MKTAG('h', 'v', 'c', '1') },
-    { AV_CODEC_ID_MPEG2VIDEO  , MKTAG('m', 'p', '4', 'v') },
-    { AV_CODEC_ID_MPEG1VIDEO  , MKTAG('m', 'p', '4', 'v') },
-    { AV_CODEC_ID_MJPEG       , MKTAG('m', 'p', '4', 'v') },
-    { AV_CODEC_ID_PNG         , MKTAG('m', 'p', '4', 'v') },
-    { AV_CODEC_ID_JPEG2000    , MKTAG('m', 'p', '4', 'v') },
-    { AV_CODEC_ID_VC1         , MKTAG('v', 'c', '-', '1') },
-    { AV_CODEC_ID_DIRAC       , MKTAG('d', 'r', 'a', 'c') },
-    { AV_CODEC_ID_TSCC2       , MKTAG('m', 'p', '4', 'v') },
-    { AV_CODEC_ID_VP9         , MKTAG('v', 'p', '0', '9') },
-    { AV_CODEC_ID_AV1         , MKTAG('a', 'v', '0', '1') },
-    { AV_CODEC_ID_AAC         , MKTAG('m', 'p', '4', 'a') },
-    { AV_CODEC_ID_MP4ALS      , MKTAG('m', 'p', '4', 'a') },
-    { AV_CODEC_ID_MP3         , MKTAG('m', 'p', '4', 'a') },
-    { AV_CODEC_ID_MP2         , MKTAG('m', 'p', '4', 'a') },
-    { AV_CODEC_ID_AC3         , MKTAG('a', 'c', '-', '3') },
-    { AV_CODEC_ID_EAC3        , MKTAG('e', 'c', '-', '3') },
-    { AV_CODEC_ID_DTS         , MKTAG('m', 'p', '4', 'a') },
-    { AV_CODEC_ID_TRUEHD      , MKTAG('m', 'l', 'p', 'a') },
-    { AV_CODEC_ID_FLAC        , MKTAG('f', 'L', 'a', 'C') },
-    { AV_CODEC_ID_OPUS        , MKTAG('O', 'p', 'u', 's') },
-    { AV_CODEC_ID_VORBIS      , MKTAG('m', 'p', '4', 'a') },
-    { AV_CODEC_ID_QCELP       , MKTAG('m', 'p', '4', 'a') },
-    { AV_CODEC_ID_EVRC        , MKTAG('m', 'p', '4', 'a') },
-    { AV_CODEC_ID_DVD_SUBTITLE, MKTAG('m', 'p', '4', 's') },
-    { AV_CODEC_ID_MOV_TEXT    , MKTAG('t', 'x', '3', 'g') },
-    { AV_CODEC_ID_BIN_DATA    , MKTAG('g', 'p', 'm', 'd') },
-    { AV_CODEC_ID_NONE        ,    0 },
+    { AV_CODEC_ID_MPEG4,           MKTAG('m', 'p', '4', 'v') },
+    { AV_CODEC_ID_H264,            MKTAG('a', 'v', 'c', '1') },
+    { AV_CODEC_ID_H264,            MKTAG('a', 'v', 'c', '3') },
+    { AV_CODEC_ID_HEVC,            MKTAG('h', 'e', 'v', '1') },
+    { AV_CODEC_ID_HEVC,            MKTAG('h', 'v', 'c', '1') },
+    { AV_CODEC_ID_MPEG2VIDEO,      MKTAG('m', 'p', '4', 'v') },
+    { AV_CODEC_ID_MPEG1VIDEO,      MKTAG('m', 'p', '4', 'v') },
+    { AV_CODEC_ID_MJPEG,           MKTAG('m', 'p', '4', 'v') },
+    { AV_CODEC_ID_PNG,             MKTAG('m', 'p', '4', 'v') },
+    { AV_CODEC_ID_JPEG2000,        MKTAG('m', 'p', '4', 'v') },
+    { AV_CODEC_ID_VC1,             MKTAG('v', 'c', '-', '1') },
+    { AV_CODEC_ID_DIRAC,           MKTAG('d', 'r', 'a', 'c') },
+    { AV_CODEC_ID_TSCC2,           MKTAG('m', 'p', '4', 'v') },
+    { AV_CODEC_ID_VP9,             MKTAG('v', 'p', '0', '9') },
+    { AV_CODEC_ID_AV1,             MKTAG('a', 'v', '0', '1') },
+    { AV_CODEC_ID_AAC,             MKTAG('m', 'p', '4', 'a') },
+    { AV_CODEC_ID_MP4ALS,          MKTAG('m', 'p', '4', 'a') },
+    { AV_CODEC_ID_MP3,             MKTAG('m', 'p', '4', 'a') },
+    { AV_CODEC_ID_MP2,             MKTAG('m', 'p', '4', 'a') },
+    { AV_CODEC_ID_AC3,             MKTAG('a', 'c', '-', '3') },
+    { AV_CODEC_ID_EAC3,            MKTAG('e', 'c', '-', '3') },
+    { AV_CODEC_ID_DTS,             MKTAG('m', 'p', '4', 'a') },
+    { AV_CODEC_ID_TRUEHD,          MKTAG('m', 'l', 'p', 'a') },
+    { AV_CODEC_ID_FLAC,            MKTAG('f', 'L', 'a', 'C') },
+    { AV_CODEC_ID_OPUS,            MKTAG('O', 'p', 'u', 's') },
+    { AV_CODEC_ID_VORBIS,          MKTAG('m', 'p', '4', 'a') },
+    { AV_CODEC_ID_QCELP,           MKTAG('m', 'p', '4', 'a') },
+    { AV_CODEC_ID_EVRC,            MKTAG('m', 'p', '4', 'a') },
+    { AV_CODEC_ID_DVD_SUBTITLE,    MKTAG('m', 'p', '4', 's') },
+    { AV_CODEC_ID_MOV_TEXT,        MKTAG('t', 'x', '3', 'g') },
+    { AV_CODEC_ID_BIN_DATA,        MKTAG('g', 'p', 'm', 'd') },
+    { AV_CODEC_ID_MPEGH_3D_AUDIO,  MKTAG('m', 'h', 'm', '1') },
+    { AV_CODEC_ID_NONE,               0 },
 };
 
 const AVCodecTag codec_ism_tags[] = {

@@ -21,16 +21,16 @@
       <holder>Sebastian Dröge</holder>
     </copyright>
     <copyright>
-      <year>2017</year>
+      <year>2019</year>
       <holder>David Bryant</holder>
     </copyright>
-    <date>2017-01-13</date>
+    <date>2019-12-14</date>
   </refentryinfo>
   <refmeta>
     <refentrytitle>wvgain</refentrytitle>
     <refmiscinfo class="source">WavPack</refmiscinfo>
     <refmiscinfo class="manual">WavPack Executable Programs</refmiscinfo>
-    <refmiscinfo class="version">5.1.0</refmiscinfo>
+    <refmiscinfo class="version">5.2.0</refmiscinfo>
     <manvolnum>1</manvolnum>
   </refmeta>
   <refnamediv>

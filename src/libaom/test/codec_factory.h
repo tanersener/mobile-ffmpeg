@@ -40,7 +40,7 @@ class CodecFactory {
                                  const aom_codec_flags_t flags) const = 0;
 
   virtual Encoder *CreateEncoder(aom_codec_enc_cfg_t cfg,
-                                 const unsigned long init_flags,
+                                 const aom_codec_flags_t init_flags,
                                  TwopassStatsStore *stats) const = 0;
 
   virtual aom_codec_err_t DefaultEncoderConfig(aom_codec_enc_cfg_t *cfg,
@@ -98,7 +98,7 @@ class AV1Decoder : public Decoder {
 
 class AV1Encoder : public Encoder {
  public:
-  AV1Encoder(aom_codec_enc_cfg_t cfg, const uint32_t init_flags,
+  AV1Encoder(aom_codec_enc_cfg_t cfg, const aom_codec_flags_t init_flags,
              TwopassStatsStore *stats)
       : Encoder(cfg, init_flags, stats) {}
 
@@ -132,7 +132,7 @@ class AV1CodecFactory : public CodecFactory {
   }
 
   virtual Encoder *CreateEncoder(aom_codec_enc_cfg_t cfg,
-                                 const unsigned long init_flags,
+                                 const aom_codec_flags_t init_flags,
                                  TwopassStatsStore *stats) const {
 #if CONFIG_AV1_ENCODER
     return new AV1Encoder(cfg, init_flags, stats);

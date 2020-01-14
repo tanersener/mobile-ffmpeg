@@ -198,7 +198,7 @@ static int has_top_right(const AV1_COMMON *cm, BLOCK_SIZE bsize, int mi_row,
                          int col_off, int ss_x, int ss_y) {
   if (!top_available || !right_available) return 0;
 
-  const int bw_unit = block_size_wide[bsize] >> tx_size_wide_log2[0];
+  const int bw_unit = mi_size_wide[bsize];
   const int plane_bw_unit = AOMMAX(bw_unit >> ss_x, 1);
   const int top_right_count_unit = tx_size_wide_unit[txsz];
 
@@ -405,7 +405,7 @@ static int has_bottom_left(const AV1_COMMON *cm, BLOCK_SIZE bsize, int mi_row,
     // Bottom-left pixels are in the bottom-left block, which is not available.
     return 0;
   } else {
-    const int bh_unit = block_size_high[bsize] >> tx_size_high_log2[0];
+    const int bh_unit = mi_size_high[bsize];
     const int plane_bh_unit = AOMMAX(bh_unit >> ss_y, 1);
     const int bottom_left_count_unit = tx_size_high_unit[txsz];
 
@@ -422,10 +422,9 @@ static int has_bottom_left(const AV1_COMMON *cm, BLOCK_SIZE bsize, int mi_row,
     // and/or bottom-left superblocks. But only the left superblock is
     // available, so check if all required pixels fall in that superblock.
     if (blk_col_in_sb == 0) {
-      const int blk_start_row_off = blk_row_in_sb
-                                        << (bh_in_mi_log2 + MI_SIZE_LOG2 -
-                                            tx_size_wide_log2[0]) >>
-                                    ss_y;
+      const int blk_start_row_off =
+          blk_row_in_sb << (bh_in_mi_log2 + MI_SIZE_LOG2 - MI_SIZE_LOG2) >>
+          ss_y;
       const int row_off_in_sb = blk_start_row_off + row_off;
       const int sb_height_unit = sb_mi_size >> ss_y;
       return row_off_in_sb + bottom_left_count_unit < sb_height_unit;
@@ -1198,7 +1197,7 @@ static void build_intra_predictors_high(
 
   // NEED_LEFT
   if (need_left) {
-    int need_bottom = !!(extend_modes[mode] & NEED_BOTTOMLEFT);
+    int need_bottom = extend_modes[mode] & NEED_BOTTOMLEFT;
     if (use_filter_intra) need_bottom = 0;
     if (is_dr_mode) need_bottom = p_angle > 180;
     const int num_left_pixels_needed = txhpx + (need_bottom ? txwpx : 0);
@@ -1223,7 +1222,7 @@ static void build_intra_predictors_high(
 
   // NEED_ABOVE
   if (need_above) {
-    int need_right = !!(extend_modes[mode] & NEED_ABOVERIGHT);
+    int need_right = extend_modes[mode] & NEED_ABOVERIGHT;
     if (use_filter_intra) need_right = 0;
     if (is_dr_mode) need_right = p_angle < 90;
     const int num_top_pixels_needed = txwpx + (need_right ? txhpx : 0);
@@ -1384,7 +1383,7 @@ static void build_intra_predictors(const MACROBLOCKD *xd, const uint8_t *ref,
 
   // NEED_LEFT
   if (need_left) {
-    int need_bottom = !!(extend_modes[mode] & NEED_BOTTOMLEFT);
+    int need_bottom = extend_modes[mode] & NEED_BOTTOMLEFT;
     if (use_filter_intra) need_bottom = 0;
     if (is_dr_mode) need_bottom = p_angle > 180;
     // the avx2 dr_prediction_z2 may read at most 3 extra bytes,
@@ -1412,7 +1411,7 @@ static void build_intra_predictors(const MACROBLOCKD *xd, const uint8_t *ref,
 
   // NEED_ABOVE
   if (need_above) {
-    int need_right = !!(extend_modes[mode] & NEED_ABOVERIGHT);
+    int need_right = extend_modes[mode] & NEED_ABOVERIGHT;
     if (use_filter_intra) need_right = 0;
     if (is_dr_mode) need_right = p_angle < 90;
     const int num_top_pixels_needed = txwpx + (need_right ? txhpx : 0);
@@ -1506,6 +1505,57 @@ static void build_intra_predictors(const MACROBLOCKD *xd, const uint8_t *ref,
   }
 }
 
+static INLINE BLOCK_SIZE scale_chroma_bsize(BLOCK_SIZE bsize, int subsampling_x,
+                                            int subsampling_y) {
+  assert(subsampling_x >= 0 && subsampling_x < 2);
+  assert(subsampling_y >= 0 && subsampling_y < 2);
+  BLOCK_SIZE bs = bsize;
+  switch (bsize) {
+    case BLOCK_4X4:
+      if (subsampling_x == 1 && subsampling_y == 1)
+        bs = BLOCK_8X8;
+      else if (subsampling_x == 1)
+        bs = BLOCK_8X4;
+      else if (subsampling_y == 1)
+        bs = BLOCK_4X8;
+      break;
+    case BLOCK_4X8:
+      if (subsampling_x == 1 && subsampling_y == 1)
+        bs = BLOCK_8X8;
+      else if (subsampling_x == 1)
+        bs = BLOCK_8X8;
+      else if (subsampling_y == 1)
+        bs = BLOCK_4X8;
+      break;
+    case BLOCK_8X4:
+      if (subsampling_x == 1 && subsampling_y == 1)
+        bs = BLOCK_8X8;
+      else if (subsampling_x == 1)
+        bs = BLOCK_8X4;
+      else if (subsampling_y == 1)
+        bs = BLOCK_8X8;
+      break;
+    case BLOCK_4X16:
+      if (subsampling_x == 1 && subsampling_y == 1)
+        bs = BLOCK_8X16;
+      else if (subsampling_x == 1)
+        bs = BLOCK_8X16;
+      else if (subsampling_y == 1)
+        bs = BLOCK_4X16;
+      break;
+    case BLOCK_16X4:
+      if (subsampling_x == 1 && subsampling_y == 1)
+        bs = BLOCK_16X8;
+      else if (subsampling_x == 1)
+        bs = BLOCK_16X4;
+      else if (subsampling_y == 1)
+        bs = BLOCK_16X8;
+      break;
+    default: break;
+  }
+  return bs;
+}
+
 void av1_predict_intra_block(
     const AV1_COMMON *cm, const MACROBLOCKD *xd, int wpx, int hpx,
     TX_SIZE tx_size, PREDICTION_MODE mode, int angle_delta, int use_palette,
@@ -1514,8 +1564,8 @@ void av1_predict_intra_block(
   const MB_MODE_INFO *const mbmi = xd->mi[0];
   const int txwpx = tx_size_wide[tx_size];
   const int txhpx = tx_size_high[tx_size];
-  const int x = col_off << tx_size_wide_log2[0];
-  const int y = row_off << tx_size_high_log2[0];
+  const int x = col_off << MI_SIZE_LOG2;
+  const int y = row_off << MI_SIZE_LOG2;
 
   if (use_palette) {
     int r, c;
@@ -1541,15 +1591,15 @@ void av1_predict_intra_block(
     return;
   }
 
-  BLOCK_SIZE bsize = mbmi->sb_type;
   const struct macroblockd_plane *const pd = &xd->plane[plane];
   const int txw = tx_size_wide_unit[tx_size];
   const int txh = tx_size_high_unit[tx_size];
-  const int have_top = row_off || (pd->subsampling_y ? xd->chroma_up_available
-                                                     : xd->up_available);
+  const int ss_x = pd->subsampling_x;
+  const int ss_y = pd->subsampling_y;
+  const int have_top =
+      row_off || (ss_y ? xd->chroma_up_available : xd->up_available);
   const int have_left =
-      col_off ||
-      (pd->subsampling_x ? xd->chroma_left_available : xd->left_available);
+      col_off || (ss_x ? xd->chroma_left_available : xd->left_available);
   const int mi_row = -xd->mb_to_top_edge >> (3 + MI_SIZE_LOG2);
   const int mi_col = -xd->mb_to_left_edge >> (3 + MI_SIZE_LOG2);
   const int xr_chr_offset = 0;
@@ -1557,29 +1607,31 @@ void av1_predict_intra_block(
 
   // Distance between the right edge of this prediction block to
   // the frame right edge
-  const int xr = (xd->mb_to_right_edge >> (3 + pd->subsampling_x)) +
-                 (wpx - x - txwpx) - xr_chr_offset;
+  const int xr =
+      (xd->mb_to_right_edge >> (3 + ss_x)) + (wpx - x - txwpx) - xr_chr_offset;
   // Distance between the bottom edge of this prediction block to
   // the frame bottom edge
-  const int yd = (xd->mb_to_bottom_edge >> (3 + pd->subsampling_y)) +
-                 (hpx - y - txhpx) - yd_chr_offset;
+  const int yd =
+      (xd->mb_to_bottom_edge >> (3 + ss_y)) + (hpx - y - txhpx) - yd_chr_offset;
   const int right_available =
-      mi_col + ((col_off + txw) << pd->subsampling_x) < xd->tile.mi_col_end;
+      mi_col + ((col_off + txw) << ss_x) < xd->tile.mi_col_end;
   const int bottom_available =
-      (yd > 0) &&
-      (mi_row + ((row_off + txh) << pd->subsampling_y) < xd->tile.mi_row_end);
+      (yd > 0) && (mi_row + ((row_off + txh) << ss_y) < xd->tile.mi_row_end);
 
   const PARTITION_TYPE partition = mbmi->partition;
 
+  BLOCK_SIZE bsize = mbmi->sb_type;
   // force 4x4 chroma component block size.
-  bsize = scale_chroma_bsize(bsize, pd->subsampling_x, pd->subsampling_y);
+  if (ss_x || ss_y) {
+    bsize = scale_chroma_bsize(bsize, ss_x, ss_y);
+  }
 
-  const int have_top_right = has_top_right(
-      cm, bsize, mi_row, mi_col, have_top, right_available, partition, tx_size,
-      row_off, col_off, pd->subsampling_x, pd->subsampling_y);
-  const int have_bottom_left = has_bottom_left(
-      cm, bsize, mi_row, mi_col, bottom_available, have_left, partition,
-      tx_size, row_off, col_off, pd->subsampling_x, pd->subsampling_y);
+  const int have_top_right =
+      has_top_right(cm, bsize, mi_row, mi_col, have_top, right_available,
+                    partition, tx_size, row_off, col_off, ss_x, ss_y);
+  const int have_bottom_left =
+      has_bottom_left(cm, bsize, mi_row, mi_col, bottom_available, have_left,
+                      partition, tx_size, row_off, col_off, ss_x, ss_y);
 
   const int disable_edge_filter = !cm->seq_params.enable_intra_edge_filter;
 #if CONFIG_AV1_HIGHBITDEPTH
@@ -1609,8 +1661,7 @@ void av1_predict_intra_block_facade(const AV1_COMMON *cm, MACROBLOCKD *xd,
   const MB_MODE_INFO *const mbmi = xd->mi[0];
   struct macroblockd_plane *const pd = &xd->plane[plane];
   const int dst_stride = pd->dst.stride;
-  uint8_t *dst =
-      &pd->dst.buf[(blk_row * dst_stride + blk_col) << tx_size_wide_log2[0]];
+  uint8_t *dst = &pd->dst.buf[(blk_row * dst_stride + blk_col) << MI_SIZE_LOG2];
   const PREDICTION_MODE mode =
       (plane == AOM_PLANE_Y) ? mbmi->mode : get_uv_mode(mbmi->uv_mode);
   const int use_palette = mbmi->palette_mode_info.palette_size[plane != 0] > 0;

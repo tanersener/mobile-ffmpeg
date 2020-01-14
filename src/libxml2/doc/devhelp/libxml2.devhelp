@@ -266,7 +266,6 @@
     <function name="XML_XPATH_NOVAR" link="libxml2-xpath.html#XML_XPATH_NOVAR"/>
     <function name="XP_ERROR" link="libxml2-xpathInternals.html#XP_ERROR"/>
     <function name="XP_ERROR0" link="libxml2-xpathInternals.html#XP_ERROR0"/>
-    <function name="_REENTRANT" link="libxml2-xmlexports.html#_REENTRANT"/>
     <function name="htmlDefaultSubelement" link="libxml2-HTMLparser.html#htmlDefaultSubelement"/>
     <function name="htmlElementAllowedHereDesc" link="libxml2-HTMLparser.html#htmlElementAllowedHereDesc"/>
     <function name="htmlRequiredAttrs" link="libxml2-HTMLparser.html#htmlRequiredAttrs"/>
@@ -1534,8 +1533,10 @@
     <function name="XPATH_NODESET" link="libxml2-xpath.html#XPATH_NODESET"/>
     <function name="XPATH_NUMBER" link="libxml2-xpath.html#XPATH_NUMBER"/>
     <function name="XPATH_NUMBER_ERROR" link="libxml2-xpath.html#XPATH_NUMBER_ERROR"/>
+    <function name="XPATH_OP_LIMIT_EXCEEDED" link="libxml2-xpath.html#XPATH_OP_LIMIT_EXCEEDED"/>
     <function name="XPATH_POINT" link="libxml2-xpath.html#XPATH_POINT"/>
     <function name="XPATH_RANGE" link="libxml2-xpath.html#XPATH_RANGE"/>
+    <function name="XPATH_RECURSION_LIMIT_EXCEEDED" link="libxml2-xpath.html#XPATH_RECURSION_LIMIT_EXCEEDED"/>
     <function name="XPATH_STACK_ERROR" link="libxml2-xpath.html#XPATH_STACK_ERROR"/>
     <function name="XPATH_START_LITERAL_ERROR" link="libxml2-xpath.html#XPATH_START_LITERAL_ERROR"/>
     <function name="XPATH_STRING" link="libxml2-xpath.html#XPATH_STRING"/>

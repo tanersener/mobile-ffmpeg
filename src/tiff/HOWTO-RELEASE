@@ -1,4 +1,4 @@
-HOWTO-RELEASE: 
+HOWTO-RELEASE:
 
 Notes on releasing.
 
@@ -22,17 +22,30 @@ Notes on releasing.
    and correctly set system clock and on a filesystem which accurately
    records file update times.  Use of GNU make is recommended.
 
-1. Commit any unsaved changes. 
+1. Commit any unsaved changes.
 
-2. Create html/vX.X.html and add it to git with 'git add html/vX.X.html'.
-   Take ChangeLog entries and html-ify in there. 
+2. Use gnulib's gitlog-to-changelog script to add new (since the last
+   release) entries to the traditional ChangeLog file.  Take note of
+   the most recent change note time stamp and use that as the starting
+   point.  Concatenate the old logs to the new logs.  The added logs
+   may be used to help produce the release notes (in next step).  For
+   example:
+
+     gitlog-to-changelog --since=`head -n 1 ChangeLog | sed -e 's/ .*//g'` --append-dot > ChangeLog.added
+     printf "\n" >> ChangeLog.added
+     cat ChangeLog.added ChangeLog > ChangeLog.new
+     mv ChangeLog.new ChangeLog
+     rm ChangeLog.added
+
+3. Create html/vX.X.html and add it to git with 'git add html/vX.X.html'.
+   Take ChangeLog entries and html-ify in there.
    Easist thing to do is take html/vX.(X-1).html and use it as a template.
 
-3. Add vX.X.html file to the list of 'docfiles' files in the html/Makefile.am.
+4. Add vX.X.html file to the list of 'docfiles' files in the html/Makefile.am.
 
-4. Update html/index.html to refer to this new page as the current release.
+5. Update html/index.html to refer to this new page as the current release.
 
-5. Increment the release version in configure.ac.  Put 'alpha' or
+6. Increment the release version in configure.ac.  Put 'alpha' or
    'beta' after the version, if applicable.  For example:
 
      4.0.0
@@ -42,7 +55,7 @@ Notes on releasing.
    Version should be updated in two places: in the second argument of the
    AC_INIT macro and in LIBTIFF_xxx_VERSION variables.
 
-6. Update library ELF versioning in configure.ac (LIBTIFF_CURRENT,
+7. Update library ELF versioning in configure.ac (LIBTIFF_CURRENT,
    LIBTIFF_REVISION, and LIBTIFF_AGE).  These numbers have nothing to
    do with the libtiff release version numbers.
 
@@ -53,11 +66,11 @@ Notes on releasing.
    have been added, removed, or interface structures have changed,
    then more care is required.
 
-7. Add an entry to Changelog similar to:
+8. Add an entry to Changelog similar to:
 
      * libtiff 4.0.0 released.
 
-8. In the source tree do
+9. In the source tree do
 
      ./autogen.sh
 
@@ -65,7 +78,7 @@ Notes on releasing.
    maintainer build with current autoconf, automake, and libtool
    packages.  It is only needed when updating tool versions.
 
-9. It is recommended (but not required) to build outside of the source
+10. It is recommended (but not required) to build outside of the source
    tree so that the source tree is kept in a pristine state.  This
    also allows sharing the source directory on several networked
    systems.  For example:
@@ -78,17 +91,17 @@ Notes on releasing.
 
      ./configure --enable-maintainer-mode
 
-10. In the build tree do
+11. In the build tree do
 
      make release
 
    This will update "RELEASE-DATE", "VERSION", and libtiff/tiffvers.h
    in the source tree.
 
-11. In the source tree, verify that the version info in RELEASE-DATE,
+12. In the source tree, verify that the version info in RELEASE-DATE,
    VERSION and libtiff/tiffvers.h is right.
 
-12. In the build tree do
+13. In the build tree do
 
       make
       make distcheck
@@ -99,11 +112,11 @@ Notes on releasing.
     Two files with names tiff-version.tar.gz and tiff-version.zip will
     be created in the top level build directory.
 
-13. In the source tree do
+14. In the source tree do
 
-      'git commit' and 'git push'
+      'git status', 'git add .', 'git commit' and 'git push'
 
-14. In the source tree, create a signed tag
+15. In the source tree, create a signed tag
 
       git tag -s v4.0.0 -m "Create tag for v4.0.0"
 
@@ -113,11 +126,21 @@ Notes on releasing.
 
       git push origin v4.0.0
 
-15. Copy release packages from the build tree to the
+16. Sign the release files in the build tree using your private key
+
+      export GPG_TTY=$(tty)
+      for file in tiff-*.tar.gz tiff-*.zip ; do \
+        gpg2 --output ${file}.sig --detach-sig $file ; \
+      done
+
+      for file in tiff-*.tar.gz tiff-*.zip ; do \
+        gpg2 --verify ${file}.sig $file ; \
+      done
+
+17. Copy release packages from the build tree to the
     ftp.remotesensing.org ftp site.
 
       scp tiff-*.tar.gz tiff-*.zip \
-    	 bfriesen@upload.osgeo.org:/osgeo/download/libtiff
+         bfriesen@upload.osgeo.org:/osgeo/download/libtiff
 
-16. Announce to list, tiff@lists.maptools.org
-
+18. Announce to list, tiff@lists.maptools.org

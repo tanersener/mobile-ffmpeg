@@ -173,7 +173,8 @@ static int update_size(AVCodecContext *avctx, int w, int h)
 #define HWACCEL_MAX (CONFIG_VP9_DXVA2_HWACCEL + \
                      CONFIG_VP9_D3D11VA_HWACCEL * 2 + \
                      CONFIG_VP9_NVDEC_HWACCEL + \
-                     CONFIG_VP9_VAAPI_HWACCEL)
+                     CONFIG_VP9_VAAPI_HWACCEL + \
+                     CONFIG_VP9_VDPAU_HWACCEL)
     enum AVPixelFormat pix_fmts[HWACCEL_MAX + 2], *fmtp = pix_fmts;
     VP9Context *s = avctx->priv_data;
     uint8_t *p;
@@ -188,6 +189,9 @@ static int update_size(AVCodecContext *avctx, int w, int h)
 
         switch (s->pix_fmt) {
         case AV_PIX_FMT_YUV420P:
+#if CONFIG_VP9_VDPAU_HWACCEL
+            *fmtp++ = AV_PIX_FMT_VDPAU;
+#endif
         case AV_PIX_FMT_YUV420P10:
 #if CONFIG_VP9_DXVA2_HWACCEL
             *fmtp++ = AV_PIX_FMT_DXVA2_VLD;
@@ -510,7 +514,7 @@ static int decode_frame_header(AVCodecContext *avctx,
     s->s.h.use_last_frame_mvs = !s->s.h.errorres && !last_invisible;
 
     if (s->s.h.keyframe) {
-        if (get_bits_long(&s->gb, 24) != VP9_SYNCCODE) { // synccode
+        if (get_bits(&s->gb, 24) != VP9_SYNCCODE) { // synccode
             av_log(avctx, AV_LOG_ERROR, "Invalid sync code\n");
             return AVERROR_INVALIDDATA;
         }
@@ -526,7 +530,7 @@ static int decode_frame_header(AVCodecContext *avctx,
         s->s.h.intraonly = s->s.h.invisible ? get_bits1(&s->gb) : 0;
         s->s.h.resetctx  = s->s.h.errorres ? 0 : get_bits(&s->gb, 2);
         if (s->s.h.intraonly) {
-            if (get_bits_long(&s->gb, 24) != VP9_SYNCCODE) { // synccode
+            if (get_bits(&s->gb, 24) != VP9_SYNCCODE) { // synccode
                 av_log(avctx, AV_LOG_ERROR, "Invalid sync code\n");
                 return AVERROR_INVALIDDATA;
             }
@@ -1816,6 +1820,9 @@ AVCodec ff_vp9_decoder = {
 #endif
 #if CONFIG_VP9_VAAPI_HWACCEL
                                HWACCEL_VAAPI(vp9),
+#endif
+#if CONFIG_VP9_VDPAU_HWACCEL
+                               HWACCEL_VDPAU(vp9),
 #endif
                                NULL
                            },

@@ -244,14 +244,6 @@ typedef struct VP9Common {
   int byte_alignment;
   int skip_loop_filter;
 
-  // Private data associated with the frame buffer callbacks.
-  void *cb_priv;
-  vpx_get_frame_buffer_cb_fn_t get_fb_cb;
-  vpx_release_frame_buffer_cb_fn_t release_fb_cb;
-
-  // Handles memory for the codec.
-  InternalFrameBufferList int_frame_buffers;
-
   // External BufferPool passed from outside.
   BufferPool *buffer_pool;
 
@@ -261,6 +253,34 @@ typedef struct VP9Common {
 
   int lf_row;
 } VP9_COMMON;
+
+typedef struct {
+  int frame_width;
+  int frame_height;
+  int render_frame_width;
+  int render_frame_height;
+  int mi_rows;
+  int mi_cols;
+  int mb_rows;
+  int mb_cols;
+  int num_mbs;
+  vpx_bit_depth_t bit_depth;
+} FRAME_INFO;
+
+static INLINE void init_frame_info(FRAME_INFO *frame_info,
+                                   const VP9_COMMON *cm) {
+  frame_info->frame_width = cm->width;
+  frame_info->frame_height = cm->height;
+  frame_info->render_frame_width = cm->render_width;
+  frame_info->render_frame_height = cm->render_height;
+  frame_info->mi_cols = cm->mi_cols;
+  frame_info->mi_rows = cm->mi_rows;
+  frame_info->mb_cols = cm->mb_cols;
+  frame_info->mb_rows = cm->mb_rows;
+  frame_info->num_mbs = cm->MBs;
+  frame_info->bit_depth = cm->bit_depth;
+  // TODO(angiebird): Figure out how to get subsampling_x/y here
+}
 
 static INLINE YV12_BUFFER_CONFIG *get_buf_frame(VP9_COMMON *cm, int index) {
   if (index < 0 || index >= FRAME_BUFFERS) return NULL;

@@ -1,10 +1,4 @@
-/.deps/
-/Makefile
-/.libs/
-/fax2tiff
 *.o
-/fax2ps
-/pal2rgb
 /ppm2tiff
 /raw2tiff
 /tiff2bw
@@ -20,3 +14,7 @@
 /tiffmedian
 /tiffset
 /tiffsplit
+/Makefile
+/fax2ps
+/fax2tiff
+/pal2rgb

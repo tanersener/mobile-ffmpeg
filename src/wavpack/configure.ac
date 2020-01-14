@@ -1,12 +1,12 @@
-# wavpack 5.1.0 configure.ac
+# wavpack 5.2.0 configure.ac
 
-AC_INIT(wavpack, 5.1.0, bryant@wavpack.com)
+AC_INIT(wavpack, 5.2.0, bryant@wavpack.com)
 AC_CONFIG_SRCDIR([src/pack.c])
 AM_INIT_AUTOMAKE
 AM_MAINTAINER_MODE
 
 LIBWAVPACK_MAJOR=5
-LIBWAVPACK_MINOR=1
+LIBWAVPACK_MINOR=2
 LIBWAVPACK_MICRO=0
 LIBWAVPACK_VERSION_STRING=$LIBWAVPACK_MAJOR.$LIBWAVPACK_MINOR.$LIBWAVPACK_MICRO
 
@@ -21,7 +21,7 @@ AC_DEFINE_UNQUOTED(LIBWAVPACK_VERSION_STRING, "$LIBWAVPACK_VERSION_STRING", [lib
 #  ? : +1 :  ?   == internal changes that doesn't break anything.
 # CURRENT : REVISION : AGE
 LT_CURRENT=3
-LT_REVISION=0
+LT_REVISION=1
 LT_AGE=2
 
 AC_SUBST(LT_CURRENT)
@@ -58,6 +58,9 @@ AC_FUNC_FSEEKO
 
 # Check if cross-compiling on mingw
 AC_MINGW32
+
+AC_ARG_ENABLE([libcrypto],
+    AS_HELP_STRING([--enable-libcrypto], [use libcrypto MD5 if available (breaks Mac build)]))
 
 AC_ARG_ENABLE([apps],
     AS_HELP_STRING([--disable-apps], [build only libwavpack (removes ICONV dependency)]))
@@ -112,6 +115,8 @@ fi
 AC_SUBST(ICONV_LIBS)
 AC_SUBST(ICONV)
 fi
+AS_IF([test "x$enable_libcrypto" = "xyes"],
+    [AC_CHECK_LIB([crypto],[MD5_Init])])
 fi
 
 AC_MSG_CHECKING([if we are building for a Windows host])

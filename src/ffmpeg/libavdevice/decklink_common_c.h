@@ -42,7 +42,6 @@ struct decklink_cctx {
     int list_formats;
     int64_t teletext_lines;
     double preroll;
-    int v210;
     int audio_channels;
     int audio_depth;
     int duplex_mode;
@@ -58,6 +57,7 @@ struct decklink_cctx {
     int copyts;
     int64_t timestamp_align;
     int timing_offset;
+    int wait_for_tc;
 };
 
 #endif /* AVDEVICE_DECKLINK_COMMON_C_H */

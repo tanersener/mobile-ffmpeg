@@ -20,7 +20,7 @@
 //
 
 #import <mobileffmpeg/MobileFFmpegConfig.h>
-#import <mobileffmpeg/MobileFFmpeg.h>
+#import <mobileffmpeg/MobileFFprobe.h>
 #import "HttpsViewController.h"
 
 @interface HttpsViewController ()
@@ -37,7 +37,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+
     // STYLE UPDATE
     [Util applyEditTextStyle: self.urlText];
     [Util applyButtonStyle: self.getInfoButton];
@@ -61,7 +61,7 @@
 
 - (IBAction)getInfoClicked:(id)sender {
     [self clearOutput];
-    
+
     NSString *testUrl = [self.urlText text];
     if ([testUrl length] > 0) {
         NSLog(@"Testing HTTPS with url \'%@\'\n", testUrl);
@@ -70,8 +70,8 @@
         [self.urlText setText:testUrl];
         NSLog(@"Testing HTTPS with default url \'%@\'\n", testUrl);
     }
-    
-    MediaInformation* information = [MobileFFmpeg getMediaInformation:testUrl];
+
+    MediaInformation* information = [MobileFFprobe getMediaInformation:testUrl];
 
     if (information == nil) {
         NSLog(@"Get media information failed\n");

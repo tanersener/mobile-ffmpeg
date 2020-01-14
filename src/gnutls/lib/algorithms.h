@@ -183,7 +183,7 @@ inline static int _gnutls_digest_is_secure(const mac_entry_st * e)
 	if (unlikely(e == NULL))
 		return 0;
 	else
-		return (e->preimage_insecure==0);
+		return !(e->flags & GNUTLS_MAC_FLAG_PREIMAGE_INSECURE);
 }
 
 /* Functions for cipher suites. */
@@ -337,6 +337,8 @@ unsigned _gnutls_digest_is_insecure(gnutls_digest_algorithm_t dig);
 int _gnutls_version_mark_disabled(const char *name);
 gnutls_protocol_t _gnutls_protocol_get_id_if_supported(const char *name);
 
+#define GNUTLS_SIGN_FLAG_TLS13_OK	1 /* if it is ok to use under TLS1.3 */
+#define GNUTLS_SIGN_FLAG_CRT_VRFY_REVERSE (1 << 1) /* reverse order of bytes in CrtVrfy signature */
 struct gnutls_sign_entry_st {
 	const char *name;
 	const char *oid;
@@ -353,8 +355,7 @@ struct gnutls_sign_entry_st {
 	gnutls_pk_algorithm_t priv_pk;
 	gnutls_pk_algorithm_t cert_pk;
 
-	/* non-zero if it is ok to use under TLS1.3 */
-	unsigned tls13_ok;
+	unsigned flags;
 
 	/* if this signature algorithm is restricted to a curve
 	 * under TLS 1.3. */
@@ -428,6 +429,7 @@ typedef struct gnutls_ecc_curve_entry_st {
 	unsigned sig_size;	/* the size of curve signatures in bytes (EdDSA) */
 	unsigned gost_curve;
 	bool supported;
+	gnutls_group_t group;
 } gnutls_ecc_curve_entry_st;
 
 const gnutls_ecc_curve_entry_st
@@ -435,6 +437,7 @@ const gnutls_ecc_curve_entry_st
 
 unsigned _gnutls_ecc_curve_is_supported(gnutls_ecc_curve_t);
 
+gnutls_group_t _gnutls_ecc_curve_get_group(gnutls_ecc_curve_t);
 const gnutls_group_entry_st *_gnutls_tls_id_to_group(unsigned num);
 const gnutls_group_entry_st * _gnutls_id_to_group(unsigned id);
 

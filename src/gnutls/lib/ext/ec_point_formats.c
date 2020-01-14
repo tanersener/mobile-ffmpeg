@@ -41,7 +41,8 @@ const hello_ext_entry_st ext_mod_supported_ec_point_formats = {
 	.name = "Supported EC Point Formats",
 	.tls_id = 11,
 	.gid = GNUTLS_EXTENSION_SUPPORTED_EC_POINT_FORMATS,
-	.parse_type = GNUTLS_EXT_TLS,
+	.client_parse_point = GNUTLS_EXT_TLS,
+	.server_parse_point = GNUTLS_EXT_TLS,
 	.validity = GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_DTLS |
 		    GNUTLS_EXT_FLAG_CLIENT_HELLO | GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
 	.recv_func = _gnutls_supported_ec_point_formats_recv_params,

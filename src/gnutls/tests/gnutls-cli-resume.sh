@@ -98,6 +98,23 @@ for i in "$WAITPID";do
 	test $? != 0 && exit 1
 done
 
+echo "Checking whether session resumption works reliably under TLS1.2 (no tickets)"
+PRIORITY="NORMAL:-VERS-ALL:+VERS-TLS1.2:%NO_TICKETS"
+WAITPID=""
+
+i=0
+while [ $i -lt 10 ]
+do
+	run_server_test "${PRIORITY}" $i &
+	WAITPID="$WAITPID $!"
+	i=`expr $i + 1`
+done
+
+for i in "$WAITPID";do
+	wait $i
+	test $? != 0 && exit 1
+done
+
 kill ${PID}
 wait
 

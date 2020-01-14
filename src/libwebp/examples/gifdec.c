@@ -137,7 +137,7 @@ int GIFReadFrame(GifFileType* const gif, int transparent_index,
   }
   dst = sub_image.argb;
 
-  tmp = (uint8_t*)malloc(rect.width * sizeof(*tmp));
+  tmp = (uint8_t*)WebPMalloc(rect.width * sizeof(*tmp));
   if (tmp == NULL) goto End;
 
   if (image_desc->Interlace) {  // Interlaced image.
@@ -168,7 +168,7 @@ int GIFReadFrame(GifFileType* const gif, int transparent_index,
  End:
   if (!ok) picture->error_code = sub_image.error_code;
   WebPPictureFree(&sub_image);
-  free(tmp);
+  WebPFree(tmp);
   return ok;
 }
 

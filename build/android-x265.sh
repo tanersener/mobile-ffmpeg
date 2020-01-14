@@ -65,6 +65,9 @@ fi
 mkdir cmake-build || exit 1
 cd cmake-build || exit 1
 
+# FIX static_assert ERRORS
+${SED_INLINE} 's/gnu++98/c++11/g' ${BASEDIR}/src/${LIB_NAME}/source/CMakeLists.txt
+
 cmake -Wno-dev \
     -DCMAKE_VERBOSE_MAKEFILE=0 \
     -DCMAKE_C_FLAGS="${CFLAGS}" \
@@ -91,6 +94,6 @@ cmake -Wno-dev \
 make -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_x265_package_config "3.2"
+create_x265_package_config "3.2.1"
 
 make install || exit 1

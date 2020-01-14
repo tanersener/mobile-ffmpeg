@@ -11,7 +11,7 @@
 
 # ARM assembly files are written in RVCT-style. We use some make magic to
 # filter those files to allow GCC compilation
-ifeq ($(ARCH_ARM),yes)
+ifeq ($(VPX_ARCH_ARM),yes)
   ASM:=$(if $(filter yes,$(CONFIG_GCC)$(CONFIG_MSVS)),.asm.S,.asm)
 else
   ASM:=.asm
@@ -139,7 +139,7 @@ CODEC_SRCS-yes += vpx_ports/mem_ops_aligned.h
 CODEC_SRCS-yes += vpx_ports/vpx_once.h
 CODEC_SRCS-yes += $(BUILD_PFX)vpx_config.c
 INSTALL-SRCS-no += $(BUILD_PFX)vpx_config.c
-ifeq ($(ARCH_X86)$(ARCH_X86_64),yes)
+ifeq ($(VPX_ARCH_X86)$(VPX_ARCH_X86_64),yes)
 INSTALL-SRCS-$(CONFIG_CODEC_SRCS) += third_party/x86inc/x86inc.asm
 INSTALL-SRCS-$(CONFIG_CODEC_SRCS) += vpx_dsp/x86/bitdepth_conversion_sse2.asm
 endif
@@ -233,7 +233,7 @@ LIBS-$(if yes,$(CONFIG_STATIC)) += $(BUILD_PFX)libvpx.a $(BUILD_PFX)libvpx_g.a
 $(BUILD_PFX)libvpx_g.a: $(LIBVPX_OBJS)
 
 SO_VERSION_MAJOR := 6
-SO_VERSION_MINOR := 1
+SO_VERSION_MINOR := 2
 SO_VERSION_PATCH := 0
 ifeq ($(filter darwin%,$(TGT_OS)),$(TGT_OS))
 LIBVPX_SO               := libvpx.$(SO_VERSION_MAJOR).dylib
@@ -347,7 +347,7 @@ CLEAN-OBJS += libvpx.syms
 #
 # Rule to make assembler configuration file from C configuration file
 #
-ifeq ($(ARCH_X86)$(ARCH_X86_64),yes)
+ifeq ($(VPX_ARCH_X86)$(VPX_ARCH_X86_64),yes)
 # YASM
 $(BUILD_PFX)vpx_config.asm: $(BUILD_PFX)vpx_config.h
 	@echo "    [CREATE] $@"

@@ -131,10 +131,10 @@ static int codec_reinit(AVCodecContext *avctx, int width, int height,
                      + RTJPEG_HEADER_SIZE;
         if (buf_size > INT_MAX/8)
             return -1;
-        if ((ret = av_image_check_size(height, width, 0, avctx)) < 0)
+        if ((ret = ff_set_dimensions(avctx, width, height)) < 0)
             return ret;
-        avctx->width  = c->width  = width;
-        avctx->height = c->height = height;
+        c->width  = width;
+        c->height = height;
         av_fast_malloc(&c->decomp_buf, &c->decomp_size,
                        buf_size);
         if (!c->decomp_buf) {
@@ -219,6 +219,14 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
     case NUV_RTJPEG:
         minsize = c->width/16 * (c->height/16) * 6;
         break;
+    case NUV_BLACK:
+    case NUV_COPY_LAST:
+    case NUV_LZO:
+    case NUV_RTJPEG_IN_LZO:
+        break;
+    default:
+        av_log(avctx, AV_LOG_ERROR, "unknown compression\n");
+        return AVERROR_INVALIDDATA;
     }
     if (buf_size < minsize / 4)
         return AVERROR_INVALIDDATA;
@@ -307,9 +315,6 @@ retry:
     case NUV_COPY_LAST:
         /* nothing more to do here */
         break;
-    default:
-        av_log(avctx, AV_LOG_ERROR, "unknown compression\n");
-        return AVERROR_INVALIDDATA;
     }
 
     if ((result = av_frame_ref(picture, c->pic)) < 0)

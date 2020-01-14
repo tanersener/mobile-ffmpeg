@@ -479,7 +479,7 @@ static void Help(void) {
       "  'q' / 'Q' / ESC .... quit\n");
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
   int c;
   WebPDecoderConfig* const config = &kParams.config;
   WebPIterator* const curr = &kParams.curr_frame;
@@ -630,7 +630,7 @@ int main(int argc, char *argv[]) {
 
 #else   // !WEBP_HAVE_GL
 
-int main(int argc, const char *argv[]) {
+int main(int argc, const char* argv[]) {
   fprintf(stderr, "OpenGL support not enabled in %s.\n", argv[0]);
   (void)argc;
   return 0;

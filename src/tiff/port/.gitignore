@@ -1,6 +1,4 @@
-/.deps/
-/Makefile
-/.libs/
-*.o
 *.lo
+*.o
 *.la
+/Makefile

@@ -9,11 +9,13 @@ libmobileffmpeg_la_SOURCES = \
     fftools_ffmpeg_filter.c \
     fftools_ffmpeg_hw.c \
     fftools_ffmpeg_opt.c \
+    fftools_ffprobe.c \
     MediaInformation.m \
     MediaInformationParser.m \
     MobileFFmpeg.m \
     MobileFFmpegConfig.m \
     mobileffmpeg_exception.m \
+    MobileFFprobe.m \
     Statistics.m \
     StreamInformation.m
 
@@ -31,6 +33,7 @@ include_HEADERS = \
     MobileFFmpeg.h \
     MobileFFmpegConfig.h \
 	mobileffmpeg_exception.h \
+	MobileFFprobe.h \
 	Statistics.h \
 	StatisticsDelegate.h \
 	StreamInformation.h

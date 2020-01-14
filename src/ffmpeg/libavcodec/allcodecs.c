@@ -218,6 +218,8 @@ extern AVCodec ff_mszh_decoder;
 extern AVCodec ff_mts2_decoder;
 extern AVCodec ff_mvc1_decoder;
 extern AVCodec ff_mvc2_decoder;
+extern AVCodec ff_mvdv_decoder;
+extern AVCodec ff_mvha_decoder;
 extern AVCodec ff_mwsc_decoder;
 extern AVCodec ff_mxpeg_decoder;
 extern AVCodec ff_nuv_decoder;
@@ -704,6 +706,7 @@ extern AVCodec ff_libopenjpeg_encoder;
 extern AVCodec ff_libopenjpeg_decoder;
 extern AVCodec ff_libopus_encoder;
 extern AVCodec ff_libopus_decoder;
+extern AVCodec ff_librav1e_encoder;
 extern AVCodec ff_librsvg_decoder;
 extern AVCodec ff_libshine_encoder;
 extern AVCodec ff_libspeex_encoder;
@@ -773,6 +776,7 @@ extern AVCodec ff_mpeg2_qsv_encoder;
 extern AVCodec ff_mpeg2_vaapi_encoder;
 extern AVCodec ff_mpeg4_cuvid_decoder;
 extern AVCodec ff_mpeg4_mediacodec_decoder;
+extern AVCodec ff_mpeg4_omx_encoder;
 extern AVCodec ff_mpeg4_v4l2m2m_encoder;
 extern AVCodec ff_vc1_cuvid_decoder;
 extern AVCodec ff_vp8_cuvid_decoder;
@@ -784,6 +788,7 @@ extern AVCodec ff_vp9_cuvid_decoder;
 extern AVCodec ff_vp9_mediacodec_decoder;
 extern AVCodec ff_vp9_qsv_decoder;
 extern AVCodec ff_vp9_vaapi_encoder;
+extern AVCodec ff_vp9_qsv_encoder;
 
 // The iterate API is not usable with ossfuzz due to the excessive size of binaries created
 #if CONFIG_OSSFUZZ

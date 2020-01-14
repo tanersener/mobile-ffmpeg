@@ -111,7 +111,7 @@ am_wavpack_OBJECTS = wavpack-wavpack.$(OBJEXT) wavpack-riff.$(OBJEXT) \
 	wavpack-import_id3.$(OBJEXT) $(am__objects_1)
 wavpack_OBJECTS = $(am_wavpack_OBJECTS)
 am__DEPENDENCIES_1 =
-wavpack_DEPENDENCIES = $(top_builddir)/src/.libs/libwavpack.la \
+wavpack_DEPENDENCIES = $(top_builddir)/src/libwavpack.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -126,7 +126,7 @@ am__wvgain_SOURCES_DIST = wvgain.c utils.c win32_unicode_support.c
 am_wvgain_OBJECTS = wvgain-wvgain.$(OBJEXT) wvgain-utils.$(OBJEXT) \
 	$(am__objects_2)
 wvgain_OBJECTS = $(am_wvgain_OBJECTS)
-wvgain_DEPENDENCIES = $(top_builddir)/src/.libs/libwavpack.la \
+wvgain_DEPENDENCIES = $(top_builddir)/src/libwavpack.la \
 	$(am__DEPENDENCIES_1)
 wvgain_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(wvgain_CFLAGS) $(CFLAGS) \
@@ -138,7 +138,7 @@ am__wvtag_SOURCES_DIST = wvtag.c utils.c import_id3.c \
 am_wvtag_OBJECTS = wvtag-wvtag.$(OBJEXT) wvtag-utils.$(OBJEXT) \
 	wvtag-import_id3.$(OBJEXT) $(am__objects_3)
 wvtag_OBJECTS = $(am_wvtag_OBJECTS)
-wvtag_DEPENDENCIES = $(top_builddir)/src/.libs/libwavpack.la \
+wvtag_DEPENDENCIES = $(top_builddir)/src/libwavpack.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 wvtag_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(wvtag_CFLAGS) $(CFLAGS) \
@@ -148,22 +148,23 @@ am__wvtest_SOURCES_DIST = wvtest.c md5.c
 @ENABLE_TESTS_TRUE@	wvtest-md5.$(OBJEXT)
 wvtest_OBJECTS = $(am_wvtest_OBJECTS)
 @ENABLE_TESTS_TRUE@wvtest_DEPENDENCIES =  \
-@ENABLE_TESTS_TRUE@	$(top_builddir)/src/.libs/libwavpack.la \
+@ENABLE_TESTS_TRUE@	$(top_builddir)/src/libwavpack.la \
 @ENABLE_TESTS_TRUE@	$(am__DEPENDENCIES_1)
 wvtest_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(wvtest_CFLAGS) $(CFLAGS) \
 	$(wvtest_LDFLAGS) $(LDFLAGS) -o $@
-am__wvunpack_SOURCES_DIST = wvunpack.c riff.c wave64.c caff.c dsdiff.c \
-	dsf.c utils.c md5.c win32_unicode_support.c
+am__wvunpack_SOURCES_DIST = wvunpack.c riff_write.c wave64_write.c \
+	caff_write.c dsdiff_write.c dsf_write.c utils.c md5.c \
+	win32_unicode_support.c
 @WINDOWS_HOST_TRUE@am__objects_4 =  \
 @WINDOWS_HOST_TRUE@	wvunpack-win32_unicode_support.$(OBJEXT)
 am_wvunpack_OBJECTS = wvunpack-wvunpack.$(OBJEXT) \
-	wvunpack-riff.$(OBJEXT) wvunpack-wave64.$(OBJEXT) \
-	wvunpack-caff.$(OBJEXT) wvunpack-dsdiff.$(OBJEXT) \
-	wvunpack-dsf.$(OBJEXT) wvunpack-utils.$(OBJEXT) \
+	wvunpack-riff_write.$(OBJEXT) wvunpack-wave64_write.$(OBJEXT) \
+	wvunpack-caff_write.$(OBJEXT) wvunpack-dsdiff_write.$(OBJEXT) \
+	wvunpack-dsf_write.$(OBJEXT) wvunpack-utils.$(OBJEXT) \
 	wvunpack-md5.$(OBJEXT) $(am__objects_4)
 wvunpack_OBJECTS = $(am_wvunpack_OBJECTS)
-wvunpack_DEPENDENCIES = $(top_builddir)/src/.libs/libwavpack.la \
+wvunpack_DEPENDENCIES = $(top_builddir)/src/libwavpack.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 wvunpack_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(wvunpack_CFLAGS) \
@@ -365,24 +366,24 @@ wavpack_SOURCES = wavpack.c riff.c wave64.c caff.c dsdiff.c dsf.c \
 	utils.c md5.c import_id3.c $(am__append_1)
 wavpack_CFLAGS = $(AM_CFLAGS) $(ICONV_CFLAGS) -I$(top_srcdir)/include
 @ENABLE_RPATH_TRUE@wavpack_LDFLAGS = -rpath $(libdir)
-wavpack_LDADD = $(AM_LDADD) $(top_builddir)/src/.libs/libwavpack.la $(LIBM) $(ICONV_LIBS)
-wvunpack_SOURCES = wvunpack.c riff.c wave64.c caff.c dsdiff.c dsf.c \
-	utils.c md5.c $(am__append_2)
+wavpack_LDADD = $(AM_LDADD) $(top_builddir)/src/libwavpack.la $(LIBM) $(ICONV_LIBS)
+wvunpack_SOURCES = wvunpack.c riff_write.c wave64_write.c caff_write.c \
+	dsdiff_write.c dsf_write.c utils.c md5.c $(am__append_2)
 wvunpack_CFLAGS = $(AM_CFLAGS) $(ICONV_CFLAGS) -I$(top_srcdir)/include
 @ENABLE_RPATH_TRUE@wvunpack_LDFLAGS = -rpath $(libdir)
-wvunpack_LDADD = $(AM_LDADD) $(top_builddir)/src/.libs/libwavpack.la $(LIBM) $(ICONV_LIBS)
+wvunpack_LDADD = $(AM_LDADD) $(top_builddir)/src/libwavpack.la $(LIBM) $(ICONV_LIBS)
 wvgain_SOURCES = wvgain.c utils.c $(am__append_3)
 wvgain_CFLAGS = $(AM_CFLAGS) -I$(top_srcdir)/include
 @ENABLE_RPATH_TRUE@wvgain_LDFLAGS = -rpath $(libdir)
-wvgain_LDADD = $(AM_LDADD) $(top_builddir)/src/.libs/libwavpack.la $(LIBM)
+wvgain_LDADD = $(AM_LDADD) $(top_builddir)/src/libwavpack.la $(LIBM)
 wvtag_SOURCES = wvtag.c utils.c import_id3.c $(am__append_4)
 wvtag_CFLAGS = $(AM_CFLAGS) -I$(top_srcdir)/include
 @ENABLE_RPATH_TRUE@wvtag_LDFLAGS = -rpath $(libdir)
-wvtag_LDADD = $(AM_LDADD) $(top_builddir)/src/.libs/libwavpack.la $(LIBM) $(ICONV_LIBS)
+wvtag_LDADD = $(AM_LDADD) $(top_builddir)/src/libwavpack.la $(LIBM) $(ICONV_LIBS)
 @ENABLE_TESTS_TRUE@wvtest_SOURCES = wvtest.c md5.c
 @ENABLE_TESTS_TRUE@wvtest_CFLAGS = $(AM_CFLAGS) -I$(top_srcdir)/include
 @ENABLE_RPATH_TRUE@@ENABLE_TESTS_TRUE@wvtest_LDFLAGS = -rpath $(libdir)
-@ENABLE_TESTS_TRUE@wvtest_LDADD = $(AM_LDADD) $(top_builddir)/src/.libs/libwavpack.la $(LIBM) -lpthread
+@ENABLE_TESTS_TRUE@wvtest_LDADD = $(AM_LDADD) $(top_builddir)/src/libwavpack.la $(LIBM) -lpthread
 noinst_HEADERS = \
 	win32_unicode_support.h \
 	utils.h \
@@ -520,13 +521,13 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wvtag-wvtag.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wvtest-md5.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wvtest-wvtest.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wvunpack-caff.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wvunpack-dsdiff.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wvunpack-dsf.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wvunpack-caff_write.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wvunpack-dsdiff_write.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wvunpack-dsf_write.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wvunpack-md5.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wvunpack-riff.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wvunpack-riff_write.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wvunpack-utils.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wvunpack-wave64.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wvunpack-wave64_write.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wvunpack-win32_unicode_support.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wvunpack-wvunpack.Po@am__quote@
 
@@ -831,75 +832,75 @@ wvunpack-wvunpack.obj: wvunpack.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wvunpack_CFLAGS) $(CFLAGS) -c -o wvunpack-wvunpack.obj `if test -f 'wvunpack.c'; then $(CYGPATH_W) 'wvunpack.c'; else $(CYGPATH_W) '$(srcdir)/wvunpack.c'; fi`
 
-wvunpack-riff.o: riff.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wvunpack_CFLAGS) $(CFLAGS) -MT wvunpack-riff.o -MD -MP -MF $(DEPDIR)/wvunpack-riff.Tpo -c -o wvunpack-riff.o `test -f 'riff.c' || echo '$(srcdir)/'`riff.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/wvunpack-riff.Tpo $(DEPDIR)/wvunpack-riff.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riff.c' object='wvunpack-riff.o' libtool=no @AMDEPBACKSLASH@
+wvunpack-riff_write.o: riff_write.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wvunpack_CFLAGS) $(CFLAGS) -MT wvunpack-riff_write.o -MD -MP -MF $(DEPDIR)/wvunpack-riff_write.Tpo -c -o wvunpack-riff_write.o `test -f 'riff_write.c' || echo '$(srcdir)/'`riff_write.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/wvunpack-riff_write.Tpo $(DEPDIR)/wvunpack-riff_write.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riff_write.c' object='wvunpack-riff_write.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wvunpack_CFLAGS) $(CFLAGS) -c -o wvunpack-riff.o `test -f 'riff.c' || echo '$(srcdir)/'`riff.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wvunpack_CFLAGS) $(CFLAGS) -c -o wvunpack-riff_write.o `test -f 'riff_write.c' || echo '$(srcdir)/'`riff_write.c
 
-wvunpack-riff.obj: riff.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wvunpack_CFLAGS) $(CFLAGS) -MT wvunpack-riff.obj -MD -MP -MF $(DEPDIR)/wvunpack-riff.Tpo -c -o wvunpack-riff.obj `if test -f 'riff.c'; then $(CYGPATH_W) 'riff.c'; else $(CYGPATH_W) '$(srcdir)/riff.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/wvunpack-riff.Tpo $(DEPDIR)/wvunpack-riff.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riff.c' object='wvunpack-riff.obj' libtool=no @AMDEPBACKSLASH@
+wvunpack-riff_write.obj: riff_write.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wvunpack_CFLAGS) $(CFLAGS) -MT wvunpack-riff_write.obj -MD -MP -MF $(DEPDIR)/wvunpack-riff_write.Tpo -c -o wvunpack-riff_write.obj `if test -f 'riff_write.c'; then $(CYGPATH_W) 'riff_write.c'; else $(CYGPATH_W) '$(srcdir)/riff_write.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/wvunpack-riff_write.Tpo $(DEPDIR)/wvunpack-riff_write.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riff_write.c' object='wvunpack-riff_write.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wvunpack_CFLAGS) $(CFLAGS) -c -o wvunpack-riff.obj `if test -f 'riff.c'; then $(CYGPATH_W) 'riff.c'; else $(CYGPATH_W) '$(srcdir)/riff.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wvunpack_CFLAGS) $(CFLAGS) -c -o wvunpack-riff_write.obj `if test -f 'riff_write.c'; then $(CYGPATH_W) 'riff_write.c'; else $(CYGPATH_W) '$(srcdir)/riff_write.c'; fi`
 
-wvunpack-wave64.o: wave64.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wvunpack_CFLAGS) $(CFLAGS) -MT wvunpack-wave64.o -MD -MP -MF $(DEPDIR)/wvunpack-wave64.Tpo -c -o wvunpack-wave64.o `test -f 'wave64.c' || echo '$(srcdir)/'`wave64.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/wvunpack-wave64.Tpo $(DEPDIR)/wvunpack-wave64.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='wave64.c' object='wvunpack-wave64.o' libtool=no @AMDEPBACKSLASH@
+wvunpack-wave64_write.o: wave64_write.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wvunpack_CFLAGS) $(CFLAGS) -MT wvunpack-wave64_write.o -MD -MP -MF $(DEPDIR)/wvunpack-wave64_write.Tpo -c -o wvunpack-wave64_write.o `test -f 'wave64_write.c' || echo '$(srcdir)/'`wave64_write.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/wvunpack-wave64_write.Tpo $(DEPDIR)/wvunpack-wave64_write.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='wave64_write.c' object='wvunpack-wave64_write.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wvunpack_CFLAGS) $(CFLAGS) -c -o wvunpack-wave64.o `test -f 'wave64.c' || echo '$(srcdir)/'`wave64.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wvunpack_CFLAGS) $(CFLAGS) -c -o wvunpack-wave64_write.o `test -f 'wave64_write.c' || echo '$(srcdir)/'`wave64_write.c
 
-wvunpack-wave64.obj: wave64.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wvunpack_CFLAGS) $(CFLAGS) -MT wvunpack-wave64.obj -MD -MP -MF $(DEPDIR)/wvunpack-wave64.Tpo -c -o wvunpack-wave64.obj `if test -f 'wave64.c'; then $(CYGPATH_W) 'wave64.c'; else $(CYGPATH_W) '$(srcdir)/wave64.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/wvunpack-wave64.Tpo $(DEPDIR)/wvunpack-wave64.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='wave64.c' object='wvunpack-wave64.obj' libtool=no @AMDEPBACKSLASH@
+wvunpack-wave64_write.obj: wave64_write.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wvunpack_CFLAGS) $(CFLAGS) -MT wvunpack-wave64_write.obj -MD -MP -MF $(DEPDIR)/wvunpack-wave64_write.Tpo -c -o wvunpack-wave64_write.obj `if test -f 'wave64_write.c'; then $(CYGPATH_W) 'wave64_write.c'; else $(CYGPATH_W) '$(srcdir)/wave64_write.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/wvunpack-wave64_write.Tpo $(DEPDIR)/wvunpack-wave64_write.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='wave64_write.c' object='wvunpack-wave64_write.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wvunpack_CFLAGS) $(CFLAGS) -c -o wvunpack-wave64.obj `if test -f 'wave64.c'; then $(CYGPATH_W) 'wave64.c'; else $(CYGPATH_W) '$(srcdir)/wave64.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wvunpack_CFLAGS) $(CFLAGS) -c -o wvunpack-wave64_write.obj `if test -f 'wave64_write.c'; then $(CYGPATH_W) 'wave64_write.c'; else $(CYGPATH_W) '$(srcdir)/wave64_write.c'; fi`
 
-wvunpack-caff.o: caff.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wvunpack_CFLAGS) $(CFLAGS) -MT wvunpack-caff.o -MD -MP -MF $(DEPDIR)/wvunpack-caff.Tpo -c -o wvunpack-caff.o `test -f 'caff.c' || echo '$(srcdir)/'`caff.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/wvunpack-caff.Tpo $(DEPDIR)/wvunpack-caff.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='caff.c' object='wvunpack-caff.o' libtool=no @AMDEPBACKSLASH@
+wvunpack-caff_write.o: caff_write.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wvunpack_CFLAGS) $(CFLAGS) -MT wvunpack-caff_write.o -MD -MP -MF $(DEPDIR)/wvunpack-caff_write.Tpo -c -o wvunpack-caff_write.o `test -f 'caff_write.c' || echo '$(srcdir)/'`caff_write.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/wvunpack-caff_write.Tpo $(DEPDIR)/wvunpack-caff_write.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='caff_write.c' object='wvunpack-caff_write.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wvunpack_CFLAGS) $(CFLAGS) -c -o wvunpack-caff.o `test -f 'caff.c' || echo '$(srcdir)/'`caff.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wvunpack_CFLAGS) $(CFLAGS) -c -o wvunpack-caff_write.o `test -f 'caff_write.c' || echo '$(srcdir)/'`caff_write.c
 
-wvunpack-caff.obj: caff.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wvunpack_CFLAGS) $(CFLAGS) -MT wvunpack-caff.obj -MD -MP -MF $(DEPDIR)/wvunpack-caff.Tpo -c -o wvunpack-caff.obj `if test -f 'caff.c'; then $(CYGPATH_W) 'caff.c'; else $(CYGPATH_W) '$(srcdir)/caff.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/wvunpack-caff.Tpo $(DEPDIR)/wvunpack-caff.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='caff.c' object='wvunpack-caff.obj' libtool=no @AMDEPBACKSLASH@
+wvunpack-caff_write.obj: caff_write.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wvunpack_CFLAGS) $(CFLAGS) -MT wvunpack-caff_write.obj -MD -MP -MF $(DEPDIR)/wvunpack-caff_write.Tpo -c -o wvunpack-caff_write.obj `if test -f 'caff_write.c'; then $(CYGPATH_W) 'caff_write.c'; else $(CYGPATH_W) '$(srcdir)/caff_write.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/wvunpack-caff_write.Tpo $(DEPDIR)/wvunpack-caff_write.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='caff_write.c' object='wvunpack-caff_write.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wvunpack_CFLAGS) $(CFLAGS) -c -o wvunpack-caff.obj `if test -f 'caff.c'; then $(CYGPATH_W) 'caff.c'; else $(CYGPATH_W) '$(srcdir)/caff.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wvunpack_CFLAGS) $(CFLAGS) -c -o wvunpack-caff_write.obj `if test -f 'caff_write.c'; then $(CYGPATH_W) 'caff_write.c'; else $(CYGPATH_W) '$(srcdir)/caff_write.c'; fi`
 
-wvunpack-dsdiff.o: dsdiff.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wvunpack_CFLAGS) $(CFLAGS) -MT wvunpack-dsdiff.o -MD -MP -MF $(DEPDIR)/wvunpack-dsdiff.Tpo -c -o wvunpack-dsdiff.o `test -f 'dsdiff.c' || echo '$(srcdir)/'`dsdiff.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/wvunpack-dsdiff.Tpo $(DEPDIR)/wvunpack-dsdiff.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='dsdiff.c' object='wvunpack-dsdiff.o' libtool=no @AMDEPBACKSLASH@
+wvunpack-dsdiff_write.o: dsdiff_write.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wvunpack_CFLAGS) $(CFLAGS) -MT wvunpack-dsdiff_write.o -MD -MP -MF $(DEPDIR)/wvunpack-dsdiff_write.Tpo -c -o wvunpack-dsdiff_write.o `test -f 'dsdiff_write.c' || echo '$(srcdir)/'`dsdiff_write.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/wvunpack-dsdiff_write.Tpo $(DEPDIR)/wvunpack-dsdiff_write.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='dsdiff_write.c' object='wvunpack-dsdiff_write.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wvunpack_CFLAGS) $(CFLAGS) -c -o wvunpack-dsdiff.o `test -f 'dsdiff.c' || echo '$(srcdir)/'`dsdiff.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wvunpack_CFLAGS) $(CFLAGS) -c -o wvunpack-dsdiff_write.o `test -f 'dsdiff_write.c' || echo '$(srcdir)/'`dsdiff_write.c
 
-wvunpack-dsdiff.obj: dsdiff.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wvunpack_CFLAGS) $(CFLAGS) -MT wvunpack-dsdiff.obj -MD -MP -MF $(DEPDIR)/wvunpack-dsdiff.Tpo -c -o wvunpack-dsdiff.obj `if test -f 'dsdiff.c'; then $(CYGPATH_W) 'dsdiff.c'; else $(CYGPATH_W) '$(srcdir)/dsdiff.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/wvunpack-dsdiff.Tpo $(DEPDIR)/wvunpack-dsdiff.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='dsdiff.c' object='wvunpack-dsdiff.obj' libtool=no @AMDEPBACKSLASH@
+wvunpack-dsdiff_write.obj: dsdiff_write.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wvunpack_CFLAGS) $(CFLAGS) -MT wvunpack-dsdiff_write.obj -MD -MP -MF $(DEPDIR)/wvunpack-dsdiff_write.Tpo -c -o wvunpack-dsdiff_write.obj `if test -f 'dsdiff_write.c'; then $(CYGPATH_W) 'dsdiff_write.c'; else $(CYGPATH_W) '$(srcdir)/dsdiff_write.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/wvunpack-dsdiff_write.Tpo $(DEPDIR)/wvunpack-dsdiff_write.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='dsdiff_write.c' object='wvunpack-dsdiff_write.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wvunpack_CFLAGS) $(CFLAGS) -c -o wvunpack-dsdiff.obj `if test -f 'dsdiff.c'; then $(CYGPATH_W) 'dsdiff.c'; else $(CYGPATH_W) '$(srcdir)/dsdiff.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wvunpack_CFLAGS) $(CFLAGS) -c -o wvunpack-dsdiff_write.obj `if test -f 'dsdiff_write.c'; then $(CYGPATH_W) 'dsdiff_write.c'; else $(CYGPATH_W) '$(srcdir)/dsdiff_write.c'; fi`
 
-wvunpack-dsf.o: dsf.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wvunpack_CFLAGS) $(CFLAGS) -MT wvunpack-dsf.o -MD -MP -MF $(DEPDIR)/wvunpack-dsf.Tpo -c -o wvunpack-dsf.o `test -f 'dsf.c' || echo '$(srcdir)/'`dsf.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/wvunpack-dsf.Tpo $(DEPDIR)/wvunpack-dsf.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='dsf.c' object='wvunpack-dsf.o' libtool=no @AMDEPBACKSLASH@
+wvunpack-dsf_write.o: dsf_write.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wvunpack_CFLAGS) $(CFLAGS) -MT wvunpack-dsf_write.o -MD -MP -MF $(DEPDIR)/wvunpack-dsf_write.Tpo -c -o wvunpack-dsf_write.o `test -f 'dsf_write.c' || echo '$(srcdir)/'`dsf_write.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/wvunpack-dsf_write.Tpo $(DEPDIR)/wvunpack-dsf_write.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='dsf_write.c' object='wvunpack-dsf_write.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wvunpack_CFLAGS) $(CFLAGS) -c -o wvunpack-dsf.o `test -f 'dsf.c' || echo '$(srcdir)/'`dsf.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wvunpack_CFLAGS) $(CFLAGS) -c -o wvunpack-dsf_write.o `test -f 'dsf_write.c' || echo '$(srcdir)/'`dsf_write.c
 
-wvunpack-dsf.obj: dsf.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wvunpack_CFLAGS) $(CFLAGS) -MT wvunpack-dsf.obj -MD -MP -MF $(DEPDIR)/wvunpack-dsf.Tpo -c -o wvunpack-dsf.obj `if test -f 'dsf.c'; then $(CYGPATH_W) 'dsf.c'; else $(CYGPATH_W) '$(srcdir)/dsf.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/wvunpack-dsf.Tpo $(DEPDIR)/wvunpack-dsf.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='dsf.c' object='wvunpack-dsf.obj' libtool=no @AMDEPBACKSLASH@
+wvunpack-dsf_write.obj: dsf_write.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wvunpack_CFLAGS) $(CFLAGS) -MT wvunpack-dsf_write.obj -MD -MP -MF $(DEPDIR)/wvunpack-dsf_write.Tpo -c -o wvunpack-dsf_write.obj `if test -f 'dsf_write.c'; then $(CYGPATH_W) 'dsf_write.c'; else $(CYGPATH_W) '$(srcdir)/dsf_write.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/wvunpack-dsf_write.Tpo $(DEPDIR)/wvunpack-dsf_write.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='dsf_write.c' object='wvunpack-dsf_write.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wvunpack_CFLAGS) $(CFLAGS) -c -o wvunpack-dsf.obj `if test -f 'dsf.c'; then $(CYGPATH_W) 'dsf.c'; else $(CYGPATH_W) '$(srcdir)/dsf.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wvunpack_CFLAGS) $(CFLAGS) -c -o wvunpack-dsf_write.obj `if test -f 'dsf_write.c'; then $(CYGPATH_W) 'dsf_write.c'; else $(CYGPATH_W) '$(srcdir)/dsf_write.c'; fi`
 
 wvunpack-utils.o: utils.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(wvunpack_CFLAGS) $(CFLAGS) -MT wvunpack-utils.o -MD -MP -MF $(DEPDIR)/wvunpack-utils.Tpo -c -o wvunpack-utils.o `test -f 'utils.c' || echo '$(srcdir)/'`utils.c

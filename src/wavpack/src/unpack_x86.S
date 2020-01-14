@@ -61,7 +61,7 @@
 #   rsi         eptr
 #
 # on stack (used for terms -1 and -2 only):
-# 
+#
 #   int32_t delta             DWORD [esp]
 #
 
@@ -84,7 +84,7 @@ unpack_decorr_stereo_pass_cont_x86:
 
         add     eax, edi                    # else add to buffer point to make eptr
         mov     esi, eax
-    
+
         mov     eax, [ebp+8]                # get term from dpp and vector appropriately
         mov     eax, [eax]
         cmp     eax, 17
@@ -950,7 +950,7 @@ unpack_cpu_has_feature_x86:
         pop     eax                         # and pop back into eax
         xor     eax, [esp]                  # compare to original pushed eflags
         popfd                               # restore original eflags
-        and     eax, 0x200000               # eax = 1 if eflags ID bit was changable
+        and     eax, 0x200000               # eax = 1 if eflags ID bit was changeable
         jz      oldcpu                      # return zero if CPUID is not available (wow!)
 
         push    ebx                         # we must save ebx

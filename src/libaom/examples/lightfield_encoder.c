@@ -259,6 +259,11 @@ static void pass1(aom_image_t *raw, FILE *infile, const char *outfile_name,
     die_codec(&codec, "Failed to turn off auto altref");
   if (aom_codec_control(&codec, AV1E_SET_FRAME_PARALLEL_DECODING, 0))
     die_codec(&codec, "Failed to set frame parallel decoding");
+  if (aom_codec_control(&codec, AV1E_ENABLE_EXT_TILE_DEBUG, 1))
+    die_codec(&codec, "Failed to enable encoder ext_tile debug");
+  if (aom_codec_control(&codec, AOME_SET_CPUUSED, 1))
+    die_codec(&codec, "Failed to set cpu-used");
+
   // Note: The superblock is a sequence parameter and has to be the same for 1
   // sequence. In lightfield application, must choose the superblock size(either
   // 64x64 or 128x128) before the encoding starts. Otherwise, the default is

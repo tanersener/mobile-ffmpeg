@@ -130,6 +130,8 @@ ECDHE-ECDSA key-exchange algorithm.
 ECDHE-PSK key-exchange algorithm.
 @item GNUTLS_@-KX_@-RSA_@-PSK
 RSA-PSK key-exchange algorithm.
+@item GNUTLS_@-KX_@-VKO_@-GOST_@-12
+VKO GOST R 34.10-2012 key-exchange algorithm.
 @end table
 
 @c gnutls_params_type_t
@@ -771,6 +773,16 @@ GOST R 34.10 CryptoPro 256 XchB curve
 GOST R 34.10 TC26 512 A curve
 @item GNUTLS_@-ECC_@-CURVE_@-GOST512B
 GOST R 34.10 TC26 512 B curve
+@item GNUTLS_@-ECC_@-CURVE_@-GOST512C
+GOST R 34.10 TC26 512 C curve
+@item GNUTLS_@-ECC_@-CURVE_@-GOST256A
+GOST R 34.10 TC26 256 A curve
+@item GNUTLS_@-ECC_@-CURVE_@-GOST256B
+GOST R 34.10 TC26 256 B curve
+@item GNUTLS_@-ECC_@-CURVE_@-GOST256C
+GOST R 34.10 TC26 256 C curve
+@item GNUTLS_@-ECC_@-CURVE_@-GOST256D
+GOST R 34.10 TC26 256 D curve
 @item GNUTLS_@-ECC_@-CURVE_@-MAX
 -- undescribed --
 @end table
@@ -791,6 +803,20 @@ the SECP384R1 curve group
 the SECP521R1 curve group
 @item GNUTLS_@-GROUP_@-X25519
 the X25519 curve group
+@item GNUTLS_@-GROUP_@-GC256A
+the GOST R 34.10 TC26 256 A curve group
+@item GNUTLS_@-GROUP_@-GC256B
+the GOST R 34.10 TC26 256 B curve group
+@item GNUTLS_@-GROUP_@-GC256C
+the GOST R 34.10 TC26 256 C curve group
+@item GNUTLS_@-GROUP_@-GC256D
+the GOST R 34.10 TC26 256 D curve group
+@item GNUTLS_@-GROUP_@-GC512A
+the GOST R 34.10 TC26 512 A curve group
+@item GNUTLS_@-GROUP_@-GC512B
+the GOST R 34.10 TC26 512 B curve group
+@item GNUTLS_@-GROUP_@-GC512C
+the GOST R 34.10 TC26 512 C curve group
 @item GNUTLS_@-GROUP_@-FFDHE2048
 the FFDHE2048 group
 @item GNUTLS_@-GROUP_@-FFDHE3072

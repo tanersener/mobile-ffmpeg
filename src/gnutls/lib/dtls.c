@@ -1040,7 +1040,7 @@ void gnutls_dtls_prestate_set(gnutls_session_t session,
 	if (ret < 0)
 		return;
 
-	params->write.sequence_number.i[7] = prestate->record_seq;
+	params->write.sequence_number = prestate->record_seq;
 
 	session->internals.dtls.hsk_read_seq = prestate->hsk_read_seq;
 	session->internals.dtls.hsk_write_seq =

@@ -16,6 +16,10 @@ VP9_CX_SRCS_REMOVE-yes += $(VP9_COMMON_SRCS_REMOVE-yes)
 VP9_CX_SRCS_REMOVE-no  += $(VP9_COMMON_SRCS_REMOVE-no)
 
 VP9_CX_SRCS-yes += vp9_cx_iface.c
+VP9_CX_SRCS-yes += vp9_cx_iface.h
+
+VP9_CX_SRCS-$(CONFIG_RATE_CTRL) += simple_encode.cc
+VP9_CX_SRCS-$(CONFIG_RATE_CTRL) += simple_encode.h
 
 VP9_CX_SRCS-yes += encoder/vp9_bitstream.c
 VP9_CX_SRCS-yes += encoder/vp9_context_tree.c
@@ -76,6 +80,8 @@ VP9_CX_SRCS-yes += encoder/vp9_resize.c
 VP9_CX_SRCS-yes += encoder/vp9_resize.h
 VP9_CX_SRCS-$(CONFIG_INTERNAL_STATS) += encoder/vp9_blockiness.c
 VP9_CX_SRCS-$(CONFIG_INTERNAL_STATS) += encoder/vp9_blockiness.h
+VP9_CX_SRCS-$(CONFIG_NON_GREEDY_MV) += encoder/vp9_non_greedy_mv.c
+VP9_CX_SRCS-$(CONFIG_NON_GREEDY_MV) += encoder/vp9_non_greedy_mv.h
 
 VP9_CX_SRCS-yes += encoder/vp9_tokenize.c
 VP9_CX_SRCS-yes += encoder/vp9_treewriter.c
@@ -116,7 +122,7 @@ endif
 VP9_CX_SRCS-$(HAVE_SSE2) += encoder/x86/vp9_dct_sse2.asm
 VP9_CX_SRCS-$(HAVE_SSE2) += encoder/x86/vp9_error_sse2.asm
 
-ifeq ($(ARCH_X86_64),yes)
+ifeq ($(VPX_ARCH_X86_64),yes)
 VP9_CX_SRCS-$(HAVE_SSSE3) += encoder/x86/vp9_quantize_ssse3_x86_64.asm
 endif
 

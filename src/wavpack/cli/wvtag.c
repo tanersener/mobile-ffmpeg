@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////
 //                           **** WAVPACK ****                            //
 //                  Hybrid Lossless Wavefile Compressor                   //
-//                Copyright (c) 1998 - 2017 David Bryant.                 //
+//                Copyright (c) 1998 - 2019 David Bryant.                 //
 //                          All Rights Reserved.                          //
 //      Distributed under the BSD Software License (see license.txt)      //
 ////////////////////////////////////////////////////////////////////////////
@@ -64,7 +64,7 @@
 
 static const char *sign_on = "\n"
 " WVTAG  WavPack Metadata Tagging Utility  %s Version %s\n"
-" Copyright (c) 2017 David Bryant.  All Rights Reserved.\n\n";
+" Copyright (c) 2018 - 2019 David Bryant.  All Rights Reserved.\n\n";
 
 static const char *version_warning = "\n"
 " WARNING: WVTAG using libwavpack version %s, expected %s (see README)\n\n";
@@ -94,8 +94,9 @@ static const char *help =
 "    --clean or --clear    clean all items from tag (done first)\n"
 "    -d \"Field\"            delete specified metadata item (text or binary)\n"
 "    -h or --help          this help display\n"
-"    --import-id3          import ID3v2 tags from the trailer of DSF files only\n"
-"                           (add --allow-huge-tags option for > 1 MB images)\n"
+"    --import-id3          import ID3v2 tags from the trailer of original file\n"
+"                           (default for DSF files, optional for other formats,\n"
+"                            add --allow-huge-tags option for > 1 MB images)\n"
 "    -l or --list          list all tag items (done last)\n"
 #ifdef _WIN32
 "    --no-utf8-convert     assume tag values read from files are already UTF-8,\n"
@@ -194,29 +195,23 @@ int main (int argc, char **argv)
     char selfname [MAX_PATH];
 
     if (GetModuleFileName (NULL, selfname, sizeof (selfname)) && filespec_name (selfname) &&
-        _strupr (filespec_name (selfname)) && strstr (filespec_name (selfname), "DEBUG")) {
-            char **argv_t = argv;
-            int argc_t = argc;
-
+        _strupr (filespec_name (selfname)) && strstr (filespec_name (selfname), "DEBUG"))
             debug_logging_mode = TRUE;
-
-            while (--argc_t)
-                error_line ("arg %d: %s", argc - argc_t, *++argv_t);
-    }
 
     strcpy (selfname, *argv);
 #else
-    if (filespec_name (*argv))
-        if (strstr (filespec_name (*argv), "ebug") || strstr (filespec_name (*argv), "DEBUG")) {
-            char **argv_t = argv;
-            int argc_t = argc;
-
+    if (filespec_name (*argv) &&
+        (strstr (filespec_name (*argv), "ebug") || strstr (filespec_name (*argv), "DEBUG")))
             debug_logging_mode = TRUE;
-
-            while (--argc_t)
-                error_line ("arg %d: %s", argc - argc_t, *++argv_t);
-    }
 #endif
+
+    if (debug_logging_mode) {
+        char **argv_t = argv;
+        int argc_t = argc;
+
+        while (--argc_t)
+            error_line ("arg %d: %s", argc - argc_t, *++argv_t);
+    }
 
     // loop through command-line arguments
 
@@ -1344,7 +1339,9 @@ static void dump_UTF8_string (char *string, FILE *dst)
 // resulting string will not fit in the specified buffer size then it is
 // truncated.
 
+#if defined (_WIN32)
 static int UTF8ToWideChar (const unsigned char *pUTF8, wchar_t *pWide);
+#endif
 
 static void UTF8ToAnsi (char *string, int len)
 {

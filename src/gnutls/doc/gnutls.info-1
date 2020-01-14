@@ -1,6 +1,6 @@
-This is gnutls.info, produced by makeinfo version 6.6 from gnutls.texi.
+This is gnutls.info, produced by makeinfo version 6.7 from gnutls.texi.
 
-This manual is last updated 27 June 2019 for version 3.6.10 of GnuTLS.
+This manual is last updated 27 June 2019 for version 3.6.11 of GnuTLS.
 
 Copyright (C) 2001-2019 Free Software Foundation, Inc.\\ Copyright (C)
 2001-2019 Nikos Mavrogiannopoulos
@@ -32,7 +32,7 @@ File: gnutls.info,  Node: Top,  Next: Preface,  Up: (dir)
 GnuTLS
 ******
 
-This manual is last updated 27 June 2019 for version 3.6.10 of GnuTLS.
+This manual is last updated 27 June 2019 for version 3.6.11 of GnuTLS.
 
 Copyright (C) 2001-2019 Free Software Foundation, Inc.\\ Copyright (C)
 2001-2019 Nikos Mavrogiannopoulos
@@ -1220,8 +1220,8 @@ And an example of a conversation where someone is acting in between:
 
      CLIENT: HERE ARE SOME CONFIDENTIAL DATA
 
-As you can see above the client was fooled, and was nai"ve enough to
-send the confidential data in the clear, despite the server telling the
+As you can see above the client was fooled, and was naïve enough to send
+the confidential data in the clear, despite the server telling the
 client that it does not support "STARTTLS".
 
 How do we avoid the above attack?  As you may have already noticed this

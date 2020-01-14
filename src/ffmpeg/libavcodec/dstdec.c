@@ -121,7 +121,7 @@ static int read_map(GetBitContext *gb, Table *t, unsigned int map[DST_MAX_CHANNE
 
 static av_always_inline int get_sr_golomb_dst(GetBitContext *gb, unsigned int k)
 {
-    int v = get_ur_golomb(gb, k, get_bits_left(gb), 0);
+    int v = get_ur_golomb_jpegls(gb, k, get_bits_left(gb), 0);
     if (v && get_bits1(gb))
         v = -v;
     return v;
@@ -162,6 +162,10 @@ static int read_table(GetBitContext *gb, Table *t, const int8_t code_pred_coeff[
                     c -= (x + 4) / 8;
                 else
                     c += (-x + 3) / 8;
+                if (!is_signed) {
+                    if (c < offset || c >= offset + (1<<coeff_bits))
+                        return AVERROR_INVALIDDATA;
+                }
                 t->coeff[i][j] = c;
             }
         }
@@ -302,11 +306,15 @@ static int decode_frame(AVCodecContext *avctx, void *data,
 
     /* Filter Coef Sets (10.12) */
 
-    read_table(gb, &s->fsets, fsets_code_pred_coeff, 7, 9, 1, 0);
+    ret = read_table(gb, &s->fsets, fsets_code_pred_coeff, 7, 9, 1, 0);
+    if (ret < 0)
+        return ret;
 
     /* Probability Tables (10.13) */
 
-    read_table(gb, &s->probs, probs_code_pred_coeff, 6, 7, 0, 1);
+    ret = read_table(gb, &s->probs, probs_code_pred_coeff, 6, 7, 0, 1);
+    if (ret < 0)
+        return ret;
 
     /* Arithmetic Coded Data (10.11) */
 

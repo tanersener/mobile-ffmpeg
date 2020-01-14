@@ -46,6 +46,22 @@ lightfield_test() {
 
   [ -e "${lf_file}" ] || return 1
 
+  # Check to ensure all camera frames have the identical frame header. If not identical, this test fails.
+  for i in ./fh*; do
+    diff ./fh004 $i > /dev/null
+      if [ $? -eq 1 ]; then
+      return 1
+    fi
+  done
+
+  # Check to ensure all camera frames use the identical frame context. If not identical, this test fails.
+  for i in ./fc*; do
+    diff ./fc004 $i > /dev/null
+      if [ $? -eq 1 ]; then
+      return 1
+    fi
+  done
+
   # Parse lightfield bitstream to construct and output a new bitstream that can
   # be decoded by an AV1 decoder.
   local bs_decoder="${LIBAOM_BIN_PATH}/lightfield_bitstream_parsing${AOM_TEST_EXE_SUFFIX}"

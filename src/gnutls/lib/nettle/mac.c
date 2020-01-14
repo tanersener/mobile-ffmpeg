@@ -39,6 +39,8 @@
 #endif
 #ifndef HAVE_NETTLE_STREEBOG512_UPDATE
 #include "gost/streebog.h"
+#endif
+#ifndef HAVE_NETTLE_GOST28147_SET_KEY
 #include "gost/gost28147.h"
 #endif
 #endif

@@ -108,7 +108,7 @@ a:hover {
 	<body>
 		<div class="container">
 			<div class="pageTitle">
-				<div class="pageHeader">Using WavPack Version 5.1.0</div>
+				<div class="pageHeader">Using WavPack Version 5.2.0</div>
 			</div>
 			<div class="pageMenu">
 				<a href="index.html">Home</a> - 
@@ -458,19 +458,21 @@ a:hover {
 					the wav headers that they provide (foobar's clienc and CDex are examples). In these
 					cases use this option to force WavPack to ignore the header and accept the actual
 					length. Because WavPack must seek to the beginning of the file to write the correct
-					length, this option cannot be used with piped output.
+					length, this option cannot be used with piped output. <b>Only use this option when it's
+					really needed; using with a valid header will cause any trailing metadata to be
+					interpreted as audio.</b>
 				</p>
 
 				<p>
-					<b><tt>--import-id3 = import applicable tag items from ID3v2.3 tag on DSF files only</tt></b>
+					<b><tt>--import-id3 = import applicable tag items from ID3v2.3 tag on DSF and other files</tt></b>
 				</p>
 				<p>
 					Sony's DSF file format specifies that these files may contain an ID3v2 tag at the end. WavPack
      considers this a trailing "wrapper" and stores it in the WavPack file as such so that the DSF
      file can be restored verbatim. However, stored this way it is not easily accessible for
      reading (and it is certainly not writable) because WavPack uses APEv2 (or, sometimes, ID3v1) tags
-     for metadata. This option causes any trailing ID3v2.3 tag in the DSF file to be scanned and all
-     applicable items imported into the APEv2 tag, including cover art.
+     for metadata. This option causes any trailing ID3v2.3 tag in the DSF file (or other file type) to be
+     scanned and all applicable items imported into the APEv2 tag, including cover art.
     </p>
 				<p>
      Note that if over 1 MB of image data is present, then the <b>--allow-huge-tags</b> option must
@@ -551,7 +553,7 @@ a:hover {
      <b><tt>--no-utf8-convert = don't recode passed tags to UTF-8, assume they are UTF-8 already</tt></b>
     </p>
     <p>
-     The text fields of APEv2 tags are encoded in the UTF-8 varient of Unicode, so when
+     The text fields of APEv2 tags are encoded in the UTF-8 variant of Unicode, so when
      tag information is passed in on the command-line they are converted to UTF-8 before
      being stored. If your system is already passing the strings in UTF-8, use this option
      to prevent double conversion.
@@ -854,7 +856,7 @@ a:hover {
 				</p>
 
 				<p>
-     <b><tt>--caf-be or --caf-le = force ouput to Apple Core Audio format</tt></b>
+     <b><tt>--caf-be or --caf-le = force output to Apple Core Audio format</tt></b>
 				</p>
 				<p>
      Output an Apple Core Audio file (either big- or little-endian) regardless of the input
@@ -871,7 +873,7 @@ a:hover {
 				</p>
 
 				<p>
-     <b><tt>--dff or --dsdiff = force ouput to Philips DSDIFF format</tt></b>
+     <b><tt>--dff or --dsdiff = force output to Philips DSDIFF format</tt></b>
 				</p>
 				<p>
      Output a Philips DSDIFF file (extension .dff) audio file regardless of the input
@@ -881,7 +883,7 @@ a:hover {
 				</p>
 
 				<p>
-     <b><tt>--dsf = force ouput to Sony DSD format</tt></b>
+     <b><tt>--dsf = force output to Sony DSD format</tt></b>
 				</p>
 				<p>
      Output a Sony DSD Stream File (extension .dsf) regardless of the input
@@ -957,7 +959,7 @@ a:hover {
      <b><tt>--no-utf8-convert = leave tag items in UTF-8 on extract or display</tt></b>
     </p>
     <p>
-     The text fields of APEv2 tags are encoded in the UTF-8 varient of Unicode, so when
+     The text fields of APEv2 tags are encoded in the UTF-8 variant of Unicode, so when
      tag information is displayed or extracted, it is converted to local multibyte encoding
      before being displayed or written to files. If your system already expects UTF-8, use this
      option to prevent the conversion.
@@ -1056,7 +1058,7 @@ a:hover {
 				</p>
 
 				<p>
-     <b><tt>-w or --wav = force ouput to Microsoft WAV format</tt></b>
+     <b><tt>-w or --wav = force output to Microsoft WAV format</tt></b>
 				</p>
 				<p>
      Output a Microsoft WAV file regardless of the input file format. All extra information in
@@ -1067,7 +1069,7 @@ a:hover {
 				</p>
 
 				<p>
-     <b><tt>--w64 = force ouput to Sony Wave64 format</tt></b>
+     <b><tt>--w64 = force output to Sony Wave64 format</tt></b>
 				</p>
 				<p>
      Output a Sony Wave64 file regardless of the input file format. All extra information in
@@ -1265,15 +1267,15 @@ a:hover {
 				</p>
 
 				<p>
-					<b><tt>--import-id3 = import applicable tag items from ID3v2.3 tag on DSF files only</tt></b>
+					<b><tt>--import-id3 = import applicable tag items from ID3v2.3 tag on DSF and other files</tt></b>
 				</p>
 				<p>
 					Sony's DSF file format specifies that these files may contain an ID3v2 tag at the end. WavPack
      considers this a trailing "wrapper" and stores it in the WavPack file as such so that the DSF
      file can be restored verbatim. However, stored this way it is not easily accessible for
      reading (and it is certainly not writable) because WavPack uses APEv2 (or, sometimes, ID3v1) tags
-     for metadata. This option causes any trailing ID3v2.3 tag in the DSF file to be scanned and all
-     applicable items imported into the APEv2 tag, including cover art.
+     for metadata. This option causes any trailing ID3v2.3 tag in the DSF file (or other file type) to be
+     scanned and all applicable items imported into the APEv2 tag, including cover art.
     </p>
     <p>
      Note that if over 1 MB of image data is present, then the <b>--allow-huge-tags</b> option must be included
@@ -1290,7 +1292,7 @@ a:hover {
      <b><tt>--no-utf8-convert = don't recode passed tags to UTF-8, assume they are UTF-8 already</tt></b>
     </p>
     <p>
-     The text fields of APEv2 tags are encoded in the UTF-8 varient of Unicode, so when
+     The text fields of APEv2 tags are encoded in the UTF-8 variant of Unicode, so when
      tag information is passed in on the command-line they are converted to UTF-8 before
      being stored. If your system is already passing the strings in UTF-8, use this option
      to prevent double conversion.

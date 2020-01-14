@@ -140,11 +140,13 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     case AV_CODEC_ID_BINKVIDEO: maxpixels /= 32; break;
     case AV_CODEC_ID_CFHD:      maxpixels /= 128; break;
     case AV_CODEC_ID_DIRAC:     maxpixels /= 8192; break;
+    case AV_CODEC_ID_DST:       maxsamples /= 8192; break;
     case AV_CODEC_ID_DXV:       maxpixels /= 32;  break;
     case AV_CODEC_ID_FFWAVESYNTH: maxsamples /= 16384; break;
     case AV_CODEC_ID_MSRLE:     maxpixels /= 16;  break;
     case AV_CODEC_ID_QTRLE:     maxpixels /= 16;  break;
     case AV_CODEC_ID_SANM:      maxpixels /= 16;  break;
+    case AV_CODEC_ID_G2M:       maxpixels /= 64;  break;
     case AV_CODEC_ID_GIF:       maxpixels /= 16;  break;
         // Performs slow frame rescaling in C
     case AV_CODEC_ID_GDV:       maxpixels /= 512; break;
@@ -157,10 +159,12 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     case AV_CODEC_ID_MSS2:        maxpixels /= 16384; break;
     case AV_CODEC_ID_MSZH:        maxpixels /= 128; break;
     case AV_CODEC_ID_SCPR:        maxpixels /= 32;    break;
+    case AV_CODEC_ID_SMACKVIDEO:  maxpixels /= 64; break;
     case AV_CODEC_ID_SNOW:        maxpixels /= 128; break;
     case AV_CODEC_ID_TGV:         maxpixels /= 32;    break;
     case AV_CODEC_ID_TRUEMOTION2: maxpixels /= 1024; break;
     case AV_CODEC_ID_VP7:         maxpixels /= 256;  break;
+    case AV_CODEC_ID_VP9:         maxpixels /= 4096; break;
     }
 
 
@@ -191,14 +195,23 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
             parser = av_parser_init(c->id);
         if (flags & 2)
             ctx->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
+        if (flags & 4) {
+            ctx->err_recognition = AV_EF_AGGRESSIVE | AV_EF_COMPLIANT | AV_EF_CAREFUL;
+            if (flags & 8)
+                ctx->err_recognition |= AV_EF_EXPLODE;
+        }
+        if (flags & 0x10)
+            ctx->flags2 |= AV_CODEC_FLAG2_FAST;
+
 
         extradata_size = bytestream2_get_le32(&gbc);
 
-        ctx->sample_rate                        = bytestream2_get_le32(&gbc);
+        ctx->sample_rate                        = bytestream2_get_le32(&gbc) & 0x7FFFFFFF;
         ctx->channels                           = (unsigned)bytestream2_get_le32(&gbc) % FF_SANE_NB_CHANNELS;
-        ctx->block_align                        = bytestream2_get_le32(&gbc);
+        ctx->block_align                        = bytestream2_get_le32(&gbc) & 0x7FFFFFFF;
         ctx->codec_tag                          = bytestream2_get_le32(&gbc);
         keyframes                               = bytestream2_get_le64(&gbc);
+        ctx->request_channel_layout             = bytestream2_get_le64(&gbc);
 
         if (extradata_size < size) {
             ctx->extradata = av_mallocz(extradata_size + AV_INPUT_BUFFER_PADDING_SIZE);

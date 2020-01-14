@@ -69,8 +69,8 @@ VP8_COMMON_SRCS-yes += common/vp8_entropymodedata.h
 
 VP8_COMMON_SRCS-yes += common/treecoder.c
 
-VP8_COMMON_SRCS-$(ARCH_X86)$(ARCH_X86_64) += common/x86/vp8_asm_stubs.c
-VP8_COMMON_SRCS-$(ARCH_X86)$(ARCH_X86_64) += common/x86/loopfilter_x86.c
+VP8_COMMON_SRCS-$(VPX_ARCH_X86)$(VPX_ARCH_X86_64) += common/x86/vp8_asm_stubs.c
+VP8_COMMON_SRCS-$(VPX_ARCH_X86)$(VPX_ARCH_X86_64) += common/x86/loopfilter_x86.c
 VP8_COMMON_SRCS-$(CONFIG_POSTPROC) += common/mfqe.c
 VP8_COMMON_SRCS-$(CONFIG_POSTPROC) += common/postproc.h
 VP8_COMMON_SRCS-$(CONFIG_POSTPROC) += common/postproc.c
@@ -92,7 +92,7 @@ ifeq ($(CONFIG_POSTPROC),yes)
 VP8_COMMON_SRCS-$(HAVE_SSE2) += common/x86/mfqe_sse2.asm
 endif
 
-ifeq ($(ARCH_X86_64),yes)
+ifeq ($(VPX_ARCH_X86_64),yes)
 VP8_COMMON_SRCS-$(HAVE_SSE2) += common/x86/loopfilter_block_sse2_x86_64.asm
 endif
 

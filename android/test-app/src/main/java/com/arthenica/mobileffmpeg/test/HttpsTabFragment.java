@@ -20,18 +20,18 @@
 package com.arthenica.mobileffmpeg.test;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.text.method.ScrollingMovementMethod;
-import android.view.LayoutInflater;
+import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
 import com.arthenica.mobileffmpeg.Config;
-import com.arthenica.mobileffmpeg.FFmpeg;
+import com.arthenica.mobileffmpeg.FFprobe;
 import com.arthenica.mobileffmpeg.LogCallback;
 import com.arthenica.mobileffmpeg.LogMessage;
 import com.arthenica.mobileffmpeg.MediaInformation;
@@ -45,52 +45,40 @@ public class HttpsTabFragment extends Fragment {
 
     public static final String HTTPS_TEST_DEFAULT_URL = "https://download.blender.org/peach/trailer/trailer_1080p.ogg";
 
-    private MainActivity mainActivity;
     private EditText urlText;
     private TextView outputText;
 
-    @Override
-    public View onCreateView(@NonNull final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_https_tab, container, false);
+    public HttpsTabFragment() {
+        super(R.layout.fragment_https_tab);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if (getView() != null) {
-            urlText = getView().findViewById(R.id.urlText);
+        urlText = view.findViewById(R.id.urlText);
 
-            View getInfoButton = getView().findViewById(R.id.getInfoButton);
-            getInfoButton.setOnClickListener(new View.OnClickListener() {
+        View getInfoButton = view.findViewById(R.id.getInfoButton);
+        getInfoButton.setOnClickListener(new View.OnClickListener() {
 
-                @Override
-                public void onClick(View v) {
-                    getInfo();
-                }
-            });
+            @Override
+            public void onClick(View v) {
+                getInfo();
+            }
+        });
 
-            outputText = getView().findViewById(R.id.outputText);
-            outputText.setMovementMethod(new ScrollingMovementMethod());
-        }
+        outputText = view.findViewById(R.id.outputText);
+        outputText.setMovementMethod(new ScrollingMovementMethod());
     }
 
     @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-        if (isVisibleToUser) {
-            setActive();
-        }
+    public void onResume() {
+        super.onResume();
+        setActive();
     }
 
-    public void setMainActivity(MainActivity mainActivity) {
-        this.mainActivity = mainActivity;
-    }
-
-    public static HttpsTabFragment newInstance(final MainActivity mainActivity) {
-        final HttpsTabFragment fragment = new HttpsTabFragment();
-        fragment.setMainActivity(mainActivity);
-        return fragment;
+    public static HttpsTabFragment newInstance() {
+        return new HttpsTabFragment();
     }
 
     public void enableLogCallback() {
@@ -123,7 +111,7 @@ public class HttpsTabFragment extends Fragment {
         }
 
         // HTTPS COMMAND ARGUMENTS
-        MediaInformation information = FFmpeg.getMediaInformation(testUrl);
+        MediaInformation information = FFprobe.getMediaInformation(testUrl);
         if (information == null) {
             appendLog("Get media information failed\n");
         } else {
@@ -220,9 +208,9 @@ public class HttpsTabFragment extends Fragment {
     }
 
     public void setActive() {
-        android.util.Log.i(MainActivity.TAG, "Https Tab Activated");
+        Log.i(MainActivity.TAG, "Https Tab Activated");
         enableLogCallback();
-        Popup.show(mainActivity, Tooltip.HTTPS_TEST_TOOLTIP_TEXT);
+        Popup.show(requireContext(), Tooltip.HTTPS_TEST_TOOLTIP_TEXT);
     }
 
     public void appendLog(final String logMessage) {

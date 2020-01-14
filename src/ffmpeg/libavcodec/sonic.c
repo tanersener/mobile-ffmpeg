@@ -144,6 +144,8 @@ static inline av_flatten int get_symbol(RangeCoder *c, uint8_t *state, int is_si
         e= 0;
         while(get_rac(c, state+1 + FFMIN(e,9))){ //1..10
             e++;
+            if (e > 31)
+                return AVERROR_INVALIDDATA;
         }
 
         a= 1;
@@ -473,7 +475,7 @@ static int predictor_calc_error(int *k, int *state, int order, int error)
     {
         int k_value = *k_ptr, state_value = *state_ptr;
         x -= shift_down(k_value * state_value, LATTICE_SHIFT);
-        state_ptr[1] = state_value + shift_down(k_value * x, LATTICE_SHIFT);
+        state_ptr[1] = state_value + shift_down(k_value * (unsigned)x, LATTICE_SHIFT);
     }
 #else
     for (i = order-2; i >= 0; i--)

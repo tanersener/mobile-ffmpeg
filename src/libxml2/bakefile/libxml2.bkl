@@ -736,11 +736,8 @@ $(TAB)copy "$(DOLLAR)(InputPath)" ..\$(CONFIG_DSTNAME)
 	<!-- FIXME:
 		<exe id="testModule" template="xml2test"><sources>$(XMLBASEDIR)$(DIRSEP)testModule.c</sources></exe>
 
-		<if cond="WITH_THREADS=='posix'">
+		<if cond="WITH_THREADS!='no'">
 			<exe id="testThreads" template="xml2test"><sources>$(XMLBASEDIR)$(DIRSEP)testThreads.c</sources></exe>
-		</if>
-		<if cond="WITH_THREADS=='ctls' or WITH_THREADS=='native'">
-			<exe id="testThreadsWin32" template="xml2test"><sources>$(XMLBASEDIR)$(DIRSEP)testThreadsWin32.c</sources></exe>
 		</if>
 	-->
 	</if>

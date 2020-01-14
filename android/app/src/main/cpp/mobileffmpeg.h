@@ -27,7 +27,7 @@
 #include "libavutil/ffversion.h"
 
 /** Library version string */
-#define MOBILE_FFMPEG_VERSION "4.3"
+#define MOBILE_FFMPEG_VERSION "4.3.1"
 
 /** Defines tag used for Android logging. */
 #define LIB_NAME "mobile-ffmpeg"
@@ -91,17 +91,17 @@ JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_Config_getNativeVersio
 
 /*
  * Class:     com_arthenica_mobileffmpeg_Config
- * Method:    nativeExecute
+ * Method:    nativeFFmpegExecute
  * Signature: ([Ljava/lang/String;)I
  */
-JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_Config_nativeExecute(JNIEnv *, jclass, jobjectArray);
+JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_Config_nativeFFmpegExecute(JNIEnv *, jclass, jobjectArray);
 
 /*
  * Class:     com_arthenica_mobileffmpeg_Config
- * Method:    nativeCancel
+ * Method:    nativeFFmpegCancel
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_Config_nativeCancel(JNIEnv *, jclass);
+JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_Config_nativeFFmpegCancel(JNIEnv *, jclass);
 
 /*
  * Class:     com_arthenica_mobileffmpeg_Config

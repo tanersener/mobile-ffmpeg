@@ -243,7 +243,8 @@ LTLIBRARIES = $(noinst_LTLIBRARIES)
 libgnutls_auth_la_LIBADD =
 am_libgnutls_auth_la_OBJECTS = anon.lo cert.lo dh_common.lo dhe.lo \
 	rsa_psk.lo dhe_psk.lo psk.lo psk_passwd.lo rsa.lo srp_kx.lo \
-	srp_passwd.lo srp_rsa.lo srp_sb64.lo anon_ecdh.lo ecdhe.lo
+	srp_passwd.lo srp_rsa.lo srp_sb64.lo anon_ecdh.lo ecdhe.lo \
+	vko_gost.lo
 libgnutls_auth_la_OBJECTS = $(am_libgnutls_auth_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -271,7 +272,7 @@ am__depfiles_remade = ./$(DEPDIR)/anon.Plo ./$(DEPDIR)/anon_ecdh.Plo \
 	./$(DEPDIR)/psk_passwd.Plo ./$(DEPDIR)/rsa.Plo \
 	./$(DEPDIR)/rsa_psk.Plo ./$(DEPDIR)/srp_kx.Plo \
 	./$(DEPDIR)/srp_passwd.Plo ./$(DEPDIR)/srp_rsa.Plo \
-	./$(DEPDIR)/srp_sb64.Plo
+	./$(DEPDIR)/srp_sb64.Plo ./$(DEPDIR)/vko_gost.Plo
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -1439,7 +1440,7 @@ libgnutls_auth_la_SOURCES = anon.c cert.c dh_common.c dhe.c \
 	rsa_psk.c dhe_psk.c psk.c psk_passwd.c rsa.c srp_kx.c \
 	srp_passwd.c srp_rsa.c srp_sb64.c anon.h cert.h dh_common.h \
 	psk.h psk_passwd.h srp_kx.h srp_passwd.h anon_ecdh.c \
-	ecdhe.c ecdhe.h rsa_common.h
+	ecdhe.c ecdhe.h rsa_common.h vko_gost.c
 
 all: all-am
 
@@ -1511,6 +1512,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/srp_passwd.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/srp_rsa.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/srp_sb64.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/vko_gost.Plo@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
 	@$(MKDIR_P) $(@D)
@@ -1688,6 +1690,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/srp_passwd.Plo
 	-rm -f ./$(DEPDIR)/srp_rsa.Plo
 	-rm -f ./$(DEPDIR)/srp_sb64.Plo
+	-rm -f ./$(DEPDIR)/vko_gost.Plo
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -1748,6 +1751,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/srp_passwd.Plo
 	-rm -f ./$(DEPDIR)/srp_rsa.Plo
 	-rm -f ./$(DEPDIR)/srp_sb64.Plo
+	-rm -f ./$(DEPDIR)/vko_gost.Plo
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

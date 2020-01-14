@@ -327,7 +327,8 @@ const hello_ext_entry_st ext_mod_status_request = {
 	.gid = GNUTLS_EXTENSION_STATUS_REQUEST,
 	.validity = GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_DTLS | GNUTLS_EXT_FLAG_CLIENT_HELLO |
 		    GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
-	.parse_type = _GNUTLS_EXT_TLS_POST_CS,
+	.client_parse_point = _GNUTLS_EXT_TLS_POST_CS,
+	.server_parse_point = _GNUTLS_EXT_TLS_POST_CS,
 	.recv_func = _gnutls_status_request_recv_params,
 	.send_func = _gnutls_status_request_send_params,
 	.deinit_func = _gnutls_status_request_deinit_data,

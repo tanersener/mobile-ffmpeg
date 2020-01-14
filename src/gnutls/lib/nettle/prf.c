@@ -23,6 +23,9 @@
 #include <gnutls_int.h>
 #include "int/tls1-prf.h"
 #include <nettle/hmac.h>
+#if ENABLE_GOST
+#include "gost/hmac-gost.h"
+#endif
 
 /*-
  * _gnutls_prf_raw:
@@ -88,6 +91,42 @@ _gnutls_prf_raw(gnutls_mac_algorithm_t mac,
 			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 		break;
 	}
+#if ENABLE_GOST
+	case GNUTLS_MAC_STREEBOG_256:{
+		struct hmac_streebog256_ctx ctx;
+		hmac_streebog256_set_key(&ctx, master_size, master);
+
+		ret = tls12_prf(&ctx,
+			  (nettle_hash_update_func *)
+			  hmac_streebog256_update,
+			  (nettle_hash_digest_func *)
+			  hmac_streebog256_digest, STREEBOG256_DIGEST_SIZE,
+			  label_size, label, seed_size,
+			  seed, outsize,
+			  (uint8_t*)out);
+
+		if (unlikely(ret != 1))
+			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+		break;
+	}
+	case GNUTLS_MAC_STREEBOG_512:{
+		struct hmac_streebog512_ctx ctx;
+		hmac_streebog512_set_key(&ctx, master_size, master);
+
+		ret = tls12_prf(&ctx,
+			  (nettle_hash_update_func *)
+			  hmac_streebog512_update,
+			  (nettle_hash_digest_func *)
+			  hmac_streebog512_digest, STREEBOG512_DIGEST_SIZE,
+			  label_size, label, seed_size,
+			  seed, outsize,
+			  (uint8_t*)out);
+
+		if (unlikely(ret != 1))
+			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+		break;
+	}
+#endif
 	default:
 		gnutls_assert();
 		_gnutls_debug_log("unhandled PRF %s\n",

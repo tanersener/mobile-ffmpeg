@@ -318,8 +318,8 @@ void	<a href="#xmlXPathDebugDumpObject">xmlXPathDebugDumpObject</a>		(FILE * out
 <div class="variablelist"><table border="0"><col align="left"/><tbody><tr><td><span class="term"><i><tt>ctxt</tt></i>:</span></td><td>an XPath evaluation context</td></tr><tr><td><span class="term"><i><tt>Returns</tt></i>:</span></td><td>the XPath object just removed</td></tr></tbody></table></div></div>
         <hr/>
         <div class="refsect2" lang="en"><h3><a name="valuePush"/>valuePush ()</h3><pre class="programlisting">int	valuePush			(<a href="libxml2-xpath.html#xmlXPathParserContextPtr">xmlXPathParserContextPtr</a> ctxt, <br/>					 <a href="libxml2-xpath.html#xmlXPathObjectPtr">xmlXPathObjectPtr</a> value)<br/>
-</pre><p>Pushes a new XPath object on top of the value stack</p>
-<div class="variablelist"><table border="0"><col align="left"/><tbody><tr><td><span class="term"><i><tt>ctxt</tt></i>:</span></td><td>an XPath evaluation context</td></tr><tr><td><span class="term"><i><tt>value</tt></i>:</span></td><td>the XPath object</td></tr><tr><td><span class="term"><i><tt>Returns</tt></i>:</span></td><td>the number of items on the value stack</td></tr></tbody></table></div></div>
+</pre><p>Pushes a new XPath object on top of the value stack. If value is NULL, a memory error is recorded in the parser context.</p>
+<div class="variablelist"><table border="0"><col align="left"/><tbody><tr><td><span class="term"><i><tt>ctxt</tt></i>:</span></td><td>an XPath evaluation context</td></tr><tr><td><span class="term"><i><tt>value</tt></i>:</span></td><td>the XPath object</td></tr><tr><td><span class="term"><i><tt>Returns</tt></i>:</span></td><td>the number of items on the value stack, or -1 in case of error.</td></tr></tbody></table></div></div>
         <hr/>
         <div class="refsect2" lang="en"><h3><a name="xmlXPathAddValues"/>xmlXPathAddValues ()</h3><pre class="programlisting">void	xmlXPathAddValues		(<a href="libxml2-xpath.html#xmlXPathParserContextPtr">xmlXPathParserContextPtr</a> ctxt)<br/>
 </pre><p>Implement the add operation on XPath objects: The numeric operators convert their operands to numbers as if by calling the number function.</p>

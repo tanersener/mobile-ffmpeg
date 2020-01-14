@@ -65,7 +65,7 @@ libxml_PyFileGet(PyObject *f) {
      * before and after a conversion took place. No way around it
      * in the Python3 infrastructure !
      * The duplicated fd and FILE * will be released in the subsequent
-     * call to libxml_PyFileRelease() which must be genrated accodingly
+     * call to libxml_PyFileRelease() which must be generated accordingly
      */
     fd = dup(fd);
     if (fd == -1)

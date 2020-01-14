@@ -110,7 +110,7 @@ void	<a href="#xmlSchemaSetParserStructuredErrors">xmlSchemaSetParserStructuredE
     <a href="libxml2-dict.html#xmlDictPtr">xmlDictPtr</a>	dict
     void *	includes	: the includes, this is opaque for now
     int	preserve	: whether to free the document
-    int	counter	: used to give ononymous components unique names
+    int	counter	: used to give anonymous components unique names
     <a href="libxml2-hash.html#xmlHashTablePtr">xmlHashTablePtr</a>	idcDef	: All identity-constraint defs.
     void *	volatiles	: Obsolete
 } xmlSchema;
@@ -245,7 +245,7 @@ The content of this structure is not made public by the API.
 <div class="variablelist"><table border="0"><col align="left"/><tbody><tr><td><span class="term"><i><tt>schema</tt></i>:</span></td><td>a precompiled XML Schemas</td></tr><tr><td><span class="term"><i><tt>Returns</tt></i>:</span></td><td>the validation context or NULL in case of error</td></tr></tbody></table></div></div>
         <hr/>
         <div class="refsect2" lang="en"><h3><a name="xmlSchemaParse"/>xmlSchemaParse ()</h3><pre class="programlisting"><a href="libxml2-xmlschemas.html#xmlSchemaPtr">xmlSchemaPtr</a>	xmlSchemaParse		(<a href="libxml2-xmlschemas.html#xmlSchemaParserCtxtPtr">xmlSchemaParserCtxtPtr</a> ctxt)<br/>
-</pre><p>parse a schema definition resource and build an internal XML Shema struture which can be used to validate instances.</p>
+</pre><p>parse a schema definition resource and build an internal XML Schema structure which can be used to validate instances.</p>
 <div class="variablelist"><table border="0"><col align="left"/><tbody><tr><td><span class="term"><i><tt>ctxt</tt></i>:</span></td><td>a schema validation context</td></tr><tr><td><span class="term"><i><tt>Returns</tt></i>:</span></td><td>the internal XML Schema structure built from the resource or NULL in case of error</td></tr></tbody></table></div></div>
         <hr/>
         <div class="refsect2" lang="en"><h3><a name="xmlSchemaSAXPlug"/>xmlSchemaSAXPlug ()</h3><pre class="programlisting"><a href="libxml2-xmlschemas.html#xmlSchemaSAXPlugPtr">xmlSchemaSAXPlugPtr</a>	xmlSchemaSAXPlug	(<a href="libxml2-xmlschemas.html#xmlSchemaValidCtxtPtr">xmlSchemaValidCtxtPtr</a> ctxt, <br/>						 <a href="libxml2-tree.html#xmlSAXHandlerPtr">xmlSAXHandlerPtr</a> * sax, <br/>						 void ** user_data)<br/>

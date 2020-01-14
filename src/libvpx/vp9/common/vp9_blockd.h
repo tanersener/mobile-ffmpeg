@@ -60,6 +60,7 @@ typedef struct {
 #define GOLDEN_FRAME 2
 #define ALTREF_FRAME 3
 #define MAX_REF_FRAMES 4
+#define MAX_INTER_REF_FRAMES 3
 
 typedef int8_t MV_REFERENCE_FRAME;
 

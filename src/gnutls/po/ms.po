@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnutls 3.6.8\n"
 "Report-Msgid-Bugs-To: bug-gnutls@gnu.org\n"
-"POT-Creation-Date: 2019-09-29 12:27+0200\n"
-"PO-Revision-Date: 2019-06-30 18:28+0800\n"
+"POT-Creation-Date: 2019-12-02 17:35+0100\n"
+"PO-Revision-Date: 2019-11-13 01:36+0800\n"
 "Last-Translator: Sharuzzaman Ahmat Raslan <sharuzzaman@gmail.com>\n"
 "Language-Team: Malay <translation-team-ms@lists.sourceforge.net>\n"
 "Language: ms\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Bugs: Report translation errors to the Language-Team address.\n"
-"X-Generator: Poedit 2.2.3\n"
+"X-Generator: Poedit 2.2.4\n"
 
 #: lib/alert.c:39
 msgid "Close notify"
@@ -138,7 +138,7 @@ msgstr "Nama pengguna SRP/PSK tiada atau tidak diketahui"
 #: lib/alert.c:83
 #, fuzzy
 msgid "An extension was expected but was not seen"
-msgstr "menjangka `ya' atau `tidak', tetapi menjumpai %s"
+msgstr "Sambungan tidak disokong telah dihantar"
 
 #: lib/alert.c:86
 msgid "No supported application protocol could be negotiated"
@@ -147,7 +147,7 @@ msgstr ""
 #: lib/alert.c:88
 #, fuzzy
 msgid "Certificate is required"
-msgstr "Aksara bukan-kosong diperlukan"
+msgstr "Sijil:"
 
 #: lib/errors.c:43
 msgid "Could not negotiate a supported cipher suite."
@@ -199,7 +199,7 @@ msgstr "Paket TLS tidak dijangka telah diterima."
 #: lib/errors.c:69
 #, fuzzy
 msgid "A TLS record packet with invalid length was received."
-msgstr "Paket TLS dengan panjang tidak dijangka telah diterima."
+msgstr "Paket rekod TLS besar telah diterima."
 
 #: lib/errors.c:71
 msgid "The TLS connection was non-properly terminated."
@@ -251,7 +251,7 @@ msgstr "Tiada sijil dijumpai!"
 #: lib/errors.c:96
 #, fuzzy
 msgid "Certificate is required."
-msgstr "Aksara bukan-kosong diperlukan"
+msgstr "Sijil:"
 
 #: lib/errors.c:99
 msgid "The given DSA key is incompatible with the selected TLS protocol."
@@ -328,7 +328,7 @@ msgstr "Akuan tidak mencukupi untuk permintaan tersebut."
 #: lib/errors.c:140
 #, fuzzy
 msgid "Error in password/key file."
-msgstr "Ralat dalam fail katalaluan."
+msgstr "Ralat huraian dalam fail katalaluan."
 
 #: lib/errors.c:141
 msgid "Wrong padding in PKCS1 packet."
@@ -340,7 +340,6 @@ msgid "The session or certificate has expired."
 msgstr "Sesi diminta telah tamat tempoh."
 
 #: lib/errors.c:145
-#, fuzzy
 msgid "The certificate is not yet activated."
 msgstr "Sijil belum lagi diaktifkan."
 
@@ -394,17 +393,17 @@ msgstr "Ralat dalam sijil."
 #: lib/errors.c:167
 #, fuzzy
 msgid "Error in the time fields of certificate."
-msgstr "Ralat dalam sijil."
+msgstr "Terdapat ralat dalam sijil."
 
 #: lib/errors.c:169
 #, fuzzy
 msgid "Error in the certificate verification."
-msgstr "Ralat dalam sijil."
+msgstr "Terdapat ralat dalam sijil."
 
 #: lib/errors.c:171
 #, fuzzy
 msgid "Error in the CRL verification."
-msgstr "Pengesahan Message Authentication Code gagal."
+msgstr "\t\tTitik Edaran CRL (%s):\n"
 
 #: lib/errors.c:173
 msgid "Error in the private key verification; seed doesn't match."
@@ -413,7 +412,7 @@ msgstr ""
 #: lib/errors.c:175
 #, fuzzy
 msgid "Could not authenticate peer."
-msgstr "Rehandshake diminta oleh peer."
+msgstr "Rakan tidak menghantar sebarang sijil."
 
 #: lib/errors.c:178
 msgid "Unknown Subject Alternative name in X.509 certificate."
@@ -449,8 +448,9 @@ msgid "Error in Database backend."
 msgstr "Ralat dalam backend Pengkalan Data."
 
 #: lib/errors.c:197
+#, fuzzy
 msgid "The Database entry already exists."
-msgstr ""
+msgstr "Seksyen telah wujud"
 
 #: lib/errors.c:198
 msgid "The certificate type is not supported."
@@ -546,7 +546,7 @@ msgstr ""
 #: lib/errors.c:244
 #, fuzzy
 msgid "The crypto library version is too old."
-msgstr "Versi pustaka tasn1 terlalu lama."
+msgstr "Versi pustaka gcrypt terlalu lama."
 
 #: lib/errors.c:247
 msgid "The tasn1 library version is too old."
@@ -567,7 +567,7 @@ msgstr "Ralat memuatkan cecincin kunci."
 #: lib/errors.c:255
 #, fuzzy
 msgid "The initialization of crypto backend has failed."
-msgstr "Pemulaan LZO telah gagal."
+msgstr "Pemulaan GnuTLS-extra telah gagal."
 
 #: lib/errors.c:258
 msgid "No supported compression algorithms have been found."
@@ -668,8 +668,11 @@ msgid "The specified algorithm or protocol is unknown."
 msgstr "Algoritma atau protokol dinyataka tidak diketahui."
 
 #: lib/errors.c:311
+#, fuzzy
 msgid "The handshake data size is too large."
 msgstr ""
+"Saiz data jabat tangan terlalu besar (DoS?), periksa "
+"gnutls_handshake_set_max_packet_length()."
 
 #: lib/errors.c:314
 msgid "Error opening /dev/crypto"
@@ -680,8 +683,9 @@ msgid "Error interfacing with /dev/crypto"
 msgstr ""
 
 #: lib/errors.c:319
+#, fuzzy
 msgid "Peer has terminated the connection"
-msgstr ""
+msgstr "Sambungan ditamatkan."
 
 #: lib/errors.c:321
 #, fuzzy
@@ -713,7 +717,7 @@ msgstr "Tidak dapat memulakan libgsasl: %s"
 #: lib/errors.c:334
 #, fuzzy
 msgid "PKCS #11 error."
-msgstr "ralat"
+msgstr "Jenis beg struktur PKCS tidak diketahui."
 
 #: lib/errors.c:336
 msgid "PKCS #11 initialization error."
@@ -727,7 +731,7 @@ msgstr "Penghurai ASN1: Ralat dalam huraian DER."
 #: lib/errors.c:340
 #, fuzzy
 msgid "Error in provided PIN."
-msgstr "Ralat decode"
+msgstr "ralat membaca"
 
 #: lib/errors.c:342
 #, fuzzy
@@ -745,7 +749,7 @@ msgstr ""
 #: lib/errors.c:349
 #, fuzzy
 msgid "Thread locking error"
-msgstr "Ralat decode"
+msgstr "ralat membaca"
 
 #: lib/errors.c:351
 msgid "PKCS #11 error in attribute"
@@ -756,8 +760,9 @@ msgid "PKCS #11 error in device"
 msgstr ""
 
 #: lib/errors.c:355
+#, fuzzy
 msgid "PKCS #11 error in data"
-msgstr ""
+msgstr "Ralat aliran data dalaman."
 
 #: lib/errors.c:357
 #, fuzzy
@@ -826,7 +831,7 @@ msgstr ""
 #: lib/errors.c:386
 #, fuzzy
 msgid "The OCSP response is invalid"
-msgstr "Kandungan \\{\\} tidak sah"
+msgstr "\t\t\tMenandatangan OCSP.\n"
 
 #: lib/errors.c:388
 msgid "The OCSP response provided doesn't match the available certificates"
@@ -835,7 +840,7 @@ msgstr ""
 #: lib/errors.c:390
 #, fuzzy
 msgid "There is no certificate status (OCSP)."
-msgstr "Selesai dengan %s (status keluar %d)\n"
+msgstr "\t\t\tMenandatangan OCSP.\n"
 
 #: lib/errors.c:392
 #, fuzzy
@@ -854,7 +859,7 @@ msgstr "Ralat apabila membaca fail."
 #: lib/errors.c:399
 #, fuzzy
 msgid "There is no self test for this algorithm."
-msgstr "sendiri"
+msgstr "sendiri  "
 
 #: lib/errors.c:401
 msgid ""
@@ -864,12 +869,12 @@ msgstr ""
 #: lib/errors.c:403
 #, fuzzy
 msgid "Error in sockets initialization."
-msgstr "Ralat decode"
+msgstr "Pemulaan LZO telah gagal."
 
 #: lib/errors.c:405
 #, fuzzy
 msgid "Error in public key generation."
-msgstr "\tAlgoritma Kekunci Awam: %s\n"
+msgstr "Terdapat ralat dalam kekunci awam."
 
 #: lib/errors.c:407
 #, fuzzy
@@ -904,7 +909,7 @@ msgstr ""
 #: lib/errors.c:421
 #, fuzzy
 msgid "The public key is invalid."
-msgstr "\tAlgoritma Kekunci Awam: %s\n"
+msgstr "- Kunci awam sijil: "
 
 #: lib/errors.c:423
 #, fuzzy
@@ -914,7 +919,7 @@ msgstr "Tiada parameter RSA sementara telah dijumpai."
 #: lib/errors.c:425
 #, fuzzy
 msgid "The public key parameters are invalid."
-msgstr "Algoritma kekunci awam tidak diketahui dijumpai."
+msgstr "Terdapat ralat dalam kekunci awam."
 
 #: lib/errors.c:427
 #, fuzzy
@@ -942,7 +947,7 @@ msgstr ""
 #: lib/errors.c:437
 #, fuzzy
 msgid "The early data were rejected."
-msgstr "Data yang diminta tiada."
+msgstr "Tiada data DANE dijumpai."
 
 #: lib/errors.c:443 libdane/errors.c:42
 msgid "Success."
@@ -986,7 +991,7 @@ msgstr "(kod ralat tidak diketahui)"
 #: lib/x509/ocsp.c:2605
 #, fuzzy
 msgid "The OCSP response is trusted. "
-msgstr "Sijil tidak dipercayai."
+msgstr "\t\t\tMenandatangan OCSP.\n"
 
 #: lib/x509/ocsp.c:2610
 #, fuzzy
@@ -996,7 +1001,7 @@ msgstr "Permintaan tidak sah."
 #: lib/x509/ocsp.c:2615
 #, fuzzy
 msgid "Error in the signer's key usageflags. "
-msgstr "ralat: get_key_usage: %s\n"
+msgstr "Terdapat ralat dalam kekunci awam."
 
 #: lib/x509/ocsp.c:2620
 #, fuzzy
@@ -1025,28 +1030,28 @@ msgstr "Permintaan tidak sah."
 #: lib/x509/ocsp.c:2644
 #, fuzzy
 msgid "Memory error"
-msgstr "Ralat dalaman dalam pengumpukan memori."
+msgstr "Terdapat ralat dalam memori."
 
-#: lib/x509/ocsp_output.c:50 lib/x509/ocsp_output.c:276 lib/x509/output.c:1679
-#: lib/x509/output.c:2212 lib/x509/output.c:2610
+#: lib/x509/ocsp_output.c:50 lib/x509/ocsp_output.c:276 lib/x509/output.c:1678
+#: lib/x509/output.c:2211 lib/x509/output.c:2609
 #, c-format
 msgid "\tVersion: %d\n"
 msgstr "\tVersi: %d\n"
 
-#: lib/x509/ocsp_output.c:136 lib/x509/ocsp_output.c:500 lib/x509/output.c:2380
-#: lib/x509/output.c:2774
+#: lib/x509/ocsp_output.c:136 lib/x509/ocsp_output.c:500 lib/x509/output.c:2379
+#: lib/x509/output.c:2773
 msgid "\t\t\tASCII: "
 msgstr "\t\t\tASCII: "
 
-#: lib/x509/ocsp_output.c:141 lib/x509/ocsp_output.c:505 lib/x509/output.c:2384
-#: lib/x509/output.c:2779
+#: lib/x509/ocsp_output.c:141 lib/x509/ocsp_output.c:505 lib/x509/output.c:2383
+#: lib/x509/output.c:2778
 msgid "\t\t\tHexdump: "
 msgstr "\t\t\tLambakan Hex: "
 
 #: lib/x509/ocsp_output.c:186
 #, fuzzy
 msgid "OCSP Request Information:\n"
-msgstr "Maklumat Permintaan Sijil PKCS #10:\n"
+msgstr "\t\t\tMenandatangan OCSP.\n"
 
 #: lib/x509/ocsp_output.c:289
 #, fuzzy
@@ -1068,7 +1073,7 @@ msgstr "[Tiada keluaran dihasilkan]\n"
 #: lib/x509/ocsp_output.c:414
 #, fuzzy, c-format
 msgid "\t\tRevocation time: %s\n"
-msgstr "%time"
+msgstr "tak memperolehi setem masa bagi %s"
 
 #: lib/x509/ocsp_output.c:434
 #, fuzzy, c-format
@@ -1078,41 +1083,41 @@ msgstr "\tTarikh kemaskini:\n"
 #: lib/x509/ocsp_output.c:452
 #, fuzzy, c-format
 msgid "\t\tNext Update: %s\n"
-msgstr "\t\tSeterusnya pada: %s\n"
+msgstr "\tTarikh kemaskini:\n"
 
 #: lib/x509/ocsp_output.c:524 lib/x509/output.c:1343 lib/x509/output.c:1614
-#: lib/x509/output.c:1740 lib/x509/output.c:1760 lib/x509/output.c:1804
-#: lib/x509/output.c:2032 lib/x509/output.c:2045 lib/x509/output.c:2459
-#: lib/x509/output.c:2587 lib/x509/output.c:2638
+#: lib/x509/output.c:1739 lib/x509/output.c:1759 lib/x509/output.c:1803
+#: lib/x509/output.c:2031 lib/x509/output.c:2044 lib/x509/output.c:2458
+#: lib/x509/output.c:2586 lib/x509/output.c:2637
 msgid "unknown"
 msgstr "tidak diketahui"
 
-#: lib/x509/ocsp_output.c:525 lib/x509/output.c:1808 lib/x509/output.c:2463
-#: lib/x509/output.c:2642
+#: lib/x509/ocsp_output.c:525 lib/x509/output.c:1807 lib/x509/output.c:2462
+#: lib/x509/output.c:2641
 #, c-format
 msgid "\tSignature Algorithm: %s\n"
 msgstr "\tAlgoritma tandatangan: %s\n"
 
-#: lib/x509/ocsp_output.c:529 lib/x509/output.c:1815 lib/x509/output.c:2468
+#: lib/x509/ocsp_output.c:529 lib/x509/output.c:1814 lib/x509/output.c:2467
 msgid ""
 "warning: signed using a broken signature algorithm that can be forged.\n"
 msgstr ""
 "amaran: ditandatangan menggunakan algoritma tandatangan rosak yang boleh "
 "dipalsukan.\n"
 
-#: lib/x509/ocsp_output.c:543 lib/x509/output.c:1841 lib/x509/output.c:2494
+#: lib/x509/ocsp_output.c:543 lib/x509/output.c:1840 lib/x509/output.c:2493
 msgid "\tSignature:\n"
 msgstr "\tTandatangan:\n"
 
 #: lib/x509/ocsp_output.c:651
 #, fuzzy
 msgid "OCSP Response Information:\n"
-msgstr "Maklumat Lain:\n"
+msgstr "\t\t\tMenandatangan OCSP.\n"
 
 #: lib/x509/output.c:54 lib/x509/output.c:84
 #, fuzzy, c-format
 msgid "%s%s: %.*s (contains illegal chars)\n"
-msgstr "%s: pilihan salah  -- %c\n"
+msgstr "%s mengandungi sistem fail %s\n"
 
 #: lib/x509/output.c:60 lib/x509/output.c:90
 #, c-format
@@ -1141,12 +1146,12 @@ msgstr "< %s ... %s > ? "
 #: lib/x509/output.c:148
 #, fuzzy, c-format
 msgid "%sRegistered ID: %.*s\n"
-msgstr "< %s ... %s > ? "
+msgstr "\t\t\tnamaLain OID: %.*s\n"
 
 #: lib/x509/output.c:152
 #, fuzzy, c-format
 msgid "%sXMPP Address: %.*s\n"
-msgstr "Jenis alamat tidak disokong."
+msgstr "\t\t\tAlamat XMPP: %.*s\n"
 
 #: lib/x509/output.c:156
 #, fuzzy, c-format
@@ -1156,7 +1161,7 @@ msgstr "< %s ... %s > ? "
 #: lib/x509/output.c:160
 #, fuzzy, c-format
 msgid "%sUnknown name: "
-msgstr "nama"
+msgstr "NAMA"
 
 #: lib/x509/output.c:302
 #, c-format
@@ -1192,7 +1197,7 @@ msgstr ""
 #: lib/x509/output.c:359
 #, fuzzy, c-format
 msgid "%s\t\t\tExcluded:\n"
-msgstr "< %s ... %s > ? "
+msgstr "%s%s: %.*s (%s)\n"
 
 #: lib/x509/output.c:399 lib/x509/output.c:401 lib/x509/output.c:403
 #, fuzzy, c-format
@@ -1212,12 +1217,12 @@ msgstr "\t\t\tTidak ditolak.\n"
 #: lib/x509/output.c:511
 #, fuzzy, c-format
 msgid "%sKey encipherment.\n"
-msgstr "\t\t\tPenyulitan data simpanan.\n"
+msgstr "\t\t\tPenyulitan kekunci.\n"
 
 #: lib/x509/output.c:513
 #, fuzzy, c-format
 msgid "%sData encipherment.\n"
-msgstr "\t\t\tPenyulitan komunikasi.\n"
+msgstr "\t\t\tPenyulitan kekunci.\n"
 
 #: lib/x509/output.c:515
 #, fuzzy, c-format
@@ -1232,17 +1237,17 @@ msgstr "\t\t\tMenandatangan sijil.\n"
 #: lib/x509/output.c:519
 #, fuzzy, c-format
 msgid "%sCRL signing.\n"
-msgstr "\t\t\tMenandatangan sijil.\n"
+msgstr "\t\t\tMenandatangan CRL.\n"
 
 #: lib/x509/output.c:521
 #, fuzzy, c-format
 msgid "%sKey encipher only.\n"
-msgstr "Hanya inilah sahaja yang dijumpai"
+msgstr "\t\t\tEncipher kekunci sahaja.\n"
 
 #: lib/x509/output.c:523
 #, fuzzy, c-format
 msgid "%sKey decipher only.\n"
-msgstr "Hanya inilah sahaja yang dijumpai"
+msgstr "\t\t\tDecipher kekunci sahaja.\n"
 
 #: lib/x509/output.c:567
 #, c-format
@@ -1257,42 +1262,42 @@ msgstr "\t\tTidak Selepas: %s\n"
 #: lib/x509/output.c:654
 #, fuzzy, c-format
 msgid "%s\t\t\tTLS WWW Server.\n"
-msgstr "%s: ralat pelayan nama tidak dapat dipulihkan berlaku."
+msgstr "\t\t\tPelayan WWW TLS.\n"
 
 #: lib/x509/output.c:656
 #, fuzzy, c-format
 msgid "%s\t\t\tTLS WWW Client.\n"
-msgstr "SASL gsasl_client_start: %s"
+msgstr "\t\t\tKlien WWW TLS.\n"
 
 #: lib/x509/output.c:658
 #, fuzzy, c-format
 msgid "%s\t\t\tCode signing.\n"
-msgstr "\t\t\tMenandatangan sijil.\n"
+msgstr "\t\t\tMenandatangan kod.\n"
 
 #: lib/x509/output.c:660
 #, fuzzy, c-format
 msgid "%s\t\t\tEmail protection.\n"
-msgstr "EMEL"
+msgstr "\t\t\tPerlindungan emel.\n"
 
 #: lib/x509/output.c:663
 #, fuzzy, c-format
 msgid "%s\t\t\tTime stamping.\n"
-msgstr "%time"
+msgstr "\t\t\tCap waktu.\n"
 
 #: lib/x509/output.c:665
 #, fuzzy, c-format
 msgid "%s\t\t\tOCSP signing.\n"
-msgstr "\t\t\tMenandatangan sijil.\n"
+msgstr "\t\t\tMenandatangan OCSP.\n"
 
 #: lib/x509/output.c:667
 #, fuzzy, c-format
 msgid "%s\t\t\tIpsec IKE.\n"
-msgstr "< %s ... %s > ? "
+msgstr "%s%s: %.*s (%s)\n"
 
 #: lib/x509/output.c:669
 #, fuzzy, c-format
 msgid "%s\t\t\tAny purpose.\n"
-msgstr "apa-apa jenis"
+msgstr "\t\t\tSebarang tujuan.\n"
 
 #: lib/x509/output.c:692
 #, fuzzy, c-format
@@ -1312,19 +1317,21 @@ msgstr "\t\t\tKekangan Panjang Laluan: %d\n"
 #: lib/x509/output.c:755
 #, fuzzy, c-format
 msgid "%s\t\t\totherName OID: %.*s\n"
-msgstr "< %s ... %s > ? "
+msgstr "\t\t\tnamaLain OID: %.*s\n"
 
 #: lib/x509/output.c:757
 #, fuzzy, c-format
 msgid "%s\t\t\totherName DER: "
-msgstr "Penghurai ASN1: Ralat dalam huraian DER."
+msgstr "\t\t\tnamaLain DER:"
 
 #: lib/x509/output.c:760
 #, fuzzy, c-format
 msgid ""
 "\n"
 "%s\t\t\totherName ASCII: "
-msgstr "\t\t\tASCII: "
+msgstr ""
+"\n"
+"\t\t\tnamaLain ASCII:"
 
 #: lib/x509/output.c:880 lib/x509/output.c:952 lib/x509/output.c:1240
 #, c-format
@@ -1356,12 +1363,12 @@ msgstr "%s%s: %.*s\n"
 #: lib/x509/output.c:936
 #, fuzzy, c-format
 msgid "%s\t\t\tSignToolCert: %.*s\n"
-msgstr "< %s ... %s > ? "
+msgstr "\t\t\tnamaLain OID: %.*s\n"
 
 #: lib/x509/output.c:944
 #, fuzzy, c-format
 msgid "%s\t\t\tCAToolCert: %.*s\n"
-msgstr "< %s ... %s > ? "
+msgstr "\t\t\tnamaLain OID: %.*s\n"
 
 #: lib/x509/output.c:988
 #, fuzzy, c-format
@@ -1374,7 +1381,7 @@ msgstr "\t\tKekangan Asas (%s):\n"
 #: lib/x509/output.c:1160 lib/x509/output.c:1174 lib/x509/output.c:1188
 #: lib/x509/output.c:1196 lib/x509/output.c:1207 lib/x509/output.c:1218
 #: lib/x509/output.c:1226 lib/x509/output.c:1232 lib/x509/output.c:1238
-#: lib/x509/output.c:2321 lib/x509/output.c:2346 lib/x509/output.c:2366
+#: lib/x509/output.c:2320 lib/x509/output.c:2345 lib/x509/output.c:2365
 msgid "critical"
 msgstr "kritikal"
 
@@ -1384,14 +1391,14 @@ msgstr "kritikal"
 #: lib/x509/output.c:1160 lib/x509/output.c:1174 lib/x509/output.c:1188
 #: lib/x509/output.c:1196 lib/x509/output.c:1207 lib/x509/output.c:1218
 #: lib/x509/output.c:1226 lib/x509/output.c:1232 lib/x509/output.c:1238
-#: lib/x509/output.c:2322 lib/x509/output.c:2347 lib/x509/output.c:2367
+#: lib/x509/output.c:2321 lib/x509/output.c:2346 lib/x509/output.c:2366
 msgid "not critical"
 msgstr "tidak kritikal"
 
 #: lib/x509/output.c:1002
 #, fuzzy, c-format
 msgid "%s\t\tSubject Key Identifier (%s):\n"
-msgstr "\t\tPengesahan Kekunci Pengenalan (%s):\n"
+msgstr "\t\tSubjek Kekunci Pengenalan (%s):\n"
 
 #: lib/x509/output.c:1094
 #, fuzzy, c-format
@@ -1401,7 +1408,7 @@ msgstr "\t\tPengesahan Kekunci Pengenalan (%s):\n"
 #: lib/x509/output.c:1107
 #, fuzzy, c-format
 msgid "%s\t\tKey Usage (%s):\n"
-msgstr "ralat: get_key_usage: %s\n"
+msgstr "\t\tPenggunaan Kekunci (%s):\n"
 
 #: lib/x509/output.c:1121
 #, fuzzy, c-format
@@ -1411,17 +1418,17 @@ msgstr "ralat: get_key_usage: %s\n"
 #: lib/x509/output.c:1134
 #, fuzzy, c-format
 msgid "%s\t\tKey Purpose (%s):\n"
-msgstr "tiada kekunci ditakrifkan untuk `%s'"
+msgstr "\t\tTujuan Kekunci (%s):\n"
 
 #: lib/x509/output.c:1146
 #, fuzzy, c-format
 msgid "%s\t\tSubject Alternative Name (%s):\n"
-msgstr "Nama Subjek Alternatif tidak diketahu dalam sijil X.509."
+msgstr "\t\tNama Alternatif Subjek (%s):\n"
 
 #: lib/x509/output.c:1158
 #, fuzzy, c-format
 msgid "%s\t\tIssuer Alternative Name (%s):\n"
-msgstr "- DN Pengeluar Sijil: %s\n"
+msgstr "\t\tNama Alternatif Subjek (%s):\n"
 
 #: lib/x509/output.c:1172
 #, fuzzy, c-format
@@ -1431,17 +1438,17 @@ msgstr "\t\tTitik Edaran CRL (%s):\n"
 #: lib/x509/output.c:1186
 #, fuzzy, c-format
 msgid "%s\t\tProxy Certificate Information (%s):\n"
-msgstr "%s: tiada maklumat saiz bagi peranti ini"
+msgstr "\t\tMaklumat Sijil Proksi (%s):\n"
 
 #: lib/x509/output.c:1194
 #, fuzzy, c-format
 msgid "%s\t\tAuthority Information Access (%s):\n"
-msgstr "Tak dapat mengakses %s"
+msgstr "\t\tPengesahan Kekunci Pengenalan (%s):\n"
 
 #: lib/x509/output.c:1206
 #, fuzzy, c-format
 msgid "%s\t\tName Constraints (%s):\n"
-msgstr "Penggunaan: %s [OPSYEN] NAMA...\n"
+msgstr "\t\tKekangan Asas (%s):\n"
 
 #: lib/x509/output.c:1216
 #, fuzzy, c-format
@@ -1451,12 +1458,12 @@ msgstr "Salaman TLS/SSL gagal: %s"
 #: lib/x509/output.c:1224
 #, fuzzy, c-format
 msgid "%s\t\tSubject Signing Tool(%s):\n"
-msgstr "\t\tPengesahan Kekunci Pengenalan (%s):\n"
+msgstr "\t\tSubjek Kekunci Pengenalan (%s):\n"
 
 #: lib/x509/output.c:1230
 #, fuzzy, c-format
 msgid "%s\t\tIssuer Signing Tool(%s):\n"
-msgstr "- DN Pengeluar Sijil: %s\n"
+msgstr "\t\tNama Alternatif Subjek (%s):\n"
 
 #: lib/x509/output.c:1236
 #, fuzzy, c-format
@@ -1469,9 +1476,9 @@ msgid "%s\tExtensions:\n"
 msgstr "\tSambungan:\n"
 
 #: lib/x509/output.c:1345
-#, fuzzy, c-format
+#, c-format
 msgid "\t%sPublic Key Algorithm: %s\n"
-msgstr "\tAlgoritma Kekunci Awam: %s\n"
+msgstr "\t%sAlgoritma Kekunci Awam: %s\n"
 
 #: lib/x509/output.c:1347
 #, c-format
@@ -1491,7 +1498,7 @@ msgstr "\t\tModulus (%d bit):\n"
 #: lib/x509/output.c:1379
 #, fuzzy, c-format
 msgid "\t\tExponent (bits %d): "
-msgstr "\t\tModulus (%d bit):\n"
+msgstr "- Eksponen: %d bit\n"
 
 #: lib/x509/output.c:1387
 #, c-format
@@ -1501,7 +1508,7 @@ msgstr "\t\tModulus (%d bit):\n"
 #: lib/x509/output.c:1394
 #, fuzzy, c-format
 msgid "\t\tExponent (bits %d):\n"
-msgstr "\t\tModulus (%d bit):\n"
+msgstr "- Eksponen: %d bit\n"
 
 #: lib/x509/output.c:1421 lib/x509/output.c:1541
 #, fuzzy, c-format
@@ -1566,200 +1573,198 @@ msgstr "< %s ... %s > ? "
 #: lib/x509/output.c:1545
 #, fuzzy, c-format
 msgid "\t\tParamSet: %s\n"
-msgstr "< %s ... %s > ? "
+msgstr "%s%s: %.*s (%s)\n"
 
-#: lib/x509/output.c:1658 lib/x509/output.c:2577
+#: lib/x509/output.c:1658 lib/x509/output.c:2576
 #, fuzzy
 msgid "Subject "
-msgstr "\tSubjek: %s\n"
+msgstr "Tajuk: %s"
 
-#: lib/x509/output.c:1694
+#: lib/x509/output.c:1693
 msgid "\tSerial Number (hex): "
 msgstr "\tNombor Siri (hex):"
 
-#: lib/x509/output.c:1707 lib/x509/output.c:2222
+#: lib/x509/output.c:1706 lib/x509/output.c:2221
 #, fuzzy
 msgid "\tIssuer:\n"
-msgstr "\tPengeluar: %s\n"
+msgstr "Pengeluar:  %s"
 
-#: lib/x509/output.c:1712 lib/x509/output.c:2227
+#: lib/x509/output.c:1711 lib/x509/output.c:2226
 #, c-format
 msgid "\tIssuer: %s\n"
 msgstr "\tPengeluar: %s\n"
 
-#: lib/x509/output.c:1721
+#: lib/x509/output.c:1720
 msgid "\tValidity:\n"
 msgstr "\tKesahan:\n"
 
-#: lib/x509/output.c:1738 lib/x509/output.c:1740
+#: lib/x509/output.c:1737 lib/x509/output.c:1739
 #, c-format
 msgid "\t\tNot Before: %s\n"
 msgstr "\t\tTidak Sebelum: %s\n"
 
-#: lib/x509/output.c:1758 lib/x509/output.c:1760
+#: lib/x509/output.c:1757 lib/x509/output.c:1759
 #, c-format
 msgid "\t\tNot After: %s\n"
 msgstr "\t\tTidak Selepas: %s\n"
 
-#: lib/x509/output.c:1771 lib/x509/output.c:2620
+#: lib/x509/output.c:1770 lib/x509/output.c:2619
 #, fuzzy
 msgid "\tSubject:\n"
-msgstr "\tSubjek: %s\n"
+msgstr "Tajuk: %s"
 
-#: lib/x509/output.c:1776 lib/x509/output.c:2625
+#: lib/x509/output.c:1775 lib/x509/output.c:2624
 #, c-format
 msgid "\tSubject: %s\n"
 msgstr "\tSubjek: %s\n"
 
-#: lib/x509/output.c:1855
+#: lib/x509/output.c:1854
 #, fuzzy
 msgid "\tFingerprint:\n"
-msgstr "\tCapjari (hex): "
+msgstr ""
+"\tCap jari MD5:\n"
+"\t\t"
 
-#: lib/x509/output.c:1864
+#: lib/x509/output.c:1863
 msgid "\t\tsha1:"
 msgstr "\t\tsha1:"
 
-#: lib/x509/output.c:1875
+#: lib/x509/output.c:1874
 msgid "\t\tsha256:"
 msgstr "\t\tsha256:"
 
-#: lib/x509/output.c:1909
+#: lib/x509/output.c:1908
 #, fuzzy, c-format
 msgid ""
 "%sPublic Key ID:\n"
 "%s\tsha1:"
-msgstr "ID Kekunci Awam: "
+msgstr "\t%sAlgoritma Kekunci Awam: %s\n"
 
-#: lib/x509/output.c:1915
+#: lib/x509/output.c:1914
 #, fuzzy, c-format
 msgid ""
 "%sPublic Key PIN:\n"
 "%s\tpin-sha256:"
-msgstr ""
-"\tId Kekunci Awam:\n"
-"\t\t"
+msgstr "\t%sAlgoritma Kekunci Awam: %s\n"
 
-#: lib/x509/output.c:1987
+#: lib/x509/output.c:1986
 #, fuzzy
 msgid "no subject,"
-msgstr "\tSubjek: %s\n"
+msgstr "Tajuk: %s"
 
-#: lib/x509/output.c:2003
+#: lib/x509/output.c:2002
 #, fuzzy
 msgid "no issuer,"
-msgstr "\tPengeluar: %s\n"
+msgstr "Pengeluar:  %s"
 
-#: lib/x509/output.c:2050
+#: lib/x509/output.c:2049
 #, c-format
 msgid "signed using %s (broken!), "
 msgstr ""
 
-#: lib/x509/output.c:2052
+#: lib/x509/output.c:2051
 #, fuzzy, c-format
 msgid "signed using %s, "
 msgstr "kurang menggunakan hukum %d (%s)"
 
-#: lib/x509/output.c:2188
+#: lib/x509/output.c:2187
 msgid "X.509 Certificate Information:\n"
 msgstr "Maklumat Sijil X.509:\n"
 
-#: lib/x509/output.c:2192 lib/x509/output.c:2832
+#: lib/x509/output.c:2191 lib/x509/output.c:2831
 msgid "Other Information:\n"
 msgstr "Maklumat Lain:\n"
 
-#: lib/x509/output.c:2207
+#: lib/x509/output.c:2206
 msgid "\tVersion: 1 (default)\n"
 msgstr "\tVersi: 1 (default)\n"
 
-#: lib/x509/output.c:2236
+#: lib/x509/output.c:2235
 msgid "\tUpdate dates:\n"
 msgstr "\tTarikh kemaskini:\n"
 
-#: lib/x509/output.c:2253
+#: lib/x509/output.c:2252
 #, c-format
 msgid "\t\tIssued: %s\n"
 msgstr "\t\tDikeluarkan: %s\n"
 
-#: lib/x509/output.c:2273
+#: lib/x509/output.c:2272
 #, c-format
 msgid "\t\tNext at: %s\n"
 msgstr "\t\tSeterusnya pada: %s\n"
 
-#: lib/x509/output.c:2304
+#: lib/x509/output.c:2303
 msgid "\tExtensions:\n"
 msgstr "\tSambungan:\n"
 
-#: lib/x509/output.c:2320
+#: lib/x509/output.c:2319
 #, fuzzy, c-format
 msgid "\t\tCRL Number (%s): "
-msgstr ""
-"Pengunaan: %s [NOMBOR]...\n"
-"    atau: %s OPSYEN\n"
+msgstr "\t\tTitik Edaran CRL (%s):\n"
 
-#: lib/x509/output.c:2345
+#: lib/x509/output.c:2344
 #, c-format
 msgid "\t\tAuthority Key Identifier (%s):\n"
 msgstr "\t\tPengesahan Kekunci Pengenalan (%s):\n"
 
-#: lib/x509/output.c:2364
+#: lib/x509/output.c:2363
 #, c-format
 msgid "\t\tUnknown extension %s (%s):\n"
 msgstr "\t\tSambungan tidak diketahui %s (%s):\n"
 
-#: lib/x509/output.c:2401
+#: lib/x509/output.c:2400
 #, c-format
 msgid "\tRevoked certificates (%d):\n"
 msgstr "\tSijil dibatalkan (%d):\n"
 
-#: lib/x509/output.c:2404
+#: lib/x509/output.c:2403
 msgid "\tNo revoked certificates.\n"
 msgstr "\tTiada sijil dibatalkan.\n"
 
-#: lib/x509/output.c:2425
+#: lib/x509/output.c:2424
 msgid "\t\tSerial Number (hex): "
 msgstr "\t\tNombor Siri (hex): "
 
-#: lib/x509/output.c:2443
+#: lib/x509/output.c:2442
 #, c-format
 msgid "\t\tRevoked at: %s\n"
 msgstr "\t\tDibatalkan pada: %s\n"
 
-#: lib/x509/output.c:2525
+#: lib/x509/output.c:2524
 msgid "X.509 Certificate Revocation List Information:\n"
 msgstr "Maklumat Senarai Pembatalan Sijil X.509:\n"
 
-#: lib/x509/output.c:2675
+#: lib/x509/output.c:2674
 #, fuzzy
 msgid "\tAttributes:\n"
 msgstr "mendapatkan atribut baru untuk %s"
 
-#: lib/x509/output.c:2732
+#: lib/x509/output.c:2731
 #, fuzzy, c-format
 msgid "\t\tChallenge password: %s\n"
-msgstr "Nama pengguna atau kata laluan tidak sah."
+msgstr "Cabaran dinyahkod: %s\n"
 
-#: lib/x509/output.c:2742
+#: lib/x509/output.c:2741
 #, c-format
 msgid "\t\tUnknown attribute %s:\n"
 msgstr "\t\tSifat %s yang tidak diketahui:\n"
 
-#: lib/x509/output.c:2828
+#: lib/x509/output.c:2827
 msgid "PKCS #10 Certificate Request Information:\n"
 msgstr "Maklumat Permintaan Sijil PKCS #10:\n"
 
-#: lib/x509/output.c:2855
+#: lib/x509/output.c:2854
 msgid "Public Key Usage:\n"
 msgstr "Penggunaan Kekunci Awam:\n"
 
-#: lib/x509/output.c:2895
+#: lib/x509/output.c:2894
 msgid "Public Key Information:\n"
 msgstr "Maklumat Kekunci Awam:\n"
 
 #: libdane/dane.c:1050
 #, fuzzy
 msgid "Certificate matches. "
-msgstr "Tiada padanan"
+msgstr "Sijil:"
 
 #: libdane/dane.c:1053
 #, fuzzy
@@ -1772,47 +1777,40 @@ msgid "CA constrains were violated. "
 msgstr "Beberapa had kekangan telah dicapai."
 
 #: libdane/dane.c:1062
-#, fuzzy
 msgid "The certificate differs. "
-msgstr "Jenis fail berbeza"
+msgstr "Sijil berbeza. "
 
 #: libdane/dane.c:1067
-#, fuzzy
 msgid "There were no DANE information. "
-msgstr "Maklumat Lain:\n"
+msgstr "Tiada maklumat DANE. "
 
 #: libdane/errors.c:43
-#, fuzzy
 msgid "There was error initializing the DNS query."
-msgstr "%s: ralat DNS tidak diketahui %d."
+msgstr "Terdapat ralat ketika memulakan pertanyaan DNS."
 
 #: libdane/errors.c:45
-#, fuzzy
 msgid "There was an error while resolving."
-msgstr "Ralat apabila membaca fail."
+msgstr "Terdapat ralat ketika menghurai."
 
 #: libdane/errors.c:47
-#, fuzzy
 msgid "No DANE data were found."
-msgstr "Tiada parameter RSA sementara telah dijumpai."
+msgstr "Tiada data DANE dijumpai."
 
 #: libdane/errors.c:49
 msgid "Unknown DANE data were found."
-msgstr ""
+msgstr "Data DANE tidak diketahui dijumpai."
 
 #: libdane/errors.c:51
-#, fuzzy
 msgid "No DNSSEC signature was found."
-msgstr "\tTandatangan:\n"
+msgstr "Tiada tandatangan DNSSEC dijumpai."
 
 #: libdane/errors.c:53
 msgid "Received corrupt data."
 msgstr ""
 
 #: libdane/errors.c:55
-#, fuzzy
 msgid "The DNSSEC signature is invalid."
-msgstr "\tTandatangan:\n"
+msgstr "Tandatangan DNSSEC tidak sah."
 
 #: libdane/errors.c:57
 msgid "There was a memory error."

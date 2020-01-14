@@ -482,7 +482,7 @@ int pack_block (WavpackContext *wpc, int32_t *buffer)
         }
         else if (wpc->block_boundary && sample_count >= (int32_t) wpc->block_boundary * 2) {
             int bc = sample_count / wpc->block_boundary, chans = (flags & MONO_DATA) ? 1 : 2;
-            int res = scan_redundancy (buffer, wpc->block_boundary * chans), i; 
+            int res = scan_redundancy (buffer, wpc->block_boundary * chans), i;
 
             for (i = 1; i < bc; ++i)
                 if (res != scan_redundancy (buffer + (i * wpc->block_boundary * chans),
@@ -959,7 +959,7 @@ void send_general_metadata (WavpackContext *wpc)
         (pack_cpu_has_feature_x86 (CPU_FEATURE_MMX) ?   \
             scan_max_magnitude_x86 (a, b) :             \
             scan_max_magnitude (a, b))
-#elif defined(OPT_ASM_X64) && (defined (_WIN64) || defined(__CYGWIN__) || defined(__MINGW64__))
+#elif defined(OPT_ASM_X64) && (defined (_WIN64) || defined(__CYGWIN__) || defined(__MINGW64__) || defined(__midipix__))
     #define DECORR_STEREO_PASS pack_decorr_stereo_pass_x64win
     #define DECORR_MONO_BUFFER pack_decorr_mono_buffer_x64win
     #define SCAN_MAX_MAGNITUDE scan_max_magnitude_x64win

@@ -221,11 +221,11 @@ typedef struct vpx_rational {
 } vpx_rational_t; /**< alias for struct vpx_rational */
 
 /*!\brief Multi-pass Encoding Pass */
-enum vpx_enc_pass {
+typedef enum vpx_enc_pass {
   VPX_RC_ONE_PASS,   /**< Single pass mode */
   VPX_RC_FIRST_PASS, /**< First pass of multi-pass mode */
   VPX_RC_LAST_PASS   /**< Final pass of multi-pass mode */
-};
+} vpx_enc_pass;
 
 /*!\brief Rate control mode */
 enum vpx_rc_mode {

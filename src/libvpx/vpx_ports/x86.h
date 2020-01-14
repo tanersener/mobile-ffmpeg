@@ -43,7 +43,7 @@ typedef enum {
 } vpx_cpu_t;
 
 #if defined(__GNUC__) && __GNUC__ || defined(__ANDROID__)
-#if ARCH_X86_64
+#if VPX_ARCH_X86_64
 #define cpuid(func, func2, ax, bx, cx, dx)                      \
   __asm__ __volatile__("cpuid           \n\t"                   \
                        : "=a"(ax), "=b"(bx), "=c"(cx), "=d"(dx) \
@@ -59,7 +59,7 @@ typedef enum {
 #endif
 #elif defined(__SUNPRO_C) || \
     defined(__SUNPRO_CC) /* end __GNUC__ or __ANDROID__*/
-#if ARCH_X86_64
+#if VPX_ARCH_X86_64
 #define cpuid(func, func2, ax, bx, cx, dx)     \
   asm volatile(                                \
       "xchg %rsi, %rbx \n\t"                   \
@@ -79,7 +79,7 @@ typedef enum {
       : "a"(func), "c"(func2));
 #endif
 #else /* end __SUNPRO__ */
-#if ARCH_X86_64
+#if VPX_ARCH_X86_64
 #if defined(_MSC_VER) && _MSC_VER > 1500
 #define cpuid(func, func2, a, b, c, d) \
   do {                                 \
@@ -202,6 +202,7 @@ static INLINE int x86_simd_caps(void) {
 
   // bits 27 (OSXSAVE) & 28 (256-bit AVX)
   if ((reg_ecx & (BIT(27) | BIT(28))) == (BIT(27) | BIT(28))) {
+    // Check for OS-support of YMM state. Necessary for AVX and AVX2.
     if ((xgetbv() & 0x6) == 0x6) {
       flags |= HAS_AVX;
 
@@ -214,8 +215,10 @@ static INLINE int x86_simd_caps(void) {
         // bits 16 (AVX-512F) & 17 (AVX-512DQ) & 28 (AVX-512CD) &
         // 30 (AVX-512BW) & 32 (AVX-512VL)
         if ((reg_ebx & (BIT(16) | BIT(17) | BIT(28) | BIT(30) | BIT(31))) ==
-            (BIT(16) | BIT(17) | BIT(28) | BIT(30) | BIT(31)))
-          flags |= HAS_AVX512;
+            (BIT(16) | BIT(17) | BIT(28) | BIT(30) | BIT(31))) {
+          // Check for OS-support of ZMM and YMM state. Necessary for AVX-512.
+          if ((xgetbv() & 0xe6) == 0xe6) flags |= HAS_AVX512;
+        }
       }
     }
   }
@@ -253,7 +256,7 @@ static INLINE unsigned int x86_readtsc(void) {
   asm volatile("rdtsc\n\t" : "=a"(tsc) :);
   return tsc;
 #else
-#if ARCH_X86_64
+#if VPX_ARCH_X86_64
   return (unsigned int)__rdtsc();
 #else
   __asm rdtsc;
@@ -271,7 +274,7 @@ static INLINE uint64_t x86_readtsc64(void) {
   asm volatile("rdtsc\n\t" : "=a"(lo), "=d"(hi));
   return ((uint64_t)hi << 32) | lo;
 #else
-#if ARCH_X86_64
+#if VPX_ARCH_X86_64
   return (uint64_t)__rdtsc();
 #else
   __asm rdtsc;
@@ -293,7 +296,7 @@ static INLINE unsigned int x86_readtscp(void) {
   unsigned int ui;
   return (unsigned int)__rdtscp(&ui);
 #else
-#if ARCH_X86_64
+#if VPX_ARCH_X86_64
   return (unsigned int)__rdtscp();
 #else
   __asm rdtscp;
@@ -319,7 +322,7 @@ static INLINE unsigned int x86_tsc_end(void) {
 #elif defined(__SUNPRO_C) || defined(__SUNPRO_CC)
 #define x86_pause_hint() asm volatile("pause \n\t")
 #else
-#if ARCH_X86_64
+#if VPX_ARCH_X86_64
 #define x86_pause_hint() _mm_pause();
 #else
 #define x86_pause_hint() __asm pause
@@ -344,7 +347,7 @@ static unsigned short x87_get_control_word(void) {
   asm volatile("fstcw %0\n\t" : "=m"(*&mode) :);
   return mode;
 }
-#elif ARCH_X86_64
+#elif VPX_ARCH_X86_64
 /* No fldcw intrinsics on Windows x64, punt to external asm */
 extern void vpx_winx64_fldcw(unsigned short mode);
 extern unsigned short vpx_winx64_fstcw(void);

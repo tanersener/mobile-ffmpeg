@@ -49,7 +49,7 @@
 #include "tiffiop.h"
 
 #ifndef HAVE_GETOPT
-extern int getopt(int, char**, char*);
+extern int getopt(int argc, char * const argv[], const char *optstring);
 #endif
 
 static  uint32  width = 0, height = 0;          /* window width & height */

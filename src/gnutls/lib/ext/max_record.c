@@ -46,7 +46,8 @@ const hello_ext_entry_st ext_mod_max_record_size = {
 	.name = "Maximum Record Size",
 	.tls_id = 1,
 	.gid = GNUTLS_EXTENSION_MAX_RECORD_SIZE,
-	.parse_type = GNUTLS_EXT_TLS,
+	.client_parse_point = GNUTLS_EXT_TLS,
+	.server_parse_point = GNUTLS_EXT_TLS,
 	.validity = GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_DTLS | GNUTLS_EXT_FLAG_CLIENT_HELLO |
 		    GNUTLS_EXT_FLAG_EE | GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
 	.recv_func = _gnutls_max_record_recv_params,

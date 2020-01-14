@@ -241,10 +241,12 @@ _gnutls_read_client_hello_v2(gnutls_session_t session, uint8_t * data,
 		session->internals.resumed = RESUME_TRUE;
 		return 0;
 	} else {
-		_gnutls_generate_session_id(session->security_parameters.
-					    session_id,
-					    &session->security_parameters.
-					    session_id_size);
+		ret = _gnutls_generate_session_id(
+			session->security_parameters.session_id,
+			&session->security_parameters.session_id_size);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
 		session->internals.resumed = RESUME_FALSE;
 	}
 

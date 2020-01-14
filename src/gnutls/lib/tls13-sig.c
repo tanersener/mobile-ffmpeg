@@ -74,7 +74,7 @@ _gnutls13_handshake_verify_data(gnutls_session_t session,
 	if (ret < 0)
 		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
-	if (se->tls13_ok == 0) /* explicitly prohibited */
+	if ((se->flags & GNUTLS_SIGN_FLAG_TLS13_OK) == 0) /* explicitly prohibited */
 		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
 	gnutls_pubkey_get_key_usage(cert->pubkey, &key_usage);
@@ -152,7 +152,7 @@ _gnutls13_handshake_sign_data(gnutls_session_t session,
 	gnutls_buffer_st buf;
 	uint8_t tmp[MAX_HASH_SIZE];
 
-	if (unlikely(se == NULL || se->tls13_ok == 0))
+	if (unlikely(se == NULL || (se->flags & GNUTLS_SIGN_FLAG_TLS13_OK) == 0))
 		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
 	if (unlikely(sign_supports_priv_pk_algorithm(se, pkey->pk_algorithm) == 0))

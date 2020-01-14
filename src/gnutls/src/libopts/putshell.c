@@ -12,7 +12,7 @@
 /*
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
- *  AutoOpts is Copyright (C) 1992-2015 by Bruce Korb - all rights reserved
+ *  AutoOpts is Copyright (C) 1992-2018 by Bruce Korb - all rights reserved
  *
  *  AutoOpts is available under any one of two licenses.  The license
  *  in use must be one of these two and the choice is under the control
@@ -30,29 +30,6 @@
  *  4379e7444a0e2ce2b12dd6f5a52a27a4d02d39d247901d3285c88cf0d37f477b  COPYING.lgplv3
  *  13aa749a5b0a454917a944ed8fffc530b784f5ead522b1aacaf4ec8aa55a6239  COPYING.mbsd
  */
-
-/* = = = START-STATIC-FORWARD = = = */
-static size_t
-string_size(char const * scan, size_t nl_len);
-
-static char const *
-print_quoted_apostrophes(char const * str);
-
-static void
-print_quot_str(char const * str);
-
-static void
-print_enumeration(tOptions * pOpts, tOptDesc * pOD);
-
-static void
-print_membership(tOptions * pOpts, tOptDesc * pOD);
-
-static void
-print_stacked_arg(tOptions * pOpts, tOptDesc * pOD);
-
-static void
-print_reordering(tOptions * opts);
-/* = = = END-STATIC-FORWARD = = = */
 
 /**
  * Count the number of bytes required to represent a string as a
@@ -183,7 +160,7 @@ optionQuoteString(char const * text, char const * nl)
             *(out++) = '"';
             *(out++) = NUL;
 #ifndef NDEBUG
-            if ((out - res) > out_sz) {
+            if ((size_t)(out - res) > out_sz) {
                 fputs(misguess_len, stderr);
                 option_exits(EXIT_FAILURE);
             }

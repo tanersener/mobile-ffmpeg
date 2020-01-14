@@ -14,6 +14,7 @@
     - [Xcode builds](#xcode-builds)
     - [Emscripten builds](#emscripten-builds)
     - [Extra Build Flags](#extra-build-flags)
+    - [Build with VMAF support](#build-with-vmaf)
 2. [Testing the library](#testing-the-av1-codec)
     - [Basics](#testing-basics)
         - [Unit tests](#1_unit-tests)
@@ -47,7 +48,9 @@
  2. [Git](https://git-scm.com/).
  3. [Perl](https://www.perl.org/).
  4. For x86 targets, [yasm](http://yasm.tortall.net/), which is preferred, or a
-    recent version of [nasm](http://www.nasm.us/).
+    recent version of [nasm](http://www.nasm.us/). If you download yasm with
+    the intention to work with Visual Studio, please download win32.exe or
+    win64.exe and rename it into yasm.exe. DO NOT download or use vsyasm.exe.
  5. Building the documentation requires [doxygen](http://doxygen.org).
  6. Building the unit tests requires [Python](https://www.python.org/).
  7. Emscripten builds require the portable
@@ -291,6 +294,24 @@ These flags can be used, for example, to enable asserts in a release build:
         -DCMAKE_BUILD_TYPE=Release \
         -DAOM_EXTRA_C_FLAGS=-UNDEBUG \
         -DAOM_EXTRA_CXX_FLAGS=-UNDEBUG
+~~~
+
+### Build with VMAF support
+
+After installing
+[libvmaf.a](https://github.com/Netflix/vmaf/blob/master/resource/doc/libvmaf.md),
+you can use it with the encoder:
+
+~~~
+    $ cmake path/to/aom -DCONFIG_TUNE_VMAF=1
+~~~
+
+Please note that the default VMAF model
+("/usr/local/share/model/vmaf_v0.6.1.pkl")
+will be used unless you set the following flag when running the encoder:
+
+~~~
+    # --vmaf-model-path=path/to/model
 ~~~
 
 ## Testing the AV1 codec

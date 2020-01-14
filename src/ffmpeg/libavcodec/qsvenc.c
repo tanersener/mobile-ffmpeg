@@ -139,6 +139,9 @@ static void dump_video_param(AVCodecContext *avctx, QSVEncContext *q,
 #if QSV_HAVE_CO3
     mfxExtCodingOption3 *co3 = (mfxExtCodingOption3*)coding_opts[2];
 #endif
+#if QSV_HAVE_EXT_HEVC_TILES
+    mfxExtHEVCTiles *exthevctiles = (mfxExtHEVCTiles *)coding_opts[3 + QSV_HAVE_CO_VPS];
+#endif
 
     av_log(avctx, AV_LOG_VERBOSE, "profile: %s; level: %"PRIu16"\n",
            print_profile(info->CodecProfile), info->CodecLevel);
@@ -203,6 +206,12 @@ static void dump_video_param(AVCodecContext *avctx, QSVEncContext *q,
            info->NumSlice, info->NumRefFrame);
     av_log(avctx, AV_LOG_VERBOSE, "RateDistortionOpt: %s\n",
            print_threestate(co->RateDistortionOpt));
+
+#if QSV_HAVE_EXT_HEVC_TILES
+    if (avctx->codec_id == AV_CODEC_ID_HEVC)
+        av_log(avctx, AV_LOG_VERBOSE, "NumTileColumns: %"PRIu16"; NumTileRows: %"PRIu16"\n",
+               exthevctiles->NumTileColumns, exthevctiles->NumTileRows);
+#endif
 
 #if QSV_HAVE_CO2
     av_log(avctx, AV_LOG_VERBOSE,
@@ -637,7 +646,8 @@ static int init_video_param(AVCodecContext *avctx, QSVEncContext *q)
     // The HEVC encoder plugin currently fails with some old libmfx version if coding options
     // are provided. Can't find the extract libmfx version which fixed it, just enable it from
     // V1.28 in order to keep compatibility security.
-    if ((avctx->codec_id != AV_CODEC_ID_HEVC) || QSV_RUNTIME_VERSION_ATLEAST(q->ver, 1, 28)) {
+    if (((avctx->codec_id != AV_CODEC_ID_HEVC) || QSV_RUNTIME_VERSION_ATLEAST(q->ver, 1, 28))
+        && (avctx->codec_id != AV_CODEC_ID_VP9)) {
         q->extco.Header.BufferId      = MFX_EXTBUFF_CODING_OPTION;
         q->extco.Header.BufferSz      = sizeof(q->extco);
 
@@ -761,6 +771,25 @@ FF_ENABLE_DEPRECATION_WARNINGS
 #endif
     }
 
+#if QSV_HAVE_EXT_VP9_PARAM
+    if (avctx->codec_id == AV_CODEC_ID_VP9) {
+        q->extvp9param.Header.BufferId = MFX_EXTBUFF_VP9_PARAM;
+        q->extvp9param.Header.BufferSz = sizeof(q->extvp9param);
+        q->extvp9param.WriteIVFHeaders = MFX_CODINGOPTION_OFF;
+        q->extparam_internal[q->nb_extparam_internal++] = (mfxExtBuffer *)&q->extvp9param;
+    }
+#endif
+
+#if QSV_HAVE_EXT_HEVC_TILES
+    if (avctx->codec_id == AV_CODEC_ID_HEVC) {
+        q->exthevctiles.Header.BufferId = MFX_EXTBUFF_HEVC_TILES;
+        q->exthevctiles.Header.BufferSz = sizeof(q->exthevctiles);
+        q->exthevctiles.NumTileColumns  = q->tile_cols;
+        q->exthevctiles.NumTileRows     = q->tile_rows;
+        q->extparam_internal[q->nb_extparam_internal++] = (mfxExtBuffer *)&q->exthevctiles;
+    }
+#endif
+
     if (!check_enc_param(avctx,q)) {
         av_log(avctx, AV_LOG_ERROR,
                "some encoding parameters are not supported by the QSV "
@@ -785,6 +814,55 @@ static int qsv_retrieve_enc_jpeg_params(AVCodecContext *avctx, QSVEncContext *q)
     // for qsv mjpeg the return value maybe 0 so alloc the buffer
     if (q->packet_size == 0)
         q->packet_size = q->param.mfx.FrameInfo.Height * q->param.mfx.FrameInfo.Width * 4;
+
+    return 0;
+}
+
+static int qsv_retrieve_enc_vp9_params(AVCodecContext *avctx, QSVEncContext *q)
+{
+    int ret = 0;
+#if QSV_HAVE_EXT_VP9_PARAM
+    mfxExtVP9Param vp9_extend_buf = {
+         .Header.BufferId = MFX_EXTBUFF_VP9_PARAM,
+         .Header.BufferSz = sizeof(vp9_extend_buf),
+    };
+#endif
+
+#if QSV_HAVE_CO2
+    mfxExtCodingOption2 co2 = {
+        .Header.BufferId = MFX_EXTBUFF_CODING_OPTION2,
+        .Header.BufferSz = sizeof(co2),
+    };
+#endif
+
+#if QSV_HAVE_CO3
+    mfxExtCodingOption3 co3 = {
+        .Header.BufferId = MFX_EXTBUFF_CODING_OPTION3,
+        .Header.BufferSz = sizeof(co3),
+    };
+#endif
+
+    mfxExtBuffer *ext_buffers[] = {
+#if QSV_HAVE_EXT_VP9_PARAM
+        (mfxExtBuffer*)&vp9_extend_buf,
+#endif
+#if QSV_HAVE_CO2
+        (mfxExtBuffer*)&co2,
+#endif
+#if QSV_HAVE_CO3
+        (mfxExtBuffer*)&co3,
+#endif
+    };
+
+    q->param.ExtParam    = ext_buffers;
+    q->param.NumExtParam = FF_ARRAY_ELEMS(ext_buffers);
+
+    ret = MFXVideoENCODE_GetVideoParam(q->session, &q->param);
+    if (ret < 0)
+        return ff_qsv_print_error(avctx, ret,
+                                  "Error calling GetVideoParam");
+
+    q->packet_size = q->param.mfx.BufferSizeInKB * q->param.mfx.BRCParamMultiplier * 1000;
 
     return 0;
 }
@@ -830,7 +908,14 @@ static int qsv_retrieve_enc_params(AVCodecContext *avctx, QSVEncContext *q)
     };
 #endif
 
-    mfxExtBuffer *ext_buffers[2 + QSV_HAVE_CO2 + QSV_HAVE_CO3 + QSV_HAVE_CO_VPS];
+#if QSV_HAVE_EXT_HEVC_TILES
+    mfxExtHEVCTiles hevc_tile_buf = {
+         .Header.BufferId = MFX_EXTBUFF_HEVC_TILES,
+         .Header.BufferSz = sizeof(hevc_tile_buf),
+    };
+#endif
+
+    mfxExtBuffer *ext_buffers[2 + QSV_HAVE_CO2 + QSV_HAVE_CO3 + QSV_HAVE_CO_VPS + QSV_HAVE_EXT_HEVC_TILES];
 
     int need_pps = avctx->codec_id != AV_CODEC_ID_MPEG2VIDEO;
     int ret, ext_buf_num = 0, extradata_offset = 0;
@@ -847,6 +932,10 @@ static int qsv_retrieve_enc_params(AVCodecContext *avctx, QSVEncContext *q)
     q->hevc_vps = ((avctx->codec_id == AV_CODEC_ID_HEVC) && QSV_RUNTIME_VERSION_ATLEAST(q->ver, 1, 17));
     if (q->hevc_vps)
         ext_buffers[ext_buf_num++] = (mfxExtBuffer*)&extradata_vps;
+#endif
+#if QSV_HAVE_EXT_HEVC_TILES
+    if (avctx->codec_id == AV_CODEC_ID_HEVC)
+        ext_buffers[ext_buf_num++] = (mfxExtBuffer*)&hevc_tile_buf;
 #endif
 
     q->param.ExtParam    = ext_buffers;
@@ -1052,25 +1141,6 @@ int ff_qsv_enc_init(AVCodecContext *avctx, QSVEncContext *q)
     if (ret < 0)
         return ret;
 
-    ret = MFXVideoENCODE_Query(q->session, &q->param, &q->param);
-    if (ret == MFX_WRN_PARTIAL_ACCELERATION) {
-        av_log(avctx, AV_LOG_WARNING, "Encoder will work with partial HW acceleration\n");
-    } else if (ret < 0) {
-        return ff_qsv_print_error(avctx, ret,
-                                  "Error querying encoder params");
-    }
-
-    ret = MFXVideoENCODE_QueryIOSurf(q->session, &q->param, &q->req);
-    if (ret < 0)
-        return ff_qsv_print_error(avctx, ret,
-                                  "Error querying (IOSurf) the encoding parameters");
-
-    if (opaque_alloc) {
-        ret = qsv_init_opaque_alloc(avctx, q);
-        if (ret < 0)
-            return ret;
-    }
-
     if (avctx->hwaccel_context) {
         AVQSVContext *qsv = avctx->hwaccel_context;
         int i, j;
@@ -1100,6 +1170,25 @@ int ff_qsv_enc_init(AVCodecContext *avctx, QSVEncContext *q)
         q->param.NumExtParam = q->nb_extparam_internal;
     }
 
+    ret = MFXVideoENCODE_Query(q->session, &q->param, &q->param);
+    if (ret == MFX_WRN_PARTIAL_ACCELERATION) {
+        av_log(avctx, AV_LOG_WARNING, "Encoder will work with partial HW acceleration\n");
+    } else if (ret < 0) {
+        return ff_qsv_print_error(avctx, ret,
+                                  "Error querying encoder params");
+    }
+
+    ret = MFXVideoENCODE_QueryIOSurf(q->session, &q->param, &q->req);
+    if (ret < 0)
+        return ff_qsv_print_error(avctx, ret,
+                                  "Error querying (IOSurf) the encoding parameters");
+
+    if (opaque_alloc) {
+        ret = qsv_init_opaque_alloc(avctx, q);
+        if (ret < 0)
+            return ret;
+    }
+
     ret = MFXVideoENCODE_Init(q->session, &q->param);
     if (ret < 0)
         return ff_qsv_print_error(avctx, ret,
@@ -1111,6 +1200,9 @@ int ff_qsv_enc_init(AVCodecContext *avctx, QSVEncContext *q)
     switch (avctx->codec_id) {
     case AV_CODEC_ID_MJPEG:
         ret = qsv_retrieve_enc_jpeg_params(avctx, q);
+        break;
+    case AV_CODEC_ID_VP9:
+        ret = qsv_retrieve_enc_vp9_params(avctx, q);
         break;
     default:
         ret = qsv_retrieve_enc_params(avctx, q);

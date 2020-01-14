@@ -9,7 +9,7 @@
 /*
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
- *  AutoOpts is Copyright (C) 1992-2015 by Bruce Korb - all rights reserved
+ *  AutoOpts is Copyright (C) 1992-2018 by Bruce Korb - all rights reserved
  *
  *  AutoOpts is available under any one of two licenses.  The license
  *  in use must be one of these two and the choice is under the control
@@ -27,50 +27,6 @@
  *  4379e7444a0e2ce2b12dd6f5a52a27a4d02d39d247901d3285c88cf0d37f477b  COPYING.lgplv3
  *  13aa749a5b0a454917a944ed8fffc530b784f5ead522b1aacaf4ec8aa55a6239  COPYING.mbsd
  */
-
-/* = = = START-STATIC-FORWARD = = = */
-static void
-file_preset(tOptions * opts, char const * fname, int dir);
-
-static char *
-handle_comment(char * txt);
-
-static char *
-handle_cfg(tOptions * opts, tOptState * ost, char * txt, int dir);
-
-static char *
-handle_directive(tOptions * opts, char * txt);
-
-static char *
-aoflags_directive(tOptions * opts, char * txt);
-
-static char *
-program_directive(tOptions * opts, char * txt);
-
-static char *
-handle_section(tOptions * opts, char * txt);
-
-static int
-parse_xml_encoding(char ** ppz);
-
-static char *
-trim_xml_text(char * intxt, char const * pznm, tOptionLoadMode mode);
-
-static void
-cook_xml_text(char * pzData);
-
-static char *
-handle_struct(tOptions * opts, tOptState * ost, char * txt, int dir);
-
-static char const *
-parse_keyword(tOptions * opts, char const * txt, tOptionValue * typ);
-
-static char const *
-parse_set_mem(tOptions * opts, char const * txt, tOptionValue * typ);
-
-static char const *
-parse_value(char const * txt, tOptionValue * typ);
-/* = = = END-STATIC-FORWARD = = = */
 
 /**
  *  Skip over some unknown attribute
@@ -466,6 +422,7 @@ file_preset(tOptions * opts, char const * fname, int dir)
                 ftext = strchr(ftext + 2, '>');
                 if (ftext++ != NULL)
                     break;
+                /* FALLTHROUGH */
 
             default:
                 ftext = NULL;
@@ -626,9 +583,9 @@ handle_directive(tOptions * opts, char * txt)
 
     for (ix = 0; ix < dir_ct; ix++) {
         size_t len = strlen(dir_names[ix]);
-        if (  (strncmp(txt + 2, dir_names[ix], len) == 0)
-           && (! IS_VALUE_NAME_CHAR(txt[len+2])) )
-            return dir_disp[ix](opts, txt + len + 2);
+        if (  (strncmp(txt, dir_names[ix], len) == 0)
+           && (! IS_VALUE_NAME_CHAR(txt[len])) )
+            return dir_disp[ix](opts, txt + len);
     }
 
     /*
@@ -681,38 +638,28 @@ aoflags_directive(tOptions * opts, char * txt)
 static char *
 program_directive(tOptions * opts, char * txt)
 {
-    static char const ttlfmt[] = "<?";
-    size_t ttl_len  = sizeof(ttlfmt) + strlen(zCfgProg);
-    char * ttl      = AGALOC(ttl_len, "prog title");
     size_t name_len = strlen(opts->pzProgName);
 
-    memcpy(ttl, ttlfmt, sizeof(ttlfmt) - 1);
-    memcpy(ttl + sizeof(ttlfmt) - 1, zCfgProg, ttl_len - (sizeof(ttlfmt) - 1));
-
-    do  {
-        txt = SPN_WHITESPACE_CHARS(txt+1);
+    for (;; txt += zCfgProg_LEN) {
+        txt = SPN_WHITESPACE_CHARS(txt);
 
         if (  (strneqvcmp(txt, opts->pzProgName, (int)name_len) == 0)
-           && (IS_END_XML_TOKEN_CHAR(txt[name_len])) ) {
-            txt += name_len;
-            break;
-        }
+           && (IS_END_XML_TOKEN_CHAR(txt[name_len])) )
 
-        txt = strstr(txt, ttl);
-    } while (txt != NULL);
+            return txt + name_len;
 
-    AGFREE(ttl);
-    if (txt != NULL)
-        for (;;) {
-            if (*txt == NUL) {
-                txt = NULL;
-                break;
-            }
-            if (*(txt++) == '>')
-                break;
-        }
+        txt = strstr(txt, zCfgProg);
+        if (txt == NULL)
+            return txt;
+    }
 
-    return txt;
+    for (;;) {
+        if (*txt == NUL)
+            return NULL;
+
+        if (*(txt++) == '>')
+            return txt;
+    }
 }
 
 /**
@@ -1006,7 +953,7 @@ handle_struct(tOptions * opts, tOptState * ost, char * txt, int dir)
  *  scanning the "homerc" list, or from a specific file request.
  *  (see "optionFileLoad()", the implementation for --load-opts)
  */
-LOCAL void
+static void
 intern_file_load(tOptions * opts)
 {
     uint32_t  svfl;
@@ -1207,7 +1154,7 @@ optionLoadOpt(tOptions * opts, tOptDesc * odesc)
  *
  * @returns NULL on failure, otherwise the scan point
  */
-LOCAL char const *
+static char const *
 parse_attrs(tOptions * opts, char const * txt, tOptionLoadMode * pMode,
             tOptionValue * pType)
 {

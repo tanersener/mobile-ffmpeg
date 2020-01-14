@@ -174,8 +174,9 @@ int av1_block_wavelet_energy_level(const AV1_COMP *cpi, MACROBLOCK *x,
                                    BLOCK_SIZE bs) {
   double energy, energy_midpoint;
   aom_clear_system_state();
-  energy_midpoint = (cpi->oxcf.pass == 2) ? cpi->twopass.frame_avg_haar_energy
-                                          : DEFAULT_E_MIDPOINT;
+  energy_midpoint = (is_stat_consumption_stage_twopass(cpi))
+                        ? cpi->twopass.frame_avg_haar_energy
+                        : DEFAULT_E_MIDPOINT;
   energy = av1_log_block_wavelet_energy(x, bs) - energy_midpoint;
   return clamp((int)round(energy), ENERGY_MIN, ENERGY_MAX);
 }

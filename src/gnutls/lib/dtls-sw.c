@@ -40,20 +40,6 @@
 
 #define DTLS_EMPTY_BITMAP		(0xFFFFFFFFFFFFFFFFULL)
 
-/* We expect the compiler to be able to spot that this is a byteswapping
- * load, and emit instructions like 'movbe' on x86_64 where appropriate.
-*/
-#define LOAD_UINT64(out, ubytes)  \
-	out = (((uint64_t)ubytes[0] << 56) |	\
-	       ((uint64_t)ubytes[1] << 48) |	\
-	       ((uint64_t)ubytes[2] << 40) |	\
-	       ((uint64_t)ubytes[3] << 32) |	\
-	       ((uint64_t)ubytes[4] << 24) |	\
-	       ((uint64_t)ubytes[5] << 16) |	\
-	       ((uint64_t)ubytes[6] << 8) |	\
-	       ((uint64_t)ubytes[7] << 0) )
-
-
 void _dtls_reset_window(struct record_parameters_st *rp)
 {
 	rp->dtls_sw_have_recv = 0;
@@ -63,12 +49,8 @@ void _dtls_reset_window(struct record_parameters_st *rp)
  * packet is detected it returns a negative value (but no sensible error code).
  * Otherwise zero.
  */
-int _dtls_record_check(struct record_parameters_st *rp, gnutls_uint64 * _seq)
+int _dtls_record_check(struct record_parameters_st *rp, uint64_t seq_num)
 {
-	uint64_t seq_num = 0;
-
-	LOAD_UINT64(seq_num, _seq->i);
-
 	if ((seq_num >> DTLS_EPOCH_SHIFT) != rp->epoch) {
 		return gnutls_assert_val(-1);
 	}

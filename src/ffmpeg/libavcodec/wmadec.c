@@ -585,8 +585,14 @@ static int wma_decode_block(WMACodecContext *s)
                     decode_exp_lsp(s, ch);
                 }
                 s->exponents_bsize[ch] = bsize;
+                s->exponents_initialized[ch] = 1;
             }
         }
+    }
+
+    for (ch = 0; ch < s->avctx->channels; ch++) {
+        if (s->channel_coded[ch] && !s->exponents_initialized[ch])
+            return AVERROR_INVALIDDATA;
     }
 
     /* parse spectral coefficients : just RLE encoding */

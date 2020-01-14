@@ -49,7 +49,7 @@ int av1_get_refresh_ref_frame_map(int refresh_frame_flags);
 
 void av1_update_ref_frame_map(AV1_COMP *cpi,
                               FRAME_UPDATE_TYPE frame_update_type,
-                              int ref_map_index,
+                              int show_existing_frame, int ref_map_index,
                               RefBufferStack *ref_buffer_stack);
 
 void av1_get_ref_frames(AV1_COMP *const cpi, RefBufferStack *ref_buffer_stack);

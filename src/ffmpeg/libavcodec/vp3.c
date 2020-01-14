@@ -2031,11 +2031,17 @@ static int vp4_mc_loop_filter(Vp3DecodeContext *s, int plane, int motion_x, int 
              plane_width,
              plane_height);
 
+#define safe_loop_filter(name, ptr, stride, bounding_values) \
+    if ((uintptr_t)(ptr) & 7) \
+        s->vp3dsp.name##_unaligned(ptr, stride, bounding_values); \
+    else \
+        s->vp3dsp.name(ptr, stride, bounding_values);
+
         if (x_offset)
-            s->vp3dsp.h_loop_filter(loop + loop_stride + x_offset + 1, loop_stride, bounding_values);
+            safe_loop_filter(h_loop_filter, loop + loop_stride + x_offset + 1, loop_stride, bounding_values);
 
         if (y_offset)
-            s->vp3dsp.v_loop_filter(loop + (y_offset + 1)*loop_stride + 1, loop_stride, bounding_values);
+            safe_loop_filter(v_loop_filter, loop + (y_offset + 1)*loop_stride + 1, loop_stride, bounding_values);
     }
 
     for (i = 0; i < 9; i++)
@@ -2961,7 +2967,7 @@ static int theora_decode_header(AVCodecContext *avctx, GetBitContext *gb)
     AVRational fps, aspect;
 
     s->theora_header = 0;
-    s->theora = get_bits_long(gb, 24);
+    s->theora = get_bits(gb, 24);
     av_log(avctx, AV_LOG_DEBUG, "Theora bitstream version %X\n", s->theora);
     if (!s->theora) {
         s->theora = 1;
@@ -2982,8 +2988,8 @@ static int theora_decode_header(AVCodecContext *avctx, GetBitContext *gb)
     s->height      = get_bits(gb, 16) << 4;
 
     if (s->theora >= 0x030200) {
-        visible_width  = get_bits_long(gb, 24);
-        visible_height = get_bits_long(gb, 24);
+        visible_width  = get_bits(gb, 24);
+        visible_height = get_bits(gb, 24);
 
         offset_x = get_bits(gb, 8); /* offset x */
         offset_y = get_bits(gb, 8); /* offset y, from bottom */
@@ -3011,8 +3017,8 @@ static int theora_decode_header(AVCodecContext *avctx, GetBitContext *gb)
                   fps.den, fps.num, 1 << 30);
     }
 
-    aspect.num = get_bits_long(gb, 24);
-    aspect.den = get_bits_long(gb, 24);
+    aspect.num = get_bits(gb, 24);
+    aspect.den = get_bits(gb, 24);
     if (aspect.num && aspect.den) {
         av_reduce(&avctx->sample_aspect_ratio.num,
                   &avctx->sample_aspect_ratio.den,

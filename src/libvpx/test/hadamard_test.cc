@@ -254,11 +254,11 @@ INSTANTIATE_TEST_CASE_P(
                       HadamardFuncWithSize(&vpx_hadamard_32x32_avx2, 32)));
 #endif  // HAVE_AVX2
 
-#if HAVE_SSSE3 && ARCH_X86_64
+#if HAVE_SSSE3 && VPX_ARCH_X86_64
 INSTANTIATE_TEST_CASE_P(
     SSSE3, HadamardLowbdTest,
     ::testing::Values(HadamardFuncWithSize(&vpx_hadamard_8x8_ssse3, 8)));
-#endif  // HAVE_SSSE3 && ARCH_X86_64
+#endif  // HAVE_SSSE3 && VPX_ARCH_X86_64
 
 #if HAVE_NEON
 INSTANTIATE_TEST_CASE_P(

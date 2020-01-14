@@ -11,7 +11,7 @@
 // This module provides a lot of the trivial WavPack API functions and several
 // functions that are common to both reading and writing WavPack files (like
 // WavpackCloseFile()). Functions here are restricted to those that have few
-// external dependancies and this is done so that applications that statically
+// external dependencies and this is done so that applications that statically
 // link to the WavPack library (like the command-line utilities on Windows)
 // do not need to include the entire library image if they only use a subset
 // of it. This module will be loaded for ANY WavPack application.
@@ -40,7 +40,7 @@ const uint32_t sample_rates [] = { 6000, 8000, 9600, 11025, 12000, 16000, 22050,
 // MODE_LOSSLESS:  file is lossless (either pure or hybrid)
 // MODE_HYBRID:  file is hybrid mode (either lossy or lossless)
 // MODE_FLOAT:  audio data is 32-bit ieee floating point
-// MODE_VALID_TAG:  file conatins a valid ID3v1 or APEv2 tag
+// MODE_VALID_TAG:  file contains a valid ID3v1 or APEv2 tag
 // MODE_HIGH:  file was created in "high" mode (information only)
 // MODE_FAST:  file was created in "fast" mode (information only)
 // MODE_EXTRA:  file was created using "extra" mode (information only)
@@ -346,11 +346,22 @@ void WavpackGetChannelIdentities (WavpackContext *wpc, unsigned char *identities
     *identities = 0;
 }
 
+// For local use only. Install a callback to be executed when WavpackCloseFile() is called,
+// usually used to dump some statistics accumulated during encode or decode.
+
+void install_close_callback (WavpackContext *wpc, void cb_func (void *wpc))
+{
+    wpc->close_callback = cb_func;
+}
+
 // Close the specified WavPack file and release all resources used by it.
 // Returns NULL.
 
 WavpackContext *WavpackCloseFile (WavpackContext *wpc)
 {
+    if (wpc->close_callback)
+        wpc->close_callback (wpc);
+
     if (wpc->streams) {
         free_streams (wpc);
 
@@ -372,6 +383,19 @@ WavpackContext *WavpackCloseFile (WavpackContext *wpc)
         wpc->reader->close (wpc->wvc_in);
 
     WavpackFreeWrapper (wpc);
+
+    if (wpc->metadata) {
+        int i;
+
+        for (i = 0; i < wpc->metacount; ++i)
+            if (wpc->metadata [i].data)
+                free (wpc->metadata [i].data);
+
+        free (wpc->metadata);
+    }
+
+    if (wpc->channel_identities)
+        free (wpc->channel_identities);
 
     if (wpc->channel_reordering)
         free (wpc->channel_reordering);
@@ -496,7 +520,7 @@ int WavpackGetReducedChannels (WavpackContext *wpc)
 }
 
 // Free all memory allocated for raw WavPack blocks (for all allocated streams)
-// and free all additonal streams. This does not free the default stream ([0])
+// and free all additional streams. This does not free the default stream ([0])
 // which is always kept around.
 
 void free_streams (WavpackContext *wpc)
@@ -525,31 +549,7 @@ void free_streams (WavpackContext *wpc)
         }
 
 #ifdef ENABLE_DSD
-        if (wpc->streams [si]->dsd.probabilities) {
-            free (wpc->streams [si]->dsd.probabilities);
-            wpc->streams [si]->dsd.probabilities = NULL;
-        }
-
-        if (wpc->streams [si]->dsd.summed_probabilities) {
-            free (wpc->streams [si]->dsd.summed_probabilities);
-            wpc->streams [si]->dsd.summed_probabilities = NULL;
-        }
-
-        if (wpc->streams [si]->dsd.value_lookup) {
-            int i;
-
-            for (i = 0; i < wpc->streams [si]->dsd.history_bins; ++i)
-                if (wpc->streams [si]->dsd.value_lookup [i])
-                    free (wpc->streams [si]->dsd.value_lookup [i]);
-
-            free (wpc->streams [si]->dsd.value_lookup);
-            wpc->streams [si]->dsd.value_lookup = NULL;
-        }
-
-        if (wpc->streams [si]->dsd.ptable) {
-            free (wpc->streams [si]->dsd.ptable);
-            wpc->streams [si]->dsd.ptable = NULL;
-        }
+        free_dsd_tables (wpc->streams [si]);
 #endif
 
         if (si) {
@@ -560,6 +560,34 @@ void free_streams (WavpackContext *wpc)
     }
 
     wpc->current_stream = 0;
+}
+
+void free_dsd_tables (WavpackStream *wps)
+{
+    if (wps->dsd.probabilities) {
+        free (wps->dsd.probabilities);
+        wps->dsd.probabilities = NULL;
+    }
+
+    if (wps->dsd.summed_probabilities) {
+        free (wps->dsd.summed_probabilities);
+        wps->dsd.summed_probabilities = NULL;
+    }
+
+    if (wps->dsd.lookup_buffer) {
+        free (wps->dsd.lookup_buffer);
+        wps->dsd.lookup_buffer = NULL;
+    }
+
+    if (wps->dsd.value_lookup) {
+        free (wps->dsd.value_lookup);
+        wps->dsd.value_lookup = NULL;
+    }
+
+    if (wps->dsd.ptable) {
+        free (wps->dsd.ptable);
+        wps->dsd.ptable = NULL;
+    }
 }
 
 void WavpackFloatNormalize (int32_t *values, int32_t num_values, int delta_exp)

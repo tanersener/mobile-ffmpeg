@@ -1,5 +1,3 @@
-/Makefile
-/.deps/
-/.libs/
 *.o
+/Makefile
 /addtiffo

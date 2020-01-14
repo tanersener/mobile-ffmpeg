@@ -278,7 +278,7 @@ void av1_fill_mode_rates(AV1_COMMON *const cm, MACROBLOCK *x,
       av1_cost_tokens_from_cdf(x->compound_type_cost[i],
                                fc->compound_type_cdf[i], NULL);
     for (i = 0; i < BLOCK_SIZES_ALL; ++i) {
-      if (get_interinter_wedge_bits(i)) {
+      if (av1_is_wedge_used(i)) {
         av1_cost_tokens_from_cdf(x->wedge_idx_cost[i], fc->wedge_idx_cdf[i],
                                  NULL);
       }
@@ -364,7 +364,7 @@ int av1_compute_rd_mult_based_on_qindex(const AV1_COMP *cpi, int qindex) {
 
 int av1_compute_rd_mult(const AV1_COMP *cpi, int qindex) {
   int64_t rdmult = av1_compute_rd_mult_based_on_qindex(cpi, qindex);
-  if (cpi->oxcf.pass == 2 &&
+  if (is_stat_consumption_stage(cpi) &&
       (cpi->common.current_frame.frame_type != KEY_FRAME)) {
     const GF_GROUP *const gf_group = &cpi->gf_group;
     const FRAME_UPDATE_TYPE frame_type = gf_group->update_type[gf_group->index];
@@ -413,7 +413,7 @@ int av1_get_adaptive_rdmult(const AV1_COMP *cpi, double beta) {
       break;
   }
 
-  if (cpi->oxcf.pass == 2 &&
+  if (is_stat_consumption_stage(cpi) &&
       (cpi->common.current_frame.frame_type != KEY_FRAME)) {
     const GF_GROUP *const gf_group = &cpi->gf_group;
     const FRAME_UPDATE_TYPE frame_type = gf_group->update_type[gf_group->index];
@@ -611,20 +611,20 @@ void av1_initialize_rd_consts(AV1_COMP *cpi) {
 
   set_block_thresholds(cm, rd);
 
-  if ((!cpi->sf.use_nonrd_pick_mode &&
+  if ((!cpi->sf.rt_sf.use_nonrd_pick_mode &&
        cpi->oxcf.mv_cost_upd_freq != COST_UPD_OFF) ||
       frame_is_intra_only(cm) || (cm->current_frame.frame_number & 0x07) == 1)
     av1_fill_mv_costs(cm->fc, cm->cur_frame_force_integer_mv,
                       cm->allow_high_precision_mv, x);
 
   if (frame_is_intra_only(cm) && cm->allow_screen_content_tools &&
-      cpi->oxcf.pass != 1) {
+      !is_stat_generation_stage(cpi)) {
     int *dvcost[2] = { &cpi->dv_cost[0][MV_MAX], &cpi->dv_cost[1][MV_MAX] };
     av1_build_nmv_cost_table(cpi->dv_joint_cost, dvcost, &cm->fc->ndvc,
                              MV_SUBPEL_NONE);
   }
 
-  if (cpi->oxcf.pass != 1) {
+  if (!is_stat_generation_stage(cpi)) {
     for (int i = 0; i < TRANS_TYPES; ++i)
       // IDENTITY: 1 bit
       // TRANSLATION: 3 bits
@@ -980,8 +980,8 @@ static void get_entropy_contexts_plane(BLOCK_SIZE plane_bsize,
                                        const struct macroblockd_plane *pd,
                                        ENTROPY_CONTEXT t_above[MAX_MIB_SIZE],
                                        ENTROPY_CONTEXT t_left[MAX_MIB_SIZE]) {
-  const int num_4x4_w = block_size_wide[plane_bsize] >> tx_size_wide_log2[0];
-  const int num_4x4_h = block_size_high[plane_bsize] >> tx_size_high_log2[0];
+  const int num_4x4_w = mi_size_wide[plane_bsize];
+  const int num_4x4_h = mi_size_high[plane_bsize];
   const ENTROPY_CONTEXT *const above = pd->above_context;
   const ENTROPY_CONTEXT *const left = pd->left_context;
 
@@ -989,13 +989,11 @@ static void get_entropy_contexts_plane(BLOCK_SIZE plane_bsize,
   memcpy(t_left, left, sizeof(ENTROPY_CONTEXT) * num_4x4_h);
 }
 
-void av1_get_entropy_contexts(BLOCK_SIZE bsize,
+void av1_get_entropy_contexts(BLOCK_SIZE plane_bsize,
                               const struct macroblockd_plane *pd,
                               ENTROPY_CONTEXT t_above[MAX_MIB_SIZE],
                               ENTROPY_CONTEXT t_left[MAX_MIB_SIZE]) {
-  assert(bsize < BLOCK_SIZES_ALL);
-  const BLOCK_SIZE plane_bsize =
-      get_plane_block_size(bsize, pd->subsampling_x, pd->subsampling_y);
+  assert(plane_bsize < BLOCK_SIZES_ALL);
   get_entropy_contexts_plane(plane_bsize, pd, t_above, t_left);
 }
 
@@ -1012,7 +1010,8 @@ void av1_mv_pred(const AV1_COMP *cpi, MACROBLOCK *x, uint8_t *ref_y_buffer,
   if (ref_mv.as_int != ref_mv1.as_int) {
     pred_mv[num_mv_refs++] = ref_mv1.as_mv;
   }
-  if (cpi->sf.adaptive_motion_search && block_size < x->max_partition_size) {
+  if (cpi->sf.mv_sf.adaptive_motion_search &&
+      block_size < x->max_partition_size) {
     pred_mv[num_mv_refs++] = x->pred_mv[ref_frame];
   }
 
@@ -1050,19 +1049,19 @@ void av1_mv_pred(const AV1_COMP *cpi, MACROBLOCK *x, uint8_t *ref_y_buffer,
 
 void av1_setup_pred_block(const MACROBLOCKD *xd,
                           struct buf_2d dst[MAX_MB_PLANE],
-                          const YV12_BUFFER_CONFIG *src, int mi_row, int mi_col,
+                          const YV12_BUFFER_CONFIG *src,
                           const struct scale_factors *scale,
                           const struct scale_factors *scale_uv,
                           const int num_planes) {
-  int i;
-
   dst[0].buf = src->y_buffer;
   dst[0].stride = src->y_stride;
   dst[1].buf = src->u_buffer;
   dst[2].buf = src->v_buffer;
   dst[1].stride = dst[2].stride = src->uv_stride;
 
-  for (i = 0; i < num_planes; ++i) {
+  const int mi_row = xd->mi_row;
+  const int mi_col = xd->mi_col;
+  for (int i = 0; i < num_planes; ++i) {
     setup_pred_plane(dst + i, xd->mi[0]->sb_type, dst[i].buf,
                      i ? src->uv_crop_width : src->y_crop_width,
                      i ? src->uv_crop_height : src->y_crop_height,
@@ -1108,7 +1107,7 @@ void av1_set_rd_speed_thresholds(AV1_COMP *cpi) {
   // Set baseline threshold values.
   for (i = 0; i < MAX_MODES; ++i) rd->thresh_mult[i] = cpi->oxcf.mode == 0;
 
-  if (sf->adaptive_rd_thresh) {
+  if (sf->inter_sf.adaptive_rd_thresh) {
     rd->thresh_mult[THR_NEARESTMV] = 300;
     rd->thresh_mult[THR_NEARESTL2] = 300;
     rd->thresh_mult[THR_NEARESTL3] = 300;

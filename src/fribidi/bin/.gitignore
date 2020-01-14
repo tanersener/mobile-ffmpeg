@@ -1,6 +1,6 @@
-*.o
 /.deps/
 /.libs/
+*.o
 /fribidi
 /fribidi-benchmark
 /fribidi-bidi-types

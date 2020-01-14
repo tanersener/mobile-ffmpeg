@@ -41,36 +41,13 @@ struct record_parameters_st {
 	unsigned epoch;
 };
 
-typedef struct {
-	unsigned char i[8];
-} gnutls_uint64;
 #define gnutls_assert_val(x) x
 
 void _dtls_reset_window(struct record_parameters_st *rp);
-int _dtls_record_check(struct record_parameters_st *rp, gnutls_uint64 * _seq);
-
-/* taken from nettle */
-#ifdef WORDS_BIGENDIAN
-# define BSWAP64(x) x
-#else
-# define BSWAP64(x) \
-	((((uint64_t)(x) & 0xff) << 56) \
-	| (((uint64_t)(x) & 0xff00) << 40) \
-	| (((uint64_t)(x) & 0xff0000) << 24) \
-	| (((uint64_t)(x) & 0xff000000) << 8) \
-	| (((uint64_t)(x) >> 8) & 0xff000000) \
-	| (((uint64_t)(x) >> 24) & 0xff0000) \
-	| (((uint64_t)(x) >> 40) & 0xff00) \
-	| ((uint64_t)(x) >> 56) )
-#endif 
+int _dtls_record_check(struct record_parameters_st *rp, uint64_t _seq);
 
 #define DTLS_SW_NO_INCLUDES
 #include "../lib/dtls-sw.c"
-
-static void uint64_set(gnutls_uint64* t, uint64_t v)
-{
-	memcpy(t->i, &v, 8);
-}
 
 #define RESET_WINDOW \
 	memset(&state, 0, sizeof(state))
@@ -79,78 +56,78 @@ static void uint64_set(gnutls_uint64* t, uint64_t v)
 	state.dtls_sw_next = (((x)&DTLS_SEQ_NUM_MASK))
 
 #define SET_WINDOW_LAST_RECV(x) \
-	uint64_set(&t, BSWAP64(x)); \
+	t = x; \
 	state.dtls_sw_have_recv = 1
 
 static void check_dtls_window_uninit_0(void **glob_state)
 {
 	struct record_parameters_st state;
-	gnutls_uint64 t;
+	uint64_t t;
 
 	RESET_WINDOW;
 	SET_WINDOW_NEXT(0);
 
-	uint64_set(&t, 0);
+	t = 0;
 
-	assert_int_equal(_dtls_record_check(&state, &t), 0);
+	assert_int_equal(_dtls_record_check(&state, t), 0);
 }
 
 static void check_dtls_window_uninit_large(void **glob_state)
 {
 	struct record_parameters_st state;
-	gnutls_uint64 t;
+	uint64_t t;
 
 	RESET_WINDOW;
 
-	uint64_set(&t, BSWAP64(LARGE_INT+1+64));
+	t = LARGE_INT+1+64;
 
-	assert_int_equal(_dtls_record_check(&state, &t), 0);
+	assert_int_equal(_dtls_record_check(&state, t), 0);
 }
 
 static void check_dtls_window_uninit_very_large(void **glob_state)
 {
 	struct record_parameters_st state;
-	gnutls_uint64 t;
+	uint64_t t;
 
 	RESET_WINDOW;
 
-	uint64_set(&t, BSWAP64(INT_OVER_32_BITS));
+	t = INT_OVER_32_BITS;
 
-	assert_int_equal(_dtls_record_check(&state, &t), 0);
+	assert_int_equal(_dtls_record_check(&state, t), 0);
 }
 
 static void check_dtls_window_12(void **glob_state)
 {
 	struct record_parameters_st state;
-	gnutls_uint64 t;
+	uint64_t t;
 
 	RESET_WINDOW;
 	SET_WINDOW_NEXT(0);
 	SET_WINDOW_LAST_RECV(1);
 
-	uint64_set(&t, BSWAP64(2));
+	t = 2;
 
-	assert_int_equal(_dtls_record_check(&state, &t), 0);
+	assert_int_equal(_dtls_record_check(&state, t), 0);
 }
 
 static void check_dtls_window_19(void **glob_state)
 {
 	struct record_parameters_st state;
-	gnutls_uint64 t;
+	uint64_t t;
 
 	RESET_WINDOW;
 	SET_WINDOW_NEXT(0);
 	SET_WINDOW_LAST_RECV(1);
 
-	uint64_set(&t, BSWAP64(9));
+	t = 9;
 
-	assert_int_equal(_dtls_record_check(&state, &t), 0);
+	assert_int_equal(_dtls_record_check(&state, t), 0);
 }
 
 static void check_dtls_window_skip1(void **glob_state)
 {
 	struct record_parameters_st state;
-	gnutls_uint64 t;
+	uint64_t t;
 	unsigned i;
 
 	RESET_WINDOW;
@@ -158,15 +135,15 @@ static void check_dtls_window_skip1(void **glob_state)
 	SET_WINDOW_LAST_RECV(1);
 
 	for (i=2;i<256;i+=2) {
-		uint64_set(&t, BSWAP64(i));
-		assert_int_equal(_dtls_record_check(&state, &t), 0);
+		t = i;
+		assert_int_equal(_dtls_record_check(&state, t), 0);
 	}
 }
 
 static void check_dtls_window_skip3(void **glob_state)
 {
 	struct record_parameters_st state;
-	gnutls_uint64 t;
+	uint64_t t;
 	unsigned i;
 
 	RESET_WINDOW;
@@ -174,327 +151,327 @@ static void check_dtls_window_skip3(void **glob_state)
 	SET_WINDOW_LAST_RECV(1);
 
 	for (i=5;i<256;i+=2) {
-		uint64_set(&t, BSWAP64(i));
-		assert_int_equal(_dtls_record_check(&state, &t), 0);
+		t = i;
+		assert_int_equal(_dtls_record_check(&state, t), 0);
 	}
 }
 
 static void check_dtls_window_21(void **glob_state)
 {
 	struct record_parameters_st state;
-	gnutls_uint64 t;
+	uint64_t t;
 
 	RESET_WINDOW;
 	SET_WINDOW_NEXT(0);
 	SET_WINDOW_LAST_RECV(2);
 
-	uint64_set(&t, BSWAP64(1));
+	t = 1;
 
-	assert_int_equal(_dtls_record_check(&state, &t), 0);
+	assert_int_equal(_dtls_record_check(&state, t), 0);
 }
 
 static void check_dtls_window_91(void **glob_state)
 {
 	struct record_parameters_st state;
-	gnutls_uint64 t;
+	uint64_t t;
 
 	RESET_WINDOW;
 	SET_WINDOW_NEXT(0);
 	SET_WINDOW_LAST_RECV(9);
 
-	uint64_set(&t, BSWAP64(1));
+	t = 1;
 
-	assert_int_equal(_dtls_record_check(&state, &t), 0);
+	assert_int_equal(_dtls_record_check(&state, t), 0);
 }
 
 static void check_dtls_window_large_21(void **glob_state)
 {
 	struct record_parameters_st state;
-	gnutls_uint64 t;
+	uint64_t t;
 
 	RESET_WINDOW;
 	SET_WINDOW_NEXT(LARGE_INT);
 	SET_WINDOW_LAST_RECV(LARGE_INT+2);
 
-	uint64_set(&t, BSWAP64(LARGE_INT+1));
+	t = LARGE_INT+1;
 
-	assert_int_equal(_dtls_record_check(&state, &t), 0);
+	assert_int_equal(_dtls_record_check(&state, t), 0);
 }
 
 static void check_dtls_window_large_12(void **glob_state)
 {
 	struct record_parameters_st state;
-	gnutls_uint64 t;
+	uint64_t t;
 
 	RESET_WINDOW;
 	SET_WINDOW_NEXT(LARGE_INT);
 	SET_WINDOW_LAST_RECV(LARGE_INT+1);
 
-	uint64_set(&t, BSWAP64(LARGE_INT+2));
+	t = LARGE_INT+2;
 
-	assert_int_equal(_dtls_record_check(&state, &t), 0);
+	assert_int_equal(_dtls_record_check(&state, t), 0);
 }
 
 static void check_dtls_window_large_91(void **glob_state)
 {
 	struct record_parameters_st state;
-	gnutls_uint64 t;
+	uint64_t t;
 
 	RESET_WINDOW;
 	SET_WINDOW_NEXT(LARGE_INT);
 	SET_WINDOW_LAST_RECV(LARGE_INT+9);
 
-	uint64_set(&t, BSWAP64(LARGE_INT+1));
+	t = LARGE_INT+1;
 
-	assert_int_equal(_dtls_record_check(&state, &t), 0);
+	assert_int_equal(_dtls_record_check(&state, t), 0);
 }
 
 static void check_dtls_window_large_19(void **glob_state)
 {
 	struct record_parameters_st state;
-	gnutls_uint64 t;
+	uint64_t t;
 
 	RESET_WINDOW;
 	SET_WINDOW_NEXT(LARGE_INT);
 	SET_WINDOW_LAST_RECV(LARGE_INT+1);
 
-	uint64_set(&t, BSWAP64(LARGE_INT+9));
+	t = LARGE_INT+9;
 
-	assert_int_equal(_dtls_record_check(&state, &t), 0);
+	assert_int_equal(_dtls_record_check(&state, t), 0);
 }
 
 static void check_dtls_window_very_large_12(void **glob_state)
 {
 	struct record_parameters_st state;
-	gnutls_uint64 t;
+	uint64_t t;
 
 	RESET_WINDOW;
 	SET_WINDOW_NEXT(INT_OVER_32_BITS);
 	SET_WINDOW_LAST_RECV(INT_OVER_32_BITS+1);
 
-	uint64_set(&t, BSWAP64(INT_OVER_32_BITS+2));
+	t = INT_OVER_32_BITS+2;
 
-	assert_int_equal(_dtls_record_check(&state, &t), 0);
+	assert_int_equal(_dtls_record_check(&state, t), 0);
 }
 
 static void check_dtls_window_very_large_91(void **glob_state)
 {
 	struct record_parameters_st state;
-	gnutls_uint64 t;
+	uint64_t t;
 
 	RESET_WINDOW;
 	SET_WINDOW_NEXT(INT_OVER_32_BITS);
 	SET_WINDOW_LAST_RECV(INT_OVER_32_BITS+9);
 
-	uint64_set(&t, BSWAP64(INT_OVER_32_BITS+1));
+	t = INT_OVER_32_BITS+1;
 
-	assert_int_equal(_dtls_record_check(&state, &t), 0);
+	assert_int_equal(_dtls_record_check(&state, t), 0);
 }
 
 static void check_dtls_window_very_large_19(void **glob_state)
 {
 	struct record_parameters_st state;
-	gnutls_uint64 t;
+	uint64_t t;
 
 	RESET_WINDOW;
 	SET_WINDOW_NEXT(INT_OVER_32_BITS);
 	SET_WINDOW_LAST_RECV(INT_OVER_32_BITS+1);
 
-	uint64_set(&t, BSWAP64(INT_OVER_32_BITS+9));
+	t = INT_OVER_32_BITS+9;
 
-	assert_int_equal(_dtls_record_check(&state, &t), 0);
+	assert_int_equal(_dtls_record_check(&state, t), 0);
 }
 
 static void check_dtls_window_outside(void **glob_state)
 {
 	struct record_parameters_st state;
-	gnutls_uint64 t;
+	uint64_t t;
 
 	RESET_WINDOW;
 	SET_WINDOW_NEXT(0);
 	SET_WINDOW_LAST_RECV(1);
 
-	uint64_set(&t, BSWAP64(1+64));
+	t = 1+64;
 
-	assert_int_equal(_dtls_record_check(&state, &t), 0);
+	assert_int_equal(_dtls_record_check(&state, t), 0);
 }
 
 static void check_dtls_window_large_outside(void **glob_state)
 {
 	struct record_parameters_st state;
-	gnutls_uint64 t;
+	uint64_t t;
 
 	RESET_WINDOW;
 	SET_WINDOW_NEXT(LARGE_INT);
 	SET_WINDOW_LAST_RECV(LARGE_INT+1);
 
-	uint64_set(&t, BSWAP64(LARGE_INT+1+64));
+	t = LARGE_INT+1+64;
 
-	assert_int_equal(_dtls_record_check(&state, &t), 0);
+	assert_int_equal(_dtls_record_check(&state, t), 0);
 }
 
 static void check_dtls_window_very_large_outside(void **glob_state)
 {
 	struct record_parameters_st state;
-	gnutls_uint64 t;
+	uint64_t t;
 
 	RESET_WINDOW;
 	SET_WINDOW_NEXT(INT_OVER_32_BITS);
 	SET_WINDOW_LAST_RECV(INT_OVER_32_BITS+1);
 
-	uint64_set(&t, BSWAP64(INT_OVER_32_BITS+1+64));
+	t = INT_OVER_32_BITS+1+64;
 
-	assert_int_equal(_dtls_record_check(&state, &t), 0);
+	assert_int_equal(_dtls_record_check(&state, t), 0);
 }
 
 static void check_dtls_window_dup1(void **glob_state)
 {
 	struct record_parameters_st state;
-	gnutls_uint64 t;
+	uint64_t t;
 
 	RESET_WINDOW;
 	SET_WINDOW_NEXT(LARGE_INT-1);
 	SET_WINDOW_LAST_RECV(LARGE_INT);
 
-	uint64_set(&t, BSWAP64(LARGE_INT));
-	assert_int_equal(_dtls_record_check(&state, &t), 0);
+	t = LARGE_INT;
+	assert_int_equal(_dtls_record_check(&state, t), 0);
 
-	uint64_set(&t, BSWAP64(LARGE_INT+1));
-	assert_int_equal(_dtls_record_check(&state, &t), 0);
+	t = LARGE_INT+1;
+	assert_int_equal(_dtls_record_check(&state, t), 0);
 
-	uint64_set(&t, BSWAP64(LARGE_INT+16));
-	assert_int_equal(_dtls_record_check(&state, &t), 0);
+	t = LARGE_INT+16;
+	assert_int_equal(_dtls_record_check(&state, t), 0);
 
-	uint64_set(&t, BSWAP64(LARGE_INT+1));
-	assert_int_equal(_dtls_record_check(&state, &t), -3);
+	t = LARGE_INT+1;
+	assert_int_equal(_dtls_record_check(&state, t), -3);
 }
 
 static void check_dtls_window_dup2(void **glob_state)
 {
 	struct record_parameters_st state;
-	gnutls_uint64 t;
+	uint64_t t;
 
 	RESET_WINDOW;
 	SET_WINDOW_NEXT(LARGE_INT-1);
 	SET_WINDOW_LAST_RECV(LARGE_INT);
 
-	uint64_set(&t, BSWAP64(LARGE_INT));
-	assert_int_equal(_dtls_record_check(&state, &t), 0);
+	t = LARGE_INT;
+	assert_int_equal(_dtls_record_check(&state, t), 0);
 
-	uint64_set(&t, BSWAP64(LARGE_INT+16));
-	assert_int_equal(_dtls_record_check(&state, &t), 0);
+	t = LARGE_INT+16;
+	assert_int_equal(_dtls_record_check(&state, t), 0);
 
-	uint64_set(&t, BSWAP64(LARGE_INT+1));
-	assert_int_equal(_dtls_record_check(&state, &t), 0);
+	t = LARGE_INT+1;
+	assert_int_equal(_dtls_record_check(&state, t), 0);
 
-	uint64_set(&t, BSWAP64(LARGE_INT+16));
-	assert_int_equal(_dtls_record_check(&state, &t), -3);
+	t = LARGE_INT+16;
+	assert_int_equal(_dtls_record_check(&state, t), -3);
 }
 
 static void check_dtls_window_dup3(void **glob_state)
 {
 	struct record_parameters_st state;
-	gnutls_uint64 t;
+	uint64_t t;
 
 	RESET_WINDOW;
 	SET_WINDOW_NEXT(LARGE_INT-1);
 	SET_WINDOW_LAST_RECV(LARGE_INT);
 
-	uint64_set(&t, BSWAP64(LARGE_INT));
-	assert_int_equal(_dtls_record_check(&state, &t), 0);
+	t = LARGE_INT;
+	assert_int_equal(_dtls_record_check(&state, t), 0);
 
-	uint64_set(&t, BSWAP64(LARGE_INT+16));
-	assert_int_equal(_dtls_record_check(&state, &t), 0);
+	t = LARGE_INT+16;
+	assert_int_equal(_dtls_record_check(&state, t), 0);
 
-	uint64_set(&t, BSWAP64(LARGE_INT+15));
-	assert_int_equal(_dtls_record_check(&state, &t), 0);
+	t = LARGE_INT+15;
+	assert_int_equal(_dtls_record_check(&state, t), 0);
 
-	uint64_set(&t, BSWAP64(LARGE_INT+14));
-	assert_int_equal(_dtls_record_check(&state, &t), 0);
+	t = LARGE_INT+14;
+	assert_int_equal(_dtls_record_check(&state, t), 0);
 
-	uint64_set(&t, BSWAP64(LARGE_INT+5));
-	assert_int_equal(_dtls_record_check(&state, &t), 0);
+	t = LARGE_INT+5;
+	assert_int_equal(_dtls_record_check(&state, t), 0);
 
-	uint64_set(&t, BSWAP64(LARGE_INT+5));
-	assert_int_equal(_dtls_record_check(&state, &t), -3);
+	t = LARGE_INT+5;
+	assert_int_equal(_dtls_record_check(&state, t), -3);
 }
 
 static void check_dtls_window_out_of_order(void **glob_state)
 {
 	struct record_parameters_st state;
-	gnutls_uint64 t;
+	uint64_t t;
 
 	RESET_WINDOW;
 	SET_WINDOW_NEXT(LARGE_INT-1);
 	SET_WINDOW_LAST_RECV(LARGE_INT);
 
-	uint64_set(&t, BSWAP64(LARGE_INT));
-	assert_int_equal(_dtls_record_check(&state, &t), 0);
+	t = LARGE_INT;
+	assert_int_equal(_dtls_record_check(&state, t), 0);
 
-	uint64_set(&t, BSWAP64(LARGE_INT+8));
-	assert_int_equal(_dtls_record_check(&state, &t), 0);
+	t = LARGE_INT+8;
+	assert_int_equal(_dtls_record_check(&state, t), 0);
 
-	uint64_set(&t, BSWAP64(LARGE_INT+7));
-	assert_int_equal(_dtls_record_check(&state, &t), 0);
+	t = LARGE_INT+7;
+	assert_int_equal(_dtls_record_check(&state, t), 0);
 
-	uint64_set(&t, BSWAP64(LARGE_INT+6));
-	assert_int_equal(_dtls_record_check(&state, &t), 0);
+	t = LARGE_INT+6;
+	assert_int_equal(_dtls_record_check(&state, t), 0);
 
-	uint64_set(&t, BSWAP64(LARGE_INT+5));
-	assert_int_equal(_dtls_record_check(&state, &t), 0);
+	t = LARGE_INT+5;
+	assert_int_equal(_dtls_record_check(&state, t), 0);
 
-	uint64_set(&t, BSWAP64(LARGE_INT+4));
-	assert_int_equal(_dtls_record_check(&state, &t), 0);
+	t = LARGE_INT+4;
+	assert_int_equal(_dtls_record_check(&state, t), 0);
 
-	uint64_set(&t, BSWAP64(LARGE_INT+3));
-	assert_int_equal(_dtls_record_check(&state, &t), 0);
+	t = LARGE_INT+3;
+	assert_int_equal(_dtls_record_check(&state, t), 0);
 
-	uint64_set(&t, BSWAP64(LARGE_INT+2));
-	assert_int_equal(_dtls_record_check(&state, &t), 0);
+	t = LARGE_INT+2;
+	assert_int_equal(_dtls_record_check(&state, t), 0);
 
-	uint64_set(&t, BSWAP64(LARGE_INT+1));
-	assert_int_equal(_dtls_record_check(&state, &t), 0);
+	t = LARGE_INT+1;
+	assert_int_equal(_dtls_record_check(&state, t), 0);
 
-	uint64_set(&t, BSWAP64(LARGE_INT+9));
-	assert_int_equal(_dtls_record_check(&state, &t), 0);
+	t = LARGE_INT+9;
+	assert_int_equal(_dtls_record_check(&state, t), 0);
 }
 
 static void check_dtls_window_epoch_higher(void **glob_state)
 {
 	struct record_parameters_st state;
-	gnutls_uint64 t;
+	uint64_t t;
 
 	RESET_WINDOW;
 	SET_WINDOW_NEXT(LARGE_INT-1);
 	SET_WINDOW_LAST_RECV(LARGE_INT);
 
-	uint64_set(&t, BSWAP64(LARGE_INT));
-	assert_int_equal(_dtls_record_check(&state, &t), 0);
+	t = LARGE_INT;
+	assert_int_equal(_dtls_record_check(&state, t), 0);
 
-	uint64_set(&t, BSWAP64((LARGE_INT+8)|0x1000000000000LL));
-	assert_int_equal(_dtls_record_check(&state, &t), -1);
+	t = (LARGE_INT+8)|0x1000000000000LL;
+	assert_int_equal(_dtls_record_check(&state, t), -1);
 }
 
 static void check_dtls_window_epoch_lower(void **glob_state)
 {
 	struct record_parameters_st state;
-	gnutls_uint64 t;
+	uint64_t t;
 
 	RESET_WINDOW;
-	uint64_set(&t, BSWAP64(0x1000000000000LL));
+	t = 0x1000000000000LL;
 
 	state.epoch = 1;
 	SET_WINDOW_NEXT(0x1000000000000LL);
 	SET_WINDOW_LAST_RECV((0x1000000000000LL) + 1);
 
-	uint64_set(&t, BSWAP64(2 | 0x1000000000000LL));
-	assert_int_equal(_dtls_record_check(&state, &t), 0);
+	t = 2 | 0x1000000000000LL;
+	assert_int_equal(_dtls_record_check(&state, t), 0);
 
-	uint64_set(&t, BSWAP64(3 | 0x1000000000000LL));
-	assert_int_equal(_dtls_record_check(&state, &t), 0);
+	t = 3 | 0x1000000000000LL;
+	assert_int_equal(_dtls_record_check(&state, t), 0);
 
-	uint64_set(&t, BSWAP64(5));
-	assert_int_equal(_dtls_record_check(&state, &t), -1);
+	t = 5;
+	assert_int_equal(_dtls_record_check(&state, t), -1);
 }
 
 

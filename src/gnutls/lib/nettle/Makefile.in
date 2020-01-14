@@ -110,17 +110,19 @@ host_triplet = @host@
 @ENABLE_MINITASN1_TRUE@am__append_1 = -I$(srcdir)/../minitasn1
 @WINDOWS_TRUE@am__append_2 = sysrng-windows.c
 @HAVE_GETENTROPY_TRUE@@WINDOWS_FALSE@am__append_3 = sysrng-getentropy.c
-@HAVE_GETENTROPY_FALSE@@WINDOWS_FALSE@am__append_4 = sysrng-linux.c
-@ENABLE_FIPS140_TRUE@am__append_5 = rnd-fips.c int/drbg-aes-self-test.c \
+@HAVE_GETENTROPY_FALSE@@HAVE_KERN_ARND_TRUE@@WINDOWS_FALSE@am__append_4 = sysrng-netbsd.c
+@HAVE_GETENTROPY_FALSE@@HAVE_KERN_ARND_FALSE@@WINDOWS_FALSE@am__append_5 = sysrng-linux.c
+@ENABLE_FIPS140_TRUE@am__append_6 = rnd-fips.c int/drbg-aes-self-test.c \
 @ENABLE_FIPS140_TRUE@	int/drbg-aes.c int/drbg-aes.h
 
-@ENABLE_GOST_TRUE@am__append_6 = gost/nettle-write.h gost/gost28147.c \
-@ENABLE_GOST_TRUE@	gost/gost28147.h gost/gosthash94.c \
-@ENABLE_GOST_TRUE@	gost/gosthash94.h gost/gosthash94-meta.c \
-@ENABLE_GOST_TRUE@	gost/streebog.c gost/streebog.h \
-@ENABLE_GOST_TRUE@	gost/streebog-meta.c gost/hmac-gosthash94.c \
-@ENABLE_GOST_TRUE@	gost/hmac-streebog.c gost/hmac-gost.h \
-@ENABLE_GOST_TRUE@	gost/bignum-le.c gost/bignum-le.h \
+@ENABLE_GOST_TRUE@am__append_7 = gost/nettle-write.h gost/gost28147.c \
+@ENABLE_GOST_TRUE@	gost/gost28147.h gost/gost-wrap.c \
+@ENABLE_GOST_TRUE@	gost/gosthash94.c gost/gosthash94.h \
+@ENABLE_GOST_TRUE@	gost/gosthash94-meta.c gost/streebog.c \
+@ENABLE_GOST_TRUE@	gost/streebog.h gost/streebog-meta.c \
+@ENABLE_GOST_TRUE@	gost/hmac-gosthash94.c gost/hmac-streebog.c \
+@ENABLE_GOST_TRUE@	gost/hmac-gost.h gost/bignum-le.c \
+@ENABLE_GOST_TRUE@	gost/bignum-le.h \
 @ENABLE_GOST_TRUE@	gost/pbkdf2-hmac-gosthash94.c \
 @ENABLE_GOST_TRUE@	gost/pbkdf2-hmac-streebog.c \
 @ENABLE_GOST_TRUE@	gost/pbkdf2-gost.h gost/nettle-internal.h \
@@ -132,8 +134,9 @@ host_triplet = @host@
 @ENABLE_GOST_TRUE@	gost/gmp-glue.h gost/ecc-gostdsa-sign.c \
 @ENABLE_GOST_TRUE@	gost/ecc-gostdsa-verify.c \
 @ENABLE_GOST_TRUE@	gost/gostdsa-mask.c gost/gostdsa-sign.c \
-@ENABLE_GOST_TRUE@	gost/gostdsa-verify.c gost/gostdsa.h \
-@ENABLE_GOST_TRUE@	gost/ecc-gost-curve.h gost/ecc-gost-hash.c
+@ENABLE_GOST_TRUE@	gost/gostdsa-verify.c gost/gostdsa-vko.c \
+@ENABLE_GOST_TRUE@	gost/gostdsa.h gost/ecc-gost-curve.h \
+@ENABLE_GOST_TRUE@	gost/ecc-gost-hash.c gost_keywrap.c
 subdir = lib/nettle
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/lib/unistring/m4/gnulib-comp.m4 \
@@ -275,12 +278,13 @@ am__libcrypto_la_SOURCES_DIST = pk.c mpi.c mac.c cipher.c init.c \
 	int/dsa-validate.c int/tls1-prf.c int/tls1-prf.h \
 	int/dsa-compute-k.c int/dsa-compute-k.h int/ecdsa-compute-k.c \
 	int/ecdsa-compute-k.h int/mpn-base256.c int/mpn-base256.h \
-	sysrng-windows.c sysrng-getentropy.c sysrng-linux.c \
-	rnd-fuzzer.c rnd-fips.c int/drbg-aes-self-test.c \
-	int/drbg-aes.c int/drbg-aes.h gost/nettle-write.h \
-	gost/gost28147.c gost/gost28147.h gost/gosthash94.c \
-	gost/gosthash94.h gost/gosthash94-meta.c gost/streebog.c \
-	gost/streebog.h gost/streebog-meta.c gost/hmac-gosthash94.c \
+	sysrng-windows.c sysrng-getentropy.c sysrng-netbsd.c \
+	sysrng-linux.c rnd-fuzzer.c rnd-fips.c \
+	int/drbg-aes-self-test.c int/drbg-aes.c int/drbg-aes.h \
+	gost/nettle-write.h gost/gost28147.c gost/gost28147.h \
+	gost/gost-wrap.c gost/gosthash94.c gost/gosthash94.h \
+	gost/gosthash94-meta.c gost/streebog.c gost/streebog.h \
+	gost/streebog-meta.c gost/hmac-gosthash94.c \
 	gost/hmac-streebog.c gost/hmac-gost.h gost/bignum-le.c \
 	gost/bignum-le.h gost/pbkdf2-hmac-gosthash94.c \
 	gost/pbkdf2-hmac-streebog.c gost/pbkdf2-gost.h \
@@ -290,17 +294,19 @@ am__libcrypto_la_SOURCES_DIST = pk.c mpi.c mac.c cipher.c init.c \
 	gost/ecc-gost512a-64.h gost/ecc-internal.h gost/gmp-glue.h \
 	gost/ecc-gostdsa-sign.c gost/ecc-gostdsa-verify.c \
 	gost/gostdsa-mask.c gost/gostdsa-sign.c gost/gostdsa-verify.c \
-	gost/gostdsa.h gost/ecc-gost-curve.h gost/ecc-gost-hash.c
+	gost/gostdsa-vko.c gost/gostdsa.h gost/ecc-gost-curve.h \
+	gost/ecc-gost-hash.c gost_keywrap.c
 am__dirstamp = $(am__leading_dot)dirstamp
 @WINDOWS_TRUE@am__objects_1 = sysrng-windows.lo
 @HAVE_GETENTROPY_TRUE@@WINDOWS_FALSE@am__objects_2 =  \
 @HAVE_GETENTROPY_TRUE@@WINDOWS_FALSE@	sysrng-getentropy.lo
-@HAVE_GETENTROPY_FALSE@@WINDOWS_FALSE@am__objects_3 = sysrng-linux.lo
-@ENABLE_FIPS140_TRUE@am__objects_4 = rnd-fips.lo \
+@HAVE_GETENTROPY_FALSE@@HAVE_KERN_ARND_TRUE@@WINDOWS_FALSE@am__objects_3 = sysrng-netbsd.lo
+@HAVE_GETENTROPY_FALSE@@HAVE_KERN_ARND_FALSE@@WINDOWS_FALSE@am__objects_4 = sysrng-linux.lo
+@ENABLE_FIPS140_TRUE@am__objects_5 = rnd-fips.lo \
 @ENABLE_FIPS140_TRUE@	int/drbg-aes-self-test.lo int/drbg-aes.lo
-@ENABLE_GOST_TRUE@am__objects_5 = gost/gost28147.lo gost/gosthash94.lo \
-@ENABLE_GOST_TRUE@	gost/gosthash94-meta.lo gost/streebog.lo \
-@ENABLE_GOST_TRUE@	gost/streebog-meta.lo \
+@ENABLE_GOST_TRUE@am__objects_6 = gost/gost28147.lo gost/gost-wrap.lo \
+@ENABLE_GOST_TRUE@	gost/gosthash94.lo gost/gosthash94-meta.lo \
+@ENABLE_GOST_TRUE@	gost/streebog.lo gost/streebog-meta.lo \
 @ENABLE_GOST_TRUE@	gost/hmac-gosthash94.lo \
 @ENABLE_GOST_TRUE@	gost/hmac-streebog.lo gost/bignum-le.lo \
 @ENABLE_GOST_TRUE@	gost/pbkdf2-hmac-gosthash94.lo \
@@ -309,14 +315,16 @@ am__dirstamp = $(am__leading_dot)dirstamp
 @ENABLE_GOST_TRUE@	gost/ecc-gostdsa-sign.lo \
 @ENABLE_GOST_TRUE@	gost/ecc-gostdsa-verify.lo \
 @ENABLE_GOST_TRUE@	gost/gostdsa-mask.lo gost/gostdsa-sign.lo \
-@ENABLE_GOST_TRUE@	gost/gostdsa-verify.lo gost/ecc-gost-hash.lo
+@ENABLE_GOST_TRUE@	gost/gostdsa-verify.lo gost/gostdsa-vko.lo \
+@ENABLE_GOST_TRUE@	gost/ecc-gost-hash.lo gost_keywrap.lo
 am_libcrypto_la_OBJECTS = pk.lo mpi.lo mac.lo cipher.lo init.lo prf.lo \
 	backport/cfb8.lo backport/cmac.lo backport/xts.lo rnd.lo \
 	int/rsa-keygen-fips186.lo int/provable-prime.lo \
 	int/dsa-keygen-fips186.lo int/dsa-validate.lo int/tls1-prf.lo \
 	int/dsa-compute-k.lo int/ecdsa-compute-k.lo int/mpn-base256.lo \
 	$(am__objects_1) $(am__objects_2) $(am__objects_3) \
-	rnd-fuzzer.lo $(am__objects_4) $(am__objects_5)
+	$(am__objects_4) rnd-fuzzer.lo $(am__objects_5) \
+	$(am__objects_6)
 libcrypto_la_OBJECTS = $(am_libcrypto_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -337,21 +345,25 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__maybe_remake_depfiles = depfiles
-am__depfiles_remade = ./$(DEPDIR)/cipher.Plo ./$(DEPDIR)/init.Plo \
+am__depfiles_remade = ./$(DEPDIR)/cipher.Plo \
+	./$(DEPDIR)/gost_keywrap.Plo ./$(DEPDIR)/init.Plo \
 	./$(DEPDIR)/mac.Plo ./$(DEPDIR)/mpi.Plo ./$(DEPDIR)/pk.Plo \
 	./$(DEPDIR)/prf.Plo ./$(DEPDIR)/rnd-fips.Plo \
 	./$(DEPDIR)/rnd-fuzzer.Plo ./$(DEPDIR)/rnd.Plo \
 	./$(DEPDIR)/sysrng-getentropy.Plo ./$(DEPDIR)/sysrng-linux.Plo \
-	./$(DEPDIR)/sysrng-windows.Plo backport/$(DEPDIR)/cfb8.Plo \
-	backport/$(DEPDIR)/cmac.Plo backport/$(DEPDIR)/xts.Plo \
-	gost/$(DEPDIR)/bignum-le.Plo gost/$(DEPDIR)/ecc-gost-hash.Plo \
+	./$(DEPDIR)/sysrng-netbsd.Plo ./$(DEPDIR)/sysrng-windows.Plo \
+	backport/$(DEPDIR)/cfb8.Plo backport/$(DEPDIR)/cmac.Plo \
+	backport/$(DEPDIR)/xts.Plo gost/$(DEPDIR)/bignum-le.Plo \
+	gost/$(DEPDIR)/ecc-gost-hash.Plo \
 	gost/$(DEPDIR)/ecc-gost256cpa.Plo \
 	gost/$(DEPDIR)/ecc-gost512a.Plo \
 	gost/$(DEPDIR)/ecc-gostdsa-sign.Plo \
 	gost/$(DEPDIR)/ecc-gostdsa-verify.Plo \
-	gost/$(DEPDIR)/gost28147.Plo gost/$(DEPDIR)/gostdsa-mask.Plo \
+	gost/$(DEPDIR)/gost-wrap.Plo gost/$(DEPDIR)/gost28147.Plo \
+	gost/$(DEPDIR)/gostdsa-mask.Plo \
 	gost/$(DEPDIR)/gostdsa-sign.Plo \
 	gost/$(DEPDIR)/gostdsa-verify.Plo \
+	gost/$(DEPDIR)/gostdsa-vko.Plo \
 	gost/$(DEPDIR)/gosthash94-meta.Plo \
 	gost/$(DEPDIR)/gosthash94.Plo \
 	gost/$(DEPDIR)/hmac-gosthash94.Plo \
@@ -1540,8 +1552,8 @@ libcrypto_la_SOURCES = pk.c mpi.c mac.c cipher.c init.c gnettle.h \
 	int/dsa-validate.c int/tls1-prf.c int/tls1-prf.h \
 	int/dsa-compute-k.c int/dsa-compute-k.h int/ecdsa-compute-k.c \
 	int/ecdsa-compute-k.h int/mpn-base256.c int/mpn-base256.h \
-	$(am__append_2) $(am__append_3) $(am__append_4) rnd-fuzzer.c \
-	$(am__append_5) $(am__append_6)
+	$(am__append_2) $(am__append_3) $(am__append_4) \
+	$(am__append_5) rnd-fuzzer.c $(am__append_6) $(am__append_7)
 all: all-am
 
 .SUFFIXES:
@@ -1628,6 +1640,7 @@ gost/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) gost/$(DEPDIR)
 	@: > gost/$(DEPDIR)/$(am__dirstamp)
 gost/gost28147.lo: gost/$(am__dirstamp) gost/$(DEPDIR)/$(am__dirstamp)
+gost/gost-wrap.lo: gost/$(am__dirstamp) gost/$(DEPDIR)/$(am__dirstamp)
 gost/gosthash94.lo: gost/$(am__dirstamp) \
 	gost/$(DEPDIR)/$(am__dirstamp)
 gost/gosthash94-meta.lo: gost/$(am__dirstamp) \
@@ -1658,6 +1671,8 @@ gost/gostdsa-sign.lo: gost/$(am__dirstamp) \
 	gost/$(DEPDIR)/$(am__dirstamp)
 gost/gostdsa-verify.lo: gost/$(am__dirstamp) \
 	gost/$(DEPDIR)/$(am__dirstamp)
+gost/gostdsa-vko.lo: gost/$(am__dirstamp) \
+	gost/$(DEPDIR)/$(am__dirstamp)
 gost/ecc-gost-hash.lo: gost/$(am__dirstamp) \
 	gost/$(DEPDIR)/$(am__dirstamp)
 
@@ -1677,6 +1692,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cipher.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gost_keywrap.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/init.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mac.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mpi.Plo@am__quote@ # am--include-marker
@@ -1687,6 +1703,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rnd.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sysrng-getentropy.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sysrng-linux.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sysrng-netbsd.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sysrng-windows.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@backport/$(DEPDIR)/cfb8.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@backport/$(DEPDIR)/cmac.Plo@am__quote@ # am--include-marker
@@ -1697,10 +1714,12 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@gost/$(DEPDIR)/ecc-gost512a.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@gost/$(DEPDIR)/ecc-gostdsa-sign.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@gost/$(DEPDIR)/ecc-gostdsa-verify.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@gost/$(DEPDIR)/gost-wrap.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@gost/$(DEPDIR)/gost28147.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@gost/$(DEPDIR)/gostdsa-mask.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@gost/$(DEPDIR)/gostdsa-sign.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@gost/$(DEPDIR)/gostdsa-verify.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@gost/$(DEPDIR)/gostdsa-vko.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@gost/$(DEPDIR)/gosthash94-meta.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@gost/$(DEPDIR)/gosthash94.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@gost/$(DEPDIR)/hmac-gosthash94.Plo@am__quote@ # am--include-marker
@@ -1891,6 +1910,7 @@ clean-am: clean-generic clean-libtool clean-noinstLTLIBRARIES \
 
 distclean: distclean-am
 		-rm -f ./$(DEPDIR)/cipher.Plo
+	-rm -f ./$(DEPDIR)/gost_keywrap.Plo
 	-rm -f ./$(DEPDIR)/init.Plo
 	-rm -f ./$(DEPDIR)/mac.Plo
 	-rm -f ./$(DEPDIR)/mpi.Plo
@@ -1901,6 +1921,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/rnd.Plo
 	-rm -f ./$(DEPDIR)/sysrng-getentropy.Plo
 	-rm -f ./$(DEPDIR)/sysrng-linux.Plo
+	-rm -f ./$(DEPDIR)/sysrng-netbsd.Plo
 	-rm -f ./$(DEPDIR)/sysrng-windows.Plo
 	-rm -f backport/$(DEPDIR)/cfb8.Plo
 	-rm -f backport/$(DEPDIR)/cmac.Plo
@@ -1911,10 +1932,12 @@ distclean: distclean-am
 	-rm -f gost/$(DEPDIR)/ecc-gost512a.Plo
 	-rm -f gost/$(DEPDIR)/ecc-gostdsa-sign.Plo
 	-rm -f gost/$(DEPDIR)/ecc-gostdsa-verify.Plo
+	-rm -f gost/$(DEPDIR)/gost-wrap.Plo
 	-rm -f gost/$(DEPDIR)/gost28147.Plo
 	-rm -f gost/$(DEPDIR)/gostdsa-mask.Plo
 	-rm -f gost/$(DEPDIR)/gostdsa-sign.Plo
 	-rm -f gost/$(DEPDIR)/gostdsa-verify.Plo
+	-rm -f gost/$(DEPDIR)/gostdsa-vko.Plo
 	-rm -f gost/$(DEPDIR)/gosthash94-meta.Plo
 	-rm -f gost/$(DEPDIR)/gosthash94.Plo
 	-rm -f gost/$(DEPDIR)/hmac-gosthash94.Plo
@@ -1979,6 +2002,7 @@ installcheck-am:
 
 maintainer-clean: maintainer-clean-am
 		-rm -f ./$(DEPDIR)/cipher.Plo
+	-rm -f ./$(DEPDIR)/gost_keywrap.Plo
 	-rm -f ./$(DEPDIR)/init.Plo
 	-rm -f ./$(DEPDIR)/mac.Plo
 	-rm -f ./$(DEPDIR)/mpi.Plo
@@ -1989,6 +2013,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/rnd.Plo
 	-rm -f ./$(DEPDIR)/sysrng-getentropy.Plo
 	-rm -f ./$(DEPDIR)/sysrng-linux.Plo
+	-rm -f ./$(DEPDIR)/sysrng-netbsd.Plo
 	-rm -f ./$(DEPDIR)/sysrng-windows.Plo
 	-rm -f backport/$(DEPDIR)/cfb8.Plo
 	-rm -f backport/$(DEPDIR)/cmac.Plo
@@ -1999,10 +2024,12 @@ maintainer-clean: maintainer-clean-am
 	-rm -f gost/$(DEPDIR)/ecc-gost512a.Plo
 	-rm -f gost/$(DEPDIR)/ecc-gostdsa-sign.Plo
 	-rm -f gost/$(DEPDIR)/ecc-gostdsa-verify.Plo
+	-rm -f gost/$(DEPDIR)/gost-wrap.Plo
 	-rm -f gost/$(DEPDIR)/gost28147.Plo
 	-rm -f gost/$(DEPDIR)/gostdsa-mask.Plo
 	-rm -f gost/$(DEPDIR)/gostdsa-sign.Plo
 	-rm -f gost/$(DEPDIR)/gostdsa-verify.Plo
+	-rm -f gost/$(DEPDIR)/gostdsa-vko.Plo
 	-rm -f gost/$(DEPDIR)/gosthash94-meta.Plo
 	-rm -f gost/$(DEPDIR)/gosthash94.Plo
 	-rm -f gost/$(DEPDIR)/hmac-gosthash94.Plo

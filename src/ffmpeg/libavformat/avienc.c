@@ -31,7 +31,6 @@
 #include "libavutil/avstring.h"
 #include "libavutil/avutil.h"
 #include "libavutil/internal.h"
-#include "libavutil/intreadwrite.h"
 #include "libavutil/dict.h"
 #include "libavutil/avassert.h"
 #include "libavutil/timestamp.h"
@@ -581,8 +580,6 @@ static int avi_write_header(AVFormatContext *s)
     avi->movi_list = ff_start_tag(pb, "LIST");
     ffio_wfourcc(pb, "movi");
 
-    avio_flush(pb);
-
     return 0;
 }
 
@@ -594,7 +591,6 @@ static void update_odml_entry(AVFormatContext *s, int stream_index, int64_t ix, 
     int64_t pos;
     int au_byterate, au_ssize, au_scale;
 
-    avio_flush(pb);
     pos = avio_tell(pb);
 
     /* Updating one entry in the AVI OpenDML master index */

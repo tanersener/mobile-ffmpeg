@@ -21,34 +21,13 @@
 #include <stdlib.h>
 #include <Foundation/Foundation.h>
 
-#include "MediaInformationParser.h"
-
 /** Global library version */
 extern NSString *const MOBILE_FFMPEG_VERSION;
-
-/** Common return code values */
-extern int const RETURN_CODE_SUCCESS;
-extern int const RETURN_CODE_CANCEL;
-extern int const RETURN_CODE_MULTIPLE_EXECUTIONS_NOT_ALLOWED;
 
 /**
  * Main class for FFmpeg operations.
  */
 @interface MobileFFmpeg : NSObject
-
-/**
- * Returns FFmpeg version bundled within the library.
- *
- * @return FFmpeg version
- */
-+ (NSString*)getFFmpegVersion;
-
-/**
- * Returns MobileFFmpeg library version.
- *
- * @return MobileFFmpeg version
- */
-+ (NSString*)getVersion;
 
 /**
  * Synchronously executes FFmpeg with arguments provided.
@@ -77,7 +56,7 @@ extern int const RETURN_CODE_MULTIPLE_EXECUTIONS_NOT_ALLOWED;
  * using a more advanced method like execute or executeWithArguments
  * @return zero on successful execution, 255 on user cancel and non-zero on error
  */
-+ (int)execute: (NSString*)command delimiter:(NSString*)delimiter;
++ (int)execute: (NSString*)command delimiter:(NSString*)delimiter __attribute__((deprecated));
 
 /**
  * Cancels an ongoing operation.
@@ -85,45 +64,6 @@ extern int const RETURN_CODE_MULTIPLE_EXECUTIONS_NOT_ALLOWED;
  * This function does not wait for termination to complete and returns immediately.
  */
 + (void)cancel;
-
-/**
- * Returns return code of last executed command.
- *
- * @return return code of last executed command
- */
-+ (int)getLastReturnCode;
-
-/**
- * Returns log output of last executed command. Please note that disabling redirection using
- * MobileFFmpegConfig.disableRedirection() method also disables this functionality.
- *
- * @return output of last executed command
- */
-+ (NSString*)getLastCommandOutput;
-
-/**
- * Returns media information for given file.
- *
- * @param path file path or uri of media file
- * @return media information
- */
-+ (MediaInformation*)getMediaInformation: (NSString*)path;
-
-/**
- * Returns media information for given file.
- *
- * @param path path or uri of media file
- * @param timeout complete timeout
- * @return media information
- */
-+ (MediaInformation*)getMediaInformation: (NSString*)path timeout:(long)timeout;
-
-/**
- * Returns MobileFFmpeg library build date.
- *
- * @return MobileFFmpeg library build date
- */
-+ (NSString*)getBuildDate;
 
 /**
  * Parses the given command into arguments.

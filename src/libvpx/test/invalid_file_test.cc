@@ -147,7 +147,7 @@ const DecodeParam kVP9InvalidFileTests[] = {
 // This file will cause a large allocation which is expected to fail in 32-bit
 // environments. Test x86 for coverage purposes as the allocation failure will
 // be in platform agnostic code.
-#if ARCH_X86
+#if VPX_ARCH_X86
   { 1, "invalid-vp90-2-00-quantizer-63.ivf.kf_65527x61446.ivf" },
 #endif
   { 1, "invalid-vp90-2-12-droppable_1.ivf.s3676_r01-05_b6-.ivf" },

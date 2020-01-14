@@ -19,6 +19,7 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
+#include "libavutil/ffversion.h"
 #include "fftools_ffmpeg.h"
 #include "MobileFFmpegConfig.h"
 #include "ArchDetect.h"
@@ -141,6 +142,13 @@ static id<LogDelegate> logDelegate = nil;
 /** Holds delegate defined to redirect statistics */
 static id<StatisticsDelegate> statisticsDelegate = nil;
 
+/** Common return code values */
+int const RETURN_CODE_SUCCESS = 0;
+int const RETURN_CODE_CANCEL = 255;
+
+int lastReturnCode;
+NSMutableString *lastCommandOutput;
+
 NSString *const LIB_NAME = @"mobile-ffmpeg";
 NSString *const MOBILE_FFMPEG_PIPE_PREFIX = @"mf_pipe_";
 
@@ -148,10 +156,6 @@ static Statistics *lastReceivedStatistics = nil;
 
 static NSMutableArray *supportedExternalLibraries;
 
-extern NSMutableString *lastCommandOutput;
-
-NSMutableString *systemCommandOutput;
-static int runningSystemCommand;
 static int lastCreatedPipeIndex;
 
 void callbackWait(int milliSeconds) {
@@ -226,7 +230,9 @@ void mobileffmpeg_log_callback_function(void *ptr, int level, const char* format
         level &= 0xff;
     }
     int activeLogLevel = [MobileFFmpegConfig getLogLevel];
-    if ((activeLogLevel == AV_LOG_QUIET) || (level > activeLogLevel)) {
+
+    // AV_LOG_STDERR logs are always redirected
+    if ((activeLogLevel == AV_LOG_QUIET && level != AV_LOG_STDERR) || (level > activeLogLevel)) {
         return;
     }
 
@@ -273,14 +279,9 @@ void callbackBlockFunction() {
 
                         // LOG CALLBACK
                         int activeLogLevel = [MobileFFmpegConfig getLogLevel];
+                        int levelValue = [callbackData getLogLevel];
 
-                        if (runningSystemCommand == 1) {
-
-                            // REDIRECT SYSTEM OUTPUT
-                            if ((activeLogLevel != AV_LOG_QUIET) && ([callbackData getLogLevel] <= activeLogLevel)) {
-                                [systemCommandOutput appendString:[callbackData getLogData]];
-                            }
-                        } else if ((activeLogLevel == AV_LOG_QUIET) || ([callbackData getLogLevel] > activeLogLevel)) {
+                        if ((activeLogLevel == AV_LOG_QUIET && levelValue != AV_LOG_STDERR) || (levelValue > activeLogLevel)) {
 
                             // LOG NEITHER PRINTED NOR FORWARDED
                         } else {
@@ -290,11 +291,16 @@ void callbackBlockFunction() {
                                 [logDelegate logCallback:[callbackData getLogLevel]:[callbackData getLogData]];
 
                             } else {
-
-                                // WRITE TO NSLOG
-                                NSLog(@"%@: %@", [MobileFFmpegConfig logLevelToString:[callbackData getLogLevel]], [callbackData getLogData]);
+                                switch (levelValue) {
+                                    case AV_LOG_QUIET:
+                                        // PRINT NO OUTPUT
+                                        break;
+                                    default:
+                                        // WRITE TO NSLOG
+                                        NSLog(@"%@: %@", [MobileFFmpegConfig logLevelToString:[callbackData getLogLevel]], [callbackData getLogData]);
+                                        break;
+                                }
                             }
-
                         }
 
                     } else {
@@ -327,53 +333,6 @@ void callbackBlockFunction() {
     activeLogLevel = av_log_get_level();
     if ((activeLogLevel != AV_LOG_QUIET) && (AV_LOG_DEBUG <= activeLogLevel)) {
         NSLog(@"Async callback block stopped.\n");
-    }
-}
-
-static int systemCommandOutputContainsPattern(NSArray *patternList) {
-    for (int i=0; i < [patternList count]; i++) {
-        NSString *pattern = [patternList objectAtIndex:i];
-        if ([systemCommandOutput rangeOfString:pattern].location != NSNotFound) {
-            return 1;
-        }
-    }
-
-    return 0;
-}
-
-/**
- * Executes system command. System command is not logged to output.
- *
- * @param arguments command arguments
- * @param commandOutputEndPatternList list of patterns which will indicate that operation has ended
- * @param successPattern success pattern
- * @param timeout execution timeout
- * @return return code
- */
-int mobileffmpeg_system_execute(NSArray *arguments, NSMutableArray *commandOutputEndPatternList, NSString *successPattern, long timeout) {
-    if (successPattern != nil) {
-        [commandOutputEndPatternList addObject:successPattern];
-    }
-    systemCommandOutput = [[NSMutableString alloc] init];
-    runningSystemCommand = 1;
-
-    int rc = [MobileFFmpeg executeWithArguments:arguments];
-
-    long totalWaitTime = 0;
-
-    while ((systemCommandOutputContainsPattern(commandOutputEndPatternList) == 0) && (totalWaitTime < timeout)) {
-        [NSThread sleepForTimeInterval:.02];
-        totalWaitTime += 20;
-    }
-
-    runningSystemCommand = 0;
-
-    [MobileFFmpeg cancel];
-
-    if (successPattern != nil && [systemCommandOutput containsString:successPattern]) {
-        return 0;
-    } else {
-        return rc;
     }
 }
 
@@ -430,10 +389,10 @@ int mobileffmpeg_system_execute(NSArray *arguments, NSMutableArray *commandOutpu
     lastReceivedStatistics = [[Statistics alloc] init];
     callbackDataArray = [[NSMutableArray alloc] init];
 
-    runningSystemCommand = 0;
     lastCreatedPipeIndex = 0;
 
-    systemCommandOutput = [[NSMutableString alloc] init];
+    lastReturnCode = 0;
+    lastCommandOutput = [[NSMutableString alloc] init];
 
     [MobileFFmpegConfig enableRedirection];
 }
@@ -506,6 +465,7 @@ int mobileffmpeg_system_execute(NSArray *arguments, NSMutableArray *commandOutpu
  */
 + (NSString*)logLevelToString: (int)level {
     switch (level) {
+        case AV_LOG_STDERR: return @"STDERR";
         case AV_LOG_TRACE: return @"TRACE";
         case AV_LOG_DEBUG: return @"DEBUG";
         case AV_LOG_VERBOSE: return @"VERBOSE";
@@ -906,6 +866,63 @@ int mobileffmpeg_system_execute(NSArray *arguments, NSMutableArray *commandOutpu
     if ([fileManager fileExistsAtPath:ffmpegPipePath]){
         [fileManager removeItemAtPath:ffmpegPipePath error:NULL];
     }
+}
+
+/**
+ * Returns FFmpeg version bundled within the library.
+ *
+ * @return FFmpeg version string
+ */
++ (NSString*)getFFmpegVersion {
+    return [NSString stringWithUTF8String:FFMPEG_VERSION];
+}
+
+/**
+ * Returns MobileFFmpeg library version.
+ *
+ * @return MobileFFmpeg version string
+ */
++ (NSString*)getVersion {
+    if ([ArchDetect isLTSBuild] == 1) {
+        return [NSString stringWithFormat:@"%@-lts", MOBILE_FFMPEG_VERSION];
+    } else {
+        return MOBILE_FFMPEG_VERSION;
+    }
+}
+
+/**
+ * Returns MobileFFmpeg library build date.
+ *
+ * @return MobileFFmpeg library build date
+ */
++ (NSString*)getBuildDate {
+    char buildDate[10];
+    sprintf(buildDate, "%d", MOBILE_FFMPEG_BUILD_DATE);
+    return [NSString stringWithUTF8String:buildDate];
+}
+
+/**
+ * Returns return code of last executed command.
+ *
+ * @return return code of last executed command
+ */
++ (int)getLastReturnCode {
+    return lastReturnCode;
+}
+
+/**
+ * Returns log output of last executed single FFmpeg/FFprobe command.
+ *
+ * This method does not support executing multiple concurrent commands. If you execute
+ * multiple commands at the same time, this method will return output from all executions.
+ *
+ * Please note that disabling redirection using MobileFFmpegConfig.disableRedirection() method
+ * also disables this functionality.
+ *
+ * @return output of last executed command
+ */
++ (NSString*)getLastCommandOutput {
+    return lastCommandOutput;
 }
 
 @end

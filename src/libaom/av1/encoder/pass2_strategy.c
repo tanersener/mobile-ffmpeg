@@ -77,17 +77,29 @@ static void reset_fpf_position(TWO_PASS *p, const FIRSTPASS_STATS *position) {
 }
 
 static int input_stats(TWO_PASS *p, FIRSTPASS_STATS *fps) {
-  if (p->stats_in >= p->stats_in_end) return EOF;
+  if (p->stats_in >= p->stats_buf_ctx->stats_in_end) return EOF;
 
   *fps = *p->stats_in;
   ++p->stats_in;
   return 1;
 }
 
+static int input_stats_lap(TWO_PASS *p, FIRSTPASS_STATS *fps) {
+  if (p->stats_in >= p->stats_buf_ctx->stats_in_end) return EOF;
+
+  *fps = *p->stats_in;
+  /* Move old stats[0] out to accommodate for next frame stats  */
+  memmove(p->frame_stats_arr[0], p->frame_stats_arr[1],
+          (p->stats_buf_ctx->stats_in_end - p->stats_in - 1) *
+              sizeof(FIRSTPASS_STATS));
+  p->stats_buf_ctx->stats_in_end--;
+  return 1;
+}
+
 // Read frame stats at an offset from the current position.
 static const FIRSTPASS_STATS *read_frame_stats(const TWO_PASS *p, int offset) {
-  if ((offset >= 0 && p->stats_in + offset >= p->stats_in_end) ||
-      (offset < 0 && p->stats_in + offset < p->stats_in_start)) {
+  if ((offset >= 0 && p->stats_in + offset >= p->stats_buf_ctx->stats_in_end) ||
+      (offset < 0 && p->stats_in + offset < p->stats_buf_ctx->stats_in_start)) {
     return NULL;
   }
 
@@ -135,24 +147,20 @@ static int frame_max_bits(const RATE_CONTROL *rc,
   return (int)max_bits;
 }
 
-static double calc_correction_factor(double err_per_mb, double err_divisor,
-                                     double pt_low, double pt_high, int q,
-                                     aom_bit_depth_t bit_depth) {
-  const double error_term = err_per_mb / err_divisor;
-
-  // Adjustment based on actual quantizer to power term.
+static const double q_pow_term[(QINDEX_RANGE >> 5) + 1] = { 0.65, 0.70, 0.75,
+                                                            0.80, 0.85, 0.90,
+                                                            0.95, 0.95, 0.95 };
+#define ERR_DIVISOR 96.0
+static double calc_correction_factor(double err_per_mb, int q) {
+  const double error_term = err_per_mb / ERR_DIVISOR;
+  const int index = q >> 5;
+  // Adjustment to power term based on qindex
   const double power_term =
-      AOMMIN(av1_convert_qindex_to_q(q, bit_depth) * 0.01 + pt_low, pt_high);
-
-  // Calculate correction factor.
-  if (power_term < 1.0) assert(error_term >= 0.0);
-
+      q_pow_term[index] +
+      (((q_pow_term[index + 1] - q_pow_term[index]) * (q % 32)) / 32.0);
+  assert(error_term >= 0.0);
   return fclamp(pow(error_term, power_term), 0.05, 5.0);
 }
-
-#define ERR_DIVISOR 96.0
-#define FACTOR_PT_LOW 0.70
-#define FACTOR_PT_HIGH 0.90
 
 static void twopass_update_bpm_factor(TWO_PASS *twopass) {
   // Based on recent history adjust expectations of bits per macroblock.
@@ -164,11 +172,15 @@ static void twopass_update_bpm_factor(TWO_PASS *twopass) {
   twopass->bpm_factor = AOMMAX(0.25, AOMMIN(4.0, twopass->bpm_factor));
 }
 
+static int qbpm_enumerator(int rate_err_tol) {
+  return 1350000 + ((300000 * AOMMIN(75, AOMMAX(rate_err_tol - 25, 0))) / 75);
+}
+
 // Similar to find_qindex_by_rate() function in ratectrl.c, but includes
 // calculation of a correction_factor.
 static int find_qindex_by_rate_with_correction(
-    int desired_bits_per_mb, aom_bit_depth_t bit_depth, FRAME_TYPE frame_type,
-    double error_per_mb, double group_weight_factor, int best_qindex,
+    int desired_bits_per_mb, aom_bit_depth_t bit_depth, double error_per_mb,
+    double group_weight_factor, int rate_err_tol, int best_qindex,
     int worst_qindex) {
   assert(best_qindex <= worst_qindex);
   int low = best_qindex;
@@ -176,25 +188,18 @@ static int find_qindex_by_rate_with_correction(
 
   while (low < high) {
     const int mid = (low + high) >> 1;
-    const double mid_factor =
-        calc_correction_factor(error_per_mb, ERR_DIVISOR, FACTOR_PT_LOW,
-                               FACTOR_PT_HIGH, mid, bit_depth);
-    const int mid_bits_per_mb = av1_rc_bits_per_mb(
-        frame_type, mid, mid_factor * group_weight_factor, bit_depth);
+    const double mid_factor = calc_correction_factor(error_per_mb, mid);
+    const double q = av1_convert_qindex_to_q(mid, bit_depth);
+    const int enumerator = qbpm_enumerator(rate_err_tol);
+    const int mid_bits_per_mb =
+        (int)((enumerator * mid_factor * group_weight_factor) / q);
+
     if (mid_bits_per_mb > desired_bits_per_mb) {
       low = mid + 1;
     } else {
       high = mid;
     }
   }
-#if CONFIG_DEBUG
-  assert(low == high);
-  const double low_factor = calc_correction_factor(
-      error_per_mb, ERR_DIVISOR, FACTOR_PT_LOW, FACTOR_PT_HIGH, low, bit_depth);
-  const int low_bits_per_mb = av1_rc_bits_per_mb(
-      frame_type, low, low_factor * group_weight_factor, bit_depth);
-  assert(low_bits_per_mb <= desired_bits_per_mb || low == worst_qindex);
-#endif  // CONFIG_DEBUG
   return low;
 }
 
@@ -218,13 +223,15 @@ static int get_twopass_worst_quality(AV1_COMP *cpi, const double section_err,
     const int target_norm_bits_per_mb =
         (int)((uint64_t)section_target_bandwidth << BPER_MB_NORMBITS) /
         active_mbs;
+    int rate_err_tol =
+        AOMMIN(cpi->oxcf.under_shoot_pct, cpi->oxcf.over_shoot_pct);
 
     twopass_update_bpm_factor(&cpi->twopass);
     // Try and pick a max Q that will be high enough to encode the
     // content at the given rate.
     int q = find_qindex_by_rate_with_correction(
-        target_norm_bits_per_mb, cpi->common.seq_params.bit_depth, INTER_FRAME,
-        av_err_per_mb, group_weight_factor, rc->best_quality,
+        target_norm_bits_per_mb, cpi->common.seq_params.bit_depth,
+        av_err_per_mb, group_weight_factor, rate_err_tol, rc->best_quality,
         rc->worst_quality);
 
     // Restriction on active max q for constrained quality mode.
@@ -309,7 +316,7 @@ static int detect_transition_to_still(AV1_COMP *cpi, int frame_interval,
     // Look ahead a few frames to see if static condition persists...
     for (j = 0; j < still_interval; ++j) {
       const FIRSTPASS_STATS *stats = &twopass->stats_in[j];
-      if (stats >= twopass->stats_in_end) break;
+      if (stats >= twopass->stats_buf_ctx->stats_in_end) break;
 
       if (stats->pcnt_inter - stats->pcnt_motion < 0.999) break;
     }
@@ -776,7 +783,7 @@ static INLINE int is_almost_static(double gf_zero_motion, int kf_zero_motion) {
 #define GROUP_ADAPTIVE_MAXQ 1
 #if GROUP_ADAPTIVE_MAXQ
 #define RC_FACTOR_MIN 0.75
-#define RC_FACTOR_MAX 1.75
+#define RC_FACTOR_MAX 1.25
 #endif  // GROUP_ADAPTIVE_MAXQ
 #define MIN_FWD_KF_INTERVAL 8
 
@@ -844,7 +851,6 @@ static void define_gf_group(AV1_COMP *cpi, FIRSTPASS_STATS *this_frame,
   FRAME_INFO *frame_info = &cpi->frame_info;
   int i;
 
-  double boost_score = 0.0;
   double gf_group_err = 0.0;
 #if GROUP_ADAPTIVE_MAXQ
   double gf_group_raw_error = 0.0;
@@ -885,7 +891,7 @@ static void define_gf_group(AV1_COMP *cpi, FIRSTPASS_STATS *this_frame,
   aom_clear_system_state();
   av1_zero(next_frame);
 
-  if (oxcf->pass == 0) {
+  if (has_no_stats_stage(cpi)) {
     define_gf_group_pass0(cpi, frame_params);
     return;
   }
@@ -992,10 +998,6 @@ static void define_gf_group(AV1_COMP *cpi, FIRSTPASS_STATS *this_frame,
       }
     }
 
-    // Calculate a boost number for this frame.
-    boost_score += decay_accumulator *
-                   calc_frame_boost(rc, frame_info, &next_frame,
-                                    this_frame_mv_in_out, GF_MAX_BOOST);
     // If almost totally static, we will not use the the max GF length later,
     // so we can continue for more frames.
     if ((i >= active_max_gf_interval + 1) &&
@@ -1156,8 +1158,9 @@ static void define_gf_group(AV1_COMP *cpi, FIRSTPASS_STATS *this_frame,
   // Set the interval until the next gf.
   // If forward keyframes are enabled, ensure the final gf group obeys the
   // MIN_FWD_KF_INTERVAL.
-  if (cpi->oxcf.fwd_kf_enabled &&
-      ((twopass->stats_in - i + rc->frames_to_key) < twopass->stats_in_end)) {
+  if (cpi->oxcf.fwd_kf_enabled && use_alt_ref &&
+      ((twopass->stats_in - i + rc->frames_to_key) <
+       twopass->stats_buf_ctx->stats_in_end)) {
     if (i == rc->frames_to_key) {
       rc->baseline_gf_interval = i;
       // if the last gf group will be smaller than MIN_FWD_KF_INTERVAL
@@ -1216,16 +1219,23 @@ static void define_gf_group(AV1_COMP *cpi, FIRSTPASS_STATS *this_frame,
     int tmp_q;
     // rc factor is a weight factor that corrects for local rate control drift.
     double rc_factor = 1.0;
-    if (rc->rate_error_estimate > 0) {
-      rc_factor = AOMMAX(RC_FACTOR_MIN,
-                         (double)(100 - rc->rate_error_estimate) / 100.0);
-    } else {
-      rc_factor = AOMMIN(RC_FACTOR_MAX,
-                         (double)(100 - rc->rate_error_estimate) / 100.0);
+    int64_t bits = cpi->oxcf.target_bandwidth;
+
+    if (bits > 0) {
+      int rate_error;
+
+      rate_error = (int)((rc->vbr_bits_off_target * 100) / bits);
+      rate_error = clamp(rate_error, -100, 100);
+      if (rate_error > 0) {
+        rc_factor = AOMMAX(RC_FACTOR_MIN, (double)(100 - rate_error) / 100.0);
+      } else {
+        rc_factor = AOMMIN(RC_FACTOR_MAX, (double)(100 - rate_error) / 100.0);
+      }
     }
+
     tmp_q = get_twopass_worst_quality(
         cpi, group_av_err, (group_av_skip_pct + group_av_inactive_zone),
-        vbr_group_bits_per_frame, twopass->kfgroup_inter_fraction * rc_factor);
+        vbr_group_bits_per_frame, rc_factor);
     rc->active_worst_quality = AOMMAX(tmp_q, rc->active_worst_quality >> 1);
   }
 #endif
@@ -1252,7 +1262,8 @@ static void define_gf_group(AV1_COMP *cpi, FIRSTPASS_STATS *this_frame,
   // Calculate a section intra ratio used in setting max loop filter.
   if (frame_params->frame_type != KEY_FRAME) {
     twopass->section_intra_rating = calculate_section_intra_ratio(
-        start_pos, twopass->stats_in_end, rc->baseline_gf_interval);
+        start_pos, twopass->stats_buf_ctx->stats_in_end,
+        rc->baseline_gf_interval);
   }
 
   // Reset rolling actual and target bits counters for ARF groups.
@@ -1454,7 +1465,7 @@ static void find_next_key_frame(AV1_COMP *cpi, FIRSTPASS_STATS *this_frame) {
 
   // Find the next keyframe.
   i = 0;
-  while (twopass->stats_in < twopass->stats_in_end &&
+  while (twopass->stats_in < twopass->stats_buf_ctx->stats_in_end &&
          rc->frames_to_key < cpi->oxcf.key_freq) {
     // Accumulate kf group error.
     kf_group_err +=
@@ -1465,7 +1476,8 @@ static void find_next_key_frame(AV1_COMP *cpi, FIRSTPASS_STATS *this_frame) {
     input_stats(twopass, this_frame);
 
     // Provided that we are not at the end of the file...
-    if (cpi->oxcf.auto_key && twopass->stats_in < twopass->stats_in_end) {
+    if (cpi->oxcf.auto_key &&
+        twopass->stats_in < twopass->stats_buf_ctx->stats_in_end) {
       double loop_decay_rate;
 
       // Check for a scene cut.
@@ -1524,7 +1536,7 @@ static void find_next_key_frame(AV1_COMP *cpi, FIRSTPASS_STATS *this_frame) {
       input_stats(twopass, &tmp_frame);
     }
     rc->next_key_frame_forced = 1;
-  } else if (twopass->stats_in == twopass->stats_in_end ||
+  } else if (twopass->stats_in == twopass->stats_buf_ctx->stats_in_end ||
              rc->frames_to_key >= cpi->oxcf.key_freq) {
     rc->next_key_frame_forced = 1;
   } else {
@@ -1532,7 +1544,7 @@ static void find_next_key_frame(AV1_COMP *cpi, FIRSTPASS_STATS *this_frame) {
   }
 
   // Special case for the last key frame of the file.
-  if (twopass->stats_in >= twopass->stats_in_end) {
+  if (twopass->stats_in >= twopass->stats_buf_ctx->stats_in_end) {
     // Accumulate kf group error.
     kf_group_err +=
         calculate_modified_err(frame_info, twopass, oxcf, this_frame);
@@ -1607,7 +1619,7 @@ static void find_next_key_frame(AV1_COMP *cpi, FIRSTPASS_STATS *this_frame) {
 
   // Calculate a section intra ratio used in setting max loop filter.
   twopass->section_intra_rating = calculate_section_intra_ratio(
-      start_position, twopass->stats_in_end, rc->frames_to_key);
+      start_position, twopass->stats_buf_ctx->stats_in_end, rc->frames_to_key);
 
   rc->kf_boost = (int)boost_score;
 
@@ -1630,16 +1642,6 @@ static void find_next_key_frame(AV1_COMP *cpi, FIRSTPASS_STATS *this_frame) {
   kf_bits = adjust_boost_bits_for_target_level(cpi, kf_bits,
                                                twopass->kf_group_bits, 0);
 
-  // Work out the fraction of the kf group bits reserved for the inter frames
-  // within the group after discounting the bits for the kf itself.
-  if (twopass->kf_group_bits) {
-    twopass->kfgroup_inter_fraction =
-        (double)(twopass->kf_group_bits - kf_bits) /
-        (double)twopass->kf_group_bits;
-  } else {
-    twopass->kfgroup_inter_fraction = 1.0;
-  }
-
   twopass->kf_group_bits -= kf_bits;
 
   // Save the bits to spend on the key frame.
@@ -1656,7 +1658,7 @@ static void find_next_key_frame(AV1_COMP *cpi, FIRSTPASS_STATS *this_frame) {
 }
 
 static int is_skippable_frame(const AV1_COMP *cpi) {
-  if (cpi->oxcf.pass == 0) return 0;
+  if (has_no_stats_stage(cpi)) return 0;
   // If the current frame does not have non-zero motion vector detected in the
   // first  pass, and so do its previous and forward frames, then this frame
   // can be skipped for partition check, and the partition size is assigned
@@ -1664,8 +1666,8 @@ static int is_skippable_frame(const AV1_COMP *cpi) {
   const TWO_PASS *const twopass = &cpi->twopass;
 
   return (!frame_is_intra_only(&cpi->common) &&
-          twopass->stats_in - 2 > twopass->stats_in_start &&
-          twopass->stats_in < twopass->stats_in_end &&
+          twopass->stats_in - 2 > twopass->stats_buf_ctx->stats_in_start &&
+          twopass->stats_in < twopass->stats_buf_ctx->stats_in_end &&
           (twopass->stats_in - 1)->pcnt_inter -
                   (twopass->stats_in - 1)->pcnt_motion ==
               1 &&
@@ -1716,7 +1718,13 @@ static void process_first_pass_stats(AV1_COMP *cpi,
     rc->avg_frame_qindex[KEY_FRAME] = rc->last_q[KEY_FRAME];
   }
 
-  if (EOF == input_stats(twopass, this_frame)) return;
+  int err = 0;
+  if (cpi->lap_enabled) {
+    err = input_stats_lap(twopass, this_frame);
+  } else {
+    err = input_stats(twopass, this_frame);
+  }
+  if (err == EOF) return;
 
   {
     const int num_mbs = (cpi->oxcf.resize_mode != RESIZE_NONE)
@@ -1745,7 +1753,7 @@ static void setup_target_rate(AV1_COMP *cpi) {
 
   int target_rate = gf_group->bit_allocation[gf_group->index];
 
-  if (cpi->oxcf.pass == 0) {
+  if (has_no_stats_stage(cpi)) {
     av1_rc_set_frame_target(cpi, target_rate, cpi->common.width,
                             cpi->common.height);
   }
@@ -1760,7 +1768,7 @@ void av1_get_second_pass_params(AV1_COMP *cpi,
   TWO_PASS *const twopass = &cpi->twopass;
   GF_GROUP *const gf_group = &cpi->gf_group;
 
-  if (cpi->oxcf.pass == 2 && !twopass->stats_in) return;
+  if (is_stat_consumption_stage(cpi) && !twopass->stats_in) return;
 
   if (rc->frames_till_gf_update_due > 0 && !(frame_flags & FRAMEFLAGS_KEY)) {
     assert(gf_group->index < gf_group->size);
@@ -1780,7 +1788,7 @@ void av1_get_second_pass_params(AV1_COMP *cpi,
 
       // Do the firstpass stats indicate that this frame is skippable for the
       // partition search?
-      if (cpi->sf.allow_partition_search_skip && cpi->oxcf.pass == 2) {
+      if (cpi->sf.part_sf.allow_partition_search_skip && cpi->oxcf.pass == 2) {
         cpi->partition_search_skippable_frame = is_skippable_frame(cpi);
       }
 
@@ -1794,7 +1802,7 @@ void av1_get_second_pass_params(AV1_COMP *cpi,
   FIRSTPASS_STATS this_frame;
   av1_zero(this_frame);
   // call above fn
-  if (cpi->oxcf.pass == 2) {
+  if (is_stat_consumption_stage(cpi)) {
     process_first_pass_stats(cpi, &this_frame);
   } else {
     rc->active_worst_quality = cpi->oxcf.cq_level;
@@ -1810,6 +1818,39 @@ void av1_get_second_pass_params(AV1_COMP *cpi,
     this_frame = this_frame_copy;
   } else {
     frame_params->frame_type = INTER_FRAME;
+    const int altref_enabled = is_altref_enabled(cpi);
+    const int sframe_dist = cpi->oxcf.sframe_dist;
+    const int sframe_mode = cpi->oxcf.sframe_mode;
+    const int sframe_enabled = cpi->oxcf.sframe_enabled;
+    const int update_type = gf_group->update_type[gf_group->index];
+    CurrentFrame *const current_frame = &cpi->common.current_frame;
+    if (sframe_enabled) {
+      if (altref_enabled) {
+        if (sframe_mode == 1) {
+          // sframe_mode == 1: insert sframe if it matches altref frame.
+          if (current_frame->frame_number % sframe_dist == 0 &&
+              current_frame->frame_number != 0 && update_type == ARF_UPDATE) {
+            frame_params->frame_type = S_FRAME;
+          }
+        } else {
+          // sframe_mode != 1: if sframe will be inserted at the next available
+          // altref frame
+          if (current_frame->frame_number % sframe_dist == 0 &&
+              current_frame->frame_number != 0) {
+            rc->sframe_due = 1;
+          }
+          if (rc->sframe_due && update_type == ARF_UPDATE) {
+            frame_params->frame_type = S_FRAME;
+            rc->sframe_due = 0;
+          }
+        }
+      } else {
+        if (current_frame->frame_number % sframe_dist == 0 &&
+            current_frame->frame_number != 0) {
+          frame_params->frame_type = S_FRAME;
+        }
+      }
+    }
   }
 
   // Define a new GF/ARF group. (Should always enter here for key frames).
@@ -1839,7 +1880,7 @@ void av1_get_second_pass_params(AV1_COMP *cpi,
 
   // Do the firstpass stats indicate that this frame is skippable for the
   // partition search?
-  if (cpi->sf.allow_partition_search_skip && cpi->oxcf.pass == 2) {
+  if (cpi->sf.part_sf.allow_partition_search_skip && cpi->oxcf.pass == 2) {
     cpi->partition_search_skippable_frame = is_skippable_frame(cpi);
   }
 
@@ -1856,11 +1897,11 @@ void av1_init_second_pass(AV1_COMP *cpi) {
   av1_twopass_zero_stats(&twopass->total_stats);
   av1_twopass_zero_stats(&twopass->total_left_stats);
 
-  if (!twopass->stats_in_end) return;
+  if (!twopass->stats_buf_ctx->stats_in_end) return;
 
   stats = &twopass->total_stats;
 
-  *stats = *twopass->stats_in_end;
+  *stats = *twopass->stats_buf_ctx->stats_in_end;
   twopass->total_left_stats = *stats;
 
   frame_rate = 10000000.0 * stats->count / stats->duration;
@@ -1887,7 +1928,7 @@ void av1_init_second_pass(AV1_COMP *cpi) {
         (avg_error * oxcf->two_pass_vbrmin_section) / 100;
     twopass->modified_error_max =
         (avg_error * oxcf->two_pass_vbrmax_section) / 100;
-    while (s < twopass->stats_in_end) {
+    while (s < twopass->stats_buf_ctx->stats_in_end) {
       modified_error_total +=
           calculate_modified_err(frame_info, twopass, oxcf, s);
       ++s;
@@ -1947,18 +1988,20 @@ void av1_twopass_postencode_update(AV1_COMP *cpi) {
     AV1_COMMON *cm = &cpi->common;
     FILE *fpfile;
     fpfile = fopen("details.stt", "a");
-    fprintf(fpfile, "%10d %10d %10d %10"PRId64" %10"PRId64" %10d %10d %10d %10.4lf %10.4lf %10.4lf %10.4lf\n",
-            cm->current_frame.frame_number,
-            rc->base_frame_target, rc->projected_frame_size,
-            rc->total_actual_bits, rc->vbr_bits_off_target,
-            rc->rate_error_estimate,
+    fprintf(fpfile,
+            "%10d %10d %10d %10" PRId64 " %10" PRId64
+            " %10d %10d %10d %10.4lf %10.4lf %10.4lf %10.4lf\n",
+            cm->current_frame.frame_number, rc->base_frame_target,
+            rc->projected_frame_size, rc->total_actual_bits,
+            rc->vbr_bits_off_target, rc->rate_error_estimate,
             twopass->rolling_arf_group_target_bits,
             twopass->rolling_arf_group_actual_bits,
             (double)twopass->rolling_arf_group_actual_bits /
                 (double)twopass->rolling_arf_group_target_bits,
             twopass->bpm_factor,
             av1_convert_qindex_to_q(cm->base_qindex, cm->seq_params.bit_depth),
-            av1_convert_qindex_to_q(rc->active_worst_quality, cm->seq_params.bit_depth));
+            av1_convert_qindex_to_q(rc->active_worst_quality,
+                                    cm->seq_params.bit_depth));
     fclose(fpfile);
   }
 #endif

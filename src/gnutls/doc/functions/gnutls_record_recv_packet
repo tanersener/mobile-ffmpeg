@@ -12,12 +12,12 @@ to directly receive the whole decrypted packet. That avoids a
 memory copy, and is intended to be used by applications seeking high
 performance.
 
-The received packet is accessed using @code{gnutls_packet_get()}  and 
+The received packet is accessed using @code{gnutls_packet_get()}  and
 must be deinitialized using @code{gnutls_packet_deinit()} . The returned
 packet will be @code{NULL}  if the return value is zero (EOF).
 
 @strong{Returns:} The number of bytes received and zero on EOF (for stream
-connections).  A negative error code is returned in case of an error.  
+connections).  A negative error code is returned in case of an error.
 
 @strong{Since:} 3.3.5
 @end deftypefun

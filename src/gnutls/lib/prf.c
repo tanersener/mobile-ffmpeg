@@ -80,6 +80,9 @@ gnutls_prf_raw(gnutls_session_t session,
 	if (vers && vers->tls13_sem)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
+	if (session->security_parameters.prf == NULL)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
 	ret = _gnutls_prf_raw(session->security_parameters.prf->id,
 			  GNUTLS_MASTER_SIZE, session->security_parameters.master_secret,
 			  label_size, label,
@@ -164,6 +167,9 @@ gnutls_prf_rfc5705(gnutls_session_t session,
 {
 	const version_entry_st *vers = get_version(session);
 	int ret;
+
+	if (session->security_parameters.prf == NULL)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	if (vers && vers->tls13_sem) {
 		ret = _tls13_derive_exporter(session->security_parameters.prf,
@@ -308,6 +314,9 @@ gnutls_prf(gnutls_session_t session,
 		else
 			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
+
+	if (session->security_parameters.prf == NULL)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	seed = gnutls_malloc(seedsize);
 	if (!seed) {

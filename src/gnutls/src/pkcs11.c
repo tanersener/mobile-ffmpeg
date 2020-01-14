@@ -34,6 +34,8 @@
 #include <stdint.h>
 #include <common.h>
 
+#include <p11-kit/pkcs11.h>
+
 #ifdef _WIN32
 # define sleep(x) Sleep(x*1000)
 #endif
@@ -1519,6 +1521,7 @@ pkcs11_mechanism_list(FILE * outfile, const char *url, unsigned int flags,
 	int idx;
 	unsigned long mechanism;
 	const char *str;
+	CK_MECHANISM_INFO minfo;
 
 	pkcs11_common(info);
 
@@ -1537,7 +1540,63 @@ pkcs11_mechanism_list(FILE * outfile, const char *url, unsigned int flags,
 			if (str == NULL)
 				str = "UNKNOWN";
 
-			fprintf(outfile, "[0x%.4lx] %s\n", mechanism, str);
+			fprintf(outfile, "[0x%.4lx] %s", mechanism, str);
+
+			if (gnutls_pkcs11_token_check_mechanism(url, mechanism, &minfo, sizeof(minfo), 0) != 0) {
+				if (minfo.ulMaxKeySize != 0)
+					fprintf(outfile, " keysize range (%ld, %ld)", minfo.ulMinKeySize, minfo.ulMaxKeySize);
+				if (minfo.flags & CKF_HW)
+					printf(" hw");
+				if (minfo.flags & CKF_ENCRYPT)
+					printf(" encrypt");
+				if (minfo.flags & CKF_DECRYPT)
+					printf(" decrypt");
+				if (minfo.flags & CKF_DIGEST)
+					printf(" digest");
+				if (minfo.flags & CKF_SIGN)
+					printf(" sign");
+				if (minfo.flags & CKF_SIGN_RECOVER)
+					printf(" sign_recover");
+				if (minfo.flags & CKF_VERIFY)
+					printf(" verify");
+				if (minfo.flags & CKF_VERIFY_RECOVER)
+					printf(" verify_recover");
+				if (minfo.flags & CKF_GENERATE)
+					printf(" generate");
+				if (minfo.flags & CKF_GENERATE_KEY_PAIR)
+					printf(" generate_key_pair");
+				if (minfo.flags & CKF_WRAP)
+					printf(" wrap");
+				if (minfo.flags & CKF_UNWRAP)
+					printf(" unwrap");
+				if (minfo.flags & CKF_DERIVE)
+					printf(" derive");
+#ifdef CKF_EC_F_P
+				if (minfo.flags & CKF_EC_F_P)
+					printf(" ec_f_p");
+#endif
+#ifdef CKF_EC_F_2M
+				if (minfo.flags & CKF_EC_F_2M)
+					printf(" ec_f_2m");
+#endif
+#ifdef CKF_EC_ECPARAMETERS
+				if (minfo.flags & CKF_EC_ECPARAMETERS)
+					printf(" ec_ecparameters");
+#endif
+#ifdef CKF_EC_NAMEDCURVE
+				if (minfo.flags & CKF_EC_NAMEDCURVE)
+					printf(" ec_namedcurve");
+#endif
+#ifdef CKF_EC_UNCOMPRESS
+				if (minfo.flags & CKF_EC_UNCOMPRESS)
+					printf(" ec_uncompress");
+#endif
+#ifdef CKF_EC_COMPRESS
+				if (minfo.flags & CKF_EC_COMPRESS)
+					printf(" ec_compress");
+#endif
+			}
+			fprintf(outfile, "\n");
 		}
 	}
 	while (ret >= 0);

@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////
 //                           **** WAVPACK ****                            //
 //                  Hybrid Lossless Wavefile Compressor                   //
-//                Copyright (c) 1998 - 2017 David Bryant.                 //
+//                Copyright (c) 1998 - 2019 David Bryant.                 //
 //                          All Rights Reserved.                          //
 //      Distributed under the BSD Software License (see license.txt)      //
 ////////////////////////////////////////////////////////////////////////////
@@ -61,7 +61,7 @@
 
 static const char *sign_on = "\n"
 " WVGAIN  ReplayGain Scanner/Tagger for WavPack  %s Version %s\n"
-" Copyright (c) 2005 - 2017 David Bryant.  All Rights Reserved.\n\n";
+" Copyright (c) 2005 - 2019 David Bryant.  All Rights Reserved.\n\n";
 
 static const char *version_warning = "\n"
 " WARNING: WVGAIN using libwavpack version %s, expected %s (see README)\n\n";
@@ -144,27 +144,23 @@ int main(int argc, char **argv)
     char selfname [MAX_PATH];
 
     if (GetModuleFileName (NULL, selfname, sizeof (selfname)) && filespec_name (selfname) &&
-        _strupr (filespec_name (selfname)) && strstr (filespec_name (selfname), "DEBUG")) {
-            char **argv_t = argv;
-            int argc_t = argc;
-
+        _strupr (filespec_name (selfname)) && strstr (filespec_name (selfname), "DEBUG"))
             debug_logging_mode = TRUE;
 
-            while (--argc_t)
-                error_line ("arg %d: %s", argc - argc_t, *++argv_t);
-    }
+    strcpy (selfname, *argv);
 #else
-    if (filespec_name (*argv))
-        if (strstr (filespec_name (*argv), "ebug") || strstr (filespec_name (*argv), "DEBUG")) {
-            char **argv_t = argv;
-            int argc_t = argc;
-
+    if (filespec_name (*argv) &&
+        (strstr (filespec_name (*argv), "ebug") || strstr (filespec_name (*argv), "DEBUG")))
             debug_logging_mode = TRUE;
-
-            while (--argc_t)
-                error_line ("arg %d: %s", argc - argc_t, *++argv_t);
-    }
 #endif
+
+    if (debug_logging_mode) {
+        char **argv_t = argv;
+        int argc_t = argc;
+
+        while (--argc_t)
+            error_line ("arg %d: %s", argc - argc_t, *++argv_t);
+    }
 
 #if defined (_WIN32)
    set_console_title = 1;      // on Windows, we default to messing with the console title
@@ -525,6 +521,8 @@ int main(int argc, char **argv)
             }
         }
 
+        free (track_peaks);
+        free (track_gains);
         free (matches);
     }
     else {

@@ -114,7 +114,7 @@ void *	<a href="#xmlIOHTTPOpenW">xmlIOHTTPOpenW</a>			(const char * post_uri, <b
 <div class="variablelist"><table border="0"><col align="left"/><tbody><tr><td><span class="term"><i><tt>context</tt></i>:</span></td><td>an Input context</td></tr><tr><td><span class="term"><i><tt>Returns</tt></i>:</span></td><td>0 or -1 in case of error</td></tr></tbody></table></div></div>
         <hr/>
         <div class="refsect2" lang="en"><h3><a name="xmlInputMatchCallback"/>Function type xmlInputMatchCallback</h3><pre class="programlisting">int	xmlInputMatchCallback		(char const * filename)<br/>
-</pre><p>Callback used in the I/O Input API to detect if the current handler can provide input fonctionnalities for this resource.</p>
+</pre><p>Callback used in the I/O Input API to detect if the current handler can provide input functionality for this resource.</p>
 <div class="variablelist"><table border="0"><col align="left"/><tbody><tr><td><span class="term"><i><tt>filename</tt></i>:</span></td><td>the filename or URI</td></tr><tr><td><span class="term"><i><tt>Returns</tt></i>:</span></td><td>1 if yes and 0 if another Input module should be used</td></tr></tbody></table></div></div>
         <hr/>
         <div class="refsect2" lang="en"><h3><a name="xmlInputOpenCallback"/>Function type xmlInputOpenCallback</h3><pre class="programlisting">void *	xmlInputOpenCallback		(char const * filename)<br/>
@@ -130,7 +130,7 @@ void *	<a href="#xmlIOHTTPOpenW">xmlIOHTTPOpenW</a>			(const char * post_uri, <b
 <div class="variablelist"><table border="0"><col align="left"/><tbody><tr><td><span class="term"><i><tt>context</tt></i>:</span></td><td>an Output context</td></tr><tr><td><span class="term"><i><tt>Returns</tt></i>:</span></td><td>0 or -1 in case of error</td></tr></tbody></table></div></div>
         <hr/>
         <div class="refsect2" lang="en"><h3><a name="xmlOutputMatchCallback"/>Function type xmlOutputMatchCallback</h3><pre class="programlisting">int	xmlOutputMatchCallback		(char const * filename)<br/>
-</pre><p>Callback used in the I/O Output API to detect if the current handler can provide output fonctionnalities for this resource.</p>
+</pre><p>Callback used in the I/O Output API to detect if the current handler can provide output functionality for this resource.</p>
 <div class="variablelist"><table border="0"><col align="left"/><tbody><tr><td><span class="term"><i><tt>filename</tt></i>:</span></td><td>the filename or URI</td></tr><tr><td><span class="term"><i><tt>Returns</tt></i>:</span></td><td>1 if yes and 0 if another Output module should be used</td></tr></tbody></table></div></div>
         <hr/>
         <div class="refsect2" lang="en"><h3><a name="xmlOutputOpenCallback"/>Function type xmlOutputOpenCallback</h3><pre class="programlisting">void *	xmlOutputOpenCallback		(char const * filename)<br/>
@@ -270,7 +270,7 @@ void *	<a href="#xmlIOHTTPOpenW">xmlIOHTTPOpenW</a>			(const char * post_uri, <b
 <div class="variablelist"><table border="0"><col align="left"/><tbody><tr><td><span class="term"><i><tt>out</tt></i>:</span></td><td>a buffered parser output</td></tr><tr><td><span class="term"><i><tt>len</tt></i>:</span></td><td>the size in bytes of the array.</td></tr><tr><td><span class="term"><i><tt>buf</tt></i>:</span></td><td>an char array</td></tr><tr><td><span class="term"><i><tt>Returns</tt></i>:</span></td><td>the number of chars immediately written, or -1 in case of error.</td></tr></tbody></table></div></div>
         <hr/>
         <div class="refsect2" lang="en"><h3><a name="xmlOutputBufferWriteEscape"/>xmlOutputBufferWriteEscape ()</h3><pre class="programlisting">int	xmlOutputBufferWriteEscape	(<a href="libxml2-tree.html#xmlOutputBufferPtr">xmlOutputBufferPtr</a> out, <br/>					 const <a href="libxml2-xmlstring.html#xmlChar">xmlChar</a> * str, <br/>					 <a href="libxml2-encoding.html#xmlCharEncodingOutputFunc">xmlCharEncodingOutputFunc</a> escaping)<br/>
-</pre><p>Write the content of the string in the output I/O buffer This routine escapes the caracters and then handle the I18N transcoding from internal UTF-8 The buffer is lossless, i.e. will store in case of partial or delayed writes.</p>
+</pre><p>Write the content of the string in the output I/O buffer This routine escapes the <a href="libxml2-SAX.html#characters">characters</a> and then handle the I18N transcoding from internal UTF-8 The buffer is lossless, i.e. will store in case of partial or delayed writes.</p>
 <div class="variablelist"><table border="0"><col align="left"/><tbody><tr><td><span class="term"><i><tt>out</tt></i>:</span></td><td>a buffered parser output</td></tr><tr><td><span class="term"><i><tt>str</tt></i>:</span></td><td>a zero terminated UTF-8 string</td></tr><tr><td><span class="term"><i><tt>escaping</tt></i>:</span></td><td>an optional escaping function (or NULL)</td></tr><tr><td><span class="term"><i><tt>Returns</tt></i>:</span></td><td>the number of chars immediately written, or -1 in case of error.</td></tr></tbody></table></div></div>
         <hr/>
         <div class="refsect2" lang="en"><h3><a name="xmlOutputBufferWriteString"/>xmlOutputBufferWriteString ()</h3><pre class="programlisting">int	xmlOutputBufferWriteString	(<a href="libxml2-tree.html#xmlOutputBufferPtr">xmlOutputBufferPtr</a> out, <br/>					 const char * str)<br/>

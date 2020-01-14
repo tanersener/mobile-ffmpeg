@@ -54,4 +54,4 @@ EXTRA_DIST += \
     restore.c               save.c                  sort.c  \
     stack.c                 stdnoreturn.in.h        streqvcmp.c  \
     text_mmap.c             time.c                  tokenize.c  \
-    usage.c                 version.c
+    usage.c version.c save-flags.c save-flags.h

@@ -50,7 +50,7 @@ autoreconf_library ${LIB_NAME}
     --with-pic \
     --with-sysroot=${SDK_PATH} \
     --with-zlib \
-    --with-iconv=${BASEDIR}/prebuilt/$(get_target_build_directory)/libiconv \
+    --with-iconv=${SDK_PATH}/usr \
     --with-sax1 \
     --without-python \
     --without-debug \
@@ -63,6 +63,6 @@ autoreconf_library ${LIB_NAME}
 make -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_libxml2_package_config "2.9.9"
+create_libxml2_package_config "2.9.10"
 
 make install || exit 1

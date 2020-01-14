@@ -220,16 +220,7 @@ UTILS = $(BINDIR)/xmllint.exe\
 	$(BINDIR)/testapi.exe\
 	$(BINDIR)/testlimits.exe
 
-ifeq ($(WITH_THREADS),yes)
-UTILS += $(BINDIR)/testThreadsWin32.exe
-endif
-ifeq ($(WITH_THREADS),ctls) 
-UTILS += $(BINDIR)/testThreadsWin32.exe
-endif
-ifeq ($(WITH_THREADS),native)
-UTILS += $(BINDIR)/testThreadsWin32.exe
-endif
-ifeq ($(WITH_THREADS),posix)
+ifneq ($(WITH_THREADS),no)
 UTILS += $(BINDIR)/testThreads.exe
 endif
 
