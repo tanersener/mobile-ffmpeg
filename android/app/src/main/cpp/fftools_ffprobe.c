@@ -886,10 +886,10 @@ static void writer_print_integers(WriterContext *wctx, const char *name,
 
 __thread const Writer *registered_writers[MAX_REGISTERED_WRITERS_NB + 1];
 
+__thread int next_registered_writer_idx = 0;
+
 static int writer_register(const Writer *writer)
 {
-    static int next_registered_writer_idx = 0;
-
     if (next_registered_writer_idx == MAX_REGISTERED_WRITERS_NB)
         return AVERROR(ENOMEM);
 
@@ -1798,11 +1798,6 @@ static Writer xml_writer = {
 
 static void writer_register_all(void)
 {
-    static int initialized;
-
-    if (initialized)
-        return;
-    initialized = 1;
 
     writer_register(&default_writer);
     writer_register(&compact_writer);

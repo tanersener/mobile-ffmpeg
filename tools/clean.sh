@@ -24,3 +24,8 @@ rm -rf ../tvos/test-app/manual-frameworks/*.framework
 rm -rf ../tvos/test-app/universal/Pods
 rm -rf ../tvos/test-app/universal/*.framework
 rm -rf ../tvos/test-app/universal/mobile-ffmpeg-universal
+
+rm -rf ../src/libvidstab
+rm -rf ../src/x264
+rm -rf ../src/x265
+rm -rf ../src/xvidcore
