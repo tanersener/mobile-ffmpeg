@@ -321,7 +321,7 @@ get_app_specific_cflags() {
         mobile-ffmpeg)
             APP_FLAGS="-std=c99 -Wno-unused-function -Wall -Wno-deprecated-declarations -Wno-pointer-sign -Wno-switch -Wno-unused-result -Wno-unused-variable -DPIC -fobjc-arc"
         ;;
-        sdl2)
+        sdl)
             APP_FLAGS="-DPIC -Wno-unused-function -D__IPHONEOS__"
         ;;
         shine)
