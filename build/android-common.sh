@@ -250,27 +250,27 @@ get_size_optimization_cflags() {
                     ARCH_OPTIMIZATION="${LINK_TIME_OPTIMIZATION_FLAGS} -O2 -ffunction-sections -fdata-sections"
                 ;;
                 *)
-                    ARCH_OPTIMIZATION="-Os -ffunction-sections -fdata-sections"
+                    ARCH_OPTIMIZATION="-O2 -ffunction-sections -fdata-sections"
                 ;;
             esac
         ;;
         arm64-v8a)
             case $1 in
                 ffmpeg)
-                    ARCH_OPTIMIZATION="${LINK_TIME_OPTIMIZATION_FLAGS} -fuse-ld=gold -O2 -ffunction-sections -fdata-sections"
+                    ARCH_OPTIMIZATION="${LINK_TIME_OPTIMIZATION_FLAGS} -fuse-ld=bfd -O2 -ffunction-sections -fdata-sections"
                 ;;
                 *)
-                    ARCH_OPTIMIZATION="-Os -ffunction-sections -fdata-sections"
+                    ARCH_OPTIMIZATION="-O2 -ffunction-sections -fdata-sections"
                 ;;
             esac
         ;;
         x86 | x86-64)
             case $1 in
                 ffmpeg)
-                    ARCH_OPTIMIZATION="${LINK_TIME_OPTIMIZATION_FLAGS} -Os -ffunction-sections -fdata-sections"
+                    ARCH_OPTIMIZATION="${LINK_TIME_OPTIMIZATION_FLAGS} -O2 -ffunction-sections -fdata-sections"
                 ;;
                 *)
-                    ARCH_OPTIMIZATION="-Os -ffunction-sections -fdata-sections"
+                    ARCH_OPTIMIZATION="-O2 -ffunction-sections -fdata-sections"
                 ;;
             esac
         ;;
@@ -291,14 +291,17 @@ get_app_specific_cflags() {
         ffmpeg)
             APP_FLAGS="-Wno-unused-function -DBIONIC_IOCTL_NO_SIGNEDNESS_OVERLOAD"
         ;;
+        kvazaar)
+            APP_FLAGS="-std=gnu99 -Wno-unused-function"
+        ;;
         shine)
             APP_FLAGS="-Wno-unused-function"
         ;;
+        sdl)
+            APP_FLAGS="-std=c11 -Wno-unused-function"
+        ;;
         soxr | snappy | libwebp)
             APP_FLAGS="-std=gnu99 -Wno-unused-function -DPIC"
-        ;;
-        kvazaar)
-            APP_FLAGS="-std=gnu99 -Wno-unused-function"
         ;;
         *)
             APP_FLAGS="-std=c99 -Wno-unused-function"
@@ -330,7 +333,7 @@ get_cxxflags() {
     fi
 
     if [[ -z ${MOBILE_FFMPEG_DEBUG} ]]; then
-        local OPTIMIZATION_FLAGS="-Os -ffunction-sections -fdata-sections"
+        local OPTIMIZATION_FLAGS="-O2 -ffunction-sections -fdata-sections"
     else
         local OPTIMIZATION_FLAGS="${MOBILE_FFMPEG_DEBUG}"
     fi
@@ -392,10 +395,10 @@ get_size_optimization_ldflags() {
         arm64-v8a)
             case $1 in
                 ffmpeg)
-                    echo "-Wl,--gc-sections ${LINK_TIME_OPTIMIZATION_FLAGS} -fuse-ld=gold -O2 -ffunction-sections -fdata-sections -finline-functions"
+                    echo "-Wl,--gc-sections ${LINK_TIME_OPTIMIZATION_FLAGS} -fuse-ld=bfd -O2 -ffunction-sections -fdata-sections -finline-functions"
                 ;;
                 *)
-                    echo "-Wl,--gc-sections -Os -ffunction-sections -fdata-sections"
+                    echo "-Wl,--gc-sections -O2 -ffunction-sections -fdata-sections"
                 ;;
             esac
         ;;
@@ -405,7 +408,7 @@ get_size_optimization_ldflags() {
                     echo "-Wl,--gc-sections,--icf=safe ${LINK_TIME_OPTIMIZATION_FLAGS} -O2 -ffunction-sections -fdata-sections -finline-functions"
                 ;;
                 *)
-                    echo "-Wl,--gc-sections,--icf=safe -Os -ffunction-sections -fdata-sections"
+                    echo "-Wl,--gc-sections,--icf=safe -O2 -ffunction-sections -fdata-sections"
                 ;;
             esac
         ;;

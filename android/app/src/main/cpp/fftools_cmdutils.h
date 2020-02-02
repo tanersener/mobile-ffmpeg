@@ -77,6 +77,7 @@ extern __thread AVDictionary *swr_opts;
 extern __thread AVDictionary *format_opts, *codec_opts, *resample_opts;
 extern __thread int hide_banner;
 extern __thread int find_stream_info;
+extern __thread int filter_nbthreads;
 
 /**
  * Register a program-specific cleanup routine.

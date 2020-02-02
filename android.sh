@@ -780,6 +780,7 @@ done
 
 export API=${ORIGINAL_API}
 
+# DEFINE ANDROID ARCHITECTURES
 rm -f ${BASEDIR}/android/build/.neon 1>>${BASEDIR}/build.log 2>&1
 ANDROID_ARCHITECTURES=""
 if [[ ${ENABLED_ARCHITECTURES[1]} -eq 1 ]]; then
@@ -798,6 +799,14 @@ if [[ ${ENABLED_ARCHITECTURES[3]} -eq 1 ]]; then
 fi
 if [[ ${ENABLED_ARCHITECTURES[4]} -eq 1 ]]; then
     ANDROID_ARCHITECTURES+="$(get_android_arch 4) "
+fi
+
+# DEFINE BUILD FFPLAY FLAG
+rm -f ${BASEDIR}/android/build/.ffplay 1>>${BASEDIR}/build.log 2>&1
+if [[ ${ENABLED_LIBRARIES[LIBRARY_SDL]} -eq 1 ]]; then
+    mkdir -p ${BASEDIR}/android/build 1>>${BASEDIR}/build.log 2>&1
+    cat > "${BASEDIR}/android/build/.ffplay" << EOF
+EOF
 fi
 
 if [[ ! -z ${ANDROID_ARCHITECTURES} ]]; then

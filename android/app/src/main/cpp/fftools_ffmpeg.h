@@ -627,7 +627,6 @@ extern __thread AVIOContext *progress_avio;
 extern __thread float max_error_rate;
 extern __thread char *videotoolbox_pixfmt;
 
-extern __thread int filter_nbthreads;
 extern __thread int filter_complex_nbthreads;
 extern __thread int vstats_version;
 
