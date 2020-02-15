@@ -39,13 +39,13 @@ export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 export LDFLAGS=$(get_ldflags ${LIB_NAME})
 export ASM_FLAGS=$(get_asmflags ${LIB_NAME})
 
-SIMD_OPTIONS=""
+ARCH_OPTIONS=""
 case ${ARCH} in
     armv7 | armv7s | arm64 | arm64e)
-        SIMD_OPTIONS="-DWITH_SIMD=1"
+        ARCH_OPTIONS="-DWITH_SIMD=1"
     ;;
     *)
-        SIMD_OPTIONS="-DWITH_SIMD=0"
+        ARCH_OPTIONS="-DWITH_SIMD=0"
     ;;
 esac
 
@@ -80,7 +80,7 @@ cmake -Wno-dev \
     -DENABLE_STATIC=1 \
     -DENABLE_SHARED=0 \
     -DWITH_JPEG8=1 \
-    ${SIMD_OPTIONS} \
+    ${ARCH_OPTIONS} \
     -DWITH_TURBOJPEG=0 \
     -DWITH_JAVA=0 \
     -DCMAKE_SYSTEM_PROCESSOR=$(get_target_arch) \

@@ -33,13 +33,13 @@ CFLAGS=$(get_cflags ${LIB_NAME})
 CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 LDFLAGS=$(get_ldflags ${LIB_NAME})
 
-SIMD_OPTIONS=""
+ARCH_OPTIONS=""
 case ${ARCH} in
     arm-v7a)
-        SIMD_OPTIONS="-DWEBP_ENABLE_SIMD=OFF"
+        ARCH_OPTIONS="-DWEBP_ENABLE_SIMD=OFF"
     ;;
     *)
-        SIMD_OPTIONS="-DWEBP_ENABLE_SIMD=ON"
+        ARCH_OPTIONS="-DWEBP_ENABLE_SIMD=ON"
     ;;
 esac
 
@@ -95,7 +95,7 @@ cmake -Wno-dev \
     -DWEBP_BUILD_IMG2WEBP=0 \
     -DWEBP_BUILD_WEBPMUX=0 \
     -DWEBP_BUILD_WEBPINFO=0 \
-    ${SIMD_OPTIONS} \
+    ${ARCH_OPTIONS} \
     -DCMAKE_SYSTEM_PROCESSOR=$(get_cmake_target_processor) \
     -DBUILD_SHARED_LIBS=0 .. || exit 1
 
