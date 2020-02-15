@@ -5,33 +5,29 @@ branches:
 sudo: false
 git:
   quiet: true
-addons:
-  apt:
-    packages:
-      - autoconf
-      - automake
-      - libtool
-      - pkg-config
-      - curl
-      - git
-      - cmake
-      - gcc
-      - gperf
-      - texinfo
-      - yasm
-      - nasm
-      - bison
-      - autogen
-      - patch
-  homebrew:
-    packages:
-      - nasm
-    update: true
 matrix:
   include:
     - name: "Android Main Build"
       language: android
       dist : trusty
+      addons:
+        apt:
+          packages:
+            - autoconf
+            - automake
+            - libtool
+            - pkg-config
+            - curl
+            - git
+            - cmake
+            - gcc
+            - gperf
+            - texinfo
+            - yasm
+            - nasm
+            - bison
+            - autogen
+            - patch
       android:
         components:
           - tools
@@ -60,6 +56,24 @@ matrix:
     - name: "Android LTS Build"
       language: android
       dist : trusty
+      addons:
+        apt:
+          packages:
+            - autoconf
+            - automake
+            - libtool
+            - pkg-config
+            - curl
+            - git
+            - cmake
+            - gcc
+            - gperf
+            - texinfo
+            - yasm
+            - nasm
+            - bison
+            - autogen
+            - patch
       android:
         components:
           - tools
@@ -89,6 +103,11 @@ matrix:
     - name: "iOS Main Build"
       language: objective-c
       osx_image: xcode10.2
+      addons:
+        homebrew:
+          packages:
+            - nasm
+          update: true
       before_script:
         - rm -f ./build.log
       after_success:
@@ -101,6 +120,11 @@ matrix:
     - name: "iOS LTS Build"
       language: objective-c
       osx_image: xcode7.3
+      addons:
+        homebrew:
+          packages:
+            - nasm
+          update: true
       before_script:
         - rm -f ./build.log
       after_success:
@@ -113,6 +137,11 @@ matrix:
     - name: "tvOS Main Build"
       language: objective-c
       osx_image: xcode10.2
+      addons:
+        homebrew:
+          packages:
+            - nasm
+          update: true
       before_script:
         - rm -f ./build.log
       after_success:
@@ -125,6 +154,11 @@ matrix:
     - name: "tvOS LTS Build"
       language: objective-c
       osx_image: xcode7.3
+      addons:
+        homebrew:
+          packages:
+            - nasm
+          update: true
       before_script:
         - rm -f ./build.log
       after_success:
