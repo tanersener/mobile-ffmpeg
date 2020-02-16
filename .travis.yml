@@ -2,13 +2,13 @@ branches:
   only:
   - master
   - development
-sudo: false
 git:
   quiet: true
-matrix:
+jobs:
   include:
     - name: "Android Main Build"
       language: android
+      os: linux
       dist : trusty
       addons:
         apt:
@@ -55,6 +55,7 @@ matrix:
         - bash ./android.sh --no-output-redirection
     - name: "Android LTS Build"
       language: android
+      os: linux
       dist : trusty
       addons:
         apt:
@@ -102,6 +103,7 @@ matrix:
         - bash ./android.sh --lts --no-output-redirection
     - name: "iOS Main Build"
       language: objective-c
+      os: osx
       osx_image: xcode10.2
       addons:
         homebrew:
@@ -120,6 +122,7 @@ matrix:
     - name: "iOS LTS Build"
       language: objective-c
       osx_image: xcode7.3
+      os: osx
       addons:
         homebrew:
           packages:
@@ -136,6 +139,7 @@ matrix:
         - bash ./ios.sh --lts --no-output-redirection
     - name: "tvOS Main Build"
       language: objective-c
+      os: osx
       osx_image: xcode10.2
       addons:
         homebrew:
@@ -153,6 +157,7 @@ matrix:
         - bash ./tvos.sh --no-output-redirection
     - name: "tvOS LTS Build"
       language: objective-c
+      os: osx
       osx_image: xcode7.3
       addons:
         homebrew:
