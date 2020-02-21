@@ -48,7 +48,7 @@ make distclean 2>/dev/null 1>/dev/null
 
 ASM_FLAGS=""
 case ${ARCH} in
-    i386 |x86-64)
+    i386 | x86-64)
         ASM_FLAGS="--disable-asm"
 
         if ! [ -x "$(command -v nasm)" ]; then
@@ -58,7 +58,16 @@ case ${ARCH} in
 
         export AS="$(command -v nasm)"
     ;;
+    x86-64h)
+        ASM_FLAGS="--disable-asm"
+        TARGET_HOST="x86_64-apple-darwin"
+        export AS="$(command -v nasm)"
+    ;;
 esac
+
+# DISABLE INLINE -arch DEFINITIONS
+${SED_INLINE} 's/CFLAGS=\"\$CFLAGS \-arch x86_64/CFLAGS=\"\$CFLAGS/g' configure
+${SED_INLINE} 's/LDFLAGS=\"\$LDFLAGS \-arch x86_64/LDFLAGS=\"\$CFLAGS/g' configure
 
 ./configure \
     --prefix=${BASEDIR}/prebuilt/$(get_target_build_directory)/${LIB_NAME} \

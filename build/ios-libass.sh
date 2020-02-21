@@ -38,6 +38,16 @@ export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 export LDFLAGS=$(get_ldflags ${LIB_NAME})
 export PKG_CONFIG_LIBDIR=${INSTALL_PKG_CONFIG_DIR}
 
+ARCH_OPTIONS=""
+case ${ARCH} in
+    x86-64h)
+        ARCH_OPTIONS="--disable-asm"
+    ;;
+    *)
+        ARCH_OPTIONS="--enable-asm"
+    ;;
+esac
+
 cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
 make distclean 2>/dev/null 1>/dev/null
@@ -57,6 +67,7 @@ fi
     --disable-harfbuzz \
     --disable-fast-install \
     --disable-test \
+    ${ARCH_OPTIONS} \
     --disable-profile \
     --disable-coretext \
     --host=${TARGET_HOST} || exit 1

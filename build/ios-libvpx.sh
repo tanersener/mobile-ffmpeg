@@ -70,6 +70,10 @@ case ${ARCH} in
         TARGET="x86_64-iphonesimulator-gcc"
         ASM_FLAGS="--enable-runtime-cpu-detect --disable-avx512"
     ;;
+    x86-64h)
+        TARGET="x86_64-macosx-gcc"
+        ASM_FLAGS="--enable-runtime-cpu-detect --disable-avx512 --disable-sse --disable-sse2 --disable-mmx"
+    ;;
 esac
 
 # PREPARE CONFIGURE OPTIONS
@@ -77,6 +81,9 @@ rm -f ${BASEDIR}/src/${LIB_NAME}/build/make/configure.sh
 case ${ARCH} in
     arm64e)
         cp ${BASEDIR}/tools/make/configure.libvpx.arm64e.sh ${BASEDIR}/src/${LIB_NAME}/build/make/configure.sh
+    ;;
+    x86-64h)
+        cp ${BASEDIR}/tools/make/configure.libvpx.x86_64h.sh ${BASEDIR}/src/${LIB_NAME}/build/make/configure.sh
     ;;
     *)
         cp ${BASEDIR}/tools/make/configure.libvpx.all.sh ${BASEDIR}/src/${LIB_NAME}/build/make/configure.sh

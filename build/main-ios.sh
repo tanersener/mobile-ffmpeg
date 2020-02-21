@@ -229,17 +229,31 @@ while [ ${#enabled_library_list[@]} -gt $completed ]; do
 
                 cd ${BASEDIR}
 
-                # BUILD EACH LIBRARY ALONE FIRST
-                ${SCRIPT_PATH} 1>>${BASEDIR}/build.log 2>&1
+                if [ ${library} == "libuuid" ] && [ ${ARCH} == "x86-64h" ]; then
 
-                if [ $? -eq 0 ]; then
+                    # USING SYSTEM LIBRARY ON x86-64h
                     (( completed+=1 ))
                     declare "$BUILD_COMPLETED_FLAG=1"
-                    check_if_dependency_rebuilt ${library}
-                    echo "ok"
+                    echo "using system library"
+
+                    # MANUALLY CREATING PACKAGE CONFIG
+                    export INSTALL_PKG_CONFIG_DIR="${PKG_CONFIG_DIRECTORY}"
+                    create_uuid_system_package_config "system"
+
                 else
-                    echo "failed"
-                    exit 1
+
+                    # BUILD EACH LIBRARY ALONE
+                    ${SCRIPT_PATH} 1>>${BASEDIR}/build.log 2>&1
+
+                    if [ $? -eq 0 ]; then
+                        (( completed+=1 ))
+                        declare "$BUILD_COMPLETED_FLAG=1"
+                        check_if_dependency_rebuilt ${library}
+                        echo "ok"
+                    else
+                        echo "failed"
+                        exit 1
+                    fi
                 fi
             else
                 (( completed+=1 ))

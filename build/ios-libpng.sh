@@ -40,7 +40,7 @@ export LDFLAGS=$(get_ldflags ${LIB_NAME})
 
 CPU_SPECIFIC_OPTIONS="--enable-hardware-optimizations=yes"
 case ${ARCH} in
-    x86 | x86-64)
+    x86 | x86-64 | x86-64h)
         CPU_SPECIFIC_OPTIONS+=" --enable-intel-sse=yes"
     ;;
     armv7 | armv7s | arm64 | arm64e)

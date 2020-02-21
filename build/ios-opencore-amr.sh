@@ -39,6 +39,9 @@ export LDFLAGS=$(get_ldflags ${LIB_NAME})
 
 # OVERRIDE CXX
 case ${ARCH} in
+	x86-64h)
+		export CXX="xcrun --sdk $(get_sdk_name) clang++ -arch x86_64h"
+	;;
 	x86-64)
 		export CXX="xcrun --sdk $(get_sdk_name) clang++ -arch x86_64"
 	;;

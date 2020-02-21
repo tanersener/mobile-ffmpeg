@@ -37,12 +37,17 @@ CFLAGS=$(get_cflags ${LIB_NAME})
 CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 LDFLAGS=$(get_ldflags ${LIB_NAME})
 
+OS_OPTIONS="OS=ios"
 case ${ARCH} in
     armv7 | armv7s)
         CFLAGS+=" -DHAVE_NEON"
     ;;
     arm64 | arm64e)
         CFLAGS+=" -DHAVE_NEON_AARCH64"
+    ;;
+    x86-64h)
+        OS_OPTIONS=""
+        CFLAGS+=" -DHAVE_AVX2"
     ;;
     *)
         CFLAGS+=" -DHAVE_AVX2"
@@ -70,7 +75,7 @@ CFLAGS="$CFLAGS" \
 CXX="${CXX}" \
 CXXFLAGS="${CXXFLAGS}" \
 LDFLAGS="$LDFLAGS" \
-OS=ios \
+${OS_OPTIONS} \
 PREFIX="${BASEDIR}/prebuilt/$(get_target_build_directory)/${LIB_NAME}" \
 SDK_MIN="${IOS_MIN_VERSION}" \
 SDKROOT="${SDK_PATH}" \

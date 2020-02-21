@@ -32,9 +32,14 @@ LIB_NAME="kvazaar"
 set_toolchain_clang_paths ${LIB_NAME}
 
 # PREPARING FLAGS
+ARCH_OPTIONS=""
 case ${ARCH} in
     i386)
         TARGET_HOST="x86-apple-darwin"
+    ;;
+    x86-64h)
+        ARCH_OPTIONS="--disable-asm"
+        TARGET_HOST="x86_64-apple-darwin"
     ;;
     *)
         TARGET_HOST=$(get_target_host)
@@ -63,6 +68,7 @@ fi
     --enable-static \
     --disable-shared \
     --disable-fast-install \
+    ${ARCH_OPTIONS} \
     --host=${TARGET_HOST} || exit 1
 
 make || exit 1

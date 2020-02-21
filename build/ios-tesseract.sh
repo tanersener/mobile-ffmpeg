@@ -63,7 +63,8 @@ export LEPTONICA_LIBS="-L${BASEDIR}/prebuilt/$(get_target_build_directory)/lepto
     --disable-largefile \
     --host=${TARGET_HOST} || exit 1
 
-${SED_INLINE} 's/$wl-bind_at_load//g' libtool
+${SED_INLINE} 's/$wl-bind_at_load//g' ${BASEDIR}/src/${LIB_NAME}/libtool
+${SED_INLINE} 's/-lrt//g' ${BASEDIR}/src/${LIB_NAME}/api/Makefile
 
 make -j$(get_cpu_count) || exit 1
 

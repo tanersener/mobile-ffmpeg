@@ -64,6 +64,11 @@ case ${ARCH} in
         TOOLCHAIN_FILE="${BASEDIR}/src/${LIB_NAME}/build/cmake/toolchains/x86_64-ios-simulator.cmake"
         ARCH_OPTIONS="-DARCH_X86_64=1 -DENABLE_SSE4_2=1 -DHAVE_SSE4_2=1"
     ;;
+    x86-64h)
+        cp /Users/taner/Projects/mobile-ffmpeg/tools/cmake/libaom.x86_64-macos.cmake ${BASEDIR}/src/${LIB_NAME}/build/cmake/toolchains/x86_64-macos.cmake
+        TOOLCHAIN_FILE="${BASEDIR}/src/${LIB_NAME}/build/cmake/toolchains/x86_64-macos.cmake"
+        ARCH_OPTIONS="-DARCH_X86_64=1 -DENABLE_SSE4_2=1 -DHAVE_SSE4_2=1"
+    ;;
 esac
 
 cd ${BASEDIR}/src/${LIB_NAME} || exit 1

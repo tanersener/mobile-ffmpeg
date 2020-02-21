@@ -42,7 +42,7 @@ case ${ARCH} in
     armv7 | armv7s | arm64 | arm64e)
         OPTIONAL_CPU_SUPPORT="--enable-arm-neon"
     ;;
-    i386 | x86-64)
+    i386 | x86-64 | x86-64h)
         OPTIONAL_CPU_SUPPORT="--enable-x86-aesni"
     ;;
 esac

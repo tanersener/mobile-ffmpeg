@@ -83,6 +83,12 @@ case ${ARCH} in
         NEON_FLAG="	--disable-neon"
         BITCODE_FLAGS=""
     ;;
+    x86-64h)
+        TARGET_CPU="x86_64h"
+        TARGET_ARCH="x86_64"
+        NEON_FLAG="	--disable-neon"
+        BITCODE_FLAGS="-fembed-bitcode -Wc,-fembed-bitcode"
+    ;;
 esac
 
 if [[ ${APPLE_TVOS_BUILD} -eq 1 ]]; then

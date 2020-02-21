@@ -58,6 +58,9 @@ case ${ARCH} in
         export CFLAGS+=" -D__thread="
         HARDWARE_ACCELERATION="--enable-hardware-acceleration"
     ;;
+    x86-64h)
+        HARDWARE_ACCELERATION="--disable-hardware-acceleration"
+    ;;
     *)
         HARDWARE_ACCELERATION="--enable-hardware-acceleration"
     ;;

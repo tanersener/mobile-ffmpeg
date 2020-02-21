@@ -7,6 +7,7 @@ ARCH_ARM64=2
 ARCH_ARM64E=3
 ARCH_I386=4
 ARCH_X86_64=5
+ARCH_X86_64H=6
 
 # LIBRARY INDEXES
 LIBRARY_FONTCONFIG=0
@@ -59,7 +60,7 @@ LIBRARY_AVFOUNDATION=46
 LIBRARY_LIBICONV=47
 
 # ENABLE ARCH
-ENABLED_ARCHITECTURES=(1 1 1 1 1 1)
+ENABLED_ARCHITECTURES=(1 1 1 1 1 1 1)
 
 # ENABLE LIBRARIES
 ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
@@ -76,7 +77,7 @@ if ! [ -x "$(command -v xcrun)" ]; then
     exit 1
 fi
 
-# USE 12.1 AS IOS_MIN_VERSION
+# USE 12.1 AS DEFAULT IOS_MIN_VERSION
 export IOS_MIN_VERSION=12.1
 
 get_mobile_ffmpeg_version() {
@@ -125,6 +126,7 @@ display_help() {
     fi
     echo -e "  --disable-i386\t\tdo not build i386 platform [yes]"
     echo -e "  --disable-x86-64\t\tdo not build x86-64 platform [yes]\n"
+    echo -e "  --disable-x86-64h\t\tdo not build x86-64h platform [yes]\n"
 
     echo -e "Libraries:"
 
@@ -223,6 +225,7 @@ enable_lts_build() {
     export IOS_MIN_VERSION=9.3
 
     disable_arch "arm64e"
+    disable_arch "x86-64h"
 }
 
 reconf_library() {
@@ -464,6 +467,9 @@ set_arch() {
         x86-64)
             ENABLED_ARCHITECTURES[ARCH_X86_64]=$2
         ;;
+        x86-64h)
+            ENABLED_ARCHITECTURES[ARCH_X86_64H]=$2
+        ;;
         *)
             print_unknown_platform $1
         ;;
@@ -489,7 +495,7 @@ print_enabled_architectures() {
     echo -n "Architectures: "
 
     let enabled=0;
-    for print_arch in {0..5}
+    for print_arch in {0..6}
     do
         if [[ ${ENABLED_ARCHITECTURES[$print_arch]} -eq 1 ]]; then
             if [[ ${enabled} -ge 1 ]]; then
@@ -660,7 +666,7 @@ create_static_fat_library() {
 
     for TARGET_ARCH in "${TARGET_ARCH_LIST[@]}"
     do
-        LIPO_COMMAND+=" $(find ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin -name $1)"
+        LIPO_COMMAND+=" $(find ${BASEDIR}/prebuilt/ios-${TARGET_ARCH} -name $1)"
     done
 
     LIPO_COMMAND+=" -output ${FAT_LIBRARY_PATH}/lib/$1"
@@ -704,7 +710,7 @@ get_external_library_license_path() {
 }
 
 get_external_library_version() {
-    echo "$(grep Version ${BASEDIR}/prebuilt/ios-${TARGET_ARCH_LIST[0]}-apple-darwin/pkgconfig/$1.pc 2>>${BASEDIR}/build.log | sed 's/Version://g;s/\ //g')"
+    echo "$(grep Version ${BASEDIR}/prebuilt/ios-${TARGET_ARCH_LIST[0]}/pkgconfig/$1.pc 2>>${BASEDIR}/build.log | sed 's/Version://g;s/\ //g')"
 }
 
 # ENABLE COMMON FUNCTIONS
@@ -833,6 +839,16 @@ if [[ ${DETECTED_IOS_SDK_VERSION} == 11* ]] || [[ ${DETECTED_IOS_SDK_VERSION} ==
         echo -e "INFO: Disabled i386 architecture which is not supported on SDK ${DETECTED_IOS_SDK_VERSION}\n" 1>>${BASEDIR}/build.log 2>&1
         disable_arch "i386"
     fi
+    if [[ -z ${BUILD_FORCE} ]] && [[ ${ENABLED_ARCHITECTURES[${ARCH_I386}]} -eq 1 ]]; then
+        echo -e "INFO: Disabled i386 architecture which is not supported on SDK ${DETECTED_IOS_SDK_VERSION}\n" 1>>${BASEDIR}/build.log 2>&1
+        disable_arch "i386"
+    fi
+fi
+
+# DISABLE x86-64h architecture on IOS versions lower than 13
+if [[ ${DETECTED_IOS_SDK_VERSION} != 13* ]] && [[ -z ${BUILD_FORCE} ]] && [[ ${ENABLED_ARCHITECTURES[${ARCH_X86_64H}]} -eq 1 ]]; then
+    echo -e "INFO: Disabled x86-64h architecture which is not supported on SDK ${DETECTED_IOS_SDK_VERSION}\n" 1>>${BASEDIR}/build.log 2>&1
+    disable_arch "x86-64h"
 fi
 
 echo -e "\nBuilding mobile-ffmpeg ${BUILD_TYPE_ID}static library for iOS\n"
@@ -868,7 +884,7 @@ done
 
 TARGET_ARCH_LIST=()
 
-for run_arch in {0..5}
+for run_arch in {0..6}
 do
     if [[ ${ENABLED_ARCHITECTURES[$run_arch]} -eq 1 ]]; then
         export ARCH=$(get_arch_name $run_arch)
@@ -882,6 +898,9 @@ do
         case ${ARCH} in
             x86-64)
                 TARGET_ARCH="x86_64"
+            ;;
+            x86-64h)
+                TARGET_ARCH="x86_64h"
             ;;
             *)
                 TARGET_ARCH="${ARCH}"
@@ -1253,7 +1272,8 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
                     exit 1
                 fi
 
-            else
+            elif [[ ${LIBRARY_LIBUUID} != $library ]]; then
+
                 library_name=$(get_library_name $((library)))
                 static_archive_name=$(get_static_archive_name $((library)))
                 LIBRARY_CREATED=$(create_static_fat_library $static_archive_name $library_name)
@@ -1290,8 +1310,8 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
     mkdir -p ${FFMPEG_UNIVERSAL}/include 1>>${BASEDIR}/build.log 2>&1
     mkdir -p ${FFMPEG_UNIVERSAL}/lib 1>>${BASEDIR}/build.log 2>&1
 
-    cp -r ${BASEDIR}/prebuilt/ios-${TARGET_ARCH_LIST[0]}-apple-darwin/ffmpeg/include/* ${FFMPEG_UNIVERSAL}/include 1>>${BASEDIR}/build.log 2>&1
-    cp ${BASEDIR}/prebuilt/ios-${TARGET_ARCH_LIST[0]}-apple-darwin/ffmpeg/include/config.h ${FFMPEG_UNIVERSAL}/include 1>>${BASEDIR}/build.log 2>&1
+    cp -r ${BASEDIR}/prebuilt/ios-${TARGET_ARCH_LIST[0]}/ffmpeg/include/* ${FFMPEG_UNIVERSAL}/include 1>>${BASEDIR}/build.log 2>&1
+    cp ${BASEDIR}/prebuilt/ios-${TARGET_ARCH_LIST[0]}/ffmpeg/include/config.h ${FFMPEG_UNIVERSAL}/include 1>>${BASEDIR}/build.log 2>&1
 
     for FFMPEG_LIB in ${FFMPEG_LIBS}
     do
@@ -1299,7 +1319,7 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
 
         for TARGET_ARCH in "${TARGET_ARCH_LIST[@]}"
         do
-            LIPO_COMMAND+=" ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/${FFMPEG_LIB}.${BUILD_LIBRARY_EXTENSION}"
+            LIPO_COMMAND+=" ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}/ffmpeg/lib/${FFMPEG_LIB}.${BUILD_LIBRARY_EXTENSION}"
         done
 
         LIPO_COMMAND+=" -output ${FFMPEG_UNIVERSAL}/lib/${FFMPEG_LIB}.${BUILD_LIBRARY_EXTENSION}"
@@ -1364,7 +1384,7 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
     LIPO_COMMAND="${LIPO} -create"
     for TARGET_ARCH in "${TARGET_ARCH_LIST[@]}"
     do
-        LIPO_COMMAND+=" ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/mobile-ffmpeg/lib/libmobileffmpeg.${BUILD_LIBRARY_EXTENSION}"
+        LIPO_COMMAND+=" ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}/mobile-ffmpeg/lib/libmobileffmpeg.${BUILD_LIBRARY_EXTENSION}"
     done
     LIPO_COMMAND+=" -output ${MOBILE_FFMPEG_UNIVERSAL}/lib/libmobileffmpeg.${BUILD_LIBRARY_EXTENSION}"
 
@@ -1375,7 +1395,7 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
         exit 1
     fi
 
-    cp -r ${BASEDIR}/prebuilt/ios-${TARGET_ARCH_LIST[0]}-apple-darwin/mobile-ffmpeg/include/* ${MOBILE_FFMPEG_UNIVERSAL}/include 1>>${BASEDIR}/build.log 2>&1
+    cp -r ${BASEDIR}/prebuilt/ios-${TARGET_ARCH_LIST[0]}/mobile-ffmpeg/include/* ${MOBILE_FFMPEG_UNIVERSAL}/include 1>>${BASEDIR}/build.log 2>&1
     cp -r ${MOBILE_FFMPEG_UNIVERSAL}/include/* ${MOBILE_FFMPEG_FRAMEWORK_PATH}/Headers 1>>${BASEDIR}/build.log 2>&1
     cp ${MOBILE_FFMPEG_UNIVERSAL}/lib/libmobileffmpeg.${BUILD_LIBRARY_EXTENSION} ${MOBILE_FFMPEG_FRAMEWORK_PATH}/mobileffmpeg 1>>${BASEDIR}/build.log 2>&1
 

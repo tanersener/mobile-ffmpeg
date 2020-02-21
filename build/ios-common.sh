@@ -126,20 +126,31 @@ get_arch_name() {
         3) echo "arm64e" ;;
         4) echo "i386" ;;
         5) echo "x86-64" ;;
+        6) echo "x86-64h" ;;
     esac
 }
 
 get_target_host() {
-    echo "$(get_target_arch)-ios-darwin"
+      case ${ARCH} in
+        x86-64h)
+            echo "x86_64-apple-macosx"
+        ;;
+        *)
+            echo "$(get_target_arch)-ios-darwin"
+        ;;
+    esac
 }
 
 get_target_build_directory() {
     case ${ARCH} in
         x86-64)
-            echo "ios-x86_64-apple-darwin"
+            echo "ios-x86_64"
+        ;;
+        x86-64h)
+            echo "ios-x86_64h"
         ;;
         *)
-            echo "ios-${ARCH}-apple-darwin"
+            echo "ios-${ARCH}"
         ;;
     esac
 }
@@ -151,6 +162,9 @@ get_target_arch() {
         ;;
         x86-64)
             echo "x86_64"
+        ;;
+        x86-64h)
+            echo "x86_64h"
         ;;
         *)
             echo "${ARCH}"
@@ -170,6 +184,9 @@ get_sdk_name() {
         i386 | x86-64)
             echo "iphonesimulator"
         ;;
+        x86-64h)
+            echo "macosx"
+        ;;
     esac
 }
 
@@ -184,6 +201,9 @@ get_min_version_cflags() {
         ;;
         i386 | x86-64)
             echo "-mios-simulator-version-min=${IOS_MIN_VERSION}"
+        ;;
+        x86-64h)
+            echo "-mmacosx-version-min=10.15"
         ;;
     esac
 }
@@ -202,6 +222,9 @@ get_common_cflags() {
     case ${ARCH} in
         i386 | x86-64)
             echo "-fstrict-aliasing -DIOS ${LTS_BUILD_FLAG}${BUILD_DATE} -isysroot ${SDK_PATH}"
+        ;;
+        x86-64h)
+            echo "-fstrict-aliasing -fembed-bitcode ${LTS_BUILD_FLAG}${BUILD_DATE} -isysroot ${SDK_PATH}"
         ;;
         *)
             echo "-fstrict-aliasing -fembed-bitcode -DIOS ${LTS_BUILD_FLAG}${BUILD_DATE} -isysroot ${SDK_PATH}"
@@ -229,6 +252,9 @@ get_arch_specific_cflags() {
         x86-64)
             echo "-arch x86_64 -target $(get_target_host) -march=x86-64 -msse4.2 -mpopcnt -m64 -mtune=intel -DMOBILE_FFMPEG_X86_64"
         ;;
+        x86-64h)
+            echo "-arch x86_64h -target $(get_target_host) -msse4.2 -mpopcnt -m64 -mtune=intel -DMOBILE_FFMPEG_X86_64H"
+        ;;
     esac
 }
 
@@ -236,31 +262,11 @@ get_size_optimization_cflags() {
 
     local ARCH_OPTIMIZATION=""
     case ${ARCH} in
-        armv7 | armv7s | arm64 | arm64e)
-            case $1 in
-                x264 | x265)
-                    ARCH_OPTIMIZATION="-Oz -Wno-ignored-optimization-argument"
-                ;;
-                ffmpeg | mobile-ffmpeg)
-                    ARCH_OPTIMIZATION="-Oz -Wno-ignored-optimization-argument"
-                ;;
-                *)
-                    ARCH_OPTIMIZATION="-Oz -Wno-ignored-optimization-argument"
-                ;;
-            esac
+        armv7 | armv7s | arm64 | arm64e | x86-64h)
+          ARCH_OPTIMIZATION="-Oz -Wno-ignored-optimization-argument"
         ;;
         i386 | x86-64)
-            case $1 in
-                x264 | ffmpeg)
-                    ARCH_OPTIMIZATION="-O2 -Wno-ignored-optimization-argument"
-                ;;
-                x265)
-                    ARCH_OPTIMIZATION="-O2 -Wno-ignored-optimization-argument"
-                ;;
-                *)
-                    ARCH_OPTIMIZATION="-O2 -Wno-ignored-optimization-argument"
-                ;;
-            esac
+          ARCH_OPTIMIZATION="-O2 -Wno-ignored-optimization-argument"
         ;;
     esac
 
@@ -273,7 +279,7 @@ get_size_optimization_asm_cflags() {
     case $1 in
         jpeg | ffmpeg)
             case ${ARCH} in
-                armv7 | armv7s | arm64 | arm64e)
+                armv7 | armv7s | arm64 | arm64e | x86-64h)
                     ARCH_OPTIMIZATION="-Oz"
                 ;;
                 i386 | x86-64)
@@ -381,7 +387,7 @@ get_cxxflags() {
 
     local BITCODE_FLAGS=""
     case ${ARCH} in
-        armv7 | armv7s | arm64 | arm64e)
+        armv7 | armv7s | arm64 | arm64e | x86-64h)
             local BITCODE_FLAGS="-fembed-bitcode"
         ;;
     esac
@@ -418,7 +424,7 @@ get_common_ldflags() {
 
 get_size_optimization_ldflags() {
     case ${ARCH} in
-        armv7 | armv7s | arm64 | arm64e)
+        armv7 | armv7s | arm64 | arm64e | x86-64h)
             case $1 in
                 ffmpeg | mobile-ffmpeg)
                     echo "-Oz -dead_strip"
@@ -461,6 +467,9 @@ get_arch_specific_ldflags() {
         x86-64)
             echo "-arch x86_64 -march=x86-64"
         ;;
+        x86-64h)
+            echo "-arch x86_64h"
+        ;;
     esac
 }
 
@@ -477,7 +486,7 @@ get_ldflags() {
     case $1 in
         mobile-ffmpeg)
             case ${ARCH} in
-                armv7 | armv7s | arm64 | arm64e)
+                armv7 | armv7s | arm64 | arm64e | x86-64h)
                     echo "${ARCH_FLAGS} ${LINKED_LIBRARIES} ${COMMON_FLAGS} -fembed-bitcode -Wc,-fembed-bitcode ${OPTIMIZATION_FLAGS}"
                 ;;
                 *)
@@ -817,6 +826,24 @@ Version: ${UUID_VERSION}
 Requires:
 Cflags: -I\${includedir}
 Libs: -L\${libdir} -luuid
+EOF
+}
+
+create_uuid_system_package_config() {
+    local UUID_VERSION="$1"
+
+    cat > "${INSTALL_PKG_CONFIG_DIR}/uuid.pc" << EOF
+prefix=${SDK_PATH}
+exec_prefix=\${prefix}
+libdir=\${exec_prefix}/lib
+includedir=\${prefix}/include
+
+Name: uuid
+Description: Universally unique id library
+Version: ${UUID_VERSION}
+Requires:
+Cflags: -I\${includedir}
+Libs: -L\${libdir}
 EOF
 }
 
