@@ -46,6 +46,7 @@ TARGET_CPU=""
 TARGET_ARCH=""
 BITCODE_FLAGS=""
 NEON_FLAG=""
+ARCH_OPTIONS="--enable-asm"
 case ${ARCH} in
     armv7)
         TARGET_CPU="armv7"
@@ -84,6 +85,7 @@ case ${ARCH} in
         BITCODE_FLAGS=""
     ;;
     x86-64h)
+        ARCH_OPTIONS="--disable-asm"
         TARGET_CPU="x86_64h"
         TARGET_ARCH="x86_64"
         NEON_FLAG="	--disable-neon"
@@ -418,7 +420,7 @@ cp ${BASEDIR}/tools/make/ffmpeg/libswscale/aarch64/hscale.S ${BASEDIR}/src/${LIB
     ${NEON_FLAG} \
     --enable-cross-compile \
     --enable-pic \
-    --enable-asm \
+    ${ARCH_OPTIONS} \
     --enable-inline-asm \
     --enable-optimizations \
     --enable-swscale \
