@@ -45,7 +45,7 @@ case ${ARCH} in
     arm64 | arm64e)
         CFLAGS+=" -DHAVE_NEON_AARCH64"
     ;;
-    x86-64h)
+    x86-64-mac-catalyst)
         OS_OPTIONS=""
         CFLAGS+=" -DHAVE_AVX2"
     ;;

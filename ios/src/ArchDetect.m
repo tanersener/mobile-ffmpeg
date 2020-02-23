@@ -161,6 +161,8 @@
     [arch appendString:@"i386"];
 #elif MOBILE_FFMPEG_X86_64
     [arch appendString:@"x86_64"];
+#elif MOBILE_FFMPEG_X86_64_MAC_CATALYST
+    [arch appendString:@"x86_64_mac_catalyst"];
 #endif
 
     return arch;

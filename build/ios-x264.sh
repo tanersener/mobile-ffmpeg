@@ -58,11 +58,6 @@ case ${ARCH} in
 
         export AS="$(command -v nasm)"
     ;;
-    x86-64h)
-        ASM_FLAGS="--disable-asm"
-        TARGET_HOST="x86_64-apple-darwin"
-        export AS="$(command -v nasm)"
-    ;;
 esac
 
 # DISABLE INLINE -arch DEFINITIONS

@@ -33,6 +33,9 @@ set_toolchain_clang_paths ${LIB_NAME}
 
 # PREPARING FLAGS
 TARGET_HOST=$(get_target_host)
+if [ ${ARCH} == "x86-64-mac-catalyst" ]; then
+    TARGET_HOST="x86_64-apple-darwin"
+fi
 COMMON_CFLAGS=$(get_cflags ${LIB_NAME})
 COMMON_LDFLAGS=$(get_ldflags ${LIB_NAME})
 

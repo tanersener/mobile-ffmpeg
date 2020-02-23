@@ -63,10 +63,6 @@ case ${ARCH} in
     i386 | x86-64)
         ASM_FLAGS="--disable-assembly"
     ;;
-    x86-64h)
-        ASM_FLAGS="--disable-assembly"
-        TARGET_HOST="x86_64-apple-darwin"
-    ;;
 esac
 
 ./configure \

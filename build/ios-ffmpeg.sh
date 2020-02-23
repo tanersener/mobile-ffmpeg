@@ -84,9 +84,9 @@ case ${ARCH} in
         NEON_FLAG="	--disable-neon"
         BITCODE_FLAGS=""
     ;;
-    x86-64h)
+    x86-64-mac-catalyst)
         ARCH_OPTIONS="--disable-asm"
-        TARGET_CPU="x86_64h"
+        TARGET_CPU="x86_64"
         TARGET_ARCH="x86_64"
         NEON_FLAG="	--disable-neon"
         BITCODE_FLAGS="-fembed-bitcode -Wc,-fembed-bitcode"

@@ -50,11 +50,6 @@ case ${ARCH} in
         unset gmp_cv_asm_w32
         TARGET_HOST="x86-apple-darwin"
     ;;
-    x86-64h)
-        # Workaround for 'cannot determine how to define a 32-bit word' error
-        export gmp_cv_asm_w32=".long"
-        TARGET_HOST=$(get_target_host)
-    ;;
     *)
         unset gmp_cv_asm_w32
         TARGET_HOST=$(get_target_host)

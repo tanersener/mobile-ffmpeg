@@ -7,7 +7,7 @@ ARCH_ARM64=2
 ARCH_ARM64E=3
 ARCH_I386=4
 ARCH_X86_64=5
-ARCH_X86_64H=6
+ARCH_X86_64_MAC_CATALYST=6
 
 # LIBRARY INDEXES
 LIBRARY_FONTCONFIG=0
@@ -94,7 +94,7 @@ display_help() {
     COMMAND=`echo $0 | sed -e 's/\.\///g'`
 
     if [[ -z ${MOBILE_FFMPEG_LTS_BUILD} ]]; then
-        echo -e "\n'"$COMMAND"' builds FFmpeg and MobileFFmpeg for iOS platform. By default six architectures (armv7, armv7s, arm64, arm64e, i386 and x86_64) are built without any external libraries enabled. Options can be used to disable architectures and/or enable external libraries. Please note that GPL libraries (external libraries with GPL license) need --enable-gpl flag to be set explicitly. When compilation ends universal fat binaries and iOS frameworks are created with enabled architectures inside.\n"
+        echo -e "\n'"$COMMAND"' builds FFmpeg and MobileFFmpeg for iOS platform. By default seven architectures (armv7, armv7s, arm64, arm64e, i386, x86_64 and x86_64 for Mac Catalyst) are built without any external libraries enabled. Options can be used to disable architectures and/or enable external libraries. Please note that GPL libraries (external libraries with GPL license) need --enable-gpl flag to be set explicitly. When compilation ends universal fat binaries and iOS frameworks are created with enabled architectures inside.\n"
     else
         echo -e "\n'"$COMMAND"' builds FFmpeg and MobileFFmpeg for iOS platform. By default five architectures (armv7, armv7s, arm64, i386 and x86_64) are built without any external libraries enabled. Options can be used to disable architectures and/or enable external libraries. Please note that GPL libraries (external libraries with GPL license) need --enable-gpl flag to be set explicitly. When compilation ends universal fat binaries and iOS frameworks are created with enabled architectures inside.\n"
     fi
@@ -126,7 +126,7 @@ display_help() {
     fi
     echo -e "  --disable-i386\t\tdo not build i386 platform [yes]"
     echo -e "  --disable-x86-64\t\tdo not build x86-64 platform [yes]"
-    echo -e "  --disable-x86-64h\t\tdo not build x86-64h platform [yes]\n"
+    echo -e "  --disable-x86-64-mac-catalyst\tdo not build x86-64-mac-catalyst platform [yes]\n"
 
     echo -e "Libraries:"
 
@@ -225,7 +225,7 @@ enable_lts_build() {
     export IOS_MIN_VERSION=9.3
 
     disable_arch "arm64e"
-    disable_arch "x86-64h"
+    disable_arch "x86-64-mac-catalyst"
 }
 
 reconf_library() {
@@ -470,8 +470,8 @@ set_arch() {
         x86-64)
             ENABLED_ARCHITECTURES[ARCH_X86_64]=$2
         ;;
-        x86-64h)
-            ENABLED_ARCHITECTURES[ARCH_X86_64H]=$2
+        x86-64-mac-catalyst)
+            ENABLED_ARCHITECTURES[ARCH_X86_64_MAC_CATALYST]=$2
         ;;
         *)
             print_unknown_platform $1
@@ -848,10 +848,10 @@ if [[ ${DETECTED_IOS_SDK_VERSION} == 11* ]] || [[ ${DETECTED_IOS_SDK_VERSION} ==
     fi
 fi
 
-# DISABLE x86-64h architecture on IOS versions lower than 13
-if [[ ${DETECTED_IOS_SDK_VERSION} != 13* ]] && [[ -z ${BUILD_FORCE} ]] && [[ ${ENABLED_ARCHITECTURES[${ARCH_X86_64H}]} -eq 1 ]]; then
-    echo -e "INFO: Disabled x86-64h architecture which is not supported on SDK ${DETECTED_IOS_SDK_VERSION}\n" 1>>${BASEDIR}/build.log 2>&1
-    disable_arch "x86-64h"
+# DISABLE x86-64-mac-catalyst architecture on IOS versions lower than 13
+if [[ ${DETECTED_IOS_SDK_VERSION} != 13* ]] && [[ -z ${BUILD_FORCE} ]] && [[ ${ENABLED_ARCHITECTURES[${ARCH_X86_64_MAC_CATALYST}]} -eq 1 ]]; then
+    echo -e "INFO: Disabled x86-64-mac-catalyst architecture which is not supported on SDK ${DETECTED_IOS_SDK_VERSION}\n" 1>>${BASEDIR}/build.log 2>&1
+    disable_arch "x86-64-mac-catalyst"
 fi
 
 echo -e "\nBuilding mobile-ffmpeg ${BUILD_TYPE_ID}static library for iOS\n"
@@ -902,8 +902,8 @@ do
             x86-64)
                 TARGET_ARCH="x86_64"
             ;;
-            x86-64h)
-                TARGET_ARCH="x86_64h"
+            x86-64-mac-catalyst)
+                TARGET_ARCH="x86_64-mac-catalyst"
             ;;
             *)
                 TARGET_ARCH="${ARCH}"

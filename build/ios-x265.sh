@@ -54,9 +54,6 @@ case ${ARCH} in
     arm64 | arm64e)
         ASM_OPTIONS="-DENABLE_ASSEMBLY=0 -DCROSS_COMPILE_ARM=1"
     ;;
-    x86-64h)
-        ASM_OPTIONS="-DENABLE_ASSEMBLY=0 -DCROSS_COMPILE_ARM=0"
-    ;;
     *)
         ASM_OPTIONS="-DENABLE_ASSEMBLY=1 -DCROSS_COMPILE_ARM=0"
     ;;

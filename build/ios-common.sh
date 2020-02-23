@@ -125,14 +125,14 @@ get_arch_name() {
         3) echo "arm64e" ;;
         4) echo "i386" ;;
         5) echo "x86-64" ;;
-        6) echo "x86-64h" ;;
+        6) echo "x86-64-mac-catalyst" ;;
     esac
 }
 
 get_target_host() {
       case ${ARCH} in
-        x86-64h)
-            echo "x86_64-apple-macosx"
+        x86-64-mac-catalyst)
+            echo "x86_64-apple-ios13.0-macabi"
         ;;
         *)
             echo "$(get_target_arch)-ios-darwin"
@@ -145,8 +145,8 @@ get_target_build_directory() {
         x86-64)
             echo "ios-x86_64"
         ;;
-        x86-64h)
-            echo "ios-x86_64h"
+        x86-64-mac-catalyst)
+            echo "ios-x86_64-mac-catalyst"
         ;;
         *)
             echo "ios-${ARCH}"
@@ -159,11 +159,8 @@ get_target_arch() {
         arm64 | arm64e)
             echo "aarch64"
         ;;
-        x86-64)
+        x86-64 | x86-64-mac-catalyst)
             echo "x86_64"
-        ;;
-        x86-64h)
-            echo "x86_64h"
         ;;
         *)
             echo "${ARCH}"
@@ -183,7 +180,7 @@ get_sdk_name() {
         i386 | x86-64)
             echo "iphonesimulator"
         ;;
-        x86-64h)
+        x86-64-mac-catalyst)
             echo "macosx"
         ;;
     esac
@@ -201,8 +198,8 @@ get_min_version_cflags() {
         i386 | x86-64)
             echo "-mios-simulator-version-min=${IOS_MIN_VERSION}"
         ;;
-        x86-64h)
-            echo "-mmacosx-version-min=10.15"
+        x86-64-mac-catalyst)
+            echo "-miphoneos-version-min=13.0"
         ;;
     esac
 }
@@ -222,7 +219,7 @@ get_common_cflags() {
         i386 | x86-64)
             echo "-fstrict-aliasing -DIOS ${LTS_BUILD_FLAG}${BUILD_DATE} -isysroot ${SDK_PATH}"
         ;;
-        x86-64h)
+        x86-64-mac-catalyst)
             echo "-fstrict-aliasing -fembed-bitcode ${LTS_BUILD_FLAG}${BUILD_DATE} -isysroot ${SDK_PATH}"
         ;;
         *)
@@ -251,8 +248,8 @@ get_arch_specific_cflags() {
         x86-64)
             echo "-arch x86_64 -target $(get_target_host) -march=x86-64 -msse4.2 -mpopcnt -m64 -mtune=intel -DMOBILE_FFMPEG_X86_64"
         ;;
-        x86-64h)
-            echo "-arch x86_64h -target $(get_target_host) -msse4.2 -mpopcnt -m64 -mtune=intel -DMOBILE_FFMPEG_X86_64H"
+        x86-64-mac-catalyst)
+            echo "-arch x86_64 -target $(get_target_host) -march=x86-64 -msse4.2 -mpopcnt -m64 -mtune=intel -DMOBILE_FFMPEG_X86_64_MAC_CATALYST -isysroot ${SDK_PATH} -isystem ${SDK_PATH}/System/iOSSupport/usr/include -iframework ${SDK_PATH}/System/iOSSupport/System/Library/Frameworks"
         ;;
     esac
 }
@@ -261,7 +258,7 @@ get_size_optimization_cflags() {
 
     local ARCH_OPTIMIZATION=""
     case ${ARCH} in
-        armv7 | armv7s | arm64 | arm64e | x86-64h)
+        armv7 | armv7s | arm64 | arm64e | x86-64-mac-catalyst)
           ARCH_OPTIMIZATION="-Oz -Wno-ignored-optimization-argument"
         ;;
         i386 | x86-64)
@@ -278,7 +275,7 @@ get_size_optimization_asm_cflags() {
     case $1 in
         jpeg | ffmpeg)
             case ${ARCH} in
-                armv7 | armv7s | arm64 | arm64e | x86-64h)
+                armv7 | armv7s | arm64 | arm64e | x86-64-mac-catalyst)
                     ARCH_OPTIMIZATION="-Oz"
                 ;;
                 i386 | x86-64)
@@ -386,7 +383,7 @@ get_cxxflags() {
 
     local BITCODE_FLAGS=""
     case ${ARCH} in
-        armv7 | armv7s | arm64 | arm64e | x86-64h)
+        armv7 | armv7s | arm64 | arm64e | x86-64-mac-catalyst)
             local BITCODE_FLAGS="-fembed-bitcode"
         ;;
     esac
@@ -423,7 +420,7 @@ get_common_ldflags() {
 
 get_size_optimization_ldflags() {
     case ${ARCH} in
-        armv7 | armv7s | arm64 | arm64e | x86-64h)
+        armv7 | armv7s | arm64 | arm64e | x86-64-mac-catalyst)
             case $1 in
                 ffmpeg | mobile-ffmpeg)
                     echo "-Oz -dead_strip"
@@ -466,8 +463,8 @@ get_arch_specific_ldflags() {
         x86-64)
             echo "-arch x86_64 -march=x86-64"
         ;;
-        x86-64h)
-            echo "-arch x86_64h"
+        x86-64-mac-catalyst)
+            echo "-arch x86_64 -march=x86-64 -target $(get_target_host) -isysroot ${SDK_PATH} -L${SDK_PATH}/System/iOSSupport/usr/lib -iframework ${SDK_PATH}/System/iOSSupport/System/Library/Frameworks"
         ;;
     esac
 }
@@ -485,7 +482,7 @@ get_ldflags() {
     case $1 in
         mobile-ffmpeg)
             case ${ARCH} in
-                armv7 | armv7s | arm64 | arm64e | x86-64h)
+                armv7 | armv7s | arm64 | arm64e | x86-64-mac-catalyst)
                     echo "${ARCH_FLAGS} ${LINKED_LIBRARIES} ${COMMON_FLAGS} -fembed-bitcode -Wc,-fembed-bitcode ${OPTIMIZATION_FLAGS}"
                 ;;
                 *)
