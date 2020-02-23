@@ -45,19 +45,19 @@ LIBRARY_GIFLIB=31
 LIBRARY_JPEG=32
 LIBRARY_LIBOGG=33
 LIBRARY_LIBPNG=34
-LIBRARY_LIBUUID=35
-LIBRARY_NETTLE=36
-LIBRARY_TIFF=37
-LIBRARY_EXPAT=38
-LIBRARY_SNDFILE=39
-LIBRARY_LEPTONICA=40
-LIBRARY_ZLIB=41
-LIBRARY_AUDIOTOOLBOX=42
-LIBRARY_COREIMAGE=43
-LIBRARY_BZIP2=44
-LIBRARY_VIDEOTOOLBOX=45
-LIBRARY_AVFOUNDATION=46
-LIBRARY_LIBICONV=47
+LIBRARY_NETTLE=35
+LIBRARY_TIFF=36
+LIBRARY_EXPAT=37
+LIBRARY_SNDFILE=38
+LIBRARY_LEPTONICA=39
+LIBRARY_ZLIB=40
+LIBRARY_AUDIOTOOLBOX=41
+LIBRARY_COREIMAGE=42
+LIBRARY_BZIP2=43
+LIBRARY_VIDEOTOOLBOX=44
+LIBRARY_AVFOUNDATION=45
+LIBRARY_LIBICONV=46
+LIBRARY_LIBUUID=47
 
 # ENABLE ARCH
 ENABLED_ARCHITECTURES=(1 1 1 1 1 1 1)
@@ -125,7 +125,7 @@ display_help() {
         echo -e "  --disable-arm64e\t\tdo not build arm64e platform [yes]"
     fi
     echo -e "  --disable-i386\t\tdo not build i386 platform [yes]"
-    echo -e "  --disable-x86-64\t\tdo not build x86-64 platform [yes]\n"
+    echo -e "  --disable-x86-64\t\tdo not build x86-64 platform [yes]"
     echo -e "  --disable-x86-64h\t\tdo not build x86-64h platform [yes]\n"
 
     echo -e "Libraries:"
@@ -232,7 +232,7 @@ reconf_library() {
     local RECONF_VARIABLE=$(echo "RECONF_$1" | sed "s/\-/\_/g")
     local library_supported=0
 
-    for library in {1..41}
+    for library in {1..40}
     do
         library_name=$(get_library_name $((library - 1)))
 
@@ -252,7 +252,7 @@ rebuild_library() {
     local REBUILD_VARIABLE=$(echo "REBUILD_$1" | sed "s/\-/\_/g")
     local library_supported=0
 
-    for library in {1..41}
+    for library in {1..40}
     do
         library_name=$(get_library_name $((library - 1)))
 
@@ -294,6 +294,9 @@ set_library() {
         ;;
         ios-libiconv)
             ENABLED_LIBRARIES[LIBRARY_LIBICONV]=$2
+        ;;
+        ios-libuuid)
+            ENABLED_LIBRARIES[LIBRARY_LIBUUID]=$2
         ;;
         chromaprint)
             ENABLED_LIBRARIES[LIBRARY_CHROMAPRINT]=$2
@@ -519,7 +522,7 @@ print_enabled_libraries() {
     let enabled=0;
 
     # FIRST BUILT-IN LIBRARIES
-    for library in {41..47}
+    for library in {40..47}
     do
         if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
             if [[ ${enabled} -ge 1 ]]; then
@@ -701,9 +704,9 @@ get_external_library_license_path() {
         26) echo "${BASEDIR}/src/$(get_library_name $1)/LICENSE.md" ;;
         28) echo "${BASEDIR}/src/$(get_library_name $1)/COPYING.txt" ;;
         32) echo "${BASEDIR}/src/$(get_library_name $1)/LICENSE.md " ;;
-        36) echo "${BASEDIR}/src/$(get_library_name $1)/COPYING.LESSERv3" ;;
-        37) echo "${BASEDIR}/src/$(get_library_name $1)/COPYRIGHT" ;;
-        40) echo "${BASEDIR}/src/$(get_library_name $1)/leptonica-license.txt" ;;
+        35) echo "${BASEDIR}/src/$(get_library_name $1)/COPYING.LESSERv3" ;;
+        36) echo "${BASEDIR}/src/$(get_library_name $1)/COPYRIGHT" ;;
+        39) echo "${BASEDIR}/src/$(get_library_name $1)/leptonica-license.txt" ;;
         4 | 9 | 12 | 18 | 20 | 25 | 30 | 34) echo "${BASEDIR}/src/$(get_library_name $1)/LICENSE" ;;
         *) echo "${BASEDIR}/src/$(get_library_name $1)/COPYING" ;;
     esac
@@ -933,7 +936,7 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
     mkdir -p ${BASEDIR}/prebuilt/ios-framework 1>>${BASEDIR}/build.log 2>&1
 
     # 1. EXTERNAL LIBRARIES
-    for library in {0..40}
+    for library in {0..39}
     do
         if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
 
@@ -1272,7 +1275,7 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
                     exit 1
                 fi
 
-            elif [[ ${LIBRARY_LIBUUID} != $library ]]; then
+            else
 
                 library_name=$(get_library_name $((library)))
                 static_archive_name=$(get_static_archive_name $((library)))

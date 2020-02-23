@@ -280,10 +280,6 @@ do
                 FFMPEG_CFLAGS+=" $(pkg-config --cflags libpng)"
                 FFMPEG_LDFLAGS+=" $(pkg-config --libs --static libpng)"
             ;;
-            libuuid)
-                FFMPEG_CFLAGS+=" $(pkg-config --cflags uuid)"
-                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static uuid)"
-            ;;
             nettle)
                 FFMPEG_CFLAGS+=" $(pkg-config --cflags nettle)"
                 FFMPEG_LDFLAGS+=" $(pkg-config --libs --static nettle)"
@@ -327,19 +323,19 @@ do
         # THE FOLLOWING LIBRARIES SHOULD BE EXPLICITLY DISABLED TO PREVENT AUTODETECT
         if [[ ${library} -eq 29 ]]; then
             CONFIGURE_POSTFIX+=" --disable-sdl2"
-        elif [[ ${library} -eq 42 ]]; then
+        elif [[ ${library} -eq 41 ]]; then
             CONFIGURE_POSTFIX+=" --disable-zlib"
-        elif [[ ${library} -eq 43 ]]; then
+        elif [[ ${library} -eq 42 ]]; then
             CONFIGURE_POSTFIX+=" --disable-audiotoolbox"
-        elif [[ ${library} -eq 44 ]]; then
+        elif [[ ${library} -eq 43 ]]; then
             CONFIGURE_POSTFIX+=" --disable-coreimage"
-        elif [[ ${library} -eq 45 ]]; then
+        elif [[ ${library} -eq 44 ]]; then
             CONFIGURE_POSTFIX+=" --disable-bzlib"
-        elif [[ ${library} -eq 46 ]]; then
+        elif [[ ${library} -eq 45 ]]; then
             CONFIGURE_POSTFIX+=" --disable-videotoolbox"
-        elif [[ ${library} -eq 47 ]]; then
+        elif [[ ${library} -eq 46 ]]; then
             CONFIGURE_POSTFIX+=" --disable-avfoundation"
-        elif [[ ${library} -eq 48 ]]; then
+        elif [[ ${library} -eq 47 ]]; then
             CONFIGURE_POSTFIX+=" --disable-iconv"
         fi
     fi

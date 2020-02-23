@@ -53,19 +53,19 @@ get_library_name() {
         32) echo "jpeg" ;;
         33) echo "libogg" ;;
         34) echo "libpng" ;;
-        35) echo "libuuid" ;;
-        36) echo "nettle" ;;
-        37) echo "tiff" ;;
-        38) echo "expat" ;;
-        39) echo "libsndfile" ;;
-        40) echo "leptonica" ;;
-        41) echo "ios-zlib" ;;
-        42) echo "ios-audiotoolbox" ;;
-        43) echo "ios-coreimage" ;;
-        44) echo "ios-bzip2" ;;
-        45) echo "ios-videotoolbox" ;;
-        46) echo "ios-avfoundation" ;;
-        47) echo "ios-libiconv" ;;
+        35) echo "nettle" ;;
+        36) echo "tiff" ;;
+        37) echo "expat" ;;
+        38) echo "libsndfile" ;;
+        39) echo "leptonica" ;;
+        40) echo "ios-zlib" ;;
+        41) echo "ios-audiotoolbox" ;;
+        42) echo "ios-coreimage" ;;
+        43) echo "ios-bzip2" ;;
+        44) echo "ios-videotoolbox" ;;
+        45) echo "ios-avfoundation" ;;
+        46) echo "ios-libiconv" ;;
+        47) echo "ios-libuuid" ;;
     esac
 }
 
@@ -84,10 +84,10 @@ get_package_config_file_name() {
         28) echo "sdl2" ;;
         32) echo "libjpeg" ;;
         33) echo "ogg" ;;
-        35) echo "uuid" ;;
-        37) echo "libtiff-4" ;;
-        39) echo "sndfile" ;;
-        40) echo "lept" ;;
+        36) echo "libtiff-4" ;;
+        38) echo "sndfile" ;;
+        39) echo "lept" ;;
+        47) echo "uuid" ;;
         *) echo $(get_library_name $1)
     esac
 }
@@ -111,9 +111,8 @@ get_static_archive_name() {
         31) echo "libgif.a" ;;
         33) echo "libogg.a" ;;
         34) echo "libpng.a" ;;
-        35) echo "libuuid.a" ;;
-        39) echo "libsndfile.a" ;;
-        40) echo "liblept.a" ;;
+        38) echo "libsndfile.a" ;;
+        39) echo "liblept.a" ;;
         *) echo lib$(get_library_name $1).a
     esac
 }
@@ -811,24 +810,6 @@ Cflags: -I\${includedir}
 EOF
 }
 
-create_uuid_package_config() {
-    local UUID_VERSION="$1"
-
-    cat > "${INSTALL_PKG_CONFIG_DIR}/uuid.pc" << EOF
-prefix=${BASEDIR}/prebuilt/$(get_target_build_directory)/libuuid
-exec_prefix=\${prefix}
-libdir=\${exec_prefix}/lib
-includedir=\${prefix}/include
-
-Name: uuid
-Description: Universally unique id library
-Version: ${UUID_VERSION}
-Requires:
-Cflags: -I\${includedir}
-Libs: -L\${libdir} -luuid
-EOF
-}
-
 create_uuid_system_package_config() {
     local UUID_VERSION="$1"
 
@@ -1095,6 +1076,7 @@ set_toolchain_clang_paths() {
     export ZLIB_PACKAGE_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}/zlib.pc"
     export BZIP2_PACKAGE_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}/bzip2.pc"
     export LIB_ICONV_PACKAGE_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}/libiconv.pc"
+    export LIB_UUID_PACKAGE_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}/uuid.pc"
 
     if [ ! -d ${INSTALL_PKG_CONFIG_DIR} ]; then
         mkdir -p ${INSTALL_PKG_CONFIG_DIR}
@@ -1110,6 +1092,10 @@ set_toolchain_clang_paths() {
 
     if [ ! -f ${BZIP2_PACKAGE_CONFIG_PATH} ]; then
         create_bzip2_package_config
+    fi
+
+    if [ ! -f ${LIB_UUID_PACKAGE_CONFIG_PATH} ]; then
+        create_uuid_system_package_config
     fi
 
     prepare_inline_sed

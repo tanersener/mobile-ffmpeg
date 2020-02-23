@@ -73,10 +73,6 @@ check_if_dependency_rebuilt() {
         libsndfile)
             set_dependency_rebuilt_flag "twolame"
         ;;
-        libuuid)
-            set_dependency_rebuilt_flag "fontconfig"
-            set_dependency_rebuilt_flag "libass"
-        ;;
         libvorbis)
             set_dependency_rebuilt_flag "libtheora"
         ;;
@@ -116,7 +112,7 @@ fi
 # FILTERING WHICH EXTERNAL LIBRARIES WILL BE BUILT
 # NOTE THAT BUILT-IN LIBRARIES ARE FORWARDED TO FFMPEG SCRIPT WITHOUT ANY PROCESSING
 enabled_library_list=()
-for library in {1..41}
+for library in {1..40}
 do
     if [[ ${!library} -eq 1 ]]; then
         ENABLED_LIBRARY=$(get_library_name $((library - 1)))
@@ -133,7 +129,7 @@ while [ ${#enabled_library_list[@]} -gt $completed ]; do
         let run=0
         case $library in
             fontconfig)
-                if [[ ! -z $OK_libuuid ]] && [[ ! -z $OK_expat ]] && [[ ! -z $OK_freetype ]]; then
+                if [[ ! -z $OK_expat ]] && [[ ! -z $OK_freetype ]]; then
                     run=1
                 fi
             ;;
@@ -153,7 +149,7 @@ while [ ${#enabled_library_list[@]} -gt $completed ]; do
                 fi
             ;;
             libass)
-                if [[ ! -z $OK_libuuid ]] && [[ ! -z $OK_expat ]] && [[ ! -z $OK_freetype ]] && [[ ! -z $OK_fribidi ]] && [[ ! -z $OK_fontconfig ]] && [[ ! -z $OK_libpng ]]; then
+                if [[ ! -z $OK_expat ]] && [[ ! -z $OK_freetype ]] && [[ ! -z $OK_fribidi ]] && [[ ! -z $OK_fontconfig ]] && [[ ! -z $OK_libpng ]]; then
                     run=1
                 fi
             ;;
@@ -229,31 +225,17 @@ while [ ${#enabled_library_list[@]} -gt $completed ]; do
 
                 cd ${BASEDIR}
 
-                if [ ${library} == "libuuid" ] && [ ${ARCH} == "x86-64h" ]; then
+                # BUILD EACH LIBRARY ALONE
+                ${SCRIPT_PATH} 1>>${BASEDIR}/build.log 2>&1
 
-                    # USING SYSTEM LIBRARY ON x86-64h
+                if [ $? -eq 0 ]; then
                     (( completed+=1 ))
                     declare "$BUILD_COMPLETED_FLAG=1"
-                    echo "using system library"
-
-                    # MANUALLY CREATING PACKAGE CONFIG
-                    export INSTALL_PKG_CONFIG_DIR="${PKG_CONFIG_DIRECTORY}"
-                    create_uuid_system_package_config "system"
-
+                    check_if_dependency_rebuilt ${library}
+                    echo "ok"
                 else
-
-                    # BUILD EACH LIBRARY ALONE
-                    ${SCRIPT_PATH} 1>>${BASEDIR}/build.log 2>&1
-
-                    if [ $? -eq 0 ]; then
-                        (( completed+=1 ))
-                        declare "$BUILD_COMPLETED_FLAG=1"
-                        check_if_dependency_rebuilt ${library}
-                        echo "ok"
-                    else
-                        echo "failed"
-                        exit 1
-                    fi
+                    echo "failed"
+                    exit 1
                 fi
             else
                 (( completed+=1 ))
