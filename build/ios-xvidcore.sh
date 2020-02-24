@@ -60,7 +60,7 @@ case ${ARCH} in
         ${SED_INLINE} 's/-Wl,-read_only_relocs,suppress//g' configure
 
     ;;
-    i386 | x86-64)
+    i386 | x86-64 | x86-64-mac-catalyst)
         ASM_FLAGS="--disable-assembly"
     ;;
 esac

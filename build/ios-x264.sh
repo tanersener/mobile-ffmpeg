@@ -48,7 +48,7 @@ make distclean 2>/dev/null 1>/dev/null
 
 ASM_FLAGS=""
 case ${ARCH} in
-    i386 | x86-64)
+    i386 | x86-64 | x86-64-mac-catalyst)
         ASM_FLAGS="--disable-asm"
 
         if ! [ -x "$(command -v nasm)" ]; then

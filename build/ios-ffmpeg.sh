@@ -404,6 +404,13 @@ ${SED_INLINE} 's/check_cflags -mdynamic-no-pic && add_asflags -mdynamic-no-pic;/
 rm -f ${BASEDIR}/src/${LIB_NAME}/libswscale/aarch64/hscale.S 1>>${BASEDIR}/build.log 2>&1
 cp ${BASEDIR}/tools/make/ffmpeg/libswscale/aarch64/hscale.S ${BASEDIR}/src/${LIB_NAME}/libswscale/aarch64/hscale.S 1>>${BASEDIR}/build.log 2>&1
 
+# Workaround for videotoolbox on mac catalyst
+if [ ${ARCH} == "x86-64-mac-catalyst" ]; then
+    ${SED_INLINE} 's/    CFDictionarySetValue(buffer_attributes\, kCVPixelBufferOpenGLESCompatibilityKey/   \/\/ CFDictionarySetValue(buffer_attributes\, kCVPixelBufferOpenGLESCompatibilityKey/g' ${BASEDIR}/src/${LIB_NAME}/libavcodec/videotoolbox.c
+else
+    ${SED_INLINE} 's/   \/\/ CFDictionarySetValue(buffer_attributes\, kCVPixelBufferOpenGLESCompatibilityKey/    CFDictionarySetValue(buffer_attributes\, kCVPixelBufferOpenGLESCompatibilityKey/g' ${BASEDIR}/src/${LIB_NAME}/libavcodec/videotoolbox.c
+fi
+
 ./configure \
     --sysroot=${SDK_PATH} \
     --prefix=${BASEDIR}/prebuilt/$(get_target_build_directory)/${LIB_NAME} \

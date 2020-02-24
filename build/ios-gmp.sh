@@ -50,6 +50,11 @@ case ${ARCH} in
         unset gmp_cv_asm_w32
         BUILD_HOST="x86-apple-darwin"
     ;;
+    x86-64-mac-catalyst)
+        # Workaround for 'cannot determine how to define a 32-bit word' error
+        export gmp_cv_asm_w32=".long"
+        BUILD_HOST=$(get_build_host)
+    ;;
     *)
         unset gmp_cv_asm_w32
         BUILD_HOST=$(get_build_host)

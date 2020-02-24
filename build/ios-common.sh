@@ -817,7 +817,7 @@ create_uuid_system_package_config() {
     cat > "${INSTALL_PKG_CONFIG_DIR}/uuid.pc" << EOF
 prefix=${SDK_PATH}
 exec_prefix=\${prefix}
-libdir=\${exec_prefix}/lib
+libdir=\${exec_prefix}/usr/lib
 includedir=\${prefix}/include
 
 Name: uuid

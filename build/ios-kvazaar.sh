@@ -37,6 +37,10 @@ case ${ARCH} in
     i386)
         BUILD_HOST="x86-apple-darwin"
     ;;
+    x86-64-mac-catalyst)
+        ARCH_OPTIONS="--disable-asm"
+        BUILD_HOST=$(get_build_host)
+    ;;
     *)
         BUILD_HOST=$(get_build_host)
     ;;
