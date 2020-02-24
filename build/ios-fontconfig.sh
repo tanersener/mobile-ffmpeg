@@ -32,7 +32,7 @@ LIB_NAME="fontconfig"
 set_toolchain_clang_paths ${LIB_NAME}
 
 # PREPARING FLAGS
-TARGET_HOST=$(get_target_host)
+BUILD_HOST=$(get_build_host)
 export CFLAGS=$(get_cflags ${LIB_NAME})
 export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 export LDFLAGS=$(get_ldflags ${LIB_NAME})
@@ -59,7 +59,7 @@ fi
     --disable-rpath \
     --disable-libxml2 \
     --disable-docs \
-    --host=${TARGET_HOST} || exit 1
+    --host=${BUILD_HOST} || exit 1
 
 # DISABLE IOS TESTS with system() calls - system() is deprecated for IOS
 # 1. test-bz106632.c

@@ -32,7 +32,7 @@ LIB_NAME="speex"
 set_toolchain_clang_paths ${LIB_NAME}
 
 # PREPARING FLAGS
-TARGET_HOST=$(get_target_host)
+BUILD_HOST=$(get_build_host)
 export CFLAGS=$(get_cflags ${LIB_NAME})
 export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 export LDFLAGS=$(get_ldflags ${LIB_NAME})
@@ -61,7 +61,7 @@ fi
     --disable-shared \
     --disable-binaries \
     --disable-fast-install \
-    --host=${TARGET_HOST} || exit 1
+    --host=${BUILD_HOST} || exit 1
 
 make -j$(get_cpu_count) || exit 1
 

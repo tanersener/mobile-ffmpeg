@@ -34,7 +34,7 @@ LIB_NAME="ffmpeg"
 set_toolchain_clang_paths ${LIB_NAME}
 
 # PREPARING FLAGS
-TARGET_HOST=$(get_target_host)
+BUILD_HOST=$(get_build_host)
 CFLAGS=$(get_cflags ${LIB_NAME})
 CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 LDFLAGS=$(get_ldflags ${LIB_NAME})
@@ -341,7 +341,7 @@ rm -f ${BASEDIR}/src/${LIB_NAME}/libswscale/aarch64/hscale.S 1>>${BASEDIR}/build
 cp ${BASEDIR}/tools/make/ffmpeg/libswscale/aarch64/hscale.S ${BASEDIR}/src/${LIB_NAME}/libswscale/aarch64/hscale.S 1>>${BASEDIR}/build.log 2>&1
 
 ./configure \
-    --cross-prefix="${TARGET_HOST}-" \
+    --cross-prefix="${BUILD_HOST}-" \
     --sysroot="${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/sysroot" \
     --prefix="${BASEDIR}/prebuilt/android-$(get_target_build)/${LIB_NAME}" \
     --pkg-config="${HOST_PKG_CONFIG_PATH}" \

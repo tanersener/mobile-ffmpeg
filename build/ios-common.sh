@@ -140,6 +140,10 @@ get_target_host() {
     esac
 }
 
+get_build_host() {
+    echo "$(get_target_arch)-ios-darwin"
+}
+
 get_target_build_directory() {
     case ${ARCH} in
         x86-64)
@@ -446,22 +450,22 @@ get_size_optimization_ldflags() {
 get_arch_specific_ldflags() {
     case ${ARCH} in
         armv7)
-            echo "-arch armv7 -march=armv7 -mfpu=neon -mfloat-abi=softfp -fembed-bitcode"
+            echo "-arch armv7 -march=armv7 -mfpu=neon -mfloat-abi=softfp -fembed-bitcode -target $(get_target_host)"
         ;;
         armv7s)
-            echo "-arch armv7s -march=armv7s -mfpu=neon -mfloat-abi=softfp -fembed-bitcode"
+            echo "-arch armv7s -march=armv7s -mfpu=neon -mfloat-abi=softfp -fembed-bitcode -target $(get_target_host)"
         ;;
         arm64)
-            echo "-arch arm64 -march=armv8-a+crc+crypto -fembed-bitcode"
+            echo "-arch arm64 -march=armv8-a+crc+crypto -fembed-bitcode -target $(get_target_host)"
         ;;
         arm64e)
-            echo "-arch arm64e -march=armv8.3-a+crc+crypto -fembed-bitcode"
+            echo "-arch arm64e -march=armv8.3-a+crc+crypto -fembed-bitcode -target $(get_target_host)"
         ;;
         i386)
-            echo "-arch i386 -march=i386"
+            echo "-arch i386 -march=i386 -target $(get_target_host)"
         ;;
         x86-64)
-            echo "-arch x86_64 -march=x86-64"
+            echo "-arch x86_64 -march=x86-64 -target $(get_target_host)"
         ;;
         x86-64-mac-catalyst)
             echo "-arch x86_64 -march=x86-64 -target $(get_target_host) -isysroot ${SDK_PATH} -L${SDK_PATH}/System/iOSSupport/usr/lib -iframework ${SDK_PATH}/System/iOSSupport/System/Library/Frameworks"
@@ -1033,8 +1037,6 @@ set_toolchain_clang_paths() {
         LOCAL_GAS_PREPROCESSOR="${BASEDIR}/src/x264/tools/gas-preprocessor.pl"
     fi
 
-    TARGET_HOST=$(get_target_host)
-    
     export AR="$(xcrun --sdk $(get_sdk_name) -f ar)"
     export CC="clang"
     export OBJC="$(xcrun --sdk $(get_sdk_name) -f clang)"

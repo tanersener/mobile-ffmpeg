@@ -48,11 +48,11 @@ fi
 case ${ARCH} in
     i386)
         unset gmp_cv_asm_w32
-        TARGET_HOST="x86-apple-darwin"
+        BUILD_HOST="x86-apple-darwin"
     ;;
     *)
         unset gmp_cv_asm_w32
-        TARGET_HOST=$(get_target_host)
+        BUILD_HOST=$(get_build_host)
     ;;
 esac
 
@@ -65,7 +65,7 @@ esac
     --disable-assembly \
     --disable-fast-install \
     --disable-maintainer-mode \
-    --host=${TARGET_HOST} || exit 1
+    --host=${BUILD_HOST} || exit 1
 
 make -j$(get_cpu_count) || exit 1
 

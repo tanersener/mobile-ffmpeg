@@ -37,7 +37,7 @@ LIB_NAME="ffmpeg"
 set_toolchain_clang_paths ${LIB_NAME}
 
 # PREPARING FLAGS
-TARGET_HOST=$(get_target_host)
+BUILD_HOST=$(get_build_host)
 FFMPEG_CFLAGS=""
 FFMPEG_LDFLAGS=""
 export PKG_CONFIG_LIBDIR="${INSTALL_PKG_CONFIG_DIR}"

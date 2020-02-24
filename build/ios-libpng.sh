@@ -32,7 +32,7 @@ LIB_NAME="libpng"
 set_toolchain_clang_paths ${LIB_NAME}
 
 # PREPARING FLAGS
-TARGET_HOST=$(get_target_host)
+BUILD_HOST=$(get_build_host)
 export CFLAGS=$(get_cflags ${LIB_NAME})
 export CPPFLAGS=$(get_cflags ${LIB_NAME})
 export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
@@ -67,7 +67,7 @@ fi
     --disable-unversioned-libpng-pc \
     --disable-unversioned-libpng-config \
     ${CPU_SPECIFIC_OPTIONS} \
-    --host=${TARGET_HOST} || exit 1
+    --host=${BUILD_HOST} || exit 1
 
 make -j$(get_cpu_count) || exit 1
 

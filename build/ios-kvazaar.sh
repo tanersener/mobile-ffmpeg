@@ -35,10 +35,10 @@ set_toolchain_clang_paths ${LIB_NAME}
 ARCH_OPTIONS=""
 case ${ARCH} in
     i386)
-        TARGET_HOST="x86-apple-darwin"
+        BUILD_HOST="x86-apple-darwin"
     ;;
     *)
-        TARGET_HOST=$(get_target_host)
+        BUILD_HOST=$(get_build_host)
     ;;
 esac
 export CFLAGS=$(get_cflags ${LIB_NAME})
@@ -65,7 +65,7 @@ fi
     --disable-shared \
     --disable-fast-install \
     ${ARCH_OPTIONS} \
-    --host=${TARGET_HOST} || exit 1
+    --host=${BUILD_HOST} || exit 1
 
 make || exit 1
 

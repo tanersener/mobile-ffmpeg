@@ -32,9 +32,9 @@ LIB_NAME="mobile-ffmpeg"
 set_toolchain_clang_paths ${LIB_NAME}
 
 # PREPARING FLAGS
-TARGET_HOST=$(get_target_host)
+BUILD_HOST=$(get_build_host)
 if [ ${ARCH} == "x86-64-mac-catalyst" ]; then
-    TARGET_HOST="x86_64-apple-darwin"
+    BUILD_HOST="x86_64-apple-darwin"
 fi
 COMMON_CFLAGS=$(get_cflags ${LIB_NAME})
 COMMON_LDFLAGS=$(get_ldflags ${LIB_NAME})
@@ -79,7 +79,7 @@ ${SED_INLINE} 's/${wl}suppress//g' configure
     ${VIDEOTOOLBOX_SUPPORT_FLAG} \
     --disable-fast-install \
     --disable-maintainer-mode \
-    --host=${TARGET_HOST} 1>>${BASEDIR}/build.log 2>&1
+    --host=${BUILD_HOST} 1>>${BASEDIR}/build.log 2>&1
 
 if [ $? -ne 0 ]; then
     echo "failed"

@@ -75,7 +75,7 @@ get_arch_name() {
     esac
 }
 
-get_target_host() {
+get_build_host() {
     case ${ARCH} in
         arm-v7a | arm-v7a-neon)
             echo "arm-linux-androideabi"
@@ -359,7 +359,7 @@ get_cxxflags() {
 }
 
 get_common_linked_libraries() {
-    local COMMON_LIBRARY_PATHS="-L${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/${TARGET_HOST}/lib -L${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/sysroot/usr/lib/${TARGET_HOST}/${API} -L${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/lib"
+    local COMMON_LIBRARY_PATHS="-L${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/${BUILD_HOST}/lib -L${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/sysroot/usr/lib/${BUILD_HOST}/${API} -L${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/lib"
 
     case $1 in
         ffmpeg)
@@ -1003,16 +1003,16 @@ download_gpl_library_source() {
 set_toolchain_clang_paths() {
     export PATH=$PATH:${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/bin
 
-    TARGET_HOST=$(get_target_host)
+    BUILD_HOST=$(get_build_host)
     
-    export AR=${TARGET_HOST}-ar
+    export AR=${BUILD_HOST}-ar
     export CC=$(get_clang_target_host)-clang
     export CXX=$(get_clang_target_host)-clang++
 
     if [ "$1" == "x264" ]; then
         export AS=${CC}
     else
-        export AS=${TARGET_HOST}-as
+        export AS=${BUILD_HOST}-as
     fi
 
     case ${ARCH} in
@@ -1021,9 +1021,9 @@ set_toolchain_clang_paths() {
         ;;
     esac
 
-    export LD=${TARGET_HOST}-ld
-    export RANLIB=${TARGET_HOST}-ranlib
-    export STRIP=${TARGET_HOST}-strip
+    export LD=${BUILD_HOST}-ld
+    export RANLIB=${BUILD_HOST}-ranlib
+    export STRIP=${BUILD_HOST}-strip
 
     export INSTALL_PKG_CONFIG_DIR="${BASEDIR}/prebuilt/android-$(get_target_build)/pkgconfig"
     export ZLIB_PACKAGE_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}/zlib.pc"
@@ -1050,14 +1050,14 @@ build_cpufeatures() {
 
     set_toolchain_clang_paths "cpu-features"
 
-    TARGET_HOST=$(get_target_host)
+    BUILD_HOST=$(get_build_host)
     export CFLAGS=$(get_cflags "cpu-features")
     export CXXFLAGS=$(get_cxxflags "cpu-features")
     export LDFLAGS=$(get_ldflags "cpu-features")
 
     # THEN BUILD FOR THIS ABI
     $(get_clang_target_host)-clang -c ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.c -o ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.o 1>>${BASEDIR}/build.log 2>&1
-    ${TARGET_HOST}-ar rcs ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/libcpufeatures.a ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.o 1>>${BASEDIR}/build.log 2>&1
+    ${BUILD_HOST}-ar rcs ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/libcpufeatures.a ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.o 1>>${BASEDIR}/build.log 2>&1
     $(get_clang_target_host)-clang -shared ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.o -o ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/libcpufeatures.so 1>>${BASEDIR}/build.log 2>&1
 
     create_cpufeatures_package_config
@@ -1076,13 +1076,13 @@ build_android_lts_support() {
     set_toolchain_clang_paths ${LIB_NAME}
 
     # PREPARING FLAGS
-    TARGET_HOST=$(get_target_host)
+    BUILD_HOST=$(get_build_host)
     CFLAGS=$(get_cflags ${LIB_NAME})
     LDFLAGS=$(get_ldflags ${LIB_NAME})
 
     # THEN BUILD FOR THIS ABI
     $(get_clang_target_host)-clang ${CFLAGS} -Wno-unused-command-line-argument -c ${BASEDIR}/android/app/src/main/cpp/android_lts_support.c -o ${BASEDIR}/android/app/src/main/cpp/android_lts_support.o ${LDFLAGS} 1>>${BASEDIR}/build.log 2>&1
-    ${TARGET_HOST}-ar rcs ${BASEDIR}/android/app/src/main/cpp/libandroidltssupport.a ${BASEDIR}/android/app/src/main/cpp/android_lts_support.o 1>>${BASEDIR}/build.log 2>&1
+    ${BUILD_HOST}-ar rcs ${BASEDIR}/android/app/src/main/cpp/libandroidltssupport.a ${BASEDIR}/android/app/src/main/cpp/android_lts_support.o 1>>${BASEDIR}/build.log 2>&1
 }
 
 autoreconf_library() {

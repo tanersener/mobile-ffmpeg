@@ -124,7 +124,7 @@ get_arch_name() {
     esac
 }
 
-get_target_host() {
+get_build_host() {
     echo "$(get_target_arch)-tvos-darwin"
 }
 
@@ -207,10 +207,10 @@ get_common_cflags() {
 get_arch_specific_cflags() {
     case ${ARCH} in
         arm64)
-            echo "-arch arm64 -target $(get_target_host) -march=armv8-a+crc+crypto -mcpu=generic -DMOBILE_FFMPEG_ARM64"
+            echo "-arch arm64 -target $(get_build_host) -march=armv8-a+crc+crypto -mcpu=generic -DMOBILE_FFMPEG_ARM64"
         ;;
         x86-64)
-            echo "-arch x86_64 -target $(get_target_host) -march=x86-64 -msse4.2 -mpopcnt -m64 -mtune=intel -DMOBILE_FFMPEG_X86_64"
+            echo "-arch x86_64 -target $(get_build_host) -march=x86-64 -msse4.2 -mpopcnt -m64 -mtune=intel -DMOBILE_FFMPEG_X86_64"
         ;;
     esac
 }
@@ -999,7 +999,7 @@ set_toolchain_clang_paths() {
         LOCAL_GAS_PREPROCESSOR="${BASEDIR}/src/x264/tools/gas-preprocessor.pl"
     fi
 
-    TARGET_HOST=$(get_target_host)
+    BUILD_HOST=$(get_build_host)
     
     export AR="$(xcrun --sdk $(get_sdk_name) -f ar)"
     export CC="clang"

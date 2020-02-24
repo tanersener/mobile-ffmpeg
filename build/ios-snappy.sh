@@ -32,7 +32,7 @@ LIB_NAME="snappy"
 set_toolchain_clang_paths ${LIB_NAME}
 
 # PREPARING FLAGS
-TARGET_HOST=$(get_target_host)
+BUILD_HOST=$(get_build_host)
 CFLAGS="$(get_cflags ${LIB_NAME}) -I${SDK_PATH}/usr/include"
 CXXFLAGS="$(get_cxxflags ${LIB_NAME})"
 LDFLAGS="$(get_ldflags ${LIB_NAME}) -L${SDK_PATH}/usr/lib"

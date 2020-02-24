@@ -28,7 +28,7 @@ LIB_NAME="tesseract"
 set_toolchain_clang_paths ${LIB_NAME}
 
 # PREPARING FLAGS
-TARGET_HOST=$(get_target_host)
+BUILD_HOST=$(get_build_host)
 export CFLAGS=$(get_cflags ${LIB_NAME})
 export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 export LDFLAGS=$(get_ldflags ${LIB_NAME})
@@ -60,7 +60,7 @@ export ac_cv_c_bigendian=no
     --disable-cube \
     --disable-tessdata-prefix \
     --disable-largefile \
-    --host=${TARGET_HOST} || exit 1
+    --host=${BUILD_HOST} || exit 1
 
 ${SED_INLINE} 's/\-lrt//g' ${BASEDIR}/src/${LIB_NAME}/api/Makefile
 

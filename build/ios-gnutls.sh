@@ -32,7 +32,7 @@ LIB_NAME="gnutls"
 set_toolchain_clang_paths ${LIB_NAME}
 
 # PREPARING FLAGS
-TARGET_HOST=$(get_target_host)
+BUILD_HOST=$(get_build_host)
 COMMON_CFLAGS=$(get_cflags ${LIB_NAME})
 COMMON_CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 COMMON_LDFLAGS=$(get_ldflags ${LIB_NAME})
@@ -96,7 +96,7 @@ fi
     --disable-tests \
     --disable-tools \
     --disable-maintainer-mode \
-    --host=${TARGET_HOST} || exit 1
+    --host=${BUILD_HOST} || exit 1
 
 make -j$(get_cpu_count) || exit 1
 
