@@ -854,6 +854,7 @@ if [[ ${DETECTED_IOS_SDK_VERSION} != 13* ]] && [[ -z ${BUILD_FORCE} ]] && [[ ${E
     disable_arch "x86-64-mac-catalyst"
 fi
 
+# DISABLE x86-64-mac-catalyst when x86-64 is enabled
 if [[ ${ENABLED_ARCHITECTURES[${ARCH_X86_64}]} -eq 1 ]] && [[ ${ENABLED_ARCHITECTURES[${ARCH_X86_64_MAC_CATALYST}]} -eq 1 ]]; then
     echo -e "INFO: Disabled x86-64-mac-catalyst architecture which can not co-exist with x86-64.\n" 1>>${BASEDIR}/build.log 2>&1
     disable_arch "x86-64-mac-catalyst"

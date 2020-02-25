@@ -40,6 +40,9 @@ export PKG_CONFIG_LIBDIR=${INSTALL_PKG_CONFIG_DIR}
 
 ARCH_OPTIONS=""
 case ${ARCH} in
+    x86-64-mac-catalyst)
+        ARCH_OPTIONS="--disable-asm"
+    ;;
     *)
         ARCH_OPTIONS="--enable-asm"
     ;;

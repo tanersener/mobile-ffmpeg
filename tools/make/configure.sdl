@@ -24662,14 +24662,6 @@ $as_echo "#define SDL_POWER_MACOSX 1" >>confdefs.h
             SOURCES="$SOURCES $srcdir/src/power/macosx/*.c"
             have_power=yes
         fi
-        # Set up files for the filesystem library
-        if test x$enable_filesystem = xyes; then
-
-$as_echo "#define SDL_FILESYSTEM_COCOA 1" >>confdefs.h
-
-            SOURCES="$SOURCES $srcdir/src/filesystem/cocoa/*.m"
-            have_filesystem=yes
-        fi
         # Set up files for the timer library
         if test x$enable_timers = xyes; then
 

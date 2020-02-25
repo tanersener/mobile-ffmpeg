@@ -62,12 +62,12 @@ case ${ARCH} in
     ;;
     x86-64)
         TOOLCHAIN_FILE="${BASEDIR}/src/${LIB_NAME}/build/cmake/toolchains/x86_64-ios-simulator.cmake"
-        ARCH_OPTIONS="-DARCH_X86_64=1 -DENABLE_SSE4_2=1 -DHAVE_SSE4_2=1"
+        ARCH_OPTIONS="-DARCH_X86_64=1 -DENABLE_SSE4_1=1 -DHAVE_SSE4_2=1"
     ;;
     x86-64-mac-catalyst)
         cp /Users/taner/Projects/mobile-ffmpeg/tools/cmake/libaom.x86_64-mac-catalyst.cmake ${BASEDIR}/src/${LIB_NAME}/build/cmake/toolchains/x86_64-mac-catalyst.cmake
         TOOLCHAIN_FILE="${BASEDIR}/src/${LIB_NAME}/build/cmake/toolchains/x86_64-mac-catalyst.cmake"
-        ARCH_OPTIONS="-DARCH_X86_64=1 -DENABLE_SSE4_2=1 -DHAVE_SSE4_2=1"
+        ARCH_OPTIONS="-DARCH_X86_64=0 -DENABLE_SSE=0 -DENABLE_SSE2=0 -DHAVE_SSE3=0 -DHAVE_SSE4_1=0 -DHAVE_SSE4_2=0 -DENABLE_MMX=0"
     ;;
 esac
 
@@ -79,6 +79,15 @@ fi
 
 mkdir cmake-build;
 cd cmake-build
+
+# Workaround to disable asm on mac catalyst
+if [ ${ARCH} == "x86-64-mac-catalyst" ]; then
+    ${SED_INLINE} 's/ add_asm_library("aom_ports/#add_asm_library("aom_ports/g' ${BASEDIR}/src/${LIB_NAME}/aom_ports/aom_ports.cmake
+    ${SED_INLINE} 's/ target_sources(aom_ports/#target_sources(aom_ports/g' ${BASEDIR}/src/${LIB_NAME}/aom_ports/aom_ports.cmake
+else
+    ${SED_INLINE} 's/#add_asm_library("aom_ports/ add_asm_library("aom_ports/g' ${BASEDIR}/src/${LIB_NAME}/aom_ports/aom_ports.cmake
+    ${SED_INLINE} 's/#target_sources(aom_ports/ target_sources(aom_ports/g' ${BASEDIR}/src/${LIB_NAME}/aom_ports/aom_ports.cmake
+fi
 
 cmake -Wno-dev \
     -DCMAKE_VERBOSE_MAKEFILE=0 \
