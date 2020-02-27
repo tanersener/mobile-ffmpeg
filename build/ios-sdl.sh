@@ -33,13 +33,20 @@ set_toolchain_clang_paths ${LIB_NAME}
 
 # PREPARING FLAGS
 BUILD_HOST=$(get_build_host)
-if [ ${ARCH} == "x86-64-mac-catalyst" ]; then
-  BUILD_HOST="x86_64-apple-macosx"
-fi
 export CFLAGS=$(get_cflags ${LIB_NAME})
 export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 export LDFLAGS=$(get_ldflags ${LIB_NAME})
 export PKG_CONFIG_LIBDIR="${INSTALL_PKG_CONFIG_DIR}"
+
+case ${ARCH} in
+    x86-64-mac-catalyst)
+        BUILD_HOST="x86_64-apple-macosx"
+        ARCH_OPTIONS="--disable-video-cocoa --disable-render-metal --disable-haptic --disable-diskaudio"
+    ;;
+    *)
+        ARCH_OPTIONS=""
+    ;;
+esac
 
 cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
@@ -62,6 +69,7 @@ cp ${BASEDIR}/tools/make/configure.sdl ${BASEDIR}/src/${LIB_NAME}/configure
     --enable-static \
     --disable-shared \
     --disable-video-opengl \
+    ${ARCH_OPTIONS} \
     --host=${BUILD_HOST} || exit 1
 
 make -j$(get_cpu_count) || exit 1
