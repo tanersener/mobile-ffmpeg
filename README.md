@@ -36,8 +36,8 @@ FFmpeg for Android, iOS and tvOS
 - Supports `API Level 16+`
 
 #### 1.2 iOS
-- Builds `armv7`, `armv7s`, `arm64`, `arm64e`, `i386` and `x86_64` architectures
-- Supports `bzip2`, `zlib`, `iconv` system libraries and `AudioToolbox`, `CoreImage`, `VideoToolbox`, `AVFoundation` system frameworks
+- Builds `armv7`, `armv7s`, `arm64`, `arm64e`, `i386`, `x86_64` and `x86_64` (Mac Catalyst) architectures
+- Supports `bzip2`, `iconv`, `libuuid`, `zlib` system libraries and `AudioToolbox`, `CoreImage`, `VideoToolbox`, `AVFoundation` system frameworks
 - Objective-C API
 - Camera access
 - `ARC` enabled library
