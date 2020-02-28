@@ -48,18 +48,18 @@ export HOGWEED_LIBS="-L${BASEDIR}/prebuilt/$(get_target_build_directory)/nettle/
 export GMP_CFLAGS="-I${BASEDIR}/prebuilt/$(get_target_build_directory)/gmp/include"
 export GMP_LIBS="-L${BASEDIR}/prebuilt/$(get_target_build_directory)/gmp/lib -lgmp"
 
-HARDWARE_ACCELERATION=""
+ARCH_OPTIONS=""
 case ${ARCH} in
     arm64 | arm64e)
-        HARDWARE_ACCELERATION="--enable-hardware-acceleration"
+        ARCH_OPTIONS="--enable-hardware-acceleration"
     ;;
     i386)
         # DISABLING thread_local WHICH IS NOT SUPPORTED ON i386
         export CFLAGS+=" -D__thread="
-        HARDWARE_ACCELERATION="--enable-hardware-acceleration"
+        ARCH_OPTIONS="--enable-hardware-acceleration"
     ;;
     *)
-        HARDWARE_ACCELERATION="--enable-hardware-acceleration"
+        ARCH_OPTIONS="--enable-hardware-acceleration"
     ;;
 esac
 
@@ -84,7 +84,7 @@ fi
     --with-included-unistring \
     --without-idn \
     --without-p11-kit \
-    ${HARDWARE_ACCELERATION} \
+    ${ARCH_OPTIONS} \
     --enable-static \
     --disable-openssl-compatibility \
     --disable-shared \

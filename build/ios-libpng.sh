@@ -38,13 +38,13 @@ export CPPFLAGS=$(get_cflags ${LIB_NAME})
 export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 export LDFLAGS=$(get_ldflags ${LIB_NAME})
 
-CPU_SPECIFIC_OPTIONS="--enable-hardware-optimizations=yes"
+ARCH_OPTIONS="--enable-hardware-optimizations=yes"
 case ${ARCH} in
     x86 | x86-64 | x86-64-mac-catalyst)
-        CPU_SPECIFIC_OPTIONS+=" --enable-intel-sse=yes"
+        ARCH_OPTIONS+=" --enable-intel-sse=yes"
     ;;
     armv7 | armv7s | arm64 | arm64e)
-        CPU_SPECIFIC_OPTIONS+=" --enable-arm-neon=yes"
+        ARCH_OPTIONS+=" --enable-arm-neon=yes"
     ;;
 esac
 
@@ -66,7 +66,7 @@ fi
     --disable-fast-install \
     --disable-unversioned-libpng-pc \
     --disable-unversioned-libpng-config \
-    ${CPU_SPECIFIC_OPTIONS} \
+    ${ARCH_OPTIONS} \
     --host=${BUILD_HOST} || exit 1
 
 make -j$(get_cpu_count) || exit 1
