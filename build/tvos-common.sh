@@ -585,7 +585,7 @@ Cflags: -I\${includedir}
 EOF
 }
 
-create_libiconv_package_config() {
+create_libiconv_system_package_config() {
     local LIB_ICONV_VERSION=$(grep '_LIBICONV_VERSION' ${SDK_PATH}/usr/include/iconv.h | grep -Eo '0x.*' | grep -Eo '.*    ')
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/libiconv.pc" << EOF
@@ -810,7 +810,7 @@ Cflags: -I\${includedir}
 EOF
 }
 
-create_zlib_package_config() {
+create_zlib_system_package_config() {
     ZLIB_VERSION=$(grep '#define ZLIB_VERSION' ${SDK_PATH}/usr/include/zlib.h | grep -Eo '\".*\"' | sed -e 's/\"//g')
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/zlib.pc" << EOF
@@ -829,7 +829,7 @@ Cflags: -I\${includedir}
 EOF
 }
 
-create_bzip2_package_config() {
+create_bzip2_system_package_config() {
     BZIP2_VERSION=$(grep -Eo 'version.*of' ${SDK_PATH}/usr/include/bzlib.h | sed -e 's/of//;s/version//g;s/\ //g')
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/bzip2.pc" << EOF
@@ -1036,15 +1036,15 @@ set_toolchain_clang_paths() {
     fi
 
     if [ ! -f ${ZLIB_PACKAGE_CONFIG_PATH} ]; then
-        create_zlib_package_config
+        create_zlib_system_package_config
     fi
 
     if [ ! -f ${LIB_ICONV_PACKAGE_CONFIG_PATH} ]; then
-        create_libiconv_package_config
+        create_libiconv_system_package_config
     fi
 
     if [ ! -f ${BZIP2_PACKAGE_CONFIG_PATH} ]; then
-        create_bzip2_package_config
+        create_bzip2_system_package_config
     fi
 
     prepare_inline_sed

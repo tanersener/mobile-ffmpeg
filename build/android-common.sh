@@ -831,7 +831,7 @@ Cflags: -I\${includedir}
 EOF
 }
 
-create_zlib_package_config() {
+create_zlib_system_package_config() {
     ZLIB_VERSION=$(grep '#define ZLIB_VERSION' ${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/sysroot/usr/include/zlib.h | grep -Eo '\".*\"' | sed -e 's/\"//g')
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/zlib.pc" << EOF
@@ -1033,7 +1033,7 @@ set_toolchain_clang_paths() {
     fi
 
     if [ ! -f ${ZLIB_PACKAGE_CONFIG_PATH} ]; then
-        create_zlib_package_config
+        create_zlib_system_package_config
     fi
 
     prepare_inline_sed
