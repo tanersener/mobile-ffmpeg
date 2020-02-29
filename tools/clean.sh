@@ -29,3 +29,4 @@ rm -rf ../src/libvidstab
 rm -rf ../src/x264
 rm -rf ../src/x265
 rm -rf ../src/xvidcore
+rm -rf ../src/rubberband

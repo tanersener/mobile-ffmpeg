@@ -23,7 +23,7 @@ fi
 # ENABLE COMMON FUNCTIONS
 . ${BASEDIR}/build/android-common.sh
 
-# PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
+# PREPARE PATHS & DEFINE ${INSTALL_PKG_CONFIG_DIR}
 LIB_NAME="gnutls"
 set_toolchain_clang_paths ${LIB_NAME}
 
@@ -58,7 +58,7 @@ esac
 
 make distclean 2>/dev/null 1>/dev/null
 
-# RECONFIGURING IF REQUESTED
+# RECONFIGURE IF REQUESTED
 if [[ ${RECONF_gnutls} -eq 1 ]]; then
     autoreconf_library ${LIB_NAME}
 fi

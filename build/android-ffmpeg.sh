@@ -29,7 +29,7 @@ fi
 # ENABLE COMMON FUNCTIONS
 . ${BASEDIR}/build/android-common.sh
 
-# PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
+# PREPARE PATHS & DEFINE ${INSTALL_PKG_CONFIG_DIR}
 LIB_NAME="ffmpeg"
 set_toolchain_clang_paths ${LIB_NAME}
 
@@ -76,7 +76,7 @@ esac
 CONFIGURE_POSTFIX=""
 HIGH_PRIORITY_INCLUDES=""
 
-for library in {1..44}
+for library in {1..46}
 do
     if [[ ${!library} -eq 1 ]]; then
         ENABLED_LIBRARY=$(get_library_name $((library - 1)))
@@ -194,6 +194,11 @@ do
                 LDFLAGS+=" $(pkg-config --libs --static opus)"
                 CONFIGURE_POSTFIX+=" --enable-libopus"
             ;;
+            rubberband)
+                CFLAGS+=" $(pkg-config --cflags rubberband)"
+                LDFLAGS+=" $(pkg-config --libs --static rubberband)"
+                CONFIGURE_POSTFIX+=" --enable-librubberband --enable-gpl"
+            ;;
             shine)
                 CFLAGS+=" $(pkg-config --cflags shine)"
                 LDFLAGS+=" $(pkg-config --libs --static shine)"
@@ -285,9 +290,9 @@ do
     else
 
         # THE FOLLOWING LIBRARIES SHOULD BE EXPLICITLY DISABLED TO PREVENT AUTODETECT
-        if [[ ${library} -eq 30 ]]; then
+        if [[ ${library} -eq 31 ]]; then
             CONFIGURE_POSTFIX+=" --disable-sdl2"
-        elif [[ ${library} -eq 43 ]]; then
+        elif [[ ${library} -eq 45 ]]; then
             CONFIGURE_POSTFIX+=" --disable-zlib"
         fi
     fi

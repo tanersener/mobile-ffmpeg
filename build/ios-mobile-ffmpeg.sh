@@ -27,7 +27,7 @@ else
     . ${BASEDIR}/build/ios-common.sh
 fi
 
-# PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
+# PREPARE PATHS & DEFINE ${INSTALL_PKG_CONFIG_DIR}
 LIB_NAME="mobile-ffmpeg"
 set_toolchain_clang_paths ${LIB_NAME}
 
@@ -55,7 +55,7 @@ make distclean 2>/dev/null 1>/dev/null
 
 rm -f ${BASEDIR}/ios/src/libmobileffmpeg* 1>>${BASEDIR}/build.log 2>&1
 
-# RECONFIGURING IF REQUESTED
+# RECONFIGURE IF REQUESTED
 if [[ ${RECONF_mobile_ffmpeg} -eq 1 ]]; then
     autoreconf_library ${LIB_NAME}
 fi

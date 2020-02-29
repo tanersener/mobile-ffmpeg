@@ -40,28 +40,30 @@ get_library_name() {
         19) echo "xvidcore" ;;
         20) echo "x265" ;;
         21) echo "libvidstab" ;;
-        22) echo "libilbc" ;;
-        23) echo "opus" ;;
-        24) echo "snappy" ;;
-        25) echo "soxr" ;;
-        26) echo "libaom" ;;
-        27) echo "chromaprint" ;;
-        28) echo "twolame" ;;
-        29) echo "sdl" ;;
-        30) echo "tesseract" ;;
-        31) echo "openh264" ;;
-        32) echo "giflib" ;;
-        33) echo "jpeg" ;;
-        34) echo "libogg" ;;
-        35) echo "libpng" ;;
-        36) echo "libuuid" ;;
-        37) echo "nettle" ;;
-        38) echo "tiff" ;;
-        39) echo "expat" ;;
-        40) echo "libsndfile" ;;
-        41) echo "leptonica" ;;
-        42) echo "android-zlib" ;;
-        43) echo "android-media-codec" ;;
+        22) echo "rubberband" ;;
+        23) echo "libilbc" ;;
+        24) echo "opus" ;;
+        25) echo "snappy" ;;
+        26) echo "soxr" ;;
+        27) echo "libaom" ;;
+        28) echo "chromaprint" ;;
+        29) echo "twolame" ;;
+        30) echo "sdl" ;;
+        31) echo "tesseract" ;;
+        32) echo "openh264" ;;
+        33) echo "giflib" ;;
+        34) echo "jpeg" ;;
+        35) echo "libogg" ;;
+        36) echo "libpng" ;;
+        37) echo "libuuid" ;;
+        38) echo "nettle" ;;
+        39) echo "tiff" ;;
+        40) echo "expat" ;;
+        41) echo "libsndfile" ;;
+        42) echo "leptonica" ;;
+        43) echo "libsamplerate" ;;
+        44) echo "android-zlib" ;;
+        45) echo "android-media-codec" ;;
     esac
 }
 
@@ -282,7 +284,6 @@ get_size_optimization_cflags() {
 }
 
 get_app_specific_cflags() {
-
     local APP_FLAGS=""
     case $1 in
         xvidcore)
@@ -291,14 +292,17 @@ get_app_specific_cflags() {
         ffmpeg)
             APP_FLAGS="-Wno-unused-function -DBIONIC_IOCTL_NO_SIGNEDNESS_OVERLOAD"
         ;;
+        kvazaar)
+            APP_FLAGS="-std=gnu99 -Wno-unused-function"
+        ;;
+        rubberband)
+            APP_FLAGS="-std=c99 -Wno-unused-function"
+        ;;
         shine)
             APP_FLAGS="-Wno-unused-function"
         ;;
         soxr | snappy | libwebp)
             APP_FLAGS="-std=gnu99 -Wno-unused-function -DPIC"
-        ;;
-        kvazaar)
-            APP_FLAGS="-std=gnu99 -Wno-unused-function"
         ;;
         *)
             APP_FLAGS="-std=c99 -Wno-unused-function"
@@ -351,6 +355,9 @@ get_cxxflags() {
         ;;
         x265)
             echo "-std=c++11 -fno-exceptions ${OPTIMIZATION_FLAGS}"
+        ;;
+        rubberband)
+            echo "-std=c++11 ${OPTIMIZATION_FLAGS}"
         ;;
         *)
             echo "-std=c++11 -fno-exceptions -fno-rtti ${OPTIMIZATION_FLAGS}"
@@ -929,6 +936,12 @@ download_gpl_library_source() {
             GPL_LIB_FILE="xvidcore-1.3.7.tar.gz"
             GPL_LIB_ORIG_DIR="xvidcore"
             GPL_LIB_DEST_DIR="xvidcore"
+        ;;
+        rubberband)
+            GPL_LIB_URL="https://breakfastquay.com/files/releases/rubberband-1.8.2.tar.bz2"
+            GPL_LIB_FILE="rubberband-1.8.2.tar.bz2"
+            GPL_LIB_ORIG_DIR="rubberband-1.8.2"
+            GPL_LIB_DEST_DIR="rubberband"
         ;;
     esac
 

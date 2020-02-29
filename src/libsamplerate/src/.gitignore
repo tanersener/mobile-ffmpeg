@@ -1,0 +1,9 @@
+*.o
+/.deps/
+/.libs/
+*.lo
+*.la
+/Makefile
+/Version_script
+/config.h
+/stamp-h1

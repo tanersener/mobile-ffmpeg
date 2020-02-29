@@ -30,34 +30,36 @@ LIBRARY_X264=18
 LIBRARY_XVIDCORE=19
 LIBRARY_X265=20
 LIBRARY_LIBVIDSTAB=21
-LIBRARY_LIBILBC=22
-LIBRARY_OPUS=23
-LIBRARY_SNAPPY=24
-LIBRARY_SOXR=25
-LIBRARY_LIBAOM=26
-LIBRARY_CHROMAPRINT=27
-LIBRARY_TWOLAME=28
-LIBRARY_SDL=29
-LIBRARY_TESSERACT=30
-LIBRARY_OPENH264=31
-LIBRARY_GIFLIB=32
-LIBRARY_JPEG=33
-LIBRARY_LIBOGG=34
-LIBRARY_LIBPNG=35
-LIBRARY_LIBUUID=36
-LIBRARY_NETTLE=37
-LIBRARY_TIFF=38
-LIBRARY_EXPAT=39
-LIBRARY_SNDFILE=40
-LIBRARY_LEPTONICA=41
-LIBRARY_ZLIB=42
-LIBRARY_MEDIA_CODEC=43
+LIBRARY_RUBBERBAND=22
+LIBRARY_LIBILBC=23
+LIBRARY_OPUS=24
+LIBRARY_SNAPPY=25
+LIBRARY_SOXR=26
+LIBRARY_LIBAOM=27
+LIBRARY_CHROMAPRINT=28
+LIBRARY_TWOLAME=29
+LIBRARY_SDL=30
+LIBRARY_TESSERACT=31
+LIBRARY_OPENH264=32
+LIBRARY_GIFLIB=33
+LIBRARY_JPEG=34
+LIBRARY_LIBOGG=35
+LIBRARY_LIBPNG=36
+LIBRARY_LIBUUID=37
+LIBRARY_NETTLE=38
+LIBRARY_TIFF=39
+LIBRARY_EXPAT=40
+LIBRARY_SNDFILE=41
+LIBRARY_LEPTONICA=42
+LIBRARY_LIBSAMPLERATE=43
+LIBRARY_ZLIB=44
+LIBRARY_MEDIA_CODEC=45
 
 # ENABLE ARCH
 ENABLED_ARCHITECTURES=(1 1 1 1 1)
 
 # ENABLE LIBRARIES
-ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 
 export BASEDIR=$(pwd)
 export MOBILE_FFMPEG_TMPDIR="${BASEDIR}/.tmp"
@@ -144,6 +146,7 @@ When compilation ends an Android Archive (AAR) file is created with enabled plat
     echo -e "GPL libraries:"
 
     echo -e "  --enable-libvidstab\t\tbuild with libvidstab [no]"
+    echo -e "  --enable-rubberband\t\tbuild with rubber band [no]"
     echo -e "  --enable-x264\t\t\tbuild with x264 [no]"
     echo -e "  --enable-x265\t\t\tbuild with x265 [no]"
     echo -e "  --enable-xvidcore\t\tbuild with xvidcore [no]\n"
@@ -208,7 +211,7 @@ reconf_library() {
     local RECONF_VARIABLE=$(echo "RECONF_$1" | sed "s/\-/\_/g")
     local library_supported=0
 
-    for library in {1..42}
+    for library in {1..44}
     do
         library_name=$(get_library_name $((library - 1)))
 
@@ -228,7 +231,7 @@ rebuild_library() {
     local REBUILD_VARIABLE=$(echo "REBUILD_$1" | sed "s/\-/\_/g")
     local library_supported=0
 
-    for library in {1..42}
+    for library in {1..44}
     do
         library_name=$(get_library_name $((library - 1)))
 
@@ -348,6 +351,11 @@ set_library() {
         opus)
             ENABLED_LIBRARIES[LIBRARY_OPUS]=$2
         ;;
+        rubberband)
+            ENABLED_LIBRARIES[LIBRARY_RUBBERBAND]=$2
+            ENABLED_LIBRARIES[LIBRARY_SNDFILE]=$2
+            ENABLED_LIBRARIES[LIBRARY_LIBSAMPLERATE]=$2
+        ;;
         sdl)
             ENABLED_LIBRARIES[LIBRARY_SDL]=$2
         ;;
@@ -390,7 +398,7 @@ set_library() {
         xvidcore)
             ENABLED_LIBRARIES[LIBRARY_XVIDCORE]=$2
         ;;
-        expat | giflib | jpeg | leptonica | libogg | libpng | libsndfile | libuuid)
+        expat | giflib | jpeg | leptonica | libogg | libsamplerate | libsndfile | libuuid)
             # THESE LIBRARIES ARE NOT ENABLED DIRECTLY
         ;;
         nettle)
@@ -477,7 +485,7 @@ print_enabled_libraries() {
     let enabled=0;
 
     # FIRST BUILT-IN LIBRARIES
-    for library in {42..43}
+    for library in {44..45}
     do
         if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
             if [[ ${enabled} -ge 1 ]]; then
@@ -489,7 +497,7 @@ print_enabled_libraries() {
     done
 
     # THEN EXTERNAL LIBRARIES
-    for library in {0..31}
+    for library in {0..32}
     do
         if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
             if [[ ${enabled} -ge 1 ]]; then
@@ -554,7 +562,7 @@ build_application_mk() {
         local LTS_BUILD_FLAG="-DMOBILE_FFMPEG_LTS "
     fi
 
-    if [[ ${ENABLED_LIBRARIES[$LIBRARY_X265]} -eq 1 ]] || [[ ${ENABLED_LIBRARIES[$LIBRARY_TESSERACT]} -eq 1 ]] || [[ ${ENABLED_LIBRARIES[$LIBRARY_OPENH264]} -eq 1 ]] || [[ ${ENABLED_LIBRARIES[$LIBRARY_SNAPPY]} -eq 1 ]]; then
+    if [[ ${ENABLED_LIBRARIES[$LIBRARY_X265]} -eq 1 ]] || [[ ${ENABLED_LIBRARIES[$LIBRARY_TESSERACT]} -eq 1 ]] || [[ ${ENABLED_LIBRARIES[$LIBRARY_OPENH264]} -eq 1 ]] || [[ ${ENABLED_LIBRARIES[$LIBRARY_SNAPPY]} -eq 1 ]] || [[ ${ENABLED_LIBRARIES[$LIBRARY_RUBBERBAND]} -eq 1 ]]; then
         local APP_STL="c++_shared"
     else
         local APP_STL="none"
@@ -649,9 +657,9 @@ do
             rebuild_library ${BUILD_LIBRARY}
 	    ;;
 	    --full)
-            for library in {0..43}
+            for library in {0..45}
             do
-                if [[ $library -ne 18 ]] && [[ $library -ne 19 ]] && [[ $library -ne 20 ]] && [[ $library -ne 21 ]]; then
+                if [[ $library -ne 18 ]] && [[ $library -ne 19 ]] && [[ $library -ne 20 ]] && [[ $library -ne 21 ]] && [[ $library -ne 22 ]]; then
                     enable_library $(get_library_name $library)
                 fi
             done
@@ -728,7 +736,7 @@ print_reconfigure_requested_libraries
 print_rebuild_requested_libraries
 
 # CHECKING GPL LIBRARIES
-for gpl_library in {18..21}
+for gpl_library in {18,19,20,21,22}
 do
     if [[ ${ENABLED_LIBRARIES[$gpl_library]} -eq 1 ]]; then
         library_name=$(get_library_name ${gpl_library})
@@ -769,7 +777,7 @@ do
         . ${BASEDIR}/build/main-android.sh "${ENABLED_LIBRARIES[@]}" || exit 1
 
         # CLEAR FLAGS
-        for library in {1..44}
+        for library in {1..46}
         do
             library_name=$(get_library_name $((library - 1)))
             unset $(echo "OK_${library_name}" | sed "s/\-/\_/g")

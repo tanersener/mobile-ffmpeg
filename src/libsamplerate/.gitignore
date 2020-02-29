@@ -1,0 +1,6 @@
+*.tmp
+/Makefile
+/config.status
+/libsamplerate.spec
+/libtool
+/samplerate.pc

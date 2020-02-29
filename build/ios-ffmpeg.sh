@@ -32,7 +32,7 @@ else
     . ${BASEDIR}/build/ios-common.sh
 fi
 
-# PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
+# PREPARE PATHS & DEFINE ${INSTALL_PKG_CONFIG_DIR}
 LIB_NAME="ffmpeg"
 set_toolchain_clang_paths ${LIB_NAME}
 
@@ -95,10 +95,10 @@ esac
 
 if [[ ${APPLE_TVOS_BUILD} -eq 1 ]]; then
     CONFIGURE_POSTFIX="--disable-avfoundation"
-    LIBRARY_COUNT=47
+    LIBRARY_COUNT=49
 else
     CONFIGURE_POSTFIX=""
-    LIBRARY_COUNT=48
+    LIBRARY_COUNT=50
 fi
 
 library=1
@@ -213,6 +213,12 @@ do
                 FFMPEG_LDFLAGS+=" $(pkg-config --libs --static opus)"
                 CONFIGURE_POSTFIX+=" --enable-libopus"
             ;;
+            rubberband)
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags rubberband)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static rubberband)"
+                FFMPEG_LDFLAGS+=" -framework Accelerate"
+                CONFIGURE_POSTFIX+=" --enable-librubberband --enable-gpl"
+            ;;
             sdl)
                 FFMPEG_CFLAGS+=" $(pkg-config --cflags sdl2)"
                 FFMPEG_LDFLAGS+=" $(pkg-config --libs --static sdl2)"
@@ -323,21 +329,21 @@ do
     else
 
         # THE FOLLOWING LIBRARIES SHOULD BE EXPLICITLY DISABLED TO PREVENT AUTODETECT
-        if [[ ${library} -eq 29 ]]; then
+        if [[ ${library} -eq 30 ]]; then
             CONFIGURE_POSTFIX+=" --disable-sdl2"
-        elif [[ ${library} -eq 41 ]]; then
-            CONFIGURE_POSTFIX+=" --disable-zlib"
-        elif [[ ${library} -eq 42 ]]; then
-            CONFIGURE_POSTFIX+=" --disable-audiotoolbox"
         elif [[ ${library} -eq 43 ]]; then
-            CONFIGURE_POSTFIX+=" --disable-coreimage"
+            CONFIGURE_POSTFIX+=" --disable-zlib"
         elif [[ ${library} -eq 44 ]]; then
-            CONFIGURE_POSTFIX+=" --disable-bzlib"
+            CONFIGURE_POSTFIX+=" --disable-audiotoolbox"
         elif [[ ${library} -eq 45 ]]; then
-            CONFIGURE_POSTFIX+=" --disable-videotoolbox"
+            CONFIGURE_POSTFIX+=" --disable-coreimage"
         elif [[ ${library} -eq 46 ]]; then
-            CONFIGURE_POSTFIX+=" --disable-avfoundation"
+            CONFIGURE_POSTFIX+=" --disable-bzlib"
         elif [[ ${library} -eq 47 ]]; then
+            CONFIGURE_POSTFIX+=" --disable-videotoolbox"
+        elif [[ ${library} -eq 48 ]]; then
+            CONFIGURE_POSTFIX+=" --disable-avfoundation"
+        elif [[ ${library} -eq 49 ]]; then
             CONFIGURE_POSTFIX+=" --disable-iconv"
         fi
     fi

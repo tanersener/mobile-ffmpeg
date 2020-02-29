@@ -26,38 +26,40 @@ LIBRARY_X264=17
 LIBRARY_XVIDCORE=18
 LIBRARY_X265=19
 LIBRARY_LIBVIDSTAB=20
-LIBRARY_LIBILBC=21
-LIBRARY_OPUS=22
-LIBRARY_SNAPPY=23
-LIBRARY_SOXR=24
-LIBRARY_LIBAOM=25
-LIBRARY_CHROMAPRINT=26
-LIBRARY_TWOLAME=27
-LIBRARY_SDL=28
-LIBRARY_TESSERACT=29
-LIBRARY_OPENH264=30
-LIBRARY_GIFLIB=31
-LIBRARY_JPEG=32
-LIBRARY_LIBOGG=33
-LIBRARY_LIBPNG=34
-LIBRARY_NETTLE=35
-LIBRARY_TIFF=36
-LIBRARY_EXPAT=37
-LIBRARY_SNDFILE=38
-LIBRARY_LEPTONICA=39
-LIBRARY_ZLIB=40
-LIBRARY_AUDIOTOOLBOX=41
-LIBRARY_COREIMAGE=42
-LIBRARY_BZIP2=43
-LIBRARY_VIDEOTOOLBOX=44
-LIBRARY_LIBICONV=45
-LIBRARY_LIBUUID=46
+LIBRARY_RUBBERBAND=21
+LIBRARY_LIBILBC=22
+LIBRARY_OPUS=23
+LIBRARY_SNAPPY=24
+LIBRARY_SOXR=25
+LIBRARY_LIBAOM=26
+LIBRARY_CHROMAPRINT=27
+LIBRARY_TWOLAME=28
+LIBRARY_SDL=29
+LIBRARY_TESSERACT=30
+LIBRARY_OPENH264=31
+LIBRARY_GIFLIB=32
+LIBRARY_JPEG=33
+LIBRARY_LIBOGG=34
+LIBRARY_LIBPNG=35
+LIBRARY_NETTLE=36
+LIBRARY_TIFF=37
+LIBRARY_EXPAT=38
+LIBRARY_SNDFILE=39
+LIBRARY_LEPTONICA=40
+LIBRARY_LIBSAMPLERATE=41
+LIBRARY_ZLIB=42
+LIBRARY_AUDIOTOOLBOX=43
+LIBRARY_COREIMAGE=44
+LIBRARY_BZIP2=45
+LIBRARY_VIDEOTOOLBOX=46
+LIBRARY_LIBICONV=47
+LIBRARY_LIBUUID=48
 
 # ENABLE ARCH
 ENABLED_ARCHITECTURES=(1 1)
 
 # ENABLE LIBRARIES
-ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 
 export BASEDIR=$(pwd)
 export MOBILE_FFMPEG_TMPDIR="${BASEDIR}/.tmp"
@@ -155,6 +157,7 @@ display_help() {
     echo -e "GPL libraries:"
 
     echo -e "  --enable-libvidstab\t\tbuild with libvidstab [no]"
+    echo -e "  --enable-rubberband\t\tbuild with rubber band [no]"
     echo -e "  --enable-x264\t\t\tbuild with x264 [no]"
     echo -e "  --enable-x265\t\t\tbuild with x265 [no]"
     echo -e "  --enable-xvidcore\t\tbuild with xvidcore [no]\n"
@@ -218,7 +221,7 @@ reconf_library() {
     local RECONF_VARIABLE=$(echo "RECONF_$1" | sed "s/\-/\_/g")
     local library_supported=0
 
-    for library in {1..40}
+    for library in {1..42}
     do
         library_name=$(get_library_name $((library - 1)))
 
@@ -238,7 +241,7 @@ rebuild_library() {
     local REBUILD_VARIABLE=$(echo "REBUILD_$1" | sed "s/\-/\_/g")
     local library_supported=0
 
-    for library in {1..40}
+    for library in {1..42}
     do
         library_name=$(get_library_name $((library - 1)))
 
@@ -370,6 +373,11 @@ set_library() {
         opus)
             ENABLED_LIBRARIES[LIBRARY_OPUS]=$2
         ;;
+        rubberband)
+            ENABLED_LIBRARIES[LIBRARY_RUBBERBAND]=$2
+            ENABLED_LIBRARIES[LIBRARY_SNDFILE]=$2
+            ENABLED_LIBRARIES[LIBRARY_LIBSAMPLERATE]=$2
+        ;;
         sdl)
             ENABLED_LIBRARIES[LIBRARY_SDL]=$2
         ;;
@@ -412,7 +420,7 @@ set_library() {
         xvidcore)
             ENABLED_LIBRARIES[LIBRARY_XVIDCORE]=$2
         ;;
-        expat | giflib | jpeg | leptonica | libogg | libpng | libsndfile | libuuid)
+        expat | giflib | jpeg | leptonica | libogg | libsamplerate | libsndfile)
             # THESE LIBRARIES ARE NOT ENABLED DIRECTLY
         ;;
         nettle)
@@ -490,7 +498,7 @@ print_enabled_libraries() {
     let enabled=0;
 
     # FIRST BUILT-IN LIBRARIES
-    for library in {40..46}
+    for library in {42..48}
     do
         if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
             if [[ ${enabled} -ge 1 ]]; then
@@ -502,7 +510,7 @@ print_enabled_libraries() {
     done
 
     # THEN EXTERNAL LIBRARIES
-    for library in {0..30}
+    for library in {0..31}
     do
         if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
             if [[ ${enabled} -ge 1 ]]; then
@@ -668,14 +676,14 @@ get_external_library_license_path() {
     case $1 in
         1) echo "${BASEDIR}/src/$(get_library_name $1)/docs/LICENSE.TXT" ;;
         3) echo "${BASEDIR}/src/$(get_library_name $1)/COPYING.LESSERv3" ;;
-        24) echo "${BASEDIR}/src/$(get_library_name $1)/COPYING.LGPL" ;;
-        26) echo "${BASEDIR}/src/$(get_library_name $1)/LICENSE.md" ;;
-        28) echo "${BASEDIR}/src/$(get_library_name $1)/COPYING.txt" ;;
-        32) echo "${BASEDIR}/src/$(get_library_name $1)/LICENSE.md " ;;
-        35) echo "${BASEDIR}/src/$(get_library_name $1)/COPYING.LESSERv3" ;;
-        36) echo "${BASEDIR}/src/$(get_library_name $1)/COPYRIGHT" ;;
-        39) echo "${BASEDIR}/src/$(get_library_name $1)/leptonica-license.txt" ;;
-        4 | 9 | 12 | 18 | 20 | 25 | 30 | 34) echo "${BASEDIR}/src/$(get_library_name $1)/LICENSE" ;;
+        25) echo "${BASEDIR}/src/$(get_library_name $1)/COPYING.LGPL" ;;
+        27) echo "${BASEDIR}/src/$(get_library_name $1)/LICENSE.md" ;;
+        29) echo "${BASEDIR}/src/$(get_library_name $1)/COPYING.txt" ;;
+        33) echo "${BASEDIR}/src/$(get_library_name $1)/LICENSE.md " ;;
+        36) echo "${BASEDIR}/src/$(get_library_name $1)/COPYING.LESSERv3" ;;
+        37) echo "${BASEDIR}/src/$(get_library_name $1)/COPYRIGHT" ;;
+        40) echo "${BASEDIR}/src/$(get_library_name $1)/leptonica-license.txt" ;;
+        4 | 9 | 12 | 18 | 20 | 26 | 31 | 35) echo "${BASEDIR}/src/$(get_library_name $1)/LICENSE" ;;
         *) echo "${BASEDIR}/src/$(get_library_name $1)/COPYING" ;;
     esac
 }
@@ -742,9 +750,9 @@ do
             rebuild_library ${BUILD_LIBRARY}
 	    ;;
 	    --full)
-            for library in {0..46}
+            for library in {0..48}
             do
-                if [[ $library -ne 17 ]] && [[ $library -ne 18 ]] && [[ $library -ne 19 ]] && [[ $library -ne 20 ]]; then
+                if [[ $library -ne 17 ]] && [[ $library -ne 18 ]] && [[ $library -ne 19 ]] && [[ $library -ne 20 ]] && [[ $library -ne 21 ]]; then
                     enable_library $(get_library_name $library)
                 fi
             done
@@ -807,7 +815,7 @@ print_reconfigure_requested_libraries
 print_rebuild_requested_libraries
 
 # CHECKING GPL LIBRARIES
-for gpl_library in {17..20}
+for gpl_library in {17..21}
 do
     if [[ ${ENABLED_LIBRARIES[$gpl_library]} -eq 1 ]]; then
         library_name=$(get_library_name ${gpl_library})
@@ -875,7 +883,7 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
     mkdir -p ${BASEDIR}/prebuilt/tvos-framework 1>>${BASEDIR}/build.log 2>&1
 
     # 1. EXTERNAL LIBRARIES
-    for library in {0..39}
+    for library in {0..41}
     do
         if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
 

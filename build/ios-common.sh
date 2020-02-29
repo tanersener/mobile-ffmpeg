@@ -39,33 +39,35 @@ get_library_name() {
         18) echo "xvidcore" ;;
         19) echo "x265" ;;
         20) echo "libvidstab" ;;
-        21) echo "libilbc" ;;
-        22) echo "opus" ;;
-        23) echo "snappy" ;;
-        24) echo "soxr" ;;
-        25) echo "libaom" ;;
-        26) echo "chromaprint" ;;
-        27) echo "twolame" ;;
-        28) echo "sdl" ;;
-        29) echo "tesseract" ;;
-        30) echo "openh264" ;;
-        31) echo "giflib" ;;
-        32) echo "jpeg" ;;
-        33) echo "libogg" ;;
-        34) echo "libpng" ;;
-        35) echo "nettle" ;;
-        36) echo "tiff" ;;
-        37) echo "expat" ;;
-        38) echo "libsndfile" ;;
-        39) echo "leptonica" ;;
-        40) echo "ios-zlib" ;;
-        41) echo "ios-audiotoolbox" ;;
-        42) echo "ios-coreimage" ;;
-        43) echo "ios-bzip2" ;;
-        44) echo "ios-videotoolbox" ;;
-        45) echo "ios-avfoundation" ;;
-        46) echo "ios-libiconv" ;;
-        47) echo "ios-libuuid" ;;
+        21) echo "rubberband" ;;
+        22) echo "libilbc" ;;
+        23) echo "opus" ;;
+        24) echo "snappy" ;;
+        25) echo "soxr" ;;
+        26) echo "libaom" ;;
+        27) echo "chromaprint" ;;
+        28) echo "twolame" ;;
+        29) echo "sdl" ;;
+        30) echo "tesseract" ;;
+        31) echo "openh264" ;;
+        32) echo "giflib" ;;
+        33) echo "jpeg" ;;
+        34) echo "libogg" ;;
+        35) echo "libpng" ;;
+        36) echo "nettle" ;;
+        37) echo "tiff" ;;
+        38) echo "expat" ;;
+        39) echo "libsndfile" ;;
+        40) echo "leptonica" ;;
+        41) echo "libsamplerate" ;;
+        42) echo "ios-zlib" ;;
+        43) echo "ios-audiotoolbox" ;;
+        44) echo "ios-coreimage" ;;
+        45) echo "ios-bzip2" ;;
+        46) echo "ios-videotoolbox" ;;
+        47) echo "ios-avfoundation" ;;
+        48) echo "ios-libiconv" ;;
+        49) echo "ios-libuuid" ;;
     esac
 }
 
@@ -79,15 +81,16 @@ get_package_config_file_name() {
         11) echo "libxml-2.0" ;;
         12) echo "opencore-amrnb" ;;
         20) echo "vidstab" ;;
-        25) echo "aom" ;;
-        26) echo "libchromaprint" ;;
-        28) echo "sdl2" ;;
-        32) echo "libjpeg" ;;
-        33) echo "ogg" ;;
-        36) echo "libtiff-4" ;;
-        38) echo "sndfile" ;;
-        39) echo "lept" ;;
-        47) echo "uuid" ;;
+        26) echo "aom" ;;
+        27) echo "libchromaprint" ;;
+        29) echo "sdl2" ;;
+        33) echo "libjpeg" ;;
+        34) echo "ogg" ;;
+        37) echo "libtiff-4" ;;
+        39) echo "sndfile" ;;
+        40) echo "lept" ;;
+        41) echo "samplerate" ;;
+        49) echo "uuid" ;;
         *) echo $(get_library_name $1)
     esac
 }
@@ -103,16 +106,17 @@ get_static_archive_name() {
         9) echo "libvpx.a" ;;
         11) echo "libxml2.a" ;;
         20) echo "libvidstab.a" ;;
-        21) echo "libilbc.a" ;;
-        25) echo "libaom.a" ;;
-        27) echo "libtwolame.a" ;;
-        28) echo "libSDL2.a" ;;
-        29) echo "libtesseract.a" ;;
-        31) echo "libgif.a" ;;
-        33) echo "libogg.a" ;;
-        34) echo "libpng.a" ;;
-        38) echo "libsndfile.a" ;;
-        39) echo "liblept.a" ;;
+        22) echo "libilbc.a" ;;
+        26) echo "libaom.a" ;;
+        28) echo "libtwolame.a" ;;
+        29) echo "libSDL2.a" ;;
+        30) echo "libtesseract.a" ;;
+        32) echo "libgif.a" ;;
+        34) echo "libogg.a" ;;
+        35) echo "libpng.a" ;;
+        39) echo "libsndfile.a" ;;
+        40) echo "liblept.a" ;;
+        41) echo "libsamplerate.a" ;;
         *) echo lib$(get_library_name $1).a
     esac
 }
@@ -399,14 +403,17 @@ get_cxxflags() {
         gnutls)
             echo "-std=c++11 -fno-rtti ${BITCODE_FLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_FLAGS}"
         ;;
-        opencore-amr)
-            echo "-fno-rtti ${BITCODE_FLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_FLAGS}"
-        ;;
         libwebp | xvidcore)
             echo "-std=c++11 -fno-exceptions -fno-rtti ${BITCODE_FLAGS} -fno-common -DPIC ${COMMON_CFLAGS} ${OPTIMIZATION_FLAGS}"
         ;;
         libaom)
             echo "-std=c++11 -fno-exceptions ${BITCODE_FLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_FLAGS}"
+        ;;
+        opencore-amr)
+            echo "-fno-rtti ${BITCODE_FLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_FLAGS}"
+        ;;
+        rubberband)
+            echo "-fno-rtti ${BITCODE_FLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_FLAGS}"
         ;;
         *)
             echo "-std=c++11 -fno-exceptions -fno-rtti ${BITCODE_FLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_FLAGS}"
@@ -948,6 +955,12 @@ download_gpl_library_source() {
             GPL_LIB_FILE="xvidcore-1.3.7.tar.gz"
             GPL_LIB_ORIG_DIR="xvidcore"
             GPL_LIB_DEST_DIR="xvidcore"
+        ;;
+        rubberband)
+            GPL_LIB_URL="https://breakfastquay.com/files/releases/rubberband-1.8.2.tar.bz2"
+            GPL_LIB_FILE="rubberband-1.8.2.tar.bz2"
+            GPL_LIB_ORIG_DIR="rubberband-1.8.2"
+            GPL_LIB_DEST_DIR="rubberband"
         ;;
     esac
 
