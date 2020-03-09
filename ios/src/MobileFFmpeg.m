@@ -128,11 +128,11 @@ extern NSMutableString *lastCommandOutput;
         } else {
             previousChar = 0;
         }
-        char currentChar = [command characterAtIndex:i];
+        unichar currentChar = [command characterAtIndex:i];
 
         if (currentChar == ' ') {
             if (singleQuoteStarted || doubleQuoteStarted) {
-                [currentArgument appendFormat: @"%c", currentChar];
+                [currentArgument appendFormat: @"%C", currentChar];
             } else if ([currentArgument length] > 0) {
                 [argumentArray addObject: currentArgument];
                 currentArgument = [[NSMutableString alloc] init];
@@ -141,7 +141,7 @@ extern NSMutableString *lastCommandOutput;
             if (singleQuoteStarted) {
                 singleQuoteStarted = false;
             } else if (doubleQuoteStarted) {
-                [currentArgument appendFormat: @"%c", currentChar];
+                [currentArgument appendFormat: @"%C", currentChar];
             } else {
                 singleQuoteStarted = true;
             }
@@ -149,12 +149,12 @@ extern NSMutableString *lastCommandOutput;
             if (doubleQuoteStarted) {
                 doubleQuoteStarted = false;
             } else if (singleQuoteStarted) {
-                [currentArgument appendFormat: @"%c", currentChar];
+                [currentArgument appendFormat: @"%C", currentChar];
             } else {
                 doubleQuoteStarted = true;
             }
         } else {
-            [currentArgument appendFormat: @"%c", currentChar];
+            [currentArgument appendFormat: @"%C", currentChar];
         }
     }
 
