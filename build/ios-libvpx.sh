@@ -68,7 +68,7 @@ case ${ARCH} in
     ;;
     x86-64)
         TARGET="x86_64-iphonesimulator-gcc"
-        ASM_FLAGS="--enable-runtime-cpu-detect --disable-avx512"
+        ASM_FLAGS="--enable-runtime-cpu-detect --disable-avx512 --disable-sse --disable-sse2 --disable-mmx"
     ;;
     x86-64-mac-catalyst)
         TARGET="x86_64-macosx-gcc"

@@ -79,6 +79,7 @@ case ${ARCH} in
         BITCODE_FLAGS=""
     ;;
     x86-64)
+        ARCH_OPTIONS="--disable-asm"
         TARGET_CPU="x86_64"
         TARGET_ARCH="x86_64"
         NEON_FLAG="	--disable-neon"

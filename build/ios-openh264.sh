@@ -56,13 +56,12 @@ esac
 
 cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
-# MAKE SURE THAT ASM IS ENABLED FOR ALL IOS ARCHITECTURES
+# MAKE SURE THAT ASM IS ENABLED FOR ALL IOS ARCHITECTURES - EXCEPT x86-64
 ${SED_INLINE} 's/arm64 aarch64/arm64% aarch64/g' ${BASEDIR}/src/${LIB_NAME}/build/arch.mk
 ${SED_INLINE} 's/%86 x86_64,/%86 x86_64 x86-64,/g' ${BASEDIR}/src/${LIB_NAME}/build/arch.mk
 ${SED_INLINE} 's/filter-out arm64,/filter-out arm64%,/g' ${BASEDIR}/src/${LIB_NAME}/build/arch.mk
 ${SED_INLINE} 's/CFLAGS += -DHAVE_NEON/#CFLAGS += -DHAVE_NEON/g' ${BASEDIR}/src/${LIB_NAME}/build/arch.mk
 ${SED_INLINE} 's/ifeq (\$(ASM_ARCH), arm64)/ifneq (\$(filter arm64%, \$(ASM_ARCH)),)/g' ${BASEDIR}/src/${LIB_NAME}/codec/common/targets.mk
-${SED_INLINE} 's/ifeq (\$(ASM_ARCH), x86)/ifneq (\$(filter %86 x86-64, \$(ASM_ARCH)),)/g' ${BASEDIR}/src/${LIB_NAME}/codec/common/targets.mk
 ${SED_INLINE} 's/ifeq (\$(ASM_ARCH), arm)/ifneq (\$(filter armv%, \$(ASM_ARCH)),)/g' ${BASEDIR}/src/${LIB_NAME}/codec/common/targets.mk
 
 make clean 2>/dev/null 1>/dev/null
