@@ -1035,7 +1035,7 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
 
       elif [[ ${LIBRARY_LIBWEBP} == $library ]]; then
 
-        LIBRARY_CREATED=$(create_static_fat_library "libwebpdecoder.a" "libwebpdecoder")
+        LIBRARY_CREATED=$(create_static_fat_library "libwebpmux.a" "libwebpmux")
         if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
           echo -e "failed\n"
           exit 1
@@ -1053,7 +1053,7 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
           exit 1
         fi
 
-        FRAMEWORK_CREATED=$(create_static_framework "libwebpdecoder" "libwebpdecoder.a" $library_version)
+        FRAMEWORK_CREATED=$(create_static_framework "libwebpmux" "libwebpmux.a" $library_version)
         if [[ ${FRAMEWORK_CREATED} -ne 0 ]]; then
           echo -e "failed\n"
           exit 1
@@ -1071,7 +1071,7 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
           exit 1
         fi
 
-        $(cp $(get_external_library_license_path ${library}) ${BASEDIR}/prebuilt/tvos-universal/libwebpdecoder-universal/LICENSE 1>>${BASEDIR}/build.log 2>&1)
+        $(cp $(get_external_library_license_path ${library}) ${BASEDIR}/prebuilt/tvos-universal/libwebpmux-universal/LICENSE 1>>${BASEDIR}/build.log 2>&1)
         if [ $? -ne 0 ]; then
           echo -e "failed\n"
           exit 1
@@ -1089,7 +1089,7 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
           exit 1
         fi
 
-        $(cp $(get_external_library_license_path ${library}) ${BASEDIR}/prebuilt/tvos-framework/libwebpdecoder.framework/LICENSE 1>>${BASEDIR}/build.log 2>&1)
+        $(cp $(get_external_library_license_path ${library}) ${BASEDIR}/prebuilt/tvos-framework/libwebpmux.framework/LICENSE 1>>${BASEDIR}/build.log 2>&1)
         if [ $? -ne 0 ]; then
           echo -e "failed\n"
           exit 1

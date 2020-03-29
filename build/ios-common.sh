@@ -718,25 +718,6 @@ Cflags: -I\${includedir}
 EOF
 }
 
-create_libwebp_package_config() {
-    local LIB_WEBP_VERSION="$1"
-
-    cat > "${INSTALL_PKG_CONFIG_DIR}/libwebp.pc" << EOF
-prefix=${BASEDIR}/prebuilt/$(get_target_build_directory)/libwebp
-exec_prefix=\${prefix}
-libdir=\${prefix}/lib
-includedir=\${prefix}/include
-
-Name: libwebp
-Description: webp codec library
-Version: ${LIB_WEBP_VERSION}
-
-Requires:
-Libs: -L\${libdir} -lwebp -lwebpdecoder -lwebpdemux
-Cflags: -I\${includedir}
-EOF
-}
-
 create_libxml2_package_config() {
     local LIBXML2_VERSION="$1"
 

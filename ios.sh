@@ -730,7 +730,7 @@ create_external_library_package() {
         elif [[ ${LIBRARY_LIBVORBIS} == "$1" ]]; then
           license_directories=("${BASEDIR}/prebuilt/ios-universal/libvorbisfile-universal" "${BASEDIR}/prebuilt/ios-universal/libvorbisenc-universal" "${BASEDIR}/prebuilt/ios-universal/libvorbis-universal" "${BASEDIR}/prebuilt/ios-framework/libvorbisfile.framework" "${BASEDIR}/prebuilt/ios-framework/libvorbisenc.framework" "${BASEDIR}/prebuilt/ios-framework/libvorbis.framework")
         elif [[ ${LIBRARY_LIBWEBP} == "$1" ]]; then
-          license_directories=("${BASEDIR}/prebuilt/ios-universal/libwebpdecoder-universal" "${BASEDIR}/prebuilt/ios-universal/libwebpdemux-universal" "${BASEDIR}/prebuilt/ios-universal/libwebp-universal" "${BASEDIR}/prebuilt/ios-framework/libwebpdecoder.framework" "${BASEDIR}/prebuilt/ios-framework/libwebpdemux.framework" "${BASEDIR}/prebuilt/ios-framework/libwebp.framework")
+          license_directories=("${BASEDIR}/prebuilt/ios-universal/libwebpmux-universal" "${BASEDIR}/prebuilt/ios-universal/libwebpdemux-universal" "${BASEDIR}/prebuilt/ios-universal/libwebp-universal" "${BASEDIR}/prebuilt/ios-framework/libwebpmux.framework" "${BASEDIR}/prebuilt/ios-framework/libwebpdemux.framework" "${BASEDIR}/prebuilt/ios-framework/libwebp.framework")
         elif [[ ${LIBRARY_OPENCOREAMR} == "$1" ]]; then
           license_directories=("${BASEDIR}/prebuilt/ios-universal/libopencore-amrwb-universal" "${BASEDIR}/prebuilt/ios-universal/libopencore-amrnb-universal" "${BASEDIR}/prebuilt/ios-framework/libopencore-amrwb.framework" "${BASEDIR}/prebuilt/ios-framework/libopencore-amrnb.framework")
         elif [[ ${LIBRARY_NETTLE} == "$1" ]]; then
@@ -1100,7 +1100,7 @@ if [[ -n ${TARGET_ARCH_LIST[0]} ]]; then
 
       elif [[ ${LIBRARY_LIBWEBP} == "$library" ]]; then
 
-        LIBRARY_CREATED=$(create_external_library_package $library "libwebpdecoder" "libwebpdecoder.a" "${library_version}")
+        LIBRARY_CREATED=$(create_external_library_package $library "libwebpmux" "libwebpmux.a" "${library_version}")
         if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
           echo -e "failed\n"
           exit 1
