@@ -55,9 +55,9 @@ make clean 2>/dev/null 1>/dev/null
 
 make -j$(get_cpu_count) \
 ARCH="$(get_toolchain_arch)" \
-CC="${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/bin/${CC}" \
+CC="$CC" \
 CFLAGS="$CFLAGS" \
-CXX="${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/bin/${CXX}" \
+CXX="$CXX" \
 CXXFLAGS="${CXXFLAGS}" \
 LDFLAGS="$LDFLAGS" \
 OS=android \
@@ -65,9 +65,7 @@ PREFIX="${BASEDIR}/prebuilt/android-$(get_target_build)/${LIB_NAME}" \
 NDKLEVEL="${API}" \
 NDKROOT="${ANDROID_NDK_ROOT}" \
 NDK_TOOLCHAIN_VERSION=clang \
-TOOLCHAINPREFIX=dummy_prefix \
-TOOLCHAIN_NAME=dummy_name \
-AR="${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/bin/${AR}" \
+AR="$AR" \
 ASM_ARCH=${ASM_ARCH} \
 TARGET="android-${API}" \
 install-static || exit 1
