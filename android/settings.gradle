@@ -1,1 +1,3 @@
 include ':app', ':test-app'
+include ':mobile-ffmpeg'
+project(':mobile-ffmpeg').projectDir = new File('..')
