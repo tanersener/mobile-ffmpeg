@@ -362,10 +362,8 @@ git checkout ${BASEDIR}/src/${LIB_NAME}/libswscale/aarch64/hscale.S 1>>${BASEDIR
     --enable-optimizations \
     --enable-swscale \
     --enable-shared \
-    --disable-v4l2-m2m \
-    --disable-outdev=v4l2 \
+    --enable-v4l2-m2m \
     --disable-outdev=fbdev \
-    --disable-indev=v4l2 \
     --disable-indev=fbdev \
     ${SIZE_OPTIONS} \
     --disable-openssl \
