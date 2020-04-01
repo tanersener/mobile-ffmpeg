@@ -206,7 +206,7 @@ get_android_arch() {
 }
 
 get_common_includes() {
-    echo "-isystem ${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/sysroot/usr/include -isystem ${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/sysroot/usr/include/${BUILD_HOST} -isystem ${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/sysroot/usr/local/include"
+    echo ""
 }
 
 get_common_cflags() {
