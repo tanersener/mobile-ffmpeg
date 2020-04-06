@@ -341,9 +341,8 @@ export LDFLAGS="${LDFLAGS}"
 # USE HIGHER LIMITS FOR FFMPEG LINKING
 ulimit -n 2048 1>>${BASEDIR}/build.log 2>&1
 
-# Workaround for issue #328
-rm -f ${BASEDIR}/src/${LIB_NAME}/libswscale/aarch64/hscale.S 1>>${BASEDIR}/build.log 2>&1
-cp ${BASEDIR}/tools/make/ffmpeg/libswscale/aarch64/hscale.S ${BASEDIR}/src/${LIB_NAME}/libswscale/aarch64/hscale.S 1>>${BASEDIR}/build.log 2>&1
+# undo workaround for issue #328
+git checkout ${BASEDIR}/src/${LIB_NAME}/libswscale/aarch64/hscale.S 1>>${BASEDIR}/build.log 2>&1
 
 ./configure \
     --cross-prefix="${BUILD_HOST}-" \
@@ -363,10 +362,8 @@ cp ${BASEDIR}/tools/make/ffmpeg/libswscale/aarch64/hscale.S ${BASEDIR}/src/${LIB
     --enable-optimizations \
     --enable-swscale \
     --enable-shared \
-    --disable-v4l2-m2m \
-    --disable-outdev=v4l2 \
+    --enable-v4l2-m2m \
     --disable-outdev=fbdev \
-    --disable-indev=v4l2 \
     --disable-indev=fbdev \
     ${SIZE_OPTIONS} \
     --disable-openssl \

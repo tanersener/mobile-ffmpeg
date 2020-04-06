@@ -53,6 +53,10 @@ cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
 make clean 2>/dev/null 1>/dev/null
 
+# revert ios changes
+git checkout ${BASEDIR}/src/${LIB_NAME}/build 1>>${BASEDIR}/build.log 2>&1
+git checkout ${BASEDIR}/src/${LIB_NAME}/codec 1>>${BASEDIR}/build.log 2>&1
+
 make -j$(get_cpu_count) \
 ARCH="$(get_toolchain_arch)" \
 CC="$CC" \
