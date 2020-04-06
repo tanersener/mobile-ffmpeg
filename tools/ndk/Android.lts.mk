@@ -23,16 +23,6 @@ endif
 
 include $(CLEAR_VARS)
 LOCAL_ARM_MODE := $(MY_ARM_MODE)
-LOCAL_MODULE := cpufeatures
-LOCAL_SRC_FILES := $(NDK_ROOT)/sources/android/cpufeatures/cpu-features.c
-LOCAL_CFLAGS := -Wall -Wextra -Werror
-LOCAL_EXPORT_C_INCLUDES := $(NDK_ROOT)/sources/android/cpufeatures
-LOCAL_EXPORT_LDLIBS := -ldl
-LOCAL_ARM_NEON := ${MY_ARM_NEON}
-include $(BUILD_SHARED_LIBRARY)
-
-include $(CLEAR_VARS)
-LOCAL_ARM_MODE := $(MY_ARM_MODE)
 LOCAL_MODULE := mobileffmpeg_abidetect
 LOCAL_SRC_FILES := $(MY_PATH)/mobileffmpeg_abidetect.c
 LOCAL_CFLAGS := -Wall -Wextra -Werror -Wno-unused-parameter -I${LOCAL_PATH}/../../prebuilt/android-$(TARGET_ARCH)/ffmpeg/include -I$(NDK_ROOT)/sources/android/cpufeatures -DMOBILE_FFMPEG_${MY_ARCH_FLAGS}
@@ -80,4 +70,5 @@ ifeq ($(TARGET_ARCH_ABI), armeabi-v7a)
     endif
 endif
 
+$(call import-module, android/cpufeatures)
 $(call import-module, ffmpeg)
