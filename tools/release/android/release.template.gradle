@@ -61,6 +61,7 @@ ext {
     libraryDescription = releaseProjectDescription
 
     siteUrl = 'https://github.com/tanersener/mobile-ffmpeg'
+    issueTrackerUrl = 'https://github.com/tanersener/mobile-ffmpeg/issues'
     gitUrl = 'https://github.com/tanersener/mobile-ffmpeg.git'
 
     libraryVersion = releaseVersionName
@@ -130,6 +131,7 @@ bintray {
         desc = libraryDescription
         websiteUrl = siteUrl
         vcsUrl = gitUrl
+        issueTrackerUrl = issueTrackerUrl
         licenses = allLicenses
         dryRun = true
         publish = false
