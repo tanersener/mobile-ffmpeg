@@ -1,6 +1,6 @@
 .\" WARNING! THIS FILE WAS GENERATED AUTOMATICALLY BY c2man!
 .\" DO NOT EDIT! CHANGES MADE TO THIS FILE WILL BE LOST!
-.TH "fribidi_remove_bidi_marks" 3 "21 October 2019" "c2man fribidi.h" "Programmer's Manual"
+.TH "fribidi_remove_bidi_marks" 3 "2 March 2020" "c2man fribidi.h" "Programmer's Manual"
 .SH "NAME"
 fribidi_remove_bidi_marks \- remove bidi marks out of an string
 .SH "SYNOPSIS"
@@ -54,13 +54,13 @@ position_from_this_list is positions_V_to_L;  if str is the logical
 string, the other way. Moreover, the position maps should be filled with
 valid entries.
 
-A position map pointing to a removed character is filled with \-1. By the
+A position map pointing to a removed character is filled with \(mi1. By the
 way, you should not use embedding_levels if str is visual string.
 
 For best results this function should be run on a whole paragraph, not
 lines; but feel free to do otherwise if you know what you are doing.
 .SH "RETURNS"
-New length of the string, or \-1 if an error occurred (memory
+New length of the string, or \(mi1 if an error occurred (memory
 allocation failure most probably).
 .SH "SEE ALSO"
 fribidi_shape_arabic(3),
@@ -91,4 +91,5 @@ fribidi_get_mirror_char(3),
 fribidi_shape_mirroring(3),
 fribidi_get_bracket(3),
 fribidi_get_bracket_types(3),
-fribidi_shape(3)
+fribidi_shape(3),
+fribidi_log2vis(3)
