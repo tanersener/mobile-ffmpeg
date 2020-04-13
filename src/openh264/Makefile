@@ -36,7 +36,7 @@ STATIC_LDFLAGS=-lstdc++
 STRIP ?= strip
 
 SHAREDLIB_MAJORVERSION=5
-FULL_VERSION := 2.0.0
+FULL_VERSION := 2.1.0
 
 ifeq (,$(wildcard $(SRC_PATH)gmp-api))
 HAVE_GMP_API=No
@@ -285,10 +285,10 @@ endif
 endif
 
 $(PROJECT_NAME).pc: $(PROJECT_NAME).pc.in
-	@sed -e 's;@prefix@;$(PREFIX);' -e 's;@VERSION@;$(FULL_VERSION);' -e 's;@LIBS@;;' -e 's;@LIBS_PRIVATE@;$(STATIC_LDFLAGS);' < $< > $@
+	@sed -e 's;@prefix@;$(PREFIX);' -e 's;@libdir@;$(PREFIX)/lib;' -e 's;@VERSION@;$(FULL_VERSION);' -e 's;@LIBS@;;' -e 's;@LIBS_PRIVATE@;$(STATIC_LDFLAGS);' < $< > $@
 
 $(PROJECT_NAME)-static.pc: $(PROJECT_NAME).pc.in
-	@sed -e 's;@prefix@;$(PREFIX);' -e 's;@VERSION@;$(FULL_VERSION);' -e 's;@LIBS@;$(STATIC_LDFLAGS);' -e 's;@LIBS_PRIVATE@;;' < $< > $@
+	@sed -e 's;@prefix@;$(PREFIX);' -e 's;@libdir@;$(PREFIX)/lib;' -e 's;@VERSION@;$(FULL_VERSION);' -e 's;@LIBS@;$(STATIC_LDFLAGS);' -e 's;@LIBS_PRIVATE@;;' < $< > $@
 
 install-headers:
 	mkdir -p $(DESTDIR)$(PREFIX)/include/wels
