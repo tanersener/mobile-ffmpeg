@@ -33,15 +33,15 @@
 #include <mpi.h>
 #include <ecc.h>
 
-static int _gnutls_x509_write_rsa_pubkey(gnutls_pk_params_st * params,
+static int _gnutls_x509_write_rsa_pubkey(const gnutls_pk_params_st * params,
 					 gnutls_datum_t * der);
-static int _gnutls_x509_write_dsa_params(gnutls_pk_params_st * params,
+static int _gnutls_x509_write_dsa_params(const gnutls_pk_params_st * params,
 					 gnutls_datum_t * der);
-static int _gnutls_x509_write_dsa_pubkey(gnutls_pk_params_st * params,
+static int _gnutls_x509_write_dsa_pubkey(const gnutls_pk_params_st * params,
 					 gnutls_datum_t * der);
-static int _gnutls_x509_write_gost_params(gnutls_pk_params_st * params,
+static int _gnutls_x509_write_gost_params(const gnutls_pk_params_st * params,
 					 gnutls_datum_t * der);
-static int _gnutls_x509_write_gost_pubkey(gnutls_pk_params_st * params,
+static int _gnutls_x509_write_gost_pubkey(const gnutls_pk_params_st * params,
 					 gnutls_datum_t * der);
 
 /*
@@ -52,7 +52,7 @@ static int _gnutls_x509_write_gost_pubkey(gnutls_pk_params_st * params,
  * Allocates the space used to store the DER data.
  */
 static int
-_gnutls_x509_write_rsa_pubkey(gnutls_pk_params_st * params,
+_gnutls_x509_write_rsa_pubkey(const gnutls_pk_params_st * params,
 			      gnutls_datum_t * der)
 {
 	int result;
@@ -110,7 +110,7 @@ _gnutls_x509_write_rsa_pubkey(gnutls_pk_params_st * params,
  * Allocates the space used to store the DER data.
  */
 int
-_gnutls_x509_write_ecc_pubkey(gnutls_pk_params_st * params,
+_gnutls_x509_write_ecc_pubkey(const gnutls_pk_params_st * params,
 			      gnutls_datum_t * der)
 {
 	int result;
@@ -139,7 +139,7 @@ _gnutls_x509_write_ecc_pubkey(gnutls_pk_params_st * params,
  * Allocates the space used to store the data.
  */
 int
-_gnutls_x509_write_eddsa_pubkey(gnutls_pk_params_st * params,
+_gnutls_x509_write_eddsa_pubkey(const gnutls_pk_params_st * params,
 			      gnutls_datum_t * raw)
 {
 	int ret;
@@ -150,7 +150,8 @@ _gnutls_x509_write_eddsa_pubkey(gnutls_pk_params_st * params,
 	if (params->raw_pub.size == 0)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	if (params->curve != GNUTLS_ECC_CURVE_ED25519)
+	if (params->curve != GNUTLS_ECC_CURVE_ED25519 &&
+	    params->curve != GNUTLS_ECC_CURVE_ED448)
 		return gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
 
 	ret = _gnutls_set_datum(raw, params->raw_pub.data, params->raw_pub.size);
@@ -161,7 +162,7 @@ _gnutls_x509_write_eddsa_pubkey(gnutls_pk_params_st * params,
 }
 
 int
-_gnutls_x509_write_gost_pubkey(gnutls_pk_params_st * params,
+_gnutls_x509_write_gost_pubkey(const gnutls_pk_params_st * params,
 			      gnutls_datum_t * der)
 {
 	bigint_t x, y;
@@ -233,7 +234,7 @@ _gnutls_x509_write_gost_pubkey(gnutls_pk_params_st * params,
 }
 
 int
-_gnutls_x509_write_pubkey_params(gnutls_pk_params_st * params,
+_gnutls_x509_write_pubkey_params(const gnutls_pk_params_st * params,
 				 gnutls_datum_t * der)
 {
 	switch (params->algo) {
@@ -252,6 +253,7 @@ _gnutls_x509_write_pubkey_params(gnutls_pk_params_st * params,
 	case GNUTLS_PK_ECDSA:
 		return _gnutls_x509_write_ecc_params(params->curve, der);
 	case GNUTLS_PK_EDDSA_ED25519:
+	case GNUTLS_PK_EDDSA_ED448:
 		der->data = NULL;
 		der->size = 0;
 
@@ -266,7 +268,7 @@ _gnutls_x509_write_pubkey_params(gnutls_pk_params_st * params,
 }
 
 int
-_gnutls_x509_write_pubkey(gnutls_pk_params_st * params,
+_gnutls_x509_write_pubkey(const gnutls_pk_params_st * params,
 			  gnutls_datum_t * der)
 {
 	switch (params->algo) {
@@ -278,6 +280,7 @@ _gnutls_x509_write_pubkey(gnutls_pk_params_st * params,
 	case GNUTLS_PK_ECDSA:
 		return _gnutls_x509_write_ecc_pubkey(params, der);
 	case GNUTLS_PK_EDDSA_ED25519:
+	case GNUTLS_PK_EDDSA_ED448:
 		return _gnutls_x509_write_eddsa_pubkey(params, der);
 	case GNUTLS_PK_GOST_01:
 	case GNUTLS_PK_GOST_12_256:
@@ -295,7 +298,7 @@ _gnutls_x509_write_pubkey(gnutls_pk_params_st * params,
  * Allocates the space used to store the DER data.
  */
 static int
-_gnutls_x509_write_dsa_params(gnutls_pk_params_st * params,
+_gnutls_x509_write_dsa_params(const gnutls_pk_params_st * params,
 			      gnutls_datum_t * der)
 {
 	int result;
@@ -355,7 +358,7 @@ _gnutls_x509_write_dsa_params(gnutls_pk_params_st * params,
  * Allocates the space used to store the DER data.
  */
 int
-_gnutls_x509_write_ecc_params(gnutls_ecc_curve_t curve,
+_gnutls_x509_write_ecc_params(const gnutls_ecc_curve_t curve,
 			      gnutls_datum_t * der)
 {
 	int result;
@@ -406,7 +409,7 @@ _gnutls_x509_write_ecc_params(gnutls_ecc_curve_t curve,
 }
 
 int
-_gnutls_x509_write_rsa_pss_params(gnutls_x509_spki_st *params,
+_gnutls_x509_write_rsa_pss_params(const gnutls_x509_spki_st *params,
 				  gnutls_datum_t *der)
 {
 	int result;
@@ -524,7 +527,7 @@ _gnutls_x509_write_rsa_pss_params(gnutls_x509_spki_st *params,
 }
 
 static int
-_gnutls_x509_write_gost_params(gnutls_pk_params_st * params,
+_gnutls_x509_write_gost_params(const gnutls_pk_params_st * params,
 			      gnutls_datum_t * der)
 {
 	int result;
@@ -569,6 +572,10 @@ _gnutls_x509_write_gost_params(gnutls_pk_params_st * params,
 		  params->curve == GNUTLS_ECC_CURVE_GOST256CPXA ||
 		  params->curve == GNUTLS_ECC_CURVE_GOST256CPXB))
 		oid = HASH_OID_STREEBOG_256;
+	else if (params->algo == GNUTLS_PK_GOST_12_512 &&
+		 (params->curve == GNUTLS_ECC_CURVE_GOST512A ||
+		  params->curve == GNUTLS_ECC_CURVE_GOST512B))
+		oid = HASH_OID_STREEBOG_512;
 	else
 		oid = NULL;
 
@@ -618,7 +625,7 @@ _gnutls_x509_write_gost_params(gnutls_pk_params_st * params,
  * Allocates the space used to store the DER data.
  */
 static int
-_gnutls_x509_write_dsa_pubkey(gnutls_pk_params_st * params,
+_gnutls_x509_write_dsa_pubkey(const gnutls_pk_params_st * params,
 			      gnutls_datum_t * der)
 {
 	int result;
@@ -702,7 +709,7 @@ _gnutls_asn1_encode_rsa(ASN1_TYPE * c2, gnutls_pk_params_st * params)
 		goto cleanup;
 	}
 
-	/* Write PRIME 
+	/* Write PRIME
 	 */
 	ret =
 	    _gnutls_x509_write_int(*c2, "modulus",
@@ -963,7 +970,7 @@ _gnutls_asn1_encode_dsa(ASN1_TYPE * c2, gnutls_pk_params_st * params)
 		return _gnutls_asn2err(result);
 	}
 
-	/* Write PRIME 
+	/* Write PRIME
 	 */
 	ret =
 	    _gnutls_x509_write_int(*c2, "p",
@@ -1031,6 +1038,7 @@ int _gnutls_asn1_encode_privkey(ASN1_TYPE * c2,
 		return _gnutls_asn1_encode_dsa(c2, params);
 	case GNUTLS_PK_ECDSA:
 	case GNUTLS_PK_EDDSA_ED25519:
+	case GNUTLS_PK_EDDSA_ED448:
 		return _gnutls_asn1_encode_ecc(c2, params);
 	case GNUTLS_PK_GOST_01:
 	case GNUTLS_PK_GOST_12_256:

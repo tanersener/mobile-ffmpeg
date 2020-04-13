@@ -90,7 +90,7 @@ structures functions such as @funcref{gnutls_privkey_set_pin_function}.
 
 @subsection Key generation
 
-All supported key types (including RSA, DSA, ECDSA, Ed25519) can be generated
+All supported key types (including RSA, DSA, ECDSA, Ed25519, Ed448) can be generated
 with GnuTLS. They can be generated with the simpler @funcref{gnutls_privkey_generate}
 or with the more advanced @funcref{gnutls_privkey_generate2}.
 

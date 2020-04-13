@@ -107,7 +107,7 @@ static void client(int fd, const char *prio)
 
 	/* Initialize TLS session
 	 */
-	gnutls_init(&session, GNUTLS_CLIENT|GNUTLS_NO_EXTENSIONS);
+	assert(gnutls_init(&session, GNUTLS_CLIENT|GNUTLS_NO_EXTENSIONS)>=0);
 
 	assert(gnutls_priority_set_direct(session, prio, NULL)>=0);
 
@@ -135,6 +135,8 @@ static void client(int fd, const char *prio)
 		if (debug)
 			success("client: Handshake was completed\n");
 	}
+
+	assert((gnutls_session_get_flags(session) & GNUTLS_SFLAGS_CLI_REQUESTED_OCSP) == 0);
 
 	if (debug)
 		success("client: TLS version is: %s\n",
@@ -214,6 +216,8 @@ static void server(int fd, const char *prio)
 		/* failure is expected here */
 		goto end;
 	}
+
+	assert((gnutls_session_get_flags(session) & GNUTLS_SFLAGS_CLI_REQUESTED_OCSP) == 0);
 
 	if (debug) {
 		success("server: Handshake was completed\n");

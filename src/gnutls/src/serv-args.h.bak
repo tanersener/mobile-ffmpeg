@@ -19,7 +19,7 @@
  * The gnutls-serv program is copyrighted and licensed
  * under the following terms:
  *
- *  Copyright (C) 2000-2019 Free Software Foundation, and others, all rights reserved.
+ *  Copyright (C) 2000-2020 Free Software Foundation, and others, all rights reserved.
  *  This is free software. It is licensed for use, modification and
  *  redistribution under the terms of the GNU General Public License,
  *  version 3 or later <http://gnu.org/licenses/gpl.html>
@@ -129,9 +129,9 @@ typedef enum {
 /** count of all options for gnutls-serv */
 #define OPTION_CT    51
 /** gnutls-serv version */
-#define GNUTLS_SERV_VERSION       "3.6.11"
+#define GNUTLS_SERV_VERSION       "3.6.13"
 /** Full gnutls-serv version text */
-#define GNUTLS_SERV_FULL_VERSION  "gnutls-serv 3.6.11"
+#define GNUTLS_SERV_FULL_VERSION  "gnutls-serv 3.6.13"
 
 /**
  *  Interface defines for all options.  Replace "n" with the UPPER_CASED

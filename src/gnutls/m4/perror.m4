@@ -1,5 +1,5 @@
-# perror.m4 serial 8
-dnl Copyright (C) 2008-2019 Free Software Foundation, Inc.
+# perror.m4 serial 9
+dnl Copyright (C) 2008-2020 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -52,8 +52,8 @@ AC_DEFUN([gl_FUNC_PERROR],
               *-musl*) gl_cv_func_perror_works="guessing yes" ;;
                        # Guess yes on native Windows.
               mingw*)  gl_cv_func_perror_works="guessing yes" ;;
-                       # Otherwise guess no.
-              *)       gl_cv_func_perror_works="guessing no" ;;
+                       # Otherwise obey --enable-cross-guesses.
+              *)       gl_cv_func_perror_works="$gl_cross_guess_normal" ;;
             esac
            ])
         ])

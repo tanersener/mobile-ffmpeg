@@ -1,5 +1,5 @@
-# setenv.m4 serial 28
-dnl Copyright (C) 2001-2004, 2006-2019 Free Software Foundation, Inc.
+# setenv.m4 serial 29
+dnl Copyright (C) 2001-2004, 2006-2020 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -39,8 +39,8 @@ AC_DEFUN([gl_FUNC_SETENV],
          *-gnu* | gnu*) gl_cv_func_setenv_works="guessing yes" ;;
                         # Guess yes on musl systems.
          *-musl*)       gl_cv_func_setenv_works="guessing yes" ;;
-                        # If we don't know, assume the worst.
-         *)             gl_cv_func_setenv_works="guessing no" ;;
+                        # If we don't know, obey --enable-cross-guesses.
+         *)             gl_cv_func_setenv_works="$gl_cross_guess_normal" ;;
        esac
       ])])
     case "$gl_cv_func_setenv_works" in
@@ -131,8 +131,8 @@ int unsetenv (const char *name);
       [case "$host_os" in
                  # Guess yes on glibc systems.
          *-gnu*) gl_cv_func_unsetenv_works="guessing yes" ;;
-                 # If we don't know, assume the worst.
-         *)      gl_cv_func_unsetenv_works="guessing no" ;;
+                 # If we don't know, obey --enable-cross-guesses.
+         *)      gl_cv_func_unsetenv_works="$gl_cross_guess_normal" ;;
        esac
       ])])
     case "$gl_cv_func_unsetenv_works" in

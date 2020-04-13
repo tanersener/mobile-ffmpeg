@@ -1,28 +1,33 @@
 /* Implementation details of FILE streams.
-   Copyright (C) 2007-2008, 2010-2019 Free Software Foundation, Inc.
+   Copyright (C) 2007-2008, 2010-2020 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   it under the terms of the GNU Lesser General Public License as published by
+   the Free Software Foundation; either version 2.1 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
+   You should have received a copy of the GNU Lesser General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Many stdio implementations have the same logic and therefore can share
    the same implementation of stdio extension API, except that some fields
    have different naming conventions, or their access requires some casts.  */
 
-/* Glibc 2.28 made _IO_IN_BACKUP private.  For now, work around this
-   problem by defining it ourselves.  FIXME: Do not rely on glibc
+/* Glibc 2.28 made _IO_UNBUFFERED and _IO_IN_BACKUP private.  For now, work
+   around this problem by defining them ourselves.  FIXME: Do not rely on glibc
    internals.  */
-#if !defined _IO_IN_BACKUP && defined _IO_EOF_SEEN
-# define _IO_IN_BACKUP 0x100
+#if defined _IO_EOF_SEEN
+# if !defined _IO_UNBUFFERED
+#  define _IO_UNBUFFERED 0x2
+# endif
+# if !defined _IO_IN_BACKUP
+#  define _IO_IN_BACKUP 0x100
+# endif
 #endif
 
 /* BSD stdio derived implementations.  */

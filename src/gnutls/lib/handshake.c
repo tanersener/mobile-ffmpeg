@@ -992,6 +992,7 @@ int _gnutls_recv_finished(gnutls_session_t session)
 #if defined(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION)
 	/* When fuzzying allow to proceed without verifying the handshake
 	 * consistency */
+	(void) vrfy;
 # warning This is unsafe for production builds
 
 #else
@@ -2166,7 +2167,7 @@ static int send_client_hello(gnutls_session_t session, int again)
 		/* Generate random data
 		 */
 		if (!(session->internals.hsk_flags & HSK_HRR_RECEIVED) &&
-		    !(IS_DTLS(session) && session->internals.dtls.hsk_hello_verify_requests == 0)) {
+		    !(IS_DTLS(session) && session->internals.dtls.hsk_hello_verify_requests != 0)) {
 			ret = _gnutls_gen_client_random(session);
 			if (ret < 0) {
 				gnutls_assert();

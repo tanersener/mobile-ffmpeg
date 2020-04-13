@@ -1,0 +1,1 @@
+@item @var{gnutls_digest_algorithm_t} @ref{gnutls_prf_hash_get} (const gnutls_session_t @var{session})

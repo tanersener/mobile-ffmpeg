@@ -1301,6 +1301,29 @@ GNUTLS_3_6_10
 	gnutls_aead_cipher_decryptv2;
 } GNUTLS_3_6_9;
 
+GNUTLS_3_6_12
+{
+ global:
+	gnutls_certificate_verification_profile_get_name;
+	gnutls_certificate_verification_profile_get_id;
+	gnutls_hmac_get_key_size;
+} GNUTLS_3_6_10;
+
+GNUTLS_3_6_13
+{
+ global:
+	gnutls_hkdf_extract;
+	gnutls_hkdf_expand;
+	gnutls_pbkdf2;
+	gnutls_session_get_keylog_function;
+	gnutls_session_set_keylog_function;
+	gnutls_prf_hash_get;
+	gnutls_psk_server_get_username2;
+	gnutls_psk_set_server_credentials_function2;
+	gnutls_psk_set_client_credentials2;
+	gnutls_psk_set_client_credentials_function2;
+} GNUTLS_3_6_12;
+
 GNUTLS_FIPS140_3_4 {
   global:
 	gnutls_cipher_self_test;

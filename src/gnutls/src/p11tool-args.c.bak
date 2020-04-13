@@ -19,7 +19,7 @@
  * The p11tool program is copyrighted and licensed
  * under the following terms:
  *
- *  Copyright (C) 2000-2019 Free Software Foundation, and others, all rights reserved.
+ *  Copyright (C) 2000-2020 Free Software Foundation, and others, all rights reserved.
  *  This is free software. It is licensed for use, modification and
  *  redistribution under the terms of the GNU General Public License,
  *  version 3 or later <http://gnu.org/licenses/gpl.html>
@@ -68,8 +68,8 @@ extern FILE * option_usage_fp;
  *  static const strings for p11tool options
  */
 static char const p11tool_opt_strs[5984] =
-/*     0 */ "p11tool 3.6.11\n"
-            "Copyright (C) 2000-2019 Free Software Foundation, and others, all rights reserved.\n"
+/*     0 */ "p11tool 3.6.13\n"
+            "Copyright (C) 2000-2020 Free Software Foundation, and others, all rights reserved.\n"
             "This is free software. It is licensed for use, modification and\n"
             "redistribution under the terms of the GNU General Public License,\n"
             "version 3 or later <http://gnu.org/licenses/gpl.html>\n\0"
@@ -301,7 +301,7 @@ static char const p11tool_opt_strs[5984] =
             "the form 'load=/usr/lib/opensc-pkcs11.so'.\n\n"
             "You can provide the PIN to be used for the PKCS #11 operations with the\n"
             "environment variables GNUTLS_PIN and GNUTLS_SO_PIN.\n\0"
-/*  5905 */ "p11tool 3.6.11\0"
+/*  5905 */ "p11tool 3.6.13\0"
 /*  5920 */ "p11tool [options] [url]\n"
             "p11tool --help for usage instructions.\n";
 
@@ -2718,8 +2718,8 @@ static void bogus_function(void) {
      translate option names.
    */
   /* referenced via p11toolOptions.pzCopyright */
-  puts(_("p11tool 3.6.11\n\
-Copyright (C) 2000-2019 Free Software Foundation, and others, all rights reserved.\n\
+  puts(_("p11tool 3.6.13\n\
+Copyright (C) 2000-2020 Free Software Foundation, and others, all rights reserved.\n\
 This is free software. It is licensed for use, modification and\n\
 redistribution under the terms of the GNU General Public License,\n\
 version 3 or later <http://gnu.org/licenses/gpl.html>\n"));
@@ -2981,7 +2981,7 @@ the form 'load=/usr/lib/opensc-pkcs11.so'.\n\n"));
 environment variables GNUTLS_PIN and GNUTLS_SO_PIN.\n"));
 
   /* referenced via p11toolOptions.pzFullVersion */
-  puts(_("p11tool 3.6.11"));
+  puts(_("p11tool 3.6.13"));
 
   /* referenced via p11toolOptions.pzFullUsage */
   puts(_("<<<NOT-FOUND>>>"));

@@ -29,7 +29,8 @@
 typedef struct gnutls_psk_client_credentials_st {
 	gnutls_datum_t username;
 	gnutls_datum_t key;
-	gnutls_psk_client_credentials_function *get_function;
+	gnutls_psk_client_credentials_function2 *get_function;
+	gnutls_psk_client_credentials_function *get_function_legacy;
 	/* TLS 1.3 - The HMAC algorithm to use to compute the binder values */
 	const mac_entry_st *binder_algo;
 } psk_client_credentials_st;
@@ -39,7 +40,8 @@ typedef struct gnutls_psk_server_credentials_st {
 	/* callback function, instead of reading the
 	 * password files.
 	 */
-	gnutls_psk_server_credentials_function *pwd_callback;
+	gnutls_psk_server_credentials_function2 *pwd_callback;
+	gnutls_psk_server_credentials_function *pwd_callback_legacy;
 
 	/* For DHE_PSK */
 	gnutls_dh_params_t dh_params;
@@ -59,11 +61,21 @@ typedef struct gnutls_psk_server_credentials_st {
 /* these structures should not use allocated data */
 typedef struct psk_auth_info_st {
 	char username[MAX_USERNAME_SIZE + 1];
+	uint16_t username_len;
 	dh_info_st dh;
 	char hint[MAX_USERNAME_SIZE + 1];
 } *psk_auth_info_t;
 
 typedef struct psk_auth_info_st psk_auth_info_st;
+
+inline static
+void _gnutls_copy_psk_username(psk_auth_info_t info, const gnutls_datum_t *username)
+{
+	assert(sizeof(info->username) > username->size);
+	memcpy(info->username, username->data, username->size);
+	info->username[username->size] = 0;
+	info->username_len = username->size;
+}
 
 #ifdef ENABLE_PSK
 
@@ -73,7 +85,6 @@ _gnutls_set_psk_session_key(gnutls_session_t session, gnutls_datum_t * key,
 int _gnutls_gen_psk_server_kx(gnutls_session_t session,
 			      gnutls_buffer_st * data);
 int _gnutls_gen_psk_client_kx(gnutls_session_t, gnutls_buffer_st *);
-
 
 #else
 #define _gnutls_set_psk_session_key(x,y,z) GNUTLS_E_UNIMPLEMENTED_FEATURE

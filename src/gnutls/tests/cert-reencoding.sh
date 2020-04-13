@@ -57,6 +57,8 @@ export TZ="UTC"
 
 . "${srcdir}/scripts/common.sh"
 
+check_for_datefudge
+
 eval "${GETPORT}"
 # Port for gnutls-serv
 TLS_SERVER_PORT=$PORT
@@ -69,14 +71,6 @@ eval "${GETPORT}"
 OPENSSL=`which openssl`
 if ! test -x "${OPENSSL}"; then
     echo "You need openssl to run this test."
-    exit 77
-fi
-
-# Check for datefudge
-TSTAMP=`datefudge "2006-09-23" date -u +%s || true`
-if test "$TSTAMP" != "1158969600"; then
-    echo $TSTAMP
-    echo "You need datefudge to run this test."
     exit 77
 fi
 

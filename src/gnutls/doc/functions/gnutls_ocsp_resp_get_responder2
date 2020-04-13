@@ -2,7 +2,7 @@
 
 
 
-@deftypefun {int} {gnutls_ocsp_resp_get_responder2} (gnutls_ocsp_resp_t @var{resp}, gnutls_datum_t * @var{dn}, unsigned @var{flags})
+@deftypefun {int} {gnutls_ocsp_resp_get_responder2} (gnutls_ocsp_resp_const_t @var{resp}, gnutls_datum_t * @var{dn}, unsigned @var{flags})
 @var{resp}: should contain a @code{gnutls_ocsp_resp_t}  type
 
 @var{dn}: newly allocated buffer with name

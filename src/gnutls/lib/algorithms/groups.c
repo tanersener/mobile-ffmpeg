@@ -125,6 +125,13 @@ static const gnutls_group_entry_st supported_groups[] = {
 	 .tls_id = 40,
 	},
 #endif
+	{
+	 .name = "X448",
+	 .id = GNUTLS_GROUP_X448,
+	 .curve = GNUTLS_ECC_CURVE_X448,
+	 .tls_id = 30,
+	 .pk = GNUTLS_PK_ECDH_X448
+	},
 #ifdef ENABLE_DHE
 	{
 	 .name = "FFDHE2048",

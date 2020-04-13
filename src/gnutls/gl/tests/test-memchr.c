@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2019 Free Software Foundation, Inc.
+ * Copyright (C) 2008-2020 Free Software Foundation, Inc.
  * Written by Eric Blake and Bruno Haible
  *
  * This program is free software: you can redistribute it and/or modify
@@ -88,7 +88,7 @@ main (void)
 
   /* Check that memchr() does not read past the first occurrence of the
      byte being searched.  See the Austin Group's clarification
-     <http://www.opengroup.org/austin/docs/austin_454.txt>.
+     <https://www.opengroup.org/austin/docs/austin_454.txt>.
      Test both '\0' and something else, since some implementations
      special-case searching for NUL.
   */

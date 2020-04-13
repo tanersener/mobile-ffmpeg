@@ -61,6 +61,7 @@ const char *side = "";
 #define PRIO_TLS12_CHACHA_POLY1305 "NONE:+VERS-TLS1.2:+CHACHA20-POLY1305:+AEAD:+SIGN-ALL:+COMP-NULL:+ECDHE-RSA:+CURVE-ALL"
 #define PRIO_CHACHA_POLY1305 "NONE:+VERS-TLS1.3:+CHACHA20-POLY1305:+AEAD:+SIGN-ALL:+COMP-NULL:+ECDHE-RSA:+CURVE-ALL"
 #define PRIO_CAMELLIA_CBC_SHA1 "NONE:+VERS-TLS1.0:+CAMELLIA-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+RSA"
+#define PRIO_GOST_CNT "NONE:+VERS-TLS1.2:+GOST28147-TC26Z-CNT:+GOST28147-TC26Z-IMIT:+SIGN-ALL:+SIGN-GOSTR341012-256:+COMP-NULL:+VKO-GOST-12:+GROUP-GOST-ALL"
 
 static const int rsa_bits = 3072, ec_bits = 256;
 
@@ -202,6 +203,42 @@ static unsigned char server_ed25519_cert_pem[] =
 	"7barRoh+qx7ZVYpe+5w3JYuxy16w\n"
 	"-----END CERTIFICATE-----\n";
 
+#ifdef ENABLE_GOST
+static unsigned char server_gost12_256_key_pem[] =
+	"-----BEGIN PRIVATE KEY-----\n"
+	"MEgCAQAwHwYIKoUDBwEBAQEwEwYHKoUDAgIkAAYIKoUDBwEBAgIEIgQg0+JttJEV\n"
+	"Ud+XBzX9q13ByKK+j2b+mEmNIo1yB0wGleo=\n"
+	"-----END PRIVATE KEY-----\n";
+
+static unsigned char server_gost12_256_cert_pem[] =
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIIC8DCCAVigAwIBAgIIWcZKgxkCMvcwDQYJKoZIhvcNAQELBQAwDzENMAsGA1UE\n"
+	"AxMEQ0EtMzAgFw0xOTEwMDgxMDQ4MTZaGA85OTk5MTIzMTIzNTk1OVowDTELMAkG\n"
+	"A1UEAxMCR1IwZjAfBggqhQMHAQEBATATBgcqhQMCAiQABggqhQMHAQECAgNDAARA\n"
+	"J9sMEEx0JW9QsT5bDqyc0TNcjVg9ZSdp4GkMtShM+OOgyBGrWK3zLP5IzHYSXja8\n"
+	"373QrJOUvdX7T7TUk5yU5aOBjTCBijAMBgNVHRMBAf8EAjAAMBQGA1UdEQQNMAuC\n"
+	"CWxvY2FsaG9zdDATBgNVHSUEDDAKBggrBgEFBQcDATAPBgNVHQ8BAf8EBQMDB4AA\n"
+	"MB0GA1UdDgQWBBQYSEtdwsYrtnOq6Ya3nt8DgFPCQjAfBgNVHSMEGDAWgBT5qIYZ\n"
+	"Y7akFBNgdg8BmjU27/G0rzANBgkqhkiG9w0BAQsFAAOCAYEAR0xtx7MWEP1KyIzM\n"
+	"4lXKdTyU4Nve5RcgqF82yR/0odqT5MPoaZDvLuRWEcQryztZD3kmRUmPmn1ujSfc\n"
+	"BbPfRnSutDXcf6imq0/U1/TV/BF3vpS1plltzetvibf8MYetHVFQHUBJDZJHh9h7\n"
+	"PGwA9SnmnGKFIxFdV6bVOLkPR54Gob9zN3E17KslL19lNtht1pxk9pshwTn35oRY\n"
+	"uOdxof9F4XjpI/4WbC8kp15QeG8XyZd5JWSl+niNOqYK31+ilQdVBr4RiZSDIcAg\n"
+	"twS5yV9Ap+R8rM8TLbeT2io4rhdUgmDllUf49zV3t6AbVvbsQfkqXmHXW8uW2WBu\n"
+	"A8FiXEbIIOb+QIW0ZGwk3BVQ7wdiw1M5w6kYtz5kBtNPxBmc+eu1+e6EAfYbFNr3\n"
+	"pkxtMk3veYWHb5s3dHZ4/t2Rn85hWqh03CWwCkKTN3qmEs4/XpybbXE/UE49e7u1\n"
+	"FkpM1bT/0gUNsNt5h3pyUzQZdiB0XbdGGFta3tB3+inIO45h\n"
+	"-----END CERTIFICATE-----\n";
+
+static const gnutls_datum_t server_gost12_256_key = { server_gost12_256_key_pem,
+	sizeof(server_gost12_256_key_pem)-1
+};
+
+static const gnutls_datum_t server_gost12_256_cert = { server_gost12_256_cert_pem,
+	sizeof(server_gost12_256_cert_pem)-1
+};
+#endif
+
 const gnutls_datum_t server_cert = { server_cert_pem,
 	sizeof(server_cert_pem)
 };
@@ -255,7 +292,9 @@ static void test_ciphersuite(const char *cipher_prio, int size)
 	const char *name;
 
 	/* Init server */
+#ifdef ENABLE_ANON
 	gnutls_anon_allocate_server_credentials(&s_anoncred);
+#endif
 	gnutls_certificate_allocate_credentials(&s_certcred);
 
 	gnutls_certificate_set_x509_key_mem(s_certcred, &server_cert,
@@ -264,6 +303,11 @@ static void test_ciphersuite(const char *cipher_prio, int size)
 	gnutls_certificate_set_x509_key_mem(s_certcred, &server_ecc_cert,
 					    &server_ecc_key,
 					    GNUTLS_X509_FMT_PEM);
+#ifdef ENABLE_GOST
+	gnutls_certificate_set_x509_key_mem(s_certcred, &server_gost12_256_cert,
+					    &server_gost12_256_key,
+					    GNUTLS_X509_FMT_PEM);
+#endif
 
 	gnutls_init(&server, GNUTLS_SERVER);
 	ret = gnutls_priority_set_direct(server, cipher_prio, &str);
@@ -271,7 +315,9 @@ static void test_ciphersuite(const char *cipher_prio, int size)
 		fprintf(stderr, "Error in %s\n", str);
 		exit(1);
 	}
+#ifdef ENABLE_ANON
 	gnutls_credentials_set(server, GNUTLS_CRD_ANON, s_anoncred);
+#endif
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, s_certcred);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
@@ -279,7 +325,9 @@ static void test_ciphersuite(const char *cipher_prio, int size)
 	reset_buffers();
 
 	/* Init client */
+#ifdef ENABLE_ANON
 	gnutls_anon_allocate_client_credentials(&c_anoncred);
+#endif
 	gnutls_certificate_allocate_credentials(&c_certcred);
 	gnutls_init(&client, GNUTLS_CLIENT);
 
@@ -288,7 +336,9 @@ static void test_ciphersuite(const char *cipher_prio, int size)
 		fprintf(stderr, "Error in %s\n", str);
 		exit(1);
 	}
+#ifdef ENABLE_ANON
 	gnutls_credentials_set(client, GNUTLS_CRD_ANON, c_anoncred);
+#endif
 	gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE, c_certcred);
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
@@ -344,12 +394,14 @@ static void test_ciphersuite(const char *cipher_prio, int size)
 	gnutls_deinit(client);
 	gnutls_deinit(server);
 
+#ifdef ENABLE_ANON
 	gnutls_anon_free_client_credentials(c_anoncred);
 	gnutls_anon_free_server_credentials(s_anoncred);
+#endif
 }
 
 static
-double calc_avg(unsigned int *diffs, unsigned int diffs_size)
+double calc_avg(uint64_t *diffs, unsigned int diffs_size)
 {
 	double avg = 0;
 	unsigned int i;
@@ -363,7 +415,7 @@ double calc_avg(unsigned int *diffs, unsigned int diffs_size)
 }
 
 static
-double calc_sstdev(unsigned int *diffs, unsigned int diffs_size,
+double calc_svar(uint64_t *diffs, unsigned int diffs_size,
 		   double avg)
 {
 	double sum = 0, d;
@@ -381,7 +433,7 @@ double calc_sstdev(unsigned int *diffs, unsigned int diffs_size,
 }
 
 
-unsigned int total_diffs[32 * 1024];
+uint64_t total_diffs[32 * 1024];
 unsigned int total_diffs_size = 0;
 
 static void test_ciphersuite_kx(const char *cipher_prio, unsigned pk)
@@ -389,25 +441,26 @@ static void test_ciphersuite_kx(const char *cipher_prio, unsigned pk)
 	/* Server stuff. */
 	gnutls_anon_server_credentials_t s_anoncred;
 	gnutls_session_t server;
-	int sret, cret;
+	int sret, cret, ret;
 	const char *str;
 	char *suite = NULL;
-	/* Client stuff. */
 	gnutls_anon_client_credentials_t c_anoncred;
 	gnutls_certificate_credentials_t c_certcred, s_certcred;
 	gnutls_session_t client;
-	/* Need to enable anonymous KX specifically. */
-	int ret;
+	unsigned i;
 	struct benchmark_st st;
 	struct timespec tr_start, tr_stop;
-	double avg, sstddev;
+	double avg, svar;
 	gnutls_priority_t priority_cache;
+	const char *scale;
 
 	total_diffs_size = 0;
 
 	/* Init server */
 	gnutls_certificate_allocate_credentials(&s_certcred);
+#ifdef ENABLE_ANON
 	gnutls_anon_allocate_server_credentials(&s_anoncred);
+#endif
 
 	ret = 0;
 	if (pk == GNUTLS_PK_RSA_PSS)
@@ -433,6 +486,12 @@ static void test_ciphersuite_kx(const char *cipher_prio, unsigned pk)
 		ret = gnutls_certificate_set_x509_key_mem(s_certcred, &server_ed25519_cert,
 						    &server_ed25519_key,
 						    GNUTLS_X509_FMT_PEM);
+#ifdef ENABLE_GOST
+	else if (pk == GNUTLS_PK_GOST_12_256)
+		ret = gnutls_certificate_set_x509_key_mem(s_certcred, &server_gost12_256_cert,
+						    &server_gost12_256_key,
+						    GNUTLS_X509_FMT_PEM);
+#endif
 	if (ret < 0) {
 		fprintf(stderr, "Error in %d: %s\n", __LINE__,
 			gnutls_strerror(ret));
@@ -440,7 +499,9 @@ static void test_ciphersuite_kx(const char *cipher_prio, unsigned pk)
 	}
 
 	/* Init client */
+#ifdef ENABLE_ANON
 	gnutls_anon_allocate_client_credentials(&c_anoncred);
+#endif
 	gnutls_certificate_allocate_credentials(&c_certcred);
 
 	start_benchmark(&st);
@@ -460,8 +521,10 @@ static void test_ciphersuite_kx(const char *cipher_prio, unsigned pk)
 			fprintf(stderr, "Error in setting priority: %s\n", gnutls_strerror(ret));
 			exit(1);
 		}
+#ifdef ENABLE_ANON
 		gnutls_credentials_set(server, GNUTLS_CRD_ANON,
 				       s_anoncred);
+#endif
 		gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
 				       s_certcred);
 		gnutls_transport_set_push_function(server, server_push);
@@ -478,8 +541,10 @@ static void test_ciphersuite_kx(const char *cipher_prio, unsigned pk)
 			fprintf(stderr, "Error in setting priority: %s\n", gnutls_strerror(ret));
 			exit(1);
 		}
+#ifdef ENABLE_ANON
 		gnutls_credentials_set(client, GNUTLS_CRD_ANON,
 				       c_anoncred);
+#endif
 		gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
 				       c_certcred);
 
@@ -501,7 +566,7 @@ static void test_ciphersuite_kx(const char *cipher_prio, unsigned pk)
 		gnutls_deinit(client);
 		gnutls_deinit(server);
 
-		total_diffs[total_diffs_size++] = timespec_sub_ms(&tr_stop, &tr_start);
+		total_diffs[total_diffs_size++] = timespec_sub_ns(&tr_stop, &tr_start);
 		if (total_diffs_size > sizeof(total_diffs)/sizeof(total_diffs[0]))
 			abort();
 
@@ -509,19 +574,36 @@ static void test_ciphersuite_kx(const char *cipher_prio, unsigned pk)
 	}
 	while (benchmark_must_finish == 0);
 
-	fprintf(stdout, "%38s  ", suite);
+	fprintf(stdout, "%s\n - ", suite);
 	gnutls_free(suite);
 	stop_benchmark(&st, "transactions", 1);
 	gnutls_priority_deinit(priority_cache);
 
 	avg = calc_avg(total_diffs, total_diffs_size);
-	sstddev = calc_sstdev(total_diffs, total_diffs_size, avg);
 
-	printf("%32s %.2f ms, sample variance: %.2f)\n",
-	       "(avg. handshake time:", avg, sstddev);
+	if (avg < 1000) {
+		scale = "ns";
+	} else if (avg < 1000000) {
+		scale = "\u00B5s";
+		avg /= 1000;
+		for (i=0;i<total_diffs_size;i++)
+			total_diffs[i] /= 1000;
+	} else {
+		scale = "ms";
+		avg /= 1000*1000;
+		for (i=0;i<total_diffs_size;i++)
+			total_diffs[i] /= 1000*1000;
+	}
 
+	svar = calc_svar(total_diffs, total_diffs_size, avg);
+
+	printf(" - avg. handshake time: %.2f %s\n - standard deviation: %.2f %s\n\n",
+	       avg, scale, sqrt(svar), scale);
+
+#ifdef ENABLE_ANON
 	gnutls_anon_free_client_credentials(c_anoncred);
 	gnutls_anon_free_server_credentials(s_anoncred);
+#endif
 }
 
 void benchmark_tls(int debug_level, int ciphers)
@@ -546,6 +628,9 @@ void benchmark_tls(int debug_level, int ciphers)
 		test_ciphersuite(PRIO_CHACHA_POLY1305, size);
 		test_ciphersuite(PRIO_AES_CBC_SHA1, size);
 		test_ciphersuite(PRIO_CAMELLIA_CBC_SHA1, size);
+#ifdef ENABLE_GOST
+		test_ciphersuite(PRIO_GOST_CNT, size);
+#endif
 
 		size = 16 * 1024;
 		printf
@@ -559,6 +644,9 @@ void benchmark_tls(int debug_level, int ciphers)
 		test_ciphersuite(PRIO_CHACHA_POLY1305, size);
 		test_ciphersuite(PRIO_AES_CBC_SHA1, size);
 		test_ciphersuite(PRIO_CAMELLIA_CBC_SHA1, size);
+#ifdef ENABLE_GOST
+		test_ciphersuite(PRIO_GOST_CNT, size);
+#endif
 	} else {
 		printf
 		    ("Testing key exchanges (RSA/DH bits: %d, EC bits: %d)\n\n",
@@ -571,6 +659,9 @@ void benchmark_tls(int debug_level, int ciphers)
 		test_ciphersuite_kx(PRIO_ECDH_X25519_ECDSA, GNUTLS_PK_ECC);
 		test_ciphersuite_kx(PRIO_ECDH_X25519_EDDSA, GNUTLS_PK_EDDSA_ED25519);
 		test_ciphersuite_kx(PRIO_RSA, GNUTLS_PK_RSA);
+#ifdef ENABLE_GOST
+		test_ciphersuite_kx(PRIO_GOST_CNT, GNUTLS_PK_GOST_12_256);
+#endif
 	}
 
 	gnutls_global_deinit();

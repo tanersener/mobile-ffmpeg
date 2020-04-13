@@ -757,6 +757,47 @@ and reset the state of the hash.
 @strong{Since:} 2.10.0
 @end deftypefun
 
+@subheading gnutls_hkdf_expand
+@anchor{gnutls_hkdf_expand}
+@deftypefun {int} {gnutls_hkdf_expand} (gnutls_mac_algorithm_t @var{mac}, const gnutls_datum_t * @var{key}, const gnutls_datum_t * @var{info}, void * @var{output}, size_t @var{length})
+@var{mac}: the mac algorithm used internally
+
+@var{key}: the pseudorandom key created with HKDF-Extract
+
+@var{info}: the optional informational data
+
+@var{output}: the output value of the expand operation
+
+@var{length}: the desired length of the output key
+
+This function will derive a variable length keying material from
+the pseudorandom key using the HKDF-Expand function as defined in
+RFC 5869.
+
+@strong{Returns:} Zero or a negative error code on error.
+
+@strong{Since:} 3.6.13
+@end deftypefun
+
+@subheading gnutls_hkdf_extract
+@anchor{gnutls_hkdf_extract}
+@deftypefun {int} {gnutls_hkdf_extract} (gnutls_mac_algorithm_t @var{mac}, const gnutls_datum_t * @var{key}, const gnutls_datum_t * @var{salt}, void * @var{output})
+@var{mac}: the mac algorithm used internally
+
+@var{key}: the initial keying material
+
+@var{salt}: the optional salt
+
+@var{output}: the output value of the extract operation
+
+This function will derive a fixed-size key using the HKDF-Extract
+function as defined in RFC 5869.
+
+@strong{Returns:} Zero or a negative error code on error.
+
+@strong{Since:} 3.6.13
+@end deftypefun
+
 @subheading gnutls_hmac
 @anchor{gnutls_hmac}
 @deftypefun {int} {gnutls_hmac} (gnutls_hmac_hd_t @var{handle}, const void * @var{ptext}, size_t @var{ptext_len})
@@ -824,6 +865,20 @@ that require nonce (like UMAC or GMAC).
 @strong{Returns:} Zero or a negative error code on error.
 
 @strong{Since:} 2.10.0
+@end deftypefun
+
+@subheading gnutls_hmac_get_key_size
+@anchor{gnutls_hmac_get_key_size}
+@deftypefun {unsigned} {gnutls_hmac_get_key_size} (gnutls_mac_algorithm_t @var{algorithm})
+@var{algorithm}: the mac algorithm to use
+
+This function will return the size of the key to be used with this
+algorithm. On the algorithms which may accept arbitrary key sizes,
+the returned size is the MAC key size used in the TLS protocol.
+
+@strong{Returns:} The key size or zero on error.
+
+@strong{Since:} 3.6.12
 @end deftypefun
 
 @subheading gnutls_hmac_get_len
@@ -900,6 +955,29 @@ Returns the size of the nonce used by the MAC in TLS.
 @strong{Returns:} length (in bytes) of the given MAC nonce size, or 0.
 
 @strong{Since:} 3.2.0
+@end deftypefun
+
+@subheading gnutls_pbkdf2
+@anchor{gnutls_pbkdf2}
+@deftypefun {int} {gnutls_pbkdf2} (gnutls_mac_algorithm_t @var{mac}, const gnutls_datum_t * @var{key}, const gnutls_datum_t * @var{salt}, unsigned @var{iter_count}, void * @var{output}, size_t @var{length})
+@var{mac}: the mac algorithm used internally
+
+@var{key}: the initial keying material
+
+@var{salt}: the salt
+
+@var{iter_count}: the iteration count
+
+@var{output}: the output value
+
+@var{length}: the desired length of the output key
+
+This function will derive a variable length keying material from
+a password according to PKCS @code{5}  PBKDF2.
+
+@strong{Returns:} Zero or a negative error code on error.
+
+@strong{Since:} 3.6.13
 @end deftypefun
 
 @subheading gnutls_rnd

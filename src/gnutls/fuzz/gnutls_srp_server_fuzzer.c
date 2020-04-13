@@ -61,6 +61,7 @@ srp_cb(gnutls_session_t session, const char *username,
 
 int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
 {
+	IGNORE_CERTS;
 	int res;
 	gnutls_datum_t rsa_cert, rsa_key;
 	gnutls_datum_t ecdsa_cert, ecdsa_key;

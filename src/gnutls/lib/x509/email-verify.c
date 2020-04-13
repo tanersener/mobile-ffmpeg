@@ -26,13 +26,6 @@
 #include "errors.h"
 #include <system.h>
 
-static int has_embedded_null(const char *str, unsigned size)
-{
-	if (strlen(str) != size)
-		return 1;
-	return 0;
-}
-
 /**
  * gnutls_x509_crt_check_email:
  * @cert: should contain an gnutls_x509_crt_t type
@@ -88,7 +81,7 @@ gnutls_x509_crt_check_email(gnutls_x509_crt_t cert,
 		if (ret == GNUTLS_SAN_RFC822NAME) {
 			found_rfc822name = 1;
 
-			if (has_embedded_null(rfc822name, rfc822namesize)) {
+			if (_gnutls_has_embedded_null(rfc822name, rfc822namesize)) {
 				_gnutls_debug_log("certificate has %s with embedded null in rfc822name\n", rfc822name);
 				continue;
 			}
@@ -130,7 +123,7 @@ gnutls_x509_crt_check_email(gnutls_x509_crt_t cert,
 			goto cleanup;
 		}
 
-		if (has_embedded_null(rfc822name, rfc822namesize)) {
+		if (_gnutls_has_embedded_null(rfc822name, rfc822namesize)) {
 			_gnutls_debug_log("certificate has EMAIL %s with embedded null in name\n", rfc822name);
 			ret = 0;
 			goto cleanup;

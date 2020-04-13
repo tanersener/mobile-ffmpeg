@@ -1,4 +1,4 @@
-/* ANSI-C code produced by gperf version 3.0.4 */
+/* ANSI-C code produced by gperf version 3.1 */
 /* Command-line: gperf --global-table -t supported_exts.gperf  */
 /* Computed positions: -k'8-9,17' */
 
@@ -26,7 +26,7 @@
       && ('w' == 119) && ('x' == 120) && ('y' == 121) && ('z' == 122) \
       && ('{' == 123) && ('|' == 124) && ('}' == 125) && ('~' == 126))
 /* The character set is not based on ISO-646.  */
-#error "gperf generated tables don't work with this execution character set. Please report a bug to <bug-gnu-gperf@gnu.org>."
+#error "gperf generated tables don't work with this execution character set. Please report a bug to <bug-gperf@gnu.org>."
 #endif
 
 #line 1 "supported_exts.gperf"
@@ -49,7 +49,7 @@ inline
 #endif
 #endif
 static unsigned int
-x509_ext_hash (register const char *str, register unsigned int len)
+x509_ext_hash (register const char *str, register size_t len)
 {
   static const unsigned char asso_values[] =
     {
@@ -80,7 +80,7 @@ x509_ext_hash (register const char *str, register unsigned int len)
       35, 35, 35, 35, 35, 35, 35, 35, 35, 35,
       35, 35, 35, 35, 35, 35
     };
-  register int hval = len;
+  register unsigned int hval = len;
 
   switch (hval)
     {
@@ -142,20 +142,14 @@ static const struct supported_exts_st wordlist[] =
     {"2.5.29.17"}
   };
 
-#ifdef __GNUC__
-__inline
-#if defined __GNUC_STDC_INLINE__ || defined __GNUC_GNU_INLINE__
-__attribute__ ((__gnu_inline__))
-#endif
-#endif
-const struct supported_exts_st *
-is_ext_oid_supported (register const char *str, register unsigned int len)
+static const struct supported_exts_st *
+is_ext_oid_supported (register const char *str, register size_t len)
 {
   if (len <= MAX_WORD_LENGTH && len >= MIN_WORD_LENGTH)
     {
-      register int key = x509_ext_hash (str, len);
+      register unsigned int key = x509_ext_hash (str, len);
 
-      if (key <= MAX_HASH_VALUE && key >= 0)
+      if (key <= MAX_HASH_VALUE)
         {
           register const char *s = wordlist[key].name;
 

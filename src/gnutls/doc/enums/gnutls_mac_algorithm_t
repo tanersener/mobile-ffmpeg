@@ -56,4 +56,8 @@ The AES-GMAC-192 MAC algorithm (requires nonce).
 The AES-GMAC-256 MAC algorithm (requires nonce).
 @item GNUTLS_@-MAC_@-GOST28147_@-TC26Z_@-IMIT
 The GOST 28147-89 working in IMIT mode with TC26 Z S-box.
+@item GNUTLS_@-MAC_@-SHAKE_@-128
+Reserved; unimplemented.
+@item GNUTLS_@-MAC_@-SHAKE_@-256
+Reserved; unimplemented.
 @end table

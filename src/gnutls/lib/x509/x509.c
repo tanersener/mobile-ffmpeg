@@ -38,6 +38,8 @@
 #include <pkcs11_int.h>
 #include "urls.h"
 #include "system-keys.h"
+#include "hash.h"
+#include "hash-pjw-bare.h"
 
 static int crt_reinit(gnutls_x509_crt_t crt)
 {
@@ -404,41 +406,94 @@ static int cache_alt_names(gnutls_x509_crt_t cert)
 	return 0;
 }
 
+static bool hcomparator(const void *v1, const void *v2)
+{
+	return (strcmp(v1, v2)==0);
+}
+
+static size_t hhasher(const void *entry, size_t n)
+{
+	const char *e = entry;
+	if (e == NULL || e[0] == 0)
+		return 0;
+
+	return hash_pjw_bare(e, strlen(e)) % n;
+}
+
 int _gnutls_check_cert_sanity(gnutls_x509_crt_t cert)
 {
-	int result = 0, version;
+	int ret = 0, version;
 	gnutls_datum_t exts;
+	Hash_table *htable = NULL;
 
 	if (cert->flags & GNUTLS_X509_CRT_FLAG_IGNORE_SANITY)
 		return 0;
 
 	/* enforce the rule that only version 3 certificates carry extensions */
-	result = gnutls_x509_crt_get_version(cert);
-	if (result < 0) {
-		gnutls_assert();
-		goto cleanup;
+	ret = gnutls_x509_crt_get_version(cert);
+	if (ret < 0) {
+		return gnutls_assert_val(ret);
 	}
 
-	version = result;
+	version = ret;
 
 	if (version < 3) {
 		if (!cert->modified) {
-			result = _gnutls_x509_get_raw_field2(cert->cert, &cert->der,
+			ret = _gnutls_x509_get_raw_field2(cert->cert, &cert->der,
 				"tbsCertificate.extensions", &exts);
-			if (result >= 0 && exts.size > 0) {
-				gnutls_assert();
+			if (ret >= 0 && exts.size > 0) {
 				_gnutls_debug_log("error: extensions present in certificate with version %d\n", version);
-				result = GNUTLS_E_X509_CERTIFICATE_ERROR;
-				goto cleanup;
+				return gnutls_assert_val(GNUTLS_E_X509_CERTIFICATE_ERROR);
 			}
 		} else {
 			if (cert->use_extensions) {
-				gnutls_assert();
 				_gnutls_debug_log("error: extensions set in certificate with version %d\n", version);
-				result = GNUTLS_E_X509_CERTIFICATE_ERROR;
+				return gnutls_assert_val(GNUTLS_E_X509_CERTIFICATE_ERROR);
+			}
+		}
+	} else {
+		/* Version is >= 3; ensure no duplicate extensions are
+		 * present. */
+		unsigned i;
+		char oid[MAX_OID_SIZE];
+		size_t oid_size;
+		char *o;
+
+		htable = hash_initialize(16, NULL, hhasher, hcomparator, gnutls_free);
+		if (htable == NULL)
+			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+		for (i=0;;i++) {
+			oid_size = sizeof(oid);
+			ret = gnutls_x509_crt_get_extension_info(cert, i, oid, &oid_size, NULL);
+			if (ret < 0) {
+				if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+					break;
+				gnutls_assert();
+				goto cleanup;
+			}
+			o = gnutls_strdup(oid);
+			if (o == NULL) {
+				ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+				goto cleanup;
+			}
+
+			ret = hash_insert_if_absent(htable, o, NULL);
+			if (ret == -1) {
+				gnutls_free(o);
+				ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+				goto cleanup;
+			} else if (ret == 0) {
+				/* duplicate */
+				gnutls_free(o);
+				_gnutls_debug_log("error: duplicate extension (%s) detected\n", oid);
+				ret = gnutls_assert_val(GNUTLS_E_X509_DUPLICATE_EXTENSION);
 				goto cleanup;
 			}
 		}
+
+		hash_free(htable);
+		htable = NULL;
 	}
 
 	if (version < 2) {
@@ -446,36 +501,35 @@ int _gnutls_check_cert_sanity(gnutls_x509_crt_t cert)
 		size_t id_size;
 
 		id_size = sizeof(id);
-		result = gnutls_x509_crt_get_subject_unique_id(cert, id, &id_size);
-		if (result >= 0 || result == GNUTLS_E_SHORT_MEMORY_BUFFER) {
-			gnutls_assert();
+		ret = gnutls_x509_crt_get_subject_unique_id(cert, id, &id_size);
+		if (ret >= 0 || ret == GNUTLS_E_SHORT_MEMORY_BUFFER) {
 			_gnutls_debug_log("error: subjectUniqueID present in certificate with version %d\n", version);
-			result = GNUTLS_E_X509_CERTIFICATE_ERROR;
+			ret = gnutls_assert_val(GNUTLS_E_X509_CERTIFICATE_ERROR);
 			goto cleanup;
 		}
 
 		id_size = sizeof(id);
-		result = gnutls_x509_crt_get_issuer_unique_id(cert, id, &id_size);
-		if (result >= 0 || result == GNUTLS_E_SHORT_MEMORY_BUFFER) {
-			gnutls_assert();
+		ret = gnutls_x509_crt_get_issuer_unique_id(cert, id, &id_size);
+		if (ret >= 0 || ret == GNUTLS_E_SHORT_MEMORY_BUFFER) {
 			_gnutls_debug_log("error: subjectUniqueID present in certificate with version %d\n", version);
-			result = GNUTLS_E_X509_CERTIFICATE_ERROR;
+			ret = gnutls_assert_val(GNUTLS_E_X509_CERTIFICATE_ERROR);
 			goto cleanup;
 		}
 	}
 
 	if (gnutls_x509_crt_get_expiration_time(cert) == -1 ||
 	    gnutls_x509_crt_get_activation_time(cert) == -1) {
-		gnutls_assert();
 		_gnutls_debug_log("error: invalid expiration or activation time in certificate\n");
-		result = GNUTLS_E_CERTIFICATE_TIME_ERROR;
+		ret = gnutls_assert_val(GNUTLS_E_CERTIFICATE_TIME_ERROR);
 		goto cleanup;
 	}
 
-	result = 0;
+	ret = 0;
 
  cleanup:
-	return result;
+	if (htable)
+		hash_free(htable);
+	return ret;
 }
 
 /**
@@ -1123,29 +1177,12 @@ gnutls_x509_crt_get_signature(gnutls_x509_crt_t cert,
  **/
 int gnutls_x509_crt_get_version(gnutls_x509_crt_t cert)
 {
-	uint8_t version[8];
-	int len, result;
-
 	if (cert == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	len = sizeof(version);
-	if ((result =
-	     asn1_read_value(cert->cert, "tbsCertificate.version", version,
-			     &len)) != ASN1_SUCCESS) {
-
-		if (result == ASN1_ELEMENT_NOT_FOUND)
-			return 1;	/* the DEFAULT version */
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-
-	if (len != 1 || version[0] >= 0x80)
-		return gnutls_assert_val(GNUTLS_E_CERTIFICATE_ERROR);
-
-	return (int) version[0] + 1;
+	return _gnutls_x509_get_version(cert->cert, "tbsCertificate.version");
 }
 
 /**
@@ -2641,16 +2678,16 @@ gnutls_x509_crt_get_extension_info(gnutls_x509_crt_t cert, unsigned indx,
 	if (oid && len > 0 && ((uint8_t*)oid)[len-1] == 0)
 		(*oid_size)--;
 
-	snprintf(name, sizeof(name),
-		 "tbsCertificate.extensions.?%u.critical", indx + 1);
-	len = sizeof(str_critical);
-	result = asn1_read_value(cert->cert, name, str_critical, &len);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-
 	if (critical) {
+		snprintf(name, sizeof(name),
+			 "tbsCertificate.extensions.?%u.critical", indx + 1);
+		len = sizeof(str_critical);
+		result = asn1_read_value(cert->cert, name, str_critical, &len);
+		if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			return _gnutls_asn2err(result);
+		}
+
 		if (str_critical[0] == 'T')
 			*critical = 1;
 		else

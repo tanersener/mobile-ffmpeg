@@ -75,6 +75,7 @@ static int client_gen_key_share(gnutls_session_t session, const gnutls_group_ent
 	int ret;
 
 	if (group->pk != GNUTLS_PK_EC && group->pk != GNUTLS_PK_ECDH_X25519 &&
+	    group->pk != GNUTLS_PK_ECDH_X448 &&
 	    group->pk != GNUTLS_PK_DH) {
 		_gnutls_debug_log("Cannot send key share for group %s!\n", group->name);
 		return GNUTLS_E_INT_RET_0;
@@ -115,7 +116,8 @@ static int client_gen_key_share(gnutls_session_t session, const gnutls_group_ent
 
 		ret = 0;
 
-	} else if (group->pk == GNUTLS_PK_ECDH_X25519) {
+	} else if (group->pk == GNUTLS_PK_ECDH_X25519 ||
+		   group->pk == GNUTLS_PK_ECDH_X448) {
 		gnutls_pk_params_release(&session->key.kshare.ecdhx_params);
 		gnutls_pk_params_init(&session->key.kshare.ecdhx_params);
 
@@ -146,17 +148,17 @@ static int client_gen_key_share(gnutls_session_t session, const gnutls_group_ent
 		ret = _gnutls_mpi_init_scan_nz(&session->key.kshare.dh_params.params[DH_G],
 			group->generator->data, group->generator->size);
 		if (ret < 0)
-			return gnutls_assert_val(ret);
+			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
 		ret = _gnutls_mpi_init_scan_nz(&session->key.kshare.dh_params.params[DH_P],
 			group->prime->data, group->prime->size);
 		if (ret < 0)
-			return gnutls_assert_val(ret);
+			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
 		ret = _gnutls_mpi_init_scan_nz(&session->key.kshare.dh_params.params[DH_Q],
 			group->q->data, group->q->size);
 		if (ret < 0)
-			return gnutls_assert_val(ret);
+			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
 		session->key.kshare.dh_params.algo = group->pk;
 		session->key.kshare.dh_params.dh_group = group->id; /* no curve in FFDH, we write the group */
@@ -195,6 +197,7 @@ static int server_gen_key_share(gnutls_session_t session, const gnutls_group_ent
 	int ret;
 
 	if (group->pk != GNUTLS_PK_EC && group->pk != GNUTLS_PK_ECDH_X25519 &&
+	    group->pk != GNUTLS_PK_ECDH_X448 &&
 	    group->pk != GNUTLS_PK_DH) {
 		_gnutls_debug_log("Cannot send key share for group %s!\n", group->name);
 		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
@@ -224,7 +227,8 @@ static int server_gen_key_share(gnutls_session_t session, const gnutls_group_ent
 
 		ret = 0;
 
-	} else if (group->pk == GNUTLS_PK_ECDH_X25519) {
+	} else if (group->pk == GNUTLS_PK_ECDH_X25519 ||
+		   group->pk == GNUTLS_PK_ECDH_X448) {
 		ret =
 		    _gnutls_buffer_append_data_prefix(extdata, 16,
 				session->key.kshare.ecdhx_params.raw_pub.data,
@@ -300,7 +304,8 @@ server_use_key_share(gnutls_session_t session, const gnutls_group_entry_st *grou
 
 		ret = 0;
 
-	} else if (group->pk == GNUTLS_PK_ECDH_X25519) {
+	} else if (group->pk == GNUTLS_PK_ECDH_X25519 ||
+		   group->pk == GNUTLS_PK_ECDH_X448) {
 		gnutls_pk_params_st pub;
 
 		gnutls_pk_params_release(&session->key.kshare.ecdhx_params);
@@ -349,17 +354,17 @@ server_use_key_share(gnutls_session_t session, const gnutls_group_entry_st *grou
 		ret = _gnutls_mpi_init_scan_nz(&session->key.kshare.dh_params.params[DH_G],
 			group->generator->data, group->generator->size);
 		if (ret < 0)
-			return gnutls_assert_val(ret);
+			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
 		ret = _gnutls_mpi_init_scan_nz(&session->key.kshare.dh_params.params[DH_P],
 			group->prime->data, group->prime->size);
 		if (ret < 0)
-			return gnutls_assert_val(ret);
+			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
 		ret = _gnutls_mpi_init_scan_nz(&session->key.kshare.dh_params.params[DH_Q],
 			group->q->data, group->q->size);
 		if (ret < 0)
-			return gnutls_assert_val(ret);
+			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
 		session->key.kshare.dh_params.algo = GNUTLS_PK_DH;
 		session->key.kshare.dh_params.qbits = *group->q_bits;
@@ -376,7 +381,7 @@ server_use_key_share(gnutls_session_t session, const gnutls_group_entry_st *grou
 		ret = _gnutls_mpi_init_scan_nz(&pub.params[DH_Y],
 			data, data_size);
 		if (ret < 0)
-			return gnutls_assert_val(ret);
+			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
 		pub.algo = group->pk;
 
@@ -438,7 +443,8 @@ client_use_key_share(gnutls_session_t session, const gnutls_group_entry_st *grou
 
 		ret = 0;
 
-	} else if (group->pk == GNUTLS_PK_ECDH_X25519) {
+	} else if (group->pk == GNUTLS_PK_ECDH_X25519 ||
+		   group->pk == GNUTLS_PK_ECDH_X448) {
 		gnutls_pk_params_st pub;
 
 		curve = _gnutls_ecc_curve_get_params(group->curve);
@@ -483,7 +489,7 @@ client_use_key_share(gnutls_session_t session, const gnutls_group_entry_st *grou
 		ret = _gnutls_mpi_init_scan_nz(&pub.params[DH_Y],
 			data, data_size);
 		if (ret < 0)
-			return gnutls_assert_val(ret);
+			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
 		pub.algo = group->pk;
 
@@ -593,7 +599,7 @@ key_share_recv_params(gnutls_session_t session,
 
 		if (_gnutls_ext_get_msg(session) == GNUTLS_EXT_FLAG_HRR) {
 			if (unlikely(!(session->internals.hsk_flags & HSK_HRR_RECEIVED)))
-				return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+				return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
 			DECR_LEN(data_size, 2);
 			gid = _gnutls_read_uint16(data);
@@ -686,7 +692,7 @@ key_share_send_params(gnutls_session_t session,
 		if (session->internals.hsk_flags & HSK_HRR_RECEIVED) { /* we know the group */
 			group = get_group(session);
 			if (unlikely(group == NULL))
-				return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+				return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
 			ret = client_gen_key_share(session, group, extdata);
 			if (ret == GNUTLS_E_INT_RET_0)

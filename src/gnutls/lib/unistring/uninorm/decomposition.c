@@ -1,5 +1,5 @@
 /* Decomposition of Unicode characters.
-   Copyright (C) 2009-2019 Free Software Foundation, Inc.
+   Copyright (C) 2009-2020 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2009.
 
    This program is free software: you can redistribute it and/or
@@ -38,7 +38,7 @@ uc_decomposition (ucs4_t uc, int *decomp_tag, ucs4_t *decomposition)
     {
       /* Hangul syllable.  See Unicode standard, chapter 3, section
          "Hangul Syllable Decomposition",  See also the clarification at
-         <http://www.unicode.org/versions/Unicode5.1.0/>, section
+         <https://www.unicode.org/versions/Unicode5.1.0/>, section
          "Clarification of Hangul Jamo Handling".  */
       unsigned int t;
 

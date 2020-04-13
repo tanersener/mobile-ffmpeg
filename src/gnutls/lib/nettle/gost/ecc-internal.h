@@ -34,6 +34,10 @@
 #ifndef GNUTLS_LIB_NETTLE_GOST_ECC_INTERNAL_H
 #define GNUTLS_LIB_NETTLE_GOST_ECC_INTERNAL_H
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include <nettle/nettle-types.h>
 #include <nettle/bignum.h>
 #include <nettle/ecc-curve.h>
@@ -46,6 +50,8 @@
 #define ecc_mod_inv _nettle_ecc_mod_inv
 #define gost_hash _gnutls_gost_hash
 #define ecc_j_to_a _nettle_ecc_j_to_a
+#define ecc_dup_jj _nettle_ecc_dup_jj
+#define ecc_add_jja _nettle_ecc_add_jja
 #define ecc_add_jjj _nettle_ecc_add_jjj
 #define ecc_mul_g _nettle_ecc_mul_g
 #define ecc_mul_a _nettle_ecc_mul_a
@@ -78,6 +84,10 @@ typedef int ecc_mod_sqrt_func (const struct ecc_modulo *m,
 typedef void ecc_add_func (const struct ecc_curve *ecc,
 			   mp_limb_t *r,
 			   const mp_limb_t *p, const mp_limb_t *q,
+			   mp_limb_t *scratch);
+
+typedef void ecc_dup_func (const struct ecc_curve *ecc,
+			   mp_limb_t *r, const mp_limb_t *p,
 			   mp_limb_t *scratch);
 
 typedef void ecc_mul_g_func (const struct ecc_curve *ecc, mp_limb_t *r,
@@ -136,12 +146,24 @@ struct ecc_curve
   unsigned short pippenger_k;
   unsigned short pippenger_c;
 
+#ifdef HAVE_NETTLE_CURVE448_MUL
+  unsigned short add_hh_itch;
+#endif
   unsigned short add_hhh_itch;
+#ifdef HAVE_NETTLE_CURVE448_MUL
+  unsigned short dup_itch;
+#endif
   unsigned short mul_itch;
   unsigned short mul_g_itch;
   unsigned short h_to_a_itch;
 
+#ifdef HAVE_NETTLE_CURVE448_MUL
+  ecc_add_func *add_hh;
+#endif
   ecc_add_func *add_hhh;
+#ifdef HAVE_NETTLE_CURVE448_MUL
+  ecc_dup_func *dup;
+#endif
   ecc_mul_func *mul;
   ecc_mul_g_func *mul_g;
   ecc_h_to_a_func *h_to_a;
@@ -153,7 +175,9 @@ struct ecc_curve
   const mp_limb_t *g;
   /* If non-NULL, the constant needed for transformation to the
      equivalent Edwards curve. */
+#ifndef HAVE_NETTLE_CURVE448_MUL
   const mp_limb_t *edwards_root;
+#endif
 
   /* For redc, same as B mod p, otherwise 1. */
   const mp_limb_t *unit;
@@ -211,6 +235,25 @@ ecc_j_to_a (const struct ecc_curve *ecc,
 	    mp_limb_t *r, const mp_limb_t *p,
 	    mp_limb_t *scratch);
 
+/* Point doubling, with jacobian input and output. Corner cases:
+   Correctly sets R = 0 (r_Z = 0) if p = 0 or 2p = 0. */
+void
+ecc_dup_jj (const struct ecc_curve *ecc,
+	    mp_limb_t *r, const mp_limb_t *p,
+	    mp_limb_t *scratch);
+
+/* Point addition, with jacobian output, one jacobian input and one
+   affine input. Corner cases: Fails for the cases
+
+     P = Q != 0                       Duplication of non-zero point
+     P = 0, Q != 0 or P != 0, Q = 0   One input zero
+   
+     Correctly gives R = 0 if P = Q = 0 or P = -Q. */
+void
+ecc_add_jja (const struct ecc_curve *ecc,
+	     mp_limb_t *r, const mp_limb_t *p, const mp_limb_t *q,
+	     mp_limb_t *scratch);
+
 /* Point addition with Jacobian input and output. */
 void
 ecc_add_jjj (const struct ecc_curve *ecc,
@@ -240,6 +283,8 @@ cnd_copy (int cnd, mp_limb_t *rp, const mp_limb_t *ap, mp_size_t n);
 /* Current scratch needs: */
 #define ECC_MOD_INV_ITCH(size) (2*(size))
 #define ECC_J_TO_A_ITCH(size) (5*(size))
+#define ECC_DUP_JJ_ITCH(size) (5*(size))
+#define ECC_ADD_JJA_ITCH(size) (6*(size))
 #define ECC_ADD_JJJ_ITCH(size) (8*(size))
 #define ECC_MUL_G_ITCH(size) (9*(size))
 #if ECC_MUL_A_WBITS == 0

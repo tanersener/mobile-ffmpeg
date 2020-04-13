@@ -1,5 +1,5 @@
-# getaddrinfo.m4 serial 31
-dnl Copyright (C) 2004-2019 Free Software Foundation, Inc.
+# getaddrinfo.m4 serial 32
+dnl Copyright (C) 2004-2020 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -55,10 +55,40 @@ AC_DEFUN([gl_GETADDRINFO],
     if test "$gl_cv_w32_getaddrinfo" = "yes"; then
       GETADDRINFO_LIB="-lws2_32"
       LIBS="$gai_saved_LIBS $GETADDRINFO_LIB"
+      dnl Check for correct signature, in particular for a cdecl-compatible
+      dnl calling convention.
+      AC_CACHE_CHECK([for getaddrinfo with POSIX signature],
+        [gl_cv_func_getaddrinfo_posix_signature],
+        [AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
+#include <sys/types.h>
+#ifdef HAVE_SYS_SOCKET_H
+#include <sys/socket.h>
+#endif
+#ifdef HAVE_NETDB_H
+#include <netdb.h>
+#endif
+#ifdef HAVE_WS2TCPIP_H
+#include <ws2tcpip.h>
+#endif
+#include <stddef.h>
+extern
+#ifdef __cplusplus
+"C"
+#endif
+int getaddrinfo (const char *, const char *, const struct addrinfo *, struct addrinfo **);
+]])],
+           [gl_cv_func_getaddrinfo_posix_signature=yes],
+           [gl_cv_func_getaddrinfo_posix_signature=no])
+        ])
+      if test $gl_cv_func_getaddrinfo_posix_signature = no; then
+        REPLACE_GETADDRINFO=1
+      fi
     else
       HAVE_GETADDRINFO=0
     fi
   fi
+  AC_DEFINE_UNQUOTED([HAVE_GETADDRINFO], [$HAVE_GETADDRINFO],
+    [Define to 1 if getaddrinfo exists, or to 0 otherwise.])
 
   # We can't use AC_REPLACE_FUNCS here because gai_strerror may be an
   # inline function declared in ws2tcpip.h, so we need to get that

@@ -341,7 +341,7 @@ static void server(int fd)
 
 	do {
 		ret = gnutls_record_recv(session, buf, sizeof(buf));
-	} while(ret > 0);
+	} while(ret > 0 || ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
 	if (ret < 0) {
 		fail("error: %s\n", gnutls_strerror(ret));

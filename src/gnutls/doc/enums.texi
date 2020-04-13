@@ -76,6 +76,10 @@ cipher-stealing requires to know where the message actually terminates
 in order to be able to compute where the stealing occurs.
 @item GNUTLS_@-CIPHER_@-GOST28147_@-TC26Z_@-CNT
 GOST 28147-89 (Magma) cipher in CNT mode with TC26 Z S-box.
+@item GNUTLS_@-CIPHER_@-CHACHA20_@-64
+Chacha20 cipher with 64-bit nonces and 64-bit block counters.
+@item GNUTLS_@-CIPHER_@-CHACHA20_@-32
+Chacha20 cipher with 96-bit nonces and 32-bit block counters.
 @item GNUTLS_@-CIPHER_@-IDEA_@-PGP_@-CFB
 IDEA in CFB mode (placeholder - unsupported).
 @item GNUTLS_@-CIPHER_@-3DES_@-PGP_@-CFB
@@ -214,6 +218,10 @@ The AES-GMAC-192 MAC algorithm (requires nonce).
 The AES-GMAC-256 MAC algorithm (requires nonce).
 @item GNUTLS_@-MAC_@-GOST28147_@-TC26Z_@-IMIT
 The GOST 28147-89 working in IMIT mode with TC26 Z S-box.
+@item GNUTLS_@-MAC_@-SHAKE_@-128
+Reserved; unimplemented.
+@item GNUTLS_@-MAC_@-SHAKE_@-256
+Reserved; unimplemented.
 @end table
 
 @c gnutls_digest_algorithm_t
@@ -254,6 +262,10 @@ GOST R 34.11-94 algorithm.
 GOST R 34.11-2001 (Streebog) algorithm, 256 bit.
 @item GNUTLS_@-DIG_@-STREEBOG_@-512
 GOST R 34.11-2001 (Streebog) algorithm, 512 bit.
+@item GNUTLS_@-DIG_@-SHAKE_@-128
+Reserved; unimplemented.
+@item GNUTLS_@-DIG_@-SHAKE_@-256
+Reserved; unimplemented.
 @end table
 
 @c gnutls_compression_method_t
@@ -628,6 +640,10 @@ GOST R 34.10-2001 algorithm per rfc5832.
 GOST R 34.10-2012 algorithm, 256-bit key per rfc7091.
 @item GNUTLS_@-PK_@-GOST_@-12_@-512
 GOST R 34.10-2012 algorithm, 512-bit key per rfc7091.
+@item GNUTLS_@-PK_@-ECDH_@-X448
+Elliptic curve algorithm, restricted to ECDH as per rfc7748.
+@item GNUTLS_@-PK_@-EDDSA_@-ED448
+Edwards curve Digital signature algorithm. Used with SHAKE256 on signatures.
 @item GNUTLS_@-PK_@-MAX
 -- undescribed --
 @end table
@@ -737,6 +753,8 @@ Digital signature algorithm GOST R 34.10-2001 with GOST R 34.11-94
 Digital signature algorithm GOST R 34.10-2012 with GOST R 34.11-2012 256 bit
 @item GNUTLS_@-SIGN_@-GOST_@-512
 Digital signature algorithm GOST R 34.10-2012 with GOST R 34.11-2012 512 bit
+@item GNUTLS_@-SIGN_@-EDDSA_@-ED448
+Digital signature algorithm EdDSA with Ed448 curve.
 @item GNUTLS_@-SIGN_@-MAX
 -- undescribed --
 @end table
@@ -783,6 +801,10 @@ GOST R 34.10 TC26 256 B curve
 GOST R 34.10 TC26 256 C curve
 @item GNUTLS_@-ECC_@-CURVE_@-GOST256D
 GOST R 34.10 TC26 256 D curve
+@item GNUTLS_@-ECC_@-CURVE_@-X448
+the X448 curve (ECDH only)
+@item GNUTLS_@-ECC_@-CURVE_@-ED448
+the Ed448 curve
 @item GNUTLS_@-ECC_@-CURVE_@-MAX
 -- undescribed --
 @end table
@@ -803,6 +825,8 @@ the SECP384R1 curve group
 the SECP521R1 curve group
 @item GNUTLS_@-GROUP_@-X25519
 the X25519 curve group
+@item GNUTLS_@-GROUP_@-X448
+the X448 curve group
 @item GNUTLS_@-GROUP_@-GC256A
 the GOST R 34.10 TC26 256 A curve group
 @item GNUTLS_@-GROUP_@-GC256B
@@ -923,6 +947,10 @@ Indicates client capability for post-handshake auth; set only on server side.
 The TLS1.3 server session returned early.
 @item GNUTLS_@-SFLAGS_@-EARLY_@-DATA
 The TLS1.3 early data has been received by the server.
+@item GNUTLS_@-SFLAGS_@-CLI_@-REQUESTED_@-OCSP
+Set when the client has requested OCSP staple during handshake.
+@item GNUTLS_@-SFLAGS_@-SERV_@-REQUESTED_@-OCSP
+Set when the server has requested OCSP staple during handshake.
 @end table
 
 @c gnutls_supplemental_data_format_type_t

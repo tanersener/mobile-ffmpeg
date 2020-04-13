@@ -11,8 +11,8 @@
 
 @var{critical}: will be non-zero if the extension is marked as critical
 
-This function will extract the certificate policy (extension 2.5.29.32) 
-specified by the given index. 
+This function will extract the certificate policy (extension 2.5.29.32)
+specified by the given index.
 
 The policy returned by this function must be deinitialized by using
 @code{gnutls_x509_policy_release()} .

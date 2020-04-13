@@ -78,6 +78,9 @@ changed
        --print-cert           Print peer's certificate in PEM format
        --save-cert=str        Save the peer's certificate chain in the specified file in PEM format
        --save-ocsp=str        Save the peer's OCSP status response in the provided file
+                                - prohibits the option 'save-ocsp-multi'
+       --save-ocsp-multi=str  Save all OCSP responses provided by the peer in this file
+                                - prohibits the option 'save-ocsp'
        --save-server-trace=str Save the server-side TLS message trace in the provided file
        --save-client-trace=str Save the client-side TLS message trace in the provided file
        --dh-bits=num          The minimum number of bits allowed for DH
@@ -88,6 +91,9 @@ changed
        --x509keyfile=str      X.509 key file or PKCS #11 URL to use
        --x509certfile=str     X.509 Certificate file or PKCS #11 URL to use
                                 - requires the option 'x509keyfile'
+       --rawpkkeyfile=str     Private key file (PKCS #8 or PKCS #12) or PKCS #11 URL to use
+       --rawpkfile=str        Raw public-key file to use
+                                - requires the option 'rawpkkeyfile'
        --srpusername=str      SRP username to use
        --srppasswd=str        SRP password to use
        --pskusername=str      PSK username to use
@@ -275,6 +281,21 @@ starttls.
 @end itemize
 
 Specify the application layer protocol for STARTTLS. If the protocol is supported, gnutls-cli will proceed to the TLS negotiation.
+@anchor{gnutls-cli save-ocsp-multi}
+@subheading save-ocsp-multi option
+
+This is the ``save all ocsp responses provided by the peer in this file'' option.
+This option takes a string argument.
+
+@noindent
+This option has some usage constraints.  It:
+@itemize @bullet
+@item
+must not appear in combination with any of the following options:
+save-ocsp.
+@end itemize
+
+The file will contain a list of PEM encoded OCSP status responses if any were provided by the peer, starting with the one for the peer's server certificate.
 @anchor{gnutls-cli dh-bits}
 @subheading dh-bits option
 

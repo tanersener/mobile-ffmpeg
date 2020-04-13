@@ -16,7 +16,7 @@
 This function will verify the given signed data, using the
 parameters from the certificate.
 
-@strong{Returns:} In case of a verification failure @code{GNUTLS_E_PK_SIG_VERIFY_FAILED}  
+@strong{Returns:} In case of a verification failure @code{GNUTLS_E_PK_SIG_VERIFY_FAILED} 
 is returned, @code{GNUTLS_E_EXPIRED}  or @code{GNUTLS_E_NOT_YET_ACTIVATED}  on expired
 or not yet activated certificate and zero or positive code on success.
 

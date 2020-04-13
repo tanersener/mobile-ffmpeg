@@ -29,6 +29,11 @@ if ! test -x "${CERTTOOL}"; then
 	exit 77
 fi
 
+if test "${GNUTLS_FORCE_FIPS_MODE}" = 1;then
+	echo "Cannot run in FIPS140-2 mode"
+	exit 77
+fi
+
 if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=1"
 fi
@@ -68,6 +73,20 @@ echo "Testing encoding/decoding"
 echo "========================="
 
 ${VALGRIND} "${CERTTOOL}" --pkcs-cipher=gost28147-tc26z --hash streebog-256 --to-p12 --password "Пароль для PFX" --p12-name "my-key" --load-certificate "${srcdir}/../certs/cert-ecc256.pem" --load-privkey "${srcdir}/../certs/ecc256.pem" --load-ca-certificate "${srcdir}/../certs/ca-cert-ecc.pem" --outder --outfile $TMPFILE >/dev/null
+rc=$?
+if test ${rc} != 0; then
+	echo "PKCS12 FATAL encoding"
+	exit 1
+fi
+
+${VALGRIND} "${CERTTOOL}" --p12-info --inder --password "Пароль для PFX" --infile $TMPFILE >${TMPFILE_PEM} 2>/dev/null
+rc=$?
+if test ${rc} != 0; then
+	echo "PKCS12 FATAL decrypting/decoding"
+	exit 1
+fi
+
+${VALGRIND} "${CERTTOOL}" --pkcs-cipher=gost28147-tc26z --hash streebog-512 --to-p12 --password "Пароль для PFX" --p12-name "my-key" --load-certificate "${srcdir}/../certs/cert-ecc256.pem" --load-privkey "${srcdir}/../certs/ecc256.pem" --load-ca-certificate "${srcdir}/../certs/ca-cert-ecc.pem" --outder --outfile $TMPFILE >/dev/null
 rc=$?
 if test ${rc} != 0; then
 	echo "PKCS12 FATAL encoding"

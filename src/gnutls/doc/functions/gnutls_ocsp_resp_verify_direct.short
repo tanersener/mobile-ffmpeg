@@ -1,1 +1,1 @@
-@item @var{int} @ref{gnutls_ocsp_resp_verify_direct} (gnutls_ocsp_resp_t @var{resp}, gnutls_x509_crt_t @var{issuer}, unsigned int * @var{verify}, unsigned int @var{flags})
+@item @var{int} @ref{gnutls_ocsp_resp_verify_direct} (gnutls_ocsp_resp_const_t @var{resp}, gnutls_x509_crt_t @var{issuer}, unsigned int * @var{verify}, unsigned int @var{flags})

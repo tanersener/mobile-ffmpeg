@@ -38,4 +38,8 @@ GOST R 34.11-94 algorithm.
 GOST R 34.11-2001 (Streebog) algorithm, 256 bit.
 @item GNUTLS_@-DIG_@-STREEBOG_@-512
 GOST R 34.11-2001 (Streebog) algorithm, 512 bit.
+@item GNUTLS_@-DIG_@-SHAKE_@-128
+Reserved; unimplemented.
+@item GNUTLS_@-DIG_@-SHAKE_@-256
+Reserved; unimplemented.
 @end table

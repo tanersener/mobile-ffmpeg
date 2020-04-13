@@ -289,3 +289,10 @@
    fun:fillin_rpath
    ...
 }
+{
+   gnutls-false-positive
+   Memcheck:Cond
+   fun:decode_complex_string.isra.0
+   fun:_gnutls_x509_dn_to_string
+   ...
+}

@@ -2,7 +2,7 @@
 
 
 
-@deftypefun {int} {gnutls_ocsp_resp_get_status} (gnutls_ocsp_resp_t @var{resp})
+@deftypefun {int} {gnutls_ocsp_resp_get_status} (gnutls_ocsp_resp_const_t @var{resp})
 @var{resp}: should contain a @code{gnutls_ocsp_resp_t}  type
 
 This function will return the status of a OCSP response, an

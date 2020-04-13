@@ -2,7 +2,7 @@
 
 
 
-@deftypefun {int} {gnutls_ocsp_resp_get_responder_raw_id} (gnutls_ocsp_resp_t @var{resp}, unsigned @var{type}, gnutls_datum_t * @var{raw})
+@deftypefun {int} {gnutls_ocsp_resp_get_responder_raw_id} (gnutls_ocsp_resp_const_t @var{resp}, unsigned @var{type}, gnutls_datum_t * @var{raw})
 @var{resp}: should contain a @code{gnutls_ocsp_resp_t}  type
 
 @var{type}: should be @code{GNUTLS_OCSP_RESP_ID_KEY}  or @code{GNUTLS_OCSP_RESP_ID_DN} 

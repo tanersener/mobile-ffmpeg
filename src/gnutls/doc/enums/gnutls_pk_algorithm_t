@@ -24,6 +24,10 @@ GOST R 34.10-2001 algorithm per rfc5832.
 GOST R 34.10-2012 algorithm, 256-bit key per rfc7091.
 @item GNUTLS_@-PK_@-GOST_@-12_@-512
 GOST R 34.10-2012 algorithm, 512-bit key per rfc7091.
+@item GNUTLS_@-PK_@-ECDH_@-X448
+Elliptic curve algorithm, restricted to ECDH as per rfc7748.
+@item GNUTLS_@-PK_@-EDDSA_@-ED448
+Edwards curve Digital signature algorithm. Used with SHAKE256 on signatures.
 @item GNUTLS_@-PK_@-MAX
 -- undescribed --
 @end table

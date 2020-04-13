@@ -19,7 +19,7 @@
  * The certtool program is copyrighted and licensed
  * under the following terms:
  *
- *  Copyright (C) 2000-2019 Free Software Foundation, and others, all rights reserved.
+ *  Copyright (C) 2000-2020 Free Software Foundation, and others, all rights reserved.
  *  This is free software. It is licensed for use, modification and
  *  redistribution under the terms of the GNU General Public License,
  *  version 3 or later <http://gnu.org/licenses/gpl.html>
@@ -67,9 +67,9 @@ extern FILE * option_usage_fp;
 /**
  *  static const strings for certtool options
  */
-static char const certtool_opt_strs[7314] =
-/*     0 */ "certtool 3.6.11\n"
-            "Copyright (C) 2000-2019 Free Software Foundation, and others, all rights reserved.\n"
+static char const certtool_opt_strs[7405] =
+/*     0 */ "certtool 3.6.13\n"
+            "Copyright (C) 2000-2020 Free Software Foundation, and others, all rights reserved.\n"
             "This is free software. It is licensed for use, modification and\n"
             "redistribution under the terms of the GNU General Public License,\n"
             "version 3 or later <http://gnu.org/licenses/gpl.html>\n\0"
@@ -218,152 +218,155 @@ static char const certtool_opt_strs[7314] =
 /*  3811 */ "Allow broken algorithms, such as MD5 for verification\0"
 /*  3865 */ "VERIFY_ALLOW_BROKEN\0"
 /*  3885 */ "verify-allow-broken\0"
-/*  3905 */ "PKCS#7 structure options:\0"
-/*  3931 */ "Generate a PKCS #7 structure\0"
-/*  3960 */ "P7_GENERATE\0"
-/*  3972 */ "p7-generate\0"
-/*  3984 */ "Signs using a PKCS #7 structure\0"
-/*  4016 */ "P7_SIGN\0"
-/*  4024 */ "p7-sign\0"
-/*  4032 */ "Signs using a detached PKCS #7 structure\0"
-/*  4073 */ "P7_DETACHED_SIGN\0"
-/*  4090 */ "p7-detached-sign\0"
-/*  4107 */ "The signer's certificate will be included in the cert list.\0"
-/*  4167 */ "P7_INCLUDE_CERT\0"
-/*  4183 */ "no-p7-include-cert\0"
-/*  4202 */ "no\0"
-/*  4205 */ "Will include a timestamp in the PKCS #7 structure\0"
-/*  4255 */ "P7_TIME\0"
-/*  4263 */ "no-p7-time\0"
-/*  4274 */ "Will show the embedded data in the PKCS #7 structure\0"
-/*  4327 */ "P7_SHOW_DATA\0"
-/*  4340 */ "no-p7-show-data\0"
-/*  4356 */ "Print information on a PKCS #7 structure\0"
-/*  4397 */ "P7_INFO\0"
-/*  4405 */ "p7-info\0"
-/*  4413 */ "Verify the provided PKCS #7 structure\0"
-/*  4451 */ "P7_VERIFY\0"
-/*  4461 */ "p7-verify\0"
-/*  4471 */ "Convert S/MIME to PKCS #7 structure\0"
-/*  4507 */ "SMIME_TO_P7\0"
-/*  4519 */ "smime-to-p7\0"
-/*  4531 */ "Other options:\0"
-/*  4546 */ "Generate PKCS #3 encoded Diffie-Hellman parameters (deprecated)\0"
-/*  4610 */ "GENERATE_DH_PARAMS\0"
-/*  4629 */ "generate-dh-params\0"
-/*  4648 */ "List the included PKCS #3 encoded Diffie-Hellman parameters\0"
-/*  4708 */ "GET_DH_PARAMS\0"
-/*  4722 */ "get-dh-params\0"
-/*  4736 */ "Print information PKCS #3 encoded Diffie-Hellman parameters\0"
-/*  4796 */ "DH_INFO\0"
-/*  4804 */ "dh-info\0"
-/*  4812 */ "Loads a private key file\0"
-/*  4837 */ "LOAD_PRIVKEY\0"
-/*  4850 */ "load-privkey\0"
-/*  4863 */ "Loads a public key file\0"
-/*  4887 */ "LOAD_PUBKEY\0"
-/*  4899 */ "load-pubkey\0"
-/*  4911 */ "Loads a certificate request file\0"
-/*  4944 */ "LOAD_REQUEST\0"
-/*  4957 */ "load-request\0"
-/*  4970 */ "Loads a certificate file\0"
-/*  4995 */ "LOAD_CERTIFICATE\0"
-/*  5012 */ "load-certificate\0"
-/*  5029 */ "Loads the certificate authority's private key file\0"
-/*  5080 */ "LOAD_CA_PRIVKEY\0"
-/*  5096 */ "load-ca-privkey\0"
-/*  5112 */ "Loads the certificate authority's certificate file\0"
-/*  5163 */ "LOAD_CA_CERTIFICATE\0"
-/*  5183 */ "load-ca-certificate\0"
-/*  5203 */ "Loads the provided CRL\0"
-/*  5226 */ "LOAD_CRL\0"
-/*  5235 */ "load-crl\0"
-/*  5244 */ "Loads auxiliary data\0"
-/*  5265 */ "LOAD_DATA\0"
-/*  5275 */ "load-data\0"
-/*  5285 */ "Password to use\0"
-/*  5301 */ "PASSWORD\0"
-/*  5310 */ "password\0"
-/*  5319 */ "Enforce a NULL password\0"
-/*  5343 */ "NULL_PASSWORD\0"
-/*  5357 */ "null-password\0"
-/*  5371 */ "Enforce an empty password\0"
-/*  5397 */ "EMPTY_PASSWORD\0"
-/*  5412 */ "empty-password\0"
-/*  5427 */ "Print big number in an easier format to parse\0"
-/*  5473 */ "HEX_NUMBERS\0"
-/*  5485 */ "hex-numbers\0"
-/*  5497 */ "In certain operations it prints the information in C-friendly format\0"
-/*  5566 */ "CPRINT\0"
-/*  5573 */ "cprint\0"
-/*  5580 */ "Generate RSA key (deprecated)\0"
-/*  5610 */ "RSA\0"
-/*  5614 */ "rsa\0"
-/*  5618 */ "Generate DSA key (deprecated)\0"
-/*  5648 */ "DSA\0"
-/*  5652 */ "dsa\0"
-/*  5656 */ "Generate ECC (ECDSA) key (deprecated)\0"
-/*  5694 */ "ECC\0"
-/*  5698 */ "ecc\0"
-/*  5702 */ "an alias for the 'ecc' option (deprecated)\0"
-/*  5745 */ "ecdsa\0"
-/*  5751 */ "Hash algorithm to use for signing\0"
-/*  5785 */ "HASH\0"
-/*  5790 */ "hash\0"
-/*  5795 */ "Specify the RSA-PSS key default salt size\0"
-/*  5837 */ "SALT_SIZE\0"
-/*  5847 */ "salt-size\0"
-/*  5857 */ "Use DER format for input certificates, private keys, and DH parameters\0"
-/*  5928 */ "INDER\0"
-/*  5934 */ "no-inder\0"
-/*  5943 */ "an alias for the 'inder' option\0"
-/*  5975 */ "inraw\0"
-/*  5981 */ "Use DER format for output certificates, private keys, and DH parameters\0"
-/*  6053 */ "OUTDER\0"
-/*  6060 */ "no-outder\0"
-/*  6070 */ "an alias for the 'outder' option\0"
-/*  6103 */ "outraw\0"
-/*  6110 */ "No effect (deprecated)\0"
-/*  6133 */ "DISABLE_QUICK_RANDOM\0"
-/*  6154 */ "disable-quick-random\0"
-/*  6175 */ "Template file to use for non-interactive operation\0"
-/*  6226 */ "TEMPLATE\0"
-/*  6235 */ "template\0"
-/*  6244 */ "Print information to stdout instead of stderr\0"
-/*  6290 */ "STDOUT_INFO\0"
-/*  6302 */ "stdout-info\0"
-/*  6314 */ "Enable interaction for entering password when in batch mode.\0"
-/*  6375 */ "ASK_PASS\0"
-/*  6384 */ "ask-pass\0"
-/*  6393 */ "Cipher to use for PKCS #8 and #12 operations\0"
-/*  6438 */ "PKCS_CIPHER\0"
-/*  6450 */ "pkcs-cipher\0"
-/*  6462 */ "Specify the PKCS #11 provider library\0"
-/*  6500 */ "PROVIDER\0"
-/*  6509 */ "provider\0"
-/*  6518 */ "Output textual information before PEM-encoded certificates, private\n"
+/*  3905 */ "Specify a security level profile to be used for verification\0"
+/*  3966 */ "VERIFY_PROFILE\0"
+/*  3981 */ "verify-profile\0"
+/*  3996 */ "PKCS#7 structure options:\0"
+/*  4022 */ "Generate a PKCS #7 structure\0"
+/*  4051 */ "P7_GENERATE\0"
+/*  4063 */ "p7-generate\0"
+/*  4075 */ "Signs using a PKCS #7 structure\0"
+/*  4107 */ "P7_SIGN\0"
+/*  4115 */ "p7-sign\0"
+/*  4123 */ "Signs using a detached PKCS #7 structure\0"
+/*  4164 */ "P7_DETACHED_SIGN\0"
+/*  4181 */ "p7-detached-sign\0"
+/*  4198 */ "The signer's certificate will be included in the cert list.\0"
+/*  4258 */ "P7_INCLUDE_CERT\0"
+/*  4274 */ "no-p7-include-cert\0"
+/*  4293 */ "no\0"
+/*  4296 */ "Will include a timestamp in the PKCS #7 structure\0"
+/*  4346 */ "P7_TIME\0"
+/*  4354 */ "no-p7-time\0"
+/*  4365 */ "Will show the embedded data in the PKCS #7 structure\0"
+/*  4418 */ "P7_SHOW_DATA\0"
+/*  4431 */ "no-p7-show-data\0"
+/*  4447 */ "Print information on a PKCS #7 structure\0"
+/*  4488 */ "P7_INFO\0"
+/*  4496 */ "p7-info\0"
+/*  4504 */ "Verify the provided PKCS #7 structure\0"
+/*  4542 */ "P7_VERIFY\0"
+/*  4552 */ "p7-verify\0"
+/*  4562 */ "Convert S/MIME to PKCS #7 structure\0"
+/*  4598 */ "SMIME_TO_P7\0"
+/*  4610 */ "smime-to-p7\0"
+/*  4622 */ "Other options:\0"
+/*  4637 */ "Generate PKCS #3 encoded Diffie-Hellman parameters (deprecated)\0"
+/*  4701 */ "GENERATE_DH_PARAMS\0"
+/*  4720 */ "generate-dh-params\0"
+/*  4739 */ "List the included PKCS #3 encoded Diffie-Hellman parameters\0"
+/*  4799 */ "GET_DH_PARAMS\0"
+/*  4813 */ "get-dh-params\0"
+/*  4827 */ "Print information PKCS #3 encoded Diffie-Hellman parameters\0"
+/*  4887 */ "DH_INFO\0"
+/*  4895 */ "dh-info\0"
+/*  4903 */ "Loads a private key file\0"
+/*  4928 */ "LOAD_PRIVKEY\0"
+/*  4941 */ "load-privkey\0"
+/*  4954 */ "Loads a public key file\0"
+/*  4978 */ "LOAD_PUBKEY\0"
+/*  4990 */ "load-pubkey\0"
+/*  5002 */ "Loads a certificate request file\0"
+/*  5035 */ "LOAD_REQUEST\0"
+/*  5048 */ "load-request\0"
+/*  5061 */ "Loads a certificate file\0"
+/*  5086 */ "LOAD_CERTIFICATE\0"
+/*  5103 */ "load-certificate\0"
+/*  5120 */ "Loads the certificate authority's private key file\0"
+/*  5171 */ "LOAD_CA_PRIVKEY\0"
+/*  5187 */ "load-ca-privkey\0"
+/*  5203 */ "Loads the certificate authority's certificate file\0"
+/*  5254 */ "LOAD_CA_CERTIFICATE\0"
+/*  5274 */ "load-ca-certificate\0"
+/*  5294 */ "Loads the provided CRL\0"
+/*  5317 */ "LOAD_CRL\0"
+/*  5326 */ "load-crl\0"
+/*  5335 */ "Loads auxiliary data\0"
+/*  5356 */ "LOAD_DATA\0"
+/*  5366 */ "load-data\0"
+/*  5376 */ "Password to use\0"
+/*  5392 */ "PASSWORD\0"
+/*  5401 */ "password\0"
+/*  5410 */ "Enforce a NULL password\0"
+/*  5434 */ "NULL_PASSWORD\0"
+/*  5448 */ "null-password\0"
+/*  5462 */ "Enforce an empty password\0"
+/*  5488 */ "EMPTY_PASSWORD\0"
+/*  5503 */ "empty-password\0"
+/*  5518 */ "Print big number in an easier format to parse\0"
+/*  5564 */ "HEX_NUMBERS\0"
+/*  5576 */ "hex-numbers\0"
+/*  5588 */ "In certain operations it prints the information in C-friendly format\0"
+/*  5657 */ "CPRINT\0"
+/*  5664 */ "cprint\0"
+/*  5671 */ "Generate RSA key (deprecated)\0"
+/*  5701 */ "RSA\0"
+/*  5705 */ "rsa\0"
+/*  5709 */ "Generate DSA key (deprecated)\0"
+/*  5739 */ "DSA\0"
+/*  5743 */ "dsa\0"
+/*  5747 */ "Generate ECC (ECDSA) key (deprecated)\0"
+/*  5785 */ "ECC\0"
+/*  5789 */ "ecc\0"
+/*  5793 */ "an alias for the 'ecc' option (deprecated)\0"
+/*  5836 */ "ecdsa\0"
+/*  5842 */ "Hash algorithm to use for signing\0"
+/*  5876 */ "HASH\0"
+/*  5881 */ "hash\0"
+/*  5886 */ "Specify the RSA-PSS key default salt size\0"
+/*  5928 */ "SALT_SIZE\0"
+/*  5938 */ "salt-size\0"
+/*  5948 */ "Use DER format for input certificates, private keys, and DH parameters\0"
+/*  6019 */ "INDER\0"
+/*  6025 */ "no-inder\0"
+/*  6034 */ "an alias for the 'inder' option\0"
+/*  6066 */ "inraw\0"
+/*  6072 */ "Use DER format for output certificates, private keys, and DH parameters\0"
+/*  6144 */ "OUTDER\0"
+/*  6151 */ "no-outder\0"
+/*  6161 */ "an alias for the 'outder' option\0"
+/*  6194 */ "outraw\0"
+/*  6201 */ "No effect (deprecated)\0"
+/*  6224 */ "DISABLE_QUICK_RANDOM\0"
+/*  6245 */ "disable-quick-random\0"
+/*  6266 */ "Template file to use for non-interactive operation\0"
+/*  6317 */ "TEMPLATE\0"
+/*  6326 */ "template\0"
+/*  6335 */ "Print information to stdout instead of stderr\0"
+/*  6381 */ "STDOUT_INFO\0"
+/*  6393 */ "stdout-info\0"
+/*  6405 */ "Enable interaction for entering password when in batch mode.\0"
+/*  6466 */ "ASK_PASS\0"
+/*  6475 */ "ask-pass\0"
+/*  6484 */ "Cipher to use for PKCS #8 and #12 operations\0"
+/*  6529 */ "PKCS_CIPHER\0"
+/*  6541 */ "pkcs-cipher\0"
+/*  6553 */ "Specify the PKCS #11 provider library\0"
+/*  6591 */ "PROVIDER\0"
+/*  6600 */ "provider\0"
+/*  6609 */ "Output textual information before PEM-encoded certificates, private\n"
             "keys, etc\0"
-/*  6596 */ "TEXT\0"
-/*  6601 */ "no-text\0"
-/*  6609 */ "display extended usage information and exit\0"
-/*  6653 */ "help\0"
-/*  6658 */ "extended usage information passed thru pager\0"
-/*  6703 */ "more-help\0"
-/*  6713 */ "output version information and exit\0"
-/*  6749 */ "version\0"
-/*  6757 */ "CERTTOOL\0"
-/*  6766 */ "certtool - GnuTLS certificate tool\n"
+/*  6687 */ "TEXT\0"
+/*  6692 */ "no-text\0"
+/*  6700 */ "display extended usage information and exit\0"
+/*  6744 */ "help\0"
+/*  6749 */ "extended usage information passed thru pager\0"
+/*  6794 */ "more-help\0"
+/*  6804 */ "output version information and exit\0"
+/*  6840 */ "version\0"
+/*  6848 */ "CERTTOOL\0"
+/*  6857 */ "certtool - GnuTLS certificate tool\n"
             "Usage:  %s [ -<flag> [<val>] | --<name>[{=| }<val>] ]...\n\0"
-/*  6859 */ "bugs@gnutls.org\0"
-/*  6875 */ "\n\0"
-/*  6877 */ "Tool to parse and generate X.509 certificates, requests and private keys.\n"
+/*  6950 */ "bugs@gnutls.org\0"
+/*  6966 */ "\n\0"
+/*  6968 */ "Tool to parse and generate X.509 certificates, requests and private keys.\n"
             "It can be used interactively or non interactively by specifying the\n"
             "template command line option.\n\n"
             "The tool accepts files or supported URIs via the --infile option.  In case\n"
             "PIN is required for URI access you can provide it using the environment\n"
             "variables GNUTLS_PIN and GNUTLS_SO_PIN.\n\0"
-/*  7238 */ "certtool 3.6.11\0"
-/*  7254 */ "certtool [options]\n"
+/*  7329 */ "certtool 3.6.13\0"
+/*  7345 */ "certtool [options]\n"
             "certtool --help for usage instructions.\n";
 
 /**
@@ -950,21 +953,34 @@ static int const aVerify_EmailCantList[] = {
 #define VERIFY_ALLOW_BROKEN_FLAGS     (OPTST_DISABLED)
 
 /**
+ *  verify-profile option description:
+ */
+/** Descriptive text for the verify-profile option */
+#define VERIFY_PROFILE_DESC      (certtool_opt_strs+3905)
+/** Upper-cased name for the verify-profile option */
+#define VERIFY_PROFILE_NAME      (certtool_opt_strs+3966)
+/** Name string for the verify-profile option */
+#define VERIFY_PROFILE_name      (certtool_opt_strs+3981)
+/** Compiled in flag settings for the verify-profile option */
+#define VERIFY_PROFILE_FLAGS     (OPTST_DISABLED \
+        | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
+
+/**
  *  pkcs7_options option description:
  */
 /** pkcs7_options option separation text */
-#define PKCS7_OPTIONS_DESC      (certtool_opt_strs+3905)
+#define PKCS7_OPTIONS_DESC      (certtool_opt_strs+3996)
 #define PKCS7_OPTIONS_FLAGS     (OPTST_DOCUMENT | OPTST_NO_INIT)
 
 /**
  *  p7-generate option description:
  */
 /** Descriptive text for the p7-generate option */
-#define P7_GENERATE_DESC      (certtool_opt_strs+3931)
+#define P7_GENERATE_DESC      (certtool_opt_strs+4022)
 /** Upper-cased name for the p7-generate option */
-#define P7_GENERATE_NAME      (certtool_opt_strs+3960)
+#define P7_GENERATE_NAME      (certtool_opt_strs+4051)
 /** Name string for the p7-generate option */
-#define P7_GENERATE_name      (certtool_opt_strs+3972)
+#define P7_GENERATE_name      (certtool_opt_strs+4063)
 /** Compiled in flag settings for the p7-generate option */
 #define P7_GENERATE_FLAGS     (OPTST_DISABLED)
 
@@ -972,11 +988,11 @@ static int const aVerify_EmailCantList[] = {
  *  p7-sign option description:
  */
 /** Descriptive text for the p7-sign option */
-#define P7_SIGN_DESC      (certtool_opt_strs+3984)
+#define P7_SIGN_DESC      (certtool_opt_strs+4075)
 /** Upper-cased name for the p7-sign option */
-#define P7_SIGN_NAME      (certtool_opt_strs+4016)
+#define P7_SIGN_NAME      (certtool_opt_strs+4107)
 /** Name string for the p7-sign option */
-#define P7_SIGN_name      (certtool_opt_strs+4024)
+#define P7_SIGN_name      (certtool_opt_strs+4115)
 /** Compiled in flag settings for the p7-sign option */
 #define P7_SIGN_FLAGS     (OPTST_DISABLED)
 
@@ -984,11 +1000,11 @@ static int const aVerify_EmailCantList[] = {
  *  p7-detached-sign option description:
  */
 /** Descriptive text for the p7-detached-sign option */
-#define P7_DETACHED_SIGN_DESC      (certtool_opt_strs+4032)
+#define P7_DETACHED_SIGN_DESC      (certtool_opt_strs+4123)
 /** Upper-cased name for the p7-detached-sign option */
-#define P7_DETACHED_SIGN_NAME      (certtool_opt_strs+4073)
+#define P7_DETACHED_SIGN_NAME      (certtool_opt_strs+4164)
 /** Name string for the p7-detached-sign option */
-#define P7_DETACHED_SIGN_name      (certtool_opt_strs+4090)
+#define P7_DETACHED_SIGN_name      (certtool_opt_strs+4181)
 /** Compiled in flag settings for the p7-detached-sign option */
 #define P7_DETACHED_SIGN_FLAGS     (OPTST_DISABLED)
 
@@ -996,13 +1012,13 @@ static int const aVerify_EmailCantList[] = {
  *  p7-include-cert option description:
  */
 /** Descriptive text for the p7-include-cert option */
-#define P7_INCLUDE_CERT_DESC      (certtool_opt_strs+4107)
+#define P7_INCLUDE_CERT_DESC      (certtool_opt_strs+4198)
 /** Upper-cased name for the p7-include-cert option */
-#define P7_INCLUDE_CERT_NAME      (certtool_opt_strs+4167)
+#define P7_INCLUDE_CERT_NAME      (certtool_opt_strs+4258)
 /** disablement name for the p7-include-cert option */
-#define NOT_P7_INCLUDE_CERT_name  (certtool_opt_strs+4183)
+#define NOT_P7_INCLUDE_CERT_name  (certtool_opt_strs+4274)
 /** disablement prefix for the p7-include-cert option */
-#define NOT_P7_INCLUDE_CERT_PFX   (certtool_opt_strs+4202)
+#define NOT_P7_INCLUDE_CERT_PFX   (certtool_opt_strs+4293)
 /** Name string for the p7-include-cert option */
 #define P7_INCLUDE_CERT_name      (NOT_P7_INCLUDE_CERT_name + 3)
 /** Compiled in flag settings for the p7-include-cert option */
@@ -1012,13 +1028,13 @@ static int const aVerify_EmailCantList[] = {
  *  p7-time option description:
  */
 /** Descriptive text for the p7-time option */
-#define P7_TIME_DESC      (certtool_opt_strs+4205)
+#define P7_TIME_DESC      (certtool_opt_strs+4296)
 /** Upper-cased name for the p7-time option */
-#define P7_TIME_NAME      (certtool_opt_strs+4255)
+#define P7_TIME_NAME      (certtool_opt_strs+4346)
 /** disablement name for the p7-time option */
-#define NOT_P7_TIME_name  (certtool_opt_strs+4263)
+#define NOT_P7_TIME_name  (certtool_opt_strs+4354)
 /** disablement prefix for the p7-time option */
-#define NOT_P7_TIME_PFX   (certtool_opt_strs+4202)
+#define NOT_P7_TIME_PFX   (certtool_opt_strs+4293)
 /** Name string for the p7-time option */
 #define P7_TIME_name      (NOT_P7_TIME_name + 3)
 /** Compiled in flag settings for the p7-time option */
@@ -1028,13 +1044,13 @@ static int const aVerify_EmailCantList[] = {
  *  p7-show-data option description:
  */
 /** Descriptive text for the p7-show-data option */
-#define P7_SHOW_DATA_DESC      (certtool_opt_strs+4274)
+#define P7_SHOW_DATA_DESC      (certtool_opt_strs+4365)
 /** Upper-cased name for the p7-show-data option */
-#define P7_SHOW_DATA_NAME      (certtool_opt_strs+4327)
+#define P7_SHOW_DATA_NAME      (certtool_opt_strs+4418)
 /** disablement name for the p7-show-data option */
-#define NOT_P7_SHOW_DATA_name  (certtool_opt_strs+4340)
+#define NOT_P7_SHOW_DATA_name  (certtool_opt_strs+4431)
 /** disablement prefix for the p7-show-data option */
-#define NOT_P7_SHOW_DATA_PFX   (certtool_opt_strs+4202)
+#define NOT_P7_SHOW_DATA_PFX   (certtool_opt_strs+4293)
 /** Name string for the p7-show-data option */
 #define P7_SHOW_DATA_name      (NOT_P7_SHOW_DATA_name + 3)
 /** Compiled in flag settings for the p7-show-data option */
@@ -1044,11 +1060,11 @@ static int const aVerify_EmailCantList[] = {
  *  p7-info option description:
  */
 /** Descriptive text for the p7-info option */
-#define P7_INFO_DESC      (certtool_opt_strs+4356)
+#define P7_INFO_DESC      (certtool_opt_strs+4447)
 /** Upper-cased name for the p7-info option */
-#define P7_INFO_NAME      (certtool_opt_strs+4397)
+#define P7_INFO_NAME      (certtool_opt_strs+4488)
 /** Name string for the p7-info option */
-#define P7_INFO_name      (certtool_opt_strs+4405)
+#define P7_INFO_name      (certtool_opt_strs+4496)
 /** Compiled in flag settings for the p7-info option */
 #define P7_INFO_FLAGS     (OPTST_DISABLED)
 
@@ -1056,11 +1072,11 @@ static int const aVerify_EmailCantList[] = {
  *  p7-verify option description:
  */
 /** Descriptive text for the p7-verify option */
-#define P7_VERIFY_DESC      (certtool_opt_strs+4413)
+#define P7_VERIFY_DESC      (certtool_opt_strs+4504)
 /** Upper-cased name for the p7-verify option */
-#define P7_VERIFY_NAME      (certtool_opt_strs+4451)
+#define P7_VERIFY_NAME      (certtool_opt_strs+4542)
 /** Name string for the p7-verify option */
-#define P7_VERIFY_name      (certtool_opt_strs+4461)
+#define P7_VERIFY_name      (certtool_opt_strs+4552)
 /** Compiled in flag settings for the p7-verify option */
 #define P7_VERIFY_FLAGS     (OPTST_DISABLED)
 
@@ -1068,11 +1084,11 @@ static int const aVerify_EmailCantList[] = {
  *  smime-to-p7 option description:
  */
 /** Descriptive text for the smime-to-p7 option */
-#define SMIME_TO_P7_DESC      (certtool_opt_strs+4471)
+#define SMIME_TO_P7_DESC      (certtool_opt_strs+4562)
 /** Upper-cased name for the smime-to-p7 option */
-#define SMIME_TO_P7_NAME      (certtool_opt_strs+4507)
+#define SMIME_TO_P7_NAME      (certtool_opt_strs+4598)
 /** Name string for the smime-to-p7 option */
-#define SMIME_TO_P7_name      (certtool_opt_strs+4519)
+#define SMIME_TO_P7_name      (certtool_opt_strs+4610)
 /** Compiled in flag settings for the smime-to-p7 option */
 #define SMIME_TO_P7_FLAGS     (OPTST_DISABLED)
 
@@ -1080,18 +1096,18 @@ static int const aVerify_EmailCantList[] = {
  *  other_options option description:
  */
 /** other_options option separation text */
-#define OTHER_OPTIONS_DESC      (certtool_opt_strs+4531)
+#define OTHER_OPTIONS_DESC      (certtool_opt_strs+4622)
 #define OTHER_OPTIONS_FLAGS     (OPTST_DOCUMENT | OPTST_NO_INIT)
 
 /**
  *  generate-dh-params option description:
  */
 /** Descriptive text for the generate-dh-params option */
-#define GENERATE_DH_PARAMS_DESC      (certtool_opt_strs+4546)
+#define GENERATE_DH_PARAMS_DESC      (certtool_opt_strs+4637)
 /** Upper-cased name for the generate-dh-params option */
-#define GENERATE_DH_PARAMS_NAME      (certtool_opt_strs+4610)
+#define GENERATE_DH_PARAMS_NAME      (certtool_opt_strs+4701)
 /** Name string for the generate-dh-params option */
-#define GENERATE_DH_PARAMS_name      (certtool_opt_strs+4629)
+#define GENERATE_DH_PARAMS_name      (certtool_opt_strs+4720)
 /** Compiled in flag settings for the generate-dh-params option */
 #define GENERATE_DH_PARAMS_FLAGS     (OPTST_DISABLED | OPTST_DEPRECATED)
 
@@ -1099,11 +1115,11 @@ static int const aVerify_EmailCantList[] = {
  *  get-dh-params option description:
  */
 /** Descriptive text for the get-dh-params option */
-#define GET_DH_PARAMS_DESC      (certtool_opt_strs+4648)
+#define GET_DH_PARAMS_DESC      (certtool_opt_strs+4739)
 /** Upper-cased name for the get-dh-params option */
-#define GET_DH_PARAMS_NAME      (certtool_opt_strs+4708)
+#define GET_DH_PARAMS_NAME      (certtool_opt_strs+4799)
 /** Name string for the get-dh-params option */
-#define GET_DH_PARAMS_name      (certtool_opt_strs+4722)
+#define GET_DH_PARAMS_name      (certtool_opt_strs+4813)
 /** Compiled in flag settings for the get-dh-params option */
 #define GET_DH_PARAMS_FLAGS     (OPTST_DISABLED)
 
@@ -1111,11 +1127,11 @@ static int const aVerify_EmailCantList[] = {
  *  dh-info option description:
  */
 /** Descriptive text for the dh-info option */
-#define DH_INFO_DESC      (certtool_opt_strs+4736)
+#define DH_INFO_DESC      (certtool_opt_strs+4827)
 /** Upper-cased name for the dh-info option */
-#define DH_INFO_NAME      (certtool_opt_strs+4796)
+#define DH_INFO_NAME      (certtool_opt_strs+4887)
 /** Name string for the dh-info option */
-#define DH_INFO_name      (certtool_opt_strs+4804)
+#define DH_INFO_name      (certtool_opt_strs+4895)
 /** Compiled in flag settings for the dh-info option */
 #define DH_INFO_FLAGS     (OPTST_DISABLED)
 
@@ -1123,11 +1139,11 @@ static int const aVerify_EmailCantList[] = {
  *  load-privkey option description:
  */
 /** Descriptive text for the load-privkey option */
-#define LOAD_PRIVKEY_DESC      (certtool_opt_strs+4812)
+#define LOAD_PRIVKEY_DESC      (certtool_opt_strs+4903)
 /** Upper-cased name for the load-privkey option */
-#define LOAD_PRIVKEY_NAME      (certtool_opt_strs+4837)
+#define LOAD_PRIVKEY_NAME      (certtool_opt_strs+4928)
 /** Name string for the load-privkey option */
-#define LOAD_PRIVKEY_name      (certtool_opt_strs+4850)
+#define LOAD_PRIVKEY_name      (certtool_opt_strs+4941)
 /** Compiled in flag settings for the load-privkey option */
 #define LOAD_PRIVKEY_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -1136,11 +1152,11 @@ static int const aVerify_EmailCantList[] = {
  *  load-pubkey option description:
  */
 /** Descriptive text for the load-pubkey option */
-#define LOAD_PUBKEY_DESC      (certtool_opt_strs+4863)
+#define LOAD_PUBKEY_DESC      (certtool_opt_strs+4954)
 /** Upper-cased name for the load-pubkey option */
-#define LOAD_PUBKEY_NAME      (certtool_opt_strs+4887)
+#define LOAD_PUBKEY_NAME      (certtool_opt_strs+4978)
 /** Name string for the load-pubkey option */
-#define LOAD_PUBKEY_name      (certtool_opt_strs+4899)
+#define LOAD_PUBKEY_name      (certtool_opt_strs+4990)
 /** Compiled in flag settings for the load-pubkey option */
 #define LOAD_PUBKEY_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -1149,11 +1165,11 @@ static int const aVerify_EmailCantList[] = {
  *  load-request option description:
  */
 /** Descriptive text for the load-request option */
-#define LOAD_REQUEST_DESC      (certtool_opt_strs+4911)
+#define LOAD_REQUEST_DESC      (certtool_opt_strs+5002)
 /** Upper-cased name for the load-request option */
-#define LOAD_REQUEST_NAME      (certtool_opt_strs+4944)
+#define LOAD_REQUEST_NAME      (certtool_opt_strs+5035)
 /** Name string for the load-request option */
-#define LOAD_REQUEST_name      (certtool_opt_strs+4957)
+#define LOAD_REQUEST_name      (certtool_opt_strs+5048)
 /** Compiled in flag settings for the load-request option */
 #define LOAD_REQUEST_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -1162,11 +1178,11 @@ static int const aVerify_EmailCantList[] = {
  *  load-certificate option description:
  */
 /** Descriptive text for the load-certificate option */
-#define LOAD_CERTIFICATE_DESC      (certtool_opt_strs+4970)
+#define LOAD_CERTIFICATE_DESC      (certtool_opt_strs+5061)
 /** Upper-cased name for the load-certificate option */
-#define LOAD_CERTIFICATE_NAME      (certtool_opt_strs+4995)
+#define LOAD_CERTIFICATE_NAME      (certtool_opt_strs+5086)
 /** Name string for the load-certificate option */
-#define LOAD_CERTIFICATE_name      (certtool_opt_strs+5012)
+#define LOAD_CERTIFICATE_name      (certtool_opt_strs+5103)
 /** Compiled in flag settings for the load-certificate option */
 #define LOAD_CERTIFICATE_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -1175,11 +1191,11 @@ static int const aVerify_EmailCantList[] = {
  *  load-ca-privkey option description:
  */
 /** Descriptive text for the load-ca-privkey option */
-#define LOAD_CA_PRIVKEY_DESC      (certtool_opt_strs+5029)
+#define LOAD_CA_PRIVKEY_DESC      (certtool_opt_strs+5120)
 /** Upper-cased name for the load-ca-privkey option */
-#define LOAD_CA_PRIVKEY_NAME      (certtool_opt_strs+5080)
+#define LOAD_CA_PRIVKEY_NAME      (certtool_opt_strs+5171)
 /** Name string for the load-ca-privkey option */
-#define LOAD_CA_PRIVKEY_name      (certtool_opt_strs+5096)
+#define LOAD_CA_PRIVKEY_name      (certtool_opt_strs+5187)
 /** Compiled in flag settings for the load-ca-privkey option */
 #define LOAD_CA_PRIVKEY_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -1188,11 +1204,11 @@ static int const aVerify_EmailCantList[] = {
  *  load-ca-certificate option description:
  */
 /** Descriptive text for the load-ca-certificate option */
-#define LOAD_CA_CERTIFICATE_DESC      (certtool_opt_strs+5112)
+#define LOAD_CA_CERTIFICATE_DESC      (certtool_opt_strs+5203)
 /** Upper-cased name for the load-ca-certificate option */
-#define LOAD_CA_CERTIFICATE_NAME      (certtool_opt_strs+5163)
+#define LOAD_CA_CERTIFICATE_NAME      (certtool_opt_strs+5254)
 /** Name string for the load-ca-certificate option */
-#define LOAD_CA_CERTIFICATE_name      (certtool_opt_strs+5183)
+#define LOAD_CA_CERTIFICATE_name      (certtool_opt_strs+5274)
 /** Compiled in flag settings for the load-ca-certificate option */
 #define LOAD_CA_CERTIFICATE_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -1201,11 +1217,11 @@ static int const aVerify_EmailCantList[] = {
  *  load-crl option description:
  */
 /** Descriptive text for the load-crl option */
-#define LOAD_CRL_DESC      (certtool_opt_strs+5203)
+#define LOAD_CRL_DESC      (certtool_opt_strs+5294)
 /** Upper-cased name for the load-crl option */
-#define LOAD_CRL_NAME      (certtool_opt_strs+5226)
+#define LOAD_CRL_NAME      (certtool_opt_strs+5317)
 /** Name string for the load-crl option */
-#define LOAD_CRL_name      (certtool_opt_strs+5235)
+#define LOAD_CRL_name      (certtool_opt_strs+5326)
 /** Compiled in flag settings for the load-crl option */
 #define LOAD_CRL_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -1214,11 +1230,11 @@ static int const aVerify_EmailCantList[] = {
  *  load-data option description:
  */
 /** Descriptive text for the load-data option */
-#define LOAD_DATA_DESC      (certtool_opt_strs+5244)
+#define LOAD_DATA_DESC      (certtool_opt_strs+5335)
 /** Upper-cased name for the load-data option */
-#define LOAD_DATA_NAME      (certtool_opt_strs+5265)
+#define LOAD_DATA_NAME      (certtool_opt_strs+5356)
 /** Name string for the load-data option */
-#define LOAD_DATA_name      (certtool_opt_strs+5275)
+#define LOAD_DATA_name      (certtool_opt_strs+5366)
 /** Compiled in flag settings for the load-data option */
 #define LOAD_DATA_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -1227,11 +1243,11 @@ static int const aVerify_EmailCantList[] = {
  *  password option description:
  */
 /** Descriptive text for the password option */
-#define PASSWORD_DESC      (certtool_opt_strs+5285)
+#define PASSWORD_DESC      (certtool_opt_strs+5376)
 /** Upper-cased name for the password option */
-#define PASSWORD_NAME      (certtool_opt_strs+5301)
+#define PASSWORD_NAME      (certtool_opt_strs+5392)
 /** Name string for the password option */
-#define PASSWORD_name      (certtool_opt_strs+5310)
+#define PASSWORD_name      (certtool_opt_strs+5401)
 /** Compiled in flag settings for the password option */
 #define PASSWORD_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -1240,11 +1256,11 @@ static int const aVerify_EmailCantList[] = {
  *  null-password option description:
  */
 /** Descriptive text for the null-password option */
-#define NULL_PASSWORD_DESC      (certtool_opt_strs+5319)
+#define NULL_PASSWORD_DESC      (certtool_opt_strs+5410)
 /** Upper-cased name for the null-password option */
-#define NULL_PASSWORD_NAME      (certtool_opt_strs+5343)
+#define NULL_PASSWORD_NAME      (certtool_opt_strs+5434)
 /** Name string for the null-password option */
-#define NULL_PASSWORD_name      (certtool_opt_strs+5357)
+#define NULL_PASSWORD_name      (certtool_opt_strs+5448)
 /** Compiled in flag settings for the null-password option */
 #define NULL_PASSWORD_FLAGS     (OPTST_DISABLED)
 
@@ -1252,11 +1268,11 @@ static int const aVerify_EmailCantList[] = {
  *  empty-password option description:
  */
 /** Descriptive text for the empty-password option */
-#define EMPTY_PASSWORD_DESC      (certtool_opt_strs+5371)
+#define EMPTY_PASSWORD_DESC      (certtool_opt_strs+5462)
 /** Upper-cased name for the empty-password option */
-#define EMPTY_PASSWORD_NAME      (certtool_opt_strs+5397)
+#define EMPTY_PASSWORD_NAME      (certtool_opt_strs+5488)
 /** Name string for the empty-password option */
-#define EMPTY_PASSWORD_name      (certtool_opt_strs+5412)
+#define EMPTY_PASSWORD_name      (certtool_opt_strs+5503)
 /** Compiled in flag settings for the empty-password option */
 #define EMPTY_PASSWORD_FLAGS     (OPTST_DISABLED)
 
@@ -1264,11 +1280,11 @@ static int const aVerify_EmailCantList[] = {
  *  hex-numbers option description:
  */
 /** Descriptive text for the hex-numbers option */
-#define HEX_NUMBERS_DESC      (certtool_opt_strs+5427)
+#define HEX_NUMBERS_DESC      (certtool_opt_strs+5518)
 /** Upper-cased name for the hex-numbers option */
-#define HEX_NUMBERS_NAME      (certtool_opt_strs+5473)
+#define HEX_NUMBERS_NAME      (certtool_opt_strs+5564)
 /** Name string for the hex-numbers option */
-#define HEX_NUMBERS_name      (certtool_opt_strs+5485)
+#define HEX_NUMBERS_name      (certtool_opt_strs+5576)
 /** Compiled in flag settings for the hex-numbers option */
 #define HEX_NUMBERS_FLAGS     (OPTST_DISABLED)
 
@@ -1276,11 +1292,11 @@ static int const aVerify_EmailCantList[] = {
  *  cprint option description:
  */
 /** Descriptive text for the cprint option */
-#define CPRINT_DESC      (certtool_opt_strs+5497)
+#define CPRINT_DESC      (certtool_opt_strs+5588)
 /** Upper-cased name for the cprint option */
-#define CPRINT_NAME      (certtool_opt_strs+5566)
+#define CPRINT_NAME      (certtool_opt_strs+5657)
 /** Name string for the cprint option */
-#define CPRINT_name      (certtool_opt_strs+5573)
+#define CPRINT_name      (certtool_opt_strs+5664)
 /** Compiled in flag settings for the cprint option */
 #define CPRINT_FLAGS     (OPTST_DISABLED)
 
@@ -1288,11 +1304,11 @@ static int const aVerify_EmailCantList[] = {
  *  rsa option description:
  */
 /** Descriptive text for the rsa option */
-#define RSA_DESC      (certtool_opt_strs+5580)
+#define RSA_DESC      (certtool_opt_strs+5671)
 /** Upper-cased name for the rsa option */
-#define RSA_NAME      (certtool_opt_strs+5610)
+#define RSA_NAME      (certtool_opt_strs+5701)
 /** Name string for the rsa option */
-#define RSA_name      (certtool_opt_strs+5614)
+#define RSA_name      (certtool_opt_strs+5705)
 /** Compiled in flag settings for the rsa option */
 #define RSA_FLAGS     (OPTST_DISABLED | OPTST_DEPRECATED)
 
@@ -1300,11 +1316,11 @@ static int const aVerify_EmailCantList[] = {
  *  dsa option description:
  */
 /** Descriptive text for the dsa option */
-#define DSA_DESC      (certtool_opt_strs+5618)
+#define DSA_DESC      (certtool_opt_strs+5709)
 /** Upper-cased name for the dsa option */
-#define DSA_NAME      (certtool_opt_strs+5648)
+#define DSA_NAME      (certtool_opt_strs+5739)
 /** Name string for the dsa option */
-#define DSA_name      (certtool_opt_strs+5652)
+#define DSA_name      (certtool_opt_strs+5743)
 /** Compiled in flag settings for the dsa option */
 #define DSA_FLAGS     (OPTST_DISABLED | OPTST_DEPRECATED)
 
@@ -1312,11 +1328,11 @@ static int const aVerify_EmailCantList[] = {
  *  ecc option description:
  */
 /** Descriptive text for the ecc option */
-#define ECC_DESC      (certtool_opt_strs+5656)
+#define ECC_DESC      (certtool_opt_strs+5747)
 /** Upper-cased name for the ecc option */
-#define ECC_NAME      (certtool_opt_strs+5694)
+#define ECC_NAME      (certtool_opt_strs+5785)
 /** Name string for the ecc option */
-#define ECC_name      (certtool_opt_strs+5698)
+#define ECC_name      (certtool_opt_strs+5789)
 /** Compiled in flag settings for the ecc option */
 #define ECC_FLAGS     (OPTST_DISABLED | OPTST_DEPRECATED)
 
@@ -1324,10 +1340,10 @@ static int const aVerify_EmailCantList[] = {
  *  ecdsa option description:
  */
 /** Descriptive text for the ecdsa option */
-#define ECDSA_DESC    (certtool_opt_strs+5702)
+#define ECDSA_DESC    (certtool_opt_strs+5793)
 #define ECDSA_NAME    NULL
 /** Unmodified name string for the ecdsa option */
-#define ECDSA_name    (certtool_opt_strs+5745)
+#define ECDSA_name    (certtool_opt_strs+5836)
 /** Compiled in flag settings for the ecdsa option */
 #define ECDSA_FLAGS     (ECC_FLAGS | OPTST_ALIAS | OPTST_DEPRECATED)
 
@@ -1335,11 +1351,11 @@ static int const aVerify_EmailCantList[] = {
  *  hash option description:
  */
 /** Descriptive text for the hash option */
-#define HASH_DESC      (certtool_opt_strs+5751)
+#define HASH_DESC      (certtool_opt_strs+5842)
 /** Upper-cased name for the hash option */
-#define HASH_NAME      (certtool_opt_strs+5785)
+#define HASH_NAME      (certtool_opt_strs+5876)
 /** Name string for the hash option */
-#define HASH_name      (certtool_opt_strs+5790)
+#define HASH_name      (certtool_opt_strs+5881)
 /** Compiled in flag settings for the hash option */
 #define HASH_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -1348,11 +1364,11 @@ static int const aVerify_EmailCantList[] = {
  *  salt-size option description:
  */
 /** Descriptive text for the salt-size option */
-#define SALT_SIZE_DESC      (certtool_opt_strs+5795)
+#define SALT_SIZE_DESC      (certtool_opt_strs+5886)
 /** Upper-cased name for the salt-size option */
-#define SALT_SIZE_NAME      (certtool_opt_strs+5837)
+#define SALT_SIZE_NAME      (certtool_opt_strs+5928)
 /** Name string for the salt-size option */
-#define SALT_SIZE_name      (certtool_opt_strs+5847)
+#define SALT_SIZE_name      (certtool_opt_strs+5938)
 /** Compiled in flag settings for the salt-size option */
 #define SALT_SIZE_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_NUMERIC))
@@ -1361,13 +1377,13 @@ static int const aVerify_EmailCantList[] = {
  *  inder option description:
  */
 /** Descriptive text for the inder option */
-#define INDER_DESC      (certtool_opt_strs+5857)
+#define INDER_DESC      (certtool_opt_strs+5948)
 /** Upper-cased name for the inder option */
-#define INDER_NAME      (certtool_opt_strs+5928)
+#define INDER_NAME      (certtool_opt_strs+6019)
 /** disablement name for the inder option */
-#define NOT_INDER_name  (certtool_opt_strs+5934)
+#define NOT_INDER_name  (certtool_opt_strs+6025)
 /** disablement prefix for the inder option */
-#define NOT_INDER_PFX   (certtool_opt_strs+4202)
+#define NOT_INDER_PFX   (certtool_opt_strs+4293)
 /** Name string for the inder option */
 #define INDER_name      (NOT_INDER_name + 3)
 /** Compiled in flag settings for the inder option */
@@ -1377,10 +1393,10 @@ static int const aVerify_EmailCantList[] = {
  *  inraw option description:
  */
 /** Descriptive text for the inraw option */
-#define INRAW_DESC    (certtool_opt_strs+5943)
+#define INRAW_DESC    (certtool_opt_strs+6034)
 #define INRAW_NAME    NULL
 /** Unmodified name string for the inraw option */
-#define INRAW_name    (certtool_opt_strs+5975)
+#define INRAW_name    (certtool_opt_strs+6066)
 /** Compiled in flag settings for the inraw option */
 #define INRAW_FLAGS     (INDER_FLAGS | OPTST_ALIAS)
 
@@ -1388,13 +1404,13 @@ static int const aVerify_EmailCantList[] = {
  *  outder option description:
  */
 /** Descriptive text for the outder option */
-#define OUTDER_DESC      (certtool_opt_strs+5981)
+#define OUTDER_DESC      (certtool_opt_strs+6072)
 /** Upper-cased name for the outder option */
-#define OUTDER_NAME      (certtool_opt_strs+6053)
+#define OUTDER_NAME      (certtool_opt_strs+6144)
 /** disablement name for the outder option */
-#define NOT_OUTDER_name  (certtool_opt_strs+6060)
+#define NOT_OUTDER_name  (certtool_opt_strs+6151)
 /** disablement prefix for the outder option */
-#define NOT_OUTDER_PFX   (certtool_opt_strs+4202)
+#define NOT_OUTDER_PFX   (certtool_opt_strs+4293)
 /** Name string for the outder option */
 #define OUTDER_name      (NOT_OUTDER_name + 3)
 /** Compiled in flag settings for the outder option */
@@ -1404,10 +1420,10 @@ static int const aVerify_EmailCantList[] = {
  *  outraw option description:
  */
 /** Descriptive text for the outraw option */
-#define OUTRAW_DESC    (certtool_opt_strs+6070)
+#define OUTRAW_DESC    (certtool_opt_strs+6161)
 #define OUTRAW_NAME    NULL
 /** Unmodified name string for the outraw option */
-#define OUTRAW_name    (certtool_opt_strs+6103)
+#define OUTRAW_name    (certtool_opt_strs+6194)
 /** Compiled in flag settings for the outraw option */
 #define OUTRAW_FLAGS     (OUTDER_FLAGS | OPTST_ALIAS)
 
@@ -1415,11 +1431,11 @@ static int const aVerify_EmailCantList[] = {
  *  disable-quick-random option description:
  */
 /** Descriptive text for the disable-quick-random option */
-#define DISABLE_QUICK_RANDOM_DESC      (certtool_opt_strs+6110)
+#define DISABLE_QUICK_RANDOM_DESC      (certtool_opt_strs+6201)
 /** Upper-cased name for the disable-quick-random option */
-#define DISABLE_QUICK_RANDOM_NAME      (certtool_opt_strs+6133)
+#define DISABLE_QUICK_RANDOM_NAME      (certtool_opt_strs+6224)
 /** Name string for the disable-quick-random option */
-#define DISABLE_QUICK_RANDOM_name      (certtool_opt_strs+6154)
+#define DISABLE_QUICK_RANDOM_name      (certtool_opt_strs+6245)
 /** Compiled in flag settings for the disable-quick-random option */
 #define DISABLE_QUICK_RANDOM_FLAGS     (OPTST_DISABLED | OPTST_DEPRECATED)
 
@@ -1427,11 +1443,11 @@ static int const aVerify_EmailCantList[] = {
  *  template option description:
  */
 /** Descriptive text for the template option */
-#define TEMPLATE_DESC      (certtool_opt_strs+6175)
+#define TEMPLATE_DESC      (certtool_opt_strs+6266)
 /** Upper-cased name for the template option */
-#define TEMPLATE_NAME      (certtool_opt_strs+6226)
+#define TEMPLATE_NAME      (certtool_opt_strs+6317)
 /** Name string for the template option */
-#define TEMPLATE_name      (certtool_opt_strs+6235)
+#define TEMPLATE_name      (certtool_opt_strs+6326)
 /** Compiled in flag settings for the template option */
 #define TEMPLATE_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -1440,11 +1456,11 @@ static int const aVerify_EmailCantList[] = {
  *  stdout-info option description:
  */
 /** Descriptive text for the stdout-info option */
-#define STDOUT_INFO_DESC      (certtool_opt_strs+6244)
+#define STDOUT_INFO_DESC      (certtool_opt_strs+6335)
 /** Upper-cased name for the stdout-info option */
-#define STDOUT_INFO_NAME      (certtool_opt_strs+6290)
+#define STDOUT_INFO_NAME      (certtool_opt_strs+6381)
 /** Name string for the stdout-info option */
-#define STDOUT_INFO_name      (certtool_opt_strs+6302)
+#define STDOUT_INFO_name      (certtool_opt_strs+6393)
 /** Compiled in flag settings for the stdout-info option */
 #define STDOUT_INFO_FLAGS     (OPTST_DISABLED)
 
@@ -1452,11 +1468,11 @@ static int const aVerify_EmailCantList[] = {
  *  ask-pass option description:
  */
 /** Descriptive text for the ask-pass option */
-#define ASK_PASS_DESC      (certtool_opt_strs+6314)
+#define ASK_PASS_DESC      (certtool_opt_strs+6405)
 /** Upper-cased name for the ask-pass option */
-#define ASK_PASS_NAME      (certtool_opt_strs+6375)
+#define ASK_PASS_NAME      (certtool_opt_strs+6466)
 /** Name string for the ask-pass option */
-#define ASK_PASS_name      (certtool_opt_strs+6384)
+#define ASK_PASS_name      (certtool_opt_strs+6475)
 /** Compiled in flag settings for the ask-pass option */
 #define ASK_PASS_FLAGS     (OPTST_DISABLED)
 
@@ -1464,11 +1480,11 @@ static int const aVerify_EmailCantList[] = {
  *  pkcs-cipher option description:
  */
 /** Descriptive text for the pkcs-cipher option */
-#define PKCS_CIPHER_DESC      (certtool_opt_strs+6393)
+#define PKCS_CIPHER_DESC      (certtool_opt_strs+6484)
 /** Upper-cased name for the pkcs-cipher option */
-#define PKCS_CIPHER_NAME      (certtool_opt_strs+6438)
+#define PKCS_CIPHER_NAME      (certtool_opt_strs+6529)
 /** Name string for the pkcs-cipher option */
-#define PKCS_CIPHER_name      (certtool_opt_strs+6450)
+#define PKCS_CIPHER_name      (certtool_opt_strs+6541)
 /** Compiled in flag settings for the pkcs-cipher option */
 #define PKCS_CIPHER_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -1477,11 +1493,11 @@ static int const aVerify_EmailCantList[] = {
  *  provider option description:
  */
 /** Descriptive text for the provider option */
-#define PROVIDER_DESC      (certtool_opt_strs+6462)
+#define PROVIDER_DESC      (certtool_opt_strs+6553)
 /** Upper-cased name for the provider option */
-#define PROVIDER_NAME      (certtool_opt_strs+6500)
+#define PROVIDER_NAME      (certtool_opt_strs+6591)
 /** Name string for the provider option */
-#define PROVIDER_name      (certtool_opt_strs+6509)
+#define PROVIDER_name      (certtool_opt_strs+6600)
 /** Compiled in flag settings for the provider option */
 #define PROVIDER_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -1490,13 +1506,13 @@ static int const aVerify_EmailCantList[] = {
  *  text option description:
  */
 /** Descriptive text for the text option */
-#define TEXT_DESC      (certtool_opt_strs+6518)
+#define TEXT_DESC      (certtool_opt_strs+6609)
 /** Upper-cased name for the text option */
-#define TEXT_NAME      (certtool_opt_strs+6596)
+#define TEXT_NAME      (certtool_opt_strs+6687)
 /** disablement name for the text option */
-#define NOT_TEXT_name  (certtool_opt_strs+6601)
+#define NOT_TEXT_name  (certtool_opt_strs+6692)
 /** disablement prefix for the text option */
-#define NOT_TEXT_PFX   (certtool_opt_strs+4202)
+#define NOT_TEXT_PFX   (certtool_opt_strs+4293)
 /** Name string for the text option */
 #define TEXT_name      (NOT_TEXT_name + 3)
 /** Compiled in flag settings for the text option */
@@ -1505,11 +1521,11 @@ static int const aVerify_EmailCantList[] = {
 /*
  *  Help/More_Help/Version option descriptions:
  */
-#define HELP_DESC       (certtool_opt_strs+6609)
-#define HELP_name       (certtool_opt_strs+6653)
+#define HELP_DESC       (certtool_opt_strs+6700)
+#define HELP_name       (certtool_opt_strs+6744)
 #ifdef HAVE_WORKING_FORK
-#define MORE_HELP_DESC  (certtool_opt_strs+6658)
-#define MORE_HELP_name  (certtool_opt_strs+6703)
+#define MORE_HELP_DESC  (certtool_opt_strs+6749)
+#define MORE_HELP_name  (certtool_opt_strs+6794)
 #define MORE_HELP_FLAGS (OPTST_IMM | OPTST_NO_INIT)
 #else
 #define MORE_HELP_DESC  HELP_DESC
@@ -1522,8 +1538,8 @@ static int const aVerify_EmailCantList[] = {
 #  define VER_FLAGS     (OPTST_SET_ARGTYPE(OPARG_TYPE_STRING) | \
                          OPTST_ARG_OPTIONAL | OPTST_IMM | OPTST_NO_INIT)
 #endif
-#define VER_DESC        (certtool_opt_strs+6713)
-#define VER_name        (certtool_opt_strs+6749)
+#define VER_DESC        (certtool_opt_strs+6804)
+#define VER_name        (certtool_opt_strs+6840)
 /**
  *  Declare option callback procedures
  */
@@ -2132,6 +2148,18 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ VERIFY_ALLOW_BROKEN_DESC, VERIFY_ALLOW_BROKEN_NAME, VERIFY_ALLOW_BROKEN_name,
      /* disablement strs */ NULL, NULL },
 
+  {  /* entry idx, value */ 49, VALUE_OPT_VERIFY_PROFILE,
+     /* equiv idx, value */ 49, VALUE_OPT_VERIFY_PROFILE,
+     /* equivalenced to  */ NO_EQUIVALENT,
+     /* min, max, act ct */ 0, 1, 0,
+     /* opt state flags  */ VERIFY_PROFILE_FLAGS, 0,
+     /* last opt argumnt */ { NULL }, /* --verify-profile */
+     /* arg list/cookie  */ NULL,
+     /* must/cannot opts */ NULL, NULL,
+     /* option proc      */ NULL,
+     /* desc, NAME, name */ VERIFY_PROFILE_DESC, VERIFY_PROFILE_NAME, VERIFY_PROFILE_name,
+     /* disablement strs */ NULL, NULL },
+
   {  /* entry idx, value */ 0, 0,
      /* equiv idx, value */ 0, 0,
      /* equivalenced to  */ NO_EQUIVALENT,
@@ -2144,8 +2172,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ PKCS7_OPTIONS_DESC, NULL, NULL,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 50, VALUE_OPT_P7_GENERATE,
-     /* equiv idx, value */ 50, VALUE_OPT_P7_GENERATE,
+  {  /* entry idx, value */ 51, VALUE_OPT_P7_GENERATE,
+     /* equiv idx, value */ 51, VALUE_OPT_P7_GENERATE,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ P7_GENERATE_FLAGS, 0,
@@ -2156,8 +2184,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ P7_GENERATE_DESC, P7_GENERATE_NAME, P7_GENERATE_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 51, VALUE_OPT_P7_SIGN,
-     /* equiv idx, value */ 51, VALUE_OPT_P7_SIGN,
+  {  /* entry idx, value */ 52, VALUE_OPT_P7_SIGN,
+     /* equiv idx, value */ 52, VALUE_OPT_P7_SIGN,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ P7_SIGN_FLAGS, 0,
@@ -2168,8 +2196,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ P7_SIGN_DESC, P7_SIGN_NAME, P7_SIGN_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 52, VALUE_OPT_P7_DETACHED_SIGN,
-     /* equiv idx, value */ 52, VALUE_OPT_P7_DETACHED_SIGN,
+  {  /* entry idx, value */ 53, VALUE_OPT_P7_DETACHED_SIGN,
+     /* equiv idx, value */ 53, VALUE_OPT_P7_DETACHED_SIGN,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ P7_DETACHED_SIGN_FLAGS, 0,
@@ -2180,8 +2208,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ P7_DETACHED_SIGN_DESC, P7_DETACHED_SIGN_NAME, P7_DETACHED_SIGN_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 53, VALUE_OPT_P7_INCLUDE_CERT,
-     /* equiv idx, value */ 53, VALUE_OPT_P7_INCLUDE_CERT,
+  {  /* entry idx, value */ 54, VALUE_OPT_P7_INCLUDE_CERT,
+     /* equiv idx, value */ 54, VALUE_OPT_P7_INCLUDE_CERT,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ P7_INCLUDE_CERT_FLAGS, 0,
@@ -2192,8 +2220,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ P7_INCLUDE_CERT_DESC, P7_INCLUDE_CERT_NAME, P7_INCLUDE_CERT_name,
      /* disablement strs */ NOT_P7_INCLUDE_CERT_name, NOT_P7_INCLUDE_CERT_PFX },
 
-  {  /* entry idx, value */ 54, VALUE_OPT_P7_TIME,
-     /* equiv idx, value */ 54, VALUE_OPT_P7_TIME,
+  {  /* entry idx, value */ 55, VALUE_OPT_P7_TIME,
+     /* equiv idx, value */ 55, VALUE_OPT_P7_TIME,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ P7_TIME_FLAGS, 0,
@@ -2204,8 +2232,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ P7_TIME_DESC, P7_TIME_NAME, P7_TIME_name,
      /* disablement strs */ NOT_P7_TIME_name, NOT_P7_TIME_PFX },
 
-  {  /* entry idx, value */ 55, VALUE_OPT_P7_SHOW_DATA,
-     /* equiv idx, value */ 55, VALUE_OPT_P7_SHOW_DATA,
+  {  /* entry idx, value */ 56, VALUE_OPT_P7_SHOW_DATA,
+     /* equiv idx, value */ 56, VALUE_OPT_P7_SHOW_DATA,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ P7_SHOW_DATA_FLAGS, 0,
@@ -2216,8 +2244,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ P7_SHOW_DATA_DESC, P7_SHOW_DATA_NAME, P7_SHOW_DATA_name,
      /* disablement strs */ NOT_P7_SHOW_DATA_name, NOT_P7_SHOW_DATA_PFX },
 
-  {  /* entry idx, value */ 56, VALUE_OPT_P7_INFO,
-     /* equiv idx, value */ 56, VALUE_OPT_P7_INFO,
+  {  /* entry idx, value */ 57, VALUE_OPT_P7_INFO,
+     /* equiv idx, value */ 57, VALUE_OPT_P7_INFO,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ P7_INFO_FLAGS, 0,
@@ -2228,8 +2256,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ P7_INFO_DESC, P7_INFO_NAME, P7_INFO_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 57, VALUE_OPT_P7_VERIFY,
-     /* equiv idx, value */ 57, VALUE_OPT_P7_VERIFY,
+  {  /* entry idx, value */ 58, VALUE_OPT_P7_VERIFY,
+     /* equiv idx, value */ 58, VALUE_OPT_P7_VERIFY,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ P7_VERIFY_FLAGS, 0,
@@ -2240,8 +2268,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ P7_VERIFY_DESC, P7_VERIFY_NAME, P7_VERIFY_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 58, VALUE_OPT_SMIME_TO_P7,
-     /* equiv idx, value */ 58, VALUE_OPT_SMIME_TO_P7,
+  {  /* entry idx, value */ 59, VALUE_OPT_SMIME_TO_P7,
+     /* equiv idx, value */ 59, VALUE_OPT_SMIME_TO_P7,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ SMIME_TO_P7_FLAGS, 0,
@@ -2264,8 +2292,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ OTHER_OPTIONS_DESC, NULL, NULL,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 60, VALUE_OPT_GENERATE_DH_PARAMS,
-     /* equiv idx, value */ 60, VALUE_OPT_GENERATE_DH_PARAMS,
+  {  /* entry idx, value */ 61, VALUE_OPT_GENERATE_DH_PARAMS,
+     /* equiv idx, value */ 61, VALUE_OPT_GENERATE_DH_PARAMS,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ GENERATE_DH_PARAMS_FLAGS, 0,
@@ -2276,8 +2304,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ GENERATE_DH_PARAMS_DESC, GENERATE_DH_PARAMS_NAME, GENERATE_DH_PARAMS_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 61, VALUE_OPT_GET_DH_PARAMS,
-     /* equiv idx, value */ 61, VALUE_OPT_GET_DH_PARAMS,
+  {  /* entry idx, value */ 62, VALUE_OPT_GET_DH_PARAMS,
+     /* equiv idx, value */ 62, VALUE_OPT_GET_DH_PARAMS,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ GET_DH_PARAMS_FLAGS, 0,
@@ -2288,8 +2316,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ GET_DH_PARAMS_DESC, GET_DH_PARAMS_NAME, GET_DH_PARAMS_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 62, VALUE_OPT_DH_INFO,
-     /* equiv idx, value */ 62, VALUE_OPT_DH_INFO,
+  {  /* entry idx, value */ 63, VALUE_OPT_DH_INFO,
+     /* equiv idx, value */ 63, VALUE_OPT_DH_INFO,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ DH_INFO_FLAGS, 0,
@@ -2300,8 +2328,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ DH_INFO_DESC, DH_INFO_NAME, DH_INFO_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 63, VALUE_OPT_LOAD_PRIVKEY,
-     /* equiv idx, value */ 63, VALUE_OPT_LOAD_PRIVKEY,
+  {  /* entry idx, value */ 64, VALUE_OPT_LOAD_PRIVKEY,
+     /* equiv idx, value */ 64, VALUE_OPT_LOAD_PRIVKEY,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ LOAD_PRIVKEY_FLAGS, 0,
@@ -2312,8 +2340,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ LOAD_PRIVKEY_DESC, LOAD_PRIVKEY_NAME, LOAD_PRIVKEY_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 64, VALUE_OPT_LOAD_PUBKEY,
-     /* equiv idx, value */ 64, VALUE_OPT_LOAD_PUBKEY,
+  {  /* entry idx, value */ 65, VALUE_OPT_LOAD_PUBKEY,
+     /* equiv idx, value */ 65, VALUE_OPT_LOAD_PUBKEY,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ LOAD_PUBKEY_FLAGS, 0,
@@ -2324,8 +2352,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ LOAD_PUBKEY_DESC, LOAD_PUBKEY_NAME, LOAD_PUBKEY_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 65, VALUE_OPT_LOAD_REQUEST,
-     /* equiv idx, value */ 65, VALUE_OPT_LOAD_REQUEST,
+  {  /* entry idx, value */ 66, VALUE_OPT_LOAD_REQUEST,
+     /* equiv idx, value */ 66, VALUE_OPT_LOAD_REQUEST,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ LOAD_REQUEST_FLAGS, 0,
@@ -2336,8 +2364,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ LOAD_REQUEST_DESC, LOAD_REQUEST_NAME, LOAD_REQUEST_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 66, VALUE_OPT_LOAD_CERTIFICATE,
-     /* equiv idx, value */ 66, VALUE_OPT_LOAD_CERTIFICATE,
+  {  /* entry idx, value */ 67, VALUE_OPT_LOAD_CERTIFICATE,
+     /* equiv idx, value */ 67, VALUE_OPT_LOAD_CERTIFICATE,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ LOAD_CERTIFICATE_FLAGS, 0,
@@ -2348,8 +2376,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ LOAD_CERTIFICATE_DESC, LOAD_CERTIFICATE_NAME, LOAD_CERTIFICATE_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 67, VALUE_OPT_LOAD_CA_PRIVKEY,
-     /* equiv idx, value */ 67, VALUE_OPT_LOAD_CA_PRIVKEY,
+  {  /* entry idx, value */ 68, VALUE_OPT_LOAD_CA_PRIVKEY,
+     /* equiv idx, value */ 68, VALUE_OPT_LOAD_CA_PRIVKEY,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ LOAD_CA_PRIVKEY_FLAGS, 0,
@@ -2360,8 +2388,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ LOAD_CA_PRIVKEY_DESC, LOAD_CA_PRIVKEY_NAME, LOAD_CA_PRIVKEY_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 68, VALUE_OPT_LOAD_CA_CERTIFICATE,
-     /* equiv idx, value */ 68, VALUE_OPT_LOAD_CA_CERTIFICATE,
+  {  /* entry idx, value */ 69, VALUE_OPT_LOAD_CA_CERTIFICATE,
+     /* equiv idx, value */ 69, VALUE_OPT_LOAD_CA_CERTIFICATE,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ LOAD_CA_CERTIFICATE_FLAGS, 0,
@@ -2372,8 +2400,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ LOAD_CA_CERTIFICATE_DESC, LOAD_CA_CERTIFICATE_NAME, LOAD_CA_CERTIFICATE_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 69, VALUE_OPT_LOAD_CRL,
-     /* equiv idx, value */ 69, VALUE_OPT_LOAD_CRL,
+  {  /* entry idx, value */ 70, VALUE_OPT_LOAD_CRL,
+     /* equiv idx, value */ 70, VALUE_OPT_LOAD_CRL,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ LOAD_CRL_FLAGS, 0,
@@ -2384,8 +2412,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ LOAD_CRL_DESC, LOAD_CRL_NAME, LOAD_CRL_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 70, VALUE_OPT_LOAD_DATA,
-     /* equiv idx, value */ 70, VALUE_OPT_LOAD_DATA,
+  {  /* entry idx, value */ 71, VALUE_OPT_LOAD_DATA,
+     /* equiv idx, value */ 71, VALUE_OPT_LOAD_DATA,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ LOAD_DATA_FLAGS, 0,
@@ -2396,8 +2424,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ LOAD_DATA_DESC, LOAD_DATA_NAME, LOAD_DATA_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 71, VALUE_OPT_PASSWORD,
-     /* equiv idx, value */ 71, VALUE_OPT_PASSWORD,
+  {  /* entry idx, value */ 72, VALUE_OPT_PASSWORD,
+     /* equiv idx, value */ 72, VALUE_OPT_PASSWORD,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ PASSWORD_FLAGS, 0,
@@ -2408,8 +2436,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ PASSWORD_DESC, PASSWORD_NAME, PASSWORD_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 72, VALUE_OPT_NULL_PASSWORD,
-     /* equiv idx, value */ 72, VALUE_OPT_NULL_PASSWORD,
+  {  /* entry idx, value */ 73, VALUE_OPT_NULL_PASSWORD,
+     /* equiv idx, value */ 73, VALUE_OPT_NULL_PASSWORD,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ NULL_PASSWORD_FLAGS, 0,
@@ -2420,8 +2448,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ NULL_PASSWORD_DESC, NULL_PASSWORD_NAME, NULL_PASSWORD_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 73, VALUE_OPT_EMPTY_PASSWORD,
-     /* equiv idx, value */ 73, VALUE_OPT_EMPTY_PASSWORD,
+  {  /* entry idx, value */ 74, VALUE_OPT_EMPTY_PASSWORD,
+     /* equiv idx, value */ 74, VALUE_OPT_EMPTY_PASSWORD,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ EMPTY_PASSWORD_FLAGS, 0,
@@ -2432,8 +2460,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ EMPTY_PASSWORD_DESC, EMPTY_PASSWORD_NAME, EMPTY_PASSWORD_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 74, VALUE_OPT_HEX_NUMBERS,
-     /* equiv idx, value */ 74, VALUE_OPT_HEX_NUMBERS,
+  {  /* entry idx, value */ 75, VALUE_OPT_HEX_NUMBERS,
+     /* equiv idx, value */ 75, VALUE_OPT_HEX_NUMBERS,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ HEX_NUMBERS_FLAGS, 0,
@@ -2444,8 +2472,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ HEX_NUMBERS_DESC, HEX_NUMBERS_NAME, HEX_NUMBERS_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 75, VALUE_OPT_CPRINT,
-     /* equiv idx, value */ 75, VALUE_OPT_CPRINT,
+  {  /* entry idx, value */ 76, VALUE_OPT_CPRINT,
+     /* equiv idx, value */ 76, VALUE_OPT_CPRINT,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ CPRINT_FLAGS, 0,
@@ -2456,8 +2484,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ CPRINT_DESC, CPRINT_NAME, CPRINT_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 76, VALUE_OPT_RSA,
-     /* equiv idx, value */ 76, VALUE_OPT_RSA,
+  {  /* entry idx, value */ 77, VALUE_OPT_RSA,
+     /* equiv idx, value */ 77, VALUE_OPT_RSA,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ RSA_FLAGS, 0,
@@ -2468,8 +2496,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ RSA_DESC, RSA_NAME, RSA_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 77, VALUE_OPT_DSA,
-     /* equiv idx, value */ 77, VALUE_OPT_DSA,
+  {  /* entry idx, value */ 78, VALUE_OPT_DSA,
+     /* equiv idx, value */ 78, VALUE_OPT_DSA,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ DSA_FLAGS, 0,
@@ -2480,8 +2508,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ DSA_DESC, DSA_NAME, DSA_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 78, VALUE_OPT_ECC,
-     /* equiv idx, value */ 78, VALUE_OPT_ECC,
+  {  /* entry idx, value */ 79, VALUE_OPT_ECC,
+     /* equiv idx, value */ 79, VALUE_OPT_ECC,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ ECC_FLAGS, 0,
@@ -2492,8 +2520,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ ECC_DESC, ECC_NAME, ECC_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 79, VALUE_OPT_ECDSA,
-     /* equiv idx, value */ 79, VALUE_OPT_ECDSA,
+  {  /* entry idx, value */ 80, VALUE_OPT_ECDSA,
+     /* equiv idx, value */ 80, VALUE_OPT_ECDSA,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ ECDSA_FLAGS, 0,
@@ -2504,8 +2532,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ ECDSA_DESC, ECDSA_NAME, ECDSA_name,
      /* disablement strs */ 0, 0 },
 
-  {  /* entry idx, value */ 80, VALUE_OPT_HASH,
-     /* equiv idx, value */ 80, VALUE_OPT_HASH,
+  {  /* entry idx, value */ 81, VALUE_OPT_HASH,
+     /* equiv idx, value */ 81, VALUE_OPT_HASH,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ HASH_FLAGS, 0,
@@ -2516,8 +2544,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ HASH_DESC, HASH_NAME, HASH_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 81, VALUE_OPT_SALT_SIZE,
-     /* equiv idx, value */ 81, VALUE_OPT_SALT_SIZE,
+  {  /* entry idx, value */ 82, VALUE_OPT_SALT_SIZE,
+     /* equiv idx, value */ 82, VALUE_OPT_SALT_SIZE,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ SALT_SIZE_FLAGS, 0,
@@ -2528,8 +2556,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ SALT_SIZE_DESC, SALT_SIZE_NAME, SALT_SIZE_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 82, VALUE_OPT_INDER,
-     /* equiv idx, value */ 82, VALUE_OPT_INDER,
+  {  /* entry idx, value */ 83, VALUE_OPT_INDER,
+     /* equiv idx, value */ 83, VALUE_OPT_INDER,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ INDER_FLAGS, 0,
@@ -2540,8 +2568,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ INDER_DESC, INDER_NAME, INDER_name,
      /* disablement strs */ NOT_INDER_name, NOT_INDER_PFX },
 
-  {  /* entry idx, value */ 83, VALUE_OPT_INRAW,
-     /* equiv idx, value */ 83, VALUE_OPT_INRAW,
+  {  /* entry idx, value */ 84, VALUE_OPT_INRAW,
+     /* equiv idx, value */ 84, VALUE_OPT_INRAW,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ INRAW_FLAGS, 0,
@@ -2552,8 +2580,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ INRAW_DESC, INRAW_NAME, INRAW_name,
      /* disablement strs */ 0, 0 },
 
-  {  /* entry idx, value */ 84, VALUE_OPT_OUTDER,
-     /* equiv idx, value */ 84, VALUE_OPT_OUTDER,
+  {  /* entry idx, value */ 85, VALUE_OPT_OUTDER,
+     /* equiv idx, value */ 85, VALUE_OPT_OUTDER,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ OUTDER_FLAGS, 0,
@@ -2564,8 +2592,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ OUTDER_DESC, OUTDER_NAME, OUTDER_name,
      /* disablement strs */ NOT_OUTDER_name, NOT_OUTDER_PFX },
 
-  {  /* entry idx, value */ 85, VALUE_OPT_OUTRAW,
-     /* equiv idx, value */ 85, VALUE_OPT_OUTRAW,
+  {  /* entry idx, value */ 86, VALUE_OPT_OUTRAW,
+     /* equiv idx, value */ 86, VALUE_OPT_OUTRAW,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ OUTRAW_FLAGS, 0,
@@ -2576,8 +2604,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ OUTRAW_DESC, OUTRAW_NAME, OUTRAW_name,
      /* disablement strs */ 0, 0 },
 
-  {  /* entry idx, value */ 86, VALUE_OPT_DISABLE_QUICK_RANDOM,
-     /* equiv idx, value */ 86, VALUE_OPT_DISABLE_QUICK_RANDOM,
+  {  /* entry idx, value */ 87, VALUE_OPT_DISABLE_QUICK_RANDOM,
+     /* equiv idx, value */ 87, VALUE_OPT_DISABLE_QUICK_RANDOM,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ DISABLE_QUICK_RANDOM_FLAGS, 0,
@@ -2588,8 +2616,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ DISABLE_QUICK_RANDOM_DESC, DISABLE_QUICK_RANDOM_NAME, DISABLE_QUICK_RANDOM_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 87, VALUE_OPT_TEMPLATE,
-     /* equiv idx, value */ 87, VALUE_OPT_TEMPLATE,
+  {  /* entry idx, value */ 88, VALUE_OPT_TEMPLATE,
+     /* equiv idx, value */ 88, VALUE_OPT_TEMPLATE,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ TEMPLATE_FLAGS, 0,
@@ -2600,8 +2628,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ TEMPLATE_DESC, TEMPLATE_NAME, TEMPLATE_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 88, VALUE_OPT_STDOUT_INFO,
-     /* equiv idx, value */ 88, VALUE_OPT_STDOUT_INFO,
+  {  /* entry idx, value */ 89, VALUE_OPT_STDOUT_INFO,
+     /* equiv idx, value */ 89, VALUE_OPT_STDOUT_INFO,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ STDOUT_INFO_FLAGS, 0,
@@ -2612,8 +2640,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ STDOUT_INFO_DESC, STDOUT_INFO_NAME, STDOUT_INFO_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 89, VALUE_OPT_ASK_PASS,
-     /* equiv idx, value */ 89, VALUE_OPT_ASK_PASS,
+  {  /* entry idx, value */ 90, VALUE_OPT_ASK_PASS,
+     /* equiv idx, value */ 90, VALUE_OPT_ASK_PASS,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ ASK_PASS_FLAGS, 0,
@@ -2624,8 +2652,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ ASK_PASS_DESC, ASK_PASS_NAME, ASK_PASS_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 90, VALUE_OPT_PKCS_CIPHER,
-     /* equiv idx, value */ 90, VALUE_OPT_PKCS_CIPHER,
+  {  /* entry idx, value */ 91, VALUE_OPT_PKCS_CIPHER,
+     /* equiv idx, value */ 91, VALUE_OPT_PKCS_CIPHER,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ PKCS_CIPHER_FLAGS, 0,
@@ -2636,8 +2664,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ PKCS_CIPHER_DESC, PKCS_CIPHER_NAME, PKCS_CIPHER_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 91, VALUE_OPT_PROVIDER,
-     /* equiv idx, value */ 91, VALUE_OPT_PROVIDER,
+  {  /* entry idx, value */ 92, VALUE_OPT_PROVIDER,
+     /* equiv idx, value */ 92, VALUE_OPT_PROVIDER,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ PROVIDER_FLAGS, 0,
@@ -2648,8 +2676,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ PROVIDER_DESC, PROVIDER_NAME, PROVIDER_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 92, VALUE_OPT_TEXT,
-     /* equiv idx, value */ 92, VALUE_OPT_TEXT,
+  {  /* entry idx, value */ 93, VALUE_OPT_TEXT,
+     /* equiv idx, value */ 93, VALUE_OPT_TEXT,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ TEXT_FLAGS, 0,
@@ -2702,21 +2730,21 @@ static tOptDesc optDesc[OPTION_CT] = {
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 /** Reference to the upper cased version of certtool. */
-#define zPROGNAME       (certtool_opt_strs+6757)
+#define zPROGNAME       (certtool_opt_strs+6848)
 /** Reference to the title line for certtool usage. */
-#define zUsageTitle     (certtool_opt_strs+6766)
+#define zUsageTitle     (certtool_opt_strs+6857)
 /** There is no certtool configuration file. */
 #define zRcName         NULL
 /** There are no directories to search for certtool config files. */
 #define apzHomeList     NULL
 /** The certtool program bug email address. */
-#define zBugsAddr       (certtool_opt_strs+6859)
+#define zBugsAddr       (certtool_opt_strs+6950)
 /** Clarification/explanation of what certtool does. */
-#define zExplain        (certtool_opt_strs+6875)
+#define zExplain        (certtool_opt_strs+6966)
 /** Extra detail explaining what certtool does. */
-#define zDetail         (certtool_opt_strs+6877)
+#define zDetail         (certtool_opt_strs+6968)
 /** The full version string for certtool. */
-#define zFullVersion    (certtool_opt_strs+7238)
+#define zFullVersion    (certtool_opt_strs+7329)
 /* extracted from optcode.tlib near line 342 */
 
 #if defined(ENABLE_NLS)
@@ -2728,7 +2756,7 @@ static tOptDesc optDesc[OPTION_CT] = {
 #endif /* ENABLE_NLS */
 
 #define certtool_full_usage (NULL)
-#define certtool_short_usage (certtool_opt_strs+7254)
+#define certtool_short_usage (certtool_opt_strs+7345)
 
 #endif /* not defined __doxygen__ */
 
@@ -2925,7 +2953,7 @@ tOptions certtoolOptions = {
       NO_EQUIVALENT, /* '-#' option index */
       NO_EQUIVALENT /* index of default opt */
     },
-    96 /* full option count */, 93 /* user option count */,
+    97 /* full option count */, 94 /* user option count */,
     certtool_full_usage, certtool_short_usage,
     NULL, NULL,
     PKGDATADIR, certtool_packager_info
@@ -3060,8 +3088,8 @@ static void bogus_function(void) {
      translate option names.
    */
   /* referenced via certtoolOptions.pzCopyright */
-  puts(_("certtool 3.6.11\n\
-Copyright (C) 2000-2019 Free Software Foundation, and others, all rights reserved.\n\
+  puts(_("certtool 3.6.13\n\
+Copyright (C) 2000-2020 Free Software Foundation, and others, all rights reserved.\n\
 This is free software. It is licensed for use, modification and\n\
 redistribution under the terms of the GNU General Public License,\n\
 version 3 or later <http://gnu.org/licenses/gpl.html>\n"));
@@ -3226,6 +3254,9 @@ with this program.  If not, see <http://www.gnu.org/licenses/>.\n"));
   puts(_("Allow broken algorithms, such as MD5 for verification"));
 
   /* referenced via certtoolOptions.pOptDesc->pzText */
+  puts(_("Specify a security level profile to be used for verification"));
+
+  /* referenced via certtoolOptions.pOptDesc->pzText */
   puts(_("PKCS#7 structure options:"));
 
   /* referenced via certtoolOptions.pOptDesc->pzText */
@@ -3383,7 +3414,7 @@ PIN is required for URI access you can provide it using the environment\n\
 variables GNUTLS_PIN and GNUTLS_SO_PIN.\n"));
 
   /* referenced via certtoolOptions.pzFullVersion */
-  puts(_("certtool 3.6.11"));
+  puts(_("certtool 3.6.13"));
 
   /* referenced via certtoolOptions.pzFullUsage */
   puts(_("<<<NOT-FOUND>>>"));

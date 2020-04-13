@@ -211,7 +211,7 @@ static int _gnutls_init_ret = 0;
  * called as many times as gnutls_global_init().  This is useful when
  * GnuTLS is used by more than one library in an application.  This
  * function can be called many times, but will only do something the
- * first time.
+ * first time. It is thread safe since GnuTLS 3.3.0.
  *
  * A subsequent call of this function if the initial has failed will
  * return the same error code.
@@ -368,7 +368,6 @@ static int _gnutls_global_init(unsigned constructor)
 
 	_gnutls_register_accel_crypto();
 	_gnutls_cryptodev_init();
-	_gnutls_load_system_priorities();
 
 #ifdef ENABLE_FIPS140
 	/* These self tests are performed on the overridden algorithms
@@ -385,6 +384,7 @@ static int _gnutls_global_init(unsigned constructor)
 		_gnutls_fips_mode_reset_zombie();
 	}
 #endif
+	_gnutls_load_system_priorities();
 	_gnutls_switch_lib_state(LIB_STATE_OPERATIONAL);
 	ret = 0;
 

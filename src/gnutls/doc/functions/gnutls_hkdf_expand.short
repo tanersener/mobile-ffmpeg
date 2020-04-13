@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_hkdf_expand} (gnutls_mac_algorithm_t @var{mac}, const gnutls_datum_t * @var{key}, const gnutls_datum_t * @var{info}, void * @var{output}, size_t @var{length})

@@ -112,6 +112,7 @@ Certificate verification related options:
                                 - prohibits the option 'verify-hostname'
        --verify-purpose=str   Specify a purpose OID to be used for certificate chain verification
        --verify-allow-broken  Allow broken algorithms, such as MD5 for verification
+       --verify-profile=str   Specify a security level profile to be used for verification
 
 PKCS#7 structure options:
 
@@ -289,7 +290,7 @@ option is also acceptable.
 This is the ``specify the key type to use on key generation'' option.
 This option takes a string argument.
 This option can be combined with --generate-privkey, to specify
-the key type to be generated. Valid options are, 'rsa', 'rsa-pss', 'dsa', 'ecdsa', and 'ed25519'.
+the key type to be generated. Valid options are, 'rsa', 'rsa-pss', 'dsa', 'ecdsa', 'ed25519, and 'ed448'.'.
 When combined with certificate generation it can be used to specify an
 RSA-PSS certificate when an RSA key is given.
 @subsubheading curve option.
@@ -408,6 +409,16 @@ This object identifier restricts the purpose of the certificates to be verified.
 
 This is the ``allow broken algorithms, such as md5 for verification'' option.
 This can be combined with --p7-verify, --verify or --verify-chain.
+@subsubheading verify-profile option.
+@anchor{certtool verify-profile}
+
+This is the ``specify a security level profile to be used for verification'' option.
+This option takes a string argument.
+This option can be used to specify a certificate verification profile. Certificate
+    verification profiles correspond to the security level. This should be one of
+    'none', 'very weak', 'low', 'legacy', 'medium', 'high', 'ultra',
+    'future'. Note that by default no profile is applied, unless one is set
+    as minimum in the gnutls configuration file.
 @anchor{certtool pkcs7-options}
 @subsubheading pkcs7-options options
 PKCS#7 structure options.

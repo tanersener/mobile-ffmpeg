@@ -2,7 +2,7 @@
 
 
 
-@deftypefun {int} {gnutls_ocsp_req_export} (gnutls_ocsp_req_t @var{req}, gnutls_datum_t * @var{data})
+@deftypefun {int} {gnutls_ocsp_req_export} (gnutls_ocsp_req_const_t @var{req}, gnutls_datum_t * @var{data})
 @var{req}: Holds the OCSP request
 
 @var{data}: newly allocate buffer holding DER encoded OCSP request

@@ -2,7 +2,7 @@
 
 
 
-@deftypefun {int} {gnutls_ocsp_resp_get_single} (gnutls_ocsp_resp_t @var{resp}, unsigned @var{indx}, gnutls_digest_algorithm_t * @var{digest}, gnutls_datum_t * @var{issuer_name_hash}, gnutls_datum_t * @var{issuer_key_hash}, gnutls_datum_t * @var{serial_number}, unsigned int * @var{cert_status}, time_t * @var{this_update}, time_t * @var{next_update}, time_t * @var{revocation_time}, unsigned int * @var{revocation_reason})
+@deftypefun {int} {gnutls_ocsp_resp_get_single} (gnutls_ocsp_resp_const_t @var{resp}, unsigned @var{indx}, gnutls_digest_algorithm_t * @var{digest}, gnutls_datum_t * @var{issuer_name_hash}, gnutls_datum_t * @var{issuer_key_hash}, gnutls_datum_t * @var{serial_number}, unsigned int * @var{cert_status}, time_t * @var{this_update}, time_t * @var{next_update}, time_t * @var{revocation_time}, unsigned int * @var{revocation_reason})
 @var{resp}: should contain a @code{gnutls_ocsp_resp_t}  type
 
 @var{indx}: Specifies response number to get. Use (0) to get the first one.

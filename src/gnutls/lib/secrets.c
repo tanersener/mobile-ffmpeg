@@ -25,8 +25,6 @@
 
 #include <config.h>
 #include "gnutls_int.h"
-#include <nettle/hkdf.h>
-#include <nettle/hmac.h>
 #include "secrets.h"
 
 /* HKDF-Extract(0,0) or HKDF-Extract(0, PSK) */
@@ -67,10 +65,17 @@ int _tls13_init_secret2(const mac_entry_st *prf,
 /* HKDF-Extract(Prev-Secret, key) */
 int _tls13_update_secret(gnutls_session_t session, const uint8_t *key, size_t key_size)
 {
-	return gnutls_hmac_fast(session->security_parameters.prf->id,
-				session->key.proto.tls13.temp_secret, session->key.proto.tls13.temp_secret_size,
-				key, key_size,
-				session->key.proto.tls13.temp_secret);
+	gnutls_datum_t _key;
+	gnutls_datum_t salt;
+
+	_key.data = (void *)key;
+	_key.size = key_size;
+	salt.data = (void *)session->key.proto.tls13.temp_secret;
+	salt.size = session->key.proto.tls13.temp_secret_size;
+
+	return gnutls_hkdf_extract(session->security_parameters.prf->id,
+				   &_key, &salt,
+				   session->key.proto.tls13.temp_secret);
 }
 
 /* Derive-Secret(Secret, Label, Messages) */
@@ -123,6 +128,8 @@ int _tls13_expand_secret2(const mac_entry_st *prf,
 {
 	uint8_t tmp[256] = "tls13 ";
 	gnutls_buffer_st str;
+	gnutls_datum_t key;
+	gnutls_datum_t info;
 	int ret;
 
 	if (unlikely(label_size >= sizeof(tmp)-6))
@@ -149,28 +156,14 @@ int _tls13_expand_secret2(const mac_entry_st *prf,
 		goto cleanup;
 	}
 
-	switch (prf->id) {
-	case GNUTLS_MAC_SHA256:{
-		struct hmac_sha256_ctx ctx;
+	key.data = (void *)secret;
+	key.size =_gnutls_mac_get_algo_len(mac_to_entry(prf->id));
+	info.data = str.data;
+	info.size = str.length;
 
-		hmac_sha256_set_key(&ctx, SHA256_DIGEST_SIZE, secret);
-		hkdf_expand(&ctx, (nettle_hash_update_func*)hmac_sha256_update,
-			(nettle_hash_digest_func*)hmac_sha256_digest, SHA256_DIGEST_SIZE,
-			str.length, str.data, out_size, out);
-		break;
-	}
-	case GNUTLS_MAC_SHA384:{
-		struct hmac_sha384_ctx ctx;
-
-		hmac_sha384_set_key(&ctx, SHA384_DIGEST_SIZE, secret);
-		hkdf_expand(&ctx, (nettle_hash_update_func*)hmac_sha384_update,
-			(nettle_hash_digest_func*)hmac_sha384_digest, SHA384_DIGEST_SIZE,
-			str.length, str.data, out_size, out);
-		break;
-	}
-	default:
+	ret = gnutls_hkdf_expand(prf->id, &key, &info, out, out_size);
+	if (ret < 0) {
 		gnutls_assert();
-		ret = GNUTLS_E_INTERNAL_ERROR;
 		goto cleanup;
 	}
 

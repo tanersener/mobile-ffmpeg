@@ -90,6 +90,14 @@ DHParameter ::= SEQUENCE {
   privateValueLength  INTEGER OPTIONAL 
 }
 
+-- From PKCS #11 3.0
+pkcs-11-ec-Parameters ::= CHOICE {
+  --ecParameters   ECParameters,
+  oId              OBJECT IDENTIFIER,
+  --implicitlyCA   NULL,
+  curveName        PrintableString
+}
+
 -- ECC from RFC5480
 ECParameters ::= CHOICE {
   namedCurve         OBJECT IDENTIFIER

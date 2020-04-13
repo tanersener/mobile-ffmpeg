@@ -92,7 +92,6 @@ ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/lib/unistring/m4/gnulib-comp.m4 \
 	$(top_srcdir)/lib/unistring/m4/inline.m4 \
 	$(top_srcdir)/lib/unistring/m4/libunistring-base.m4 \
-	$(top_srcdir)/src/gl/m4/__inline.m4 \
 	$(top_srcdir)/src/gl/m4/bison.m4 \
 	$(top_srcdir)/src/gl/m4/clock_time.m4 \
 	$(top_srcdir)/src/gl/m4/fseek.m4 \
@@ -112,7 +111,7 @@ am__aclocal_m4_deps = $(top_srcdir)/lib/unistring/m4/gnulib-comp.m4 \
 	$(top_srcdir)/src/gl/m4/tzset.m4 \
 	$(top_srcdir)/src/libopts/m4/libopts.m4 \
 	$(top_srcdir)/src/libopts/m4/stdnoreturn.m4 \
-	$(top_srcdir)/m4/00gnulib.m4 \
+	$(top_srcdir)/m4/00gnulib.m4 $(top_srcdir)/m4/__inline.m4 \
 	$(top_srcdir)/m4/absolute-header.m4 $(top_srcdir)/m4/alloca.m4 \
 	$(top_srcdir)/m4/arpa_inet_h.m4 \
 	$(top_srcdir)/m4/ax_ac_append_to_file.m4 \
@@ -147,10 +146,11 @@ am__aclocal_m4_deps = $(top_srcdir)/lib/unistring/m4/gnulib-comp.m4 \
 	$(top_srcdir)/m4/inet_pton.m4 \
 	$(top_srcdir)/m4/intl-thread-locale.m4 \
 	$(top_srcdir)/m4/intlmacosx.m4 $(top_srcdir)/m4/intmax_t.m4 \
-	$(top_srcdir)/m4/inttypes-pri.m4 $(top_srcdir)/m4/inttypes.m4 \
-	$(top_srcdir)/m4/inttypes_h.m4 $(top_srcdir)/m4/ioctl.m4 \
-	$(top_srcdir)/m4/isblank.m4 $(top_srcdir)/m4/langinfo_h.m4 \
-	$(top_srcdir)/m4/largefile.m4 $(top_srcdir)/m4/lcmessage.m4 \
+	$(top_srcdir)/m4/inttostr.m4 $(top_srcdir)/m4/inttypes-pri.m4 \
+	$(top_srcdir)/m4/inttypes.m4 $(top_srcdir)/m4/inttypes_h.m4 \
+	$(top_srcdir)/m4/ioctl.m4 $(top_srcdir)/m4/isblank.m4 \
+	$(top_srcdir)/m4/langinfo_h.m4 $(top_srcdir)/m4/largefile.m4 \
+	$(top_srcdir)/m4/lcmessage.m4 \
 	$(top_srcdir)/m4/ld-output-def.m4 \
 	$(top_srcdir)/m4/ld-version-script.m4 \
 	$(top_srcdir)/m4/lib-ld.m4 $(top_srcdir)/m4/lib-link.m4 \
@@ -160,27 +160,32 @@ am__aclocal_m4_deps = $(top_srcdir)/lib/unistring/m4/gnulib-comp.m4 \
 	$(top_srcdir)/m4/locale-zh.m4 $(top_srcdir)/m4/locale_h.m4 \
 	$(top_srcdir)/m4/localename.m4 \
 	$(top_srcdir)/m4/localtime-buffer.m4 $(top_srcdir)/m4/lock.m4 \
-	$(top_srcdir)/m4/longlong.m4 $(top_srcdir)/m4/lseek.m4 \
-	$(top_srcdir)/m4/lstat.m4 $(top_srcdir)/m4/ltoptions.m4 \
-	$(top_srcdir)/m4/ltsugar.m4 $(top_srcdir)/m4/ltversion.m4 \
-	$(top_srcdir)/m4/lt~obsolete.m4 $(top_srcdir)/m4/malloc.m4 \
-	$(top_srcdir)/m4/malloca.m4 $(top_srcdir)/m4/manywarnings.m4 \
-	$(top_srcdir)/m4/memchr.m4 $(top_srcdir)/m4/memmem.m4 \
-	$(top_srcdir)/m4/minmax.m4 $(top_srcdir)/m4/mmap-anon.m4 \
-	$(top_srcdir)/m4/mode_t.m4 $(top_srcdir)/m4/msvc-inval.m4 \
+	$(top_srcdir)/m4/lseek.m4 $(top_srcdir)/m4/lstat.m4 \
+	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
+	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/lt~obsolete.m4 \
+	$(top_srcdir)/m4/malloc.m4 $(top_srcdir)/m4/malloca.m4 \
+	$(top_srcdir)/m4/manywarnings.m4 $(top_srcdir)/m4/memchr.m4 \
+	$(top_srcdir)/m4/memmem.m4 $(top_srcdir)/m4/minmax.m4 \
+	$(top_srcdir)/m4/mmap-anon.m4 $(top_srcdir)/m4/mode_t.m4 \
+	$(top_srcdir)/m4/msvc-inval.m4 \
 	$(top_srcdir)/m4/msvc-nothrow.m4 $(top_srcdir)/m4/multiarch.m4 \
 	$(top_srcdir)/m4/nanosleep.m4 $(top_srcdir)/m4/netdb_h.m4 \
 	$(top_srcdir)/m4/netinet_in_h.m4 $(top_srcdir)/m4/nls.m4 \
 	$(top_srcdir)/m4/off_t.m4 $(top_srcdir)/m4/open-cloexec.m4 \
-	$(top_srcdir)/m4/open.m4 $(top_srcdir)/m4/pathmax.m4 \
-	$(top_srcdir)/m4/perror.m4 $(top_srcdir)/m4/pipe.m4 \
-	$(top_srcdir)/m4/pkg.m4 $(top_srcdir)/m4/po.m4 \
-	$(top_srcdir)/m4/printf.m4 $(top_srcdir)/m4/progtest.m4 \
+	$(top_srcdir)/m4/open-slash.m4 $(top_srcdir)/m4/open.m4 \
+	$(top_srcdir)/m4/pathmax.m4 $(top_srcdir)/m4/perror.m4 \
+	$(top_srcdir)/m4/pipe.m4 $(top_srcdir)/m4/pkg.m4 \
+	$(top_srcdir)/m4/po.m4 $(top_srcdir)/m4/printf.m4 \
+	$(top_srcdir)/m4/progtest.m4 \
+	$(top_srcdir)/m4/pthread-thread.m4 \
+	$(top_srcdir)/m4/pthread_h.m4 \
 	$(top_srcdir)/m4/pthread_rwlock_rdlock.m4 \
-	$(top_srcdir)/m4/putenv.m4 $(top_srcdir)/m4/raise.m4 \
-	$(top_srcdir)/m4/read-file.m4 $(top_srcdir)/m4/realloc.m4 \
+	$(top_srcdir)/m4/pthread_sigmask.m4 $(top_srcdir)/m4/putenv.m4 \
+	$(top_srcdir)/m4/raise.m4 $(top_srcdir)/m4/read-file.m4 \
+	$(top_srcdir)/m4/realloc.m4 $(top_srcdir)/m4/sched_h.m4 \
 	$(top_srcdir)/m4/secure_getenv.m4 $(top_srcdir)/m4/select.m4 \
 	$(top_srcdir)/m4/setenv.m4 $(top_srcdir)/m4/setlocale.m4 \
+	$(top_srcdir)/m4/setlocale_null.m4 \
 	$(top_srcdir)/m4/sigaction.m4 $(top_srcdir)/m4/signal_h.m4 \
 	$(top_srcdir)/m4/signalblocking.m4 \
 	$(top_srcdir)/m4/size_max.m4 $(top_srcdir)/m4/sleep.m4 \
@@ -202,15 +207,16 @@ am__aclocal_m4_deps = $(top_srcdir)/lib/unistring/m4/gnulib-comp.m4 \
 	$(top_srcdir)/m4/sys_socket_h.m4 \
 	$(top_srcdir)/m4/sys_stat_h.m4 $(top_srcdir)/m4/sys_time_h.m4 \
 	$(top_srcdir)/m4/sys_types_h.m4 $(top_srcdir)/m4/sys_uio_h.m4 \
-	$(top_srcdir)/m4/threadlib.m4 $(top_srcdir)/m4/time_h.m4 \
-	$(top_srcdir)/m4/time_r.m4 $(top_srcdir)/m4/ungetc.m4 \
-	$(top_srcdir)/m4/unistd_h.m4 \
+	$(top_srcdir)/m4/thread.m4 $(top_srcdir)/m4/threadlib.m4 \
+	$(top_srcdir)/m4/time_h.m4 $(top_srcdir)/m4/time_r.m4 \
+	$(top_srcdir)/m4/ungetc.m4 $(top_srcdir)/m4/unistd_h.m4 \
 	$(top_srcdir)/m4/valgrind-tests.m4 \
 	$(top_srcdir)/m4/vasnprintf.m4 $(top_srcdir)/m4/vasprintf.m4 \
-	$(top_srcdir)/m4/vsnprintf.m4 $(top_srcdir)/m4/warn-on-use.m4 \
-	$(top_srcdir)/m4/warnings.m4 $(top_srcdir)/m4/wchar_h.m4 \
-	$(top_srcdir)/m4/wchar_t.m4 $(top_srcdir)/m4/wint_t.m4 \
-	$(top_srcdir)/m4/xsize.m4 $(top_srcdir)/configure.ac
+	$(top_srcdir)/m4/visibility.m4 $(top_srcdir)/m4/vsnprintf.m4 \
+	$(top_srcdir)/m4/warn-on-use.m4 $(top_srcdir)/m4/warnings.m4 \
+	$(top_srcdir)/m4/wchar_h.m4 $(top_srcdir)/m4/wchar_t.m4 \
+	$(top_srcdir)/m4/wint_t.m4 $(top_srcdir)/m4/xsize.m4 \
+	$(top_srcdir)/m4/zzgnulib.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 DIST_COMMON = $(srcdir)/Makefile.am $(am__DIST_COMMON)
@@ -218,8 +224,9 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
+am__objects_1 = main.$(OBJEXT)
 am_gnutls_base64_decoder_fuzzer_OBJECTS =  \
-	gnutls_base64_decoder_fuzzer.$(OBJEXT) main.$(OBJEXT)
+	gnutls_base64_decoder_fuzzer.$(OBJEXT) $(am__objects_1)
 gnutls_base64_decoder_fuzzer_OBJECTS =  \
 	$(am_gnutls_base64_decoder_fuzzer_OBJECTS)
 gnutls_base64_decoder_fuzzer_LDADD = $(LDADD)
@@ -230,13 +237,13 @@ gnutls_base64_decoder_fuzzer_DEPENDENCIES = ../gl/libgnu.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
 am_gnutls_base64_encoder_fuzzer_OBJECTS =  \
-	gnutls_base64_encoder_fuzzer.$(OBJEXT) main.$(OBJEXT)
+	gnutls_base64_encoder_fuzzer.$(OBJEXT) $(am__objects_1)
 gnutls_base64_encoder_fuzzer_OBJECTS =  \
 	$(am_gnutls_base64_encoder_fuzzer_OBJECTS)
 gnutls_base64_encoder_fuzzer_LDADD = $(LDADD)
@@ -246,9 +253,9 @@ gnutls_base64_encoder_fuzzer_DEPENDENCIES = ../gl/libgnu.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am_gnutls_client_fuzzer_OBJECTS = gnutls_client_fuzzer.$(OBJEXT) \
-	main.$(OBJEXT)
+	$(am__objects_1)
 gnutls_client_fuzzer_OBJECTS = $(am_gnutls_client_fuzzer_OBJECTS)
 gnutls_client_fuzzer_LDADD = $(LDADD)
 gnutls_client_fuzzer_DEPENDENCIES = ../gl/libgnu.la \
@@ -257,9 +264,9 @@ gnutls_client_fuzzer_DEPENDENCIES = ../gl/libgnu.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am_gnutls_client_rawpk_fuzzer_OBJECTS =  \
-	gnutls_client_rawpk_fuzzer.$(OBJEXT) main.$(OBJEXT)
+	gnutls_client_rawpk_fuzzer.$(OBJEXT) $(am__objects_1)
 gnutls_client_rawpk_fuzzer_OBJECTS =  \
 	$(am_gnutls_client_rawpk_fuzzer_OBJECTS)
 gnutls_client_rawpk_fuzzer_LDADD = $(LDADD)
@@ -269,9 +276,9 @@ gnutls_client_rawpk_fuzzer_DEPENDENCIES = ../gl/libgnu.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am_gnutls_dn_parser_fuzzer_OBJECTS =  \
-	gnutls_dn_parser_fuzzer.$(OBJEXT) main.$(OBJEXT)
+	gnutls_dn_parser_fuzzer.$(OBJEXT) $(am__objects_1)
 gnutls_dn_parser_fuzzer_OBJECTS =  \
 	$(am_gnutls_dn_parser_fuzzer_OBJECTS)
 gnutls_dn_parser_fuzzer_LDADD = $(LDADD)
@@ -281,9 +288,21 @@ gnutls_dn_parser_fuzzer_DEPENDENCIES = ../gl/libgnu.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+am_gnutls_ext_raw_parse_fuzzer_OBJECTS =  \
+	gnutls_ext_raw_parse_fuzzer.$(OBJEXT) $(am__objects_1)
+gnutls_ext_raw_parse_fuzzer_OBJECTS =  \
+	$(am_gnutls_ext_raw_parse_fuzzer_OBJECTS)
+gnutls_ext_raw_parse_fuzzer_LDADD = $(LDADD)
+gnutls_ext_raw_parse_fuzzer_DEPENDENCIES = ../gl/libgnu.la \
+	../lib/libgnutls.la $(LIBOBJS) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am_gnutls_idna_parser_fuzzer_OBJECTS =  \
-	gnutls_idna_parser_fuzzer.$(OBJEXT) main.$(OBJEXT)
+	gnutls_idna_parser_fuzzer.$(OBJEXT) $(am__objects_1)
 gnutls_idna_parser_fuzzer_OBJECTS =  \
 	$(am_gnutls_idna_parser_fuzzer_OBJECTS)
 gnutls_idna_parser_fuzzer_LDADD = $(LDADD)
@@ -293,9 +312,9 @@ gnutls_idna_parser_fuzzer_DEPENDENCIES = ../gl/libgnu.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am_gnutls_ocsp_req_parser_fuzzer_OBJECTS =  \
-	gnutls_ocsp_req_parser_fuzzer.$(OBJEXT) main.$(OBJEXT)
+	gnutls_ocsp_req_parser_fuzzer.$(OBJEXT) $(am__objects_1)
 gnutls_ocsp_req_parser_fuzzer_OBJECTS =  \
 	$(am_gnutls_ocsp_req_parser_fuzzer_OBJECTS)
 gnutls_ocsp_req_parser_fuzzer_LDADD = $(LDADD)
@@ -305,9 +324,9 @@ gnutls_ocsp_req_parser_fuzzer_DEPENDENCIES = ../gl/libgnu.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am_gnutls_ocsp_resp_parser_fuzzer_OBJECTS =  \
-	gnutls_ocsp_resp_parser_fuzzer.$(OBJEXT) main.$(OBJEXT)
+	gnutls_ocsp_resp_parser_fuzzer.$(OBJEXT) $(am__objects_1)
 gnutls_ocsp_resp_parser_fuzzer_OBJECTS =  \
 	$(am_gnutls_ocsp_resp_parser_fuzzer_OBJECTS)
 gnutls_ocsp_resp_parser_fuzzer_LDADD = $(LDADD)
@@ -317,9 +336,9 @@ gnutls_ocsp_resp_parser_fuzzer_DEPENDENCIES = ../gl/libgnu.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am_gnutls_pkcs12_key_parser_fuzzer_OBJECTS =  \
-	gnutls_pkcs12_key_parser_fuzzer.$(OBJEXT) main.$(OBJEXT)
+	gnutls_pkcs12_key_parser_fuzzer.$(OBJEXT) $(am__objects_1)
 gnutls_pkcs12_key_parser_fuzzer_OBJECTS =  \
 	$(am_gnutls_pkcs12_key_parser_fuzzer_OBJECTS)
 gnutls_pkcs12_key_parser_fuzzer_LDADD = $(LDADD)
@@ -329,9 +348,9 @@ gnutls_pkcs12_key_parser_fuzzer_DEPENDENCIES = ../gl/libgnu.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am_gnutls_pkcs7_parser_fuzzer_OBJECTS =  \
-	gnutls_pkcs7_parser_fuzzer.$(OBJEXT) main.$(OBJEXT)
+	gnutls_pkcs7_parser_fuzzer.$(OBJEXT) $(am__objects_1)
 gnutls_pkcs7_parser_fuzzer_OBJECTS =  \
 	$(am_gnutls_pkcs7_parser_fuzzer_OBJECTS)
 gnutls_pkcs7_parser_fuzzer_LDADD = $(LDADD)
@@ -341,9 +360,9 @@ gnutls_pkcs7_parser_fuzzer_DEPENDENCIES = ../gl/libgnu.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am_gnutls_pkcs8_key_parser_fuzzer_OBJECTS =  \
-	gnutls_pkcs8_key_parser_fuzzer.$(OBJEXT) main.$(OBJEXT)
+	gnutls_pkcs8_key_parser_fuzzer.$(OBJEXT) $(am__objects_1)
 gnutls_pkcs8_key_parser_fuzzer_OBJECTS =  \
 	$(am_gnutls_pkcs8_key_parser_fuzzer_OBJECTS)
 gnutls_pkcs8_key_parser_fuzzer_LDADD = $(LDADD)
@@ -353,9 +372,9 @@ gnutls_pkcs8_key_parser_fuzzer_DEPENDENCIES = ../gl/libgnu.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am_gnutls_private_key_parser_fuzzer_OBJECTS =  \
-	gnutls_private_key_parser_fuzzer.$(OBJEXT) main.$(OBJEXT)
+	gnutls_private_key_parser_fuzzer.$(OBJEXT) $(am__objects_1)
 gnutls_private_key_parser_fuzzer_OBJECTS =  \
 	$(am_gnutls_private_key_parser_fuzzer_OBJECTS)
 gnutls_private_key_parser_fuzzer_LDADD = $(LDADD)
@@ -365,9 +384,9 @@ gnutls_private_key_parser_fuzzer_DEPENDENCIES = ../gl/libgnu.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am_gnutls_psk_client_fuzzer_OBJECTS =  \
-	gnutls_psk_client_fuzzer.$(OBJEXT) main.$(OBJEXT)
+	gnutls_psk_client_fuzzer.$(OBJEXT) $(am__objects_1)
 gnutls_psk_client_fuzzer_OBJECTS =  \
 	$(am_gnutls_psk_client_fuzzer_OBJECTS)
 gnutls_psk_client_fuzzer_LDADD = $(LDADD)
@@ -377,9 +396,9 @@ gnutls_psk_client_fuzzer_DEPENDENCIES = ../gl/libgnu.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am_gnutls_psk_server_fuzzer_OBJECTS =  \
-	gnutls_psk_server_fuzzer.$(OBJEXT) main.$(OBJEXT)
+	gnutls_psk_server_fuzzer.$(OBJEXT) $(am__objects_1)
 gnutls_psk_server_fuzzer_OBJECTS =  \
 	$(am_gnutls_psk_server_fuzzer_OBJECTS)
 gnutls_psk_server_fuzzer_LDADD = $(LDADD)
@@ -389,9 +408,9 @@ gnutls_psk_server_fuzzer_DEPENDENCIES = ../gl/libgnu.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am_gnutls_reverse_idna_parser_fuzzer_OBJECTS =  \
-	gnutls_reverse_idna_parser_fuzzer.$(OBJEXT) main.$(OBJEXT)
+	gnutls_reverse_idna_parser_fuzzer.$(OBJEXT) $(am__objects_1)
 gnutls_reverse_idna_parser_fuzzer_OBJECTS =  \
 	$(am_gnutls_reverse_idna_parser_fuzzer_OBJECTS)
 gnutls_reverse_idna_parser_fuzzer_LDADD = $(LDADD)
@@ -401,9 +420,9 @@ gnutls_reverse_idna_parser_fuzzer_DEPENDENCIES = ../gl/libgnu.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am_gnutls_server_fuzzer_OBJECTS = gnutls_server_fuzzer.$(OBJEXT) \
-	main.$(OBJEXT)
+	$(am__objects_1)
 gnutls_server_fuzzer_OBJECTS = $(am_gnutls_server_fuzzer_OBJECTS)
 gnutls_server_fuzzer_LDADD = $(LDADD)
 gnutls_server_fuzzer_DEPENDENCIES = ../gl/libgnu.la \
@@ -412,9 +431,9 @@ gnutls_server_fuzzer_DEPENDENCIES = ../gl/libgnu.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am_gnutls_server_rawpk_fuzzer_OBJECTS =  \
-	gnutls_server_rawpk_fuzzer.$(OBJEXT) main.$(OBJEXT)
+	gnutls_server_rawpk_fuzzer.$(OBJEXT) $(am__objects_1)
 gnutls_server_rawpk_fuzzer_OBJECTS =  \
 	$(am_gnutls_server_rawpk_fuzzer_OBJECTS)
 gnutls_server_rawpk_fuzzer_LDADD = $(LDADD)
@@ -424,9 +443,9 @@ gnutls_server_rawpk_fuzzer_DEPENDENCIES = ../gl/libgnu.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am_gnutls_set_trust_file_fuzzer_OBJECTS =  \
-	gnutls_set_trust_file_fuzzer.$(OBJEXT) main.$(OBJEXT)
+	gnutls_set_trust_file_fuzzer.$(OBJEXT) $(am__objects_1)
 gnutls_set_trust_file_fuzzer_OBJECTS =  \
 	$(am_gnutls_set_trust_file_fuzzer_OBJECTS)
 am__DEPENDENCIES_2 = ../gl/libgnu.la ../lib/libgnutls.la $(LIBOBJS) \
@@ -434,11 +453,12 @@ am__DEPENDENCIES_2 = ../gl/libgnu.la ../lib/libgnutls.la $(LIBOBJS) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1)
 gnutls_set_trust_file_fuzzer_DEPENDENCIES = $(am__DEPENDENCIES_2) \
 	$(am__DEPENDENCIES_1)
 am_gnutls_srp_client_fuzzer_OBJECTS =  \
-	gnutls_srp_client_fuzzer.$(OBJEXT) main.$(OBJEXT)
+	gnutls_srp_client_fuzzer.$(OBJEXT) $(am__objects_1)
 gnutls_srp_client_fuzzer_OBJECTS =  \
 	$(am_gnutls_srp_client_fuzzer_OBJECTS)
 gnutls_srp_client_fuzzer_LDADD = $(LDADD)
@@ -448,9 +468,9 @@ gnutls_srp_client_fuzzer_DEPENDENCIES = ../gl/libgnu.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am_gnutls_srp_server_fuzzer_OBJECTS =  \
-	gnutls_srp_server_fuzzer.$(OBJEXT) main.$(OBJEXT)
+	gnutls_srp_server_fuzzer.$(OBJEXT) $(am__objects_1)
 gnutls_srp_server_fuzzer_OBJECTS =  \
 	$(am_gnutls_srp_server_fuzzer_OBJECTS)
 gnutls_srp_server_fuzzer_LDADD = $(LDADD)
@@ -460,9 +480,33 @@ gnutls_srp_server_fuzzer_DEPENDENCIES = ../gl/libgnu.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+am_gnutls_x509_crl_parser_fuzzer_OBJECTS =  \
+	gnutls_x509_crq_parser_fuzzer.$(OBJEXT) $(am__objects_1)
+gnutls_x509_crl_parser_fuzzer_OBJECTS =  \
+	$(am_gnutls_x509_crl_parser_fuzzer_OBJECTS)
+gnutls_x509_crl_parser_fuzzer_LDADD = $(LDADD)
+gnutls_x509_crl_parser_fuzzer_DEPENDENCIES = ../gl/libgnu.la \
+	../lib/libgnutls.la $(LIBOBJS) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+am_gnutls_x509_crq_parser_fuzzer_OBJECTS =  \
+	gnutls_x509_crq_parser_fuzzer.$(OBJEXT) $(am__objects_1)
+gnutls_x509_crq_parser_fuzzer_OBJECTS =  \
+	$(am_gnutls_x509_crq_parser_fuzzer_OBJECTS)
+gnutls_x509_crq_parser_fuzzer_LDADD = $(LDADD)
+gnutls_x509_crq_parser_fuzzer_DEPENDENCIES = ../gl/libgnu.la \
+	../lib/libgnutls.la $(LIBOBJS) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am_gnutls_x509_parser_fuzzer_OBJECTS =  \
-	gnutls_x509_parser_fuzzer.$(OBJEXT) main.$(OBJEXT)
+	gnutls_x509_parser_fuzzer.$(OBJEXT) $(am__objects_1)
 gnutls_x509_parser_fuzzer_OBJECTS =  \
 	$(am_gnutls_x509_parser_fuzzer_OBJECTS)
 gnutls_x509_parser_fuzzer_LDADD = $(LDADD)
@@ -472,9 +516,9 @@ gnutls_x509_parser_fuzzer_DEPENDENCIES = ../gl/libgnu.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am_gnutls_x509_verify_fuzzer_OBJECTS =  \
-	gnutls_x509_verify_fuzzer.$(OBJEXT) main.$(OBJEXT)
+	gnutls_x509_verify_fuzzer.$(OBJEXT) $(am__objects_1)
 gnutls_x509_verify_fuzzer_OBJECTS =  \
 	$(am_gnutls_x509_verify_fuzzer_OBJECTS)
 gnutls_x509_verify_fuzzer_LDADD = $(LDADD)
@@ -484,7 +528,7 @@ gnutls_x509_verify_fuzzer_DEPENDENCIES = ../gl/libgnu.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -505,6 +549,7 @@ am__depfiles_remade = ./$(DEPDIR)/gnutls_base64_decoder_fuzzer.Po \
 	./$(DEPDIR)/gnutls_client_fuzzer.Po \
 	./$(DEPDIR)/gnutls_client_rawpk_fuzzer.Po \
 	./$(DEPDIR)/gnutls_dn_parser_fuzzer.Po \
+	./$(DEPDIR)/gnutls_ext_raw_parse_fuzzer.Po \
 	./$(DEPDIR)/gnutls_idna_parser_fuzzer.Po \
 	./$(DEPDIR)/gnutls_ocsp_req_parser_fuzzer.Po \
 	./$(DEPDIR)/gnutls_ocsp_resp_parser_fuzzer.Po \
@@ -520,6 +565,7 @@ am__depfiles_remade = ./$(DEPDIR)/gnutls_base64_decoder_fuzzer.Po \
 	./$(DEPDIR)/gnutls_set_trust_file_fuzzer.Po \
 	./$(DEPDIR)/gnutls_srp_client_fuzzer.Po \
 	./$(DEPDIR)/gnutls_srp_server_fuzzer.Po \
+	./$(DEPDIR)/gnutls_x509_crq_parser_fuzzer.Po \
 	./$(DEPDIR)/gnutls_x509_parser_fuzzer.Po \
 	./$(DEPDIR)/gnutls_x509_verify_fuzzer.Po ./$(DEPDIR)/main.Po
 am__mv = mv -f
@@ -546,6 +592,7 @@ SOURCES = $(gnutls_base64_decoder_fuzzer_SOURCES) \
 	$(gnutls_client_fuzzer_SOURCES) \
 	$(gnutls_client_rawpk_fuzzer_SOURCES) \
 	$(gnutls_dn_parser_fuzzer_SOURCES) \
+	$(gnutls_ext_raw_parse_fuzzer_SOURCES) \
 	$(gnutls_idna_parser_fuzzer_SOURCES) \
 	$(gnutls_ocsp_req_parser_fuzzer_SOURCES) \
 	$(gnutls_ocsp_resp_parser_fuzzer_SOURCES) \
@@ -561,6 +608,8 @@ SOURCES = $(gnutls_base64_decoder_fuzzer_SOURCES) \
 	$(gnutls_set_trust_file_fuzzer_SOURCES) \
 	$(gnutls_srp_client_fuzzer_SOURCES) \
 	$(gnutls_srp_server_fuzzer_SOURCES) \
+	$(gnutls_x509_crl_parser_fuzzer_SOURCES) \
+	$(gnutls_x509_crq_parser_fuzzer_SOURCES) \
 	$(gnutls_x509_parser_fuzzer_SOURCES) \
 	$(gnutls_x509_verify_fuzzer_SOURCES)
 DIST_SOURCES = $(gnutls_base64_decoder_fuzzer_SOURCES) \
@@ -568,6 +617,7 @@ DIST_SOURCES = $(gnutls_base64_decoder_fuzzer_SOURCES) \
 	$(gnutls_client_fuzzer_SOURCES) \
 	$(gnutls_client_rawpk_fuzzer_SOURCES) \
 	$(gnutls_dn_parser_fuzzer_SOURCES) \
+	$(gnutls_ext_raw_parse_fuzzer_SOURCES) \
 	$(gnutls_idna_parser_fuzzer_SOURCES) \
 	$(gnutls_ocsp_req_parser_fuzzer_SOURCES) \
 	$(gnutls_ocsp_resp_parser_fuzzer_SOURCES) \
@@ -583,6 +633,8 @@ DIST_SOURCES = $(gnutls_base64_decoder_fuzzer_SOURCES) \
 	$(gnutls_set_trust_file_fuzzer_SOURCES) \
 	$(gnutls_srp_client_fuzzer_SOURCES) \
 	$(gnutls_srp_server_fuzzer_SOURCES) \
+	$(gnutls_x509_crl_parser_fuzzer_SOURCES) \
+	$(gnutls_x509_crq_parser_fuzzer_SOURCES) \
 	$(gnutls_x509_parser_fuzzer_SOURCES) \
 	$(gnutls_x509_verify_fuzzer_SOURCES)
 am__can_run_installinfo = \
@@ -842,6 +894,7 @@ CCASDEPMODE = @CCASDEPMODE@
 CCASFLAGS = @CCASFLAGS@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
+CFLAG_VISIBILITY = @CFLAG_VISIBILITY@
 CMOCKA_CFLAGS = @CMOCKA_CFLAGS@
 CMOCKA_LIBS = @CMOCKA_LIBS@
 CODE_COVERAGE_CFLAGS = @CODE_COVERAGE_CFLAGS@
@@ -894,6 +947,7 @@ GMSGFMT = @GMSGFMT@
 GMSGFMT_015 = @GMSGFMT_015@
 GNULIB_ACCEPT = @GNULIB_ACCEPT@
 GNULIB_ACCEPT4 = @GNULIB_ACCEPT4@
+GNULIB_ACCESS = @GNULIB_ACCESS@
 GNULIB_ATOLL = @GNULIB_ATOLL@
 GNULIB_BIND = @GNULIB_BIND@
 GNULIB_BTOWC = @GNULIB_BTOWC@
@@ -903,6 +957,8 @@ GNULIB_CHDIR = @GNULIB_CHDIR@
 GNULIB_CHOWN = @GNULIB_CHOWN@
 GNULIB_CLOSE = @GNULIB_CLOSE@
 GNULIB_CONNECT = @GNULIB_CONNECT@
+GNULIB_COPY_FILE_RANGE = @GNULIB_COPY_FILE_RANGE@
+GNULIB_CREAT = @GNULIB_CREAT@
 GNULIB_CTIME = @GNULIB_CTIME@
 GNULIB_DPRINTF = @GNULIB_DPRINTF@
 GNULIB_DUP = @GNULIB_DUP@
@@ -958,6 +1014,7 @@ GNULIB_GETLINE = @GNULIB_GETLINE@
 GNULIB_GETLOADAVG = @GNULIB_GETLOADAVG@
 GNULIB_GETLOGIN = @GNULIB_GETLOGIN@
 GNULIB_GETLOGIN_R = @GNULIB_GETLOGIN_R@
+GNULIB_GETOPT_POSIX = @GNULIB_GETOPT_POSIX@
 GNULIB_GETPAGESIZE = @GNULIB_GETPAGESIZE@
 GNULIB_GETPASS = @GNULIB_GETPASS@
 GNULIB_GETPEERNAME = @GNULIB_GETPEERNAME@
@@ -1040,7 +1097,15 @@ GNULIB_PREAD = @GNULIB_PREAD@
 GNULIB_PRINTF = @GNULIB_PRINTF@
 GNULIB_PRINTF_POSIX = @GNULIB_PRINTF_POSIX@
 GNULIB_PSELECT = @GNULIB_PSELECT@
+GNULIB_PTHREAD_COND = @GNULIB_PTHREAD_COND@
+GNULIB_PTHREAD_MUTEX = @GNULIB_PTHREAD_MUTEX@
+GNULIB_PTHREAD_MUTEX_TIMEDLOCK = @GNULIB_PTHREAD_MUTEX_TIMEDLOCK@
+GNULIB_PTHREAD_ONCE = @GNULIB_PTHREAD_ONCE@
+GNULIB_PTHREAD_RWLOCK = @GNULIB_PTHREAD_RWLOCK@
 GNULIB_PTHREAD_SIGMASK = @GNULIB_PTHREAD_SIGMASK@
+GNULIB_PTHREAD_SPIN = @GNULIB_PTHREAD_SPIN@
+GNULIB_PTHREAD_THREAD = @GNULIB_PTHREAD_THREAD@
+GNULIB_PTHREAD_TSS = @GNULIB_PTHREAD_TSS@
 GNULIB_PTSNAME = @GNULIB_PTSNAME@
 GNULIB_PTSNAME_R = @GNULIB_PTSNAME_R@
 GNULIB_PUTC = @GNULIB_PUTC@
@@ -1067,6 +1132,7 @@ GNULIB_RENAMEAT = @GNULIB_RENAMEAT@
 GNULIB_RMDIR = @GNULIB_RMDIR@
 GNULIB_RPMATCH = @GNULIB_RPMATCH@
 GNULIB_SCANF = @GNULIB_SCANF@
+GNULIB_SCHED_YIELD = @GNULIB_SCHED_YIELD@
 GNULIB_SECURE_GETENV = @GNULIB_SECURE_GETENV@
 GNULIB_SELECT = @GNULIB_SELECT@
 GNULIB_SEND = @GNULIB_SEND@
@@ -1074,6 +1140,7 @@ GNULIB_SENDTO = @GNULIB_SENDTO@
 GNULIB_SETENV = @GNULIB_SETENV@
 GNULIB_SETHOSTNAME = @GNULIB_SETHOSTNAME@
 GNULIB_SETLOCALE = @GNULIB_SETLOCALE@
+GNULIB_SETLOCALE_NULL = @GNULIB_SETLOCALE_NULL@
 GNULIB_SETSOCKOPT = @GNULIB_SETSOCKOPT@
 GNULIB_SHUTDOWN = @GNULIB_SHUTDOWN@
 GNULIB_SIGACTION = @GNULIB_SIGACTION@
@@ -1203,6 +1270,7 @@ HAVE_BTOWC = @HAVE_BTOWC@
 HAVE_C99_STDINT_H = @HAVE_C99_STDINT_H@
 HAVE_CANONICALIZE_FILE_NAME = @HAVE_CANONICALIZE_FILE_NAME@
 HAVE_CHOWN = @HAVE_CHOWN@
+HAVE_COPY_FILE_RANGE = @HAVE_COPY_FILE_RANGE@
 HAVE_CRTDEFS_H = @HAVE_CRTDEFS_H@
 HAVE_DECL_ENVIRON = @HAVE_DECL_ENVIRON@
 HAVE_DECL_FCHDIR = @HAVE_DECL_FCHDIR@
@@ -1297,12 +1365,12 @@ HAVE_LCHMOD = @HAVE_LCHMOD@
 HAVE_LCHOWN = @HAVE_LCHOWN@
 HAVE_LIBCRYPTO = @HAVE_LIBCRYPTO@
 HAVE_LIBDL = @HAVE_LIBDL@
+HAVE_LIBEV = @HAVE_LIBEV@
 HAVE_LIBPTHREAD = @HAVE_LIBPTHREAD@
 HAVE_LIBRT = @HAVE_LIBRT@
 HAVE_LIBSECCOMP = @HAVE_LIBSECCOMP@
 HAVE_LINK = @HAVE_LINK@
 HAVE_LINKAT = @HAVE_LINKAT@
-HAVE_LONG_LONG_INT = @HAVE_LONG_LONG_INT@
 HAVE_LSTAT = @HAVE_LSTAT@
 HAVE_MAX_ALIGN_T = @HAVE_MAX_ALIGN_T@
 HAVE_MBRLEN = @HAVE_MBRLEN@
@@ -1340,7 +1408,65 @@ HAVE_POSIX_OPENPT = @HAVE_POSIX_OPENPT@
 HAVE_POSIX_SIGNALBLOCKING = @HAVE_POSIX_SIGNALBLOCKING@
 HAVE_PREAD = @HAVE_PREAD@
 HAVE_PSELECT = @HAVE_PSELECT@
+HAVE_PTHREAD_ATTR_DESTROY = @HAVE_PTHREAD_ATTR_DESTROY@
+HAVE_PTHREAD_ATTR_GETDETACHSTATE = @HAVE_PTHREAD_ATTR_GETDETACHSTATE@
+HAVE_PTHREAD_ATTR_INIT = @HAVE_PTHREAD_ATTR_INIT@
+HAVE_PTHREAD_ATTR_SETDETACHSTATE = @HAVE_PTHREAD_ATTR_SETDETACHSTATE@
+HAVE_PTHREAD_CONDATTR_DESTROY = @HAVE_PTHREAD_CONDATTR_DESTROY@
+HAVE_PTHREAD_CONDATTR_INIT = @HAVE_PTHREAD_CONDATTR_INIT@
+HAVE_PTHREAD_COND_BROADCAST = @HAVE_PTHREAD_COND_BROADCAST@
+HAVE_PTHREAD_COND_DESTROY = @HAVE_PTHREAD_COND_DESTROY@
+HAVE_PTHREAD_COND_INIT = @HAVE_PTHREAD_COND_INIT@
+HAVE_PTHREAD_COND_SIGNAL = @HAVE_PTHREAD_COND_SIGNAL@
+HAVE_PTHREAD_COND_TIMEDWAIT = @HAVE_PTHREAD_COND_TIMEDWAIT@
+HAVE_PTHREAD_COND_WAIT = @HAVE_PTHREAD_COND_WAIT@
+HAVE_PTHREAD_CREATE = @HAVE_PTHREAD_CREATE@
+HAVE_PTHREAD_CREATE_DETACHED = @HAVE_PTHREAD_CREATE_DETACHED@
+HAVE_PTHREAD_DETACH = @HAVE_PTHREAD_DETACH@
+HAVE_PTHREAD_EQUAL = @HAVE_PTHREAD_EQUAL@
+HAVE_PTHREAD_EXIT = @HAVE_PTHREAD_EXIT@
+HAVE_PTHREAD_GETSPECIFIC = @HAVE_PTHREAD_GETSPECIFIC@
+HAVE_PTHREAD_H = @HAVE_PTHREAD_H@
+HAVE_PTHREAD_JOIN = @HAVE_PTHREAD_JOIN@
+HAVE_PTHREAD_KEY_CREATE = @HAVE_PTHREAD_KEY_CREATE@
+HAVE_PTHREAD_KEY_DELETE = @HAVE_PTHREAD_KEY_DELETE@
+HAVE_PTHREAD_MUTEXATTR_DESTROY = @HAVE_PTHREAD_MUTEXATTR_DESTROY@
+HAVE_PTHREAD_MUTEXATTR_GETROBUST = @HAVE_PTHREAD_MUTEXATTR_GETROBUST@
+HAVE_PTHREAD_MUTEXATTR_GETTYPE = @HAVE_PTHREAD_MUTEXATTR_GETTYPE@
+HAVE_PTHREAD_MUTEXATTR_INIT = @HAVE_PTHREAD_MUTEXATTR_INIT@
+HAVE_PTHREAD_MUTEXATTR_SETROBUST = @HAVE_PTHREAD_MUTEXATTR_SETROBUST@
+HAVE_PTHREAD_MUTEXATTR_SETTYPE = @HAVE_PTHREAD_MUTEXATTR_SETTYPE@
+HAVE_PTHREAD_MUTEX_DESTROY = @HAVE_PTHREAD_MUTEX_DESTROY@
+HAVE_PTHREAD_MUTEX_INIT = @HAVE_PTHREAD_MUTEX_INIT@
+HAVE_PTHREAD_MUTEX_LOCK = @HAVE_PTHREAD_MUTEX_LOCK@
+HAVE_PTHREAD_MUTEX_RECURSIVE = @HAVE_PTHREAD_MUTEX_RECURSIVE@
+HAVE_PTHREAD_MUTEX_ROBUST = @HAVE_PTHREAD_MUTEX_ROBUST@
+HAVE_PTHREAD_MUTEX_TIMEDLOCK = @HAVE_PTHREAD_MUTEX_TIMEDLOCK@
+HAVE_PTHREAD_MUTEX_TRYLOCK = @HAVE_PTHREAD_MUTEX_TRYLOCK@
+HAVE_PTHREAD_MUTEX_UNLOCK = @HAVE_PTHREAD_MUTEX_UNLOCK@
+HAVE_PTHREAD_ONCE = @HAVE_PTHREAD_ONCE@
+HAVE_PTHREAD_PROCESS_SHARED = @HAVE_PTHREAD_PROCESS_SHARED@
+HAVE_PTHREAD_RWLOCKATTR_DESTROY = @HAVE_PTHREAD_RWLOCKATTR_DESTROY@
+HAVE_PTHREAD_RWLOCKATTR_INIT = @HAVE_PTHREAD_RWLOCKATTR_INIT@
+HAVE_PTHREAD_RWLOCK_DESTROY = @HAVE_PTHREAD_RWLOCK_DESTROY@
+HAVE_PTHREAD_RWLOCK_INIT = @HAVE_PTHREAD_RWLOCK_INIT@
+HAVE_PTHREAD_RWLOCK_RDLOCK = @HAVE_PTHREAD_RWLOCK_RDLOCK@
+HAVE_PTHREAD_RWLOCK_TIMEDRDLOCK = @HAVE_PTHREAD_RWLOCK_TIMEDRDLOCK@
+HAVE_PTHREAD_RWLOCK_TIMEDWRLOCK = @HAVE_PTHREAD_RWLOCK_TIMEDWRLOCK@
+HAVE_PTHREAD_RWLOCK_TRYRDLOCK = @HAVE_PTHREAD_RWLOCK_TRYRDLOCK@
+HAVE_PTHREAD_RWLOCK_TRYWRLOCK = @HAVE_PTHREAD_RWLOCK_TRYWRLOCK@
+HAVE_PTHREAD_RWLOCK_UNLOCK = @HAVE_PTHREAD_RWLOCK_UNLOCK@
+HAVE_PTHREAD_RWLOCK_WRLOCK = @HAVE_PTHREAD_RWLOCK_WRLOCK@
+HAVE_PTHREAD_SELF = @HAVE_PTHREAD_SELF@
+HAVE_PTHREAD_SETSPECIFIC = @HAVE_PTHREAD_SETSPECIFIC@
 HAVE_PTHREAD_SIGMASK = @HAVE_PTHREAD_SIGMASK@
+HAVE_PTHREAD_SPINLOCK_T = @HAVE_PTHREAD_SPINLOCK_T@
+HAVE_PTHREAD_SPIN_DESTROY = @HAVE_PTHREAD_SPIN_DESTROY@
+HAVE_PTHREAD_SPIN_INIT = @HAVE_PTHREAD_SPIN_INIT@
+HAVE_PTHREAD_SPIN_LOCK = @HAVE_PTHREAD_SPIN_LOCK@
+HAVE_PTHREAD_SPIN_TRYLOCK = @HAVE_PTHREAD_SPIN_TRYLOCK@
+HAVE_PTHREAD_SPIN_UNLOCK = @HAVE_PTHREAD_SPIN_UNLOCK@
+HAVE_PTHREAD_T = @HAVE_PTHREAD_T@
 HAVE_PTSNAME = @HAVE_PTSNAME@
 HAVE_PTSNAME_R = @HAVE_PTSNAME_R@
 HAVE_PWRITE = @HAVE_PWRITE@
@@ -1357,6 +1483,8 @@ HAVE_REALPATH = @HAVE_REALPATH@
 HAVE_RENAMEAT = @HAVE_RENAMEAT@
 HAVE_RPMATCH = @HAVE_RPMATCH@
 HAVE_SA_FAMILY_T = @HAVE_SA_FAMILY_T@
+HAVE_SCHED_H = @HAVE_SCHED_H@
+HAVE_SCHED_YIELD = @HAVE_SCHED_YIELD@
 HAVE_SECURE_GETENV = @HAVE_SECURE_GETENV@
 HAVE_SETENV = @HAVE_SETENV@
 HAVE_SETHOSTNAME = @HAVE_SETHOSTNAME@
@@ -1385,6 +1513,7 @@ HAVE_STRTOLL = @HAVE_STRTOLL@
 HAVE_STRTOULL = @HAVE_STRTOULL@
 HAVE_STRUCT_ADDRINFO = @HAVE_STRUCT_ADDRINFO@
 HAVE_STRUCT_RANDOM_DATA = @HAVE_STRUCT_RANDOM_DATA@
+HAVE_STRUCT_SCHED_PARAM = @HAVE_STRUCT_SCHED_PARAM@
 HAVE_STRUCT_SIGACTION_SA_SIGACTION = @HAVE_STRUCT_SIGACTION_SA_SIGACTION@
 HAVE_STRUCT_SOCKADDR_STORAGE = @HAVE_STRUCT_SOCKADDR_STORAGE@
 HAVE_STRUCT_SOCKADDR_STORAGE_SS_FAMILY = @HAVE_STRUCT_SOCKADDR_STORAGE_SS_FAMILY@
@@ -1393,6 +1522,7 @@ HAVE_STRVERSCMP = @HAVE_STRVERSCMP@
 HAVE_SYMLINK = @HAVE_SYMLINK@
 HAVE_SYMLINKAT = @HAVE_SYMLINKAT@
 HAVE_SYS_BITYPES_H = @HAVE_SYS_BITYPES_H@
+HAVE_SYS_CDEFS_H = @HAVE_SYS_CDEFS_H@
 HAVE_SYS_INTTYPES_H = @HAVE_SYS_INTTYPES_H@
 HAVE_SYS_IOCTL_H = @HAVE_SYS_IOCTL_H@
 HAVE_SYS_LOADAVG_H = @HAVE_SYS_LOADAVG_H@
@@ -1409,11 +1539,11 @@ HAVE_TZSET = @HAVE_TZSET@
 HAVE_UNISTD_H = @HAVE_UNISTD_H@
 HAVE_UNLINKAT = @HAVE_UNLINKAT@
 HAVE_UNLOCKPT = @HAVE_UNLOCKPT@
-HAVE_UNSIGNED_LONG_LONG_INT = @HAVE_UNSIGNED_LONG_LONG_INT@
 HAVE_USLEEP = @HAVE_USLEEP@
 HAVE_UTIMENSAT = @HAVE_UTIMENSAT@
 HAVE_VASPRINTF = @HAVE_VASPRINTF@
 HAVE_VDPRINTF = @HAVE_VDPRINTF@
+HAVE_VISIBILITY = @HAVE_VISIBILITY@
 HAVE_WCHAR_H = @HAVE_WCHAR_H@
 HAVE_WCHAR_T = @HAVE_WCHAR_T@
 HAVE_WCPCPY = @HAVE_WCPCPY@
@@ -1479,6 +1609,9 @@ LIBCRYPTO = @LIBCRYPTO@
 LIBCRYPTO_PREFIX = @LIBCRYPTO_PREFIX@
 LIBDL = @LIBDL@
 LIBDL_PREFIX = @LIBDL_PREFIX@
+LIBEV = @LIBEV@
+LIBEV_LIBS = @LIBEV_LIBS@
+LIBEV_PREFIX = @LIBEV_PREFIX@
 LIBGNUTLS_CFLAGS = @LIBGNUTLS_CFLAGS@
 LIBGNUTLS_LIBS = @LIBGNUTLS_LIBS@
 LIBICONV = @LIBICONV@
@@ -1490,16 +1623,16 @@ LIBOBJS = @LIBOBJS@
 LIBOPTS_CFLAGS = @LIBOPTS_CFLAGS@
 LIBOPTS_DIR = @LIBOPTS_DIR@
 LIBOPTS_LDADD = @LIBOPTS_LDADD@
-LIBPTH = @LIBPTH@
+LIBPMULTITHREAD = @LIBPMULTITHREAD@
 LIBPTHREAD = @LIBPTHREAD@
 LIBPTHREAD_PREFIX = @LIBPTHREAD_PREFIX@
-LIBPTH_PREFIX = @LIBPTH_PREFIX@
 LIBRT = @LIBRT@
 LIBRT_PREFIX = @LIBRT_PREFIX@
 LIBS = @LIBS@
 LIBSECCOMP = @LIBSECCOMP@
 LIBSECCOMP_PREFIX = @LIBSECCOMP_PREFIX@
 LIBSOCKET = @LIBSOCKET@
+LIBSTDTHREAD = @LIBSTDTHREAD@
 LIBTASN1_CFLAGS = @LIBTASN1_CFLAGS@
 LIBTASN1_LIBS = @LIBTASN1_LIBS@
 LIBTESTS_LIBDEPS = @LIBTESTS_LIBDEPS@
@@ -1512,7 +1645,12 @@ LIBUNISTRING_UNISTR_H = @LIBUNISTRING_UNISTR_H@
 LIBUNISTRING_UNITYPES_H = @LIBUNISTRING_UNITYPES_H@
 LIB_CLOCK_GETTIME = @LIB_CLOCK_GETTIME@
 LIB_NANOSLEEP = @LIB_NANOSLEEP@
+LIB_PTHREAD = @LIB_PTHREAD@
+LIB_PTHREAD_SIGMASK = @LIB_PTHREAD_SIGMASK@
+LIB_SCHED_YIELD = @LIB_SCHED_YIELD@
 LIB_SELECT = @LIB_SELECT@
+LIB_SETLOCALE = @LIB_SETLOCALE@
+LIB_SETLOCALE_NULL = @LIB_SETLOCALE_NULL@
 LIMITS_H = @LIMITS_H@
 LIPO = @LIPO@
 LN_S = @LN_S@
@@ -1524,11 +1662,11 @@ LOCALE_ZH_CN = @LOCALE_ZH_CN@
 LTALLOCA = @LTALLOCA@
 LTLIBCRYPTO = @LTLIBCRYPTO@
 LTLIBDL = @LTLIBDL@
+LTLIBEV = @LTLIBEV@
 LTLIBICONV = @LTLIBICONV@
 LTLIBINTL = @LTLIBINTL@
 LTLIBMULTITHREAD = @LTLIBMULTITHREAD@
 LTLIBOBJS = @LTLIBOBJS@
-LTLIBPTH = @LTLIBPTH@
 LTLIBPTHREAD = @LTLIBPTHREAD@
 LTLIBRT = @LTLIBRT@
 LTLIBSECCOMP = @LTLIBSECCOMP@
@@ -1570,6 +1708,8 @@ NEXT_AS_FIRST_DIRECTIVE_LIMITS_H = @NEXT_AS_FIRST_DIRECTIVE_LIMITS_H@
 NEXT_AS_FIRST_DIRECTIVE_LOCALE_H = @NEXT_AS_FIRST_DIRECTIVE_LOCALE_H@
 NEXT_AS_FIRST_DIRECTIVE_NETDB_H = @NEXT_AS_FIRST_DIRECTIVE_NETDB_H@
 NEXT_AS_FIRST_DIRECTIVE_NETINET_IN_H = @NEXT_AS_FIRST_DIRECTIVE_NETINET_IN_H@
+NEXT_AS_FIRST_DIRECTIVE_PTHREAD_H = @NEXT_AS_FIRST_DIRECTIVE_PTHREAD_H@
+NEXT_AS_FIRST_DIRECTIVE_SCHED_H = @NEXT_AS_FIRST_DIRECTIVE_SCHED_H@
 NEXT_AS_FIRST_DIRECTIVE_SIGNAL_H = @NEXT_AS_FIRST_DIRECTIVE_SIGNAL_H@
 NEXT_AS_FIRST_DIRECTIVE_STDDEF_H = @NEXT_AS_FIRST_DIRECTIVE_STDDEF_H@
 NEXT_AS_FIRST_DIRECTIVE_STDINT_H = @NEXT_AS_FIRST_DIRECTIVE_STDINT_H@
@@ -1597,6 +1737,8 @@ NEXT_LIMITS_H = @NEXT_LIMITS_H@
 NEXT_LOCALE_H = @NEXT_LOCALE_H@
 NEXT_NETDB_H = @NEXT_NETDB_H@
 NEXT_NETINET_IN_H = @NEXT_NETINET_IN_H@
+NEXT_PTHREAD_H = @NEXT_PTHREAD_H@
+NEXT_SCHED_H = @NEXT_SCHED_H@
 NEXT_SIGNAL_H = @NEXT_SIGNAL_H@
 NEXT_STDDEF_H = @NEXT_STDDEF_H@
 NEXT_STDINT_H = @NEXT_STDINT_H@
@@ -1630,6 +1772,7 @@ PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
+PARSE_DATETIME_BISON = @PARSE_DATETIME_BISON@
 PATCH_VERSION = @PATCH_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 PKG_CONFIG = @PKG_CONFIG@
@@ -1645,11 +1788,13 @@ PRI_MACROS_BROKEN = @PRI_MACROS_BROKEN@
 PTHREAD_H_DEFINES_STRUCT_TIMESPEC = @PTHREAD_H_DEFINES_STRUCT_TIMESPEC@
 PTRDIFF_T_SUFFIX = @PTRDIFF_T_SUFFIX@
 RANLIB = @RANLIB@
+REPLACE_ACCESS = @REPLACE_ACCESS@
 REPLACE_BTOWC = @REPLACE_BTOWC@
 REPLACE_CALLOC = @REPLACE_CALLOC@
 REPLACE_CANONICALIZE_FILE_NAME = @REPLACE_CANONICALIZE_FILE_NAME@
 REPLACE_CHOWN = @REPLACE_CHOWN@
 REPLACE_CLOSE = @REPLACE_CLOSE@
+REPLACE_CREAT = @REPLACE_CREAT@
 REPLACE_CTIME = @REPLACE_CTIME@
 REPLACE_DPRINTF = @REPLACE_DPRINTF@
 REPLACE_DUP = @REPLACE_DUP@
@@ -1675,6 +1820,7 @@ REPLACE_FTELLO = @REPLACE_FTELLO@
 REPLACE_FTRUNCATE = @REPLACE_FTRUNCATE@
 REPLACE_FUTIMENS = @REPLACE_FUTIMENS@
 REPLACE_GAI_STRERROR = @REPLACE_GAI_STRERROR@
+REPLACE_GETADDRINFO = @REPLACE_GETADDRINFO@
 REPLACE_GETCWD = @REPLACE_GETCWD@
 REPLACE_GETDELIM = @REPLACE_GETDELIM@
 REPLACE_GETDOMAINNAME = @REPLACE_GETDOMAINNAME@
@@ -1727,7 +1873,58 @@ REPLACE_POPEN = @REPLACE_POPEN@
 REPLACE_PREAD = @REPLACE_PREAD@
 REPLACE_PRINTF = @REPLACE_PRINTF@
 REPLACE_PSELECT = @REPLACE_PSELECT@
+REPLACE_PTHREAD_ATTR_DESTROY = @REPLACE_PTHREAD_ATTR_DESTROY@
+REPLACE_PTHREAD_ATTR_GETDETACHSTATE = @REPLACE_PTHREAD_ATTR_GETDETACHSTATE@
+REPLACE_PTHREAD_ATTR_INIT = @REPLACE_PTHREAD_ATTR_INIT@
+REPLACE_PTHREAD_ATTR_SETDETACHSTATE = @REPLACE_PTHREAD_ATTR_SETDETACHSTATE@
+REPLACE_PTHREAD_CONDATTR_DESTROY = @REPLACE_PTHREAD_CONDATTR_DESTROY@
+REPLACE_PTHREAD_CONDATTR_INIT = @REPLACE_PTHREAD_CONDATTR_INIT@
+REPLACE_PTHREAD_COND_BROADCAST = @REPLACE_PTHREAD_COND_BROADCAST@
+REPLACE_PTHREAD_COND_DESTROY = @REPLACE_PTHREAD_COND_DESTROY@
+REPLACE_PTHREAD_COND_INIT = @REPLACE_PTHREAD_COND_INIT@
+REPLACE_PTHREAD_COND_SIGNAL = @REPLACE_PTHREAD_COND_SIGNAL@
+REPLACE_PTHREAD_COND_TIMEDWAIT = @REPLACE_PTHREAD_COND_TIMEDWAIT@
+REPLACE_PTHREAD_COND_WAIT = @REPLACE_PTHREAD_COND_WAIT@
+REPLACE_PTHREAD_CREATE = @REPLACE_PTHREAD_CREATE@
+REPLACE_PTHREAD_DETACH = @REPLACE_PTHREAD_DETACH@
+REPLACE_PTHREAD_EQUAL = @REPLACE_PTHREAD_EQUAL@
+REPLACE_PTHREAD_EXIT = @REPLACE_PTHREAD_EXIT@
+REPLACE_PTHREAD_GETSPECIFIC = @REPLACE_PTHREAD_GETSPECIFIC@
+REPLACE_PTHREAD_JOIN = @REPLACE_PTHREAD_JOIN@
+REPLACE_PTHREAD_KEY_CREATE = @REPLACE_PTHREAD_KEY_CREATE@
+REPLACE_PTHREAD_KEY_DELETE = @REPLACE_PTHREAD_KEY_DELETE@
+REPLACE_PTHREAD_MUTEXATTR_DESTROY = @REPLACE_PTHREAD_MUTEXATTR_DESTROY@
+REPLACE_PTHREAD_MUTEXATTR_GETROBUST = @REPLACE_PTHREAD_MUTEXATTR_GETROBUST@
+REPLACE_PTHREAD_MUTEXATTR_GETTYPE = @REPLACE_PTHREAD_MUTEXATTR_GETTYPE@
+REPLACE_PTHREAD_MUTEXATTR_INIT = @REPLACE_PTHREAD_MUTEXATTR_INIT@
+REPLACE_PTHREAD_MUTEXATTR_SETROBUST = @REPLACE_PTHREAD_MUTEXATTR_SETROBUST@
+REPLACE_PTHREAD_MUTEXATTR_SETTYPE = @REPLACE_PTHREAD_MUTEXATTR_SETTYPE@
+REPLACE_PTHREAD_MUTEX_DESTROY = @REPLACE_PTHREAD_MUTEX_DESTROY@
+REPLACE_PTHREAD_MUTEX_INIT = @REPLACE_PTHREAD_MUTEX_INIT@
+REPLACE_PTHREAD_MUTEX_LOCK = @REPLACE_PTHREAD_MUTEX_LOCK@
+REPLACE_PTHREAD_MUTEX_TIMEDLOCK = @REPLACE_PTHREAD_MUTEX_TIMEDLOCK@
+REPLACE_PTHREAD_MUTEX_TRYLOCK = @REPLACE_PTHREAD_MUTEX_TRYLOCK@
+REPLACE_PTHREAD_MUTEX_UNLOCK = @REPLACE_PTHREAD_MUTEX_UNLOCK@
+REPLACE_PTHREAD_ONCE = @REPLACE_PTHREAD_ONCE@
+REPLACE_PTHREAD_RWLOCKATTR_DESTROY = @REPLACE_PTHREAD_RWLOCKATTR_DESTROY@
+REPLACE_PTHREAD_RWLOCKATTR_INIT = @REPLACE_PTHREAD_RWLOCKATTR_INIT@
+REPLACE_PTHREAD_RWLOCK_DESTROY = @REPLACE_PTHREAD_RWLOCK_DESTROY@
+REPLACE_PTHREAD_RWLOCK_INIT = @REPLACE_PTHREAD_RWLOCK_INIT@
+REPLACE_PTHREAD_RWLOCK_RDLOCK = @REPLACE_PTHREAD_RWLOCK_RDLOCK@
+REPLACE_PTHREAD_RWLOCK_TIMEDRDLOCK = @REPLACE_PTHREAD_RWLOCK_TIMEDRDLOCK@
+REPLACE_PTHREAD_RWLOCK_TIMEDWRLOCK = @REPLACE_PTHREAD_RWLOCK_TIMEDWRLOCK@
+REPLACE_PTHREAD_RWLOCK_TRYRDLOCK = @REPLACE_PTHREAD_RWLOCK_TRYRDLOCK@
+REPLACE_PTHREAD_RWLOCK_TRYWRLOCK = @REPLACE_PTHREAD_RWLOCK_TRYWRLOCK@
+REPLACE_PTHREAD_RWLOCK_UNLOCK = @REPLACE_PTHREAD_RWLOCK_UNLOCK@
+REPLACE_PTHREAD_RWLOCK_WRLOCK = @REPLACE_PTHREAD_RWLOCK_WRLOCK@
+REPLACE_PTHREAD_SELF = @REPLACE_PTHREAD_SELF@
+REPLACE_PTHREAD_SETSPECIFIC = @REPLACE_PTHREAD_SETSPECIFIC@
 REPLACE_PTHREAD_SIGMASK = @REPLACE_PTHREAD_SIGMASK@
+REPLACE_PTHREAD_SPIN_DESTROY = @REPLACE_PTHREAD_SPIN_DESTROY@
+REPLACE_PTHREAD_SPIN_INIT = @REPLACE_PTHREAD_SPIN_INIT@
+REPLACE_PTHREAD_SPIN_LOCK = @REPLACE_PTHREAD_SPIN_LOCK@
+REPLACE_PTHREAD_SPIN_TRYLOCK = @REPLACE_PTHREAD_SPIN_TRYLOCK@
+REPLACE_PTHREAD_SPIN_UNLOCK = @REPLACE_PTHREAD_SPIN_UNLOCK@
 REPLACE_PTSNAME = @REPLACE_PTSNAME@
 REPLACE_PTSNAME_R = @REPLACE_PTSNAME_R@
 REPLACE_PUTENV = @REPLACE_PUTENV@
@@ -1745,6 +1942,7 @@ REPLACE_REMOVE = @REPLACE_REMOVE@
 REPLACE_RENAME = @REPLACE_RENAME@
 REPLACE_RENAMEAT = @REPLACE_RENAMEAT@
 REPLACE_RMDIR = @REPLACE_RMDIR@
+REPLACE_SCHED_YIELD = @REPLACE_SCHED_YIELD@
 REPLACE_SELECT = @REPLACE_SELECT@
 REPLACE_SETENV = @REPLACE_SETENV@
 REPLACE_SETLOCALE = @REPLACE_SETLOCALE@
@@ -1796,6 +1994,7 @@ REPLACE_WCRTOMB = @REPLACE_WCRTOMB@
 REPLACE_WCSFTIME = @REPLACE_WCSFTIME@
 REPLACE_WCSNRTOMBS = @REPLACE_WCSNRTOMBS@
 REPLACE_WCSRTOMBS = @REPLACE_WCSRTOMBS@
+REPLACE_WCSTOK = @REPLACE_WCSTOK@
 REPLACE_WCSWIDTH = @REPLACE_WCSWIDTH@
 REPLACE_WCTOB = @REPLACE_WCTOB@
 REPLACE_WCTOMB = @REPLACE_WCTOMB@
@@ -1904,13 +2103,13 @@ libexecdir = @libexecdir@
 localedir = @localedir@
 localstatedir = @localstatedir@
 mandir = @mandir@
+maybe_guileextensiondir = @maybe_guileextensiondir@
 mkdir_p = @mkdir_p@
 oldincludedir = @oldincludedir@
 pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
-runstatedir = @runstatedir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
@@ -1956,31 +2155,38 @@ FUZZERS = \
  gnutls_srp_client_fuzzer$(EXEEXT) \
  gnutls_srp_server_fuzzer$(EXEEXT) \
  gnutls_set_trust_file_fuzzer$(EXEEXT) \
- gnutls_x509_parser_fuzzer$(EXEEXT)
+ gnutls_x509_crl_parser_fuzzer$(EXEEXT) \
+ gnutls_x509_crq_parser_fuzzer$(EXEEXT) \
+ gnutls_x509_parser_fuzzer$(EXEEXT) \
+ gnutls_ext_raw_parse_fuzzer$(EXEEXT)
 
 check_PROGRAMS = $(FUZZERS)
-gnutls_x509_verify_fuzzer_SOURCES = gnutls_x509_verify_fuzzer.c main.c fuzzer.h
-gnutls_base64_decoder_fuzzer_SOURCES = gnutls_base64_decoder_fuzzer.c main.c fuzzer.h
-gnutls_base64_encoder_fuzzer_SOURCES = gnutls_base64_encoder_fuzzer.c main.c fuzzer.h
-gnutls_client_fuzzer_SOURCES = gnutls_client_fuzzer.c main.c fuzzer.h mem.h certs.h
-gnutls_client_rawpk_fuzzer_SOURCES = gnutls_client_rawpk_fuzzer.c main.c fuzzer.h mem.h certs.h
-gnutls_dn_parser_fuzzer_SOURCES = gnutls_dn_parser_fuzzer.c main.c fuzzer.h
-gnutls_idna_parser_fuzzer_SOURCES = gnutls_idna_parser_fuzzer.c main.c fuzzer.h
-gnutls_ocsp_req_parser_fuzzer_SOURCES = gnutls_ocsp_req_parser_fuzzer.c main.c fuzzer.h
-gnutls_ocsp_resp_parser_fuzzer_SOURCES = gnutls_ocsp_resp_parser_fuzzer.c main.c fuzzer.h
-gnutls_pkcs12_key_parser_fuzzer_SOURCES = gnutls_pkcs12_key_parser_fuzzer.c main.c fuzzer.h
-gnutls_pkcs7_parser_fuzzer_SOURCES = gnutls_pkcs7_parser_fuzzer.c main.c fuzzer.h
-gnutls_pkcs8_key_parser_fuzzer_SOURCES = gnutls_pkcs8_key_parser_fuzzer.c main.c fuzzer.h
-gnutls_private_key_parser_fuzzer_SOURCES = gnutls_private_key_parser_fuzzer.c main.c fuzzer.h
-gnutls_psk_client_fuzzer_SOURCES = gnutls_psk_client_fuzzer.c main.c fuzzer.h mem.h psk.h
-gnutls_psk_server_fuzzer_SOURCES = gnutls_psk_server_fuzzer.c main.c fuzzer.h mem.h psk.h
-gnutls_reverse_idna_parser_fuzzer_SOURCES = gnutls_reverse_idna_parser_fuzzer.c main.c fuzzer.h
-gnutls_server_fuzzer_SOURCES = gnutls_server_fuzzer.c main.c fuzzer.h mem.h certs.h
-gnutls_server_rawpk_fuzzer_SOURCES = gnutls_server_rawpk_fuzzer.c main.c fuzzer.h mem.h certs.h
-gnutls_srp_client_fuzzer_SOURCES = gnutls_srp_client_fuzzer.c main.c fuzzer.h mem.h srp.h
-gnutls_srp_server_fuzzer_SOURCES = gnutls_srp_server_fuzzer.c main.c fuzzer.h mem.h srp.h
-gnutls_set_trust_file_fuzzer_SOURCES = gnutls_set_trust_file_fuzzer.c main.c fuzzer.h
-gnutls_x509_parser_fuzzer_SOURCES = gnutls_x509_parser_fuzzer.c main.c fuzzer.h
+COMMON_SOURCES = main.c fuzzer.h
+gnutls_x509_verify_fuzzer_SOURCES = gnutls_x509_verify_fuzzer.c $(COMMON_SOURCES)
+gnutls_base64_decoder_fuzzer_SOURCES = gnutls_base64_decoder_fuzzer.c $(COMMON_SOURCES)
+gnutls_base64_encoder_fuzzer_SOURCES = gnutls_base64_encoder_fuzzer.c $(COMMON_SOURCES)
+gnutls_client_fuzzer_SOURCES = gnutls_client_fuzzer.c $(COMMON_SOURCES) mem.h certs.h
+gnutls_client_rawpk_fuzzer_SOURCES = gnutls_client_rawpk_fuzzer.c $(COMMON_SOURCES) mem.h certs.h
+gnutls_dn_parser_fuzzer_SOURCES = gnutls_dn_parser_fuzzer.c $(COMMON_SOURCES)
+gnutls_idna_parser_fuzzer_SOURCES = gnutls_idna_parser_fuzzer.c $(COMMON_SOURCES)
+gnutls_ocsp_req_parser_fuzzer_SOURCES = gnutls_ocsp_req_parser_fuzzer.c $(COMMON_SOURCES)
+gnutls_ocsp_resp_parser_fuzzer_SOURCES = gnutls_ocsp_resp_parser_fuzzer.c $(COMMON_SOURCES)
+gnutls_pkcs12_key_parser_fuzzer_SOURCES = gnutls_pkcs12_key_parser_fuzzer.c $(COMMON_SOURCES)
+gnutls_pkcs7_parser_fuzzer_SOURCES = gnutls_pkcs7_parser_fuzzer.c $(COMMON_SOURCES)
+gnutls_pkcs8_key_parser_fuzzer_SOURCES = gnutls_pkcs8_key_parser_fuzzer.c $(COMMON_SOURCES)
+gnutls_private_key_parser_fuzzer_SOURCES = gnutls_private_key_parser_fuzzer.c $(COMMON_SOURCES)
+gnutls_psk_client_fuzzer_SOURCES = gnutls_psk_client_fuzzer.c $(COMMON_SOURCES) mem.h psk.h
+gnutls_psk_server_fuzzer_SOURCES = gnutls_psk_server_fuzzer.c $(COMMON_SOURCES) mem.h psk.h
+gnutls_reverse_idna_parser_fuzzer_SOURCES = gnutls_reverse_idna_parser_fuzzer.c $(COMMON_SOURCES)
+gnutls_server_fuzzer_SOURCES = gnutls_server_fuzzer.c $(COMMON_SOURCES) mem.h certs.h
+gnutls_server_rawpk_fuzzer_SOURCES = gnutls_server_rawpk_fuzzer.c $(COMMON_SOURCES) mem.h certs.h
+gnutls_srp_client_fuzzer_SOURCES = gnutls_srp_client_fuzzer.c $(COMMON_SOURCES) mem.h srp.h
+gnutls_srp_server_fuzzer_SOURCES = gnutls_srp_server_fuzzer.c $(COMMON_SOURCES) mem.h srp.h
+gnutls_set_trust_file_fuzzer_SOURCES = gnutls_set_trust_file_fuzzer.c $(COMMON_SOURCES)
+gnutls_x509_crl_parser_fuzzer_SOURCES = gnutls_x509_crq_parser_fuzzer.c $(COMMON_SOURCES)
+gnutls_x509_crq_parser_fuzzer_SOURCES = gnutls_x509_crq_parser_fuzzer.c $(COMMON_SOURCES)
+gnutls_x509_parser_fuzzer_SOURCES = gnutls_x509_parser_fuzzer.c $(COMMON_SOURCES)
+gnutls_ext_raw_parse_fuzzer_SOURCES = gnutls_ext_raw_parse_fuzzer.c $(COMMON_SOURCES)
 gnutls_set_trust_file_fuzzer_LDADD = $(LDADD) $(LIBDL)
 TESTS = $(FUZZERS)
 LCOV_INFO = coverage.info
@@ -2047,6 +2253,10 @@ gnutls_dn_parser_fuzzer$(EXEEXT): $(gnutls_dn_parser_fuzzer_OBJECTS) $(gnutls_dn
 	@rm -f gnutls_dn_parser_fuzzer$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(gnutls_dn_parser_fuzzer_OBJECTS) $(gnutls_dn_parser_fuzzer_LDADD) $(LIBS)
 
+gnutls_ext_raw_parse_fuzzer$(EXEEXT): $(gnutls_ext_raw_parse_fuzzer_OBJECTS) $(gnutls_ext_raw_parse_fuzzer_DEPENDENCIES) $(EXTRA_gnutls_ext_raw_parse_fuzzer_DEPENDENCIES) 
+	@rm -f gnutls_ext_raw_parse_fuzzer$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(gnutls_ext_raw_parse_fuzzer_OBJECTS) $(gnutls_ext_raw_parse_fuzzer_LDADD) $(LIBS)
+
 gnutls_idna_parser_fuzzer$(EXEEXT): $(gnutls_idna_parser_fuzzer_OBJECTS) $(gnutls_idna_parser_fuzzer_DEPENDENCIES) $(EXTRA_gnutls_idna_parser_fuzzer_DEPENDENCIES) 
 	@rm -f gnutls_idna_parser_fuzzer$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(gnutls_idna_parser_fuzzer_OBJECTS) $(gnutls_idna_parser_fuzzer_LDADD) $(LIBS)
@@ -2107,6 +2317,14 @@ gnutls_srp_server_fuzzer$(EXEEXT): $(gnutls_srp_server_fuzzer_OBJECTS) $(gnutls_
 	@rm -f gnutls_srp_server_fuzzer$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(gnutls_srp_server_fuzzer_OBJECTS) $(gnutls_srp_server_fuzzer_LDADD) $(LIBS)
 
+gnutls_x509_crl_parser_fuzzer$(EXEEXT): $(gnutls_x509_crl_parser_fuzzer_OBJECTS) $(gnutls_x509_crl_parser_fuzzer_DEPENDENCIES) $(EXTRA_gnutls_x509_crl_parser_fuzzer_DEPENDENCIES) 
+	@rm -f gnutls_x509_crl_parser_fuzzer$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(gnutls_x509_crl_parser_fuzzer_OBJECTS) $(gnutls_x509_crl_parser_fuzzer_LDADD) $(LIBS)
+
+gnutls_x509_crq_parser_fuzzer$(EXEEXT): $(gnutls_x509_crq_parser_fuzzer_OBJECTS) $(gnutls_x509_crq_parser_fuzzer_DEPENDENCIES) $(EXTRA_gnutls_x509_crq_parser_fuzzer_DEPENDENCIES) 
+	@rm -f gnutls_x509_crq_parser_fuzzer$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(gnutls_x509_crq_parser_fuzzer_OBJECTS) $(gnutls_x509_crq_parser_fuzzer_LDADD) $(LIBS)
+
 gnutls_x509_parser_fuzzer$(EXEEXT): $(gnutls_x509_parser_fuzzer_OBJECTS) $(gnutls_x509_parser_fuzzer_DEPENDENCIES) $(EXTRA_gnutls_x509_parser_fuzzer_DEPENDENCIES) 
 	@rm -f gnutls_x509_parser_fuzzer$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(gnutls_x509_parser_fuzzer_OBJECTS) $(gnutls_x509_parser_fuzzer_LDADD) $(LIBS)
@@ -2126,6 +2344,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gnutls_client_fuzzer.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gnutls_client_rawpk_fuzzer.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gnutls_dn_parser_fuzzer.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gnutls_ext_raw_parse_fuzzer.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gnutls_idna_parser_fuzzer.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gnutls_ocsp_req_parser_fuzzer.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gnutls_ocsp_resp_parser_fuzzer.Po@am__quote@ # am--include-marker
@@ -2141,6 +2360,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gnutls_set_trust_file_fuzzer.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gnutls_srp_client_fuzzer.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gnutls_srp_server_fuzzer.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gnutls_x509_crq_parser_fuzzer.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gnutls_x509_parser_fuzzer.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gnutls_x509_verify_fuzzer.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@ # am--include-marker
@@ -2521,9 +2741,30 @@ gnutls_set_trust_file_fuzzer.log: gnutls_set_trust_file_fuzzer$(EXEEXT)
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
+gnutls_x509_crl_parser_fuzzer.log: gnutls_x509_crl_parser_fuzzer$(EXEEXT)
+	@p='gnutls_x509_crl_parser_fuzzer$(EXEEXT)'; \
+	b='gnutls_x509_crl_parser_fuzzer'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+gnutls_x509_crq_parser_fuzzer.log: gnutls_x509_crq_parser_fuzzer$(EXEEXT)
+	@p='gnutls_x509_crq_parser_fuzzer$(EXEEXT)'; \
+	b='gnutls_x509_crq_parser_fuzzer'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
 gnutls_x509_parser_fuzzer.log: gnutls_x509_parser_fuzzer$(EXEEXT)
 	@p='gnutls_x509_parser_fuzzer$(EXEEXT)'; \
 	b='gnutls_x509_parser_fuzzer'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+gnutls_ext_raw_parse_fuzzer.log: gnutls_ext_raw_parse_fuzzer$(EXEEXT)
+	@p='gnutls_ext_raw_parse_fuzzer$(EXEEXT)'; \
+	b='gnutls_ext_raw_parse_fuzzer'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
@@ -2629,6 +2870,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/gnutls_client_fuzzer.Po
 	-rm -f ./$(DEPDIR)/gnutls_client_rawpk_fuzzer.Po
 	-rm -f ./$(DEPDIR)/gnutls_dn_parser_fuzzer.Po
+	-rm -f ./$(DEPDIR)/gnutls_ext_raw_parse_fuzzer.Po
 	-rm -f ./$(DEPDIR)/gnutls_idna_parser_fuzzer.Po
 	-rm -f ./$(DEPDIR)/gnutls_ocsp_req_parser_fuzzer.Po
 	-rm -f ./$(DEPDIR)/gnutls_ocsp_resp_parser_fuzzer.Po
@@ -2644,6 +2886,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/gnutls_set_trust_file_fuzzer.Po
 	-rm -f ./$(DEPDIR)/gnutls_srp_client_fuzzer.Po
 	-rm -f ./$(DEPDIR)/gnutls_srp_server_fuzzer.Po
+	-rm -f ./$(DEPDIR)/gnutls_x509_crq_parser_fuzzer.Po
 	-rm -f ./$(DEPDIR)/gnutls_x509_parser_fuzzer.Po
 	-rm -f ./$(DEPDIR)/gnutls_x509_verify_fuzzer.Po
 	-rm -f ./$(DEPDIR)/main.Po
@@ -2697,6 +2940,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/gnutls_client_fuzzer.Po
 	-rm -f ./$(DEPDIR)/gnutls_client_rawpk_fuzzer.Po
 	-rm -f ./$(DEPDIR)/gnutls_dn_parser_fuzzer.Po
+	-rm -f ./$(DEPDIR)/gnutls_ext_raw_parse_fuzzer.Po
 	-rm -f ./$(DEPDIR)/gnutls_idna_parser_fuzzer.Po
 	-rm -f ./$(DEPDIR)/gnutls_ocsp_req_parser_fuzzer.Po
 	-rm -f ./$(DEPDIR)/gnutls_ocsp_resp_parser_fuzzer.Po
@@ -2712,6 +2956,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/gnutls_set_trust_file_fuzzer.Po
 	-rm -f ./$(DEPDIR)/gnutls_srp_client_fuzzer.Po
 	-rm -f ./$(DEPDIR)/gnutls_srp_server_fuzzer.Po
+	-rm -f ./$(DEPDIR)/gnutls_x509_crq_parser_fuzzer.Po
 	-rm -f ./$(DEPDIR)/gnutls_x509_parser_fuzzer.Po
 	-rm -f ./$(DEPDIR)/gnutls_x509_verify_fuzzer.Po
 	-rm -f ./$(DEPDIR)/main.Po
@@ -2772,12 +3017,13 @@ oss-fuzz:
 	for ccfile in *_fuzzer.c; do \
 	fuzzer=$$(basename $$ccfile .c); \
 	XLIBS="-lhogweed -lnettle -ltasn1 -lgmp -lidn2 -lunistring"; \
-	$$CXX $$CXXFLAGS -I$(top_srcdir)/lib/includes/ -I$(top_srcdir) \
-	"$${fuzzer}.c" -o "$${fuzzer}" \
+	$$CC $$CFLAGS -I$(top_srcdir)/lib/includes/ -I$(top_srcdir) \
+	-c "$${fuzzer}.c" -o "$${fuzzer}.o" ; \
+	$$CXX $$CXXFLAGS "$${fuzzer}.o" -o "$${fuzzer}" \
 	../lib/.libs/libgnutls.a $${LIB_FUZZING_ENGINE} \
 	-Wl,-Bstatic \
 	$${XLIBS} \
-	-Wl,-Bdynamic; \
+	-Wl,-Bdynamic || exit $?; \
 	done; \
 	fi
 

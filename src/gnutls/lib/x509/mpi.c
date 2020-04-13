@@ -134,7 +134,9 @@ _gnutls_get_asn_mpis(ASN1_TYPE asn, const char *root,
 	_asnstr_append_name(name, sizeof(name), root,
 			    ".algorithm.parameters");
 
-	if (pk_algorithm != GNUTLS_PK_RSA && pk_algorithm != GNUTLS_PK_EDDSA_ED25519 && pk_algorithm != GNUTLS_PK_ECDH_X25519) {
+	if (pk_algorithm != GNUTLS_PK_RSA &&
+	    pk_algorithm != GNUTLS_PK_EDDSA_ED25519 && pk_algorithm != GNUTLS_PK_ECDH_X25519 &&
+	    pk_algorithm != GNUTLS_PK_EDDSA_ED448 && pk_algorithm != GNUTLS_PK_ECDH_X448) {
 		/* RSA and EdDSA do not use parameters */
 		result = _gnutls_x509_read_value(asn, name, &tmp);
 		if (pk_algorithm == GNUTLS_PK_RSA_PSS && 

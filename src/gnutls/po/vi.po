@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: libgnutls-3.2.3\n"
 "Report-Msgid-Bugs-To: bug-gnutls@gnu.org\n"
-"POT-Creation-Date: 2019-12-02 17:35+0100\n"
+"POT-Creation-Date: 2020-03-30 21:03+0200\n"
 "PO-Revision-Date: 2013-08-06 07:13+0700\n"
 "Last-Translator: Trần Ngọc Quân <vnwildman@gmail.com>\n"
 "Language-Team: Vietnamese <translation-team-vi@lists.sourceforge.net>\n"
@@ -427,372 +427,377 @@ msgstr ""
 msgid "Unsupported extension in X.509 certificate."
 msgstr "Gặp phần mở rộng chứng nhận X.509 không được hỗ trợ."
 
-#: lib/errors.c:190
+#: lib/errors.c:189
+#, fuzzy
+msgid "Duplicate extension in X.509 certificate."
+msgstr "Gặp phần mở rộng chứng nhận X.509 không được hỗ trợ."
+
+#: lib/errors.c:192
 msgid "Key usage violation in certificate has been detected."
 msgstr "Đã phát hiện sự vi phạm cách sử dụng khoá trong chứng nhận."
 
-#: lib/errors.c:192 lib/errors.c:454
+#: lib/errors.c:194 lib/errors.c:456
 msgid "Function was interrupted."
 msgstr "Hàm đã bị ngắt."
 
-#: lib/errors.c:194
+#: lib/errors.c:196
 msgid "TLS Application data were received, while expecting handshake data."
 msgstr ""
 "Nhận được dữ liệu Ứng dụng TLS, trong khi đang đợi dữ liệu thiết lập quan hệ."
 
-#: lib/errors.c:196
+#: lib/errors.c:198
 msgid "Error in Database backend."
 msgstr "Gặp lỗi trong hậu phương cơ sở dữ liệu."
 
-#: lib/errors.c:197
+#: lib/errors.c:199
 msgid "The Database entry already exists."
 msgstr ""
 
-#: lib/errors.c:198
+#: lib/errors.c:200
 msgid "The certificate type is not supported."
 msgstr "Loại chứng nhận không được hỗ trợ."
 
-#: lib/errors.c:201
+#: lib/errors.c:203
 msgid "The given memory buffer is too short to hold parameters."
 msgstr "Đã đưa ra một vùng đệm bộ nhớ quá ngắn để chứa các tham số."
 
-#: lib/errors.c:203 libdane/errors.c:61
+#: lib/errors.c:205 libdane/errors.c:61
 msgid "The request is invalid."
 msgstr "Yêu cầu không hợp lệ."
 
-#: lib/errors.c:205
+#: lib/errors.c:207
 msgid "The cookie was bad."
 msgstr "Cookie sai."
 
-#: lib/errors.c:206
+#: lib/errors.c:208
 msgid "An illegal parameter has been received."
 msgstr "Nhận được một tham số cấm."
 
-#: lib/errors.c:208
+#: lib/errors.c:210
 msgid "An illegal parameter was found."
 msgstr "Có tham số không hợp lệ được tìm thấy."
 
-#: lib/errors.c:210
+#: lib/errors.c:212
 msgid "Error while reading file."
 msgstr "Gặp lỗi khi đọc tập tin."
 
-#: lib/errors.c:211
+#: lib/errors.c:213
 #, fuzzy
 msgid "A disallowed SNI server name has been received."
 msgstr "Nhận được một tham số cấm."
 
-#: lib/errors.c:214
+#: lib/errors.c:216
 msgid "ASN1 parser: Element was not found."
 msgstr "Bộ phân tích ASN1: Không tìm thấy phần tử."
 
-#: lib/errors.c:216
+#: lib/errors.c:218
 msgid "ASN1 parser: Identifier was not found"
 msgstr "Bộ phân tích ASN1: Không tìm thấy định danh."
 
-#: lib/errors.c:218
+#: lib/errors.c:220
 msgid "ASN1 parser: Error in DER parsing."
 msgstr "Bộ phân tích ASN1: gặp lỗi khi phân tích ngữ cảnh DER."
 
-#: lib/errors.c:220
+#: lib/errors.c:222
 msgid "ASN1 parser: Value was not found."
 msgstr "Bộ phân tích ASN1: Không tìm thấy giá trị."
 
-#: lib/errors.c:222
+#: lib/errors.c:224
 msgid "ASN1 parser: Generic parsing error."
 msgstr "Bộ phân tích ASN1: Lỗi phân tích ngữ cảnh chung."
 
-#: lib/errors.c:224
+#: lib/errors.c:226
 msgid "ASN1 parser: Value is not valid."
 msgstr "Bộ phân tích ASN1: Giá trị không hợp lệ."
 
-#: lib/errors.c:226
+#: lib/errors.c:228
 msgid "ASN1 parser: Error in TAG."
 msgstr "Bộ phân tích ASN1: Gặp lỗi trong TAG (thẻ)."
 
-#: lib/errors.c:228
+#: lib/errors.c:230
 msgid "ASN1 parser: error in implicit tag"
 msgstr "Bộ phân tích ASN1: Gặp lỗi trong thẻ dứt ẩn."
 
-#: lib/errors.c:230
+#: lib/errors.c:232
 msgid "ASN1 parser: Error in type 'ANY'."
 msgstr "Bộ phân tích ASN1: Lỗi trong kiểu “ANY” (bất kỳ)."
 
-#: lib/errors.c:232
+#: lib/errors.c:234
 msgid "ASN1 parser: Syntax error."
 msgstr "Bộ phân tích ASN1: Lỗi cú pháp."
 
-#: lib/errors.c:234
+#: lib/errors.c:236
 msgid "ASN1 parser: Overflow in DER parsing."
 msgstr "Bộ phân tích ASN1: Tràn trong phân tích DER."
 
-#: lib/errors.c:238
+#: lib/errors.c:240
 msgid "Too many empty record packets have been received."
 msgstr "Nhận được quá nhiều gói tin chứa bản ghi trống."
 
-#: lib/errors.c:240
+#: lib/errors.c:242
 msgid "Too many handshake packets have been received."
 msgstr "Nhận được quá nhiều gói tin bắt tay."
 
-#: lib/errors.c:242
+#: lib/errors.c:244
 msgid "More than a single object matches the criteria."
 msgstr ""
 
-#: lib/errors.c:244
+#: lib/errors.c:246
 msgid "The crypto library version is too old."
 msgstr "Phiên bản thư viện crypto quá cũ."
 
-#: lib/errors.c:247
+#: lib/errors.c:249
 msgid "The tasn1 library version is too old."
 msgstr "Phiên bản thư viện tasn1 quá cũ."
 
-#: lib/errors.c:249
+#: lib/errors.c:251
 msgid "The OpenPGP User ID is revoked."
 msgstr "Mã số người dùng OpenPGP bị thu hồi."
 
-#: lib/errors.c:251
+#: lib/errors.c:253
 msgid "The OpenPGP key has not a preferred key set."
 msgstr "Khoá OpenPGP không có tập hợp khoá được ưu tiên hơn."
 
-#: lib/errors.c:253
+#: lib/errors.c:255
 msgid "Error loading the keyring."
 msgstr "Gặp lỗi khi nạp vòng khoá."
 
-#: lib/errors.c:255
+#: lib/errors.c:257
 msgid "The initialization of crypto backend has failed."
 msgstr "Khởi tạo thư viện mã hoá crypto làm backend gặp lỗi."
 
-#: lib/errors.c:258
+#: lib/errors.c:260
 msgid "No supported compression algorithms have been found."
 msgstr "Không tìm thấy thuật toán nén được hỗ trợ."
 
-#: lib/errors.c:260
+#: lib/errors.c:262
 msgid "No supported cipher suites have been found."
 msgstr "Không tìm thấy bộ ứng dụng mật mã được hỗ trợ."
 
-#: lib/errors.c:262
+#: lib/errors.c:264
 msgid "Could not get OpenPGP key."
 msgstr "Không thể lấy khoá OpenPGP."
 
-#: lib/errors.c:264
+#: lib/errors.c:266
 msgid "Could not find OpenPGP subkey."
 msgstr "Không tìm thấy khoá phụ OpenPGP."
 
-#: lib/errors.c:266
+#: lib/errors.c:268
 msgid "Safe renegotiation failed."
 msgstr "Đàm-phán-lại an toàn gặp lỗi."
 
-#: lib/errors.c:268
+#: lib/errors.c:270
 msgid "Unsafe renegotiation denied."
 msgstr "Đàm-phán-lại không an toàn bị từ chối"
 
-#: lib/errors.c:271
+#: lib/errors.c:273
 msgid "The SRP username supplied is illegal."
 msgstr "Đã cung cấp một tên người dùng SRP cấm."
 
-#: lib/errors.c:273
+#: lib/errors.c:275
 #, fuzzy
 msgid "The username supplied is unknown."
 msgstr "Tài khoản người dùng SRP đã áp dụng không được biết."
 
-#: lib/errors.c:276
+#: lib/errors.c:278
 msgid "The OpenPGP fingerprint is not supported."
 msgstr "Dấu tay OpenPGP không phải được hỗ trợ."
 
-#: lib/errors.c:278
+#: lib/errors.c:280
 msgid "The signature algorithm is not supported."
 msgstr "Thuật toán chữ ký không được hỗ trợ."
 
-#: lib/errors.c:280
+#: lib/errors.c:282
 msgid "The certificate has unsupported attributes."
 msgstr "Chứng nhận có thuộc tính không được hỗ trợ."
 
-#: lib/errors.c:282
+#: lib/errors.c:284
 msgid "The OID is not supported."
 msgstr "IOD không được hỗ trợ."
 
-#: lib/errors.c:284
+#: lib/errors.c:286
 msgid "The hash algorithm is unknown."
 msgstr "Không rõ thuật toán chuyển đổi chuỗi sang mẫu duy nhất (hash)."
 
-#: lib/errors.c:286
+#: lib/errors.c:288
 msgid "The PKCS structure's content type is unknown."
 msgstr "Không rõ loại nội dung của cấu trúc PKCS."
 
-#: lib/errors.c:288
+#: lib/errors.c:290
 msgid "The PKCS structure's bag type is unknown."
 msgstr "Không rõ loại bao của cấu trúc PKCS."
 
-#: lib/errors.c:290 lib/errors.c:296
+#: lib/errors.c:292 lib/errors.c:298
 msgid "The given password contains invalid characters."
-msgstr "Đã đưa ra một mật khẩu chứa ký tự không hợp lệ."
-
-#: lib/errors.c:292
-#, fuzzy
-msgid "The given string contains invalid UTF-8 characters."
 msgstr "Đã đưa ra một mật khẩu chứa ký tự không hợp lệ."
 
 #: lib/errors.c:294
 #, fuzzy
+msgid "The given string contains invalid UTF-8 characters."
+msgstr "Đã đưa ra một mật khẩu chứa ký tự không hợp lệ."
+
+#: lib/errors.c:296
+#, fuzzy
 msgid "The given email string contains non-ASCII characters before '@'."
 msgstr "Đã đưa ra một mật khẩu chứa ký tự không hợp lệ."
 
-#: lib/errors.c:299
+#: lib/errors.c:301
 msgid "The Message Authentication Code verification failed."
 msgstr "Lỗi thẩm tra Mã Xác Thực Thông Điệp."
 
-#: lib/errors.c:301
+#: lib/errors.c:303
 msgid "Some constraint limits were reached."
 msgstr "Đã tới một số giới hạn ràng buộc."
 
-#: lib/errors.c:303
+#: lib/errors.c:305
 msgid "Failed to acquire random data."
 msgstr "Lỗi lấy dữ liệu ngẫu nhiên. "
 
-#: lib/errors.c:305
+#: lib/errors.c:307
 msgid "Verifying TLS/IA phase checksum failed"
 msgstr "Lỗi thẩm tra tổng kiểm của giải đoạn TLS/IA."
 
-#: lib/errors.c:308
+#: lib/errors.c:310
 msgid "The specified algorithm or protocol is unknown."
 msgstr "Không rõ thuật toán hoặc giao thức đã ghi rõ."
 
-#: lib/errors.c:311
+#: lib/errors.c:313
 msgid "The handshake data size is too large."
 msgstr "Kích thước dữ liệu bắt tay quá lớn."
 
-#: lib/errors.c:314
+#: lib/errors.c:316
 msgid "Error opening /dev/crypto"
 msgstr "Lỗi mở /dev/crypto"
 
-#: lib/errors.c:317
+#: lib/errors.c:319
 msgid "Error interfacing with /dev/crypto"
 msgstr "Lỗi giao diện với /dev/crypto"
 
-#: lib/errors.c:319
+#: lib/errors.c:321
 msgid "Peer has terminated the connection"
 msgstr "Mạng ngang hàng đã kết thúc kết nối"
 
-#: lib/errors.c:321
+#: lib/errors.c:323
 msgid "Channel binding data not available"
 msgstr "Dữ liệu ràng buộc kênh không sẵn sàng"
 
-#: lib/errors.c:324
+#: lib/errors.c:326
 msgid "TPM error."
 msgstr "lỗi TPM."
 
-#: lib/errors.c:326
+#: lib/errors.c:328
 msgid "The TPM library (trousers) cannot be found."
 msgstr ""
 
-#: lib/errors.c:328
+#: lib/errors.c:330
 msgid "TPM is not initialized."
 msgstr "TPM chưa được khởi tạo."
 
-#: lib/errors.c:330
+#: lib/errors.c:332
 msgid "TPM key was not found in persistent storage."
 msgstr "Khóa TPM không tìm thấy tại kho lưu cố định."
 
-#: lib/errors.c:332
+#: lib/errors.c:334
 msgid "Cannot initialize a session with the TPM."
 msgstr "Không thể khởi tạo một phiên với TPM."
 
-#: lib/errors.c:334
+#: lib/errors.c:336
 msgid "PKCS #11 error."
 msgstr "lỗi PKCS #11."
 
-#: lib/errors.c:336
+#: lib/errors.c:338
 msgid "PKCS #11 initialization error."
 msgstr "PKCS #11 lỗi khởi tạo."
 
-#: lib/errors.c:338
+#: lib/errors.c:340
 msgid "Error in parsing."
 msgstr "Lỗi phân tích."
 
-#: lib/errors.c:340
+#: lib/errors.c:342
 msgid "Error in provided PIN."
 msgstr "Lỗi trong PIN đã cung cấp."
 
-#: lib/errors.c:342
+#: lib/errors.c:344
 msgid "Error in provided SRK password for TPM."
 msgstr "Lỗi trong mật khẩu SRK đã cung cấp cho TPM."
 
-#: lib/errors.c:345
+#: lib/errors.c:347
 msgid "Error in provided password for key to be loaded in TPM."
 msgstr "Lỗi trong mật khẩu được cung cấp cho khóa được tải trong TPM."
 
-#: lib/errors.c:347
+#: lib/errors.c:349
 msgid "PKCS #11 error in slot"
 msgstr "PKCS #11 lỗi trên khe"
 
-#: lib/errors.c:349
+#: lib/errors.c:351
 msgid "Thread locking error"
 msgstr "lỗi khóa tuyến trình"
 
-#: lib/errors.c:351
+#: lib/errors.c:353
 msgid "PKCS #11 error in attribute"
 msgstr "PKCS #11 lỗi trên thuộc tính"
 
-#: lib/errors.c:353
+#: lib/errors.c:355
 msgid "PKCS #11 error in device"
 msgstr "PKCS #11 lỗi trên thiết bị"
 
-#: lib/errors.c:355
+#: lib/errors.c:357
 msgid "PKCS #11 error in data"
 msgstr "PKCS #11 lỗi dữ liệu"
 
-#: lib/errors.c:357
+#: lib/errors.c:359
 msgid "PKCS #11 unsupported feature"
 msgstr "PKCS #11 đặc tính kỹ thuật không được hỗ trợ"
 
-#: lib/errors.c:359
+#: lib/errors.c:361
 msgid "PKCS #11 error in key"
 msgstr "PKCS #11 lỗi trên khoá"
 
-#: lib/errors.c:361
+#: lib/errors.c:363
 msgid "PKCS #11 PIN expired"
 msgstr "PKCS #11 PIN hết hạn"
 
-#: lib/errors.c:363
+#: lib/errors.c:365
 msgid "PKCS #11 PIN locked"
 msgstr "PKCS #11 lỗi PIN bị khoá"
 
-#: lib/errors.c:365
+#: lib/errors.c:367
 msgid "PKCS #11 error in session"
 msgstr "PKCS #11 lỗi trên phiên"
 
-#: lib/errors.c:367
+#: lib/errors.c:369
 msgid "PKCS #11 error in signature"
 msgstr "PKCS #11 lỗi trong chữ ký"
 
-#: lib/errors.c:369
+#: lib/errors.c:371
 msgid "PKCS #11 error in token"
 msgstr "PKCS #11 lỗi thẻ bài"
 
-#: lib/errors.c:371
+#: lib/errors.c:373
 msgid "PKCS #11 user error"
 msgstr "PKCS #11 lỗi người dùng"
 
-#: lib/errors.c:373
+#: lib/errors.c:375
 msgid "The operation timed out"
 msgstr "Thao tác bị lỗi quá thời gian"
 
-#: lib/errors.c:375
+#: lib/errors.c:377
 msgid "The operation was cancelled due to user error"
 msgstr "Thao tác bị huỷ bỏ bởi vì lỗi từ phía người dùng"
 
-#: lib/errors.c:377
+#: lib/errors.c:379
 msgid "No supported ECC curves were found"
 msgstr "Không tìm thấy đường cong ECC được hỗ trợ"
 
-#: lib/errors.c:379
+#: lib/errors.c:381
 msgid "The curve is unsupported"
 msgstr "Không hỗ trợ curve"
 
-#: lib/errors.c:381
+#: lib/errors.c:383
 msgid "The requested PKCS #11 object is not available"
 msgstr "Đã yêu cầu đối tượng PKCS #11 là không sẵn sàng."
 
-#: lib/errors.c:384
+#: lib/errors.c:386
 msgid ""
 "The provided X.509 certificate list is not sorted (in subject to issuer "
 "order)"
@@ -800,213 +805,213 @@ msgstr ""
 "Danh sách giấy chứng thực X.509 đã cung cấp không được xắp xếp đúng (theo "
 "thứ tự từ chủ thể đến nhà phát hành)"
 
-#: lib/errors.c:386
+#: lib/errors.c:388
 msgid "The OCSP response is invalid"
 msgstr "Đáp ứng OCSP không hợp lệ"
 
-#: lib/errors.c:388
+#: lib/errors.c:390
 msgid "The OCSP response provided doesn't match the available certificates"
 msgstr ""
 
-#: lib/errors.c:390
+#: lib/errors.c:392
 msgid "There is no certificate status (OCSP)."
 msgstr "Ở đây không có trạng thái chứng nhận (OCSP)."
 
-#: lib/errors.c:392
+#: lib/errors.c:394
 msgid "Error in the system's randomness device."
 msgstr "Có lỗi trong thiết bị tạo số ngẫu nhiên của hệ thống."
 
-#: lib/errors.c:395
+#: lib/errors.c:397
 msgid "No common application protocol could be negotiated."
 msgstr "Không có giao thức ứng dụng chung nào được dàn xếp."
 
-#: lib/errors.c:397
+#: lib/errors.c:399
 #, fuzzy
 msgid "Error while performing self checks."
 msgstr "Gặp lỗi khi đọc tập tin."
 
-#: lib/errors.c:399
+#: lib/errors.c:401
 msgid "There is no self test for this algorithm."
 msgstr ""
 
-#: lib/errors.c:401
+#: lib/errors.c:403
 msgid ""
 "An error has been detected in the library and cannot continue operations."
 msgstr ""
 
-#: lib/errors.c:403
+#: lib/errors.c:405
 #, fuzzy
 msgid "Error in sockets initialization."
 msgstr "Gặp lỗi trong hàm push."
 
-#: lib/errors.c:405
+#: lib/errors.c:407
 #, fuzzy
 msgid "Error in public key generation."
 msgstr "Gặp lỗi trong hàm pull."
 
-#: lib/errors.c:407
+#: lib/errors.c:409
 #, fuzzy
 msgid "Invalid TLS extensions length field."
 msgstr "Nhận được một phần mở rộng TLS cấm."
 
-#: lib/errors.c:409
+#: lib/errors.c:411
 msgid "Peer's certificate or username has changed during a rehandshake."
 msgstr ""
 
-#: lib/errors.c:411
+#: lib/errors.c:413
 msgid "The provided string has an embedded null."
 msgstr ""
 
-#: lib/errors.c:413
+#: lib/errors.c:415
 msgid "Attempted handshake during false start."
 msgstr ""
 
-#: lib/errors.c:415
+#: lib/errors.c:417
 #, fuzzy
 msgid "The SNI host name not recognised."
 msgstr "Đã gửi một tên máy phục vụ không được nhận ra"
 
-#: lib/errors.c:417
+#: lib/errors.c:419
 msgid "There was an issue converting to or from UTF8."
 msgstr ""
 
-#: lib/errors.c:419
+#: lib/errors.c:421
 msgid "Cannot perform this action while handshake is in progress."
 msgstr ""
 
-#: lib/errors.c:421
+#: lib/errors.c:423
 #, fuzzy
 msgid "The public key is invalid."
 msgstr "Yêu cầu không hợp lệ."
 
-#: lib/errors.c:423
+#: lib/errors.c:425
 msgid "There are no validation parameters present."
 msgstr ""
 
-#: lib/errors.c:425
+#: lib/errors.c:427
 msgid "The public key parameters are invalid."
 msgstr ""
 
-#: lib/errors.c:427
+#: lib/errors.c:429
 #, fuzzy
 msgid "The private key is invalid."
 msgstr "Yêu cầu không hợp lệ."
 
-#: lib/errors.c:429
+#: lib/errors.c:431
 #, fuzzy
 msgid "The DER time encoding is invalid."
 msgstr "Yêu cầu không hợp lệ."
 
-#: lib/errors.c:431
+#: lib/errors.c:433
 #, fuzzy
 msgid "The signature is incompatible with the public key."
 msgstr "Khoá DSA đưa ra thì không tương thích với giao thức TLS đã chọn."
 
-#: lib/errors.c:433
+#: lib/errors.c:435
 msgid "One of the involved algorithms has insufficient security level."
 msgstr ""
 
-#: lib/errors.c:435
+#: lib/errors.c:437
 msgid "No common key share with peer."
 msgstr ""
 
-#: lib/errors.c:437
+#: lib/errors.c:439
 msgid "The early data were rejected."
 msgstr ""
 
-#: lib/errors.c:443 libdane/errors.c:42
+#: lib/errors.c:445 libdane/errors.c:42
 msgid "Success."
 msgstr "Thành công."
 
-#: lib/errors.c:444
+#: lib/errors.c:446
 msgid "A TLS warning alert has been received."
 msgstr "Nhận được một cảnh giác báo trước TLS."
 
-#: lib/errors.c:446
+#: lib/errors.c:448
 msgid "A heartbeat pong message was received."
 msgstr "Đã nhận được tiếng vọng “pong”."
 
-#: lib/errors.c:448
+#: lib/errors.c:450
 msgid "A heartbeat ping message was received."
 msgstr "Đã nhận được tiếng vọng “ping”."
 
-#: lib/errors.c:450
+#: lib/errors.c:452
 msgid "Resource temporarily unavailable, try again."
 msgstr "Tài nguyên tạm thời không sẵn sàng, hãy thử lại."
 
-#: lib/errors.c:452
+#: lib/errors.c:454
 msgid "The transmitted packet is too large (EMSGSIZE)."
 msgstr "Gói đã truyền là quá lớn (EMSGSIZE)."
 
-#: lib/errors.c:455
+#: lib/errors.c:457
 msgid "Rehandshake was requested by the peer."
 msgstr "Đồng đẳng đã yêu cầu thiết lập lại quan hệ."
 
-#: lib/errors.c:457
+#: lib/errors.c:459
 #, fuzzy
 msgid "Re-authentication was requested by the peer."
 msgstr "Đồng đẳng đã yêu cầu thiết lập lại quan hệ."
 
-#: lib/errors.c:549 libdane/errors.c:100
+#: lib/errors.c:551 libdane/errors.c:100
 msgid "(unknown error code)"
 msgstr "(không rõ mã lỗi)"
 
-#: lib/x509/ocsp.c:2605
+#: lib/x509/ocsp.c:2578
 #, fuzzy
 msgid "The OCSP response is trusted. "
 msgstr "Đáp ứng OCSP không hợp lệ"
 
-#: lib/x509/ocsp.c:2610
+#: lib/x509/ocsp.c:2583
 #, fuzzy
 msgid "The OCSP response's signer could not be found. "
 msgstr "Đáp ứng OCSP không hợp lệ"
 
-#: lib/x509/ocsp.c:2615
+#: lib/x509/ocsp.c:2588
 msgid "Error in the signer's key usageflags. "
 msgstr ""
 
-#: lib/x509/ocsp.c:2620
+#: lib/x509/ocsp.c:2593
 #, fuzzy
 msgid "The OCSP response's signer is not trusted. "
 msgstr "Đáp ứng OCSP không hợp lệ"
 
-#: lib/x509/ocsp.c:2625
+#: lib/x509/ocsp.c:2598
 #, fuzzy
 msgid "The OCSP response depends on insecure algorithms. "
 msgstr "Đáp ứng OCSP không hợp lệ"
 
-#: lib/x509/ocsp.c:2630
+#: lib/x509/ocsp.c:2603
 #, fuzzy
 msgid "The OCSP response's signature cannot be validated. "
 msgstr "Đáp ứng OCSP không hợp lệ"
 
-#: lib/x509/ocsp.c:2635
+#: lib/x509/ocsp.c:2608
 msgid "The OCSP response's signer's certificate is not activated. "
 msgstr ""
 
-#: lib/x509/ocsp.c:2640
+#: lib/x509/ocsp.c:2613
 #, fuzzy
 msgid "The OCSP response's signer's certificate is expired. "
 msgstr "Đáp ứng OCSP không hợp lệ"
 
-#: lib/x509/ocsp.c:2644
+#: lib/x509/ocsp.c:2617
 #, fuzzy
 msgid "Memory error"
 msgstr "Lỗi giải mật mã"
 
-#: lib/x509/ocsp_output.c:50 lib/x509/ocsp_output.c:276 lib/x509/output.c:1678
-#: lib/x509/output.c:2211 lib/x509/output.c:2609
+#: lib/x509/ocsp_output.c:50 lib/x509/ocsp_output.c:276 lib/x509/output.c:1680
+#: lib/x509/output.c:2211 lib/x509/output.c:2608
 #, c-format
 msgid "\tVersion: %d\n"
 msgstr "\tPhiên bản %d\n"
 
-#: lib/x509/ocsp_output.c:136 lib/x509/ocsp_output.c:500 lib/x509/output.c:2379
-#: lib/x509/output.c:2773
+#: lib/x509/ocsp_output.c:136 lib/x509/ocsp_output.c:500 lib/x509/output.c:2378
+#: lib/x509/output.c:2771
 msgid "\t\t\tASCII: "
 msgstr "\t\t\tASCII: "
 
-#: lib/x509/ocsp_output.c:141 lib/x509/ocsp_output.c:505 lib/x509/output.c:2383
-#: lib/x509/output.c:2778
+#: lib/x509/ocsp_output.c:141 lib/x509/ocsp_output.c:505 lib/x509/output.c:2382
+#: lib/x509/output.c:2776
 msgid "\t\t\tHexdump: "
 msgstr "\t\t\tĐổ thập lục: "
 
@@ -1044,26 +1049,26 @@ msgstr "\t\tCập nhật này: %s\n"
 msgid "\t\tNext Update: %s\n"
 msgstr "\t\tCập nhật kế tiếp: %s\n"
 
-#: lib/x509/ocsp_output.c:524 lib/x509/output.c:1343 lib/x509/output.c:1614
-#: lib/x509/output.c:1739 lib/x509/output.c:1759 lib/x509/output.c:1803
-#: lib/x509/output.c:2031 lib/x509/output.c:2044 lib/x509/output.c:2458
-#: lib/x509/output.c:2586 lib/x509/output.c:2637
+#: lib/x509/ocsp_output.c:524 lib/x509/output.c:1344 lib/x509/output.c:1616
+#: lib/x509/output.c:1741 lib/x509/output.c:1761 lib/x509/output.c:1805
+#: lib/x509/output.c:2033 lib/x509/output.c:2046 lib/x509/output.c:2457
+#: lib/x509/output.c:2585 lib/x509/output.c:2636
 msgid "unknown"
 msgstr "không rõ"
 
-#: lib/x509/ocsp_output.c:525 lib/x509/output.c:1807 lib/x509/output.c:2462
-#: lib/x509/output.c:2641
+#: lib/x509/ocsp_output.c:525 lib/x509/output.c:1809 lib/x509/output.c:2461
+#: lib/x509/output.c:2640
 #, c-format
 msgid "\tSignature Algorithm: %s\n"
 msgstr "\tThuật toán Chữ ký: %s\n"
 
-#: lib/x509/ocsp_output.c:529 lib/x509/output.c:1814 lib/x509/output.c:2467
+#: lib/x509/ocsp_output.c:529 lib/x509/output.c:1816 lib/x509/output.c:2466
 msgid ""
 "warning: signed using a broken signature algorithm that can be forged.\n"
 msgstr ""
 "cảnh báo : đã ký dùng một thuật toán chữ ký bị hỏng có thể bị giả mạo.\n"
 
-#: lib/x509/ocsp_output.c:543 lib/x509/output.c:1840 lib/x509/output.c:2493
+#: lib/x509/ocsp_output.c:543 lib/x509/output.c:1842 lib/x509/output.c:2492
 msgid "\tSignature:\n"
 msgstr "\tChữ ký:\n"
 
@@ -1293,12 +1298,12 @@ msgstr ""
 "\n"
 "%s\t\t\tASCII tên khác: "
 
-#: lib/x509/output.c:880 lib/x509/output.c:952 lib/x509/output.c:1240
+#: lib/x509/output.c:880 lib/x509/output.c:953 lib/x509/output.c:1241
 #, c-format
 msgid "%s\t\t\tASCII: "
 msgstr "%s\t\t\tASCII: "
 
-#: lib/x509/output.c:884 lib/x509/output.c:956 lib/x509/output.c:1244
+#: lib/x509/output.c:884 lib/x509/output.c:957 lib/x509/output.c:1245
 #, c-format
 msgid "%s\t\t\tHexdump: "
 msgstr "%s\t\t\tĐổ thập lục: "
@@ -1308,293 +1313,293 @@ msgstr "%s\t\t\tĐổ thập lục: "
 msgid "%s\t\t\t%.*s\n"
 msgstr ""
 
-#: lib/x509/output.c:920
+#: lib/x509/output.c:919
 #, c-format
 msgid "%s\t\t\tSignTool: %.*s\n"
 msgstr ""
 
-#: lib/x509/output.c:928
+#: lib/x509/output.c:927
 #, fuzzy, c-format
 msgid "%s\t\t\tCATool: %.*s\n"
 msgstr "%s\t\t\tOID tên khác: %.*s\n"
 
-#: lib/x509/output.c:936
+#: lib/x509/output.c:935
 #, fuzzy, c-format
 msgid "%s\t\t\tSignToolCert: %.*s\n"
 msgstr "%s\t\t\tOID tên khác: %.*s\n"
 
-#: lib/x509/output.c:944
+#: lib/x509/output.c:943
 #, fuzzy, c-format
 msgid "%s\t\t\tCAToolCert: %.*s\n"
 msgstr "%s\t\t\tOID tên khác: %.*s\n"
 
-#: lib/x509/output.c:988
+#: lib/x509/output.c:989
 #, c-format
 msgid "%s\t\tBasic Constraints (%s):\n"
 msgstr "%s\t\tRàng buộc Cơ bản (%s):\n"
 
-#: lib/x509/output.c:990 lib/x509/output.c:1004 lib/x509/output.c:1049
-#: lib/x509/output.c:1083 lib/x509/output.c:1096 lib/x509/output.c:1108
-#: lib/x509/output.c:1123 lib/x509/output.c:1135 lib/x509/output.c:1148
-#: lib/x509/output.c:1160 lib/x509/output.c:1174 lib/x509/output.c:1188
-#: lib/x509/output.c:1196 lib/x509/output.c:1207 lib/x509/output.c:1218
-#: lib/x509/output.c:1226 lib/x509/output.c:1232 lib/x509/output.c:1238
-#: lib/x509/output.c:2320 lib/x509/output.c:2345 lib/x509/output.c:2365
+#: lib/x509/output.c:991 lib/x509/output.c:1005 lib/x509/output.c:1050
+#: lib/x509/output.c:1084 lib/x509/output.c:1097 lib/x509/output.c:1109
+#: lib/x509/output.c:1124 lib/x509/output.c:1136 lib/x509/output.c:1149
+#: lib/x509/output.c:1161 lib/x509/output.c:1175 lib/x509/output.c:1189
+#: lib/x509/output.c:1197 lib/x509/output.c:1208 lib/x509/output.c:1219
+#: lib/x509/output.c:1227 lib/x509/output.c:1233 lib/x509/output.c:1239
+#: lib/x509/output.c:2319 lib/x509/output.c:2344 lib/x509/output.c:2364
 msgid "critical"
 msgstr "hết hạn"
 
-#: lib/x509/output.c:990 lib/x509/output.c:1004 lib/x509/output.c:1050
-#: lib/x509/output.c:1084 lib/x509/output.c:1096 lib/x509/output.c:1108
-#: lib/x509/output.c:1123 lib/x509/output.c:1135 lib/x509/output.c:1148
-#: lib/x509/output.c:1160 lib/x509/output.c:1174 lib/x509/output.c:1188
-#: lib/x509/output.c:1196 lib/x509/output.c:1207 lib/x509/output.c:1218
-#: lib/x509/output.c:1226 lib/x509/output.c:1232 lib/x509/output.c:1238
-#: lib/x509/output.c:2321 lib/x509/output.c:2346 lib/x509/output.c:2366
+#: lib/x509/output.c:991 lib/x509/output.c:1005 lib/x509/output.c:1051
+#: lib/x509/output.c:1085 lib/x509/output.c:1097 lib/x509/output.c:1109
+#: lib/x509/output.c:1124 lib/x509/output.c:1136 lib/x509/output.c:1149
+#: lib/x509/output.c:1161 lib/x509/output.c:1175 lib/x509/output.c:1189
+#: lib/x509/output.c:1197 lib/x509/output.c:1208 lib/x509/output.c:1219
+#: lib/x509/output.c:1227 lib/x509/output.c:1233 lib/x509/output.c:1239
+#: lib/x509/output.c:2320 lib/x509/output.c:2345 lib/x509/output.c:2365
 msgid "not critical"
 msgstr "chưa hết hạn"
 
-#: lib/x509/output.c:1002
+#: lib/x509/output.c:1003
 #, c-format
 msgid "%s\t\tSubject Key Identifier (%s):\n"
 msgstr "%s\tĐịnh danh Chủ thể Khoá (%s):\n"
 
-#: lib/x509/output.c:1094
+#: lib/x509/output.c:1095
 #, c-format
 msgid "%s\t\tAuthority Key Identifier (%s):\n"
 msgstr "%s\t\tĐịnh danh Nhà cầm quyền Khóa (%s):\n"
 
-#: lib/x509/output.c:1107
+#: lib/x509/output.c:1108
 #, c-format
 msgid "%s\t\tKey Usage (%s):\n"
 msgstr "%s\t\tSử dụng Khoá (%s):\n"
 
-#: lib/x509/output.c:1121
+#: lib/x509/output.c:1122
 #, c-format
 msgid "%s\t\tPrivate Key Usage Period (%s):\n"
 msgstr "%s\t\tChu kỳ Sử dụng Khóa Riêng (%s):\n"
 
-#: lib/x509/output.c:1134
+#: lib/x509/output.c:1135
 #, c-format
 msgid "%s\t\tKey Purpose (%s):\n"
 msgstr "%s\t\tMục đích Khoá (%s):\n"
 
-#: lib/x509/output.c:1146
+#: lib/x509/output.c:1147
 #, c-format
 msgid "%s\t\tSubject Alternative Name (%s):\n"
 msgstr "%s\t\tTên Xen kẽ Chủ thể (%s):\n"
 
-#: lib/x509/output.c:1158
+#: lib/x509/output.c:1159
 #, c-format
 msgid "%s\t\tIssuer Alternative Name (%s):\n"
 msgstr "%s\t\tTên Thay thế Nhà phát hành (%s):\n"
 
-#: lib/x509/output.c:1172
+#: lib/x509/output.c:1173
 #, c-format
 msgid "%s\t\tCRL Distribution points (%s):\n"
 msgstr "%s\t\tĐiểm phân phối CRL (%s):\n"
 
-#: lib/x509/output.c:1186
+#: lib/x509/output.c:1187
 #, c-format
 msgid "%s\t\tProxy Certificate Information (%s):\n"
 msgstr "%s\t\tThông tin Chứng nhận Ủy nhiệm (%s):\n"
 
-#: lib/x509/output.c:1194
+#: lib/x509/output.c:1195
 #, c-format
 msgid "%s\t\tAuthority Information Access (%s):\n"
 msgstr "%s\t\tTruy cập Thông tin Nhà chức trách (%s):\n"
 
-#: lib/x509/output.c:1206
+#: lib/x509/output.c:1207
 #, fuzzy, c-format
 msgid "%s\t\tName Constraints (%s):\n"
 msgstr "%s\t\tRàng buộc Cơ bản (%s):\n"
 
-#: lib/x509/output.c:1216
+#: lib/x509/output.c:1217
 #, fuzzy, c-format
 msgid "%s\t\tTLS Features (%s):\n"
 msgstr "%s\t\tMục đích Khoá (%s):\n"
 
-#: lib/x509/output.c:1224
+#: lib/x509/output.c:1225
 #, fuzzy, c-format
 msgid "%s\t\tSubject Signing Tool(%s):\n"
 msgstr "%s\tĐịnh danh Chủ thể Khoá (%s):\n"
 
-#: lib/x509/output.c:1230
+#: lib/x509/output.c:1231
 #, fuzzy, c-format
 msgid "%s\t\tIssuer Signing Tool(%s):\n"
 msgstr "%s\t\tTên Thay thế Nhà phát hành (%s):\n"
 
-#: lib/x509/output.c:1236
+#: lib/x509/output.c:1237
 #, c-format
 msgid "%s\t\tUnknown extension %s (%s):\n"
 msgstr "%s\t\tPhần mở rộng không được nhận ra %s (%s):\n"
 
-#: lib/x509/output.c:1293
+#: lib/x509/output.c:1294
 #, c-format
 msgid "%s\tExtensions:\n"
 msgstr "%s\tPhần mở rộng:\n"
 
-#: lib/x509/output.c:1345
+#: lib/x509/output.c:1346
 #, c-format
 msgid "\t%sPublic Key Algorithm: %s\n"
 msgstr "\t%sThuật toán Khoá Công: %s\n"
 
-#: lib/x509/output.c:1347
+#: lib/x509/output.c:1348
 #, c-format
 msgid "\tAlgorithm Security Level: %s (%d bits)\n"
 msgstr "\tMức An ninh Thuật toán: %s (%d bít)\n"
 
-#: lib/x509/output.c:1352
+#: lib/x509/output.c:1353
 msgid "\t\tParameters:\n"
 msgstr ""
 
-#: lib/x509/output.c:1372
+#: lib/x509/output.c:1373
 #, c-format
 msgid "\t\tModulus (bits %d): "
 msgstr "\t\tGiá trị tuyệt đối (%d bit):"
 
-#: lib/x509/output.c:1379
+#: lib/x509/output.c:1380
 #, c-format
 msgid "\t\tExponent (bits %d): "
 msgstr "\t\tMũ (%d bit): "
 
-#: lib/x509/output.c:1387
+#: lib/x509/output.c:1388
 #, c-format
 msgid "\t\tModulus (bits %d):\n"
 msgstr "\t\tGiá trị tuyệt đối (%d bit):\n"
 
-#: lib/x509/output.c:1394
+#: lib/x509/output.c:1395
 #, c-format
 msgid "\t\tExponent (bits %d):\n"
 msgstr "\t\tMũ (%d bit):\n"
 
-#: lib/x509/output.c:1421 lib/x509/output.c:1541
+#: lib/x509/output.c:1423 lib/x509/output.c:1543
 #, c-format
 msgid "\t\tCurve:\t%s\n"
 msgstr "\t\tĐặc tuyến:\t%s\n"
 
-#: lib/x509/output.c:1425 lib/x509/output.c:1551
+#: lib/x509/output.c:1427 lib/x509/output.c:1553
 msgid "\t\tX: "
 msgstr "\t\tX: "
 
-#: lib/x509/output.c:1431 lib/x509/output.c:1556
+#: lib/x509/output.c:1433 lib/x509/output.c:1558
 msgid "\t\tY: "
 msgstr "\t\tY: "
 
-#: lib/x509/output.c:1438 lib/x509/output.c:1562
+#: lib/x509/output.c:1440 lib/x509/output.c:1564
 msgid "\t\tX:\n"
 msgstr "\t\tX:\n"
 
-#: lib/x509/output.c:1443 lib/x509/output.c:1566
+#: lib/x509/output.c:1445 lib/x509/output.c:1568
 msgid "\t\tY:\n"
 msgstr "\t\tY:\n"
 
-#: lib/x509/output.c:1471
+#: lib/x509/output.c:1473
 #, c-format
 msgid "\t\tPublic key (bits %d): "
 msgstr "\t\tKhoá công (%d bít): "
 
-#: lib/x509/output.c:1477
+#: lib/x509/output.c:1479
 msgid "\t\tP: "
 msgstr "\t\tP: "
 
-#: lib/x509/output.c:1482
+#: lib/x509/output.c:1484
 msgid "\t\tQ: "
 msgstr "\t\tQ: "
 
-#: lib/x509/output.c:1487
+#: lib/x509/output.c:1489
 msgid "\t\tG: "
 msgstr "\t\tG: "
 
-#: lib/x509/output.c:1495
+#: lib/x509/output.c:1497
 #, c-format
 msgid "\t\tPublic key (bits %d):\n"
 msgstr "\t\tKhoá công (%d bit):\n"
 
-#: lib/x509/output.c:1500
+#: lib/x509/output.c:1502
 msgid "\t\tP:\n"
 msgstr "\t\tP:\n"
 
-#: lib/x509/output.c:1504
+#: lib/x509/output.c:1506
 msgid "\t\tQ:\n"
 msgstr "\t\tQ:\n"
 
-#: lib/x509/output.c:1508
+#: lib/x509/output.c:1510
 msgid "\t\tG:\n"
 msgstr "\t\tG:\n"
 
-#: lib/x509/output.c:1543
+#: lib/x509/output.c:1545
 #, fuzzy, c-format
 msgid "\t\tDigest:\t%s\n"
 msgstr "\t\tĐặc tuyến:\t%s\n"
 
-#: lib/x509/output.c:1545
+#: lib/x509/output.c:1547
 #, fuzzy, c-format
 msgid "\t\tParamSet: %s\n"
 msgstr "\t\tTạo: %s\n"
 
-#: lib/x509/output.c:1658 lib/x509/output.c:2576
+#: lib/x509/output.c:1660 lib/x509/output.c:2575
 msgid "Subject "
 msgstr "Chủ thể "
 
-#: lib/x509/output.c:1693
+#: lib/x509/output.c:1695
 msgid "\tSerial Number (hex): "
 msgstr "\tSố sản xuất (thập lục): "
 
-#: lib/x509/output.c:1706 lib/x509/output.c:2221
+#: lib/x509/output.c:1708 lib/x509/output.c:2221
 #, fuzzy
 msgid "\tIssuer:\n"
 msgstr "\tNơi cấp: %s\n"
 
-#: lib/x509/output.c:1711 lib/x509/output.c:2226
+#: lib/x509/output.c:1713 lib/x509/output.c:2226
 #, c-format
 msgid "\tIssuer: %s\n"
 msgstr "\tNơi cấp: %s\n"
 
-#: lib/x509/output.c:1720
+#: lib/x509/output.c:1722
 msgid "\tValidity:\n"
 msgstr "\tCó hiệu lực:\n"
 
-#: lib/x509/output.c:1737 lib/x509/output.c:1739
+#: lib/x509/output.c:1739 lib/x509/output.c:1741
 #, c-format
 msgid "\t\tNot Before: %s\n"
 msgstr "\t\tKhông trước: %s\n"
 
-#: lib/x509/output.c:1757 lib/x509/output.c:1759
+#: lib/x509/output.c:1759 lib/x509/output.c:1761
 #, c-format
 msgid "\t\tNot After: %s\n"
 msgstr "\t\tKhông sau: %s\n"
 
-#: lib/x509/output.c:1770 lib/x509/output.c:2619
+#: lib/x509/output.c:1772 lib/x509/output.c:2618
 #, fuzzy
 msgid "\tSubject:\n"
 msgstr "\tChủ thể: %s\n"
 
-#: lib/x509/output.c:1775 lib/x509/output.c:2624
+#: lib/x509/output.c:1777 lib/x509/output.c:2623
 #, c-format
 msgid "\tSubject: %s\n"
 msgstr "\tChủ thể: %s\n"
 
-#: lib/x509/output.c:1854
+#: lib/x509/output.c:1856
 #, fuzzy
 msgid "\tFingerprint:\n"
 msgstr "dấu vân tay: "
 
-#: lib/x509/output.c:1863
+#: lib/x509/output.c:1865
 msgid "\t\tsha1:"
 msgstr ""
 
-#: lib/x509/output.c:1874
+#: lib/x509/output.c:1876
 msgid "\t\tsha256:"
 msgstr ""
 
-#: lib/x509/output.c:1908
+#: lib/x509/output.c:1910
 #, fuzzy, c-format
 msgid ""
 "%sPublic Key ID:\n"
 "%s\tsha1:"
 msgstr "Mã số ID Khoá Công: "
 
-#: lib/x509/output.c:1914
+#: lib/x509/output.c:1916
 #, fuzzy, c-format
 msgid ""
 "%sPublic Key PIN:\n"
@@ -1603,36 +1608,32 @@ msgstr ""
 "\tMã số Khoá Công:\n"
 "\t\t"
 
-#: lib/x509/output.c:1986
+#: lib/x509/output.c:1988
 #, fuzzy
 msgid "no subject,"
 msgstr "Chủ thể "
 
-#: lib/x509/output.c:2002
+#: lib/x509/output.c:2004
 msgid "no issuer,"
 msgstr ""
 
-#: lib/x509/output.c:2049
+#: lib/x509/output.c:2051
 #, c-format
 msgid "signed using %s (broken!), "
 msgstr "đã ký dùng %s (bị hỏng!), "
 
-#: lib/x509/output.c:2051
+#: lib/x509/output.c:2053
 #, c-format
 msgid "signed using %s, "
 msgstr "đã ký dùng %s, "
 
-#: lib/x509/output.c:2187
+#: lib/x509/output.c:2189
 msgid "X.509 Certificate Information:\n"
 msgstr "Thông tin Chứng nhận X.509:\n"
 
-#: lib/x509/output.c:2191 lib/x509/output.c:2831
+#: lib/x509/output.c:2193 lib/x509/output.c:2829
 msgid "Other Information:\n"
 msgstr "Thông tin khác:\n"
-
-#: lib/x509/output.c:2206
-msgid "\tVersion: 1 (default)\n"
-msgstr "\tPhiên bản: 1 (mặc định)\n"
 
 #: lib/x509/output.c:2235
 msgid "\tUpdate dates:\n"
@@ -1648,70 +1649,70 @@ msgstr "\t\tCấp: %s\n"
 msgid "\t\tNext at: %s\n"
 msgstr "\t\tLần sau vào : %s\n"
 
-#: lib/x509/output.c:2303
+#: lib/x509/output.c:2302
 msgid "\tExtensions:\n"
 msgstr "\tPhần mở rộng:\n"
 
-#: lib/x509/output.c:2319
+#: lib/x509/output.c:2318
 #, c-format
 msgid "\t\tCRL Number (%s): "
 msgstr "\t\tSố CRL (%s): "
 
-#: lib/x509/output.c:2344
+#: lib/x509/output.c:2343
 #, c-format
 msgid "\t\tAuthority Key Identifier (%s):\n"
 msgstr "\t\tĐịnh danh Nhà cầm quyền Khoá (%s):\n"
 
-#: lib/x509/output.c:2363
+#: lib/x509/output.c:2362
 #, c-format
 msgid "\t\tUnknown extension %s (%s):\n"
 msgstr "\t\tKhông hiểu phần mở rộng %s (%s):\n"
 
-#: lib/x509/output.c:2400
+#: lib/x509/output.c:2399
 #, c-format
 msgid "\tRevoked certificates (%d):\n"
 msgstr "\tChứng nhận bị thu hồi (%d):\n"
 
-#: lib/x509/output.c:2403
+#: lib/x509/output.c:2402
 msgid "\tNo revoked certificates.\n"
 msgstr "\tKhông có chứng nhận bị thu hồi.\n"
 
-#: lib/x509/output.c:2424
+#: lib/x509/output.c:2423
 msgid "\t\tSerial Number (hex): "
 msgstr "\t\tSố sê-ri (thập lục phân): "
 
-#: lib/x509/output.c:2442
+#: lib/x509/output.c:2441
 #, c-format
 msgid "\t\tRevoked at: %s\n"
 msgstr "\t\tĐược thu hồi vào: %s\n"
 
-#: lib/x509/output.c:2524
+#: lib/x509/output.c:2523
 msgid "X.509 Certificate Revocation List Information:\n"
 msgstr "Danh sách Thu hồi Chứng nhận X.509:\n"
 
-#: lib/x509/output.c:2674
+#: lib/x509/output.c:2672
 msgid "\tAttributes:\n"
 msgstr "\tThuộc tính:\n"
 
-#: lib/x509/output.c:2731
+#: lib/x509/output.c:2729
 #, c-format
 msgid "\t\tChallenge password: %s\n"
 msgstr "\t\tMật khẩu yêu cầu: %s\n"
 
-#: lib/x509/output.c:2741
+#: lib/x509/output.c:2739
 #, c-format
 msgid "\t\tUnknown attribute %s:\n"
 msgstr "\t\tKhông nhận ra thuộc tính %s:\n"
 
-#: lib/x509/output.c:2827
+#: lib/x509/output.c:2825
 msgid "PKCS #10 Certificate Request Information:\n"
 msgstr "Thông tin Yêu cầu Chứng nhận PKCS #10:\n"
 
-#: lib/x509/output.c:2854
+#: lib/x509/output.c:2852
 msgid "Public Key Usage:\n"
 msgstr "Cách dùng Khoá Công:\n"
 
-#: lib/x509/output.c:2894
+#: lib/x509/output.c:2892
 msgid "Public Key Information:\n"
 msgstr "Thông tin Khóa Công:\n"
 
@@ -1792,6 +1793,9 @@ msgstr ""
 #, fuzzy
 msgid "Error in file."
 msgstr "Có lỗi trong tập tin mật khẩu."
+
+#~ msgid "\tVersion: 1 (default)\n"
+#~ msgstr "\tPhiên bản: 1 (mặc định)\n"
 
 #~ msgid "Received a TLS/IA Intermediate Phase Finished message"
 #~ msgstr "Nhận được một thông điệp Giải đoạn TLS/IA Trung gian đã Kết thúc."

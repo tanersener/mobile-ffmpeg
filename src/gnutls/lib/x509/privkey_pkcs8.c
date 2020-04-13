@@ -36,7 +36,6 @@
 #include <num.h>
 #include <random.h>
 #include <pk.h>
-#include <nettle/pbkdf2.h>
 #include "attributes.h"
 #include "prov-seed.h"
 
@@ -69,6 +68,7 @@ _encode_privkey(gnutls_x509_privkey_t pkey, gnutls_datum_t * raw)
 
 	switch (pkey->params.algo) {
 	case GNUTLS_PK_EDDSA_ED25519:
+	case GNUTLS_PK_EDDSA_ED448:
 		/* we encode as octet string (which is going to be stored inside
 		 * another octet string). No comments. */
 		ret = _gnutls_x509_encode_string(ASN1_ETYPE_OCTET_STRING,
@@ -1115,7 +1115,16 @@ _decode_pkcs8_eddsa_key(ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey, const c
 			return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
 		}
 		gnutls_free(pkey->params.raw_priv.data);
-		pkey->params.algo = GNUTLS_PK_EDDSA_ED25519;
+		switch (curve) {
+		case GNUTLS_ECC_CURVE_ED25519:
+			pkey->params.algo = GNUTLS_PK_EDDSA_ED25519;
+			break;
+		case GNUTLS_ECC_CURVE_ED448:
+			pkey->params.algo = GNUTLS_PK_EDDSA_ED448;
+			break;
+		default:
+			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+		}
 		pkey->params.raw_priv.data = tmp.data;
 		pkey->params.raw_priv.size = tmp.size;
 		pkey->params.curve = curve;
@@ -1449,6 +1458,7 @@ decode_private_key_info(const gnutls_datum_t * der,
 			result = _decode_pkcs8_ecc_key(pkcs8_asn, pkey);
 			break;
 		case GNUTLS_PK_EDDSA_ED25519:
+		case GNUTLS_PK_EDDSA_ED448:
 			result = _decode_pkcs8_eddsa_key(pkcs8_asn, pkey, oid);
 			break;
 		case GNUTLS_PK_GOST_01:

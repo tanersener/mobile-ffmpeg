@@ -58,17 +58,48 @@ gnutls_sec_param_t _gnutls_profile_to_sec_level(gnutls_certificate_verification_
 	return GNUTLS_SEC_PARAM_UNKNOWN;
 }
 
-gnutls_certificate_verification_profiles_t _gnutls_profile_get_id(const char *name)
+/**
+ * gnutls_certificate_verification_profile_get_id:
+ * @name: is a profile name
+ *
+ * Convert a string to a #gnutls_certificate_verification_profiles_t value.  The names are
+ * compared in a case insensitive way.
+ *
+ * Returns: a #gnutls_certificate_verification_profiles_t id of the specified profile,
+ *   or %GNUTLS_PROFILE_UNKNOWN on failure.
+ **/
+gnutls_certificate_verification_profiles_t gnutls_certificate_verification_profile_get_id(const char *name)
 {
 	const gnutls_profile_entry *p;
 
 	if (name == NULL)
 		return GNUTLS_PROFILE_UNKNOWN;
 
-	for(p = profiles; p->name != NULL; p++) {
+	for (p = profiles; p->name != NULL; p++) {
 		if (c_strcasecmp(p->name, name) == 0)
 			return p->profile;
 	}
 
 	return GNUTLS_PROFILE_UNKNOWN;
+}
+
+/**
+ * gnutls_certificate_verification_profile_get_name:
+ * @id: is a profile ID
+ *
+ * Convert a #gnutls_certificate_verification_profiles_t value to a string.
+ *
+ * Returns: a string that contains the name of the specified profile or %NULL.
+ **/
+const char *
+gnutls_certificate_verification_profile_get_name(gnutls_certificate_verification_profiles_t id)
+{
+	const gnutls_profile_entry *p;
+
+	for (p = profiles; p->name != NULL; p++) {
+		if (p->profile == id)
+			return p->name;
+	}
+
+	return NULL;
 }

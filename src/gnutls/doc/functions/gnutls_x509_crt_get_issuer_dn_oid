@@ -19,6 +19,6 @@ account for the trailing null.
 
 @strong{Returns:} @code{GNUTLS_E_SHORT_MEMORY_BUFFER}  if the provided buffer is not
 long enough, and in that case the  @code{buf_size} will be updated with
-the required size. @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  if there 
+the required size. @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  if there
 are no data in the current index. On success 0 is returned.
 @end deftypefun

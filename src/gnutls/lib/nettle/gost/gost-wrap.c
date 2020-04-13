@@ -93,7 +93,6 @@ gost28147_key_wrap_cryptopro(const struct gost28147_param *param,
 	gost28147_set_param(&ctx, param);
 	gost28147_encrypt(&ctx, GOST28147_KEY_SIZE, enc, cek);
 
-	gost28147_imit_init(&ictx);
 	gost28147_imit_set_key(&ictx, GOST28147_KEY_SIZE, kd);
 	gost28147_imit_set_param(&ictx, param);
 	gost28147_imit_set_nonce(&ictx, ukm);
@@ -121,7 +120,6 @@ gost28147_key_unwrap_cryptopro(const struct gost28147_param *param,
 	gost28147_set_param(&ctx, param);
 	gost28147_decrypt(&ctx, GOST28147_KEY_SIZE, cek, enc);
 
-	gost28147_imit_init(&ictx);
 	gost28147_imit_set_key(&ictx, GOST28147_KEY_SIZE, kd);
 	gost28147_imit_set_param(&ictx, param);
 	gost28147_imit_set_nonce(&ictx, ukm);

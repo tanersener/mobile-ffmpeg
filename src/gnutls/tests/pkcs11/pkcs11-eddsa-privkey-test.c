@@ -94,6 +94,8 @@ void doit(void)
 	gnutls_privkey_t pkey;
 	gnutls_pubkey_t pubkey;
 	gnutls_pubkey_t pubkey2;
+	gnutls_pubkey_t pubkey3;
+	gnutls_pubkey_t pubkey4;
 	unsigned i, sigalgo;
 
 	bin = softhsm_bin();
@@ -188,8 +190,21 @@ void doit(void)
 		     gnutls_strerror(ret));
 	}
 
+	/* Write pubkey to the card too */
+	assert(gnutls_pubkey_init(&pubkey) == 0);
+	assert(gnutls_pubkey_import_x509(pubkey, crt, 0) == 0);
+
+	ret = gnutls_pkcs11_copy_pubkey(SOFTHSM_URL, pubkey, "cert", NULL,
+					GNUTLS_KEY_DIGITAL_SIGNATURE |
+					GNUTLS_KEY_KEY_ENCIPHERMENT, 0);
+	if (ret < 0) {
+		fail("gnutls_pkcs11_copy_pubkey: %s\n",
+		     gnutls_strerror(ret));
+	}
+
 	gnutls_x509_crt_deinit(crt);
 	gnutls_x509_privkey_deinit(key);
+	gnutls_pubkey_deinit(pubkey);
 	gnutls_pkcs11_set_pin_function(NULL, NULL);
 
 	assert(gnutls_privkey_init(&pkey) == 0);
@@ -201,6 +216,31 @@ void doit(void)
 					     PIN);
 	if (ret < 0) {
 		fail("error in gnutls_privkey_import_pkcs11_url: %s\n", gnutls_strerror(ret));
+	}
+
+	/* Try to read the public key with public key URI */
+	assert(gnutls_pubkey_init(&pubkey3) == 0);
+
+
+	ret =
+	    gnutls_pubkey_import_pkcs11_url(pubkey3,
+					    SOFTHSM_URL
+					    ";object=cert;object-type=public;pin-value="
+					    PIN, 0);
+	if (ret < 0) {
+		fail("error in gnutls_pubkey_import_pkcs11_url: %s\n", gnutls_strerror(ret));
+	}
+
+	/* Try to read the public key with certificate URI */
+	assert(gnutls_pubkey_init(&pubkey4) == 0);
+
+	ret =
+	    gnutls_pubkey_import_pkcs11_url(pubkey4,
+					    SOFTHSM_URL
+					    ";object=cert;object-type=cert;pin-value="
+					    PIN, 0);
+	if (ret < 0) {
+		fail("error in gnutls_pubkey_import_pkcs11_url: %s\n", gnutls_strerror(ret));
 	}
 
 	assert(gnutls_pubkey_init(&pubkey) == 0);
@@ -241,6 +281,9 @@ void doit(void)
 		gnutls_free(sig.data);
 	}
 
+	/* TODO is there any sensible way to check the pubkeys are the same? */
+	gnutls_pubkey_deinit(pubkey4);
+	gnutls_pubkey_deinit(pubkey3);
 	gnutls_pubkey_deinit(pubkey2);
 	gnutls_pubkey_deinit(pubkey);
 	gnutls_privkey_deinit(pkey);

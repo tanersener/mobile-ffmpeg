@@ -1,1 +1,1 @@
-@item @var{int} @ref{gnutls_ocsp_resp_get_certs} (gnutls_ocsp_resp_t @var{resp}, gnutls_x509_crt_t ** @var{certs}, size_t * @var{ncerts})
+@item @var{int} @ref{gnutls_ocsp_resp_get_certs} (gnutls_ocsp_resp_const_t @var{resp}, gnutls_x509_crt_t ** @var{certs}, size_t * @var{ncerts})

@@ -11,7 +11,7 @@
 
 @var{out}: Newly allocated datum with null terminated string.
 
-This function will pretty print X.509 certificate extensions, 
+This function will pretty print X.509 certificate extensions,
 suitable for display to a human.
 
 The output  @code{out} needs to be deallocated using @code{gnutls_free()} .

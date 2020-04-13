@@ -331,6 +331,8 @@ int wrap_padlock_hash_fast(gnutls_digest_algorithm_t algo,
 			   const void *text, size_t text_size,
 			   void *digest)
 {
+	if (text_size == 0 && text == NULL)
+		text = digest;
 	if (algo == GNUTLS_DIG_SHA1) {
 		uint32_t iv[5] = {
 			0x67452301UL,
@@ -362,7 +364,6 @@ int wrap_padlock_hash_fast(gnutls_digest_algorithm_t algo,
 		wrap_padlock_hash_update(&ctx, text, text_size);
 
 		wrap_padlock_hash_output(&ctx, digest, ctx.length);
-		wrap_padlock_hash_deinit(&ctx);
 	}
 
 	return 0;

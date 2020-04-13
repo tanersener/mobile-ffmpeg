@@ -101,14 +101,14 @@ abi-dump-latest: lib/libgnutls.la libdane/libgnutls-dane.la
 
 abi-check-latest: lib/libgnutls.la libdane/libgnutls-dane.la
 	@echo "Checking whether the latest ABI dump matches"
-	@abidiff --suppressions $(ABIGNORE_FILE) lib/.libs/libgnutls.so $(LIBGNUTLS_ABI_LAST_FILE) --hd2 "$(srcdir)/lib/includes/gnutls/"; if test $$? != 0;then \
+	@abidiff --suppressions $(ABIGNORE_FILE) lib/.libs/libgnutls.so $(LIBGNUTLS_ABI_LAST_FILE) --hd2 "$(srcdir)/lib/includes/gnutls/" --hd2 $(builddir)/lib/includes/gnutls/ ; if test $$? != 0;then \
 		echo "*********************************************************"; \
 		echo "libgnutls ABI has changed; use 'make files-update'       "; \
 		echo "and use 'git diff' to check correctness before committing"; \
 		echo "*********************************************************"; \
 		false; \
 	fi
-	@abidiff libdane/.libs/libgnutls-dane.so $(LIBDANE_ABI_LAST_FILE) --hd2 "$(srcdir)/libdane/includes/gnutls/"; if test $$? != 0;then \
+	@abidiff libdane/.libs/libgnutls-dane.so $(LIBDANE_ABI_LAST_FILE) --hd2 "$(srcdir)/libdane/includes/gnutls/" --hd2 $(builddir)/lib/includes/gnutls/; if test $$? != 0;then \
 		echo "*********************************************************"; \
 		echo "libgnutls-dane ABI has changed; use 'make files-update'  "; \
 		echo "and use 'git diff' to check correctness before committing"; \
@@ -123,7 +123,7 @@ ABICHECK_COMMON = --no-added-syms
 abi-check: lib/libgnutls.la libdane/libgnutls-dane.la
 	@for file in $$(echo $(srcdir)/devel/libgnutls-*-$$(uname -m).abi);do \
 		echo "Comparing libgnutls with $$file"; \
-		abidiff $${file} lib/.libs/libgnutls.so $(ABICHECK_COMMON) --suppressions $(ABIGNORE_FILE) --hd2 "$(srcdir)/lib/includes/gnutls/"; \
+		abidiff $${file} lib/.libs/libgnutls.so $(ABICHECK_COMMON) --suppressions $(ABIGNORE_FILE) --hd2 "$(srcdir)/lib/includes/gnutls/" --hd2 $(builddir)/lib/includes/gnutls/; \
 		if test $$? != 0;then \
 			echo "****************************************************************************"; \
 			echo "ABI check failed; If intentional add suppression in devel/libgnutls.abignore"; \
@@ -133,7 +133,7 @@ abi-check: lib/libgnutls.la libdane/libgnutls-dane.la
 	done
 	@for file in $$(echo $(srcdir)/devel/libdane-*-$$(uname -m).abi);do \
 		echo "Comparing libgnutls-dane with $$file"; \
-		abidiff $${file} libdane/.libs/libgnutls-dane.so $(ABICHECK_COMMON) --hd2 "$(srcdir)/libdane/includes/gnutls/"; \
+		abidiff $${file} libdane/.libs/libgnutls-dane.so $(ABICHECK_COMMON) --hd2 "$(srcdir)/libdane/includes/gnutls/" --hd2 $(builddir)/lib/includes/gnutls/; \
 		if test $$? != 0;then \
 			echo "**********************************************"; \
 			echo "ABI check failed; If intentional add a        "; \

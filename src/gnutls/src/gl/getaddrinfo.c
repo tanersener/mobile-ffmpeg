@@ -1,5 +1,5 @@
 /* Get address information (partial implementation).
-   Copyright (C) 1997, 2001-2002, 2004-2019 Free Software Foundation, Inc.
+   Copyright (C) 1997, 2001-2002, 2004-2020 Free Software Foundation, Inc.
    Contributed by Simon Josefsson <simon@josefsson.org>.
 
    This program is free software; you can redistribute it and/or modify
@@ -54,18 +54,41 @@
 # define PF_UNSPEC 0
 #endif
 
-#if defined _WIN32 && !defined __CYGWIN__
-# define WINDOWS_NATIVE
-#endif
+#if HAVE_GETADDRINFO
+
+/* Override with cdecl calling convention.  */
+
+int
+getaddrinfo (const char *restrict nodename,
+             const char *restrict servname,
+             const struct addrinfo *restrict hints,
+             struct addrinfo **restrict res)
+# undef getaddrinfo
+{
+  return getaddrinfo (nodename, servname, hints, res);
+}
+
+void
+freeaddrinfo (struct addrinfo *ai)
+# undef freeaddrinfo
+{
+  freeaddrinfo (ai);
+}
+
+#else
+
+# if defined _WIN32 && !defined __CYGWIN__
+#  define WINDOWS_NATIVE
+# endif
 
 /* gl_sockets_startup */
-#include "sockets.h"
+# include "sockets.h"
 
-#ifdef WINDOWS_NATIVE
+# ifdef WINDOWS_NATIVE
 
 /* Avoid warnings from gcc -Wcast-function-type.  */
-# define GetProcAddress \
-   (void *) GetProcAddress
+#  define GetProcAddress \
+    (void *) GetProcAddress
 
 typedef int (WSAAPI *getaddrinfo_func) (const char*, const char*,
                                         const struct addrinfo*,
@@ -112,20 +135,20 @@ use_win32_p (void)
 
   return 1;
 }
-#endif
+# endif
 
 static bool
 validate_family (int family)
 {
   /* FIXME: Support more families. */
-#if HAVE_IPV4
+# if HAVE_IPV4
      if (family == PF_INET)
        return true;
-#endif
-#if HAVE_IPV6
+# endif
+# if HAVE_IPV6
      if (family == PF_INET6)
        return true;
-#endif
+# endif
      if (family == PF_UNSPEC)
        return true;
      return false;
@@ -144,23 +167,23 @@ getaddrinfo (const char *restrict nodename,
   struct hostent *he;
   void *storage;
   size_t size;
-#if HAVE_IPV6
+# if HAVE_IPV6
   struct v6_pair {
     struct addrinfo addrinfo;
     struct sockaddr_in6 sockaddr_in6;
   };
-#endif
-#if HAVE_IPV4
+# endif
+# if HAVE_IPV4
   struct v4_pair {
     struct addrinfo addrinfo;
     struct sockaddr_in sockaddr_in;
   };
-#endif
+# endif
 
-#ifdef WINDOWS_NATIVE
+# ifdef WINDOWS_NATIVE
   if (use_win32_p ())
     return getaddrinfo_ptr (nodename, servname, hints, res);
-#endif
+# endif
 
   if (hints && (hints->ai_flags & ~(AI_CANONNAME|AI_PASSIVE)))
     /* FIXME: Support more flags. */
@@ -179,11 +202,11 @@ getaddrinfo (const char *restrict nodename,
       if (!(hints->ai_flags & AI_PASSIVE))
         return EAI_NONAME;
 
-#ifdef HAVE_IPV6
+# ifdef HAVE_IPV6
       nodename = (hints->ai_family == AF_INET6) ? "::" : "0.0.0.0";
-#else
+# else
       nodename = "0.0.0.0";
-#endif
+# endif
     }
 
   if (servname)
@@ -217,17 +240,17 @@ getaddrinfo (const char *restrict nodename,
 
   switch (he->h_addrtype)
     {
-#if HAVE_IPV6
+# if HAVE_IPV6
     case PF_INET6:
       size = sizeof (struct v6_pair);
       break;
-#endif
+# endif
 
-#if HAVE_IPV4
+# if HAVE_IPV4
     case PF_INET:
       size = sizeof (struct v4_pair);
       break;
-#endif
+# endif
 
     default:
       return EAI_NODATA;
@@ -239,7 +262,7 @@ getaddrinfo (const char *restrict nodename,
 
   switch (he->h_addrtype)
     {
-#if HAVE_IPV6
+# if HAVE_IPV6
     case PF_INET6:
       {
         struct v6_pair *p = storage;
@@ -261,9 +284,9 @@ getaddrinfo (const char *restrict nodename,
         tmp->ai_addrlen = sizeof *sinp;
       }
       break;
-#endif
+# endif
 
-#if HAVE_IPV4
+# if HAVE_IPV4
     case PF_INET:
       {
         struct v4_pair *p = storage;
@@ -285,7 +308,7 @@ getaddrinfo (const char *restrict nodename,
         tmp->ai_addrlen = sizeof *sinp;
       }
       break;
-#endif
+# endif
 
     default:
       free (storage);
@@ -313,21 +336,21 @@ getaddrinfo (const char *restrict nodename,
   tmp->ai_addr->sa_family = he->h_addrtype;
   tmp->ai_family = he->h_addrtype;
 
-#ifdef HAVE_STRUCT_SOCKADDR_SA_LEN
+# ifdef HAVE_STRUCT_SOCKADDR_SA_LEN
   switch (he->h_addrtype)
     {
-#if HAVE_IPV4
+#  if HAVE_IPV4
     case AF_INET:
       tmp->ai_addr->sa_len = sizeof (struct sockaddr_in);
       break;
-#endif
-#if HAVE_IPV6
+#  endif
+#  if HAVE_IPV6
     case AF_INET6:
       tmp->ai_addr->sa_len = sizeof (struct sockaddr_in6);
       break;
-#endif
+#  endif
     }
-#endif
+# endif
 
   /* FIXME: If more than one address, create linked list of addrinfo's. */
 
@@ -340,13 +363,13 @@ getaddrinfo (const char *restrict nodename,
 void
 freeaddrinfo (struct addrinfo *ai)
 {
-#ifdef WINDOWS_NATIVE
+# ifdef WINDOWS_NATIVE
   if (use_win32_p ())
     {
       freeaddrinfo_ptr (ai);
       return;
     }
-#endif
+# endif
 
   while (ai)
     {
@@ -366,11 +389,11 @@ getnameinfo (const struct sockaddr *restrict sa, socklen_t salen,
              char *restrict service, socklen_t servicelen,
              int flags)
 {
-#ifdef WINDOWS_NATIVE
+# ifdef WINDOWS_NATIVE
   if (use_win32_p ())
     return getnameinfo_ptr (sa, salen, node, nodelen,
                             service, servicelen, flags);
-#endif
+# endif
 
   /* FIXME: Support other flags. */
   if ((node && nodelen > 0 && !(flags & NI_NUMERICHOST)) ||
@@ -383,18 +406,18 @@ getnameinfo (const struct sockaddr *restrict sa, socklen_t salen,
 
   switch (sa->sa_family)
     {
-#if HAVE_IPV4
+# if HAVE_IPV4
     case AF_INET:
       if (salen < sizeof (struct sockaddr_in))
         return EAI_FAMILY;
       break;
-#endif
-#if HAVE_IPV6
+# endif
+# if HAVE_IPV6
     case AF_INET6:
       if (salen < sizeof (struct sockaddr_in6))
         return EAI_FAMILY;
       break;
-#endif
+# endif
     default:
       return EAI_FAMILY;
     }
@@ -403,23 +426,23 @@ getnameinfo (const struct sockaddr *restrict sa, socklen_t salen,
     {
       switch (sa->sa_family)
         {
-#if HAVE_IPV4
+# if HAVE_IPV4
         case AF_INET:
           if (!inet_ntop (AF_INET,
                           &(((const struct sockaddr_in *) sa)->sin_addr),
                           node, nodelen))
             return EAI_SYSTEM;
           break;
-#endif
+# endif
 
-#if HAVE_IPV6
+# if HAVE_IPV6
         case AF_INET6:
           if (!inet_ntop (AF_INET6,
                           &(((const struct sockaddr_in6 *) sa)->sin6_addr),
                           node, nodelen))
             return EAI_SYSTEM;
           break;
-#endif
+# endif
 
         default:
           return EAI_FAMILY;
@@ -429,12 +452,12 @@ getnameinfo (const struct sockaddr *restrict sa, socklen_t salen,
   if (service && servicelen > 0 && flags & NI_NUMERICSERV)
     switch (sa->sa_family)
       {
-#if HAVE_IPV4
+# if HAVE_IPV4
       case AF_INET:
-#endif
-#if HAVE_IPV6
+# endif
+# if HAVE_IPV6
       case AF_INET6:
-#endif
+# endif
         {
           unsigned short int port
             = ntohs (((const struct sockaddr_in *) sa)->sin_port);
@@ -446,3 +469,5 @@ getnameinfo (const struct sockaddr *restrict sa, socklen_t salen,
 
   return 0;
 }
+
+#endif

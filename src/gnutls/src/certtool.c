@@ -168,6 +168,7 @@ generate_private_key_int(common_info_st * cinfo)
 
 	if (key_type == GNUTLS_PK_ECDSA ||
 	    key_type == GNUTLS_PK_EDDSA_ED25519 ||
+	    key_type == GNUTLS_PK_EDDSA_ED448 ||
 	    key_type == GNUTLS_PK_GOST_01 ||
 	    key_type == GNUTLS_PK_GOST_12_256 ||
 	    key_type == GNUTLS_PK_GOST_12_512) {
@@ -373,7 +374,6 @@ generate_certificate(gnutls_privkey_t * ret_key,
 
 			get_oid_crt_set(crt);
 			get_key_purpose_set(TYPE_CRT, crt);
-			get_extensions_crt_set(TYPE_CRT, crt);
 
 			if (!batch)
 				fprintf(stderr,
@@ -466,6 +466,8 @@ generate_certificate(gnutls_privkey_t * ret_key,
 			app_exit(1);
 		}
 	}
+
+	get_extensions_crt_set(TYPE_CRT, crt);
 
 	/* append additional extensions */
 	if (cinfo->v1_cert == 0) {
@@ -1420,6 +1422,20 @@ static void cmd_parser(int argc, char **argv)
 	if (HAVE_OPT(EMPTY_PASSWORD)) {
 		cinfo.empty_password = 1;
 		cinfo.password = "";
+	}
+
+	if (HAVE_OPT(VERIFY_PROFILE)) {
+		if (strcasecmp(OPT_ARG(VERIFY_PROFILE), "none")) {
+			cinfo.verification_profile = GNUTLS_PROFILE_UNKNOWN;
+		} else {
+			cinfo.verification_profile = gnutls_certificate_verification_profile_get_id(OPT_ARG(VERIFY_PROFILE));
+		}
+	} else if (!HAVE_OPT(VERIFY_ALLOW_BROKEN)) {
+		if (HAVE_OPT(VERIFY_CHAIN) || HAVE_OPT(VERIFY)) {
+			fprintf(stderr, "Note that no verification profile was selected. In the future the medium profile will be enabled by default.\n");
+			fprintf(stderr, "Use --verify-profile low to apply the default verification of NORMAL priority string.\n");
+		}
+		/* cinfo.verification_profile = GNUTLS_PROFILE_LOW; */
 	}
 
 	if (HAVE_OPT(SIGN_PARAMS))
@@ -2395,6 +2411,7 @@ _verify_x509_mem(const void *cert, int cert_size, common_info_st *cinfo,
 	}
 
 	vflags = GNUTLS_VERIFY_DO_NOT_ALLOW_SAME;
+	vflags |= GNUTLS_PROFILE_TO_VFLAGS(cinfo->verification_profile);
 
 	if (HAVE_OPT(VERIFY_ALLOW_BROKEN))
 		vflags |= GNUTLS_VERIFY_ALLOW_BROKEN;

@@ -358,6 +358,84 @@ static void try_save_cert(gnutls_session_t session)
 	return;
 }
 
+static void try_save_ocsp_status(gnutls_session_t session)
+{
+	unsigned int cert_num = 0;
+	gnutls_certificate_get_peers(session, &cert_num);
+	if (cert_num == 0) {
+		fprintf(stderr, "no certificates sent by server, so can't get OCSP status!\n");
+		return;
+	}
+
+	const char *path;
+	gnutls_x509_crt_fmt_t type;
+	unsigned int max_out;
+
+	/* This function is called if exactly one of SAVE_OCSP and
+	 * SAVE_OCSP_MULTI is set. */
+	if (HAVE_OPT(SAVE_OCSP))
+	{
+		path = OPT_ARG(SAVE_OCSP);
+		type = GNUTLS_X509_FMT_DER;
+		max_out = 1;
+	} else {
+		path = OPT_ARG(SAVE_OCSP_MULTI);
+		type = GNUTLS_X509_FMT_PEM;
+		max_out = cert_num;
+	}
+
+	FILE *fp = fopen(path, "w");
+	if (fp == NULL) {
+		fprintf(stderr, "could not open %s for writing\n", path);
+		exit(1);
+	}
+
+	for (unsigned int i = 0; i < max_out; i++) {
+		gnutls_datum_t oresp;
+		int ret = gnutls_ocsp_status_request_get2(session, i, &oresp);
+		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+			fprintf(stderr, "no OCSP response for certificate %u\n", i);
+			continue;
+		} else if (ret < 0) {
+			fprintf(stderr, "error getting OCSP response %u: %s\n",
+			        i, gnutls_strerror(ret));
+			exit(1);
+		}
+
+		if (type == GNUTLS_X509_FMT_DER) {
+			/* on success the return value is equal to the
+			 * number of items (third parameter) */
+			if (fwrite(oresp.data, oresp.size, 1, fp) != 1) {
+				fprintf(stderr, "writing to %s failed\n", path);
+				exit(1);
+			}
+			continue;
+		}
+
+		gnutls_datum_t t;
+		ret = gnutls_pem_base64_encode_alloc("OCSP RESPONSE",
+		                                     &oresp, &t);
+		if (ret < 0) {
+			fprintf(stderr, "error allocating PEM OCSP response: %s\n",
+			        gnutls_strerror(ret));
+			exit(1);
+		}
+
+		/* on success the return value is equal to the number
+		 * of items (third parameter) */
+		if (fwrite(t.data, t.size, 1, fp) != 1) {
+			fprintf(stderr, "writing to %s failed\n", path);
+			exit(1);
+		}
+		gnutls_free(t.data);
+	}
+	if (fclose(fp) != 0) {
+		perror("failed to close OCSP save file");
+	}
+
+	return;
+}
+
 static int cert_verify_callback(gnutls_session_t session)
 {
 	int rc;
@@ -367,7 +445,6 @@ static int cert_verify_callback(gnutls_session_t session)
 	int dane = ENABLED_OPT(DANE);
 	int ca_verify = ENABLED_OPT(CA_VERIFICATION);
 	const char *txt_service;
-	gnutls_datum_t oresp;
 	const char *host;
 
 	/* On an session with TOFU the PKI/DANE verification
@@ -389,20 +466,15 @@ static int cert_verify_callback(gnutls_session_t session)
 		try_save_cert(session);
 	}
 
-	rc = gnutls_ocsp_status_request_get(session, &oresp);
-	if (rc < 0) {
-		oresp.data = NULL;
-		oresp.size = 0;
+#ifndef ENABLE_OCSP
+	if (HAVE_OPT(SAVE_OCSP_MULTI) || HAVE_OPT(SAVE_OCSP) || HAVE_OPT(OCSP)) {
+		fprintf(stderr, "OCSP is not supported!\n");
 	}
-
-	if (HAVE_OPT(SAVE_OCSP) && oresp.data) {
-		FILE *fp = fopen(OPT_ARG(SAVE_OCSP), "w");
-
-		if (fp != NULL) {
-			fwrite(oresp.data, 1, oresp.size, fp);
-			fclose(fp);
-		}
+#else
+	if (HAVE_OPT(SAVE_OCSP_MULTI) || HAVE_OPT(SAVE_OCSP)) {
+		try_save_ocsp_status(session);
 	}
+#endif
 
 	print_cert_info(session, verbose, print_cert);
 
@@ -413,7 +485,9 @@ static int cert_verify_callback(gnutls_session_t session)
 			    (stdout, "*** PKI verification of server certificate failed...\n");
 			if (!insecure && !ssh)
 				return -1;
-		} else if (ENABLED_OPT(OCSP) && gnutls_ocsp_status_request_is_checked(session, 0) == 0) {	/* off-line verification succeeded. Try OCSP */
+		}
+#ifdef ENABLE_OCSP
+		else if (ENABLED_OPT(OCSP) && gnutls_ocsp_status_request_is_checked(session, 0) == 0) {	/* off-line verification succeeded. Try OCSP */
 			rc = cert_verify_ocsp(session);
 			if (rc == -1) {
 				log_msg
@@ -425,6 +499,7 @@ static int cert_verify_callback(gnutls_session_t session)
 			else
 				log_msg(stdout, "*** OCSP: verified %d certificate(s).\n", rc);
 		}
+#endif
 	}
 
 	if (dane) {		/* try DANE auth */
@@ -677,10 +752,21 @@ gnutls_session_t init_tls_session(const char *host)
 					       host, strlen(host));
 	}
 
-	if (HAVE_OPT(DH_BITS))
+	if (HAVE_OPT(DH_BITS)) {
+#if defined(ENABLE_DHE) || defined(ENABLE_ANON)
 		gnutls_dh_set_prime_bits(session, OPT_VALUE_DH_BITS);
+#else
+		fprintf(stderr, "Setting DH parameters is not supported\n");
+		exit(1);
+#endif
+	}
+
 
 	if (HAVE_OPT(ALPN)) {
+#ifndef ENABLE_ALPN
+		fprintf(stderr, "ALPN is not supported\n");
+		exit(1);
+#else
 		unsigned proto_n = STACKCT_OPT(ALPN);
 		char **protos = (void *) STACKLST_OPT(ALPN);
 
@@ -696,6 +782,7 @@ gnutls_session_t init_tls_session(const char *host)
 			p[i].size = strlen(protos[i]);
 		}
 		gnutls_alpn_set_protocols(session, p, proto_n, 0);
+#endif
 	}
 
 	gnutls_credentials_set(session, GNUTLS_CRD_ANON, anon_cred);
@@ -1135,16 +1222,26 @@ int do_inline_command_processing(char *buffer_ptr, size_t curr_bytes,
 static void
 print_other_info(gnutls_session_t session)
 {
+#ifdef ENABLE_OCSP
 	int ret;
+	unsigned i;
+	unsigned int list_size;
 	gnutls_datum_t oresp;
+	const gnutls_datum_t * peers;
 
-	ret = gnutls_ocsp_status_request_get(session, &oresp);
-	if (ret < 0) {
-		oresp.data = NULL;
-		oresp.size = 0;
-	}
+	peers = gnutls_certificate_get_peers(session, &list_size);
 
-	if (ENABLED_OPT(VERBOSE) && oresp.data) {
+	if (!ENABLED_OPT(VERBOSE) || peers == NULL)
+		return;
+
+	for (i = 0; i < list_size; i++) {
+		ret = gnutls_ocsp_status_request_get2(session, i, &oresp);
+		if (ret < 0) {
+			oresp.data = NULL;
+			oresp.size = 0;
+			continue;
+		}
+
 		gnutls_ocsp_resp_t r;
 		gnutls_datum_t p;
 		unsigned flag;
@@ -1175,7 +1272,7 @@ print_other_info(gnutls_session_t session)
 			gnutls_free(p.data);
 		}
 	}
-
+#endif
 }
 
 int main(int argc, char **argv)
@@ -1961,6 +2058,7 @@ static void init_global_tls_stuff(void)
  * -1: certificate chain could not be checked fully
  * >=0: number of certificates verified ok
  */
+#ifdef ENABLE_OCSP
 static int cert_verify_ocsp(gnutls_session_t session)
 {
 	gnutls_x509_crt_t cert, issuer;
@@ -2057,3 +2155,4 @@ cleanup:
 		return -1;
 	return ok >= 1 ? (int) ok : -1;
 }
+#endif

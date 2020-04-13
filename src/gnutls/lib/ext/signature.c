@@ -35,6 +35,14 @@
 #include <algorithms.h>
 #include <abstract_int.h>
 
+/*
+ * Some (all SChannel) clients fail to send proper SigAlgs due to Micro$oft crazyness.
+ * Patch the extension for them.
+ */
+#ifdef ENABLE_GOST
+#define GOST_SIG_FIXUP_SCHANNEL
+#endif
+
 static int _gnutls_signature_algorithm_recv_params(gnutls_session_t
 						   session,
 						   const uint8_t * data,
@@ -95,6 +103,12 @@ _gnutls_sign_algorithm_write_params(gnutls_session_t session,
 			continue;
 
 		if (prev && prev->id[0] == aid->id[0] && prev->id[1] == aid->id[1])
+			continue;
+
+		/* Ignore non-GOST sign types for CertReq */
+		if (session->security_parameters.cs &&
+		    _gnutls_kx_is_vko_gost(session->security_parameters.cs->kx_algorithm) &&
+		    !_sign_is_gost(session->internals.priorities->sigalg.entry[i]))
 			continue;
 
 		_gnutls_handshake_log
@@ -259,6 +273,23 @@ _gnutls_signature_algorithm_send_params(gnutls_session_t session,
 	return 0;
 }
 
+#ifdef GOST_SIG_FIXUP_SCHANNEL
+static bool
+is_gost_sig_present(sig_ext_st *priv)
+{
+	unsigned i;
+	const gnutls_sign_entry_st *se;
+
+	for (i = 0; i < priv->sign_algorithms_size; i++) {
+		se = _gnutls_sign_to_entry(priv->sign_algorithms[i]);
+		if (se != NULL && _sign_is_gost(se))
+			return true;
+	}
+
+	return false;
+}
+#endif
+
 /* Returns a requested by the peer signature algorithm that
  * matches the given certificate's public key algorithm.
  *
@@ -271,7 +302,8 @@ gnutls_sign_algorithm_t
 _gnutls_session_get_sign_algo(gnutls_session_t session,
 			      gnutls_pcert_st * cert,
 			      gnutls_privkey_t privkey,
-			      unsigned client_cert)
+			      unsigned client_cert,
+			      gnutls_kx_algorithm_t kx_algorithm)
 {
 	unsigned i;
 	int ret;
@@ -290,9 +322,45 @@ _gnutls_session_get_sign_algo(gnutls_session_t session,
 	    _gnutls_hello_ext_get_priv(session,
 					GNUTLS_EXTENSION_SIGNATURE_ALGORITHMS,
 					&epriv);
-	priv = epriv;
+	if (ret < 0)
+		priv = NULL;
+	else
+		priv = epriv;
 
-	if (ret < 0 || !_gnutls_version_has_selectable_sighash(ver)) {
+#ifdef GOST_SIG_FIXUP_SCHANNEL
+	/*
+	 * Some (all SChannel) clients fail to send proper SigAlgs due to Micro$oft crazyness.
+	 * If we are negotiating GOST KX (because we have received GOST
+	 * ciphersuites) and if we have received no GOST SignatureAlgorithms,
+	 * assume that the client could not send them and continue negotiation
+	 * as if correct algorithm was sent.
+	 */
+	if (_gnutls_kx_is_vko_gost(kx_algorithm) &&
+	    (!priv ||
+	     !is_gost_sig_present(priv) ||
+	     !_gnutls_version_has_selectable_sighash(ver))) {
+		gnutls_digest_algorithm_t dig;
+
+		_gnutls_handshake_log("EXT[%p]: GOST KX, but no GOST SigAlgs received, patching up.", session);
+
+		if (cert_algo == GNUTLS_PK_GOST_01)
+			dig = GNUTLS_DIG_GOSTR_94;
+		else if (cert_algo == GNUTLS_PK_GOST_12_256)
+			dig = GNUTLS_DIG_STREEBOG_256;
+		else if (cert_algo == GNUTLS_PK_GOST_12_512)
+			dig = GNUTLS_DIG_STREEBOG_512;
+		else
+			dig = GNUTLS_DIG_SHA1;
+
+		ret = gnutls_pk_to_sign(cert_algo, dig);
+
+		if (!client_cert && _gnutls_session_sign_algo_enabled(session, ret) < 0)
+			goto fail;
+		return ret;
+	}
+#endif
+
+	if (!priv || !_gnutls_version_has_selectable_sighash(ver)) {
 		/* none set, allow SHA-1 only */
 		ret = gnutls_pk_to_sign(cert_algo, GNUTLS_DIG_SHA1);
 

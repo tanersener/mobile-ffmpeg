@@ -1,8 +1,7 @@
-This is gnutls-guile.info, produced by makeinfo version 6.7 from
+This is gnutls-guile.info, produced by makeinfo version 6.6 from
 gnutls-guile.texi.
 
-This manual is last updated 19 September 2019 for version 3.6.11 of
-GnuTLS.
+This manual is last updated 1 January 2020 for version 3.6.13 of GnuTLS.
 
 Copyright (C) 2001-2012, 2014, 2016, 2019 Free Software Foundation, Inc.
 
@@ -23,8 +22,7 @@ File: gnutls-guile.info,  Node: Top,  Next: Preface,  Up: (dir)
 GnuTLS-Guile
 ************
 
-This manual is last updated 19 September 2019 for version 3.6.11 of
-GnuTLS.
+This manual is last updated 1 January 2020 for version 3.6.13 of GnuTLS.
 
 Copyright (C) 2001-2012, 2014, 2016, 2019 Free Software Foundation, Inc.
 
@@ -133,7 +131,7 @@ the version number of the loaded library as follows:
      $ guile
      scheme@(guile-user)> (use-modules (gnutls))
      scheme@(guile-user)> (gnutls-version)
-     "3.6.11"
+     "3.6.13"
      scheme@(guile-user)>
 
 
@@ -1616,26 +1614,21 @@ Concept Index
 
 
 Tag Table:
-Node: Top799
-Node: Preface1868
-Node: Guile Preparations2435
-Node: Guile API Conventions5194
-Node: Enumerates and Constants5768
-Node: Procedure Names8093
-Node: Representation of Binary Data9076
-Ref: Representation of Binary Data-Footnote-110001
-Node: Input and Output10117
-Node: Exception Handling12462
-Node: Guile Examples14290
-Node: Anonymous Authentication Guile Example14589
-Node: Guile Reference17106
-Node: Copying Information36480
-Node: Procedure Index61668
-Node: Concept Index72545
+Node: Top796
+Node: Preface1862
+Node: Guile Preparations2429
+Node: Guile API Conventions5188
+Node: Enumerates and Constants5762
+Node: Procedure Names8087
+Node: Representation of Binary Data9070
+Ref: Representation of Binary Data-Footnote-19995
+Node: Input and Output10111
+Node: Exception Handling12456
+Node: Guile Examples14284
+Node: Anonymous Authentication Guile Example14583
+Node: Guile Reference17100
+Node: Copying Information36474
+Node: Procedure Index61662
+Node: Concept Index72539
 
 End Tag Table
-
-
-Local Variables:
-coding: utf-8
-End:

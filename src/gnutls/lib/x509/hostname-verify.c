@@ -86,13 +86,6 @@ check_ip(gnutls_x509_crt_t cert, const void *ip, unsigned ip_size)
 	return 0;
 }
 
-static int has_embedded_null(const char *str, unsigned size)
-{
-	if (strlen(str) != size)
-		return 1;
-	return 0;
-}
-
 /**
  * gnutls_x509_crt_check_ip:
  * @cert: should contain an gnutls_x509_crt_t type
@@ -227,7 +220,7 @@ gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 		if (ret == GNUTLS_SAN_DNSNAME) {
 			found_dnsname = 1;
 
-			if (has_embedded_null(dnsname, dnsnamesize)) {
+			if (_gnutls_has_embedded_null(dnsname, dnsnamesize)) {
 				_gnutls_debug_log("certificate has %s with embedded null in name\n", dnsname);
 				continue;
 			}
@@ -275,7 +268,7 @@ gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 			goto cleanup;
 		}
 
-		if (has_embedded_null(dnsname, dnsnamesize)) {
+		if (_gnutls_has_embedded_null(dnsname, dnsnamesize)) {
 			_gnutls_debug_log("certificate has CN %s with embedded null in name\n", dnsname);
 			ret = 0;
 			goto cleanup;

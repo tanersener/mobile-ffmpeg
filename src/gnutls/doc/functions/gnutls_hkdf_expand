@@ -1,0 +1,23 @@
+
+
+
+
+@deftypefun {int} {gnutls_hkdf_expand} (gnutls_mac_algorithm_t @var{mac}, const gnutls_datum_t * @var{key}, const gnutls_datum_t * @var{info}, void * @var{output}, size_t @var{length})
+@var{mac}: the mac algorithm used internally
+
+@var{key}: the pseudorandom key created with HKDF-Extract
+
+@var{info}: the optional informational data
+
+@var{output}: the output value of the expand operation
+
+@var{length}: the desired length of the output key
+
+This function will derive a variable length keying material from
+the pseudorandom key using the HKDF-Expand function as defined in
+RFC 5869.
+
+@strong{Returns:} Zero or a negative error code on error.
+
+@strong{Since:} 3.6.13
+@end deftypefun

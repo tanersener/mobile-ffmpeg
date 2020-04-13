@@ -3981,6 +3981,35 @@ static const char *gost12_512[] = {
 };
 #endif
 
+static const char *rsa_512[] = {
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIIBTjCB+aADAgECAhQcc65I8jSxWRjcS1czw4MRLIc8qDANBgkqhkiG9w0BAQsF\n"
+	"ADAUMRIwEAYDVQQDDAlsb2NhbGhvc3QwHhcNMTkxMjE1MDI1NTU4WhcNMjkxMjEy\n"
+	"MDI1NTU4WjAUMRIwEAYDVQQDDAlsb2NhbGhvc3QwXDANBgkqhkiG9w0BAQEFAANL\n"
+	"ADBIAkEAwZFO/Vz94lR3/TKz76qRCV2skqthX7PB6YxeLHH3ifWSYR2qCYTBikaA\n"
+	"Sm6PGDvAliviIjGjKTkdDdqZX2S94QIDAQABoyMwITAJBgNVHRMEAjAAMBQGA1Ud\n"
+	"EQQNMAuCCWxvY2FsaG9zdDANBgkqhkiG9w0BAQsFAANBAHslvfVxod5p+Gt7l4LV\n"
+	"M2HBxOt4YM8mRCtyNSmJEGAe+aIzXaiSiRnVkVvjQvdxacu2D4yP52BUo1vzNnCq\n"
+	"2UI=\n"
+	"-----END CERTIFICATE-----\n",
+	NULL
+};
+
+static const char *ed448[] = {
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIIBhDCCAQSgAwIBAgIUIWKQV5hisum31Z2Fw+PeZ80wqnkwBQYDK2VxMBkxFzAV\n"
+	"BgNVBAMTDkdudVRMUyB0ZXN0IENBMCAXDTIwMDMxNjA5MTY1M1oYDzk5OTkxMjMx\n"
+	"MjM1OTU5WjAZMRcwFQYDVQQDEw5HbnVUTFMgdGVzdCBDQTBDMAUGAytlcQM6AFsM\n"
+	"fQUL5TonNaVrBB7H4UtwnVlolZatMXceHZiWnzMKXOZXlIabi0nTGkvSFu9ed6JJ\n"
+	"L7EWarjRAKNDMEEwDwYDVR0TAQH/BAUwAwEB/zAPBgNVHQ8BAf8EBQMDBwQAMB0G\n"
+	"A1UdDgQWBBRMwtFQ9T9Ndw63UP2QGAuIFoYb6TAFBgMrZXEDcwB8hbYLw7KMlb3a\n"
+	"Q2YAXiugWt2WcAMtvKgqzjXzUt2jilaDA72d3MCAWQQsMmQfRNSthDIao5CksoDk\n"
+	"Xc8qFzckmdBiF7W+UNT3OMisE9yIxF4iA1Sxsji3C0WDUq2jen5Uv9E99H+r47L8\n"
+	"U955wKxWJAA=\n"
+	"-----END CERTIFICATE-----\n",
+	NULL
+};
+
 #if defined __clang__ || __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5)
 #  pragma GCC diagnostic push
 #  pragma GCC diagnostic ignored "-Wunused-variable"
@@ -4141,10 +4170,14 @@ static struct
 #ifdef ENABLE_GOST
   { "gost 34.10-01 - ok", gost01, &gost01[2], 0, 0, 0, 1466612070, 1},
   { "gost 34.10-01 - not ok (due to profile)", gost01, &gost01[2], GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_ULTRA),
-	GNUTLS_CERT_INSECURE_ALGORITHM | GNUTLS_CERT_INVALID, NULL, 1466612070, 1},
+    GNUTLS_CERT_INSECURE_ALGORITHM | GNUTLS_CERT_INVALID, NULL, 1466612070, 1},
   { "gost 34.10-12-256 - ok", gost12_256, &gost12_256[0], 0, 0, 0, 1466612070, 1},
   { "gost 34.10-12-512 - ok", gost12_512, &gost12_512[0], 0, 0, 0, 1466612070, 1},
 #endif
+  { "rsa-512 - not ok (due to profile)", rsa_512, &rsa_512[0], GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_MEDIUM),
+    GNUTLS_CERT_INSECURE_ALGORITHM | GNUTLS_CERT_INVALID, NULL, 1576759855, 1},
+  { "ed448 - ok", ed448, &ed448[0], GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_ULTRA),
+    0, NULL, 1584352960, 1},
   { NULL, NULL, NULL, 0, 0}
 };
 

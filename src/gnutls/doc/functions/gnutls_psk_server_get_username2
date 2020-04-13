@@ -1,0 +1,20 @@
+
+
+
+
+@deftypefun {int} {gnutls_psk_server_get_username2} (gnutls_session_t @var{session}, gnutls_datum_t * @var{username})
+@var{session}: is a gnutls session
+
+@var{username}: a datum that will be filled in by this function
+
+Return a pointer to the username of the peer in the supplied datum. Does not
+need to be null-terminated.
+
+This should only be called in case of PSK authentication and in
+case of a server.
+
+The returned pointer should be considered constant (do not free) and valid 
+for the lifetime of the session.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS} , or a negative value in case of an error.
+@end deftypefun

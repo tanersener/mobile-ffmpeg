@@ -334,6 +334,11 @@
 #define GNUTLS_ECDHE_PSK_NULL_SHA256 { 0xC0, 0x3A }
 #define GNUTLS_ECDHE_PSK_NULL_SHA384 { 0xC0, 0x3B }
 
+/* draft-smyshlyaev-tls12-gost-suites */
+#ifdef ENABLE_GOST
+#define GNUTLS_GOSTR341112_256_28147_CNT_IMIT { 0xc1, 0x02 }
+#endif
+
 #define CIPHER_SUITES_COUNT (sizeof(cs_algorithms)/sizeof(gnutls_cipher_suite_entry_st)-1)
 
 /* The following is a potential list of ciphersuites. For the options to be
@@ -1173,6 +1178,12 @@ static const gnutls_cipher_suite_entry_st cs_algorithms[] = {
 	      GNUTLS_DTLS_VERSION_MIN),
 #endif
 
+#ifdef ENABLE_GOST
+	ENTRY_PRF(GNUTLS_GOSTR341112_256_28147_CNT_IMIT,
+		  GNUTLS_CIPHER_GOST28147_TC26Z_CNT, GNUTLS_KX_VKO_GOST_12,
+		  GNUTLS_MAC_GOST28147_TC26Z_IMIT, GNUTLS_TLS1_2,
+		  GNUTLS_VERSION_UNKNOWN, GNUTLS_MAC_STREEBOG_256),
+#endif
 
 	{0, {0, 0}, 0, 0, 0, 0, 0, 0}
 };

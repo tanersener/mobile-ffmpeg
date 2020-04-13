@@ -78,6 +78,11 @@ Usage:  gnutls-serv [ -<flag> [<val>] | --<name>[@{=| @}<val>] ]...
                                 - may appear multiple times
        --x509certfile=str     X.509 Certificate file or PKCS #11 URL to use
                                 - may appear multiple times
+       --rawpkkeyfile=str     Private key file (PKCS #8 or PKCS #12) or PKCS #11 URL to use
+                                - may appear multiple times
+       --rawpkfile=str        Raw public-key file to use
+                                - requires the option 'rawpkkeyfile'
+                                - may appear multiple times
        --srppasswd=file       SRP password file to use
                                 - file must pre-exist
        --srppasswdconf=file   SRP password configuration file to use

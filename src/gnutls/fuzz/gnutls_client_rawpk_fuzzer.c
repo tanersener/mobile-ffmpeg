@@ -54,6 +54,7 @@
 
 int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
 {
+	IGNORE_CERTS;
 	int res;
 	gnutls_session_t session;
 	gnutls_certificate_credentials_t rawpk_cred;

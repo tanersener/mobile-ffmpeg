@@ -46,8 +46,6 @@ extern "C" {
 /* Name mangling */
 #define gostdsa_sign _gnutls_gostdsa_sign
 #define gostdsa_verify _gnutls_gostdsa_verify
-#define gostdsa_unmask_key _gnutls_gostdsa_unmask_key
-#define gostdsa_vko _gnutls_gostdsa_vko
 #define ecc_gostdsa_sign _gnutls_ecc_gostdsa_sign
 #define ecc_gostdsa_sign_itch _gnutls_ecc_gostdsa_sign_itch
 #define ecc_gostdsa_verify _gnutls_ecc_gostdsa_verify
@@ -71,16 +69,6 @@ int
 gostdsa_verify (const struct ecc_point *pub,
 	        size_t length, const uint8_t *digest,
 	        const struct dsa_signature *signature);
-
-int
-gostdsa_unmask_key (const struct ecc_curve *ecc,
-		    mpz_t key);
-
-int
-gostdsa_vko(const struct ecc_scalar *key,
-	    const struct ecc_point *pub,
-	    size_t ukm_length, const uint8_t *ukm,
-	    size_t out_length, uint8_t *out);
 
 /* Low-level GOSTDSA functions. */
 mp_size_t

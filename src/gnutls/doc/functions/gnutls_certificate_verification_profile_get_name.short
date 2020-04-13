@@ -1,0 +1,1 @@
+@item @var{const char *} @ref{gnutls_certificate_verification_profile_get_name} (gnutls_certificate_verification_profiles_t @var{id})

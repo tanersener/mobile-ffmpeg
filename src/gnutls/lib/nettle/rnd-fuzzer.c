@@ -77,6 +77,8 @@ __r48_rand_iterate(unsigned short int xsubi[3], struct r48_rand_data *buffer)
 
 #ifdef __clang__
 __attribute__((no_sanitize("integer")))
+#elif defined __GNUC__
+__attribute__((no_sanitize("shift-base")))
 #endif
 static int
 r48_r(unsigned short int xsubi[3], struct r48_rand_data *buffer,

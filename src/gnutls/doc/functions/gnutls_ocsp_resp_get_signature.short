@@ -1,1 +1,1 @@
-@item @var{int} @ref{gnutls_ocsp_resp_get_signature} (gnutls_ocsp_resp_t @var{resp}, gnutls_datum_t * @var{sig})
+@item @var{int} @ref{gnutls_ocsp_resp_get_signature} (gnutls_ocsp_resp_const_t @var{resp}, gnutls_datum_t * @var{sig})

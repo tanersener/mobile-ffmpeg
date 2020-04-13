@@ -1,0 +1,14 @@
+
+
+
+
+@deftypefun {gnutls_keylog_func} {gnutls_session_get_keylog_function} (const gnutls_session_t @var{session})
+@var{session}: is @code{gnutls_session_t}  type
+
+This function will return the callback function set using
+@code{gnutls_session_set_keylog_function()} .
+
+@strong{Returns:} The function set or @code{NULL}  otherwise.
+
+@strong{Since:} 3.6.13
+@end deftypefun

@@ -520,7 +520,7 @@ int _gnutls_hello_ext_pack(gnutls_session_t session, gnutls_buffer_st *packed)
 	BUFFER_APPEND_NUM(packed, 0);
 
 	for (i = 0; i <= GNUTLS_EXTENSION_MAX_VALUE; i++) {
-		if (session->internals.used_exts & (1<<i)) {
+		if (session->internals.used_exts & ((ext_track_t)1 << i)) {
 
 			ext = gid_to_ext_entry(session, i);
 			if (ext == NULL)

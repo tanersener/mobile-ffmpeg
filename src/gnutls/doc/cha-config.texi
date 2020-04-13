@@ -25,6 +25,7 @@ used can be queried using @funcref{gnutls_get_system_config_file}.
 * Disabling algorithms and protocols::
 * Querying for disabled algorithms and protocols::
 * Overriding the parameter verification profile::
+* Overriding the default priority string::
 @end menu
 
 @node Application-specific priority strings
@@ -154,5 +155,20 @@ using the following.
 
 # do not allow applications use the LOW or VERY-WEAK profiles.
 min-verification-profile = legacy
+
+@end example
+
+@node Overriding the default priority string
+@section Overriding the default priority string
+
+GnuTLS uses default priority string which is defined at compiled
+time. Usually it is set to @code{NORMAL}. This override allows to set
+the default priority string to something more appropriate for a given
+deployment.
+
+Below example sets a more specific default priority string.
+@example
+[overrides]
+default-priority-string = SECURE128:-VERS-TLS-ALL:+VERS-TLS1.3
 
 @end example

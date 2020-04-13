@@ -205,6 +205,7 @@ privkey_to_pubkey(gnutls_pk_algorithm_t pk,
 
 		break;
 	case GNUTLS_PK_EDDSA_ED25519:
+	case GNUTLS_PK_EDDSA_ED448:
 		ret = _gnutls_set_datum(&pub->raw_pub, priv->raw_pub.data, priv->raw_pub.size);
 		if (ret < 0)
 			return gnutls_assert_val(ret);

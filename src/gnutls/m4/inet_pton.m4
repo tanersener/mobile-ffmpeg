@@ -1,5 +1,5 @@
-# inet_pton.m4 serial 18
-dnl Copyright (C) 2006, 2008-2019 Free Software Foundation, Inc.
+# inet_pton.m4 serial 19
+dnl Copyright (C) 2006, 2008-2020 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -24,15 +24,16 @@ AC_DEFUN([gl_FUNC_INET_PTON],
   INET_PTON_LIB=
   gl_PREREQ_SYS_H_WINSOCK2
   if test $HAVE_WINSOCK2_H = 1; then
+    dnl It needs to be overridden, because the stdcall calling convention
+    dnl is not compliant with POSIX.  Set REPLACE_INET_PTON in order to avoid
+    dnl a name conflict at the linker level, even though the header file
+    dnl <ws2tcpip.h> declares inet_pton only if _WIN32_WINNT >= 0x0600.
+    REPLACE_INET_PTON=1
     AC_CHECK_DECLS([inet_pton],,, [[#include <ws2tcpip.h>]])
     if test $ac_cv_have_decl_inet_pton = yes; then
-      dnl It needs to be overridden, because the stdcall calling convention
-      dnl is not compliant with POSIX.
-      REPLACE_INET_PTON=1
       INET_PTON_LIB="-lws2_32"
     else
       HAVE_DECL_INET_PTON=0
-      HAVE_INET_PTON=0
     fi
   else
     gl_save_LIBS=$LIBS
