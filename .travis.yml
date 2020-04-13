@@ -52,7 +52,7 @@ jobs:
         - tail -30 ./build.log
         - tail -30 ./src/ffmpeg/ffbuild/config.log
       script:
-        - bash ./android.sh --no-output-redirection
+        - bash ./android.sh --no-output-redirection -d
     - name: "Android LTS Build"
       language: android
       os: linux
@@ -100,7 +100,7 @@ jobs:
         - tail -30 ./build.log
         - tail -30 ./src/ffmpeg/ffbuild/config.log
       script:
-        - bash ./android.sh --lts --no-output-redirection
+        - bash ./android.sh --lts --no-output-redirection -d
     - name: "iOS Main Build"
       language: objective-c
       os: osx
@@ -118,7 +118,7 @@ jobs:
         - tail -30 ./build.log
         - tail -30 ./src/ffmpeg/ffbuild/config.log
       script:
-        - bash ./ios.sh --no-output-redirection
+        - bash ./ios.sh --no-output-redirection --disable-arm64e
     - name: "iOS LTS Build"
       language: objective-c
       osx_image: xcode7.3
@@ -136,7 +136,7 @@ jobs:
         - tail -30 ./build.log
         - tail -30 ./src/ffmpeg/ffbuild/config.log
       script:
-        - bash ./ios.sh --lts --no-output-redirection
+        - bash ./ios.sh --lts --no-output-redirection --disable-armv7 --disable-armv7s --disable-i386
     - name: "tvOS Main Build"
       language: objective-c
       os: osx
