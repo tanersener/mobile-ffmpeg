@@ -22,6 +22,8 @@ package com.arthenica.mobileffmpeg.util;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.arthenica.smartexception.java.Exceptions;
+
 import java.io.IOException;
 
 import static com.arthenica.mobileffmpeg.test.MainActivity.TAG;
@@ -41,7 +43,7 @@ public class AsyncCatImageTask extends AsyncTask<String, Integer, Integer> {
 
             return rc;
         } catch (final IOException | InterruptedException e) {
-            Log.e(TAG, String.format("Async cat image command failed for %s.", inputs[0]), e);
+            Log.e(TAG, String.format("Async cat image command failed for %s.%s", inputs[0], Exceptions.getStackTraceString(e)));
             return -1;
         }
     }

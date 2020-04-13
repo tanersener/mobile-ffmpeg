@@ -36,6 +36,7 @@ import com.arthenica.mobileffmpeg.Config;
 import com.arthenica.mobileffmpeg.util.AsyncSingleFFmpegExecuteTask;
 import com.arthenica.mobileffmpeg.util.ResourcesUtil;
 import com.arthenica.mobileffmpeg.util.SingleExecuteCallback;
+import com.arthenica.smartexception.java.Exceptions;
 
 import java.io.File;
 import java.io.IOException;
@@ -56,6 +57,10 @@ public class MainActivity extends AppCompatActivity {
             Manifest.permission.CAMERA
     };
 
+    static {
+        Exceptions.registerRootPackage("com.arthenica");
+    }
+
     protected static final Queue<Callable> actionQueue = new ConcurrentLinkedQueue<>();
 
     protected static final Handler handler = new Handler();
@@ -72,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
                     try {
                         callable.call();
                     } catch (final Exception e) {
-                        android.util.Log.e(MainActivity.TAG, "Running UI action received error.", e);
+                        android.util.Log.e(TAG, String.format("Running UI action received error.%s", Exceptions.getStackTraceString(e)));
                     }
                 }
             } while (callable != null);
@@ -123,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
             registerAppFont();
             Log.d(TAG, "Application fonts registered.");
         } catch (final IOException e) {
-            Log.e(TAG, "Font registration failed.", e);
+            Log.e(TAG, String.format("Font registration failed.%s", Exceptions.getStackTraceString(e)));
         }
 
         Log.d(TAG, "Listing supported camera ids.");

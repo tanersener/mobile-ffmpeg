@@ -46,6 +46,7 @@ import com.arthenica.mobileffmpeg.StatisticsCallback;
 import com.arthenica.mobileffmpeg.util.DialogUtil;
 import com.arthenica.mobileffmpeg.util.ResourcesUtil;
 import com.arthenica.mobileffmpeg.util.SingleExecuteCallback;
+import com.arthenica.smartexception.java.Exceptions;
 
 import java.io.File;
 import java.io.IOException;
@@ -206,7 +207,7 @@ public class VideoTabFragment extends Fragment implements AdapterView.OnItemSele
             }, ffmpegCommand);
 
         } catch (IOException e) {
-            Log.e(TAG, "Encode video failed", e);
+            Log.e(TAG, String.format("Encode video failed %s", Exceptions.getStackTraceString(e)));
             Popup.show(requireContext(), "Encode video failed");
         }
     }
@@ -228,7 +229,7 @@ public class VideoTabFragment extends Fragment implements AdapterView.OnItemSele
 
             Log.d(TAG, String.format("FFmpeg process exited with rc %d", returnCode));
         } catch (IOException e) {
-            Log.e(TAG, "Encode webp failed", e);
+            Log.e(TAG, String.format("Encode webp failed %s", Exceptions.getStackTraceString(e)));
             Popup.show(requireContext(), "Encode webp failed");
         }
     }

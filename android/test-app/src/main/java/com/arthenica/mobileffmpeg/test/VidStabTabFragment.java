@@ -38,6 +38,7 @@ import com.arthenica.mobileffmpeg.LogMessage;
 import com.arthenica.mobileffmpeg.util.DialogUtil;
 import com.arthenica.mobileffmpeg.util.ResourcesUtil;
 import com.arthenica.mobileffmpeg.util.SingleExecuteCallback;
+import com.arthenica.smartexception.java.Exceptions;
 
 import java.io.File;
 import java.io.IOException;
@@ -92,7 +93,7 @@ public class VidStabTabFragment extends Fragment {
 
             @Override
             public void apply(LogMessage message) {
-                android.util.Log.d(MainActivity.TAG, message.getText());
+                Log.d(MainActivity.TAG, message.getText());
             }
         });
     }
@@ -121,7 +122,7 @@ public class VidStabTabFragment extends Fragment {
                 stabilizedVideoFile.delete();
             }
 
-            android.util.Log.d(TAG, "Testing VID.STAB");
+            Log.d(TAG, "Testing VID.STAB");
 
             showCreateProgressDialog();
 
@@ -131,13 +132,13 @@ public class VidStabTabFragment extends Fragment {
 
             final String ffmpegCommand = Video.generateShakingVideoScript(image1File.getAbsolutePath(), image2File.getAbsolutePath(), image3File.getAbsolutePath(), videoFile.getAbsolutePath());
 
-            android.util.Log.d(TAG, String.format("FFmpeg process started with arguments\n'%s'", ffmpegCommand));
+            Log.d(TAG, String.format("FFmpeg process started with arguments\n'%s'", ffmpegCommand));
 
             MainActivity.executeAsync(new SingleExecuteCallback() {
 
                 @Override
                 public void apply(final int returnCode, final String commandOutput) {
-                    android.util.Log.d(TAG, String.format("FFmpeg process exited with rc %d", returnCode));
+                    Log.d(TAG, String.format("FFmpeg process exited with rc %d", returnCode));
 
                     hideCreateProgressDialog();
 
@@ -147,30 +148,30 @@ public class VidStabTabFragment extends Fragment {
                         public Object call() {
                             if (returnCode == RETURN_CODE_SUCCESS) {
 
-                                android.util.Log.d(TAG, "Create completed successfully; stabilizing video.");
+                                Log.d(TAG, "Create completed successfully; stabilizing video.");
 
                                 final String analyzeVideoCommand = String.format("-y -i %s -vf vidstabdetect=shakiness=10:accuracy=15:result=%s -f null -", videoFile.getAbsolutePath(), shakeResultsFile.getAbsolutePath());
 
                                 showStabilizeProgressDialog();
 
-                                android.util.Log.d(TAG, String.format("FFmpeg process started with arguments\n'%s'", analyzeVideoCommand));
+                                Log.d(TAG, String.format("FFmpeg process started with arguments\n'%s'", analyzeVideoCommand));
 
                                 MainActivity.executeAsync(new SingleExecuteCallback() {
 
                                     @Override
                                     public void apply(final int returnCode, final String commandOutput) {
-                                        android.util.Log.d(TAG, String.format("FFmpeg process exited with rc %d", returnCode));
+                                        Log.d(TAG, String.format("FFmpeg process exited with rc %d", returnCode));
 
                                         if (returnCode == RETURN_CODE_SUCCESS) {
                                             final String stabilizeVideoCommand = String.format("-y -i %s -vf vidstabtransform=smoothing=30:input=%s -c:v mpeg4 %s", videoFile.getAbsolutePath(), shakeResultsFile.getAbsolutePath(), stabilizedVideoFile.getAbsolutePath());
 
-                                            android.util.Log.d(TAG, String.format("FFmpeg process started with arguments\n'%s'", stabilizeVideoCommand));
+                                            Log.d(TAG, String.format("FFmpeg process started with arguments\n'%s'", stabilizeVideoCommand));
 
                                             MainActivity.executeAsync(new SingleExecuteCallback() {
 
                                                 @Override
                                                 public void apply(final int returnCode, final String commandOutput) {
-                                                    android.util.Log.d(TAG, String.format("FFmpeg process exited with rc %d", returnCode));
+                                                    Log.d(TAG, String.format("FFmpeg process exited with rc %d", returnCode));
 
                                                     hideStabilizeProgressDialog();
 
@@ -179,12 +180,12 @@ public class VidStabTabFragment extends Fragment {
                                                         @Override
                                                         public Object call() {
                                                             if (returnCode == RETURN_CODE_SUCCESS) {
-                                                                android.util.Log.d(TAG, "Stabilize video completed successfully; playing videos.");
+                                                                Log.d(TAG, "Stabilize video completed successfully; playing videos.");
                                                                 playVideo();
                                                                 playStabilizedVideo();
                                                             } else {
                                                                 Popup.show(requireContext(), "Stabilize video failed. Please check log for the details.");
-                                                                android.util.Log.d(TAG, String.format("Stabilize video failed with rc=%d", returnCode));
+                                                                Log.d(TAG, String.format("Stabilize video failed with rc=%d", returnCode));
                                                             }
 
                                                             return null;
@@ -196,14 +197,14 @@ public class VidStabTabFragment extends Fragment {
                                         } else {
                                             hideStabilizeProgressDialog();
                                             Popup.show(requireContext(), "Stabilize video failed. Please check log for the details.");
-                                            android.util.Log.d(TAG, String.format("Stabilize video failed with rc=%d", returnCode));
+                                            Log.d(TAG, String.format("Stabilize video failed with rc=%d", returnCode));
                                         }
                                     }
                                 }, analyzeVideoCommand);
 
                             } else {
                                 Popup.show(requireContext(), "Create video failed. Please check log for the details.");
-                                android.util.Log.d(TAG, String.format("Create failed with rc=%d", returnCode));
+                                Log.d(TAG, String.format("Create failed with rc=%d", returnCode));
                             }
 
                             return null;
@@ -213,7 +214,7 @@ public class VidStabTabFragment extends Fragment {
             }, ffmpegCommand);
 
         } catch (IOException e) {
-            android.util.Log.e(TAG, "Stabilize video failed", e);
+            Log.e(TAG, String.format("Stabilize video failed %s", Exceptions.getStackTraceString(e)));
             Popup.show(requireContext(), "Stabilize video failed");
         }
     }
