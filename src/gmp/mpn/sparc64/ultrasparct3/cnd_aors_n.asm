@@ -2,7 +2,7 @@ dnl  SPARC v9 mpn_cnd_add_n and mpn_cnd_sub_n for T3/T4/T5.
 
 dnl  Contributed to the GNU project by David Miller and Torbjörn Granlund.
 
-dnl  Copyright 2013 Free Software Foundation, Inc.
+dnl  Copyright 2013, 2017 Free Software Foundation, Inc.
 
 dnl  This file is part of the GNU MP Library.
 dnl
@@ -62,7 +62,8 @@ define(`w0',  `%g1')  define(`w1',  `%g3')
 ifdef(`OPERATION_cnd_add_n',`
   define(`LOGOP',   `and	$1, $2, $3')
   define(`MAKEMASK',`cmp	%g0, $1
-		     subc	%g0, %g0, $2')
+		     addxc(	%g0, %g0, $2)
+		     neg	$2, $2')
   define(`INITCY',  `addcc	%g0, 0, %g0')
   define(`RETVAL',  `addxc(	%g0, %g0, %i0)')
   define(`func',    `mpn_cnd_add_n')
@@ -70,7 +71,8 @@ ifdef(`OPERATION_cnd_add_n',`
 ifdef(`OPERATION_cnd_sub_n',`
   define(`LOGOP',   `orn	$2, $1, $3')
   define(`MAKEMASK',`cmp	$1, 1
-		     subc	%g0, %g0, $2')
+		     addxc(	%g0, %g0, $2)
+		     neg	$2, $2')
   define(`INITCY',  `subcc	%g0, 1, %g0')
   define(`RETVAL',  `addxc(	%g0, %g0, %i0)
 		     xor	%i0, 1, %i0')

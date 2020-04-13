@@ -29,7 +29,6 @@ GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
 #include <intrinsics.h>
-#include "gmp.h"
 #include "gmp-impl.h"
 
 mp_limb_t

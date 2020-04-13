@@ -36,10 +36,13 @@ C	     cycles/limb
 C StrongARM:	 -
 C XScale	 -
 C ARM11		 4.68
-C Cortex-A7	 3.625
-C Cortex-A8	 4
+C Cortex-A5	 3.63
+C Cortex-A7	 3.65
+C Cortex-A8	 4.0
 C Cortex-A9	 2.25
 C Cortex-A15	 2.5
+C Cortex-A17	 2.13
+C Cortex-A53	 3.5
 
 define(`rp',`r0')
 define(`up',`r1')

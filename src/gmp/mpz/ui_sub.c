@@ -1,6 +1,6 @@
 /* mpz_ui_sub -- Subtract an unsigned one-word integer and an mpz_t.
 
-Copyright 2002, 2004 Free Software Foundation, Inc.
+Copyright 2002, 2004, 2015 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -28,7 +28,6 @@ You should have received copies of the GNU General Public License and the
 GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
-#include "gmp.h"
 #include "gmp-impl.h"
 
 void
@@ -52,10 +51,7 @@ mpz_ui_sub (mpz_ptr w, unsigned long int uval, mpz_srcptr v)
     }
 #endif
 
-  vp = PTR(v);
   vn = SIZ(v);
-
-  wp = PTR(w);
 
   if (vn > 1)
     {
@@ -64,23 +60,21 @@ mpz_ui_sub (mpz_ptr w, unsigned long int uval, mpz_srcptr v)
       mpn_sub_1 (wp, vp, vn, (mp_limb_t) uval);
       wn = -(vn - (wp[vn - 1] == 0));
     }
-  else if (vn == 1)
+  else if (vn >= 0)
     {
-      if (uval >= vp[0])
+      mp_limb_t vp0;
+      vp0 = PTR (v)[0] & - (mp_limb_t) vn;
+      wp = MPZ_NEWALLOC (w, 1);
+      if (uval >= vp0)
 	{
-	  wp[0] = uval - vp[0];
+	  wp[0] = uval - vp0;
 	  wn = wp[0] != 0;
 	}
       else
 	{
-	  wp[0] = vp[0] - uval;
+	  wp[0] = vp0 - uval;
 	  wn = -1;
 	}
-    }
-  else if (vn == 0)
-    {
-      wp[0] = uval;
-      wn = uval != 0;
     }
   else /* (vn < 0) */
     {

@@ -1,7 +1,7 @@
 /* mpq_equal(u,v) -- Compare U, V.  Return non-zero if they are equal, zero
    if they are non-equal.
 
-Copyright 1996, 2001, 2002 Free Software Foundation, Inc.
+Copyright 1996, 2001, 2002, 2018 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -29,7 +29,6 @@ You should have received copies of the GNU General Public License and the
 GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
-#include "gmp.h"
 #include "gmp-impl.h"
 
 int
@@ -47,17 +46,17 @@ mpq_equal (mpq_srcptr op1, mpq_srcptr op2) __GMP_NOTHROW
   if (num1_size != num2_size)
     return 0;
 
+  den1_size = SIZ(DEN(op1));
+  den2_size = SIZ(DEN(op2));
+  if (den1_size != den2_size)
+    return 0;
+
   num1_ptr = PTR(NUM(op1));
   num2_ptr = PTR(NUM(op2));
   num1_size = ABS (num1_size);
   for (i = 0; i < num1_size; i++)
     if (num1_ptr[i] != num2_ptr[i])
       return 0;
-
-  den1_size = SIZ(DEN(op1));
-  den2_size = SIZ(DEN(op2));
-  if (den1_size != den2_size)
-    return 0;
 
   den1_ptr = PTR(DEN(op1));
   den2_ptr = PTR(DEN(op2));

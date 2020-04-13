@@ -19,7 +19,6 @@ the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
 
 #include "config.h"
 
-#include "gmp.h"
 #include "gmpxx.h"
 #include "gmp-impl.h"
 #include "tests.h"
@@ -38,6 +37,14 @@ void check_noexcept ()
   static_assert(noexcept(q1 = std::move(q2)), "sorry");
   static_assert(noexcept(f1 = std::move(f2)), "sorry");
   static_assert(noexcept(q1 = std::move(z1)), "sorry");
+
+  // Only mpz has lazy allocation for now
+  static_assert(std::is_nothrow_default_constructible<mpz_class>::value, "sorry");
+  static_assert(std::is_nothrow_move_constructible<mpz_class>::value, "sorry");
+  static_assert(!std::is_nothrow_default_constructible<mpq_class>::value, "sorry");
+  static_assert(!std::is_nothrow_move_constructible<mpq_class>::value, "sorry");
+  static_assert(!std::is_nothrow_default_constructible<mpf_class>::value, "sorry");
+  static_assert(!std::is_nothrow_move_constructible<mpf_class>::value, "sorry");
 }
 
 void check_common_type ()

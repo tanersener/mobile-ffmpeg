@@ -31,8 +31,9 @@ dnl  see https://www.gnu.org/licenses/.
 include(`../config.m4')
 
 C	     cycles/limb
-C Cortex-A53	 ?
-C Cortex-A57	 ?
+C Cortex-A53	 8
+C Cortex-A57	 7
+C X-Gene	 4.25
 
 define(`qp',	  `x0')
 define(`up',	  `x1')

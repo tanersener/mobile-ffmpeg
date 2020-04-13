@@ -46,6 +46,7 @@ dnl
 dnl  Simply override the definition in x86_64-defs.m4.
 
 define(`CALL',`call	GSYM_PREFIX`'$1')
+define(`TCALL',`jmp	GSYM_PREFIX`'$1')
 
 
 dnl  Usage: JUMPTABSECT

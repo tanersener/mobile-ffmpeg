@@ -1,6 +1,6 @@
 /* mpq_inp_str -- read an mpq from a FILE.
 
-Copyright 2001 Free Software Foundation, Inc.
+Copyright 2001, 2018 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -30,7 +30,6 @@ see https://www.gnu.org/licenses/.  */
 
 #include <stdio.h>
 #include <ctype.h>
-#include "gmp.h"
 #include "gmp-impl.h"
 
 
@@ -44,7 +43,7 @@ mpq_inp_str (mpq_ptr q, FILE *fp, int base)
     fp = stdin;
 
   SIZ(DEN(q)) = 1;
-  PTR(DEN(q))[0] = 1;
+  MPZ_NEWALLOC (DEN(q), 1)[0] = 1;
 
   nread = mpz_inp_str (mpq_numref(q), fp, base);
   if (nread == 0)

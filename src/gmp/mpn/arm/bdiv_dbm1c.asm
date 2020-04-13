@@ -109,5 +109,5 @@ L(wd1):	subs	r5, r5, r8
 	str	r5, [qp]
 	sbc	r0, r5, r12
 	pop	{r4, r5, r6, r7, r8}
-	ret	lr
+	return	lr
 EPILOGUE()

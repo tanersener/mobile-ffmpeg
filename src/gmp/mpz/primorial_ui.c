@@ -2,7 +2,7 @@
 
 Contributed to the GNU project by Marco Bodrato.
 
-Copyright 2012 Free Software Foundation, Inc.
+Copyright 2012, 2015, 2016 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -30,7 +30,6 @@ You should have received copies of the GNU General Public License and the
 GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
-#include "gmp.h"
 #include "gmp-impl.h"
 
 /* TODO: Remove duplicated constants / macros / static functions...
@@ -56,7 +55,8 @@ see https://www.gnu.org/licenses/.  */
       ++__i;							\
       if (((sieve)[__index] & __mask) == 0)			\
 	{							\
-	  (prime) = id_to_n(__i)
+	  mp_limb_t prime;					\
+	  prime = id_to_n(__i)
 
 #define LOOP_ON_SIEVE_BEGIN(prime,start,end,off,sieve)		\
   do {								\
@@ -73,7 +73,7 @@ see https://www.gnu.org/licenses/.  */
 	}							\
       __mask = __mask << 1 | __mask >> (GMP_LIMB_BITS-1);	\
       __index += __mask & 1;					\
-    }  while (__i <= __max_i)					\
+    }  while (__i <= __max_i)
 
 #define LOOP_ON_SIEVE_END					\
     LOOP_ON_SIEVE_STOP;						\
@@ -108,24 +108,22 @@ primesieve_size (mp_limb_t n) { return n_to_bit(n) / GMP_LIMB_BITS + 1; }
 void
 mpz_primorial_ui (mpz_ptr x, unsigned long n)
 {
-  static const mp_limb_t table[] = { 1, 1, 2, 6, 6 };
-
   ASSERT (n <= GMP_NUMB_MAX);
 
-  if (n < numberof (table))
+  if (n < 5)
     {
-      PTR (x)[0] = table[n];
+      MPZ_NEWALLOC (x, 1)[0] = (066211 >> (n*3)) & 7;
       SIZ (x) = 1;
     }
   else
     {
       mp_limb_t *sieve, *factors;
-      mp_size_t size;
+      mp_size_t size, j;
       mp_limb_t prod;
-      mp_limb_t j;
       TMP_DECL;
 
-      size = 1 + n / GMP_NUMB_BITS + n / (2*GMP_NUMB_BITS);
+      size = n / GMP_NUMB_BITS;
+      size = size + (size >> 1) + 1;
       ASSERT (size >= primesieve_size (n));
       sieve = MPZ_NEWALLOC (x, size);
       size = (gmp_primesieve (sieve, n) + 1) / log_n_max (n) + 1;
@@ -135,20 +133,20 @@ mpz_primorial_ui (mpz_ptr x, unsigned long n)
 
       j = 0;
 
-      prod = table[numberof (table)-1];
+      prod = 6;
 
       /* Store primes from 5 to n */
       {
-	mp_limb_t prime, max_prod;
+	mp_limb_t max_prod;
 
 	max_prod = GMP_NUMB_MAX / n;
 
-	LOOP_ON_SIEVE_BEGIN (prime, n_to_bit(numberof (table)), n_to_bit (n), 0, sieve);
+	LOOP_ON_SIEVE_BEGIN (prime, n_to_bit(5), n_to_bit (n), 0, sieve);
 	FACTOR_LIST_STORE (prime, prod, max_prod, factors, j);
 	LOOP_ON_SIEVE_END;
       }
 
-      if (LIKELY (j != 0))
+      if (j != 0)
 	{
 	  factors[j++] = prod;
 	  mpz_prodlimbs (x, factors, j);

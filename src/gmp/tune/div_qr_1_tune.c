@@ -30,7 +30,6 @@ see https://www.gnu.org/licenses/.  */
 
 #define TUNE_PROGRAM_BUILD 1
 
-#include "gmp.h"
 #include "gmp-impl.h"
 
 mp_limb_t mpn_div_qr_1n_pi1_1 (mp_ptr, mp_srcptr, mp_size_t, mp_limb_t, mp_limb_t, mp_limb_t);

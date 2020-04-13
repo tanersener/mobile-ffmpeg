@@ -137,6 +137,7 @@ void mpz_negrandom (mpz_ptr, gmp_randstate_t);
 int mpz_pow2abs_p (mpz_srcptr) __GMP_ATTRIBUTE_PURE;
 void mpz_set_n (mpz_ptr, mp_srcptr, mp_size_t);
 void mpz_set_str_or_abort (mpz_ptr, const char *, int);
+void mpz_clobber(mpz_ptr);
 
 mp_size_t mpn_diff_highest (mp_srcptr, mp_srcptr, mp_size_t) __GMP_ATTRIBUTE_PURE;
 mp_size_t mpn_diff_lowest (mp_srcptr, mp_srcptr, mp_size_t) __GMP_ATTRIBUTE_PURE;
@@ -229,7 +230,9 @@ int refmpn_equal_anynail (mp_srcptr, mp_srcptr, mp_size_t);
 
 void refmpn_fill (mp_ptr, mp_size_t, mp_limb_t);
 
+mp_limb_t refmpn_gcd_11 (mp_limb_t, mp_limb_t);
 mp_limb_t refmpn_gcd_1 (mp_srcptr, mp_size_t, mp_limb_t);
+mp_double_limb_t refmpn_gcd_22 (mp_limb_t, mp_limb_t, mp_limb_t, mp_limb_t);
 mp_limb_t refmpn_gcd (mp_ptr, mp_ptr, mp_size_t, mp_ptr, mp_size_t);
 
 size_t refmpn_get_str (unsigned char *, int, mp_ptr, mp_size_t);
@@ -354,6 +357,7 @@ void refmpq_sub (mpq_ptr, mpq_srcptr, mpq_srcptr);
 
 void refmpz_combit (mpz_ptr, unsigned long);
 unsigned long refmpz_hamdist (mpz_srcptr, mpz_srcptr);
+void refmpz_gcd (mpz_ptr, mpz_srcptr, mpz_srcptr);
 int refmpz_kronecker (mpz_srcptr, mpz_srcptr);
 int refmpz_jacobi (mpz_srcptr, mpz_srcptr);
 int refmpz_legendre (mpz_srcptr, mpz_srcptr);

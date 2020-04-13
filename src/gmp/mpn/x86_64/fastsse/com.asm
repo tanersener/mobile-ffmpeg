@@ -78,6 +78,10 @@ ASM_START()
 PROLOGUE(mpn_com)
 	FUNC_ENTRY(3)
 
+IFDOS(`	add	$-56, %rsp	')
+IFDOS(`	movdqa	%xmm6, (%rsp)	')
+IFDOS(`	movdqa	%xmm7, 16(%rsp)	')
+
 	pcmpeqb	%xmm7, %xmm7		C set to 111...111
 
 	test	$8, R8(rp)		C is rp 16-byte aligned?
@@ -162,6 +166,10 @@ L(sma):	add	$14, n
 	not	%rax
 	mov	%rax, (rp)
 1:
-L(don):	FUNC_EXIT()
+L(don):
+IFDOS(`	movdqa	(%rsp), %xmm6	')
+IFDOS(`	movdqa	16(%rsp), %xmm7	')
+IFDOS(`	add	$56, %rsp	')
+	FUNC_EXIT()
 	ret
 EPILOGUE()

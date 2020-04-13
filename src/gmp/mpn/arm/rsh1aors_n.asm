@@ -120,5 +120,5 @@ L(e1):	RSTCY(	r12, r1)
 	str	r4, [rp, #0]
 	mov	r0, r11
 	pop	{r4-r11}
-	ret	r14
+	return	r14
 EPILOGUE()

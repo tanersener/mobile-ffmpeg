@@ -39,7 +39,6 @@ GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
 
-#include "gmp.h"
 #include "gmp-impl.h"
 
 /* Evaluate in: -2, -1, 0, +1, +2, +inf
@@ -161,7 +160,7 @@ mpn_toom52_mul (mp_ptr pp,
 
   /* Compute bs2 and bsm2, recycling bs1 and bsm1. bs2=bs1+b1; bsm2=bsm1-b1  */
   mpn_add (bs2, bs1, n+1, b1, t);
-  if (flags & toom6_vm1_neg )
+  if (flags & toom6_vm1_neg)
     {
       bsm2[n] = mpn_add (bsm2, bsm1, n, b1, t);
       flags = (enum toom6_flags) (flags ^ toom6_vm2_neg);

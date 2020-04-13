@@ -6,7 +6,7 @@
    SAFE TO REACH IT THROUGH DOCUMENTED INTERFACES.  IN FACT, IT IS ALMOST
    GUARANTEED THAT IT WILL CHANGE OR DISAPPEAR IN A FUTURE GNU MP RELEASE.
 
-Copyright 2006-2010, 2012, 2014 Free Software Foundation, Inc.
+Copyright 2006-2010, 2012, 2014, 2018 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -35,7 +35,6 @@ GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
 
-#include "gmp.h"
 #include "gmp-impl.h"
 
 /* Evaluate in: -1, 0, +inf
@@ -135,12 +134,22 @@ mpn_toom2_sqr (mp_ptr pp,
 
   cy -= mpn_sub_n (pp + n, pp + n, vm1, 2 * n);
 
-  ASSERT (cy + 1  <= 3);
+  ASSERT (cy + 1 <= 3);
   ASSERT (cy2 <= 2);
 
-  MPN_INCR_U (pp + 2 * n, s + s, cy2);
-  if (LIKELY (cy <= 2))
+  if (LIKELY (cy <= 2)) {
+    MPN_INCR_U (pp + 2 * n, s + s, cy2);
     MPN_INCR_U (pp + 3 * n, s + s - n, cy);
-  else
-    MPN_DECR_U (pp + 3 * n, s + s - n, 1);
+  } else { /* cy is negative */
+    /* The total contribution of v0+vinf-vm1 can not be negative. */
+#if WANT_ASSERT
+    /* The borrow in cy stops the propagation of the carry cy2, */
+    ASSERT (cy2 == 1);
+    cy += mpn_add_1 (pp + 2 * n, pp + 2 * n, n, cy2);
+    ASSERT (cy == 0);
+#else
+    /* we simply fill the area with zeros. */
+    MPN_FILL (pp + 2 * n, n, 0);
+#endif
+  }
 }

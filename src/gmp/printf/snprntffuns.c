@@ -4,7 +4,7 @@
    CERTAIN TO BE SUBJECT TO INCOMPATIBLE CHANGES OR DISAPPEAR COMPLETELY IN
    FUTURE GNU MP RELEASES.
 
-Copyright 2001, 2002 Free Software Foundation, Inc.
+Copyright 2001, 2002, 2018 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -36,7 +36,6 @@ see https://www.gnu.org/licenses/.  */
 #include <stdio.h>
 #include <string.h>
 
-#include "gmp.h"
 #include "gmp-impl.h"
 
 
@@ -63,7 +62,8 @@ static int
 gmp_snprintf_format (struct gmp_snprintf_t *d, const char *fmt,
                      va_list orig_ap)
 {
-  int      ret, step, alloc, avail;
+  int      ret;
+  size_t   step, alloc, avail;
   va_list  ap;
   char     *p;
 
@@ -75,10 +75,7 @@ gmp_snprintf_format (struct gmp_snprintf_t *d, const char *fmt,
       va_copy (ap, orig_ap);
       ret = vsnprintf (d->buf, avail, fmt, ap);
       if (ret == -1)
-        {
-          ASSERT (strlen (d->buf) == avail-1);
-          ret = avail-1;
-        }
+        return ret;
 
       step = MIN (ret, avail-1);
       d->size -= step;
@@ -102,9 +99,9 @@ gmp_snprintf_format (struct gmp_snprintf_t *d, const char *fmt,
       p = __GMP_ALLOCATE_FUNC_TYPE (alloc, char);
       va_copy (ap, orig_ap);
       ret = vsnprintf (p, alloc, fmt, ap);
-      (*__gmp_free_func) (p, alloc);
+      __GMP_FREE_FUNC_TYPE (p, alloc, char);
     }
-  while (ret == alloc-1 || ret == -1);
+  while (ret == alloc-1);
 
   return ret;
 }

@@ -31,13 +31,25 @@ dnl  see https://www.gnu.org/licenses/.
 
 
 C	     cycles/limb
-C AMD K8,K9	 2
-C AMD K10	 2
+C AMD K8,K9	 2.1
+C AMD K10	 2.0
+C AMD bd1	~2.7
+C AMD bd2	~2.7
+C AMD bd3	 ?
+C AMD bd4	 ?
+C AMD zen	 2.0
+C AMD bt1	 3.3
+C AMD bt2	 3.0
 C Intel P4	 ?
-C Intel core2	 3
+C Intel PNR	 3.0
 C Intel NHM	 2.75
 C Intel SBR	 2.55
-C Intel atom	 ?
+C Intel IBR	 2.49
+C Intel HWL	 2.25
+C Intel BWL	 1.89
+C Intel SKL	 1.90
+C Intel atom	 8.4
+C Intel SLM	 4.0
 C VIA nano	 ?
 
 C INPUT PARAMETERS

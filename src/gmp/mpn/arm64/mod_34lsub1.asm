@@ -31,18 +31,19 @@ dnl  see https://www.gnu.org/licenses/.
 include(`../config.m4')
 
 C	     cycles/limb
-C Cortex-A53	 ?
-C Cortex-A57	 ?
+C Cortex-A53	 2
+C Cortex-A57	 1
+C X-Gene	 1.45
 
 define(`ap',	x0)
 define(`n',	x1)
 
-changecom(@&*$)
+changecom(blah)
 
 C mp_limb_t mpn_mod_34lsub1 (mp_srcptr up, mp_size_t n)
 
 C TODO
-C  * An alternative inner loop which could run at 0.722 c/l:
+C  * An alternative inner loop which could run at 0.722 c/l on A57:
 C	adds	x8, x8, x2
 C	adcs	x9, x9, x3
 C	ldp	x2, x3, [ap, #-32]

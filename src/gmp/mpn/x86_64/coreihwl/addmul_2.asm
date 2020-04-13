@@ -37,17 +37,20 @@ C AMD K8,K9	n/a
 C AMD K10	n/a
 C AMD bull	n/a
 C AMD pile	n/a
-C AMD steam	 ?
+C AMD steam	n/a
+C AMD excavator	 ?
 C AMD bobcat	n/a
-C AMD jaguar	 ?
+C AMD jaguar	n/a
 C Intel P4	n/a
 C Intel core	n/a
 C Intel NHM	n/a
 C Intel SBR	n/a
 C Intel IBR	n/a
 C Intel HWL	 2.15
-C Intel BWL	 ?
+C Intel BWL	 2.33
+C Intel SKL	 2.22
 C Intel atom	n/a
+C Intel SLM	n/a
 C VIA nano	n/a
 
 C The loop of this code is the result of running a code generation and

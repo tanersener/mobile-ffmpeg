@@ -28,7 +28,7 @@ see https://www.gnu.org/licenses/.
 
 
 
-There are 5 generations of 64-but s390 processors, z900, z990, z9,
+There are 5 generations of 64-bit s390 processors, z900, z990, z9,
 z10, and z196.  The current GMP code was optimised for the two oldest,
 z900 and z990.
 

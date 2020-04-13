@@ -1,6 +1,6 @@
 /* Test mpf_get_d_2exp.
 
-Copyright 2002, 2003 Free Software Foundation, Inc.
+Copyright 2002, 2003, 2017 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library test suite.
 
@@ -19,46 +19,51 @@ the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "gmp.h"
 #include "gmp-impl.h"
 #include "tests.h"
 
 
 static void
-check_onebit (void)
+check_data (void)
 {
-  static const long data[] = {
-    -513, -512, -511, -65, -64, -63, -32, -1,
-    0, 1, 32, 53, 54, 64, 128, 256, 511, 512, 513
-  };
   mpf_t   f;
   double  got, want;
-  long    got_exp, want_exp;
-  int     i;
+  long    got_exp;
+  long    exp;
+  struct {
+    int base;
+    int shift;
+  } data[] = {
+   {-1, 1}, {-3, 2}, {-5, 3}, {-7, 3}, { 1, 1}, { 3, 2}, { 5, 3}, { 7, 3}
+  };
 
-  mpf_init2 (f, 1024L);
+  mpf_init2 (f, 3);
 
-  for (i = 0; i < numberof (data); i++)
+  for (exp = -513; exp <= 513; exp++)
     {
-      mpf_set_ui (f, 1L);
-      if (data[i] >= 0)
-        mpf_mul_2exp (f, f, data[i]);
-      else
-        mpf_div_2exp (f, f, -data[i]);
-      want = 0.5;
-      want_exp = data[i] + 1;
+      size_t i;
+      for (i = 0; i < numberof (data); i++)
+	{
+	  want = (double) data[i].base / (1 << data[i].shift);
+	  mpf_set_d (f, want);
 
-      got = mpf_get_d_2exp (&got_exp, f);
-      if (got != want || got_exp != want_exp)
-        {
-          printf    ("mpf_get_d_2exp wrong on 2**%ld\n", data[i]);
-          mpf_trace ("   f    ", f);
-          d_trace   ("   want ", want);
-          d_trace   ("   got  ", got);
-          printf    ("   want exp %ld\n", want_exp);
-          printf    ("   got exp  %ld\n", got_exp);
-          abort();
-        }
+	  if (exp >= 0)
+	    mpf_mul_2exp (f, f, exp);
+	  else
+	    mpf_div_2exp (f, f, -exp);
+
+	  got = mpf_get_d_2exp (&got_exp, f);
+	  if (got != want || got_exp != exp)
+	    {
+	      printf    ("mpf_get_d_2exp wrong on 2**%ld\n", exp);
+	      mpf_trace ("   f    ", f);
+	      d_trace   ("   want ", want);
+	      d_trace   ("   got  ", got);
+	      printf    ("   want exp %ld\n", exp);
+	      printf    ("   got exp  %ld\n", got_exp);
+	      abort();
+	    }
+	}
     }
   mpf_clear (f);
 }
@@ -113,7 +118,7 @@ main (void)
   tests_start ();
   mp_trace_base = 16;
 
-  check_onebit ();
+  check_data ();
   check_round ();
 
   tests_end ();

@@ -79,6 +79,7 @@ testmain (int argc, char **argv)
 	}
       mini_random_bit_op (OP_COMBIT, MAXBITS, a, &b, ref);
       mpz_set (res, a);
+      mpz_com (a, a);
       mpz_combit (res, b);
       if (mpz_cmp (res, ref))
 	{
@@ -89,7 +90,7 @@ testmain (int argc, char **argv)
 	  dump ("ref", ref);
 	  abort ();
 	}
-      if (mpz_tstbit (res, b) == mpz_tstbit (a, b))
+      if (mpz_tstbit (res, b) != mpz_tstbit (a, b))
 	{
 	  fprintf (stderr, "mpz_tstbit failed (after mpz_combit):\n");
 	  dump ("res", a);

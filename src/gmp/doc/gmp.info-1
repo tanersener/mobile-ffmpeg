@@ -1,9 +1,9 @@
-This is gmp.info, produced by makeinfo version 6.1 from gmp.texi.
+This is gmp.info, produced by makeinfo version 6.6 from gmp.texi.
 
 This manual describes how to install and use the GNU multiple precision
-arithmetic library, version 6.1.2.
+arithmetic library, version 6.2.0.
 
-   Copyright 1991, 1993-2016 Free Software Foundation, Inc.
+   Copyright 1991, 1993-2016, 2018 Free Software Foundation, Inc.
 
    Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.3 or
@@ -24,9 +24,9 @@ GNU MP
 ******
 
 This manual describes how to install and use the GNU multiple precision
-arithmetic library, version 6.1.2.
+arithmetic library, version 6.2.0.
 
-   Copyright 1991, 1993-2016 Free Software Foundation, Inc.
+   Copyright 1991, 1993-2016, 2018 Free Software Foundation, Inc.
 
    Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.3 or
@@ -230,7 +230,7 @@ Build Directory
      directory.  For example
 
           cd /my/build/dir
-          /my/sources/gmp-6.1.2/configure
+          /my/sources/gmp-6.2.0/configure
 
      Not all 'make' programs have the necessary features ('VPATH') to
      support this.  In particular, SunOS and Slowaris 'make' have bugs
@@ -930,7 +930,7 @@ MS-DOS and MS Windows
      Windows system Cygwin, DJGPP and MINGW can be used.  All three are
      excellent ports of GCC and the various GNU tools.
 
-          <http://www.cygwin.com/>
+          <https://www.cygwin.com/>
           <http://www.delorie.com/djgpp/>
           <http://www.mingw.org/>
 
@@ -1315,9 +1315,7 @@ File: gmp.info,  Node: Variable Conventions,  Next: Parameter Conventions,  Prev
 ========================
 
 GMP functions generally have output arguments before input arguments.
-This notation is by analogy with the assignment operator.  The BSD MP
-compatibility functions are exceptions, having the output arguments
-last.
+This notation is by analogy with the assignment operator.
 
    GMP lets you use the same variable for both input and output in one
 call.  For example, the main function for integer multiplication,
@@ -1355,6 +1353,18 @@ end.  For example,
        mpz_clear (n);
      }
 
+   GMP types like 'mpz_t' are implemented as one-element arrays of
+certain structures.  Declaring a variable creates an object with the
+fields GMP needs, but variables are normally manipulated by using the
+pointer to the object.  For both behavior and efficiency reasons, it is
+discouraged to make copies of the GMP object itself (either directly or
+via aggregate objects containing such GMP objects).  If copies are done,
+all of them must be used read-only; using a copy as the output of some
+function will invalidate all the other copies.  Note that the actual
+fields in each 'mpz_t' etc are for internal use only and should not be
+accessed directly by code that expects to be compatible with future GMP
+releases.
+
 
 File: gmp.info,  Node: Parameter Conventions,  Next: Memory Management,  Prev: Variable Conventions,  Up: GMP Basics
 
@@ -1362,10 +1372,10 @@ File: gmp.info,  Node: Parameter Conventions,  Next: Memory Management,  Prev: V
 =========================
 
 When a GMP variable is used as a function parameter, it's effectively a
-call-by-reference, meaning if the function stores a value there it will
-change the original in the caller.  Parameters which are input-only can
-be designated 'const' to provoke a compiler error or warning on
-attempting to modify them.
+call-by-reference, meaning that when the function stores a value there
+it will change the original in the caller.  Parameters which are
+input-only can be designated 'const' to provoke a compiler error or
+warning on attempting to modify them.
 
    When a function is going to return a GMP result, it should designate
 a parameter that it sets, like the library functions do.  More than one
@@ -1397,18 +1407,14 @@ calculation, and storing the result to the indicated parameter.
        return 0;
      }
 
-   'foo' works even if the mainline passes the same variable for 'param'
-and 'result', just like the library functions.  But sometimes it's
-tricky to make that work, and an application might not want to bother
-supporting that sort of thing.
+   Our function 'foo' works even if its caller passes the same variable
+for 'param' and 'result', just like the library functions.  But
+sometimes it's tricky to make that work, and an application might not
+want to bother supporting that sort of thing.
 
-   For interest, the GMP types 'mpz_t' etc are implemented as
-one-element arrays of certain structures.  This is why declaring a
-variable creates an object with the fields GMP needs, but then using it
-as a parameter passes a pointer to the object.  Note that the actual
-fields in each 'mpz_t' etc are for internal use only and should not be
-accessed directly by code that expects to be compatible with future GMP
-releases.
+   Since GMP types are implemented as one-element arrays, using a GMP
+variable as a parameter passes a pointer to the object.  Hence the
+call-by-reference.
 
 
 File: gmp.info,  Node: Memory Management,  Next: Reentrancy,  Prev: Parameter Conventions,  Up: GMP Basics
@@ -1497,7 +1503,7 @@ File: gmp.info,  Node: Useful Macros and Constants,  Next: Compatibility with ol
 
  -- Global Constant: const char * const gmp_version
      The GMP version number, as a null-terminated string, in the form
-     "i.j.k".  This release is "6.1.2".  Note that the format "i.j" was
+     "i.j.k".  This release is "6.2.0".  Note that the format "i.j" was
      used, before version 4.3.0, when k was zero.
 
  -- Macro: __GMP_CC
@@ -1766,13 +1772,9 @@ Heap Problems
      Debugging, or 'man 3 malloc'.  Other possibilities, in no
      particular order, include
 
-          <http://www.inf.ethz.ch/personal/biere/projects/ccmalloc/>
+          <http://cs.ecs.baylor.edu/~donahoo/tools/ccmalloc/>
           <http://dmalloc.com/>
-          <http://www.perens.com/FreeSoftware/>  (electric fence)
-          <http://packages.debian.org/stable/devel/fda>
-          <http://www.gnupdate.org/components/leakbug/>
-          <http://people.redhat.com/~otaylor/memprof/>
-          <http://www.cbmamiga.demon.co.uk/mpatrol/>
+          <https://wiki.gnome.org/Apps/MemProf>
 
      The GMP default allocation routines in 'memory.c' also have a
      simple sentinel scheme which can be enabled with '#define DEBUG' in
@@ -1803,7 +1805,7 @@ Source File Paths
      to the source directory.
 
           cd /my/build/dir
-          /my/source/dir/gmp-6.1.2/configure
+          /my/source/dir/gmp-6.2.0/configure
 
      This works via 'VPATH', and might require GNU 'make'.  Alternately
      it might be possible to change the '.c.lo' rules appropriately.
@@ -1959,7 +1961,7 @@ profiling choices for a GMP build are as follows.
      This instrumenting is not normally a standard system feature and
      will require support from an external library, such as
 
-          <http://sourceforge.net/projects/fnccheck/>
+          <https://sourceforge.net/projects/fnccheck/>
 
      This should be included in 'LIBS' during the GMP configure so that
      test programs will link.  For example,
@@ -2566,9 +2568,9 @@ File: gmp.info,  Node: Integer Exponentiation,  Next: Integer Roots,  Prev: Inte
           long int EXP, const mpz_t MOD)
      Set ROP to (BASE raised to EXP) modulo MOD.
 
-     Negative EXP is supported if an inverse BASE^-1 mod MOD exists (see
-     'mpz_invert' in *note Number Theoretic Functions::).  If an inverse
-     doesn't exist then a divide by zero is raised.
+     Negative EXP is supported if the inverse BASE^(-1) mod MOD exists
+     (see 'mpz_invert' in *note Number Theoretic Functions::).  If an
+     inverse doesn't exist then a divide by zero is raised.
 
  -- Function: void mpz_powm_sec (mpz_t ROP, const mpz_t BASE, const
           mpz_t EXP, const mpz_t MOD)
@@ -2641,12 +2643,16 @@ File: gmp.info,  Node: Number Theoretic Functions,  Next: Integer Comparisons,  
      return 1 if N is probably prime (without being certain), or return
      0 if N is definitely non-prime.
 
-     This function performs some trial divisions, then REPS Miller-Rabin
-     probabilistic primality tests.  A higher REPS value will reduce the
-     chances of a non-prime being identified as "probably prime".  A
-     composite number will be identified as a prime with a probability
-     of less than 4^(-REPS).  Reasonable values of REPS are between 15
-     and 50.
+     This function performs some trial divisions, a Baillie-PSW probable
+     prime test, then REPS-24 Miller-Rabin probabilistic primality
+     tests.  A higher REPS value will reduce the chances of a non-prime
+     being identified as "probably prime".  A composite number will be
+     identified as a prime with an asymptotic probability of less than
+     4^(-REPS).  Reasonable values of REPS are between 15 and 50.
+
+     GMP versions up to and including 6.1.2 did not use the Baillie-PSW
+     primality test.  In those older versions of GMP, this function
+     performed REPS Miller-Rabin tests.
 
  -- Function: void mpz_nextprime (mpz_t ROP, const mpz_t OP)
      Set ROP to the next prime greater than OP.
@@ -2689,7 +2695,7 @@ File: gmp.info,  Node: Number Theoretic Functions,  Next: Integer Comparisons,  
      In all cases, S = 0 if and only if G = abs(B), i.e., if B divides A
      or A = B = 0.
 
-     If T is 'NULL' then that value is not computed.
+     If T or G is 'NULL' then that value is not computed.
 
  -- Function: void mpz_lcm (mpz_t ROP, const mpz_t OP1, const mpz_t OP2)
  -- Function: void mpz_lcm_ui (mpz_t ROP, const mpz_t OP1, unsigned long
@@ -2988,7 +2994,7 @@ number functions.
      the binary representation.  Useful for testing functions and
      algorithms, since this kind of random numbers have proven to be
      more likely to trigger corner-case bugs.  The random number will be
-     in the range 2^N-1 to 2^N-1, inclusive.
+     in the range 2^(N-1) to 2^N-1, inclusive.
 
      The variable STATE must be initialized by calling one of the
      'gmp_randinit' functions (*note Random State Initialization::)
@@ -3348,9 +3354,14 @@ File: gmp.info,  Node: Rational Conversions,  Next: Rational Arithmetic,  Prev: 
      is exact.
 
  -- Function: char * mpq_get_str (char *STR, int BASE, const mpq_t OP)
-     Convert OP to a string of digits in base BASE.  The base may vary
-     from 2 to 36.  The string will be of the form 'num/den', or if the
-     denominator is 1 then just 'num'.
+     Convert OP to a string of digits in base BASE.  The base argument
+     may vary from 2 to 62 or from -2 to -36.  The string will be of the
+     form 'num/den', or if the denominator is 1 then just 'num'.
+
+     For BASE in the range 2..36, digits and lower-case letters are
+     used; for -2..-36, digits and upper-case letters are used; for
+     37..62, digits, upper-case letters, and lower-case letters (in that
+     significance order) are used.
 
      If STR is 'NULL', the result string is allocated using the current
      allocation function (*note Custom Allocation::).  The block will be
@@ -3497,8 +3508,14 @@ prototypes for these functions.
  -- Function: size_t mpq_out_str (FILE *STREAM, int BASE, const mpq_t
           OP)
      Output OP on stdio stream STREAM, as a string of digits in base
-     BASE.  The base may vary from 2 to 36.  Output is in the form
-     'num/den' or if the denominator is 1 then just 'num'.
+     BASE.  The base argument may vary from 2 to 62 or from -2 to -36.
+     Output is in the form 'num/den' or if the denominator is 1 then
+     just 'num'.
+
+     For BASE in the range 2..36, digits and lower-case letters are
+     used; for -2..-36, digits and upper-case letters are used; for
+     37..62, digits, upper-case letters, and lower-case letters (in that
+     significance order) are used.
 
      Return the number of bytes written, or if an error occurred, return
      0.
@@ -3515,12 +3532,12 @@ prototypes for these functions.
      not be in canonical form, then 'mpq_canonicalize' must be called
      (*note Rational Number Functions::).
 
-     The BASE can be between 2 and 36, or can be 0 in which case the
+     The BASE can be between 2 and 62, or can be 0 in which case the
      leading characters of the string determine the base, '0x' or '0X'
-     for hexadecimal, '0' for octal, or decimal otherwise.  The leading
-     characters are examined separately for the numerator and
-     denominator of a fraction, so for instance '0x10/11' is 16/11,
-     whereas '0x10/0x11' is 16/17.
+     for hexadecimal, '0b' and '0B' for binary, '0' for octal, or
+     decimal otherwise.  The leading characters are examined separately
+     for the numerator and denominator of a fraction, so for instance
+     '0x10/11' is 16/11, whereas '0x10/0x11' is 16/17.
 
 
 File: gmp.info,  Node: Floating-point Functions,  Next: Low-level Functions,  Prev: Rational Number Functions,  Up: Top
@@ -4354,9 +4371,9 @@ For example, {S1P, S1N}.
      {YP, YN}.  The result can be up to YN limbs, the return value is
      the actual number produced.  Both source operands are destroyed.
 
-     It is required that XN >= YN > 0, and the most significant limb of
-     {YP, YN} must be non-zero.  No overlap is permitted between {XP,
-     XN} and {YP, YN}.
+     It is required that XN >= YN > 0, the most significant limb of {YP,
+     YN} must be non-zero, and at least one of the two operands must be
+     odd.  No overlap is permitted between {XP, XN} and {YP, YN}.
 
  -- Function: mp_limb_t mpn_gcd_1 (const mp_limb_t *XP, mp_size_t XN,
           mp_limb_t YLIMB)
@@ -4659,7 +4676,8 @@ leaky 'mpn_add_n' and 'mpn_sub_n'.  (3) Alpha ev6 has a leaky
      Set R to (B raised to E) modulo M, where R = {RP,N}, M = {MP,N},
      and E = {EP,ceil(ENB / 'GMP\_NUMB\_BITS')}.
 
-     It is required that B > 0, that M > 0 is odd, and that E < 2^ENB.
+     It is required that B > 0, that M > 0 is odd, and that E < 2^ENB,
+     with ENB > 0.
 
      No overlapping between R and the input operands is allowed.
 
@@ -5672,11 +5690,18 @@ File: gmp.info,  Node: C++ Interface Integers,  Next: C++ Interface Rationals,  
 
  -- Function: mpz_class gcd (mpz_class OP1, mpz_class OP2)
  -- Function: mpz_class lcm (mpz_class OP1, mpz_class OP2)
+ -- Function: mpz_class mpz_class::factorial (type OP)
+ -- Function: mpz_class factorial (mpz_class OP)
+ -- Function: mpz_class mpz_class::primorial (type OP)
+ -- Function: mpz_class primorial (mpz_class OP)
+ -- Function: mpz_class mpz_class::fibonacci (type OP)
+ -- Function: mpz_class fibonacci (mpz_class OP)
 
  -- Function: void mpz_class::swap (mpz_class& OP)
  -- Function: void swap (mpz_class& OP1, mpz_class& OP2)
      These functions provide a C++ class interface to the corresponding
-     GMP C routines.
+     GMP C routines.  Calling 'factorial' or 'primorial' on a negative
+     number is undefined.
 
      'cmp' can be used with any of the classes or the standard C++
      types, except 'long long' and 'long double'.
@@ -6186,9 +6211,7 @@ C++
           temporaries.
         * ALP <https://www-sop.inria.fr/saga/logiciels/ALP/>
           Linear algebra and polynomials using templates.
-        * Arithmos <http://cant.ua.ac.be/old/arithmos/>
-          Rationals with infinities and square roots.
-        * CLN <http://www.ginac.de/CLN/>
+        * CLN <https://www.ginac.de/CLN/>
           High level classes for arithmetic.
         * Linbox <http://www.linalg.org/>
           Sparse vectors and matrices.
@@ -6207,23 +6230,19 @@ Java
 Lisp
         * GNU Common Lisp <https://www.gnu.org/software/gcl/gcl.html>
         * Librep <http://librep.sourceforge.net/>
-        * XEmacs (21.5.18 beta and up) <http://www.xemacs.org>
+        * XEmacs (21.5.18 beta and up) <https://www.xemacs.org>
           Optional big integers, rationals and floats using GMP.
-
-M4
-        * GNU m4 betas <http://www.seindal.dk/rene/gnu/>
-          Optionally provides an arbitrary precision 'mpeval'.
 
 ML
         * MLton compiler <http://mlton.org/>
 
 Objective Caml
-        * MLGMP <http://opam.ocamlpro.com/pkg/mlgmp.20120224.html>
+        * MLGMP <https://opam.ocaml.org/packages/mlgmp/>
         * Numerix <http://pauillac.inria.fr/~quercia/>
           Optionally using GMP.
 
 Oz
-        * Mozart <http://mozart.github.io/>
+        * Mozart <https://mozart.github.io/>
 
 Pascal
         * GNU Pascal Compiler <http://www.gnu-pascal.de/>
@@ -6234,15 +6253,15 @@ Pascal
 Perl
         * GMP module, see 'demos/perl' in the GMP sources (*note
           Demonstration Programs::).
-        * Math::GMP <http://www.cpan.org/>
+        * Math::GMP <https://www.cpan.org/>
           Compatible with Math::BigInt, but not as many functions as the
           GMP module above.
-        * Math::BigInt::GMP <http://www.cpan.org/>
+        * Math::BigInt::GMP <https://www.cpan.org/>
           Plug Math::GMP into normal Math::BigInt operations.
 
 Pike
-        * mpz module in the standard distribution,
-          <http://pike.ida.liu.se/>
+        * pikempz module in the standard distribution,
+          <https://pike.lysator.liu.se/>
 
 Prolog
         * SWI Prolog <http://www.swi-prolog.org/>
@@ -6252,23 +6271,22 @@ Python
         * GMPY <https://code.google.com/p/gmpy/>
 
 Ruby
-        * http://rubygems.org/gems/gmp
+        * <https://rubygems.org/gems/gmp>
 
 Scheme
         * GNU Guile <https://www.gnu.org/software/guile/guile.html>
-        * RScheme <http://www.rscheme.org/>
+        * RScheme <https://www.rscheme.org/>
         * STklos <http://www.stklos.net/>
 
 Smalltalk
-        * GNU Smalltalk
-          <http://www.smalltalk.org/versions/GNUSmalltalk.html>
+        * GNU Smalltalk <http://smalltalk.gnu.org/>
 
 Other
         * Axiom <https://savannah.nongnu.org/projects/axiom>
           Computer algebra using GCL.
         * DrGenius <http://drgenius.seul.org/>
           Geometry system and mathematical programming language.
-        * GiNaC <http://www.ginac.de/>
+        * GiNaC <httsp://www.ginac.de/>
           C++ computer algebra using CLN.
         * GOO <https://www.eecs.berkeley.edu/~jrb/goo/>
           Dynamic object oriented language.
@@ -6666,11 +6684,11 @@ for a single operand.  It can be virtual, i.e.  zero, or real, when the
 two operand are not exactly balanced.  By choosing an even r, Toom-r+1/2
 requires 2r points, a multiple of four.
 
-   The four-plets of points include 0, inf, +1, -1 and +-2^i, +-2^-i .
+   The quadruplets of points include 0, inf, +1, -1 and +-2^i, +-2^-i .
 Each of them giving shortcuts for the evaluation phase and for some
 steps in the interpolation phase.  Further tricks are used to reduce the
 memory footprint of the whole multiplication algorithm to a memory
-buffer equanl in size to the result of the product.
+buffer equal in size to the result of the product.
 
    Current GMP uses both Toom-6'n'half and Toom-8'n'half.
 

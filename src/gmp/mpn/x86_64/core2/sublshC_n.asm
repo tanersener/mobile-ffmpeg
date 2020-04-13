@@ -1,4 +1,4 @@
-dnl  AMD64 mpn_sublshC_n -- rp[] = up[] - (vp[] << 1), optimised for Core 2 and
+dnl  AMD64 mpn_sublshC_n -- rp[] = up[] - (vp[] << C), optimised for Core 2 and
 dnl  Core iN.
 
 dnl  Contributed to the GNU project by Torbjorn Granlund.

@@ -31,5 +31,4 @@ see https://www.gnu.org/licenses/.  */
 
 #define __GMP_FORCE_mpz_perfect_square_p 1
 
-#include "gmp.h"
 #include "gmp-impl.h"

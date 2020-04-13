@@ -102,7 +102,7 @@ itanium | itanium2)
   test_cpu=ia64 ;;
 pentium | pentiummmx | pentiumpro | pentium[234m] | k[567] | k6[23] | geode | athlon | viac3*)
   test_cpu=i386 ;;
-athlon64 | atom | silvermont | goldmont | core2 | corei* | opteron | k[89] | k10 | bobcat | jaguar* | bulldozer* | piledriver* | steamroller* | excavator* | nano | nehalem* | westmere* | sandybridge* | ivybridge* | haswell* | broadwell* | skylake* | kabylake* | knightslanding)
+athlon64 | atom | silvermont | goldmont | core2 | corei* | opteron | k[89] | k10 | bobcat | jaguar* | bulldozer* | piledriver* | steamroller* | excavator* | zen* | nano | nehalem | westmere | sandybridge* | ivybridge* | haswell* | broadwell* | skylake* | kabylake* | knightslanding)
   test_cpu=x86_64 ;;
 power[2-9] | power2sc)
   test_cpu=power ;;
@@ -129,8 +129,8 @@ z900esa | z990esa | z9esa | z10esa | z196esa)
 
 armsa1 | armxscale | arm9tdmi | arm9te |				\
 arm10* | arm11mpcore | armsa1 | arm1136 | arm1156 | arm1176 |		\
-armcortexa5 | armcortexa7 | armcortexa8 | armcortexa9 | armcortexa15 |	\
-armcortexr4 | armcortexr5 | armcortexm3 | arm*neon | xgene1 | exynosm1 | thunderx)
+armcortex[arm][0-9] | armcortex[arm][0-9][0-9] |			\
+arm*neon | armxgene1 | armexynosm1 | armthunderx)
   test_cpu="arm";;
 
 *)

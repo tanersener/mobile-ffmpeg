@@ -2,7 +2,7 @@
 
 Contributed to the GNU project by Marco Bodrato.
 
-Copyright 2012 Free Software Foundation, Inc.
+Copyright 2012, 2015, 2018 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -30,7 +30,6 @@ You should have received copies of the GNU General Public License and the
 GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
-#include "gmp.h"
 #include "gmp-impl.h"
 
 #define FACTOR_LIST_STORE(P, PR, MAX_PR, VEC, I)		\
@@ -67,10 +66,11 @@ mpz_2fac_ui (mpz_ptr x, unsigned long n)
     mpz_mul_2exp (x, x, count);
   } else { /* n is odd */
     if (n <= ODD_DOUBLEFACTORIAL_TABLE_LIMIT) {
-	PTR (x)[0] = __gmp_odd2fac_table[n >> 1];
-	SIZ (x) = 1;
+      MPZ_NEWALLOC (x, 1)[0] = __gmp_odd2fac_table[n >> 1];
+      SIZ (x) = 1;
     } else if (BELOW_THRESHOLD (n, FAC_2DSC_THRESHOLD)) { /* odd basecase, */
-      mp_limb_t *factors, prod, max_prod, j;
+      mp_limb_t *factors, prod, max_prod;
+      mp_size_t j;
       TMP_SDECL;
 
       /* FIXME: we might alloc a fixed amount 1+FAC_2DSC_THRESHOLD/FACTORS_PER_LIMB */

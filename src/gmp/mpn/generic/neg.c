@@ -30,5 +30,4 @@ see https://www.gnu.org/licenses/.  */
 
 #define __GMP_FORCE_mpn_neg 1
 
-#include "gmp.h"
 #include "gmp-impl.h"

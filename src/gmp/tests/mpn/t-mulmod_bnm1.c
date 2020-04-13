@@ -23,7 +23,6 @@ the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "gmp.h"
 #include "gmp-impl.h"
 #include "tests.h"
 
@@ -85,16 +84,7 @@ main (int argc, char **argv)
   TMP_DECL;
   TMP_MARK;
 
-  if (argc > 1)
-    {
-      char *end;
-      count = strtol (argv[1], &end, 0);
-      if (*end || count <= 0)
-	{
-	  fprintf (stderr, "Invalid test count: %s.\n", argv[1]);
-	  return 1;
-	}
-    }
+  TESTS_REPS (count, argv, argc);
 
   tests_start ();
   rands = RANDS;

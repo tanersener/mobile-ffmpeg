@@ -56,8 +56,8 @@ C TODO
 C  * Try using 128-bit operations.  Note that Neon lacks pure 128-bit shifts,
 C    which might make it tricky.
 C  * Clean up and simplify.
-C  * Consider sharing most of the code for lshift and rshift, since the feed-in code,
-C    the loop, and most of the wind-down code are identical.
+C  * Consider sharing most of the code for lshift and rshift, since the feed-in
+C    code, the loop, and most of the wind-down code are identical.
 C  * Replace the basecase code with code using 'extension' registers.
 C  * Optimise.  It is not clear that this loop insn permutation is optimal for
 C    either A9 or A15.
@@ -85,7 +85,7 @@ ifdef(`OPERATION_rshift',`
 
 MULFUNC_PROLOGUE(mpn_lshift mpn_rshift)
 
-ASM_START()
+ASM_START(neon)
 	TEXT
 	ALIGN(64)
 PROLOGUE(func)

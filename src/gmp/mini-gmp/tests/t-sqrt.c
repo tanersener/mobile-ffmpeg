@@ -87,7 +87,7 @@ mpz_mpn_sqrtrem (mpz_t s, mpz_t r, const mpz_t u)
     }
   } else {
     mpz_limbs_finish (r, ret);
-    if (ret != mpz_size (r)) {
+    if ((size_t) ret != mpz_size (r)) {
       fprintf (stderr, "mpn_sqrtrem wrong return value.\n");
       abort ();
     }

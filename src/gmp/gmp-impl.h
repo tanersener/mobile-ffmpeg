@@ -3,7 +3,7 @@
    THE CONTENTS OF THIS FILE ARE FOR INTERNAL USE AND ARE ALMOST CERTAIN TO
    BE SUBJECT TO INCOMPATIBLE CHANGES IN FUTURE GNU MP RELEASES.
 
-Copyright 1991, 1993-1997, 1999-2015 Free Software Foundation, Inc.
+Copyright 1991-2018 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -91,8 +91,8 @@ see https://www.gnu.org/licenses/.  */
   __GMP_DECLSPEC mp_limb_t name (mp_ptr, mp_srcptr, mp_size_t, mp_limb_t)
 #define DECL_divrem_1(name) \
   __GMP_DECLSPEC mp_limb_t name (mp_ptr, mp_size_t, mp_srcptr, mp_size_t, mp_limb_t)
-#define DECL_gcd_1(name) \
-  __GMP_DECLSPEC mp_limb_t name (mp_srcptr, mp_size_t, mp_limb_t)
+#define DECL_gcd_11(name) \
+  __GMP_DECLSPEC mp_limb_t name (mp_limb_t, mp_limb_t)
 #define DECL_lshift(name) \
   __GMP_DECLSPEC mp_limb_t name (mp_ptr, mp_srcptr, mp_size_t, unsigned)
 #define DECL_lshiftc(name) \
@@ -142,6 +142,7 @@ see https://www.gnu.org/licenses/.  */
 
 #if ! defined (__GMP_WITHIN_CONFIGURE)
 #include "config.h"
+#include "gmp.h"
 #include "gmp-mparam.h"
 #include "fib_table.h"
 #include "fac_table.h"
@@ -340,10 +341,10 @@ extern "C" {
    TMP_MARK was made, but then no TMP_ALLOCs.  */
 
 /* The alignment in bytes, used for TMP_ALLOCed blocks, when alloca or
-   __gmp_allocate_func doesn't already determine it.  Currently TMP_ALLOC
-   isn't used for "double"s, so that's not in the union.  */
+   __gmp_allocate_func doesn't already determine it.  */
 union tmp_align_t {
   mp_limb_t  l;
+  double     d;
   char       *p;
 };
 #define __TMP_ALIGN  sizeof (union tmp_align_t)
@@ -837,168 +838,255 @@ __GMP_DECLSPEC mp_limb_t mpn_addmul_8 (mp_ptr, mp_srcptr, mp_size_t, mp_srcptr);
 #define mpn_addmul_2s __MPN(addmul_2s)
 __GMP_DECLSPEC mp_limb_t mpn_addmul_2s (mp_ptr, mp_srcptr, mp_size_t, mp_srcptr);
 
-/* mpn_addlsh1_n(c,a,b,n), when it exists, sets {c,n} to {a,n}+2*{b,n}, and
-   returns the carry out (0, 1 or 2). Use _ip1 when a=c. */
-#ifndef mpn_addlsh1_n  /* if not done with cpuvec in a fat binary */
+/* Override mpn_addlsh1_n, mpn_addlsh2_n, mpn_sublsh1_n, etc with mpn_addlsh_n,
+   etc when !HAVE_NATIVE the former but HAVE_NATIVE_ the latter.  Similarly,
+   override foo_ip1 functions with foo.  We then lie and say these macros
+   represent native functions, but leave a trace by using the value 2 rather
+   than 1.  */
+
+#if HAVE_NATIVE_mpn_addlsh_n && ! HAVE_NATIVE_mpn_addlsh1_n
+#define mpn_addlsh1_n(a,b,c,d)          mpn_addlsh_n(a,b,c,d,1)
+#define HAVE_NATIVE_mpn_addlsh1_n       2
+#endif
+
+#if HAVE_NATIVE_mpn_addlsh_nc && ! HAVE_NATIVE_mpn_addlsh1_nc
+#define mpn_addlsh1_nc(a,b,c,d,x)       mpn_addlsh_nc(a,b,c,d,1,x)
+#define HAVE_NATIVE_mpn_addlsh1_nc      2
+#endif
+
+#if HAVE_NATIVE_mpn_addlsh1_n && ! HAVE_NATIVE_mpn_addlsh1_n_ip1
+#define mpn_addlsh1_n_ip1(a,b,n)        mpn_addlsh1_n(a,a,b,n)
+#define HAVE_NATIVE_mpn_addlsh1_n_ip1   2
+#endif
+
+#if HAVE_NATIVE_mpn_addlsh1_nc && ! HAVE_NATIVE_mpn_addlsh1_nc_ip1
+#define mpn_addlsh1_nc_ip1(a,b,n,c)     mpn_addlsh1_nc(a,a,b,n,c)
+#define HAVE_NATIVE_mpn_addlsh1_nc_ip1  2
+#endif
+
+#if HAVE_NATIVE_mpn_addlsh_n && ! HAVE_NATIVE_mpn_addlsh2_n
+#define mpn_addlsh2_n(a,b,c,d)          mpn_addlsh_n(a,b,c,d,2)
+#define HAVE_NATIVE_mpn_addlsh2_n       2
+#endif
+
+#if HAVE_NATIVE_mpn_addlsh_nc && ! HAVE_NATIVE_mpn_addlsh2_nc
+#define mpn_addlsh2_nc(a,b,c,d,x)       mpn_addlsh_nc(a,b,c,d,2,x)
+#define HAVE_NATIVE_mpn_addlsh2_nc      2
+#endif
+
+#if HAVE_NATIVE_mpn_addlsh2_n && ! HAVE_NATIVE_mpn_addlsh2_n_ip1
+#define mpn_addlsh2_n_ip1(a,b,n)        mpn_addlsh2_n(a,a,b,n)
+#define HAVE_NATIVE_mpn_addlsh2_n_ip1   2
+#endif
+
+#if HAVE_NATIVE_mpn_addlsh2_nc && ! HAVE_NATIVE_mpn_addlsh2_nc_ip1
+#define mpn_addlsh2_nc_ip1(a,b,n,c)     mpn_addlsh2_nc(a,a,b,n,c)
+#define HAVE_NATIVE_mpn_addlsh2_nc_ip1  2
+#endif
+
+#if HAVE_NATIVE_mpn_sublsh_n && ! HAVE_NATIVE_mpn_sublsh1_n
+#define mpn_sublsh1_n(a,b,c,d)          mpn_sublsh_n(a,b,c,d,1)
+#define HAVE_NATIVE_mpn_sublsh1_n       2
+#endif
+
+#if HAVE_NATIVE_mpn_sublsh_nc && ! HAVE_NATIVE_mpn_sublsh1_nc
+#define mpn_sublsh1_nc(a,b,c,d,x)       mpn_sublsh_nc(a,b,c,d,1,x)
+#define HAVE_NATIVE_mpn_sublsh1_nc      2
+#endif
+
+#if HAVE_NATIVE_mpn_sublsh1_n && ! HAVE_NATIVE_mpn_sublsh1_n_ip1
+#define mpn_sublsh1_n_ip1(a,b,n)        mpn_sublsh1_n(a,a,b,n)
+#define HAVE_NATIVE_mpn_sublsh1_n_ip1   2
+#endif
+
+#if HAVE_NATIVE_mpn_sublsh1_nc && ! HAVE_NATIVE_mpn_sublsh1_nc_ip1
+#define mpn_sublsh1_nc_ip1(a,b,n,c)     mpn_sublsh1_nc(a,a,b,n,c)
+#define HAVE_NATIVE_mpn_sublsh1_nc_ip1  2
+#endif
+
+#if HAVE_NATIVE_mpn_sublsh_n && ! HAVE_NATIVE_mpn_sublsh2_n
+#define mpn_sublsh2_n(a,b,c,d)          mpn_sublsh_n(a,b,c,d,2)
+#define HAVE_NATIVE_mpn_sublsh2_n       2
+#endif
+
+#if HAVE_NATIVE_mpn_sublsh_nc && ! HAVE_NATIVE_mpn_sublsh2_nc
+#define mpn_sublsh2_nc(a,b,c,d,x)       mpn_sublsh_nc(a,b,c,d,2,x)
+#define HAVE_NATIVE_mpn_sublsh2_nc      2
+#endif
+
+#if HAVE_NATIVE_mpn_sublsh2_n && ! HAVE_NATIVE_mpn_sublsh2_n_ip1
+#define mpn_sublsh2_n_ip1(a,b,n)        mpn_sublsh2_n(a,a,b,n)
+#define HAVE_NATIVE_mpn_sublsh2_n_ip1   2
+#endif
+
+#if HAVE_NATIVE_mpn_sublsh2_nc && ! HAVE_NATIVE_mpn_sublsh2_nc_ip1
+#define mpn_sublsh2_nc_ip1(a,b,n,c)     mpn_sublsh2_nc(a,a,b,n,c)
+#define HAVE_NATIVE_mpn_sublsh2_nc_ip1  2
+#endif
+
+#if HAVE_NATIVE_mpn_rsblsh_n && ! HAVE_NATIVE_mpn_rsblsh1_n
+#define mpn_rsblsh1_n(a,b,c,d)          mpn_rsblsh_n(a,b,c,d,1)
+#define HAVE_NATIVE_mpn_rsblsh1_n       2
+#endif
+
+#if HAVE_NATIVE_mpn_rsblsh_nc && ! HAVE_NATIVE_mpn_rsblsh1_nc
+#define mpn_rsblsh1_nc(a,b,c,d,x)       mpn_rsblsh_nc(a,b,c,d,1,x)
+#define HAVE_NATIVE_mpn_rsblsh1_nc      2
+#endif
+
+#if HAVE_NATIVE_mpn_rsblsh1_n && ! HAVE_NATIVE_mpn_rsblsh1_n_ip1
+#define mpn_rsblsh1_n_ip1(a,b,n)        mpn_rsblsh1_n(a,a,b,n)
+#define HAVE_NATIVE_mpn_rsblsh1_n_ip1   2
+#endif
+
+#if HAVE_NATIVE_mpn_rsblsh1_nc && ! HAVE_NATIVE_mpn_rsblsh1_nc_ip1
+#define mpn_rsblsh1_nc_ip1(a,b,n,c)     mpn_rsblsh1_nc(a,a,b,n,c)
+#define HAVE_NATIVE_mpn_rsblsh1_nc_ip1  2
+#endif
+
+#if HAVE_NATIVE_mpn_rsblsh_n && ! HAVE_NATIVE_mpn_rsblsh2_n
+#define mpn_rsblsh2_n(a,b,c,d)          mpn_rsblsh_n(a,b,c,d,2)
+#define HAVE_NATIVE_mpn_rsblsh2_n       2
+#endif
+
+#if HAVE_NATIVE_mpn_rsblsh_nc && ! HAVE_NATIVE_mpn_rsblsh2_nc
+#define mpn_rsblsh2_nc(a,b,c,d,x)       mpn_rsblsh_nc(a,b,c,d,2,x)
+#define HAVE_NATIVE_mpn_rsblsh2_nc      2
+#endif
+
+#if HAVE_NATIVE_mpn_rsblsh2_n && ! HAVE_NATIVE_mpn_rsblsh2_n_ip1
+#define mpn_rsblsh2_n_ip1(a,b,n)        mpn_rsblsh2_n(a,a,b,n)
+#define HAVE_NATIVE_mpn_rsblsh2_n_ip1   2
+#endif
+
+#if HAVE_NATIVE_mpn_rsblsh2_nc && ! HAVE_NATIVE_mpn_rsblsh2_nc_ip1
+#define mpn_rsblsh2_nc_ip1(a,b,n,c)     mpn_rsblsh2_nc(a,a,b,n,c)
+#define HAVE_NATIVE_mpn_rsblsh2_nc_ip1  2
+#endif
+
+
+#ifndef mpn_addlsh1_n
 #define mpn_addlsh1_n __MPN(addlsh1_n)
 __GMP_DECLSPEC mp_limb_t mpn_addlsh1_n (mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
 #endif
+#ifndef mpn_addlsh1_nc
 #define mpn_addlsh1_nc __MPN(addlsh1_nc)
 __GMP_DECLSPEC mp_limb_t mpn_addlsh1_nc (mp_ptr, mp_srcptr, mp_srcptr, mp_size_t, mp_limb_t);
-#if HAVE_NATIVE_mpn_addlsh1_n && ! HAVE_NATIVE_mpn_addlsh1_n_ip1
-#define mpn_addlsh1_n_ip1(dst,src,n) mpn_addlsh1_n(dst,dst,src,n)
-#define HAVE_NATIVE_mpn_addlsh1_n_ip1 1
-#else
+#endif
+#ifndef mpn_addlsh1_n_ip1
 #define mpn_addlsh1_n_ip1 __MPN(addlsh1_n_ip1)
 __GMP_DECLSPEC mp_limb_t mpn_addlsh1_n_ip1 (mp_ptr, mp_srcptr, mp_size_t);
 #endif
-#if HAVE_NATIVE_mpn_addlsh1_nc && ! HAVE_NATIVE_mpn_addlsh1_nc_ip1
-#define mpn_addlsh1_nc_ip1(dst,src,n,c) mpn_addlsh1_nc(dst,dst,src,n,c)
-#define HAVE_NATIVE_mpn_addlsh1_nc_ip1 1
-#else
+#ifndef mpn_addlsh1_nc_ip1
 #define mpn_addlsh1_nc_ip1 __MPN(addlsh1_nc_ip1)
 __GMP_DECLSPEC mp_limb_t mpn_addlsh1_nc_ip1 (mp_ptr, mp_srcptr, mp_size_t, mp_limb_t);
 #endif
 
-#ifndef mpn_addlsh2_n  /* if not done with cpuvec in a fat binary */
-/* mpn_addlsh2_n(c,a,b,n), when it exists, sets {c,n} to {a,n}+4*{b,n}, and
-   returns the carry out (0, ..., 4). Use _ip1 when a=c. */
+#ifndef mpn_addlsh2_n
 #define mpn_addlsh2_n __MPN(addlsh2_n)
 __GMP_DECLSPEC mp_limb_t mpn_addlsh2_n (mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
 #endif
+#ifndef mpn_addlsh2_nc
 #define mpn_addlsh2_nc __MPN(addlsh2_nc)
 __GMP_DECLSPEC mp_limb_t mpn_addlsh2_nc (mp_ptr, mp_srcptr, mp_srcptr, mp_size_t, mp_limb_t);
-#if HAVE_NATIVE_mpn_addlsh2_n && ! HAVE_NATIVE_mpn_addlsh2_n_ip1
-#define mpn_addlsh2_n_ip1(dst,src,n) mpn_addlsh2_n(dst,dst,src,n)
-#define HAVE_NATIVE_mpn_addlsh2_n_ip1 1
-#else
+#endif
+#ifndef mpn_addlsh2_n_ip1
 #define mpn_addlsh2_n_ip1 __MPN(addlsh2_n_ip1)
 __GMP_DECLSPEC mp_limb_t mpn_addlsh2_n_ip1 (mp_ptr, mp_srcptr, mp_size_t);
 #endif
-#if HAVE_NATIVE_mpn_addlsh2_nc && ! HAVE_NATIVE_mpn_addlsh2_nc_ip1
-#define mpn_addlsh2_nc_ip1(dst,src,n,c) mpn_addlsh2_nc(dst,dst,src,n,c)
-#define HAVE_NATIVE_mpn_addlsh2_nc_ip1 1
-#else
+#ifndef mpn_addlsh2_nc_ip1
 #define mpn_addlsh2_nc_ip1 __MPN(addlsh2_nc_ip1)
 __GMP_DECLSPEC mp_limb_t mpn_addlsh2_nc_ip1 (mp_ptr, mp_srcptr, mp_size_t, mp_limb_t);
 #endif
 
-/* mpn_addlsh_n(c,a,b,n,k), when it exists, sets {c,n} to {a,n}+2^k*{b,n}, and
-   returns the carry out (0, ..., 2^k). Use _ip1 when a=c. */
+#ifndef mpn_addlsh_n
 #define mpn_addlsh_n __MPN(addlsh_n)
 __GMP_DECLSPEC mp_limb_t mpn_addlsh_n (mp_ptr, mp_srcptr, mp_srcptr, mp_size_t, unsigned int);
+#endif
+#ifndef mpn_addlsh_nc
 #define mpn_addlsh_nc __MPN(addlsh_nc)
 __GMP_DECLSPEC mp_limb_t mpn_addlsh_nc (mp_ptr, mp_srcptr, mp_srcptr, mp_size_t, unsigned int, mp_limb_t);
-#if HAVE_NATIVE_mpn_addlsh_n && ! HAVE_NATIVE_mpn_addlsh_n_ip1
-#define mpn_addlsh_n_ip1(dst,src,n,s) mpn_addlsh_n(dst,dst,src,n,s)
-#define HAVE_NATIVE_mpn_addlsh_n_ip1 1
-#else
+#endif
+#ifndef mpn_addlsh_n_ip1
 #define mpn_addlsh_n_ip1 __MPN(addlsh_n_ip1)
   __GMP_DECLSPEC mp_limb_t mpn_addlsh_n_ip1 (mp_ptr, mp_srcptr, mp_size_t, unsigned int);
 #endif
-#if HAVE_NATIVE_mpn_addlsh_nc && ! HAVE_NATIVE_mpn_addlsh_nc_ip1
-#define mpn_addlsh_nc_ip1(dst,src,n,s,c) mpn_addlsh_nc(dst,dst,src,n,s,c)
-#define HAVE_NATIVE_mpn_addlsh_nc_ip1 1
-#else
+#ifndef mpn_addlsh_nc_ip1
 #define mpn_addlsh_nc_ip1 __MPN(addlsh_nc_ip1)
 __GMP_DECLSPEC mp_limb_t mpn_addlsh_nc_ip1 (mp_ptr, mp_srcptr, mp_size_t, unsigned int, mp_limb_t);
 #endif
 
-#ifndef mpn_sublsh1_n  /* if not done with cpuvec in a fat binary */
-/* mpn_sublsh1_n(c,a,b,n), when it exists, sets {c,n} to {a,n}-2*{b,n}, and
-   returns the borrow out (0, 1 or 2). Use _ip1 when a=c. */
+#ifndef mpn_sublsh1_n
 #define mpn_sublsh1_n __MPN(sublsh1_n)
 __GMP_DECLSPEC mp_limb_t mpn_sublsh1_n (mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
 #endif
+#ifndef mpn_sublsh1_nc
 #define mpn_sublsh1_nc __MPN(sublsh1_nc)
 __GMP_DECLSPEC mp_limb_t mpn_sublsh1_nc (mp_ptr, mp_srcptr, mp_srcptr, mp_size_t, mp_limb_t);
-#if HAVE_NATIVE_mpn_sublsh1_n && ! HAVE_NATIVE_mpn_sublsh1_n_ip1
-#define mpn_sublsh1_n_ip1(dst,src,n) mpn_sublsh1_n(dst,dst,src,n)
-#define HAVE_NATIVE_mpn_sublsh1_n_ip1 1
-#else
+#endif
+#ifndef mpn_sublsh1_n_ip1
 #define mpn_sublsh1_n_ip1 __MPN(sublsh1_n_ip1)
 __GMP_DECLSPEC mp_limb_t mpn_sublsh1_n_ip1 (mp_ptr, mp_srcptr, mp_size_t);
 #endif
-#if HAVE_NATIVE_mpn_sublsh1_nc && ! HAVE_NATIVE_mpn_sublsh1_nc_ip1
-#define mpn_sublsh1_nc_ip1(dst,src,n,c) mpn_sublsh1_nc(dst,dst,src,n,c)
-#define HAVE_NATIVE_mpn_sublsh1_nc_ip1 1
-#else
+#ifndef mpn_sublsh1_nc_ip1
 #define mpn_sublsh1_nc_ip1 __MPN(sublsh1_nc_ip1)
 __GMP_DECLSPEC mp_limb_t mpn_sublsh1_nc_ip1 (mp_ptr, mp_srcptr, mp_size_t, mp_limb_t);
 #endif
 
-/* mpn_rsblsh1_n(c,a,b,n), when it exists, sets {c,n} to 2*{b,n}-{a,n}, and
-   returns the carry out (-1, 0, 1).  */
+#ifndef mpn_sublsh2_n
+#define mpn_sublsh2_n __MPN(sublsh2_n)
+__GMP_DECLSPEC mp_limb_t mpn_sublsh2_n (mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
+#endif
+#ifndef mpn_sublsh2_nc
+#define mpn_sublsh2_nc __MPN(sublsh2_nc)
+__GMP_DECLSPEC mp_limb_t mpn_sublsh2_nc (mp_ptr, mp_srcptr, mp_srcptr, mp_size_t, mp_limb_t);
+#endif
+#ifndef mpn_sublsh2_n_ip1
+#define mpn_sublsh2_n_ip1 __MPN(sublsh2_n_ip1)
+__GMP_DECLSPEC mp_limb_t mpn_sublsh2_n_ip1 (mp_ptr, mp_srcptr, mp_size_t);
+#endif
+#ifndef mpn_sublsh2_nc_ip1
+#define mpn_sublsh2_nc_ip1 __MPN(sublsh2_nc_ip1)
+__GMP_DECLSPEC mp_limb_t mpn_sublsh2_nc_ip1 (mp_ptr, mp_srcptr, mp_size_t, mp_limb_t);
+#endif
+
+#ifndef mpn_sublsh_n
+#define mpn_sublsh_n __MPN(sublsh_n)
+__GMP_DECLSPEC mp_limb_t mpn_sublsh_n (mp_ptr, mp_srcptr, mp_srcptr, mp_size_t, unsigned int);
+#endif
+#ifndef mpn_sublsh_nc
+#define mpn_sublsh_nc __MPN(sublsh_nc)
+__GMP_DECLSPEC mp_limb_t mpn_sublsh_nc (mp_ptr, mp_srcptr, mp_srcptr, mp_size_t, unsigned int, mp_limb_t);
+#endif
+#ifndef mpn_sublsh_n_ip1
+#define mpn_sublsh_n_ip1 __MPN(sublsh_n_ip1)
+  __GMP_DECLSPEC mp_limb_t mpn_sublsh_n_ip1 (mp_ptr, mp_srcptr, mp_size_t, unsigned int);
+#endif
+#ifndef mpn_sublsh_nc_ip1
+#define mpn_sublsh_nc_ip1 __MPN(sublsh_nc_ip1)
+__GMP_DECLSPEC mp_limb_t mpn_sublsh_nc_ip1 (mp_ptr, mp_srcptr, mp_size_t, unsigned int, mp_limb_t);
+#endif
+
 #define mpn_rsblsh1_n __MPN(rsblsh1_n)
 __GMP_DECLSPEC mp_limb_signed_t mpn_rsblsh1_n (mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
 #define mpn_rsblsh1_nc __MPN(rsblsh1_nc)
 __GMP_DECLSPEC mp_limb_signed_t mpn_rsblsh1_nc (mp_ptr, mp_srcptr, mp_srcptr, mp_size_t, mp_limb_t);
 
-/* mpn_sublsh2_n(c,a,b,n), when it exists, sets {c,n} to {a,n}-4*{b,n}, and
-   returns the borrow out (0, ..., 4). Use _ip1 when a=c. */
-#define mpn_sublsh2_n __MPN(sublsh2_n)
-__GMP_DECLSPEC mp_limb_t mpn_sublsh2_n (mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
-#define mpn_sublsh2_nc __MPN(sublsh2_nc)
-__GMP_DECLSPEC mp_limb_t mpn_sublsh2_nc (mp_ptr, mp_srcptr, mp_srcptr, mp_size_t, mp_limb_t);
-#if HAVE_NATIVE_mpn_sublsh2_n && ! HAVE_NATIVE_mpn_sublsh2_n_ip1
-#define mpn_sublsh2_n_ip1(dst,src,n) mpn_sublsh2_n(dst,dst,src,n)
-#define HAVE_NATIVE_mpn_sublsh2_n_ip1 1
-#else
-#define mpn_sublsh2_n_ip1 __MPN(sublsh2_n_ip1)
-__GMP_DECLSPEC mp_limb_t mpn_sublsh2_n_ip1 (mp_ptr, mp_srcptr, mp_size_t);
-#endif
-#if HAVE_NATIVE_mpn_sublsh2_nc && ! HAVE_NATIVE_mpn_sublsh2_nc_ip1
-#define mpn_sublsh2_nc_ip1(dst,src,n,c) mpn_sublsh2_nc(dst,dst,src,n,c)
-#define HAVE_NATIVE_mpn_sublsh2_nc_ip1 1
-#else
-#define mpn_sublsh2_nc_ip1 __MPN(sublsh2_nc_ip1)
-__GMP_DECLSPEC mp_limb_t mpn_sublsh2_nc_ip1 (mp_ptr, mp_srcptr, mp_size_t, mp_limb_t);
-#endif
-
-/* mpn_sublsh_n(c,a,b,n,k), when it exists, sets {c,n} to {a,n}-2^k*{b,n}, and
-   returns the carry out (0, ..., 2^k). Use _ip1 when a=c. */
-#define mpn_sublsh_n __MPN(sublsh_n)
-__GMP_DECLSPEC mp_limb_t mpn_sublsh_n (mp_ptr, mp_srcptr, mp_srcptr, mp_size_t, unsigned int);
-#if HAVE_NATIVE_mpn_sublsh_n && ! HAVE_NATIVE_mpn_sublsh_n_ip1
-#define mpn_sublsh_n_ip1(dst,src,n,s) mpn_sublsh_n(dst,dst,src,n,s)
-#define HAVE_NATIVE_mpn_sublsh_n_ip1 1
-#else
-#define mpn_sublsh_n_ip1 __MPN(sublsh_n_ip1)
-__GMP_DECLSPEC mp_limb_t mpn_sublsh_n_ip1 (mp_ptr, mp_srcptr, mp_size_t, unsigned int);
-#endif
-#if HAVE_NATIVE_mpn_sublsh_nc && ! HAVE_NATIVE_mpn_sublsh_nc_ip1
-#define mpn_sublsh_nc_ip1(dst,src,n,s,c) mpn_sublsh_nc(dst,dst,src,n,s,c)
-#define HAVE_NATIVE_mpn_sublsh_nc_ip1 1
-#else
-#define mpn_sublsh_nc_ip1 __MPN(sublsh_nc_ip1)
-__GMP_DECLSPEC mp_limb_t mpn_sublsh_nc_ip1 (mp_ptr, mp_srcptr, mp_size_t, unsigned int, mp_limb_t);
-#endif
-
-/* mpn_rsblsh2_n(c,a,b,n), when it exists, sets {c,n} to 4*{b,n}-{a,n}, and
-   returns the carry out (-1, ..., 3).  */
 #define mpn_rsblsh2_n __MPN(rsblsh2_n)
 __GMP_DECLSPEC mp_limb_signed_t mpn_rsblsh2_n (mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
 #define mpn_rsblsh2_nc __MPN(rsblsh2_nc)
 __GMP_DECLSPEC mp_limb_signed_t mpn_rsblsh2_nc (mp_ptr, mp_srcptr, mp_srcptr, mp_size_t, mp_limb_t);
 
-/* mpn_rsblsh_n(c,a,b,n,k), when it exists, sets {c,n} to 2^k*{b,n}-{a,n}, and
-   returns the carry out (-1, 0, ..., 2^k-1).  */
 #define mpn_rsblsh_n __MPN(rsblsh_n)
 __GMP_DECLSPEC mp_limb_signed_t mpn_rsblsh_n (mp_ptr, mp_srcptr, mp_srcptr, mp_size_t, unsigned int);
 #define mpn_rsblsh_nc __MPN(rsblsh_nc)
 __GMP_DECLSPEC mp_limb_signed_t mpn_rsblsh_nc (mp_ptr, mp_srcptr, mp_srcptr, mp_size_t, unsigned int, mp_limb_t);
 
-/* mpn_rsh1add_n(c,a,b,n), when it exists, sets {c,n} to ({a,n} + {b,n}) >> 1,
-   and returns the bit rshifted out (0 or 1).  */
 #define mpn_rsh1add_n __MPN(rsh1add_n)
 __GMP_DECLSPEC mp_limb_t mpn_rsh1add_n (mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
 #define mpn_rsh1add_nc __MPN(rsh1add_nc)
 __GMP_DECLSPEC mp_limb_t mpn_rsh1add_nc (mp_ptr, mp_srcptr, mp_srcptr, mp_size_t, mp_limb_t);
 
-/* mpn_rsh1sub_n(c,a,b,n), when it exists, sets {c,n} to ({a,n} - {b,n}) >> 1,
-   and returns the bit rshifted out (0 or 1).  If there's a borrow from the
-   subtract, it's stored as a 1 in the high bit of c[n-1], like a twos
-   complement negative.  */
 #define mpn_rsh1sub_n __MPN(rsh1sub_n)
 __GMP_DECLSPEC mp_limb_t mpn_rsh1sub_n (mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
 #define mpn_rsh1sub_nc __MPN(rsh1sub_nc)
@@ -1044,6 +1132,12 @@ __GMP_DECLSPEC void mpn_dump (mp_srcptr, mp_size_t);
 
 #define mpn_fib2_ui __MPN(fib2_ui)
 __GMP_DECLSPEC mp_size_t mpn_fib2_ui (mp_ptr, mp_ptr, unsigned long);
+
+#define mpn_fib2m __MPN(fib2m)
+__GMP_DECLSPEC int mpn_fib2m (mp_ptr, mp_ptr, mp_srcptr, mp_size_t, mp_srcptr, mp_size_t);
+
+#define mpn_strongfibo __MPN(strongfibo)
+__GMP_DECLSPEC int mpn_strongfibo (mp_srcptr, mp_size_t, mp_ptr);
 
 /* Remap names of internal mpn functions.  */
 #define __clz_tab               __MPN(clz_tab)
@@ -1446,15 +1540,11 @@ __GMP_DECLSPEC mp_limb_t mpn_dcpi1_div_q (mp_ptr, mp_ptr, mp_size_t, mp_srcptr, 
 
 #define   mpn_dcpi1_divappr_q __MPN(dcpi1_divappr_q)
 __GMP_DECLSPEC mp_limb_t mpn_dcpi1_divappr_q (mp_ptr, mp_ptr, mp_size_t, mp_srcptr, mp_size_t, gmp_pi1_t *);
-#define   mpn_dcpi1_divappr_q_n __MPN(dcpi1_divappr_q_n)
-__GMP_DECLSPEC mp_limb_t mpn_dcpi1_divappr_q_n (mp_ptr, mp_ptr, mp_srcptr, mp_size_t, gmp_pi1_t *, mp_ptr);
 
 #define   mpn_mu_div_qr __MPN(mu_div_qr)
 __GMP_DECLSPEC mp_limb_t mpn_mu_div_qr (mp_ptr, mp_ptr, mp_srcptr, mp_size_t, mp_srcptr, mp_size_t, mp_ptr);
 #define   mpn_mu_div_qr_itch __MPN(mu_div_qr_itch)
 __GMP_DECLSPEC mp_size_t mpn_mu_div_qr_itch (mp_size_t, mp_size_t, int) ATTRIBUTE_CONST;
-#define   mpn_mu_div_qr_choose_in __MPN(mu_div_qr_choose_in)
-__GMP_DECLSPEC mp_size_t mpn_mu_div_qr_choose_in (mp_size_t, mp_size_t, int);
 
 #define   mpn_preinv_mu_div_qr __MPN(preinv_mu_div_qr)
 __GMP_DECLSPEC mp_limb_t mpn_preinv_mu_div_qr (mp_ptr, mp_ptr, mp_srcptr, mp_size_t, mp_srcptr, mp_size_t, mp_srcptr, mp_size_t, mp_ptr);
@@ -1465,11 +1555,6 @@ __GMP_DECLSPEC mp_size_t mpn_preinv_mu_div_qr_itch (mp_size_t, mp_size_t, mp_siz
 __GMP_DECLSPEC mp_limb_t mpn_mu_divappr_q (mp_ptr, mp_srcptr, mp_size_t, mp_srcptr, mp_size_t, mp_ptr);
 #define   mpn_mu_divappr_q_itch __MPN(mu_divappr_q_itch)
 __GMP_DECLSPEC mp_size_t mpn_mu_divappr_q_itch (mp_size_t, mp_size_t, int) ATTRIBUTE_CONST;
-#define   mpn_mu_divappr_q_choose_in __MPN(mu_divappr_q_choose_in)
-__GMP_DECLSPEC mp_size_t mpn_mu_divappr_q_choose_in (mp_size_t, mp_size_t, int);
-
-#define   mpn_preinv_mu_divappr_q __MPN(preinv_mu_divappr_q)
-__GMP_DECLSPEC mp_limb_t mpn_preinv_mu_divappr_q (mp_ptr, mp_srcptr, mp_size_t, mp_srcptr, mp_size_t, mp_srcptr, mp_size_t, mp_ptr);
 
 #define   mpn_mu_div_q __MPN(mu_div_q)
 __GMP_DECLSPEC mp_limb_t mpn_mu_div_q (mp_ptr, mp_srcptr, mp_size_t, mp_srcptr, mp_size_t, mp_ptr);
@@ -1506,6 +1591,9 @@ __GMP_DECLSPEC mp_limb_t mpn_sbpi1_bdiv_qr (mp_ptr, mp_ptr, mp_size_t, mp_srcptr
 #define   mpn_sbpi1_bdiv_q __MPN(sbpi1_bdiv_q)
 __GMP_DECLSPEC void      mpn_sbpi1_bdiv_q (mp_ptr, mp_ptr, mp_size_t, mp_srcptr, mp_size_t, mp_limb_t);
 
+#define   mpn_sbpi1_bdiv_r __MPN(sbpi1_bdiv_r)
+__GMP_DECLSPEC mp_limb_t mpn_sbpi1_bdiv_r (mp_ptr, mp_size_t, mp_srcptr, mp_size_t, mp_limb_t);
+
 #define   mpn_dcpi1_bdiv_qr __MPN(dcpi1_bdiv_qr)
 __GMP_DECLSPEC mp_limb_t mpn_dcpi1_bdiv_qr (mp_ptr, mp_ptr, mp_size_t, mp_srcptr, mp_size_t, mp_limb_t);
 #define   mpn_dcpi1_bdiv_qr_n_itch __MPN(dcpi1_bdiv_qr_n_itch)
@@ -1515,11 +1603,6 @@ __GMP_DECLSPEC mp_size_t mpn_dcpi1_bdiv_qr_n_itch (mp_size_t) ATTRIBUTE_CONST;
 __GMP_DECLSPEC mp_limb_t mpn_dcpi1_bdiv_qr_n (mp_ptr, mp_ptr, mp_srcptr, mp_size_t, mp_limb_t, mp_ptr);
 #define   mpn_dcpi1_bdiv_q __MPN(dcpi1_bdiv_q)
 __GMP_DECLSPEC void      mpn_dcpi1_bdiv_q (mp_ptr, mp_ptr, mp_size_t, mp_srcptr, mp_size_t, mp_limb_t);
-
-#define   mpn_dcpi1_bdiv_q_n __MPN(dcpi1_bdiv_q_n)
-__GMP_DECLSPEC void      mpn_dcpi1_bdiv_q_n (mp_ptr, mp_ptr, mp_srcptr, mp_size_t, mp_limb_t, mp_ptr);
-#define   mpn_dcpi1_bdiv_q_n_itch __MPN(dcpi1_bdiv_q_n_itch)
-__GMP_DECLSPEC mp_size_t mpn_dcpi1_bdiv_q_n_itch (mp_size_t) ATTRIBUTE_CONST;
 
 #define   mpn_mu_bdiv_qr __MPN(mu_bdiv_qr)
 __GMP_DECLSPEC mp_limb_t mpn_mu_bdiv_qr (mp_ptr, mp_ptr, mp_srcptr, mp_size_t, mp_srcptr, mp_size_t, mp_ptr);
@@ -1563,48 +1646,6 @@ __GMP_DECLSPEC void      mpn_powlo (mp_ptr, mp_srcptr, mp_srcptr, mp_size_t, mp_
 __GMP_DECLSPEC mp_limb_t mpn_sec_pi1_div_qr (mp_ptr, mp_ptr, mp_size_t, mp_srcptr, mp_size_t, mp_limb_t, mp_ptr);
 #define mpn_sec_pi1_div_r __MPN(sec_pi1_div_r)
 __GMP_DECLSPEC void mpn_sec_pi1_div_r (mp_ptr, mp_size_t, mp_srcptr, mp_size_t, mp_limb_t, mp_ptr);
-
-
-/* Override mpn_addlsh1_n, mpn_addlsh2_n, mpn_sublsh1_n, etc with mpn_addlsh_n,
-   etc when !HAVE_NATIVE the former but HAVE_NATIVE_ the latter.  We then lie
-   and say these macros represent native functions, but leave a trace by using
-   the value 2 rather than 1.  */
-
-#if HAVE_NATIVE_mpn_addlsh_n && ! HAVE_NATIVE_mpn_addlsh1_n
-#undef mpn_addlsh1_n
-#define mpn_addlsh1_n(a,b,c,d) mpn_addlsh_n(a,b,c,d,1)
-#define HAVE_NATIVE_mpn_addlsh1_n 2
-#endif
-
-#if HAVE_NATIVE_mpn_addlsh_n && ! HAVE_NATIVE_mpn_addlsh2_n
-#undef mpn_addlsh2_n
-#define mpn_addlsh2_n(a,b,c,d) mpn_addlsh_n(a,b,c,d,2)
-#define HAVE_NATIVE_mpn_addlsh2_n 2
-#endif
-
-#if HAVE_NATIVE_mpn_sublsh_n && ! HAVE_NATIVE_mpn_sublsh1_n
-#undef mpn_sublsh1_n
-#define mpn_sublsh1_n(a,b,c,d) mpn_sublsh_n(a,b,c,d,1)
-#define HAVE_NATIVE_mpn_sublsh1_n 2
-#endif
-
-#if HAVE_NATIVE_mpn_sublsh_n && ! HAVE_NATIVE_mpn_sublsh2_n
-#undef mpn_sublsh2_n
-#define mpn_sublsh2_n(a,b,c,d) mpn_sublsh_n(a,b,c,d,2)
-#define HAVE_NATIVE_mpn_sublsh2_n 2
-#endif
-
-#if HAVE_NATIVE_mpn_rsblsh_n && ! HAVE_NATIVE_mpn_rsblsh1_n
-#undef mpn_rsblsh1_n
-#define mpn_rsblsh1_n(a,b,c,d) mpn_rsblsh_n(a,b,c,d,1)
-#define HAVE_NATIVE_mpn_rsblsh1_n 2
-#endif
-
-#if HAVE_NATIVE_mpn_rsblsh_n && ! HAVE_NATIVE_mpn_rsblsh2_n
-#undef mpn_rsblsh2_n
-#define mpn_rsblsh2_n(a,b,c,d) mpn_rsblsh_n(a,b,c,d,2)
-#define HAVE_NATIVE_mpn_rsblsh2_n 2
-#endif
 
 
 #ifndef DIVEXACT_BY3_METHOD
@@ -1665,6 +1706,12 @@ __GMP_DECLSPEC mp_size_t mpz_prodlimbs (mpz_ptr, mp_ptr, mp_size_t);
 
 #define mpz_oddfac_1  __gmpz_oddfac_1
 __GMP_DECLSPEC void mpz_oddfac_1 (mpz_ptr, mp_limb_t, unsigned);
+
+#define mpz_stronglucas  __gmpz_stronglucas
+__GMP_DECLSPEC int mpz_stronglucas (mpz_srcptr, mpz_ptr, mpz_ptr);
+
+#define mpz_lucas_mod  __gmpz_lucas_mod
+__GMP_DECLSPEC int mpz_lucas_mod (mpz_ptr, mpz_ptr, long, mp_bitcnt_t, mpz_srcptr, mpz_ptr, mpz_ptr);
 
 #define mpz_inp_str_nowhite __gmpz_inp_str_nowhite
 #ifdef _GMP_H_HAVE_FILE
@@ -3662,9 +3709,9 @@ __GMP_DECLSPEC extern const unsigned char  binvert_limb_table[128];
     mp_limb_t  __x = (input);						\
     __x -= (__x >> 1) & MP_LIMB_T_MAX/3;				\
     __x = ((__x >> 2) & MP_LIMB_T_MAX/5) + (__x & MP_LIMB_T_MAX/5);	\
-    __x = ((__x >> 4) + __x) & MP_LIMB_T_MAX/17;			\
-    __x = ((__x >> 8) + __x);						\
-    (result) = __x & 0xff;						\
+    __x += (__x >> 4);							\
+    __x = ((__x >> 8) & MP_LIMB_T_MAX/4369)+(__x & MP_LIMB_T_MAX/4369);	\
+    (result) = __x;							\
   } while (0)
 #endif
 
@@ -3921,6 +3968,14 @@ __GMP_DECLSPEC void __gmp_invalid_operation (void) ATTRIBUTE_NORETURN;
 #define PP_FIRST_OMITTED 3
 #endif
 
+typedef struct
+{
+  mp_limb_t d0, d1;
+} mp_double_limb_t;
+
+#define mpn_gcd_22 __MPN (gcd_22)
+__GMP_DECLSPEC mp_double_limb_t mpn_gcd_22 (mp_limb_t, mp_limb_t, mp_limb_t, mp_limb_t);
+
 /* BIT1 means a result value in bit 1 (second least significant bit), with a
    zero bit representing +1 and a one bit representing -1.  Bits other than
    bit 1 are garbage.  These are meant to be kept in "int"s, and casts are
@@ -4135,8 +4190,6 @@ mpn_jacobi_update (unsigned bits, unsigned denominator, unsigned q)
 /* Matrix multiplication */
 #define   mpn_matrix22_mul __MPN(matrix22_mul)
 __GMP_DECLSPEC void      mpn_matrix22_mul (mp_ptr, mp_ptr, mp_ptr, mp_ptr, mp_size_t, mp_srcptr, mp_srcptr, mp_srcptr, mp_srcptr, mp_size_t, mp_ptr);
-#define   mpn_matrix22_mul_strassen __MPN(matrix22_mul_strassen)
-__GMP_DECLSPEC void      mpn_matrix22_mul_strassen (mp_ptr, mp_ptr, mp_ptr, mp_ptr, mp_size_t, mp_srcptr, mp_srcptr, mp_srcptr, mp_srcptr, mp_size_t, mp_ptr);
 #define   mpn_matrix22_mul_itch __MPN(matrix22_mul_itch)
 __GMP_DECLSPEC mp_size_t mpn_matrix22_mul_itch (mp_size_t, mp_size_t) ATTRIBUTE_CONST;
 
@@ -4297,17 +4350,16 @@ struct powers
   int base;
 };
 typedef struct powers powers_t;
-#define mpn_dc_set_str_powtab_alloc(n) ((n) + GMP_LIMB_BITS)
+#define mpn_str_powtab_alloc(n) ((n) + 2 * GMP_LIMB_BITS) /* FIXME: This can perhaps be trimmed */
 #define mpn_dc_set_str_itch(n) ((n) + GMP_LIMB_BITS)
-#define mpn_dc_get_str_powtab_alloc(n) ((n) + 2 * GMP_LIMB_BITS)
 #define mpn_dc_get_str_itch(n) ((n) + GMP_LIMB_BITS)
 
+#define mpn_compute_powtab __MPN(compute_powtab)
+__GMP_DECLSPEC size_t mpn_compute_powtab (powers_t *, mp_ptr, mp_size_t, int);
 #define   mpn_dc_set_str __MPN(dc_set_str)
 __GMP_DECLSPEC mp_size_t mpn_dc_set_str (mp_ptr, const unsigned char *, size_t, const powers_t *, mp_ptr);
 #define   mpn_bc_set_str __MPN(bc_set_str)
 __GMP_DECLSPEC mp_size_t mpn_bc_set_str (mp_ptr, const unsigned char *, size_t, int);
-#define   mpn_set_str_compute_powtab __MPN(set_str_compute_powtab)
-__GMP_DECLSPEC void      mpn_set_str_compute_powtab (powers_t *, mp_ptr, mp_size_t, int);
 
 
 /* __GMPF_BITS_TO_PREC applies a minimum 53 bits, rounds upwards to a whole
@@ -4615,7 +4667,7 @@ struct cpuvec_t {
   DECL_copyi           ((*copyi));
   DECL_divexact_1      ((*divexact_1));
   DECL_divrem_1        ((*divrem_1));
-  DECL_gcd_1           ((*gcd_1));
+  DECL_gcd_11          ((*gcd_11));
   DECL_lshift          ((*lshift));
   DECL_lshiftc         ((*lshiftc));
   DECL_mod_1           ((*mod_1));
@@ -4896,6 +4948,10 @@ extern mp_size_t			redc_1_to_redc_n_threshold;
 #undef	MATRIX22_STRASSEN_THRESHOLD
 #define MATRIX22_STRASSEN_THRESHOLD	matrix22_strassen_threshold
 extern mp_size_t			matrix22_strassen_threshold;
+
+typedef int hgcd2_func_t (mp_limb_t, mp_limb_t, mp_limb_t, mp_limb_t,
+			  struct hgcd_matrix1 *);
+extern hgcd2_func_t *hgcd2_func;
 
 #undef	HGCD_THRESHOLD
 #define HGCD_THRESHOLD			hgcd_threshold

@@ -1,6 +1,6 @@
 /* Miscellaneous test program support routines.
 
-Copyright 2000-2003, 2005, 2013 Free Software Foundation, Inc.
+Copyright 2000-2003, 2005, 2013, 2015, 2019 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library test suite.
 
@@ -40,7 +40,6 @@ the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
 # endif
 #endif
 
-#include "gmp.h"
 #include "gmp-impl.h"
 #include "tests.h"
 
@@ -77,13 +76,42 @@ tests_end (void)
   tests_memory_end ();
 }
 
+static void
+seed_from_tod (gmp_randstate_ptr  rands)
+{
+  unsigned long seed;
+#if HAVE_GETTIMEOFDAY
+  struct timeval  tv;
+  gettimeofday (&tv, NULL);
+  seed = tv.tv_sec ^ ((unsigned long) tv.tv_usec << 12);
+  seed &= 0xffffffff;
+#else
+  time_t  tv;
+  time (&tv);
+  seed = tv;
+#endif
+  gmp_randseed_ui (rands, seed);
+  printf ("Seed GMP_CHECK_RANDOMIZE=%lu (include this in bug reports)\n", seed);
+}
+
+static void
+seed_from_urandom (gmp_randstate_ptr rands, FILE *fs)
+{
+  mpz_t seed;
+  unsigned char buf[6];
+  fread (buf, 1, 6, fs);
+  mpz_init (seed);
+  mpz_import (seed, 6, 1, 1, 0, 0, buf);
+  gmp_randseed (rands, seed);
+  gmp_printf ("Seed GMP_CHECK_RANDOMIZE=%Zd (include this in bug reports)\n", seed);
+  mpz_clear (seed);
+}
 
 void
 tests_rand_start (void)
 {
   gmp_randstate_ptr  rands;
-  char           *perform_seed;
-  unsigned long  seed;
+  char           *seed_string;
 
   if (__gmp_rands_initialized)
     {
@@ -96,35 +124,28 @@ tests_rand_start (void)
   __gmp_rands_initialized = 1;
   rands = __gmp_rands;
 
-  perform_seed = getenv ("GMP_CHECK_RANDOMIZE");
-  if (perform_seed != NULL)
+  seed_string = getenv ("GMP_CHECK_RANDOMIZE");
+  if (seed_string != NULL)
     {
-#ifdef HAVE_STRTOUL
-      seed = strtoul (perform_seed, 0, 0);
-#else
-      /* This will not work right for seeds >= 2^31 on 64-bit machines.
-	 Perhaps use atol unconditionally?  Is that ubiquitous?  */
-      seed = atoi (perform_seed);
-#endif
-      if (! (seed == 0 || seed == 1))
+      if (strcmp (seed_string, "0") != 0 &&
+	  strcmp (seed_string, "1") != 0)
         {
-          printf ("Re-seeding with GMP_CHECK_RANDOMIZE=%lu\n", seed);
-          gmp_randseed_ui (rands, seed);
+	  mpz_t seed;
+	  mpz_init_set_str (seed, seed_string, 0);
+          gmp_printf ("Re-seeding with GMP_CHECK_RANDOMIZE=%Zd\n", seed);
+          gmp_randseed (rands, seed);
+	  mpz_clear (seed);
         }
       else
         {
-#if HAVE_GETTIMEOFDAY
-          struct timeval  tv;
-          gettimeofday (&tv, NULL);
-          seed = tv.tv_sec ^ ((unsigned long) tv.tv_usec << 12);
-	  seed &= 0xffffffff;
-#else
-          time_t  tv;
-          time (&tv);
-          seed = tv;
-#endif
-          gmp_randseed_ui (rands, seed);
-          printf ("Seed GMP_CHECK_RANDOMIZE=%lu (include this in bug reports)\n", seed);
+	  FILE *fs = fopen ("/dev/urandom", "r");
+	  if (fs != NULL)
+	    {
+	      seed_from_urandom (rands, fs);
+	      fclose (fs);
+	    }
+	  else
+	    seed_from_tod (rands);
         }
       fflush (stdout);
     }
@@ -188,7 +209,7 @@ strtoupper (char *s_orig)
 {
   char  *s;
   for (s = s_orig; *s != '\0'; s++)
-    if (isascii (*s))
+    if (islower (*s))
       *s = toupper (*s);
   return s_orig;
 }
@@ -262,7 +283,7 @@ byte_diff_lowest (const void *p1, const void *p2, mp_size_t size)
 }
 
 
-/* Find most significant limb position where p1,size and p2,size differ.  */
+/* Find most significant byte position where p1,size and p2,size differ.  */
 mp_size_t
 byte_diff_highest (const void *p1, const void *p2, mp_size_t size)
 {
@@ -377,6 +398,14 @@ mpz_negrandom (mpz_ptr rop, gmp_randstate_t rstate)
   _gmp_rand (&n, rstate, 1);
   if (n != 0)
     mpz_neg (rop, rop);
+}
+
+void
+mpz_clobber(mpz_ptr rop)
+{
+  MPN_ZERO(PTR(rop), ALLOC(rop));
+  PTR(rop)[0] = 0xDEADBEEF;
+  SIZ(rop) = 0xDEFACE;
 }
 
 mp_limb_t

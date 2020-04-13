@@ -2,7 +2,7 @@ divert(-1)
 
 dnl  m4 macros for PowerPC assembler (32 and 64 bit).
 
-dnl  Copyright 2000, 2002, 2003 Free Software Foundation, Inc.
+dnl  Copyright 2000, 2002, 2003, 2017, 2018 Free Software Foundation, Inc.
 
 dnl  This file is part of the GNU MP Library.
 dnl
@@ -100,5 +100,22 @@ define(`ASSERT_counter',incr(ASSERT_counter))
 
 define(ASSERT_counter,1)
 
+dnl  Manually assemble some new instructions
+dnl
+
+define(`maddld',m4_assert_numargs(4)`dnl
+.long eval(0x10000033+m4_lshift($1,21)+m4_lshift($2,16)+m4_lshift($3,11)+m4_lshift($4,6))')
+
+define(`maddhdu',m4_assert_numargs(4)`dnl
+.long eval(0x10000031+m4_lshift($1,21)+m4_lshift($2,16)+m4_lshift($3,11)+m4_lshift($4,6))')
+
+define(`popcntd',m4_assert_numargs(2)`dnl
+.long eval(0x7c0003f4+m4_lshift($2,21)+m4_lshift($1,16))')
+
+define(`divdeu',m4_assert_numargs(3)`dnl
+.long eval(0x7c000312+m4_lshift($1,21)+m4_lshift($2,16)+m4_lshift($3,11))')
+
+define(`addex',m4_assert_numargs(4)`dnl
+.long eval(0x7c000154+m4_lshift($1,21)+m4_lshift($2,16)+m4_lshift($3,11)+m4_lshift($4,9))')
 
 divert

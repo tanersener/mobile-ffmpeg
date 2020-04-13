@@ -204,7 +204,7 @@ main(int argc, char **argv)
       if (best_time > lehmer_time)
 	best_p = 0;
 
-      printf("%6d %6d %5.3g", n, best_p, (double) best_p / n);
+      printf("%6zu %6zu %5.3g", n, best_p, (double) best_p / n);
       if (best_p > 0)
 	{
 	  double speedup = 100 * (lehmer_time - best_time) / lehmer_time;

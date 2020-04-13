@@ -8,7 +8,7 @@
    GUARANTEED THAT THEY'LL CHANGE OR DISAPPEAR IN A FUTURE GNU MP RELEASE.
 
 
-Copyright 1993-1996, 1999-2002, 2011 Free Software Foundation, Inc.
+Copyright 1993-1996, 1999-2002, 2011, 2017 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -36,7 +36,6 @@ You should have received copies of the GNU General Public License and the
 GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
-#include "gmp.h"
 #include "gmp-impl.h"
 #include "longlong.h"
 
@@ -50,10 +49,10 @@ see https://www.gnu.org/licenses/.  */
 #endif
 
 /* Define some longlong.h-style macros, but for wider operations.
-   * add_sssaaaa is like longlong.h's add_ssaaaa but the propagating
-     carry-out into an additional sum operand.
-   * add_csaac accepts two addends and a carry in, and generates a sum
-     and a carry out.  A little like a "full adder".
+   * add_sssaaaa is like longlong.h's add_ssaaaa but propagating carry-out into
+     an additional sum operand.
+   * add_csaac accepts two addends and a carry in, and generates a sum and a
+     carry out.  A little like a "full adder".
 */
 #if defined (__GNUC__)  && ! defined (__INTEL_COMPILER) && ! defined (NO_ASM)
 
@@ -64,11 +63,6 @@ see https://www.gnu.org/licenses/.  */
 	   : "0"  ((USItype)(s2)),					\
 	     "1"  ((USItype)(a1)), "g" ((USItype)(b1)),			\
 	     "%2" ((USItype)(a0)), "g" ((USItype)(b0)))
-#define add_csaac(co, s, a, b, ci)					\
-  __asm__ ("bt\t$0, %2\n\tadc\t%5, %k1\n\tadc\t%k0, %k0"		\
-	   : "=r" (co), "=r" (s)					\
-	   : "rm"  ((USItype)(ci)), "0" (CNST_LIMB(0)),			\
-	     "%1" ((USItype)(a)), "g" ((USItype)(b)))
 #endif
 
 #if defined (__amd64__) && W_TYPE_SIZE == 64
@@ -78,11 +72,14 @@ see https://www.gnu.org/licenses/.  */
 	   : "0"  ((UDItype)(s2)),					\
 	     "1"  ((UDItype)(a1)), "rme" ((UDItype)(b1)),		\
 	     "%2" ((UDItype)(a0)), "rme" ((UDItype)(b0)))
-#define add_csaac(co, s, a, b, ci)					\
-  __asm__ ("bt\t$0, %2\n\tadc\t%5, %q1\n\tadc\t%q0, %q0"		\
-	   : "=r" (co), "=r" (s)					\
-	   : "rm"  ((UDItype)(ci)), "0" (CNST_LIMB(0)),			\
-	     "%1" ((UDItype)(a)), "g" ((UDItype)(b)))
+#endif
+
+#if defined (__aarch64__) && W_TYPE_SIZE == 64
+#define add_sssaaaa(s2, s1, s0, a1, a0, b1, b0)				\
+  __asm__ ("adds\t%2, %x6, %7\n\tadcs\t%1, %x4, %x5\n\tadc\t%0, %3, xzr"\
+	   : "=r" (s2), "=&r" (s1), "=&r" (s0)				\
+	   : "rZ" (s2), "%rZ"  (a1), "rZ" (b1), "%rZ" (a0), "rI" (b0)	\
+	     __CLOBBER_CC)
 #endif
 
 #if HAVE_HOST_CPU_FAMILY_powerpc && !defined (_LONG_LONG_LIMB)
@@ -90,9 +87,10 @@ see https://www.gnu.org/licenses/.  */
    processor running in 32-bit mode, since the carry flag then gets the 32-bit
    carry.  */
 #define add_sssaaaa(s2, s1, s0, a1, a0, b1, b0)				\
-  __asm__ ("add%I7c\t%2,%6,%7\n\tadde\t%1,%4,%5\n\taddze\t%0,%0"	\
+  __asm__ ("add%I7c\t%2,%6,%7\n\tadde\t%1,%4,%5\n\taddze\t%0,%3"	\
 	   : "=r" (s2), "=&r" (s1), "=&r" (s0)				\
-	   : "r"  (s2), "r"  (a1), "r" (b1), "%r" (a0), "rI" (b0))
+	   : "r"  (s2), "r"  (a1), "r" (b1), "%r" (a0), "rI" (b0)	\
+	     __CLOBBER_CC)
 #endif
 
 #endif /* __GNUC__ */
@@ -112,40 +110,24 @@ see https://www.gnu.org/licenses/.  */
   } while (0)
 #endif
 
-#ifndef add_csaac
-#define add_csaac(co, s, a, b, ci)					\
-  do {									\
-    UWtype __s, __c;							\
-    __s = (a) + (b);							\
-    __c = __s < (a);							\
-    __s = __s + (ci);							\
-    (s) = __s;								\
-    (co) = __c + (__s < (ci));						\
-  } while (0)
-#endif
-
 /* Typically used with r1, r0 same as n3, n2. Other types of overlap
    between inputs and outputs are not supported. */
 #define udiv_qr_4by2(q1,q0, r1,r0, n3,n2,n1,n0, d1,d0, di1,di0)		\
   do {									\
     mp_limb_t _q3, _q2a, _q2, _q1, _q2c, _q1c, _q1d, _q0;		\
     mp_limb_t _t1, _t0;							\
-    mp_limb_t _c, _mask;						\
+    mp_limb_t _mask;							\
 									\
-    umul_ppmm (_q3,_q2a, n3, di1);					\
+    /* [q3,q2,q1,q0] = [n3,n2]*[di1,di0] + [n3,n2,n1,n0] + [0,1,0,0] */	\
     umul_ppmm (_q2,_q1, n2, di1);					\
+    umul_ppmm (_q3,_q2a, n3, di1);					\
+    ++_q2;	/* _q2 cannot overflow */				\
+    add_ssaaaa (_q3,_q2, _q3,_q2, n3,_q2a);				\
     umul_ppmm (_q2c,_q1c, n3, di0);					\
-    add_sssaaaa (_q3,_q2,_q1, _q2,_q1, _q2c,_q1c);			\
+    add_sssaaaa (_q3,_q2,_q1, _q2,_q1, n2,_q1c);			\
     umul_ppmm (_q1d,_q0, n2, di0);					\
-    add_sssaaaa (_q3,_q2,_q1, _q2,_q1, _q2a,_q1d);			\
-									\
-    add_ssaaaa (r1, r0, n3, n2, CNST_LIMB(0), CNST_LIMB(1));		\
-									\
-    /* [q3,q2,q1,q0] += [n3,n3,n1,n0] */				\
-    add_csaac (_c, _q0, _q0, n0, CNST_LIMB(0));				\
-    add_csaac (_c, _q1, _q1, n1, _c);					\
-    add_csaac (_c, _q2, _q2, r0, _c);					\
-    _q3 = _q3 + r1 + _c;						\
+    add_sssaaaa (_q2c,_q1,_q0, _q1,_q0, n1,n0); /* _q2c cannot overflow */ \
+    add_sssaaaa (_q3,_q2,_q1, _q2,_q1, _q2c,_q1d);			\
 									\
     umul_ppmm (_t1,_t0, _q2, d0);					\
     _t1 += _q2 * d1 + _q3 * d0;						\
@@ -283,9 +265,9 @@ mpn_div_qr_2n_pi2 (mp_ptr qp, mp_ptr rp, mp_srcptr np, mp_size_t nn,
    Return the most significant limb of the quotient.
 
    Preconditions:
-   1. qp must either not overlap with the input operands at all, or
+   1. qp must either not overlap with the other operands at all, or
       qp >= np + 2 must hold true.  (This means that it's possible to put
-      the quotient in the high part of {np,nn}, right above the remainder.
+      the quotient in the high part of {np,nn}, right above the remainder.)
    2. nn >= 2.  */
 
 mp_limb_t

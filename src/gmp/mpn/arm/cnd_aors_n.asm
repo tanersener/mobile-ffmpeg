@@ -130,5 +130,5 @@ L(top):	ldm	vp!, {r4,r5,r6,r7}
 
 L(end):	RETVAL
 	pop	{r4-r11}
-	ret	r14
+	return	r14
 EPILOGUE()

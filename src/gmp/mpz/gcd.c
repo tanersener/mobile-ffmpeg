@@ -1,7 +1,7 @@
 /* mpz/gcd.c:   Calculate the greatest common divisor of two integers.
 
-Copyright 1991, 1993, 1994, 1996, 2000-2002, 2005, 2010 Free Software
-Foundation, Inc.
+Copyright 1991, 1993, 1994, 1996, 2000-2002, 2005, 2010, 2015, 2016
+Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -29,7 +29,6 @@ You should have received copies of the GNU General Public License and the
 GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
-#include "gmp.h"
 #include "gmp-impl.h"
 #include "longlong.h"
 
@@ -57,8 +56,8 @@ mpz_gcd (mpz_ptr g, mpz_srcptr u, mpz_srcptr v)
       SIZ (g) = vsize;
       if (g == v)
 	return;
-      MPZ_REALLOC (g, vsize);
-      MPN_COPY (PTR (g), vp, vsize);
+      tp = MPZ_NEWALLOC (g, vsize);
+      MPN_COPY (tp, vp, vsize);
       return;
     }
 
@@ -68,34 +67,34 @@ mpz_gcd (mpz_ptr g, mpz_srcptr u, mpz_srcptr v)
       SIZ (g) = usize;
       if (g == u)
 	return;
-      MPZ_REALLOC (g, usize);
-      MPN_COPY (PTR (g), up, usize);
+      tp = MPZ_NEWALLOC (g, usize);
+      MPN_COPY (tp, up, usize);
       return;
     }
 
   if (usize == 1)
     {
       SIZ (g) = 1;
-      PTR (g)[0] = mpn_gcd_1 (vp, vsize, up[0]);
+      MPZ_NEWALLOC (g, 1)[0] = mpn_gcd_1 (vp, vsize, up[0]);
       return;
     }
 
   if (vsize == 1)
     {
       SIZ(g) = 1;
-      PTR (g)[0] = mpn_gcd_1 (up, usize, vp[0]);
+      MPZ_NEWALLOC (g, 1)[0] = mpn_gcd_1 (up, usize, vp[0]);
       return;
     }
 
   TMP_MARK;
 
   /*  Eliminate low zero bits from U and V and move to temporary storage.  */
-  while (*up == 0)
-    up++;
-  u_zero_limbs = up - PTR(u);
-  usize -= u_zero_limbs;
-  count_trailing_zeros (u_zero_bits, *up);
   tp = up;
+  while (*tp == 0)
+    tp++;
+  u_zero_limbs = tp - up;
+  usize -= u_zero_limbs;
+  count_trailing_zeros (u_zero_bits, *tp);
   up = TMP_ALLOC_LIMBS (usize);
   if (u_zero_bits != 0)
     {
@@ -105,12 +104,12 @@ mpz_gcd (mpz_ptr g, mpz_srcptr u, mpz_srcptr v)
   else
     MPN_COPY (up, tp, usize);
 
-  while (*vp == 0)
-    vp++;
-  v_zero_limbs = vp - PTR (v);
-  vsize -= v_zero_limbs;
-  count_trailing_zeros (v_zero_bits, *vp);
   tp = vp;
+  while (*tp == 0)
+    tp++;
+  v_zero_limbs = tp - vp;
+  vsize -= v_zero_limbs;
+  count_trailing_zeros (v_zero_bits, *tp);
   vp = TMP_ALLOC_LIMBS (vsize);
   if (v_zero_bits != 0)
     {
@@ -125,15 +124,13 @@ mpz_gcd (mpz_ptr g, mpz_srcptr u, mpz_srcptr v)
       g_zero_limbs = v_zero_limbs;
       g_zero_bits = v_zero_bits;
     }
-  else if (u_zero_limbs < v_zero_limbs)
+  else
     {
       g_zero_limbs = u_zero_limbs;
-      g_zero_bits = u_zero_bits;
-    }
-  else  /*  Equal.  */
-    {
-      g_zero_limbs = u_zero_limbs;
-      g_zero_bits = MIN (u_zero_bits, v_zero_bits);
+      if (u_zero_limbs < v_zero_limbs)
+	g_zero_bits = u_zero_bits;
+      else  /*  Equal.  */
+	g_zero_bits = MIN (u_zero_bits, v_zero_bits);
     }
 
   /*  Call mpn_gcd.  The 2nd argument must not have more bits than the 1st.  */
@@ -147,19 +144,19 @@ mpz_gcd (mpz_ptr g, mpz_srcptr u, mpz_srcptr v)
     {
       mp_limb_t cy_limb;
       gsize += (vp[vsize - 1] >> (GMP_NUMB_BITS - g_zero_bits)) != 0;
-      MPZ_REALLOC (g, gsize);
-      MPN_ZERO (PTR (g), g_zero_limbs);
+      tp = MPZ_NEWALLOC (g, gsize);
+      MPN_ZERO (tp, g_zero_limbs);
 
-      tp = PTR(g) + g_zero_limbs;
+      tp = tp + g_zero_limbs;
       cy_limb = mpn_lshift (tp, vp, vsize, g_zero_bits);
       if (cy_limb != 0)
 	tp[vsize] = cy_limb;
     }
   else
     {
-      MPZ_REALLOC (g, gsize);
-      MPN_ZERO (PTR (g), g_zero_limbs);
-      MPN_COPY (PTR (g) + g_zero_limbs, vp, vsize);
+      tp = MPZ_NEWALLOC (g, gsize);
+      MPN_ZERO (tp, g_zero_limbs);
+      MPN_COPY (tp + g_zero_limbs, vp, vsize);
     }
 
   SIZ (g) = gsize;

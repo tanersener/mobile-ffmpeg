@@ -5,7 +5,7 @@
    CERTAIN TO BE SUBJECT TO INCOMPATIBLE CHANGES OR DISAPPEAR COMPLETELY IN
    FUTURE GNU MP RELEASES.
 
-Copyright 2001 Free Software Foundation, Inc.
+Copyright 2001, 2018 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -44,7 +44,6 @@ see https://www.gnu.org/licenses/.  */
 #include <string.h>
 #include <obstack.h>
 
-#include "gmp.h"
 #include "gmp-impl.h"
 
 
@@ -69,4 +68,6 @@ const struct doprnt_funs_t  __gmp_obstack_printf_funs = {
   (doprnt_reps_t)   gmp_obstack_reps
 };
 
+#else
+typedef int __gmp_dummy_typedef;
 #endif /* HAVE_OBSTACK_VPRINTF */

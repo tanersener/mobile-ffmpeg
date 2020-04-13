@@ -22,7 +22,6 @@ the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
 
 #include <stdio.h>
 #include <stdlib.h> /* for free */
-#include "gmp.h"
 #include "gmp-impl.h"
 #include "longlong.h"
 #include "tests.h"
@@ -79,6 +78,52 @@ refmpz_hamdist (mpz_srcptr x, mpz_srcptr y)
   return ret;
 }
 
+void
+refmpz_gcd (mpz_ptr g, mpz_srcptr a_orig, mpz_srcptr b_orig)
+{
+  mp_bitcnt_t a_twos, b_twos, common_twos;
+  mpz_t a;
+  mpz_t b;
+  mpz_init (a);
+  mpz_init (b);
+  mpz_abs (a, a_orig);
+  mpz_abs (b, b_orig);
+
+  if (mpz_sgn (a) == 0)
+    {
+      mpz_set (g, b);
+      return;
+    }
+  if (mpz_sgn (b) == 0)
+    {
+      mpz_set (g, a);
+      return;
+    }
+  a_twos = mpz_scan1 (a, 0);
+  mpz_tdiv_q_2exp (a, a, a_twos);
+
+  b_twos = mpz_scan1 (b, 0);
+  mpz_tdiv_q_2exp (b, b, b_twos);
+
+  common_twos = MIN(a_twos, b_twos);
+  for (;;)
+    {
+      int c;
+      mp_bitcnt_t twos;
+      c = mpz_cmp (a, b);
+      if (c == 0)
+	break;
+      if (c < 0)
+	mpz_swap (a, b);
+      mpz_sub (a, a, b);
+      twos = mpz_scan1 (a, 0);
+      mpz_tdiv_q_2exp (a, a, twos);
+    }
+  mpz_mul_2exp (g, a, common_twos);
+
+  mpz_clear (a);
+  mpz_clear (b);
+}
 
 /* (0/b), with mpz b; is 1 if b=+/-1, 0 otherwise */
 #define JACOBI_0Z(b)  JACOBI_0LS (PTR(b)[0], SIZ(b))

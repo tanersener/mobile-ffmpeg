@@ -1,6 +1,6 @@
 dnl  PowerPC-64 mpn_popcount.
 
-dnl  Copyright 2012 Free Software Foundation, Inc.
+dnl  Copyright 2012, 2017 Free Software Foundation, Inc.
 
 dnl  This file is part of the GNU MP Library.
 dnl
@@ -56,13 +56,13 @@ ifdef(`HAVE_ABI_mode32',
 
 L(odd):	ld	r4, 0(up)
 	addi	up, up, 8
-	popcntd	r0, r4
+	popcntd(r0, r4)
 	bdz	L(e1)
 
 L(evn):	ld	r4, 0(up)
 	ld	r5, 8(up)
-	popcntd	r8, r4
-	popcntd	r9, r5
+	popcntd(r8, r4)
+	popcntd(r9, r5)
 	bdz	L(e2)
 
 	ld	r4, 16(up)
@@ -71,18 +71,18 @@ L(evn):	ld	r4, 0(up)
 	addi	up, up, 32
 
 L(top):	add	r0, r0, r8
-	popcntd	r8, r4
+	popcntd(r8, r4)
 	ld	r4, 0(up)
 	add	r12, r12, r9
-	popcntd	r9, r5
+	popcntd(r9, r5)
 	ld	r5, 8(up)
 	addi	up, up, 16
 	bdnz	L(top)
 
 L(e4):	add	r0, r0, r8
-	popcntd	r8, r4
+	popcntd(r8, r4)
 	add	r12, r12, r9
-	popcntd	r9, r5
+	popcntd(r9, r5)
 L(e2):	add	r0, r0, r8
 	add	r12, r12, r9
 L(e1):	add	r3, r0, r12

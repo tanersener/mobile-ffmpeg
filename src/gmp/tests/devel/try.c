@@ -125,7 +125,6 @@ the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
 #include <sys/mman.h>
 #endif
 
-#include "gmp.h"
 #include "gmp-impl.h"
 #include "longlong.h"
 #include "tests.h"
@@ -1867,19 +1866,19 @@ const struct choice_t choice_array[] = {
   { TRY(mpn_rsh1sub_n), TYPE_RSH1SUB_N },
 #endif
 
-#if HAVE_NATIVE_mpn_addlsh1_nc
+#if HAVE_NATIVE_mpn_addlsh1_nc == 1
   { TRY(mpn_addlsh1_nc), TYPE_ADDLSH1_NC },
 #endif
-#if HAVE_NATIVE_mpn_addlsh2_nc
+#if HAVE_NATIVE_mpn_addlsh2_nc == 1
   { TRY(mpn_addlsh2_nc), TYPE_ADDLSH2_NC },
 #endif
 #if HAVE_NATIVE_mpn_addlsh_nc
   { TRY(mpn_addlsh_nc), TYPE_ADDLSH_NC },
 #endif
-#if HAVE_NATIVE_mpn_sublsh1_nc
+#if HAVE_NATIVE_mpn_sublsh1_nc == 1
   { TRY(mpn_sublsh1_nc), TYPE_SUBLSH1_NC },
 #endif
-#if HAVE_NATIVE_mpn_sublsh2_nc
+#if HAVE_NATIVE_mpn_sublsh2_nc == 1
   { TRY(mpn_sublsh2_nc), TYPE_SUBLSH2_NC },
 #endif
 #if HAVE_NATIVE_mpn_sublsh_nc

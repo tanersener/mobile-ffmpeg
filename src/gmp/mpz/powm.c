@@ -2,8 +2,8 @@
 
    Contributed to the GNU project by Torbjorn Granlund.
 
-Copyright 1991, 1993, 1994, 1996, 1997, 2000-2002, 2005, 2008, 2009, 2011, 2012
-Free Software Foundation, Inc.
+Copyright 1991, 1993, 1994, 1996, 1997, 2000-2002, 2005, 2008, 2009,
+2011, 2012, 2015, 2019 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -32,7 +32,6 @@ GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
 
-#include "gmp.h"
 #include "gmp-impl.h"
 #include "longlong.h"
 
@@ -86,7 +85,7 @@ mpz_powm (mpz_ptr r, mpz_srcptr b, mpz_srcptr e, mpz_srcptr m)
 	  /* b^0 mod m,  b is anything and m is non-zero.
 	     Result is 1 mod m, i.e., 1 or 0 depending on if m = 1.  */
 	  SIZ(r) = n != 1 || mp[0] != 1;
-	  PTR(r)[0] = 1;
+	  MPZ_NEWALLOC (r, 1)[0] = 1;
 	  TMP_FREE;	/* we haven't really allocated anything here */
 	  return;
 	}
@@ -126,11 +125,11 @@ mpz_powm (mpz_ptr r, mpz_srcptr b, mpz_srcptr e, mpz_srcptr m)
 	  rn = n;
 	  MPN_NORMALIZE (rp, rn);
 
-	  if (SIZ(b) < 0 && rn != 0)
+	  if (rn != 0 && SIZ(b) < 0)
 	    {
 	      mpn_sub (rp, mp, n, rp, rn);
 	      rn = n;
-	      MPN_NORMALIZE (rp, rn);
+	      MPN_NORMALIZE_NOT_ZERO (rp, rn);
 	    }
 	}
       else
@@ -139,7 +138,7 @@ mpz_powm (mpz_ptr r, mpz_srcptr b, mpz_srcptr e, mpz_srcptr m)
 	    {
 	      mpn_sub (rp, mp, n, bp, bn);
 	      rn = n;
-	      rn -= (rp[rn - 1] == 0);
+	      MPN_NORMALIZE_NOT_ZERO (rp, rn);
 	    }
 	  else
 	    {
@@ -275,7 +274,7 @@ mpz_powm (mpz_ptr r, mpz_srcptr b, mpz_srcptr e, mpz_srcptr m)
     }
 
  ret:
-  MPZ_REALLOC (r, rn);
+  MPZ_NEWALLOC (r, rn);
   SIZ(r) = rn;
   MPN_COPY (PTR(r), rp, rn);
 

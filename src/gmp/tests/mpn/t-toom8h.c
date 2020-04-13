@@ -8,7 +8,8 @@
 #define MIN_AN MUL_TOOM8H_MIN
 
 #define MIN_BN(an)			 \
-(MAX(GMP_NUMB_BITS <= 10*3 ? (an*6)/10 : \
+(MAX(GMP_NUMB_BITS <=  9*3 ? (an*7)/ 9 : \
+     GMP_NUMB_BITS <= 10*3 ? (an*6)/10 : \
      GMP_NUMB_BITS <= 11*3 ? (an*5)/11 : \
      GMP_NUMB_BITS <= 12*3 ? (an*4)/12 : \
      (an*4)/13, 86) )

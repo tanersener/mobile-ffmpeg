@@ -1,6 +1,6 @@
 /* mpq_set_f -- set an mpq from an mpf.
 
-Copyright 2000-2002 Free Software Foundation, Inc.
+Copyright 2000-2002, 2018 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -28,7 +28,6 @@ You should have received copies of the GNU General Public License and the
 GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
-#include "gmp.h"
 #include "gmp-impl.h"
 #include "longlong.h"
 
@@ -47,7 +46,7 @@ mpq_set_f (mpq_ptr q, mpf_srcptr f)
       /* set q=0 */
       SIZ(NUM(q)) = 0;
       SIZ(DEN(q)) = 1;
-      PTR(DEN(q))[0] = 1;
+      MPZ_NEWALLOC (DEN(q), 1)[0] = 1;
       return;
     }
 
@@ -66,7 +65,7 @@ mpq_set_f (mpq_ptr q, mpf_srcptr f)
 
       SIZ(NUM(q)) = fsize >= 0 ? fexp : -fexp;
       SIZ(DEN(q)) = 1;
-      PTR(DEN(q))[0] = 1;
+      MPZ_NEWALLOC (DEN(q), 1)[0] = 1;
     }
   else
     {

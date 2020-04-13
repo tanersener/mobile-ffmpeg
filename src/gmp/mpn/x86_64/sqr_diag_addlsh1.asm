@@ -40,11 +40,11 @@ C AMD pile	 3.6
 C AMD steam	 ?
 C AMD bobcat	 4
 C AMD jaguar	 ?
-C Intel P4	 ?
+C Intel P4	 11.5
 C Intel core	 4
 C Intel NHM	 3.6
 C Intel SBR	 3.15
-C Intel IBR	 3.2
+C Intel IBR	 3.0
 C Intel HWL	 2.6
 C Intel BWL	 ?
 C Intel atom	14

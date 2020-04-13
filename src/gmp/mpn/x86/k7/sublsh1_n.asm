@@ -57,7 +57,7 @@ C processors.  It uses 2*4-way unrolling, for good reasons.
 C
 C Breaking carry recurrency might be a good idea.  We would then need separate
 C registers for the shift carry and add/subtract carry, which in turn would
-C force is to 2*2-way unrolling.
+C force us to 2*2-way unrolling.
 
 defframe(PARAM_SIZE,	12)
 defframe(PARAM_SRC,	 8)

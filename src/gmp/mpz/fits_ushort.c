@@ -30,5 +30,4 @@ see https://www.gnu.org/licenses/.  */
 
 #define __GMP_FORCE_mpz_fits_ushort_p 1
 
-#include "gmp.h"
 #include "gmp-impl.h"

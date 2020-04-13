@@ -1,6 +1,6 @@
 /* mpq_set_z (dest,src) -- Set DEST to SRC.
 
-Copyright 1996, 2001, 2012 Free Software Foundation, Inc.
+Copyright 1996, 2001, 2012, 2015, 2018 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -28,7 +28,6 @@ You should have received copies of the GNU General Public License and the
 GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
-#include "gmp.h"
 #include "gmp-impl.h"
 
 void
@@ -39,11 +38,11 @@ mpq_set_z (mpq_ptr dest, mpz_srcptr src)
   mp_ptr dp;
 
   num_size = SIZ (src);
+  SIZ(NUM(dest)) = num_size;
   abs_num_size = ABS (num_size);
   dp = MPZ_NEWALLOC (NUM(dest), abs_num_size);
-  SIZ(NUM(dest)) = num_size;
   MPN_COPY (dp, PTR(src), abs_num_size);
 
-  PTR(DEN(dest))[0] = 1;
+  MPZ_NEWALLOC (DEN(dest), 1)[0] = 1;
   SIZ(DEN(dest)) = 1;
 }

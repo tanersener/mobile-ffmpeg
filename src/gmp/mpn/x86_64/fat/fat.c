@@ -7,7 +7,7 @@
    THEY'RE ALMOST CERTAIN TO BE SUBJECT TO INCOMPATIBLE CHANGES OR DISAPPEAR
    COMPLETELY IN FUTURE GNU MP RELEASES.
 
-Copyright 2003, 2004, 2009, 2011-2015 Free Software Foundation, Inc.
+Copyright 2003, 2004, 2009, 2011-2015, 2017 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -39,7 +39,6 @@ see https://www.gnu.org/licenses/.  */
 #include <stdlib.h>   /* for getenv */
 #include <string.h>
 
-#include "gmp.h"
 #include "gmp-impl.h"
 
 /* Change this to "#define TRACE(x) x" for some traces. */
@@ -92,6 +91,7 @@ static struct {
   { "steamroller","AuthenticAMD", MAKE_FMS (21, 0x30) },
   { "excavator",  "AuthenticAMD", MAKE_FMS (21, 0x60) },
   { "jaguar",     "AuthenticAMD", MAKE_FMS (22, 1) },
+  { "zen",        "AuthenticAMD", MAKE_FMS (23, 1) },
 
   { "nano",       "CentaurHauls", MAKE_FMS (6, 15) },
 };
@@ -160,7 +160,7 @@ struct cpuvec_t __gmpn_cpuvec = {
   __MPN(copyi_init),
   __MPN(divexact_1_init),
   __MPN(divrem_1_init),
-  __MPN(gcd_1_init),
+  __MPN(gcd_11_init),
   __MPN(lshift_init),
   __MPN(lshiftc_init),
   __MPN(mod_1_init),
@@ -325,15 +325,25 @@ __gmpn_cpuvec_init (void)
 	    case 0x2c:		/* WSM Gulftown */
 	    case 0x2e:		/* NHM Beckton */
 	    case 0x2f:		/* WSM Eagleton */
+	      CPUVEC_SETUP_core2;
+	      CPUVEC_SETUP_coreinhm;
+	      break;
+
 	    case 0x37:		/* Silvermont */
 	    case 0x4a:		/* Silvermont */
 	    case 0x4c:		/* Airmont */
 	    case 0x4d:		/* Silvermont/Avoton */
 	    case 0x5a:		/* Silvermont */
+	      CPUVEC_SETUP_atom;
+	      CPUVEC_SETUP_silvermont;
+	      break;
+
 	    case 0x5c:		/* Goldmont */
 	    case 0x5f:		/* Goldmont */
-	      CPUVEC_SETUP_core2;
-	      CPUVEC_SETUP_coreinhm;
+	    case 0x7a:		/* Goldmont Plus */
+	      CPUVEC_SETUP_atom;
+	      CPUVEC_SETUP_silvermont;
+	      CPUVEC_SETUP_goldmont;
 	      break;
 
 	    case 0x2a:		/* SB */
@@ -401,7 +411,6 @@ __gmpn_cpuvec_init (void)
 	case 0x0f:		/* k8 */
 	case 0x11:		/* "fam 11h", mix of k8 and k10 */
 	case 0x13:
-	case 0x17:
 	  CPUVEC_SETUP_k8;
 	  break;
 
@@ -412,16 +421,27 @@ __gmpn_cpuvec_init (void)
 	  break;
 
 	case 0x14:		/* bobcat */
+	  CPUVEC_SETUP_k8;
+	  CPUVEC_SETUP_k10;
+	  CPUVEC_SETUP_bt1;
+	  break;
+
 	case 0x16:		/* jaguar */
 	  CPUVEC_SETUP_k8;
 	  CPUVEC_SETUP_k10;
-	  CPUVEC_SETUP_bobcat;
+	  CPUVEC_SETUP_bt1;
+	  CPUVEC_SETUP_bt2;
 	  break;
 
 	case 0x15:	    /* bulldozer, piledriver, steamroller, excavator */
 	  CPUVEC_SETUP_k8;
 	  CPUVEC_SETUP_k10;
 	  CPUVEC_SETUP_bd1;
+	  break;
+
+	case 0x17:	    /* zen */
+	  CPUVEC_SETUP_zen;
+	  break;
 	}
     }
   else if (strcmp (vendor_string, "CentaurHauls") == 0)

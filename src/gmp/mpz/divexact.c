@@ -32,9 +32,7 @@ GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
 
-#include "gmp.h"
 #include "gmp-impl.h"
-#include "longlong.h"
 
 void
 mpz_divexact (mpz_ptr quot, mpz_srcptr num, mpz_srcptr den)
@@ -74,7 +72,7 @@ mpz_divexact (mpz_ptr quot, mpz_srcptr num, mpz_srcptr den)
   if (quot == num || quot == den)
     qp = TMP_ALLOC_LIMBS (qn);
   else
-    qp = MPZ_REALLOC (quot, qn);
+    qp = MPZ_NEWALLOC (quot, qn);
 
   np = PTR(num);
   dp = PTR(den);
@@ -83,7 +81,7 @@ mpz_divexact (mpz_ptr quot, mpz_srcptr num, mpz_srcptr den)
   MPN_NORMALIZE (qp, qn);
 
   if (qp != PTR(quot))
-    MPN_COPY (MPZ_REALLOC (quot, qn), qp, qn);
+    MPN_COPY (MPZ_NEWALLOC (quot, qn), qp, qn);
 
   SIZ(quot) = (SIZ(num) ^ SIZ(den)) >= 0 ? qn : -qn;
 

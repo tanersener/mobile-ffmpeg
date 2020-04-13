@@ -19,7 +19,6 @@ the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "gmp.h"
 #include "gmp-impl.h"
 #include "tests.h"
 
@@ -43,8 +42,8 @@ main (int argc, char *argv[])
 
   if (argc > 1 && argv[1][0] == 'x')
     limit = ULONG_MAX;
-  else if (argc > 1)
-    limit = atoi (argv[1]);
+  else
+    TESTS_REPS (limit, argv, argc);
 
   /* for small limb testing */
   limit = MIN (limit, MP_LIMB_T_MAX);

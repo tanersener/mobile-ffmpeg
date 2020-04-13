@@ -91,7 +91,7 @@ L(9):	subfc	r31, r28, r31
 	cmpld	cr7, r29, r30
 	blt	cr7, L(8)
 	mfcr	r0
-	rlwinm	r0, r0, 30, 1
+	rlwinm	r0, r0, 30, 31, 31
 	subfc	r9, r28, r31
 	addze.	r0, r0
 	nop
@@ -176,7 +176,7 @@ L(18):
 	blr
 L(fix):
 	mfcr	r0
-	rlwinm	r0, r0, 30, 1
+	rlwinm	r0, r0, 30, 31, 31
 	subfc	r9, r28, r31
 	addze.	r0, r0
 	beq	cr0, L(bck)

@@ -71,5 +71,5 @@ L(top):	ldmia	up!, { r3, r8, r9, r12 }	C load 4 limbs
 	bne	L(top)
 
 	ldmfd	sp!, { r7, r8, r9 }		C restore regs from stack
-L(rtn):	ret	lr
+L(rtn):	return	lr
 EPILOGUE()

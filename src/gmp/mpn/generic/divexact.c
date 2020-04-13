@@ -8,7 +8,7 @@
    SAFE TO REACH THEM THROUGH DOCUMENTED INTERFACES.  IN FACT, IT IS ALMOST
    GUARANTEED THAT THEY WILL CHANGE OR DISAPPEAR IN A FUTURE GMP RELEASE.
 
-Copyright 2006, 2007, 2009 Free Software Foundation, Inc.
+Copyright 2006, 2007, 2009, 2017 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -37,7 +37,6 @@ GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
 
-#include "gmp.h"
 #include "gmp-impl.h"
 #include "longlong.h"
 
@@ -99,6 +98,9 @@ mpn_divexact (mp_ptr qp,
   tp = TMP_ALLOC_LIMBS (mpn_bdiv_q_itch (qn, dn));
   mpn_bdiv_q (qp, np, qn, dp, dn, tp);
   TMP_FREE;
+
+  /* Since bdiv_q computes -N/D (mod B^{qn}), we must negate now. */
+  mpn_neg (qp, qp, qn);
 }
 
 #else

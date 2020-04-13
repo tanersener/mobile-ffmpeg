@@ -3,7 +3,7 @@
 
    Contributed by Paul Zimmermann (algorithm) and
    Paul Zimmermann and Torbjorn Granlund (implementation).
-   Marco Bodrato wrote logbased_root to seed the loop. 
+   Marco Bodrato wrote logbased_root to seed the loop.
 
    THE FUNCTIONS IN THIS FILE ARE INTERNAL, AND HAVE MUTABLE INTERFACES.  IT'S
    ONLY SAFE TO REACH THEM THROUGH DOCUMENTED INTERFACES.  IN FACT, IT'S ALMOST
@@ -44,7 +44,6 @@ see https://www.gnu.org/licenses/.  */
 
 #include <stdio.h>		/* for NULL */
 
-#include "gmp.h"
 #include "gmp-impl.h"
 #include "longlong.h"
 
@@ -479,7 +478,7 @@ mpn_rootrem_internal (mp_ptr rootp, mp_ptr remp, mp_srcptr up, mp_size_t un,
 
       /* 8: current buffer: {sp,sn} */
 
-    };
+    }
 
   /* otherwise we have rn > 0, thus the return value is ok */
   if (!approx || sp[0] <= CNST_LIMB (1))

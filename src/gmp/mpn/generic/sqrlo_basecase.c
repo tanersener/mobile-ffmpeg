@@ -5,8 +5,8 @@
    SAFE TO REACH THIS FUNCTION THROUGH DOCUMENTED INTERFACES.
 
 
-Copyright 1991-1994, 1996, 1997, 2000-2005, 2008, 2010, 2011, 2015
-Free Software Foundation, Inc.
+Copyright 1991-1994, 1996, 1997, 2000-2005, 2008, 2010, 2011, 2015,
+2016 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -34,7 +34,6 @@ You should have received copies of the GNU General Public License and the
 GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
-#include "gmp.h"
 #include "gmp-impl.h"
 #include "longlong.h"
 
@@ -99,6 +98,14 @@ see https://www.gnu.org/licenses/.  */
 #ifndef SQRLO_SPECIAL_CASES
 #define SQRLO_SPECIAL_CASES 2
 #endif
+
+#if TUNE_PROGRAM_BUILD || WANT_FAT_BINARY
+#define MAYBE_special_cases 1
+#else
+#define MAYBE_special_cases \
+  ((SQRLO_BASECASE_THRESHOLD <= SQRLO_SPECIAL_CASES) && (SQRLO_DC_THRESHOLD != 0))
+#endif
+
 void
 mpn_sqrlo_basecase (mp_ptr rp, mp_srcptr up, mp_size_t n)
 {
@@ -109,7 +116,7 @@ mpn_sqrlo_basecase (mp_ptr rp, mp_srcptr up, mp_size_t n)
 
   ul = up[0];
 
-  if (n <= SQRLO_SPECIAL_CASES)
+  if (MAYBE_special_cases && n <= SQRLO_SPECIAL_CASES)
     {
 #if SQRLO_SPECIAL_CASES == 1
       rp[0] = (ul * ul) & GMP_NUMB_MASK;
@@ -179,3 +186,9 @@ mpn_sqrlo_basecase (mp_ptr rp, mp_srcptr up, mp_size_t n)
     }
 }
 #undef SQRLO_SPECIAL_CASES
+#undef MAYBE_special_cases
+#undef SQRLO_BASECASE_ALLOC
+#undef SQRLO_SHORTCUT_MULTIPLICATIONS
+#undef MPN_SQR_DIAGONAL
+#undef MPN_SQRLO_DIAGONAL
+#undef MPN_SQRLO_DIAG_ADDLSH1

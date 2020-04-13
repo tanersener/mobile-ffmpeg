@@ -19,6 +19,7 @@
 
 
 AM_CPPFLAGS = -I$(top_srcdir) -I$(top_srcdir)/tests
+AM_LDFLAGS = -no-install
 LDADD = $(top_builddir)/tests/libtests.la $(top_builddir)/libgmp.la
 
 check_PROGRAMS = t-dm2exp t-conv t-add t-sub t-sqrt t-sqrt_ui t-muldiv reuse \

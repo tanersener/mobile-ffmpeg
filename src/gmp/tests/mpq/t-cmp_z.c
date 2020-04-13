@@ -20,7 +20,6 @@ the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "gmp.h"
 #include "gmp-impl.h"
 #include "tests.h"
 
@@ -117,7 +116,7 @@ main (int argc, char **argv)
   for (i = 0; i < reps; i++)
     {
       if (i % 8192 == 0)
-	sizes_test (urandom () % (i + 1) + 1);	  
+	sizes_test (urandom () % (i + 1) + 1);
       size = urandom () % SIZE - SIZE/2;
       mpz_random2 (NUM (a), size);
       do

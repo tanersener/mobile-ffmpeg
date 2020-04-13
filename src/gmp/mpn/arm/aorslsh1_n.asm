@@ -163,5 +163,5 @@ L(rt1):	mov	r14, r12
 	REVCY(r12)
 L(rt0):	RETVAL(	r14)
 	pop	{r4-r10r11, r14}
-	ret	r14
+	return	r14
 EPILOGUE()

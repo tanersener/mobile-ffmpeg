@@ -24,7 +24,7 @@ the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
 #include "testutils.h"
 
 /* Always called with sz fitting in a signed long, and si is the
-   corresponding value. */ 
+   corresponding value. */
 int
 check_si (const mpz_t sz, long si)
 {
@@ -56,7 +56,7 @@ check_si (const mpz_t sz, long si)
 }
 
 /* Called with mpz_cmp (sz, oz) == c. If sz fits in a signed long,
-   si is the coresponding value, and similarly for oz and oi. */ 
+   si is the coresponding value, and similarly for oz and oi. */
 void
 check_si_cmp (const mpz_t sz, const mpz_t oz, long si, long oi, int c)
 {
@@ -89,7 +89,7 @@ check_si_cmp (const mpz_t sz, const mpz_t oz, long si, long oi, int c)
 	  goto fail;
 	}
     }
-  if (mpz_fits_slong_p (oz)) 
+  if (mpz_fits_slong_p (oz))
     {
       if (!check_si (oz, oi))
 	goto fail;
@@ -134,15 +134,15 @@ try_op_si (int c)
 	overflow_count++;
 
       check_si_cmp (sz, oz, si, oi, c);
-    
+
       /* c * (2^k + 1) */
       if (c == -1)
 	mpz_sub_ui (oz, sz, 1);
       else
 	mpz_add_ui (oz, sz, 1);
       if (mpz_fits_slong_p (oz))
-	oi = si + c;      
-      else 
+	oi = si + c;
+      else
 	overflow_count++;
       check_si_cmp (oz, sz, oi, si, c);
 
@@ -153,18 +153,18 @@ try_op_si (int c)
       else
 	mpz_sub_ui (oz, oz, 1); /* oz = sz * 2 - 1 */
       if (mpz_fits_slong_p (oz))
-	oi = (si - c) * 2 + c; 
-      else 
+	oi = (si - c) * 2 + c;
+      else
 	overflow_count++;
-      
+
       check_si_cmp (oz, sz, oi, si, c);
     };
-  
+
   mpz_clear (sz);
   mpz_clear (oz);
 }
 
-void 
+void
 try_fits_slong_p (void)
 {
   mpz_t x;

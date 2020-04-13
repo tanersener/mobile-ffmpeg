@@ -49,7 +49,6 @@ extern char *optarg;
 extern int optind, opterr;
 #endif
 
-#include "gmp.h"
 #include "gmp-impl.h"
 
 int main (argc, argv)

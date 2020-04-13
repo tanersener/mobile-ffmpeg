@@ -36,14 +36,22 @@ C	     cycles/limb
 C AMD K8,K9	 -
 C AMD K10	 -
 C AMD bd1	 -
-C AMD bobcat	 -
+C AMD bd2	 -
+C AMD bd3	 -
+C AMD bd4	 -
+C AMD zen	 ?
+C AMD bt1	 -
+C AMD bt2	 -
 C Intel P4	 -
 C Intel PNR	 -
 C Intel NHM	 -
 C Intel SBR	 -
+C Intel IBR	 -
 C Intel HWL	 -
 C Intel BWL	 ?
+C Intel SKL	 ?
 C Intel atom	 -
+C Intel SLM	 -
 C VIA nano	 -
 
 define(`rp',      `%rdi')	dnl rcx

@@ -1,7 +1,7 @@
 /* Test mpz_powm, mpz_mul, mpz_mod, mpz_mod_ui, mpz_div_ui.
 
-Copyright 1991, 1993, 1994, 1996, 1999-2001, 2009, 2012 Free Software
-Foundation, Inc.
+Copyright 1991, 1993, 1994, 1996, 1999-2001, 2009, 2012, 2019 Free
+Software Foundation, Inc.
 
 This file is part of the GNU MP Library test suite.
 
@@ -22,7 +22,6 @@ the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
 #include <stdlib.h>
 #include <string.h>
 
-#include "gmp.h"
 #include "gmp-impl.h"
 #include "tests.h"
 
@@ -74,11 +73,39 @@ main (int argc, char **argv)
 
   memset (allsizes, 0, (1 << (SIZEM + 2 - 1)) * sizeof (int));
 
+  reps += reps >> 3;
   for (i = 0; i < reps || ! allsizes_seen (allsizes); i++)
     {
       mpz_urandomb (bs, rands, 32);
       size_range = mpz_get_ui (bs) % SIZEM + 2;
 
+      if ((i & 7) == 0)
+	{
+	  mpz_set_ui (exp, 1);
+
+	  do  /* Loop until mathematically well-defined.  */
+	    {
+	      mpz_urandomb (bs, rands, size_range / 2 + 2);
+	      base_size = mpz_get_ui (bs);
+	      mpz_rrandomb (base, rands, base_size);
+	    }
+	  while (mpz_cmp_ui (base, 0) == 0);
+
+	  mpz_urandomb (bs, rands, size_range / 2);
+	  mod_size = mpz_get_ui (bs);
+	  mod_size = MIN (mod_size, base_size);
+	  mpz_rrandomb (mod, rands, mod_size);
+
+	  mpz_urandomb (bs, rands, size_range);
+	  mod_size = mpz_get_ui (bs) + base_size + 2;
+	  if ((i & 8) == 0)
+	    mod_size += (GMP_NUMB_BITS - mod_size) % GMP_NUMB_BITS;
+	  mpz_setbit (mod, mod_size);
+
+	  mpz_sub (base, base, mod);
+	}
+      else
+	{
       do  /* Loop until mathematically well-defined.  */
 	{
 	  mpz_urandomb (bs, rands, size_range);
@@ -107,6 +134,7 @@ main (int argc, char **argv)
 	mpz_neg (base, base);
 
       /* printf ("%ld %ld %ld\n", SIZ (base), SIZ (exp), SIZ (mod)); */
+	}
 
       mpz_set_ui (r2, 1);
       mpz_mod (base2, base, mod);

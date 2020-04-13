@@ -75,6 +75,6 @@ esac
 make -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_gmp_package_config "6.1.2"
+create_gmp_package_config "6.2.0"
 
 make install || exit 1

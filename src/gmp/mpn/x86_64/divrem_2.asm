@@ -100,8 +100,10 @@ L(2):
 	push	%r11
 IFSTD(`	mov	%r11, %rdi	')
 IFDOS(`	mov	%r11, %rcx	')
+IFDOS(`	sub	$32, %rsp	')
 	ASSERT(nz, `test $15, %rsp')
 	CALL(	mpn_invert_limb)
+IFDOS(`	add	$32, %rsp	')
 	pop	%r11
 	pop	%r10
 	pop	%r8

@@ -135,5 +135,5 @@ L(mid):	sub	n, n, #4
 	pop	{ r4, r5, r6, r7 }	C popping r8-r10 here strangely fails
 
 L(rtn):	pop	{ r8, r9, r10 }
-	ret	r14
+	return	r14
 EPILOGUE()

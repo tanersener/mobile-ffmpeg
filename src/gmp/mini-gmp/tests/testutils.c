@@ -1,6 +1,6 @@
 /*
 
-Copyright 2013-2015, Free Software Foundation, Inc.
+Copyright 2013-2015, 2018 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library test suite.
 
@@ -22,6 +22,7 @@ the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
 /* Include it here, so we we could tweak, e.g., how MPZ_REALLOC
    works. */
 #include "../mini-gmp.c"
+#include "../mini-mpq.c"
 
 static size_t total_alloc = 0;
 
@@ -170,4 +171,11 @@ mpz_set_str_or_abort (mpz_ptr z, const char *str, int base)
       fprintf (stderr, "   base = %d\n", base);
       abort();
     }
+}
+
+int
+mpz_lucas_mod (mpz_t V, mpz_t Qk, long Q,
+	       mp_bitcnt_t b0, const mpz_t n)
+{
+  return gmp_lucas_mod (V, Qk, Q, b0, n);
 }

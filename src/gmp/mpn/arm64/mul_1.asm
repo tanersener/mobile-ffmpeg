@@ -2,7 +2,7 @@ dnl  ARM64 mpn_mul_1
 
 dnl  Contributed to the GNU project by Torbjörn Granlund.
 
-dnl  Copyright 2013 Free Software Foundation, Inc.
+dnl  Copyright 2013, 2015, 2017 Free Software Foundation, Inc.
 
 dnl  This file is part of the GNU MP Library.
 dnl
@@ -33,66 +33,95 @@ dnl  see https://www.gnu.org/licenses/.
 include(`../config.m4')
 
 C	     cycles/limb
-C Cortex-A53	 ?
-C Cortex-A57	 ?
+C Cortex-A53	7.5-8
+C Cortex-A57	 7
+C Cortex-A72
+C X-Gene	 4
+
+C TODO
+C  * Start first multiply earlier.
+
+changecom(blah)
 
 define(`rp', `x0')
 define(`up', `x1')
 define(`n',  `x2')
 define(`v0', `x3')
 
-ASM_START()
+
+PROLOGUE(mpn_mul_1c)
+	adds	xzr, xzr, xzr		C clear cy flag
+	b	L(com)
+EPILOGUE()
+
 PROLOGUE(mpn_mul_1)
-	ldr	x12, [up], #8
-	and	x6, n, #3
-	and	n, n, #-4
-	cbz	x6, L(fi0)
-	cmp	x6, #2
-	b.cc	L(fi1)
-	b.eq	L(fi2)
+	adds	x4, xzr, xzr		C clear register and cy flag
+L(com):	lsr	x18, n, #2
+	tbnz	n, #0, L(bx1)
 
-L(fi3):	mul	x8, x12, v0
-	umulh	x13, x12, v0
-	cmn	xzr, xzr
-	b	L(L3)
-L(fi2):	mul	x7, x12, v0
-	umulh	x5, x12, v0
-	cmn	xzr, xzr
-	b	L(L2)
-L(fi0):	mul	x9, x12, v0
-	umulh	x5, x12, v0
-	sub	n, n, #4
-	cmn	xzr, xzr
-	b	L(L0)
-L(fi1):	mul	x10, x12, v0
-	umulh	x13, x12, v0
-	cmn	xzr, xzr
-	cbz	n, L(end)
+L(bx0):	mov	x11, x4
+	tbz	n, #1, L(b00)
 
-L(top):	sub	n, n, #4
-	ldr	x12, [up], #8
-	mul	x6, x12, v0
-	umulh	x5, x12, v0
-	str	x10, [rp], #8
-	adcs	x9, x6, x13
-L(L0):	ldr	x12, [up], #8
-	mul	x6, x12, v0
-	umulh	x13, x12, v0
-	str	x9, [rp] ,#8
-	adcs	x8, x6, x5
-L(L3):	ldr	x12, [up], #8
-	mul	x6, x12, v0
-	umulh	x5, x12, v0
-	str	x8, [rp], #8
-	adcs	x7, x6, x13
-L(L2):	ldr	x12, [up], #8
-	mul	x6, x12, v0
-	umulh	x13, x12, v0
-	str	x7, [rp], #8
-	adcs	x10, x6, x5
-	cbnz	n, L(top)
+L(b10):	ldp	x4, x5, [up]
+	mul	x8, x4, v0
+	umulh	x10, x4, v0
+	cbz	x18, L(2)
+	ldp	x6, x7, [up,#16]!
+	mul	x9, x5, v0
+	b	L(mid)-8
 
-L(end):	str	x10, [rp]
-	adc	x0, x13, xzr
+L(2):	mul	x9, x5, v0
+	b	L(2e)
+
+L(bx1):	ldr	x7, [up],#8
+	mul	x9, x7, v0
+	umulh	x11, x7, v0
+	adds	x9, x9, x4
+	str	x9, [rp],#8
+	tbnz	n, #1, L(b10)
+
+L(b01):	cbz	x18, L(1)
+
+L(b00):	ldp	x6, x7, [up]
+	mul	x8, x6, v0
+	umulh	x10, x6, v0
+	ldp	x4, x5, [up,#16]
+	mul	x9, x7, v0
+	adcs	x12, x8, x11
+	umulh	x11, x7, v0
+	add	rp, rp, #16
+	sub	x18, x18, #1
+	cbz	x18, L(end)
+
+	ALIGN(16)
+L(top):	mul	x8, x4, v0
+	ldp	x6, x7, [up,#32]!
+	adcs	x13, x9, x10
+	umulh	x10, x4, v0
+	mul	x9, x5, v0
+	stp	x12, x13, [rp,#-16]
+	adcs	x12, x8, x11
+	umulh	x11, x5, v0
+L(mid):	mul	x8, x6, v0
+	ldp	x4, x5, [up,#16]
+	adcs	x13, x9, x10
+	umulh	x10, x6, v0
+	mul	x9, x7, v0
+	stp	x12, x13, [rp],#32
+	adcs	x12, x8, x11
+	umulh	x11, x7, v0
+	sub	x18, x18, #1
+	cbnz	x18, L(top)
+
+L(end):	mul	x8, x4, v0
+	adcs	x13, x9, x10
+	umulh	x10, x4, v0
+	mul	x9, x5, v0
+	stp	x12, x13, [rp,#-16]
+L(2e):	adcs	x12, x8, x11
+	umulh	x11, x5, v0
+	adcs	x13, x9, x10
+	stp	x12, x13, [rp]
+L(1):	adc	x0, x11, xzr
 	ret
 EPILOGUE()
