@@ -26,6 +26,7 @@
 #include "libavutil/avassert.h"
 #include "os_support.h"
 #include "avformat.h"
+#include "internal.h"
 #if CONFIG_NETWORK
 #include "network.h"
 #endif
@@ -54,8 +55,8 @@ static void *urlcontext_child_next(void *obj, void *prev)
 #define E AV_OPT_FLAG_ENCODING_PARAM
 #define D AV_OPT_FLAG_DECODING_PARAM
 static const AVOption options[] = {
-    {"protocol_whitelist", "List of protocols that are allowed to be used", OFFSET(protocol_whitelist), AV_OPT_TYPE_STRING, { .str = NULL },  CHAR_MIN, CHAR_MAX, D },
-    {"protocol_blacklist", "List of protocols that are not allowed to be used", OFFSET(protocol_blacklist), AV_OPT_TYPE_STRING, { .str = NULL },  CHAR_MIN, CHAR_MAX, D },
+    {"protocol_whitelist", "List of protocols that are allowed to be used", OFFSET(protocol_whitelist), AV_OPT_TYPE_STRING, { .str = NULL },  0, 0, D },
+    {"protocol_blacklist", "List of protocols that are not allowed to be used", OFFSET(protocol_blacklist), AV_OPT_TYPE_STRING, { .str = NULL },  0, 0, D },
     {"rw_timeout", "Timeout for IO operations (in microseconds)", offsetof(URLContext, rw_timeout), AV_OPT_TYPE_INT64, { .i64 = 0 }, 0, INT64_MAX, AV_OPT_FLAG_ENCODING_PARAM | AV_OPT_FLAG_DECODING_PARAM },
     { NULL }
 };
@@ -664,4 +665,12 @@ int ff_check_interrupt(AVIOInterruptCB *cb)
     if (cb && cb->callback)
         return cb->callback(cb->opaque);
     return 0;
+}
+
+int ff_rename(const char *url_src, const char *url_dst, void *logctx)
+{
+    int ret = avpriv_io_move(url_src, url_dst);
+    if (ret < 0)
+        av_log(logctx, AV_LOG_ERROR, "failed to rename file %s to %s: %s\n", url_src, url_dst, av_err2str(ret));
+    return ret;
 }

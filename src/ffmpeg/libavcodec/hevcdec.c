@@ -427,6 +427,12 @@ static enum AVPixelFormat get_format(HEVCContext *s, const HEVCSPS *sps)
         *fmt++ = AV_PIX_FMT_CUDA;
 #endif
         break;
+    case AV_PIX_FMT_YUV422P:
+    case AV_PIX_FMT_YUV422P10LE:
+#if CONFIG_HEVC_VAAPI_HWACCEL
+       *fmt++ = AV_PIX_FMT_VAAPI;
+#endif
+        break;
     case AV_PIX_FMT_YUV420P12:
     case AV_PIX_FMT_YUV444P10:
     case AV_PIX_FMT_YUV444P12:
@@ -3077,7 +3083,7 @@ static int decode_nal_units(HEVCContext *s, const uint8_t *buf, int length)
 
         if (s->avctx->skip_frame >= AVDISCARD_ALL ||
             (s->avctx->skip_frame >= AVDISCARD_NONREF
-            && ff_hevc_nal_is_nonref(nal->type)))
+            && ff_hevc_nal_is_nonref(nal->type)) || nal->nuh_layer_id > 0)
             continue;
 
         ret = decode_nal_unit(s, nal);
@@ -3485,8 +3491,6 @@ static av_cold int hevc_decode_init(AVCodecContext *avctx)
     HEVCContext *s = avctx->priv_data;
     int ret;
 
-    avctx->internal->allocate_progress = 1;
-
     ret = hevc_init_context(avctx);
     if (ret < 0)
         return ret;
@@ -3502,11 +3506,13 @@ static av_cold int hevc_decode_init(AVCodecContext *avctx)
     else
         s->threads_number = 1;
 
-    if (avctx->extradata_size > 0 && avctx->extradata) {
-        ret = hevc_decode_extradata(s, avctx->extradata, avctx->extradata_size, 1);
-        if (ret < 0) {
-            hevc_decode_free(avctx);
-            return ret;
+    if (!avctx->internal->is_copy) {
+        if (avctx->extradata_size > 0 && avctx->extradata) {
+            ret = hevc_decode_extradata(s, avctx->extradata, avctx->extradata_size, 1);
+            if (ret < 0) {
+                hevc_decode_free(avctx);
+                return ret;
+            }
         }
     }
 
@@ -3517,22 +3523,6 @@ static av_cold int hevc_decode_init(AVCodecContext *avctx)
 
     return 0;
 }
-
-#if HAVE_THREADS
-static av_cold int hevc_init_thread_copy(AVCodecContext *avctx)
-{
-    HEVCContext *s = avctx->priv_data;
-    int ret;
-
-    memset(s, 0, sizeof(*s));
-
-    ret = hevc_init_context(avctx);
-    if (ret < 0)
-        return ret;
-
-    return 0;
-}
-#endif
 
 static void hevc_decode_flush(AVCodecContext *avctx)
 {
@@ -3573,10 +3563,10 @@ AVCodec ff_hevc_decoder = {
     .decode                = hevc_decode_frame,
     .flush                 = hevc_decode_flush,
     .update_thread_context = ONLY_IF_THREADS_ENABLED(hevc_update_thread_context),
-    .init_thread_copy      = ONLY_IF_THREADS_ENABLED(hevc_init_thread_copy),
     .capabilities          = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_DELAY |
                              AV_CODEC_CAP_SLICE_THREADS | AV_CODEC_CAP_FRAME_THREADS,
-    .caps_internal         = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_EXPORTS_CROPPING,
+    .caps_internal         = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_EXPORTS_CROPPING |
+                             FF_CODEC_CAP_ALLOCATE_PROGRESS,
     .profiles              = NULL_IF_CONFIG_SMALL(ff_hevc_profiles),
     .hw_configs            = (const AVCodecHWConfigInternal*[]) {
 #if CONFIG_HEVC_DXVA2_HWACCEL

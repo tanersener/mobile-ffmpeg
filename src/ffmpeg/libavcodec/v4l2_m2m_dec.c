@@ -39,7 +39,7 @@ static int v4l2_try_start(AVCodecContext *avctx)
     V4L2m2mContext *s = ((V4L2m2mPriv*)avctx->priv_data)->context;
     V4L2Context *const capture = &s->capture;
     V4L2Context *const output = &s->output;
-    struct v4l2_selection selection;
+    struct v4l2_selection selection = { 0 };
     int ret;
 
     /* 1. start the output process */
@@ -217,7 +217,7 @@ static av_cold int v4l2_decode_init(AVCodecContext *avctx)
 static av_cold int v4l2_decode_close(AVCodecContext *avctx)
 {
     V4L2m2mPriv *priv = avctx->priv_data;
-    V4L2m2mContext* s = priv->context;
+    V4L2m2mContext *s = priv->context;
     av_packet_unref(&s->buf_pkt);
     return ff_v4l2_m2m_codec_end(priv);
 }

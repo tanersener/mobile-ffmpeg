@@ -60,10 +60,10 @@ static inline int v4l2_mplane_video(struct v4l2_capability *cap)
     return 0;
 }
 
-static int v4l2_prepare_contexts(V4L2m2mContext* s, int probe)
+static int v4l2_prepare_contexts(V4L2m2mContext *s, int probe)
 {
     struct v4l2_capability cap;
-    void *log_ctx = s->priv;
+    void *log_ctx = s->avctx;
     int ret;
 
     s->capture.done = s->output.done = 0;
@@ -97,9 +97,9 @@ static int v4l2_prepare_contexts(V4L2m2mContext* s, int probe)
     return AVERROR(EINVAL);
 }
 
-static int v4l2_probe_driver(V4L2m2mContext* s)
+static int v4l2_probe_driver(V4L2m2mContext *s)
 {
-    void *log_ctx = s->priv;
+    void *log_ctx = s->avctx;
     int ret;
 
     s->fd = open(s->devname, O_RDWR | O_NONBLOCK, 0);
@@ -133,9 +133,9 @@ done:
     return ret;
 }
 
-static int v4l2_configure_contexts(V4L2m2mContext* s)
+static int v4l2_configure_contexts(V4L2m2mContext *s)
 {
-    void *log_ctx = s->priv;
+    void *log_ctx = s->avctx;
     int ret;
     struct v4l2_format ofmt, cfmt;
 
@@ -176,7 +176,7 @@ static int v4l2_configure_contexts(V4L2m2mContext* s)
     }
 
     /* decoder's buffers need to be updated at a later stage */
-    if (!s->avctx || !av_codec_is_decoder(s->avctx->codec)) {
+    if (s->avctx && !av_codec_is_decoder(s->avctx->codec)) {
         ret = ff_v4l2_context_init(&s->capture);
         if (ret) {
             av_log(log_ctx, AV_LOG_ERROR, "no v4l2 capture context's buffers\n");
@@ -202,9 +202,9 @@ error:
  *                  V4L2 M2M Interface
  *
  ******************************************************************************/
-int ff_v4l2_m2m_codec_reinit(V4L2m2mContext* s)
+int ff_v4l2_m2m_codec_reinit(V4L2m2mContext *s)
 {
-    void *log_ctx = s->priv;
+    void *log_ctx = s->avctx;
     int ret;
 
     av_log(log_ctx, AV_LOG_DEBUG, "reinit context\n");
@@ -264,8 +264,8 @@ int ff_v4l2_m2m_codec_full_reinit(V4L2m2mContext *s)
 
     ret = ff_v4l2_context_set_status(&s->capture, VIDIOC_STREAMOFF);
     if (ret) {
-            av_log(log_ctx, AV_LOG_ERROR, "capture VIDIOC_STREAMOFF\n");
-            goto error;
+        av_log(log_ctx, AV_LOG_ERROR, "capture VIDIOC_STREAMOFF\n");
+        goto error;
     }
 
     /* release and unmmap the buffers */
@@ -307,7 +307,7 @@ int ff_v4l2_m2m_codec_full_reinit(V4L2m2mContext *s)
     }
 
     /* decoder's buffers need to be updated at a later stage */
-    if (!s->avctx || !av_codec_is_decoder(s->avctx->codec)) {
+    if (s->avctx && !av_codec_is_decoder(s->avctx->codec)) {
         ret = ff_v4l2_context_init(&s->capture);
         if (ret) {
             av_log(log_ctx, AV_LOG_ERROR, "no v4l2 capture context's buffers\n");
@@ -335,16 +335,16 @@ static void v4l2_m2m_destroy_context(void *opaque, uint8_t *context)
 
 int ff_v4l2_m2m_codec_end(V4L2m2mPriv *priv)
 {
-    V4L2m2mContext* s = priv->context;
+    V4L2m2mContext *s = priv->context;
     int ret;
 
     ret = ff_v4l2_context_set_status(&s->output, VIDIOC_STREAMOFF);
     if (ret)
-        av_log(priv, AV_LOG_ERROR, "VIDIOC_STREAMOFF %s\n", s->output.name);
+        av_log(s->avctx, AV_LOG_ERROR, "VIDIOC_STREAMOFF %s\n", s->output.name);
 
     ret = ff_v4l2_context_set_status(&s->capture, VIDIOC_STREAMOFF);
     if (ret)
-        av_log(priv, AV_LOG_ERROR, "VIDIOC_STREAMOFF %s\n", s->capture.name);
+        av_log(s->avctx, AV_LOG_ERROR, "VIDIOC_STREAMOFF %s\n", s->capture.name);
 
     ff_v4l2_context_release(&s->output);
 
@@ -358,7 +358,6 @@ int ff_v4l2_m2m_codec_init(V4L2m2mPriv *priv)
 {
     int ret = AVERROR(EINVAL);
     struct dirent *entry;
-    char node[PATH_MAX];
     DIR *dirp;
 
     V4L2m2mContext *s = priv->context;
@@ -372,9 +371,8 @@ int ff_v4l2_m2m_codec_init(V4L2m2mPriv *priv)
         if (strncmp(entry->d_name, "video", 5))
             continue;
 
-        snprintf(node, sizeof(node), "/dev/%s", entry->d_name);
-        av_log(priv, AV_LOG_DEBUG, "probing device %s\n", node);
-        strncpy(s->devname, node, strlen(node) + 1);
+        snprintf(s->devname, sizeof(s->devname), "/dev/%s", entry->d_name);
+        av_log(s->avctx, AV_LOG_DEBUG, "probing device %s\n", s->devname);
         ret = v4l2_probe_driver(s);
         if (!ret)
             break;
@@ -383,13 +381,13 @@ int ff_v4l2_m2m_codec_init(V4L2m2mPriv *priv)
     closedir(dirp);
 
     if (ret) {
-        av_log(priv, AV_LOG_ERROR, "Could not find a valid device\n");
+        av_log(s->avctx, AV_LOG_ERROR, "Could not find a valid device\n");
         memset(s->devname, 0, sizeof(s->devname));
 
         return ret;
     }
 
-    av_log(priv, AV_LOG_INFO, "Using device %s\n", node);
+    av_log(s->avctx, AV_LOG_INFO, "Using device %s\n", s->devname);
 
     return v4l2_configure_contexts(s);
 }

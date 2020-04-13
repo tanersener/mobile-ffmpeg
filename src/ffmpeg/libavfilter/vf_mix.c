@@ -289,7 +289,7 @@ static av_cold void uninit(AVFilterContext *ctx)
         for (i = 0; i < ctx->nb_inputs; i++)
             av_freep(&ctx->input_pads[i].name);
     } else {
-        for (i = 0; i < s->nb_frames; i++)
+        for (i = 0; i < s->nb_frames && s->frames; i++)
             av_frame_free(&s->frames[i]);
     }
     av_freep(&s->frames);
@@ -305,7 +305,7 @@ static int activate(AVFilterContext *ctx)
 #define FLAGS AV_OPT_FLAG_VIDEO_PARAM | AV_OPT_FLAG_FILTERING_PARAM
 
 static const AVOption mix_options[] = {
-    { "inputs", "set number of inputs", OFFSET(nb_inputs), AV_OPT_TYPE_INT, {.i64=2}, 2, INT_MAX, .flags = FLAGS },
+    { "inputs", "set number of inputs", OFFSET(nb_inputs), AV_OPT_TYPE_INT, {.i64=2}, 2, INT16_MAX, .flags = FLAGS },
     { "weights", "set weight for each input", OFFSET(weights_str), AV_OPT_TYPE_STRING, {.str="1 1"}, 0, 0, .flags = FLAGS },
     { "scale", "set scale", OFFSET(scale), AV_OPT_TYPE_FLOAT, {.dbl=0}, 0, INT16_MAX, .flags = FLAGS },
     { "duration", "how to determine end of stream", OFFSET(duration), AV_OPT_TYPE_INT, {.i64=0}, 0, 2, .flags = FLAGS, "duration" },

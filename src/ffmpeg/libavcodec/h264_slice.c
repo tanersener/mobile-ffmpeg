@@ -29,7 +29,6 @@
 #include "libavutil/display.h"
 #include "libavutil/imgutils.h"
 #include "libavutil/stereo3d.h"
-#include "libavutil/timer.h"
 #include "internal.h"
 #include "cabac.h"
 #include "cabac_functions.h"
@@ -334,7 +333,6 @@ int ff_h264_update_thread_context(AVCodecContext *dst,
     }
 
     av_buffer_unref(&h->ps.pps_ref);
-    av_buffer_unref(&h->ps.sps_ref);
     h->ps.pps = NULL;
     h->ps.sps = NULL;
     if (h1->ps.pps_ref) {
@@ -342,12 +340,7 @@ int ff_h264_update_thread_context(AVCodecContext *dst,
         if (!h->ps.pps_ref)
             return AVERROR(ENOMEM);
         h->ps.pps = (const PPS*)h->ps.pps_ref->data;
-    }
-    if (h1->ps.sps_ref) {
-        h->ps.sps_ref = av_buffer_ref(h1->ps.sps_ref);
-        if (!h->ps.sps_ref)
-            return AVERROR(ENOMEM);
-        h->ps.sps = (const SPS*)h->ps.sps_ref->data;
+        h->ps.sps = h->ps.pps->sps;
     }
 
     if (need_reinit || !inited) {
@@ -865,7 +858,7 @@ static enum AVPixelFormat get_pixel_format(H264Context *h, int force_callback)
 }
 
 /* export coded and cropped frame dimensions to AVCodecContext */
-static int init_dimensions(H264Context *h)
+static void init_dimensions(H264Context *h)
 {
     const SPS *sps = (const SPS*)h->ps.sps;
     int cr = sps->crop_right;
@@ -903,8 +896,6 @@ static int init_dimensions(H264Context *h)
     h->crop_left           = cl;
     h->crop_top            = ct;
     h->crop_bottom         = cb;
-
-    return 0;
 }
 
 static int h264_slice_header_init(H264Context *h)
@@ -1016,13 +1007,8 @@ static int h264_init_ps(H264Context *h, const H264SliceContext *sl, int first_sl
         h->ps.pps = (const PPS*)h->ps.pps_ref->data;
     }
 
-    if (h->ps.sps != (const SPS*)h->ps.sps_list[h->ps.pps->sps_id]->data) {
-        av_buffer_unref(&h->ps.sps_ref);
-        h->ps.sps = NULL;
-        h->ps.sps_ref = av_buffer_ref(h->ps.sps_list[h->ps.pps->sps_id]);
-        if (!h->ps.sps_ref)
-            return AVERROR(ENOMEM);
-        h->ps.sps = (const SPS*)h->ps.sps_ref->data;
+    if (h->ps.sps != h->ps.pps->sps) {
+        h->ps.sps = (const SPS*)h->ps.pps->sps;
 
         if (h->mb_width  != h->ps.sps->mb_width ||
             h->mb_height != h->ps.sps->mb_height ||
@@ -1069,9 +1055,7 @@ static int h264_init_ps(H264Context *h, const H264SliceContext *sl, int first_sl
         h->width  = 16 * h->mb_width;
         h->height = 16 * h->mb_height;
 
-        ret = init_dimensions(h);
-        if (ret < 0)
-            return ret;
+        init_dimensions(h);
 
         if (sps->video_signal_type_present_flag) {
             h->avctx->color_range = sps->full_range > 0 ? AVCOL_RANGE_JPEG
@@ -1091,6 +1075,7 @@ static int h264_init_ps(H264Context *h, const H264SliceContext *sl, int first_sl
             h->avctx->color_trc = h->sei.alternative_transfer.preferred_transfer_characteristics;
         }
     }
+    h->avctx->chroma_sample_location = sps->chroma_location;
 
     if (!h->context_initialized || must_reinit || needs_reinit) {
         int flush_changes = h->context_initialized;
@@ -1138,6 +1123,16 @@ static int h264_export_frame_props(H264Context *h)
     /* Signal interlacing information externally. */
     /* Prioritize picture timing SEI information over used
      * decoding process if it exists. */
+    if (h->sei.picture_timing.present) {
+        int ret = ff_h264_sei_process_picture_timing(&h->sei.picture_timing, sps,
+                                                     h->avctx);
+        if (ret < 0) {
+            av_log(h->avctx, AV_LOG_ERROR, "Error processing a picture timing SEI\n");
+            if (h->avctx->err_recognition & AV_EF_EXPLODE)
+                return ret;
+            h->sei.picture_timing.present = 0;
+        }
+    }
 
     if (sps->pic_struct_present_flag && h->sei.picture_timing.present) {
         H264SEIPictureTiming *pt = &h->sei.picture_timing;
@@ -1773,13 +1768,7 @@ static int h264_slice_header_parse(const H264Context *h, H264SliceContext *sl,
         return AVERROR_INVALIDDATA;
     }
     pps = (const PPS*)h->ps.pps_list[sl->pps_id]->data;
-
-    if (!h->ps.sps_list[pps->sps_id]) {
-        av_log(h->avctx, AV_LOG_ERROR,
-               "non-existing SPS %u referenced\n", pps->sps_id);
-        return AVERROR_INVALIDDATA;
-    }
-    sps = (const SPS*)h->ps.sps_list[pps->sps_id]->data;
+    sps = pps->sps;
 
     sl->frame_num = get_bits(&sl->gb, sps->log2_max_frame_num);
     if (!first_slice) {
@@ -2165,7 +2154,7 @@ int ff_h264_queue_decode_slice(H264Context *h, const H2645NAL *nal)
             av_log(h->avctx, AV_LOG_ERROR, "PPS changed between slices\n");
             return AVERROR_INVALIDDATA;
         }
-        if (h->ps.sps != (const SPS*)h->ps.sps_list[h->ps.pps->sps_id]->data) {
+        if (h->ps.sps != pps->sps) {
             av_log(h->avctx, AV_LOG_ERROR,
                "SPS changed in the middle of the frame\n");
             return AVERROR_INVALIDDATA;
@@ -2621,7 +2610,6 @@ static int decode_slice(struct AVCodecContext *avctx, void *arg)
         ff_h264_init_cabac_states(h, sl);
 
         for (;;) {
-            // START_TIMER
             int ret, eos;
             if (sl->mb_x + sl->mb_y * h->mb_width >= sl->next_slice_idx) {
                 av_log(h->avctx, AV_LOG_ERROR, "Slice overlaps with next at %d\n",
@@ -2632,7 +2620,6 @@ static int decode_slice(struct AVCodecContext *avctx, void *arg)
             }
 
             ret = ff_h264_decode_mb_cabac(h, sl);
-            // STOP_TIMER("decode_mb_cabac")
 
             if (ret >= 0)
                 ff_h264_hl_decode_mb(h, sl);

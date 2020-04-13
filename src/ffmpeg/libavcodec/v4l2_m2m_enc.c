@@ -83,7 +83,7 @@ static inline int v4l2_get_ext_ctrl(V4L2m2mContext *s, unsigned int id, signed i
 
     ret = ioctl(s->fd, VIDIOC_G_EXT_CTRLS, &ctrls);
     if (ret < 0) {
-        av_log(s->avctx, AV_LOG_WARNING, "Failed to set %s\n", name);
+        av_log(s->avctx, AV_LOG_WARNING, "Failed to get %s\n", name);
         return ret;
     }
 
@@ -172,7 +172,7 @@ static int v4l2_prepare_encoder(V4L2m2mContext *s)
      * settingss
      */
     if (avctx->framerate.num || avctx->framerate.den)
-        v4l2_set_timeperframe(s, avctx->framerate.num, avctx->framerate.den);
+        v4l2_set_timeperframe(s, avctx->framerate.den, avctx->framerate.num);
 
     /* set ext ctrls */
     v4l2_set_ext_ctrl(s, MPEG_CID(HEADER_MODE), MPEG_VIDEO(HEADER_MODE_SEPARATE), "header mode");
@@ -312,12 +312,12 @@ static av_cold int v4l2_encode_init(AVCodecContext *avctx)
     capture->av_codec_id = avctx->codec_id;
     capture->av_pix_fmt = AV_PIX_FMT_NONE;
 
+    s->avctx = avctx;
     ret = ff_v4l2_m2m_codec_init(priv);
     if (ret) {
         av_log(avctx, AV_LOG_ERROR, "can't configure encoder\n");
         return ret;
     }
-    s->avctx = avctx;
 
     if (V4L2_TYPE_IS_MULTIPLANAR(output->type))
         v4l2_fmt_output = output->format.fmt.pix_mp.pixelformat;

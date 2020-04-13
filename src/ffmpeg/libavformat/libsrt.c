@@ -96,7 +96,7 @@ typedef struct SRTContext {
 #define E AV_OPT_FLAG_ENCODING_PARAM
 #define OFFSET(x) offsetof(SRTContext, x)
 static const AVOption libsrt_options[] = {
-    { "rw_timeout",     "Timeout of socket I/O operations",                                     OFFSET(rw_timeout),       AV_OPT_TYPE_INT64, { .i64 = -1 }, -1, INT64_MAX, .flags = D|E },
+    { "timeout",        "Timeout of socket I/O operations",                                     OFFSET(rw_timeout),       AV_OPT_TYPE_INT64, { .i64 = -1 }, -1, INT64_MAX, .flags = D|E },
     { "listen_timeout", "Connection awaiting timeout",                                          OFFSET(listen_timeout),   AV_OPT_TYPE_INT64, { .i64 = -1 }, -1, INT64_MAX, .flags = D|E },
     { "send_buffer_size", "Socket send buffer size (in bytes)",                                 OFFSET(send_buffer_size), AV_OPT_TYPE_INT,      { .i64 = -1 }, -1, INT_MAX,   .flags = D|E },
     { "recv_buffer_size", "Socket receive buffer size (in bytes)",                              OFFSET(recv_buffer_size), AV_OPT_TYPE_INT,      { .i64 = -1 }, -1, INT_MAX,   .flags = D|E },
@@ -145,33 +145,37 @@ static const AVOption libsrt_options[] = {
 
 static int libsrt_neterrno(URLContext *h)
 {
-    int err = srt_getlasterror(NULL);
-    av_log(h, AV_LOG_ERROR, "%s\n", srt_getlasterror_str());
-    if (err == SRT_EASYNCRCV)
+    int os_errno;
+    int err = srt_getlasterror(&os_errno);
+    if (err == SRT_EASYNCRCV || err == SRT_EASYNCSND)
         return AVERROR(EAGAIN);
-    return AVERROR_UNKNOWN;
+    av_log(h, AV_LOG_ERROR, "%s\n", srt_getlasterror_str());
+    return os_errno ? AVERROR(os_errno) : AVERROR_UNKNOWN;
 }
 
 static int libsrt_socket_nonblock(int socket, int enable)
 {
-    int ret = srt_setsockopt(socket, 0, SRTO_SNDSYN, &enable, sizeof(enable));
+    int ret, blocking = enable ? 0 : 1;
+    /* Setting SRTO_{SND,RCV}SYN options to 1 enable blocking mode, setting them to 0 enable non-blocking mode. */
+    ret = srt_setsockopt(socket, 0, SRTO_SNDSYN, &blocking, sizeof(blocking));
     if (ret < 0)
         return ret;
-    return srt_setsockopt(socket, 0, SRTO_RCVSYN, &enable, sizeof(enable));
+    return srt_setsockopt(socket, 0, SRTO_RCVSYN, &blocking, sizeof(blocking));
 }
 
 static int libsrt_network_wait_fd(URLContext *h, int eid, int fd, int write)
 {
-    int ret, len = 1;
-    int modes = write ? SRT_EPOLL_OUT : SRT_EPOLL_IN;
+    int ret, len = 1, errlen = 1;
+    int modes = SRT_EPOLL_ERR | (write ? SRT_EPOLL_OUT : SRT_EPOLL_IN);
     SRTSOCKET ready[1];
+    SRTSOCKET error[1];
 
     if (srt_epoll_add_usock(eid, fd, &modes) < 0)
         return libsrt_neterrno(h);
     if (write) {
-        ret = srt_epoll_wait(eid, 0, 0, ready, &len, POLLING_TIME, 0, 0, 0, 0);
+        ret = srt_epoll_wait(eid, error, &errlen, ready, &len, POLLING_TIME, 0, 0, 0, 0);
     } else {
-        ret = srt_epoll_wait(eid, ready, &len, 0, 0, POLLING_TIME, 0, 0, 0, 0);
+        ret = srt_epoll_wait(eid, ready, &len, error, &errlen, POLLING_TIME, 0, 0, 0, 0);
     }
     if (ret < 0) {
         if (srt_getlasterror(NULL) == SRT_ETIMEOUT)
@@ -179,7 +183,7 @@ static int libsrt_network_wait_fd(URLContext *h, int eid, int fd, int write)
         else
             ret = libsrt_neterrno(h);
     } else {
-        ret = 0;
+        ret = errlen ? AVERROR(EIO) : 0;
     }
     if (srt_epoll_remove_usock(eid, fd) < 0)
         return libsrt_neterrno(h);
@@ -208,7 +212,7 @@ static int libsrt_network_wait_fd_timeout(URLContext *h, int eid, int fd, int wr
     }
 }
 
-static int libsrt_listen(int eid, int fd, const struct sockaddr *addr, socklen_t addrlen, URLContext *h, int timeout)
+static int libsrt_listen(int eid, int fd, const struct sockaddr *addr, socklen_t addrlen, URLContext *h, int64_t timeout)
 {
     int ret;
     int reuse = 1;
@@ -223,14 +227,9 @@ static int libsrt_listen(int eid, int fd, const struct sockaddr *addr, socklen_t
     if (ret)
         return libsrt_neterrno(h);
 
-    while ((ret = libsrt_network_wait_fd_timeout(h, eid, fd, 1, timeout, &h->interrupt_callback))) {
-        switch (ret) {
-        case AVERROR(ETIMEDOUT):
-            continue;
-        default:
-            return ret;
-        }
-    }
+    ret = libsrt_network_wait_fd_timeout(h, eid, fd, 1, timeout, &h->interrupt_callback);
+    if (ret < 0)
+        return ret;
 
     ret = srt_accept(fd, NULL, NULL);
     if (ret < 0)
@@ -241,41 +240,23 @@ static int libsrt_listen(int eid, int fd, const struct sockaddr *addr, socklen_t
     return ret;
 }
 
-static int libsrt_listen_connect(int eid, int fd, const struct sockaddr *addr, socklen_t addrlen, int timeout, URLContext *h, int will_try_next)
+static int libsrt_listen_connect(int eid, int fd, const struct sockaddr *addr, socklen_t addrlen, int64_t timeout, URLContext *h, int will_try_next)
 {
     int ret;
 
-    if (libsrt_socket_nonblock(fd, 1) < 0)
-        av_log(h, AV_LOG_DEBUG, "ff_socket_nonblock failed\n");
+    ret = srt_connect(fd, addr, addrlen);
+    if (ret < 0)
+        return libsrt_neterrno(h);
 
-    while ((ret = srt_connect(fd, addr, addrlen))) {
-        ret = libsrt_neterrno(h);
-        switch (ret) {
-        case AVERROR(EINTR):
-            if (ff_check_interrupt(&h->interrupt_callback))
-                return AVERROR_EXIT;
-            continue;
-        case AVERROR(EINPROGRESS):
-        case AVERROR(EAGAIN):
-            ret = libsrt_network_wait_fd_timeout(h, eid, fd, 1, timeout, &h->interrupt_callback);
-            if (ret < 0)
-                return ret;
-            ret = srt_getlasterror(NULL);
-            srt_clearlasterror();
-            if (ret != 0) {
-                char buf[128];
-                ret = AVERROR(ret);
-                av_strerror(ret, buf, sizeof(buf));
-                if (will_try_next)
-                    av_log(h, AV_LOG_WARNING,
-                           "Connection to %s failed (%s), trying next address\n",
-                           h->filename, buf);
-                else
-                    av_log(h, AV_LOG_ERROR, "Connection to %s failed: %s\n",
-                           h->filename, buf);
-            }
-        default:
-            return ret;
+    ret = libsrt_network_wait_fd_timeout(h, eid, fd, 1, timeout, &h->interrupt_callback);
+    if (ret < 0) {
+        if (will_try_next) {
+            av_log(h, AV_LOG_WARNING,
+                   "Connection to %s failed (%s), trying next address\n",
+                   h->filename, av_err2str(ret));
+        } else {
+            av_log(h, AV_LOG_ERROR, "Connection to %s failed: %s\n",
+                   h->filename, av_err2str(ret));
         }
     }
     return ret;
@@ -380,7 +361,7 @@ static int libsrt_setup(URLContext *h, const char *uri, int flags)
     int ret;
     char hostname[1024],proto[1024],path[1024];
     char portstr[10];
-    int open_timeout = 5000000;
+    int open_timeout = 0;
     int eid;
 
     eid = srt_epoll_create();
@@ -443,9 +424,12 @@ static int libsrt_setup(URLContext *h, const char *uri, int flags)
     if (s->send_buffer_size > 0) {
         srt_setsockopt(fd, SOL_SOCKET, SRTO_UDP_SNDBUF, &s->send_buffer_size, sizeof (s->send_buffer_size));
     }
+    if (libsrt_socket_nonblock(fd, 1) < 0)
+        av_log(h, AV_LOG_DEBUG, "libsrt_socket_nonblock failed\n");
+
     if (s->mode == SRT_MODE_LISTENER) {
         // multi-client
-        if ((ret = libsrt_listen(s->eid, fd, cur_ai->ai_addr, cur_ai->ai_addrlen, h, open_timeout / 1000)) < 0)
+        if ((ret = libsrt_listen(s->eid, fd, cur_ai->ai_addr, cur_ai->ai_addrlen, h, s->listen_timeout)) < 0)
             goto fail1;
         fd = ret;
     } else {
@@ -456,7 +440,7 @@ static int libsrt_setup(URLContext *h, const char *uri, int flags)
         }
 
         if ((ret = libsrt_listen_connect(s->eid, fd, cur_ai->ai_addr, cur_ai->ai_addrlen,
-                                          open_timeout / 1000, h, !!cur_ai->ai_next)) < 0) {
+                                          open_timeout, h, !!cur_ai->ai_next)) < 0) {
             if (ret == AVERROR_EXIT)
                 goto fail1;
             else
@@ -523,6 +507,7 @@ static int libsrt_open(URLContext *h, const char *uri, int flags)
             av_freep(&s->passphrase);
             s->passphrase = av_strndup(buf, strlen(buf));
         }
+#if SRT_VERSION_VALUE >= 0x010302
         if (av_find_info_tag(buf, sizeof(buf), "enforced_encryption", p)) {
             s->enforced_encryption = strtol(buf, NULL, 10);
         }
@@ -532,6 +517,7 @@ static int libsrt_open(URLContext *h, const char *uri, int flags)
         if (av_find_info_tag(buf, sizeof(buf), "kmpreannounce", p)) {
             s->kmpreannounce = strtol(buf, NULL, 10);
         }
+#endif
         if (av_find_info_tag(buf, sizeof(buf), "mss", p)) {
             s->mss = strtol(buf, NULL, 10);
         }

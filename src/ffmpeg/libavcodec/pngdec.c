@@ -320,6 +320,15 @@ static void deloco_ ## NAME(TYPE *dst, int size, int alpha) \
 YUV2RGB(rgb8, uint8_t)
 YUV2RGB(rgb16, uint16_t)
 
+static int percent_missing(PNGDecContext *s)
+{
+    if (s->interlace_type) {
+        return 100 - 100 * s->pass / (NB_PASSES - 1);
+    } else {
+        return 100 - 100 * s->y / s->cur_h;
+    }
+}
+
 /* process exactly one decompressed row */
 static void png_handle_row(PNGDecContext *s)
 {
@@ -1354,6 +1363,9 @@ exit_loop:
         return 0;
     }
 
+    if (percent_missing(s) > avctx->discard_damaged_percentage)
+        return AVERROR_INVALIDDATA;
+
     if (s->bits_per_pixel <= 4)
         handle_small_bpp(s, p);
 
@@ -1759,10 +1771,7 @@ static av_cold int png_dec_init(AVCodecContext *avctx)
         return AVERROR(ENOMEM);
     }
 
-    if (!avctx->internal->is_copy) {
-        avctx->internal->allocate_progress = 1;
-        ff_pngdsp_init(&s->dsp);
-    }
+    ff_pngdsp_init(&s->dsp);
 
     return 0;
 }
@@ -1797,10 +1806,10 @@ AVCodec ff_apng_decoder = {
     .init           = png_dec_init,
     .close          = png_dec_end,
     .decode         = decode_frame_apng,
-    .init_thread_copy = ONLY_IF_THREADS_ENABLED(png_dec_init),
     .update_thread_context = ONLY_IF_THREADS_ENABLED(update_thread_context),
     .capabilities   = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_FRAME_THREADS /*| AV_CODEC_CAP_DRAW_HORIZ_BAND*/,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
+    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE |
+                      FF_CODEC_CAP_ALLOCATE_PROGRESS,
 };
 #endif
 
@@ -1814,10 +1823,10 @@ AVCodec ff_png_decoder = {
     .init           = png_dec_init,
     .close          = png_dec_end,
     .decode         = decode_frame_png,
-    .init_thread_copy = ONLY_IF_THREADS_ENABLED(png_dec_init),
     .update_thread_context = ONLY_IF_THREADS_ENABLED(update_thread_context),
     .capabilities   = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_FRAME_THREADS /*| AV_CODEC_CAP_DRAW_HORIZ_BAND*/,
-    .caps_internal  = FF_CODEC_CAP_SKIP_FRAME_FILL_PARAM | FF_CODEC_CAP_INIT_THREADSAFE,
+    .caps_internal  = FF_CODEC_CAP_SKIP_FRAME_FILL_PARAM | FF_CODEC_CAP_INIT_THREADSAFE |
+                      FF_CODEC_CAP_ALLOCATE_PROGRESS,
 };
 #endif
 
@@ -1833,6 +1842,7 @@ AVCodec ff_lscr_decoder = {
     .decode         = decode_frame_lscr,
     .flush          = decode_flush,
     .capabilities   = AV_CODEC_CAP_DR1 /*| AV_CODEC_CAP_DRAW_HORIZ_BAND*/,
-    .caps_internal  = FF_CODEC_CAP_SKIP_FRAME_FILL_PARAM | FF_CODEC_CAP_INIT_THREADSAFE,
+    .caps_internal  = FF_CODEC_CAP_SKIP_FRAME_FILL_PARAM | FF_CODEC_CAP_INIT_THREADSAFE |
+                      FF_CODEC_CAP_ALLOCATE_PROGRESS,
 };
 #endif

@@ -112,10 +112,20 @@ static int vp9_frame_alloc(AVCodecContext *avctx, VP9Frame *f)
         return ret;
 
     sz = 64 * s->sb_cols * s->sb_rows;
-    f->extradata = av_buffer_allocz(sz * (1 + sizeof(VP9mvrefPair)));
+    if (sz != s->frame_extradata_pool_size) {
+        av_buffer_pool_uninit(&s->frame_extradata_pool);
+        s->frame_extradata_pool = av_buffer_pool_init(sz * (1 + sizeof(VP9mvrefPair)), NULL);
+        if (!s->frame_extradata_pool) {
+            s->frame_extradata_pool_size = 0;
+            goto fail;
+        }
+        s->frame_extradata_pool_size = sz;
+    }
+    f->extradata = av_buffer_pool_get(s->frame_extradata_pool);
     if (!f->extradata) {
         goto fail;
     }
+    memset(f->extradata->data, 0, f->extradata->size);
 
     f->segmentation_map = f->extradata->data;
     f->mv = (VP9mvrefPair *) (f->extradata->data + sz);
@@ -1210,6 +1220,7 @@ static av_cold int vp9_decode_free(AVCodecContext *avctx)
             vp9_frame_unref(avctx, &s->s.frames[i]);
         av_frame_free(&s->s.frames[i].tf.f);
     }
+    av_buffer_pool_uninit(&s->frame_extradata_pool);
     for (i = 0; i < 8; i++) {
         if (s->s.refs[i].f->buf[0])
             ff_thread_release_buffer(avctx, &s->s.refs[i]);
@@ -1730,7 +1741,6 @@ static av_cold int vp9_decode_init(AVCodecContext *avctx)
 {
     VP9Context *s = avctx->priv_data;
 
-    avctx->internal->allocate_progress = 1;
     s->last_bpp = 0;
     s->s.h.filter.sharpness = -1;
 
@@ -1738,11 +1748,6 @@ static av_cold int vp9_decode_init(AVCodecContext *avctx)
 }
 
 #if HAVE_THREADS
-static av_cold int vp9_decode_init_thread_copy(AVCodecContext *avctx)
-{
-    return init_frames(avctx);
-}
-
 static int vp9_decode_update_thread_context(AVCodecContext *dst, const AVCodecContext *src)
 {
     int i, ret;
@@ -1799,9 +1804,9 @@ AVCodec ff_vp9_decoder = {
     .close                 = vp9_decode_free,
     .decode                = vp9_decode_frame,
     .capabilities          = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_FRAME_THREADS | AV_CODEC_CAP_SLICE_THREADS,
-    .caps_internal         = FF_CODEC_CAP_SLICE_THREAD_HAS_MF,
+    .caps_internal         = FF_CODEC_CAP_SLICE_THREAD_HAS_MF |
+                             FF_CODEC_CAP_ALLOCATE_PROGRESS,
     .flush                 = vp9_decode_flush,
-    .init_thread_copy      = ONLY_IF_THREADS_ENABLED(vp9_decode_init_thread_copy),
     .update_thread_context = ONLY_IF_THREADS_ENABLED(vp9_decode_update_thread_context),
     .profiles              = NULL_IF_CONFIG_SMALL(ff_vp9_profiles),
     .bsfs                  = "vp9_superframe_split",

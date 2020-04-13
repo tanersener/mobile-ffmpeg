@@ -882,7 +882,6 @@ static int seg_write_packet(AVFormatContext *s, AVPacket *pkt)
                 goto calc_times;
             }
             memcpy(st->codecpar->extradata, pkt_extradata, pkt_extradata_size);
-            st->codecpar->extradata_size = pkt_extradata_size;
         }
     }
 
@@ -972,7 +971,8 @@ calc_times:
            av_ts2str(pkt->pts), av_ts2timestr(pkt->pts, &st->time_base),
            av_ts2str(pkt->dts), av_ts2timestr(pkt->dts, &st->time_base));
 
-    ret = ff_write_chained(seg->avf, pkt->stream_index, pkt, s, seg->initial_offset || seg->reset_timestamps);
+    ret = ff_write_chained(seg->avf, pkt->stream_index, pkt, s,
+                           seg->initial_offset || seg->reset_timestamps || seg->avf->oformat->interleave_packet);
 
 fail:
     if (pkt->stream_index == seg->reference_stream_index) {
@@ -1047,7 +1047,7 @@ static int seg_check_bitstream(struct AVFormatContext *s, const AVPacket *pkt)
 #define OFFSET(x) offsetof(SegmentContext, x)
 #define E AV_OPT_FLAG_ENCODING_PARAM
 static const AVOption options[] = {
-    { "reference_stream",  "set reference stream", OFFSET(reference_stream_specifier), AV_OPT_TYPE_STRING, {.str = "auto"}, CHAR_MIN, CHAR_MAX, E },
+    { "reference_stream",  "set reference stream", OFFSET(reference_stream_specifier), AV_OPT_TYPE_STRING, {.str = "auto"}, 0, 0, E },
     { "segment_format",    "set container format used for the segments", OFFSET(format),  AV_OPT_TYPE_STRING, {.str = NULL},  0, 0,       E },
     { "segment_format_options", "set list of options for the container format used for the segments", OFFSET(format_options), AV_OPT_TYPE_DICT, {.str = NULL}, 0, 0, E },
     { "segment_list",      "set the segment list filename",              OFFSET(list),    AV_OPT_TYPE_STRING, {.str = NULL},  0, 0,       E },

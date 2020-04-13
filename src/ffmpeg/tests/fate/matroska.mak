@@ -12,10 +12,15 @@ fate-matroska-prores-header-insertion-bz2: CMD = framecrc -i $(TARGET_SAMPLES)/m
 FATE_MATROSKA-$(call DEMMUX, MATROSKA, MATROSKA) += fate-matroska-remux
 fate-matroska-remux: CMD = md5pipe -i $(TARGET_SAMPLES)/vp9-test-vectors/vp90-2-2pass-akiyo.webm -color_trc 4 -c:v copy -fflags +bitexact -strict -2 -f matroska
 fate-matroska-remux: CMP = oneline
-fate-matroska-remux: REF = e5457e5fa606d564a54914bd12f426c8
+fate-matroska-remux: REF = 8369f24de64aaa52cf57a699dcdc7d58
 
 FATE_MATROSKA-$(call ALLYES, MATROSKA_DEMUXER VORBIS_PARSER) += fate-matroska-xiph-lacing
 fate-matroska-xiph-lacing: CMD = framecrc -i $(TARGET_SAMPLES)/mkv/xiph_lacing.mka -c:a copy
+
+# This tests that the Matroska demuxer correctly demuxes WavPack
+# without CodecPrivate; it also tests zlib compressed WavPack.
+FATE_MATROSKA-$(call ALLYES, MATROSKA_DEMUXER ZLIB) += fate-matroska-wavpack-missing-codecprivate
+fate-matroska-wavpack-missing-codecprivate: CMD = framecrc -i $(TARGET_SAMPLES)/mkv/wavpack_missing_codecprivate.mka -c copy
 
 # This tests that the matroska demuxer supports decompressing
 # zlib compressed tracks (both the CodecPrivate as well as the actual frames).
@@ -31,6 +36,18 @@ fate-matroska-lzo-decompression: CMD = framecrc -i $(TARGET_SAMPLES)/mkv/lzo.mka
 # of flac tracks. It also tests header removal compression.
 FATE_MATROSKA-$(call ALLYES, MATROSKA_DEMUXER FLAC_PARSER) += fate-matroska-flac-channel-mapping
 fate-matroska-flac-channel-mapping: CMD = framecrc -i $(TARGET_SAMPLES)/mkv/flac_channel_layouts.mka -map 0 -c:a copy
+
+# This tests that the Matroska muxer writes the channel layout
+# of FLAC tracks as a Vorbis comment in the CodecPrivate if necessary
+# and that FLAC extradata is correctly updated when a packet
+# with sidedata containing new extradata is encountered.
+# Furthermore it tests everything the matroska-flac-channel-mapping test
+# tests and it also tests the FLAC decoder and encoder, in particular
+# the latter's ability to send updated extradata.
+FATE_MATROSKA-$(call ALLYES, FLAC_DECODER FLAC_ENCODER FLAC_PARSER \
+                MATROSKA_DEMUXER MATROSKA_MUXER) += fate-matroska-flac-extradata-update
+fate-matroska-flac-extradata-update: CMD = transcode matroska $(TARGET_SAMPLES)/mkv/flac_channel_layouts.mka \
+                                           matroska "-map 0 -map 0:0 -c flac -frames:a:2 8" "-map 0 -c copy"
 
 FATE_MATROSKA_FFPROBE-$(call ALLYES, MATROSKA_DEMUXER) += fate-matroska-spherical-mono
 fate-matroska-spherical-mono: CMD = run ffprobe$(PROGSSUF)$(EXESUF) -show_entries stream_side_data_list -select_streams v -v 0 $(TARGET_SAMPLES)/mkv/spherical.mkv

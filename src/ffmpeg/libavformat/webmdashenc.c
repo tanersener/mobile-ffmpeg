@@ -57,22 +57,11 @@ typedef struct WebMDashMuxContext {
     char *utc_timing_url;
     double time_shift_buffer_depth;
     int minimum_update_period;
-    int debug_mode;
 } WebMDashMuxContext;
 
 static const char *get_codec_name(int codec_id)
 {
-    switch (codec_id) {
-        case AV_CODEC_ID_VP8:
-            return "vp8";
-        case AV_CODEC_ID_VP9:
-            return "vp9";
-        case AV_CODEC_ID_VORBIS:
-            return "vorbis";
-        case AV_CODEC_ID_OPUS:
-            return "opus";
-    }
-    return NULL;
+    return avcodec_descriptor_get(codec_id)->name;
 }
 
 static double get_duration(AVFormatContext *s)
@@ -114,7 +103,7 @@ static int write_header(AVFormatContext *s)
         if (!strftime(gmt_iso, 21, "%Y-%m-%dT%H:%M:%SZ", gmt)) {
             return AVERROR_UNKNOWN;
         }
-        if (w->debug_mode) {
+        if (s->flags & AVFMT_FLAG_BITEXACT) {
             av_strlcpy(gmt_iso, "", 1);
         }
         avio_printf(s->pb, "  availabilityStartTime=\"%s\"\n", gmt_iso);
@@ -440,7 +429,7 @@ static int write_adaptation_set(AVFormatContext *s, int as_index)
 static int to_integer(char *p, int len)
 {
     int ret;
-    char *q = av_malloc(sizeof(char) * len);
+    char *q = av_malloc(len);
     if (!q)
         return AVERROR(ENOMEM);
     av_strlcpy(q, p, len);
@@ -489,11 +478,12 @@ static int parse_adaptation_sets(AVFormatContext *s)
             state = parsing_streams;
         } else if (state == parsing_streams) {
             struct AdaptationSet *as = &w->as[w->nb_as - 1];
+            int ret = av_reallocp_array(&as->streams, ++as->nb_streams,
+                                        sizeof(*as->streams));
+            if (ret < 0)
+                return ret;
             q = p;
             while (*q != '\0' && *q != ',' && *q != ' ') q++;
-            as->streams = av_realloc(as->streams, sizeof(*as->streams) * ++as->nb_streams);
-            if (as->streams == NULL)
-                return AVERROR(ENOMEM);
             as->streams[as->nb_streams - 1] = to_integer(p, q - p + 1);
             if (as->streams[as->nb_streams - 1] < 0 ||
                 as->streams[as->nb_streams - 1] >= s->nb_streams) {
@@ -516,6 +506,14 @@ static int webm_dash_manifest_write_header(AVFormatContext *s)
     double start = 0.0;
     int ret;
     WebMDashMuxContext *w = s->priv_data;
+
+    for (unsigned i = 0; i < s->nb_streams; i++) {
+        enum AVCodecID codec_id = s->streams[i]->codecpar->codec_id;
+        if (codec_id != AV_CODEC_ID_VP8    && codec_id != AV_CODEC_ID_VP9 &&
+            codec_id != AV_CODEC_ID_VORBIS && codec_id != AV_CODEC_ID_OPUS)
+            return AVERROR(EINVAL);
+    }
+
     ret = parse_adaptation_sets(s);
     if (ret < 0) {
         goto fail;
@@ -550,16 +548,9 @@ static int webm_dash_manifest_write_packet(AVFormatContext *s, AVPacket *pkt)
     return AVERROR_EOF;
 }
 
-static int webm_dash_manifest_write_trailer(AVFormatContext *s)
-{
-    free_adaptation_sets(s);
-    return 0;
-}
-
 #define OFFSET(x) offsetof(WebMDashMuxContext, x)
 static const AVOption options[] = {
     { "adaptation_sets", "Adaptation sets. Syntax: id=0,streams=0,1,2 id=1,streams=3,4 and so on", OFFSET(adaptation_sets), AV_OPT_TYPE_STRING, { 0 }, 0, 0, AV_OPT_FLAG_ENCODING_PARAM },
-    { "debug_mode", "[private option - users should never set this]. Create deterministic output", OFFSET(debug_mode), AV_OPT_TYPE_BOOL, {.i64 = 0}, 0, 1, AV_OPT_FLAG_ENCODING_PARAM },
     { "live", "create a live stream manifest", OFFSET(is_live), AV_OPT_TYPE_BOOL, {.i64 = 0}, 0, 1, AV_OPT_FLAG_ENCODING_PARAM },
     { "chunk_start_index",  "start index of the chunk", OFFSET(chunk_start_index), AV_OPT_TYPE_INT, {.i64 = 0}, 0, INT_MAX, AV_OPT_FLAG_ENCODING_PARAM },
     { "chunk_duration_ms", "duration of each chunk (in milliseconds)", OFFSET(chunk_duration), AV_OPT_TYPE_INT, {.i64 = 1000}, 0, INT_MAX, AV_OPT_FLAG_ENCODING_PARAM },
@@ -585,7 +576,6 @@ AVOutputFormat ff_webm_dash_manifest_muxer = {
     .priv_data_size    = sizeof(WebMDashMuxContext),
     .write_header      = webm_dash_manifest_write_header,
     .write_packet      = webm_dash_manifest_write_packet,
-    .write_trailer     = webm_dash_manifest_write_trailer,
     .priv_class        = &webm_dash_class,
 };
 #endif
