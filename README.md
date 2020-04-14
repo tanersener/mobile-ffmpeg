@@ -1,4 +1,4 @@
-# MobileFFmpeg [![Financial Contributors on Open Collective](https://opencollective.com/mobile-ffmpeg/all/badge.svg?label=financial+contributors)](https://opencollective.com/mobile-ffmpeg) ![GitHub release](https://img.shields.io/badge/release-v4.3.1-blue.svg) ![Bintray](https://img.shields.io/badge/bintray-v4.3.1-blue.svg) ![CocoaPods](https://img.shields.io/badge/pod-v4.3.1-blue.svg) [![Build Status](https://travis-ci.org/tanersener/mobile-ffmpeg.svg?branch=master)](https://travis-ci.org/tanersener/mobile-ffmpeg)
+# MobileFFmpeg [![Financial Contributors on Open Collective](https://opencollective.com/mobile-ffmpeg/all/badge.svg?label=financial+contributors)](https://opencollective.com/mobile-ffmpeg) ![GitHub release](https://img.shields.io/badge/release-v4.3.2-blue.svg) ![Bintray](https://img.shields.io/badge/bintray-v4.3.2-blue.svg) ![CocoaPods](https://img.shields.io/badge/pod-v4.3.2-blue.svg) [![Build Status](https://travis-ci.org/tanersener/mobile-ffmpeg.svg?branch=master)](https://travis-ci.org/tanersener/mobile-ffmpeg)
 
 FFmpeg for Android, iOS and tvOS
 
@@ -14,16 +14,16 @@ FFmpeg for Android, iOS and tvOS
     
         `chromaprint`, `fontconfig`, `freetype`, `fribidi`, `gmp`, `gnutls`, `kvazaar`, `lame`, `libaom`, `libass`, `libiconv`, `libilbc`, `libtheora`, `libvorbis`, `libvpx`, `libwebp`, `libxml2`, `opencore-amr`, `openh264`, `opus`, `sdl`, `shine`, `snappy`, `soxr`, `speex`, `tesseract`, `twolame`, `wavpack`
     
-    - 4 external libraries with GPL license
+    - 5 external libraries with GPL license
     
-        `vid.stab`, `x264`, `x265`, `xvidcore`
+        `rubberband`, `vid.stab`, `x264`, `x265`, `xvidcore`
 
     - Concurrent execution
 
 - Exposes both FFmpeg library and MobileFFmpeg wrapper library capabilities
-- Includes cross-compile instructions for 44 open-source libraries
+- Includes cross-compile instructions for 46 open-source libraries
     
-    `chromaprint`, `expat`, `ffmpeg`, `fontconfig`, `freetype`, `fribidi`, `giflib`, `gmp`, `gnutls`, `kvazaar`, `lame`, `leptonica`, `libaom`, `libass`, `libiconv`, `libilbc`, `libjpeg`, `libjpeg-turbo`, `libogg`, `libpng`, `libsndfile`, `libtheora`, `libuuid`, `libvorbis`, `libvpx`, `libwebp`, `libxml2`, `nettle`, `opencore-amr`, `openh264`, `opus`, `sdl`, `shine`, `snappy`, `soxr`, `speex`, `tesseract`, `tiff`, `twolame`, `vid.stab`, `wavpack`, `x264`, `x265`, `xvidcore`
+    `chromaprint`, `expat`, `ffmpeg`, `fontconfig`, `freetype`, `fribidi`, `giflib`, `gmp`, `gnutls`, `kvazaar`, `lame`, `leptonica`, `libaom`, `libass`, `libiconv`, `libilbc`, `libjpeg`, `libjpeg-turbo`, `libogg`, `libpng`, `libsamplerate`, `libsndfile`, `libtheora`, `libuuid`, `libvorbis`, `libvpx`, `libwebp`, `libxml2`, `nettle`, `opencore-amr`, `openh264`, `opus`, `rubberband`, `sdl`, `shine`, `snappy`, `soxr`, `speex`, `tesseract`, `tiff`, `twolame`, `vid.stab`, `wavpack`, `x264`, `x265`, `xvidcore`
 
 - Licensed under LGPL 3.0, can be customized to support GPL v3.0
 
@@ -42,16 +42,16 @@ FFmpeg for Android, iOS and tvOS
 - Camera access
 - `ARC` enabled library
 - Built with `-fembed-bitcode` flag
-- Creates static framework and static universal (fat) library (.a)
+- Creates static frameworks, static xcframeworks and static universal (fat) libraries (.a)
 - Supports `iOS SDK 9.3` or later
  
 #### 1.3 tvOS
 - Builds `arm64` and `x86_64` architectures
-- Supports `bzip2`, `zlib`, `iconv` system libraries and `AudioToolbox`, `CoreImage`, `VideoToolbox` system frameworks
+- Supports `bzip2`, `iconv`, `libuuid`, `zlib` system libraries and `AudioToolbox`, `CoreImage`, `VideoToolbox` system frameworks
 - Objective-C API
 - `ARC` enabled library
 - Built with `-fembed-bitcode` flag
-- Creates static framework and static universal (fat) library (.a)
+- Creates static frameworks and static universal (fat) libraries (.a)
 - Supports `tvOS SDK 9.2` or later
 
 ### 2. Using
@@ -120,7 +120,7 @@ Please remember that some parts of `FFmpeg` are licensed under the `GPL` and onl
 1. Add MobileFFmpeg dependency to your `build.gradle` in `mobile-ffmpeg-<package name>` format
     ```
     dependencies {
-        implementation 'com.arthenica:mobile-ffmpeg-full:4.3.1'
+        implementation 'com.arthenica:mobile-ffmpeg-full:4.3.2'
     }
     ```
 
@@ -223,12 +223,12 @@ Please remember that some parts of `FFmpeg` are licensed under the `GPL` and onl
 
     - iOS
     ```
-    pod 'mobile-ffmpeg-full', '~> 4.3.1'
+    pod 'mobile-ffmpeg-full', '~> 4.3.2'
     ```
 
     - tvOS
     ```
-    pod 'mobile-ffmpeg-tvos-full', '~> 4.3.1'
+    pod 'mobile-ffmpeg-tvos-full', '~> 4.3.2'
     ```
 
 2. Execute FFmpeg commands.
@@ -362,6 +362,7 @@ Exact version number is obtained using `git describe --tags`.
 
 |  MobileFFmpeg Version | FFmpeg Version | Release Date |
 | :----: | :----: |:----: |
+| [4.3.2](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v4.3.2) | 4.3-dev-2955 | Apr 15, 2020 |
 | [4.3.1](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v4.3.1) | 4.3-dev-1944 | Jan 25, 2020 |
 | [4.3.1.LTS](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v4.3.1.LTS) | 4.3-dev-1944 | Jan 25, 2020 |
 | [4.3](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v4.3) | 4.3-dev-1181 | Oct 27, 2019 |
@@ -397,7 +398,7 @@ This table shows the differences between two variants.
 | Android Architectures | arm-v7a-neon<br/>arm64-v8a<br/>x86<br/>x86-64 | arm-v7a<br/>arm-v7a-neon<br/>arm64-v8a<br/>x86<br/>x86-64 |
 | Xcode Support | 10.1 | 7.3.1 |
 | iOS SDK | 12.1 | 9.3 |
-| iOS Architectures | arm64<br/>arm64e<br/>x86-64 | armv7<br/>arm64<br/>i386<br/>x86-64 |
+| iOS Architectures | arm64<br/>arm64e<br/>x86-64<br/>x86-64-mac-catalyst | armv7<br/>arm64<br/>i386<br/>x86-64 |
 | tvOS SDK | 10.2 | 9.2 |
 | tvOS Architectures | arm64<br/>x86-64 | arm64<br/>x86-64 |
 
@@ -424,7 +425,7 @@ Please visit [Android Prerequisites](https://github.com/tanersener/mobile-ffmpeg
 
 2. Android builds require these additional packages.
     - **Android SDK 4.1 Jelly Bean (API Level 16)** or later
-    - **Android NDK r20** or later with LLDB and CMake
+    - **Android NDK r21** or later with LLDB and CMake
 
 3. iOS builds need these extra packages and tools.
     - **Xcode 7.3.1** or later
@@ -478,14 +479,16 @@ All libraries created by the top level build scripts (`android.sh`, `ios.sh` and
 the `prebuilt` directory.
 
 - `Android` archive (.aar file) is located under the `android-aar` folder
-- `iOS` frameworks are located under the `ios-framework`folder
-- `iOS` universal binaries are located under the `ios-universal`folder
-- `tvOS` frameworks are located under the `tvos-framework`folder
-- `tvOS` universal binaries are located under the `tvos-universal`folder 
+- `iOS` frameworks are located under the `ios-framework` folder
+- `iOS` xcframeworks are located under the `ios-xcframework` folder
+- `iOS` universal binaries are located under the `ios-universal` folder
+- `tvOS` frameworks are located under the `tvos-framework` folder
+- `tvOS` universal binaries are located under the `tvos-universal` folder
 
 #### 5.4 GPL Support
-It is possible to enable GPL licensed libraries `x264`, `xvidcore` since `v1.1` and `vid.stab`, `x265` since `v2.1` 
-from the top level build scripts. Their source code is not included in the repository and downloaded when enabled.
+It is possible to enable GPL licensed libraries `x264`, `xvidcore` since `v1.1`; `vid.stab`, `x265` since `v2.1` and
+`rubberband` since `v4.3.2` from the top level build scripts. Their source code is not included in the repository and
+downloaded when enabled.
 
 #### 5.5 External Libraries
 `build` directory includes build scripts of all external libraries. Two scripts exist for each external library, 
@@ -549,7 +552,10 @@ Please visit [License](https://github.com/tanersener/mobile-ffmpeg/wiki/License)
 
 ### 9. Contributing
 
-If you have any recommendations or ideas to improve it, please feel free to submit issues or pull requests. Any help is appreciated.
+If you have any recommendations or ideas to improve it, please feel free to submit issues or pull requests. 
+
+`master` branch includes only the latest tested and released source code. So, please open your pull requests against
+`development`, so they can be tested property.
 
 ### 10. See Also
 

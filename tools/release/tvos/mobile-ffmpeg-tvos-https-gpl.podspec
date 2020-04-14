@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
     s.version           = "VERSION"
     s.summary           = "Mobile FFmpeg tvOS Https GPL Static Framework"
     s.description       = <<-DESC
-    Includes FFmpeg v4.3-dev-1944 with gmp v6.1.2, gnutls v3.6.11.1, libvid.stab v1.1.0, x264 v20191125-stable, x265 v3.2.1 and xvidcore v1.3.7 libraries enabled.
+    Includes FFmpeg v4.3-dev-2955 with gmp v6.2.0, gnutls v3.6.13, libvid.stab v1.1.0, x264 v20200409-stable, x265 v3.3 and xvidcore v1.3.7 libraries enabled.
     DESC
 
     s.homepage          = "https://github.com/tanersener/mobile-ffmpeg"
