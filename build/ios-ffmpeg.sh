@@ -415,6 +415,9 @@ else
     ${SED_INLINE} 's/   \/\/ CFDictionarySetValue(buffer_attributes\, kCVPixelBufferOpenGLESCompatibilityKey/    CFDictionarySetValue(buffer_attributes\, kCVPixelBufferOpenGLESCompatibilityKey/g' ${BASEDIR}/src/${LIB_NAME}/libavcodec/videotoolbox.c
 fi
 
+# Workaround for not supported iOS/tvOS features
+git checkout 2e595085ef653f365af49e6a32f012cc6d9ee03c -- ${BASEDIR}/src/${LIB_NAME}/libavdevice/avfoundation.m 1>>${BASEDIR}/build.log 2>&1
+
 ./configure \
     --sysroot=${SDK_PATH} \
     --prefix=${BASEDIR}/prebuilt/$(get_target_build_directory)/${LIB_NAME} \
