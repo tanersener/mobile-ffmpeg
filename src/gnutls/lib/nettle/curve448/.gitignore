@@ -1,4 +1,4 @@
 /.deps/
+/.libs/
 *.dirstamp
-*.o
-*.lo
+/eccdata

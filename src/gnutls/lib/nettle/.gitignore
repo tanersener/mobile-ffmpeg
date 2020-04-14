@@ -1,4 +1,6 @@
-*.o
+/.deps/
+/.libs/
 *.lo
-*.la
+*.o
 /Makefile
+*.la

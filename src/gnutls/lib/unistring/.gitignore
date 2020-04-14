@@ -1,3 +1,4 @@
+/.libs/
 /sys/
 *.la
 /Makefile
