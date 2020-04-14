@@ -16,6 +16,7 @@ buildscript {
 
 android {
     compileSdkVersion Integer.parseInt(releaseTargetSdk)
+    ndkVersion "21.0.6113669"
 
     defaultConfig {
         minSdkVersion Integer.parseInt(releaseMinSdk)
