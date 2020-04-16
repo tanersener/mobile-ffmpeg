@@ -82,7 +82,7 @@ display_help() {
   echo -e "\n'"$COMMAND"' builds FFmpeg and MobileFFmpeg for Android platform. By default five Android ABIs (armeabi-v7a, armeabi-v7a-neon, arm64-v8a, x86 and x86_64) are built \
 without any external libraries enabled. Options can be used to disable ABIs and/or enable external libraries. \
 Please note that GPL libraries (external libraries with GPL license) need --enable-gpl flag to be set explicitly. \
-When compilation ends an Android Archive (AAR) file is created with enabled platforms inside.\n"
+When compilation ends an Android Archive (AAR) file is created under the prebuilt folder.\n"
 
   echo -e "Usage: ./"$COMMAND" [OPTION]...\n"
 
