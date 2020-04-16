@@ -398,9 +398,13 @@ This table shows the differences between two variants.
 | Android Architectures | arm-v7a-neon<br/>arm64-v8a<br/>x86<br/>x86-64 | arm-v7a<br/>arm-v7a-neon<br/>arm64-v8a<br/>x86<br/>x86-64 |
 | Xcode Support | 10.1 | 7.3.1 |
 | iOS SDK | 12.1 | 9.3 |
-| iOS Architectures | arm64<br/>arm64e<br/>x86-64<br/>x86-64-mac-catalyst | armv7<br/>arm64<br/>i386<br/>x86-64 |
+| iOS Architectures | arm64<br/>arm64e<sup>1</sup><br/>x86-64<br/>x86-64-mac-catalyst<sup>2</sup> | armv7<br/>arm64<br/>i386<br/>x86-64 |
 | tvOS SDK | 10.2 | 9.2 |
 | tvOS Architectures | arm64<br/>x86-64 | arm64<br/>x86-64 |
+
+<sup>1</sup> - Included until `v4.3.2`
+
+<sup>2</sup> - Included since `v4.3.2`
 
 ### 5. Building
 
@@ -552,10 +556,11 @@ Please visit [License](https://github.com/tanersener/mobile-ffmpeg/wiki/License)
 
 ### 9. Contributing
 
-If you have any recommendations or ideas to improve it, please feel free to submit issues or pull requests. 
+Feel free to submit issues or pull requests. 
 
-`master` branch includes only the latest tested and released source code. So, please open your pull requests against
-`development`, so they can be tested property.
+Please note that `master` branch includes only the latest released source code. Changes planned for the next release 
+are implemented under the `development` branch. So, if you want to create a pull request, please open it against the 
+`development`.
 
 ### 10. See Also
 
