@@ -29,12 +29,12 @@ fi
 # ENABLE COMMON FUNCTIONS
 . ${BASEDIR}/build/android-common.sh
 
-# PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
+# PREPARE PATHS & DEFINE ${INSTALL_PKG_CONFIG_DIR}
 LIB_NAME="ffmpeg"
 set_toolchain_clang_paths ${LIB_NAME}
 
 # PREPARING FLAGS
-TARGET_HOST=$(get_target_host)
+BUILD_HOST=$(get_build_host)
 CFLAGS=$(get_cflags ${LIB_NAME})
 CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 LDFLAGS=$(get_ldflags ${LIB_NAME})
@@ -76,7 +76,7 @@ esac
 CONFIGURE_POSTFIX=""
 HIGH_PRIORITY_INCLUDES=""
 
-for library in {1..44}
+for library in {1..46}
 do
     if [[ ${!library} -eq 1 ]]; then
         ENABLED_LIBRARY=$(get_library_name $((library - 1)))
@@ -194,6 +194,11 @@ do
                 LDFLAGS+=" $(pkg-config --libs --static opus)"
                 CONFIGURE_POSTFIX+=" --enable-libopus"
             ;;
+            rubberband)
+                CFLAGS+=" $(pkg-config --cflags rubberband)"
+                LDFLAGS+=" $(pkg-config --libs --static rubberband)"
+                CONFIGURE_POSTFIX+=" --enable-librubberband --enable-gpl"
+            ;;
             shine)
                 CFLAGS+=" $(pkg-config --cflags shine)"
                 LDFLAGS+=" $(pkg-config --libs --static shine)"
@@ -285,9 +290,9 @@ do
     else
 
         # THE FOLLOWING LIBRARIES SHOULD BE EXPLICITLY DISABLED TO PREVENT AUTODETECT
-        if [[ ${library} -eq 30 ]]; then
+        if [[ ${library} -eq 31 ]]; then
             CONFIGURE_POSTFIX+=" --disable-sdl2"
-        elif [[ ${library} -eq 43 ]]; then
+        elif [[ ${library} -eq 45 ]]; then
             CONFIGURE_POSTFIX+=" --disable-zlib"
         fi
     fi
@@ -336,12 +341,8 @@ export LDFLAGS="${LDFLAGS}"
 # USE HIGHER LIMITS FOR FFMPEG LINKING
 ulimit -n 2048 1>>${BASEDIR}/build.log 2>&1
 
-# Workaround for issue #328
-rm -f ${BASEDIR}/src/${LIB_NAME}/libswscale/aarch64/hscale.S 1>>${BASEDIR}/build.log 2>&1
-cp ${BASEDIR}/tools/make/ffmpeg/libswscale/aarch64/hscale.S ${BASEDIR}/src/${LIB_NAME}/libswscale/aarch64/hscale.S 1>>${BASEDIR}/build.log 2>&1
-
 ./configure \
-    --cross-prefix="${TARGET_HOST}-" \
+    --cross-prefix="${BUILD_HOST}-" \
     --sysroot="${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/sysroot" \
     --prefix="${BASEDIR}/prebuilt/android-$(get_target_build)/${LIB_NAME}" \
     --pkg-config="${HOST_PKG_CONFIG_PATH}" \
@@ -358,10 +359,8 @@ cp ${BASEDIR}/tools/make/ffmpeg/libswscale/aarch64/hscale.S ${BASEDIR}/src/${LIB
     --enable-optimizations \
     --enable-swscale \
     --enable-shared \
-    --disable-v4l2-m2m \
-    --disable-outdev=v4l2 \
+    --enable-v4l2-m2m \
     --disable-outdev=fbdev \
-    --disable-indev=v4l2 \
     --disable-indev=fbdev \
     ${SIZE_OPTIONS} \
     --disable-openssl \

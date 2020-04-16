@@ -1,6 +1,6 @@
 dnl  ARM32 calling conventions checking.
 
-dnl  Copyright 2000, 2003, 2004, 2006, 2007, 2010, 2013 Free Software
+dnl  Copyright 2000, 2003, 2004, 2006, 2007, 2010, 2013, 2016 Free Software
 dnl  Foundation, Inc.
 
 dnl  This file is part of the GNU MP Library test suite.
@@ -59,7 +59,7 @@ PROLOGUE(calling_conventions)
 	LEA(	r12, calling_conventions_function)
 	ldr	r12, [r12]
 	mov	r14, pc
-	ret	r12
+	return	r12
 
 	LEA(	r12, calling_conventions_values)
 
@@ -79,5 +79,5 @@ PROLOGUE(calling_conventions)
 	add	r12, r12, #JUNK_PARAMS
 	ldm	r12, {r1-r3}
 
-	ret	r14
+	return	r14
 EPILOGUE()

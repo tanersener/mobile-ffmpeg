@@ -20,7 +20,6 @@ the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "gmp.h"
 #include "gmp-impl.h"
 #include "tests.h"
 
@@ -65,8 +64,8 @@ check_one (mpq_srcptr q, int base, const char *want)
     {
       printf ("mpq_get_str wrong return value (passing non-NULL)\n");
       printf ("  base %d\n", base);
-      printf ("  got  %p\n", ret);
-      printf ("  want %p\n", want);
+      printf ("  got  %p\n", (void *) ret);
+      printf ("  want %p\n", (void *) str);
       abort ();
     }
   if (strcmp (str, want) != 0)

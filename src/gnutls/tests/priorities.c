@@ -138,6 +138,9 @@ void doit(void)
 		try_prio("NORMAL:-CIPHER-ALL:+NULL", null, 1, __LINE__);	/* null */
 		try_prio("NORMAL:-CIPHER-ALL:+NULL:+CIPHER-ALL", null_normal_cs, 8, __LINE__);	/* should be null + all */
 		try_prio("NORMAL:-CIPHER-ALL:+NULL:+CIPHER-ALL:-CIPHER-ALL:+AES-128-CBC", 4, 1, __LINE__);	/* should be null + all */
+#ifdef ENABLE_GOST
+		try_prio("NONE:+VERS-TLS1.2:+GOST", 1, 1, __LINE__);
+#endif
 	}
 
 	try_prio("PERFORMANCE", normal_cs, normal_ciphers, __LINE__);

@@ -1,6 +1,6 @@
 /* mpz_set (dest_integer, src_integer) -- Assign DEST_INTEGER from SRC_INTEGER.
 
-Copyright 1991, 1993-1995, 2000, 2012 Free Software Foundation, Inc.
+Copyright 1991, 1993-1995, 2000, 2012, 2015 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -28,7 +28,6 @@ You should have received copies of the GNU General Public License and the
 GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
-#include "gmp.h"
 #include "gmp-impl.h"
 
 
@@ -41,7 +40,7 @@ mpz_set (mpz_ptr w, mpz_srcptr u)
   usize = SIZ(u);
   size = ABS (usize);
 
-  wp = MPZ_REALLOC (w, size);
+  wp = MPZ_NEWALLOC (w, size);
 
   up = PTR(u);
 

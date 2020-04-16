@@ -30,7 +30,6 @@ see https://www.gnu.org/licenses/.  */
 
 #define __GMP_FORCE_mpq_neg 1
 
-#include "gmp.h"
 #include "gmp-impl.h"
 
 

@@ -1,6 +1,6 @@
 /* mpz_set_d(integer, val) -- Assign INTEGER with a double value VAL.
 
-Copyright 1995, 1996, 2000-2003, 2006 Free Software Foundation, Inc.
+Copyright 1995, 1996, 2000-2003, 2006, 2015 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -34,7 +34,6 @@ see https://www.gnu.org/licenses/.  */
 #include <float.h>  /* for DBL_MAX */
 #endif
 
-#include "gmp.h"
 #include "gmp-impl.h"
 
 
@@ -62,13 +61,10 @@ mpz_set_d (mpz_ptr r, double d)
 
   rn = __gmp_extract_double (tp, d);
 
-  if (ALLOC(r) < rn)
-    _mpz_realloc (r, rn);
-
   if (rn <= 0)
     rn = 0;
 
-  rp = PTR (r);
+  rp = MPZ_NEWALLOC (r, rn);
 
   switch (rn)
     {

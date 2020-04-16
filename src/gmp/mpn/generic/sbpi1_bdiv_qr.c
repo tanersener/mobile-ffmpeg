@@ -1,13 +1,13 @@
 /* mpn_sbpi1_bdiv_qr -- schoolbook Hensel division with precomputed inverse,
    returning quotient and remainder.
 
-   Contributed to the GNU project by Niels Möller.
+   Contributed to the GNU project by Niels Möller and Torbjörn Granlund.
 
    THE FUNCTIONS IN THIS FILE ARE INTERNAL FUNCTIONS WITH MUTABLE INTERFACES.
    IT IS ONLY SAFE TO REACH THEM THROUGH DOCUMENTED INTERFACES.  IN FACT, IT IS
    ALMOST GUARANTEED THAT THEY'LL CHANGE OR DISAPPEAR IN A FUTURE GMP RELEASE.
 
-Copyright 2006, 2009, 2011, 2012 Free Software Foundation, Inc.
+Copyright 2006, 2009, 2011, 2012, 2017 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -35,85 +35,48 @@ You should have received copies of the GNU General Public License and the
 GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
-#include "gmp.h"
 #include "gmp-impl.h"
 
 
-/* Computes a binary quotient of size qn = nn - dn.
+/* Computes a binary quotient of size qn = un - dn.
    Output:
 
-      Q = N * D^{-1} mod B^qn,
+      Q = -U * D^{-1} mod B^qn,
 
-      R = (N - Q * D) * B^(-qn)
+      R = (U + Q * D) * B^(-qn)
 
-   Stores the dn least significant limbs of R at {np + nn - dn, dn},
-   and returns the borrow from the subtraction N - Q*D.
+   Stores the dn least significant limbs of R at {up + un - dn, dn},
+   and returns the carry from the addition N + Q*D.
 
    D must be odd. dinv is (-D)^-1 mod B. */
 
 mp_limb_t
 mpn_sbpi1_bdiv_qr (mp_ptr qp,
-		   mp_ptr np, mp_size_t nn,
+		   mp_ptr up, mp_size_t un,
 		   mp_srcptr dp, mp_size_t dn, mp_limb_t dinv)
 {
-  mp_size_t qn;
   mp_size_t i;
-  mp_limb_t rh;
-  mp_limb_t ql;
+  mp_limb_t cy;
 
   ASSERT (dn > 0);
-  ASSERT (nn > dn);
+  ASSERT (un > dn);
   ASSERT ((dp[0] & 1) != 0);
-  /* FIXME: Add ASSERTs for allowable overlapping; i.e., that qp = np is OK,
-     but some over N/Q overlaps will not work.  */
+  ASSERT (-(dp[0] * dinv) == 1);
+  ASSERT (up == qp || !MPN_OVERLAP_P (up, un, qp, un - dn));
 
-  qn = nn - dn;
-
-  rh = 0;
-
-  /* To complete the negation, this value is added to q. */
-  ql = 1;
-  while (qn > dn)
+  for (i = un - dn, cy = 0; i != 0; i--)
     {
-      for (i = 0; i < dn; i++)
-	{
-	  mp_limb_t q;
+      mp_limb_t q = dinv * up[0];
+      mp_limb_t hi = mpn_addmul_1 (up, dp, dn, q);
+      *qp++ = q;
 
-	  q = dinv * np[i];
-	  np[i] = mpn_addmul_1 (np + i, dp, dn, q);
-	  qp[i] = ~q;
-	}
-      rh += mpn_add (np + dn, np + dn, qn, np, dn);
-      ql = mpn_add_1 (qp, qp, dn, ql);
-
-      qp += dn; qn -= dn;
-      np += dn; nn -= dn;
+      hi += cy;
+      cy = hi < cy;
+      hi += up[dn];
+      cy += hi < up[dn];
+      up[dn] = hi;
+      up++;
     }
 
-  for (i = 0; i < qn; i++)
-    {
-      mp_limb_t q;
-
-      q = dinv * np[i];
-      np[i] = mpn_addmul_1 (np + i, dp, dn, q);
-      qp[i] = ~q;
-    }
-
-  rh += mpn_add_n (np + dn, np + dn, np, qn);
-  ql = mpn_add_1 (qp, qp, qn, ql);
-
-  if (UNLIKELY (ql > 0))
-    {
-      /* q == 0 */
-      ASSERT (rh == 0);
-      return 0;
-    }
-  else
-    {
-      mp_limb_t cy;
-
-      cy = mpn_sub_n (np + qn, np + qn, dp, dn);
-      ASSERT (cy >= rh);
-      return cy - rh;
-    }
+  return cy;
 }

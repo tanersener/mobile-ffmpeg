@@ -41,13 +41,15 @@ gcdext_valid_p (const mpz_t a, const mpz_t b,
   if (mpz_sgn (a) == 0)
     {
       /* Must have g == abs (b). Any value for s is in some sense "correct",
-	 but it makes sense to require that s == 0. */
-      return mpz_cmpabs (g, b) == 0 && mpz_sgn (s) == 0;
+	 but it makes sense to require that s == 0, t = sgn (b)*/
+      return mpz_cmpabs (g, b) == 0
+	&& mpz_sgn (s) == 0 && mpz_cmp_si (t, mpz_sgn (b)) == 0;
     }
   else if (mpz_sgn (b) == 0)
     {
-      /* Must have g == abs (a), s == sign (a) */
-      return mpz_cmpabs (g, a) == 0 && mpz_cmp_si (s, mpz_sgn (a)) == 0;
+      /* Must have g == abs (a), s == sign (a), t = 0 */
+      return mpz_cmpabs (g, a) == 0
+	&& mpz_cmp_si (s, mpz_sgn (a)) == 0 && mpz_sgn (t) == 0;
     }
 
   if (mpz_sgn (g) <= 0)

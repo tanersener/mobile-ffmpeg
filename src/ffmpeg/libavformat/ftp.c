@@ -18,12 +18,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include <string.h>
+
 #include "libavutil/avstring.h"
 #include "libavutil/internal.h"
 #include "libavutil/parseutils.h"
 #include "avformat.h"
 #include "internal.h"
 #include "url.h"
+#include "urldecode.h"
 #include "libavutil/opt.h"
 #include "libavutil/bprint.h"
 
@@ -36,7 +39,8 @@ typedef enum {
     DOWNLOADING,
     UPLOADING,
     LISTING_DIR,
-    DISCONNECTED
+    DISCONNECTED,
+    ENDOFFILE,
 } FTPState;
 
 typedef enum {
@@ -228,7 +232,6 @@ static int ftp_send_command(FTPContext *s, const char *command,
 static void ftp_close_data_connection(FTPContext *s)
 {
     ffurl_closep(&s->conn_data);
-    s->position = 0;
     s->state = DISCONNECTED;
 }
 
@@ -245,10 +248,14 @@ static int ftp_auth(FTPContext *s)
     static const int user_codes[] = {331, 230, 0};
     static const int pass_codes[] = {230, 0};
 
+    if (strpbrk(s->user, "\r\n"))
+        return AVERROR(EINVAL);
     snprintf(buf, sizeof(buf), "USER %s\r\n", s->user);
     err = ftp_send_command(s, buf, user_codes, NULL);
     if (err == 331) {
         if (s->password) {
+            if (strpbrk(s->password, "\r\n"))
+                return AVERROR(EINVAL);
             snprintf(buf, sizeof(buf), "PASS %s\r\n", s->password);
             err = ftp_send_command(s, buf, pass_codes, NULL);
         } else
@@ -658,7 +665,7 @@ static int ftp_connect(URLContext *h, const char *url)
 {
     char proto[10], path[MAX_URL_SIZE], credentials[MAX_URL_SIZE], hostname[MAX_URL_SIZE];
     const char *tok_user = NULL, *tok_pass = NULL;
-    char *end = NULL, *newpath = NULL;
+    char *newpath = NULL;
     int err;
     FTPContext *s = h->priv_data;
 
@@ -675,21 +682,28 @@ static int ftp_connect(URLContext *h, const char *url)
                  path, sizeof(path),
                  url);
 
-    tok_user = av_strtok(credentials, ":", &end);
-    tok_pass = av_strtok(end, ":", &end);
-    if (!tok_user) {
+    if (!*credentials) {
         if (!s->option_user) {
             tok_user = "anonymous";
             tok_pass = av_x_if_null(s->anonymous_password, "nopassword");
         } else {
             tok_user = s->option_user;
+            tok_pass = s->option_password;
         }
+        s->user = av_strdup(tok_user);
+        s->password = av_strdup(tok_pass);
+    } else {
+        char *pass = strchr(credentials, ':');
+        if (pass) {
+            *pass++ = '\0';
+            tok_pass = pass;
+            s->password = ff_urldecode(pass, 0);
+        } else {
+            tok_pass = s->option_password;
+            s->password = av_strdup(tok_pass);
+        }
+        s->user = ff_urldecode(credentials, 0);
     }
-    if (!tok_pass) {
-        tok_pass = s->option_password;
-    }
-    s->user = av_strdup(tok_user);
-    s->password = av_strdup(tok_pass);
     s->hostname = av_strdup(hostname);
     if (!s->hostname || !s->user || (tok_pass && !s->password)) {
         return AVERROR(ENOMEM);
@@ -726,8 +740,7 @@ static int ftp_open(URLContext *h, const char *url, int flags)
     if (ftp_restart(s, 0) < 0) {
         h->is_streamed = 1;
     } else {
-        if (ftp_file_size(s) < 0 && flags & AVIO_FLAG_READ)
-            h->is_streamed = 1;
+        ftp_file_size(s);
         if (s->write_seekable != 1 && flags & AVIO_FLAG_WRITE)
             h->is_streamed = 1;
     }
@@ -744,7 +757,7 @@ static int64_t ftp_seek(URLContext *h, int64_t pos, int whence)
 {
     FTPContext *s = h->priv_data;
     int err;
-    int64_t new_pos, fake_pos;
+    int64_t new_pos;
 
     ff_dlog(h, "ftp protocol seek %"PRId64" %d\n", pos, whence);
 
@@ -774,11 +787,10 @@ static int64_t ftp_seek(URLContext *h, int64_t pos, int whence)
         return AVERROR(EINVAL);
     }
 
-    fake_pos = s->filesize != -1 ? FFMIN(new_pos, s->filesize) : new_pos;
-    if (fake_pos != s->position) {
+    if (new_pos != s->position) {
         if ((err = ftp_abort(h)) < 0)
             return err;
-        s->position = fake_pos;
+        s->position = new_pos;
     }
     return new_pos;
 }
@@ -790,16 +802,13 @@ static int ftp_read(URLContext *h, unsigned char *buf, int size)
 
     ff_dlog(h, "ftp protocol read %d bytes\n", size);
   retry:
+    if (s->state == ENDOFFILE)
+        return AVERROR_EOF;
     if (s->state == DISCONNECTED) {
-        /* optimization */
-        if (s->position >= s->filesize)
-            return AVERROR_EOF;
         if ((err = ftp_connect_data_connection(h)) < 0)
             return err;
     }
     if (s->state == READY) {
-        if (s->position >= s->filesize)
-            return AVERROR_EOF;
         if ((err = ftp_retrieve(s)) < 0)
             return err;
     }
@@ -807,27 +816,28 @@ static int ftp_read(URLContext *h, unsigned char *buf, int size)
         read = ffurl_read(s->conn_data, buf, size);
         if (read >= 0) {
             s->position += read;
-            if (s->position >= s->filesize) {
-                /* server will terminate, but keep current position to avoid madness */
-                /* save position to restart from it */
-                int64_t pos = s->position;
-                if (ftp_abort(h) < 0) {
-                    s->position = pos;
-                    return AVERROR(EIO);
-                }
-                s->position = pos;
-            }
+            s->filesize = FFMAX(s->filesize, s->position);
         }
-        if (read <= 0 && s->position < s->filesize && !h->is_streamed) {
+        if (read == AVERROR_EOF) {
+           static const int retr_codes[] = {226, 250, 425, 426, 451, 0};
+           char *response = NULL;
+           err = ftp_status(s, &response, retr_codes);
+           if (err == 226) {
+               ftp_close_data_connection(s);
+               av_freep(&response);
+               s->state = ENDOFFILE;
+               return AVERROR_EOF;
+           }
+           /* 250 is not allowed, any other status means some kind of error */
+           av_log(h, AV_LOG_ERROR, "FTP transfer failed: %s\n", response ? response : (err < 0 ? av_err2str(err) : "?"));
+           av_freep(&response);
+           read = AVERROR(EIO);
+        }
+        if (read <= 0 && !h->is_streamed) {
             /* Server closed connection. Probably due to inactivity */
-            int64_t pos = s->position;
             av_log(h, AV_LOG_INFO, "Reconnect to FTP server.\n");
             if ((err = ftp_abort(h)) < 0)
                 return err;
-            if ((err = ftp_seek(h, pos, SEEK_SET)) < 0) {
-                av_log(h, AV_LOG_ERROR, "Position cannot be restored.\n");
-                return err;
-            }
             if (!retry_done) {
                 retry_done = 1;
                 goto retry;

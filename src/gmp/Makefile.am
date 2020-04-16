@@ -1,8 +1,8 @@
 ## Process this file with automake to generate Makefile.in
 
 
-# Copyright 1991, 1993, 1994, 1996, 1997, 1999-2004, 2006-2009, 2011-2016 Free
-# Software Foundation, Inc.
+# Copyright 1991, 1993, 1994, 1996, 1997, 1999-2004, 2006-2009, 2011-2016,
+# 2018, 2020 Free Software Foundation, Inc.
 #
 #  This file is part of the GNU MP Library.
 #
@@ -89,6 +89,7 @@
 #        6.1.0   13:0:3    9:0:5     -
 #        6.1.1   13:1:3    9:1:5     -
 #        6.1.2   13:2:3    9:2:5     -
+#        6.2.0   14:0:4   10:0:6     -
 #
 # Starting at 3:0:0 is a slight abuse of the versioning system, but it
 # ensures we're past soname libgmp.so.2, which was used on Debian GNU/Linux
@@ -101,13 +102,13 @@
 # it's still good to get the shared library filename (like
 # libgmpxx.so.3.0.4) incrementing, to make it clear which GMP it's from.
 
-LIBGMP_LT_CURRENT    = 13
-LIBGMP_LT_REVISION   = 2
-LIBGMP_LT_AGE        = 3
+LIBGMP_LT_CURRENT    = 14
+LIBGMP_LT_REVISION   = 0
+LIBGMP_LT_AGE        = 4
 
-LIBGMPXX_LT_CURRENT  = 9
-LIBGMPXX_LT_REVISION = 2
-LIBGMPXX_LT_AGE      = 5
+LIBGMPXX_LT_CURRENT  = 10
+LIBGMPXX_LT_REVISION = 0
+LIBGMPXX_LT_AGE      = 6
 
 
 SUBDIRS = tests mpn mpz mpq mpf printf scanf rand cxx demos tune doc
@@ -115,15 +116,21 @@ SUBDIRS = tests mpn mpz mpq mpf printf scanf rand cxx demos tune doc
 EXTRA_DIST = configfsf.guess configfsf.sub .gdbinit INSTALL.autoconf \
 	     COPYING.LESSERv3 COPYINGv2 COPYINGv3
 
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = gmp.pc
+
+# Put asl.h here for now.
+EXTRA_DIST += asl.h
 
 if WANT_CXX
 GMPXX_HEADERS_OPTION = gmpxx.h
+pkgconfig_DATA += gmpxx.pc
 endif
 EXTRA_DIST += gmpxx.h
 
-# gmp.h and mp.h are architecture dependent, mainly since they encode the
-# limb size used in libgmp.  For that reason they belong under $exec_prefix
-# not $prefix, strictly speaking.
+# gmp.h is architecture dependent, mainly since it encodes the limb size used
+# in libgmp.  For that reason it belongs under $exec_prefix not $prefix,
+# strictly speaking.
 #
 # $exec_prefix/include is not in the default include path for gcc built to
 # the same $prefix and $exec_prefix, which might mean gmp.h is not found,
@@ -194,7 +201,7 @@ MPZ_OBJECTS = mpz/abs$U.lo mpz/add$U.lo mpz/add_ui$U.lo			\
   mpz/kronuz$U.lo mpz/kronzs$U.lo mpz/kronzu$U.lo			\
   mpz/lcm$U.lo mpz/lcm_ui$U.lo mpz/limbs_finish$U.lo			\
   mpz/limbs_modify$U.lo mpz/limbs_read$U.lo mpz/limbs_write$U.lo	\
-  mpz/lucnum_ui$U.lo mpz/lucnum2_ui$U.lo				\
+  mpz/lucmod$U.lo mpz/lucnum_ui$U.lo mpz/lucnum2_ui$U.lo		\
   mpz/millerrabin$U.lo mpz/mod$U.lo mpz/mul$U.lo mpz/mul_2exp$U.lo	\
   mpz/mul_si$U.lo mpz/mul_ui$U.lo					\
   mpz/n_pow_ui$U.lo mpz/neg$U.lo mpz/nextprime$U.lo			\
@@ -208,7 +215,8 @@ MPZ_OBJECTS = mpz/abs$U.lo mpz/add$U.lo mpz/add_ui$U.lo			\
   mpz/set_q$U.lo mpz/set_si$U.lo mpz/set_str$U.lo mpz/set_ui$U.lo	\
   mpz/setbit$U.lo							\
   mpz/size$U.lo mpz/sizeinbase$U.lo mpz/sqrt$U.lo			\
-  mpz/sqrtrem$U.lo mpz/sub$U.lo mpz/sub_ui$U.lo mpz/swap$U.lo		\
+  mpz/sqrtrem$U.lo mpz/stronglucas$U.lo mpz/sub$U.lo			\
+  mpz/sub_ui$U.lo mpz/swap$U.lo						\
   mpz/tdiv_ui$U.lo mpz/tdiv_q$U.lo mpz/tdiv_q_2exp$U.lo			\
   mpz/tdiv_q_ui$U.lo mpz/tdiv_qr$U.lo mpz/tdiv_qr_ui$U.lo		\
   mpz/tdiv_r$U.lo mpz/tdiv_r_2exp$U.lo mpz/tdiv_r_ui$U.lo		\
@@ -404,6 +412,7 @@ EXTRA_DIST += gen-psqr.c
 
 # Distribute mini-gmp. Test sources copied by dist-hook.
 EXTRA_DIST += mini-gmp/README mini-gmp/mini-gmp.c mini-gmp/mini-gmp.h \
+	      mini-gmp/mini-mpq.c mini-gmp/mini-mpq.h \
 	      mini-gmp/tests/Makefile mini-gmp/tests/run-tests
 
 # Avoid: CVS - cvs directories
@@ -434,7 +443,7 @@ check-mini-gmp:
 		MINI_GMP_DIR="$$abs_srcdir/mini-gmp" \
 		LDFLAGS="-L../../.libs" \
 		LIBS="-lgmp -lm" \
-		CC="$(CC)" CFLAGS="$(CFLAGS)" CPPFLAGS="-I../.." check
+		CC="$(CC)" CFLAGS="$(CFLAGS)" CPPFLAGS="$(CPPFLAGS) -I../.." check
 
 clean-mini-gmp:
 	if [ -d mini-gmp/tests ] ; then \

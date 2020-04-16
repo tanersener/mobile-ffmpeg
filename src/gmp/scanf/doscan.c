@@ -63,7 +63,6 @@ see https://www.gnu.org/licenses/.  */
 #include <sys/types.h> /* for quad_t */
 #endif
 
-#include "gmp.h"
 #include "gmp-impl.h"
 
 
@@ -402,7 +401,7 @@ gmpscan (const struct gmp_doscan_funs_t *funs, void *data,
 	      if (exp >= 0)
 		mpf_mul_2exp (f, f, (unsigned long) exp);
 	      else
-		mpf_div_2exp (f, f, - (unsigned long) exp);
+		mpf_div_2exp (f, f, NEG_CAST (unsigned long, exp));
 	    }
 	}
 	break;

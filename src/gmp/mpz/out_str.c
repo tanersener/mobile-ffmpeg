@@ -1,8 +1,8 @@
 /* mpz_out_str(stream, base, integer) -- Output to STREAM the multi prec.
    integer INTEGER in base BASE.
 
-Copyright 1991, 1993, 1994, 1996, 2001, 2005, 2011, 2012 Free Software
-Foundation, Inc.
+Copyright 1991, 1993, 1994, 1996, 2001, 2005, 2011, 2012, 2017 Free
+Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -31,7 +31,6 @@ GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
 #include <stdio.h>
-#include "gmp.h"
 #include "gmp-impl.h"
 #include "longlong.h"
 
@@ -50,26 +49,23 @@ mpz_out_str (FILE *stream, int base, mpz_srcptr x)
   if (stream == 0)
     stream = stdout;
 
-  if (base >= 0)
+  num_to_text = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+  if (base > 1)
     {
-      num_to_text = "0123456789abcdefghijklmnopqrstuvwxyz";
-      if (base <= 1)
-	base = 10;
-      else if (base > 36)
-	{
-	  num_to_text = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-	  if (base > 62)
+      if (base <= 36)
+	num_to_text = "0123456789abcdefghijklmnopqrstuvwxyz";
+      else if (UNLIKELY (base > 62))
 	    return 0;
-	}
+    }
+  else if (base > -2)
+    {
+      base = 10;
     }
   else
     {
       base = -base;
-      if (base <= 1)
-	base = 10;
-      else if (base > 36)
+      if (UNLIKELY (base > 36))
 	return 0;
-      num_to_text = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     }
 
   written = 0;

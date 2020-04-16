@@ -43,6 +43,41 @@
 #  define SLASH '/'
 #endif
 
+static int test_single_file(const char *fname)
+{
+	int fd, ret;
+	struct stat st;
+	uint8_t *data;
+	ssize_t n;
+
+	if ((fd = open(fname, O_RDONLY)) == -1) {
+		fprintf(stderr, "Failed to open %s (%d)\n", fname, errno);
+		return -1;
+	}
+
+	if (fstat(fd, &st) != 0) {
+		fprintf(stderr, "Failed to stat %d (%d)\n", fd, errno);
+		close(fd);
+		return -1;
+	}
+
+	data = malloc(st.st_size);
+	if ((n = read(fd, data, st.st_size)) == st.st_size) {
+		printf("testing %llu bytes from '%s'\n", (unsigned long long) st.st_size, fname);
+		fflush(stdout);
+		LLVMFuzzerTestOneInput(data, st.st_size);
+		fflush(stderr);
+		ret = 0;
+	} else {
+		fprintf(stderr, "Failed to read %llu bytes from %s (%d), got %zd\n", (unsigned long long) st.st_size, fname, errno, n);
+		ret = -1;
+	}
+
+	free(data);
+	close(fd);
+	return ret;
+}
+
 static int test_all_from(const char *dirname)
 {
 	DIR *dirp;
@@ -55,31 +90,8 @@ static int test_all_from(const char *dirname)
 			char fname[strlen(dirname) + strlen(dp->d_name) + 2];
 			snprintf(fname, sizeof(fname), "%s/%s", dirname, dp->d_name);
 
-			int fd;
-			if ((fd = open(fname, O_RDONLY)) == -1) {
-				fprintf(stderr, "Failed to open %s (%d)\n", fname, errno);
+			if (test_single_file(fname) < 0)
 				continue;
-			}
-
-			struct stat st;
-			if (fstat(fd, &st) != 0) {
-				fprintf(stderr, "Failed to stat %d (%d)\n", fd, errno);
-				close(fd);
-				continue;
-			}
-
-			uint8_t *data = malloc(st.st_size);
-			ssize_t n;
-			if ((n = read(fd, data, st.st_size)) == st.st_size) {
-				printf("testing %llu bytes from '%s'\n", (unsigned long long) st.st_size, fname);
-				fflush(stdout);
-				LLVMFuzzerTestOneInput(data, st.st_size);
-				fflush(stderr);
-			} else
-				fprintf(stderr, "Failed to read %llu bytes from %s (%d), got %zd\n", (unsigned long long) st.st_size, fname, errno, n);
-
-			free(data);
-			close(fd);
 		}
 		closedir(dirp);
 		return 0;
@@ -108,7 +120,9 @@ int main(int argc, char **argv)
 	target_len -= 4; // ignore .exe
 #endif
 
-	{
+	if (argc > 1) { /* test a single file */
+		test_single_file(argv[1]);
+	} else { /* test the target directory */
 		int rc;
 		char corporadir[sizeof(SRCDIR) + 1 + target_len + 8];
 		snprintf(corporadir, sizeof(corporadir), SRCDIR "/%.*s.in", (int) target_len, target);

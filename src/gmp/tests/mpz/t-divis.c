@@ -20,7 +20,6 @@ the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "gmp.h"
 #include "gmp-impl.h"
 #include "tests.h"
 
@@ -157,8 +156,7 @@ main (int argc, char *argv[])
 
   tests_start ();
 
-  if (argc == 2)
-    reps = atoi (argv[1]);
+  TESTS_REPS (reps, argv, argc);
 
   check_data ();
   check_random (reps);

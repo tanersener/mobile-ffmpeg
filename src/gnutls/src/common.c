@@ -996,7 +996,7 @@ int check_command(gnutls_session_t session, const char *str, unsigned no_cli_cer
 			if (ret < 0) {
 				fprintf(stderr, "reauth: %s\n",
 					gnutls_strerror(ret));
-				exit(1);
+				return ret;
 			}
 			return 1;
 		} else
@@ -1013,7 +1013,7 @@ int check_command(gnutls_session_t session, const char *str, unsigned no_cli_cer
 				} else {
 					fprintf(stderr, "ping: %s\n",
 						gnutls_strerror(ret));
-					exit(1);
+					return ret;
 				}
 			}
 			return 2;

@@ -38,6 +38,7 @@
 #include <common.h>
 #include <pk.h>
 #include "supported_exts.h"
+#include "profiles.h"
 
 /* Checks if two certs have the same name and the same key.  Return 1 on match. 
  * If @is_ca is zero then this function is identical to gnutls_x509_crt_equals()
@@ -420,9 +421,9 @@ unsigned _gnutls_is_broken_sig_allowed(const gnutls_sign_entry_st *se, unsigned 
 			_gnutls_debug_log(#level": certificate's signature hash is unknown\n"); \
 			return gnutls_assert_val(0); \
 		} \
-		if (entry->output_size*8/2 < sym_bits) { \
+		if (_gnutls_sign_get_hash_strength(sigalg) < sym_bits) { \
 			_gnutls_cert_log("cert", crt); \
-			_gnutls_debug_log(#level": certificate's signature hash strength is unacceptable (is %u bits, needed %u)\n", entry->output_size*8/2, sym_bits); \
+			_gnutls_debug_log(#level": certificate's signature hash strength is unacceptable (is %u bits, needed %u)\n", _gnutls_sign_get_hash_strength(sigalg), sym_bits); \
 			return gnutls_assert_val(0); \
 		} \
 		sp = gnutls_pk_bits_to_sec_param(pkalg, bits); \
@@ -460,9 +461,20 @@ static unsigned is_level_acceptable(
 	gnutls_pk_params_st params;
 	gnutls_sec_param_t sp;
 	int hash;
+	gnutls_certificate_verification_profiles_t min_profile;
 
-	if (profile == GNUTLS_PROFILE_UNKNOWN)
+	min_profile = _gnutls_get_system_wide_verification_profile();
+
+	if (min_profile) {
+		if (profile < min_profile) {
+			gnutls_assert();
+			profile = min_profile;
+		}
+	}
+
+	if (profile == GNUTLS_PROFILE_UNKNOWN) {
 		return 1;
+	}
 
 	pkalg = gnutls_x509_crt_get_pk_algorithm(crt, &bits);
 	if (pkalg < 0)
@@ -858,6 +870,36 @@ gnutls_x509_crt_check_issuer(gnutls_x509_crt_t cert,
 	return is_issuer(cert, issuer);
 }
 
+static
+unsigned check_ca_sanity(const gnutls_x509_crt_t issuer,
+			 time_t now, unsigned int flags)
+{
+	unsigned int status = 0;
+	unsigned sigalg;
+	int ret;
+
+	/* explicit time check for trusted CA that we remove from
+	 * list. GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS
+	 */
+	if (!(flags & GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS) &&
+	    !(flags & GNUTLS_VERIFY_DISABLE_TIME_CHECKS)) {
+		status |= check_time_status(issuer, now);
+	}
+
+	ret =
+	    _gnutls_x509_get_signature_algorithm(issuer->cert, "signatureAlgorithm");
+	sigalg = ret;
+
+	/* we explicitly allow CAs which we do not support their self-algorithms
+	 * to pass. */
+	if (ret >= 0 && !is_level_acceptable(issuer, NULL, sigalg, flags)) {
+		status |= GNUTLS_CERT_INSECURE_ALGORITHM|GNUTLS_CERT_INVALID;
+	}
+
+	return status;
+
+}
+
 /* Verify X.509 certificate chain.
  *
  * Note that the return value is an OR of GNUTLS_CERT_* elements.
@@ -916,25 +958,17 @@ _gnutls_verify_crt_status(const gnutls_x509_crt_t * certificate_list,
 			 * CA to self-signed CA at some point. */
 			if (_gnutls_check_if_same_key
 			    (certificate_list[i], trusted_cas[j], i) != 0) {
-				/* explicit time check for trusted CA that we remove from
-				 * list. GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS
-				 */
 
-				if (!(flags & GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS) &&
-					!(flags & GNUTLS_VERIFY_DISABLE_TIME_CHECKS)) {
-					status |=
-					    check_time_status(trusted_cas[j],
-						       now);
-					if (status != 0) {
-						if (func)
-							func(certificate_list[i], trusted_cas[j], NULL, status);
-						return status;
-					}
-				}
+				status |= check_ca_sanity(trusted_cas[j], now, flags);
 
 				if (func)
 					func(certificate_list[i],
 					     trusted_cas[j], NULL, status);
+
+				if (status != 0) {
+					return gnutls_assert_val(status);
+				}
+
 				clist_size = i;
 				break;
 			}
@@ -1164,19 +1198,15 @@ _gnutls_pkcs11_verify_crt_status(const char* url,
 
 		if (gnutls_pkcs11_crt_is_known (url, certificate_list[i], vflags) != 0) {
 
-			if (!(flags & GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS) &&
-				!(flags & GNUTLS_VERIFY_DISABLE_TIME_CHECKS)) {
-				status |=
-				    check_time_status(certificate_list[i], now);
-				if (status != 0) {
-					if (func)
-						func(certificate_list[i], certificate_list[i], NULL, status);
-					return status;
-				}
-			}
+			status |= check_ca_sanity(certificate_list[i], now, flags);
+
 			if (func)
 				func(certificate_list[i],
 				     certificate_list[i], NULL, status);
+
+			if (status != 0) {
+				return gnutls_assert_val(status);
+			}
 
 			clist_size = i;
 			break;

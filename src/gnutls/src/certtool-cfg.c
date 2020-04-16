@@ -1880,10 +1880,11 @@ int get_tls_server_status(void)
 /* convert a printable IP to binary */
 static int string_to_ip(unsigned char *ip, const char *str)
 {
-	int len = strlen(str);
 	int ret;
 
 #if HAVE_IPV6
+	int len = strlen(str);
+
 	if (strchr(str, ':') != NULL || len > 16) {	/* IPv6 */
 		ret = inet_pton(AF_INET6, str, ip);
 		if (ret <= 0) {

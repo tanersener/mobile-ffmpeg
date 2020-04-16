@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_psk_server_get_username2} (gnutls_session_t @var{session}, gnutls_datum_t * @var{username})

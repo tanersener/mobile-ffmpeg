@@ -2,7 +2,7 @@
 
 
 
-@deftypefun {int} {gnutls_ocsp_req_get_nonce} (gnutls_ocsp_req_t @var{req}, unsigned int * @var{critical}, gnutls_datum_t * @var{nonce})
+@deftypefun {int} {gnutls_ocsp_req_get_nonce} (gnutls_ocsp_req_const_t @var{req}, unsigned int * @var{critical}, gnutls_datum_t * @var{nonce})
 @var{req}: should contain a @code{gnutls_ocsp_req_t}  type
 
 @var{critical}: whether nonce extension is marked critical, or NULL

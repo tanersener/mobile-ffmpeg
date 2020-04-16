@@ -172,7 +172,8 @@ int _gnutls_proc_ecdh_common_client_kx(gnutls_session_t session,
 			gnutls_assert();
 			goto cleanup;
 		}
-	} else if (ecurve->pk == GNUTLS_PK_ECDH_X25519) {
+	} else if (ecurve->pk == GNUTLS_PK_ECDH_X25519 ||
+		   ecurve->pk == GNUTLS_PK_ECDH_X448) {
 		if (ecurve->size != point_size)
 			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
@@ -183,7 +184,8 @@ int _gnutls_proc_ecdh_common_client_kx(gnutls_session_t session,
 			goto cleanup;
 		}
 
-		/* RFC7748 requires to mask the MSB in the final byte */
+		/* RFC7748 requires to mask the MSB in the final byte
+		 * for X25519 (not X448) */
 		if (ecurve->id == GNUTLS_ECC_CURVE_X25519) {
 			session->key.proto.tls12.ecdh.raw.data[point_size-1] &= 0x7f;
 		}
@@ -282,7 +284,7 @@ _gnutls_gen_ecdh_common_client_kx_int(gnutls_session_t session,
 			gnutls_assert();
 			goto cleanup;
 		}
-	} else if (pk == GNUTLS_PK_ECDH_X25519) {
+	} else if (pk == GNUTLS_PK_ECDH_X25519 || pk == GNUTLS_PK_ECDH_X448) {
 		ret =
 		    _gnutls_buffer_append_data_prefix(data, 8,
 					session->key.proto.tls12.ecdh.params.raw_pub.data,
@@ -382,7 +384,8 @@ _gnutls_proc_ecdh_common_server_kx(gnutls_session_t session,
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-	} else if (ecurve->pk == GNUTLS_PK_ECDH_X25519) {
+	} else if (ecurve->pk == GNUTLS_PK_ECDH_X25519 ||
+		   ecurve->pk == GNUTLS_PK_ECDH_X448) {
 		if (ecurve->size != point_size)
 			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
@@ -391,7 +394,8 @@ _gnutls_proc_ecdh_common_server_kx(gnutls_session_t session,
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-		/* RFC7748 requires to mask the MSB in the final byte */
+		/* RFC7748 requires to mask the MSB in the final byte
+		 * for X25519 (not X448) */
 		if (ecurve->id == GNUTLS_ECC_CURVE_X25519) {
 			session->key.proto.tls12.ecdh.raw.data[point_size-1] &= 0x7f;
 		}
@@ -462,7 +466,8 @@ int _gnutls_ecdh_common_print_server_kx(gnutls_session_t session,
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-	} else if (group->pk == GNUTLS_PK_ECDH_X25519) {
+	} else if (group->pk == GNUTLS_PK_ECDH_X25519 ||
+		   group->pk == GNUTLS_PK_ECDH_X448) {
 		ret =
 			_gnutls_buffer_append_data_prefix(data, 8,
 					session->key.proto.tls12.ecdh.params.raw_pub.data,

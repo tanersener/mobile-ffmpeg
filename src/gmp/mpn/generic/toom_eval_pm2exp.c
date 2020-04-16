@@ -35,7 +35,6 @@ GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
 
-#include "gmp.h"
 #include "gmp-impl.h"
 
 /* Evaluates a polynomial of degree k > 2, in the points +2^shift and -2^shift. */

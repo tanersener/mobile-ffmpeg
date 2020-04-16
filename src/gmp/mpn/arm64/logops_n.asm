@@ -32,11 +32,13 @@ dnl  see https://www.gnu.org/licenses/.
 
 include(`../config.m4')
 
-C	     cycles/limb
-C Cortex-A53	 ?
-C Cortex-A57	 ?
+C	     cycles/limb     cycles/limb
+C	      nand,nior	      all other
+C Cortex-A53	3.25-3.5	2.75-3
+C Cortex-A57	 2.0		 1.5
+C X-Gene	 2.14		 2.0
 
-changecom(@&*$)
+changecom(blah)
 
 define(`rp', `x0')
 define(`up', `x1')
@@ -76,31 +78,62 @@ MULFUNC_PROLOGUE(mpn_and_n mpn_andn_n mpn_nand_n mpn_ior_n mpn_iorn_n mpn_nior_n
 
 ASM_START()
 PROLOGUE(func)
-	tbz	n, #0, L(b0)
+	lsr	x18, n, #2
+	tbz	n, #0, L(bx0)
 
-	ldr	x4, [up],#8
-	ldr	x6, [vp],#8
-	sub	n, n, #1
-	LOGOP(	x8, x4, x6)
-	POSTOP(	x8)
-	str	x8, [rp],#8
-	cbz	n, L(rtn)
+L(bx1):	ldr	x7, [up]
+	ldr	x11, [vp]
+	LOGOP(	x15, x7, x11)
+	POSTOP(	x15)
+	str	x15, [rp],#8
+	tbnz	n, #1, L(b11)
 
-L(b0):	ldp	x4, x5, [up],#16
-	ldp	x6, x7, [vp],#16
-	sub	n, n, #2
+L(b01):	cbz	x18, L(ret)
+	ldp	x4, x5, [up,#8]
+	ldp	x8, x9, [vp,#8]
+	sub	up, up, #8
+	sub	vp, vp, #8
 	b	L(mid)
 
-L(top):	ldp	x4, x5, [up],#16
-	ldp	x6, x7, [vp],#16
-	sub	n, n, #2
-	stp	x8, x9, [rp],#16
-L(mid):	LOGOP(	x8, x4, x6)
-	LOGOP(	x9, x5, x7)
-	POSTOP(	x8)
-	POSTOP(	x9)
-	cbnz	n, L(top)
+L(b11):	ldp	x6, x7, [up,#8]
+	ldp	x10, x11, [vp,#8]
+	add	up, up, #8
+	add	vp, vp, #8
+	cbz	x18, L(end)
+	b	L(top)
 
-	stp	x8, x9, [rp],#16
-L(rtn):	ret
+L(bx0):	tbnz	n, #1, L(b10)
+
+L(b00):	ldp	x4, x5, [up],#-16
+	ldp	x8, x9, [vp],#-16
+	b	L(mid)
+
+L(b10):	ldp	x6, x7, [up]
+	ldp	x10, x11, [vp]
+	cbz	x18, L(end)
+
+	ALIGN(16)
+L(top):	ldp	x4, x5, [up,#16]
+	ldp	x8, x9, [vp,#16]
+	LOGOP(	x12, x6, x10)
+	LOGOP(	x13, x7, x11)
+	POSTOP(	x12)
+	POSTOP(	x13)
+	stp	x12, x13, [rp],#16
+L(mid):	ldp	x6, x7, [up,#32]!
+	ldp	x10, x11, [vp,#32]!
+	LOGOP(	x12, x4, x8)
+	LOGOP(	x13, x5, x9)
+	POSTOP(	x12)
+	POSTOP(	x13)
+	stp	x12, x13, [rp],#16
+	sub	x18, x18, #1
+	cbnz	x18, L(top)
+
+L(end):	LOGOP(	x12, x6, x10)
+	LOGOP(	x13, x7, x11)
+	POSTOP(	x12)
+	POSTOP(	x13)
+	stp	x12, x13, [rp]
+L(ret):	ret
 EPILOGUE()

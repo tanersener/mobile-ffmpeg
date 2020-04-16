@@ -2,7 +2,8 @@
 
 Contributed to the GNU project by Marco Bodrato.
 
-Copyright 1991, 1993-1995, 2000-2003, 2011, 2012 Free Software Foundation, Inc.
+Copyright 1991, 1993-1995, 2000-2003, 2011, 2012, 2015 Free Software
+Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -30,7 +31,6 @@ You should have received copies of the GNU General Public License and the
 GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
-#include "gmp.h"
 #include "gmp-impl.h"
 
 #define FACTOR_LIST_STORE(P, PR, MAX_PR, VEC, I)		\
@@ -60,7 +60,7 @@ mpz_fac_ui (mpz_ptr x, unsigned long n)
 
   if (n < numberof (table))
     {
-      PTR (x)[0] = table[n];
+      MPZ_NEWALLOC (x, 1)[0] = table[n];
       SIZ (x) = 1;
     }
   else if (BELOW_THRESHOLD (n, FAC_ODD_THRESHOLD))

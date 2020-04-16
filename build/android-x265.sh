@@ -23,12 +23,12 @@ fi
 # ENABLE COMMON FUNCTIONS
 . ${BASEDIR}/build/android-common.sh
 
-# PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
+# PREPARE PATHS & DEFINE ${INSTALL_PKG_CONFIG_DIR}
 LIB_NAME="x265"
 set_toolchain_clang_paths ${LIB_NAME}
 
 # PREPARING FLAGS
-TARGET_HOST=$(get_target_host)
+BUILD_HOST=$(get_build_host)
 CFLAGS=$(get_cflags ${LIB_NAME})
 CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 LDFLAGS=$(get_ldflags ${LIB_NAME})
@@ -42,19 +42,19 @@ if [[ ${DOWNLOAD_RESULT} -ne 0 ]]; then
 fi
 cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
-ASM_OPTIONS=""
+ARCH_OPTIONS=""
 case ${ARCH} in
     arm-v7a | arm-v7a-neon)
-        ASM_OPTIONS="-DENABLE_ASSEMBLY=0 -DCROSS_COMPILE_ARM=1"
+        ARCH_OPTIONS="-DENABLE_ASSEMBLY=0 -DCROSS_COMPILE_ARM=1"
     ;;
     arm64-v8a)
-        ASM_OPTIONS="-DENABLE_ASSEMBLY=0 -DCROSS_COMPILE_ARM=1"
+        ARCH_OPTIONS="-DENABLE_ASSEMBLY=0 -DCROSS_COMPILE_ARM=1"
     ;;
     x86)
-        ASM_OPTIONS="-DENABLE_ASSEMBLY=0 -DCROSS_COMPILE_ARM=0"
+        ARCH_OPTIONS="-DENABLE_ASSEMBLY=0 -DCROSS_COMPILE_ARM=0"
     ;;
     x86-64)
-        ASM_OPTIONS="-DENABLE_ASSEMBLY=0 -DCROSS_COMPILE_ARM=0"
+        ARCH_OPTIONS="-DENABLE_ASSEMBLY=0 -DCROSS_COMPILE_ARM=0"
     ;;
 esac
 
@@ -87,13 +87,13 @@ cmake -Wno-dev \
     -DSTATIC_LINK_CRT=1 \
     -DENABLE_PIC=1 \
     -DENABLE_CLI=0 \
-    ${ASM_OPTIONS} \
+    ${ARCH_OPTIONS} \
     -DCMAKE_SYSTEM_PROCESSOR="${ARCH}" \
     -DENABLE_SHARED=0 ../source || exit 1
 
 make -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_x265_package_config "3.2.1"
+create_x265_package_config "3.3"
 
 make install || exit 1

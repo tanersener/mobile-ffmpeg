@@ -71,4 +71,10 @@ timespec_sub_ms(struct timespec *a, struct timespec *b)
 	return (a->tv_sec - b->tv_sec) * 1000 + (a->tv_nsec - b->tv_nsec) / (1000 * 1000);
 }
 
+inline static unsigned long
+timespec_sub_ns(struct timespec *a, struct timespec *b)
+{
+	return (a->tv_sec - b->tv_sec) * 1000000000 + (a->tv_nsec - b->tv_nsec);
+}
+
 #endif /* GNUTLS_SRC_BENCHMARK_H */

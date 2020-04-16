@@ -159,9 +159,9 @@ testmain (int argc, char **argv)
   for (i = 0; i < COUNT; i++)
     {
       int base;
-      for (base = 0; base <= 36; base += 1 + (base == 0))
+      for (base = 0; base <= 62; base += 1 + (base == 0))
 	{
-	  hex_random_str_op (MAXBITS, i&1 ? base: -base, &ap, &rp);
+	  hex_random_str_op (MAXBITS, (i&1 || base > 36) ? base: -base, &ap, &rp);
 	  if (mpz_set_str (a, ap, 16) != 0)
 	    {
 	      fprintf (stderr, "mpz_set_str failed on input %s\n", ap);
@@ -181,7 +181,7 @@ testmain (int argc, char **argv)
 		       base, (unsigned) arn, (unsigned)bn);
 	      abort ();
 	    }
-	  bp = mpz_get_str (NULL, i&1 ? base: -base, a);
+	  bp = mpz_get_str (NULL, (i&1 || base > 36) ? base: -base, a);
 	  if (strcmp (bp, rp))
 	    {
 	      fprintf (stderr, "mpz_get_str failed:\n");
@@ -197,7 +197,7 @@ testmain (int argc, char **argv)
 	    {
 	      size_t tn;
 	      rewind (tmp);
-	      tn = mpz_out_str (tmp, i&1 ? base: -base, a);
+	      tn = mpz_out_str (tmp, (i&1 || base > 36) ? base: -base, a);
 	      if (tn != rn)
 		{
 		  fprintf (stderr, "mpz_out_str, bad return value:\n");
@@ -249,7 +249,7 @@ testmain (int argc, char **argv)
 	      size_t i;
 	      const char *absr;
 	      mp_limb_t t[MAXLIMBS];
-	      mp_size_t tn = mpz_size (a);
+	      size_t tn = mpz_size (a);
 
 	      assert (tn <= MAXLIMBS);
 	      mpn_copyi (t, a->_mp_d, tn);
@@ -272,11 +272,11 @@ testmain (int argc, char **argv)
 	      for (i = 0; i < bn; i++)
 		{
 		  unsigned char digit = absr[i];
-		  unsigned value;
+		  char value;
 		  if (digit >= '0' && digit <= '9')
 		    value = digit - '0';
 		  else if (digit >= 'a' && digit <= 'z')
-		    value = digit - 'a' + 10;
+		    value = digit - 'a' + ((base > 36) ? 36 : 10);
 		  else if (digit >= 'A' && digit <= 'Z')
 		    value = digit - 'A' + 10;
 		  else

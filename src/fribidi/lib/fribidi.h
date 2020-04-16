@@ -57,13 +57,13 @@
  * string, the other way. Moreover, the position maps should be filled with
  * valid entries.
  * 
- * A position map pointing to a removed character is filled with \-1. By the
+ * A position map pointing to a removed character is filled with \(mi1. By the
  * way, you should not use embedding_levels if str is visual string.
  * 
  * For best results this function should be run on a whole paragraph, not
  * lines; but feel free to do otherwise if you know what you are doing.
  *
- * Returns: New length of the string, or \-1 if an error occurred (memory
+ * Returns: New length of the string, or \(mi1 if an error occurred (memory
  * allocation failure most probably).
  */
 FRIBIDI_ENTRY FriBidiStrIndex
@@ -109,6 +109,8 @@ FRIBIDI_ENTRY FriBidiLevel fribidi_log2vis (
 					 * positions */
   FriBidiLevel *embedding_levels	/* output list of embedding levels */
 );
+
+/* End of functions */
 
 #ifdef FRIBIDI_NO_DEPRECATED
 #else

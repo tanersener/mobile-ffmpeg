@@ -2,7 +2,7 @@ dnl  ARM64 mpn_add_n and mpn_sub_n
 
 dnl  Contributed to the GNU project by Torbjörn Granlund.
 
-dnl  Copyright 2013 Free Software Foundation, Inc.
+dnl  Copyright 2013, 2017 Free Software Foundation, Inc.
 
 dnl  This file is part of the GNU MP Library.
 dnl
@@ -33,10 +33,11 @@ dnl  see https://www.gnu.org/licenses/.
 include(`../config.m4')
 
 C	     cycles/limb
-C Cortex-A53	 ?
-C Cortex-A57	 ?
+C Cortex-A53	2.75-3.25
+C Cortex-A57	 1.5
+C X-Gene	 2.0
 
-changecom(@&*$)
+changecom(blah)
 
 define(`rp', `x0')
 define(`up', `x1')
@@ -47,16 +48,15 @@ ifdef(`OPERATION_add_n', `
   define(`ADDSUBC',	adcs)
   define(`CLRCY',	`cmn	xzr, xzr')
   define(`SETCY',	`cmp	$1, #1')
-  define(`RETVAL',	`adc	x0, xzr, xzr')
-  define(`func',	mpn_add_n)
+  define(`RETVAL',	`cset	x0, cs')
+  define(`func_n',	mpn_add_n)
   define(`func_nc',	mpn_add_nc)')
 ifdef(`OPERATION_sub_n', `
   define(`ADDSUBC',	sbcs)
   define(`CLRCY',	`cmp	xzr, xzr')
-  define(`SETCY',	`subs	$1, xzr, $1')
-  define(`RETVAL',	`sbc	x0, xzr, xzr
-			and	x0, x0, #1')
-  define(`func',	mpn_sub_n)
+  define(`SETCY',	`cmp	xzr, $1')
+  define(`RETVAL',	`cset	x0, cc')
+  define(`func_n',	mpn_sub_n)
   define(`func_nc',	mpn_sub_nc)')
 
 MULFUNC_PROLOGUE(mpn_add_n mpn_add_nc mpn_sub_n mpn_sub_nc)
@@ -66,33 +66,60 @@ PROLOGUE(func_nc)
 	SETCY(	x4)
 	b	L(ent)
 EPILOGUE()
-PROLOGUE(func)
+PROLOGUE(func_n)
 	CLRCY
-L(ent):	tbz	n, #0, L(b0)
+L(ent):	lsr	x18, n, #2
+	tbz	n, #0, L(bx0)
 
-	ldr	x4, [up],#8
-	ldr	x6, [vp],#8
-	sub	n, n, #1
-	ADDSUBC	x8, x4, x6
-	str	x8, [rp],#8
-	cbz	n, L(rt)
+L(bx1):	ldr	x7, [up]
+	ldr	x11, [vp]
+	ADDSUBC	x13, x7, x11
+	str	x13, [rp],#8
+	tbnz	n, #1, L(b11)
 
-L(b0):	ldp	x4, x5, [up],#16
-	ldp	x6, x7, [vp],#16
-	sub	n, n, #2
-	ADDSUBC	x8, x4, x6
-	ADDSUBC	x9, x5, x7
-	cbz	n, L(end)
+L(b01):	cbz	x18, L(ret)
+	ldp	x4, x5, [up,#8]
+	ldp	x8, x9, [vp,#8]
+	sub	up, up, #8
+	sub	vp, vp, #8
+	b	L(mid)
 
-L(top):	ldp	x4, x5, [up],#16
-	ldp	x6, x7, [vp],#16
-	sub	n, n, #2
-	stp	x8, x9, [rp],#16
-	ADDSUBC	x8, x4, x6
-	ADDSUBC	x9, x5, x7
-	cbnz	n, L(top)
+L(b11):	ldp	x6, x7, [up,#8]
+	ldp	x10, x11, [vp,#8]
+	add	up, up, #8
+	add	vp, vp, #8
+	cbz	x18, L(end)
+	b	L(top)
 
-L(end):	stp	x8, x9, [rp]
-L(rt):	RETVAL
+L(bx0):	tbnz	n, #1, L(b10)
+
+L(b00):	ldp	x4, x5, [up]
+	ldp	x8, x9, [vp]
+	sub	up, up, #16
+	sub	vp, vp, #16
+	b	L(mid)
+
+L(b10):	ldp	x6, x7, [up]
+	ldp	x10, x11, [vp]
+	cbz	x18, L(end)
+
+	ALIGN(16)
+L(top):	ldp	x4, x5, [up,#16]
+	ldp	x8, x9, [vp,#16]
+	ADDSUBC	x12, x6, x10
+	ADDSUBC	x13, x7, x11
+	stp	x12, x13, [rp],#16
+L(mid):	ldp	x6, x7, [up,#32]!
+	ldp	x10, x11, [vp,#32]!
+	ADDSUBC	x12, x4, x8
+	ADDSUBC	x13, x5, x9
+	stp	x12, x13, [rp],#16
+	sub	x18, x18, #1
+	cbnz	x18, L(top)
+
+L(end):	ADDSUBC	x12, x6, x10
+	ADDSUBC	x13, x7, x11
+	stp	x12, x13, [rp]
+L(ret):	RETVAL
 	ret
 EPILOGUE()

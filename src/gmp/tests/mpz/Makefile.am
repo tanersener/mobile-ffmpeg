@@ -19,13 +19,14 @@
 
 
 AM_CPPFLAGS = -I$(top_srcdir) -I$(top_srcdir)/tests
+AM_LDFLAGS = -no-install
 LDADD = $(top_builddir)/tests/libtests.la $(top_builddir)/libgmp.la
 
 check_PROGRAMS = reuse t-addsub t-cmp t-mul t-mul_i t-tdiv t-tdiv_ui t-fdiv \
   t-fdiv_ui t-cdiv_ui t-gcd t-gcd_ui t-lcm t-invert dive dive_ui t-sqrtrem \
   convert io t-inp_str logic bit t-powm t-powm_ui t-pow t-div_2exp      \
   t-root t-perfsqr t-perfpow t-jac t-bin t-get_d t-get_d_2exp t-get_si	\
-  t-set_d t-set_si							\
+  t-set_d t-set_si t-lucm						\
   t-fac_ui t-mfac_uiui t-primorial_ui t-fib_ui t-lucnum_ui t-scan t-fits   \
   t-divis t-divis_2exp t-cong t-cong_2exp t-sizeinbase t-set_str        \
   t-aorsmul t-cmp_d t-cmp_si t-hamdist t-oddeven t-popcount t-set_f     \

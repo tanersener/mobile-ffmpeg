@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnutls 3.6.8\n"
 "Report-Msgid-Bugs-To: bug-gnutls@gnu.org\n"
-"POT-Creation-Date: 2019-12-02 17:35+0100\n"
+"POT-Creation-Date: 2020-03-30 21:03+0200\n"
 "PO-Revision-Date: 2019-06-18 07:01+02:00\n"
 "Last-Translator: Petr Pisar <petr.pisar@atlas.cz>\n"
 "Language-Team: Czech <translation-team-cs@lists.sourceforge.net>\n"
@@ -413,570 +413,575 @@ msgstr "Nepodporované kritické rozšíření v X.509 certifikátu."
 msgid "Unsupported extension in X.509 certificate."
 msgstr "Nepodporované rozšíření v X.509 certifikátu."
 
-#: lib/errors.c:190
+#: lib/errors.c:189
+#, fuzzy
+msgid "Duplicate extension in X.509 certificate."
+msgstr "Nepodporované rozšíření v X.509 certifikátu."
+
+#: lib/errors.c:192
 msgid "Key usage violation in certificate has been detected."
 msgstr "Bylo zaznamenáno použití klíče v rozporu s pravidly."
 
-#: lib/errors.c:192 lib/errors.c:454
+#: lib/errors.c:194 lib/errors.c:456
 msgid "Function was interrupted."
 msgstr "Funkce byla přerušena."
 
-#: lib/errors.c:194
+#: lib/errors.c:196
 msgid "TLS Application data were received, while expecting handshake data."
 msgstr "Byla přijata aplikační data TLS, zatímco měla přijít data zahájení."
 
-#: lib/errors.c:196
+#: lib/errors.c:198
 msgid "Error in Database backend."
 msgstr "Chyba databázovém jádře."
 
-#: lib/errors.c:197
+#: lib/errors.c:199
 msgid "The Database entry already exists."
 msgstr "Položka v databázi již existuje."
 
-#: lib/errors.c:198
+#: lib/errors.c:200
 msgid "The certificate type is not supported."
 msgstr "Tento druh certifikátu není podporován."
 
-#: lib/errors.c:201
+#: lib/errors.c:203
 msgid "The given memory buffer is too short to hold parameters."
 msgstr "Zadaný paměťový buffer je pro uložení parametrů příliš malý."
 
-#: lib/errors.c:203 libdane/errors.c:61
+#: lib/errors.c:205 libdane/errors.c:61
 msgid "The request is invalid."
 msgstr "Požadavek je neplatný."
 
-#: lib/errors.c:205
+#: lib/errors.c:207
 msgid "The cookie was bad."
 msgstr "Cookie byl chybný."
 
-#: lib/errors.c:206
+#: lib/errors.c:208
 msgid "An illegal parameter has been received."
 msgstr "Byl přijat neplatný parametr."
 
-#: lib/errors.c:208
+#: lib/errors.c:210
 msgid "An illegal parameter was found."
 msgstr "Byl nalezen neplatný parametr."
 
-#: lib/errors.c:210
+#: lib/errors.c:212
 msgid "Error while reading file."
 msgstr "Chyba při čtení souboru."
 
-#: lib/errors.c:211
+#: lib/errors.c:213
 msgid "A disallowed SNI server name has been received."
 msgstr "V SNI byl přijat zakázaný název serveru."
 
-#: lib/errors.c:214
+#: lib/errors.c:216
 msgid "ASN1 parser: Element was not found."
 msgstr "ASN1 parser: Prvek nebyl nalezen."
 
-#: lib/errors.c:216
+#: lib/errors.c:218
 msgid "ASN1 parser: Identifier was not found"
 msgstr "ASN1 parser: Identifikátor nebyl nalezen."
 
-#: lib/errors.c:218
+#: lib/errors.c:220
 msgid "ASN1 parser: Error in DER parsing."
 msgstr "ASN1 parser: Chyba při rozebírání DER."
 
-#: lib/errors.c:220
+#: lib/errors.c:222
 msgid "ASN1 parser: Value was not found."
 msgstr "ASN1 parser: Hodnota nebyla nalezena."
 
-#: lib/errors.c:222
+#: lib/errors.c:224
 msgid "ASN1 parser: Generic parsing error."
 msgstr "ASN1 parser: Obecná chyba při rozebírání."
 
-#: lib/errors.c:224
+#: lib/errors.c:226
 msgid "ASN1 parser: Value is not valid."
 msgstr "ASN1 parser: Hodnota není platná."
 
-#: lib/errors.c:226
+#: lib/errors.c:228
 msgid "ASN1 parser: Error in TAG."
 msgstr "ASN1 parser: Chyba ve ZNAČCE."
 
-#: lib/errors.c:228
+#: lib/errors.c:230
 msgid "ASN1 parser: error in implicit tag"
 msgstr "ASN1 parser: chyba v implicitní značce"
 
-#: lib/errors.c:230
+#: lib/errors.c:232
 msgid "ASN1 parser: Error in type 'ANY'."
 msgstr "ASN1 parser: Chyba v typu „ANY“."
 
-#: lib/errors.c:232
+#: lib/errors.c:234
 msgid "ASN1 parser: Syntax error."
 msgstr "ASN1 parser: Chyba syntaxe."
 
-#: lib/errors.c:234
+#: lib/errors.c:236
 msgid "ASN1 parser: Overflow in DER parsing."
 msgstr "ASN1 parser: Přetečení při rozebírání DER."
 
-#: lib/errors.c:238
+#: lib/errors.c:240
 msgid "Too many empty record packets have been received."
 msgstr "Bylo přijato příliš mnoho packetů s prázdnou strukturou."
 
-#: lib/errors.c:240
+#: lib/errors.c:242
 msgid "Too many handshake packets have been received."
 msgstr "Bylo přijato příliš mnoho zahajovacích packetů."
 
-#: lib/errors.c:242
+#: lib/errors.c:244
 msgid "More than a single object matches the criteria."
 msgstr "Kritériím vyhovuje více než jeden objekt."
 
-#: lib/errors.c:244
+#: lib/errors.c:246
 msgid "The crypto library version is too old."
 msgstr "Verze kryptografické knihovny je příliš stará."
 
-#: lib/errors.c:247
+#: lib/errors.c:249
 msgid "The tasn1 library version is too old."
 msgstr "Verze knihovny tasn1 je příliš stará."
 
-#: lib/errors.c:249
+#: lib/errors.c:251
 msgid "The OpenPGP User ID is revoked."
 msgstr "ID OpenPGP uživatele bylo odvoláno."
 
-#: lib/errors.c:251
+#: lib/errors.c:253
 msgid "The OpenPGP key has not a preferred key set."
 msgstr "OpenPGP klíč postrádá množinu přednostních klíčů."
 
-#: lib/errors.c:253
+#: lib/errors.c:255
 msgid "Error loading the keyring."
 msgstr "Chyba při načítání souboru s klíči. "
 
-#: lib/errors.c:255
+#: lib/errors.c:257
 msgid "The initialization of crypto backend has failed."
 msgstr "Inicializace kryptografického jádra selhala."
 
-#: lib/errors.c:258
+#: lib/errors.c:260
 msgid "No supported compression algorithms have been found."
 msgstr "Žádné podporované kompresní algoritmy nebyly nalezeny."
 
-#: lib/errors.c:260
+#: lib/errors.c:262
 msgid "No supported cipher suites have been found."
 msgstr "Žádné podporované režimy šifer nebyly nalezeny."
 
-#: lib/errors.c:262
+#: lib/errors.c:264
 msgid "Could not get OpenPGP key."
 msgstr "Nebylo možné získat OpenPGP klíč."
 
-#: lib/errors.c:264
+#: lib/errors.c:266
 msgid "Could not find OpenPGP subkey."
 msgstr "Nebylo možné najít OpenPGP podklíč."
 
-#: lib/errors.c:266
+#: lib/errors.c:268
 msgid "Safe renegotiation failed."
 msgstr "Bezpečné znovuvyjednání selhalo."
 
-#: lib/errors.c:268
+#: lib/errors.c:270
 msgid "Unsafe renegotiation denied."
 msgstr "Nebezpečné znovuvyjednání je zakázáno."
 
-#: lib/errors.c:271
+#: lib/errors.c:273
 msgid "The SRP username supplied is illegal."
 msgstr "Zadané SRP uživatelské jméno je neplatné."
 
-#: lib/errors.c:273
+#: lib/errors.c:275
 msgid "The username supplied is unknown."
 msgstr "Zadané uživatelské jméno není známo."
 
-#: lib/errors.c:276
+#: lib/errors.c:278
 msgid "The OpenPGP fingerprint is not supported."
 msgstr "OpenPGP otisk není podporován."
 
-#: lib/errors.c:278
+#: lib/errors.c:280
 msgid "The signature algorithm is not supported."
 msgstr "Algoritmus podpisu není podporován."
 
-#: lib/errors.c:280
+#: lib/errors.c:282
 msgid "The certificate has unsupported attributes."
 msgstr "Certifikát má nepodporované atributy."
 
-#: lib/errors.c:282
+#: lib/errors.c:284
 msgid "The OID is not supported."
 msgstr "Tento OID není podporován."
 
-#: lib/errors.c:284
+#: lib/errors.c:286
 msgid "The hash algorithm is unknown."
 msgstr "Hašovací algoritmus není znám."
 
-#: lib/errors.c:286
+#: lib/errors.c:288
 msgid "The PKCS structure's content type is unknown."
 msgstr "Typ obsahu struktury PKCS není znám."
 
 # „Bag“ překládá jako „kufřík“ Klíma
 # <http://crypto-world.info/klima/2001/chip-2001-04-176-178.pdf>. Jedná se
 # o prvek struktury PFX.
-#: lib/errors.c:288
+#: lib/errors.c:290
 msgid "The PKCS structure's bag type is unknown."
 msgstr "Typ kufříku ve struktuře PKCS není znám."
 
-#: lib/errors.c:290 lib/errors.c:296
+#: lib/errors.c:292 lib/errors.c:298
 msgid "The given password contains invalid characters."
 msgstr "Zadané heslo obsahuje neplatné znaky."
 
-#: lib/errors.c:292
+#: lib/errors.c:294
 msgid "The given string contains invalid UTF-8 characters."
 msgstr "Zadaný řetězec obsahuje neplatné znaky UTF-8."
 
-#: lib/errors.c:294
+#: lib/errors.c:296
 msgid "The given email string contains non-ASCII characters before '@'."
 msgstr "Zadaný řetězec s e-mailovou adresou obsahuje před „@“ neASCII znaky."
 
-#: lib/errors.c:299
+#: lib/errors.c:301
 msgid "The Message Authentication Code verification failed."
 msgstr "MAC (autentizační kód zprávy) se nepodařilo ověřit."
 
-#: lib/errors.c:301
+#: lib/errors.c:303
 msgid "Some constraint limits were reached."
 msgstr "Některé hranice omezení byly dosaženy."
 
-#: lib/errors.c:303
+#: lib/errors.c:305
 msgid "Failed to acquire random data."
 msgstr "Nezdařilo se získat náhodná data."
 
-#: lib/errors.c:305
+#: lib/errors.c:307
 msgid "Verifying TLS/IA phase checksum failed"
 msgstr "Kontrolní součet fáze TLS/IA se nepodařilo ověřit"
 
-#: lib/errors.c:308
+#: lib/errors.c:310
 msgid "The specified algorithm or protocol is unknown."
 msgstr "Zadaný algoritmus nebo protokol není znám."
 
-#: lib/errors.c:311
+#: lib/errors.c:313
 msgid "The handshake data size is too large."
 msgstr "Velikost zahajovacích dat je příliš velká."
 
-#: lib/errors.c:314
+#: lib/errors.c:316
 msgid "Error opening /dev/crypto"
 msgstr "Chyba při otevírání /dev/crypto"
 
-#: lib/errors.c:317
+#: lib/errors.c:319
 msgid "Error interfacing with /dev/crypto"
 msgstr "Chyba na rozhraní /dev/crypto"
 
-#: lib/errors.c:319
+#: lib/errors.c:321
 msgid "Peer has terminated the connection"
 msgstr "Protistrana ukončila spojení"
 
-#: lib/errors.c:321
+#: lib/errors.c:323
 msgid "Channel binding data not available"
 msgstr "Údaje o vazbě kanálu nejsou dostupné"
 
-#: lib/errors.c:324
+#: lib/errors.c:326
 msgid "TPM error."
 msgstr "Chyba TPM."
 
-#: lib/errors.c:326
+#: lib/errors.c:328
 msgid "The TPM library (trousers) cannot be found."
 msgstr "Nelze nalézt knihovnu TPM (trousers)."
 
-#: lib/errors.c:328
+#: lib/errors.c:330
 msgid "TPM is not initialized."
 msgstr "TPM není inicializován."
 
-#: lib/errors.c:330
+#: lib/errors.c:332
 msgid "TPM key was not found in persistent storage."
 msgstr "Klíč TPM nebyl v trvalém úložišti nalezen."
 
-#: lib/errors.c:332
+#: lib/errors.c:334
 msgid "Cannot initialize a session with the TPM."
 msgstr "Nelze zahájit relaci s TPM."
 
-#: lib/errors.c:334
+#: lib/errors.c:336
 msgid "PKCS #11 error."
 msgstr "Chyba PKCS #11."
 
-#: lib/errors.c:336
+#: lib/errors.c:338
 msgid "PKCS #11 initialization error."
 msgstr "Chyba inicializace PKCS #11."
 
-#: lib/errors.c:338
+#: lib/errors.c:340
 msgid "Error in parsing."
 msgstr "Chyba rozboru."
 
-#: lib/errors.c:340
+#: lib/errors.c:342
 msgid "Error in provided PIN."
 msgstr "Chyba v poskytnutém PIN."
 
-#: lib/errors.c:342
+#: lib/errors.c:344
 msgid "Error in provided SRK password for TPM."
 msgstr "Chyba v poskytnutém heslu SRK pro TPM."
 
-#: lib/errors.c:345
+#: lib/errors.c:347
 msgid "Error in provided password for key to be loaded in TPM."
 msgstr "Chyba v poskytnutém heslu pro klíč, který se měl nahrát do TPM."
 
-#: lib/errors.c:347
+#: lib/errors.c:349
 msgid "PKCS #11 error in slot"
 msgstr "PKCS #11 chyba ve slotu"
 
-#: lib/errors.c:349
+#: lib/errors.c:351
 msgid "Thread locking error"
 msgstr "Chyba zamykaní vlákna"
 
-#: lib/errors.c:351
+#: lib/errors.c:353
 msgid "PKCS #11 error in attribute"
 msgstr "PKCS #11 chyba v atributu"
 
-#: lib/errors.c:353
+#: lib/errors.c:355
 msgid "PKCS #11 error in device"
 msgstr "PKCS #11 chyba v zařízení"
 
-#: lib/errors.c:355
+#: lib/errors.c:357
 msgid "PKCS #11 error in data"
 msgstr "PKCS #11 chyba v datech"
 
-#: lib/errors.c:357
+#: lib/errors.c:359
 msgid "PKCS #11 unsupported feature"
 msgstr "Nepodporovaná vlastnost PKCS #11"
 
-#: lib/errors.c:359
+#: lib/errors.c:361
 msgid "PKCS #11 error in key"
 msgstr "PKCS #11 chyba v klíči"
 
-#: lib/errors.c:361
+#: lib/errors.c:363
 msgid "PKCS #11 PIN expired"
 msgstr "PKCS #11 PINu vypršela platnost"
 
-#: lib/errors.c:363
+#: lib/errors.c:365
 msgid "PKCS #11 PIN locked"
 msgstr "PKCS #11 PIN uzamknut"
 
-#: lib/errors.c:365
+#: lib/errors.c:367
 msgid "PKCS #11 error in session"
 msgstr "PKCS #11 chyba v relaci"
 
-#: lib/errors.c:367
+#: lib/errors.c:369
 msgid "PKCS #11 error in signature"
 msgstr "PKCS #11 chyba v podpisu"
 
 # XXX: Nepřekládat jako zařízení, hláška „PKCS #11 error in device“ již
 # existuje.
-#: lib/errors.c:369
+#: lib/errors.c:371
 msgid "PKCS #11 error in token"
 msgstr "PKCS #11 chyba v tokenu"
 
-#: lib/errors.c:371
+#: lib/errors.c:373
 msgid "PKCS #11 user error"
 msgstr "PKCS #11 chyba uživatele"
 
-#: lib/errors.c:373
+#: lib/errors.c:375
 msgid "The operation timed out"
 msgstr "Operace neskončila v řádném čase"
 
-#: lib/errors.c:375
+#: lib/errors.c:377
 msgid "The operation was cancelled due to user error"
 msgstr "Operace byla zrušena kvůli chybě uživatele"
 
-#: lib/errors.c:377
+#: lib/errors.c:379
 msgid "No supported ECC curves were found"
 msgstr "Nebyly nalezeny žádné podporované křivky ECC"
 
-#: lib/errors.c:379
+#: lib/errors.c:381
 msgid "The curve is unsupported"
 msgstr "Tato křivka není podporována"
 
-#: lib/errors.c:381
+#: lib/errors.c:383
 msgid "The requested PKCS #11 object is not available"
 msgstr "Požadovaný PKCS #11 object není dostupný"
 
-#: lib/errors.c:384
+#: lib/errors.c:386
 msgid ""
 "The provided X.509 certificate list is not sorted (in subject to issuer "
 "order)"
 msgstr ""
 "Poskytnutý seznam certifikátů X.509 není seřazen (od předmětu po vydavatele)"
 
-#: lib/errors.c:386
+#: lib/errors.c:388
 msgid "The OCSP response is invalid"
 msgstr "Odpověď OCSP je neplatná"
 
-#: lib/errors.c:388
+#: lib/errors.c:390
 msgid "The OCSP response provided doesn't match the available certificates"
 msgstr "Poskytnutá odpověď OCSP neodpovídá dostupným certifikátům"
 
-#: lib/errors.c:390
+#: lib/errors.c:392
 msgid "There is no certificate status (OCSP)."
 msgstr "Chybí stav certifikátu (OCSP)."
 
-#: lib/errors.c:392
+#: lib/errors.c:394
 msgid "Error in the system's randomness device."
 msgstr "Chyba v zařízení se systémovým zdrojem náhody."
 
-#: lib/errors.c:395
+#: lib/errors.c:397
 msgid "No common application protocol could be negotiated."
 msgstr "Nebylo možné dojednat žádný společný aplikační protokol."
 
-#: lib/errors.c:397
+#: lib/errors.c:399
 msgid "Error while performing self checks."
 msgstr "Chyba při provádění sebekontroly."
 
-#: lib/errors.c:399
+#: lib/errors.c:401
 msgid "There is no self test for this algorithm."
 msgstr "Pro tento algoritmus chybí sebetest."
 
-#: lib/errors.c:401
+#: lib/errors.c:403
 msgid ""
 "An error has been detected in the library and cannot continue operations."
 msgstr "V knihovně byla nalezena chyba a v činnosti nelze pokračovat."
 
-#: lib/errors.c:403
+#: lib/errors.c:405
 msgid "Error in sockets initialization."
 msgstr "Chyba při inicializaci socketů."
 
-#: lib/errors.c:405
+#: lib/errors.c:407
 msgid "Error in public key generation."
 msgstr "Chyba při vytváření veřejného klíče."
 
-#: lib/errors.c:407
+#: lib/errors.c:409
 msgid "Invalid TLS extensions length field."
 msgstr "Neplatná délka položky s rozšířeními TLS."
 
-#: lib/errors.c:409
+#: lib/errors.c:411
 msgid "Peer's certificate or username has changed during a rehandshake."
 msgstr ""
 "Během dojednávání změn spojení se změnil certifikát protějšku nebo "
 "uživatelské jméno."
 
-#: lib/errors.c:411
+#: lib/errors.c:413
 msgid "The provided string has an embedded null."
 msgstr "Zadaný řetězec obsahuje znak null."
 
-#: lib/errors.c:413
+#: lib/errors.c:415
 msgid "Attempted handshake during false start."
 msgstr "Pokus o dojednání spojení během falešného startu."
 
-#: lib/errors.c:415
+#: lib/errors.c:417
 msgid "The SNI host name not recognised."
 msgstr "Jméno serveru v SNI nebylo rozpoznáno."
 
-#: lib/errors.c:417
+#: lib/errors.c:419
 msgid "There was an issue converting to or from UTF8."
 msgstr "Při překladu do nebo z UTF-8 se vyskytly potíže."
 
-#: lib/errors.c:419
+#: lib/errors.c:421
 msgid "Cannot perform this action while handshake is in progress."
 msgstr "Dojednává-li se spojení, tuto akci nelze provézt."
 
-#: lib/errors.c:421
+#: lib/errors.c:423
 msgid "The public key is invalid."
 msgstr "Veřejný klíč není platný."
 
-#: lib/errors.c:423
+#: lib/errors.c:425
 msgid "There are no validation parameters present."
 msgstr "Nejsou přítomny žádné validační parametry."
 
-#: lib/errors.c:425
+#: lib/errors.c:427
 msgid "The public key parameters are invalid."
 msgstr "Parametry veřejného klíče nejsou platné."
 
-#: lib/errors.c:427
+#: lib/errors.c:429
 msgid "The private key is invalid."
 msgstr "Soukromý klíč není platný."
 
-#: lib/errors.c:429
+#: lib/errors.c:431
 msgid "The DER time encoding is invalid."
 msgstr "Kódovaní DER času není platné."
 
-#: lib/errors.c:431
+#: lib/errors.c:433
 msgid "The signature is incompatible with the public key."
 msgstr "Podpis není slučitelný s veřejným klíčem."
 
-#: lib/errors.c:433
+#: lib/errors.c:435
 msgid "One of the involved algorithms has insufficient security level."
 msgstr "Jeden ze zahrnutých algoritmů má nedostatečnou úroveň bezpečnosti."
 
-#: lib/errors.c:435
+#: lib/errors.c:437
 msgid "No common key share with peer."
 msgstr "Žádný sdílený klíč není společný s protějškem."
 
-#: lib/errors.c:437
+#: lib/errors.c:439
 msgid "The early data were rejected."
 msgstr "Brzká data byla odmítnuta."
 
-#: lib/errors.c:443 libdane/errors.c:42
+#: lib/errors.c:445 libdane/errors.c:42
 msgid "Success."
 msgstr "Úspěch."
 
-#: lib/errors.c:444
+#: lib/errors.c:446
 msgid "A TLS warning alert has been received."
 msgstr "Bylo přijato varovné upozornění TLS."
 
-#: lib/errors.c:446
+#: lib/errors.c:448
 msgid "A heartbeat pong message was received."
 msgstr "Byla přijata odpověď na udržovací zprávu."
 
-#: lib/errors.c:448
+#: lib/errors.c:450
 msgid "A heartbeat ping message was received."
 msgstr "Byl přijat požadavek na udržovací zprávu."
 
-#: lib/errors.c:450
+#: lib/errors.c:452
 msgid "Resource temporarily unavailable, try again."
 msgstr "Zdroj je dočasně nedostupný, zkusí se znovu."
 
-#: lib/errors.c:452
+#: lib/errors.c:454
 msgid "The transmitted packet is too large (EMSGSIZE)."
 msgstr "Přenášený packet je příliš velký (EMSGSIZE)."
 
-#: lib/errors.c:455
+#: lib/errors.c:457
 msgid "Rehandshake was requested by the peer."
 msgstr "Druhá strana požádala o znovuzahájení relace."
 
-#: lib/errors.c:457
+#: lib/errors.c:459
 msgid "Re-authentication was requested by the peer."
 msgstr "Druhá strana požádala o novou autentizaci."
 
-#: lib/errors.c:549 libdane/errors.c:100
+#: lib/errors.c:551 libdane/errors.c:100
 msgid "(unknown error code)"
 msgstr "(neznámý chybový kód)"
 
-#: lib/x509/ocsp.c:2605
+#: lib/x509/ocsp.c:2578
 msgid "The OCSP response is trusted. "
 msgstr "Odpověď OCSP je důvěryhodná. "
 
-#: lib/x509/ocsp.c:2610
+#: lib/x509/ocsp.c:2583
 msgid "The OCSP response's signer could not be found. "
 msgstr "Podepisovatel odpovědi OCSP nemohl být nalezen. "
 
-#: lib/x509/ocsp.c:2615
+#: lib/x509/ocsp.c:2588
 msgid "Error in the signer's key usageflags. "
 msgstr "Chyba v příznacích použití v klíči podepisovatele. "
 
-#: lib/x509/ocsp.c:2620
+#: lib/x509/ocsp.c:2593
 msgid "The OCSP response's signer is not trusted. "
 msgstr "Podepisovatel odpovědi OCSP není důvěryhodný. "
 
-#: lib/x509/ocsp.c:2625
+#: lib/x509/ocsp.c:2598
 msgid "The OCSP response depends on insecure algorithms. "
 msgstr "Odpověď OCSP závisí na nebezpečných algoritmech. "
 
-#: lib/x509/ocsp.c:2630
+#: lib/x509/ocsp.c:2603
 msgid "The OCSP response's signature cannot be validated. "
 msgstr "Podpis odpovědi OCSP nelze ověřit. "
 
-#: lib/x509/ocsp.c:2635
+#: lib/x509/ocsp.c:2608
 msgid "The OCSP response's signer's certificate is not activated. "
 msgstr "Certifikát podepisovatele odpovědi OCSP není aktivovaný. "
 
-#: lib/x509/ocsp.c:2640
+#: lib/x509/ocsp.c:2613
 msgid "The OCSP response's signer's certificate is expired. "
 msgstr "Certifikátu podepisovatele odpovědi OCSP vypršela platnost. "
 
-#: lib/x509/ocsp.c:2644
+#: lib/x509/ocsp.c:2617
 msgid "Memory error"
 msgstr "Chyba paměti"
 
-#: lib/x509/ocsp_output.c:50 lib/x509/ocsp_output.c:276 lib/x509/output.c:1678
-#: lib/x509/output.c:2211 lib/x509/output.c:2609
+#: lib/x509/ocsp_output.c:50 lib/x509/ocsp_output.c:276 lib/x509/output.c:1680
+#: lib/x509/output.c:2211 lib/x509/output.c:2608
 #, c-format
 msgid "\tVersion: %d\n"
 msgstr "\tVerze: %d\n"
 
-#: lib/x509/ocsp_output.c:136 lib/x509/ocsp_output.c:500 lib/x509/output.c:2379
-#: lib/x509/output.c:2773
+#: lib/x509/ocsp_output.c:136 lib/x509/ocsp_output.c:500 lib/x509/output.c:2378
+#: lib/x509/output.c:2771
 msgid "\t\t\tASCII: "
 msgstr "\t\t\tASCII: "
 
-#: lib/x509/ocsp_output.c:141 lib/x509/ocsp_output.c:505 lib/x509/output.c:2383
-#: lib/x509/output.c:2778
+#: lib/x509/ocsp_output.c:141 lib/x509/ocsp_output.c:505 lib/x509/output.c:2382
+#: lib/x509/output.c:2776
 msgid "\t\t\tHexdump: "
 msgstr "\t\t\tHexavýpis: "
 
@@ -1013,26 +1018,26 @@ msgstr "\t\tTato aktualizace: %s\n"
 msgid "\t\tNext Update: %s\n"
 msgstr "\t\tDalší aktualizace: %s\n"
 
-#: lib/x509/ocsp_output.c:524 lib/x509/output.c:1343 lib/x509/output.c:1614
-#: lib/x509/output.c:1739 lib/x509/output.c:1759 lib/x509/output.c:1803
-#: lib/x509/output.c:2031 lib/x509/output.c:2044 lib/x509/output.c:2458
-#: lib/x509/output.c:2586 lib/x509/output.c:2637
+#: lib/x509/ocsp_output.c:524 lib/x509/output.c:1344 lib/x509/output.c:1616
+#: lib/x509/output.c:1741 lib/x509/output.c:1761 lib/x509/output.c:1805
+#: lib/x509/output.c:2033 lib/x509/output.c:2046 lib/x509/output.c:2457
+#: lib/x509/output.c:2585 lib/x509/output.c:2636
 msgid "unknown"
 msgstr "není známo"
 
-#: lib/x509/ocsp_output.c:525 lib/x509/output.c:1807 lib/x509/output.c:2462
-#: lib/x509/output.c:2641
+#: lib/x509/ocsp_output.c:525 lib/x509/output.c:1809 lib/x509/output.c:2461
+#: lib/x509/output.c:2640
 #, c-format
 msgid "\tSignature Algorithm: %s\n"
 msgstr "\tAlgoritmus podpisu: %s\n"
 
-#: lib/x509/ocsp_output.c:529 lib/x509/output.c:1814 lib/x509/output.c:2467
+#: lib/x509/ocsp_output.c:529 lib/x509/output.c:1816 lib/x509/output.c:2466
 msgid ""
 "warning: signed using a broken signature algorithm that can be forged.\n"
 msgstr ""
 "varování: podepsáno vadným podpisovým algoritmem, kterým lze falšovat.\n"
 
-#: lib/x509/ocsp_output.c:543 lib/x509/output.c:1840 lib/x509/output.c:2493
+#: lib/x509/ocsp_output.c:543 lib/x509/output.c:1842 lib/x509/output.c:2492
 msgid "\tSignature:\n"
 msgstr "\tPodpis:\n"
 
@@ -1259,12 +1264,12 @@ msgstr ""
 "\n"
 "%s\t\t\tdalšíJméno v ASCII: "
 
-#: lib/x509/output.c:880 lib/x509/output.c:952 lib/x509/output.c:1240
+#: lib/x509/output.c:880 lib/x509/output.c:953 lib/x509/output.c:1241
 #, c-format
 msgid "%s\t\t\tASCII: "
 msgstr "%s\t\t\tASCII: "
 
-#: lib/x509/output.c:884 lib/x509/output.c:956 lib/x509/output.c:1244
+#: lib/x509/output.c:884 lib/x509/output.c:957 lib/x509/output.c:1245
 #, c-format
 msgid "%s\t\t\tHexdump: "
 msgstr "%s\t\t\tHexavýpis: "
@@ -1274,290 +1279,290 @@ msgstr "%s\t\t\tHexavýpis: "
 msgid "%s\t\t\t%.*s\n"
 msgstr "%s%s: %.*s\n"
 
-#: lib/x509/output.c:920
+#: lib/x509/output.c:919
 #, c-format
 msgid "%s\t\t\tSignTool: %.*s\n"
 msgstr ""
 
-#: lib/x509/output.c:928
+#: lib/x509/output.c:927
 #, fuzzy, c-format
 msgid "%s\t\t\tCATool: %.*s\n"
 msgstr "%s%s: %.*s\n"
 
-#: lib/x509/output.c:936
+#: lib/x509/output.c:935
 #, fuzzy, c-format
 msgid "%s\t\t\tSignToolCert: %.*s\n"
 msgstr "%s\t\t\tOID dalšíhoJména: %.*s\n"
 
-#: lib/x509/output.c:944
+#: lib/x509/output.c:943
 #, fuzzy, c-format
 msgid "%s\t\t\tCAToolCert: %.*s\n"
 msgstr "%s\t\t\tOID dalšíhoJména: %.*s\n"
 
-#: lib/x509/output.c:988
+#: lib/x509/output.c:989
 #, c-format
 msgid "%s\t\tBasic Constraints (%s):\n"
 msgstr "%s\t\tZákladní omezení (%s):\n"
 
-#: lib/x509/output.c:990 lib/x509/output.c:1004 lib/x509/output.c:1049
-#: lib/x509/output.c:1083 lib/x509/output.c:1096 lib/x509/output.c:1108
-#: lib/x509/output.c:1123 lib/x509/output.c:1135 lib/x509/output.c:1148
-#: lib/x509/output.c:1160 lib/x509/output.c:1174 lib/x509/output.c:1188
-#: lib/x509/output.c:1196 lib/x509/output.c:1207 lib/x509/output.c:1218
-#: lib/x509/output.c:1226 lib/x509/output.c:1232 lib/x509/output.c:1238
-#: lib/x509/output.c:2320 lib/x509/output.c:2345 lib/x509/output.c:2365
+#: lib/x509/output.c:991 lib/x509/output.c:1005 lib/x509/output.c:1050
+#: lib/x509/output.c:1084 lib/x509/output.c:1097 lib/x509/output.c:1109
+#: lib/x509/output.c:1124 lib/x509/output.c:1136 lib/x509/output.c:1149
+#: lib/x509/output.c:1161 lib/x509/output.c:1175 lib/x509/output.c:1189
+#: lib/x509/output.c:1197 lib/x509/output.c:1208 lib/x509/output.c:1219
+#: lib/x509/output.c:1227 lib/x509/output.c:1233 lib/x509/output.c:1239
+#: lib/x509/output.c:2319 lib/x509/output.c:2344 lib/x509/output.c:2364
 msgid "critical"
 msgstr "kritické"
 
-#: lib/x509/output.c:990 lib/x509/output.c:1004 lib/x509/output.c:1050
-#: lib/x509/output.c:1084 lib/x509/output.c:1096 lib/x509/output.c:1108
-#: lib/x509/output.c:1123 lib/x509/output.c:1135 lib/x509/output.c:1148
-#: lib/x509/output.c:1160 lib/x509/output.c:1174 lib/x509/output.c:1188
-#: lib/x509/output.c:1196 lib/x509/output.c:1207 lib/x509/output.c:1218
-#: lib/x509/output.c:1226 lib/x509/output.c:1232 lib/x509/output.c:1238
-#: lib/x509/output.c:2321 lib/x509/output.c:2346 lib/x509/output.c:2366
+#: lib/x509/output.c:991 lib/x509/output.c:1005 lib/x509/output.c:1051
+#: lib/x509/output.c:1085 lib/x509/output.c:1097 lib/x509/output.c:1109
+#: lib/x509/output.c:1124 lib/x509/output.c:1136 lib/x509/output.c:1149
+#: lib/x509/output.c:1161 lib/x509/output.c:1175 lib/x509/output.c:1189
+#: lib/x509/output.c:1197 lib/x509/output.c:1208 lib/x509/output.c:1219
+#: lib/x509/output.c:1227 lib/x509/output.c:1233 lib/x509/output.c:1239
+#: lib/x509/output.c:2320 lib/x509/output.c:2345 lib/x509/output.c:2365
 msgid "not critical"
 msgstr "není kritické"
 
-#: lib/x509/output.c:1002
+#: lib/x509/output.c:1003
 #, c-format
 msgid "%s\t\tSubject Key Identifier (%s):\n"
 msgstr "%s\t\tIdentifikátor klíče subjektu (%s):\n"
 
-#: lib/x509/output.c:1094
+#: lib/x509/output.c:1095
 #, c-format
 msgid "%s\t\tAuthority Key Identifier (%s):\n"
 msgstr "%s\t\tIdentifikátor klíče autority (%s):\n"
 
-#: lib/x509/output.c:1107
+#: lib/x509/output.c:1108
 #, c-format
 msgid "%s\t\tKey Usage (%s):\n"
 msgstr "%s\t\tUžití klíče (%s):\n"
 
-#: lib/x509/output.c:1121
+#: lib/x509/output.c:1122
 #, c-format
 msgid "%s\t\tPrivate Key Usage Period (%s):\n"
 msgstr "%s\t\tObdobí užití soukromého klíče (%s):\n"
 
-#: lib/x509/output.c:1134
+#: lib/x509/output.c:1135
 #, c-format
 msgid "%s\t\tKey Purpose (%s):\n"
 msgstr "%s\t\tÚčel klíče (%s):\n"
 
-#: lib/x509/output.c:1146
+#: lib/x509/output.c:1147
 #, c-format
 msgid "%s\t\tSubject Alternative Name (%s):\n"
 msgstr "%s\t\tAlternativní jméno subjektu (%s):\n"
 
-#: lib/x509/output.c:1158
+#: lib/x509/output.c:1159
 #, c-format
 msgid "%s\t\tIssuer Alternative Name (%s):\n"
 msgstr "%s\t\tAlternativní jméno vydavatele (%s):\n"
 
-#: lib/x509/output.c:1172
+#: lib/x509/output.c:1173
 #, c-format
 msgid "%s\t\tCRL Distribution points (%s):\n"
 msgstr "%s\t\tMísta distribuce CRL (%s):\n"
 
-#: lib/x509/output.c:1186
+#: lib/x509/output.c:1187
 #, c-format
 msgid "%s\t\tProxy Certificate Information (%s):\n"
 msgstr "%s\t\tInformace o zástupném certifikátu (%s):\n"
 
-#: lib/x509/output.c:1194
+#: lib/x509/output.c:1195
 #, c-format
 msgid "%s\t\tAuthority Information Access (%s):\n"
 msgstr "%s\t\tPřístup k údajům o autoritě (%s):\n"
 
-#: lib/x509/output.c:1206
+#: lib/x509/output.c:1207
 #, c-format
 msgid "%s\t\tName Constraints (%s):\n"
 msgstr "%s\t\tOmezení jména (%s):\n"
 
-#: lib/x509/output.c:1216
+#: lib/x509/output.c:1217
 #, c-format
 msgid "%s\t\tTLS Features (%s):\n"
 msgstr "%s\t\tVlastnosti TLS (%s):\n"
 
-#: lib/x509/output.c:1224
+#: lib/x509/output.c:1225
 #, fuzzy, c-format
 msgid "%s\t\tSubject Signing Tool(%s):\n"
 msgstr "%s\t\tIdentifikátor klíče subjektu (%s):\n"
 
-#: lib/x509/output.c:1230
+#: lib/x509/output.c:1231
 #, fuzzy, c-format
 msgid "%s\t\tIssuer Signing Tool(%s):\n"
 msgstr "%s\t\tAlternativní jméno vydavatele (%s):\n"
 
-#: lib/x509/output.c:1236
+#: lib/x509/output.c:1237
 #, c-format
 msgid "%s\t\tUnknown extension %s (%s):\n"
 msgstr "%s\t\tNeznámé rozšíření %s (%s):\n"
 
-#: lib/x509/output.c:1293
+#: lib/x509/output.c:1294
 #, c-format
 msgid "%s\tExtensions:\n"
 msgstr "%s\tRozšíření:\n"
 
-#: lib/x509/output.c:1345
+#: lib/x509/output.c:1346
 #, c-format
 msgid "\t%sPublic Key Algorithm: %s\n"
 msgstr "\t%sAlgoritmus veřejného klíče: %s\n"
 
 # TODO: Pluralize
-#: lib/x509/output.c:1347
+#: lib/x509/output.c:1348
 #, c-format
 msgid "\tAlgorithm Security Level: %s (%d bits)\n"
 msgstr "\tÚroveň bezpečnosti algoritmu: %s (%d bitů)\n"
 
-#: lib/x509/output.c:1352
+#: lib/x509/output.c:1353
 msgid "\t\tParameters:\n"
 msgstr "\t\tParametry:\n"
 
 # TODO: Pluralize
-#: lib/x509/output.c:1372
+#: lib/x509/output.c:1373
 #, c-format
 msgid "\t\tModulus (bits %d): "
 msgstr "\t\tModul (%d bitů): "
 
 # TODO: Pluralize
-#: lib/x509/output.c:1379
+#: lib/x509/output.c:1380
 #, c-format
 msgid "\t\tExponent (bits %d): "
 msgstr "\t\tMocnitel (%d bitů): "
 
 # TODO: Pluralize
-#: lib/x509/output.c:1387
+#: lib/x509/output.c:1388
 #, c-format
 msgid "\t\tModulus (bits %d):\n"
 msgstr "\t\tModul (%d bitů:)\n"
 
 # TODO: Pluralize
-#: lib/x509/output.c:1394
+#: lib/x509/output.c:1395
 #, c-format
 msgid "\t\tExponent (bits %d):\n"
 msgstr "\t\tMocnitel (%d bitů):\n"
 
-#: lib/x509/output.c:1421 lib/x509/output.c:1541
+#: lib/x509/output.c:1423 lib/x509/output.c:1543
 #, c-format
 msgid "\t\tCurve:\t%s\n"
 msgstr "\t\tKřivka:\t%s\n"
 
-#: lib/x509/output.c:1425 lib/x509/output.c:1551
+#: lib/x509/output.c:1427 lib/x509/output.c:1553
 msgid "\t\tX: "
 msgstr "\t\tX: "
 
-#: lib/x509/output.c:1431 lib/x509/output.c:1556
+#: lib/x509/output.c:1433 lib/x509/output.c:1558
 msgid "\t\tY: "
 msgstr "\t\tY: "
 
-#: lib/x509/output.c:1438 lib/x509/output.c:1562
+#: lib/x509/output.c:1440 lib/x509/output.c:1564
 msgid "\t\tX:\n"
 msgstr "\t\tX:\n"
 
-#: lib/x509/output.c:1443 lib/x509/output.c:1566
+#: lib/x509/output.c:1445 lib/x509/output.c:1568
 msgid "\t\tY:\n"
 msgstr "\t\tY:\n"
 
 # TODO: Pluralize
-#: lib/x509/output.c:1471
+#: lib/x509/output.c:1473
 #, c-format
 msgid "\t\tPublic key (bits %d): "
 msgstr "\t\tVeřejný klíč (%d bitů): "
 
-#: lib/x509/output.c:1477
+#: lib/x509/output.c:1479
 msgid "\t\tP: "
 msgstr "\t\tP: "
 
-#: lib/x509/output.c:1482
+#: lib/x509/output.c:1484
 msgid "\t\tQ: "
 msgstr "\t\tQ: "
 
-#: lib/x509/output.c:1487
+#: lib/x509/output.c:1489
 msgid "\t\tG: "
 msgstr "\t\tG: "
 
 # TODO: Pluralize
-#: lib/x509/output.c:1495
+#: lib/x509/output.c:1497
 #, c-format
 msgid "\t\tPublic key (bits %d):\n"
 msgstr "\t\tVeřejný klíč (%d bitů):\n"
 
-#: lib/x509/output.c:1500
+#: lib/x509/output.c:1502
 msgid "\t\tP:\n"
 msgstr "\t\tP:\n"
 
-#: lib/x509/output.c:1504
+#: lib/x509/output.c:1506
 msgid "\t\tQ:\n"
 msgstr "\t\tQ:\n"
 
-#: lib/x509/output.c:1508
+#: lib/x509/output.c:1510
 msgid "\t\tG:\n"
 msgstr "\t\tG:\n"
 
-#: lib/x509/output.c:1543
+#: lib/x509/output.c:1545
 #, c-format
 msgid "\t\tDigest:\t%s\n"
 msgstr "\t\tAlgoritmus otisku:\t%s\n"
 
-#: lib/x509/output.c:1545
+#: lib/x509/output.c:1547
 #, c-format
 msgid "\t\tParamSet: %s\n"
 msgstr "\t\tMnožina parametrů: %s\n"
 
-#: lib/x509/output.c:1658 lib/x509/output.c:2576
+#: lib/x509/output.c:1660 lib/x509/output.c:2575
 msgid "Subject "
 msgstr "Subjekt "
 
-#: lib/x509/output.c:1693
+#: lib/x509/output.c:1695
 msgid "\tSerial Number (hex): "
 msgstr "\tSériové číslo (hex): "
 
-#: lib/x509/output.c:1706 lib/x509/output.c:2221
+#: lib/x509/output.c:1708 lib/x509/output.c:2221
 msgid "\tIssuer:\n"
 msgstr "\tVydavatel:\n"
 
-#: lib/x509/output.c:1711 lib/x509/output.c:2226
+#: lib/x509/output.c:1713 lib/x509/output.c:2226
 #, c-format
 msgid "\tIssuer: %s\n"
 msgstr "\tVydavatel: %s\n"
 
-#: lib/x509/output.c:1720
+#: lib/x509/output.c:1722
 msgid "\tValidity:\n"
 msgstr "\tPlatnost:\n"
 
-#: lib/x509/output.c:1737 lib/x509/output.c:1739
+#: lib/x509/output.c:1739 lib/x509/output.c:1741
 #, c-format
 msgid "\t\tNot Before: %s\n"
 msgstr "\t\tNe před: %s\n"
 
-#: lib/x509/output.c:1757 lib/x509/output.c:1759
+#: lib/x509/output.c:1759 lib/x509/output.c:1761
 #, c-format
 msgid "\t\tNot After: %s\n"
 msgstr "\t\tNe po: %s\n"
 
-#: lib/x509/output.c:1770 lib/x509/output.c:2619
+#: lib/x509/output.c:1772 lib/x509/output.c:2618
 msgid "\tSubject:\n"
 msgstr "\tSubjekt:\n"
 
-#: lib/x509/output.c:1775 lib/x509/output.c:2624
+#: lib/x509/output.c:1777 lib/x509/output.c:2623
 #, c-format
 msgid "\tSubject: %s\n"
 msgstr "\tSubjekt: %s\n"
 
-#: lib/x509/output.c:1854
+#: lib/x509/output.c:1856
 msgid "\tFingerprint:\n"
 msgstr "\tOtisk:\n"
 
-#: lib/x509/output.c:1863
+#: lib/x509/output.c:1865
 msgid "\t\tsha1:"
 msgstr "\t\tSHA-1:"
 
-#: lib/x509/output.c:1874
+#: lib/x509/output.c:1876
 msgid "\t\tsha256:"
 msgstr "\t\tSHA-256:"
 
-#: lib/x509/output.c:1908
+#: lib/x509/output.c:1910
 #, c-format
 msgid ""
 "%sPublic Key ID:\n"
@@ -1566,7 +1571,7 @@ msgstr ""
 "%s ID veřejného klíče:\n"
 "%s\tSHA-1:"
 
-#: lib/x509/output.c:1914
+#: lib/x509/output.c:1916
 #, c-format
 msgid ""
 "%sPublic Key PIN:\n"
@@ -1575,35 +1580,31 @@ msgstr ""
 "%sPIN veřejného klíče:\n"
 "%s\tPIN-SHA-ě56:"
 
-#: lib/x509/output.c:1986
+#: lib/x509/output.c:1988
 msgid "no subject,"
 msgstr "žádný subjekt, "
 
-#: lib/x509/output.c:2002
+#: lib/x509/output.c:2004
 msgid "no issuer,"
 msgstr "žádný vydavatel,"
 
-#: lib/x509/output.c:2049
+#: lib/x509/output.c:2051
 #, c-format
 msgid "signed using %s (broken!), "
 msgstr "podepsáno pomocí %s (rozbito!), "
 
-#: lib/x509/output.c:2051
+#: lib/x509/output.c:2053
 #, c-format
 msgid "signed using %s, "
 msgstr "podepsáno pomocí %s, "
 
-#: lib/x509/output.c:2187
+#: lib/x509/output.c:2189
 msgid "X.509 Certificate Information:\n"
 msgstr "Informace X.509 certifikátu:\n"
 
-#: lib/x509/output.c:2191 lib/x509/output.c:2831
+#: lib/x509/output.c:2193 lib/x509/output.c:2829
 msgid "Other Information:\n"
 msgstr "Další Informace:\n"
-
-#: lib/x509/output.c:2206
-msgid "\tVersion: 1 (default)\n"
-msgstr "\tVerze: 1 (implicitní)\n"
 
 #: lib/x509/output.c:2235
 msgid "\tUpdate dates:\n"
@@ -1619,70 +1620,70 @@ msgstr "\t\tVydáno: %s\n"
 msgid "\t\tNext at: %s\n"
 msgstr "\t\tDalší v: %s\n"
 
-#: lib/x509/output.c:2303
+#: lib/x509/output.c:2302
 msgid "\tExtensions:\n"
 msgstr "\tRozšíření:\n"
 
-#: lib/x509/output.c:2319
+#: lib/x509/output.c:2318
 #, c-format
 msgid "\t\tCRL Number (%s): "
 msgstr "\t\tČíslo CRL (%s): "
 
-#: lib/x509/output.c:2344
+#: lib/x509/output.c:2343
 #, c-format
 msgid "\t\tAuthority Key Identifier (%s):\n"
 msgstr "\t\tIdentifikátor klíče autority (%s):\n"
 
-#: lib/x509/output.c:2363
+#: lib/x509/output.c:2362
 #, c-format
 msgid "\t\tUnknown extension %s (%s):\n"
 msgstr "\t\tNeznámé rozšíření %s (%s):\n"
 
-#: lib/x509/output.c:2400
+#: lib/x509/output.c:2399
 #, c-format
 msgid "\tRevoked certificates (%d):\n"
 msgstr "\tOdvolané certifikáty (%d):\n"
 
-#: lib/x509/output.c:2403
+#: lib/x509/output.c:2402
 msgid "\tNo revoked certificates.\n"
 msgstr "\tŽádné odvolané certifikáty.\n"
 
-#: lib/x509/output.c:2424
+#: lib/x509/output.c:2423
 msgid "\t\tSerial Number (hex): "
 msgstr "\t\tSériové číslo (hex): "
 
-#: lib/x509/output.c:2442
+#: lib/x509/output.c:2441
 #, c-format
 msgid "\t\tRevoked at: %s\n"
 msgstr "\t\tOdvoláno v: %s\n"
 
-#: lib/x509/output.c:2524
+#: lib/x509/output.c:2523
 msgid "X.509 Certificate Revocation List Information:\n"
 msgstr "Informace o seznamu odvolaných X.509 certifikátů (CRL):\n"
 
-#: lib/x509/output.c:2674
+#: lib/x509/output.c:2672
 msgid "\tAttributes:\n"
 msgstr "\tAtributy:\n"
 
-#: lib/x509/output.c:2731
+#: lib/x509/output.c:2729
 #, c-format
 msgid "\t\tChallenge password: %s\n"
 msgstr "\t\tHeslo výzvy: %s\n"
 
-#: lib/x509/output.c:2741
+#: lib/x509/output.c:2739
 #, c-format
 msgid "\t\tUnknown attribute %s:\n"
 msgstr "\t\tNeznámý atribut %s:\n"
 
-#: lib/x509/output.c:2827
+#: lib/x509/output.c:2825
 msgid "PKCS #10 Certificate Request Information:\n"
 msgstr "Údaje o PKCS #10 žádosti o certifikát:\n"
 
-#: lib/x509/output.c:2854
+#: lib/x509/output.c:2852
 msgid "Public Key Usage:\n"
 msgstr "Užití veřejného klíče:\n"
 
-#: lib/x509/output.c:2894
+#: lib/x509/output.c:2892
 msgid "Public Key Information:\n"
 msgstr "Informace o veřejném klíči:\n"
 
@@ -1753,6 +1754,9 @@ msgstr "Ve veřejném klíči se vyskytla chyba."
 #: libdane/errors.c:69
 msgid "Error in file."
 msgstr "Chyba v souboru."
+
+#~ msgid "\tVersion: 1 (default)\n"
+#~ msgstr "\tVerze: 1 (implicitní)\n"
 
 #~ msgid "Received a TLS/IA Intermediate Phase Finished message"
 #~ msgstr "Přijata TLS/IA zpráva Intermediate Phase Finished"

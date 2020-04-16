@@ -8,5 +8,12 @@
 This should only be called in case of PSK authentication and in
 case of a server.
 
-@strong{Returns:} the username of the peer, or @code{NULL}  in case of an error.
+The returned pointer should be considered constant (do not free) and valid 
+for the lifetime of the session.
+
+This function will return @code{NULL}  if the username has embedded NULL bytes.
+In that case, @code{gnutls_psk_server_get_username2()}  should be used to retrieve the username.
+
+@strong{Returns:} the username of the peer, or @code{NULL}  in case of an error,
+or if the username has embedded NULLs.
 @end deftypefun

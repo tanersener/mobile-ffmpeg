@@ -2,7 +2,7 @@
 
 
 
-@deftypefun {int} {gnutls_ocsp_resp_get_response} (gnutls_ocsp_resp_t @var{resp}, gnutls_datum_t * @var{response_type_oid}, gnutls_datum_t * @var{response})
+@deftypefun {int} {gnutls_ocsp_resp_get_response} (gnutls_ocsp_resp_const_t @var{resp}, gnutls_datum_t * @var{response_type_oid}, gnutls_datum_t * @var{response})
 @var{resp}: should contain a @code{gnutls_ocsp_resp_t}  type
 
 @var{response_type_oid}: newly allocated output buffer with response type OID

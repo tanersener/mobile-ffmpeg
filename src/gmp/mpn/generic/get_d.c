@@ -4,7 +4,8 @@
    CERTAIN TO BE SUBJECT TO INCOMPATIBLE CHANGES OR DISAPPEAR COMPLETELY IN
    FUTURE GNU MP RELEASES.
 
-Copyright 2003, 2004, 2007, 2009, 2010, 2012 Free Software Foundation, Inc.
+Copyright 2003, 2004, 2007, 2009, 2010, 2012, 2018 Free Software
+Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -32,7 +33,12 @@ You should have received copies of the GNU General Public License and the
 GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
-#include "gmp.h"
+#include "config.h"
+
+#if HAVE_FLOAT_H
+#include <float.h>  /* for DBL_MANT_DIG and FLT_RADIX */
+#endif
+
 #include "gmp-impl.h"
 #include "longlong.h"
 
@@ -355,21 +361,41 @@ mpn_get_d (mp_srcptr up, mp_size_t size, mp_size_t sign, long exp)
 #endif
 
 #if ! FORMAT_RECOGNIZED
-    {      /* Non-IEEE or strange limb size, do something generic. */
+
+#if !defined(GMP_DBL_MANT_BITS)
+#if defined(DBL_MANT_DIG) && FLT_RADIX == 2
+#define GMP_DBL_MANT_BITS DBL_MANT_DIG
+#else
+/* FIXME: Chose a smarter default value. */
+#define GMP_DBL_MANT_BITS (16 * sizeof (double))
+#endif
+#endif
+
+    { /* Non-IEEE or strange limb size, generically convert
+	 GMP_DBL_MANT_BITS bits. */
+      mp_limb_t l;
+      int m;
       mp_size_t i;
       double d, weight;
       unsigned long uexp;
 
       /* First generate an fp number disregarding exp, instead keeping things
 	 within the numb base factor from 1, which should prevent overflow and
-	 underflow even for the most exponent limited fp formats.  The
-	 termination criteria should be refined, since we now include too many
-	 limbs.  */
-      weight = 1/MP_BASE_AS_DOUBLE;
-      d = up[size - 1];
-      for (i = size - 2; i >= 0; i--)
+	 underflow even for the most exponent limited fp formats.  */
+      i = size - 1;
+      l = up[i];
+      count_leading_zeros (m, l);
+      m = m + GMP_DBL_MANT_BITS - GMP_LIMB_BITS;
+      if (m < 0)
+	l &= GMP_NUMB_MAX << -m;
+      d = l;
+      for (weight = 1/MP_BASE_AS_DOUBLE; m > 0 && --i >= 0;)
 	{
-	  d += up[i] * weight;
+	  l = up[i];
+	  m -= GMP_NUMB_BITS;
+	  if (m < 0)
+	    l &= GMP_NUMB_MAX << -m;
+	  d += l * weight;
 	  weight /= MP_BASE_AS_DOUBLE;
 	  if (weight == 0)
 	    break;
@@ -385,7 +411,7 @@ mpn_get_d (mp_srcptr up, mp_size_t size, mp_size_t sign, long exp)
       else
 	{
 	  weight = 0.5;
-	  uexp = 1 - (unsigned long) (exp + 1);
+	  uexp = NEG_CAST (unsigned long, exp);
 	}
 #if 1
       /* Square-and-multiply exponentiation.  */

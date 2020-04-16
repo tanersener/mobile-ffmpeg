@@ -4,5 +4,6 @@ cmbuild
 .project
 .vscode
 .gitignore
+.git
 TAGS
 /cmake-build/

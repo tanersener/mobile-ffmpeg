@@ -76,6 +76,10 @@ cipher-stealing requires to know where the message actually terminates
 in order to be able to compute where the stealing occurs.
 @item GNUTLS_@-CIPHER_@-GOST28147_@-TC26Z_@-CNT
 GOST 28147-89 (Magma) cipher in CNT mode with TC26 Z S-box.
+@item GNUTLS_@-CIPHER_@-CHACHA20_@-64
+Chacha20 cipher with 64-bit nonces and 64-bit block counters.
+@item GNUTLS_@-CIPHER_@-CHACHA20_@-32
+Chacha20 cipher with 96-bit nonces and 32-bit block counters.
 @item GNUTLS_@-CIPHER_@-IDEA_@-PGP_@-CFB
 IDEA in CFB mode (placeholder - unsupported).
 @item GNUTLS_@-CIPHER_@-3DES_@-PGP_@-CFB

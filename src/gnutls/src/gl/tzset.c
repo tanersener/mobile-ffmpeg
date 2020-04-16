@@ -1,6 +1,6 @@
 /* Provide tzset for systems that don't have it or for which it's broken.
 
-   Copyright (C) 2001-2003, 2005-2007, 2009-2019 Free Software Foundation, Inc.
+   Copyright (C) 2001-2003, 2005-2007, 2009-2020 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -50,7 +50,7 @@ tzset (void)
        - Time zone names based on geography, without slashes, e.g.
          "Singapore".
        - Time zone names that contain explicit DST rules.  Syntax: see
-         <http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap08.html#tag_08_03>
+         <https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap08.html#tag_08_03>
      The Microsoft CRT understands only the first kind.  It produces incorrect
      results if the value of TZ is of the other kinds.
      But in a Cygwin environment, /etc/profile.d/tzset.sh sets TZ to a value

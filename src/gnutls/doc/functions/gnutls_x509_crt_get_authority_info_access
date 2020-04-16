@@ -37,7 +37,7 @@ hold the accessLocation GeneralName type (e.g.,
 
 If  @code{what} is @code{GNUTLS_IA_URI} ,  @code{data} will hold the accessLocation URI
 data.  Requesting this  @code{what} value leads to an error if the
-accessLocation is not of the "uniformResourceIdentifier" type. 
+accessLocation is not of the "uniformResourceIdentifier" type.
 
 If  @code{what} is @code{GNUTLS_IA_OCSP_URI} ,  @code{data} will hold the OCSP URI.
 Requesting this  @code{what} value leads to an error if the accessMethod

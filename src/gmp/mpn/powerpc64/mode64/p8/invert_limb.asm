@@ -1,6 +1,6 @@
 dnl  PowerPC-64 mpn_invert_limb -- Invert a normalized limb.
 
-dnl  Copyright 2015 Free Software Foundation, Inc.
+dnl  Copyright 2015, 2017 Free Software Foundation, Inc.
 
 dnl  This file is part of the GNU MP Library.
 dnl
@@ -45,7 +45,7 @@ ASM_START()
 PROLOGUE(mpn_invert_limb)
 	sldi.	r4, r3, 1
 	neg	r5, r3
-	divdeu	r3, r5, r3
+	divdeu(	r3, r5, r3)
 	beq-	L(1)
 	blr
 L(1):	li	r3, -1

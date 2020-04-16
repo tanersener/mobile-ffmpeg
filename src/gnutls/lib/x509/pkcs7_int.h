@@ -80,7 +80,7 @@ _gnutls_decrypt_pbes1_des_md5_data(const char *password,
 			   unsigned password_len,
 			   const struct pbkdf2_params *kdf_params,
 			   const struct pbe_enc_params *enc_params,
-			   gnutls_datum_t *encrypted_data, /* overwritten */
+			   const gnutls_datum_t *encrypted_data,
 			   gnutls_datum_t *decrypted_data);
 
 int _gnutls_check_pkcs_cipher_schema(const char *oid);
@@ -95,7 +95,7 @@ _gnutls_pkcs_raw_decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
 int
 _gnutls_pkcs_raw_encrypt_data(const gnutls_datum_t * plain,
 	     const struct pbe_enc_params *enc_params,
-	     gnutls_datum_t * key, gnutls_datum_t * encrypted);
+	     const gnutls_datum_t * key, gnutls_datum_t * encrypted);
 
 int _gnutls_pkcs7_decrypt_data(const gnutls_datum_t * data,
 			       const char *password, gnutls_datum_t * dec);

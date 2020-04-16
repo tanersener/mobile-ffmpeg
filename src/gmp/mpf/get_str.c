@@ -4,8 +4,8 @@
    example, the number 3.1416 would be returned as "31416" in DIGIT_PTR and
    1 in EXP.
 
-Copyright 1993-1997, 2000-2003, 2005, 2006, 2011, 2015 Free Software
-Foundation, Inc.
+Copyright 1993-1997, 2000-2003, 2005, 2006, 2011, 2015, 2017 Free
+Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -34,7 +34,6 @@ GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
 #include <stdlib.h>		/* for NULL */
-#include "gmp.h"
 #include "gmp-impl.h"
 #include "longlong.h"		/* for count_leading_zeros */
 
@@ -139,26 +138,23 @@ mpf_get_str (char *dbuf, mp_exp_t *exp, int base, size_t n_digits, mpf_srcptr u)
   un = ABSIZ(u);
   ue = EXP(u);
 
-  if (base >= 0)
+  num_to_text = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+  if (base > 1)
     {
-      num_to_text = "0123456789abcdefghijklmnopqrstuvwxyz";
-      if (base <= 1)
-	base = 10;
-      else if (base > 36)
-	{
-	  num_to_text = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-	  if (base > 62)
+      if (base <= 36)
+	num_to_text = "0123456789abcdefghijklmnopqrstuvwxyz";
+      else if (UNLIKELY (base > 62))
 	    return NULL;
-	}
+    }
+  else if (base > -2)
+    {
+      base = 10;
     }
   else
     {
       base = -base;
-      if (base <= 1)
-	base = 10;
-      else if (base > 36)
+      if (UNLIKELY (base > 36))
 	return NULL;
-      num_to_text = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     }
 
   MPF_SIGNIFICANT_DIGITS (max_digits, base, PREC(u));
@@ -170,7 +166,7 @@ mpf_get_str (char *dbuf, mp_exp_t *exp, int base, size_t n_digits, mpf_srcptr u)
       /* We didn't get a string from the user.  Allocate one (and return
 	 a pointer to it) with space for `-' and terminating null.  */
       alloc_size = n_digits + 2;
-      dbuf = (char *) (*__gmp_allocate_func) (n_digits + 2);
+      dbuf = __GMP_ALLOCATE_FUNC_TYPE (n_digits + 2, char);
     }
 
   if (un == 0)

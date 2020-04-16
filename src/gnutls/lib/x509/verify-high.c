@@ -274,7 +274,7 @@ gnutls_x509_trust_list_add_cas(gnutls_x509_trust_list_t list,
 			       unsigned clist_size, unsigned int flags)
 {
 	unsigned i, j;
-	uint32_t hash;
+	size_t hash;
 	int ret;
 	unsigned exists;
 
@@ -565,7 +565,7 @@ gnutls_x509_trust_list_remove_cas(gnutls_x509_trust_list_t list,
 {
 	int r = 0;
 	unsigned j, i;
-	uint32_t hash;
+	size_t hash;
 
 	for (i = 0; i < clist_size; i++) {
 		hash =
@@ -644,7 +644,7 @@ gnutls_x509_trust_list_add_named_crt(gnutls_x509_trust_list_t list,
 				     const void *name, size_t name_size,
 				     unsigned int flags)
 {
-	uint32_t hash;
+	size_t hash;
 
 	if (name_size >= MAX_SERVER_NAME_SIZE)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
@@ -712,7 +712,7 @@ gnutls_x509_trust_list_add_crls(gnutls_x509_trust_list_t list,
 	int ret;
 	unsigned x, i, j = 0;
 	unsigned int vret = 0;
-	uint32_t hash;
+	size_t hash;
 	gnutls_x509_crl_t *tmp;
 
 	/* Probably we can optimize things such as removing duplicates
@@ -806,7 +806,7 @@ static int shorten_clist(gnutls_x509_trust_list_t list,
 			 unsigned int clist_size)
 {
 	unsigned int j, i;
-	uint32_t hash;
+	size_t hash;
 
 	if (clist_size > 1) {
 		/* Check if the last certificate in the path is self signed.
@@ -859,7 +859,7 @@ int trust_list_get_issuer(gnutls_x509_trust_list_t list,
 {
 	int ret;
 	unsigned int i;
-	uint32_t hash;
+	size_t hash;
 
 	hash =
 	    hash_pjw_bare(cert->raw_issuer_dn.data,
@@ -893,7 +893,7 @@ int trust_list_get_issuer_by_dn(gnutls_x509_trust_list_t list,
 {
 	int ret;
 	unsigned int i, j;
-	uint32_t hash;
+	size_t hash;
 	uint8_t tmp[256];
 	size_t tmp_size;
 
@@ -1257,7 +1257,7 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 {
 	int ret;
 	unsigned int i;
-	uint32_t hash;
+	size_t hash;
 	gnutls_x509_crt_t sorted[DEFAULT_MAX_VERIFY_DEPTH];
 	const char *hostname = NULL, *purpose = NULL, *email = NULL;
 	unsigned hostname_size = 0;
@@ -1501,7 +1501,7 @@ gnutls_x509_trust_list_verify_named_crt(gnutls_x509_trust_list_t list,
 {
 	int ret;
 	unsigned int i;
-	uint32_t hash;
+	size_t hash;
 
 
 	hash =
@@ -1558,7 +1558,7 @@ _gnutls_trustlist_inlist(gnutls_x509_trust_list_t list,
 {
 	int ret;
 	unsigned int i;
-	uint32_t hash;
+	size_t hash;
 
 	hash = hash_pjw_bare(cert->raw_dn.data, cert->raw_dn.size);
 	hash %= list->size;

@@ -6,7 +6,7 @@
    SAFE TO REACH THEM THROUGH DOCUMENTED INTERFACES.  IN FACT, IT IS ALMOST
    GUARANTEED THAT THEY WILL CHANGE OR DISAPPEAR IN A FUTURE GNU MP RELEASE.
 
-Copyright 1998-2010, 2012, 2013 Free Software Foundation, Inc.
+Copyright 1998-2010, 2012, 2013, 2018 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -66,7 +66,6 @@ see https://www.gnu.org/licenses/.  */
 #define TRACE(x)
 #endif
 
-#include "gmp.h"
 #include "gmp-impl.h"
 
 #ifdef WANT_ADDSUB
@@ -289,6 +288,26 @@ mpn_fft_mul_2exp_modF (mp_ptr r, mp_srcptr a, mp_bitcnt_t d, mp_size_t n)
     }
 }
 
+#if HAVE_NATIVE_mpn_add_n_sub_n
+static inline void
+mpn_fft_add_sub_modF (mp_ptr A0, mp_ptr Ai, mp_srcptr tp, mp_size_t n)
+{
+  mp_limb_t cyas, c, x;
+
+  cyas = mpn_add_n_sub_n (A0, Ai, A0, tp, n);
+
+  c = A0[n] - tp[n] - (cyas & 1);
+  x = (-c) & -((c & GMP_LIMB_HIGHBIT) != 0);
+  Ai[n] = x + c;
+  MPN_INCR_U (Ai, n + 1, x);
+
+  c = A0[n] + tp[n] + (cyas >> 1);
+  x = (c - 1) & -(c != 0);
+  A0[n] = c - x;
+  MPN_DECR_U (A0, n + 1, x);
+}
+
+#else /* ! HAVE_NATIVE_mpn_add_n_sub_n  */
 
 /* r <- a+b mod 2^(n*GMP_NUMB_BITS)+1.
    Assumes a and b are semi-normalized.
@@ -351,6 +370,7 @@ mpn_fft_sub_modF (mp_ptr r, mp_srcptr a, mp_srcptr b, mp_size_t n)
     }
 #endif
 }
+#endif /* HAVE_NATIVE_mpn_add_n_sub_n */
 
 /* input: A[0] ... A[inc*(K-1)] are residues mod 2^N+1 where
 	  N=n*GMP_NUMB_BITS, and 2^omega is a primitive root mod 2^N+1
@@ -389,8 +409,12 @@ mpn_fft_fft (mp_ptr *Ap, mp_size_t K, int **ll,
 	  /* Ap[inc] <- Ap[0] + Ap[inc] * 2^(lk[1] * omega)
 	     Ap[0]   <- Ap[0] + Ap[inc] * 2^(lk[0] * omega) */
 	  mpn_fft_mul_2exp_modF (tp, Ap[inc], lk[0] * omega, n);
+#if HAVE_NATIVE_mpn_add_n_sub_n
+	  mpn_fft_add_sub_modF (Ap[0], Ap[inc], tp, n);
+#else
 	  mpn_fft_sub_modF (Ap[inc], Ap[0], tp, n);
 	  mpn_fft_add_modF (Ap[0],   Ap[0], tp, n);
+#endif
 	}
     }
 }
@@ -576,8 +600,12 @@ mpn_fft_fftinv (mp_ptr *Ap, mp_size_t K, mp_size_t omega, mp_size_t n, mp_ptr tp
 	  /* Ap[K2] <- Ap[0] + Ap[K2] * 2^((j + K2) * omega)
 	     Ap[0]  <- Ap[0] + Ap[K2] * 2^(j * omega) */
 	  mpn_fft_mul_2exp_modF (tp, Ap[K2], j * omega, n);
+#if HAVE_NATIVE_mpn_add_n_sub_n
+	  mpn_fft_add_sub_modF (Ap[0], Ap[K2], tp, n);
+#else
 	  mpn_fft_sub_modF (Ap[K2], Ap[0], tp, n);
 	  mpn_fft_add_modF (Ap[0],  Ap[0], tp, n);
+#endif
 	}
     }
 }
@@ -966,7 +994,6 @@ mpn_mul_fft_full (mp_ptr op,
   oldcc = cc;
 #if HAVE_NATIVE_mpn_add_n_sub_n
   c2 = mpn_add_n_sub_n (pad_op + l, pad_op, pad_op, pad_op + l, l);
-  /* c2 & 1 is the borrow, c2 & 2 is the carry */
   cc += c2 >> 1; /* carry out from high <- low + high */
   c2 = c2 & 1; /* borrow out from low <- low - high */
 #else

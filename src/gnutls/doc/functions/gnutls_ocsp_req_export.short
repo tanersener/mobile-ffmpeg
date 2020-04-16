@@ -1,1 +1,1 @@
-@item @var{int} @ref{gnutls_ocsp_req_export} (gnutls_ocsp_req_t @var{req}, gnutls_datum_t * @var{data})
+@item @var{int} @ref{gnutls_ocsp_req_export} (gnutls_ocsp_req_const_t @var{req}, gnutls_datum_t * @var{data})

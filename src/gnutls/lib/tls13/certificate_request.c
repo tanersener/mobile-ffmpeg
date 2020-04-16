@@ -26,6 +26,7 @@
 #include "handshake.h"
 #include "tls13/certificate_request.h"
 #include "ext/signature.h"
+#include "ext/status_request.h"
 #include "mbuffers.h"
 #include "algorithms.h"
 #include "auth/cert.h"
@@ -108,6 +109,14 @@ int parse_cert_extension(void *_ctx, unsigned tls_id, const uint8_t *data, unsig
 
 			ctx->pk_algos[ctx->pk_algos_length++] = se->pk;
 		}
+#ifdef ENABLE_OCSP
+	} else if (tls_id == ext_mod_status_request.tls_id) {
+		if (data_size != 0)
+			return gnutls_assert_val(GNUTLS_E_TLS_PACKET_DECODING_ERROR);
+
+		/* we are now allowed to send OCSP staples */
+		session->internals.hsk_flags |= HSK_CLIENT_OCSP_REQUESTED;
+#endif
 	} else if (tls_id == EXTID_CERTIFICATE_AUTHORITIES) {
 		if (data_size < 3) {
 			return gnutls_assert_val(GNUTLS_E_TLS_PACKET_DECODING_ERROR);
@@ -187,7 +196,7 @@ int _gnutls13_recv_certificate_request_int(gnutls_session_t session, gnutls_buff
 	if (apr_cert_list_length > 0) {
 		gnutls_sign_algorithm_t algo;
 
-		algo = _gnutls_session_get_sign_algo(session, &apr_cert_list[0], apr_pkey, 0);
+		algo = _gnutls_session_get_sign_algo(session, &apr_cert_list[0], apr_pkey, 0, GNUTLS_KX_UNKNOWN);
 		if (algo == GNUTLS_SIGN_UNKNOWN) {
 			_gnutls_handshake_log("HSK[%p]: rejecting client auth because of no suitable signature algorithm\n", session);
 			_gnutls_selected_certs_deinit(session);
@@ -255,6 +264,11 @@ int write_certificate_authorities(void *ctx, gnutls_buffer_st *buf)
 					      cred->
 					      tlist->x509_rdn_sequence.
 					      size);
+}
+
+static int append_empty_ext(void *ctx, gnutls_buffer_st *buf)
+{
+	return GNUTLS_E_INT_RET_0;
 }
 
 int _gnutls13_send_certificate_request(gnutls_session_t session, unsigned again)
@@ -331,6 +345,17 @@ int _gnutls13_send_certificate_request(gnutls_session_t session, unsigned again)
 			gnutls_assert();
 			goto cleanup;
 		}
+
+#ifdef ENABLE_OCSP
+		/* We always advertise our support for OCSP stapling */
+		ret = _gnutls_extv_append(&buf, ext_mod_status_request.tls_id, session,
+					  append_empty_ext);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+		session->internals.hsk_flags |= HSK_CLIENT_OCSP_REQUESTED;
+#endif
 
 		ret = _gnutls_extv_append_final(&buf, init_pos, 0);
 		if (ret < 0) {

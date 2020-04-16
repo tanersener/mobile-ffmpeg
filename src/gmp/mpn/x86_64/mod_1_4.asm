@@ -190,8 +190,10 @@ PROLOGUE(mpn_mod_1s_4p_cps)
 	sal	R8(%rcx), %r12		C b << cnt
 IFSTD(`	mov	%r12, %rdi	')	C pass parameter
 IFDOS(`	mov	%r12, %rcx	')	C pass parameter
+IFDOS(`	sub	$32, %rsp	')
 	ASSERT(nz, `test $15, %rsp')
 	CALL(	mpn_invert_limb)
+IFDOS(`	add	$32, %rsp	')
 	mov	%r12, %r8
 	mov	%rax, %r11
 	mov	%rax, (%rbx)		C store bi

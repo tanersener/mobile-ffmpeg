@@ -266,6 +266,7 @@ static const FormatEntry format_entries[] = {
     [AV_PIX_FMT_YUVA444P12LE] = { 1, 1 },
     [AV_PIX_FMT_NV24]        = { 1, 1 },
     [AV_PIX_FMT_NV42]        = { 1, 1 },
+    [AV_PIX_FMT_Y210LE]      = { 1, 0 },
 };
 
 int sws_isSupportedInput(enum AVPixelFormat pix_fmt)
@@ -1502,6 +1503,7 @@ av_cold int sws_init_context(SwsContext *c, SwsFilter *srcFilter,
         ff_free_filters(c2);
         if (ff_init_filters(c2) < 0) {
             sws_freeContext(c2);
+            c->cascaded_context[1] = NULL;
             return -1;
         }
 

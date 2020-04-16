@@ -4,7 +4,7 @@
    CERTAIN TO BE SUBJECT TO INCOMPATIBLE CHANGES OR DISAPPEAR COMPLETELY IN
    FUTURE GNU MP RELEASES.
 
-Copyright 2001, 2002, 2005, 2009 Free Software Foundation, Inc.
+Copyright 2001, 2002, 2005, 2009, 2018 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -33,7 +33,6 @@ GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
 #include <stdio.h>
-#include "gmp.h"
 #include "gmp-impl.h"
 
 /* change this to "#define TRACE(x) x" for diagnostics */
@@ -48,19 +47,13 @@ see https://www.gnu.org/licenses/.  */
    fp[0] is 0 and f1p[0] is 1.  f1p[size-1] can be zero, since F[n-1]<F[n]
    (for n>0).
 
-   Notes:
+   Notes: F[2k+1] = 4*F[k]^2 - F[k-1]^2 + 2*(-1)^k.
 
    In F[2k+1] with k even, +2 is applied to 4*F[k]^2 just by ORing into the
    low limb.
 
-   In F[2k+1] with k odd, -2 is applied to the low limb of 4*F[k]^2 -
-   F[k-1]^2.  This F[2k+1] is an F[4m+3] and such numbers are congruent to
-   1, 2 or 5 mod 8, which means no underflow reaching it with a -2 (since
-   that would leave 6 or 7 mod 8).
-
-   This property of F[4m+3] can be verified by induction on F[4m+3] =
-   7*F[4m-1] - F[4m-5], that formula being a standard lucas sequence
-   identity U[i+j] = U[i]*V[j] - U[i-j]*Q^j.
+   In F[2k+1] with k odd, -2 is applied to F[k-1]^2 just by ORing into the
+   low limb.
 */
 
 mp_size_t
@@ -132,15 +125,13 @@ mpn_fib2_ui (mp_ptr fp, mp_ptr f1p, unsigned long int n)
 
 	  /* Calculate F[2k+1] = 4*F[k]^2 - F[k-1]^2 + 2*(-1)^k.
 	     n&mask is the low bit of our implied k.  */
+
+	  ASSERT ((fp[0] & 2) == 0);
+	  /* fp is F[k-1]^2 == 0 or 1 mod 4, like all squares. */
+	  fp[0] |= (n & mask ? 2 : 0);			/* possible -2 */
 #if HAVE_NATIVE_mpn_rsblsh2_n
 	  fp[size] = mpn_rsblsh2_n (fp, fp, xp, size);
-	  if ((n & mask) == 0)
-	    MPN_INCR_U(fp, size + 1, 2);	/* possible +2 */
-	  else
-	  {
-	    ASSERT (fp[0] >= 2);
-	    fp[0] -= 2;				/* possible -2 */
-	  }
+	  MPN_INCR_U(fp, size + 1, (n & mask ? 0 : 2));	/* possible +2 */
 #else
 	  {
 	    mp_limb_t  c;
@@ -148,8 +139,6 @@ mpn_fib2_ui (mp_ptr fp, mp_ptr f1p, unsigned long int n)
 	    c = mpn_lshift (xp, xp, size, 2);
 	    xp[0] |= (n & mask ? 0 : 2);	/* possible +2 */
 	    c -= mpn_sub_n (fp, xp, fp, size);
-	    ASSERT (n & mask ? fp[0] != 0 && fp[0] != 1 : 1);
-	    fp[0] -= (n & mask ? 2 : 0);	/* possible -2 */
 	    fp[size] = c;
 	  }
 #endif

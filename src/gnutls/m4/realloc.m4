@@ -1,10 +1,8 @@
-# realloc.m4 serial 17
-dnl Copyright (C) 2007, 2009-2019 Free Software Foundation, Inc.
+# realloc.m4 serial 18
+dnl Copyright (C) 2007, 2009-2020 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
-
-m4_version_prereq([2.70], [] ,[
 
 # This is adapted with modifications from upstream Autoconf here:
 # https://git.savannah.gnu.org/cgit/autoconf.git/commit/?id=04be2b7a29d65d9a08e64e8e56e594c91749598c
@@ -35,8 +33,8 @@ AC_DEFUN([_AC_FUNC_REALLOC_IF],
           *-gnu* | gnu* | *-musl* | freebsd* | netbsd* | openbsd* \
           | hpux* | solaris* | cygwin* | mingw*)
             ac_cv_func_realloc_0_nonnull="guessing yes" ;;
-          # If we don't know, assume the worst.
-          *) ac_cv_func_realloc_0_nonnull="guessing no" ;;
+          # If we don't know, obey --enable-cross-guesses.
+          *) ac_cv_func_realloc_0_nonnull="$gl_cross_guess_normal" ;;
         esac
        ])
     ])
@@ -49,8 +47,6 @@ AC_DEFUN([_AC_FUNC_REALLOC_IF],
       ;;
   esac
 ])# AC_FUNC_REALLOC
-
-])
 
 # gl_FUNC_REALLOC_GNU
 # -------------------

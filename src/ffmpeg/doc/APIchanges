@@ -15,6 +15,44 @@ libavutil:     2017-10-21
 
 API changes, most recent first:
 
+2020-xx-xx - xxxxxxxxxx - lavc 58.78.100 - avcodec.h codec_desc.h codec_id.h packet.h
+  Move AVCodecDesc-related public API to new header codec_desc.h.
+  Move AVCodecID enum to new header codec_id.h.
+  Move AVPacket-related public API to new header packet.h.
+
+2020-03-29 - xxxxxxxxxx - lavf 58.42.100 - avformat.h
+  av_read_frame() now guarantees to handle uninitialized input packets
+  and to return refcounted packets on success.
+
+2020-03-27 - xxxxxxxxxx - lavc 58.77.100 - avcodec.h
+  av_packet_ref() now guarantees to return the destination packet
+  in a blank state on error.
+
+2020-03-10 - xxxxxxxxxx - lavc 58.75.100 - avcodec.h
+  Add AV_PKT_DATA_ICC_PROFILE.
+
+2020-02-21 - xxxxxxxxxx - lavc 58.73.101 - avcodec.h
+  Add AV_CODEC_EXPORT_DATA_PRFT.
+
+2020-02-21 - xxxxxxxxxx - lavc 58.73.100 - avcodec.h
+  Add AVCodecContext.export_side_data and AV_CODEC_EXPORT_DATA_MVS.
+
+2020-02-13 - xxxxxxxxxx - lavu 56.41.100 - tx.h
+  Add AV_TX_INT32_FFT and AV_TX_INT32_MDCT
+
+2020-02-12 - xxxxxxxxxx - lavu 56.40.100 - log.h
+  Add av_log_once().
+
+2020-02-04 - xxxxxxxxxx - lavu 56.39.100 - hwcontext.h
+  Add AV_PIX_FMT_VULKAN
+  Add AV_HWDEVICE_TYPE_VULKAN and implementation.
+
+2020-01-30 - xxxxxxxxxx - lavf 58.37.100 - avio.h
+  Add avio_protocol_get_class().
+
+2020-01-15 - xxxxxxxxxx - lavc 58.66.100 - avcodec.h
+  Add AV_PKT_DATA_PRFT and AVProducerReferenceTime.
+
 2019-12-27 - xxxxxxxxxx - lavu 56.38.100 - eval.h
   Add av_expr_count_func().
 

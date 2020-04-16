@@ -34,7 +34,6 @@ see https://www.gnu.org/licenses/.  */
 #include <float.h>  /* for DBL_MAX */
 #endif
 
-#include "gmp.h"
 #include "gmp-impl.h"
 
 int

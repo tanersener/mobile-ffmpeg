@@ -23,29 +23,29 @@ fi
 # ENABLE COMMON FUNCTIONS
 . ${BASEDIR}/build/android-common.sh
 
-# PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
+# PREPARE PATHS & DEFINE ${INSTALL_PKG_CONFIG_DIR}
 LIB_NAME="libpng"
 set_toolchain_clang_paths ${LIB_NAME}
 
 # PREPARING FLAGS
-TARGET_HOST=$(get_target_host)
+BUILD_HOST=$(get_build_host)
 export CFLAGS=$(get_cflags ${LIB_NAME})
 export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 export LDFLAGS=$(get_ldflags ${LIB_NAME})
 
-CPU_SPECIFIC_OPTIONS=""
+ARCH_OPTIONS=""
 case ${ARCH} in
     x86 | x86-64)
-        CPU_SPECIFIC_OPTIONS="--enable-hardware-optimizations --enable-intel-sse=yes"
+        ARCH_OPTIONS="--enable-hardware-optimizations --enable-intel-sse=yes"
     ;;
     arm-v7a-neon | arm64-v8a)
-        CPU_SPECIFIC_OPTIONS="--enable-hardware-optimizations --enable-arm-neon=yes"
+        ARCH_OPTIONS="--enable-hardware-optimizations --enable-arm-neon=yes"
     ;;
     arm-v7a)
         # hardware-optimizations not enabled because
         # when --enable-hardware-optimizations is added
         # make tries to build arm-neon specific instructions, which breaks compilation
-        CPU_SPECIFIC_OPTIONS="--enable-arm-neon=no"
+        ARCH_OPTIONS="--enable-arm-neon=no"
     ;;
 esac
 
@@ -53,7 +53,7 @@ cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
 make distclean 2>/dev/null 1>/dev/null
 
-# RECONFIGURING IF REQUESTED
+# RECONFIGURE IF REQUESTED
 if [[ ${RECONF_libpng} -eq 1 ]]; then
     autoreconf_library ${LIB_NAME}
 fi
@@ -67,8 +67,8 @@ fi
     --disable-fast-install \
     --disable-unversioned-libpng-pc \
     --disable-unversioned-libpng-config \
-    ${CPU_SPECIFIC_OPTIONS} \
-    --host=${TARGET_HOST} || exit 1
+    ${ARCH_OPTIONS} \
+    --host=${BUILD_HOST} || exit 1
 
 make -j$(get_cpu_count) || exit 1
 

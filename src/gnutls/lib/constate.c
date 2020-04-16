@@ -422,9 +422,11 @@ _tls13_set_keys(gnutls_session_t session, hs_stage_t stage,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	_gnutls_nss_keylog_write(session, keylog_label,
-				 ckey,
-				 session->security_parameters.prf->output_size);
+	ret = _gnutls_call_keylog_func(session, keylog_label,
+				       ckey,
+				       session->security_parameters.prf->output_size);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 	/* client keys */
 	ret = _tls13_expand_secret(session, "key", 3, NULL, 0, ckey, key_size, ckey_block);
@@ -457,9 +459,11 @@ _tls13_set_keys(gnutls_session_t session, hs_stage_t stage,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	_gnutls_nss_keylog_write(session, keylog_label,
-				 skey,
-				 session->security_parameters.prf->output_size);
+	ret = _gnutls_call_keylog_func(session, keylog_label,
+				       skey,
+				       session->security_parameters.prf->output_size);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 	ret = _tls13_expand_secret(session, "key", 3, NULL, 0, skey, key_size, skey_block);
 	if (ret < 0)

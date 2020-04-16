@@ -2,7 +2,7 @@
 
    Contributed to the GNU project by Torbjorn Granlund.
 
-Copyright 2009, 2012, 2013 Free Software Foundation, Inc.
+Copyright 2009, 2012, 2013, 2016, 2018 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -59,7 +59,7 @@ mpz_t B;
 int
 main (int argc, char *argv[])
 {
-  unsigned long t, p;
+  int t, p;
   mpz_t ppp, acc, inv, gmp_numb_max, tmp, Bhalf;
   mpz_t pre[7];
   int i;
@@ -91,15 +91,16 @@ main (int argc, char *argv[])
   for (i = 0; i < 7; i++)
     mpz_init (pre[i]);
 
-  mpz_init_set_ui (gmp_numb_max, 1);
-  mpz_mul_2exp (gmp_numb_max, gmp_numb_max, limb_bits);
+  mpz_init (B);
+  mpz_setbit (B, limb_bits);
+  mpz_init_set (gmp_numb_max, B);
   mpz_sub_ui (gmp_numb_max, gmp_numb_max, 1);
 
   mpz_init (tmp);
   mpz_init (inv);
 
-  mpz_init_set_ui (B, 1);  mpz_mul_2exp (B, B, limb_bits);
-  mpz_init_set_ui (Bhalf, 1);  mpz_mul_2exp (Bhalf, Bhalf, limb_bits - 1);
+  mpz_init (Bhalf);
+  mpz_setbit (Bhalf, limb_bits - 1);
 
   start_p = 3;
 

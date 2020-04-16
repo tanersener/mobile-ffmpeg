@@ -1,0 +1,24 @@
+
+
+
+
+@deftypefun {int} {gnutls_pbkdf2} (gnutls_mac_algorithm_t @var{mac}, const gnutls_datum_t * @var{key}, const gnutls_datum_t * @var{salt}, unsigned @var{iter_count}, void * @var{output}, size_t @var{length})
+@var{mac}: the mac algorithm used internally
+
+@var{key}: the initial keying material
+
+@var{salt}: the salt
+
+@var{iter_count}: the iteration count
+
+@var{output}: the output value
+
+@var{length}: the desired length of the output key
+
+This function will derive a variable length keying material from
+a password according to PKCS @code{5}  PBKDF2.
+
+@strong{Returns:} Zero or a negative error code on error.
+
+@strong{Since:} 3.6.13
+@end deftypefun

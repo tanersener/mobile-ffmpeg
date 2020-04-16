@@ -37,7 +37,7 @@
 
 #include <stdlib.h>
 
-#include "gostdsa.h"
+#include "gostdsa2.h"
 #include "ecc-internal.h"
 
 #include "gmp-glue.h"

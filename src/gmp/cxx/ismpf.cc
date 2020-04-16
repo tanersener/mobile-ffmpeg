@@ -33,7 +33,6 @@ see https://www.gnu.org/licenses/.  */
 #include <string>
 #include <clocale>    // for localeconv
 
-#include "gmp.h"
 #include "gmp-impl.h"
 
 using namespace std;

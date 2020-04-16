@@ -519,10 +519,15 @@
 (eval-when (expand load eval)
   (define %libdir
     (or (getenv "GNUTLS_GUILE_EXTENSION_DIR")
-        "@guileextensiondir@"))
+
+        ;; The .scm file is supposed to be architecture-independent.  Thus,
+        ;; save 'extensiondir' only if it's different from what Guile expects.
+        @maybe_guileextensiondir@))
 
   (unless (getenv "GNUTLS_GUILE_CROSS_COMPILING")
-    (load-extension (string-append %libdir "/guile-gnutls-v-2")
+    (load-extension (if %libdir
+                        (string-append %libdir "/guile-gnutls-v-2")
+                        "guile-gnutls-v-2")
                     "scm_init_gnutls")))
 
 (cond-expand

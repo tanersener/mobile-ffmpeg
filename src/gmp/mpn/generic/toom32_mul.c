@@ -40,7 +40,6 @@ GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
 
-#include "gmp.h"
 #include "gmp-impl.h"
 
 /* Evaluate in: -1, 0, +1, +inf
@@ -105,7 +104,7 @@ mpn_toom32_mul (mp_ptr pp,
 
   /* FIXME: Keep v1[2*n] and vm1[2*n] in scalar variables? */
 
-  /* Compute ap1 = a0 + a1 + a3, am1 = a0 - a1 + a3 */
+  /* Compute ap1 = a0 + a1 + a2, am1 = a0 - a1 + a2 */
   ap1_hi = mpn_add (ap1, a0, n, a2, s);
 #if HAVE_NATIVE_mpn_add_n_sub_n
   if (ap1_hi == 0 && mpn_cmp (ap1, a1, n) < 0)

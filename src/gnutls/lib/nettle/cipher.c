@@ -45,7 +45,13 @@
 #include <nettle/cbc.h>
 #include <nettle/gcm.h>
 #include <nettle/ccm.h>
+#ifdef HAVE_NETTLE_CHACHA_SET_COUNTER
+#include <nettle/chacha.h>
 #include <nettle/chacha-poly1305.h>
+#else
+#include "chacha/chacha.h"
+#include "chacha/chacha-poly1305.h"
+#endif
 #ifdef HAVE_NETTLE_CFB8_ENCRYPT
 #include <nettle/cfb.h>
 #else
@@ -166,36 +172,36 @@ _cfb_decrypt(struct nettle_cipher_ctx *ctx, size_t length, uint8_t * dst,
 static void
 _gost28147_set_key_tc26z(void *ctx, const uint8_t *key)
 {
-	gost28147_set_key(ctx, key);
 	gost28147_set_param(ctx, &gost28147_param_TC26_Z);
+	gost28147_set_key(ctx, key);
 }
 
 static void
 _gost28147_set_key_cpa(void *ctx, const uint8_t *key)
 {
-	gost28147_set_key(ctx, key);
 	gost28147_set_param(ctx, &gost28147_param_CryptoPro_A);
+	gost28147_set_key(ctx, key);
 }
 
 static void
 _gost28147_set_key_cpb(void *ctx, const uint8_t *key)
 {
-	gost28147_set_key(ctx, key);
 	gost28147_set_param(ctx, &gost28147_param_CryptoPro_B);
+	gost28147_set_key(ctx, key);
 }
 
 static void
 _gost28147_set_key_cpc(void *ctx, const uint8_t *key)
 {
-	gost28147_set_key(ctx, key);
 	gost28147_set_param(ctx, &gost28147_param_CryptoPro_C);
+	gost28147_set_key(ctx, key);
 }
 
 static void
 _gost28147_set_key_cpd(void *ctx, const uint8_t *key)
 {
-	gost28147_set_key(ctx, key);
 	gost28147_set_param(ctx, &gost28147_param_CryptoPro_D);
+	gost28147_set_key(ctx, key);
 }
 
 static void
@@ -244,6 +250,22 @@ _ccm_decrypt(struct nettle_cipher_ctx *ctx,
 				    nonce_size, nonce,
 				    auth_size, auth,
 				    tag_size, length, dst, src);
+}
+
+static void
+_chacha_set_nonce(struct chacha_ctx *ctx,
+		  size_t length, const uint8_t *nonce)
+{
+	chacha_set_nonce(ctx, nonce + CHACHA_COUNTER_SIZE);
+	chacha_set_counter(ctx, nonce);
+}
+
+static void
+_chacha_set_nonce96(struct chacha_ctx *ctx,
+		    size_t length, const uint8_t *nonce)
+{
+	chacha_set_nonce96(ctx, nonce + CHACHA_COUNTER32_SIZE);
+	chacha_set_counter32(ctx, nonce);
 }
 
 static void
@@ -606,6 +628,36 @@ static const struct nettle_cipher_st builtin_ciphers[] = {
 	   .set_encrypt_key = (nettle_set_key_func*)salsa20_256_set_key,
 	   .set_decrypt_key = (nettle_set_key_func*)salsa20_256_set_key,
 	   .max_iv_size = SALSA20_NONCE_SIZE,
+	},
+	{  .algo = GNUTLS_CIPHER_CHACHA20_32,
+	   .block_size = 1,
+	   .key_size = CHACHA_KEY_SIZE,
+	   .encrypt_block = (nettle_cipher_func*)chacha_crypt32,
+	   .decrypt_block = (nettle_cipher_func*)chacha_crypt32,
+
+	   .ctx_size = sizeof(struct chacha_ctx),
+	   .encrypt = _stream_encrypt,
+	   .decrypt = _stream_encrypt,
+	   .set_encrypt_key = (nettle_set_key_func*)chacha_set_key,
+	   .set_decrypt_key = (nettle_set_key_func*)chacha_set_key,
+	   .set_iv = (setiv_func)_chacha_set_nonce96,
+	   /* we allow setting the initial block counter as part of nonce */
+	   .max_iv_size = CHACHA_NONCE96_SIZE + CHACHA_COUNTER32_SIZE,
+	},
+	{  .algo = GNUTLS_CIPHER_CHACHA20_64,
+	   .block_size = 1,
+	   .key_size = CHACHA_KEY_SIZE,
+	   .encrypt_block = (nettle_cipher_func*)chacha_crypt,
+	   .decrypt_block = (nettle_cipher_func*)chacha_crypt,
+
+	   .ctx_size = sizeof(struct chacha_ctx),
+	   .encrypt = _stream_encrypt,
+	   .decrypt = _stream_encrypt,
+	   .set_encrypt_key = (nettle_set_key_func*)chacha_set_key,
+	   .set_decrypt_key = (nettle_set_key_func*)chacha_set_key,
+	   .set_iv = (setiv_func)_chacha_set_nonce,
+	   /* we allow setting the initial block counter as part of nonce */
+	   .max_iv_size = CHACHA_NONCE_SIZE + CHACHA_COUNTER_SIZE,
 	},
 	{  .algo = GNUTLS_CIPHER_CHACHA20_POLY1305,
 	   .block_size = CHACHA_POLY1305_BLOCK_SIZE,

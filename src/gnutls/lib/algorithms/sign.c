@@ -125,6 +125,18 @@ gnutls_sign_entry_st sign_algorithms[] = {
 	 .flags = GNUTLS_SIGN_FLAG_TLS13_OK,
 	 .aid = {{8, 7}, SIG_SEM_DEFAULT}},
 
+	 /* Ed448: The hash algorithm here is set to be SHAKE256, although that is
+	  * an internal detail of Ed448; we set it, because CMS/PKCS#7 requires
+	  * that mapping. */
+	 {.name = "EdDSA-Ed448",
+	 .oid = SIG_ED448_OID,
+	 .id = GNUTLS_SIGN_EDDSA_ED448,
+	 .pk = GNUTLS_PK_EDDSA_ED448,
+	 .hash = GNUTLS_DIG_SHAKE_256,
+	 .flags = GNUTLS_SIGN_FLAG_TLS13_OK,
+	 .aid = {{8, 8}, SIG_SEM_DEFAULT},
+	 .hash_output_size = 114},
+
 	 /* ECDSA */
 	 /* The following three signature algorithms
 	  * have different semantics when used under TLS 1.2
@@ -773,4 +785,31 @@ _gnutls13_sign_get_compatible_with_privkey(gnutls_privkey_t privkey)
 	);
 
 	return NULL;
+}
+
+unsigned
+_gnutls_sign_get_hash_strength(gnutls_sign_algorithm_t sign)
+{
+	const gnutls_sign_entry_st *se = _gnutls_sign_to_entry(sign);
+	const mac_entry_st *me;
+	unsigned hash_output_size;
+
+	if (unlikely(se == NULL))
+		return 0;
+
+	me = mac_to_entry(se->hash);
+	if (unlikely(me == NULL))
+		return 0;
+
+	if (se->hash_output_size > 0)
+		hash_output_size = se->hash_output_size;
+	else
+		hash_output_size = _gnutls_mac_get_algo_len(me);
+
+	if (me->id == GNUTLS_MAC_SHAKE_128)
+		return MIN(hash_output_size*8/2, 128);
+	else if (me->id == GNUTLS_MAC_SHAKE_256)
+		return MIN(hash_output_size*8/2, 256);
+
+	return hash_output_size*8/2;
 }

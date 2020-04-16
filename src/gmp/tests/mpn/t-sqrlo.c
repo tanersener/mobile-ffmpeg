@@ -21,7 +21,6 @@ the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "gmp.h"
 #include "gmp-impl.h"
 #include "tests.h"
 
@@ -47,16 +46,7 @@ main (int argc, char **argv)
   TMP_DECL;
   TMP_MARK;
 
-  if (argc > 1)
-    {
-      char *end;
-      count = strtol (argv[1], &end, 0);
-      if (*end || count <= 0)
-	{
-	  fprintf (stderr, "Invalid test count: %s.\n", argv[1]);
-	  return 1;
-	}
-    }
+  TESTS_REPS (count, argv, argc);
 
   tests_start ();
   rands = RANDS;
@@ -93,10 +83,8 @@ main (int argc, char **argv)
       p_after = pp[n];
 
       itch = mpn_sqrlo_itch (n);
-#if 0
       ASSERT_ALWAYS (itch <= mpn_sqrlo_itch (MAX_N));
       mpn_random2 (scratch-1, itch+2);
-#endif
       s_before = scratch[-1];
       s_after = scratch[itch];
 

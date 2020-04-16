@@ -30,15 +30,25 @@ dnl  see https://www.gnu.org/licenses/.
 
 include(`../config.m4')
 
-
-C	     cycles/limb
+C	    cycles/limb
 C AMD K8,K9	 2
-C AMD K10	 2
+C AMD K10	 1.93\2
+C AMD bull	 1.62\2.1
+C AMD pile	 1.6\1.7
+C AMD steam
+C AMD excavator
+C AMD bobcat	 2.79
+C AMD jaguar	 2.54
 C Intel P4	10
 C Intel core2	 2
 C Intel NHM	 2
 C Intel SBR	 2
+C Intel IBR	 1.95
+C Intel HWL	 1.72
+C Intel BWL	 1.54
+C Intel SKL	 1.52
 C Intel atom	 9
+C Intel SLM	 6.5
 C VIA nano	 3
 
 C INPUT PARAMETERS
@@ -138,4 +148,3 @@ PROLOGUE(func_nc)
 IFDOS(`	mov	56(%rsp), %r8	')
 	jmp	L(start)
 EPILOGUE()
-

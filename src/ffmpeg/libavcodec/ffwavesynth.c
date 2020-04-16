@@ -217,7 +217,7 @@ static void wavesynth_seek(struct wavesynth_context *ws, int64_t ts)
     *last = -1;
     lcg_seek(&ws->dither_state, (uint32_t)ts - (uint32_t)ws->cur_ts);
     if (ws->pink_need) {
-        uint64_t pink_ts_cur  = (ws->cur_ts + PINK_UNIT - 1) & ~(PINK_UNIT - 1);
+        uint64_t pink_ts_cur  = (ws->cur_ts + (uint64_t)PINK_UNIT - 1) & ~(PINK_UNIT - 1);
         uint64_t pink_ts_next = ts & ~(PINK_UNIT - 1);
         int pos = ts & (PINK_UNIT - 1);
         lcg_seek(&ws->pink_state, (uint32_t)(pink_ts_next - pink_ts_cur) * 2);
@@ -281,7 +281,7 @@ static int wavesynth_parse_extradata(AVCodecContext *avc)
                 dphi1 = frac64(f1, (int64_t)avc->sample_rate << 16);
                 dphi2 = frac64(f2, (int64_t)avc->sample_rate << 16);
                 in->dphi0 = dphi1;
-                in->ddphi = (dphi2 - dphi1) / dt;
+                in->ddphi = (int64_t)(dphi2 - (uint64_t)dphi1) / dt;
                 if (phi & 0x80000000) {
                     phi &= ~0x80000000;
                     if (phi >= i)

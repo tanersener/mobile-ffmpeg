@@ -40,6 +40,7 @@ typedef struct AFFTFiltContext {
     FFTComplex **fft_data;
     FFTComplex **fft_temp;
     int nb_exprs;
+    int channels;
     int window_size;
     AVExpr **real;
     AVExpr **imag;
@@ -129,6 +130,7 @@ static int config_input(AVFilterLink *inlink)
     char *args;
     const char *last_expr = "1";
 
+    s->channels = inlink->channels;
     s->pts  = AV_NOPTS_VALUE;
     s->fft_bits = av_log2(s->fft_size);
     s->fft  = av_fft_init(s->fft_bits, 0);
@@ -176,13 +178,13 @@ static int config_input(AVFilterLink *inlink)
         ret = av_expr_parse(&s->real[ch], arg ? arg : last_expr, var_names,
                             NULL, NULL, func2_names, func2, 0, ctx);
         if (ret < 0)
-            break;
+            goto fail;
         if (arg)
             last_expr = arg;
         s->nb_exprs++;
     }
 
-    av_free(args);
+    av_freep(&args);
 
     args = av_strdup(s->img_str ? s->img_str : s->real_str);
     if (!args)
@@ -196,12 +198,12 @@ static int config_input(AVFilterLink *inlink)
         ret = av_expr_parse(&s->imag[ch], arg ? arg : last_expr, var_names,
                             NULL, NULL, func2_names, func2, 0, ctx);
         if (ret < 0)
-            break;
+            goto fail;
         if (arg)
             last_expr = arg;
     }
 
-    av_free(args);
+    av_freep(&args);
 
     s->fifo = av_audio_fifo_alloc(inlink->format, inlink->channels, s->window_size);
     if (!s->fifo)
@@ -222,6 +224,9 @@ static int config_input(AVFilterLink *inlink)
     s->buffer = ff_get_audio_buffer(inlink, s->window_size * 2);
     if (!s->buffer)
         return AVERROR(ENOMEM);
+
+fail:
+    av_freep(&args);
 
     return ret;
 }
@@ -432,7 +437,7 @@ static av_cold void uninit(AVFilterContext *ctx)
     av_fft_end(s->fft);
     av_fft_end(s->ifft);
 
-    for (i = 0; i < s->nb_exprs; i++) {
+    for (i = 0; i < s->channels; i++) {
         if (s->fft_data)
             av_freep(&s->fft_data[i]);
         if (s->fft_temp)

@@ -187,6 +187,9 @@ static void start(const char *prio)
 
 	HANDSHAKE(client, server);
 
+	assert((gnutls_session_get_flags(server) & GNUTLS_SFLAGS_CLI_REQUESTED_OCSP) != 0);
+	assert((gnutls_session_get_flags(client) & GNUTLS_SFLAGS_CLI_REQUESTED_OCSP) != 0);
+
 	ret = gnutls_ocsp_status_request_get(client, &response);
 	if (ret != 0)
 		fail("no response was found: %s\n", gnutls_strerror(ret));

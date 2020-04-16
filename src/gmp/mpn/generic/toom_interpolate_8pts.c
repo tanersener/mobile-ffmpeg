@@ -34,7 +34,6 @@ You should have received copies of the GNU General Public License and the
 GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
-#include "gmp.h"
 #include "gmp-impl.h"
 
 #define BINVERT_3 MODLIMB_INVERSE_3
@@ -184,12 +183,12 @@ mpn_toom_interpolate_8pts (mp_ptr pp, mp_size_t n,
 
   cy = mpn_add_n (pp + n, pp + n, r7, n); /* Hr8+Lr7-Lr5 */
   cy-= mpn_sub_n (pp + n, pp + n, r5, n);
-  if (0 > cy)
-    MPN_DECR_U (r7 + n, 2*n + 1, 1);
-  else
-    MPN_INCR_U (r7 + n, 2*n + 1, cy);
+  if (cy > 0) {
+    MPN_INCR_U (r7 + n, 2*n + 1, 1);
+    cy = 0;
+  }
 
-  cy = mpn_sub_n (pp + 2*n, r7 + n, r5 + n, n); /* Mr7-Mr5 */
+  cy = mpn_sub_nc (pp + 2*n, r7 + n, r5 + n, n, -cy); /* Mr7-Mr5 */
   MPN_DECR_U (r7 + 2*n, n + 1, cy);
 
   cy = mpn_add_n (pp + 3*n, r5, r7+ 2*n, n+1); /* Hr7+Lr5 */

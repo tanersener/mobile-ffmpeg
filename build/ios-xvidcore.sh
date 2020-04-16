@@ -27,12 +27,12 @@ else
     . ${BASEDIR}/build/ios-common.sh
 fi
 
-# PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
+# PREPARE PATHS & DEFINE ${INSTALL_PKG_CONFIG_DIR}
 LIB_NAME="xvidcore"
 set_toolchain_clang_paths ${LIB_NAME}
 
 # PREPARING FLAGS
-TARGET_HOST=$(get_target_host)
+BUILD_HOST=$(get_build_host)
 export CFLAGS=$(get_cflags ${LIB_NAME})
 export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 export LDFLAGS=$(get_ldflags ${LIB_NAME})
@@ -41,7 +41,7 @@ cd ${BASEDIR}/src/${LIB_NAME}/build/generic || exit 1
 
 make distclean 2>/dev/null 1>/dev/null
 
-# RECONFIGURING IF REQUESTED
+# RECONFIGURE IF REQUESTED
 if [[ ${RECONF_xvidcore} -eq 1 ]]; then
     ./bootstrap.sh
 fi
@@ -60,7 +60,7 @@ case ${ARCH} in
         ${SED_INLINE} 's/-Wl,-read_only_relocs,suppress//g' configure
 
     ;;
-    i386 | x86-64)
+    i386 | x86-64 | x86-64-mac-catalyst)
         ASM_FLAGS="--disable-assembly"
     ;;
 esac
@@ -68,7 +68,7 @@ esac
 ./configure \
     --prefix=${BASEDIR}/prebuilt/$(get_target_build_directory)/${LIB_NAME} \
     ${ASM_FLAGS} \
-    --host=${TARGET_HOST} || exit 1
+    --host=${BUILD_HOST} || exit 1
 
 make -j$(get_cpu_count) || exit 1
 

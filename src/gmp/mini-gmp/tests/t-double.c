@@ -1,6 +1,6 @@
 /*
 
-Copyright 2012, 2013 Free Software Foundation, Inc.
+Copyright 2012, 2013, 2018 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library test suite.
 
@@ -22,12 +22,101 @@ the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <float.h>
 
 #include "testutils.h"
 
 #define GMP_LIMB_BITS (sizeof(mp_limb_t) * CHAR_BIT)
 
+mp_bitcnt_t
+mpz_mantissasizeinbits (const mpz_t z)
+{
+  return ! mpz_cmp_ui (z, 0) ? 0 :
+    mpz_sizeinbase (z, 2) - mpz_scan1 (z, 0);
+}
+
+#if defined(DBL_MANT_DIG) && FLT_RADIX == 2
+int
+mpz_get_d_exact_p (const mpz_t z)
+{
+  return mpz_mantissasizeinbits (z) <= DBL_MANT_DIG;
+}
+#define HAVE_EXACT_P 1
+#endif
+
 #define COUNT 10000
+
+void
+test_matissa (void)
+{
+  mpz_t x, y;
+  int i, c;
+
+  mpz_init (x);
+  mpz_init (y);
+
+  mini_urandomb (y, 4);
+  c = i = mpz_get_ui (y);
+
+  do {
+    double d;
+    int cmp;
+
+    mpz_setbit (x, c);
+    d = mpz_get_d (x);
+    mpz_set_d (y, d);
+    if (mpz_cmp_d (y, d) != 0)
+      {
+	fprintf (stderr, "mpz_cmp_d (y, d) failed:\n"
+		 "d = %.20g\n"
+		 "i = %i\n"
+		 "c = %i\n",
+		 d, i, c);
+	abort ();
+      }
+
+    cmp = mpz_cmp (x, y);
+
+#if defined(HAVE_EXACT_P)
+    if ((mpz_get_d_exact_p (x) != 0) != (cmp == 0))
+      {
+	fprintf (stderr, "Not all bits converted:\n"
+		 "d = %.20g\n"
+		 "i = %i\n"
+		 "c = %i\n",
+		 d, i, c);
+	abort ();
+      }
+#endif
+
+    if (cmp < 0)
+      {
+	fprintf (stderr, "mpz_get_d failed:\n"
+		 "d = %.20g\n"
+		 "i = %i\n"
+		 "c = %i\n",
+		 d, i, c);
+	abort ();
+      }
+    else if (cmp > 0)
+      {
+	if (mpz_cmp_d (x, d) <= 0)
+	  {
+	    fprintf (stderr, "mpz_cmp_d (x, d) failed:\n"
+		     "d = %.20g\n"
+		     "i = %i\n"
+		     "c = %i\n",
+		     d, i, c);
+	    abort ();
+	  }
+	break;
+      }
+    ++c;
+  } while (1);
+
+  mpz_clear (x);
+  mpz_clear (y);
+}
 
 static const struct
 {
@@ -135,4 +224,5 @@ testmain (int argc, char **argv)
     }
 
   mpz_clear (x);
+  test_matissa();
 }

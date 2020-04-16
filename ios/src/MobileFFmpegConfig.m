@@ -369,11 +369,15 @@ void callbackBlockFunction() {
     [supportedExternalLibraries addObject:@"libwebp"];
     [supportedExternalLibraries addObject:@"libxml2"];
     [supportedExternalLibraries addObject:@"opencore-amr"];
+    [supportedExternalLibraries addObject:@"openh264"];
     [supportedExternalLibraries addObject:@"opus"];
+    [supportedExternalLibraries addObject:@"rubberband"];
+    [supportedExternalLibraries addObject:@"sdl2"];
     [supportedExternalLibraries addObject:@"shine"];
     [supportedExternalLibraries addObject:@"snappy"];
     [supportedExternalLibraries addObject:@"soxr"];
     [supportedExternalLibraries addObject:@"speex"];
+    [supportedExternalLibraries addObject:@"tesseract"];
     [supportedExternalLibraries addObject:@"twolame"];
     [supportedExternalLibraries addObject:@"wavpack"];
     [supportedExternalLibraries addObject:@"x264"];

@@ -179,6 +179,12 @@ ARCFOUR-128 is a compatible algorithm with RSA's RC4 algorithm, which is conside
 secret. It is a considered to be broken, and is only used for compatibility
 purposed. For this reason it is not enabled by default.
 
+@item GOST28147-TC26Z-CNT @tab
+Legacy (stream) @tab
+TLS 1.2 @tab
+This is a 64-bit block cipher GOST 28147-89 with TC26Z S-Box working in CNT
+mode. It is one of the approved ciphers in Russia. It is not enabled by default.
+
 @item NULL @tab
 Legacy (stream) @tab
 TLS 1.0, TLS 1.1, TLS 1.2 @tab
@@ -210,6 +216,11 @@ An HMAC based on SHA2-256. Outputs 256 bits of data.
 
 @item MAC-SHA384 @tab
 An HMAC based on SHA2-384. Outputs 384 bits of data.
+
+@item GOST28147-TC26Z-IMIT @tab
+This is a 64-bit block cipher GOST 28147-89 with TC26Z S-Box working in special
+MAC mode called Imitovstavks. It is one of the approved MAC algorithms in
+Russia. Outputs 32 bits of data. It is not enabled by default.
 
 @item MAC-AEAD @tab
 This indicates that an authenticated encryption algorithm, such as

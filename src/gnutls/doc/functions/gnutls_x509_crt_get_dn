@@ -14,7 +14,7 @@ buffer. The name will be in the form "C=xxxx,O=yyyy,CN=zzzz" as
 described in RFC4514. The output string will be ASCII or UTF-8
 encoded, depending on the certificate data.
 
-If  @code{buf} is null then only the size will be filled. 
+If  @code{buf} is null then only the size will be filled.
 
 This function does not output a fully RFC4514 compliant string, if
 that is required see @code{gnutls_x509_crt_get_dn3()} .

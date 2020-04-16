@@ -4,7 +4,7 @@
    ONLY SAFE TO REACH IT THROUGH DOCUMENTED INTERFACES.  IN FACT, IT IS ALMOST
    GUARANTEED THAT IT'LL CHANGE OR DISAPPEAR IN A FUTURE GNU MP RELEASE.
 
-Copyright 2013 Free Software Foundation, Inc.
+Copyright 2013, 2017 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -42,13 +42,12 @@ see https://www.gnu.org/licenses/.  */
    * Not yet adequately tested.
 */
 
-#include "gmp.h"
 #include "gmp-impl.h"
 #include "longlong.h"
 
 /* Define some longlong.h-style macros, but for wider operations.
-   * add_sssaaaa is like longlong.h's add_ssaaaa but propagating
-     carry-out into an additional sum operand.
+   * add_sssaaaa is like longlong.h's add_ssaaaa but propagating carry-out into
+     an additional sum operand.
 */
 #if defined (__GNUC__)  && ! defined (__INTEL_COMPILER) && ! defined (NO_ASM)
 
@@ -70,14 +69,22 @@ see https://www.gnu.org/licenses/.  */
 	     "%2" ((UDItype)(a0)), "rme" ((UDItype)(b0)))
 #endif
 
+#if defined (__aarch64__) && W_TYPE_SIZE == 64
+#define add_sssaaaa(s2, s1, s0, a1, a0, b1, b0)				\
+  __asm__ ("adds\t%2, %x6, %7\n\tadcs\t%1, %x4, %x5\n\tadc\t%0, %3, xzr"\
+	   : "=r" (s2), "=&r" (s1), "=&r" (s0)				\
+	   : "rZ" (s2), "%rZ"  (a1), "rZ" (b1), "%rZ" (a0), "rI" (b0) __CLOBBER_CC)
+#endif
+
 #if HAVE_HOST_CPU_FAMILY_powerpc && !defined (_LONG_LONG_LIMB)
 /* This works fine for 32-bit and 64-bit limbs, except for 64-bit limbs with a
    processor running in 32-bit mode, since the carry flag then gets the 32-bit
    carry.  */
 #define add_sssaaaa(s2, s1, s0, a1, a0, b1, b0)				\
-  __asm__ ("add%I7c\t%2,%6,%7\n\tadde\t%1,%4,%5\n\taddze\t%0,%0"	\
+  __asm__ ("add%I7c\t%2,%6,%7\n\tadde\t%1,%4,%5\n\taddze\t%0,%3"	\
 	   : "=r" (s2), "=&r" (s1), "=&r" (s0)				\
-	   : "r"  (s2), "r"  (a1), "r" (b1), "%r" (a0), "rI" (b0))
+	   : "r"  (s2), "r"  (a1), "r" (b1), "%r" (a0), "rI" (b0)	\
+	     __CLOBBER_CC)
 #endif
 
 #endif /* __GNUC__ */

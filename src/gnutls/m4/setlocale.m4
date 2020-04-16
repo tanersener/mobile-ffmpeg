@@ -1,5 +1,5 @@
-# setlocale.m4 serial 6
-dnl Copyright (C) 2011-2019 Free Software Foundation, Inc.
+# setlocale.m4 serial 7
+dnl Copyright (C) 2011-2020 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -7,16 +7,20 @@ dnl with or without modifications, as long as this notice is preserved.
 AC_DEFUN([gl_FUNC_SETLOCALE],
 [
   AC_REQUIRE([gl_LOCALE_H_DEFAULTS])
+  AC_REQUIRE([gl_FUNC_SETLOCALE_NULL])
   AC_REQUIRE([AC_CANONICAL_HOST])
+
+  dnl Test whether we need to improve on the general working of setlocale.
+  NEED_SETLOCALE_IMPROVED=0
   case "$host_os" in
     dnl On native Windows systems, setlocale(category,NULL) does not look at
     dnl the environment variables LC_ALL, category, and LANG.
-    mingw*) REPLACE_SETLOCALE=1 ;;
+    mingw*) NEED_SETLOCALE_IMPROVED=1 ;;
     dnl On Cygwin 1.5.x, setlocale always succeeds but setlocale(LC_CTYPE,NULL)
     dnl is then still "C".
     cygwin*)
       case `uname -r` in
-        1.5.*) REPLACE_SETLOCALE=1 ;;
+        1.5.*) NEED_SETLOCALE_IMPROVED=1 ;;
       esac
       ;;
     dnl On Android 4.3, setlocale(category,"C") always fails.
@@ -42,10 +46,33 @@ int main ()
         ])
       case "$gl_cv_func_setlocale_works" in
         *yes) ;;
-        *) REPLACE_SETLOCALE=1 ;;
+        *) NEED_SETLOCALE_IMPROVED=1 ;;
       esac
       ;;
   esac
+  AC_DEFINE_UNQUOTED([NEED_SETLOCALE_IMPROVED], [$NEED_SETLOCALE_IMPROVED],
+    [Define to 1 to enable general improvements of setlocale.])
+
+  dnl Test whether we need a multithread-safe setlocale(category,NULL).
+  NEED_SETLOCALE_MTSAFE=0
+  if test $SETLOCALE_NULL_ALL_MTSAFE = 0 || test $SETLOCALE_NULL_ONE_MTSAFE = 0; then
+    NEED_SETLOCALE_MTSAFE=1
+  fi
+  AC_DEFINE_UNQUOTED([NEED_SETLOCALE_MTSAFE], [$NEED_SETLOCALE_MTSAFE],
+    [Define to 1 to enable a multithread-safety fix of setlocale.])
+
+  if test $NEED_SETLOCALE_IMPROVED = 1 || test $NEED_SETLOCALE_MTSAFE = 1; then
+    REPLACE_SETLOCALE=1
+  fi
+
+  if test $NEED_SETLOCALE_MTSAFE = 1; then
+    LIB_SETLOCALE="$LIB_SETLOCALE_NULL"
+  else
+    LIB_SETLOCALE=
+  fi
+  dnl LIB_SETLOCALE is expected to be '-pthread' or '-lpthread' on AIX with gcc
+  dnl or xlc, and empty otherwise.
+  AC_SUBST([LIB_SETLOCALE])
 ])
 
 # Prerequisites of lib/setlocale.c.

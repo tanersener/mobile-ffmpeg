@@ -2,7 +2,7 @@
 
 # See if we need to emulate a missing ftruncate function using chsize.
 
-# Copyright (C) 2000-2001, 2003-2007, 2009-2019 Free Software Foundation, Inc.
+# Copyright (C) 2000-2001, 2003-2007, 2009-2020 Free Software Foundation, Inc.
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -20,7 +20,7 @@ AC_DEFUN([gl_FUNC_FTRUNCATE],
           dnl The MSVCRT _chsize() function only accepts a 32-bit file size,
           dnl and the mingw64 ftruncate64() function is unreliable (it may
           dnl delete the file, see
-          dnl <http://mingw-w64.sourcearchive.com/documentation/2.0-1/ftruncate64_8c_source.html>).
+          dnl <https://web.archive.org/web/20160425005423/http://mingw-w64.sourcearchive.com/documentation/2.0-1/ftruncate64_8c_source.html>).
           dnl Use gnulib's ftruncate() implementation instead.
           REPLACE_FTRUNCATE=1
           ;;

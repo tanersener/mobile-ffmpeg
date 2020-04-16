@@ -23,6 +23,7 @@ SUBDIRS = . devel mpn mpz mpq mpf rand misc cxx
 include ../mpn/Makeasm.am
 
 AM_CPPFLAGS = -I$(top_srcdir)
+AM_LDFLAGS = -no-install
 LDADD = libtests.la $(top_builddir)/libgmp.la
 
 check_LTLIBRARIES = libtests.la

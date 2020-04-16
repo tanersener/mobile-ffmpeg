@@ -70,12 +70,12 @@ check_if_dependency_rebuilt() {
             set_dependency_rebuilt_flag "leptonica"
             set_dependency_rebuilt_flag "tesseract"
         ;;
+        libsamplerate)
+            set_dependency_rebuilt_flag "rubberband"
+        ;;
         libsndfile)
             set_dependency_rebuilt_flag "twolame"
-        ;;
-        libuuid)
-            set_dependency_rebuilt_flag "fontconfig"
-            set_dependency_rebuilt_flag "libass"
+            set_dependency_rebuilt_flag "rubberband"
         ;;
         libvorbis)
             set_dependency_rebuilt_flag "libtheora"
@@ -116,7 +116,7 @@ fi
 # FILTERING WHICH EXTERNAL LIBRARIES WILL BE BUILT
 # NOTE THAT BUILT-IN LIBRARIES ARE FORWARDED TO FFMPEG SCRIPT WITHOUT ANY PROCESSING
 enabled_library_list=()
-for library in {1..41}
+for library in {1..42}
 do
     if [[ ${!library} -eq 1 ]]; then
         ENABLED_LIBRARY=$(get_library_name $((library - 1)))
@@ -133,7 +133,7 @@ while [ ${#enabled_library_list[@]} -gt $completed ]; do
         let run=0
         case $library in
             fontconfig)
-                if [[ ! -z $OK_libuuid ]] && [[ ! -z $OK_expat ]] && [[ ! -z $OK_freetype ]]; then
+                if [[ ! -z $OK_expat ]] && [[ ! -z $OK_freetype ]]; then
                     run=1
                 fi
             ;;
@@ -153,7 +153,7 @@ while [ ${#enabled_library_list[@]} -gt $completed ]; do
                 fi
             ;;
             libass)
-                if [[ ! -z $OK_libuuid ]] && [[ ! -z $OK_expat ]] && [[ ! -z $OK_freetype ]] && [[ ! -z $OK_fribidi ]] && [[ ! -z $OK_fontconfig ]] && [[ ! -z $OK_libpng ]]; then
+                if [[ ! -z $OK_expat ]] && [[ ! -z $OK_freetype ]] && [[ ! -z $OK_fribidi ]] && [[ ! -z $OK_fontconfig ]] && [[ ! -z $OK_libpng ]]; then
                     run=1
                 fi
             ;;
@@ -174,6 +174,11 @@ while [ ${#enabled_library_list[@]} -gt $completed ]; do
             ;;
             nettle)
                 if [[ ! -z $OK_gmp ]]; then
+                    run=1
+                fi
+            ;;
+            rubberband)
+                if [[ ! -z $OK_libsndfile ]] && [[ ! -z $OK_libsamplerate ]]; then
                     run=1
                 fi
             ;;
@@ -229,7 +234,7 @@ while [ ${#enabled_library_list[@]} -gt $completed ]; do
 
                 cd ${BASEDIR}
 
-                # BUILD EACH LIBRARY ALONE FIRST
+                # BUILD EACH LIBRARY ALONE
                 ${SCRIPT_PATH} 1>>${BASEDIR}/build.log 2>&1
 
                 if [ $? -eq 0 ]; then

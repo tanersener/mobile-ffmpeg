@@ -7,7 +7,7 @@ IT IS ONLY SAFE TO REACH IT THROUGH DOCUMENTED INTERFACES.
 IN FACT, IT IS ALMOST GUARANTEED THAT IT WILL CHANGE OR
 DISAPPEAR IN A FUTURE GNU MP RELEASE.
 
-Copyright 2010-2012 Free Software Foundation, Inc.
+Copyright 2010-2012, 2015, 2016 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -35,46 +35,7 @@ You should have received copies of the GNU General Public License and the
 GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
-#include "gmp.h"
 #include "gmp-impl.h"
-
-/**************************************************************/
-/* Section macros: common macros, for mswing/fac/bin (&sieve) */
-/**************************************************************/
-
-#define LOOP_ON_SIEVE_CONTINUE(prime,end,sieve)			\
-    __max_i = (end);						\
-								\
-    do {							\
-      ++__i;							\
-      if (((sieve)[__index] & __mask) == 0)			\
-	{							\
-	  (prime) = id_to_n(__i)
-
-#define LOOP_ON_SIEVE_BEGIN(prime,start,end,off,sieve)		\
-  do {								\
-    mp_limb_t __mask, __index, __max_i, __i;			\
-								\
-    __i = (start)-(off);					\
-    __index = __i / GMP_LIMB_BITS;				\
-    __mask = CNST_LIMB(1) << (__i % GMP_LIMB_BITS);		\
-    __i += (off);						\
-								\
-    LOOP_ON_SIEVE_CONTINUE(prime,end,sieve)
-
-#define LOOP_ON_SIEVE_STOP					\
-	}							\
-      __mask = __mask << 1 | __mask >> (GMP_LIMB_BITS-1);	\
-      __index += __mask & 1;					\
-    }  while (__i <= __max_i)					\
-
-#define LOOP_ON_SIEVE_END					\
-    LOOP_ON_SIEVE_STOP;						\
-  } while (0)
-
-/*********************************************************/
-/* Section sieve: sieving functions and tools for primes */
-/*********************************************************/
 
 #if 0
 static mp_limb_t
@@ -96,11 +57,30 @@ primesieve_size (mp_limb_t n) { return n_to_bit(n) / GMP_LIMB_BITS + 1; }
 
 #if GMP_LIMB_BITS > 61
 #define SIEVE_SEED CNST_LIMB(0x3294C9E069128480)
+#if GMP_LIMB_BITS == 64
+/* 110bits pre-sieved mask for primes 5, 11*/
+#define SIEVE_MASK1 CNST_LIMB(0x81214a1204892058)
+#define SIEVE_MASKT CNST_LIMB(0xc8130681244)
+/* 182bits pre-sieved mask for primes 7, 13*/
+#define SIEVE_2MSK1 CNST_LIMB(0x9402180c40230184)
+#define SIEVE_2MSK2 CNST_LIMB(0x0285021088402120)
+#define SIEVE_2MSKT CNST_LIMB(0xa41210084421)
+#define SEED_LIMIT 210
+#else
 #define SEED_LIMIT 202
+#endif
 #else
 #if GMP_LIMB_BITS > 30
 #define SIEVE_SEED CNST_LIMB(0x69128480)
+#if GMP_LIMB_BITS == 32
+/* 70bits pre-sieved mask for primes 5, 7*/
+#define SIEVE_MASK1 CNST_LIMB(0x12148960)
+#define SIEVE_MASK2 CNST_LIMB(0x44a120cc)
+#define SIEVE_MASKT CNST_LIMB(0x1a)
+#define SEED_LIMIT 120
+#else
 #define SEED_LIMIT 114
+#endif
 #else
 #if GMP_LIMB_BITS > 15
 #define SIEVE_SEED CNST_LIMB(0x8480)
@@ -117,32 +97,179 @@ primesieve_size (mp_limb_t n) { return n_to_bit(n) / GMP_LIMB_BITS + 1; }
 #endif /* 30 */
 #endif /* 61 */
 
+#define SET_OFF1(m1, m2, M1, M2, off, BITS)		\
+  if (off) {						\
+    if (off < GMP_LIMB_BITS) {				\
+      m1 = (M1 >> off) | (M2 << (GMP_LIMB_BITS - off));	\
+      if (off <= BITS - GMP_LIMB_BITS) {		\
+	m2 = M1 << (BITS - GMP_LIMB_BITS - off)		\
+	  | M2 >> off;					\
+      } else {						\
+	m1 |= M1 << (BITS - off);			\
+	m2 = M1 >> (off + GMP_LIMB_BITS - BITS);	\
+      }							\
+    } else {						\
+      m1 = M1 << (BITS - off)				\
+	| M2 >> (off - GMP_LIMB_BITS);			\
+      m2 = M2 << (BITS - off)				\
+	| M1 >> (off + GMP_LIMB_BITS - BITS);		\
+    }							\
+  } else {						\
+    m1 = M1; m2 = M2;					\
+  }
+
+#define SET_OFF2(m1, m2, m3, M1, M2, M3, off, BITS)	\
+  if (off) {						\
+    if (off <= GMP_LIMB_BITS) {				\
+      m1 = M2 << (GMP_LIMB_BITS - off);			\
+      m2 = M3 << (GMP_LIMB_BITS - off);			\
+      if (off != GMP_LIMB_BITS) {			\
+	m1 |= (M1 >> off);				\
+	m2 |= (M2 >> off);				\
+      }							\
+      if (off <= BITS - 2 * GMP_LIMB_BITS) {		\
+	m3 = M1 << (BITS - 2 * GMP_LIMB_BITS - off)	\
+	  | M3 >> off;					\
+      } else {						\
+	m2 |= M1 << (BITS - GMP_LIMB_BITS - off);	\
+	m3 = M1 >> (off + 2 * GMP_LIMB_BITS - BITS);	\
+      }							\
+    } else if (off < 2 *GMP_LIMB_BITS) {		\
+      m1 = M2 >> (off - GMP_LIMB_BITS)			\
+	| M3 << (2 * GMP_LIMB_BITS - off);		\
+      if (off <= BITS - GMP_LIMB_BITS) {		\
+	m2 = M3 >> (off - GMP_LIMB_BITS)		\
+	  | M1 << (BITS - GMP_LIMB_BITS - off);		\
+	m3 = M2 << (BITS - GMP_LIMB_BITS - off);	\
+	if (off != BITS - GMP_LIMB_BITS) {		\
+	  m3 |= M1 >> (off + 2 * GMP_LIMB_BITS - BITS);	\
+	}						\
+      } else {						\
+	m1 |= M1 << (BITS - off);			\
+	m2 = M2 << (BITS - off)				\
+	  | M1 >> (GMP_LIMB_BITS - BITS + off);		\
+	m3 = M2 >> (GMP_LIMB_BITS - BITS + off);	\
+      }							\
+    } else {						\
+      m1 = M1 << (BITS - off)				\
+	| M3 >> (off - 2 * GMP_LIMB_BITS);		\
+      m2 = M2 << (BITS - off)				\
+	| M1 >> (off + GMP_LIMB_BITS - BITS);		\
+      m3 = M3 << (BITS - off)				\
+	| M2 >> (off + GMP_LIMB_BITS - BITS);		\
+    }							\
+  } else {						\
+    m1 = M1; m2 = M2; m3 = M3;				\
+  }
+
+#define ROTATE1(m1, m2, BITS)			\
+  do {						\
+    mp_limb_t __tmp;				\
+    __tmp = m1 >> (2 * GMP_LIMB_BITS - BITS);	\
+    m1 = (m1 << (BITS - GMP_LIMB_BITS)) | m2;	\
+    m2 = __tmp;					\
+  } while (0)
+
+#define ROTATE2(m1, m2, m3, BITS)		\
+  do {						\
+    mp_limb_t __tmp;				\
+    __tmp = m2 >> (3 * GMP_LIMB_BITS - BITS);	\
+    m2 = m2 << (BITS - GMP_LIMB_BITS * 2)	\
+      | m1 >> (3 * GMP_LIMB_BITS - BITS);	\
+    m1 = m1 << (BITS - GMP_LIMB_BITS * 2) | m3;	\
+    m3 = __tmp;					\
+  } while (0)
+
+static mp_limb_t
+fill_bitpattern (mp_ptr bit_array, mp_size_t limbs, mp_limb_t offset)
+{
+#ifdef SIEVE_2MSK2
+  mp_limb_t m11, m12, m21, m22, m23;
+
+  if (offset == 0) { /* This branch is not needed. */
+    m11 = SIEVE_MASK1;
+    m12 = SIEVE_MASKT;
+    m21 = SIEVE_2MSK1;
+    m22 = SIEVE_2MSK2;
+    m23 = SIEVE_2MSKT;
+  } else { /* correctly handle offset == 0... */
+    m21 = offset % 110;
+    SET_OFF1 (m11, m12, SIEVE_MASK1, SIEVE_MASKT, m21, 110);
+    offset %= 182;
+    SET_OFF2 (m21, m22, m23, SIEVE_2MSK1, SIEVE_2MSK2, SIEVE_2MSKT, offset, 182);
+  }
+  /* THINK: Consider handling odd values of 'limbs' outside the loop,
+     to have a single exit condition. */
+  do {
+    bit_array[0] = m11 | m21;
+    if (--limbs == 0)
+      break;
+    ROTATE1 (m11, m12, 110);
+    bit_array[1] = m11 | m22;
+    bit_array += 2;
+    ROTATE1 (m11, m12, 110);
+    ROTATE2 (m21, m22, m23, 182);
+  } while (--limbs != 0);
+  return 4;
+#else
+#ifdef SIEVE_MASK2
+  mp_limb_t mask, mask2, tail;
+
+  if (offset == 0) { /* This branch is not needed. */
+    mask = SIEVE_MASK1;
+    mask2 = SIEVE_MASK2;
+    tail = SIEVE_MASKT;
+  } else { /* correctly handle offset == 0... */
+    offset %= 70;
+    SET_OFF2 (mask, mask2, tail, SIEVE_MASK1, SIEVE_MASK2, SIEVE_MASKT, offset, 70);
+  }
+  /* THINK: Consider handling odd values of 'limbs' outside the loop,
+     to have a single exit condition. */
+  do {
+    bit_array[0] = mask;
+    if (--limbs == 0)
+      break;
+    bit_array[1] = mask2;
+    bit_array += 2;
+    ROTATE2 (mask, mask2, tail, 70);
+  } while (--limbs != 0);
+  return 2;
+#else
+  MPN_FILL (bit_array, limbs, CNST_LIMB(0));
+  return 0;
+#endif
+#endif
+}
+
 static void
 first_block_primesieve (mp_ptr bit_array, mp_limb_t n)
 {
   mp_size_t bits, limbs;
+  mp_limb_t i;
 
   ASSERT (n > 4);
 
   bits  = n_to_bit(n);
-  limbs = bits / GMP_LIMB_BITS + 1;
+  limbs = bits / GMP_LIMB_BITS;
 
-  /* FIXME: We can skip 5 too, filling with a 5-part pattern. */
-  MPN_ZERO (bit_array, limbs);
+  if (limbs != 0)
+    i = fill_bitpattern (bit_array + 1, limbs, 0);
   bit_array[0] = SIEVE_SEED;
 
   if ((bits + 1) % GMP_LIMB_BITS != 0)
-    bit_array[limbs-1] |= MP_LIMB_T_MAX << ((bits + 1) % GMP_LIMB_BITS);
+    bit_array[limbs] |= MP_LIMB_T_MAX << ((bits + 1) % GMP_LIMB_BITS);
 
   if (n > SEED_LIMIT) {
-    mp_limb_t mask, index, i;
+    mp_limb_t mask, index;
 
-    ASSERT (n > 49);
+    ASSERT (i < GMP_LIMB_BITS);
 
-    mask = 1;
+    if (n_to_bit (SEED_LIMIT + 1) < GMP_LIMB_BITS)
+      i = 0;
+    mask = CNST_LIMB(1) << i;
     index = 0;
-    i = 1;
     do {
+      ++i;
       if ((bit_array[index] & mask) == 0)
 	{
 	  mp_size_t step, lindex;
@@ -177,67 +304,75 @@ first_block_primesieve (mp_ptr bit_array, mp_limb_t n)
 	}
       mask = mask << 1 | mask >> (GMP_LIMB_BITS-1);
       index += mask & 1;
-      i++;
     } while (1);
   }
 }
 
 static void
 block_resieve (mp_ptr bit_array, mp_size_t limbs, mp_limb_t offset,
-		      mp_srcptr sieve, mp_limb_t sieve_bits)
+	       mp_srcptr sieve)
 {
-  mp_size_t bits, step;
+  mp_size_t bits, off = offset;
+  mp_limb_t mask, index, i;
 
   ASSERT (limbs > 0);
+  ASSERT (offset >= GMP_LIMB_BITS);
 
   bits = limbs * GMP_LIMB_BITS - 1;
 
-  /* FIXME: We can skip 5 too, filling with a 5-part pattern. */
-  MPN_ZERO (bit_array, limbs);
+  i = fill_bitpattern (bit_array, limbs, offset - GMP_LIMB_BITS);
 
-  LOOP_ON_SIEVE_BEGIN(step,0,sieve_bits,0,sieve);
-  {
-    mp_size_t lindex;
-    mp_limb_t lmask;
-    unsigned  maskrot;
+  ASSERT (i < GMP_LIMB_BITS);
 
-/*  lindex = n_to_bit(id_to_n(i)*id_to_n(i)); */
-    lindex = __i*(step+1)-1+(-(__i&1)&(__i+1));
-/*  lindex = __i*(step+1+(__i&1))-1+(__i&1); */
-    if (lindex > bits + offset)
-      break;
+  mask = CNST_LIMB(1) << i;
+  index = 0;
+  do {
+    ++i;
+    if ((sieve[index] & mask) == 0)
+      {
+	mp_size_t step, lindex;
+	mp_limb_t lmask;
+	unsigned  maskrot;
 
-    step <<= 1;
-    maskrot = step % GMP_LIMB_BITS;
+	step = id_to_n(i);
 
-    if (lindex < offset)
-      lindex += step * ((offset - lindex - 1) / step + 1);
+/*	lindex = n_to_bit(id_to_n(i)*id_to_n(i)); */
+	lindex = i*(step+1)-1+(-(i&1)&(i+1));
+/*	lindex = i*(step+1+(i&1))-1+(i&1); */
+	if (lindex > bits + off)
+	  break;
 
-    lindex -= offset;
+	step <<= 1;
+	maskrot = step % GMP_LIMB_BITS;
 
-    lmask = CNST_LIMB(1) << (lindex % GMP_LIMB_BITS);
-    for ( ; lindex <= bits; lindex += step) {
-      bit_array[lindex / GMP_LIMB_BITS] |= lmask;
-      lmask = lmask << maskrot | lmask >> (GMP_LIMB_BITS - maskrot);
-    };
+	if (lindex < off)
+	  lindex += step * ((off - lindex - 1) / step + 1);
 
-/*  lindex = n_to_bit(id_to_n(i)*bit_to_n(i)); */
-    lindex = __i*(__i*3+6)+(__i&1);
-    if (lindex > bits + offset)
-      continue;
+	lindex -= off;
 
-    if (lindex < offset)
-      lindex += step * ((offset - lindex - 1) / step + 1);
+	lmask = CNST_LIMB(1) << (lindex % GMP_LIMB_BITS);
+	for ( ; lindex <= bits; lindex += step) {
+	  bit_array[lindex / GMP_LIMB_BITS] |= lmask;
+	  lmask = lmask << maskrot | lmask >> (GMP_LIMB_BITS - maskrot);
+	};
 
-    lindex -= offset;
+/*	lindex = n_to_bit(id_to_n(i)*bit_to_n(i)); */
+	lindex = i*(i*3+6)+(i&1);
 
-    lmask = CNST_LIMB(1) << (lindex % GMP_LIMB_BITS);
-    for ( ; lindex <= bits; lindex += step) {
-      bit_array[lindex / GMP_LIMB_BITS] |= lmask;
-      lmask = lmask << maskrot | lmask >> (GMP_LIMB_BITS - maskrot);
-    };
-  }
-  LOOP_ON_SIEVE_END;
+	if (lindex < off)
+	  lindex += step * ((off - lindex - 1) / step + 1);
+
+	lindex -= off;
+
+	lmask = CNST_LIMB(1) << (lindex % GMP_LIMB_BITS);
+	for ( ; lindex <= bits; lindex += step) {
+	  bit_array[lindex / GMP_LIMB_BITS] |= lmask;
+	  lmask = lmask << maskrot | lmask >> (GMP_LIMB_BITS - maskrot);
+	};
+      }
+      mask = mask << 1 | mask >> (GMP_LIMB_BITS-1);
+      index += mask & 1;
+  } while (1);
 }
 
 #define BLOCK_SIZE 2048
@@ -273,8 +408,9 @@ gmp_primesieve (mp_ptr bit_array, mp_limb_t n)
     mp_size_t off;
     off = BLOCK_SIZE + (size % BLOCK_SIZE);
     first_block_primesieve (bit_array, id_to_n (off * GMP_LIMB_BITS));
-    for ( ; off < size; off += BLOCK_SIZE)
-      block_resieve (bit_array + off, BLOCK_SIZE, off * GMP_LIMB_BITS, bit_array, off * GMP_LIMB_BITS - 1);
+    do {
+      block_resieve (bit_array + off, BLOCK_SIZE, off * GMP_LIMB_BITS, bit_array);
+    } while ((off += BLOCK_SIZE) < size);
   } else {
     first_block_primesieve (bit_array, n);
   }
@@ -282,14 +418,19 @@ gmp_primesieve (mp_ptr bit_array, mp_limb_t n)
   if ((bits + 1) % GMP_LIMB_BITS != 0)
     bit_array[size-1] |= MP_LIMB_T_MAX << ((bits + 1) % GMP_LIMB_BITS);
 
-
   return size * GMP_LIMB_BITS - mpn_popcount (bit_array, size);
 }
 
 #undef BLOCK_SIZE
 #undef SEED_LIMIT
 #undef SIEVE_SEED
-#undef LOOP_ON_SIEVE_END
-#undef LOOP_ON_SIEVE_STOP
-#undef LOOP_ON_SIEVE_BEGIN
-#undef LOOP_ON_SIEVE_CONTINUE
+#undef SIEVE_MASK1
+#undef SIEVE_MASK2
+#undef SIEVE_MASKT
+#undef SIEVE_2MSK1
+#undef SIEVE_2MSK2
+#undef SIEVE_2MSKT
+#undef SET_OFF1
+#undef SET_OFF2
+#undef ROTATE1
+#undef ROTATE2

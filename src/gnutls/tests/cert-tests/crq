@@ -147,6 +147,97 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
+# check whether the generation with extension works
+datefudge -s "2007-04-22" \
+	"${CERTTOOL}" --generate-request \
+		--load-privkey "${srcdir}/data/template-test.key" \
+		--template "${srcdir}/templates/arb-extensions.tmpl" \
+		--outfile $OUTFILE 2>/dev/null
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "add_extension crq failed"
+	exit ${rc}
+fi
+
+${DIFF} --ignore-matching-lines "Algorithm Security Level" "${srcdir}/data/arb-extensions.csr" "${OUTFILE}" >/dev/null 2>&1
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "Certificate request generation with explicit extensions failed"
+	exit ${rc}
+fi
+
+# Generate certificate from CRQ with no explicit extensions
+datefudge -s "2007-04-22" \
+	"${CERTTOOL}" --generate-certificate \
+		--load-ca-privkey "${srcdir}/../../doc/credentials/x509/ca-key.pem" \
+		--load-ca-certificate "${srcdir}/../../doc/credentials/x509/ca.pem" \
+		--load-request "${srcdir}/data/arb-extensions.csr" \
+		--template "${srcdir}/templates/template-no-ca.tmpl" \
+		--outfile "${OUTFILE}" 2>/dev/null
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "generate certificate with crq failed"
+	exit ${rc}
+fi
+
+${DIFF} --ignore-matching-lines "Algorithm Security Level" "${srcdir}/data/crq-cert-no-ca.pem" "${OUTFILE}" >/dev/null 2>&1
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "Certificate from request generation failed"
+	exit ${rc}
+fi
+
+# Generate certificate from CRQ with CRQ extensions
+datefudge -s "2007-04-22" \
+	"${CERTTOOL}" --generate-certificate \
+		--load-ca-privkey "${srcdir}/../../doc/credentials/x509/ca-key.pem" \
+		--load-ca-certificate "${srcdir}/../../doc/credentials/x509/ca.pem" \
+		--load-request "${srcdir}/data/arb-extensions.csr" \
+		--template "${srcdir}/templates/template-no-ca-honor.tmpl" \
+		--outfile "${OUTFILE}" 2>/dev/null
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "generate certificate with crq failed"
+	exit ${rc}
+fi
+
+${DIFF} --ignore-matching-lines "Algorithm Security Level" "${srcdir}/data/crq-cert-no-ca-honor.pem" "${OUTFILE}" >/dev/null 2>&1
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "Certificate from request generation with honor flag failed"
+	exit ${rc}
+fi
+
+# Generate certificate from CRQ with explicit extensions
+datefudge -s "2007-04-22" \
+	"${CERTTOOL}" --generate-certificate \
+		--load-ca-privkey "${srcdir}/../../doc/credentials/x509/ca-key.pem" \
+		--load-ca-certificate "${srcdir}/../../doc/credentials/x509/ca.pem" \
+		--load-request "${srcdir}/data/arb-extensions.csr" \
+		--template "${srcdir}/templates/template-no-ca-explicit.tmpl" \
+		--outfile "${OUTFILE}" 2>/dev/null
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "generate certificate with crq failed"
+	exit ${rc}
+fi
+
+${DIFF} --ignore-matching-lines "Algorithm Security Level" "${srcdir}/data/crq-cert-no-ca-explicit.pem" "${OUTFILE}" >/dev/null 2>&1
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "Certificate from request generation with explicit extensions failed"
+	exit ${rc}
+fi
+
+
 rm -f "${OUTFILE}" "${OUTFILE2}" "${TMPFILE}"
 
 exit 0

@@ -27,12 +27,12 @@ else
     . ${BASEDIR}/build/ios-common.sh
 fi
 
-# PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
+# PREPARE PATHS & DEFINE ${INSTALL_PKG_CONFIG_DIR}
 LIB_NAME="nettle"
 set_toolchain_clang_paths ${LIB_NAME}
 
 # PREPARING FLAGS
-TARGET_HOST=$(get_target_host)
+BUILD_HOST=$(get_build_host)
 export CFLAGS=$(get_cflags ${LIB_NAME})
 export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 export LDFLAGS=$(get_ldflags ${LIB_NAME})
@@ -42,7 +42,7 @@ case ${ARCH} in
     armv7 | armv7s | arm64 | arm64e)
         OPTIONAL_CPU_SUPPORT="--enable-arm-neon"
     ;;
-    i386 | x86-64)
+    i386 | x86-64 | x86-64-mac-catalyst)
         OPTIONAL_CPU_SUPPORT="--enable-x86-aesni"
     ;;
 esac
@@ -51,7 +51,7 @@ cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
 make distclean 2>/dev/null 1>/dev/null
 
-# RECONFIGURING IF REQUESTED
+# RECONFIGURE IF REQUESTED
 if [[ ${RECONF_nettle} -eq 1 ]]; then
     autoreconf_library ${LIB_NAME}
 fi
@@ -69,7 +69,7 @@ fi
     --disable-gcov \
     --disable-documentation \
     ${OPTIONAL_CPU_SUPPORT} \
-    --host=${TARGET_HOST} || exit 1
+    --host=${BUILD_HOST} || exit 1
 
 make -j$(get_cpu_count) || exit 1
 

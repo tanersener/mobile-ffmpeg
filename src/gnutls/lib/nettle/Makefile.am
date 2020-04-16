@@ -82,18 +82,77 @@ libcrypto_la_SOURCES += \
 libcrypto_la_SOURCES += \
 	gost/bignum-le.c gost/bignum-le.h
 
-libcrypto_la_SOURCES += \
-	gost/pbkdf2-hmac-gosthash94.c gost/pbkdf2-hmac-streebog.c \
-	gost/pbkdf2-gost.h
-
+if NEED_GOSTDSA
 libcrypto_la_SOURCES += \
 	gost/nettle-internal.h \
 	gost/ecc-gost256cpa.c gost/ecc-gost256cpa-32.h  gost/ecc-gost256cpa-64.h\
 	gost/ecc-gost512a.c gost/ecc-gost512a-32.h gost/ecc-gost512a-64.h \
 	gost/ecc-internal.h gost/gmp-glue.h \
 	gost/ecc-gostdsa-sign.c gost/ecc-gostdsa-verify.c \
-	gost/gostdsa-mask.c gost/gostdsa-sign.c gost/gostdsa-verify.c gost/gostdsa-vko.c \
+	gost/gostdsa-sign.c gost/gostdsa-verify.c \
 	gost/gostdsa.h gost/ecc-gost-curve.h gost/ecc-gost-hash.c
+endif
+
+libcrypto_la_SOURCES += \
+	gost/gostdsa-mask.c gost/gostdsa-vko.c gost/gostdsa2.h
 
 libcrypto_la_SOURCES += gost_keywrap.c
+endif
+
+if NEED_CURVE448
+curve448_generated_headers = \
+	curve448/ecc-curve448-32.h curve448/ecc-curve448-64.h
+
+BUILT_SOURCES = $(curve448_generated_headers)
+EXTRA_DIST = $(curve448_generated_headers) curve448/eccdata.stamp
+
+noinst_PROGRAMS = curve448/eccdata$(EXEEXT)
+
+curve448_eccdata_SOURCES = curve448/eccdata.c
+curve448_eccdata_CFLAGS = $(GMP_CFLAGS)
+curve448_eccdata_LDADD = $(GMP_LIBS) ../../gl/libgnu.la
+
+curve448/eccdata.stamp: $(curve448_eccdata_SOURCES)
+	$(AM_V_GEN)$(MAKE) $(AM_MAKEFLAGS) curve448/eccdata$(EXEEXT) && touch $@
+
+curve448/ecc-curve448-32.h: curve448/eccdata.stamp
+	$(AM_V_GEN)curve448/eccdata$(EXEEXT) curve448 38 6 32 > $@T && mv $@T $@
+
+curve448/ecc-curve448-64.h: curve448/eccdata.stamp
+	$(AM_V_GEN)curve448/eccdata$(EXEEXT) curve448 38 6 64 > $@T && mv $@T $@
+
+libcrypto_la_SOURCES += \
+	curve448/nettle-write.h curve448/gmp-glue.h curve448/gmp-glue.c
+
+libcrypto_la_SOURCES += \
+	curve448/sha3.c curve448/sha3.h curve448/sha3-256.c \
+	curve448/sha3-permute.c curve448/sha3-internal.h \
+	curve448/shake256.c
+
+libcrypto_la_SOURCES += \
+	curve448/ecc-internal.h \
+	curve448/ecc-add-eh.c curve448/ecc-add-ehh.c curve448/ecc-dup-eh.c \
+	curve448/ecc-eh-to-a.c curve448/ecc-mul-a-eh.c curve448/ecc-mul-g-eh.c \
+	curve448/ecc-mul-m.c curve448/ecc-mod.c curve448/ecc-mod-arith.c \
+	curve448/ecc-mod-inv.c \
+	curve448/ecc-a-to-j.c \
+	curve448/sec-tabselect.c curve448/cnd-copy.c curve448/sec-add-1.c \
+	curve448/ecc-curve448.c $(curve448_genereated_headers) \
+	curve448/curve448-eh-to-x.c curve448/curve448.h curve448/curve448-mul.c \
+	curve448/curve448-mul-g.c
+
+libcrypto_la_SOURCES += \
+	curve448/eddsa.h curve448/eddsa-compress.c curve448/eddsa-decompress.c \
+	curve448/eddsa-expand.c curve448/eddsa-hash.c curve448/eddsa-internal.h \
+	curve448/eddsa-pubkey.c curve448/eddsa-sign.c curve448/eddsa-verify.c \
+	curve448/ed448-shake256.c curve448/ed448-shake256-pubkey.c \
+	curve448/ed448-shake256-sign.c curve448/ed448-shake256-verify.c
+endif
+
+if NEED_CHACHA
+libcrypto_la_SOURCES += \
+	chacha/chacha-core-internal.c chacha/chacha-crypt.c \
+	chacha/chacha-internal.h chacha/chacha-poly1305.c \
+	chacha/chacha-poly1305.h chacha/chacha-set-key.c \
+	chacha/chacha-set-nonce.c chacha/chacha.h
 endif

@@ -35,6 +35,7 @@ local-checks-to-skip = sc_GPL_version sc_bindtextdomain			\
 	sc_immutable_NEWS sc_program_name sc_prohibit_atoi_atof		\
 	sc_prohibit_always_true_header_tests                            \
 	sc_prohibit_empty_lines_at_EOF sc_prohibit_hash_without_use	\
+	sc_prohibit_gnu_make_extensions                                 \
 	sc_prohibit_have_config_h sc_prohibit_magic_number_exit		\
 	sc_prohibit_strcmp sc_require_config_h				\
 	sc_require_config_h_first sc_texinfo_acronym sc_trailing_blank	\
@@ -45,6 +46,7 @@ VC_LIST_ALWAYS_EXCLUDE_REGEX = ^maint.mk|gtk-doc.make|m4/pkg|doc/fdl-1.3.texi|sr
 update-copyright-env = UPDATE_COPYRIGHT_USE_INTERVALS=1
 
 # Explicit syntax-check exceptions.
+exclude_file_name_regexp--sc_copyright_check = ^./gnulib/.*$$
 exclude_file_name_regexp--sc_error_message_uppercase = ^doc/examples/ex-cxx.cpp|guile/src/core.c|src/certtool.c|src/ocsptool.c|src/crywrap/crywrap.c|tests/pkcs12_encode.c$$
 exclude_file_name_regexp--sc_file_system = ^doc/doxygen/Doxyfile
 exclude_file_name_regexp--sc_prohibit_cvs_keyword = ^lib/nettle/.*$$

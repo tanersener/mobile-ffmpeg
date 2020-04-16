@@ -30,7 +30,6 @@ You should have received copies of the GNU General Public License and the
 GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
-#include "gmp.h"
 #include "gmp-impl.h"
 #include "longlong.h"
 
@@ -81,7 +80,7 @@ mpz_nextprime (mpz_ptr p, mpz_srcptr n)
   TMP_SMARK;
 
   /* Compute residues modulo small odd primes */
-  moduli = TMP_SALLOC_TYPE (prime_limit * sizeof moduli[0], unsigned short);
+  moduli = TMP_SALLOC_TYPE (prime_limit, unsigned short);
 
   for (;;)
     {
@@ -89,7 +88,7 @@ mpz_nextprime (mpz_ptr p, mpz_srcptr n)
       prime = 3;
       for (i = 0; i < prime_limit; i++)
 	{
-	  moduli[i] = mpz_fdiv_ui (p, prime);
+	  moduli[i] = mpz_tdiv_ui (p, prime);
 	  prime += primegap[i];
 	}
 

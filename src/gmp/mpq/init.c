@@ -1,6 +1,7 @@
 /* mpq_init -- Make a new rational number with value 0/1.
 
-Copyright 1991, 1994, 1995, 2000-2002 Free Software Foundation, Inc.
+Copyright 1991, 1994, 1995, 2000-2002, 2015, 2018 Free Software
+Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -28,22 +29,17 @@ You should have received copies of the GNU General Public License and the
 GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
-#include "gmp.h"
 #include "gmp-impl.h"
 
 void
 mpq_init (mpq_t x)
 {
-  ALLOC(NUM(x)) = 1;
-  PTR(NUM(x)) = __GMP_ALLOCATE_FUNC_LIMBS (1);
+  static const mp_limb_t dummy_limb=0xc1a0;
+  ALLOC(NUM(x)) = 0;
+  PTR(NUM(x)) = (mp_ptr) &dummy_limb;
   SIZ(NUM(x)) = 0;
   ALLOC(DEN(x)) = 1;
   PTR(DEN(x)) = __GMP_ALLOCATE_FUNC_LIMBS (1);
   PTR(DEN(x))[0] = 1;
   SIZ(DEN(x)) = 1;
-
-#ifdef __CHECKER__
-  /* let the low limb look initialized, for the benefit of mpz_get_ui etc */
-  PTR(NUM(x))[0] = 0;
-#endif
 }

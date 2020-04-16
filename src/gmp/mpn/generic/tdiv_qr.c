@@ -5,13 +5,13 @@
    operands are unaffected.
 
    Preconditions:
-   1. The most significant limb of of the divisor must be non-zero.
+   1. The most significant limb of the divisor must be non-zero.
    2. nn >= dn, even if qxn is non-zero.  (??? relax this ???)
 
    The time complexity of this is O(qn*qn+M(dn,qn)), where M(m,n) is the time
    complexity of multiplication.
 
-Copyright 1997, 2000-2002, 2005, 2009 Free Software Foundation, Inc.
+Copyright 1997, 2000-2002, 2005, 2009, 2015 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -39,7 +39,6 @@ You should have received copies of the GNU General Public License and the
 GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
-#include "gmp.h"
 #include "gmp-impl.h"
 #include "longlong.h"
 
@@ -69,17 +68,16 @@ mpn_tdiv_qr (mp_ptr qp, mp_ptr rp, mp_size_t qxn,
 
     case 2:
       {
-	mp_ptr n2p, d2p;
+	mp_ptr n2p;
 	mp_limb_t qhl, cy;
 	TMP_DECL;
 	TMP_MARK;
 	if ((dp[1] & GMP_NUMB_HIGHBIT) == 0)
 	  {
 	    int cnt;
-	    mp_limb_t dtmp[2];
+	    mp_limb_t d2p[2];
 	    count_leading_zeros (cnt, dp[1]);
 	    cnt -= GMP_NAIL_BITS;
-	    d2p = dtmp;
 	    d2p[1] = (dp[1] << cnt) | (dp[0] >> (GMP_NUMB_BITS - cnt));
 	    d2p[0] = (dp[0] << cnt) & GMP_NUMB_MASK;
 	    n2p = TMP_ALLOC_LIMBS (nn + 1);
@@ -94,10 +92,9 @@ mpn_tdiv_qr (mp_ptr qp, mp_ptr rp, mp_size_t qxn,
 	  }
 	else
 	  {
-	    d2p = (mp_ptr) dp;
 	    n2p = TMP_ALLOC_LIMBS (nn);
 	    MPN_COPY (n2p, np, nn);
-	    qhl = mpn_divrem_2 (qp, 0L, n2p, nn, d2p);
+	    qhl = mpn_divrem_2 (qp, 0L, n2p, nn, dp);
 	    qp[nn - 2] = qhl;	/* always store nn-2+1 quotient limbs */
 	    rp[0] = n2p[0];
 	    rp[1] = n2p[1];

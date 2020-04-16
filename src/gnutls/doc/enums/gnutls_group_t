@@ -16,6 +16,8 @@ the SECP384R1 curve group
 the SECP521R1 curve group
 @item GNUTLS_@-GROUP_@-X25519
 the X25519 curve group
+@item GNUTLS_@-GROUP_@-X448
+the X448 curve group
 @item GNUTLS_@-GROUP_@-GC256A
 the GOST R 34.10 TC26 256 A curve group
 @item GNUTLS_@-GROUP_@-GC256B

@@ -6,7 +6,7 @@
    SAFE TO REACH THEM THROUGH DOCUMENTED INTERFACES.  IN FACT, IT IS ALMOST
    GUARANTEED THAT THEY WILL CHANGE OR DISAPPEAR IN A FUTURE GMP RELEASE.
 
-Copyright (C) 2004-2007, 2009, 2012 Free Software Foundation, Inc.
+Copyright (C) 2004-2007, 2009, 2012, 2017 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -34,7 +34,6 @@ You should have received copies of the GNU General Public License and the
 GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
-#include "gmp.h"
 #include "gmp-impl.h"
 
 
@@ -83,6 +82,8 @@ mpn_binvert (mp_ptr rp, mp_srcptr up, mp_size_t n, mp_ptr scratch)
     mpn_sbpi1_bdiv_q (rp, xp, rn, up, rn, -di);
   else
     mpn_dcpi1_bdiv_q (rp, xp, rn, up, rn, -di);
+
+  mpn_neg (rp, rp, rn);
 
   /* Use Newton iterations to get the desired precision.  */
   for (; rn < n; rn = newrn)

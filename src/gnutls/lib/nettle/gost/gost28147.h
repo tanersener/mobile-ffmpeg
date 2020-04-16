@@ -73,7 +73,6 @@ extern "C" {
 #define gost28147_key_wrap_cryptopro _gnutls_gost28147_key_wrap_cryptopro
 #define gost28147_key_unwrap_cryptopro _gnutls_gost28147_key_unwrap_cryptopro
 
-#define gost28147_imit_init _gnutls_gost28147_imit_init
 #define gost28147_imit_set_key _gnutls_gost28147_imit_set_key
 #define gost28147_imit_set_nonce _gnutls_gost28147_imit_set_nonce
 #define gost28147_imit_set_param _gnutls_gost28147_imit_set_param
@@ -184,9 +183,6 @@ struct gost28147_imit_ctx
   unsigned index;               /* Into buffer */
   uint32_t state[GOST28147_IMIT_BLOCK_SIZE/4];
 };
-
-void
-gost28147_imit_init(struct gost28147_imit_ctx *ctx);
 
 void
 gost28147_imit_set_key(struct gost28147_imit_ctx *ctx,

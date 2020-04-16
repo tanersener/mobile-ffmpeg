@@ -29,7 +29,6 @@ You should have received copies of the GNU General Public License and the
 GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
-#include "gmp.h"
 #include "gmp-impl.h"
 #include "longlong.h"
 
@@ -37,31 +36,31 @@ void
 mpz_tdiv_r (mpz_ptr rem, mpz_srcptr num, mpz_srcptr den)
 {
   mp_size_t ql;
-  mp_size_t ns, ds, nl, dl;
+  mp_size_t ns, nl, dl;
   mp_ptr np, dp, qp, rp;
   TMP_DECL;
 
   ns = SIZ (num);
-  ds = SIZ (den);
   nl = ABS (ns);
-  dl = ABS (ds);
+  dl = ABSIZ (den);
   ql = nl - dl + 1;
 
   if (UNLIKELY (dl == 0))
     DIVIDE_BY_ZERO;
 
-  rp = MPZ_REALLOC (rem, dl);
-
   if (ql <= 0)
     {
       if (num != rem)
 	{
+	  SIZ (rem) = ns;
+	  rp = MPZ_NEWALLOC (rem, nl);
 	  np = PTR (num);
 	  MPN_COPY (rp, np, nl);
-	  SIZ (rem) = SIZ (num);
 	}
       return;
     }
+
+  rp = MPZ_REALLOC (rem, dl);
 
   TMP_MARK;
   qp = TMP_ALLOC_LIMBS (ql);

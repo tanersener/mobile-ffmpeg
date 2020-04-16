@@ -31,8 +31,9 @@ dnl  see https://www.gnu.org/licenses/.
 include(`../config.m4')
 
 C	     cycles/limb
-C Cortex-A53	 ?
-C Cortex-A57	 ?
+C Cortex-A53	 4.5
+C Cortex-A57	 1.9
+C X-Gene	 4.36
 
 C TODO
 C  * Consider greater unrolling.
@@ -42,7 +43,7 @@ C    valgrind!)
 C  * Explore if explicit align directives, e.g., "[ptr:128]" help.
 C  * See rth's gmp-devel 2013-02/03 messages about final summation tricks.
 
-changecom(@&*$)
+changecom(blah)
 
 C INPUT PARAMETERS
 define(`ap', x0)

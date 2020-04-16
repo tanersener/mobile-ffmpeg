@@ -31,7 +31,6 @@ see https://www.gnu.org/licenses/.  */
 #include <cctype>
 #include <iostream>
 #include <string>
-#include "gmp.h"
 #include "gmp-impl.h"
 
 using namespace std;

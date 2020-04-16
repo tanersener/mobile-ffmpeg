@@ -27,12 +27,12 @@ else
     . ${BASEDIR}/build/ios-common.sh
 fi
 
-# PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
+# PREPARE PATHS & DEFINE ${INSTALL_PKG_CONFIG_DIR}
 LIB_NAME="gnutls"
 set_toolchain_clang_paths ${LIB_NAME}
 
 # PREPARING FLAGS
-TARGET_HOST=$(get_target_host)
+BUILD_HOST=$(get_build_host)
 COMMON_CFLAGS=$(get_cflags ${LIB_NAME})
 COMMON_CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 COMMON_LDFLAGS=$(get_ldflags ${LIB_NAME})
@@ -48,18 +48,18 @@ export HOGWEED_LIBS="-L${BASEDIR}/prebuilt/$(get_target_build_directory)/nettle/
 export GMP_CFLAGS="-I${BASEDIR}/prebuilt/$(get_target_build_directory)/gmp/include"
 export GMP_LIBS="-L${BASEDIR}/prebuilt/$(get_target_build_directory)/gmp/lib -lgmp"
 
-HARDWARE_ACCELERATION=""
+ARCH_OPTIONS=""
 case ${ARCH} in
     arm64 | arm64e)
-        HARDWARE_ACCELERATION="--enable-hardware-acceleration"
+        ARCH_OPTIONS="--enable-hardware-acceleration"
     ;;
     i386)
         # DISABLING thread_local WHICH IS NOT SUPPORTED ON i386
         export CFLAGS+=" -D__thread="
-        HARDWARE_ACCELERATION="--enable-hardware-acceleration"
+        ARCH_OPTIONS="--enable-hardware-acceleration"
     ;;
     *)
-        HARDWARE_ACCELERATION="--enable-hardware-acceleration"
+        ARCH_OPTIONS="--enable-hardware-acceleration"
     ;;
 esac
 
@@ -71,7 +71,7 @@ cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
 make distclean 2>/dev/null 1>/dev/null
 
-# RECONFIGURING IF REQUESTED
+# RECONFIGURE IF REQUESTED
 if [[ ${RECONF_gnutls} -eq 1 ]]; then
     autoreconf_library ${LIB_NAME}
 fi
@@ -84,7 +84,7 @@ fi
     --with-included-unistring \
     --without-idn \
     --without-p11-kit \
-    ${HARDWARE_ACCELERATION} \
+    ${ARCH_OPTIONS} \
     --enable-static \
     --disable-openssl-compatibility \
     --disable-shared \
@@ -96,11 +96,11 @@ fi
     --disable-tests \
     --disable-tools \
     --disable-maintainer-mode \
-    --host=${TARGET_HOST} || exit 1
+    --host=${BUILD_HOST} || exit 1
 
 make -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_gnutls_package_config "3.6.11.1"
+create_gnutls_package_config "3.6.13"
 
 make install || exit 1

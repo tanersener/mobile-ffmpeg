@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">MobileFFmpeg iOS / tvOS API
-   &#160;<span id="projectnumber">4.3.1</span>
+   &#160;<span id="projectnumber">4.3.2</span>
    </div>
   </td>
  </tr>
@@ -395,10 +395,10 @@ Variables</h2></td></tr>
 <tr class="separator:ae1a832e0aee85dbc82c89e7f91b94619"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6c0fb8ee2ce9782980e83a03dacabf07"><td class="memItemLeft" align="right" valign="top">__thread <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c.html#a61569f2965b7a369eb10b6d75d410d11">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d48/fftools__ffmpeg_8c.html#a6c0fb8ee2ce9782980e83a03dacabf07">input_sync</a></td></tr>
 <tr class="separator:a6c0fb8ee2ce9782980e83a03dacabf07"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab6ecededc74e12b5495009d9406723fe"><td class="memItemLeft" align="right" valign="top">__thread volatile <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c.html#a61569f2965b7a369eb10b6d75d410d11">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d48/fftools__ffmpeg_8c.html#ab6ecededc74e12b5495009d9406723fe">received_sigterm</a> = 0</td></tr>
-<tr class="separator:ab6ecededc74e12b5495009d9406723fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6926be63dea96de61f2be8192f97e258"><td class="memItemLeft" align="right" valign="top">__thread volatile <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c.html#a61569f2965b7a369eb10b6d75d410d11">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d48/fftools__ffmpeg_8c.html#a6926be63dea96de61f2be8192f97e258">received_nb_signals</a> = 0</td></tr>
-<tr class="separator:a6926be63dea96de61f2be8192f97e258"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1a9c2c01a83c8bbcd4eb7a8af9a0b160"><td class="memItemLeft" align="right" valign="top">volatile <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c.html#a61569f2965b7a369eb10b6d75d410d11">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d48/fftools__ffmpeg_8c.html#a1a9c2c01a83c8bbcd4eb7a8af9a0b160">received_sigterm</a> = 0</td></tr>
+<tr class="separator:a1a9c2c01a83c8bbcd4eb7a8af9a0b160"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa67220b3d47d990ba75e7099f11cfa68"><td class="memItemLeft" align="right" valign="top">volatile <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c.html#a61569f2965b7a369eb10b6d75d410d11">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d48/fftools__ffmpeg_8c.html#aa67220b3d47d990ba75e7099f11cfa68">received_nb_signals</a> = 0</td></tr>
+<tr class="separator:aa67220b3d47d990ba75e7099f11cfa68"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a72854b6777d538ea0fb18d2552741072"><td class="memItemLeft" align="right" valign="top">__thread atomic_int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d48/fftools__ffmpeg_8c.html#a72854b6777d538ea0fb18d2552741072">transcode_init_done</a> = ATOMIC_VAR_INIT(0)</td></tr>
 <tr class="separator:a72854b6777d538ea0fb18d2552741072"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6d1a3c26248469cd3aa5ae35bde51df9"><td class="memItemLeft" align="right" valign="top">__thread volatile <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c.html#a61569f2965b7a369eb10b6d75d410d11">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d48/fftools__ffmpeg_8c.html#a6d1a3c26248469cd3aa5ae35bde51df9">ffmpeg_exited</a> = 0</td></tr>
@@ -5182,14 +5182,14 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="a6926be63dea96de61f2be8192f97e258"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6926be63dea96de61f2be8192f97e258">&#9670;&nbsp;</a></span>received_nb_signals</h2>
+<a id="aa67220b3d47d990ba75e7099f11cfa68"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa67220b3d47d990ba75e7099f11cfa68">&#9670;&nbsp;</a></span>received_nb_signals</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">__thread volatile <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c.html#a61569f2965b7a369eb10b6d75d410d11">int</a> received_nb_signals = 0</td>
+          <td class="memname">volatile <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c.html#a61569f2965b7a369eb10b6d75d410d11">int</a> received_nb_signals = 0</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -5198,14 +5198,14 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="ab6ecededc74e12b5495009d9406723fe"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab6ecededc74e12b5495009d9406723fe">&#9670;&nbsp;</a></span>received_sigterm</h2>
+<a id="a1a9c2c01a83c8bbcd4eb7a8af9a0b160"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1a9c2c01a83c8bbcd4eb7a8af9a0b160">&#9670;&nbsp;</a></span>received_sigterm</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">__thread volatile <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c.html#a61569f2965b7a369eb10b6d75d410d11">int</a> received_sigterm = 0</td>
+          <td class="memname">volatile <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c.html#a61569f2965b7a369eb10b6d75d410d11">int</a> received_sigterm = 0</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -5321,7 +5321,7 @@ Variables</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Jan 12 2020 21:33:00 for MobileFFmpeg iOS / tvOS API by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 14 2020 21:31:52 for MobileFFmpeg iOS / tvOS API by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/>
 </a> 1.8.17
 </small></address>

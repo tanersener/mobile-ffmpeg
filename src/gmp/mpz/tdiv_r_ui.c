@@ -1,8 +1,8 @@
 /* mpz_tdiv_r_ui(rem, dividend, divisor_limb)
    -- Set REM to DIVDEND mod DIVISOR_LIMB.
 
-Copyright 1991, 1993, 1994, 1996, 1998, 2001, 2002, 2004, 2005, 2012 Free
-Software Foundation, Inc.
+Copyright 1991, 1993, 1994, 1996, 1998, 2001, 2002, 2004, 2005, 2012,
+2015 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -30,7 +30,6 @@ You should have received copies of the GNU General Public License and the
 GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
-#include "gmp.h"
 #include "gmp-impl.h"
 
 unsigned long int
@@ -64,11 +63,11 @@ mpz_tdiv_r_ui (mpz_ptr rem, mpz_srcptr dividend, unsigned long int divisor)
 	{
 	  rl = np[0];
 	  SIZ(rem) = ns >= 0 ? 1 : -1;
-	  PTR(rem)[0] = rl;
+	  MPZ_NEWALLOC (rem, 1)[0] = rl;
 	  return rl;
 	}
 
-      rp = MPZ_REALLOC (rem, 2);
+      rp = MPZ_NEWALLOC (rem, 2);
 
       TMP_MARK;
       dp[0] = divisor & GMP_NUMB_MASK;
@@ -88,10 +87,8 @@ mpz_tdiv_r_ui (mpz_ptr rem, mpz_srcptr dividend, unsigned long int divisor)
 	SIZ(rem) = 0;
       else
 	{
-	  /* Store the single-limb remainder.  We don't check if there's space
-	     for just one limb, since no function ever makes zero space.  */
 	  SIZ(rem) = ns >= 0 ? 1 : -1;
-	  PTR(rem)[0] = rl;
+	  MPZ_NEWALLOC (rem, 1)[0] = rl;
 	}
     }
 

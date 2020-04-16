@@ -34,13 +34,14 @@ You should have received copies of the GNU General Public License and the
 GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
-#include "gmp.h"
 #include "gmp-impl.h"
+
+#define BINVERT_3 MODLIMB_INVERSE_3
 
 /* For odd divisors, mpn_divexact_1 works fine with two's complement. */
 #ifndef mpn_divexact_by3
-#if HAVE_NATIVE_mpn_pi1_bdiv_q_1 && MODLIMB_INVERSE_3
-#define mpn_divexact_by3(dst,src,size) mpn_pi1_bdiv_q_1(dst,src,size,3,MODLIMB_INVERSE_3,0)
+#if HAVE_NATIVE_mpn_pi1_bdiv_q_1
+#define mpn_divexact_by3(dst,src,size) mpn_pi1_bdiv_q_1(dst,src,size,3,BINVERT_3,0)
 #else
 #define mpn_divexact_by3(dst,src,size) mpn_divexact_1(dst,src,size,3)
 #endif

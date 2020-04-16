@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-# Copyright (C) 2002-2019 Free Software Foundation, Inc.
+# Copyright (C) 2002-2020 Free Software Foundation, Inc.
 #
 # This file is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -44,6 +44,7 @@
 #  --tests-base=gl/tests \
 #  --aux-dir=build-aux \
 #  --with-tests \
+#  --lgpl=2 \
 #  --no-conditional-dependencies \
 #  --libtool \
 #  --macro-prefix=gl \
@@ -61,6 +62,7 @@
 #  getline \
 #  gettext-h \
 #  gettimeofday \
+#  hash \
 #  hash-pjw-bare \
 #  havelib \
 #  inet_ntop \
@@ -92,6 +94,7 @@
 #  unistd \
 #  valgrind-tests \
 #  vasprintf \
+#  verify \
 #  vsnprintf \
 #  warnings
 
@@ -176,7 +179,6 @@ ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/lib/unistring/m4/gnulib-comp.m4 \
 	$(top_srcdir)/lib/unistring/m4/inline.m4 \
 	$(top_srcdir)/lib/unistring/m4/libunistring-base.m4 \
-	$(top_srcdir)/src/gl/m4/__inline.m4 \
 	$(top_srcdir)/src/gl/m4/bison.m4 \
 	$(top_srcdir)/src/gl/m4/clock_time.m4 \
 	$(top_srcdir)/src/gl/m4/fseek.m4 \
@@ -196,7 +198,7 @@ am__aclocal_m4_deps = $(top_srcdir)/lib/unistring/m4/gnulib-comp.m4 \
 	$(top_srcdir)/src/gl/m4/tzset.m4 \
 	$(top_srcdir)/src/libopts/m4/libopts.m4 \
 	$(top_srcdir)/src/libopts/m4/stdnoreturn.m4 \
-	$(top_srcdir)/m4/00gnulib.m4 \
+	$(top_srcdir)/m4/00gnulib.m4 $(top_srcdir)/m4/__inline.m4 \
 	$(top_srcdir)/m4/absolute-header.m4 $(top_srcdir)/m4/alloca.m4 \
 	$(top_srcdir)/m4/arpa_inet_h.m4 \
 	$(top_srcdir)/m4/ax_ac_append_to_file.m4 \
@@ -231,10 +233,11 @@ am__aclocal_m4_deps = $(top_srcdir)/lib/unistring/m4/gnulib-comp.m4 \
 	$(top_srcdir)/m4/inet_pton.m4 \
 	$(top_srcdir)/m4/intl-thread-locale.m4 \
 	$(top_srcdir)/m4/intlmacosx.m4 $(top_srcdir)/m4/intmax_t.m4 \
-	$(top_srcdir)/m4/inttypes-pri.m4 $(top_srcdir)/m4/inttypes.m4 \
-	$(top_srcdir)/m4/inttypes_h.m4 $(top_srcdir)/m4/ioctl.m4 \
-	$(top_srcdir)/m4/isblank.m4 $(top_srcdir)/m4/langinfo_h.m4 \
-	$(top_srcdir)/m4/largefile.m4 $(top_srcdir)/m4/lcmessage.m4 \
+	$(top_srcdir)/m4/inttostr.m4 $(top_srcdir)/m4/inttypes-pri.m4 \
+	$(top_srcdir)/m4/inttypes.m4 $(top_srcdir)/m4/inttypes_h.m4 \
+	$(top_srcdir)/m4/ioctl.m4 $(top_srcdir)/m4/isblank.m4 \
+	$(top_srcdir)/m4/langinfo_h.m4 $(top_srcdir)/m4/largefile.m4 \
+	$(top_srcdir)/m4/lcmessage.m4 \
 	$(top_srcdir)/m4/ld-output-def.m4 \
 	$(top_srcdir)/m4/ld-version-script.m4 \
 	$(top_srcdir)/m4/lib-ld.m4 $(top_srcdir)/m4/lib-link.m4 \
@@ -244,27 +247,32 @@ am__aclocal_m4_deps = $(top_srcdir)/lib/unistring/m4/gnulib-comp.m4 \
 	$(top_srcdir)/m4/locale-zh.m4 $(top_srcdir)/m4/locale_h.m4 \
 	$(top_srcdir)/m4/localename.m4 \
 	$(top_srcdir)/m4/localtime-buffer.m4 $(top_srcdir)/m4/lock.m4 \
-	$(top_srcdir)/m4/longlong.m4 $(top_srcdir)/m4/lseek.m4 \
-	$(top_srcdir)/m4/lstat.m4 $(top_srcdir)/m4/ltoptions.m4 \
-	$(top_srcdir)/m4/ltsugar.m4 $(top_srcdir)/m4/ltversion.m4 \
-	$(top_srcdir)/m4/lt~obsolete.m4 $(top_srcdir)/m4/malloc.m4 \
-	$(top_srcdir)/m4/malloca.m4 $(top_srcdir)/m4/manywarnings.m4 \
-	$(top_srcdir)/m4/memchr.m4 $(top_srcdir)/m4/memmem.m4 \
-	$(top_srcdir)/m4/minmax.m4 $(top_srcdir)/m4/mmap-anon.m4 \
-	$(top_srcdir)/m4/mode_t.m4 $(top_srcdir)/m4/msvc-inval.m4 \
+	$(top_srcdir)/m4/lseek.m4 $(top_srcdir)/m4/lstat.m4 \
+	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
+	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/lt~obsolete.m4 \
+	$(top_srcdir)/m4/malloc.m4 $(top_srcdir)/m4/malloca.m4 \
+	$(top_srcdir)/m4/manywarnings.m4 $(top_srcdir)/m4/memchr.m4 \
+	$(top_srcdir)/m4/memmem.m4 $(top_srcdir)/m4/minmax.m4 \
+	$(top_srcdir)/m4/mmap-anon.m4 $(top_srcdir)/m4/mode_t.m4 \
+	$(top_srcdir)/m4/msvc-inval.m4 \
 	$(top_srcdir)/m4/msvc-nothrow.m4 $(top_srcdir)/m4/multiarch.m4 \
 	$(top_srcdir)/m4/nanosleep.m4 $(top_srcdir)/m4/netdb_h.m4 \
 	$(top_srcdir)/m4/netinet_in_h.m4 $(top_srcdir)/m4/nls.m4 \
 	$(top_srcdir)/m4/off_t.m4 $(top_srcdir)/m4/open-cloexec.m4 \
-	$(top_srcdir)/m4/open.m4 $(top_srcdir)/m4/pathmax.m4 \
-	$(top_srcdir)/m4/perror.m4 $(top_srcdir)/m4/pipe.m4 \
-	$(top_srcdir)/m4/pkg.m4 $(top_srcdir)/m4/po.m4 \
-	$(top_srcdir)/m4/printf.m4 $(top_srcdir)/m4/progtest.m4 \
+	$(top_srcdir)/m4/open-slash.m4 $(top_srcdir)/m4/open.m4 \
+	$(top_srcdir)/m4/pathmax.m4 $(top_srcdir)/m4/perror.m4 \
+	$(top_srcdir)/m4/pipe.m4 $(top_srcdir)/m4/pkg.m4 \
+	$(top_srcdir)/m4/po.m4 $(top_srcdir)/m4/printf.m4 \
+	$(top_srcdir)/m4/progtest.m4 \
+	$(top_srcdir)/m4/pthread-thread.m4 \
+	$(top_srcdir)/m4/pthread_h.m4 \
 	$(top_srcdir)/m4/pthread_rwlock_rdlock.m4 \
-	$(top_srcdir)/m4/putenv.m4 $(top_srcdir)/m4/raise.m4 \
-	$(top_srcdir)/m4/read-file.m4 $(top_srcdir)/m4/realloc.m4 \
+	$(top_srcdir)/m4/pthread_sigmask.m4 $(top_srcdir)/m4/putenv.m4 \
+	$(top_srcdir)/m4/raise.m4 $(top_srcdir)/m4/read-file.m4 \
+	$(top_srcdir)/m4/realloc.m4 $(top_srcdir)/m4/sched_h.m4 \
 	$(top_srcdir)/m4/secure_getenv.m4 $(top_srcdir)/m4/select.m4 \
 	$(top_srcdir)/m4/setenv.m4 $(top_srcdir)/m4/setlocale.m4 \
+	$(top_srcdir)/m4/setlocale_null.m4 \
 	$(top_srcdir)/m4/sigaction.m4 $(top_srcdir)/m4/signal_h.m4 \
 	$(top_srcdir)/m4/signalblocking.m4 \
 	$(top_srcdir)/m4/size_max.m4 $(top_srcdir)/m4/sleep.m4 \
@@ -286,15 +294,16 @@ am__aclocal_m4_deps = $(top_srcdir)/lib/unistring/m4/gnulib-comp.m4 \
 	$(top_srcdir)/m4/sys_socket_h.m4 \
 	$(top_srcdir)/m4/sys_stat_h.m4 $(top_srcdir)/m4/sys_time_h.m4 \
 	$(top_srcdir)/m4/sys_types_h.m4 $(top_srcdir)/m4/sys_uio_h.m4 \
-	$(top_srcdir)/m4/threadlib.m4 $(top_srcdir)/m4/time_h.m4 \
-	$(top_srcdir)/m4/time_r.m4 $(top_srcdir)/m4/ungetc.m4 \
-	$(top_srcdir)/m4/unistd_h.m4 \
+	$(top_srcdir)/m4/thread.m4 $(top_srcdir)/m4/threadlib.m4 \
+	$(top_srcdir)/m4/time_h.m4 $(top_srcdir)/m4/time_r.m4 \
+	$(top_srcdir)/m4/ungetc.m4 $(top_srcdir)/m4/unistd_h.m4 \
 	$(top_srcdir)/m4/valgrind-tests.m4 \
 	$(top_srcdir)/m4/vasnprintf.m4 $(top_srcdir)/m4/vasprintf.m4 \
-	$(top_srcdir)/m4/vsnprintf.m4 $(top_srcdir)/m4/warn-on-use.m4 \
-	$(top_srcdir)/m4/warnings.m4 $(top_srcdir)/m4/wchar_h.m4 \
-	$(top_srcdir)/m4/wchar_t.m4 $(top_srcdir)/m4/wint_t.m4 \
-	$(top_srcdir)/m4/xsize.m4 $(top_srcdir)/configure.ac
+	$(top_srcdir)/m4/visibility.m4 $(top_srcdir)/m4/vsnprintf.m4 \
+	$(top_srcdir)/m4/warn-on-use.m4 $(top_srcdir)/m4/warnings.m4 \
+	$(top_srcdir)/m4/wchar_h.m4 $(top_srcdir)/m4/wchar_t.m4 \
+	$(top_srcdir)/m4/wint_t.m4 $(top_srcdir)/m4/xsize.m4 \
+	$(top_srcdir)/m4/zzgnulib.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 DIST_COMMON = $(srcdir)/Makefile.am $(noinst_HEADERS) \
@@ -306,9 +315,9 @@ CONFIG_CLEAN_VPATH_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 am__DEPENDENCIES_1 =
-am_libgnu_la_OBJECTS = c-ctype.lo c-strcasecmp.lo c-strncasecmp.lo \
-	hash-pjw-bare.lo read-file.lo stat-time.lo sys_socket.lo \
-	unistd.lo xsize.lo
+am_libgnu_la_OBJECTS = bitrotate.lo c-ctype.lo c-strcasecmp.lo \
+	c-strncasecmp.lo hash.lo hash-pjw-bare.lo read-file.lo \
+	stat-time.lo sys_socket.lo unistd.lo xsize.lo
 libgnu_la_OBJECTS = $(am_libgnu_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -333,12 +342,13 @@ DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__maybe_remake_depfiles = depfiles
 am__depfiles_remade = ./$(DEPDIR)/alloca.Plo ./$(DEPDIR)/asnprintf.Plo \
-	./$(DEPDIR)/asprintf.Plo ./$(DEPDIR)/c-ctype.Plo \
-	./$(DEPDIR)/c-strcasecmp.Plo ./$(DEPDIR)/c-strncasecmp.Plo \
-	./$(DEPDIR)/float.Plo ./$(DEPDIR)/fstat.Plo \
-	./$(DEPDIR)/ftell.Plo ./$(DEPDIR)/ftello.Plo \
-	./$(DEPDIR)/getdelim.Plo ./$(DEPDIR)/getline.Plo \
-	./$(DEPDIR)/gettimeofday.Plo ./$(DEPDIR)/hash-pjw-bare.Plo \
+	./$(DEPDIR)/asprintf.Plo ./$(DEPDIR)/bitrotate.Plo \
+	./$(DEPDIR)/c-ctype.Plo ./$(DEPDIR)/c-strcasecmp.Plo \
+	./$(DEPDIR)/c-strncasecmp.Plo ./$(DEPDIR)/float.Plo \
+	./$(DEPDIR)/fstat.Plo ./$(DEPDIR)/ftell.Plo \
+	./$(DEPDIR)/ftello.Plo ./$(DEPDIR)/getdelim.Plo \
+	./$(DEPDIR)/getline.Plo ./$(DEPDIR)/gettimeofday.Plo \
+	./$(DEPDIR)/hash-pjw-bare.Plo ./$(DEPDIR)/hash.Plo \
 	./$(DEPDIR)/inet_ntop.Plo ./$(DEPDIR)/inet_pton.Plo \
 	./$(DEPDIR)/itold.Plo ./$(DEPDIR)/localtime-buffer.Plo \
 	./$(DEPDIR)/lseek.Plo ./$(DEPDIR)/malloc.Plo \
@@ -472,6 +482,7 @@ CCASDEPMODE = @CCASDEPMODE@
 CCASFLAGS = @CCASFLAGS@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
+CFLAG_VISIBILITY = @CFLAG_VISIBILITY@
 CMOCKA_CFLAGS = @CMOCKA_CFLAGS@
 CMOCKA_LIBS = @CMOCKA_LIBS@
 CODE_COVERAGE_CFLAGS = @CODE_COVERAGE_CFLAGS@
@@ -524,6 +535,7 @@ GMSGFMT = @GMSGFMT@
 GMSGFMT_015 = @GMSGFMT_015@
 GNULIB_ACCEPT = @GNULIB_ACCEPT@
 GNULIB_ACCEPT4 = @GNULIB_ACCEPT4@
+GNULIB_ACCESS = @GNULIB_ACCESS@
 GNULIB_ATOLL = @GNULIB_ATOLL@
 GNULIB_BIND = @GNULIB_BIND@
 GNULIB_BTOWC = @GNULIB_BTOWC@
@@ -533,6 +545,8 @@ GNULIB_CHDIR = @GNULIB_CHDIR@
 GNULIB_CHOWN = @GNULIB_CHOWN@
 GNULIB_CLOSE = @GNULIB_CLOSE@
 GNULIB_CONNECT = @GNULIB_CONNECT@
+GNULIB_COPY_FILE_RANGE = @GNULIB_COPY_FILE_RANGE@
+GNULIB_CREAT = @GNULIB_CREAT@
 GNULIB_CTIME = @GNULIB_CTIME@
 GNULIB_DPRINTF = @GNULIB_DPRINTF@
 GNULIB_DUP = @GNULIB_DUP@
@@ -588,6 +602,7 @@ GNULIB_GETLINE = @GNULIB_GETLINE@
 GNULIB_GETLOADAVG = @GNULIB_GETLOADAVG@
 GNULIB_GETLOGIN = @GNULIB_GETLOGIN@
 GNULIB_GETLOGIN_R = @GNULIB_GETLOGIN_R@
+GNULIB_GETOPT_POSIX = @GNULIB_GETOPT_POSIX@
 GNULIB_GETPAGESIZE = @GNULIB_GETPAGESIZE@
 GNULIB_GETPASS = @GNULIB_GETPASS@
 GNULIB_GETPEERNAME = @GNULIB_GETPEERNAME@
@@ -670,7 +685,15 @@ GNULIB_PREAD = @GNULIB_PREAD@
 GNULIB_PRINTF = @GNULIB_PRINTF@
 GNULIB_PRINTF_POSIX = @GNULIB_PRINTF_POSIX@
 GNULIB_PSELECT = @GNULIB_PSELECT@
+GNULIB_PTHREAD_COND = @GNULIB_PTHREAD_COND@
+GNULIB_PTHREAD_MUTEX = @GNULIB_PTHREAD_MUTEX@
+GNULIB_PTHREAD_MUTEX_TIMEDLOCK = @GNULIB_PTHREAD_MUTEX_TIMEDLOCK@
+GNULIB_PTHREAD_ONCE = @GNULIB_PTHREAD_ONCE@
+GNULIB_PTHREAD_RWLOCK = @GNULIB_PTHREAD_RWLOCK@
 GNULIB_PTHREAD_SIGMASK = @GNULIB_PTHREAD_SIGMASK@
+GNULIB_PTHREAD_SPIN = @GNULIB_PTHREAD_SPIN@
+GNULIB_PTHREAD_THREAD = @GNULIB_PTHREAD_THREAD@
+GNULIB_PTHREAD_TSS = @GNULIB_PTHREAD_TSS@
 GNULIB_PTSNAME = @GNULIB_PTSNAME@
 GNULIB_PTSNAME_R = @GNULIB_PTSNAME_R@
 GNULIB_PUTC = @GNULIB_PUTC@
@@ -697,6 +720,7 @@ GNULIB_RENAMEAT = @GNULIB_RENAMEAT@
 GNULIB_RMDIR = @GNULIB_RMDIR@
 GNULIB_RPMATCH = @GNULIB_RPMATCH@
 GNULIB_SCANF = @GNULIB_SCANF@
+GNULIB_SCHED_YIELD = @GNULIB_SCHED_YIELD@
 GNULIB_SECURE_GETENV = @GNULIB_SECURE_GETENV@
 GNULIB_SELECT = @GNULIB_SELECT@
 GNULIB_SEND = @GNULIB_SEND@
@@ -704,6 +728,7 @@ GNULIB_SENDTO = @GNULIB_SENDTO@
 GNULIB_SETENV = @GNULIB_SETENV@
 GNULIB_SETHOSTNAME = @GNULIB_SETHOSTNAME@
 GNULIB_SETLOCALE = @GNULIB_SETLOCALE@
+GNULIB_SETLOCALE_NULL = @GNULIB_SETLOCALE_NULL@
 GNULIB_SETSOCKOPT = @GNULIB_SETSOCKOPT@
 GNULIB_SHUTDOWN = @GNULIB_SHUTDOWN@
 GNULIB_SIGACTION = @GNULIB_SIGACTION@
@@ -833,6 +858,7 @@ HAVE_BTOWC = @HAVE_BTOWC@
 HAVE_C99_STDINT_H = @HAVE_C99_STDINT_H@
 HAVE_CANONICALIZE_FILE_NAME = @HAVE_CANONICALIZE_FILE_NAME@
 HAVE_CHOWN = @HAVE_CHOWN@
+HAVE_COPY_FILE_RANGE = @HAVE_COPY_FILE_RANGE@
 HAVE_CRTDEFS_H = @HAVE_CRTDEFS_H@
 HAVE_DECL_ENVIRON = @HAVE_DECL_ENVIRON@
 HAVE_DECL_FCHDIR = @HAVE_DECL_FCHDIR@
@@ -927,12 +953,12 @@ HAVE_LCHMOD = @HAVE_LCHMOD@
 HAVE_LCHOWN = @HAVE_LCHOWN@
 HAVE_LIBCRYPTO = @HAVE_LIBCRYPTO@
 HAVE_LIBDL = @HAVE_LIBDL@
+HAVE_LIBEV = @HAVE_LIBEV@
 HAVE_LIBPTHREAD = @HAVE_LIBPTHREAD@
 HAVE_LIBRT = @HAVE_LIBRT@
 HAVE_LIBSECCOMP = @HAVE_LIBSECCOMP@
 HAVE_LINK = @HAVE_LINK@
 HAVE_LINKAT = @HAVE_LINKAT@
-HAVE_LONG_LONG_INT = @HAVE_LONG_LONG_INT@
 HAVE_LSTAT = @HAVE_LSTAT@
 HAVE_MAX_ALIGN_T = @HAVE_MAX_ALIGN_T@
 HAVE_MBRLEN = @HAVE_MBRLEN@
@@ -970,7 +996,65 @@ HAVE_POSIX_OPENPT = @HAVE_POSIX_OPENPT@
 HAVE_POSIX_SIGNALBLOCKING = @HAVE_POSIX_SIGNALBLOCKING@
 HAVE_PREAD = @HAVE_PREAD@
 HAVE_PSELECT = @HAVE_PSELECT@
+HAVE_PTHREAD_ATTR_DESTROY = @HAVE_PTHREAD_ATTR_DESTROY@
+HAVE_PTHREAD_ATTR_GETDETACHSTATE = @HAVE_PTHREAD_ATTR_GETDETACHSTATE@
+HAVE_PTHREAD_ATTR_INIT = @HAVE_PTHREAD_ATTR_INIT@
+HAVE_PTHREAD_ATTR_SETDETACHSTATE = @HAVE_PTHREAD_ATTR_SETDETACHSTATE@
+HAVE_PTHREAD_CONDATTR_DESTROY = @HAVE_PTHREAD_CONDATTR_DESTROY@
+HAVE_PTHREAD_CONDATTR_INIT = @HAVE_PTHREAD_CONDATTR_INIT@
+HAVE_PTHREAD_COND_BROADCAST = @HAVE_PTHREAD_COND_BROADCAST@
+HAVE_PTHREAD_COND_DESTROY = @HAVE_PTHREAD_COND_DESTROY@
+HAVE_PTHREAD_COND_INIT = @HAVE_PTHREAD_COND_INIT@
+HAVE_PTHREAD_COND_SIGNAL = @HAVE_PTHREAD_COND_SIGNAL@
+HAVE_PTHREAD_COND_TIMEDWAIT = @HAVE_PTHREAD_COND_TIMEDWAIT@
+HAVE_PTHREAD_COND_WAIT = @HAVE_PTHREAD_COND_WAIT@
+HAVE_PTHREAD_CREATE = @HAVE_PTHREAD_CREATE@
+HAVE_PTHREAD_CREATE_DETACHED = @HAVE_PTHREAD_CREATE_DETACHED@
+HAVE_PTHREAD_DETACH = @HAVE_PTHREAD_DETACH@
+HAVE_PTHREAD_EQUAL = @HAVE_PTHREAD_EQUAL@
+HAVE_PTHREAD_EXIT = @HAVE_PTHREAD_EXIT@
+HAVE_PTHREAD_GETSPECIFIC = @HAVE_PTHREAD_GETSPECIFIC@
+HAVE_PTHREAD_H = @HAVE_PTHREAD_H@
+HAVE_PTHREAD_JOIN = @HAVE_PTHREAD_JOIN@
+HAVE_PTHREAD_KEY_CREATE = @HAVE_PTHREAD_KEY_CREATE@
+HAVE_PTHREAD_KEY_DELETE = @HAVE_PTHREAD_KEY_DELETE@
+HAVE_PTHREAD_MUTEXATTR_DESTROY = @HAVE_PTHREAD_MUTEXATTR_DESTROY@
+HAVE_PTHREAD_MUTEXATTR_GETROBUST = @HAVE_PTHREAD_MUTEXATTR_GETROBUST@
+HAVE_PTHREAD_MUTEXATTR_GETTYPE = @HAVE_PTHREAD_MUTEXATTR_GETTYPE@
+HAVE_PTHREAD_MUTEXATTR_INIT = @HAVE_PTHREAD_MUTEXATTR_INIT@
+HAVE_PTHREAD_MUTEXATTR_SETROBUST = @HAVE_PTHREAD_MUTEXATTR_SETROBUST@
+HAVE_PTHREAD_MUTEXATTR_SETTYPE = @HAVE_PTHREAD_MUTEXATTR_SETTYPE@
+HAVE_PTHREAD_MUTEX_DESTROY = @HAVE_PTHREAD_MUTEX_DESTROY@
+HAVE_PTHREAD_MUTEX_INIT = @HAVE_PTHREAD_MUTEX_INIT@
+HAVE_PTHREAD_MUTEX_LOCK = @HAVE_PTHREAD_MUTEX_LOCK@
+HAVE_PTHREAD_MUTEX_RECURSIVE = @HAVE_PTHREAD_MUTEX_RECURSIVE@
+HAVE_PTHREAD_MUTEX_ROBUST = @HAVE_PTHREAD_MUTEX_ROBUST@
+HAVE_PTHREAD_MUTEX_TIMEDLOCK = @HAVE_PTHREAD_MUTEX_TIMEDLOCK@
+HAVE_PTHREAD_MUTEX_TRYLOCK = @HAVE_PTHREAD_MUTEX_TRYLOCK@
+HAVE_PTHREAD_MUTEX_UNLOCK = @HAVE_PTHREAD_MUTEX_UNLOCK@
+HAVE_PTHREAD_ONCE = @HAVE_PTHREAD_ONCE@
+HAVE_PTHREAD_PROCESS_SHARED = @HAVE_PTHREAD_PROCESS_SHARED@
+HAVE_PTHREAD_RWLOCKATTR_DESTROY = @HAVE_PTHREAD_RWLOCKATTR_DESTROY@
+HAVE_PTHREAD_RWLOCKATTR_INIT = @HAVE_PTHREAD_RWLOCKATTR_INIT@
+HAVE_PTHREAD_RWLOCK_DESTROY = @HAVE_PTHREAD_RWLOCK_DESTROY@
+HAVE_PTHREAD_RWLOCK_INIT = @HAVE_PTHREAD_RWLOCK_INIT@
+HAVE_PTHREAD_RWLOCK_RDLOCK = @HAVE_PTHREAD_RWLOCK_RDLOCK@
+HAVE_PTHREAD_RWLOCK_TIMEDRDLOCK = @HAVE_PTHREAD_RWLOCK_TIMEDRDLOCK@
+HAVE_PTHREAD_RWLOCK_TIMEDWRLOCK = @HAVE_PTHREAD_RWLOCK_TIMEDWRLOCK@
+HAVE_PTHREAD_RWLOCK_TRYRDLOCK = @HAVE_PTHREAD_RWLOCK_TRYRDLOCK@
+HAVE_PTHREAD_RWLOCK_TRYWRLOCK = @HAVE_PTHREAD_RWLOCK_TRYWRLOCK@
+HAVE_PTHREAD_RWLOCK_UNLOCK = @HAVE_PTHREAD_RWLOCK_UNLOCK@
+HAVE_PTHREAD_RWLOCK_WRLOCK = @HAVE_PTHREAD_RWLOCK_WRLOCK@
+HAVE_PTHREAD_SELF = @HAVE_PTHREAD_SELF@
+HAVE_PTHREAD_SETSPECIFIC = @HAVE_PTHREAD_SETSPECIFIC@
 HAVE_PTHREAD_SIGMASK = @HAVE_PTHREAD_SIGMASK@
+HAVE_PTHREAD_SPINLOCK_T = @HAVE_PTHREAD_SPINLOCK_T@
+HAVE_PTHREAD_SPIN_DESTROY = @HAVE_PTHREAD_SPIN_DESTROY@
+HAVE_PTHREAD_SPIN_INIT = @HAVE_PTHREAD_SPIN_INIT@
+HAVE_PTHREAD_SPIN_LOCK = @HAVE_PTHREAD_SPIN_LOCK@
+HAVE_PTHREAD_SPIN_TRYLOCK = @HAVE_PTHREAD_SPIN_TRYLOCK@
+HAVE_PTHREAD_SPIN_UNLOCK = @HAVE_PTHREAD_SPIN_UNLOCK@
+HAVE_PTHREAD_T = @HAVE_PTHREAD_T@
 HAVE_PTSNAME = @HAVE_PTSNAME@
 HAVE_PTSNAME_R = @HAVE_PTSNAME_R@
 HAVE_PWRITE = @HAVE_PWRITE@
@@ -987,6 +1071,8 @@ HAVE_REALPATH = @HAVE_REALPATH@
 HAVE_RENAMEAT = @HAVE_RENAMEAT@
 HAVE_RPMATCH = @HAVE_RPMATCH@
 HAVE_SA_FAMILY_T = @HAVE_SA_FAMILY_T@
+HAVE_SCHED_H = @HAVE_SCHED_H@
+HAVE_SCHED_YIELD = @HAVE_SCHED_YIELD@
 HAVE_SECURE_GETENV = @HAVE_SECURE_GETENV@
 HAVE_SETENV = @HAVE_SETENV@
 HAVE_SETHOSTNAME = @HAVE_SETHOSTNAME@
@@ -1015,6 +1101,7 @@ HAVE_STRTOLL = @HAVE_STRTOLL@
 HAVE_STRTOULL = @HAVE_STRTOULL@
 HAVE_STRUCT_ADDRINFO = @HAVE_STRUCT_ADDRINFO@
 HAVE_STRUCT_RANDOM_DATA = @HAVE_STRUCT_RANDOM_DATA@
+HAVE_STRUCT_SCHED_PARAM = @HAVE_STRUCT_SCHED_PARAM@
 HAVE_STRUCT_SIGACTION_SA_SIGACTION = @HAVE_STRUCT_SIGACTION_SA_SIGACTION@
 HAVE_STRUCT_SOCKADDR_STORAGE = @HAVE_STRUCT_SOCKADDR_STORAGE@
 HAVE_STRUCT_SOCKADDR_STORAGE_SS_FAMILY = @HAVE_STRUCT_SOCKADDR_STORAGE_SS_FAMILY@
@@ -1023,6 +1110,7 @@ HAVE_STRVERSCMP = @HAVE_STRVERSCMP@
 HAVE_SYMLINK = @HAVE_SYMLINK@
 HAVE_SYMLINKAT = @HAVE_SYMLINKAT@
 HAVE_SYS_BITYPES_H = @HAVE_SYS_BITYPES_H@
+HAVE_SYS_CDEFS_H = @HAVE_SYS_CDEFS_H@
 HAVE_SYS_INTTYPES_H = @HAVE_SYS_INTTYPES_H@
 HAVE_SYS_IOCTL_H = @HAVE_SYS_IOCTL_H@
 HAVE_SYS_LOADAVG_H = @HAVE_SYS_LOADAVG_H@
@@ -1039,11 +1127,11 @@ HAVE_TZSET = @HAVE_TZSET@
 HAVE_UNISTD_H = @HAVE_UNISTD_H@
 HAVE_UNLINKAT = @HAVE_UNLINKAT@
 HAVE_UNLOCKPT = @HAVE_UNLOCKPT@
-HAVE_UNSIGNED_LONG_LONG_INT = @HAVE_UNSIGNED_LONG_LONG_INT@
 HAVE_USLEEP = @HAVE_USLEEP@
 HAVE_UTIMENSAT = @HAVE_UTIMENSAT@
 HAVE_VASPRINTF = @HAVE_VASPRINTF@
 HAVE_VDPRINTF = @HAVE_VDPRINTF@
+HAVE_VISIBILITY = @HAVE_VISIBILITY@
 HAVE_WCHAR_H = @HAVE_WCHAR_H@
 HAVE_WCHAR_T = @HAVE_WCHAR_T@
 HAVE_WCPCPY = @HAVE_WCPCPY@
@@ -1109,6 +1197,9 @@ LIBCRYPTO = @LIBCRYPTO@
 LIBCRYPTO_PREFIX = @LIBCRYPTO_PREFIX@
 LIBDL = @LIBDL@
 LIBDL_PREFIX = @LIBDL_PREFIX@
+LIBEV = @LIBEV@
+LIBEV_LIBS = @LIBEV_LIBS@
+LIBEV_PREFIX = @LIBEV_PREFIX@
 LIBGNUTLS_CFLAGS = @LIBGNUTLS_CFLAGS@
 LIBGNUTLS_LIBS = @LIBGNUTLS_LIBS@
 LIBICONV = @LIBICONV@
@@ -1120,16 +1211,16 @@ LIBOBJS = @LIBOBJS@
 LIBOPTS_CFLAGS = @LIBOPTS_CFLAGS@
 LIBOPTS_DIR = @LIBOPTS_DIR@
 LIBOPTS_LDADD = @LIBOPTS_LDADD@
-LIBPTH = @LIBPTH@
+LIBPMULTITHREAD = @LIBPMULTITHREAD@
 LIBPTHREAD = @LIBPTHREAD@
 LIBPTHREAD_PREFIX = @LIBPTHREAD_PREFIX@
-LIBPTH_PREFIX = @LIBPTH_PREFIX@
 LIBRT = @LIBRT@
 LIBRT_PREFIX = @LIBRT_PREFIX@
 LIBS = @LIBS@
 LIBSECCOMP = @LIBSECCOMP@
 LIBSECCOMP_PREFIX = @LIBSECCOMP_PREFIX@
 LIBSOCKET = @LIBSOCKET@
+LIBSTDTHREAD = @LIBSTDTHREAD@
 LIBTASN1_CFLAGS = @LIBTASN1_CFLAGS@
 LIBTASN1_LIBS = @LIBTASN1_LIBS@
 LIBTESTS_LIBDEPS = @LIBTESTS_LIBDEPS@
@@ -1142,7 +1233,12 @@ LIBUNISTRING_UNISTR_H = @LIBUNISTRING_UNISTR_H@
 LIBUNISTRING_UNITYPES_H = @LIBUNISTRING_UNITYPES_H@
 LIB_CLOCK_GETTIME = @LIB_CLOCK_GETTIME@
 LIB_NANOSLEEP = @LIB_NANOSLEEP@
+LIB_PTHREAD = @LIB_PTHREAD@
+LIB_PTHREAD_SIGMASK = @LIB_PTHREAD_SIGMASK@
+LIB_SCHED_YIELD = @LIB_SCHED_YIELD@
 LIB_SELECT = @LIB_SELECT@
+LIB_SETLOCALE = @LIB_SETLOCALE@
+LIB_SETLOCALE_NULL = @LIB_SETLOCALE_NULL@
 LIMITS_H = @LIMITS_H@
 LIPO = @LIPO@
 LN_S = @LN_S@
@@ -1154,11 +1250,11 @@ LOCALE_ZH_CN = @LOCALE_ZH_CN@
 LTALLOCA = @LTALLOCA@
 LTLIBCRYPTO = @LTLIBCRYPTO@
 LTLIBDL = @LTLIBDL@
+LTLIBEV = @LTLIBEV@
 LTLIBICONV = @LTLIBICONV@
 LTLIBINTL = @LTLIBINTL@
 LTLIBMULTITHREAD = @LTLIBMULTITHREAD@
 LTLIBOBJS = @LTLIBOBJS@
-LTLIBPTH = @LTLIBPTH@
 LTLIBPTHREAD = @LTLIBPTHREAD@
 LTLIBRT = @LTLIBRT@
 LTLIBSECCOMP = @LTLIBSECCOMP@
@@ -1200,6 +1296,8 @@ NEXT_AS_FIRST_DIRECTIVE_LIMITS_H = @NEXT_AS_FIRST_DIRECTIVE_LIMITS_H@
 NEXT_AS_FIRST_DIRECTIVE_LOCALE_H = @NEXT_AS_FIRST_DIRECTIVE_LOCALE_H@
 NEXT_AS_FIRST_DIRECTIVE_NETDB_H = @NEXT_AS_FIRST_DIRECTIVE_NETDB_H@
 NEXT_AS_FIRST_DIRECTIVE_NETINET_IN_H = @NEXT_AS_FIRST_DIRECTIVE_NETINET_IN_H@
+NEXT_AS_FIRST_DIRECTIVE_PTHREAD_H = @NEXT_AS_FIRST_DIRECTIVE_PTHREAD_H@
+NEXT_AS_FIRST_DIRECTIVE_SCHED_H = @NEXT_AS_FIRST_DIRECTIVE_SCHED_H@
 NEXT_AS_FIRST_DIRECTIVE_SIGNAL_H = @NEXT_AS_FIRST_DIRECTIVE_SIGNAL_H@
 NEXT_AS_FIRST_DIRECTIVE_STDDEF_H = @NEXT_AS_FIRST_DIRECTIVE_STDDEF_H@
 NEXT_AS_FIRST_DIRECTIVE_STDINT_H = @NEXT_AS_FIRST_DIRECTIVE_STDINT_H@
@@ -1227,6 +1325,8 @@ NEXT_LIMITS_H = @NEXT_LIMITS_H@
 NEXT_LOCALE_H = @NEXT_LOCALE_H@
 NEXT_NETDB_H = @NEXT_NETDB_H@
 NEXT_NETINET_IN_H = @NEXT_NETINET_IN_H@
+NEXT_PTHREAD_H = @NEXT_PTHREAD_H@
+NEXT_SCHED_H = @NEXT_SCHED_H@
 NEXT_SIGNAL_H = @NEXT_SIGNAL_H@
 NEXT_STDDEF_H = @NEXT_STDDEF_H@
 NEXT_STDINT_H = @NEXT_STDINT_H@
@@ -1260,6 +1360,7 @@ PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
+PARSE_DATETIME_BISON = @PARSE_DATETIME_BISON@
 PATCH_VERSION = @PATCH_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 PKG_CONFIG = @PKG_CONFIG@
@@ -1275,11 +1376,13 @@ PRI_MACROS_BROKEN = @PRI_MACROS_BROKEN@
 PTHREAD_H_DEFINES_STRUCT_TIMESPEC = @PTHREAD_H_DEFINES_STRUCT_TIMESPEC@
 PTRDIFF_T_SUFFIX = @PTRDIFF_T_SUFFIX@
 RANLIB = @RANLIB@
+REPLACE_ACCESS = @REPLACE_ACCESS@
 REPLACE_BTOWC = @REPLACE_BTOWC@
 REPLACE_CALLOC = @REPLACE_CALLOC@
 REPLACE_CANONICALIZE_FILE_NAME = @REPLACE_CANONICALIZE_FILE_NAME@
 REPLACE_CHOWN = @REPLACE_CHOWN@
 REPLACE_CLOSE = @REPLACE_CLOSE@
+REPLACE_CREAT = @REPLACE_CREAT@
 REPLACE_CTIME = @REPLACE_CTIME@
 REPLACE_DPRINTF = @REPLACE_DPRINTF@
 REPLACE_DUP = @REPLACE_DUP@
@@ -1305,6 +1408,7 @@ REPLACE_FTELLO = @REPLACE_FTELLO@
 REPLACE_FTRUNCATE = @REPLACE_FTRUNCATE@
 REPLACE_FUTIMENS = @REPLACE_FUTIMENS@
 REPLACE_GAI_STRERROR = @REPLACE_GAI_STRERROR@
+REPLACE_GETADDRINFO = @REPLACE_GETADDRINFO@
 REPLACE_GETCWD = @REPLACE_GETCWD@
 REPLACE_GETDELIM = @REPLACE_GETDELIM@
 REPLACE_GETDOMAINNAME = @REPLACE_GETDOMAINNAME@
@@ -1357,7 +1461,58 @@ REPLACE_POPEN = @REPLACE_POPEN@
 REPLACE_PREAD = @REPLACE_PREAD@
 REPLACE_PRINTF = @REPLACE_PRINTF@
 REPLACE_PSELECT = @REPLACE_PSELECT@
+REPLACE_PTHREAD_ATTR_DESTROY = @REPLACE_PTHREAD_ATTR_DESTROY@
+REPLACE_PTHREAD_ATTR_GETDETACHSTATE = @REPLACE_PTHREAD_ATTR_GETDETACHSTATE@
+REPLACE_PTHREAD_ATTR_INIT = @REPLACE_PTHREAD_ATTR_INIT@
+REPLACE_PTHREAD_ATTR_SETDETACHSTATE = @REPLACE_PTHREAD_ATTR_SETDETACHSTATE@
+REPLACE_PTHREAD_CONDATTR_DESTROY = @REPLACE_PTHREAD_CONDATTR_DESTROY@
+REPLACE_PTHREAD_CONDATTR_INIT = @REPLACE_PTHREAD_CONDATTR_INIT@
+REPLACE_PTHREAD_COND_BROADCAST = @REPLACE_PTHREAD_COND_BROADCAST@
+REPLACE_PTHREAD_COND_DESTROY = @REPLACE_PTHREAD_COND_DESTROY@
+REPLACE_PTHREAD_COND_INIT = @REPLACE_PTHREAD_COND_INIT@
+REPLACE_PTHREAD_COND_SIGNAL = @REPLACE_PTHREAD_COND_SIGNAL@
+REPLACE_PTHREAD_COND_TIMEDWAIT = @REPLACE_PTHREAD_COND_TIMEDWAIT@
+REPLACE_PTHREAD_COND_WAIT = @REPLACE_PTHREAD_COND_WAIT@
+REPLACE_PTHREAD_CREATE = @REPLACE_PTHREAD_CREATE@
+REPLACE_PTHREAD_DETACH = @REPLACE_PTHREAD_DETACH@
+REPLACE_PTHREAD_EQUAL = @REPLACE_PTHREAD_EQUAL@
+REPLACE_PTHREAD_EXIT = @REPLACE_PTHREAD_EXIT@
+REPLACE_PTHREAD_GETSPECIFIC = @REPLACE_PTHREAD_GETSPECIFIC@
+REPLACE_PTHREAD_JOIN = @REPLACE_PTHREAD_JOIN@
+REPLACE_PTHREAD_KEY_CREATE = @REPLACE_PTHREAD_KEY_CREATE@
+REPLACE_PTHREAD_KEY_DELETE = @REPLACE_PTHREAD_KEY_DELETE@
+REPLACE_PTHREAD_MUTEXATTR_DESTROY = @REPLACE_PTHREAD_MUTEXATTR_DESTROY@
+REPLACE_PTHREAD_MUTEXATTR_GETROBUST = @REPLACE_PTHREAD_MUTEXATTR_GETROBUST@
+REPLACE_PTHREAD_MUTEXATTR_GETTYPE = @REPLACE_PTHREAD_MUTEXATTR_GETTYPE@
+REPLACE_PTHREAD_MUTEXATTR_INIT = @REPLACE_PTHREAD_MUTEXATTR_INIT@
+REPLACE_PTHREAD_MUTEXATTR_SETROBUST = @REPLACE_PTHREAD_MUTEXATTR_SETROBUST@
+REPLACE_PTHREAD_MUTEXATTR_SETTYPE = @REPLACE_PTHREAD_MUTEXATTR_SETTYPE@
+REPLACE_PTHREAD_MUTEX_DESTROY = @REPLACE_PTHREAD_MUTEX_DESTROY@
+REPLACE_PTHREAD_MUTEX_INIT = @REPLACE_PTHREAD_MUTEX_INIT@
+REPLACE_PTHREAD_MUTEX_LOCK = @REPLACE_PTHREAD_MUTEX_LOCK@
+REPLACE_PTHREAD_MUTEX_TIMEDLOCK = @REPLACE_PTHREAD_MUTEX_TIMEDLOCK@
+REPLACE_PTHREAD_MUTEX_TRYLOCK = @REPLACE_PTHREAD_MUTEX_TRYLOCK@
+REPLACE_PTHREAD_MUTEX_UNLOCK = @REPLACE_PTHREAD_MUTEX_UNLOCK@
+REPLACE_PTHREAD_ONCE = @REPLACE_PTHREAD_ONCE@
+REPLACE_PTHREAD_RWLOCKATTR_DESTROY = @REPLACE_PTHREAD_RWLOCKATTR_DESTROY@
+REPLACE_PTHREAD_RWLOCKATTR_INIT = @REPLACE_PTHREAD_RWLOCKATTR_INIT@
+REPLACE_PTHREAD_RWLOCK_DESTROY = @REPLACE_PTHREAD_RWLOCK_DESTROY@
+REPLACE_PTHREAD_RWLOCK_INIT = @REPLACE_PTHREAD_RWLOCK_INIT@
+REPLACE_PTHREAD_RWLOCK_RDLOCK = @REPLACE_PTHREAD_RWLOCK_RDLOCK@
+REPLACE_PTHREAD_RWLOCK_TIMEDRDLOCK = @REPLACE_PTHREAD_RWLOCK_TIMEDRDLOCK@
+REPLACE_PTHREAD_RWLOCK_TIMEDWRLOCK = @REPLACE_PTHREAD_RWLOCK_TIMEDWRLOCK@
+REPLACE_PTHREAD_RWLOCK_TRYRDLOCK = @REPLACE_PTHREAD_RWLOCK_TRYRDLOCK@
+REPLACE_PTHREAD_RWLOCK_TRYWRLOCK = @REPLACE_PTHREAD_RWLOCK_TRYWRLOCK@
+REPLACE_PTHREAD_RWLOCK_UNLOCK = @REPLACE_PTHREAD_RWLOCK_UNLOCK@
+REPLACE_PTHREAD_RWLOCK_WRLOCK = @REPLACE_PTHREAD_RWLOCK_WRLOCK@
+REPLACE_PTHREAD_SELF = @REPLACE_PTHREAD_SELF@
+REPLACE_PTHREAD_SETSPECIFIC = @REPLACE_PTHREAD_SETSPECIFIC@
 REPLACE_PTHREAD_SIGMASK = @REPLACE_PTHREAD_SIGMASK@
+REPLACE_PTHREAD_SPIN_DESTROY = @REPLACE_PTHREAD_SPIN_DESTROY@
+REPLACE_PTHREAD_SPIN_INIT = @REPLACE_PTHREAD_SPIN_INIT@
+REPLACE_PTHREAD_SPIN_LOCK = @REPLACE_PTHREAD_SPIN_LOCK@
+REPLACE_PTHREAD_SPIN_TRYLOCK = @REPLACE_PTHREAD_SPIN_TRYLOCK@
+REPLACE_PTHREAD_SPIN_UNLOCK = @REPLACE_PTHREAD_SPIN_UNLOCK@
 REPLACE_PTSNAME = @REPLACE_PTSNAME@
 REPLACE_PTSNAME_R = @REPLACE_PTSNAME_R@
 REPLACE_PUTENV = @REPLACE_PUTENV@
@@ -1375,6 +1530,7 @@ REPLACE_REMOVE = @REPLACE_REMOVE@
 REPLACE_RENAME = @REPLACE_RENAME@
 REPLACE_RENAMEAT = @REPLACE_RENAMEAT@
 REPLACE_RMDIR = @REPLACE_RMDIR@
+REPLACE_SCHED_YIELD = @REPLACE_SCHED_YIELD@
 REPLACE_SELECT = @REPLACE_SELECT@
 REPLACE_SETENV = @REPLACE_SETENV@
 REPLACE_SETLOCALE = @REPLACE_SETLOCALE@
@@ -1426,6 +1582,7 @@ REPLACE_WCRTOMB = @REPLACE_WCRTOMB@
 REPLACE_WCSFTIME = @REPLACE_WCSFTIME@
 REPLACE_WCSNRTOMBS = @REPLACE_WCSNRTOMBS@
 REPLACE_WCSRTOMBS = @REPLACE_WCSRTOMBS@
+REPLACE_WCSTOK = @REPLACE_WCSTOK@
 REPLACE_WCSWIDTH = @REPLACE_WCSWIDTH@
 REPLACE_WCTOB = @REPLACE_WCTOB@
 REPLACE_WCTOMB = @REPLACE_WCTOMB@
@@ -1534,13 +1691,13 @@ libexecdir = @libexecdir@
 localedir = @localedir@
 localstatedir = @localstatedir@
 mandir = @mandir@
+maybe_guileextensiondir = @maybe_guileextensiondir@
 mkdir_p = @mkdir_p@
 oldincludedir = @oldincludedir@
 pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
-runstatedir = @runstatedir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
@@ -1564,13 +1721,14 @@ EXTRA_DIST = alloca.c alloca.in.h arpa_inet.in.h byteswap.in.h \
 	errno.in.h float.c float.in.h itold.c fstat.c stat-w32.c \
 	stat-w32.h ftell.c ftello.c stdio-impl.h \
 	$(top_srcdir)/build-aux/gendocs.sh getdelim.c getline.c \
-	gettimeofday.c $(top_srcdir)/GNUmakefile \
+	gettimeofday.c $(top_srcdir)/GNUmakefile hash.h \
 	$(top_srcdir)/build-aux/config.rpath inet_ntop.c inet_pton.c \
-	intprops.h limits.in.h localtime-buffer.c localtime-buffer.h \
-	lseek.c $(top_srcdir)/maint.mk malloc.c memchr.c \
-	memchr.valgrind memmem.c str-two-way.h msvc-inval.c \
-	msvc-inval.h msvc-nothrow.c msvc-nothrow.h netdb.in.h \
-	netinet_in.in.h pathmax.h $(top_srcdir)/build-aux/pmccabe2html \
+	intprops.h inttypes.in.h cdefs.h libc-config.h limits.in.h \
+	localtime-buffer.c localtime-buffer.h lseek.c \
+	$(top_srcdir)/maint.mk malloc.c memchr.c memchr.valgrind \
+	memmem.c str-two-way.h msvc-inval.c msvc-inval.h \
+	msvc-nothrow.c msvc-nothrow.h netdb.in.h netinet_in.in.h \
+	pathmax.h $(top_srcdir)/build-aux/pmccabe2html \
 	$(top_srcdir)/build-aux/pmccabe.css read-file.h realloc.c \
 	secure_getenv.c setsockopt.c w32sock.h _Noreturn.h \
 	arg-nonnull.h c++defs.h warn-on-use.h snprintf.c stat-time.h \
@@ -1583,33 +1741,33 @@ EXTRA_DIST = alloca.c alloca.in.h arpa_inet.in.h byteswap.in.h \
 	float+.h printf-args.c printf-args.h printf-parse.c \
 	printf-parse.h vasnprintf.c vasnprintf.h asprintf.c \
 	vasprintf.c $(top_srcdir)/build-aux/vc-list-files verify.h \
-	vsnprintf.c wchar.in.h
+	vsnprintf.c wchar.in.h xalloc-oversized.h
 BUILT_SOURCES = $(ALLOCA_H) arpa/inet.h $(BYTESWAP_H) $(ERRNO_H) \
-	$(FLOAT_H) $(LIMITS_H) netdb.h $(NETINET_IN_H) $(STDALIGN_H) \
-	$(STDBOOL_H) $(STDDEF_H) $(STDINT_H) stdio.h stdlib.h string.h \
-	strings.h sys/socket.h sys/stat.h sys/time.h sys/types.h \
-	sys/uio.h time.h unistd.h wchar.h
+	$(FLOAT_H) inttypes.h $(LIMITS_H) netdb.h $(NETINET_IN_H) \
+	$(STDALIGN_H) $(STDBOOL_H) $(STDDEF_H) $(STDINT_H) stdio.h \
+	stdlib.h string.h strings.h sys/socket.h sys/stat.h sys/time.h \
+	sys/types.h sys/uio.h time.h unistd.h wchar.h
 SUFFIXES = 
 MOSTLYCLEANFILES = core *.stackdump alloca.h alloca.h-t arpa/inet.h \
 	arpa/inet.h-t byteswap.h byteswap.h-t errno.h errno.h-t \
-	float.h float.h-t limits.h limits.h-t netdb.h netdb.h-t \
-	netinet/in.h netinet/in.h-t stdalign.h stdalign.h-t stdbool.h \
-	stdbool.h-t stddef.h stddef.h-t stdint.h stdint.h-t stdio.h \
-	stdio.h-t stdlib.h stdlib.h-t string.h string.h-t strings.h \
-	strings.h-t sys/socket.h sys/socket.h-t sys/stat.h \
-	sys/stat.h-t sys/time.h sys/time.h-t sys/types.h sys/types.h-t \
-	sys/uio.h sys/uio.h-t time.h time.h-t unistd.h unistd.h-t \
-	wchar.h wchar.h-t
+	float.h float.h-t inttypes.h inttypes.h-t limits.h limits.h-t \
+	netdb.h netdb.h-t netinet/in.h netinet/in.h-t stdalign.h \
+	stdalign.h-t stdbool.h stdbool.h-t stddef.h stddef.h-t \
+	stdint.h stdint.h-t stdio.h stdio.h-t stdlib.h stdlib.h-t \
+	string.h string.h-t strings.h strings.h-t sys/socket.h \
+	sys/socket.h-t sys/stat.h sys/stat.h-t sys/time.h sys/time.h-t \
+	sys/types.h sys/types.h-t sys/uio.h sys/uio.h-t time.h \
+	time.h-t unistd.h unistd.h-t wchar.h wchar.h-t
 MOSTLYCLEANDIRS = arpa netinet sys sys sys
 CLEANFILES = 
 DISTCLEANFILES = 
 MAINTAINERCLEANFILES = 
 AM_CPPFLAGS = 
 AM_CFLAGS = 
-libgnu_la_SOURCES = c-ctype.h c-ctype.c c-strcase.h c-strcasecmp.c \
-	c-strncasecmp.c gettext.h hash-pjw-bare.h hash-pjw-bare.c \
-	minmax.h read-file.c size_max.h stat-time.c sys_socket.c \
-	unistd.c xsize.h xsize.c
+libgnu_la_SOURCES = bitrotate.h bitrotate.c c-ctype.h c-ctype.c \
+	c-strcase.h c-strcasecmp.c c-strncasecmp.c gettext.h hash.c \
+	hash-pjw-bare.h hash-pjw-bare.c minmax.h read-file.c \
+	size_max.h stat-time.c sys_socket.c unistd.c xsize.h xsize.c
 libgnu_la_LIBADD = $(gl_LTLIBOBJS) @LTALLOCA@
 libgnu_la_DEPENDENCIES = $(gl_LTLIBOBJS) @LTALLOCA@
 EXTRA_libgnu_la_SOURCES = alloca.c float.c itold.c fstat.c stat-w32.c \
@@ -1708,6 +1866,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/alloca.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/asnprintf.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/asprintf.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bitrotate.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/c-ctype.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/c-strcasecmp.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/c-strncasecmp.Plo@am__quote@ # am--include-marker
@@ -1719,6 +1878,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/getline.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gettimeofday.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hash-pjw-bare.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hash.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inet_ntop.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inet_pton.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/itold.Plo@am__quote@ # am--include-marker
@@ -1997,6 +2157,7 @@ distclean: distclean-recursive
 		-rm -f ./$(DEPDIR)/alloca.Plo
 	-rm -f ./$(DEPDIR)/asnprintf.Plo
 	-rm -f ./$(DEPDIR)/asprintf.Plo
+	-rm -f ./$(DEPDIR)/bitrotate.Plo
 	-rm -f ./$(DEPDIR)/c-ctype.Plo
 	-rm -f ./$(DEPDIR)/c-strcasecmp.Plo
 	-rm -f ./$(DEPDIR)/c-strncasecmp.Plo
@@ -2008,6 +2169,7 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/getline.Plo
 	-rm -f ./$(DEPDIR)/gettimeofday.Plo
 	-rm -f ./$(DEPDIR)/hash-pjw-bare.Plo
+	-rm -f ./$(DEPDIR)/hash.Plo
 	-rm -f ./$(DEPDIR)/inet_ntop.Plo
 	-rm -f ./$(DEPDIR)/inet_pton.Plo
 	-rm -f ./$(DEPDIR)/itold.Plo
@@ -2089,6 +2251,7 @@ maintainer-clean: maintainer-clean-recursive
 		-rm -f ./$(DEPDIR)/alloca.Plo
 	-rm -f ./$(DEPDIR)/asnprintf.Plo
 	-rm -f ./$(DEPDIR)/asprintf.Plo
+	-rm -f ./$(DEPDIR)/bitrotate.Plo
 	-rm -f ./$(DEPDIR)/c-ctype.Plo
 	-rm -f ./$(DEPDIR)/c-strcasecmp.Plo
 	-rm -f ./$(DEPDIR)/c-strncasecmp.Plo
@@ -2100,6 +2263,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/getline.Plo
 	-rm -f ./$(DEPDIR)/gettimeofday.Plo
 	-rm -f ./$(DEPDIR)/hash-pjw-bare.Plo
+	-rm -f ./$(DEPDIR)/hash.Plo
 	-rm -f ./$(DEPDIR)/inet_ntop.Plo
 	-rm -f ./$(DEPDIR)/inet_pton.Plo
 	-rm -f ./$(DEPDIR)/itold.Plo
@@ -2199,6 +2363,7 @@ arpa/inet.h: arpa_inet.in.h $(top_builddir)/config.status $(CXXDEFS_H) $(WARN_ON
 	      -e 's|@''HAVE_ARPA_INET_H''@|$(HAVE_ARPA_INET_H)|g' \
 	      -e 's/@''GNULIB_INET_NTOP''@/$(GNULIB_INET_NTOP)/g' \
 	      -e 's/@''GNULIB_INET_PTON''@/$(GNULIB_INET_PTON)/g' \
+	      -e 's|@''HAVE_WS2TCPIP_H''@|$(HAVE_WS2TCPIP_H)|g' \
 	      -e 's|@''HAVE_DECL_INET_NTOP''@|$(HAVE_DECL_INET_NTOP)|g' \
 	      -e 's|@''HAVE_DECL_INET_PTON''@|$(HAVE_DECL_INET_PTON)|g' \
 	      -e 's|@''REPLACE_INET_NTOP''@|$(REPLACE_INET_NTOP)|g' \
@@ -2263,6 +2428,41 @@ distclean-local: clean-GNUmakefile
 clean-GNUmakefile:
 	test '$(srcdir)' = . || rm -f $(top_builddir)/GNUmakefile
 
+# We need the following in order to create <inttypes.h> when the system
+# doesn't have one that works with the given compiler.
+inttypes.h: inttypes.in.h $(top_builddir)/config.status $(CXXDEFS_H) $(WARN_ON_USE_H) $(ARG_NONNULL_H)
+	$(AM_V_GEN)rm -f $@-t $@ && \
+	{ echo '/* DO NOT EDIT! GENERATED AUTOMATICALLY! */'; \
+	  sed -e 's/@''HAVE_INTTYPES_H''@/$(HAVE_INTTYPES_H)/g' \
+	      -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
+	      -e 's|@''PRAGMA_SYSTEM_HEADER''@|@PRAGMA_SYSTEM_HEADER@|g' \
+	      -e 's|@''PRAGMA_COLUMNS''@|@PRAGMA_COLUMNS@|g' \
+	      -e 's|@''NEXT_INTTYPES_H''@|$(NEXT_INTTYPES_H)|g' \
+	      -e 's/@''PRI_MACROS_BROKEN''@/$(PRI_MACROS_BROKEN)/g' \
+	      -e 's/@''APPLE_UNIVERSAL_BUILD''@/$(APPLE_UNIVERSAL_BUILD)/g' \
+	      -e 's/@''PRIPTR_PREFIX''@/$(PRIPTR_PREFIX)/g' \
+	      -e 's/@''GNULIB_IMAXABS''@/$(GNULIB_IMAXABS)/g' \
+	      -e 's/@''GNULIB_IMAXDIV''@/$(GNULIB_IMAXDIV)/g' \
+	      -e 's/@''GNULIB_STRTOIMAX''@/$(GNULIB_STRTOIMAX)/g' \
+	      -e 's/@''GNULIB_STRTOUMAX''@/$(GNULIB_STRTOUMAX)/g' \
+	      -e 's/@''HAVE_DECL_IMAXABS''@/$(HAVE_DECL_IMAXABS)/g' \
+	      -e 's/@''HAVE_DECL_IMAXDIV''@/$(HAVE_DECL_IMAXDIV)/g' \
+	      -e 's/@''HAVE_DECL_STRTOIMAX''@/$(HAVE_DECL_STRTOIMAX)/g' \
+	      -e 's/@''HAVE_DECL_STRTOUMAX''@/$(HAVE_DECL_STRTOUMAX)/g' \
+	      -e 's/@''HAVE_IMAXDIV_T''@/$(HAVE_IMAXDIV_T)/g' \
+	      -e 's/@''REPLACE_STRTOIMAX''@/$(REPLACE_STRTOIMAX)/g' \
+	      -e 's/@''REPLACE_STRTOUMAX''@/$(REPLACE_STRTOUMAX)/g' \
+	      -e 's/@''INT32_MAX_LT_INTMAX_MAX''@/$(INT32_MAX_LT_INTMAX_MAX)/g' \
+	      -e 's/@''INT64_MAX_EQ_LONG_MAX''@/$(INT64_MAX_EQ_LONG_MAX)/g' \
+	      -e 's/@''UINT32_MAX_LT_UINTMAX_MAX''@/$(UINT32_MAX_LT_UINTMAX_MAX)/g' \
+	      -e 's/@''UINT64_MAX_EQ_ULONG_MAX''@/$(UINT64_MAX_EQ_ULONG_MAX)/g' \
+	      -e '/definitions of _GL_FUNCDECL_RPL/r $(CXXDEFS_H)' \
+	      -e '/definition of _GL_ARG_NONNULL/r $(ARG_NONNULL_H)' \
+	      -e '/definition of _GL_WARN_ON_USE/r $(WARN_ON_USE_H)' \
+	      < $(srcdir)/inttypes.in.h; \
+	} > $@-t && \
+	mv $@-t $@
+
 # We need the following in order to create <limits.h> when the system
 # doesn't have one that is compatible with GNU.
 @GL_GENERATE_LIMITS_H_TRUE@limits.h: limits.in.h $(top_builddir)/config.status
@@ -2297,6 +2497,7 @@ netdb.h: netdb.in.h $(top_builddir)/config.status $(CXXDEFS_H) $(ARG_NONNULL_H) 
 	      -e 's|@''HAVE_DECL_GETADDRINFO''@|$(HAVE_DECL_GETADDRINFO)|g' \
 	      -e 's|@''HAVE_DECL_GETNAMEINFO''@|$(HAVE_DECL_GETNAMEINFO)|g' \
 	      -e 's|@''REPLACE_GAI_STRERROR''@|$(REPLACE_GAI_STRERROR)|g' \
+	      -e 's|@''REPLACE_GETADDRINFO''@|$(REPLACE_GETADDRINFO)|g' \
 	      -e '/definitions of _GL_FUNCDECL_RPL/r $(CXXDEFS_H)' \
 	      -e '/definition of _GL_ARG_NONNULL/r $(ARG_NONNULL_H)' \
 	      -e '/definition of _GL_WARN_ON_USE/r $(WARN_ON_USE_H)' \
@@ -2380,8 +2581,6 @@ netdb.h: netdb.in.h $(top_builddir)/config.status $(CXXDEFS_H) $(ARG_NONNULL_H) 
 @GL_GENERATE_STDINT_H_TRUE@	      -e 's/@''HAVE_SYS_INTTYPES_H''@/$(HAVE_SYS_INTTYPES_H)/g' \
 @GL_GENERATE_STDINT_H_TRUE@	      -e 's/@''HAVE_SYS_BITYPES_H''@/$(HAVE_SYS_BITYPES_H)/g' \
 @GL_GENERATE_STDINT_H_TRUE@	      -e 's/@''HAVE_WCHAR_H''@/$(HAVE_WCHAR_H)/g' \
-@GL_GENERATE_STDINT_H_TRUE@	      -e 's/@''HAVE_LONG_LONG_INT''@/$(HAVE_LONG_LONG_INT)/g' \
-@GL_GENERATE_STDINT_H_TRUE@	      -e 's/@''HAVE_UNSIGNED_LONG_LONG_INT''@/$(HAVE_UNSIGNED_LONG_LONG_INT)/g' \
 @GL_GENERATE_STDINT_H_TRUE@	      -e 's/@''APPLE_UNIVERSAL_BUILD''@/$(APPLE_UNIVERSAL_BUILD)/g' \
 @GL_GENERATE_STDINT_H_TRUE@	      -e 's/@''BITSIZEOF_PTRDIFF_T''@/$(BITSIZEOF_PTRDIFF_T)/g' \
 @GL_GENERATE_STDINT_H_TRUE@	      -e 's/@''PTRDIFF_T_SUFFIX''@/$(PTRDIFF_T_SUFFIX)/g' \
@@ -2958,9 +3157,11 @@ unistd.h: unistd.in.h $(top_builddir)/config.status $(CXXDEFS_H) $(ARG_NONNULL_H
 	      -e 's|@''PRAGMA_COLUMNS''@|@PRAGMA_COLUMNS@|g' \
 	      -e 's|@''NEXT_UNISTD_H''@|$(NEXT_UNISTD_H)|g' \
 	      -e 's|@''WINDOWS_64_BIT_OFF_T''@|$(WINDOWS_64_BIT_OFF_T)|g' \
+	      -e 's/@''GNULIB_ACCESS''@/$(GNULIB_ACCESS)/g' \
 	      -e 's/@''GNULIB_CHDIR''@/$(GNULIB_CHDIR)/g' \
 	      -e 's/@''GNULIB_CHOWN''@/$(GNULIB_CHOWN)/g' \
 	      -e 's/@''GNULIB_CLOSE''@/$(GNULIB_CLOSE)/g' \
+	      -e 's/@''GNULIB_COPY_FILE_RANGE''@/$(GNULIB_COPY_FILE_RANGE)/g' \
 	      -e 's/@''GNULIB_DUP''@/$(GNULIB_DUP)/g' \
 	      -e 's/@''GNULIB_DUP2''@/$(GNULIB_DUP2)/g' \
 	      -e 's/@''GNULIB_DUP3''@/$(GNULIB_DUP3)/g' \
@@ -2979,6 +3180,7 @@ unistd.h: unistd.in.h $(top_builddir)/config.status $(CXXDEFS_H) $(ARG_NONNULL_H
 	      -e 's/@''GNULIB_GETHOSTNAME''@/$(GNULIB_GETHOSTNAME)/g' \
 	      -e 's/@''GNULIB_GETLOGIN''@/$(GNULIB_GETLOGIN)/g' \
 	      -e 's/@''GNULIB_GETLOGIN_R''@/$(GNULIB_GETLOGIN_R)/g' \
+	      -e 's/@''GNULIB_GETOPT_POSIX''@/$(GNULIB_GETOPT_POSIX)/g' \
 	      -e 's/@''GNULIB_GETPAGESIZE''@/$(GNULIB_GETPAGESIZE)/g' \
 	      -e 's/@''GNULIB_GETPASS''@/$(GNULIB_GETPASS)/g' \
 	      -e 's/@''GNULIB_GETUSERSHELL''@/$(GNULIB_GETUSERSHELL)/g' \
@@ -3011,6 +3213,7 @@ unistd.h: unistd.in.h $(top_builddir)/config.status $(CXXDEFS_H) $(ARG_NONNULL_H
 	      -e 's/@''GNULIB_WRITE''@/$(GNULIB_WRITE)/g' \
 	      < $(srcdir)/unistd.in.h | \
 	  sed -e 's|@''HAVE_CHOWN''@|$(HAVE_CHOWN)|g' \
+	      -e 's|@''HAVE_COPY_FILE_RANGE''@|$(HAVE_COPY_FILE_RANGE)|g' \
 	      -e 's|@''HAVE_DUP2''@|$(HAVE_DUP2)|g' \
 	      -e 's|@''HAVE_DUP3''@|$(HAVE_DUP3)|g' \
 	      -e 's|@''HAVE_EUIDACCESS''@|$(HAVE_EUIDACCESS)|g' \
@@ -3055,7 +3258,8 @@ unistd.h: unistd.in.h $(top_builddir)/config.status $(CXXDEFS_H) $(ARG_NONNULL_H
 	      -e 's|@''HAVE_OS_H''@|$(HAVE_OS_H)|g' \
 	      -e 's|@''HAVE_SYS_PARAM_H''@|$(HAVE_SYS_PARAM_H)|g' \
 	  | \
-	  sed -e 's|@''REPLACE_CHOWN''@|$(REPLACE_CHOWN)|g' \
+	  sed -e 's|@''REPLACE_ACCESS''@|$(REPLACE_ACCESS)|g' \
+	      -e 's|@''REPLACE_CHOWN''@|$(REPLACE_CHOWN)|g' \
 	      -e 's|@''REPLACE_CLOSE''@|$(REPLACE_CLOSE)|g' \
 	      -e 's|@''REPLACE_DUP''@|$(REPLACE_DUP)|g' \
 	      -e 's|@''REPLACE_DUP2''@|$(REPLACE_DUP2)|g' \
@@ -3208,6 +3412,7 @@ wchar.h: wchar.in.h $(top_builddir)/config.status $(CXXDEFS_H) $(ARG_NONNULL_H) 
 	      -e 's|@''REPLACE_WCWIDTH''@|$(REPLACE_WCWIDTH)|g' \
 	      -e 's|@''REPLACE_WCSWIDTH''@|$(REPLACE_WCSWIDTH)|g' \
 	      -e 's|@''REPLACE_WCSFTIME''@|$(REPLACE_WCSFTIME)|g' \
+	      -e 's|@''REPLACE_WCSTOK''@|$(REPLACE_WCSTOK)|g' \
 	      -e '/definitions of _GL_FUNCDECL_RPL/r $(CXXDEFS_H)' \
 	      -e '/definition of _GL_ARG_NONNULL/r $(ARG_NONNULL_H)' \
 	      -e '/definition of _GL_WARN_ON_USE/r $(WARN_ON_USE_H)'; \

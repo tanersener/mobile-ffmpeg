@@ -50,6 +50,7 @@ int _gnutls_check_id_for_change(gnutls_session_t session)
 	cred_type = gnutls_auth_get_type(session);
 	if (cred_type == GNUTLS_CRD_PSK || cred_type == GNUTLS_CRD_SRP) {
 		const char *username = NULL;
+		int username_length;
 
 		if (cred_type == GNUTLS_CRD_PSK) {
 			psk_auth_info_t ai;
@@ -59,6 +60,7 @@ int _gnutls_check_id_for_change(gnutls_session_t session)
 				return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 			username = ai->username;
+			username_length = ai->username_len;
 #ifdef ENABLE_SRP
 		} else {
 			srp_server_auth_info_t ai = _gnutls_get_auth_info(session, GNUTLS_CRD_SRP);
@@ -66,23 +68,23 @@ int _gnutls_check_id_for_change(gnutls_session_t session)
 				return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 			username = ai->username;
+			username_length = strlen(ai->username);
 #endif
 		}
 
 		if (username == NULL)
 			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-		if (session->internals.saved_username_set) {
-			if (strcmp(session->internals.saved_username, username) != 0) {
+		if (session->internals.saved_username_size != -1) {
+			if (session->internals.saved_username_size == username_length &&
+			    strncmp(session->internals.saved_username, username, username_length) != 0) {
 				_gnutls_debug_log("Session's PSK username changed during rehandshake; aborting!\n");
 				return gnutls_assert_val(GNUTLS_E_SESSION_USER_ID_CHANGED);
 			}
 		} else {
-			size_t len = strlen(username);
-
-			memcpy(session->internals.saved_username, username, len);
-			session->internals.saved_username[len] = 0;
-			session->internals.saved_username_set = 1;
+			memcpy(session->internals.saved_username, username, username_length);
+			session->internals.saved_username[username_length] = 0;
+			session->internals.saved_username_size = username_length;
 		}
 	}
 

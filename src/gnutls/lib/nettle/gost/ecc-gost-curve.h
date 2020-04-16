@@ -49,10 +49,10 @@ struct ecc_curve;
 #endif
 #endif
 
-#define nettle_get_gost_256cpa _gnutls_get_gost_256cpa
-#define nettle_get_gost_512a _gnutls_get_gost_512a
-const struct ecc_curve * NETTLE_PURE nettle_get_gost_256cpa(void);
-const struct ecc_curve * NETTLE_PURE nettle_get_gost_512a(void);
+#define nettle_get_gost_gc256b _gnutls_get_gost_gc256b
+#define nettle_get_gost_gc512a _gnutls_get_gost_gc512a
+const struct ecc_curve * NETTLE_PURE nettle_get_gost_gc256b(void);
+const struct ecc_curve * NETTLE_PURE nettle_get_gost_gc512a(void);
 
 #ifdef __cplusplus
 }

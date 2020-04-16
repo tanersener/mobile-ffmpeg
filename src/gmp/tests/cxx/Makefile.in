@@ -108,13 +108,13 @@ host_triplet = @host@
 @WANT_CXX_TRUE@	t-cxx11$(EXEEXT) t-headers$(EXEEXT) \
 @WANT_CXX_TRUE@	t-iostream$(EXEEXT) t-istream$(EXEEXT) \
 @WANT_CXX_TRUE@	t-locale$(EXEEXT) t-misc$(EXEEXT) \
-@WANT_CXX_TRUE@	t-mix$(EXEEXT) t-ops$(EXEEXT) t-ops2$(EXEEXT) \
-@WANT_CXX_TRUE@	t-ops3$(EXEEXT) t-ostream$(EXEEXT) \
-@WANT_CXX_TRUE@	t-prec$(EXEEXT) t-ternary$(EXEEXT) \
-@WANT_CXX_TRUE@	t-unary$(EXEEXT) \
+@WANT_CXX_TRUE@	t-mix$(EXEEXT) t-ops$(EXEEXT) t-ops2qf$(EXEEXT) \
+@WANT_CXX_TRUE@	t-ops2f$(EXEEXT) t-ops3$(EXEEXT) \
+@WANT_CXX_TRUE@	t-ostream$(EXEEXT) t-prec$(EXEEXT) \
+@WANT_CXX_TRUE@	t-ternary$(EXEEXT) t-unary$(EXEEXT) \
 @WANT_CXX_TRUE@	t-do-exceptions-work-at-all-with-this-compiler$(EXEEXT) \
-@WANT_CXX_TRUE@	t-assign$(EXEEXT) t-constr$(EXEEXT) \
-@WANT_CXX_TRUE@	t-rand$(EXEEXT)
+@WANT_CXX_TRUE@	t-ops2z$(EXEEXT) t-assign$(EXEEXT) \
+@WANT_CXX_TRUE@	t-constr$(EXEEXT) t-rand$(EXEEXT)
 subdir = tests/cxx
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
@@ -198,10 +198,20 @@ t_ops_OBJECTS = $(am_t_ops_OBJECTS)
 t_ops_LDADD = $(LDADD)
 t_ops_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
 	$(top_builddir)/libgmpxx.la $(top_builddir)/libgmp.la
-am_t_ops2_OBJECTS = t-ops2.$(OBJEXT)
-t_ops2_OBJECTS = $(am_t_ops2_OBJECTS)
-t_ops2_LDADD = $(LDADD)
-t_ops2_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
+am_t_ops2f_OBJECTS = t-ops2f.$(OBJEXT)
+t_ops2f_OBJECTS = $(am_t_ops2f_OBJECTS)
+t_ops2f_LDADD = $(LDADD)
+t_ops2f_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
+	$(top_builddir)/libgmpxx.la $(top_builddir)/libgmp.la
+am_t_ops2qf_OBJECTS = t-ops2qf.$(OBJEXT)
+t_ops2qf_OBJECTS = $(am_t_ops2qf_OBJECTS)
+t_ops2qf_LDADD = $(LDADD)
+t_ops2qf_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
+	$(top_builddir)/libgmpxx.la $(top_builddir)/libgmp.la
+am_t_ops2z_OBJECTS = t-ops2z.$(OBJEXT)
+t_ops2z_OBJECTS = $(am_t_ops2z_OBJECTS)
+t_ops2z_LDADD = $(LDADD)
+t_ops2z_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
 	$(top_builddir)/libgmpxx.la $(top_builddir)/libgmp.la
 am_t_ops3_OBJECTS = t-ops3.$(OBJEXT)
 t_ops3_OBJECTS = $(am_t_ops3_OBJECTS)
@@ -289,17 +299,19 @@ SOURCES = $(t_assign_SOURCES) $(t_binary_SOURCES) $(t_cast_SOURCES) \
 	$(t_do_exceptions_work_at_all_with_this_compiler_SOURCES) \
 	$(t_headers_SOURCES) $(t_iostream_SOURCES) \
 	$(t_istream_SOURCES) $(t_locale_SOURCES) $(t_misc_SOURCES) \
-	$(t_mix_SOURCES) $(t_ops_SOURCES) $(t_ops2_SOURCES) \
-	$(t_ops3_SOURCES) $(t_ostream_SOURCES) $(t_prec_SOURCES) \
-	$(t_rand_SOURCES) $(t_ternary_SOURCES) $(t_unary_SOURCES)
+	$(t_mix_SOURCES) $(t_ops_SOURCES) $(t_ops2f_SOURCES) \
+	$(t_ops2qf_SOURCES) $(t_ops2z_SOURCES) $(t_ops3_SOURCES) \
+	$(t_ostream_SOURCES) $(t_prec_SOURCES) $(t_rand_SOURCES) \
+	$(t_ternary_SOURCES) $(t_unary_SOURCES)
 DIST_SOURCES = $(t_assign_SOURCES) $(t_binary_SOURCES) \
 	$(t_cast_SOURCES) $(t_constr_SOURCES) $(t_cxx11_SOURCES) \
 	$(t_do_exceptions_work_at_all_with_this_compiler_SOURCES) \
 	$(t_headers_SOURCES) $(t_iostream_SOURCES) \
 	$(t_istream_SOURCES) $(t_locale_SOURCES) $(t_misc_SOURCES) \
-	$(t_mix_SOURCES) $(t_ops_SOURCES) $(t_ops2_SOURCES) \
-	$(t_ops3_SOURCES) $(t_ostream_SOURCES) $(t_prec_SOURCES) \
-	$(t_rand_SOURCES) $(t_ternary_SOURCES) $(t_unary_SOURCES)
+	$(t_mix_SOURCES) $(t_ops_SOURCES) $(t_ops2f_SOURCES) \
+	$(t_ops2qf_SOURCES) $(t_ops2z_SOURCES) $(t_ops3_SOURCES) \
+	$(t_ostream_SOURCES) $(t_prec_SOURCES) $(t_rand_SOURCES) \
+	$(t_ternary_SOURCES) $(t_unary_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -699,6 +711,7 @@ top_srcdir = @top_srcdir@
 # -lm is needed for t-ops2 which compares the results of trunc and mpf_trunc.
 #
 AM_CPPFLAGS = -I$(top_srcdir) -I$(top_srcdir)/tests
+AM_LDFLAGS = -no-install
 LDADD = -L$(top_builddir)/.libs \
   $(top_builddir)/tests/libtests.la \
   $(top_builddir)/libgmpxx.la \
@@ -706,6 +719,7 @@ LDADD = -L$(top_builddir)/.libs \
   -lm
 
 @WANT_CXX_TRUE@TESTS = $(check_PROGRAMS)
+EXTRA_DIST = t-ops2.h
 t_assign_SOURCES = t-assign.cc
 t_binary_SOURCES = t-binary.cc
 t_cast_SOURCES = t-cast.cc
@@ -718,7 +732,9 @@ t_locale_SOURCES = t-locale.cc clocale.c
 t_misc_SOURCES = t-misc.cc
 t_mix_SOURCES = t-mix.cc
 t_ops_SOURCES = t-ops.cc
-t_ops2_SOURCES = t-ops2.cc
+t_ops2z_SOURCES = t-ops2z.cc
+t_ops2qf_SOURCES = t-ops2qf.cc
+t_ops2f_SOURCES = t-ops2f.cc
 t_ops3_SOURCES = t-ops3.cc
 t_ostream_SOURCES = t-ostream.cc
 t_prec_SOURCES = t-prec.cc
@@ -836,9 +852,17 @@ t-ops$(EXEEXT): $(t_ops_OBJECTS) $(t_ops_DEPENDENCIES) $(EXTRA_t_ops_DEPENDENCIE
 	@rm -f t-ops$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(t_ops_OBJECTS) $(t_ops_LDADD) $(LIBS)
 
-t-ops2$(EXEEXT): $(t_ops2_OBJECTS) $(t_ops2_DEPENDENCIES) $(EXTRA_t_ops2_DEPENDENCIES) 
-	@rm -f t-ops2$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(t_ops2_OBJECTS) $(t_ops2_LDADD) $(LIBS)
+t-ops2f$(EXEEXT): $(t_ops2f_OBJECTS) $(t_ops2f_DEPENDENCIES) $(EXTRA_t_ops2f_DEPENDENCIES) 
+	@rm -f t-ops2f$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(t_ops2f_OBJECTS) $(t_ops2f_LDADD) $(LIBS)
+
+t-ops2qf$(EXEEXT): $(t_ops2qf_OBJECTS) $(t_ops2qf_DEPENDENCIES) $(EXTRA_t_ops2qf_DEPENDENCIES) 
+	@rm -f t-ops2qf$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(t_ops2qf_OBJECTS) $(t_ops2qf_LDADD) $(LIBS)
+
+t-ops2z$(EXEEXT): $(t_ops2z_OBJECTS) $(t_ops2z_DEPENDENCIES) $(EXTRA_t_ops2z_DEPENDENCIES) 
+	@rm -f t-ops2z$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(t_ops2z_OBJECTS) $(t_ops2z_LDADD) $(LIBS)
 
 t-ops3$(EXEEXT): $(t_ops3_OBJECTS) $(t_ops3_DEPENDENCIES) $(EXTRA_t_ops3_DEPENDENCIES) 
 	@rm -f t-ops3$(EXEEXT)
@@ -1157,9 +1181,16 @@ t-ops.log: t-ops$(EXEEXT)
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
-t-ops2.log: t-ops2$(EXEEXT)
-	@p='t-ops2$(EXEEXT)'; \
-	b='t-ops2'; \
+t-ops2qf.log: t-ops2qf$(EXEEXT)
+	@p='t-ops2qf$(EXEEXT)'; \
+	b='t-ops2qf'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+t-ops2f.log: t-ops2f$(EXEEXT)
+	@p='t-ops2f$(EXEEXT)'; \
+	b='t-ops2f'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
@@ -1202,6 +1233,13 @@ t-unary.log: t-unary$(EXEEXT)
 t-do-exceptions-work-at-all-with-this-compiler.log: t-do-exceptions-work-at-all-with-this-compiler$(EXEEXT)
 	@p='t-do-exceptions-work-at-all-with-this-compiler$(EXEEXT)'; \
 	b='t-do-exceptions-work-at-all-with-this-compiler'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+t-ops2z.log: t-ops2z$(EXEEXT)
+	@p='t-ops2z$(EXEEXT)'; \
+	b='t-ops2z'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \

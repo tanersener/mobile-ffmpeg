@@ -27,17 +27,22 @@ else
     . ${BASEDIR}/build/ios-common.sh
 fi
 
-# PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
+# PREPARE PATHS & DEFINE ${INSTALL_PKG_CONFIG_DIR}
 LIB_NAME="kvazaar"
 set_toolchain_clang_paths ${LIB_NAME}
 
 # PREPARING FLAGS
+ARCH_OPTIONS=""
 case ${ARCH} in
     i386)
-        TARGET_HOST="x86-apple-darwin"
+        BUILD_HOST="x86-apple-darwin"
+    ;;
+    x86-64 | x86-64-mac-catalyst)
+        ARCH_OPTIONS="--disable-asm"
+        BUILD_HOST=$(get_build_host)
     ;;
     *)
-        TARGET_HOST=$(get_target_host)
+        BUILD_HOST=$(get_build_host)
     ;;
 esac
 export CFLAGS=$(get_cflags ${LIB_NAME})
@@ -51,7 +56,7 @@ cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
 make distclean 2>/dev/null 1>/dev/null
 
-# RECONFIGURING IF REQUESTED
+# RECONFIGURE IF REQUESTED
 if [[ ${RECONF_kvazaar} -eq 1 ]]; then
     autoreconf_library ${LIB_NAME}
 fi
@@ -63,7 +68,8 @@ fi
     --enable-static \
     --disable-shared \
     --disable-fast-install \
-    --host=${TARGET_HOST} || exit 1
+    ${ARCH_OPTIONS} \
+    --host=${BUILD_HOST} || exit 1
 
 make || exit 1
 

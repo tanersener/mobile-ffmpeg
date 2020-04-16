@@ -2,8 +2,8 @@
 
    Contributed to the GNU project by Torbjörn Granlund.
 
-Copyright 1991, 1993, 1994, 1996, 1997, 2000-2002, 2005, 2008, 2009, 2011-2013
-Free Software Foundation, Inc.
+Copyright 1991, 1993, 1994, 1996, 1997, 2000-2002, 2005, 2008, 2009,
+2011-2013, 2015 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -32,7 +32,6 @@ GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
 
-#include "gmp.h"
 #include "gmp-impl.h"
 #include "longlong.h"
 
@@ -59,11 +58,7 @@ see https://www.gnu.org/licenses/.  */
 static void
 mod (mp_ptr np, mp_size_t nn, mp_srcptr dp, mp_size_t dn, gmp_pi1_t *dinv, mp_ptr tp)
 {
-  mp_ptr qp;
-  TMP_DECL;
-  TMP_MARK;
-
-  qp = tp;
+  mp_ptr qp = tp;
 
   if (dn == 1)
     {
@@ -90,14 +85,20 @@ mod (mp_ptr np, mp_size_t nn, mp_srcptr dp, mp_size_t dn, gmp_pi1_t *dinv, mp_pt
       /* We need to allocate separate remainder area, since mpn_mu_div_qr does
 	 not handle overlap between the numerator and remainder areas.
 	 FIXME: Make it handle such overlap.  */
-      mp_ptr rp = TMP_BALLOC_LIMBS (dn);
-      mp_size_t itch = mpn_mu_div_qr_itch (nn, dn, 0);
-      mp_ptr scratch = TMP_BALLOC_LIMBS (itch);
+      mp_ptr rp, scratch;
+      mp_size_t itch;
+      TMP_DECL;
+      TMP_MARK;
+
+      itch = mpn_mu_div_qr_itch (nn, dn, 0);
+      rp = TMP_BALLOC_LIMBS (dn);
+      scratch = TMP_BALLOC_LIMBS (itch);
+
       mpn_mu_div_qr (qp, rp, np, nn, dp, dn, scratch);
       MPN_COPY (np, rp, dn);
-    }
 
-  TMP_FREE;
+      TMP_FREE;
+    }
 }
 
 /* Compute t = a mod m, a is defined by (ap,an), m is defined by (mp,mn), and
@@ -109,8 +110,7 @@ reduce (mp_ptr tp, mp_srcptr ap, mp_size_t an, mp_srcptr mp, mp_size_t mn, gmp_p
   TMP_DECL;
   TMP_MARK;
 
-  rp = TMP_ALLOC_LIMBS (an);
-  scratch = TMP_ALLOC_LIMBS (an - mn + 1);
+  TMP_ALLOC_LIMBS_2 (rp, an, scratch, an - mn + 1);
   MPN_COPY (rp, ap, an);
   mod (rp, an, mp, mn, dinv, scratch);
   MPN_COPY (tp, rp, mn);
@@ -136,12 +136,17 @@ mpz_powm_ui (mpz_ptr r, mpz_srcptr b, unsigned long int el, mpz_srcptr m)
       if (UNLIKELY (mn == 0))
 	DIVIDE_BY_ZERO;
 
-      if (el == 0)
+      if (el <= 1)
 	{
+	  if (el == 1)
+	    {
+	      mpz_mod (r, b, m);
+	      return;
+	    }
 	  /* Exponent is zero, result is 1 mod M, i.e., 1 or 0 depending on if
 	     M equals 1.  */
-	  SIZ(r) = (mn == 1 && mp[0] == 1) ? 0 : 1;
-	  PTR(r)[0] = 1;
+	  SIZ(r) = mn != 1 || mp[0] != 1;
+	  MPZ_NEWALLOC (r, 1)[0] = 1;
 	  return;
 	}
 
@@ -183,9 +188,7 @@ mpz_powm_ui (mpz_ptr r, mpz_srcptr b, unsigned long int el, mpz_srcptr m)
 	  return;
 	}
 
-      tp = TMP_ALLOC_LIMBS (2 * mn + 1);
-      xp = TMP_ALLOC_LIMBS (mn);
-      scratch = TMP_ALLOC_LIMBS (mn + 1);
+      TMP_ALLOC_LIMBS_3 (xp, mn, scratch, mn + 1, tp, 2 * mn + 1);
 
       MPN_COPY (xp, bp, bn);
       xn = bn;
@@ -195,16 +198,7 @@ mpz_powm_ui (mpz_ptr r, mpz_srcptr b, unsigned long int el, mpz_srcptr m)
       e = (e << c) << 1;		/* shift the exp bits to the left, lose msb */
       c = GMP_LIMB_BITS - 1 - c;
 
-      if (c == 0)
-	{
-	  /* If m is already normalized (high bit of high limb set), and b is
-	     the same size, but a bigger value, and e==1, then there's no
-	     modular reductions done and we can end up with a result out of
-	     range at the end. */
-	  if (xn == mn && mpn_cmp (xp, mp, mn) >= 0)
-	    mpn_sub_n (xp, xp, mp, mn);
-	}
-      else
+      ASSERT (c != 0); /* el > 1 */
 	{
 	  /* Main loop. */
 	  do
@@ -253,17 +247,12 @@ mpz_powm_ui (mpz_ptr r, mpz_srcptr b, unsigned long int el, mpz_srcptr m)
 	  cy = mpn_lshift (tp, xp, xn, m_zero_cnt);
 	  tp[xn] = cy; xn += cy != 0;
 
-	  if (xn < mn)
-	    {
-	      MPN_COPY (xp, tp, xn);
-	    }
-	  else
+	  if (xn >= mn)
 	    {
 	      mod (tp, xn, mp, mn, &dinv, scratch);
-	      MPN_COPY (xp, tp, mn);
 	      xn = mn;
 	    }
-	  mpn_rshift (xp, xp, xn, m_zero_cnt);
+	  mpn_rshift (xp, tp, xn, m_zero_cnt);
 	}
       MPN_NORMALIZE (xp, xn);
 
@@ -274,7 +263,7 @@ mpz_powm_ui (mpz_ptr r, mpz_srcptr b, unsigned long int el, mpz_srcptr m)
 	  xn = mn;
 	  MPN_NORMALIZE (xp, xn);
 	}
-      MPZ_REALLOC (r, xn);
+      MPZ_NEWALLOC (r, xn);
       SIZ (r) = xn;
       MPN_COPY (PTR(r), xp, xn);
 

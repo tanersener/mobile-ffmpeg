@@ -121,7 +121,9 @@ static void tcp_server(const char *name, int port);
 /* These are global */
 gnutls_srp_server_credentials_t srp_cred = NULL;
 gnutls_psk_server_credentials_t psk_cred = NULL;
+#ifdef ENABLE_ANON
 gnutls_anon_server_credentials_t dh_cred = NULL;
+#endif
 gnutls_certificate_credentials_t cert_cred = NULL;
 
 const int ssl_session_cache = 2048;
@@ -384,7 +386,9 @@ gnutls_session_t initialize_session(int dtls)
 	int ret;
 	unsigned i;
 	const char *err;
+#ifdef ENABLE_ALPN
 	gnutls_datum_t alpn[MAX_ALPN_PROTOCOLS];
+#endif
 	unsigned alpn_size;
 	unsigned flags = GNUTLS_SERVER | GNUTLS_POST_HANDSHAKE_AUTH | GNUTLS_ENABLE_RAWPK;
 
@@ -443,6 +447,12 @@ gnutls_session_t initialize_session(int dtls)
 		}
 	}
 
+#ifndef ENABLE_ALPN
+	if (alpn_protos_size != 0) {
+		fprintf(stderr, "ALPN is not supported\n");
+		exit(1);
+	}
+#else
 	alpn_size = MIN(MAX_ALPN_PROTOCOLS,alpn_protos_size);
 	for (i=0;i<alpn_size;i++) {
 		alpn[i].data = (void*)alpn_protos[i];
@@ -454,8 +464,11 @@ gnutls_session_t initialize_session(int dtls)
 		fprintf(stderr, "Error setting ALPN protocols: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
+#endif
 
+#ifdef ENABLE_ANON
 	gnutls_credentials_set(session, GNUTLS_CRD_ANON, dh_cred);
+#endif
 
 	if (srp_cred != NULL)
 		gnutls_credentials_set(session, GNUTLS_CRD_SRP, srp_cred);
@@ -705,11 +718,13 @@ static char *peer_print_info(gnutls_session_t session, int *ret_length,
 		}
 #endif
 
+#if defined(ENABLE_DHE) || defined(ENABLE_ANON)
 		if (kx_alg == GNUTLS_KX_DHE_RSA || kx_alg == GNUTLS_KX_DHE_DSS) {
 			snprintf(tmp_buffer, tmp_buffer_size,
 				 "Ephemeral DH using prime of <b>%d</b> bits.<br>\n",
 				 gnutls_dh_get_prime_bits(session));
 		}
+#endif
 
 		tmp = gnutls_compression_get_name(gnutls_compression_get(session));
 		if (tmp == NULL)
@@ -1014,7 +1029,7 @@ static void strip(char *data)
 	}
 }
 
-static void
+static unsigned
 get_response(gnutls_session_t session, char *request,
 	     char **response, int *response_length)
 {
@@ -1035,7 +1050,7 @@ get_response(gnutls_session_t session, char *request,
 			goto unimplemented;
 		*p = '\0';
 	}
-/*    *response = peer_print_info(session, request+4, h, response_length); */
+
 	if (http != 0) {
 		if (http_data_file == NULL)
 			*response = peer_print_info(session, response_length, h);
@@ -1051,25 +1066,34 @@ get_response(gnutls_session_t session, char *request,
 			*response = strdup("Successfully executed command\n");
 			if (*response == NULL) {
 				fprintf(stderr, "Memory error\n");
-				exit(1);
+				return 0;
 			}
 			*response_length = strlen(*response);
-			return;
+			return 1;
 		} else if (ret == 0) {
 			*response = strdup(request);
-			*response_length = ((*response) ? strlen(*response) : 0);
+			if (*response == NULL) {
+				fprintf(stderr, "Memory error\n");
+				return 0;
+			}
+			*response_length = strlen(*response);
 		} else {
+			*response = NULL;
 			do {
-				ret = gnutls_alert_send(session, GNUTLS_AL_FATAL, GNUTLS_A_UNEXPECTED_MESSAGE);
+				ret = gnutls_alert_send_appropriate(session, ret);
 			} while(ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
+			return 0;
 		}
 	}
 
-	return;
+	return 1;
 
       unimplemented:
 	*response = strdup(HTTP_UNIMPLEMENTED);
+	if (*response == NULL)
+		return 0;
 	*response_length = ((*response) ? strlen(*response) : 0);
+	return 1;
 }
 
 static void terminate(int sig) __attribute__ ((__noreturn__));
@@ -1247,6 +1271,12 @@ int main(int argc, char **argv)
 			"Warning: no private key and certificate pairs were set.\n");
 	}
 
+#ifndef ENABLE_OCSP
+	if (HAVE_OPT(IGNORE_OCSP_RESPONSE_ERRORS) || ocsp_responses_size != 0) {
+		fprintf(stderr, "OCSP is not supported!\n");
+			exit(1);
+	}
+#else
 	/* OCSP status-request TLS extension */
 	if (HAVE_OPT(IGNORE_OCSP_RESPONSE_ERRORS))
 		gnutls_certificate_set_flags(cert_cred, GNUTLS_CERTIFICATE_SKIP_OCSP_RESPONSE_CHECK);
@@ -1262,13 +1292,19 @@ int main(int argc, char **argv)
 			exit(1);
 		}
 	}
+#endif
 
 	if (use_static_dh_params) {
+#if defined(ENABLE_DHE) || defined(ENABLE_ANON)
 		ret = gnutls_certificate_set_known_dh_params(cert_cred, GNUTLS_SEC_PARAM_MEDIUM);
 		if (ret < 0) {
 			fprintf(stderr, "Error while setting DH parameters: %s\n", gnutls_strerror(ret));
 			exit(1);
 		}
+#else
+		fprintf(stderr, "Setting DH parameters is not supported\n");
+		exit(1);
+#endif
 	} else {
 		gnutls_certificate_set_params_function(cert_cred, get_params);
 	}
@@ -1663,18 +1699,21 @@ static void tcp_server(const char *name, int port)
 						    || strstr(j->
 							      http_request,
 							      "\n\n")) {
-							get_response(j->
-								     tls_session,
-								     j->
-								     http_request,
-								     &j->
-								     http_response,
-								     &j->
-								     response_length);
-							j->http_state =
-							    HTTP_STATE_RESPONSE;
-							j->response_written
-							    = 0;
+							if (get_response(j->
+								         tls_session,
+								         j->
+								         http_request,
+								         &j->
+								         http_response,
+								         &j->
+								         response_length)) {
+								j->http_state =
+								    HTTP_STATE_RESPONSE;
+								j->response_written
+								    = 0;
+							} else {
+								j->http_state = HTTP_STATE_CLOSING;
+							}
 						}
 					}
 				}

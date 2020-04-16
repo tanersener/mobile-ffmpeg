@@ -1,6 +1,6 @@
 dnl  AMD64 mpn_hamdist -- hamming distance.
 
-dnl  Copyright 2008, 2010-2012 Free Software Foundation, Inc.
+dnl  Copyright 2008, 2010-2012, 2017 Free Software Foundation, Inc.
 
 dnl  This file is part of the GNU MP Library.
 dnl
@@ -30,20 +30,26 @@ dnl  see https://www.gnu.org/licenses/.
 
 include(`../config.m4')
 
-C		    cycles/limb
-C AMD K8,K9		 n/a
-C AMD K10		 2
-C Intel P4		 n/a
-C Intel core2		 n/a
-C Intel corei		 2.05
-C Intel atom		 n/a
-C VIA nano		 n/a
-
-C This is very straightforward 2-way unrolled code.
-
-C TODO
-C  * Write something less basic.  It should not be hard to reach 1.5 c/l with
-C    4-way unrolling.
+C	     cycles/limb
+C AMD K8,K9	 -
+C AMD K10	 2.0		=
+C AMD bd1	~4.4		=
+C AMD bd2	~4.4		=
+C AMD bd3
+C AMD bd4
+C AMD bobcat	 7.55		=
+C AMD jaguar	 2.52		-
+C Intel P4	 -
+C Intel core2	 -
+C Intel NHM	 2.03		+
+C Intel SBR	 2.01		+
+C Intel IBR	 1.96		+
+C Intel HWL	 1.64		=
+C Intel BWL	 1.56		-
+C Intel SKL	 1.52		=
+C Intel atom
+C Intel SLM	 3.0		-
+C VIA nano
 
 define(`ap',		`%rdi')
 define(`bp',		`%rsi')
@@ -64,12 +70,12 @@ PROLOGUE(mpn_hamdist)
 	lea	(bp,n,8), bp			C point at B operand end
 	neg	n
 
-	bt	$0, R32(n)
-	jnc	L(2)
+	test	$1, R8(n)
+	jz	L(2)
 
 L(1):	.byte	0xf3,0x49,0x0f,0xb8,0xc0	C popcnt %r8, %rax
 	xor	R32(%r10), R32(%r10)
-	add	$1, n
+	inc	n
 	js	L(top)
 	FUNC_EXIT()
 	ret

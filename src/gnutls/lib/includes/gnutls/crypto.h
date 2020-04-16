@@ -123,6 +123,7 @@ int gnutls_hmac(gnutls_hmac_hd_t handle, const void *text, size_t textlen);
 void gnutls_hmac_output(gnutls_hmac_hd_t handle, void *digest);
 void gnutls_hmac_deinit(gnutls_hmac_hd_t handle, void *digest);
 unsigned gnutls_hmac_get_len(gnutls_mac_algorithm_t algorithm) __GNUTLS_CONST__;
+unsigned gnutls_hmac_get_key_size(gnutls_mac_algorithm_t algorithm) __GNUTLS_CONST__;
 int gnutls_hmac_fast(gnutls_mac_algorithm_t algorithm,
 		     const void *key, size_t keylen,
 		     const void *text, size_t textlen, void *digest);
@@ -137,6 +138,24 @@ unsigned gnutls_hash_get_len(gnutls_digest_algorithm_t algorithm) __GNUTLS_CONST
 int gnutls_hash_fast(gnutls_digest_algorithm_t algorithm,
 		     const void *text, size_t textlen, void *digest);
 gnutls_hash_hd_t gnutls_hash_copy(gnutls_hash_hd_t handle);
+
+/* KDF API */
+
+int gnutls_hkdf_extract(gnutls_mac_algorithm_t mac,
+			const gnutls_datum_t *key,
+			const gnutls_datum_t *salt,
+			void *output);
+
+int gnutls_hkdf_expand(gnutls_mac_algorithm_t mac,
+		       const gnutls_datum_t *key,
+		       const gnutls_datum_t *info,
+		       void *output, size_t length);
+
+int gnutls_pbkdf2(gnutls_mac_algorithm_t mac,
+		  const gnutls_datum_t *key,
+		  const gnutls_datum_t *salt,
+		  unsigned iter_count,
+		  void *output, size_t length);
 
 /* register ciphers */
 

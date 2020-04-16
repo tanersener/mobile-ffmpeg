@@ -36,12 +36,22 @@ C	    cycles/limb
 C AMD K8,K9	 0.67	   0.583 is possible with zero-reg instead of $0, 4-way
 C AMD K10	 0.67	   this seems hard to beat
 C AMD bd1	 1
+C AMD bd2	 1
+C AMD bd3	 ?
+C AMD bd4	 ?
+C AMD zen	 0.62
 C AMD bobcat	 1.07
+C AMD jaguar	 1
 C Intel P4	 7.35	   terrible, use old code
 C Intel core2	 1.25	   1+epsilon with huge unrolling
 C Intel NHM	 1.15	   this seems hard to beat
 C Intel SBR	 0.93
+C Intel IBR	 0.93
+C Intel HWL	 0.82
+C Intel BWL	 0.64
+C Intel SKY	 0.60
 C Intel atom	 2.5
+C Intel SLM      1.59
 C VIA nano	 1.25	   this seems hard to beat
 
 C INPUT PARAMETERS

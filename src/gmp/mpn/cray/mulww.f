@@ -3,27 +3,27 @@ c    Helper for mpn_mul_1, mpn_addmul_1, and mpn_submul_1 for Cray PVP.
 c    Copyright 1996, 2000 Free Software Foundation, Inc.
 
 c    This file is part of the GNU MP Library.
-c  
+c
 c    The GNU MP Library is free software; you can redistribute it and/or modify
 c    it under the terms of either:
-c  
+c
 c      * the GNU Lesser General Public License as published by the Free
 c        Software Foundation; either version 3 of the License, or (at your
 c        option) any later version.
-c  
+c
 c    or
-c  
+c
 c      * the GNU General Public License as published by the Free Software
 c        Foundation; either version 2 of the License, or (at your option) any
 c        later version.
-c  
+c
 c    or both in parallel, as here.
-c  
+c
 c    The GNU MP Library is distributed in the hope that it will be useful, but
 c    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 c    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
 c    for more details.
-c  
+c
 c    You should have received copies of the GNU General Public License and the
 c    GNU Lesser General Public License along with the GNU MP Library.  If not,
 c    see https://www.gnu.org/licenses/.

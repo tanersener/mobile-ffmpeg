@@ -50,16 +50,18 @@ This driver can be installed using amdgpu-pro-install script in official amd dri
 @section AviSynth
 
 FFmpeg can read AviSynth scripts as input. To enable support, pass
-@code{--enable-avisynth} to configure.  The correct headers are
-included in compat/avisynth/, which allows the user to enable support
-without needing to search for these headers themselves.
+@code{--enable-avisynth} to configure after installing the headers
+provided by @url{https://github.com/AviSynth/AviSynthPlus, AviSynth+}.
+AviSynth+ can be configured to install only the headers by either
+passing @code{-DHEADERS_ONLY:bool=on} to the normal CMake-based build
+system, or by using the supplied @code{GNUmakefile}.
 
 For Windows, supported AviSynth variants are
 @url{http://avisynth.nl, AviSynth 2.6 RC1 or higher} for 32-bit builds and
 @url{http://avisynth.nl/index.php/AviSynth+, AviSynth+ r1718 or higher} for 32-bit and 64-bit builds.
 
-For Linux and OS X, the supported AviSynth variant is
-@url{https://github.com/avxsynth/avxsynth, AvxSynth}.
+For Linux, macOS, and BSD, the only supported AviSynth variant is
+@url{https://github.com/AviSynth/AviSynthPlus, AviSynth+}, starting with version 3.5.
 
 @float NOTE
 In 2016, AviSynth+ added support for building with GCC. However, due to
@@ -77,10 +79,11 @@ GCC builds of AviSynth+ without any special flags.
 @end float
 
 @float NOTE
-AviSynth and AvxSynth are loaded dynamically.  Distributors can build FFmpeg
-with @code{--enable-avisynth}, and the binaries will work regardless of the
-end user having AviSynth or AvxSynth installed - they'll only need to be
-installed to use AviSynth scripts (obviously).
+AviSynth(+) is loaded dynamically.  Distributors can build FFmpeg
+with @code{--enable-avisynth}, and the binaries will work regardless
+of the end user having AviSynth installed.  If/when an end user
+would like to use AviSynth scripts, then they can install AviSynth(+)
+and FFmpeg will be able to find and use it to open scripts.
 @end float
 
 @section Chromaprint
@@ -416,6 +419,9 @@ library:
     @tab Contains header with version and mode info, simplifying playback.
 @item CRI ADX                   @tab X @tab X
     @tab Audio-only format used in console video games.
+@item CRI AIX                   @tab   @tab X
+@item CRI HCA                   @tab   @tab X
+    @tab Audio-only format used in console video games.
 @item Discworld II BMV          @tab   @tab X
 @item Interplay C93             @tab   @tab X
     @tab Used in the game Cyberia from Interplay.
@@ -571,7 +577,6 @@ library:
 @item raw aptX                  @tab X @tab X
 @item raw aptX HD               @tab X @tab X
 @item raw Chinese AVS video     @tab X @tab X
-@item raw CRI ADX               @tab X @tab X
 @item raw Dirac                 @tab X @tab X
 @item raw DNxHD                 @tab X @tab X
 @item raw DTS                   @tab X @tab X
@@ -814,11 +819,13 @@ following image formats are supported:
 @item Autodesk RLE           @tab     @tab  X
     @tab fourcc: AASC
 @item AV1                    @tab  E  @tab  E
-    @tab Supported through external libraries libaom and libdav1d
+    @tab Supported through external libraries libaom, libdav1d and librav1e
 @item Avid 1:1 10-bit RGB Packer  @tab  X  @tab  X
     @tab fourcc: AVrp
 @item AVS (Audio Video Standard) video  @tab     @tab  X
     @tab Video encoding used by the Creature Shock game.
+@item AVS2-P2/IEEE1857.4     @tab  E  @tab  E
+    @tab Supported through external libraries libxavs2 and libdavs2
 @item AYUV                   @tab  X  @tab  X
     @tab Microsoft uncompressed packed 4:4:4:4
 @item Beam Software VB       @tab     @tab  X
@@ -844,6 +851,8 @@ following image formats are supported:
     @tab Codec used in Delphine Software International games.
 @item Discworld II BMV Video @tab     @tab  X
 @item Canopus Lossless Codec @tab     @tab  X
+@item CDToons                @tab     @tab  X
+    @tab Codec used in various Broderbund games.
 @item Cinepak                @tab     @tab  X
 @item Cirrus Logic AccuPak   @tab  X  @tab  X
     @tab fourcc: CLJR
@@ -1077,6 +1086,7 @@ following image formats are supported:
 @item ACELP.KELVIN           @tab     @tab  X
 @item ADPCM 4X Movie         @tab     @tab  X
 @item APDCM Yamaha AICA      @tab     @tab  X
+@item ADPCM Argonaut Games   @tab     @tab  X
 @item ADPCM CDROM XA         @tab     @tab  X
 @item ADPCM Creative Technology @tab     @tab  X
     @tab 16 -> 4, 8 -> 4, 8 -> 3, 8 -> 2
@@ -1095,7 +1105,10 @@ following image formats are supported:
 @item ADPCM IMA Electronic Arts EACS  @tab     @tab  X
 @item ADPCM IMA Electronic Arts SEAD  @tab     @tab  X
 @item ADPCM IMA Funcom       @tab     @tab  X
+@item ADPCM IMA High Voltage Software ALP   @tab     @tab  X
 @item ADPCM IMA QuickTime    @tab  X  @tab  X
+@item ADPCM IMA Simon & Schuster Interactive   @tab  @tab  X
+@item ADPCM IMA Ubisoft APM  @tab     @tab X
 @item ADPCM IMA Loki SDL MJPEG  @tab     @tab  X
 @item ADPCM IMA WAV          @tab  X  @tab  X
 @item ADPCM IMA Westwood     @tab     @tab  X
@@ -1125,6 +1138,7 @@ following image formats are supported:
 @item ADPCM Westwood Studios IMA @tab     @tab  X
     @tab Used in Westwood Studios games like Command and Conquer.
 @item ADPCM Yamaha           @tab  X  @tab  X
+@item ADPCM Zork             @tab     @tab  X
 @item AMR-NB                 @tab  E  @tab  X
     @tab encoding supported through external library libopencore-amrnb
 @item AMR-WB                 @tab  E  @tab  X
@@ -1146,6 +1160,7 @@ following image formats are supported:
     @tab decoding supported through external library libcelt
 @item codec2                 @tab  E  @tab  E
     @tab en/decoding supported through external library libcodec2
+@item CRI HCA                @tab     @tab X
 @item Delphine Software International CIN audio  @tab     @tab  X
     @tab Codec used in Delphine Software International games.
 @item Digital Speech Standard - Standard Play mode (DSS SP) @tab     @tab  X
@@ -1155,6 +1170,7 @@ following image formats are supported:
 @item DCA (DTS Coherent Acoustics)  @tab  X  @tab  X
     @tab supported extensions: XCh, XXCH, X96, XBR, XLL, LBR (partially)
 @item Dolby E  @tab     @tab  X
+@item DPCM Gremlin           @tab     @tab  X
 @item DPCM id RoQ            @tab  X  @tab  X
     @tab Used in Quake III, Jedi Knight 2 and other computer games.
 @item DPCM Interplay         @tab     @tab  X
@@ -1166,6 +1182,7 @@ following image formats are supported:
 @item DPCM Sol               @tab     @tab  X
 @item DPCM Xan               @tab     @tab  X
     @tab Used in Origin's Wing Commander IV AVI files.
+@item DPCM Xilam DERF        @tab     @tab  X
 @item DSD (Direct Stream Digital), least significant bit first  @tab  @tab  X
 @item DSD (Direct Stream Digital), most significant bit first   @tab  @tab  X
 @item DSD (Direct Stream Digital), least significant bit first, planar  @tab  @tab  X
@@ -1232,7 +1249,6 @@ following image formats are supported:
 @item PCM unsigned 24-bit little-endian  @tab  X  @tab  X
 @item PCM unsigned 32-bit big-endian  @tab  X  @tab  X
 @item PCM unsigned 32-bit little-endian  @tab  X  @tab  X
-@item PCM Zork               @tab     @tab  X
 @item QCELP / PureVoice      @tab     @tab  X
 @item QDesign Music Codec 1  @tab     @tab  X
 @item QDesign Music Codec 2  @tab     @tab  X
@@ -1323,6 +1339,7 @@ performance on systems without hardware floating point support).
 
 @multitable @columnfractions .4 .1
 @item Name         @tab Support
+@item AMQP         @tab E
 @item file         @tab X
 @item FTP          @tab X
 @item Gopher       @tab X

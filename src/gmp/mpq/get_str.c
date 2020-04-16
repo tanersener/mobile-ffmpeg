@@ -1,6 +1,6 @@
 /* mpq_get_str -- mpq to string conversion.
 
-Copyright 2001, 2002, 2006, 2011 Free Software Foundation, Inc.
+Copyright 2001, 2002, 2006, 2011, 2018 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -30,7 +30,6 @@ see https://www.gnu.org/licenses/.  */
 
 #include <stdio.h>
 #include <string.h>
-#include "gmp.h"
 #include "gmp-impl.h"
 #include "longlong.h"
 
@@ -48,10 +47,12 @@ mpq_get_str (char *str, int base, mpq_srcptr q)
       /* This is an overestimate since we don't bother checking how much of
 	 the high limbs of num and den are used.  +2 for rounding up the
 	 chars per bit of num and den.  +3 for sign, slash and '\0'.  */
+      if (ABS(base) < 2)
+	base = 10;
       DIGITS_IN_BASE_PER_LIMB (str_alloc, ABSIZ(NUM(q)) + SIZ(DEN(q)), ABS(base));
       str_alloc += 6;
 
-      str = (char *) (*__gmp_allocate_func) (str_alloc);
+      str = __GMP_ALLOCATE_FUNC_TYPE (str_alloc, char);
     }
 
   mpz_get_str (str, base, mpq_numref(q));
@@ -65,9 +66,12 @@ mpq_get_str (char *str, int base, mpq_srcptr q)
 
   ASSERT (len == strlen(str));
   ASSERT (str_alloc == 0 || len+1 <= str_alloc);
-  ASSERT (len+1 <=  /* size recommended to applications */
-	  mpz_sizeinbase (mpq_numref(q), ABS(base)) +
-	  mpz_sizeinbase (mpq_denref(q), ABS(base)) + 3);
+  ASSERT (len+1 <= 3 + /* size recommended to applications */
+	  (ABS(base) < 2 ?
+	   mpz_sizeinbase (mpq_numref(q), 10) +
+	   mpz_sizeinbase (mpq_denref(q), 10)
+	   : mpz_sizeinbase (mpq_numref(q), ABS(base)) +
+	   mpz_sizeinbase (mpq_denref(q), ABS(base))));
 
   if (str_alloc != 0)
     __GMP_REALLOCATE_FUNC_MAYBE_TYPE (str, str_alloc, len+1, char);

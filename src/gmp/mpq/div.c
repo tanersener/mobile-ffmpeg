@@ -1,6 +1,7 @@
 /* mpq_div -- divide two rational numbers.
 
-Copyright 1991, 1994-1996, 2000, 2001, 2015 Free Software Foundation, Inc.
+Copyright 1991, 1994-1996, 2000, 2001, 2015, 2018 Free Software
+Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -28,7 +29,6 @@ You should have received copies of the GNU General Public License and the
 GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
-#include "gmp.h"
 #include "gmp-impl.h"
 
 
@@ -49,12 +49,9 @@ mpq_div (mpq_ptr quot, mpq_srcptr op1, mpq_srcptr op2)
 
   if (UNLIKELY (quot == op2))
     {
-      if (op1 == op2)
+      if (UNLIKELY (op1 == op2))
 	{
-	  PTR(NUM(quot))[0] = 1;
-	  SIZ(NUM(quot)) = 1;
-	  PTR(DEN(quot))[0] = 1;
-	  SIZ(DEN(quot)) = 1;
+	  mpq_set_ui (quot, 1, 1);
 	  return;
 	}
 
@@ -83,7 +80,7 @@ mpq_div (mpq_ptr quot, mpq_srcptr op1, mpq_srcptr op2)
       /* We special case this to simplify allocation logic; gcd(0,x) = x
 	 is a singular case for the allocations.  */
       SIZ(NUM(quot)) = 0;
-      PTR(DEN(quot))[0] = 1;
+      MPZ_NEWALLOC (DEN(quot), 1)[0] = 1;
       SIZ(DEN(quot)) = 1;
       return;
     }

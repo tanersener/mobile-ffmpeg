@@ -487,7 +487,7 @@ static xcb_screen_t *get_screen(const xcb_setup_t *setup, int screen_num)
 }
 
 static int pixfmt_from_pixmap_format(AVFormatContext *s, int depth,
-                                     int *pix_fmt)
+                                     int *pix_fmt, int *bpp)
 {
     XCBGrabContext *c        = s->priv_data;
     const xcb_setup_t *setup = xcb_get_setup(c->conn);
@@ -525,14 +525,7 @@ static int pixfmt_from_pixmap_format(AVFormatContext *s, int depth,
         }
 
         if (*pix_fmt) {
-            c->bpp        = fmt->bits_per_pixel;
-            c->frame_size = c->width * c->height * fmt->bits_per_pixel / 8;
-#if CONFIG_LIBXCB_SHM
-            c->shm_pool = av_buffer_pool_init2(c->frame_size + AV_INPUT_BUFFER_PADDING_SIZE,
-                                               c->conn, allocate_shm_buffer, NULL);
-            if (!c->shm_pool)
-                return AVERROR(ENOMEM);
-#endif
+            *bpp        = fmt->bits_per_pixel;
             return 0;
         }
 
@@ -549,6 +542,7 @@ static int create_stream(AVFormatContext *s)
     AVStream *st      = avformat_new_stream(s, NULL);
     xcb_get_geometry_cookie_t gc;
     xcb_get_geometry_reply_t *geo;
+    int64_t frame_size_bits;
     int ret;
 
     if (!st)
@@ -587,14 +581,30 @@ static int create_stream(AVFormatContext *s)
     c->frame_duration = av_rescale_q(1, c->time_base, AV_TIME_BASE_Q);
     c->time_frame = av_gettime();
 
+    ret = pixfmt_from_pixmap_format(s, geo->depth, &st->codecpar->format, &c->bpp);
+    free(geo);
+    if (ret < 0)
+        return ret;
+
+    frame_size_bits = (int64_t)c->width * c->height * c->bpp;
+    if (frame_size_bits / 8 + AV_INPUT_BUFFER_PADDING_SIZE > INT_MAX) {
+        av_log(s, AV_LOG_ERROR, "Captured area is too large\n");
+        return AVERROR_PATCHWELCOME;
+    }
+    c->frame_size = frame_size_bits / 8;
+
+#if CONFIG_LIBXCB_SHM
+    c->shm_pool = av_buffer_pool_init2(c->frame_size + AV_INPUT_BUFFER_PADDING_SIZE,
+                                           c->conn, allocate_shm_buffer, NULL);
+    if (!c->shm_pool)
+        return AVERROR(ENOMEM);
+#endif
+
     st->codecpar->codec_type = AVMEDIA_TYPE_VIDEO;
     st->codecpar->codec_id   = AV_CODEC_ID_RAWVIDEO;
     st->codecpar->width      = c->width;
     st->codecpar->height     = c->height;
-
-    ret = pixfmt_from_pixmap_format(s, geo->depth, &st->codecpar->format);
-
-    free(geo);
+    st->codecpar->bit_rate   = av_rescale(frame_size_bits, st->avg_frame_rate.num, st->avg_frame_rate.den);
 
     return ret;
 }

@@ -25,11 +25,14 @@ import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import com.arthenica.mobileffmpeg.test.MainActivity;
+import com.arthenica.smartexception.java.Exceptions;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
+import static com.arthenica.mobileffmpeg.test.MainActivity.TAG;
 
 public class ResourcesUtil {
     public static void resourceToFile(Resources resources, final int resourceId, final File file) throws IOException {
@@ -60,7 +63,7 @@ public class ResourcesUtil {
                 outputStream.write(buffer, 0, readSize);
             }
         } catch (final IOException e) {
-            Log.e(MainActivity.TAG, "Saving raw resource failed.", e);
+            Log.e(TAG, String.format("Saving raw resource failed.%s", Exceptions.getStackTraceString(e)));
         } finally {
             inputStream.close();
             outputStream.flush();

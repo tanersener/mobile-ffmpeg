@@ -75,6 +75,22 @@ typedef struct {
 	int (*exists) (gnutls_digest_algorithm_t);
 } gnutls_crypto_digest_st;
 
+typedef struct {
+	int (*hkdf_extract) (gnutls_mac_algorithm_t,
+			     const void *key, size_t keysize,
+			     const void *salt, size_t saltsize,
+			     void *output);
+	int (*hkdf_expand) (gnutls_mac_algorithm_t,
+			    const void *key, size_t keysize,
+			    const void *info, size_t infosize,
+			    void *output, size_t length);
+	int (*pbkdf2) (gnutls_mac_algorithm_t,
+		       const void *key, size_t keysize,
+		       const void *salt, size_t saltsize,
+		       unsigned iter_count,
+		       void *output, size_t length);
+} gnutls_crypto_kdf_st;
+
 typedef struct gnutls_crypto_rnd {
 	int (*init) (void **ctx); /* called prior to first usage of randomness */
 	int (*rnd) (void *ctx, int level, void *data, size_t datasize);

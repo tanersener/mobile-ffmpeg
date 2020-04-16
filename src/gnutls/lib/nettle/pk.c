@@ -48,11 +48,22 @@
 #include <nettle/ecdsa.h>
 #include <nettle/ecc-curve.h>
 #include <nettle/curve25519.h>
+#if HAVE_CURVE448
+#include <nettle/curve448.h>
+#else
+#include "curve448/curve448.h"
+#include "curve448/eddsa.h"
+#endif
 #include <nettle/eddsa.h>
 #include <nettle/version.h>
 #if ENABLE_GOST
+#if NEED_GOSTDSA
 #include "gost/gostdsa.h"
 #include "gost/ecc-gost-curve.h"
+#else
+#include <nettle/gostdsa.h>
+#endif
+#include "gost/gostdsa2.h"
 #endif
 #include "int/ecdsa-compute-k.h"
 #include "int/dsa-compute-k.h"
@@ -235,6 +246,22 @@ ecc_shared_secret(struct ecc_scalar *private_key,
  */
 #define DH_EXPONENT_SIZE(p_size) (2*_gnutls_pk_bits_to_subgroup_bits(p_size))
 
+static inline int
+edwards_curve_mul(gnutls_pk_algorithm_t algo,
+		  uint8_t *q, const uint8_t *n, const uint8_t *p)
+{
+	switch (algo) {
+	case GNUTLS_PK_ECDH_X25519:
+		curve25519_mul(q, n, p);
+		return 0;
+	case GNUTLS_PK_ECDH_X448:
+		curve448_mul(q, n, p);
+		return 0;
+	default:
+		return gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+	}
+}
+
 /* This is used for DH or ECDH key derivation. In DH for example
  * it is given the peers Y and our x, and calculates Y^x
  */
@@ -388,6 +415,7 @@ dh_cleanup:
 			break;
 		}
 	case GNUTLS_PK_ECDH_X25519:
+	case GNUTLS_PK_ECDH_X448:
 		{
 			unsigned size = gnutls_ecc_curve_get_size(priv->curve);
 
@@ -407,7 +435,9 @@ dh_cleanup:
 
 			out->size = size;
 
-			curve25519_mul(out->data, priv->raw_priv.data, pub->raw_pub.data);
+			ret = edwards_curve_mul(algo, out->data, priv->raw_priv.data, pub->raw_pub.data);
+			if (ret < 0)
+				goto cleanup;
 
 			if (_gnutls_mem_is_zero(out->data, out->size)) {
 				gnutls_free(out->data);
@@ -739,11 +769,43 @@ _rsa_pss_sign_digest_tr(gnutls_digest_algorithm_t dig,
 	return ret;
 }
 
+static inline gnutls_ecc_curve_t
+get_eddsa_curve(gnutls_pk_algorithm_t algo)
+{
+	switch (algo) {
+	case GNUTLS_PK_EDDSA_ED25519:
+		return GNUTLS_ECC_CURVE_ED25519;
+	case GNUTLS_PK_EDDSA_ED448:
+		return GNUTLS_ECC_CURVE_ED448;
+	default:
+		return gnutls_assert_val(GNUTLS_ECC_CURVE_INVALID);
+	}
+}
+
+static inline int
+eddsa_sign(gnutls_pk_algorithm_t algo,
+	   const uint8_t *pub,
+	   const uint8_t *priv,
+	   size_t length, const uint8_t *msg,
+	   uint8_t *signature)
+{
+	switch (algo) {
+	case GNUTLS_PK_EDDSA_ED25519:
+		ed25519_sha512_sign(pub, priv, length, msg, signature);
+		return 0;
+	case GNUTLS_PK_EDDSA_ED448:
+		ed448_shake256_sign(pub, priv, length, msg, signature);
+		return 0;
+	default:
+		return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM);
+	}
+}
+
 /* This is the lower-level part of privkey_sign_raw_data().
  *
  * It accepts data in the appropriate hash form, i.e., DigestInfo
  * for PK_RSA, hash for PK_ECDSA, PK_DSA, PK_RSA_PSS, and raw data
- * for Ed25519.
+ * for Ed25519 and Ed448.
  *
  * in case of EC/DSA, signed data are encoded into r,s values
  */
@@ -774,10 +836,11 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 
 	switch (algo) {
 	case GNUTLS_PK_EDDSA_ED25519:	/* we do EdDSA */
+	case GNUTLS_PK_EDDSA_ED448:
 		{
 			const gnutls_ecc_curve_entry_st *e;
 
-			if (pk_params->curve != GNUTLS_ECC_CURVE_ED25519)
+			if (unlikely(get_eddsa_curve(algo) != pk_params->curve))
 				return gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
 
 			e = _gnutls_ecc_curve_get_params(pk_params->curve);
@@ -792,12 +855,18 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 
 			signature->size = e->sig_size;
 
-			if (pk_params->raw_pub.size != e->size || pk_params->raw_priv.size != e->size)
-				return gnutls_assert_val(GNUTLS_E_PK_SIGN_FAILED);
+			if (pk_params->raw_pub.size != e->size || pk_params->raw_priv.size != e->size) {
+				ret = gnutls_assert_val(GNUTLS_E_PK_SIGN_FAILED);
+				goto cleanup;
+			}
 
-			ed25519_sha512_sign(pk_params->raw_pub.data,
-			                    pk_params->raw_priv.data,
-			                    vdata->size, vdata->data, signature->data);
+			ret = eddsa_sign(algo,
+					 pk_params->raw_pub.data,
+					 pk_params->raw_priv.data,
+					 vdata->size, vdata->data,
+					 signature->data);
+			if (ret < 0)
+				goto cleanup;
 
 			break;
 		}
@@ -1130,6 +1199,30 @@ _rsa_pss_verify_digest(gnutls_digest_algorithm_t dig,
 	return verify_func(pub, salt_size, digest, s);
 }
 
+static inline int
+eddsa_verify(gnutls_pk_algorithm_t algo,
+	     const uint8_t *pub,
+	     size_t length, const uint8_t *msg,
+	     const uint8_t *signature)
+{
+	int ret;
+
+	switch (algo) {
+	case GNUTLS_PK_EDDSA_ED25519:
+		ret = ed25519_sha512_verify(pub, length, msg, signature);
+		if (ret == 0)
+			return gnutls_assert_val(GNUTLS_E_PK_SIG_VERIFY_FAILED);
+		return 0;
+	case GNUTLS_PK_EDDSA_ED448:
+		ret = ed448_shake256_verify(pub, length, msg, signature);
+		if (ret == 0)
+			return gnutls_assert_val(GNUTLS_E_PK_SIG_VERIFY_FAILED);
+		return 0;
+	default:
+		return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM);
+	}
+}
+
 static int
 _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 		       const gnutls_datum_t * vdata,
@@ -1149,10 +1242,11 @@ _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 
 	switch (algo) {
 	case GNUTLS_PK_EDDSA_ED25519:	/* we do EdDSA */
+	case GNUTLS_PK_EDDSA_ED448:
 		{
 			const gnutls_ecc_curve_entry_st *e;
 
-			if (pk_params->curve != GNUTLS_ECC_CURVE_ED25519)
+			if (unlikely(get_eddsa_curve(algo) != pk_params->curve))
 				return gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
 
 			e = _gnutls_ecc_curve_get_params(pk_params->curve);
@@ -1165,13 +1259,10 @@ _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 			if (pk_params->raw_pub.size != e->size)
 				return gnutls_assert_val(GNUTLS_E_PK_SIGN_FAILED);
 
-			ret = ed25519_sha512_verify(pk_params->raw_pub.data, vdata->size, vdata->data, signature->data);
-			if (ret == 0) {
-				gnutls_assert();
-				ret = GNUTLS_E_PK_SIG_VERIFY_FAILED;
-			} else {
-				ret = 0;
-			}
+			ret = eddsa_verify(algo,
+					   pk_params->raw_pub.data,
+					   vdata->size, vdata->data,
+					   signature->data);
 			break;
 		}
 #if ENABLE_GOST
@@ -1413,13 +1504,11 @@ static inline const struct ecc_curve *get_supported_gost_curve(int curve)
 	switch (curve) {
 #if ENABLE_GOST
 	case GNUTLS_ECC_CURVE_GOST256CPA:
-		return nettle_get_gost_256cpa();
 	case GNUTLS_ECC_CURVE_GOST256CPXA:
-		return nettle_get_gost_256cpa();
-	case GNUTLS_ECC_CURVE_GOST512A:
-		return nettle_get_gost_512a();
 	case GNUTLS_ECC_CURVE_GOST256B:
-		return nettle_get_gost_256cpa();
+		return nettle_get_gost_gc256b();
+	case GNUTLS_ECC_CURVE_GOST512A:
+		return nettle_get_gost_gc512a();
 #endif
 	default:
 		return NULL;
@@ -1431,6 +1520,8 @@ static int _wrap_nettle_pk_curve_exists(gnutls_ecc_curve_t curve)
 	switch (curve) {
 		case GNUTLS_ECC_CURVE_ED25519:
 		case GNUTLS_ECC_CURVE_X25519:
+		case GNUTLS_ECC_CURVE_ED448:
+		case GNUTLS_ECC_CURVE_X448:
 			return 1;
 		default:
 			return ((get_supported_nist_curve(curve)!=NULL ||
@@ -1556,6 +1647,7 @@ wrap_nettle_pk_generate_params(gnutls_pk_algorithm_t algo,
 	case GNUTLS_PK_RSA:
 	case GNUTLS_PK_ECDSA:
 	case GNUTLS_PK_EDDSA_ED25519:
+	case GNUTLS_PK_EDDSA_ED448:
 #if ENABLE_GOST
 	case GNUTLS_PK_GOST_01:
 	case GNUTLS_PK_GOST_12_256:
@@ -1914,6 +2006,7 @@ gnutls_x509_spki_st spki;
 		FALLTHROUGH;
 	case GNUTLS_PK_EC: /* we only do keys for ECDSA */
 	case GNUTLS_PK_EDDSA_ED25519:
+	case GNUTLS_PK_EDDSA_ED448:
 	case GNUTLS_PK_DSA:
 	case GNUTLS_PK_RSA_PSS:
 	case GNUTLS_PK_GOST_01:
@@ -1934,6 +2027,7 @@ gnutls_x509_spki_st spki;
 		break;
 	case GNUTLS_PK_DH:
 	case GNUTLS_PK_ECDH_X25519:
+	case GNUTLS_PK_ECDH_X448:
 		ret = 0;
 		goto cleanup;
 	default:
@@ -1952,6 +2046,38 @@ cleanup:
 	return ret;
 }
 #endif
+
+static inline int
+eddsa_public_key(gnutls_pk_algorithm_t algo,
+		 uint8_t *pub, const uint8_t *priv)
+{
+	switch (algo) {
+	case GNUTLS_PK_EDDSA_ED25519:
+		ed25519_sha512_public_key(pub, priv);
+		return 0;
+	case GNUTLS_PK_EDDSA_ED448:
+		ed448_shake256_public_key(pub, priv);
+		return 0;
+	default:
+		return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM);
+	}
+}
+
+static inline int
+edwards_curve_mul_g(gnutls_pk_algorithm_t algo,
+		    uint8_t *q, const uint8_t *n)
+{
+	switch (algo) {
+	case GNUTLS_PK_ECDH_X25519:
+		curve25519_mul_g(q, n);
+		return 0;
+	case GNUTLS_PK_ECDH_X448:
+		curve448_mul_g(q, n);
+		return 0;
+	default:
+		return gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+	}
+}
 
 /* To generate a DH key either q must be set in the params or
  * level should be set to the number of required bits.
@@ -2190,13 +2316,14 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 			break;
 		}
 	case GNUTLS_PK_EDDSA_ED25519:
+	case GNUTLS_PK_EDDSA_ED448:
 		{
 			unsigned size = gnutls_ecc_curve_get_size(level);
 
 			if (params->pkflags & GNUTLS_PK_FLAG_PROVABLE)
 				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-			if (level != GNUTLS_ECC_CURVE_ED25519)
+			if (unlikely(get_eddsa_curve(algo) != level))
 				return gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
 
 			if (size == 0)
@@ -2222,7 +2349,11 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 			params->raw_pub.size = size;
 			params->raw_priv.size = size;
 
-			ed25519_sha512_public_key(params->raw_pub.data, params->raw_priv.data);
+			ret = eddsa_public_key(algo,
+					       params->raw_pub.data,
+					       params->raw_priv.data);
+			if (ret < 0)
+				goto fail;
 
 			break;
 		}
@@ -2335,6 +2466,7 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 		}
 #endif
 	case GNUTLS_PK_ECDH_X25519:
+	case GNUTLS_PK_ECDH_X448:
 		{
 			unsigned size = gnutls_ecc_curve_get_size(level);
 
@@ -2361,13 +2493,17 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 			params->raw_pub.size = size;
 			params->raw_priv.size = size;
 
-			curve25519_mul_g(params->raw_pub.data, params->raw_priv.data);
+			ret = edwards_curve_mul_g(algo, params->raw_pub.data, params->raw_priv.data);
+			if (ret < 0)
+				goto fail;
 			break;
 		}
 	default:
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
+
+	params->algo = algo;
 
 #ifdef ENABLE_FIPS140
 	ret = pct_test(algo, params);
@@ -2376,8 +2512,6 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 		goto fail;
 	}
 #endif
-
-	params->algo = algo;
 
 	FAIL_IF_LIB_ERROR;
 	return 0;
@@ -2595,18 +2729,29 @@ wrap_nettle_pk_verify_priv_params(gnutls_pk_algorithm_t algo,
 			mpz_clear(y2);
 		}
 		break;
-	case GNUTLS_PK_EDDSA_ED25519: {
-		uint8_t pub[32];
+	case GNUTLS_PK_EDDSA_ED25519:
+	case GNUTLS_PK_EDDSA_ED448: {
+		gnutls_ecc_curve_t curve;
+		const gnutls_ecc_curve_entry_st *e;
+		uint8_t pub[57]; /* can accommodate both curves */
+
+		curve = get_eddsa_curve(algo);
+		e = _gnutls_ecc_curve_get_params(curve);
+		if (e == NULL)
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 		if (params->raw_pub.data == NULL) {
 			return 0; /* nothing to verify */
 		}
 
-		if (params->raw_pub.size != 32)
+		if (params->raw_pub.size != e->size)
 			return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
 
-		ed25519_sha512_public_key(pub, params->raw_priv.data);
-		if (memcmp(params->raw_pub.data, pub, 32) != 0)
+		ret = eddsa_public_key(algo, pub, params->raw_priv.data);
+		if (ret < 0)
+			return ret;
+
+		if (memcmp(params->raw_pub.data, pub, e->size) != 0)
 			return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
 
 		ret = 0;
@@ -2707,6 +2852,7 @@ wrap_nettle_pk_verify_pub_params(gnutls_pk_algorithm_t algo,
 	case GNUTLS_PK_RSA_PSS:
 	case GNUTLS_PK_DSA:
 	case GNUTLS_PK_EDDSA_ED25519:
+	case GNUTLS_PK_EDDSA_ED448:
 		return 0;
 	case GNUTLS_PK_ECDSA:
 		{
@@ -2892,8 +3038,9 @@ wrap_nettle_pk_fixup(gnutls_pk_algorithm_t algo,
 		if (ret == 0) {
 			return gnutls_assert_val(GNUTLS_E_PK_INVALID_PRIVKEY);
 		}
-	} else if (algo == GNUTLS_PK_EDDSA_ED25519) {
-		if (params->curve != GNUTLS_ECC_CURVE_ED25519)
+	} else if (algo == GNUTLS_PK_EDDSA_ED25519 ||
+		   algo == GNUTLS_PK_EDDSA_ED448) {
+		if (unlikely(get_eddsa_curve(algo) != params->curve))
 			return gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
 
 		if (params->raw_priv.data == NULL)
@@ -2906,7 +3053,14 @@ wrap_nettle_pk_fixup(gnutls_pk_algorithm_t algo,
 		if (params->raw_pub.data == NULL)
 			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
-		ed25519_sha512_public_key(params->raw_pub.data, params->raw_priv.data);
+		ret = eddsa_public_key(algo,
+				       params->raw_pub.data,
+				       params->raw_priv.data);
+		if (ret < 0) {
+			gnutls_free(params->raw_pub.data);
+			return ret;
+		}
+
 		params->raw_pub.size = params->raw_priv.size;
 	} else if (algo == GNUTLS_PK_RSA_PSS) {
 		if (params->params_nr < RSA_PRIVATE_PARAMS - 3)

@@ -1,4 +1,4 @@
-dnl  SPARC v9 mpn_sqr_dial_addlsh1 for T3/T4/T5.
+dnl  SPARC v9 mpn_sqr_diag_addlsh1 for T3/T4/T5.
 
 dnl  Contributed to the GNU project by Torbjörn Granlund.
 

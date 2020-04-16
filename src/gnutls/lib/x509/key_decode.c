@@ -565,6 +565,9 @@ int _gnutls_x509_read_pubkey(gnutls_pk_algorithm_t algo, uint8_t * der,
 	case GNUTLS_PK_EDDSA_ED25519:
 		ret = _gnutls_x509_read_eddsa_pubkey(GNUTLS_ECC_CURVE_ED25519, der, dersize, params);
 		break;
+	case GNUTLS_PK_EDDSA_ED448:
+		ret = _gnutls_x509_read_eddsa_pubkey(GNUTLS_ECC_CURVE_ED448, der, dersize, params);
+		break;
 	case GNUTLS_PK_GOST_01:
 	case GNUTLS_PK_GOST_12_256:
 	case GNUTLS_PK_GOST_12_512:
@@ -590,6 +593,7 @@ int _gnutls_x509_read_pubkey_params(gnutls_pk_algorithm_t algo,
 	switch (algo) {
 	case GNUTLS_PK_RSA:
 	case GNUTLS_PK_EDDSA_ED25519:
+	case GNUTLS_PK_EDDSA_ED448:
 		return 0;
 	case GNUTLS_PK_RSA_PSS:
 		return _gnutls_x509_read_rsa_pss_params(der, dersize, &params->spki);
@@ -634,6 +638,7 @@ int _gnutls_x509_check_pubkey_params(gnutls_pk_params_st * params)
 	case GNUTLS_PK_DSA:
 	case GNUTLS_PK_ECDSA:
 	case GNUTLS_PK_EDDSA_ED25519:
+	case GNUTLS_PK_EDDSA_ED448:
 	case GNUTLS_PK_GOST_01:
 	case GNUTLS_PK_GOST_12_256:
 	case GNUTLS_PK_GOST_12_512:

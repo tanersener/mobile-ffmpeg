@@ -6,7 +6,8 @@
 	mpz_mul_si
 	mpz_addmul_ui (should this really allow a+=a*c?)
 
-Copyright 1996, 1999-2002, 2009, 2012, 2013 Free Software Foundation, Inc.
+Copyright 1996, 1999-2002, 2009, 2012, 2013, 2016 Free Software Foundation,
+Inc.
 
 This file is part of the GNU MP Library test suite.
 
@@ -28,7 +29,6 @@ the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
 #include <string.h>
 #include <unistd.h>
 
-#include "gmp.h"
 #include "gmp-impl.h"
 #include "tests.h"
 
@@ -201,7 +201,7 @@ int
 main (int argc, char **argv)
 {
   int i;
-  int pass, reps = 400;
+  unsigned int pass, reps = 400;
   mpz_t in1, in2, in3;
   unsigned long int in2i;
   mp_size_t size;
@@ -231,47 +231,43 @@ main (int argc, char **argv)
   mpz_init (res3);
   mpz_init (t);
 
+  mpz_set_ui (res1, 1);		/* force allocation */
+  mpz_set_ui (res2, 1);		/* force allocation */
+  mpz_set_ui (res3, 1);		/* force allocation */
+
   for (pass = 1; pass <= reps; pass++)
     {
+#ifndef VERBOSE
       if (isatty (fileno (stdout)))
 	{
 	  printf ("\r%d/%d passes", pass, reps);
 	  fflush (stdout);
 	}
+#endif
 
       mpz_urandomb (bs, rands, 32);
-      size_range = mpz_get_ui (bs) % 21 + 2;
+      /* Make size_range gradually bigger with each pass. */
+      size_range = mpz_get_ui (bs) % (pass * 15 / reps + 1) + 8;
 
-      if ((pass & 1) == 0)
-	{
-	  /* Make all input operands have quite different sizes */
-	  mpz_urandomb (bs, rands, 32);
-	  size = mpz_get_ui (bs) % size_range;
-	  mpz_rrandomb (in1, rands, size);
+#define MAKE_RANDOM_OP(in, size_range, s)				\
+  do {									\
+    mpz_urandomb (bs, rands, size_range);				\
+    if (((pass >> s) & 3) == 3) /* conditional exponential dist */	\
+      mpz_urandomb (bs, rands, mpz_get_ui (bs) % (size_range - 7) + 7);	\
+    mpz_rrandomb (in, rands, mpz_get_ui (bs));				\
+  } while (0)
 
-	  mpz_urandomb (bs, rands, 32);
-	  size = mpz_get_ui (bs) % size_range;
-	  mpz_rrandomb (in2, rands, size);
+      MAKE_RANDOM_OP (in1, size_range, 0);
+      MAKE_RANDOM_OP (in2, size_range, 2);
+      MAKE_RANDOM_OP (in3, size_range, 4);
+#undef MAKE_RANDOM_OP
 
-	  mpz_urandomb (bs, rands, 32);
-	  size = mpz_get_ui (bs) % size_range;
-	  mpz_rrandomb (in3, rands, size);
-	}
-      else
-	{
-	  /* Make all input operands have about the same size */
-	  mpz_urandomb (bs, rands, size_range);
-	  size = mpz_get_ui (bs);
-	  mpz_rrandomb (in1, rands, size);
-
-	  mpz_urandomb (bs, rands, size_range);
-	  size = mpz_get_ui (bs);
-	  mpz_rrandomb (in2, rands, size);
-
-	  mpz_urandomb (bs, rands, size_range);
-	  size = mpz_get_ui (bs);
-	  mpz_rrandomb (in3, rands, size);
-	}
+#ifdef VERBOSE
+      printf("%9d%9d%8d\n",
+	     mpz_sizeinbase(in1,2),
+	     mpz_sizeinbase(in2,2),
+	     mpz_sizeinbase(in3,2));
+#endif
 
       mpz_urandomb (bs, rands, 3);
       bsi = mpz_get_ui (bs);
@@ -315,12 +311,14 @@ main (int argc, char **argv)
 	  MPZ_CHECK_FORMAT (ref2);
 
 	  mpz_set (res1, in1);
+	  mpz_clobber (res2);
 	  INVOKE_RRSS (ddss_div[i], res1, res2, res1, in2);
 	  MPZ_CHECK_FORMAT (res1);
 	  MPZ_CHECK_FORMAT (res2);
 	  if (mpz_cmp (ref1, res1) != 0 || mpz_cmp (ref2, res2) != 0)
 	    FAIL (ddss_div, i, in1, in2, NULL);
 
+	  mpz_clobber (res1);
 	  mpz_set (res2, in1);
 	  INVOKE_RRSS (ddss_div[i], res1, res2, res2, in2);
 	  MPZ_CHECK_FORMAT (res1);
@@ -329,12 +327,14 @@ main (int argc, char **argv)
 	    FAIL (ddss_div, i, in1, in2, NULL);
 
 	  mpz_set (res1, in2);
+	  mpz_clobber (res2);
 	  INVOKE_RRSS (ddss_div[i], res1, res2, in1, res1);
 	  MPZ_CHECK_FORMAT (res1);
 	  MPZ_CHECK_FORMAT (res2);
 	  if (mpz_cmp (ref1, res1) != 0 || mpz_cmp (ref2, res2) != 0)
 	    FAIL (ddss_div, i, in1, in2, NULL);
 
+	  mpz_clobber (res1);
 	  mpz_set (res2, in2);
 	  INVOKE_RRSS (ddss_div[i], res1, res2, in1, res2);
 	  MPZ_CHECK_FORMAT (res1);
@@ -395,11 +395,13 @@ main (int argc, char **argv)
 	      MPZ_CHECK_FORMAT (ref1);
 
 	      mpz_set (res1, in1);
+	      mpz_clobber (res2);
 	      r2 = (ddsi_div[i].fptr) (res1, res2, res1, in2i);
 	      MPZ_CHECK_FORMAT (res1);
 	      if (mpz_cmp (ref1, res1) != 0 || mpz_cmp (ref2, res2) != 0 || r1 != r2)
 		FAIL (ddsi_div, i, in1, in2, NULL);
 
+	      mpz_clobber (res1);
 	      mpz_set (res2, in1);
 	      (ddsi_div[i].fptr) (res1, res2, res2, in2i);
 	      MPZ_CHECK_FORMAT (res1);
@@ -475,91 +477,147 @@ main (int argc, char **argv)
 	  MPZ_CHECK_FORMAT (ref2);
 	  MPZ_CHECK_FORMAT (ref3);
 
+#define GCDEXT_CHECK3(i1, i2) do {					\
+	    mpz_gcdext (res1, res2, res3, i1, i2);			\
+	    MPZ_CHECK_FORMAT (res1);					\
+	    MPZ_CHECK_FORMAT (res2);					\
+	    MPZ_CHECK_FORMAT (res3);					\
+	    if (mpz_cmp (ref1, res1) != 0 || mpz_cmp (ref2, res2) != 0	\
+		|| mpz_cmp (ref3, res3) != 0)				\
+	      FAIL2 (mpz_gcdext, i1, i2, NULL);				\
+	  } while (0)
+#define GCDEXT_CHECK2(i1, i2) do {					\
+	    mpz_gcdext (res1, res2, NULL, i1, i2);			\
+	    MPZ_CHECK_FORMAT (res1);					\
+	    MPZ_CHECK_FORMAT (res2);					\
+	    if (mpz_cmp (ref1, res1) != 0 || mpz_cmp (ref2, res2) != 0)	\
+	      FAIL2 (mpz_gcdext, i1, i2, NULL);				\
+	  } while (0)
+
 	  mpz_set (res1, in1);
-	  mpz_gcdext (res1, res2, res3, res1, in2);
-	  MPZ_CHECK_FORMAT (res1);
-	  MPZ_CHECK_FORMAT (res2);
-	  MPZ_CHECK_FORMAT (res3);
-	  if (mpz_cmp (ref1, res1) != 0 || mpz_cmp (ref2, res2) != 0
-	      || mpz_cmp (ref3, res3) != 0)
-	    FAIL2 (mpz_gcdext, in1, in2, NULL);
+	  mpz_clobber (res2);
+	  mpz_clobber (res3);
+	  GCDEXT_CHECK3 (res1, in2);
 
+	  mpz_clobber (res1);
 	  mpz_set (res2, in1);
-	  mpz_gcdext (res1, res2, res3, res2, in2);
-	  MPZ_CHECK_FORMAT (res1);
-	  MPZ_CHECK_FORMAT (res2);
-	  MPZ_CHECK_FORMAT (res3);
-	  if (mpz_cmp (ref1, res1) != 0 || mpz_cmp (ref2, res2) != 0
-	      || mpz_cmp (ref3, res3) != 0)
-	    FAIL2 (mpz_gcdext, in1, in2, NULL);
+	  mpz_clobber (res3);
+	  GCDEXT_CHECK3 (res2, in2);
 
+	  mpz_clobber (res1);
+	  mpz_clobber (res2);
 	  mpz_set (res3, in1);
-	  mpz_gcdext (res1, res2, res3, res3, in2);
-	  MPZ_CHECK_FORMAT (res1);
-	  MPZ_CHECK_FORMAT (res2);
-	  MPZ_CHECK_FORMAT (res3);
-	  if (mpz_cmp (ref1, res1) != 0 || mpz_cmp (ref2, res2) != 0
-	      || mpz_cmp (ref3, res3) != 0)
-	    FAIL2 (mpz_gcdext, in1, in2, NULL);
+	  GCDEXT_CHECK3 (res3, in2);
 
 	  mpz_set (res1, in2);
-	  mpz_gcdext (res1, res2, res3, in1, res1);
-	  MPZ_CHECK_FORMAT (res1);
-	  MPZ_CHECK_FORMAT (res2);
-	  MPZ_CHECK_FORMAT (res3);
-	  if (mpz_cmp (ref1, res1) != 0 || mpz_cmp (ref2, res2) != 0
-	      || mpz_cmp (ref3, res3) != 0)
-	    FAIL2 (mpz_gcdext, in1, in2, NULL);
+	  mpz_clobber (res2);
+	  mpz_clobber (res3);
+	  GCDEXT_CHECK3 (in1, res1);
 
+	  mpz_clobber (res1);
 	  mpz_set (res2, in2);
-	  mpz_gcdext (res1, res2, res3, in1, res2);
-	  MPZ_CHECK_FORMAT (res1);
-	  MPZ_CHECK_FORMAT (res2);
-	  MPZ_CHECK_FORMAT (res3);
-	  if (mpz_cmp (ref1, res1) != 0 || mpz_cmp (ref2, res2) != 0
-	      || mpz_cmp (ref3, res3) != 0)
-	    FAIL2 (mpz_gcdext, in1, in2, NULL);
+	  mpz_clobber (res3);
+	  GCDEXT_CHECK3 (in1, res2);
 
+	  mpz_clobber (res1);
+	  mpz_clobber (res2);
 	  mpz_set (res3, in2);
-	  mpz_gcdext (res1, res2, res3, in1, res3);
-	  MPZ_CHECK_FORMAT (res1);
-	  MPZ_CHECK_FORMAT (res2);
-	  MPZ_CHECK_FORMAT (res3);
-	  if (mpz_cmp (ref1, res1) != 0 || mpz_cmp (ref2, res2) != 0
-	      || mpz_cmp (ref3, res3) != 0)
-	    FAIL2 (mpz_gcdext, in1, in2, NULL);
+	  GCDEXT_CHECK3 (in1, res3);
 
 	  mpz_set (res1, in1);
-	  mpz_gcdext (res1, res2, NULL, res1, in2);
-	  MPZ_CHECK_FORMAT (res1);
-	  MPZ_CHECK_FORMAT (res2);
-	  if (mpz_cmp (ref1, res1) != 0 || mpz_cmp (ref2, res2) != 0
-	      || mpz_cmp (ref3, res3) != 0)
-	    FAIL2 (mpz_gcdext, in1, in2, NULL);
+	  mpz_set (res2, in2);
+	  mpz_clobber (res3);
+	  GCDEXT_CHECK3 (res1, res2);
 
+	  mpz_set (res1, in1);
+	  mpz_clobber (res2);
+	  mpz_set (res3, in2);
+	  GCDEXT_CHECK3 (res1, res3);
+
+	  mpz_clobber (res1);
 	  mpz_set (res2, in1);
-	  mpz_gcdext (res1, res2, NULL, res2, in2);
-	  MPZ_CHECK_FORMAT (res1);
-	  MPZ_CHECK_FORMAT (res2);
-	  if (mpz_cmp (ref1, res1) != 0 || mpz_cmp (ref2, res2) != 0
-	      || mpz_cmp (ref3, res3) != 0)
-	    FAIL2 (mpz_gcdext, in1, in2, NULL);
+	  mpz_set (res3, in2);
+	  GCDEXT_CHECK3 (res2, res3);
 
 	  mpz_set (res1, in2);
-	  mpz_gcdext (res1, res2, NULL, in1, res1);
-	  MPZ_CHECK_FORMAT (res1);
-	  MPZ_CHECK_FORMAT (res2);
-	  if (mpz_cmp (ref1, res1) != 0 || mpz_cmp (ref2, res2) != 0
-	      || mpz_cmp (ref3, res3) != 0)
-	    FAIL2 (mpz_gcdext, in1, in2, NULL);
+	  mpz_set (res2, in1);
+	  mpz_clobber (res3);
+	  GCDEXT_CHECK3 (res2, res1);
 
+	  mpz_set (res1, in2);
+	  mpz_clobber (res2);
+	  mpz_set (res3, in1);
+	  GCDEXT_CHECK3 (res3, res1);
+
+	  mpz_clobber (res1);
 	  mpz_set (res2, in2);
-	  mpz_gcdext (res1, res2, NULL, in1, res2);
-	  MPZ_CHECK_FORMAT (res1);
-	  MPZ_CHECK_FORMAT (res2);
-	  if (mpz_cmp (ref1, res1) != 0 || mpz_cmp (ref2, res2) != 0
-	      || mpz_cmp (ref3, res3) != 0)
-	    FAIL2 (mpz_gcdext, in1, in2, NULL);
+	  mpz_set (res3, in1);
+	  GCDEXT_CHECK3(res3, res2);
+
+	  mpz_set (res1, in1);
+	  mpz_clobber (res2);
+	  GCDEXT_CHECK2 (res1, in2);
+
+	  mpz_clobber (res1);
+	  mpz_set (res2, in1);
+	  GCDEXT_CHECK2 (res2, in2);
+
+	  mpz_set (res1, in2);
+	  mpz_clobber (res2);
+	  GCDEXT_CHECK2 (in1, res1);
+
+	  mpz_clobber (res1);
+	  mpz_set (res2, in2);
+	  GCDEXT_CHECK2 (in1, res2);
+#undef GCDEXT_CHECK
+	  /* Identical inputs, gcd(in1, in1). Then the result should be
+	     gcd = abs(in1), s = 0, t = sgn(in1). */
+	  mpz_abs (ref1, in1);
+	  mpz_set_ui (ref2, 0);
+	  mpz_set_si (ref3, mpz_sgn (in1));
+
+#define GCDEXT_CHECK_SAME3(in) do {					\
+	    mpz_gcdext (res1, res2, res3, in, in);			\
+	    MPZ_CHECK_FORMAT (res1);					\
+	    MPZ_CHECK_FORMAT (res2);					\
+	    MPZ_CHECK_FORMAT (res3);					\
+	    if (mpz_cmp (ref1, res1) != 0 || mpz_cmp (ref2, res2) != 0	\
+		|| mpz_cmp (ref3, res3) != 0)				\
+	      FAIL2 (mpz_gcdext, in, in, NULL);				\
+	  } while (0)
+#define GCDEXT_CHECK_SAME2(in) do {					\
+	    mpz_gcdext (res1, res2, NULL, in, in);			\
+	    MPZ_CHECK_FORMAT (res1);					\
+	    MPZ_CHECK_FORMAT (res2);					\
+	    if (mpz_cmp (ref1, res1) != 0 || mpz_cmp (ref2, res2) != 0)	\
+	      FAIL2 (mpz_gcdext, in, in, NULL);				\
+	  } while (0)
+
+	  mpz_set (res1, in1);
+	  mpz_clobber (res2);
+	  mpz_clobber (res3);
+	  GCDEXT_CHECK_SAME3 (res1);
+
+	  mpz_clobber (res1);
+	  mpz_set (res2, in1);
+	  mpz_clobber (res3);
+	  GCDEXT_CHECK_SAME3 (res2);
+
+	  mpz_clobber (res1);
+	  mpz_clobber (res2);
+	  mpz_set (res3, in1);
+	  GCDEXT_CHECK_SAME3 (res3);
+
+	  mpz_set (res1, in1);
+	  mpz_clobber (res2);
+	  mpz_clobber (res3);
+	  GCDEXT_CHECK_SAME2 (res1);
+
+	  mpz_clobber (res1);
+	  mpz_set (res2, in1);
+	  mpz_clobber (res3);
+	  GCDEXT_CHECK_SAME2 (res2);
+#undef GCDEXT_CHECK_SAME
 	}
 
       /* Don't run mpz_powm for huge exponents or when undefined.  */

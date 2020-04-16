@@ -1,7 +1,7 @@
 /* mpq_set_ui(dest,ulong_num,ulong_den) -- Set DEST to the rational number
    ULONG_NUM/ULONG_DEN.
 
-Copyright 1991, 1994, 1995, 2001-2003 Free Software Foundation, Inc.
+Copyright 1991, 1994, 1995, 2001-2003, 2018 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -29,7 +29,6 @@ You should have received copies of the GNU General Public License and the
 GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
-#include "gmp.h"
 #include "gmp-impl.h"
 
 void
@@ -46,16 +45,16 @@ mpq_set_ui (mpq_t dest, unsigned long int num, unsigned long int den)
 
   if (num == 0)
     {
-      /* Canonicalize 0/n to 0/1.  */
+      /* Canonicalize 0/d to 0/1.  */
       den = 1;
       SIZ(NUM(dest)) = 0;
     }
   else
     {
-      PTR(NUM(dest))[0] = num;
+      MPZ_NEWALLOC (NUM(dest), 1)[0] = num;
       SIZ(NUM(dest)) = 1;
     }
 
-  PTR(DEN(dest))[0] = den;
+  MPZ_NEWALLOC (DEN(dest), 1)[0] = den;
   SIZ(DEN(dest)) = (den != 0);
 }

@@ -2292,22 +2292,15 @@ static void gost28147_key_mesh_cryptopro(struct gost28147_ctx *ctx)
   ctx->key_count = 0;
 }
 
-static void
-_gost28147_set_key(struct gost28147_ctx *ctx, const uint8_t *key)
-{
-  unsigned i;
-
-  for (i = 0; i < 8; i++, key += 4)
-    ctx->key[i] = LE_READ_UINT32(key);
-  ctx->key_count = 0;
-}
-
 void
 gost28147_set_key(struct gost28147_ctx *ctx, const uint8_t *key)
 {
+  unsigned i;
+
   assert(key);
-  _gost28147_set_key(ctx, key);
-  gost28147_set_param(ctx, &gost28147_param_TC26_Z);
+  for (i = 0; i < 8; i++, key += 4)
+    ctx->key[i] = LE_READ_UINT32(key);
+  ctx->key_count = 0;
 }
 
 void
@@ -2419,8 +2412,8 @@ gost28147_cnt_init(struct gost28147_cnt_ctx *ctx,
 		   const uint8_t *key,
 		   const struct gost28147_param *param)
 {
-  gost28147_set_key(&ctx->ctx, key);
   gost28147_set_param(&ctx->ctx, param);
+  gost28147_set_key(&ctx->ctx, key);
   ctx->bytes = 0;
 }
 
@@ -2470,13 +2463,13 @@ gost28147_cnt_crypt(struct gost28147_cnt_ctx *ctx,
     }
 }
 
-void
-gost28147_imit_init(struct gost28147_imit_ctx *ctx)
+static void
+_gost28147_imit_reinit(struct gost28147_imit_ctx *ctx)
 {
-  memset(ctx->state, 0, GOST28147_BLOCK_SIZE);
+  ctx->state[0] = 0;
+  ctx->state[1] = 0;
   ctx->index = 0;
   ctx->count = 0;
-  gost28147_set_param(&ctx->cctx, &gost28147_param_TC26_Z); /* Default */
 }
 
 void
@@ -2487,8 +2480,8 @@ gost28147_imit_set_key(struct gost28147_imit_ctx *ctx,
   assert(length == GOST28147_IMIT_KEY_SIZE);
   assert(key);
 
-  _gost28147_set_key(&ctx->cctx, key);
-  /* Do not reset param here */
+  _gost28147_imit_reinit(ctx);
+  gost28147_set_key(&ctx->cctx, key);
 }
 
 void
@@ -2549,6 +2542,6 @@ gost28147_imit_digest(struct gost28147_imit_ctx *ctx,
     }
 
   _nettle_write_le32(length, digest, ctx->state);
-  gost28147_imit_init(ctx);
+  _gost28147_imit_reinit(ctx);
 }
 #endif

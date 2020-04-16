@@ -331,9 +331,7 @@ static int mpjpeg_read_packet(AVFormatContext *s, AVPacket *pkt)
         int remaining = 0, len;
 
         const int read_chunk = 2048;
-        av_init_packet(pkt);
-        pkt->data = NULL;
-        pkt->size = 0;
+
         pkt->pos  = avio_tell(s->pb);
 
         while ((ret = ffio_ensure_seekback(s->pb, read_chunk - remaining)) >= 0 && /* we may need to return as much as all we've read back to the buffer */
@@ -359,8 +357,6 @@ static int mpjpeg_read_packet(AVFormatContext *s, AVPacket *pkt)
         /* error or EOF occurred */
         if (ret == AVERROR_EOF) {
             ret = pkt->size > 0 ? pkt->size : AVERROR_EOF;
-        } else {
-            av_packet_unref(pkt);
         }
     }
 

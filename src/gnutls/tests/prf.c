@@ -323,6 +323,12 @@ static void client(int fd)
 		exit(1);
 	}
 
+	ret = gnutls_prf_hash_get(session);
+	if (ret != GNUTLS_DIG_MD5_SHA1) {
+		fprintf(stderr, "negotiated unexpected hash: %s\n", gnutls_digest_get_name(ret));
+		exit(1);
+	}
+
 	check_prfs(session);
 
 	gnutls_bye(session, GNUTLS_SHUT_WR);

@@ -39,33 +39,35 @@ get_library_name() {
         18) echo "xvidcore" ;;
         19) echo "x265" ;;
         20) echo "libvidstab" ;;
-        21) echo "libilbc" ;;
-        22) echo "opus" ;;
-        23) echo "snappy" ;;
-        24) echo "soxr" ;;
-        25) echo "libaom" ;;
-        26) echo "chromaprint" ;;
-        27) echo "twolame" ;;
-        28) echo "sdl" ;;
-        29) echo "tesseract" ;;
-        30) echo "openh264" ;;
-        31) echo "giflib" ;;
-        32) echo "jpeg" ;;
-        33) echo "libogg" ;;
-        34) echo "libpng" ;;
-        35) echo "libuuid" ;;
+        21) echo "rubberband" ;;
+        22) echo "libilbc" ;;
+        23) echo "opus" ;;
+        24) echo "snappy" ;;
+        25) echo "soxr" ;;
+        26) echo "libaom" ;;
+        27) echo "chromaprint" ;;
+        28) echo "twolame" ;;
+        29) echo "sdl" ;;
+        30) echo "tesseract" ;;
+        31) echo "openh264" ;;
+        32) echo "giflib" ;;
+        33) echo "jpeg" ;;
+        34) echo "libogg" ;;
+        35) echo "libpng" ;;
         36) echo "nettle" ;;
         37) echo "tiff" ;;
         38) echo "expat" ;;
         39) echo "libsndfile" ;;
         40) echo "leptonica" ;;
-        41) echo "ios-zlib" ;;
-        42) echo "ios-audiotoolbox" ;;
-        43) echo "ios-coreimage" ;;
-        44) echo "ios-bzip2" ;;
-        45) echo "ios-videotoolbox" ;;
-        46) echo "ios-avfoundation" ;;
-        47) echo "ios-libiconv" ;;
+        41) echo "libsamplerate" ;;
+        42) echo "ios-zlib" ;;
+        43) echo "ios-audiotoolbox" ;;
+        44) echo "ios-coreimage" ;;
+        45) echo "ios-bzip2" ;;
+        46) echo "ios-videotoolbox" ;;
+        47) echo "ios-avfoundation" ;;
+        48) echo "ios-libiconv" ;;
+        49) echo "ios-libuuid" ;;
     esac
 }
 
@@ -79,15 +81,16 @@ get_package_config_file_name() {
         11) echo "libxml-2.0" ;;
         12) echo "opencore-amrnb" ;;
         20) echo "vidstab" ;;
-        25) echo "aom" ;;
-        26) echo "libchromaprint" ;;
-        28) echo "sdl2" ;;
-        32) echo "libjpeg" ;;
-        33) echo "ogg" ;;
-        35) echo "uuid" ;;
+        26) echo "aom" ;;
+        27) echo "libchromaprint" ;;
+        29) echo "sdl2" ;;
+        33) echo "libjpeg" ;;
+        34) echo "ogg" ;;
         37) echo "libtiff-4" ;;
         39) echo "sndfile" ;;
         40) echo "lept" ;;
+        41) echo "samplerate" ;;
+        49) echo "uuid" ;;
         *) echo $(get_library_name $1)
     esac
 }
@@ -103,17 +106,17 @@ get_static_archive_name() {
         9) echo "libvpx.a" ;;
         11) echo "libxml2.a" ;;
         20) echo "libvidstab.a" ;;
-        21) echo "libilbc.a" ;;
-        25) echo "libaom.a" ;;
-        27) echo "libtwolame.a" ;;
-        28) echo "libSDL2.a" ;;
-        29) echo "libtesseract.a" ;;
-        31) echo "libgif.a" ;;
-        33) echo "libogg.a" ;;
-        34) echo "libpng.a" ;;
-        35) echo "libuuid.a" ;;
+        22) echo "libilbc.a" ;;
+        26) echo "libaom.a" ;;
+        28) echo "libtwolame.a" ;;
+        29) echo "libSDL2.a" ;;
+        30) echo "libtesseract.a" ;;
+        32) echo "libgif.a" ;;
+        34) echo "libogg.a" ;;
+        35) echo "libpng.a" ;;
         39) echo "libsndfile.a" ;;
         40) echo "liblept.a" ;;
+        41) echo "libsamplerate.a" ;;
         *) echo lib$(get_library_name $1).a
     esac
 }
@@ -126,20 +129,35 @@ get_arch_name() {
         3) echo "arm64e" ;;
         4) echo "i386" ;;
         5) echo "x86-64" ;;
+        6) echo "x86-64-mac-catalyst" ;;
     esac
 }
 
 get_target_host() {
+      case ${ARCH} in
+        x86-64-mac-catalyst)
+            echo "x86_64-apple-ios13.0-macabi"
+        ;;
+        *)
+            echo "$(get_target_arch)-ios-darwin"
+        ;;
+    esac
+}
+
+get_build_host() {
     echo "$(get_target_arch)-ios-darwin"
 }
 
 get_target_build_directory() {
     case ${ARCH} in
         x86-64)
-            echo "ios-x86_64-apple-darwin"
+            echo "ios-x86_64"
+        ;;
+        x86-64-mac-catalyst)
+            echo "ios-x86_64-mac-catalyst"
         ;;
         *)
-            echo "ios-${ARCH}-apple-darwin"
+            echo "ios-${ARCH}"
         ;;
     esac
 }
@@ -149,7 +167,7 @@ get_target_arch() {
         arm64 | arm64e)
             echo "aarch64"
         ;;
-        x86-64)
+        x86-64 | x86-64-mac-catalyst)
             echo "x86_64"
         ;;
         *)
@@ -170,6 +188,9 @@ get_sdk_name() {
         i386 | x86-64)
             echo "iphonesimulator"
         ;;
+        x86-64-mac-catalyst)
+            echo "macosx"
+        ;;
     esac
 }
 
@@ -184,6 +205,9 @@ get_min_version_cflags() {
         ;;
         i386 | x86-64)
             echo "-mios-simulator-version-min=${IOS_MIN_VERSION}"
+        ;;
+        x86-64-mac-catalyst)
+            echo "-miphoneos-version-min=13.0"
         ;;
     esac
 }
@@ -202,6 +226,9 @@ get_common_cflags() {
     case ${ARCH} in
         i386 | x86-64)
             echo "-fstrict-aliasing -DIOS ${LTS_BUILD_FLAG}${BUILD_DATE} -isysroot ${SDK_PATH}"
+        ;;
+        x86-64-mac-catalyst)
+            echo "-fstrict-aliasing -fembed-bitcode ${LTS_BUILD_FLAG}${BUILD_DATE} -isysroot ${SDK_PATH}"
         ;;
         *)
             echo "-fstrict-aliasing -fembed-bitcode -DIOS ${LTS_BUILD_FLAG}${BUILD_DATE} -isysroot ${SDK_PATH}"
@@ -229,6 +256,9 @@ get_arch_specific_cflags() {
         x86-64)
             echo "-arch x86_64 -target $(get_target_host) -march=x86-64 -msse4.2 -mpopcnt -m64 -mtune=intel -DMOBILE_FFMPEG_X86_64"
         ;;
+        x86-64-mac-catalyst)
+            echo "-arch x86_64 -target $(get_target_host) -march=x86-64 -msse4.2 -mpopcnt -m64 -mtune=intel -DMOBILE_FFMPEG_X86_64_MAC_CATALYST -isysroot ${SDK_PATH} -isystem ${SDK_PATH}/System/iOSSupport/usr/include -iframework ${SDK_PATH}/System/iOSSupport/System/Library/Frameworks"
+        ;;
     esac
 }
 
@@ -236,31 +266,11 @@ get_size_optimization_cflags() {
 
     local ARCH_OPTIMIZATION=""
     case ${ARCH} in
-        armv7 | armv7s | arm64 | arm64e)
-            case $1 in
-                x264 | x265)
-                    ARCH_OPTIMIZATION="-Oz -Wno-ignored-optimization-argument"
-                ;;
-                ffmpeg | mobile-ffmpeg)
-                    ARCH_OPTIMIZATION="-Oz -Wno-ignored-optimization-argument"
-                ;;
-                *)
-                    ARCH_OPTIMIZATION="-Oz -Wno-ignored-optimization-argument"
-                ;;
-            esac
+        armv7 | armv7s | arm64 | arm64e | x86-64-mac-catalyst)
+          ARCH_OPTIMIZATION="-Oz -Wno-ignored-optimization-argument"
         ;;
         i386 | x86-64)
-            case $1 in
-                x264 | ffmpeg)
-                    ARCH_OPTIMIZATION="-O2 -Wno-ignored-optimization-argument"
-                ;;
-                x265)
-                    ARCH_OPTIMIZATION="-O2 -Wno-ignored-optimization-argument"
-                ;;
-                *)
-                    ARCH_OPTIMIZATION="-O2 -Wno-ignored-optimization-argument"
-                ;;
-            esac
+          ARCH_OPTIMIZATION="-O2 -Wno-ignored-optimization-argument"
         ;;
     esac
 
@@ -273,7 +283,7 @@ get_size_optimization_asm_cflags() {
     case $1 in
         jpeg | ffmpeg)
             case ${ARCH} in
-                armv7 | armv7s | arm64 | arm64e)
+                armv7 | armv7s | arm64 | arm64e | x86-64-mac-catalyst)
                     ARCH_OPTIMIZATION="-Oz"
                 ;;
                 i386 | x86-64)
@@ -381,7 +391,7 @@ get_cxxflags() {
 
     local BITCODE_FLAGS=""
     case ${ARCH} in
-        armv7 | armv7s | arm64 | arm64e)
+        armv7 | armv7s | arm64 | arm64e | x86-64-mac-catalyst)
             local BITCODE_FLAGS="-fembed-bitcode"
         ;;
     esac
@@ -393,14 +403,17 @@ get_cxxflags() {
         gnutls)
             echo "-std=c++11 -fno-rtti ${BITCODE_FLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_FLAGS}"
         ;;
-        opencore-amr)
-            echo "-fno-rtti ${BITCODE_FLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_FLAGS}"
-        ;;
         libwebp | xvidcore)
             echo "-std=c++11 -fno-exceptions -fno-rtti ${BITCODE_FLAGS} -fno-common -DPIC ${COMMON_CFLAGS} ${OPTIMIZATION_FLAGS}"
         ;;
         libaom)
             echo "-std=c++11 -fno-exceptions ${BITCODE_FLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_FLAGS}"
+        ;;
+        opencore-amr)
+            echo "-fno-rtti ${BITCODE_FLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_FLAGS}"
+        ;;
+        rubberband)
+            echo "-fno-rtti ${BITCODE_FLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_FLAGS}"
         ;;
         *)
             echo "-std=c++11 -fno-exceptions -fno-rtti ${BITCODE_FLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_FLAGS}"
@@ -418,7 +431,7 @@ get_common_ldflags() {
 
 get_size_optimization_ldflags() {
     case ${ARCH} in
-        armv7 | armv7s | arm64 | arm64e)
+        armv7 | armv7s | arm64 | arm64e | x86-64-mac-catalyst)
             case $1 in
                 ffmpeg | mobile-ffmpeg)
                     echo "-Oz -dead_strip"
@@ -444,22 +457,25 @@ get_size_optimization_ldflags() {
 get_arch_specific_ldflags() {
     case ${ARCH} in
         armv7)
-            echo "-arch armv7 -march=armv7 -mfpu=neon -mfloat-abi=softfp -fembed-bitcode"
+            echo "-arch armv7 -march=armv7 -mfpu=neon -mfloat-abi=softfp -fembed-bitcode -target $(get_target_host)"
         ;;
         armv7s)
-            echo "-arch armv7s -march=armv7s -mfpu=neon -mfloat-abi=softfp -fembed-bitcode"
+            echo "-arch armv7s -march=armv7s -mfpu=neon -mfloat-abi=softfp -fembed-bitcode -target $(get_target_host)"
         ;;
         arm64)
-            echo "-arch arm64 -march=armv8-a+crc+crypto -fembed-bitcode"
+            echo "-arch arm64 -march=armv8-a+crc+crypto -fembed-bitcode -target $(get_target_host)"
         ;;
         arm64e)
-            echo "-arch arm64e -march=armv8.3-a+crc+crypto -fembed-bitcode"
+            echo "-arch arm64e -march=armv8.3-a+crc+crypto -fembed-bitcode -target $(get_target_host)"
         ;;
         i386)
-            echo "-arch i386 -march=i386"
+            echo "-arch i386 -march=i386 -target $(get_target_host)"
         ;;
         x86-64)
-            echo "-arch x86_64 -march=x86-64"
+            echo "-arch x86_64 -march=x86-64 -target $(get_target_host)"
+        ;;
+        x86-64-mac-catalyst)
+            echo "-arch x86_64 -march=x86-64 -target $(get_target_host) -isysroot ${SDK_PATH} -L${SDK_PATH}/System/iOSSupport/usr/lib -iframework ${SDK_PATH}/System/iOSSupport/System/Library/Frameworks"
         ;;
     esac
 }
@@ -477,7 +493,7 @@ get_ldflags() {
     case $1 in
         mobile-ffmpeg)
             case ${ARCH} in
-                armv7 | armv7s | arm64 | arm64e)
+                armv7 | armv7s | arm64 | arm64e | x86-64-mac-catalyst)
                     echo "${ARCH_FLAGS} ${LINKED_LIBRARIES} ${COMMON_FLAGS} -fembed-bitcode -Wc,-fembed-bitcode ${OPTIMIZATION_FLAGS}"
                 ;;
                 *)
@@ -614,7 +630,7 @@ Cflags: -I\${includedir}
 EOF
 }
 
-create_libiconv_package_config() {
+create_libiconv_system_package_config() {
     local LIB_ICONV_VERSION=$(grep '_LIBICONV_VERSION' ${SDK_PATH}/usr/include/iconv.h | grep -Eo '0x.*' | grep -Eo '.*    ')
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/libiconv.pc" << EOF
@@ -702,25 +718,6 @@ Cflags: -I\${includedir}
 EOF
 }
 
-create_libwebp_package_config() {
-    local LIB_WEBP_VERSION="$1"
-
-    cat > "${INSTALL_PKG_CONFIG_DIR}/libwebp.pc" << EOF
-prefix=${BASEDIR}/prebuilt/$(get_target_build_directory)/libwebp
-exec_prefix=\${prefix}
-libdir=\${prefix}/lib
-includedir=\${prefix}/include
-
-Name: libwebp
-Description: webp codec library
-Version: ${LIB_WEBP_VERSION}
-
-Requires:
-Libs: -L\${libdir} -lwebp -lwebpdecoder -lwebpdemux
-Cflags: -I\${includedir}
-EOF
-}
-
 create_libxml2_package_config() {
     local LIBXML2_VERSION="$1"
 
@@ -802,13 +799,13 @@ Cflags: -I\${includedir}
 EOF
 }
 
-create_uuid_package_config() {
+create_libuuid_system_package_config() {
     local UUID_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/uuid.pc" << EOF
-prefix=${BASEDIR}/prebuilt/$(get_target_build_directory)/libuuid
+prefix=${SDK_PATH}
 exec_prefix=\${prefix}
-libdir=\${exec_prefix}/lib
+libdir=\${exec_prefix}/usr/lib
 includedir=\${prefix}/include
 
 Name: uuid
@@ -816,7 +813,7 @@ Description: Universally unique id library
 Version: ${UUID_VERSION}
 Requires:
 Cflags: -I\${includedir}
-Libs: -L\${libdir} -luuid
+Libs: -L\${libdir}
 EOF
 }
 
@@ -839,7 +836,7 @@ Cflags: -I\${includedir}
 EOF
 }
 
-create_zlib_package_config() {
+create_zlib_system_package_config() {
     ZLIB_VERSION=$(grep '#define ZLIB_VERSION' ${SDK_PATH}/usr/include/zlib.h | grep -Eo '\".*\"' | sed -e 's/\"//g')
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/zlib.pc" << EOF
@@ -858,7 +855,7 @@ Cflags: -I\${includedir}
 EOF
 }
 
-create_bzip2_package_config() {
+create_bzip2_system_package_config() {
     BZIP2_VERSION=$(grep -Eo 'version.*of' ${SDK_PATH}/usr/include/bzlib.h | sed -e 's/of//;s/version//g;s/\ //g')
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/bzip2.pc" << EOF
@@ -923,15 +920,15 @@ download_gpl_library_source() {
             GPL_LIB_DEST_DIR="libvidstab"
         ;;
         x264)
-            GPL_LIB_URL="https://code.videolan.org/videolan/x264/-/archive/1771b556ee45207f8711744ccbd5d42a3949b14c/x264-1771b556ee45207f8711744ccbd5d42a3949b14c.tar.bz2"
-            GPL_LIB_FILE="x264-1771b556ee45207f8711744ccbd5d42a3949b14c.tar.bz2"
-            GPL_LIB_ORIG_DIR="x264-1771b556ee45207f8711744ccbd5d42a3949b14c"
+            GPL_LIB_URL="https://code.videolan.org/videolan/x264/-/archive/296494a4011f58f32adc54304a2654627558c59a/x264-296494a4011f58f32adc54304a2654627558c59a.tar.bz2"
+            GPL_LIB_FILE="x264-296494a4011f58f32adc54304a2654627558c59a.tar.bz2"
+            GPL_LIB_ORIG_DIR="x264-296494a4011f58f32adc54304a2654627558c59a"
             GPL_LIB_DEST_DIR="x264"
         ;;
         x265)
-            GPL_LIB_URL="https://bitbucket.org/multicoreware/x265/downloads/x265_3.2.1.tar.gz"
-            GPL_LIB_FILE="x265-3.2.tar.gz"
-            GPL_LIB_ORIG_DIR="x265_3.2.1"
+            GPL_LIB_URL="https://bitbucket.org/multicoreware/x265/downloads/x265_3.3.tar.gz"
+            GPL_LIB_FILE="x265_3.3.tar.gz"
+            GPL_LIB_ORIG_DIR="x265_3.3"
             GPL_LIB_DEST_DIR="x265"
         ;;
         xvidcore)
@@ -939,6 +936,12 @@ download_gpl_library_source() {
             GPL_LIB_FILE="xvidcore-1.3.7.tar.gz"
             GPL_LIB_ORIG_DIR="xvidcore"
             GPL_LIB_DEST_DIR="xvidcore"
+        ;;
+        rubberband)
+            GPL_LIB_URL="https://breakfastquay.com/files/releases/rubberband-1.8.2.tar.bz2"
+            GPL_LIB_FILE="rubberband-1.8.2.tar.bz2"
+            GPL_LIB_ORIG_DIR="rubberband-1.8.2"
+            GPL_LIB_DEST_DIR="rubberband"
         ;;
     esac
 
@@ -1028,8 +1031,6 @@ set_toolchain_clang_paths() {
         LOCAL_GAS_PREPROCESSOR="${BASEDIR}/src/x264/tools/gas-preprocessor.pl"
     fi
 
-    TARGET_HOST=$(get_target_host)
-    
     export AR="$(xcrun --sdk $(get_sdk_name) -f ar)"
     export CC="clang"
     export OBJC="$(xcrun --sdk $(get_sdk_name) -f clang)"
@@ -1068,21 +1069,26 @@ set_toolchain_clang_paths() {
     export ZLIB_PACKAGE_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}/zlib.pc"
     export BZIP2_PACKAGE_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}/bzip2.pc"
     export LIB_ICONV_PACKAGE_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}/libiconv.pc"
+    export LIB_UUID_PACKAGE_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}/uuid.pc"
 
     if [ ! -d ${INSTALL_PKG_CONFIG_DIR} ]; then
         mkdir -p ${INSTALL_PKG_CONFIG_DIR}
     fi
 
     if [ ! -f ${ZLIB_PACKAGE_CONFIG_PATH} ]; then
-        create_zlib_package_config
+        create_zlib_system_package_config
     fi
 
     if [ ! -f ${LIB_ICONV_PACKAGE_CONFIG_PATH} ]; then
-        create_libiconv_package_config
+        create_libiconv_system_package_config
     fi
 
     if [ ! -f ${BZIP2_PACKAGE_CONFIG_PATH} ]; then
-        create_bzip2_package_config
+        create_bzip2_system_package_config
+    fi
+
+    if [ ! -f ${LIB_UUID_PACKAGE_CONFIG_PATH} ]; then
+        create_libuuid_system_package_config
     fi
 
     prepare_inline_sed

@@ -59,7 +59,7 @@ ifdef(`DO_sub', `
   define(`CLRCY',	`cmp	r13, #0')
   define(`RETVAL',	`sbc	$2, $2, $2
 			cmn	$2, #1
-			adc	 r0, $1, #0')
+			adc	r0, $1, #0')
   define(`func',	mpn_sublsh`'LSH`'_n)')
 ifdef(`DO_rsb', `
   define(`ADCSBCS',	`sbcs	$1, $3, $2')

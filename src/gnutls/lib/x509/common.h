@@ -98,6 +98,7 @@
 #define SIG_RSA_SHA3_512_OID "2.16.840.1.101.3.4.3.16"
 
 #define SIG_EDDSA_SHA512_OID "1.3.101.112"
+#define SIG_ED448_OID "1.3.101.113"
 
 #define XMPP_OID "1.3.6.1.5.5.7.8.5"
 #define KRB5_PRINCIPAL_OID "1.3.6.1.5.2.2"
@@ -191,9 +192,9 @@ _gnutls_x509_get_signature_algorithm(ASN1_TYPE src, const char *src_name);
 
 int _gnutls_x509_encode_and_copy_PKI_params(ASN1_TYPE dst,
 					    const char *dst_name,
-					    gnutls_pk_params_st * params);
+					    const gnutls_pk_params_st * params);
 int _gnutls_x509_encode_PKI_params(gnutls_datum_t * der,
-				   gnutls_pk_params_st * params);
+				   const gnutls_pk_params_st * params);
 int _gnutls_asn1_copy_node(ASN1_TYPE * dst, const char *dst_name,
 			   ASN1_TYPE src, const char *src_name);
 
@@ -222,7 +223,7 @@ _gnutls_x509_get_raw_field(ASN1_TYPE c2, const char *whom, gnutls_datum_t *out)
 }
 
 int
-_gnutls_x509_get_raw_field2(ASN1_TYPE c2, gnutls_datum_t * raw,
+_gnutls_x509_get_raw_field2(ASN1_TYPE c2, const gnutls_datum_t * raw,
 			 const char *whom, gnutls_datum_t * dn);
 
 unsigned
@@ -235,7 +236,7 @@ _gnutls_check_if_same_key2(gnutls_x509_crt_t cert1,
 			   gnutls_datum_t *cert2bin);
 
 unsigned
-_gnutls_check_valid_key_id(gnutls_datum_t *key_id,
+_gnutls_check_valid_key_id(const gnutls_datum_t *key_id,
 			   gnutls_x509_crt_t cert, time_t now,
 			   unsigned *has_ski);
 
@@ -256,12 +257,14 @@ int _gnutls_strdatum_to_buf(gnutls_datum_t * d, void *buf,
 
 unsigned _gnutls_is_same_dn(gnutls_x509_crt_t cert1, gnutls_x509_crt_t cert2);
 
-int _gnutls_copy_string(gnutls_datum_t* str, uint8_t *out, size_t *out_size);
-int _gnutls_copy_data(gnutls_datum_t* str, uint8_t *out, size_t *out_size);
+int _gnutls_copy_string(const gnutls_datum_t* str, uint8_t *out, size_t *out_size);
+int _gnutls_copy_data(const gnutls_datum_t* str, uint8_t *out, size_t *out_size);
 
 int _gnutls_x509_decode_ext(const gnutls_datum_t *der, gnutls_x509_ext_st *out);
 int _gnutls_x509_raw_crt_to_raw_pubkey(const gnutls_datum_t * cert,
 			   gnutls_datum_t * rpubkey);
+
+int _gnutls_x509_get_version(ASN1_TYPE root, const char *name);
 
 int x509_crt_to_raw_pubkey(gnutls_x509_crt_t crt,
 			   gnutls_datum_t * rpubkey);
@@ -279,10 +282,10 @@ int _gnutls_check_if_sorted(gnutls_x509_crt_t * crt, int nr);
 inline static int _asn1_strict_der_decode (asn1_node * element, const void *ider,
 		       int len, char *errorDescription)
 {
-#ifdef ASN1_DECODE_FLAG_ALLOW_INCORRECT_TIME
-# define _ASN1_DER_FLAGS ASN1_DECODE_FLAG_ALLOW_INCORRECT_TIME|ASN1_DECODE_FLAG_STRICT_DER
-#else
+#if defined(STRICT_DER_TIME) || !defined(ASN1_DECODE_FLAG_ALLOW_INCORRECT_TIME)
 # define _ASN1_DER_FLAGS ASN1_DECODE_FLAG_STRICT_DER
+#else
+# define _ASN1_DER_FLAGS (ASN1_DECODE_FLAG_ALLOW_INCORRECT_TIME|ASN1_DECODE_FLAG_STRICT_DER)
 #endif
 	return asn1_der_decoding2(element, ider, &len, _ASN1_DER_FLAGS, errorDescription);
 }

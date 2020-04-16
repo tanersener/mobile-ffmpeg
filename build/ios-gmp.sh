@@ -27,7 +27,7 @@ else
     . ${BASEDIR}/build/ios-common.sh
 fi
 
-# PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
+# PREPARE PATHS & DEFINE ${INSTALL_PKG_CONFIG_DIR}
 LIB_NAME="gmp"
 set_toolchain_clang_paths ${LIB_NAME}
 
@@ -39,7 +39,7 @@ cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
 make distclean 2>/dev/null 1>/dev/null
 
-# RECONFIGURING IF REQUESTED
+# RECONFIGURE IF REQUESTED
 if [[ ${RECONF_gmp} -eq 1 ]]; then
     autoreconf_library ${LIB_NAME}
 fi
@@ -47,10 +47,17 @@ fi
 # PREPARING FLAGS
 case ${ARCH} in
     i386)
-        TARGET_HOST="x86-apple-darwin"
+        unset gmp_cv_asm_w32
+        BUILD_HOST="x86-apple-darwin"
+    ;;
+    x86-64-mac-catalyst)
+        # Workaround for 'cannot determine how to define a 32-bit word' error
+        export gmp_cv_asm_w32=".long"
+        BUILD_HOST=$(get_build_host)
     ;;
     *)
-        TARGET_HOST=$(get_target_host)
+        unset gmp_cv_asm_w32
+        BUILD_HOST=$(get_build_host)
     ;;
 esac
 
@@ -63,11 +70,11 @@ esac
     --disable-assembly \
     --disable-fast-install \
     --disable-maintainer-mode \
-    --host=${TARGET_HOST} || exit 1
+    --host=${BUILD_HOST} || exit 1
 
 make -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_gmp_package_config "6.1.2"
+create_gmp_package_config "6.2.0"
 
 make install || exit 1

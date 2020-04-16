@@ -1,0 +1,11 @@
+
+
+
+
+@deftypefun {const char *} {gnutls_certificate_verification_profile_get_name} (gnutls_certificate_verification_profiles_t @var{id})
+@var{id}: is a profile ID
+
+Convert a @code{gnutls_certificate_verification_profiles_t}  value to a string.
+
+@strong{Returns:} a string that contains the name of the specified profile or @code{NULL} .
+@end deftypefun

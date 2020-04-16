@@ -1,6 +1,6 @@
 /* Test gmp_printf and related functions.
 
-Copyright 2001-2003 Free Software Foundation, Inc.
+Copyright 2001-2003, 2015 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library test suite.
 
@@ -51,7 +51,6 @@ the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
 #include <unistd.h>  /* for unlink */
 #endif
 
-#include "gmp.h"
 #include "gmp-impl.h"
 #include "tests.h"
 
@@ -872,6 +871,15 @@ check_misc (void)
     static char  xs[801];
     memset (xs, 'x', sizeof(xs)-1);
     check_one (xs, "%s", xs);
+  }
+  {
+    char  *xs;
+    xs = (char *) (*__gmp_allocate_func) (MAX_OUTPUT * 2 - 12);
+    memset (xs, '%', MAX_OUTPUT * 2 - 14);
+    xs [MAX_OUTPUT * 2 - 13] = '\0';
+    xs [MAX_OUTPUT * 2 - 14] = 'x';
+    check_one (xs + MAX_OUTPUT - 7, xs, NULL);
+    (*__gmp_free_func) (xs, MAX_OUTPUT * 2 - 12);
   }
 
   mpz_set_ui (z, 12345L);

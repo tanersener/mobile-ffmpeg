@@ -2,7 +2,7 @@ dnl  AMD64 mpn_lshift optimised for CPUs with fast SSE.
 
 dnl  Contributed to the GNU project by David Harvey and Torbjorn Granlund.
 
-dnl  Copyright 2010-2012 Free Software Foundation, Inc.
+dnl  Copyright 2010-2012, 2018 Free Software Foundation, Inc.
 
 dnl  This file is part of the GNU MP Library.
 dnl
@@ -69,6 +69,7 @@ ASM_START()
 	TEXT
 	ALIGN(64)
 PROLOGUE(mpn_lshift)
+	FUNC_ENTRY(4)
 	movd	R32(%rcx), %xmm4
 	mov	$64, R32(%rax)
 	sub	R32(%rcx), R32(%rax)
@@ -124,6 +125,7 @@ L(uent):sub	$2, n
 	psrlq	%xmm5, %xmm0
 	por	%xmm1, %xmm0
 	movdqa	%xmm0, (rp)
+	FUNC_EXIT()
 	ret
 C *****************************************************************************
 
@@ -149,6 +151,7 @@ L(aent):
 	psrlq	%xmm5, %xmm0
 	por	%xmm1, %xmm0
 	movdqa	%xmm0, (rp)
+	FUNC_EXIT()
 	ret
 C *****************************************************************************
 
@@ -165,5 +168,6 @@ L(le2):	jne	L(end8)
 L(end8):movq	(ap), %xmm0
 	psllq	%xmm4, %xmm0
 	movq	%xmm0, (rp)
+	FUNC_EXIT()
 	ret
 EPILOGUE()

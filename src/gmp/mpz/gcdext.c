@@ -1,8 +1,8 @@
 /* mpz_gcdext(g, s, t, a, b) -- Set G to gcd(a, b), and S and T such that
    g = as + bt.
 
-Copyright 1991, 1993-1997, 2000, 2001, 2005, 2011, 2012 Free Software
-Foundation, Inc.
+Copyright 1991, 1993-1997, 2000, 2001, 2005, 2011, 2012, 2015 Free
+Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -31,7 +31,6 @@ GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
 #include <stdio.h> /* for NULL */
-#include "gmp.h"
 #include "gmp-impl.h"
 
 void
@@ -51,6 +50,8 @@ mpz_gcdext (mpz_ptr g, mpz_ptr s, mpz_ptr t, mpz_srcptr a, mpz_srcptr b)
   asize = ABSIZ (a);
   bsize = ABSIZ (b);
 
+  ASSERT (s != NULL);
+
   if (asize < bsize)
     {
       MPZ_SRCPTR_SWAP (a, b);
@@ -63,27 +64,31 @@ mpz_gcdext (mpz_ptr g, mpz_ptr s, mpz_ptr t, mpz_srcptr a, mpz_srcptr b)
       /* g = |a|, s = sgn(a), t = 0. */
       ssize = SIZ (a) >= 0 ? (asize != 0) : -1;
 
-      gp = MPZ_REALLOC (g, asize);
-      MPN_COPY (gp, PTR (a), asize);
-      SIZ (g) = asize;
-
+      if (g != NULL)
+	{
+	  /* If g == a, then ALLOC(g) == ALLOC(a) >= asize, i.e.
+	     the next MPZ_NEWALLOC returns the old PTR(a) .*/
+	  gp = MPZ_NEWALLOC (g, asize);
+	  MPN_COPY (gp, PTR (a), asize);
+	  SIZ (g) = asize;
+	}
       if (t != NULL)
 	SIZ (t) = 0;
       if (s != NULL)
 	{
 	  SIZ (s) = ssize;
-	  PTR (s)[0] = 1;
+	  MPZ_NEWALLOC (s, 1)[0] = 1;
 	}
       return;
     }
 
   TMP_MARK;
 
-  TMP_ALLOC_LIMBS_2 (tmp_ap, asize, tmp_bp, bsize);
+  TMP_ALLOC_LIMBS_2 (tmp_gp, bsize, tmp_sp, asize + bsize + bsize + 1);
+  tmp_bp = tmp_sp + bsize + 1;
+  tmp_ap = tmp_bp + bsize;
   MPN_COPY (tmp_ap, PTR (a), asize);
   MPN_COPY (tmp_bp, PTR (b), bsize);
-
-  TMP_ALLOC_LIMBS_2 (tmp_gp, bsize, tmp_sp, bsize + 1);
 
   gsize = mpn_gcdext (tmp_gp, tmp_sp, &tmp_ssize, tmp_ap, asize, tmp_bp, bsize);
 
@@ -93,17 +98,20 @@ mpz_gcdext (mpz_ptr g, mpz_ptr s, mpz_ptr t, mpz_srcptr a, mpz_srcptr b)
   if (t != NULL)
     {
       mpz_t x;
-      __mpz_struct gtmp, stmp;
+      mpz_t gtmp, stmp;
 
-      PTR (&gtmp) = tmp_gp;
-      SIZ (&gtmp) = gsize;
+      PTR (gtmp) = tmp_gp;
+      SIZ (gtmp) = gsize;
 
-      PTR (&stmp) = tmp_sp;
-      SIZ (&stmp) = tmp_ssize;
+      PTR (stmp) = tmp_sp;
+      SIZ (stmp) = tmp_ssize;
 
-      MPZ_TMP_INIT (x, ssize + asize + 1);
-      mpz_mul (x, &stmp, a);
-      mpz_sub (x, &gtmp, x);
+      ASSERT (ssize <= bsize); /* ssize*2 + asize + 1 <= asize + bsize*2 + 1 */
+      PTR (x) = tmp_sp + ssize;
+      ALLOC (x) = ssize + asize + 1;
+
+      mpz_mul (x, stmp, a);
+      mpz_sub (x, gtmp, x);
       mpz_divexact (t, x, b);
     }
 
@@ -111,14 +119,17 @@ mpz_gcdext (mpz_ptr g, mpz_ptr s, mpz_ptr t, mpz_srcptr a, mpz_srcptr b)
     {
       mp_ptr sp;
 
-      sp = MPZ_REALLOC (s, ssize);
+      sp = MPZ_NEWALLOC (s, ssize);
       MPN_COPY (sp, tmp_sp, ssize);
       SIZ (s) = tmp_ssize;
     }
 
-  gp = MPZ_REALLOC (g, gsize);
-  MPN_COPY (gp, tmp_gp, gsize);
-  SIZ (g) = gsize;
+  if (g != NULL)
+    {
+      gp = MPZ_NEWALLOC (g, gsize);
+      MPN_COPY (gp, tmp_gp, gsize);
+      SIZ (g) = gsize;
+    }
 
   TMP_FREE;
 }

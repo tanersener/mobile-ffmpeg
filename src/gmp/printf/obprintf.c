@@ -1,6 +1,6 @@
 /* gmp_obstack_printf -- formatted output to an obstack.
 
-Copyright 2001, 2002 Free Software Foundation, Inc.
+Copyright 2001, 2002, 2018 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -36,7 +36,6 @@ see https://www.gnu.org/licenses/.  */
 #include <obstack.h>
 #include <string.h>
 
-#include "gmp.h"
 #include "gmp-impl.h"
 
 
@@ -56,4 +55,6 @@ gmp_obstack_printf (struct obstack *ob, const char *fmt, ...)
   return ret;
 }
 
+#else
+typedef int __gmp_dummy_typedef;
 #endif /* HAVE_OBSTACK_VPRINTF */

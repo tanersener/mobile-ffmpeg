@@ -1,5 +1,5 @@
 /* Set the current locale.  -*- coding: utf-8 -*-
-   Copyright (C) 2009, 2011-2019 Free Software Foundation, Inc.
+   Copyright (C) 2009, 2011-2020 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -51,6 +51,37 @@ extern void gl_locale_name_canonicalize (char *name);
 
 # undef setlocale
 
+/* Which of the replacements to activate?  */
+# if NEED_SETLOCALE_IMPROVED
+#  define setlocale_improved rpl_setlocale
+# elif NEED_SETLOCALE_MTSAFE
+#  define setlocale_mtsafe rpl_setlocale
+# else
+#  error "This file should only be compiled if NEED_SETLOCALE_IMPROVED || NEED_SETLOCALE_MTSAFE."
+# endif
+
+/* Like setlocale, but guaranteed to be multithread-safe if LOCALE == NULL.  */
+# if !SETLOCALE_NULL_ALL_MTSAFE || !SETLOCALE_NULL_ONE_MTSAFE /* i.e. if NEED_SETLOCALE_MTSAFE */
+
+#  if NEED_SETLOCALE_IMPROVED
+static
+#  endif
+char *
+setlocale_mtsafe (int category, const char *locale)
+{
+  if (locale == NULL)
+    return (char *) setlocale_null (category);
+  else
+    return setlocale (category, locale);
+}
+# else /* !NEED_SETLOCALE_MTSAFE */
+
+#  define setlocale_mtsafe setlocale
+
+# endif /* NEED_SETLOCALE_MTSAFE */
+
+# if NEED_SETLOCALE_IMPROVED
+
 /* Return string representation of locale category CATEGORY.  */
 static const char *
 category_to_name (int category)
@@ -85,7 +116,7 @@ category_to_name (int category)
   return retval;
 }
 
-# if defined _WIN32 && ! defined __CYGWIN__
+#  if defined _WIN32 && ! defined __CYGWIN__
 
 /* The native Windows setlocale() function expects locale names of the form
    "German" or "German_Germany" or "DEU", but not "de" or "de_DE".  We need
@@ -617,7 +648,7 @@ search (const struct table_entry *table, size_t table_size, const char *string,
           {
             size_t i;
 
-            for (i = mid; i < hi; i++)
+            for (i = mid + 1; i < hi; i++)
               {
                 if (strcmp (table[i].code, string) > 0)
                   {
@@ -652,7 +683,7 @@ setlocale_unixlike (int category, const char *locale)
     locale = "C";
 
   /* First, try setlocale with the original argument unchanged.  */
-  result = setlocale (category, locale);
+  result = setlocale_mtsafe (category, locale);
   if (result != NULL)
     return result;
 
@@ -794,13 +825,13 @@ setlocale_unixlike (int category, const char *locale)
   return NULL;
 }
 
-# elif defined __ANDROID__
+#  elif defined __ANDROID__
 
 /* Like setlocale, but accept also the locale names "C" and "POSIX".  */
 static char *
 setlocale_unixlike (int category, const char *locale)
 {
-  char *result = setlocale (category, locale);
+  char *result = setlocale_mtsafe (category, locale);
   if (result == NULL)
     switch (category)
       {
@@ -825,13 +856,13 @@ setlocale_unixlike (int category, const char *locale)
       }
   return result;
 }
-#  define setlocale setlocale_unixlike
+#   define setlocale setlocale_unixlike
 
-# else
-#  define setlocale_unixlike setlocale
-# endif
+#  else
+#   define setlocale_unixlike setlocale_mtsafe
+#  endif
 
-# if LC_MESSAGES == 1729
+#  if LC_MESSAGES == 1729
 
 /* The system does not store an LC_MESSAGES locale category.  Do it here.  */
 static char lc_messages_name[64] = "C";
@@ -853,12 +884,533 @@ setlocale_single (int category, const char *locale)
     return setlocale_unixlike (category, locale);
 }
 
-# else
-#  define setlocale_single setlocale_unixlike
-# endif
+#  else
+#   define setlocale_single setlocale_unixlike
+#  endif
+
+#  if defined __APPLE__ && defined __MACH__
+
+/* Mapping from language to main territory where that language is spoken.  */
+static char const locales_with_principal_territory[][6 + 1] =
+  {
+                /* Language     Main territory */
+    "ace_ID",   /* Achinese     Indonesia */
+    "af_ZA",    /* Afrikaans    South Africa */
+    "ak_GH",    /* Akan         Ghana */
+    "am_ET",    /* Amharic      Ethiopia */
+    "an_ES",    /* Aragonese    Spain */
+    "ang_GB",   /* Old English  Britain */
+    "arn_CL",   /* Mapudungun   Chile */
+    "as_IN",    /* Assamese     India */
+    "ast_ES",   /* Asturian     Spain */
+    "av_RU",    /* Avaric       Russia */
+    "awa_IN",   /* Awadhi       India */
+    "az_AZ",    /* Azerbaijani  Azerbaijan */
+    "ban_ID",   /* Balinese     Indonesia */
+    "be_BY",    /* Belarusian   Belarus */
+    "bej_SD",   /* Beja         Sudan */
+    "bem_ZM",   /* Bemba        Zambia */
+    "bg_BG",    /* Bulgarian    Bulgaria */
+    "bho_IN",   /* Bhojpuri     India */
+    "bi_VU",    /* Bislama      Vanuatu */
+    "bik_PH",   /* Bikol        Philippines */
+    "bin_NG",   /* Bini         Nigeria */
+    "bm_ML",    /* Bambara      Mali */
+    "bn_IN",    /* Bengali      India */
+    "bo_CN",    /* Tibetan      China */
+    "br_FR",    /* Breton       France */
+    "bs_BA",    /* Bosnian      Bosnia */
+    "bug_ID",   /* Buginese     Indonesia */
+    "ca_ES",    /* Catalan      Spain */
+    "ce_RU",    /* Chechen      Russia */
+    "ceb_PH",   /* Cebuano      Philippines */
+    "co_FR",    /* Corsican     France */
+    "cr_CA",    /* Cree         Canada */
+    /* Don't put "crh_UZ" or "crh_UA" here.  That would be asking for fruitless
+       political discussion.  */
+    "cs_CZ",    /* Czech        Czech Republic */
+    "csb_PL",   /* Kashubian    Poland */
+    "cy_GB",    /* Welsh        Britain */
+    "da_DK",    /* Danish       Denmark */
+    "de_DE",    /* German       Germany */
+    "din_SD",   /* Dinka        Sudan */
+    "doi_IN",   /* Dogri        India */
+    "dsb_DE",   /* Lower Sorbian        Germany */
+    "dv_MV",    /* Divehi       Maldives */
+    "dz_BT",    /* Dzongkha     Bhutan */
+    "ee_GH",    /* Éwé          Ghana */
+    "el_GR",    /* Greek        Greece */
+    /* Don't put "en_GB" or "en_US" here.  That would be asking for fruitless
+       political discussion.  */
+    "es_ES",    /* Spanish      Spain */
+    "et_EE",    /* Estonian     Estonia */
+    "fa_IR",    /* Persian      Iran */
+    "fi_FI",    /* Finnish      Finland */
+    "fil_PH",   /* Filipino     Philippines */
+    "fj_FJ",    /* Fijian       Fiji */
+    "fo_FO",    /* Faroese      Faeroe Islands */
+    "fon_BJ",   /* Fon          Benin */
+    "fr_FR",    /* French       France */
+    "fur_IT",   /* Friulian     Italy */
+    "fy_NL",    /* Western Frisian      Netherlands */
+    "ga_IE",    /* Irish        Ireland */
+    "gd_GB",    /* Scottish Gaelic      Britain */
+    "gon_IN",   /* Gondi        India */
+    "gsw_CH",   /* Swiss German Switzerland */
+    "gu_IN",    /* Gujarati     India */
+    "he_IL",    /* Hebrew       Israel */
+    "hi_IN",    /* Hindi        India */
+    "hil_PH",   /* Hiligaynon   Philippines */
+    "hr_HR",    /* Croatian     Croatia */
+    "hsb_DE",   /* Upper Sorbian        Germany */
+    "ht_HT",    /* Haitian      Haiti */
+    "hu_HU",    /* Hungarian    Hungary */
+    "hy_AM",    /* Armenian     Armenia */
+    "id_ID",    /* Indonesian   Indonesia */
+    "ig_NG",    /* Igbo         Nigeria */
+    "ii_CN",    /* Sichuan Yi   China */
+    "ilo_PH",   /* Iloko        Philippines */
+    "is_IS",    /* Icelandic    Iceland */
+    "it_IT",    /* Italian      Italy */
+    "ja_JP",    /* Japanese     Japan */
+    "jab_NG",   /* Hyam         Nigeria */
+    "jv_ID",    /* Javanese     Indonesia */
+    "ka_GE",    /* Georgian     Georgia */
+    "kab_DZ",   /* Kabyle       Algeria */
+    "kaj_NG",   /* Jju          Nigeria */
+    "kam_KE",   /* Kamba        Kenya */
+    "kmb_AO",   /* Kimbundu     Angola */
+    "kcg_NG",   /* Tyap         Nigeria */
+    "kdm_NG",   /* Kagoma       Nigeria */
+    "kg_CD",    /* Kongo        Democratic Republic of Congo */
+    "kk_KZ",    /* Kazakh       Kazakhstan */
+    "kl_GL",    /* Kalaallisut  Greenland */
+    "km_KH",    /* Central Khmer        Cambodia */
+    "kn_IN",    /* Kannada      India */
+    "ko_KR",    /* Korean       Korea (South) */
+    "kok_IN",   /* Konkani      India */
+    "kr_NG",    /* Kanuri       Nigeria */
+    "kru_IN",   /* Kurukh       India */
+    "ky_KG",    /* Kyrgyz       Kyrgyzstan */
+    "lg_UG",    /* Ganda        Uganda */
+    "li_BE",    /* Limburgish   Belgium */
+    "lo_LA",    /* Laotian      Laos */
+    "lt_LT",    /* Lithuanian   Lithuania */
+    "lu_CD",    /* Luba-Katanga Democratic Republic of Congo */
+    "lua_CD",   /* Luba-Lulua   Democratic Republic of Congo */
+    "luo_KE",   /* Luo          Kenya */
+    "lv_LV",    /* Latvian      Latvia */
+    "mad_ID",   /* Madurese     Indonesia */
+    "mag_IN",   /* Magahi       India */
+    "mai_IN",   /* Maithili     India */
+    "mak_ID",   /* Makasar      Indonesia */
+    "man_ML",   /* Mandingo     Mali */
+    "men_SL",   /* Mende        Sierra Leone */
+    "mfe_MU",   /* Mauritian Creole     Mauritius */
+    "mg_MG",    /* Malagasy     Madagascar */
+    "mi_NZ",    /* Maori        New Zealand */
+    "min_ID",   /* Minangkabau  Indonesia */
+    "mk_MK",    /* Macedonian   North Macedonia */
+    "ml_IN",    /* Malayalam    India */
+    "mn_MN",    /* Mongolian    Mongolia */
+    "mni_IN",   /* Manipuri     India */
+    "mos_BF",   /* Mossi        Burkina Faso */
+    "mr_IN",    /* Marathi      India */
+    "ms_MY",    /* Malay        Malaysia */
+    "mt_MT",    /* Maltese      Malta */
+    "mwr_IN",   /* Marwari      India */
+    "my_MM",    /* Burmese      Myanmar */
+    "na_NR",    /* Nauru        Nauru */
+    "nah_MX",   /* Nahuatl      Mexico */
+    "nap_IT",   /* Neapolitan   Italy */
+    "nb_NO",    /* Norwegian Bokmål    Norway */
+    "nds_DE",   /* Low Saxon    Germany */
+    "ne_NP",    /* Nepali       Nepal */
+    "nl_NL",    /* Dutch        Netherlands */
+    "nn_NO",    /* Norwegian Nynorsk    Norway */
+    "no_NO",    /* Norwegian    Norway */
+    "nr_ZA",    /* South Ndebele        South Africa */
+    "nso_ZA",   /* Northern Sotho       South Africa */
+    "ny_MW",    /* Chichewa     Malawi */
+    "nym_TZ",   /* Nyamwezi     Tanzania */
+    "nyn_UG",   /* Nyankole     Uganda */
+    "oc_FR",    /* Occitan      France */
+    "oj_CA",    /* Ojibwa       Canada */
+    "or_IN",    /* Oriya        India */
+    "pa_IN",    /* Punjabi      India */
+    "pag_PH",   /* Pangasinan   Philippines */
+    "pam_PH",   /* Pampanga     Philippines */
+    "pap_AN",   /* Papiamento   Netherlands Antilles - this line can be removed in 2018 */
+    "pbb_CO",   /* Páez         Colombia */
+    "pl_PL",    /* Polish       Poland */
+    "ps_AF",    /* Pashto       Afghanistan */
+    "pt_PT",    /* Portuguese   Portugal */
+    "raj_IN",   /* Rajasthani   India */
+    "rm_CH",    /* Romansh      Switzerland */
+    "rn_BI",    /* Kirundi      Burundi */
+    "ro_RO",    /* Romanian     Romania */
+    "ru_RU",    /* Russian      Russia */
+    "rw_RW",    /* Kinyarwanda  Rwanda */
+    "sa_IN",    /* Sanskrit     India */
+    "sah_RU",   /* Yakut        Russia */
+    "sas_ID",   /* Sasak        Indonesia */
+    "sat_IN",   /* Santali      India */
+    "sc_IT",    /* Sardinian    Italy */
+    "scn_IT",   /* Sicilian     Italy */
+    "sg_CF",    /* Sango        Central African Republic */
+    "shn_MM",   /* Shan         Myanmar */
+    "si_LK",    /* Sinhala      Sri Lanka */
+    "sid_ET",   /* Sidamo       Ethiopia */
+    "sk_SK",    /* Slovak       Slovakia */
+    "sl_SI",    /* Slovenian    Slovenia */
+    "sm_WS",    /* Samoan       Samoa */
+    "smn_FI",   /* Inari Sami   Finland */
+    "sms_FI",   /* Skolt Sami   Finland */
+    "so_SO",    /* Somali       Somalia */
+    "sq_AL",    /* Albanian     Albania */
+    "sr_RS",    /* Serbian      Serbia */
+    "srr_SN",   /* Serer        Senegal */
+    "suk_TZ",   /* Sukuma       Tanzania */
+    "sus_GN",   /* Susu         Guinea */
+    "sv_SE",    /* Swedish      Sweden */
+    "te_IN",    /* Telugu       India */
+    "tem_SL",   /* Timne        Sierra Leone */
+    "tet_ID",   /* Tetum        Indonesia */
+    "tg_TJ",    /* Tajik        Tajikistan */
+    "th_TH",    /* Thai         Thailand */
+    "ti_ER",    /* Tigrinya     Eritrea */
+    "tiv_NG",   /* Tiv          Nigeria */
+    "tk_TM",    /* Turkmen      Turkmenistan */
+    "tl_PH",    /* Tagalog      Philippines */
+    "to_TO",    /* Tonga        Tonga */
+    "tpi_PG",   /* Tok Pisin    Papua New Guinea */
+    "tr_TR",    /* Turkish      Turkey */
+    "tum_MW",   /* Tumbuka      Malawi */
+    "ug_CN",    /* Uighur       China */
+    "uk_UA",    /* Ukrainian    Ukraine */
+    "umb_AO",   /* Umbundu      Angola */
+    "ur_PK",    /* Urdu         Pakistan */
+    "uz_UZ",    /* Uzbek        Uzbekistan */
+    "ve_ZA",    /* Venda        South Africa */
+    "vi_VN",    /* Vietnamese   Vietnam */
+    "wa_BE",    /* Walloon      Belgium */
+    "wal_ET",   /* Walamo       Ethiopia */
+    "war_PH",   /* Waray        Philippines */
+    "wen_DE",   /* Sorbian      Germany */
+    "yao_MW",   /* Yao          Malawi */
+    "zap_MX"    /* Zapotec      Mexico */
+  };
+
+/* Compare just the language part of two locale names.  */
+static int
+langcmp (const char *locale1, const char *locale2)
+{
+  size_t locale1_len;
+  size_t locale2_len;
+  int cmp;
+
+  {
+    const char *locale1_end = strchr (locale1, '_');
+    if (locale1_end != NULL)
+      locale1_len = locale1_end - locale1;
+    else
+      locale1_len = strlen (locale1);
+  }
+  {
+    const char *locale2_end = strchr (locale2, '_');
+    if (locale2_end != NULL)
+      locale2_len = locale2_end - locale2;
+    else
+      locale2_len = strlen (locale2);
+  }
+
+  if (locale1_len < locale2_len)
+    {
+      cmp = memcmp (locale1, locale2, locale1_len);
+      if (cmp == 0)
+        cmp = -1;
+    }
+  else
+    {
+      cmp = memcmp (locale1, locale2, locale2_len);
+      if (locale1_len > locale2_len && cmp == 0)
+        cmp = 1;
+    }
+
+  return cmp;
+}
+
+/* Given a locale name, return the main locale with the same language,
+   or NULL if not found.
+   For example: "fr_DE" -> "fr_FR".  */
+static const char *
+get_main_locale_with_same_language (const char *locale)
+{
+#   define table locales_with_principal_territory
+  /* The table is sorted.  Perform a binary search.  */
+  size_t hi = sizeof (table) / sizeof (table[0]);
+  size_t lo = 0;
+  while (lo < hi)
+    {
+      /* Invariant:
+         for i < lo, langcmp (table[i], locale) < 0,
+         for i >= hi, langcmp (table[i], locale) > 0.  */
+      size_t mid = (hi + lo) >> 1; /* >= lo, < hi */
+      int cmp = langcmp (table[mid], locale);
+      if (cmp < 0)
+        lo = mid + 1;
+      else if (cmp > 0)
+        hi = mid;
+      else
+        {
+          /* Found an i with
+               langcmp (language_table[i], locale) == 0.
+             Verify that it is the only such i.  */
+          if (mid > lo && langcmp (table[mid - 1], locale) >= 0)
+            abort ();
+          if (mid + 1 < hi && langcmp (table[mid + 1], locale) <= 0)
+            abort ();
+          return table[mid];
+        }
+    }
+#   undef table
+  return NULL;
+}
+
+/* Mapping from territory to main language that is spoken in that territory.  */
+static char const locales_with_principal_language[][6 + 1] =
+  {
+    /* This is based on the set of existing locales in glibc, with duplicates
+       removed, and on the Wikipedia pages named "Languages of <territory>".
+       If in doubt, use the locale that exists in macOS.  For example, the only
+       "*_IN" locale in macOS 10.13 is "hi_IN", so use that.  */
+    /* A useful shell function for producing a line of this table is:
+         func_line ()
+         {
+           # Usage: func_line ll_CC
+           ll=`echo "$1" | sed -e 's|_.*||'`
+           cc=`echo "$1" | sed -e 's|^.*_||'`
+           llx=`sed -n -e "s|^${ll} ||p" < gettext-tools/doc/ISO_639`
+           ccx=`expand gettext-tools/doc/ISO_3166 | sed -n -e "s|^${cc}  *||p"`
+           echo "    \"$1\",    /$X* ${llx} ${ccx} *$X/"
+         }
+     */
+              /* Main language  Territory */
+    "ca_AD",    /* Catalan      Andorra */
+    "ar_AE",    /* Arabic       United Arab Emirates */
+    "ps_AF",    /* Pashto       Afghanistan */
+    "en_AG",    /* English      Antigua and Barbuda */
+    "sq_AL",    /* Albanian     Albania */
+    "hy_AM",    /* Armenian     Armenia */
+    "pap_AN",   /* Papiamento   Netherlands Antilles - this line can be removed in 2018 */
+    "pt_AO",    /* Portuguese   Angola */
+    "es_AR",    /* Spanish      Argentina */
+    "de_AT",    /* German       Austria */
+    "en_AU",    /* English      Australia */
+    /* Aruba has two official languages: "nl_AW", "pap_AW".  */
+    "az_AZ",    /* Azerbaijani  Azerbaijan */
+    "bs_BA",    /* Bosnian      Bosnia */
+    "bn_BD",    /* Bengali      Bangladesh */
+    "nl_BE",    /* Dutch        Belgium */
+    "fr_BF",    /* French       Burkina Faso */
+    "bg_BG",    /* Bulgarian    Bulgaria */
+    "ar_BH",    /* Arabic       Bahrain */
+    "rn_BI",    /* Kirundi      Burundi */
+    "fr_BJ",    /* French       Benin */
+    "es_BO",    /* Spanish      Bolivia */
+    "pt_BR",    /* Portuguese   Brazil */
+    "dz_BT",    /* Dzongkha     Bhutan */
+    "en_BW",    /* English      Botswana */
+    "be_BY",    /* Belarusian   Belarus */
+    "en_CA",    /* English      Canada */
+    "fr_CD",    /* French       Democratic Republic of Congo */
+    "sg_CF",    /* Sango        Central African Republic */
+    "de_CH",    /* German       Switzerland */
+    "es_CL",    /* Spanish      Chile */
+    "zh_CN",    /* Chinese      China */
+    "es_CO",    /* Spanish      Colombia */
+    "es_CR",    /* Spanish      Costa Rica */
+    "es_CU",    /* Spanish      Cuba */
+    /* Curaçao has three official languages: "nl_CW", "pap_CW", "en_CW".  */
+    "el_CY",    /* Greek        Cyprus */
+    "cs_CZ",    /* Czech        Czech Republic */
+    "de_DE",    /* German       Germany */
+    /* Djibouti has two official languages: "ar_DJ" and "fr_DJ".  */
+    "da_DK",    /* Danish       Denmark */
+    "es_DO",    /* Spanish      Dominican Republic */
+    "ar_DZ",    /* Arabic       Algeria */
+    "es_EC",    /* Spanish      Ecuador */
+    "et_EE",    /* Estonian     Estonia */
+    "ar_EG",    /* Arabic       Egypt */
+    "ti_ER",    /* Tigrinya     Eritrea */
+    "es_ES",    /* Spanish      Spain */
+    "am_ET",    /* Amharic      Ethiopia */
+    "fi_FI",    /* Finnish      Finland */
+    /* Fiji has three official languages: "en_FJ", "fj_FJ", "hif_FJ".  */
+    "fo_FO",    /* Faroese      Faeroe Islands */
+    "fr_FR",    /* French       France */
+    "en_GB",    /* English      Britain */
+    "ka_GE",    /* Georgian     Georgia */
+    "en_GH",    /* English      Ghana */
+    "kl_GL",    /* Kalaallisut  Greenland */
+    "fr_GN",    /* French       Guinea */
+    "el_GR",    /* Greek        Greece */
+    "es_GT",    /* Spanish      Guatemala */
+    "zh_HK",    /* Chinese      Hong Kong */
+    "es_HN",    /* Spanish      Honduras */
+    "hr_HR",    /* Croatian     Croatia */
+    "ht_HT",    /* Haitian      Haiti */
+    "hu_HU",    /* Hungarian    Hungary */
+    "id_ID",    /* Indonesian   Indonesia */
+    "en_IE",    /* English      Ireland */
+    "he_IL",    /* Hebrew       Israel */
+    "hi_IN",    /* Hindi        India */
+    "ar_IQ",    /* Arabic       Iraq */
+    "fa_IR",    /* Persian      Iran */
+    "is_IS",    /* Icelandic    Iceland */
+    "it_IT",    /* Italian      Italy */
+    "ar_JO",    /* Arabic       Jordan */
+    "ja_JP",    /* Japanese     Japan */
+    "sw_KE",    /* Swahili      Kenya */
+    "ky_KG",    /* Kyrgyz       Kyrgyzstan */
+    "km_KH",    /* Central Khmer        Cambodia */
+    "ko_KR",    /* Korean       Korea (South) */
+    "ar_KW",    /* Arabic       Kuwait */
+    "kk_KZ",    /* Kazakh       Kazakhstan */
+    "lo_LA",    /* Laotian      Laos */
+    "ar_LB",    /* Arabic       Lebanon */
+    "de_LI",    /* German       Liechtenstein */
+    "si_LK",    /* Sinhala      Sri Lanka */
+    "lt_LT",    /* Lithuanian   Lithuania */
+    /* Luxembourg has three official languages: "lb_LU", "fr_LU", "de_LU".  */
+    "lv_LV",    /* Latvian      Latvia */
+    "ar_LY",    /* Arabic       Libya */
+    "ar_MA",    /* Arabic       Morocco */
+    "sr_ME",    /* Serbian      Montenegro */
+    "mg_MG",    /* Malagasy     Madagascar */
+    "mk_MK",    /* Macedonian   North Macedonia */
+    "fr_ML",    /* French       Mali */
+    "my_MM",    /* Burmese      Myanmar */
+    "mn_MN",    /* Mongolian    Mongolia */
+    "mt_MT",    /* Maltese      Malta */
+    "mfe_MU",   /* Mauritian Creole     Mauritius */
+    "dv_MV",    /* Divehi       Maldives */
+    "ny_MW",    /* Chichewa     Malawi */
+    "es_MX",    /* Spanish      Mexico */
+    "ms_MY",    /* Malay        Malaysia */
+    "en_NG",    /* English      Nigeria */
+    "es_NI",    /* Spanish      Nicaragua */
+    "nl_NL",    /* Dutch        Netherlands */
+    "no_NO",    /* Norwegian    Norway */
+    "ne_NP",    /* Nepali       Nepal */
+    "na_NR",    /* Nauru        Nauru */
+    "niu_NU",   /* Niuean       Niue */
+    "en_NZ",    /* English      New Zealand */
+    "ar_OM",    /* Arabic       Oman */
+    "es_PA",    /* Spanish      Panama */
+    "es_PE",    /* Spanish      Peru */
+    "tpi_PG",   /* Tok Pisin    Papua New Guinea */
+    "fil_PH",   /* Filipino     Philippines */
+    "pa_PK",    /* Punjabi      Pakistan */
+    "pl_PL",    /* Polish       Poland */
+    "es_PR",    /* Spanish      Puerto Rico */
+    "pt_PT",    /* Portuguese   Portugal */
+    "es_PY",    /* Spanish      Paraguay */
+    "ar_QA",    /* Arabic       Qatar */
+    "ro_RO",    /* Romanian     Romania */
+    "sr_RS",    /* Serbian      Serbia */
+    "ru_RU",    /* Russian      Russia */
+    "rw_RW",    /* Kinyarwanda  Rwanda */
+    "ar_SA",    /* Arabic       Saudi Arabia */
+    "en_SC",    /* English      Seychelles */
+    "ar_SD",    /* Arabic       Sudan */
+    "sv_SE",    /* Swedish      Sweden */
+    "en_SG",    /* English      Singapore */
+    "sl_SI",    /* Slovenian    Slovenia */
+    "sk_SK",    /* Slovak       Slovakia */
+    "en_SL",    /* English      Sierra Leone */
+    "fr_SN",    /* French       Senegal */
+    "so_SO",    /* Somali       Somalia */
+    "ar_SS",    /* Arabic       South Sudan */
+    "es_SV",    /* Spanish      El Salvador */
+    "ar_SY",    /* Arabic       Syria */
+    "th_TH",    /* Thai         Thailand */
+    "tg_TJ",    /* Tajik        Tajikistan */
+    "tk_TM",    /* Turkmen      Turkmenistan */
+    "ar_TN",    /* Arabic       Tunisia */
+    "to_TO",    /* Tonga        Tonga */
+    "tr_TR",    /* Turkish      Turkey */
+    "zh_TW",    /* Chinese      Taiwan */
+    "sw_TZ",    /* Swahili      Tanzania */
+    "uk_UA",    /* Ukrainian    Ukraine */
+    "lg_UG",    /* Ganda        Uganda */
+    "en_US",    /* English      United States of America */
+    "es_UY",    /* Spanish      Uruguay */
+    "uz_UZ",    /* Uzbek        Uzbekistan */
+    "es_VE",    /* Spanish      Venezuela */
+    "vi_VN",    /* Vietnamese   Vietnam */
+    "bi_VU",    /* Bislama      Vanuatu */
+    "sm_WS",    /* Samoan       Samoa */
+    "ar_YE",    /* Arabic       Yemen */
+    "en_ZA",    /* English      South Africa */
+    "en_ZM",    /* English      Zambia */
+    "en_ZW"     /* English      Zimbabwe */
+  };
+
+/* Compare just the territory part of two locale names.  */
+static int
+terrcmp (const char *locale1, const char *locale2)
+{
+  const char *territory1 = strrchr (locale1, '_') + 1;
+  const char *territory2 = strrchr (locale2, '_') + 1;
+
+  return strcmp (territory1, territory2);
+}
+
+/* Given a locale name, return the locale corresponding to the main language
+   with the same territory, or NULL if not found.
+   For example: "fr_DE" -> "de_DE".  */
+static const char *
+get_main_locale_with_same_territory (const char *locale)
+{
+  if (strrchr (locale, '_') != NULL)
+    {
+#   define table locales_with_principal_language
+      /* The table is sorted.  Perform a binary search.  */
+      size_t hi = sizeof (table) / sizeof (table[0]);
+      size_t lo = 0;
+      while (lo < hi)
+        {
+          /* Invariant:
+             for i < lo, terrcmp (table[i], locale) < 0,
+             for i >= hi, terrcmp (table[i], locale) > 0.  */
+          size_t mid = (hi + lo) >> 1; /* >= lo, < hi */
+          int cmp = terrcmp (table[mid], locale);
+          if (cmp < 0)
+            lo = mid + 1;
+          else if (cmp > 0)
+            hi = mid;
+          else
+            {
+              /* Found an i with
+                   terrcmp (language_table[i], locale) == 0.
+                 Verify that it is the only such i.  */
+              if (mid > lo && terrcmp (table[mid - 1], locale) >= 0)
+                abort ();
+              if (mid + 1 < hi && terrcmp (table[mid + 1], locale) <= 0)
+                abort ();
+              return table[mid];
+            }
+        }
+#   undef table
+    }
+  return NULL;
+}
+
+#  endif
 
 char *
-rpl_setlocale (int category, const char *locale)
+setlocale_improved (int category, const char *locale)
 {
   if (locale != NULL && locale[0] == '\0')
     {
@@ -910,14 +1462,14 @@ rpl_setlocale (int category, const char *locale)
                 goto fail;
               i = 0;
             }
-# if defined _WIN32 && ! defined __CYGWIN__
+#  if defined _WIN32 && ! defined __CYGWIN__
           /* On native Windows, setlocale(LC_ALL,...) may succeed but set the
              LC_CTYPE category to an invalid value ("C") when it does not
              support the specified encoding.  Report a failure instead.  */
           if (strchr (base_name, '.') != NULL
               && strcmp (setlocale (LC_CTYPE, NULL), "C") == 0)
             goto fail;
-# endif
+#  endif
 
           for (; i < sizeof (categories) / sizeof (categories[0]); i++)
             {
@@ -931,30 +1483,32 @@ rpl_setlocale (int category, const char *locale)
               /* If name is the same as base_name, it has already been set
                  through the setlocale call before the loop.  */
               if (strcmp (name, base_name) != 0
-# if LC_MESSAGES == 1729
+#  if LC_MESSAGES == 1729
                   || cat == LC_MESSAGES
-# endif
+#  endif
                  )
                 if (setlocale_single (cat, name) == NULL)
-# if defined __APPLE__ && defined __MACH__
+#  if defined __APPLE__ && defined __MACH__
                   {
                     /* On Mac OS X 10.13, some locales can be set through
                        System Preferences > Language & Region, that are not
                        supported by libc.  The system's setlocale() falls
-                       back to "C" for these locale categories.  We can possibly
-                       do better.  If we can't, print a warning, to limit user
+                       back to "C" for these locale categories.  We can do
+                       better, by trying an existing locale with the same
+                       language or an existing locale with the same territory.
+                       If we can't, print a warning, to limit user
                        expectations.  */
-                    int warn = 1;
+                    int warn = 0;
 
                     if (cat == LC_CTYPE)
                       warn = (setlocale_single (cat, "UTF-8") == NULL);
-#  if HAVE_CFLOCALECOPYPREFERREDLANGUAGES || HAVE_CFPREFERENCESCOPYAPPVALUE /* MacOS X 10.4 or newer */
                     else if (cat == LC_MESSAGES)
                       {
+#   if HAVE_CFLOCALECOPYPREFERREDLANGUAGES || HAVE_CFPREFERENCESCOPYAPPVALUE /* MacOS X 10.4 or newer */
                         /* Take the primary language preference.  */
-#   if HAVE_CFLOCALECOPYPREFERREDLANGUAGES /* MacOS X 10.5 or newer */
+#    if HAVE_CFLOCALECOPYPREFERREDLANGUAGES /* MacOS X 10.5 or newer */
                         CFArrayRef prefArray = CFLocaleCopyPreferredLanguages ();
-#   elif HAVE_CFPREFERENCESCOPYAPPVALUE /* MacOS X 10.4 or newer */
+#    elif HAVE_CFPREFERENCESCOPYAPPVALUE /* MacOS X 10.4 or newer */
                         CFTypeRef preferences =
                           CFPreferencesCopyAppValue (CFSTR ("AppleLanguages"),
                                                      kCFPreferencesCurrentApplication);
@@ -962,7 +1516,7 @@ rpl_setlocale (int category, const char *locale)
                             && CFGetTypeID (preferences) == CFArrayGetTypeID ())
                           {
                             CFArrayRef prefArray = (CFArrayRef)preferences;
-#   endif
+#    endif
                             int n = CFArrayGetCount (prefArray);
                             if (n > 0)
                               {
@@ -985,36 +1539,71 @@ rpl_setlocale (int category, const char *locale)
                                     gl_locale_name_canonicalize (buf);
 
                                     /* Try setlocale with this value.  */
-                                    warn = (setlocale_single (cat, buf) == NULL);
+                                    if (setlocale_single (cat, buf) == NULL)
+                                      {
+                                        const char *last_try =
+                                          get_main_locale_with_same_language (buf);
+
+                                        if (last_try == NULL
+                                            || setlocale_single (cat, last_try) == NULL)
+                                          warn = 1;
+                                      }
                                   }
                               }
-#   if HAVE_CFLOCALECOPYPREFERREDLANGUAGES /* MacOS X 10.5 or newer */
+#    if HAVE_CFLOCALECOPYPREFERREDLANGUAGES /* MacOS X 10.5 or newer */
                         CFRelease (prefArray);
-#   elif HAVE_CFPREFERENCESCOPYAPPVALUE /* MacOS X 10.4 or newer */
+#    elif HAVE_CFPREFERENCESCOPYAPPVALUE /* MacOS X 10.4 or newer */
                           }
+#    endif
+#   else
+                        const char *last_try =
+                          get_main_locale_with_same_language (name);
+
+                        if (last_try == NULL
+                            || setlocale_single (cat, last_try) == NULL)
+                          warn = 1;
 #   endif
                       }
-#  endif
-                    /* No fallback possible for LC_NUMERIC.  The application
-                       should use the locale properties
-                       kCFLocaleDecimalSeparator, kCFLocaleGroupingSeparator.
-                       No fallback possible for LC_TIME.  The application should
-                       use the locale property kCFLocaleCalendarIdentifier.
-                       No fallback possible for LC_COLLATE.  The application
-                       should use the locale properties
-                       kCFLocaleCollationIdentifier, kCFLocaleCollatorIdentifier.
-                       No fallback possible for LC_MONETARY.  The application
-                       should use the locale properties
-                       kCFLocaleCurrencySymbol, kCFLocaleCurrencyCode.  */
+                    else
+                      {
+                        /* For LC_NUMERIC, the application should use the locale
+                           properties kCFLocaleDecimalSeparator,
+                           kCFLocaleGroupingSeparator.
+                           For LC_TIME, the application should use the locale
+                           property kCFLocaleCalendarIdentifier.
+                           For LC_COLLATE, the application should use the locale
+                           properties kCFLocaleCollationIdentifier,
+                           kCFLocaleCollatorIdentifier.
+                           For LC_MONETARY, the applicationshould use the locale
+                           properties kCFLocaleCurrencySymbol,
+                           kCFLocaleCurrencyCode.
+                           But since most applications don't have macOS specific
+                           code like this, try an existing locale with the same
+                           territory.  */
+                        const char *last_try =
+                          get_main_locale_with_same_territory (name);
+
+                        if (last_try == NULL
+                            || setlocale_single (cat, last_try) == NULL)
+                          warn = 1;
+                      }
 
                     if (warn)
-                      fprintf (stderr,
-                               "Warning: Failed to set locale category %s to %s.\n",
-                               category_to_name (cat), name);
+                      {
+                        /* Warn only if the environment variable
+                           SETLOCALE_VERBOSE is set.  Otherwise these warnings
+                           are just annoyances, since normal users won't invoke
+                           'localedef'.  */
+                        const char *verbose = getenv ("SETLOCALE_VERBOSE");
+                        if (verbose != NULL && verbose[0] != '\0')
+                          fprintf (stderr,
+                                   "Warning: Failed to set locale category %s to %s.\n",
+                                   category_to_name (cat), name);
+                      }
                   }
-# else
+#  else
                   goto fail;
-# endif
+#  endif
             }
 
           /* All steps were successful.  */
@@ -1039,7 +1628,7 @@ rpl_setlocale (int category, const char *locale)
     }
   else
     {
-# if defined _WIN32 && ! defined __CYGWIN__
+#  if defined _WIN32 && ! defined __CYGWIN__
       if (category == LC_ALL && locale != NULL && strchr (locale, '.') != NULL)
         {
           char *saved_locale;
@@ -1074,9 +1663,11 @@ rpl_setlocale (int category, const char *locale)
           return setlocale (LC_ALL, NULL);
         }
       else
-# endif
+#  endif
         return setlocale_single (category, locale);
     }
 }
+
+# endif /* NEED_SETLOCALE_IMPROVED */
 
 #endif

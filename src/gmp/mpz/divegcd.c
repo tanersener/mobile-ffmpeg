@@ -31,7 +31,6 @@ You should have received copies of the GNU General Public License and the
 GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
-#include "gmp.h"
 #include "gmp-impl.h"
 #include "longlong.h"
 
@@ -98,10 +97,10 @@ mpz_divexact_limb (mpz_ptr q, mpz_srcptr a, mp_limb_t d)
 
   qp = MPZ_REALLOC (q, abs_size);
 
-  mpn_divexact_1 (qp, PTR(a), abs_size, d);
+  MPN_DIVREM_OR_DIVEXACT_1 (qp, PTR(a), abs_size, d);
 
   abs_size -= (qp[abs_size-1] == 0);
-  SIZ(q) = (size>0 ? abs_size : -abs_size);
+  SIZ(q) = (size > 0 ? abs_size : -abs_size);
 }
 
 void

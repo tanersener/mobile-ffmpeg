@@ -484,23 +484,12 @@ gnutls_x509_crl_get_signature(gnutls_x509_crl_t crl,
  **/
 int gnutls_x509_crl_get_version(gnutls_x509_crl_t crl)
 {
-	uint8_t version[8];
-	int len, result;
-
 	if (crl == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	len = sizeof(version);
-	if ((result =
-	     asn1_read_value(crl->crl, "tbsCertList.version", version,
-			     &len)) != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-
-	return (int) version[0] + 1;
+	return _gnutls_x509_get_version(crl->crl, "tbsCertList.version");
 }
 
 /**

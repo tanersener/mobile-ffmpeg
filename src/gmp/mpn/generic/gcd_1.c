@@ -1,6 +1,6 @@
 /* mpn_gcd_1 -- mpn and limb greatest common divisor.
 
-Copyright 1994, 1996, 2000, 2001, 2009, 2012 Free Software Foundation, Inc.
+Copyright 1994, 1996, 2000, 2001, 2009, 2012, 2019 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -28,27 +28,8 @@ You should have received copies of the GNU General Public License and the
 GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
-#include "gmp.h"
 #include "gmp-impl.h"
 #include "longlong.h"
-
-#ifndef GCD_1_METHOD
-#define GCD_1_METHOD 2
-#endif
-
-#define USE_ZEROTAB 0
-
-#if USE_ZEROTAB
-#define MAXSHIFT 4
-#define MASK ((1 << MAXSHIFT) - 1)
-static const unsigned char zerotab[1 << MAXSHIFT] =
-{
-#if MAXSHIFT > 4
-  5, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
-#endif
-  4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0
-};
-#endif
 
 /* Does not work for U == 0 or V == 0.  It would be tough to make it work for
    V == 0 since gcd(x,0) = x, and U does not generally fit in an mp_limb_t.
@@ -62,6 +43,7 @@ mpn_gcd_1 (mp_srcptr up, mp_size_t size, mp_limb_t vlimb)
 {
   mp_limb_t      ulimb;
   unsigned long  zero_bits, u_low_zero_bits;
+  int c;
 
   ASSERT (size >= 1);
   ASSERT (vlimb != 0);
@@ -87,112 +69,34 @@ mpn_gcd_1 (mp_srcptr up, mp_size_t size, mp_limb_t vlimb)
       if (ulimb == 0)
 	goto done;
 
-      goto strip_u_maybe;
+      count_trailing_zeros (c, ulimb);
+      ulimb >>= c;
     }
-
-  /* size==1, so up[0]!=0 */
-  count_trailing_zeros (u_low_zero_bits, ulimb);
-  ulimb >>= u_low_zero_bits;
-  zero_bits = MIN (zero_bits, u_low_zero_bits);
-
-  /* make u bigger */
-  if (vlimb > ulimb)
-    MP_LIMB_T_SWAP (ulimb, vlimb);
-
-  /* if u is much bigger than v, reduce using a division rather than
-     chipping away at it bit-by-bit */
-  if ((ulimb >> 16) > vlimb)
+  else
     {
-      ulimb %= vlimb;
-      if (ulimb == 0)
-	goto done;
-      goto strip_u_maybe;
-    }
+      /* size==1, so up[0]!=0 */
+      count_trailing_zeros (u_low_zero_bits, ulimb);
+      ulimb >>= u_low_zero_bits;
+      zero_bits = MIN (zero_bits, u_low_zero_bits);
 
-  ASSERT (ulimb & 1);
-  ASSERT (vlimb & 1);
+      /* make u bigger */
+      if (vlimb > ulimb)
+	MP_LIMB_T_SWAP (ulimb, vlimb);
 
-#if GCD_1_METHOD == 1
-  while (ulimb != vlimb)
-    {
-      ASSERT (ulimb & 1);
-      ASSERT (vlimb & 1);
-
-      if (ulimb > vlimb)
+      /* if u is much bigger than v, reduce using a division rather than
+	 chipping away at it bit-by-bit */
+      if ((ulimb >> 16) > vlimb)
 	{
-	  ulimb -= vlimb;
-	  do
-	    {
-	      ulimb >>= 1;
-	      ASSERT (ulimb != 0);
-	    strip_u_maybe:
-	      ;
-	    }
-	  while ((ulimb & 1) == 0);
-	}
-      else /*  vlimb > ulimb.  */
-	{
-	  vlimb -= ulimb;
-	  do
-	    {
-	      vlimb >>= 1;
-	      ASSERT (vlimb != 0);
-	    }
-	  while ((vlimb & 1) == 0);
+	  ulimb %= vlimb;
+	  if (ulimb == 0)
+	    goto done;
+
+	  count_trailing_zeros (c, ulimb);
+	  ulimb >>= c;
 	}
     }
-#else
-# if GCD_1_METHOD  == 2
 
-  ulimb >>= 1;
-  vlimb >>= 1;
-
-  while (ulimb != vlimb)
-    {
-      int c;
-      mp_limb_t t;
-      mp_limb_t vgtu;
-
-      t = ulimb - vlimb;
-      vgtu = LIMB_HIGHBIT_TO_MASK (t);
-
-      /* v <-- min (u, v) */
-      vlimb += (vgtu & t);
-
-      /* u <-- |u - v| */
-      ulimb = (t ^ vgtu) - vgtu;
-
-#if USE_ZEROTAB
-      /* Number of trailing zeros is the same no matter if we look at
-       * t or ulimb, but using t gives more parallelism. */
-      c = zerotab[t & MASK];
-
-      while (UNLIKELY (c == MAXSHIFT))
-	{
-	  ulimb >>= MAXSHIFT;
-	  if (0)
-	  strip_u_maybe:
-	    vlimb >>= 1;
-
-	  c = zerotab[ulimb & MASK];
-	}
-#else
-      if (0)
-	{
-	strip_u_maybe:
-	  vlimb >>= 1;
-	  t = ulimb;
-	}
-      count_trailing_zeros (c, t);
-#endif
-      ulimb >>= (c + 1);
-    }
-
-  vlimb = (vlimb << 1) | 1;
-# else
-#  error Unknown GCD_1_METHOD
-# endif
-#endif
+  vlimb = mpn_gcd_11 (ulimb, vlimb);
 
  done:
   return vlimb << zero_bits;

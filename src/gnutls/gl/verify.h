@@ -1,18 +1,18 @@
 /* Compile-time assert-like macros.
 
-   Copyright (C) 2005-2006, 2009-2019 Free Software Foundation, Inc.
+   Copyright (C) 2005-2006, 2009-2020 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   it under the terms of the GNU Lesser General Public License as published by
+   the Free Software Foundation; either version 2.1 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
+   You should have received a copy of the GNU Lesser General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Paul Eggert, Bruno Haible, and Jim Meyering.  */
@@ -175,9 +175,11 @@
 #define _GL_GENSYM(prefix) _GL_CONCAT (prefix, _GL_COUNTER)
 
 /* Verify requirement R at compile-time, as an integer constant expression
-   that returns 1.  If R is false, fail at compile-time.  */
+   that returns 1.  If R is false, fail at compile-time, preferably
+   with a diagnostic that includes the string-literal DIAGNOSTIC.  */
 
-#define _GL_VERIFY_TRUE(R) (!!sizeof (_GL_VERIFY_TYPE (R)))
+#define _GL_VERIFY_TRUE(R, DIAGNOSTIC) \
+   (!!sizeof (_GL_VERIFY_TYPE (R, DIAGNOSTIC)))
 
 #ifdef __cplusplus
 # if !GNULIB_defined_struct__gl_verify_type
@@ -187,15 +189,16 @@ template <int w>
   };
 #  define GNULIB_defined_struct__gl_verify_type 1
 # endif
-# define _GL_VERIFY_TYPE(R) _gl_verify_type<(R) ? 1 : -1>
-#elif defined _GL_HAVE__STATIC_ASSERT1
-# define _GL_VERIFY_TYPE(R) \
+# define _GL_VERIFY_TYPE(R, DIAGNOSTIC) \
+    _gl_verify_type<(R) ? 1 : -1>
+#elif defined _GL_HAVE__STATIC_ASSERT
+# define _GL_VERIFY_TYPE(R, DIAGNOSTIC) \
     struct {                                   \
-      _Static_assert (R); \
+      _Static_assert (R, DIAGNOSTIC);          \
       int _gl_dummy;                          \
     }
 #else
-# define _GL_VERIFY_TYPE(R)                                             \
+# define _GL_VERIFY_TYPE(R, DIAGNOSTIC) \
     struct { unsigned int _gl_verify_error_if_negative: (R) ? 1 : -1; }
 #endif
 
@@ -214,7 +217,7 @@ template <int w>
 #else
 # define _GL_VERIFY(R, DIAGNOSTIC, ...)                                \
     extern int (*_GL_GENSYM (_gl_verify_function) (void))	       \
-      [_GL_VERIFY_TRUE (R)]
+      [_GL_VERIFY_TRUE (R, DIAGNOSTIC)]
 #endif
 
 /* _GL_STATIC_ASSERT_H is defined if this code is copied into assert.h.  */
@@ -230,6 +233,22 @@ template <int w>
 
 /* @assert.h omit start@  */
 
+#if 3 < __GNUC__ + (3 < __GNUC_MINOR__ + (4 <= __GNUC_PATCHLEVEL__))
+# define _GL_HAS_BUILTIN_TRAP 1
+#elif defined __has_builtin
+# define _GL_HAS_BUILTIN_TRAP __has_builtin (__builtin_trap)
+#else
+# define _GL_HAS_BUILTIN_TRAP 0
+#endif
+
+#if 4 < __GNUC__ + (5 <= __GNUC_MINOR__)
+# define _GL_HAS_BUILTIN_UNREACHABLE 1
+#elif defined __has_builtin
+# define _GL_HAS_BUILTIN_UNREACHABLE __has_builtin (__builtin_unreachable)
+#else
+# define _GL_HAS_BUILTIN_UNREACHABLE 0
+#endif
+
 /* Each of these macros verifies that its argument R is nonzero.  To
    be portable, R should be an integer constant expression.  Unlike
    assert (R), there is no run-time overhead.
@@ -242,35 +261,32 @@ template <int w>
 /* Verify requirement R at compile-time.  Return the value of the
    expression E.  */
 
-#define verify_expr(R, E) (_GL_VERIFY_TRUE (R) ? (E) : (E))
+#define verify_expr(R, E) \
+   (_GL_VERIFY_TRUE (R, "verify_expr (" #R ", " #E ")") ? (E) : (E))
 
 /* Verify requirement R at compile-time, as a declaration without a
    trailing ';'.  verify (R) acts like static_assert (R) except that
-   it is portable to C11/C++14 and earlier, and its name is shorter
-   and may be more convenient.  */
+   it is portable to C11/C++14 and earlier, it can issue better
+   diagnostics, and its name is shorter and may be more convenient.  */
 
-#ifdef _GL_HAVE__STATIC_ASSERT1
-# define verify(R) _Static_assert (R)
-#else
+#ifdef __PGI
+/* PGI barfs if R is long.  */
 # define verify(R) _GL_VERIFY (R, "verify (...)", -)
+#else
+# define verify(R) _GL_VERIFY (R, "verify (" #R ")", -)
 #endif
 
-#ifndef __has_builtin
-# define __has_builtin(x) 0
-#endif
+/* Assume that R always holds.  Behavior is undefined if R is false,
+   fails to evaluate, or has side effects.  Although assuming R can
+   help a compiler generate better code or diagnostics, performance
+   can suffer if R uses hard-to-optimize features such as function
+   calls not inlined by the compiler.  */
 
-/* Assume that R always holds.  This lets the compiler optimize
-   accordingly.  R should not have side-effects; it may or may not be
-   evaluated.  Behavior is undefined if R is false.  */
-
-#if (__has_builtin (__builtin_unreachable) \
-     || 4 < __GNUC__ + (5 <= __GNUC_MINOR__))
+#if _GL_HAS_BUILTIN_UNREACHABLE
 # define assume(R) ((R) ? (void) 0 : __builtin_unreachable ())
 #elif 1200 <= _MSC_VER
 # define assume(R) __assume (R)
-#elif ((defined GCC_LINT || defined lint) \
-       && (__has_builtin (__builtin_trap) \
-           || 3 < __GNUC__ + (3 < __GNUC_MINOR__ + (4 <= __GNUC_PATCHLEVEL__))))
+#elif (defined GCC_LINT || defined lint) && _GL_HAS_BUILTIN_TRAP
   /* Doing it this way helps various packages when configured with
      --enable-gcc-warnings, which compiles with -Dlint.  It's nicer
      when 'assume' silences warnings even with older GCCs.  */

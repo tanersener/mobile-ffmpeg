@@ -29,7 +29,6 @@ GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
 #include <stdio.h>  /* for NULL */
-#include "gmp.h"
 #include "gmp-impl.h"
 
 void

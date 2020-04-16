@@ -690,6 +690,7 @@ SUFFIXES = .s .S .asm
 # can be overridden during development, eg. "make RM_TMP=: mul_1.lo"
 RM_TMP = rm -f
 AM_CPPFLAGS = -I$(top_srcdir)
+AM_LDFLAGS = -no-install
 LDADD = libtests.la $(top_builddir)/libgmp.la
 check_LTLIBRARIES = libtests.la
 EXTRA_libtests_la_SOURCES = amd64call.asm amd64check.c x86call.asm x86check.c \

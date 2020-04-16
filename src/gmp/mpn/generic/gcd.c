@@ -1,6 +1,6 @@
 /* mpn/gcd.c: mpn_gcd for gcd of two odd integers.
 
-Copyright 1991, 1993-1998, 2000-2005, 2008, 2010, 2012 Free Software
+Copyright 1991, 1993-1998, 2000-2005, 2008, 2010, 2012, 2019 Free Software
 Foundation, Inc.
 
 This file is part of the GNU MP Library.
@@ -29,7 +29,6 @@ You should have received copies of the GNU General Public License and the
 GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
-#include "gmp.h"
 #include "gmp-impl.h"
 #include "longlong.h"
 
@@ -75,61 +74,6 @@ gcd_hook (void *p, mp_srcptr gp, mp_size_t gn,
   struct gcd_ctx *ctx = (struct gcd_ctx *) p;
   MPN_COPY (ctx->gp, gp, gn);
   ctx->gn = gn;
-}
-
-#if GMP_NAIL_BITS > 0
-/* Nail supports should be easy, replacing the sub_ddmmss with nails
- * logic. */
-#error Nails not supported.
-#endif
-
-/* Use binary algorithm to compute G <-- GCD (U, V) for usize, vsize == 2.
-   Both U and V must be odd. */
-static inline mp_size_t
-gcd_2 (mp_ptr gp, mp_srcptr up, mp_srcptr vp)
-{
-  mp_limb_t u0, u1, v0, v1;
-  mp_size_t gn;
-
-  u0 = up[0];
-  u1 = up[1];
-  v0 = vp[0];
-  v1 = vp[1];
-
-  ASSERT (u0 & 1);
-  ASSERT (v0 & 1);
-
-  /* Check for u0 != v0 needed to ensure that argument to
-   * count_trailing_zeros is non-zero. */
-  while (u1 != v1 && u0 != v0)
-    {
-      unsigned long int r;
-      if (u1 > v1)
-	{
-	  sub_ddmmss (u1, u0, u1, u0, v1, v0);
-	  count_trailing_zeros (r, u0);
-	  u0 = ((u1 << (GMP_NUMB_BITS - r)) & GMP_NUMB_MASK) | (u0 >> r);
-	  u1 >>= r;
-	}
-      else  /* u1 < v1.  */
-	{
-	  sub_ddmmss (v1, v0, v1, v0, u1, u0);
-	  count_trailing_zeros (r, v0);
-	  v0 = ((v1 << (GMP_NUMB_BITS - r)) & GMP_NUMB_MASK) | (v0 >> r);
-	  v1 >>= r;
-	}
-    }
-
-  gp[0] = u0, gp[1] = u1, gn = 1 + (u1 != 0);
-
-  /* If U == V == GCD, done.  Otherwise, compute GCD (V, |U - V|).  */
-  if (u1 == v1 && u0 == v0)
-    return gn;
-
-  v0 = (u0 == v0) ? ((u1 > v1) ? u1-v1 : v1-u1) : ((u0 > v0) ? u0-v0 : v0-u0);
-  gp[0] = mpn_gcd_1 (gp, gn, v0);
-
-  return 1;
 }
 
 mp_size_t
@@ -273,37 +217,49 @@ mpn_gcd (mp_ptr gp, mp_ptr up, mp_size_t usize, mp_ptr vp, mp_size_t n)
 
   ASSERT(up[n-1] | vp[n-1]);
 
-  if (n == 1)
-    {
-      *gp = mpn_gcd_1(up, 1, vp[0]);
-      ctx.gn = 1;
-      goto done;
-    }
-
-  /* Due to the calling convention for mpn_gcd, at most one can be
-     even. */
-
-  if (! (up[0] & 1))
+  /* Due to the calling convention for mpn_gcd, at most one can be even. */
+  if ((up[0] & 1) == 0)
     MP_PTR_SWAP (up, vp);
+  ASSERT ((up[0] & 1) != 0);
 
-  ASSERT (up[0] & 1);
+  {
+    mp_limb_t u0, u1, v0, v1;
+    mp_double_limb_t g;
 
-  if (vp[0] == 0)
-    {
-      *gp = mpn_gcd_1 (up, 2, vp[1]);
-      ctx.gn = 1;
-      goto done;
-    }
-  else if (! (vp[0] & 1))
-    {
-      int r;
-      count_trailing_zeros (r, vp[0]);
-      vp[0] = ((vp[1] << (GMP_NUMB_BITS - r)) & GMP_NUMB_MASK) | (vp[0] >> r);
-      vp[1] >>= r;
-    }
+    u0 = up[0];
+    v0 = vp[0];
 
-  ctx.gn = gcd_2(gp, up, vp);
+    if (n == 1)
+      {
+	int cnt;
+	count_trailing_zeros (cnt, v0);
+	*gp = mpn_gcd_11 (u0, v0 >> cnt);
+	ctx.gn = 1;
+	goto done;
+      }
 
+    v1 = vp[1];
+    if (UNLIKELY (v0 == 0))
+      {
+	v0 = v1;
+	v1 = 0;
+	/* FIXME: We could invoke a mpn_gcd_21 here, just like mpn_gcd_22 could
+	   when this situation occurs internally.  */
+      }
+    if ((v0 & 1) == 0)
+      {
+	int cnt;
+	count_trailing_zeros (cnt, v0);
+	v0 = ((v1 << (GMP_NUMB_BITS - cnt)) & GMP_NUMB_MASK) | (v0 >> cnt);
+	v1 >>= cnt;
+      }
+
+    u1 = up[1];
+    g = mpn_gcd_22 (u1, u0, v1, v0);
+    gp[0] = g.d0;
+    gp[1] = g.d1;
+    ctx.gn = 1 + (g.d1 > 0);
+  }
 done:
   TMP_FREE;
   return ctx.gn;

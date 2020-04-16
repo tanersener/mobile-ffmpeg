@@ -1,10 +1,13 @@
+/.deps/
+/.libs/
 /sys/
 /arpa/
-*.o
 *.lo
+*.o
 *.la
 /Makefile
 /alloca.h
+/inttypes.h
 /limits.h
 /netdb.h
 /stddef.h
@@ -16,4 +19,3 @@
 /time.h
 /unistd.h
 /wchar.h
-/byteswap.h

@@ -57,10 +57,6 @@ C TODO
 C   * Implement proper cor2, replacing current cor0.
 C   * Micro-optimise.
 
-C When playing with pointers, set this to $2 to fall back to conservative
-C indexing in wind-down code.
-define(`I',`$1')
-
 define(`rp',       `%rdi')
 define(`up',       `%rsi')
 define(`vp_param', `%rdx')

@@ -43,6 +43,7 @@ import com.arthenica.mobileffmpeg.util.AsyncCatImageTask;
 import com.arthenica.mobileffmpeg.util.DialogUtil;
 import com.arthenica.mobileffmpeg.util.ResourcesUtil;
 import com.arthenica.mobileffmpeg.util.SingleExecuteCallback;
+import com.arthenica.smartexception.java.Exceptions;
 
 import java.io.File;
 import java.io.IOException;
@@ -188,7 +189,7 @@ public class PipeTabFragment extends Fragment {
             startAsyncCatImageProcess(image3File.getAbsolutePath(), pipe3);
 
         } catch (IOException e) {
-            Log.e(TAG, "Create video failed", e);
+            Log.e(TAG, String.format("Create video failed %s", Exceptions.getStackTraceString(e)));
             Popup.show(requireContext(), "Create video failed");
         }
     }

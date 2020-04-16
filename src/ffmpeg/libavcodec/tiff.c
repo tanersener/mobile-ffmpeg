@@ -1218,6 +1218,8 @@ static void set_sar(TiffContext *s, unsigned tag, unsigned num, unsigned den)
 
 static int tiff_decode_tag(TiffContext *s, AVFrame *frame)
 {
+    AVFrameSideData *sd;
+    GetByteContext gb_temp;
     unsigned tag, type, count, off, value = 0, value2 = 1; // value2 is a denominator so init. to 1
     int i, start;
     int pos;
@@ -1642,6 +1644,22 @@ static int tiff_decode_tag(TiffContext *s, AVFrame *frame)
                 }
             }
         }
+        break;
+    case TIFF_ICC_PROFILE:
+        if (type != TIFF_UNDEFINED)
+            return AVERROR_INVALIDDATA;
+
+        gb_temp = s->gb;
+        bytestream2_seek(&gb_temp, SEEK_SET, off);
+
+        if (bytestream2_get_bytes_left(&gb_temp) < count)
+            return AVERROR_INVALIDDATA;
+
+        sd = av_frame_new_side_data(frame, AV_FRAME_DATA_ICC_PROFILE, count);
+        if (!sd)
+            return AVERROR(ENOMEM);
+
+        bytestream2_get_bufferu(&gb_temp, sd->data, count);
         break;
     case TIFF_ARTIST:
         ADD_METADATA(count, "artist", NULL);
@@ -2147,7 +2165,6 @@ AVCodec ff_tiff_decoder = {
     .init           = tiff_init,
     .close          = tiff_end,
     .decode         = decode_frame,
-    .init_thread_copy = ONLY_IF_THREADS_ENABLED(tiff_init),
     .capabilities   = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_FRAME_THREADS,
     .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
     .priv_class     = &tiff_decoder_class,

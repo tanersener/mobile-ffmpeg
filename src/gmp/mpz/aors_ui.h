@@ -1,8 +1,8 @@
 /* mpz_add_ui, mpz_sub_ui -- Add or subtract an mpz_t and an unsigned
    one-word integer.
 
-Copyright 1991, 1993, 1994, 1996, 1999-2002, 2004, 2012, 2013 Free Software
-Foundation, Inc.
+Copyright 1991, 1993, 1994, 1996, 1999-2002, 2004, 2012, 2013, 2015
+Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -30,7 +30,6 @@ You should have received copies of the GNU General Public License and the
 GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
-#include "gmp.h"
 #include "gmp-impl.h"
 
 
@@ -80,7 +79,7 @@ FUNCTION (mpz_ptr w, mpz_srcptr u, unsigned long int vval)
   usize = SIZ (u);
   if (usize == 0)
     {
-      PTR (w)[0] = vval;
+      MPZ_NEWALLOC (w, 1)[0] = vval;
       SIZ (w) = VARIATION_NEG (vval != 0);
       return;
     }

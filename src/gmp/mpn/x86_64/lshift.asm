@@ -1,7 +1,7 @@
 dnl  AMD64 mpn_lshift -- mpn left shift.
 
-dnl  Copyright 2003, 2005, 2007, 2009, 2011, 2012 Free Software Foundation,
-dnl  Inc.
+dnl  Copyright 2003, 2005, 2007, 2009, 2011, 2012, 2018 Free Software
+dnl  Foundation, Inc.
 
 dnl  This file is part of the GNU MP Library.
 dnl
@@ -56,82 +56,7 @@ ASM_START()
 	ALIGN(32)
 PROLOGUE(mpn_lshift)
 	FUNC_ENTRY(4)
-	cmp	$1, R8(%rcx)
-	jne	L(gen)
-
-C For cnt=1 we want to work from lowest limb towards higher limbs.
-C Check for bad overlap (up=rp is OK!) up=rp+1..rp+n-1 is bad.
-C FIXME: this could surely be done more cleverly.
-
-	mov    rp, %rax
-	sub    up, %rax
-	je     L(fwd)			C rp = up
-	shr    $3, %rax
-	cmp    n, %rax
-	jb     L(gen)
-
-L(fwd):	mov	R32(n), R32(%rax)
-	shr	$2, n
-	je	L(e1)
-	and	$3, R32(%rax)
-
-	ALIGN(8)
-	nop
-	nop
-L(t1):	mov	(up), %r8
-	mov	8(up), %r9
-	mov	16(up), %r10
-	mov	24(up), %r11
-	lea	32(up), up
-	adc	%r8, %r8
-	mov	%r8, (rp)
-	adc	%r9, %r9
-	mov	%r9, 8(rp)
-	adc	%r10, %r10
-	mov	%r10, 16(rp)
-	adc	%r11, %r11
-	mov	%r11, 24(rp)
-	lea	32(rp), rp
-	dec	n
-	jne	L(t1)
-
-	inc	R32(%rax)
-	dec	R32(%rax)
-	jne	L(n00)
-	adc	R32(%rax), R32(%rax)
-	FUNC_EXIT()
-	ret
-L(e1):	test	R32(%rax), R32(%rax)	C clear cy
-L(n00):	mov	(up), %r8
-	dec	R32(%rax)
-	jne	L(n01)
-	adc	%r8, %r8
-	mov	%r8, (rp)
-L(ret):	adc	R32(%rax), R32(%rax)
-	FUNC_EXIT()
-	ret
-L(n01):	dec	R32(%rax)
-	mov	8(up), %r9
-	jne	L(n10)
-	adc	%r8, %r8
-	adc	%r9, %r9
-	mov	%r8, (rp)
-	mov	%r9, 8(rp)
-	adc	R32(%rax), R32(%rax)
-	FUNC_EXIT()
-	ret
-L(n10):	mov	16(up), %r10
-	adc	%r8, %r8
-	adc	%r9, %r9
-	adc	%r10, %r10
-	mov	%r8, (rp)
-	mov	%r9, 8(rp)
-	mov	%r10, 16(rp)
-	adc	$-1, R32(%rax)
-	FUNC_EXIT()
-	ret
-
-L(gen):	neg	R32(%rcx)		C put rsh count in cl
+	neg	R32(%rcx)		C put rsh count in cl
 	mov	-8(up,n,8), %rax
 	shr	R8(%rcx), %rax		C function return value
 

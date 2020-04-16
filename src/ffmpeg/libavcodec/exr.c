@@ -41,6 +41,7 @@
 #include "libavutil/common.h"
 #include "libavutil/imgutils.h"
 #include "libavutil/intfloat.h"
+#include "libavutil/avstring.h"
 #include "libavutil/opt.h"
 #include "libavutil/color_utils.h"
 
@@ -1182,7 +1183,7 @@ static int decode_block(AVCodecContext *avctx, void *tdata,
         const uint8_t * a;
         const uint8_t *rgb[3];
 
-        for (c = 0; c < rgb_channel_count; c++){
+        for (c = 0; c < rgb_channel_count; c++) {
             rgb[c] = channel_buffer[c];
         }
 
@@ -1399,24 +1400,24 @@ static int decode_header(EXRContext *s, AVFrame *frame)
                 }
 
                 if (layer_match) { /* only search channel if the layer match is valid */
-                    if (!strcmp(ch_gb.buffer, "R") ||
-                        !strcmp(ch_gb.buffer, "X") ||
-                        !strcmp(ch_gb.buffer, "U")) {
+                    if (!av_strcasecmp(ch_gb.buffer, "R") ||
+                        !av_strcasecmp(ch_gb.buffer, "X") ||
+                        !av_strcasecmp(ch_gb.buffer, "U")) {
                         channel_index = 0;
                         s->is_luma = 0;
-                    } else if (!strcmp(ch_gb.buffer, "G") ||
-                               !strcmp(ch_gb.buffer, "V")) {
+                    } else if (!av_strcasecmp(ch_gb.buffer, "G") ||
+                               !av_strcasecmp(ch_gb.buffer, "V")) {
                         channel_index = 1;
                         s->is_luma = 0;
-                    } else if (!strcmp(ch_gb.buffer, "Y")) {
+                    } else if (!av_strcasecmp(ch_gb.buffer, "Y")) {
                         channel_index = 1;
                         s->is_luma = 1;
-                    } else if (!strcmp(ch_gb.buffer, "B") ||
-                               !strcmp(ch_gb.buffer, "Z") ||
-                               !strcmp(ch_gb.buffer, "W")){
-                               channel_index = 2;
+                    } else if (!av_strcasecmp(ch_gb.buffer, "B") ||
+                               !av_strcasecmp(ch_gb.buffer, "Z") ||
+                               !av_strcasecmp(ch_gb.buffer, "W")) {
+                        channel_index = 2;
                         s->is_luma = 0;
-                    } else if (!strcmp(ch_gb.buffer, "A")) {
+                    } else if (!av_strcasecmp(ch_gb.buffer, "A")) {
                         channel_index = 3;
                     } else {
                         av_log(s->avctx, AV_LOG_WARNING,
@@ -1494,7 +1495,7 @@ static int decode_header(EXRContext *s, AVFrame *frame)
 
             /* Check if all channels are set with an offset or if the channels
              * are causing an overflow  */
-            if (!s->is_luma){/* if we expected to have at least 3 channels */
+            if (!s->is_luma) {/* if we expected to have at least 3 channels */
                 if (FFMIN3(s->channel_offsets[0],
                            s->channel_offsets[1],
                            s->channel_offsets[2]) < 0) {
@@ -1595,7 +1596,7 @@ static int decode_header(EXRContext *s, AVFrame *frame)
             s->tile_attr.level_mode = tileLevel & 0x0f;
             s->tile_attr.level_round = (tileLevel >> 4) & 0x0f;
 
-            if (s->tile_attr.level_mode >= EXR_TILE_LEVEL_UNKNOWN){
+            if (s->tile_attr.level_mode >= EXR_TILE_LEVEL_UNKNOWN) {
                 avpriv_report_missing_feature(s->avctx, "Tile level mode %d",
                                               s->tile_attr.level_mode);
                 ret = AVERROR_PATCHWELCOME;
@@ -1862,20 +1863,6 @@ static av_cold int decode_init(AVCodecContext *avctx)
     return 0;
 }
 
-#if HAVE_THREADS
-static int decode_init_thread_copy(AVCodecContext *avctx)
-{
-    EXRContext *s = avctx->priv_data;
-
-    // allocate thread data, used for non EXR_RAW compression types
-    s->thread_data = av_mallocz_array(avctx->thread_count, sizeof(EXRThreadData));
-    if (!s->thread_data)
-        return AVERROR_INVALIDDATA;
-
-    return 0;
-}
-#endif
-
 static av_cold int decode_end(AVCodecContext *avctx)
 {
     EXRContext *s = avctx->priv_data;
@@ -1955,7 +1942,6 @@ AVCodec ff_exr_decoder = {
     .id               = AV_CODEC_ID_EXR,
     .priv_data_size   = sizeof(EXRContext),
     .init             = decode_init,
-    .init_thread_copy = ONLY_IF_THREADS_ENABLED(decode_init_thread_copy),
     .close            = decode_end,
     .decode           = decode_frame,
     .capabilities     = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_FRAME_THREADS |

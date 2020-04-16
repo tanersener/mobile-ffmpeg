@@ -1,5 +1,5 @@
 /* Determine name of the currently selected locale.
-   Copyright (C) 2007, 2009-2019 Free Software Foundation, Inc.
+   Copyright (C) 2007, 2009-2020 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -86,8 +86,7 @@ extern const char * gl_locale_name_environ (int category, const char *categoryna
 
    The result must not be freed; it is statically allocated.  */
 extern const char * gl_locale_name_default (void)
-#if !(HAVE_CFLOCALECOPYCURRENT || HAVE_CFPREFERENCESCOPYAPPVALUE \
-      || defined _WIN32 || defined __CYGWIN__)
+#if !(HAVE_CFPREFERENCESCOPYAPPVALUE || defined _WIN32 || defined __CYGWIN__)
   _GL_ATTRIBUTE_CONST
 #endif
   ;

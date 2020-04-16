@@ -169,8 +169,7 @@ _gnutls_gen_psk_client_kx(gnutls_session_t session,
 	}
 
 	assert(username.data != NULL);
-	memcpy(info->username, username.data, username.size);
-	info->username[username.size] = 0;
+	_gnutls_copy_psk_username(info, &username);
 
 
       cleanup:
@@ -231,11 +230,10 @@ _gnutls_proc_psk_client_kx(gnutls_session_t session, uint8_t * data,
 		return GNUTLS_E_ILLEGAL_SRP_USERNAME;
 	}
 
-	memcpy(info->username, username.data, username.size);
-	info->username[username.size] = 0;
+	_gnutls_copy_psk_username(info, &username);
 
 	ret =
-	    _gnutls_psk_pwd_find_entry(session, info->username, &psk_key);
+	    _gnutls_psk_pwd_find_entry(session, info->username, info->username_len, &psk_key);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 

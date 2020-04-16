@@ -27,22 +27,32 @@ else
     . ${BASEDIR}/build/ios-common.sh
 fi
 
-# PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
+# PREPARE PATHS & DEFINE ${INSTALL_PKG_CONFIG_DIR}
 LIB_NAME="sdl"
 set_toolchain_clang_paths ${LIB_NAME}
 
 # PREPARING FLAGS
-TARGET_HOST=$(get_target_host)
+BUILD_HOST=$(get_build_host)
 export CFLAGS=$(get_cflags ${LIB_NAME})
 export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 export LDFLAGS=$(get_ldflags ${LIB_NAME})
 export PKG_CONFIG_LIBDIR="${INSTALL_PKG_CONFIG_DIR}"
 
+case ${ARCH} in
+    x86-64-mac-catalyst)
+        BUILD_HOST="x86_64-apple-macosx"
+        ARCH_OPTIONS="--disable-video-cocoa --disable-render-metal --disable-haptic --disable-diskaudio"
+    ;;
+    *)
+        ARCH_OPTIONS=""
+    ;;
+esac
+
 cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
 make distclean 2>/dev/null 1>/dev/null
 
-# RECONFIGURING IF REQUESTED
+# RECONFIGURE IF REQUESTED
 if [[ ${RECONF_sdl} -eq 1 ]]; then
     autoreconf_library ${LIB_NAME}
 fi
@@ -59,7 +69,8 @@ cp ${BASEDIR}/tools/make/configure.sdl ${BASEDIR}/src/${LIB_NAME}/configure
     --enable-static \
     --disable-shared \
     --disable-video-opengl \
-    --host=${TARGET_HOST} || exit 1
+    ${ARCH_OPTIONS} \
+    --host=${BUILD_HOST} || exit 1
 
 make -j$(get_cpu_count) || exit 1
 

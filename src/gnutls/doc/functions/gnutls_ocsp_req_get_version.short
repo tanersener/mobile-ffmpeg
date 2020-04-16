@@ -1,1 +1,1 @@
-@item @var{int} @ref{gnutls_ocsp_req_get_version} (gnutls_ocsp_req_t @var{req})
+@item @var{int} @ref{gnutls_ocsp_req_get_version} (gnutls_ocsp_req_const_t @var{req})

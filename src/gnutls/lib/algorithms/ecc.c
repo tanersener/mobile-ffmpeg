@@ -96,6 +96,22 @@ gnutls_ecc_curve_entry_st ecc_curves[] = {
 	 .sig_size = 64,
 	 .supported = 1,
 	},
+	{
+	 .name = "X448",
+	 .id = GNUTLS_ECC_CURVE_X448,
+	 .pk = GNUTLS_PK_ECDH_X448,
+	 .size = 56,
+	 .supported = 1,
+	},
+	{
+	 .name = "Ed448",
+	 .oid = SIG_ED448_OID,
+	 .id = GNUTLS_ECC_CURVE_ED448,
+	 .pk = GNUTLS_PK_EDDSA_ED448,
+	 .size = 57,
+	 .sig_size = 114,
+	 .supported = 1,
+	},
 #if ENABLE_GOST
 	/* Curves for usage in GOST digital signature algorithm (GOST R
 	 * 34.10-2001/-2012) and key agreement (VKO GOST R 34.10-2001/-2012).

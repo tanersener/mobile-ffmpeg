@@ -33,7 +33,6 @@ GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
 
-#include "gmp.h"
 #include "gmp-impl.h"
 #include "longlong.h"
 
@@ -79,21 +78,23 @@ mpn_pow_1 (mp_ptr rp, mp_srcptr bp, mp_size_t bn, mp_limb_t exp, mp_ptr tp)
 
   if (bn == 1)
     {
-      mp_limb_t bl = bp[0];
+      mp_limb_t rl, rh, bl = bp[0];
 
       if ((cnt & 1) != 0)
 	MP_PTR_SWAP (rp, tp);
 
-      mpn_sqr (rp, bp, bn);
-      rn = 2 * bn; rn -= rp[rn - 1] == 0;
+      umul_ppmm (rh, rl, bl, bl << GMP_NAIL_BITS);
+      rp[0] = rl >> GMP_NAIL_BITS;
+      rp[1] = rh;
+      rn = 1 + (rh != 0);
 
       for (i = GMP_LIMB_BITS - cnt - 1;;)
 	{
 	  exp <<= 1;
 	  if ((exp & GMP_LIMB_HIGHBIT) != 0)
 	    {
-	      rp[rn] = mpn_mul_1 (rp, rp, rn, bl);
-	      rn += rp[rn] != 0;
+	      rp[rn] = rh = mpn_mul_1 (rp, rp, rn, bl);
+	      rn += rh != 0;
 	    }
 
 	  if (--i == 0)

@@ -36,15 +36,17 @@ C	     cycles/limb     cycles/limb     cycles/limb      good
 C              aligned	      unaligned	      best seen	     for cpu?
 C AMD K8,K9	 2.0		 illop		1.0/1.0		N
 C AMD K10	 0.85		 illop				Y/N
-C AMD bull	 0.70		 0.66				Y
-C AMD pile	 0.68		 0.66				Y
-C AMD steam	 ?		 ?
-C AMD excavator	 ?		 ?
-C AMD bobcat	 1.97		 8.16		1.5/1.5		N
-C AMD jaguar	 0.77		 0.93		0.65/opt	N/Y
+C AMD bd1	 0.70		 0.66				Y
+C AMD bd2	 0.68		 0.66				Y
+C AMD bd3	 ?		 ?
+C AMD bd4	 ?		 ?
+C AMD bt1	 1.97		 8.16		1.5/1.5		N
+C AMD bt2	 0.77		 0.93		0.65/opt	N/Y
+C AMD zn1	 ?		 ?
+C AMD zn2	 ?		 ?
 C Intel P4	 2.26		 illop				Y/N
-C Intel core	 0.52		 0.64		opt/opt		Y
-C Intel NHM	 0.52		 0.71		opt/opt		Y
+C Intel CNR	 0.52		 0.64		opt/opt		Y
+C Intel NHM	 0.52		 0.71		0.50/0.67	N
 C Intel SBR	 0.51		 0.54		opt/0.51	Y
 C Intel IBR	 0.50		 0.54		opt/opt		Y
 C Intel HWL	 0.50		 0.51		opt/opt		Y

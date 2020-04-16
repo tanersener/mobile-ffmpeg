@@ -79,4 +79,3 @@ L(oop):	ldu	r0, 8(r4)
 	srdi	r3, r4, 32
 	blr
 EPILOGUE()
-

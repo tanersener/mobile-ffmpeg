@@ -40,28 +40,30 @@ get_library_name() {
         19) echo "xvidcore" ;;
         20) echo "x265" ;;
         21) echo "libvidstab" ;;
-        22) echo "libilbc" ;;
-        23) echo "opus" ;;
-        24) echo "snappy" ;;
-        25) echo "soxr" ;;
-        26) echo "libaom" ;;
-        27) echo "chromaprint" ;;
-        28) echo "twolame" ;;
-        29) echo "sdl" ;;
-        30) echo "tesseract" ;;
-        31) echo "openh264" ;;
-        32) echo "giflib" ;;
-        33) echo "jpeg" ;;
-        34) echo "libogg" ;;
-        35) echo "libpng" ;;
-        36) echo "libuuid" ;;
-        37) echo "nettle" ;;
-        38) echo "tiff" ;;
-        39) echo "expat" ;;
-        40) echo "libsndfile" ;;
-        41) echo "leptonica" ;;
-        42) echo "android-zlib" ;;
-        43) echo "android-media-codec" ;;
+        22) echo "rubberband" ;;
+        23) echo "libilbc" ;;
+        24) echo "opus" ;;
+        25) echo "snappy" ;;
+        26) echo "soxr" ;;
+        27) echo "libaom" ;;
+        28) echo "chromaprint" ;;
+        29) echo "twolame" ;;
+        30) echo "sdl" ;;
+        31) echo "tesseract" ;;
+        32) echo "openh264" ;;
+        33) echo "giflib" ;;
+        34) echo "jpeg" ;;
+        35) echo "libogg" ;;
+        36) echo "libpng" ;;
+        37) echo "libuuid" ;;
+        38) echo "nettle" ;;
+        39) echo "tiff" ;;
+        40) echo "expat" ;;
+        41) echo "libsndfile" ;;
+        42) echo "leptonica" ;;
+        43) echo "libsamplerate" ;;
+        44) echo "android-zlib" ;;
+        45) echo "android-media-codec" ;;
     esac
 }
 
@@ -75,7 +77,7 @@ get_arch_name() {
     esac
 }
 
-get_target_host() {
+get_build_host() {
     case ${ARCH} in
         arm-v7a | arm-v7a-neon)
             echo "arm-linux-androideabi"
@@ -204,7 +206,7 @@ get_android_arch() {
 }
 
 get_common_includes() {
-    echo "-I${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/sysroot/usr/include -I${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/sysroot/usr/local/include"
+    echo ""
 }
 
 get_common_cflags() {
@@ -282,7 +284,6 @@ get_size_optimization_cflags() {
 }
 
 get_app_specific_cflags() {
-
     local APP_FLAGS=""
     case $1 in
         xvidcore)
@@ -291,14 +292,17 @@ get_app_specific_cflags() {
         ffmpeg)
             APP_FLAGS="-Wno-unused-function -DBIONIC_IOCTL_NO_SIGNEDNESS_OVERLOAD"
         ;;
+        kvazaar)
+            APP_FLAGS="-std=gnu99 -Wno-unused-function"
+        ;;
+        rubberband)
+            APP_FLAGS="-std=c99 -Wno-unused-function"
+        ;;
         shine)
             APP_FLAGS="-Wno-unused-function"
         ;;
         soxr | snappy | libwebp)
             APP_FLAGS="-std=gnu99 -Wno-unused-function -DPIC"
-        ;;
-        kvazaar)
-            APP_FLAGS="-std=gnu99 -Wno-unused-function"
         ;;
         *)
             APP_FLAGS="-std=c99 -Wno-unused-function"
@@ -352,6 +356,9 @@ get_cxxflags() {
         x265)
             echo "-std=c++11 -fno-exceptions ${OPTIMIZATION_FLAGS}"
         ;;
+        rubberband)
+            echo "-std=c++11 ${OPTIMIZATION_FLAGS}"
+        ;;
         *)
             echo "-std=c++11 -fno-exceptions -fno-rtti ${OPTIMIZATION_FLAGS}"
         ;;
@@ -359,7 +366,7 @@ get_cxxflags() {
 }
 
 get_common_linked_libraries() {
-    local COMMON_LIBRARY_PATHS="-L${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/${TARGET_HOST}/lib -L${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/sysroot/usr/lib/${TARGET_HOST}/${API} -L${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/lib"
+    local COMMON_LIBRARY_PATHS="-L${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/${BUILD_HOST}/lib -L${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/sysroot/usr/lib/${BUILD_HOST}/${API} -L${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/lib"
 
     case $1 in
         ffmpeg)
@@ -674,25 +681,6 @@ Cflags: -I\${includedir}
 EOF
 }
 
-create_libwebp_package_config() {
-    local LIB_WEBP_VERSION="$1"
-
-    cat > "${INSTALL_PKG_CONFIG_DIR}/libwebp.pc" << EOF
-prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/libwebp
-exec_prefix=\${prefix}
-libdir=\${prefix}/lib
-includedir=\${prefix}/include
-
-Name: libwebp
-Description: webp codec library
-Version: ${LIB_WEBP_VERSION}
-
-Requires:
-Libs: -L\${libdir} -lwebp -lwebpdecoder -lwebpdemux
-Cflags: -I\${includedir}
-EOF
-}
-
 create_libxml2_package_config() {
     local LIBXML2_VERSION="$1"
 
@@ -831,7 +819,7 @@ Cflags: -I\${includedir}
 EOF
 }
 
-create_zlib_package_config() {
+create_zlib_system_package_config() {
     ZLIB_VERSION=$(grep '#define ZLIB_VERSION' ${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/sysroot/usr/include/zlib.h | grep -Eo '\".*\"' | sed -e 's/\"//g')
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/zlib.pc" << EOF
@@ -913,15 +901,15 @@ download_gpl_library_source() {
             GPL_LIB_DEST_DIR="libvidstab"
         ;;
         x264)
-            GPL_LIB_URL="https://code.videolan.org/videolan/x264/-/archive/1771b556ee45207f8711744ccbd5d42a3949b14c/x264-1771b556ee45207f8711744ccbd5d42a3949b14c.tar.bz2"
-            GPL_LIB_FILE="x264-1771b556ee45207f8711744ccbd5d42a3949b14c.tar.bz2"
-            GPL_LIB_ORIG_DIR="x264-1771b556ee45207f8711744ccbd5d42a3949b14c"
+            GPL_LIB_URL="https://code.videolan.org/videolan/x264/-/archive/296494a4011f58f32adc54304a2654627558c59a/x264-296494a4011f58f32adc54304a2654627558c59a.tar.bz2"
+            GPL_LIB_FILE="x264-296494a4011f58f32adc54304a2654627558c59a.tar.bz2"
+            GPL_LIB_ORIG_DIR="x264-296494a4011f58f32adc54304a2654627558c59a"
             GPL_LIB_DEST_DIR="x264"
         ;;
         x265)
-            GPL_LIB_URL="https://bitbucket.org/multicoreware/x265/downloads/x265_3.2.1.tar.gz"
-            GPL_LIB_FILE="x265-3.2.1.tar.gz"
-            GPL_LIB_ORIG_DIR="x265_3.2.1"
+            GPL_LIB_URL="https://bitbucket.org/multicoreware/x265/downloads/x265_3.3.tar.gz"
+            GPL_LIB_FILE="x265_3.3.tar.gz"
+            GPL_LIB_ORIG_DIR="x265_3.3"
             GPL_LIB_DEST_DIR="x265"
         ;;
         xvidcore)
@@ -929,6 +917,12 @@ download_gpl_library_source() {
             GPL_LIB_FILE="xvidcore-1.3.7.tar.gz"
             GPL_LIB_ORIG_DIR="xvidcore"
             GPL_LIB_DEST_DIR="xvidcore"
+        ;;
+        rubberband)
+            GPL_LIB_URL="https://breakfastquay.com/files/releases/rubberband-1.8.2.tar.bz2"
+            GPL_LIB_FILE="rubberband-1.8.2.tar.bz2"
+            GPL_LIB_ORIG_DIR="rubberband-1.8.2"
+            GPL_LIB_DEST_DIR="rubberband"
         ;;
     esac
 
@@ -1003,16 +997,16 @@ download_gpl_library_source() {
 set_toolchain_clang_paths() {
     export PATH=$PATH:${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/bin
 
-    TARGET_HOST=$(get_target_host)
+    BUILD_HOST=$(get_build_host)
     
-    export AR=${TARGET_HOST}-ar
+    export AR=${BUILD_HOST}-ar
     export CC=$(get_clang_target_host)-clang
     export CXX=$(get_clang_target_host)-clang++
 
     if [ "$1" == "x264" ]; then
         export AS=${CC}
     else
-        export AS=${TARGET_HOST}-as
+        export AS=${BUILD_HOST}-as
     fi
 
     case ${ARCH} in
@@ -1021,9 +1015,9 @@ set_toolchain_clang_paths() {
         ;;
     esac
 
-    export LD=${TARGET_HOST}-ld
-    export RANLIB=${TARGET_HOST}-ranlib
-    export STRIP=${TARGET_HOST}-strip
+    export LD=${BUILD_HOST}-ld
+    export RANLIB=${BUILD_HOST}-ranlib
+    export STRIP=${BUILD_HOST}-strip
 
     export INSTALL_PKG_CONFIG_DIR="${BASEDIR}/prebuilt/android-$(get_target_build)/pkgconfig"
     export ZLIB_PACKAGE_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}/zlib.pc"
@@ -1033,7 +1027,7 @@ set_toolchain_clang_paths() {
     fi
 
     if [ ! -f ${ZLIB_PACKAGE_CONFIG_PATH} ]; then
-        create_zlib_package_config
+        create_zlib_system_package_config
     fi
 
     prepare_inline_sed
@@ -1050,14 +1044,14 @@ build_cpufeatures() {
 
     set_toolchain_clang_paths "cpu-features"
 
-    TARGET_HOST=$(get_target_host)
+    BUILD_HOST=$(get_build_host)
     export CFLAGS=$(get_cflags "cpu-features")
     export CXXFLAGS=$(get_cxxflags "cpu-features")
     export LDFLAGS=$(get_ldflags "cpu-features")
 
     # THEN BUILD FOR THIS ABI
     $(get_clang_target_host)-clang -c ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.c -o ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.o 1>>${BASEDIR}/build.log 2>&1
-    ${TARGET_HOST}-ar rcs ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/libcpufeatures.a ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.o 1>>${BASEDIR}/build.log 2>&1
+    ${BUILD_HOST}-ar rcs ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/libcpufeatures.a ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.o 1>>${BASEDIR}/build.log 2>&1
     $(get_clang_target_host)-clang -shared ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.o -o ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/libcpufeatures.so 1>>${BASEDIR}/build.log 2>&1
 
     create_cpufeatures_package_config
@@ -1076,13 +1070,13 @@ build_android_lts_support() {
     set_toolchain_clang_paths ${LIB_NAME}
 
     # PREPARING FLAGS
-    TARGET_HOST=$(get_target_host)
+    BUILD_HOST=$(get_build_host)
     CFLAGS=$(get_cflags ${LIB_NAME})
     LDFLAGS=$(get_ldflags ${LIB_NAME})
 
     # THEN BUILD FOR THIS ABI
     $(get_clang_target_host)-clang ${CFLAGS} -Wno-unused-command-line-argument -c ${BASEDIR}/android/app/src/main/cpp/android_lts_support.c -o ${BASEDIR}/android/app/src/main/cpp/android_lts_support.o ${LDFLAGS} 1>>${BASEDIR}/build.log 2>&1
-    ${TARGET_HOST}-ar rcs ${BASEDIR}/android/app/src/main/cpp/libandroidltssupport.a ${BASEDIR}/android/app/src/main/cpp/android_lts_support.o 1>>${BASEDIR}/build.log 2>&1
+    ${BUILD_HOST}-ar rcs ${BASEDIR}/android/app/src/main/cpp/libandroidltssupport.a ${BASEDIR}/android/app/src/main/cpp/android_lts_support.o 1>>${BASEDIR}/build.log 2>&1
 }
 
 autoreconf_library() {

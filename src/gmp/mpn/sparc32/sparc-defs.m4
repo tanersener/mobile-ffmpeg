@@ -3,7 +3,7 @@ divert(-1)
 dnl  m4 macros for SPARC assembler (32 and 64 bit).
 
 
-dnl  Copyright 2002, 2011, 2013 Free Software Foundation, Inc.
+dnl  Copyright 2002, 2011, 2013, 2017 Free Software Foundation, Inc.
 
 dnl  This file is part of the GNU MP Library.
 dnl
@@ -62,6 +62,15 @@ dnl
 dnl  Use whatever 64-bit code sequence is appropriate to load "symbol" into
 dnl  register "reg", potentially using register "pic_reg" to perform the
 dnl  calculations.
+dnl
+dnl  Caveat: We used to use the setx pseudo insn here, but some GNU/Linux
+dnl  releases causes invalid code or relocs for that.
+dnl
+dnl  Optimisation 1: Use thunk call instead of RDPC which causes pipeline
+dnl  replay for some sparcs.
+dnl
+dnl  Optimisation 2: Do the two symbol building sequences in parallel instead
+dnl  of one after the other.  That might need one more scratch register.
 
 define(LEA64,
 m4_assert_numargs(3)
@@ -71,9 +80,14 @@ m4_assert_defined(`HAVE_GOTDATA')
 	sethi	%hi(_GLOBAL_OFFSET_TABLE_+4), %`$3'
 	add	%`$3', %lo(_GLOBAL_OFFSET_TABLE_+8), %`$3'
 	add	%`$2', %`$3', %`$3'
-	sethi	%hi(`$1'), %`$2'
-	or	%`$2', %lo(`$1'), %`$2'
-	ldx	[%`$3' + %`$2'], %`$2'',`
-	setx	`$1', %`$3', %`$2'')')
+	sethi	%gdop_hix22(`$1'), %`$2'
+	xor	%`$2', %gdop_lox10(`$1'), %`$2'
+	ldx	[%`$3' + %`$2'], %`$2', %gdop(`$1')
+',`
+	sethi	%h44(`$1'), %`$2'
+	or	%`$2', %m44(`$1'), %`$2'
+	sllx	%`$2', 12, %`$2'
+	or	%`$2', %l44(`$1'), %$2
+')')
 
 divert

@@ -110,37 +110,35 @@ host_triplet = @host@
 @NEED_LIBOPTS_TRUE@am__append_1 = libopts
 @NEED_LIBOPTS_TRUE@am__append_2 = -I$(srcdir)/libopts
 bin_PROGRAMS = psktool$(EXEEXT) gnutls-cli-debug$(EXEEXT) \
-	certtool$(EXEEXT) $(am__EXEEXT_1) $(am__EXEEXT_2) \
-	$(am__EXEEXT_3) $(am__EXEEXT_4) $(am__EXEEXT_5) \
-	$(am__EXEEXT_6)
+	certtool$(EXEEXT) gnutls-serv$(EXEEXT) gnutls-cli$(EXEEXT) \
+	$(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3) \
+	$(am__EXEEXT_4) $(am__EXEEXT_5)
 @ENABLE_SRP_TRUE@am__append_3 = srptool
-@ENABLE_OCSP_TRUE@am__append_4 = ocsptool gnutls-serv 
-@ENABLE_ANON_TRUE@@ENABLE_OCSP_TRUE@am__append_5 = gnutls-cli
-@ENABLE_DANE_TRUE@am__append_6 = danetool
+@ENABLE_OCSP_TRUE@am__append_4 = ocsptool
+@ENABLE_DANE_TRUE@am__append_5 = danetool
 noinst_PROGRAMS = systemkey$(EXEEXT)
 
 # TPM makes use of PKCS #11 callbacks
-@ENABLE_PKCS11_TRUE@@ENABLE_TROUSERS_TRUE@am__append_7 = tpmtool
-@ENABLE_PKCS11_TRUE@am__append_8 = p11tool
-@ENABLE_SRP_TRUE@am__append_9 = libcmd-srp.la
-@ENABLE_OCSP_TRUE@am__append_10 = libcmd-ocsp.la libcmd-serv.la
-@ENABLE_ANON_TRUE@@ENABLE_DANE_TRUE@@ENABLE_OCSP_TRUE@am__append_11 = ../libdane/libgnutls-dane.la
-@ENABLE_ANON_TRUE@@ENABLE_OCSP_TRUE@am__append_12 = libcmd-cli.la
-@ENABLE_MINITASN1_TRUE@am__append_13 = ../lib/minitasn1/libminitasn1.la ../gl/libgnu.la 
-@ENABLE_MINITASN1_TRUE@am__append_14 = -I$(top_srcdir)/lib/minitasn1
-@ENABLE_MINITASN1_FALSE@am__append_15 = $(LIBTASN1_LIBS)
-@ENABLE_DANE_TRUE@am__append_16 = ../libdane/libgnutls-dane.la
+@ENABLE_PKCS11_TRUE@@ENABLE_TROUSERS_TRUE@am__append_6 = tpmtool
+@ENABLE_PKCS11_TRUE@am__append_7 = p11tool
+@ENABLE_SRP_TRUE@am__append_8 = libcmd-srp.la
+@ENABLE_OCSP_TRUE@am__append_9 = libcmd-ocsp.la
+@ENABLE_OCSP_TRUE@am__append_10 = ocsptool-common.c
+@ENABLE_DANE_TRUE@am__append_11 = ../libdane/libgnutls-dane.la
+@ENABLE_MINITASN1_TRUE@am__append_12 = ../lib/minitasn1/libminitasn1.la ../gl/libgnu.la 
+@ENABLE_MINITASN1_TRUE@am__append_13 = -I$(top_srcdir)/lib/minitasn1
+@ENABLE_MINITASN1_FALSE@am__append_14 = $(LIBTASN1_LIBS)
+@ENABLE_DANE_TRUE@am__append_15 = ../libdane/libgnutls-dane.la
 
 # p11 tool
-@ENABLE_PKCS11_TRUE@am__append_17 = mech-list.h
-@ENABLE_PKCS11_TRUE@am__append_18 = libcmd-p11tool.la
-@ENABLE_TROUSERS_TRUE@am__append_19 = libcmd-tpmtool.la
+@ENABLE_PKCS11_TRUE@am__append_16 = mech-list.h
+@ENABLE_PKCS11_TRUE@am__append_17 = libcmd-p11tool.la
+@ENABLE_TROUSERS_TRUE@am__append_18 = libcmd-tpmtool.la
 subdir = src
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/lib/unistring/m4/gnulib-comp.m4 \
 	$(top_srcdir)/lib/unistring/m4/inline.m4 \
 	$(top_srcdir)/lib/unistring/m4/libunistring-base.m4 \
-	$(top_srcdir)/src/gl/m4/__inline.m4 \
 	$(top_srcdir)/src/gl/m4/bison.m4 \
 	$(top_srcdir)/src/gl/m4/clock_time.m4 \
 	$(top_srcdir)/src/gl/m4/fseek.m4 \
@@ -160,7 +158,7 @@ am__aclocal_m4_deps = $(top_srcdir)/lib/unistring/m4/gnulib-comp.m4 \
 	$(top_srcdir)/src/gl/m4/tzset.m4 \
 	$(top_srcdir)/src/libopts/m4/libopts.m4 \
 	$(top_srcdir)/src/libopts/m4/stdnoreturn.m4 \
-	$(top_srcdir)/m4/00gnulib.m4 \
+	$(top_srcdir)/m4/00gnulib.m4 $(top_srcdir)/m4/__inline.m4 \
 	$(top_srcdir)/m4/absolute-header.m4 $(top_srcdir)/m4/alloca.m4 \
 	$(top_srcdir)/m4/arpa_inet_h.m4 \
 	$(top_srcdir)/m4/ax_ac_append_to_file.m4 \
@@ -195,10 +193,11 @@ am__aclocal_m4_deps = $(top_srcdir)/lib/unistring/m4/gnulib-comp.m4 \
 	$(top_srcdir)/m4/inet_pton.m4 \
 	$(top_srcdir)/m4/intl-thread-locale.m4 \
 	$(top_srcdir)/m4/intlmacosx.m4 $(top_srcdir)/m4/intmax_t.m4 \
-	$(top_srcdir)/m4/inttypes-pri.m4 $(top_srcdir)/m4/inttypes.m4 \
-	$(top_srcdir)/m4/inttypes_h.m4 $(top_srcdir)/m4/ioctl.m4 \
-	$(top_srcdir)/m4/isblank.m4 $(top_srcdir)/m4/langinfo_h.m4 \
-	$(top_srcdir)/m4/largefile.m4 $(top_srcdir)/m4/lcmessage.m4 \
+	$(top_srcdir)/m4/inttostr.m4 $(top_srcdir)/m4/inttypes-pri.m4 \
+	$(top_srcdir)/m4/inttypes.m4 $(top_srcdir)/m4/inttypes_h.m4 \
+	$(top_srcdir)/m4/ioctl.m4 $(top_srcdir)/m4/isblank.m4 \
+	$(top_srcdir)/m4/langinfo_h.m4 $(top_srcdir)/m4/largefile.m4 \
+	$(top_srcdir)/m4/lcmessage.m4 \
 	$(top_srcdir)/m4/ld-output-def.m4 \
 	$(top_srcdir)/m4/ld-version-script.m4 \
 	$(top_srcdir)/m4/lib-ld.m4 $(top_srcdir)/m4/lib-link.m4 \
@@ -208,27 +207,32 @@ am__aclocal_m4_deps = $(top_srcdir)/lib/unistring/m4/gnulib-comp.m4 \
 	$(top_srcdir)/m4/locale-zh.m4 $(top_srcdir)/m4/locale_h.m4 \
 	$(top_srcdir)/m4/localename.m4 \
 	$(top_srcdir)/m4/localtime-buffer.m4 $(top_srcdir)/m4/lock.m4 \
-	$(top_srcdir)/m4/longlong.m4 $(top_srcdir)/m4/lseek.m4 \
-	$(top_srcdir)/m4/lstat.m4 $(top_srcdir)/m4/ltoptions.m4 \
-	$(top_srcdir)/m4/ltsugar.m4 $(top_srcdir)/m4/ltversion.m4 \
-	$(top_srcdir)/m4/lt~obsolete.m4 $(top_srcdir)/m4/malloc.m4 \
-	$(top_srcdir)/m4/malloca.m4 $(top_srcdir)/m4/manywarnings.m4 \
-	$(top_srcdir)/m4/memchr.m4 $(top_srcdir)/m4/memmem.m4 \
-	$(top_srcdir)/m4/minmax.m4 $(top_srcdir)/m4/mmap-anon.m4 \
-	$(top_srcdir)/m4/mode_t.m4 $(top_srcdir)/m4/msvc-inval.m4 \
+	$(top_srcdir)/m4/lseek.m4 $(top_srcdir)/m4/lstat.m4 \
+	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
+	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/lt~obsolete.m4 \
+	$(top_srcdir)/m4/malloc.m4 $(top_srcdir)/m4/malloca.m4 \
+	$(top_srcdir)/m4/manywarnings.m4 $(top_srcdir)/m4/memchr.m4 \
+	$(top_srcdir)/m4/memmem.m4 $(top_srcdir)/m4/minmax.m4 \
+	$(top_srcdir)/m4/mmap-anon.m4 $(top_srcdir)/m4/mode_t.m4 \
+	$(top_srcdir)/m4/msvc-inval.m4 \
 	$(top_srcdir)/m4/msvc-nothrow.m4 $(top_srcdir)/m4/multiarch.m4 \
 	$(top_srcdir)/m4/nanosleep.m4 $(top_srcdir)/m4/netdb_h.m4 \
 	$(top_srcdir)/m4/netinet_in_h.m4 $(top_srcdir)/m4/nls.m4 \
 	$(top_srcdir)/m4/off_t.m4 $(top_srcdir)/m4/open-cloexec.m4 \
-	$(top_srcdir)/m4/open.m4 $(top_srcdir)/m4/pathmax.m4 \
-	$(top_srcdir)/m4/perror.m4 $(top_srcdir)/m4/pipe.m4 \
-	$(top_srcdir)/m4/pkg.m4 $(top_srcdir)/m4/po.m4 \
-	$(top_srcdir)/m4/printf.m4 $(top_srcdir)/m4/progtest.m4 \
+	$(top_srcdir)/m4/open-slash.m4 $(top_srcdir)/m4/open.m4 \
+	$(top_srcdir)/m4/pathmax.m4 $(top_srcdir)/m4/perror.m4 \
+	$(top_srcdir)/m4/pipe.m4 $(top_srcdir)/m4/pkg.m4 \
+	$(top_srcdir)/m4/po.m4 $(top_srcdir)/m4/printf.m4 \
+	$(top_srcdir)/m4/progtest.m4 \
+	$(top_srcdir)/m4/pthread-thread.m4 \
+	$(top_srcdir)/m4/pthread_h.m4 \
 	$(top_srcdir)/m4/pthread_rwlock_rdlock.m4 \
-	$(top_srcdir)/m4/putenv.m4 $(top_srcdir)/m4/raise.m4 \
-	$(top_srcdir)/m4/read-file.m4 $(top_srcdir)/m4/realloc.m4 \
+	$(top_srcdir)/m4/pthread_sigmask.m4 $(top_srcdir)/m4/putenv.m4 \
+	$(top_srcdir)/m4/raise.m4 $(top_srcdir)/m4/read-file.m4 \
+	$(top_srcdir)/m4/realloc.m4 $(top_srcdir)/m4/sched_h.m4 \
 	$(top_srcdir)/m4/secure_getenv.m4 $(top_srcdir)/m4/select.m4 \
 	$(top_srcdir)/m4/setenv.m4 $(top_srcdir)/m4/setlocale.m4 \
+	$(top_srcdir)/m4/setlocale_null.m4 \
 	$(top_srcdir)/m4/sigaction.m4 $(top_srcdir)/m4/signal_h.m4 \
 	$(top_srcdir)/m4/signalblocking.m4 \
 	$(top_srcdir)/m4/size_max.m4 $(top_srcdir)/m4/sleep.m4 \
@@ -250,15 +254,16 @@ am__aclocal_m4_deps = $(top_srcdir)/lib/unistring/m4/gnulib-comp.m4 \
 	$(top_srcdir)/m4/sys_socket_h.m4 \
 	$(top_srcdir)/m4/sys_stat_h.m4 $(top_srcdir)/m4/sys_time_h.m4 \
 	$(top_srcdir)/m4/sys_types_h.m4 $(top_srcdir)/m4/sys_uio_h.m4 \
-	$(top_srcdir)/m4/threadlib.m4 $(top_srcdir)/m4/time_h.m4 \
-	$(top_srcdir)/m4/time_r.m4 $(top_srcdir)/m4/ungetc.m4 \
-	$(top_srcdir)/m4/unistd_h.m4 \
+	$(top_srcdir)/m4/thread.m4 $(top_srcdir)/m4/threadlib.m4 \
+	$(top_srcdir)/m4/time_h.m4 $(top_srcdir)/m4/time_r.m4 \
+	$(top_srcdir)/m4/ungetc.m4 $(top_srcdir)/m4/unistd_h.m4 \
 	$(top_srcdir)/m4/valgrind-tests.m4 \
 	$(top_srcdir)/m4/vasnprintf.m4 $(top_srcdir)/m4/vasprintf.m4 \
-	$(top_srcdir)/m4/vsnprintf.m4 $(top_srcdir)/m4/warn-on-use.m4 \
-	$(top_srcdir)/m4/warnings.m4 $(top_srcdir)/m4/wchar_h.m4 \
-	$(top_srcdir)/m4/wchar_t.m4 $(top_srcdir)/m4/wint_t.m4 \
-	$(top_srcdir)/m4/xsize.m4 $(top_srcdir)/configure.ac
+	$(top_srcdir)/m4/visibility.m4 $(top_srcdir)/m4/vsnprintf.m4 \
+	$(top_srcdir)/m4/warn-on-use.m4 $(top_srcdir)/m4/warnings.m4 \
+	$(top_srcdir)/m4/wchar_h.m4 $(top_srcdir)/m4/wchar_t.m4 \
+	$(top_srcdir)/m4/wint_t.m4 $(top_srcdir)/m4/xsize.m4 \
+	$(top_srcdir)/m4/zzgnulib.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 DIST_COMMON = $(srcdir)/Makefile.am $(am__DIST_COMMON)
@@ -267,14 +272,11 @@ CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES = args-std.def
 CONFIG_CLEAN_VPATH_FILES =
 @ENABLE_SRP_TRUE@am__EXEEXT_1 = srptool$(EXEEXT)
-@ENABLE_OCSP_TRUE@am__EXEEXT_2 = ocsptool$(EXEEXT) \
-@ENABLE_OCSP_TRUE@	gnutls-serv$(EXEEXT)
-@ENABLE_ANON_TRUE@@ENABLE_OCSP_TRUE@am__EXEEXT_3 =  \
-@ENABLE_ANON_TRUE@@ENABLE_OCSP_TRUE@	gnutls-cli$(EXEEXT)
-@ENABLE_DANE_TRUE@am__EXEEXT_4 = danetool$(EXEEXT)
-@ENABLE_PKCS11_TRUE@@ENABLE_TROUSERS_TRUE@am__EXEEXT_5 =  \
+@ENABLE_OCSP_TRUE@am__EXEEXT_2 = ocsptool$(EXEEXT)
+@ENABLE_DANE_TRUE@am__EXEEXT_3 = danetool$(EXEEXT)
+@ENABLE_PKCS11_TRUE@@ENABLE_TROUSERS_TRUE@am__EXEEXT_4 =  \
 @ENABLE_PKCS11_TRUE@@ENABLE_TROUSERS_TRUE@	tpmtool$(EXEEXT)
-@ENABLE_PKCS11_TRUE@am__EXEEXT_6 = p11tool$(EXEEXT)
+@ENABLE_PKCS11_TRUE@am__EXEEXT_5 = p11tool$(EXEEXT)
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
@@ -283,7 +285,7 @@ am__DEPENDENCIES_1 =
 @NEED_LIBOPTS_TRUE@am__DEPENDENCIES_2 = libopts/libopts.la
 @ENABLE_MINITASN1_FALSE@am__DEPENDENCIES_3 = $(am__DEPENDENCIES_1)
 am__DEPENDENCIES_4 = $(am__DEPENDENCIES_2) $(am__DEPENDENCIES_1) \
-	$(am__append_13) $(am__DEPENDENCIES_3)
+	$(am__append_12) $(am__DEPENDENCIES_3)
 libcmd_certtool_la_DEPENDENCIES = ../lib/libgnutls.la gl/libgnu_gpl.la \
 	../gl/libgnu.la $(am__DEPENDENCIES_4) gl/libgnu_gpl.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
@@ -301,13 +303,10 @@ nodist_libcmd_cli_debug_la_OBJECTS = cli-debug-args.lo
 libcmd_cli_debug_la_OBJECTS = $(am_libcmd_cli_debug_la_OBJECTS) \
 	$(nodist_libcmd_cli_debug_la_OBJECTS)
 libcmd_cli_la_LIBADD =
-am__libcmd_cli_la_SOURCES_DIST = cli-args.def
 am_libcmd_cli_la_OBJECTS =
-@ENABLE_ANON_TRUE@@ENABLE_OCSP_TRUE@nodist_libcmd_cli_la_OBJECTS =  \
-@ENABLE_ANON_TRUE@@ENABLE_OCSP_TRUE@	cli-args.lo
+nodist_libcmd_cli_la_OBJECTS = cli-args.lo
 libcmd_cli_la_OBJECTS = $(am_libcmd_cli_la_OBJECTS) \
 	$(nodist_libcmd_cli_la_OBJECTS)
-@ENABLE_ANON_TRUE@@ENABLE_OCSP_TRUE@am_libcmd_cli_la_rpath =
 libcmd_danetool_la_DEPENDENCIES = ../lib/libgnutls.la gl/libgnu_gpl.la \
 	../gl/libgnu.la $(am__DEPENDENCIES_4) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
@@ -340,12 +339,10 @@ nodist_libcmd_psk_la_OBJECTS = psktool-args.lo
 libcmd_psk_la_OBJECTS = $(am_libcmd_psk_la_OBJECTS) \
 	$(nodist_libcmd_psk_la_OBJECTS)
 libcmd_serv_la_LIBADD =
-am__libcmd_serv_la_SOURCES_DIST = serv-args.def
 am_libcmd_serv_la_OBJECTS =
-@ENABLE_OCSP_TRUE@nodist_libcmd_serv_la_OBJECTS = serv-args.lo
+nodist_libcmd_serv_la_OBJECTS = serv-args.lo
 libcmd_serv_la_OBJECTS = $(am_libcmd_serv_la_OBJECTS) \
 	$(nodist_libcmd_serv_la_OBJECTS)
-@ENABLE_OCSP_TRUE@am_libcmd_serv_la_rpath =
 libcmd_srp_la_LIBADD =
 am__libcmd_srp_la_SOURCES_DIST = srptool-args.def
 am_libcmd_srp_la_OBJECTS =
@@ -381,32 +378,21 @@ am_danetool_OBJECTS = danetool.$(OBJEXT) certtool-common.$(OBJEXT) \
 	certtool-extras.$(OBJEXT) common.$(OBJEXT) socket.$(OBJEXT)
 danetool_OBJECTS = $(am_danetool_OBJECTS)
 danetool_DEPENDENCIES = ../lib/libgnutls.la libcmd-danetool.la \
-	../gl/libgnu.la gl/libgnu_gpl.la $(am__append_16)
+	../gl/libgnu.la gl/libgnu_gpl.la $(am__append_15)
 am__gnutls_cli_SOURCES_DIST = cli.c common.h common.c socket.c \
-	socket.h ocsptool-common.c inline_cmds.h benchmark-cipher.c \
-	benchmark.c benchmark.h benchmark-tls.c
-@ENABLE_ANON_TRUE@@ENABLE_OCSP_TRUE@am__objects_1 = benchmark-cipher.$(OBJEXT) \
-@ENABLE_ANON_TRUE@@ENABLE_OCSP_TRUE@	benchmark.$(OBJEXT) \
-@ENABLE_ANON_TRUE@@ENABLE_OCSP_TRUE@	benchmark-tls.$(OBJEXT)
-@ENABLE_ANON_TRUE@@ENABLE_OCSP_TRUE@am_gnutls_cli_OBJECTS =  \
-@ENABLE_ANON_TRUE@@ENABLE_OCSP_TRUE@	cli.$(OBJEXT) \
-@ENABLE_ANON_TRUE@@ENABLE_OCSP_TRUE@	common.$(OBJEXT) \
-@ENABLE_ANON_TRUE@@ENABLE_OCSP_TRUE@	socket.$(OBJEXT) \
-@ENABLE_ANON_TRUE@@ENABLE_OCSP_TRUE@	ocsptool-common.$(OBJEXT) \
-@ENABLE_ANON_TRUE@@ENABLE_OCSP_TRUE@	$(am__objects_1)
+	socket.h inline_cmds.h benchmark-cipher.c benchmark.c \
+	benchmark.h benchmark-tls.c ocsptool-common.c
+am__objects_1 = benchmark-cipher.$(OBJEXT) benchmark.$(OBJEXT) \
+	benchmark-tls.$(OBJEXT)
+@ENABLE_OCSP_TRUE@am__objects_2 = ocsptool-common.$(OBJEXT)
+am_gnutls_cli_OBJECTS = cli.$(OBJEXT) common.$(OBJEXT) \
+	socket.$(OBJEXT) $(am__objects_1) $(am__objects_2)
 gnutls_cli_OBJECTS = $(am_gnutls_cli_OBJECTS)
-@ENABLE_ANON_TRUE@@ENABLE_OCSP_TRUE@gnutls_cli_DEPENDENCIES =  \
-@ENABLE_ANON_TRUE@@ENABLE_OCSP_TRUE@	../lib/libgnutls.la \
-@ENABLE_ANON_TRUE@@ENABLE_OCSP_TRUE@	$(am__append_11) \
-@ENABLE_ANON_TRUE@@ENABLE_OCSP_TRUE@	libcmd-cli.la \
-@ENABLE_ANON_TRUE@@ENABLE_OCSP_TRUE@	$(am__DEPENDENCIES_2) \
-@ENABLE_ANON_TRUE@@ENABLE_OCSP_TRUE@	../gl/libgnu.la \
-@ENABLE_ANON_TRUE@@ENABLE_OCSP_TRUE@	$(am__DEPENDENCIES_1) \
-@ENABLE_ANON_TRUE@@ENABLE_OCSP_TRUE@	$(am__DEPENDENCIES_1) \
-@ENABLE_ANON_TRUE@@ENABLE_OCSP_TRUE@	$(am__DEPENDENCIES_1) \
-@ENABLE_ANON_TRUE@@ENABLE_OCSP_TRUE@	$(am__DEPENDENCIES_1) \
-@ENABLE_ANON_TRUE@@ENABLE_OCSP_TRUE@	$(am__DEPENDENCIES_1) \
-@ENABLE_ANON_TRUE@@ENABLE_OCSP_TRUE@	gl/libgnu_gpl.la
+gnutls_cli_DEPENDENCIES = ../lib/libgnutls.la $(am__append_11) \
+	libcmd-cli.la $(am__DEPENDENCIES_2) ../gl/libgnu.la \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) gl/libgnu_gpl.la
 am_gnutls_cli_debug_OBJECTS = cli-debug.$(OBJEXT) tests.$(OBJEXT) \
 	socket.$(OBJEXT) common.$(OBJEXT)
 gnutls_cli_debug_OBJECTS = $(am_gnutls_cli_debug_OBJECTS)
@@ -414,16 +400,12 @@ gnutls_cli_debug_DEPENDENCIES = ../lib/libgnutls.la \
 	libcmd-cli-debug.la $(am__DEPENDENCIES_2) ../gl/libgnu.la \
 	gl/libgnu_gpl.la $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
-am__gnutls_serv_SOURCES_DIST = list.h serv.c udp-serv.c udp-serv.h \
-	common.h common.c certtool-common.h
-@ENABLE_OCSP_TRUE@am_gnutls_serv_OBJECTS = serv.$(OBJEXT) \
-@ENABLE_OCSP_TRUE@	udp-serv.$(OBJEXT) common.$(OBJEXT)
+am_gnutls_serv_OBJECTS = serv.$(OBJEXT) udp-serv.$(OBJEXT) \
+	common.$(OBJEXT)
 gnutls_serv_OBJECTS = $(am_gnutls_serv_OBJECTS)
-@ENABLE_OCSP_TRUE@gnutls_serv_DEPENDENCIES = ../lib/libgnutls.la \
-@ENABLE_OCSP_TRUE@	libcmd-serv.la $(am__DEPENDENCIES_2) \
-@ENABLE_OCSP_TRUE@	../gl/libgnu.la $(am__DEPENDENCIES_1) \
-@ENABLE_OCSP_TRUE@	gl/libgnu_gpl.la $(am__DEPENDENCIES_1) \
-@ENABLE_OCSP_TRUE@	$(am__DEPENDENCIES_1)
+gnutls_serv_DEPENDENCIES = ../lib/libgnutls.la libcmd-serv.la \
+	$(am__DEPENDENCIES_2) ../gl/libgnu.la $(am__DEPENDENCIES_1) \
+	gl/libgnu_gpl.la $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am__ocsptool_SOURCES_DIST = ocsptool.c ocsptool-common.h \
 	ocsptool-common.c certtool-common.c socket.c common.c common.h \
 	socket.h
@@ -548,17 +530,15 @@ SOURCES = $(libcmd_certtool_la_SOURCES) \
 	$(ocsptool_SOURCES) $(p11tool_SOURCES) $(psktool_SOURCES) \
 	$(srptool_SOURCES) $(systemkey_SOURCES) $(tpmtool_SOURCES)
 DIST_SOURCES = $(libcmd_certtool_la_SOURCES) \
-	$(libcmd_cli_debug_la_SOURCES) \
-	$(am__libcmd_cli_la_SOURCES_DIST) \
+	$(libcmd_cli_debug_la_SOURCES) $(libcmd_cli_la_SOURCES) \
 	$(libcmd_danetool_la_SOURCES) \
 	$(am__libcmd_ocsp_la_SOURCES_DIST) \
 	$(am__libcmd_p11tool_la_SOURCES_DIST) $(libcmd_psk_la_SOURCES) \
-	$(am__libcmd_serv_la_SOURCES_DIST) \
-	$(am__libcmd_srp_la_SOURCES_DIST) \
+	$(libcmd_serv_la_SOURCES) $(am__libcmd_srp_la_SOURCES_DIST) \
 	$(libcmd_systemkey_la_SOURCES) \
 	$(am__libcmd_tpmtool_la_SOURCES_DIST) $(certtool_SOURCES) \
 	$(danetool_SOURCES) $(am__gnutls_cli_SOURCES_DIST) \
-	$(gnutls_cli_debug_SOURCES) $(am__gnutls_serv_SOURCES_DIST) \
+	$(gnutls_cli_debug_SOURCES) $(gnutls_serv_SOURCES) \
 	$(am__ocsptool_SOURCES_DIST) $(am__p11tool_SOURCES_DIST) \
 	$(psktool_SOURCES) $(am__srptool_SOURCES_DIST) \
 	$(systemkey_SOURCES) $(am__tpmtool_SOURCES_DIST)
@@ -656,6 +636,7 @@ CCASDEPMODE = @CCASDEPMODE@
 CCASFLAGS = @CCASFLAGS@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
+CFLAG_VISIBILITY = @CFLAG_VISIBILITY@
 CMOCKA_CFLAGS = @CMOCKA_CFLAGS@
 CMOCKA_LIBS = @CMOCKA_LIBS@
 CODE_COVERAGE_CFLAGS = @CODE_COVERAGE_CFLAGS@
@@ -708,6 +689,7 @@ GMSGFMT = @GMSGFMT@
 GMSGFMT_015 = @GMSGFMT_015@
 GNULIB_ACCEPT = @GNULIB_ACCEPT@
 GNULIB_ACCEPT4 = @GNULIB_ACCEPT4@
+GNULIB_ACCESS = @GNULIB_ACCESS@
 GNULIB_ATOLL = @GNULIB_ATOLL@
 GNULIB_BIND = @GNULIB_BIND@
 GNULIB_BTOWC = @GNULIB_BTOWC@
@@ -717,6 +699,8 @@ GNULIB_CHDIR = @GNULIB_CHDIR@
 GNULIB_CHOWN = @GNULIB_CHOWN@
 GNULIB_CLOSE = @GNULIB_CLOSE@
 GNULIB_CONNECT = @GNULIB_CONNECT@
+GNULIB_COPY_FILE_RANGE = @GNULIB_COPY_FILE_RANGE@
+GNULIB_CREAT = @GNULIB_CREAT@
 GNULIB_CTIME = @GNULIB_CTIME@
 GNULIB_DPRINTF = @GNULIB_DPRINTF@
 GNULIB_DUP = @GNULIB_DUP@
@@ -772,6 +756,7 @@ GNULIB_GETLINE = @GNULIB_GETLINE@
 GNULIB_GETLOADAVG = @GNULIB_GETLOADAVG@
 GNULIB_GETLOGIN = @GNULIB_GETLOGIN@
 GNULIB_GETLOGIN_R = @GNULIB_GETLOGIN_R@
+GNULIB_GETOPT_POSIX = @GNULIB_GETOPT_POSIX@
 GNULIB_GETPAGESIZE = @GNULIB_GETPAGESIZE@
 GNULIB_GETPASS = @GNULIB_GETPASS@
 GNULIB_GETPEERNAME = @GNULIB_GETPEERNAME@
@@ -854,7 +839,15 @@ GNULIB_PREAD = @GNULIB_PREAD@
 GNULIB_PRINTF = @GNULIB_PRINTF@
 GNULIB_PRINTF_POSIX = @GNULIB_PRINTF_POSIX@
 GNULIB_PSELECT = @GNULIB_PSELECT@
+GNULIB_PTHREAD_COND = @GNULIB_PTHREAD_COND@
+GNULIB_PTHREAD_MUTEX = @GNULIB_PTHREAD_MUTEX@
+GNULIB_PTHREAD_MUTEX_TIMEDLOCK = @GNULIB_PTHREAD_MUTEX_TIMEDLOCK@
+GNULIB_PTHREAD_ONCE = @GNULIB_PTHREAD_ONCE@
+GNULIB_PTHREAD_RWLOCK = @GNULIB_PTHREAD_RWLOCK@
 GNULIB_PTHREAD_SIGMASK = @GNULIB_PTHREAD_SIGMASK@
+GNULIB_PTHREAD_SPIN = @GNULIB_PTHREAD_SPIN@
+GNULIB_PTHREAD_THREAD = @GNULIB_PTHREAD_THREAD@
+GNULIB_PTHREAD_TSS = @GNULIB_PTHREAD_TSS@
 GNULIB_PTSNAME = @GNULIB_PTSNAME@
 GNULIB_PTSNAME_R = @GNULIB_PTSNAME_R@
 GNULIB_PUTC = @GNULIB_PUTC@
@@ -881,6 +874,7 @@ GNULIB_RENAMEAT = @GNULIB_RENAMEAT@
 GNULIB_RMDIR = @GNULIB_RMDIR@
 GNULIB_RPMATCH = @GNULIB_RPMATCH@
 GNULIB_SCANF = @GNULIB_SCANF@
+GNULIB_SCHED_YIELD = @GNULIB_SCHED_YIELD@
 GNULIB_SECURE_GETENV = @GNULIB_SECURE_GETENV@
 GNULIB_SELECT = @GNULIB_SELECT@
 GNULIB_SEND = @GNULIB_SEND@
@@ -888,6 +882,7 @@ GNULIB_SENDTO = @GNULIB_SENDTO@
 GNULIB_SETENV = @GNULIB_SETENV@
 GNULIB_SETHOSTNAME = @GNULIB_SETHOSTNAME@
 GNULIB_SETLOCALE = @GNULIB_SETLOCALE@
+GNULIB_SETLOCALE_NULL = @GNULIB_SETLOCALE_NULL@
 GNULIB_SETSOCKOPT = @GNULIB_SETSOCKOPT@
 GNULIB_SHUTDOWN = @GNULIB_SHUTDOWN@
 GNULIB_SIGACTION = @GNULIB_SIGACTION@
@@ -1017,6 +1012,7 @@ HAVE_BTOWC = @HAVE_BTOWC@
 HAVE_C99_STDINT_H = @HAVE_C99_STDINT_H@
 HAVE_CANONICALIZE_FILE_NAME = @HAVE_CANONICALIZE_FILE_NAME@
 HAVE_CHOWN = @HAVE_CHOWN@
+HAVE_COPY_FILE_RANGE = @HAVE_COPY_FILE_RANGE@
 HAVE_CRTDEFS_H = @HAVE_CRTDEFS_H@
 HAVE_DECL_ENVIRON = @HAVE_DECL_ENVIRON@
 HAVE_DECL_FCHDIR = @HAVE_DECL_FCHDIR@
@@ -1111,12 +1107,12 @@ HAVE_LCHMOD = @HAVE_LCHMOD@
 HAVE_LCHOWN = @HAVE_LCHOWN@
 HAVE_LIBCRYPTO = @HAVE_LIBCRYPTO@
 HAVE_LIBDL = @HAVE_LIBDL@
+HAVE_LIBEV = @HAVE_LIBEV@
 HAVE_LIBPTHREAD = @HAVE_LIBPTHREAD@
 HAVE_LIBRT = @HAVE_LIBRT@
 HAVE_LIBSECCOMP = @HAVE_LIBSECCOMP@
 HAVE_LINK = @HAVE_LINK@
 HAVE_LINKAT = @HAVE_LINKAT@
-HAVE_LONG_LONG_INT = @HAVE_LONG_LONG_INT@
 HAVE_LSTAT = @HAVE_LSTAT@
 HAVE_MAX_ALIGN_T = @HAVE_MAX_ALIGN_T@
 HAVE_MBRLEN = @HAVE_MBRLEN@
@@ -1154,7 +1150,65 @@ HAVE_POSIX_OPENPT = @HAVE_POSIX_OPENPT@
 HAVE_POSIX_SIGNALBLOCKING = @HAVE_POSIX_SIGNALBLOCKING@
 HAVE_PREAD = @HAVE_PREAD@
 HAVE_PSELECT = @HAVE_PSELECT@
+HAVE_PTHREAD_ATTR_DESTROY = @HAVE_PTHREAD_ATTR_DESTROY@
+HAVE_PTHREAD_ATTR_GETDETACHSTATE = @HAVE_PTHREAD_ATTR_GETDETACHSTATE@
+HAVE_PTHREAD_ATTR_INIT = @HAVE_PTHREAD_ATTR_INIT@
+HAVE_PTHREAD_ATTR_SETDETACHSTATE = @HAVE_PTHREAD_ATTR_SETDETACHSTATE@
+HAVE_PTHREAD_CONDATTR_DESTROY = @HAVE_PTHREAD_CONDATTR_DESTROY@
+HAVE_PTHREAD_CONDATTR_INIT = @HAVE_PTHREAD_CONDATTR_INIT@
+HAVE_PTHREAD_COND_BROADCAST = @HAVE_PTHREAD_COND_BROADCAST@
+HAVE_PTHREAD_COND_DESTROY = @HAVE_PTHREAD_COND_DESTROY@
+HAVE_PTHREAD_COND_INIT = @HAVE_PTHREAD_COND_INIT@
+HAVE_PTHREAD_COND_SIGNAL = @HAVE_PTHREAD_COND_SIGNAL@
+HAVE_PTHREAD_COND_TIMEDWAIT = @HAVE_PTHREAD_COND_TIMEDWAIT@
+HAVE_PTHREAD_COND_WAIT = @HAVE_PTHREAD_COND_WAIT@
+HAVE_PTHREAD_CREATE = @HAVE_PTHREAD_CREATE@
+HAVE_PTHREAD_CREATE_DETACHED = @HAVE_PTHREAD_CREATE_DETACHED@
+HAVE_PTHREAD_DETACH = @HAVE_PTHREAD_DETACH@
+HAVE_PTHREAD_EQUAL = @HAVE_PTHREAD_EQUAL@
+HAVE_PTHREAD_EXIT = @HAVE_PTHREAD_EXIT@
+HAVE_PTHREAD_GETSPECIFIC = @HAVE_PTHREAD_GETSPECIFIC@
+HAVE_PTHREAD_H = @HAVE_PTHREAD_H@
+HAVE_PTHREAD_JOIN = @HAVE_PTHREAD_JOIN@
+HAVE_PTHREAD_KEY_CREATE = @HAVE_PTHREAD_KEY_CREATE@
+HAVE_PTHREAD_KEY_DELETE = @HAVE_PTHREAD_KEY_DELETE@
+HAVE_PTHREAD_MUTEXATTR_DESTROY = @HAVE_PTHREAD_MUTEXATTR_DESTROY@
+HAVE_PTHREAD_MUTEXATTR_GETROBUST = @HAVE_PTHREAD_MUTEXATTR_GETROBUST@
+HAVE_PTHREAD_MUTEXATTR_GETTYPE = @HAVE_PTHREAD_MUTEXATTR_GETTYPE@
+HAVE_PTHREAD_MUTEXATTR_INIT = @HAVE_PTHREAD_MUTEXATTR_INIT@
+HAVE_PTHREAD_MUTEXATTR_SETROBUST = @HAVE_PTHREAD_MUTEXATTR_SETROBUST@
+HAVE_PTHREAD_MUTEXATTR_SETTYPE = @HAVE_PTHREAD_MUTEXATTR_SETTYPE@
+HAVE_PTHREAD_MUTEX_DESTROY = @HAVE_PTHREAD_MUTEX_DESTROY@
+HAVE_PTHREAD_MUTEX_INIT = @HAVE_PTHREAD_MUTEX_INIT@
+HAVE_PTHREAD_MUTEX_LOCK = @HAVE_PTHREAD_MUTEX_LOCK@
+HAVE_PTHREAD_MUTEX_RECURSIVE = @HAVE_PTHREAD_MUTEX_RECURSIVE@
+HAVE_PTHREAD_MUTEX_ROBUST = @HAVE_PTHREAD_MUTEX_ROBUST@
+HAVE_PTHREAD_MUTEX_TIMEDLOCK = @HAVE_PTHREAD_MUTEX_TIMEDLOCK@
+HAVE_PTHREAD_MUTEX_TRYLOCK = @HAVE_PTHREAD_MUTEX_TRYLOCK@
+HAVE_PTHREAD_MUTEX_UNLOCK = @HAVE_PTHREAD_MUTEX_UNLOCK@
+HAVE_PTHREAD_ONCE = @HAVE_PTHREAD_ONCE@
+HAVE_PTHREAD_PROCESS_SHARED = @HAVE_PTHREAD_PROCESS_SHARED@
+HAVE_PTHREAD_RWLOCKATTR_DESTROY = @HAVE_PTHREAD_RWLOCKATTR_DESTROY@
+HAVE_PTHREAD_RWLOCKATTR_INIT = @HAVE_PTHREAD_RWLOCKATTR_INIT@
+HAVE_PTHREAD_RWLOCK_DESTROY = @HAVE_PTHREAD_RWLOCK_DESTROY@
+HAVE_PTHREAD_RWLOCK_INIT = @HAVE_PTHREAD_RWLOCK_INIT@
+HAVE_PTHREAD_RWLOCK_RDLOCK = @HAVE_PTHREAD_RWLOCK_RDLOCK@
+HAVE_PTHREAD_RWLOCK_TIMEDRDLOCK = @HAVE_PTHREAD_RWLOCK_TIMEDRDLOCK@
+HAVE_PTHREAD_RWLOCK_TIMEDWRLOCK = @HAVE_PTHREAD_RWLOCK_TIMEDWRLOCK@
+HAVE_PTHREAD_RWLOCK_TRYRDLOCK = @HAVE_PTHREAD_RWLOCK_TRYRDLOCK@
+HAVE_PTHREAD_RWLOCK_TRYWRLOCK = @HAVE_PTHREAD_RWLOCK_TRYWRLOCK@
+HAVE_PTHREAD_RWLOCK_UNLOCK = @HAVE_PTHREAD_RWLOCK_UNLOCK@
+HAVE_PTHREAD_RWLOCK_WRLOCK = @HAVE_PTHREAD_RWLOCK_WRLOCK@
+HAVE_PTHREAD_SELF = @HAVE_PTHREAD_SELF@
+HAVE_PTHREAD_SETSPECIFIC = @HAVE_PTHREAD_SETSPECIFIC@
 HAVE_PTHREAD_SIGMASK = @HAVE_PTHREAD_SIGMASK@
+HAVE_PTHREAD_SPINLOCK_T = @HAVE_PTHREAD_SPINLOCK_T@
+HAVE_PTHREAD_SPIN_DESTROY = @HAVE_PTHREAD_SPIN_DESTROY@
+HAVE_PTHREAD_SPIN_INIT = @HAVE_PTHREAD_SPIN_INIT@
+HAVE_PTHREAD_SPIN_LOCK = @HAVE_PTHREAD_SPIN_LOCK@
+HAVE_PTHREAD_SPIN_TRYLOCK = @HAVE_PTHREAD_SPIN_TRYLOCK@
+HAVE_PTHREAD_SPIN_UNLOCK = @HAVE_PTHREAD_SPIN_UNLOCK@
+HAVE_PTHREAD_T = @HAVE_PTHREAD_T@
 HAVE_PTSNAME = @HAVE_PTSNAME@
 HAVE_PTSNAME_R = @HAVE_PTSNAME_R@
 HAVE_PWRITE = @HAVE_PWRITE@
@@ -1171,6 +1225,8 @@ HAVE_REALPATH = @HAVE_REALPATH@
 HAVE_RENAMEAT = @HAVE_RENAMEAT@
 HAVE_RPMATCH = @HAVE_RPMATCH@
 HAVE_SA_FAMILY_T = @HAVE_SA_FAMILY_T@
+HAVE_SCHED_H = @HAVE_SCHED_H@
+HAVE_SCHED_YIELD = @HAVE_SCHED_YIELD@
 HAVE_SECURE_GETENV = @HAVE_SECURE_GETENV@
 HAVE_SETENV = @HAVE_SETENV@
 HAVE_SETHOSTNAME = @HAVE_SETHOSTNAME@
@@ -1199,6 +1255,7 @@ HAVE_STRTOLL = @HAVE_STRTOLL@
 HAVE_STRTOULL = @HAVE_STRTOULL@
 HAVE_STRUCT_ADDRINFO = @HAVE_STRUCT_ADDRINFO@
 HAVE_STRUCT_RANDOM_DATA = @HAVE_STRUCT_RANDOM_DATA@
+HAVE_STRUCT_SCHED_PARAM = @HAVE_STRUCT_SCHED_PARAM@
 HAVE_STRUCT_SIGACTION_SA_SIGACTION = @HAVE_STRUCT_SIGACTION_SA_SIGACTION@
 HAVE_STRUCT_SOCKADDR_STORAGE = @HAVE_STRUCT_SOCKADDR_STORAGE@
 HAVE_STRUCT_SOCKADDR_STORAGE_SS_FAMILY = @HAVE_STRUCT_SOCKADDR_STORAGE_SS_FAMILY@
@@ -1207,6 +1264,7 @@ HAVE_STRVERSCMP = @HAVE_STRVERSCMP@
 HAVE_SYMLINK = @HAVE_SYMLINK@
 HAVE_SYMLINKAT = @HAVE_SYMLINKAT@
 HAVE_SYS_BITYPES_H = @HAVE_SYS_BITYPES_H@
+HAVE_SYS_CDEFS_H = @HAVE_SYS_CDEFS_H@
 HAVE_SYS_INTTYPES_H = @HAVE_SYS_INTTYPES_H@
 HAVE_SYS_IOCTL_H = @HAVE_SYS_IOCTL_H@
 HAVE_SYS_LOADAVG_H = @HAVE_SYS_LOADAVG_H@
@@ -1223,11 +1281,11 @@ HAVE_TZSET = @HAVE_TZSET@
 HAVE_UNISTD_H = @HAVE_UNISTD_H@
 HAVE_UNLINKAT = @HAVE_UNLINKAT@
 HAVE_UNLOCKPT = @HAVE_UNLOCKPT@
-HAVE_UNSIGNED_LONG_LONG_INT = @HAVE_UNSIGNED_LONG_LONG_INT@
 HAVE_USLEEP = @HAVE_USLEEP@
 HAVE_UTIMENSAT = @HAVE_UTIMENSAT@
 HAVE_VASPRINTF = @HAVE_VASPRINTF@
 HAVE_VDPRINTF = @HAVE_VDPRINTF@
+HAVE_VISIBILITY = @HAVE_VISIBILITY@
 HAVE_WCHAR_H = @HAVE_WCHAR_H@
 HAVE_WCHAR_T = @HAVE_WCHAR_T@
 HAVE_WCPCPY = @HAVE_WCPCPY@
@@ -1293,6 +1351,9 @@ LIBCRYPTO = @LIBCRYPTO@
 LIBCRYPTO_PREFIX = @LIBCRYPTO_PREFIX@
 LIBDL = @LIBDL@
 LIBDL_PREFIX = @LIBDL_PREFIX@
+LIBEV = @LIBEV@
+LIBEV_LIBS = @LIBEV_LIBS@
+LIBEV_PREFIX = @LIBEV_PREFIX@
 LIBGNUTLS_CFLAGS = @LIBGNUTLS_CFLAGS@
 LIBGNUTLS_LIBS = @LIBGNUTLS_LIBS@
 LIBICONV = @LIBICONV@
@@ -1304,16 +1365,16 @@ LIBOBJS = @LIBOBJS@
 LIBOPTS_CFLAGS = @LIBOPTS_CFLAGS@
 LIBOPTS_DIR = @LIBOPTS_DIR@
 LIBOPTS_LDADD = @LIBOPTS_LDADD@
-LIBPTH = @LIBPTH@
+LIBPMULTITHREAD = @LIBPMULTITHREAD@
 LIBPTHREAD = @LIBPTHREAD@
 LIBPTHREAD_PREFIX = @LIBPTHREAD_PREFIX@
-LIBPTH_PREFIX = @LIBPTH_PREFIX@
 LIBRT = @LIBRT@
 LIBRT_PREFIX = @LIBRT_PREFIX@
 LIBS = @LIBS@
 LIBSECCOMP = @LIBSECCOMP@
 LIBSECCOMP_PREFIX = @LIBSECCOMP_PREFIX@
 LIBSOCKET = @LIBSOCKET@
+LIBSTDTHREAD = @LIBSTDTHREAD@
 LIBTASN1_CFLAGS = @LIBTASN1_CFLAGS@
 LIBTASN1_LIBS = @LIBTASN1_LIBS@
 LIBTESTS_LIBDEPS = @LIBTESTS_LIBDEPS@
@@ -1326,7 +1387,12 @@ LIBUNISTRING_UNISTR_H = @LIBUNISTRING_UNISTR_H@
 LIBUNISTRING_UNITYPES_H = @LIBUNISTRING_UNITYPES_H@
 LIB_CLOCK_GETTIME = @LIB_CLOCK_GETTIME@
 LIB_NANOSLEEP = @LIB_NANOSLEEP@
+LIB_PTHREAD = @LIB_PTHREAD@
+LIB_PTHREAD_SIGMASK = @LIB_PTHREAD_SIGMASK@
+LIB_SCHED_YIELD = @LIB_SCHED_YIELD@
 LIB_SELECT = @LIB_SELECT@
+LIB_SETLOCALE = @LIB_SETLOCALE@
+LIB_SETLOCALE_NULL = @LIB_SETLOCALE_NULL@
 LIMITS_H = @LIMITS_H@
 LIPO = @LIPO@
 LN_S = @LN_S@
@@ -1338,11 +1404,11 @@ LOCALE_ZH_CN = @LOCALE_ZH_CN@
 LTALLOCA = @LTALLOCA@
 LTLIBCRYPTO = @LTLIBCRYPTO@
 LTLIBDL = @LTLIBDL@
+LTLIBEV = @LTLIBEV@
 LTLIBICONV = @LTLIBICONV@
 LTLIBINTL = @LTLIBINTL@
 LTLIBMULTITHREAD = @LTLIBMULTITHREAD@
 LTLIBOBJS = @LTLIBOBJS@
-LTLIBPTH = @LTLIBPTH@
 LTLIBPTHREAD = @LTLIBPTHREAD@
 LTLIBRT = @LTLIBRT@
 LTLIBSECCOMP = @LTLIBSECCOMP@
@@ -1384,6 +1450,8 @@ NEXT_AS_FIRST_DIRECTIVE_LIMITS_H = @NEXT_AS_FIRST_DIRECTIVE_LIMITS_H@
 NEXT_AS_FIRST_DIRECTIVE_LOCALE_H = @NEXT_AS_FIRST_DIRECTIVE_LOCALE_H@
 NEXT_AS_FIRST_DIRECTIVE_NETDB_H = @NEXT_AS_FIRST_DIRECTIVE_NETDB_H@
 NEXT_AS_FIRST_DIRECTIVE_NETINET_IN_H = @NEXT_AS_FIRST_DIRECTIVE_NETINET_IN_H@
+NEXT_AS_FIRST_DIRECTIVE_PTHREAD_H = @NEXT_AS_FIRST_DIRECTIVE_PTHREAD_H@
+NEXT_AS_FIRST_DIRECTIVE_SCHED_H = @NEXT_AS_FIRST_DIRECTIVE_SCHED_H@
 NEXT_AS_FIRST_DIRECTIVE_SIGNAL_H = @NEXT_AS_FIRST_DIRECTIVE_SIGNAL_H@
 NEXT_AS_FIRST_DIRECTIVE_STDDEF_H = @NEXT_AS_FIRST_DIRECTIVE_STDDEF_H@
 NEXT_AS_FIRST_DIRECTIVE_STDINT_H = @NEXT_AS_FIRST_DIRECTIVE_STDINT_H@
@@ -1411,6 +1479,8 @@ NEXT_LIMITS_H = @NEXT_LIMITS_H@
 NEXT_LOCALE_H = @NEXT_LOCALE_H@
 NEXT_NETDB_H = @NEXT_NETDB_H@
 NEXT_NETINET_IN_H = @NEXT_NETINET_IN_H@
+NEXT_PTHREAD_H = @NEXT_PTHREAD_H@
+NEXT_SCHED_H = @NEXT_SCHED_H@
 NEXT_SIGNAL_H = @NEXT_SIGNAL_H@
 NEXT_STDDEF_H = @NEXT_STDDEF_H@
 NEXT_STDINT_H = @NEXT_STDINT_H@
@@ -1444,6 +1514,7 @@ PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
+PARSE_DATETIME_BISON = @PARSE_DATETIME_BISON@
 PATCH_VERSION = @PATCH_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 PKG_CONFIG = @PKG_CONFIG@
@@ -1459,11 +1530,13 @@ PRI_MACROS_BROKEN = @PRI_MACROS_BROKEN@
 PTHREAD_H_DEFINES_STRUCT_TIMESPEC = @PTHREAD_H_DEFINES_STRUCT_TIMESPEC@
 PTRDIFF_T_SUFFIX = @PTRDIFF_T_SUFFIX@
 RANLIB = @RANLIB@
+REPLACE_ACCESS = @REPLACE_ACCESS@
 REPLACE_BTOWC = @REPLACE_BTOWC@
 REPLACE_CALLOC = @REPLACE_CALLOC@
 REPLACE_CANONICALIZE_FILE_NAME = @REPLACE_CANONICALIZE_FILE_NAME@
 REPLACE_CHOWN = @REPLACE_CHOWN@
 REPLACE_CLOSE = @REPLACE_CLOSE@
+REPLACE_CREAT = @REPLACE_CREAT@
 REPLACE_CTIME = @REPLACE_CTIME@
 REPLACE_DPRINTF = @REPLACE_DPRINTF@
 REPLACE_DUP = @REPLACE_DUP@
@@ -1489,6 +1562,7 @@ REPLACE_FTELLO = @REPLACE_FTELLO@
 REPLACE_FTRUNCATE = @REPLACE_FTRUNCATE@
 REPLACE_FUTIMENS = @REPLACE_FUTIMENS@
 REPLACE_GAI_STRERROR = @REPLACE_GAI_STRERROR@
+REPLACE_GETADDRINFO = @REPLACE_GETADDRINFO@
 REPLACE_GETCWD = @REPLACE_GETCWD@
 REPLACE_GETDELIM = @REPLACE_GETDELIM@
 REPLACE_GETDOMAINNAME = @REPLACE_GETDOMAINNAME@
@@ -1541,7 +1615,58 @@ REPLACE_POPEN = @REPLACE_POPEN@
 REPLACE_PREAD = @REPLACE_PREAD@
 REPLACE_PRINTF = @REPLACE_PRINTF@
 REPLACE_PSELECT = @REPLACE_PSELECT@
+REPLACE_PTHREAD_ATTR_DESTROY = @REPLACE_PTHREAD_ATTR_DESTROY@
+REPLACE_PTHREAD_ATTR_GETDETACHSTATE = @REPLACE_PTHREAD_ATTR_GETDETACHSTATE@
+REPLACE_PTHREAD_ATTR_INIT = @REPLACE_PTHREAD_ATTR_INIT@
+REPLACE_PTHREAD_ATTR_SETDETACHSTATE = @REPLACE_PTHREAD_ATTR_SETDETACHSTATE@
+REPLACE_PTHREAD_CONDATTR_DESTROY = @REPLACE_PTHREAD_CONDATTR_DESTROY@
+REPLACE_PTHREAD_CONDATTR_INIT = @REPLACE_PTHREAD_CONDATTR_INIT@
+REPLACE_PTHREAD_COND_BROADCAST = @REPLACE_PTHREAD_COND_BROADCAST@
+REPLACE_PTHREAD_COND_DESTROY = @REPLACE_PTHREAD_COND_DESTROY@
+REPLACE_PTHREAD_COND_INIT = @REPLACE_PTHREAD_COND_INIT@
+REPLACE_PTHREAD_COND_SIGNAL = @REPLACE_PTHREAD_COND_SIGNAL@
+REPLACE_PTHREAD_COND_TIMEDWAIT = @REPLACE_PTHREAD_COND_TIMEDWAIT@
+REPLACE_PTHREAD_COND_WAIT = @REPLACE_PTHREAD_COND_WAIT@
+REPLACE_PTHREAD_CREATE = @REPLACE_PTHREAD_CREATE@
+REPLACE_PTHREAD_DETACH = @REPLACE_PTHREAD_DETACH@
+REPLACE_PTHREAD_EQUAL = @REPLACE_PTHREAD_EQUAL@
+REPLACE_PTHREAD_EXIT = @REPLACE_PTHREAD_EXIT@
+REPLACE_PTHREAD_GETSPECIFIC = @REPLACE_PTHREAD_GETSPECIFIC@
+REPLACE_PTHREAD_JOIN = @REPLACE_PTHREAD_JOIN@
+REPLACE_PTHREAD_KEY_CREATE = @REPLACE_PTHREAD_KEY_CREATE@
+REPLACE_PTHREAD_KEY_DELETE = @REPLACE_PTHREAD_KEY_DELETE@
+REPLACE_PTHREAD_MUTEXATTR_DESTROY = @REPLACE_PTHREAD_MUTEXATTR_DESTROY@
+REPLACE_PTHREAD_MUTEXATTR_GETROBUST = @REPLACE_PTHREAD_MUTEXATTR_GETROBUST@
+REPLACE_PTHREAD_MUTEXATTR_GETTYPE = @REPLACE_PTHREAD_MUTEXATTR_GETTYPE@
+REPLACE_PTHREAD_MUTEXATTR_INIT = @REPLACE_PTHREAD_MUTEXATTR_INIT@
+REPLACE_PTHREAD_MUTEXATTR_SETROBUST = @REPLACE_PTHREAD_MUTEXATTR_SETROBUST@
+REPLACE_PTHREAD_MUTEXATTR_SETTYPE = @REPLACE_PTHREAD_MUTEXATTR_SETTYPE@
+REPLACE_PTHREAD_MUTEX_DESTROY = @REPLACE_PTHREAD_MUTEX_DESTROY@
+REPLACE_PTHREAD_MUTEX_INIT = @REPLACE_PTHREAD_MUTEX_INIT@
+REPLACE_PTHREAD_MUTEX_LOCK = @REPLACE_PTHREAD_MUTEX_LOCK@
+REPLACE_PTHREAD_MUTEX_TIMEDLOCK = @REPLACE_PTHREAD_MUTEX_TIMEDLOCK@
+REPLACE_PTHREAD_MUTEX_TRYLOCK = @REPLACE_PTHREAD_MUTEX_TRYLOCK@
+REPLACE_PTHREAD_MUTEX_UNLOCK = @REPLACE_PTHREAD_MUTEX_UNLOCK@
+REPLACE_PTHREAD_ONCE = @REPLACE_PTHREAD_ONCE@
+REPLACE_PTHREAD_RWLOCKATTR_DESTROY = @REPLACE_PTHREAD_RWLOCKATTR_DESTROY@
+REPLACE_PTHREAD_RWLOCKATTR_INIT = @REPLACE_PTHREAD_RWLOCKATTR_INIT@
+REPLACE_PTHREAD_RWLOCK_DESTROY = @REPLACE_PTHREAD_RWLOCK_DESTROY@
+REPLACE_PTHREAD_RWLOCK_INIT = @REPLACE_PTHREAD_RWLOCK_INIT@
+REPLACE_PTHREAD_RWLOCK_RDLOCK = @REPLACE_PTHREAD_RWLOCK_RDLOCK@
+REPLACE_PTHREAD_RWLOCK_TIMEDRDLOCK = @REPLACE_PTHREAD_RWLOCK_TIMEDRDLOCK@
+REPLACE_PTHREAD_RWLOCK_TIMEDWRLOCK = @REPLACE_PTHREAD_RWLOCK_TIMEDWRLOCK@
+REPLACE_PTHREAD_RWLOCK_TRYRDLOCK = @REPLACE_PTHREAD_RWLOCK_TRYRDLOCK@
+REPLACE_PTHREAD_RWLOCK_TRYWRLOCK = @REPLACE_PTHREAD_RWLOCK_TRYWRLOCK@
+REPLACE_PTHREAD_RWLOCK_UNLOCK = @REPLACE_PTHREAD_RWLOCK_UNLOCK@
+REPLACE_PTHREAD_RWLOCK_WRLOCK = @REPLACE_PTHREAD_RWLOCK_WRLOCK@
+REPLACE_PTHREAD_SELF = @REPLACE_PTHREAD_SELF@
+REPLACE_PTHREAD_SETSPECIFIC = @REPLACE_PTHREAD_SETSPECIFIC@
 REPLACE_PTHREAD_SIGMASK = @REPLACE_PTHREAD_SIGMASK@
+REPLACE_PTHREAD_SPIN_DESTROY = @REPLACE_PTHREAD_SPIN_DESTROY@
+REPLACE_PTHREAD_SPIN_INIT = @REPLACE_PTHREAD_SPIN_INIT@
+REPLACE_PTHREAD_SPIN_LOCK = @REPLACE_PTHREAD_SPIN_LOCK@
+REPLACE_PTHREAD_SPIN_TRYLOCK = @REPLACE_PTHREAD_SPIN_TRYLOCK@
+REPLACE_PTHREAD_SPIN_UNLOCK = @REPLACE_PTHREAD_SPIN_UNLOCK@
 REPLACE_PTSNAME = @REPLACE_PTSNAME@
 REPLACE_PTSNAME_R = @REPLACE_PTSNAME_R@
 REPLACE_PUTENV = @REPLACE_PUTENV@
@@ -1559,6 +1684,7 @@ REPLACE_REMOVE = @REPLACE_REMOVE@
 REPLACE_RENAME = @REPLACE_RENAME@
 REPLACE_RENAMEAT = @REPLACE_RENAMEAT@
 REPLACE_RMDIR = @REPLACE_RMDIR@
+REPLACE_SCHED_YIELD = @REPLACE_SCHED_YIELD@
 REPLACE_SELECT = @REPLACE_SELECT@
 REPLACE_SETENV = @REPLACE_SETENV@
 REPLACE_SETLOCALE = @REPLACE_SETLOCALE@
@@ -1610,6 +1736,7 @@ REPLACE_WCRTOMB = @REPLACE_WCRTOMB@
 REPLACE_WCSFTIME = @REPLACE_WCSFTIME@
 REPLACE_WCSNRTOMBS = @REPLACE_WCSNRTOMBS@
 REPLACE_WCSRTOMBS = @REPLACE_WCSRTOMBS@
+REPLACE_WCSTOK = @REPLACE_WCSTOK@
 REPLACE_WCSWIDTH = @REPLACE_WCSWIDTH@
 REPLACE_WCTOB = @REPLACE_WCTOB@
 REPLACE_WCTOMB = @REPLACE_WCTOMB@
@@ -1718,13 +1845,13 @@ libexecdir = @libexecdir@
 localedir = @localedir@
 localstatedir = @localstatedir@
 mandir = @mandir@
+maybe_guileextensiondir = @maybe_guileextensiondir@
 mkdir_p = @mkdir_p@
 oldincludedir = @oldincludedir@
 pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
-runstatedir = @runstatedir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
@@ -1778,7 +1905,7 @@ ARGS_STAMPS = \
 	systemkey-args.stamp srptool-args.stamp ocsptool-args.stamp p11tool-args.stamp \
 	danetool-args.stamp serv-args.stamp psktool-args.stamp
 
-BUILT_SOURCES = $(ARGS_BUILT) $(am__append_17)
+BUILT_SOURCES = $(ARGS_BUILT) $(am__append_16)
 DISTCLEANFILES = $(BUILT_SOURCES) $(ARGS_STAMPS)
 EXTRA_DIST = gen-mech-list.sh $(ARGS_BAK)
 MAINTAINERCLEANFILES = $(ARGS_BAK)
@@ -1786,13 +1913,13 @@ AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
 AM_CPPFLAGS = -I$(srcdir)/gl -I$(builddir)/gl \
 	-I$(builddir)/../lib/includes -I$(srcdir)/../lib/includes \
 	-I$(srcdir)/../libdane/includes -I$(srcdir)/../extra/includes \
-	$(LIBOPTS_CFLAGS) $(am__append_2) $(am__append_14)
+	$(LIBOPTS_CFLAGS) $(am__append_2) $(am__append_13)
 @NEED_LIBOPTS_FALSE@LIBOPTS = $(LIBOPTS_LDADD)
 @NEED_LIBOPTS_TRUE@LIBOPTS = libopts/libopts.la
-noinst_LTLIBRARIES = $(am__append_9) libcmd-psk.la $(am__append_10) \
-	$(am__append_12) libcmd-cli-debug.la libcmd-certtool.la \
-	libcmd-danetool.la $(am__append_18) $(am__append_19) \
-	libcmd-systemkey.la
+noinst_LTLIBRARIES = $(am__append_8) libcmd-psk.la $(am__append_9) \
+	libcmd-serv.la libcmd-cli.la libcmd-cli-debug.la \
+	libcmd-certtool.la libcmd-danetool.la $(am__append_17) \
+	$(am__append_18) libcmd-systemkey.la
 @ENABLE_SRP_TRUE@srptool_SOURCES = srptool.c
 @ENABLE_SRP_TRUE@srptool_LDADD = ../lib/libgnutls.la libcmd-srp.la \
 @ENABLE_SRP_TRUE@	$(LIBOPTS) ../gl/libgnu.la $(LTLIBINTL) \
@@ -1813,37 +1940,26 @@ nodist_libcmd_psk_la_SOURCES = psktool-args.c psktool-args.h
 @ENABLE_OCSP_TRUE@	$(LIBIDN_LIBS)
 @ENABLE_OCSP_TRUE@libcmd_ocsp_la_SOURCES = ocsptool-args.def
 @ENABLE_OCSP_TRUE@nodist_libcmd_ocsp_la_SOURCES = ocsptool-args.h ocsptool-args.c
-@ENABLE_OCSP_TRUE@gnutls_serv_SOURCES = \
-@ENABLE_OCSP_TRUE@  list.h serv.c			\
-@ENABLE_OCSP_TRUE@  udp-serv.c udp-serv.h		\
-@ENABLE_OCSP_TRUE@  common.h common.c		\
-@ENABLE_OCSP_TRUE@  certtool-common.h 
+gnutls_serv_SOURCES = \
+  list.h serv.c			\
+  udp-serv.c udp-serv.h		\
+  common.h common.c		\
+  certtool-common.h 
 
-@ENABLE_OCSP_TRUE@gnutls_serv_LDADD = ../lib/libgnutls.la \
-@ENABLE_OCSP_TRUE@	libcmd-serv.la $(LIBOPTS) ../gl/libgnu.la \
-@ENABLE_OCSP_TRUE@	$(LTLIBINTL) gl/libgnu_gpl.la $(LIBSOCKET) \
-@ENABLE_OCSP_TRUE@	$(GETADDRINFO_LIB) $(LIBIDN_LIBS)
-@ENABLE_OCSP_TRUE@libcmd_serv_la_SOURCES = serv-args.def
-@ENABLE_OCSP_TRUE@nodist_libcmd_serv_la_SOURCES = serv-args.c serv-args.h
-@ENABLE_ANON_TRUE@@ENABLE_OCSP_TRUE@BENCHMARK_SRCS = benchmark-cipher.c benchmark.c benchmark.h benchmark-tls.c
-@ENABLE_ANON_TRUE@@ENABLE_OCSP_TRUE@gnutls_cli_SOURCES = cli.c common.h common.c \
-@ENABLE_ANON_TRUE@@ENABLE_OCSP_TRUE@	socket.c socket.h ocsptool-common.c inline_cmds.h \
-@ENABLE_ANON_TRUE@@ENABLE_OCSP_TRUE@	$(BENCHMARK_SRCS)
-
-@ENABLE_ANON_TRUE@@ENABLE_OCSP_TRUE@gnutls_cli_LDADD =  \
-@ENABLE_ANON_TRUE@@ENABLE_OCSP_TRUE@	../lib/libgnutls.la \
-@ENABLE_ANON_TRUE@@ENABLE_OCSP_TRUE@	$(am__append_11) \
-@ENABLE_ANON_TRUE@@ENABLE_OCSP_TRUE@	libcmd-cli.la $(LIBOPTS) \
-@ENABLE_ANON_TRUE@@ENABLE_OCSP_TRUE@	../gl/libgnu.la \
-@ENABLE_ANON_TRUE@@ENABLE_OCSP_TRUE@	$(LTLIBINTL) \
-@ENABLE_ANON_TRUE@@ENABLE_OCSP_TRUE@	$(LIBIDN_LIBS) \
-@ENABLE_ANON_TRUE@@ENABLE_OCSP_TRUE@	$(LIBSOCKET) \
-@ENABLE_ANON_TRUE@@ENABLE_OCSP_TRUE@	$(GETADDRINFO_LIB) \
-@ENABLE_ANON_TRUE@@ENABLE_OCSP_TRUE@	$(LIB_CLOCK_GETTIME) \
-@ENABLE_ANON_TRUE@@ENABLE_OCSP_TRUE@	$(SERVENT_LIB) \
-@ENABLE_ANON_TRUE@@ENABLE_OCSP_TRUE@	gl/libgnu_gpl.la
-@ENABLE_ANON_TRUE@@ENABLE_OCSP_TRUE@libcmd_cli_la_SOURCES = cli-args.def
-@ENABLE_ANON_TRUE@@ENABLE_OCSP_TRUE@nodist_libcmd_cli_la_SOURCES = cli-args.c cli-args.h
+gnutls_serv_LDADD = ../lib/libgnutls.la libcmd-serv.la $(LIBOPTS) \
+	../gl/libgnu.la $(LTLIBINTL) gl/libgnu_gpl.la $(LIBSOCKET) \
+	$(GETADDRINFO_LIB) $(LIBIDN_LIBS)
+libcmd_serv_la_SOURCES = serv-args.def
+nodist_libcmd_serv_la_SOURCES = serv-args.c serv-args.h
+BENCHMARK_SRCS = benchmark-cipher.c benchmark.c benchmark.h benchmark-tls.c
+gnutls_cli_SOURCES = cli.c common.h common.c socket.c socket.h \
+	inline_cmds.h $(BENCHMARK_SRCS) $(am__append_10)
+gnutls_cli_LDADD = ../lib/libgnutls.la -lm $(am__append_11) \
+	libcmd-cli.la $(LIBOPTS) ../gl/libgnu.la $(LTLIBINTL) \
+	$(LIBIDN_LIBS) $(LIBSOCKET) $(GETADDRINFO_LIB) \
+	$(LIB_CLOCK_GETTIME) $(SERVENT_LIB) gl/libgnu_gpl.la
+libcmd_cli_la_SOURCES = cli-args.def
+nodist_libcmd_cli_la_SOURCES = cli-args.c cli-args.h
 gnutls_cli_debug_SOURCES = cli-debug.c tests.h tests.c \
 		socket.c socket.h common.h common.c
 
@@ -1854,8 +1970,8 @@ libcmd_cli_debug_la_SOURCES = cli-debug-args.def
 nodist_libcmd_cli_debug_la_SOURCES = cli-debug-args.c cli-debug-args.h
 
 #certtool
-COMMON_LIBS = $(LIBOPTS) $(LTLIBINTL) $(am__append_13) \
-	$(am__append_15)
+COMMON_LIBS = $(LIBOPTS) $(LTLIBINTL) $(am__append_12) \
+	$(am__append_14)
 certtool_SOURCES = certtool.c certtool-common.c certtool-extras.c common.c
 certtool_LDADD = ../lib/libgnutls.la libcmd-certtool.la \
 	../gl/libgnu.la gl/libgnu_gpl.la
@@ -1868,7 +1984,7 @@ libcmd_certtool_la_LIBADD = ../lib/libgnutls.la gl/libgnu_gpl.la \
 	gl/libgnu_gpl.la $(INET_PTON_LIB) $(LIB_CLOCK_GETTIME)
 danetool_SOURCES = danetool.c certtool-common.c certtool-extras.c common.c socket.c
 danetool_LDADD = ../lib/libgnutls.la $(LIBIDN_LIBS) libcmd-danetool.la \
-	../gl/libgnu.la gl/libgnu_gpl.la $(am__append_16)
+	../gl/libgnu.la gl/libgnu_gpl.la $(am__append_15)
 libcmd_danetool_la_SOURCES = danetool-args.def \
 	certtool-cfg.h certtool-cfg.c
 
@@ -2027,7 +2143,7 @@ libcmd-cli-debug.la: $(libcmd_cli_debug_la_OBJECTS) $(libcmd_cli_debug_la_DEPEND
 	$(AM_V_CCLD)$(LINK)  $(libcmd_cli_debug_la_OBJECTS) $(libcmd_cli_debug_la_LIBADD) $(LIBS)
 
 libcmd-cli.la: $(libcmd_cli_la_OBJECTS) $(libcmd_cli_la_DEPENDENCIES) $(EXTRA_libcmd_cli_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(LINK) $(am_libcmd_cli_la_rpath) $(libcmd_cli_la_OBJECTS) $(libcmd_cli_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK)  $(libcmd_cli_la_OBJECTS) $(libcmd_cli_la_LIBADD) $(LIBS)
 
 libcmd-danetool.la: $(libcmd_danetool_la_OBJECTS) $(libcmd_danetool_la_DEPENDENCIES) $(EXTRA_libcmd_danetool_la_DEPENDENCIES) 
 	$(AM_V_CCLD)$(LINK)  $(libcmd_danetool_la_OBJECTS) $(libcmd_danetool_la_LIBADD) $(LIBS)
@@ -2042,7 +2158,7 @@ libcmd-psk.la: $(libcmd_psk_la_OBJECTS) $(libcmd_psk_la_DEPENDENCIES) $(EXTRA_li
 	$(AM_V_CCLD)$(LINK)  $(libcmd_psk_la_OBJECTS) $(libcmd_psk_la_LIBADD) $(LIBS)
 
 libcmd-serv.la: $(libcmd_serv_la_OBJECTS) $(libcmd_serv_la_DEPENDENCIES) $(EXTRA_libcmd_serv_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(LINK) $(am_libcmd_serv_la_rpath) $(libcmd_serv_la_OBJECTS) $(libcmd_serv_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK)  $(libcmd_serv_la_OBJECTS) $(libcmd_serv_la_LIBADD) $(LIBS)
 
 libcmd-srp.la: $(libcmd_srp_la_OBJECTS) $(libcmd_srp_la_DEPENDENCIES) $(EXTRA_libcmd_srp_la_DEPENDENCIES) 
 	$(AM_V_CCLD)$(LINK) $(am_libcmd_srp_la_rpath) $(libcmd_srp_la_OBJECTS) $(libcmd_srp_la_LIBADD) $(LIBS)

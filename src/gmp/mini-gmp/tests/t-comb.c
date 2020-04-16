@@ -1,6 +1,6 @@
 /* Exercise mpz_fac_ui and mpz_bin_uiui.
 
-Copyright 2000-2002, 2012, 2013 Free Software Foundation, Inc.
+Copyright 2000-2002, 2012, 2013, 2017-2018 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library test suite.
 
@@ -102,7 +102,18 @@ fac_smallexaustive (unsigned int limit)
 
 void checkWilson (mpz_t f, unsigned long n)
 {
-  unsigned long m;
+  unsigned long m, a;
+
+  mpz_2fac_ui (f, 2 * n - 1);
+
+  a = mpz_fdiv_q_ui (f, f, n);
+  m = mpz_fdiv_ui (f, n);
+  if ((m != n - 1) || (a != 0))
+    {
+      printf ("mpz_2fac_ui(%lu) wrong\n", 2 * n - 1);
+      printf ("  Wilson's theorem not verified: got (%lu, %lu), expected (0, %lu).\n", a, m, n - 1);
+      abort ();
+    }
 
   mpz_fac_ui (f, n - 1);
   m = mpz_fdiv_ui (f, n);

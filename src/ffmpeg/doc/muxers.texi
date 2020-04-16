@@ -236,8 +236,10 @@ This is a deprecated option to set the segment length in microseconds, use @var{
 @item seg_duration @var{duration}
 Set the segment length in seconds (fractional value can be set). The value is
 treated as average segment duration when @var{use_template} is enabled and
-@var{use_timeline} is disabled and as minimum segment duration for all the other
-use cases.
+@item frag_duration @var{duration}
+Set the length in seconds of fragments within segments (fractional value can be set).
+@item frag_type @var{type}
+Set the type of interval for fragmentation.
 @item window_size @var{size}
 Set the maximum number of segments kept in the manifest.
 @item extra_window_size @var{size}
@@ -278,9 +280,14 @@ To map all video (or audio) streams to an AdaptationSet, "v" (or "a") can be use
 
 When no assignment is defined, this defaults to an AdaptationSet for each stream.
 
-Optional syntax is "id=x,descriptor=descriptor_string,streams=a,b,c id=y,streams=d,e" and so on, descriptor is useful to the scheme defined by ISO/IEC 23009-1:2014/Amd.2:2015.
+Optional syntax is "id=x,seg_duration=x,frag_duration=x,frag_type=type,descriptor=descriptor_string,streams=a,b,c id=y,seg_duration=y,frag_type=type,streams=d,e" and so on,
+descriptor is useful to the scheme defined by ISO/IEC 23009-1:2014/Amd.2:2015.
 For example, -adaptation_sets "id=0,descriptor=<SupplementalProperty schemeIdUri=\"urn:mpeg:dash:srd:2014\" value=\"0,0,0,1,1,2,2\"/>,streams=v".
 Please note that descriptor string should be a self-closing xml tag.
+seg_duration, frag_duration and frag_type override the global option values for each adaptation set.
+For example, -adaptation_sets "id=0,seg_duration=2,frag_duration=1,frag_type=duration,streams=v id=1,seg_duration=2,frag_type=none,streams=a"
+type_id marks an adaptation set as containing streams meant to be used for Trick Mode for the referenced adaptation set.
+For example, -adaptation_sets "id=0,seg_duration=2,frag_type=none,streams=0 id=1,seg_duration=10,frag_type=none,trick_id=0,streams=1"
 @item timeout @var{timeout}
 Set timeout for socket I/O operations. Applicable only for HTTP output.
 @item index_correction @var{index_correction}
@@ -326,8 +333,28 @@ This option will also try to comply with the above open spec, till Apple's spec 
 Applicable only when @var{streaming} and @var{hls_playlist} options are enabled.
 This is an experimental feature.
 
+@item ldash @var{ldash}
+Enable Low-latency Dash by constraining the presence and values of some elements.
+
 @item master_m3u8_publish_rate @var{master_m3u8_publish_rate}
 Publish master playlist repeatedly every after specified number of segment intervals.
+
+@item -write_prft @var{write_prft}
+Write Producer Reference Time elements on supported streams. This also enables writing
+prft boxes in the underlying muxer. Applicable only when the @var{utc_url} option is enabled.
+It's set to auto by default, in which case the muxer will attempt to enable it only in modes
+that require it.
+
+@item -mpd_profile @var{mpd_profile}
+Set one or more manifest profiles.
+
+@item -http_opts @var{http_opts}
+A :-separated list of key=value options to pass to the underlying HTTP
+protocol. Applicable only for HTTP output.
+
+@item -target_latency @var{target_latency}
+Set an intended target latency in seconds (fractional value can be set) for serving. Applicable only when @var{streaming} and @var{write_prft} options are enabled.
+This is an informative fields clients can use to measure the latency of the service.
 
 @end table
 
@@ -1035,6 +1062,21 @@ have and language is named ENG, the other audio language is named CHN.
 
 By default, a single hls variant containing all the encoded streams is created.
 
+@example
+ffmpeg -y -i input_with_subtitle.mkv \
+ -b:v:0 5250k -c:v h264 -pix_fmt yuv420p -profile:v main -level 4.1 \
+ -b:a:0 256k \
+ -c:s webvtt -c:a mp2 -ar 48000 -ac 2 -map 0:v -map 0:a:0 -map 0:s:0 \
+ -f hls -var_stream_map "v:0,a:0,s:0,sgroup:subtitle" \
+ -master_pl_name master.m3u8 -t 300 -hls_time 10 -hls_init_time 4 -hls_list_size \
+ 10 -master_pl_publish_rate 10  -hls_flags \
+ delete_segments+discont_start+split_by_time ./tmp/video.m3u8
+@end example
+
+This example adds @code{#EXT-X-MEDIA} tag with @code{TYPE=SUBTITLES} in
+the master playlist with webvtt subtitle group name 'subtitle'. Please make sure
+the input file has one text subtitle stream at least.
+
 @item cc_stream_map
 Map string which specifies different closed captions groups and their
 attributes. The closed captions stream groups are separated by space.
@@ -1193,6 +1235,11 @@ overwritten with new images. Default value is 0.
 @item strftime
 If set to 1, expand the filename with date and time information from
 @code{strftime()}. Default value is 0.
+
+@item protocol_opts @var{options_list}
+Set protocol options as a :-separated list of key=value parameters. Values
+containing the @code{:} special character must be escaped.
+
 @end table
 
 @subsection Examples
@@ -1233,6 +1280,12 @@ ffmpeg -f v4l2 -r 1 -i /dev/video0 -f image2 -strftime 1 "%Y-%m-%d_%H-%M-%S.jpg"
 You can set the file name with current frame's PTS:
 @example
 ffmpeg -f v4l2 -r 1 -i /dev/video0 -copyts -f image2 -frame_pts true %d.jpg"
+@end example
+
+A more complex example is to publish contents of your desktop directly to a
+WebDAV server every second:
+@example
+ffmpeg -f x11grab -framerate 1 -i :0.0 -q:v 6 -update 1 -protocol_opts method=PUT http://example.com/desktop.jpg
 @end example
 
 @section matroska
@@ -1314,8 +1367,9 @@ index at the beginning of the file.
 
 If this option is set to a non-zero value, the muxer will reserve a given amount
 of space in the file header and then try to write the cues there when the muxing
-finishes. If the available space does not suffice, muxing will fail. A safe size
-for most use cases should be about 50kB per hour of video.
+finishes. If the reserved space does not suffice, no Cues will be written, the
+file will be finalized and writing the trailer will return an error.
+A safe size for most use cases should be about 50kB per hour of video.
 
 Note that cues are only written if the output is seekable and this option will
 have no effect if it is not.
@@ -1466,13 +1520,6 @@ Smooth Streaming content can be pushed in real time to a publishing
 point on IIS with this muxer. Example:
 @example
 ffmpeg -re @var{<normal input/transcoding options>} -movflags isml+frag_keyframe -f ismv http://server/publishingpoint.isml/Streams(Encoder1)
-@end example
-
-@subsection Audible AAX
-
-Audible AAX files are encrypted M4B files, and they can be decrypted by specifying a 4 byte activation secret.
-@example
-ffmpeg -activation_bytes 1CEB00DA -i test.aax -vn -c:a copy output.mp4
 @end example
 
 @section mp3

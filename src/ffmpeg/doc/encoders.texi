@@ -1508,6 +1508,15 @@ Complexity-based.
 Cyclic refresh.
 @end table
 
+@item tune (@emph{tune})
+Set the distortion metric the encoder is tuned with. Default is @code{psnr}.
+
+@table @samp
+@item psnr (@emph{0})
+
+@item ssim (@emph{1})
+@end table
+
 @item lag-in-frames
 Set the maximum number of frames which the encoder may keep in flight
 at any one time for lookahead purposes.  Defaults to the internal
@@ -1586,6 +1595,9 @@ Enable row based multi-threading. Disabled by default.
 @item enable-cdef (@emph{boolean})
 Enable Constrained Directional Enhancement Filter. The libaom-av1
 encoder enables CDEF by default.
+
+@item enable-restoration (@emph{boolean})
+Enable Loop Restoration Filter. Default is true for libaom-av1.
 
 @item enable-global-motion (@emph{boolean})
 Enable the use of global motion for block prediction. Default is true.
@@ -1885,8 +1897,6 @@ Enable error resiliency features.
 Increase sharpness at the expense of lower PSNR.
 The valid range is [0, 7].
 
-@item VP8-specific options
-@table @option
 @item ts-parameters
 Sets the temporal scalability configuration using a :-separated list of
 key=value pairs. For example, to specify temporal scalability parameters
@@ -1894,7 +1904,7 @@ with @code{ffmpeg}:
 @example
 ffmpeg -i INPUT -c:v libvpx -ts-parameters ts_number_layers=3:\
 ts_target_bitrate=250,500,1000:ts_rate_decimator=4,2,1:\
-ts_periodicity=4:ts_layer_id=0,2,1,2 OUTPUT
+ts_periodicity=4:ts_layer_id=0,2,1,2:ts_layering_mode=3 OUTPUT
 @end example
 Below is a brief explanation of each of the parameters, please
 refer to @code{struct vpx_codec_enc_cfg} in @code{vpx/vpx_encoder.h} for more
@@ -1911,6 +1921,30 @@ Frame rate decimation factor for each temporal layer.
 Length of the sequence defining frame temporal layer membership.
 @item ts_layer_id
 Template defining the membership of frames to temporal layers.
+@item ts_layering_mode
+(optional) Selecting the temporal structure from a set of pre-defined temporal layering modes.
+Currently supports the following options.
+@table @option
+@item 0
+No temporal layering flags are provided internally,
+relies on flags being passed in using @code{metadata} field in @code{AVFrame}
+with following keys.
+@table @option
+@item vp8-flags
+Sets the flags passed into the encoder to indicate the referencing scheme for
+the current frame.
+Refer to function @code{vpx_codec_encode} in @code{vpx/vpx_encoder.h} for more
+details.
+@item temporal_id
+Explicitly sets the temporal id of the current frame to encode.
+@end table
+@item 2
+Two temporal layers. 0-1...
+@item 3
+Three temporal layers. 0-2-1-2...; with single reference frame.
+@item 4
+Same as option "3", except there is a dependency between
+the two temporal layer 2 frames within the temporal period.
 @end table
 @end table
 
@@ -3196,6 +3230,14 @@ and they can also be used in Matroska files.
 @subsection Options
 
 @table @option
+@item palette
+Specify the global palette used by the bitmaps.
+
+The format for this option is a string containing 16 24-bits hexadecimal
+numbers (without 0x prefix) separated by commas, for example @code{0d00ee,
+ee450d, 101010, eaeaea, 0ce60b, ec14ed, ebff0b, 0d617a, 7b7b7b, d1d1d1,
+7b2a0e, 0d950c, 0f007b, cf0dec, cfa80c, 7c127b}.
+
 @item even_rows_fix
 When set to 1, enable a work-around that makes the number of pixel rows
 even in all subtitles.  This fixes a problem with some players that

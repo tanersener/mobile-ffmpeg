@@ -3,7 +3,7 @@ dnl  Process this file with autoconf to produce a configure script.
 
 define(GMP_COPYRIGHT,[[
 
-Copyright 1996-2016 Free Software Foundation, Inc.
+Copyright 1996-2020 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -47,6 +47,7 @@ m4_pattern_allow(GMP_NAIL_BITS)
 m4_pattern_allow(GMP_NUMB_BITS)
 m4_pattern_allow(GMP_NONSTD_ABI)
 m4_pattern_allow(GMP_CPU_TYPE)
+m4_pattern_allow(GMP_AVX_NOT_REALLY_AVAILABLE)
 
 # If --target is not used then $target_alias is empty, but if say
 # "./configure athlon-pc-freebsd3.5" is used, then all three of
@@ -77,7 +78,7 @@ dnl
 dnl  Note that there's a copy of these options in the top-level Makefile.am,
 dnl  so update there too if changing anything.
 dnl
-AM_INIT_AUTOMAKE([1.8 gnu no-dependencies])
+AM_INIT_AUTOMAKE([1.8 gnu no-dependencies subdir-objects])
 AC_CONFIG_HEADERS(config.h:config.in)
 AM_MAINTAINER_MODE
 
@@ -321,6 +322,26 @@ AH_VERBATIM([HAVE_HOST_CPU_1],
 #undef HAVE_HOST_CPU_pentiumpro
 #undef HAVE_HOST_CPU_pentium2
 #undef HAVE_HOST_CPU_pentium3
+#undef HAVE_HOST_CPU_pentium4
+#undef HAVE_HOST_CPU_core2
+#undef HAVE_HOST_CPU_nehalem
+#undef HAVE_HOST_CPU_westmere
+#undef HAVE_HOST_CPU_sandybridge
+#undef HAVE_HOST_CPU_ivybridge
+#undef HAVE_HOST_CPU_haswell
+#undef HAVE_HOST_CPU_broadwell
+#undef HAVE_HOST_CPU_skylake
+#undef HAVE_HOST_CPU_silvermont
+#undef HAVE_HOST_CPU_goldmont
+#undef HAVE_HOST_CPU_k8
+#undef HAVE_HOST_CPU_k10
+#undef HAVE_HOST_CPU_bulldozer
+#undef HAVE_HOST_CPU_piledriver
+#undef HAVE_HOST_CPU_steamroller
+#undef HAVE_HOST_CPU_excavator
+#undef HAVE_HOST_CPU_zen
+#undef HAVE_HOST_CPU_bobcat
+#undef HAVE_HOST_CPU_jaguar
 #undef HAVE_HOST_CPU_s390_z900
 #undef HAVE_HOST_CPU_s390_z990
 #undef HAVE_HOST_CPU_s390_z9
@@ -601,8 +622,8 @@ case $host in
     CALLING_CONVENTIONS_OBJS='arm32call.lo arm32check.lo'
     CALLING_CONVENTIONS_OBJS_64=""
     cclist_64="gcc cc"
-    any_32_testlist="sizeof-long-4"
-    any_64_testlist="sizeof-long-8"
+    any_32_testlist="sizeof-void*-4"
+    any_64_testlist="sizeof-void*-8"
 
     # This is needed for clang, which is not content with flags like -mfpu=neon
     # alone.
@@ -611,6 +632,8 @@ case $host in
         gcc_cflags_fpmode="-mfloat-abi=softfp" ;;
       *-*-*eabihf)
         gcc_cflags_fpmode="-mfloat-abi=hard" ;;
+      *-*-mingw*)
+        limb_64=longlong ;;
     esac
 
     # FIXME: We make mandatory compiler options optional here.  We should
@@ -634,24 +657,24 @@ case $host in
 	gcc_cflags_arch="-march=armv6"
 	;;
       armcortexa5 | armv7*)
-	path="arm/v6t2 arm/v6 arm/v5 arm"
+	path="arm/v7a/cora5 arm/v6t2 arm/v6 arm/v5 arm"
 	gcc_cflags_arch="-march=armv7-a"
 	gcc_cflags_tune="-mtune=cortex-a5"
 	;;
       armcortexa5neon)
-	path="arm/neon arm/v6t2 arm/v6 arm/v5 arm"
+	path="arm/neon arm/v7a/cora5 arm/v6t2 arm/v6 arm/v5 arm"
 	gcc_cflags_neon="-mfpu=neon"
 	gcc_cflags_arch="-march=armv7-a"
 	gcc_cflags_tune="-mtune=cortex-a5"
 	;;
       armcortexa7)
 	path="arm/v7a/cora7 arm/v6t2 arm/v6 arm/v5 arm"
-	gcc_cflags_arch="-march=armv7-a"
+	gcc_cflags_arch="-march=armv7ve -march=armv7-a"
 	gcc_cflags_tune="-mtune=cortex-a7"
 	;;
       armcortexa7neon)
 	path="arm/neon arm/v7a/cora7 arm/v6t2 arm/v6 arm/v5 arm"
-	gcc_cflags_arch="-march=armv7-a"
+	gcc_cflags_arch="-march=armv7ve -march=armv7-a"
 	gcc_cflags_neon="-mfpu=neon"
 	gcc_cflags_tune="-mtune=cortex-a7"
 	;;
@@ -679,12 +702,23 @@ case $host in
 	;;
       armcortexa15)
 	path="arm/v7a/cora15 arm/v6t2 arm/v6 arm/v5 arm"
-	gcc_cflags_arch="-march=armv7-a"
+	gcc_cflags_arch="-march=armv7ve -march=armv7-a"
 	gcc_cflags_tune="-mtune=cortex-a15 -mtune=cortex-a9"
 	;;
       armcortexa15neon)
 	path="arm/v7a/cora15/neon arm/neon arm/v7a/cora15 arm/v6t2 arm/v6 arm/v5 arm"
-	gcc_cflags_arch="-march=armv7-a"
+	gcc_cflags_arch="-march=armv7ve -march=armv7-a"
+	gcc_cflags_neon="-mfpu=neon"
+	gcc_cflags_tune="-mtune=cortex-a15 -mtune=cortex-a9"
+	;;
+      armcortexa12 | armcortexa17)
+	path="arm/v7a/cora17 arm/v7a/cora15 arm/v6t2 arm/v6 arm/v5 arm"
+	gcc_cflags_arch="-march=armv7ve -march=armv7-a"
+	gcc_cflags_tune="-mtune=cortex-a15 -mtune=cortex-a9"
+	;;
+      armcortexa12neon | armcortexa17neon)
+	path="arm/v7a/cora17/neon arm/v7a/cora15/neon arm/neon arm/v7a/cora17 arm/v7a/cora15 arm/v6t2 arm/v6 arm/v5 arm"
+	gcc_cflags_arch="-march=armv7ve -march=armv7-a"
 	gcc_cflags_neon="-mfpu=neon"
 	gcc_cflags_tune="-mtune=cortex-a15 -mtune=cortex-a9"
 	;;
@@ -704,13 +738,13 @@ case $host in
 	gcc_cflags_neon="-mfpu=neon"
 	gcc_cflags_tune="-mtune=cortex-a57"
 	;;
-      armcortexa72 | armcortexa72neon)
+      [armcortexa7[2-9] | armcortexa7[2-9]neon])
         abilist="64 32"
 	path="arm/v7a/cora15/neon arm/neon arm/v7a/cora15 arm/v6t2 arm/v6 arm/v5 arm"
-	path_64="arm64/cora72 arm64"
+	path_64="arm64/cora57 arm64"
 	gcc_cflags_arch="-march=armv8-a"
 	gcc_cflags_neon="-mfpu=neon"
-	gcc_cflags_tune="-mtune=cortex-a72"
+	gcc_cflags_tune="-mtune=cortex-a72 -mtune=cortex-a57"
 	;;
       armexynosm1)
         abilist="64 32"
@@ -843,7 +877,6 @@ case $host in
           # systems (GNU/Linux for instance), but lets assume they're ok.
           case $host in
             [*-*-hpux[1-9] | *-*-hpux[1-9].* | *-*-hpux10 | *-*-hpux10.*]) ;;
-	    [*-*-linux*])  abilist="1.0" ;; # due to linux permanent kernel bug
             *)    abilist="2.0w $abilist" ;;
           esac
 
@@ -994,7 +1027,7 @@ case $host in
     GMP_INCLUDE_MPN(mips32/mips-defs.m4)
 
     case $host in
-      [mips64*-*-* | mips*-*-irix[6789]*])
+      [mips64*-*-* | mipsisa64*-*-* | mips*-*-irix[6789]*])
         abilist="n32 64 o32"
 
         cclist_n32="gcc cc"
@@ -1003,7 +1036,6 @@ case $host in
         gcc_n32_cflags_abi="-mabi=n32 -mn32"
         cc_n32_cflags="-O2 -n32"	# no -g, it disables all optimizations
         limb_n32=longlong
-        path_n32="mips64"
 
         cclist_64="gcc cc"
         gcc_64_cflags_optlist="abi"
@@ -1012,7 +1044,18 @@ case $host in
         gcc_64_ldflags="-Wc,-mabi=64"
         cc_64_cflags="-O2 -64"		# no -g, it disables all optimizations
         cc_64_ldflags="-Wc,-64"
-        path_64="mips64"
+
+	case $host_cpu in
+	  [mips64r[6789]* | mipsisa64r[6789]*])
+	    path_n32="mips64/r6 mips64"
+	    path_64="mips64/r6 mips64"
+	    ;;
+	  *)
+	    path_n32="mips64/hilo mips64"
+	    path_64="mips64/hilo mips64"
+	    ;;
+	esac
+
         ;;
     esac
     ;;
@@ -1119,9 +1162,12 @@ case $host in
       power7)	    gcc_cflags_cpu="-mtune=power7 -mtune=power5"
 		    xlc_cflags_arch="-qarch=pwr7 -qarch=pwr5"
 		    cpu_path="p7 p5 p4 p3-p7" ;;
-      [power[89]])  gcc_cflags_cpu="-mtune=power8 -mtune=power7 -mtune=power5"
+      power8)	    gcc_cflags_cpu="-mtune=power8 -mtune=power7 -mtune=power5"
 		    xlc_cflags_arch="-qarch=pwr8 -qarch=pwr7 -qarch=pwr5"
 		    cpu_path="p8 p7 p5 p4 p3-p7" ;;
+      power9)	    gcc_cflags_cpu="-mtune=power9 -mtune=power8 -mtune=power7 -mtune=power5"
+		    xlc_cflags_arch="-qarch=pwr9 -qarch=pwr8 -qarch=pwr7 -qarch=pwr5"
+		    cpu_path="p9 p8 p7 p5 p4 p3-p7" ;;
     esac
 
     case $host in
@@ -1186,18 +1232,18 @@ case $host in
 	    # incompatible with a shared library.
 	    #
 	    abilist="mode64 mode32 $abilist"
-	    gcc_cflags_opt="-O3 -O2 -O1"	# will this become used?
+	    gcc_cflags_opt="-O2 -O1"	# will this become used?
 	    cclist_mode32="gcc"
 	    gcc_mode32_cflags_maybe="-m32"
 	    gcc_mode32_cflags="-mpowerpc64"
 	    gcc_mode32_cflags_optlist="subtype cpu opt"
 	    gcc_mode32_cflags_subtype="-force_cpusubtype_ALL"
-	    gcc_mode32_cflags_opt="-O3 -O2 -O1"
+	    gcc_mode32_cflags_opt="-O2 -O1"
 	    limb_mode32=longlong
 	    cclist_mode64="gcc"
 	    gcc_mode64_cflags="-m64"
 	    gcc_mode64_cflags_optlist="cpu opt"
-	    gcc_mode64_cflags_opt="-O3 -O2 -O1"
+	    gcc_mode64_cflags_opt="-O2 -O1"
 	    path_mode64=""
 	    path_mode32=""
 	    p=""
@@ -1235,12 +1281,12 @@ case $host in
 	    gcc_mode32_cflags_maybe="-m32"
 	    gcc_mode32_cflags="-mpowerpc64"
 	    gcc_mode32_cflags_optlist="cpu opt"
-	    gcc_mode32_cflags_opt="-O3 -O2 -O1"
+	    gcc_mode32_cflags_opt="-O2 -O1"
 	    limb_mode32=longlong
 	    cclist_mode64="gcc gcc64"
 	    gcc_mode64_cflags_maybe="-m64"
 	    gcc_mode64_cflags_optlist="cpu opt"
-	    gcc_mode64_cflags_opt="-O3 -O2 -O1"
+	    gcc_mode64_cflags_opt="-O2 -O1"
 	    path_mode64=""
 	    path_mode32=""
 	    p=""
@@ -1292,6 +1338,13 @@ case $host in
       xlc_cflags="-O2 -qarch=pwr -qmaxmem=20000"
       ;;
     esac
+    ;;
+
+
+  # RISC-V
+  [riscv64-*-*])
+    cclist="gcc"
+    path="riscv/64"
     ;;
 
 
@@ -1540,8 +1593,10 @@ case $host in
 	    path_64="sparc64/ultrasparc34 sparc64/ultrasparc1234 sparc64" ;;
 	  [ultrasparct[12]])
 	    path_64="sparc64/ultrasparct1 sparc64" ;;
-	  [ultrasparct[345]])
+	  [ultrasparct3])
 	    path_64="sparc64/ultrasparct3 sparc64" ;;
+	  [ultrasparct[45]])
+	    path_64="sparc64/ultrasparct45 sparc64/ultrasparct3 sparc64" ;;
 	  *)
 	    path_64="sparc64"
 	esac
@@ -1645,6 +1700,11 @@ case $host in
 
     # Availability of rdtsc is checked at run-time.
     SPEED_CYCLECOUNTER_OBJ=pentium.lo
+
+    # Set to "yes" below on a per-cpu basis. We do that in order to allow for
+    # a relevant warning to be output when using a CPU with mulx on a system
+    # which cannot assemble it.
+    x86_have_mulx=no
 
     # gcc 2.7.2 only knows i386 and i486, using -m386 or -m486.  These
     #     represent -mcpu= since -m486 doesn't generate 486 specific insns.
@@ -1788,14 +1848,14 @@ case $host in
       bobcat)
 	gcc_cflags_cpu="-mtune=btver1 -mtune=amdfam10 -mtune=k8"
 	gcc_cflags_arch="-march=btver1 -march=amdfam10 -march=k8 -march=k8~-mno-sse2"
-	path="x86/bobcat x86/k7/mmx x86/k7 x86/mmx x86"
-	path_64="x86_64/bobcat x86_64/k10 x86_64/k8 x86_64"
+	path="x86/bt1 x86/k7/mmx x86/k7 x86/mmx x86"
+	path_64="x86_64/bt1 x86_64/k10 x86_64/k8 x86_64"
 	;;
       jaguar | jaguarnoavx)
 	gcc_cflags_cpu="-mtune=btver2 -mtune=btver1 -mtune=amdfam10 -mtune=k8"
 	gcc_cflags_arch="-march=btver2 -march=btver1 -march=amdfam10 -march=k8 -march=k8~-mno-sse2"
-	path="x86/jaguar x86/bobcat x86/k7/mmx x86/k7 x86/mmx x86"
-	path_64="x86_64/jaguar x86_64/bobcat x86_64/k10 x86_64/k8 x86_64"
+	path="x86/bt2 x86/bt1 x86/k7/mmx x86/k7 x86/mmx x86"
+	path_64="x86_64/bt2 x86_64/bt1 x86_64/k10 x86_64/k8 x86_64"
 	;;
       bulldozer | bd1 | bulldozernoavx | bd1noavx)
 	gcc_cflags_cpu="-mtune=bdver1 -mtune=amdfam10 -mtune=k8"
@@ -1820,6 +1880,21 @@ case $host in
 	gcc_cflags_arch="-march=bdver4 -march=bdver3 -march=bdver2 -march=bdver1 -march=amdfam10 -march=k8 -march=k8~-mno-sse2"
 	path="x86/bd4 x86/bd3 x86/bd2 x86/bd1 x86/k7/mmx x86/k7 x86/mmx x86"
 	path_64="x86_64/bd4 x86_64/bd3 x86_64/bd2 x86_64/bd1 x86_64/k10 x86_64/k8 x86_64"
+	x86_have_mulx=yes
+	;;
+      zen | zennoavx)
+	gcc_cflags_cpu="-mtune=znver1 -mtune=amdfam10 -mtune=k8"
+	gcc_cflags_arch="-march=znver1 -march=amdfam10 -march=k8"
+	path="x86/k7/mmx x86/k7 x86/mmx x86"
+	x86_have_mulx=yes
+	path_64="x86_64/zen x86_64"
+	;;
+      zen2 | zen2noavx)
+	gcc_cflags_cpu="-mtune=znver2 -mtune=znver1 -mtune=amdfam10 -mtune=k8"
+	gcc_cflags_arch="-march=znver2 -march=znver1 -march=amdfam10 -march=k8"
+	path="x86/k7/mmx x86/k7 x86/mmx x86"
+	x86_have_mulx=yes
+	path_64="x86_64/zen2 x86_64/zen x86_64"
 	;;
       core2)
 	gcc_cflags_cpu="-mtune=core2 -mtune=k8"
@@ -1828,8 +1903,8 @@ case $host in
 	path_64="x86_64/core2 x86_64"
 	;;
       corei | coreinhm | coreiwsm | nehalem | westmere)
-	gcc_cflags_cpu="-mtune=corei7 -mtune=core2 -mtune=k8"
-	gcc_cflags_arch="-march=corei7 -march=core2 -march=core2~-mno-sse2 -march=k8 -march=k8~-mno-sse2"
+	gcc_cflags_cpu="-mtune=nehalem -mtune=corei7 -mtune=core2 -mtune=k8"
+	gcc_cflags_arch="-march=nehalem -march=corei7 -march=core2 -march=core2~-mno-sse2 -march=k8 -march=k8~-mno-sse2"
 	path="x86/coreinhm x86/p6/sse2 x86/p6/p3mmx x86/p6/mmx x86/p6 x86/mmx x86"
 	path_64="x86_64/coreinhm x86_64/core2 x86_64"
 	;;
@@ -1843,23 +1918,26 @@ case $host in
       coreihwl | coreihwlnoavx | haswell | haswellnoavx)
 	gcc_cflags_cpu="-mtune=haswell -mtune=corei7 -mtune=core2 -mtune=k8"
 	gcc_cflags_arch="-march=haswell -march=corei7 -march=core2 -march=core2~-mno-sse2 -march=k8 -march=k8~-mno-sse2"
-	path="x86/coreisbr x86/p6/sse2 x86/p6/p3mmx x86/p6/mmx x86/p6 x86/mmx x86"
+	path="x86/coreihwl x86/coreisbr x86/p6/sse2 x86/p6/p3mmx x86/p6/mmx x86/p6 x86/mmx x86"
 	path_64="x86_64/coreihwl x86_64/coreisbr x86_64/coreinhm x86_64/core2 x86_64"
+	x86_have_mulx=yes
 	;;
       coreibwl | coreibwlnoavx | broadwell | broadwellnoavx)
 	gcc_cflags_cpu="-mtune=broadwell -mtune=corei7 -mtune=core2 -mtune=k8"
 	gcc_cflags_arch="-march=broadwell -march=corei7 -march=core2 -march=core2~-mno-sse2 -march=k8 -march=k8~-mno-sse2"
-	path="x86/coreisbr x86/p6/sse2 x86/p6/p3mmx x86/p6/mmx x86/p6 x86/mmx x86"
+	path="x86/coreihwl x86/coreisbr x86/p6/sse2 x86/p6/p3mmx x86/p6/mmx x86/p6 x86/mmx x86"
 	path_64="x86_64/coreibwl x86_64/coreihwl x86_64/coreisbr x86_64/coreinhm x86_64/core2 x86_64"
 	# extra_functions_64="missing"	 # enable for bmi2/adx simulation
+	x86_have_mulx=yes
 	;;
       skylake | skylakenoavx | kabylake | kabylakenoavx)
 	gcc_cflags_cpu="-mtune=skylake -mtune=broadwell -mtune=corei7 -mtune=core2 -mtune=k8"
 	# Don't pass -march=skylake for now as then some compilers emit AVX512.
 	gcc_cflags_arch="-march=broadwell -march=corei7 -march=core2 -march=core2~-mno-sse2 -march=k8 -march=k8~-mno-sse2"
-	path="x86/coreisbr x86/p6/sse2 x86/p6/p3mmx x86/p6/mmx x86/p6 x86/mmx x86"
+	path="x86/coreihwl x86/coreisbr x86/p6/sse2 x86/p6/p3mmx x86/p6/mmx x86/p6 x86/mmx x86"
 	path_64="x86_64/skylake x86_64/coreibwl x86_64/coreihwl x86_64/coreisbr x86_64/coreinhm x86_64/core2 x86_64"
 	# extra_functions_64="missing"	 # enable for bmi2/adx simulation
+	x86_have_mulx=yes
 	;;
       atom)			# in-order pipeline atom
 	gcc_cflags_cpu="-mtune=atom -mtune=pentium3"
@@ -1867,11 +1945,17 @@ case $host in
 	path="x86/atom/sse2 x86/atom/mmx x86/atom x86/mmx x86"
 	path_64="x86_64/atom x86_64"
 	;;
-      silvermont | goldmont)	# out-of-order pipeline atom
+      silvermont)		# out-of-order pipeline atom
 	gcc_cflags_cpu="-mtune=slm -mtune=atom -mtune=pentium3"
 	gcc_cflags_arch="-march=slm -march=atom -march=pentium3"
-	path="x86/atom/sse2 x86/atom/mmx x86/atom x86/mmx x86"
+	path="x86/silvermont x86/atom/sse2 x86/atom/mmx x86/atom x86/mmx x86"
 	path_64="x86_64/silvermont x86_64/atom x86_64"
+	;;
+      goldmont)			# out-of-order pipeline atom
+	gcc_cflags_cpu="-mtune=slm -mtune=atom -mtune=pentium3"
+	gcc_cflags_arch="-march=slm -march=atom -march=pentium3"
+	path="x86/goldmont x86/atom/sse2 x86/atom/mmx x86/atom x86/mmx x86"
+	path_64="x86_64/goldmont x86_64/silvermont x86_64/atom x86_64"
 	;;
       nano)
 	gcc_cflags_cpu="-mtune=nano"
@@ -1892,7 +1976,9 @@ case $host in
       # unconditionally for NetBSD where they don't work but OSXSAVE is set
       # to claim the contrary.
       *noavx-*-* | *-*-netbsd*)
-	gcc_cflags_noavx="-mno-avx";;
+	gcc_cflags_noavx="-mno-avx"
+	GMP_DEFINE_RAW(["define(<GMP_AVX_NOT_REALLY_AVAILABLE>,1)"])
+	;;
     esac
 
     case $host in
@@ -2194,7 +2280,7 @@ case $host in
 
       fat_functions="add_n addmul_1 bdiv_dbm1c com cnd_add_n cnd_sub_n
 		     copyd copyi dive_1 divrem_1
-		     gcd_1 lshift lshiftc mod_1 mod_1_1 mod_1_1_cps mod_1_2
+		     gcd_11 lshift lshiftc mod_1 mod_1_1 mod_1_1_cps mod_1_2
 		     mod_1_2_cps mod_1_4 mod_1_4_cps mod_34lsub1 mode1o mul_1
 		     mul_basecase mullo_basecase pre_divrem_1 pre_mod_1 redc_1
 		     redc_2 rshift sqr_basecase sub_n submul_1"
@@ -2205,7 +2291,7 @@ case $host in
 	fat_path="x86 x86/fat x86/i486
 		  x86/k6 x86/k6/mmx x86/k6/k62mmx
 		  x86/k7 x86/k7/mmx
-		  x86/k8 x86/k10 x86/bobcat
+		  x86/k8 x86/k10 x86/bt1
 		  x86/pentium x86/pentium/mmx
 		  x86/p6 x86/p6/mmx x86/p6/p3mmx x86/p6/sse2
 		  x86/pentium4 x86/pentium4/mmx x86/pentium4/sse2
@@ -2218,10 +2304,10 @@ case $host in
 	extra_functions_64="$extra_functions_64 fat fat_entry"
 	path_64="x86_64/fat x86_64"
 	fat_path="x86_64 x86_64/fat
-		  x86_64/k8 x86_64/k10 x86_64/bd1 x86_64/bobcat x86_64/pentium4
-		  x86_64/core2 x86_64/coreinhm x86_64/coreisbr x86_64/coreihwl
-		  x86_64/coreibwl x86_64/skylake x86_64/atom x86_64/silvermont
-		  x86_64/nano"
+		  x86_64/k8 x86_64/k10 x86_64/bd1 x86_64/bt1 x86_64/bt2 x86_64/zen
+		  x86_64/pentium4 x86_64/core2 x86_64/coreinhm x86_64/coreisbr
+		  x86_64/coreihwl x86_64/coreibwl x86_64/skylake x86_64/atom
+		  x86_64/silvermont x86_64/goldmont x86_64/nano"
 	fat_functions="$fat_functions addmul_2 addlsh1_n addlsh2_n sublsh1_n"
       fi
 
@@ -2303,12 +2389,12 @@ if test $found_compiler = yes; then
   CC="$cc"
   CFLAGS="$cflags"
   CPPFLAGS="$cppflags"
-  eval GMP_NONSTD_ABI=\"\$GMP_NONSTD_ABI_$ABI\"
 
   # Could easily have this in config.h too, if desired.
   ABI_nodots=`echo $ABI | sed 's/\./_/'`
   GMP_DEFINE_RAW("define_not_for_expansion(\`HAVE_ABI_$ABI_nodots')", POST)
 
+  eval GMP_NONSTD_ABI=\"\$GMP_NONSTD_ABI_$ABI_nodots\"
 
   # GMP_LDFLAGS substitution, selected according to ABI.
   # These are needed on libgmp.la and libmp.la, but currently not on
@@ -2383,9 +2469,12 @@ AC_SUBST(DEFN_LONG_LONG_LIMB)
 
 # The C compiler and preprocessor, put into ANSI mode if possible.
 AC_PROG_CC
-AC_PROG_CC_STDC
+AC_PROG_CC_C99
 AC_PROG_CPP
 
+#if test "$ac_cv_prog_cc_c99" = no; then
+#  AC_MSG_ERROR([Cannot find a C99 capable compiler])
+#fi
 
 # The C compiler on the build system, and associated tests.
 GMP_PROG_CC_FOR_BUILD
@@ -2511,12 +2600,6 @@ case $host in
         *sse2*)  GMP_ASM_X86_SSE2( , [GMP_STRIP_PATH(sse2)]) ;;
       esac
     fi
-    case "$path $fat_path" in
-      *mulx*)  GMP_ASM_X86_MULX( , [GMP_STRIP_PATH(mulx)]) ;;
-    esac
-    case "$path $fat_path" in
-      *adx*)   GMP_ASM_X86_ADX( , [GMP_STRIP_PATH(adx)]) ;;
-    esac
     ;;
 esac
 
@@ -2912,15 +2995,15 @@ gmp_mpn_functions="$extra_functions					   \
   mul_1 addmul_1 submul_1						   \
   add_err1_n add_err2_n add_err3_n sub_err1_n sub_err2_n sub_err3_n	   \
   lshift rshift dive_1 diveby3 divis divrem divrem_1 divrem_2		   \
-  fib2_ui mod_1 mod_34lsub1 mode1o pre_divrem_1 pre_mod_1 dump		   \
+  fib2_ui fib2m mod_1 mod_34lsub1 mode1o pre_divrem_1 pre_mod_1 dump	   \
   mod_1_1 mod_1_2 mod_1_3 mod_1_4 lshiftc				   \
   mul mul_fft mul_n sqr mul_basecase sqr_basecase nussbaumer_mul	   \
   mulmid_basecase toom42_mulmid mulmid_n mulmid				   \
   random random2 pow_1							   \
-  rootrem sqrtrem sizeinbase get_str set_str				   \
+  rootrem sqrtrem sizeinbase get_str set_str compute_powtab		   \
   scan0 scan1 popcount hamdist cmp zero_p				   \
-  perfsqr perfpow							   \
-  gcd_1 gcd gcdext_1 gcdext gcd_subdiv_step				   \
+  perfsqr perfpow strongfibo						   \
+  gcd_11 gcd_22 gcd_1 gcd gcdext_1 gcdext gcd_subdiv_step		   \
   gcdext_lehmer								   \
   div_q tdiv_qr jacbase jacobi_2 jacobi get_d				   \
   matrix22_mul matrix22_mul1_inverse_vector				   \
@@ -2944,7 +3027,7 @@ gmp_mpn_functions="$extra_functions					   \
   dcpi1_div_q dcpi1_div_qr dcpi1_divappr_q				   \
   mu_div_qr mu_divappr_q mu_div_q					   \
   bdiv_q_1								   \
-  sbpi1_bdiv_q sbpi1_bdiv_qr						   \
+  sbpi1_bdiv_q sbpi1_bdiv_qr sbpi1_bdiv_r				   \
   dcpi1_bdiv_q dcpi1_bdiv_qr						   \
   mu_bdiv_q mu_bdiv_qr							   \
   bdiv_q bdiv_qr broot brootinv bsqrt bsqrtinv				   \
@@ -3509,6 +3592,8 @@ AH_VERBATIM([HAVE_NATIVE],
 #undef HAVE_NATIVE_mpn_divrem_1c
 #undef HAVE_NATIVE_mpn_divrem_2
 #undef HAVE_NATIVE_mpn_gcd_1
+#undef HAVE_NATIVE_mpn_gcd_11
+#undef HAVE_NATIVE_mpn_gcd_22
 #undef HAVE_NATIVE_mpn_hamdist
 #undef HAVE_NATIVE_mpn_invert_limb
 #undef HAVE_NATIVE_mpn_ior_n
@@ -3551,6 +3636,7 @@ AH_VERBATIM([HAVE_NATIVE],
 #undef HAVE_NATIVE_mpn_rsh1sub_n
 #undef HAVE_NATIVE_mpn_rsh1sub_nc
 #undef HAVE_NATIVE_mpn_rshift
+#undef HAVE_NATIVE_mpn_sbpi1_bdiv_r
 #undef HAVE_NATIVE_mpn_sqr_basecase
 #undef HAVE_NATIVE_mpn_sqr_diagonal
 #undef HAVE_NATIVE_mpn_sqr_diag_addlsh1
@@ -3632,6 +3718,13 @@ if test "$gmp_asm_syntax_testing" != no; then
       GMP_ASM_POWERPC_R_REGISTERS
       GMP_INCLUDE_MPN(powerpc32/powerpc-defs.m4)
 
+      # Check for Linux ELFv1 ABI
+      AC_EGREP_CPP(yes,
+[#if _CALL_ELF == 1
+yes
+#endif],
+      [GMP_DEFINE_RAW(["define(<ELFv1_ABI>)"])])
+
       # Check for Linux ELFv2 ABI
       AC_EGREP_CPP(yes,
 [#if _CALL_ELF == 2
@@ -3678,6 +3771,9 @@ yes
       ;;
     X86_PATTERN | X86_64_PATTERN)
       GMP_ASM_ALIGN_FILL_0x90
+      if test "$x86_have_mulx" = yes; then
+        GMP_ASM_X86_MULX
+      fi
       case $ABI in
         32)
           GMP_INCLUDE_MPN(x86/x86-defs.m4)
@@ -3752,7 +3848,7 @@ AC_DEFINE_UNQUOTED(GMP_MPARAM_H_SUGGEST, "$gmp_mparam_source",
 #
 if test -z "$fat_path"; then
   for i in SQR_TOOM2_THRESHOLD BMOD_1_TO_MOD_1_THRESHOLD SHLD_SLOW SHRD_SLOW; do
-    value=`sed -n 's/^#define '$i'[ 	]*\([0-9][0-9]*\).*$/\1/p' $gmp_mparam_source`
+    value=`sed -n 's/^#define '$i'[ 	]*\([0-9A-Z][0-9A-Z_]*\).*$/\1/p' $gmp_mparam_source`
     if test -n "$value"; then
       GMP_DEFINE_RAW(["define(<$i>,<$value>)"])
     fi
@@ -3891,15 +3987,7 @@ fi
 AC_PROG_YACC
 AM_PROG_LEX
 
-# Configs for demos/expr directory
-#
-# Libtool already runs an AC_CHECK_TOOL for ranlib, but we give
-# AC_PROG_RANLIB anyway since automake is supposed to complain if it's not
-# called.  (Automake 1.8.4 doesn't, at least not when the only library is in
-# an EXTRA_LIBRARIES.)
-#
-AC_PROG_RANLIB
-
+LT_INIT
 
 # Create config.m4.
 GMP_FINISH
@@ -3917,7 +4005,7 @@ AC_OUTPUT(Makefile							\
   tests/cxx/Makefile							\
   doc/Makefile tune/Makefile						\
   demos/Makefile demos/calc/Makefile demos/expr/Makefile		\
-  gmp.h:gmp-h.in)
+  gmp.h:gmp-h.in gmp.pc:gmp.pc.in gmpxx.pc:gmpxx.pc.in)
 
 AC_MSG_NOTICE([summary of build options:
 
@@ -3929,15 +4017,3 @@ AC_MSG_NOTICE([summary of build options:
   Static libraries:  ${enable_static}
   Shared libraries:  ${enable_shared}
 ])
-
-if test x$cross_compiling = xyes ; then
-   case "$host" in
-     *-*-mingw* | *-*-cygwin)
-     if test x$ABI = x64 ; then
-	AC_MSG_NOTICE([If wine64 is installed, use make check TESTS_ENVIRONMENT=wine64.])
-     else
-	AC_MSG_NOTICE([If wine is installed, use make check TESTS_ENVIRONMENT=wine.])
-     fi
-     ;;
-   esac
-fi

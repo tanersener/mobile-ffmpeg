@@ -1,6 +1,6 @@
 /* mpq_set_str -- string to mpq conversion.
 
-Copyright 2001, 2002 Free Software Foundation, Inc.
+Copyright 2001, 2002, 2015, 2018 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -30,7 +30,6 @@ see https://www.gnu.org/licenses/.  */
 
 #include <stdio.h>
 #include <string.h>
-#include "gmp.h"
 #include "gmp-impl.h"
 
 
@@ -50,7 +49,7 @@ mpq_set_str (mpq_ptr q, const char *str, int base)
   if (slash == NULL)
     {
       SIZ(DEN(q)) = 1;
-      PTR(DEN(q))[0] = 1;
+      MPZ_NEWALLOC (DEN(q), 1)[0] = 1;
 
       return mpz_set_str (mpq_numref(q), str, base);
     }
@@ -60,7 +59,7 @@ mpq_set_str (mpq_ptr q, const char *str, int base)
   memcpy (num, str, numlen);
   num[numlen] = '\0';
   ret = mpz_set_str (mpq_numref(q), num, base);
-  (*__gmp_free_func) (num, numlen+1);
+  __GMP_FREE_FUNC_TYPE (num, numlen+1, char);
 
   if (ret != 0)
     return ret;

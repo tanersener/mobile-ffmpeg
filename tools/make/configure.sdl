@@ -24540,7 +24540,7 @@ $as_echo "#define SDL_VIDEO_RENDER_OGL_ES2 1" >>confdefs.h
             EXTRA_LDFLAGS="$EXTRA_LDFLAGS -Wl,-framework,Metal"
         fi
         ;;
-    *-*-darwin* )
+    *-*-darwin*)
         # This could be either full "Mac OS X", or plain "Darwin" which is
         # just the OS X kernel sans upper layers like Carbon and Cocoa.
         # Next line is broken, and a few files below require Mac OS X (full)
@@ -24626,6 +24626,98 @@ $as_echo "#define SDL_TIMER_UNIX 1" >>confdefs.h
         EXTRA_LDFLAGS="$EXTRA_LDFLAGS -Wl,-framework,CoreVideo"
         EXTRA_LDFLAGS="$EXTRA_LDFLAGS -Wl,-framework,Cocoa"
         EXTRA_LDFLAGS="$EXTRA_LDFLAGS -Wl,-framework,Carbon"
+        EXTRA_LDFLAGS="$EXTRA_LDFLAGS -Wl,-framework,IOKit"
+
+        if test x$enable_render = xyes -a x$enable_render_metal = xyes; then
+            EXTRA_LDFLAGS="$EXTRA_LDFLAGS -Wl,-weak_framework,QuartzCore -Wl,-weak_framework,Metal"
+        fi
+        ;;
+    *-macosx)
+        # This could be either full "Mac OS X", or plain "Darwin" which is
+        # just the OS X kernel sans upper layers like Carbon and Cocoa.
+        # Next line is broken, and a few files below require Mac OS X (full)
+        ARCH=macosx
+
+        # Mac OS X builds with both the Carbon and OSX APIs at the moment
+        EXTRA_CFLAGS="$EXTRA_CFLAGS -DTARGET_API_MAC_CARBON"
+        EXTRA_CFLAGS="$EXTRA_CFLAGS -DTARGET_API_MAC_OSX"
+
+        CheckVisibilityHidden
+        CheckDeclarationAfterStatement
+        CheckDummyVideo
+        CheckDiskAudio
+        CheckDummyAudio
+        CheckDLOPEN
+        CheckCOCOA
+        CheckMETAL
+        CheckX11
+        CheckMacGL
+        CheckOpenGLX11
+        CheckVulkan
+        CheckPTHREAD
+
+        # Set up files for the audio library
+        if test x$enable_audio = xyes; then
+
+$as_echo "#define SDL_AUDIO_DRIVER_COREAUDIO 1" >>confdefs.h
+
+            SOURCES="$SOURCES $srcdir/src/audio/coreaudio/*.m"
+            EXTRA_LDFLAGS="$EXTRA_LDFLAGS -Wl,-framework,CoreAudio -Wl,-framework,AudioToolbox"
+            SUMMARY_audio="${SUMMARY_audio} coreaudio"
+            have_audio=yes
+        fi
+        # Set up files for the joystick library
+        if test x$enable_joystick = xyes; then
+
+$as_echo "#define SDL_JOYSTICK_IOKIT 1" >>confdefs.h
+
+            SOURCES="$SOURCES $srcdir/src/joystick/darwin/*.c"
+            have_joystick=yes
+        fi
+        # Set up files for the haptic library
+        if test x$enable_haptic = xyes; then
+
+$as_echo "#define SDL_HAPTIC_IOKIT 1" >>confdefs.h
+
+            SOURCES="$SOURCES $srcdir/src/haptic/darwin/*.c"
+            EXTRA_LDFLAGS="$EXTRA_LDFLAGS -Wl,-framework,ForceFeedback"
+            have_haptic=yes
+        fi
+        # Set up files for the power library
+        if test x$enable_power = xyes; then
+
+$as_echo "#define SDL_POWER_MACOSX 1" >>confdefs.h
+
+            SOURCES="$SOURCES $srcdir/src/power/macosx/*.c"
+            have_power=yes
+        fi
+        # Set up files for the filesystem library
+        if test x$enable_filesystem = xyes; then
+
+$as_echo "#define SDL_FILESYSTEM_COCOA 1" >>confdefs.h
+
+            SOURCES="$SOURCES $srcdir/src/filesystem/cocoa/*.m"
+            have_filesystem=yes
+        fi
+        # Set up files for the timer library
+        if test x$enable_timers = xyes; then
+
+$as_echo "#define SDL_TIMER_UNIX 1" >>confdefs.h
+
+            SOURCES="$SOURCES $srcdir/src/timer/unix/*.c"
+            have_timers=yes
+        fi
+        # Set up additional files for the file library
+        if test x$enable_file = xyes; then
+            SOURCES="$SOURCES $srcdir/src/file/cocoa/*.m"
+        fi
+        # Set up other core UNIX files
+        SOURCES="$SOURCES $srcdir/src/core/unix/*.c"
+        # The Mac OS X platform requires special setup.
+        EXTRA_LDFLAGS="$EXTRA_LDFLAGS -lobjc"
+        EXTRA_LDFLAGS="$EXTRA_LDFLAGS -Wl,-framework,CoreVideo"
+        EXTRA_LDFLAGS="$EXTRA_LDFLAGS -Wl,-framework,AVFoundation"
+        EXTRA_LDFLAGS="$EXTRA_LDFLAGS -Wl,-framework,Foundation"
         EXTRA_LDFLAGS="$EXTRA_LDFLAGS -Wl,-framework,IOKit"
 
         if test x$enable_render = xyes -a x$enable_render_metal = xyes; then

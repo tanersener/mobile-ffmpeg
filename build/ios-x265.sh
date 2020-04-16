@@ -27,12 +27,12 @@ else
     . ${BASEDIR}/build/ios-common.sh
 fi
 
-# PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
+# PREPARE PATHS & DEFINE ${INSTALL_PKG_CONFIG_DIR}
 LIB_NAME="x265"
 set_toolchain_clang_paths ${LIB_NAME}
 
 # PREPARING FLAGS
-TARGET_HOST=$(get_target_host)
+BUILD_HOST=$(get_build_host)
 CFLAGS=$(get_cflags ${LIB_NAME})
 CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 LDFLAGS=$(get_ldflags ${LIB_NAME})
@@ -46,16 +46,19 @@ if [[ ${DOWNLOAD_RESULT} -ne 0 ]]; then
 fi
 cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
-ASM_OPTIONS=""
+ARCH_OPTIONS=""
 case ${ARCH} in
     armv7 | armv7s)
-        ASM_OPTIONS="-DENABLE_ASSEMBLY=1 -DCROSS_COMPILE_ARM=1"
+        ARCH_OPTIONS="-DENABLE_ASSEMBLY=1 -DCROSS_COMPILE_ARM=1"
     ;;
     arm64 | arm64e)
-        ASM_OPTIONS="-DENABLE_ASSEMBLY=0 -DCROSS_COMPILE_ARM=1"
+        ARCH_OPTIONS="-DENABLE_ASSEMBLY=0 -DCROSS_COMPILE_ARM=1"
+    ;;
+    x86-64-mac-catalyst)
+        ARCH_OPTIONS="-DENABLE_ASSEMBLY=0 -DCROSS_COMPILE_ARM=0"
     ;;
     *)
-        ASM_OPTIONS="-DENABLE_ASSEMBLY=1 -DCROSS_COMPILE_ARM=0"
+        ARCH_OPTIONS="-DENABLE_ASSEMBLY=1 -DCROSS_COMPILE_ARM=0"
     ;;
 esac
 
@@ -123,7 +126,7 @@ cmake -Wno-dev \
     -DSTATIC_LINK_CRT=1 \
     -DENABLE_PIC=1 \
     -DENABLE_CLI=0 \
-    ${ASM_OPTIONS} \
+    ${ARCH_OPTIONS} \
     -DCMAKE_SYSTEM_PROCESSOR=$(get_target_arch) \
     -DENABLE_SHARED=0 ../source || exit 1
 

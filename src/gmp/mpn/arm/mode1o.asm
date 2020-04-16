@@ -88,5 +88,5 @@ L(end):	sbcs	cy, r5, cy
 	addcc	r0, r0, #1
 
 	ldmfd	sp!, {r4, r5}
-	ret	r14
+	return	r14
 EPILOGUE()

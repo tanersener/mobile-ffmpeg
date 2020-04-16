@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-# Copyright 2000-2002 Free Software Foundation, Inc.
+# Copyright 2000-2002, 2018 Free Software Foundation, Inc.
 #
 # This file is part of the GNU MP Library test suite.
 #
@@ -106,7 +106,9 @@ build_triplet = @build@
 host_triplet = @host@
 EXTRA_PROGRAMS = aors_n$(EXEEXT) anymul_1$(EXEEXT) copy$(EXEEXT) \
 	divmod_1$(EXEEXT) divrem$(EXEEXT) shift$(EXEEXT) \
-	logops_n$(EXEEXT) tst-addsub$(EXEEXT) try$(EXEEXT)
+	logops_n$(EXEEXT) sqrtrem_1_2$(EXEEXT) primes$(EXEEXT) \
+	tst-addsub$(EXEEXT) try$(EXEEXT) addmul_N$(EXEEXT) \
+	mul_N$(EXEEXT) cnd_aors_n$(EXEEXT)
 subdir = tests/devel
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
@@ -118,19 +120,29 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
-anymul_1_SOURCES = anymul_1.c
-anymul_1_OBJECTS = anymul_1.$(OBJEXT)
-anymul_1_LDADD = $(LDADD)
-anymul_1_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
+addmul_N_SOURCES = addmul_N.c
+addmul_N_OBJECTS = addmul_N.$(OBJEXT)
+addmul_N_LDADD = $(LDADD)
+addmul_N_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
 	$(top_builddir)/libgmp.la
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
+anymul_1_SOURCES = anymul_1.c
+anymul_1_OBJECTS = anymul_1.$(OBJEXT)
+anymul_1_LDADD = $(LDADD)
+anymul_1_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
+	$(top_builddir)/libgmp.la
 aors_n_SOURCES = aors_n.c
 aors_n_OBJECTS = aors_n.$(OBJEXT)
 aors_n_LDADD = $(LDADD)
 aors_n_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
+	$(top_builddir)/libgmp.la
+cnd_aors_n_SOURCES = cnd_aors_n.c
+cnd_aors_n_OBJECTS = cnd_aors_n.$(OBJEXT)
+cnd_aors_n_LDADD = $(LDADD)
+cnd_aors_n_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
 	$(top_builddir)/libgmp.la
 copy_SOURCES = copy.c
 copy_OBJECTS = copy.$(OBJEXT)
@@ -152,10 +164,25 @@ logops_n_OBJECTS = logops_n.$(OBJEXT)
 logops_n_LDADD = $(LDADD)
 logops_n_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
 	$(top_builddir)/libgmp.la
+mul_N_SOURCES = mul_N.c
+mul_N_OBJECTS = mul_N.$(OBJEXT)
+mul_N_LDADD = $(LDADD)
+mul_N_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
+	$(top_builddir)/libgmp.la
+primes_SOURCES = primes.c
+primes_OBJECTS = primes.$(OBJEXT)
+primes_LDADD = $(LDADD)
+primes_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
+	$(top_builddir)/libgmp.la
 shift_SOURCES = shift.c
 shift_OBJECTS = shift.$(OBJEXT)
 shift_LDADD = $(LDADD)
 shift_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
+	$(top_builddir)/libgmp.la
+sqrtrem_1_2_SOURCES = sqrtrem_1_2.c
+sqrtrem_1_2_OBJECTS = sqrtrem_1_2.$(OBJEXT)
+sqrtrem_1_2_LDADD = $(LDADD)
+sqrtrem_1_2_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
 	$(top_builddir)/libgmp.la
 try_SOURCES = try.c
 try_OBJECTS = try.$(OBJEXT)
@@ -200,10 +227,12 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = anymul_1.c aors_n.c copy.c divmod_1.c divrem.c logops_n.c \
-	shift.c try.c tst-addsub.c
-DIST_SOURCES = anymul_1.c aors_n.c copy.c divmod_1.c divrem.c \
-	logops_n.c shift.c try.c tst-addsub.c
+SOURCES = addmul_N.c anymul_1.c aors_n.c cnd_aors_n.c copy.c \
+	divmod_1.c divrem.c logops_n.c mul_N.c primes.c shift.c \
+	sqrtrem_1_2.c try.c tst-addsub.c
+DIST_SOURCES = addmul_N.c anymul_1.c aors_n.c cnd_aors_n.c copy.c \
+	divmod_1.c divrem.c logops_n.c mul_N.c primes.c shift.c \
+	sqrtrem_1_2.c try.c tst-addsub.c
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -392,6 +421,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CPPFLAGS = -I$(top_srcdir) -I$(top_srcdir)/tests
+AM_LDFLAGS = -no-install
 LDADD = $(top_builddir)/tests/libtests.la $(top_builddir)/libgmp.la
 CLEANFILES = $(EXTRA_PROGRAMS)
 all: all-am
@@ -428,6 +458,10 @@ $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
 
+addmul_N$(EXEEXT): $(addmul_N_OBJECTS) $(addmul_N_DEPENDENCIES) $(EXTRA_addmul_N_DEPENDENCIES) 
+	@rm -f addmul_N$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(addmul_N_OBJECTS) $(addmul_N_LDADD) $(LIBS)
+
 anymul_1$(EXEEXT): $(anymul_1_OBJECTS) $(anymul_1_DEPENDENCIES) $(EXTRA_anymul_1_DEPENDENCIES) 
 	@rm -f anymul_1$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(anymul_1_OBJECTS) $(anymul_1_LDADD) $(LIBS)
@@ -435,6 +469,10 @@ anymul_1$(EXEEXT): $(anymul_1_OBJECTS) $(anymul_1_DEPENDENCIES) $(EXTRA_anymul_1
 aors_n$(EXEEXT): $(aors_n_OBJECTS) $(aors_n_DEPENDENCIES) $(EXTRA_aors_n_DEPENDENCIES) 
 	@rm -f aors_n$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(aors_n_OBJECTS) $(aors_n_LDADD) $(LIBS)
+
+cnd_aors_n$(EXEEXT): $(cnd_aors_n_OBJECTS) $(cnd_aors_n_DEPENDENCIES) $(EXTRA_cnd_aors_n_DEPENDENCIES) 
+	@rm -f cnd_aors_n$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(cnd_aors_n_OBJECTS) $(cnd_aors_n_LDADD) $(LIBS)
 
 copy$(EXEEXT): $(copy_OBJECTS) $(copy_DEPENDENCIES) $(EXTRA_copy_DEPENDENCIES) 
 	@rm -f copy$(EXEEXT)
@@ -452,9 +490,21 @@ logops_n$(EXEEXT): $(logops_n_OBJECTS) $(logops_n_DEPENDENCIES) $(EXTRA_logops_n
 	@rm -f logops_n$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(logops_n_OBJECTS) $(logops_n_LDADD) $(LIBS)
 
+mul_N$(EXEEXT): $(mul_N_OBJECTS) $(mul_N_DEPENDENCIES) $(EXTRA_mul_N_DEPENDENCIES) 
+	@rm -f mul_N$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(mul_N_OBJECTS) $(mul_N_LDADD) $(LIBS)
+
+primes$(EXEEXT): $(primes_OBJECTS) $(primes_DEPENDENCIES) $(EXTRA_primes_DEPENDENCIES) 
+	@rm -f primes$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(primes_OBJECTS) $(primes_LDADD) $(LIBS)
+
 shift$(EXEEXT): $(shift_OBJECTS) $(shift_DEPENDENCIES) $(EXTRA_shift_DEPENDENCIES) 
 	@rm -f shift$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(shift_OBJECTS) $(shift_LDADD) $(LIBS)
+
+sqrtrem_1_2$(EXEEXT): $(sqrtrem_1_2_OBJECTS) $(sqrtrem_1_2_DEPENDENCIES) $(EXTRA_sqrtrem_1_2_DEPENDENCIES) 
+	@rm -f sqrtrem_1_2$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(sqrtrem_1_2_OBJECTS) $(sqrtrem_1_2_LDADD) $(LIBS)
 
 try$(EXEEXT): $(try_OBJECTS) $(try_DEPENDENCIES) $(EXTRA_try_DEPENDENCIES) 
 	@rm -f try$(EXEEXT)

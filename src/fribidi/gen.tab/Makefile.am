@@ -26,6 +26,7 @@ gen_brackets_type_tab_CPPFLAGS = $(AM_CPPFLAGS)
 CFLAGS_FOR_BUILD += -DHAVE_CONFIG_H -I$(top_builddir) -I$(top_builddir)/lib -I$(top_srcdir)/lib
 CC = $(CC_FOR_BUILD)
 CFLAGS = $(CFLAGS_FOR_BUILD)
+LDFLAGS = $(LDFLAGS_FOR_BUILD)
 
 CLEANFILES = $(EXTRA_PROGRAMS)
 DISTCLEANFILES =

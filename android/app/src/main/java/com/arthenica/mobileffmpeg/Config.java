@@ -85,7 +85,7 @@ public class Config {
         /* LOAD NOT-LOADED LIBRARIES ON API < 21 */
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             final List<String> externalLibrariesEnabled = getExternalLibraries();
-            if (externalLibrariesEnabled.contains("tesseract") || externalLibrariesEnabled.contains("x265") || externalLibrariesEnabled.contains("snappy") || externalLibrariesEnabled.contains("openh264")) {
+            if (externalLibrariesEnabled.contains("tesseract") || externalLibrariesEnabled.contains("x265") || externalLibrariesEnabled.contains("snappy") || externalLibrariesEnabled.contains("openh264") || externalLibrariesEnabled.contains("rubberband")) {
                 // libc++_shared.so included only when tesseract or x265 is enabled
                 System.loadLibrary("c++_shared");
             }

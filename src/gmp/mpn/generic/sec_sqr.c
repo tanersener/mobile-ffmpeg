@@ -30,7 +30,6 @@ You should have received copies of the GNU General Public License and the
 GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
-#include "gmp.h"
 #include "gmp-impl.h"
 
 #if ! HAVE_NATIVE_mpn_sqr_basecase
@@ -65,7 +64,7 @@ mpn_sec_sqr (mp_ptr rp,
    size.  */
   mpn_sqr_basecase (rp, ap, an);
 #else
-/* Else use mpn_sqr_basecase for its allowed sizes, else mpn_mul_basecase.  */
+/* Else use mpn_mul_basecase.  */
   mpn_mul_basecase (rp, ap, an, ap, an);
 #endif
 }

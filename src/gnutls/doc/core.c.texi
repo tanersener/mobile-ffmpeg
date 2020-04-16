@@ -501,77 +501,77 @@ Return true if @var{obj} is of type @code{anonymous-client-credentials}.
 Return true if @var{obj} is of type @code{session}.
 @end deffn
 
-@c snarfed from ../guile/src/enum-map.i.c:1011
+@c snarfed from ../guile/src/enum-map.i.c:1023
 @deffn {Scheme Procedure} openpgp-certificate-format->string enumval
 Return a string describing @var{enumval}, a @code{openpgp-certificate-format} value.
 @end deffn
 
-@c snarfed from ../guile/src/enum-map.i.c:970
+@c snarfed from ../guile/src/enum-map.i.c:982
 @deffn {Scheme Procedure} error->string enumval
 Return a string describing @var{enumval}, a @code{error} value.
 @end deffn
 
-@c snarfed from ../guile/src/enum-map.i.c:949
+@c snarfed from ../guile/src/enum-map.i.c:961
 @deffn {Scheme Procedure} certificate-verify->string enumval
 Return a string describing @var{enumval}, a @code{certificate-verify} value.
 @end deffn
 
-@c snarfed from ../guile/src/enum-map.i.c:904
+@c snarfed from ../guile/src/enum-map.i.c:916
 @deffn {Scheme Procedure} key-usage->string enumval
 Return a string describing @var{enumval}, a @code{key-usage} value.
 @end deffn
 
-@c snarfed from ../guile/src/enum-map.i.c:856
+@c snarfed from ../guile/src/enum-map.i.c:868
 @deffn {Scheme Procedure} psk-key-format->string enumval
 Return a string describing @var{enumval}, a @code{psk-key-format} value.
 @end deffn
 
-@c snarfed from ../guile/src/enum-map.i.c:815
+@c snarfed from ../guile/src/enum-map.i.c:827
 @deffn {Scheme Procedure} server-name-type->string enumval
 Return a string describing @var{enumval}, a @code{server-name-type} value.
 @end deffn
 
-@c snarfed from ../guile/src/enum-map.i.c:775
+@c snarfed from ../guile/src/enum-map.i.c:787
 @deffn {Scheme Procedure} sign-algorithm->string enumval
 Return a string describing @var{enumval}, a @code{sign-algorithm} value.
 @end deffn
 
-@c snarfed from ../guile/src/enum-map.i.c:754
+@c snarfed from ../guile/src/enum-map.i.c:766
 @deffn {Scheme Procedure} pk-algorithm->string enumval
 Return a string describing @var{enumval}, a @code{pk-algorithm} value.
 @end deffn
 
-@c snarfed from ../guile/src/enum-map.i.c:733
+@c snarfed from ../guile/src/enum-map.i.c:745
 @deffn {Scheme Procedure} x509-subject-alternative-name->string enumval
 Return a string describing @var{enumval}, a @code{x509-subject-alternative-name} value.
 @end deffn
 
-@c snarfed from ../guile/src/enum-map.i.c:690
+@c snarfed from ../guile/src/enum-map.i.c:702
 @deffn {Scheme Procedure} x509-certificate-format->string enumval
 Return a string describing @var{enumval}, a @code{x509-certificate-format} value.
 @end deffn
 
-@c snarfed from ../guile/src/enum-map.i.c:649
+@c snarfed from ../guile/src/enum-map.i.c:661
 @deffn {Scheme Procedure} certificate-type->string enumval
 Return a string describing @var{enumval}, a @code{certificate-type} value.
 @end deffn
 
-@c snarfed from ../guile/src/enum-map.i.c:628
+@c snarfed from ../guile/src/enum-map.i.c:640
 @deffn {Scheme Procedure} protocol->string enumval
 Return a string describing @var{enumval}, a @code{protocol} value.
 @end deffn
 
-@c snarfed from ../guile/src/enum-map.i.c:585
+@c snarfed from ../guile/src/enum-map.i.c:597
 @deffn {Scheme Procedure} close-request->string enumval
 Return a string describing @var{enumval}, a @code{close-request} value.
 @end deffn
 
-@c snarfed from ../guile/src/enum-map.i.c:544
+@c snarfed from ../guile/src/enum-map.i.c:556
 @deffn {Scheme Procedure} certificate-request->string enumval
 Return a string describing @var{enumval}, a @code{certificate-request} value.
 @end deffn
 
-@c snarfed from ../guile/src/enum-map.i.c:502
+@c snarfed from ../guile/src/enum-map.i.c:514
 @deffn {Scheme Procedure} certificate-status->string enumval
 Return a string describing @var{enumval}, a @code{certificate-status} value.
 @end deffn

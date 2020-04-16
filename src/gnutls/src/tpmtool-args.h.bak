@@ -19,7 +19,7 @@
  * The tpmtool program is copyrighted and licensed
  * under the following terms:
  *
- *  Copyright (C) 2000-2019 Free Software Foundation, and others, all rights reserved.
+ *  Copyright (C) 2000-2020 Free Software Foundation, and others, all rights reserved.
  *  This is free software. It is licensed for use, modification and
  *  redistribution under the terms of the GNU General Public License,
  *  version 3 or later <http://gnu.org/licenses/gpl.html>
@@ -99,9 +99,9 @@ typedef enum {
 /** count of all options for tpmtool */
 #define OPTION_CT    21
 /** tpmtool version */
-#define TPMTOOL_VERSION       "3.6.11"
+#define TPMTOOL_VERSION       "3.6.13"
 /** Full tpmtool version text */
-#define TPMTOOL_FULL_VERSION  "tpmtool 3.6.11"
+#define TPMTOOL_FULL_VERSION  "tpmtool 3.6.13"
 
 /**
  *  Interface defines for all options.  Replace "n" with the UPPER_CASED

@@ -54,6 +54,7 @@ class Packages {
         supportedExternalLibraries.add("opencore-amr");
         supportedExternalLibraries.add("openh264");
         supportedExternalLibraries.add("opus");
+        supportedExternalLibraries.add("rubberband");
         supportedExternalLibraries.add("sdl2");
         supportedExternalLibraries.add("shine");
         supportedExternalLibraries.add("snappy");

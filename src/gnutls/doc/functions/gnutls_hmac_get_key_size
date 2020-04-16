@@ -1,0 +1,15 @@
+
+
+
+
+@deftypefun {unsigned} {gnutls_hmac_get_key_size} (gnutls_mac_algorithm_t @var{algorithm})
+@var{algorithm}: the mac algorithm to use
+
+This function will return the size of the key to be used with this
+algorithm. On the algorithms which may accept arbitrary key sizes,
+the returned size is the MAC key size used in the TLS protocol.
+
+@strong{Returns:} The key size or zero on error.
+
+@strong{Since:} 3.6.12
+@end deftypefun

@@ -19,7 +19,7 @@
  * The srptool program is copyrighted and licensed
  * under the following terms:
  *
- *  Copyright (C) 2000-2019 Free Software Foundation, and others, all rights reserved.
+ *  Copyright (C) 2000-2020 Free Software Foundation, and others, all rights reserved.
  *  This is free software. It is licensed for use, modification and
  *  redistribution under the terms of the GNU General Public License,
  *  version 3 or later <http://gnu.org/licenses/gpl.html>
@@ -68,8 +68,8 @@ extern FILE * option_usage_fp;
  *  static const strings for srptool options
  */
 static char const srptool_opt_strs[2025] =
-/*     0 */ "srptool 3.6.11\n"
-            "Copyright (C) 2000-2019 Free Software Foundation, and others, all rights reserved.\n"
+/*     0 */ "srptool 3.6.13\n"
+            "Copyright (C) 2000-2020 Free Software Foundation, and others, all rights reserved.\n"
             "This is free software. It is licensed for use, modification and\n"
             "redistribution under the terms of the GNU General Public License,\n"
             "version 3 or later <http://gnu.org/licenses/gpl.html>\n\0"
@@ -124,7 +124,7 @@ static char const srptool_opt_strs[2025] =
             "In brief, to use SRP you need to create two files.  These are the password\n"
             "file that holds the users and the verifiers associated with them and the\n"
             "configuration file to hold the group parameters (called tpasswd.conf).\n\0"
-/*  1952 */ "srptool 3.6.11\0"
+/*  1952 */ "srptool 3.6.13\0"
 /*  1967 */ "srptool [options]\n"
             "srptool --help for usage instructions.\n";
 
@@ -697,8 +697,8 @@ static void bogus_function(void) {
      translate option names.
    */
   /* referenced via srptoolOptions.pzCopyright */
-  puts(_("srptool 3.6.11\n\
-Copyright (C) 2000-2019 Free Software Foundation, and others, all rights reserved.\n\
+  puts(_("srptool 3.6.13\n\
+Copyright (C) 2000-2020 Free Software Foundation, and others, all rights reserved.\n\
 This is free software. It is licensed for use, modification and\n\
 redistribution under the terms of the GNU General Public License,\n\
 version 3 or later <http://gnu.org/licenses/gpl.html>\n"));
@@ -764,7 +764,7 @@ file that holds the users and the verifiers associated with them and the\n\
 configuration file to hold the group parameters (called tpasswd.conf).\n"));
 
   /* referenced via srptoolOptions.pzFullVersion */
-  puts(_("srptool 3.6.11"));
+  puts(_("srptool 3.6.13"));
 
   /* referenced via srptoolOptions.pzFullUsage */
   puts(_("<<<NOT-FOUND>>>"));

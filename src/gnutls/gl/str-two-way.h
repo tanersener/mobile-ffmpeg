@@ -1,19 +1,19 @@
 /* Byte-wise substring search, using the Two-Way algorithm.
-   Copyright (C) 2008-2019 Free Software Foundation, Inc.
+   Copyright (C) 2008-2020 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Written by Eric Blake <ebb9@byu.net>, 2008.
 
    This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3, or (at your option)
+   it under the terms of the GNU Lesser General Public License as published by
+   the Free Software Foundation; either version 2.1, or (at your option)
    any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public License along
+   You should have received a copy of the GNU Lesser General Public License along
    with this program; if not, see <https://www.gnu.org/licenses/>.  */
 
 /* Before including this file, you need to include <config.h> and
@@ -49,7 +49,7 @@
    character shift table similar to the Boyer-Moore algorithm to
    achieve improved (potentially sub-linear) performance.
 
-   See http://www-igm.univ-mlv.fr/~lecroq/string/node26.html#SECTION00260,
+   See https://www-igm.univ-mlv.fr/~lecroq/string/node26.html#SECTION00260,
    https://en.wikipedia.org/wiki/Boyer-Moore_string_search_algorithm,
    https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.34.6641&rep=rep1&type=pdf
 */

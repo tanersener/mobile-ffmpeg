@@ -27,7 +27,7 @@ else
     . ${BASEDIR}/build/ios-common.sh
 fi
 
-# PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
+# PREPARE PATHS & DEFINE ${INSTALL_PKG_CONFIG_DIR}
 LIB_NAME="libvpx"
 set_toolchain_clang_paths ${LIB_NAME}
 
@@ -68,7 +68,11 @@ case ${ARCH} in
     ;;
     x86-64)
         TARGET="x86_64-iphonesimulator-gcc"
-        ASM_FLAGS="--enable-runtime-cpu-detect --disable-avx512"
+        ASM_FLAGS="--enable-runtime-cpu-detect --disable-avx512 --disable-sse --disable-sse2 --disable-mmx"
+    ;;
+    x86-64-mac-catalyst)
+        TARGET="x86_64-macosx-gcc"
+        ASM_FLAGS="--enable-runtime-cpu-detect --disable-avx512 --disable-sse --disable-sse2 --disable-mmx"
     ;;
 esac
 
@@ -77,6 +81,9 @@ rm -f ${BASEDIR}/src/${LIB_NAME}/build/make/configure.sh
 case ${ARCH} in
     arm64e)
         cp ${BASEDIR}/tools/make/configure.libvpx.arm64e.sh ${BASEDIR}/src/${LIB_NAME}/build/make/configure.sh
+    ;;
+    x86-64-mac-catalyst)
+        cp ${BASEDIR}/tools/make/configure.libvpx.x86_64_mac_catalyst.sh ${BASEDIR}/src/${LIB_NAME}/build/make/configure.sh
     ;;
     *)
         cp ${BASEDIR}/tools/make/configure.libvpx.all.sh ${BASEDIR}/src/${LIB_NAME}/build/make/configure.sh

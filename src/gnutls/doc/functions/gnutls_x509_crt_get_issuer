@@ -8,9 +8,9 @@
 @var{dn}: output variable with pointer to uint8_t DN
 
 Return the Certificate's Issuer DN as a @code{gnutls_x509_dn_t}  data type,
-that can be decoded using @code{gnutls_x509_dn_get_rdn_ava()} . 
+that can be decoded using @code{gnutls_x509_dn_get_rdn_ava()} .
 
-Note that  @code{dn} should be treated as constant. Because it points 
+Note that  @code{dn} should be treated as constant. Because it points
 into the  @code{cert} object, you should not use  @code{dn} after  @code{cert} is
 deallocated.
 

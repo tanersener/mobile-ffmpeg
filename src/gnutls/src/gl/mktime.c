@@ -1,5 +1,5 @@
 /* Convert a 'struct tm' to a time_t value.
-   Copyright (C) 1993-2019 Free Software Foundation, Inc.
+   Copyright (C) 1993-2020 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Paul Eggert <eggert@twinsun.com>.
 
@@ -78,7 +78,7 @@ my_tzset (void)
        - Time zone names based on geography, without slashes, e.g.
          "Singapore".
        - Time zone names that contain explicit DST rules.  Syntax: see
-         <http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap08.html#tag_08_03>
+         <https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap08.html#tag_08_03>
      The Microsoft CRT understands only the first kind.  It produces incorrect
      results if the value of TZ is of the other kinds.
      But in a Cygwin environment, /etc/profile.d/tzset.sh sets TZ to a value
@@ -141,7 +141,7 @@ shr (long_int a, int b)
   long_int one = 1;
   return (-one >> 1 == -1
 	  ? a >> b
-	  : a / (one << b) - (a % (one << b) < 0));
+	  : (a + (a < 0)) / (one << b) - (a < 0));
 }
 
 /* Bounds for the intersection of __time64_t and long_int.  */
@@ -211,8 +211,8 @@ ydhms_diff (long_int year1, long_int yday1, int hour1, int min1, int sec1,
      Take care to avoid integer overflow here.  */
   int a4 = shr (year1, 2) + shr (TM_YEAR_BASE, 2) - ! (year1 & 3);
   int b4 = shr (year0, 2) + shr (TM_YEAR_BASE, 2) - ! (year0 & 3);
-  int a100 = a4 / 25 - (a4 % 25 < 0);
-  int b100 = b4 / 25 - (b4 % 25 < 0);
+  int a100 = (a4 + (a4 < 0)) / 25 - (a4 < 0);
+  int b100 = (b4 + (b4 < 0)) / 25 - (b4 < 0);
   int a400 = shr (a100, 2);
   int b400 = shr (b100, 2);
   int intervening_leap_days = (a4 - b4) - (a100 - b100) + (a400 - b400);

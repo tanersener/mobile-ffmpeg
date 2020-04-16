@@ -461,7 +461,92 @@ test_case_st tests[] = {
 		.have_srp_cred = 1,
 		.server_prio = "NORMAL:-KX-ALL:+SRP:-VERS-ALL:+VERS-TLS1.2",
 		.client_prio = "NORMAL:-KX-ALL:+SRP:-VERS-ALL:+VERS-TLS1.2"
-	}
+	},
+
+#ifdef ENABLE_GOST
+	{
+		.name = "TLS 1.2 VKO-GOST-12 without cred",
+		.client_ret = GNUTLS_E_AGAIN,
+		.server_ret = GNUTLS_E_INSUFFICIENT_CREDENTIALS,
+		.not_on_fips = 1,
+		.server_prio = "NORMAL:-KX-ALL:+VKO-GOST-12:+GROUP-GOST-ALL:+CIPHER-GOST-ALL:+MAC-GOST-ALL:+SIGN-GOST-ALL:-VERS-ALL:+VERS-TLS1.2",
+		.client_prio = "NORMAL:-KX-ALL:+VKO-GOST-12:+GROUP-GOST-ALL:+CIPHER-GOST-ALL:+MAC-GOST-ALL:+SIGN-GOST-ALL:-VERS-ALL:+VERS-TLS1.2"
+	},
+	{
+		.name = "TLS 1.2 VKO-GOST-12 with cred but no cert",
+		.client_ret = GNUTLS_E_AGAIN,
+		.server_ret = GNUTLS_E_NO_CIPHER_SUITES,
+		.have_cert_cred = 1,
+		.not_on_fips = 1,
+		.server_prio = "NORMAL:-KX-ALL:+VKO-GOST-12:+GROUP-GOST-ALL:+CIPHER-GOST-ALL:+MAC-GOST-ALL:+SIGN-GOST-ALL:-VERS-ALL:+VERS-TLS1.2",
+		.client_prio = "NORMAL:-KX-ALL:+VKO-GOST-12:+GROUP-GOST-ALL:+CIPHER-GOST-ALL:+MAC-GOST-ALL:+SIGN-GOST-ALL:-VERS-ALL:+VERS-TLS1.2"
+	},
+	{
+		.name = "TLS 1.2 VKO-GOST-12 with cred but no GOST cert",
+		.client_ret = GNUTLS_E_AGAIN,
+		.server_ret = GNUTLS_E_NO_CIPHER_SUITES,
+		.have_cert_cred = 1,
+		.have_rsa_sign_cert = 1,
+		.have_rsa_decrypt_cert = 1,
+		.not_on_fips = 1,
+		.server_prio = "NORMAL:-KX-ALL:+VKO-GOST-12:+GROUP-GOST-ALL:+CIPHER-GOST-ALL:+MAC-GOST-ALL:+SIGN-GOST-ALL:-VERS-ALL:+VERS-TLS1.2",
+		.client_prio = "NORMAL:-KX-ALL:+VKO-GOST-12:+GROUP-GOST-ALL:+CIPHER-GOST-ALL:+MAC-GOST-ALL:+SIGN-GOST-ALL:-VERS-ALL:+VERS-TLS1.2"
+	},
+	{
+		.name = "TLS 1.2 VKO-GOST-12 with cred and GOST12-256 cert",
+		.server_ret = 0,
+		.client_ret = 0,
+		.have_cert_cred = 1,
+		.have_gost12_256_cert = 1,
+		.not_on_fips = 1,
+		.server_prio = "NORMAL:-KX-ALL:+VKO-GOST-12:+GROUP-GOST-ALL:+CIPHER-GOST-ALL:+MAC-GOST-ALL:+SIGN-GOST-ALL:-VERS-ALL:+VERS-TLS1.2",
+		.client_prio = "NORMAL:-KX-ALL:+VKO-GOST-12:+GROUP-GOST-ALL:+CIPHER-GOST-ALL:+MAC-GOST-ALL:+SIGN-GOST-ALL:-VERS-ALL:+VERS-TLS1.2"
+	},
+	{
+		.name = "TLS 1.2 VKO-GOST-12 with cred and GOST12-512 cert",
+		.server_ret = 0,
+		.client_ret = 0,
+		.have_cert_cred = 1,
+		.have_gost12_512_cert = 1,
+		.not_on_fips = 1,
+		.server_prio = "NORMAL:-KX-ALL:+VKO-GOST-12:+GROUP-GOST-ALL:+CIPHER-GOST-ALL:+MAC-GOST-ALL:+SIGN-GOST-ALL:-VERS-ALL:+VERS-TLS1.2",
+		.client_prio = "NORMAL:-KX-ALL:+VKO-GOST-12:+GROUP-GOST-ALL:+CIPHER-GOST-ALL:+MAC-GOST-ALL:+SIGN-GOST-ALL:-VERS-ALL:+VERS-TLS1.2"
+	},
+	{
+		.name = "TLS 1.2 VKO-GOST-12 with cred and multiple certs",
+		.server_ret = 0,
+		.client_ret = 0,
+		.have_cert_cred = 1,
+		.have_ecc_sign_cert = 1,
+		.have_rsa_sign_cert = 1,
+		.have_rsa_decrypt_cert = 1,
+		.have_gost12_256_cert = 1,
+		.have_gost12_512_cert = 1,
+		.not_on_fips = 1,
+		.server_prio = "NORMAL:-KX-ALL:+VKO-GOST-12:+GROUP-GOST-ALL:+CIPHER-GOST-ALL:+MAC-GOST-ALL:+SIGN-GOST-ALL:-VERS-ALL:+VERS-TLS1.2",
+		.client_prio = "NORMAL:-KX-ALL:+VKO-GOST-12:+GROUP-GOST-ALL:+CIPHER-GOST-ALL:+MAC-GOST-ALL:+SIGN-GOST-ALL:-VERS-ALL:+VERS-TLS1.2"
+	},
+	{
+		.name = "TLS 1.2 VKO-GOST-12 with cred and GOST12-256 cert client lacking signature algs (like SChannel)",
+		.server_ret = 0,
+		.client_ret = 0,
+		.have_cert_cred = 1,
+		.have_gost12_256_cert = 1,
+		.not_on_fips = 1,
+		.server_prio = "NORMAL:-KX-ALL:+VKO-GOST-12:+GROUP-GOST-ALL:+CIPHER-GOST-ALL:+MAC-GOST-ALL:+SIGN-GOST-ALL:-VERS-ALL:+VERS-TLS1.2",
+		.client_prio = "NONE:+VKO-GOST-12:+GROUP-GOST-ALL:+CIPHER-GOST-ALL:+MAC-GOST-ALL:+VERS-TLS1.2:+SIGN-RSA-SHA256"
+	},
+	{
+		.name = "TLS 1.2 VKO-GOST-12 with cred and GOST12-512 cert client lacking signature algs (like SChannel)",
+		.server_ret = 0,
+		.client_ret = 0,
+		.have_cert_cred = 1,
+		.have_gost12_512_cert = 1,
+		.not_on_fips = 1,
+		.server_prio = "NORMAL:-KX-ALL:+VKO-GOST-12:+GROUP-GOST-ALL:+CIPHER-GOST-ALL:+MAC-GOST-ALL:+SIGN-GOST-ALL:-VERS-ALL:+VERS-TLS1.2",
+		.client_prio = "NONE:+VKO-GOST-12:+GROUP-GOST-ALL:+CIPHER-GOST-ALL:+MAC-GOST-ALL:+VERS-TLS1.2:+SIGN-RSA-SHA256"
+	},
+#endif
 };
 
 void doit(void)

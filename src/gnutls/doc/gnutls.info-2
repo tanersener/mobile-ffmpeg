@@ -1,9 +1,9 @@
-This is gnutls.info, produced by makeinfo version 6.7 from gnutls.texi.
+This is gnutls.info, produced by makeinfo version 6.6 from gnutls.texi.
 
-This manual is last updated 27 June 2019 for version 3.6.11 of GnuTLS.
+This manual is last updated 2 January 2020 for version 3.6.13 of GnuTLS.
 
-Copyright (C) 2001-2019 Free Software Foundation, Inc.\\ Copyright (C)
-2001-2019 Nikos Mavrogiannopoulos
+Copyright (C) 2001-2020 Free Software Foundation, Inc.\\ Copyright (C)
+2001-2020 Nikos Mavrogiannopoulos
 
      Permission is granted to copy, distribute and/or modify this
      document under the terms of the GNU Free Documentation License,
@@ -851,9 +851,12 @@ File: gnutls.info,  Node: Initialization,  Next: Version check,  Prev: Headers, 
 --------------------
 
 The GnuTLS library is initialized on load; prior to 3.3.0 was
-initialized by calling *note gnutls_global_init::(1).  The
-initialization typically enables CPU-specific acceleration, performs any
-required precalculations needed, opens any required system devices
+initialized by calling *note gnutls_global_init::(1).  *note
+gnutls_global_init:: in versions after 3.3.0 is thread-safe (see *note
+Thread safety::).
+
+The initialization typically enables CPU-specific acceleration, performs
+any required precalculations needed, opens any required system devices
 (e.g., /dev/urandom on Linux) and initializes subsystems that could be
 used later.
 
@@ -2874,23 +2877,28 @@ following characters.
 Type           Keywords
 ------------------------------------------------------------------
 Ciphers        Examples are AES-128-GCM, AES-256-GCM,
-               AES-256-CBC; see also
+               AES-256-CBC, GOST28147-TC26Z-CNT; see also
                *note Table 3.1: tab:ciphers. for more options.
                Catch all name is CIPHER-ALL which will add all
-               the algorithms from NORMAL priority.
+               the algorithms from NORMAL priority.  The
+               shortcut for secure GOST algorithms is
+               CIPHER-GOST-ALL.
                
 Key exchange   RSA, DHE-RSA, DHE-DSS, SRP, SRP-RSA, SRP-DSS,
                PSK, DHE-PSK, ECDHE-PSK, ECDHE-RSA, ECDHE-ECDSA,
-               ANON-ECDH, ANON-DH. The Catch all name is KX-ALL
-               which will add all the algorithms from NORMAL
-               priority.  Under TLS1.3, the DHE-PSK and
+               VKO-GOST-12, ANON-ECDH, ANON-DH. Catch all name
+               is KX-ALL which will add all the algorithms from
+               NORMAL priority.  Under TLS1.3, the DHE-PSK and
                ECDHE-PSK strings are equivalent and instruct
                for a Diffie-Hellman key exchange using the
-               enabled groups.
+               enabled groups.  The shortcut for secure GOST
+               algorithms is KX-GOST-ALL.
                
-MAC            MD5, SHA1, SHA256, SHA384, AEAD (used with GCM
-               ciphers only).  All algorithms from NORMAL
-               priority can be accessed with MAC-ALL.
+MAC            MD5, SHA1, SHA256, SHA384, GOST28147-TC26Z-IMIT,
+               AEAD (used with GCM ciphers only).  All
+               algorithms from NORMAL priority can be accessed
+               with MAC-ALL. The shortcut for secure GOST
+               algorithms is MAC-GOST-ALL.
                
 Compression    COMP-NULL, COMP-DEFLATE. Catch all is COMP-ALL.
 algorithms     
@@ -2907,30 +2915,36 @@ algorithms     SIGN-RSA-SHA384, SIGN-RSA-SHA512, SIGN-DSA-SHA1,
                SIGN-ECDSA-SHA1, SIGN-ECDSA-SHA224,
                SIGN-ECDSA-SHA256, SIGN-ECDSA-SHA384,
                SIGN-ECDSA-SHA512, SIGN-RSA-PSS-SHA256,
-               SIGN-RSA-PSS-SHA384, SIGN-RSA-PSS-SHA512.  Catch
-               all which enables all algorithms from NORMAL
-               priority is SIGN-ALL. This option is only
-               considered for TLS 1.2 and later.
+               SIGN-RSA-PSS-SHA384, SIGN-RSA-PSS-SHA512,
+               SIGN-GOSTR341001, SIGN-GOSTR341012-256,
+               SIGN-GOSTR341012-512.  Catch all which enables
+               all algorithms from NORMAL priority is SIGN-ALL.
+               Shortcut which enables secure GOST algorithms is
+               SIGN-GOST-ALL. This option is only considered
+               for TLS 1.2 and later.
                
 Groups         GROUP-SECP256R1, GROUP-SECP384R1,
-               GROUP-SECP521R1, GROUP-X25519, GROUP-FFDHE2048,
-               GROUP-FFDHE3072, GROUP-FFDHE4096,
-               GROUP-FFDHE6144, and GROUP-FFDHE8192.  Groups
-               include both elliptic curve groups, e.g.,
-               SECP256R1, as well as finite field groups such
-               as FFDHE2048.  Catch all which enables all
-               groups from NORMAL priority is GROUP-ALL. The
-               helper keywords GROUP-DH-ALL and GROUP-EC-ALL
-               are also available, restricting the groups to
-               finite fields (DH) and elliptic curves.
+               GROUP-SECP521R1, GROUP-X25519, GROUP-X448,
+               GROUP-FFDHE2048, GROUP-FFDHE3072,
+               GROUP-FFDHE4096, GROUP-FFDHE6144, and
+               GROUP-FFDHE8192.  Groups include both elliptic
+               curve groups, e.g., SECP256R1, as well as finite
+               field groups such as FFDHE2048.  Catch all which
+               enables all groups from NORMAL priority is
+               GROUP-ALL. The helper keywords GROUP-DH-ALL,
+               GROUP-GOST-ALL and GROUP-EC-ALL are also
+               available, restricting the groups to finite
+               fields (DH), GOST curves and generic elliptic
+               curves.
                
 Elliptic       CURVE-SECP192R1, CURVE-SECP224R1,
 curves         CURVE-SECP256R1, CURVE-SECP384R1,
-(legacy)       CURVE-SECP521R1, and CURVE-X25519.  Catch all
-               which enables all curves from NORMAL priority is
-               CURVE-ALL. Note that the CURVE keyword is kept
-               for backwards compatibility only, for new
-               applications see the GROUP keyword above.
+(legacy)       CURVE-SECP521R1, CURVE-X25519, and CURVE-X448.
+               Catch all which enables all curves from NORMAL
+               priority is CURVE-ALL. Note that the CURVE
+               keyword is kept for backwards compatibility
+               only, for new applications see the GROUP keyword
+               above.
                
 Certificate    Certificate types can be given in a symmetric
 types          fashion (i.e.  the same for both client and
@@ -2948,6 +2962,12 @@ types          fashion (i.e.  the same for both client and
                client or server; catch all is CTYPE-CLI-ALL and
                CTYPE-SRV-ALL. The type 'X509' is aliased to
                'X.509' for legacy reasons.
+               
+Generic        The keyword GOST is a shortcut for secure GOST
+               algorithms (MACs, ciphers, KXes, groups and
+               signatures).  For example the following string
+               will enable all TLS 1.2 GOST ciphersuites:
+               'NONE:+VERS-TLS1.2:+GOST'.
                
 
 Table 6.4: The supported algorithm keywords in priority strings.

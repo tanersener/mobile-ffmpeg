@@ -113,6 +113,9 @@ void start(const char *prio, unsigned expect_max)
 
 	HANDSHAKE(client, server);
 
+	assert((gnutls_session_get_flags(server) & GNUTLS_SFLAGS_CLI_REQUESTED_OCSP) != 0);
+	assert((gnutls_session_get_flags(client) & GNUTLS_SFLAGS_CLI_REQUESTED_OCSP) != 0);
+
 	/* check gnutls_certificate_get_ours() - client side */
 	{
 		const gnutls_datum_t *mcert;

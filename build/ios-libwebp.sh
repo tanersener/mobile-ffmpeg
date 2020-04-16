@@ -27,76 +27,61 @@ else
     . ${BASEDIR}/build/ios-common.sh
 fi
 
-# PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
+# PREPARE PATHS & DEFINE ${INSTALL_PKG_CONFIG_DIR}
 LIB_NAME="libwebp"
 set_toolchain_clang_paths ${LIB_NAME}
 
 # PREPARING FLAGS
-TARGET_HOST=$(get_target_host)
-CFLAGS=$(get_cflags ${LIB_NAME})
-CXXFLAGS=$(get_cxxflags ${LIB_NAME})
-LDFLAGS=$(get_ldflags ${LIB_NAME})
+BUILD_HOST=$(get_build_host)
+export CFLAGS=$(get_cflags ${LIB_NAME})
+export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
+export LDFLAGS=$(get_ldflags ${LIB_NAME})
+export PKG_CONFIG_LIBDIR="${INSTALL_PKG_CONFIG_DIR}"
+
+ARCH_OPTIONS=""
+case ${ARCH} in
+    armv7 | armv7s | arm64 | arm64e)
+        ARCH_OPTIONS="--enable-neon --enable-neon-rtcd"
+    ;;
+    x86-64-mac-catalyst)
+        ARCH_OPTIONS="--disable-sse2 --disable-sse4.1"
+    ;;
+    *)
+        ARCH_OPTIONS="--enable-sse2 --enable-sse4.1"
+    ;;
+esac
 
 cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
-if [ -d "build" ]; then
-    rm -rf build
-fi
+make distclean 2>/dev/null 1>/dev/null
 
-mkdir build;
-cd build
+# ALWAYS RECONFIGURE
+autoreconf_library ${LIB_NAME}
 
-# OVERRIDING INCLUDE PATH ORDER
-CFLAGS="-I${BASEDIR}/prebuilt/$(get_target_build_directory)/giflib/include \
--I${BASEDIR}/prebuilt/$(get_target_build_directory)/jpeg/include \
--I${BASEDIR}/prebuilt/$(get_target_build_directory)/libpng/include \
--I${BASEDIR}/prebuilt/$(get_target_build_directory)/tiff/include $CFLAGS"
-
-cmake -Wno-dev \
-    -DCMAKE_VERBOSE_MAKEFILE=0 \
-    -DCMAKE_C_FLAGS="${CFLAGS}" \
-    -DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
-    -DCMAKE_EXE_LINKER_FLAGS="${LDFLAGS}" \
-    -DCMAKE_SYSROOT="${SDK_PATH}" \
-    -DCMAKE_FIND_ROOT_PATH="${SDK_PATH}" \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX="${BASEDIR}/prebuilt/$(get_target_build_directory)/${LIB_NAME}" \
-    -DCMAKE_SYSTEM_NAME=Darwin \
-    -DCMAKE_OSX_SYSROOT="" \
-    -DCMAKE_C_COMPILER="$CC" \
-    -DCMAKE_LINKER="$LD" \
-    -DCMAKE_AR="$(xcrun --sdk $(get_sdk_name) -f ar)" \
-    -DCMAKE_AS="$AS" \
-    -DGIF_INCLUDE_DIR=${BASEDIR}/prebuilt/$(get_target_build_directory)/giflib/include \
-    -DGIF_LIBRARY= \
-    -DJPEG_INCLUDE_DIR=${BASEDIR}/prebuilt/$(get_target_build_directory)/jpeg/include \
-    -DJPEG_LIBRARY=${BASEDIR}/prebuilt/$(get_target_build_directory)/jpeg/lib \
-    -DPNG_PNG_INCLUDE_DIR=${BASEDIR}/prebuilt/$(get_target_build_directory)/libpng/include \
-    -DPNG_LIBRARY=${BASEDIR}/prebuilt/$(get_target_build_directory)/libpng/lib \
-    -DTIFF_INCLUDE_DIR=${BASEDIR}/prebuilt/$(get_target_build_directory)/tiff/include \
-    -DTIFF_LIBRARY=${BASEDIR}/prebuilt/$(get_target_build_directory)/tiff/lib \
-    -DZLIB_INCLUDE_DIR=${SDK_PATH}/usr/include \
-    -DZLIB_LIBRARY=${SDK_PATH}/usr/lib \
-    -DGLUT_INCLUDE_DIR= \
-    -DGLUT_cocoa_LIBRARY= \
-    -DGLUT_glut_LIBRARY= \
-    -DOPENGL_INCLUDE_DIR= \
-    -DSDLMAIN_LIBRARY= \
-    -DSDL_INCLUDE_DIR= \
-    -DWEBP_BUILD_CWEBP=0 \
-    -DWEBP_BUILD_DWEBP=0 \
-    -DWEBP_BUILD_EXTRAS=0 \
-    -DWEBP_BUILD_GIF2WEBP=0 \
-    -DWEBP_BUILD_IMG2WEBP=0 \
-    -DWEBP_BUILD_WEBPMUX=0 \
-    -DWEBP_BUILD_WEBPINFO=0 \
-    -DWEBP_BUILD_ANIM_UTILS=0 \
-    -DCMAKE_SYSTEM_PROCESSOR=$(get_target_arch) \
-    -DBUILD_SHARED_LIBS=0 .. || exit 1
+./configure \
+    --prefix="${BASEDIR}/prebuilt/$(get_target_build_directory)/${LIB_NAME}" \
+    --with-pic \
+    --with-sysroot=${SDK_PATH} \
+    --enable-static \
+    --disable-shared \
+    --disable-dependency-tracking \
+    --enable-libwebpmux \
+    ${ARCH_OPTIONS} \
+    --with-pngincludedir="${BASEDIR}/prebuilt/$(get_target_build_directory)/libpng/include" \
+    --with-pnglibdir="${BASEDIR}/prebuilt/$(get_target_build_directory)/libpng/lib" \
+    --with-jpegincludedir="${BASEDIR}/prebuilt/$(get_target_build_directory)/jpeg/include" \
+    --with-jpeglibdir="${BASEDIR}/prebuilt/$(get_target_build_directory)/jpeg/lib" \
+    --with-gifincludedir="${BASEDIR}/prebuilt/$(get_target_build_directory)/giflib/include" \
+    --with-giflibdir="${BASEDIR}/prebuilt/$(get_target_build_directory)/giflib/lib" \
+    --with-tiffincludedir="${BASEDIR}/prebuilt/$(get_target_build_directory)/tiff/include" \
+    --with-tifflibdir="${BASEDIR}/prebuilt/$(get_target_build_directory)/tiff/lib" \
+    --host=${BUILD_HOST} || exit 1
 
 make -j$(get_cpu_count) || exit 1
 
-# CREATE PACKAGE CONFIG MANUALLY
-create_libwebp_package_config "1.1.0"
+# MANUALLY COPY PKG-CONFIG FILES
+cp ${BASEDIR}/src/${LIB_NAME}/src/*.pc ${INSTALL_PKG_CONFIG_DIR} || exit 1
+cp ${BASEDIR}/src/${LIB_NAME}/src/demux/*.pc ${INSTALL_PKG_CONFIG_DIR} || exit 1
+cp ${BASEDIR}/src/${LIB_NAME}/src/mux/*.pc ${INSTALL_PKG_CONFIG_DIR} || exit 1
 
 make install || exit 1

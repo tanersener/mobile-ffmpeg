@@ -166,7 +166,8 @@ am_libspeed_la_OBJECTS = common.lo divrem1div.lo divrem1inv.lo \
 	div_qr_1n_pi1_2.lo div_qr_1_tune.lo freq.lo gcdext_single.lo \
 	gcdext_double.lo gcdextod.lo gcdextos.lo hgcd_lehmer.lo \
 	hgcd_appr_lehmer.lo hgcd_reduce_1.lo hgcd_reduce_2.lo \
-	jacbase1.lo jacbase2.lo jacbase3.lo jacbase4.lo mod_1_div.lo \
+	jacbase1.lo jacbase2.lo jacbase3.lo jacbase4.lo hgcd2-1.lo \
+	hgcd2-2.lo hgcd2-3.lo hgcd2-4.lo hgcd2-5.lo mod_1_div.lo \
 	mod_1_inv.lo mod_1_1-1.lo mod_1_1-2.lo modlinv.lo noop.lo \
 	powm_mod.lo powm_redc.lo pre_divrem_1.lo set_strb.lo \
 	set_strs.lo set_strp.lo time.lo
@@ -202,7 +203,7 @@ tune_gcd_p_LDADD = $(LDADD)
 tune_gcd_p_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(tune_gcd_p_LDFLAGS) $(LDFLAGS) -o $@
-am_tuneup_OBJECTS = tuneup.$(OBJEXT)
+am_tuneup_OBJECTS = tuneup.$(OBJEXT) hgcd2.$(OBJEXT)
 am__objects_1 = div_qr_2.$(OBJEXT) bdiv_q.$(OBJEXT) bdiv_qr.$(OBJEXT) \
 	dcpi1_div_qr.$(OBJEXT) dcpi1_divappr_q.$(OBJEXT) \
 	dcpi1_bdiv_qr.$(OBJEXT) dcpi1_bdiv_q.$(OBJEXT) \
@@ -457,6 +458,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CPPFLAGS = -I$(top_srcdir) -I$(top_srcdir)/tests
+AM_LDFLAGS = -no-install
 EXTRA_DIST = alpha.asm pentium.asm sparcv9.asm hppa.asm hppa2.asm hppa2w.asm \
   ia64.asm powerpc.asm powerpc64.asm x86_64.asm many.pl
 
@@ -478,6 +480,7 @@ libspeed_la_SOURCES = \
   gcdext_single.c gcdext_double.c gcdextod.c gcdextos.c			\
   hgcd_lehmer.c hgcd_appr_lehmer.c hgcd_reduce_1.c hgcd_reduce_2.c	\
   jacbase1.c jacbase2.c jacbase3.c jacbase4.c				\
+  hgcd2-1.c hgcd2-2.c hgcd2-3.c hgcd2-4.c hgcd2-5.c			\
   mod_1_div.c mod_1_inv.c mod_1_1-1.c mod_1_1-2.c modlinv.c		\
   noop.c powm_mod.c powm_redc.c pre_divrem_1.c				\
   set_strb.c set_strs.c set_strp.c time.c
@@ -494,7 +497,7 @@ speed_LDFLAGS = $(STATIC)
 speed_dynamic_SOURCES = speed.c
 speed_ext_SOURCES = speed-ext.c
 speed_ext_LDFLAGS = $(STATIC)
-tuneup_SOURCES = tuneup.c
+tuneup_SOURCES = tuneup.c hgcd2.c
 nodist_tuneup_SOURCES = sqr_basecase.c fac_ui.c $(TUNE_MPN_SRCS)
 tuneup_DEPENDENCIES = $(TUNE_SQR_OBJ) libspeed.la
 tuneup_LDADD = $(tuneup_DEPENDENCIES) $(TUNE_LIBS)
@@ -945,6 +948,8 @@ fac_ui.c: $(top_builddir)/mpz/fac_ui.c
 	$(RM_TMP) tmp-$*.s
 .asm.lo:
 	$(LIBTOOL) --mode=compile --tag=CC $(top_srcdir)/mpn/m4-ccas --m4="$(M4)" $(CCAS) $(COMPILE_FLAGS) `test -f '$<' || echo '$(srcdir)/'`$<
+
+.NOTPARALLEL:
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -59,16 +59,17 @@ static int decode_mvdv(MidiVidContext *s, AVCodecContext *avctx, AVFrame *frame)
     uint32_t nb_blocks;
 
     nb_vectors = bytestream2_get_le16(gb);
-    intra_flag = bytestream2_get_le16(gb);
+    intra_flag = !!bytestream2_get_le16(gb);
     if (intra_flag) {
         nb_blocks = (avctx->width / 2) * (avctx->height / 2);
     } else {
-        int ret, skip_linesize;
+        int ret, skip_linesize, padding;
 
         nb_blocks = bytestream2_get_le32(gb);
         skip_linesize = avctx->width >> 1;
         mask_start = gb->buffer_start + bytestream2_tell(gb);
-        mask_size = (avctx->width >> 5) * (avctx->height >> 2);
+        mask_size = (FFALIGN(avctx->width, 32) >> 2) * (avctx->height >> 2) >> 3;
+        padding = (FFALIGN(avctx->width, 32) - avctx->width) >> 2;
 
         if (bytestream2_get_bytes_left(gb) < mask_size)
             return AVERROR_INVALIDDATA;
@@ -88,6 +89,7 @@ static int decode_mvdv(MidiVidContext *s, AVCodecContext *avctx, AVFrame *frame)
                 skip[(y*2+1)*skip_linesize + x*2  ] = flag;
                 skip[(y*2+1)*skip_linesize + x*2+1] = flag;
             }
+            skip_bits_long(&mask, padding);
         }
     }
 
@@ -96,10 +98,10 @@ static int decode_mvdv(MidiVidContext *s, AVCodecContext *avctx, AVFrame *frame)
         return AVERROR_INVALIDDATA;
     bytestream2_skip(gb, nb_vectors * 12);
     if (nb_vectors > 256) {
-        if (bytestream2_get_bytes_left(gb) < (nb_blocks + 7) / 8)
+        if (bytestream2_get_bytes_left(gb) < (nb_blocks + 7 * !intra_flag) / 8)
             return AVERROR_INVALIDDATA;
-        bytestream2_init(&idx9, gb->buffer_start + bytestream2_tell(gb), (nb_blocks + 7) / 8);
-        bytestream2_skip(gb, (nb_blocks + 7) / 8);
+        bytestream2_init(&idx9, gb->buffer_start + bytestream2_tell(gb), (nb_blocks + 7 * !intra_flag) / 8);
+        bytestream2_skip(gb, (nb_blocks + 7 * !intra_flag) / 8);
     }
 
     skip = s->skip;
@@ -126,6 +128,8 @@ static int decode_mvdv(MidiVidContext *s, AVCodecContext *avctx, AVFrame *frame)
                 idx9bits--;
                 idx = bytestream2_get_byte(gb) | (((idx9val >> (7 - idx9bits)) & 1) << 8);
             }
+            if (idx >= nb_vectors)
+                return AVERROR_INVALIDDATA;
 
             dsty[x  +frame->linesize[0]] = vec[idx * 12 + 0];
             dsty[x+1+frame->linesize[0]] = vec[idx * 12 + 3];
@@ -233,6 +237,9 @@ static av_cold int decode_init(AVCodecContext *avctx)
 {
     MidiVidContext *s = avctx->priv_data;
     int ret = av_image_check_size(avctx->width, avctx->height, 0, avctx);
+
+    if (avctx->width & 3 || avctx->height & 3)
+        ret = AVERROR_INVALIDDATA;
 
     if (ret < 0) {
         av_log(avctx, AV_LOG_ERROR, "Invalid image size %dx%d.\n",

@@ -21,7 +21,6 @@ the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
 
 #include <iostream>
 
-#include "gmp.h"
 #include "gmpxx.h"
 #include "gmp-impl.h"
 #include "tests.h"
@@ -502,6 +501,16 @@ check_mpq (void)
     mpq_class a(1, 2), b(2, 3);
     mpq_class c;
     c = a / b; ASSERT_ALWAYS(c == 0.75);
+  }
+  {
+    mpq_class one = 1;
+    mpq_class x(2, 5);
+    ASSERT_ALWAYS(1 / x == one / x);
+    ASSERT_ALWAYS(1u / x == one / x);
+    x = (-1) / x;
+    ASSERT_ALWAYS(x == -2.5);
+    ASSERT_ALWAYS(0 / x == 0);
+    ASSERT_ALWAYS(0u / x == 0);
   }
 
   // operator<<

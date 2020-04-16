@@ -1,18 +1,18 @@
 /* read-file.c -- read file contents into a string
-   Copyright (C) 2006, 2009-2019 Free Software Foundation, Inc.
+   Copyright (C) 2006, 2009-2020 Free Software Foundation, Inc.
    Written by Simon Josefsson and Bruno Haible.
 
    This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3, or (at your option)
+   it under the terms of the GNU Lesser General Public License as published by
+   the Free Software Foundation; either version 2.1, or (at your option)
    any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
+   You should have received a copy of the GNU Lesser General Public License
    along with this program; if not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
@@ -25,7 +25,7 @@
 /* Get ftello.  */
 #include <stdio.h>
 
-/* Get SIZE_MAX.  */
+/* Get PTRDIFF_MAX.  */
 #include <stdint.h>
 
 /* Get malloc, realloc, free. */
@@ -59,7 +59,7 @@ fread_file (FILE *stream, size_t *length)
             off_t alloc_off = st.st_size - pos;
 
             /* '1' below, accounts for the trailing NUL.  */
-            if (SIZE_MAX - 1 < alloc_off)
+            if (PTRDIFF_MAX - 1 < alloc_off)
               {
                 errno = ENOMEM;
                 return NULL;
@@ -107,16 +107,16 @@ fread_file (FILE *stream, size_t *length)
         {
           char *new_buf;
 
-          if (alloc == SIZE_MAX)
+          if (alloc == PTRDIFF_MAX)
             {
               save_errno = ENOMEM;
               break;
             }
 
-          if (alloc < SIZE_MAX - alloc / 2)
+          if (alloc < PTRDIFF_MAX - alloc / 2)
             alloc = alloc + alloc / 2;
           else
-            alloc = SIZE_MAX;
+            alloc = PTRDIFF_MAX;
 
           if (!(new_buf = realloc (buf, alloc)))
             {

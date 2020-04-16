@@ -75,6 +75,12 @@ PROLOGUE(mpn_sec_tabselect)
 	FUNC_ENTRY(4)
 IFDOS(`	mov	56(%rsp), %r8d	')
 
+IFDOS(`	add	$-88, %rsp	')
+IFDOS(`	movdqu	%xmm6, (%rsp)	')
+IFDOS(`	movdqu	%xmm7, 16(%rsp)	')
+IFDOS(`	movdqu	%xmm8, 32(%rsp)	')
+IFDOS(`	movdqu	%xmm9, 48(%rsp)	')
+
 	movd	which, %xmm8
 	pshufd	$0, %xmm8, %xmm8	C 4 `which' copies
 	mov	$1, R32(%rax)
@@ -88,15 +94,15 @@ IFDOS(`	mov	56(%rsp), %r8d	')
 L(outer_top):
 	mov	nents, i
 	mov	tp, %r11
-	pxor	%xmm13, %xmm13
+	pxor	%xmm1, %xmm1
 	pxor	%xmm4, %xmm4
 	pxor	%xmm5, %xmm5
 	pxor	%xmm6, %xmm6
 	pxor	%xmm7, %xmm7
 	ALIGN(16)
 L(top):	movdqa	%xmm8, %xmm0
-	pcmpeqd	%xmm13, %xmm0
-	paddd	%xmm9, %xmm13
+	pcmpeqd	%xmm1, %xmm0
+	paddd	%xmm9, %xmm1
 	movdqu	0(tp), %xmm2
 	movdqu	16(tp), %xmm3
 	pand	%xmm0, %xmm2
@@ -128,13 +134,13 @@ L(outer_end):
 	je	L(b0xx)
 L(b1xx):mov	nents, i
 	mov	tp, %r11
-	pxor	%xmm13, %xmm13
+	pxor	%xmm1, %xmm1
 	pxor	%xmm4, %xmm4
 	pxor	%xmm5, %xmm5
 	ALIGN(16)
 L(tp4):	movdqa	%xmm8, %xmm0
-	pcmpeqd	%xmm13, %xmm0
-	paddd	%xmm9, %xmm13
+	pcmpeqd	%xmm1, %xmm0
+	paddd	%xmm9, %xmm1
 	movdqu	0(tp), %xmm2
 	movdqu	16(tp), %xmm3
 	pand	%xmm0, %xmm2
@@ -153,12 +159,12 @@ L(b0xx):test	$2, R8(n)
 	je	L(b00x)
 L(b01x):mov	nents, i
 	mov	tp, %r11
-	pxor	%xmm13, %xmm13
+	pxor	%xmm1, %xmm1
 	pxor	%xmm4, %xmm4
 	ALIGN(16)
 L(tp2):	movdqa	%xmm8, %xmm0
-	pcmpeqd	%xmm13, %xmm0
-	paddd	%xmm9, %xmm13
+	pcmpeqd	%xmm1, %xmm0
+	paddd	%xmm9, %xmm1
 	movdqu	0(tp), %xmm2
 	pand	%xmm0, %xmm2
 	por	%xmm2, %xmm4
@@ -173,12 +179,12 @@ L(b00x):test	$1, R8(n)
 	je	L(b000)
 L(b001):mov	nents, i
 	mov	tp, %r11
-	pxor	%xmm13, %xmm13
+	pxor	%xmm1, %xmm1
 	pxor	%xmm4, %xmm4
 	ALIGN(16)
 L(tp1):	movdqa	%xmm8, %xmm0
-	pcmpeqd	%xmm13, %xmm0
-	paddd	%xmm9, %xmm13
+	pcmpeqd	%xmm1, %xmm0
+	paddd	%xmm9, %xmm1
 	movq	0(tp), %xmm2
 	pand	%xmm0, %xmm2
 	por	%xmm2, %xmm4
@@ -187,6 +193,12 @@ L(tp1):	movdqa	%xmm8, %xmm0
 	jne	L(tp1)
 	movq	%xmm4, 0(rp)
 
-L(b000):FUNC_EXIT()
+L(b000):
+IFDOS(`	movdqu	(%rsp), %xmm6	')
+IFDOS(`	movdqu	16(%rsp), %xmm7	')
+IFDOS(`	movdqu	32(%rsp), %xmm8	')
+IFDOS(`	movdqu	48(%rsp), %xmm9	')
+IFDOS(`	add	$88, %rsp	')
+	FUNC_EXIT()
 	ret
 EPILOGUE()

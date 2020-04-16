@@ -30,7 +30,6 @@ You should have received copies of the GNU General Public License and the
 GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
-#include "gmp.h"
 #include "gmp-impl.h"
 
 void
@@ -43,17 +42,11 @@ mpz_init_set (mpz_ptr w, mpz_srcptr u)
   size = ABS (usize);
 
   ALLOC (w) = MAX (size, 1);
-  PTR (w) = __GMP_ALLOCATE_FUNC_LIMBS (ALLOC (w));
+  wp = __GMP_ALLOCATE_FUNC_LIMBS (ALLOC (w));
 
-  wp = PTR (w);
+  PTR (w) = wp;
   up = PTR (u);
 
   MPN_COPY (wp, up, size);
   SIZ (w) = usize;
-
-#ifdef __CHECKER__
-  /* let the low limb look initialized, for the benefit of mpz_get_ui etc */
-  if (size == 0)
-    wp[0] = 0;
-#endif
 }

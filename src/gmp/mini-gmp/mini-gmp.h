@@ -1,6 +1,6 @@
 /* mini-gmp, a minimalistic implementation of a GNU GMP subset.
 
-Copyright 2011-2015 Free Software Foundation, Inc.
+Copyright 2011-2015, 2017, 2019 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -53,7 +53,11 @@ void mp_get_memory_functions (void *(**) (size_t),
 			      void *(**) (void *, size_t, size_t),
 			      void (**) (void *, size_t));
 
-typedef unsigned long mp_limb_t;
+#ifndef MINI_GMP_LIMB_TYPE
+#define MINI_GMP_LIMB_TYPE long
+#endif
+
+typedef unsigned MINI_GMP_LIMB_TYPE mp_limb_t;
 typedef long mp_size_t;
 typedef unsigned long mp_bitcnt_t;
 
@@ -217,6 +221,8 @@ void mpz_rootrem (mpz_t, mpz_t, const mpz_t, unsigned long);
 int mpz_root (mpz_t, const mpz_t, unsigned long);
 
 void mpz_fac_ui (mpz_t, unsigned long);
+void mpz_2fac_ui (mpz_t, unsigned long);
+void mpz_mfac_uiui (mpz_t, unsigned long, unsigned long);
 void mpz_bin_uiui (mpz_t, unsigned long, unsigned long);
 
 int mpz_probab_prime_p (const mpz_t, int);

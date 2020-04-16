@@ -1,6 +1,6 @@
 /*
 
-Copyright 2012, 2013 Free Software Foundation, Inc.
+Copyright 2012, 2013, 2018 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library test suite.
 
@@ -57,7 +57,7 @@ testmain (int argc, char **argv)
 	    {
 	      mpz_cdiv_qr, mpz_fdiv_qr, mpz_tdiv_qr
 	    };
-	  static div_qr_ui_func  *div_qr_ui[3] =
+	  static div_qr_ui_func * const div_qr_ui[3] =
 	    {
 	      mpz_cdiv_qr_ui, mpz_fdiv_qr_ui, mpz_tdiv_qr_ui
 	    };
@@ -65,7 +65,7 @@ testmain (int argc, char **argv)
 	    {
 	      mpz_cdiv_q, mpz_fdiv_q, mpz_tdiv_q
 	    };
-	  static div_x_ui_func  *div_q_ui[3] =
+	  static div_x_ui_func * const div_q_ui[3] =
 	    {
 	      mpz_cdiv_q_ui, mpz_fdiv_q_ui, mpz_tdiv_q_ui
 	    };
@@ -73,11 +73,11 @@ testmain (int argc, char **argv)
 	    {
 	      mpz_cdiv_r, mpz_fdiv_r, mpz_tdiv_r
 	    };
-	  static div_x_ui_func  *div_r_ui[3] =
+	  static div_x_ui_func * const div_r_ui[3] =
 	    {
 	      mpz_cdiv_r_ui, mpz_fdiv_r_ui, mpz_tdiv_r_ui
 	    };
-	  static div_ui_func  *div_ui[3] =
+	  static div_ui_func * const div_ui[3] =
 	    {
 	      mpz_cdiv_ui, mpz_fdiv_ui, mpz_tdiv_ui
 	    };
@@ -131,6 +131,7 @@ testmain (int argc, char **argv)
 		}
 	    }
 
+	  mpz_set_si (r, -6);
 	  if (j == 0 && mpz_sgn (b) < 0)  /* ceil, negative divisor */
 	    {
 	      mpz_mod (r, a, b);
@@ -161,8 +162,10 @@ testmain (int argc, char **argv)
 
 	  if (mpz_fits_ulong_p (b))
 	    {
-	      mp_limb_t rl;
+	      unsigned long rl;
 
+	      mpz_set_si (r, -7);
+	      mpz_set_ui (q, ~7);
 	      rl = div_qr_ui[j] (q, r, a, mpz_get_ui (b));
 	      if (rl != mpz_get_ui (rr)
 		  || mpz_cmp (r, rr) || mpz_cmp (q, rq))
@@ -196,7 +199,7 @@ testmain (int argc, char **argv)
 	      rl = div_r_ui[j] (r, a, mpz_get_ui (b));
 	      if (rl != mpz_get_ui (rr) || mpz_cmp (r, rr))
 		{
-		  fprintf (stderr, "mpz_%cdiv_qr_ui failed:\n", name[j]);
+		  fprintf (stderr, "mpz_%cdiv_r_ui failed:\n", name[j]);
 		  dump ("a", a);
 		  dump ("b", b);
 		  fprintf(stderr, "rl   = %lx\n", rl);
@@ -208,7 +211,7 @@ testmain (int argc, char **argv)
 	      rl = div_ui[j] (a, mpz_get_ui (b));
 	      if (rl != mpz_get_ui (rr))
 		{
-		  fprintf (stderr, "mpz_%cdiv_qr_ui failed:\n", name[j]);
+		  fprintf (stderr, "mpz_%cdiv_ui failed:\n", name[j]);
 		  dump ("a", a);
 		  dump ("b", b);
 		  fprintf(stderr, "rl   = %lx\n", rl);
@@ -231,6 +234,7 @@ testmain (int argc, char **argv)
 
 	      if (j == 1)	/* floor */
 		{
+		  mpz_set_si (r, -2);
 		  mpz_mod_ui (r, a, mpz_get_ui (b));
 		  if (mpz_cmp (r, rr))
 		    {

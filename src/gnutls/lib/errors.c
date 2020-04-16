@@ -186,6 +186,8 @@ static const gnutls_error_entry error_entries[] = {
 		    GNUTLS_E_X509_UNSUPPORTED_CRITICAL_EXTENSION),
 	ERROR_ENTRY(N_("Unsupported extension in X.509 certificate."),
 		    GNUTLS_E_X509_UNSUPPORTED_EXTENSION),
+	ERROR_ENTRY(N_("Duplicate extension in X.509 certificate."),
+		    GNUTLS_E_X509_DUPLICATE_EXTENSION),
 	ERROR_ENTRY(N_
 		    ("Key usage violation in certificate has been detected."),
 		    GNUTLS_E_KEY_USAGE_VIOLATION),

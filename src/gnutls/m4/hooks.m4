@@ -40,9 +40,9 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
   #     in CONTRIBUTION.md for more info.
   #
   # Interfaces removed:                           AGE=0 (+bump all symbol versions in .map)
-  AC_SUBST(LT_CURRENT, 56)
-  AC_SUBST(LT_REVISION, 1)
-  AC_SUBST(LT_AGE, 26)
+  AC_SUBST(LT_CURRENT, 57)
+  AC_SUBST(LT_REVISION, 0)
+  AC_SUBST(LT_AGE, 27)
 
   AC_SUBST(LT_SSL_CURRENT, 27)
   AC_SUBST(LT_SSL_REVISION, 2)
@@ -143,6 +143,20 @@ LIBTASN1_MINIMUM=4.9
     AC_MSG_RESULT(no)
     AC_MSG_WARN([C99 macros not supported. This may affect compiling.])
   ])
+
+  ac_strict_der_time=yes
+  AC_MSG_CHECKING([whether to disable strict DER time encodings for backwards compatibility])
+  AC_ARG_ENABLE(strict-der-time,
+    AS_HELP_STRING([--disable-strict-der-time],
+                   [allow non compliant DER time values]),
+    ac_strict_der_time=$enableval)
+  if test x$ac_strict_der_time != xno; then
+   AC_MSG_RESULT(no)
+   AC_DEFINE([STRICT_DER_TIME], 1, [force strict DER time constraints])
+  else
+   AC_MSG_RESULT(yes)
+  fi
+  AM_CONDITIONAL(STRICT_DER_TIME, test "$ac_strict_der_time" != "no")
 
   ac_allow_sha1=no
   AC_MSG_CHECKING([whether to allow SHA1 as an acceptable hash for cert digital signatures])

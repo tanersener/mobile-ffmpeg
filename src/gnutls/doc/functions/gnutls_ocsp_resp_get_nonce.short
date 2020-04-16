@@ -1,1 +1,1 @@
-@item @var{int} @ref{gnutls_ocsp_resp_get_nonce} (gnutls_ocsp_resp_t @var{resp}, unsigned int * @var{critical}, gnutls_datum_t * @var{nonce})
+@item @var{int} @ref{gnutls_ocsp_resp_get_nonce} (gnutls_ocsp_resp_const_t @var{resp}, unsigned int * @var{critical}, gnutls_datum_t * @var{nonce})

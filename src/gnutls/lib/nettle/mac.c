@@ -32,6 +32,8 @@
 #include <nettle/sha3.h>
 #include <nettle/hmac.h>
 #include <nettle/umac.h>
+#include <nettle/hkdf.h>
+#include <nettle/pbkdf2.h>
 #if ENABLE_GOST
 #include "gost/hmac-gost.h"
 #ifndef HAVE_NETTLE_GOSTHASH94CP_UPDATE
@@ -138,8 +140,8 @@ struct nettle_mac_ctx {
 static void
 _wrap_gost28147_imit_set_key_tc26z(void *ctx, size_t len, const uint8_t * key)
 {
-	gost28147_imit_set_key(ctx, len, key);
 	gost28147_imit_set_param(ctx, &gost28147_param_TC26_Z);
+	gost28147_imit_set_key(ctx, len, key);
 }
 #endif
 
@@ -825,6 +827,69 @@ wrap_nettle_hash_output(void *src_ctx, void *digest, size_t digestsize)
 	return 0;
 }
 
+/* KDF functions based on MAC
+ */
+static int
+wrap_nettle_hkdf_extract (gnutls_mac_algorithm_t mac,
+			  const void *key, size_t keysize,
+			  const void *salt, size_t saltsize,
+			  void *output)
+{
+	struct nettle_mac_ctx ctx;
+	int ret;
+
+	ret = _mac_ctx_init(mac, &ctx);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ctx.set_key(&ctx, saltsize, salt);
+	hkdf_extract(&ctx.ctx, ctx.update, ctx.digest, ctx.length,
+		     keysize, key, output);
+
+	return 0;
+}
+
+static int
+wrap_nettle_hkdf_expand (gnutls_mac_algorithm_t mac,
+			 const void *key, size_t keysize,
+			 const void *info, size_t infosize,
+			 void *output, size_t length)
+{
+	struct nettle_mac_ctx ctx;
+	int ret;
+
+	ret = _mac_ctx_init(mac, &ctx);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ctx.set_key(&ctx, keysize, key);
+	hkdf_expand(&ctx.ctx, ctx.update, ctx.digest, ctx.length,
+		    infosize, info, length, output);
+
+	return 0;
+}
+
+static int
+wrap_nettle_pbkdf2 (gnutls_mac_algorithm_t mac,
+		    const void *key, size_t keysize,
+		    const void *salt, size_t saltsize,
+		    unsigned iter_count,
+		    void *output, size_t length)
+{
+	struct nettle_mac_ctx ctx;
+	int ret;
+
+	ret = _mac_ctx_init(mac, &ctx);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ctx.set_key(&ctx, keysize, key);
+	pbkdf2(&ctx.ctx, ctx.update, ctx.digest, ctx.length,
+	       iter_count, saltsize, salt, length, output);
+
+	return 0;
+}
+
 gnutls_crypto_mac_st _gnutls_mac_ops = {
 	.init = wrap_nettle_mac_init,
 	.setkey = wrap_nettle_mac_set_key,
@@ -845,4 +910,14 @@ gnutls_crypto_digest_st _gnutls_digest_ops = {
 	.fast = wrap_nettle_hash_fast,
 	.exists = wrap_nettle_hash_exists,
 	.copy = wrap_nettle_hash_copy,
+};
+
+/* These names are clashing with nettle's name mangling. */
+#undef hkdf_extract
+#undef hkdf_expand
+#undef pbkdf2
+gnutls_crypto_kdf_st _gnutls_kdf_ops = {
+	.hkdf_extract = wrap_nettle_hkdf_extract,
+	.hkdf_expand = wrap_nettle_hkdf_expand,
+	.pbkdf2 = wrap_nettle_pbkdf2,
 };

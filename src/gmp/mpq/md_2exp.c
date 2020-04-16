@@ -1,7 +1,7 @@
 /* mpq_mul_2exp, mpq_div_2exp - multiply or divide by 2^N */
 
 /*
-Copyright 2000, 2002, 2012 Free Software Foundation, Inc.
+Copyright 2000, 2002, 2012, 2018 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -29,7 +29,6 @@ You should have received copies of the GNU General Public License and the
 GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
-#include "gmp.h"
 #include "gmp-impl.h"
 #include "longlong.h"
 
@@ -103,7 +102,7 @@ mpq_div_2exp (mpq_ptr dst, mpq_srcptr src, mp_bitcnt_t n)
     {
       SIZ(NUM(dst)) = 0;
       SIZ(DEN(dst)) = 1;
-      PTR(DEN(dst))[0] = 1;
+      MPZ_NEWALLOC (DEN(dst), 1)[0] = 1;
       return;
     }
 
