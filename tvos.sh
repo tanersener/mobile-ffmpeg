@@ -778,6 +778,11 @@ if [[ ! -z ${DISPLAY_HELP} ]]; then
   exit 0
 fi
 
+if [[ -z ${BUILD_VERSION} ]]; then
+  echo -e "\nerror: Can not run git commands in this folder. See build.log.\n"
+  exit 1
+fi
+
 # SELECT XCODE VERSION USED FOR BUILDING
 XCODE_FOR_MOBILE_FFMPEG=~/.xcode.for.mobile.ffmpeg.sh
 if [[ -f ${XCODE_FOR_MOBILE_FFMPEG} ]]; then

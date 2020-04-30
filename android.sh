@@ -709,6 +709,11 @@ if [[ -z ${ANDROID_HOME} ]]; then
   exit 1
 fi
 
+if [[ -z ${BUILD_VERSION} ]]; then
+  echo -e "\nerror: Can not run git commands in this folder. See build.log.\n"
+  exit 1
+fi
+
 echo -e "\nBuilding mobile-ffmpeg ${BUILD_TYPE_ID}library for Android\n"
 echo -e -n "INFO: Building mobile-ffmpeg ${BUILD_VERSION} ${BUILD_TYPE_ID}library for Android: " 1>>${BASEDIR}/build.log 2>&1
 echo -e $(date) 1>>${BASEDIR}/build.log 2>&1
