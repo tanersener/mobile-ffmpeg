@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Taner Sener
+ * Copyright (c) 2018, 2020 Taner Sener
  *
  * This file is part of MobileFFmpeg.
  *
@@ -23,36 +23,13 @@
 @interface MediaInformationParser : NSObject
 
 /**
- * Extracts MediaInformation from given command output.
+ * Extracts MediaInformation from the given ffprobe json output.
  */
-+ (MediaInformation*)from: (NSString*)rawCommandOutput;
++ (MediaInformation*)from: (NSString*)ffprobeJsonOutput;
 
 /**
- * Extracts StreamInformation from given input.
+ * Extracts MediaInformation from the given ffprobe json output and saves parsing errors in error parameter.
  */
-+ (StreamInformation*)parseStreamBlock:(NSString*)input;
-
-+ (void (^)(NSString *__autoreleasing*, NSString *__autoreleasing*))parseInputBlock:(NSString*)input;
-+ (void (^)(NSNumber *__autoreleasing*, NSNumber *__autoreleasing*, NSNumber *__autoreleasing*))parseDurationBlock:(NSString*)input;
-+ (void (^)(NSString *__autoreleasing*, NSString *__autoreleasing*))parseMetadataBlock:(NSString*)input;
-+ (void (^)(NSNumber *__autoreleasing*, NSNumber *__autoreleasing*))parseVideoDimensions: (NSString*)input;
-
-+ (NSString*)parseVideoStreamSampleAspectRatio: (NSString*)input;
-+ (NSString*)parseVideoStreamDisplayAspectRatio: (NSString*)input;
-+ (NSNumber*)parseAudioStreamSampleRate: (NSString*)input;
-+ (NSString*)parseStreamType: (NSString*)input;
-+ (NSString*)parseStreamCodec: (NSString*)input;
-+ (NSString*)parseStreamFullCodec: (NSString*)input;
-+ (NSNumber*)parseStreamIndex: (NSString*)input;
-+ (NSNumber*)parseDuration: (NSString*)input;
-+ (NSNumber*)parseStartTime: (NSString*)input;
-+ (NSString*)substring:(NSString*)string from:(NSString*)start to:(NSString*)end ignoring:(NSArray*)ignoredTokens;
-+ (NSString*)substring:(NSString*)string from:(NSString*)start ignoring:(NSArray*)ignoredTokens;
-+ (NSString*)substring:(NSString*)string to:(NSString*)start ignoring:(NSArray*)ignoredTokens;
-+ (int)index:(NSString*)string of:(NSString*)substring from:(int)startIndex times:(int)n;
-+ (int)count:(NSString*)string of:(NSString*)substring;
-+ (NSNumber*)toInteger: (NSString*)input;
-+ (NSNumber*)toIntegerObject: (NSString*)input;
-+ (NSString*)safeGet:(NSArray*)array from:(int)index;
++ (MediaInformation*)from: (NSString*)ffprobeJsonOutput with: (NSError*)error;
 
 @end

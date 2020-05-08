@@ -1,7 +1,7 @@
 //
 // MediaInformationParserTest.h
 //
-// Copyright (c) 2018-2019 Taner Sener
+// Copyright (c) 2018-2020 Taner Sener
 //
 // This file is part of MobileFFmpeg.
 //

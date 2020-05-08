@@ -76,7 +76,7 @@
     if (information == nil) {
         NSLog(@"Get media information failed\n");
     } else {
-        NSLog(@"Media information for %@\n", [information getPath]);
+        NSLog(@"Media information for %@\n", [information getFilename]);
         
         if ([information getFormat] != nil) {
             [self appendOutput:[NSString stringWithFormat:@"Format: %@\n", [information getFormat]]];
@@ -90,10 +90,10 @@
         if ([information getStartTime] != nil) {
             [self appendOutput:[NSString stringWithFormat:@"Start time: %@\n", [information getStartTime]]];
         }
-        if ([information getMetadataEntries] != nil) {
-            NSDictionary* entries = [information getMetadataEntries];
-            for(NSString *key in [entries allKeys]) {
-                [self appendOutput:[NSString stringWithFormat:@"Metadata: %@:%@", key, [entries objectForKey:key]]];
+        if ([information getTags] != nil) {
+            NSDictionary* tags = [information getTags];
+            for(NSString *key in [tags allKeys]) {
+                [self appendOutput:[NSString stringWithFormat:@"Tag: %@:%@", key, [tags objectForKey:key]]];
             }
         }
         if ([information getStreams] != nil) {
@@ -112,9 +112,6 @@
                 }
                 if ([stream getFormat] != nil) {
                     [self appendOutput:[NSString stringWithFormat:@"Stream format: %@\n", [stream getFormat]]];
-                }
-                if ([stream getFullFormat] != nil) {
-                    [self appendOutput:[NSString stringWithFormat:@"Stream full format: %@\n", [stream getFullFormat]]];
                 }
 
                 if ([stream getWidth] != nil) {
@@ -156,10 +153,10 @@
                     [self appendOutput:[NSString stringWithFormat:@"Stream codec time base: %@\n", [stream getCodecTimeBase]]];
                 }
 
-                if ([stream getMetadataEntries] != nil) {
-                    NSDictionary* entries = [information getMetadataEntries];
-                    for(NSString *key in [entries allKeys]) {
-                        [self appendOutput:[NSString stringWithFormat:@"Stream metadata: %@:%@", key, [entries objectForKey:key]]];
+                if ([stream getTags] != nil) {
+                    NSDictionary* tags = [stream getTags];
+                    for(NSString *key in [tags allKeys]) {
+                        [self appendOutput:[NSString stringWithFormat:@"Stream tag: %@:%@", key, [tags objectForKey:key]]];
                     }
                 }
             }

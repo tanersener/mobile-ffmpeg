@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Taner Sener
+ * Copyright (c) 2018, 2020 Taner Sener
  *
  * This file is part of MobileFFmpeg.
  *
@@ -24,7 +24,7 @@
  */
 @interface StreamInformation : NSObject
 
-- (instancetype)init;
+- (instancetype)init:(NSDictionary*)streamDictionary;
 
 /**
  * Returns stream index.
@@ -34,25 +34,11 @@
 - (NSNumber*)getIndex;
 
 /**
- * Sets stream index.
- *
- * @param index stream index, starting from zero
- */
-- (void)setIndex:(NSNumber*) index;
-
-/**
  * Returns stream type.
  *
  * @return stream type; audio or video
  */
 - (NSString*)getType;
-
-/**
- * Sets stream type.
- *
- * @param type stream type; audio or video
- */
-- (void)setType:(NSString*) type;
 
 /**
  * Returns stream codec.
@@ -62,25 +48,11 @@
 - (NSString*)getCodec;
 
 /**
- * Sets stream codec.
- *
- * @param codec stream codec
- */
-- (void)setCodec:(NSString*) codec;
-
-/**
  * Returns full stream codec.
  *
  * @return stream codec with additional profile and mode information
  */
 - (NSString*)getFullCodec;
-
-/**
- * Sets full stream codec.
- *
- * @param fullCodec stream codec with additional profile and mode information
- */
-- (void)setFullCodec:(NSString*) fullCodec;
 
 /**
  * Returns stream format.
@@ -90,39 +62,11 @@
 - (NSString*)getFormat;
 
 /**
- * Sets stream format.
- *
- * @param format stream format
- */
-- (void)setFormat:(NSString*) format;
-
-/**
- * Returns full stream format.
- *
- * @return stream format with
- */
-- (NSString*)getFullFormat;
-
-/**
- * Sets full stream format.
- *
- * @param fullFormat stream format with
- */
-- (void)setFullFormat:(NSString*) fullFormat;
-
-/**
  * Returns width.
  *
  * @return width in pixels
  */
 - (NSNumber*)getWidth;
-
-/**
- * Sets width.
- *
- * @param width in pixels
- */
-- (void)setWidth:(NSNumber*) width;
 
 /**
  * Returns height.
@@ -132,39 +76,18 @@
 - (NSNumber*)getHeight;
 
 /**
- * Sets height.
- *
- * @param height in pixels
- */
-- (void)setHeight:(NSNumber*) height;
-
-/**
  * Returns bitrate.
  *
  * @return bitrate in kb/s
  */
-- (NSNumber*)getBitrate;
-
-/**
- * Sets bitrate.
- *
- * @param bitrate in kb/s
- */
-- (void)setBitrate:(NSNumber*) bitrate;
+- (NSString*)getBitrate;
 
 /**
  * Returns sample rate.
  *
  * @return sample rate in hz
  */
-- (NSNumber*)getSampleRate;
-
-/**
- * Sets sample rate.
- *
- * @param sampleRate in hz
- */
-- (void)setSampleRate:(NSNumber*) sampleRate;
+- (NSString*)getSampleRate;
 
 /**
  * Returns sample format.
@@ -174,25 +97,11 @@
 - (NSString*)getSampleFormat;
 
 /**
- * Sets sample format.
- *
- * @param sampleFormat sample format
- */
-- (void)setSampleFormat:(NSString*) sampleFormat;
-
-/**
  * Returns channel layout.
  *
  * @return channel layout
  */
 - (NSString*)getChannelLayout;
-
-/**
- * Sets channel layout.
- *
- * @param channelLayout mono or stereo
- */
-- (void)setChannelLayout:(NSString*) channelLayout;
 
 /**
  * Returns sample aspect ratio.
@@ -202,25 +111,11 @@
 - (NSString*)getSampleAspectRatio;
 
 /**
- * Sets sample aspect ratio.
- *
- * @param sampleAspectRatio sample aspect ratio
- */
-- (void)setSampleAspectRatio:(NSString*) sampleAspectRatio;
-
-/**
  * Returns display aspect ratio.
  *
  * @return display aspect ratio
  */
 - (NSString*)getDisplayAspectRatio;
-
-/**
- * Sets display aspect ratio.
- *
- * @param displayAspectRatio display aspect ratio
- */
-- (void)setDisplayAspectRatio:(NSString*) displayAspectRatio;
 
 /**
  * Returns average frame rate.
@@ -230,25 +125,11 @@
 - (NSString*)getAverageFrameRate;
 
 /**
- * Sets average frame rate.
- *
- * @param averageFrameRate average frame rate in fps
- */
-- (void)setAverageFrameRate:(NSString*) averageFrameRate;
-
-/**
  * Returns real frame rate.
  *
  * @return real frame rate in tbr
  */
 - (NSString*)getRealFrameRate;
-
-/**
- * Sets real frame rate.
- *
- * @param realFrameRate real frame rate in tbr
- */
-- (void)setRealFrameRate:(NSString*) realFrameRate;
 
 /**
  * Returns time base.
@@ -258,13 +139,6 @@
 - (NSString*)getTimeBase;
 
 /**
- * Sets time base.
- *
- * @param timeBase time base in tbn
- */
-- (void)setTimeBase:(NSString*) timeBase;
-
-/**
  * Returns codec time base.
  *
  * @return codec time base in tbc
@@ -272,56 +146,38 @@
 - (NSString*)getCodecTimeBase;
 
 /**
- * Sets codec time base.
+ * Returns all tags.
  *
- * @param codecTimeBase codec time base in tbc
+ * @return tags dictionary
  */
-- (void)setCodecTimeBase:(NSString*) codecTimeBase;
+- (NSDictionary*)getTags;
 
 /**
- * Adds metadata.
+ * Returns the stream property associated with the key.
  *
- * @param key metadata key
- * @param value metadata value
+ * @return stream property as string or nil if the key is not found
  */
-- (void)addMetadata:(NSString*)key :(NSString*)value;
+- (NSString*)getStringProperty:(NSString*)key;
 
 /**
- * Retrieves metadata value associated with this key.
+ * Returns the stream property associated with the key.
  *
- * @param key metadata key
- * @return metadata value associated with this key
+ * @return stream property as number or nil if the key is not found
  */
-- (NSString*)getMetadata:(NSString*)key;
+- (NSNumber*)getNumberProperty:(NSString*)key;
 
 /**
- * Returns all metadata entries.
+ * Returns the stream properties associated with the key.
  *
- * @return metadata dictionary
- */
-- (NSDictionary*)getMetadataEntries;
+ * @return stream properties in a dictionary or nil if the key is not found
+*/
+- (NSDictionary*)getProperties:(NSString*)key;
 
 /**
- * Adds side data.
+ * Returns all stream properties defined.
  *
- * @param key side data key
- * @param value side data value
- */
-- (void)addSidedata:(NSString*)key :(NSString*)value;
-
-/**
- * Retrieves side data value associated with this key.
- *
- * @param key side data key
- * @return side data value associated with this key
- */
-- (NSString*)getSidedata:(NSString*)key;
-
-/**
- * Returns all side data entries.
- *
- * @return set of site data entries
- */
-- (NSDictionary*)getSidedataEntries;
+ * @return all stream properties in a dictionary or nil if no properties are defined
+*/
+- (NSDictionary*)getAllProperties;
 
 @end

@@ -40,4 +40,5 @@ task javadoc(type: Javadoc) {
 
 dependencies {
     testImplementation "androidx.test.ext:junit:1.1.1"
+    testImplementation "org.json:json:20190722"
 }
