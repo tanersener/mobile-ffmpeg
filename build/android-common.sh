@@ -51,19 +51,20 @@ get_library_name() {
         30) echo "sdl" ;;
         31) echo "tesseract" ;;
         32) echo "openh264" ;;
-        33) echo "giflib" ;;
-        34) echo "jpeg" ;;
-        35) echo "libogg" ;;
-        36) echo "libpng" ;;
-        37) echo "libuuid" ;;
-        38) echo "nettle" ;;
-        39) echo "tiff" ;;
-        40) echo "expat" ;;
-        41) echo "libsndfile" ;;
-        42) echo "leptonica" ;;
-        43) echo "libsamplerate" ;;
-        44) echo "android-zlib" ;;
-        45) echo "android-media-codec" ;;
+        33) echo "vo-amrwbenc" ;;
+        34) echo "giflib" ;;
+        35) echo "jpeg" ;;
+        36) echo "libogg" ;;
+        37) echo "libpng" ;;
+        38) echo "libuuid" ;;
+        39) echo "nettle" ;;
+        40) echo "tiff" ;;
+        41) echo "expat" ;;
+        42) echo "libsndfile" ;;
+        43) echo "leptonica" ;;
+        44) echo "libsamplerate" ;;
+        45) echo "android-zlib" ;;
+        46) echo "android-media-codec" ;;
     esac
 }
 

@@ -64,7 +64,7 @@
  * multiple operations (execute or getMediaInformation) at the same time, the response of this
  * method is not predictable.
  *
- * @param command
+ * @param command ffprobe command
  * @return media information
  */
 + (MediaInformation*)getMediaInformationFromCommand: (NSString*)command;

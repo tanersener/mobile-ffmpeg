@@ -165,7 +165,9 @@
         extension = @"ogg";
     } else if ([audioCodec containsString:@"opus"]) {
         extension = @"opus";
-    } else if ([audioCodec containsString:@"amr"]) {
+    } else if ([audioCodec containsString:@"amr-nb"]) {
+        extension = @"amr";
+    } else if ([audioCodec containsString:@"amr-wb"]) {
         extension = @"amr";
     } else if ([audioCodec containsString:@"ilbc"]) {
         extension = @"lbc";
@@ -252,8 +254,10 @@
         return [NSString stringWithFormat:@"-hide_banner -y -i %@ -c:a libvorbis -b:a 64k %@", audioSampleFile, audioOutputFile];
     } else if ([audioCodec containsString:@"opus"]) {
         return [NSString stringWithFormat:@"-hide_banner -y -i %@ -c:a libopus -b:a 64k -vbr on -compression_level 10 %@", audioSampleFile, audioOutputFile];
-    } else if ([audioCodec containsString:@"amr"]) {
+    } else if ([audioCodec containsString:@"amr-nb"]) {
         return [NSString stringWithFormat:@"-hide_banner -y -i %@ -ar 8000 -ab 12.2k -c:a libopencore_amrnb %@", audioSampleFile, audioOutputFile];
+    } else if ([audioCodec containsString:@"amr-wb"]) {
+        return [NSString stringWithFormat:@"-hide_banner -y -i %@ -ar 8000 -ab 12.2k -c:a libvo_amrwbenc -strict experimental %@", audioSampleFile, audioOutputFile];
     } else if ([audioCodec containsString:@"ilbc"]) {
         return [NSString stringWithFormat:@"-hide_banner -y -i %@ -c:a ilbc -ar 8000 -b:a 15200 %@", audioSampleFile, audioOutputFile];
     } else if ([audioCodec containsString:@"speex"]) {

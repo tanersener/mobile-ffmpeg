@@ -41,25 +41,26 @@ LIBRARY_TWOLAME=29
 LIBRARY_SDL=30
 LIBRARY_TESSERACT=31
 LIBRARY_OPENH264=32
-LIBRARY_GIFLIB=33
-LIBRARY_JPEG=34
-LIBRARY_LIBOGG=35
-LIBRARY_LIBPNG=36
-LIBRARY_LIBUUID=37
-LIBRARY_NETTLE=38
-LIBRARY_TIFF=39
-LIBRARY_EXPAT=40
-LIBRARY_SNDFILE=41
-LIBRARY_LEPTONICA=42
-LIBRARY_LIBSAMPLERATE=43
-LIBRARY_ZLIB=44
-LIBRARY_MEDIA_CODEC=45
+LIBRARY_VO_AMRWBENC=33
+LIBRARY_GIFLIB=34
+LIBRARY_JPEG=35
+LIBRARY_LIBOGG=36
+LIBRARY_LIBPNG=37
+LIBRARY_LIBUUID=38
+LIBRARY_NETTLE=39
+LIBRARY_TIFF=40
+LIBRARY_EXPAT=41
+LIBRARY_SNDFILE=42
+LIBRARY_LEPTONICA=43
+LIBRARY_LIBSAMPLERATE=44
+LIBRARY_ZLIB=45
+LIBRARY_MEDIA_CODEC=46
 
 # ENABLE ARCH
 ENABLED_ARCHITECTURES=(1 1 1 1 1)
 
 # ENABLE LIBRARIES
-ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 
 export BASEDIR=$(pwd)
 export MOBILE_FFMPEG_TMPDIR="${BASEDIR}/.tmp"
@@ -141,6 +142,7 @@ When compilation ends an Android Archive (AAR) file is created under the prebuil
   echo -e "  --enable-speex\t\tbuild with speex [no]"
   echo -e "  --enable-tesseract\t\tbuild with tesseract [no]"
   echo -e "  --enable-twolame\t\tbuild with twolame [no]"
+  echo -e "  --enable-vo-amrwbenc\t\tbuild with vo-amrwbenc [no]"
   echo -e "  --enable-wavpack\t\tbuild with wavpack [no]\n"
 
   echo -e "GPL libraries:"
@@ -211,7 +213,7 @@ reconf_library() {
   local RECONF_VARIABLE=$(echo "RECONF_$1" | sed "s/\-/\_/g")
   local library_supported=0
 
-  for library in {1..44}; do
+  for library in {1..45}; do
     library_name=$(get_library_name $((library - 1)))
 
     if [[ $1 != "ffmpeg" ]] && [[ ${library_name} == $1 ]]; then
@@ -230,7 +232,7 @@ rebuild_library() {
   local REBUILD_VARIABLE=$(echo "REBUILD_$1" | sed "s/\-/\_/g")
   local library_supported=0
 
-  for library in {1..44}; do
+  for library in {1..45}; do
     library_name=$(get_library_name $((library - 1)))
 
     if [[ $1 != "ffmpeg" ]] && [[ ${library_name} == $1 ]]; then
@@ -384,6 +386,9 @@ set_library() {
     ENABLED_LIBRARIES[LIBRARY_TWOLAME]=$2
     ENABLED_LIBRARIES[LIBRARY_SNDFILE]=$2
     ;;
+  vo-amrwbenc)
+    ENABLED_LIBRARIES[LIBRARY_VO_AMRWBENC]=$2
+    ;;
   wavpack)
     ENABLED_LIBRARIES[LIBRARY_WAVPACK]=$2
     ;;
@@ -482,7 +487,7 @@ print_enabled_libraries() {
   let enabled=0
 
   # FIRST BUILT-IN LIBRARIES
-  for library in {44..45}; do
+  for library in {45..46}; do
     if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
       if [[ ${enabled} -ge 1 ]]; then
         echo -n ", "
@@ -493,7 +498,7 @@ print_enabled_libraries() {
   done
 
   # THEN EXTERNAL LIBRARIES
-  for library in {0..32}; do
+  for library in {0..33}; do
     if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
       if [[ ${enabled} -ge 1 ]]; then
         echo -n ", "
@@ -649,7 +654,7 @@ while [ ! $# -eq 0 ]; do
     rebuild_library ${BUILD_LIBRARY}
     ;;
   --full)
-    for library in {0..45}; do
+    for library in {0..46}; do
       if [[ $library -ne 18 ]] && [[ $library -ne 19 ]] && [[ $library -ne 20 ]] && [[ $library -ne 21 ]] && [[ $library -ne 22 ]]; then
         enable_library $(get_library_name $library)
       fi
@@ -771,7 +776,7 @@ for run_arch in {0..4}; do
     . ${BASEDIR}/build/main-android.sh "${ENABLED_LIBRARIES[@]}" || exit 1
 
     # CLEAR FLAGS
-    for library in {1..46}; do
+    for library in {1..47}; do
       library_name=$(get_library_name $((library - 1)))
       unset $(echo "OK_${library_name}" | sed "s/\-/\_/g")
       unset $(echo "DEPENDENCY_REBUILT_${library_name}" | sed "s/\-/\_/g")

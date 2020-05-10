@@ -50,24 +50,25 @@ get_library_name() {
         29) echo "sdl" ;;
         30) echo "tesseract" ;;
         31) echo "openh264" ;;
-        32) echo "giflib" ;;
-        33) echo "jpeg" ;;
-        34) echo "libogg" ;;
-        35) echo "libpng" ;;
-        36) echo "nettle" ;;
-        37) echo "tiff" ;;
-        38) echo "expat" ;;
-        39) echo "libsndfile" ;;
-        40) echo "leptonica" ;;
-        41) echo "libsamplerate" ;;
-        42) echo "ios-zlib" ;;
-        43) echo "ios-audiotoolbox" ;;
-        44) echo "ios-coreimage" ;;
-        45) echo "ios-bzip2" ;;
-        46) echo "ios-videotoolbox" ;;
-        47) echo "ios-avfoundation" ;;
-        48) echo "ios-libiconv" ;;
-        49) echo "ios-libuuid" ;;
+        32) echo "vo-amrwbenc" ;;
+        33) echo "giflib" ;;
+        34) echo "jpeg" ;;
+        35) echo "libogg" ;;
+        36) echo "libpng" ;;
+        37) echo "nettle" ;;
+        38) echo "tiff" ;;
+        39) echo "expat" ;;
+        40) echo "libsndfile" ;;
+        41) echo "leptonica" ;;
+        42) echo "libsamplerate" ;;
+        43) echo "ios-zlib" ;;
+        44) echo "ios-audiotoolbox" ;;
+        45) echo "ios-coreimage" ;;
+        46) echo "ios-bzip2" ;;
+        47) echo "ios-videotoolbox" ;;
+        48) echo "ios-avfoundation" ;;
+        49) echo "ios-libiconv" ;;
+        50) echo "ios-libuuid" ;;
     esac
 }
 
@@ -84,13 +85,13 @@ get_package_config_file_name() {
         26) echo "aom" ;;
         27) echo "libchromaprint" ;;
         29) echo "sdl2" ;;
-        33) echo "libjpeg" ;;
-        34) echo "ogg" ;;
-        37) echo "libtiff-4" ;;
-        39) echo "sndfile" ;;
-        40) echo "lept" ;;
-        41) echo "samplerate" ;;
-        49) echo "uuid" ;;
+        34) echo "libjpeg" ;;
+        35) echo "ogg" ;;
+        38) echo "libtiff-4" ;;
+        40) echo "sndfile" ;;
+        41) echo "lept" ;;
+        42) echo "samplerate" ;;
+        50) echo "uuid" ;;
         *) echo $(get_library_name $1)
     esac
 }
@@ -111,12 +112,12 @@ get_static_archive_name() {
         28) echo "libtwolame.a" ;;
         29) echo "libSDL2.a" ;;
         30) echo "libtesseract.a" ;;
-        32) echo "libgif.a" ;;
-        34) echo "libogg.a" ;;
-        35) echo "libpng.a" ;;
-        39) echo "libsndfile.a" ;;
-        40) echo "liblept.a" ;;
-        41) echo "libsamplerate.a" ;;
+        33) echo "libgif.a" ;;
+        35) echo "libogg.a" ;;
+        36) echo "libpng.a" ;;
+        40) echo "libsndfile.a" ;;
+        41) echo "liblept.a" ;;
+        42) echo "libsamplerate.a" ;;
         *) echo lib$(get_library_name $1).a
     esac
 }
