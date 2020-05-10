@@ -697,6 +697,7 @@ echo -e "\nINFO: Build options: $*\n" 1>>${BASEDIR}/build.log 2>&1
 GPL_ENABLED="no"
 DISPLAY_HELP=""
 BUILD_LTS=""
+BUILD_FULL=""
 BUILD_TYPE_ID=""
 BUILD_FORCE=""
 BUILD_VERSION=$(git describe --tags 2>>${BASEDIR}/build.log)
@@ -746,11 +747,7 @@ while [ ! $# -eq 0 ]; do
     rebuild_library ${BUILD_LIBRARY}
     ;;
   --full)
-    for library in {0..49}; do
-      if [[ $library -ne 17 ]] && [[ $library -ne 18 ]] && [[ $library -ne 19 ]] && [[ $library -ne 20 ]] && [[ $library -ne 21 ]]; then
-        enable_library $(get_library_name $library)
-      fi
-    done
+    BUILD_FULL="1"
     ;;
   --enable-gpl)
     GPL_ENABLED="yes"
@@ -773,14 +770,26 @@ while [ ! $# -eq 0 ]; do
 done
 
 # DETECT BUILD TYPE
-if [[ ! -z ${BUILD_LTS} ]]; then
+if [[ -n ${BUILD_LTS} ]]; then
   enable_lts_build
   BUILD_TYPE_ID+="LTS "
 fi
 
-if [[ ! -z ${DISPLAY_HELP} ]]; then
+if [[ -n ${DISPLAY_HELP} ]]; then
   display_help
   exit 0
+fi
+
+if [[ -n ${BUILD_FULL} ]]; then
+  for library in {0..49}; do
+    if [ ${GPL_ENABLED} == "yes" ]; then
+      enable_library $(get_library_name $library)
+    else
+      if [[ $library -ne 17 ]] && [[ $library -ne 18 ]] && [[ $library -ne 19 ]] && [[ $library -ne 20 ]] && [[ $library -ne 21 ]]; then
+        enable_library $(get_library_name $library)
+      fi
+    fi
+  done
 fi
 
 if [[ -z ${BUILD_VERSION} ]]; then

@@ -602,6 +602,7 @@ rm -rf ${BASEDIR}/android/obj 1>>${BASEDIR}/build.log 2>&1
 GPL_ENABLED="no"
 DISPLAY_HELP=""
 BUILD_LTS=""
+BUILD_FULL=""
 BUILD_TYPE_ID=""
 BUILD_VERSION=$(git describe --tags 2>>${BASEDIR}/build.log)
 
@@ -654,11 +655,7 @@ while [ ! $# -eq 0 ]; do
     rebuild_library ${BUILD_LIBRARY}
     ;;
   --full)
-    for library in {0..46}; do
-      if [[ $library -ne 18 ]] && [[ $library -ne 19 ]] && [[ $library -ne 20 ]] && [[ $library -ne 21 ]] && [[ $library -ne 22 ]]; then
-        enable_library $(get_library_name $library)
-      fi
-    done
+    BUILD_FULL="1"
     ;;
   --enable-gpl)
     GPL_ENABLED="yes"
@@ -702,6 +699,18 @@ fi
 if [[ ! -z ${DISPLAY_HELP} ]]; then
   display_help
   exit 0
+fi
+
+if [[ -n ${BUILD_FULL} ]]; then
+  for library in {0..46}; do
+    if [ ${GPL_ENABLED} == "yes" ]; then
+      enable_library $(get_library_name $library)
+    else
+      if [[ $library -ne 18 ]] && [[ $library -ne 19 ]] && [[ $library -ne 20 ]] && [[ $library -ne 21 ]] && [[ $library -ne 22 ]]; then
+        enable_library $(get_library_name $library)
+      fi
+    fi
+  done
 fi
 
 if [[ -z ${ANDROID_NDK_ROOT} ]]; then

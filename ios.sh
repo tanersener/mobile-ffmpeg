@@ -817,6 +817,7 @@ GPL_ENABLED="no"
 DISPLAY_HELP=""
 BUILD_TYPE_ID=""
 BUILD_LTS=""
+BUILD_FULL=""
 MOBILE_FFMPEG_XCF_BUILD=""
 BUILD_FORCE=""
 BUILD_VERSION=$(git describe --tags 2>>"${BASEDIR}/build.log")
@@ -869,11 +870,7 @@ while [ ! $# -eq 0 ]; do
     rebuild_library "${BUILD_LIBRARY}"
     ;;
   --full)
-    for library in {0..50}; do
-      if [[ $library -ne 17 ]] && [[ $library -ne 18 ]] && [[ $library -ne 19 ]] && [[ $library -ne 20 ]] && [[ $library -ne 21 ]]; then
-        enable_library "$(get_library_name $library)"
-      fi
-    done
+    BUILD_FULL="1"
     ;;
   --enable-gpl)
     GPL_ENABLED="yes"
@@ -904,6 +901,18 @@ fi
 if [[ -n ${DISPLAY_HELP} ]]; then
   display_help
   exit 0
+fi
+
+if [[ -n ${BUILD_FULL} ]]; then
+  for library in {0..50}; do
+    if [ ${GPL_ENABLED} == "yes" ]; then
+      enable_library $(get_library_name $library)
+    else
+      if [[ $library -ne 17 ]] && [[ $library -ne 18 ]] && [[ $library -ne 19 ]] && [[ $library -ne 20 ]] && [[ $library -ne 21 ]]; then
+        enable_library $(get_library_name $library)
+      fi
+    fi
+  done
 fi
 
 if [[ -z ${BUILD_VERSION} ]]; then
