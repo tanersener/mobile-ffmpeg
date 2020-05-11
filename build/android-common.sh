@@ -205,6 +205,23 @@ get_android_arch() {
     esac
 }
 
+get_cmake_android_abi() { # to be used with CMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_ROOT/build/cmake/android.toolchain.cmake
+    case ${ARCH} in
+        arm-v7a | arm-v7a-neon)
+            echo "armeabi-v7a"
+        ;;
+        arm64-v8a)
+            echo "arm64-v8a"
+        ;;
+        x86)
+            echo "x86"
+        ;;
+        x86-64)
+            echo "x86_64"
+        ;;
+    esac
+}
+
 get_common_includes() {
     echo ""
 }
