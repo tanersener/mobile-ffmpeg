@@ -62,8 +62,9 @@ get_library_name() {
         41) echo "libsndfile" ;;
         42) echo "leptonica" ;;
         43) echo "libsamplerate" ;;
-        44) echo "android-zlib" ;;
-        45) echo "android-media-codec" ;;
+        44) echo "cpu_features" ;;
+        45) echo "android-zlib" ;;
+        46) echo "android-media-codec" ;;
     esac
 }
 
@@ -855,23 +856,6 @@ Cflags: -I\${includedir}
 EOF
 }
 
-create_cpufeatures_package_config() {
-    cat > "${INSTALL_PKG_CONFIG_DIR}/cpufeatures.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/sources/android/cpufeatures
-exec_prefix=\${prefix}
-libdir=\${exec_prefix}
-includedir=\${prefix}
-
-Name: cpufeatures
-Description: cpu features Android utility
-Version: 1.${API}
-
-Requires:
-Libs: -L\${libdir} -lcpufeatures
-Cflags: -I\${includedir}
-EOF
-}
-
 #
 # download <url> <local file name> <on error action>
 #
@@ -1048,30 +1032,6 @@ set_toolchain_clang_paths() {
     fi
 
     prepare_inline_sed
-}
-
-build_cpufeatures() {
-
-    # CLEAN OLD BUILD
-    rm -f ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.o 1>>${BASEDIR}/build.log 2>&1
-    rm -f ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/libcpufeatures.a 1>>${BASEDIR}/build.log 2>&1
-    rm -f ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/libcpufeatures.so 1>>${BASEDIR}/build.log 2>&1
-
-    echo -e "\nINFO: Building cpu-features for ${ARCH}\n" 1>>${BASEDIR}/build.log 2>&1
-
-    set_toolchain_clang_paths "cpu-features"
-
-    BUILD_HOST=$(get_build_host)
-    export CFLAGS=$(get_cflags "cpu-features")
-    export CXXFLAGS=$(get_cxxflags "cpu-features")
-    export LDFLAGS=$(get_ldflags "cpu-features")
-
-    # THEN BUILD FOR THIS ABI
-    $(get_clang_target_host)-clang -c ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.c -o ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.o 1>>${BASEDIR}/build.log 2>&1
-    ${BUILD_HOST}-ar rcs ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/libcpufeatures.a ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.o 1>>${BASEDIR}/build.log 2>&1
-    $(get_clang_target_host)-clang -shared ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.o -o ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/libcpufeatures.so 1>>${BASEDIR}/build.log 2>&1
-
-    create_cpufeatures_package_config
 }
 
 build_android_lts_support() {

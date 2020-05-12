@@ -52,14 +52,17 @@ LIBRARY_EXPAT=40
 LIBRARY_SNDFILE=41
 LIBRARY_LEPTONICA=42
 LIBRARY_LIBSAMPLERATE=43
-LIBRARY_ZLIB=44
-LIBRARY_MEDIA_CODEC=45
+LIBRARY_CPU_FEATURES=44
+LIBRARY_ZLIB=45
+LIBRARY_MEDIA_CODEC=46
 
 # ENABLE ARCH
 ENABLED_ARCHITECTURES=(1 1 1 1 1)
 
 # ENABLE LIBRARIES
-ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+
+ENABLED_LIBRARIES[LIBRARY_CPU_FEATURES]=1
 
 export BASEDIR=$(pwd)
 export MOBILE_FFMPEG_TMPDIR="${BASEDIR}/.tmp"
@@ -251,6 +254,9 @@ enable_library() {
 
 set_library() {
   case $1 in
+  cpu_features)
+    ENABLED_LIBRARIES[LIBRARY_CPU_FEATURES]=$2
+    ;;
   android-media-codec)
     ENABLED_LIBRARIES[LIBRARY_MEDIA_CODEC]=$2
     ;;
@@ -482,7 +488,7 @@ print_enabled_libraries() {
   let enabled=0
 
   # FIRST BUILT-IN LIBRARIES
-  for library in {44..45}; do
+  for library in {44..46}; do
     if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
       if [[ ${enabled} -ge 1 ]]; then
         echo -n ", "
@@ -649,7 +655,7 @@ while [ ! $# -eq 0 ]; do
     rebuild_library ${BUILD_LIBRARY}
     ;;
   --full)
-    for library in {0..45}; do
+    for library in {0..46}; do
       if [[ $library -ne 18 ]] && [[ $library -ne 19 ]] && [[ $library -ne 20 ]] && [[ $library -ne 21 ]] && [[ $library -ne 22 ]]; then
         enable_library $(get_library_name $library)
       fi
@@ -771,7 +777,7 @@ for run_arch in {0..4}; do
     . ${BASEDIR}/build/main-android.sh "${ENABLED_LIBRARIES[@]}" || exit 1
 
     # CLEAR FLAGS
-    for library in {1..46}; do
+    for library in {1..47}; do
       library_name=$(get_library_name $((library - 1)))
       unset $(echo "OK_${library_name}" | sed "s/\-/\_/g")
       unset $(echo "DEPENDENCY_REBUILT_${library_name}" | sed "s/\-/\_/g")
