@@ -3,7 +3,7 @@ $(call import-add-path, $(LOCAL_PATH))
 
 MY_ARM_MODE := arm
 MY_ARM_NEON := false
-LOCAL_PATH := ../app/src/main/cpp
+LOCAL_PATH := app/src/main/cpp
 
 # DEFINE ARCH FLAGS
 ifeq ($(TARGET_ARCH_ABI), armeabi-v7a)
