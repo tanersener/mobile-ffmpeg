@@ -6,7 +6,7 @@
    SAFE TO REACH IT THROUGH DOCUMENTED INTERFACES.  IN FACT, IT IS ALMOST
    GUARANTEED THAT IT WILL CHANGE OR DISAPPEAR IN A FUTURE GNU MP RELEASE.
 
-Copyright 2009, 2010, 2012 Free Software Foundation, Inc.
+Copyright 2009, 2010, 2012, 2015 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -35,7 +35,6 @@ GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
 
-#include "gmp.h"
 #include "gmp-impl.h"
 
 
@@ -170,7 +169,7 @@ do {									\
    we want to compute f(2^(GMP_NUMB_BITS * n)) for a polynomial f of
    degree 11 (or 10), given the 12 (rsp. 11) values:
 
-     r0 = limit at infinity of f(x) / x^7,
+     r0 = limit at infinity of f(x) / x^11,
      r1 = f(4),f(-4),
      r2 = f(2),f(-2),
      r3 = f(1),f(-1),
@@ -287,12 +286,22 @@ mpn_toom_interpolate_12pts (mp_ptr pp, mp_ptr r1, mp_ptr r3, mp_ptr r5,
 
   ASSERT_NOCARRY(mpn_sub_n (r3, r3, r2, n3p1));
 
+#ifdef HAVE_NATIVE_mpn_rsh1sub_n
+  mpn_rsh1sub_n (r4, r2, r4, n3p1);
+  r4 [n3p1 - 1] &= GMP_NUMB_MASK >> 1;
+#else
   mpn_sub_n (r4, r2, r4, n3p1);
   ASSERT_NOCARRY(mpn_rshift(r4, r4, n3p1, 1));
+#endif
   ASSERT_NOCARRY(mpn_sub_n (r2, r2, r4, n3p1));
 
+#ifdef HAVE_NATIVE_mpn_rsh1add_n
+  mpn_rsh1add_n (r5, r5, r1, n3p1);
+  r5 [n3p1 - 1] &= GMP_NUMB_MASK >> 1;
+#else
   mpn_add_n (r5, r5, r1, n3p1);
   ASSERT_NOCARRY(mpn_rshift(r5, r5, n3p1, 1));
+#endif
 
   /* last interpolation steps... */
   ASSERT_NOCARRY(mpn_sub_n (r3, r3, r1, n3p1));

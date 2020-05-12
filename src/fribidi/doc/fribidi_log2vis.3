@@ -1,6 +1,6 @@
 .\" WARNING! THIS FILE WAS GENERATED AUTOMATICALLY BY c2man!
 .\" DO NOT EDIT! CHANGES MADE TO THIS FILE WILL BE LOST!
-.TH "fribidi_log2vis" 3 "13 October 2019" "c2man fribidi.h" "Programmer's Manual"
+.TH "fribidi_log2vis" 3 "2 March 2020" "c2man fribidi.h" "Programmer's Manual"
 .SH "NAME"
 fribidi_log2vis \- get visual string
 .SH "SYNOPSIS"
@@ -86,8 +86,10 @@ list of embedding levels as defined by the algorithm.
 If NULL is passed as any of the the lists, the list is ignored and not
 filled.
 
-This function is obsolete because it only handles one-line paragraphs.
-Please consider using other functions instead.  Deprecated.
+Note that this function handles one-line paragraphs. For multi-
+paragraph texts it is necessary to first split the text into
+separate paragraphs and then carry over the resolved pbase_dir
+between the subsequent invocations.
 .SH "RETURNS"
 Maximum level found plus one, or zero if any error occurred
 (memory allocation failure most probably).
@@ -111,6 +113,7 @@ fribidi_set_reorder_nsm(3),
 fribidi_log2vis_get_embedding_levels(3),
 fribidi_get_type(3),
 fribidi_get_type_internal(3),
+fribidi_get_par_embedding_levels(3),
 fribidi_join_arabic(3),
 fribidi_get_joining_type(3),
 fribidi_get_joining_types(3),

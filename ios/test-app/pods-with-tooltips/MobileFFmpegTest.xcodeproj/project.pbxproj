@@ -76,6 +76,7 @@
 		3457454A2113B8AD00059043 /* AudioViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AudioViewController.m; sourceTree = "<group>"; };
 		3457454D2113B8D300059043 /* SubtitleViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SubtitleViewController.h; sourceTree = "<group>"; };
 		3457454E2113B8D300059043 /* SubtitleViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SubtitleViewController.m; sourceTree = "<group>"; };
+		346B8266244878C000971D55 /* MobileFFmpegTest.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MobileFFmpegTest.entitlements; sourceTree = "<group>"; };
 		348439EA20B2EFAF001A3990 /* pyramid.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = pyramid.jpg; sourceTree = "<group>"; };
 		348439EB20B2EFAF001A3990 /* tajmahal.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = tajmahal.jpg; sourceTree = "<group>"; };
 		348439EC20B2EFAF001A3990 /* colosseum.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = colosseum.jpg; sourceTree = "<group>"; };
@@ -158,6 +159,7 @@
 		34FAE212209F7DDD005CE2AE /* MobileFFmpegTest */ = {
 			isa = PBXGroup;
 			children = (
+				346B8266244878C000971D55 /* MobileFFmpegTest.entitlements */,
 				34FAE213209F7DDD005CE2AE /* AppDelegate.h */,
 				34FAE214209F7DDD005CE2AE /* AppDelegate.m */,
 				34FAE21F209F7DDE005CE2AE /* Assets.xcassets */,
@@ -230,6 +232,7 @@
 			buildConfigurationList = 34FAE229209F7DDE005CE2AE /* Build configuration list for PBXNativeTarget "MobileFFmpegTest" */;
 			buildPhases = (
 				5E094331BD641A4FE317B9CB /* [CP] Check Pods Manifest.lock */,
+				D97ABCA4159A024C5AC69577 /* [CP] Prepare Artifacts */,
 				34FAE20C209F7DDD005CE2AE /* Sources */,
 				34FAE20D209F7DDD005CE2AE /* Frameworks */,
 				34FAE20E209F7DDD005CE2AE /* Resources */,
@@ -319,6 +322,74 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
+		D97ABCA4159A024C5AC69577 /* [CP] Prepare Artifacts */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-MobileFFmpegTest/Pods-MobileFFmpegTest-artifacts.sh",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/mobileffmpeg.xcframework",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/libavcodec.xcframework",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/libavdevice.xcframework",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/libavfilter.xcframework",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/libavformat.xcframework",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/libavutil.xcframework",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/libswresample.xcframework",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/libswscale.xcframework",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/expat.xcframework",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/fontconfig.xcframework",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/freetype.xcframework",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/fribidi.xcframework",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/giflib.xcframework",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/gmp.xcframework",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/gnutls.xcframework",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/jpeg.xcframework",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/kvazaar.xcframework",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/lame.xcframework",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/libaom.xcframework",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/libass.xcframework",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/libhogweed.xcframework",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/libilbc.xcframework",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/libnettle.xcframework",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/libogg.xcframework",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/libopencore-amrnb.xcframework",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/libopencore-amrwb.xcframework",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/libpng.xcframework",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/libsndfile.xcframework",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/libtheora.xcframework",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/libtheoradec.xcframework",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/libtheoraenc.xcframework",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/libvorbis.xcframework",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/libvorbisenc.xcframework",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/libvorbisfile.xcframework",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/libvpx.xcframework",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/libwebp.xcframework",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/libwebpmux.xcframework",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/libwebpdemux.xcframework",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/libxml2.xcframework",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/opus.xcframework",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/shine.xcframework",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/snappy.xcframework",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/soxr.xcframework",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/speex.xcframework",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/tiff.xcframework",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/twolame.xcframework",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/wavpack.xcframework",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/libvidstab.xcframework",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/x264.xcframework",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/x265.xcframework",
+				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/xvidcore.xcframework",
+			);
+			name = "[CP] Prepare Artifacts";
+			outputPaths = (
+				"${BUILT_PRODUCTS_DIR}/cocoapods-artifacts-${CONFIGURATION}.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-MobileFFmpegTest/Pods-MobileFFmpegTest-artifacts.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		DFE64F47D0B2AA62D946772E /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -326,6 +397,7 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-MobileFFmpegTest/Pods-MobileFFmpegTest-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/cocoapods-artifacts-${CONFIGURATION}.txt",
 				"${BUILT_PRODUCTS_DIR}/NMEasyTipView/NMEasyTipView.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
@@ -505,9 +577,10 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = MobileFFmpegTest/MobileFFmpegTest.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 42;
+				CURRENT_PROJECT_VERSION = 45;
 				DEVELOPMENT_TEAM = 98GD5J4999;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -523,6 +596,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.arthenica.mobileffmpeg.test.MobileFFmpegTest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SUPPORTS_MACCATALYST = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -533,9 +607,10 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = MobileFFmpegTest/MobileFFmpegTest.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 42;
+				CURRENT_PROJECT_VERSION = 45;
 				DEVELOPMENT_TEAM = 98GD5J4999;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -551,6 +626,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.arthenica.mobileffmpeg.test.MobileFFmpegTest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SUPPORTS_MACCATALYST = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;

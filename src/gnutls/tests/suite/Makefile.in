@@ -32,7 +32,6 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-
 VPATH = @srcdir@
 am__is_gnu_make = { \
   if test -z '$(MAKELEVEL)'; then \
@@ -123,7 +122,6 @@ ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/lib/unistring/m4/gnulib-comp.m4 \
 	$(top_srcdir)/lib/unistring/m4/inline.m4 \
 	$(top_srcdir)/lib/unistring/m4/libunistring-base.m4 \
-	$(top_srcdir)/src/gl/m4/__inline.m4 \
 	$(top_srcdir)/src/gl/m4/bison.m4 \
 	$(top_srcdir)/src/gl/m4/clock_time.m4 \
 	$(top_srcdir)/src/gl/m4/fseek.m4 \
@@ -143,7 +141,7 @@ am__aclocal_m4_deps = $(top_srcdir)/lib/unistring/m4/gnulib-comp.m4 \
 	$(top_srcdir)/src/gl/m4/tzset.m4 \
 	$(top_srcdir)/src/libopts/m4/libopts.m4 \
 	$(top_srcdir)/src/libopts/m4/stdnoreturn.m4 \
-	$(top_srcdir)/m4/00gnulib.m4 \
+	$(top_srcdir)/m4/00gnulib.m4 $(top_srcdir)/m4/__inline.m4 \
 	$(top_srcdir)/m4/absolute-header.m4 $(top_srcdir)/m4/alloca.m4 \
 	$(top_srcdir)/m4/arpa_inet_h.m4 \
 	$(top_srcdir)/m4/ax_ac_append_to_file.m4 \
@@ -178,10 +176,11 @@ am__aclocal_m4_deps = $(top_srcdir)/lib/unistring/m4/gnulib-comp.m4 \
 	$(top_srcdir)/m4/inet_pton.m4 \
 	$(top_srcdir)/m4/intl-thread-locale.m4 \
 	$(top_srcdir)/m4/intlmacosx.m4 $(top_srcdir)/m4/intmax_t.m4 \
-	$(top_srcdir)/m4/inttypes-pri.m4 $(top_srcdir)/m4/inttypes.m4 \
-	$(top_srcdir)/m4/inttypes_h.m4 $(top_srcdir)/m4/ioctl.m4 \
-	$(top_srcdir)/m4/isblank.m4 $(top_srcdir)/m4/langinfo_h.m4 \
-	$(top_srcdir)/m4/largefile.m4 $(top_srcdir)/m4/lcmessage.m4 \
+	$(top_srcdir)/m4/inttostr.m4 $(top_srcdir)/m4/inttypes-pri.m4 \
+	$(top_srcdir)/m4/inttypes.m4 $(top_srcdir)/m4/inttypes_h.m4 \
+	$(top_srcdir)/m4/ioctl.m4 $(top_srcdir)/m4/isblank.m4 \
+	$(top_srcdir)/m4/langinfo_h.m4 $(top_srcdir)/m4/largefile.m4 \
+	$(top_srcdir)/m4/lcmessage.m4 \
 	$(top_srcdir)/m4/ld-output-def.m4 \
 	$(top_srcdir)/m4/ld-version-script.m4 \
 	$(top_srcdir)/m4/lib-ld.m4 $(top_srcdir)/m4/lib-link.m4 \
@@ -191,27 +190,32 @@ am__aclocal_m4_deps = $(top_srcdir)/lib/unistring/m4/gnulib-comp.m4 \
 	$(top_srcdir)/m4/locale-zh.m4 $(top_srcdir)/m4/locale_h.m4 \
 	$(top_srcdir)/m4/localename.m4 \
 	$(top_srcdir)/m4/localtime-buffer.m4 $(top_srcdir)/m4/lock.m4 \
-	$(top_srcdir)/m4/longlong.m4 $(top_srcdir)/m4/lseek.m4 \
-	$(top_srcdir)/m4/lstat.m4 $(top_srcdir)/m4/ltoptions.m4 \
-	$(top_srcdir)/m4/ltsugar.m4 $(top_srcdir)/m4/ltversion.m4 \
-	$(top_srcdir)/m4/lt~obsolete.m4 $(top_srcdir)/m4/malloc.m4 \
-	$(top_srcdir)/m4/malloca.m4 $(top_srcdir)/m4/manywarnings.m4 \
-	$(top_srcdir)/m4/memchr.m4 $(top_srcdir)/m4/memmem.m4 \
-	$(top_srcdir)/m4/minmax.m4 $(top_srcdir)/m4/mmap-anon.m4 \
-	$(top_srcdir)/m4/mode_t.m4 $(top_srcdir)/m4/msvc-inval.m4 \
+	$(top_srcdir)/m4/lseek.m4 $(top_srcdir)/m4/lstat.m4 \
+	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
+	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/lt~obsolete.m4 \
+	$(top_srcdir)/m4/malloc.m4 $(top_srcdir)/m4/malloca.m4 \
+	$(top_srcdir)/m4/manywarnings.m4 $(top_srcdir)/m4/memchr.m4 \
+	$(top_srcdir)/m4/memmem.m4 $(top_srcdir)/m4/minmax.m4 \
+	$(top_srcdir)/m4/mmap-anon.m4 $(top_srcdir)/m4/mode_t.m4 \
+	$(top_srcdir)/m4/msvc-inval.m4 \
 	$(top_srcdir)/m4/msvc-nothrow.m4 $(top_srcdir)/m4/multiarch.m4 \
 	$(top_srcdir)/m4/nanosleep.m4 $(top_srcdir)/m4/netdb_h.m4 \
 	$(top_srcdir)/m4/netinet_in_h.m4 $(top_srcdir)/m4/nls.m4 \
 	$(top_srcdir)/m4/off_t.m4 $(top_srcdir)/m4/open-cloexec.m4 \
-	$(top_srcdir)/m4/open.m4 $(top_srcdir)/m4/pathmax.m4 \
-	$(top_srcdir)/m4/perror.m4 $(top_srcdir)/m4/pipe.m4 \
-	$(top_srcdir)/m4/pkg.m4 $(top_srcdir)/m4/po.m4 \
-	$(top_srcdir)/m4/printf.m4 $(top_srcdir)/m4/progtest.m4 \
+	$(top_srcdir)/m4/open-slash.m4 $(top_srcdir)/m4/open.m4 \
+	$(top_srcdir)/m4/pathmax.m4 $(top_srcdir)/m4/perror.m4 \
+	$(top_srcdir)/m4/pipe.m4 $(top_srcdir)/m4/pkg.m4 \
+	$(top_srcdir)/m4/po.m4 $(top_srcdir)/m4/printf.m4 \
+	$(top_srcdir)/m4/progtest.m4 \
+	$(top_srcdir)/m4/pthread-thread.m4 \
+	$(top_srcdir)/m4/pthread_h.m4 \
 	$(top_srcdir)/m4/pthread_rwlock_rdlock.m4 \
-	$(top_srcdir)/m4/putenv.m4 $(top_srcdir)/m4/raise.m4 \
-	$(top_srcdir)/m4/read-file.m4 $(top_srcdir)/m4/realloc.m4 \
+	$(top_srcdir)/m4/pthread_sigmask.m4 $(top_srcdir)/m4/putenv.m4 \
+	$(top_srcdir)/m4/raise.m4 $(top_srcdir)/m4/read-file.m4 \
+	$(top_srcdir)/m4/realloc.m4 $(top_srcdir)/m4/sched_h.m4 \
 	$(top_srcdir)/m4/secure_getenv.m4 $(top_srcdir)/m4/select.m4 \
 	$(top_srcdir)/m4/setenv.m4 $(top_srcdir)/m4/setlocale.m4 \
+	$(top_srcdir)/m4/setlocale_null.m4 \
 	$(top_srcdir)/m4/sigaction.m4 $(top_srcdir)/m4/signal_h.m4 \
 	$(top_srcdir)/m4/signalblocking.m4 \
 	$(top_srcdir)/m4/size_max.m4 $(top_srcdir)/m4/sleep.m4 \
@@ -233,15 +237,16 @@ am__aclocal_m4_deps = $(top_srcdir)/lib/unistring/m4/gnulib-comp.m4 \
 	$(top_srcdir)/m4/sys_socket_h.m4 \
 	$(top_srcdir)/m4/sys_stat_h.m4 $(top_srcdir)/m4/sys_time_h.m4 \
 	$(top_srcdir)/m4/sys_types_h.m4 $(top_srcdir)/m4/sys_uio_h.m4 \
-	$(top_srcdir)/m4/threadlib.m4 $(top_srcdir)/m4/time_h.m4 \
-	$(top_srcdir)/m4/time_r.m4 $(top_srcdir)/m4/ungetc.m4 \
-	$(top_srcdir)/m4/unistd_h.m4 \
+	$(top_srcdir)/m4/thread.m4 $(top_srcdir)/m4/threadlib.m4 \
+	$(top_srcdir)/m4/time_h.m4 $(top_srcdir)/m4/time_r.m4 \
+	$(top_srcdir)/m4/ungetc.m4 $(top_srcdir)/m4/unistd_h.m4 \
 	$(top_srcdir)/m4/valgrind-tests.m4 \
 	$(top_srcdir)/m4/vasnprintf.m4 $(top_srcdir)/m4/vasprintf.m4 \
-	$(top_srcdir)/m4/vsnprintf.m4 $(top_srcdir)/m4/warn-on-use.m4 \
-	$(top_srcdir)/m4/warnings.m4 $(top_srcdir)/m4/wchar_h.m4 \
-	$(top_srcdir)/m4/wchar_t.m4 $(top_srcdir)/m4/wint_t.m4 \
-	$(top_srcdir)/m4/xsize.m4 $(top_srcdir)/configure.ac
+	$(top_srcdir)/m4/visibility.m4 $(top_srcdir)/m4/vsnprintf.m4 \
+	$(top_srcdir)/m4/warn-on-use.m4 $(top_srcdir)/m4/warnings.m4 \
+	$(top_srcdir)/m4/wchar_h.m4 $(top_srcdir)/m4/wchar_t.m4 \
+	$(top_srcdir)/m4/wint_t.m4 $(top_srcdir)/m4/xsize.m4 \
+	$(top_srcdir)/m4/zzgnulib.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 DIST_COMMON = $(srcdir)/Makefile.am $(am__DIST_COMMON)
@@ -250,93 +255,31 @@ CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 PROGRAMS = $(noinst_PROGRAMS)
-LTLIBRARIES = $(noinst_LTLIBRARIES)
-libecore_la_LIBADD =
-am__dirstamp = $(am__leading_dot)dirstamp
-nodist_libecore_la_OBJECTS = ecore/src/lib/libecore_la-ecore_anim.lo \
-	ecore/src/lib/libecore_la-ecore_app.lo \
-	ecore/src/lib/libecore_la-ecore.lo \
-	ecore/src/lib/libecore_la-ecore_events.lo \
-	ecore/src/lib/libecore_la-ecore_exe.lo \
-	ecore/src/lib/libecore_la-ecore_getopt.lo \
-	ecore/src/lib/libecore_la-ecore_glib.lo \
-	ecore/src/lib/libecore_la-ecore_idle_enterer.lo \
-	ecore/src/lib/libecore_la-ecore_idle_exiter.lo \
-	ecore/src/lib/libecore_la-ecore_idler.lo \
-	ecore/src/lib/libecore_la-ecore_job.lo \
-	ecore/src/lib/libecore_la-ecore_main.lo \
-	ecore/src/lib/libecore_la-ecore_pipe.lo \
-	ecore/src/lib/libecore_la-ecore_poll.lo \
-	ecore/src/lib/libecore_la-ecore_signal.lo \
-	ecore/src/lib/libecore_la-ecore_thread.lo \
-	ecore/src/lib/libecore_la-ecore_time.lo \
-	ecore/src/lib/libecore_la-ecore_timer.lo \
-	ecore/src/lib/libecore_la-eina_accessor.lo \
-	ecore/src/lib/libecore_la-eina_array.lo \
-	ecore/src/lib/libecore_la-eina_benchmark.lo \
-	ecore/src/lib/libecore_la-eina_binshare.lo \
-	ecore/src/lib/libecore_la-eina_chained_mempool.lo \
-	ecore/src/lib/libecore_la-eina_convert.lo \
-	ecore/src/lib/libecore_la-eina_counter.lo \
-	ecore/src/lib/libecore_la-eina_cpu.lo \
-	ecore/src/lib/libecore_la-eina_error.lo \
-	ecore/src/lib/libecore_la-eina_file.lo \
-	ecore/src/lib/libecore_la-eina_fp.lo \
-	ecore/src/lib/libecore_la-eina_hamster.lo \
-	ecore/src/lib/libecore_la-eina_hash.lo \
-	ecore/src/lib/libecore_la-eina_inlist.lo \
-	ecore/src/lib/libecore_la-eina_iterator.lo \
-	ecore/src/lib/libecore_la-eina_lalloc.lo \
-	ecore/src/lib/libecore_la-eina_list.lo \
-	ecore/src/lib/libecore_la-eina_log.lo \
-	ecore/src/lib/libecore_la-eina_magic.lo \
-	ecore/src/lib/libecore_la-eina_main.lo \
-	ecore/src/lib/libecore_la-eina_matrixsparse.lo \
-	ecore/src/lib/libecore_la-eina_mempool.lo \
-	ecore/src/lib/libecore_la-eina_module.lo \
-	ecore/src/lib/libecore_la-eina_quadtree.lo \
-	ecore/src/lib/libecore_la-eina_rbtree.lo \
-	ecore/src/lib/libecore_la-eina_rectangle.lo \
-	ecore/src/lib/libecore_la-eina_safety_checks.lo \
-	ecore/src/lib/libecore_la-eina_sched.lo \
-	ecore/src/lib/libecore_la-eina_share_common.lo \
-	ecore/src/lib/libecore_la-eina_strbuf.lo \
-	ecore/src/lib/libecore_la-eina_strbuf_common.lo \
-	ecore/src/lib/libecore_la-eina_str.lo \
-	ecore/src/lib/libecore_la-eina_stringshare.lo \
-	ecore/src/lib/libecore_la-eina_tiler.lo \
-	ecore/src/lib/libecore_la-eina_unicode.lo \
-	ecore/src/lib/libecore_la-eina_ustrbuf.lo \
-	ecore/src/lib/libecore_la-eina_ustringshare.lo \
-	ecore/src/lib/libecore_la-eina_value.lo
-libecore_la_OBJECTS = $(nodist_libecore_la_OBJECTS)
-AM_V_lt = $(am__v_lt_@AM_V@)
-am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
-am__v_lt_0 = --silent
-am__v_lt_1 = 
-libecore_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libecore_la_CFLAGS) \
-	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-@MACOSX_FALSE@@WINDOWS_FALSE@am_libecore_la_rpath =
 @MACOSX_FALSE@@WINDOWS_FALSE@nodist_eagain_cli_OBJECTS =  \
-@MACOSX_FALSE@@WINDOWS_FALSE@	mini-eagain2.$(OBJEXT)
+@MACOSX_FALSE@@WINDOWS_FALSE@	eagain-cli.$(OBJEXT)
 eagain_cli_OBJECTS = $(nodist_eagain_cli_OBJECTS)
 am__DEPENDENCIES_1 =
 am__DEPENDENCIES_2 = ../../lib/libgnutls.la ../../gl/libgnu.la \
 	../libutils.la $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
-@MACOSX_FALSE@@WINDOWS_FALSE@eagain_cli_DEPENDENCIES = libecore.la \
+@MACOSX_FALSE@@WINDOWS_FALSE@eagain_cli_DEPENDENCIES =  \
+@MACOSX_FALSE@@WINDOWS_FALSE@	$(am__DEPENDENCIES_1) \
 @MACOSX_FALSE@@WINDOWS_FALSE@	$(am__DEPENDENCIES_1) \
 @MACOSX_FALSE@@WINDOWS_FALSE@	$(am__DEPENDENCIES_2)
-mini_record_timing_SOURCES = mini-record-timing.c
-mini_record_timing_OBJECTS = mini-record-timing.$(OBJEXT)
+AM_V_lt = $(am__v_lt_@AM_V@)
+am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+am__v_lt_0 = --silent
+am__v_lt_1 = 
+@MACOSX_FALSE@@WINDOWS_FALSE@nodist_mini_record_timing_OBJECTS =  \
+@MACOSX_FALSE@@WINDOWS_FALSE@	mini-record-timing.$(OBJEXT)
+mini_record_timing_OBJECTS = $(nodist_mini_record_timing_OBJECTS)
 @MACOSX_FALSE@@WINDOWS_FALSE@mini_record_timing_DEPENDENCIES =  \
 @MACOSX_FALSE@@WINDOWS_FALSE@	$(am__DEPENDENCIES_2)
-prime_check_SOURCES = prime-check.c
-prime_check_OBJECTS = prime_check-prime-check.$(OBJEXT)
+nodist_prime_check_OBJECTS = prime_check-prime-check.$(OBJEXT)
+prime_check_OBJECTS = $(nodist_prime_check_OBJECTS)
 prime_check_DEPENDENCIES = $(am__DEPENDENCIES_2)
-rng_SOURCES = rng.c
-rng_OBJECTS = rng.$(OBJEXT)
+nodist_rng_OBJECTS = rng.$(OBJEXT)
+rng_OBJECTS = $(nodist_rng_OBJECTS)
 rng_LDADD = $(LDADD)
 rng_DEPENDENCIES = ../../lib/libgnutls.la ../../gl/libgnu.la \
 	../libutils.la $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
@@ -356,65 +299,9 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__maybe_remake_depfiles = depfiles
-am__depfiles_remade = ./$(DEPDIR)/mini-eagain2.Po \
+am__depfiles_remade = ./$(DEPDIR)/eagain-cli.Po \
 	./$(DEPDIR)/mini-record-timing.Po \
-	./$(DEPDIR)/prime_check-prime-check.Po ./$(DEPDIR)/rng.Po \
-	ecore/src/lib/$(DEPDIR)/libecore_la-ecore.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-ecore_anim.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-ecore_app.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-ecore_events.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-ecore_exe.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-ecore_getopt.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-ecore_glib.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-ecore_idle_enterer.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-ecore_idle_exiter.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-ecore_idler.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-ecore_job.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-ecore_main.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-ecore_pipe.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-ecore_poll.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-ecore_signal.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-ecore_thread.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-ecore_time.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-ecore_timer.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-eina_accessor.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-eina_array.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-eina_benchmark.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-eina_binshare.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-eina_chained_mempool.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-eina_convert.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-eina_counter.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-eina_cpu.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-eina_error.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-eina_file.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-eina_fp.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-eina_hamster.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-eina_hash.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-eina_inlist.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-eina_iterator.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-eina_lalloc.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-eina_list.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-eina_log.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-eina_magic.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-eina_main.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-eina_matrixsparse.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-eina_mempool.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-eina_module.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-eina_quadtree.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-eina_rbtree.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-eina_rectangle.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-eina_safety_checks.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-eina_sched.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-eina_share_common.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-eina_str.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-eina_strbuf.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-eina_strbuf_common.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-eina_stringshare.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-eina_tiler.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-eina_unicode.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-eina_ustrbuf.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-eina_ustringshare.Plo \
-	ecore/src/lib/$(DEPDIR)/libecore_la-eina_value.Plo
+	./$(DEPDIR)/prime_check-prime-check.Po ./$(DEPDIR)/rng.Po
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -434,9 +321,10 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(nodist_libecore_la_SOURCES) $(nodist_eagain_cli_SOURCES) \
-	mini-record-timing.c prime-check.c rng.c
-DIST_SOURCES = mini-record-timing.c prime-check.c rng.c
+SOURCES = $(nodist_eagain_cli_SOURCES) \
+	$(nodist_mini_record_timing_SOURCES) \
+	$(nodist_prime_check_SOURCES) $(nodist_rng_SOURCES)
+DIST_SOURCES =
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -692,6 +580,7 @@ CCASDEPMODE = @CCASDEPMODE@
 CCASFLAGS = @CCASFLAGS@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
+CFLAG_VISIBILITY = @CFLAG_VISIBILITY@
 CMOCKA_CFLAGS = @CMOCKA_CFLAGS@
 CMOCKA_LIBS = @CMOCKA_LIBS@
 CODE_COVERAGE_CFLAGS = @CODE_COVERAGE_CFLAGS@
@@ -744,6 +633,7 @@ GMSGFMT = @GMSGFMT@
 GMSGFMT_015 = @GMSGFMT_015@
 GNULIB_ACCEPT = @GNULIB_ACCEPT@
 GNULIB_ACCEPT4 = @GNULIB_ACCEPT4@
+GNULIB_ACCESS = @GNULIB_ACCESS@
 GNULIB_ATOLL = @GNULIB_ATOLL@
 GNULIB_BIND = @GNULIB_BIND@
 GNULIB_BTOWC = @GNULIB_BTOWC@
@@ -753,6 +643,8 @@ GNULIB_CHDIR = @GNULIB_CHDIR@
 GNULIB_CHOWN = @GNULIB_CHOWN@
 GNULIB_CLOSE = @GNULIB_CLOSE@
 GNULIB_CONNECT = @GNULIB_CONNECT@
+GNULIB_COPY_FILE_RANGE = @GNULIB_COPY_FILE_RANGE@
+GNULIB_CREAT = @GNULIB_CREAT@
 GNULIB_CTIME = @GNULIB_CTIME@
 GNULIB_DPRINTF = @GNULIB_DPRINTF@
 GNULIB_DUP = @GNULIB_DUP@
@@ -808,6 +700,7 @@ GNULIB_GETLINE = @GNULIB_GETLINE@
 GNULIB_GETLOADAVG = @GNULIB_GETLOADAVG@
 GNULIB_GETLOGIN = @GNULIB_GETLOGIN@
 GNULIB_GETLOGIN_R = @GNULIB_GETLOGIN_R@
+GNULIB_GETOPT_POSIX = @GNULIB_GETOPT_POSIX@
 GNULIB_GETPAGESIZE = @GNULIB_GETPAGESIZE@
 GNULIB_GETPASS = @GNULIB_GETPASS@
 GNULIB_GETPEERNAME = @GNULIB_GETPEERNAME@
@@ -890,7 +783,15 @@ GNULIB_PREAD = @GNULIB_PREAD@
 GNULIB_PRINTF = @GNULIB_PRINTF@
 GNULIB_PRINTF_POSIX = @GNULIB_PRINTF_POSIX@
 GNULIB_PSELECT = @GNULIB_PSELECT@
+GNULIB_PTHREAD_COND = @GNULIB_PTHREAD_COND@
+GNULIB_PTHREAD_MUTEX = @GNULIB_PTHREAD_MUTEX@
+GNULIB_PTHREAD_MUTEX_TIMEDLOCK = @GNULIB_PTHREAD_MUTEX_TIMEDLOCK@
+GNULIB_PTHREAD_ONCE = @GNULIB_PTHREAD_ONCE@
+GNULIB_PTHREAD_RWLOCK = @GNULIB_PTHREAD_RWLOCK@
 GNULIB_PTHREAD_SIGMASK = @GNULIB_PTHREAD_SIGMASK@
+GNULIB_PTHREAD_SPIN = @GNULIB_PTHREAD_SPIN@
+GNULIB_PTHREAD_THREAD = @GNULIB_PTHREAD_THREAD@
+GNULIB_PTHREAD_TSS = @GNULIB_PTHREAD_TSS@
 GNULIB_PTSNAME = @GNULIB_PTSNAME@
 GNULIB_PTSNAME_R = @GNULIB_PTSNAME_R@
 GNULIB_PUTC = @GNULIB_PUTC@
@@ -917,6 +818,7 @@ GNULIB_RENAMEAT = @GNULIB_RENAMEAT@
 GNULIB_RMDIR = @GNULIB_RMDIR@
 GNULIB_RPMATCH = @GNULIB_RPMATCH@
 GNULIB_SCANF = @GNULIB_SCANF@
+GNULIB_SCHED_YIELD = @GNULIB_SCHED_YIELD@
 GNULIB_SECURE_GETENV = @GNULIB_SECURE_GETENV@
 GNULIB_SELECT = @GNULIB_SELECT@
 GNULIB_SEND = @GNULIB_SEND@
@@ -924,6 +826,7 @@ GNULIB_SENDTO = @GNULIB_SENDTO@
 GNULIB_SETENV = @GNULIB_SETENV@
 GNULIB_SETHOSTNAME = @GNULIB_SETHOSTNAME@
 GNULIB_SETLOCALE = @GNULIB_SETLOCALE@
+GNULIB_SETLOCALE_NULL = @GNULIB_SETLOCALE_NULL@
 GNULIB_SETSOCKOPT = @GNULIB_SETSOCKOPT@
 GNULIB_SHUTDOWN = @GNULIB_SHUTDOWN@
 GNULIB_SIGACTION = @GNULIB_SIGACTION@
@@ -1053,6 +956,7 @@ HAVE_BTOWC = @HAVE_BTOWC@
 HAVE_C99_STDINT_H = @HAVE_C99_STDINT_H@
 HAVE_CANONICALIZE_FILE_NAME = @HAVE_CANONICALIZE_FILE_NAME@
 HAVE_CHOWN = @HAVE_CHOWN@
+HAVE_COPY_FILE_RANGE = @HAVE_COPY_FILE_RANGE@
 HAVE_CRTDEFS_H = @HAVE_CRTDEFS_H@
 HAVE_DECL_ENVIRON = @HAVE_DECL_ENVIRON@
 HAVE_DECL_FCHDIR = @HAVE_DECL_FCHDIR@
@@ -1147,12 +1051,12 @@ HAVE_LCHMOD = @HAVE_LCHMOD@
 HAVE_LCHOWN = @HAVE_LCHOWN@
 HAVE_LIBCRYPTO = @HAVE_LIBCRYPTO@
 HAVE_LIBDL = @HAVE_LIBDL@
+HAVE_LIBEV = @HAVE_LIBEV@
 HAVE_LIBPTHREAD = @HAVE_LIBPTHREAD@
 HAVE_LIBRT = @HAVE_LIBRT@
 HAVE_LIBSECCOMP = @HAVE_LIBSECCOMP@
 HAVE_LINK = @HAVE_LINK@
 HAVE_LINKAT = @HAVE_LINKAT@
-HAVE_LONG_LONG_INT = @HAVE_LONG_LONG_INT@
 HAVE_LSTAT = @HAVE_LSTAT@
 HAVE_MAX_ALIGN_T = @HAVE_MAX_ALIGN_T@
 HAVE_MBRLEN = @HAVE_MBRLEN@
@@ -1190,7 +1094,65 @@ HAVE_POSIX_OPENPT = @HAVE_POSIX_OPENPT@
 HAVE_POSIX_SIGNALBLOCKING = @HAVE_POSIX_SIGNALBLOCKING@
 HAVE_PREAD = @HAVE_PREAD@
 HAVE_PSELECT = @HAVE_PSELECT@
+HAVE_PTHREAD_ATTR_DESTROY = @HAVE_PTHREAD_ATTR_DESTROY@
+HAVE_PTHREAD_ATTR_GETDETACHSTATE = @HAVE_PTHREAD_ATTR_GETDETACHSTATE@
+HAVE_PTHREAD_ATTR_INIT = @HAVE_PTHREAD_ATTR_INIT@
+HAVE_PTHREAD_ATTR_SETDETACHSTATE = @HAVE_PTHREAD_ATTR_SETDETACHSTATE@
+HAVE_PTHREAD_CONDATTR_DESTROY = @HAVE_PTHREAD_CONDATTR_DESTROY@
+HAVE_PTHREAD_CONDATTR_INIT = @HAVE_PTHREAD_CONDATTR_INIT@
+HAVE_PTHREAD_COND_BROADCAST = @HAVE_PTHREAD_COND_BROADCAST@
+HAVE_PTHREAD_COND_DESTROY = @HAVE_PTHREAD_COND_DESTROY@
+HAVE_PTHREAD_COND_INIT = @HAVE_PTHREAD_COND_INIT@
+HAVE_PTHREAD_COND_SIGNAL = @HAVE_PTHREAD_COND_SIGNAL@
+HAVE_PTHREAD_COND_TIMEDWAIT = @HAVE_PTHREAD_COND_TIMEDWAIT@
+HAVE_PTHREAD_COND_WAIT = @HAVE_PTHREAD_COND_WAIT@
+HAVE_PTHREAD_CREATE = @HAVE_PTHREAD_CREATE@
+HAVE_PTHREAD_CREATE_DETACHED = @HAVE_PTHREAD_CREATE_DETACHED@
+HAVE_PTHREAD_DETACH = @HAVE_PTHREAD_DETACH@
+HAVE_PTHREAD_EQUAL = @HAVE_PTHREAD_EQUAL@
+HAVE_PTHREAD_EXIT = @HAVE_PTHREAD_EXIT@
+HAVE_PTHREAD_GETSPECIFIC = @HAVE_PTHREAD_GETSPECIFIC@
+HAVE_PTHREAD_H = @HAVE_PTHREAD_H@
+HAVE_PTHREAD_JOIN = @HAVE_PTHREAD_JOIN@
+HAVE_PTHREAD_KEY_CREATE = @HAVE_PTHREAD_KEY_CREATE@
+HAVE_PTHREAD_KEY_DELETE = @HAVE_PTHREAD_KEY_DELETE@
+HAVE_PTHREAD_MUTEXATTR_DESTROY = @HAVE_PTHREAD_MUTEXATTR_DESTROY@
+HAVE_PTHREAD_MUTEXATTR_GETROBUST = @HAVE_PTHREAD_MUTEXATTR_GETROBUST@
+HAVE_PTHREAD_MUTEXATTR_GETTYPE = @HAVE_PTHREAD_MUTEXATTR_GETTYPE@
+HAVE_PTHREAD_MUTEXATTR_INIT = @HAVE_PTHREAD_MUTEXATTR_INIT@
+HAVE_PTHREAD_MUTEXATTR_SETROBUST = @HAVE_PTHREAD_MUTEXATTR_SETROBUST@
+HAVE_PTHREAD_MUTEXATTR_SETTYPE = @HAVE_PTHREAD_MUTEXATTR_SETTYPE@
+HAVE_PTHREAD_MUTEX_DESTROY = @HAVE_PTHREAD_MUTEX_DESTROY@
+HAVE_PTHREAD_MUTEX_INIT = @HAVE_PTHREAD_MUTEX_INIT@
+HAVE_PTHREAD_MUTEX_LOCK = @HAVE_PTHREAD_MUTEX_LOCK@
+HAVE_PTHREAD_MUTEX_RECURSIVE = @HAVE_PTHREAD_MUTEX_RECURSIVE@
+HAVE_PTHREAD_MUTEX_ROBUST = @HAVE_PTHREAD_MUTEX_ROBUST@
+HAVE_PTHREAD_MUTEX_TIMEDLOCK = @HAVE_PTHREAD_MUTEX_TIMEDLOCK@
+HAVE_PTHREAD_MUTEX_TRYLOCK = @HAVE_PTHREAD_MUTEX_TRYLOCK@
+HAVE_PTHREAD_MUTEX_UNLOCK = @HAVE_PTHREAD_MUTEX_UNLOCK@
+HAVE_PTHREAD_ONCE = @HAVE_PTHREAD_ONCE@
+HAVE_PTHREAD_PROCESS_SHARED = @HAVE_PTHREAD_PROCESS_SHARED@
+HAVE_PTHREAD_RWLOCKATTR_DESTROY = @HAVE_PTHREAD_RWLOCKATTR_DESTROY@
+HAVE_PTHREAD_RWLOCKATTR_INIT = @HAVE_PTHREAD_RWLOCKATTR_INIT@
+HAVE_PTHREAD_RWLOCK_DESTROY = @HAVE_PTHREAD_RWLOCK_DESTROY@
+HAVE_PTHREAD_RWLOCK_INIT = @HAVE_PTHREAD_RWLOCK_INIT@
+HAVE_PTHREAD_RWLOCK_RDLOCK = @HAVE_PTHREAD_RWLOCK_RDLOCK@
+HAVE_PTHREAD_RWLOCK_TIMEDRDLOCK = @HAVE_PTHREAD_RWLOCK_TIMEDRDLOCK@
+HAVE_PTHREAD_RWLOCK_TIMEDWRLOCK = @HAVE_PTHREAD_RWLOCK_TIMEDWRLOCK@
+HAVE_PTHREAD_RWLOCK_TRYRDLOCK = @HAVE_PTHREAD_RWLOCK_TRYRDLOCK@
+HAVE_PTHREAD_RWLOCK_TRYWRLOCK = @HAVE_PTHREAD_RWLOCK_TRYWRLOCK@
+HAVE_PTHREAD_RWLOCK_UNLOCK = @HAVE_PTHREAD_RWLOCK_UNLOCK@
+HAVE_PTHREAD_RWLOCK_WRLOCK = @HAVE_PTHREAD_RWLOCK_WRLOCK@
+HAVE_PTHREAD_SELF = @HAVE_PTHREAD_SELF@
+HAVE_PTHREAD_SETSPECIFIC = @HAVE_PTHREAD_SETSPECIFIC@
 HAVE_PTHREAD_SIGMASK = @HAVE_PTHREAD_SIGMASK@
+HAVE_PTHREAD_SPINLOCK_T = @HAVE_PTHREAD_SPINLOCK_T@
+HAVE_PTHREAD_SPIN_DESTROY = @HAVE_PTHREAD_SPIN_DESTROY@
+HAVE_PTHREAD_SPIN_INIT = @HAVE_PTHREAD_SPIN_INIT@
+HAVE_PTHREAD_SPIN_LOCK = @HAVE_PTHREAD_SPIN_LOCK@
+HAVE_PTHREAD_SPIN_TRYLOCK = @HAVE_PTHREAD_SPIN_TRYLOCK@
+HAVE_PTHREAD_SPIN_UNLOCK = @HAVE_PTHREAD_SPIN_UNLOCK@
+HAVE_PTHREAD_T = @HAVE_PTHREAD_T@
 HAVE_PTSNAME = @HAVE_PTSNAME@
 HAVE_PTSNAME_R = @HAVE_PTSNAME_R@
 HAVE_PWRITE = @HAVE_PWRITE@
@@ -1207,6 +1169,8 @@ HAVE_REALPATH = @HAVE_REALPATH@
 HAVE_RENAMEAT = @HAVE_RENAMEAT@
 HAVE_RPMATCH = @HAVE_RPMATCH@
 HAVE_SA_FAMILY_T = @HAVE_SA_FAMILY_T@
+HAVE_SCHED_H = @HAVE_SCHED_H@
+HAVE_SCHED_YIELD = @HAVE_SCHED_YIELD@
 HAVE_SECURE_GETENV = @HAVE_SECURE_GETENV@
 HAVE_SETENV = @HAVE_SETENV@
 HAVE_SETHOSTNAME = @HAVE_SETHOSTNAME@
@@ -1235,6 +1199,7 @@ HAVE_STRTOLL = @HAVE_STRTOLL@
 HAVE_STRTOULL = @HAVE_STRTOULL@
 HAVE_STRUCT_ADDRINFO = @HAVE_STRUCT_ADDRINFO@
 HAVE_STRUCT_RANDOM_DATA = @HAVE_STRUCT_RANDOM_DATA@
+HAVE_STRUCT_SCHED_PARAM = @HAVE_STRUCT_SCHED_PARAM@
 HAVE_STRUCT_SIGACTION_SA_SIGACTION = @HAVE_STRUCT_SIGACTION_SA_SIGACTION@
 HAVE_STRUCT_SOCKADDR_STORAGE = @HAVE_STRUCT_SOCKADDR_STORAGE@
 HAVE_STRUCT_SOCKADDR_STORAGE_SS_FAMILY = @HAVE_STRUCT_SOCKADDR_STORAGE_SS_FAMILY@
@@ -1243,6 +1208,7 @@ HAVE_STRVERSCMP = @HAVE_STRVERSCMP@
 HAVE_SYMLINK = @HAVE_SYMLINK@
 HAVE_SYMLINKAT = @HAVE_SYMLINKAT@
 HAVE_SYS_BITYPES_H = @HAVE_SYS_BITYPES_H@
+HAVE_SYS_CDEFS_H = @HAVE_SYS_CDEFS_H@
 HAVE_SYS_INTTYPES_H = @HAVE_SYS_INTTYPES_H@
 HAVE_SYS_IOCTL_H = @HAVE_SYS_IOCTL_H@
 HAVE_SYS_LOADAVG_H = @HAVE_SYS_LOADAVG_H@
@@ -1259,11 +1225,11 @@ HAVE_TZSET = @HAVE_TZSET@
 HAVE_UNISTD_H = @HAVE_UNISTD_H@
 HAVE_UNLINKAT = @HAVE_UNLINKAT@
 HAVE_UNLOCKPT = @HAVE_UNLOCKPT@
-HAVE_UNSIGNED_LONG_LONG_INT = @HAVE_UNSIGNED_LONG_LONG_INT@
 HAVE_USLEEP = @HAVE_USLEEP@
 HAVE_UTIMENSAT = @HAVE_UTIMENSAT@
 HAVE_VASPRINTF = @HAVE_VASPRINTF@
 HAVE_VDPRINTF = @HAVE_VDPRINTF@
+HAVE_VISIBILITY = @HAVE_VISIBILITY@
 HAVE_WCHAR_H = @HAVE_WCHAR_H@
 HAVE_WCHAR_T = @HAVE_WCHAR_T@
 HAVE_WCPCPY = @HAVE_WCPCPY@
@@ -1329,6 +1295,9 @@ LIBCRYPTO = @LIBCRYPTO@
 LIBCRYPTO_PREFIX = @LIBCRYPTO_PREFIX@
 LIBDL = @LIBDL@
 LIBDL_PREFIX = @LIBDL_PREFIX@
+LIBEV = @LIBEV@
+LIBEV_LIBS = @LIBEV_LIBS@
+LIBEV_PREFIX = @LIBEV_PREFIX@
 LIBGNUTLS_CFLAGS = @LIBGNUTLS_CFLAGS@
 LIBGNUTLS_LIBS = @LIBGNUTLS_LIBS@
 LIBICONV = @LIBICONV@
@@ -1340,16 +1309,16 @@ LIBOBJS = @LIBOBJS@
 LIBOPTS_CFLAGS = @LIBOPTS_CFLAGS@
 LIBOPTS_DIR = @LIBOPTS_DIR@
 LIBOPTS_LDADD = @LIBOPTS_LDADD@
-LIBPTH = @LIBPTH@
+LIBPMULTITHREAD = @LIBPMULTITHREAD@
 LIBPTHREAD = @LIBPTHREAD@
 LIBPTHREAD_PREFIX = @LIBPTHREAD_PREFIX@
-LIBPTH_PREFIX = @LIBPTH_PREFIX@
 LIBRT = @LIBRT@
 LIBRT_PREFIX = @LIBRT_PREFIX@
 LIBS = @LIBS@
 LIBSECCOMP = @LIBSECCOMP@
 LIBSECCOMP_PREFIX = @LIBSECCOMP_PREFIX@
 LIBSOCKET = @LIBSOCKET@
+LIBSTDTHREAD = @LIBSTDTHREAD@
 LIBTASN1_CFLAGS = @LIBTASN1_CFLAGS@
 LIBTASN1_LIBS = @LIBTASN1_LIBS@
 LIBTESTS_LIBDEPS = @LIBTESTS_LIBDEPS@
@@ -1362,7 +1331,12 @@ LIBUNISTRING_UNISTR_H = @LIBUNISTRING_UNISTR_H@
 LIBUNISTRING_UNITYPES_H = @LIBUNISTRING_UNITYPES_H@
 LIB_CLOCK_GETTIME = @LIB_CLOCK_GETTIME@
 LIB_NANOSLEEP = @LIB_NANOSLEEP@
+LIB_PTHREAD = @LIB_PTHREAD@
+LIB_PTHREAD_SIGMASK = @LIB_PTHREAD_SIGMASK@
+LIB_SCHED_YIELD = @LIB_SCHED_YIELD@
 LIB_SELECT = @LIB_SELECT@
+LIB_SETLOCALE = @LIB_SETLOCALE@
+LIB_SETLOCALE_NULL = @LIB_SETLOCALE_NULL@
 LIMITS_H = @LIMITS_H@
 LIPO = @LIPO@
 LN_S = @LN_S@
@@ -1374,11 +1348,11 @@ LOCALE_ZH_CN = @LOCALE_ZH_CN@
 LTALLOCA = @LTALLOCA@
 LTLIBCRYPTO = @LTLIBCRYPTO@
 LTLIBDL = @LTLIBDL@
+LTLIBEV = @LTLIBEV@
 LTLIBICONV = @LTLIBICONV@
 LTLIBINTL = @LTLIBINTL@
 LTLIBMULTITHREAD = @LTLIBMULTITHREAD@
 LTLIBOBJS = @LTLIBOBJS@
-LTLIBPTH = @LTLIBPTH@
 LTLIBPTHREAD = @LTLIBPTHREAD@
 LTLIBRT = @LTLIBRT@
 LTLIBSECCOMP = @LTLIBSECCOMP@
@@ -1420,6 +1394,8 @@ NEXT_AS_FIRST_DIRECTIVE_LIMITS_H = @NEXT_AS_FIRST_DIRECTIVE_LIMITS_H@
 NEXT_AS_FIRST_DIRECTIVE_LOCALE_H = @NEXT_AS_FIRST_DIRECTIVE_LOCALE_H@
 NEXT_AS_FIRST_DIRECTIVE_NETDB_H = @NEXT_AS_FIRST_DIRECTIVE_NETDB_H@
 NEXT_AS_FIRST_DIRECTIVE_NETINET_IN_H = @NEXT_AS_FIRST_DIRECTIVE_NETINET_IN_H@
+NEXT_AS_FIRST_DIRECTIVE_PTHREAD_H = @NEXT_AS_FIRST_DIRECTIVE_PTHREAD_H@
+NEXT_AS_FIRST_DIRECTIVE_SCHED_H = @NEXT_AS_FIRST_DIRECTIVE_SCHED_H@
 NEXT_AS_FIRST_DIRECTIVE_SIGNAL_H = @NEXT_AS_FIRST_DIRECTIVE_SIGNAL_H@
 NEXT_AS_FIRST_DIRECTIVE_STDDEF_H = @NEXT_AS_FIRST_DIRECTIVE_STDDEF_H@
 NEXT_AS_FIRST_DIRECTIVE_STDINT_H = @NEXT_AS_FIRST_DIRECTIVE_STDINT_H@
@@ -1447,6 +1423,8 @@ NEXT_LIMITS_H = @NEXT_LIMITS_H@
 NEXT_LOCALE_H = @NEXT_LOCALE_H@
 NEXT_NETDB_H = @NEXT_NETDB_H@
 NEXT_NETINET_IN_H = @NEXT_NETINET_IN_H@
+NEXT_PTHREAD_H = @NEXT_PTHREAD_H@
+NEXT_SCHED_H = @NEXT_SCHED_H@
 NEXT_SIGNAL_H = @NEXT_SIGNAL_H@
 NEXT_STDDEF_H = @NEXT_STDDEF_H@
 NEXT_STDINT_H = @NEXT_STDINT_H@
@@ -1480,6 +1458,7 @@ PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
+PARSE_DATETIME_BISON = @PARSE_DATETIME_BISON@
 PATCH_VERSION = @PATCH_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 PKG_CONFIG = @PKG_CONFIG@
@@ -1495,11 +1474,13 @@ PRI_MACROS_BROKEN = @PRI_MACROS_BROKEN@
 PTHREAD_H_DEFINES_STRUCT_TIMESPEC = @PTHREAD_H_DEFINES_STRUCT_TIMESPEC@
 PTRDIFF_T_SUFFIX = @PTRDIFF_T_SUFFIX@
 RANLIB = @RANLIB@
+REPLACE_ACCESS = @REPLACE_ACCESS@
 REPLACE_BTOWC = @REPLACE_BTOWC@
 REPLACE_CALLOC = @REPLACE_CALLOC@
 REPLACE_CANONICALIZE_FILE_NAME = @REPLACE_CANONICALIZE_FILE_NAME@
 REPLACE_CHOWN = @REPLACE_CHOWN@
 REPLACE_CLOSE = @REPLACE_CLOSE@
+REPLACE_CREAT = @REPLACE_CREAT@
 REPLACE_CTIME = @REPLACE_CTIME@
 REPLACE_DPRINTF = @REPLACE_DPRINTF@
 REPLACE_DUP = @REPLACE_DUP@
@@ -1525,6 +1506,7 @@ REPLACE_FTELLO = @REPLACE_FTELLO@
 REPLACE_FTRUNCATE = @REPLACE_FTRUNCATE@
 REPLACE_FUTIMENS = @REPLACE_FUTIMENS@
 REPLACE_GAI_STRERROR = @REPLACE_GAI_STRERROR@
+REPLACE_GETADDRINFO = @REPLACE_GETADDRINFO@
 REPLACE_GETCWD = @REPLACE_GETCWD@
 REPLACE_GETDELIM = @REPLACE_GETDELIM@
 REPLACE_GETDOMAINNAME = @REPLACE_GETDOMAINNAME@
@@ -1577,7 +1559,58 @@ REPLACE_POPEN = @REPLACE_POPEN@
 REPLACE_PREAD = @REPLACE_PREAD@
 REPLACE_PRINTF = @REPLACE_PRINTF@
 REPLACE_PSELECT = @REPLACE_PSELECT@
+REPLACE_PTHREAD_ATTR_DESTROY = @REPLACE_PTHREAD_ATTR_DESTROY@
+REPLACE_PTHREAD_ATTR_GETDETACHSTATE = @REPLACE_PTHREAD_ATTR_GETDETACHSTATE@
+REPLACE_PTHREAD_ATTR_INIT = @REPLACE_PTHREAD_ATTR_INIT@
+REPLACE_PTHREAD_ATTR_SETDETACHSTATE = @REPLACE_PTHREAD_ATTR_SETDETACHSTATE@
+REPLACE_PTHREAD_CONDATTR_DESTROY = @REPLACE_PTHREAD_CONDATTR_DESTROY@
+REPLACE_PTHREAD_CONDATTR_INIT = @REPLACE_PTHREAD_CONDATTR_INIT@
+REPLACE_PTHREAD_COND_BROADCAST = @REPLACE_PTHREAD_COND_BROADCAST@
+REPLACE_PTHREAD_COND_DESTROY = @REPLACE_PTHREAD_COND_DESTROY@
+REPLACE_PTHREAD_COND_INIT = @REPLACE_PTHREAD_COND_INIT@
+REPLACE_PTHREAD_COND_SIGNAL = @REPLACE_PTHREAD_COND_SIGNAL@
+REPLACE_PTHREAD_COND_TIMEDWAIT = @REPLACE_PTHREAD_COND_TIMEDWAIT@
+REPLACE_PTHREAD_COND_WAIT = @REPLACE_PTHREAD_COND_WAIT@
+REPLACE_PTHREAD_CREATE = @REPLACE_PTHREAD_CREATE@
+REPLACE_PTHREAD_DETACH = @REPLACE_PTHREAD_DETACH@
+REPLACE_PTHREAD_EQUAL = @REPLACE_PTHREAD_EQUAL@
+REPLACE_PTHREAD_EXIT = @REPLACE_PTHREAD_EXIT@
+REPLACE_PTHREAD_GETSPECIFIC = @REPLACE_PTHREAD_GETSPECIFIC@
+REPLACE_PTHREAD_JOIN = @REPLACE_PTHREAD_JOIN@
+REPLACE_PTHREAD_KEY_CREATE = @REPLACE_PTHREAD_KEY_CREATE@
+REPLACE_PTHREAD_KEY_DELETE = @REPLACE_PTHREAD_KEY_DELETE@
+REPLACE_PTHREAD_MUTEXATTR_DESTROY = @REPLACE_PTHREAD_MUTEXATTR_DESTROY@
+REPLACE_PTHREAD_MUTEXATTR_GETROBUST = @REPLACE_PTHREAD_MUTEXATTR_GETROBUST@
+REPLACE_PTHREAD_MUTEXATTR_GETTYPE = @REPLACE_PTHREAD_MUTEXATTR_GETTYPE@
+REPLACE_PTHREAD_MUTEXATTR_INIT = @REPLACE_PTHREAD_MUTEXATTR_INIT@
+REPLACE_PTHREAD_MUTEXATTR_SETROBUST = @REPLACE_PTHREAD_MUTEXATTR_SETROBUST@
+REPLACE_PTHREAD_MUTEXATTR_SETTYPE = @REPLACE_PTHREAD_MUTEXATTR_SETTYPE@
+REPLACE_PTHREAD_MUTEX_DESTROY = @REPLACE_PTHREAD_MUTEX_DESTROY@
+REPLACE_PTHREAD_MUTEX_INIT = @REPLACE_PTHREAD_MUTEX_INIT@
+REPLACE_PTHREAD_MUTEX_LOCK = @REPLACE_PTHREAD_MUTEX_LOCK@
+REPLACE_PTHREAD_MUTEX_TIMEDLOCK = @REPLACE_PTHREAD_MUTEX_TIMEDLOCK@
+REPLACE_PTHREAD_MUTEX_TRYLOCK = @REPLACE_PTHREAD_MUTEX_TRYLOCK@
+REPLACE_PTHREAD_MUTEX_UNLOCK = @REPLACE_PTHREAD_MUTEX_UNLOCK@
+REPLACE_PTHREAD_ONCE = @REPLACE_PTHREAD_ONCE@
+REPLACE_PTHREAD_RWLOCKATTR_DESTROY = @REPLACE_PTHREAD_RWLOCKATTR_DESTROY@
+REPLACE_PTHREAD_RWLOCKATTR_INIT = @REPLACE_PTHREAD_RWLOCKATTR_INIT@
+REPLACE_PTHREAD_RWLOCK_DESTROY = @REPLACE_PTHREAD_RWLOCK_DESTROY@
+REPLACE_PTHREAD_RWLOCK_INIT = @REPLACE_PTHREAD_RWLOCK_INIT@
+REPLACE_PTHREAD_RWLOCK_RDLOCK = @REPLACE_PTHREAD_RWLOCK_RDLOCK@
+REPLACE_PTHREAD_RWLOCK_TIMEDRDLOCK = @REPLACE_PTHREAD_RWLOCK_TIMEDRDLOCK@
+REPLACE_PTHREAD_RWLOCK_TIMEDWRLOCK = @REPLACE_PTHREAD_RWLOCK_TIMEDWRLOCK@
+REPLACE_PTHREAD_RWLOCK_TRYRDLOCK = @REPLACE_PTHREAD_RWLOCK_TRYRDLOCK@
+REPLACE_PTHREAD_RWLOCK_TRYWRLOCK = @REPLACE_PTHREAD_RWLOCK_TRYWRLOCK@
+REPLACE_PTHREAD_RWLOCK_UNLOCK = @REPLACE_PTHREAD_RWLOCK_UNLOCK@
+REPLACE_PTHREAD_RWLOCK_WRLOCK = @REPLACE_PTHREAD_RWLOCK_WRLOCK@
+REPLACE_PTHREAD_SELF = @REPLACE_PTHREAD_SELF@
+REPLACE_PTHREAD_SETSPECIFIC = @REPLACE_PTHREAD_SETSPECIFIC@
 REPLACE_PTHREAD_SIGMASK = @REPLACE_PTHREAD_SIGMASK@
+REPLACE_PTHREAD_SPIN_DESTROY = @REPLACE_PTHREAD_SPIN_DESTROY@
+REPLACE_PTHREAD_SPIN_INIT = @REPLACE_PTHREAD_SPIN_INIT@
+REPLACE_PTHREAD_SPIN_LOCK = @REPLACE_PTHREAD_SPIN_LOCK@
+REPLACE_PTHREAD_SPIN_TRYLOCK = @REPLACE_PTHREAD_SPIN_TRYLOCK@
+REPLACE_PTHREAD_SPIN_UNLOCK = @REPLACE_PTHREAD_SPIN_UNLOCK@
 REPLACE_PTSNAME = @REPLACE_PTSNAME@
 REPLACE_PTSNAME_R = @REPLACE_PTSNAME_R@
 REPLACE_PUTENV = @REPLACE_PUTENV@
@@ -1595,6 +1628,7 @@ REPLACE_REMOVE = @REPLACE_REMOVE@
 REPLACE_RENAME = @REPLACE_RENAME@
 REPLACE_RENAMEAT = @REPLACE_RENAMEAT@
 REPLACE_RMDIR = @REPLACE_RMDIR@
+REPLACE_SCHED_YIELD = @REPLACE_SCHED_YIELD@
 REPLACE_SELECT = @REPLACE_SELECT@
 REPLACE_SETENV = @REPLACE_SETENV@
 REPLACE_SETLOCALE = @REPLACE_SETLOCALE@
@@ -1646,6 +1680,7 @@ REPLACE_WCRTOMB = @REPLACE_WCRTOMB@
 REPLACE_WCSFTIME = @REPLACE_WCSFTIME@
 REPLACE_WCSNRTOMBS = @REPLACE_WCSNRTOMBS@
 REPLACE_WCSRTOMBS = @REPLACE_WCSRTOMBS@
+REPLACE_WCSTOK = @REPLACE_WCSTOK@
 REPLACE_WCSWIDTH = @REPLACE_WCSWIDTH@
 REPLACE_WCTOB = @REPLACE_WCTOB@
 REPLACE_WCTOMB = @REPLACE_WCTOMB@
@@ -1754,13 +1789,13 @@ libexecdir = @libexecdir@
 localedir = @localedir@
 localstatedir = @localstatedir@
 mandir = @mandir@
+maybe_guileextensiondir = @maybe_guileextensiondir@
 mkdir_p = @mkdir_p@
 oldincludedir = @oldincludedir@
 pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
-runstatedir = @runstatedir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
@@ -1784,13 +1819,8 @@ AM_CPPFLAGS = \
 	-I$(top_builddir)/extra/includes	\
 	-I$(top_srcdir)/lib			\
 	-I$(top_srcdir)/tests			\
-	-I$(top_srcdir)/doc/examples	\
-	-I$(top_srcdir)/tests/suite/ecore/src/include \
-	-I$(top_srcdir)/tests/suite/ecore/src/lib
+	-I$(top_srcdir)/doc/examples
 
-EXTRA_DIST = cbc-record-check.sh testcompat-main-polarssl \
-	testcompat-main-openssl testcompat-common params.dh \
-	tls-fuzzer/tls-fuzzer-common.sh
 AM_LDFLAGS = -no-install
 LDADD = ../../lib/libgnutls.la \
 	../../gl/libgnu.la \
@@ -1798,48 +1828,6 @@ LDADD = ../../lib/libgnutls.la \
 	$(LIBSOCKET) $(INET_NTOP_LIB) $(INET_PTON_LIB)
 
 prime_check_LDADD = $(LDADD) -lhogweed -lgmp
-libecore_la_CPPFLAGS = -I$(top_srcdir)/tests/suite/ecore/		\
-	-I$(top_srcdir)/tests/suite/ecore/src/include			\
-	-I$(top_srcdir)/tests/suite/ecore/src/lib -DHAVE_CONFIG_H	\
-	-D__UNUSED__= -DVMAJ=1 -D VMIC=0 -DVMIN=0 -DVREV=0		\
-	-DEFL_HAVE_POSIX_THREADS=1 -DEFL_HAVE_POSIX_THREADS_SPINLOCK=1	\
-	-DEFL_HAVE_THREADS=1 -DEINA_BUILD_CHAINED_POOL=1		\
-	-DEINA_STATIC_BUILD_CHAINED_POOL=1 -DHAVE_CLOCK_GETTIME		\
-	-DHAVE_GETTIMEOFDAY -DPACKAGE_LIB_DIR=\"/usr/lib\"		\
-	-DMODULE_ARCH=\"unix\" -DSHARED_LIB_SUFFIX=\".so\"
-
-libecore_la_CFLAGS = -w
-nodist_libecore_la_SOURCES = ecore/src/lib/ecore_anim.c			\
-	ecore/src/lib/ecore_app.c ecore/src/lib/ecore.c			\
-	ecore/src/lib/ecore_events.c ecore/src/lib/ecore_exe.c		\
-	ecore/src/lib/ecore_getopt.c ecore/src/lib/ecore_glib.c		\
-	ecore/src/lib/ecore_idle_enterer.c				\
-	ecore/src/lib/ecore_idle_exiter.c ecore/src/lib/ecore_idler.c	\
-	ecore/src/lib/ecore_job.c ecore/src/lib/ecore_main.c		\
-	ecore/src/lib/ecore_pipe.c ecore/src/lib/ecore_poll.c		\
-	ecore/src/lib/ecore_signal.c ecore/src/lib/ecore_thread.c	\
-	ecore/src/lib/ecore_time.c ecore/src/lib/ecore_timer.c		\
-	ecore/src/lib/eina_accessor.c ecore/src/lib/eina_array.c	\
-	ecore/src/lib/eina_benchmark.c ecore/src/lib/eina_binshare.c	\
-	ecore/src/lib/eina_chained_mempool.c				\
-	ecore/src/lib/eina_convert.c ecore/src/lib/eina_counter.c	\
-	ecore/src/lib/eina_cpu.c ecore/src/lib/eina_error.c		\
-	ecore/src/lib/eina_file.c ecore/src/lib/eina_fp.c		\
-	ecore/src/lib/eina_hamster.c ecore/src/lib/eina_hash.c		\
-	ecore/src/lib/eina_inlist.c ecore/src/lib/eina_iterator.c	\
-	ecore/src/lib/eina_lalloc.c ecore/src/lib/eina_list.c		\
-	ecore/src/lib/eina_log.c ecore/src/lib/eina_magic.c		\
-	ecore/src/lib/eina_main.c ecore/src/lib/eina_matrixsparse.c	\
-	ecore/src/lib/eina_mempool.c ecore/src/lib/eina_module.c	\
-	ecore/src/lib/eina_quadtree.c ecore/src/lib/eina_rbtree.c	\
-	ecore/src/lib/eina_rectangle.c					\
-	ecore/src/lib/eina_safety_checks.c ecore/src/lib/eina_sched.c	\
-	ecore/src/lib/eina_share_common.c ecore/src/lib/eina_strbuf.c	\
-	ecore/src/lib/eina_strbuf_common.c ecore/src/lib/eina_str.c	\
-	ecore/src/lib/eina_stringshare.c ecore/src/lib/eina_tiler.c	\
-	ecore/src/lib/eina_unicode.c ecore/src/lib/eina_ustrbuf.c	\
-	ecore/src/lib/eina_ustringshare.c ecore/src/lib/eina_value.c
-
 scripts_to_test = chain.sh testrng.sh testcompat-polarssl.sh \
 	testcompat-openssl.sh testrandom.sh \
 	tls-fuzzer/tls-fuzzer-nocert.sh tls-fuzzer/tls-fuzzer-cert.sh \
@@ -1852,11 +1840,14 @@ scripts_to_test = chain.sh testrng.sh testcompat-polarssl.sh \
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) LC_ALL="C" VALGRIND="$(VALGRIND)" \
 	top_builddir="$(top_builddir)" srcdir="$(srcdir)" \
 	ASAN_OPTIONS="detect_leaks=0" GNUTLS_TEST_SUITE_RUN=1 \
+	GNUTLS_SYSTEM_PRIORITY_FILE=$(abs_top_srcdir)/tests/system.prio \
 	OPENSSL_ia32cap=0x00000000 $(am__append_1) $(am__append_3)
-@MACOSX_FALSE@@WINDOWS_FALSE@noinst_LTLIBRARIES = libecore.la
 @MACOSX_FALSE@@WINDOWS_FALSE@mini_record_timing_LDADD = -lrt $(LDADD)
-@MACOSX_FALSE@@WINDOWS_FALSE@eagain_cli_LDADD = libecore.la -lrt -lm $(LIBDL) -lpthread $(LDADD)
-@MACOSX_FALSE@@WINDOWS_FALSE@nodist_eagain_cli_SOURCES = mini-eagain2.c
+@MACOSX_FALSE@@WINDOWS_FALSE@nodist_mini_record_timing_SOURCES = mini-record-timing.c
+@MACOSX_FALSE@@WINDOWS_FALSE@eagain_cli_LDADD = $(LIBEV_LIBS) -lrt -lm $(LIBDL) -lpthread $(LDADD)
+@MACOSX_FALSE@@WINDOWS_FALSE@nodist_eagain_cli_SOURCES = eagain-cli.c
+nodist_prime_check_SOURCES = prime-check.c
+nodist_rng_SOURCES = rng.c
 nodist_check_SCRIPTS = $(scripts_to_test)
 prime_check_CPPFLAGS = $(AM_CPPFLAGS) $(NETTLE_CFLAGS)
 TEST_EXTENSIONS = .sh
@@ -1914,182 +1905,6 @@ clean-noinstPROGRAMS:
 	echo " rm -f" $$list; \
 	rm -f $$list
 
-clean-noinstLTLIBRARIES:
-	-test -z "$(noinst_LTLIBRARIES)" || rm -f $(noinst_LTLIBRARIES)
-	@list='$(noinst_LTLIBRARIES)'; \
-	locs=`for p in $$list; do echo $$p; done | \
-	      sed 's|^[^/]*$$|.|; s|/[^/]*$$||; s|$$|/so_locations|' | \
-	      sort -u`; \
-	test -z "$$locs" || { \
-	  echo rm -f $${locs}; \
-	  rm -f $${locs}; \
-	}
-ecore/src/lib/$(am__dirstamp):
-	@$(MKDIR_P) ecore/src/lib
-	@: > ecore/src/lib/$(am__dirstamp)
-ecore/src/lib/$(DEPDIR)/$(am__dirstamp):
-	@$(MKDIR_P) ecore/src/lib/$(DEPDIR)
-	@: > ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-ecore_anim.lo:  \
-	ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-ecore_app.lo: ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-ecore.lo: ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-ecore_events.lo:  \
-	ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-ecore_exe.lo: ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-ecore_getopt.lo:  \
-	ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-ecore_glib.lo:  \
-	ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-ecore_idle_enterer.lo:  \
-	ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-ecore_idle_exiter.lo:  \
-	ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-ecore_idler.lo:  \
-	ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-ecore_job.lo: ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-ecore_main.lo:  \
-	ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-ecore_pipe.lo:  \
-	ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-ecore_poll.lo:  \
-	ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-ecore_signal.lo:  \
-	ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-ecore_thread.lo:  \
-	ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-ecore_time.lo:  \
-	ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-ecore_timer.lo:  \
-	ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-eina_accessor.lo:  \
-	ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-eina_array.lo:  \
-	ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-eina_benchmark.lo:  \
-	ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-eina_binshare.lo:  \
-	ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-eina_chained_mempool.lo:  \
-	ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-eina_convert.lo:  \
-	ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-eina_counter.lo:  \
-	ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-eina_cpu.lo: ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-eina_error.lo:  \
-	ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-eina_file.lo: ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-eina_fp.lo: ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-eina_hamster.lo:  \
-	ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-eina_hash.lo: ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-eina_inlist.lo:  \
-	ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-eina_iterator.lo:  \
-	ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-eina_lalloc.lo:  \
-	ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-eina_list.lo: ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-eina_log.lo: ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-eina_magic.lo:  \
-	ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-eina_main.lo: ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-eina_matrixsparse.lo:  \
-	ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-eina_mempool.lo:  \
-	ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-eina_module.lo:  \
-	ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-eina_quadtree.lo:  \
-	ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-eina_rbtree.lo:  \
-	ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-eina_rectangle.lo:  \
-	ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-eina_safety_checks.lo:  \
-	ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-eina_sched.lo:  \
-	ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-eina_share_common.lo:  \
-	ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-eina_strbuf.lo:  \
-	ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-eina_strbuf_common.lo:  \
-	ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-eina_str.lo: ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-eina_stringshare.lo:  \
-	ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-eina_tiler.lo:  \
-	ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-eina_unicode.lo:  \
-	ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-eina_ustrbuf.lo:  \
-	ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-eina_ustringshare.lo:  \
-	ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-ecore/src/lib/libecore_la-eina_value.lo:  \
-	ecore/src/lib/$(am__dirstamp) \
-	ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-
-libecore.la: $(libecore_la_OBJECTS) $(libecore_la_DEPENDENCIES) $(EXTRA_libecore_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libecore_la_LINK) $(am_libecore_la_rpath) $(libecore_la_OBJECTS) $(libecore_la_LIBADD) $(LIBS)
-
 eagain-cli$(EXEEXT): $(eagain_cli_OBJECTS) $(eagain_cli_DEPENDENCIES) $(EXTRA_eagain_cli_DEPENDENCIES) 
 	@rm -f eagain-cli$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(eagain_cli_OBJECTS) $(eagain_cli_LDADD) $(LIBS)
@@ -2108,72 +1923,14 @@ rng$(EXEEXT): $(rng_OBJECTS) $(rng_DEPENDENCIES) $(EXTRA_rng_DEPENDENCIES)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
-	-rm -f ecore/src/lib/*.$(OBJEXT)
-	-rm -f ecore/src/lib/*.lo
 
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mini-eagain2.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eagain-cli.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mini-record-timing.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/prime_check-prime-check.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rng.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-ecore.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-ecore_anim.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-ecore_app.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-ecore_events.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-ecore_exe.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-ecore_getopt.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-ecore_glib.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-ecore_idle_enterer.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-ecore_idle_exiter.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-ecore_idler.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-ecore_job.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-ecore_main.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-ecore_pipe.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-ecore_poll.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-ecore_signal.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-ecore_thread.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-ecore_time.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-ecore_timer.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-eina_accessor.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-eina_array.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-eina_benchmark.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-eina_binshare.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-eina_chained_mempool.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-eina_convert.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-eina_counter.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-eina_cpu.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-eina_error.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-eina_file.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-eina_fp.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-eina_hamster.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-eina_hash.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-eina_inlist.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-eina_iterator.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-eina_lalloc.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-eina_list.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-eina_log.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-eina_magic.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-eina_main.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-eina_matrixsparse.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-eina_mempool.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-eina_module.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-eina_quadtree.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-eina_rbtree.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-eina_rectangle.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-eina_safety_checks.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-eina_sched.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-eina_share_common.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-eina_str.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-eina_strbuf.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-eina_strbuf_common.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-eina_stringshare.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-eina_tiler.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-eina_unicode.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-eina_ustrbuf.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-eina_ustringshare.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ecore/src/lib/$(DEPDIR)/libecore_la-eina_value.Plo@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
 	@$(MKDIR_P) $(@D)
@@ -2205,398 +1962,6 @@ am--depfiles: $(am__depfiles_remade)
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LTCOMPILE) -c -o $@ $<
 
-ecore/src/lib/libecore_la-ecore_anim.lo: ecore/src/lib/ecore_anim.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-ecore_anim.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-ecore_anim.Tpo -c -o ecore/src/lib/libecore_la-ecore_anim.lo `test -f 'ecore/src/lib/ecore_anim.c' || echo '$(srcdir)/'`ecore/src/lib/ecore_anim.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-ecore_anim.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-ecore_anim.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/ecore_anim.c' object='ecore/src/lib/libecore_la-ecore_anim.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-ecore_anim.lo `test -f 'ecore/src/lib/ecore_anim.c' || echo '$(srcdir)/'`ecore/src/lib/ecore_anim.c
-
-ecore/src/lib/libecore_la-ecore_app.lo: ecore/src/lib/ecore_app.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-ecore_app.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-ecore_app.Tpo -c -o ecore/src/lib/libecore_la-ecore_app.lo `test -f 'ecore/src/lib/ecore_app.c' || echo '$(srcdir)/'`ecore/src/lib/ecore_app.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-ecore_app.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-ecore_app.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/ecore_app.c' object='ecore/src/lib/libecore_la-ecore_app.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-ecore_app.lo `test -f 'ecore/src/lib/ecore_app.c' || echo '$(srcdir)/'`ecore/src/lib/ecore_app.c
-
-ecore/src/lib/libecore_la-ecore.lo: ecore/src/lib/ecore.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-ecore.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-ecore.Tpo -c -o ecore/src/lib/libecore_la-ecore.lo `test -f 'ecore/src/lib/ecore.c' || echo '$(srcdir)/'`ecore/src/lib/ecore.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-ecore.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-ecore.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/ecore.c' object='ecore/src/lib/libecore_la-ecore.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-ecore.lo `test -f 'ecore/src/lib/ecore.c' || echo '$(srcdir)/'`ecore/src/lib/ecore.c
-
-ecore/src/lib/libecore_la-ecore_events.lo: ecore/src/lib/ecore_events.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-ecore_events.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-ecore_events.Tpo -c -o ecore/src/lib/libecore_la-ecore_events.lo `test -f 'ecore/src/lib/ecore_events.c' || echo '$(srcdir)/'`ecore/src/lib/ecore_events.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-ecore_events.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-ecore_events.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/ecore_events.c' object='ecore/src/lib/libecore_la-ecore_events.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-ecore_events.lo `test -f 'ecore/src/lib/ecore_events.c' || echo '$(srcdir)/'`ecore/src/lib/ecore_events.c
-
-ecore/src/lib/libecore_la-ecore_exe.lo: ecore/src/lib/ecore_exe.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-ecore_exe.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-ecore_exe.Tpo -c -o ecore/src/lib/libecore_la-ecore_exe.lo `test -f 'ecore/src/lib/ecore_exe.c' || echo '$(srcdir)/'`ecore/src/lib/ecore_exe.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-ecore_exe.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-ecore_exe.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/ecore_exe.c' object='ecore/src/lib/libecore_la-ecore_exe.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-ecore_exe.lo `test -f 'ecore/src/lib/ecore_exe.c' || echo '$(srcdir)/'`ecore/src/lib/ecore_exe.c
-
-ecore/src/lib/libecore_la-ecore_getopt.lo: ecore/src/lib/ecore_getopt.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-ecore_getopt.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-ecore_getopt.Tpo -c -o ecore/src/lib/libecore_la-ecore_getopt.lo `test -f 'ecore/src/lib/ecore_getopt.c' || echo '$(srcdir)/'`ecore/src/lib/ecore_getopt.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-ecore_getopt.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-ecore_getopt.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/ecore_getopt.c' object='ecore/src/lib/libecore_la-ecore_getopt.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-ecore_getopt.lo `test -f 'ecore/src/lib/ecore_getopt.c' || echo '$(srcdir)/'`ecore/src/lib/ecore_getopt.c
-
-ecore/src/lib/libecore_la-ecore_glib.lo: ecore/src/lib/ecore_glib.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-ecore_glib.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-ecore_glib.Tpo -c -o ecore/src/lib/libecore_la-ecore_glib.lo `test -f 'ecore/src/lib/ecore_glib.c' || echo '$(srcdir)/'`ecore/src/lib/ecore_glib.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-ecore_glib.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-ecore_glib.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/ecore_glib.c' object='ecore/src/lib/libecore_la-ecore_glib.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-ecore_glib.lo `test -f 'ecore/src/lib/ecore_glib.c' || echo '$(srcdir)/'`ecore/src/lib/ecore_glib.c
-
-ecore/src/lib/libecore_la-ecore_idle_enterer.lo: ecore/src/lib/ecore_idle_enterer.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-ecore_idle_enterer.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-ecore_idle_enterer.Tpo -c -o ecore/src/lib/libecore_la-ecore_idle_enterer.lo `test -f 'ecore/src/lib/ecore_idle_enterer.c' || echo '$(srcdir)/'`ecore/src/lib/ecore_idle_enterer.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-ecore_idle_enterer.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-ecore_idle_enterer.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/ecore_idle_enterer.c' object='ecore/src/lib/libecore_la-ecore_idle_enterer.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-ecore_idle_enterer.lo `test -f 'ecore/src/lib/ecore_idle_enterer.c' || echo '$(srcdir)/'`ecore/src/lib/ecore_idle_enterer.c
-
-ecore/src/lib/libecore_la-ecore_idle_exiter.lo: ecore/src/lib/ecore_idle_exiter.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-ecore_idle_exiter.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-ecore_idle_exiter.Tpo -c -o ecore/src/lib/libecore_la-ecore_idle_exiter.lo `test -f 'ecore/src/lib/ecore_idle_exiter.c' || echo '$(srcdir)/'`ecore/src/lib/ecore_idle_exiter.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-ecore_idle_exiter.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-ecore_idle_exiter.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/ecore_idle_exiter.c' object='ecore/src/lib/libecore_la-ecore_idle_exiter.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-ecore_idle_exiter.lo `test -f 'ecore/src/lib/ecore_idle_exiter.c' || echo '$(srcdir)/'`ecore/src/lib/ecore_idle_exiter.c
-
-ecore/src/lib/libecore_la-ecore_idler.lo: ecore/src/lib/ecore_idler.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-ecore_idler.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-ecore_idler.Tpo -c -o ecore/src/lib/libecore_la-ecore_idler.lo `test -f 'ecore/src/lib/ecore_idler.c' || echo '$(srcdir)/'`ecore/src/lib/ecore_idler.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-ecore_idler.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-ecore_idler.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/ecore_idler.c' object='ecore/src/lib/libecore_la-ecore_idler.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-ecore_idler.lo `test -f 'ecore/src/lib/ecore_idler.c' || echo '$(srcdir)/'`ecore/src/lib/ecore_idler.c
-
-ecore/src/lib/libecore_la-ecore_job.lo: ecore/src/lib/ecore_job.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-ecore_job.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-ecore_job.Tpo -c -o ecore/src/lib/libecore_la-ecore_job.lo `test -f 'ecore/src/lib/ecore_job.c' || echo '$(srcdir)/'`ecore/src/lib/ecore_job.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-ecore_job.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-ecore_job.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/ecore_job.c' object='ecore/src/lib/libecore_la-ecore_job.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-ecore_job.lo `test -f 'ecore/src/lib/ecore_job.c' || echo '$(srcdir)/'`ecore/src/lib/ecore_job.c
-
-ecore/src/lib/libecore_la-ecore_main.lo: ecore/src/lib/ecore_main.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-ecore_main.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-ecore_main.Tpo -c -o ecore/src/lib/libecore_la-ecore_main.lo `test -f 'ecore/src/lib/ecore_main.c' || echo '$(srcdir)/'`ecore/src/lib/ecore_main.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-ecore_main.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-ecore_main.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/ecore_main.c' object='ecore/src/lib/libecore_la-ecore_main.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-ecore_main.lo `test -f 'ecore/src/lib/ecore_main.c' || echo '$(srcdir)/'`ecore/src/lib/ecore_main.c
-
-ecore/src/lib/libecore_la-ecore_pipe.lo: ecore/src/lib/ecore_pipe.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-ecore_pipe.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-ecore_pipe.Tpo -c -o ecore/src/lib/libecore_la-ecore_pipe.lo `test -f 'ecore/src/lib/ecore_pipe.c' || echo '$(srcdir)/'`ecore/src/lib/ecore_pipe.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-ecore_pipe.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-ecore_pipe.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/ecore_pipe.c' object='ecore/src/lib/libecore_la-ecore_pipe.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-ecore_pipe.lo `test -f 'ecore/src/lib/ecore_pipe.c' || echo '$(srcdir)/'`ecore/src/lib/ecore_pipe.c
-
-ecore/src/lib/libecore_la-ecore_poll.lo: ecore/src/lib/ecore_poll.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-ecore_poll.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-ecore_poll.Tpo -c -o ecore/src/lib/libecore_la-ecore_poll.lo `test -f 'ecore/src/lib/ecore_poll.c' || echo '$(srcdir)/'`ecore/src/lib/ecore_poll.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-ecore_poll.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-ecore_poll.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/ecore_poll.c' object='ecore/src/lib/libecore_la-ecore_poll.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-ecore_poll.lo `test -f 'ecore/src/lib/ecore_poll.c' || echo '$(srcdir)/'`ecore/src/lib/ecore_poll.c
-
-ecore/src/lib/libecore_la-ecore_signal.lo: ecore/src/lib/ecore_signal.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-ecore_signal.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-ecore_signal.Tpo -c -o ecore/src/lib/libecore_la-ecore_signal.lo `test -f 'ecore/src/lib/ecore_signal.c' || echo '$(srcdir)/'`ecore/src/lib/ecore_signal.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-ecore_signal.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-ecore_signal.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/ecore_signal.c' object='ecore/src/lib/libecore_la-ecore_signal.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-ecore_signal.lo `test -f 'ecore/src/lib/ecore_signal.c' || echo '$(srcdir)/'`ecore/src/lib/ecore_signal.c
-
-ecore/src/lib/libecore_la-ecore_thread.lo: ecore/src/lib/ecore_thread.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-ecore_thread.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-ecore_thread.Tpo -c -o ecore/src/lib/libecore_la-ecore_thread.lo `test -f 'ecore/src/lib/ecore_thread.c' || echo '$(srcdir)/'`ecore/src/lib/ecore_thread.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-ecore_thread.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-ecore_thread.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/ecore_thread.c' object='ecore/src/lib/libecore_la-ecore_thread.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-ecore_thread.lo `test -f 'ecore/src/lib/ecore_thread.c' || echo '$(srcdir)/'`ecore/src/lib/ecore_thread.c
-
-ecore/src/lib/libecore_la-ecore_time.lo: ecore/src/lib/ecore_time.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-ecore_time.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-ecore_time.Tpo -c -o ecore/src/lib/libecore_la-ecore_time.lo `test -f 'ecore/src/lib/ecore_time.c' || echo '$(srcdir)/'`ecore/src/lib/ecore_time.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-ecore_time.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-ecore_time.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/ecore_time.c' object='ecore/src/lib/libecore_la-ecore_time.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-ecore_time.lo `test -f 'ecore/src/lib/ecore_time.c' || echo '$(srcdir)/'`ecore/src/lib/ecore_time.c
-
-ecore/src/lib/libecore_la-ecore_timer.lo: ecore/src/lib/ecore_timer.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-ecore_timer.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-ecore_timer.Tpo -c -o ecore/src/lib/libecore_la-ecore_timer.lo `test -f 'ecore/src/lib/ecore_timer.c' || echo '$(srcdir)/'`ecore/src/lib/ecore_timer.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-ecore_timer.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-ecore_timer.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/ecore_timer.c' object='ecore/src/lib/libecore_la-ecore_timer.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-ecore_timer.lo `test -f 'ecore/src/lib/ecore_timer.c' || echo '$(srcdir)/'`ecore/src/lib/ecore_timer.c
-
-ecore/src/lib/libecore_la-eina_accessor.lo: ecore/src/lib/eina_accessor.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-eina_accessor.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-eina_accessor.Tpo -c -o ecore/src/lib/libecore_la-eina_accessor.lo `test -f 'ecore/src/lib/eina_accessor.c' || echo '$(srcdir)/'`ecore/src/lib/eina_accessor.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-eina_accessor.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-eina_accessor.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/eina_accessor.c' object='ecore/src/lib/libecore_la-eina_accessor.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-eina_accessor.lo `test -f 'ecore/src/lib/eina_accessor.c' || echo '$(srcdir)/'`ecore/src/lib/eina_accessor.c
-
-ecore/src/lib/libecore_la-eina_array.lo: ecore/src/lib/eina_array.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-eina_array.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-eina_array.Tpo -c -o ecore/src/lib/libecore_la-eina_array.lo `test -f 'ecore/src/lib/eina_array.c' || echo '$(srcdir)/'`ecore/src/lib/eina_array.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-eina_array.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-eina_array.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/eina_array.c' object='ecore/src/lib/libecore_la-eina_array.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-eina_array.lo `test -f 'ecore/src/lib/eina_array.c' || echo '$(srcdir)/'`ecore/src/lib/eina_array.c
-
-ecore/src/lib/libecore_la-eina_benchmark.lo: ecore/src/lib/eina_benchmark.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-eina_benchmark.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-eina_benchmark.Tpo -c -o ecore/src/lib/libecore_la-eina_benchmark.lo `test -f 'ecore/src/lib/eina_benchmark.c' || echo '$(srcdir)/'`ecore/src/lib/eina_benchmark.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-eina_benchmark.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-eina_benchmark.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/eina_benchmark.c' object='ecore/src/lib/libecore_la-eina_benchmark.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-eina_benchmark.lo `test -f 'ecore/src/lib/eina_benchmark.c' || echo '$(srcdir)/'`ecore/src/lib/eina_benchmark.c
-
-ecore/src/lib/libecore_la-eina_binshare.lo: ecore/src/lib/eina_binshare.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-eina_binshare.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-eina_binshare.Tpo -c -o ecore/src/lib/libecore_la-eina_binshare.lo `test -f 'ecore/src/lib/eina_binshare.c' || echo '$(srcdir)/'`ecore/src/lib/eina_binshare.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-eina_binshare.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-eina_binshare.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/eina_binshare.c' object='ecore/src/lib/libecore_la-eina_binshare.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-eina_binshare.lo `test -f 'ecore/src/lib/eina_binshare.c' || echo '$(srcdir)/'`ecore/src/lib/eina_binshare.c
-
-ecore/src/lib/libecore_la-eina_chained_mempool.lo: ecore/src/lib/eina_chained_mempool.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-eina_chained_mempool.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-eina_chained_mempool.Tpo -c -o ecore/src/lib/libecore_la-eina_chained_mempool.lo `test -f 'ecore/src/lib/eina_chained_mempool.c' || echo '$(srcdir)/'`ecore/src/lib/eina_chained_mempool.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-eina_chained_mempool.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-eina_chained_mempool.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/eina_chained_mempool.c' object='ecore/src/lib/libecore_la-eina_chained_mempool.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-eina_chained_mempool.lo `test -f 'ecore/src/lib/eina_chained_mempool.c' || echo '$(srcdir)/'`ecore/src/lib/eina_chained_mempool.c
-
-ecore/src/lib/libecore_la-eina_convert.lo: ecore/src/lib/eina_convert.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-eina_convert.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-eina_convert.Tpo -c -o ecore/src/lib/libecore_la-eina_convert.lo `test -f 'ecore/src/lib/eina_convert.c' || echo '$(srcdir)/'`ecore/src/lib/eina_convert.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-eina_convert.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-eina_convert.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/eina_convert.c' object='ecore/src/lib/libecore_la-eina_convert.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-eina_convert.lo `test -f 'ecore/src/lib/eina_convert.c' || echo '$(srcdir)/'`ecore/src/lib/eina_convert.c
-
-ecore/src/lib/libecore_la-eina_counter.lo: ecore/src/lib/eina_counter.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-eina_counter.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-eina_counter.Tpo -c -o ecore/src/lib/libecore_la-eina_counter.lo `test -f 'ecore/src/lib/eina_counter.c' || echo '$(srcdir)/'`ecore/src/lib/eina_counter.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-eina_counter.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-eina_counter.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/eina_counter.c' object='ecore/src/lib/libecore_la-eina_counter.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-eina_counter.lo `test -f 'ecore/src/lib/eina_counter.c' || echo '$(srcdir)/'`ecore/src/lib/eina_counter.c
-
-ecore/src/lib/libecore_la-eina_cpu.lo: ecore/src/lib/eina_cpu.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-eina_cpu.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-eina_cpu.Tpo -c -o ecore/src/lib/libecore_la-eina_cpu.lo `test -f 'ecore/src/lib/eina_cpu.c' || echo '$(srcdir)/'`ecore/src/lib/eina_cpu.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-eina_cpu.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-eina_cpu.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/eina_cpu.c' object='ecore/src/lib/libecore_la-eina_cpu.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-eina_cpu.lo `test -f 'ecore/src/lib/eina_cpu.c' || echo '$(srcdir)/'`ecore/src/lib/eina_cpu.c
-
-ecore/src/lib/libecore_la-eina_error.lo: ecore/src/lib/eina_error.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-eina_error.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-eina_error.Tpo -c -o ecore/src/lib/libecore_la-eina_error.lo `test -f 'ecore/src/lib/eina_error.c' || echo '$(srcdir)/'`ecore/src/lib/eina_error.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-eina_error.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-eina_error.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/eina_error.c' object='ecore/src/lib/libecore_la-eina_error.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-eina_error.lo `test -f 'ecore/src/lib/eina_error.c' || echo '$(srcdir)/'`ecore/src/lib/eina_error.c
-
-ecore/src/lib/libecore_la-eina_file.lo: ecore/src/lib/eina_file.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-eina_file.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-eina_file.Tpo -c -o ecore/src/lib/libecore_la-eina_file.lo `test -f 'ecore/src/lib/eina_file.c' || echo '$(srcdir)/'`ecore/src/lib/eina_file.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-eina_file.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-eina_file.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/eina_file.c' object='ecore/src/lib/libecore_la-eina_file.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-eina_file.lo `test -f 'ecore/src/lib/eina_file.c' || echo '$(srcdir)/'`ecore/src/lib/eina_file.c
-
-ecore/src/lib/libecore_la-eina_fp.lo: ecore/src/lib/eina_fp.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-eina_fp.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-eina_fp.Tpo -c -o ecore/src/lib/libecore_la-eina_fp.lo `test -f 'ecore/src/lib/eina_fp.c' || echo '$(srcdir)/'`ecore/src/lib/eina_fp.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-eina_fp.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-eina_fp.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/eina_fp.c' object='ecore/src/lib/libecore_la-eina_fp.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-eina_fp.lo `test -f 'ecore/src/lib/eina_fp.c' || echo '$(srcdir)/'`ecore/src/lib/eina_fp.c
-
-ecore/src/lib/libecore_la-eina_hamster.lo: ecore/src/lib/eina_hamster.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-eina_hamster.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-eina_hamster.Tpo -c -o ecore/src/lib/libecore_la-eina_hamster.lo `test -f 'ecore/src/lib/eina_hamster.c' || echo '$(srcdir)/'`ecore/src/lib/eina_hamster.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-eina_hamster.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-eina_hamster.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/eina_hamster.c' object='ecore/src/lib/libecore_la-eina_hamster.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-eina_hamster.lo `test -f 'ecore/src/lib/eina_hamster.c' || echo '$(srcdir)/'`ecore/src/lib/eina_hamster.c
-
-ecore/src/lib/libecore_la-eina_hash.lo: ecore/src/lib/eina_hash.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-eina_hash.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-eina_hash.Tpo -c -o ecore/src/lib/libecore_la-eina_hash.lo `test -f 'ecore/src/lib/eina_hash.c' || echo '$(srcdir)/'`ecore/src/lib/eina_hash.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-eina_hash.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-eina_hash.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/eina_hash.c' object='ecore/src/lib/libecore_la-eina_hash.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-eina_hash.lo `test -f 'ecore/src/lib/eina_hash.c' || echo '$(srcdir)/'`ecore/src/lib/eina_hash.c
-
-ecore/src/lib/libecore_la-eina_inlist.lo: ecore/src/lib/eina_inlist.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-eina_inlist.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-eina_inlist.Tpo -c -o ecore/src/lib/libecore_la-eina_inlist.lo `test -f 'ecore/src/lib/eina_inlist.c' || echo '$(srcdir)/'`ecore/src/lib/eina_inlist.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-eina_inlist.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-eina_inlist.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/eina_inlist.c' object='ecore/src/lib/libecore_la-eina_inlist.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-eina_inlist.lo `test -f 'ecore/src/lib/eina_inlist.c' || echo '$(srcdir)/'`ecore/src/lib/eina_inlist.c
-
-ecore/src/lib/libecore_la-eina_iterator.lo: ecore/src/lib/eina_iterator.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-eina_iterator.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-eina_iterator.Tpo -c -o ecore/src/lib/libecore_la-eina_iterator.lo `test -f 'ecore/src/lib/eina_iterator.c' || echo '$(srcdir)/'`ecore/src/lib/eina_iterator.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-eina_iterator.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-eina_iterator.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/eina_iterator.c' object='ecore/src/lib/libecore_la-eina_iterator.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-eina_iterator.lo `test -f 'ecore/src/lib/eina_iterator.c' || echo '$(srcdir)/'`ecore/src/lib/eina_iterator.c
-
-ecore/src/lib/libecore_la-eina_lalloc.lo: ecore/src/lib/eina_lalloc.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-eina_lalloc.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-eina_lalloc.Tpo -c -o ecore/src/lib/libecore_la-eina_lalloc.lo `test -f 'ecore/src/lib/eina_lalloc.c' || echo '$(srcdir)/'`ecore/src/lib/eina_lalloc.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-eina_lalloc.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-eina_lalloc.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/eina_lalloc.c' object='ecore/src/lib/libecore_la-eina_lalloc.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-eina_lalloc.lo `test -f 'ecore/src/lib/eina_lalloc.c' || echo '$(srcdir)/'`ecore/src/lib/eina_lalloc.c
-
-ecore/src/lib/libecore_la-eina_list.lo: ecore/src/lib/eina_list.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-eina_list.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-eina_list.Tpo -c -o ecore/src/lib/libecore_la-eina_list.lo `test -f 'ecore/src/lib/eina_list.c' || echo '$(srcdir)/'`ecore/src/lib/eina_list.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-eina_list.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-eina_list.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/eina_list.c' object='ecore/src/lib/libecore_la-eina_list.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-eina_list.lo `test -f 'ecore/src/lib/eina_list.c' || echo '$(srcdir)/'`ecore/src/lib/eina_list.c
-
-ecore/src/lib/libecore_la-eina_log.lo: ecore/src/lib/eina_log.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-eina_log.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-eina_log.Tpo -c -o ecore/src/lib/libecore_la-eina_log.lo `test -f 'ecore/src/lib/eina_log.c' || echo '$(srcdir)/'`ecore/src/lib/eina_log.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-eina_log.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-eina_log.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/eina_log.c' object='ecore/src/lib/libecore_la-eina_log.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-eina_log.lo `test -f 'ecore/src/lib/eina_log.c' || echo '$(srcdir)/'`ecore/src/lib/eina_log.c
-
-ecore/src/lib/libecore_la-eina_magic.lo: ecore/src/lib/eina_magic.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-eina_magic.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-eina_magic.Tpo -c -o ecore/src/lib/libecore_la-eina_magic.lo `test -f 'ecore/src/lib/eina_magic.c' || echo '$(srcdir)/'`ecore/src/lib/eina_magic.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-eina_magic.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-eina_magic.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/eina_magic.c' object='ecore/src/lib/libecore_la-eina_magic.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-eina_magic.lo `test -f 'ecore/src/lib/eina_magic.c' || echo '$(srcdir)/'`ecore/src/lib/eina_magic.c
-
-ecore/src/lib/libecore_la-eina_main.lo: ecore/src/lib/eina_main.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-eina_main.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-eina_main.Tpo -c -o ecore/src/lib/libecore_la-eina_main.lo `test -f 'ecore/src/lib/eina_main.c' || echo '$(srcdir)/'`ecore/src/lib/eina_main.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-eina_main.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-eina_main.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/eina_main.c' object='ecore/src/lib/libecore_la-eina_main.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-eina_main.lo `test -f 'ecore/src/lib/eina_main.c' || echo '$(srcdir)/'`ecore/src/lib/eina_main.c
-
-ecore/src/lib/libecore_la-eina_matrixsparse.lo: ecore/src/lib/eina_matrixsparse.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-eina_matrixsparse.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-eina_matrixsparse.Tpo -c -o ecore/src/lib/libecore_la-eina_matrixsparse.lo `test -f 'ecore/src/lib/eina_matrixsparse.c' || echo '$(srcdir)/'`ecore/src/lib/eina_matrixsparse.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-eina_matrixsparse.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-eina_matrixsparse.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/eina_matrixsparse.c' object='ecore/src/lib/libecore_la-eina_matrixsparse.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-eina_matrixsparse.lo `test -f 'ecore/src/lib/eina_matrixsparse.c' || echo '$(srcdir)/'`ecore/src/lib/eina_matrixsparse.c
-
-ecore/src/lib/libecore_la-eina_mempool.lo: ecore/src/lib/eina_mempool.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-eina_mempool.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-eina_mempool.Tpo -c -o ecore/src/lib/libecore_la-eina_mempool.lo `test -f 'ecore/src/lib/eina_mempool.c' || echo '$(srcdir)/'`ecore/src/lib/eina_mempool.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-eina_mempool.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-eina_mempool.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/eina_mempool.c' object='ecore/src/lib/libecore_la-eina_mempool.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-eina_mempool.lo `test -f 'ecore/src/lib/eina_mempool.c' || echo '$(srcdir)/'`ecore/src/lib/eina_mempool.c
-
-ecore/src/lib/libecore_la-eina_module.lo: ecore/src/lib/eina_module.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-eina_module.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-eina_module.Tpo -c -o ecore/src/lib/libecore_la-eina_module.lo `test -f 'ecore/src/lib/eina_module.c' || echo '$(srcdir)/'`ecore/src/lib/eina_module.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-eina_module.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-eina_module.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/eina_module.c' object='ecore/src/lib/libecore_la-eina_module.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-eina_module.lo `test -f 'ecore/src/lib/eina_module.c' || echo '$(srcdir)/'`ecore/src/lib/eina_module.c
-
-ecore/src/lib/libecore_la-eina_quadtree.lo: ecore/src/lib/eina_quadtree.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-eina_quadtree.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-eina_quadtree.Tpo -c -o ecore/src/lib/libecore_la-eina_quadtree.lo `test -f 'ecore/src/lib/eina_quadtree.c' || echo '$(srcdir)/'`ecore/src/lib/eina_quadtree.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-eina_quadtree.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-eina_quadtree.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/eina_quadtree.c' object='ecore/src/lib/libecore_la-eina_quadtree.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-eina_quadtree.lo `test -f 'ecore/src/lib/eina_quadtree.c' || echo '$(srcdir)/'`ecore/src/lib/eina_quadtree.c
-
-ecore/src/lib/libecore_la-eina_rbtree.lo: ecore/src/lib/eina_rbtree.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-eina_rbtree.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-eina_rbtree.Tpo -c -o ecore/src/lib/libecore_la-eina_rbtree.lo `test -f 'ecore/src/lib/eina_rbtree.c' || echo '$(srcdir)/'`ecore/src/lib/eina_rbtree.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-eina_rbtree.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-eina_rbtree.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/eina_rbtree.c' object='ecore/src/lib/libecore_la-eina_rbtree.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-eina_rbtree.lo `test -f 'ecore/src/lib/eina_rbtree.c' || echo '$(srcdir)/'`ecore/src/lib/eina_rbtree.c
-
-ecore/src/lib/libecore_la-eina_rectangle.lo: ecore/src/lib/eina_rectangle.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-eina_rectangle.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-eina_rectangle.Tpo -c -o ecore/src/lib/libecore_la-eina_rectangle.lo `test -f 'ecore/src/lib/eina_rectangle.c' || echo '$(srcdir)/'`ecore/src/lib/eina_rectangle.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-eina_rectangle.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-eina_rectangle.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/eina_rectangle.c' object='ecore/src/lib/libecore_la-eina_rectangle.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-eina_rectangle.lo `test -f 'ecore/src/lib/eina_rectangle.c' || echo '$(srcdir)/'`ecore/src/lib/eina_rectangle.c
-
-ecore/src/lib/libecore_la-eina_safety_checks.lo: ecore/src/lib/eina_safety_checks.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-eina_safety_checks.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-eina_safety_checks.Tpo -c -o ecore/src/lib/libecore_la-eina_safety_checks.lo `test -f 'ecore/src/lib/eina_safety_checks.c' || echo '$(srcdir)/'`ecore/src/lib/eina_safety_checks.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-eina_safety_checks.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-eina_safety_checks.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/eina_safety_checks.c' object='ecore/src/lib/libecore_la-eina_safety_checks.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-eina_safety_checks.lo `test -f 'ecore/src/lib/eina_safety_checks.c' || echo '$(srcdir)/'`ecore/src/lib/eina_safety_checks.c
-
-ecore/src/lib/libecore_la-eina_sched.lo: ecore/src/lib/eina_sched.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-eina_sched.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-eina_sched.Tpo -c -o ecore/src/lib/libecore_la-eina_sched.lo `test -f 'ecore/src/lib/eina_sched.c' || echo '$(srcdir)/'`ecore/src/lib/eina_sched.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-eina_sched.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-eina_sched.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/eina_sched.c' object='ecore/src/lib/libecore_la-eina_sched.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-eina_sched.lo `test -f 'ecore/src/lib/eina_sched.c' || echo '$(srcdir)/'`ecore/src/lib/eina_sched.c
-
-ecore/src/lib/libecore_la-eina_share_common.lo: ecore/src/lib/eina_share_common.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-eina_share_common.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-eina_share_common.Tpo -c -o ecore/src/lib/libecore_la-eina_share_common.lo `test -f 'ecore/src/lib/eina_share_common.c' || echo '$(srcdir)/'`ecore/src/lib/eina_share_common.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-eina_share_common.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-eina_share_common.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/eina_share_common.c' object='ecore/src/lib/libecore_la-eina_share_common.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-eina_share_common.lo `test -f 'ecore/src/lib/eina_share_common.c' || echo '$(srcdir)/'`ecore/src/lib/eina_share_common.c
-
-ecore/src/lib/libecore_la-eina_strbuf.lo: ecore/src/lib/eina_strbuf.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-eina_strbuf.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-eina_strbuf.Tpo -c -o ecore/src/lib/libecore_la-eina_strbuf.lo `test -f 'ecore/src/lib/eina_strbuf.c' || echo '$(srcdir)/'`ecore/src/lib/eina_strbuf.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-eina_strbuf.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-eina_strbuf.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/eina_strbuf.c' object='ecore/src/lib/libecore_la-eina_strbuf.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-eina_strbuf.lo `test -f 'ecore/src/lib/eina_strbuf.c' || echo '$(srcdir)/'`ecore/src/lib/eina_strbuf.c
-
-ecore/src/lib/libecore_la-eina_strbuf_common.lo: ecore/src/lib/eina_strbuf_common.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-eina_strbuf_common.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-eina_strbuf_common.Tpo -c -o ecore/src/lib/libecore_la-eina_strbuf_common.lo `test -f 'ecore/src/lib/eina_strbuf_common.c' || echo '$(srcdir)/'`ecore/src/lib/eina_strbuf_common.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-eina_strbuf_common.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-eina_strbuf_common.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/eina_strbuf_common.c' object='ecore/src/lib/libecore_la-eina_strbuf_common.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-eina_strbuf_common.lo `test -f 'ecore/src/lib/eina_strbuf_common.c' || echo '$(srcdir)/'`ecore/src/lib/eina_strbuf_common.c
-
-ecore/src/lib/libecore_la-eina_str.lo: ecore/src/lib/eina_str.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-eina_str.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-eina_str.Tpo -c -o ecore/src/lib/libecore_la-eina_str.lo `test -f 'ecore/src/lib/eina_str.c' || echo '$(srcdir)/'`ecore/src/lib/eina_str.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-eina_str.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-eina_str.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/eina_str.c' object='ecore/src/lib/libecore_la-eina_str.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-eina_str.lo `test -f 'ecore/src/lib/eina_str.c' || echo '$(srcdir)/'`ecore/src/lib/eina_str.c
-
-ecore/src/lib/libecore_la-eina_stringshare.lo: ecore/src/lib/eina_stringshare.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-eina_stringshare.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-eina_stringshare.Tpo -c -o ecore/src/lib/libecore_la-eina_stringshare.lo `test -f 'ecore/src/lib/eina_stringshare.c' || echo '$(srcdir)/'`ecore/src/lib/eina_stringshare.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-eina_stringshare.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-eina_stringshare.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/eina_stringshare.c' object='ecore/src/lib/libecore_la-eina_stringshare.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-eina_stringshare.lo `test -f 'ecore/src/lib/eina_stringshare.c' || echo '$(srcdir)/'`ecore/src/lib/eina_stringshare.c
-
-ecore/src/lib/libecore_la-eina_tiler.lo: ecore/src/lib/eina_tiler.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-eina_tiler.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-eina_tiler.Tpo -c -o ecore/src/lib/libecore_la-eina_tiler.lo `test -f 'ecore/src/lib/eina_tiler.c' || echo '$(srcdir)/'`ecore/src/lib/eina_tiler.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-eina_tiler.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-eina_tiler.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/eina_tiler.c' object='ecore/src/lib/libecore_la-eina_tiler.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-eina_tiler.lo `test -f 'ecore/src/lib/eina_tiler.c' || echo '$(srcdir)/'`ecore/src/lib/eina_tiler.c
-
-ecore/src/lib/libecore_la-eina_unicode.lo: ecore/src/lib/eina_unicode.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-eina_unicode.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-eina_unicode.Tpo -c -o ecore/src/lib/libecore_la-eina_unicode.lo `test -f 'ecore/src/lib/eina_unicode.c' || echo '$(srcdir)/'`ecore/src/lib/eina_unicode.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-eina_unicode.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-eina_unicode.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/eina_unicode.c' object='ecore/src/lib/libecore_la-eina_unicode.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-eina_unicode.lo `test -f 'ecore/src/lib/eina_unicode.c' || echo '$(srcdir)/'`ecore/src/lib/eina_unicode.c
-
-ecore/src/lib/libecore_la-eina_ustrbuf.lo: ecore/src/lib/eina_ustrbuf.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-eina_ustrbuf.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-eina_ustrbuf.Tpo -c -o ecore/src/lib/libecore_la-eina_ustrbuf.lo `test -f 'ecore/src/lib/eina_ustrbuf.c' || echo '$(srcdir)/'`ecore/src/lib/eina_ustrbuf.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-eina_ustrbuf.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-eina_ustrbuf.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/eina_ustrbuf.c' object='ecore/src/lib/libecore_la-eina_ustrbuf.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-eina_ustrbuf.lo `test -f 'ecore/src/lib/eina_ustrbuf.c' || echo '$(srcdir)/'`ecore/src/lib/eina_ustrbuf.c
-
-ecore/src/lib/libecore_la-eina_ustringshare.lo: ecore/src/lib/eina_ustringshare.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-eina_ustringshare.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-eina_ustringshare.Tpo -c -o ecore/src/lib/libecore_la-eina_ustringshare.lo `test -f 'ecore/src/lib/eina_ustringshare.c' || echo '$(srcdir)/'`ecore/src/lib/eina_ustringshare.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-eina_ustringshare.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-eina_ustringshare.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/eina_ustringshare.c' object='ecore/src/lib/libecore_la-eina_ustringshare.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-eina_ustringshare.lo `test -f 'ecore/src/lib/eina_ustringshare.c' || echo '$(srcdir)/'`ecore/src/lib/eina_ustringshare.c
-
-ecore/src/lib/libecore_la-eina_value.lo: ecore/src/lib/eina_value.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -MT ecore/src/lib/libecore_la-eina_value.lo -MD -MP -MF ecore/src/lib/$(DEPDIR)/libecore_la-eina_value.Tpo -c -o ecore/src/lib/libecore_la-eina_value.lo `test -f 'ecore/src/lib/eina_value.c' || echo '$(srcdir)/'`ecore/src/lib/eina_value.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ecore/src/lib/$(DEPDIR)/libecore_la-eina_value.Tpo ecore/src/lib/$(DEPDIR)/libecore_la-eina_value.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ecore/src/lib/eina_value.c' object='ecore/src/lib/libecore_la-eina_value.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libecore_la_CPPFLAGS) $(CPPFLAGS) $(libecore_la_CFLAGS) $(CFLAGS) -c -o ecore/src/lib/libecore_la-eina_value.lo `test -f 'ecore/src/lib/eina_value.c' || echo '$(srcdir)/'`ecore/src/lib/eina_value.c
-
 prime_check-prime-check.o: prime-check.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(prime_check_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT prime_check-prime-check.o -MD -MP -MF $(DEPDIR)/prime_check-prime-check.Tpo -c -o prime_check-prime-check.o `test -f 'prime-check.c' || echo '$(srcdir)/'`prime-check.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/prime_check-prime-check.Tpo $(DEPDIR)/prime_check-prime-check.Po
@@ -2616,7 +1981,6 @@ mostlyclean-libtool:
 
 clean-libtool:
 	-rm -rf .libs _libs
-	-rm -rf ecore/src/lib/.libs ecore/src/lib/_libs
 
 ID: $(am__tagged_files)
 	$(am__define_uniq_tagged_files); mkid -fID $$unique
@@ -2871,7 +2235,7 @@ check-am: all-am
 	  $(nodist_check_SCRIPTS)
 	$(MAKE) $(AM_MAKEFLAGS) check-TESTS
 check: check-am
-all-am: Makefile $(PROGRAMS) $(LTLIBRARIES)
+all-am: Makefile $(PROGRAMS)
 installdirs:
 install: install-am
 install-exec: install-exec-am
@@ -2902,8 +2266,6 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
-	-rm -f ecore/src/lib/$(DEPDIR)/$(am__dirstamp)
-	-rm -f ecore/src/lib/$(am__dirstamp)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
@@ -2911,69 +2273,13 @@ maintainer-clean-generic:
 clean: clean-am
 
 clean-am: clean-checkPROGRAMS clean-generic clean-libtool \
-	clean-noinstLTLIBRARIES clean-noinstPROGRAMS mostlyclean-am
+	clean-noinstPROGRAMS mostlyclean-am
 
 distclean: distclean-am
-		-rm -f ./$(DEPDIR)/mini-eagain2.Po
+		-rm -f ./$(DEPDIR)/eagain-cli.Po
 	-rm -f ./$(DEPDIR)/mini-record-timing.Po
 	-rm -f ./$(DEPDIR)/prime_check-prime-check.Po
 	-rm -f ./$(DEPDIR)/rng.Po
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-ecore.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-ecore_anim.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-ecore_app.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-ecore_events.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-ecore_exe.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-ecore_getopt.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-ecore_glib.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-ecore_idle_enterer.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-ecore_idle_exiter.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-ecore_idler.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-ecore_job.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-ecore_main.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-ecore_pipe.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-ecore_poll.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-ecore_signal.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-ecore_thread.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-ecore_time.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-ecore_timer.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_accessor.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_array.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_benchmark.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_binshare.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_chained_mempool.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_convert.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_counter.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_cpu.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_error.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_file.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_fp.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_hamster.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_hash.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_inlist.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_iterator.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_lalloc.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_list.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_log.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_magic.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_main.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_matrixsparse.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_mempool.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_module.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_quadtree.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_rbtree.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_rectangle.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_safety_checks.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_sched.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_share_common.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_str.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_strbuf.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_strbuf_common.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_stringshare.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_tiler.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_unicode.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_ustrbuf.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_ustringshare.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_value.Plo
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -3019,66 +2325,10 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-		-rm -f ./$(DEPDIR)/mini-eagain2.Po
+		-rm -f ./$(DEPDIR)/eagain-cli.Po
 	-rm -f ./$(DEPDIR)/mini-record-timing.Po
 	-rm -f ./$(DEPDIR)/prime_check-prime-check.Po
 	-rm -f ./$(DEPDIR)/rng.Po
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-ecore.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-ecore_anim.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-ecore_app.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-ecore_events.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-ecore_exe.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-ecore_getopt.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-ecore_glib.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-ecore_idle_enterer.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-ecore_idle_exiter.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-ecore_idler.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-ecore_job.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-ecore_main.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-ecore_pipe.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-ecore_poll.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-ecore_signal.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-ecore_thread.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-ecore_time.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-ecore_timer.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_accessor.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_array.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_benchmark.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_binshare.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_chained_mempool.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_convert.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_counter.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_cpu.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_error.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_file.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_fp.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_hamster.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_hash.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_inlist.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_iterator.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_lalloc.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_list.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_log.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_magic.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_main.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_matrixsparse.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_mempool.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_module.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_quadtree.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_rbtree.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_rectangle.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_safety_checks.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_sched.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_share_common.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_str.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_strbuf.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_strbuf_common.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_stringshare.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_tiler.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_unicode.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_ustrbuf.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_ustringshare.Plo
-	-rm -f ecore/src/lib/$(DEPDIR)/libecore_la-eina_value.Plo
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
@@ -3101,18 +2351,18 @@ uninstall-am:
 
 .PHONY: CTAGS GTAGS TAGS all all-am am--depfiles check check-TESTS \
 	check-am clean clean-checkPROGRAMS clean-generic clean-libtool \
-	clean-noinstLTLIBRARIES clean-noinstPROGRAMS cscopelist-am \
-	ctags ctags-am distclean distclean-compile distclean-generic \
-	distclean-libtool distclean-tags distdir dvi dvi-am html \
-	html-am info info-am install install-am install-data \
-	install-data-am install-dvi install-dvi-am install-exec \
-	install-exec-am install-html install-html-am install-info \
-	install-info-am install-man install-pdf install-pdf-am \
-	install-ps install-ps-am install-strip installcheck \
-	installcheck-am installdirs maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-compile \
-	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	recheck tags tags-am uninstall uninstall-am
+	clean-noinstPROGRAMS cscopelist-am ctags ctags-am distclean \
+	distclean-compile distclean-generic distclean-libtool \
+	distclean-tags distdir dvi dvi-am html html-am info info-am \
+	install install-am install-data install-data-am install-dvi \
+	install-dvi-am install-exec install-exec-am install-html \
+	install-html-am install-info install-info-am install-man \
+	install-pdf install-pdf-am install-ps install-ps-am \
+	install-strip installcheck installcheck-am installdirs \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
+	pdf pdf-am ps ps-am recheck tags tags-am uninstall \
+	uninstall-am
 
 .PRECIOUS: Makefile
 

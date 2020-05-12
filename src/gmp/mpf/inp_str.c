@@ -31,7 +31,6 @@ see https://www.gnu.org/licenses/.  */
 
 #include <stdio.h>
 #include <ctype.h>
-#include "gmp.h"
 #include "gmp-impl.h"
 
 size_t
@@ -47,7 +46,7 @@ mpf_inp_str (mpf_ptr rop, FILE *stream, int base)
     stream = stdin;
 
   alloc_size = 100;
-  str = (char *) (*__gmp_allocate_func) (alloc_size);
+  str = __GMP_ALLOCATE_FUNC_TYPE (alloc_size, char);
   str_size = 0;
   nread = 0;
 
@@ -65,7 +64,7 @@ mpf_inp_str (mpf_ptr rop, FILE *stream, int base)
 	{
 	  size_t old_alloc_size = alloc_size;
 	  alloc_size = alloc_size * 3 / 2;
-	  str = (char *) (*__gmp_reallocate_func) (str, old_alloc_size, alloc_size);
+	  str = __GMP_REALLOCATE_FUNC_TYPE (str, old_alloc_size, alloc_size, char);
 	}
       if (c == EOF || isspace (c))
 	break;
@@ -79,7 +78,7 @@ mpf_inp_str (mpf_ptr rop, FILE *stream, int base)
     {
       size_t old_alloc_size = alloc_size;
       alloc_size = alloc_size * 3 / 2;
-      str = (char *) (*__gmp_reallocate_func) (str, old_alloc_size, alloc_size);
+      str = __GMP_REALLOCATE_FUNC_TYPE (str, old_alloc_size, alloc_size, char);
     }
   str[str_size] = 0;
 

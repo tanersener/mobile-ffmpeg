@@ -405,11 +405,8 @@ if [[ -z ${NO_WORKSPACE_CLEANUP_ffmpeg} ]]; then
     make distclean 2>/dev/null 1>/dev/null
 fi
 
+# Workaround to prevent adding of -mdynamic-no-pic flag
 ${SED_INLINE} 's/check_cflags -mdynamic-no-pic && add_asflags -mdynamic-no-pic;/check_cflags -mdynamic-no-pic;/g' ./configure 1>>${BASEDIR}/build.log 2>&1
-
-# Workaround for issue #328
-rm -f ${BASEDIR}/src/${LIB_NAME}/libswscale/aarch64/hscale.S 1>>${BASEDIR}/build.log 2>&1
-cp ${BASEDIR}/tools/make/ffmpeg/libswscale/aarch64/hscale.S ${BASEDIR}/src/${LIB_NAME}/libswscale/aarch64/hscale.S 1>>${BASEDIR}/build.log 2>&1
 
 # Workaround for videotoolbox on mac catalyst
 if [ ${ARCH} == "x86-64-mac-catalyst" ]; then
@@ -417,6 +414,9 @@ if [ ${ARCH} == "x86-64-mac-catalyst" ]; then
 else
     ${SED_INLINE} 's/   \/\/ CFDictionarySetValue(buffer_attributes\, kCVPixelBufferOpenGLESCompatibilityKey/    CFDictionarySetValue(buffer_attributes\, kCVPixelBufferOpenGLESCompatibilityKey/g' ${BASEDIR}/src/${LIB_NAME}/libavcodec/videotoolbox.c
 fi
+
+# Workaround for not supported iOS/tvOS features
+git checkout 2e595085ef653f365af49e6a32f012cc6d9ee03c -- ${BASEDIR}/src/${LIB_NAME}/libavdevice/avfoundation.m 1>>${BASEDIR}/build.log 2>&1
 
 ./configure \
     --sysroot=${SDK_PATH} \
@@ -473,6 +473,12 @@ fi
     --disable-vaapi \
     --disable-vdpau \
     ${CONFIGURE_POSTFIX} 1>>${BASEDIR}/build.log 2>&1
+
+# Workaround for issue #328
+echo "" >>ffbuild/config.mak
+echo "all:" >>ffbuild/config.mak
+echo "libswscale/aarch64/hscale.o: ${BASEDIR}/tools/make/ffmpeg/libswscale/aarch64/hscale.S" >>ffbuild/config.mak
+echo '	$(COMPILE_S)' >>ffbuild/config.mak
 
 if [ $? -ne 0 ]; then
     echo "failed"

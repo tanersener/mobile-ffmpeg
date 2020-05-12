@@ -366,7 +366,7 @@ cleanup:
  * Returns: In case of failure a negative error code will be
  *   returned, and 0 on success.
  **/
-int gnutls_ocsp_req_export(gnutls_ocsp_req_t req, gnutls_datum_t * data)
+int gnutls_ocsp_req_export(gnutls_ocsp_req_const_t req, gnutls_datum_t * data)
 {
 	int ret;
 
@@ -398,7 +398,7 @@ int gnutls_ocsp_req_export(gnutls_ocsp_req_t req, gnutls_datum_t * data)
  * Returns: In case of failure a negative error code will be
  *   returned, and 0 on success.
  **/
-int gnutls_ocsp_resp_export(gnutls_ocsp_resp_t resp, gnutls_datum_t * data)
+int gnutls_ocsp_resp_export(gnutls_ocsp_resp_const_t resp, gnutls_datum_t * data)
 {
 	return gnutls_ocsp_resp_export2(resp, data, GNUTLS_X509_FMT_DER);
 }
@@ -416,7 +416,7 @@ int gnutls_ocsp_resp_export(gnutls_ocsp_resp_t resp, gnutls_datum_t * data)
  *
  * Since: 3.6.3
  **/
-int gnutls_ocsp_resp_export2(gnutls_ocsp_resp_t resp, gnutls_datum_t * data,
+int gnutls_ocsp_resp_export2(gnutls_ocsp_resp_const_t resp, gnutls_datum_t * data,
 			     gnutls_x509_crt_fmt_t fmt)
 {
 	int ret;
@@ -454,27 +454,14 @@ int gnutls_ocsp_resp_export2(gnutls_ocsp_resp_t resp, gnutls_datum_t * data,
  *
  * Returns: version of OCSP request, or a negative error code on error.
  **/
-int gnutls_ocsp_req_get_version(gnutls_ocsp_req_t req)
+int gnutls_ocsp_req_get_version(gnutls_ocsp_req_const_t req)
 {
-	uint8_t version[8];
-	int len, ret;
-
 	if (req == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	len = sizeof(version);
-	ret =
-	    asn1_read_value(req->req, "tbsRequest.version", version, &len);
-	if (ret != ASN1_SUCCESS) {
-		if (ret == ASN1_ELEMENT_NOT_FOUND)
-			return 1;	/* the DEFAULT version */
-		gnutls_assert();
-		return _gnutls_asn2err(ret);
-	}
-
-	return (int) version[0] + 1;
+	return _gnutls_x509_get_version(req->req, "tbsRequest.version");
 }
 
 /**
@@ -507,7 +494,7 @@ int gnutls_ocsp_req_get_version(gnutls_ocsp_req_t req)
  *   returned.
  **/
 int
-gnutls_ocsp_req_get_cert_id(gnutls_ocsp_req_t req,
+gnutls_ocsp_req_get_cert_id(gnutls_ocsp_req_const_t req,
 			    unsigned indx,
 			    gnutls_digest_algorithm_t * digest,
 			    gnutls_datum_t * issuer_name_hash,
@@ -814,7 +801,7 @@ gnutls_ocsp_req_add_cert(gnutls_ocsp_req_t req,
  *   be returned.
  **/
 int
-gnutls_ocsp_req_get_extension(gnutls_ocsp_req_t req,
+gnutls_ocsp_req_get_extension(gnutls_ocsp_req_const_t req,
 			      unsigned indx,
 			      gnutls_datum_t * oid,
 			      unsigned int *critical,
@@ -919,7 +906,7 @@ gnutls_ocsp_req_set_extension(gnutls_ocsp_req_t req,
  *   negative error code is returned.
  **/
 int
-gnutls_ocsp_req_get_nonce(gnutls_ocsp_req_t req,
+gnutls_ocsp_req_get_nonce(gnutls_ocsp_req_const_t req,
 			  unsigned int *critical, gnutls_datum_t * nonce)
 {
 	int ret;
@@ -1049,7 +1036,7 @@ int gnutls_ocsp_req_randomize_nonce(gnutls_ocsp_req_t req)
  * Returns: status of OCSP request as a #gnutls_ocsp_resp_status_t, or
  *   a negative error code on error.
  **/
-int gnutls_ocsp_resp_get_status(gnutls_ocsp_resp_t resp)
+int gnutls_ocsp_resp_get_status(gnutls_ocsp_resp_const_t resp)
 {
 	uint8_t str[1];
 	int len, ret;
@@ -1105,7 +1092,7 @@ int gnutls_ocsp_resp_get_status(gnutls_ocsp_resp_t resp)
  *   negative error value.
  **/
 int
-gnutls_ocsp_resp_get_response(gnutls_ocsp_resp_t resp,
+gnutls_ocsp_resp_get_response(gnutls_ocsp_resp_const_t resp,
 			      gnutls_datum_t * response_type_oid,
 			      gnutls_datum_t * response)
 {
@@ -1151,28 +1138,14 @@ gnutls_ocsp_resp_get_response(gnutls_ocsp_resp_t resp,
  * Returns: version of Basic OCSP response, or a negative error code
  *   on error.
  **/
-int gnutls_ocsp_resp_get_version(gnutls_ocsp_resp_t resp)
+int gnutls_ocsp_resp_get_version(gnutls_ocsp_resp_const_t resp)
 {
-	uint8_t version[8];
-	int len, ret;
-
 	if (resp == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	len = sizeof(version);
-	ret =
-	    asn1_read_value(resp->resp, "tbsResponseData.version", version,
-			    &len);
-	if (ret != ASN1_SUCCESS) {
-		if (ret == ASN1_ELEMENT_NOT_FOUND)
-			return 1;	/* the DEFAULT version */
-		gnutls_assert();
-		return _gnutls_asn2err(ret);
-	}
-
-	return (int) version[0] + 1;
+	return _gnutls_x509_get_version(resp->resp, "tbsResponseData.version");
 }
 
 /**
@@ -1199,7 +1172,7 @@ int gnutls_ocsp_resp_get_version(gnutls_ocsp_resp_t resp)
  *   return success and set @dn elements to zero.
  **/
 int
-gnutls_ocsp_resp_get_responder(gnutls_ocsp_resp_t resp,
+gnutls_ocsp_resp_get_responder(gnutls_ocsp_resp_const_t resp,
 			       gnutls_datum_t * dn)
 {
 	int ret;
@@ -1240,7 +1213,7 @@ gnutls_ocsp_resp_get_responder(gnutls_ocsp_resp_t resp,
  *   %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE.
  **/
 int
-gnutls_ocsp_resp_get_responder2(gnutls_ocsp_resp_t resp,
+gnutls_ocsp_resp_get_responder2(gnutls_ocsp_resp_const_t resp,
 			        gnutls_datum_t * dn, unsigned flags)
 {
 	if (resp == NULL || dn == NULL) {
@@ -1273,7 +1246,7 @@ gnutls_ocsp_resp_get_responder2(gnutls_ocsp_resp_t resp,
  *   negative error code is returned.
  **/
 int
-gnutls_ocsp_resp_get_responder_raw_id(gnutls_ocsp_resp_t resp,
+gnutls_ocsp_resp_get_responder_raw_id(gnutls_ocsp_resp_const_t resp,
 				      unsigned type,
 				      gnutls_datum_t * raw)
 {
@@ -1341,7 +1314,7 @@ gnutls_ocsp_resp_get_responder_raw_id(gnutls_ocsp_resp_t resp,
  *
  * Returns: signing time, or (time_t)-1 on error.
  **/
-time_t gnutls_ocsp_resp_get_produced(gnutls_ocsp_resp_t resp)
+time_t gnutls_ocsp_resp_get_produced(gnutls_ocsp_resp_const_t resp)
 {
 	char ttime[MAX_TIME];
 	int len, ret;
@@ -1381,7 +1354,7 @@ time_t gnutls_ocsp_resp_get_produced(gnutls_ocsp_resp_t resp)
  * Since: 3.1.3
  **/
 int
-gnutls_ocsp_resp_check_crt(gnutls_ocsp_resp_t resp,
+gnutls_ocsp_resp_check_crt(gnutls_ocsp_resp_const_t resp,
 			   unsigned int indx, gnutls_x509_crt_t crt)
 {
 	int ret;
@@ -1493,7 +1466,7 @@ gnutls_ocsp_resp_check_crt(gnutls_ocsp_resp_t resp,
  *   returned.
  **/
 int
-gnutls_ocsp_resp_get_single(gnutls_ocsp_resp_t resp,
+gnutls_ocsp_resp_get_single(gnutls_ocsp_resp_const_t resp,
 			    unsigned indx,
 			    gnutls_digest_algorithm_t * digest,
 			    gnutls_datum_t * issuer_name_hash,
@@ -1702,7 +1675,7 @@ gnutls_ocsp_resp_get_single(gnutls_ocsp_resp_t resp,
  *   be returned.
  **/
 int
-gnutls_ocsp_resp_get_extension(gnutls_ocsp_resp_t resp,
+gnutls_ocsp_resp_get_extension(gnutls_ocsp_resp_const_t resp,
 			       unsigned indx,
 			       gnutls_datum_t * oid,
 			       unsigned int *critical,
@@ -1780,7 +1753,7 @@ gnutls_ocsp_resp_get_extension(gnutls_ocsp_resp_t resp,
  *   negative error code is returned.
  **/
 int
-gnutls_ocsp_resp_get_nonce(gnutls_ocsp_resp_t resp,
+gnutls_ocsp_resp_get_nonce(gnutls_ocsp_resp_const_t resp,
 			   unsigned int *critical, gnutls_datum_t * nonce)
 {
 	int ret;
@@ -1820,7 +1793,7 @@ gnutls_ocsp_resp_get_nonce(gnutls_ocsp_resp_t resp,
  * Returns: a #gnutls_sign_algorithm_t value, or a negative error code
  *   on error.
  **/
-int gnutls_ocsp_resp_get_signature_algorithm(gnutls_ocsp_resp_t resp)
+int gnutls_ocsp_resp_get_signature_algorithm(gnutls_ocsp_resp_const_t resp)
 {
 	int ret;
 	gnutls_datum_t sa;
@@ -1850,7 +1823,7 @@ int gnutls_ocsp_resp_get_signature_algorithm(gnutls_ocsp_resp_t resp)
  *   negative error value.
  **/
 int
-gnutls_ocsp_resp_get_signature(gnutls_ocsp_resp_t resp,
+gnutls_ocsp_resp_get_signature(gnutls_ocsp_resp_const_t resp,
 			       gnutls_datum_t * sig)
 {
 	int ret;
@@ -1892,7 +1865,7 @@ gnutls_ocsp_resp_get_signature(gnutls_ocsp_resp_t resp,
  *   negative error value.
  **/
 int
-gnutls_ocsp_resp_get_certs(gnutls_ocsp_resp_t resp,
+gnutls_ocsp_resp_get_certs(gnutls_ocsp_resp_const_t resp,
 			   gnutls_x509_crt_t ** certs, size_t * ncerts)
 {
 	int ret;
@@ -1976,7 +1949,7 @@ gnutls_ocsp_resp_get_certs(gnutls_ocsp_resp_t resp,
 
 /* Search the OCSP response for a certificate matching the responderId
    mentioned in the OCSP response. */
-static gnutls_x509_crt_t find_signercert(gnutls_ocsp_resp_t resp)
+static gnutls_x509_crt_t find_signercert(gnutls_ocsp_resp_const_t resp)
 {
 	int rc;
 	gnutls_x509_crt_t *certs = NULL;
@@ -2096,7 +2069,7 @@ static gnutls_x509_crt_t find_signercert(gnutls_ocsp_resp_t resp)
 }
 
 static int
-_ocsp_resp_verify_direct(gnutls_ocsp_resp_t resp,
+_ocsp_resp_verify_direct(gnutls_ocsp_resp_const_t resp,
 			 gnutls_x509_crt_t signercert,
 			 unsigned int *verify, unsigned int flags)
 {
@@ -2236,7 +2209,7 @@ static int check_ocsp_purpose(gnutls_x509_crt_t signercert)
  *   negative error value.
  **/
 int
-gnutls_ocsp_resp_verify_direct(gnutls_ocsp_resp_t resp,
+gnutls_ocsp_resp_verify_direct(gnutls_ocsp_resp_const_t resp,
 			       gnutls_x509_crt_t issuer,
 			       unsigned int *verify, unsigned int flags)
 {
@@ -2321,7 +2294,7 @@ gnutls_ocsp_resp_verify_direct(gnutls_ocsp_resp_t resp,
  *   negative error value.
  **/
 int
-gnutls_ocsp_resp_verify(gnutls_ocsp_resp_t resp,
+gnutls_ocsp_resp_verify(gnutls_ocsp_resp_const_t resp,
 			gnutls_x509_trust_list_t trustlist,
 			unsigned int *verify, unsigned int flags)
 {
@@ -2544,7 +2517,7 @@ gnutls_ocsp_resp_list_import2(gnutls_ocsp_resp_t **ocsps,
  * time, and would otherwise treat it as too old.
  * Otherwise it returns the time after which that data  is invalid.
  */
-time_t _gnutls_ocsp_get_validity(gnutls_ocsp_resp_t resp)
+time_t _gnutls_ocsp_get_validity(gnutls_ocsp_resp_const_t resp)
 {
 	unsigned int cert_status;
 	time_t rtime, vtime, ntime, now;

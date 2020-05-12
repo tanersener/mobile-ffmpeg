@@ -2,7 +2,7 @@
 # This Makefile fragment tries to be general-purpose enough to be
 # used by many projects via the gnulib maintainer-makefile module.
 
-## Copyright (C) 2001-2019 Free Software Foundation, Inc.
+## Copyright (C) 2001-2020 Free Software Foundation, Inc.
 ##
 ## This program is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@ ME := maint.mk
 # These variables ought to be defined through the configure.ac section
 # of the module description. But some packages import this file directly,
 # ignoring the module description.
+AWK ?= awk
 GREP ?= grep
 SED ?= sed
 
@@ -190,7 +191,7 @@ $(sc_z_rules_): %.z: %
 	@end=$$(date +%s.%N);						\
 	start=$$(cat .sc-start-$*);					\
 	rm -f .sc-start-$*;						\
-	awk -v s=$$start -v e=$$end					\
+	$(AWK) -v s=$$start -v e=$$end					\
 	  'END {printf "%.2f $(patsubst sc_%,%,$*)\n", e - s}' < /dev/null
 
 # The patsubst here is to replace each sc_% rule with its sc_%.z wrapper
@@ -408,6 +409,43 @@ sc_prohibit_magic_number_exit:
 	halt='use EXIT_* values rather than magic number'		\
 	  $(_sc_search_regexp)
 
+# Check that we don't use $< in non-implicit Makefile rules.
+#
+# To find the Makefiles, trace AC_CONFIG_FILES.  Using VC_LIST would
+# miss the Makefiles that are not under VC control (e.g., symlinks
+# installed for gettext).  "Parsing" (recursive) uses of SUBDIRS seems
+# too delicate.
+#
+# Use GNU Make's --print-data-base to normalize the rules into some
+# easy to parse format: they are separated by two \n.  Look for the
+# "section" about non-pattern rules (marked with "# Files") inside
+# which there are still the POSIX Make like implicit rules (".c.o").
+sc_prohibit_gnu_make_extensions_awk_ =					\
+  BEGIN {								\
+      RS = "\n\n";							\
+      in_rules = 0;							\
+  }									\
+  /^\# Files/ {								\
+      in_rules = 1;							\
+  }									\
+  /\$$</ && in_rules && $$0 !~ /^(.*\n)*\.\w+(\.\w+)?:/ {		\
+      print "Error: " file ": $$< in a non implicit rule\n" $$0;	\
+      status = 1;							\
+  }									\
+  END {									\
+     exit status;							\
+  }
+sc_prohibit_gnu_make_extensions:
+	@if $(AWK) --version | grep GNU >/dev/null 2>&1; then		\
+	  (cd $(srcdir) && autoconf --trace AC_CONFIG_FILES:'$$1') |	\
+	    tr ' ' '\n' |						\
+	    $(SED) -ne '/Makefile/{s/\.in$$//;p;}' |			\
+	    while read m; do						\
+	      $(MAKE) -qp -f $$m .DUMMY-TARGET 2>/dev/null |		\
+	        $(AWK) -v file=$$m -e '$($@_awk_)' || exit 1;		\
+	    done;							\
+	fi
+
 # Using EXIT_SUCCESS as the first argument to error is misleading,
 # since when that parameter is 0, error does not exit.  Use '0' instead.
 sc_error_exit_success:
@@ -611,7 +649,7 @@ sc_prohibit_safe_read_without_use:
 
 sc_prohibit_argmatch_without_use:
 	@h='argmatch.h' \
-	re='(\<(ARRAY_CARDINALITY|X?ARGMATCH(|_TO_ARGUMENT|_VERIFY))\>|\<(invalid_arg|argmatch(_exit_fn|_(in)?valid)?) *\()' \
+	re='(\<(ARGMATCH_DEFINE_GROUP|ARRAY_CARDINALITY|X?ARGMATCH(|_TO_ARGUMENT|_VERIFY))\>|\<(invalid_arg|argmatch(_exit_fn|_(in)?valid)?) *\()' \
 	  $(_sc_header_without_use)
 
 sc_prohibit_canonicalize_without_use:
@@ -1348,7 +1386,7 @@ gpg_key_ID ?=								\
   $$(cd $(srcdir)							\
      && git cat-file tag v$(VERSION)					\
         | $(gpgv) --status-fd 1 --keyring /dev/null - - 2>/dev/null	\
-        | awk '/^\[GNUPG:\] ERRSIG / {print $$3; exit}')
+        | $(AWK) '/^\[GNUPG:\] ERRSIG / {print $$3; exit}')
 
 translation_project_ ?= coordinator@translationproject.org
 

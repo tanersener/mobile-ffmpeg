@@ -358,7 +358,7 @@ static int add_pubkey(gnutls_pubkey_t pubkey, struct ck_attribute *a, unsigned *
 		break;
 	}
 	case GNUTLS_PK_EDDSA_ED25519: {
-		gnutls_datum_t params;
+		gnutls_datum_t params, ecpoint;
 
 		ret =
 		    _gnutls_x509_write_ecc_params(pubkey->params.curve,
@@ -373,9 +373,18 @@ static int add_pubkey(gnutls_pubkey_t pubkey, struct ck_attribute *a, unsigned *
 		a[*a_val].value_len = params.size;
 		(*a_val)++;
 
+		ret = _gnutls_x509_encode_string(ASN1_ETYPE_OCTET_STRING,
+						 pubkey->params.raw_pub.data,
+						 pubkey->params.raw_pub.size,
+						 &ecpoint);
+		if (ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
+
 		a[*a_val].type = CKA_EC_POINT;
-		a[*a_val].value = pubkey->params.raw_pub.data;
-		a[*a_val].value_len = pubkey->params.raw_pub.size;
+		a[*a_val].value = ecpoint.data;
+		a[*a_val].value_len = ecpoint.size;
 		(*a_val)++;
 		break;
 	}

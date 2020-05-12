@@ -82,7 +82,7 @@ EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem 
 	data/ca-gnutls-keyid.pem data/ca-no-keyid.pem data/ca-weird-keyid.pem \
 	data/key-ca-1234.p8 data/key-ca-empty.p8 data/key-ca-null.p8 \
 	data/openssl-key-ecc.p8 data/key-ecc.p8 data/key-ecc.pem suppressions.valgrind \
-	data/encpkcs8.pem data/unencpkcs8.pem data/enc2pkcs8.pem \
+	data/encpkcs8.pem data/unencpkcs8.pem data/enc2pkcs8.pem data/dup-exts.pem \
 	data/openssl-3des.p8 data/openssl-3des.p8.txt data/openssl-aes128.p8 \
 	data/openssl-aes128.p8.txt data/openssl-aes256.p8 data/openssl-aes256.p8.txt \
 	data/cert.dsa.1024.pem data/cert.dsa.2048.pem data/cert.dsa.3072.pem \
@@ -94,10 +94,14 @@ EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem 
 	data/key-invalid3.der data/pkcs8-eddsa.pem data/pkcs8-eddsa.pem.txt \
 	data/rfc4490.p7b data/rfc4490.p7b.out data/gost01.p12 data/gost12.p12 data/gost12-2.p12 \
 	data/ca-crl-invalid.crl data/ca-crl-invalid.pem data/ca-crl-valid.pem data/ca-crl-valid.crl \
-	data/rfc4134-ca-rsa.pem data/rfc4134-4.5.p7b \
-	data/key-gost01.p8 data/key-gost01-2.p8 data/key-gost01-2-enc.p8 \
+	data/rfc4134-ca-rsa.pem data/rfc4134-4.5.p7b templates/template-no-ca.tmpl \
+	data/key-gost01.p8 data/key-gost01-2.p8 data/key-gost01-2-enc.p8 data/crq-cert-no-ca.pem \
 	data/key-gost12-256.p8 data/key-gost12-256-2.p8 data/key-gost12-256-2-enc.p8 \
-	data/key-gost12-512.p8 data/grfc.crt data/gost-cert-ca.pem data/gost-cert-new.pem
+	data/key-gost12-512.p8 data/grfc.crt data/gost-cert-ca.pem data/gost-cert-new.pem \
+	data/cert-with-non-digits-time-ca.pem data/cert-with-non-digits-time.pem \
+	data/chain-512-leaf.pem data/chain-512-subca.pem data/chain-512-ca.pem \
+	templates/template-no-ca-honor.tmpl templates/template-no-ca-explicit.tmpl \
+	data/crq-cert-no-ca-explicit.pem data/crq-cert-no-ca-honor.pem
 
 dist_check_SCRIPTS = pathlen aki invalid-sig email \
 	pkcs7 pkcs7-broken-sigs privkey-import name-constraints certtool-long-cn crl provable-privkey \
@@ -107,11 +111,16 @@ dist_check_SCRIPTS = pathlen aki invalid-sig email \
 	pkcs12 certtool-crl-decoding pkcs12-encode pkcs12-corner-cases inhibit-anypolicy \
 	smime cert-time alt-chain pkcs7-list-sign pkcs7-eddsa certtool-ecdsa \
 	key-id pkcs8 pkcs8-decode ecdsa illegal-rsa pkcs8-invalid key-invalid \
-	pkcs8-eddsa certtool-subca
+	pkcs8-eddsa certtool-subca certtool-verify-profiles x509-duplicate-ext
 
 dist_check_SCRIPTS += key-id ecdsa pkcs8-invalid key-invalid pkcs8-decode pkcs8 pkcs8-eddsa \
 	certtool-utf8 crq
 
+if STRICT_DER_TIME
+dist_check_SCRIPTS += cert-non-digits-time reject-invalid-time
+else
+dist_check_SCRIPTS += tolerate-invalid-time
+endif
 
 if WANT_TEST_SUITE
 dist_check_SCRIPTS += provable-dh-default
@@ -147,6 +156,7 @@ TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
 	ac_cv_sizeof_time_t="$(ac_cv_sizeof_time_t)" \
 	ASAN_OPTIONS="detect_leaks=0:exitcode=6" \
 	GNUTLS_TEST_SUITE_RUN=1			\
+	GNUTLS_SYSTEM_PRIORITY_FILE=$(abs_top_srcdir)/tests/system.prio \
 	srcdir="$(srcdir)"
 
 if ENABLE_FIPS140

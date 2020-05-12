@@ -33,7 +33,6 @@ GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
 
-#include "gmp.h"
 #include "gmp-impl.h"
 
 
@@ -97,9 +96,7 @@ see https://www.gnu.org/licenses/.  */
 mp_limb_t
 mpn_mod_34lsub1 (mp_srcptr p, mp_size_t n)
 {
-  mp_limb_t  c0 = 0;
-  mp_limb_t  c1 = 0;
-  mp_limb_t  c2 = 0;
+  mp_limb_t  c0, c1, c2;
   mp_limb_t  a0, a1, a2;
 
   ASSERT (n >= 1);

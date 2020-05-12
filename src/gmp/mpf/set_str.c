@@ -2,8 +2,8 @@
    in base BASE to a float in dest.  If BASE is zero, the leading characters
    of STRING is used to figure out the base.
 
-Copyright 1993-1997, 2000-2003, 2005, 2007, 2008, 2011, 2013 Free Software
-Foundation, Inc.
+Copyright 1993-1997, 2000-2003, 2005, 2007, 2008, 2011, 2013, 2019 Free
+Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -54,7 +54,6 @@ see https://www.gnu.org/licenses/.  */
 #include <locale.h>    /* for localeconv */
 #endif
 
-#include "gmp.h"
 #include "gmp-impl.h"
 #include "longlong.h"
 
@@ -127,12 +126,15 @@ mpf_set_str (mpf_ptr x, const char *str, int base)
   size_t i, j;
   int c;
   int negative;
-  char *dotpos = 0;
+  char *dotpos;
   const char *expptr;
   int exp_base;
   const char  *point = GMP_DECIMAL_POINT;
   size_t      pointlen = strlen (point);
   const unsigned char *digit_value;
+  int incr;
+  size_t n_zeros_skipped;
+
   TMP_DECL;
 
   c = (unsigned char) *str;
@@ -199,6 +201,10 @@ mpf_set_str (mpf_ptr x, const char *str, int base)
   TMP_MARK;
   s = begs = (char *) TMP_ALLOC (str_size + 1);
 
+  incr = 0;
+  n_zeros_skipped = 0;
+  dotpos = NULL;
+
   /* Loop through mantissa, converting it from ASCII to raw byte values.  */
   for (i = 0; i < str_size; i++)
     {
@@ -231,7 +237,13 @@ mpf_set_str (mpf_ptr x, const char *str, int base)
 		  TMP_FREE;
 		  return -1;
 		}
-	      *s++ = dig;
+	      *s = dig;
+	      incr |= dig != 0;
+	      s += incr;	/* Increment after first non-0 digit seen. */
+	      if (dotpos != NULL)
+		/* Count skipped zeros between radix point and first non-0
+		   digit. */
+		n_zeros_skipped += 1 - incr;
 	    }
 	}
       c = (unsigned char) *++str;
@@ -252,25 +264,24 @@ mpf_set_str (mpf_ptr x, const char *str, int base)
 #if 0
     size_t n_chars_needed;
 
-    /* This breaks things like 0.000...0001.  To safely ignore superfluous
-       digits, we need to skip over leading zeros.  */
+    /* This needs careful testing.  Leave disabled for now.  */
     /* Just consider the relevant leading digits of the mantissa.  */
     LIMBS_PER_DIGIT_IN_BASE (n_chars_needed, prec, base);
     if (str_size > n_chars_needed)
       str_size = n_chars_needed;
 #endif
 
-    LIMBS_PER_DIGIT_IN_BASE (ma, str_size, base);
-    mp = TMP_ALLOC_LIMBS (ma);
-    mn = mpn_set_str (mp, (unsigned char *) begs, str_size, base);
-
-    if (mn == 0)
+    if (str_size == 0)
       {
 	SIZ(x) = 0;
 	EXP(x) = 0;
 	TMP_FREE;
 	return 0;
       }
+
+    LIMBS_PER_DIGIT_IN_BASE (ma, str_size, base);
+    mp = TMP_ALLOC_LIMBS (ma);
+    mn = mpn_set_str (mp, (unsigned char *) begs, str_size, base);
 
     madj = 0;
     /* Ignore excess limbs in MP,MSIZE.  */
@@ -311,7 +322,7 @@ mpf_set_str (mpf_ptr x, const char *str, int base)
     else
       exp_in_base = 0;
     if (dotpos != 0)
-      exp_in_base -= s - dotpos;
+      exp_in_base -= s - dotpos + n_zeros_skipped;
     divflag = exp_in_base < 0;
     exp_in_base = ABS (exp_in_base);
 
@@ -325,8 +336,7 @@ mpf_set_str (mpf_ptr x, const char *str, int base)
       }
 
     ra = 2 * (prec + 1);
-    rp = TMP_ALLOC_LIMBS (ra);
-    tp = TMP_ALLOC_LIMBS (ra);
+    TMP_ALLOC_LIMBS_2 (rp, ra, tp, ra);
     rn = mpn_pow_1_highpart (rp, &radj, (mp_limb_t) base, exp_in_base, prec, tp);
 
     if (divflag)

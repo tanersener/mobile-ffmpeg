@@ -32,4 +32,4 @@ include(`../config.m4')
 
 
 MULFUNC_PROLOGUE(mpn_submul_1)
-include_mpn(`x86/k6/aorsmul_1.asm')
+include_mpn(`x86/pentium4/sse2/submul_1.asm')

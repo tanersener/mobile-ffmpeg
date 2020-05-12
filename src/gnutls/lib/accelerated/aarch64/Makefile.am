@@ -44,11 +44,9 @@ libaarch64_la_SOURCES = aarch64-common.c aarch64-common.h sha-aarch64.h sha-aarc
 	hmac-sha-aarch64.c aes-cbc-aarch64.c aes-gcm-aarch64.c aes-aarch64.h aes-ccm-aarch64.c
 
 if MACOSX
-ADIR=macosx
+libaarch64_la_SOURCES += macosx/sha1-armv8.s macosx/sha512-armv8.s macosx/sha256-armv8.s \
+	macosx/aes-aarch64.s macosx/ghash-aarch64.s
 else
-ADIR=elf
+libaarch64_la_SOURCES += elf/sha1-armv8.s elf/sha512-armv8.s elf/sha256-armv8.s \
+	elf/aes-aarch64.s elf/ghash-aarch64.s
 endif
-
-libaarch64_la_SOURCES += $(ADIR)/sha1-armv8.s $(ADIR)/sha512-armv8.s $(ADIR)/sha256-armv8.s \
-	$(ADIR)/aes-aarch64.s $(ADIR)/ghash-aarch64.s
-

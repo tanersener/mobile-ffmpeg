@@ -1,5 +1,5 @@
 # DO NOT EDIT! GENERATED AUTOMATICALLY!
-# Copyright (C) 2002-2019 Free Software Foundation, Inc.
+# Copyright (C) 2002-2020 Free Software Foundation, Inc.
 #
 # This file is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -552,7 +552,6 @@ AC_DEFUN([unistring_FILE_LIST], [
   m4/inline.m4
   m4/libunistring-base.m4
   m4/limits-h.m4
-  m4/longlong.m4
   m4/multiarch.m4
   m4/off_t.m4
   m4/ssize_t.m4
@@ -560,4 +559,5 @@ AC_DEFUN([unistring_FILE_LIST], [
   m4/stdint.m4
   m4/sys_types_h.m4
   m4/wint_t.m4
+  m4/zzgnulib.m4
 ])

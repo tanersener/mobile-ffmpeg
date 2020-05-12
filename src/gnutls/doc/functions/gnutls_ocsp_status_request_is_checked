@@ -2,14 +2,15 @@
 
 
 
-@deftypefun {int} {gnutls_ocsp_status_request_is_checked} (gnutls_session_t @var{session}, unsigned int @var{flags})
+@deftypefun {unsigned} {gnutls_ocsp_status_request_is_checked} (gnutls_session_t @var{session}, unsigned int @var{flags})
 @var{session}: is a gnutls session
 
 @var{flags}: should be zero or @code{GNUTLS_OCSP_SR_IS_AVAIL} 
 
 When flags are zero this function returns non-zero if a valid OCSP status
 response was included in the TLS handshake. That is, an OCSP status response
-which is not too old or superseded. It returns zero otherwise.
+which is not too old, superseded or marks the certificate as revoked.
+It returns zero otherwise.
 
 When the flag @code{GNUTLS_OCSP_SR_IS_AVAIL}  is specified, the function
 returns non-zero if an OCSP status response was included in the handshake
@@ -24,7 +25,7 @@ This function is always usable on client side, but on server side only
 under TLS 1.3, which is the first version of TLS that allows cliend-side OCSP
 responses.
 
-@strong{Returns:} non zero if the response was valid, or a zero if it wasn't sent,
+@strong{Returns:} Non-zero if the response was valid, or a zero if it wasn't sent,
 or sent and was invalid.
 
 @strong{Since:} 3.1.4

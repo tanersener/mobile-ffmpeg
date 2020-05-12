@@ -83,6 +83,10 @@ typedef struct Jpeg2000Tile {
     Jpeg2000QuantStyle  qntsty[4];
     Jpeg2000POC         poc;
     Jpeg2000TilePart    tile_part[32];
+    uint8_t             has_ppt;                // whether this tile has a ppt marker
+    uint8_t             *packed_headers;        // contains packed headers. Used only along with PPT marker
+    int                 packed_headers_size;    // size in bytes of the packed headers
+    GetByteContext      packed_headers_stream;  // byte context corresponding to packed headers
     uint16_t tp_idx;                    // Tile-part index
     int coord[2][2];                    // border coordinates {{x0, x1}, {y0, y1}}
 } Jpeg2000Tile;
@@ -562,6 +566,7 @@ static int get_coc(Jpeg2000DecoderContext *s, Jpeg2000CodingStyle *c,
                    uint8_t *properties)
 {
     int compno, ret;
+    uint8_t has_eph;
 
     if (bytestream2_get_bytes_left(&s->g) < 2) {
         av_log(s->avctx, AV_LOG_ERROR, "Insufficient space for COC\n");
@@ -578,7 +583,9 @@ static int get_coc(Jpeg2000DecoderContext *s, Jpeg2000CodingStyle *c,
     }
 
     c      += compno;
+    has_eph = c->csty & JPEG2000_CSTY_EPH;
     c->csty = bytestream2_get_byteu(&s->g);
+    c->csty |= has_eph; //do not override eph present bits from COD
 
     if ((ret = get_cox(s, c)) < 0)
         return ret;
@@ -795,7 +802,7 @@ static int get_sot(Jpeg2000DecoderContext *s, int n)
  * markers. Parsing the TLM header is needed to increment the input header
  * buffer.
  * This marker is mandatory for DCI. */
-static uint8_t get_tlm(Jpeg2000DecoderContext *s, int n)
+static int get_tlm(Jpeg2000DecoderContext *s, int n)
 {
     uint8_t Stlm, ST, SP, tile_tlm, i;
     bytestream2_get_byte(&s->g);               /* Ztlm: skipped */
@@ -803,7 +810,11 @@ static uint8_t get_tlm(Jpeg2000DecoderContext *s, int n)
 
     // too complex ? ST = ((Stlm >> 4) & 0x01) + ((Stlm >> 4) & 0x02);
     ST = (Stlm >> 4) & 0x03;
-    // TODO: Manage case of ST = 0b11 --> raise error
+    if (ST == 0x03) {
+        av_log(s->avctx, AV_LOG_ERROR, "TLM marker contains invalid ST value.\n");
+        return AVERROR_INVALIDDATA;
+    }
+
     SP       = (Stlm >> 6) & 0x01;
     tile_tlm = (n - 4) / ((SP + 1) * 2 + ST);
     for (i = 0; i < tile_tlm; i++) {
@@ -847,6 +858,41 @@ static int get_plt(Jpeg2000DecoderContext *s, int n)
     }
     if (v & 0x80)
         return AVERROR_INVALIDDATA;
+
+    return 0;
+}
+
+static int get_ppt(Jpeg2000DecoderContext *s, int n)
+{
+    Jpeg2000Tile *tile;
+    void *new;
+
+    if (n < 3) {
+        av_log(s->avctx, AV_LOG_ERROR, "Invalid length for PPT data.\n");
+        return AVERROR_INVALIDDATA;
+    }
+    if (s->curtileno < 0)
+        return AVERROR_INVALIDDATA;
+
+    tile = &s->tile[s->curtileno];
+    if (tile->tp_idx != 0) {
+        av_log(s->avctx, AV_LOG_ERROR,
+               "PPT marker can occur only on first tile part of a tile.\n");
+        return AVERROR_INVALIDDATA;
+    }
+
+    tile->has_ppt = 1;  // this tile has a ppt marker
+    bytestream2_get_byte(&s->g); // Zppt is skipped and not used
+    new = av_realloc(tile->packed_headers,
+                     tile->packed_headers_size + n - 3);
+    if (new) {
+        tile->packed_headers = new;
+    } else
+        return AVERROR(ENOMEM);
+    memcpy(tile->packed_headers + tile->packed_headers_size,
+           s->g.buffer, n - 3);
+    tile->packed_headers_size += n - 3;
+    bytestream2_skip(&s->g, n - 3);
 
     return 0;
 }
@@ -923,6 +969,19 @@ static int getlblockinc(Jpeg2000DecoderContext *s)
     return res;
 }
 
+static inline void select_stream(Jpeg2000DecoderContext *s, Jpeg2000Tile *tile,
+                                 int *tp_index)
+{
+    s->g = tile->tile_part[*tp_index].tpg;
+    if (bytestream2_get_bytes_left(&s->g) == 0 && s->bit_index == 8) {
+        if (*tp_index < FF_ARRAY_ELEMS(tile->tile_part) - 1) {
+            s->g = tile->tile_part[++(*tp_index)].tpg;
+        }
+    }
+    if (bytestream2_peek_be32(&s->g) == JPEG2000_SOP_FIXED_BYTES)
+        bytestream2_skip(&s->g, JPEG2000_SOP_BYTE_LENGTH);
+}
+
 static int jpeg2000_decode_packet(Jpeg2000DecoderContext *s, Jpeg2000Tile *tile, int *tp_index,
                                   Jpeg2000CodingStyle *codsty,
                                   Jpeg2000ResLevel *rlevel, int precno,
@@ -934,19 +993,15 @@ static int jpeg2000_decode_packet(Jpeg2000DecoderContext *s, Jpeg2000Tile *tile,
     if (layno < rlevel->band[0].prec[precno].decoded_layers)
         return 0;
     rlevel->band[0].prec[precno].decoded_layers = layno + 1;
-
-    if (bytestream2_get_bytes_left(&s->g) == 0 && s->bit_index == 8) {
-        if (*tp_index < FF_ARRAY_ELEMS(tile->tile_part) - 1) {
-            s->g = tile->tile_part[++(*tp_index)].tpg;
-        }
-    }
-
-    if (bytestream2_peek_be32(&s->g) == JPEG2000_SOP_FIXED_BYTES)
-        bytestream2_skip(&s->g, JPEG2000_SOP_BYTE_LENGTH);
+    // Select stream to read from
+    if (tile->has_ppt)
+        s->g = tile->packed_headers_stream;
+    else
+        select_stream(s, tile, tp_index);
 
     if (!(ret = get_bits(s, 1))) {
         jpeg2000_flush(s);
-        return 0;
+        goto skip_data;
     } else if (ret < 0)
         return ret;
 
@@ -1052,6 +1107,11 @@ static int jpeg2000_decode_packet(Jpeg2000DecoderContext *s, Jpeg2000Tile *tile,
             av_log(s->avctx, AV_LOG_ERROR, "EPH marker not found. instead %X\n", bytestream2_peek_be32(&s->g));
     }
 
+    // Save state of stream
+    if (tile->has_ppt) {
+        tile->packed_headers_stream = s->g;
+        select_stream(s, tile, tp_index);
+    }
     for (bandno = 0; bandno < rlevel->nbands; bandno++) {
         Jpeg2000Band *band = rlevel->band + bandno;
         Jpeg2000Prec *prec = band->prec + precno;
@@ -1093,6 +1153,15 @@ static int jpeg2000_decode_packet(Jpeg2000DecoderContext *s, Jpeg2000Tile *tile,
             av_freep(&cblk->lengthinc);
         }
     }
+    // Save state of stream
+    tile->tile_part[*tp_index].tpg = s->g;
+    return 0;
+
+skip_data:
+    if (tile->has_ppt)
+        tile->packed_headers_stream = s->g;
+    else
+        tile->tile_part[*tp_index].tpg = s->g;
     return 0;
 }
 
@@ -1284,14 +1353,14 @@ static int jpeg2000_decode_packets_po_iteration(Jpeg2000DecoderContext *s, Jpeg2
                             continue;
                         }
 
-                            for (layno = 0; layno < LYEpoc; layno++) {
-                                if ((ret = jpeg2000_decode_packet(s, tile, tp_index,
-                                                                codsty, rlevel,
-                                                                precno, layno,
-                                                                qntsty->expn + (reslevelno ? 3 * (reslevelno - 1) + 1 : 0),
-                                                                qntsty->nguardbits)) < 0)
-                                    return ret;
-                            }
+                        for (layno = 0; layno < LYEpoc; layno++) {
+                            if ((ret = jpeg2000_decode_packet(s, tile, tp_index,
+                                                              codsty, rlevel,
+                                                              precno, layno,
+                                                              qntsty->expn + (reslevelno ? 3 * (reslevelno - 1) + 1 : 0),
+                                                              qntsty->nguardbits)) < 0)
+                                return ret;
+                        }
                     }
                 }
             }
@@ -1925,6 +1994,11 @@ static int jpeg2000_read_main_headers(Jpeg2000DecoderContext *s)
                 av_log(s->avctx, AV_LOG_ERROR, "Invalid tpend\n");
                 return AVERROR_INVALIDDATA;
             }
+
+            if (tile->has_ppt && tile->tp_idx == 0) {
+                bytestream2_init(&tile->packed_headers_stream, tile->packed_headers, tile->packed_headers_size);
+            }
+
             bytestream2_init(&tp->tpg, s->g.buffer, tp->tp_end - s->g.buffer);
             bytestream2_skip(&s->g, tp->tp_end - s->g.buffer);
 
@@ -1935,8 +2009,12 @@ static int jpeg2000_read_main_headers(Jpeg2000DecoderContext *s)
 
         len = bytestream2_get_be16(&s->g);
         if (len < 2 || bytestream2_get_bytes_left(&s->g) < len - 2) {
-            av_log(s->avctx, AV_LOG_ERROR, "Invalid len %d left=%d\n", len, bytestream2_get_bytes_left(&s->g));
-            return AVERROR_INVALIDDATA;
+            if (s->avctx->strict_std_compliance >= FF_COMPLIANCE_STRICT) {
+                av_log(s->avctx, AV_LOG_ERROR, "Invalid len %d left=%d\n", len, bytestream2_get_bytes_left(&s->g));
+                return AVERROR_INVALIDDATA;
+            }
+            av_log(s->avctx, AV_LOG_WARNING, "Missing EOC Marker.\n");
+            break;
         }
 
         switch (marker) {
@@ -1987,6 +2065,10 @@ static int jpeg2000_read_main_headers(Jpeg2000DecoderContext *s)
             // Packet length, tile-part header
             ret = get_plt(s, len);
             break;
+        case JPEG2000_PPT:
+            // Packed headers, tile-part header
+            ret = get_ppt(s, len);
+            break;
         default:
             av_log(s->avctx, AV_LOG_ERROR,
                    "unsupported marker 0x%.4"PRIX16" at pos 0x%X\n",
@@ -2016,7 +2098,6 @@ static int jpeg2000_read_bitstream_packets(Jpeg2000DecoderContext *s)
         if ((ret = init_tile(s, tileno)) < 0)
             return ret;
 
-        s->g = tile->tile_part[0].tpg;
         if ((ret = jpeg2000_decode_packets(s, tile)) < 0)
             return ret;
     }

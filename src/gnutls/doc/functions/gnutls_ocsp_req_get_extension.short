@@ -1,1 +1,1 @@
-@item @var{int} @ref{gnutls_ocsp_req_get_extension} (gnutls_ocsp_req_t @var{req}, unsigned @var{indx}, gnutls_datum_t * @var{oid}, unsigned int * @var{critical}, gnutls_datum_t * @var{data})
+@item @var{int} @ref{gnutls_ocsp_req_get_extension} (gnutls_ocsp_req_const_t @var{req}, unsigned @var{indx}, gnutls_datum_t * @var{oid}, unsigned int * @var{critical}, gnutls_datum_t * @var{data})

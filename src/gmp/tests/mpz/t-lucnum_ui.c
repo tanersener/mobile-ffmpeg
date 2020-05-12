@@ -19,7 +19,6 @@ the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "gmp.h"
 #include "gmp-impl.h"
 #include "tests.h"
 
@@ -40,8 +39,8 @@ check_sequence (int argc, char *argv[])
 
   if (argc > 1 && argv[1][0] == 'x')
     limit = ULONG_MAX;
-  else if (argc > 1)
-    limit = atoi (argv[1]);
+  else
+    TESTS_REPS (limit, argv, argc);
 
   /* start at n==0 */
   mpz_init_set_si (want_ln1, -1); /* L[-1] */

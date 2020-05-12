@@ -34,7 +34,8 @@ gnutls_sign_algorithm_t
 _gnutls_session_get_sign_algo(gnutls_session_t session,
 			      gnutls_pcert_st * cert,
 			      gnutls_privkey_t privkey,
-			      unsigned client_cert);
+			      unsigned client_cert,
+			      gnutls_kx_algorithm_t kx_algorithm);
 int _gnutls_sign_algorithm_parse_data(gnutls_session_t session,
 				      const uint8_t * data,
 				      size_t data_size);

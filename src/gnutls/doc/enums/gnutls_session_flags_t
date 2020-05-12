@@ -24,4 +24,8 @@ Indicates client capability for post-handshake auth; set only on server side.
 The TLS1.3 server session returned early.
 @item GNUTLS_@-SFLAGS_@-EARLY_@-DATA
 The TLS1.3 early data has been received by the server.
+@item GNUTLS_@-SFLAGS_@-CLI_@-REQUESTED_@-OCSP
+Set when the client has requested OCSP staple during handshake.
+@item GNUTLS_@-SFLAGS_@-SERV_@-REQUESTED_@-OCSP
+Set when the server has requested OCSP staple during handshake.
 @end table

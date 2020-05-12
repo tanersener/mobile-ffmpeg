@@ -203,9 +203,11 @@ generate_early_secrets(gnutls_session_t session,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	_gnutls_nss_keylog_write(session, "CLIENT_EARLY_TRAFFIC_SECRET",
-				 session->key.proto.tls13.e_ckey,
-				 prf->output_size);
+	ret = _gnutls_call_keylog_func(session, "CLIENT_EARLY_TRAFFIC_SECRET",
+				       session->key.proto.tls13.e_ckey,
+				       prf->output_size);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 	ret = _tls13_derive_secret2(prf, EARLY_EXPORTER_MASTER_LABEL, sizeof(EARLY_EXPORTER_MASTER_LABEL)-1,
 				    session->internals.handshake_hash_buffer.data,
@@ -215,9 +217,11 @@ generate_early_secrets(gnutls_session_t session,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	_gnutls_nss_keylog_write(session, "EARLY_EXPORTER_SECRET",
-				 session->key.proto.tls13.ap_expkey,
-				 prf->output_size);
+	ret = _gnutls_call_keylog_func(session, "EARLY_EXPORTER_SECRET",
+				       session->key.proto.tls13.ap_expkey,
+				       prf->output_size);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 	return 0;
 }
@@ -390,8 +394,7 @@ client_send_params(gnutls_session_t session,
 		info = _gnutls_get_auth_info(session, GNUTLS_CRD_PSK);
 		assert(info != NULL);
 
-		memcpy(info->username, username.data, username.size);
-		info->username[username.size] = 0;
+		_gnutls_copy_psk_username(info, &username);
 
 		if ((ret = _gnutls_buffer_append_data_prefix(extdata, 16,
 							     username.data,
@@ -605,17 +608,11 @@ static int server_recv_params(gnutls_session_t session,
 		} else if (pskcred &&
 			   psk.ob_ticket_age == 0 &&
 			   psk.identity.size > 0 && psk.identity.size <= MAX_USERNAME_SIZE) {
-			/* _gnutls_psk_pwd_find_entry() expects 0-terminated identities */
-			char identity_str[MAX_USERNAME_SIZE + 1];
-
 			prf = pskcred->binder_algo;
-
-			memcpy(identity_str, psk.identity.data, psk.identity.size);
-			identity_str[psk.identity.size] = 0;
 
 			/* this fails only on configuration errors; as such we always
 			 * return its error code in that case */
-			ret = _gnutls_psk_pwd_find_entry(session, identity_str, &key);
+			ret = _gnutls_psk_pwd_find_entry(session, (char *) psk.identity.data, psk.identity.size, &key);
 			if (ret < 0)
 				return gnutls_assert_val(ret);
 
@@ -680,8 +677,7 @@ static int server_recv_params(gnutls_session_t session,
 		info = _gnutls_get_auth_info(session, GNUTLS_CRD_PSK);
 		assert(info != NULL);
 
-		memcpy(info->username, psk.identity.data, psk.identity.size);
-		info->username[psk.identity.size] = 0;
+		_gnutls_copy_psk_username(info, &psk.identity);
 		_gnutls_handshake_log("EXT[%p]: selected PSK identity: %s (%d)\n", session, info->username, psk_index);
 	} else {
 		if (session->internals.hsk_flags & HSK_EARLY_DATA_ACCEPTED) {

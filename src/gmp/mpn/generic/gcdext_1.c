@@ -28,7 +28,6 @@ You should have received copies of the GNU General Public License and the
 GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
-#include "gmp.h"
 #include "gmp-impl.h"
 #include "longlong.h"
 
@@ -40,20 +39,7 @@ see https://www.gnu.org/licenses/.  */
 #define GCDEXT_1_BINARY_METHOD 2
 #endif
 
-#ifndef USE_ZEROTAB
-#define USE_ZEROTAB 1
-#endif
-
 #if GCDEXT_1_USE_BINARY
-
-#if USE_ZEROTAB
-static unsigned char zerotab[0x40] = {
-  6, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
-  4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
-  5, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
-  4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0
-};
-#endif
 
 mp_limb_t
 mpn_gcdext_1 (mp_limb_signed_t *sp, mp_limb_signed_t *tp,
@@ -111,48 +97,20 @@ mpn_gcdext_1 (mp_limb_signed_t *sp, mp_limb_signed_t *tp,
       if (u > v)
 	{
 	  u -= v;
-#if USE_ZEROTAB
-	  count = zerotab [u & 0x3f];
-	  u >>= count;
-	  if (UNLIKELY (count == 6))
-	    {
-	      unsigned c;
-	      do
-		{
-		  c = zerotab[u & 0x3f];
-		  u >>= c;
-		  count += c;
-		}
-	      while (c == 6);
-	    }
-#else
+
 	  count_trailing_zeros (count, u);
 	  u >>= count;
-#endif
+
 	  t0 += t1; t1 <<= count;
 	  s0 += s1; s1 <<= count;
 	}
       else
 	{
 	  v -= u;
-#if USE_ZEROTAB
-	  count = zerotab [v & 0x3f];
-	  v >>= count;
-	  if (UNLIKELY (count == 6))
-	    {
-	      unsigned c;
-	      do
-		{
-		  c = zerotab[v & 0x3f];
-		  v >>= c;
-		  count += c;
-		}
-	      while (c == 6);
-	    }
-#else
+
 	  count_trailing_zeros (count, v);
 	  v >>= count;
-#endif
+
 	  t1 += t0; t0 <<= count;
 	  s1 += s0; s0 <<= count;
 	}
@@ -194,22 +152,8 @@ mpn_gcdext_1 (mp_limb_signed_t *sp, mp_limb_signed_t *tp,
 
       /* Number of trailing zeros is the same no matter if we look at
        * d or u, but using d gives more parallelism. */
-#if USE_ZEROTAB
-      count = zerotab[d & 0x3f];
-      if (UNLIKELY (count == 6))
-	{
-	  unsigned c = 6;
-	  do
-	    {
-	      d >>= c;
-	      c = zerotab[d & 0x3f];
-	      count += c;
-	    }
-	  while (c == 6);
-	}
-#else
       count_trailing_zeros (count, d);
-#endif
+
       det_sign ^= vgtu;
 
       tx = vgtu & (t0 - t1);
@@ -238,7 +182,7 @@ mpn_gcdext_1 (mp_limb_signed_t *sp, mp_limb_signed_t *tp,
   ugh = ug/2 + (ug & 1);
   vgh = vg/2 + (vg & 1);
 
-  /* Now ±2^{shift} g = s0 U - t0 V. Get rid of the power of two, using
+  /* Now 2^{shift} g = s0 U - t0 V. Get rid of the power of two, using
      s0 U - t0 V = (s0 + V/g) U - (t0 + U/g) V. */
   for (i = 0; i < shift; i++)
     {
@@ -249,8 +193,11 @@ mpn_gcdext_1 (mp_limb_signed_t *sp, mp_limb_signed_t *tp,
       s0 += mask & vgh;
       t0 += mask & ugh;
     }
-  /* FIXME: Try simplifying this condition. */
-  if ( (s0 > 1 && 2*s0 >= vg) || (t0 > 1 && 2*t0 >= ug) )
+
+  ASSERT_ALWAYS (s0 <= vg);
+  ASSERT_ALWAYS (t0 <= ug);
+
+  if (s0 > vg - s0)
     {
       s0 -= vg;
       t0 -= ug;

@@ -42,6 +42,7 @@ import com.arthenica.mobileffmpeg.StatisticsCallback;
 import com.arthenica.mobileffmpeg.util.DialogUtil;
 import com.arthenica.mobileffmpeg.util.ResourcesUtil;
 import com.arthenica.mobileffmpeg.util.SingleExecuteCallback;
+import com.arthenica.smartexception.java.Exceptions;
 
 import java.io.File;
 import java.io.IOException;
@@ -103,7 +104,7 @@ public class SubtitleTabFragment extends Fragment {
 
             @Override
             public void apply(LogMessage message) {
-                android.util.Log.d(MainActivity.TAG, message.getText());
+                Log.d(MainActivity.TAG, message.getText());
             }
         });
     }
@@ -229,7 +230,7 @@ public class SubtitleTabFragment extends Fragment {
             }, ffmpegCommand);
 
         } catch (IOException e) {
-            Log.e(TAG, "Burn subtitles failed", e);
+            Log.e(TAG, String.format("Burn subtitles failed %s", Exceptions.getStackTraceString(e)));
             Popup.show(requireContext(), "Burn subtitles failed");
         }
     }

@@ -150,5 +150,32 @@ void doit(void)
 			GNUTLS_E_AGAIN, GNUTLS_E_KEY_USAGE_VIOLATION,
 			&rawpk_public_key2, &rawpk_private_key2, 0, &rawpk_public_key1, &rawpk_private_key1, GNUTLS_KEY_KEY_ENCIPHERMENT);
 
+#ifdef ENABLE_GOST
+	if (!gnutls_fips140_mode_enabled()) {
+		server_priority = "NORMAL:+CTYPE-ALL"
+			":+VKO-GOST-12"
+			":+GROUP-GOST-ALL"
+			":+CIPHER-GOST-ALL"
+			":+MAC-GOST-ALL"
+			":+SIGN-GOST-ALL";
+		const char *gost_client_prio = "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+VKO-GOST-12:+GROUP-GOST-ALL:+CIPHER-GOST-ALL:+MAC-GOST-ALL:+SIGN-GOST-ALL";
+		try_with_key("TLS 1.2 with gost12 256 no-cli-cert (ctype X.509)", gost_client_prio, GNUTLS_KX_VKO_GOST_12, GNUTLS_SIGN_GOST_256, GNUTLS_SIGN_UNKNOWN,
+			&server_ca3_gost12_256_cert, &server_ca3_gost12_256_key, NULL, NULL, 0, GNUTLS_CRT_X509, GNUTLS_CRT_UNKNOWN);
+		try_with_key("TLS 1.2 with gost12 256 ask cli-cert (ctype X.509)", gost_client_prio, GNUTLS_KX_VKO_GOST_12, GNUTLS_SIGN_GOST_256, GNUTLS_SIGN_UNKNOWN,
+			&server_ca3_gost12_256_cert, &server_ca3_gost12_256_key, NULL, NULL, ASK_CERT, GNUTLS_CRT_X509, GNUTLS_CRT_X509);
+		try_with_key("TLS 1.2 with gost12 256 use cli-cert (ctype X.509)", gost_client_prio, GNUTLS_KX_VKO_GOST_12, GNUTLS_SIGN_GOST_256, GNUTLS_SIGN_GOST_256,
+			&server_ca3_gost12_256_cert, &server_ca3_gost12_256_key, &cligost12_256_ca3_cert, &cligost12_256_ca3_key, USE_CERT, GNUTLS_CRT_X509, GNUTLS_CRT_X509);
+		try_with_key("TLS 1.2 with gost12 512 no-cli-cert (ctype X.509)", gost_client_prio, GNUTLS_KX_VKO_GOST_12, GNUTLS_SIGN_GOST_512, GNUTLS_SIGN_UNKNOWN,
+			&server_ca3_gost12_512_cert, &server_ca3_gost12_512_key, NULL, NULL, 0, GNUTLS_CRT_X509, GNUTLS_CRT_UNKNOWN);
+		try_with_key("TLS 1.2 with gost12 512 ask cli-cert (ctype X.509)", gost_client_prio, GNUTLS_KX_VKO_GOST_12, GNUTLS_SIGN_GOST_512, GNUTLS_SIGN_UNKNOWN,
+			&server_ca3_gost12_512_cert, &server_ca3_gost12_512_key, NULL, NULL, ASK_CERT, GNUTLS_CRT_X509, GNUTLS_CRT_X509);
+		try_with_key("TLS 1.2 with gost12 512 use cli-cert (ctype X.509)", gost_client_prio, GNUTLS_KX_VKO_GOST_12, GNUTLS_SIGN_GOST_512, GNUTLS_SIGN_GOST_512,
+			&server_ca3_gost12_512_cert, &server_ca3_gost12_512_key, &cligost12_512_ca3_cert, &cligost12_512_ca3_key, USE_CERT, GNUTLS_CRT_X509, GNUTLS_CRT_X509);
+		try_with_key("TLS 1.2 with gost12 512 use cli-cert gost12 256 (ctype X.509)", gost_client_prio, GNUTLS_KX_VKO_GOST_12, GNUTLS_SIGN_GOST_512, GNUTLS_SIGN_GOST_256,
+			&server_ca3_gost12_512_cert, &server_ca3_gost12_512_key, &cligost12_256_ca3_cert, &cligost12_256_ca3_key, USE_CERT, GNUTLS_CRT_X509, GNUTLS_CRT_X509);
+		server_priority = NULL;
+	}
+#endif
+
 	gnutls_global_deinit();
 }

@@ -35,7 +35,7 @@
 #define addf _gnutls_buffer_append_printf
 #define adds _gnutls_buffer_append_str
 
-static void print_req(gnutls_buffer_st * str, gnutls_ocsp_req_t req)
+static void print_req(gnutls_buffer_st * str, gnutls_ocsp_req_const_t req)
 {
 	int ret;
 	unsigned indx;
@@ -169,7 +169,7 @@ static void print_req(gnutls_buffer_st * str, gnutls_ocsp_req_t req)
  *   negative error value.
  **/
 int
-gnutls_ocsp_req_print(gnutls_ocsp_req_t req,
+gnutls_ocsp_req_print(gnutls_ocsp_req_const_t req,
 		      gnutls_ocsp_print_formats_t format,
 		      gnutls_datum_t * out)
 {
@@ -197,7 +197,7 @@ gnutls_ocsp_req_print(gnutls_ocsp_req_t req,
 }
 
 static void
-print_resp(gnutls_buffer_st * str, gnutls_ocsp_resp_t resp,
+print_resp(gnutls_buffer_st * str, gnutls_ocsp_resp_const_t resp,
 	   gnutls_ocsp_print_formats_t format)
 {
 	int ret;
@@ -639,7 +639,7 @@ print_resp(gnutls_buffer_st * str, gnutls_ocsp_resp_t resp,
  *   negative error value.
  **/
 int
-gnutls_ocsp_resp_print(gnutls_ocsp_resp_t resp,
+gnutls_ocsp_resp_print(gnutls_ocsp_resp_const_t resp,
 		       gnutls_ocsp_print_formats_t format,
 		       gnutls_datum_t * out)
 {

@@ -38,7 +38,7 @@ EXTRA_DIST = suppressions.valgrind eagain-common.h cert-common.h test-chains.h \
 	certs/ca-ecc.pem certs/cert-ecc384.pem certs/cert-ecc.pem certs/ecc256.pem \
 	certs/ecc521.pem certs/rsa-2432.pem x509cert-dir/ca.pem psk.passwd \
 	certs/rawpk_priv.pem certs/rawpk_pub.pem \
-	certs/ed25519.pem certs/cert-ed25519.pem \
+	certs/ed25519.pem certs/cert-ed25519.pem certs/rsa-512.pem \
 	system.prio pkcs11/softhsm.h pkcs11/pkcs11-pubkey-import.c gnutls-asan.supp \
 	rsa-md5-collision/README safe-renegotiation/README starttls-smtp.txt starttls-ftp.txt \
 	starttls-lmtp.txt starttls-pop3.txt starttls-xmpp.txt starttls-nntp.txt starttls-sieve.txt \
@@ -71,7 +71,8 @@ EXTRA_DIST = suppressions.valgrind eagain-common.h cert-common.h test-chains.h \
 	testpkcs11.pkcs15 testpkcs11.softhsm testpkcs11.sc-hsm testpkcs11-certs/ca.crt testpkcs11-certs/ca-tmpl \
 	testpkcs11-certs/client.key testpkcs11-certs/server.crt testpkcs11-certs/server-tmpl \
 	testpkcs11-certs/ca.key testpkcs11-certs/client.crt testpkcs11-certs/client-tmpl testpkcs11-certs/server.key \
-	crt_type-neg-common.c
+	crt_type-neg-common.c \
+	system-override-default-priority-string.bad.config system-override-default-priority-string.none.config system-override-default-priority-string.only-tls13.config
 
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
 AM_CPPFLAGS = \
@@ -179,7 +180,7 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 fallback-scsv pkcs8-key-decode urls dtls-rehandshake-cert rfc7633-ok \
 	 key-usage-rsa key-usage-ecdhe-rsa mini-session-verify-function auto-verify \
 	 record-timeouts mini-dtls-hello-verify-48 set-default-prio \
-	 tls12-anon-upgrade tlsext-decoding rsa-psk-cb \
+	 tls12-anon-upgrade tlsext-decoding rsa-psk-cb gnutls-ids \
 	 rehandshake-switch-cert rehandshake-switch-cert-allow rehandshake-switch-cert-client \
 	 rehandshake-switch-cert-client-allow handshake-versions dtls-handshake-versions \
 	 dtls-max-record tls12-max-record alpn-server-prec ocsp-filename-memleak \
@@ -215,10 +216,16 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 resume-with-stek-expiration resume-with-previous-stek rawpk-api \
 	 tls-record-size-limit-asym dh-compute ecdh-compute sign-verify-data-newapi \
 	 sign-verify-newapi sign-verify-deterministic iov aead-cipher-vec \
-	 tls13-without-timeout-func buffer
+	 tls13-without-timeout-func buffer status-request-revoked \
+	 set_x509_ocsp_multi_cli kdf-api keylog-func \
+	 dtls_hello_random_value tls_hello_random_value
 
 if HAVE_SECCOMP_TESTS
 ctests += dtls-with-seccomp tls-with-seccomp dtls-client-with-seccomp tls-client-with-seccomp
+endif
+
+if STRICT_DER_TIME
+ctests += strict-der
 endif
 
 if !DISABLE_SYSTEM_CONFIG
@@ -420,7 +427,7 @@ openssl_LDADD = ../extra/libgnutls-openssl.la $(LDADD)
 endif
 
 if HAVE_FORK
-ctests += x509self x509dn anonself pskself dhepskself	\
+ctests += x509self x509dn anonself pskself pskself2 dhepskself	\
 	setcredcrash tls12-resume-x509 tls12-resume-psk tls12-resume-anon \
 	tls13-resume-x509 tls13-resume-psk tls13-early-data tls13-early-data-neg \
 	resume-with-record-size-limit
@@ -502,12 +509,13 @@ dist_check_SCRIPTS += fastopen.sh pkgconfig.sh starttls.sh starttls-ftp.sh start
 	ocsp-tests/ocsp-test cipher-listings.sh sni-hostname.sh server-multi-keys.sh \
 	psktool.sh ocsp-tests/ocsp-load-chain gnutls-cli-save-data.sh gnutls-cli-debug.sh \
 	sni-resume.sh ocsp-tests/ocsptool cert-reencoding.sh pkcs7-cat.sh long-crl.sh \
-	serv-udp.sh logfile-option.sh gnutls-cli-resume.sh profile-tests.sh
+	serv-udp.sh logfile-option.sh gnutls-cli-resume.sh profile-tests.sh \
+	server-weak-keys.sh
 
 if !DISABLE_SYSTEM_CONFIG
 dist_check_SCRIPTS += system-override-sig-hash.sh system-override-versions.sh system-override-invalid.sh \
 	system-override-curves.sh system-override-profiles.sh system-override-tls.sh \
-	system-override-kx.sh
+	system-override-kx.sh system-override-default-priority-string.sh
 endif
 
 dist_check_SCRIPTS += gnutls-cli-self-signed.sh gnutls-cli-invalid-crl.sh gnutls-cli-rawpk.sh
@@ -577,7 +585,7 @@ TESTS_ENVIRONMENT +=						\
 	PKCS12PASSWORD_2=""					\
 	PKCS12PATH=$(srcdir)/cert-tests/data/			\
 	X509CERTDIR=$(srcdir)/x509cert-dir/			\
-	GNUTLS_SYSTEM_PRIORITY_FILE=$(srcdir)/system.prio	\
+	GNUTLS_SYSTEM_PRIORITY_FILE=$(abs_top_srcdir)/tests/system.prio	\
 	PSK_FILE=$(srcdir)/psk.passwd				\
 	OPENSSL_ia32cap=0x00000000				\
 	EXEEXT=$(EXEEXT)					\

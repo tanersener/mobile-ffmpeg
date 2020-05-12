@@ -52,7 +52,7 @@ PROLOGUE(mpn_invert_limb)
 	adds	r1, r12, r0
 	adc	r3, r3, r0
 	rsb	r0, r3, r2
-	ret	lr
+	return	lr
 EPILOGUE()
 
 	RODATA

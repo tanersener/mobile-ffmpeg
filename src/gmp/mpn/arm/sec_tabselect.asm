@@ -109,7 +109,7 @@ L(tp2):	subs	c, c, #1
 	bge	L(tp2)
 	stmia	rp, {r8,r9}
 	pop	{r4-r11, r14}
-	ret	lr
+	return	lr
 
 L(n2):	cmp	j, #-2
 	bne	L(n1)
@@ -127,5 +127,5 @@ L(tp1):	subs	c, c, #1
 	bge	L(tp1)
 	str	r8, [rp]
 L(n1):	pop	{r4-r11, r14}
-	ret	lr
+	return	lr
 EPILOGUE()

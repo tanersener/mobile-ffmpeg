@@ -7,7 +7,7 @@
    SAFE TO REACH IT THROUGH DOCUMENTED INTERFACES.  IN FACT, IT IS ALMOST
    GUARANTEED THAT IT WILL CHANGE OR DISAPPEAR IN A FUTURE GNU MP RELEASE.
 
-Copyright 2006-2010, 2012, 2014 Free Software Foundation, Inc.
+Copyright 2006-2010, 2012, 2014, 2018 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -36,7 +36,6 @@ GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
 
-#include "gmp.h"
 #include "gmp-impl.h"
 
 /* Evaluate in: -1, 0, +inf
@@ -196,16 +195,27 @@ mpn_toom22_mul (mp_ptr pp,
 
   if (vm1_neg)
     cy += mpn_add_n (pp + n, pp + n, vm1, 2 * n);
-  else
+  else {
     cy -= mpn_sub_n (pp + n, pp + n, vm1, 2 * n);
+    if (UNLIKELY (cy + 1 == 0)) { /* cy is negative */
+      /* The total contribution of v0+vinf-vm1 can not be negative. */
+#if WANT_ASSERT
+      /* The borrow in cy stops the propagation of the carry cy2, */
+      ASSERT (cy2 == 1);
+      cy += mpn_add_1 (pp + 2 * n, pp + 2 * n, n, cy2);
+      ASSERT (cy == 0);
+#else
+      /* we simply fill the area with zeros. */
+      MPN_FILL (pp + 2 * n, n, 0);
+#endif
+      return;
+    }
+  }
 
-  ASSERT (cy + 1  <= 3);
+  ASSERT (cy  <= 2);
   ASSERT (cy2 <= 2);
 
   MPN_INCR_U (pp + 2 * n, s + t, cy2);
-  if (LIKELY (cy <= 2))
-    /* if s+t==n, cy is zero, but we should not acces pp[3*n] at all. */
-    MPN_INCR_U (pp + 3 * n, s + t - n, cy);
-  else
-    MPN_DECR_U (pp + 3 * n, s + t - n, 1);
+  /* if s+t==n, cy is zero, but we should not access pp[3*n] at all. */
+  MPN_INCR_U (pp + 3 * n, s + t - n, cy);
 }

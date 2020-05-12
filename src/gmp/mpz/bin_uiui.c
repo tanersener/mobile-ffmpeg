@@ -2,7 +2,7 @@
 
 Contributed to the GNU project by Torbjorn Granlund and Marco Bodrato.
 
-Copyright 2010-2012 Free Software Foundation, Inc.
+Copyright 2010-2012, 2015-2018 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -30,12 +30,11 @@ You should have received copies of the GNU General Public License and the
 GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
-#include "gmp.h"
 #include "gmp-impl.h"
 #include "longlong.h"
 
 #ifndef BIN_GOETGHELUCK_THRESHOLD
-#define BIN_GOETGHELUCK_THRESHOLD  1000
+#define BIN_GOETGHELUCK_THRESHOLD  512
 #endif
 #ifndef BIN_UIUI_ENABLE_SMALLDC
 #define BIN_UIUI_ENABLE_SMALLDC    1
@@ -110,58 +109,69 @@ mul3 (mp_limb_t m)
 static mp_limb_t
 mul4 (mp_limb_t m)
 {
-  mp_limb_t m01 = (m + 0) * (m + 1) >> 1;
-  mp_limb_t m23 = (m + 2) * (m + 3) >> 1;
-  return m01 * m23;
+  mp_limb_t m03 = (m + 0) * (m + 3) >> 1;
+  return m03 * (m03 + 1); /* mul2 (m03) ? */
 }
 
 static mp_limb_t
 mul5 (mp_limb_t m)
 {
-  mp_limb_t m012 = (m + 0) * (m + 1) * (m + 2) >> 1;
-  mp_limb_t m34 = (m + 3) * (m + 4) >> 1;
-  return m012 * m34;
+  mp_limb_t m03 = (m + 0) * (m + 3) >> 1;
+  mp_limb_t m034 = m03 * (m + 4);
+  return (m03 + 1) * m034;
 }
 
 static mp_limb_t
 mul6 (mp_limb_t m)
 {
-  mp_limb_t m01 = (m + 0) * (m + 1);
-  mp_limb_t m23 = (m + 2) * (m + 3);
-  mp_limb_t m45 = (m + 4) * (m + 5) >> 1;
-  mp_limb_t m0123 = m01 * m23 >> 3;
-  return m0123 * m45;
+  mp_limb_t m05 = (m + 0) * (m + 5);
+  mp_limb_t m1234 = (m05 + 5) * (m05 + 5) >> 3;
+  return m1234 * (m05 >> 1);
 }
 
 static mp_limb_t
 mul7 (mp_limb_t m)
 {
-  mp_limb_t m01 = (m + 0) * (m + 1);
-  mp_limb_t m23 = (m + 2) * (m + 3);
-  mp_limb_t m456 = (m + 4) * (m + 5) * (m + 6) >> 1;
-  mp_limb_t m0123 = m01 * m23 >> 3;
-  return m0123 * m456;
+  mp_limb_t m05 = (m + 0) * (m + 5);
+  mp_limb_t m1234 = (m05 + 5) * (m05 + 5) >> 3;
+  mp_limb_t m056 = m05 * (m + 6) >> 1;
+  return m1234 * m056;
 }
 
 static mp_limb_t
 mul8 (mp_limb_t m)
 {
-  mp_limb_t m01 = (m + 0) * (m + 1);
-  mp_limb_t m23 = (m + 2) * (m + 3);
-  mp_limb_t m45 = (m + 4) * (m + 5);
-  mp_limb_t m67 = (m + 6) * (m + 7);
-  mp_limb_t m0123 = m01 * m23 >> 3;
-  mp_limb_t m4567 = m45 * m67 >> 3;
-  return m0123 * m4567;
+  mp_limb_t m07 = (m + 0) * (m + 7);
+  mp_limb_t m0257 = m07 * (m07 + 10) >> 3;
+  mp_limb_t m1346 = m07 + 9 + m0257;
+  return m0257 * m1346;
 }
+
+/*
+static mp_limb_t
+mul9 (mp_limb_t m)
+{
+  return (m + 8) * mul8 (m) ;
+}
+
+static mp_limb_t
+mul10 (mp_limb_t m)
+{
+  mp_limb_t m09 = (m + 0) * (m + 9);
+  mp_limb_t m18 = (m09 >> 1) + 4;
+  mp_limb_t m0369 = m09 * (m09 + 18) >> 3;
+  mp_limb_t m2457 = m09 * 2 + 35 + m0369;
+  return ((m0369 * m2457) >> 1) * m18;
+}
+*/
 
 typedef mp_limb_t (* mulfunc_t) (mp_limb_t);
 
-static const mulfunc_t mulfunc[] = {mul1,mul2,mul3,mul4,mul5,mul6,mul7,mul8};
+static const mulfunc_t mulfunc[] = {mul1,mul2,mul3,mul4,mul5,mul6,mul7,mul8 /* ,mul9,mul10 */};
 #define M (numberof(mulfunc))
 
 /* Number of factors-of-2 removed by the corresponding mulN function.  */
-static const unsigned char tcnttab[] = {0, 1, 1, 2, 2, 4, 4, 6};
+static const unsigned char tcnttab[] = {0, 1, 1, 2, 2, 4, 4, 6 /*,6,8*/};
 
 #if 1
 /* This variant is inaccurate but share the code with other functions.  */
@@ -176,11 +186,11 @@ static const unsigned char tcnttab[] = {0, 1, 1, 2, 2, 4, 4, 6};
 static const unsigned long ftab[] =
 #if GMP_NUMB_BITS == 64
   /* 1 to 8 factors per iteration */
-  {CNST_LIMB(0xffffffffffffffff),CNST_LIMB(0x100000000),0x32cbfe,0x16a0b,0x24c4,0xa16,0x34b,0x1b2 /*,0xdf,0x8d */};
+  {CNST_LIMB(0xffffffffffffffff),CNST_LIMB(0x16a09e667),0x32cbfc,0x16a08,0x24c0,0xa11,0x345,0x1ab /*,0xe9,0x8e */};
 #endif
 #if GMP_NUMB_BITS == 32
   /* 1 to 7 factors per iteration */
-  {0xffffffff,0x10000,0x801,0x16b,0x71,0x42,0x26 /* ,0x1e */};
+  {0xffffffff,0x16a09,0x7ff,0x168,0x6f,0x3d,0x20 /* ,0x17 */};
 #endif
 
 #define MAXFACS(max,l)							\
@@ -199,11 +209,10 @@ static const mp_limb_t facinv[] = { ONE_LIMB_ODD_FACTORIAL_INVERSES_TABLE };
 static void
 mpz_bdiv_bin_uiui (mpz_ptr r, unsigned long int n, unsigned long int k)
 {
-  int nmax, kmax, nmaxnow, numfac;
+  unsigned nmax, kmax, nmaxnow, numfac;
   mp_ptr np, kp;
   mp_size_t nn, kn, alloc;
   mp_limb_t i, j, t, iii, jjj, cy, dinv;
-  mp_bitcnt_t i2cnt, j2cnt;
   int cnt;
   mp_size_t maxn;
   TMP_DECL;
@@ -216,9 +225,8 @@ mpz_bdiv_bin_uiui (mpz_ptr r, unsigned long int n, unsigned long int k)
   /* FIXME: This allocation might be insufficient, but is usually way too
      large.  */
   alloc = SOME_THRESHOLD - 1 + MAX (3 * maxn / 2, SOME_THRESHOLD);
-  alloc = MIN (alloc, k) + 1;
-  np = TMP_ALLOC_LIMBS (alloc);
-  kp = TMP_ALLOC_LIMBS (SOME_THRESHOLD + 1);
+  alloc = MIN (alloc, (mp_size_t) k) + 1;
+  TMP_ALLOC_LIMBS_2 (np, alloc, kp, SOME_THRESHOLD + 1);
 
   MAXFACS (nmax, n);
   ASSERT (nmax <= M);
@@ -229,10 +237,6 @@ mpz_bdiv_bin_uiui (mpz_ptr r, unsigned long int n, unsigned long int k)
   i = n - k + 1;
 
   np[0] = 1; nn = 1;
-
-  i2cnt = 0;				/* total low zeros in dividend */
-  j2cnt = __gmp_fac2cnt_table[ODD_FACTORIAL_TABLE_LIMIT / 2 - 1];
-					/* total low zeros in divisor */
 
   numfac = 1;
   j = ODD_FACTORIAL_TABLE_LIMIT + 1;
@@ -252,7 +256,6 @@ mpz_bdiv_bin_uiui (mpz_ptr r, unsigned long int n, unsigned long int k)
 	  j += kmax;				/* number of factors used */
 	  count_trailing_zeros (cnt, jjj);	/* count low zeros */
 	  jjj >>= cnt;				/* remove remaining low zeros */
-	  j2cnt += tcnttab[kmax - 1] + cnt;	/* update low zeros count */
 	  cy = mpn_mul_1 (kp, kp, kn, jjj);	/* accumulate new factors */
 	  kp[kn] = cy;
 	  kn += cy != 0;
@@ -268,7 +271,6 @@ mpz_bdiv_bin_uiui (mpz_ptr r, unsigned long int n, unsigned long int k)
 	  i += nmaxnow;				/* number of factors used */
 	  count_trailing_zeros (cnt, iii);	/* count low zeros */
 	  iii >>= cnt;				/* remove remaining low zeros */
-	  i2cnt += tcnttab[nmaxnow - 1] + cnt;	/* update low zeros count */
 	  cy = mpn_mul_1 (np, np, nn, iii);	/* accumulate new factors */
 	  np[nn] = cy;
 	  nn += cy != 0;
@@ -281,6 +283,7 @@ mpz_bdiv_bin_uiui (mpz_ptr r, unsigned long int n, unsigned long int k)
       nn += (np[nn - 1] >= kp[kn - 1]);
       nn -= kn;
       mpn_sbpi1_bdiv_q (np, np, nn, kp, MIN(kn,nn), -dinv);
+      mpn_neg (np, np, nn);
 
       if (kmax == 0)
 	break;
@@ -290,11 +293,14 @@ mpz_bdiv_bin_uiui (mpz_ptr r, unsigned long int n, unsigned long int k)
       j += kmax;				/* number of factors used */
       count_trailing_zeros (cnt, jjj);		/* count low zeros */
       jjj >>= cnt;				/* remove remaining low zeros */
-      j2cnt += tcnttab[kmax - 1] + cnt;		/* update low zeros count */
     }
 
   /* Put back the right number of factors of 2.  */
-  cnt = i2cnt - j2cnt;
+  popc_limb (cnt, n - k);
+  popc_limb (j, k);
+  cnt += j;
+  popc_limb (j, n);
+  cnt -= j;
   if (cnt != 0)
     {
       ASSERT (cnt < GMP_NUMB_BITS); /* can happen, but not for intended use */
@@ -314,44 +320,51 @@ mpz_bdiv_bin_uiui (mpz_ptr r, unsigned long int n, unsigned long int k)
 static void
 mpz_smallk_bin_uiui (mpz_ptr r, unsigned long int n, unsigned long int k)
 {
-  int nmax, numfac;
+  unsigned nmax, numfac;
   mp_ptr rp;
   mp_size_t rn, alloc;
   mp_limb_t i, iii, cy;
-  mp_bitcnt_t i2cnt, cnt;
-
-  count_leading_zeros (cnt, (mp_limb_t) n);
-  cnt = GMP_LIMB_BITS - cnt;
-  alloc = cnt * k / GMP_NUMB_BITS + 3;	/* FIXME: ensure rounding is enough. */
-  rp = MPZ_NEWALLOC (r, alloc);
+  unsigned i2cnt, cnt;
 
   MAXFACS (nmax, n);
   nmax = MIN (nmax, M);
 
   i = n - k + 1;
 
-  nmax = MIN (nmax, k);
+  i2cnt = __gmp_fac2cnt_table[k / 2 - 1];		/* low zeros count */
+  if (nmax >= k)
+    {
+      MPZ_NEWALLOC (r, 1) [0] = mulfunc[k - 1] (i) * facinv[k - 2] >>
+	(i2cnt - tcnttab[k - 1]);
+      SIZ(r) = 1;
+      return;
+    }
+
+  count_leading_zeros (cnt, (mp_limb_t) n);
+  cnt = GMP_LIMB_BITS - cnt;
+  alloc = cnt * k / GMP_NUMB_BITS + 3;	/* FIXME: ensure rounding is enough. */
+  rp = MPZ_NEWALLOC (r, alloc);
+
   rp[0] = mulfunc[nmax - 1] (i);
   rn = 1;
   i += nmax;				/* number of factors used */
-  i2cnt = tcnttab[nmax - 1];		/* low zeros count */
+  i2cnt -= tcnttab[nmax - 1];		/* low zeros count */
   numfac = k - nmax;
-  while (numfac != 0)
+  do
     {
       nmax = MIN (nmax, numfac);
       iii = mulfunc[nmax - 1] (i);
       i += nmax;			/* number of factors used */
-      i2cnt += tcnttab[nmax - 1];	/* update low zeros count */
+      i2cnt -= tcnttab[nmax - 1];	/* update low zeros count */
       cy = mpn_mul_1 (rp, rp, rn, iii);	/* accumulate new factors */
       rp[rn] = cy;
       rn += cy != 0;
       numfac -= nmax;
-    }
+    } while (numfac != 0);
 
   ASSERT (rn < alloc);
 
-  mpn_pi1_bdiv_q_1 (rp, rp, rn, __gmp_oddfac_table[k], facinv[k - 2],
-		    __gmp_fac2cnt_table[k / 2 - 1] - i2cnt);
+  mpn_pi1_bdiv_q_1 (rp, rp, rn, __gmp_oddfac_table[k], facinv[k - 2], i2cnt);
   /* A two-fold, branch-free normalisation is possible :*/
   /* rn -= rp[rn - 1] == 0; */
   /* rn -= rp[rn - 1] == 0; */
@@ -485,7 +498,8 @@ mpz_smallkdc_bin_uiui (mpz_ptr r, unsigned long int n, unsigned long int k)
       ++__i;							\
       if (((sieve)[__index] & __mask) == 0)			\
 	{							\
-	  (prime) = id_to_n(__i)
+	  mp_limb_t prime;					\
+	  prime = id_to_n(__i)
 
 #define LOOP_ON_SIEVE_BEGIN(prime,start,end,off,sieve)		\
   do {								\
@@ -502,7 +516,7 @@ mpz_smallkdc_bin_uiui (mpz_ptr r, unsigned long int n, unsigned long int k)
 	}							\
       __mask = __mask << 1 | __mask >> (GMP_LIMB_BITS-1);	\
       __index += __mask & 1;					\
-    }  while (__i <= __max_i)					\
+    }  while (__i <= __max_i)
 
 #define LOOP_ON_SIEVE_END					\
     LOOP_ON_SIEVE_STOP;						\
@@ -556,24 +570,29 @@ primesieve_size (mp_limb_t n) { return n_to_bit(n) / GMP_LIMB_BITS + 1; }
     }							\
   } while (0)
 
-/* Returns an approximation of the sqare root of x.  *
- * It gives: x <= limb_apprsqrt (x) ^ 2 < x * 9/4    */
+/* Returns an approximation of the sqare root of x.
+ * It gives:
+ *   limb_apprsqrt (x) ^ 2 <= x < (limb_apprsqrt (x)+1) ^ 2
+ * or
+ *   x <= limb_apprsqrt (x) ^ 2 <= x * 9/8
+ */
 static mp_limb_t
 limb_apprsqrt (mp_limb_t x)
 {
   int s;
 
   ASSERT (x > 2);
-  count_leading_zeros (s, x - 1);
-  s = GMP_LIMB_BITS - 1 - s;
-  return (CNST_LIMB(1) << (s >> 1)) + (CNST_LIMB(1) << ((s - 1) >> 1));
+  count_leading_zeros (s, x);
+  s = (GMP_LIMB_BITS - s) >> 1;
+  return ((CNST_LIMB(1) << s) + (x >> s)) >> 1;
 }
 
 static void
 mpz_goetgheluck_bin_uiui (mpz_ptr r, unsigned long int n, unsigned long int k)
 {
   mp_limb_t *sieve, *factors, count;
-  mp_limb_t prod, max_prod, j;
+  mp_limb_t prod, max_prod;
+  mp_size_t j;
   TMP_DECL;
 
   ASSERT (BIN_GOETGHELUCK_THRESHOLD >= 13);
@@ -602,38 +621,30 @@ mpz_goetgheluck_bin_uiui (mpz_ptr r, unsigned long int n, unsigned long int k)
     {
       mp_limb_t s;
 
-      {
-	mp_limb_t prime;
-	s = limb_apprsqrt(n);
-	s = n_to_bit (s);
-	LOOP_ON_SIEVE_BEGIN (prime, n_to_bit (5), s, 0,sieve);
-	COUNT_A_PRIME (prime, n, k, prod, max_prod, factors, j);
-	LOOP_ON_SIEVE_END;
-	s++;
-      }
+      s = limb_apprsqrt(n);
+      s = n_to_bit (s);
+      ASSERT (bit_to_n (s+1) * bit_to_n (s+1) > n);
+      ASSERT (s <= n_to_bit (n >> 1));
+      LOOP_ON_SIEVE_BEGIN (prime, n_to_bit (5), s, 0,sieve);
+      COUNT_A_PRIME (prime, n, k, prod, max_prod, factors, j);
+      LOOP_ON_SIEVE_STOP;
 
       ASSERT (max_prod <= GMP_NUMB_MAX / 2);
       max_prod <<= 1;
-      ASSERT (bit_to_n (s) * bit_to_n (s) > n);
-      ASSERT (s <= n_to_bit (n >> 1));
-      {
-	mp_limb_t prime;
 
-	LOOP_ON_SIEVE_BEGIN (prime, s, n_to_bit (n >> 1), 0,sieve);
-	SH_COUNT_A_PRIME (prime, n, k, prod, max_prod, factors, j);
-	LOOP_ON_SIEVE_END;
-      }
+      LOOP_ON_SIEVE_CONTINUE (prime, n_to_bit (n >> 1),sieve);
+      SH_COUNT_A_PRIME (prime, n, k, prod, max_prod, factors, j);
+      LOOP_ON_SIEVE_END;
+
       max_prod >>= 1;
     }
 
   /* Store primes from (n-k)+1 to n */
   ASSERT (n_to_bit (n - k) < n_to_bit (n));
-    {
-      mp_limb_t prime;
-      LOOP_ON_SIEVE_BEGIN (prime, n_to_bit (n - k) + 1, n_to_bit (n), 0,sieve);
-      FACTOR_LIST_STORE (prime, prod, max_prod, factors, j);
-      LOOP_ON_SIEVE_END;
-    }
+
+  LOOP_ON_SIEVE_BEGIN (prime, n_to_bit (n - k) + 1, n_to_bit (n), 0,sieve);
+  FACTOR_LIST_STORE (prime, prod, max_prod, factors, j);
+  LOOP_ON_SIEVE_END;
 
   if (LIKELY (j != 0))
     {
@@ -642,7 +653,7 @@ mpz_goetgheluck_bin_uiui (mpz_ptr r, unsigned long int n, unsigned long int k)
     }
   else
     {
-      PTR (r)[0] = prod;
+      MPZ_NEWALLOC (r, 1)[0] = prod;
       SIZ (r) = 1;
     }
   TMP_FREE;
@@ -677,10 +688,10 @@ mpz_bin_uiui (mpz_ptr r, unsigned long int n, unsigned long int k)
     /* Rewrite bin(n,k) as bin(n,n-k) if that is smaller. */
     k = MIN (k, n - k);
     if (k < 2) {
-      PTR(r)[0] = k ? n : 1; /* 1 + ((-k) & (n-1)); */
+      MPZ_NEWALLOC (r, 1)[0] = k ? n : 1; /* 1 + ((-k) & (n-1)); */
       SIZ(r) = 1;
     } else if (n <= ODD_FACTORIAL_EXTTABLE_LIMIT) { /* k >= 2, n >= 4 */
-      PTR(r)[0] = bc_bin_uiui (n, k);
+      MPZ_NEWALLOC (r, 1)[0] = bc_bin_uiui (n, k);
       SIZ(r) = 1;
     } else if (k <= ODD_FACTORIAL_TABLE_LIMIT)
       mpz_smallk_bin_uiui (r, n, k);

@@ -2,7 +2,7 @@
 
    Contributed to the GNU project by Martin Boij (as part of perfpow.c).
 
-Copyright 2009, 2010, 2012, 2013 Free Software Foundation, Inc.
+Copyright 2009, 2010, 2012, 2013, 2018 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -30,19 +30,23 @@ You should have received copies of the GNU General Public License and the
 GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
-#include "gmp.h"
 #include "gmp-impl.h"
 
-/* Computes a^e (mod B). Uses right-to-left binary algorithm, since
+/* Computes a^2e (mod B). Uses right-to-left binary algorithm, since
    typical use will have e small. */
 static mp_limb_t
-powlimb (mp_limb_t a, mp_limb_t e)
+powsquaredlimb (mp_limb_t a, mp_limb_t e)
 {
   mp_limb_t r;
 
-  for (r = 1; e > 0; e >>= 1, a *= a)
+  r = 1;
+  /* if (LIKELY (e != 0)) */
+  do {
+    a *= a;
     if (e & 1)
       r *= a;
+    e >>= 1;
+  } while (e != 0);
 
   return r;
 }
@@ -67,7 +71,9 @@ powlimb (mp_limb_t a, mp_limb_t e)
 
      (4) Use a small table to get starting value.
 
-   Scratch need: 5*bn, where bn = ceil (bnb / GMP_NUMB_BITS).
+   Scratch need: bn + (((bn + 1) >> 1) + 1) + scratch for mpn_powlo
+   Currently mpn_powlo requires 3*bn
+   so that 5*bn is surely enough, where bn = ceil (bnb / GMP_NUMB_BITS).
 */
 
 void
@@ -76,36 +82,36 @@ mpn_brootinv (mp_ptr rp, mp_srcptr yp, mp_size_t bn, mp_limb_t k, mp_ptr tp)
   mp_ptr tp2, tp3;
   mp_limb_t kinv, k2, r0, y0;
   mp_size_t order[GMP_LIMB_BITS + 1];
-  int i, d;
+  int d;
 
   ASSERT (bn > 0);
   ASSERT ((k & 1) != 0);
 
   tp2 = tp + bn;
-  tp3 = tp + 2 * bn;
-  k2 = k + 1;
+  tp3 = tp + bn + ((bn + 3) >> 1);
+  k2 = (k >> 1) + 1; /* (k + 1) / 2 , but avoid k+1 overflow */
 
   binvert_limb (kinv, k);
 
   /* 4-bit initial approximation:
 
    y%16 | 1  3  5  7  9 11 13 15,
-    k%4 +-------------------------+k2%4
-     1  | 1 11 13  7  9  3  5 15  |  2
+    k%4 +-------------------------+k2%2
+     1  | 1 11 13  7  9  3  5 15  |  1
      3  | 1  3  5  7  9 11 13 15  |  0
 
   */
   y0 = yp[0];
 
-  r0 = y0 ^ (((y0 << 1) ^ (y0 << 2)) & (k2 << 2) & 8);		/* 4 bits */
-  r0 = kinv * (k2 * r0 - y0 * powlimb(r0, k2 & 0x7f));		/* 8 bits */
-  r0 = kinv * (k2 * r0 - y0 * powlimb(r0, k2 & 0x7fff));	/* 16 bits */
+  r0 = y0 ^ (((y0 << 1) ^ (y0 << 2)) & (k2 << 3) & 8);			/* 4 bits */
+  r0 = kinv * (k2 * r0 * 2 - y0 * powsquaredlimb(r0, k2 & 0x3f));	/* 8 bits */
+  r0 = kinv * (k2 * r0 * 2 - y0 * powsquaredlimb(r0, k2 & 0x3fff));	/* 16 bits */
 #if GMP_NUMB_BITS > 16
   {
     unsigned prec = 16;
     do
       {
-	r0 = kinv * (k2 * r0 - y0 * powlimb(r0, k2));
+	r0 = kinv * (k2 * r0 * 2 - y0 * powsquaredlimb(r0, k2));
 	prec *= 2;
       }
     while (prec < GMP_NUMB_BITS);
@@ -116,25 +122,38 @@ mpn_brootinv (mp_ptr rp, mp_srcptr yp, mp_size_t bn, mp_limb_t k, mp_ptr tp)
   if (bn == 1)
     return;
 
-  /* This initialization doesn't matter for the result (any garbage is
-     cancelled in the iteration), but proper initialization makes
-     valgrind happier. */
-  MPN_ZERO (rp+1, bn-1);
-
   d = 0;
-  for (; bn > 1; bn = (bn + 1) >> 1)
+  for (; bn != 2; bn = (bn + 1) >> 1)
     order[d++] = bn;
 
-  for (i = d - 1; i >= 0; i--)
+  order[d] = 2;
+  bn = 1;
+
+  do
     {
-      bn = order[i];
+      mpn_sqr (tp, rp, bn); /* Result may overlap tp2 */
+      tp2[bn] = mpn_mul_1 (tp2, rp, bn, k2 << 1);
 
-      mpn_mul_1 (tp, rp, bn, k2);
+      bn = order[d];
 
-      mpn_powlo (tp2, rp, &k2, 1, bn, tp3);
-      mpn_mullo_n (rp, yp, tp2, bn);
+      mpn_powlo (rp, tp, &k2, 1, bn, tp3);
+      mpn_mullo_n (tp, yp, rp, bn);
 
-      mpn_sub_n (tp2, tp, rp, bn);
-      mpn_pi1_bdiv_q_1 (rp, tp2, bn, k, kinv, 0);
+      /* mpn_sub (tp, tp2, ((bn + 1) >> 1) + 1, tp, bn); */
+      /* The function above is not handled, ((bn + 1) >> 1) + 1 <= bn*/
+      {
+	mp_size_t pbn = (bn + 3) >> 1; /* Size of tp2 */
+	int borrow;
+	borrow = mpn_sub_n (tp, tp2, tp, pbn) != 0;
+	if (bn > pbn) /* 3 < bn */
+	  {
+	    if (borrow)
+	      mpn_com (tp + pbn, tp + pbn, bn - pbn);
+	    else
+	      mpn_neg (tp + pbn, tp + pbn, bn - pbn);
+	  }
+      }
+      mpn_pi1_bdiv_q_1 (rp, tp, bn, k, kinv, 0);
     }
+  while (--d >= 0);
 }

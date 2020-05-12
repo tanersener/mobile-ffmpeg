@@ -115,16 +115,16 @@ check_PROGRAMS = reuse$(EXEEXT) t-addsub$(EXEEXT) t-cmp$(EXEEXT) \
 	t-div_2exp$(EXEEXT) t-root$(EXEEXT) t-perfsqr$(EXEEXT) \
 	t-perfpow$(EXEEXT) t-jac$(EXEEXT) t-bin$(EXEEXT) \
 	t-get_d$(EXEEXT) t-get_d_2exp$(EXEEXT) t-get_si$(EXEEXT) \
-	t-set_d$(EXEEXT) t-set_si$(EXEEXT) t-fac_ui$(EXEEXT) \
-	t-mfac_uiui$(EXEEXT) t-primorial_ui$(EXEEXT) t-fib_ui$(EXEEXT) \
-	t-lucnum_ui$(EXEEXT) t-scan$(EXEEXT) t-fits$(EXEEXT) \
-	t-divis$(EXEEXT) t-divis_2exp$(EXEEXT) t-cong$(EXEEXT) \
-	t-cong_2exp$(EXEEXT) t-sizeinbase$(EXEEXT) t-set_str$(EXEEXT) \
-	t-aorsmul$(EXEEXT) t-cmp_d$(EXEEXT) t-cmp_si$(EXEEXT) \
-	t-hamdist$(EXEEXT) t-oddeven$(EXEEXT) t-popcount$(EXEEXT) \
-	t-set_f$(EXEEXT) t-io_raw$(EXEEXT) t-import$(EXEEXT) \
-	t-export$(EXEEXT) t-pprime_p$(EXEEXT) t-nextprime$(EXEEXT) \
-	t-remove$(EXEEXT) t-limbs$(EXEEXT)
+	t-set_d$(EXEEXT) t-set_si$(EXEEXT) t-lucm$(EXEEXT) \
+	t-fac_ui$(EXEEXT) t-mfac_uiui$(EXEEXT) t-primorial_ui$(EXEEXT) \
+	t-fib_ui$(EXEEXT) t-lucnum_ui$(EXEEXT) t-scan$(EXEEXT) \
+	t-fits$(EXEEXT) t-divis$(EXEEXT) t-divis_2exp$(EXEEXT) \
+	t-cong$(EXEEXT) t-cong_2exp$(EXEEXT) t-sizeinbase$(EXEEXT) \
+	t-set_str$(EXEEXT) t-aorsmul$(EXEEXT) t-cmp_d$(EXEEXT) \
+	t-cmp_si$(EXEEXT) t-hamdist$(EXEEXT) t-oddeven$(EXEEXT) \
+	t-popcount$(EXEEXT) t-set_f$(EXEEXT) t-io_raw$(EXEEXT) \
+	t-import$(EXEEXT) t-export$(EXEEXT) t-pprime_p$(EXEEXT) \
+	t-nextprime$(EXEEXT) t-remove$(EXEEXT) t-limbs$(EXEEXT)
 subdir = tests/mpz
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
@@ -330,6 +330,11 @@ t_limbs_OBJECTS = t-limbs.$(OBJEXT)
 t_limbs_LDADD = $(LDADD)
 t_limbs_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
 	$(top_builddir)/libgmp.la
+t_lucm_SOURCES = t-lucm.c
+t_lucm_OBJECTS = t-lucm.$(OBJEXT)
+t_lucm_LDADD = $(LDADD)
+t_lucm_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
+	$(top_builddir)/libgmp.la
 t_lucnum_ui_SOURCES = t-lucnum_ui.c
 t_lucnum_ui_OBJECTS = t-lucnum_ui.$(OBJEXT)
 t_lucnum_ui_LDADD = $(LDADD)
@@ -494,11 +499,11 @@ SOURCES = bit.c convert.c dive.c dive_ui.c io.c logic.c reuse.c \
 	t-divis_2exp.c t-export.c t-fac_ui.c t-fdiv.c t-fdiv_ui.c \
 	t-fib_ui.c t-fits.c t-gcd.c t-gcd_ui.c t-get_d.c \
 	t-get_d_2exp.c t-get_si.c t-hamdist.c t-import.c t-inp_str.c \
-	t-invert.c t-io_raw.c t-jac.c t-lcm.c t-limbs.c t-lucnum_ui.c \
-	t-mfac_uiui.c t-mul.c t-mul_i.c t-nextprime.c t-oddeven.c \
-	t-perfpow.c t-perfsqr.c t-popcount.c t-pow.c t-powm.c \
-	t-powm_ui.c t-pprime_p.c t-primorial_ui.c t-remove.c t-root.c \
-	t-scan.c t-set_d.c t-set_f.c t-set_si.c t-set_str.c \
+	t-invert.c t-io_raw.c t-jac.c t-lcm.c t-limbs.c t-lucm.c \
+	t-lucnum_ui.c t-mfac_uiui.c t-mul.c t-mul_i.c t-nextprime.c \
+	t-oddeven.c t-perfpow.c t-perfsqr.c t-popcount.c t-pow.c \
+	t-powm.c t-powm_ui.c t-pprime_p.c t-primorial_ui.c t-remove.c \
+	t-root.c t-scan.c t-set_d.c t-set_f.c t-set_si.c t-set_str.c \
 	t-sizeinbase.c t-sqrtrem.c t-tdiv.c t-tdiv_ui.c
 DIST_SOURCES = bit.c convert.c dive.c dive_ui.c io.c logic.c reuse.c \
 	t-addsub.c t-aorsmul.c t-bin.c t-cdiv_ui.c t-cmp.c t-cmp_d.c \
@@ -506,11 +511,11 @@ DIST_SOURCES = bit.c convert.c dive.c dive_ui.c io.c logic.c reuse.c \
 	t-divis_2exp.c t-export.c t-fac_ui.c t-fdiv.c t-fdiv_ui.c \
 	t-fib_ui.c t-fits.c t-gcd.c t-gcd_ui.c t-get_d.c \
 	t-get_d_2exp.c t-get_si.c t-hamdist.c t-import.c t-inp_str.c \
-	t-invert.c t-io_raw.c t-jac.c t-lcm.c t-limbs.c t-lucnum_ui.c \
-	t-mfac_uiui.c t-mul.c t-mul_i.c t-nextprime.c t-oddeven.c \
-	t-perfpow.c t-perfsqr.c t-popcount.c t-pow.c t-powm.c \
-	t-powm_ui.c t-pprime_p.c t-primorial_ui.c t-remove.c t-root.c \
-	t-scan.c t-set_d.c t-set_f.c t-set_si.c t-set_str.c \
+	t-invert.c t-io_raw.c t-jac.c t-lcm.c t-limbs.c t-lucm.c \
+	t-lucnum_ui.c t-mfac_uiui.c t-mul.c t-mul_i.c t-nextprime.c \
+	t-oddeven.c t-perfpow.c t-perfsqr.c t-popcount.c t-pow.c \
+	t-powm.c t-powm_ui.c t-pprime_p.c t-primorial_ui.c t-remove.c \
+	t-root.c t-scan.c t-set_d.c t-set_f.c t-set_si.c t-set_str.c \
 	t-sizeinbase.c t-sqrtrem.c t-tdiv.c t-tdiv_ui.c
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
@@ -904,6 +909,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CPPFLAGS = -I$(top_srcdir) -I$(top_srcdir)/tests
+AM_LDFLAGS = -no-install
 LDADD = $(top_builddir)/tests/libtests.la $(top_builddir)/libgmp.la
 TESTS = $(check_PROGRAMS)
 
@@ -1105,6 +1111,10 @@ t-lcm$(EXEEXT): $(t_lcm_OBJECTS) $(t_lcm_DEPENDENCIES) $(EXTRA_t_lcm_DEPENDENCIE
 t-limbs$(EXEEXT): $(t_limbs_OBJECTS) $(t_limbs_DEPENDENCIES) $(EXTRA_t_limbs_DEPENDENCIES) 
 	@rm -f t-limbs$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(t_limbs_OBJECTS) $(t_limbs_LDADD) $(LIBS)
+
+t-lucm$(EXEEXT): $(t_lucm_OBJECTS) $(t_lucm_DEPENDENCIES) $(EXTRA_t_lucm_DEPENDENCIES) 
+	@rm -f t-lucm$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(t_lucm_OBJECTS) $(t_lucm_LDADD) $(LIBS)
 
 t-lucnum_ui$(EXEEXT): $(t_lucnum_ui_OBJECTS) $(t_lucnum_ui_DEPENDENCIES) $(EXTRA_t_lucnum_ui_DEPENDENCIES) 
 	@rm -f t-lucnum_ui$(EXEEXT)
@@ -1668,6 +1678,13 @@ t-set_d.log: t-set_d$(EXEEXT)
 t-set_si.log: t-set_si$(EXEEXT)
 	@p='t-set_si$(EXEEXT)'; \
 	b='t-set_si'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+t-lucm.log: t-lucm$(EXEEXT)
+	@p='t-lucm$(EXEEXT)'; \
+	b='t-lucm'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \

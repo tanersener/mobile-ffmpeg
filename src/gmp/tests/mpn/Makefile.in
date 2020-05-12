@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-# Copyright 2001-2003, 2009-2014 Free Software Foundation, Inc.
+# Copyright 2001-2003, 2009-2014, 2018 Free Software Foundation, Inc.
 #
 # This file is part of the GNU MP Library test suite.
 #
@@ -118,8 +118,9 @@ check_PROGRAMS = t-asmtype$(EXEEXT) t-aors_1$(EXEEXT) \
 	t-mullo$(EXEEXT) t-sqrlo$(EXEEXT) t-mulmod_bnm1$(EXEEXT) \
 	t-sqrmod_bnm1$(EXEEXT) t-mulmid$(EXEEXT) t-hgcd$(EXEEXT) \
 	t-hgcd_appr$(EXEEXT) t-matrix22$(EXEEXT) t-invert$(EXEEXT) \
-	t-bdiv$(EXEEXT) t-broot$(EXEEXT) t-brootinv$(EXEEXT) \
-	t-minvert$(EXEEXT) t-sizeinbase$(EXEEXT)
+	t-bdiv$(EXEEXT) t-fib2m$(EXEEXT) t-broot$(EXEEXT) \
+	t-brootinv$(EXEEXT) t-minvert$(EXEEXT) t-sizeinbase$(EXEEXT) \
+	t-gcd_11$(EXEEXT) t-gcd_22$(EXEEXT) t-gcdext_1$(EXEEXT)
 subdir = tests/mpn
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
@@ -179,6 +180,26 @@ t_fat_SOURCES = t-fat.c
 t_fat_OBJECTS = t-fat.$(OBJEXT)
 t_fat_LDADD = $(LDADD)
 t_fat_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
+	$(top_builddir)/libgmp.la
+t_fib2m_SOURCES = t-fib2m.c
+t_fib2m_OBJECTS = t-fib2m.$(OBJEXT)
+t_fib2m_LDADD = $(LDADD)
+t_fib2m_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
+	$(top_builddir)/libgmp.la
+t_gcd_11_SOURCES = t-gcd_11.c
+t_gcd_11_OBJECTS = t-gcd_11.$(OBJEXT)
+t_gcd_11_LDADD = $(LDADD)
+t_gcd_11_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
+	$(top_builddir)/libgmp.la
+t_gcd_22_SOURCES = t-gcd_22.c
+t_gcd_22_OBJECTS = t-gcd_22.$(OBJEXT)
+t_gcd_22_LDADD = $(LDADD)
+t_gcd_22_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
+	$(top_builddir)/libgmp.la
+t_gcdext_1_SOURCES = t-gcdext_1.c
+t_gcdext_1_OBJECTS = t-gcdext_1.$(OBJEXT)
+t_gcdext_1_LDADD = $(LDADD)
+t_gcdext_1_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
 	$(top_builddir)/libgmp.la
 t_get_d_SOURCES = t-get_d.c
 t_get_d_OBJECTS = t-get_d.$(OBJEXT)
@@ -399,25 +420,25 @@ am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
 SOURCES = logic.c t-aors_1.c t-asmtype.c t-bdiv.c t-broot.c \
-	t-brootinv.c t-div.c t-divrem_1.c t-fat.c t-get_d.c t-hgcd.c \
-	t-hgcd_appr.c t-instrument.c t-invert.c t-iord_u.c \
-	t-matrix22.c t-minvert.c t-mod_1.c t-mp_bases.c t-mul.c \
-	t-mullo.c t-mulmid.c t-mulmod_bnm1.c t-perfsqr.c t-scan.c \
-	t-sizeinbase.c t-sqrlo.c t-sqrmod_bnm1.c t-toom2-sqr.c \
-	t-toom22.c t-toom3-sqr.c t-toom32.c t-toom33.c t-toom4-sqr.c \
-	t-toom42.c t-toom43.c t-toom44.c t-toom52.c t-toom53.c \
-	t-toom54.c t-toom6-sqr.c t-toom62.c t-toom63.c t-toom6h.c \
-	t-toom8-sqr.c t-toom8h.c
+	t-brootinv.c t-div.c t-divrem_1.c t-fat.c t-fib2m.c t-gcd_11.c \
+	t-gcd_22.c t-gcdext_1.c t-get_d.c t-hgcd.c t-hgcd_appr.c \
+	t-instrument.c t-invert.c t-iord_u.c t-matrix22.c t-minvert.c \
+	t-mod_1.c t-mp_bases.c t-mul.c t-mullo.c t-mulmid.c \
+	t-mulmod_bnm1.c t-perfsqr.c t-scan.c t-sizeinbase.c t-sqrlo.c \
+	t-sqrmod_bnm1.c t-toom2-sqr.c t-toom22.c t-toom3-sqr.c \
+	t-toom32.c t-toom33.c t-toom4-sqr.c t-toom42.c t-toom43.c \
+	t-toom44.c t-toom52.c t-toom53.c t-toom54.c t-toom6-sqr.c \
+	t-toom62.c t-toom63.c t-toom6h.c t-toom8-sqr.c t-toom8h.c
 DIST_SOURCES = logic.c t-aors_1.c t-asmtype.c t-bdiv.c t-broot.c \
-	t-brootinv.c t-div.c t-divrem_1.c t-fat.c t-get_d.c t-hgcd.c \
-	t-hgcd_appr.c t-instrument.c t-invert.c t-iord_u.c \
-	t-matrix22.c t-minvert.c t-mod_1.c t-mp_bases.c t-mul.c \
-	t-mullo.c t-mulmid.c t-mulmod_bnm1.c t-perfsqr.c t-scan.c \
-	t-sizeinbase.c t-sqrlo.c t-sqrmod_bnm1.c t-toom2-sqr.c \
-	t-toom22.c t-toom3-sqr.c t-toom32.c t-toom33.c t-toom4-sqr.c \
-	t-toom42.c t-toom43.c t-toom44.c t-toom52.c t-toom53.c \
-	t-toom54.c t-toom6-sqr.c t-toom62.c t-toom63.c t-toom6h.c \
-	t-toom8-sqr.c t-toom8h.c
+	t-brootinv.c t-div.c t-divrem_1.c t-fat.c t-fib2m.c t-gcd_11.c \
+	t-gcd_22.c t-gcdext_1.c t-get_d.c t-hgcd.c t-hgcd_appr.c \
+	t-instrument.c t-invert.c t-iord_u.c t-matrix22.c t-minvert.c \
+	t-mod_1.c t-mp_bases.c t-mul.c t-mullo.c t-mulmid.c \
+	t-mulmod_bnm1.c t-perfsqr.c t-scan.c t-sizeinbase.c t-sqrlo.c \
+	t-sqrmod_bnm1.c t-toom2-sqr.c t-toom22.c t-toom3-sqr.c \
+	t-toom32.c t-toom33.c t-toom4-sqr.c t-toom42.c t-toom43.c \
+	t-toom44.c t-toom52.c t-toom53.c t-toom54.c t-toom6-sqr.c \
+	t-toom62.c t-toom63.c t-toom6h.c t-toom8-sqr.c t-toom8h.c
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -810,6 +831,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CPPFLAGS = -I$(top_srcdir) -I$(top_srcdir)/tests
+AM_LDFLAGS = -no-install
 LDADD = $(top_builddir)/tests/libtests.la $(top_builddir)/libgmp.la
 EXTRA_DIST = toom-shared.h toom-sqr-shared.h
 TESTS = $(check_PROGRAMS)
@@ -891,6 +913,22 @@ t-divrem_1$(EXEEXT): $(t_divrem_1_OBJECTS) $(t_divrem_1_DEPENDENCIES) $(EXTRA_t_
 t-fat$(EXEEXT): $(t_fat_OBJECTS) $(t_fat_DEPENDENCIES) $(EXTRA_t_fat_DEPENDENCIES) 
 	@rm -f t-fat$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(t_fat_OBJECTS) $(t_fat_LDADD) $(LIBS)
+
+t-fib2m$(EXEEXT): $(t_fib2m_OBJECTS) $(t_fib2m_DEPENDENCIES) $(EXTRA_t_fib2m_DEPENDENCIES) 
+	@rm -f t-fib2m$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(t_fib2m_OBJECTS) $(t_fib2m_LDADD) $(LIBS)
+
+t-gcd_11$(EXEEXT): $(t_gcd_11_OBJECTS) $(t_gcd_11_DEPENDENCIES) $(EXTRA_t_gcd_11_DEPENDENCIES) 
+	@rm -f t-gcd_11$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(t_gcd_11_OBJECTS) $(t_gcd_11_LDADD) $(LIBS)
+
+t-gcd_22$(EXEEXT): $(t_gcd_22_OBJECTS) $(t_gcd_22_DEPENDENCIES) $(EXTRA_t_gcd_22_DEPENDENCIES) 
+	@rm -f t-gcd_22$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(t_gcd_22_OBJECTS) $(t_gcd_22_LDADD) $(LIBS)
+
+t-gcdext_1$(EXEEXT): $(t_gcdext_1_OBJECTS) $(t_gcdext_1_DEPENDENCIES) $(EXTRA_t_gcdext_1_DEPENDENCIES) 
+	@rm -f t-gcdext_1$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(t_gcdext_1_OBJECTS) $(t_gcdext_1_LDADD) $(LIBS)
 
 t-get_d$(EXEEXT): $(t_get_d_OBJECTS) $(t_get_d_DEPENDENCIES) $(EXTRA_t_get_d_DEPENDENCIES) 
 	@rm -f t-get_d$(EXEEXT)
@@ -1548,6 +1586,13 @@ t-bdiv.log: t-bdiv$(EXEEXT)
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
+t-fib2m.log: t-fib2m$(EXEEXT)
+	@p='t-fib2m$(EXEEXT)'; \
+	b='t-fib2m'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
 t-broot.log: t-broot$(EXEEXT)
 	@p='t-broot$(EXEEXT)'; \
 	b='t-broot'; \
@@ -1572,6 +1617,27 @@ t-minvert.log: t-minvert$(EXEEXT)
 t-sizeinbase.log: t-sizeinbase$(EXEEXT)
 	@p='t-sizeinbase$(EXEEXT)'; \
 	b='t-sizeinbase'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+t-gcd_11.log: t-gcd_11$(EXEEXT)
+	@p='t-gcd_11$(EXEEXT)'; \
+	b='t-gcd_11'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+t-gcd_22.log: t-gcd_22$(EXEEXT)
+	@p='t-gcd_22$(EXEEXT)'; \
+	b='t-gcd_22'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+t-gcdext_1.log: t-gcdext_1$(EXEEXT)
+	@p='t-gcdext_1$(EXEEXT)'; \
+	b='t-gcdext_1'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \

@@ -34,13 +34,22 @@ C	     cycles/limb
 C AMD K8,K9	 1.5
 C AMD K10	 1.5
 C AMD bd1	 1.8
-C AMD bobcat	 2.5
-C Intel P4
+C AMD bd2	 1.74
+C AMD bd3	 ?
+C AMD bd4	 1.78
+C AMD zen	 1.5
+C AMD bt1	 2.54
+C AMD bt2	 2.15
+C Intel P4	11.5
 C Intel core2	 4.9
-C Intel NHM	 5.5
-C Intel SBR	 1.61
-C Intel IBR	 1.61
+C Intel NHM	 5.53
+C Intel SBR	 1.59
+C Intel IBR	 1.55
+C Intel HWL	 1.44
+C Intel BWL	 1.14
+C Intel SKL	 1.21
 C Intel atom	 4
+C Intel SLM	 3
 C VIA nano	 3.25
 
 C The loop of this code is the result of running a code generation and

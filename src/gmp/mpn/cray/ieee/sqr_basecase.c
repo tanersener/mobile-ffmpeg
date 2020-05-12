@@ -31,7 +31,6 @@ see https://www.gnu.org/licenses/.  */
 /* This is just mpn_mul_basecase with trivial modifications.  */
 
 #include <intrinsics.h>
-#include "gmp.h"
 #include "gmp-impl.h"
 
 void

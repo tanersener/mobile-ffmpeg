@@ -950,8 +950,8 @@ static int decklink_autodetect(struct decklink_cctx *cctx) {
         return -1;
     }
 
-    // 1 second timeout
-    for (i = 0; i < 10; i++) {
+    // 3 second timeout
+    for (i = 0; i < 30; i++) {
         av_usleep(100000);
         /* Sometimes VideoInputFrameArrived is called without the
          * bmdFrameHasNoInputSource flag before VideoInputFormatChanged.
@@ -983,7 +983,7 @@ av_cold int ff_decklink_read_close(AVFormatContext *avctx)
     struct decklink_cctx *cctx = (struct decklink_cctx *)avctx->priv_data;
     struct decklink_ctx *ctx = (struct decklink_ctx *)cctx->ctx;
 
-    if (ctx->capture_started) {
+    if (ctx->dli) {
         ctx->dli->StopStreams();
         ctx->dli->DisableVideoInput();
         ctx->dli->DisableAudioInput();

@@ -1,4 +1,4 @@
-dnl  X86-64 mpn_lshift optimised for Intel Sandy Bridge.
+dnl  X86-64 mpn_lshift optimised for AMD K10.
 
 dnl  Copyright 2012 Free Software Foundation, Inc.
 

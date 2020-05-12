@@ -1,6 +1,7 @@
 /* mpq_clear -- free the space occupied by an mpq_t.
 
-Copyright 1991, 1994, 1995, 2000, 2001, 2015 Free Software Foundation, Inc.
+Copyright 1991, 1994, 1995, 2000, 2001, 2015, 2018 Free Software
+Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -28,12 +29,13 @@ You should have received copies of the GNU General Public License and the
 GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
-#include "gmp.h"
 #include "gmp-impl.h"
 
 void
 mpq_clear (mpq_t x)
 {
-  __GMP_FREE_FUNC_LIMBS (PTR(NUM(x)), ALLOC(NUM(x)));
-  __GMP_FREE_FUNC_LIMBS (PTR(DEN(x)), ALLOC(DEN(x)));
+  if (ALLOC (NUM(x)))
+    __GMP_FREE_FUNC_LIMBS (PTR(NUM(x)), ALLOC(NUM(x)));
+  if (ALLOC (DEN(x)))
+    __GMP_FREE_FUNC_LIMBS (PTR(DEN(x)), ALLOC(DEN(x)));
 }

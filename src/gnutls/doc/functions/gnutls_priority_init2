@@ -57,7 +57,7 @@ of 192.
 
 "@@KEYWORD1,KEYWORD2,..." The system administrator imposed settings.
 The provided keyword(s) will be expanded from a configuration-time
-provided file - default is: /etc/gnutls/default-priorities.
+provided file - default is: /etc/gnutls/config.
 Any attributes that follow it, will be appended to the expanded
 string. If multiple keywords are provided, separated by commas,
 then the first keyword that exists in the configuration file

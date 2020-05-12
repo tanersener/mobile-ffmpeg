@@ -21,7 +21,6 @@ the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
 #include <unistd.h>
 #include <signal.h>
 #include <math.h>
-#include "gmp.h"
 #include "gmpstat.h"
 
 #define RCSID(msg) \

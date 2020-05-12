@@ -456,6 +456,23 @@ unsigned gnutls_hmac_get_len(gnutls_mac_algorithm_t algorithm)
 }
 
 /**
+ * gnutls_hmac_get_key_size:
+ * @algorithm: the mac algorithm to use
+ *
+ * This function will return the size of the key to be used with this
+ * algorithm. On the algorithms which may accept arbitrary key sizes,
+ * the returned size is the MAC key size used in the TLS protocol.
+ *
+ * Returns: The key size or zero on error.
+ *
+ * Since: 3.6.12
+ **/
+unsigned gnutls_hmac_get_key_size(gnutls_mac_algorithm_t algorithm)
+{
+	return _gnutls_mac_get_key_size(mac_to_entry(algorithm));
+}
+
+/**
  * gnutls_hmac_fast:
  * @algorithm: the hash algorithm to use
  * @key: the key to use
@@ -1383,4 +1400,99 @@ void gnutls_aead_cipher_deinit(gnutls_aead_cipher_hd_t handle)
 {
 	_gnutls_aead_cipher_deinit(handle);
 	gnutls_free(handle);
+}
+
+extern gnutls_crypto_kdf_st _gnutls_kdf_ops;
+
+/**
+ * gnutls_hkdf_extract:
+ * @mac: the mac algorithm used internally
+ * @key: the initial keying material
+ * @salt: the optional salt
+ * @output: the output value of the extract operation
+ *
+ * This function will derive a fixed-size key using the HKDF-Extract
+ * function as defined in RFC 5869.
+ *
+ * Returns: Zero or a negative error code on error.
+ *
+ * Since: 3.6.13
+ */
+int
+gnutls_hkdf_extract(gnutls_mac_algorithm_t mac,
+		    const gnutls_datum_t *key,
+		    const gnutls_datum_t *salt,
+		    void *output)
+{
+	/* MD5 is only allowed internally for TLS */
+	if (is_mac_algo_forbidden(mac))
+		return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
+
+	return _gnutls_kdf_ops.hkdf_extract(mac, key->data, key->size,
+					    salt ? salt->data : NULL,
+					    salt ? salt->size : 0,
+					    output);
+}
+
+/**
+ * gnutls_hkdf_expand:
+ * @mac: the mac algorithm used internally
+ * @key: the pseudorandom key created with HKDF-Extract
+ * @info: the optional informational data
+ * @output: the output value of the expand operation
+ * @length: the desired length of the output key
+ *
+ * This function will derive a variable length keying material from
+ * the pseudorandom key using the HKDF-Expand function as defined in
+ * RFC 5869.
+ *
+ * Returns: Zero or a negative error code on error.
+ *
+ * Since: 3.6.13
+ */
+int
+gnutls_hkdf_expand(gnutls_mac_algorithm_t mac,
+		   const gnutls_datum_t *key,
+		   const gnutls_datum_t *info,
+		   void *output, size_t length)
+{
+	/* MD5 is only allowed internally for TLS */
+	if (is_mac_algo_forbidden(mac))
+		return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
+
+	return _gnutls_kdf_ops.hkdf_expand(mac, key->data, key->size,
+					   info->data, info->size,
+					   output, length);
+}
+
+/**
+ * gnutls_pbkdf2:
+ * @mac: the mac algorithm used internally
+ * @key: the initial keying material
+ * @salt: the salt
+ * @iter_count: the iteration count
+ * @output: the output value
+ * @length: the desired length of the output key
+ *
+ * This function will derive a variable length keying material from
+ * a password according to PKCS #5 PBKDF2.
+ *
+ * Returns: Zero or a negative error code on error.
+ *
+ * Since: 3.6.13
+ */
+int
+gnutls_pbkdf2(gnutls_mac_algorithm_t mac,
+	      const gnutls_datum_t *key,
+	      const gnutls_datum_t *salt,
+	      unsigned iter_count,
+	      void *output, size_t length)
+{
+	/* MD5 is only allowed internally for TLS */
+	if (is_mac_algo_forbidden(mac))
+		return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
+
+	return _gnutls_kdf_ops.pbkdf2(mac, key->data, key->size,
+				      salt->data, salt->size, iter_count,
+				      output, length);
 }

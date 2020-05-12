@@ -37,10 +37,6 @@
 #include "x509_int.h"
 #include "pkcs7_int.h"
 #include <random.h>
-#include <nettle/pbkdf2.h>
-#if ENABLE_GOST
-#include "../nettle/gost/pbkdf2-gost.h"
-#endif
 
 
 /* Decodes the PKCS #12 auth_safe, and returns the allocated raw data,
@@ -865,29 +861,22 @@ _gnutls_pkcs12_gost_string_to_key(gnutls_mac_algorithm_t algo,
 {
 	uint8_t temp[96];
 	size_t temp_len = sizeof(temp);
-	unsigned int pass_len = 0;
+	gnutls_datum_t key;
+	gnutls_datum_t _salt;
+	int ret;
 
-	if (pass)
-		pass_len = strlen(pass);
-
-	if (algo == GNUTLS_MAC_GOSTR_94)
-		pbkdf2_hmac_gosthash94cp(pass_len, (uint8_t *) pass,
-				iter,
-				salt_size,
-				salt, temp_len, temp);
-	else if (algo == GNUTLS_MAC_STREEBOG_256)
-		pbkdf2_hmac_streebog256(pass_len, (uint8_t *) pass,
-				iter,
-				salt_size,
-				salt, temp_len, temp);
-	else if (algo == GNUTLS_MAC_STREEBOG_512)
-		pbkdf2_hmac_streebog512(pass_len, (uint8_t *) pass,
-				iter,
-				salt_size,
-				salt, temp_len, temp);
-	else
-		/* Should not reach here */
+	if (iter == 0)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	key.data = (void *)pass;
+	key.size = pass ? strlen(pass) : 0;
+
+	_salt.data = (void *)salt;
+	_salt.size = salt_size;
+
+	ret = gnutls_pbkdf2(algo, &key, &_salt, iter, temp, temp_len);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 	memcpy(keybuf, temp + temp_len - req_keylen, req_keylen);
 
@@ -970,7 +959,7 @@ int gnutls_pkcs12_generate_mac2(gnutls_pkcs12_t pkcs12, gnutls_mac_algorithm_t m
 							   sizeof(salt),
 							   iter,
 							   pass,
-							   mac_size,
+							   key_len,
 							   key);
 	} else
 #endif

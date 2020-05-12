@@ -1,6 +1,6 @@
 /* mpf_set_q (mpf_t rop, mpq_t op) -- Convert the rational op to the float rop.
 
-Copyright 1996, 1999, 2001, 2002, 2004, 2005 Free Software Foundation, Inc.
+Copyright 1996, 1999, 2001, 2002, 2004, 2005, 2016 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -28,47 +28,27 @@ You should have received copies of the GNU General Public License and the
 GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
-#include <stdio.h>  /* for NULL */
-#include "gmp.h"
 #include "gmp-impl.h"
-#include "longlong.h"
 
 
-/* As usual the aim is to produce PREC(r) limbs, with the high non-zero.
-   The basic mpn_tdiv_qr produces a quotient of nsize-dsize+1 limbs, with
-   either the high or second highest limb non-zero.  We arrange for
-   nsize-dsize+1 to equal prec+1, hence giving either prec or prec+1 result
-   limbs at PTR(r).
+/* As usual the aim is to produce PREC(r) limbs, with the high non-zero.  The
+   basic mpn_div_q produces a quotient of nsize-dsize+1 limbs, with either the
+   high or second highest limb non-zero.  We arrange for nsize-dsize+1 to equal
+   prec+1, hence giving either prec or prec+1 result limbs at PTR(r).
 
-   nsize-dsize+1 == prec+1 is achieved by adjusting num(q), either dropping
-   low limbs if it's too big, or padding with low zeros if it's too small.
-   The full given den(q) is always used.
+   nsize-dsize+1 == prec+1 is achieved by adjusting num(q), either dropping low
+   limbs if it's too big, or padding with low zeros if it's too small.  The
+   full given den(q) is always used.
 
-   We cannot truncate den(q), because even when it's much bigger than prec
-   the last limbs can still influence the final quotient.  Often they don't,
-   but we leave optimization of that to a prospective quotient-only mpn
-   division.
-
-   Not done:
-
-   If den(q) is a power of 2 then we may end up with low zero limbs on the
-   result.  But nothing is done about this, since it should be unlikely on
-   random data, and can be left to an application to call mpf_div_2exp if it
-   might occur with any frequency.
+   We cannot truncate den(q), because even when it's much bigger than prec the
+   last limbs can still influence the final quotient.  Often they don't, but we
+   leave optimization of that to mpn_div_q.
 
    Enhancements:
 
-   The high quotient limb is non-zero when high{np,dsize} >= {dp,dsize}.  We
+   The high quotient limb is non-zero when high{np,dsize} > {dp,dsize}.  We
    could make that comparison and use qsize==prec instead of qsize==prec+1,
-   to save one limb in the division.
-
-   Future:
-
-   If/when mpn_tdiv_qr supports its qxn parameter we can use that instead of
-   padding n with zeros in temporary space.
-
-   If/when a quotient-only division exists it can be used here immediately.
-   remp is only to satisfy mpn_tdiv_qr, the remainder is not used.  */
+   to save one limb in the division.  */
 
 void
 mpf_set_q (mpf_t r, mpq_srcptr q)
@@ -76,7 +56,7 @@ mpf_set_q (mpf_t r, mpq_srcptr q)
   mp_srcptr np, dp;
   mp_size_t prec, nsize, dsize, qsize, prospective_qsize, tsize, zeros;
   mp_size_t sign_quotient, high_zero;
-  mp_ptr qp, tp, remp;
+  mp_ptr qp, tp;
   mp_exp_t exp;
   TMP_DECL;
 
@@ -106,42 +86,25 @@ mpf_set_q (mpf_t r, mpq_srcptr q)
   exp = prospective_qsize;                /* ie. number of integer limbs */
   qsize = prec + 1;                       /* desired q */
 
-  zeros = qsize - prospective_qsize;   /* n zeros to get desired qsize */
-  tsize = nsize + zeros;               /* possible copy of n */
-
-  if (WANT_TMP_DEBUG)
-    {
-      /* separate alloc blocks, for malloc debugging */
-      remp = TMP_ALLOC_LIMBS (dsize);
-      tp = NULL;
-      if (zeros > 0)
-        tp = TMP_ALLOC_LIMBS (tsize);
-    }
-  else
-    {
-      /* one alloc with a conditionalized size, for efficiency */
-      mp_size_t size = dsize + (zeros > 0 ? tsize : 0);
-      remp = TMP_ALLOC_LIMBS (size);
-      tp = remp + dsize;
-    }
+  zeros = qsize - prospective_qsize;      /* n zeros to get desired qsize */
+  tsize = nsize + zeros;                  /* size of intermediate numerator */
+  tp = TMP_ALLOC_LIMBS (tsize + 1);       /* +1 for mpn_div_q's scratch */
 
   if (zeros > 0)
     {
       /* pad n with zeros into temporary space */
       MPN_ZERO (tp, zeros);
       MPN_COPY (tp+zeros, np, nsize);
-      np = tp;
-      nsize = tsize;
+      np = tp;                            /* mpn_div_q allows this overlap */
     }
   else
     {
       /* shorten n to get desired qsize */
-      nsize += zeros;
       np -= zeros;
     }
 
-  ASSERT (nsize-dsize+1 == qsize);
-  mpn_tdiv_qr (qp, remp, (mp_size_t) 0, np, nsize, dp, dsize);
+  ASSERT (tsize-dsize+1 == qsize);
+  mpn_div_q (qp, np, tsize, dp, dsize, tp);
 
   /* strip possible zero high limb */
   high_zero = (qp[qsize-1] == 0);

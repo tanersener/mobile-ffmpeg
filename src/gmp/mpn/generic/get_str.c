@@ -2,13 +2,12 @@
 
    Contributed to the GNU project by Torbjorn Granlund.
 
-   THE FUNCTIONS IN THIS FILE, EXCEPT mpn_get_str, ARE INTERNAL WITH A MUTABLE
-   INTERFACE.  IT IS ONLY SAFE TO REACH THEM THROUGH DOCUMENTED INTERFACES.  IN
-   FACT, IT IS ALMOST GUARANTEED THAT THEY WILL CHANGE OR DISAPPEAR IN A FUTURE
-   GNU MP RELEASE.
+   THE FUNCTIONS IN THIS FILE, EXCEPT mpn_get_str, ARE INTERNAL WITH MUTABLE
+   INTERFACES.  IT IS ONLY SAFE TO REACH THEM THROUGH DOCUMENTED INTERFACES.
+   IN FACT, IT IS ALMOST GUARANTEED THAT THEY WILL CHANGE OR DISAPPEAR IN A
+   FUTURE GNU MP RELEASE.
 
-Copyright 1991-1994, 1996, 2000-2002, 2004, 2006-2008, 2011, 2012 Free Software
-Foundation, Inc.
+Copyright 1991-2017 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -36,7 +35,6 @@ You should have received copies of the GNU General Public License and the
 GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
-#include "gmp.h"
 #include "gmp-impl.h"
 #include "longlong.h"
 
@@ -45,7 +43,7 @@ see https://www.gnu.org/licenses/.  */
 
   A) Divide U repeatedly by B, generating a quotient and remainder, until the
      quotient becomes zero.  The remainders hold the converted digits.  Digits
-     come out from right to left.  (Used in mpn_sb_get_str.)
+     come out from right to left.  (Used in mpn_bc_get_str.)
 
   B) Divide U by b^g, for g such that 1/b <= U/b^g < 1, generating a fraction.
      Then develop digits by multiplying the fraction repeatedly by b.  Digits
@@ -90,7 +88,7 @@ see https://www.gnu.org/licenses/.  */
 	...
       else
 	if (un < GET_STR_PRECOMPUTE_THRESHOLD)
-	  mpn_sb_get_str (str, base, up, un);
+	  mpn_bx_get_str (str, base, up, un);
 	else
 	  precompute_power_tables
 	  mpn_dc_get_str
@@ -98,18 +96,18 @@ see https://www.gnu.org/licenses/.  */
     mpn_dc_get_str:
 	mpn_tdiv_qr
 	if (qn < GET_STR_DC_THRESHOLD)
-	  mpn_sb_get_str
+	  mpn_bc_get_str
 	else
 	  mpn_dc_get_str
 	if (rn < GET_STR_DC_THRESHOLD)
-	  mpn_sb_get_str
+	  mpn_bc_get_str
 	else
 	  mpn_dc_get_str
 
 
   The reason for the two threshold values is the cost of
-  precompute_power_tables.  GET_STR_PRECOMPUTE_THRESHOLD will be considerably
-  larger than GET_STR_PRECOMPUTE_THRESHOLD.  */
+  precompute_power_tables.  GET_STR_PRECOMPUTE_THRESHOLD will be
+  considerably larger than GET_STR_DC_THRESHOLD.  */
 
 
 /* The x86s and m68020 have a quotient and remainder "div" instruction and
@@ -147,7 +145,7 @@ see https://www.gnu.org/licenses/.  */
    after the last digit of the result string.  Complexity is O(un^2); intended
    for small conversions.  */
 static unsigned char *
-mpn_sb_get_str (unsigned char *str, size_t len,
+mpn_bc_get_str (unsigned char *str, size_t len,
 		mp_ptr up, mp_size_t un, int base)
 {
   mp_limb_t rl, ul;
@@ -315,7 +313,7 @@ mpn_dc_get_str (unsigned char *str, size_t len,
   if (BELOW_THRESHOLD (un, GET_STR_DC_THRESHOLD))
     {
       if (un != 0)
-	str = mpn_sb_get_str (str, len, up, un, powtab->base);
+	str = mpn_bc_get_str (str, len, up, un, powtab->base);
       else
 	{
 	  while (len != 0)
@@ -359,7 +357,6 @@ mpn_dc_get_str (unsigned char *str, size_t len,
   return str;
 }
 
-
 /* There are no leading zeros on the digits generated at str, but that's not
    currently a documented feature.  The current mpz_out_str and mpz_get_str
    rely on it.  */
@@ -367,13 +364,9 @@ mpn_dc_get_str (unsigned char *str, size_t len,
 size_t
 mpn_get_str (unsigned char *str, int base, mp_ptr up, mp_size_t un)
 {
-  mp_ptr powtab_mem, powtab_mem_ptr;
-  mp_limb_t big_base;
-  size_t digits_in_base;
+  mp_ptr powtab_mem;
   powers_t powtab[GMP_LIMB_BITS];
   int pi;
-  mp_size_t n;
-  mp_ptr p, t;
   size_t out_len;
   mp_ptr tmp;
   TMP_DECL;
@@ -434,115 +427,20 @@ mpn_get_str (unsigned char *str, int base, mp_ptr up, mp_size_t un)
   /* General case.  The base is not a power of 2.  */
 
   if (BELOW_THRESHOLD (un, GET_STR_PRECOMPUTE_THRESHOLD))
-    return mpn_sb_get_str (str, (size_t) 0, up, un, base) - str;
+    return mpn_bc_get_str (str, (size_t) 0, up, un, base) - str;
 
   TMP_MARK;
 
   /* Allocate one large block for the powers of big_base.  */
-  powtab_mem = TMP_BALLOC_LIMBS (mpn_dc_get_str_powtab_alloc (un));
-  powtab_mem_ptr = powtab_mem;
+  powtab_mem = TMP_BALLOC_LIMBS (mpn_str_powtab_alloc (un));
 
   /* Compute a table of powers, were the largest power is >= sqrt(U).  */
+  size_t ndig;
+  mp_size_t xn;
+  DIGITS_IN_BASE_PER_LIMB (ndig, un, base);
+  xn = 1 + ndig / mp_bases[base].chars_per_limb; /* FIXME: scalar integer division */
 
-  big_base = mp_bases[base].big_base;
-  digits_in_base = mp_bases[base].chars_per_limb;
-
-  {
-    mp_size_t n_pows, xn, pn, exptab[GMP_LIMB_BITS], bexp;
-    mp_limb_t cy;
-    mp_size_t shift;
-    size_t ndig;
-
-    DIGITS_IN_BASE_PER_LIMB (ndig, un, base);
-    xn = 1 + ndig / mp_bases[base].chars_per_limb; /* FIXME: scalar integer division */
-
-    n_pows = 0;
-    for (pn = xn; pn != 1; pn = (pn + 1) >> 1)
-      {
-	exptab[n_pows] = pn;
-	n_pows++;
-      }
-    exptab[n_pows] = 1;
-
-    powtab[0].p = &big_base;
-    powtab[0].n = 1;
-    powtab[0].digits_in_base = digits_in_base;
-    powtab[0].base = base;
-    powtab[0].shift = 0;
-
-    powtab[1].p = powtab_mem_ptr;  powtab_mem_ptr += 2;
-    powtab[1].p[0] = big_base;
-    powtab[1].n = 1;
-    powtab[1].digits_in_base = digits_in_base;
-    powtab[1].base = base;
-    powtab[1].shift = 0;
-
-    n = 1;
-    p = &big_base;
-    bexp = 1;
-    shift = 0;
-    for (pi = 2; pi < n_pows; pi++)
-      {
-	t = powtab_mem_ptr;
-	powtab_mem_ptr += 2 * n + 2;
-
-	ASSERT_ALWAYS (powtab_mem_ptr < powtab_mem + mpn_dc_get_str_powtab_alloc (un));
-
-	mpn_sqr (t, p, n);
-
-	digits_in_base *= 2;
-	n *= 2;  n -= t[n - 1] == 0;
-	bexp *= 2;
-
-	if (bexp + 1 < exptab[n_pows - pi])
-	  {
-	    digits_in_base += mp_bases[base].chars_per_limb;
-	    cy = mpn_mul_1 (t, t, n, big_base);
-	    t[n] = cy;
-	    n += cy != 0;
-	    bexp += 1;
-	  }
-	shift *= 2;
-	/* Strip low zero limbs.  */
-	while (t[0] == 0)
-	  {
-	    t++;
-	    n--;
-	    shift++;
-	  }
-	p = t;
-	powtab[pi].p = p;
-	powtab[pi].n = n;
-	powtab[pi].digits_in_base = digits_in_base;
-	powtab[pi].base = base;
-	powtab[pi].shift = shift;
-      }
-
-    for (pi = 1; pi < n_pows; pi++)
-      {
-	t = powtab[pi].p;
-	n = powtab[pi].n;
-	cy = mpn_mul_1 (t, t, n, big_base);
-	t[n] = cy;
-	n += cy != 0;
-	if (t[0] == 0)
-	  {
-	    powtab[pi].p = t + 1;
-	    n--;
-	    powtab[pi].shift++;
-	  }
-	powtab[pi].n = n;
-	powtab[pi].digits_in_base += mp_bases[base].chars_per_limb;
-      }
-
-#if 0
-    { int i;
-      printf ("Computed table values for base=%d, un=%d, xn=%d:\n", base, un, xn);
-      for (i = 0; i < n_pows; i++)
-	printf ("%2d: %10ld %10ld %11ld %ld\n", i, exptab[n_pows-i], powtab[i].n, powtab[i].digits_in_base, powtab[i].shift);
-    }
-#endif
-  }
+  pi = 1 + mpn_compute_powtab (powtab, powtab_mem, xn, base);
 
   /* Using our precomputed powers, now in powtab[], convert our number.  */
   tmp = TMP_BALLOC_LIMBS (mpn_dc_get_str_itch (un));

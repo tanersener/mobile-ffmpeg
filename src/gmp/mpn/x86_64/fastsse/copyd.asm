@@ -94,8 +94,12 @@ PROLOGUE(mpn_copyd)
 	lea	-8(rp), rp
 	dec	n
 
-	sub	$16, n
+L(ali):	sub	$16, n
 	jc	L(sma)
+
+IFDOS(`	add	$-56, %rsp	')
+IFDOS(`	movdqa	%xmm6, (%rsp)	')
+IFDOS(`	movdqa	%xmm7, 16(%rsp)	')
 
 	ALIGN(16)
 L(top):	movdqu	(up), %xmm0
@@ -116,8 +120,12 @@ L(top):	movdqu	(up), %xmm0
 	movdqa	%xmm6, -96(rp)
 	movdqa	%xmm7, -112(rp)
 	lea	-128(rp), rp
-L(ali):	sub	$16, n
+	sub	$16, n
 	jnc	L(top)
+
+IFDOS(`	movdqa	(%rsp), %xmm6	')
+IFDOS(`	movdqa	16(%rsp), %xmm7	')
+IFDOS(`	add	$56, %rsp	')
 
 L(sma):	test	$8, R8(n)
 	jz	1f

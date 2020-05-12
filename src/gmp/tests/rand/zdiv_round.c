@@ -18,7 +18,6 @@ Public License for more details.
 You should have received a copy of the GNU General Public License along with
 the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
 
-#include "gmp.h"
 
 void
 zdiv_round (mpz_t rop, mpz_t n, mpz_t d)

@@ -33,10 +33,13 @@ include(`../config.m4')
 C	     cycles/limb
 C StrongARM	 ?
 C XScale	 ?
-C Cortex-A7	 ?
-C Cortex-A8	 ?
+C Cortex-A5	 2.67
+C Cortex-A7	 2.35
+C Cortex-A8	 2.0
 C Cortex-A9	 1.33
 C Cortex-A15	 1.33
+C Cortex-A17	 3.34
+C Cortex-A53	 2.0
 
 define(`ap',	r0)
 define(`n',	r1)
@@ -106,7 +109,7 @@ L(sum2):
 	add	r0, r0, r12, lsr #8
 
 	pop	{ r4, r5, r6, r7 }
-	ret	lr
+	return	lr
 
 L(le2):	cmn	n, #1
 	bne	L(1)
@@ -117,5 +120,5 @@ L(1):	ldr	r2, [ap]
 	bic	r0, r2, #0xff000000
 	add	r0, r0, r2, lsr #24
 	pop	{ r4, r5, r6, r7 }
-	ret	lr
+	return	lr
 EPILOGUE()

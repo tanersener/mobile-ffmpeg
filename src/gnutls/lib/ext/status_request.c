@@ -80,12 +80,13 @@ client_send(gnutls_session_t session,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
+	session->internals.hsk_flags |= HSK_OCSP_REQUESTED;
+
 	return len;
 }
 
 static int
 server_recv(gnutls_session_t session,
-	    status_request_ext_st * priv,
 	    const uint8_t * data, size_t data_size)
 {
 	unsigned rid_bytes = 0;
@@ -114,9 +115,12 @@ server_recv(gnutls_session_t session,
 
 	/* sanity check only, we don't use any of the data below */
 
-	if (data_size < (ssize_t)rid_bytes)
+	if (data_size < rid_bytes)
 		return
 		    gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+
+	_gnutls_handshake_log("EXT[%p]: OCSP status was requested\n", session);
+	session->internals.hsk_flags |= HSK_OCSP_REQUESTED;
 
 	return 0;
 }
@@ -165,12 +169,20 @@ server_send(gnutls_session_t session,
 	gnutls_certificate_credentials_t cred;
 	gnutls_status_request_ocsp_func func;
 	void *func_ptr;
+	const version_entry_st *ver = get_version(session);
 
 	cred = (gnutls_certificate_credentials_t)
 	    _gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE);
 	if (cred == NULL)	/* no certificate authentication */
-		return gnutls_assert_val(0);
+		return 0;
 
+	/* no need to set sresp; responses are send during certificate sending and
+	 * no response is required from server side. */
+	if (ver && ver->multi_ocsp)
+		return 0;
+
+	/* Under TLS1.2 we obtain the response at this point in order to respond
+	 * appropriately (empty extension vs no response) */
 	if (session->internals.selected_ocsp_length > 0) {
 		if (session->internals.selected_ocsp[0].response.data) {
 			if (session->internals.selected_ocsp[0].exptime != 0 &&
@@ -191,18 +203,18 @@ server_send(gnutls_session_t session,
 	} else if (session->internals.selected_ocsp_func) {
 		func = session->internals.selected_ocsp_func;
 		func_ptr = session->internals.selected_ocsp_func_ptr;
+
+		if (func == NULL)
+			return 0;
+
+		ret = func(session, func_ptr, &priv->sresp);
+		if (ret == GNUTLS_E_NO_CERTIFICATE_STATUS)
+			return 0;
+		else if (ret < 0)
+			return gnutls_assert_val(ret);
 	} else {
 		return 0;
 	}
-
-	if (func == NULL)
-		return 0;
-
-	ret = func(session, func_ptr, &priv->sresp);
-	if (ret == GNUTLS_E_NO_CERTIFICATE_STATUS)
-		return 0;
-	else if (ret < 0)
-		return gnutls_assert_val(ret);
 
 	return GNUTLS_E_INT_RET_0;
 }
@@ -220,11 +232,10 @@ _gnutls_status_request_send_params(gnutls_session_t session,
 	if (_gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE) == NULL)
 		return 0;
 
-	ret = _gnutls_hello_ext_get_priv(session,
-					   GNUTLS_EXTENSION_STATUS_REQUEST,
-					   &epriv);
-
 	if (session->security_parameters.entity == GNUTLS_CLIENT) {
+		ret = _gnutls_hello_ext_get_priv(session,
+						 GNUTLS_EXTENSION_STATUS_REQUEST,
+						 &epriv);
 		if (ret < 0 || epriv == NULL)	/* it is ok not to have it */
 			return 0;
 		priv = epriv;
@@ -236,8 +247,8 @@ _gnutls_status_request_send_params(gnutls_session_t session,
 			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
 		_gnutls_hello_ext_set_priv(session,
-					     GNUTLS_EXTENSION_STATUS_REQUEST,
-					     epriv);
+					   GNUTLS_EXTENSION_STATUS_REQUEST,
+					   epriv);
 
 		return server_send(session, extdata, priv);
 	}
@@ -251,18 +262,18 @@ _gnutls_status_request_recv_params(gnutls_session_t session,
 	status_request_ext_st *priv;
 	int ret;
 
-	ret = _gnutls_hello_ext_get_priv(session,
-					   GNUTLS_EXTENSION_STATUS_REQUEST,
-					   &epriv);
-	if (ret < 0 || epriv == NULL)	/* it is ok not to have it */
-		return 0;
+	if (session->security_parameters.entity == GNUTLS_CLIENT) {
+		ret = _gnutls_hello_ext_get_priv(session,
+						 GNUTLS_EXTENSION_STATUS_REQUEST,
+						 &epriv);
+		if (ret < 0 || epriv == NULL)	/* it is ok not to have it */
+			return 0;
+		priv = epriv;
 
-	priv = epriv;
-
-	if (session->security_parameters.entity == GNUTLS_CLIENT)
 		return client_recv(session, priv, data, size);
-	else
-		return server_recv(session, priv, data, size);
+	} else {
+		return server_recv(session, data, size);
+	}
 }
 
 /**
@@ -347,11 +358,14 @@ _gnutls_send_server_certificate_status(gnutls_session_t session, int again)
 	gnutls_ext_priv_data_t epriv;
 	status_request_ext_st *priv;
 
+	if (!(session->internals.hsk_flags & HSK_OCSP_REQUESTED))
+		return 0;
+
 	if (again == 0) {
 		ret =
 		    _gnutls_hello_ext_get_priv(session,
-						 GNUTLS_EXTENSION_STATUS_REQUEST,
-						 &epriv);
+						GNUTLS_EXTENSION_STATUS_REQUEST,
+						&epriv);
 		if (ret < 0)
 			return 0;
 

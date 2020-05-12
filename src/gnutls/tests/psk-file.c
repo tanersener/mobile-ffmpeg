@@ -54,6 +54,36 @@ int main(int argc, char **argv)
 
 #include "utils.h"
 
+static char hexchar(unsigned int val)
+{
+	if (val < 10)
+		return '0' + val;
+	if (val < 16)
+		return 'a' + val - 10;
+	abort();
+}
+
+static bool hex_encode(const void *buf, size_t bufsize, char *dest, size_t destsize)
+{
+	size_t used = 0;
+
+	if (destsize < 1)
+		return false;
+
+	while (used < bufsize) {
+		unsigned int c = ((const unsigned char *)buf)[used];
+		if (destsize < 3)
+			return false;
+		*(dest++) = hexchar(c >> 4);
+		*(dest++) = hexchar(c & 0xF);
+		used++;
+		destsize -= 2;
+	}
+	*dest = '\0';
+
+	return used + 1;
+}
+
 /* A very basic TLS client, with PSK authentication.
  */
 
@@ -67,8 +97,8 @@ static void tls_log_func(int level, const char *str)
 #define MAX_BUF 1024
 #define MSG "Hello TLS"
 
-static void client(int sd, const char *prio, const char *user, const gnutls_datum_t *key,
-		   unsigned expect_hint, int expect_fail, int exp_kx)
+static void client(int sd, const char *prio, const gnutls_datum_t *user, const gnutls_datum_t *key,
+		   unsigned expect_hint, int expect_fail, int exp_kx, unsigned binary_user)
 {
 	int ret, ii, kx;
 	gnutls_session_t session;
@@ -84,8 +114,13 @@ static void client(int sd, const char *prio, const char *user, const gnutls_datu
 	side = "client";
 
 	gnutls_psk_allocate_client_credentials(&pskcred);
-	gnutls_psk_set_client_credentials(pskcred, user, key,
-					  GNUTLS_PSK_KEY_HEX);
+
+	if (binary_user) {
+		gnutls_psk_set_client_credentials2(pskcred, user, key, GNUTLS_PSK_KEY_HEX);
+	} else {
+		gnutls_psk_set_client_credentials(pskcred, (const char *) user->data, key,
+						  GNUTLS_PSK_KEY_HEX);
+	}
 
 	assert(gnutls_init(&session, GNUTLS_CLIENT|GNUTLS_KEY_SHARE_TOP)>=0);
 
@@ -173,13 +208,14 @@ static void client(int sd, const char *prio, const char *user, const gnutls_datu
 
 #define MAX_BUF 1024
 
-static void server(int sd, const char *prio, const char *user, bool no_cred,
-		   int expect_fail, int exp_kx)
+static void server(int sd, const char *prio, const gnutls_datum_t *user, bool no_cred,
+		   int expect_fail, int exp_kx, unsigned binary_user)
 {
 	gnutls_psk_server_credentials_t server_pskcred;
 	int ret, kx;
 	gnutls_session_t session;
 	const char *pskid;
+	gnutls_datum_t pskid_binary;
 	char buffer[MAX_BUF + 1];
 	char *psk_file = getenv("PSK_FILE");
 	char *desc;
@@ -219,7 +255,7 @@ static void server(int sd, const char *prio, const char *user, bool no_cred,
 		gnutls_alert_send_appropriate(session, ret);
 
 		/* We have to make sure that we do not close connection till
-		 * test client reads our fatal alert, otherwise it migh exit
+		 * test client reads our fatal alert, otherwise it might exit
 		 * with GNUTLS_E_PUSH_ERROR instead */
 		gnutls_session_force_valid(session);
 		while ((gnutls_record_recv_seq(session, buf, sizeof(buf), seq)) >= 0)
@@ -281,10 +317,24 @@ static void server(int sd, const char *prio, const char *user, bool no_cred,
 		fail("server: expected failure but connection succeeded!\n");
 
 	if (!no_cred) {
-		pskid = gnutls_psk_server_get_username(session);
-		if (pskid == NULL || strcmp(pskid, user) != 0) {
-			fail("server: username (%s), does not match expected (%s)\n",
-			     pskid, user);
+		if (binary_user) {
+			char pskid_bin[1024], userdata_bin[1024];
+
+			if (gnutls_psk_server_get_username2(session, &pskid_binary))
+				fail("server: Could not get binary pskid\n");
+
+			if (memcmp(pskid_binary.data, user->data, user->size) != 0) {
+				hex_encode(user->data, user->size, userdata_bin, sizeof(userdata_bin));
+				hex_encode(pskid_binary.data, pskid_binary.size, pskid_bin, sizeof(pskid_bin));
+				fail("server: binary username (%s) does not match expected (%s)\n",
+						pskid_bin, userdata_bin);
+			}
+		} else {
+			pskid = gnutls_psk_server_get_username(session);
+			if (pskid == NULL || strcmp(pskid, (const char *) user->data) != 0) {
+				fail("server: username (%s), does not match expected (%s)\n",
+				     pskid, (const char *) user->data);
+			}
 		}
 	}
 
@@ -306,9 +356,20 @@ static void server(int sd, const char *prio, const char *user, bool no_cred,
 		success("server: finished\n");
 }
 
+static void print_user(const char *caption, const char *prio, const gnutls_datum_t *user, unsigned binary_user)
+{
+	char hexuser[100];
+
+	if (binary_user) {
+		hex_encode(user->data, user->size, hexuser, sizeof(hexuser));
+		success("%s %s (user:%s)\n", caption, prio, hexuser);
+	} else
+		success("%s %s (user:%s)\n", caption, prio, (const char *) user->data);
+}
+
 static
-void run_test3(const char *prio, const char *sprio, const char *user, const gnutls_datum_t *key, bool no_cred,
-	      unsigned expect_hint, int exp_kx, int expect_fail_cli, int expect_fail_serv)
+void run_test3(const char *prio, const char *sprio, const gnutls_datum_t *user, const gnutls_datum_t *key, bool no_cred,
+	      unsigned expect_hint, int exp_kx, int expect_fail_cli, int expect_fail_serv, unsigned binary_user)
 {
 	pid_t child;
 	int err;
@@ -316,11 +377,10 @@ void run_test3(const char *prio, const char *sprio, const char *user, const gnut
 
 	signal(SIGPIPE, SIG_IGN);
 
-	if (expect_fail_serv || expect_fail_cli) {
-		success("ntest %s (user:%s)\n", prio, user);
-	} else {
-		success("test %s (user:%s)\n", prio, user);
-	}
+	if (expect_fail_serv || expect_fail_cli)
+		print_user("ntest", prio, user, binary_user);
+	else
+		print_user("test", prio, user, binary_user);
 
 	err = socketpair(AF_UNIX, SOCK_STREAM, 0, sockets);
 	if (err == -1) {
@@ -340,86 +400,155 @@ void run_test3(const char *prio, const char *sprio, const char *user, const gnut
 		close(sockets[1]);
 		int status;
 		/* parent */
-		server(sockets[0], sprio?sprio:prio, user, no_cred, expect_fail_serv, exp_kx);
+		server(sockets[0], sprio?sprio:prio, user, no_cred, expect_fail_serv, exp_kx, binary_user);
 		wait(&status);
 		check_wait_status(status);
 	} else {
 		close(sockets[0]);
-		client(sockets[1], prio, user, key, expect_hint, expect_fail_cli, exp_kx);
+		client(sockets[1], prio, user, key, expect_hint, expect_fail_cli, exp_kx, binary_user);
 		exit(0);
 	}
 }
 
 static
-void run_test2(const char *prio, const char *sprio, const char *user, const gnutls_datum_t *key,
-	      unsigned expect_hint, int exp_kx, int expect_fail_cli, int expect_fail_serv)
+void run_test2(const char *prio, const char *sprio, const gnutls_datum_t *user, const gnutls_datum_t *key,
+	      unsigned expect_hint, int exp_kx, int expect_fail_cli, int expect_fail_serv, unsigned binary_user)
 {
-	run_test3(prio, sprio, user, key, 0, expect_hint, exp_kx, expect_fail_cli, expect_fail_serv);
+	run_test3(prio, sprio, user, key, 0, expect_hint, exp_kx, expect_fail_cli, expect_fail_serv, binary_user);
 }
 
 static
-void run_test_ok(const char *prio, const char *user, const gnutls_datum_t *key, unsigned expect_hint, int expect_fail)
+void run_test_ok(const char *prio, const gnutls_datum_t *user, const gnutls_datum_t *key, unsigned expect_hint, int expect_fail, unsigned binary_user)
 {
-	run_test2(prio, NULL, user, key, expect_hint, GNUTLS_KX_PSK, expect_fail, expect_fail);
+	run_test2(prio, NULL, user, key, expect_hint, GNUTLS_KX_PSK, expect_fail, expect_fail, binary_user);
 }
 
 static
-void run_ectest_ok(const char *prio, const char *user, const gnutls_datum_t *key, unsigned expect_hint, int expect_fail)
+void run_ectest_ok(const char *prio, const gnutls_datum_t *user, const gnutls_datum_t *key, unsigned expect_hint, int expect_fail, unsigned binary_user)
 {
-	run_test2(prio, NULL, user, key, expect_hint, GNUTLS_KX_ECDHE_PSK, expect_fail, expect_fail);
+	run_test2(prio, NULL, user, key, expect_hint, GNUTLS_KX_ECDHE_PSK, expect_fail, expect_fail, binary_user);
 }
 
 static
-void run_dhtest_ok(const char *prio, const char *user, const gnutls_datum_t *key, unsigned expect_hint, int expect_fail)
+void run_dhtest_ok(const char *prio, const gnutls_datum_t *user, const gnutls_datum_t *key, unsigned expect_hint, int expect_fail, unsigned binary_user)
 {
-	run_test2(prio, NULL, user, key, expect_hint, GNUTLS_KX_DHE_PSK, expect_fail, expect_fail);
+	run_test2(prio, NULL, user, key, expect_hint, GNUTLS_KX_DHE_PSK, expect_fail, expect_fail, binary_user);
 }
 
 void doit(void)
 {
+	char hexuser[] = { 0xde, 0xad, 0xbe, 0xef },
+			nulluser1[] = { 0 },
+			nulluser2[] = { 0, 0, 0xaa, 0 };
+	const gnutls_datum_t user_jas = { (void *) "jas", strlen("jas") };
+	const gnutls_datum_t user_unknown = { (void *) "unknown", strlen("unknown") };
+	const gnutls_datum_t user_nonhex = { (void *) "non-hex", strlen("non-hex") };
+	const gnutls_datum_t user_hex = { (void *) hexuser, sizeof(hexuser) };
+	const gnutls_datum_t user_null_1 = { (void *) nulluser1, sizeof(nulluser1) };
+	const gnutls_datum_t user_null_2 = { (void *) nulluser2, sizeof(nulluser2) };
 	const gnutls_datum_t key = { (void *) "9e32cf7786321a828ef7668f09fb35db", 32 };
 	const gnutls_datum_t wrong_key = { (void *) "9e31cf7786321a828ef7668f09fb35db", 32 };
 
-	run_test_ok("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+PSK", "jas", &key, 1, 0);
-	run_dhtest_ok("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+DHE-PSK", "jas", &key, 1, 0);
-	run_ectest_ok("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+ECDHE-PSK", "jas", &key, 1, 0);
-	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+PSK", NULL, "unknown", &key, 1, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_DECRYPTION_FAILED);
-	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+PSK", NULL, "jas", &wrong_key, 1, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_DECRYPTION_FAILED);
-	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+PSK", NULL, "non-hex", &key, 1, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_KEYFILE_ERROR);
+	run_test_ok("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+PSK", &user_jas, &key, 1, 0, 0);
+	run_test_ok("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+PSK", &user_hex, &key, 1, 0, 1);
+	run_test_ok("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+PSK", &user_null_1, &key, 1, 0, 1);
+	run_test_ok("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+PSK", &user_null_2, &key, 1, 0, 1);
+	run_dhtest_ok("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+DHE-PSK", &user_jas, &key, 1, 0, 0);
+	run_dhtest_ok("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+DHE-PSK", &user_hex, &key, 1, 0, 1);
+	run_dhtest_ok("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+DHE-PSK", &user_null_1, &key, 1, 0, 1);
+	run_dhtest_ok("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+DHE-PSK", &user_null_2, &key, 1, 0, 1);
+	run_ectest_ok("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+ECDHE-PSK", &user_jas, &key, 1, 0, 0);
+	run_ectest_ok("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+ECDHE-PSK", &user_hex, &key, 1, 0, 1);
+	run_ectest_ok("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+ECDHE-PSK", &user_null_1, &key, 1, 0, 1);
+	run_ectest_ok("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+ECDHE-PSK", &user_null_2, &key, 1, 0, 1);
+	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+PSK", NULL, &user_unknown, &key, 1, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_DECRYPTION_FAILED, 0);
+	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+PSK", NULL, &user_jas, &wrong_key, 1, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_DECRYPTION_FAILED, 0);
+	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+PSK", NULL, &user_nonhex, &key, 1, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_KEYFILE_ERROR, 0);
+	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+PSK", NULL, &user_hex, &wrong_key, 1, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_DECRYPTION_FAILED, 1);
+	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+PSK", NULL, &user_null_1, &wrong_key, 1, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_DECRYPTION_FAILED, 1);
+	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+PSK", NULL, &user_null_2, &wrong_key, 1, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_DECRYPTION_FAILED, 1);
 
-	run_test_ok("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+PSK", "jas", &key, 1, 0);
-	run_test_ok("NORMAL:-KX-ALL:+PSK", "jas", &key, 0, 0);
-	run_test2("NORMAL:+PSK", NULL, "unknown", &key, 1, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
-	run_test2("NORMAL:+PSK", NULL, "jas", &wrong_key, 1, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
-	run_test2("NORMAL:-KX-ALL:+PSK", NULL, "non-hex", &key, 1, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_KEYFILE_ERROR);
+	run_test_ok("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+PSK", &user_jas, &key, 1, 0, 0);
+	run_test_ok("NORMAL:-KX-ALL:+PSK", &user_jas, &key, 0, 0, 0);
+	run_test_ok("NORMAL:-KX-ALL:+PSK", &user_hex, &key, 0, 0, 1);
+	run_test_ok("NORMAL:-KX-ALL:+PSK", &user_null_1, &key, 0, 0, 1);
+	run_test_ok("NORMAL:-KX-ALL:+PSK", &user_null_2, &key, 0, 0, 1);
+	run_test2("NORMAL:+PSK", NULL, &user_unknown, &key, 1, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER, 0);
+	run_test2("NORMAL:+PSK", NULL, &user_jas, &wrong_key, 1, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER, 0);
+	run_test2("NORMAL:+PSK", NULL, &user_hex, &wrong_key, 1, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER, 1);
+	run_test2("NORMAL:+PSK", NULL, &user_null_1, &wrong_key, 1, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER, 1);
+	run_test2("NORMAL:+PSK", NULL, &user_null_2, &wrong_key, 1, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER, 1);
+	run_test2("NORMAL:-KX-ALL:+PSK", NULL, &user_nonhex, &key, 1, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_KEYFILE_ERROR, 0);
 
-	run_dhtest_ok("NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-EC-ALL", "jas", &key, 0, 0);
-	run_test_ok("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK", "jas", &key, 0, 0);
+	run_dhtest_ok("NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-EC-ALL", &user_jas, &key, 0, 0, 0);
+	run_dhtest_ok("NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-EC-ALL", &user_hex, &key, 0, 0, 1);
+	run_dhtest_ok("NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-EC-ALL", &user_null_1, &key, 0, 0, 1);
+	run_dhtest_ok("NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-EC-ALL", &user_null_2, &key, 0, 0, 1);
+	run_test_ok("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK", &user_jas, &key, 0, 0, 0);
+	run_test_ok("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK", &user_hex, &key, 0, 0, 1);
+	run_test_ok("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK", &user_null_1, &key, 0, 0, 1);
+	run_test_ok("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK", &user_null_2, &key, 0, 0, 1);
 
 	/* test priorities of DHE-PSK and PSK */
-	run_ectest_ok("NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+DHE-PSK:+PSK:-GROUP-DH-ALL", "jas", &key, 0, 0);
-	run_test_ok("NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+PSK:+DHE-PSK:-GROUP-DH-ALL", "jas", &key, 0, 0);
+	run_ectest_ok("NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+DHE-PSK:+PSK:-GROUP-DH-ALL", &user_jas, &key, 0, 0, 0);
+	run_ectest_ok("NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+DHE-PSK:+PSK:-GROUP-DH-ALL", &user_hex, &key, 0, 0, 1);
+	run_ectest_ok("NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+DHE-PSK:+PSK:-GROUP-DH-ALL", &user_null_1, &key, 0, 0, 1);
+	run_ectest_ok("NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+DHE-PSK:+PSK:-GROUP-DH-ALL", &user_null_2, &key, 0, 0, 1);
+	run_test_ok("NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+PSK:+DHE-PSK:-GROUP-DH-ALL", &user_jas, &key, 0, 0, 0);
+	run_test_ok("NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+PSK:+DHE-PSK:-GROUP-DH-ALL", &user_hex, &key, 0, 0, 1);
+	run_test_ok("NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+PSK:+DHE-PSK:-GROUP-DH-ALL", &user_null_1, &key, 0, 0, 1);
+	run_test_ok("NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+PSK:+DHE-PSK:-GROUP-DH-ALL", &user_null_2, &key, 0, 0, 1);
 	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+DHE-PSK:+PSK:-GROUP-DH-ALL", 
 		  "NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+PSK:+DHE-PSK:%SERVER_PRECEDENCE:-GROUP-DH-ALL",
-		  "jas", &key, 0, GNUTLS_KX_PSK, 0, 0);
+		  &user_jas, &key, 0, GNUTLS_KX_PSK, 0, 0, 0);
+	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+DHE-PSK:+PSK:-GROUP-DH-ALL",
+		  "NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+PSK:+DHE-PSK:%SERVER_PRECEDENCE:-GROUP-DH-ALL",
+		  &user_hex, &key, 0, GNUTLS_KX_PSK, 0, 0, 1);
+	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+DHE-PSK:+PSK:-GROUP-DH-ALL",
+		  "NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+PSK:+DHE-PSK:%SERVER_PRECEDENCE:-GROUP-DH-ALL",
+		  &user_null_1, &key, 0, GNUTLS_KX_PSK, 0, 0, 1);
+	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+DHE-PSK:+PSK:-GROUP-DH-ALL",
+		  "NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+PSK:+DHE-PSK:%SERVER_PRECEDENCE:-GROUP-DH-ALL",
+		  &user_null_2, &key, 0, GNUTLS_KX_PSK, 0, 0, 1);
 	/* try with PRF that doesn't match binder (SHA256) */
-	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-256-GCM:+PSK:+DHE-PSK", NULL, "jas", &key, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_NO_CIPHER_SUITES);
+	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-256-GCM:+PSK:+DHE-PSK", NULL, &user_jas, &key, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_NO_CIPHER_SUITES, 0);
+	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-256-GCM:+PSK:+DHE-PSK", NULL, &user_hex, &key, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_NO_CIPHER_SUITES, 1);
+	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-256-GCM:+PSK:+DHE-PSK", NULL, &user_null_1, &key, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_NO_CIPHER_SUITES, 1);
+	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-256-GCM:+PSK:+DHE-PSK", NULL, &user_null_2, &key, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_NO_CIPHER_SUITES, 1);
 	/* try with no groups and PSK */
-	run_test_ok("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK:-GROUP-ALL", "jas", &key, 0, 0);
+	run_test_ok("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK:-GROUP-ALL", &user_jas, &key, 0, 0, 0);
+	run_test_ok("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK:-GROUP-ALL", &user_hex, &key, 0, 0, 1);
+	run_test_ok("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK:-GROUP-ALL", &user_null_1, &key, 0, 0, 1);
+	run_test_ok("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK:-GROUP-ALL", &user_null_2, &key, 0, 0, 1);
 	/* try without any groups but DHE-PSK */
-	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-ALL", "NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:+PSK", "jas", &key, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_NO_COMMON_KEY_SHARE);
-	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-ALL", "NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:+PSK:-GROUP-ALL", "jas", &key, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_NO_COMMON_KEY_SHARE);
+	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-ALL", "NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:+PSK", &user_jas, &key, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_NO_COMMON_KEY_SHARE, 0);
+	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-ALL", "NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:+PSK:-GROUP-ALL", &user_jas, &key, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_NO_COMMON_KEY_SHARE, 0);
+	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-ALL", "NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:+PSK", &user_hex, &key, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_NO_COMMON_KEY_SHARE, 1);
+	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-ALL", "NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:+PSK:-GROUP-ALL", &user_hex, &key, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_NO_COMMON_KEY_SHARE, 1);
+	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-ALL", "NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:+PSK", &user_null_1, &key, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_NO_COMMON_KEY_SHARE, 1);
+	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-ALL", "NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:+PSK:-GROUP-ALL", &user_null_1, &key, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_NO_COMMON_KEY_SHARE, 1);
+	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-ALL", "NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:+PSK", &user_null_2, &key, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_NO_COMMON_KEY_SHARE, 1);
+	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-ALL", "NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:+PSK:-GROUP-ALL", &user_null_2, &key, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_NO_COMMON_KEY_SHARE, 1);
 
 	/* if user invalid we continue without PSK */
-	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK:+DHE-PSK", NULL, "non-hex", &key, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_KEYFILE_ERROR);
-	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK:+DHE-PSK", NULL, "unknown", &key, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
-	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK:+DHE-PSK", NULL, "jas", &wrong_key, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK:+DHE-PSK", NULL, &user_nonhex, &key, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_KEYFILE_ERROR, 0);
+	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK:+DHE-PSK", NULL, &user_unknown, &key, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER, 0);
+	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK:+DHE-PSK", NULL, &user_jas, &wrong_key, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER, 0);
+	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK:+DHE-PSK", NULL, &user_hex, &wrong_key, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER, 1);
+	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK:+DHE-PSK", NULL, &user_null_1, &wrong_key, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER, 1);
+	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK:+DHE-PSK", NULL, &user_null_2, &wrong_key, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER, 1);
 
 	/* try with HelloRetryRequest and PSK */
-	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-ALL:+GROUP-FFDHE2048:+GROUP-FFDHE4096", "NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-ALL:+GROUP-FFDHE4096", "jas", &key, 0, GNUTLS_KX_DHE_PSK, 0, 0);
+	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-ALL:+GROUP-FFDHE2048:+GROUP-FFDHE4096", "NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-ALL:+GROUP-FFDHE4096", &user_jas, &key, 0, GNUTLS_KX_DHE_PSK, 0, 0, 0);
+	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-ALL:+GROUP-FFDHE2048:+GROUP-FFDHE4096", "NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-ALL:+GROUP-FFDHE4096", &user_hex, &key, 0, GNUTLS_KX_DHE_PSK, 0, 0, 1);
+	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-ALL:+GROUP-FFDHE2048:+GROUP-FFDHE4096", "NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-ALL:+GROUP-FFDHE4096", &user_null_1, &key, 0, GNUTLS_KX_DHE_PSK, 0, 0, 1);
+	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-ALL:+GROUP-FFDHE2048:+GROUP-FFDHE4096", "NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-ALL:+GROUP-FFDHE4096", &user_null_2, &key, 0, GNUTLS_KX_DHE_PSK, 0, 0, 1);
 
 	/* try without server credentials */
-	run_test3("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK:+DHE-PSK", NULL, "jas", &key, 1, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_INSUFFICIENT_CREDENTIALS);
+	run_test3("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK:+DHE-PSK", NULL, &user_jas, &key, 1, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_INSUFFICIENT_CREDENTIALS, 0);
+	run_test3("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK:+DHE-PSK", NULL, &user_hex, &key, 1, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_INSUFFICIENT_CREDENTIALS, 1);
+	run_test3("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK:+DHE-PSK", NULL, &user_null_1, &key, 1, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_INSUFFICIENT_CREDENTIALS, 1);
+	run_test3("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK:+DHE-PSK", NULL, &user_null_2, &key, 1, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_INSUFFICIENT_CREDENTIALS, 1);
 }
 
 #endif				/* _WIN32 */

@@ -29,6 +29,8 @@ dnl  You should have received copies of the GNU General Public License and the
 dnl  GNU Lesser General Public License along with the GNU MP Library.  If not,
 dnl  see https://www.gnu.org/licenses/.
 
+define(`AIX')
+
 define(`ASM_START',
 	`.machine	"any"
 	.toc')

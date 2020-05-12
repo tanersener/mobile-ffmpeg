@@ -18,6 +18,7 @@ int main(int argc, char **argv)
 # include <nettle/aes.h>
 # include <nettle/cbc.h>
 # include <nettle/gcm.h>
+# include <assert.h>
 
 /* this tests whether the API to override ciphers works sanely.
  */
@@ -29,7 +30,7 @@ static void tls_log_func(int level, const char *str)
 }
 
 struct myaes_ctx {
-	struct aes_ctx aes;
+	struct aes128_ctx aes;
 	unsigned char iv[16];
 	int enc;
 };
@@ -38,9 +39,7 @@ static int
 myaes_init(gnutls_cipher_algorithm_t algorithm, void **_ctx, int enc)
 {
 	/* we use key size to distinguish */
-	if (algorithm != GNUTLS_CIPHER_AES_128_CBC
-	    && algorithm != GNUTLS_CIPHER_AES_192_CBC
-	    && algorithm != GNUTLS_CIPHER_AES_256_CBC)
+	if (algorithm != GNUTLS_CIPHER_AES_128_CBC)
 		return GNUTLS_E_INVALID_REQUEST;
 
 	*_ctx = calloc(1, sizeof(struct myaes_ctx));
@@ -58,10 +57,12 @@ myaes_setkey(void *_ctx, const void *userkey, size_t keysize)
 {
 	struct myaes_ctx *ctx = _ctx;
 
+	assert(keysize == 16);
+
 	if (ctx->enc)
-		aes_set_encrypt_key(&ctx->aes, keysize, userkey);
+		aes128_set_encrypt_key(&ctx->aes, userkey);
 	else
-		aes_set_decrypt_key(&ctx->aes, keysize, userkey);
+		aes128_set_decrypt_key(&ctx->aes, userkey);
 
 	return 0;
 }
@@ -81,7 +82,7 @@ myaes_encrypt(void *_ctx, const void *src, size_t src_size,
 	struct myaes_ctx *ctx = _ctx;
 
 	used++;
-	cbc_encrypt(&ctx->aes, (nettle_cipher_func*)aes_encrypt, 16, ctx->iv, src_size, dst, src);
+	cbc_encrypt(&ctx->aes, (nettle_cipher_func*)aes128_encrypt, 16, ctx->iv, src_size, dst, src);
 	return 0;
 }
 
@@ -92,7 +93,7 @@ myaes_decrypt(void *_ctx, const void *src, size_t src_size,
 	struct myaes_ctx *ctx = _ctx;
 
 	used++;
-	cbc_decrypt(&ctx->aes, (nettle_cipher_func*)aes_decrypt, 16, ctx->iv, src_size, dst, src);
+	cbc_decrypt(&ctx->aes, (nettle_cipher_func*)aes128_decrypt, 16, ctx->iv, src_size, dst, src);
 
 	return 0;
 }

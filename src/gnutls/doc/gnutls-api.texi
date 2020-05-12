@@ -3079,7 +3079,7 @@ This function increments a global counter, so that
 called as many times as @code{gnutls_global_init()} .  This is useful when
 GnuTLS is used by more than one library in an application.  This
 function can be called many times, but will only do something the
-first time.
+first time. It is thread safe since GnuTLS 3.3.0.
 
 A subsequent call of this function if the initial has failed will
 return the same error code.
@@ -3985,14 +3985,15 @@ otherwise a negative error code is returned.
 
 @subheading gnutls_ocsp_status_request_is_checked
 @anchor{gnutls_ocsp_status_request_is_checked}
-@deftypefun {int} {gnutls_ocsp_status_request_is_checked} (gnutls_session_t @var{session}, unsigned int @var{flags})
+@deftypefun {unsigned} {gnutls_ocsp_status_request_is_checked} (gnutls_session_t @var{session}, unsigned int @var{flags})
 @var{session}: is a gnutls session
 
 @var{flags}: should be zero or @code{GNUTLS_OCSP_SR_IS_AVAIL} 
 
 When flags are zero this function returns non-zero if a valid OCSP status
 response was included in the TLS handshake. That is, an OCSP status response
-which is not too old or superseded. It returns zero otherwise.
+which is not too old, superseded or marks the certificate as revoked.
+It returns zero otherwise.
 
 When the flag @code{GNUTLS_OCSP_SR_IS_AVAIL}  is specified, the function
 returns non-zero if an OCSP status response was included in the handshake
@@ -4007,7 +4008,7 @@ This function is always usable on client side, but on server side only
 under TLS 1.3, which is the first version of TLS that allows cliend-side OCSP
 responses.
 
-@strong{Returns:} non zero if the response was valid, or a zero if it wasn't sent,
+@strong{Returns:} Non-zero if the response was valid, or a zero if it wasn't sent,
 or sent and was invalid.
 
 @strong{Since:} 3.1.4
@@ -4415,6 +4416,22 @@ must be non-null.
 @strong{Since:} 3.6.8
 @end deftypefun
 
+@subheading gnutls_prf_hash_get
+@anchor{gnutls_prf_hash_get}
+@deftypefun {gnutls_digest_algorithm_t} {gnutls_prf_hash_get} (const gnutls_session_t @var{session})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+Get the currently used hash algorithm. In TLS 1.3, the hash
+algorithm is used for both the key derivation function and
+handshake message authentication code. In TLS 1.2, it matches the
+hash algorithm used for PRF.
+
+@strong{Returns:} the currently used hash algorithm, a
+@code{gnutls_digest_algorithm_t}  value.
+
+@strong{Since:} 3.6.13
+@end deftypefun
+
 @subheading gnutls_prf_raw
 @anchor{gnutls_prf_raw}
 @deftypefun {int} {gnutls_prf_raw} (gnutls_session_t @var{session}, size_t @var{label_size}, const char * @var{label}, size_t @var{seed_size}, const char * @var{seed}, size_t @var{outsize}, char * @var{out})
@@ -4700,7 +4717,7 @@ of 192.
 
 "@@KEYWORD1,KEYWORD2,..." The system administrator imposed settings.
 The provided keyword(s) will be expanded from a configuration-time
-provided file - default is: /etc/gnutls/default-priorities.
+provided file - default is: /etc/gnutls/config.
 Any attributes that follow it, will be appended to the expanded
 string. If multiple keywords are provided, separated by commas,
 then the first keyword that exists in the configuration file
@@ -4968,7 +4985,33 @@ Free a gnutls_psk_server_credentials_t structure.
 This should only be called in case of PSK authentication and in
 case of a server.
 
-@strong{Returns:} the username of the peer, or @code{NULL}  in case of an error.
+The returned pointer should be considered constant (do not free) and valid 
+for the lifetime of the session.
+
+This function will return @code{NULL}  if the username has embedded NULL bytes.
+In that case, @code{gnutls_psk_server_get_username2()}  should be used to retrieve the username.
+
+@strong{Returns:} the username of the peer, or @code{NULL}  in case of an error,
+or if the username has embedded NULLs.
+@end deftypefun
+
+@subheading gnutls_psk_server_get_username2
+@anchor{gnutls_psk_server_get_username2}
+@deftypefun {int} {gnutls_psk_server_get_username2} (gnutls_session_t @var{session}, gnutls_datum_t * @var{username})
+@var{session}: is a gnutls session
+
+@var{username}: a datum that will be filled in by this function
+
+Return a pointer to the username of the peer in the supplied datum. Does not
+need to be null-terminated.
+
+This should only be called in case of PSK authentication and in
+case of a server.
+
+The returned pointer should be considered constant (do not free) and valid 
+for the lifetime of the session.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS} , or a negative value in case of an error.
 @end deftypefun
 
 @subheading gnutls_psk_set_client_credentials
@@ -4994,6 +5037,25 @@ in raw byte format or in Hex format (without the 0x prefix).
 an error code is returned.
 @end deftypefun
 
+@subheading gnutls_psk_set_client_credentials2
+@anchor{gnutls_psk_set_client_credentials2}
+@deftypefun {int} {gnutls_psk_set_client_credentials2} (gnutls_psk_client_credentials_t @var{res}, const gnutls_datum_t * @var{username}, const gnutls_datum_t * @var{key}, gnutls_psk_key_flags @var{flags})
+@var{res}: is a @code{gnutls_psk_client_credentials_t}  type.
+
+@var{username}: is the userid
+
+@var{key}: is the user's key
+
+@var{flags}: indicate the format of the key, either
+@code{GNUTLS_PSK_KEY_RAW}  or @code{GNUTLS_PSK_KEY_HEX} .
+
+This function is identical to @code{gnutls_psk_set_client_credentials()} ,
+except that it allows a non-null-terminated username to be introduced.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise
+an error code is returned.
+@end deftypefun
+
 @subheading gnutls_psk_set_client_credentials_function
 @anchor{gnutls_psk_set_client_credentials_function}
 @deftypefun {void} {gnutls_psk_set_client_credentials_function} (gnutls_psk_client_credentials_t         @var{cred}, gnutls_psk_client_credentials_function         * @var{func})
@@ -5006,6 +5068,33 @@ password for client PSK authentication.
 The callback's function form is:
 int (*callback)(gnutls_session_t, char** username,
 gnutls_datum_t* key);
+
+The  @code{username} and  @code{key} ->data must be allocated using @code{gnutls_malloc()} .
+The  @code{username} should be an ASCII string or UTF-8
+string. In case of a UTF-8 string it is recommended to be following
+the PRECIS framework for usernames (rfc8265).
+
+The callback function will be called once per handshake.
+
+The callback function should return 0 on success.
+-1 indicates an error.
+@end deftypefun
+
+@subheading gnutls_psk_set_client_credentials_function2
+@anchor{gnutls_psk_set_client_credentials_function2}
+@deftypefun {void} {gnutls_psk_set_client_credentials_function2} (gnutls_psk_client_credentials_t @var{cred}, gnutls_psk_client_credentials_function2 * @var{func})
+@var{cred}: is a @code{gnutls_psk_server_credentials_t}  type.
+
+@var{func}: is the callback function
+
+This function can be used to set a callback to retrieve the username and
+password for client PSK authentication.
+The callback's function form is:
+int (*callback)(gnutls_session_t, gnutls_datum_t* username,
+gnutls_datum_t* key);
+
+This callback function has the same semantics as that of @code{gnutls_psk_set_client_credentials_function()} ,
+but it allows non-string usernames to be used.
 
 The  @code{username} and  @code{key} ->data must be allocated using @code{gnutls_malloc()} .
 The  @code{username} should be an ASCII string or UTF-8
@@ -5060,6 +5149,32 @@ This function can be used to set a callback to retrieve the user's PSK credentia
 The callback's function form is:
 int (*callback)(gnutls_session_t, const char* username,
 gnutls_datum_t* key);
+
+ @code{username} contains the actual username.
+The  @code{key} must be filled in using the @code{gnutls_malloc()} .
+
+In case the callback returned a negative number then gnutls will
+assume that the username does not exist.
+
+The callback function will only be called once per handshake.  The
+callback function should return 0 on success, while -1 indicates
+an error.
+@end deftypefun
+
+@subheading gnutls_psk_set_server_credentials_function2
+@anchor{gnutls_psk_set_server_credentials_function2}
+@deftypefun {void} {gnutls_psk_set_server_credentials_function2} (gnutls_psk_server_credentials_t @var{cred}, gnutls_psk_server_credentials_function2 @var{func})
+@var{cred}: is a @code{gnutls_psk_server_credentials_t}  type.
+
+@var{func}: is the callback function
+
+This function can be used to set a callback to retrieve the user's PSK credentials.
+The callback's function form is:
+int (*callback)(gnutls_session_t, const gnutls_datum_t* username,
+gnutls_datum_t* key);
+
+This callback function has the same semantics as that of @code{gnutls_psk_set_server_credentials_function()} ,
+but it allows non-string usernames to be used.
 
  @code{username} contains the actual username.
 The  @code{key} must be filled in using the @code{gnutls_malloc()} .
@@ -6198,6 +6313,19 @@ an error code is returned.
 @strong{Since:} 3.1.4
 @end deftypefun
 
+@subheading gnutls_session_get_keylog_function
+@anchor{gnutls_session_get_keylog_function}
+@deftypefun {gnutls_keylog_func} {gnutls_session_get_keylog_function} (const gnutls_session_t @var{session})
+@var{session}: is @code{gnutls_session_t}  type
+
+This function will return the callback function set using
+@code{gnutls_session_set_keylog_function()} .
+
+@strong{Returns:} The function set or @code{NULL}  otherwise.
+
+@strong{Since:} 3.6.13
+@end deftypefun
+
 @subheading gnutls_session_get_master_secret
 @anchor{gnutls_session_get_master_secret}
 @deftypefun {void} {gnutls_session_get_master_secret} (gnutls_session_t @var{session}, gnutls_datum_t * @var{secret})
@@ -6348,6 +6476,19 @@ To set session resumption parameters use @code{gnutls_session_set_data()}  inste
 an error code is returned.
 
 @strong{Since:} 3.2.1
+@end deftypefun
+
+@subheading gnutls_session_set_keylog_function
+@anchor{gnutls_session_set_keylog_function}
+@deftypefun {void} {gnutls_session_set_keylog_function} (gnutls_session_t @var{session}, gnutls_keylog_func @var{func})
+@var{session}: is @code{gnutls_session_t}  type
+
+@var{func}: is the function to be called
+
+This function will set a callback to be called when a new secret is
+derived and installed during handshake.
+
+@strong{Since:} 3.6.13
 @end deftypefun
 
 @subheading gnutls_session_set_premaster

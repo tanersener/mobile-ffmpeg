@@ -163,7 +163,7 @@ do
             libvpx)
                 CFLAGS+=" $(pkg-config --cflags vpx)"
                 LDFLAGS+=" $(pkg-config --libs vpx)"
-                LDFLAGS+=" $(pkg-config --libs --static cpufeatures)"
+                LDFLAGS+=" $(pkg-config --libs cpu_features)"
                 CONFIGURE_POSTFIX+=" --enable-libvpx"
             ;;
             libwebp)
@@ -340,9 +340,6 @@ export LDFLAGS="${LDFLAGS}"
 
 # USE HIGHER LIMITS FOR FFMPEG LINKING
 ulimit -n 2048 1>>${BASEDIR}/build.log 2>&1
-
-# undo workaround for issue #328
-git checkout ${BASEDIR}/src/${LIB_NAME}/libswscale/aarch64/hscale.S 1>>${BASEDIR}/build.log 2>&1
 
 ./configure \
     --cross-prefix="${BUILD_HOST}-" \

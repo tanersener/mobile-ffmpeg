@@ -31,9 +31,7 @@ see https://www.gnu.org/licenses/.  */
 #define __gmpn_set_str mpn_set_str_subquad
 #define __gmpn_bc_set_str mpn_bc_set_str_subquad
 #define __gmpn_dc_set_str mpn_dc_set_str_subquad
-#define __gmpn_set_str_compute_powtab mpn_set_str_compute_powtab_subquad
 
-#include "gmp.h"
 #include "gmp-impl.h"
 
 #undef SET_STR_DC_THRESHOLD

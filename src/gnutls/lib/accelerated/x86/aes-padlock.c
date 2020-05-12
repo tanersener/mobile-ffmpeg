@@ -119,13 +119,14 @@ padlock_aes_cbc_encrypt(void *_ctx, const void *src, size_t src_size,
 {
 	struct padlock_ctx *ctx = _ctx;
 	struct padlock_cipher_data *pce;
+	int ret = 1;
 
 	pce = ALIGN16(&ctx->expanded_key);
 
 	if (src_size > 0)
-		padlock_cbc_encrypt(dst, src, pce, src_size);
+		ret = padlock_cbc_encrypt(dst, src, pce, src_size);
 
-	return 0;
+	return ret ? 0 : GNUTLS_E_ENCRYPTION_FAILED;
 }
 
 
@@ -135,13 +136,14 @@ padlock_aes_cbc_decrypt(void *_ctx, const void *src, size_t src_size,
 {
 	struct padlock_ctx *ctx = _ctx;
 	struct padlock_cipher_data *pcd;
+	int ret = 1;
 
 	pcd = ALIGN16(&ctx->expanded_key);
 
 	if (src_size > 0)
 		padlock_cbc_encrypt(dst, src, pcd, src_size);
 
-	return 0;
+	return ret ? 0 : GNUTLS_E_ENCRYPTION_FAILED;
 }
 
 static void aes_deinit(void *_ctx)

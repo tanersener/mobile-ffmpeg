@@ -36,10 +36,6 @@
 #include <num.h>
 #include <random.h>
 #include <pk.h>
-#include <nettle/pbkdf2.h>
-#if ENABLE_GOST
-#include "../nettle/gost/pbkdf2-gost.h"
-#endif
 
 #define PBES1_DES_MD5_OID "1.2.840.113549.1.5.3"
 
@@ -1112,40 +1108,16 @@ _gnutls_pbes2_string_to_key(unsigned int pass_len, const char *password,
 			    const struct pbkdf2_params *kdf_params,
 			    int key_size, uint8_t *key)
 {
-	int result = 0;
+	gnutls_datum_t _key;
+	gnutls_datum_t salt;
 
-	if (kdf_params->mac == GNUTLS_MAC_SHA1)
-		pbkdf2_hmac_sha1(pass_len, (uint8_t *) password,
-				 kdf_params->iter_count,
-				 kdf_params->salt_size,
-				 kdf_params->salt, key_size, key);
-	else if (kdf_params->mac == GNUTLS_MAC_SHA256)
-		pbkdf2_hmac_sha256(pass_len, (uint8_t *) password,
-				   kdf_params->iter_count,
-				   kdf_params->salt_size,
-				   kdf_params->salt, key_size, key);
-#if ENABLE_GOST
-	else if (kdf_params->mac == GNUTLS_MAC_GOSTR_94)
-		pbkdf2_hmac_gosthash94cp(pass_len, (uint8_t *) password,
-					 kdf_params->iter_count,
-					 kdf_params->salt_size,
-					 kdf_params->salt, key_size, key);
-	else if (kdf_params->mac == GNUTLS_MAC_STREEBOG_256)
-		pbkdf2_hmac_streebog256(pass_len, (uint8_t *) password,
-					kdf_params->iter_count,
-					kdf_params->salt_size,
-					kdf_params->salt, key_size, key);
-	else if (kdf_params->mac == GNUTLS_MAC_STREEBOG_512)
-		pbkdf2_hmac_streebog512(pass_len, (uint8_t *) password,
-					kdf_params->iter_count,
-					kdf_params->salt_size,
-					kdf_params->salt, key_size, key);
-#endif
-	else
-		result =
-		    gnutls_assert_val(GNUTLS_E_UNKNOWN_HASH_ALGORITHM);
+	_key.data = (void *)password;
+	_key.size = pass_len;
+	salt.data = (void *)kdf_params->salt;
+	salt.size = kdf_params->salt_size;
 
-	return result;
+	return gnutls_pbkdf2(kdf_params->mac, &_key, &salt,
+			     kdf_params->iter_count, key, key_size);
 }
 
 int
@@ -1747,7 +1719,7 @@ _gnutls_pkcs_write_schema_params(schema_id schema, ASN1_TYPE pkcs8_asn,
 int
 _gnutls_pkcs_raw_encrypt_data(const gnutls_datum_t * plain,
 			      const struct pbe_enc_params *enc_params,
-			      gnutls_datum_t * key, gnutls_datum_t * encrypted)
+			      const gnutls_datum_t * key, gnutls_datum_t * encrypted)
 {
 	int result;
 	int data_size;

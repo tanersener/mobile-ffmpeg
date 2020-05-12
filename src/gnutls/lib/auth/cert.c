@@ -55,9 +55,13 @@ selected_certs_set(gnutls_session_t session,
 		   gnutls_status_request_ocsp_func ocsp_func,
 		   void *ocsp_func_ptr);
 
-#define MAX_CLIENT_SIGN_ALGOS 3
+#define MAX_CLIENT_SIGN_ALGOS 5
 #define CERTTYPE_SIZE (MAX_CLIENT_SIGN_ALGOS+1)
-typedef enum CertificateSigType { RSA_SIGN = 1, DSA_SIGN = 2, ECDSA_SIGN = 64
+typedef enum CertificateSigType { RSA_SIGN = 1, DSA_SIGN = 2, ECDSA_SIGN = 64,
+#ifdef ENABLE_GOST
+	GOSTR34102012_256_SIGN = 67,
+	GOSTR34102012_512_SIGN = 68
+#endif
 } CertificateSigType;
 
 /* Moves data from an internal certificate struct (gnutls_pcert_st) to
@@ -1017,6 +1021,12 @@ inline static int _gnutls_check_supported_sign_algo(CertificateSigType algo)
 		return GNUTLS_PK_DSA;
 	case ECDSA_SIGN:
 		return GNUTLS_PK_EC;
+#ifdef ENABLE_GOST
+	case GOSTR34102012_256_SIGN:
+		return GNUTLS_PK_GOST_12_256;
+	case GOSTR34102012_512_SIGN:
+		return GNUTLS_PK_GOST_12_512;
+#endif
 	}
 
 	return -1;
@@ -1267,7 +1277,7 @@ _gnutls_gen_cert_server_cert_req(gnutls_session_t session,
 				 gnutls_buffer_st * data)
 {
 	gnutls_certificate_credentials_t cred;
-	int ret;
+	int ret, i;
 	uint8_t tmp_data[CERTTYPE_SIZE];
 	const version_entry_st *ver = get_version(session);
 	unsigned init_pos = data->length;
@@ -1287,12 +1297,21 @@ _gnutls_gen_cert_server_cert_req(gnutls_session_t session,
 		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 
-	tmp_data[0] = CERTTYPE_SIZE - 1;
-	tmp_data[1] = RSA_SIGN;
-	tmp_data[2] = DSA_SIGN;
-	tmp_data[3] = ECDSA_SIGN;	/* only these for now */
+	i = 1;
+#ifdef ENABLE_GOST
+	if (_gnutls_kx_is_vko_gost(session->security_parameters.cs->kx_algorithm)) {
+		tmp_data[i++] = GOSTR34102012_256_SIGN;
+		tmp_data[i++] = GOSTR34102012_512_SIGN;
+	} else
+#endif
+	{
+		tmp_data[i++] = RSA_SIGN;
+		tmp_data[i++] = DSA_SIGN;
+		tmp_data[i++] = ECDSA_SIGN;
+	}
+	tmp_data[0] = i - 1;
 
-	ret = _gnutls_buffer_append_data(data, tmp_data, CERTTYPE_SIZE);
+	ret = _gnutls_buffer_append_data(data, tmp_data, i);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -1497,7 +1516,7 @@ int cert_select_sign_algorithm(gnutls_session_t session,
 		return 0;
 	}
 
-	algo = _gnutls_session_get_sign_algo(session, cert, pkey, 0);
+	algo = _gnutls_session_get_sign_algo(session, cert, pkey, 0, cs->kx_algorithm);
 	if (algo == GNUTLS_SIGN_UNKNOWN)
 		return gnutls_assert_val(GNUTLS_E_INCOMPATIBLE_SIG_WITH_KEY);
 

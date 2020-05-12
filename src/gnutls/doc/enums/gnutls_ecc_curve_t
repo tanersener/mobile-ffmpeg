@@ -42,6 +42,10 @@ GOST R 34.10 TC26 256 B curve
 GOST R 34.10 TC26 256 C curve
 @item GNUTLS_@-ECC_@-CURVE_@-GOST256D
 GOST R 34.10 TC26 256 D curve
+@item GNUTLS_@-ECC_@-CURVE_@-X448
+the X448 curve (ECDH only)
+@item GNUTLS_@-ECC_@-CURVE_@-ED448
+the Ed448 curve
 @item GNUTLS_@-ECC_@-CURVE_@-MAX
 -- undescribed --
 @end table

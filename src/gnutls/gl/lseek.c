@@ -1,17 +1,17 @@
 /* An lseek() function that detects pipes.
-   Copyright (C) 2007, 2009-2019 Free Software Foundation, Inc.
+   Copyright (C) 2007, 2009-2020 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3, or (at your option)
+   it under the terms of the GNU Lesser General Public License as published by
+   the Free Software Foundation; either version 2.1, or (at your option)
    any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public License along
+   You should have received a copy of the GNU Lesser General Public License along
    with this program; if not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
@@ -63,7 +63,7 @@ rpl_lseek (int fd, off_t offset, int whence)
       return -1;
     }
 #endif
-#if _GL_WINDOWS_64_BIT_OFF_T
+#if _GL_WINDOWS_64_BIT_OFF_T || (defined __MINGW32__ && defined _FILE_OFFSET_BITS && (_FILE_OFFSET_BITS == 64))
   return _lseeki64 (fd, offset, whence);
 #else
   return lseek (fd, offset, whence);

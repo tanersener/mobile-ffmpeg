@@ -32,7 +32,6 @@ see https://www.gnu.org/licenses/.  */
 
 #include <string.h>
 
-#include "gmp.h"
 #include "gmp-impl.h"
 
 
@@ -48,7 +47,7 @@ gmp_vsscanf (const char *s, const char *fmt, va_list ap)
   char   *alloc;
   int    ret;
   size = strlen (s) + 1;
-  alloc = (char *) (*__gmp_allocate_func) (size);
+  alloc = __GMP_ALLOCATE_FUNC_TYPE (size, char);
   memcpy (alloc, s, size);
   s = alloc;
   ret = __gmp_doscan (&__gmp_sscanf_funs, (void *) &s, fmt, ap);

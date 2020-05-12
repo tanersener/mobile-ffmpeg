@@ -2,7 +2,7 @@
 
 
 
-@deftypefun {int} {gnutls_ocsp_req_print} (gnutls_ocsp_req_t @var{req}, gnutls_ocsp_print_formats_t @var{format}, gnutls_datum_t * @var{out})
+@deftypefun {int} {gnutls_ocsp_req_print} (gnutls_ocsp_req_const_t @var{req}, gnutls_ocsp_print_formats_t @var{format}, gnutls_datum_t * @var{out})
 @var{req}: The data to be printed
 
 @var{format}: Indicate the format to use

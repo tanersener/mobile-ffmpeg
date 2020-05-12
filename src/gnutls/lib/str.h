@@ -70,6 +70,13 @@ inline static unsigned _gnutls_dnsname_is_valid(const char *str, unsigned size)
 	return 1;
 }
 
+inline static bool _gnutls_has_embedded_null(const char *str, unsigned size)
+{
+	if (strlen(str) != size)
+		return true;
+	return false;
+}
+
 void _gnutls_str_cpy(char *dest, size_t dest_tot_size, const char *src);
 void _gnutls_str_cat(char *dest, size_t dest_tot_size, const char *src);
 

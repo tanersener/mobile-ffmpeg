@@ -1,10 +1,10 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<!-- This manual is last updated 27 June 2019 for version
-3.6.11 of GnuTLS.
+<!-- This manual is last updated 2 January 2020 for version
+3.6.13 of GnuTLS.
 
-Copyright (C) 2001-2019 Free Software Foundation, Inc.\\
-Copyright (C) 2001-2019 Nikos Mavrogiannopoulos
+Copyright (C) 2001-2020 Free Software Foundation, Inc.\\
+Copyright (C) 2001-2020 Nikos Mavrogiannopoulos
 
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.3 or
@@ -12,19 +12,20 @@ any later version published by the Free Software Foundation; with no
 Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
 copy of the license is included in the section entitled "GNU Free
 Documentation License". -->
-<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
+<!-- Created by GNU Texinfo 6.6, http://www.gnu.org/software/texinfo/ -->
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<title>GnuTLS 3.6.11</title>
+<title>GnuTLS 3.6.13</title>
 
-<meta name="description" content="GnuTLS 3.6.11">
-<meta name="keywords" content="GnuTLS 3.6.11">
+<meta name="description" content="GnuTLS 3.6.13">
+<meta name="keywords" content="GnuTLS 3.6.13">
 <meta name="resource-type" content="document">
 <meta name="distribution" content="global">
 <meta name="Generator" content="makeinfo">
 <link href="#Top" rel="start" title="Top">
 <link href="#Function-and-Data-Index" rel="index" title="Function and Data Index">
 <link href="#SEC_Contents" rel="contents" title="Table of Contents">
+<link href="dir.html#Top" rel="up" title="(dir)">
 <style type="text/css">
 <!--
 a.summary-letter {text-decoration: none}
@@ -143,7 +144,7 @@ dl {
 </head>
 
 <body lang="en">
-<h1 class="settitle" align="center">GnuTLS 3.6.11</h1>
+<h1 class="settitle" align="center">GnuTLS 3.6.13</h1>
 
 
 
@@ -431,6 +432,7 @@ dl {
     </ul></li>
     <li><a id="toc-Querying-for-disabled-algorithms-and-protocols-1" href="#Querying-for-disabled-algorithms-and-protocols">8.3 Querying for disabled algorithms and protocols</a></li>
     <li><a id="toc-Overriding-the-parameter-verification-profile-1" href="#Overriding-the-parameter-verification-profile">8.4 Overriding the parameter verification profile</a></li>
+    <li><a id="toc-Overriding-the-default-priority-string-1" href="#Overriding-the-default-priority-string">8.5 Overriding the default priority string</a></li>
   </ul></li>
   <li><a id="toc-Using-GnuTLS-as-a-cryptographic-library-1" href="#Using-GnuTLS-as-a-cryptographic-library">9 Using GnuTLS as a cryptographic library</a>
   <ul class="no-bullet">
@@ -489,23 +491,23 @@ dl {
   </ul></li>
   <li><a id="toc-Copying-Information-1" href="#Copying-Information">Appendix F Copying Information</a></li>
   <li><a id="toc-Bibliography-1" href="#Bibliography">Bibliography</a></li>
-  <li><a id="toc-Function-and-Data-Index-1" href="#Function-and-Data-Index" rel="index">Function and Data Index</a></li>
-  <li><a id="toc-Concept-Index-1" href="#Concept-Index" rel="index">Concept Index</a></li>
+  <li><a id="toc-Function-and-Data-Index-1" href="#Function-and-Data-Index">Function and Data Index</a></li>
+  <li><a id="toc-Concept-Index-1" href="#Concept-Index">Concept Index</a></li>
 </ul>
 </div>
 
 
 <span id="Top"></span><div class="header">
 <p>
-Next: <a href="#Preface" accesskey="n" rel="next">Preface</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Function-and-Data-Index" title="Index" rel="index">Index</a>]</p>
+Next: <a href="#Preface" accesskey="n" rel="next">Preface</a>, Up: <a href="dir.html#Top" accesskey="u" rel="up">(dir)</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Function-and-Data-Index" title="Index" rel="index">Index</a>]</p>
 </div>
 <span id="GnuTLS"></span><h1 class="top">GnuTLS</h1>
 
-<p>This manual is last updated 27 June 2019 for version
-3.6.11 of GnuTLS.
+<p>This manual is last updated 2 January 2020 for version
+3.6.13 of GnuTLS.
 </p>
-<p>Copyright &copy; 2001-2019 Free Software Foundation, Inc.\\
-Copyright &copy; 2001-2019 Nikos Mavrogiannopoulos
+<p>Copyright &copy; 2001-2020 Free Software Foundation, Inc.\\
+Copyright &copy; 2001-2020 Nikos Mavrogiannopoulos
 </p>
 <blockquote>
 <p>Permission is granted to copy, distribute and/or modify this document
@@ -553,9 +555,9 @@ Documentation License&rdquo;.
 </td></tr>
 <tr><td align="left" valign="top">&bull; <a href="#Bibliography">Bibliography</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
 </td></tr>
-<tr><td align="left" valign="top">&bull; <a href="#Function-and-Data-Index" rel="index">Function and Data Index</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+<tr><td align="left" valign="top">&bull; <a href="#Function-and-Data-Index">Function and Data Index</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
 </td></tr>
-<tr><td align="left" valign="top">&bull; <a href="#Concept-Index" rel="index">Concept Index</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+<tr><td align="left" valign="top">&bull; <a href="#Concept-Index">Concept Index</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
 </td></tr>
 </table>
 
@@ -928,6 +930,8 @@ encryption (EDE). Has 64 bits block size and is used in CBC mode.</td></tr>
 <tr><td width="20%">ARCFOUR-128</td><td width="10%">Legacy (stream)</td><td width="15%">TLS 1.0, TLS 1.1, TLS 1.2</td><td width="55%">ARCFOUR-128 is a compatible algorithm with RSA&rsquo;s RC4 algorithm, which is considered to be a trade
 secret. It is a considered to be broken, and is only used for compatibility
 purposed. For this reason it is not enabled by default.</td></tr>
+<tr><td width="20%">GOST28147-TC26Z-CNT</td><td width="10%">Legacy (stream)</td><td width="15%">TLS 1.2</td><td width="55%">This is a 64-bit block cipher GOST 28147-89 with TC26Z S-Box working in CNT
+mode. It is one of the approved ciphers in Russia. It is not enabled by default.</td></tr>
 <tr><td width="20%">NULL</td><td width="10%">Legacy (stream)</td><td width="15%">TLS 1.0, TLS 1.1, TLS 1.2</td><td width="55%">NULL is the empty/identity cipher which doesn&rsquo;t encrypt any data. It can be
 combined with data authentication under TLS 1.2 or earlier, but is only used
 transiently under TLS 1.3 until encryption starts. This cipher cannot be negotiated
@@ -947,6 +951,9 @@ by Ron Rivest. Outputs 128 bits of data.</td></tr>
 designed by NSA. Outputs 160 bits of data.</td></tr>
 <tr><td width="20%">MAC-SHA256</td><td width="70%">An HMAC based on SHA2-256. Outputs 256 bits of data.</td></tr>
 <tr><td width="20%">MAC-SHA384</td><td width="70%">An HMAC based on SHA2-384. Outputs 384 bits of data.</td></tr>
+<tr><td width="20%">GOST28147-TC26Z-IMIT</td><td width="70%">This is a 64-bit block cipher GOST 28147-89 with TC26Z S-Box working in special
+MAC mode called Imitovstavks. It is one of the approved MAC algorithms in
+Russia. Outputs 32 bits of data. It is not enabled by default.</td></tr>
 <tr><td width="20%">MAC-AEAD</td><td width="70%">This indicates that an authenticated encryption algorithm, such as
 GCM, is in use.</td></tr>
 </table>
@@ -3635,8 +3642,8 @@ requests are the following.
 <dt><code><var>int</var> <a href="#gnutls_005focsp_005freq_005finit">gnutls_ocsp_req_init</a> (gnutls_ocsp_req_t * <var>req</var>)</code></dt>
 <dt><code><var>void</var> <a href="#gnutls_005focsp_005freq_005fdeinit">gnutls_ocsp_req_deinit</a> (gnutls_ocsp_req_t <var>req</var>)</code></dt>
 <dt><code><var>int</var> <a href="#gnutls_005focsp_005freq_005fimport">gnutls_ocsp_req_import</a> (gnutls_ocsp_req_t <var>req</var>, const gnutls_datum_t * <var>data</var>)</code></dt>
-<dt><code><var>int</var> <a href="#gnutls_005focsp_005freq_005fexport">gnutls_ocsp_req_export</a> (gnutls_ocsp_req_t <var>req</var>, gnutls_datum_t * <var>data</var>)</code></dt>
-<dt><code><var>int</var> <a href="#gnutls_005focsp_005freq_005fprint">gnutls_ocsp_req_print</a> (gnutls_ocsp_req_t <var>req</var>, gnutls_ocsp_print_formats_t <var>format</var>, gnutls_datum_t * <var>out</var>)</code></dt>
+<dt><code><var>int</var> <a href="#gnutls_005focsp_005freq_005fexport">gnutls_ocsp_req_export</a> (gnutls_ocsp_req_const_t <var>req</var>, gnutls_datum_t * <var>data</var>)</code></dt>
+<dt><code><var>int</var> <a href="#gnutls_005focsp_005freq_005fprint">gnutls_ocsp_req_print</a> (gnutls_ocsp_req_const_t <var>req</var>, gnutls_ocsp_print_formats_t <var>format</var>, gnutls_datum_t * <var>out</var>)</code></dt>
 </dl>
 
 <p>To generate an OCSP request the issuer name hash, issuer key hash, and 
@@ -3652,7 +3659,7 @@ request.
 <dl compact="compact">
 <dt><code><var>int</var> <a href="#gnutls_005focsp_005freq_005fadd_005fcert_005fid">gnutls_ocsp_req_add_cert_id</a> (gnutls_ocsp_req_t <var>req</var>, gnutls_digest_algorithm_t <var>digest</var>, const gnutls_datum_t * <var>issuer_name_hash</var>, const gnutls_datum_t * <var>issuer_key_hash</var>, const gnutls_datum_t * <var>serial_number</var>)</code></dt>
 <dt><code><var>int</var> <a href="#gnutls_005focsp_005freq_005fadd_005fcert">gnutls_ocsp_req_add_cert</a> (gnutls_ocsp_req_t <var>req</var>, gnutls_digest_algorithm_t <var>digest</var>, gnutls_x509_crt_t <var>issuer</var>, gnutls_x509_crt_t <var>cert</var>)</code></dt>
-<dt><code><var>int</var> <a href="#gnutls_005focsp_005freq_005fget_005fcert_005fid">gnutls_ocsp_req_get_cert_id</a> (gnutls_ocsp_req_t <var>req</var>, unsigned <var>indx</var>, gnutls_digest_algorithm_t * <var>digest</var>, gnutls_datum_t * <var>issuer_name_hash</var>, gnutls_datum_t * <var>issuer_key_hash</var>, gnutls_datum_t * <var>serial_number</var>)</code></dt>
+<dt><code><var>int</var> <a href="#gnutls_005focsp_005freq_005fget_005fcert_005fid">gnutls_ocsp_req_get_cert_id</a> (gnutls_ocsp_req_const_t <var>req</var>, unsigned <var>indx</var>, gnutls_digest_algorithm_t * <var>digest</var>, gnutls_datum_t * <var>issuer_name_hash</var>, gnutls_datum_t * <var>issuer_key_hash</var>, gnutls_datum_t * <var>serial_number</var>)</code></dt>
 </dl>
 
 <p>Each OCSP request may contain a number of extensions.  Extensions are
@@ -3661,7 +3668,7 @@ whose syntax and semantics is implied by the OID. You can extract or
 set those extensions using the following functions.
 </p>
 <dl compact="compact">
-<dt><code><var>int</var> <a href="#gnutls_005focsp_005freq_005fget_005fextension">gnutls_ocsp_req_get_extension</a> (gnutls_ocsp_req_t <var>req</var>, unsigned <var>indx</var>, gnutls_datum_t * <var>oid</var>, unsigned int * <var>critical</var>, gnutls_datum_t * <var>data</var>)</code></dt>
+<dt><code><var>int</var> <a href="#gnutls_005focsp_005freq_005fget_005fextension">gnutls_ocsp_req_get_extension</a> (gnutls_ocsp_req_const_t <var>req</var>, unsigned <var>indx</var>, gnutls_datum_t * <var>oid</var>, unsigned int * <var>critical</var>, gnutls_datum_t * <var>data</var>)</code></dt>
 <dt><code><var>int</var> <a href="#gnutls_005focsp_005freq_005fset_005fextension">gnutls_ocsp_req_set_extension</a> (gnutls_ocsp_req_t <var>req</var>, const char * <var>oid</var>, unsigned int <var>critical</var>, const gnutls_datum_t * <var>data</var>)</code></dt>
 </dl>
 
@@ -3672,7 +3679,7 @@ that is intended to be sufficiently random and unique so that an
 attacker will not be able to give a stale response for the same nonce.
 </p>
 <dl compact="compact">
-<dt><code><var>int</var> <a href="#gnutls_005focsp_005freq_005fget_005fnonce">gnutls_ocsp_req_get_nonce</a> (gnutls_ocsp_req_t <var>req</var>, unsigned int * <var>critical</var>, gnutls_datum_t * <var>nonce</var>)</code></dt>
+<dt><code><var>int</var> <a href="#gnutls_005focsp_005freq_005fget_005fnonce">gnutls_ocsp_req_get_nonce</a> (gnutls_ocsp_req_const_t <var>req</var>, unsigned int * <var>critical</var>, gnutls_datum_t * <var>nonce</var>)</code></dt>
 <dt><code><var>int</var> <a href="#gnutls_005focsp_005freq_005fset_005fnonce">gnutls_ocsp_req_set_nonce</a> (gnutls_ocsp_req_t <var>req</var>, unsigned int <var>critical</var>, const gnutls_datum_t * <var>nonce</var>)</code></dt>
 <dt><code><var>int</var> <a href="#gnutls_005focsp_005freq_005frandomize_005fnonce">gnutls_ocsp_req_randomize_nonce</a> (gnutls_ocsp_req_t <var>req</var>)</code></dt>
 </dl>
@@ -3705,8 +3712,8 @@ and deallocating OCSP responses.
 <dt><code><var>int</var> <a href="#gnutls_005focsp_005fresp_005finit">gnutls_ocsp_resp_init</a> (gnutls_ocsp_resp_t * <var>resp</var>)</code></dt>
 <dt><code><var>void</var> <a href="#gnutls_005focsp_005fresp_005fdeinit">gnutls_ocsp_resp_deinit</a> (gnutls_ocsp_resp_t <var>resp</var>)</code></dt>
 <dt><code><var>int</var> <a href="#gnutls_005focsp_005fresp_005fimport">gnutls_ocsp_resp_import</a> (gnutls_ocsp_resp_t <var>resp</var>, const gnutls_datum_t * <var>data</var>)</code></dt>
-<dt><code><var>int</var> <a href="#gnutls_005focsp_005fresp_005fexport">gnutls_ocsp_resp_export</a> (gnutls_ocsp_resp_t <var>resp</var>, gnutls_datum_t * <var>data</var>)</code></dt>
-<dt><code><var>int</var> <a href="#gnutls_005focsp_005fresp_005fprint">gnutls_ocsp_resp_print</a> (gnutls_ocsp_resp_t <var>resp</var>, gnutls_ocsp_print_formats_t <var>format</var>, gnutls_datum_t * <var>out</var>)</code></dt>
+<dt><code><var>int</var> <a href="#gnutls_005focsp_005fresp_005fexport">gnutls_ocsp_resp_export</a> (gnutls_ocsp_resp_const_t <var>resp</var>, gnutls_datum_t * <var>data</var>)</code></dt>
+<dt><code><var>int</var> <a href="#gnutls_005focsp_005fresp_005fprint">gnutls_ocsp_resp_print</a> (gnutls_ocsp_resp_const_t <var>resp</var>, gnutls_ocsp_print_formats_t <var>format</var>, gnutls_datum_t * <var>out</var>)</code></dt>
 </dl>
 
 <p>The utility function that extracts the revocation as well as other information
@@ -3717,7 +3724,7 @@ from a response is shown below.
 
 
 <dl>
-<dt id="index-gnutls_005focsp_005fresp_005fget_005fsingle">Function: <em>int</em> <strong>gnutls_ocsp_resp_get_single</strong> <em>(gnutls_ocsp_resp_t <var>resp</var>, unsigned <var>indx</var>, gnutls_digest_algorithm_t * <var>digest</var>, gnutls_datum_t * <var>issuer_name_hash</var>, gnutls_datum_t * <var>issuer_key_hash</var>, gnutls_datum_t * <var>serial_number</var>, unsigned int * <var>cert_status</var>, time_t * <var>this_update</var>, time_t * <var>next_update</var>, time_t * <var>revocation_time</var>, unsigned int * <var>revocation_reason</var>)</em></dt>
+<dt id="index-gnutls_005focsp_005fresp_005fget_005fsingle">Function: <em>int</em> <strong>gnutls_ocsp_resp_get_single</strong> <em>(gnutls_ocsp_resp_const_t <var>resp</var>, unsigned <var>indx</var>, gnutls_digest_algorithm_t * <var>digest</var>, gnutls_datum_t * <var>issuer_name_hash</var>, gnutls_datum_t * <var>issuer_key_hash</var>, gnutls_datum_t * <var>serial_number</var>, unsigned int * <var>cert_status</var>, time_t * <var>this_update</var>, time_t * <var>next_update</var>, time_t * <var>revocation_time</var>, unsigned int * <var>revocation_reason</var>)</em></dt>
 <dd><p><var>resp</var>: should contain a <code>gnutls_ocsp_resp_t</code>  type
 </p>
 <p><var>indx</var>: Specifies response number to get. Use (0) to get the first one.
@@ -3799,9 +3806,9 @@ anchors before it can be relied upon. It is also important to check
 whether the received OCSP response corresponds to the certificate being checked.
 </p>
 <dl compact="compact">
-<dt><code><var>int</var> <a href="#gnutls_005focsp_005fresp_005fverify">gnutls_ocsp_resp_verify</a> (gnutls_ocsp_resp_t <var>resp</var>, gnutls_x509_trust_list_t <var>trustlist</var>, unsigned int * <var>verify</var>, unsigned int <var>flags</var>)</code></dt>
-<dt><code><var>int</var> <a href="#gnutls_005focsp_005fresp_005fverify_005fdirect">gnutls_ocsp_resp_verify_direct</a> (gnutls_ocsp_resp_t <var>resp</var>, gnutls_x509_crt_t <var>issuer</var>, unsigned int * <var>verify</var>, unsigned int <var>flags</var>)</code></dt>
-<dt><code><var>int</var> <a href="#gnutls_005focsp_005fresp_005fcheck_005fcrt">gnutls_ocsp_resp_check_crt</a> (gnutls_ocsp_resp_t <var>resp</var>, unsigned int <var>indx</var>, gnutls_x509_crt_t <var>crt</var>)</code></dt>
+<dt><code><var>int</var> <a href="#gnutls_005focsp_005fresp_005fverify">gnutls_ocsp_resp_verify</a> (gnutls_ocsp_resp_const_t <var>resp</var>, gnutls_x509_trust_list_t <var>trustlist</var>, unsigned int * <var>verify</var>, unsigned int <var>flags</var>)</code></dt>
+<dt><code><var>int</var> <a href="#gnutls_005focsp_005fresp_005fverify_005fdirect">gnutls_ocsp_resp_verify_direct</a> (gnutls_ocsp_resp_const_t <var>resp</var>, gnutls_x509_crt_t <var>issuer</var>, unsigned int * <var>verify</var>, unsigned int <var>flags</var>)</code></dt>
+<dt><code><var>int</var> <a href="#gnutls_005focsp_005fresp_005fcheck_005fcrt">gnutls_ocsp_resp_check_crt</a> (gnutls_ocsp_resp_const_t <var>resp</var>, unsigned int <var>indx</var>, gnutls_x509_crt_t <var>crt</var>)</code></dt>
 </dl>
 
 <hr>
@@ -3844,7 +3851,7 @@ application to retrieve the OCSP responses as sent by the server.
 <dl compact="compact">
 <dt><code><var>void</var> <a href="#gnutls_005fcertificate_005fset_005fretrieve_005ffunction3">gnutls_certificate_set_retrieve_function3</a> (gnutls_certificate_credentials_t <var>cred</var>, gnutls_certificate_retrieve_function3 * <var>func</var>)</code></dt>
 <dt><code><var>int</var> <a href="#gnutls_005fcertificate_005fset_005focsp_005fstatus_005frequest_005ffile2">gnutls_certificate_set_ocsp_status_request_file2</a> (gnutls_certificate_credentials_t <var>sc</var>, const char * <var>response_file</var>, unsigned <var>idx</var>, gnutls_x509_crt_fmt_t <var>fmt</var>)</code></dt>
-<dt><code><var>int</var> <a href="#gnutls_005focsp_005fstatus_005frequest_005fis_005fchecked">gnutls_ocsp_status_request_is_checked</a> (gnutls_session_t <var>session</var>, unsigned int <var>flags</var>)</code></dt>
+<dt><code><var>unsigned</var> <a href="#gnutls_005focsp_005fstatus_005frequest_005fis_005fchecked">gnutls_ocsp_status_request_is_checked</a> (gnutls_session_t <var>session</var>, unsigned int <var>flags</var>)</code></dt>
 </dl>
 
 <p>A server is expected to provide the relevant certificate&rsquo;s OCSP responses using
@@ -4313,6 +4320,7 @@ Certificate verification related options:
                                 - prohibits the option 'verify-hostname'
        --verify-purpose=str   Specify a purpose OID to be used for certificate chain verification
        --verify-allow-broken  Allow broken algorithms, such as MD5 for verification
+       --verify-profile=str   Specify a security level profile to be used for verification
 
 PKCS#7 structure options:
 
@@ -4468,7 +4476,7 @@ option is also acceptable.
 <p>This is the &ldquo;specify the key type to use on key generation&rdquo; option.
 This option takes a string argument.
 This option can be combined with &ndash;generate-privkey, to specify
-the key type to be generated. Valid options are, &rsquo;rsa&rsquo;, &rsquo;rsa-pss&rsquo;, &rsquo;dsa&rsquo;, &rsquo;ecdsa&rsquo;, and &rsquo;ed25519&rsquo;.
+the key type to be generated. Valid options are, &rsquo;rsa&rsquo;, &rsquo;rsa-pss&rsquo;, &rsquo;dsa&rsquo;, &rsquo;ecdsa&rsquo;, &rsquo;ed25519, and &rsquo;ed448&rsquo;.&rsquo;.
 When combined with certificate generation it can be used to specify an
 RSA-PSS certificate when an RSA key is given.
 </p><span id="curve-option_002e"></span><h4 class="subsubheading">curve option.</h4>
@@ -4567,6 +4575,15 @@ This object identifier restricts the purpose of the certificates to be verified.
 <span id="certtool-verify_002dallow_002dbroken"></span>
 <p>This is the &ldquo;allow broken algorithms, such as md5 for verification&rdquo; option.
 This can be combined with &ndash;p7-verify, &ndash;verify or &ndash;verify-chain.
+</p><span id="verify_002dprofile-option_002e"></span><h4 class="subsubheading">verify-profile option.</h4>
+<span id="certtool-verify_002dprofile"></span>
+<p>This is the &ldquo;specify a security level profile to be used for verification&rdquo; option.
+This option takes a string argument.
+This option can be used to specify a certificate verification profile. Certificate
+    verification profiles correspond to the security level. This should be one of
+    &rsquo;none&rsquo;, &rsquo;very weak&rsquo;, &rsquo;low&rsquo;, &rsquo;legacy&rsquo;, &rsquo;medium&rsquo;, &rsquo;high&rsquo;, &rsquo;ultra&rsquo;,
+    &rsquo;future&rsquo;. Note that by default no profile is applied, unless one is set
+    as minimum in the gnutls configuration file.
 <span id="certtool-pkcs7_002doptions"></span></p><span id="pkcs7_002doptions-options"></span><h4 class="subsubheading">pkcs7-options options</h4>
 <p>PKCS#7 structure options.
 </p><span id="p7_002dgenerate-option_002e"></span><h4 class="subsubheading">p7-generate option.</h4>
@@ -9138,8 +9155,10 @@ Next: <a href="#Version-check" accesskey="n" rel="next">Version check</a>, Previ
 </div>
 <span id="Initialization-2"></span><h4 class="subsection">6.2.2 Initialization</h4>
 
-<p>The GnuTLS library is initialized on load; prior to 3.3.0 was initialized by calling <a href="#gnutls_005fglobal_005finit">gnutls_global_init</a><a id="DOCF18" href="#FOOT18"><sup>18</sup></a>. 
-The initialization typically enables CPU-specific acceleration, performs any required
+<p>The GnuTLS library is initialized on load; prior to 3.3.0 was initialized by calling <a href="#gnutls_005fglobal_005finit">gnutls_global_init</a><a id="DOCF18" href="#FOOT18"><sup>18</sup></a>. <a href="#gnutls_005fglobal_005finit">gnutls_global_init</a> in
+versions after 3.3.0 is thread-safe (see <a href="#Thread-safety">Thread safety</a>).
+</p>
+<p>The initialization typically enables CPU-specific acceleration, performs any required
 precalculations needed, opens any required system devices (e.g., /dev/urandom on Linux)
 and initializes subsystems that could be used later.
 </p>
@@ -11327,16 +11346,19 @@ characters.
 <div class="float"><span id="tab_003aprio_002dalgorithms"></span>
 <table>
 <thead><tr><th width="20%">Type</th><th width="70%">Keywords</th></tr></thead>
-<tr><td width="20%">Ciphers</td><td width="70%">Examples are AES-128-GCM, AES-256-GCM, AES-256-CBC; see also
+<tr><td width="20%">Ciphers</td><td width="70%">Examples are AES-128-GCM, AES-256-GCM, AES-256-CBC, GOST28147-TC26Z-CNT; see also
 <a href="#tab_003aciphers">Table 3.1</a> for more options. Catch all name is CIPHER-ALL which will add
-all the algorithms from NORMAL priority.</td></tr>
+all the algorithms from NORMAL priority. The shortcut for secure GOST
+algorithms is CIPHER-GOST-ALL.</td></tr>
 <tr><td width="20%">Key exchange</td><td width="70%">RSA, DHE-RSA, DHE-DSS, SRP, SRP-RSA, SRP-DSS,
-PSK, DHE-PSK, ECDHE-PSK, ECDHE-RSA, ECDHE-ECDSA, ANON-ECDH, ANON-DH. The
+PSK, DHE-PSK, ECDHE-PSK, ECDHE-RSA, ECDHE-ECDSA, VKO-GOST-12, ANON-ECDH, ANON-DH.
 Catch all name is KX-ALL which will add all the algorithms from NORMAL
 priority. Under TLS1.3, the DHE-PSK and ECDHE-PSK strings are equivalent
-and instruct for a Diffie-Hellman key exchange using the enabled groups.</td></tr>
-<tr><td width="20%">MAC</td><td width="70%">MD5, SHA1, SHA256, SHA384, AEAD (used with
-GCM ciphers only). All algorithms from NORMAL priority can be accessed with MAC-ALL.</td></tr>
+and instruct for a Diffie-Hellman key exchange using the enabled groups. The
+shortcut for secure GOST algorithms is KX-GOST-ALL.</td></tr>
+<tr><td width="20%">MAC</td><td width="70%">MD5, SHA1, SHA256, SHA384, GOST28147-TC26Z-IMIT, AEAD (used with
+GCM ciphers only). All algorithms from NORMAL priority can be accessed with
+MAC-ALL. The shortcut for secure GOST algorithms is MAC-GOST-ALL.</td></tr>
 <tr><td width="20%">Compression algorithms</td><td width="70%">COMP-NULL, COMP-DEFLATE. Catch all is COMP-ALL.</td></tr>
 <tr><td width="20%">TLS versions</td><td width="70%">VERS-TLS1.0, VERS-TLS1.1, VERS-TLS1.2, VERS-TLS1.3,
 VERS-DTLS1.0, VERS-DTLS1.2. 
@@ -11347,19 +11369,21 @@ versions you can use VERS-TLS-ALL and VERS-DTLS-ALL.</td></tr>
 SIGN-RSA-SHA256, SIGN-RSA-SHA384, SIGN-RSA-SHA512, SIGN-DSA-SHA1,
 SIGN-DSA-SHA224, SIGN-DSA-SHA256, SIGN-RSA-MD5, SIGN-ECDSA-SHA1,
 SIGN-ECDSA-SHA224, SIGN-ECDSA-SHA256, SIGN-ECDSA-SHA384, SIGN-ECDSA-SHA512,
-SIGN-RSA-PSS-SHA256, SIGN-RSA-PSS-SHA384, SIGN-RSA-PSS-SHA512.
+SIGN-RSA-PSS-SHA256, SIGN-RSA-PSS-SHA384, SIGN-RSA-PSS-SHA512,
+SIGN-GOSTR341001, SIGN-GOSTR341012-256, SIGN-GOSTR341012-512.
 Catch all which enables all algorithms from NORMAL priority is SIGN-ALL.
+Shortcut which enables secure GOST algorithms is SIGN-GOST-ALL.
 This option is only considered for TLS 1.2 and later.</td></tr>
-<tr><td width="20%">Groups</td><td width="70%">GROUP-SECP256R1, GROUP-SECP384R1, GROUP-SECP521R1, GROUP-X25519,
+<tr><td width="20%">Groups</td><td width="70%">GROUP-SECP256R1, GROUP-SECP384R1, GROUP-SECP521R1, GROUP-X25519, GROUP-X448,
 GROUP-FFDHE2048, GROUP-FFDHE3072, GROUP-FFDHE4096, GROUP-FFDHE6144, and
 GROUP-FFDHE8192.
 Groups include both elliptic curve groups, e.g., SECP256R1, as well as 
 finite field groups such as FFDHE2048. Catch all which enables all groups
-from NORMAL priority is GROUP-ALL. The helper keywords GROUP-DH-ALL and
-GROUP-EC-ALL are also available, restricting the groups to finite fields
-(DH) and elliptic curves.</td></tr>
+from NORMAL priority is GROUP-ALL. The helper keywords GROUP-DH-ALL,
+GROUP-GOST-ALL and GROUP-EC-ALL are also available, restricting the groups
+to finite fields (DH), GOST curves and generic elliptic curves.</td></tr>
 <tr><td width="20%">Elliptic curves (legacy)</td><td width="70%">CURVE-SECP192R1, CURVE-SECP224R1, CURVE-SECP256R1, CURVE-SECP384R1,
-CURVE-SECP521R1, and CURVE-X25519.
+CURVE-SECP521R1, CURVE-X25519, and CURVE-X448.
 Catch all which enables all curves from NORMAL priority is CURVE-ALL. Note
 that the CURVE keyword is kept for backwards compatibility only, for new
 applications see the GROUP keyword above.</td></tr>
@@ -11374,6 +11398,9 @@ CTYPE-CLI-RAWPK, CTYPE-SRV-RAWPK can be used to specialize on client or server;
 catch all is CTYPE-CLI-ALL and CTYPE-SRV-ALL. The type &rsquo;X509&rsquo; is aliased to &rsquo;X.509&rsquo;
 for legacy reasons.
 </p></td></tr>
+<tr><td width="20%">Generic</td><td width="70%">The keyword GOST is a shortcut for secure GOST algorithms (MACs, ciphers,
+KXes, groups and signatures). For example the following string will enable all
+TLS 1.2 GOST ciphersuites: &rsquo;NONE:+VERS-TLS1.2:+GOST&rsquo;.</td></tr>
 </table>
 
 <div class="float-caption"><p><strong>Table 6.4: </strong>The supported algorithm keywords in priority strings.</p></div></div>
@@ -16882,6 +16909,8 @@ until the library is unloaded.
 </td></tr>
 <tr><td align="left" valign="top">&bull; <a href="#Overriding-the-parameter-verification-profile" accesskey="4">Overriding the parameter verification profile</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
 </td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#Overriding-the-default-priority-string" accesskey="5">Overriding the default priority string</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
 </table>
 
 <hr>
@@ -17015,7 +17044,7 @@ lists provided by the following functions.
 <hr>
 <span id="Overriding-the-parameter-verification-profile"></span><div class="header">
 <p>
-Previous: <a href="#Querying-for-disabled-algorithms-and-protocols" accesskey="p" rel="prev">Querying for disabled algorithms and protocols</a>, Up: <a href="#System_002dwide-configuration-of-the-library" accesskey="u" rel="up">System-wide configuration of the library</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Function-and-Data-Index" title="Index" rel="index">Index</a>]</p>
+Next: <a href="#Overriding-the-default-priority-string" accesskey="n" rel="next">Overriding the default priority string</a>, Previous: <a href="#Querying-for-disabled-algorithms-and-protocols" accesskey="p" rel="prev">Querying for disabled algorithms and protocols</a>, Up: <a href="#System_002dwide-configuration-of-the-library" accesskey="u" rel="up">System-wide configuration of the library</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Function-and-Data-Index" title="Index" rel="index">Index</a>]</p>
 </div>
 <span id="Overriding-the-parameter-verification-profile-1"></span><h3 class="section">8.4 Overriding the parameter verification profile</h3>
 
@@ -17034,6 +17063,25 @@ using the following.
 
 # do not allow applications use the LOW or VERY-WEAK profiles.
 min-verification-profile = legacy
+
+</pre></div>
+
+<hr>
+<span id="Overriding-the-default-priority-string"></span><div class="header">
+<p>
+Previous: <a href="#Overriding-the-parameter-verification-profile" accesskey="p" rel="prev">Overriding the parameter verification profile</a>, Up: <a href="#System_002dwide-configuration-of-the-library" accesskey="u" rel="up">System-wide configuration of the library</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Function-and-Data-Index" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="Overriding-the-default-priority-string-1"></span><h3 class="section">8.5 Overriding the default priority string</h3>
+
+<p>GnuTLS uses default priority string which is defined at compiled
+time. Usually it is set to <code>NORMAL</code>. This override allows to set
+the default priority string to something more appropriate for a given
+deployment.
+</p>
+<p>Below example sets a more specific default priority string.
+</p><div class="example">
+<pre class="example">[overrides]
+default-priority-string = SECURE128:-VERS-TLS-ALL:+VERS-TLS1.3
 
 </pre></div>
 
@@ -17197,6 +17245,12 @@ in order to be able to compute where the stealing occurs.
 <dt><code>GNUTLS_CIPHER_GOST28147_TC26Z_CNT</code></dt>
 <dd><p>GOST 28147-89 (Magma) cipher in CNT mode with TC26 Z S-box.
 </p></dd>
+<dt><code>GNUTLS_CIPHER_CHACHA20_64</code></dt>
+<dd><p>Chacha20 cipher with 64-bit nonces and 64-bit block counters.
+</p></dd>
+<dt><code>GNUTLS_CIPHER_CHACHA20_32</code></dt>
+<dd><p>Chacha20 cipher with 96-bit nonces and 32-bit block counters.
+</p></dd>
 <dt><code>GNUTLS_CIPHER_IDEA_PGP_CFB</code></dt>
 <dd><p>IDEA in CFB mode (placeholder - unsupported).
 </p></dd>
@@ -17349,7 +17403,7 @@ structures functions such as <a href="#gnutls_005fprivkey_005fset_005fpin_005ffu
 
 <span id="Key-generation-2"></span><h4 class="subsection">9.2.1 Key generation</h4>
 
-<p>All supported key types (including RSA, DSA, ECDSA, Ed25519) can be generated
+<p>All supported key types (including RSA, DSA, ECDSA, Ed25519, Ed448) can be generated
 with GnuTLS. They can be generated with the simpler <a href="#gnutls_005fprivkey_005fgenerate">gnutls_privkey_generate</a>
 or with the more advanced <a href="#gnutls_005fprivkey_005fgenerate2">gnutls_privkey_generate2</a>.
 </p>
@@ -17622,6 +17676,12 @@ in the name of the MAC functions listed below, they can be used either for HMAC 
 <dt><code>GNUTLS_MAC_GOST28147_TC26Z_IMIT</code></dt>
 <dd><p>The GOST 28147-89 working in IMIT mode with TC26 Z S-box.
 </p></dd>
+<dt><code>GNUTLS_MAC_SHAKE_128</code></dt>
+<dd><p>Reserved; unimplemented.
+</p></dd>
+<dt><code>GNUTLS_MAC_SHAKE_256</code></dt>
+<dd><p>Reserved; unimplemented.
+</p></dd>
 </dl>
 
 <div class="float-caption"><p><strong>Figure 9.3: </strong>The supported MAC and HMAC algorithms.</p></div></div>
@@ -17706,6 +17766,12 @@ are shown in <a href="#gnutls_005fdigest_005falgorithm_005ft">Figure 9.4</a>.
 </p></dd>
 <dt><code>GNUTLS_DIG_STREEBOG_512</code></dt>
 <dd><p>GOST R 34.11-2001 (Streebog) algorithm, 512 bit.
+</p></dd>
+<dt><code>GNUTLS_DIG_SHAKE_128</code></dt>
+<dd><p>Reserved; unimplemented.
+</p></dd>
+<dt><code>GNUTLS_DIG_SHAKE_256</code></dt>
+<dd><p>Reserved; unimplemented.
 </p></dd>
 </dl>
 
@@ -18014,6 +18080,9 @@ changed
        --print-cert           Print peer's certificate in PEM format
        --save-cert=str        Save the peer's certificate chain in the specified file in PEM format
        --save-ocsp=str        Save the peer's OCSP status response in the provided file
+                                - prohibits the option 'save-ocsp-multi'
+       --save-ocsp-multi=str  Save all OCSP responses provided by the peer in this file
+                                - prohibits the option 'save-ocsp'
        --save-server-trace=str Save the server-side TLS message trace in the provided file
        --save-client-trace=str Save the client-side TLS message trace in the provided file
        --dh-bits=num          The minimum number of bits allowed for DH
@@ -18024,6 +18093,9 @@ changed
        --x509keyfile=str      X.509 key file or PKCS #11 URL to use
        --x509certfile=str     X.509 Certificate file or PKCS #11 URL to use
                                 - requires the option 'x509keyfile'
+       --rawpkkeyfile=str     Private key file (PKCS #8 or PKCS #12) or PKCS #11 URL to use
+       --rawpkfile=str        Raw public-key file to use
+                                - requires the option 'rawpkkeyfile'
        --srpusername=str      SRP username to use
        --srppasswd=str        SRP password to use
        --pskusername=str      PSK username to use
@@ -18181,6 +18253,18 @@ starttls.
 </li></ul>
 
 <p>Specify the application layer protocol for STARTTLS. If the protocol is supported, gnutls-cli will proceed to the TLS negotiation.
+<span id="gnutls_002dcli-save_002docsp_002dmulti"></span></p><span id="save_002docsp_002dmulti-option"></span><h4 class="subheading">save-ocsp-multi option</h4>
+
+<p>This is the &ldquo;save all ocsp responses provided by the peer in this file&rdquo; option.
+This option takes a string argument.
+</p>
+<p>This option has some usage constraints.  It:
+</p><ul>
+<li> must not appear in combination with any of the following options:
+save-ocsp.
+</li></ul>
+
+<p>The file will contain a list of PEM encoded OCSP status responses if any were provided by the peer, starting with the one for the peer&rsquo;s server certificate.
 <span id="gnutls_002dcli-dh_002dbits"></span></p><span id="dh_002dbits-option"></span><h4 class="subheading">dh-bits option</h4>
 
 <p>This is the &ldquo;the minimum number of bits allowed for dh&rdquo; option.
@@ -18486,6 +18570,11 @@ Usage:  gnutls-serv [ -&lt;flag&gt; [&lt;val&gt;] | --&lt;name&gt;[{=| }&lt;val&
        --x509keyfile=str      X.509 key file or PKCS #11 URL to use
                                 - may appear multiple times
        --x509certfile=str     X.509 Certificate file or PKCS #11 URL to use
+                                - may appear multiple times
+       --rawpkkeyfile=str     Private key file (PKCS #8 or PKCS #12) or PKCS #11 URL to use
+                                - may appear multiple times
+       --rawpkfile=str        Raw public-key file to use
+                                - requires the option 'rawpkkeyfile'
                                 - may appear multiple times
        --srppasswd=file       SRP password file to use
                                 - file must pre-exist
@@ -20327,6 +20416,7 @@ expressions.
 <tr><td width="15%">-427</td><td width="40%">GNUTLS_E_MISSING_EXTENSION</td><td width="37%">An required TLS extension was received.</td></tr>
 <tr><td width="15%">-428</td><td width="40%">GNUTLS_E_DB_ENTRY_EXISTS</td><td width="37%">The Database entry already exists.</td></tr>
 <tr><td width="15%">-429</td><td width="40%">GNUTLS_E_EARLY_DATA_REJECTED</td><td width="37%">The early data were rejected.</td></tr>
+<tr><td width="15%">-430</td><td width="40%">GNUTLS_E_X509_DUPLICATE_EXTENSION</td><td width="37%">Duplicate extension in X.509 certificate.</td></tr>
 </table>
 
 
@@ -20528,6 +20618,7 @@ Next: <a href="#API-reference" accesskey="n" rel="next">API reference</a>, Previ
 <tr><td width="60%">TLS_SRP_SHA_RSA_AES_128_CBC_SHA1</td><td width="20%">0xC0 0x1E</td><td width="20%">TLS1.0</td></tr>
 <tr><td width="60%">TLS_SRP_SHA_DSS_AES_256_CBC_SHA1</td><td width="20%">0xC0 0x22</td><td width="20%">TLS1.0</td></tr>
 <tr><td width="60%">TLS_SRP_SHA_RSA_AES_256_CBC_SHA1</td><td width="20%">0xC0 0x21</td><td width="20%">TLS1.0</td></tr>
+<tr><td width="60%">TLS_GOSTR341112_256_28147_CNT_IMIT</td><td width="20%">0xC1 0x02</td><td width="20%">TLS1.2</td></tr>
 </table>
 
 
@@ -20562,6 +20653,8 @@ Next: <a href="#API-reference" accesskey="n" rel="next">API reference</a>, Previ
 <dt><code>ARCFOUR-128</code></dt>
 <dt><code>ESTREAM-SALSA20-256</code></dt>
 <dt><code>SALSA20-256</code></dt>
+<dt><code>CHACHA20-32</code></dt>
+<dt><code>CHACHA20-64</code></dt>
 <dt><code>CAMELLIA-256-CBC</code></dt>
 <dt><code>CAMELLIA-192-CBC</code></dt>
 <dt><code>CAMELLIA-128-CBC</code></dt>
@@ -20623,6 +20716,7 @@ Next: <a href="#API-reference" accesskey="n" rel="next">API reference</a>, Previ
 <dt><code>SRP</code></dt>
 <dt><code>ANON-DH</code></dt>
 <dt><code>ANON-ECDH</code></dt>
+<dt><code>VKO-GOST-12</code></dt>
 <dt><code>RSA-EXPORT</code></dt>
 </dl>
 
@@ -20637,8 +20731,10 @@ Next: <a href="#API-reference" accesskey="n" rel="next">API reference</a>, Previ
 <dt><code>GOST R 34.10-2001</code></dt>
 <dt><code>EC/ECDSA</code></dt>
 <dt><code>EdDSA (Ed25519)</code></dt>
+<dt><code>EdDSA (Ed448)</code></dt>
 <dt><code>DH</code></dt>
 <dt><code>ECDH (X25519)</code></dt>
+<dt><code>ECDH (X448)</code></dt>
 </dl>
 
 <span id="Public-key-signature-algorithms"></span><h3 class="heading">Public key signature algorithms</h3>
@@ -20653,6 +20749,7 @@ Next: <a href="#API-reference" accesskey="n" rel="next">API reference</a>, Previ
 <dt><code>RSA-PSS-SHA512</code></dt>
 <dt><code>RSA-PSS-RSAE-SHA512</code></dt>
 <dt><code>EdDSA-Ed25519</code></dt>
+<dt><code>EdDSA-Ed448</code></dt>
 <dt><code>ECDSA-SHA256</code></dt>
 <dt><code>ECDSA-SHA384</code></dt>
 <dt><code>ECDSA-SHA512</code></dt>
@@ -20694,12 +20791,13 @@ Next: <a href="#API-reference" accesskey="n" rel="next">API reference</a>, Previ
 
 <span id="Groups"></span><h3 class="heading">Groups</h3>
 <dl compact="compact">
-<dt><code>SECP192R1</code></dt>
-<dt><code>SECP224R1</code></dt>
 <dt><code>SECP256R1</code></dt>
 <dt><code>SECP384R1</code></dt>
 <dt><code>SECP521R1</code></dt>
 <dt><code>X25519</code></dt>
+<dt><code>GC256B</code></dt>
+<dt><code>GC512A</code></dt>
+<dt><code>X448</code></dt>
 <dt><code>FFDHE2048</code></dt>
 <dt><code>FFDHE3072</code></dt>
 <dt><code>FFDHE4096</code></dt>
@@ -23836,7 +23934,7 @@ when gnutls usage is no longer needed.
 called as many times as <code>gnutls_global_init()</code> .  This is useful when
 GnuTLS is used by more than one library in an application.  This
 function can be called many times, but will only do something the
-first time.
+first time. It is thread safe since GnuTLS 3.3.0.
 </p>
 <p>A subsequent call of this function if the initial has failed will
 return the same error code.
@@ -24742,14 +24840,15 @@ otherwise a negative error code is returned.
 
 <span id="gnutls_005focsp_005fstatus_005frequest_005fis_005fchecked-1"></span><h4 class="subheading">gnutls_ocsp_status_request_is_checked</h4>
 <span id="gnutls_005focsp_005fstatus_005frequest_005fis_005fchecked"></span><dl>
-<dt id="index-gnutls_005focsp_005fstatus_005frequest_005fis_005fchecked">Function: <em>int</em> <strong>gnutls_ocsp_status_request_is_checked</strong> <em>(gnutls_session_t <var>session</var>, unsigned int <var>flags</var>)</em></dt>
+<dt id="index-gnutls_005focsp_005fstatus_005frequest_005fis_005fchecked">Function: <em>unsigned</em> <strong>gnutls_ocsp_status_request_is_checked</strong> <em>(gnutls_session_t <var>session</var>, unsigned int <var>flags</var>)</em></dt>
 <dd><p><var>session</var>: is a gnutls session
 </p>
 <p><var>flags</var>: should be zero or <code>GNUTLS_OCSP_SR_IS_AVAIL</code> 
 </p>
 <p>When flags are zero this function returns non-zero if a valid OCSP status
 response was included in the TLS handshake. That is, an OCSP status response
-which is not too old or superseded. It returns zero otherwise.
+which is not too old, superseded or marks the certificate as revoked.
+It returns zero otherwise.
 </p>
 <p>When the flag <code>GNUTLS_OCSP_SR_IS_AVAIL</code>  is specified, the function
 returns non-zero if an OCSP status response was included in the handshake
@@ -24764,7 +24863,7 @@ any of gnutls_certificate_verify_peers*() are called.
 under TLS 1.3, which is the first version of TLS that allows cliend-side OCSP
 responses.
 </p>
-<p><strong>Returns:</strong> non zero if the response was valid, or a zero if it wasn&rsquo;t sent,
+<p><strong>Returns:</strong> Non-zero if the response was valid, or a zero if it wasn&rsquo;t sent,
 or sent and was invalid.
 </p>
 <p><strong>Since:</strong> 3.1.4
@@ -25172,6 +25271,22 @@ must be non-null.
 <p><strong>Since:</strong> 3.6.8
 </p></dd></dl>
 
+<span id="gnutls_005fprf_005fhash_005fget-1"></span><h4 class="subheading">gnutls_prf_hash_get</h4>
+<span id="gnutls_005fprf_005fhash_005fget"></span><dl>
+<dt id="index-gnutls_005fprf_005fhash_005fget">Function: <em>gnutls_digest_algorithm_t</em> <strong>gnutls_prf_hash_get</strong> <em>(const gnutls_session_t <var>session</var>)</em></dt>
+<dd><p><var>session</var>: is a <code>gnutls_session_t</code>  type.
+</p>
+<p>Get the currently used hash algorithm. In TLS 1.3, the hash
+algorithm is used for both the key derivation function and
+handshake message authentication code. In TLS 1.2, it matches the
+hash algorithm used for PRF.
+</p>
+<p><strong>Returns:</strong> the currently used hash algorithm, a
+<code>gnutls_digest_algorithm_t</code>  value.
+</p>
+<p><strong>Since:</strong> 3.6.13
+</p></dd></dl>
+
 <span id="gnutls_005fprf_005fraw-1"></span><h4 class="subheading">gnutls_prf_raw</h4>
 <span id="gnutls_005fprf_005fraw"></span><dl>
 <dt id="index-gnutls_005fprf_005fraw">Function: <em>int</em> <strong>gnutls_prf_raw</strong> <em>(gnutls_session_t <var>session</var>, size_t <var>label_size</var>, const char * <var>label</var>, size_t <var>seed_size</var>, const char * <var>seed</var>, size_t <var>outsize</var>, char * <var>out</var>)</em></dt>
@@ -25457,7 +25572,7 @@ of 192.
 </p>
 <p>&quot;@KEYWORD1,KEYWORD2,...&quot; The system administrator imposed settings.
 The provided keyword(s) will be expanded from a configuration-time
-provided file - default is: /etc/gnutls/default-priorities.
+provided file - default is: /etc/gnutls/config.
 Any attributes that follow it, will be appended to the expanded
 string. If multiple keywords are provided, separated by commas,
 then the first keyword that exists in the configuration file
@@ -25725,7 +25840,33 @@ if TLS 1.3 has been negotiated.
 <p>This should only be called in case of PSK authentication and in
 case of a server.
 </p>
-<p><strong>Returns:</strong> the username of the peer, or <code>NULL</code>  in case of an error.
+<p>The returned pointer should be considered constant (do not free) and valid 
+for the lifetime of the session.
+</p>
+<p>This function will return <code>NULL</code>  if the username has embedded NULL bytes.
+In that case, <code>gnutls_psk_server_get_username2()</code>  should be used to retrieve the username.
+</p>
+<p><strong>Returns:</strong> the username of the peer, or <code>NULL</code>  in case of an error,
+or if the username has embedded NULLs.
+</p></dd></dl>
+
+<span id="gnutls_005fpsk_005fserver_005fget_005fusername2-1"></span><h4 class="subheading">gnutls_psk_server_get_username2</h4>
+<span id="gnutls_005fpsk_005fserver_005fget_005fusername2"></span><dl>
+<dt id="index-gnutls_005fpsk_005fserver_005fget_005fusername2">Function: <em>int</em> <strong>gnutls_psk_server_get_username2</strong> <em>(gnutls_session_t <var>session</var>, gnutls_datum_t * <var>username</var>)</em></dt>
+<dd><p><var>session</var>: is a gnutls session
+</p>
+<p><var>username</var>: a datum that will be filled in by this function
+</p>
+<p>Return a pointer to the username of the peer in the supplied datum. Does not
+need to be null-terminated.
+</p>
+<p>This should only be called in case of PSK authentication and in
+case of a server.
+</p>
+<p>The returned pointer should be considered constant (do not free) and valid 
+for the lifetime of the session.
+</p>
+<p><strong>Returns:</strong> <code>GNUTLS_E_SUCCESS</code> , or a negative value in case of an error.
 </p></dd></dl>
 
 <span id="gnutls_005fpsk_005fset_005fclient_005fcredentials-1"></span><h4 class="subheading">gnutls_psk_set_client_credentials</h4>
@@ -25751,6 +25892,25 @@ in raw byte format or in Hex format (without the 0x prefix).
 an error code is returned.
 </p></dd></dl>
 
+<span id="gnutls_005fpsk_005fset_005fclient_005fcredentials2-1"></span><h4 class="subheading">gnutls_psk_set_client_credentials2</h4>
+<span id="gnutls_005fpsk_005fset_005fclient_005fcredentials2"></span><dl>
+<dt id="index-gnutls_005fpsk_005fset_005fclient_005fcredentials2">Function: <em>int</em> <strong>gnutls_psk_set_client_credentials2</strong> <em>(gnutls_psk_client_credentials_t <var>res</var>, const gnutls_datum_t * <var>username</var>, const gnutls_datum_t * <var>key</var>, gnutls_psk_key_flags <var>flags</var>)</em></dt>
+<dd><p><var>res</var>: is a <code>gnutls_psk_client_credentials_t</code>  type.
+</p>
+<p><var>username</var>: is the userid
+</p>
+<p><var>key</var>: is the user&rsquo;s key
+</p>
+<p><var>flags</var>: indicate the format of the key, either
+<code>GNUTLS_PSK_KEY_RAW</code>  or <code>GNUTLS_PSK_KEY_HEX</code> .
+</p>
+<p>This function is identical to <code>gnutls_psk_set_client_credentials()</code> ,
+except that it allows a non-null-terminated username to be introduced.
+</p>
+<p><strong>Returns:</strong> On success, <code>GNUTLS_E_SUCCESS</code>  (0) is returned, otherwise
+an error code is returned.
+</p></dd></dl>
+
 <span id="gnutls_005fpsk_005fset_005fclient_005fcredentials_005ffunction-1"></span><h4 class="subheading">gnutls_psk_set_client_credentials_function</h4>
 <span id="gnutls_005fpsk_005fset_005fclient_005fcredentials_005ffunction"></span><dl>
 <dt id="index-gnutls_005fpsk_005fset_005fclient_005fcredentials_005ffunction-1">Function: <em>void</em> <strong>gnutls_psk_set_client_credentials_function</strong> <em>(gnutls_psk_client_credentials_t         <var>cred</var>, gnutls_psk_client_credentials_function         * <var>func</var>)</em></dt>
@@ -25763,6 +25923,33 @@ password for client PSK authentication.
 The callback&rsquo;s function form is:
 int (*callback)(gnutls_session_t, char** username,
 gnutls_datum_t* key);
+</p>
+<p>The  <code>username</code> and  <code>key</code> -&gt;data must be allocated using <code>gnutls_malloc()</code> .
+The  <code>username</code> should be an ASCII string or UTF-8
+string. In case of a UTF-8 string it is recommended to be following
+the PRECIS framework for usernames (rfc8265).
+</p>
+<p>The callback function will be called once per handshake.
+</p>
+<p>The callback function should return 0 on success.
+-1 indicates an error.
+</p></dd></dl>
+
+<span id="gnutls_005fpsk_005fset_005fclient_005fcredentials_005ffunction2-1"></span><h4 class="subheading">gnutls_psk_set_client_credentials_function2</h4>
+<span id="gnutls_005fpsk_005fset_005fclient_005fcredentials_005ffunction2"></span><dl>
+<dt id="index-gnutls_005fpsk_005fset_005fclient_005fcredentials_005ffunction2">Function: <em>void</em> <strong>gnutls_psk_set_client_credentials_function2</strong> <em>(gnutls_psk_client_credentials_t <var>cred</var>, gnutls_psk_client_credentials_function2 * <var>func</var>)</em></dt>
+<dd><p><var>cred</var>: is a <code>gnutls_psk_server_credentials_t</code>  type.
+</p>
+<p><var>func</var>: is the callback function
+</p>
+<p>This function can be used to set a callback to retrieve the username and
+password for client PSK authentication.
+The callback&rsquo;s function form is:
+int (*callback)(gnutls_session_t, gnutls_datum_t* username,
+gnutls_datum_t* key);
+</p>
+<p>This callback function has the same semantics as that of <code>gnutls_psk_set_client_credentials_function()</code> ,
+but it allows non-string usernames to be used.
 </p>
 <p>The  <code>username</code> and  <code>key</code> -&gt;data must be allocated using <code>gnutls_malloc()</code> .
 The  <code>username</code> should be an ASCII string or UTF-8
@@ -25817,6 +26004,32 @@ an error code is returned.
 The callback&rsquo;s function form is:
 int (*callback)(gnutls_session_t, const char* username,
 gnutls_datum_t* key);
+</p>
+<p><code>username</code> contains the actual username.
+The  <code>key</code> must be filled in using the <code>gnutls_malloc()</code> .
+</p>
+<p>In case the callback returned a negative number then gnutls will
+assume that the username does not exist.
+</p>
+<p>The callback function will only be called once per handshake.  The
+callback function should return 0 on success, while -1 indicates
+an error.
+</p></dd></dl>
+
+<span id="gnutls_005fpsk_005fset_005fserver_005fcredentials_005ffunction2-1"></span><h4 class="subheading">gnutls_psk_set_server_credentials_function2</h4>
+<span id="gnutls_005fpsk_005fset_005fserver_005fcredentials_005ffunction2"></span><dl>
+<dt id="index-gnutls_005fpsk_005fset_005fserver_005fcredentials_005ffunction2">Function: <em>void</em> <strong>gnutls_psk_set_server_credentials_function2</strong> <em>(gnutls_psk_server_credentials_t <var>cred</var>, gnutls_psk_server_credentials_function2 <var>func</var>)</em></dt>
+<dd><p><var>cred</var>: is a <code>gnutls_psk_server_credentials_t</code>  type.
+</p>
+<p><var>func</var>: is the callback function
+</p>
+<p>This function can be used to set a callback to retrieve the user&rsquo;s PSK credentials.
+The callback&rsquo;s function form is:
+int (*callback)(gnutls_session_t, const gnutls_datum_t* username,
+gnutls_datum_t* key);
+</p>
+<p>This callback function has the same semantics as that of <code>gnutls_psk_set_server_credentials_function()</code> ,
+but it allows non-string usernames to be used.
 </p>
 <p><code>username</code> contains the actual username.
 The  <code>key</code> must be filled in using the <code>gnutls_malloc()</code> .
@@ -26955,6 +27168,19 @@ an error code is returned.
 <p><strong>Since:</strong> 3.1.4
 </p></dd></dl>
 
+<span id="gnutls_005fsession_005fget_005fkeylog_005ffunction-1"></span><h4 class="subheading">gnutls_session_get_keylog_function</h4>
+<span id="gnutls_005fsession_005fget_005fkeylog_005ffunction"></span><dl>
+<dt id="index-gnutls_005fsession_005fget_005fkeylog_005ffunction">Function: <em>gnutls_keylog_func</em> <strong>gnutls_session_get_keylog_function</strong> <em>(const gnutls_session_t <var>session</var>)</em></dt>
+<dd><p><var>session</var>: is <code>gnutls_session_t</code>  type
+</p>
+<p>This function will return the callback function set using
+<code>gnutls_session_set_keylog_function()</code> .
+</p>
+<p><strong>Returns:</strong> The function set or <code>NULL</code>  otherwise.
+</p>
+<p><strong>Since:</strong> 3.6.13
+</p></dd></dl>
+
 <span id="gnutls_005fsession_005fget_005fmaster_005fsecret-1"></span><h4 class="subheading">gnutls_session_get_master_secret</h4>
 <span id="gnutls_005fsession_005fget_005fmaster_005fsecret"></span><dl>
 <dt id="index-gnutls_005fsession_005fget_005fmaster_005fsecret">Function: <em>void</em> <strong>gnutls_session_get_master_secret</strong> <em>(gnutls_session_t <var>session</var>, gnutls_datum_t * <var>secret</var>)</em></dt>
@@ -27105,6 +27331,19 @@ function unless you are implementing a custom protocol.
 an error code is returned.
 </p>
 <p><strong>Since:</strong> 3.2.1
+</p></dd></dl>
+
+<span id="gnutls_005fsession_005fset_005fkeylog_005ffunction-1"></span><h4 class="subheading">gnutls_session_set_keylog_function</h4>
+<span id="gnutls_005fsession_005fset_005fkeylog_005ffunction"></span><dl>
+<dt id="index-gnutls_005fsession_005fset_005fkeylog_005ffunction">Function: <em>void</em> <strong>gnutls_session_set_keylog_function</strong> <em>(gnutls_session_t <var>session</var>, gnutls_keylog_func <var>func</var>)</em></dt>
+<dd><p><var>session</var>: is <code>gnutls_session_t</code>  type
+</p>
+<p><var>func</var>: is the function to be called
+</p>
+<p>This function will set a callback to be called when a new secret is
+derived and installed during handshake.
+</p>
+<p><strong>Since:</strong> 3.6.13
 </p></dd></dl>
 
 <span id="gnutls_005fsession_005fset_005fpremaster-1"></span><h4 class="subheading">gnutls_session_set_premaster</h4>
@@ -28851,6 +29090,28 @@ when the  <code>res</code> structure is deinitialized.
 <p><strong>Returns:</strong> <code>GNUTLS_E_SUCCESS</code>  (0) on success, or a negative error code.
 </p>
 <p><strong>Since:</strong> 3.2.2
+</p></dd></dl>
+
+<span id="gnutls_005fcertificate_005fverification_005fprofile_005fget_005fid-1"></span><h4 class="subheading">gnutls_certificate_verification_profile_get_id</h4>
+<span id="gnutls_005fcertificate_005fverification_005fprofile_005fget_005fid"></span><dl>
+<dt id="index-gnutls_005fcertificate_005fverification_005fprofile_005fget_005fid">Function: <em>gnutls_certificate_verification_profiles_t</em> <strong>gnutls_certificate_verification_profile_get_id</strong> <em>(const char * <var>name</var>)</em></dt>
+<dd><p><var>name</var>: is a profile name
+</p>
+<p>Convert a string to a <code>gnutls_certificate_verification_profiles_t</code>  value.  The names are
+compared in a case insensitive way.
+</p>
+<p><strong>Returns:</strong> a <code>gnutls_certificate_verification_profiles_t</code>  id of the specified profile,
+or <code>GNUTLS_PROFILE_UNKNOWN</code>  on failure.
+</p></dd></dl>
+
+<span id="gnutls_005fcertificate_005fverification_005fprofile_005fget_005fname-1"></span><h4 class="subheading">gnutls_certificate_verification_profile_get_name</h4>
+<span id="gnutls_005fcertificate_005fverification_005fprofile_005fget_005fname"></span><dl>
+<dt id="index-gnutls_005fcertificate_005fverification_005fprofile_005fget_005fname">Function: <em>const char *</em> <strong>gnutls_certificate_verification_profile_get_name</strong> <em>(gnutls_certificate_verification_profiles_t <var>id</var>)</em></dt>
+<dd><p><var>id</var>: is a profile ID
+</p>
+<p>Convert a <code>gnutls_certificate_verification_profiles_t</code>  value to a string.
+</p>
+<p><strong>Returns:</strong> a string that contains the name of the specified profile or <code>NULL</code> .
 </p></dd></dl>
 
 <span id="gnutls_005fpkcs8_005finfo-1"></span><h4 class="subheading">gnutls_pkcs8_info</h4>
@@ -30633,7 +30894,7 @@ success, or a negative error code on error.
 <p><var>oid_size</var>: initially holds the size of  <code>oid</code> 
 </p>
 <p>This function will return the OID of the public key algorithm
-on that certificate request. This is function
+on that certificate request. This function
 is useful in the case <code>gnutls_x509_crq_get_pk_algorithm()</code> 
 returned <code>GNUTLS_PK_UNKNOWN</code> .
 </p>
@@ -30688,7 +30949,7 @@ mapped to <code>GNUTLS_SIGN_UNKNOWN</code> .
 <p><var>oid_size</var>: initially holds the size of  <code>oid</code> 
 </p>
 <p>This function will return the OID of the signature algorithm
-that has been used to sign this certificate request. This is function
+that has been used to sign this certificate request. This function
 is useful in the case <code>gnutls_x509_crq_get_signature_algorithm()</code> 
 returned <code>GNUTLS_SIGN_UNKNOWN</code> .
 </p>
@@ -31533,7 +31794,7 @@ hold the accessLocation GeneralName type (e.g.,
 </p>
 <p>If  <code>what</code> is <code>GNUTLS_IA_URI</code> ,  <code>data</code> will hold the accessLocation URI
 data.  Requesting this  <code>what</code> value leads to an error if the
-accessLocation is not of the &quot;uniformResourceIdentifier&quot; type. 
+accessLocation is not of the &quot;uniformResourceIdentifier&quot; type.
 </p>
 <p>If  <code>what</code> is <code>GNUTLS_IA_OCSP_URI</code> ,  <code>data</code> will hold the OCSP URI.
 Requesting this  <code>what</code> value leads to an error if the accessMethod
@@ -31588,11 +31849,11 @@ negative error code.
 <p><var>critical</var>: will be non-zero if the extension is marked as critical (may be null)
 </p>
 <p>This function will return the X.509 authority key
-identifier when stored as a general name (authorityCertIssuer) 
+identifier when stored as a general name (authorityCertIssuer)
 and serial number.
 </p>
 <p>Because more than one general names might be stored
- <code>seq</code> can be used as a counter to request them all until 
+ <code>seq</code> can be used as a counter to request them all until
 <code>GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE</code>  is returned.
 </p>
 <p><strong>Returns:</strong> On success, <code>GNUTLS_E_SUCCESS</code>  (0) is returned, <code>GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE</code> 
@@ -31713,7 +31974,7 @@ buffer. The name will be in the form &quot;C=xxxx,O=yyyy,CN=zzzz&quot; as
 described in RFC4514. The output string will be ASCII or UTF-8
 encoded, depending on the certificate data.
 </p>
-<p>If  <code>buf</code> is null then only the size will be filled. 
+<p>If  <code>buf</code> is null then only the size will be filled.
 </p>
 <p>This function does not output a fully RFC4514 compliant string, if
 that is required see <code>gnutls_x509_crt_get_dn3()</code> .
@@ -31800,7 +32061,7 @@ using <code>gnutls_x509_dn_oid_known()</code> .
 </p>
 <p><strong>Returns:</strong> <code>GNUTLS_E_SHORT_MEMORY_BUFFER</code>  if the provided buffer is not
 long enough, and in that case the  <code>buf_size</code> will be updated with
-the required size. <code>GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE</code>  if there 
+the required size. <code>GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE</code>  if there
 are no data in the current index. On success 0 is returned.
 </p></dd></dl>
 
@@ -31823,7 +32084,7 @@ account for the trailing null.
 </p>
 <p><strong>Returns:</strong> <code>GNUTLS_E_SHORT_MEMORY_BUFFER</code>  if the provided buffer is not
 long enough, and in that case the  <code>buf_size</code> will be updated with
-the required size. <code>GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE</code>  if there 
+the required size. <code>GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE</code>  if there
 are no data in the current index. On success 0 is returned.
 </p></dd></dl>
 
@@ -31956,7 +32217,7 @@ be stored as a string in the provided buffer.  Use
 </p>
 <p>If the buffer provided is not long enough to hold the output, then
  <code>oid_size</code> is updated and <code>GNUTLS_E_SHORT_MEMORY_BUFFER</code>  will be
-returned. The  <code>oid</code> returned will be null terminated, although 
+returned. The  <code>oid</code> returned will be null terminated, although
  <code>oid_size</code> will not account for the trailing null (the latter is not
 true for GnuTLS prior to 3.6.0).
 </p>
@@ -32042,9 +32303,9 @@ returned.
 <p><var>dn</var>: output variable with pointer to uint8_t DN
 </p>
 <p>Return the Certificate&rsquo;s Issuer DN as a <code>gnutls_x509_dn_t</code>  data type,
-that can be decoded using <code>gnutls_x509_dn_get_rdn_ava()</code> . 
+that can be decoded using <code>gnutls_x509_dn_get_rdn_ava()</code> .
 </p>
-<p>Note that  <code>dn</code> should be treated as constant. Because it points 
+<p>Note that  <code>dn</code> should be treated as constant. Because it points
 into the  <code>cert</code> object, you should not use  <code>dn</code> after  <code>cert</code> is
 deallocated.
 </p>
@@ -32173,7 +32434,7 @@ provided buffer. The name will be in the form
 &quot;C=xxxx,O=yyyy,CN=zzzz&quot; as described in RFC4514. The output string
 will be ASCII or UTF-8 encoded, depending on the certificate data.
 </p>
-<p>If  <code>buf</code> is null then only the size will be filled. 
+<p>If  <code>buf</code> is null then only the size will be filled.
 </p>
 <p>This function does not output a fully RFC4514 compliant string, if
 that is required see <code>gnutls_x509_crt_get_issuer_dn3()</code> .
@@ -32260,7 +32521,7 @@ using <code>gnutls_x509_dn_oid_known()</code> .
 </p>
 <p><strong>Returns:</strong> <code>GNUTLS_E_SHORT_MEMORY_BUFFER</code>  if the provided buffer is not
 long enough, and in that case the  <code>buf_size</code> will be updated with
-the required size. <code>GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE</code>  if there 
+the required size. <code>GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE</code>  if there
 are no data in the current index. On success 0 is returned.
 </p></dd></dl>
 
@@ -32283,7 +32544,7 @@ account for the trailing null.
 </p>
 <p><strong>Returns:</strong> <code>GNUTLS_E_SHORT_MEMORY_BUFFER</code>  if the provided buffer is not
 long enough, and in that case the  <code>buf_size</code> will be updated with
-the required size. <code>GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE</code>  if there 
+the required size. <code>GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE</code>  if there
 are no data in the current index. On success 0 is returned.
 </p></dd></dl>
 
@@ -32554,8 +32815,8 @@ the given structure.  The new parameters will be allocated using
 </p>
 <p><var>critical</var>: will be non-zero if the extension is marked as critical
 </p>
-<p>This function will extract the certificate policy (extension 2.5.29.32) 
-specified by the given index. 
+<p>This function will extract the certificate policy (extension 2.5.29.32)
+specified by the given index.
 </p>
 <p>The policy returned by this function must be deinitialized by using
 <code>gnutls_x509_policy_release()</code> .
@@ -32728,9 +32989,9 @@ certificate. The provided  <code>spki</code> must be initialized.
 <p><var>dn</var>: output variable with pointer to uint8_t DN.
 </p>
 <p>Return the Certificate&rsquo;s Subject DN as a <code>gnutls_x509_dn_t</code>  data type,
-that can be decoded using <code>gnutls_x509_dn_get_rdn_ava()</code> . 
+that can be decoded using <code>gnutls_x509_dn_get_rdn_ava()</code> .
 </p>
-<p>Note that  <code>dn</code> should be treated as constant. Because it points 
+<p>Note that  <code>dn</code> should be treated as constant. Because it points
 into the  <code>cert</code> object, you should not use  <code>dn</code> after  <code>cert</code> is
 deallocated.
 </p>
@@ -33605,7 +33866,7 @@ marked as critical.
 <p><var>userdata</var>: data associated with the callback
 </p>
 <p>This function will set a callback function to be used when
-it is required to access a protected object. This function overrides 
+it is required to access a protected object. This function overrides
 the global function set using <code>gnutls_pkcs11_set_pin_function()</code> .
 </p>
 <p>Note that this callback is currently used only during the import
@@ -33741,28 +34002,6 @@ negative error value.
 <p><strong>Since:</strong> 3.6.0
 </p></dd></dl>
 
-<span id="gnutls_005fx509_005fcrt_005fset_005fsubject_005falternative_005fname-1"></span><h4 class="subheading">gnutls_x509_crt_set_subject_alternative_name</h4>
-<span id="gnutls_005fx509_005fcrt_005fset_005fsubject_005falternative_005fname"></span><dl>
-<dt id="index-gnutls_005fx509_005fcrt_005fset_005fsubject_005falternative_005fname">Function: <em>int</em> <strong>gnutls_x509_crt_set_subject_alternative_name</strong> <em>(gnutls_x509_crt_t <var>crt</var>, gnutls_x509_subject_alt_name_t           <var>type</var>, const char * <var>data_string</var>)</em></dt>
-<dd><p><var>crt</var>: a certificate of type <code>gnutls_x509_crt_t</code> 
-</p>
-<p><var>type</var>: is one of the gnutls_x509_subject_alt_name_t enumerations
-</p>
-<p><var>data_string</var>: The data to be set, a (0) terminated string
-</p>
-<p>This function will set the subject alternative name certificate
-extension. This function assumes that data can be expressed as a null
-terminated string.
-</p>
-<p>The name of the function is unfortunate since it is inconsistent with
-<code>gnutls_x509_crt_get_subject_alt_name()</code> .
-</p>
-<p>See <code>gnutls_x509_crt_set_subject_alt_name()</code>  for more information.
-</p>
-<p><strong>Returns:</strong> On success, <code>GNUTLS_E_SUCCESS</code>  (0) is returned, otherwise a
-negative error value.
-</p></dd></dl>
-
 <span id="gnutls_005fx509_005fcrt_005fset_005fsubject_005falt_005fname-1"></span><h4 class="subheading">gnutls_x509_crt_set_subject_alt_name</h4>
 <span id="gnutls_005fx509_005fcrt_005fset_005fsubject_005falt_005fname"></span><dl>
 <dt id="index-gnutls_005fx509_005fcrt_005fset_005fsubject_005falt_005fname">Function: <em>int</em> <strong>gnutls_x509_crt_set_subject_alt_name</strong> <em>(gnutls_x509_crt_t <var>crt</var>, gnutls_x509_subject_alt_name_t <var>type</var>, const void * <var>data</var>, unsigned int <var>data_size</var>, unsigned int <var>flags</var>)</em></dt>
@@ -33815,6 +34054,28 @@ can be used to encode the provided data.
 negative error value.
 </p>
 <p><strong>Since:</strong> 3.5.0
+</p></dd></dl>
+
+<span id="gnutls_005fx509_005fcrt_005fset_005fsubject_005falternative_005fname-1"></span><h4 class="subheading">gnutls_x509_crt_set_subject_alternative_name</h4>
+<span id="gnutls_005fx509_005fcrt_005fset_005fsubject_005falternative_005fname"></span><dl>
+<dt id="index-gnutls_005fx509_005fcrt_005fset_005fsubject_005falternative_005fname">Function: <em>int</em> <strong>gnutls_x509_crt_set_subject_alternative_name</strong> <em>(gnutls_x509_crt_t <var>crt</var>, gnutls_x509_subject_alt_name_t           <var>type</var>, const char * <var>data_string</var>)</em></dt>
+<dd><p><var>crt</var>: a certificate of type <code>gnutls_x509_crt_t</code> 
+</p>
+<p><var>type</var>: is one of the gnutls_x509_subject_alt_name_t enumerations
+</p>
+<p><var>data_string</var>: The data to be set, a (0) terminated string
+</p>
+<p>This function will set the subject alternative name certificate
+extension. This function assumes that data can be expressed as a null
+terminated string.
+</p>
+<p>The name of the function is unfortunate since it is inconsistent with
+<code>gnutls_x509_crt_get_subject_alt_name()</code> .
+</p>
+<p>See <code>gnutls_x509_crt_set_subject_alt_name()</code>  for more information.
+</p>
+<p><strong>Returns:</strong> On success, <code>GNUTLS_E_SUCCESS</code>  (0) is returned, otherwise a
+negative error value.
 </p></dd></dl>
 
 <span id="gnutls_005fx509_005fcrt_005fset_005fsubject_005fkey_005fid-1"></span><h4 class="subheading">gnutls_x509_crt_set_subject_key_id</h4>
@@ -33975,7 +34236,7 @@ negative error value.
 <p>This function will verify the given signed data, using the
 parameters from the certificate.
 </p>
-<p><strong>Returns:</strong> In case of a verification failure <code>GNUTLS_E_PK_SIG_VERIFY_FAILED</code>  
+<p><strong>Returns:</strong> In case of a verification failure <code>GNUTLS_E_PK_SIG_VERIFY_FAILED</code> 
 is returned, <code>GNUTLS_E_EXPIRED</code>  or <code>GNUTLS_E_NOT_YET_ACTIVATED</code>  on expired
 or not yet activated certificate and zero or positive code on success.
 </p>
@@ -34756,7 +35017,7 @@ in the  <code>features</code> structure then they will be merged with.
 </p>
 <p><var>out</var>: Newly allocated datum with null terminated string.
 </p>
-<p>This function will pretty print X.509 certificate extensions, 
+<p>This function will pretty print X.509 certificate extensions,
 suitable for display to a human.
 </p>
 <p>The output  <code>out</code> needs to be deallocated using <code>gnutls_free()</code> .
@@ -37255,7 +37516,7 @@ negative error code is returned.
 
 <span id="gnutls_005focsp_005freq_005fexport-1"></span><h4 class="subheading">gnutls_ocsp_req_export</h4>
 <span id="gnutls_005focsp_005freq_005fexport"></span><dl>
-<dt id="index-gnutls_005focsp_005freq_005fexport">Function: <em>int</em> <strong>gnutls_ocsp_req_export</strong> <em>(gnutls_ocsp_req_t <var>req</var>, gnutls_datum_t * <var>data</var>)</em></dt>
+<dt id="index-gnutls_005focsp_005freq_005fexport">Function: <em>int</em> <strong>gnutls_ocsp_req_export</strong> <em>(gnutls_ocsp_req_const_t <var>req</var>, gnutls_datum_t * <var>data</var>)</em></dt>
 <dd><p><var>req</var>: Holds the OCSP request
 </p>
 <p><var>data</var>: newly allocate buffer holding DER encoded OCSP request
@@ -37268,7 +37529,7 @@ returned, and 0 on success.
 
 <span id="gnutls_005focsp_005freq_005fget_005fcert_005fid-1"></span><h4 class="subheading">gnutls_ocsp_req_get_cert_id</h4>
 <span id="gnutls_005focsp_005freq_005fget_005fcert_005fid"></span><dl>
-<dt id="index-gnutls_005focsp_005freq_005fget_005fcert_005fid">Function: <em>int</em> <strong>gnutls_ocsp_req_get_cert_id</strong> <em>(gnutls_ocsp_req_t <var>req</var>, unsigned <var>indx</var>, gnutls_digest_algorithm_t * <var>digest</var>, gnutls_datum_t * <var>issuer_name_hash</var>, gnutls_datum_t * <var>issuer_key_hash</var>, gnutls_datum_t * <var>serial_number</var>)</em></dt>
+<dt id="index-gnutls_005focsp_005freq_005fget_005fcert_005fid">Function: <em>int</em> <strong>gnutls_ocsp_req_get_cert_id</strong> <em>(gnutls_ocsp_req_const_t <var>req</var>, unsigned <var>indx</var>, gnutls_digest_algorithm_t * <var>digest</var>, gnutls_datum_t * <var>issuer_name_hash</var>, gnutls_datum_t * <var>issuer_key_hash</var>, gnutls_datum_t * <var>serial_number</var>)</em></dt>
 <dd><p><var>req</var>: should contain a <code>gnutls_ocsp_req_t</code>  type
 </p>
 <p><var>indx</var>: Specifies which extension OID to get. Use (0) to get the first one.
@@ -37304,7 +37565,7 @@ returned.
 
 <span id="gnutls_005focsp_005freq_005fget_005fextension-1"></span><h4 class="subheading">gnutls_ocsp_req_get_extension</h4>
 <span id="gnutls_005focsp_005freq_005fget_005fextension"></span><dl>
-<dt id="index-gnutls_005focsp_005freq_005fget_005fextension">Function: <em>int</em> <strong>gnutls_ocsp_req_get_extension</strong> <em>(gnutls_ocsp_req_t <var>req</var>, unsigned <var>indx</var>, gnutls_datum_t * <var>oid</var>, unsigned int * <var>critical</var>, gnutls_datum_t * <var>data</var>)</em></dt>
+<dt id="index-gnutls_005focsp_005freq_005fget_005fextension">Function: <em>int</em> <strong>gnutls_ocsp_req_get_extension</strong> <em>(gnutls_ocsp_req_const_t <var>req</var>, unsigned <var>indx</var>, gnutls_datum_t * <var>oid</var>, unsigned int * <var>critical</var>, gnutls_datum_t * <var>data</var>)</em></dt>
 <dd><p><var>req</var>: should contain a <code>gnutls_ocsp_req_t</code>  type
 </p>
 <p><var>indx</var>: Specifies which extension OID to get. Use (0) to get the first one.
@@ -37333,7 +37594,7 @@ be returned.
 
 <span id="gnutls_005focsp_005freq_005fget_005fnonce-1"></span><h4 class="subheading">gnutls_ocsp_req_get_nonce</h4>
 <span id="gnutls_005focsp_005freq_005fget_005fnonce"></span><dl>
-<dt id="index-gnutls_005focsp_005freq_005fget_005fnonce">Function: <em>int</em> <strong>gnutls_ocsp_req_get_nonce</strong> <em>(gnutls_ocsp_req_t <var>req</var>, unsigned int * <var>critical</var>, gnutls_datum_t * <var>nonce</var>)</em></dt>
+<dt id="index-gnutls_005focsp_005freq_005fget_005fnonce">Function: <em>int</em> <strong>gnutls_ocsp_req_get_nonce</strong> <em>(gnutls_ocsp_req_const_t <var>req</var>, unsigned int * <var>critical</var>, gnutls_datum_t * <var>nonce</var>)</em></dt>
 <dd><p><var>req</var>: should contain a <code>gnutls_ocsp_req_t</code>  type
 </p>
 <p><var>critical</var>: whether nonce extension is marked critical, or NULL
@@ -37351,7 +37612,7 @@ negative error code is returned.
 
 <span id="gnutls_005focsp_005freq_005fget_005fversion-1"></span><h4 class="subheading">gnutls_ocsp_req_get_version</h4>
 <span id="gnutls_005focsp_005freq_005fget_005fversion"></span><dl>
-<dt id="index-gnutls_005focsp_005freq_005fget_005fversion">Function: <em>int</em> <strong>gnutls_ocsp_req_get_version</strong> <em>(gnutls_ocsp_req_t <var>req</var>)</em></dt>
+<dt id="index-gnutls_005focsp_005freq_005fget_005fversion">Function: <em>int</em> <strong>gnutls_ocsp_req_get_version</strong> <em>(gnutls_ocsp_req_const_t <var>req</var>)</em></dt>
 <dd><p><var>req</var>: should contain a <code>gnutls_ocsp_req_t</code>  type
 </p>
 <p>This function will return the version of the OCSP request.
@@ -37388,7 +37649,7 @@ negative error value.
 
 <span id="gnutls_005focsp_005freq_005fprint-1"></span><h4 class="subheading">gnutls_ocsp_req_print</h4>
 <span id="gnutls_005focsp_005freq_005fprint"></span><dl>
-<dt id="index-gnutls_005focsp_005freq_005fprint">Function: <em>int</em> <strong>gnutls_ocsp_req_print</strong> <em>(gnutls_ocsp_req_t <var>req</var>, gnutls_ocsp_print_formats_t <var>format</var>, gnutls_datum_t * <var>out</var>)</em></dt>
+<dt id="index-gnutls_005focsp_005freq_005fprint">Function: <em>int</em> <strong>gnutls_ocsp_req_print</strong> <em>(gnutls_ocsp_req_const_t <var>req</var>, gnutls_ocsp_print_formats_t <var>format</var>, gnutls_datum_t * <var>out</var>)</em></dt>
 <dd><p><var>req</var>: The data to be printed
 </p>
 <p><var>format</var>: Indicate the format to use
@@ -37457,7 +37718,7 @@ negative error code is returned.
 
 <span id="gnutls_005focsp_005fresp_005fcheck_005fcrt-1"></span><h4 class="subheading">gnutls_ocsp_resp_check_crt</h4>
 <span id="gnutls_005focsp_005fresp_005fcheck_005fcrt"></span><dl>
-<dt id="index-gnutls_005focsp_005fresp_005fcheck_005fcrt">Function: <em>int</em> <strong>gnutls_ocsp_resp_check_crt</strong> <em>(gnutls_ocsp_resp_t <var>resp</var>, unsigned int <var>indx</var>, gnutls_x509_crt_t <var>crt</var>)</em></dt>
+<dt id="index-gnutls_005focsp_005fresp_005fcheck_005fcrt">Function: <em>int</em> <strong>gnutls_ocsp_resp_check_crt</strong> <em>(gnutls_ocsp_resp_const_t <var>resp</var>, unsigned int <var>indx</var>, gnutls_x509_crt_t <var>crt</var>)</em></dt>
 <dd><p><var>resp</var>: should contain a <code>gnutls_ocsp_resp_t</code>  type
 </p>
 <p><var>indx</var>: Specifies response number to get. Use (0) to get the first one.
@@ -37483,7 +37744,7 @@ negative error code is returned.
 
 <span id="gnutls_005focsp_005fresp_005fexport-1"></span><h4 class="subheading">gnutls_ocsp_resp_export</h4>
 <span id="gnutls_005focsp_005fresp_005fexport"></span><dl>
-<dt id="index-gnutls_005focsp_005fresp_005fexport">Function: <em>int</em> <strong>gnutls_ocsp_resp_export</strong> <em>(gnutls_ocsp_resp_t <var>resp</var>, gnutls_datum_t * <var>data</var>)</em></dt>
+<dt id="index-gnutls_005focsp_005fresp_005fexport">Function: <em>int</em> <strong>gnutls_ocsp_resp_export</strong> <em>(gnutls_ocsp_resp_const_t <var>resp</var>, gnutls_datum_t * <var>data</var>)</em></dt>
 <dd><p><var>resp</var>: Holds the OCSP response
 </p>
 <p><var>data</var>: newly allocate buffer holding DER encoded OCSP response
@@ -37496,7 +37757,7 @@ returned, and 0 on success.
 
 <span id="gnutls_005focsp_005fresp_005fexport2-1"></span><h4 class="subheading">gnutls_ocsp_resp_export2</h4>
 <span id="gnutls_005focsp_005fresp_005fexport2"></span><dl>
-<dt id="index-gnutls_005focsp_005fresp_005fexport2">Function: <em>int</em> <strong>gnutls_ocsp_resp_export2</strong> <em>(gnutls_ocsp_resp_t <var>resp</var>, gnutls_datum_t * <var>data</var>, gnutls_x509_crt_fmt_t <var>fmt</var>)</em></dt>
+<dt id="index-gnutls_005focsp_005fresp_005fexport2">Function: <em>int</em> <strong>gnutls_ocsp_resp_export2</strong> <em>(gnutls_ocsp_resp_const_t <var>resp</var>, gnutls_datum_t * <var>data</var>, gnutls_x509_crt_fmt_t <var>fmt</var>)</em></dt>
 <dd><p><var>resp</var>: Holds the OCSP response
 </p>
 <p><var>data</var>: newly allocate buffer holding DER or PEM encoded OCSP response
@@ -37513,7 +37774,7 @@ returned, and 0 on success.
 
 <span id="gnutls_005focsp_005fresp_005fget_005fcerts-1"></span><h4 class="subheading">gnutls_ocsp_resp_get_certs</h4>
 <span id="gnutls_005focsp_005fresp_005fget_005fcerts"></span><dl>
-<dt id="index-gnutls_005focsp_005fresp_005fget_005fcerts">Function: <em>int</em> <strong>gnutls_ocsp_resp_get_certs</strong> <em>(gnutls_ocsp_resp_t <var>resp</var>, gnutls_x509_crt_t ** <var>certs</var>, size_t * <var>ncerts</var>)</em></dt>
+<dt id="index-gnutls_005focsp_005fresp_005fget_005fcerts">Function: <em>int</em> <strong>gnutls_ocsp_resp_get_certs</strong> <em>(gnutls_ocsp_resp_const_t <var>resp</var>, gnutls_x509_crt_t ** <var>certs</var>, size_t * <var>ncerts</var>)</em></dt>
 <dd><p><var>resp</var>: should contain a <code>gnutls_ocsp_resp_t</code>  type
 </p>
 <p><var>certs</var>: newly allocated array with <code>gnutls_x509_crt_t</code>  certificates
@@ -37539,7 +37800,7 @@ negative error value.
 
 <span id="gnutls_005focsp_005fresp_005fget_005fextension-1"></span><h4 class="subheading">gnutls_ocsp_resp_get_extension</h4>
 <span id="gnutls_005focsp_005fresp_005fget_005fextension"></span><dl>
-<dt id="index-gnutls_005focsp_005fresp_005fget_005fextension">Function: <em>int</em> <strong>gnutls_ocsp_resp_get_extension</strong> <em>(gnutls_ocsp_resp_t <var>resp</var>, unsigned <var>indx</var>, gnutls_datum_t * <var>oid</var>, unsigned int * <var>critical</var>, gnutls_datum_t * <var>data</var>)</em></dt>
+<dt id="index-gnutls_005focsp_005fresp_005fget_005fextension">Function: <em>int</em> <strong>gnutls_ocsp_resp_get_extension</strong> <em>(gnutls_ocsp_resp_const_t <var>resp</var>, unsigned <var>indx</var>, gnutls_datum_t * <var>oid</var>, unsigned int * <var>critical</var>, gnutls_datum_t * <var>data</var>)</em></dt>
 <dd><p><var>resp</var>: should contain a <code>gnutls_ocsp_resp_t</code>  type
 </p>
 <p><var>indx</var>: Specifies which extension OID to get. Use (0) to get the first one.
@@ -37568,7 +37829,7 @@ be returned.
 
 <span id="gnutls_005focsp_005fresp_005fget_005fnonce-1"></span><h4 class="subheading">gnutls_ocsp_resp_get_nonce</h4>
 <span id="gnutls_005focsp_005fresp_005fget_005fnonce"></span><dl>
-<dt id="index-gnutls_005focsp_005fresp_005fget_005fnonce">Function: <em>int</em> <strong>gnutls_ocsp_resp_get_nonce</strong> <em>(gnutls_ocsp_resp_t <var>resp</var>, unsigned int * <var>critical</var>, gnutls_datum_t * <var>nonce</var>)</em></dt>
+<dt id="index-gnutls_005focsp_005fresp_005fget_005fnonce">Function: <em>int</em> <strong>gnutls_ocsp_resp_get_nonce</strong> <em>(gnutls_ocsp_resp_const_t <var>resp</var>, unsigned int * <var>critical</var>, gnutls_datum_t * <var>nonce</var>)</em></dt>
 <dd><p><var>resp</var>: should contain a <code>gnutls_ocsp_resp_t</code>  type
 </p>
 <p><var>critical</var>: whether nonce extension is marked critical
@@ -37587,7 +37848,7 @@ negative error code is returned.
 
 <span id="gnutls_005focsp_005fresp_005fget_005fproduced-1"></span><h4 class="subheading">gnutls_ocsp_resp_get_produced</h4>
 <span id="gnutls_005focsp_005fresp_005fget_005fproduced"></span><dl>
-<dt id="index-gnutls_005focsp_005fresp_005fget_005fproduced">Function: <em>time_t</em> <strong>gnutls_ocsp_resp_get_produced</strong> <em>(gnutls_ocsp_resp_t <var>resp</var>)</em></dt>
+<dt id="index-gnutls_005focsp_005fresp_005fget_005fproduced">Function: <em>time_t</em> <strong>gnutls_ocsp_resp_get_produced</strong> <em>(gnutls_ocsp_resp_const_t <var>resp</var>)</em></dt>
 <dd><p><var>resp</var>: should contain a <code>gnutls_ocsp_resp_t</code>  type
 </p>
 <p>This function will return the time when the OCSP response was
@@ -37598,7 +37859,7 @@ signed.
 
 <span id="gnutls_005focsp_005fresp_005fget_005fresponder-1"></span><h4 class="subheading">gnutls_ocsp_resp_get_responder</h4>
 <span id="gnutls_005focsp_005fresp_005fget_005fresponder"></span><dl>
-<dt id="index-gnutls_005focsp_005fresp_005fget_005fresponder">Function: <em>int</em> <strong>gnutls_ocsp_resp_get_responder</strong> <em>(gnutls_ocsp_resp_t <var>resp</var>, gnutls_datum_t * <var>dn</var>)</em></dt>
+<dt id="index-gnutls_005focsp_005fresp_005fget_005fresponder">Function: <em>int</em> <strong>gnutls_ocsp_resp_get_responder</strong> <em>(gnutls_ocsp_resp_const_t <var>resp</var>, gnutls_datum_t * <var>dn</var>)</em></dt>
 <dd><p><var>resp</var>: should contain a <code>gnutls_ocsp_resp_t</code>  type
 </p>
 <p><var>dn</var>: newly allocated buffer with name
@@ -37624,7 +37885,7 @@ return success and set  <code>dn</code> elements to zero.
 
 <span id="gnutls_005focsp_005fresp_005fget_005fresponder2-1"></span><h4 class="subheading">gnutls_ocsp_resp_get_responder2</h4>
 <span id="gnutls_005focsp_005fresp_005fget_005fresponder2"></span><dl>
-<dt id="index-gnutls_005focsp_005fresp_005fget_005fresponder2">Function: <em>int</em> <strong>gnutls_ocsp_resp_get_responder2</strong> <em>(gnutls_ocsp_resp_t <var>resp</var>, gnutls_datum_t * <var>dn</var>, unsigned <var>flags</var>)</em></dt>
+<dt id="index-gnutls_005focsp_005fresp_005fget_005fresponder2">Function: <em>int</em> <strong>gnutls_ocsp_resp_get_responder2</strong> <em>(gnutls_ocsp_resp_const_t <var>resp</var>, gnutls_datum_t * <var>dn</var>, unsigned <var>flags</var>)</em></dt>
 <dd><p><var>resp</var>: should contain a <code>gnutls_ocsp_resp_t</code>  type
 </p>
 <p><var>dn</var>: newly allocated buffer with name
@@ -37653,7 +37914,7 @@ negative error code is returned. When no data exist it will return
 
 <span id="gnutls_005focsp_005fresp_005fget_005fresponder_005fraw_005fid-1"></span><h4 class="subheading">gnutls_ocsp_resp_get_responder_raw_id</h4>
 <span id="gnutls_005focsp_005fresp_005fget_005fresponder_005fraw_005fid"></span><dl>
-<dt id="index-gnutls_005focsp_005fresp_005fget_005fresponder_005fraw_005fid">Function: <em>int</em> <strong>gnutls_ocsp_resp_get_responder_raw_id</strong> <em>(gnutls_ocsp_resp_t <var>resp</var>, unsigned <var>type</var>, gnutls_datum_t * <var>raw</var>)</em></dt>
+<dt id="index-gnutls_005focsp_005fresp_005fget_005fresponder_005fraw_005fid">Function: <em>int</em> <strong>gnutls_ocsp_resp_get_responder_raw_id</strong> <em>(gnutls_ocsp_resp_const_t <var>resp</var>, unsigned <var>type</var>, gnutls_datum_t * <var>raw</var>)</em></dt>
 <dd><p><var>resp</var>: should contain a <code>gnutls_ocsp_resp_t</code>  type
 </p>
 <p><var>type</var>: should be <code>GNUTLS_OCSP_RESP_ID_KEY</code>  or <code>GNUTLS_OCSP_RESP_ID_DN</code> 
@@ -37673,7 +37934,7 @@ negative error code is returned.
 
 <span id="gnutls_005focsp_005fresp_005fget_005fresponse-1"></span><h4 class="subheading">gnutls_ocsp_resp_get_response</h4>
 <span id="gnutls_005focsp_005fresp_005fget_005fresponse"></span><dl>
-<dt id="index-gnutls_005focsp_005fresp_005fget_005fresponse">Function: <em>int</em> <strong>gnutls_ocsp_resp_get_response</strong> <em>(gnutls_ocsp_resp_t <var>resp</var>, gnutls_datum_t * <var>response_type_oid</var>, gnutls_datum_t * <var>response</var>)</em></dt>
+<dt id="index-gnutls_005focsp_005fresp_005fget_005fresponse">Function: <em>int</em> <strong>gnutls_ocsp_resp_get_response</strong> <em>(gnutls_ocsp_resp_const_t <var>resp</var>, gnutls_datum_t * <var>response_type_oid</var>, gnutls_datum_t * <var>response</var>)</em></dt>
 <dd><p><var>resp</var>: should contain a <code>gnutls_ocsp_resp_t</code>  type
 </p>
 <p><var>response_type_oid</var>: newly allocated output buffer with response type OID
@@ -37697,7 +37958,7 @@ negative error value.
 
 <span id="gnutls_005focsp_005fresp_005fget_005fsignature-1"></span><h4 class="subheading">gnutls_ocsp_resp_get_signature</h4>
 <span id="gnutls_005focsp_005fresp_005fget_005fsignature"></span><dl>
-<dt id="index-gnutls_005focsp_005fresp_005fget_005fsignature">Function: <em>int</em> <strong>gnutls_ocsp_resp_get_signature</strong> <em>(gnutls_ocsp_resp_t <var>resp</var>, gnutls_datum_t * <var>sig</var>)</em></dt>
+<dt id="index-gnutls_005focsp_005fresp_005fget_005fsignature">Function: <em>int</em> <strong>gnutls_ocsp_resp_get_signature</strong> <em>(gnutls_ocsp_resp_const_t <var>resp</var>, gnutls_datum_t * <var>sig</var>)</em></dt>
 <dd><p><var>resp</var>: should contain a <code>gnutls_ocsp_resp_t</code>  type
 </p>
 <p><var>sig</var>: newly allocated output buffer with signature data
@@ -37710,7 +37971,7 @@ negative error value.
 
 <span id="gnutls_005focsp_005fresp_005fget_005fsignature_005falgorithm-1"></span><h4 class="subheading">gnutls_ocsp_resp_get_signature_algorithm</h4>
 <span id="gnutls_005focsp_005fresp_005fget_005fsignature_005falgorithm"></span><dl>
-<dt id="index-gnutls_005focsp_005fresp_005fget_005fsignature_005falgorithm">Function: <em>int</em> <strong>gnutls_ocsp_resp_get_signature_algorithm</strong> <em>(gnutls_ocsp_resp_t <var>resp</var>)</em></dt>
+<dt id="index-gnutls_005focsp_005fresp_005fget_005fsignature_005falgorithm">Function: <em>int</em> <strong>gnutls_ocsp_resp_get_signature_algorithm</strong> <em>(gnutls_ocsp_resp_const_t <var>resp</var>)</em></dt>
 <dd><p><var>resp</var>: should contain a <code>gnutls_ocsp_resp_t</code>  type
 </p>
 <p>This function will return a value of the <code>gnutls_sign_algorithm_t</code> 
@@ -37723,7 +37984,7 @@ on error.
 
 <span id="gnutls_005focsp_005fresp_005fget_005fsingle-1"></span><h4 class="subheading">gnutls_ocsp_resp_get_single</h4>
 <span id="gnutls_005focsp_005fresp_005fget_005fsingle"></span><dl>
-<dt id="index-gnutls_005focsp_005fresp_005fget_005fsingle-1">Function: <em>int</em> <strong>gnutls_ocsp_resp_get_single</strong> <em>(gnutls_ocsp_resp_t <var>resp</var>, unsigned <var>indx</var>, gnutls_digest_algorithm_t * <var>digest</var>, gnutls_datum_t * <var>issuer_name_hash</var>, gnutls_datum_t * <var>issuer_key_hash</var>, gnutls_datum_t * <var>serial_number</var>, unsigned int * <var>cert_status</var>, time_t * <var>this_update</var>, time_t * <var>next_update</var>, time_t * <var>revocation_time</var>, unsigned int * <var>revocation_reason</var>)</em></dt>
+<dt id="index-gnutls_005focsp_005fresp_005fget_005fsingle-1">Function: <em>int</em> <strong>gnutls_ocsp_resp_get_single</strong> <em>(gnutls_ocsp_resp_const_t <var>resp</var>, unsigned <var>indx</var>, gnutls_digest_algorithm_t * <var>digest</var>, gnutls_datum_t * <var>issuer_name_hash</var>, gnutls_datum_t * <var>issuer_key_hash</var>, gnutls_datum_t * <var>serial_number</var>, unsigned int * <var>cert_status</var>, time_t * <var>this_update</var>, time_t * <var>next_update</var>, time_t * <var>revocation_time</var>, unsigned int * <var>revocation_reason</var>)</em></dt>
 <dd><p><var>resp</var>: should contain a <code>gnutls_ocsp_resp_t</code>  type
 </p>
 <p><var>indx</var>: Specifies response number to get. Use (0) to get the first one.
@@ -37762,7 +38023,7 @@ returned.
 
 <span id="gnutls_005focsp_005fresp_005fget_005fstatus-1"></span><h4 class="subheading">gnutls_ocsp_resp_get_status</h4>
 <span id="gnutls_005focsp_005fresp_005fget_005fstatus"></span><dl>
-<dt id="index-gnutls_005focsp_005fresp_005fget_005fstatus">Function: <em>int</em> <strong>gnutls_ocsp_resp_get_status</strong> <em>(gnutls_ocsp_resp_t <var>resp</var>)</em></dt>
+<dt id="index-gnutls_005focsp_005fresp_005fget_005fstatus">Function: <em>int</em> <strong>gnutls_ocsp_resp_get_status</strong> <em>(gnutls_ocsp_resp_const_t <var>resp</var>)</em></dt>
 <dd><p><var>resp</var>: should contain a <code>gnutls_ocsp_resp_t</code>  type
 </p>
 <p>This function will return the status of a OCSP response, an
@@ -37774,7 +38035,7 @@ a negative error code on error.
 
 <span id="gnutls_005focsp_005fresp_005fget_005fversion-1"></span><h4 class="subheading">gnutls_ocsp_resp_get_version</h4>
 <span id="gnutls_005focsp_005fresp_005fget_005fversion"></span><dl>
-<dt id="index-gnutls_005focsp_005fresp_005fget_005fversion">Function: <em>int</em> <strong>gnutls_ocsp_resp_get_version</strong> <em>(gnutls_ocsp_resp_t <var>resp</var>)</em></dt>
+<dt id="index-gnutls_005focsp_005fresp_005fget_005fversion">Function: <em>int</em> <strong>gnutls_ocsp_resp_get_version</strong> <em>(gnutls_ocsp_resp_const_t <var>resp</var>)</em></dt>
 <dd><p><var>resp</var>: should contain a <code>gnutls_ocsp_resp_t</code>  type
 </p>
 <p>This function will return the version of the Basic OCSP Response.
@@ -37861,7 +38122,7 @@ structure independently, and use <code>gnutls_free()</code>  at  <code>ocsps</co
 
 <span id="gnutls_005focsp_005fresp_005fprint-1"></span><h4 class="subheading">gnutls_ocsp_resp_print</h4>
 <span id="gnutls_005focsp_005fresp_005fprint"></span><dl>
-<dt id="index-gnutls_005focsp_005fresp_005fprint">Function: <em>int</em> <strong>gnutls_ocsp_resp_print</strong> <em>(gnutls_ocsp_resp_t <var>resp</var>, gnutls_ocsp_print_formats_t <var>format</var>, gnutls_datum_t * <var>out</var>)</em></dt>
+<dt id="index-gnutls_005focsp_005fresp_005fprint">Function: <em>int</em> <strong>gnutls_ocsp_resp_print</strong> <em>(gnutls_ocsp_resp_const_t <var>resp</var>, gnutls_ocsp_print_formats_t <var>format</var>, gnutls_datum_t * <var>out</var>)</em></dt>
 <dd><p><var>resp</var>: The data to be printed
 </p>
 <p><var>format</var>: Indicate the format to use
@@ -37882,7 +38143,7 @@ negative error value.
 
 <span id="gnutls_005focsp_005fresp_005fverify-1"></span><h4 class="subheading">gnutls_ocsp_resp_verify</h4>
 <span id="gnutls_005focsp_005fresp_005fverify"></span><dl>
-<dt id="index-gnutls_005focsp_005fresp_005fverify">Function: <em>int</em> <strong>gnutls_ocsp_resp_verify</strong> <em>(gnutls_ocsp_resp_t <var>resp</var>, gnutls_x509_trust_list_t <var>trustlist</var>, unsigned int * <var>verify</var>, unsigned int <var>flags</var>)</em></dt>
+<dt id="index-gnutls_005focsp_005fresp_005fverify">Function: <em>int</em> <strong>gnutls_ocsp_resp_verify</strong> <em>(gnutls_ocsp_resp_const_t <var>resp</var>, gnutls_x509_trust_list_t <var>trustlist</var>, unsigned int * <var>verify</var>, unsigned int <var>flags</var>)</em></dt>
 <dd><p><var>resp</var>: should contain a <code>gnutls_ocsp_resp_t</code>  type
 </p>
 <p><var>trustlist</var>: trust anchors as a <code>gnutls_x509_trust_list_t</code>  type
@@ -37916,7 +38177,7 @@ negative error value.
 
 <span id="gnutls_005focsp_005fresp_005fverify_005fdirect-1"></span><h4 class="subheading">gnutls_ocsp_resp_verify_direct</h4>
 <span id="gnutls_005focsp_005fresp_005fverify_005fdirect"></span><dl>
-<dt id="index-gnutls_005focsp_005fresp_005fverify_005fdirect">Function: <em>int</em> <strong>gnutls_ocsp_resp_verify_direct</strong> <em>(gnutls_ocsp_resp_t <var>resp</var>, gnutls_x509_crt_t <var>issuer</var>, unsigned int * <var>verify</var>, unsigned int <var>flags</var>)</em></dt>
+<dt id="index-gnutls_005focsp_005fresp_005fverify_005fdirect">Function: <em>int</em> <strong>gnutls_ocsp_resp_verify_direct</strong> <em>(gnutls_ocsp_resp_const_t <var>resp</var>, gnutls_x509_crt_t <var>issuer</var>, unsigned int * <var>verify</var>, unsigned int <var>flags</var>)</em></dt>
 <dd><p><var>resp</var>: should contain a <code>gnutls_ocsp_resp_t</code>  type
 </p>
 <p><var>issuer</var>: certificate believed to have signed the response
@@ -41322,21 +41583,17 @@ negative error value.
 </p>
 <p><var>signature</var>: will contain newly allocated signature
 </p>
-<p>This function will sign the given hashed data using a signature algorithm
-supported by the private key. Signature algorithms are always used
-together with a hash functions.  Different hash functions may be
-used for the RSA algorithm, but only SHA-XXX for the DSA keys.
+<p>This function will sign the given hashed data using the specified signature
+algorithm. This function is an enhancement of <code>gnutls_privkey_sign_hash()</code> ,
+as it allows utilizing a alternative signature algorithm where possible
+(e.g, use an RSA key with RSA-PSS).
 </p>
-<p>You may use <code>gnutls_pubkey_get_preferred_hash_algorithm()</code>  to determine
-the hash algorithm.
+<p>The flags may be <code>GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA</code> .
+In that case this function will ignore  <code>hash_algo</code> and perform a raw PKCS1 signature.
+Note that this flag is supported since 3.6.9.
 </p>
-<p>The flags may be <code>GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA</code>  or <code>GNUTLS_PRIVKEY_SIGN_FLAG_RSA_PSS</code> .
-In the former case this function will ignore  <code>hash_algo</code> and perform a raw PKCS1 signature,
-and in the latter an RSA-PSS signature will be generated. Note that the flag
-<code>GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA</code>  is supported since 3.6.9.
-</p>
-<p>Note that, not all algorithm support signing already hashed data. When
-signing with Ed25519, <code>gnutls_privkey_sign_data()</code>  should be used.
+<p>Note also that, not all algorithm support signing already hashed data. When
+signing with Ed25519, <code>gnutls_privkey_sign_data2()</code>  should be used instead.
 </p>
 <p><strong>Returns:</strong> On success, <code>GNUTLS_E_SUCCESS</code>  (0) is returned, otherwise a
 negative error value.
@@ -43680,6 +43937,47 @@ and reset the state of the hash.
 <p><strong>Since:</strong> 2.10.0
 </p></dd></dl>
 
+<span id="gnutls_005fhkdf_005fexpand-1"></span><h4 class="subheading">gnutls_hkdf_expand</h4>
+<span id="gnutls_005fhkdf_005fexpand"></span><dl>
+<dt id="index-gnutls_005fhkdf_005fexpand">Function: <em>int</em> <strong>gnutls_hkdf_expand</strong> <em>(gnutls_mac_algorithm_t <var>mac</var>, const gnutls_datum_t * <var>key</var>, const gnutls_datum_t * <var>info</var>, void * <var>output</var>, size_t <var>length</var>)</em></dt>
+<dd><p><var>mac</var>: the mac algorithm used internally
+</p>
+<p><var>key</var>: the pseudorandom key created with HKDF-Extract
+</p>
+<p><var>info</var>: the optional informational data
+</p>
+<p><var>output</var>: the output value of the expand operation
+</p>
+<p><var>length</var>: the desired length of the output key
+</p>
+<p>This function will derive a variable length keying material from
+the pseudorandom key using the HKDF-Expand function as defined in
+RFC 5869.
+</p>
+<p><strong>Returns:</strong> Zero or a negative error code on error.
+</p>
+<p><strong>Since:</strong> 3.6.13
+</p></dd></dl>
+
+<span id="gnutls_005fhkdf_005fextract-1"></span><h4 class="subheading">gnutls_hkdf_extract</h4>
+<span id="gnutls_005fhkdf_005fextract"></span><dl>
+<dt id="index-gnutls_005fhkdf_005fextract">Function: <em>int</em> <strong>gnutls_hkdf_extract</strong> <em>(gnutls_mac_algorithm_t <var>mac</var>, const gnutls_datum_t * <var>key</var>, const gnutls_datum_t * <var>salt</var>, void * <var>output</var>)</em></dt>
+<dd><p><var>mac</var>: the mac algorithm used internally
+</p>
+<p><var>key</var>: the initial keying material
+</p>
+<p><var>salt</var>: the optional salt
+</p>
+<p><var>output</var>: the output value of the extract operation
+</p>
+<p>This function will derive a fixed-size key using the HKDF-Extract
+function as defined in RFC 5869.
+</p>
+<p><strong>Returns:</strong> Zero or a negative error code on error.
+</p>
+<p><strong>Since:</strong> 3.6.13
+</p></dd></dl>
+
 <span id="gnutls_005fhmac-1"></span><h4 class="subheading">gnutls_hmac</h4>
 <span id="gnutls_005fhmac"></span><dl>
 <dt id="index-gnutls_005fhmac">Function: <em>int</em> <strong>gnutls_hmac</strong> <em>(gnutls_hmac_hd_t <var>handle</var>, const void * <var>ptext</var>, size_t <var>ptext_len</var>)</em></dt>
@@ -43747,6 +44045,20 @@ that require nonce (like UMAC or GMAC).
 <p><strong>Returns:</strong> Zero or a negative error code on error.
 </p>
 <p><strong>Since:</strong> 2.10.0
+</p></dd></dl>
+
+<span id="gnutls_005fhmac_005fget_005fkey_005fsize-1"></span><h4 class="subheading">gnutls_hmac_get_key_size</h4>
+<span id="gnutls_005fhmac_005fget_005fkey_005fsize"></span><dl>
+<dt id="index-gnutls_005fhmac_005fget_005fkey_005fsize">Function: <em>unsigned</em> <strong>gnutls_hmac_get_key_size</strong> <em>(gnutls_mac_algorithm_t <var>algorithm</var>)</em></dt>
+<dd><p><var>algorithm</var>: the mac algorithm to use
+</p>
+<p>This function will return the size of the key to be used with this
+algorithm. On the algorithms which may accept arbitrary key sizes,
+the returned size is the MAC key size used in the TLS protocol.
+</p>
+<p><strong>Returns:</strong> The key size or zero on error.
+</p>
+<p><strong>Since:</strong> 3.6.12
 </p></dd></dl>
 
 <span id="gnutls_005fhmac_005fget_005flen-1"></span><h4 class="subheading">gnutls_hmac_get_len</h4>
@@ -43823,6 +44135,29 @@ and reset the state of the MAC.
 <p><strong>Returns:</strong> length (in bytes) of the given MAC nonce size, or 0.
 </p>
 <p><strong>Since:</strong> 3.2.0
+</p></dd></dl>
+
+<span id="gnutls_005fpbkdf2-1"></span><h4 class="subheading">gnutls_pbkdf2</h4>
+<span id="gnutls_005fpbkdf2"></span><dl>
+<dt id="index-gnutls_005fpbkdf2">Function: <em>int</em> <strong>gnutls_pbkdf2</strong> <em>(gnutls_mac_algorithm_t <var>mac</var>, const gnutls_datum_t * <var>key</var>, const gnutls_datum_t * <var>salt</var>, unsigned <var>iter_count</var>, void * <var>output</var>, size_t <var>length</var>)</em></dt>
+<dd><p><var>mac</var>: the mac algorithm used internally
+</p>
+<p><var>key</var>: the initial keying material
+</p>
+<p><var>salt</var>: the salt
+</p>
+<p><var>iter_count</var>: the iteration count
+</p>
+<p><var>output</var>: the output value
+</p>
+<p><var>length</var>: the desired length of the output key
+</p>
+<p>This function will derive a variable length keying material from
+a password according to PKCS <code>5</code>  PBKDF2.
+</p>
+<p><strong>Returns:</strong> Zero or a negative error code on error.
+</p>
+<p><strong>Since:</strong> 3.6.13
 </p></dd></dl>
 
 <span id="gnutls_005frnd-1"></span><h4 class="subheading">gnutls_rnd</h4>
@@ -44719,7 +45054,7 @@ Syntax&quot;, June 1999, Available from <a href="https://www.rsa.com">https://ww
 </p>
 </dd>
 <dt><span id="PKCS11"></span>[PKCS11]</dt>
-<dd><p>RSA Laboratories, &quot;PKCS #11 Base Functionality v2.30: Cryptoki – Draft 4&quot;,
+<dd><p>RSA Laboratories, &quot;PKCS #11 Base Functionality v2.30: Cryptoki â Draft 4&quot;,
 July 2009, Available from <a href="https://www.rsa.com">https://www.rsa.com</a>.
 </p>
 </dd>
@@ -44979,6 +45314,8 @@ Next: <a href="#Concept-Index" accesskey="n" rel="next">Concept Index</a>, Previ
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fcertificate_005ftype_005fget_005fid"><code>gnutls_certificate_type_get_id</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Core-TLS-API">Core TLS API</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fcertificate_005ftype_005fget_005fname"><code>gnutls_certificate_type_get_name</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Core-TLS-API">Core TLS API</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fcertificate_005ftype_005flist"><code>gnutls_certificate_type_list</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Core-TLS-API">Core TLS API</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-gnutls_005fcertificate_005fverification_005fprofile_005fget_005fid"><code>gnutls_certificate_verification_profile_get_id</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#X509-certificate-API">X509 certificate API</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-gnutls_005fcertificate_005fverification_005fprofile_005fget_005fname"><code>gnutls_certificate_verification_profile_get_name</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#X509-certificate-API">X509 certificate API</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fcertificate_005fverification_005fstatus_005fprint"><code>gnutls_certificate_verification_status_print</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Core-TLS-API">Core TLS API</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fcertificate_005fverify_005fflags"><code>gnutls_certificate_verify_flags</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Verifying-a-certificate-in-the-context-of-TLS-session">Verifying a certificate in the context of TLS session</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fcertificate_005fverify_005fflags-1"><code>gnutls_certificate_verify_flags</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Certificate-verification">Certificate verification</a></td></tr>
@@ -45141,10 +45478,13 @@ Next: <a href="#Concept-Index" accesskey="n" rel="next">Concept Index</a>, Previ
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fhex_005fdecode2"><code>gnutls_hex_decode2</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Core-TLS-API">Core TLS API</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fhex_005fencode"><code>gnutls_hex_encode</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Core-TLS-API">Core TLS API</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fhex_005fencode2"><code>gnutls_hex_encode2</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Core-TLS-API">Core TLS API</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-gnutls_005fhkdf_005fexpand"><code>gnutls_hkdf_expand</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Cryptographic-API">Cryptographic API</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-gnutls_005fhkdf_005fextract"><code>gnutls_hkdf_extract</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Cryptographic-API">Cryptographic API</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fhmac"><code>gnutls_hmac</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Cryptographic-API">Cryptographic API</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fhmac_005fcopy"><code>gnutls_hmac_copy</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Cryptographic-API">Cryptographic API</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fhmac_005fdeinit"><code>gnutls_hmac_deinit</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Cryptographic-API">Cryptographic API</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fhmac_005ffast"><code>gnutls_hmac_fast</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Cryptographic-API">Cryptographic API</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-gnutls_005fhmac_005fget_005fkey_005fsize"><code>gnutls_hmac_get_key_size</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Cryptographic-API">Cryptographic API</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fhmac_005fget_005flen"><code>gnutls_hmac_get_len</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Cryptographic-API">Cryptographic API</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fhmac_005finit"><code>gnutls_hmac_init</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Cryptographic-API">Cryptographic API</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fhmac_005foutput"><code>gnutls_hmac_output</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Cryptographic-API">Cryptographic API</a></td></tr>
@@ -45220,6 +45560,7 @@ Next: <a href="#Concept-Index" accesskey="n" rel="next">Concept Index</a>, Previ
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fopenpgp_005fsend_005fcert"><code>gnutls_openpgp_send_cert</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Core-TLS-API">Core TLS API</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fpacket_005fdeinit"><code>gnutls_packet_deinit</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Core-TLS-API">Core TLS API</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fpacket_005fget"><code>gnutls_packet_get</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Core-TLS-API">Core TLS API</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-gnutls_005fpbkdf2"><code>gnutls_pbkdf2</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Cryptographic-API">Cryptographic API</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fpcert_005fdeinit"><code>gnutls_pcert_deinit</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Abstract-key-API">Abstract key API</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fpcert_005fexport_005fopenpgp"><code>gnutls_pcert_export_openpgp</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Abstract-key-API">Abstract key API</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fpcert_005fexport_005fx509"><code>gnutls_pcert_export_x509</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Abstract-key-API">Abstract key API</a></td></tr>
@@ -45376,6 +45717,7 @@ Next: <a href="#Concept-Index" accesskey="n" rel="next">Concept Index</a>, Previ
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fpk_005fto_005fsign"><code>gnutls_pk_to_sign</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Core-TLS-API">Core TLS API</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fprf"><code>gnutls_prf</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Core-TLS-API">Core TLS API</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fprf_005fearly"><code>gnutls_prf_early</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Core-TLS-API">Core TLS API</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-gnutls_005fprf_005fhash_005fget"><code>gnutls_prf_hash_get</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Core-TLS-API">Core TLS API</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fprf_005fraw"><code>gnutls_prf_raw</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Core-TLS-API">Core TLS API</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fprf_005frfc5705"><code>gnutls_prf_rfc5705</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Deriving-keys-for-other-applications_002fprotocols">Deriving keys for other applications/protocols</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fprf_005frfc5705-1"><code>gnutls_prf_rfc5705</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Core-TLS-API">Core TLS API</a></td></tr>
@@ -45461,13 +45803,17 @@ Next: <a href="#Concept-Index" accesskey="n" rel="next">Concept Index</a>, Previ
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fpsk_005ffree_005fclient_005fcredentials"><code>gnutls_psk_free_client_credentials</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Core-TLS-API">Core TLS API</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fpsk_005ffree_005fserver_005fcredentials"><code>gnutls_psk_free_server_credentials</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Core-TLS-API">Core TLS API</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fpsk_005fserver_005fget_005fusername"><code>gnutls_psk_server_get_username</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Core-TLS-API">Core TLS API</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-gnutls_005fpsk_005fserver_005fget_005fusername2"><code>gnutls_psk_server_get_username2</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Core-TLS-API">Core TLS API</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fpsk_005fset_005fclient_005fcredentials"><code>gnutls_psk_set_client_credentials</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Core-TLS-API">Core TLS API</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-gnutls_005fpsk_005fset_005fclient_005fcredentials2"><code>gnutls_psk_set_client_credentials2</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Core-TLS-API">Core TLS API</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fpsk_005fset_005fclient_005fcredentials_005ffunction"><code>gnutls_psk_set_client_credentials_function</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#PSK-credentials">PSK credentials</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fpsk_005fset_005fclient_005fcredentials_005ffunction-1"><code>gnutls_psk_set_client_credentials_function</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Core-TLS-API">Core TLS API</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-gnutls_005fpsk_005fset_005fclient_005fcredentials_005ffunction2"><code>gnutls_psk_set_client_credentials_function2</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Core-TLS-API">Core TLS API</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fpsk_005fset_005fparams_005ffunction"><code>gnutls_psk_set_params_function</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Core-TLS-API">Core TLS API</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fpsk_005fset_005fserver_005fcredentials_005ffile"><code>gnutls_psk_set_server_credentials_file</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#PSK-credentials">PSK credentials</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fpsk_005fset_005fserver_005fcredentials_005ffile-1"><code>gnutls_psk_set_server_credentials_file</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Core-TLS-API">Core TLS API</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fpsk_005fset_005fserver_005fcredentials_005ffunction"><code>gnutls_psk_set_server_credentials_function</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Core-TLS-API">Core TLS API</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-gnutls_005fpsk_005fset_005fserver_005fcredentials_005ffunction2"><code>gnutls_psk_set_server_credentials_function2</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Core-TLS-API">Core TLS API</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fpsk_005fset_005fserver_005fcredentials_005fhint"><code>gnutls_psk_set_server_credentials_hint</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Core-TLS-API">Core TLS API</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fpsk_005fset_005fserver_005fdh_005fparams"><code>gnutls_psk_set_server_dh_params</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Core-TLS-API">Core TLS API</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fpsk_005fset_005fserver_005fknown_005fdh_005fparams"><code>gnutls_psk_set_server_known_dh_params</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Core-TLS-API">Core TLS API</a></td></tr>
@@ -45584,6 +45930,7 @@ Next: <a href="#Concept-Index" accesskey="n" rel="next">Concept Index</a>, Previ
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fsession_005fget_005fid"><code>gnutls_session_get_id</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Core-TLS-API">Core TLS API</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fsession_005fget_005fid2"><code>gnutls_session_get_id2</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Session-resumption">Session resumption</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fsession_005fget_005fid2-1"><code>gnutls_session_get_id2</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Core-TLS-API">Core TLS API</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-gnutls_005fsession_005fget_005fkeylog_005ffunction"><code>gnutls_session_get_keylog_function</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Core-TLS-API">Core TLS API</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fsession_005fget_005fmaster_005fsecret"><code>gnutls_session_get_master_secret</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Core-TLS-API">Core TLS API</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fsession_005fget_005fptr"><code>gnutls_session_get_ptr</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Core-TLS-API">Core TLS API</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fsession_005fget_005frandom"><code>gnutls_session_get_random</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Core-TLS-API">Core TLS API</a></td></tr>
@@ -45595,6 +45942,7 @@ Next: <a href="#Concept-Index" accesskey="n" rel="next">Concept Index</a>, Previ
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fsession_005fresumption_005frequested-1"><code>gnutls_session_resumption_requested</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Core-TLS-API">Core TLS API</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fsession_005fset_005fdata"><code>gnutls_session_set_data</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Core-TLS-API">Core TLS API</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fsession_005fset_005fid"><code>gnutls_session_set_id</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Core-TLS-API">Core TLS API</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-gnutls_005fsession_005fset_005fkeylog_005ffunction"><code>gnutls_session_set_keylog_function</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Core-TLS-API">Core TLS API</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fsession_005fset_005fpremaster"><code>gnutls_session_set_premaster</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Core-TLS-API">Core TLS API</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fsession_005fset_005fptr"><code>gnutls_session_set_ptr</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Core-TLS-API">Core TLS API</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-gnutls_005fsession_005fset_005fverify_005fcert"><code>gnutls_session_set_verify_cert</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Certificate-credentials">Certificate credentials</a></td></tr>
@@ -46411,77 +46759,77 @@ Previous: <a href="#Function-and-Data-Index" accesskey="p" rel="prev">Function a
 <hr>
 <h4 class="footnotes-heading">Footnotes</h4>
 
-<h5><a id="FOOT1" href="#DOCF1">(1)</a></h3>
+<h3><a id="FOOT1" href="#DOCF1">(1)</a></h3>
 <p>Needed
 to use RFC6125 name comparison in internationalized domains.</p>
-<h5><a id="FOOT2" href="#DOCF2">(2)</a></h3>
+<h3><a id="FOOT2" href="#DOCF2">(2)</a></h3>
 <p><a href="https://p11-glue.github.io/p11-glue/trust-module.html">https://p11-glue.github.io/p11-glue/trust-module.html</a></p>
-<h5><a id="FOOT3" href="#DOCF3">(3)</a></h3>
+<h3><a id="FOOT3" href="#DOCF3">(3)</a></h3>
 <p>IETF, or Internet Engineering Task Force,
 is a large open international community of network designers,
 operators, vendors, and researchers concerned with the evolution of
 the Internet architecture and the smooth operation of the Internet.
 It is open to any interested individual.</p>
-<h5><a id="FOOT4" href="#DOCF4">(4)</a></h3>
+<h3><a id="FOOT4" href="#DOCF4">(4)</a></h3>
 <p>In early versions of TLS compression was optionally
 available as well. This is no longer the case in recent versions of the
 protocol.</p>
-<h5><a id="FOOT5" href="#DOCF5">(5)</a></h3>
+<h3><a id="FOOT5" href="#DOCF5">(5)</a></h3>
 <p>MAC stands for Message Authentication Code. It can be described as a keyed hash algorithm. See RFC2104.</p>
-<h5><a id="FOOT6" href="#DOCF6">(6)</a></h3>
+<h3><a id="FOOT6" href="#DOCF6">(6)</a></h3>
 <p>See also the Server Name Indication extension on
 <a href="#serverind">serverind</a>.</p>
-<h5><a id="FOOT7" href="#DOCF7">(7)</a></h3>
+<h3><a id="FOOT7" href="#DOCF7">(7)</a></h3>
 <p>See LDAP, IMAP etc.</p>
-<h5><a id="FOOT8" href="#DOCF8">(8)</a></h3>
+<h3><a id="FOOT8" href="#DOCF8">(8)</a></h3>
 <p>see <a href="https://p11-glue.github.io/p11-glue/trust-module.html">https://p11-glue.github.io/p11-glue/trust-module.html</a>.</p>
-<h5><a id="FOOT9" href="#DOCF9">(9)</a></h3>
+<h3><a id="FOOT9" href="#DOCF9">(9)</a></h3>
 <p>For example, OpenSC-supported cards.</p>
-<h5><a id="FOOT10" href="#DOCF10">(10)</a></h3>
+<h3><a id="FOOT10" href="#DOCF10">(10)</a></h3>
 <p><a href="https://p11-glue.github.io/p11-glue/p11-kit.html">https://p11-glue.github.io/p11-glue/p11-kit.html</a></p>
-<h5><a id="FOOT11" href="#DOCF11">(11)</a></h3>
+<h3><a id="FOOT11" href="#DOCF11">(11)</a></h3>
 <p>For
 example when an open session is to be reinitialized, but the PIN is not available
 to GnuTLS (e.g., it was entered at a pinpad).</p>
-<h5><a id="FOOT12" href="#DOCF12">(12)</a></h3>
+<h3><a id="FOOT12" href="#DOCF12">(12)</a></h3>
 <p><a href="https://p11-glue.github.io/p11-glue/trust-module.html">https://p11-glue.github.io/p11-glue/trust-module.html</a></p>
-<h5><a id="FOOT13" href="#DOCF13">(13)</a></h3>
+<h3><a id="FOOT13" href="#DOCF13">(13)</a></h3>
 <p>See
 the &rsquo;Restricting the scope of CA certificates&rsquo; post at <a href="https://nmav.gnutls.org/2016/06/restricting-scope-of-ca-certificates.html">https://nmav.gnutls.org/2016/06/restricting-scope-of-ca-certificates.html</a></p>
-<h5><a id="FOOT14" href="#DOCF14">(14)</a></h3>
+<h3><a id="FOOT14" href="#DOCF14">(14)</a></h3>
 <p><a href="https://github.com/google/chaps-linux">https://github.com/google/chaps-linux</a></p>
-<h5><a id="FOOT15" href="#DOCF15">(15)</a></h3>
+<h3><a id="FOOT15" href="#DOCF15">(15)</a></h3>
 <p><a href="https://sourceforge.net/projects/opencryptoki/">https://sourceforge.net/projects/opencryptoki/</a></p>
-<h5><a id="FOOT16" href="#DOCF16">(16)</a></h3>
+<h3><a id="FOOT16" href="#DOCF16">(16)</a></h3>
 <p>The first message in a <acronym>TLS</acronym> handshake</p>
-<h5><a id="FOOT17" href="#DOCF17">(17)</a></h3>
+<h3><a id="FOOT17" href="#DOCF17">(17)</a></h3>
 <p>On special systems
 you could manually specify the locking system using
 the function <a href="#gnutls_005fglobal_005fset_005fmutex">gnutls_global_set_mutex</a> before calling any other
 GnuTLS function. Setting mutexes manually is not recommended.</p>
-<h5><a id="FOOT18" href="#DOCF18">(18)</a></h3>
+<h3><a id="FOOT18" href="#DOCF18">(18)</a></h3>
 <p>The original behavior of requiring explicit initialization can obtained by setting the
 GNUTLS_NO_EXPLICIT_INIT environment variable to 1, or by using the macro GNUTLS_SKIP_GLOBAL_INIT
 in a global section of your program &ndash;the latter works in systems with
 support for weak symbols only.</p>
-<h5><a id="FOOT19" href="#DOCF19">(19)</a></h3>
+<h3><a id="FOOT19" href="#DOCF19">(19)</a></h3>
 <p>A key of 128 bits or 16 bytes should be sufficient for this purpose.</p>
-<h5><a id="FOOT20" href="#DOCF20">(20)</a></h3>
+<h3><a id="FOOT20" href="#DOCF20">(20)</a></h3>
 <p>It depends on the group in use.  Groups with
 less bits are always faster, but the number of bits ties with the security
 parameter.  See <a href="#Selecting-cryptographic-key-sizes">Selecting cryptographic key sizes</a>
 for the acceptable security levels.</p>
-<h5><a id="FOOT21" href="#DOCF21">(21)</a></h3>
+<h3><a id="FOOT21" href="#DOCF21">(21)</a></h3>
 <p>See <a href="https://www.lysator.liu.se/~nisse/nettle/">https://www.lysator.liu.se/~nisse/nettle/</a>.</p>
-<h5><a id="FOOT22" href="#DOCF22">(22)</a></h3>
+<h3><a id="FOOT22" href="#DOCF22">(22)</a></h3>
 <p>See the nettle manual <a href="https://www.lysator.liu.se/~nisse/nettle/nettle.html">https://www.lysator.liu.se/~nisse/nettle/nettle.html</a></p>
-<h5><a id="FOOT23" href="#DOCF23">(23)</a></h3>
+<h3><a id="FOOT23" href="#DOCF23">(23)</a></h3>
 <p>such as the
 <code>gnutls_certificate_credentials_t</code> structures</p>
-<h5><a id="FOOT24" href="#DOCF24">(24)</a></h3>
+<h3><a id="FOOT24" href="#DOCF24">(24)</a></h3>
 <p>See
 <a href="https://lists.gnu.org/archive/html/gnutls-devel/2011-02/msg00079.html">https://lists.gnu.org/archive/html/gnutls-devel/2011-02/msg00079.html</a>.</p>
-<h5><a id="FOOT25" href="#DOCF25">(25)</a></h3>
+<h3><a id="FOOT25" href="#DOCF25">(25)</a></h3>
 <p>Check <a href="https://home.gna.org/cryptodev-linux/">https://home.gna.org/cryptodev-linux/</a>
 for the Linux kernel implementation of <code>/dev/crypto</code>.</p>
 </div>

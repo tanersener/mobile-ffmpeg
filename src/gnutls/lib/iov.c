@@ -77,6 +77,12 @@ _gnutls_iov_iter_next(struct iov_iter_st *iter, uint8_t **data)
 		size_t len = iov->iov_len;
 		size_t block_left;
 
+		if (!p) {
+			// skip NULL iov entries, else we run into issues below
+			iter->iov_index++;
+			continue;
+		}
+
 		if (unlikely(len < iter->iov_offset))
 			return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 		len -= iter->iov_offset;

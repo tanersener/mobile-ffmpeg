@@ -62,7 +62,7 @@ This function will deinitialize a OCSP request structure.
 
 @subheading gnutls_ocsp_req_export
 @anchor{gnutls_ocsp_req_export}
-@deftypefun {int} {gnutls_ocsp_req_export} (gnutls_ocsp_req_t @var{req}, gnutls_datum_t * @var{data})
+@deftypefun {int} {gnutls_ocsp_req_export} (gnutls_ocsp_req_const_t @var{req}, gnutls_datum_t * @var{data})
 @var{req}: Holds the OCSP request
 
 @var{data}: newly allocate buffer holding DER encoded OCSP request
@@ -75,7 +75,7 @@ returned, and 0 on success.
 
 @subheading gnutls_ocsp_req_get_cert_id
 @anchor{gnutls_ocsp_req_get_cert_id}
-@deftypefun {int} {gnutls_ocsp_req_get_cert_id} (gnutls_ocsp_req_t @var{req}, unsigned @var{indx}, gnutls_digest_algorithm_t * @var{digest}, gnutls_datum_t * @var{issuer_name_hash}, gnutls_datum_t * @var{issuer_key_hash}, gnutls_datum_t * @var{serial_number})
+@deftypefun {int} {gnutls_ocsp_req_get_cert_id} (gnutls_ocsp_req_const_t @var{req}, unsigned @var{indx}, gnutls_digest_algorithm_t * @var{digest}, gnutls_datum_t * @var{issuer_name_hash}, gnutls_datum_t * @var{issuer_key_hash}, gnutls_datum_t * @var{serial_number})
 @var{req}: should contain a @code{gnutls_ocsp_req_t}  type
 
 @var{indx}: Specifies which extension OID to get. Use (0) to get the first one.
@@ -111,7 +111,7 @@ returned.
 
 @subheading gnutls_ocsp_req_get_extension
 @anchor{gnutls_ocsp_req_get_extension}
-@deftypefun {int} {gnutls_ocsp_req_get_extension} (gnutls_ocsp_req_t @var{req}, unsigned @var{indx}, gnutls_datum_t * @var{oid}, unsigned int * @var{critical}, gnutls_datum_t * @var{data})
+@deftypefun {int} {gnutls_ocsp_req_get_extension} (gnutls_ocsp_req_const_t @var{req}, unsigned @var{indx}, gnutls_datum_t * @var{oid}, unsigned int * @var{critical}, gnutls_datum_t * @var{data})
 @var{req}: should contain a @code{gnutls_ocsp_req_t}  type
 
 @var{indx}: Specifies which extension OID to get. Use (0) to get the first one.
@@ -140,7 +140,7 @@ be returned.
 
 @subheading gnutls_ocsp_req_get_nonce
 @anchor{gnutls_ocsp_req_get_nonce}
-@deftypefun {int} {gnutls_ocsp_req_get_nonce} (gnutls_ocsp_req_t @var{req}, unsigned int * @var{critical}, gnutls_datum_t * @var{nonce})
+@deftypefun {int} {gnutls_ocsp_req_get_nonce} (gnutls_ocsp_req_const_t @var{req}, unsigned int * @var{critical}, gnutls_datum_t * @var{nonce})
 @var{req}: should contain a @code{gnutls_ocsp_req_t}  type
 
 @var{critical}: whether nonce extension is marked critical, or NULL
@@ -158,7 +158,7 @@ negative error code is returned.
 
 @subheading gnutls_ocsp_req_get_version
 @anchor{gnutls_ocsp_req_get_version}
-@deftypefun {int} {gnutls_ocsp_req_get_version} (gnutls_ocsp_req_t @var{req})
+@deftypefun {int} {gnutls_ocsp_req_get_version} (gnutls_ocsp_req_const_t @var{req})
 @var{req}: should contain a @code{gnutls_ocsp_req_t}  type
 
 This function will return the version of the OCSP request.
@@ -195,7 +195,7 @@ negative error value.
 
 @subheading gnutls_ocsp_req_print
 @anchor{gnutls_ocsp_req_print}
-@deftypefun {int} {gnutls_ocsp_req_print} (gnutls_ocsp_req_t @var{req}, gnutls_ocsp_print_formats_t @var{format}, gnutls_datum_t * @var{out})
+@deftypefun {int} {gnutls_ocsp_req_print} (gnutls_ocsp_req_const_t @var{req}, gnutls_ocsp_print_formats_t @var{format}, gnutls_datum_t * @var{out})
 @var{req}: The data to be printed
 
 @var{format}: Indicate the format to use
@@ -264,7 +264,7 @@ negative error code is returned.
 
 @subheading gnutls_ocsp_resp_check_crt
 @anchor{gnutls_ocsp_resp_check_crt}
-@deftypefun {int} {gnutls_ocsp_resp_check_crt} (gnutls_ocsp_resp_t @var{resp}, unsigned int @var{indx}, gnutls_x509_crt_t @var{crt})
+@deftypefun {int} {gnutls_ocsp_resp_check_crt} (gnutls_ocsp_resp_const_t @var{resp}, unsigned int @var{indx}, gnutls_x509_crt_t @var{crt})
 @var{resp}: should contain a @code{gnutls_ocsp_resp_t}  type
 
 @var{indx}: Specifies response number to get. Use (0) to get the first one.
@@ -290,7 +290,7 @@ This function will deinitialize a OCSP response structure.
 
 @subheading gnutls_ocsp_resp_export
 @anchor{gnutls_ocsp_resp_export}
-@deftypefun {int} {gnutls_ocsp_resp_export} (gnutls_ocsp_resp_t @var{resp}, gnutls_datum_t * @var{data})
+@deftypefun {int} {gnutls_ocsp_resp_export} (gnutls_ocsp_resp_const_t @var{resp}, gnutls_datum_t * @var{data})
 @var{resp}: Holds the OCSP response
 
 @var{data}: newly allocate buffer holding DER encoded OCSP response
@@ -303,7 +303,7 @@ returned, and 0 on success.
 
 @subheading gnutls_ocsp_resp_export2
 @anchor{gnutls_ocsp_resp_export2}
-@deftypefun {int} {gnutls_ocsp_resp_export2} (gnutls_ocsp_resp_t @var{resp}, gnutls_datum_t * @var{data}, gnutls_x509_crt_fmt_t @var{fmt})
+@deftypefun {int} {gnutls_ocsp_resp_export2} (gnutls_ocsp_resp_const_t @var{resp}, gnutls_datum_t * @var{data}, gnutls_x509_crt_fmt_t @var{fmt})
 @var{resp}: Holds the OCSP response
 
 @var{data}: newly allocate buffer holding DER or PEM encoded OCSP response
@@ -320,7 +320,7 @@ returned, and 0 on success.
 
 @subheading gnutls_ocsp_resp_get_certs
 @anchor{gnutls_ocsp_resp_get_certs}
-@deftypefun {int} {gnutls_ocsp_resp_get_certs} (gnutls_ocsp_resp_t @var{resp}, gnutls_x509_crt_t ** @var{certs}, size_t * @var{ncerts})
+@deftypefun {int} {gnutls_ocsp_resp_get_certs} (gnutls_ocsp_resp_const_t @var{resp}, gnutls_x509_crt_t ** @var{certs}, size_t * @var{ncerts})
 @var{resp}: should contain a @code{gnutls_ocsp_resp_t}  type
 
 @var{certs}: newly allocated array with @code{gnutls_x509_crt_t}  certificates
@@ -346,7 +346,7 @@ negative error value.
 
 @subheading gnutls_ocsp_resp_get_extension
 @anchor{gnutls_ocsp_resp_get_extension}
-@deftypefun {int} {gnutls_ocsp_resp_get_extension} (gnutls_ocsp_resp_t @var{resp}, unsigned @var{indx}, gnutls_datum_t * @var{oid}, unsigned int * @var{critical}, gnutls_datum_t * @var{data})
+@deftypefun {int} {gnutls_ocsp_resp_get_extension} (gnutls_ocsp_resp_const_t @var{resp}, unsigned @var{indx}, gnutls_datum_t * @var{oid}, unsigned int * @var{critical}, gnutls_datum_t * @var{data})
 @var{resp}: should contain a @code{gnutls_ocsp_resp_t}  type
 
 @var{indx}: Specifies which extension OID to get. Use (0) to get the first one.
@@ -375,7 +375,7 @@ be returned.
 
 @subheading gnutls_ocsp_resp_get_nonce
 @anchor{gnutls_ocsp_resp_get_nonce}
-@deftypefun {int} {gnutls_ocsp_resp_get_nonce} (gnutls_ocsp_resp_t @var{resp}, unsigned int * @var{critical}, gnutls_datum_t * @var{nonce})
+@deftypefun {int} {gnutls_ocsp_resp_get_nonce} (gnutls_ocsp_resp_const_t @var{resp}, unsigned int * @var{critical}, gnutls_datum_t * @var{nonce})
 @var{resp}: should contain a @code{gnutls_ocsp_resp_t}  type
 
 @var{critical}: whether nonce extension is marked critical
@@ -394,7 +394,7 @@ negative error code is returned.
 
 @subheading gnutls_ocsp_resp_get_produced
 @anchor{gnutls_ocsp_resp_get_produced}
-@deftypefun {time_t} {gnutls_ocsp_resp_get_produced} (gnutls_ocsp_resp_t @var{resp})
+@deftypefun {time_t} {gnutls_ocsp_resp_get_produced} (gnutls_ocsp_resp_const_t @var{resp})
 @var{resp}: should contain a @code{gnutls_ocsp_resp_t}  type
 
 This function will return the time when the OCSP response was
@@ -405,7 +405,7 @@ signed.
 
 @subheading gnutls_ocsp_resp_get_responder
 @anchor{gnutls_ocsp_resp_get_responder}
-@deftypefun {int} {gnutls_ocsp_resp_get_responder} (gnutls_ocsp_resp_t @var{resp}, gnutls_datum_t * @var{dn})
+@deftypefun {int} {gnutls_ocsp_resp_get_responder} (gnutls_ocsp_resp_const_t @var{resp}, gnutls_datum_t * @var{dn})
 @var{resp}: should contain a @code{gnutls_ocsp_resp_t}  type
 
 @var{dn}: newly allocated buffer with name
@@ -431,7 +431,7 @@ return success and set  @code{dn} elements to zero.
 
 @subheading gnutls_ocsp_resp_get_responder2
 @anchor{gnutls_ocsp_resp_get_responder2}
-@deftypefun {int} {gnutls_ocsp_resp_get_responder2} (gnutls_ocsp_resp_t @var{resp}, gnutls_datum_t * @var{dn}, unsigned @var{flags})
+@deftypefun {int} {gnutls_ocsp_resp_get_responder2} (gnutls_ocsp_resp_const_t @var{resp}, gnutls_datum_t * @var{dn}, unsigned @var{flags})
 @var{resp}: should contain a @code{gnutls_ocsp_resp_t}  type
 
 @var{dn}: newly allocated buffer with name
@@ -460,7 +460,7 @@ negative error code is returned. When no data exist it will return
 
 @subheading gnutls_ocsp_resp_get_responder_raw_id
 @anchor{gnutls_ocsp_resp_get_responder_raw_id}
-@deftypefun {int} {gnutls_ocsp_resp_get_responder_raw_id} (gnutls_ocsp_resp_t @var{resp}, unsigned @var{type}, gnutls_datum_t * @var{raw})
+@deftypefun {int} {gnutls_ocsp_resp_get_responder_raw_id} (gnutls_ocsp_resp_const_t @var{resp}, unsigned @var{type}, gnutls_datum_t * @var{raw})
 @var{resp}: should contain a @code{gnutls_ocsp_resp_t}  type
 
 @var{type}: should be @code{GNUTLS_OCSP_RESP_ID_KEY}  or @code{GNUTLS_OCSP_RESP_ID_DN} 
@@ -480,7 +480,7 @@ negative error code is returned.
 
 @subheading gnutls_ocsp_resp_get_response
 @anchor{gnutls_ocsp_resp_get_response}
-@deftypefun {int} {gnutls_ocsp_resp_get_response} (gnutls_ocsp_resp_t @var{resp}, gnutls_datum_t * @var{response_type_oid}, gnutls_datum_t * @var{response})
+@deftypefun {int} {gnutls_ocsp_resp_get_response} (gnutls_ocsp_resp_const_t @var{resp}, gnutls_datum_t * @var{response_type_oid}, gnutls_datum_t * @var{response})
 @var{resp}: should contain a @code{gnutls_ocsp_resp_t}  type
 
 @var{response_type_oid}: newly allocated output buffer with response type OID
@@ -504,7 +504,7 @@ negative error value.
 
 @subheading gnutls_ocsp_resp_get_signature
 @anchor{gnutls_ocsp_resp_get_signature}
-@deftypefun {int} {gnutls_ocsp_resp_get_signature} (gnutls_ocsp_resp_t @var{resp}, gnutls_datum_t * @var{sig})
+@deftypefun {int} {gnutls_ocsp_resp_get_signature} (gnutls_ocsp_resp_const_t @var{resp}, gnutls_datum_t * @var{sig})
 @var{resp}: should contain a @code{gnutls_ocsp_resp_t}  type
 
 @var{sig}: newly allocated output buffer with signature data
@@ -517,7 +517,7 @@ negative error value.
 
 @subheading gnutls_ocsp_resp_get_signature_algorithm
 @anchor{gnutls_ocsp_resp_get_signature_algorithm}
-@deftypefun {int} {gnutls_ocsp_resp_get_signature_algorithm} (gnutls_ocsp_resp_t @var{resp})
+@deftypefun {int} {gnutls_ocsp_resp_get_signature_algorithm} (gnutls_ocsp_resp_const_t @var{resp})
 @var{resp}: should contain a @code{gnutls_ocsp_resp_t}  type
 
 This function will return a value of the @code{gnutls_sign_algorithm_t} 
@@ -530,7 +530,7 @@ on error.
 
 @subheading gnutls_ocsp_resp_get_single
 @anchor{gnutls_ocsp_resp_get_single}
-@deftypefun {int} {gnutls_ocsp_resp_get_single} (gnutls_ocsp_resp_t @var{resp}, unsigned @var{indx}, gnutls_digest_algorithm_t * @var{digest}, gnutls_datum_t * @var{issuer_name_hash}, gnutls_datum_t * @var{issuer_key_hash}, gnutls_datum_t * @var{serial_number}, unsigned int * @var{cert_status}, time_t * @var{this_update}, time_t * @var{next_update}, time_t * @var{revocation_time}, unsigned int * @var{revocation_reason})
+@deftypefun {int} {gnutls_ocsp_resp_get_single} (gnutls_ocsp_resp_const_t @var{resp}, unsigned @var{indx}, gnutls_digest_algorithm_t * @var{digest}, gnutls_datum_t * @var{issuer_name_hash}, gnutls_datum_t * @var{issuer_key_hash}, gnutls_datum_t * @var{serial_number}, unsigned int * @var{cert_status}, time_t * @var{this_update}, time_t * @var{next_update}, time_t * @var{revocation_time}, unsigned int * @var{revocation_reason})
 @var{resp}: should contain a @code{gnutls_ocsp_resp_t}  type
 
 @var{indx}: Specifies response number to get. Use (0) to get the first one.
@@ -569,7 +569,7 @@ returned.
 
 @subheading gnutls_ocsp_resp_get_status
 @anchor{gnutls_ocsp_resp_get_status}
-@deftypefun {int} {gnutls_ocsp_resp_get_status} (gnutls_ocsp_resp_t @var{resp})
+@deftypefun {int} {gnutls_ocsp_resp_get_status} (gnutls_ocsp_resp_const_t @var{resp})
 @var{resp}: should contain a @code{gnutls_ocsp_resp_t}  type
 
 This function will return the status of a OCSP response, an
@@ -581,7 +581,7 @@ a negative error code on error.
 
 @subheading gnutls_ocsp_resp_get_version
 @anchor{gnutls_ocsp_resp_get_version}
-@deftypefun {int} {gnutls_ocsp_resp_get_version} (gnutls_ocsp_resp_t @var{resp})
+@deftypefun {int} {gnutls_ocsp_resp_get_version} (gnutls_ocsp_resp_const_t @var{resp})
 @var{resp}: should contain a @code{gnutls_ocsp_resp_t}  type
 
 This function will return the version of the Basic OCSP Response.
@@ -668,7 +668,7 @@ In PEM files, when no OCSP responses are detected
 
 @subheading gnutls_ocsp_resp_print
 @anchor{gnutls_ocsp_resp_print}
-@deftypefun {int} {gnutls_ocsp_resp_print} (gnutls_ocsp_resp_t @var{resp}, gnutls_ocsp_print_formats_t @var{format}, gnutls_datum_t * @var{out})
+@deftypefun {int} {gnutls_ocsp_resp_print} (gnutls_ocsp_resp_const_t @var{resp}, gnutls_ocsp_print_formats_t @var{format}, gnutls_datum_t * @var{out})
 @var{resp}: The data to be printed
 
 @var{format}: Indicate the format to use
@@ -689,7 +689,7 @@ negative error value.
 
 @subheading gnutls_ocsp_resp_verify
 @anchor{gnutls_ocsp_resp_verify}
-@deftypefun {int} {gnutls_ocsp_resp_verify} (gnutls_ocsp_resp_t @var{resp}, gnutls_x509_trust_list_t @var{trustlist}, unsigned int * @var{verify}, unsigned int @var{flags})
+@deftypefun {int} {gnutls_ocsp_resp_verify} (gnutls_ocsp_resp_const_t @var{resp}, gnutls_x509_trust_list_t @var{trustlist}, unsigned int * @var{verify}, unsigned int @var{flags})
 @var{resp}: should contain a @code{gnutls_ocsp_resp_t}  type
 
 @var{trustlist}: trust anchors as a @code{gnutls_x509_trust_list_t}  type
@@ -723,7 +723,7 @@ negative error value.
 
 @subheading gnutls_ocsp_resp_verify_direct
 @anchor{gnutls_ocsp_resp_verify_direct}
-@deftypefun {int} {gnutls_ocsp_resp_verify_direct} (gnutls_ocsp_resp_t @var{resp}, gnutls_x509_crt_t @var{issuer}, unsigned int * @var{verify}, unsigned int @var{flags})
+@deftypefun {int} {gnutls_ocsp_resp_verify_direct} (gnutls_ocsp_resp_const_t @var{resp}, gnutls_x509_crt_t @var{issuer}, unsigned int * @var{verify}, unsigned int @var{flags})
 @var{resp}: should contain a @code{gnutls_ocsp_resp_t}  type
 
 @var{issuer}: certificate believed to have signed the response

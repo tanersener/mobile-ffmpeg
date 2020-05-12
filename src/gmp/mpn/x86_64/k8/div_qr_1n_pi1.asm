@@ -81,7 +81,7 @@ ABI_SUPPORT(STD64)
 	TEXT
 	ALIGN(16)
 PROLOGUE(mpn_div_qr_1n_pi1)
-	FUNC_ENTRY(6)
+	FUNC_ENTRY(4)
 IFDOS(`	mov	56(%rsp), %r8	')
 IFDOS(`	mov	64(%rsp), %r9	')
 	dec	UN_INPUT
@@ -108,7 +108,7 @@ IFDOS(`	mov	64(%rsp), %r9	')
 	add	$1, T
 L(single_div_done):
 	mov	T, (QP)
-	FUNC_EXIT
+	FUNC_EXIT()
 	ret
 L(first):
 	C FIXME: Could delay some of these until we enter the loop.
@@ -235,7 +235,7 @@ L(done):
 	pop	%r13
 	pop	%r14
 	pop	%r15
-	FUNC_EXIT
+	FUNC_EXIT()
 	ret
 
 L(q_incr):

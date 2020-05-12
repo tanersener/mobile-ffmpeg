@@ -23,7 +23,9 @@
 
 #include "libavutil/common.h"
 #include "libavutil/internal.h"
-#include "avcodec.h"
+
+#include "codec_id.h"
+#include "codec_desc.h"
 #include "profiles.h"
 #include "version.h"
 
@@ -1747,6 +1749,20 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .long_name = NULL_IF_CONFIG_SMALL("MidiVid Archive Codec"),
         .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
     },
+    {
+        .id        = AV_CODEC_ID_CDTOONS,
+        .type      = AVMEDIA_TYPE_VIDEO,
+        .name      = "cdtoons",
+        .long_name = NULL_IF_CONFIG_SMALL("CDToons video"),
+        .props     = AV_CODEC_PROP_LOSSLESS,
+    },
+    {
+        .id        = AV_CODEC_ID_MV30,
+        .type      = AVMEDIA_TYPE_VIDEO,
+        .name      = "mv30",
+        .long_name = NULL_IF_CONFIG_SMALL("MidiVid 3.0"),
+        .props     = AV_CODEC_PROP_LOSSY,
+    },
 
     /* various PCM "codecs" */
     {
@@ -1867,13 +1883,6 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .name      = "pcm_s24daud",
         .long_name = NULL_IF_CONFIG_SMALL("PCM D-Cinema audio signed 24-bit"),
         .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSLESS,
-    },
-    {
-        .id        = AV_CODEC_ID_PCM_ZORK,
-        .type      = AVMEDIA_TYPE_AUDIO,
-        .name      = "pcm_zork",
-        .long_name = NULL_IF_CONFIG_SMALL("PCM Zork"),
-        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
     },
     {
         .id        = AV_CODEC_ID_PCM_S16LE_PLANAR,
@@ -2297,6 +2306,48 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .long_name = NULL_IF_CONFIG_SMALL("ADPCM AmuseGraphics Movie AGM"),
         .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
     },
+    {
+        .id        = AV_CODEC_ID_ADPCM_ARGO,
+        .type      = AVMEDIA_TYPE_AUDIO,
+        .name      = "adpcm_argo",
+        .long_name = NULL_IF_CONFIG_SMALL("ADPCM Argonaut Games"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
+    },
+    {
+        .id        = AV_CODEC_ID_ADPCM_IMA_SSI,
+        .type      = AVMEDIA_TYPE_AUDIO,
+        .name      = "adpcm_ima_ssi",
+        .long_name = NULL_IF_CONFIG_SMALL("ADPCM IMA Simon & Schuster Interactive"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
+    },
+    {
+        .id        = AV_CODEC_ID_ADPCM_ZORK,
+        .type      = AVMEDIA_TYPE_AUDIO,
+        .name      = "adpcm_zork",
+        .long_name = NULL_IF_CONFIG_SMALL("ADPCM Zork"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
+    },
+    {
+        .id        = AV_CODEC_ID_ADPCM_IMA_APM,
+        .type      = AVMEDIA_TYPE_AUDIO,
+        .name      = "adpcm_ima_apm",
+        .long_name = NULL_IF_CONFIG_SMALL("ADPCM IMA Ubisoft APM"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
+    },
+    {
+        .id        = AV_CODEC_ID_ADPCM_IMA_ALP,
+        .type      = AVMEDIA_TYPE_AUDIO,
+        .name      = "adpcm_ima_alp",
+        .long_name = NULL_IF_CONFIG_SMALL("ADPCM IMA High Voltage Software ALP"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
+    },
+    {
+        .id        = AV_CODEC_ID_ADPCM_IMA_MTF,
+        .type      = AVMEDIA_TYPE_AUDIO,
+        .name      = "adpcm_ima_mtf",
+        .long_name = NULL_IF_CONFIG_SMALL("ADPCM IMA Capcom's MT Framework"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
+    },
 
     /* AMR */
     {
@@ -2371,6 +2422,13 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .type      = AVMEDIA_TYPE_AUDIO,
         .name      = "gremlin_dpcm",
         .long_name = NULL_IF_CONFIG_SMALL("DPCM Gremlin"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
+    },
+    {
+        .id        = AV_CODEC_ID_DERF_DPCM,
+        .type      = AVMEDIA_TYPE_AUDIO,
+        .name      = "derf_dpcm",
+        .long_name = NULL_IF_CONFIG_SMALL("DPCM Xilam DERF"),
         .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
     },
 
@@ -3022,6 +3080,20 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .name      = "mpegh_3d_audio",
         .long_name = NULL_IF_CONFIG_SMALL("MPEG-H 3D Audio"),
         .props     = AV_CODEC_PROP_LOSSY,
+    },
+    {
+        .id        = AV_CODEC_ID_SIREN,
+        .type      = AVMEDIA_TYPE_AUDIO,
+        .name      = "siren",
+        .long_name = NULL_IF_CONFIG_SMALL("Siren"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
+    },
+    {
+        .id        = AV_CODEC_ID_HCA,
+        .type      = AVMEDIA_TYPE_AUDIO,
+        .name      = "hca",
+        .long_name = NULL_IF_CONFIG_SMALL("CRI HCA"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
     },
 
     /* subtitle codecs */

@@ -52,14 +52,17 @@ LIBRARY_EXPAT=40
 LIBRARY_SNDFILE=41
 LIBRARY_LEPTONICA=42
 LIBRARY_LIBSAMPLERATE=43
-LIBRARY_ZLIB=44
-LIBRARY_MEDIA_CODEC=45
+LIBRARY_CPU_FEATURES=44
+LIBRARY_ZLIB=45
+LIBRARY_MEDIA_CODEC=46
 
 # ENABLE ARCH
 ENABLED_ARCHITECTURES=(1 1 1 1 1)
 
 # ENABLE LIBRARIES
-ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+
+ENABLED_LIBRARIES[LIBRARY_CPU_FEATURES]=1
 
 export BASEDIR=$(pwd)
 export MOBILE_FFMPEG_TMPDIR="${BASEDIR}/.tmp"
@@ -82,7 +85,7 @@ display_help() {
   echo -e "\n'"$COMMAND"' builds FFmpeg and MobileFFmpeg for Android platform. By default five Android ABIs (armeabi-v7a, armeabi-v7a-neon, arm64-v8a, x86 and x86_64) are built \
 without any external libraries enabled. Options can be used to disable ABIs and/or enable external libraries. \
 Please note that GPL libraries (external libraries with GPL license) need --enable-gpl flag to be set explicitly. \
-When compilation ends an Android Archive (AAR) file is created with enabled platforms inside.\n"
+When compilation ends an Android Archive (AAR) file is created under the prebuilt folder.\n"
 
   echo -e "Usage: ./"$COMMAND" [OPTION]...\n"
 
@@ -251,6 +254,9 @@ enable_library() {
 
 set_library() {
   case $1 in
+  cpu_features)
+    ENABLED_LIBRARIES[LIBRARY_CPU_FEATURES]=$2
+    ;;
   android-media-codec)
     ENABLED_LIBRARIES[LIBRARY_MEDIA_CODEC]=$2
     ;;
@@ -482,7 +488,7 @@ print_enabled_libraries() {
   let enabled=0
 
   # FIRST BUILT-IN LIBRARIES
-  for library in {44..45}; do
+  for library in {44..46}; do
     if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
       if [[ ${enabled} -ge 1 ]]; then
         echo -n ", "
@@ -555,12 +561,10 @@ build_application_mk() {
     local LTS_BUILD_FLAG="-DMOBILE_FFMPEG_LTS "
   fi
 
-  if [[ ${ENABLED_LIBRARIES[$LIBRARY_X265]} -eq 1 ]] || [[ ${ENABLED_LIBRARIES[$LIBRARY_TESSERACT]} -eq 1 ]] || [[ ${ENABLED_LIBRARIES[$LIBRARY_OPENH264]} -eq 1 ]] || [[ ${ENABLED_LIBRARIES[$LIBRARY_SNAPPY]} -eq 1 ]] || [[ ${ENABLED_LIBRARIES[$LIBRARY_RUBBERBAND]} -eq 1 ]]; then
+  if [[ ${ENABLED_LIBRARIES[$LIBRARY_X265]} -eq 1 ]] || [[ ${ENABLED_LIBRARIES[$LIBRARY_TESSERACT]} -eq 1 ]] || [[ ${ENABLED_LIBRARIES[$LIBRARY_SNAPPY]} -eq 1 ]] || [[ ${ENABLED_LIBRARIES[$LIBRARY_RUBBERBAND]} -eq 1 ]]; then
     local APP_STL="c++_shared"
   else
     local APP_STL="none"
-
-    ${SED_INLINE} 's/c++_shared //g' ${BASEDIR}/android/jni/Android.mk 1>>${BASEDIR}/build.log 2>&1
   fi
 
   local BUILD_DATE="-DMOBILE_FFMPEG_BUILD_DATE=$(date +%Y%m%d 2>>${BASEDIR}/build.log)"
@@ -588,7 +592,7 @@ EOF
 DETECTED_NDK_VERSION=$(grep -Eo Revision.* ${ANDROID_NDK_ROOT}/source.properties | sed 's/Revision//g;s/=//g;s/ //g')
 
 echo -e "\nINFO: Using Android NDK v${DETECTED_NDK_VERSION} provided at ${ANDROID_NDK_ROOT}\n" 1>>${BASEDIR}/build.log 2>&1
-echo -e "INFO: Build options: $@\n" 1>>${BASEDIR}/build.log 2>&1
+echo -e "INFO: Build options: $*\n" 1>>${BASEDIR}/build.log 2>&1
 
 # CLEAR OLD NATIVE LIBS
 rm -rf ${BASEDIR}/android/libs 1>>${BASEDIR}/build.log 2>&1
@@ -649,7 +653,7 @@ while [ ! $# -eq 0 ]; do
     rebuild_library ${BUILD_LIBRARY}
     ;;
   --full)
-    for library in {0..45}; do
+    for library in {0..46}; do
       if [[ $library -ne 18 ]] && [[ $library -ne 19 ]] && [[ $library -ne 20 ]] && [[ $library -ne 21 ]] && [[ $library -ne 22 ]]; then
         enable_library $(get_library_name $library)
       fi
@@ -709,6 +713,11 @@ if [[ -z ${ANDROID_HOME} ]]; then
   exit 1
 fi
 
+if [[ -z ${BUILD_VERSION} ]]; then
+  echo -e "\nerror: Can not run git commands in this folder. See build.log.\n"
+  exit 1
+fi
+
 echo -e "\nBuilding mobile-ffmpeg ${BUILD_TYPE_ID}library for Android\n"
 echo -e -n "INFO: Building mobile-ffmpeg ${BUILD_VERSION} ${BUILD_TYPE_ID}library for Android: " 1>>${BASEDIR}/build.log 2>&1
 echo -e $(date) 1>>${BASEDIR}/build.log 2>&1
@@ -751,7 +760,7 @@ export ORIGINAL_API=${API}
 
 for run_arch in {0..4}; do
   if [[ ${ENABLED_ARCHITECTURES[$run_arch]} -eq 1 ]]; then
-    if [[ (${run_arch} -eq ${ARCH_ARM64_V8A} || ${run_arch} -eq ${ARCH_X86_64}) && ${API} < 21 ]]; then
+    if [[ (${run_arch} -eq ${ARCH_ARM64_V8A} || ${run_arch} -eq ${ARCH_X86_64}) && ${API} -lt 21 ]]; then
 
       # 64 bit ABIs supported after API 21
       export API=21
@@ -766,7 +775,7 @@ for run_arch in {0..4}; do
     . ${BASEDIR}/build/main-android.sh "${ENABLED_LIBRARIES[@]}" || exit 1
 
     # CLEAR FLAGS
-    for library in {1..46}; do
+    for library in {1..47}; do
       library_name=$(get_library_name $((library - 1)))
       unset $(echo "OK_${library_name}" | sed "s/\-/\_/g")
       unset $(echo "DEPENDENCY_REBUILT_${library_name}" | sed "s/\-/\_/g")

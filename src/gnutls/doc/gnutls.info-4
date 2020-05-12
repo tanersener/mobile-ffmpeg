@@ -1,9 +1,9 @@
-This is gnutls.info, produced by makeinfo version 6.7 from gnutls.texi.
+This is gnutls.info, produced by makeinfo version 6.6 from gnutls.texi.
 
-This manual is last updated 27 June 2019 for version 3.6.11 of GnuTLS.
+This manual is last updated 2 January 2020 for version 3.6.13 of GnuTLS.
 
-Copyright (C) 2001-2019 Free Software Foundation, Inc.\\ Copyright (C)
-2001-2019 Nikos Mavrogiannopoulos
+Copyright (C) 2001-2020 Free Software Foundation, Inc.\\ Copyright (C)
+2001-2020 Nikos Mavrogiannopoulos
 
      Permission is granted to copy, distribute and/or modify this
      document under the terms of the GNU Free Documentation License,
@@ -295,6 +295,34 @@ gnutls_certificate_set_trust_list
      code.
 
      *Since:* 3.2.2
+
+gnutls_certificate_verification_profile_get_id
+----------------------------------------------
+
+ -- Function: gnutls_certificate_verification_profiles_t
+          gnutls_certificate_verification_profile_get_id (const char *
+          NAME)
+     NAME: is a profile name
+
+     Convert a string to a 'gnutls_certificate_verification_profiles_t'
+     value.  The names are compared in a case insensitive way.
+
+     *Returns:* a 'gnutls_certificate_verification_profiles_t' id of the
+     specified profile, or 'GNUTLS_PROFILE_UNKNOWN' on failure.
+
+gnutls_certificate_verification_profile_get_name
+------------------------------------------------
+
+ -- Function: const char *
+          gnutls_certificate_verification_profile_get_name
+          (gnutls_certificate_verification_profiles_t ID)
+     ID: is a profile ID
+
+     Convert a 'gnutls_certificate_verification_profiles_t' value to a
+     string.
+
+     *Returns:* a string that contains the name of the specified profile
+     or 'NULL' .
 
 gnutls_pkcs8_info
 -----------------
@@ -2275,7 +2303,7 @@ gnutls_x509_crq_get_pk_oid
      OID_SIZE: initially holds the size of 'oid'
 
      This function will return the OID of the public key algorithm on
-     that certificate request.  This is function is useful in the case
+     that certificate request.  This function is useful in the case
      'gnutls_x509_crq_get_pk_algorithm()' returned 'GNUTLS_PK_UNKNOWN' .
 
      *Returns:* zero or a negative error code on error.
@@ -2334,8 +2362,8 @@ gnutls_x509_crq_get_signature_oid
      OID_SIZE: initially holds the size of 'oid'
 
      This function will return the OID of the signature algorithm that
-     has been used to sign this certificate request.  This is function
-     is useful in the case 'gnutls_x509_crq_get_signature_algorithm()'
+     has been used to sign this certificate request.  This function is
+     useful in the case 'gnutls_x509_crq_get_signature_algorithm()'
      returned 'GNUTLS_SIGN_UNKNOWN' .
 
      *Returns:* zero or a negative error code on error.
@@ -5697,30 +5725,6 @@ gnutls_x509_crt_set_spki
 
      *Since:* 3.6.0
 
-gnutls_x509_crt_set_subject_alternative_name
---------------------------------------------
-
- -- Function: int gnutls_x509_crt_set_subject_alternative_name
-          (gnutls_x509_crt_t CRT, gnutls_x509_subject_alt_name_t TYPE,
-          const char * DATA_STRING)
-     CRT: a certificate of type 'gnutls_x509_crt_t'
-
-     TYPE: is one of the gnutls_x509_subject_alt_name_t enumerations
-
-     DATA_STRING: The data to be set, a (0) terminated string
-
-     This function will set the subject alternative name certificate
-     extension.  This function assumes that data can be expressed as a
-     null terminated string.
-
-     The name of the function is unfortunate since it is inconsistent
-     with 'gnutls_x509_crt_get_subject_alt_name()' .
-
-     See 'gnutls_x509_crt_set_subject_alt_name()' for more information.
-
-     *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
-     otherwise a negative error value.
-
 gnutls_x509_crt_set_subject_alt_name
 ------------------------------------
 
@@ -5784,6 +5788,30 @@ gnutls_x509_crt_set_subject_alt_othername
      otherwise a negative error value.
 
      *Since:* 3.5.0
+
+gnutls_x509_crt_set_subject_alternative_name
+--------------------------------------------
+
+ -- Function: int gnutls_x509_crt_set_subject_alternative_name
+          (gnutls_x509_crt_t CRT, gnutls_x509_subject_alt_name_t TYPE,
+          const char * DATA_STRING)
+     CRT: a certificate of type 'gnutls_x509_crt_t'
+
+     TYPE: is one of the gnutls_x509_subject_alt_name_t enumerations
+
+     DATA_STRING: The data to be set, a (0) terminated string
+
+     This function will set the subject alternative name certificate
+     extension.  This function assumes that data can be expressed as a
+     null terminated string.
+
+     The name of the function is unfortunate since it is inconsistent
+     with 'gnutls_x509_crt_get_subject_alt_name()' .
+
+     See 'gnutls_x509_crt_set_subject_alt_name()' for more information.
+
+     *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
+     otherwise a negative error value.
 
 gnutls_x509_crt_set_subject_key_id
 ----------------------------------

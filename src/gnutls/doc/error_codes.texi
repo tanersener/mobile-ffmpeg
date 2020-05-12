@@ -189,4 +189,5 @@
 @item -427 @tab GNUTLS_@-E_@-MISSING_@-EXTENSION @tab An required TLS extension was received.
 @item -428 @tab GNUTLS_@-E_@-DB_@-ENTRY_@-EXISTS @tab The Database entry already exists.
 @item -429 @tab GNUTLS_@-E_@-EARLY_@-DATA_@-REJECTED @tab The early data were rejected.
+@item -430 @tab GNUTLS_@-E_@-X509_@-DUPLICATE_@-EXTENSION @tab Duplicate extension in X.509 certificate.
 @end multitable

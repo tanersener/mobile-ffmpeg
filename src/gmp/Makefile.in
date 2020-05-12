@@ -14,8 +14,8 @@
 
 @SET_MAKE@
 
-# Copyright 1991, 1993, 1994, 1996, 1997, 1999-2004, 2006-2009, 2011-2016 Free
-# Software Foundation, Inc.
+# Copyright 1991, 1993, 1994, 1996, 1997, 1999-2004, 2006-2009, 2011-2016,
+# 2018, 2020 Free Software Foundation, Inc.
 #
 #  This file is part of the GNU MP Library.
 #
@@ -100,6 +100,7 @@
 #        6.1.0   13:0:3    9:0:5     -
 #        6.1.1   13:1:3    9:1:5     -
 #        6.1.2   13:2:3    9:2:5     -
+#        6.2.0   14:0:4   10:0:6     -
 #
 # Starting at 3:0:0 is a slight abuse of the versioning system, but it
 # ensures we're past soname libgmp.so.2, which was used on Debian GNU/Linux
@@ -111,6 +112,7 @@
 # Even if we thought the code generated will be identical on all systems,
 # it's still good to get the shared library filename (like
 # libgmpxx.so.3.0.4) incrementing, to make it clear which GMP it's from.
+
 
 
 VPATH = @srcdir@
@@ -187,6 +189,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
+@WANT_CXX_TRUE@am__append_1 = gmpxx.pc
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
@@ -200,7 +203,7 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno config.status.lineno
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = config.h
-CONFIG_CLEAN_FILES = gmp.h gmp-mparam.h
+CONFIG_CLEAN_FILES = gmp.h gmp.pc gmpxx.pc gmp-mparam.h
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -229,8 +232,8 @@ am__uninstall_files_from_dir = { \
     || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
          $(am__cd) "$$dir" && rm -f $$files; }; \
   }
-am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(includedir)" \
-	"$(DESTDIR)$(includeexecdir)"
+am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(pkgconfigdir)" \
+	"$(DESTDIR)$(includedir)" "$(DESTDIR)$(includeexecdir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 am__DEPENDENCIES_1 = $(MPF_OBJECTS) $(MPZ_OBJECTS) $(MPQ_OBJECTS) \
 	$(MPN_OBJECTS) $(PRINTF_OBJECTS) $(SCANF_OBJECTS) \
@@ -247,7 +250,8 @@ am__v_lt_1 =
 libgmp_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(libgmp_la_LDFLAGS) $(LDFLAGS) -o $@
-am_libgmpxx_la_OBJECTS = dummy.lo
+am__dirstamp = $(am__leading_dot)dirstamp
+am_libgmpxx_la_OBJECTS = cxx/dummy.lo
 libgmpxx_la_OBJECTS = $(am_libgmpxx_la_OBJECTS)
 libgmpxx_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
@@ -321,6 +325,7 @@ am__can_run_installinfo = \
     n|no|NO) false;; \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
+DATA = $(pkgconfig_DATA)
 am__include_HEADERS_DIST = gmpxx.h
 HEADERS = $(include_HEADERS) $(nodist_includeexec_HEADERS)
 RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
@@ -354,9 +359,9 @@ CTAGS = ctags
 CSCOPE = cscope
 DIST_SUBDIRS = $(SUBDIRS)
 am__DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/config.in \
-	$(srcdir)/gmp-h.in AUTHORS COPYING ChangeLog INSTALL NEWS \
-	README compile config.guess config.sub install-sh ltmain.sh \
-	missing
+	$(srcdir)/gmp-h.in $(srcdir)/gmp.pc.in $(srcdir)/gmpxx.pc.in \
+	AUTHORS COPYING ChangeLog INSTALL NEWS README compile \
+	config.guess config.sub install-sh ltmain.sh missing
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -560,13 +565,15 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-LIBGMP_LT_CURRENT = 13
-LIBGMP_LT_REVISION = 2
-LIBGMP_LT_AGE = 3
-LIBGMPXX_LT_CURRENT = 9
-LIBGMPXX_LT_REVISION = 2
-LIBGMPXX_LT_AGE = 5
+LIBGMP_LT_CURRENT = 14
+LIBGMP_LT_REVISION = 0
+LIBGMP_LT_AGE = 4
+LIBGMPXX_LT_CURRENT = 10
+LIBGMPXX_LT_REVISION = 0
+LIBGMPXX_LT_AGE = 6
 SUBDIRS = tests mpn mpz mpq mpf printf scanf rand cxx demos tune doc
+
+# Put asl.h here for now.
 
 # The "test -f" support for srcdir!=builddir is similar to the automake .c.o
 # etc rules, but with each foo.c explicitly, since $< is not portable
@@ -586,16 +593,18 @@ SUBDIRS = tests mpn mpz mpq mpf printf scanf rand cxx demos tune doc
 
 # Distribute mini-gmp. Test sources copied by dist-hook.
 EXTRA_DIST = configfsf.guess configfsf.sub .gdbinit INSTALL.autoconf \
-	COPYING.LESSERv3 COPYINGv2 COPYINGv3 gmpxx.h bootstrap.c \
+	COPYING.LESSERv3 COPYINGv2 COPYINGv3 asl.h gmpxx.h bootstrap.c \
 	gen-fac.c gen-fib.c gen-bases.c gen-trialdivtab.c \
 	gen-jacobitab.c gen-psqr.c mini-gmp/README mini-gmp/mini-gmp.c \
-	mini-gmp/mini-gmp.h mini-gmp/tests/Makefile \
-	mini-gmp/tests/run-tests
+	mini-gmp/mini-gmp.h mini-gmp/mini-mpq.c mini-gmp/mini-mpq.h \
+	mini-gmp/tests/Makefile mini-gmp/tests/run-tests
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = gmp.pc $(am__append_1)
 @WANT_CXX_TRUE@GMPXX_HEADERS_OPTION = gmpxx.h
 
-# gmp.h and mp.h are architecture dependent, mainly since they encode the
-# limb size used in libgmp.  For that reason they belong under $exec_prefix
-# not $prefix, strictly speaking.
+# gmp.h is architecture dependent, mainly since it encodes the limb size used
+# in libgmp.  For that reason it belongs under $exec_prefix not $prefix,
+# strictly speaking.
 #
 # $exec_prefix/include is not in the default include path for gcc built to
 # the same $prefix and $exec_prefix, which might mean gmp.h is not found,
@@ -668,7 +677,7 @@ MPZ_OBJECTS = mpz/abs$U.lo mpz/add$U.lo mpz/add_ui$U.lo			\
   mpz/kronuz$U.lo mpz/kronzs$U.lo mpz/kronzu$U.lo			\
   mpz/lcm$U.lo mpz/lcm_ui$U.lo mpz/limbs_finish$U.lo			\
   mpz/limbs_modify$U.lo mpz/limbs_read$U.lo mpz/limbs_write$U.lo	\
-  mpz/lucnum_ui$U.lo mpz/lucnum2_ui$U.lo				\
+  mpz/lucmod$U.lo mpz/lucnum_ui$U.lo mpz/lucnum2_ui$U.lo		\
   mpz/millerrabin$U.lo mpz/mod$U.lo mpz/mul$U.lo mpz/mul_2exp$U.lo	\
   mpz/mul_si$U.lo mpz/mul_ui$U.lo					\
   mpz/n_pow_ui$U.lo mpz/neg$U.lo mpz/nextprime$U.lo			\
@@ -682,7 +691,8 @@ MPZ_OBJECTS = mpz/abs$U.lo mpz/add$U.lo mpz/add_ui$U.lo			\
   mpz/set_q$U.lo mpz/set_si$U.lo mpz/set_str$U.lo mpz/set_ui$U.lo	\
   mpz/setbit$U.lo							\
   mpz/size$U.lo mpz/sizeinbase$U.lo mpz/sqrt$U.lo			\
-  mpz/sqrtrem$U.lo mpz/sub$U.lo mpz/sub_ui$U.lo mpz/swap$U.lo		\
+  mpz/sqrtrem$U.lo mpz/stronglucas$U.lo mpz/sub$U.lo			\
+  mpz/sub_ui$U.lo mpz/swap$U.lo						\
   mpz/tdiv_ui$U.lo mpz/tdiv_q$U.lo mpz/tdiv_q_2exp$U.lo			\
   mpz/tdiv_q_ui$U.lo mpz/tdiv_qr$U.lo mpz/tdiv_qr_ui$U.lo		\
   mpz/tdiv_r$U.lo mpz/tdiv_r_2exp$U.lo mpz/tdiv_r_ui$U.lo		\
@@ -826,6 +836,10 @@ distclean-hdr:
 	-rm -f config.h stamp-h1
 gmp.h: $(top_builddir)/config.status $(srcdir)/gmp-h.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
+gmp.pc: $(top_builddir)/config.status $(srcdir)/gmp.pc.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+gmpxx.pc: $(top_builddir)/config.status $(srcdir)/gmpxx.pc.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
 
 install-libLTLIBRARIES: $(lib_LTLIBRARIES)
 	@$(NORMAL_INSTALL)
@@ -864,12 +878,18 @@ clean-libLTLIBRARIES:
 
 libgmp.la: $(libgmp_la_OBJECTS) $(libgmp_la_DEPENDENCIES) $(EXTRA_libgmp_la_DEPENDENCIES) 
 	$(AM_V_CCLD)$(libgmp_la_LINK) -rpath $(libdir) $(libgmp_la_OBJECTS) $(libgmp_la_LIBADD) $(LIBS)
+cxx/$(am__dirstamp):
+	@$(MKDIR_P) cxx
+	@: > cxx/$(am__dirstamp)
+cxx/dummy.lo: cxx/$(am__dirstamp)
 
 libgmpxx.la: $(libgmpxx_la_OBJECTS) $(libgmpxx_la_DEPENDENCIES) $(EXTRA_libgmpxx_la_DEPENDENCIES) 
 	$(AM_V_CXXLD)$(libgmpxx_la_LINK) $(am_libgmpxx_la_rpath) $(libgmpxx_la_OBJECTS) $(libgmpxx_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
+	-rm -f cxx/*.$(OBJEXT)
+	-rm -f cxx/*.lo
 
 distclean-compile:
 	-rm -f *.tab.c
@@ -892,17 +912,36 @@ distclean-compile:
 .cc.lo:
 	$(AM_V_CXX)$(LTCXXCOMPILE) -c -o $@ $<
 
-dummy.lo: cxx/dummy.cc
-	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o dummy.lo `test -f 'cxx/dummy.cc' || echo '$(srcdir)/'`cxx/dummy.cc
-
 mostlyclean-libtool:
 	-rm -f *.lo
 
 clean-libtool:
 	-rm -rf .libs _libs
+	-rm -rf cxx/.libs cxx/_libs
 
 distclean-libtool:
 	-rm -f libtool config.lt
+install-pkgconfigDATA: $(pkgconfig_DATA)
+	@$(NORMAL_INSTALL)
+	@list='$(pkgconfig_DATA)'; test -n "$(pkgconfigdir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(pkgconfigdir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(pkgconfigdir)" || exit 1; \
+	fi; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(pkgconfigdir)'"; \
+	  $(INSTALL_DATA) $$files "$(DESTDIR)$(pkgconfigdir)" || exit $$?; \
+	done
+
+uninstall-pkgconfigDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(pkgconfig_DATA)'; test -n "$(pkgconfigdir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	dir='$(DESTDIR)$(pkgconfigdir)'; $(am__uninstall_files_from_dir)
 install-includeHEADERS: $(include_HEADERS)
 	@$(NORMAL_INSTALL)
 	@list='$(include_HEADERS)'; test -n "$(includedir)" || list=; \
@@ -1246,10 +1285,10 @@ distcleancheck: distclean
 check-am: all-am
 check: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) check-recursive
-all-am: Makefile $(LTLIBRARIES) $(HEADERS) config.h
+all-am: Makefile $(LTLIBRARIES) $(DATA) $(HEADERS) config.h
 installdirs: installdirs-recursive
 installdirs-am:
-	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(includedir)" "$(DESTDIR)$(includeexecdir)"; do \
+	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(pkgconfigdir)" "$(DESTDIR)$(includedir)" "$(DESTDIR)$(includeexecdir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: $(BUILT_SOURCES)
@@ -1279,6 +1318,7 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
+	-rm -f cxx/$(am__dirstamp)
 	-test -z "$(DISTCLEANFILES)" || rm -f $(DISTCLEANFILES)
 
 maintainer-clean-generic:
@@ -1308,7 +1348,7 @@ info: info-recursive
 
 info-am:
 
-install-data-am: install-includeHEADERS
+install-data-am: install-includeHEADERS install-pkgconfigDATA
 	@$(NORMAL_INSTALL)
 	$(MAKE) $(AM_MAKEFLAGS) install-data-hook
 install-dvi: install-dvi-recursive
@@ -1358,7 +1398,7 @@ ps: ps-recursive
 ps-am:
 
 uninstall-am: uninstall-includeHEADERS uninstall-libLTLIBRARIES \
-	uninstall-nodist_includeexecHEADERS
+	uninstall-nodist_includeexecHEADERS uninstall-pkgconfigDATA
 
 .MAKE: $(am__recursive_targets) all check install install-am \
 	install-data-am install-strip
@@ -1378,12 +1418,13 @@ uninstall-am: uninstall-includeHEADERS uninstall-libLTLIBRARIES \
 	install-includeHEADERS install-info install-info-am \
 	install-libLTLIBRARIES install-man \
 	install-nodist_includeexecHEADERS install-pdf install-pdf-am \
-	install-ps install-ps-am install-strip installcheck \
-	installcheck-am installdirs installdirs-am maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-compile \
-	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags tags-am uninstall uninstall-am uninstall-includeHEADERS \
-	uninstall-libLTLIBRARIES uninstall-nodist_includeexecHEADERS
+	install-pkgconfigDATA install-ps install-ps-am install-strip \
+	installcheck installcheck-am installdirs installdirs-am \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
+	pdf pdf-am ps ps-am tags tags-am uninstall uninstall-am \
+	uninstall-includeHEADERS uninstall-libLTLIBRARIES \
+	uninstall-nodist_includeexecHEADERS uninstall-pkgconfigDATA
 
 .PRECIOUS: Makefile
 
@@ -1474,7 +1515,7 @@ check-mini-gmp:
 		MINI_GMP_DIR="$$abs_srcdir/mini-gmp" \
 		LDFLAGS="-L../../.libs" \
 		LIBS="-lgmp -lm" \
-		CC="$(CC)" CFLAGS="$(CFLAGS)" CPPFLAGS="-I../.." check
+		CC="$(CC)" CFLAGS="$(CFLAGS)" CPPFLAGS="$(CPPFLAGS) -I../.." check
 
 clean-mini-gmp:
 	if [ -d mini-gmp/tests ] ; then \

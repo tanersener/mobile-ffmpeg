@@ -1,1 +1,1 @@
-@item @var{int} @ref{gnutls_ocsp_resp_verify} (gnutls_ocsp_resp_t @var{resp}, gnutls_x509_trust_list_t @var{trustlist}, unsigned int * @var{verify}, unsigned int @var{flags})
+@item @var{int} @ref{gnutls_ocsp_resp_verify} (gnutls_ocsp_resp_const_t @var{resp}, gnutls_x509_trust_list_t @var{trustlist}, unsigned int * @var{verify}, unsigned int @var{flags})

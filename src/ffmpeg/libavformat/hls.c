@@ -403,8 +403,7 @@ static struct segment *new_init_section(struct playlist *pls,
                                         const char *url_base)
 {
     struct segment *sec;
-    char *ptr;
-    char tmp_str[MAX_URL_SIZE];
+    char tmp_str[MAX_URL_SIZE], *ptr = tmp_str;
 
     if (!info->uri[0])
         return NULL;
@@ -413,8 +412,12 @@ static struct segment *new_init_section(struct playlist *pls,
     if (!sec)
         return NULL;
 
-    ff_make_absolute_url(tmp_str, sizeof(tmp_str), url_base, info->uri);
-    sec->url = av_strdup(tmp_str);
+    if (!av_strncasecmp(info->uri, "data:", 5)) {
+        ptr = info->uri;
+    } else {
+        ff_make_absolute_url(tmp_str, sizeof(tmp_str), url_base, info->uri);
+    }
+    sec->url = av_strdup(ptr);
     if (!sec->url) {
         av_free(sec);
         return NULL;
@@ -627,6 +630,9 @@ static int open_url(AVFormatContext *s, AVIOContext **pb, const char *url,
     if (av_strstart(url, "crypto", NULL)) {
         if (url[6] == '+' || url[6] == ':')
             proto_name = avio_find_protocol_name(url + 7);
+    } else if (av_strstart(url, "data", NULL)) {
+        if (url[4] == '+' || url[4] == ':')
+            proto_name = avio_find_protocol_name(url + 5);
     }
 
     if (!proto_name)
@@ -646,12 +652,16 @@ static int open_url(AVFormatContext *s, AVIOContext **pb, const char *url,
         }
     } else if (av_strstart(proto_name, "http", NULL)) {
         is_http = 1;
+    } else if (av_strstart(proto_name, "data", NULL)) {
+        ;
     } else
         return AVERROR_INVALIDDATA;
 
     if (!strncmp(proto_name, url, strlen(proto_name)) && url[strlen(proto_name)] == ':')
         ;
     else if (av_strstart(url, "crypto", NULL) && !strncmp(proto_name, url + 7, strlen(proto_name)) && url[7 + strlen(proto_name)] == ':')
+        ;
+    else if (av_strstart(url, "data", NULL) && !strncmp(proto_name, url + 5, strlen(proto_name)) && url[5 + strlen(proto_name)] == ':')
         ;
     else if (strcmp(proto_name, "file") || !strncmp(url, "file,", 5))
         return AVERROR_INVALIDDATA;
@@ -2214,7 +2224,6 @@ static int hls_read_packet(AVFormatContext *s, AVPacket *pkt)
         if (ist->codecpar->codec_id != st->codecpar->codec_id) {
             ret = set_stream_info_from_input_stream(st, pls, ist);
             if (ret < 0) {
-                av_packet_unref(pkt);
                 return ret;
             }
         }

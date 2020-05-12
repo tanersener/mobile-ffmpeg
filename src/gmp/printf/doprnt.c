@@ -63,7 +63,6 @@ see https://www.gnu.org/licenses/.  */
 #include <sys/types.h> /* for quad_t */
 #endif
 
-#include "gmp.h"
 #include "gmp-impl.h"
 
 
@@ -340,7 +339,7 @@ __gmp_doprnt (const struct doprnt_funs_t *funs, void *data,
 				       va_arg (ap, mpz_srcptr));
 	      gmp_integer:
 		ret = __gmp_doprnt_integer (funs, data, &param, gmp_str);
-		(*__gmp_free_func) (gmp_str, strlen(gmp_str)+1);
+		 __GMP_FREE_FUNC_TYPE (gmp_str, strlen(gmp_str)+1, char);
 		DOPRNT_ACCUMULATE (ret);
 		va_copy (last_ap, ap);
 		last_fmt = fmt;
@@ -618,7 +617,7 @@ __gmp_doprnt (const struct doprnt_funs_t *funs, void *data,
       goto error;
 
  done:
-  (*__gmp_free_func) (alloc_fmt, alloc_fmt_size);
+  __GMP_FREE_FUNC_TYPE (alloc_fmt, alloc_fmt_size, char);
   return retval;
 
  error:

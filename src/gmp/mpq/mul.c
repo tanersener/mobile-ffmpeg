@@ -28,7 +28,6 @@ You should have received copies of the GNU General Public License and the
 GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
-#include "gmp.h"
 #include "gmp-impl.h"
 
 
@@ -62,7 +61,7 @@ mpq_mul (mpq_ptr prod, mpq_srcptr op1, mpq_srcptr op2)
       /* We special case this to simplify allocation logic; gcd(0,x) = x
 	 is a singular case for the allocations.  */
       SIZ(NUM(prod)) = 0;
-      PTR(DEN(prod))[0] = 1;
+      MPZ_NEWALLOC (DEN(prod), 1)[0] = 1;
       SIZ(DEN(prod)) = 1;
       return;
     }

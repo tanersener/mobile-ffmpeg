@@ -43,6 +43,13 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 		assert(ret >= 0);
 		gnutls_free(out.data);
 	}
+	gnutls_x509_crt_deinit(crt);
+
+	ret = gnutls_x509_crt_init(&crt);
+	assert(ret >= 0);
+
+	gnutls_x509_crt_set_flags(crt, GNUTLS_X509_CRT_FLAG_IGNORE_SANITY);
+	gnutls_x509_crt_import(crt, &raw, GNUTLS_X509_FMT_DER);
 
 	gnutls_x509_crt_deinit(crt);
 	return 0;

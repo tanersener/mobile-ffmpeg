@@ -1,0 +1,20 @@
+
+
+
+
+@deftypefun {int} {gnutls_hkdf_extract} (gnutls_mac_algorithm_t @var{mac}, const gnutls_datum_t * @var{key}, const gnutls_datum_t * @var{salt}, void * @var{output})
+@var{mac}: the mac algorithm used internally
+
+@var{key}: the initial keying material
+
+@var{salt}: the optional salt
+
+@var{output}: the output value of the extract operation
+
+This function will derive a fixed-size key using the HKDF-Extract
+function as defined in RFC 5869.
+
+@strong{Returns:} Zero or a negative error code on error.
+
+@strong{Since:} 3.6.13
+@end deftypefun

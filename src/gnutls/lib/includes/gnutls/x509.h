@@ -1033,6 +1033,9 @@ typedef enum gnutls_certificate_verification_profiles_t {
 #define GNUTLS_VFLAGS_TO_PROFILE(x) \
 	((((unsigned)x)>>24)&0xff)
 
+const char *
+	gnutls_certificate_verification_profile_get_name(gnutls_certificate_verification_profiles_t id) __GNUTLS_CONST__;
+gnutls_certificate_verification_profiles_t gnutls_certificate_verification_profile_get_id(const char *name) __GNUTLS_CONST__;
 
 unsigned gnutls_x509_crt_check_issuer(gnutls_x509_crt_t cert,
 				 gnutls_x509_crt_t issuer);

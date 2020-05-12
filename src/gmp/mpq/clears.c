@@ -1,6 +1,6 @@
 /* mpq_clears() -- Clear multiple mpq_t variables.
 
-Copyright 2009, 2014, 2015 Free Software Foundation, Inc.
+Copyright 2009, 2014, 2015, 2018 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -29,7 +29,6 @@ GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
 #include <stdarg.h>
-#include "gmp.h"
 #include "gmp-impl.h"
 
 void
@@ -39,12 +38,15 @@ mpq_clears (mpq_ptr x, ...)
 
   va_start (ap, x);
 
-  while (x != NULL)
+  do
     {
-      __GMP_FREE_FUNC_LIMBS (PTR(NUM(x)), ALLOC(NUM(x)));
-      __GMP_FREE_FUNC_LIMBS (PTR(DEN(x)), ALLOC(DEN(x)));
+      if (ALLOC (NUM(x)))
+	__GMP_FREE_FUNC_LIMBS (PTR(NUM(x)), ALLOC(NUM(x)));
+      if (ALLOC (DEN(x)))
+	__GMP_FREE_FUNC_LIMBS (PTR(DEN(x)), ALLOC(DEN(x)));
       x = va_arg (ap, mpq_ptr);
     }
+  while (x != NULL);
 
   va_end (ap);
 }

@@ -1,8 +1,7 @@
-dnl  AMD64 mpn_bdiv_q_1, mpn_pi1_bdiv_q_1 -- schoolbook Hensel division by
-dnl  1-limb divisor, returning quotient only.
+dnl  AMD64 mpn_bdiv_q_1, mpn_pi1_bdiv_q_1 -- Hensel division by 1-limb divisor.
 
-dnl  Copyright 2001, 2002, 2004-2006, 2009, 2011, 2012 Free Software
-dnl  Foundation, Inc.
+dnl  Copyright 2001, 2002, 2004-2006, 2010-2012, 2017 Free Software Foundation,
+dnl  Inc.
 
 dnl  This file is part of the GNU MP Library.
 dnl
@@ -32,16 +31,27 @@ dnl  see https://www.gnu.org/licenses/.
 
 include(`../config.m4')
 
-
-C	     cycles/limb
-C AMD K8,K9	10
-C AMD K10	10
-C Intel P4	33
-C Intel core2	13.25
-C Intel corei	14
-C Intel atom	42
-C VIA nano	 ?
-
+C	    cycles/limb    cycles/limb
+C	       norm	       unorm
+C AMD K8,K9	11		11
+C AMD K10	11		11
+C AMD bull	13.5		14
+C AMD pile	14		15
+C AMD steam
+C AMD excavator
+C AMD bobcat	14		14
+C AMD jaguar	14.5		15
+C Intel P4	33		33
+C Intel core2	13.5		13.25
+C Intel NHM	14		14
+C Intel SBR	8		8.25
+C Intel IBR	7.75		7.85
+C Intel HWL	8		8
+C Intel BWL	8		8
+C Intel SKL	8		8
+C Intel atom	34		36
+C Intel SLM	13.7		13.5
+C VIA nano	19.25		19.25	needs re-measuring
 
 C INPUT PARAMETERS
 define(`rp',		`%rdi')
@@ -66,7 +76,7 @@ PROLOGUE(mpn_bdiv_q_1)
 	mov	%rdx, %r10
 
 	bt	$0, R32(%rax)
-	jnc	L(evn)			C skip bsfq unless divisor is even
+	jnc	L(evn)			C skip bsf unless divisor is even
 
 L(odd):	mov	%rax, %rbx
 	shr	R32(%rax)
@@ -93,7 +103,7 @@ L(odd):	mov	%rax, %rbx
 	imul	%rbx, %rax		C inv*inv*d
 	sub	%rax, %r8		C inv = 2*inv - inv*inv*d, 64 bits
 
-	jmp	L(com)
+	jmp	L(pi1)
 
 L(evn):	bsf	%rax, %rcx
 	shr	R8(%rcx), %rax
@@ -110,50 +120,68 @@ IFDOS(`	mov	64(%rsp), %r9	')
 	mov	%rdx, %r10		C n
 	mov	%r9, %rcx		C ncnt
 
-L(com):	mov	(up), %rax		C up[0]
+L(pi1):	mov	(up), %rax		C up[0]
 
 	dec	%r10
 	jz	L(one)
 
-	mov	8(up), %rdx		C up[1]
-	lea	(up,%r10,8), up		C up end
+	lea	8(up,%r10,8), up	C up end
 	lea	(rp,%r10,8), rp		C rp end
 	neg	%r10			C -n
 
-	shrd	R8(%rcx), %rdx, %rax
-
+	test	R32(%rcx), R32(%rcx)
+	jnz	L(unorm)		C branch if count != 0
 	xor	R32(%rbx), R32(%rbx)
-	jmp	L(ent)
+	jmp	L(nent)
 
 	ALIGN(8)
-L(top):
-	C rax	q
-	C rbx	carry bit, 0 or 1
-	C rcx	ncnt
-	C rdx
-	C r10	counter, limbs, negative
-
-	mul	%r11			C carry limb in rdx
-	mov	(up,%r10,8), %rax
-	mov	8(up,%r10,8), %r9
-	shrd	R8(%rcx), %r9, %rax
-	nop
+L(ntop):mul	%r11			C carry limb in rdx	0 10
+	mov	-8(up,%r10,8), %rax	C
 	sub	%rbx, %rax		C apply carry bit
-	setc	R8(%rbx)
-	sub	%rdx, %rax		C apply carry limb
-	adc	$0, %rbx
-L(ent):	imul	%r8, %rax
-	mov	%rax, (rp,%r10,8)
-	inc	%r10
-	jnz	L(top)
+	setc	R8(%rbx)		C
+	sub	%rdx, %rax		C apply carry limb	5
+	adc	$0, R32(%rbx)		C			6
+L(nent):imul	%r8, %rax		C			6
+	mov	%rax, (rp,%r10,8)	C
+	inc	%r10			C
+	jnz	L(ntop)
 
-	mul	%r11			C carry limb in rdx
-	mov	(up), %rax		C up high limb
-	shr	R8(%rcx), %rax
+	mov	-8(up), %r9		C up high limb
+	jmp	L(com)
+
+L(unorm):
+	mov	(up,%r10,8), %r9	C up[1]
+	shr	R8(%rcx), %rax		C
+	neg	R32(%rcx)
+	shl	R8(%rcx), %r9		C
+	neg	R32(%rcx)
+	or	%r9, %rax
+	xor	R32(%rbx), R32(%rbx)
+	jmp	L(uent)
+
+	ALIGN(8)
+L(utop):mul	%r11			C carry limb in rdx	0 10
+	mov	(up,%r10,8), %rax	C
+	shl	R8(%rcx), %rax		C
+	neg	R32(%rcx)
+	or	%r9, %rax
 	sub	%rbx, %rax		C apply carry bit
-	sub	%rdx, %rax		C apply carry limb
-	imul	%r8, %rax
-	mov	%rax, (rp)
+	setc	R8(%rbx)		C
+	sub	%rdx, %rax		C apply carry limb	5
+	adc	$0, R32(%rbx)		C			6
+L(uent):imul	%r8, %rax		C			6
+	mov	(up,%r10,8), %r9	C
+	shr	R8(%rcx), %r9		C
+	neg	R32(%rcx)
+	mov	%rax, (rp,%r10,8)	C
+	inc	%r10			C
+	jnz	L(utop)
+
+L(com):	mul	%r11			C carry limb in rdx
+	sub	%rbx, %r9		C apply carry bit
+	sub	%rdx, %r9		C apply carry limb
+	imul	%r8, %r9
+	mov	%r9, (rp)
 	pop	%rbx
 	FUNC_EXIT()
 	ret

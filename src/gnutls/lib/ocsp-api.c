@@ -597,7 +597,8 @@ gnutls_certificate_get_ocsp_expiration(gnutls_certificate_credentials_t sc,
  *
  * When flags are zero this function returns non-zero if a valid OCSP status
  * response was included in the TLS handshake. That is, an OCSP status response
- * which is not too old or superseded. It returns zero otherwise.
+ * which is not too old, superseded or marks the certificate as revoked.
+ * It returns zero otherwise.
  *
  * When the flag %GNUTLS_OCSP_SR_IS_AVAIL is specified, the function
  * returns non-zero if an OCSP status response was included in the handshake
@@ -612,12 +613,12 @@ gnutls_certificate_get_ocsp_expiration(gnutls_certificate_credentials_t sc,
  * under TLS 1.3, which is the first version of TLS that allows cliend-side OCSP
  * responses.
  *
- * Returns: non zero if the response was valid, or a zero if it wasn't sent,
+ * Returns: Non-zero if the response was valid, or a zero if it wasn't sent,
  * or sent and was invalid.
  *
  * Since: 3.1.4
  **/
-int
+unsigned
 gnutls_ocsp_status_request_is_checked(gnutls_session_t session,
 				      unsigned int flags)
 {

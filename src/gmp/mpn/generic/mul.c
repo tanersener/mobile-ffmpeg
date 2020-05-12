@@ -3,7 +3,7 @@
    Contributed to the GNU project by Torbjorn Granlund.
 
 Copyright 1991, 1993, 1994, 1996, 1997, 1999-2003, 2005-2007, 2009, 2010, 2012,
-2014 Free Software Foundation, Inc.
+2014, 2019 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -31,7 +31,6 @@ You should have received copies of the GNU General Public License and the
 GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
-#include "gmp.h"
 #include "gmp-impl.h"
 
 
@@ -109,11 +108,7 @@ see https://www.gnu.org/licenses/.  */
 
   * That problem is even more prevalent for toomX3.  We therefore use special
     THRESHOLD variables there.
-
-  * Is our ITCH allocation correct?
 */
-
-#define ITCH (16*vn + 100)
 
 mp_limb_t
 mpn_mul (mp_ptr prodp,
@@ -125,12 +120,17 @@ mpn_mul (mp_ptr prodp,
   ASSERT (! MPN_OVERLAP_P (prodp, un+vn, up, un));
   ASSERT (! MPN_OVERLAP_P (prodp, un+vn, vp, vn));
 
-  if (un == vn)
+  if (BELOW_THRESHOLD (un, MUL_TOOM22_THRESHOLD))
     {
-      if (up == vp)
-	mpn_sqr (prodp, up, un);
-      else
-	mpn_mul_n (prodp, up, vp, un);
+      /* When un (and thus vn) is below the toom22 range, do mul_basecase.
+	 Test un and not vn here not to thwart the un >> vn code below.
+	 This special case is not necessary, but cuts the overhead for the
+	 smallest operands. */
+      mpn_mul_basecase (prodp, up, un, vp, vn);
+    }
+  else if (un == vn)
+    {
+      mpn_mul_n (prodp, up, vp, un);
     }
   else if (vn < MUL_TOOM22_THRESHOLD)
     { /* plain schoolbook multiplication */

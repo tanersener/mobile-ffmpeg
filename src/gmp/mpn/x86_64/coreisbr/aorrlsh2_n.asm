@@ -1,5 +1,5 @@
-dnl  AMD64 mpn_addlsh2_n -- rp[] = up[] + (vp[] << 1)
-dnl  AMD64 mpn_rsblsh2_n -- rp[] = (vp[] << 1) - up[]
+dnl  AMD64 mpn_addlsh2_n -- rp[] = up[] + (vp[] << 2)
+dnl  AMD64 mpn_rsblsh2_n -- rp[] = (vp[] << 2) - up[]
 
 dnl  Contributed to the GNU project by Torbjorn Granlund.
 

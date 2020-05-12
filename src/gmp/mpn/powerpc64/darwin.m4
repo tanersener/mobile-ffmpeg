@@ -29,13 +29,13 @@ dnl  You should have received copies of the GNU General Public License and the
 dnl  GNU Lesser General Public License along with the GNU MP Library.  If not,
 dnl  see https://www.gnu.org/licenses/.
 
+define(`DARWIN')
+
 define(`ASM_START',`')
 
 dnl  Called: PROLOGUE_cpu(GSYM_PREFIX`'foo[,toc])
 dnl          EPILOGUE_cpu(GSYM_PREFIX`'foo)
 dnl
-
-define(`DARWIN')
 
 define(`PROLOGUE_cpu',
 m4_assert_numargs_range(1,2)
@@ -46,8 +46,7 @@ m4_assert_numargs_range(1,2)
 	.align	5
 $1:')
 
-define(`EPILOGUE_cpu',
-m4_assert_numargs(1))
+define(`lea_list', `')
 
 dnl  LEAL -- Load Effective Address Local.  This is to be used for symbols
 dnl  defined in the same file.  It will not work for externally defined
@@ -74,7 +73,7 @@ dnl  another file.  It will not work for locally defined symbols.
 define(`LEA',
 m4_assert_numargs(2)
 `ifdef(`PIC',
-`define(`EPILOGUE_cpu',
+`define(`lea_list',
 `	.non_lazy_symbol_pointer
 `L'$2`'$non_lazy_ptr:
 	.indirect_symbol $2
@@ -111,6 +110,10 @@ m4_assert_numargs(1))
 
 define(`CALL',
 	`bl	GSYM_PREFIX`'$1')
+
+define(`EPILOGUE_cpu',
+`lea_list'
+`define(`lea_list', `')')
 
 define(`ASM_END', `dnl')
 

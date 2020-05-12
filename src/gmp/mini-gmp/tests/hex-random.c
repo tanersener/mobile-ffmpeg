@@ -1,6 +1,6 @@
 /*
 
-Copyright 2011, 2016 Free Software Foundation, Inc.
+Copyright 2011, 2016, 2018 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library test suite.
 
@@ -30,6 +30,19 @@ the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
 #include "gmp.h"
 
 #include "hex-random.h"
+
+/* FIXME: gmp-impl.h included only for mpz_lucas_mod */
+/* #include "gmp-impl.h" */
+#if defined (__cplusplus)
+extern "C" {
+#endif
+
+#define mpz_lucas_mod  __gmpz_lucas_mod
+__GMP_DECLSPEC int mpz_lucas_mod (mpz_ptr, mpz_ptr, long, mp_bitcnt_t, mpz_srcptr, mpz_ptr, mpz_ptr);
+
+#if defined (__cplusplus)
+}
+#endif
 
 static gmp_randstate_t state;
 
@@ -480,4 +493,81 @@ hex_random_str_op (unsigned long maxbits,
   *rp = mpz_get_str (NULL, base, a);
 
   mpz_clear (a);
+}
+
+void hex_random_lucm_op (unsigned long maxbits,
+			 char **vp, char **qp, char **mp,
+			 long *Q, unsigned long *b0, int *res)
+{
+  mpz_t m, v, q, t1, t2;
+  unsigned long mbits;
+
+  mpz_init (m);
+  mpz_init (v);
+  mpz_init (q);
+  mpz_init (t1);
+  mpz_init (t2);
+
+  *Q = gmp_urandomb_ui (state, 14) + 1;
+
+  do
+    {
+      mbits = gmp_urandomb_ui (state, 32) % maxbits + 5;
+
+      mpz_rrandomb (m, state, mbits);
+      *b0 = gmp_urandomb_ui (state, 32) % (mbits - 3) + 2;
+      /* The GMP  implementation uses the exponent (m >> b0) + 1. */
+      /* mini-gmp implementation uses the exponent (m >> b0) | 1. */
+      /* They are the same (and are used) only when (m >> b0) is even */
+      mpz_clrbit (m, *b0);
+      /* mini-gmp implementation only works if the modulus is odd. */
+      mpz_setbit (m, 0);
+    }
+  while (mpz_gcd_ui (NULL, m, *Q) != 1);
+
+  if (*Q == 1 || gmp_urandomb_ui (state, 1))
+    *Q = - *Q;
+
+#if (__GNU_MP_VERSION == 6 && (__GNU_MP_VERSION_MINOR > 1 || __GNU_MP_VERSION_PATCHLEVEL > 9))
+  *res = mpz_lucas_mod (v, q, *Q, *b0, m, t1, t2);
+#else
+  *b0 = 0;
+#endif
+
+  gmp_asprintf (vp, "%Zx", v);
+  gmp_asprintf (qp, "%Zx", q);
+  gmp_asprintf (mp, "%Zx", m);
+
+  mpz_clear (m);
+  mpz_clear (v);
+  mpz_clear (q);
+  mpz_clear (t1);
+  mpz_clear (t2);
+}
+
+void
+hex_mpq_random_str_op (unsigned long maxbits,
+		       int base, char **ap, char **rp)
+{
+  mpq_t a;
+  unsigned long abits;
+  unsigned signs;
+
+  mpq_init (a);
+
+  abits = gmp_urandomb_ui (state, 32) % maxbits;
+
+  mpz_rrandomb (mpq_numref (a), state, abits);
+  mpz_rrandomb (mpq_denref (a), state, abits);
+  mpz_add_ui (mpq_denref (a), mpq_denref (a), 1);
+
+  mpq_canonicalize (a);
+  signs = gmp_urandomb_ui (state, 2);
+  if (signs & 1)
+    mpq_neg (a, a);
+
+  *ap = mpq_get_str (NULL, 16, a);
+  *rp = mpq_get_str (NULL, base, a);
+
+  mpq_clear (a);
 }

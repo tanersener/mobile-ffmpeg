@@ -1,5 +1,5 @@
 /* Test of lstat() function.
-   Copyright (C) 2008-2019 Free Software Foundation, Inc.
+   Copyright (C) 2008-2020 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -31,12 +31,16 @@ test_lstat_func (int (*func) (char const *, struct stat *), bool print)
   /* Test for common directories.  */
   ASSERT (func (".", &st1) == 0);
   ASSERT (func ("./", &st2) == 0);
+#if !(defined _WIN32 && !defined __CYGWIN__ && !_GL_WINDOWS_STAT_INODES)
   ASSERT (SAME_INODE (st1, st2));
+#endif
   ASSERT (S_ISDIR (st1.st_mode));
   ASSERT (S_ISDIR (st2.st_mode));
   ASSERT (func ("/", &st1) == 0);
   ASSERT (func ("///", &st2) == 0);
+#if !(defined _WIN32 && !defined __CYGWIN__ && !_GL_WINDOWS_STAT_INODES)
   ASSERT (SAME_INODE (st1, st2));
+#endif
   ASSERT (S_ISDIR (st1.st_mode));
   ASSERT (S_ISDIR (st2.st_mode));
   ASSERT (func ("..", &st1) == 0);
@@ -85,7 +89,9 @@ test_lstat_func (int (*func) (char const *, struct stat *), bool print)
   ASSERT (stat (BASE "link1", &st2) == 0);
   ASSERT (S_ISDIR (st1.st_mode));
   ASSERT (S_ISDIR (st2.st_mode));
+#if !(defined _WIN32 && !defined __CYGWIN__ && !_GL_WINDOWS_STAT_INODES)
   ASSERT (SAME_INODE (st1, st2));
+#endif
 
   ASSERT (func (BASE "link2", &st1) == 0);
   ASSERT (S_ISLNK (st1.st_mode));

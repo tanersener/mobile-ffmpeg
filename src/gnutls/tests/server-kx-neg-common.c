@@ -38,6 +38,8 @@ typedef struct test_case_st {
 	unsigned have_ecc_sign_cert;
 	unsigned have_ed25519_sign_cert;
 	unsigned have_rsa_decrypt_cert;
+	unsigned have_gost12_256_cert;
+	unsigned have_gost12_512_cert;
 	unsigned not_on_fips;
 	unsigned exp_version;
 	const char *client_prio;
@@ -220,6 +222,14 @@ static void try(test_case_st *test)
 
 	if (test->have_rsa_sign_cert) {
 		assert(gnutls_certificate_set_x509_key_mem(s_cert_cred, &server_ca3_localhost_rsa_sign_cert, &server_ca3_key, GNUTLS_X509_FMT_PEM) >= 0);
+	}
+
+	if (test->have_gost12_256_cert) {
+		assert(gnutls_certificate_set_x509_key_mem(s_cert_cred, &server_ca3_gost12_256_cert, &server_ca3_gost12_256_key, GNUTLS_X509_FMT_PEM) >= 0);
+	}
+
+	if (test->have_gost12_512_cert) {
+		assert(gnutls_certificate_set_x509_key_mem(s_cert_cred, &server_ca3_gost12_512_cert, &server_ca3_gost12_512_key, GNUTLS_X509_FMT_PEM) >= 0);
 	}
 
 	/* client does everything */

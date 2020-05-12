@@ -29,7 +29,6 @@ You should have received copies of the GNU General Public License and the
 GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
-#include "gmp.h"
 #include "gmp-impl.h"
 #include "longlong.h"
 
@@ -38,7 +37,7 @@ mpz_tdiv_q (mpz_ptr quot, mpz_srcptr num, mpz_srcptr den)
 {
   mp_size_t ql;
   mp_size_t ns, ds, nl, dl;
-  mp_ptr np, dp, qp;
+  mp_ptr np, dp, qp, tp;
   TMP_DECL;
 
   ns = SIZ (num);
@@ -59,7 +58,6 @@ mpz_tdiv_q (mpz_ptr quot, mpz_srcptr num, mpz_srcptr den)
   qp = MPZ_REALLOC (quot, ql);
 
   TMP_MARK;
-  np = PTR (num);
   dp = PTR (den);
 
   /* Copy denominator to temporary space if it overlaps with the quotient.  */
@@ -70,21 +68,17 @@ mpz_tdiv_q (mpz_ptr quot, mpz_srcptr num, mpz_srcptr den)
       MPN_COPY (tp, dp, dl);
       dp = tp;
     }
+
+  tp = TMP_ALLOC_LIMBS (nl + 1);
+  np = PTR (num);
   /* Copy numerator to temporary space if it overlaps with the quotient.  */
   if (np == qp)
     {
-      mp_ptr tp;
-      tp = TMP_ALLOC_LIMBS (nl + 1);
       MPN_COPY (tp, np, nl);
       /* Overlap dividend and scratch.  */
-      mpn_div_q (qp, tp, nl, dp, dl, tp);
+      np = tp;
     }
-  else
-    {
-      mp_ptr tp;
-      tp = TMP_ALLOC_LIMBS (nl + 1);
-      mpn_div_q (qp, np, nl, dp, dl, tp);
-    }
+  mpn_div_q (qp, np, nl, dp, dl, tp);
 
   ql -=  qp[ql - 1] == 0;
 

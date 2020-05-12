@@ -40,7 +40,7 @@ typedef struct ZMQContext {
 #define D AV_OPT_FLAG_DECODING_PARAM
 #define E AV_OPT_FLAG_ENCODING_PARAM
 static const AVOption options[] = {
-    { "pkt_size", "Maximum send/read packet size", OFFSET(pkt_size), AV_OPT_TYPE_INT, { .i64 = 32768 }, -1, INT_MAX, .flags = D | E },
+    { "pkt_size", "Maximum send/read packet size", OFFSET(pkt_size), AV_OPT_TYPE_INT, { .i64 = 131072 }, -1, INT_MAX, .flags = D | E },
     { NULL }
 };
 
@@ -101,16 +101,13 @@ static int zmq_proto_open(URLContext *h, const char *uri, int flags)
         s->socket = zmq_socket(s->context, ZMQ_PUB);
         if (!s->socket) {
             av_log(h, AV_LOG_ERROR, "Error occured during zmq_socket(): %s\n", ZMQ_STRERROR);
-            zmq_ctx_term(s->context);
-            return AVERROR_EXTERNAL;
+            goto fail_term;
         }
 
         ret = zmq_bind(s->socket, uri);
         if (ret == -1) {
             av_log(h, AV_LOG_ERROR, "Error occured during zmq_bind(): %s\n", ZMQ_STRERROR);
-            zmq_close(s->socket);
-            zmq_ctx_term(s->context);
-            return AVERROR_EXTERNAL;
+            goto fail_close;
         }
     }
 
@@ -119,20 +116,28 @@ static int zmq_proto_open(URLContext *h, const char *uri, int flags)
         s->socket = zmq_socket(s->context, ZMQ_SUB);
         if (!s->socket) {
             av_log(h, AV_LOG_ERROR, "Error occured during zmq_socket(): %s\n", ZMQ_STRERROR);
-            zmq_ctx_term(s->context);
-            return AVERROR_EXTERNAL;
+            goto fail_term;
         }
 
-        zmq_setsockopt(s->socket, ZMQ_SUBSCRIBE, "", 0);
+        ret = zmq_setsockopt(s->socket, ZMQ_SUBSCRIBE, "", 0);
+        if (ret == -1) {
+            av_log(h, AV_LOG_ERROR, "Error occured during zmq_setsockopt(): %s\n", ZMQ_STRERROR);
+            goto fail_close;
+        }
+
         ret = zmq_connect(s->socket, uri);
         if (ret == -1) {
             av_log(h, AV_LOG_ERROR, "Error occured during zmq_connect(): %s\n", ZMQ_STRERROR);
-            zmq_close(s->socket);
-            zmq_ctx_term(s->context);
-            return AVERROR_EXTERNAL;
+            goto fail_close;
         }
     }
     return 0;
+
+fail_close:
+    zmq_close(s->socket);
+fail_term:
+    zmq_ctx_term(s->context);
+    return AVERROR_EXTERNAL;
 }
 
 static int zmq_proto_write(URLContext *h, const unsigned char *buf, int size)

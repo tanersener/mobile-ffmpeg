@@ -1,9 +1,9 @@
-This is gnutls.info, produced by makeinfo version 6.7 from gnutls.texi.
+This is gnutls.info, produced by makeinfo version 6.6 from gnutls.texi.
 
-This manual is last updated 27 June 2019 for version 3.6.11 of GnuTLS.
+This manual is last updated 2 January 2020 for version 3.6.13 of GnuTLS.
 
-Copyright (C) 2001-2019 Free Software Foundation, Inc.\\ Copyright (C)
-2001-2019 Nikos Mavrogiannopoulos
+Copyright (C) 2001-2020 Free Software Foundation, Inc.\\ Copyright (C)
+2001-2020 Nikos Mavrogiannopoulos
 
      Permission is granted to copy, distribute and/or modify this
      document under the terms of the GNU Free Documentation License,
@@ -32,10 +32,10 @@ File: gnutls.info,  Node: Top,  Next: Preface,  Up: (dir)
 GnuTLS
 ******
 
-This manual is last updated 27 June 2019 for version 3.6.11 of GnuTLS.
+This manual is last updated 2 January 2020 for version 3.6.13 of GnuTLS.
 
-Copyright (C) 2001-2019 Free Software Foundation, Inc.\\ Copyright (C)
-2001-2019 Nikos Mavrogiannopoulos
+Copyright (C) 2001-2020 Free Software Foundation, Inc.\\ Copyright (C)
+2001-2020 Nikos Mavrogiannopoulos
 
      Permission is granted to copy, distribute and/or modify this
      document under the terms of the GNU Free Documentation License,
@@ -455,6 +455,12 @@ ARCFOUR-128    Legacy  TLS 1.0,    ARCFOUR-128 is a compatible algorithm
                                    For this reason it is not enabled by
                                    default.
                                    
+GOST28147-TC26Z-CNTLegacyTLS 1.2   This is a 64-bit block cipher GOST
+               (stream)            28147-89 with TC26Z S-Box working in
+                                   CNT mode.  It is one of the approved
+                                   ciphers in Russia.  It is not enabled
+                                   by default.
+                                   
 NULL           Legacy  TLS 1.0,    NULL is the empty/identity cipher
                (stream)TLS 1.1,    which doesn't encrypt any data.  It
                        TLS 1.2     can be combined with data
@@ -486,6 +492,12 @@ MAC-SHA256     An HMAC based on SHA2-256.  Outputs 256 bits of
                
 MAC-SHA384     An HMAC based on SHA2-384.  Outputs 384 bits of
                data.
+               
+GOST28147-TC26Z-IMITThis is a 64-bit block cipher GOST 28147-89 with
+               TC26Z S-Box working in special MAC mode called
+               Imitovstavks.  It is one of the approved MAC
+               algorithms in Russia.  Outputs 32 bits of data.
+               It is not enabled by default.
                
 MAC-AEAD       This indicates that an authenticated encryption
                algorithm, such as GCM, is in use.
@@ -1220,8 +1232,8 @@ And an example of a conversation where someone is acting in between:
 
      CLIENT: HERE ARE SOME CONFIDENTIAL DATA
 
-As you can see above the client was fooled, and was naïve enough to send
-the confidential data in the clear, despite the server telling the
+As you can see above the client was fooled, and was nai"ve enough to
+send the confidential data in the clear, despite the server telling the
 client that it does not support "STARTTLS".
 
 How do we avoid the above attack?  As you may have already noticed this
@@ -3017,8 +3029,8 @@ requests are the following.
 'INT *note gnutls_ocsp_req_init:: (gnutls_ocsp_req_t * REQ)'
 'VOID *note gnutls_ocsp_req_deinit:: (gnutls_ocsp_req_t REQ)'
 'INT *note gnutls_ocsp_req_import:: (gnutls_ocsp_req_t REQ, const gnutls_datum_t * DATA)'
-'INT *note gnutls_ocsp_req_export:: (gnutls_ocsp_req_t REQ, gnutls_datum_t * DATA)'
-'INT *note gnutls_ocsp_req_print:: (gnutls_ocsp_req_t REQ, gnutls_ocsp_print_formats_t FORMAT, gnutls_datum_t * OUT)'
+'INT *note gnutls_ocsp_req_export:: (gnutls_ocsp_req_const_t REQ, gnutls_datum_t * DATA)'
+'INT *note gnutls_ocsp_req_print:: (gnutls_ocsp_req_const_t REQ, gnutls_ocsp_print_formats_t FORMAT, gnutls_datum_t * OUT)'
 
 To generate an OCSP request the issuer name hash, issuer key hash, and
 the checked certificate's serial number are required.  There are two
@@ -3031,14 +3043,14 @@ existing an OCSP request.
 
 'INT *note gnutls_ocsp_req_add_cert_id:: (gnutls_ocsp_req_t REQ, gnutls_digest_algorithm_t DIGEST, const gnutls_datum_t * ISSUER_NAME_HASH, const gnutls_datum_t * ISSUER_KEY_HASH, const gnutls_datum_t * SERIAL_NUMBER)'
 'INT *note gnutls_ocsp_req_add_cert:: (gnutls_ocsp_req_t REQ, gnutls_digest_algorithm_t DIGEST, gnutls_x509_crt_t ISSUER, gnutls_x509_crt_t CERT)'
-'INT *note gnutls_ocsp_req_get_cert_id:: (gnutls_ocsp_req_t REQ, unsigned INDX, gnutls_digest_algorithm_t * DIGEST, gnutls_datum_t * ISSUER_NAME_HASH, gnutls_datum_t * ISSUER_KEY_HASH, gnutls_datum_t * SERIAL_NUMBER)'
+'INT *note gnutls_ocsp_req_get_cert_id:: (gnutls_ocsp_req_const_t REQ, unsigned INDX, gnutls_digest_algorithm_t * DIGEST, gnutls_datum_t * ISSUER_NAME_HASH, gnutls_datum_t * ISSUER_KEY_HASH, gnutls_datum_t * SERIAL_NUMBER)'
 
 Each OCSP request may contain a number of extensions.  Extensions are
 identified by an Object Identifier (OID) and an opaque data buffer whose
 syntax and semantics is implied by the OID. You can extract or set those
 extensions using the following functions.
 
-'INT *note gnutls_ocsp_req_get_extension:: (gnutls_ocsp_req_t REQ, unsigned INDX, gnutls_datum_t * OID, unsigned int * CRITICAL, gnutls_datum_t * DATA)'
+'INT *note gnutls_ocsp_req_get_extension:: (gnutls_ocsp_req_const_t REQ, unsigned INDX, gnutls_datum_t * OID, unsigned int * CRITICAL, gnutls_datum_t * DATA)'
 'INT *note gnutls_ocsp_req_set_extension:: (gnutls_ocsp_req_t REQ, const char * OID, unsigned int CRITICAL, const gnutls_datum_t * DATA)'
 
 A common OCSP Request extension is the nonce extension (OID
@@ -3047,7 +3059,7 @@ recorded OCSP responses.  The nonce extension carries a value that is
 intended to be sufficiently random and unique so that an attacker will
 not be able to give a stale response for the same nonce.
 
-'INT *note gnutls_ocsp_req_get_nonce:: (gnutls_ocsp_req_t REQ, unsigned int * CRITICAL, gnutls_datum_t * NONCE)'
+'INT *note gnutls_ocsp_req_get_nonce:: (gnutls_ocsp_req_const_t REQ, unsigned int * CRITICAL, gnutls_datum_t * NONCE)'
 'INT *note gnutls_ocsp_req_set_nonce:: (gnutls_ocsp_req_t REQ, unsigned int CRITICAL, const gnutls_datum_t * NONCE)'
 'INT *note gnutls_ocsp_req_randomize_nonce:: (gnutls_ocsp_req_t REQ)'
 
@@ -3089,14 +3101,14 @@ deallocating OCSP responses.
 'INT *note gnutls_ocsp_resp_init:: (gnutls_ocsp_resp_t * RESP)'
 'VOID *note gnutls_ocsp_resp_deinit:: (gnutls_ocsp_resp_t RESP)'
 'INT *note gnutls_ocsp_resp_import:: (gnutls_ocsp_resp_t RESP, const gnutls_datum_t * DATA)'
-'INT *note gnutls_ocsp_resp_export:: (gnutls_ocsp_resp_t RESP, gnutls_datum_t * DATA)'
-'INT *note gnutls_ocsp_resp_print:: (gnutls_ocsp_resp_t RESP, gnutls_ocsp_print_formats_t FORMAT, gnutls_datum_t * OUT)'
+'INT *note gnutls_ocsp_resp_export:: (gnutls_ocsp_resp_const_t RESP, gnutls_datum_t * DATA)'
+'INT *note gnutls_ocsp_resp_print:: (gnutls_ocsp_resp_const_t RESP, gnutls_ocsp_print_formats_t FORMAT, gnutls_datum_t * OUT)'
 
 The utility function that extracts the revocation as well as other
 information from a response is shown below.
 
- -- Function: int gnutls_ocsp_resp_get_single (gnutls_ocsp_resp_t RESP,
-          unsigned INDX, gnutls_digest_algorithm_t * DIGEST,
+ -- Function: int gnutls_ocsp_resp_get_single (gnutls_ocsp_resp_const_t
+          RESP, unsigned INDX, gnutls_digest_algorithm_t * DIGEST,
           gnutls_datum_t * ISSUER_NAME_HASH, gnutls_datum_t *
           ISSUER_KEY_HASH, gnutls_datum_t * SERIAL_NUMBER, unsigned int
           * CERT_STATUS, time_t * THIS_UPDATE, time_t * NEXT_UPDATE,
@@ -3174,9 +3186,9 @@ trust anchors before it can be relied upon.  It is also important to
 check whether the received OCSP response corresponds to the certificate
 being checked.
 
-'INT *note gnutls_ocsp_resp_verify:: (gnutls_ocsp_resp_t RESP, gnutls_x509_trust_list_t TRUSTLIST, unsigned int * VERIFY, unsigned int FLAGS)'
-'INT *note gnutls_ocsp_resp_verify_direct:: (gnutls_ocsp_resp_t RESP, gnutls_x509_crt_t ISSUER, unsigned int * VERIFY, unsigned int FLAGS)'
-'INT *note gnutls_ocsp_resp_check_crt:: (gnutls_ocsp_resp_t RESP, unsigned int INDX, gnutls_x509_crt_t CRT)'
+'INT *note gnutls_ocsp_resp_verify:: (gnutls_ocsp_resp_const_t RESP, gnutls_x509_trust_list_t TRUSTLIST, unsigned int * VERIFY, unsigned int FLAGS)'
+'INT *note gnutls_ocsp_resp_verify_direct:: (gnutls_ocsp_resp_const_t RESP, gnutls_x509_crt_t ISSUER, unsigned int * VERIFY, unsigned int FLAGS)'
+'INT *note gnutls_ocsp_resp_check_crt:: (gnutls_ocsp_resp_const_t RESP, unsigned int INDX, gnutls_x509_crt_t CRT)'
 
 
 File: gnutls.info,  Node: OCSP stapling,  Next: Managing encrypted keys,  Prev: OCSP certificate status checking,  Up: More on certificate authentication
@@ -3215,7 +3227,7 @@ following functions.
 
 'VOID *note gnutls_certificate_set_retrieve_function3:: (gnutls_certificate_credentials_t CRED, gnutls_certificate_retrieve_function3 * FUNC)'
 'INT *note gnutls_certificate_set_ocsp_status_request_file2:: (gnutls_certificate_credentials_t SC, const char * RESPONSE_FILE, unsigned IDX, gnutls_x509_crt_fmt_t FMT)'
-'INT *note gnutls_ocsp_status_request_is_checked:: (gnutls_session_t SESSION, unsigned int FLAGS)'
+'UNSIGNED *note gnutls_ocsp_status_request_is_checked:: (gnutls_session_t SESSION, unsigned int FLAGS)'
 
 A server is expected to provide the relevant certificate's OCSP
 responses using *note
@@ -3637,6 +3649,7 @@ to 'more'.  Both will exit with a status code of 0.
                                      - prohibits the option 'verify-hostname'
             --verify-purpose=str   Specify a purpose OID to be used for certificate chain verification
             --verify-allow-broken  Allow broken algorithms, such as MD5 for verification
+            --verify-profile=str   Specify a security level profile to be used for verification
 
      PKCS#7 structure options:
 
@@ -3839,8 +3852,8 @@ key-type option.
 This is the "specify the key type to use on key generation" option.
 This option takes a string argument.  This option can be combined with
 -generate-privkey, to specify the key type to be generated.  Valid
-options are, 'rsa', 'rsa-pss', 'dsa', 'ecdsa', and 'ed25519'.  When
-combined with certificate generation it can be used to specify an
+options are, 'rsa', 'rsa-pss', 'dsa', 'ecdsa', 'ed25519, and 'ed448'.'.
+When combined with certificate generation it can be used to specify an
 RSA-PSS certificate when an RSA key is given.
 
 curve option.
@@ -3981,6 +3994,17 @@ verify-allow-broken option.
 
 This is the "allow broken algorithms, such as md5 for verification"
 option.  This can be combined with -p7-verify, -verify or -verify-chain.
+
+verify-profile option.
+......................
+
+This is the "specify a security level profile to be used for
+verification" option.  This option takes a string argument.  This option
+can be used to specify a certificate verification profile.  Certificate
+verification profiles correspond to the security level.  This should be
+one of 'none', 'very weak', 'low', 'legacy', 'medium', 'high', 'ultra',
+'future'.  Note that by default no profile is applied, unless one is set
+as minimum in the gnutls configuration file.
 
 pkcs7-options options
 .....................

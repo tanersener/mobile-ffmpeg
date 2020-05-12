@@ -1,6 +1,6 @@
 dnl  X86-32 and X86-64 mpn_popcount using SSE2.
 
-dnl  Copyright 2006, 2007, 2011, 2015 Free Software Foundation, Inc.
+dnl  Copyright 2006, 2007, 2011, 2015, 2020 Free Software Foundation, Inc.
 
 dnl  This file is part of the GNU MP Library.
 dnl
@@ -120,12 +120,8 @@ LIMB32(`push	%ebx		')
 
 	pxor	%xmm3, %xmm3		C zero grand total count
 LIMB64(`pxor	zero, zero	')
-ifdef(`PIC',`
+
 	LEAL(	cnsts, breg)
-',`
-LIMB32(`mov	$cnsts, breg	')
-LIMB64(`movabs	$cnsts, breg	')
-')
 
 	movdqa	-48(breg), mm01010101
 	movdqa	-32(breg), mm00110011

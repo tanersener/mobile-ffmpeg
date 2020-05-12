@@ -20,11 +20,11 @@
 @var{critical}: will be non-zero if the extension is marked as critical (may be null)
 
 This function will return the X.509 authority key
-identifier when stored as a general name (authorityCertIssuer) 
+identifier when stored as a general name (authorityCertIssuer)
 and serial number.
 
 Because more than one general names might be stored
- @code{seq} can be used as a counter to request them all until 
+ @code{seq} can be used as a counter to request them all until
 @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  is returned.
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE} 

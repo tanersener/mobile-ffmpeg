@@ -94,6 +94,6 @@ cmake -Wno-dev \
 make -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_x265_package_config "3.2.1"
+create_x265_package_config "3.3"
 
 make install || exit 1

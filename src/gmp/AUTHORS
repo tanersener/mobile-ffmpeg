@@ -33,10 +33,10 @@ Jason Moxham		Previous versions of mpz/fac_ui.c and gen-fac_ui.c
 Niels Möller		gen-jacobitab.c,
 			mpn/generic/hgcd2.c, hgcd.c, hgcd_step.c,
 			hgcd_appr.c, hgcd_matrix.c, hgcd_reduce.c,
-			gcd.c, gcdext.c, matrix22_mul.c,
+			gcd.c, gcd_11.c, gcd_22.c, gcdext.c, matrix22_mul.c,
 			gcdext_1.c, gcd_subdiv_step.c, gcd_lehmer.c,
 			gcdext_subdiv_step.c, gcdext_lehmer.c,
-			jacobi_2.c, jacbase.c, hgcd_jacobi.c, hgcd2_jacobi.c
+			jacobi_2.c, jacbase.c, hgcd_jacobi.c, hgcd2_jacobi.c,
 			matrix22_mul1_inverse_vector.c,
 			toom_interpolate_7pts, mulmod_bnm1.c, dcpi1_bdiv_qr.c,
 			dcpi1_bdiv_q.c, sbpi1_bdiv_qr.c, sbpi1_bdiv_q.c,
@@ -62,9 +62,15 @@ Marco Bodrato		mpn/generic/toom44_mul.c, toom4_sqr.c, toom53_mul.c,
 			toom8h_mul.c, toom8_sqr.c, toom_interpolate_16pts.c,
 			mulmod_bnm1.c, sqrmod_bnm1.c, nussbaumer_mul.c,
 			toom_eval_pm2.c, toom_eval_pm2rexp.c,
+			fib2m.c, strongfibo.c,
 			mullo_n.c, sqrlo.c, invert.c, invertappr.c;
+			mpn/x86/atom/aors_n.asm, aorslshC_n.asm,
+			aorrlsh{1,2,C}_n.asm, aorsmul_1.asm, logops_n.asm,
+			sublsh2_n.asm, rshift.asm; primesieve.c;
 			mpz/fac_ui.c, 2fac_ui.c, mfac_uiui.c, oddfac_1.c,
-			primorial_ui.c, prodlimbs.c, goetgheluck_bin_uiui.c.
+			primorial_ui.c, prodlimbs.c, bin_ui.c,
+			lucmod.c, stronglucas.c,
+			goetgheluck_bin_uiui.c; mini-gmp/mini-mpq.c.
 
 David Harvey		mpn/generic/add_err1_n.c, add_err2_n.c,
 			add_err3_n.c, sub_err1_n.c, sub_err2_n.c,

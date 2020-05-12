@@ -61,7 +61,12 @@ get_entropy_func _rnd_get_system_entropy = NULL;
 #  if defined(SYS_getrandom)
 #   define getrandom(dst,s,flags) syscall(SYS_getrandom, (void*)dst, (size_t)s, (unsigned int)flags)
 #  else
-#   define getrandom(dst,s,flags) -1
+static ssize_t _getrandom0(void *buf, size_t buflen, unsigned int flags)
+{
+        errno = ENOSYS;
+        return -1;
+}
+#   define getrandom(dst,s,flags) _getrandom0(dst,s,flags)
 #  endif
 # endif
 

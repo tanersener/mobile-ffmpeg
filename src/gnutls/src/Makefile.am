@@ -82,16 +82,13 @@ else
 LIBOPTS = $(LIBOPTS_LDADD)
 endif
 
-bin_PROGRAMS = psktool gnutls-cli-debug certtool
+bin_PROGRAMS = psktool gnutls-cli-debug certtool gnutls-serv gnutls-cli
 if ENABLE_SRP
 bin_PROGRAMS += srptool
 endif
 
 if ENABLE_OCSP
-bin_PROGRAMS += ocsptool gnutls-serv 
-if ENABLE_ANON
-bin_PROGRAMS += gnutls-cli
-endif
+bin_PROGRAMS += ocsptool
 endif
 
 if ENABLE_DANE
@@ -140,6 +137,8 @@ noinst_LTLIBRARIES += libcmd-ocsp.la
 libcmd_ocsp_la_SOURCES = ocsptool-args.def
 nodist_libcmd_ocsp_la_SOURCES = ocsptool-args.h ocsptool-args.c
 
+endif
+
 gnutls_serv_SOURCES =		\
   list.h serv.c			\
   udp-serv.c udp-serv.h		\
@@ -153,14 +152,15 @@ noinst_LTLIBRARIES += libcmd-serv.la
 libcmd_serv_la_SOURCES = serv-args.def
 nodist_libcmd_serv_la_SOURCES = serv-args.c serv-args.h
 
-if ENABLE_ANON
-
 BENCHMARK_SRCS = benchmark-cipher.c benchmark.c benchmark.h benchmark-tls.c
 
 gnutls_cli_SOURCES = cli.c common.h common.c \
-	socket.c socket.h ocsptool-common.c inline_cmds.h \
+	socket.c socket.h inline_cmds.h \
 	$(BENCHMARK_SRCS)
-gnutls_cli_LDADD = ../lib/libgnutls.la
+if ENABLE_OCSP
+gnutls_cli_SOURCES += ocsptool-common.c
+endif
+gnutls_cli_LDADD = ../lib/libgnutls.la -lm
 if ENABLE_DANE
 gnutls_cli_LDADD += ../libdane/libgnutls-dane.la
 endif
@@ -170,8 +170,6 @@ gnutls_cli_LDADD += $(LIBSOCKET) $(GETADDRINFO_LIB) $(LIB_CLOCK_GETTIME) \
 noinst_LTLIBRARIES += libcmd-cli.la
 libcmd_cli_la_SOURCES = cli-args.def
 nodist_libcmd_cli_la_SOURCES = cli-args.c cli-args.h
-endif
-endif
 
 gnutls_cli_debug_SOURCES = cli-debug.c tests.h tests.c \
 		socket.c socket.h common.h common.c

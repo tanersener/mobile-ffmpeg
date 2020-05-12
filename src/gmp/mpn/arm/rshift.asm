@@ -82,5 +82,5 @@ L(end):	orr	r7, r7, r6, lsl tnc
 L(1):	str	r7, [rp]
 	mov	r0, r4, lsl tnc
 	pop	{r4, r6, r7, r8}
-	ret	r14
+	return	r14
 EPILOGUE()

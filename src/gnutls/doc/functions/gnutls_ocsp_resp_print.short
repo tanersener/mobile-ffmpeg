@@ -1,1 +1,1 @@
-@item @var{int} @ref{gnutls_ocsp_resp_print} (gnutls_ocsp_resp_t @var{resp}, gnutls_ocsp_print_formats_t @var{format}, gnutls_datum_t * @var{out})
+@item @var{int} @ref{gnutls_ocsp_resp_print} (gnutls_ocsp_resp_const_t @var{resp}, gnutls_ocsp_print_formats_t @var{format}, gnutls_datum_t * @var{out})

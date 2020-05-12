@@ -2,7 +2,7 @@
 
 
 
-@deftypefun {int} {gnutls_ocsp_resp_get_extension} (gnutls_ocsp_resp_t @var{resp}, unsigned @var{indx}, gnutls_datum_t * @var{oid}, unsigned int * @var{critical}, gnutls_datum_t * @var{data})
+@deftypefun {int} {gnutls_ocsp_resp_get_extension} (gnutls_ocsp_resp_const_t @var{resp}, unsigned @var{indx}, gnutls_datum_t * @var{oid}, unsigned int * @var{critical}, gnutls_datum_t * @var{data})
 @var{resp}: should contain a @code{gnutls_ocsp_resp_t}  type
 
 @var{indx}: Specifies which extension OID to get. Use (0) to get the first one.

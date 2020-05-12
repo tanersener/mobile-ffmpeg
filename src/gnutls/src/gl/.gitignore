@@ -1,3 +1,5 @@
+/.deps/
+/.libs/
 /arpa/
 /sys/
 *.lo

@@ -1,6 +1,6 @@
 /* mpz_lucnum_ui -- calculate Lucas number.
 
-Copyright 2001, 2003, 2005, 2011, 2012 Free Software Foundation, Inc.
+Copyright 2001, 2003, 2005, 2011, 2012, 2015, 2016 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -29,7 +29,6 @@ GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
 #include <stdio.h>
-#include "gmp.h"
 #include "gmp-impl.h"
 
 
@@ -68,7 +67,7 @@ mpz_lucnum_ui (mpz_ptr ln, unsigned long n)
   if (n <= FIB_TABLE_LUCNUM_LIMIT)
     {
       /* L[n] = F[n] + 2F[n-1] */
-      PTR(ln)[0] = FIB_TABLE(n) + 2 * FIB_TABLE ((int) n - 1);
+      MPZ_NEWALLOC (ln, 1)[0] = FIB_TABLE(n) + 2 * FIB_TABLE ((int) n - 1);
       SIZ(ln) = 1;
       return;
     }
@@ -77,7 +76,7 @@ mpz_lucnum_ui (mpz_ptr ln, unsigned long n)
      since square or mul used below might need an extra limb over the true
      size */
   lalloc = MPN_FIB2_SIZE (n) + 2;
-  lp = MPZ_REALLOC (ln, lalloc);
+  lp = MPZ_NEWALLOC (ln, lalloc);
 
   TMP_MARK;
   xalloc = lalloc;

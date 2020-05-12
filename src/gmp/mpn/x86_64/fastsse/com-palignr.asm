@@ -36,19 +36,20 @@ C	     cycles/limb     cycles/limb     cycles/limb      good
 C              aligned	      unaligned	      best seen	     for cpu?
 C AMD K8,K9	 2.0		 illop		1.0/1.0		N
 C AMD K10	 0.85		 illop				Y/N
-C AMD bull	 1.39		 ? 1.45				Y/N
-C AMD pile     0.8-1.4	       0.7-1.4				Y
-C AMD steam
-C AMD excavator
+C AMD bd1	 1.39		 ? 1.45				Y/N
+C AMD bd2     0.8-1.4	       0.7-1.4				Y
+C AMD bd3
+C AMD bd4
 C AMD bobcat	 1.97		 ? 8.17		1.5/1.5		N
 C AMD jaguar	 1.02		 1.02		0.91/0.91	N
 C Intel P4	 2.26		 illop				Y/N
-C Intel core	 0.52		 0.95		opt/0.74	Y
-C Intel NHM	 0.52		 0.65		opt/opt		Y
+C Intel core	 0.58		 0.87		opt/0.74	Y
+C Intel NHM	 0.64		 1.14		opt/bad		Y
 C Intel SBR	 0.51		 0.65		opt/opt		Y
 C Intel IBR	 0.50		 0.64		opt/0.57	Y
 C Intel HWL	 0.51		 0.58		opt/opt		Y
-C Intel BWL	 0.57		 0.69		opt/0.65	Y
+C Intel BWL	 0.52		 0.64		opt/opt		Y
+C Intel SKL	 0.51		 0.63		opt/opt		Y
 C Intel atom	 1.16		 1.70		opt/opt		Y
 C Intel SLM	 1.02		 1.52				N
 C VIA nano	 1.09		 1.10		opt/opt		Y
@@ -81,7 +82,7 @@ PROLOGUE(mpn_com)
 	cmp	$COM_SSE_THRESHOLD, n
 	jbe	L(bc)
 
-	pcmpeqb	%xmm7, %xmm7		C set to 111...111
+	pcmpeqb	%xmm5, %xmm5		C set to 111...111
 
 	test	$8, R8(rp)		C is rp 16-byte aligned?
 	jz	L(rp_aligned)		C jump if rp aligned
@@ -107,10 +108,10 @@ L(atop):movdqa	0(up), %xmm0
 	movdqa	32(up), %xmm2
 	movdqa	48(up), %xmm3
 	lea	64(up), up
-	pxor	%xmm7, %xmm0
-	pxor	%xmm7, %xmm1
-	pxor	%xmm7, %xmm2
-	pxor	%xmm7, %xmm3
+	pxor	%xmm5, %xmm0
+	pxor	%xmm5, %xmm1
+	pxor	%xmm5, %xmm2
+	pxor	%xmm5, %xmm3
 	movdqa	%xmm0, (rp)
 	movdqa	%xmm1, 16(rp)
 	movdqa	%xmm2, 32(rp)
@@ -124,8 +125,8 @@ L(am):	sub	$8, n
 	movdqa	(up), %xmm0
 	movdqa	16(up), %xmm1
 	lea	32(up), up
-	pxor	%xmm7, %xmm0
-	pxor	%xmm7, %xmm1
+	pxor	%xmm5, %xmm0
+	pxor	%xmm5, %xmm1
 	movdqa	%xmm0, (rp)
 	movdqa	%xmm1, 16(rp)
 	lea	32(rp), rp
@@ -134,7 +135,7 @@ L(am):	sub	$8, n
 	jz	1f
 	movdqa	(up), %xmm0
 	lea	16(up), up
-	pxor	%xmm7, %xmm0
+	pxor	%xmm5, %xmm0
 	movdqa	%xmm0, (rp)
 	lea	16(rp), rp
 
@@ -167,44 +168,44 @@ C quite separate: up-rp < 5 or up-up > 15 limbs
 
 	ALIGN(16)
 L(utop):movdqa	120(up), %xmm3
-	pxor	%xmm7, %xmm0
+	pxor	%xmm5, %xmm0
 	movdqa	%xmm0, -128(rp)
 	sub	$16, n
 L(um):	movdqa	104(up), %xmm2
 	palignr($8, %xmm2, %xmm3)
 	movdqa	88(up), %xmm1
-	pxor	%xmm7, %xmm3
+	pxor	%xmm5, %xmm3
 	movdqa	%xmm3, 112(rp)
 	palignr($8, %xmm1, %xmm2)
 	movdqa	72(up), %xmm0
-	pxor	%xmm7, %xmm2
+	pxor	%xmm5, %xmm2
 	movdqa	%xmm2, 96(rp)
 	palignr($8, %xmm0, %xmm1)
 	movdqa	56(up), %xmm3
-	pxor	%xmm7, %xmm1
+	pxor	%xmm5, %xmm1
 	movdqa	%xmm1, 80(rp)
 	palignr($8, %xmm3, %xmm0)
 	movdqa	40(up), %xmm2
-	pxor	%xmm7, %xmm0
+	pxor	%xmm5, %xmm0
 	movdqa	%xmm0, 64(rp)
 	palignr($8, %xmm2, %xmm3)
 	movdqa	24(up), %xmm1
-	pxor	%xmm7, %xmm3
+	pxor	%xmm5, %xmm3
 	movdqa	%xmm3, 48(rp)
 	palignr($8, %xmm1, %xmm2)
 	movdqa	8(up), %xmm0
-	pxor	%xmm7, %xmm2
+	pxor	%xmm5, %xmm2
 	movdqa	%xmm2, 32(rp)
 	palignr($8, %xmm0, %xmm1)
 	movdqa	-8(up), %xmm3
-	pxor	%xmm7, %xmm1
+	pxor	%xmm5, %xmm1
 	movdqa	%xmm1, 16(rp)
 	palignr($8, %xmm3, %xmm0)
 	lea	128(up), up
 	lea	128(rp), rp
 	jnc	L(utop)
 
-	pxor	%xmm7, %xmm0
+	pxor	%xmm5, %xmm0
 	movdqa	%xmm0, -128(rp)
 
 L(uend):test	$8, R8(n)
@@ -213,19 +214,19 @@ L(uend):test	$8, R8(n)
 	movdqa	40(up), %xmm2
 	palignr($8, %xmm2, %xmm3)
 	movdqa	24(up), %xmm1
-	pxor	%xmm7, %xmm3
+	pxor	%xmm5, %xmm3
 	movdqa	%xmm3, 48(rp)
 	palignr($8, %xmm1, %xmm2)
 	movdqa	8(up), %xmm0
-	pxor	%xmm7, %xmm2
+	pxor	%xmm5, %xmm2
 	movdqa	%xmm2, 32(rp)
 	palignr($8, %xmm0, %xmm1)
 	movdqa	-8(up), %xmm3
-	pxor	%xmm7, %xmm1
+	pxor	%xmm5, %xmm1
 	movdqa	%xmm1, 16(rp)
 	palignr($8, %xmm3, %xmm0)
 	lea	64(up), up
-	pxor	%xmm7, %xmm0
+	pxor	%xmm5, %xmm0
 	movdqa	%xmm0, (rp)
 	lea	64(rp), rp
 
@@ -235,11 +236,11 @@ L(uend):test	$8, R8(n)
 	movdqa	8(up), %xmm0
 	palignr($8, %xmm0, %xmm1)
 	movdqa	-8(up), %xmm3
-	pxor	%xmm7, %xmm1
+	pxor	%xmm5, %xmm1
 	movdqa	%xmm1, 16(rp)
 	palignr($8, %xmm3, %xmm0)
 	lea	32(up), up
-	pxor	%xmm7, %xmm0
+	pxor	%xmm5, %xmm0
 	movdqa	%xmm0, (rp)
 	lea	32(rp), rp
 
@@ -249,7 +250,7 @@ L(uend):test	$8, R8(n)
 	movdqa	-8(up), %xmm3
 	palignr($8, %xmm3, %xmm0)
 	lea	16(up), up
-	pxor	%xmm7, %xmm0
+	pxor	%xmm5, %xmm0
 	movdqa	%xmm0, (rp)
 	lea	16(rp), rp
 

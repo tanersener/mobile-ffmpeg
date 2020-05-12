@@ -188,7 +188,7 @@ int _gnutls13_send_certificate_verify(gnutls_session_t session, unsigned again)
 		}
 
 		if (server) {
-			algo = _gnutls_session_get_sign_algo(session, &apr_cert_list[0], apr_pkey, 0);
+			algo = _gnutls_session_get_sign_algo(session, &apr_cert_list[0], apr_pkey, 0, GNUTLS_KX_UNKNOWN);
 			if (algo == GNUTLS_SIGN_UNKNOWN)
 				return gnutls_assert_val(GNUTLS_E_INCOMPATIBLE_SIG_WITH_KEY);
 

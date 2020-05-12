@@ -65,7 +65,7 @@ C latency.
 C
 C Breaking carry recurrency might be a good idea.  We would then need separate
 C registers for the shift carry and add/subtract carry, which in turn would
-C force is to 2*2-way unrolling.
+C force us to 2*2-way unrolling.
 
 defframe(PARAM_SIZE,	16)
 defframe(PARAM_DBLD,	12)

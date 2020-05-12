@@ -48,6 +48,8 @@
 #define HASH_OID_SHA3_256 "2.16.840.1.101.3.4.2.8"
 #define HASH_OID_SHA3_384 "2.16.840.1.101.3.4.2.9"
 #define HASH_OID_SHA3_512 "2.16.840.1.101.3.4.2.10"
+#define HASH_OID_SHAKE_128 "2.16.840.1.101.3.4.2.11"
+#define HASH_OID_SHAKE_256 "2.16.840.1.101.3.4.2.12"
 #define HASH_OID_GOST_R_3411_94 "1.2.643.2.2.9"
 #define HASH_OID_STREEBOG_256 "1.2.643.7.1.1.2.2"
 #define HASH_OID_STREEBOG_512 "1.2.643.7.1.1.2.3"
@@ -276,7 +278,7 @@ void _gnutls_x509_privkey_get_spki_params(gnutls_x509_privkey_t key,
 
 int _gnutls_x509_read_rsa_pss_params(uint8_t * der, int dersize,
 				     gnutls_x509_spki_st * params);
-int _gnutls_x509_write_rsa_pss_params(gnutls_x509_spki_st * params,
+int _gnutls_x509_write_rsa_pss_params(const gnutls_x509_spki_st * params,
 				      gnutls_datum_t * der);
 
 /* extensions.c */
@@ -351,18 +353,18 @@ int _gnutls_x509_read_pubkey_signature_params(gnutls_pk_algorithm_t algo,
 					      uint8_t * der, int dersize,
 					      gnutls_pk_params_st * params);
 
-int _gnutls_x509_write_ecc_params(gnutls_ecc_curve_t curve,
+int _gnutls_x509_write_ecc_params(const gnutls_ecc_curve_t curve,
 				  gnutls_datum_t * der);
-int _gnutls_x509_write_ecc_pubkey(gnutls_pk_params_st * params,
+int _gnutls_x509_write_ecc_pubkey(const gnutls_pk_params_st * params,
 				  gnutls_datum_t * der);
 
-int _gnutls_x509_write_eddsa_pubkey(gnutls_pk_params_st * params,
+int _gnutls_x509_write_eddsa_pubkey(const gnutls_pk_params_st * params,
 				    gnutls_datum_t * der);
 
 int
-_gnutls_x509_write_pubkey_params(gnutls_pk_params_st * params,
+_gnutls_x509_write_pubkey_params(const gnutls_pk_params_st * params,
 				 gnutls_datum_t * der);
-int _gnutls_x509_write_pubkey(gnutls_pk_params_st * params,
+int _gnutls_x509_write_pubkey(const gnutls_pk_params_st * params,
 			      gnutls_datum_t * der);
 
 int _gnutls_x509_read_uint(ASN1_TYPE node, const char *value,

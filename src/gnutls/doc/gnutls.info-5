@@ -1,9 +1,9 @@
-This is gnutls.info, produced by makeinfo version 6.7 from gnutls.texi.
+This is gnutls.info, produced by makeinfo version 6.6 from gnutls.texi.
 
-This manual is last updated 27 June 2019 for version 3.6.11 of GnuTLS.
+This manual is last updated 2 January 2020 for version 3.6.13 of GnuTLS.
 
-Copyright (C) 2001-2019 Free Software Foundation, Inc.\\ Copyright (C)
-2001-2019 Nikos Mavrogiannopoulos
+Copyright (C) 2001-2020 Free Software Foundation, Inc.\\ Copyright (C)
+2001-2020 Nikos Mavrogiannopoulos
 
      Permission is granted to copy, distribute and/or modify this
      document under the terms of the GNU Free Documentation License,
@@ -695,7 +695,7 @@ gnutls_ocsp_req_deinit
 gnutls_ocsp_req_export
 ----------------------
 
- -- Function: int gnutls_ocsp_req_export (gnutls_ocsp_req_t REQ,
+ -- Function: int gnutls_ocsp_req_export (gnutls_ocsp_req_const_t REQ,
           gnutls_datum_t * DATA)
      REQ: Holds the OCSP request
 
@@ -709,8 +709,8 @@ gnutls_ocsp_req_export
 gnutls_ocsp_req_get_cert_id
 ---------------------------
 
- -- Function: int gnutls_ocsp_req_get_cert_id (gnutls_ocsp_req_t REQ,
-          unsigned INDX, gnutls_digest_algorithm_t * DIGEST,
+ -- Function: int gnutls_ocsp_req_get_cert_id (gnutls_ocsp_req_const_t
+          REQ, unsigned INDX, gnutls_digest_algorithm_t * DIGEST,
           gnutls_datum_t * ISSUER_NAME_HASH, gnutls_datum_t *
           ISSUER_KEY_HASH, gnutls_datum_t * SERIAL_NUMBER)
      REQ: should contain a 'gnutls_ocsp_req_t' type
@@ -749,9 +749,9 @@ gnutls_ocsp_req_get_cert_id
 gnutls_ocsp_req_get_extension
 -----------------------------
 
- -- Function: int gnutls_ocsp_req_get_extension (gnutls_ocsp_req_t REQ,
-          unsigned INDX, gnutls_datum_t * OID, unsigned int * CRITICAL,
-          gnutls_datum_t * DATA)
+ -- Function: int gnutls_ocsp_req_get_extension (gnutls_ocsp_req_const_t
+          REQ, unsigned INDX, gnutls_datum_t * OID, unsigned int *
+          CRITICAL, gnutls_datum_t * DATA)
      REQ: should contain a 'gnutls_ocsp_req_t' type
 
      INDX: Specifies which extension OID to get.  Use (0) to get the
@@ -783,8 +783,8 @@ gnutls_ocsp_req_get_extension
 gnutls_ocsp_req_get_nonce
 -------------------------
 
- -- Function: int gnutls_ocsp_req_get_nonce (gnutls_ocsp_req_t REQ,
-          unsigned int * CRITICAL, gnutls_datum_t * NONCE)
+ -- Function: int gnutls_ocsp_req_get_nonce (gnutls_ocsp_req_const_t
+          REQ, unsigned int * CRITICAL, gnutls_datum_t * NONCE)
      REQ: should contain a 'gnutls_ocsp_req_t' type
 
      CRITICAL: whether nonce extension is marked critical, or NULL
@@ -802,7 +802,8 @@ gnutls_ocsp_req_get_nonce
 gnutls_ocsp_req_get_version
 ---------------------------
 
- -- Function: int gnutls_ocsp_req_get_version (gnutls_ocsp_req_t REQ)
+ -- Function: int gnutls_ocsp_req_get_version (gnutls_ocsp_req_const_t
+          REQ)
      REQ: should contain a 'gnutls_ocsp_req_t' type
 
      This function will return the version of the OCSP request.
@@ -841,7 +842,7 @@ gnutls_ocsp_req_init
 gnutls_ocsp_req_print
 ---------------------
 
- -- Function: int gnutls_ocsp_req_print (gnutls_ocsp_req_t REQ,
+ -- Function: int gnutls_ocsp_req_print (gnutls_ocsp_req_const_t REQ,
           gnutls_ocsp_print_formats_t FORMAT, gnutls_datum_t * OUT)
      REQ: The data to be printed
 
@@ -916,8 +917,8 @@ gnutls_ocsp_req_set_nonce
 gnutls_ocsp_resp_check_crt
 --------------------------
 
- -- Function: int gnutls_ocsp_resp_check_crt (gnutls_ocsp_resp_t RESP,
-          unsigned int INDX, gnutls_x509_crt_t CRT)
+ -- Function: int gnutls_ocsp_resp_check_crt (gnutls_ocsp_resp_const_t
+          RESP, unsigned int INDX, gnutls_x509_crt_t CRT)
      RESP: should contain a 'gnutls_ocsp_resp_t' type
 
      INDX: Specifies response number to get.  Use (0) to get the first
@@ -944,8 +945,8 @@ gnutls_ocsp_resp_deinit
 gnutls_ocsp_resp_export
 -----------------------
 
- -- Function: int gnutls_ocsp_resp_export (gnutls_ocsp_resp_t RESP,
-          gnutls_datum_t * DATA)
+ -- Function: int gnutls_ocsp_resp_export (gnutls_ocsp_resp_const_t
+          RESP, gnutls_datum_t * DATA)
      RESP: Holds the OCSP response
 
      DATA: newly allocate buffer holding DER encoded OCSP response
@@ -958,8 +959,8 @@ gnutls_ocsp_resp_export
 gnutls_ocsp_resp_export2
 ------------------------
 
- -- Function: int gnutls_ocsp_resp_export2 (gnutls_ocsp_resp_t RESP,
-          gnutls_datum_t * DATA, gnutls_x509_crt_fmt_t FMT)
+ -- Function: int gnutls_ocsp_resp_export2 (gnutls_ocsp_resp_const_t
+          RESP, gnutls_datum_t * DATA, gnutls_x509_crt_fmt_t FMT)
      RESP: Holds the OCSP response
 
      DATA: newly allocate buffer holding DER or PEM encoded OCSP
@@ -977,8 +978,8 @@ gnutls_ocsp_resp_export2
 gnutls_ocsp_resp_get_certs
 --------------------------
 
- -- Function: int gnutls_ocsp_resp_get_certs (gnutls_ocsp_resp_t RESP,
-          gnutls_x509_crt_t ** CERTS, size_t * NCERTS)
+ -- Function: int gnutls_ocsp_resp_get_certs (gnutls_ocsp_resp_const_t
+          RESP, gnutls_x509_crt_t ** CERTS, size_t * NCERTS)
      RESP: should contain a 'gnutls_ocsp_resp_t' type
 
      CERTS: newly allocated array with 'gnutls_x509_crt_t' certificates
@@ -1004,9 +1005,9 @@ gnutls_ocsp_resp_get_certs
 gnutls_ocsp_resp_get_extension
 ------------------------------
 
- -- Function: int gnutls_ocsp_resp_get_extension (gnutls_ocsp_resp_t
-          RESP, unsigned INDX, gnutls_datum_t * OID, unsigned int *
-          CRITICAL, gnutls_datum_t * DATA)
+ -- Function: int gnutls_ocsp_resp_get_extension
+          (gnutls_ocsp_resp_const_t RESP, unsigned INDX, gnutls_datum_t
+          * OID, unsigned int * CRITICAL, gnutls_datum_t * DATA)
      RESP: should contain a 'gnutls_ocsp_resp_t' type
 
      INDX: Specifies which extension OID to get.  Use (0) to get the
@@ -1038,8 +1039,8 @@ gnutls_ocsp_resp_get_extension
 gnutls_ocsp_resp_get_nonce
 --------------------------
 
- -- Function: int gnutls_ocsp_resp_get_nonce (gnutls_ocsp_resp_t RESP,
-          unsigned int * CRITICAL, gnutls_datum_t * NONCE)
+ -- Function: int gnutls_ocsp_resp_get_nonce (gnutls_ocsp_resp_const_t
+          RESP, unsigned int * CRITICAL, gnutls_datum_t * NONCE)
      RESP: should contain a 'gnutls_ocsp_resp_t' type
 
      CRITICAL: whether nonce extension is marked critical
@@ -1058,8 +1059,8 @@ gnutls_ocsp_resp_get_nonce
 gnutls_ocsp_resp_get_produced
 -----------------------------
 
- -- Function: time_t gnutls_ocsp_resp_get_produced (gnutls_ocsp_resp_t
-          RESP)
+ -- Function: time_t gnutls_ocsp_resp_get_produced
+          (gnutls_ocsp_resp_const_t RESP)
      RESP: should contain a 'gnutls_ocsp_resp_t' type
 
      This function will return the time when the OCSP response was
@@ -1070,8 +1071,8 @@ gnutls_ocsp_resp_get_produced
 gnutls_ocsp_resp_get_responder
 ------------------------------
 
- -- Function: int gnutls_ocsp_resp_get_responder (gnutls_ocsp_resp_t
-          RESP, gnutls_datum_t * DN)
+ -- Function: int gnutls_ocsp_resp_get_responder
+          (gnutls_ocsp_resp_const_t RESP, gnutls_datum_t * DN)
      RESP: should contain a 'gnutls_ocsp_resp_t' type
 
      DN: newly allocated buffer with name
@@ -1097,8 +1098,9 @@ gnutls_ocsp_resp_get_responder
 gnutls_ocsp_resp_get_responder2
 -------------------------------
 
- -- Function: int gnutls_ocsp_resp_get_responder2 (gnutls_ocsp_resp_t
-          RESP, gnutls_datum_t * DN, unsigned FLAGS)
+ -- Function: int gnutls_ocsp_resp_get_responder2
+          (gnutls_ocsp_resp_const_t RESP, gnutls_datum_t * DN, unsigned
+          FLAGS)
      RESP: should contain a 'gnutls_ocsp_resp_t' type
 
      DN: newly allocated buffer with name
@@ -1128,7 +1130,8 @@ gnutls_ocsp_resp_get_responder_raw_id
 -------------------------------------
 
  -- Function: int gnutls_ocsp_resp_get_responder_raw_id
-          (gnutls_ocsp_resp_t RESP, unsigned TYPE, gnutls_datum_t * RAW)
+          (gnutls_ocsp_resp_const_t RESP, unsigned TYPE, gnutls_datum_t
+          * RAW)
      RESP: should contain a 'gnutls_ocsp_resp_t' type
 
      TYPE: should be 'GNUTLS_OCSP_RESP_ID_KEY' or
@@ -1150,9 +1153,9 @@ gnutls_ocsp_resp_get_responder_raw_id
 gnutls_ocsp_resp_get_response
 -----------------------------
 
- -- Function: int gnutls_ocsp_resp_get_response (gnutls_ocsp_resp_t
-          RESP, gnutls_datum_t * RESPONSE_TYPE_OID, gnutls_datum_t *
-          RESPONSE)
+ -- Function: int gnutls_ocsp_resp_get_response
+          (gnutls_ocsp_resp_const_t RESP, gnutls_datum_t *
+          RESPONSE_TYPE_OID, gnutls_datum_t * RESPONSE)
      RESP: should contain a 'gnutls_ocsp_resp_t' type
 
      RESPONSE_TYPE_OID: newly allocated output buffer with response type
@@ -1177,8 +1180,8 @@ gnutls_ocsp_resp_get_response
 gnutls_ocsp_resp_get_signature
 ------------------------------
 
- -- Function: int gnutls_ocsp_resp_get_signature (gnutls_ocsp_resp_t
-          RESP, gnutls_datum_t * SIG)
+ -- Function: int gnutls_ocsp_resp_get_signature
+          (gnutls_ocsp_resp_const_t RESP, gnutls_datum_t * SIG)
      RESP: should contain a 'gnutls_ocsp_resp_t' type
 
      SIG: newly allocated output buffer with signature data
@@ -1192,7 +1195,7 @@ gnutls_ocsp_resp_get_signature_algorithm
 ----------------------------------------
 
  -- Function: int gnutls_ocsp_resp_get_signature_algorithm
-          (gnutls_ocsp_resp_t RESP)
+          (gnutls_ocsp_resp_const_t RESP)
      RESP: should contain a 'gnutls_ocsp_resp_t' type
 
      This function will return a value of the 'gnutls_sign_algorithm_t'
@@ -1205,8 +1208,8 @@ gnutls_ocsp_resp_get_signature_algorithm
 gnutls_ocsp_resp_get_single
 ---------------------------
 
- -- Function: int gnutls_ocsp_resp_get_single (gnutls_ocsp_resp_t RESP,
-          unsigned INDX, gnutls_digest_algorithm_t * DIGEST,
+ -- Function: int gnutls_ocsp_resp_get_single (gnutls_ocsp_resp_const_t
+          RESP, unsigned INDX, gnutls_digest_algorithm_t * DIGEST,
           gnutls_datum_t * ISSUER_NAME_HASH, gnutls_datum_t *
           ISSUER_KEY_HASH, gnutls_datum_t * SERIAL_NUMBER, unsigned int
           * CERT_STATUS, time_t * THIS_UPDATE, time_t * NEXT_UPDATE,
@@ -1256,7 +1259,8 @@ gnutls_ocsp_resp_get_single
 gnutls_ocsp_resp_get_status
 ---------------------------
 
- -- Function: int gnutls_ocsp_resp_get_status (gnutls_ocsp_resp_t RESP)
+ -- Function: int gnutls_ocsp_resp_get_status (gnutls_ocsp_resp_const_t
+          RESP)
      RESP: should contain a 'gnutls_ocsp_resp_t' type
 
      This function will return the status of a OCSP response, an
@@ -1268,7 +1272,8 @@ gnutls_ocsp_resp_get_status
 gnutls_ocsp_resp_get_version
 ----------------------------
 
- -- Function: int gnutls_ocsp_resp_get_version (gnutls_ocsp_resp_t RESP)
+ -- Function: int gnutls_ocsp_resp_get_version (gnutls_ocsp_resp_const_t
+          RESP)
      RESP: should contain a 'gnutls_ocsp_resp_t' type
 
      This function will return the version of the Basic OCSP Response.
@@ -1361,7 +1366,7 @@ gnutls_ocsp_resp_list_import2
 gnutls_ocsp_resp_print
 ----------------------
 
- -- Function: int gnutls_ocsp_resp_print (gnutls_ocsp_resp_t RESP,
+ -- Function: int gnutls_ocsp_resp_print (gnutls_ocsp_resp_const_t RESP,
           gnutls_ocsp_print_formats_t FORMAT, gnutls_datum_t * OUT)
      RESP: The data to be printed
 
@@ -1384,9 +1389,9 @@ gnutls_ocsp_resp_print
 gnutls_ocsp_resp_verify
 -----------------------
 
- -- Function: int gnutls_ocsp_resp_verify (gnutls_ocsp_resp_t RESP,
-          gnutls_x509_trust_list_t TRUSTLIST, unsigned int * VERIFY,
-          unsigned int FLAGS)
+ -- Function: int gnutls_ocsp_resp_verify (gnutls_ocsp_resp_const_t
+          RESP, gnutls_x509_trust_list_t TRUSTLIST, unsigned int *
+          VERIFY, unsigned int FLAGS)
      RESP: should contain a 'gnutls_ocsp_resp_t' type
 
      TRUSTLIST: trust anchors as a 'gnutls_x509_trust_list_t' type
@@ -1422,9 +1427,9 @@ gnutls_ocsp_resp_verify
 gnutls_ocsp_resp_verify_direct
 ------------------------------
 
- -- Function: int gnutls_ocsp_resp_verify_direct (gnutls_ocsp_resp_t
-          RESP, gnutls_x509_crt_t ISSUER, unsigned int * VERIFY,
-          unsigned int FLAGS)
+ -- Function: int gnutls_ocsp_resp_verify_direct
+          (gnutls_ocsp_resp_const_t RESP, gnutls_x509_crt_t ISSUER,
+          unsigned int * VERIFY, unsigned int FLAGS)
      RESP: should contain a 'gnutls_ocsp_resp_t' type
 
      ISSUER: certificate believed to have signed the response
@@ -1447,568 +1452,6 @@ gnutls_ocsp_resp_verify_direct
      variable to find out the verification status.
 
      The 'flags' variable should be 0 for now.
-
-     *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
-     otherwise a negative error value.
-
-
-File: gnutls.info,  Node: PKCS 12 API,  Next: PKCS 11 API,  Prev: OCSP API,  Up: API reference
-
-E.6 PKCS 12 API
-===============
-
-The following functions are to be used for PKCS 12 handling.  Their
-prototypes lie in 'gnutls/pkcs12.h'.
-
-gnutls_pkcs12_bag_decrypt
--------------------------
-
- -- Function: int gnutls_pkcs12_bag_decrypt (gnutls_pkcs12_bag_t BAG,
-          const char * PASS)
-     BAG: The bag
-
-     PASS: The password used for encryption, must be ASCII.
-
-     This function will decrypt the given encrypted bag and return 0 on
-     success.
-
-     *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
-     otherwise a negative error code is returned.
-
-gnutls_pkcs12_bag_deinit
-------------------------
-
- -- Function: void gnutls_pkcs12_bag_deinit (gnutls_pkcs12_bag_t BAG)
-     BAG: A pointer to the type to be initialized
-
-     This function will deinitialize a PKCS12 Bag structure.
-
-gnutls_pkcs12_bag_enc_info
---------------------------
-
- -- Function: int gnutls_pkcs12_bag_enc_info (gnutls_pkcs12_bag_t BAG,
-          unsigned int * SCHEMA, unsigned int * CIPHER, void * SALT,
-          unsigned int * SALT_SIZE, unsigned int * ITER_COUNT, char **
-          OID)
-     BAG: The bag
-
-     SCHEMA: indicate the schema as one of 'gnutls_pkcs_encrypt_flags_t'
-
-     CIPHER: the cipher used as 'gnutls_cipher_algorithm_t'
-
-     SALT: PBKDF2 salt (if non-NULL then 'salt_size' initially holds its
-     size)
-
-     SALT_SIZE: PBKDF2 salt size
-
-     ITER_COUNT: PBKDF2 iteration count
-
-     OID: if non-NULL it will contain an allocated null-terminated
-     variable with the OID
-
-     This function will provide information on the encryption algorithms
-     used in an encrypted bag.  If the structure algorithms are unknown
-     the code 'GNUTLS_E_UNKNOWN_CIPHER_TYPE' will be returned, and only
-     'oid' , will be set.  That is, 'oid' will be set on encrypted bags
-     whether supported or not.  It must be deinitialized using
-     'gnutls_free()' .  The other variables are only set on supported
-     structures.
-
-     *Returns:* 'GNUTLS_E_INVALID_REQUEST' if the provided bag isn't
-     encrypted, 'GNUTLS_E_UNKNOWN_CIPHER_TYPE' if the structure's
-     encryption isn't supported, or another negative error code in case
-     of a failure.  Zero on success.
-
-gnutls_pkcs12_bag_encrypt
--------------------------
-
- -- Function: int gnutls_pkcs12_bag_encrypt (gnutls_pkcs12_bag_t BAG,
-          const char * PASS, unsigned int FLAGS)
-     BAG: The bag
-
-     PASS: The password used for encryption, must be ASCII
-
-     FLAGS: should be one of 'gnutls_pkcs_encrypt_flags_t' elements
-     bitwise or'd
-
-     This function will encrypt the given bag.
-
-     *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
-     otherwise a negative error code is returned.
-
-gnutls_pkcs12_bag_get_count
----------------------------
-
- -- Function: int gnutls_pkcs12_bag_get_count (gnutls_pkcs12_bag_t BAG)
-     BAG: The bag
-
-     This function will return the number of the elements within the
-     bag.
-
-     *Returns:* Number of elements in bag, or an negative error code on
-     error.
-
-gnutls_pkcs12_bag_get_data
---------------------------
-
- -- Function: int gnutls_pkcs12_bag_get_data (gnutls_pkcs12_bag_t BAG,
-          unsigned INDX, gnutls_datum_t * DATA)
-     BAG: The bag
-
-     INDX: The element of the bag to get the data from
-
-     DATA: where the bag's data will be.  Should be treated as constant.
-
-     This function will return the bag's data.  The data is a constant
-     that is stored into the bag.  Should not be accessed after the bag
-     is deleted.
-
-     *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
-     otherwise a negative error value.
-
-gnutls_pkcs12_bag_get_friendly_name
------------------------------------
-
- -- Function: int gnutls_pkcs12_bag_get_friendly_name
-          (gnutls_pkcs12_bag_t BAG, unsigned INDX, char ** NAME)
-     BAG: The bag
-
-     INDX: The bag's element to add the id
-
-     NAME: will hold a pointer to the name (to be treated as const)
-
-     This function will return the friendly name, of the specified bag
-     element.  The key ID is usually used to distinguish the local
-     private key and the certificate pair.
-
-     *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
-     otherwise a negative error value.  or a negative error code on
-     error.
-
-gnutls_pkcs12_bag_get_key_id
-----------------------------
-
- -- Function: int gnutls_pkcs12_bag_get_key_id (gnutls_pkcs12_bag_t BAG,
-          unsigned INDX, gnutls_datum_t * ID)
-     BAG: The bag
-
-     INDX: The bag's element to add the id
-
-     ID: where the ID will be copied (to be treated as const)
-
-     This function will return the key ID, of the specified bag element.
-     The key ID is usually used to distinguish the local private key and
-     the certificate pair.
-
-     *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
-     otherwise a negative error value.  or a negative error code on
-     error.
-
-gnutls_pkcs12_bag_get_type
---------------------------
-
- -- Function: int gnutls_pkcs12_bag_get_type (gnutls_pkcs12_bag_t BAG,
-          unsigned INDX)
-     BAG: The bag
-
-     INDX: The element of the bag to get the type
-
-     This function will return the bag's type.
-
-     *Returns:* On error a negative error value or one of the
-     'gnutls_pkcs12_bag_type_t' enumerations.
-
-gnutls_pkcs12_bag_init
-----------------------
-
- -- Function: int gnutls_pkcs12_bag_init (gnutls_pkcs12_bag_t * BAG)
-     BAG: A pointer to the type to be initialized
-
-     This function will initialize a PKCS12 bag structure.  PKCS12 Bags
-     usually contain private keys, lists of X.509 Certificates and X.509
-     Certificate revocation lists.
-
-     *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
-     otherwise a negative error value.
-
-gnutls_pkcs12_bag_set_crl
--------------------------
-
- -- Function: int gnutls_pkcs12_bag_set_crl (gnutls_pkcs12_bag_t BAG,
-          gnutls_x509_crl_t CRL)
-     BAG: The bag
-
-     CRL: the CRL to be copied.
-
-     This function will insert the given CRL into the bag.  This is just
-     a wrapper over 'gnutls_pkcs12_bag_set_data()' .
-
-     *Returns:* the index of the added bag on success, or a negative
-     error code on failure.
-
-gnutls_pkcs12_bag_set_crt
--------------------------
-
- -- Function: int gnutls_pkcs12_bag_set_crt (gnutls_pkcs12_bag_t BAG,
-          gnutls_x509_crt_t CRT)
-     BAG: The bag
-
-     CRT: the certificate to be copied.
-
-     This function will insert the given certificate into the bag.  This
-     is just a wrapper over 'gnutls_pkcs12_bag_set_data()' .
-
-     *Returns:* the index of the added bag on success, or a negative
-     value on failure.
-
-gnutls_pkcs12_bag_set_data
---------------------------
-
- -- Function: int gnutls_pkcs12_bag_set_data (gnutls_pkcs12_bag_t BAG,
-          gnutls_pkcs12_bag_type_t TYPE, const gnutls_datum_t * DATA)
-     BAG: The bag
-
-     TYPE: The data's type
-
-     DATA: the data to be copied.
-
-     This function will insert the given data of the given type into the
-     bag.
-
-     *Returns:* the index of the added bag on success, or a negative
-     value on error.
-
-gnutls_pkcs12_bag_set_friendly_name
------------------------------------
-
- -- Function: int gnutls_pkcs12_bag_set_friendly_name
-          (gnutls_pkcs12_bag_t BAG, unsigned INDX, const char * NAME)
-     BAG: The bag
-
-     INDX: The bag's element to add the id
-
-     NAME: the name
-
-     This function will add the given key friendly name, to the
-     specified, by the index, bag element.  The name will be encoded as
-     a 'Friendly name' bag attribute, which is usually used to set a
-     user name to the local private key and the certificate pair.
-
-     *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
-     otherwise a negative error value.  or a negative error code on
-     error.
-
-gnutls_pkcs12_bag_set_key_id
-----------------------------
-
- -- Function: int gnutls_pkcs12_bag_set_key_id (gnutls_pkcs12_bag_t BAG,
-          unsigned INDX, const gnutls_datum_t * ID)
-     BAG: The bag
-
-     INDX: The bag's element to add the id
-
-     ID: the ID
-
-     This function will add the given key ID, to the specified, by the
-     index, bag element.  The key ID will be encoded as a 'Local key
-     identifier' bag attribute, which is usually used to distinguish the
-     local private key and the certificate pair.
-
-     *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
-     otherwise a negative error value.  or a negative error code on
-     error.
-
-gnutls_pkcs12_bag_set_privkey
------------------------------
-
- -- Function: int gnutls_pkcs12_bag_set_privkey (gnutls_pkcs12_bag_t
-          BAG, gnutls_x509_privkey_t PRIVKEY, const char * PASSWORD,
-          unsigned FLAGS)
-     BAG: The bag
-
-     PRIVKEY: the private key to be copied.
-
-     PASSWORD: the password to protect the key with (may be 'NULL' )
-
-     FLAGS: should be one of 'gnutls_pkcs_encrypt_flags_t' elements
-     bitwise or'd
-
-     This function will insert the given private key into the bag.  This
-     is just a wrapper over 'gnutls_pkcs12_bag_set_data()' .
-
-     *Returns:* the index of the added bag on success, or a negative
-     value on failure.
-
-gnutls_pkcs12_deinit
---------------------
-
- -- Function: void gnutls_pkcs12_deinit (gnutls_pkcs12_t PKCS12)
-     PKCS12: The type to be initialized
-
-     This function will deinitialize a PKCS12 type.
-
-gnutls_pkcs12_export
---------------------
-
- -- Function: int gnutls_pkcs12_export (gnutls_pkcs12_t PKCS12,
-          gnutls_x509_crt_fmt_t FORMAT, void * OUTPUT_DATA, size_t *
-          OUTPUT_DATA_SIZE)
-     PKCS12: A pkcs12 type
-
-     FORMAT: the format of output params.  One of PEM or DER.
-
-     OUTPUT_DATA: will contain a structure PEM or DER encoded
-
-     OUTPUT_DATA_SIZE: holds the size of output_data (and will be
-     replaced by the actual size of parameters)
-
-     This function will export the pkcs12 structure to DER or PEM
-     format.
-
-     If the buffer provided is not long enough to hold the output, then
-     *output_data_size will be updated and GNUTLS_E_SHORT_MEMORY_BUFFER
-     will be returned.
-
-     If the structure is PEM encoded, it will have a header of "BEGIN
-     PKCS12".
-
-     *Returns:* In case of failure a negative error code will be
-     returned, and 0 on success.
-
-gnutls_pkcs12_export2
----------------------
-
- -- Function: int gnutls_pkcs12_export2 (gnutls_pkcs12_t PKCS12,
-          gnutls_x509_crt_fmt_t FORMAT, gnutls_datum_t * OUT)
-     PKCS12: A pkcs12 type
-
-     FORMAT: the format of output params.  One of PEM or DER.
-
-     OUT: will contain a structure PEM or DER encoded
-
-     This function will export the pkcs12 structure to DER or PEM
-     format.
-
-     The output buffer is allocated using 'gnutls_malloc()' .
-
-     If the structure is PEM encoded, it will have a header of "BEGIN
-     PKCS12".
-
-     *Returns:* In case of failure a negative error code will be
-     returned, and 0 on success.
-
-     *Since:* 3.1.3
-
-gnutls_pkcs12_generate_mac
---------------------------
-
- -- Function: int gnutls_pkcs12_generate_mac (gnutls_pkcs12_t PKCS12,
-          const char * PASS)
-     PKCS12: A pkcs12 type
-
-     PASS: The password for the MAC
-
-     This function will generate a MAC for the PKCS12 structure.
-
-     *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
-     otherwise a negative error value.
-
-gnutls_pkcs12_generate_mac2
----------------------------
-
- -- Function: int gnutls_pkcs12_generate_mac2 (gnutls_pkcs12_t PKCS12,
-          gnutls_mac_algorithm_t MAC, const char * PASS)
-     PKCS12: A pkcs12 type
-
-     MAC: the MAC algorithm to use
-
-     PASS: The password for the MAC
-
-     This function will generate a MAC for the PKCS12 structure.
-
-     *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
-     otherwise a negative error value.
-
-gnutls_pkcs12_get_bag
----------------------
-
- -- Function: int gnutls_pkcs12_get_bag (gnutls_pkcs12_t PKCS12, int
-          INDX, gnutls_pkcs12_bag_t BAG)
-     PKCS12: A pkcs12 type
-
-     INDX: contains the index of the bag to extract
-
-     BAG: An initialized bag, where the contents of the bag will be
-     copied
-
-     This function will return a Bag from the PKCS12 structure.
-
-     After the last Bag has been read
-     'GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE' will be returned.
-
-     *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
-     otherwise a negative error value.
-
-gnutls_pkcs12_import
---------------------
-
- -- Function: int gnutls_pkcs12_import (gnutls_pkcs12_t PKCS12, const
-          gnutls_datum_t * DATA, gnutls_x509_crt_fmt_t FORMAT, unsigned
-          int FLAGS)
-     PKCS12: The data to store the parsed PKCS12.
-
-     DATA: The DER or PEM encoded PKCS12.
-
-     FORMAT: One of DER or PEM
-
-     FLAGS: an ORed sequence of gnutls_privkey_pkcs8_flags
-
-     This function will convert the given DER or PEM encoded PKCS12 to
-     the native gnutls_pkcs12_t format.  The output will be stored in
-     'pkcs12'.
-
-     If the PKCS12 is PEM encoded it should have a header of "PKCS12".
-
-     *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
-     otherwise a negative error value.
-
-gnutls_pkcs12_init
-------------------
-
- -- Function: int gnutls_pkcs12_init (gnutls_pkcs12_t * PKCS12)
-     PKCS12: A pointer to the type to be initialized
-
-     This function will initialize a PKCS12 type.  PKCS12 structures
-     usually contain lists of X.509 Certificates and X.509 Certificate
-     revocation lists.
-
-     *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
-     otherwise a negative error value.
-
-gnutls_pkcs12_mac_info
-----------------------
-
- -- Function: int gnutls_pkcs12_mac_info (gnutls_pkcs12_t PKCS12,
-          unsigned int * MAC, void * SALT, unsigned int * SALT_SIZE,
-          unsigned int * ITER_COUNT, char ** OID)
-     PKCS12: A pkcs12 type
-
-     MAC: the MAC algorithm used as 'gnutls_mac_algorithm_t'
-
-     SALT: the salt used for string to key (if non-NULL then 'salt_size'
-     initially holds its size)
-
-     SALT_SIZE: string to key salt size
-
-     ITER_COUNT: string to key iteration count
-
-     OID: if non-NULL it will contain an allocated null-terminated
-     variable with the OID
-
-     This function will provide information on the MAC algorithm used in
-     a PKCS '12' structure.  If the structure algorithms are unknown the
-     code 'GNUTLS_E_UNKNOWN_HASH_ALGORITHM' will be returned, and only
-     'oid' , will be set.  That is, 'oid' will be set on structures with
-     a MAC whether supported or not.  It must be deinitialized using
-     'gnutls_free()' .  The other variables are only set on supported
-     structures.
-
-     *Returns:* 'GNUTLS_E_INVALID_REQUEST' if the provided structure
-     doesn't contain a MAC, 'GNUTLS_E_UNKNOWN_HASH_ALGORITHM' if the
-     structure's MAC isn't supported, or another negative error code in
-     case of a failure.  Zero on success.
-
-gnutls_pkcs12_set_bag
----------------------
-
- -- Function: int gnutls_pkcs12_set_bag (gnutls_pkcs12_t PKCS12,
-          gnutls_pkcs12_bag_t BAG)
-     PKCS12: should contain a gnutls_pkcs12_t type
-
-     BAG: An initialized bag
-
-     This function will insert a Bag into the PKCS12 structure.
-
-     *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
-     otherwise a negative error value.
-
-gnutls_pkcs12_simple_parse
---------------------------
-
- -- Function: int gnutls_pkcs12_simple_parse (gnutls_pkcs12_t P12, const
-          char * PASSWORD, gnutls_x509_privkey_t * KEY,
-          gnutls_x509_crt_t ** CHAIN, unsigned int * CHAIN_LEN,
-          gnutls_x509_crt_t ** EXTRA_CERTS, unsigned int *
-          EXTRA_CERTS_LEN, gnutls_x509_crl_t * CRL, unsigned int FLAGS)
-     P12: A pkcs12 type
-
-     PASSWORD: optional password used to decrypt the structure, bags and
-     keys.
-
-     KEY: a structure to store the parsed private key.
-
-     CHAIN: the corresponding to key certificate chain (may be 'NULL' )
-
-     CHAIN_LEN: will be updated with the number of additional (may be
-     'NULL' )
-
-     EXTRA_CERTS: optional pointer to receive an array of additional
-     certificates found in the PKCS12 structure (may be 'NULL' ).
-
-     EXTRA_CERTS_LEN: will be updated with the number of additional
-     certs (may be 'NULL' ).
-
-     CRL: an optional structure to store the parsed CRL (may be 'NULL'
-     ).
-
-     FLAGS: should be zero or one of GNUTLS_PKCS12_SP_*
-
-     This function parses a PKCS12 structure in 'pkcs12' and extracts
-     the private key, the corresponding certificate chain, any
-     additional certificates and a CRL. The structures in 'key' ,
-     'chain' 'crl' , and 'extra_certs' must not be initialized.
-
-     The 'extra_certs' and 'extra_certs_len' parameters are optional and
-     both may be set to 'NULL' .  If either is non-'NULL' , then both
-     must be set.  The value for 'extra_certs' is allocated using
-     'gnutls_malloc()' .
-
-     Encrypted PKCS12 bags and PKCS8 private keys are supported, but
-     only with password based security and the same password for all
-     operations.
-
-     Note that a PKCS12 structure may contain many keys and/or
-     certificates, and there is no way to identify which key/certificate
-     pair you want.  For this reason this function is useful for PKCS12
-     files that contain only one key/certificate pair and/or one CRL.
-
-     If the provided structure has encrypted fields but no password is
-     provided then this function returns 'GNUTLS_E_DECRYPTION_FAILED' .
-
-     Note that normally the chain constructed does not include self
-     signed certificates, to comply with TLS' requirements.  If,
-     however, the flag 'GNUTLS_PKCS12_SP_INCLUDE_SELF_SIGNED' is
-     specified then self signed certificates will be included in the
-     chain.
-
-     Prior to using this function the PKCS '12' structure integrity must
-     be verified using 'gnutls_pkcs12_verify_mac()' .
-
-     *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
-     otherwise a negative error value.
-
-     *Since:* 3.1.0
-
-gnutls_pkcs12_verify_mac
-------------------------
-
- -- Function: int gnutls_pkcs12_verify_mac (gnutls_pkcs12_t PKCS12,
-          const char * PASS)
-     PKCS12: should contain a gnutls_pkcs12_t type
-
-     PASS: The password for the MAC
-
-     This function will verify the MAC for the PKCS12 structure.
 
      *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
      otherwise a negative error value.

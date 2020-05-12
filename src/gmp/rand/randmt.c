@@ -34,7 +34,6 @@ see https://www.gnu.org/licenses/.  */
 
 #include <stdio.h>   /* for NULL */
 
-#include "gmp.h"
 #include "gmp-impl.h"
 #include "randmt.h"
 
@@ -378,7 +377,7 @@ __gmp_randiset_mt (gmp_randstate_ptr dst, gmp_randstate_srcptr src)
   mp_size_t i;
 
   /* Set the generator functions.  */
-  RNG_FNPTR (dst) = (void *) &Mersenne_Twister_Generator_Noseed;
+  RNG_FNPTR (dst) = RNG_FNPTR(src);
 
   /* Allocate the MT-specific state.  */
   dstp = (gmp_rand_mt_struct *) __GMP_ALLOCATE_FUNC_LIMBS (sz);

@@ -1,6 +1,6 @@
 /* Shared speed subroutines.
 
-Copyright 1999-2006, 2008-2015 Free Software Foundation, Inc.
+Copyright 1999-2006, 2008-2017, 2019 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -41,7 +41,6 @@ see https://www.gnu.org/licenses/.  */
 #include <sys/ioctl.h>
 #endif
 
-#include "gmp.h"
 #include "gmp-impl.h"
 #include "longlong.h"
 
@@ -226,8 +225,9 @@ speed_measure (double (*fun) (struct speed_params *s), struct speed_params *s)
   fprintf (stderr, "speed_measure() could not get %d results within %.1f%%\n",
 	   e, (TOLERANCE-1.0)*100.0);
   fprintf (stderr, "    unsorted         sorted\n");
-  fprintf (stderr, "  %.12f    %.12f    is about 0.5%%\n",
-	   t_unsorted[0]*(TOLERANCE-1.0), t[0]*(TOLERANCE-1.0));
+  fprintf (stderr, "  %.12f    %.12f    is about %.1f%%\n",
+	   t_unsorted[0]*(TOLERANCE-1.0), t[0]*(TOLERANCE-1.0),
+	   100*(TOLERANCE-1.0));
   for (i = 0; i < numberof (t); i++)
     fprintf (stderr, "  %.09f       %.09f\n", t_unsorted[i], t[i]);
 
@@ -896,6 +896,11 @@ speed_mpn_dcpi1_bdiv_q (struct speed_params *s)
   SPEED_ROUTINE_MPN_PI1_BDIV_Q (mpn_dcpi1_bdiv_q);
 }
 double
+speed_mpn_sbpi1_bdiv_r (struct speed_params *s)
+{
+  SPEED_ROUTINE_MPN_PI1_BDIV_R (mpn_sbpi1_bdiv_r);
+}
+double
 speed_mpn_mu_bdiv_q (struct speed_params *s)
 {
   SPEED_ROUTINE_MPN_MU_BDIV_Q (mpn_mu_bdiv_q, mpn_mu_bdiv_q_itch);
@@ -1512,6 +1517,8 @@ speed_mpn_sqrlo (struct speed_params *s)
 double
 speed_mpn_sqrlo_basecase (struct speed_params *s)
 {
+  SPEED_RESTRICT_COND (ABOVE_THRESHOLD (s->size, MIN (3, SQRLO_BASECASE_THRESHOLD))
+		       && BELOW_THRESHOLD (s->size, SQRLO_DC_THRESHOLD));
   SPEED_ROUTINE_MPN_SQRLO (mpn_sqrlo_basecase);
 }
 double
@@ -1627,6 +1634,37 @@ speed_mpn_matrix22_mul (struct speed_params *s)
 }
 
 double
+speed_mpn_hgcd2 (struct speed_params *s)
+{
+  SPEED_ROUTINE_MPN_HGCD2 (mpn_hgcd2);
+}
+double
+speed_mpn_hgcd2_1 (struct speed_params *s)
+{
+  SPEED_ROUTINE_MPN_HGCD2 (mpn_hgcd2_1);
+}
+double
+speed_mpn_hgcd2_2 (struct speed_params *s)
+{
+  SPEED_ROUTINE_MPN_HGCD2 (mpn_hgcd2_2);
+}
+double
+speed_mpn_hgcd2_3 (struct speed_params *s)
+{
+  SPEED_ROUTINE_MPN_HGCD2 (mpn_hgcd2_3);
+}
+double
+speed_mpn_hgcd2_4 (struct speed_params *s)
+{
+  SPEED_ROUTINE_MPN_HGCD2 (mpn_hgcd2_4);
+}
+double
+speed_mpn_hgcd2_5 (struct speed_params *s)
+{
+  SPEED_ROUTINE_MPN_HGCD2 (mpn_hgcd2_5);
+}
+
+double
 speed_mpn_hgcd (struct speed_params *s)
 {
   SPEED_ROUTINE_MPN_HGCD_CALL (mpn_hgcd, mpn_hgcd_itch);
@@ -1710,11 +1748,26 @@ speed_mpn_gcd_1 (struct speed_params *s)
   SPEED_ROUTINE_MPN_GCD_1 (mpn_gcd_1);
 }
 double
+speed_mpn_gcd_11 (struct speed_params *s)
+{
+  SPEED_ROUTINE_MPN_GCD_11 (mpn_gcd_11);
+}
+double
 speed_mpn_gcd_1N (struct speed_params *s)
 {
   SPEED_ROUTINE_MPN_GCD_1N (mpn_gcd_1);
 }
+double
+speed_mpn_gcd_22 (struct speed_params *s)
+{
+  SPEED_ROUTINE_MPN_GCD_22 (mpn_gcd_22);
+}
 
+double
+speed_mpz_nextprime (struct speed_params *s)
+{
+  SPEED_ROUTINE_MPZ_NEXTPRIME (mpz_nextprime);
+}
 
 double
 speed_mpz_jacobi (struct speed_params *s)
@@ -1774,6 +1827,19 @@ speed_mpn_root (struct speed_params *s)
 
 
 double
+speed_mpn_perfect_power_p (struct speed_params *s)
+{
+  SPEED_ROUTINE_MPN_PERFECT_POWER (mpn_perfect_power_p);
+}
+
+double
+speed_mpn_perfect_square_p (struct speed_params *s)
+{
+  SPEED_ROUTINE_MPN_PERFECT_SQUARE (mpn_perfect_square_p);
+}
+
+
+double
 speed_mpz_fac_ui (struct speed_params *s)
 {
   SPEED_ROUTINE_MPZ_FAC_UI (mpz_fac_ui);
@@ -1783,6 +1849,12 @@ double
 speed_mpz_2fac_ui (struct speed_params *s)
 {
   SPEED_ROUTINE_MPZ_UI (mpz_2fac_ui);
+}
+
+double
+speed_mpz_primorial_ui (struct speed_params *s)
+{
+  SPEED_ROUTINE_MPZ_UI (mpz_primorial_ui);
 }
 
 
@@ -2034,8 +2106,49 @@ speed_mpz_add (struct speed_params *s)
 }
 
 
-/* If r==0, calculate (size,size/2),
-   otherwise calculate (size,r). */
+/* An inverse (s->r) or (s->size)/2 modulo s->size limbs */
+
+double
+speed_mpz_invert (struct speed_params *s)
+{
+  mpz_t     a, m, r;
+  mp_size_t k;
+  unsigned  i;
+  double    t;
+
+  if (s->r == 0)
+    k = s->size/2;
+  else if (s->r < GMP_LIMB_HIGHBIT)
+    k = s->r;
+  else /* s->r < 0 */
+    k = s->size - (-s->r);
+
+  SPEED_RESTRICT_COND (k > 0 && k <= s->size);
+
+  mpz_init_set_n (m, s->yp, s->size);
+  mpz_setbit (m, 0);	/* force m to odd */
+
+  mpz_init_set_n (a, s->xp, k);
+
+  mpz_init (r);
+  while (mpz_invert (r, a, m) == 0)
+    mpz_add_ui (a, a, 1);
+
+  speed_starttime ();
+  i = s->reps;
+  do
+    mpz_invert (r, a, m);
+  while (--i != 0);
+  t = speed_endtime ();
+
+  mpz_clear (r);
+  mpz_clear (a);
+  mpz_clear (m);
+  return t;
+  }
+
+/* If r==0, calculate binomial(size,size/2),
+   otherwise calculate binomial(size,r). */
 
 double
 speed_mpz_bin_uiui (struct speed_params *s)
@@ -2099,6 +2212,36 @@ speed_mpz_bin_ui (struct speed_params *s)
   return t;
 }
 
+/* If r==0, calculate mfac(size,log(size)),
+   otherwise calculate mfac(size,r). */
+
+double
+speed_mpz_mfac_uiui (struct speed_params *s)
+{
+  mpz_t          w;
+  unsigned long  k;
+  unsigned  i;
+  double    t;
+
+  mpz_init (w);
+  if (s->r != 0)
+    k = s->r;
+  else
+    for (k = 1; s->size >> k; ++k);
+
+  speed_starttime ();
+  i = s->reps;
+  do
+    {
+      mpz_mfac_uiui (w, s->size, k);
+    }
+  while (--i != 0);
+  t = speed_endtime ();
+
+  mpz_clear (w);
+  return t;
+}
+
 /* The multiplies are successively dependent so the latency is measured, not
    the issue rate.  There's only 10 per loop so the code doesn't get too big
    since umul_ppmm is several instructions on some cpus.
@@ -2111,9 +2254,6 @@ speed_mpz_bin_ui (struct speed_params *s)
    preprocessor expansion space if umul_ppmm is big.
 
    Limitations:
-
-   Don't blindly use this to set UMUL_TIME in gmp-mparam.h, check the code
-   generated first, especially on CPUs with low latency multipliers.
 
    The default umul_ppmm doing h*l will be getting increasing numbers of
    high zero bits in the calculation.  CPUs with data-dependent multipliers

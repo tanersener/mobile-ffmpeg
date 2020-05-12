@@ -30,11 +30,11 @@ You should have received copies of the GNU General Public License and the
 GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
-#include "gmp.h"
 #include "gmp-impl.h"
 
 void
 mpz_clear (mpz_ptr x)
 {
-  __GMP_FREE_FUNC_LIMBS (PTR (x), ALLOC(x));
+  if (ALLOC (x))
+    __GMP_FREE_FUNC_LIMBS (PTR (x), ALLOC(x));
 }

@@ -19,7 +19,7 @@
  * The psktool program is copyrighted and licensed
  * under the following terms:
  *
- *  Copyright (C) 2000-2019 Free Software Foundation, and others, all rights reserved.
+ *  Copyright (C) 2000-2020 Free Software Foundation, and others, all rights reserved.
  *  This is free software. It is licensed for use, modification and
  *  redistribution under the terms of the GNU General Public License,
  *  version 3 or later <http://gnu.org/licenses/gpl.html>
@@ -68,8 +68,8 @@ extern FILE * option_usage_fp;
  *  static const strings for psktool options
  */
 static char const psktool_opt_strs[1588] =
-/*     0 */ "psktool 3.6.11\n"
-            "Copyright (C) 2000-2019 Free Software Foundation, and others, all rights reserved.\n"
+/*     0 */ "psktool 3.6.13\n"
+            "Copyright (C) 2000-2020 Free Software Foundation, and others, all rights reserved.\n"
             "This is free software. It is licensed for use, modification and\n"
             "redistribution under the terms of the GNU General Public License,\n"
             "version 3 or later <http://gnu.org/licenses/gpl.html>\n\0"
@@ -110,7 +110,7 @@ static char const psktool_opt_strs[1588] =
 /*  1397 */ "\n\0"
 /*  1399 */ "Program that generates random keys for use with TLS-PSK.  The keys are\n"
             "stored in hexadecimal format in a key file.\n\0"
-/*  1515 */ "psktool 3.6.11\0"
+/*  1515 */ "psktool 3.6.13\0"
 /*  1530 */ "psktool [options]\n"
             "psktool --help for usage instructions.\n";
 
@@ -656,8 +656,8 @@ static void bogus_function(void) {
      translate option names.
    */
   /* referenced via psktoolOptions.pzCopyright */
-  puts(_("psktool 3.6.11\n\
-Copyright (C) 2000-2019 Free Software Foundation, and others, all rights reserved.\n\
+  puts(_("psktool 3.6.13\n\
+Copyright (C) 2000-2020 Free Software Foundation, and others, all rights reserved.\n\
 This is free software. It is licensed for use, modification and\n\
 redistribution under the terms of the GNU General Public License,\n\
 version 3 or later <http://gnu.org/licenses/gpl.html>\n"));
@@ -710,7 +710,7 @@ Usage:  %s [ -<flag> [<val>] | --<name>[{=| }<val>] ]...\n"));
 stored in hexadecimal format in a key file.\n"));
 
   /* referenced via psktoolOptions.pzFullVersion */
-  puts(_("psktool 3.6.11"));
+  puts(_("psktool 3.6.13"));
 
   /* referenced via psktoolOptions.pzFullUsage */
   puts(_("<<<NOT-FOUND>>>"));

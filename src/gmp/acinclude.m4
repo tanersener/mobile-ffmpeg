@@ -1,7 +1,7 @@
 dnl  GMP specific autoconf macros
 
 
-dnl  Copyright 2000-2006, 2009, 2011, 2013-2015 Free Software Foundation, Inc.
+dnl  Copyright 2000-2006, 2009, 2011, 2013-2018 Free Software Foundation, Inc.
 dnl
 dnl  This file is part of the GNU MP Library.
 dnl
@@ -63,7 +63,7 @@ define(X86_PATTERN,
 [[i?86*-*-* | k[5-8]*-*-* | pentium*-*-* | athlon-*-* | viac3*-*-* | geode*-*-* | atom-*-*]])
 
 define(X86_64_PATTERN,
-[[athlon64-*-* | k8-*-* | k10-*-* | bobcat-*-* | jaguar*-*-* | bulldozer*-*-* | piledriver*-*-* | steamroller*-*-* | excavator*-*-* | pentium4-*-* | atom-*-* | silvermont-*-* | goldmont-*-* | core2-*-* | corei*-*-* | x86_64-*-* | nano-*-* | nehalem*-*-* | westmere*-*-* | sandybridge*-*-* | ivybridge*-*-* | haswell*-*-* | broadwell*-*-* | skylake*-*-* | kabylake*-*-*]])
+[[athlon64-*-* | k8-*-* | k10-*-* | bobcat-*-* | jaguar*-*-* | bulldozer*-*-* | piledriver*-*-* | steamroller*-*-* | excavator*-*-* | zen*-*-* | pentium4-*-* | atom-*-* | silvermont-*-* | goldmont-*-* | core2-*-* | corei*-*-* | x86_64-*-* | nano-*-* | nehalem*-*-* | westmere*-*-* | sandybridge*-*-* | ivybridge*-*-* | haswell*-*-* | broadwell*-*-* | skylake*-*-* | kabylake*-*-*]])
 
 dnl  GMP_FAT_SUFFIX(DSTVAR, DIRECTORY)
 dnl  ---------------------------------
@@ -741,7 +741,7 @@ main ()
   long i;
   for (i = 0; i < 88 + 1; i++)
     a[i] = ~0L;
-  r = malloc (10000 * sizeof (unsigned long));
+  r = calloc (10000, sizeof (unsigned long));
   r2 = r;
   for (i = 0; i < 528; i += 23)
     {
@@ -907,8 +907,8 @@ dnl  a workaround for a HP compiler bug.
 
 AC_DEFUN([GMP_C_TEST_SIZEOF],
 [echo "configure: testlist $2" >&AC_FD_CC
-[gmp_sizeof_type=`echo "$2" | sed 's/sizeof-\([a-z]*\).*/\1/'`]
-[gmp_sizeof_want=`echo "$2" | sed 's/sizeof-[a-z]*-\([0-9]*\).*/\1/'`]
+[gmp_sizeof_type=`echo "$2" | sed 's/sizeof-\([a-z\*]*\).*/\1/'`]
+[gmp_sizeof_want=`echo "$2" | sed 's/sizeof-[a-z\*]*-\([0-9]*\).*/\1/'`]
 AC_MSG_CHECKING([compiler $1 has sizeof($gmp_sizeof_type)==$gmp_sizeof_want])
 cat >conftest.c <<EOF
 [int
@@ -1803,8 +1803,8 @@ AC_REQUIRE([GMP_PROG_NM])
 AC_CACHE_CHECK([if .align assembly directive is logarithmic],
                gmp_cv_asm_align_log,
 [GMP_TRY_ASSEMBLE(
-[      	$gmp_cv_asm_data
-      	.align  4
+[	$gmp_cv_asm_data
+	.align  4
 	$gmp_cv_asm_globl	foo
 	$gmp_cv_asm_byte	1
 	.align	4
@@ -1858,10 +1858,10 @@ AC_DEFUN([GMP_ASM_ALIGN_FILL_0x90],
 AC_CACHE_CHECK([if the .align directive accepts an 0x90 fill in .text],
                gmp_cv_asm_align_fill_0x90,
 [GMP_TRY_ASSEMBLE(
-[      	$gmp_cv_asm_text
-      	.align  4, 0x90
+[	$gmp_cv_asm_text
+	.align  4, 0x90
 	.byte   0
-      	.align  4, 0x90],
+	.align  4, 0x90],
 [if grep "Warning: Fill parameter ignored for executable section" conftest.out >/dev/null; then
   echo "Suppressing this warning by omitting 0x90" 1>&AC_FD_CC
   gmp_cv_asm_align_fill_0x90=no
@@ -2659,6 +2659,8 @@ AC_DEFUN([GMP_ASM_X86_MULX],
 ])
 case $gmp_cv_asm_x86_mulx in
 yes)
+  AC_DEFINE(X86_ASM_MULX, 1,
+  [Define to 1 if the assembler understands the mulx instruction])
   ifelse([$1],,:,[$1])
   ;;
 *)
@@ -2666,45 +2668,6 @@ yes)
   AC_MSG_WARN([| WARNING WARNING WARNING])
   AC_MSG_WARN([| Host CPU has the mulx instruction, but it can't be])
   AC_MSG_WARN([| assembled by])
-  AC_MSG_WARN([|     $CCAS $CFLAGS $CPPFLAGS])
-  AC_MSG_WARN([| Older x86 instructions will be used.])
-  AC_MSG_WARN([| This will be an inferior build.])
-  AC_MSG_WARN([+----------------------------------------------------------])
-  ifelse([$2],,:,[$2])
-  ;;
-esac
-])
-
-
-dnl  GMP_ASM_X86_ADX([ACTION-IF-YES][,ACTION-IF-NO])
-dnl  ------------------------------------------------
-dnl  Determine whether the assembler supports the adcx and adox instructions
-dnl  which debut with the Haswell shrink Broadwell.
-dnl
-dnl  This macro is wanted before GMP_ASM_TEXT, so ".text" is hard coded
-dnl  here.  ".text" is believed to be correct on all x86 systems, certainly
-dnl  it's all GMP_ASM_TEXT gives currently.  Actually ".text" probably isn't
-dnl  needed at all, at least for just checking instruction syntax.
-
-AC_DEFUN([GMP_ASM_X86_ADX],
-[AC_CACHE_CHECK([if the assembler knows about the adox instruction],
-		gmp_cv_asm_x86_adx,
-[GMP_TRY_ASSEMBLE(
-[	.text
-	adox	%r8, %r9
-	adcx	%r8, %r9],
-  [gmp_cv_asm_x86_adx=yes],
-  [gmp_cv_asm_x86_adx=no])
-])
-case $gmp_cv_asm_x86_adx in
-yes)
-  ifelse([$1],,:,[$1])
-  ;;
-*)
-  AC_MSG_WARN([+----------------------------------------------------------])
-  AC_MSG_WARN([| WARNING WARNING WARNING])
-  AC_MSG_WARN([| Host CPU has the adcx and adox instructions, but they])
-  AC_MSG_WARN([| can't be assembled by])
   AC_MSG_WARN([|     $CCAS $CFLAGS $CPPFLAGS])
   AC_MSG_WARN([| Older x86 instructions will be used.])
   AC_MSG_WARN([| This will be an inferior build.])
@@ -3296,7 +3259,8 @@ AC_CACHE_CHECK([format of `double' floating point],
                 gmp_cv_c_double_format,
 [gmp_cv_c_double_format=unknown
 cat >conftest.c <<\EOF
-[struct foo {
+[#include <stdio.h>
+struct foo {
   char    before[8];
   double  x;
   char    after[8];
@@ -3306,9 +3270,16 @@ struct foo foo = {
   { '\001', '\043', '\105', '\147', '\211', '\253', '\315', '\357' },
   -123456789.0,
   { '\376', '\334', '\272', '\230', '\166', '\124', '\062', '\020' },
-};]
+};
+int main(){
+  int i;
+  for (i = 0; i < 8; i++) {
+    printf ("%d %f\n", foo.before[i] + foo.after[i], foo.x);
+  }
+  return 0;
+}]
 EOF
-gmp_compile="$CC $CFLAGS $CPPFLAGS -c conftest.c >&AC_FD_CC 2>&1"
+gmp_compile="$CC $CFLAGS $CPPFLAGS conftest.c -o conftest$EXEEXT >&AC_FD_CC 2>&1"
 if AC_TRY_EVAL(gmp_compile); then
 cat >conftest.awk <<\EOF
 [
@@ -3404,7 +3375,7 @@ BEGIN {
           got[12] == "124" &&  \
           got[13] == "000" &&  \
           got[14] == "000" &&  \
-	  got[15] == "000")
+          got[15] == "000")
         {
           print "IEEE big endian"
           found = 1
@@ -3461,11 +3432,11 @@ END {
 }
 ]
 EOF
-  gmp_cv_c_double_format=`od -b conftest.$OBJEXT | $AWK -f conftest.awk`
+  gmp_cv_c_double_format=`od -b conftest$EXEEXT | $AWK -f conftest.awk`
   case $gmp_cv_c_double_format in
   unknown*)
-    echo "cannot match anything, conftest.$OBJEXT contains" >&AC_FD_CC
-    od -b conftest.$OBJEXT >&AC_FD_CC
+    echo "cannot match anything, conftest$EXEEXT contains" >&AC_FD_CC
+    od -b conftest$EXEEXT >&AC_FD_CC
     ;;
   esac
 else
@@ -3729,11 +3700,11 @@ check (const char *fmt, ...)
 
   ret = vsnprintf (buf, 4, fmt, ap);
 
-  if (strcmp (buf, "hel") != 0)
+  if (ret == -1 || strcmp (buf, "hel") != 0)
     return 1;
 
   /* allowed return values */
-  if (ret != -1 && ret != 3 && ret != 11)
+  if (ret != 3 && ret != 11)
     return 2;
 
   return 0;

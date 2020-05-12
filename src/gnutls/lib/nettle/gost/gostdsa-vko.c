@@ -38,7 +38,7 @@
 #include <stdlib.h>
 
 #include "ecc-internal.h"
-#include "gostdsa.h"
+#include "gostdsa2.h"
 
 int
 gostdsa_vko(const struct ecc_scalar *key,

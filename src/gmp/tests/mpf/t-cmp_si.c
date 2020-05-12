@@ -19,7 +19,6 @@ the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "gmp.h"
 #include "gmp-impl.h"
 #include "tests.h"
 
@@ -107,16 +106,16 @@ check_data (void)
 
       got = mpf_cmp_z (a, bz);
       if (SGN (got) != data[i].want)
-      	{
+	{
 	  b = mpz_get_si (bz);
-      	  printf ("mpf_cmp_z wrong on data[%d]\n", i);
-      	  printf ("  a="); mpf_out_str (stdout, 10, 0, a);
-      	  printf (" (%s)\n", data[i].a);
-      	  printf ("  b=%ld (%s)\n", b, data[i].b);
-      	  printf ("  got=%d\n", got);
-      	  printf ("  want=%d\n", data[i].want);
-      	  abort();
-      	}
+	  printf ("mpf_cmp_z wrong on data[%d]\n", i);
+	  printf ("  a="); mpf_out_str (stdout, 10, 0, a);
+	  printf (" (%s)\n", data[i].a);
+	  printf ("  b=%ld (%s)\n", b, data[i].b);
+	  printf ("  got=%d\n", got);
+	  printf ("  want=%d\n", data[i].want);
+	  abort();
+	}
     }
 
   mpf_clear (a);

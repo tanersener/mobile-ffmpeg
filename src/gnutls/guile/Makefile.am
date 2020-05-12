@@ -44,7 +44,7 @@ CLEANFILES = modules/gnutls.scm
 
 .in.scm:
 	$(AM_V_GEN)$(MKDIR_P) "`dirname "$@"`" ; cat "$^" |		\
-	  $(SED) -e's|[@]guileextensiondir[@]|$(guileextensiondir)|g'	\
+	  $(SED) -e's|[@]maybe_guileextensiondir[@]|$(maybe_guileextensiondir)|g' \
 	  > "$@.tmp"
 	$(AM_V_at)mv "$@.tmp" "$@"
 

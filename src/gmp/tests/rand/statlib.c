@@ -70,7 +70,6 @@ Km = sqr (n) * rm
 #include <stdlib.h>
 #include <math.h>
 
-#include "gmp.h"
 #include "gmpstat.h"
 
 /* ks (Kp, Km, X, P, n) -- Perform a Kolmogorov-Smirnov test on the N

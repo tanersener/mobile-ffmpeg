@@ -143,7 +143,8 @@ _gnutls_session_pack(gnutls_session_t session,
 		}
 		break;
 	default:
-		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+		ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+		goto fail;
 
 	}
 
@@ -775,7 +776,7 @@ pack_psk_auth_info(gnutls_session_t session, gnutls_buffer_st * ps)
 	if (info == NULL)
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-	username_len = strlen(info->username) + 1;	/* include the terminating null */
+	username_len = info->username_len;
 	hint_len = strlen(info->hint) + 1;	/* include the terminating null */
 
 	size_offset = ps->length;
@@ -823,7 +824,7 @@ unpack_psk_auth_info(gnutls_session_t session, gnutls_buffer_st * ps)
 		return GNUTLS_E_INVALID_REQUEST;
 
 	BUFFER_POP_NUM(ps, username_size);
-	if (username_size > sizeof(info->username)) {
+	if (username_size > (sizeof(info->username) - 1)) {
 		gnutls_assert();
 		return GNUTLS_E_INTERNAL_ERROR;
 	}
@@ -831,6 +832,10 @@ unpack_psk_auth_info(gnutls_session_t session, gnutls_buffer_st * ps)
 	BUFFER_POP(ps, info->username, username_size);
 	if (username_size == 0)
 		info->username[0] = 0;
+
+	/* append a null terminator and set length */
+	info->username[username_size] = 0;
+	info->username_len = username_size;
 
 	BUFFER_POP_NUM(ps, hint_size);
 	if (hint_size > sizeof(info->hint)) {

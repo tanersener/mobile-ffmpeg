@@ -62,8 +62,9 @@ get_library_name() {
         41) echo "libsndfile" ;;
         42) echo "leptonica" ;;
         43) echo "libsamplerate" ;;
-        44) echo "android-zlib" ;;
-        45) echo "android-media-codec" ;;
+        44) echo "cpu_features" ;;
+        45) echo "android-zlib" ;;
+        46) echo "android-media-codec" ;;
     esac
 }
 
@@ -200,6 +201,23 @@ get_android_arch() {
             echo "x86"
         ;;
         4)
+            echo "x86_64"
+        ;;
+    esac
+}
+
+get_cmake_android_abi() { # to be used with CMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_ROOT/build/cmake/android.toolchain.cmake
+    case ${ARCH} in
+        arm-v7a | arm-v7a-neon)
+            echo "armeabi-v7a"
+        ;;
+        arm64-v8a)
+            echo "arm64-v8a"
+        ;;
+        x86)
+            echo "x86"
+        ;;
+        x86-64)
             echo "x86_64"
         ;;
     esac
@@ -838,23 +856,6 @@ Cflags: -I\${includedir}
 EOF
 }
 
-create_cpufeatures_package_config() {
-    cat > "${INSTALL_PKG_CONFIG_DIR}/cpufeatures.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/sources/android/cpufeatures
-exec_prefix=\${prefix}
-libdir=\${exec_prefix}
-includedir=\${prefix}
-
-Name: cpufeatures
-Description: cpu features Android utility
-Version: 1.${API}
-
-Requires:
-Libs: -L\${libdir} -lcpufeatures
-Cflags: -I\${includedir}
-EOF
-}
-
 #
 # download <url> <local file name> <on error action>
 #
@@ -901,15 +902,15 @@ download_gpl_library_source() {
             GPL_LIB_DEST_DIR="libvidstab"
         ;;
         x264)
-            GPL_LIB_URL="https://code.videolan.org/videolan/x264/-/archive/1771b556ee45207f8711744ccbd5d42a3949b14c/x264-1771b556ee45207f8711744ccbd5d42a3949b14c.tar.bz2"
-            GPL_LIB_FILE="x264-1771b556ee45207f8711744ccbd5d42a3949b14c.tar.bz2"
-            GPL_LIB_ORIG_DIR="x264-1771b556ee45207f8711744ccbd5d42a3949b14c"
+            GPL_LIB_URL="https://code.videolan.org/videolan/x264/-/archive/296494a4011f58f32adc54304a2654627558c59a/x264-296494a4011f58f32adc54304a2654627558c59a.tar.bz2"
+            GPL_LIB_FILE="x264-296494a4011f58f32adc54304a2654627558c59a.tar.bz2"
+            GPL_LIB_ORIG_DIR="x264-296494a4011f58f32adc54304a2654627558c59a"
             GPL_LIB_DEST_DIR="x264"
         ;;
         x265)
-            GPL_LIB_URL="https://bitbucket.org/multicoreware/x265/downloads/x265_3.2.1.tar.gz"
-            GPL_LIB_FILE="x265-3.2.1.tar.gz"
-            GPL_LIB_ORIG_DIR="x265_3.2.1"
+            GPL_LIB_URL="https://bitbucket.org/multicoreware/x265/downloads/x265_3.3.tar.gz"
+            GPL_LIB_FILE="x265_3.3.tar.gz"
+            GPL_LIB_ORIG_DIR="x265_3.3"
             GPL_LIB_DEST_DIR="x265"
         ;;
         xvidcore)
@@ -1031,30 +1032,6 @@ set_toolchain_clang_paths() {
     fi
 
     prepare_inline_sed
-}
-
-build_cpufeatures() {
-
-    # CLEAN OLD BUILD
-    rm -f ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.o 1>>${BASEDIR}/build.log 2>&1
-    rm -f ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/libcpufeatures.a 1>>${BASEDIR}/build.log 2>&1
-    rm -f ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/libcpufeatures.so 1>>${BASEDIR}/build.log 2>&1
-
-    echo -e "\nINFO: Building cpu-features for ${ARCH}\n" 1>>${BASEDIR}/build.log 2>&1
-
-    set_toolchain_clang_paths "cpu-features"
-
-    BUILD_HOST=$(get_build_host)
-    export CFLAGS=$(get_cflags "cpu-features")
-    export CXXFLAGS=$(get_cxxflags "cpu-features")
-    export LDFLAGS=$(get_ldflags "cpu-features")
-
-    # THEN BUILD FOR THIS ABI
-    $(get_clang_target_host)-clang -c ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.c -o ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.o 1>>${BASEDIR}/build.log 2>&1
-    ${BUILD_HOST}-ar rcs ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/libcpufeatures.a ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.o 1>>${BASEDIR}/build.log 2>&1
-    $(get_clang_target_host)-clang -shared ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.o -o ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/libcpufeatures.so 1>>${BASEDIR}/build.log 2>&1
-
-    create_cpufeatures_package_config
 }
 
 build_android_lts_support() {

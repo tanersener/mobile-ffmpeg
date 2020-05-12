@@ -23,7 +23,7 @@ dnl Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.63)
 
 dnl when updating version also update LT_REVISION in m4/hooks.m4
-AC_INIT([GnuTLS], [3.6.11], [bugs@gnutls.org])
+AC_INIT([GnuTLS], [3.6.13], [bugs@gnutls.org])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIRS([m4 src/gl/m4 src/libopts/m4 lib/unistring/m4])
 AC_CANONICAL_HOST
@@ -433,7 +433,7 @@ AC_ARG_ENABLE(full-test-suite,
 
 # test if we are in git master or in release build. In release
 # builds we do not use valgrind.
-SUITE_FILE="${srcdir}/tests/suite/mini-eagain2.c"
+SUITE_FILE="${srcdir}/tests/suite/prime-check.c"
 if test "$full_test_suite" = yes && test ! -f "$SUITE_FILE";then
 	full_test_suite=no
 fi
@@ -449,6 +449,16 @@ if test "$enable_oldgnutls_interop" != "no" && test "$full_test_suite" != yes;th
 fi
 
 AM_CONDITIONAL(ENABLE_OLDGNUTLS_INTEROP, test "$enable_oldgnutls_interop" != "no")
+
+# check for libev - used in full test suite
+AC_LIB_HAVE_LINKFLAGS(ev,, [#include <ev.h>], [ev_run(0,0);])
+if test "$ac_cv_libev" = yes; then
+        AC_SUBST([LIBEV_LIBS], [$LIBEV])
+elif test "$full_test_suite" = yes;then
+        AC_MSG_ERROR([[***
+*** libev4 was not found.
+***]])
+fi
 
 dnl GCC warnings to enable
 
@@ -639,6 +649,34 @@ save_LIBS=$LIBS
 LIBS="$LIBS $NETTLE_LIBS"
 AC_CHECK_FUNCS(nettle_streebog512_update)
 LIBS=$save_LIBS
+
+# Check for Curve448 and Ed448
+have_curve448=no
+save_LIBS=$LIBS
+LIBS="$LIBS $HOGWEED_LIBS $NETTLE_LIBS"
+AC_CHECK_FUNCS([nettle_curve448_mul nettle_ed448_shake256_sign],
+               [AC_DEFINE([HAVE_CURVE448], 1, [Enable Curve448])
+	        have_curve448=yes])
+LIBS=$save_LIBS
+AM_CONDITIONAL(NEED_CURVE448, test "$have_curve448" != "yes")
+
+have_gostdsa=yes
+save_LIBS=$LIBS
+LIBS="$LIBS $HOGWEED_LIBS $NETTLE_LIBS"
+AC_CHECK_FUNCS([nettle_get_gost_gc256b nettle_get_gost_gc512a nettle_gostdsa_sign], [],
+	       have_gostdsa=no)
+LIBS=$save_LIBS
+AS_IF([test "$have_gostdsa" != "yes"], AC_DEFINE([NEED_GOSTDSA], 1, [Use backported GOST R 34.10 DSA support]))
+AM_CONDITIONAL(NEED_GOSTDSA, [test "$have_gostdsa" != "yes"])
+
+# Check if nettle has ChaCha20 initial block counter support
+have_chacha_set_counter=no
+save_LIBS=$LIBS
+LIBS="$LIBS $NETTLE_LIBS"
+AC_CHECK_FUNCS([nettle_chacha_set_counter],
+               [have_chacha_set_counter=yes])
+LIBS=$save_LIBS
+AM_CONDITIONAL(NEED_CHACHA, [test "$have_chacha_set_counter" != "yes"])
 
 AC_MSG_CHECKING([whether to build libdane])
 AC_ARG_ENABLE(libdane,
@@ -919,6 +957,7 @@ AC_ARG_WITH([guile-extension-dir], AS_HELP_STRING([--with-guile-extension-dir=DI
 AC_SUBST([guilesitedir])
 AC_SUBST([guilesiteccachedir])
 AC_SUBST([guileextensiondir])
+maybe_guileextensiondir="\"$guileextensiondir\""
 
 if test "$opt_guile_bindings" = "yes"; then
    AC_MSG_RESULT([***
@@ -990,6 +1029,14 @@ if test "$opt_guile_bindings" = "yes"; then
 	AC_CHECK_FUNCS([scm_gc_malloc_pointerless])
 	CFLAGS="$save_CFLAGS"
 	LIBS="$save_LIBS"
+
+	# Do we need to hard-code $guileextensiondir in gnutls.scm?
+	# This is not necessary when $guileextensiondir is equal to
+	# Guile's 'extensiondir' as specified in 'guile-MAJOR.MINOR.pc'.
+	if test "$guileextensiondir" = "`$PKG_CONFIG guile-$GUILE_EFFECTIVE_VERSION --variable extensiondir`" \
+	     || test "$guileextensiondir" = '$(GUILE_EXTENSION)'; then
+	  maybe_guileextensiondir='#f'
+	fi
       else
         AC_MSG_RESULT([no])
         AC_MSG_WARN([A sufficiently recent GNU Guile not found.  Guile bindings not built.])
@@ -998,6 +1045,7 @@ if test "$opt_guile_bindings" = "yes"; then
    fi
 fi
 
+AC_SUBST([maybe_guileextensiondir])
 AM_CONDITIONAL([HAVE_GUILE], [test "$opt_guile_bindings" = "yes"])
 AM_CONDITIONAL([HAVE_GUILD], [test "x$GUILD" != "x"])
 AM_CONDITIONAL([CROSS_COMPILING], [test "x$cross_compiling" = "xyes"])
@@ -1132,6 +1180,7 @@ if features are disabled)
   IDNA support:         $idna_support
   Non-SuiteB curves:    $enable_non_suiteb
   FIPS140 mode:         $enable_fips
+  Strict DER time:	$ac_strict_der_time
 ])
 
 AC_MSG_NOTICE([Optional libraries:

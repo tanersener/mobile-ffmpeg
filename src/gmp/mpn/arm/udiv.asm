@@ -61,7 +61,7 @@ L(oop):	divstep(n1,n0,d)
 
 	str	n1, [rem_ptr]		C store remainder
 	adc	r0, n0, n0		C quotient: add last carry from divstep
-	ret	lr
+	return	lr
 
 L(_large_divisor):
 	stmfd	sp!, { r8, lr }

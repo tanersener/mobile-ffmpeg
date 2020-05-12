@@ -2,7 +2,7 @@ dnl  AMD64 mpn_lshiftc optimised for CPUs with fast SSE.
 
 dnl  Contributed to the GNU project by David Harvey and Torbjorn Granlund.
 
-dnl  Copyright 2010-2012 Free Software Foundation, Inc.
+dnl  Copyright 2010-2012, 2018 Free Software Foundation, Inc.
 
 dnl  This file is part of the GNU MP Library.
 dnl
@@ -70,6 +70,7 @@ ASM_START()
 	TEXT
 	ALIGN(16)
 PROLOGUE(mpn_lshiftc)
+	FUNC_ENTRY(4)
 	movd	R32(%rcx), %xmm4
 	mov	$64, R32(%rax)
 	sub	R32(%rcx), R32(%rax)
@@ -79,7 +80,7 @@ PROLOGUE(mpn_lshiftc)
 	mov	-8(ap,n,8), %rax
 	shr	R8(%rcx), %rax
 
-	pcmpeqb	%xmm7, %xmm7		C set to 111...111
+	pcmpeqb	%xmm2, %xmm2		C set to 111...111
 
 	cmp	$2, n
 	jle	L(le2)
@@ -94,7 +95,7 @@ C Do one initial limb in order to make rp aligned
 	psllq	%xmm4, %xmm0
 	psrlq	%xmm5, %xmm1
 	por	%xmm1, %xmm0
-	pxor	%xmm7, %xmm0
+	pxor	%xmm2, %xmm0
 	movq	%xmm0, -8(rp,n,8)
 	dec	n
 
@@ -114,7 +115,7 @@ L(utop):movq	(ap,n,8), %xmm1
 	psllq	%xmm4, %xmm1
 	psrlq	%xmm5, %xmm0
 	por	%xmm1, %xmm0
-	pxor	%xmm7, %xmm0
+	pxor	%xmm2, %xmm0
 	movdqa	%xmm0, (rp,n,8)
 L(uent):sub	$2, n
 	ja	L(utop)
@@ -128,8 +129,9 @@ L(uent):sub	$2, n
 	psllq	%xmm4, %xmm1
 	psrlq	%xmm5, %xmm0
 	por	%xmm1, %xmm0
-	pxor	%xmm7, %xmm0
+	pxor	%xmm2, %xmm0
 	movdqa	%xmm0, (rp)
+	FUNC_EXIT()
 	ret
 C *****************************************************************************
 
@@ -142,7 +144,7 @@ L(atop):movdqa	(ap,n,8), %xmm0		C xmm0 = B*ap[n-1] + ap[n-2]
 	psllq	%xmm4, %xmm0
 	psrlq	%xmm5, %xmm1
 	por	%xmm1, %xmm0
-	pxor	%xmm7, %xmm0
+	pxor	%xmm2, %xmm0
 	movdqa	%xmm0, (rp,n,8)
 L(aent):sub	$2, n
 	ja	L(atop)
@@ -155,8 +157,9 @@ L(aent):sub	$2, n
 	psllq	%xmm4, %xmm0
 	psrlq	%xmm5, %xmm1
 	por	%xmm1, %xmm0
-	pxor	%xmm7, %xmm0
+	pxor	%xmm2, %xmm0
 	movdqa	%xmm0, (rp)
+	FUNC_EXIT()
 	ret
 C *****************************************************************************
 
@@ -168,12 +171,13 @@ L(le2):	jne	L(end8)
 	psllq	%xmm4, %xmm0
 	psrlq	%xmm5, %xmm1
 	por	%xmm1, %xmm0
-	pxor	%xmm7, %xmm0
+	pxor	%xmm2, %xmm0
 	movq	%xmm0, 8(rp)
 
 L(end8):movq	(ap), %xmm0
 	psllq	%xmm4, %xmm0
-	pxor	%xmm7, %xmm0
+	pxor	%xmm2, %xmm0
 	movq	%xmm0, (rp)
+	FUNC_EXIT()
 	ret
 EPILOGUE()

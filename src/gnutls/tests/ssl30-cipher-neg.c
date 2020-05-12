@@ -118,6 +118,8 @@ test_case_st tests[] = {
 
 void doit(void)
 {
+	(void) try;
+
 #ifdef ENABLE_SSL3
 	unsigned i;
 	global_init();

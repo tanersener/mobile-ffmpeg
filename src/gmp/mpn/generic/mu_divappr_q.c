@@ -68,9 +68,11 @@ see https://www.gnu.org/licenses/.  */
 #endif
 
 #include <stdlib.h>		/* for NULL */
-#include "gmp.h"
 #include "gmp-impl.h"
 
+static mp_limb_t mpn_preinv_mu_divappr_q (mp_ptr, mp_srcptr, mp_size_t,
+			 mp_srcptr, mp_size_t, mp_srcptr, mp_size_t, mp_ptr);
+static mp_size_t mpn_mu_divappr_q_choose_in (mp_size_t, mp_size_t, int);
 
 mp_limb_t
 mpn_mu_divappr_q (mp_ptr qp,
@@ -156,7 +158,7 @@ mpn_mu_divappr_q (mp_ptr qp,
   return qh;
 }
 
-mp_limb_t
+static mp_limb_t
 mpn_preinv_mu_divappr_q (mp_ptr qp,
 			 mp_srcptr np,
 			 mp_size_t nn,
@@ -312,7 +314,7 @@ mpn_preinv_mu_divappr_q (mp_ptr qp,
    (c) qn < dn/3:       in = qn
    In all cases we have in <= dn.
  */
-mp_size_t
+static mp_size_t
 mpn_mu_divappr_q_choose_in (mp_size_t qn, mp_size_t dn, int k)
 {
   mp_size_t in;

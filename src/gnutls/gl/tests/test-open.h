@@ -1,5 +1,5 @@
 /* Test of opening a file descriptor.
-   Copyright (C) 2007-2019 Free Software Foundation, Inc.
+   Copyright (C) 2007-2020 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -37,8 +37,11 @@ static ALWAYS_INLINE int
 test_open (int (*func) (char const *, int, ...), bool print)
 {
   int fd;
+
   /* Remove anything from prior partial run.  */
   unlink (BASE "file");
+  unlink (BASE "e.exe");
+  unlink (BASE "link");
 
   /* Cannot create directory.  */
   errno = 0;
@@ -48,6 +51,11 @@ test_open (int (*func) (char const *, int, ...), bool print)
 
   /* Create a regular file.  */
   fd = func (BASE "file", O_CREAT | O_RDONLY, 0600);
+  ASSERT (0 <= fd);
+  ASSERT (close (fd) == 0);
+
+  /* Create an executable regular file.  */
+  fd = func (BASE "e.exe", O_CREAT | O_RDONLY, 0700);
   ASSERT (0 <= fd);
   ASSERT (close (fd) == 0);
 
@@ -98,6 +106,7 @@ test_open (int (*func) (char const *, int, ...), bool print)
 
   /* Cleanup.  */
   ASSERT (unlink (BASE "file") == 0);
+  ASSERT (unlink (BASE "e.exe") == 0);
   ASSERT (unlink (BASE "link") == 0);
 
   return 0;

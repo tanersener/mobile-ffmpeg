@@ -2,7 +2,8 @@
    negative based on if U > V, U == V, or U < V.  Vn and Vd may have
    common factors.
 
-Copyright 1993, 1994, 1996, 2000-2003, 2005, 2014 Free Software Foundation, Inc.
+Copyright 1993, 1994, 1996, 2000-2003, 2005, 2014, 2018 Free Software
+Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -30,7 +31,6 @@ You should have received copies of the GNU General Public License and the
 GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
-#include "gmp.h"
 #include "gmp-impl.h"
 
 int
@@ -69,11 +69,13 @@ _mpq_cmp_ui (mpq_srcptr op1, unsigned long int num2, unsigned long int den2)
     return -1;
 
   /* NUM1 x DEN2 is either TMP1_SIZE limbs or TMP1_SIZE-1 limbs.
-     Same for NUM1 x DEN1 with respect to TMP2_SIZE.  */
-  if (num1_size > den1_size + 1)
+     Same for NUM2 x DEN1 with respect to TMP2_SIZE.  */
+  /* If frac2 <= 1 (i.e. num2 <= den2), shortcut with a simpler
+     condition: num1 > den1. Here we only test sizes. */
+  if (num1_size > den1_size + (num2 > den2))
     /* NUM1 x DEN2 is surely larger in magnitude than NUM2 x DEN1.  */
     return num1_size;
-  if (den1_size > num1_size + 1)
+  if (den1_size > num1_size + (den2 > num2))
     /* NUM1 x DEN2 is surely smaller in magnitude than NUM2 x DEN1.  */
     return -num1_size;
 
@@ -90,8 +92,8 @@ _mpq_cmp_ui (mpq_srcptr op1, unsigned long int num2, unsigned long int den2)
   tmp2_ptr[den1_size] = cy_limb;
   tmp2_size = den1_size + (cy_limb != 0);
 
-  cc = tmp1_size - tmp2_size != 0
-    ? tmp1_size - tmp2_size : mpn_cmp (tmp1_ptr, tmp2_ptr, tmp1_size);
+  cc = tmp1_size - tmp2_size;
+  cc = cc != 0 ? cc : mpn_cmp (tmp1_ptr, tmp2_ptr, tmp1_size);
   TMP_FREE;
   return cc;
 }

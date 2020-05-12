@@ -1,6 +1,6 @@
 /* Parse a string into an internal timestamp.
 
-   Copyright (C) 1995, 1997-1998, 2003-2004, 2007, 2009-2019 Free Software
+   Copyright (C) 1995, 1997-1998, 2003-2004, 2007, 2009-2020 Free Software
    Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify

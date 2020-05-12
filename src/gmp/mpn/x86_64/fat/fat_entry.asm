@@ -167,7 +167,9 @@ IFSTD(`	push	%rsi	')
 	push	%r8
 	push	%r9
 	push	%rax
+IFDOS(`	sub	$32, %rsp	')
 	CALL(	__gmpn_cpuvec_init)
+IFDOS(`	add	$32, %rsp	')
 	pop	%rax
 	pop	%r9
 	pop	%r8

@@ -29,7 +29,7 @@
  * will see HAVE_THREADS_H, but won't be able to use _Thread_local. */
 #if __STDC_VERSION__ >= 201112 && !defined(__STDC_NO_THREADS__) && defined(HAVE_THREADS_H)
 # include <threads.h>
-#elif defined(__GNUC__) /* clang is also covered by __GNUC__ */
+#elif defined(__GNUC__) || defined(__SUNPRO_C) || defined(__xlC__) /* clang is covered by __GNUC__ */
 # define _Thread_local __thread
 #elif defined(_MSC_VER)
 # define _Thread_local __declspec(thread)

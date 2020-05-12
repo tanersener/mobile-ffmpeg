@@ -2,7 +2,7 @@ divert(-1)
 
 dnl  m4 macros for ARM assembler.
 
-dnl  Copyright 2001, 2012, 2013 Free Software Foundation, Inc.
+dnl  Copyright 2001, 2012-2016, 2018-2019 Free Software Foundation, Inc.
 
 dnl  This file is part of the GNU MP Library.
 dnl
@@ -36,6 +36,11 @@ dnl  don't want to disable macro expansions in or after them.
 
 changecom(@&*$)
 
+define(`ASM_START',
+m4_assert_numargs_range(0,1)
+`ifelse($1,`neon',`.fpu	neon',
+        $1,,`',
+        1,1,`m4_error(`$0 got invalid argument $1')')')
 
 dnl  APCS register names.
 
@@ -43,18 +48,18 @@ deflit(a1,r0)
 deflit(a2,r1)
 deflit(a3,r2)
 deflit(a4,r3)
-deflit(v1,r4)
-deflit(v2,r5)
-deflit(v3,r6)
-deflit(v4,r7)
-deflit(v5,r8)
-deflit(v6,r9)
+dnl deflit(v1,r4)
+dnl deflit(v2,r5)
+dnl deflit(v3,r6)
+dnl deflit(v4,r7)
+dnl deflit(v5,r8)
+dnl deflit(v6,r9)
 deflit(sb,r9)
-deflit(v7,r10)
+dnl deflit(v7,r10)
 deflit(sl,r10)
 deflit(fp,r11)
 deflit(ip,r12)
-deflit(sp,r13)
+dnl deflit(sp,r13)
 deflit(lr,r14)
 deflit(pc,r15)
 
@@ -84,11 +89,12 @@ L(ptr'lea_num`):	.word	GSYM_PREFIX`'$2')
 ')dnl
 ')
 
-define(`ret',`ifdef(`NOTHUMB',`mov	pc, ',`bx')')
+define(`return',`ifdef(`NOTHUMB',`mov	pc, ',`bx')')
 
 
 define(`EPILOGUE_cpu',
 `lea_list
-	SIZE(`$1',.-`$1')')
+	SIZE(`$1',.-`$1')'
+`define(`lea_list', `')')
 
 divert

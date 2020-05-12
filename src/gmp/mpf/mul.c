@@ -1,6 +1,6 @@
 /* mpf_mul -- Multiply two floats.
 
-Copyright 1993, 1994, 1996, 2001, 2005 Free Software Foundation, Inc.
+Copyright 1993, 1994, 1996, 2001, 2005, 2019 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -28,70 +28,107 @@ You should have received copies of the GNU General Public License and the
 GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
-#include "gmp.h"
 #include "gmp-impl.h"
 
 void
 mpf_mul (mpf_ptr r, mpf_srcptr u, mpf_srcptr v)
 {
-  mp_srcptr up, vp;
-  mp_size_t usize, vsize;
   mp_size_t sign_product;
   mp_size_t prec = r->_mp_prec;
+  mp_size_t rsize;
+  mp_limb_t cy_limb;
+  mp_ptr rp, tp;
+  mp_size_t adj;
+  TMP_DECL;
 
-  usize = u->_mp_size;
-  vsize = v->_mp_size;
-  sign_product = usize ^ vsize;
-
-  usize = ABS (usize);
-  vsize = ABS (vsize);
-
-  up = u->_mp_d;
-  vp = v->_mp_d;
-  if (usize > prec)
+  if (u == v)
     {
-      up += usize - prec;
-      usize = prec;
-    }
-  if (vsize > prec)
-    {
-      vp += vsize - prec;
-      vsize = prec;
-    }
+      mp_srcptr up;
+      mp_size_t usize;
 
-  if (usize == 0 || vsize == 0)
-    {
-      r->_mp_size = 0;
-      r->_mp_exp = 0;		/* ??? */
+      usize = u->_mp_size;
+      sign_product = 0;
+
+      usize = ABS (usize);
+
+      up = u->_mp_d;
+      if (usize > prec)
+	{
+	  up += usize - prec;
+	  usize = prec;
+	}
+
+      if (usize == 0)
+	{
+	  r->_mp_size = 0;
+	  r->_mp_exp = 0;		/* ??? */
+	  return;
+	}
+      else
+	{
+	  TMP_MARK;
+	  rsize = 2 * usize;
+	  tp = TMP_ALLOC_LIMBS (rsize);
+
+	  mpn_sqr (tp, up, usize);
+	  cy_limb = tp[rsize - 1];
+	}
     }
   else
     {
-      mp_size_t rsize;
-      mp_limb_t cy_limb;
-      mp_ptr rp, tp;
-      mp_size_t adj;
-      TMP_DECL;
+      mp_srcptr up, vp;
+      mp_size_t usize, vsize;
 
-      TMP_MARK;
-      rsize = usize + vsize;
-      tp = TMP_ALLOC_LIMBS (rsize);
-      cy_limb = (usize >= vsize
-		 ? mpn_mul (tp, up, usize, vp, vsize)
-		 : mpn_mul (tp, vp, vsize, up, usize));
+      usize = u->_mp_size;
+      vsize = v->_mp_size;
+      sign_product = usize ^ vsize;
 
-      adj = cy_limb == 0;
-      rsize -= adj;
-      prec++;
-      if (rsize > prec)
+      usize = ABS (usize);
+      vsize = ABS (vsize);
+
+      up = u->_mp_d;
+      vp = v->_mp_d;
+      if (usize > prec)
 	{
-	  tp += rsize - prec;
-	  rsize = prec;
+	  up += usize - prec;
+	  usize = prec;
 	}
-      rp = r->_mp_d;
-      MPN_COPY (rp, tp, rsize);
-      r->_mp_exp = u->_mp_exp + v->_mp_exp - adj;
-      r->_mp_size = sign_product >= 0 ? rsize : -rsize;
+      if (vsize > prec)
+	{
+	  vp += vsize - prec;
+	  vsize = prec;
+	}
 
-      TMP_FREE;
+      if (usize == 0 || vsize == 0)
+	{
+	  r->_mp_size = 0;
+	  r->_mp_exp = 0;
+	  return;
+	}
+      else
+	{
+	  TMP_MARK;
+	  rsize = usize + vsize;
+	  tp = TMP_ALLOC_LIMBS (rsize);
+	  cy_limb = (usize >= vsize
+		     ? mpn_mul (tp, up, usize, vp, vsize)
+		     : mpn_mul (tp, vp, vsize, up, usize));
+
+	}
     }
+
+  adj = cy_limb == 0;
+  rsize -= adj;
+  prec++;
+  if (rsize > prec)
+    {
+      tp += rsize - prec;
+      rsize = prec;
+    }
+  rp = r->_mp_d;
+  MPN_COPY (rp, tp, rsize);
+  r->_mp_exp = u->_mp_exp + v->_mp_exp - adj;
+  r->_mp_size = sign_product >= 0 ? rsize : -rsize;
+
+  TMP_FREE;
 }

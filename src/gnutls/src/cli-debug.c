@@ -85,15 +85,20 @@ static const TLS_TEST tls_tests[] = {
 	 test_send_record_with_allow_small_records, "yes", "no", "dunno"},
 #ifdef ENABLE_SSL3
 	{"for SSL 3.0 (RFC6101) support", test_ssl3, "yes", "no", "dunno"},
+	{"for SSL 3.0 with extensions", test_ssl3_with_extensions, "yes", "no", "dunno"},
+	{"for SSL 3.0 with cipher suites not in SSL 3.0 spec",
+	 test_ssl3_unknown_ciphersuites, "yes", "no", "dunno"},
+#endif
 	/* The following tests will disable TLS 1.x if the server is
 	 * buggy */
-#endif
 	{"whether we need to disable TLS 1.2", test_tls_disable2, "no",
 	 "yes", "dunno"},
 	{"whether we need to disable TLS 1.1", test_tls_disable1, "no",
 	 "yes", "dunno"},
 	{"whether we need to disable TLS 1.0", test_tls_disable0, "no",
 	 "yes", "dunno"},
+	/* The following test will disable extensions if the server
+	 * is buggy */
 	{"whether %NO_EXTENSIONS is required", test_no_extensions, "no", "yes",
 	 "dunno"},
 	{"whether %COMPAT is required", test_record_padding, "no", "yes",
@@ -159,6 +164,9 @@ static const TLS_TEST tls_tests[] = {
 	{"for ephemeral EC Diffie-Hellman support", test_ecdhe, "yes",
 	 "no",
 	 "dunno"},
+#ifdef ENABLE_GOST
+	{"for VKO GOST-2012 (draft-smyshlyaev-tls12-gost-suites) support", test_vko_gost_12, "yes", "no", "dunno"},
+#endif
 	{"for curve SECP256r1 (RFC4492)", test_ecdhe_secp256r1, "yes", "no", "dunno"},
 	{"for curve SECP384r1 (RFC4492)", test_ecdhe_secp384r1, "yes", "no", "dunno"},
 	{"for curve SECP521r1 (RFC4492)", test_ecdhe_secp521r1, "yes", "no", "dunno"},
@@ -180,9 +188,16 @@ static const TLS_TEST tls_tests[] = {
 	 "dunno"},
 	{"for CHACHA20-POLY1305 cipher (RFC7905) support", test_chacha20, "yes", "no",
 	 "dunno"},
+#ifdef ENABLE_GOST
+	{"for GOST28147-CNT cipher (draft-smyshlyaev-tls12-gost-suites) support", test_gost_cnt, "yes", "no",
+	 "dunno"},
+#endif
 	{"for MD5 MAC support", test_md5, "yes", "no", "dunno"},
 	{"for SHA1 MAC support", test_sha, "yes", "no", "dunno"},
 	{"for SHA256 MAC support", test_sha256, "yes", "no", "dunno"},
+#ifdef ENABLE_GOST
+	{"for GOST28147-IMIT MAC (draft-smyshlyaev-tls12-gost-suites) support", test_gost_imit, "yes", "no", "dunno"},
+#endif
 	{"for max record size (RFC6066) support", test_max_record_size, "yes",
 	 "no", "dunno"},
 #ifdef ENABLE_OCSP

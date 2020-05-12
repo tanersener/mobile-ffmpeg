@@ -255,6 +255,7 @@ check_ocsp_response(gnutls_session_t session, gnutls_x509_crt_t cert,
 				  gnutls_strerror(ret));
 		ret = gnutls_assert_val(0);
 		check_failed = 1;
+		*ostatus |= GNUTLS_CERT_INVALID;
 		*ostatus |= GNUTLS_CERT_INVALID_OCSP_STATUS;
 		goto cleanup;
 	}
@@ -265,6 +266,7 @@ check_ocsp_response(gnutls_session_t session, gnutls_x509_crt_t cert,
 		_gnutls_audit_log(session,
 				  "Got OCSP response with an unrelated certificate.\n");
 		check_failed = 1;
+		*ostatus |= GNUTLS_CERT_INVALID;
 		*ostatus |= GNUTLS_CERT_INVALID_OCSP_STATUS;
 		goto cleanup;
 	}
@@ -296,6 +298,7 @@ check_ocsp_response(gnutls_session_t session, gnutls_x509_crt_t cert,
 		ret = gnutls_assert_val(0);
 		gnutls_assert();
 		check_failed = 1;
+		*ostatus |= GNUTLS_CERT_INVALID;
 		*ostatus |= GNUTLS_CERT_INVALID_OCSP_STATUS;
 		goto cleanup;
 	}
@@ -309,6 +312,7 @@ check_ocsp_response(gnutls_session_t session, gnutls_x509_crt_t cert,
 
 		ret = gnutls_assert_val(0);
 		check_failed = 1;
+		*ostatus |= GNUTLS_CERT_INVALID;
 		*ostatus |= GNUTLS_CERT_INVALID_OCSP_STATUS;
 		goto cleanup;
 	}
@@ -322,6 +326,7 @@ check_ocsp_response(gnutls_session_t session, gnutls_x509_crt_t cert,
 				  gnutls_strerror(ret));
 		ret = gnutls_assert_val(0);
 		check_failed = 1;
+		*ostatus |= GNUTLS_CERT_INVALID;
 		*ostatus |= GNUTLS_CERT_INVALID_OCSP_STATUS;
 		goto cleanup;
 	}
@@ -330,6 +335,7 @@ check_ocsp_response(gnutls_session_t session, gnutls_x509_crt_t cert,
 		_gnutls_audit_log(session,
 				  "The certificate was revoked via OCSP\n");
 		check_failed = 1;
+		*ostatus |= GNUTLS_CERT_INVALID;
 		*ostatus |= GNUTLS_CERT_REVOKED;
 		ret = gnutls_assert_val(0);
 		goto cleanup;
@@ -344,6 +350,7 @@ check_ocsp_response(gnutls_session_t session, gnutls_x509_crt_t cert,
 			_gnutls_audit_log(session,
 					  "The OCSP response is old\n");
 			check_failed = 1;
+			*ostatus |= GNUTLS_CERT_INVALID;
 			*ostatus |= GNUTLS_CERT_REVOCATION_DATA_SUPERSEDED;
 			goto cleanup;
 		}
@@ -353,6 +360,7 @@ check_ocsp_response(gnutls_session_t session, gnutls_x509_crt_t cert,
 			_gnutls_audit_log(session,
 					  "There is a newer OCSP response but was not provided by the server\n");
 			check_failed = 1;
+			*ostatus |= GNUTLS_CERT_INVALID;
 			*ostatus |= GNUTLS_CERT_REVOCATION_DATA_SUPERSEDED;
 			goto cleanup;
 		}
@@ -383,9 +391,8 @@ _gnutls_ocsp_verify_mandatory_stapling(gnutls_session_t session,
 	 *
 	 * To proceed, first check whether we have requested the certificate status
 	 */
-	if (!_gnutls_hello_ext_is_present(session, GNUTLS_EXTENSION_STATUS_REQUEST)) {
+	if (!(session->internals.hsk_flags & HSK_OCSP_REQUESTED))
 		return 0;
-	}
 
 	ret = gnutls_x509_tlsfeatures_init(&tlsfeatures);
 	if (ret < 0) {

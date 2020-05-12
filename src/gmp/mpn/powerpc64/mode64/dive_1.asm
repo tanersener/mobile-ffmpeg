@@ -30,13 +30,14 @@ dnl  see https://www.gnu.org/licenses/.
 
 include(`../config.m4')
 
-C                       cycles/limb
-C                       norm    unorm
-C POWER3/PPC630        13-19
-C POWER4/PPC970         16
-C POWER5                16      16
-C POWER6                37      46
-C POWER7                12      12
+C			cycles/limb
+C			norm	unorm
+C POWER3/PPC630	       13-19
+C POWER4/PPC970		16
+C POWER5		16	16
+C POWER6		37	46
+C POWER7		12	12
+C POWER8		12	12
 
 C TODO
 C  * Check if n=1 code is really an improvement.  It probably isn't.
@@ -87,6 +88,7 @@ L(7):
 	sldi	r0, r0, 1
 	mulld	r9, d, r9
 	subf	r7, r9, r0		C r7 = 1/d mod 2^64
+
 	bne	cr0, L(norm)
 	subfic	r8, r10, 64		C set carry as side effect
 	li	r5, 0
@@ -123,10 +125,11 @@ L(loop1):
 	addi	up, up, 8
 	subfe	r5, r5, r9
 	mulld	r11, r7, r5
-	mulhdu	r5, r11, d	C result not used
+	mulhdu	r5, r11, d	C result not used in last iteration
 	std	r11, 8(rp)
 	addi	rp, rp, 8
 	bdnz	L(loop1)
+
 	blr
 EPILOGUE()
 ASM_END()

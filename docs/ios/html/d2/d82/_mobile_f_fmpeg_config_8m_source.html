@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">MobileFFmpeg iOS / tvOS API
-   &#160;<span id="projectnumber">4.3.1</span>
+   &#160;<span id="projectnumber">4.3.2</span>
    </div>
   </td>
  </tr>
@@ -391,451 +391,455 @@ $(function() {
 <div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;    [supportedExternalLibraries addObject:@&quot;libwebp&quot;];</div>
 <div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;    [supportedExternalLibraries addObject:@&quot;libxml2&quot;];</div>
 <div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;    [supportedExternalLibraries addObject:@&quot;opencore-amr&quot;];</div>
-<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;    [supportedExternalLibraries addObject:@&quot;opus&quot;];</div>
-<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;    [supportedExternalLibraries addObject:@&quot;shine&quot;];</div>
-<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;    [supportedExternalLibraries addObject:@&quot;snappy&quot;];</div>
-<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;    [supportedExternalLibraries addObject:@&quot;soxr&quot;];</div>
-<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;    [supportedExternalLibraries addObject:@&quot;speex&quot;];</div>
-<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;    [supportedExternalLibraries addObject:@&quot;twolame&quot;];</div>
-<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;    [supportedExternalLibraries addObject:@&quot;wavpack&quot;];</div>
-<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;    [supportedExternalLibraries addObject:@&quot;x264&quot;];</div>
-<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;    [supportedExternalLibraries addObject:@&quot;x265&quot;];</div>
-<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;    [supportedExternalLibraries addObject:@&quot;xvid&quot;];</div>
-<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160; </div>
-<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;    [<a class="code" href="../../dd/d2b/interface_arch_detect.html">ArchDetect</a> class];</div>
-<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;    [<a class="code" href="../../d3/d21/interface_mobile_f_fmpeg.html">MobileFFmpeg</a> class];</div>
-<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160; </div>
-<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;    <a class="code" href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#aad49c603a65074ce7a5d491ce9a54eb5">redirectionEnabled</a> = 0;</div>
-<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;    <a class="code" href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#a3bd629114c94f2e77441d35154ffdeec">lock</a> = [[NSRecursiveLock alloc] init];</div>
-<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;    <a class="code" href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#aa91ec0f91afe80906264eb5dcec1bc9f">semaphore</a> = dispatch_semaphore_create(0);</div>
-<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;    <a class="code" href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#a381c4a772202d1c5a42a569bdd91d8a3">lastReceivedStatistics</a> = [[<a class="code" href="../../d9/dcc/interface_statistics.html">Statistics</a> alloc] init];</div>
-<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;    <a class="code" href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#ab86ca8355c6cfee0bab6d15b28bda5bf">callbackDataArray</a> = [[NSMutableArray alloc] init];</div>
-<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160; </div>
-<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;    <a class="code" href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#a93810b6a9ba8cf5dfa7a42e0aafe0365">lastCreatedPipeIndex</a> = 0;</div>
-<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160; </div>
-<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;    <a class="code" href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#ae7a108ddd6a67ae1f62a675b05aac9d5">lastReturnCode</a> = 0;</div>
-<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;    <a class="code" href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#a342e10e2589c067da75d3be8aac473c6">lastCommandOutput</a> = [[NSMutableString alloc] init];</div>
-<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160; </div>
-<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;    [<a class="code" href="../../df/d45/interface_mobile_f_fmpeg_config.html">MobileFFmpegConfig</a> <a class="code" href="../../df/d45/interface_mobile_f_fmpeg_config.html#a4e849048a122782d3e292cf1f604e8cd">enableRedirection</a>];</div>
-<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;}</div>
-<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160; </div>
-<div class="line"><a name="l00403"></a><span class="lineno"><a class="line" href="../../df/d45/interface_mobile_f_fmpeg_config.html#a4e849048a122782d3e292cf1f604e8cd">  403</a></span>&#160;+ (void)<a class="code" href="../../df/d45/interface_mobile_f_fmpeg_config.html#a4e849048a122782d3e292cf1f604e8cd">enableRedirection</a> {</div>
-<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;    [lock lock];</div>
-<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160; </div>
-<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;    <span class="keywordflow">if</span> (<a class="code" href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#aad49c603a65074ce7a5d491ce9a54eb5">redirectionEnabled</a> != 0) {</div>
-<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;        [lock unlock];</div>
-<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;        <span class="keywordflow">return</span>;</div>
-<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;    }</div>
-<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;    <a class="code" href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#aad49c603a65074ce7a5d491ce9a54eb5">redirectionEnabled</a> = 1;</div>
-<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160; </div>
-<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;    [lock unlock];</div>
-<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160; </div>
-<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{</div>
-<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;        <a class="code" href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#a75363553d36058d35665352cd1c5fba0">callbackBlockFunction</a>();</div>
-<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;    });</div>
+<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;    [supportedExternalLibraries addObject:@&quot;openh264&quot;];</div>
+<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;    [supportedExternalLibraries addObject:@&quot;opus&quot;];</div>
+<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;    [supportedExternalLibraries addObject:@&quot;rubberband&quot;];</div>
+<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;    [supportedExternalLibraries addObject:@&quot;sdl2&quot;];</div>
+<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;    [supportedExternalLibraries addObject:@&quot;shine&quot;];</div>
+<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;    [supportedExternalLibraries addObject:@&quot;snappy&quot;];</div>
+<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;    [supportedExternalLibraries addObject:@&quot;soxr&quot;];</div>
+<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;    [supportedExternalLibraries addObject:@&quot;speex&quot;];</div>
+<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;    [supportedExternalLibraries addObject:@&quot;tesseract&quot;];</div>
+<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;    [supportedExternalLibraries addObject:@&quot;twolame&quot;];</div>
+<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;    [supportedExternalLibraries addObject:@&quot;wavpack&quot;];</div>
+<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;    [supportedExternalLibraries addObject:@&quot;x264&quot;];</div>
+<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;    [supportedExternalLibraries addObject:@&quot;x265&quot;];</div>
+<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;    [supportedExternalLibraries addObject:@&quot;xvid&quot;];</div>
+<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160; </div>
+<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;    [<a class="code" href="../../dd/d2b/interface_arch_detect.html">ArchDetect</a> class];</div>
+<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;    [<a class="code" href="../../d3/d21/interface_mobile_f_fmpeg.html">MobileFFmpeg</a> class];</div>
+<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160; </div>
+<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;    <a class="code" href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#aad49c603a65074ce7a5d491ce9a54eb5">redirectionEnabled</a> = 0;</div>
+<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;    <a class="code" href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#a3bd629114c94f2e77441d35154ffdeec">lock</a> = [[NSRecursiveLock alloc] init];</div>
+<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;    <a class="code" href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#aa91ec0f91afe80906264eb5dcec1bc9f">semaphore</a> = dispatch_semaphore_create(0);</div>
+<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;    <a class="code" href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#a381c4a772202d1c5a42a569bdd91d8a3">lastReceivedStatistics</a> = [[<a class="code" href="../../d9/dcc/interface_statistics.html">Statistics</a> alloc] init];</div>
+<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;    <a class="code" href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#ab86ca8355c6cfee0bab6d15b28bda5bf">callbackDataArray</a> = [[NSMutableArray alloc] init];</div>
+<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160; </div>
+<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;    <a class="code" href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#a93810b6a9ba8cf5dfa7a42e0aafe0365">lastCreatedPipeIndex</a> = 0;</div>
+<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160; </div>
+<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;    <a class="code" href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#ae7a108ddd6a67ae1f62a675b05aac9d5">lastReturnCode</a> = 0;</div>
+<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;    <a class="code" href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#a342e10e2589c067da75d3be8aac473c6">lastCommandOutput</a> = [[NSMutableString alloc] init];</div>
+<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160; </div>
+<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;    [<a class="code" href="../../df/d45/interface_mobile_f_fmpeg_config.html">MobileFFmpegConfig</a> <a class="code" href="../../df/d45/interface_mobile_f_fmpeg_config.html#a4e849048a122782d3e292cf1f604e8cd">enableRedirection</a>];</div>
+<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;}</div>
+<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160; </div>
+<div class="line"><a name="l00407"></a><span class="lineno"><a class="line" href="../../df/d45/interface_mobile_f_fmpeg_config.html#a4e849048a122782d3e292cf1f604e8cd">  407</a></span>&#160;+ (void)<a class="code" href="../../df/d45/interface_mobile_f_fmpeg_config.html#a4e849048a122782d3e292cf1f604e8cd">enableRedirection</a> {</div>
+<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;    [lock lock];</div>
+<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160; </div>
+<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;    <span class="keywordflow">if</span> (<a class="code" href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#aad49c603a65074ce7a5d491ce9a54eb5">redirectionEnabled</a> != 0) {</div>
+<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;        [lock unlock];</div>
+<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;        <span class="keywordflow">return</span>;</div>
+<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;    }</div>
+<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;    <a class="code" href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#aad49c603a65074ce7a5d491ce9a54eb5">redirectionEnabled</a> = 1;</div>
+<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160; </div>
+<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;    [lock unlock];</div>
 <div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160; </div>
-<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;    av_log_set_callback(<a class="code" href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#a2a0b0c8c4f0496cd0ed87e183a0a493d">mobileffmpeg_log_callback_function</a>);</div>
-<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;    <a class="code" href="../../d7/d48/fftools__ffmpeg_8c.html#a4dd17285e4049bfb915b75d39ff9971e">set_report_callback</a>(<a class="code" href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#a6eb0937147ed33c73e39f95ba9260e3e">mobileffmpeg_statistics_callback_function</a>);</div>
-<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;}</div>
+<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{</div>
+<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;        <a class="code" href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#a75363553d36058d35665352cd1c5fba0">callbackBlockFunction</a>();</div>
+<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;    });</div>
 <div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160; </div>
-<div class="line"><a name="l00425"></a><span class="lineno"><a class="line" href="../../df/d45/interface_mobile_f_fmpeg_config.html#ae7d648c9c855966b59c6f8d7bfada703">  425</a></span>&#160;+ (void)<a class="code" href="../../df/d45/interface_mobile_f_fmpeg_config.html#ae7d648c9c855966b59c6f8d7bfada703">disableRedirection</a> {</div>
-<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;    [lock lock];</div>
-<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160; </div>
-<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;    <span class="keywordflow">if</span> (<a class="code" href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#aad49c603a65074ce7a5d491ce9a54eb5">redirectionEnabled</a> != 1) {</div>
-<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;        [lock unlock];</div>
-<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;        <span class="keywordflow">return</span>;</div>
-<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;    }</div>
-<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;    <a class="code" href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#aad49c603a65074ce7a5d491ce9a54eb5">redirectionEnabled</a> = 0;</div>
-<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160; </div>
-<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;    [lock unlock];</div>
-<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160; </div>
-<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;    av_log_set_callback(av_log_default_callback);</div>
-<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;    <a class="code" href="../../d7/d48/fftools__ffmpeg_8c.html#a4dd17285e4049bfb915b75d39ff9971e">set_report_callback</a>(nil);</div>
-<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160; </div>
-<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;    <a class="code" href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#a644c542922f73e055f1262790e04b97e">callbackNotify</a>();</div>
-<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;}</div>
-<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160; </div>
-<div class="line"><a name="l00447"></a><span class="lineno"><a class="line" href="../../df/d45/interface_mobile_f_fmpeg_config.html#a3642a0d1db33abc6c61a8e3d1e96e4d1">  447</a></span>&#160;+ (<a class="code" href="../../d2/d36/fftools__ffmpeg__filter_8c.html#a61569f2965b7a369eb10b6d75d410d11">int</a>)<a class="code" href="../../df/d45/interface_mobile_f_fmpeg_config.html#a3642a0d1db33abc6c61a8e3d1e96e4d1">getLogLevel</a> {</div>
-<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;    <span class="keywordflow">return</span> av_log_get_level();</div>
-<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;}</div>
-<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160; </div>
-<div class="line"><a name="l00456"></a><span class="lineno"><a class="line" href="../../df/d45/interface_mobile_f_fmpeg_config.html#ab26989c88f9d6a3f4befca42c4b18139">  456</a></span>&#160;+ (void)setLogLevel: (<span class="keywordtype">int</span>)level {</div>
-<div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;    av_log_set_level(level);</div>
-<div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;}</div>
-<div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160; </div>
-<div class="line"><a name="l00466"></a><span class="lineno"><a class="line" href="../../df/d45/interface_mobile_f_fmpeg_config.html#a246bd6935549dc61c2e3b8070d2a1ae5">  466</a></span>&#160;+ (NSString*)logLevelToString: (<span class="keywordtype">int</span>)level {</div>
-<div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160;    <span class="keywordflow">switch</span> (level) {</div>
-<div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="../../d8/d4e/fftools__cmdutils_8h.html#a632891572be1648c03646028e8bfcac1">AV_LOG_STDERR</a>: <span class="keywordflow">return</span> <span class="stringliteral">@&quot;STDERR&quot;</span>;</div>
-<div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160;        <span class="keywordflow">case</span> AV_LOG_TRACE: <span class="keywordflow">return</span> <span class="stringliteral">@&quot;TRACE&quot;</span>;</div>
-<div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="../../de/dea/_mobile_f_fmpeg_config_8h.html#a5b7221c3afd06848486776bd834a58a5">AV_LOG_DEBUG</a>: <span class="keywordflow">return</span> <span class="stringliteral">@&quot;DEBUG&quot;</span>;</div>
-<div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="../../de/dea/_mobile_f_fmpeg_config_8h.html#a9b58b28e2d429b930b69db19877f76a8">AV_LOG_VERBOSE</a>: <span class="keywordflow">return</span> <span class="stringliteral">@&quot;VERBOSE&quot;</span>;</div>
-<div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="../../de/dea/_mobile_f_fmpeg_config_8h.html#ad172eacfed8653e454c6fdcbe53baab3">AV_LOG_INFO</a>: <span class="keywordflow">return</span> <span class="stringliteral">@&quot;INFO&quot;</span>;</div>
-<div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="../../de/dea/_mobile_f_fmpeg_config_8h.html#a85b57516ca703cc47d9bbe5f4658c716">AV_LOG_WARNING</a>: <span class="keywordflow">return</span> <span class="stringliteral">@&quot;WARNING&quot;</span>;</div>
-<div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="../../de/dea/_mobile_f_fmpeg_config_8h.html#affe151ff4cd8a24b2e77ac8d9616c85c">AV_LOG_ERROR</a>: <span class="keywordflow">return</span> <span class="stringliteral">@&quot;ERROR&quot;</span>;</div>
-<div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="../../de/dea/_mobile_f_fmpeg_config_8h.html#a96970a2980bf6ad28cd403e7dc52d6c5">AV_LOG_FATAL</a>: <span class="keywordflow">return</span> <span class="stringliteral">@&quot;FATAL&quot;</span>;</div>
-<div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="../../de/dea/_mobile_f_fmpeg_config_8h.html#a09623098406ba81d130824ac742d146e">AV_LOG_PANIC</a>: <span class="keywordflow">return</span> <span class="stringliteral">@&quot;PANIC&quot;</span>;</div>
-<div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="../../de/dea/_mobile_f_fmpeg_config_8h.html#a11e329935b59b83ca722b66674f37fd4">AV_LOG_QUIET</a>:</div>
-<div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160;        <span class="keywordflow">default</span>: <span class="keywordflow">return</span> <span class="stringliteral">@&quot;&quot;</span>;</div>
-<div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160;    }</div>
-<div class="line"><a name="l00480"></a><span class="lineno">  480</span>&#160;}</div>
-<div class="line"><a name="l00481"></a><span class="lineno">  481</span>&#160; </div>
-<div class="line"><a name="l00487"></a><span class="lineno"><a class="line" href="../../df/d45/interface_mobile_f_fmpeg_config.html#a090caa8257554204736f1cfc43dfd465">  487</a></span>&#160;+ (void)setLogDelegate: (<span class="keywordtype">id</span>&lt;<a class="code" href="../../d1/dd3/protocol_log_delegate-p.html">LogDelegate</a>&gt;)newLogDelegate {</div>
-<div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160;    <a class="code" href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#aff064b31dbd5415e864ead16a0022d28">logDelegate</a> = newLogDelegate;</div>
-<div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160;}</div>
-<div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160; </div>
-<div class="line"><a name="l00496"></a><span class="lineno"><a class="line" href="../../df/d45/interface_mobile_f_fmpeg_config.html#aa9122c6b1ab995286d7fdaa55191feee">  496</a></span>&#160;+ (void)setStatisticsDelegate: (<span class="keywordtype">id</span>&lt;<a class="code" href="../../d5/d74/protocol_statistics_delegate-p.html">StatisticsDelegate</a>&gt;)newStatisticsDelegate {</div>
-<div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;    <a class="code" href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#a171d97cea90bbf68ceaa06813fc6788b">statisticsDelegate</a> = newStatisticsDelegate;</div>
-<div class="line"><a name="l00498"></a><span class="lineno">  498</span>&#160;}</div>
-<div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160; </div>
-<div class="line"><a name="l00505"></a><span class="lineno"><a class="line" href="../../df/d45/interface_mobile_f_fmpeg_config.html#ac8e48eda99c41aeab3e73c67425487fc">  505</a></span>&#160;+ (<a class="code" href="../../d9/dcc/interface_statistics.html">Statistics</a>*)<a class="code" href="../../df/d45/interface_mobile_f_fmpeg_config.html#ac8e48eda99c41aeab3e73c67425487fc">getLastReceivedStatistics</a> {</div>
-<div class="line"><a name="l00506"></a><span class="lineno">  506</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#a381c4a772202d1c5a42a569bdd91d8a3">lastReceivedStatistics</a>;</div>
-<div class="line"><a name="l00507"></a><span class="lineno">  507</span>&#160;}</div>
-<div class="line"><a name="l00508"></a><span class="lineno">  508</span>&#160; </div>
-<div class="line"><a name="l00512"></a><span class="lineno"><a class="line" href="../../df/d45/interface_mobile_f_fmpeg_config.html#ac1a6b38a63bfe4a0fa33377ccf4a8dbe">  512</a></span>&#160;+ (void)<a class="code" href="../../df/d45/interface_mobile_f_fmpeg_config.html#ac1a6b38a63bfe4a0fa33377ccf4a8dbe">resetStatistics</a> {</div>
-<div class="line"><a name="l00513"></a><span class="lineno">  513</span>&#160;    <a class="code" href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#a381c4a772202d1c5a42a569bdd91d8a3">lastReceivedStatistics</a> = [[<a class="code" href="../../d9/dcc/interface_statistics.html">Statistics</a> alloc] init];</div>
-<div class="line"><a name="l00514"></a><span class="lineno">  514</span>&#160;}</div>
-<div class="line"><a name="l00515"></a><span class="lineno">  515</span>&#160; </div>
-<div class="line"><a name="l00521"></a><span class="lineno"><a class="line" href="../../df/d45/interface_mobile_f_fmpeg_config.html#a08aec3cd82ae9f2c63b8efe2a3ff3968">  521</a></span>&#160;+ (void)setFontconfigConfigurationPath: (NSString*)path {</div>
-<div class="line"><a name="l00522"></a><span class="lineno">  522</span>&#160;    <span class="keywordflow">if</span> (<a class="code" href="../../d5/d1a/_media_information_8m.html#a5552179bb57b10de7dfd8b47e47a76d1">path</a> != nil) {</div>
-<div class="line"><a name="l00523"></a><span class="lineno">  523</span>&#160;        setenv(<span class="stringliteral">&quot;FONTCONFIG_PATH&quot;</span>, [<a class="code" href="../../d5/d1a/_media_information_8m.html#a5552179bb57b10de7dfd8b47e47a76d1">path</a> UTF8String], <span class="keyword">true</span>);</div>
-<div class="line"><a name="l00524"></a><span class="lineno">  524</span>&#160;    }</div>
-<div class="line"><a name="l00525"></a><span class="lineno">  525</span>&#160;}</div>
-<div class="line"><a name="l00526"></a><span class="lineno">  526</span>&#160; </div>
-<div class="line"><a name="l00536"></a><span class="lineno"><a class="line" href="../../df/d45/interface_mobile_f_fmpeg_config.html#a73a706ca450450a3b603bbdbcb57960c">  536</a></span>&#160;+ (void)setFontDirectory: (NSString*)fontDirectoryPath with:(NSDictionary*)fontNameMapping {</div>
-<div class="line"><a name="l00537"></a><span class="lineno">  537</span>&#160;    NSError *error = nil;</div>
-<div class="line"><a name="l00538"></a><span class="lineno">  538</span>&#160;    BOOL isDirectory = YES;</div>
-<div class="line"><a name="l00539"></a><span class="lineno">  539</span>&#160;    BOOL isFile = NO;</div>
-<div class="line"><a name="l00540"></a><span class="lineno">  540</span>&#160;    <span class="keywordtype">int</span> validFontNameMappingCount = 0;</div>
-<div class="line"><a name="l00541"></a><span class="lineno">  541</span>&#160;    NSString *tempConfigurationDirectory = [NSTemporaryDirectory() stringByAppendingPathComponent:@&quot;.mobileffmpeg&quot;];</div>
-<div class="line"><a name="l00542"></a><span class="lineno">  542</span>&#160;    NSString *fontConfigurationFile = [tempConfigurationDirectory stringByAppendingPathComponent:@&quot;fonts.conf&quot;];</div>
-<div class="line"><a name="l00543"></a><span class="lineno">  543</span>&#160;    <span class="keywordtype">int</span> activeLogLevel = av_log_get_level();</div>
-<div class="line"><a name="l00544"></a><span class="lineno">  544</span>&#160; </div>
-<div class="line"><a name="l00545"></a><span class="lineno">  545</span>&#160;    <span class="keywordflow">if</span> (![[NSFileManager defaultManager] fileExistsAtPath:tempConfigurationDirectory isDirectory:&amp;isDirectory]) {</div>
-<div class="line"><a name="l00546"></a><span class="lineno">  546</span>&#160; </div>
-<div class="line"><a name="l00547"></a><span class="lineno">  547</span>&#160;        <span class="keywordflow">if</span> (![[NSFileManager defaultManager] createDirectoryAtPath:tempConfigurationDirectory withIntermediateDirectories:YES attributes:nil error:&amp;error]) {</div>
-<div class="line"><a name="l00548"></a><span class="lineno">  548</span>&#160;            <span class="keywordflow">if</span> ((activeLogLevel != <a class="code" href="../../de/dea/_mobile_f_fmpeg_config_8h.html#a11e329935b59b83ca722b66674f37fd4">AV_LOG_QUIET</a>) &amp;&amp; (<a class="code" href="../../de/dea/_mobile_f_fmpeg_config_8h.html#a85b57516ca703cc47d9bbe5f4658c716">AV_LOG_WARNING</a> &lt;= activeLogLevel)) {</div>
-<div class="line"><a name="l00549"></a><span class="lineno">  549</span>&#160;                NSLog(<span class="stringliteral">@&quot;Failed to set font directory. Error received while creating temp conf directory: %@.&quot;</span>, error);</div>
-<div class="line"><a name="l00550"></a><span class="lineno">  550</span>&#160;            }</div>
-<div class="line"><a name="l00551"></a><span class="lineno">  551</span>&#160;            <span class="keywordflow">return</span>;</div>
-<div class="line"><a name="l00552"></a><span class="lineno">  552</span>&#160;        }</div>
-<div class="line"><a name="l00553"></a><span class="lineno">  553</span>&#160; </div>
-<div class="line"><a name="l00554"></a><span class="lineno">  554</span>&#160;        <span class="keywordflow">if</span> ((activeLogLevel != <a class="code" href="../../de/dea/_mobile_f_fmpeg_config_8h.html#a11e329935b59b83ca722b66674f37fd4">AV_LOG_QUIET</a>) &amp;&amp; (<a class="code" href="../../de/dea/_mobile_f_fmpeg_config_8h.html#a5b7221c3afd06848486776bd834a58a5">AV_LOG_DEBUG</a> &lt;= activeLogLevel)) {</div>
-<div class="line"><a name="l00555"></a><span class="lineno">  555</span>&#160;            NSLog(<span class="stringliteral">@&quot;Created temporary font conf directory: TRUE.&quot;</span>);</div>
+<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;    av_log_set_callback(<a class="code" href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#a2a0b0c8c4f0496cd0ed87e183a0a493d">mobileffmpeg_log_callback_function</a>);</div>
+<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;    <a class="code" href="../../d7/d48/fftools__ffmpeg_8c.html#a4dd17285e4049bfb915b75d39ff9971e">set_report_callback</a>(<a class="code" href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#a6eb0937147ed33c73e39f95ba9260e3e">mobileffmpeg_statistics_callback_function</a>);</div>
+<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;}</div>
+<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160; </div>
+<div class="line"><a name="l00429"></a><span class="lineno"><a class="line" href="../../df/d45/interface_mobile_f_fmpeg_config.html#ae7d648c9c855966b59c6f8d7bfada703">  429</a></span>&#160;+ (void)<a class="code" href="../../df/d45/interface_mobile_f_fmpeg_config.html#ae7d648c9c855966b59c6f8d7bfada703">disableRedirection</a> {</div>
+<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;    [lock lock];</div>
+<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160; </div>
+<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;    <span class="keywordflow">if</span> (<a class="code" href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#aad49c603a65074ce7a5d491ce9a54eb5">redirectionEnabled</a> != 1) {</div>
+<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;        [lock unlock];</div>
+<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;        <span class="keywordflow">return</span>;</div>
+<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;    }</div>
+<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;    <a class="code" href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#aad49c603a65074ce7a5d491ce9a54eb5">redirectionEnabled</a> = 0;</div>
+<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160; </div>
+<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;    [lock unlock];</div>
+<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160; </div>
+<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;    av_log_set_callback(av_log_default_callback);</div>
+<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;    <a class="code" href="../../d7/d48/fftools__ffmpeg_8c.html#a4dd17285e4049bfb915b75d39ff9971e">set_report_callback</a>(nil);</div>
+<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160; </div>
+<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;    <a class="code" href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#a644c542922f73e055f1262790e04b97e">callbackNotify</a>();</div>
+<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;}</div>
+<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160; </div>
+<div class="line"><a name="l00451"></a><span class="lineno"><a class="line" href="../../df/d45/interface_mobile_f_fmpeg_config.html#a3642a0d1db33abc6c61a8e3d1e96e4d1">  451</a></span>&#160;+ (<a class="code" href="../../d2/d36/fftools__ffmpeg__filter_8c.html#a61569f2965b7a369eb10b6d75d410d11">int</a>)<a class="code" href="../../df/d45/interface_mobile_f_fmpeg_config.html#a3642a0d1db33abc6c61a8e3d1e96e4d1">getLogLevel</a> {</div>
+<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;    <span class="keywordflow">return</span> av_log_get_level();</div>
+<div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;}</div>
+<div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160; </div>
+<div class="line"><a name="l00460"></a><span class="lineno"><a class="line" href="../../df/d45/interface_mobile_f_fmpeg_config.html#ab26989c88f9d6a3f4befca42c4b18139">  460</a></span>&#160;+ (void)setLogLevel: (<span class="keywordtype">int</span>)level {</div>
+<div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;    av_log_set_level(level);</div>
+<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;}</div>
+<div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160; </div>
+<div class="line"><a name="l00470"></a><span class="lineno"><a class="line" href="../../df/d45/interface_mobile_f_fmpeg_config.html#a246bd6935549dc61c2e3b8070d2a1ae5">  470</a></span>&#160;+ (NSString*)logLevelToString: (<span class="keywordtype">int</span>)level {</div>
+<div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160;    <span class="keywordflow">switch</span> (level) {</div>
+<div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="../../d8/d4e/fftools__cmdutils_8h.html#a632891572be1648c03646028e8bfcac1">AV_LOG_STDERR</a>: <span class="keywordflow">return</span> <span class="stringliteral">@&quot;STDERR&quot;</span>;</div>
+<div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;        <span class="keywordflow">case</span> AV_LOG_TRACE: <span class="keywordflow">return</span> <span class="stringliteral">@&quot;TRACE&quot;</span>;</div>
+<div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="../../de/dea/_mobile_f_fmpeg_config_8h.html#a5b7221c3afd06848486776bd834a58a5">AV_LOG_DEBUG</a>: <span class="keywordflow">return</span> <span class="stringliteral">@&quot;DEBUG&quot;</span>;</div>
+<div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="../../de/dea/_mobile_f_fmpeg_config_8h.html#a9b58b28e2d429b930b69db19877f76a8">AV_LOG_VERBOSE</a>: <span class="keywordflow">return</span> <span class="stringliteral">@&quot;VERBOSE&quot;</span>;</div>
+<div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="../../de/dea/_mobile_f_fmpeg_config_8h.html#ad172eacfed8653e454c6fdcbe53baab3">AV_LOG_INFO</a>: <span class="keywordflow">return</span> <span class="stringliteral">@&quot;INFO&quot;</span>;</div>
+<div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="../../de/dea/_mobile_f_fmpeg_config_8h.html#a85b57516ca703cc47d9bbe5f4658c716">AV_LOG_WARNING</a>: <span class="keywordflow">return</span> <span class="stringliteral">@&quot;WARNING&quot;</span>;</div>
+<div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="../../de/dea/_mobile_f_fmpeg_config_8h.html#affe151ff4cd8a24b2e77ac8d9616c85c">AV_LOG_ERROR</a>: <span class="keywordflow">return</span> <span class="stringliteral">@&quot;ERROR&quot;</span>;</div>
+<div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="../../de/dea/_mobile_f_fmpeg_config_8h.html#a96970a2980bf6ad28cd403e7dc52d6c5">AV_LOG_FATAL</a>: <span class="keywordflow">return</span> <span class="stringliteral">@&quot;FATAL&quot;</span>;</div>
+<div class="line"><a name="l00480"></a><span class="lineno">  480</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="../../de/dea/_mobile_f_fmpeg_config_8h.html#a09623098406ba81d130824ac742d146e">AV_LOG_PANIC</a>: <span class="keywordflow">return</span> <span class="stringliteral">@&quot;PANIC&quot;</span>;</div>
+<div class="line"><a name="l00481"></a><span class="lineno">  481</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="../../de/dea/_mobile_f_fmpeg_config_8h.html#a11e329935b59b83ca722b66674f37fd4">AV_LOG_QUIET</a>:</div>
+<div class="line"><a name="l00482"></a><span class="lineno">  482</span>&#160;        <span class="keywordflow">default</span>: <span class="keywordflow">return</span> <span class="stringliteral">@&quot;&quot;</span>;</div>
+<div class="line"><a name="l00483"></a><span class="lineno">  483</span>&#160;    }</div>
+<div class="line"><a name="l00484"></a><span class="lineno">  484</span>&#160;}</div>
+<div class="line"><a name="l00485"></a><span class="lineno">  485</span>&#160; </div>
+<div class="line"><a name="l00491"></a><span class="lineno"><a class="line" href="../../df/d45/interface_mobile_f_fmpeg_config.html#a090caa8257554204736f1cfc43dfd465">  491</a></span>&#160;+ (void)setLogDelegate: (<span class="keywordtype">id</span>&lt;<a class="code" href="../../d1/dd3/protocol_log_delegate-p.html">LogDelegate</a>&gt;)newLogDelegate {</div>
+<div class="line"><a name="l00492"></a><span class="lineno">  492</span>&#160;    <a class="code" href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#aff064b31dbd5415e864ead16a0022d28">logDelegate</a> = newLogDelegate;</div>
+<div class="line"><a name="l00493"></a><span class="lineno">  493</span>&#160;}</div>
+<div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160; </div>
+<div class="line"><a name="l00500"></a><span class="lineno"><a class="line" href="../../df/d45/interface_mobile_f_fmpeg_config.html#aa9122c6b1ab995286d7fdaa55191feee">  500</a></span>&#160;+ (void)setStatisticsDelegate: (<span class="keywordtype">id</span>&lt;<a class="code" href="../../d5/d74/protocol_statistics_delegate-p.html">StatisticsDelegate</a>&gt;)newStatisticsDelegate {</div>
+<div class="line"><a name="l00501"></a><span class="lineno">  501</span>&#160;    <a class="code" href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#a171d97cea90bbf68ceaa06813fc6788b">statisticsDelegate</a> = newStatisticsDelegate;</div>
+<div class="line"><a name="l00502"></a><span class="lineno">  502</span>&#160;}</div>
+<div class="line"><a name="l00503"></a><span class="lineno">  503</span>&#160; </div>
+<div class="line"><a name="l00509"></a><span class="lineno"><a class="line" href="../../df/d45/interface_mobile_f_fmpeg_config.html#ac8e48eda99c41aeab3e73c67425487fc">  509</a></span>&#160;+ (<a class="code" href="../../d9/dcc/interface_statistics.html">Statistics</a>*)<a class="code" href="../../df/d45/interface_mobile_f_fmpeg_config.html#ac8e48eda99c41aeab3e73c67425487fc">getLastReceivedStatistics</a> {</div>
+<div class="line"><a name="l00510"></a><span class="lineno">  510</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#a381c4a772202d1c5a42a569bdd91d8a3">lastReceivedStatistics</a>;</div>
+<div class="line"><a name="l00511"></a><span class="lineno">  511</span>&#160;}</div>
+<div class="line"><a name="l00512"></a><span class="lineno">  512</span>&#160; </div>
+<div class="line"><a name="l00516"></a><span class="lineno"><a class="line" href="../../df/d45/interface_mobile_f_fmpeg_config.html#ac1a6b38a63bfe4a0fa33377ccf4a8dbe">  516</a></span>&#160;+ (void)<a class="code" href="../../df/d45/interface_mobile_f_fmpeg_config.html#ac1a6b38a63bfe4a0fa33377ccf4a8dbe">resetStatistics</a> {</div>
+<div class="line"><a name="l00517"></a><span class="lineno">  517</span>&#160;    <a class="code" href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#a381c4a772202d1c5a42a569bdd91d8a3">lastReceivedStatistics</a> = [[<a class="code" href="../../d9/dcc/interface_statistics.html">Statistics</a> alloc] init];</div>
+<div class="line"><a name="l00518"></a><span class="lineno">  518</span>&#160;}</div>
+<div class="line"><a name="l00519"></a><span class="lineno">  519</span>&#160; </div>
+<div class="line"><a name="l00525"></a><span class="lineno"><a class="line" href="../../df/d45/interface_mobile_f_fmpeg_config.html#a08aec3cd82ae9f2c63b8efe2a3ff3968">  525</a></span>&#160;+ (void)setFontconfigConfigurationPath: (NSString*)path {</div>
+<div class="line"><a name="l00526"></a><span class="lineno">  526</span>&#160;    <span class="keywordflow">if</span> (<a class="code" href="../../d5/d1a/_media_information_8m.html#a5552179bb57b10de7dfd8b47e47a76d1">path</a> != nil) {</div>
+<div class="line"><a name="l00527"></a><span class="lineno">  527</span>&#160;        setenv(<span class="stringliteral">&quot;FONTCONFIG_PATH&quot;</span>, [<a class="code" href="../../d5/d1a/_media_information_8m.html#a5552179bb57b10de7dfd8b47e47a76d1">path</a> UTF8String], <span class="keyword">true</span>);</div>
+<div class="line"><a name="l00528"></a><span class="lineno">  528</span>&#160;    }</div>
+<div class="line"><a name="l00529"></a><span class="lineno">  529</span>&#160;}</div>
+<div class="line"><a name="l00530"></a><span class="lineno">  530</span>&#160; </div>
+<div class="line"><a name="l00540"></a><span class="lineno"><a class="line" href="../../df/d45/interface_mobile_f_fmpeg_config.html#a73a706ca450450a3b603bbdbcb57960c">  540</a></span>&#160;+ (void)setFontDirectory: (NSString*)fontDirectoryPath with:(NSDictionary*)fontNameMapping {</div>
+<div class="line"><a name="l00541"></a><span class="lineno">  541</span>&#160;    NSError *error = nil;</div>
+<div class="line"><a name="l00542"></a><span class="lineno">  542</span>&#160;    BOOL isDirectory = YES;</div>
+<div class="line"><a name="l00543"></a><span class="lineno">  543</span>&#160;    BOOL isFile = NO;</div>
+<div class="line"><a name="l00544"></a><span class="lineno">  544</span>&#160;    <span class="keywordtype">int</span> validFontNameMappingCount = 0;</div>
+<div class="line"><a name="l00545"></a><span class="lineno">  545</span>&#160;    NSString *tempConfigurationDirectory = [NSTemporaryDirectory() stringByAppendingPathComponent:@&quot;.mobileffmpeg&quot;];</div>
+<div class="line"><a name="l00546"></a><span class="lineno">  546</span>&#160;    NSString *fontConfigurationFile = [tempConfigurationDirectory stringByAppendingPathComponent:@&quot;fonts.conf&quot;];</div>
+<div class="line"><a name="l00547"></a><span class="lineno">  547</span>&#160;    <span class="keywordtype">int</span> activeLogLevel = av_log_get_level();</div>
+<div class="line"><a name="l00548"></a><span class="lineno">  548</span>&#160; </div>
+<div class="line"><a name="l00549"></a><span class="lineno">  549</span>&#160;    <span class="keywordflow">if</span> (![[NSFileManager defaultManager] fileExistsAtPath:tempConfigurationDirectory isDirectory:&amp;isDirectory]) {</div>
+<div class="line"><a name="l00550"></a><span class="lineno">  550</span>&#160; </div>
+<div class="line"><a name="l00551"></a><span class="lineno">  551</span>&#160;        <span class="keywordflow">if</span> (![[NSFileManager defaultManager] createDirectoryAtPath:tempConfigurationDirectory withIntermediateDirectories:YES attributes:nil error:&amp;error]) {</div>
+<div class="line"><a name="l00552"></a><span class="lineno">  552</span>&#160;            <span class="keywordflow">if</span> ((activeLogLevel != <a class="code" href="../../de/dea/_mobile_f_fmpeg_config_8h.html#a11e329935b59b83ca722b66674f37fd4">AV_LOG_QUIET</a>) &amp;&amp; (<a class="code" href="../../de/dea/_mobile_f_fmpeg_config_8h.html#a85b57516ca703cc47d9bbe5f4658c716">AV_LOG_WARNING</a> &lt;= activeLogLevel)) {</div>
+<div class="line"><a name="l00553"></a><span class="lineno">  553</span>&#160;                NSLog(<span class="stringliteral">@&quot;Failed to set font directory. Error received while creating temp conf directory: %@.&quot;</span>, error);</div>
+<div class="line"><a name="l00554"></a><span class="lineno">  554</span>&#160;            }</div>
+<div class="line"><a name="l00555"></a><span class="lineno">  555</span>&#160;            <span class="keywordflow">return</span>;</div>
 <div class="line"><a name="l00556"></a><span class="lineno">  556</span>&#160;        }</div>
-<div class="line"><a name="l00557"></a><span class="lineno">  557</span>&#160;    }</div>
-<div class="line"><a name="l00558"></a><span class="lineno">  558</span>&#160; </div>
-<div class="line"><a name="l00559"></a><span class="lineno">  559</span>&#160;    <span class="keywordflow">if</span> ([[NSFileManager defaultManager] fileExistsAtPath:fontConfigurationFile isDirectory:&amp;isFile]) {</div>
-<div class="line"><a name="l00560"></a><span class="lineno">  560</span>&#160;        BOOL fontConfigurationDeleted = [[NSFileManager defaultManager] removeItemAtPath:fontConfigurationFile error:NULL];</div>
-<div class="line"><a name="l00561"></a><span class="lineno">  561</span>&#160;        <span class="keywordflow">if</span> ((activeLogLevel != <a class="code" href="../../de/dea/_mobile_f_fmpeg_config_8h.html#a11e329935b59b83ca722b66674f37fd4">AV_LOG_QUIET</a>) &amp;&amp; (<a class="code" href="../../de/dea/_mobile_f_fmpeg_config_8h.html#a5b7221c3afd06848486776bd834a58a5">AV_LOG_DEBUG</a> &lt;= activeLogLevel)) {</div>
-<div class="line"><a name="l00562"></a><span class="lineno">  562</span>&#160;            NSLog(<span class="stringliteral">@&quot;Deleted old temporary font configuration: %s.&quot;</span>, fontConfigurationDeleted?<span class="stringliteral">&quot;TRUE&quot;</span>:<span class="stringliteral">&quot;FALSE&quot;</span>);</div>
-<div class="line"><a name="l00563"></a><span class="lineno">  563</span>&#160;        }</div>
-<div class="line"><a name="l00564"></a><span class="lineno">  564</span>&#160;    }</div>
-<div class="line"><a name="l00565"></a><span class="lineno">  565</span>&#160; </div>
-<div class="line"><a name="l00566"></a><span class="lineno">  566</span>&#160;    <span class="comment">/* PROCESS MAPPINGS FIRST */</span></div>
-<div class="line"><a name="l00567"></a><span class="lineno">  567</span>&#160;    NSString *fontNameMappingBlock = <span class="stringliteral">@&quot;&quot;</span>;</div>
-<div class="line"><a name="l00568"></a><span class="lineno">  568</span>&#160;    <span class="keywordflow">for</span> (NSString *fontName in [fontNameMapping allKeys]) {</div>
-<div class="line"><a name="l00569"></a><span class="lineno">  569</span>&#160;        NSString *mappedFontName = [fontNameMapping objectForKey:fontName];</div>
-<div class="line"><a name="l00570"></a><span class="lineno">  570</span>&#160; </div>
-<div class="line"><a name="l00571"></a><span class="lineno">  571</span>&#160;        <span class="keywordflow">if</span> ((fontName != nil) &amp;&amp; (mappedFontName != nil) &amp;&amp; ([fontName length] &gt; 0) &amp;&amp; ([mappedFontName length] &gt; 0)) {</div>
-<div class="line"><a name="l00572"></a><span class="lineno">  572</span>&#160; </div>
-<div class="line"><a name="l00573"></a><span class="lineno">  573</span>&#160;            fontNameMappingBlock = [NSString stringWithFormat:@&quot;%@\n%@\n%@%@%@\n%@\n%@\n%@%@%@\n%@\n%@\n&quot;,</div>
-<div class="line"><a name="l00574"></a><span class="lineno">  574</span>&#160;                @&quot;        &lt;match target=\&quot;pattern\&quot;&gt;&quot;,</div>
-<div class="line"><a name="l00575"></a><span class="lineno">  575</span>&#160;                @&quot;                &lt;test qual=\&quot;any\&quot; name=\&quot;family\&quot;&gt;&quot;,</div>
-<div class="line"><a name="l00576"></a><span class="lineno">  576</span>&#160;                @&quot;                        &lt;string&gt;&quot;, fontName, @&quot;&lt;/string&gt;&quot;,</div>
-<div class="line"><a name="l00577"></a><span class="lineno">  577</span>&#160;                @&quot;                &lt;/test&gt;&quot;,</div>
-<div class="line"><a name="l00578"></a><span class="lineno">  578</span>&#160;                @&quot;                &lt;edit name=\&quot;family\&quot; mode=\&quot;assign\&quot; binding=\&quot;same\&quot;&gt;&quot;,</div>
-<div class="line"><a name="l00579"></a><span class="lineno">  579</span>&#160;                @&quot;                        &lt;string&gt;&quot;, mappedFontName, @&quot;&lt;/string&gt;&quot;,</div>
-<div class="line"><a name="l00580"></a><span class="lineno">  580</span>&#160;                @&quot;                &lt;/edit&gt;&quot;,</div>
-<div class="line"><a name="l00581"></a><span class="lineno">  581</span>&#160;                @&quot;        &lt;/match&gt;&quot;];</div>
-<div class="line"><a name="l00582"></a><span class="lineno">  582</span>&#160; </div>
-<div class="line"><a name="l00583"></a><span class="lineno">  583</span>&#160;            validFontNameMappingCount++;</div>
-<div class="line"><a name="l00584"></a><span class="lineno">  584</span>&#160;        }</div>
-<div class="line"><a name="l00585"></a><span class="lineno">  585</span>&#160;    }</div>
+<div class="line"><a name="l00557"></a><span class="lineno">  557</span>&#160; </div>
+<div class="line"><a name="l00558"></a><span class="lineno">  558</span>&#160;        <span class="keywordflow">if</span> ((activeLogLevel != <a class="code" href="../../de/dea/_mobile_f_fmpeg_config_8h.html#a11e329935b59b83ca722b66674f37fd4">AV_LOG_QUIET</a>) &amp;&amp; (<a class="code" href="../../de/dea/_mobile_f_fmpeg_config_8h.html#a5b7221c3afd06848486776bd834a58a5">AV_LOG_DEBUG</a> &lt;= activeLogLevel)) {</div>
+<div class="line"><a name="l00559"></a><span class="lineno">  559</span>&#160;            NSLog(<span class="stringliteral">@&quot;Created temporary font conf directory: TRUE.&quot;</span>);</div>
+<div class="line"><a name="l00560"></a><span class="lineno">  560</span>&#160;        }</div>
+<div class="line"><a name="l00561"></a><span class="lineno">  561</span>&#160;    }</div>
+<div class="line"><a name="l00562"></a><span class="lineno">  562</span>&#160; </div>
+<div class="line"><a name="l00563"></a><span class="lineno">  563</span>&#160;    <span class="keywordflow">if</span> ([[NSFileManager defaultManager] fileExistsAtPath:fontConfigurationFile isDirectory:&amp;isFile]) {</div>
+<div class="line"><a name="l00564"></a><span class="lineno">  564</span>&#160;        BOOL fontConfigurationDeleted = [[NSFileManager defaultManager] removeItemAtPath:fontConfigurationFile error:NULL];</div>
+<div class="line"><a name="l00565"></a><span class="lineno">  565</span>&#160;        <span class="keywordflow">if</span> ((activeLogLevel != <a class="code" href="../../de/dea/_mobile_f_fmpeg_config_8h.html#a11e329935b59b83ca722b66674f37fd4">AV_LOG_QUIET</a>) &amp;&amp; (<a class="code" href="../../de/dea/_mobile_f_fmpeg_config_8h.html#a5b7221c3afd06848486776bd834a58a5">AV_LOG_DEBUG</a> &lt;= activeLogLevel)) {</div>
+<div class="line"><a name="l00566"></a><span class="lineno">  566</span>&#160;            NSLog(<span class="stringliteral">@&quot;Deleted old temporary font configuration: %s.&quot;</span>, fontConfigurationDeleted?<span class="stringliteral">&quot;TRUE&quot;</span>:<span class="stringliteral">&quot;FALSE&quot;</span>);</div>
+<div class="line"><a name="l00567"></a><span class="lineno">  567</span>&#160;        }</div>
+<div class="line"><a name="l00568"></a><span class="lineno">  568</span>&#160;    }</div>
+<div class="line"><a name="l00569"></a><span class="lineno">  569</span>&#160; </div>
+<div class="line"><a name="l00570"></a><span class="lineno">  570</span>&#160;    <span class="comment">/* PROCESS MAPPINGS FIRST */</span></div>
+<div class="line"><a name="l00571"></a><span class="lineno">  571</span>&#160;    NSString *fontNameMappingBlock = <span class="stringliteral">@&quot;&quot;</span>;</div>
+<div class="line"><a name="l00572"></a><span class="lineno">  572</span>&#160;    <span class="keywordflow">for</span> (NSString *fontName in [fontNameMapping allKeys]) {</div>
+<div class="line"><a name="l00573"></a><span class="lineno">  573</span>&#160;        NSString *mappedFontName = [fontNameMapping objectForKey:fontName];</div>
+<div class="line"><a name="l00574"></a><span class="lineno">  574</span>&#160; </div>
+<div class="line"><a name="l00575"></a><span class="lineno">  575</span>&#160;        <span class="keywordflow">if</span> ((fontName != nil) &amp;&amp; (mappedFontName != nil) &amp;&amp; ([fontName length] &gt; 0) &amp;&amp; ([mappedFontName length] &gt; 0)) {</div>
+<div class="line"><a name="l00576"></a><span class="lineno">  576</span>&#160; </div>
+<div class="line"><a name="l00577"></a><span class="lineno">  577</span>&#160;            fontNameMappingBlock = [NSString stringWithFormat:@&quot;%@\n%@\n%@%@%@\n%@\n%@\n%@%@%@\n%@\n%@\n&quot;,</div>
+<div class="line"><a name="l00578"></a><span class="lineno">  578</span>&#160;                @&quot;        &lt;match target=\&quot;pattern\&quot;&gt;&quot;,</div>
+<div class="line"><a name="l00579"></a><span class="lineno">  579</span>&#160;                @&quot;                &lt;test qual=\&quot;any\&quot; name=\&quot;family\&quot;&gt;&quot;,</div>
+<div class="line"><a name="l00580"></a><span class="lineno">  580</span>&#160;                @&quot;                        &lt;string&gt;&quot;, fontName, @&quot;&lt;/string&gt;&quot;,</div>
+<div class="line"><a name="l00581"></a><span class="lineno">  581</span>&#160;                @&quot;                &lt;/test&gt;&quot;,</div>
+<div class="line"><a name="l00582"></a><span class="lineno">  582</span>&#160;                @&quot;                &lt;edit name=\&quot;family\&quot; mode=\&quot;assign\&quot; binding=\&quot;same\&quot;&gt;&quot;,</div>
+<div class="line"><a name="l00583"></a><span class="lineno">  583</span>&#160;                @&quot;                        &lt;string&gt;&quot;, mappedFontName, @&quot;&lt;/string&gt;&quot;,</div>
+<div class="line"><a name="l00584"></a><span class="lineno">  584</span>&#160;                @&quot;                &lt;/edit&gt;&quot;,</div>
+<div class="line"><a name="l00585"></a><span class="lineno">  585</span>&#160;                @&quot;        &lt;/match&gt;&quot;];</div>
 <div class="line"><a name="l00586"></a><span class="lineno">  586</span>&#160; </div>
-<div class="line"><a name="l00587"></a><span class="lineno">  587</span>&#160;    NSString *fontConfiguration = [NSString stringWithFormat:@&quot;%@\n%@\n%@\n%@\n%@%@%@\n%@\n%@\n&quot;,</div>
-<div class="line"><a name="l00588"></a><span class="lineno">  588</span>&#160;                            @&quot;&lt;?xml version=\&quot;1.0\&quot;?&gt;&quot;,</div>
-<div class="line"><a name="l00589"></a><span class="lineno">  589</span>&#160;                            @&quot;&lt;!DOCTYPE fontconfig SYSTEM \&quot;fonts.dtd\&quot;&gt;&quot;,</div>
-<div class="line"><a name="l00590"></a><span class="lineno">  590</span>&#160;                            @&quot;&lt;fontconfig&gt;&quot;,</div>
-<div class="line"><a name="l00591"></a><span class="lineno">  591</span>&#160;                            @&quot;    &lt;dir&gt;.&lt;/dir&gt;&quot;,</div>
-<div class="line"><a name="l00592"></a><span class="lineno">  592</span>&#160;                            @&quot;    &lt;dir&gt;&quot;, fontDirectoryPath, @&quot;&lt;/dir&gt;&quot;,</div>
-<div class="line"><a name="l00593"></a><span class="lineno">  593</span>&#160;                            fontNameMappingBlock,</div>
-<div class="line"><a name="l00594"></a><span class="lineno">  594</span>&#160;                            @&quot;&lt;/fontconfig&gt;&quot;];</div>
-<div class="line"><a name="l00595"></a><span class="lineno">  595</span>&#160; </div>
-<div class="line"><a name="l00596"></a><span class="lineno">  596</span>&#160;    <span class="keywordflow">if</span> (![fontConfiguration writeToFile:fontConfigurationFile atomically:YES encoding:NSUTF8StringEncoding error:&amp;error]) {</div>
-<div class="line"><a name="l00597"></a><span class="lineno">  597</span>&#160;        <span class="keywordflow">if</span> ((activeLogLevel != <a class="code" href="../../de/dea/_mobile_f_fmpeg_config_8h.html#a11e329935b59b83ca722b66674f37fd4">AV_LOG_QUIET</a>) &amp;&amp; (<a class="code" href="../../de/dea/_mobile_f_fmpeg_config_8h.html#a85b57516ca703cc47d9bbe5f4658c716">AV_LOG_WARNING</a> &lt;= activeLogLevel)) {</div>
-<div class="line"><a name="l00598"></a><span class="lineno">  598</span>&#160;            NSLog(<span class="stringliteral">@&quot;Failed to set font directory. Error received while saving font configuration: %@.&quot;</span>, error);</div>
-<div class="line"><a name="l00599"></a><span class="lineno">  599</span>&#160;        }</div>
-<div class="line"><a name="l00600"></a><span class="lineno">  600</span>&#160;        <span class="keywordflow">return</span>;</div>
-<div class="line"><a name="l00601"></a><span class="lineno">  601</span>&#160;    }</div>
-<div class="line"><a name="l00602"></a><span class="lineno">  602</span>&#160;    <span class="keywordflow">if</span> ((activeLogLevel != <a class="code" href="../../de/dea/_mobile_f_fmpeg_config_8h.html#a11e329935b59b83ca722b66674f37fd4">AV_LOG_QUIET</a>) &amp;&amp; (<a class="code" href="../../de/dea/_mobile_f_fmpeg_config_8h.html#a5b7221c3afd06848486776bd834a58a5">AV_LOG_DEBUG</a> &lt;= activeLogLevel)) {</div>
-<div class="line"><a name="l00603"></a><span class="lineno">  603</span>&#160;        NSLog(<span class="stringliteral">@&quot;Saved new temporary font configuration with %d font name mappings.&quot;</span>, validFontNameMappingCount);</div>
-<div class="line"><a name="l00604"></a><span class="lineno">  604</span>&#160;    }</div>
-<div class="line"><a name="l00605"></a><span class="lineno">  605</span>&#160; </div>
-<div class="line"><a name="l00606"></a><span class="lineno">  606</span>&#160;    [<a class="code" href="../../df/d45/interface_mobile_f_fmpeg_config.html">MobileFFmpegConfig</a> <a class="code" href="../../df/d45/interface_mobile_f_fmpeg_config.html#a08aec3cd82ae9f2c63b8efe2a3ff3968">setFontconfigConfigurationPath</a>:tempConfigurationDirectory];</div>
-<div class="line"><a name="l00607"></a><span class="lineno">  607</span>&#160; </div>
-<div class="line"><a name="l00608"></a><span class="lineno">  608</span>&#160;    <span class="keywordflow">if</span> ((activeLogLevel != <a class="code" href="../../de/dea/_mobile_f_fmpeg_config_8h.html#a11e329935b59b83ca722b66674f37fd4">AV_LOG_QUIET</a>) &amp;&amp; (<a class="code" href="../../de/dea/_mobile_f_fmpeg_config_8h.html#a5b7221c3afd06848486776bd834a58a5">AV_LOG_DEBUG</a> &lt;= activeLogLevel)) {</div>
-<div class="line"><a name="l00609"></a><span class="lineno">  609</span>&#160;        NSLog(<span class="stringliteral">@&quot;Font directory %@ registered successfully.&quot;</span>, fontDirectoryPath);</div>
-<div class="line"><a name="l00610"></a><span class="lineno">  610</span>&#160;    }</div>
-<div class="line"><a name="l00611"></a><span class="lineno">  611</span>&#160;}</div>
-<div class="line"><a name="l00612"></a><span class="lineno">  612</span>&#160; </div>
-<div class="line"><a name="l00618"></a><span class="lineno"><a class="line" href="../../df/d45/interface_mobile_f_fmpeg_config.html#aa5d2ee83a36d86a735474684fb33433c">  618</a></span>&#160;+ (NSString*)<a class="code" href="../../df/d45/interface_mobile_f_fmpeg_config.html#aa5d2ee83a36d86a735474684fb33433c">getBuildConf</a> {</div>
-<div class="line"><a name="l00619"></a><span class="lineno">  619</span>&#160;    <span class="keywordflow">return</span> [NSString stringWithUTF8String:FFMPEG_CONFIGURATION];</div>
-<div class="line"><a name="l00620"></a><span class="lineno">  620</span>&#160;}</div>
-<div class="line"><a name="l00621"></a><span class="lineno">  621</span>&#160; </div>
-<div class="line"><a name="l00627"></a><span class="lineno"><a class="line" href="../../df/d45/interface_mobile_f_fmpeg_config.html#a2eadd8d13624ca1f3d797d487c6429e8">  627</a></span>&#160;+ (NSString*)<a class="code" href="../../df/d45/interface_mobile_f_fmpeg_config.html#a2eadd8d13624ca1f3d797d487c6429e8">getPackageName</a> {</div>
-<div class="line"><a name="l00628"></a><span class="lineno">  628</span>&#160;    NSArray *enabledLibraryArray = [<a class="code" href="../../df/d45/interface_mobile_f_fmpeg_config.html">MobileFFmpegConfig</a> <a class="code" href="../../df/d45/interface_mobile_f_fmpeg_config.html#a17a80daa4903d8e7b4490c42f85396c9">getExternalLibraries</a>];</div>
-<div class="line"><a name="l00629"></a><span class="lineno">  629</span>&#160;    Boolean speex = [enabledLibraryArray containsObject:@&quot;speex&quot;];</div>
-<div class="line"><a name="l00630"></a><span class="lineno">  630</span>&#160;    Boolean fribidi = [enabledLibraryArray containsObject:@&quot;fribidi&quot;];</div>
-<div class="line"><a name="l00631"></a><span class="lineno">  631</span>&#160;    Boolean gnutls = [enabledLibraryArray containsObject:@&quot;gnutls&quot;];</div>
-<div class="line"><a name="l00632"></a><span class="lineno">  632</span>&#160;    Boolean xvid = [enabledLibraryArray containsObject:@&quot;xvid&quot;];</div>
-<div class="line"><a name="l00633"></a><span class="lineno">  633</span>&#160; </div>
-<div class="line"><a name="l00634"></a><span class="lineno">  634</span>&#160;    Boolean min = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00635"></a><span class="lineno">  635</span>&#160;    Boolean minGpl = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00636"></a><span class="lineno">  636</span>&#160;    Boolean https = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00637"></a><span class="lineno">  637</span>&#160;    Boolean httpsGpl = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00638"></a><span class="lineno">  638</span>&#160;    Boolean audio = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00639"></a><span class="lineno">  639</span>&#160;    Boolean video = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00640"></a><span class="lineno">  640</span>&#160;    Boolean full = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00641"></a><span class="lineno">  641</span>&#160;    Boolean fullGpl = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00642"></a><span class="lineno">  642</span>&#160; </div>
-<div class="line"><a name="l00643"></a><span class="lineno">  643</span>&#160;    <span class="keywordflow">if</span> (speex &amp;&amp; fribidi) {</div>
-<div class="line"><a name="l00644"></a><span class="lineno">  644</span>&#160;        <span class="keywordflow">if</span> (xvid) {</div>
-<div class="line"><a name="l00645"></a><span class="lineno">  645</span>&#160;            fullGpl = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00646"></a><span class="lineno">  646</span>&#160;        } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00647"></a><span class="lineno">  647</span>&#160;            full = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00648"></a><span class="lineno">  648</span>&#160;        }</div>
-<div class="line"><a name="l00649"></a><span class="lineno">  649</span>&#160;    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (speex) {</div>
-<div class="line"><a name="l00650"></a><span class="lineno">  650</span>&#160;        audio = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00651"></a><span class="lineno">  651</span>&#160;    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (fribidi) {</div>
-<div class="line"><a name="l00652"></a><span class="lineno">  652</span>&#160;        video = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00653"></a><span class="lineno">  653</span>&#160;    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (xvid) {</div>
-<div class="line"><a name="l00654"></a><span class="lineno">  654</span>&#160;        <span class="keywordflow">if</span> (gnutls) {</div>
-<div class="line"><a name="l00655"></a><span class="lineno">  655</span>&#160;            httpsGpl = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00656"></a><span class="lineno">  656</span>&#160;        } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00657"></a><span class="lineno">  657</span>&#160;            minGpl = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00658"></a><span class="lineno">  658</span>&#160;        }</div>
-<div class="line"><a name="l00659"></a><span class="lineno">  659</span>&#160;    } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00660"></a><span class="lineno">  660</span>&#160;        <span class="keywordflow">if</span> (gnutls) {</div>
-<div class="line"><a name="l00661"></a><span class="lineno">  661</span>&#160;            https = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00662"></a><span class="lineno">  662</span>&#160;        } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00663"></a><span class="lineno">  663</span>&#160;            min = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00664"></a><span class="lineno">  664</span>&#160;        }</div>
-<div class="line"><a name="l00665"></a><span class="lineno">  665</span>&#160;    }</div>
-<div class="line"><a name="l00666"></a><span class="lineno">  666</span>&#160; </div>
-<div class="line"><a name="l00667"></a><span class="lineno">  667</span>&#160;    <span class="keywordflow">if</span> (fullGpl) {</div>
-<div class="line"><a name="l00668"></a><span class="lineno">  668</span>&#160;        <span class="keywordflow">if</span> ([enabledLibraryArray containsObject:<span class="stringliteral">@&quot;fontconfig&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00669"></a><span class="lineno">  669</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;freetype&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00670"></a><span class="lineno">  670</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;fribidi&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00671"></a><span class="lineno">  671</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;gmp&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00672"></a><span class="lineno">  672</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;gnutls&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00673"></a><span class="lineno">  673</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;kvazaar&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00674"></a><span class="lineno">  674</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;mp3lame&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00675"></a><span class="lineno">  675</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libaom&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00676"></a><span class="lineno">  676</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libass&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00677"></a><span class="lineno">  677</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;iconv&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00678"></a><span class="lineno">  678</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libilbc&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00679"></a><span class="lineno">  679</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libtheora&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00680"></a><span class="lineno">  680</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libvidstab&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00681"></a><span class="lineno">  681</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libvorbis&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00682"></a><span class="lineno">  682</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libvpx&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00683"></a><span class="lineno">  683</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libwebp&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00684"></a><span class="lineno">  684</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libxml2&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00685"></a><span class="lineno">  685</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;opencore-amr&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00686"></a><span class="lineno">  686</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;opus&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00687"></a><span class="lineno">  687</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;shine&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00688"></a><span class="lineno">  688</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;snappy&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00689"></a><span class="lineno">  689</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;soxr&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00690"></a><span class="lineno">  690</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;speex&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00691"></a><span class="lineno">  691</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;twolame&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00692"></a><span class="lineno">  692</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;wavpack&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00693"></a><span class="lineno">  693</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;x264&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00694"></a><span class="lineno">  694</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;x265&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00695"></a><span class="lineno">  695</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;xvid&quot;</span>]) {</div>
-<div class="line"><a name="l00696"></a><span class="lineno">  696</span>&#160;            <span class="keywordflow">return</span> <span class="stringliteral">@&quot;full-gpl&quot;</span>;</div>
-<div class="line"><a name="l00697"></a><span class="lineno">  697</span>&#160;        } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00698"></a><span class="lineno">  698</span>&#160;            <span class="keywordflow">return</span> <span class="stringliteral">@&quot;custom&quot;</span>;</div>
-<div class="line"><a name="l00699"></a><span class="lineno">  699</span>&#160;        }</div>
-<div class="line"><a name="l00700"></a><span class="lineno">  700</span>&#160;    }</div>
-<div class="line"><a name="l00701"></a><span class="lineno">  701</span>&#160; </div>
-<div class="line"><a name="l00702"></a><span class="lineno">  702</span>&#160;    <span class="keywordflow">if</span> (full) {</div>
-<div class="line"><a name="l00703"></a><span class="lineno">  703</span>&#160;        <span class="keywordflow">if</span> ([enabledLibraryArray containsObject:<span class="stringliteral">@&quot;fontconfig&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00704"></a><span class="lineno">  704</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;freetype&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00705"></a><span class="lineno">  705</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;fribidi&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00706"></a><span class="lineno">  706</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;gmp&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00707"></a><span class="lineno">  707</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;gnutls&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00708"></a><span class="lineno">  708</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;kvazaar&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00709"></a><span class="lineno">  709</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;mp3lame&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00710"></a><span class="lineno">  710</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libaom&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00711"></a><span class="lineno">  711</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libass&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00712"></a><span class="lineno">  712</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;iconv&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00713"></a><span class="lineno">  713</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libilbc&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00714"></a><span class="lineno">  714</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libtheora&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00715"></a><span class="lineno">  715</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libvorbis&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00716"></a><span class="lineno">  716</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libvpx&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00717"></a><span class="lineno">  717</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libwebp&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00718"></a><span class="lineno">  718</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libxml2&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00719"></a><span class="lineno">  719</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;opencore-amr&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00720"></a><span class="lineno">  720</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;opus&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00721"></a><span class="lineno">  721</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;shine&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00722"></a><span class="lineno">  722</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;snappy&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00723"></a><span class="lineno">  723</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;soxr&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00724"></a><span class="lineno">  724</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;speex&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00725"></a><span class="lineno">  725</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;twolame&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00726"></a><span class="lineno">  726</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;wavpack&quot;</span>]) {</div>
-<div class="line"><a name="l00727"></a><span class="lineno">  727</span>&#160;            <span class="keywordflow">return</span> <span class="stringliteral">@&quot;full&quot;</span>;</div>
-<div class="line"><a name="l00728"></a><span class="lineno">  728</span>&#160;        } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00729"></a><span class="lineno">  729</span>&#160;            <span class="keywordflow">return</span> <span class="stringliteral">@&quot;custom&quot;</span>;</div>
-<div class="line"><a name="l00730"></a><span class="lineno">  730</span>&#160;        }</div>
-<div class="line"><a name="l00731"></a><span class="lineno">  731</span>&#160;    }</div>
-<div class="line"><a name="l00732"></a><span class="lineno">  732</span>&#160; </div>
-<div class="line"><a name="l00733"></a><span class="lineno">  733</span>&#160;    <span class="keywordflow">if</span> (video) {</div>
-<div class="line"><a name="l00734"></a><span class="lineno">  734</span>&#160;        <span class="keywordflow">if</span> ([enabledLibraryArray containsObject:<span class="stringliteral">@&quot;fontconfig&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00735"></a><span class="lineno">  735</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;freetype&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00736"></a><span class="lineno">  736</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;fribidi&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00737"></a><span class="lineno">  737</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;kvazaar&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00738"></a><span class="lineno">  738</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libaom&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00739"></a><span class="lineno">  739</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libass&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00740"></a><span class="lineno">  740</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;iconv&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00741"></a><span class="lineno">  741</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libtheora&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00742"></a><span class="lineno">  742</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libvpx&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00743"></a><span class="lineno">  743</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libwebp&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00744"></a><span class="lineno">  744</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;snappy&quot;</span>]) {</div>
-<div class="line"><a name="l00745"></a><span class="lineno">  745</span>&#160;            <span class="keywordflow">return</span> <span class="stringliteral">@&quot;video&quot;</span>;</div>
-<div class="line"><a name="l00746"></a><span class="lineno">  746</span>&#160;        } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00747"></a><span class="lineno">  747</span>&#160;            <span class="keywordflow">return</span> <span class="stringliteral">@&quot;custom&quot;</span>;</div>
-<div class="line"><a name="l00748"></a><span class="lineno">  748</span>&#160;        }</div>
-<div class="line"><a name="l00749"></a><span class="lineno">  749</span>&#160;    }</div>
-<div class="line"><a name="l00750"></a><span class="lineno">  750</span>&#160; </div>
-<div class="line"><a name="l00751"></a><span class="lineno">  751</span>&#160;    <span class="keywordflow">if</span> (audio) {</div>
-<div class="line"><a name="l00752"></a><span class="lineno">  752</span>&#160;        <span class="keywordflow">if</span> ([enabledLibraryArray containsObject:<span class="stringliteral">@&quot;mp3lame&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00753"></a><span class="lineno">  753</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libilbc&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00754"></a><span class="lineno">  754</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libvorbis&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00755"></a><span class="lineno">  755</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;opencore-amr&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00756"></a><span class="lineno">  756</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;opus&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00757"></a><span class="lineno">  757</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;shine&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00758"></a><span class="lineno">  758</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;soxr&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00759"></a><span class="lineno">  759</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;speex&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00760"></a><span class="lineno">  760</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;twolame&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00761"></a><span class="lineno">  761</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;wavpack&quot;</span>]) {</div>
-<div class="line"><a name="l00762"></a><span class="lineno">  762</span>&#160;            <span class="keywordflow">return</span> <span class="stringliteral">@&quot;audio&quot;</span>;</div>
-<div class="line"><a name="l00763"></a><span class="lineno">  763</span>&#160;        } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00764"></a><span class="lineno">  764</span>&#160;            <span class="keywordflow">return</span> <span class="stringliteral">@&quot;custom&quot;</span>;</div>
-<div class="line"><a name="l00765"></a><span class="lineno">  765</span>&#160;        }</div>
-<div class="line"><a name="l00766"></a><span class="lineno">  766</span>&#160;    }</div>
-<div class="line"><a name="l00767"></a><span class="lineno">  767</span>&#160; </div>
-<div class="line"><a name="l00768"></a><span class="lineno">  768</span>&#160;    <span class="keywordflow">if</span> (httpsGpl) {</div>
-<div class="line"><a name="l00769"></a><span class="lineno">  769</span>&#160;        <span class="keywordflow">if</span> ([enabledLibraryArray containsObject:<span class="stringliteral">@&quot;gmp&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00770"></a><span class="lineno">  770</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;gnutls&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00771"></a><span class="lineno">  771</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libvidstab&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00772"></a><span class="lineno">  772</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;x264&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00773"></a><span class="lineno">  773</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;x265&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00774"></a><span class="lineno">  774</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;xvid&quot;</span>]) {</div>
-<div class="line"><a name="l00775"></a><span class="lineno">  775</span>&#160;            <span class="keywordflow">return</span> <span class="stringliteral">@&quot;https-gpl&quot;</span>;</div>
-<div class="line"><a name="l00776"></a><span class="lineno">  776</span>&#160;        } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00777"></a><span class="lineno">  777</span>&#160;            <span class="keywordflow">return</span> <span class="stringliteral">@&quot;custom&quot;</span>;</div>
-<div class="line"><a name="l00778"></a><span class="lineno">  778</span>&#160;        }</div>
-<div class="line"><a name="l00779"></a><span class="lineno">  779</span>&#160;    }</div>
-<div class="line"><a name="l00780"></a><span class="lineno">  780</span>&#160; </div>
-<div class="line"><a name="l00781"></a><span class="lineno">  781</span>&#160;    <span class="keywordflow">if</span> (https) {</div>
-<div class="line"><a name="l00782"></a><span class="lineno">  782</span>&#160;        <span class="keywordflow">if</span> ([enabledLibraryArray containsObject:<span class="stringliteral">@&quot;gmp&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00783"></a><span class="lineno">  783</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;gnutls&quot;</span>]) {</div>
-<div class="line"><a name="l00784"></a><span class="lineno">  784</span>&#160;            <span class="keywordflow">return</span> <span class="stringliteral">@&quot;https&quot;</span>;</div>
-<div class="line"><a name="l00785"></a><span class="lineno">  785</span>&#160;        } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00786"></a><span class="lineno">  786</span>&#160;            <span class="keywordflow">return</span> <span class="stringliteral">@&quot;custom&quot;</span>;</div>
-<div class="line"><a name="l00787"></a><span class="lineno">  787</span>&#160;        }</div>
-<div class="line"><a name="l00788"></a><span class="lineno">  788</span>&#160;    }</div>
-<div class="line"><a name="l00789"></a><span class="lineno">  789</span>&#160; </div>
-<div class="line"><a name="l00790"></a><span class="lineno">  790</span>&#160;    <span class="keywordflow">if</span> (minGpl) {</div>
-<div class="line"><a name="l00791"></a><span class="lineno">  791</span>&#160;        <span class="keywordflow">if</span> ([enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libvidstab&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00792"></a><span class="lineno">  792</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;x264&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00793"></a><span class="lineno">  793</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;x265&quot;</span>] &amp;&amp;</div>
-<div class="line"><a name="l00794"></a><span class="lineno">  794</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;xvid&quot;</span>]) {</div>
-<div class="line"><a name="l00795"></a><span class="lineno">  795</span>&#160;            <span class="keywordflow">return</span> <span class="stringliteral">@&quot;min-gpl&quot;</span>;</div>
-<div class="line"><a name="l00796"></a><span class="lineno">  796</span>&#160;        } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00797"></a><span class="lineno">  797</span>&#160;            <span class="keywordflow">return</span> <span class="stringliteral">@&quot;custom&quot;</span>;</div>
-<div class="line"><a name="l00798"></a><span class="lineno">  798</span>&#160;        }</div>
-<div class="line"><a name="l00799"></a><span class="lineno">  799</span>&#160;    }</div>
-<div class="line"><a name="l00800"></a><span class="lineno">  800</span>&#160; </div>
-<div class="line"><a name="l00801"></a><span class="lineno">  801</span>&#160;    <span class="keywordflow">return</span> <span class="stringliteral">@&quot;min&quot;</span>;</div>
-<div class="line"><a name="l00802"></a><span class="lineno">  802</span>&#160;}</div>
-<div class="line"><a name="l00803"></a><span class="lineno">  803</span>&#160; </div>
-<div class="line"><a name="l00809"></a><span class="lineno"><a class="line" href="../../df/d45/interface_mobile_f_fmpeg_config.html#a17a80daa4903d8e7b4490c42f85396c9">  809</a></span>&#160;+ (NSArray*)<a class="code" href="../../df/d45/interface_mobile_f_fmpeg_config.html#a17a80daa4903d8e7b4490c42f85396c9">getExternalLibraries</a> {</div>
-<div class="line"><a name="l00810"></a><span class="lineno">  810</span>&#160;    NSString *buildConfiguration = [<a class="code" href="../../df/d45/interface_mobile_f_fmpeg_config.html">MobileFFmpegConfig</a> <a class="code" href="../../df/d45/interface_mobile_f_fmpeg_config.html#aa5d2ee83a36d86a735474684fb33433c">getBuildConf</a>];</div>
-<div class="line"><a name="l00811"></a><span class="lineno">  811</span>&#160;    NSMutableArray *enabledLibraryArray = [[NSMutableArray alloc] init];</div>
-<div class="line"><a name="l00812"></a><span class="lineno">  812</span>&#160; </div>
-<div class="line"><a name="l00813"></a><span class="lineno">  813</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0; i &lt; [supportedExternalLibraries count]; i++) {</div>
-<div class="line"><a name="l00814"></a><span class="lineno">  814</span>&#160;        NSString *supportedExternalLibrary = [supportedExternalLibraries objectAtIndex:i];</div>
-<div class="line"><a name="l00815"></a><span class="lineno">  815</span>&#160; </div>
-<div class="line"><a name="l00816"></a><span class="lineno">  816</span>&#160;        NSString *libraryName1 = [NSString stringWithFormat:@&quot;enable-%@&quot;, supportedExternalLibrary];</div>
-<div class="line"><a name="l00817"></a><span class="lineno">  817</span>&#160;        NSString *libraryName2 = [NSString stringWithFormat:@&quot;enable-lib%@&quot;, supportedExternalLibrary];</div>
-<div class="line"><a name="l00818"></a><span class="lineno">  818</span>&#160; </div>
-<div class="line"><a name="l00819"></a><span class="lineno">  819</span>&#160;        <span class="keywordflow">if</span> ([buildConfiguration rangeOfString:libraryName1].location != NSNotFound || [buildConfiguration rangeOfString:libraryName2].location != NSNotFound) {</div>
-<div class="line"><a name="l00820"></a><span class="lineno">  820</span>&#160;            [enabledLibraryArray addObject:supportedExternalLibrary];</div>
-<div class="line"><a name="l00821"></a><span class="lineno">  821</span>&#160;        }</div>
-<div class="line"><a name="l00822"></a><span class="lineno">  822</span>&#160;    }</div>
-<div class="line"><a name="l00823"></a><span class="lineno">  823</span>&#160; </div>
-<div class="line"><a name="l00824"></a><span class="lineno">  824</span>&#160;    [enabledLibraryArray sortUsingSelector:@selector(compare:)];</div>
-<div class="line"><a name="l00825"></a><span class="lineno">  825</span>&#160; </div>
-<div class="line"><a name="l00826"></a><span class="lineno">  826</span>&#160;    <span class="keywordflow">return</span> enabledLibraryArray;</div>
-<div class="line"><a name="l00827"></a><span class="lineno">  827</span>&#160;}</div>
-<div class="line"><a name="l00828"></a><span class="lineno">  828</span>&#160; </div>
-<div class="line"><a name="l00836"></a><span class="lineno"><a class="line" href="../../df/d45/interface_mobile_f_fmpeg_config.html#ac861ab3fcda37bcdfb88f24f082b2b87">  836</a></span>&#160;+ (NSString*)<a class="code" href="../../df/d45/interface_mobile_f_fmpeg_config.html#ac861ab3fcda37bcdfb88f24f082b2b87">registerNewFFmpegPipe</a> {</div>
-<div class="line"><a name="l00837"></a><span class="lineno">  837</span>&#160; </div>
-<div class="line"><a name="l00838"></a><span class="lineno">  838</span>&#160;    <span class="comment">// PIPES ARE CREATED UNDER THE CACHE DIRECTORY</span></div>
-<div class="line"><a name="l00839"></a><span class="lineno">  839</span>&#160;    NSString *cacheDir = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0];</div>
-<div class="line"><a name="l00840"></a><span class="lineno">  840</span>&#160; </div>
-<div class="line"><a name="l00841"></a><span class="lineno">  841</span>&#160;    NSString *newFFmpegPipePath = [NSString stringWithFormat:@&quot;%@/%@%d&quot;, cacheDir, MOBILE_FFMPEG_PIPE_PREFIX, (++lastCreatedPipeIndex)];</div>
-<div class="line"><a name="l00842"></a><span class="lineno">  842</span>&#160; </div>
-<div class="line"><a name="l00843"></a><span class="lineno">  843</span>&#160;    <span class="comment">// FIRST CLOSE OLD PIPES WITH THE SAME NAME</span></div>
-<div class="line"><a name="l00844"></a><span class="lineno">  844</span>&#160;    [<a class="code" href="../../df/d45/interface_mobile_f_fmpeg_config.html">MobileFFmpegConfig</a> <a class="code" href="../../df/d45/interface_mobile_f_fmpeg_config.html#a98ef246bf01900e2109e628b4d9cc9f9">closeFFmpegPipe</a>:newFFmpegPipePath];</div>
-<div class="line"><a name="l00845"></a><span class="lineno">  845</span>&#160; </div>
-<div class="line"><a name="l00846"></a><span class="lineno">  846</span>&#160;    <span class="keywordtype">int</span> rc = mkfifo([newFFmpegPipePath UTF8String], S_IRWXU | S_IRWXG | S_IROTH);</div>
-<div class="line"><a name="l00847"></a><span class="lineno">  847</span>&#160;    <span class="keywordflow">if</span> (rc == 0) {</div>
-<div class="line"><a name="l00848"></a><span class="lineno">  848</span>&#160;        <span class="keywordflow">return</span> newFFmpegPipePath;</div>
-<div class="line"><a name="l00849"></a><span class="lineno">  849</span>&#160;    } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00850"></a><span class="lineno">  850</span>&#160;        <span class="keywordtype">int</span> activeLogLevel = av_log_get_level();</div>
-<div class="line"><a name="l00851"></a><span class="lineno">  851</span>&#160;        <span class="keywordflow">if</span> ((activeLogLevel != <a class="code" href="../../de/dea/_mobile_f_fmpeg_config_8h.html#a11e329935b59b83ca722b66674f37fd4">AV_LOG_QUIET</a>) &amp;&amp; (<a class="code" href="../../de/dea/_mobile_f_fmpeg_config_8h.html#a85b57516ca703cc47d9bbe5f4658c716">AV_LOG_WARNING</a> &lt;= activeLogLevel)) {</div>
-<div class="line"><a name="l00852"></a><span class="lineno">  852</span>&#160;            NSLog(<span class="stringliteral">@&quot;Failed to register new FFmpeg pipe %@. Operation failed with rc=%d.&quot;</span>, newFFmpegPipePath, rc);</div>
-<div class="line"><a name="l00853"></a><span class="lineno">  853</span>&#160;        }</div>
-<div class="line"><a name="l00854"></a><span class="lineno">  854</span>&#160;        <span class="keywordflow">return</span> nil;</div>
-<div class="line"><a name="l00855"></a><span class="lineno">  855</span>&#160;    }</div>
-<div class="line"><a name="l00856"></a><span class="lineno">  856</span>&#160;}</div>
-<div class="line"><a name="l00857"></a><span class="lineno">  857</span>&#160; </div>
-<div class="line"><a name="l00863"></a><span class="lineno"><a class="line" href="../../df/d45/interface_mobile_f_fmpeg_config.html#a98ef246bf01900e2109e628b4d9cc9f9">  863</a></span>&#160;+ (void)closeFFmpegPipe: (NSString*)ffmpegPipePath {</div>
-<div class="line"><a name="l00864"></a><span class="lineno">  864</span>&#160;    NSFileManager *fileManager = [NSFileManager defaultManager];</div>
-<div class="line"><a name="l00865"></a><span class="lineno">  865</span>&#160; </div>
-<div class="line"><a name="l00866"></a><span class="lineno">  866</span>&#160;    <span class="keywordflow">if</span> ([fileManager fileExistsAtPath:ffmpegPipePath]){</div>
-<div class="line"><a name="l00867"></a><span class="lineno">  867</span>&#160;        [fileManager removeItemAtPath:ffmpegPipePath error:NULL];</div>
-<div class="line"><a name="l00868"></a><span class="lineno">  868</span>&#160;    }</div>
-<div class="line"><a name="l00869"></a><span class="lineno">  869</span>&#160;}</div>
-<div class="line"><a name="l00870"></a><span class="lineno">  870</span>&#160; </div>
-<div class="line"><a name="l00876"></a><span class="lineno"><a class="line" href="../../df/d45/interface_mobile_f_fmpeg_config.html#ada92e6ffd8cb406eab6ebe1d7659a2d1">  876</a></span>&#160;+ (NSString*)<a class="code" href="../../df/d45/interface_mobile_f_fmpeg_config.html#ada92e6ffd8cb406eab6ebe1d7659a2d1">getFFmpegVersion</a> {</div>
-<div class="line"><a name="l00877"></a><span class="lineno">  877</span>&#160;    <span class="keywordflow">return</span> [NSString stringWithUTF8String:FFMPEG_VERSION];</div>
-<div class="line"><a name="l00878"></a><span class="lineno">  878</span>&#160;}</div>
-<div class="line"><a name="l00879"></a><span class="lineno">  879</span>&#160; </div>
-<div class="line"><a name="l00885"></a><span class="lineno"><a class="line" href="../../df/d45/interface_mobile_f_fmpeg_config.html#a3d9f82e7cfb6c95fdfb4021b4e3b2194">  885</a></span>&#160;+ (NSString*)<a class="code" href="../../df/d45/interface_mobile_f_fmpeg_config.html#a3d9f82e7cfb6c95fdfb4021b4e3b2194">getVersion</a> {</div>
-<div class="line"><a name="l00886"></a><span class="lineno">  886</span>&#160;    <span class="keywordflow">if</span> ([<a class="code" href="../../dd/d2b/interface_arch_detect.html">ArchDetect</a> isLTSBuild] == 1) {</div>
-<div class="line"><a name="l00887"></a><span class="lineno">  887</span>&#160;        <span class="keywordflow">return</span> [NSString stringWithFormat:@&quot;%@-lts&quot;, MOBILE_FFMPEG_VERSION];</div>
-<div class="line"><a name="l00888"></a><span class="lineno">  888</span>&#160;    } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00889"></a><span class="lineno">  889</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="../../de/d1a/_mobile_f_fmpeg_8h.html#a4195a7107d7e543caceb997e9d0d2fce">MOBILE_FFMPEG_VERSION</a>;</div>
-<div class="line"><a name="l00890"></a><span class="lineno">  890</span>&#160;    }</div>
-<div class="line"><a name="l00891"></a><span class="lineno">  891</span>&#160;}</div>
-<div class="line"><a name="l00892"></a><span class="lineno">  892</span>&#160; </div>
-<div class="line"><a name="l00898"></a><span class="lineno"><a class="line" href="../../df/d45/interface_mobile_f_fmpeg_config.html#a5adfbaa584362f6cd55a4a120507fd0e">  898</a></span>&#160;+ (NSString*)<a class="code" href="../../df/d45/interface_mobile_f_fmpeg_config.html#a5adfbaa584362f6cd55a4a120507fd0e">getBuildDate</a> {</div>
-<div class="line"><a name="l00899"></a><span class="lineno">  899</span>&#160;    <span class="keywordtype">char</span> buildDate[10];</div>
-<div class="line"><a name="l00900"></a><span class="lineno">  900</span>&#160;    sprintf(buildDate, <span class="stringliteral">&quot;%d&quot;</span>, MOBILE_FFMPEG_BUILD_DATE);</div>
-<div class="line"><a name="l00901"></a><span class="lineno">  901</span>&#160;    <span class="keywordflow">return</span> [NSString stringWithUTF8String:buildDate];</div>
-<div class="line"><a name="l00902"></a><span class="lineno">  902</span>&#160;}</div>
-<div class="line"><a name="l00903"></a><span class="lineno">  903</span>&#160; </div>
-<div class="line"><a name="l00909"></a><span class="lineno"><a class="line" href="../../df/d45/interface_mobile_f_fmpeg_config.html#a37e8ebe4487e5a298dc7af943be56010">  909</a></span>&#160;+ (<a class="code" href="../../d2/d36/fftools__ffmpeg__filter_8c.html#a61569f2965b7a369eb10b6d75d410d11">int</a>)<a class="code" href="../../df/d45/interface_mobile_f_fmpeg_config.html#a37e8ebe4487e5a298dc7af943be56010">getLastReturnCode</a> {</div>
-<div class="line"><a name="l00910"></a><span class="lineno">  910</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#ae7a108ddd6a67ae1f62a675b05aac9d5">lastReturnCode</a>;</div>
-<div class="line"><a name="l00911"></a><span class="lineno">  911</span>&#160;}</div>
-<div class="line"><a name="l00912"></a><span class="lineno">  912</span>&#160; </div>
-<div class="line"><a name="l00924"></a><span class="lineno"><a class="line" href="../../df/d45/interface_mobile_f_fmpeg_config.html#a0d82d52dfacc516f2a0c2f277d29bf63">  924</a></span>&#160;+ (NSString*)<a class="code" href="../../df/d45/interface_mobile_f_fmpeg_config.html#a0d82d52dfacc516f2a0c2f277d29bf63">getLastCommandOutput</a> {</div>
-<div class="line"><a name="l00925"></a><span class="lineno">  925</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#a342e10e2589c067da75d3be8aac473c6">lastCommandOutput</a>;</div>
-<div class="line"><a name="l00926"></a><span class="lineno">  926</span>&#160;}</div>
-<div class="line"><a name="l00927"></a><span class="lineno">  927</span>&#160; </div>
-<div class="line"><a name="l00928"></a><span class="lineno">  928</span>&#160;<span class="keyword">@end</span></div>
+<div class="line"><a name="l00587"></a><span class="lineno">  587</span>&#160;            validFontNameMappingCount++;</div>
+<div class="line"><a name="l00588"></a><span class="lineno">  588</span>&#160;        }</div>
+<div class="line"><a name="l00589"></a><span class="lineno">  589</span>&#160;    }</div>
+<div class="line"><a name="l00590"></a><span class="lineno">  590</span>&#160; </div>
+<div class="line"><a name="l00591"></a><span class="lineno">  591</span>&#160;    NSString *fontConfiguration = [NSString stringWithFormat:@&quot;%@\n%@\n%@\n%@\n%@%@%@\n%@\n%@\n&quot;,</div>
+<div class="line"><a name="l00592"></a><span class="lineno">  592</span>&#160;                            @&quot;&lt;?xml version=\&quot;1.0\&quot;?&gt;&quot;,</div>
+<div class="line"><a name="l00593"></a><span class="lineno">  593</span>&#160;                            @&quot;&lt;!DOCTYPE fontconfig SYSTEM \&quot;fonts.dtd\&quot;&gt;&quot;,</div>
+<div class="line"><a name="l00594"></a><span class="lineno">  594</span>&#160;                            @&quot;&lt;fontconfig&gt;&quot;,</div>
+<div class="line"><a name="l00595"></a><span class="lineno">  595</span>&#160;                            @&quot;    &lt;dir&gt;.&lt;/dir&gt;&quot;,</div>
+<div class="line"><a name="l00596"></a><span class="lineno">  596</span>&#160;                            @&quot;    &lt;dir&gt;&quot;, fontDirectoryPath, @&quot;&lt;/dir&gt;&quot;,</div>
+<div class="line"><a name="l00597"></a><span class="lineno">  597</span>&#160;                            fontNameMappingBlock,</div>
+<div class="line"><a name="l00598"></a><span class="lineno">  598</span>&#160;                            @&quot;&lt;/fontconfig&gt;&quot;];</div>
+<div class="line"><a name="l00599"></a><span class="lineno">  599</span>&#160; </div>
+<div class="line"><a name="l00600"></a><span class="lineno">  600</span>&#160;    <span class="keywordflow">if</span> (![fontConfiguration writeToFile:fontConfigurationFile atomically:YES encoding:NSUTF8StringEncoding error:&amp;error]) {</div>
+<div class="line"><a name="l00601"></a><span class="lineno">  601</span>&#160;        <span class="keywordflow">if</span> ((activeLogLevel != <a class="code" href="../../de/dea/_mobile_f_fmpeg_config_8h.html#a11e329935b59b83ca722b66674f37fd4">AV_LOG_QUIET</a>) &amp;&amp; (<a class="code" href="../../de/dea/_mobile_f_fmpeg_config_8h.html#a85b57516ca703cc47d9bbe5f4658c716">AV_LOG_WARNING</a> &lt;= activeLogLevel)) {</div>
+<div class="line"><a name="l00602"></a><span class="lineno">  602</span>&#160;            NSLog(<span class="stringliteral">@&quot;Failed to set font directory. Error received while saving font configuration: %@.&quot;</span>, error);</div>
+<div class="line"><a name="l00603"></a><span class="lineno">  603</span>&#160;        }</div>
+<div class="line"><a name="l00604"></a><span class="lineno">  604</span>&#160;        <span class="keywordflow">return</span>;</div>
+<div class="line"><a name="l00605"></a><span class="lineno">  605</span>&#160;    }</div>
+<div class="line"><a name="l00606"></a><span class="lineno">  606</span>&#160;    <span class="keywordflow">if</span> ((activeLogLevel != <a class="code" href="../../de/dea/_mobile_f_fmpeg_config_8h.html#a11e329935b59b83ca722b66674f37fd4">AV_LOG_QUIET</a>) &amp;&amp; (<a class="code" href="../../de/dea/_mobile_f_fmpeg_config_8h.html#a5b7221c3afd06848486776bd834a58a5">AV_LOG_DEBUG</a> &lt;= activeLogLevel)) {</div>
+<div class="line"><a name="l00607"></a><span class="lineno">  607</span>&#160;        NSLog(<span class="stringliteral">@&quot;Saved new temporary font configuration with %d font name mappings.&quot;</span>, validFontNameMappingCount);</div>
+<div class="line"><a name="l00608"></a><span class="lineno">  608</span>&#160;    }</div>
+<div class="line"><a name="l00609"></a><span class="lineno">  609</span>&#160; </div>
+<div class="line"><a name="l00610"></a><span class="lineno">  610</span>&#160;    [<a class="code" href="../../df/d45/interface_mobile_f_fmpeg_config.html">MobileFFmpegConfig</a> <a class="code" href="../../df/d45/interface_mobile_f_fmpeg_config.html#a08aec3cd82ae9f2c63b8efe2a3ff3968">setFontconfigConfigurationPath</a>:tempConfigurationDirectory];</div>
+<div class="line"><a name="l00611"></a><span class="lineno">  611</span>&#160; </div>
+<div class="line"><a name="l00612"></a><span class="lineno">  612</span>&#160;    <span class="keywordflow">if</span> ((activeLogLevel != <a class="code" href="../../de/dea/_mobile_f_fmpeg_config_8h.html#a11e329935b59b83ca722b66674f37fd4">AV_LOG_QUIET</a>) &amp;&amp; (<a class="code" href="../../de/dea/_mobile_f_fmpeg_config_8h.html#a5b7221c3afd06848486776bd834a58a5">AV_LOG_DEBUG</a> &lt;= activeLogLevel)) {</div>
+<div class="line"><a name="l00613"></a><span class="lineno">  613</span>&#160;        NSLog(<span class="stringliteral">@&quot;Font directory %@ registered successfully.&quot;</span>, fontDirectoryPath);</div>
+<div class="line"><a name="l00614"></a><span class="lineno">  614</span>&#160;    }</div>
+<div class="line"><a name="l00615"></a><span class="lineno">  615</span>&#160;}</div>
+<div class="line"><a name="l00616"></a><span class="lineno">  616</span>&#160; </div>
+<div class="line"><a name="l00622"></a><span class="lineno"><a class="line" href="../../df/d45/interface_mobile_f_fmpeg_config.html#aa5d2ee83a36d86a735474684fb33433c">  622</a></span>&#160;+ (NSString*)<a class="code" href="../../df/d45/interface_mobile_f_fmpeg_config.html#aa5d2ee83a36d86a735474684fb33433c">getBuildConf</a> {</div>
+<div class="line"><a name="l00623"></a><span class="lineno">  623</span>&#160;    <span class="keywordflow">return</span> [NSString stringWithUTF8String:FFMPEG_CONFIGURATION];</div>
+<div class="line"><a name="l00624"></a><span class="lineno">  624</span>&#160;}</div>
+<div class="line"><a name="l00625"></a><span class="lineno">  625</span>&#160; </div>
+<div class="line"><a name="l00631"></a><span class="lineno"><a class="line" href="../../df/d45/interface_mobile_f_fmpeg_config.html#a2eadd8d13624ca1f3d797d487c6429e8">  631</a></span>&#160;+ (NSString*)<a class="code" href="../../df/d45/interface_mobile_f_fmpeg_config.html#a2eadd8d13624ca1f3d797d487c6429e8">getPackageName</a> {</div>
+<div class="line"><a name="l00632"></a><span class="lineno">  632</span>&#160;    NSArray *enabledLibraryArray = [<a class="code" href="../../df/d45/interface_mobile_f_fmpeg_config.html">MobileFFmpegConfig</a> <a class="code" href="../../df/d45/interface_mobile_f_fmpeg_config.html#a17a80daa4903d8e7b4490c42f85396c9">getExternalLibraries</a>];</div>
+<div class="line"><a name="l00633"></a><span class="lineno">  633</span>&#160;    Boolean speex = [enabledLibraryArray containsObject:@&quot;speex&quot;];</div>
+<div class="line"><a name="l00634"></a><span class="lineno">  634</span>&#160;    Boolean fribidi = [enabledLibraryArray containsObject:@&quot;fribidi&quot;];</div>
+<div class="line"><a name="l00635"></a><span class="lineno">  635</span>&#160;    Boolean gnutls = [enabledLibraryArray containsObject:@&quot;gnutls&quot;];</div>
+<div class="line"><a name="l00636"></a><span class="lineno">  636</span>&#160;    Boolean xvid = [enabledLibraryArray containsObject:@&quot;xvid&quot;];</div>
+<div class="line"><a name="l00637"></a><span class="lineno">  637</span>&#160; </div>
+<div class="line"><a name="l00638"></a><span class="lineno">  638</span>&#160;    Boolean min = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00639"></a><span class="lineno">  639</span>&#160;    Boolean minGpl = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00640"></a><span class="lineno">  640</span>&#160;    Boolean https = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00641"></a><span class="lineno">  641</span>&#160;    Boolean httpsGpl = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00642"></a><span class="lineno">  642</span>&#160;    Boolean audio = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00643"></a><span class="lineno">  643</span>&#160;    Boolean video = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00644"></a><span class="lineno">  644</span>&#160;    Boolean full = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00645"></a><span class="lineno">  645</span>&#160;    Boolean fullGpl = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00646"></a><span class="lineno">  646</span>&#160; </div>
+<div class="line"><a name="l00647"></a><span class="lineno">  647</span>&#160;    <span class="keywordflow">if</span> (speex &amp;&amp; fribidi) {</div>
+<div class="line"><a name="l00648"></a><span class="lineno">  648</span>&#160;        <span class="keywordflow">if</span> (xvid) {</div>
+<div class="line"><a name="l00649"></a><span class="lineno">  649</span>&#160;            fullGpl = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00650"></a><span class="lineno">  650</span>&#160;        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00651"></a><span class="lineno">  651</span>&#160;            full = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00652"></a><span class="lineno">  652</span>&#160;        }</div>
+<div class="line"><a name="l00653"></a><span class="lineno">  653</span>&#160;    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (speex) {</div>
+<div class="line"><a name="l00654"></a><span class="lineno">  654</span>&#160;        audio = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00655"></a><span class="lineno">  655</span>&#160;    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (fribidi) {</div>
+<div class="line"><a name="l00656"></a><span class="lineno">  656</span>&#160;        video = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00657"></a><span class="lineno">  657</span>&#160;    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (xvid) {</div>
+<div class="line"><a name="l00658"></a><span class="lineno">  658</span>&#160;        <span class="keywordflow">if</span> (gnutls) {</div>
+<div class="line"><a name="l00659"></a><span class="lineno">  659</span>&#160;            httpsGpl = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00660"></a><span class="lineno">  660</span>&#160;        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00661"></a><span class="lineno">  661</span>&#160;            minGpl = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00662"></a><span class="lineno">  662</span>&#160;        }</div>
+<div class="line"><a name="l00663"></a><span class="lineno">  663</span>&#160;    } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00664"></a><span class="lineno">  664</span>&#160;        <span class="keywordflow">if</span> (gnutls) {</div>
+<div class="line"><a name="l00665"></a><span class="lineno">  665</span>&#160;            https = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00666"></a><span class="lineno">  666</span>&#160;        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00667"></a><span class="lineno">  667</span>&#160;            min = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00668"></a><span class="lineno">  668</span>&#160;        }</div>
+<div class="line"><a name="l00669"></a><span class="lineno">  669</span>&#160;    }</div>
+<div class="line"><a name="l00670"></a><span class="lineno">  670</span>&#160; </div>
+<div class="line"><a name="l00671"></a><span class="lineno">  671</span>&#160;    <span class="keywordflow">if</span> (fullGpl) {</div>
+<div class="line"><a name="l00672"></a><span class="lineno">  672</span>&#160;        <span class="keywordflow">if</span> ([enabledLibraryArray containsObject:<span class="stringliteral">@&quot;fontconfig&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00673"></a><span class="lineno">  673</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;freetype&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00674"></a><span class="lineno">  674</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;fribidi&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00675"></a><span class="lineno">  675</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;gmp&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00676"></a><span class="lineno">  676</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;gnutls&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00677"></a><span class="lineno">  677</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;kvazaar&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00678"></a><span class="lineno">  678</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;mp3lame&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00679"></a><span class="lineno">  679</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libaom&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00680"></a><span class="lineno">  680</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libass&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00681"></a><span class="lineno">  681</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;iconv&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00682"></a><span class="lineno">  682</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libilbc&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00683"></a><span class="lineno">  683</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libtheora&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00684"></a><span class="lineno">  684</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libvidstab&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00685"></a><span class="lineno">  685</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libvorbis&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00686"></a><span class="lineno">  686</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libvpx&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00687"></a><span class="lineno">  687</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libwebp&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00688"></a><span class="lineno">  688</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libxml2&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00689"></a><span class="lineno">  689</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;opencore-amr&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00690"></a><span class="lineno">  690</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;opus&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00691"></a><span class="lineno">  691</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;shine&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00692"></a><span class="lineno">  692</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;snappy&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00693"></a><span class="lineno">  693</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;soxr&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00694"></a><span class="lineno">  694</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;speex&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00695"></a><span class="lineno">  695</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;twolame&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00696"></a><span class="lineno">  696</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;wavpack&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00697"></a><span class="lineno">  697</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;x264&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00698"></a><span class="lineno">  698</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;x265&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00699"></a><span class="lineno">  699</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;xvid&quot;</span>]) {</div>
+<div class="line"><a name="l00700"></a><span class="lineno">  700</span>&#160;            <span class="keywordflow">return</span> <span class="stringliteral">@&quot;full-gpl&quot;</span>;</div>
+<div class="line"><a name="l00701"></a><span class="lineno">  701</span>&#160;        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00702"></a><span class="lineno">  702</span>&#160;            <span class="keywordflow">return</span> <span class="stringliteral">@&quot;custom&quot;</span>;</div>
+<div class="line"><a name="l00703"></a><span class="lineno">  703</span>&#160;        }</div>
+<div class="line"><a name="l00704"></a><span class="lineno">  704</span>&#160;    }</div>
+<div class="line"><a name="l00705"></a><span class="lineno">  705</span>&#160; </div>
+<div class="line"><a name="l00706"></a><span class="lineno">  706</span>&#160;    <span class="keywordflow">if</span> (full) {</div>
+<div class="line"><a name="l00707"></a><span class="lineno">  707</span>&#160;        <span class="keywordflow">if</span> ([enabledLibraryArray containsObject:<span class="stringliteral">@&quot;fontconfig&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00708"></a><span class="lineno">  708</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;freetype&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00709"></a><span class="lineno">  709</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;fribidi&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00710"></a><span class="lineno">  710</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;gmp&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00711"></a><span class="lineno">  711</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;gnutls&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00712"></a><span class="lineno">  712</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;kvazaar&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00713"></a><span class="lineno">  713</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;mp3lame&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00714"></a><span class="lineno">  714</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libaom&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00715"></a><span class="lineno">  715</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libass&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00716"></a><span class="lineno">  716</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;iconv&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00717"></a><span class="lineno">  717</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libilbc&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00718"></a><span class="lineno">  718</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libtheora&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00719"></a><span class="lineno">  719</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libvorbis&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00720"></a><span class="lineno">  720</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libvpx&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00721"></a><span class="lineno">  721</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libwebp&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00722"></a><span class="lineno">  722</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libxml2&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00723"></a><span class="lineno">  723</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;opencore-amr&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00724"></a><span class="lineno">  724</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;opus&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00725"></a><span class="lineno">  725</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;shine&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00726"></a><span class="lineno">  726</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;snappy&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00727"></a><span class="lineno">  727</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;soxr&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00728"></a><span class="lineno">  728</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;speex&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00729"></a><span class="lineno">  729</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;twolame&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00730"></a><span class="lineno">  730</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;wavpack&quot;</span>]) {</div>
+<div class="line"><a name="l00731"></a><span class="lineno">  731</span>&#160;            <span class="keywordflow">return</span> <span class="stringliteral">@&quot;full&quot;</span>;</div>
+<div class="line"><a name="l00732"></a><span class="lineno">  732</span>&#160;        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00733"></a><span class="lineno">  733</span>&#160;            <span class="keywordflow">return</span> <span class="stringliteral">@&quot;custom&quot;</span>;</div>
+<div class="line"><a name="l00734"></a><span class="lineno">  734</span>&#160;        }</div>
+<div class="line"><a name="l00735"></a><span class="lineno">  735</span>&#160;    }</div>
+<div class="line"><a name="l00736"></a><span class="lineno">  736</span>&#160; </div>
+<div class="line"><a name="l00737"></a><span class="lineno">  737</span>&#160;    <span class="keywordflow">if</span> (video) {</div>
+<div class="line"><a name="l00738"></a><span class="lineno">  738</span>&#160;        <span class="keywordflow">if</span> ([enabledLibraryArray containsObject:<span class="stringliteral">@&quot;fontconfig&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00739"></a><span class="lineno">  739</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;freetype&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00740"></a><span class="lineno">  740</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;fribidi&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00741"></a><span class="lineno">  741</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;kvazaar&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00742"></a><span class="lineno">  742</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libaom&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00743"></a><span class="lineno">  743</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libass&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00744"></a><span class="lineno">  744</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;iconv&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00745"></a><span class="lineno">  745</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libtheora&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00746"></a><span class="lineno">  746</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libvpx&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00747"></a><span class="lineno">  747</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libwebp&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00748"></a><span class="lineno">  748</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;snappy&quot;</span>]) {</div>
+<div class="line"><a name="l00749"></a><span class="lineno">  749</span>&#160;            <span class="keywordflow">return</span> <span class="stringliteral">@&quot;video&quot;</span>;</div>
+<div class="line"><a name="l00750"></a><span class="lineno">  750</span>&#160;        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00751"></a><span class="lineno">  751</span>&#160;            <span class="keywordflow">return</span> <span class="stringliteral">@&quot;custom&quot;</span>;</div>
+<div class="line"><a name="l00752"></a><span class="lineno">  752</span>&#160;        }</div>
+<div class="line"><a name="l00753"></a><span class="lineno">  753</span>&#160;    }</div>
+<div class="line"><a name="l00754"></a><span class="lineno">  754</span>&#160; </div>
+<div class="line"><a name="l00755"></a><span class="lineno">  755</span>&#160;    <span class="keywordflow">if</span> (audio) {</div>
+<div class="line"><a name="l00756"></a><span class="lineno">  756</span>&#160;        <span class="keywordflow">if</span> ([enabledLibraryArray containsObject:<span class="stringliteral">@&quot;mp3lame&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00757"></a><span class="lineno">  757</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libilbc&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00758"></a><span class="lineno">  758</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libvorbis&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00759"></a><span class="lineno">  759</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;opencore-amr&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00760"></a><span class="lineno">  760</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;opus&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00761"></a><span class="lineno">  761</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;shine&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00762"></a><span class="lineno">  762</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;soxr&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00763"></a><span class="lineno">  763</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;speex&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00764"></a><span class="lineno">  764</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;twolame&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00765"></a><span class="lineno">  765</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;wavpack&quot;</span>]) {</div>
+<div class="line"><a name="l00766"></a><span class="lineno">  766</span>&#160;            <span class="keywordflow">return</span> <span class="stringliteral">@&quot;audio&quot;</span>;</div>
+<div class="line"><a name="l00767"></a><span class="lineno">  767</span>&#160;        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00768"></a><span class="lineno">  768</span>&#160;            <span class="keywordflow">return</span> <span class="stringliteral">@&quot;custom&quot;</span>;</div>
+<div class="line"><a name="l00769"></a><span class="lineno">  769</span>&#160;        }</div>
+<div class="line"><a name="l00770"></a><span class="lineno">  770</span>&#160;    }</div>
+<div class="line"><a name="l00771"></a><span class="lineno">  771</span>&#160; </div>
+<div class="line"><a name="l00772"></a><span class="lineno">  772</span>&#160;    <span class="keywordflow">if</span> (httpsGpl) {</div>
+<div class="line"><a name="l00773"></a><span class="lineno">  773</span>&#160;        <span class="keywordflow">if</span> ([enabledLibraryArray containsObject:<span class="stringliteral">@&quot;gmp&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00774"></a><span class="lineno">  774</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;gnutls&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00775"></a><span class="lineno">  775</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libvidstab&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00776"></a><span class="lineno">  776</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;x264&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00777"></a><span class="lineno">  777</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;x265&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00778"></a><span class="lineno">  778</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;xvid&quot;</span>]) {</div>
+<div class="line"><a name="l00779"></a><span class="lineno">  779</span>&#160;            <span class="keywordflow">return</span> <span class="stringliteral">@&quot;https-gpl&quot;</span>;</div>
+<div class="line"><a name="l00780"></a><span class="lineno">  780</span>&#160;        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00781"></a><span class="lineno">  781</span>&#160;            <span class="keywordflow">return</span> <span class="stringliteral">@&quot;custom&quot;</span>;</div>
+<div class="line"><a name="l00782"></a><span class="lineno">  782</span>&#160;        }</div>
+<div class="line"><a name="l00783"></a><span class="lineno">  783</span>&#160;    }</div>
+<div class="line"><a name="l00784"></a><span class="lineno">  784</span>&#160; </div>
+<div class="line"><a name="l00785"></a><span class="lineno">  785</span>&#160;    <span class="keywordflow">if</span> (https) {</div>
+<div class="line"><a name="l00786"></a><span class="lineno">  786</span>&#160;        <span class="keywordflow">if</span> ([enabledLibraryArray containsObject:<span class="stringliteral">@&quot;gmp&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00787"></a><span class="lineno">  787</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;gnutls&quot;</span>]) {</div>
+<div class="line"><a name="l00788"></a><span class="lineno">  788</span>&#160;            <span class="keywordflow">return</span> <span class="stringliteral">@&quot;https&quot;</span>;</div>
+<div class="line"><a name="l00789"></a><span class="lineno">  789</span>&#160;        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00790"></a><span class="lineno">  790</span>&#160;            <span class="keywordflow">return</span> <span class="stringliteral">@&quot;custom&quot;</span>;</div>
+<div class="line"><a name="l00791"></a><span class="lineno">  791</span>&#160;        }</div>
+<div class="line"><a name="l00792"></a><span class="lineno">  792</span>&#160;    }</div>
+<div class="line"><a name="l00793"></a><span class="lineno">  793</span>&#160; </div>
+<div class="line"><a name="l00794"></a><span class="lineno">  794</span>&#160;    <span class="keywordflow">if</span> (minGpl) {</div>
+<div class="line"><a name="l00795"></a><span class="lineno">  795</span>&#160;        <span class="keywordflow">if</span> ([enabledLibraryArray containsObject:<span class="stringliteral">@&quot;libvidstab&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00796"></a><span class="lineno">  796</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;x264&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00797"></a><span class="lineno">  797</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;x265&quot;</span>] &amp;&amp;</div>
+<div class="line"><a name="l00798"></a><span class="lineno">  798</span>&#160;            [enabledLibraryArray containsObject:<span class="stringliteral">@&quot;xvid&quot;</span>]) {</div>
+<div class="line"><a name="l00799"></a><span class="lineno">  799</span>&#160;            <span class="keywordflow">return</span> <span class="stringliteral">@&quot;min-gpl&quot;</span>;</div>
+<div class="line"><a name="l00800"></a><span class="lineno">  800</span>&#160;        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00801"></a><span class="lineno">  801</span>&#160;            <span class="keywordflow">return</span> <span class="stringliteral">@&quot;custom&quot;</span>;</div>
+<div class="line"><a name="l00802"></a><span class="lineno">  802</span>&#160;        }</div>
+<div class="line"><a name="l00803"></a><span class="lineno">  803</span>&#160;    }</div>
+<div class="line"><a name="l00804"></a><span class="lineno">  804</span>&#160; </div>
+<div class="line"><a name="l00805"></a><span class="lineno">  805</span>&#160;    <span class="keywordflow">return</span> <span class="stringliteral">@&quot;min&quot;</span>;</div>
+<div class="line"><a name="l00806"></a><span class="lineno">  806</span>&#160;}</div>
+<div class="line"><a name="l00807"></a><span class="lineno">  807</span>&#160; </div>
+<div class="line"><a name="l00813"></a><span class="lineno"><a class="line" href="../../df/d45/interface_mobile_f_fmpeg_config.html#a17a80daa4903d8e7b4490c42f85396c9">  813</a></span>&#160;+ (NSArray*)<a class="code" href="../../df/d45/interface_mobile_f_fmpeg_config.html#a17a80daa4903d8e7b4490c42f85396c9">getExternalLibraries</a> {</div>
+<div class="line"><a name="l00814"></a><span class="lineno">  814</span>&#160;    NSString *buildConfiguration = [<a class="code" href="../../df/d45/interface_mobile_f_fmpeg_config.html">MobileFFmpegConfig</a> <a class="code" href="../../df/d45/interface_mobile_f_fmpeg_config.html#aa5d2ee83a36d86a735474684fb33433c">getBuildConf</a>];</div>
+<div class="line"><a name="l00815"></a><span class="lineno">  815</span>&#160;    NSMutableArray *enabledLibraryArray = [[NSMutableArray alloc] init];</div>
+<div class="line"><a name="l00816"></a><span class="lineno">  816</span>&#160; </div>
+<div class="line"><a name="l00817"></a><span class="lineno">  817</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0; i &lt; [supportedExternalLibraries count]; i++) {</div>
+<div class="line"><a name="l00818"></a><span class="lineno">  818</span>&#160;        NSString *supportedExternalLibrary = [supportedExternalLibraries objectAtIndex:i];</div>
+<div class="line"><a name="l00819"></a><span class="lineno">  819</span>&#160; </div>
+<div class="line"><a name="l00820"></a><span class="lineno">  820</span>&#160;        NSString *libraryName1 = [NSString stringWithFormat:@&quot;enable-%@&quot;, supportedExternalLibrary];</div>
+<div class="line"><a name="l00821"></a><span class="lineno">  821</span>&#160;        NSString *libraryName2 = [NSString stringWithFormat:@&quot;enable-lib%@&quot;, supportedExternalLibrary];</div>
+<div class="line"><a name="l00822"></a><span class="lineno">  822</span>&#160; </div>
+<div class="line"><a name="l00823"></a><span class="lineno">  823</span>&#160;        <span class="keywordflow">if</span> ([buildConfiguration rangeOfString:libraryName1].location != NSNotFound || [buildConfiguration rangeOfString:libraryName2].location != NSNotFound) {</div>
+<div class="line"><a name="l00824"></a><span class="lineno">  824</span>&#160;            [enabledLibraryArray addObject:supportedExternalLibrary];</div>
+<div class="line"><a name="l00825"></a><span class="lineno">  825</span>&#160;        }</div>
+<div class="line"><a name="l00826"></a><span class="lineno">  826</span>&#160;    }</div>
+<div class="line"><a name="l00827"></a><span class="lineno">  827</span>&#160; </div>
+<div class="line"><a name="l00828"></a><span class="lineno">  828</span>&#160;    [enabledLibraryArray sortUsingSelector:@selector(compare:)];</div>
+<div class="line"><a name="l00829"></a><span class="lineno">  829</span>&#160; </div>
+<div class="line"><a name="l00830"></a><span class="lineno">  830</span>&#160;    <span class="keywordflow">return</span> enabledLibraryArray;</div>
+<div class="line"><a name="l00831"></a><span class="lineno">  831</span>&#160;}</div>
+<div class="line"><a name="l00832"></a><span class="lineno">  832</span>&#160; </div>
+<div class="line"><a name="l00840"></a><span class="lineno"><a class="line" href="../../df/d45/interface_mobile_f_fmpeg_config.html#ac861ab3fcda37bcdfb88f24f082b2b87">  840</a></span>&#160;+ (NSString*)<a class="code" href="../../df/d45/interface_mobile_f_fmpeg_config.html#ac861ab3fcda37bcdfb88f24f082b2b87">registerNewFFmpegPipe</a> {</div>
+<div class="line"><a name="l00841"></a><span class="lineno">  841</span>&#160; </div>
+<div class="line"><a name="l00842"></a><span class="lineno">  842</span>&#160;    <span class="comment">// PIPES ARE CREATED UNDER THE CACHE DIRECTORY</span></div>
+<div class="line"><a name="l00843"></a><span class="lineno">  843</span>&#160;    NSString *cacheDir = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0];</div>
+<div class="line"><a name="l00844"></a><span class="lineno">  844</span>&#160; </div>
+<div class="line"><a name="l00845"></a><span class="lineno">  845</span>&#160;    NSString *newFFmpegPipePath = [NSString stringWithFormat:@&quot;%@/%@%d&quot;, cacheDir, MOBILE_FFMPEG_PIPE_PREFIX, (++lastCreatedPipeIndex)];</div>
+<div class="line"><a name="l00846"></a><span class="lineno">  846</span>&#160; </div>
+<div class="line"><a name="l00847"></a><span class="lineno">  847</span>&#160;    <span class="comment">// FIRST CLOSE OLD PIPES WITH THE SAME NAME</span></div>
+<div class="line"><a name="l00848"></a><span class="lineno">  848</span>&#160;    [<a class="code" href="../../df/d45/interface_mobile_f_fmpeg_config.html">MobileFFmpegConfig</a> <a class="code" href="../../df/d45/interface_mobile_f_fmpeg_config.html#a98ef246bf01900e2109e628b4d9cc9f9">closeFFmpegPipe</a>:newFFmpegPipePath];</div>
+<div class="line"><a name="l00849"></a><span class="lineno">  849</span>&#160; </div>
+<div class="line"><a name="l00850"></a><span class="lineno">  850</span>&#160;    <span class="keywordtype">int</span> rc = mkfifo([newFFmpegPipePath UTF8String], S_IRWXU | S_IRWXG | S_IROTH);</div>
+<div class="line"><a name="l00851"></a><span class="lineno">  851</span>&#160;    <span class="keywordflow">if</span> (rc == 0) {</div>
+<div class="line"><a name="l00852"></a><span class="lineno">  852</span>&#160;        <span class="keywordflow">return</span> newFFmpegPipePath;</div>
+<div class="line"><a name="l00853"></a><span class="lineno">  853</span>&#160;    } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00854"></a><span class="lineno">  854</span>&#160;        <span class="keywordtype">int</span> activeLogLevel = av_log_get_level();</div>
+<div class="line"><a name="l00855"></a><span class="lineno">  855</span>&#160;        <span class="keywordflow">if</span> ((activeLogLevel != <a class="code" href="../../de/dea/_mobile_f_fmpeg_config_8h.html#a11e329935b59b83ca722b66674f37fd4">AV_LOG_QUIET</a>) &amp;&amp; (<a class="code" href="../../de/dea/_mobile_f_fmpeg_config_8h.html#a85b57516ca703cc47d9bbe5f4658c716">AV_LOG_WARNING</a> &lt;= activeLogLevel)) {</div>
+<div class="line"><a name="l00856"></a><span class="lineno">  856</span>&#160;            NSLog(<span class="stringliteral">@&quot;Failed to register new FFmpeg pipe %@. Operation failed with rc=%d.&quot;</span>, newFFmpegPipePath, rc);</div>
+<div class="line"><a name="l00857"></a><span class="lineno">  857</span>&#160;        }</div>
+<div class="line"><a name="l00858"></a><span class="lineno">  858</span>&#160;        <span class="keywordflow">return</span> nil;</div>
+<div class="line"><a name="l00859"></a><span class="lineno">  859</span>&#160;    }</div>
+<div class="line"><a name="l00860"></a><span class="lineno">  860</span>&#160;}</div>
+<div class="line"><a name="l00861"></a><span class="lineno">  861</span>&#160; </div>
+<div class="line"><a name="l00867"></a><span class="lineno"><a class="line" href="../../df/d45/interface_mobile_f_fmpeg_config.html#a98ef246bf01900e2109e628b4d9cc9f9">  867</a></span>&#160;+ (void)closeFFmpegPipe: (NSString*)ffmpegPipePath {</div>
+<div class="line"><a name="l00868"></a><span class="lineno">  868</span>&#160;    NSFileManager *fileManager = [NSFileManager defaultManager];</div>
+<div class="line"><a name="l00869"></a><span class="lineno">  869</span>&#160; </div>
+<div class="line"><a name="l00870"></a><span class="lineno">  870</span>&#160;    <span class="keywordflow">if</span> ([fileManager fileExistsAtPath:ffmpegPipePath]){</div>
+<div class="line"><a name="l00871"></a><span class="lineno">  871</span>&#160;        [fileManager removeItemAtPath:ffmpegPipePath error:NULL];</div>
+<div class="line"><a name="l00872"></a><span class="lineno">  872</span>&#160;    }</div>
+<div class="line"><a name="l00873"></a><span class="lineno">  873</span>&#160;}</div>
+<div class="line"><a name="l00874"></a><span class="lineno">  874</span>&#160; </div>
+<div class="line"><a name="l00880"></a><span class="lineno"><a class="line" href="../../df/d45/interface_mobile_f_fmpeg_config.html#ada92e6ffd8cb406eab6ebe1d7659a2d1">  880</a></span>&#160;+ (NSString*)<a class="code" href="../../df/d45/interface_mobile_f_fmpeg_config.html#ada92e6ffd8cb406eab6ebe1d7659a2d1">getFFmpegVersion</a> {</div>
+<div class="line"><a name="l00881"></a><span class="lineno">  881</span>&#160;    <span class="keywordflow">return</span> [NSString stringWithUTF8String:FFMPEG_VERSION];</div>
+<div class="line"><a name="l00882"></a><span class="lineno">  882</span>&#160;}</div>
+<div class="line"><a name="l00883"></a><span class="lineno">  883</span>&#160; </div>
+<div class="line"><a name="l00889"></a><span class="lineno"><a class="line" href="../../df/d45/interface_mobile_f_fmpeg_config.html#a3d9f82e7cfb6c95fdfb4021b4e3b2194">  889</a></span>&#160;+ (NSString*)<a class="code" href="../../df/d45/interface_mobile_f_fmpeg_config.html#a3d9f82e7cfb6c95fdfb4021b4e3b2194">getVersion</a> {</div>
+<div class="line"><a name="l00890"></a><span class="lineno">  890</span>&#160;    <span class="keywordflow">if</span> ([<a class="code" href="../../dd/d2b/interface_arch_detect.html">ArchDetect</a> isLTSBuild] == 1) {</div>
+<div class="line"><a name="l00891"></a><span class="lineno">  891</span>&#160;        <span class="keywordflow">return</span> [NSString stringWithFormat:@&quot;%@-lts&quot;, MOBILE_FFMPEG_VERSION];</div>
+<div class="line"><a name="l00892"></a><span class="lineno">  892</span>&#160;    } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00893"></a><span class="lineno">  893</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="../../de/d1a/_mobile_f_fmpeg_8h.html#a4195a7107d7e543caceb997e9d0d2fce">MOBILE_FFMPEG_VERSION</a>;</div>
+<div class="line"><a name="l00894"></a><span class="lineno">  894</span>&#160;    }</div>
+<div class="line"><a name="l00895"></a><span class="lineno">  895</span>&#160;}</div>
+<div class="line"><a name="l00896"></a><span class="lineno">  896</span>&#160; </div>
+<div class="line"><a name="l00902"></a><span class="lineno"><a class="line" href="../../df/d45/interface_mobile_f_fmpeg_config.html#a5adfbaa584362f6cd55a4a120507fd0e">  902</a></span>&#160;+ (NSString*)<a class="code" href="../../df/d45/interface_mobile_f_fmpeg_config.html#a5adfbaa584362f6cd55a4a120507fd0e">getBuildDate</a> {</div>
+<div class="line"><a name="l00903"></a><span class="lineno">  903</span>&#160;    <span class="keywordtype">char</span> buildDate[10];</div>
+<div class="line"><a name="l00904"></a><span class="lineno">  904</span>&#160;    sprintf(buildDate, <span class="stringliteral">&quot;%d&quot;</span>, MOBILE_FFMPEG_BUILD_DATE);</div>
+<div class="line"><a name="l00905"></a><span class="lineno">  905</span>&#160;    <span class="keywordflow">return</span> [NSString stringWithUTF8String:buildDate];</div>
+<div class="line"><a name="l00906"></a><span class="lineno">  906</span>&#160;}</div>
+<div class="line"><a name="l00907"></a><span class="lineno">  907</span>&#160; </div>
+<div class="line"><a name="l00913"></a><span class="lineno"><a class="line" href="../../df/d45/interface_mobile_f_fmpeg_config.html#a37e8ebe4487e5a298dc7af943be56010">  913</a></span>&#160;+ (<a class="code" href="../../d2/d36/fftools__ffmpeg__filter_8c.html#a61569f2965b7a369eb10b6d75d410d11">int</a>)<a class="code" href="../../df/d45/interface_mobile_f_fmpeg_config.html#a37e8ebe4487e5a298dc7af943be56010">getLastReturnCode</a> {</div>
+<div class="line"><a name="l00914"></a><span class="lineno">  914</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#ae7a108ddd6a67ae1f62a675b05aac9d5">lastReturnCode</a>;</div>
+<div class="line"><a name="l00915"></a><span class="lineno">  915</span>&#160;}</div>
+<div class="line"><a name="l00916"></a><span class="lineno">  916</span>&#160; </div>
+<div class="line"><a name="l00928"></a><span class="lineno"><a class="line" href="../../df/d45/interface_mobile_f_fmpeg_config.html#a0d82d52dfacc516f2a0c2f277d29bf63">  928</a></span>&#160;+ (NSString*)<a class="code" href="../../df/d45/interface_mobile_f_fmpeg_config.html#a0d82d52dfacc516f2a0c2f277d29bf63">getLastCommandOutput</a> {</div>
+<div class="line"><a name="l00929"></a><span class="lineno">  929</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#a342e10e2589c067da75d3be8aac473c6">lastCommandOutput</a>;</div>
+<div class="line"><a name="l00930"></a><span class="lineno">  930</span>&#160;}</div>
+<div class="line"><a name="l00931"></a><span class="lineno">  931</span>&#160; </div>
+<div class="line"><a name="l00932"></a><span class="lineno">  932</span>&#160;<span class="keyword">@end</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <div class="ttc" id="a_mobile_f_fmpeg_config_8m_html_a4d8475531b98508bd77f07d9300c7c96"><div class="ttname"><a href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#a4d8475531b98508bd77f07d9300c7c96">MOBILE_FFMPEG_PIPE_PREFIX</a></div><div class="ttdeci">NSString *const MOBILE_FFMPEG_PIPE_PREFIX</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00153">MobileFFmpegConfig.m:153</a></div></div>
 <div class="ttc" id="a_statistics_8m_html_a6dc6e6f3c75c509ce943163afb5dade7"><div class="ttname"><a href="../../d9/db1/_statistics_8m.html#a6dc6e6f3c75c509ce943163afb5dade7">speed</a></div><div class="ttdeci">double speed</div><div class="ttdef"><b>Definition:</b> <a href="../../d9/db1/_statistics_8m_source.html#l00029">Statistics.m:29</a></div></div>
@@ -853,10 +857,10 @@ $(function() {
 <div class="ttc" id="a_mobile_f_fmpeg_config_8h_html_a85b57516ca703cc47d9bbe5f4658c716"><div class="ttname"><a href="../../de/dea/_mobile_f_fmpeg_config_8h.html#a85b57516ca703cc47d9bbe5f4658c716">AV_LOG_WARNING</a></div><div class="ttdeci">#define AV_LOG_WARNING</div><div class="ttdef"><b>Definition:</b> <a href="../../de/dea/_mobile_f_fmpeg_config_8h_source.html#l00061">MobileFFmpegConfig.h:61</a></div></div>
 <div class="ttc" id="a_mobile_f_fmpeg_config_8m_html_a791ecc42e908c87d50f3fa0ad28bce28"><div class="ttname"><a href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#a791ecc42e908c87d50f3fa0ad28bce28">statisticsSpeed</a></div><div class="ttdeci">double statisticsSpeed</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00053">MobileFFmpegConfig.m:53</a></div></div>
 <div class="ttc" id="a_mobile_f_fmpeg_config_8m_html_a2c334c87d8c60bc99ecdf9d297943318ae6b6c0f8a115b1b9552df5bd5ad0936a"><div class="ttname"><a href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#a2c334c87d8c60bc99ecdf9d297943318ae6b6c0f8a115b1b9552df5bd5ad0936a">StatisticsType</a></div><div class="ttdeci">@ StatisticsType</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00030">MobileFFmpegConfig.m:30</a></div></div>
-<div class="ttc" id="ainterface_mobile_f_fmpeg_config_html_ac1a6b38a63bfe4a0fa33377ccf4a8dbe"><div class="ttname"><a href="../../df/d45/interface_mobile_f_fmpeg_config.html#ac1a6b38a63bfe4a0fa33377ccf4a8dbe">+[MobileFFmpegConfig resetStatistics]</a></div><div class="ttdeci">void resetStatistics()</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00512">MobileFFmpegConfig.m:512</a></div></div>
+<div class="ttc" id="ainterface_mobile_f_fmpeg_config_html_ac1a6b38a63bfe4a0fa33377ccf4a8dbe"><div class="ttname"><a href="../../df/d45/interface_mobile_f_fmpeg_config.html#ac1a6b38a63bfe4a0fa33377ccf4a8dbe">+[MobileFFmpegConfig resetStatistics]</a></div><div class="ttdeci">void resetStatistics()</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00516">MobileFFmpegConfig.m:516</a></div></div>
 <div class="ttc" id="ainterface_mobile_f_fmpeg_config_html_af6148bf2d55101d364b9b63da047a618"><div class="ttname"><a href="../../df/d45/interface_mobile_f_fmpeg_config.html#af6148bf2d55101d364b9b63da047a618">+[MobileFFmpegConfig initialize]</a></div><div class="ttdeci">void initialize()</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00352">MobileFFmpegConfig.m:352</a></div></div>
 <div class="ttc" id="a_media_information_8m_html_a4463441abf566bc2703745548576b112"><div class="ttname"><a href="../../d5/d1a/_media_information_8m.html#a4463441abf566bc2703745548576b112">bitrate</a></div><div class="ttdeci">NSNumber * bitrate</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/d1a/_media_information_8m_source.html#l00047">MediaInformation.m:47</a></div></div>
-<div class="ttc" id="ainterface_mobile_f_fmpeg_config_html_a17a80daa4903d8e7b4490c42f85396c9"><div class="ttname"><a href="../../df/d45/interface_mobile_f_fmpeg_config.html#a17a80daa4903d8e7b4490c42f85396c9">+[MobileFFmpegConfig getExternalLibraries]</a></div><div class="ttdeci">NSArray * getExternalLibraries()</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00809">MobileFFmpegConfig.m:809</a></div></div>
+<div class="ttc" id="ainterface_mobile_f_fmpeg_config_html_a17a80daa4903d8e7b4490c42f85396c9"><div class="ttname"><a href="../../df/d45/interface_mobile_f_fmpeg_config.html#a17a80daa4903d8e7b4490c42f85396c9">+[MobileFFmpegConfig getExternalLibraries]</a></div><div class="ttdeci">NSArray * getExternalLibraries()</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00813">MobileFFmpegConfig.m:813</a></div></div>
 <div class="ttc" id="a_mobile_f_fmpeg_config_8h_html_a96970a2980bf6ad28cd403e7dc52d6c5"><div class="ttname"><a href="../../de/dea/_mobile_f_fmpeg_config_8h.html#a96970a2980bf6ad28cd403e7dc52d6c5">AV_LOG_FATAL</a></div><div class="ttdeci">#define AV_LOG_FATAL</div><div class="ttdef"><b>Definition:</b> <a href="../../de/dea/_mobile_f_fmpeg_config_8h_source.html#l00049">MobileFFmpegConfig.h:49</a></div></div>
 <div class="ttc" id="a_mobile_f_fmpeg_config_8m_html_a5f5082a8a3faf4573f6b11934b50af3a"><div class="ttname"><a href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#a5f5082a8a3faf4573f6b11934b50af3a">statisticsCallbackDataAdd</a></div><div class="ttdeci">void statisticsCallbackDataAdd(int frameNumber, float fps, float quality, int64_t size, int time, double bitrate, double speed)</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00188">MobileFFmpegConfig.m:188</a></div></div>
 <div class="ttc" id="a_mobile_f_fmpeg_config_8h_html_affe151ff4cd8a24b2e77ac8d9616c85c"><div class="ttname"><a href="../../de/dea/_mobile_f_fmpeg_config_8h.html#affe151ff4cd8a24b2e77ac8d9616c85c">AV_LOG_ERROR</a></div><div class="ttdeci">#define AV_LOG_ERROR</div><div class="ttdef"><b>Definition:</b> <a href="../../de/dea/_mobile_f_fmpeg_config_8h_source.html#l00055">MobileFFmpegConfig.h:55</a></div></div>
@@ -866,7 +870,7 @@ $(function() {
 <div class="ttc" id="a_media_information_8m_html_a5552179bb57b10de7dfd8b47e47a76d1"><div class="ttname"><a href="../../d5/d1a/_media_information_8m.html#a5552179bb57b10de7dfd8b47e47a76d1">path</a></div><div class="ttdeci">NSString * path</div><div class="ttdef"><b>Definition:</b> <a href="../../d5/d1a/_media_information_8m_source.html#l00022">MediaInformation.m:22</a></div></div>
 <div class="ttc" id="a_mobile_f_fmpeg_config_8m_html_af5de988322381a65389fe8ef984e7f74"><div class="ttname"><a href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#af5de988322381a65389fe8ef984e7f74">RETURN_CODE_CANCEL</a></div><div class="ttdeci">const int RETURN_CODE_CANCEL</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00147">MobileFFmpegConfig.m:147</a></div></div>
 <div class="ttc" id="ainterface_callback_data_html_aa3cb776d0cff49da468d408cd1c618e0"><div class="ttname"><a href="../../d8/d27/interface_callback_data.html#aa3cb776d0cff49da468d408cd1c618e0">-[CallbackData getLogData]</a></div><div class="ttdeci">NSString * getLogData()</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00099">MobileFFmpegConfig.m:99</a></div></div>
-<div class="ttc" id="ainterface_mobile_f_fmpeg_config_html_a4e849048a122782d3e292cf1f604e8cd"><div class="ttname"><a href="../../df/d45/interface_mobile_f_fmpeg_config.html#a4e849048a122782d3e292cf1f604e8cd">+[MobileFFmpegConfig enableRedirection]</a></div><div class="ttdeci">void enableRedirection()</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00403">MobileFFmpegConfig.m:403</a></div></div>
+<div class="ttc" id="ainterface_mobile_f_fmpeg_config_html_a4e849048a122782d3e292cf1f604e8cd"><div class="ttname"><a href="../../df/d45/interface_mobile_f_fmpeg_config.html#a4e849048a122782d3e292cf1f604e8cd">+[MobileFFmpegConfig enableRedirection]</a></div><div class="ttdeci">void enableRedirection()</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00407">MobileFFmpegConfig.m:407</a></div></div>
 <div class="ttc" id="a_mobile_f_fmpeg_8h_html"><div class="ttname"><a href="../../de/d1a/_mobile_f_fmpeg_8h.html">MobileFFmpeg.h</a></div></div>
 <div class="ttc" id="a_mobile_f_fmpeg_config_8h_html_a09623098406ba81d130824ac742d146e"><div class="ttname"><a href="../../de/dea/_mobile_f_fmpeg_config_8h.html#a09623098406ba81d130824ac742d146e">AV_LOG_PANIC</a></div><div class="ttdeci">#define AV_LOG_PANIC</div><div class="ttdef"><b>Definition:</b> <a href="../../de/dea/_mobile_f_fmpeg_config_8h_source.html#l00042">MobileFFmpegConfig.h:42</a></div></div>
 <div class="ttc" id="a_mobile_f_fmpeg_config_8m_html_aa91ec0f91afe80906264eb5dcec1bc9f"><div class="ttname"><a href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#aa91ec0f91afe80906264eb5dcec1bc9f">semaphore</a></div><div class="ttdeci">static dispatch_semaphore_t semaphore</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00136">MobileFFmpegConfig.m:136</a></div></div>
@@ -878,30 +882,30 @@ $(function() {
 <div class="ttc" id="a_mobile_f_fmpeg_config_8m_html_a93810b6a9ba8cf5dfa7a42e0aafe0365"><div class="ttname"><a href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#a93810b6a9ba8cf5dfa7a42e0aafe0365">lastCreatedPipeIndex</a></div><div class="ttdeci">static int lastCreatedPipeIndex</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00159">MobileFFmpegConfig.m:159</a></div></div>
 <div class="ttc" id="a_mobile_f_fmpeg_config_8m_html_aa30519ff1f0aad4018957668255ee85a"><div class="ttname"><a href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#aa30519ff1f0aad4018957668255ee85a">statisticsFps</a></div><div class="ttdeci">float statisticsFps</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00048">MobileFFmpegConfig.m:48</a></div></div>
 <div class="ttc" id="ainterface_callback_data_html_a8c52fa5e18231fc95cc18b29463b236a"><div class="ttname"><a href="../../d8/d27/interface_callback_data.html#a8c52fa5e18231fc95cc18b29463b236a">-[CallbackData getStatisticsSize]</a></div><div class="ttdeci">int64_t getStatisticsSize()</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00115">MobileFFmpegConfig.m:115</a></div></div>
-<div class="ttc" id="ainterface_mobile_f_fmpeg_config_html_ada92e6ffd8cb406eab6ebe1d7659a2d1"><div class="ttname"><a href="../../df/d45/interface_mobile_f_fmpeg_config.html#ada92e6ffd8cb406eab6ebe1d7659a2d1">+[MobileFFmpegConfig getFFmpegVersion]</a></div><div class="ttdeci">NSString * getFFmpegVersion()</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00876">MobileFFmpegConfig.m:876</a></div></div>
-<div class="ttc" id="ainterface_mobile_f_fmpeg_config_html_a3d9f82e7cfb6c95fdfb4021b4e3b2194"><div class="ttname"><a href="../../df/d45/interface_mobile_f_fmpeg_config.html#a3d9f82e7cfb6c95fdfb4021b4e3b2194">+[MobileFFmpegConfig getVersion]</a></div><div class="ttdeci">NSString * getVersion()</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00885">MobileFFmpegConfig.m:885</a></div></div>
-<div class="ttc" id="ainterface_mobile_f_fmpeg_config_html_a5adfbaa584362f6cd55a4a120507fd0e"><div class="ttname"><a href="../../df/d45/interface_mobile_f_fmpeg_config.html#a5adfbaa584362f6cd55a4a120507fd0e">+[MobileFFmpegConfig getBuildDate]</a></div><div class="ttdeci">NSString * getBuildDate()</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00898">MobileFFmpegConfig.m:898</a></div></div>
+<div class="ttc" id="ainterface_mobile_f_fmpeg_config_html_ada92e6ffd8cb406eab6ebe1d7659a2d1"><div class="ttname"><a href="../../df/d45/interface_mobile_f_fmpeg_config.html#ada92e6ffd8cb406eab6ebe1d7659a2d1">+[MobileFFmpegConfig getFFmpegVersion]</a></div><div class="ttdeci">NSString * getFFmpegVersion()</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00880">MobileFFmpegConfig.m:880</a></div></div>
+<div class="ttc" id="ainterface_mobile_f_fmpeg_config_html_a3d9f82e7cfb6c95fdfb4021b4e3b2194"><div class="ttname"><a href="../../df/d45/interface_mobile_f_fmpeg_config.html#a3d9f82e7cfb6c95fdfb4021b4e3b2194">+[MobileFFmpegConfig getVersion]</a></div><div class="ttdeci">NSString * getVersion()</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00889">MobileFFmpegConfig.m:889</a></div></div>
+<div class="ttc" id="ainterface_mobile_f_fmpeg_config_html_a5adfbaa584362f6cd55a4a120507fd0e"><div class="ttname"><a href="../../df/d45/interface_mobile_f_fmpeg_config.html#a5adfbaa584362f6cd55a4a120507fd0e">+[MobileFFmpegConfig getBuildDate]</a></div><div class="ttdeci">NSString * getBuildDate()</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00902">MobileFFmpegConfig.m:902</a></div></div>
 <div class="ttc" id="a_mobile_f_fmpeg_config_8m_html_a644c542922f73e055f1262790e04b97e"><div class="ttname"><a href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#a644c542922f73e055f1262790e04b97e">callbackNotify</a></div><div class="ttdeci">void callbackNotify()</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00165">MobileFFmpegConfig.m:165</a></div></div>
 <div class="ttc" id="a_statistics_8m_html_a453b6f47a32a66668745b8ad4b6f4b94"><div class="ttname"><a href="../../d9/db1/_statistics_8m.html#a453b6f47a32a66668745b8ad4b6f4b94">videoQuality</a></div><div class="ttdeci">float videoQuality</div><div class="ttdef"><b>Definition:</b> <a href="../../d9/db1/_statistics_8m_source.html#l00025">Statistics.m:25</a></div></div>
 <div class="ttc" id="a_mobile_f_fmpeg_config_8m_html_a0d14c1d315a753420a92bfee4857406d"><div class="ttname"><a href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#a0d14c1d315a753420a92bfee4857406d">LIB_NAME</a></div><div class="ttdeci">NSString *const LIB_NAME</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00152">MobileFFmpegConfig.m:152</a></div></div>
 <div class="ttc" id="ainterface_callback_data_html_a2be0d8fc9397a173bd47694ae766714e"><div class="ttname"><a href="../../d8/d27/interface_callback_data.html#a2be0d8fc9397a173bd47694ae766714e">-[CallbackData getStatisticsQuality]</a></div><div class="ttdeci">float getStatisticsQuality()</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00111">MobileFFmpegConfig.m:111</a></div></div>
-<div class="ttc" id="ainterface_mobile_f_fmpeg_config_html_a37e8ebe4487e5a298dc7af943be56010"><div class="ttname"><a href="../../df/d45/interface_mobile_f_fmpeg_config.html#a37e8ebe4487e5a298dc7af943be56010">+[MobileFFmpegConfig getLastReturnCode]</a></div><div class="ttdeci">int getLastReturnCode()</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00909">MobileFFmpegConfig.m:909</a></div></div>
+<div class="ttc" id="ainterface_mobile_f_fmpeg_config_html_a37e8ebe4487e5a298dc7af943be56010"><div class="ttname"><a href="../../df/d45/interface_mobile_f_fmpeg_config.html#a37e8ebe4487e5a298dc7af943be56010">+[MobileFFmpegConfig getLastReturnCode]</a></div><div class="ttdeci">int getLastReturnCode()</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00913">MobileFFmpegConfig.m:913</a></div></div>
 <div class="ttc" id="a_mobile_f_fmpeg_config_8m_html_a7feb3cb9401cce7f8422d737cc8fc63d"><div class="ttname"><a href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#a7feb3cb9401cce7f8422d737cc8fc63d">statisticsFrameNumber</a></div><div class="ttdeci">int statisticsFrameNumber</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00047">MobileFFmpegConfig.m:47</a></div></div>
 <div class="ttc" id="a_mobile_f_fmpeg_config_8m_html_a314e2fe656e82a7215be863f4de84ec5"><div class="ttname"><a href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#a314e2fe656e82a7215be863f4de84ec5">statisticsBitrate</a></div><div class="ttdeci">double statisticsBitrate</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00052">MobileFFmpegConfig.m:52</a></div></div>
 <div class="ttc" id="ainterface_callback_data_html_a515dceae6c3219c64c7c329d2a8ac6aa"><div class="ttname"><a href="../../d8/d27/interface_callback_data.html#a515dceae6c3219c64c7c329d2a8ac6aa">-[CallbackData getStatisticsSpeed]</a></div><div class="ttdeci">double getStatisticsSpeed()</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00127">MobileFFmpegConfig.m:127</a></div></div>
 <div class="ttc" id="a_mobile_f_fmpeg_config_8m_html_a0933d281efb715f0464e0383bd5d916e"><div class="ttname"><a href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#a0933d281efb715f0464e0383bd5d916e">callbackWait</a></div><div class="ttdeci">void callbackWait(int milliSeconds)</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00161">MobileFFmpegConfig.m:161</a></div></div>
-<div class="ttc" id="ainterface_mobile_f_fmpeg_config_html_a0d82d52dfacc516f2a0c2f277d29bf63"><div class="ttname"><a href="../../df/d45/interface_mobile_f_fmpeg_config.html#a0d82d52dfacc516f2a0c2f277d29bf63">+[MobileFFmpegConfig getLastCommandOutput]</a></div><div class="ttdeci">NSString * getLastCommandOutput()</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00924">MobileFFmpegConfig.m:924</a></div></div>
+<div class="ttc" id="ainterface_mobile_f_fmpeg_config_html_a0d82d52dfacc516f2a0c2f277d29bf63"><div class="ttname"><a href="../../df/d45/interface_mobile_f_fmpeg_config.html#a0d82d52dfacc516f2a0c2f277d29bf63">+[MobileFFmpegConfig getLastCommandOutput]</a></div><div class="ttdeci">NSString * getLastCommandOutput()</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00928">MobileFFmpegConfig.m:928</a></div></div>
 <div class="ttc" id="a_statistics_8m_html_a42715f65f02da52edc5b22021d8ae670"><div class="ttname"><a href="../../d9/db1/_statistics_8m.html#a42715f65f02da52edc5b22021d8ae670">time</a></div><div class="ttdeci">int time</div><div class="ttdef"><b>Definition:</b> <a href="../../d9/db1/_statistics_8m_source.html#l00027">Statistics.m:27</a></div></div>
 <div class="ttc" id="a_mobile_f_fmpeg_config_8m_html_a2c334c87d8c60bc99ecdf9d297943318aeeced9e809b51a3532dfc6701bbe3bb6"><div class="ttname"><a href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#a2c334c87d8c60bc99ecdf9d297943318aeeced9e809b51a3532dfc6701bbe3bb6">LogType</a></div><div class="ttdeci">@ LogType</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00029">MobileFFmpegConfig.m:29</a></div></div>
 <div class="ttc" id="a_mobile_f_fmpeg_config_8m_html_aff064b31dbd5415e864ead16a0022d28"><div class="ttname"><a href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#aff064b31dbd5415e864ead16a0022d28">logDelegate</a></div><div class="ttdeci">static id&lt; LogDelegate &gt; logDelegate</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00140">MobileFFmpegConfig.m:140</a></div></div>
 <div class="ttc" id="a_mobile_f_fmpeg_config_8m_html_a3bd629114c94f2e77441d35154ffdeec"><div class="ttname"><a href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#a3bd629114c94f2e77441d35154ffdeec">lock</a></div><div class="ttdeci">static NSRecursiveLock * lock</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00135">MobileFFmpegConfig.m:135</a></div></div>
 <div class="ttc" id="a_stream_information_8m_html_a93680d6497794a5fe65d556ebefe05f1"><div class="ttname"><a href="../../d7/da5/_stream_information_8m.html#a93680d6497794a5fe65d556ebefe05f1">format</a></div><div class="ttdeci">NSString * format</div><div class="ttdef"><b>Definition:</b> <a href="../../d7/da5/_stream_information_8m_source.html#l00032">StreamInformation.m:32</a></div></div>
-<div class="ttc" id="ainterface_mobile_f_fmpeg_config_html_ac8e48eda99c41aeab3e73c67425487fc"><div class="ttname"><a href="../../df/d45/interface_mobile_f_fmpeg_config.html#ac8e48eda99c41aeab3e73c67425487fc">+[MobileFFmpegConfig getLastReceivedStatistics]</a></div><div class="ttdeci">Statistics * getLastReceivedStatistics()</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00505">MobileFFmpegConfig.m:505</a></div></div>
+<div class="ttc" id="ainterface_mobile_f_fmpeg_config_html_ac8e48eda99c41aeab3e73c67425487fc"><div class="ttname"><a href="../../df/d45/interface_mobile_f_fmpeg_config.html#ac8e48eda99c41aeab3e73c67425487fc">+[MobileFFmpegConfig getLastReceivedStatistics]</a></div><div class="ttdeci">Statistics * getLastReceivedStatistics()</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00509">MobileFFmpegConfig.m:509</a></div></div>
 <div class="ttc" id="a_mobile_f_fmpeg_config_8m_html_a2c334c87d8c60bc99ecdf9d297943318"><div class="ttname"><a href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#a2c334c87d8c60bc99ecdf9d297943318">CallbackType</a></div><div class="ttdeci">CallbackType</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00028">MobileFFmpegConfig.m:28</a></div></div>
 <div class="ttc" id="a_mobile_f_fmpeg_config_8h_html_a9b58b28e2d429b930b69db19877f76a8"><div class="ttname"><a href="../../de/dea/_mobile_f_fmpeg_config_8h.html#a9b58b28e2d429b930b69db19877f76a8">AV_LOG_VERBOSE</a></div><div class="ttdeci">#define AV_LOG_VERBOSE</div><div class="ttdef"><b>Definition:</b> <a href="../../de/dea/_mobile_f_fmpeg_config_8h_source.html#l00071">MobileFFmpegConfig.h:71</a></div></div>
 <div class="ttc" id="a_mobile_f_fmpeg_config_8m_html_a75363553d36058d35665352cd1c5fba0"><div class="ttname"><a href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#a75363553d36058d35665352cd1c5fba0">callbackBlockFunction</a></div><div class="ttdeci">void callbackBlockFunction()</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00265">MobileFFmpegConfig.m:265</a></div></div>
-<div class="ttc" id="ainterface_mobile_f_fmpeg_config_html_a3642a0d1db33abc6c61a8e3d1e96e4d1"><div class="ttname"><a href="../../df/d45/interface_mobile_f_fmpeg_config.html#a3642a0d1db33abc6c61a8e3d1e96e4d1">+[MobileFFmpegConfig getLogLevel]</a></div><div class="ttdeci">int getLogLevel()</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00447">MobileFFmpegConfig.m:447</a></div></div>
-<div class="ttc" id="ainterface_mobile_f_fmpeg_config_html_a2eadd8d13624ca1f3d797d487c6429e8"><div class="ttname"><a href="../../df/d45/interface_mobile_f_fmpeg_config.html#a2eadd8d13624ca1f3d797d487c6429e8">+[MobileFFmpegConfig getPackageName]</a></div><div class="ttdeci">NSString * getPackageName()</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00627">MobileFFmpegConfig.m:627</a></div></div>
+<div class="ttc" id="ainterface_mobile_f_fmpeg_config_html_a3642a0d1db33abc6c61a8e3d1e96e4d1"><div class="ttname"><a href="../../df/d45/interface_mobile_f_fmpeg_config.html#a3642a0d1db33abc6c61a8e3d1e96e4d1">+[MobileFFmpegConfig getLogLevel]</a></div><div class="ttdeci">int getLogLevel()</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00451">MobileFFmpegConfig.m:451</a></div></div>
+<div class="ttc" id="ainterface_mobile_f_fmpeg_config_html_a2eadd8d13624ca1f3d797d487c6429e8"><div class="ttname"><a href="../../df/d45/interface_mobile_f_fmpeg_config.html#a2eadd8d13624ca1f3d797d487c6429e8">+[MobileFFmpegConfig getPackageName]</a></div><div class="ttdeci">NSString * getPackageName()</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00631">MobileFFmpegConfig.m:631</a></div></div>
 <div class="ttc" id="afftools__cmdutils_8h_html_a632891572be1648c03646028e8bfcac1"><div class="ttname"><a href="../../d8/d4e/fftools__cmdutils_8h.html#a632891572be1648c03646028e8bfcac1">AV_LOG_STDERR</a></div><div class="ttdeci">#define AV_LOG_STDERR</div><div class="ttdef"><b>Definition:</b> <a href="../../d8/d4e/fftools__cmdutils_8h_source.html#l00061">fftools_cmdutils.h:61</a></div></div>
 <div class="ttc" id="afftools__ffmpeg__filter_8c_html_a61569f2965b7a369eb10b6d75d410d11"><div class="ttname"><a href="../../d2/d36/fftools__ffmpeg__filter_8c.html#a61569f2965b7a369eb10b6d75d410d11">int</a></div><div class="ttdeci">int</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html#l00199">fftools_ffmpeg_filter.c:199</a></div></div>
 <div class="ttc" id="ainterface_callback_data_html_aa8c015ca125f12e88b25c319b8f717a3"><div class="ttname"><a href="../../d8/d27/interface_callback_data.html#aa8c015ca125f12e88b25c319b8f717a3">-[CallbackData getStatisticsBitrate]</a></div><div class="ttdeci">double getStatisticsBitrate()</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00123">MobileFFmpegConfig.m:123</a></div></div>
@@ -911,7 +915,7 @@ $(function() {
 <div class="ttc" id="a_arch_detect_8h_html"><div class="ttname"><a href="../../d6/d8f/_arch_detect_8h.html">ArchDetect.h</a></div></div>
 <div class="ttc" id="a_mobile_f_fmpeg_config_8m_html_ae0491a0fcaaf0b200f7ce24202d92d05"><div class="ttname"><a href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#ae0491a0fcaaf0b200f7ce24202d92d05">supportedExternalLibraries</a></div><div class="ttdeci">static NSMutableArray * supportedExternalLibraries</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00157">MobileFFmpegConfig.m:157</a></div></div>
 <div class="ttc" id="a_mobile_f_fmpeg_config_8h_html_a5b7221c3afd06848486776bd834a58a5"><div class="ttname"><a href="../../de/dea/_mobile_f_fmpeg_config_8h.html#a5b7221c3afd06848486776bd834a58a5">AV_LOG_DEBUG</a></div><div class="ttdeci">#define AV_LOG_DEBUG</div><div class="ttdef"><b>Definition:</b> <a href="../../de/dea/_mobile_f_fmpeg_config_8h_source.html#l00076">MobileFFmpegConfig.h:76</a></div></div>
-<div class="ttc" id="ainterface_mobile_f_fmpeg_config_html_a98ef246bf01900e2109e628b4d9cc9f9"><div class="ttname"><a href="../../df/d45/interface_mobile_f_fmpeg_config.html#a98ef246bf01900e2109e628b4d9cc9f9">+[MobileFFmpegConfig closeFFmpegPipe:]</a></div><div class="ttdeci">void closeFFmpegPipe:(NSString *ffmpegPipePath)</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00863">MobileFFmpegConfig.m:863</a></div></div>
+<div class="ttc" id="ainterface_mobile_f_fmpeg_config_html_a98ef246bf01900e2109e628b4d9cc9f9"><div class="ttname"><a href="../../df/d45/interface_mobile_f_fmpeg_config.html#a98ef246bf01900e2109e628b4d9cc9f9">+[MobileFFmpegConfig closeFFmpegPipe:]</a></div><div class="ttdeci">void closeFFmpegPipe:(NSString *ffmpegPipePath)</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00867">MobileFFmpegConfig.m:867</a></div></div>
 <div class="ttc" id="a_mobile_f_fmpeg_config_8m_html_ad327bfe6cf17b860af3a7d061983394e"><div class="ttname"><a href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#ad327bfe6cf17b860af3a7d061983394e">logCallbackDataAdd</a></div><div class="ttdeci">void logCallbackDataAdd(int level, NSString *logData)</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00175">MobileFFmpegConfig.m:175</a></div></div>
 <div class="ttc" id="a_stream_information_8m_html_abff6a04d71c2bba87e646615388a1f5c"><div class="ttname"><a href="../../d7/da5/_stream_information_8m.html#abff6a04d71c2bba87e646615388a1f5c">type</a></div><div class="ttdeci">NSString * type</div><div class="ttdef"><b>Definition:</b> <a href="../../d7/da5/_stream_information_8m_source.html#l00022">StreamInformation.m:22</a></div></div>
 <div class="ttc" id="ainterface_callback_data_html_acaf74ab1a753455e368d35336601913b"><div class="ttname"><a href="../../d8/d27/interface_callback_data.html#acaf74ab1a753455e368d35336601913b">-[CallbackData getLogLevel]</a></div><div class="ttdeci">int getLogLevel()</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00095">MobileFFmpegConfig.m:95</a></div></div>
@@ -922,18 +926,18 @@ $(function() {
 <div class="ttc" id="a_mobile_f_fmpeg_config_8m_html_a171d97cea90bbf68ceaa06813fc6788b"><div class="ttname"><a href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#a171d97cea90bbf68ceaa06813fc6788b">statisticsDelegate</a></div><div class="ttdeci">static id&lt; StatisticsDelegate &gt; statisticsDelegate</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00143">MobileFFmpegConfig.m:143</a></div></div>
 <div class="ttc" id="a_mobile_f_fmpeg_config_8m_html_a381c4a772202d1c5a42a569bdd91d8a3"><div class="ttname"><a href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#a381c4a772202d1c5a42a569bdd91d8a3">lastReceivedStatistics</a></div><div class="ttdeci">static Statistics * lastReceivedStatistics</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00155">MobileFFmpegConfig.m:155</a></div></div>
 <div class="ttc" id="ainterface_callback_data_html_ab9dbf9c19854fc85f37bd35c6019bf8f"><div class="ttname"><a href="../../d8/d27/interface_callback_data.html#ab9dbf9c19854fc85f37bd35c6019bf8f">-[CallbackData getStatisticsTime]</a></div><div class="ttdeci">int getStatisticsTime()</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00119">MobileFFmpegConfig.m:119</a></div></div>
-<div class="ttc" id="ainterface_mobile_f_fmpeg_config_html_aa5d2ee83a36d86a735474684fb33433c"><div class="ttname"><a href="../../df/d45/interface_mobile_f_fmpeg_config.html#aa5d2ee83a36d86a735474684fb33433c">+[MobileFFmpegConfig getBuildConf]</a></div><div class="ttdeci">NSString * getBuildConf()</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00618">MobileFFmpegConfig.m:618</a></div></div>
+<div class="ttc" id="ainterface_mobile_f_fmpeg_config_html_aa5d2ee83a36d86a735474684fb33433c"><div class="ttname"><a href="../../df/d45/interface_mobile_f_fmpeg_config.html#aa5d2ee83a36d86a735474684fb33433c">+[MobileFFmpegConfig getBuildConf]</a></div><div class="ttdeci">NSString * getBuildConf()</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00622">MobileFFmpegConfig.m:622</a></div></div>
 <div class="ttc" id="a_statistics_8m_html_a40665b4a1c051aecbe68c746c4b82079"><div class="ttname"><a href="../../d9/db1/_statistics_8m.html#a40665b4a1c051aecbe68c746c4b82079">videoFps</a></div><div class="ttdeci">float videoFps</div><div class="ttdef"><b>Definition:</b> <a href="../../d9/db1/_statistics_8m_source.html#l00022">Statistics.m:22</a></div></div>
 <div class="ttc" id="a_mobile_f_fmpeg_config_8h_html_a11e329935b59b83ca722b66674f37fd4"><div class="ttname"><a href="../../de/dea/_mobile_f_fmpeg_config_8h.html#a11e329935b59b83ca722b66674f37fd4">AV_LOG_QUIET</a></div><div class="ttdeci">#define AV_LOG_QUIET</div><div class="ttdef"><b>Definition:</b> <a href="../../de/dea/_mobile_f_fmpeg_config_8h_source.html#l00037">MobileFFmpegConfig.h:37</a></div></div>
 <div class="ttc" id="ainterface_callback_data_html_add9e5cd3ecc037c98d99bdc7ce5c90d0"><div class="ttname"><a href="../../d8/d27/interface_callback_data.html#add9e5cd3ecc037c98d99bdc7ce5c90d0">-[CallbackData getStatisticsFps]</a></div><div class="ttdeci">float getStatisticsFps()</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00107">MobileFFmpegConfig.m:107</a></div></div>
-<div class="ttc" id="ainterface_mobile_f_fmpeg_config_html_ae7d648c9c855966b59c6f8d7bfada703"><div class="ttname"><a href="../../df/d45/interface_mobile_f_fmpeg_config.html#ae7d648c9c855966b59c6f8d7bfada703">+[MobileFFmpegConfig disableRedirection]</a></div><div class="ttdeci">void disableRedirection()</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00425">MobileFFmpegConfig.m:425</a></div></div>
+<div class="ttc" id="ainterface_mobile_f_fmpeg_config_html_ae7d648c9c855966b59c6f8d7bfada703"><div class="ttname"><a href="../../df/d45/interface_mobile_f_fmpeg_config.html#ae7d648c9c855966b59c6f8d7bfada703">+[MobileFFmpegConfig disableRedirection]</a></div><div class="ttdeci">void disableRedirection()</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00429">MobileFFmpegConfig.m:429</a></div></div>
 <div class="ttc" id="a_mobile_f_fmpeg_config_8m_html_ae7a108ddd6a67ae1f62a675b05aac9d5"><div class="ttname"><a href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#ae7a108ddd6a67ae1f62a675b05aac9d5">lastReturnCode</a></div><div class="ttdeci">int lastReturnCode</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00149">MobileFFmpegConfig.m:149</a></div></div>
-<div class="ttc" id="ainterface_mobile_f_fmpeg_config_html_a08aec3cd82ae9f2c63b8efe2a3ff3968"><div class="ttname"><a href="../../df/d45/interface_mobile_f_fmpeg_config.html#a08aec3cd82ae9f2c63b8efe2a3ff3968">+[MobileFFmpegConfig setFontconfigConfigurationPath:]</a></div><div class="ttdeci">void setFontconfigConfigurationPath:(NSString *path)</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00521">MobileFFmpegConfig.m:521</a></div></div>
-<div class="ttc" id="ainterface_mobile_f_fmpeg_config_html_ac861ab3fcda37bcdfb88f24f082b2b87"><div class="ttname"><a href="../../df/d45/interface_mobile_f_fmpeg_config.html#ac861ab3fcda37bcdfb88f24f082b2b87">+[MobileFFmpegConfig registerNewFFmpegPipe]</a></div><div class="ttdeci">NSString * registerNewFFmpegPipe()</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00836">MobileFFmpegConfig.m:836</a></div></div>
+<div class="ttc" id="ainterface_mobile_f_fmpeg_config_html_a08aec3cd82ae9f2c63b8efe2a3ff3968"><div class="ttname"><a href="../../df/d45/interface_mobile_f_fmpeg_config.html#a08aec3cd82ae9f2c63b8efe2a3ff3968">+[MobileFFmpegConfig setFontconfigConfigurationPath:]</a></div><div class="ttdeci">void setFontconfigConfigurationPath:(NSString *path)</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00525">MobileFFmpegConfig.m:525</a></div></div>
+<div class="ttc" id="ainterface_mobile_f_fmpeg_config_html_ac861ab3fcda37bcdfb88f24f082b2b87"><div class="ttname"><a href="../../df/d45/interface_mobile_f_fmpeg_config.html#ac861ab3fcda37bcdfb88f24f082b2b87">+[MobileFFmpegConfig registerNewFFmpegPipe]</a></div><div class="ttdeci">NSString * registerNewFFmpegPipe()</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00840">MobileFFmpegConfig.m:840</a></div></div>
 <div class="ttc" id="a_mobile_f_fmpeg_config_8m_html_af5958167dc925f0fb6ad593b094038e3"><div class="ttname"><a href="../../d2/d82/_mobile_f_fmpeg_config_8m.html#af5958167dc925f0fb6ad593b094038e3">logLevel</a></div><div class="ttdeci">int logLevel</div><div class="ttdef"><b>Definition:</b> <a href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00040">MobileFFmpegConfig.m:40</a></div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Jan 12 2020 21:33:00 for MobileFFmpeg iOS / tvOS API by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 14 2020 21:31:51 for MobileFFmpeg iOS / tvOS API by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/>
 </a> 1.8.17
 </small></address>

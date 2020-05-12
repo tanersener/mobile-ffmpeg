@@ -1,6 +1,6 @@
 /* Provide a sys/socket header file for systems lacking it (read: MinGW)
    and for systems where it is incomplete.
-   Copyright (C) 2005-2019 Free Software Foundation, Inc.
+   Copyright (C) 2005-2020 Free Software Foundation, Inc.
    Written by Simon Josefsson.
 
    This program is free software; you can redistribute it and/or modify
@@ -517,7 +517,10 @@ _GL_FUNCDECL_RPL (recv, ssize_t, (int fd, void *buf, size_t len, int flags)
                                  _GL_ARG_NONNULL ((2)));
 _GL_CXXALIAS_RPL (recv, ssize_t, (int fd, void *buf, size_t len, int flags));
 # else
-_GL_CXXALIAS_SYS (recv, ssize_t, (int fd, void *buf, size_t len, int flags));
+/* Need to cast, because on HP-UX 11.31 the return type may be
+                             int,
+   depending on compiler options.  */
+_GL_CXXALIAS_SYS_CAST (recv, ssize_t, (int fd, void *buf, size_t len, int flags));
 # endif
 _GL_CXXALIASWARN (recv);
 #elif @HAVE_WINSOCK2_H@
@@ -543,8 +546,11 @@ _GL_FUNCDECL_RPL (send, ssize_t,
 _GL_CXXALIAS_RPL (send, ssize_t,
                   (int fd, const void *buf, size_t len, int flags));
 # else
-_GL_CXXALIAS_SYS (send, ssize_t,
-                  (int fd, const void *buf, size_t len, int flags));
+/* Need to cast, because on HP-UX 11.31 the return type may be
+                             int,
+   depending on compiler options.  */
+_GL_CXXALIAS_SYS_CAST (send, ssize_t,
+                       (int fd, const void *buf, size_t len, int flags));
 # endif
 _GL_CXXALIASWARN (send);
 #elif @HAVE_WINSOCK2_H@

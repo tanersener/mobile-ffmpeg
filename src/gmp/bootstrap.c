@@ -1,6 +1,6 @@
 /* Functions needed for bootstrapping the gmp build, based on mini-gmp.
 
-Copyright 2001, 2002, 2004, 2011, 2012 Free Software Foundation, Inc.
+Copyright 2001, 2002, 2004, 2011, 2012, 2015 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -29,6 +29,7 @@ GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
 
+#define MINI_GMP_DONT_USE_FLOAT_H 1
 #include "mini-gmp/mini-gmp.c"
 
 #define MIN(l,o) ((l) < (o) ? (l) : (o))
@@ -88,7 +89,7 @@ log2_ceil (int n)
 /* Set inv to the inverse of d, in the style of invert_limb, ie. for
    udiv_qrnnd_preinv.  */
 void
-mpz_preinv_invert (mpz_t inv, mpz_t d, int numb_bits)
+mpz_preinv_invert (mpz_t inv, const mpz_t d, int numb_bits)
 {
   mpz_t  t;
   int    norm;
@@ -96,19 +97,17 @@ mpz_preinv_invert (mpz_t inv, mpz_t d, int numb_bits)
 
   norm = numb_bits - mpz_sizeinbase (d, 2);
   assert (norm >= 0);
-  mpz_init_set_ui (t, 1L);
-  mpz_mul_2exp (t, t, 2*numb_bits - norm);
+  mpz_init (t);
+  mpz_setbit (t, 2*numb_bits - norm);
   mpz_tdiv_q (inv, t, d);
-  mpz_set_ui (t, 1L);
-  mpz_mul_2exp (t, t, numb_bits);
-  mpz_sub (inv, inv, t);
+  mpz_clrbit (inv, numb_bits);
 
   mpz_clear (t);
 }
 
 /* Calculate r satisfying r*d == 1 mod 2^n. */
 void
-mpz_invert_2exp (mpz_t r, mpz_t a, unsigned long n)
+mpz_invert_2exp (mpz_t r, const mpz_t a, unsigned long n)
 {
   unsigned long  i;
   mpz_t  inv, prod;
@@ -140,6 +139,7 @@ void
 mpz_invert_ui_2exp (mpz_t r, unsigned long a, unsigned long n)
 {
   mpz_t  az;
+
   mpz_init_set_ui (az, a);
   mpz_invert_2exp (r, az, n);
   mpz_clear (az);

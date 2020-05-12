@@ -29,13 +29,9 @@ fi
 
 export TZ="UTC"
 
-# Check for datefudge
-TSTAMP=`datefudge "2006-09-23" date -u +%s || true`
-if test "$TSTAMP" != "1158969600"; then
-	echo $TSTAMP
-	echo "You need datefudge to run this test"
-	exit 77
-fi
+. "${srcdir}/scripts/common.sh"
+
+check_for_datefudge
 
 datefudge -s "2017-06-19" \
 	"${OCSPTOOL}" -e --load-chain "${srcdir}/ocsp-tests/certs/chain-amazon.com.pem" --infile "${srcdir}/ocsp-tests/certs/ocsp-amazon.com.der" --verify-allow-broken

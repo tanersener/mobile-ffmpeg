@@ -1,4 +1,4 @@
-Copyright 2011-2013 Free Software Foundation, Inc.
+Copyright 2011-2013, 2018 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -27,8 +27,8 @@ GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.
 
 
-This is "mini-gmp", a small implementation of a subset of GMP's mpn
-and mpz interfaces.
+This is "mini-gmp", a small implementation of a subset of GMP's mpn,
+mpz and mpq interfaces.
 
 It is intended for applications which need arithmetic on numbers
 larger than a machine word, but which don't need to handle very large
@@ -38,12 +38,11 @@ can also arrange for optional linking with the real GMP library, using
 mini-gmp as a fallback when for some reason GMP is not available, or
 not desired as a dependency.
 
-The supported GMP subset is declared in mini-gmp.h. The implemented
+The supported GMP subset of the mpn and mpz interfaces is declared in
+mini-gmp.h, and implemented in mini-gmp.c. The implemented
 functions are fully compatible with the corresponding GMP functions,
 as specified in the GMP manual, with a few exceptions:
 
-  mpz_set_str, mpz_init_set_str, mpz_get_str, mpz_out_str and
-  mpz_sizeinbase support only |base| <= 36;
   mpz_export and mpz_import support only NAILS = 0.
 
   The REALLOC_FUNC and FREE_FUNC registered with
@@ -51,7 +50,7 @@ as specified in the GMP manual, with a few exceptions:
   allocated block in the corresponding argument. mini-gmp always
   passes zero for these rarely used arguments.
 
-The implementation is a single file, mini-gmp.c.
+  When mpz_get_str allocates the block, it can be longer than needed.
 
 The performance target for mini-gmp is to be at most 10 times slower
 than the real GMP library, for numbers of size up to a few hundred
@@ -59,19 +58,22 @@ bits. No asymptotically fast algorithms are included in mini-gmp, so
 it will be many orders of magnitude slower than GMP for very large
 numbers.
 
+The supported GMP subset of the mpq layer is declared in mini-mpq.h,
+and implemented in mini-mpq.c.
+
 You should never "install" mini-gmp. Applications can either just
 #include mini-gmp.c (but then, beware that it defines several macros
-and functions outside of the advertised interface). Or compile
-mini-gmp.c as a separate compilation unit, and use the declarations in
-mini-gmp.h.
+and functions outside of the advertised interface), and if needed
+#include mini-mpq.c in a later line (order is important). Or compile
+mini-gmp.c and mini-mpq.c as separate compilation units, and use the
+declarations in mini-gmp.h and mini-mpq.h.
 
 The tests subdirectory contains a testsuite. To use it, you need GMP
 and GNU make. Just run make check in the tests directory. If the
 hard-coded compiler settings are not right, you have to either edit the
 Makefile or pass overriding values on the make command line (e.g.,
-make CC=cc check). Testing is not (yet) as thorough as for the real
-GMP.
+make CC=cc check).
 
-The current version was put together by Niels Möller
+The initial version of mini-gmp was put together by Niels Möller
 <nisse@lysator.liu.se>, with a fair amount of copy-and-paste from the
 GMP sources.

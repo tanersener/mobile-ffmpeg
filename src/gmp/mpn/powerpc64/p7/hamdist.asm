@@ -1,6 +1,6 @@
 dnl  PowerPC-64 mpn_hamdist.
 
-dnl  Copyright 2012 Free Software Foundation, Inc.
+dnl  Copyright 2012, 2017 Free Software Foundation, Inc.
 
 dnl  This file is part of the GNU MP Library.
 dnl
@@ -64,7 +64,7 @@ L(odd):	ld	r6, 0(up)
 	ld	r8, 0(vp)
 	addi	vp, vp, 8
 	xor	r10, r6, r8
-	popcntd	r0, r10
+	popcntd(r0, r10)
 	bdz	L(e1)
 
 L(evn):	ld	r6, 0(up)
@@ -85,21 +85,21 @@ L(top):	add	r0, r0, r30
 	ld	r6, 0(up)
 	ld	r8, 0(vp)
 	xor	r11, r7, r9
-	popcntd	r30, r10
+	popcntd(r30, r10)
 	add	r12, r12, r31
 	ld	r7, 8(up)
 	ld	r9, 8(vp)
 	xor	r10, r6, r8
-	popcntd	r31, r11
+	popcntd(r31, r11)
 	addi	up, up, 16
 	addi	vp, vp, 16
 	bdnz	L(top)
 
 L(end):	add	r0, r0, r30
 	xor	r11, r7, r9
-	popcntd	r30, r10
+	popcntd(r30, r10)
 	add	r12, r12, r31
-	popcntd	r31, r11
+	popcntd(r31, r11)
 
 	add	r0, r0, r30
 	add	r12, r12, r31

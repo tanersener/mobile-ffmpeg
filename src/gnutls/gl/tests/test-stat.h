@@ -1,5 +1,5 @@
 /* Tests of stat.
-   Copyright (C) 2009-2019 Free Software Foundation, Inc.
+   Copyright (C) 2009-2020 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -32,12 +32,18 @@ test_stat_func (int (*func) (char const *, struct stat *), bool print)
   ASSERT (cwd);
   ASSERT (func (".", &st1) == 0);
   ASSERT (func ("./", &st2) == 0);
+#if !(defined _WIN32 && !defined __CYGWIN__ && !_GL_WINDOWS_STAT_INODES)
   ASSERT (SAME_INODE (st1, st2));
+#endif
   ASSERT (func (cwd, &st2) == 0);
+#if !(defined _WIN32 && !defined __CYGWIN__ && !_GL_WINDOWS_STAT_INODES)
   ASSERT (SAME_INODE (st1, st2));
+#endif
   ASSERT (func ("/", &st1) == 0);
   ASSERT (func ("///", &st2) == 0);
+#if !(defined _WIN32 && !defined __CYGWIN__ && !_GL_WINDOWS_STAT_INODES)
   ASSERT (SAME_INODE (st1, st2));
+#endif
 
   errno = 0;
   ASSERT (func ("", &st1) == -1);

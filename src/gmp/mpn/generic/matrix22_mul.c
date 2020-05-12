@@ -34,7 +34,6 @@ You should have received copies of the GNU General Public License and the
 GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
-#include "gmp.h"
 #include "gmp-impl.h"
 #include "longlong.h"
 
@@ -127,7 +126,7 @@ mpn_matrix22_mul_itch (mp_size_t rn, mp_size_t mn)
  * Resulting elements are of size up to rn + mn + 1.
  *
  * Temporary storage: 3 rn + 3 mn + 5. */
-void
+static void
 mpn_matrix22_mul_strassen (mp_ptr r0, mp_ptr r1, mp_ptr r2, mp_ptr r3, mp_size_t rn,
 			   mp_srcptr m0, mp_srcptr m1, mp_srcptr m2, mp_srcptr m3, mp_size_t mn,
 			   mp_ptr tp)

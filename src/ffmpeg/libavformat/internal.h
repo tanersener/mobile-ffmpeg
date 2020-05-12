@@ -580,25 +580,13 @@ int ff_stream_add_bitstream_filter(AVStream *st, const char *name, const char *a
 int ff_stream_encode_params_copy(AVStream *dst, const AVStream *src);
 
 /**
- * Wrap errno on rename() error.
+ * Wrap avpriv_io_move and log if error happens.
  *
- * @param oldpath source path
- * @param newpath destination path
+ * @param url_src source path
+ * @param url_dst destination path
  * @return        0 or AVERROR on failure
  */
-static inline int ff_rename(const char *oldpath, const char *newpath, void *logctx)
-{
-    int ret = 0;
-    if (rename(oldpath, newpath) == -1) {
-        ret = AVERROR(errno);
-        if (logctx) {
-            char err[AV_ERROR_MAX_STRING_SIZE] = {0};
-            av_make_error_string(err, AV_ERROR_MAX_STRING_SIZE, ret);
-            av_log(logctx, AV_LOG_ERROR, "failed to rename file %s to %s: %s\n", oldpath, newpath, err);
-        }
-    }
-    return ret;
-}
+int ff_rename(const char *url_src, const char *url_dst, void *logctx);
 
 /**
  * Allocate extradata with additional AV_INPUT_BUFFER_PADDING_SIZE at end

@@ -31,7 +31,6 @@ the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
 #include <stdio.h>  /* for NULL */
 #include <stdlib.h> /* for malloc */
 
-#include "gmp.h"
 #include "gmp-impl.h"
 #include "longlong.h"
 
@@ -1981,6 +1980,68 @@ refmpn_mul_any (mp_ptr prodp,
 
 
 mp_limb_t
+refmpn_gcd_11 (mp_limb_t x, mp_limb_t y)
+{
+  /* The non-ref function also requires input operands to be odd, but
+     below refmpn_gcd_1 doesn't guarantee that. */
+  ASSERT (x > 0);
+  ASSERT (y > 0);
+  do
+    {
+      while ((x & 1) == 0)  x >>= 1;
+      while ((y & 1) == 0)  y >>= 1;
+
+      if (x < y)
+	MP_LIMB_T_SWAP (x, y);
+
+      x -= y;
+    }
+  while (x != 0);
+
+  return y;
+}
+
+mp_double_limb_t
+refmpn_gcd_22 (mp_limb_t x1, mp_limb_t x0, mp_limb_t y1, mp_limb_t y0)
+{
+  ASSERT ((x0 & 1) != 0);
+  ASSERT ((y0 & 1) != 0);
+  mp_double_limb_t g;
+  mp_limb_t cy;
+
+  do
+    {
+      while ((x0 & 1) == 0)
+	{
+	  x0 = (x1 << (GMP_NUMB_BITS - 1)) | (x0 >> 1);
+	  x1 >>= 1;
+	}
+      while ((y0 & 1) == 0)
+	{
+	  y0 = (y1 << (GMP_NUMB_BITS - 1)) | (y0 >> 1);
+	  y1 >>= 1;
+	}
+
+
+      if (x1 < y1 || (x1 == y1 && x0 < y0))
+	{
+	  mp_limb_t t;
+	  t = x1; x1 = y1; y1 = t;
+	  t = x0; x0 = y0; y0 = t;
+	}
+
+      cy = (x0 < y0);
+      x0 -= y0;
+      x1 -= y1 + cy;
+    }
+  while ((x1 | x0) != 0);
+
+  g.d1 = y1;
+  g.d0 = y0;
+  return g;
+}
+
+mp_limb_t
 refmpn_gcd_1 (mp_srcptr xp, mp_size_t xsize, mp_limb_t y)
 {
   mp_limb_t  x;
@@ -2003,20 +2064,7 @@ refmpn_gcd_1 (mp_srcptr xp, mp_size_t xsize, mp_limb_t y)
       twos++;
     }
 
-  for (;;)
-    {
-      while ((x & 1) == 0)  x >>= 1;
-      while ((y & 1) == 0)  y >>= 1;
-
-      if (x < y)
-	MP_LIMB_T_SWAP (x, y);
-
-      x -= y;
-      if (x == 0)
-	break;
-    }
-
-  return y << twos;
+  return refmpn_gcd_11 (x, y) << twos;
 }
 
 

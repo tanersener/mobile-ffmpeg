@@ -33,10 +33,11 @@
 #include "x509_int.h"
 #include "extras/hex.h"
 #include <common.h>
+#include <c-ctype.h>
 
 time_t _gnutls_utcTime2gtime(const char *ttime);
 
-/* TIME functions 
+/* TIME functions
  * Conversions between generalized or UTC time to time_t
  *
  */
@@ -58,7 +59,7 @@ typedef struct fake_tm {
  * who placed it under public domain:
  */
 
-/* The number of days in each month. 
+/* The number of days in each month.
  */
 static const int MONTHDAYS[] = {
 	31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31
@@ -82,7 +83,7 @@ static time_t mktime_utc(const struct fake_tm *tm)
 /* We do allow some ill-formed dates, but we don't do anything special
  * with them and our callers really shouldn't pass them to us.  Do
  * explicitly disallow the ones that would cause invalid array accesses
- * or other algorithm problems. 
+ * or other algorithm problems.
  */
 	if (tm->tm_mon < 0 || tm->tm_mon > 11 || tm->tm_year < 1970)
 		return (time_t) - 1;
@@ -91,7 +92,7 @@ static time_t mktime_utc(const struct fake_tm *tm)
 	if (tm->tm_sec > 60 || tm->tm_min > 59 || tm->tm_mday > 31 || tm->tm_mday < 1 || tm->tm_hour > 23)
 		return (time_t) - 1;
 
-/* Convert to a time_t. 
+/* Convert to a time_t.
  */
 	for (i = 1970; i < tm->tm_year; i++)
 		result += 365 + ISLEAP(i);
@@ -176,13 +177,24 @@ static time_t time2gtime(const char *ttime, int year)
 time_t _gnutls_utcTime2gtime(const char *ttime)
 {
 	char xx[3];
-	int year;
+	int year, i;
+	int len = strlen(ttime);
 
-	if (strlen(ttime) < 10) {
+	if (len < 10) {
 		gnutls_assert();
 		return (time_t) - 1;
 	}
+
+#ifdef STRICT_DER_TIME
+	/* Make sure everything else is digits. */
+	for (i = 0; i < len - 1; i++) {
+		if (c_isdigit(ttime[i]))
+			continue;
+		return gnutls_assert_val((time_t)-1);
+	}
+#endif
 	xx[2] = 0;
+
 /* get the year
  */
 	memcpy(xx, ttime, 2);	/* year */
@@ -265,6 +277,7 @@ gtime_to_suitable_time(time_t gtime, char *str_time, size_t str_time_size, unsig
 			*tag = ASN1_TAG_UTCTime;
 		ret = strftime(str_time, str_time_size, "%y%m%d%H%M%SZ", &_tm);
 	}
+
 	if (!ret) {
 		gnutls_assert();
 		return GNUTLS_E_SHORT_MEMORY_BUFFER;
@@ -278,7 +291,7 @@ gtime_to_generalTime(time_t gtime, char *str_time, size_t str_time_size)
 {
 	size_t ret;
 	struct tm _tm;
-	
+
 	if (gtime == (time_t)-1
 #if SIZEOF_LONG == 8
 		|| gtime >= 253402210800

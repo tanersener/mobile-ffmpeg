@@ -2,7 +2,7 @@
 
 
 
-@deftypefun {int} {gnutls_ocsp_req_get_version} (gnutls_ocsp_req_t @var{req})
+@deftypefun {int} {gnutls_ocsp_req_get_version} (gnutls_ocsp_req_const_t @var{req})
 @var{req}: should contain a @code{gnutls_ocsp_req_t}  type
 
 This function will return the version of the OCSP request.

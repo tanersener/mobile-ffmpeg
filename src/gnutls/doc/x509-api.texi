@@ -34,6 +34,28 @@ when the  @code{res} structure is deinitialized.
 @strong{Since:} 3.2.2
 @end deftypefun
 
+@subheading gnutls_certificate_verification_profile_get_id
+@anchor{gnutls_certificate_verification_profile_get_id}
+@deftypefun {gnutls_certificate_verification_profiles_t} {gnutls_certificate_verification_profile_get_id} (const char * @var{name})
+@var{name}: is a profile name
+
+Convert a string to a @code{gnutls_certificate_verification_profiles_t}  value.  The names are
+compared in a case insensitive way.
+
+@strong{Returns:} a @code{gnutls_certificate_verification_profiles_t}  id of the specified profile,
+or @code{GNUTLS_PROFILE_UNKNOWN}  on failure.
+@end deftypefun
+
+@subheading gnutls_certificate_verification_profile_get_name
+@anchor{gnutls_certificate_verification_profile_get_name}
+@deftypefun {const char *} {gnutls_certificate_verification_profile_get_name} (gnutls_certificate_verification_profiles_t @var{id})
+@var{id}: is a profile ID
+
+Convert a @code{gnutls_certificate_verification_profiles_t}  value to a string.
+
+@strong{Returns:} a string that contains the name of the specified profile or @code{NULL} .
+@end deftypefun
+
 @subheading gnutls_pkcs8_info
 @anchor{gnutls_pkcs8_info}
 @deftypefun {int} {gnutls_pkcs8_info} (const gnutls_datum_t * @var{data}, gnutls_x509_crt_fmt_t @var{format}, unsigned int * @var{schema}, unsigned int * @var{cipher}, void * @var{salt}, unsigned int * @var{salt_size}, unsigned int * @var{iter_count}, char ** @var{oid})
@@ -1814,7 +1836,7 @@ success, or a negative error code on error.
 @var{oid_size}: initially holds the size of  @code{oid} 
 
 This function will return the OID of the public key algorithm
-on that certificate request. This is function
+on that certificate request. This function
 is useful in the case @code{gnutls_x509_crq_get_pk_algorithm()} 
 returned @code{GNUTLS_PK_UNKNOWN} .
 
@@ -1869,7 +1891,7 @@ mapped to @code{GNUTLS_SIGN_UNKNOWN} .
 @var{oid_size}: initially holds the size of  @code{oid} 
 
 This function will return the OID of the signature algorithm
-that has been used to sign this certificate request. This is function
+that has been used to sign this certificate request. This function
 is useful in the case @code{gnutls_x509_crq_get_signature_algorithm()} 
 returned @code{GNUTLS_SIGN_UNKNOWN} .
 
@@ -2714,7 +2736,7 @@ hold the accessLocation GeneralName type (e.g.,
 
 If  @code{what} is @code{GNUTLS_IA_URI} ,  @code{data} will hold the accessLocation URI
 data.  Requesting this  @code{what} value leads to an error if the
-accessLocation is not of the "uniformResourceIdentifier" type. 
+accessLocation is not of the "uniformResourceIdentifier" type.
 
 If  @code{what} is @code{GNUTLS_IA_OCSP_URI} ,  @code{data} will hold the OCSP URI.
 Requesting this  @code{what} value leads to an error if the accessMethod
@@ -2769,11 +2791,11 @@ negative error code.
 @var{critical}: will be non-zero if the extension is marked as critical (may be null)
 
 This function will return the X.509 authority key
-identifier when stored as a general name (authorityCertIssuer) 
+identifier when stored as a general name (authorityCertIssuer)
 and serial number.
 
 Because more than one general names might be stored
- @code{seq} can be used as a counter to request them all until 
+ @code{seq} can be used as a counter to request them all until
 @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  is returned.
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE} 
@@ -2894,7 +2916,7 @@ buffer. The name will be in the form "C=xxxx,O=yyyy,CN=zzzz" as
 described in RFC4514. The output string will be ASCII or UTF-8
 encoded, depending on the certificate data.
 
-If  @code{buf} is null then only the size will be filled. 
+If  @code{buf} is null then only the size will be filled.
 
 This function does not output a fully RFC4514 compliant string, if
 that is required see @code{gnutls_x509_crt_get_dn3()} .
@@ -2981,7 +3003,7 @@ If  @code{buf} is null then only the size will be filled. If the  @code{raw_flag
 
 @strong{Returns:} @code{GNUTLS_E_SHORT_MEMORY_BUFFER}  if the provided buffer is not
 long enough, and in that case the  @code{buf_size} will be updated with
-the required size. @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  if there 
+the required size. @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  if there
 are no data in the current index. On success 0 is returned.
 @end deftypefun
 
@@ -3004,7 +3026,7 @@ account for the trailing null.
 
 @strong{Returns:} @code{GNUTLS_E_SHORT_MEMORY_BUFFER}  if the provided buffer is not
 long enough, and in that case the  @code{buf_size} will be updated with
-the required size. @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  if there 
+the required size. @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  if there
 are no data in the current index. On success 0 is returned.
 @end deftypefun
 
@@ -3137,7 +3159,7 @@ be stored as a string in the provided buffer.  Use
 
 If the buffer provided is not long enough to hold the output, then
  @code{oid_size} is updated and @code{GNUTLS_E_SHORT_MEMORY_BUFFER}  will be
-returned. The  @code{oid} returned will be null terminated, although 
+returned. The  @code{oid} returned will be null terminated, although
  @code{oid_size} will not account for the trailing null (the latter is not
 true for GnuTLS prior to 3.6.0).
 
@@ -3223,9 +3245,9 @@ returned.
 @var{dn}: output variable with pointer to uint8_t DN
 
 Return the Certificate's Issuer DN as a @code{gnutls_x509_dn_t}  data type,
-that can be decoded using @code{gnutls_x509_dn_get_rdn_ava()} . 
+that can be decoded using @code{gnutls_x509_dn_get_rdn_ava()} .
 
-Note that  @code{dn} should be treated as constant. Because it points 
+Note that  @code{dn} should be treated as constant. Because it points
 into the  @code{cert} object, you should not use  @code{dn} after  @code{cert} is
 deallocated.
 
@@ -3354,7 +3376,7 @@ provided buffer. The name will be in the form
 "C=xxxx,O=yyyy,CN=zzzz" as described in RFC4514. The output string
 will be ASCII or UTF-8 encoded, depending on the certificate data.
 
-If  @code{buf} is null then only the size will be filled. 
+If  @code{buf} is null then only the size will be filled.
 
 This function does not output a fully RFC4514 compliant string, if
 that is required see @code{gnutls_x509_crt_get_issuer_dn3()} .
@@ -3441,7 +3463,7 @@ If  @code{buf} is null then only the size will be filled. If the  @code{raw_flag
 
 @strong{Returns:} @code{GNUTLS_E_SHORT_MEMORY_BUFFER}  if the provided buffer is not
 long enough, and in that case the  @code{buf_size} will be updated with
-the required size. @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  if there 
+the required size. @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  if there
 are no data in the current index. On success 0 is returned.
 @end deftypefun
 
@@ -3464,7 +3486,7 @@ account for the trailing null.
 
 @strong{Returns:} @code{GNUTLS_E_SHORT_MEMORY_BUFFER}  if the provided buffer is not
 long enough, and in that case the  @code{buf_size} will be updated with
-the required size. @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  if there 
+the required size. @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  if there
 are no data in the current index. On success 0 is returned.
 @end deftypefun
 
@@ -3735,8 +3757,8 @@ the given structure.  The new parameters will be allocated using
 
 @var{critical}: will be non-zero if the extension is marked as critical
 
-This function will extract the certificate policy (extension 2.5.29.32) 
-specified by the given index. 
+This function will extract the certificate policy (extension 2.5.29.32)
+specified by the given index.
 
 The policy returned by this function must be deinitialized by using
 @code{gnutls_x509_policy_release()} .
@@ -3909,9 +3931,9 @@ certificate. The provided  @code{spki} must be initialized.
 @var{dn}: output variable with pointer to uint8_t DN.
 
 Return the Certificate's Subject DN as a @code{gnutls_x509_dn_t}  data type,
-that can be decoded using @code{gnutls_x509_dn_get_rdn_ava()} . 
+that can be decoded using @code{gnutls_x509_dn_get_rdn_ava()} .
 
-Note that  @code{dn} should be treated as constant. Because it points 
+Note that  @code{dn} should be treated as constant. Because it points
 into the  @code{cert} object, you should not use  @code{dn} after  @code{cert} is
 deallocated.
 
@@ -4786,7 +4808,7 @@ marked as critical.
 @var{userdata}: data associated with the callback
 
 This function will set a callback function to be used when
-it is required to access a protected object. This function overrides 
+it is required to access a protected object. This function overrides
 the global function set using @code{gnutls_pkcs11_set_pin_function()} .
 
 Note that this callback is currently used only during the import
@@ -4922,28 +4944,6 @@ negative error value.
 @strong{Since:} 3.6.0
 @end deftypefun
 
-@subheading gnutls_x509_crt_set_subject_alternative_name
-@anchor{gnutls_x509_crt_set_subject_alternative_name}
-@deftypefun {int} {gnutls_x509_crt_set_subject_alternative_name} (gnutls_x509_crt_t @var{crt}, gnutls_x509_subject_alt_name_t           @var{type}, const char * @var{data_string})
-@var{crt}: a certificate of type @code{gnutls_x509_crt_t} 
-
-@var{type}: is one of the gnutls_x509_subject_alt_name_t enumerations
-
-@var{data_string}: The data to be set, a (0) terminated string
-
-This function will set the subject alternative name certificate
-extension. This function assumes that data can be expressed as a null
-terminated string.
-
-The name of the function is unfortunate since it is inconsistent with
-@code{gnutls_x509_crt_get_subject_alt_name()} .
-
-See @code{gnutls_x509_crt_set_subject_alt_name()}  for more information.
-
-@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
-negative error value.
-@end deftypefun
-
 @subheading gnutls_x509_crt_set_subject_alt_name
 @anchor{gnutls_x509_crt_set_subject_alt_name}
 @deftypefun {int} {gnutls_x509_crt_set_subject_alt_name} (gnutls_x509_crt_t @var{crt}, gnutls_x509_subject_alt_name_t @var{type}, const void * @var{data}, unsigned int @var{data_size}, unsigned int @var{flags})
@@ -4996,6 +4996,28 @@ can be used to encode the provided data.
 negative error value.
 
 @strong{Since:} 3.5.0
+@end deftypefun
+
+@subheading gnutls_x509_crt_set_subject_alternative_name
+@anchor{gnutls_x509_crt_set_subject_alternative_name}
+@deftypefun {int} {gnutls_x509_crt_set_subject_alternative_name} (gnutls_x509_crt_t @var{crt}, gnutls_x509_subject_alt_name_t           @var{type}, const char * @var{data_string})
+@var{crt}: a certificate of type @code{gnutls_x509_crt_t} 
+
+@var{type}: is one of the gnutls_x509_subject_alt_name_t enumerations
+
+@var{data_string}: The data to be set, a (0) terminated string
+
+This function will set the subject alternative name certificate
+extension. This function assumes that data can be expressed as a null
+terminated string.
+
+The name of the function is unfortunate since it is inconsistent with
+@code{gnutls_x509_crt_get_subject_alt_name()} .
+
+See @code{gnutls_x509_crt_set_subject_alt_name()}  for more information.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
 @end deftypefun
 
 @subheading gnutls_x509_crt_set_subject_key_id
@@ -5156,7 +5178,7 @@ negative error value.
 This function will verify the given signed data, using the
 parameters from the certificate.
 
-@strong{Returns:} In case of a verification failure @code{GNUTLS_E_PK_SIG_VERIFY_FAILED}  
+@strong{Returns:} In case of a verification failure @code{GNUTLS_E_PK_SIG_VERIFY_FAILED} 
 is returned, @code{GNUTLS_E_EXPIRED}  or @code{GNUTLS_E_NOT_YET_ACTIVATED}  on expired
 or not yet activated certificate and zero or positive code on success.
 
@@ -5937,7 +5959,7 @@ in the  @code{features} structure then they will be merged with.
 
 @var{out}: Newly allocated datum with null terminated string.
 
-This function will pretty print X.509 certificate extensions, 
+This function will pretty print X.509 certificate extensions,
 suitable for display to a human.
 
 The output  @code{out} needs to be deallocated using @code{gnutls_free()} .

@@ -1,12 +1,12 @@
 # getcwd.m4 - check for working getcwd that is compatible with glibc
 
-# Copyright (C) 2001, 2003-2007, 2009-2019 Free Software Foundation, Inc.
+# Copyright (C) 2001, 2003-2007, 2009-2020 Free Software Foundation, Inc.
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
 
 # Written by Paul Eggert.
-# serial 17
+# serial 18
 
 AC_DEFUN([gl_FUNC_GETCWD_NULL],
   [
@@ -54,8 +54,8 @@ AC_DEFUN([gl_FUNC_GETCWD_NULL],
             *-musl*)       gl_cv_func_getcwd_null="guessing yes";;
                            # Guess yes on Cygwin.
             cygwin*)       gl_cv_func_getcwd_null="guessing yes";;
-                           # If we don't know, assume the worst.
-            *)             gl_cv_func_getcwd_null="guessing no";;
+                           # If we don't know, obey --enable-cross-guesses.
+            *)             gl_cv_func_getcwd_null="$gl_cross_guess_normal";;
           esac
         ]])])
 ])
@@ -127,7 +127,7 @@ AC_DEFUN([gl_FUNC_GETCWD],
   dnl Define HAVE_MINIMALLY_WORKING_GETCWD and HAVE_PARTLY_WORKING_GETCWD
   dnl if appropriate.
   case "$gl_cv_func_getcwd_path_max" in
-    "no"|"no, it has the AIX bug") ;;
+    *"no" | *"no, it has the AIX bug") ;;
     *)
       AC_DEFINE([HAVE_MINIMALLY_WORKING_GETCWD], [1],
         [Define to 1 if getcwd minimally works, that is, its result can be
@@ -135,12 +135,12 @@ AC_DEFUN([gl_FUNC_GETCWD],
       ;;
   esac
   case "$gl_cv_func_getcwd_path_max" in
-    "no, but it is partly working")
+    *"no, but it is partly working")
       AC_DEFINE([HAVE_PARTLY_WORKING_GETCWD], [1],
         [Define to 1 if getcwd works, except it sometimes fails when it
          shouldn't, setting errno to ERANGE, ENAMETOOLONG, or ENOENT.])
       ;;
-    "yes, but with shorter paths")
+    *"yes, but with shorter paths")
       AC_DEFINE([HAVE_GETCWD_SHORTER], [1],
         [Define to 1 if getcwd works, but with shorter paths
          than is generally tested with the replacement.])

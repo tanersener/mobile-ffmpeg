@@ -19,7 +19,7 @@
  * The ocsptool program is copyrighted and licensed
  * under the following terms:
  *
- *  Copyright (C) 2000-2019 Free Software Foundation, and others, all rights reserved.
+ *  Copyright (C) 2000-2020 Free Software Foundation, and others, all rights reserved.
  *  This is free software. It is licensed for use, modification and
  *  redistribution under the terms of the GNU General Public License,
  *  version 3 or later <http://gnu.org/licenses/gpl.html>
@@ -68,8 +68,8 @@ extern FILE * option_usage_fp;
  *  static const strings for ocsptool options
  */
 static char const ocsptool_opt_strs[2760] =
-/*     0 */ "ocsptool 3.6.11\n"
-            "Copyright (C) 2000-2019 Free Software Foundation, and others, all rights reserved.\n"
+/*     0 */ "ocsptool 3.6.13\n"
+            "Copyright (C) 2000-2020 Free Software Foundation, and others, all rights reserved.\n"
             "This is free software. It is licensed for use, modification and\n"
             "redistribution under the terms of the GNU General Public License,\n"
             "version 3 or later <http://gnu.org/licenses/gpl.html>\n\0"
@@ -165,7 +165,7 @@ static char const ocsptool_opt_strs[2760] =
             "requests/responses, generate requests and verify responses.  Unlike other\n"
             "GnuTLS applications it outputs DER encoded structures by default unless the\n"
             "'--outpem' option is specified.\n\0"
-/*  2684 */ "ocsptool 3.6.11\0"
+/*  2684 */ "ocsptool 3.6.13\0"
 /*  2700 */ "ocsptool [options]\n"
             "ocsptool --help for usage instructions.\n";
 
@@ -1290,8 +1290,8 @@ static void bogus_function(void) {
      translate option names.
    */
   /* referenced via ocsptoolOptions.pzCopyright */
-  puts(_("ocsptool 3.6.11\n\
-Copyright (C) 2000-2019 Free Software Foundation, and others, all rights reserved.\n\
+  puts(_("ocsptool 3.6.13\n\
+Copyright (C) 2000-2020 Free Software Foundation, and others, all rights reserved.\n\
 This is free software. It is licensed for use, modification and\n\
 redistribution under the terms of the GNU General Public License,\n\
 version 3 or later <http://gnu.org/licenses/gpl.html>\n"));
@@ -1397,7 +1397,7 @@ GnuTLS applications it outputs DER encoded structures by default unless the\n\
 '--outpem' option is specified.\n"));
 
   /* referenced via ocsptoolOptions.pzFullVersion */
-  puts(_("ocsptool 3.6.11"));
+  puts(_("ocsptool 3.6.13"));
 
   /* referenced via ocsptoolOptions.pzFullUsage */
   puts(_("<<<NOT-FOUND>>>"));

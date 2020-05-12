@@ -12,7 +12,8 @@
    SAFE TO REACH THEM THROUGH DOCUMENTED INTERFACES.  IN FACT, IT IS ALMOST
    GUARANTEED THAT THEY WILL CHANGE OR DISAPPEAR IN A FUTURE GMP RELEASE.
 
-Copyright (C) 2007, 2009, 2010, 2012, 2015 Free Software Foundation, Inc.
+Copyright (C) 2007, 2009, 2010, 2012, 2015, 2016 Free Software
+Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
@@ -40,7 +41,6 @@ You should have received copies of the GNU General Public License and the
 GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
-#include "gmp.h"
 #include "gmp-impl.h"
 #include "longlong.h"
 
@@ -97,13 +97,8 @@ mpn_bc_invertappr (mp_ptr ip, mp_srcptr dp, mp_size_t n, mp_ptr xp)
   if (n == 1)
     invert_limb (*ip, *dp);
   else {
-    mp_size_t i;
-
     /* n > 1 here */
-    i = n;
-    do
-      xp[--i] = GMP_NUMB_MAX;
-    while (i);
+    MPN_FILL (xp, n, GMP_NUMB_MAX);
     mpn_com (xp + n, dp, n);
 
     /* Now xp contains B^2n - {dp,n}*B^n - 1 */

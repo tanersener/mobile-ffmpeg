@@ -2,7 +2,7 @@
 
 
 
-@deftypefun {int} {gnutls_ocsp_req_get_cert_id} (gnutls_ocsp_req_t @var{req}, unsigned @var{indx}, gnutls_digest_algorithm_t * @var{digest}, gnutls_datum_t * @var{issuer_name_hash}, gnutls_datum_t * @var{issuer_key_hash}, gnutls_datum_t * @var{serial_number})
+@deftypefun {int} {gnutls_ocsp_req_get_cert_id} (gnutls_ocsp_req_const_t @var{req}, unsigned @var{indx}, gnutls_digest_algorithm_t * @var{digest}, gnutls_datum_t * @var{issuer_name_hash}, gnutls_datum_t * @var{issuer_key_hash}, gnutls_datum_t * @var{serial_number})
 @var{req}: should contain a @code{gnutls_ocsp_req_t}  type
 
 @var{indx}: Specifies which extension OID to get. Use (0) to get the first one.
