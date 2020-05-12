@@ -81,7 +81,7 @@ extern NSMutableString *lastCommandOutput;
 }
 
 /**
- * Returns media information for given file.
+ * Returns media information for the given file.
  *
  * This method does not support executing multiple concurrent operations. If you execute
  * multiple operations (execute or getMediaInformation) at the same time, the response of this
@@ -91,18 +91,21 @@ extern NSMutableString *lastCommandOutput;
  * @return media information
  */
 + (MediaInformation*)getMediaInformation: (NSString*)path {
-    int rc = [MobileFFprobe executeWithArguments:[[NSArray alloc] initWithObjects:@"-v", @"info", @"-hide_banner", @"-i", path, nil]];
+    return [MobileFFprobe getMediaInformationFromCommandArguments:[[NSArray alloc] initWithObjects:@"-v", @"error", @"-hide_banner", @"-print_format", @"json", @"-show_format", @"-show_streams", @"-i", path, nil]];
+}
 
-    if (rc == 0) {
-        return [MediaInformationParser from:[MobileFFmpegConfig getLastCommandOutput]];
-    } else {
-        int activeLogLevel = av_log_get_level();
-        if ((activeLogLevel != AV_LOG_QUIET) && (AV_LOG_WARNING <= activeLogLevel)) {
-            NSLog(@"%@", [MobileFFmpegConfig getLastCommandOutput]);
-        }
-
-        return nil;
-    }
+/**
+ * Returns media information for the given command.
+ *
+ * This method does not support executing multiple concurrent operations. If you execute
+ * multiple operations (execute or getMediaInformation) at the same time, the response of this
+ * method is not predictable.
+ *
+ * @param command
+ * @return media information
+ */
++ (MediaInformation*)getMediaInformationFromCommand: (NSString*)command {
+    return [MobileFFprobe getMediaInformationFromCommandArguments:[MobileFFmpeg parseArguments: command]];
 }
 
 /**
@@ -120,6 +123,21 @@ extern NSMutableString *lastCommandOutput;
  */
 + (MediaInformation*)getMediaInformation: (NSString*)path timeout:(long)timeout {
     return [MobileFFprobe getMediaInformation:path];
+}
+
++ (MediaInformation*)getMediaInformationFromCommandArguments: (NSArray*)arguments {
+    int rc = [MobileFFprobe executeWithArguments:arguments];
+
+    if (rc == 0) {
+        return [MediaInformationParser from:[MobileFFmpegConfig getLastCommandOutput]];
+    } else {
+        int activeLogLevel = av_log_get_level();
+        if ((activeLogLevel != AV_LOG_QUIET) && (AV_LOG_WARNING <= activeLogLevel)) {
+            NSLog(@"%@", [MobileFFmpegConfig getLastCommandOutput]);
+        }
+
+        return nil;
+    }
 }
 
 @end

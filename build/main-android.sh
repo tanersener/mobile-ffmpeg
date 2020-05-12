@@ -122,7 +122,7 @@ fi
 # FILTERING WHICH EXTERNAL LIBRARIES WILL BE BUILT
 # NOTE THAT BUILT-IN LIBRARIES ARE FORWARDED TO FFMPEG SCRIPT WITHOUT ANY PROCESSING
 enabled_library_list=()
-for library in {1..45}
+for library in {1..46}
 do
     if [[ ${!library} -eq 1 ]]; then
         ENABLED_LIBRARY=$(get_library_name $((library - 1)))

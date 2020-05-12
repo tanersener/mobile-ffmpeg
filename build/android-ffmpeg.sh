@@ -178,11 +178,8 @@ do
             ;;
             opencore-amr)
                 CFLAGS+=" $(pkg-config --cflags opencore-amrnb)"
-                CFLAGS+=" $(pkg-config --cflags opencore-amrwb)"
                 LDFLAGS+=" $(pkg-config --libs --static opencore-amrnb)"
-                LDFLAGS+=" $(pkg-config --libs --static opencore-amrwb)"
                 CONFIGURE_POSTFIX+=" --enable-libopencore-amrnb"
-                CONFIGURE_POSTFIX+=" --enable-libopencore-amrwb"
             ;;
             openh264)
                 FFMPEG_CFLAGS+=" $(pkg-config --cflags openh264)"
@@ -235,6 +232,11 @@ do
                 CFLAGS+=" $(pkg-config --cflags twolame)"
                 LDFLAGS+=" $(pkg-config --libs --static twolame)"
                 CONFIGURE_POSTFIX+=" --enable-libtwolame"
+            ;;
+            vo-amrwbenc)
+                CFLAGS+=" $(pkg-config --cflags vo-amrwbenc)"
+                LDFLAGS+=" $(pkg-config --libs --static vo-amrwbenc)"
+                CONFIGURE_POSTFIX+=" --enable-libvo-amrwbenc"
             ;;
             wavpack)
                 CFLAGS+=" $(pkg-config --cflags wavpack)"

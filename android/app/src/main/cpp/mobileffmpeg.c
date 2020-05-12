@@ -61,7 +61,7 @@ struct CallbackData {
   int type;                 // 1 (log callback) or 2 (statistics callback)
 
   int logLevel;             // log level
-  char *logData;            // log data
+  AVBPrint logData;         // log data
 
   int statisticsFrameNumber;        // statistics frame number
   float statisticsFps;              // statistics fps
@@ -81,7 +81,7 @@ pthread_cond_t monitorCondition;
 
 /** Last command output variables */
 pthread_mutex_t logMutex;
-static char *lastCommandOutput;
+static AVBPrint lastCommandOutput;
 
 pthread_t callbackThread;
 int redirectionEnabled;
@@ -233,7 +233,7 @@ void logInit() {
     pthread_mutex_init(&logMutex, &attributes);
     pthread_mutexattr_destroy(&attributes);
 
-    lastCommandOutput = NULL;
+    av_bprint_init(&lastCommandOutput, 0, AV_BPRINT_SIZE_UNLIMITED);
 }
 
 void mutexUnInit() {
@@ -267,48 +267,18 @@ void lastCommandOutputUnlock() {
 
 void clearLastCommandOutput() {
     lastCommandOutputLock();
-
-    if (lastCommandOutput != NULL) {
-        av_free(lastCommandOutput);
-        lastCommandOutput = NULL;
-    }
-
+    av_bprint_clear(&lastCommandOutput);
     lastCommandOutputUnlock();
 }
 
-void appendLastCommandOutput(const char *logMessage) {
-    size_t length = 0;
-    char *tempLastCommandOutput = NULL;
-    size_t logMessageLength = strlen(logMessage);
-
-    if (logMessageLength <= 0) {
+void appendLastCommandOutput(AVBPrint *logMessage) {
+    if (logMessage->len <= 0) {
         return;
     }
 
     lastCommandOutputLock();
-
-    if (lastCommandOutput == NULL) {
-        length = logMessageLength + 1;
-
-        lastCommandOutput = (char*)av_malloc(length);
-        memcpy(lastCommandOutput, logMessage, length);
-    } else {
-        size_t length1 = strlen(lastCommandOutput);
-        length = length1 + logMessageLength + 1;
-
-        char *newLastCommandOutput = (char*)av_malloc(length);
-        memcpy(newLastCommandOutput, lastCommandOutput, length1);
-        memcpy(newLastCommandOutput + length1, logMessage, logMessageLength + 1);
-
-        tempLastCommandOutput = lastCommandOutput;
-        lastCommandOutput = newLastCommandOutput;
-    }
-
+    av_bprintf(&lastCommandOutput, "%s", logMessage->str);
     lastCommandOutputUnlock();
-
-    if (tempLastCommandOutput != NULL) {
-        av_free(tempLastCommandOutput);
-    }
 }
 
 void monitorWait(int milliSeconds) {
@@ -343,15 +313,14 @@ void monitorNotify() {
  * @param level log level
  * @param data log data
  */
-void logCallbackDataAdd(int level, const char *data) {
+void logCallbackDataAdd(int level, AVBPrint *data) {
 
     // CREATE DATA STRUCT FIRST
     struct CallbackData *newData = (struct CallbackData*)av_malloc(sizeof(struct CallbackData));
     newData->type = 1;
     newData->logLevel = level;
-    size_t dataSize = strlen(data) + 1;
-    newData->logData = (char*)av_malloc(dataSize);
-    memcpy(newData->logData, data, dataSize);
+    av_bprint_init(&newData->logData, 0, AV_BPRINT_SIZE_UNLIMITED);
+    av_bprintf(&newData->logData, "%s", data->str);
     newData->next = NULL;
 
     mutexLock();
@@ -459,7 +428,7 @@ struct CallbackData *callbackDataRemove() {
  * @param vargs arguments
  */
 void mobileffmpeg_log_callback_function(void *ptr, int level, const char* format, va_list vargs) {
-    char line[LOG_LINE_SIZE];
+    AVBPrint fullLine;
     AVBPrint part[4];
     int print_prefix = 1;
 
@@ -473,21 +442,27 @@ void mobileffmpeg_log_callback_function(void *ptr, int level, const char* format
         return;
     }
 
+    av_bprint_init(&fullLine, 0, AV_BPRINT_SIZE_UNLIMITED);
+
     avutil_log_format_line(ptr, level, format, vargs, part, &print_prefix);
     avutil_log_sanitize(part[0].str);
     avutil_log_sanitize(part[1].str);
     avutil_log_sanitize(part[2].str);
     avutil_log_sanitize(part[3].str);
 
-    snprintf(line, sizeof(line), "%s%s%s%s", part[0].str, part[1].str, part[2].str, part[3].str);
+    // COMBINE ALL 4 LOG PARTS
+    av_bprintf(&fullLine, "%s%s%s%s", part[0].str, part[1].str, part[2].str, part[3].str);
 
-    logCallbackDataAdd(level, line);
-    appendLastCommandOutput(line);
+    if (fullLine.len > 0) {
+        logCallbackDataAdd(level, &fullLine);
+        appendLastCommandOutput(&fullLine);
+    }
 
     av_bprint_finalize(part, NULL);
     av_bprint_finalize(part+1, NULL);
     av_bprint_finalize(part+2, NULL);
     av_bprint_finalize(part+3, NULL);
+    av_bprint_finalize(&fullLine, NULL);
 }
 
 /**
@@ -533,15 +508,15 @@ void *callbackThreadFunction() {
 
                 // LOG CALLBACK
 
-                size_t size = strlen(callbackData->logData);
+                int size = callbackData->logData.len;
 
                 jbyteArray byteArray = (jbyteArray) (*env)->NewByteArray(env, size);
-                (*env)->SetByteArrayRegion(env, byteArray, 0, size, (jbyte *)callbackData->logData);
+                (*env)->SetByteArrayRegion(env, byteArray, 0, size, callbackData->logData.str);
                 (*env)->CallStaticVoidMethod(env, configClass, logMethod, callbackData->logLevel, byteArray);
                 (*env)->DeleteLocalRef(env, byteArray);
 
                 // CLEAN LOG DATA
-                av_free(callbackData->logData);
+                av_bprint_finalize(&callbackData->logData, NULL);
 
             } else {
 
@@ -855,15 +830,12 @@ JNIEXPORT int JNICALL Java_com_arthenica_mobileffmpeg_Config_setNativeEnvironmen
  * @return output of the last executed command
  */
 JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_Config_getNativeLastCommandOutput(JNIEnv *env, jclass object) {
-    if (lastCommandOutput != NULL) {
-        int size = strlen(lastCommandOutput);
-
-        if (size > 0) {
-            jbyteArray byteArray = (*env)->NewByteArray(env, size);
-            (*env)->SetByteArrayRegion(env, byteArray, 0, size, lastCommandOutput);
-            jstring charsetName = (*env)->NewStringUTF(env, "UTF-8");
-            return (jstring) (*env)->NewObject(env, stringClass, stringConstructor, byteArray, charsetName);
-        }
+    int size = lastCommandOutput.len;
+    if (size > 0) {
+        jbyteArray byteArray = (*env)->NewByteArray(env, size);
+        (*env)->SetByteArrayRegion(env, byteArray, 0, size, lastCommandOutput.str);
+        jstring charsetName = (*env)->NewStringUTF(env, "UTF-8");
+        return (jstring) (*env)->NewObject(env, stringClass, stringConstructor, byteArray, charsetName);
     }
 
     return (*env)->NewStringUTF(env, "");

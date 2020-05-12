@@ -37,29 +37,30 @@ LIBRARY_TWOLAME=28
 LIBRARY_SDL=29
 LIBRARY_TESSERACT=30
 LIBRARY_OPENH264=31
-LIBRARY_GIFLIB=32
-LIBRARY_JPEG=33
-LIBRARY_LIBOGG=34
-LIBRARY_LIBPNG=35
-LIBRARY_NETTLE=36
-LIBRARY_TIFF=37
-LIBRARY_EXPAT=38
-LIBRARY_SNDFILE=39
-LIBRARY_LEPTONICA=40
-LIBRARY_LIBSAMPLERATE=41
-LIBRARY_ZLIB=42
-LIBRARY_AUDIOTOOLBOX=43
-LIBRARY_COREIMAGE=44
-LIBRARY_BZIP2=45
-LIBRARY_VIDEOTOOLBOX=46
-LIBRARY_LIBICONV=47
-LIBRARY_LIBUUID=48
+LIBRARY_VO_AMRWBENC=32
+LIBRARY_GIFLIB=33
+LIBRARY_JPEG=34
+LIBRARY_LIBOGG=35
+LIBRARY_LIBPNG=36
+LIBRARY_NETTLE=37
+LIBRARY_TIFF=38
+LIBRARY_EXPAT=39
+LIBRARY_SNDFILE=40
+LIBRARY_LEPTONICA=41
+LIBRARY_LIBSAMPLERATE=42
+LIBRARY_ZLIB=43
+LIBRARY_AUDIOTOOLBOX=44
+LIBRARY_COREIMAGE=45
+LIBRARY_BZIP2=46
+LIBRARY_VIDEOTOOLBOX=47
+LIBRARY_LIBICONV=48
+LIBRARY_LIBUUID=49
 
 # ENABLE ARCH
 ENABLED_ARCHITECTURES=(1 1)
 
 # ENABLE LIBRARIES
-ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 
 export BASEDIR=$(pwd)
 export MOBILE_FFMPEG_TMPDIR="${BASEDIR}/.tmp"
@@ -152,6 +153,7 @@ display_help() {
   echo -e "  --enable-speex\t\tbuild with speex [no]"
   echo -e "  --enable-tesseract\t\tbuild with tesseract [no]"
   echo -e "  --enable-twolame\t\tbuild with twolame [no]"
+  echo -e "  --enable-vo-amrwbenc\t\tbuild with vo-amrwbenc [no]"
   echo -e "  --enable-wavpack\t\tbuild with wavpack [no]\n"
 
   echo -e "GPL libraries:"
@@ -221,12 +223,12 @@ reconf_library() {
   local RECONF_VARIABLE=$(echo "RECONF_$1" | sed "s/\-/\_/g")
   local library_supported=0
 
-  for library in {1..42}; do
+  for library in {1..43}; do
     library_name=$(get_library_name $((library - 1)))
 
-    if [[ $1 != "ffmpeg" ]] && [[ ${library_name} == $1 ]]; then
-      export ${RECONF_VARIABLE}=1
-      RECONF_LIBRARIES+=($1)
+    if [[ $1 != "ffmpeg" ]] && [[ ${library_name} == "$1" ]]; then
+      export "${RECONF_VARIABLE}"=1
+      RECONF_LIBRARIES+=("$1")
       library_supported=1
     fi
   done
@@ -240,7 +242,7 @@ rebuild_library() {
   local REBUILD_VARIABLE=$(echo "REBUILD_$1" | sed "s/\-/\_/g")
   local library_supported=0
 
-  for library in {1..42}; do
+  for library in {1..43}; do
     library_name=$(get_library_name $((library - 1)))
 
     if [[ $1 != "ffmpeg" ]] && [[ ${library_name} == $1 ]]; then
@@ -406,6 +408,9 @@ set_library() {
     ENABLED_LIBRARIES[LIBRARY_TWOLAME]=$2
     ENABLED_LIBRARIES[LIBRARY_SNDFILE]=$2
     ;;
+  vo-amrwbenc)
+    ENABLED_LIBRARIES[LIBRARY_VO_AMRWBENC]=$2
+    ;;
   wavpack)
     ENABLED_LIBRARIES[LIBRARY_WAVPACK]=$2
     ;;
@@ -495,7 +500,7 @@ print_enabled_libraries() {
   let enabled=0
 
   # FIRST BUILT-IN LIBRARIES
-  for library in {42..48}; do
+  for library in {43..49}; do
     if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
       if [[ ${enabled} -ge 1 ]]; then
         echo -n ", "
@@ -506,7 +511,7 @@ print_enabled_libraries() {
   done
 
   # THEN EXTERNAL LIBRARIES
-  for library in {0..31}; do
+  for library in {0..32}; do
     if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
       if [[ ${enabled} -ge 1 ]]; then
         echo -n ", "
@@ -671,11 +676,11 @@ get_external_library_license_path() {
   25) echo "${BASEDIR}/src/$(get_library_name $1)/COPYING.LGPL" ;;
   27) echo "${BASEDIR}/src/$(get_library_name $1)/LICENSE.md" ;;
   29) echo "${BASEDIR}/src/$(get_library_name $1)/COPYING.txt" ;;
-  33) echo "${BASEDIR}/src/$(get_library_name $1)/LICENSE.md " ;;
-  36) echo "${BASEDIR}/src/$(get_library_name $1)/COPYING.LESSERv3" ;;
-  37) echo "${BASEDIR}/src/$(get_library_name $1)/COPYRIGHT" ;;
-  40) echo "${BASEDIR}/src/$(get_library_name $1)/leptonica-license.txt" ;;
-  4 | 9 | 12 | 18 | 20 | 26 | 31 | 35) echo "${BASEDIR}/src/$(get_library_name $1)/LICENSE" ;;
+  34) echo "${BASEDIR}/src/$(get_library_name $1)/LICENSE.md " ;;
+  37) echo "${BASEDIR}/src/$(get_library_name $1)/COPYING.LESSERv3" ;;
+  38) echo "${BASEDIR}/src/$(get_library_name $1)/COPYRIGHT" ;;
+  41) echo "${BASEDIR}/src/$(get_library_name $1)/leptonica-license.txt" ;;
+  4 | 9 | 12 | 18 | 20 | 26 | 31 | 36) echo "${BASEDIR}/src/$(get_library_name $1)/LICENSE" ;;
   *) echo "${BASEDIR}/src/$(get_library_name $1)/COPYING" ;;
   esac
 }
@@ -692,6 +697,7 @@ echo -e "\nINFO: Build options: $*\n" 1>>${BASEDIR}/build.log 2>&1
 GPL_ENABLED="no"
 DISPLAY_HELP=""
 BUILD_LTS=""
+BUILD_FULL=""
 BUILD_TYPE_ID=""
 BUILD_FORCE=""
 BUILD_VERSION=$(git describe --tags 2>>${BASEDIR}/build.log)
@@ -741,11 +747,7 @@ while [ ! $# -eq 0 ]; do
     rebuild_library ${BUILD_LIBRARY}
     ;;
   --full)
-    for library in {0..48}; do
-      if [[ $library -ne 17 ]] && [[ $library -ne 18 ]] && [[ $library -ne 19 ]] && [[ $library -ne 20 ]] && [[ $library -ne 21 ]]; then
-        enable_library $(get_library_name $library)
-      fi
-    done
+    BUILD_FULL="1"
     ;;
   --enable-gpl)
     GPL_ENABLED="yes"
@@ -768,14 +770,26 @@ while [ ! $# -eq 0 ]; do
 done
 
 # DETECT BUILD TYPE
-if [[ ! -z ${BUILD_LTS} ]]; then
+if [[ -n ${BUILD_LTS} ]]; then
   enable_lts_build
   BUILD_TYPE_ID+="LTS "
 fi
 
-if [[ ! -z ${DISPLAY_HELP} ]]; then
+if [[ -n ${DISPLAY_HELP} ]]; then
   display_help
   exit 0
+fi
+
+if [[ -n ${BUILD_FULL} ]]; then
+  for library in {0..49}; do
+    if [ ${GPL_ENABLED} == "yes" ]; then
+      enable_library $(get_library_name $library)
+    else
+      if [[ $library -ne 17 ]] && [[ $library -ne 18 ]] && [[ $library -ne 19 ]] && [[ $library -ne 20 ]] && [[ $library -ne 21 ]]; then
+        enable_library $(get_library_name $library)
+      fi
+    fi
+  done
 fi
 
 if [[ -z ${BUILD_VERSION} ]]; then
@@ -852,7 +866,7 @@ for run_arch in {0..1}; do
     TARGET_ARCH_LIST+=(${TARGET_ARCH})
 
     # CLEAR FLAGS
-    for library in {1..47}; do
+    for library in {1..48}; do
       library_name=$(get_library_name $((library - 1)))
       unset $(echo "OK_${library_name}" | sed "s/\-/\_/g")
       unset $(echo "DEPENDENCY_REBUILT_${library_name}" | sed "s/\-/\_/g")
@@ -875,7 +889,7 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
   mkdir -p ${BASEDIR}/prebuilt/tvos-framework 1>>${BASEDIR}/build.log 2>&1
 
   # 1. EXTERNAL LIBRARIES
-  for library in {0..41}; do
+  for library in {0..42}; do
     if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
 
       library_name=$(get_library_name ${library})
@@ -1116,20 +1130,8 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
         [[ ${LIBRARY_OPENCOREAMR} == $library ]]
       then
 
-        LIBRARY_CREATED=$(create_static_fat_library "libopencore-amrwb.a" "libopencore-amrwb")
-        if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
         LIBRARY_CREATED=$(create_static_fat_library "libopencore-amrnb.a" "libopencore-amrnb")
         if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-        FRAMEWORK_CREATED=$(create_static_framework "libopencore-amrwb" "libopencore-amrwb.a" $library_version)
-        if [[ ${FRAMEWORK_CREATED} -ne 0 ]]; then
           echo -e "failed\n"
           exit 1
         fi
@@ -1140,19 +1142,7 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
           exit 1
         fi
 
-        $(cp $(get_external_library_license_path ${library}) ${BASEDIR}/prebuilt/tvos-universal/libopencore-amrwb-universal/LICENSE 1>>${BASEDIR}/build.log 2>&1)
-        if [ $? -ne 0 ]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
         $(cp $(get_external_library_license_path ${library}) ${BASEDIR}/prebuilt/tvos-universal/libopencore-amrnb-universal/LICENSE 1>>${BASEDIR}/build.log 2>&1)
-        if [ $? -ne 0 ]; then
-          echo -e "failed\n"
-          exit 1
-        fi
-
-        $(cp $(get_external_library_license_path ${library}) ${BASEDIR}/prebuilt/tvos-framework/libopencore-amrwb.framework/LICENSE 1>>${BASEDIR}/build.log 2>&1)
         if [ $? -ne 0 ]; then
           echo -e "failed\n"
           exit 1
