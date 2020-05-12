@@ -588,7 +588,7 @@ EOF
 DETECTED_NDK_VERSION=$(grep -Eo Revision.* ${ANDROID_NDK_ROOT}/source.properties | sed 's/Revision//g;s/=//g;s/ //g')
 
 echo -e "\nINFO: Using Android NDK v${DETECTED_NDK_VERSION} provided at ${ANDROID_NDK_ROOT}\n" 1>>${BASEDIR}/build.log 2>&1
-echo -e "INFO: Build options: $@\n" 1>>${BASEDIR}/build.log 2>&1
+echo -e "INFO: Build options: $*\n" 1>>${BASEDIR}/build.log 2>&1
 
 # CLEAR OLD NATIVE LIBS
 rm -rf ${BASEDIR}/android/libs 1>>${BASEDIR}/build.log 2>&1
@@ -756,7 +756,7 @@ export ORIGINAL_API=${API}
 
 for run_arch in {0..4}; do
   if [[ ${ENABLED_ARCHITECTURES[$run_arch]} -eq 1 ]]; then
-    if [[ (${run_arch} -eq ${ARCH_ARM64_V8A} || ${run_arch} -eq ${ARCH_X86_64}) && ${API} < 21 ]]; then
+    if [[ (${run_arch} -eq ${ARCH_ARM64_V8A} || ${run_arch} -eq ${ARCH_X86_64}) && ${API} -lt 21 ]]; then
 
       # 64 bit ABIs supported after API 21
       export API=21
