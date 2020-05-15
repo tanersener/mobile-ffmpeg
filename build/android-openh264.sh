@@ -64,6 +64,7 @@ CFLAGS="$CFLAGS" \
 CXX="$CXX" \
 CXXFLAGS="${CXXFLAGS}" \
 LDFLAGS="$LDFLAGS" \
+STATIC_LDFLAGS="" \
 OS=android \
 PREFIX="${BASEDIR}/prebuilt/android-$(get_target_build)/${LIB_NAME}" \
 NDKLEVEL="${API}" \
