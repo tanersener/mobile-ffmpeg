@@ -566,7 +566,7 @@ build_application_mk() {
     local LTS_BUILD_FLAG="-DMOBILE_FFMPEG_LTS "
   fi
 
-  if [[ ${ENABLED_LIBRARIES[$LIBRARY_X265]} -eq 1 ]] || [[ ${ENABLED_LIBRARIES[$LIBRARY_TESSERACT]} -eq 1 ]] || [[ ${ENABLED_LIBRARIES[$LIBRARY_SNAPPY]} -eq 1 ]] || [[ ${ENABLED_LIBRARIES[$LIBRARY_RUBBERBAND]} -eq 1 ]]; then
+  if [[ ${ENABLED_LIBRARIES[$LIBRARY_X265]} -eq 1 ]] || [[ ${ENABLED_LIBRARIES[$LIBRARY_TESSERACT]} -eq 1 ]] || [[ ${ENABLED_LIBRARIES[$LIBRARY_OPENH264]} -eq 1 ]] || [[ ${ENABLED_LIBRARIES[$LIBRARY_SNAPPY]} -eq 1 ]] || [[ ${ENABLED_LIBRARIES[$LIBRARY_RUBBERBAND]} -eq 1 ]]; then
     local APP_STL="c++_shared"
   else
     local APP_STL="none"
@@ -590,6 +590,16 @@ APP_CFLAGS := -O3 -DANDROID ${LTS_BUILD_FLAG}${BUILD_DATE} -Wall -Wno-deprecated
 APP_LDFLAGS := -Wl,--hash-style=both
 EOF
 }
+
+if [[ -z ${ANDROID_NDK_ROOT} ]]; then
+  echo "ANDROID_NDK_ROOT not defined"
+  exit 1
+fi
+
+if [[ -z ${ANDROID_HOME} ]]; then
+  echo "ANDROID_HOME not defined"
+  exit 1
+fi
 
 # ENABLE COMMON FUNCTIONS
 . ${BASEDIR}/build/android-common.sh
@@ -715,16 +725,6 @@ if [[ -n ${BUILD_FULL} ]]; then
       fi
     fi
   done
-fi
-
-if [[ -z ${ANDROID_NDK_ROOT} ]]; then
-  echo "ANDROID_NDK_ROOT not defined"
-  exit 1
-fi
-
-if [[ -z ${ANDROID_HOME} ]]; then
-  echo "ANDROID_HOME not defined"
-  exit 1
 fi
 
 if [[ -z ${BUILD_VERSION} ]]; then
