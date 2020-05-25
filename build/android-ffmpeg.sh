@@ -76,7 +76,7 @@ esac
 CONFIGURE_POSTFIX=""
 HIGH_PRIORITY_INCLUDES=""
 
-for library in {1..46}
+for library in {1..49}
 do
     if [[ ${!library} -eq 1 ]]; then
         ENABLED_LIBRARY=$(get_library_name $((library - 1)))
@@ -163,7 +163,7 @@ do
             libvpx)
                 CFLAGS+=" $(pkg-config --cflags vpx)"
                 LDFLAGS+=" $(pkg-config --libs vpx)"
-                LDFLAGS+=" $(pkg-config --libs cpu_features)"
+                LDFLAGS+=" $(pkg-config --libs cpu-features)"
                 CONFIGURE_POSTFIX+=" --enable-libvpx"
             ;;
             libwebp)
@@ -288,13 +288,15 @@ do
             android-media-codec)
                 CONFIGURE_POSTFIX+=" --enable-mediacodec"
             ;;
+            cpu-features)
+                LDFLAGS+=" $(pkg-config --libs --static cpu-features)"
         esac
     else
 
         # THE FOLLOWING LIBRARIES SHOULD BE EXPLICITLY DISABLED TO PREVENT AUTODETECT
         if [[ ${library} -eq 31 ]]; then
             CONFIGURE_POSTFIX+=" --disable-sdl2"
-        elif [[ ${library} -eq 45 ]]; then
+        elif [[ ${library} -eq 46 ]]; then
             CONFIGURE_POSTFIX+=" --disable-zlib"
         fi
     fi

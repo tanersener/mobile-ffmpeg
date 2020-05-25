@@ -63,9 +63,9 @@ get_library_name() {
         42) echo "libsndfile" ;;
         43) echo "leptonica" ;;
         44) echo "libsamplerate" ;;
-        45) echo "cpu_features" ;;
-        46) echo "android-zlib" ;;
-        47) echo "android-media-codec" ;;
+        45) echo "android-zlib" ;;
+        46) echo "android-media-codec" ;;
+        47) echo "cpu-features" ;;
     esac
 }
 
@@ -202,23 +202,6 @@ get_android_arch() {
             echo "x86"
         ;;
         4)
-            echo "x86_64"
-        ;;
-    esac
-}
-
-get_cmake_android_abi() { # to be used with CMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_ROOT/build/cmake/android.toolchain.cmake
-    case ${ARCH} in
-        arm-v7a | arm-v7a-neon)
-            echo "armeabi-v7a"
-        ;;
-        arm64-v8a)
-            echo "arm64-v8a"
-        ;;
-        x86)
-            echo "x86"
-        ;;
-        x86-64)
             echo "x86_64"
         ;;
     esac
@@ -857,6 +840,24 @@ Cflags: -I\${includedir}
 EOF
 }
 
+create_cpufeatures_package_config() {
+    cat > "${INSTALL_PKG_CONFIG_DIR}/cpu-features.pc" << EOF
+prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/cpu-features
+exec_prefix=\${prefix}/bin
+libdir=\${prefix}/lib
+includedir=\${prefix}/include/ndk_compat
+
+Name: cpufeatures
+URL: https://github.com/google/cpu_features
+Description: cpu_features Android compatibility library
+Version: 1.${API}
+
+Requires:
+Libs: -L\${libdir} -lndk_compat
+Cflags: -I\${includedir}
+EOF
+}
+
 #
 # download <url> <local file name> <on error action>
 #
@@ -994,6 +995,45 @@ download_gpl_library_source() {
         echo ${COPY_RC}
         return
     fi
+}
+
+android_ndk_abi() { # to be used with CMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_ROOT/build/cmake/android.toolchain.cmake
+    case ${ARCH} in
+        arm-v7a | arm-v7a-neon)
+            echo "armeabi-v7a"
+        ;;
+        arm64-v8a)
+            echo "arm64-v8a"
+        ;;
+        x86)
+            echo "x86"
+        ;;
+        x86-64)
+            echo "x86_64"
+        ;;
+    esac
+}
+
+android_ndk_binary_dir() {
+  echo ${BASEDIR}/android/build/${LIB_NAME}/$(get_target_build)
+}
+
+android_ndk_cmake() {
+    local cmake=$(which cmake)
+    if [[ -z ${cmake} ]]; then
+        cmake=$(find ${ANDROID_HOME}/cmake -path \*/bin/cmake -type f -print -quit)
+    fi
+    if [[ -z ${cmake} ]]; then
+        cmake="missing_cmake"
+    fi
+
+    echo ${cmake} \
+  -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_ROOT/build/cmake/android.toolchain.cmake \
+  -H${BASEDIR}/src/${LIB_NAME} \
+  -B$(android_ndk_binary_dir) \
+  -DANDROID_ABI=$(android_ndk_abi) \
+  -DANDROID_PLATFORM=android-${API} \
+  -DCMAKE_INSTALL_PREFIX=${BASEDIR}/prebuilt/android-$(get_target_build)/${LIB_NAME}
 }
 
 set_toolchain_clang_paths() {

@@ -53,17 +53,15 @@ LIBRARY_EXPAT=41
 LIBRARY_SNDFILE=42
 LIBRARY_LEPTONICA=43
 LIBRARY_LIBSAMPLERATE=44
-LIBRARY_CPU_FEATURES=45
-LIBRARY_ZLIB=46
-LIBRARY_MEDIA_CODEC=47
+LIBRARY_ZLIB=45
+LIBRARY_MEDIA_CODEC=46
+LIBRARY_CPU_FEATURES=47
 
 # ENABLE ARCH
 ENABLED_ARCHITECTURES=(1 1 1 1 1)
 
 # ENABLE LIBRARIES
-ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
-
-ENABLED_LIBRARIES[LIBRARY_CPU_FEATURES]=1
+ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1)
 
 export BASEDIR=$(pwd)
 export MOBILE_FFMPEG_TMPDIR="${BASEDIR}/.tmp"
@@ -235,8 +233,8 @@ rebuild_library() {
   local REBUILD_VARIABLE=$(echo "REBUILD_$1" | sed "s/\-/\_/g")
   local library_supported=0
 
-  for library in {1..45}; do
-    library_name=$(get_library_name $((library - 1)))
+  for library in {0..47}; do
+    library_name=$(get_library_name ${library})
 
     if [[ $1 != "ffmpeg" ]] && [[ ${library_name} == $1 ]]; then
       export ${REBUILD_VARIABLE}=1
@@ -492,19 +490,7 @@ print_enabled_libraries() {
 
   let enabled=0
 
-  # FIRST BUILT-IN LIBRARIES
-  for library in {45..47}; do
-    if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
-      if [[ ${enabled} -ge 1 ]]; then
-        echo -n ", "
-      fi
-      echo -n $(get_library_name $library)
-      enabled=$((${enabled} + 1))
-    fi
-  done
-
-  # THEN EXTERNAL LIBRARIES
-  for library in {0..33}; do
+  for library in 47 {45..46} {0..33}; do
     if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
       if [[ ${enabled} -ge 1 ]]; then
         echo -n ", "
@@ -716,7 +702,7 @@ if [[ ! -z ${DISPLAY_HELP} ]]; then
 fi
 
 if [[ -n ${BUILD_FULL} ]]; then
-  for library in {0..47}; do
+  for library in {0..46}; do
     if [ ${GPL_ENABLED} == "yes" ]; then
       enable_library $(get_library_name $library)
     else
@@ -789,8 +775,8 @@ for run_arch in {0..4}; do
     . ${BASEDIR}/build/main-android.sh "${ENABLED_LIBRARIES[@]}" || exit 1
 
     # CLEAR FLAGS
-    for library in {1..46}; do
-      library_name=$(get_library_name $((library - 1)))
+    for library in {0..47}; do
+      library_name=$(get_library_name ${library})
       unset $(echo "OK_${library_name}" | sed "s/\-/\_/g")
       unset $(echo "DEPENDENCY_REBUILT_${library_name}" | sed "s/\-/\_/g")
     done
