@@ -1,5 +1,6 @@
 LOCAL_PATH := $(call my-dir)
 $(call import-add-path, $(LOCAL_PATH))
+FFMPEG_INCLUDES := $(LOCAL_PATH)/../../prebuilt/android-$(TARGET_ARCH)/ffmpeg/include
 
 MY_ARM_MODE := arm
 MY_ARM_NEON := false
@@ -26,8 +27,9 @@ LOCAL_ARM_MODE := $(MY_ARM_MODE)
 LOCAL_MODULE := mobileffmpeg_abidetect
 LOCAL_SRC_FILES := mobileffmpeg_abidetect.c
 LOCAL_CFLAGS := -Wall -Wextra -Werror -Wno-unused-parameter -DMOBILE_FFMPEG_${MY_ARCH_FLAGS}
+LOCAL_C_INCLUDES += $(FFMPEG_INCLUDES)
 LOCAL_LDLIBS := -llog -lz -landroid
-LOCAL_SHARED_LIBRARIES := cpu_features libavcodec libavutil
+LOCAL_SHARED_LIBRARIES := cpu-features
 LOCAL_ARM_NEON := ${MY_ARM_NEON}
 include $(BUILD_SHARED_LIBRARY)
 
@@ -51,5 +53,4 @@ LOCAL_ARM_NEON := ${MY_ARM_NEON}
 include $(BUILD_SHARED_LIBRARY)
 
 $(call import-module, ffmpeg)
-$(call import-module, cpu_features)
-$(call import-module, cxx-stl/llvm-libc++)
+$(call import-module, cpu-features)
