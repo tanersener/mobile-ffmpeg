@@ -1,3 +1,3 @@
-[submodule "src/cpu_features"]
-	path = src/cpu_features
+[submodule "cpu_features"]
+	path = src/cpu-features
 	url = https://github.com/tanersener/cpu_features.git
