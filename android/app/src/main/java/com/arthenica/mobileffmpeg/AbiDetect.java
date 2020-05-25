@@ -20,7 +20,6 @@
 package com.arthenica.mobileffmpeg;
 
 import android.os.Build;
-import android.util.Log;
 
 /**
  * <p>This class is used to detect running ABI name using Android's <code>cpufeatures</code>
@@ -36,16 +35,7 @@ public class AbiDetect {
 
         /* LOAD NOT-LOADED LIBRARIES ON API < 21 */
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            try {
-                System.loadLibrary("c++_shared");
-            }
-            catch (UnsatisfiedLinkError ex) {
-                Log.i(Config.TAG, "libc++_shared.so fialed to load, try to proceed without it");
-            }
             System.loadLibrary("ndk_compat");
-            System.loadLibrary("avutil");
-            System.loadLibrary("swresample");
-            System.loadLibrary("avcodec");
         }
         System.loadLibrary("mobileffmpeg_abidetect");
 
