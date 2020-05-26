@@ -35,9 +35,8 @@ LDFLAGS=$(get_ldflags ${LIB_NAME})
 
 case ${ARCH} in
     arm-v7a-neon)
-      ASM_ARCH=arm
-        # Enabling NEON causes undefined symbol error for WelsCopy8x8_neon
-        # CFLAGS+=" -DHAVE_NEON"
+        ASM_ARCH=arm
+        CFLAGS+=" -DHAVE_NEON -DANDROID_NDK"
     ;;
     arm64-v8a)
         ASM_ARCH=arm64
@@ -56,6 +55,10 @@ make clean 2>/dev/null 1>/dev/null
 # revert ios changes
 git checkout ${BASEDIR}/src/${LIB_NAME}/build 1>>${BASEDIR}/build.log 2>&1
 git checkout ${BASEDIR}/src/${LIB_NAME}/codec 1>>${BASEDIR}/build.log 2>&1
+
+# comment out the piece that compiles cpu-features into libopenh264.a
+${SED_INLINE} 's/^COMMON_OBJS +=/# COMMON_OBJS +=/' ${BASEDIR}/src/${LIB_NAME}/build/platform-android.mk
+${SED_INLINE} 's/^COMMON_CFLAGS +=/# COMMON_CFLAGS +=/' ${BASEDIR}/src/${LIB_NAME}/build/platform-android.mk
 
 make -j$(get_cpu_count) \
 ARCH="$(get_toolchain_arch)" \
