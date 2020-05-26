@@ -23,4 +23,5 @@ LIB_NAME="cpu-features"
 $(android_ndk_cmake) -DBUILD_PIC=ON || exit 1
 make -C $(android_ndk_binary_dir) install || exit 1
 
+set_toolchain_clang_paths
 create_cpufeatures_package_config
