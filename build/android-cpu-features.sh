@@ -20,7 +20,7 @@ fi
 
 LIB_NAME="cpu-features"
 
-$(android_ndk_cmake) -DBUILD_SHARED_LIBS=ON || exit 1
+$(android_ndk_cmake) -DBUILD_PIC=ON || exit 1
 make -C $(android_ndk_binary_dir) install || exit 1
 
 create_cpufeatures_package_config

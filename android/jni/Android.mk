@@ -29,7 +29,7 @@ LOCAL_SRC_FILES := mobileffmpeg_abidetect.c
 LOCAL_CFLAGS := -Wall -Wextra -Werror -Wno-unused-parameter -DMOBILE_FFMPEG_${MY_ARCH_FLAGS}
 LOCAL_C_INCLUDES += $(FFMPEG_INCLUDES)
 LOCAL_LDLIBS := -llog -lz -landroid
-LOCAL_SHARED_LIBRARIES := cpu-features
+LOCAL_STATIC_LIBRARIES := cpu-features
 LOCAL_ARM_NEON := ${MY_ARM_NEON}
 include $(BUILD_SHARED_LIBRARY)
 

@@ -33,10 +33,6 @@ public class AbiDetect {
     static {
         armV7aNeonLoaded = false;
 
-        /* LOAD NOT-LOADED LIBRARIES ON API < 21 */
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            System.loadLibrary("ndk_compat");
-        }
         System.loadLibrary("mobileffmpeg_abidetect");
 
         /* ALL LIBRARIES LOADED AT STARTUP */

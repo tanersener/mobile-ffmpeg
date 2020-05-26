@@ -287,9 +287,6 @@ do
             ;;
             android-media-codec)
                 CONFIGURE_POSTFIX+=" --enable-mediacodec"
-            ;;
-            cpu-features)
-                LDFLAGS+=" $(pkg-config --libs --static cpu-features)"
         esac
     else
 
@@ -355,6 +352,7 @@ ulimit -n 2048 1>>${BASEDIR}/build.log 2>&1
     --cpu="${TARGET_CPU}" \
     --cc="${CC}" \
     --cxx="${CXX}" \
+    --extra-libs="$(pkg-config --libs --static cpu-features)" \
     --target-os=android \
     ${ASM_FLAGS} \
     --enable-cross-compile \
