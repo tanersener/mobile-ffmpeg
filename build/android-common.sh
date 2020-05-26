@@ -65,6 +65,7 @@ get_library_name() {
         44) echo "libsamplerate" ;;
         45) echo "android-zlib" ;;
         46) echo "android-media-codec" ;;
+        47) echo "cpu-features" ;;
     esac
 }
 
@@ -840,18 +841,19 @@ EOF
 }
 
 create_cpufeatures_package_config() {
-    cat > "${INSTALL_PKG_CONFIG_DIR}/cpufeatures.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/sources/android/cpufeatures
-exec_prefix=\${prefix}
-libdir=\${exec_prefix}
-includedir=\${prefix}
+    cat > "${INSTALL_PKG_CONFIG_DIR}/cpu-features.pc" << EOF
+prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/cpu-features
+exec_prefix=\${prefix}/bin
+libdir=\${prefix}/lib
+includedir=\${prefix}/include/ndk_compat
 
 Name: cpufeatures
-Description: cpu features Android utility
+URL: https://github.com/google/cpu_features
+Description: cpu_features Android compatibility library
 Version: 1.${API}
 
 Requires:
-Libs: -L\${libdir} -lcpufeatures
+Libs: -L\${libdir} -lndk_compat
 Cflags: -I\${includedir}
 EOF
 }
@@ -995,6 +997,45 @@ download_gpl_library_source() {
     fi
 }
 
+android_ndk_abi() { # to be used with CMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_ROOT/build/cmake/android.toolchain.cmake
+    case ${ARCH} in
+        arm-v7a | arm-v7a-neon)
+            echo "armeabi-v7a"
+        ;;
+        arm64-v8a)
+            echo "arm64-v8a"
+        ;;
+        x86)
+            echo "x86"
+        ;;
+        x86-64)
+            echo "x86_64"
+        ;;
+    esac
+}
+
+android_ndk_binary_dir() {
+  echo ${BASEDIR}/android/build/${LIB_NAME}/$(get_target_build)
+}
+
+android_ndk_cmake() {
+    local cmake=$(which cmake)
+    if [[ -z ${cmake} ]]; then
+        cmake=$(find ${ANDROID_HOME}/cmake -path \*/bin/cmake -type f -print -quit)
+    fi
+    if [[ -z ${cmake} ]]; then
+        cmake="missing_cmake"
+    fi
+
+    echo ${cmake} \
+  -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_ROOT/build/cmake/android.toolchain.cmake \
+  -H${BASEDIR}/src/${LIB_NAME} \
+  -B$(android_ndk_binary_dir) \
+  -DANDROID_ABI=$(android_ndk_abi) \
+  -DANDROID_PLATFORM=android-${API} \
+  -DCMAKE_INSTALL_PREFIX=${BASEDIR}/prebuilt/android-$(get_target_build)/${LIB_NAME}
+}
+
 set_toolchain_clang_paths() {
     export PATH=$PATH:${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/bin
 
@@ -1032,30 +1073,6 @@ set_toolchain_clang_paths() {
     fi
 
     prepare_inline_sed
-}
-
-build_cpufeatures() {
-
-    # CLEAN OLD BUILD
-    rm -f ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.o 1>>${BASEDIR}/build.log 2>&1
-    rm -f ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/libcpufeatures.a 1>>${BASEDIR}/build.log 2>&1
-    rm -f ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/libcpufeatures.so 1>>${BASEDIR}/build.log 2>&1
-
-    echo -e "\nINFO: Building cpu-features for ${ARCH}\n" 1>>${BASEDIR}/build.log 2>&1
-
-    set_toolchain_clang_paths "cpu-features"
-
-    BUILD_HOST=$(get_build_host)
-    export CFLAGS=$(get_cflags "cpu-features")
-    export CXXFLAGS=$(get_cxxflags "cpu-features")
-    export LDFLAGS=$(get_ldflags "cpu-features")
-
-    # THEN BUILD FOR THIS ABI
-    $(get_clang_target_host)-clang -c ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.c -o ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.o 1>>${BASEDIR}/build.log 2>&1
-    ${BUILD_HOST}-ar rcs ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/libcpufeatures.a ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.o 1>>${BASEDIR}/build.log 2>&1
-    $(get_clang_target_host)-clang -shared ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.o -o ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/libcpufeatures.so 1>>${BASEDIR}/build.log 2>&1
-
-    create_cpufeatures_package_config
 }
 
 build_android_lts_support() {

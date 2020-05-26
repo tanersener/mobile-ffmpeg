@@ -55,12 +55,13 @@ LIBRARY_LEPTONICA=43
 LIBRARY_LIBSAMPLERATE=44
 LIBRARY_ZLIB=45
 LIBRARY_MEDIA_CODEC=46
+LIBRARY_CPU_FEATURES=47
 
 # ENABLE ARCH
 ENABLED_ARCHITECTURES=(1 1 1 1 1)
 
 # ENABLE LIBRARIES
-ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1)
 
 export BASEDIR=$(pwd)
 export MOBILE_FFMPEG_TMPDIR="${BASEDIR}/.tmp"
@@ -232,8 +233,8 @@ rebuild_library() {
   local REBUILD_VARIABLE=$(echo "REBUILD_$1" | sed "s/\-/\_/g")
   local library_supported=0
 
-  for library in {1..45}; do
-    library_name=$(get_library_name $((library - 1)))
+  for library in {0..47}; do
+    library_name=$(get_library_name ${library})
 
     if [[ $1 != "ffmpeg" ]] && [[ ${library_name} == $1 ]]; then
       export ${REBUILD_VARIABLE}=1
@@ -486,19 +487,7 @@ print_enabled_libraries() {
 
   let enabled=0
 
-  # FIRST BUILT-IN LIBRARIES
-  for library in {45..46}; do
-    if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
-      if [[ ${enabled} -ge 1 ]]; then
-        echo -n ", "
-      fi
-      echo -n $(get_library_name $library)
-      enabled=$((${enabled} + 1))
-    fi
-  done
-
-  # THEN EXTERNAL LIBRARIES
-  for library in {0..33}; do
+  for library in 47 {45..46} {0..33}; do
     if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
       if [[ ${enabled} -ge 1 ]]; then
         echo -n ", "
@@ -564,8 +553,6 @@ build_application_mk() {
     local APP_STL="c++_shared"
   else
     local APP_STL="none"
-
-    ${SED_INLINE} 's/c++_shared //g' ${BASEDIR}/android/jni/Android.mk 1>>${BASEDIR}/build.log 2>&1
   fi
 
   local BUILD_DATE="-DMOBILE_FFMPEG_BUILD_DATE=$(date +%Y%m%d 2>>${BASEDIR}/build.log)"
@@ -587,13 +574,23 @@ APP_LDFLAGS := -Wl,--hash-style=both
 EOF
 }
 
+if [[ -z ${ANDROID_NDK_ROOT} ]]; then
+  echo "ANDROID_NDK_ROOT not defined"
+  exit 1
+fi
+
+if [[ -z ${ANDROID_HOME} ]]; then
+  echo "ANDROID_HOME not defined"
+  exit 1
+fi
+
 # ENABLE COMMON FUNCTIONS
 . ${BASEDIR}/build/android-common.sh
 
 DETECTED_NDK_VERSION=$(grep -Eo Revision.* ${ANDROID_NDK_ROOT}/source.properties | sed 's/Revision//g;s/=//g;s/ //g')
 
 echo -e "\nINFO: Using Android NDK v${DETECTED_NDK_VERSION} provided at ${ANDROID_NDK_ROOT}\n" 1>>${BASEDIR}/build.log 2>&1
-echo -e "INFO: Build options: $@\n" 1>>${BASEDIR}/build.log 2>&1
+echo -e "INFO: Build options: $*\n" 1>>${BASEDIR}/build.log 2>&1
 
 # CLEAR OLD NATIVE LIBS
 rm -rf ${BASEDIR}/android/libs 1>>${BASEDIR}/build.log 2>&1
@@ -713,16 +710,6 @@ if [[ -n ${BUILD_FULL} ]]; then
   done
 fi
 
-if [[ -z ${ANDROID_NDK_ROOT} ]]; then
-  echo "ANDROID_NDK_ROOT not defined"
-  exit 1
-fi
-
-if [[ -z ${ANDROID_HOME} ]]; then
-  echo "ANDROID_HOME not defined"
-  exit 1
-fi
-
 if [[ -z ${BUILD_VERSION} ]]; then
   echo -e "\nerror: Can not run git commands in this folder. See build.log.\n"
   exit 1
@@ -770,7 +757,7 @@ export ORIGINAL_API=${API}
 
 for run_arch in {0..4}; do
   if [[ ${ENABLED_ARCHITECTURES[$run_arch]} -eq 1 ]]; then
-    if [[ (${run_arch} -eq ${ARCH_ARM64_V8A} || ${run_arch} -eq ${ARCH_X86_64}) && ${API} < 21 ]]; then
+    if [[ (${run_arch} -eq ${ARCH_ARM64_V8A} || ${run_arch} -eq ${ARCH_X86_64}) && ${API} -lt 21 ]]; then
 
       # 64 bit ABIs supported after API 21
       export API=21
@@ -785,8 +772,8 @@ for run_arch in {0..4}; do
     . ${BASEDIR}/build/main-android.sh "${ENABLED_LIBRARIES[@]}" || exit 1
 
     # CLEAR FLAGS
-    for library in {1..47}; do
-      library_name=$(get_library_name $((library - 1)))
+    for library in {0..47}; do
+      library_name=$(get_library_name ${library})
       unset $(echo "OK_${library_name}" | sed "s/\-/\_/g")
       unset $(echo "DEPENDENCY_REBUILT_${library_name}" | sed "s/\-/\_/g")
     done

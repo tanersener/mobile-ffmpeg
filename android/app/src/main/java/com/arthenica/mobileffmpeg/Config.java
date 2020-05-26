@@ -89,7 +89,6 @@ public class Config {
                 // libc++_shared.so included only when tesseract or x265 is enabled
                 System.loadLibrary("c++_shared");
             }
-            System.loadLibrary("cpufeatures");
             System.loadLibrary("avutil");
             System.loadLibrary("swscale");
             System.loadLibrary("swresample");
