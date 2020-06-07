@@ -732,6 +732,11 @@ print_enabled_libraries
 print_reconfigure_requested_libraries
 print_rebuild_requested_libraries
 
+# UPDATING SUBMODULES
+echo -e "\nINFO: Updating submodules" 1>>${BASEDIR}/build.log 2>&1
+git submodule update --init
+echo -e "\nINFO: Updated submodules\n" 1>>${BASEDIR}/build.log 2>&1
+
 # CHECKING GPL LIBRARIES
 for gpl_library in {18,19,20,21,22}; do
   if [[ ${ENABLED_LIBRARIES[$gpl_library]} -eq 1 ]]; then
