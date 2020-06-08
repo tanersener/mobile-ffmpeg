@@ -142,6 +142,7 @@ public class MediaInformation {
     /**
      * Returns the media property associated with the key.
      *
+     * @param key property key
      * @return media property as string or null if the key is not found
      */
     public String getStringProperty(final String key) {
@@ -161,6 +162,7 @@ public class MediaInformation {
     /**
      * Returns the media property associated with the key.
      *
+     * @param key property key
      * @return media property as Long or null if the key is not found
      */
     public Long getNumberProperty(String key) {
@@ -180,6 +182,7 @@ public class MediaInformation {
     /**
      * Returns the media properties associated with the key.
      *
+     * @param key properties key
      * @return media properties as a JSONObject or null if the key is not found
      */
     public JSONObject getProperties(String key) {

@@ -224,6 +224,7 @@ public class StreamInformation {
     /**
      * Returns the stream property associated with the key.
      *
+     * @param key property key
      * @return stream property as string or null if the key is not found
      */
     public String getStringProperty(final String key) {
@@ -243,6 +244,7 @@ public class StreamInformation {
     /**
      * Returns the stream property associated with the key.
      *
+     * @param key property key
      * @return stream property as Long or null if the key is not found
      */
     public Long getNumberProperty(String key) {
@@ -262,6 +264,7 @@ public class StreamInformation {
     /**
      * Returns the stream properties associated with the key.
      *
+     * @param key properties key
      * @return stream properties as a JSONObject or null if the key is not found
      */
     public JSONObject getProperties(String key) {
