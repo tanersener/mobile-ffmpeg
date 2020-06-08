@@ -487,7 +487,7 @@ print_enabled_libraries() {
 
   let enabled=0
 
-  for library in 47 {45..46} {0..33}; do
+  for library in {45..47} {0..33}; do
     if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
       if [[ ${enabled} -ge 1 ]]; then
         echo -n ", "
