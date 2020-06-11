@@ -368,7 +368,7 @@ fi
 if [[ -z ${MOBILE_FFMPEG_DEBUG} ]]; then
     DEBUG_OPTIONS="--disable-debug";
 else
-    DEBUG_OPTIONS="--enable-debug";
+    DEBUG_OPTIONS="--enable-debug --disable-stripping";
 fi
 
 # CFLAGS PARTS
