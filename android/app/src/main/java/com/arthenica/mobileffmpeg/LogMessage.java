@@ -43,4 +43,19 @@ public class LogMessage {
         return text;
     }
 
+    @Override
+    public String toString() {
+        final StringBuilder stringBuilder = new StringBuilder();
+
+        stringBuilder.append("LogMessage{");
+        stringBuilder.append("level=");
+        stringBuilder.append(level);
+        stringBuilder.append(", text=");
+        stringBuilder.append("\'");
+        stringBuilder.append(text);
+        stringBuilder.append('\'');
+        stringBuilder.append('}');
+
+        return stringBuilder.toString();
+    }
 }
