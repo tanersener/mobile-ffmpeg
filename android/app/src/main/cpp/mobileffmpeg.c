@@ -816,7 +816,11 @@ JNIEXPORT int JNICALL Java_com_arthenica_mobileffmpeg_Config_setNativeEnvironmen
     const char *variableNameString = (*env)->GetStringUTFChars(env, variableName, 0);
     const char *variableValueString = (*env)->GetStringUTFChars(env, variableValue, 0);
 
-    return setenv(variableNameString, variableValueString, 1);
+    int rc = setenv(variableNameString, variableValueString, 1);
+
+    (*env)->ReleaseStringUTFChars(env, variableName, variableNameString);
+    (*env)->ReleaseStringUTFChars(env, variableValue, variableValueString);
+    return rc;
 }
 
 /**
