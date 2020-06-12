@@ -582,21 +582,18 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     logMethod = (*env)->GetStaticMethodID(env, localConfigClass, "log", "(I[B)V");
     if (logMethod == NULL) {
         LOGE("OnLoad thread failed to GetStaticMethodID for %s.\n", "log");
-        (*globalVm)->DetachCurrentThread(globalVm);
         return JNI_FALSE;
     }
 
     statisticsMethod = (*env)->GetStaticMethodID(env, localConfigClass, "statistics", "(IFFJIDD)V");
     if (logMethod == NULL) {
         LOGE("OnLoad thread failed to GetStaticMethodID for %s.\n", "statistics");
-        (*globalVm)->DetachCurrentThread(globalVm);
         return JNI_FALSE;
     }
 
     stringConstructor = (*env)->GetMethodID(env, localStringClass, "<init>", "([BLjava/lang/String;)V");
     if (stringConstructor == NULL) {
         LOGE("OnLoad thread failed to GetMethodID for %s.\n", "<init>");
-        (*globalVm)->DetachCurrentThread(globalVm);
         return JNI_FALSE;
     }
 
