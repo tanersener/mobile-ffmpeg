@@ -33,14 +33,12 @@ export CFLAGS=$(get_cflags ${LIB_NAME})
 export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 export LDFLAGS=$(get_ldflags ${LIB_NAME})
 
-cd ${BASEDIR}/src/${LIB_NAME} || exit 1
+cd ${BASEDIR}/src/${LIB_NAME}/${LIB_NAME} || exit 1
 
 make distclean 2>/dev/null 1>/dev/null
 
-# RECONFIGURE IF REQUESTED
-if [[ ${RECONF_expat} -eq 1 ]]; then
-    autoreconf_library ${LIB_NAME}
-fi
+# ALWAYS RECONFIGURE
+autoreconf_library ${LIB_NAME}
 
 ./configure \
     --prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/${LIB_NAME} \
