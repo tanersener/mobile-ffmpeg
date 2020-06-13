@@ -19,9 +19,9 @@ fi
 . ${BASEDIR}/build/android-common.sh
 
 LIB_NAME="cpu-features"
+set_toolchain_clang_paths ${LIB_NAME}
 
 $(android_ndk_cmake) -DBUILD_PIC=ON || exit 1
-make -C $(android_ndk_binary_dir) install || exit 1
+make -C $(android_build_dir) install || exit 1
 
-set_toolchain_clang_paths
 create_cpufeatures_package_config

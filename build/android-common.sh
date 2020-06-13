@@ -1014,23 +1014,23 @@ android_ndk_abi() { # to be used with CMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_ROOT/bui
     esac
 }
 
-android_ndk_binary_dir() {
+android_build_dir() {
   echo ${BASEDIR}/android/build/${LIB_NAME}/$(get_target_build)
 }
 
 android_ndk_cmake() {
-    local cmake=$(which cmake)
+    local cmake=$(find ${ANDROID_HOME}/cmake -path \*/bin/cmake -type f -print -quit)
     if [[ -z ${cmake} ]]; then
-        cmake=$(find ${ANDROID_HOME}/cmake -path \*/bin/cmake -type f -print -quit)
+        cmake=$(which cmake)
     fi
     if [[ -z ${cmake} ]]; then
         cmake="missing_cmake"
     fi
 
     echo ${cmake} \
-  -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_ROOT/build/cmake/android.toolchain.cmake \
+  -DCMAKE_TOOLCHAIN_FILE=${ANDROID_NDK_ROOT}/build/cmake/android.toolchain.cmake \
   -H${BASEDIR}/src/${LIB_NAME} \
-  -B$(android_ndk_binary_dir) \
+  -B$(android_build_dir) \
   -DANDROID_ABI=$(android_ndk_abi) \
   -DANDROID_PLATFORM=android-${API} \
   -DCMAKE_INSTALL_PREFIX=${BASEDIR}/prebuilt/android-$(get_target_build)/${LIB_NAME}
