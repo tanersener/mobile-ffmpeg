@@ -30,10 +30,12 @@ rm -rf ../tvos/test-app/universal/*.framework
 rm -rf ../tvos/test-app/universal/*.xcframework
 rm -rf ../tvos/test-app/universal/mobile-ffmpeg-universal
 
+rm -rf ../src/cpu-features
+rm -rf ../src/expat
+rm -rf ../src/openh264
+
 rm -rf ../src/libvidstab
 rm -rf ../src/x264
 rm -rf ../src/x265
 rm -rf ../src/xvidcore
 rm -rf ../src/rubberband
-
-git submodule deinit -f ..

@@ -63,10 +63,10 @@ ENABLED_ARCHITECTURES=(1 1)
 ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 
 export BASEDIR=$(pwd)
-export MOBILE_FFMPEG_TMPDIR="${BASEDIR}/.tmp"
 
 RECONF_LIBRARIES=()
 REBUILD_LIBRARIES=()
+REDOWNLOAD_LIBRARIES=()
 
 # CHECKING IF XCODE IS INSTALLED
 if ! [ -x "$(command -v xcrun)" ]; then
@@ -109,7 +109,7 @@ display_help() {
 
   echo -e "Licensing options:"
 
-  echo -e "  --enable-gpl\t\t\tallow use of GPL libraries, resulting libs will be licensed under GPLv3.0 [no]\n"
+  echo -e "  --enable-gpl\t\t\tallow use of GPL libraries, created libs will be licensed under GPLv3.0 [no]\n"
 
   echo -e "Platforms:"
 
@@ -167,6 +167,7 @@ display_help() {
   echo -e "Advanced options:"
 
   echo -e "  --reconf-LIBRARY\t\trun autoreconf before building LIBRARY [no]"
+  echo -e "  --redownload-LIBRARY\t\tdownload LIBRARY even it is detected as already downloaded [no]"
   echo -e "  --rebuild-LIBRARY\t\tbuild LIBRARY even it is detected as already built [no]\n"
 }
 
@@ -254,6 +255,25 @@ rebuild_library() {
 
   if [[ ${library_supported} -eq 0 ]]; then
     echo -e "INFO: --rebuild flag detected for library $1 is not supported.\n" 1>>${BASEDIR}/build.log 2>&1
+  fi
+}
+
+redownload_library() {
+  local REDOWNLOAD_VARIABLE=$(echo "REDOWNLOAD_$1" | sed "s/\-/\_/g")
+  local library_supported=0
+
+  for library in {0..47}; do
+    library_name=$(get_library_name ${library})
+
+    if [[ $1 != "ffmpeg" ]] && [[ ${library_name} == $1 ]]; then
+      export ${REDOWNLOAD_VARIABLE}=1
+      REDOWNLOAD_LIBRARIES+=($1)
+      library_supported=1
+    fi
+  done
+
+  if [[ ${library_supported} -eq 0 ]]; then
+    echo -e "INFO: --redownload flag detected for library $1 is not supported.\n" 1>>${BASEDIR}/build.log 2>&1
   fi
 }
 
@@ -568,6 +588,26 @@ print_rebuild_requested_libraries() {
   fi
 }
 
+print_redownload_requested_libraries() {
+  local counter=0
+
+  for REDOWNLOAD_LIBRARY in "${REDOWNLOAD_LIBRARIES[@]}"; do
+    if [[ ${counter} -eq 0 ]]; then
+      echo -n "Redownload: "
+    else
+      echo -n ", "
+    fi
+
+    echo -n ${REDOWNLOAD_LIBRARY}
+
+    counter=$((${counter} + 1))
+  done
+
+  if [[ ${counter} -gt 0 ]]; then
+    echo ""
+  fi
+}
+
 build_info_plist() {
   local FILE_PATH="$1"
   local FRAMEWORK_NAME="$2"
@@ -747,6 +787,11 @@ while [ ! $# -eq 0 ]; do
 
     rebuild_library ${BUILD_LIBRARY}
     ;;
+  --redownload-*)
+    DOWNLOAD_LIBRARY=$(echo $1 | sed -e 's/^--[A-Za-z]*-//g')
+
+    redownload_library ${DOWNLOAD_LIBRARY}
+    ;;
   --full)
     BUILD_FULL="1"
     ;;
@@ -823,13 +868,7 @@ print_enabled_architectures
 print_enabled_libraries
 print_reconfigure_requested_libraries
 print_rebuild_requested_libraries
-
-# SYNC EXTERNAL LIBRARIES
-echo -e "\nINFO: Syncing external libraries" 1>>${BASEDIR}/build.log 2>&1
-echo -e -n "\nsync external libraries: "
-git submodule update --init --recursive 1>>${BASEDIR}/build.log 2>&1
-echo "ok"
-echo -e "\nINFO: Synced external libraries\n" 1>>${BASEDIR}/build.log 2>&1
+print_redownload_requested_libraries
 
 # CHECK GPL LIBRARIES
 for gpl_library in {17..21}; do

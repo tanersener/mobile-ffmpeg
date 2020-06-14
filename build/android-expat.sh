@@ -33,6 +33,11 @@ export CFLAGS=$(get_cflags ${LIB_NAME})
 export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 export LDFLAGS=$(get_ldflags ${LIB_NAME})
 
+# DOWNLOAD LIBRARY
+DOWNLOAD_RESULT=$(download_library_source ${LIB_NAME})
+if [[ ${DOWNLOAD_RESULT} -ne 0 ]]; then
+    exit 1
+fi
 cd ${BASEDIR}/src/${LIB_NAME}/${LIB_NAME} || exit 1
 
 make distclean 2>/dev/null 1>/dev/null

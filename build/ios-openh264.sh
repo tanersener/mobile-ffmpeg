@@ -54,6 +54,11 @@ case ${ARCH} in
     ;;
 esac
 
+# DOWNLOAD LIBRARY
+DOWNLOAD_RESULT=$(download_library_source ${LIB_NAME})
+if [[ ${DOWNLOAD_RESULT} -ne 0 ]]; then
+    exit 1
+fi
 cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
 # MAKE SURE THAT ASM IS ENABLED FOR ALL IOS ARCHITECTURES - EXCEPT x86-64

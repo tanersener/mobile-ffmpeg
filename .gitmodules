@@ -1,9 +1,0 @@
-[submodule "cpu_features"]
-	path = src/cpu-features
-	url = https://github.com/google/cpu_features.git
-[submodule "src/expat"]
-	path = src/expat
-	url = https://github.com/libexpat/libexpat
-[submodule "src/openh264"]
-	path = src/openh264
-	url = https://github.com/cisco/openh264
