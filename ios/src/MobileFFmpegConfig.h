@@ -253,4 +253,14 @@ extern NSString *const LIB_NAME;
  */
 + (NSString*)getLastCommandOutput;
 
+/**
+ * Registers a new ignored signal. Ignored signals are not handled by the library.
+ *
+ * By default, the following 5 signals are handled: SIGINT, SIGQUIT, SIGPIPE, SIGTERM and SIGXCPU. Any of them can be
+ * ignored.
+ *
+ * @param signum signal number to ignore
+ */
++ (void)ignoreSignal: (int)signum;
+
 @end

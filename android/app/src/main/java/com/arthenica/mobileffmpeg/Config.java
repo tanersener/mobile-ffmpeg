@@ -687,4 +687,20 @@ public class Config {
      */
     native static String getNativeLastCommandOutput();
 
+    /**
+     * <p>Registers a new ignored signal. Ignored signals are not handled by the library.
+     *
+     * @param signal signal number to ignore
+     */
+    public static void ignoreSignal(final Signal signal) {
+        ignoreNativeSignal(signal.getValue());
+    }
+
+    /**
+     * <p>Registers a new ignored signal natively. Ignored signals are not handled by the library.
+     *
+     * @param signum signal number
+     */
+    native static void ignoreNativeSignal(final int signum);
+
 }

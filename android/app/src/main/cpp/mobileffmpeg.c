@@ -113,6 +113,12 @@ const char *configClassName = "com/arthenica/mobileffmpeg/Config";
 /** Full name of String class */
 const char *stringClassName = "java/lang/String";
 
+int handleSIGQUIT = 1;
+int handleSIGINT = 1;
+int handleSIGTERM = 1;
+int handleSIGXCPU = 1;
+int handleSIGPIPE = 1;
+
 /** Prototypes of native functions defined by Config class. */
 JNINativeMethod configMethods[] = {
     {"enableNativeRedirection", "()V", (void*) Java_com_arthenica_mobileffmpeg_Config_enableNativeRedirection},
@@ -126,7 +132,9 @@ JNINativeMethod configMethods[] = {
     {"nativeFFprobeExecute", "([Ljava/lang/String;)I", (void*) Java_com_arthenica_mobileffmpeg_Config_nativeFFprobeExecute},
     {"registerNewNativeFFmpegPipe", "(Ljava/lang/String;)I", (void*) Java_com_arthenica_mobileffmpeg_Config_registerNewNativeFFmpegPipe},
     {"getNativeBuildDate", "()Ljava/lang/String;", (void*) Java_com_arthenica_mobileffmpeg_Config_getNativeBuildDate},
-    {"setNativeEnvironmentVariable", "(Ljava/lang/String;Ljava/lang/String;)I", (void*) Java_com_arthenica_mobileffmpeg_Config_setNativeEnvironmentVariable}
+    {"setNativeEnvironmentVariable", "(Ljava/lang/String;Ljava/lang/String;)I", (void*) Java_com_arthenica_mobileffmpeg_Config_setNativeEnvironmentVariable},
+    {"getNativeLastCommandOutput", "()Ljava/lang/String;", (void*) Java_com_arthenica_mobileffmpeg_Config_getNativeLastCommandOutput},
+    {"ignoreNativeSignal", "(I)V", (void*) Java_com_arthenica_mobileffmpeg_Config_ignoreNativeSignal}
 };
 
 /** Forward declaration for function defined in fftools_ffmpeg.c */
@@ -840,4 +848,25 @@ JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_Config_getNativeLastCo
     }
 
     return (*env)->NewStringUTF(env, "");
+}
+
+/**
+ * Registers a new ignored signal. Ignored signals are not handled by the library.
+ *
+ * @param env pointer to native method interface
+ * @param object reference to the class on which this method is invoked
+ * @param signum signal number
+ */
+JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_Config_ignoreNativeSignal(JNIEnv *env, jclass object, jint signum) {
+    if (signum == SIGQUIT) {
+        handleSIGQUIT = 0;
+    } else if (signum == SIGINT) {
+        handleSIGINT = 0;
+    } else if (signum == SIGTERM) {
+        handleSIGTERM = 0;
+    } else if (signum == SIGXCPU) {
+        handleSIGXCPU = 0;
+    } else if (signum == SIGPIPE) {
+        handleSIGPIPE = 0;
+    }
 }

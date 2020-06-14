@@ -131,4 +131,11 @@ JNIEXPORT int JNICALL Java_com_arthenica_mobileffmpeg_Config_setNativeEnvironmen
  */
 JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_Config_getNativeLastCommandOutput(JNIEnv *env, jclass object);
 
+/*
+ * Class:     com_arthenica_mobileffmpeg_Config
+ * Method:    ignoreNativeSignal
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_Config_ignoreNativeSignal(JNIEnv *env, jclass object, jint signum);
+
 #endif /* MOBILE_FFMPEG_H */

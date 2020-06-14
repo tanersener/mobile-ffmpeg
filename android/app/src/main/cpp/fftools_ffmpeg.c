@@ -24,11 +24,14 @@
  */
 
 /*
+ * CHANGES 06.2020
+ * - ignoring signals implemented
+ *
  * CHANGES 01.2020
  * - ffprobe support changes
  *
  * CHANGES 12.2019
- * - Concurrent execution support
+ * - concurrent execution support
  *
  * CHANGES 08.2018
  * --------------------------------------------------------
@@ -238,6 +241,12 @@ __thread int restore_tty;
 #if HAVE_THREADS
 static void free_input_threads(void);
 #endif
+
+extern int handleSIGQUIT;
+extern int handleSIGINT;
+extern int handleSIGTERM;
+extern int handleSIGXCPU;
+extern int handleSIGPIPE;
 
 /* sub2video hack:
    Convert subtitles to video with alpha to insert them in filter graphs.
@@ -476,17 +485,27 @@ void term_init(void)
 
             tcsetattr (0, TCSANOW, &tty);
         }
-        signal(SIGQUIT, sigterm_handler); /* Quit (POSIX).  */
+        if (handleSIGQUIT == 1) {
+            signal(SIGQUIT, sigterm_handler); /* Quit (POSIX).  */
+        }
     }
 #endif
 
-    signal(SIGINT , sigterm_handler); /* Interrupt (ANSI).    */
-    signal(SIGTERM, sigterm_handler); /* Termination (ANSI).  */
+    if (handleSIGINT == 1) {
+        signal(SIGINT , sigterm_handler); /* Interrupt (ANSI).    */
+    }
+    if (handleSIGTERM == 1) {
+        signal(SIGTERM, sigterm_handler); /* Termination (ANSI).  */
+    }
 #ifdef SIGXCPU
-    signal(SIGXCPU, sigterm_handler);
+    if (handleSIGXCPU == 1) {
+        signal(SIGXCPU, sigterm_handler);
+    }
 #endif
 #ifdef SIGPIPE
-    signal(SIGPIPE, SIG_IGN); /* Broken pipe (POSIX). */
+    if (handleSIGPIPE == 1) {
+        signal(SIGPIPE, SIG_IGN); /* Broken pipe (POSIX). */
+    }
 #endif
 #if HAVE_SETCONSOLECTRLHANDLER
     SetConsoleCtrlHandler((PHANDLER_ROUTINE) CtrlHandler, TRUE);

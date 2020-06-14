@@ -158,6 +158,12 @@ static NSMutableArray *supportedExternalLibraries;
 
 static int lastCreatedPipeIndex;
 
+int handleSIGQUIT = 1;
+int handleSIGINT = 1;
+int handleSIGTERM = 1;
+int handleSIGXCPU = 1;
+int handleSIGPIPE = 1;
+
 void callbackWait(int milliSeconds) {
     dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(milliSeconds * NSEC_PER_MSEC)));
 }
@@ -927,6 +933,25 @@ void callbackBlockFunction() {
  */
 + (NSString*)getLastCommandOutput {
     return lastCommandOutput;
+}
+
+/**
+ * Registers a new ignored signal. Ignored signals are not handled by the library.
+ *
+ * @param signum signal number to ignore
+ */
++ (void)ignoreSignal: (int)signum {
+    if (signum == SIGQUIT) {
+        handleSIGQUIT = 0;
+    } else if (signum == SIGINT) {
+        handleSIGINT = 0;
+    } else if (signum == SIGTERM) {
+        handleSIGTERM = 0;
+    } else if (signum == SIGXCPU) {
+        handleSIGXCPU = 0;
+    } else if (signum == SIGPIPE) {
+        handleSIGPIPE = 0;
+    }
 }
 
 @end
