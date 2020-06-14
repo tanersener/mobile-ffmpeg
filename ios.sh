@@ -988,7 +988,14 @@ print_enabled_libraries
 print_reconfigure_requested_libraries
 print_rebuild_requested_libraries
 
-# CHECKING GPL LIBRARIES
+# SYNC EXTERNAL LIBRARIES
+echo -e "\nINFO: Syncing external libraries" 1>>${BASEDIR}/build.log 2>&1
+echo -e -n "\nsync external libraries: "
+git submodule update --init --recursive 1>>${BASEDIR}/build.log 2>&1
+echo "ok"
+echo -e "\nINFO: Synced external libraries\n" 1>>${BASEDIR}/build.log 2>&1
+
+# CHECK GPL LIBRARIES
 for gpl_library in {17..21}; do
   if [[ ${ENABLED_LIBRARIES[$gpl_library]} -eq 1 ]]; then
     library_name=$(get_library_name ${gpl_library})

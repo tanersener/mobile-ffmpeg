@@ -35,3 +35,5 @@ rm -rf ../src/x264
 rm -rf ../src/x265
 rm -rf ../src/xvidcore
 rm -rf ../src/rubberband
+
+git submodule deinit -f ..
