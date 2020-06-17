@@ -8,7 +8,7 @@ export SOURCE_PACKAGE="${BASEDIR}/../../prebuilt/ios-framework"
 export COCOA_PACKAGE="${BASEDIR}/../../prebuilt/ios-cocoa"
 export UNIVERSAL_PACKAGE="${BASEDIR}/../../prebuilt/ios-universal"
 export ALL_UNIVERSAL_PACKAGES="${BASEDIR}/../../prebuilt/ios-all-universal"
-export CUSTOM_OPTIONS="--disable-armv7s --lts --enable-ios-zlib --enable-ios-bzip2 --enable-ios-coreimage --enable-ios-avfoundation --enable-ios-audiotoolbox --enable-ios-videotoolbox"
+export CUSTOM_OPTIONS="--disable-armv7s --lts --enable-ios-zlib --enable-ios-bzip2 --enable-ios-coreimage --enable-ios-audiotoolbox --enable-ios-videotoolbox"
 export GPL_PACKAGES="--enable-gpl --enable-libvidstab --enable-x264 --enable-x265 --enable-xvidcore"
 export FULL_PACKAGES="--enable-fontconfig --enable-freetype --enable-fribidi --enable-gmp --enable-gnutls --enable-kvazaar --enable-lame --enable-libaom --enable-libass --enable-libilbc --enable-libtheora --enable-libvorbis --enable-libvpx --enable-libwebp --enable-libxml2 --enable-opencore-amr --enable-opus --enable-shine --enable-snappy --enable-soxr --enable-speex --enable-twolame --enable-wavpack"
 
