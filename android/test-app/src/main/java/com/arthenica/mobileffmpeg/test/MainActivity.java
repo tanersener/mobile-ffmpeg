@@ -173,7 +173,7 @@ public class MainActivity extends AppCompatActivity {
         final HashMap<String, String> fontNameMapping = new HashMap<>();
         fontNameMapping.put("MyFontName", "Doppio One");
         Config.setFontDirectory(this, cacheDirectory.getAbsolutePath(), fontNameMapping);
-        // Config.setFontDirectory(this, cacheDirectory.getAbsolutePath(), null);
+        Config.setEnvironmentVariable("FFREPORT", String.format("file=%s", new File(cacheDirectory.getAbsolutePath(), "ffreport.txt").getAbsolutePath()));
     }
 
     protected void listSupportedCameraIds() {

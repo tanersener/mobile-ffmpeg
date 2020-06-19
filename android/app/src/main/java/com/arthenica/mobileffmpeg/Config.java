@@ -703,4 +703,16 @@ public class Config {
      */
     native static void ignoreNativeSignal(final int signum);
 
+
+    /**
+     * <p>Sets an environment variable.
+     *
+     * @param variableName  environment variable name
+     * @param variableValue environment variable value
+     * @return zero on success, non-zero on error
+     */
+    public static int setEnvironmentVariable(final String variableName, final String variableValue) {
+        return setNativeEnvironmentVariable(variableName, variableValue);
+    }
+
 }
