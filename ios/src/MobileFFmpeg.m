@@ -22,6 +22,7 @@
 #include "MobileFFmpeg.h"
 #include "ArchDetect.h"
 #include "MobileFFmpegConfig.h"
+#include "AtomicLong.h"
 
 /** Forward declaration for function defined in fftools_ffmpeg.c */
 int ffmpeg_execute(int argc, char **argv);
@@ -34,19 +35,23 @@ NSString *const MOBILE_FFMPEG_VERSION = @"4.3.3";
 extern int lastReturnCode;
 extern NSMutableString *lastCommandOutput;
 
+long const DEFAULT_EXECUTION_ID = 0;
+AtomicLong *executionIdCounter;
+
+extern __thread volatile long executionId;
+int cancelRequested(long executionId);
+void addExecution(long executionId);
+void removeExecution(long executionId);
+
 + (void)initialize {
     [MobileFFmpegConfig class];
+
+    executionIdCounter = [[AtomicLong alloc] initWithInitialValue:3000];
 
     NSLog(@"Loaded mobile-ffmpeg-%@-%@-%@-%@\n", [MobileFFmpegConfig getPackageName], [ArchDetect getArch], [MobileFFmpegConfig getVersion], [MobileFFmpegConfig getBuildDate]);
 }
 
-/**
- * Synchronously executes FFmpeg with arguments provided.
- *
- * @param arguments FFmpeg command options/arguments as string array
- * @return zero on successful execution, 255 on user cancel and non-zero on error
- */
-+ (int)executeWithArguments: (NSArray*)arguments {
++ (int)executeWithId:(long)newExecutionId andArguments:(NSArray*)arguments {
     lastCommandOutput = [[NSMutableString alloc] init];
 
     char **commandCharPArray = (char **)av_malloc(sizeof(char*) * ([arguments count] + 1));
@@ -63,8 +68,15 @@ extern NSMutableString *lastCommandOutput;
         commandCharPArray[i + 1] = (char *) [argument UTF8String];
     }
 
+    // REGISTER THE ID BEFORE STARTING EXECUTION
+    executionId = newExecutionId;
+    addExecution(newExecutionId);
+
     // RUN
     lastReturnCode = ffmpeg_execute(([arguments count] + 1), commandCharPArray);
+
+    // ALWAYS REMOVE THE ID FROM THE MAP
+    removeExecution(newExecutionId);
 
     // CLEANUP
     av_free(commandCharPArray[0]);
@@ -74,25 +86,88 @@ extern NSMutableString *lastCommandOutput;
 }
 
 /**
- * Synchronously executes FFmpeg command provided. Space character is used to split command
- * into arguments.
+ * Synchronously executes FFmpeg with arguments provided.
+ *
+ * @param arguments FFmpeg command options/arguments as string array
+ * @return zero on successful execution, 255 on user cancel and non-zero on error
+ */
++ (int)executeWithArguments:(NSArray*)arguments {
+    return [self executeWithId:DEFAULT_EXECUTION_ID andArguments:arguments];
+}
+
+/**
+ * Asynchronously executes FFmpeg with arguments provided. Space character is used to split command into arguments.
+ *
+ * @param arguments FFmpeg command options/arguments as string array
+ * @param delegate delegate that will be notified when execution is completed
+ * @return a unique id that represents this execution
+ */
++ (int)executeWithArgumentsAsync:(NSArray*)arguments withCallback:(id<ExecuteDelegate>)delegate {
+    return [self executeWithArgumentsAsync:arguments withCallback:delegate andDispatchQueue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)];
+}
+
+/**
+ * Asynchronously executes FFmpeg with arguments provided. Space character is used to split command into arguments.
+ *
+ * @param arguments FFmpeg command options/arguments as string array
+ * @param delegate delegate that will be notified when execution is completed
+ * @param queue dispatch queue that will be used to run this asynchronous operation
+ * @return a unique id that represents this execution
+ */
++ (int)executeWithArgumentsAsync:(NSArray*)arguments withCallback:(id<ExecuteDelegate>)delegate andDispatchQueue:(dispatch_queue_t)queue {
+    const long newExecutionId = [executionIdCounter incrementAndGet];
+
+    dispatch_async(queue, ^{
+        const int returnCode = [self executeWithId:newExecutionId andArguments:arguments];
+        if (delegate != nil) {
+            [delegate executeCallback:executionId:returnCode];
+        }
+    });
+
+    return newExecutionId;
+}
+
+/**
+ * Synchronously executes FFmpeg command provided. Space character is used to split command into arguments.
  *
  * @param command FFmpeg command
  * @return zero on successful execution, 255 on user cancel and non-zero on error
  */
-+ (int)execute: (NSString*)command {
++ (int)execute:(NSString*)command {
     return [self executeWithArguments: [self parseArguments: command]];
 }
 
 /**
- * Synchronously executes FFmpeg command provided. Delimiter parameter is used to split
- * command into arguments.
+ * Asynchronously executes FFmpeg command provided. Space character is used to split command into arguments.
+ *
+ * @param command FFmpeg command
+ * @param delegate delegate that will be notified when execution is completed
+ * @return a unique id that represents this execution
+ */
++ (int)executeAsync:(NSString*)command withCallback:(id<ExecuteDelegate>)delegate {
+    return [self executeAsync:command withCallback:delegate andDispatchQueue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)];
+}
+
+/**
+ * Asynchronously executes FFmpeg command provided. Space character is used to split command into arguments.
+ *
+ * @param command FFmpeg command
+ * @param delegate delegate that will be notified when execution is completed
+ * @param queue dispatch queue that will be used to run this asynchronous operation
+ * @return a unique id that represents this execution
+ */
++ (int)executeAsync:(NSString*)command withCallback:(id<ExecuteDelegate>)delegate andDispatchQueue:(dispatch_queue_t)queue {
+    return [self executeWithArgumentsAsync:[self parseArguments:command] withCallback:delegate andDispatchQueue:queue];
+}
+
+/**
+ * Synchronously executes FFmpeg command provided. Delimiter parameter is used to split command into arguments.
  *
  * @param command FFmpeg command
  * @param delimiter arguments delimiter
  * @return zero on successful execution, 255 on user cancel and non-zero on error
  */
-+ (int)execute: (NSString*)command delimiter:(NSString*)delimiter {
++ (int)execute:(NSString*)command delimiter:(NSString*)delimiter {
 
     // SPLITTING ARGUMENTS
     NSArray* argumentArray = [command componentsSeparatedByString:(delimiter == nil ? @" ": delimiter)];
@@ -105,7 +180,18 @@ extern NSMutableString *lastCommandOutput;
  * This function does not wait for termination to complete and returns immediately.
  */
 + (void)cancel {
-    cancel_operation();
+    cancel_operation(DEFAULT_EXECUTION_ID);
+}
+
+/**
+ * Cancels an ongoing operation.
+ *
+ * This function does not wait for termination to complete and returns immediately.
+ *
+ * @param executionId execution id
+ */
++ (void)cancel:(long)executionId {
+    cancel_operation(executionId);
 }
 
 /**
@@ -114,7 +200,7 @@ extern NSMutableString *lastCommandOutput;
  * @param command string command
  * @return array of arguments
  */
-+ (NSArray*)parseArguments: (NSString*)command {
++ (NSArray*)parseArguments:(NSString*)command {
     NSMutableArray *argumentArray = [[NSMutableArray alloc] init];
     NSMutableString *currentArgument = [[NSMutableString alloc] init];
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Taner Sener
+ * Copyright (c) 2018-2020 Taner Sener
  *
  * This file is part of MobileFFmpeg.
  *
@@ -586,12 +586,38 @@ public class Config {
     }
 
     /**
+     * <p>Synchronously executes FFmpeg with arguments provided.
+     *
+     * @param executionId id of the execution
+     * @param arguments FFmpeg command options/arguments as string array
+     * @return zero on successful execution, 255 on user cancel and non-zero on error
+     */
+    static int ffmpegExecute(final long executionId, final String[] arguments) {
+        final int lastReturnCode = nativeFFmpegExecute(executionId, arguments);
+
+        Config.setLastReturnCode(lastReturnCode);
+
+        return lastReturnCode;
+    }
+
+    /**
      * Updates return code value for the last executed command.
      *
      * @param newLastReturnCode new last return code value
      */
     static void setLastReturnCode(int newLastReturnCode) {
         lastReturnCode = newLastReturnCode;
+    }
+
+    /**
+     * <p>Sets an environment variable.
+     *
+     * @param variableName  environment variable name
+     * @param variableValue environment variable value
+     * @return zero on success, non-zero on error
+     */
+    public static int setEnvironmentVariable(final String variableName, final String variableValue) {
+        return setNativeEnvironmentVariable(variableName, variableValue);
     }
 
     /**
@@ -635,16 +661,19 @@ public class Config {
     /**
      * <p>Synchronously executes FFmpeg natively with arguments provided.
      *
+     * @param executionId id of the execution
      * @param arguments FFmpeg command options/arguments as string array
      * @return zero on successful execution, 255 on user cancel and non-zero on error
      */
-    native static int nativeFFmpegExecute(final String[] arguments);
+    native static int nativeFFmpegExecute(final long executionId, final String[] arguments);
 
     /**
      * <p>Cancels an ongoing FFmpeg operation natively. This function does not wait for termination
      * to complete and returns immediately.
+     *
+     * @param executionId id of the execution
      */
-    native static void nativeFFmpegCancel();
+    native static void nativeFFmpegCancel(final long executionId);
 
     /**
      * <p>Synchronously executes FFprobe natively with arguments provided.
@@ -702,17 +731,5 @@ public class Config {
      * @param signum signal number
      */
     native static void ignoreNativeSignal(final int signum);
-
-
-    /**
-     * <p>Sets an environment variable.
-     *
-     * @param variableName  environment variable name
-     * @param variableValue environment variable value
-     * @return zero on success, non-zero on error
-     */
-    public static int setEnvironmentVariable(final String variableName, final String variableValue) {
-        return setNativeEnvironmentVariable(variableName, variableValue);
-    }
 
 }

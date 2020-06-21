@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, 2020 Taner Sener
+ * Copyright (c) 2020 Taner Sener
  *
  * This file is part of MobileFFmpeg.
  *
@@ -17,19 +17,31 @@
  * along with MobileFFmpeg.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <Foundation/Foundation.h>
-#include "MediaInformation.h"
+#include "AtomicLong.h"
 
-@interface MediaInformationParser : NSObject
+@implementation AtomicLong {
+    NSRecursiveLock *lock;
+    long value;
+}
 
-/**
- * Extracts MediaInformation from the given ffprobe json output.
- */
-+ (MediaInformation*)from:(NSString*)ffprobeJsonOutput;
+- (instancetype)initWithInitialValue:(long)initialValue {
+    self = [super init];
+    if (self) {
+        value = initialValue;
+    }
 
-/**
- * Extracts MediaInformation from the given ffprobe json output and saves parsing errors in error parameter.
- */
-+ (MediaInformation*)from:(NSString*)ffprobeJsonOutput with:(NSError*)error;
+    return self;
+}
+
+- (long)incrementAndGet {
+    long returnValue;
+
+    [lock lock];
+    value += 1;
+    returnValue = value;
+    [lock unlock];
+
+    return returnValue;
+}
 
 @end

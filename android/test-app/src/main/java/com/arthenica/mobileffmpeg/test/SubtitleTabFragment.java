@@ -34,6 +34,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.arthenica.mobileffmpeg.Config;
+import com.arthenica.mobileffmpeg.ExecuteCallback;
 import com.arthenica.mobileffmpeg.FFmpeg;
 import com.arthenica.mobileffmpeg.LogCallback;
 import com.arthenica.mobileffmpeg.LogMessage;
@@ -41,7 +42,6 @@ import com.arthenica.mobileffmpeg.Statistics;
 import com.arthenica.mobileffmpeg.StatisticsCallback;
 import com.arthenica.mobileffmpeg.util.DialogUtil;
 import com.arthenica.mobileffmpeg.util.ResourcesUtil;
-import com.arthenica.mobileffmpeg.util.SingleExecuteCallback;
 import com.arthenica.smartexception.java.Exceptions;
 
 import java.io.File;
@@ -66,6 +66,7 @@ public class SubtitleTabFragment extends Fragment {
     private AlertDialog burnProgressDialog;
     private Statistics statistics;
     private State state;
+    private Long executionId;
 
     public SubtitleTabFragment() {
         super(R.layout.fragment_subtitle_tab);
@@ -158,43 +159,44 @@ public class SubtitleTabFragment extends Fragment {
 
             final String ffmpegCommand = Video.generateEncodeVideoScript(image1File.getAbsolutePath(), image2File.getAbsolutePath(), image3File.getAbsolutePath(), videoFile.getAbsolutePath(), "mpeg4", "");
 
-            Log.d(TAG, String.format("FFmpeg process started with arguments\n'%s'", ffmpegCommand));
+            Log.d(TAG, String.format("FFmpeg process started with arguments\n'%s'.", ffmpegCommand));
 
             state = State.CREATING;
 
-            MainActivity.executeAsync(new SingleExecuteCallback() {
+            executionId = FFmpeg.executeAsync(ffmpegCommand, new ExecuteCallback() {
 
                 @Override
-                public void apply(final int returnCode, final String commandOutput) {
-                    Log.d(TAG, String.format("FFmpeg process exited with rc %d", returnCode));
+                public void apply(final long executionId, final int returnCode) {
+                    Log.d(TAG, String.format("FFmpeg process exited with rc %d.", returnCode));
 
                     hideCreateProgressDialog();
 
-                    MainActivity.addUIAction(new Callable() {
+                    if (returnCode == RETURN_CODE_SUCCESS) {
 
-                        @Override
-                        public Object call() {
-                            if (returnCode == RETURN_CODE_SUCCESS) {
+                        MainActivity.addUIAction(new Callable<Object>() {
+
+                            @Override
+                            public Object call() {
 
                                 Log.d(TAG, "Create completed successfully; burning subtitles.");
 
-                                String burnSubtitlesCommand = String.format("-y -i %s -vf subtitles=%s:force_style='FontName=MyFontName' -c:v mpeg4 %s", videoFile.getAbsolutePath(), getSubtitleFile().getAbsolutePath(), videoWithSubtitlesFile.getAbsolutePath());
+                                String burnSubtitlesCommand = String.format("-y -i %s -vf subtitles=%s:force_style='FontName=MyFontName' -c:v mpeg4 %s.", videoFile.getAbsolutePath(), getSubtitleFile().getAbsolutePath(), videoWithSubtitlesFile.getAbsolutePath());
 
                                 showBurnProgressDialog();
 
-                                Log.d(TAG, String.format("FFmpeg process started with arguments\n'%s'", burnSubtitlesCommand));
+                                Log.d(TAG, String.format("FFmpeg process started with arguments\n'%s'.", burnSubtitlesCommand));
 
                                 state = State.BURNING;
 
-                                MainActivity.executeAsync(new SingleExecuteCallback() {
+                                FFmpeg.executeAsync(burnSubtitlesCommand, new ExecuteCallback() {
 
                                     @Override
-                                    public void apply(final int returnCode, final String commandOutput) {
-                                        Log.d(TAG, String.format("FFmpeg process exited with rc %d", returnCode));
+                                    public void apply(final long executionId, final int returnCode) {
+                                        Log.d(TAG, String.format("FFmpeg process exited with rc %d.", returnCode));
 
                                         hideBurnProgressDialog();
 
-                                        MainActivity.addUIAction(new Callable() {
+                                        MainActivity.addUIAction(new Callable<Object>() {
 
                                             @Override
                                             public Object call() {
@@ -206,31 +208,26 @@ public class SubtitleTabFragment extends Fragment {
                                                     Log.e(TAG, "Burn subtitles operation cancelled");
                                                 } else {
                                                     Popup.show(requireContext(), "Burn subtitles failed. Please check log for the details.");
-                                                    Log.e(TAG, String.format("Burn subtitles failed with rc=%d", returnCode));
+                                                    Log.e(TAG, String.format("Burn subtitles failed with rc=%d.", returnCode));
                                                 }
 
                                                 return null;
                                             }
                                         });
                                     }
-                                }, burnSubtitlesCommand);
+                                });
 
-                            } else if (returnCode == RETURN_CODE_CANCEL) {
-                                Popup.show(requireContext(), "Create operation cancelled.");
-                                Log.e(TAG, "Create operation cancelled");
-                            } else {
-                                Popup.show(requireContext(), "Create video failed. Please check log for the details.");
-                                Log.e(TAG, String.format("Create failed with rc=%d", returnCode));
+                                return null;
                             }
-
-                            return null;
-                        }
-                    });
+                        });
+                    }
                 }
-            }, ffmpegCommand);
+            });
+
+            Log.d(TAG, String.format("FFmpeg started execution id: %d.", executionId));
 
         } catch (IOException e) {
-            Log.e(TAG, String.format("Burn subtitles failed %s", Exceptions.getStackTraceString(e)));
+            Log.e(TAG, String.format("Burn subtitles failed %s.", Exceptions.getStackTraceString(e)));
             Popup.show(requireContext(), "Burn subtitles failed");
         }
     }
@@ -288,7 +285,10 @@ public class SubtitleTabFragment extends Fragment {
 
             @Override
             public void onClick(View v) {
-                FFmpeg.cancel();
+                if (executionId != null) {
+                    Log.d(TAG, String.format("Cancelling FFmpeg execution with executionId %d.", executionId));
+                    FFmpeg.cancel(executionId);
+                }
             }
         });
         createProgressDialog.show();
@@ -307,12 +307,12 @@ public class SubtitleTabFragment extends Fragment {
         if (state == State.CREATING) {
             TextView textView = createProgressDialog.findViewById(R.id.progressDialogText);
             if (textView != null) {
-                textView.setText(String.format("Creating video: %% %s", completePercentage));
+                textView.setText(String.format("Creating video: %% %s.", completePercentage));
             }
         } else if (state == State.BURNING) {
             TextView textView = burnProgressDialog.findViewById(R.id.progressDialogText);
             if (textView != null) {
-                textView.setText(String.format("Burning subtitles: %% %s", completePercentage));
+                textView.setText(String.format("Burning subtitles: %% %s.", completePercentage));
             }
         }
 

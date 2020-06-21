@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, 2020 Taner Sener
+ * Copyright (c) 2020 Taner Sener
  *
  * This file is part of MobileFFmpeg.
  *
@@ -18,18 +18,14 @@
  */
 
 #include <Foundation/Foundation.h>
-#include "MediaInformation.h"
-
-@interface MediaInformationParser : NSObject
 
 /**
- * Extracts MediaInformation from the given ffprobe json output.
+ * Represents an atomic long data type.
  */
-+ (MediaInformation*)from:(NSString*)ffprobeJsonOutput;
+@interface AtomicLong : NSObject
 
-/**
- * Extracts MediaInformation from the given ffprobe json output and saves parsing errors in error parameter.
- */
-+ (MediaInformation*)from:(NSString*)ffprobeJsonOutput with:(NSError*)error;
+- (instancetype)initWithInitialValue:(long)initialValue;
+
+- (long)incrementAndGet;
 
 @end

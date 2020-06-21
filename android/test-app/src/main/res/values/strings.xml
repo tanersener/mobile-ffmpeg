@@ -7,15 +7,22 @@
     <string name="subtitle_tab">SUBTITLE</string>
     <string name="vidstab_tab">VID.STAB</string>
     <string name="pipe_tab">PIPE</string>
+    <string name="concurrent_tab">CONCURRENT</string>
     <string name="command_text_input_placeholder">Enter command</string>
     <string name="command_run_ffmpeg_button_text">RUN FFMPEG</string>
     <string name="command_run_ffprobe_button_text">RUN FFPROBE</string>
-    <string name="video_encode_button_text">ENCODE</string>
+    <string name="encode_button_text">ENCODE</string>
+    <string name="encode_button_text_1">ENCODE 1</string>
+    <string name="encode_button_text_2">ENCODE 2</string>
+    <string name="encode_button_text_3">ENCODE 3</string>
     <string name="video_create_button_text">CREATE</string>
     <string name="https_get_info_button_text">GET INFO</string>
     <string name="https_text_input_placeholder">Enter https url</string>
-    <string name="audio_encode_button_text">ENCODE</string>
     <string name="subtitle_burn_subtitles_button_text">BURN SUBTITLES</string>
     <string name="vidstab_stabilize_video_button_text">STABILIZE VIDEO</string>
-    <string name="dialog_cancel_button_text">Cancel</string>
+    <string name="cancel_button_text">Cancel</string>
+    <string name="cancel_button_text_1">Cancel 1</string>
+    <string name="cancel_button_text_2">Cancel 2</string>
+    <string name="cancel_button_text_3">Cancel 3</string>
+    <string name="cancel_button_text_all">Cancel All</string>
 </resources>

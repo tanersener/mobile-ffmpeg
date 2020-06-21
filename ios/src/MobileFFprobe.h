@@ -34,7 +34,7 @@
  * @param arguments FFprobe command options/arguments as string array
  * @return zero on successful execution, 255 on user cancel and non-zero on error
  */
-+ (int)executeWithArguments: (NSArray*)arguments;
++ (int)executeWithArguments:(NSArray*)arguments;
 
 /**
  * Synchronously executes FFprobe command provided. Space character is used to split command
@@ -43,7 +43,7 @@
  * @param command FFprobe command
  * @return zero on successful execution, 255 on user cancel and non-zero on error
  */
-+ (int)execute: (NSString*)command;
++ (int)execute:(NSString*)command;
 
 /**
  * Returns media information for the given file.
@@ -55,7 +55,7 @@
  * @param path or uri of media file
  * @return media information
  */
-+ (MediaInformation*)getMediaInformation: (NSString*)path;
++ (MediaInformation*)getMediaInformation:(NSString*)path;
 
 /**
  * Returns media information for the given command.
@@ -67,7 +67,7 @@
  * @param command ffprobe command
  * @return media information
  */
-+ (MediaInformation*)getMediaInformationFromCommand: (NSString*)command;
++ (MediaInformation*)getMediaInformationFromCommand:(NSString*)command;
 
 /**
  * Returns media information for given file.
@@ -82,6 +82,6 @@
  * timeout parameter is not effective anymore.
  * @return media information
  */
-+ (MediaInformation*)getMediaInformation: (NSString*)path timeout:(long)timeout __attribute__((deprecated));
++ (MediaInformation*)getMediaInformation:(NSString*)path timeout:(long)timeout __attribute__((deprecated));
 
 @end

@@ -65,7 +65,7 @@ typedef enum {
     return self;
 }
 
- - (instancetype)initWithVideoFrameNumber: (int)videoFrameNumber
+ - (instancetype)initWithVideoFrameNumber:(int)videoFrameNumber
                             fps:(float)videoFps
                             quality:(float)videoQuality
                             size:(int64_t)size
@@ -130,6 +130,11 @@ typedef enum {
 
 @end
 
+/** Execution map variables */
+const int EXECUTION_MAP_SIZE = 1000;
+static volatile int executionMap[EXECUTION_MAP_SIZE];
+static NSRecursiveLock *executionMapLock;
+
 /** Redirection control variables */
 static int redirectionEnabled;
 static NSRecursiveLock *lock;
@@ -158,11 +163,15 @@ static NSMutableArray *supportedExternalLibraries;
 
 static int lastCreatedPipeIndex;
 
-int handleSIGQUIT = 1;
-int handleSIGINT = 1;
-int handleSIGTERM = 1;
-int handleSIGXCPU = 1;
-int handleSIGPIPE = 1;
+/** Fields that control the handling of SIGNALs */
+volatile int handleSIGQUIT = 1;
+volatile int handleSIGINT = 1;
+volatile int handleSIGTERM = 1;
+volatile int handleSIGXCPU = 1;
+volatile int handleSIGPIPE = 1;
+
+/** Holds the id of the current execution */
+__thread volatile long executionId = 0;
 
 void callbackWait(int milliSeconds) {
     dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(milliSeconds * NSEC_PER_MSEC)));
@@ -202,6 +211,20 @@ void statisticsCallbackDataAdd(int frameNumber, float fps, float quality, int64_
 }
 
 /**
+ * Adds an execution id to the execution map.
+ *
+ * @param id execution id
+ */
+void addExecution(long id) {
+    [executionMapLock lock];
+
+    int key = id % EXECUTION_MAP_SIZE;
+    executionMap[key] = 1;
+
+    [executionMapLock unlock];
+}
+
+/**
  * Removes head of callback data list.
  */
 CallbackData *callbackDataRemove() {
@@ -219,6 +242,41 @@ CallbackData *callbackDataRemove() {
     }
 
     return newData;
+}
+
+/**
+ * Removes an execution id from the execution map.
+ *
+ * @param id execution id
+ */
+void removeExecution(long id) {
+    [executionMapLock lock];
+
+    int key = id % EXECUTION_MAP_SIZE;
+    executionMap[key] = 0;
+
+    [executionMapLock unlock];
+}
+
+/**
+ * Checks whether a cancel request for the given execution id exists in the execution map.
+ *
+ * @param id execution id
+ * @return 1 if exists, false otherwise
+ */
+int cancelRequested(long id) {
+    int found = 0;
+
+    [executionMapLock lock];
+
+    int key = id % EXECUTION_MAP_SIZE;
+    if (executionMap[key] == 0) {
+        found = 1;
+    }
+
+    [executionMapLock unlock];
+
+    return found;
 }
 
 /**
@@ -390,11 +448,16 @@ void callbackBlockFunction() {
     [supportedExternalLibraries addObject:@"x265"];
     [supportedExternalLibraries addObject:@"xvid"];
 
+    for(int i = 0; i<EXECUTION_MAP_SIZE; i++) {
+        executionMap[i] = 0;
+    }
+
     [ArchDetect class];
     [MobileFFmpeg class];
 
     redirectionEnabled = 0;
     lock = [[NSRecursiveLock alloc] init];
+    executionMapLock = [[NSRecursiveLock alloc] init];
     semaphore = dispatch_semaphore_create(0);
     lastReceivedStatistics = [[Statistics alloc] init];
     callbackDataArray = [[NSMutableArray alloc] init];
@@ -463,7 +526,7 @@ void callbackBlockFunction() {
  *
  * @param level log level
  */
-+ (void)setLogLevel: (int)level {
++ (void)setLogLevel:(int)level {
     av_log_set_level(level);
 }
 
@@ -473,7 +536,7 @@ void callbackBlockFunction() {
  * @param level value
  * @return string value
  */
-+ (NSString*)logLevelToString: (int)level {
++ (NSString*)logLevelToString:(int)level {
     switch (level) {
         case AV_LOG_STDERR: return @"STDERR";
         case AV_LOG_TRACE: return @"TRACE";
@@ -494,7 +557,7 @@ void callbackBlockFunction() {
  *
  * @param newLogDelegate new log delegate
  */
-+ (void)setLogDelegate: (id<LogDelegate>)newLogDelegate {
++ (void)setLogDelegate:(id<LogDelegate>)newLogDelegate {
     logDelegate = newLogDelegate;
 }
 
@@ -503,7 +566,7 @@ void callbackBlockFunction() {
  *
  * @param newStatisticsDelegate statistics delegate
  */
-+ (void)setStatisticsDelegate: (id<StatisticsDelegate>)newStatisticsDelegate {
++ (void)setStatisticsDelegate:(id<StatisticsDelegate>)newStatisticsDelegate {
     statisticsDelegate = newStatisticsDelegate;
 }
 
@@ -528,7 +591,7 @@ void callbackBlockFunction() {
  *
  * @param path directory which contains fontconfig configuration (fonts.conf)
  */
-+ (void)setFontconfigConfigurationPath: (NSString*)path {
++ (void)setFontconfigConfigurationPath:(NSString*)path {
     if (path != nil) {
         setenv("FONTCONFIG_PATH", [path UTF8String], true);
     }
@@ -543,7 +606,7 @@ void callbackBlockFunction() {
  * @param fontDirectoryPath directory which contains fonts (.ttf and .otf files)
  * @param fontNameMapping custom font name mappings, useful to access your fonts with more friendly names
  */
-+ (void)setFontDirectory: (NSString*)fontDirectoryPath with:(NSDictionary*)fontNameMapping {
++ (void)setFontDirectory:(NSString*)fontDirectoryPath with:(NSDictionary*)fontNameMapping {
     NSError *error = nil;
     BOOL isDirectory = YES;
     BOOL isFile = NO;
@@ -870,7 +933,7 @@ void callbackBlockFunction() {
  *
  * @param ffmpegPipePath full path of ffmpeg pipe
  */
-+ (void)closeFFmpegPipe: (NSString*)ffmpegPipePath {
++ (void)closeFFmpegPipe:(NSString*)ffmpegPipePath {
     NSFileManager *fileManager = [NSFileManager defaultManager];
 
     if ([fileManager fileExistsAtPath:ffmpegPipePath]){
@@ -940,7 +1003,7 @@ void callbackBlockFunction() {
  *
  * @param signum signal number to ignore
  */
-+ (void)ignoreSignal: (int)signum {
++ (void)ignoreSignal:(int)signum {
     if (signum == SIGQUIT) {
         handleSIGQUIT = 0;
     } else if (signum == SIGINT) {

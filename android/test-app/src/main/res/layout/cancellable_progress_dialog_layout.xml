@@ -42,7 +42,7 @@
             android:background="@drawable/dialog_button"
             android:fontFamily="sans-serif"
             android:gravity="center"
-            android:text="@string/dialog_cancel_button_text"
+            android:text="@string/cancel_button_text"
             android:textAlignment="center"
             android:textColor="@android:color/black"
             android:textSize="16sp"

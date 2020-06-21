@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, 2020 Taner Sener
+ * Copyright (c) 2020 Taner Sener
  *
  * This file is part of MobileFFmpeg.
  *
@@ -17,19 +17,10 @@
  * along with MobileFFmpeg.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <Foundation/Foundation.h>
-#include "MediaInformation.h"
-
-@interface MediaInformationParser : NSObject
-
 /**
- * Extracts MediaInformation from the given ffprobe json output.
+ * Use this delegate to receive an execution result.
  */
-+ (MediaInformation*)from:(NSString*)ffprobeJsonOutput;
-
-/**
- * Extracts MediaInformation from the given ffprobe json output and saves parsing errors in error parameter.
- */
-+ (MediaInformation*)from:(NSString*)ffprobeJsonOutput with:(NSError*)error;
-
+@protocol ExecuteDelegate<NSObject>
+@required
+- (void)executeCallback:(long)executionId :(int)returnCode;
 @end

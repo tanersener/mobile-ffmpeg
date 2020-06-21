@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Taner Sener
+ * Copyright (c) 2018-2020 Taner Sener
  *
  * This file is part of MobileFFmpeg.
  *
@@ -19,8 +19,12 @@
 
 package com.arthenica.mobileffmpeg;
 
+import android.os.AsyncTask;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * <p>Main class for FFmpeg operations. Provides {@link #execute(String...)} method to execute
@@ -34,6 +38,10 @@ import java.util.List;
  * @since v1.0
  */
 public class FFmpeg {
+
+    static final long DEFAULT_EXECUTION_ID = 0;
+
+    private static final AtomicLong executionIdCounter = new AtomicLong(3000);
 
     static {
         AbiDetect.class.getName();
@@ -50,14 +58,43 @@ public class FFmpeg {
      * <p>Synchronously executes FFmpeg with arguments provided.
      *
      * @param arguments FFmpeg command options/arguments as string array
-     * @return zero on successful execution, 255 on user cancel and non-zero on error
+     * @return 0 on successful execution, 255 on user cancel, other non-zero codes on error
      */
     public static int execute(final String[] arguments) {
-        final int lastReturnCode = Config.nativeFFmpegExecute(arguments);
+        return Config.ffmpegExecute(DEFAULT_EXECUTION_ID, arguments);
+    }
 
-        Config.setLastReturnCode(lastReturnCode);
+    /**
+     * <p>Asynchronously executes FFmpeg with arguments provided.
+     *
+     * @param arguments       FFmpeg command options/arguments as string array
+     * @param executeCallback callback that will be notified when execution is completed
+     * @return returns a unique id that represents this execution
+     */
+    public static long executeAsync(final String[] arguments, final ExecuteCallback executeCallback) {
+        final long newExecutionId = executionIdCounter.incrementAndGet();
 
-        return lastReturnCode;
+        AsyncFFmpegExecuteTask asyncFFmpegExecuteTask = new AsyncFFmpegExecuteTask(newExecutionId, arguments, executeCallback);
+        asyncFFmpegExecuteTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+        return newExecutionId;
+    }
+
+    /**
+     * <p>Asynchronously executes FFmpeg with arguments provided.
+     *
+     * @param arguments       FFmpeg command options/arguments as string array
+     * @param executeCallback callback that will be notified when execution is completed
+     * @param executor        executor that will be used to run this asynchronous operation
+     * @return returns a unique id that represents this execution
+     */
+    public static long executeAsync(final String[] arguments, final ExecuteCallback executeCallback, final Executor executor) {
+        final long newExecutionId = executionIdCounter.incrementAndGet();
+
+        AsyncFFmpegExecuteTask asyncFFmpegExecuteTask = new AsyncFFmpegExecuteTask(newExecutionId, arguments, executeCallback);
+        asyncFFmpegExecuteTask.executeOnExecutor(executor);
+
+        return newExecutionId;
     }
 
     /**
@@ -66,7 +103,7 @@ public class FFmpeg {
      *
      * @param command   FFmpeg command
      * @param delimiter delimiter used to split arguments
-     * @return zero on successful execution, 255 on user cancel and non-zero on error
+     * @return 0 on successful execution, 255 on user cancel, other non-zero codes on error
      * @since 3.0
      * @deprecated argument splitting mechanism used in this method is pretty simple and prone to
      * errors. Consider using a more advanced method like {@link #execute(String)} or
@@ -82,18 +119,67 @@ public class FFmpeg {
      * your command.
      *
      * @param command FFmpeg command
-     * @return zero on successful execution, 255 on user cancel and non-zero on error
+     * @return 0 on successful execution, 255 on user cancel, other non-zero codes on error
      */
     public static int execute(final String command) {
         return execute(parseArguments(command));
     }
 
     /**
-     * <p>Cancels an ongoing operation. This function does not wait for termination to complete and
-     * returns immediately.
+     * <p>Asynchronously executes FFmpeg command provided. Space character is used to split command
+     * into arguments. You can use single and double quote characters to specify arguments inside
+     * your command.
+     *
+     * @param command         FFmpeg command
+     * @param executeCallback callback that will be notified when execution is completed
+     * @return returns a unique id that represents this execution
+     */
+    public static long executeAsync(final String command, final ExecuteCallback executeCallback) {
+        final long newExecutionId = executionIdCounter.incrementAndGet();
+
+        AsyncFFmpegExecuteTask asyncFFmpegExecuteTask = new AsyncFFmpegExecuteTask(newExecutionId, command, executeCallback);
+        asyncFFmpegExecuteTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+        return newExecutionId;
+    }
+
+    /**
+     * <p>Asynchronously executes FFmpeg command provided. Space character is used to split command
+     * into arguments. You can use single and double quote characters to specify arguments inside
+     * your command.
+     *
+     * @param command         FFmpeg command
+     * @param executeCallback callback that will be notified when execution is completed
+     * @param executor        executor that will be used to run this asynchronous operation
+     * @return returns a unique id that represents this execution
+     */
+    public static long executeAsync(final String command, final ExecuteCallback executeCallback, final Executor executor) {
+        final long newExecutionId = executionIdCounter.incrementAndGet();
+
+        AsyncFFmpegExecuteTask asyncFFmpegExecuteTask = new AsyncFFmpegExecuteTask(newExecutionId, command, executeCallback);
+        asyncFFmpegExecuteTask.executeOnExecutor(executor);
+
+        return newExecutionId;
+    }
+
+    /**
+     * <p>Cancels an ongoing operation.
+     *
+     * <p>This function does not wait for termination to complete and returns immediately.
      */
     public static void cancel() {
-        Config.nativeFFmpegCancel();
+        Config.nativeFFmpegCancel(DEFAULT_EXECUTION_ID);
+    }
+
+    /**
+     * <p>Cancels an ongoing operation.
+     *
+     * <p>This function does not wait for termination to complete and returns immediately.
+     *
+     * @param executionId id of the execution
+     */
+    public static void cancel(final long executionId) {
+        Config.nativeFFmpegCancel(executionId);
     }
 
     /**

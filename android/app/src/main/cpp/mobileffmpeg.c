@@ -17,34 +17,6 @@
  * along with MobileFFmpeg.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * CHANGES 08.2019
- * --------------------------------------------------------
- * - lastCommandOutput methods introduced
- * - AV_LOG_STDERR introduced
- *
- * CHANGES 04.2019
- * --------------------------------------------------------
- * - setNativeEnvironmentVariable method added
- *
- * CHANGES 02.2019
- * --------------------------------------------------------
- * - JavaVM registered via av_jni_set_java_vm()
- * - registerNewNativeFFmpegPipe() method added
- *
- * CHANGES 10.2018
- * --------------------------------------------------------
- * - getBuildConf method added
- *
- * CHANGES 09.2018
- * --------------------------------------------------------
- * - Merged with mobileffmpeg_config
- *
- * CHANGES 08.2018
- * --------------------------------------------------------
- * - Copied methods with avutil_log_ prefix from libavutil/log.c
- */
-
 #include <pthread.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -74,13 +46,18 @@ struct CallbackData {
   struct CallbackData *next;
 };
 
+/** Execution map variables */
+const int EXECUTION_MAP_SIZE = 1000;
+static volatile int executionMap[EXECUTION_MAP_SIZE];
+static pthread_mutex_t executionMapMutex;
+
 /** Redirection control variables */
-pthread_mutex_t lockMutex;
-pthread_mutex_t monitorMutex;
-pthread_cond_t monitorCondition;
+static pthread_mutex_t lockMutex;
+static pthread_mutex_t monitorMutex;
+static pthread_cond_t monitorCondition;
 
 /** Last command output variables */
-pthread_mutex_t logMutex;
+static pthread_mutex_t logMutex;
 static AVBPrint lastCommandOutput;
 
 pthread_t callbackThread;
@@ -113,11 +90,15 @@ const char *configClassName = "com/arthenica/mobileffmpeg/Config";
 /** Full name of String class */
 const char *stringClassName = "java/lang/String";
 
-int handleSIGQUIT = 1;
-int handleSIGINT = 1;
-int handleSIGTERM = 1;
-int handleSIGXCPU = 1;
-int handleSIGPIPE = 1;
+/** Fields that control the handling of SIGNALs */
+volatile int handleSIGQUIT = 1;
+volatile int handleSIGINT = 1;
+volatile int handleSIGTERM = 1;
+volatile int handleSIGXCPU = 1;
+volatile int handleSIGPIPE = 1;
+
+/** Holds the id of the current execution */
+__thread volatile long executionId = 0;
 
 /** Prototypes of native functions defined by Config class. */
 JNINativeMethod configMethods[] = {
@@ -127,8 +108,8 @@ JNINativeMethod configMethods[] = {
     {"getNativeLogLevel", "()I", (void*) Java_com_arthenica_mobileffmpeg_Config_getNativeLogLevel},
     {"getNativeFFmpegVersion", "()Ljava/lang/String;", (void*) Java_com_arthenica_mobileffmpeg_Config_getNativeFFmpegVersion},
     {"getNativeVersion", "()Ljava/lang/String;", (void*) Java_com_arthenica_mobileffmpeg_Config_getNativeVersion},
-    {"nativeFFmpegExecute", "([Ljava/lang/String;)I", (void*) Java_com_arthenica_mobileffmpeg_Config_nativeFFmpegExecute},
-    {"nativeFFmpegCancel", "()V", (void*) Java_com_arthenica_mobileffmpeg_Config_nativeFFmpegCancel},
+    {"nativeFFmpegExecute", "(J[Ljava/lang/String;)I", (void*) Java_com_arthenica_mobileffmpeg_Config_nativeFFmpegExecute},
+    {"nativeFFmpegCancel", "(J)V", (void*) Java_com_arthenica_mobileffmpeg_Config_nativeFFmpegCancel},
     {"nativeFFprobeExecute", "([Ljava/lang/String;)I", (void*) Java_com_arthenica_mobileffmpeg_Config_nativeFFprobeExecute},
     {"registerNewNativeFFmpegPipe", "(Ljava/lang/String;)I", (void*) Java_com_arthenica_mobileffmpeg_Config_registerNewNativeFFmpegPipe},
     {"getNativeBuildDate", "()Ljava/lang/String;", (void*) Java_com_arthenica_mobileffmpeg_Config_getNativeBuildDate},
@@ -139,9 +120,6 @@ JNINativeMethod configMethods[] = {
 
 /** Forward declaration for function defined in fftools_ffmpeg.c */
 int ffmpeg_execute(int argc, char **argv);
-
-/** DEFINES LINE SIZE USED FOR LOGGING */
-#define LOG_LINE_SIZE 1024
 
 static const char *avutil_log_get_level_str(int level) {
     switch (level) {
@@ -244,6 +222,15 @@ void logInit() {
     av_bprint_init(&lastCommandOutput, 0, AV_BPRINT_SIZE_UNLIMITED);
 }
 
+void executionMapLockInit() {
+    pthread_mutexattr_t attributes;
+    pthread_mutexattr_init(&attributes);
+    pthread_mutexattr_settype(&attributes, PTHREAD_MUTEX_RECURSIVE_NP);
+
+    pthread_mutex_init(&executionMapMutex, &attributes);
+    pthread_mutexattr_destroy(&attributes);
+}
+
 void mutexUnInit() {
     pthread_mutex_destroy(&lockMutex);
 }
@@ -257,6 +244,10 @@ void logUnInit() {
     pthread_mutex_destroy(&logMutex);
 }
 
+void executionMapLockUnInit() {
+    pthread_mutex_destroy(&executionMapMutex);
+}
+
 void mutexLock() {
     pthread_mutex_lock(&lockMutex);
 }
@@ -265,12 +256,20 @@ void lastCommandOutputLock() {
     pthread_mutex_lock(&logMutex);
 }
 
+void executionMapLock() {
+    pthread_mutex_lock(&executionMapMutex);
+}
+
 void mutexUnlock() {
     pthread_mutex_unlock(&lockMutex);
 }
 
 void lastCommandOutputUnlock() {
     pthread_mutex_unlock(&logMutex);
+}
+
+void executionMapUnlock() {
+    pthread_mutex_unlock(&executionMapMutex);
 }
 
 void clearLastCommandOutput() {
@@ -396,6 +395,20 @@ void statisticsCallbackDataAdd(int frameNumber, float fps, float quality, int64_
 }
 
 /**
+ * Adds an execution id to the execution map.
+ *
+ * @param id execution id
+ */
+void addExecution(long id) {
+    executionMapLock();
+
+    int key = id % EXECUTION_MAP_SIZE;
+    executionMap[key] = 1;
+
+    executionMapUnlock();
+}
+
+/**
  * Removes head of callback data list.
  */
 struct CallbackData *callbackDataRemove() {
@@ -425,6 +438,41 @@ struct CallbackData *callbackDataRemove() {
     mutexUnlock();
 
     return currentData;
+}
+
+/**
+ * Removes an execution id from the execution map.
+ *
+ * @param id execution id
+ */
+void removeExecution(long id) {
+    executionMapLock();
+
+    int key = id % EXECUTION_MAP_SIZE;
+    executionMap[key] = 0;
+
+    executionMapUnlock();
+}
+
+/**
+ * Checks whether a cancel request for the given execution id exists in the execution map.
+ *
+ * @param id execution id
+ * @return 1 if exists, false otherwise
+ */
+int cancelRequested(long id) {
+    int found = 0;
+
+    executionMapLock();
+
+    int key = id % EXECUTION_MAP_SIZE;
+    if (executionMap[key] == 0) {
+        found = 1;
+    }
+
+    executionMapUnlock();
+
+    return found;
 }
 
 /**
@@ -614,10 +662,15 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
 
     callbackDataHead = NULL;
     callbackDataTail = NULL;
-
+    
+    for(int i = 0; i<EXECUTION_MAP_SIZE; i++) {
+        executionMap[i] = 0;
+    }
+    
     mutexInit();
     monitorInit();
     logInit();
+    executionMapLockInit();
 
     return JNI_VERSION_1_6;
 }
@@ -721,10 +774,11 @@ JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_Config_getNativeVersio
  *
  * @param env pointer to native method interface
  * @param object reference to the class on which this method is invoked
+ * @param id execution id
  * @param stringArray reference to the object holding FFmpeg command arguments
  * @return zero on successful execution, non-zero on error
  */
-JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_Config_nativeFFmpegExecute(JNIEnv *env, jclass object, jobjectArray stringArray) {
+JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_Config_nativeFFmpegExecute(JNIEnv *env, jclass object, jlong id, jobjectArray stringArray) {
     jstring *tempArray = NULL;
     int argumentCount = 1;
     char **argv = NULL;
@@ -757,8 +811,15 @@ JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_Config_nativeFFmpegExecut
     // LAST COMMAND OUTPUT SHOULD BE CLEARED BEFORE STARTING A NEW EXECUTION
     clearLastCommandOutput();
 
+    // REGISTER THE ID BEFORE STARTING EXECUTION
+    executionId = id;
+    addExecution(id);
+
     // RUN
     int retCode = ffmpeg_execute(argumentCount, argv);
+
+    // ALWAYS REMOVE THE ID FROM THE MAP
+    removeExecution(id);
 
     // CLEANUP
     if (tempArray != NULL) {
@@ -779,9 +840,10 @@ JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_Config_nativeFFmpegExecut
  *
  * @param env pointer to native method interface
  * @param object reference to the class on which this method is invoked
+ * @param id execution id
  */
-JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_Config_nativeFFmpegCancel(JNIEnv *env, jclass object) {
-    cancel_operation();
+JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_Config_nativeFFmpegCancel(JNIEnv *env, jclass object, jlong id) {
+    cancel_operation(id);
 }
 
 /**

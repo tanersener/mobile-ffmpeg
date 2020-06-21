@@ -39,7 +39,7 @@ import com.arthenica.mobileffmpeg.FFmpeg;
 import com.arthenica.mobileffmpeg.LogCallback;
 import com.arthenica.mobileffmpeg.LogMessage;
 import com.arthenica.mobileffmpeg.util.DialogUtil;
-import com.arthenica.mobileffmpeg.util.SingleExecuteCallback;
+import com.arthenica.mobileffmpeg.ExecuteCallback;
 
 import java.io.File;
 import java.util.concurrent.Callable;
@@ -103,7 +103,7 @@ public class AudioTabFragment extends Fragment implements AdapterView.OnItemSele
 
             @Override
             public void apply(final LogMessage message) {
-                MainActivity.addUIAction(new Callable() {
+                MainActivity.addUIAction(new Callable<Object>() {
 
                     @Override
                     public Object call() {
@@ -145,17 +145,17 @@ public class AudioTabFragment extends Fragment implements AdapterView.OnItemSele
 
         clearLog();
 
-        android.util.Log.d(TAG, String.format("FFmpeg process started with arguments\n'%s'", ffmpegCommand));
+        android.util.Log.d(TAG, String.format("FFmpeg process started with arguments\n'%s'.", ffmpegCommand));
 
-        MainActivity.executeAsync(new SingleExecuteCallback() {
+        MainActivity.executeAsync(new ExecuteCallback() {
 
             @Override
-            public void apply(final int returnCode, final String commandOutput) {
-                android.util.Log.d(TAG, String.format("FFmpeg process exited with rc %d", returnCode));
+            public void apply(final long executionId, final int returnCode) {
+                android.util.Log.d(TAG, String.format("FFmpeg process exited with rc %d.", returnCode));
 
                 hideProgressDialog();
 
-                MainActivity.addUIAction(new Callable() {
+                MainActivity.addUIAction(new Callable<Object>() {
 
                     @Override
                     public Object call() {
@@ -164,7 +164,7 @@ public class AudioTabFragment extends Fragment implements AdapterView.OnItemSele
                             android.util.Log.d(TAG, "Encode completed successfully.");
                         } else {
                             Popup.show(requireContext(), "Encode failed. Please check log for the details.");
-                            android.util.Log.d(TAG, String.format("Encode failed with rc=%d", returnCode));
+                            android.util.Log.d(TAG, String.format("Encode failed with rc=%d.", returnCode));
                         }
 
                         return null;
@@ -181,11 +181,11 @@ public class AudioTabFragment extends Fragment implements AdapterView.OnItemSele
 
         final String ffmpegCommand = String.format("-v quiet -i %s -f chromaprint -fp_format 2 -", audioSampleFile.getAbsolutePath());
 
-        Log.d(TAG, String.format("FFmpeg process started with arguments\n'%s'", ffmpegCommand));
+        Log.d(TAG, String.format("FFmpeg process started with arguments\n'%s'.", ffmpegCommand));
 
         int returnCode = FFmpeg.execute(ffmpegCommand);
 
-        Log.d(TAG, String.format("FFmpeg process exited with rc %d", returnCode));
+        Log.d(TAG, String.format("FFmpeg process exited with rc %d.", returnCode));
     }
 
     public void createAudioSample() {
@@ -196,16 +196,16 @@ public class AudioTabFragment extends Fragment implements AdapterView.OnItemSele
             audioSampleFile.delete();
         }
 
-        String ffmpegCommand = String.format("-hide_banner -y -f lavfi -i sine=frequency=1000:duration=5 -c:a pcm_s16le %s", audioSampleFile.getAbsolutePath());
+        String ffmpegCommand = String.format("-hide_banner -y -f lavfi -i sine=frequency=1000:duration=5 -c:a pcm_s16le %s.", audioSampleFile.getAbsolutePath());
 
-        android.util.Log.d(TAG, String.format("Sample file is created with '%s'", ffmpegCommand));
+        android.util.Log.d(TAG, String.format("Sample file is created with '%s'.", ffmpegCommand));
 
         int result = FFmpeg.execute(ffmpegCommand);
         if (result == 0) {
             encodeButton.setEnabled(true);
             android.util.Log.d(TAG, "AUDIO sample created");
         } else {
-            android.util.Log.d(TAG, String.format("Creating AUDIO sample failed with rc=%d", result));
+            android.util.Log.d(TAG, String.format("Creating AUDIO sample failed with rc=%d.", result));
             Popup.show(requireContext(), "Creating AUDIO sample failed. Please check log for the details.");
         }
     }
@@ -289,29 +289,29 @@ public class AudioTabFragment extends Fragment implements AdapterView.OnItemSele
 
         switch (audioCodec) {
             case "mp2 (twolame)":
-                return String.format("-hide_banner -y -i %s -c:a mp2 -b:a 192k %s", audioSampleFile, audioOutputFile);
+                return String.format("-hide_banner -y -i %s -c:a mp2 -b:a 192k %s.", audioSampleFile, audioOutputFile);
             case "mp3 (liblame)":
-                return String.format("-hide_banner -y -i %s -c:a libmp3lame -qscale:a 2 %s", audioSampleFile, audioOutputFile);
+                return String.format("-hide_banner -y -i %s -c:a libmp3lame -qscale:a 2 %s.", audioSampleFile, audioOutputFile);
             case "mp3 (libshine)":
-                return String.format("-hide_banner -y -i %s -c:a libshine -qscale:a 2 %s", audioSampleFile, audioOutputFile);
+                return String.format("-hide_banner -y -i %s -c:a libshine -qscale:a 2 %s.", audioSampleFile, audioOutputFile);
             case "vorbis":
-                return String.format("-hide_banner -y -i %s -c:a libvorbis -b:a 64k %s", audioSampleFile, audioOutputFile);
+                return String.format("-hide_banner -y -i %s -c:a libvorbis -b:a 64k %s.", audioSampleFile, audioOutputFile);
             case "opus":
-                return String.format("-hide_banner -y -i %s -c:a libopus -b:a 64k -vbr on -compression_level 10 %s", audioSampleFile, audioOutputFile);
+                return String.format("-hide_banner -y -i %s -c:a libopus -b:a 64k -vbr on -compression_level 10 %s.", audioSampleFile, audioOutputFile);
             case "amr-nb":
-                return String.format("-hide_banner -y -i %s -ar 8000 -ab 12.2k -c:a libopencore_amrnb %s", audioSampleFile, audioOutputFile);
+                return String.format("-hide_banner -y -i %s -ar 8000 -ab 12.2k -c:a libopencore_amrnb %s.", audioSampleFile, audioOutputFile);
             case "amr-wb":
-                return String.format("-hide_banner -y -i %s -ar 8000 -ab 12.2k -c:a libvo_amrwbenc -strict experimental %s", audioSampleFile, audioOutputFile);
+                return String.format("-hide_banner -y -i %s -ar 8000 -ab 12.2k -c:a libvo_amrwbenc -strict experimental %s.", audioSampleFile, audioOutputFile);
             case "ilbc":
-                return String.format("-hide_banner -y -i %s -c:a ilbc -ar 8000 -b:a 15200 %s", audioSampleFile, audioOutputFile);
+                return String.format("-hide_banner -y -i %s -c:a ilbc -ar 8000 -b:a 15200 %s.", audioSampleFile, audioOutputFile);
             case "speex":
-                return String.format("-hide_banner -y -i %s -c:a libspeex -ar 16000 %s", audioSampleFile, audioOutputFile);
+                return String.format("-hide_banner -y -i %s -c:a libspeex -ar 16000 %s.", audioSampleFile, audioOutputFile);
             case "wavpack":
-                return String.format("-hide_banner -y -i %s -c:a wavpack -b:a 64k %s", audioSampleFile, audioOutputFile);
+                return String.format("-hide_banner -y -i %s -c:a wavpack -b:a 64k %s.", audioSampleFile, audioOutputFile);
             default:
 
                 // soxr
-                return String.format("-hide_banner -y -i %s -af aresample=resampler=soxr -ar 44100 %s", audioSampleFile, audioOutputFile);
+                return String.format("-hide_banner -y -i %s -af aresample=resampler=soxr -ar 44100 %s.", audioSampleFile, audioOutputFile);
         }
     }
 

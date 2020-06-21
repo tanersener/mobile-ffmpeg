@@ -110,7 +110,7 @@ public class CommandTabFragment extends Fragment {
     public void runFFmpeg() {
         clearLog();
 
-        final String ffmpegCommand = String.format("%s", commandText.getText().toString());
+        final String ffmpegCommand = String.format("%s.", commandText.getText().toString());
 
         android.util.Log.d(MainActivity.TAG, "Testing FFmpeg COMMAND synchronously.");
 
@@ -118,7 +118,7 @@ public class CommandTabFragment extends Fragment {
 
         int result = FFmpeg.execute(ffmpegCommand);
 
-        android.util.Log.d(MainActivity.TAG, String.format("FFmpeg process exited with rc %d", result));
+        android.util.Log.d(MainActivity.TAG, String.format("FFmpeg process exited with rc %d.", result));
 
         if (result != 0) {
             Popup.show(requireContext(), "Command failed. Please check output for the details.");
@@ -128,7 +128,7 @@ public class CommandTabFragment extends Fragment {
     public void runFFprobe() {
         clearLog();
 
-        final String ffprobeCommand = String.format("%s", commandText.getText().toString());
+        final String ffprobeCommand = String.format("%s.", commandText.getText().toString());
 
         android.util.Log.d(MainActivity.TAG, "Testing FFprobe COMMAND synchronously.");
 
@@ -136,7 +136,7 @@ public class CommandTabFragment extends Fragment {
 
         int result = FFprobe.execute(ffprobeCommand);
 
-        android.util.Log.d(MainActivity.TAG, String.format("FFprobe process exited with rc %d", result));
+        android.util.Log.d(MainActivity.TAG, String.format("FFprobe process exited with rc %d.", result));
 
         if (result != 0) {
             Popup.show(requireContext(), "Command failed. Please check output for the details.");

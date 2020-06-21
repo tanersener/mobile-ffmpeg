@@ -42,7 +42,7 @@ extern NSMutableString *lastCommandOutput;
  * @param arguments FFprobe command options/arguments as string array
  * @return zero on successful execution, 255 on user cancel and non-zero on error
  */
-+ (int)executeWithArguments: (NSArray*)arguments {
++ (int)executeWithArguments:(NSArray*)arguments {
     lastCommandOutput = [[NSMutableString alloc] init];
 
     char **commandCharPArray = (char **)av_malloc(sizeof(char*) * ([arguments count] + 1));
@@ -76,7 +76,7 @@ extern NSMutableString *lastCommandOutput;
  * @param command FFprobe command
  * @return zero on successful execution, 255 on user cancel and non-zero on error
  */
-+ (int)execute: (NSString*)command {
++ (int)execute:(NSString*)command {
     return [MobileFFprobe executeWithArguments: [MobileFFmpeg parseArguments: command]];
 }
 
@@ -90,7 +90,7 @@ extern NSMutableString *lastCommandOutput;
  * @param path or uri of media file
  * @return media information
  */
-+ (MediaInformation*)getMediaInformation: (NSString*)path {
++ (MediaInformation*)getMediaInformation:(NSString*)path {
     return [MobileFFprobe getMediaInformationFromCommandArguments:[[NSArray alloc] initWithObjects:@"-v", @"error", @"-hide_banner", @"-print_format", @"json", @"-show_format", @"-show_streams", @"-i", path, nil]];
 }
 
@@ -104,7 +104,7 @@ extern NSMutableString *lastCommandOutput;
  * @param command
  * @return media information
  */
-+ (MediaInformation*)getMediaInformationFromCommand: (NSString*)command {
++ (MediaInformation*)getMediaInformationFromCommand:(NSString*)command {
     return [MobileFFprobe getMediaInformationFromCommandArguments:[MobileFFmpeg parseArguments: command]];
 }
 
@@ -121,11 +121,11 @@ extern NSMutableString *lastCommandOutput;
  * timeout parameter is not effective anymore.
  * @return media information
  */
-+ (MediaInformation*)getMediaInformation: (NSString*)path timeout:(long)timeout {
++ (MediaInformation*)getMediaInformation:(NSString*)path timeout:(long)timeout {
     return [MobileFFprobe getMediaInformation:path];
 }
 
-+ (MediaInformation*)getMediaInformationFromCommandArguments: (NSArray*)arguments {
++ (MediaInformation*)getMediaInformationFromCommandArguments:(NSArray*)arguments {
     int rc = [MobileFFprobe executeWithArguments:arguments];
 
     if (rc == 0) {

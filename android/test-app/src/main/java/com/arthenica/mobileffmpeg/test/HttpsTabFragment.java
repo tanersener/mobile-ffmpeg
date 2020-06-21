@@ -107,9 +107,9 @@ public class HttpsTabFragment extends Fragment {
         if (testUrl.isEmpty()) {
             testUrl = HTTPS_TEST_DEFAULT_URL;
             urlText.setText(testUrl);
-            android.util.Log.d(MainActivity.TAG, String.format("Testing HTTPS with default url '%s'", testUrl));
+            android.util.Log.d(MainActivity.TAG, String.format("Testing HTTPS with default url '%s'.", testUrl));
         } else {
-            android.util.Log.d(MainActivity.TAG, String.format("Testing HTTPS with url '%s'", testUrl));
+            android.util.Log.d(MainActivity.TAG, String.format("Testing HTTPS with url '%s'.", testUrl));
         }
 
         // HTTPS COMMAND ARGUMENTS

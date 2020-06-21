@@ -92,16 +92,16 @@ JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_Config_getNativeVersio
 /*
  * Class:     com_arthenica_mobileffmpeg_Config
  * Method:    nativeFFmpegExecute
- * Signature: ([Ljava/lang/String;)I
+ * Signature: (J[Ljava/lang/String;)I
  */
-JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_Config_nativeFFmpegExecute(JNIEnv *, jclass, jobjectArray);
+JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_Config_nativeFFmpegExecute(JNIEnv *, jclass, jlong id, jobjectArray);
 
 /*
  * Class:     com_arthenica_mobileffmpeg_Config
  * Method:    nativeFFmpegCancel
- * Signature: ()V
+ * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_Config_nativeFFmpegCancel(JNIEnv *, jclass);
+JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_Config_nativeFFmpegCancel(JNIEnv *, jclass, jlong);
 
 /*
  * Class:     com_arthenica_mobileffmpeg_Config

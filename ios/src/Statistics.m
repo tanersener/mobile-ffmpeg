@@ -44,7 +44,7 @@
     return self;
 }
 
- - (instancetype)initWithVideoFrameNumber: (int)newVideoFrameNumber fps:(float)newVideoFps quality:(float)newVideoQuality size:(int64_t)newSize time:(int)newTime bitrate:(double)newBitrate speed:(double)newSpeed {
+ - (instancetype)initWithVideoFrameNumber:(int)newVideoFrameNumber fps:(float)newVideoFps quality:(float)newVideoQuality size:(int64_t)newSize time:(int)newTime bitrate:(double)newBitrate speed:(double)newSpeed {
     self = [super init];
     if (self) {
         videoFrameNumber = newVideoFrameNumber;

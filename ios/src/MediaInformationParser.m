@@ -21,7 +21,7 @@
 
 @implementation MediaInformationParser
 
-+ (MediaInformation*)from: (NSString*)ffprobeJsonOutput {
++ (MediaInformation*)from:(NSString*)ffprobeJsonOutput {
     NSError *error;
 
     MediaInformation* mediaInformation = [self from: ffprobeJsonOutput with: error];
@@ -33,7 +33,7 @@
     return mediaInformation;
 }
 
-+ (MediaInformation*)from: (NSString*)ffprobeJsonOutput with: (NSError*)error {
++ (MediaInformation*)from:(NSString*)ffprobeJsonOutput with:(NSError*)error {
     NSData *jsonData = [ffprobeJsonOutput dataUsingEncoding:NSUTF8StringEncoding];
     NSDictionary *jsonDictionary = [NSJSONSerialization JSONObjectWithData:jsonData options:kNilOptions error:&error];
     if (error != nil || jsonDictionary == nil) {

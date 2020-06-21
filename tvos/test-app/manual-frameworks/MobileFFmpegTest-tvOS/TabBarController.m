@@ -27,6 +27,7 @@
 #import "SubtitleViewController.h"
 #import "VidStabViewController.h"
 #import "PipeViewController.h"
+#import "ConcurrentExecutionViewController.h"
 
 @interface TabBarController () <UITabBarControllerDelegate>
 
@@ -67,6 +68,9 @@
     } else if ([viewController isKindOfClass:[PipeViewController class]]) {
         PipeViewController* pipeView = (PipeViewController*)viewController;
         [pipeView setActive];
+    } else if ([viewController isKindOfClass:[ConcurrentExecutionViewController class]]) {
+        ConcurrentExecutionViewController* concurrentExecutionView = (ConcurrentExecutionViewController*)viewController;
+        [concurrentExecutionView setActive];
     }
 }
 

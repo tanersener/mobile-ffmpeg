@@ -682,6 +682,8 @@ build_modulemap() {
 framework module mobileffmpeg {
 
   header "ArchDetect.h"
+  header "AtomicLong.h"
+  header "ExecuteDelegate.h"
   header "LogDelegate.h"
   header "MediaInformation.h"
   header "MediaInformationParser.h"

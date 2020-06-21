@@ -24,5 +24,5 @@
  */
 @protocol StatisticsDelegate<NSObject>
 @required
-- (void)statisticsCallback: (Statistics*)statistics;
+- (void)statisticsCallback:(Statistics*)statistics;
 @end

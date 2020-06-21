@@ -128,7 +128,7 @@ extern NSString *const LIB_NAME;
  *
  * @param level log level
  */
-+ (void)setLogLevel: (int)level;
++ (void)setLogLevel:(int)level;
 
 /**
  * Converts int log level to string.
@@ -136,21 +136,21 @@ extern NSString *const LIB_NAME;
  * @param level value
  * @return string value
  */
-+ (NSString*)logLevelToString: (int)level;
++ (NSString*)logLevelToString:(int)level;
 
 /**
  * Sets a LogDelegate. logCallback method inside LogDelegate is used to redirect logs.
  *
  * @param newLogDelegate log delegate or nil to disable a previously defined delegate
  */
-+ (void)setLogDelegate: (id<LogDelegate>)newLogDelegate;
++ (void)setLogDelegate:(id<LogDelegate>)newLogDelegate;
 
 /**
  * Sets a StatisticsDelegate. statisticsCallback method inside StatisticsDelegate is used to redirect statistics.
  *
  * @param newStatisticsDelegate statistics delegate or nil to disable a previously defined delegate
  */
-+ (void)setStatisticsDelegate: (id<StatisticsDelegate>)newStatisticsDelegate;
++ (void)setStatisticsDelegate:(id<StatisticsDelegate>)newStatisticsDelegate;
 
 /**
  * Returns the last received statistics data. It is recommended to call it before starting a new execution.
@@ -169,7 +169,7 @@ extern NSString *const LIB_NAME;
  *
  * @param path directory which contains fontconfig configuration (fonts.conf)
  */
-+ (void)setFontconfigConfigurationPath: (NSString*)path;
++ (void)setFontconfigConfigurationPath:(NSString*)path;
 
 /**
  * Registers fonts inside the given path, so they are available to use in FFmpeg filters.
@@ -180,7 +180,7 @@ extern NSString *const LIB_NAME;
  * @param fontDirectoryPath directory which contains fonts (.ttf and .otf files)
  * @param fontNameMapping custom font name mappings, useful to access your fonts with more friendly names
  */
-+ (void)setFontDirectory: (NSString*)fontDirectoryPath with:(NSDictionary*)fontNameMapping;
++ (void)setFontDirectory:(NSString*)fontDirectoryPath with:(NSDictionary*)fontNameMapping;
 
 /**
  * Returns package name.
@@ -210,7 +210,7 @@ extern NSString *const LIB_NAME;
  *
  * @param ffmpegPipePath full path of ffmpeg pipe
  */
-+ (void)closeFFmpegPipe: (NSString*)ffmpegPipePath;
++ (void)closeFFmpegPipe:(NSString*)ffmpegPipePath;
 
 /**
  * Returns FFmpeg version bundled within the library.
@@ -261,6 +261,6 @@ extern NSString *const LIB_NAME;
  *
  * @param signum signal number to ignore
  */
-+ (void)ignoreSignal: (int)signum;
++ (void)ignoreSignal:(int)signum;
 
 @end
