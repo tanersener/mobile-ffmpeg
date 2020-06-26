@@ -37,7 +37,7 @@ jobs:
           - extra-google-m2repository
           - extra-android-m2repository
       install:
-        - echo y | sdkmanager "ndk;21.0.6113669"
+        - echo y | sdkmanager "ndk;21.3.6528147"
         - echo y | sdkmanager "cmake;3.10.2.4988404"
       before_install:
         - touch $HOME/.android/repositories.cfg
@@ -84,7 +84,7 @@ jobs:
           - extra-google-m2repository
           - extra-android-m2repository
       install:
-        - echo y | sdkmanager "ndk;21.0.6113669"
+        - echo y | sdkmanager "ndk;21.3.6528147"
         - echo y | sdkmanager "cmake;3.10.2.4988404"
       before_install:
         - touch $HOME/.android/repositories.cfg
