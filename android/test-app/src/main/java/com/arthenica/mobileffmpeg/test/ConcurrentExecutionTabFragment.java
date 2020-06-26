@@ -160,7 +160,7 @@ public class ConcurrentExecutionTabFragment extends Fragment {
 
                     @Override
                     public Object call() {
-                        appendLog(message.getText());
+                        appendLog(String.format(Locale.getDefault(), "%d:%s", message.getExecutionId(), message.getText()));
                         return null;
                     }
                 });

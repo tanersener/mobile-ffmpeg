@@ -213,10 +213,11 @@ public class Config {
     /**
      * <p>Log redirection method called by JNI/native part.
      *
-     * @param levelValue log level as defined in {@link Level}
-     * @param logMessage redirected log message
+     * @param executionId id of the execution that generated this log, 0 by default
+     * @param levelValue  log level as defined in {@link Level}
+     * @param logMessage  redirected log message
      */
-    private static void log(final int levelValue, final byte[] logMessage) {
+    private static void log(final long executionId, final int levelValue, final byte[] logMessage) {
         final Level level = Level.from(levelValue);
         final String text = new String(logMessage);
 
@@ -228,7 +229,7 @@ public class Config {
 
         if (logCallbackFunction != null) {
             try {
-                logCallbackFunction.apply(new LogMessage(level, text));
+                logCallbackFunction.apply(new LogMessage(executionId, level, text));
             } catch (final Exception e) {
                 Log.e(Config.TAG, "Exception thrown inside LogCallback block", e);
             }
@@ -273,6 +274,7 @@ public class Config {
     /**
      * <p>Statistics redirection method called by JNI/native part.
      *
+     * @param executionId      id of the execution that generated this statistics, 0 by default
      * @param videoFrameNumber last processed frame number for videos
      * @param videoFps         frames processed per second for videos
      * @param videoQuality     quality of the video stream
@@ -281,10 +283,10 @@ public class Config {
      * @param bitrate          output bit rate in kbits/s
      * @param speed            processing speed = processed duration / operation duration
      */
-    private static void statistics(final int videoFrameNumber, final float videoFps,
-                                   final float videoQuality, final long size, final int time,
-                                   final double bitrate, final double speed) {
-        final Statistics newStatistics = new Statistics(videoFrameNumber, videoFps, videoQuality, size, time, bitrate, speed);
+    private static void statistics(final long executionId, final int videoFrameNumber,
+                                   final float videoFps, final float videoQuality, final long size,
+                                   final int time, final double bitrate, final double speed) {
+        final Statistics newStatistics = new Statistics(executionId, videoFrameNumber, videoFps, videoQuality, size, time, bitrate, speed);
         lastReceivedStatistics.update(newStatistics);
 
         if (statisticsCallbackFunction != null) {
@@ -589,7 +591,7 @@ public class Config {
      * <p>Synchronously executes FFmpeg with arguments provided.
      *
      * @param executionId id of the execution
-     * @param arguments FFmpeg command options/arguments as string array
+     * @param arguments   FFmpeg command options/arguments as string array
      * @return zero on successful execution, 255 on user cancel and non-zero on error
      */
     static int ffmpegExecute(final long executionId, final String[] arguments) {
@@ -662,7 +664,7 @@ public class Config {
      * <p>Synchronously executes FFmpeg natively with arguments provided.
      *
      * @param executionId id of the execution
-     * @param arguments FFmpeg command options/arguments as string array
+     * @param arguments   FFmpeg command options/arguments as string array
      * @return zero on successful execution, 255 on user cancel and non-zero on error
      */
     native static int nativeFFmpegExecute(final long executionId, final String[] arguments);

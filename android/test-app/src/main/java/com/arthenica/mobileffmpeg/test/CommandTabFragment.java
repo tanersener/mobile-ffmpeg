@@ -110,7 +110,7 @@ public class CommandTabFragment extends Fragment {
     public void runFFmpeg() {
         clearLog();
 
-        final String ffmpegCommand = String.format("%s.", commandText.getText().toString());
+        final String ffmpegCommand = String.format("%s", commandText.getText().toString());
 
         android.util.Log.d(MainActivity.TAG, "Testing FFmpeg COMMAND synchronously.");
 
@@ -128,7 +128,7 @@ public class CommandTabFragment extends Fragment {
     public void runFFprobe() {
         clearLog();
 
-        final String ffprobeCommand = String.format("%s.", commandText.getText().toString());
+        final String ffprobeCommand = String.format("%s", commandText.getText().toString());
 
         android.util.Log.d(MainActivity.TAG, "Testing FFprobe COMMAND synchronously.");
 

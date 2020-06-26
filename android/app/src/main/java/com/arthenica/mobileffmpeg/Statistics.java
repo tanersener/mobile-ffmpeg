@@ -27,6 +27,7 @@ package com.arthenica.mobileffmpeg;
  */
 public class Statistics {
 
+    private long executionId;
     private int videoFrameNumber;
     private float videoFps;
     private float videoQuality;
@@ -36,6 +37,7 @@ public class Statistics {
     private double speed;
 
     public Statistics() {
+        executionId = 0;
         videoFrameNumber = 0;
         videoFps = 0;
         videoQuality = 0;
@@ -45,7 +47,8 @@ public class Statistics {
         speed = 0;
     }
 
-    public Statistics(int videoFrameNumber, float videoFps, float videoQuality, long size, int time, double bitrate, double speed) {
+    public Statistics(long executionId, int videoFrameNumber, float videoFps, float videoQuality, long size, int time, double bitrate, double speed) {
+        this.executionId = executionId;
         this.videoFrameNumber = videoFrameNumber;
         this.videoFps = videoFps;
         this.videoQuality = videoQuality;
@@ -57,6 +60,7 @@ public class Statistics {
 
     public void update(final Statistics newStatistics) {
         if (newStatistics != null) {
+            this.executionId = newStatistics.getExecutionId();
             if (newStatistics.getVideoFrameNumber() > 0) {
                 this.videoFrameNumber = newStatistics.getVideoFrameNumber();
             }
@@ -84,6 +88,14 @@ public class Statistics {
                 this.speed = newStatistics.getSpeed();
             }
         }
+    }
+
+    public long getExecutionId() {
+        return executionId;
+    }
+
+    public void setExecutionId(long executionId) {
+        this.executionId = executionId;
     }
 
     public int getVideoFrameNumber() {
@@ -147,7 +159,9 @@ public class Statistics {
         final StringBuilder stringBuilder = new StringBuilder();
 
         stringBuilder.append("Statistics{");
-        stringBuilder.append("videoFrameNumber=");
+        stringBuilder.append("executionId=");
+        stringBuilder.append(executionId);
+        stringBuilder.append(", videoFrameNumber=");
         stringBuilder.append(videoFrameNumber);
         stringBuilder.append(", videoFps=");
         stringBuilder.append(videoFps);

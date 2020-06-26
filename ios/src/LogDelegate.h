@@ -22,5 +22,5 @@
  */
 @protocol LogDelegate<NSObject>
 @required
-- (void)logCallback:(int)level :(NSString*)message;
+- (void)logCallback:(long)executionId :(int)level :(NSString*)message;
 @end

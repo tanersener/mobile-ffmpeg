@@ -27,12 +27,18 @@ package com.arthenica.mobileffmpeg;
  */
 public class LogMessage {
 
+    private final long executionId;
     private final Level level;
     private final String text;
 
-    public LogMessage(final Level level, final String text) {
+    public LogMessage(final long executionId, final Level level, final String text) {
+        this.executionId = executionId;
         this.level = level;
         this.text = text;
+    }
+
+    public long getExecutionId() {
+        return executionId;
     }
 
     public Level getLevel() {
@@ -48,7 +54,9 @@ public class LogMessage {
         final StringBuilder stringBuilder = new StringBuilder();
 
         stringBuilder.append("LogMessage{");
-        stringBuilder.append("level=");
+        stringBuilder.append("executionId=");
+        stringBuilder.append(executionId);
+        stringBuilder.append(", level=");
         stringBuilder.append(level);
         stringBuilder.append(", text=");
         stringBuilder.append("\'");

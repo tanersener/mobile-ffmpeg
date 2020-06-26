@@ -90,7 +90,7 @@
     [super didReceiveMemoryWarning];
 }
 
-- (void)logCallback: (int)level :(NSString*)message {
+- (void)logCallback:(long)executionId :(int)level :(NSString*)message {
     dispatch_async(dispatch_get_main_queue(), ^{
         NSLog(@"%@", message);
     });

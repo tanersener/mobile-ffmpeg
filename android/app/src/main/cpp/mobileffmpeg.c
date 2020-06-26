@@ -31,6 +31,7 @@
 /** Callback data structure */
 struct CallbackData {
   int type;                 // 1 (log callback) or 2 (statistics callback)
+  long executionId;         // execution id
 
   int logLevel;             // log level
   AVBPrint logData;         // log data
@@ -325,6 +326,7 @@ void logCallbackDataAdd(int level, AVBPrint *data) {
     // CREATE DATA STRUCT FIRST
     struct CallbackData *newData = (struct CallbackData*)av_malloc(sizeof(struct CallbackData));
     newData->type = 1;
+    newData->executionId = executionId;
     newData->logLevel = level;
     av_bprint_init(&newData->logData, 0, AV_BPRINT_SIZE_UNLIMITED);
     av_bprintf(&newData->logData, "%s", data->str);
@@ -361,6 +363,7 @@ void statisticsCallbackDataAdd(int frameNumber, float fps, float quality, int64_
     // CREATE DATA STRUCT FIRST
     struct CallbackData *newData = (struct CallbackData*)av_malloc(sizeof(struct CallbackData));
     newData->type = 2;
+    newData->executionId = executionId;
     newData->statisticsFrameNumber = frameNumber;
     newData->statisticsFps = fps;
     newData->statisticsQuality = quality;
@@ -568,7 +571,7 @@ void *callbackThreadFunction() {
 
                 jbyteArray byteArray = (jbyteArray) (*env)->NewByteArray(env, size);
                 (*env)->SetByteArrayRegion(env, byteArray, 0, size, callbackData->logData.str);
-                (*env)->CallStaticVoidMethod(env, configClass, logMethod, callbackData->logLevel, byteArray);
+                (*env)->CallStaticVoidMethod(env, configClass, logMethod, (jlong) callbackData->executionId, callbackData->logLevel, byteArray);
                 (*env)->DeleteLocalRef(env, byteArray);
 
                 // CLEAN LOG DATA
@@ -579,10 +582,10 @@ void *callbackThreadFunction() {
                 // STATISTICS CALLBACK
 
                 (*env)->CallStaticVoidMethod(env, configClass, statisticsMethod,
-                    callbackData->statisticsFrameNumber, callbackData->statisticsFps,
-                    callbackData->statisticsQuality, callbackData->statisticsSize,
-                    callbackData->statisticsTime, callbackData->statisticsBitrate,
-                    callbackData->statisticsSpeed);
+                    (jlong) callbackData->executionId, callbackData->statisticsFrameNumber,
+                    callbackData->statisticsFps, callbackData->statisticsQuality,
+                    callbackData->statisticsSize, callbackData->statisticsTime,
+                    callbackData->statisticsBitrate, callbackData->statisticsSpeed);
 
             }
 
@@ -635,13 +638,13 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
 
     (*env)->GetJavaVM(env, &globalVm);
 
-    logMethod = (*env)->GetStaticMethodID(env, localConfigClass, "log", "(I[B)V");
+    logMethod = (*env)->GetStaticMethodID(env, localConfigClass, "log", "(JI[B)V");
     if (logMethod == NULL) {
         LOGE("OnLoad thread failed to GetStaticMethodID for %s.\n", "log");
         return JNI_FALSE;
     }
 
-    statisticsMethod = (*env)->GetStaticMethodID(env, localConfigClass, "statistics", "(IFFJIDD)V");
+    statisticsMethod = (*env)->GetStaticMethodID(env, localConfigClass, "statistics", "(JIFFJIDD)V");
     if (logMethod == NULL) {
         LOGE("OnLoad thread failed to GetStaticMethodID for %s.\n", "statistics");
         return JNI_FALSE;
@@ -812,14 +815,14 @@ JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_Config_nativeFFmpegExecut
     clearLastCommandOutput();
 
     // REGISTER THE ID BEFORE STARTING EXECUTION
-    executionId = id;
-    addExecution(id);
+    executionId = (long) id;
+    addExecution((long) id);
 
     // RUN
     int retCode = ffmpeg_execute(argumentCount, argv);
 
     // ALWAYS REMOVE THE ID FROM THE MAP
-    removeExecution(id);
+    removeExecution((long) id);
 
     // CLEANUP
     if (tempArray != NULL) {

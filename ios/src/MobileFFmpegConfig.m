@@ -40,6 +40,7 @@ typedef enum {
 @implementation CallbackData {
 
     CallbackType type;
+    long executionId;                   // execution id
 
     int logLevel;                       // log level
     NSString *logData;                  // log data
@@ -53,11 +54,11 @@ typedef enum {
     double statisticsSpeed;             // statistics speed
 }
 
- - (instancetype)initWithLogLevel:(int)newLogLevel data:(NSString*)newData {
+ - (instancetype)initWithId:(long)currentExecutionId logLevel:(int)newLogLevel data:(NSString*)newData {
     self = [super init];
     if (self) {
         type = LogType;
-
+        executionId = currentExecutionId;
         logLevel = newLogLevel;
         logData = newData;
     }
@@ -65,7 +66,8 @@ typedef enum {
     return self;
 }
 
- - (instancetype)initWithVideoFrameNumber:(int)videoFrameNumber
+ - (instancetype)initWithId:(long)currentExecutionId
+                            videoFrameNumber:(int)videoFrameNumber
                             fps:(float)videoFps
                             quality:(float)videoQuality
                             size:(int64_t)size
@@ -75,7 +77,7 @@ typedef enum {
     self = [super init];
     if (self) {
         type = StatisticsType;
-
+        executionId = currentExecutionId;
         statisticsFrameNumber = videoFrameNumber;
         statisticsFps = videoFps;
         statisticsQuality = videoQuality;
@@ -90,6 +92,10 @@ typedef enum {
 
 - (CallbackType)getType {
     return type;
+}
+
+- (long)getExecutionId {
+    return executionId;
 }
 
 - (int)getLogLevel {
@@ -188,7 +194,7 @@ void callbackNotify() {
  * @param logData log data
  */
 void logCallbackDataAdd(int level, NSString *logData) {
-    CallbackData *callbackData = [[CallbackData alloc] initWithLogLevel:level data:logData];
+    CallbackData *callbackData = [[CallbackData alloc] initWithId:executionId logLevel:level data:logData];
 
     [lock lock];
     [callbackDataArray addObject:callbackData];
@@ -201,7 +207,7 @@ void logCallbackDataAdd(int level, NSString *logData) {
  * Adds statistics data to the end of callback data list.
  */
 void statisticsCallbackDataAdd(int frameNumber, float fps, float quality, int64_t size, int time, double bitrate, double speed) {
-    CallbackData *callbackData = [[CallbackData alloc] initWithVideoFrameNumber:frameNumber fps:fps quality:quality size:size time:time bitrate:bitrate speed:speed];
+    CallbackData *callbackData = [[CallbackData alloc] initWithId:executionId videoFrameNumber:frameNumber fps:fps quality:quality size:size time:time bitrate:bitrate speed:speed];
 
     [lock lock];
     [callbackDataArray addObject:callbackData];
@@ -352,7 +358,7 @@ void callbackBlockFunction() {
                             if (logDelegate != nil) {
 
                                 // FORWARD LOG TO DELEGATE
-                                [logDelegate logCallback:[callbackData getLogLevel]:[callbackData getLogData]];
+                                [logDelegate logCallback:[callbackData getExecutionId]:[callbackData getLogLevel]:[callbackData getLogData]];
 
                             } else {
                                 switch (levelValue) {
@@ -370,7 +376,7 @@ void callbackBlockFunction() {
                     } else {
 
                         // STATISTICS CALLBACK
-                        Statistics *newStatistics = [[Statistics alloc] initWithVideoFrameNumber:[callbackData getStatisticsFrameNumber] fps:[callbackData getStatisticsFps] quality:[callbackData getStatisticsQuality] size:[callbackData getStatisticsSize] time:[callbackData getStatisticsTime] bitrate:[callbackData getStatisticsBitrate] speed:[callbackData getStatisticsSpeed]];
+                        Statistics *newStatistics = [[Statistics alloc] initWithId:[callbackData getExecutionId] videoFrameNumber:[callbackData getStatisticsFrameNumber] fps:[callbackData getStatisticsFps] quality:[callbackData getStatisticsQuality] size:[callbackData getStatisticsSize] time:[callbackData getStatisticsTime] bitrate:[callbackData getStatisticsBitrate] speed:[callbackData getStatisticsSpeed]];
                         [lastReceivedStatistics update:newStatistics];
 
                         if (logDelegate != nil) {
