@@ -163,7 +163,7 @@ public class VidStabTabFragment extends Fragment {
                                         Log.d(TAG, String.format("FFmpeg process exited with rc %d.", returnCode));
 
                                         if (returnCode == RETURN_CODE_SUCCESS) {
-                                            final String stabilizeVideoCommand = String.format("-y -i %s -vf vidstabtransform=smoothing=30:input=%s -c:v mpeg4 %s.", videoFile.getAbsolutePath(), shakeResultsFile.getAbsolutePath(), stabilizedVideoFile.getAbsolutePath());
+                                            final String stabilizeVideoCommand = String.format("-y -i %s -vf vidstabtransform=smoothing=30:input=%s -c:v mpeg4 %s", videoFile.getAbsolutePath(), shakeResultsFile.getAbsolutePath(), stabilizedVideoFile.getAbsolutePath());
 
                                             Log.d(TAG, String.format("FFmpeg process started with arguments\n'%s'.", stabilizeVideoCommand));
 

@@ -223,7 +223,7 @@ public class VideoTabFragment extends Fragment implements AdapterView.OnItemSele
 
             Log.d(TAG, "Testing VIDEO encoding with 'webp' codec");
 
-            final String ffmpegCommand = String.format("-hide_banner -i %s %s.", imageFile.getAbsolutePath(), outputFile.getAbsolutePath());
+            final String ffmpegCommand = String.format("-hide_banner -i %s %s", imageFile.getAbsolutePath(), outputFile.getAbsolutePath());
 
             Log.d(TAG, String.format("FFmpeg process started with arguments\n'%s'.", ffmpegCommand));
 
