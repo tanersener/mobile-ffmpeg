@@ -42,7 +42,7 @@ jobs:
       before_install:
         - touch $HOME/.android/repositories.cfg
       before_script:
-        - export ANDROID_NDK_ROOT=${ANDROID_HOME}ndk/21.0.6113669
+        - export ANDROID_NDK_ROOT=${ANDROID_HOME}ndk/21.3.6528147
         - rm -f ./build.log
         - wget https://www.nasm.us/pub/nasm/releasebuilds/2.14.02/nasm-2.14.02.tar.gz;tar zxvf nasm-2.14.02.tar.gz;cd nasm-2.14.02;./configure;make;sudo make install;cd ..
       after_success:
@@ -89,7 +89,7 @@ jobs:
       before_install:
         - touch $HOME/.android/repositories.cfg
       before_script:
-        - export ANDROID_NDK_ROOT=${ANDROID_HOME}ndk/21.0.6113669
+        - export ANDROID_NDK_ROOT=${ANDROID_HOME}ndk/21.3.6528147
         - rm -f ./build.log
         - wget https://www.nasm.us/pub/nasm/releasebuilds/2.14.02/nasm-2.14.02.tar.gz;tar zxvf nasm-2.14.02.tar.gz;cd nasm-2.14.02;./configure;make;sudo make install;cd ..
       after_success:
