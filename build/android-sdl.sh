@@ -62,8 +62,9 @@ fi
 mkdir build;
 cd build
 
-# UPDATE PACKAGE NAME USED BY SDL
-${SED_INLINE} 's/org_libsdl_app/com_arthenica_mobileffmpeg_sdl/g' ${BASEDIR}/src/${LIB_NAME}/src/core/android/SDL_android.c
+# USE OUR OWN IMPLEMENTATION
+rm -f ${BASEDIR}/src/${LIB_NAME}/src/core/android/SDL_android.c
+cp ${BASEDIR}/tools/make/sdl/SDL_android.c ${BASEDIR}/src/${LIB_NAME}/src/core/android/SDL_android.c
 
 cmake -Wno-dev \
     -DCMAKE_VERBOSE_MAKEFILE=0 \
@@ -84,8 +85,9 @@ cmake -Wno-dev \
     -DCMAKE_AR="${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/bin/$AR" \
     -DCMAKE_AS="${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/bin/$AS" \
     -DCMAKE_RANLIB="${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/bin/$RANLIB" \
-    -DSDL_SHARED=1 \
-    -DSDL_STATIC=0 .. || exit 1
+    -DSDL_SHARED=0 \
+    -DSDL_STATIC=1 \
+    -DSDL_STATIC_PIC=1 .. || exit 1
 
 make -j$(get_cpu_count) || exit 1
 

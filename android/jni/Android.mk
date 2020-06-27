@@ -9,13 +9,14 @@ MY_LIBRARY_SOURCE := $(MY_PATH)/mobileffmpeg.c $(MY_PATH)/mobileffprobe.c $(MY_P
 MY_LIBRARY_SHARED_LIBRARIES := libavfilter libavformat libavcodec libavutil libswresample libavdevice libswscale
 MY_LIBRARY_LDLIBS := -llog -lz -landroid
 MY_LIBRARY_INCLUDES :=
+MY_LIBRARY_WHOLE_STATIC_LIBRARIES :=
 
 # ENABLE FFPLAY
 ifeq ("$(shell test -e $(LOCAL_PATH)/../build/.ffplay && echo ffplay)","ffplay")
-    MY_LIBRARY_SOURCE += $(MY_PATH)/fftools_ffplay.c
-    MY_LIBRARY_SHARED_LIBRARIES += sdl
+    MY_LIBRARY_SOURCE += $(MY_PATH)/fftools_ffplay.c $(MY_PATH)/mobileffplay.c
+    MY_LIBRARY_WHOLE_STATIC_LIBRARIES += sdl
     MY_LIBRARY_LDLIBS += -lGLESv1_CM -lGLESv2
-    MY_LIBRARY_INCLUDES := -I${LOCAL_PATH}/../../prebuilt/android-$(TARGET_ARCH)/sdl/include/SDL2
+    MY_LIBRARY_INCLUDES := -I${LOCAL_PATH}/../../prebuilt/android-$(TARGET_ARCH)/sdl/include/SDL2 -I${LOCAL_PATH}/../../src/sdl/src/core/android
 endif
 
 # DEFINE ARCH FLAGS
@@ -66,6 +67,7 @@ endif
 LOCAL_CFLAGS := -Wall -Werror -Wno-unused-parameter -Wno-switch -Wno-sign-compare -I${LOCAL_PATH}/../../prebuilt/android-$(TARGET_ARCH)/ffmpeg/include ${MY_LIBRARY_INCLUDES}
 LOCAL_LDLIBS := ${MY_LIBRARY_LDLIBS}
 LOCAL_SHARED_LIBRARIES := ${MY_LIBRARY_SHARED_LIBRARIES}
+LOCAL_WHOLE_STATIC_LIBRARIES := ${MY_LIBRARY_WHOLE_STATIC_LIBRARIES}
 LOCAL_ARM_NEON := ${MY_ARM_NEON}
 include $(BUILD_SHARED_LIBRARY)
 

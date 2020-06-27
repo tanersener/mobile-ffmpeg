@@ -51,8 +51,8 @@ android.applicationVariants.all { variant ->
 }
 
 dependencies {
-    // implementation project(':app')
-    implementation 'com.arthenica:mobile-ffmpeg-full:4.3.1'
+    implementation project(':app')
+    // implementation 'com.arthenica:mobile-ffmpeg-full:4.3.1'
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
 }

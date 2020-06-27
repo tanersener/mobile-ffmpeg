@@ -52,7 +52,7 @@
             android:textStyle="bold" />
     </LinearLayout>
 
-    <VideoView
+    <com.arthenica.mobileffmpeg.player.PlayerSurface
         android:id="@+id/videoPlayerFrame"
         android:layout_width="wrap_content"
         android:background="@drawable/rounded_video_frame"

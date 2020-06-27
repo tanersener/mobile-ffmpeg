@@ -20,18 +20,15 @@
 package com.arthenica.mobileffmpeg.test;
 
 import android.app.AlertDialog;
-import android.media.MediaPlayer;
-import android.net.Uri;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.AndroidRuntimeException;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.MediaController;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -39,10 +36,14 @@ import androidx.fragment.app.Fragment;
 
 import com.arthenica.mobileffmpeg.Config;
 import com.arthenica.mobileffmpeg.FFmpeg;
+import com.arthenica.mobileffmpeg.FFplay;
 import com.arthenica.mobileffmpeg.LogCallback;
 import com.arthenica.mobileffmpeg.LogMessage;
 import com.arthenica.mobileffmpeg.Statistics;
 import com.arthenica.mobileffmpeg.StatisticsCallback;
+import com.arthenica.mobileffmpeg.player.GenericMotionListener;
+import com.arthenica.mobileffmpeg.player.PlayerSession;
+import com.arthenica.mobileffmpeg.player.PlayerSurface;
 import com.arthenica.mobileffmpeg.util.DialogUtil;
 import com.arthenica.mobileffmpeg.util.ResourcesUtil;
 import com.arthenica.mobileffmpeg.util.SingleExecuteCallback;
@@ -57,10 +58,12 @@ import static com.arthenica.mobileffmpeg.test.MainActivity.TAG;
 
 public class VideoTabFragment extends Fragment implements AdapterView.OnItemSelectedListener {
 
-    private VideoView videoView;
     private AlertDialog progressDialog;
     private String selectedCodec;
     private Statistics statistics;
+
+    private PlayerSession playerSession;
+    private PlayerSurface playerSurface;
 
     public VideoTabFragment() {
         super(R.layout.fragment_video_tab);
@@ -83,23 +86,20 @@ public class VideoTabFragment extends Fragment implements AdapterView.OnItemSele
 
                 @Override
                 public void onClick(View v) {
-                    encodeVideo();
+                    playVideo();
+                    // encodeVideo();
                     // encodeWebp();
                 }
             });
         }
 
-        videoView = view.findViewById(R.id.videoPlayerFrame);
-
         progressDialog = DialogUtil.createProgressDialog(requireContext(), "Encoding video");
 
         selectedCodec = getResources().getStringArray(R.array.video_codec)[0];
-    }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        setActive();
+        playerSession = new PlayerSession(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT, getContext(), getVideoFile().getAbsolutePath());
+        playerSurface = view.findViewById(R.id.videoPlayerFrame);
+        playerSurface.init(getActivity(), new GenericMotionListener(), playerSession);
     }
 
     public static VideoTabFragment newInstance() {
@@ -155,7 +155,7 @@ public class VideoTabFragment extends Fragment implements AdapterView.OnItemSele
         try {
 
             // IF VIDEO IS PLAYING STOP PLAYBACK
-            videoView.stopPlayback();
+            // videoView.stopPlayback();
 
             if (videoFile.exists()) {
                 videoFile.delete();
@@ -234,7 +234,7 @@ public class VideoTabFragment extends Fragment implements AdapterView.OnItemSele
     }
 
     protected void playVideo() {
-        MediaController mediaController = new MediaController(requireContext());
+        /* MediaController mediaController = new MediaController(requireContext());
         mediaController.setAnchorView(videoView);
         videoView.setVideoURI(Uri.parse("file://" + getVideoFile().getAbsolutePath()));
         videoView.setMediaController(mediaController);
@@ -254,7 +254,12 @@ public class VideoTabFragment extends Fragment implements AdapterView.OnItemSele
                 return false;
             }
         });
-        videoView.start();
+        videoView.start();*/
+
+        // Intent intent = new Intent(getContext(), FullScreenActivity.class);
+        // intent.putExtra(PlayerSession.FFPLAY_COMMAND, getVideoFile().getAbsolutePath());
+        // startActivity(intent);
+        playerSurface.play();
     }
 
     public String getSelectedVideoCodec() {
@@ -391,6 +396,43 @@ public class VideoTabFragment extends Fragment implements AdapterView.OnItemSele
                 return null;
             }
         });
+    }
+
+    @Override
+    public void onPause() {
+        Log.v(Config.TAG, "VideoTabFragment paused.");
+        playerSurface.setNextNativeState(PlayerSession.NativeState.PAUSED);
+        playerSurface.setResumedCalled(false);
+        playerSurface.handleNativeState();
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        Log.v(Config.TAG, "VideoTabFragment resumed.");
+        setActive();
+        playerSurface.setNextNativeState(PlayerSession.NativeState.RESUMED);
+        playerSurface.setResumedCalled(true);
+        playerSurface.handleNativeState();
+        super.onResume();
+    }
+
+    @Override
+    public void onLowMemory() {
+        Log.v(Config.TAG, "VideoTabFragment is on low memory.");
+        FFplay.playerNativeLowMemory();
+        super.onLowMemory();
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.v(Config.TAG, "VideoTabFragment destroyed.");
+        playerSurface.setNextNativeState(PlayerSession.NativeState.PAUSED);
+        playerSurface.handleNativeState();
+
+        // Send a quit message to the application
+        FFplay.playerNativeQuit();
+        super.onDestroy();
     }
 
 }

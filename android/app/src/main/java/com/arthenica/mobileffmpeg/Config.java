@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Taner Sener
+ * Copyright (c) 2018-2020 Taner Sener
  *
  * This file is part of MobileFFmpeg.
  *
@@ -103,6 +103,7 @@ public class Config {
         Abi.class.getName();
         FFmpeg.class.getName();
         FFprobe.class.getName();
+        FFplay.class.getName();
 
         /*
          * NEON supported arm-v7a library has a different name
@@ -598,26 +599,26 @@ public class Config {
     /**
      * <p>Enables native redirection. Necessary for log and statistics callback functions.
      */
-    private static native void enableNativeRedirection();
+    private native static void enableNativeRedirection();
 
     /**
      * <p>Disables native redirection
      */
-    private static native void disableNativeRedirection();
+    private native static void disableNativeRedirection();
 
     /**
      * Sets native log level
      *
      * @param level log level
      */
-    private static native void setNativeLogLevel(int level);
+    private native static void setNativeLogLevel(int level);
 
     /**
      * Returns native log level.
      *
      * @return log level
      */
-    private static native int getNativeLogLevel();
+    private native static int getNativeLogLevel();
 
     /**
      * <p>Returns FFmpeg version bundled within the library natively.

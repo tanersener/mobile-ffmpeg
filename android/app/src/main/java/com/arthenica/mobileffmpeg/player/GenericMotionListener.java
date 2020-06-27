@@ -19,54 +19,72 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-package com.arthenica.mobileffmpeg.sdl;
+/*
+ * CHANGES 07.2020
+ * - SDLGenericMotionListener renamed as GenericMotionListener
+ */
+
+package com.arthenica.mobileffmpeg.player;
 
 import android.view.InputDevice;
 import android.view.MotionEvent;
 import android.view.View;
 
-public class SDLGenericMotionListener implements View.OnGenericMotionListener {
-    // Generic Motion (mouse hover, joystick...) events go here
+import com.arthenica.mobileffmpeg.FFplay;
+
+/**
+ * <p>Generic motion listener for FFplay Player.
+ */
+public class GenericMotionListener implements View.OnGenericMotionListener {
+
     @Override
-    public boolean onGenericMotion(View v, MotionEvent event) {
+    public boolean onGenericMotion(final View view, final MotionEvent event) {
+        ControllerHandler controllerHandler = FFplay.getControllerHandler();
         float x, y;
         int action;
 
         switch (event.getSource()) {
             case InputDevice.SOURCE_JOYSTICK:
             case InputDevice.SOURCE_GAMEPAD:
-            case InputDevice.SOURCE_DPAD:
-                return SDLControllerManager.handleJoystickMotionEvent(event);
-
-            case InputDevice.SOURCE_MOUSE:
-                if (!SDLActivity.mSeparateMouseAndTouch) {
+            case InputDevice.SOURCE_DPAD: {
+                if (controllerHandler != null) {
+                    return controllerHandler.handleJoystickMotionEvent(event);
+                } else {
+                    return false;
+                }
+            }
+            case InputDevice.SOURCE_MOUSE: {
+                if (!FFplay.isSeparateMouseAndTouch()) {
                     break;
                 }
                 action = event.getActionMasked();
                 switch (action) {
-                    case MotionEvent.ACTION_SCROLL:
+                    case MotionEvent.ACTION_SCROLL: {
                         x = event.getAxisValue(MotionEvent.AXIS_HSCROLL, 0);
                         y = event.getAxisValue(MotionEvent.AXIS_VSCROLL, 0);
-                        SDLActivity.onNativeMouse(0, action, x, y);
-                        return true;
 
-                    case MotionEvent.ACTION_HOVER_MOVE:
+                        FFplay.playerOnMouse(0, action, x, y);
+                        return true;
+                    }
+                    case MotionEvent.ACTION_HOVER_MOVE: {
                         x = event.getX(0);
                         y = event.getY(0);
 
-                        SDLActivity.onNativeMouse(0, action, x, y);
+                        FFplay.playerOnMouse(0, action, x, y);
                         return true;
-
-                    default:
+                    }
+                    default: {
                         break;
+                    }
                 }
                 break;
-
-            default:
+            }
+            default: {
                 break;
+            }
         }
 
-        // Event was not managed
         return false;
     }
+
 }

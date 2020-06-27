@@ -24,6 +24,9 @@
  */
 
 /*
+ * CHANGES 07.2020
+ * - reverted concurrent execution support changes
+ *
  * CHANGES 02.2020
  * - ffplay support changes
  * - Concurrent execution support
@@ -67,6 +70,7 @@
 
 #include <assert.h>
 
+#include "mobileffmpeg.h"
 #include "mobileffmpeg_exception.h"
 
 #define MAX_QUEUE_SIZE (15 * 1024 * 1024)
@@ -313,68 +317,68 @@ typedef struct VideoState {
 } VideoState;
 
 /* options specified by the user */
-__thread AVInputFormat *file_iformat;
-__thread const char *ffplay_input_filename;
-__thread const char *window_title;
-__thread int default_width  = 640;
-__thread int default_height = 480;
-__thread int screen_width  = 0;
-__thread int screen_height = 0;
-__thread int screen_left = SDL_WINDOWPOS_CENTERED;
-__thread int screen_top = SDL_WINDOWPOS_CENTERED;
-__thread int audio_disable;
-__thread int video_disable;
-__thread int subtitle_disable;
-__thread const char* wanted_stream_spec[AVMEDIA_TYPE_NB] = {0};
-__thread int seek_by_bytes = -1;
-__thread float seek_interval = 10;
-__thread int display_disable;
-__thread int borderless;
-__thread int alwaysontop;
-__thread int startup_volume = 100;
-__thread int show_status = 1;
-__thread int av_sync_type = AV_SYNC_AUDIO_MASTER;
-__thread int64_t start_time = AV_NOPTS_VALUE;
-__thread int64_t duration = AV_NOPTS_VALUE;
-__thread int fast = 0;
-__thread int genpts = 0;
-__thread int lowres = 0;
-__thread int decoder_reorder_pts = -1;
-__thread int autoexit;
-__thread int exit_on_keydown;
-__thread int exit_on_mousedown;
-__thread int loop = 1;
-__thread int framedrop = -1;
-__thread int infinite_buffer = -1;
-__thread enum ShowMode show_mode = SHOW_MODE_NONE;
-__thread const char *audio_codec_name;
-__thread const char *subtitle_codec_name;
-__thread const char *video_codec_name;
-__thread double rdftspeed = 0.02;
-__thread int64_t cursor_last_shown;
-__thread int cursor_hidden = 0;
+static AVInputFormat *file_iformat;
+static const char *ffplay_input_filename;
+static const char *window_title;
+static int default_width  = 640;
+static int default_height = 480;
+static int screen_width  = 0;
+static int screen_height = 0;
+static int screen_left = SDL_WINDOWPOS_CENTERED;
+static int screen_top = SDL_WINDOWPOS_CENTERED;
+static int audio_disable;
+static int video_disable;
+static int subtitle_disable;
+static const char* wanted_stream_spec[AVMEDIA_TYPE_NB] = {0};
+static int seek_by_bytes = -1;
+static float seek_interval = 10;
+static int display_disable;
+static int borderless;
+static int alwaysontop;
+static int startup_volume = 100;
+static int show_status = 1;
+static int av_sync_type = AV_SYNC_AUDIO_MASTER;
+static int64_t start_time = AV_NOPTS_VALUE;
+static int64_t duration = AV_NOPTS_VALUE;
+static int fast = 0;
+static int genpts = 0;
+static int lowres = 0;
+static int decoder_reorder_pts = -1;
+static int autoexit;
+static int exit_on_keydown;
+static int exit_on_mousedown;
+static int loop = 1;
+static int framedrop = -1;
+static int infinite_buffer = -1;
+static enum ShowMode show_mode = SHOW_MODE_NONE;
+static const char *audio_codec_name;
+static const char *subtitle_codec_name;
+static const char *video_codec_name;
+double rdftspeed = 0.02;
+static int64_t cursor_last_shown;
+static int cursor_hidden = 0;
 #if CONFIG_AVFILTER
-__thread const char **vfilters_list = NULL;
-__thread int nb_vfilters = 0;
-__thread char *afilters = NULL;
+static const char **vfilters_list = NULL;
+static int nb_vfilters = 0;
+static char *afilters = NULL;
 #endif
-__thread int autorotate = 1;
+static int autorotate = 1;
 
 /* current context */
-__thread int is_full_screen;
-__thread int64_t audio_callback_time;
+static int is_full_screen;
+static int64_t audio_callback_time;
 
-__thread AVPacket flush_pkt;
+static AVPacket flush_pkt;
 
 #define FF_QUIT_EVENT    (SDL_USEREVENT + 2)
 
-__thread SDL_Window *window;
-__thread SDL_Renderer *renderer;
-__thread SDL_RendererInfo renderer_info = {0};
-__thread SDL_AudioDeviceID audio_dev;
-__thread int main_ffplay_return_code = 0;
+static SDL_Window *window;
+static SDL_Renderer *renderer;
+static SDL_RendererInfo renderer_info = {0};
+static SDL_AudioDeviceID audio_dev;
+static int main_ffplay_return_code = 0;
 extern __thread int longjmp_value;
-__thread OptionDef *ffplay_options = NULL;
+OptionDef *ffplay_options = NULL;
 
 static const struct TextureFormatEntry {
     enum AVPixelFormat format;
@@ -3667,12 +3671,12 @@ void ffplay_var_cleanup() {
     is_full_screen = 0;
     audio_callback_time = 0;
 
-    // __thread AVPacket flush_pkt;
+    // AVPacket flush_pkt;
 
     window = NULL;
     renderer = NULL;
-    // __thread SDL_RendererInfo renderer_info = {0};
-    // __thread SDL_AudioDeviceID audio_dev;
+    // SDL_RendererInfo renderer_info = {0};
+    // SDL_AudioDeviceID audio_dev;
 }
 
 int ffplay_execute(int argc, char **argv)
