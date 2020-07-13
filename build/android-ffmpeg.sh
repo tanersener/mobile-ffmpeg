@@ -367,7 +367,7 @@ ulimit -n 2048 1>>${BASEDIR}/build.log 2>&1
     --disable-xmm-clobber-test \
     ${DEBUG_OPTIONS} \
     --disable-neon-clobber-test \
-    --disable-programs \
+    --disable-ffplay \
     --disable-postproc \
     --disable-doc \
     --disable-htmlpages \
