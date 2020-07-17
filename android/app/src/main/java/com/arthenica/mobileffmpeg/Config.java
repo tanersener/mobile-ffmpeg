@@ -78,6 +78,8 @@ public class Config {
 
     private static int lastCreatedPipeIndex;
 
+    private static final List<FFmpegExecution> executions;
+
     static {
 
         Log.i(Config.TAG, "Loading mobile-ffmpeg.");
@@ -140,6 +142,8 @@ public class Config {
         enableRedirection();
 
         lastCreatedPipeIndex = 0;
+
+        executions = new ArrayList<>();
     }
 
     /**
@@ -588,6 +592,26 @@ public class Config {
     }
 
     /**
+     * <p>Sets an environment variable.
+     *
+     * @param variableName  environment variable name
+     * @param variableValue environment variable value
+     * @return zero on success, non-zero on error
+     */
+    public static int setEnvironmentVariable(final String variableName, final String variableValue) {
+        return setNativeEnvironmentVariable(variableName, variableValue);
+    }
+
+    /**
+     * <p>Registers a new ignored signal. Ignored signals are not handled by the library.
+     *
+     * @param signal signal number to ignore
+     */
+    public static void ignoreSignal(final Signal signal) {
+        ignoreNativeSignal(signal.getValue());
+    }
+
+    /**
      * <p>Synchronously executes FFmpeg with arguments provided.
      *
      * @param executionId id of the execution
@@ -595,11 +619,18 @@ public class Config {
      * @return zero on successful execution, 255 on user cancel and non-zero on error
      */
     static int ffmpegExecute(final long executionId, final String[] arguments) {
-        final int lastReturnCode = nativeFFmpegExecute(executionId, arguments);
+        final FFmpegExecution currentFFmpegExecution = new FFmpegExecution(executionId, arguments);
+        executions.add(currentFFmpegExecution);
 
-        Config.setLastReturnCode(lastReturnCode);
+        try {
+            final int lastReturnCode = nativeFFmpegExecute(executionId, arguments);
 
-        return lastReturnCode;
+            Config.setLastReturnCode(lastReturnCode);
+
+            return lastReturnCode;
+        } finally {
+            executions.remove(currentFFmpegExecution);
+        }
     }
 
     /**
@@ -612,14 +643,12 @@ public class Config {
     }
 
     /**
-     * <p>Sets an environment variable.
+     * <p>Lists ongoing FFmpeg executions.
      *
-     * @param variableName  environment variable name
-     * @param variableValue environment variable value
-     * @return zero on success, non-zero on error
+     * @return list of ongoing FFmpeg executions
      */
-    public static int setEnvironmentVariable(final String variableName, final String variableValue) {
-        return setNativeEnvironmentVariable(variableName, variableValue);
+    static List<FFmpegExecution> listFFmpegExecutions() {
+        return new ArrayList<>(executions);
     }
 
     /**
@@ -651,14 +680,14 @@ public class Config {
      *
      * @return FFmpeg version
      */
-    native static String getNativeFFmpegVersion();
+    private native static String getNativeFFmpegVersion();
 
     /**
      * <p>Returns MobileFFmpeg library version natively.
      *
      * @return MobileFFmpeg version
      */
-    native static String getNativeVersion();
+    private native static String getNativeVersion();
 
     /**
      * <p>Synchronously executes FFmpeg natively with arguments provided.
@@ -667,7 +696,7 @@ public class Config {
      * @param arguments   FFmpeg command options/arguments as string array
      * @return zero on successful execution, 255 on user cancel and non-zero on error
      */
-    native static int nativeFFmpegExecute(final long executionId, final String[] arguments);
+    private native static int nativeFFmpegExecute(final long executionId, final String[] arguments);
 
     /**
      * <p>Cancels an ongoing FFmpeg operation natively. This function does not wait for termination
@@ -693,14 +722,14 @@ public class Config {
      * @param ffmpegPipePath full path of ffmpeg pipe
      * @return zero on successful creation, non-zero on error
      */
-    native static int registerNewNativeFFmpegPipe(final String ffmpegPipePath);
+    private native static int registerNewNativeFFmpegPipe(final String ffmpegPipePath);
 
     /**
      * <p>Returns MobileFFmpeg library build date natively.
      *
      * @return MobileFFmpeg library build date
      */
-    native static String getNativeBuildDate();
+    private native static String getNativeBuildDate();
 
     /**
      * <p>Sets an environment variable natively.
@@ -709,29 +738,20 @@ public class Config {
      * @param variableValue environment variable value
      * @return zero on success, non-zero on error
      */
-    public native static int setNativeEnvironmentVariable(final String variableName, final String variableValue);
+    private native static int setNativeEnvironmentVariable(final String variableName, final String variableValue);
 
     /**
      * <p>Returns log output of the last executed single command natively.
      *
      * @return output of the last executed single command
      */
-    native static String getNativeLastCommandOutput();
-
-    /**
-     * <p>Registers a new ignored signal. Ignored signals are not handled by the library.
-     *
-     * @param signal signal number to ignore
-     */
-    public static void ignoreSignal(final Signal signal) {
-        ignoreNativeSignal(signal.getValue());
-    }
+    private native static String getNativeLastCommandOutput();
 
     /**
      * <p>Registers a new ignored signal natively. Ignored signals are not handled by the library.
      *
      * @param signum signal number
      */
-    native static void ignoreNativeSignal(final int signum);
+    private native static void ignoreNativeSignal(final int signum);
 
 }

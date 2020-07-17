@@ -30,7 +30,7 @@
     double speed;
 }
 
- - (instancetype)init {
+- (instancetype)init {
     self = [super init];
     if (self) {
         executionId = 0;
@@ -46,7 +46,7 @@
     return self;
 }
 
- - (instancetype)initWithId:(long)currentExecutionId videoFrameNumber:(int)newVideoFrameNumber fps:(float)newVideoFps quality:(float)newVideoQuality size:(int64_t)newSize time:(int)newTime bitrate:(double)newBitrate speed:(double)newSpeed {
+- (instancetype)initWithId:(long)currentExecutionId videoFrameNumber:(int)newVideoFrameNumber fps:(float)newVideoFps quality:(float)newVideoQuality size:(int64_t)newSize time:(int)newTime bitrate:(double)newBitrate speed:(double)newSpeed {
     self = [super init];
     if (self) {
         executionId = currentExecutionId;
@@ -62,7 +62,7 @@
     return self;
 }
 
- - (void)update:(Statistics*)statistics {
+- (void)update:(Statistics*)statistics {
     if (statistics != nil) {
         executionId = [statistics getExecutionId];
         if ([statistics getVideoFrameNumber] > 0) {

@@ -32,6 +32,7 @@ import androidx.fragment.app.Fragment;
 import com.arthenica.mobileffmpeg.Config;
 import com.arthenica.mobileffmpeg.ExecuteCallback;
 import com.arthenica.mobileffmpeg.FFmpeg;
+import com.arthenica.mobileffmpeg.FFmpegExecution;
 import com.arthenica.mobileffmpeg.LogCallback;
 import com.arthenica.mobileffmpeg.LogMessage;
 import com.arthenica.mobileffmpeg.util.ResourcesUtil;
@@ -39,6 +40,7 @@ import com.arthenica.smartexception.java.Exceptions;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.Callable;
 
@@ -218,6 +220,18 @@ public class ConcurrentExecutionTabFragment extends Fragment {
             Log.e(TAG, String.format("Encode video failed %s.", Exceptions.getStackTraceString(e)));
             Popup.show(requireContext(), "Encode video failed");
         }
+
+        listFFmpegExecutions();
+    }
+
+    public void listFFmpegExecutions() {
+        final List<FFmpegExecution> ffmpegExecutions = FFmpeg.listExecutions();
+        Log.d(TAG, "Listing ongoing FFmpeg executions.");
+        for (int i = 0; i < ffmpegExecutions.size(); i++) {
+            FFmpegExecution execution = ffmpegExecutions.get(i);
+            Log.d(TAG, "Execution " + i + "= id:" + execution.getExecutionId() + ", command:" + execution.getCommand());
+        }
+        Log.d(TAG, "Listed ongoing FFmpeg executions.");
     }
 
     public void cancel(final int buttonNumber) {

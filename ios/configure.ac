@@ -1,6 +1,6 @@
-# mobile-ffmpeg 4.3.3 configure.ac
+# mobile-ffmpeg 4.4 configure.ac
 
-AC_INIT([mobile-ffmpeg], [4.3.3], [https://github.com/tanersener/mobile-ffmpeg/issues/new])
+AC_INIT([mobile-ffmpeg], [4.4], [https://github.com/tanersener/mobile-ffmpeg/issues/new])
 AC_CONFIG_SRCDIR([src/MobileFFmpeg.m])
 AC_CONFIG_MACRO_DIR([m4])
 

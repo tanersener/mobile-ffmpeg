@@ -119,4 +119,19 @@ extern NSString *const MOBILE_FFMPEG_VERSION;
  */
 + (NSArray*)parseArguments:(NSString*)command;
 
+/**
+ * <p>Combines arguments into a string.
+ *
+ * @param arguments arguments
+ * @return string containing all arguments
+ */
++ (NSString*)argumentsToString:(NSArray*)arguments;
+
+/**
+ * <p>Lists ongoing executions.
+ *
+ * @return list of ongoing executions
+ */
++ (NSArray*)listExecutions;
+
 @end

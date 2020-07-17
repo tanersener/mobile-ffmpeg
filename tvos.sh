@@ -660,6 +660,7 @@ framework module mobileffmpeg {
   header "ArchDetect.h"
   header "AtomicLong.h"
   header "ExecuteDelegate.h"
+  header "FFmpegExecution.h"
   header "LogDelegate.h"
   header "MediaInformation.h"
   header "MediaInformationParser.h"

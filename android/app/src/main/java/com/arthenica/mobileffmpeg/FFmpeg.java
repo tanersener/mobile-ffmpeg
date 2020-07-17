@@ -183,6 +183,15 @@ public class FFmpeg {
     }
 
     /**
+     * <p>Lists ongoing executions.
+     *
+     * @return list of ongoing executions
+     */
+    public static List<FFmpegExecution> listExecutions() {
+        return Config.listFFmpegExecutions();
+    }
+
+    /**
      * <p>Parses the given command into arguments.
      *
      * @param command string command
@@ -237,6 +246,28 @@ public class FFmpeg {
         }
 
         return argumentList.toArray(new String[0]);
+    }
+
+    /**
+     * <p>Combines arguments into a string.
+     *
+     * @param arguments arguments
+     * @return string containing all arguments
+     */
+    static String argumentsToString(final String[] arguments) {
+        if (arguments == null) {
+            return "null";
+        }
+
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < arguments.length; i++) {
+            if (i > 0) {
+                stringBuilder.append(" ");
+            }
+            stringBuilder.append(arguments[i]);
+        }
+
+        return stringBuilder.toString();
     }
 
 }

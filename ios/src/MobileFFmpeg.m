@@ -23,6 +23,7 @@
 #include "ArchDetect.h"
 #include "MobileFFmpegConfig.h"
 #include "AtomicLong.h"
+#include "FFmpegExecution.h"
 
 /** Forward declaration for function defined in fftools_ffmpeg.c */
 int ffmpeg_execute(int argc, char **argv);
@@ -43,16 +44,23 @@ int cancelRequested(long executionId);
 void addExecution(long executionId);
 void removeExecution(long executionId);
 
+NSMutableArray *executions;
+
 + (void)initialize {
     [MobileFFmpegConfig class];
 
     executionIdCounter = [[AtomicLong alloc] initWithInitialValue:3000];
+
+    executions = [[NSMutableArray alloc] init];
 
     NSLog(@"Loaded mobile-ffmpeg-%@-%@-%@-%@\n", [MobileFFmpegConfig getPackageName], [ArchDetect getArch], [MobileFFmpegConfig getVersion], [MobileFFmpegConfig getBuildDate]);
 }
 
 + (int)executeWithId:(long)newExecutionId andArguments:(NSArray*)arguments {
     lastCommandOutput = [[NSMutableString alloc] init];
+
+    FFmpegExecution* currentFFmpegExecution = [[FFmpegExecution alloc] initWithExecutionId:newExecutionId andArguments:arguments];
+    [executions addObject: currentFFmpegExecution];
 
     char **commandCharPArray = (char **)av_malloc(sizeof(char*) * ([arguments count] + 1));
 
@@ -81,6 +89,8 @@ void removeExecution(long executionId);
     // CLEANUP
     av_free(commandCharPArray[0]);
     av_free(commandCharPArray);
+
+    [executions removeObject: currentFFmpegExecution];
 
     return lastReturnCode;
 }
@@ -249,6 +259,38 @@ void removeExecution(long executionId);
     }
 
     return argumentArray;
+}
+
+/**
+ * <p>Combines arguments into a string.
+ *
+ * @param arguments arguments
+ * @return string containing all arguments
+ */
++ (NSString*)argumentsToString:(NSArray*)arguments {
+    if (arguments == nil) {
+        return @"null";
+    }
+
+    NSMutableString *string = [NSMutableString stringWithString:@""];
+    for (int i=0; i < [arguments count]; i++) {
+        NSString *argument = [arguments objectAtIndex:i];
+        if (i > 0) {
+            [string appendString:@" "];
+        }
+        [string appendString:argument];
+    }
+
+    return string;
+}
+
+/**
+ * <p>Lists ongoing executions.
+ *
+ * @return list of ongoing executions
+ */
++ (NSArray*)listExecutions {
+    return executions;
 }
 
 @end

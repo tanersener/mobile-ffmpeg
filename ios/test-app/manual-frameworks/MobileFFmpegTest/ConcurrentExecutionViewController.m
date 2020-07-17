@@ -23,6 +23,7 @@
 #import <mobileffmpeg/MobileFFmpegConfig.h>
 #import <mobileffmpeg/MobileFFmpeg.h>
 #import <mobileffmpeg/MobileFFprobe.h>
+#import <mobileffmpeg/FFmpegExecution.h>
 #import "ConcurrentExecutionViewController.h"
 
 @interface ConcurrentExecutionViewController ()
@@ -144,7 +145,23 @@
             executionId3 = executionId;
         }
     }
+    
+    [self listFFmpegExecutions];
 }
+
+- (void)listFFmpegExecutions {
+    NSArray* ffmpegExecutions = [MobileFFmpeg listExecutions];
+    
+    NSLog(@"Listing ongoing FFmpeg executions.\n");
+    
+    for (int i = 0; i < [ffmpegExecutions count]; i++) {
+        FFmpegExecution* execution = [ffmpegExecutions objectAtIndex:i];
+        NSLog(@"Execution %d= id: %ld, command: %@.\n", i, [execution getExecutionId], [execution getCommand]);
+    }
+    
+    NSLog(@"Listed ongoing FFmpeg executions.\n");
+}
+
 
 - (void)cancel:(int)buttonNumber {
     long executionId = 0;

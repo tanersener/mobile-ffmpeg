@@ -11,6 +11,7 @@ libmobileffmpeg_la_SOURCES = \
     fftools_ffmpeg_hw.c \
     fftools_ffmpeg_opt.c \
     fftools_ffprobe.c \
+    FFmpegExecution.m \
     MediaInformation.m \
     MediaInformationParser.m \
     MobileFFmpeg.m \
@@ -28,6 +29,7 @@ include_HEADERS = \
     ArchDetect.h \
     AtomicLong.h \
     ExecuteDelegate.h \
+    FFmpegExecution.h \
 	fftools_cmdutils.h \
     fftools_ffmpeg.h \
 	LogDelegate.h \

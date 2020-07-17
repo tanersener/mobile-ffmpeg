@@ -651,6 +651,16 @@ public class FFmpegTest {
         Assert.assertEquals("video.mp4", argumentArray[12]);
     }
 
+    @Test
+    public void argumentsToString() {
+        Assert.assertEquals("null", argumentsToString(null));
+        Assert.assertEquals("-i input.mp4 -vf filter -c:v mpeg4 output.mp4", argumentsToString(new String[]{"-i", "input.mp4", "-vf", "filter", "-c:v", "mpeg4", "output.mp4"}));
+    }
+
+    public String argumentsToString(final String[] arguments) {
+        return FFmpeg.argumentsToString(arguments);
+    }
+
     private void assertMediaInput(MediaInformation mediaInformation, String format, String filename) {
         Assert.assertEquals(format, mediaInformation.getFormat());
         Assert.assertEquals(filename, mediaInformation.getFilename());
