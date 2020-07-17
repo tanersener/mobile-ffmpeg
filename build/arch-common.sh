@@ -66,63 +66,30 @@ autoreconf_library() {
 
 #
 # 1. <repo url>
-# 2. <local folder path>
-# 3. <commit id>
+# 2. <tag name>
+# 3. <local folder path>
 #
 clone_git_repository() {
   local RC
 
-  (mkdir -p $2 1>>${BASEDIR}/build.log 2>&1)
+  (mkdir -p $3 1>>${BASEDIR}/build.log 2>&1)
 
   RC=$?
 
   if [ ${RC} -ne 0 ]; then
-    echo -e "\nDEBUG: Failed to create local directory $2\n" 1>>${BASEDIR}/build.log 2>&1
-    rm -rf $2 1>>${BASEDIR}/build.log 2>&1
+    echo -e "\nDEBUG: Failed to create local directory $3\n" 1>>${BASEDIR}/build.log 2>&1
+    rm -rf $3 1>>${BASEDIR}/build.log 2>&1
     echo ${RC}
     return
   fi
 
-  (git clone $1 $2 --depth 1 1>>${BASEDIR}/build.log 2>&1)
+  (git clone --depth 1 --branch $2 $1 $3 1>>${BASEDIR}/build.log 2>&1)
 
   RC=$?
 
   if [ ${RC} -ne 0 ]; then
-    echo -e "\nDEBUG: Failed to clone $1\n" 1>>${BASEDIR}/build.log 2>&1
-    rm -rf $2 1>>${BASEDIR}/build.log 2>&1
-    echo ${RC}
-    return
-  fi
-
-  cd $2 1>>${BASEDIR}/build.log 2>&1
-
-  RC=$?
-
-  if [ ${RC} -ne 0 ]; then
-    echo -e "\nDEBUG: Failed to cd into $2\n" 1>>${BASEDIR}/build.log 2>&1
-    rm -rf $2 1>>${BASEDIR}/build.log 2>&1
-    echo ${RC}
-    return
-  fi
-
-  (git fetch --depth 1 origin $3 1>>${BASEDIR}/build.log 2>&1)
-
-  RC=$?
-
-  if [ ${RC} -ne 0 ]; then
-    echo -e "\nDEBUG: Failed to fetch commit id $3 from $1\n" 1>>${BASEDIR}/build.log 2>&1
-    rm -rf $2 1>>${BASEDIR}/build.log 2>&1
-    echo ${RC}
-    return
-  fi
-
-  (git checkout $3 1>>${BASEDIR}/build.log 2>&1)
-
-  RC=$?
-
-  if [ ${RC} -ne 0 ]; then
-    echo -e "\nDEBUG: Failed to checkout commit id $3 from $1\n" 1>>${BASEDIR}/build.log 2>&1
-    rm -rf $2 1>>${BASEDIR}/build.log 2>&1
+    echo -e "\nDEBUG: Failed to clone $1 -> $2\n" 1>>${BASEDIR}/build.log 2>&1
+    rm -rf $3 1>>${BASEDIR}/build.log 2>&1
     echo ${RC}
     return
   fi
@@ -166,7 +133,7 @@ download_library_source() {
   local LIB_REPO_URL=""
   local LIB_NAME="$1"
   local LIB_LOCAL_PATH=${BASEDIR}/src/${LIB_NAME}
-  local LIB_COMMIT_ID=""
+  local LIB_TAG=""
   local LIBRARY_RC=""
   local DOWNLOAD_RC=""
 
@@ -174,16 +141,8 @@ download_library_source() {
 
   case $1 in
   cpu-features)
-    LIB_REPO_URL="https://github.com/google/cpu_features"
-    LIB_COMMIT_ID="339bfd32be1285877ff517cba8b82ce72e946afd"      # master
-    ;;
-  expat)
-    LIB_REPO_URL="https://github.com/libexpat/libexpat"
-    LIB_COMMIT_ID="a7bc26b69768f7fb24f0c7976fae24b157b85b13"      # R_2_2_9
-    ;;
-  openh264)
-    LIB_REPO_URL="https://github.com/cisco/openh264"
-    LIB_COMMIT_ID="a60e28efe227ea8ea760b1e29a8943e371ebe4b3"      # v2.1.0
+    LIB_REPO_URL="https://github.com/tanersener/cpu_features"
+    LIB_TAG="v0.4.1.1"
     ;;
   esac
 
@@ -195,13 +154,12 @@ download_library_source() {
     return
   fi
 
-  DOWNLOAD_RC=$(clone_git_repository "${LIB_REPO_URL}" "${LIB_LOCAL_PATH}" "${LIB_COMMIT_ID}")
+  DOWNLOAD_RC=$(clone_git_repository "${LIB_REPO_URL}" "${LIB_TAG}" "${LIB_LOCAL_PATH}")
 
   if [ ${DOWNLOAD_RC} -ne 0 ]; then
     echo -e "INFO: Downloading library $1 failed. Can not get library from ${LIB_REPO_URL}\n" 1>>${BASEDIR}/build.log 2>&1
     echo ${DOWNLOAD_RC}
   else
-    rm -rf ${LIB_LOCAL_PATH}/.git 1>>${BASEDIR}/build.log 2>&1
     echo -e "DEBUG: $1 library downloaded\n" 1>>${BASEDIR}/build.log 2>&1
   fi
 }

@@ -271,6 +271,9 @@ public class VideoTabFragment extends Fragment implements AdapterView.OnItemSele
             case "x264":
                 videoCodec = "libx264";
                 break;
+            case "openh264":
+                videoCodec = "libopenh264";
+                break;
             case "x265":
                 videoCodec = "libx265";
                 break;

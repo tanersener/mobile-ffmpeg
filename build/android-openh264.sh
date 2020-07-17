@@ -40,19 +40,14 @@ case ${ARCH} in
     ;;
     arm64-v8a)
         ASM_ARCH=arm64
-        CFLAGS+=" -DHAVE_NEON_AARCH64"
+        CFLAGS+=" -DHAVE_NEON_AARCH64 -DANDROID_NDK"
     ;;
     x86*)
         ASM_ARCH=x86
-        CFLAGS+=" -DHAVE_AVX2"
+        CFLAGS+=" -DHAVE_AVX2 -DANDROID_NDK"
     ;;
 esac
 
-# DOWNLOAD LIBRARY
-DOWNLOAD_RESULT=$(download_library_source ${LIB_NAME})
-if [[ ${DOWNLOAD_RESULT} -ne 0 ]]; then
-    exit 1
-fi
 cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
 make clean 2>/dev/null 1>/dev/null
