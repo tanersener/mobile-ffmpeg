@@ -198,6 +198,8 @@
     // APPLYING NECESSARY TRANSFORMATION HERE
     if ([videoCodec isEqualToString:@"h264"]) {
         videoCodec = @"libx264";
+    } else if ([videoCodec containsString:@"h264 (openh264)"]) {
+        videoCodec = @"libopenh264";
     } else if ([videoCodec containsString:@"h264 (videotoolbox)"]) {
         videoCodec = @"h264_videotoolbox";
     } else if ([videoCodec containsString:@"x265"]) {
