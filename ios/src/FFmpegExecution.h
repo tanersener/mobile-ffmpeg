@@ -26,6 +26,8 @@
 
 - (instancetype)initWithExecutionId:(long)newExecutionId andArguments:(NSArray*)arguments;
 
+- (NSDate*)getStartTime;
+
 - (long)getExecutionId;
 
 - (NSString*)getCommand;

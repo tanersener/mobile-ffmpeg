@@ -19,6 +19,8 @@
 
 package com.arthenica.mobileffmpeg;
 
+import java.util.Date;
+
 /**
  * <p>Represents an ongoing FFmpeg execution.
  *
@@ -26,12 +28,18 @@ package com.arthenica.mobileffmpeg;
  * @since v4.4
  */
 public class FFmpegExecution {
+    private final Date startTime;
     private final long executionId;
     private final String command;
 
     public FFmpegExecution(final long executionId, final String[] arguments) {
+        this.startTime = new Date();
         this.executionId = executionId;
         this.command = FFmpeg.argumentsToString(arguments);
+    }
+
+    public Date getStartTime() {
+        return startTime;
     }
 
     public long getExecutionId() {

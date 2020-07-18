@@ -21,6 +21,7 @@
 #include "MobileFFmpeg.h"
 
 @implementation FFmpegExecution {
+    NSDate* startTime;
     long executionId;
     NSString* command;
 }
@@ -28,11 +29,16 @@
 - (instancetype)initWithExecutionId:(long)newExecutionId andArguments:(NSArray*)arguments {
     self = [super init];
     if (self) {
+        startTime = [NSDate date];
         executionId = newExecutionId;
         command = [MobileFFmpeg argumentsToString:arguments];
     }
 
     return self;
+}
+
+- (NSDate*)getStartTime {
+    return startTime;
 }
 
 - (long)getExecutionId {

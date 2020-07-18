@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder.AppleTV.Storyboard" version="3.0" toolsVersion="16097" targetRuntime="AppleTV" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="B80-EI-IC6">
+<document type="com.apple.InterfaceBuilder.AppleTV.Storyboard" version="3.0" toolsVersion="16097.2" targetRuntime="AppleTV" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="B80-EI-IC6">
     <device id="appleTV" appearance="light"/>
     <dependencies>
         <deployment identifier="tvOS"/>
@@ -21,7 +21,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3Wr-qB-Pyg" userLabel="Run FFmpeg Button" customClass="TvButton">
-                                <rect key="frame" x="895" y="299" width="130" height="32"/>
+                                <rect key="frame" x="895" y="202" width="130" height="32"/>
                                 <color key="backgroundColor" red="0.94117647058823528" green="0.94117647058823528" blue="0.95983767649706664" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="32" id="Vbs-En-ncY"/>
@@ -41,7 +41,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0OP-Pr-kwN" userLabel="Run FFprobe Button" customClass="TvButton">
-                                <rect key="frame" x="895" y="361" width="130" height="32"/>
+                                <rect key="frame" x="895" y="264" width="130" height="32"/>
                                 <color key="backgroundColor" red="0.94117647058823528" green="0.94117647058823528" blue="0.96078431372549" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="130" id="85g-G9-Rc6"/>
@@ -63,7 +63,7 @@
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="MobileFFmpegTest" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4qP-Cg-LeP">
-                                <rect key="frame" x="90" y="157" width="1740" height="50"/>
+                                <rect key="frame" x="90" y="60" width="1740" height="50"/>
                                 <color key="backgroundColor" red="0.95686274509803915" green="0.40784313725490196" blue="0.25882352941176467" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="e4q-j1-NcS"/>
@@ -73,7 +73,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Enter command" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="WEh-8G-EBV">
-                                <rect key="frame" x="110" y="237" width="1700" height="32"/>
+                                <rect key="frame" x="110" y="140" width="1700" height="32"/>
                                 <color key="backgroundColor" red="0.90198421478271484" green="0.9058806300163269" blue="0.91761696338653564" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="32" id="0at-Ak-O3K"/>
@@ -82,7 +82,7 @@
                                 <textInputTraits key="textInputTraits" autocorrectionType="no"/>
                             </textField>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="gqc-19-yb3">
-                                <rect key="frame" x="120" y="423" width="1680" height="557"/>
+                                <rect key="frame" x="120" y="326" width="1680" height="654"/>
                                 <color key="backgroundColor" red="0.94117647058823528" green="0.94117647058823528" blue="0.96078431372549022" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <accessibility key="accessibilityConfiguration" hint="Run output"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="15"/>
@@ -307,7 +307,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="MobileFFmpegTest" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qjq-ds-G4r">
-                                <rect key="frame" x="90" y="157" width="1740" height="50"/>
+                                <rect key="frame" x="90" y="60" width="1740" height="50"/>
                                 <color key="backgroundColor" red="0.95686274510000002" green="0.40784313729999999" blue="0.25882352939999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="xbI-E1-tqj"/>
@@ -317,7 +317,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="z7Q-Af-rbI" customClass="TvButton">
-                                <rect key="frame" x="920" y="359" width="80" height="32"/>
+                                <rect key="frame" x="920" y="262" width="80" height="32"/>
                                 <color key="backgroundColor" red="0.94117647058823528" green="0.94117647058823528" blue="0.96078431372549022" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="80" id="6F7-uT-WDk"/>
@@ -338,14 +338,14 @@
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wZ4-t0-3Pz">
-                                <rect key="frame" x="20" y="421" width="1880" height="579"/>
+                                <rect key="frame" x="20" y="324" width="1880" height="676"/>
                                 <color key="tintColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="mpeg4" borderStyle="roundedRect" placeholder="mpeg4, h264, x265, xvid, vp8, vp9, aom, kvazaar, theora, hap" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="ATw-Py-5o6" userLabel="Video Codec Text">
-                                <rect key="frame" x="720.5" y="267" width="479" height="32"/>
+                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="mpeg4" borderStyle="roundedRect" placeholder="mpeg4, h264, h264 (openh264), h264 (videotoolbox), x265, xvid, vp8, vp9, aom, kvazaar, theora, hap" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="ATw-Py-5o6" userLabel="Video Codec Text">
+                                <rect key="frame" x="590" y="170" width="740" height="32"/>
                                 <color key="backgroundColor" red="0.90198421480000002" green="0.90588062999999996" blue="0.91761696339999999" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                 <constraints>
                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="400" id="ES2-Xg-2lJ"/>
@@ -655,8 +655,6 @@
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     </tabBar>
                     <connections>
-                        <segue destination="9pv-A4-QxB" kind="relationship" relationship="viewControllers" id="Ubx-0c-rC0"/>
-                        <segue destination="8rJ-Kc-sve" kind="relationship" relationship="viewControllers" id="KEo-kH-f6T"/>
                         <segue destination="bz3-AU-N9p" kind="relationship" relationship="viewControllers" id="JDI-eG-1Hg"/>
                         <segue destination="e0F-AO-I4l" kind="relationship" relationship="viewControllers" id="E5k-nD-0Nr"/>
                         <segue destination="CNM-FA-Rhq" kind="relationship" relationship="viewControllers" id="QGr-t3-scR"/>

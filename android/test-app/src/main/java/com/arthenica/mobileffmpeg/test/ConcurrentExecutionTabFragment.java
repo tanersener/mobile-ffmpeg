@@ -229,7 +229,7 @@ public class ConcurrentExecutionTabFragment extends Fragment {
         Log.d(TAG, "Listing ongoing FFmpeg executions.");
         for (int i = 0; i < ffmpegExecutions.size(); i++) {
             FFmpegExecution execution = ffmpegExecutions.get(i);
-            Log.d(TAG, "Execution " + i + "= id:" + execution.getExecutionId() + ", command:" + execution.getCommand());
+            Log.d(TAG, String.format("Execution %d = id:%d, startTime:%s, command:%s.", i, execution.getExecutionId(), execution.getStartTime(), execution.getCommand()));
         }
         Log.d(TAG, "Listed ongoing FFmpeg executions.");
     }

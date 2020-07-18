@@ -46,6 +46,7 @@
 		34E281B424A571430048B3EC /* libavformat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34E281AC24A571430048B3EC /* libavformat.framework */; };
 		34E281B524A571430048B3EC /* libswscale.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34E281AD24A571430048B3EC /* libswscale.framework */; };
 		34E281B624A571430048B3EC /* mobileffmpeg.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34E281AE24A571430048B3EC /* mobileffmpeg.framework */; };
+		34F2036D24C32303003C6973 /* openh264.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34F2036C24C32303003C6973 /* openh264.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -105,6 +106,7 @@
 		34E281AC24A571430048B3EC /* libavformat.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libavformat.framework; path = "../../../prebuilt/tvos-framework/libavformat.framework"; sourceTree = "<group>"; };
 		34E281AD24A571430048B3EC /* libswscale.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libswscale.framework; path = "../../../prebuilt/tvos-framework/libswscale.framework"; sourceTree = "<group>"; };
 		34E281AE24A571430048B3EC /* mobileffmpeg.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = mobileffmpeg.framework; path = "../../../prebuilt/tvos-framework/mobileffmpeg.framework"; sourceTree = "<group>"; };
+		34F2036C24C32303003C6973 /* openh264.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = openh264.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -112,6 +114,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				34F2036D24C32303003C6973 /* openh264.framework in Frameworks */,
 				34C97E8823CB7655004F75D3 /* libiconv.tbd in Frameworks */,
 				34E281B624A571430048B3EC /* mobileffmpeg.framework in Frameworks */,
 				34C06C0122AD71090039DF48 /* GameController.framework in Frameworks */,
@@ -190,6 +193,7 @@
 		3498DC65209F7F1C005F5883 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				34F2036C24C32303003C6973 /* openh264.framework */,
 				34C97E8723CB7655004F75D3 /* libiconv.tbd */,
 				34C06C0022AD71090039DF48 /* GameController.framework */,
 				34C06BFE22AD70E40039DF48 /* libz.tbd */,

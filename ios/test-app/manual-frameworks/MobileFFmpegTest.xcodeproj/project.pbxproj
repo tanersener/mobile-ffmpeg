@@ -51,6 +51,7 @@
 		34DC789E21215B5800C3486C /* sil_open_font_license.txt in Resources */ = {isa = PBXBuildFile; fileRef = 34DC789A21215B5800C3486C /* sil_open_font_license.txt */; };
 		34E313FC24A533040004B1D7 /* ConcurrentExecutionViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 34E313FA24A533040004B1D7 /* ConcurrentExecutionViewController.h */; };
 		34E313FD24A533040004B1D7 /* ConcurrentExecutionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 34E313FB24A533040004B1D7 /* ConcurrentExecutionViewController.m */; };
+		34F2036B24C31F61003C6973 /* openh264.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34F2036A24C31F61003C6973 /* openh264.framework */; };
 		34FAE215209F7DDD005CE2AE /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 34FAE214209F7DDD005CE2AE /* AppDelegate.m */; };
 		34FAE218209F7DDD005CE2AE /* CommandViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 34FAE217209F7DDD005CE2AE /* CommandViewController.m */; };
 		34FAE21B209F7DDD005CE2AE /* VideoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 34FAE21A209F7DDD005CE2AE /* VideoViewController.m */; };
@@ -118,6 +119,7 @@
 		34DC789A21215B5800C3486C /* sil_open_font_license.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = sil_open_font_license.txt; sourceTree = "<group>"; };
 		34E313FA24A533040004B1D7 /* ConcurrentExecutionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConcurrentExecutionViewController.h; sourceTree = "<group>"; };
 		34E313FB24A533040004B1D7 /* ConcurrentExecutionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ConcurrentExecutionViewController.m; sourceTree = "<group>"; };
+		34F2036A24C31F61003C6973 /* openh264.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = openh264.framework; sourceTree = "<group>"; };
 		34FAE210209F7DDD005CE2AE /* MobileFFmpegTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MobileFFmpegTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		34FAE213209F7DDD005CE2AE /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		34FAE214209F7DDD005CE2AE /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -141,6 +143,7 @@
 				34AE897122AE5A4600742D95 /* GameController.framework in Frameworks */,
 				341D1EAA23CA8F3F00B24203 /* libswresample.framework in Frameworks */,
 				34AE897022AE5A3500742D95 /* VideoToolbox.framework in Frameworks */,
+				34F2036B24C31F61003C6973 /* openh264.framework in Frameworks */,
 				341D1E8523CA8F3E00B24203 /* libavdevice.framework in Frameworks */,
 				341D1EA123CA8F3F00B24203 /* mobileffmpeg.framework in Frameworks */,
 				34AE896F22AE5A2E00742D95 /* CoreMotion.framework in Frameworks */,
@@ -190,6 +193,7 @@
 				3431662A21D13B0A001A7185 /* libc++.tbd */,
 				343165D221D13704001A7185 /* libbz2.tbd */,
 				343165D021D136FC001A7185 /* libz.tbd */,
+				34F2036A24C31F61003C6973 /* openh264.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";

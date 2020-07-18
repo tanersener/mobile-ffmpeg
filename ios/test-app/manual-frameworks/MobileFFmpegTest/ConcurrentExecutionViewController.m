@@ -156,7 +156,7 @@
     
     for (int i = 0; i < [ffmpegExecutions count]; i++) {
         FFmpegExecution* execution = [ffmpegExecutions objectAtIndex:i];
-        NSLog(@"Execution %d= id: %ld, command: %@.\n", i, [execution getExecutionId], [execution getCommand]);
+        NSLog(@"Execution %d = id: %ld, startTime: %@, command: %@.\n", i, [execution getExecutionId], [execution getStartTime], [execution getCommand]);
     }
     
     NSLog(@"Listed ongoing FFmpeg executions.\n");
