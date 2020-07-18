@@ -43,9 +43,16 @@ typedef void (intra_pred_planar_func)(
   const kvz_pixel *const ref_left,
   kvz_pixel *const dst);
 
+typedef void (intra_pred_filtered_dc_func)(
+  const int_fast8_t log2_width,
+  const kvz_pixel *const ref_top,
+  const kvz_pixel *const ref_left,
+  kvz_pixel *const out_block);
+
 // Declare function pointers.
 extern angular_pred_func * kvz_angular_pred;
 extern intra_pred_planar_func * kvz_intra_pred_planar;
+extern intra_pred_filtered_dc_func * kvz_intra_pred_filtered_dc;
 
 int kvz_strategy_register_intra(void* opaque, uint8_t bitdepth);
 
@@ -53,6 +60,7 @@ int kvz_strategy_register_intra(void* opaque, uint8_t bitdepth);
 #define STRATEGIES_INTRA_EXPORTS \
   {"angular_pred", (void**) &kvz_angular_pred}, \
   {"intra_pred_planar", (void**) &kvz_intra_pred_planar}, \
+  {"intra_pred_filtered_dc", (void**) &kvz_intra_pred_filtered_dc}, \
 
 
 

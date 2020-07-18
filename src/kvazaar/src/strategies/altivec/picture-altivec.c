@@ -21,7 +21,9 @@
 #include "strategies/altivec/picture-altivec.h"
 
 #if COMPILE_POWERPC_ALTIVEC
+#undef bool
 #include <altivec.h>
+#define bool _Bool
 #include <stdlib.h>
 
 #include "kvazaar.h"

@@ -27,7 +27,8 @@
  */
 
 #include "global.h" // IWYU pragma: keep
-
+#include "ml_intra_cu_depth_pred.h"
+#include "constraint.h"
 
 // Forward declare because including the header would lead  to a cyclic
 // dependency.

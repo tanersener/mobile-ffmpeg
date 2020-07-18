@@ -22,6 +22,7 @@ http://ultravideo.cs.tut.fi/#encoder for more information.
 - [Compiling Kvazaar](#compiling-kvazaar)
   - [Required libraries](#required-libraries)
   - [Autotools](#autotools)
+  - [Autotools on MinGW](#autotools-on-mingw)
   - [OS X](#os-x)
   - [Visual Studio](#visual-studio)
   - [Docker](#docker)
@@ -113,11 +114,16 @@ Video structure:
                                    - 0: Only send VPS with the first frame.
                                    - N: Send VPS with every Nth intra frame.
   -r, --ref <integer>        : Number of reference frames, in range 1..15 [4]
-      --gop <string>         : GOP structure [8]
-                                   - 0: Disabled
-                                   - 8: B-frame pyramid of length 8
-                                   - lp-<string>: Low-delay P-frame GOP
+      --gop <string>         : GOP structure [lp-g4d3t1]
+                                   -  0: Disabled
+                                   -  8: B-frame pyramid of length 8
+                                   - 16: B-frame pyramid of length 16
+                                   - lp-<string>: Low-delay P/B-frame GOP
                                      (e.g. lp-g8d4t2, see README)
+      --intra-qp-offset <int>: QP offset for intra frames [-51..51] [auto]
+                                   - N: Set QP offset to N.
+                                   - auto: Select offset automatically based
+                                     on GOP length.
       --(no-)open-gop        : Use open GOP configuration. [enabled]
       --cqmfile <filename>   : Read custom quantization matrices from a file.
       --scaling-list <string>: Set scaling list mode. [off]
@@ -127,6 +133,15 @@ Video structure:
       --bitrate <integer>    : Target bitrate [0]
                                    - 0: Disable rate control.
                                    - N: Target N bits per second.
+      --rc-algorithm <string>: Select used rc-algorithm. [lambda]
+                                   - lambda: rate control from:
+                                     DOI: 10.1109/TIP.2014.2336550 
+                                   - oba: DOI: 10.1109/TCSVT.2016.2589878
+      --(no-)intra-bits      : Use Hadamard cost based allocation for intra
+                               frames. Default on for gop 8 and off for lp-gop
+      --(no-)clip-neighbour  : On oba based rate control whether to clip 
+                               lambda values to same frame's ctus or previous'.
+                               Default on for RA GOPS and disabled for LP.
       --(no-)lossless        : Use lossless coding. [disabled]
       --mv-constraint <string> : Constrain movement vectors. [none]
                                    - none: No constraint
@@ -150,6 +165,9 @@ Video structure:
       --high-tier            : Used with --level. Use high tier bitrate limits
                                instead of the main tier limits during encoding.
                                High tier requires level 4 or higher.
+      --(no-)vaq <integer>   : Enable variance adaptive quantization with given
+                               strength, in range 1..20. Recommended: 5.
+                               [disabled]
 
 Compression tools:
       --(no-)deblock <beta:tc> : Deblocking filter. [0:0]
@@ -173,6 +191,8 @@ Compression tools:
                                         chroma mode search.
       --(no-)mv-rdo          : Rate-distortion optimized motion vector costs
                                [disabled]
+      --(no-)zero-coeff-rdo  : If a CU is set inter, check if forcing zero
+                               residual improves the RD cost. [enabled]
       --(no-)full-intra-search : Try all intra modes during rough search.
                                [disabled]
       --(no-)transform-skip  : Try transform skip [disabled]
@@ -192,8 +212,19 @@ Compression tools:
                                    - 4: + 1/4-pixel diagonal
       --pu-depth-inter <int>-<int> : Inter prediction units sizes [0-3]
                                    - 0, 1, 2, 3: from 64x64 to 8x8
+                                   - Accepts a list of values separated by ','
+                                     for setting separate depths per GOP layer
+                                     (values can be omitted to use the first
+                                     value for the respective layer).
       --pu-depth-intra <int>-<int> : Intra prediction units sizes [1-4]
                                    - 0, 1, 2, 3, 4: from 64x64 to 4x4
+                                   - Accepts a list of values separated by ','
+                                     for setting separate depths per GOP layer
+                                     (values can be omitted to use the first
+                                     value for the respective layer).
+      --ml-pu-depth-intra    : Predict the pu-depth-intra using machine
+                                learning trees, overrides the
+                                --pu-depth-intra parameter. [disabled]
       --tr-depth-intra <int> : Transform split depth for intra blocks [0]
       --(no-)bipred          : Bi-prediction [disabled]
       --cu-split-termination <string> : CU split search termination [zero]
@@ -246,6 +277,13 @@ Parallel processing:
                                    - tiles: Put tiles in independent slices.
                                    - wpp: Put rows in dependent slices.
                                    - tiles+wpp: Do both.
+      --partial-coding <x-offset>!<y-offset>!<slice-width>!<slice-height>
+                             : Encode partial frame.
+                               Parts must be merged to form a valid bitstream.
+                               X and Y are CTU offsets.
+                               Slice width and height must be divisible by CTU
+                               in pixels unless it is the last CTU row/column.
+                               This parameter is used by kvaShare.
 
 Video Usability Information:
       --sar <width:height>   : Specify sample aspect ratio
@@ -299,20 +337,20 @@ where the names have been abbreviated to fit the layout in GitHub.
 
 |                      | 0-uf  | 1-sf  | 2-vf  | 3-fr  | 4-f   | 5-m   | 6-s   | 7-sr  | 8-vs  | 9-p   |
 | -------------------- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- |
-| rd                   | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 2     | 2     | 2     |
+| rd                   | 0     | 0     | 0     | 0     | 0     | 0     | 1     | 2     | 2     | 2     |
 | pu-depth-intra       | 2-3   | 2-3   | 2-3   | 2-3   | 1-3   | 1-4   | 1-4   | 1-4   | 1-4   | 1-4   |
-| pu-depth-inter       | 2-3   | 2-3   | 1-3   | 1-3   | 1-3   | 0-3   | 0-3   | 0-3   | 0-3   | 0-3   |
-| me                   | hexbs | hexbs | hexbs | hexbs | hexbs | hexbs | hexbs | hexbs | hexbs | tz    |
-| gop                  | g4d4t1| g4d4t1| g4d4t1| g4d4t1| g4d4t1| 8     | 8     | 8     | 8     | 8     |
+| pu-depth-inter       | 1-2   | 1-2   | 1-3   | 1-3   | 1-3   | 0-3   | 0-3   | 0-3   | 0-3   | 0-3   |
+| me                   | hexbs | hexbs | hexbs | hexbs | hexbs | hexbs | hexbs | hexbs | tz    | tz    |
+| gop                  | 8     | 8     | 8     | 8     | 8     | 16    | 16    | 16    | 16    | 16    |
 | ref                  | 1     | 1     | 1     | 1     | 2     | 4     | 4     | 4     | 4     | 4     |
-| bipred               | 0     | 0     | 0     | 0     | 0     | 0     | 1     | 1     | 1     | 1     |
+| bipred               | 1     | 1     | 1     | 1     | 1     | 1     | 1     | 1     | 1     | 1     |
 | deblock              | 1     | 1     | 1     | 1     | 1     | 1     | 1     | 1     | 1     | 1     |
 | signhide             | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 1     | 1     | 1     |
-| subme                | 2     | 2     | 2     | 4     | 4     | 4     | 4     | 4     | 4     | 4     |
+| subme                | 0     | 2     | 2     | 4     | 4     | 4     | 4     | 4     | 4     | 4     |
 | sao                  | off   | full  | full  | full  | full  | full  | full  | full  | full  | full  |
 | rdoq                 | 0     | 0     | 0     | 0     | 0     | 1     | 1     | 1     | 1     | 1     |
 | rdoq-skip            | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     |
-| transform-skip       | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 1     |
+| transform-skip       | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 1     | 1     |
 | mv-rdo               | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 1     |
 | full-intra-search    | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     |
 | smp                  | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 1     | 1     |
@@ -320,7 +358,7 @@ where the names have been abbreviated to fit the layout in GitHub.
 | cu-split-termination | zero  | zero  | zero  | zero  | zero  | zero  | zero  | zero  | zero  | off   |
 | me-early-termination | sens. | sens. | sens. | sens. | sens. | on    | on    | off   | off   | off   |
 | intra-rdo-et         | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     |
-| early-skip           | 1     | 1     | 1     | 1     | 1     | 1     | 1     | 1     | 1     | 1     |
+| early-skip           | 1     | 1     | 1     | 1     | 1     | 1     | 1     | 1     | 1     | 0     |
 | fast-residual-cost   | 28    | 28    | 28    | 0     | 0     | 0     | 0     | 0     | 0     | 0     |
 | max-merge            | 5     | 5     | 5     | 5     | 5     | 5     | 5     | 5     | 5     | 5     |
 
@@ -357,6 +395,12 @@ Run the following commands to compile and install Kvazaar.
 
 See `./configure --help` for more options.
 
+### Autotools on MinGW
+It is recommended to use Clang instead of GCC in MinGW environments. GCC also works, but AVX2 optimizations will be disabled because of a known GCC issue from 2012, so performance will suffer badly. Instead of `./configure`, run
+
+    CC=clang ./configure
+
+to build Kvazaar using Clang.
 
 ### OS X
 - Install Homebrew
@@ -365,7 +409,7 @@ See `./configure --help` for more options.
 
 
 ### Visual Studio
-- At least VisualStudio 2015 is required.
+- At least VisualStudio 2015.2 is required.
 - Project files can be found under build/.
 - Requires external [vsyasm.exe](http://yasm.tortall.net/Download.html)
   in %PATH%

@@ -1,0 +1,13 @@
+#!/usr/bin/awk -f
+BEGIN {
+    GREEN = "\033[32m"
+    RED = "\033[31m"
+    YELLOW = "\033[33m"
+    RESET = "\033[m"
+}
+
+/^PASS/ { sub("PASS", GREEN "PASS" RESET) }
+/^SKIP/ { sub("SKIP", YELLOW "SKIP" RESET) }
+/^FAIL/ { sub("FAIL", RED "FAIL" RESET) }
+
+{ print($0) }

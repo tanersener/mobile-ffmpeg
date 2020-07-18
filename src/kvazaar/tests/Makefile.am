@@ -11,7 +11,8 @@ TESTS = $(check_PROGRAMS) \
     test_slices.sh \
     test_smp.sh \
     test_tools.sh \
-    test_weird_shapes.sh
+    test_weird_shapes.sh \
+	test_pu_depth_constraints.sh 
 
 EXTRA_DIST = \
     test_external_symbols.sh \
@@ -26,6 +27,7 @@ EXTRA_DIST = \
     test_smp.sh \
     test_tools.sh \
     test_weird_shapes.sh \
+	test_pu_depth_constraints.sh \
     util.sh
 
 check_PROGRAMS = kvazaar_tests

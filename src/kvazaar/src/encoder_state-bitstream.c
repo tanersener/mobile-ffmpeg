@@ -39,6 +39,7 @@
 #include "tables.h"
 #include "threadqueue.h"
 #include "videoframe.h"
+#include "rate_control.h"
 
 
 static void encoder_state_write_bitstream_aud(encoder_state_t * const state)
@@ -346,8 +347,14 @@ static void encoder_state_write_bitstream_seq_parameter_set(bitstream_t* stream,
     WRITE_U(stream, 0, 1, "separate_colour_plane_flag");
   }
 
-  WRITE_UE(stream, encoder->in.width, "pic_width_in_luma_samples");
-  WRITE_UE(stream, encoder->in.height, "pic_height_in_luma_samples");
+  if (encoder->cfg.partial_coding.fullWidth != 0) {
+    WRITE_UE(stream, encoder->cfg.partial_coding.fullWidth, "pic_width_in_luma_samples");
+    WRITE_UE(stream, encoder->cfg.partial_coding.fullHeight, "pic_height_in_luma_samples");
+  }
+  else {
+    WRITE_UE(stream, encoder->in.width, "pic_width_in_luma_samples");
+    WRITE_UE(stream, encoder->in.height, "pic_height_in_luma_samples");
+  }
 
   if (encoder->in.width != encoder->in.real_width || encoder->in.height != encoder->in.real_height) {
     // The standard does not seem to allow setting conf_win values such that
@@ -371,18 +378,22 @@ static void encoder_state_write_bitstream_seq_parameter_set(bitstream_t* stream,
 
   WRITE_UE(stream, encoder->bitdepth-8, "bit_depth_luma_minus8");
   WRITE_UE(stream, encoder->bitdepth-8, "bit_depth_chroma_minus8");
-  WRITE_UE(stream, 1, "log2_max_pic_order_cnt_lsb_minus4");
+  WRITE_UE(stream, encoder->poc_lsb_bits - 4, "log2_max_pic_order_cnt_lsb_minus4");
+
   WRITE_U(stream, 0, 1, "sps_sub_layer_ordering_info_present_flag");
 
   //for each layer
   if (encoder->cfg.gop_lowdelay) {
-    WRITE_UE(stream, encoder->cfg.ref_frames, "sps_max_dec_pic_buffering");
-    WRITE_UE(stream, 0, "sps_num_reorder_pics");
+    const int dpb = encoder->cfg.ref_frames;
+    WRITE_UE(stream, dpb - 1, "sps_max_dec_pic_buffering_minus1");
+    WRITE_UE(stream, 0, "sps_max_num_reorder_pics");
   } else {
-    WRITE_UE(stream, encoder->cfg.ref_frames + encoder->cfg.gop_len, "sps_max_dec_pic_buffering");
-    WRITE_UE(stream, encoder->cfg.gop_len, "sps_num_reorder_pics");
+    // Clip to non-negative values to prevent problems with GOP=0
+    const int dpb = MIN(16, encoder->cfg.gop_len);
+    WRITE_UE(stream, MAX(dpb - 1, 0), "sps_max_dec_pic_buffering_minus1");
+    WRITE_UE(stream, MAX(encoder->cfg.gop_len - 1, 0), "sps_max_num_reorder_pics");
   }
-  WRITE_UE(stream, 0, "sps_max_latency_increase");
+  WRITE_UE(stream, 0, "sps_max_latency_increase_plus1");
   //end for
 
   WRITE_UE(stream, MIN_SIZE-3, "log2_min_coding_block_size_minus3");
@@ -709,16 +720,18 @@ static void kvz_encoder_state_write_bitstream_slice_header_independent(
   if (state->frame->pictype != KVZ_NAL_IDR_W_RADL
       && state->frame->pictype != KVZ_NAL_IDR_N_LP)
   {
+    const int poc_lsb = state->frame->poc & ((1 << encoder->poc_lsb_bits) - 1);
+    WRITE_U(stream, poc_lsb, encoder->poc_lsb_bits, "pic_order_cnt_lsb");
+
     int last_poc = 0;
     int poc_shift = 0;
 
-      WRITE_U(stream, state->frame->poc&0x1f, 5, "pic_order_cnt_lsb");
-      WRITE_U(stream, 0, 1, "short_term_ref_pic_set_sps_flag");
-      WRITE_UE(stream, ref_negative, "num_negative_pics");
-      WRITE_UE(stream, ref_positive, "num_positive_pics");
-    for (j = 0; j < ref_negative; j++) {      
+    WRITE_U(stream, 0, 1, "short_term_ref_pic_set_sps_flag");
+    WRITE_UE(stream, ref_negative, "num_negative_pics");
+    WRITE_UE(stream, ref_positive, "num_positive_pics");
+    for (j = 0; j < ref_negative; j++) {
       int8_t delta_poc = 0;
-      
+
       if (encoder->cfg.gop_len) {
         int8_t found = 0;
         do {
@@ -832,6 +845,11 @@ void kvz_encoder_state_write_bitstream_slice_header(
   printf("=========== Slice ===========\n");
 #endif
 
+  if (encoder->cfg.partial_coding.fullWidth != 0) {
+    state->slice->start_in_rs = encoder->cfg.partial_coding.startCTU_x +
+      CEILDIV(encoder->cfg.partial_coding.fullWidth, 64) * encoder->cfg.partial_coding.startCTU_y;
+  }
+
   bool first_slice_segment_in_pic = (state->slice->start_in_rs == 0);
   if ((state->encoder_control->cfg.slices & KVZ_SLICES_WPP)
       && state->wfrow->lcu_offset_y > 0)
@@ -854,6 +872,9 @@ void kvz_encoder_state_write_bitstream_slice_header(
     }
 
     int lcu_cnt = encoder->in.width_in_lcu * encoder->in.height_in_lcu;
+    if (encoder->cfg.partial_coding.fullWidth != 0) {
+      lcu_cnt = CEILDIV(encoder->cfg.partial_coding.fullWidth, 64) * CEILDIV(encoder->cfg.partial_coding.fullHeight, 64);
+    }
     int num_bits = kvz_math_ceil_log2(lcu_cnt);
     int slice_start_rs = state->slice->start_in_rs;
     if (state->encoder_control->cfg.slices & KVZ_SLICES_WPP) {
@@ -1043,8 +1064,11 @@ static void encoder_state_write_bitstream_main(encoder_state_t * const state)
     state->frame->total_bits_coded = state->previous_encoder_state->frame->total_bits_coded;
   }
   state->frame->total_bits_coded += newpos - curpos;
+  if(state->encoder_control->cfg.rc_algorithm == KVZ_OBA) {
+    kvz_update_after_picture(state);
+  }
 
-    state->frame->cur_gop_bits_coded = state->previous_encoder_state->frame->cur_gop_bits_coded;
+  state->frame->cur_gop_bits_coded = state->previous_encoder_state->frame->cur_gop_bits_coded;
   state->frame->cur_gop_bits_coded += newpos - curpos;
 }
 

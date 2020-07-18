@@ -188,12 +188,54 @@ static void kvz_intra_pred_planar_generic(
 #endif
 }
 
+/**
+* \brief Generage intra DC prediction with post filtering applied.
+* \param log2_width    Log2 of width, range 2..5.
+* \param in_ref_above  Pointer to -1 index of above reference, length=width*2+1.
+* \param in_ref_left   Pointer to -1 index of left reference, length=width*2+1.
+* \param dst           Buffer of size width*width.
+*/
+static void kvz_intra_pred_filtered_dc_generic(
+  const int_fast8_t log2_width,
+  const kvz_pixel *const ref_top,
+  const kvz_pixel *const ref_left,
+  kvz_pixel *const out_block)
+{
+  assert(log2_width >= 2 && log2_width <= 5);
+
+  const int_fast8_t width = 1 << log2_width;
+
+  int_fast16_t sum = 0;
+  for (int_fast8_t i = 0; i < width; ++i) {
+    sum += ref_top[i + 1];
+    sum += ref_left[i + 1];
+  }
+
+  const kvz_pixel dc_val = (sum + width) >> (log2_width + 1);
+
+  // Filter top-left with ([1 2 1] / 4)
+  out_block[0] = (ref_left[1] + 2 * dc_val + ref_top[1] + 2) / 4;
+
+  // Filter rest of the boundary with ([1 3] / 4)
+  for (int_fast8_t x = 1; x < width; ++x) {
+    out_block[x] = (ref_top[x + 1] + 3 * dc_val + 2) / 4;
+  }
+  for (int_fast8_t y = 1; y < width; ++y) {
+    out_block[y * width] = (ref_left[y + 1] + 3 * dc_val + 2) / 4;
+    for (int_fast8_t x = 1; x < width; ++x) {
+      out_block[y * width + x] = dc_val;
+    }
+  }
+}
+
+
 int kvz_strategy_register_intra_generic(void* opaque, uint8_t bitdepth)
 {
   bool success = true;
 
   success &= kvz_strategyselector_register(opaque, "angular_pred", "generic", 0, &kvz_angular_pred_generic);
   success &= kvz_strategyselector_register(opaque, "intra_pred_planar", "generic", 0, &kvz_intra_pred_planar_generic);
+  success &= kvz_strategyselector_register(opaque, "intra_pred_filtered_dc", "generic", 0, &kvz_intra_pred_filtered_dc_generic);
 
   return success;
 }

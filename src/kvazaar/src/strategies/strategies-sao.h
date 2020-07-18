@@ -51,7 +51,7 @@ typedef void (sao_reconstruct_color_func)(const encoder_control_t * const encode
 
 typedef int (sao_band_ddistortion_func)(const encoder_state_t * const state, const kvz_pixel *orig_data, const kvz_pixel *rec_data,
   int block_width, int block_height,
-  int band_pos, int sao_bands[4]);
+  int band_pos, const int sao_bands[4]);
 
 // Declare function pointers.
 extern sao_edge_ddistortion_func * kvz_sao_edge_ddistortion;

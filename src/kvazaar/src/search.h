@@ -30,6 +30,7 @@
 #include "encoderstate.h"
 #include "global.h" // IWYU pragma: keep
 #include "image.h"
+#include "constraint.h"
 
 void kvz_sort_modes(int8_t *__restrict modes, double *__restrict costs, uint8_t length);
 

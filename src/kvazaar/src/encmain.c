@@ -305,6 +305,10 @@ void output_recon_pictures(const kvz_api *const api,
   } while (picture_written);
 }
 
+static double calc_avg_qp(uint64_t qp_sum, uint32_t frames_done)
+{
+  return (double)qp_sum / (double)frames_done;
+}
 
 /**
  * \brief Program main function.
@@ -432,6 +436,7 @@ int main(int argc, char *argv[])
     uint64_t bitstream_length = 0;
     uint32_t frames_done = 0;
     double psnr_sum[3] = { 0.0, 0.0, 0.0 };
+    uint64_t qp_sum = 0;
 
     // how many bits have been written this second? used for checking if framerate exceeds level's limits
     uint64_t bits_this_second = 0;
@@ -597,12 +602,15 @@ int main(int argc, char *argv[])
                                 opts->config->height);
         }
 
+        qp_sum      += info_out.qp;
         frames_done += 1;
+
         psnr_sum[0] += frame_psnr[0];
         psnr_sum[1] += frame_psnr[1];
         psnr_sum[2] += frame_psnr[2];
 
-        print_frame_info(&info_out, frame_psnr, len_out, encoder->cfg.calc_psnr);
+        print_frame_info(&info_out, frame_psnr, len_out, encoder->cfg.calc_psnr,
+                         calc_avg_qp(qp_sum, frames_done));
       }
 
       api->picture_free(cur_in_img);
@@ -632,12 +640,38 @@ int main(int argc, char *argv[])
     fprintf(stderr, " Total CPU time: %.3f s.\n", ((float)(clock() - start_time)) / CLOCKS_PER_SEC);
 
     {
+      const double mega = (double)(1 << 20);
+
       double encoding_time = ( (double)(encoding_end_cpu_time - encoding_start_cpu_time) ) / (double) CLOCKS_PER_SEC;
       double wall_time = KVZ_CLOCK_T_AS_DOUBLE(encoding_end_real_time) - KVZ_CLOCK_T_AS_DOUBLE(encoding_start_real_time);
-      fprintf(stderr, " Encoding time: %.3f s.\n", encoding_time);
+
+      double encoding_cpu = 100.0 * encoding_time / wall_time;
+      double encoding_fps = (double)frames_done   / wall_time;
+
+      double n_bits       = (double)(bitstream_length * 8);
+      double sf_num       = (double)encoder->cfg.framerate_num;
+      double sf_den       = (double)encoder->cfg.framerate_denom;
+      double sequence_fps =         sf_num / sf_den;
+
+      double sequence_t   = (double)frames_done / sequence_fps;
+      double bitrate_bps  = (double)n_bits      / sequence_t;
+      double bitrate_mbps =         bitrate_bps / mega;
+
+      double avg_qp       = calc_avg_qp(qp_sum, frames_done);
+
+#ifdef _WIN32
+      if (encoding_cpu > 100.0) {
+        encoding_cpu = 100.0;
+      }
+#endif
+      fprintf(stderr, " Encoding time: %.3f s.\n",      encoding_time);
       fprintf(stderr, " Encoding wall time: %.3f s.\n", wall_time);
-      fprintf(stderr, " Encoding CPU usage: %.2f%%\n", encoding_time/wall_time*100.f);
-      fprintf(stderr, " FPS: %.2f\n", ((double)frames_done)/wall_time);
+
+      fprintf(stderr, " Encoding CPU usage: %.2f%%\n",  encoding_cpu);
+      fprintf(stderr, " FPS: %.2f\n",                   encoding_fps);
+
+      fprintf(stderr, " Bitrate: %.3f Mbps\n",          bitrate_mbps);
+      fprintf(stderr, " AVG QP: %.1f\n",                avg_qp);
     }
     pthread_join(input_thread, NULL);
   }

@@ -37,6 +37,8 @@
 #include "tables.h"
 #include "threadqueue.h"
 
+#include "strategies/strategies-picture.h"
+
 
 int kvz_encoder_state_match_children_of_previous_frame(encoder_state_t * const state) {
   int i;
@@ -616,7 +618,17 @@ static void encoder_state_worker_encode_lcu(void * opaque)
   const encoder_control_t * const encoder = state->encoder_control;
   videoframe_t* const frame = state->tile->frame;
 
-  kvz_set_lcu_lambda_and_qp(state, lcu->position);
+  switch (encoder->cfg.rc_algorithm) {
+    case KVZ_NO_RC:
+    case KVZ_LAMBDA:
+      kvz_set_lcu_lambda_and_qp(state, lcu->position);
+      break;
+    case KVZ_OBA:
+      kvz_set_ctu_qp_lambda(state, lcu->position);
+      break;
+    default:
+      assert(0);
+  }
 
   lcu_coeff_t coeff;
   state->coeff = &coeff;
@@ -702,8 +714,26 @@ static void encoder_state_worker_encode_lcu(void * opaque)
     }
   }
 
+  pthread_mutex_lock(&state->frame->rc_lock);
   const uint32_t bits = kvz_bitstream_tell(&state->stream) - existing_bits;
+  state->frame->cur_frame_bits_coded += bits;
+  // This variable is used differently by intra and inter frames and shouldn't
+  // be touched in intra frames here
+  state->frame->remaining_weight -= !state->frame->is_irap ?
+    kvz_get_lcu_stats(state, lcu->position.x, lcu->position.y)->original_weight :
+    0;
+  pthread_mutex_unlock(&state->frame->rc_lock);
   kvz_get_lcu_stats(state, lcu->position.x, lcu->position.y)->bits = bits;
+
+  uint8_t not_skip = false;
+  for(int y = 0; y < 64 && !not_skip; y+=8) {
+    for(int x = 0; x < 64 && !not_skip; x+=8) {
+      not_skip |= !kvz_cu_array_at_const(state->tile->frame->cu_array,
+        lcu->position_px.x + x,
+        lcu->position_px.y + y)->skipped;
+    }
+  }
+  kvz_get_lcu_stats(state, lcu->position.x, lcu->position.y)->skipped = !not_skip;
 
   //Wavefronts need the context to be copied to the next row
   if (state->type == ENCODER_STATE_TYPE_WAVEFRONT_ROW && lcu->index == 1) {
@@ -802,6 +832,11 @@ static void encoder_state_encode_leaf(encoder_state_t * const state)
             dep_lcu = dep_lcu->right;
           }
           kvz_threadqueue_job_dep_add(job[0], ref_state->tile->wf_jobs[dep_lcu->id]);
+
+          //TODO: Preparation for the lock free implementation of the new rc
+          if (ref_state->frame->slicetype == KVZ_SLICE_I && ref_state->frame->num != 0 && state->encoder_control->cfg.owf > 1 && true) {
+            kvz_threadqueue_job_dep_add(job[0], ref_state->previous_encoder_state->tile->wf_jobs[dep_lcu->id]);
+          }
 
           // Very spesific bug that happens when owf length is longer than the
           // gop length. Takes care of that.
@@ -1163,6 +1198,12 @@ static void encoder_state_init_children(encoder_state_t * const state) {
   kvz_threadqueue_free_job(&state->tqj_bitstream_written);
   kvz_threadqueue_free_job(&state->tqj_recon_done);
 
+  //Copy the constraint pointer
+  // TODO: Try to do it in the if (state->is_leaf)
+  //if (state->parent != NULL) {
+    // state->constraint = state->parent->constraint;
+  //}
+
   for (int i = 0; state->children[i].encoder_control; ++i) {
     encoder_state_init_children(&state->children[i]);
   }
@@ -1184,6 +1225,21 @@ static void normalize_lcu_weights(encoder_state_t * const state)
   }
 }
 
+// Check if lcu is edge lcu. Return false if frame dimensions are 64 divisible
+static bool edge_lcu(int id, int lcus_x, int lcus_y, bool xdiv64, bool ydiv64)
+{
+  if (xdiv64 && ydiv64) {
+    return false;
+  }
+  int last_row_first_id = (lcus_y - 1) * lcus_x;
+  if ((id % lcus_x == lcus_x - 1 && !xdiv64) || (id >= last_row_first_id && !ydiv64)) {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
 static void encoder_state_init_new_frame(encoder_state_t * const state, kvz_picture* frame) {
   assert(state->type == ENCODER_STATE_TYPE_MAIN);
 
@@ -1197,11 +1253,108 @@ static void encoder_state_init_new_frame(encoder_state_t * const state, kvz_pict
       state->tile->frame->height
   );
 
+  // Variance adaptive quantization
+  if (cfg->vaq) {
+    const bool has_chroma = state->encoder_control->chroma_format != KVZ_CSP_400;
+    double d = cfg->vaq * 0.1; // Empirically decided constant. Affects delta-QP strength
+    
+    // Calculate frame pixel variance
+    uint32_t len = state->tile->frame->width * state->tile->frame->height;
+    uint32_t c_len = len / 4;
+    double frame_var = kvz_pixel_var(state->tile->frame->source->y, len);
+    if (has_chroma) {
+      frame_var += kvz_pixel_var(state->tile->frame->source->u, c_len);
+      frame_var += kvz_pixel_var(state->tile->frame->source->v, c_len);
+    }
+
+    // Loop through LCUs
+    // For each LCU calculate: D * (log(LCU pixel variance) - log(frame pixel variance))
+    unsigned x_lim = state->tile->frame->width_in_lcu;
+    unsigned y_lim = state->tile->frame->height_in_lcu;
+    
+    unsigned id = 0;
+    for (int y = 0; y < y_lim; ++y) {
+      for (int x = 0; x < x_lim; ++x) {
+        kvz_pixel tmp[LCU_LUMA_SIZE];
+        int pxl_x = x * LCU_WIDTH;
+        int pxl_y = y * LCU_WIDTH;
+        int x_max = MIN(pxl_x + LCU_WIDTH, frame->width) - pxl_x;
+        int y_max = MIN(pxl_y + LCU_WIDTH, frame->height) - pxl_y;
+        
+        bool xdiv64 = false;
+        bool ydiv64 = false;
+        if (frame->width % 64 == 0) xdiv64 = true;
+        if (frame->height % 64 == 0) ydiv64 = true;
+
+        // Luma variance
+        if (!edge_lcu(id, x_lim, y_lim, xdiv64, ydiv64)) {
+          kvz_pixels_blit(&state->tile->frame->source->y[pxl_x + pxl_y * state->tile->frame->source->stride], tmp,
+            x_max, y_max, state->tile->frame->source->stride, LCU_WIDTH);
+        } else {
+          // Extend edge pixels for edge lcus
+          for (int y = 0; y < LCU_WIDTH; y++) {
+            for (int x = 0; x < LCU_WIDTH; x++) {
+              int src_y = CLIP(0, frame->height - 1, pxl_y + y);
+              int src_x = CLIP(0, frame->width - 1, pxl_x + x);
+              tmp[y * LCU_WIDTH + x] = state->tile->frame->source->y[src_y * state->tile->frame->source->stride + src_x];
+            }
+          }
+        }
+        
+        double lcu_var = kvz_pixel_var(tmp, LCU_LUMA_SIZE);
+
+        if (has_chroma) {
+          // Add chroma variance if not monochrome
+          int32_t c_stride = state->tile->frame->source->stride >> 1;
+          kvz_pixel chromau_tmp[LCU_CHROMA_SIZE];
+          kvz_pixel chromav_tmp[LCU_CHROMA_SIZE];
+          int lcu_chroma_width = LCU_WIDTH >> 1;
+          int c_pxl_x = x * lcu_chroma_width;
+          int c_pxl_y = y * lcu_chroma_width;
+          int c_x_max = MIN(c_pxl_x + lcu_chroma_width, frame->width >> 1) - c_pxl_x;
+          int c_y_max = MIN(c_pxl_y + lcu_chroma_width, frame->height >> 1) - c_pxl_y;
+
+          if (!edge_lcu(id, x_lim, y_lim, xdiv64, ydiv64)) {
+            kvz_pixels_blit(&state->tile->frame->source->u[c_pxl_x + c_pxl_y * c_stride], chromau_tmp, c_x_max, c_y_max, c_stride, lcu_chroma_width);
+            kvz_pixels_blit(&state->tile->frame->source->v[c_pxl_x + c_pxl_y * c_stride], chromav_tmp, c_x_max, c_y_max, c_stride, lcu_chroma_width);
+          }
+          else {
+            for (int y = 0; y < lcu_chroma_width; y++) {
+              for (int x = 0; x < lcu_chroma_width; x++) {
+                int src_y = CLIP(0, (frame->height >> 1) - 1, c_pxl_y + y);
+                int src_x = CLIP(0, (frame->width >> 1) - 1, c_pxl_x + x);
+                chromau_tmp[y * lcu_chroma_width + x] = state->tile->frame->source->u[src_y * c_stride + src_x];
+                chromav_tmp[y * lcu_chroma_width + x] = state->tile->frame->source->v[src_y * c_stride + src_x];
+              }
+            }
+          }
+          lcu_var += kvz_pixel_var(chromau_tmp, LCU_CHROMA_SIZE);
+          lcu_var += kvz_pixel_var(chromav_tmp, LCU_CHROMA_SIZE);
+        }
+                
+        state->frame->aq_offsets[id] = d * (log(lcu_var) - log(frame_var));
+        id++; 
+      }
+    }
+  }
+  // Variance adaptive quantization - END
+
   // Use this flag to handle closed gop irap picture selection.
   // If set to true, irap is already set and we avoid
   // setting it based on the intra period
   bool is_closed_normal_gop = false;
 
+  encoder_state_t *previous = state->previous_encoder_state;
+  int owf = MIN(state->encoder_control->cfg.owf, state->frame->num);
+
+  const int layer = state->encoder_control->cfg.gop[state->frame->gop_offset].layer;
+
+  while (--owf > 0 && layer != state->encoder_control->cfg.gop[previous->frame->gop_offset].layer) {
+    previous = previous->previous_encoder_state;
+  }
+
+  if (owf == 0) previous = state;
+  state->frame->previous_layer_state = previous;
   // Set POC.
   if (state->frame->num == 0) {
     state->frame->poc = 0;
@@ -1281,8 +1434,20 @@ static void encoder_state_init_new_frame(encoder_state_t * const state, kvz_pict
   if (cfg->target_bitrate > 0 && state->frame->num > cfg->owf) {
     normalize_lcu_weights(state);
   }
-  kvz_set_picture_lambda_and_qp(state);
+  state->frame->cur_frame_bits_coded = 0;
 
+  switch (state->encoder_control->cfg.rc_algorithm) {
+    case KVZ_NO_RC:
+    case KVZ_LAMBDA:
+      kvz_set_picture_lambda_and_qp(state);
+      break;
+    case KVZ_OBA:
+      kvz_estimate_pic_lambda(state);
+      break;
+    default:
+      assert(0);
+  }
+ 
   encoder_state_init_children(state);
 }
 
@@ -1345,6 +1510,7 @@ void kvz_encoder_prepare(encoder_state_t *state)
     assert(!state->tile->frame->rec);
     assert(!state->tile->frame->cu_array);
     state->frame->prepared = 1;
+
     return;
   }
 
@@ -1395,6 +1561,8 @@ void kvz_encoder_prepare(encoder_state_t *state)
   state->frame->irap_poc = prev_state->frame->irap_poc;
 
   state->frame->prepared = 1;
+
+
 }
 
 coeff_scan_order_t kvz_get_scan_order(int8_t cu_type, int intra_mode, int depth)

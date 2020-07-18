@@ -621,6 +621,7 @@ static void get_quantized_recon_avx2(int16_t *residual, const kvz_pixel *pred_in
 * \param pred_in  Predicted pixels.
 * \param rec_out  Reconstructed pixels.
 * \param coeff_out  Coefficients used for reconstruction of rec_out.
+* \param early_skip if this is used for early skip, bypass IT and IQ
 *
 * \returns  Whether coeff_out contains any non-zero coefficients.
 */
@@ -629,11 +630,12 @@ int kvz_quantize_residual_avx2(encoder_state_t *const state,
   const coeff_scan_order_t scan_order, const int use_trskip,
   const int in_stride, const int out_stride,
   const kvz_pixel *const ref_in, const kvz_pixel *const pred_in,
-  kvz_pixel *rec_out, coeff_t *coeff_out)
+  kvz_pixel *rec_out, coeff_t *coeff_out,
+  bool early_skip)
 {
   // Temporary arrays to pass data to and from kvz_quant and transform functions.
-  int16_t residual[TR_MAX_WIDTH * TR_MAX_WIDTH];
-  coeff_t coeff[TR_MAX_WIDTH * TR_MAX_WIDTH];
+  ALIGNED(64) int16_t residual[TR_MAX_WIDTH * TR_MAX_WIDTH];
+  ALIGNED(64) coeff_t coeff[TR_MAX_WIDTH * TR_MAX_WIDTH];
 
   int has_coeffs = 0;
 
@@ -673,7 +675,7 @@ int kvz_quantize_residual_avx2(encoder_state_t *const state,
 
   // Do the inverse quantization and transformation and the reconstruction to
   // rec_out.
-  if (has_coeffs) {
+  if (has_coeffs && !early_skip) {
 
     // Get quantized residual. (coeff_out -> coeff -> residual)
     kvz_dequant(state, coeff_out, coeff, width, width, (color == COLOR_Y ? 0 : (color == COLOR_U ? 2 : 3)), cur_cu->type);

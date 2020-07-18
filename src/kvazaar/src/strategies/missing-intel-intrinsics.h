@@ -18,4 +18,18 @@
   #endif // __andn_u32
 #endif // _andn_u32
 
+// Some Visual Studio headers apparently lack these pseudoinstructions
+#if COMPILE_INTEL_AVX2
+  #ifndef _mm256_bsrli_epi128
+    #define _mm256_bsrli_epi128(a, imm8) _mm256_srli_si256((a), (imm8))
+  #endif
+  #ifndef _mm256_insert_epi32
+    #define _mm256_insert_epi32(a, i, index) (_mm256_blend_epi32((a), _mm256_set1_epi32(i), (1 << (index))))
+  #endif
+
+  #ifndef _mm256_extract_epi32
+    #define _mm256_extract_epi32(a, index) (_mm_extract_epi32(_mm256_extracti128_si256((a), (index) >> 2), (index) & 3))
+  #endif
+#endif
+
 #endif

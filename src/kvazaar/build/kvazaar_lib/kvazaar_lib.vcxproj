@@ -138,6 +138,7 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\constraint.c" />
     <ClCompile Include="..\..\src\extras\crypto.cpp" />
     <ClCompile Include="..\..\src\extras\libmd5.c" />
     <ClCompile Include="..\..\src\input_frame_buffer.c" />
@@ -159,6 +160,7 @@
     <ClCompile Include="..\..\src\imagelist.c" />
     <ClCompile Include="..\..\src\inter.c" />
     <ClCompile Include="..\..\src\intra.c" />
+    <ClCompile Include="..\..\src\ml_intra_cu_depth_pred.c" />
     <ClCompile Include="..\..\src\nal.c" />
     <ClCompile Include="..\..\src\rate_control.c" />
     <ClCompile Include="..\..\src\rdo.c" />
@@ -199,9 +201,11 @@
     <ClCompile Include="..\..\src\strategies\strategies-intra.c" />
     <ClCompile Include="..\..\src\strategies\strategies-quant.c" />
     <ClInclude Include="..\..\src\checkpoint.h" />
+    <ClInclude Include="..\..\src\constraint.h" />
     <ClInclude Include="..\..\src\cu.h" />
     <ClInclude Include="..\..\src\extras\crypto.h" />
     <ClInclude Include="..\..\src\extras\libmd5.h" />
+    <ClInclude Include="..\..\src\gop.h" />
     <ClInclude Include="..\..\src\image.h" />
     <ClInclude Include="..\..\src\imagelist.h" />
     <ClCompile Include="..\..\src\strategies\altivec\picture-altivec.c" />
@@ -259,6 +263,7 @@
     <ClInclude Include="..\..\src\input_frame_buffer.h" />
     <ClInclude Include="..\..\src\kvazaar_internal.h" />
     <ClInclude Include="..\..\src\kvz_math.h" />
+    <ClInclude Include="..\..\src\ml_intra_cu_depth_pred.h" />
     <ClInclude Include="..\..\src\search_inter.h" />
     <ClInclude Include="..\..\src\search_intra.h" />
     <ClInclude Include="..\..\src\strategies\avx2\avx2_common_functions.h" />

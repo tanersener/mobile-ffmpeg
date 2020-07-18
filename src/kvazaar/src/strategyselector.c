@@ -103,115 +103,115 @@ int kvz_strategyselector_init(int32_t cpuid, uint8_t bitdepth) {
 
   //We can free the structure now, as all strategies are statically set to pointers
   if (strategies.allocated) {
-	  //Also check what optimizations are available and what are in use
-	  //SIMD optimizations available
-	  bool strategies_available = false;
-	  fprintf(stderr, "Available: ");
-	  if (kvz_g_strategies_available.intel_flags.avx != 0){
-		  fprintf(stderr, "avx(%d) ", kvz_g_strategies_available.intel_flags.avx);
-		  strategies_available = true;
-	  }
-	  if (kvz_g_strategies_available.intel_flags.avx2 != 0){
-		  fprintf(stderr, "avx2(%d) ", kvz_g_strategies_available.intel_flags.avx2);
-		  strategies_available = true;
-	  }
-	  if (kvz_g_strategies_available.intel_flags.mmx != 0) {
-		  fprintf(stderr, "mmx(%d) ", kvz_g_strategies_available.intel_flags.mmx);
-		  strategies_available = true;
-	  }
-	  if (kvz_g_strategies_available.intel_flags.sse != 0) {
-		  fprintf(stderr, "sse(%d) ", kvz_g_strategies_available.intel_flags.sse);
-		  strategies_available = true;
-	  }
-	  if (kvz_g_strategies_available.intel_flags.sse2 != 0) {
-		  fprintf(stderr, "sse2(%d) ", kvz_g_strategies_available.intel_flags.sse2);
-		  strategies_available = true;
-	  }
-	  if (kvz_g_strategies_available.intel_flags.sse3 != 0) {
-		  fprintf(stderr, "sse3(%d) ", kvz_g_strategies_available.intel_flags.sse3);
-		  strategies_available = true;
-	  }
-	  if (kvz_g_strategies_available.intel_flags.sse41 != 0) {
-		  fprintf(stderr, "sse41(%d) ", kvz_g_strategies_available.intel_flags.sse41);
-		  strategies_available = true;
-	  }
-	  if (kvz_g_strategies_available.intel_flags.sse42 != 0) {
-		  fprintf(stderr, "sse42(%d) ", kvz_g_strategies_available.intel_flags.sse42);
-		  strategies_available = true;
-	  }
-	  if (kvz_g_strategies_available.intel_flags.ssse3 != 0) {
-		  fprintf(stderr, "ssse3(%d) ", kvz_g_strategies_available.intel_flags.ssse3);
-		  strategies_available = true;
-	  }
-	  if (kvz_g_strategies_available.arm_flags.neon != 0) {
-		  fprintf(stderr, "neon(%d) ", kvz_g_strategies_available.arm_flags.neon);
-		  strategies_available = true;
-	  }
-	  if (kvz_g_strategies_available.powerpc_flags.altivec != 0) {
-		  fprintf(stderr, "altivec(%d) ", kvz_g_strategies_available.powerpc_flags.altivec);
-		  strategies_available = true;
-	  }
-	  //If there is no strategies available
-	  if (!strategies_available){
-		  fprintf(stderr, "no SIMD optimizations");
-	  }
-	  fprintf(stderr, "\n");
+    //Also check what optimizations are available and what are in use
+    //SIMD optimizations available
+    bool strategies_available = false;
+    fprintf(stderr, "Available: ");
+    if (kvz_g_strategies_available.intel_flags.avx != 0){
+      fprintf(stderr, "avx(%d) ", kvz_g_strategies_available.intel_flags.avx);
+      strategies_available = true;
+    }
+    if (kvz_g_strategies_available.intel_flags.avx2 != 0){
+      fprintf(stderr, "avx2(%d) ", kvz_g_strategies_available.intel_flags.avx2);
+      strategies_available = true;
+    }
+    if (kvz_g_strategies_available.intel_flags.mmx != 0) {
+      fprintf(stderr, "mmx(%d) ", kvz_g_strategies_available.intel_flags.mmx);
+      strategies_available = true;
+    }
+    if (kvz_g_strategies_available.intel_flags.sse != 0) {
+      fprintf(stderr, "sse(%d) ", kvz_g_strategies_available.intel_flags.sse);
+      strategies_available = true;
+    }
+    if (kvz_g_strategies_available.intel_flags.sse2 != 0) {
+      fprintf(stderr, "sse2(%d) ", kvz_g_strategies_available.intel_flags.sse2);
+      strategies_available = true;
+    }
+    if (kvz_g_strategies_available.intel_flags.sse3 != 0) {
+      fprintf(stderr, "sse3(%d) ", kvz_g_strategies_available.intel_flags.sse3);
+      strategies_available = true;
+    }
+    if (kvz_g_strategies_available.intel_flags.sse41 != 0) {
+      fprintf(stderr, "sse41(%d) ", kvz_g_strategies_available.intel_flags.sse41);
+      strategies_available = true;
+    }
+    if (kvz_g_strategies_available.intel_flags.sse42 != 0) {
+      fprintf(stderr, "sse42(%d) ", kvz_g_strategies_available.intel_flags.sse42);
+      strategies_available = true;
+    }
+    if (kvz_g_strategies_available.intel_flags.ssse3 != 0) {
+      fprintf(stderr, "ssse3(%d) ", kvz_g_strategies_available.intel_flags.ssse3);
+      strategies_available = true;
+    }
+    if (kvz_g_strategies_available.arm_flags.neon != 0) {
+      fprintf(stderr, "neon(%d) ", kvz_g_strategies_available.arm_flags.neon);
+      strategies_available = true;
+    }
+    if (kvz_g_strategies_available.powerpc_flags.altivec != 0) {
+      fprintf(stderr, "altivec(%d) ", kvz_g_strategies_available.powerpc_flags.altivec);
+      strategies_available = true;
+    }
+    //If there is no strategies available
+    if (!strategies_available){
+      fprintf(stderr, "no SIMD optimizations");
+    }
+    fprintf(stderr, "\n");
 
-	  //SIMD optimizations in use
-	  bool strategies_in_use = false;
-	  fprintf(stderr, "In use: ");
-	  if (kvz_g_strategies_in_use.intel_flags.avx != 0){
-		  fprintf(stderr, "avx(%d) ", kvz_g_strategies_in_use.intel_flags.avx);
-		  strategies_in_use = true;
-	  }
-	  if (kvz_g_strategies_in_use.intel_flags.avx2 != 0){ 
-		  fprintf(stderr, "avx2(%d) ", kvz_g_strategies_in_use.intel_flags.avx2);
-		  strategies_in_use = true;
-	  }
-	  if (kvz_g_strategies_in_use.intel_flags.mmx != 0) {
-		  fprintf(stderr, "mmx(%d) ", kvz_g_strategies_in_use.intel_flags.mmx);
-		  strategies_in_use = true;
-	  }
-	  if (kvz_g_strategies_in_use.intel_flags.sse != 0) {
-		  fprintf(stderr, "sse(%d) ", kvz_g_strategies_in_use.intel_flags.sse);
-		  strategies_in_use = true;
-	  }
-	  if (kvz_g_strategies_in_use.intel_flags.sse2 != 0) {
-		  fprintf(stderr, "sse2(%d) ", kvz_g_strategies_in_use.intel_flags.sse2);
-		  strategies_in_use = true;
-	  }
-	  if (kvz_g_strategies_in_use.intel_flags.sse3 != 0) {
-		  fprintf(stderr, "sse3(%d) ", kvz_g_strategies_in_use.intel_flags.sse3);
-		  strategies_in_use = true;
-	  }
-	  if (kvz_g_strategies_in_use.intel_flags.sse41 != 0) {
-		  fprintf(stderr, "sse41(%d) ", kvz_g_strategies_in_use.intel_flags.sse41);
-		  strategies_in_use = true;
-	  }
-	  if (kvz_g_strategies_in_use.intel_flags.sse42 != 0) {
-		  fprintf(stderr, "sse42(%d) ", kvz_g_strategies_in_use.intel_flags.sse42);
-		  strategies_in_use = true;
-	  }
-	  if (kvz_g_strategies_in_use.intel_flags.ssse3 != 0) {
-		  fprintf(stderr, "ssse3(%d) ", kvz_g_strategies_in_use.intel_flags.ssse3);
-		  strategies_in_use = true;
-	  }
-	  if (kvz_g_strategies_in_use.arm_flags.neon != 0) {
-		  fprintf(stderr, "neon(%d) ", kvz_g_strategies_in_use.arm_flags.neon);
-		  strategies_in_use = true;
-	  }
-	  if (kvz_g_strategies_in_use.powerpc_flags.altivec != 0) {
-		  fprintf(stderr, "altivec(%d) ", kvz_g_strategies_in_use.powerpc_flags.altivec);
-		  strategies_in_use = true;
-	  }
-	  //If there is no strategies in use
-	  if (!strategies_in_use){
-		  fprintf(stderr, "no SIMD optimizations");
-	  }
-	  fprintf(stderr, "\n");
+    //SIMD optimizations in use
+    bool strategies_in_use = false;
+    fprintf(stderr, "In use: ");
+    if (kvz_g_strategies_in_use.intel_flags.avx != 0){
+      fprintf(stderr, "avx(%d) ", kvz_g_strategies_in_use.intel_flags.avx);
+      strategies_in_use = true;
+    }
+    if (kvz_g_strategies_in_use.intel_flags.avx2 != 0){ 
+      fprintf(stderr, "avx2(%d) ", kvz_g_strategies_in_use.intel_flags.avx2);
+      strategies_in_use = true;
+    }
+    if (kvz_g_strategies_in_use.intel_flags.mmx != 0) {
+      fprintf(stderr, "mmx(%d) ", kvz_g_strategies_in_use.intel_flags.mmx);
+      strategies_in_use = true;
+    }
+    if (kvz_g_strategies_in_use.intel_flags.sse != 0) {
+      fprintf(stderr, "sse(%d) ", kvz_g_strategies_in_use.intel_flags.sse);
+      strategies_in_use = true;
+    }
+    if (kvz_g_strategies_in_use.intel_flags.sse2 != 0) {
+      fprintf(stderr, "sse2(%d) ", kvz_g_strategies_in_use.intel_flags.sse2);
+      strategies_in_use = true;
+    }
+    if (kvz_g_strategies_in_use.intel_flags.sse3 != 0) {
+      fprintf(stderr, "sse3(%d) ", kvz_g_strategies_in_use.intel_flags.sse3);
+      strategies_in_use = true;
+    }
+    if (kvz_g_strategies_in_use.intel_flags.sse41 != 0) {
+      fprintf(stderr, "sse41(%d) ", kvz_g_strategies_in_use.intel_flags.sse41);
+      strategies_in_use = true;
+    }
+    if (kvz_g_strategies_in_use.intel_flags.sse42 != 0) {
+      fprintf(stderr, "sse42(%d) ", kvz_g_strategies_in_use.intel_flags.sse42);
+      strategies_in_use = true;
+    }
+    if (kvz_g_strategies_in_use.intel_flags.ssse3 != 0) {
+      fprintf(stderr, "ssse3(%d) ", kvz_g_strategies_in_use.intel_flags.ssse3);
+      strategies_in_use = true;
+    }
+    if (kvz_g_strategies_in_use.arm_flags.neon != 0) {
+      fprintf(stderr, "neon(%d) ", kvz_g_strategies_in_use.arm_flags.neon);
+      strategies_in_use = true;
+    }
+    if (kvz_g_strategies_in_use.powerpc_flags.altivec != 0) {
+      fprintf(stderr, "altivec(%d) ", kvz_g_strategies_in_use.powerpc_flags.altivec);
+      strategies_in_use = true;
+    }
+    //If there is no strategies in use
+    if (!strategies_in_use){
+      fprintf(stderr, "no SIMD optimizations");
+    }
+    fprintf(stderr, "\n");
 
-	  //Free memory
-	  free(strategies.strategies);
+    //Free memory
+    free(strategies.strategies);
   }
 
   return 1;

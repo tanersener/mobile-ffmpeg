@@ -146,7 +146,7 @@ TEST dct(void)
   if (strcmp(test_env.strategy->type, "fast_forward_dst_4x4") == 0) index = 0;
 
   int16_t *buf = dct_bufs[index];
-  int16_t test_result[LCU_WIDTH*LCU_WIDTH] = { 0 };
+  ALIGNED(32) int16_t test_result[LCU_WIDTH*LCU_WIDTH] = { 0 };
 
   test_env.tested_func(KVZ_BIT_DEPTH, buf, test_result);
 
@@ -163,7 +163,7 @@ TEST idct(void)
   if (strcmp(test_env.strategy->type, "fast_inverse_dst_4x4") == 0) index = 0;
 
   int16_t *buf = dct_bufs[index];
-  int16_t test_result[LCU_WIDTH*LCU_WIDTH] = { 0 };
+  ALIGNED(32) int16_t test_result[LCU_WIDTH*LCU_WIDTH] = { 0 };
 
   test_env.tested_func(KVZ_BIT_DEPTH, buf, test_result);
 

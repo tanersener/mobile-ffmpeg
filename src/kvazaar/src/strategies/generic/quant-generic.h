@@ -43,6 +43,7 @@ int kvz_quantize_residual_generic(encoder_state_t *const state,
   const coeff_scan_order_t scan_order, const int use_trskip,
   const int in_stride, const int out_stride,
   const kvz_pixel *const ref_in, const kvz_pixel *const pred_in,
-  kvz_pixel *rec_out, coeff_t *coeff_out);
+  kvz_pixel *rec_out, coeff_t *coeff_out,
+  bool early_skip);
 
 #endif //STRATEGIES_QUANT_GENERIC_H_

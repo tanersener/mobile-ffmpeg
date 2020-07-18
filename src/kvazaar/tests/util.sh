@@ -45,7 +45,7 @@ valgrind_test() {
     # No quotes for $valgrind because it expands to multiple (or zero)
     # arguments.
     print_and_run \
-        libtool execute $valgrind \
+        ../libtool execute $valgrind \
             ../src/kvazaar -i "${yuvfile}" "--input-res=${dimensions}" -o "${hevcfile}" "$@"
 
     print_and_run \
@@ -66,7 +66,7 @@ encode_test() {
 
     set +e
     print_and_run \
-        libtool execute \
+        ../libtool execute \
             ../src/kvazaar -i "${yuvfile}" "--input-res=${dimensions}" -o "${hevcfile}" "$@"
     actual_status="$?"
     set -e

@@ -64,6 +64,11 @@ extern "C" {
  */
 #define KVZ_MAX_GOP_LENGTH 32
 
+ /**
+ * Maximum amount of GoP layers.
+ */
+#define KVZ_MAX_GOP_LAYERS 6
+
 /**
  * Size of data chunks.
  */
@@ -213,6 +218,12 @@ enum kvz_scalinglist {
   KVZ_SCALING_LIST_DEFAULT = 2,  
 };
 
+enum kvz_rc_algorithm
+{
+  KVZ_NO_RC = 0,
+  KVZ_LAMBDA = 1,
+  KVZ_OBA = 2,
+};
 // Map from input format to chroma format.
 #define KVZ_FORMAT2CSP(format) ((enum kvz_chroma_format)"\0\1\2\3"[format])
 
@@ -229,6 +240,8 @@ typedef struct kvz_gop_config {
   int8_t ref_pos[16];  /*!< \brief reference picture offset list */
   int8_t ref_neg_count;/*!< \brief Reference picture count */
   int8_t ref_neg[16];  /*!< \brief reference picture offset list */
+  double qp_model_offset;
+  double qp_model_scale;
 } kvz_gop_config;
 
 /**
@@ -306,8 +319,8 @@ typedef struct kvz_config
   int32_t cpuid;
 
   struct {
-    int32_t min;
-    int32_t max;
+    int32_t min[KVZ_MAX_GOP_LAYERS];
+    int32_t max[KVZ_MAX_GOP_LAYERS];
   } pu_depth_inter, pu_depth_intra;
 
   int32_t add_encoder_info;
@@ -372,6 +385,11 @@ typedef struct kvz_config
   /** \brief Maximum steps that hexagonal and diagonal motion estimation can use. -1 to disable */
   uint32_t me_max_steps;
 
+  /** \brief Offset to add to QP for intra frames */
+  int8_t intra_qp_offset;
+  /** \brief Select intra QP Offset based on GOP length */
+  uint8_t intra_qp_offset_auto;
+
   /** \brief Minimum QP that uses CABAC for residual cost instead of a fast estimate. */
   int8_t fast_residual_cost_limit;
 
@@ -380,6 +398,8 @@ typedef struct kvz_config
 
   /** \brief Flag to enable/disable open GOP configuration */
   int8_t open_gop;
+
+	int32_t vaq; /** \brief Enable variance adaptive quantization*/
 
   /** \brief Type of scaling lists to use */
   int8_t scaling_list;
@@ -390,6 +410,30 @@ typedef struct kvz_config
   /** \brief Enable Early Skip Mode Decision */
   uint8_t early_skip;
 
+  /** \brief Enable Machine learning CU depth prediction for Intra encoding. */
+  uint8_t ml_pu_depth_intra;  
+  
+  /** \brief Used for partial frame encoding*/
+  struct {
+    uint8_t startCTU_x;
+    uint8_t startCTU_y;
+    uint16_t fullWidth;
+    uint16_t fullHeight;
+  } partial_coding;
+
+  /** \brief Always consider CU without any quantized residual */
+  uint8_t zero_coeff_rdo;
+
+  /** \brief Currently unused parameter for OBA rc */
+  int8_t frame_allocation;
+
+  /** \brief used rc scheme, 0 for QP */
+  int8_t rc_algorithm;
+
+  /** \brief whether to use hadamard based bit allocation for intra frames or not */
+  uint8_t intra_bit_allocation;
+
+  uint8_t clip_neighbour;
 } kvz_config;
 
 /**

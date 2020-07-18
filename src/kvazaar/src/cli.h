@@ -58,6 +58,7 @@ void print_help(void);
 void print_frame_info(const kvz_frame_info *const info,
                       const double frame_psnr[3],
                       const uint32_t bytes,
-                      const bool print_psnr);
+                      const bool print_psnr,
+                      const double avg_qp);
 
 #endif

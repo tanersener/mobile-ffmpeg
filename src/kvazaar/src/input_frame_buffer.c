@@ -43,15 +43,18 @@ void kvz_init_input_frame_buffer(input_frame_buffer_t *input_buffer)
  *
  * The caller must not modify img_in after calling this function.
  *
- * \param buf     an input frame buffer
- * \param state   a main encoder state
- * \param img_in  input frame or NULL
+ * \param buf         an input frame buffer
+ * \param state       a main encoder state
+ * \param img_in      input frame or NULL
+ * \param first_done  whether the first frame has been done,
+ *                    needed for the OBA rc
  * \return        pointer to the next picture, or NULL if no picture is
  *                available
  */
 kvz_picture* kvz_encoder_feed_frame(input_frame_buffer_t *buf,
                                     encoder_state_t *const state,
-                                    kvz_picture *const img_in)
+                                    kvz_picture *const img_in, 
+                                    int first_done)
 {
   const encoder_control_t* const encoder = state->encoder_control;
   const kvz_config* const cfg = &encoder->cfg;
@@ -82,7 +85,7 @@ kvz_picture* kvz_encoder_feed_frame(input_frame_buffer_t *buf,
     buf->num_out++;
     return kvz_image_copy_ref(img_in);
   }
-
+  
   if (img_in != NULL) {
     // Index of the next input picture, in range [-1, +inf). Values
     // i and j refer to the same indices in buf->pic_buffer iff
@@ -140,7 +143,7 @@ kvz_picture* kvz_encoder_feed_frame(input_frame_buffer_t *buf,
     dts_out = buf->pts_buffer[gop_buf_size - 1] + buf->delay;
     gop_offset = 0; // highest quality picture
 
-  } else {
+  } else if(first_done) {
     gop_offset = (buf->num_out - 1) % cfg->gop_len;
     
     // For closed gop, calculate the gop_offset again
@@ -182,6 +185,9 @@ kvz_picture* kvz_encoder_feed_frame(input_frame_buffer_t *buf,
       int dts_idx = buf->num_out - (cfg->gop_len - 1);
       dts_out = buf->pts_buffer[dts_idx % gop_buf_size];
     }
+  }
+  else {
+    return NULL;
   }
 
   // Index in buf->pic_buffer and buf->pts_buffer.
