@@ -35,21 +35,6 @@
 
 #include "bignum.h"
 
-#ifdef mpz_limbs_read
-#define GMP_HAVE_mpz_limbs_read 1
-#else
-#define GMP_HAVE_mpz_limbs_read 0
-#endif
-
-/* Name mangling. */
-#if !GMP_HAVE_mpz_limbs_read
-#define mpz_limbs_read _nettle_mpz_limbs_read
-#define mpz_limbs_write _nettle_mpz_limbs_write
-#define mpz_limbs_modify _nettle_mpz_limbs_modify
-#define mpz_limbs_finish _nettle_mpz_limbs_finish
-#define mpz_roinit_n _nettle_mpz_roinit_n
-#endif
-
 #define cnd_swap _nettle_cnd_swap
 #define mpz_limbs_cmp _nettle_mpz_limbs_cmp
 #define mpz_limbs_read_n _nettle_mpz_limbs_read_n
@@ -84,39 +69,6 @@
 
 #define NETTLE_OCTET_SIZE_TO_LIMB_SIZE(n) \
   (((n) * 8 + GMP_NUMB_BITS - 1) / GMP_NUMB_BITS)
-
-/* Some functions for interfacing between mpz and mpn code. Signs of
-   the mpz numbers are generally ignored. */
-
-#if !GMP_HAVE_mpz_limbs_read
-/* Read access to mpz numbers. */
-
-/* Return limb pointer, for read-only operations. Use mpz_size to get
-   the number of limbs. */
-const mp_limb_t *
-mpz_limbs_read (const mpz_srcptr x);
-
-/* Write access to mpz numbers. */
-
-/* Get a limb pointer for writing, previous contents may be
-   destroyed. */
-mp_limb_t *
-mpz_limbs_write (mpz_ptr x, mp_size_t n);
-
-/* Get a limb pointer for writing, previous contents is intact. */
-mp_limb_t *
-mpz_limbs_modify (mpz_ptr x, mp_size_t n);
-
-/* Update size. */
-void
-mpz_limbs_finish (mpz_ptr x, mp_size_t n);
-
-/* Using an mpn number as an mpz. Can be used for read-only access
-   only. x must not be cleared or reallocated. */
-mpz_srcptr
-mpz_roinit_n (mpz_ptr x, const mp_limb_t *xp, mp_size_t xs);
-
-#endif /* !GMP_HAVE_mpz_limbs_read */
 
 void
 cnd_swap (mp_limb_t cnd, mp_limb_t *ap, mp_limb_t *bp, mp_size_t n);

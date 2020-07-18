@@ -72,39 +72,39 @@ ecc_dup_jj (const struct ecc_curve *ecc,
 #define zp (p + 2*ecc->p.size)
   
   /* delta */
-  ecc_modp_sqr (ecc, delta, zp);
+  ecc_mod_sqr (&ecc->p, delta, zp);
 
   /* gamma */
-  ecc_modp_sqr (ecc, gamma, yp);
+  ecc_mod_sqr (&ecc->p, gamma, yp);
 
   /* z'. Can use beta area as scratch. */
-  ecc_modp_add (ecc, r + 2*ecc->p.size, yp, zp);
-  ecc_modp_sqr (ecc, beta, r + 2*ecc->p.size);
-  ecc_modp_sub (ecc, beta, beta, gamma);
-  ecc_modp_sub (ecc, r + 2*ecc->p.size, beta, delta);
+  ecc_mod_add (&ecc->p, r + 2*ecc->p.size, yp, zp);
+  ecc_mod_sqr (&ecc->p, beta, r + 2*ecc->p.size);
+  ecc_mod_sub (&ecc->p, beta, beta, gamma);
+  ecc_mod_sub (&ecc->p, r + 2*ecc->p.size, beta, delta);
   
   /* alpha. Can use beta area as scratch, and overwrite delta. */
-  ecc_modp_add (ecc, sum, xp, delta);
-  ecc_modp_sub (ecc, delta, xp, delta);
-  ecc_modp_mul (ecc, beta, sum, delta);
-  ecc_modp_mul_1 (ecc, alpha, beta, 3);
+  ecc_mod_add (&ecc->p, sum, xp, delta);
+  ecc_mod_sub (&ecc->p, delta, xp, delta);
+  ecc_mod_mul (&ecc->p, beta, sum, delta);
+  ecc_mod_mul_1 (&ecc->p, alpha, beta, 3);
 
   /* beta */
-  ecc_modp_mul (ecc, beta, xp, gamma);
+  ecc_mod_mul (&ecc->p, beta, xp, gamma);
 
   /* Do gamma^2 and 4*beta early, to get them out of the way. We can
      then use the old area at gamma as scratch. */
-  ecc_modp_sqr (ecc, g2, gamma);
-  ecc_modp_mul_1 (ecc, sum, beta, 4);
+  ecc_mod_sqr (&ecc->p, g2, gamma);
+  ecc_mod_mul_1 (&ecc->p, sum, beta, 4);
   
   /* x' */
-  ecc_modp_sqr (ecc, gamma, alpha);   /* Overwrites gamma and beta */
-  ecc_modp_submul_1 (ecc, gamma, sum, 2);
+  ecc_mod_sqr (&ecc->p, gamma, alpha);   /* Overwrites gamma and beta */
+  ecc_mod_submul_1 (&ecc->p, gamma, sum, 2);
   mpn_copyi (r, gamma, ecc->p.size);
 
   /* y' */
-  ecc_modp_sub (ecc, sum, sum, r);
-  ecc_modp_mul (ecc, gamma, sum, alpha);
-  ecc_modp_submul_1 (ecc, gamma, g2, 8);
+  ecc_mod_sub (&ecc->p, sum, sum, r);
+  ecc_mod_mul (&ecc->p, gamma, sum, alpha);
+  ecc_mod_submul_1 (&ecc->p, gamma, g2, 8);
   mpn_copyi (r + ecc->p.size, gamma, ecc->p.size);
 }

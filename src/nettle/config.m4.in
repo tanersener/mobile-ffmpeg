@@ -8,6 +8,9 @@ define(<ALIGN_LOG>, <@ASM_ALIGN_LOG@>)dnl
 define(<W64_ABI>, <@W64_ABI@>)dnl
 define(<RODATA>, <@ASM_RODATA@>)dnl
 define(<WORDS_BIGENDIAN>, <@ASM_WORDS_BIGENDIAN@>)dnl
+define(<ASM_X86_ENDBR>,<@ASM_X86_ENDBR@>)dnl
+define(<ASM_X86_MARK_CET_ALIGN>,<@ASM_X86_MARK_CET_ALIGN@>)dnl
 divert(1)
+@ASM_X86_MARK_CET@
 @ASM_MARK_NOEXEC_STACK@
 divert

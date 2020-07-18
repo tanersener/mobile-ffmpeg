@@ -34,8 +34,6 @@
 #ifndef NETTLE_BIGNUM_H_INCLUDED
 #define NETTLE_BIGNUM_H_INCLUDED
 
-#include "nettle-meta.h"
-
 #include "nettle-types.h"
 
 /* For NETTLE_USE_MINI_GMP */
@@ -46,8 +44,6 @@
 
 # define GMP_NUMB_MASK (~(mp_limb_t) 0)
 
-/* Function missing in older gmp versions, and checked for with ifdef */
-# define mpz_limbs_read mpz_limbs_read
 /* Side-channel silent powm not available in mini-gmp. */
 # define mpz_powm_sec mpz_powm
 #else

@@ -1,3 +1,93 @@
+NEWS for the Nettle 3.6 release
+
+	This release adds a couple of new features, most notable being
+	support for ED448 signatures.
+
+	It is not binary compatible with earlier releases. The shared
+	library names are libnettle.so.8.0 and libhogweed.so.6.0, with
+	sonames nibnettle.so.8 and libhogweed.so.6. The changed
+	sonames are mainly to avoid upgrade problems with recent
+	GnuTLS versions, that depend on Nettle internals outside of
+	the advertised ABI. But also because of the removal of
+	internal poly1305 functions which were undocumented but
+	declared in an installed header file, see Interface changes
+	below.
+
+	New features:
+
+	* Support for Curve448 and ED448 signatures. Contributed by
+	  Daiki Ueno.
+
+	* Support for SHAKE256 (SHA3 variant with arbitrary output
+	  size). Contributed by Daiki Ueno.
+
+	* Support for SIV-CMAC (Synthetic Initialization Vector) mode,
+	  contributed by Nikos Mavrogiannopoulos.
+
+	* Support for CMAC64, contributed by Dmitry Baryshkov.
+
+	* Support for the "CryptoPro" variant of the GOST hash
+	  function, as gosthash94cp. Contributed by Dmitry Baryshkov.
+
+	* Support for GOST DSA signatures, including GOST curves
+	  gc256b and gc512a. Contributed by Dmitry Baryshkov.
+
+	* Support for Intel CET in x86 and x86_64 assembly files, if
+	  enabled via CFLAGS (gcc --fcf-protection=full). Contributed
+	  by H.J. Lu and Simo Sorce.
+
+	* A few new functions to improve support for the Chacha
+	  variant with 96-bit nonce and 32-bit block counter (the
+	  existing functions use nonce and counter of 64-bit each),
+	  and functions to set the counter. Contributed by Daiki Ueno.
+
+	* New interface, struct nettle_mac, for MAC (message
+	  authentication code) algorithms. This abstraction is only
+	  for MACs that don't require a per-message nonce. For HMAC,
+	  the key size is fixed, and equal the digest size of the
+	  underlying hash function.
+
+	Bug fixes:
+
+	* Fix bug in cfb8_decrypt. Previously, the IV was not updated
+	  correctly in the case of input data shorter than the block
+	  size. Reported by Stephan Mueller, fixed by Daiki Ueno.
+
+	* Fix configure check for __builtin_bswap64, the incorrect
+	  check would result in link errors on platforms missing this
+	  function. Patch contributed by George Koehler.
+
+	* All use of old-fashioned suffix rules in the Makefiles have
+	  been replaced with %-pattern rules. Nettle's use of suffix
+	  rules in earlier versions depended on undocumented GNU make
+	  behavior, which is being deprecated in GNU make 4.3.
+
+	  Building with other make programs than GNU make is untested
+	  and unsupported. (Building with BSD make or Solaris make
+	  used to work years ago, but has not been tested recently).
+
+	Interface changes:
+
+	* Declarations of internal poly1305.h functions have been
+	  removed from the header file poly1305.h, to make it clear
+	  that they are not part of the advertised API or ABI.
+
+	Miscellaneous:
+
+	* Building the public key support of nettle now requires GMP
+	  version 6.1.0 or later (unless --enable-mini-gmp is used).
+
+	* A fair amount of changes to ECC internals, with a few
+	  deleted and a few new fields in the internal struct
+	  ecc_curve. Files and functions have been renamed to more
+	  consistently match the curve name, e.g., ecc-256.c has been
+	  renamed to ecc-secp256r1.c.
+
+	* Documentation for chacha-poly1305 updated. It is no longer
+	  experimental. The implementation was updated to follow RFC
+	  8439 in Nettle-3.1, but that was not documented or announced
+	  at the time.
+
 NEWS for the Nettle 3.5.1 release
 
 	The Nettle-3.5.1 corrects a packaging mistake in Nettle-3.5.

@@ -918,6 +918,7 @@ main(int argc, char **argv)
       &nettle_sha3_224, &nettle_sha3_256,
       &nettle_sha3_384, &nettle_sha3_512,
       &nettle_ripemd160, &nettle_gosthash94,
+      &nettle_gosthash94cp,
       NULL
     };
 

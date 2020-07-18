@@ -32,7 +32,7 @@ define(<GMP_NUMB_BITS>,<>)dnl
 define(<PROLOGUE>,
 <.globl C_NAME($1)
 DECLARE_FUNC(C_NAME($1))
-C_NAME($1):>)
+C_NAME($1): ASM_X86_ENDBR>)
 
 define(<EPILOGUE>,
 <ifelse(ELF_STYLE,yes,

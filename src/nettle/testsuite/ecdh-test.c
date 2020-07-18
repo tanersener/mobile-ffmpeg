@@ -31,27 +31,29 @@
 
 #include "testutils.h"
 
-static void
-set_point (struct ecc_point *p,
-	   const char *x, const char *y)
+static int
+set_point (struct ecc_point *p, const char *x, const char *y)
 {
   mpz_t X, Y;
+  int ret;
+
   mpz_init_set_str (X, x, 0);
   mpz_init_set_str (Y, y, 0);
-  if (!ecc_point_set (p, X, Y))
-    die ("Test point not on curve!\n");
+  ret = ecc_point_set (p, X, Y);
 
   mpz_clear (X);
   mpz_clear (Y);
+  return ret;
 }
-  
+
 static void
 set_scalar (struct ecc_scalar *s,
 	    const char *x)
 {
   mpz_t X;
   mpz_init_set_str (X, x, 0);
-  ecc_scalar_set (s, X);
+  if (!ecc_scalar_set (s, X))
+    abort ();
   mpz_clear (X);
 }
 
@@ -102,15 +104,15 @@ test_dh (const char *name, const struct ecc_curve *ecc,
   ecc_scalar_init (&A_priv, ecc);
   set_scalar (&A_priv, a_priv);
   ecc_point_init (&A, ecc);
-  set_point (&A, ax, ay);
+  ASSERT (set_point (&A, ax, ay));
 
   ecc_scalar_init (&B_priv, ecc);
   set_scalar (&B_priv, b_priv);
   ecc_point_init (&B, ecc);
-  set_point (&B, bx, by);
+  ASSERT (set_point (&B, bx, by));
 
   ecc_point_init (&S, ecc);
-  set_point (&S, sx, sy);
+  ASSERT (set_point (&S, sx, sy));
 
   ecc_point_init (&T, ecc);
 
@@ -135,9 +137,48 @@ test_dh (const char *name, const struct ecc_curve *ecc,
   ecc_point_clear (&T);  
 }
 
+static void
+test_public_key (const char *label, const struct ecc_curve *ecc,
+                 const char *x, const char *y, int expect_success)
+{
+  struct ecc_point P;
+  int ret;
+
+  ecc_point_init (&P, ecc);
+  ret = set_point (&P, x, y);
+
+  if (!ret && expect_success)
+    die ("Test point '%s' not on curve!\n", label);
+
+  if (ret && !expect_success)
+    die ("Expected failure to set point '%s'!", label);
+
+  ecc_point_clear (&P);
+}
+
 void
 test_main(void)
 {
+  test_public_key ("(0,0) with secp-192r1", &_nettle_secp_192r1, "0", "0", 0);
+  test_public_key (
+    "(P,0) with secp-192r1", &_nettle_secp_192r1,
+    "6277101735386680763835789423207666416083908700390324961279",
+    "0", 0);
+  test_public_key (
+    "(0,P) with secp-192r1", &_nettle_secp_192r1, "0",
+    "6277101735386680763835789423207666416083908700390324961279",
+    0);
+  test_public_key (
+    "(P,P) with secp-192r1", &_nettle_secp_192r1,
+    "6277101735386680763835789423207666416083908700390324961279",
+    "6277101735386680763835789423207666416083908700390324961279",
+    0);
+  test_public_key ("(1,2) with secp-192r1", &_nettle_secp_192r1, "1", "2", 0);
+  test_public_key ("(X,Y) with secp-192r1", &_nettle_secp_192r1,
+    "1050363442265225480786760666329560655512990381040021438562",
+    "5298249600854377235107392014200406283816103564916230704184",
+    1);
+
   test_dh ("secp-192r1", &_nettle_secp_192r1,
 	   "3406157206141798348095184987208239421004566462391397236532",
 	   "1050363442265225480786760666329560655512990381040021438562",
@@ -200,4 +241,17 @@ test_main(void)
 	   "38072138078045635808869930165213470653418146012939584392304609812494425185763",
 	   "10481077163111981870382976851703705086808805457403127024129174358161599078055",
 	   "29260211489972704256554624312266763530759418996739976957020673870747051409679");
+
+  /* NOTE: This isn't the standard way to do curve448
+     diffie-hellman, but it tests that the ecc_point interface works
+     also with curve448. */
+  test_dh ("curve448", &_nettle_curve448,
+	   "129458936807933142766404648460937163205634163580407624950524900086792185737444124895392953822100034523565454893159084960036749128566328",
+	   "23903108874160330022289088207864530114505726115081678533913226179385920277612083777349117962138808929878378666596532036566924169949084",
+	   "693683143993815499711046966874265987454661213870193324674425656110752379002105414428569086535475560314058341102862207145978150379762153",
+	   "66424594649188102315894632429895338306697492782714758296415311427244880255966850729749965592839835963032731282879151354354178946253531",
+	   "411851112596680430188999894591634506976361833537024658040418853047370769553774913299417695327870642536912872558385293694714169201128264",
+	   "337433451779159274143076131600929733721586133908369086734805607026091240174740218929467625260731556550599267570314197354864315711490353",
+	   "224725768629972498035446273711269105191383993674106563435257119903436206484342709996926420948730961128941009070083709026343858723205213",
+	   "514544926219850986487923720424370435708360925070646212523588162169142573918197583804309386017625350764529605929374479238949748203847320");
 }

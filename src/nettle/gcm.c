@@ -53,66 +53,7 @@
 #include "nettle-internal.h"
 #include "macros.h"
 #include "ctr-internal.h"
-
-#define GHASH_POLYNOMIAL 0xE1UL
-
-static void
-gcm_gf_add (union nettle_block16 *r,
-	    const union nettle_block16 *x, const union nettle_block16 *y)
-{
-  r->w[0] = x->w[0] ^ y->w[0];
-  r->w[1] = x->w[1] ^ y->w[1];
-#if SIZEOF_LONG == 4
-  r->w[2] = x->w[2] ^ y->w[2];
-  r->w[3] = x->w[3] ^ y->w[3];
-#endif      
-}
-/* Multiplication by 010...0; a big-endian shift right. If the bit
-   shifted out is one, the defining polynomial is added to cancel it
-   out. r == x is allowed. */
-static void
-gcm_gf_shift (union nettle_block16 *r, const union nettle_block16 *x)
-{
-  long mask;
-
-  /* Shift uses big-endian representation. */
-#if WORDS_BIGENDIAN
-# if SIZEOF_LONG == 4
-  mask = - (x->w[3] & 1);
-  r->w[3] = (x->w[3] >> 1) | ((x->w[2] & 1) << 31);
-  r->w[2] = (x->w[2] >> 1) | ((x->w[1] & 1) << 31);
-  r->w[1] = (x->w[1] >> 1) | ((x->w[0] & 1) << 31);
-  r->w[0] = (x->w[0] >> 1) ^ (mask & (GHASH_POLYNOMIAL << 24)); 
-# elif SIZEOF_LONG == 8
-  mask = - (x->w[1] & 1);
-  r->w[1] = (x->w[1] >> 1) | ((x->w[0] & 1) << 63);
-  r->w[0] = (x->w[0] >> 1) ^ (mask & (GHASH_POLYNOMIAL << 56));
-# else
-#  error Unsupported word size. */
-#endif
-#else /* ! WORDS_BIGENDIAN */
-# if SIZEOF_LONG == 4
-#define RSHIFT_WORD(x) \
-  ((((x) & 0xfefefefeUL) >> 1) \
-   | (((x) & 0x00010101) << 15))
-  mask = - ((x->w[3] >> 24) & 1);
-  r->w[3] = RSHIFT_WORD(x->w[3]) | ((x->w[2] >> 17) & 0x80);
-  r->w[2] = RSHIFT_WORD(x->w[2]) | ((x->w[1] >> 17) & 0x80);
-  r->w[1] = RSHIFT_WORD(x->w[1]) | ((x->w[0] >> 17) & 0x80);
-  r->w[0] = RSHIFT_WORD(x->w[0]) ^ (mask & GHASH_POLYNOMIAL);
-# elif SIZEOF_LONG == 8
-#define RSHIFT_WORD(x) \
-  ((((x) & 0xfefefefefefefefeUL) >> 1) \
-   | (((x) & 0x0001010101010101UL) << 15))
-  mask = - ((x->w[1] >> 56) & 1);
-  r->w[1] = RSHIFT_WORD(x->w[1]) | ((x->w[0] >> 49) & 0x80);
-  r->w[0] = RSHIFT_WORD(x->w[0]) ^ (mask & GHASH_POLYNOMIAL);
-# else
-#  error Unsupported word size. */
-# endif
-# undef RSHIFT_WORD
-#endif /* ! WORDS_BIGENDIAN */
-}
+#include "block-internal.h"
 
 #if GCM_TABLE_BITS == 0
 /* Sets x <- x * y mod r, using the plain bitwise algorithm from the
@@ -135,9 +76,9 @@ gcm_gf_mul (union nettle_block16 *x, const union nettle_block16 *y)
       for (j = 0; j < 8; j++, b <<= 1)
 	{
 	  if (b & 0x80)
-	    gcm_gf_add(&Z, &Z, &V);
+	    block16_xor(&Z, &V);
 	  
-	  gcm_gf_shift(&V, &V);
+	  block16_mulx_ghash(&V, &V);
 	}
     }
   memcpy (x->b, Z.b, sizeof(Z));
@@ -160,45 +101,22 @@ shift_table[0x10] = {
 static void
 gcm_gf_shift_4(union nettle_block16 *x)
 {
-  unsigned long *w = x->w;
-  unsigned long reduce;
+  uint64_t *u64 = x->u64;
+  uint64_t reduce;
 
   /* Shift uses big-endian representation. */
 #if WORDS_BIGENDIAN
-# if SIZEOF_LONG == 4
-  reduce = shift_table[w[3] & 0xf];
-  w[3] = (w[3] >> 4) | ((w[2] & 0xf) << 28);
-  w[2] = (w[2] >> 4) | ((w[1] & 0xf) << 28);
-  w[1] = (w[1] >> 4) | ((w[0] & 0xf) << 28);
-  w[0] = (w[0] >> 4) ^ (reduce << 16);
-# elif SIZEOF_LONG == 8
-  reduce = shift_table[w[1] & 0xf];
-  w[1] = (w[1] >> 4) | ((w[0] & 0xf) << 60);
-  w[0] = (w[0] >> 4) ^ (reduce << 48);
-# else
-#  error Unsupported word size. */
-#endif
+  reduce = shift_table[u64[1] & 0xf];
+  u64[1] = (u64[1] >> 4) | ((u64[0] & 0xf) << 60);
+  u64[0] = (u64[0] >> 4) ^ (reduce << 48);
 #else /* ! WORDS_BIGENDIAN */
-# if SIZEOF_LONG == 4
-#define RSHIFT_WORD(x) \
-  ((((x) & 0xf0f0f0f0UL) >> 4)			\
-   | (((x) & 0x000f0f0f) << 12))
-  reduce = shift_table[(w[3] >> 24) & 0xf];
-  w[3] = RSHIFT_WORD(w[3]) | ((w[2] >> 20) & 0xf0);
-  w[2] = RSHIFT_WORD(w[2]) | ((w[1] >> 20) & 0xf0);
-  w[1] = RSHIFT_WORD(w[1]) | ((w[0] >> 20) & 0xf0);
-  w[0] = RSHIFT_WORD(w[0]) ^ reduce;
-# elif SIZEOF_LONG == 8
-#define RSHIFT_WORD(x) \
-  ((((x) & 0xf0f0f0f0f0f0f0f0UL) >> 4) \
-   | (((x) & 0x000f0f0f0f0f0f0fUL) << 12))
-  reduce = shift_table[(w[1] >> 56) & 0xf];
-  w[1] = RSHIFT_WORD(w[1]) | ((w[0] >> 52) & 0xf0);
-  w[0] = RSHIFT_WORD(w[0]) ^ reduce;
-# else
-#  error Unsupported word size. */
-# endif
-# undef RSHIFT_WORD
+#define RSHIFT_WORD_4(x) \
+  ((((x) & UINT64_C(0xf0f0f0f0f0f0f0f0)) >> 4) \
+   | (((x) & UINT64_C(0x000f0f0f0f0f0f0f)) << 12))
+  reduce = shift_table[(u64[1] >> 56) & 0xf];
+  u64[1] = RSHIFT_WORD_4(u64[1]) | ((u64[0] >> 52) & 0xf0);
+  u64[0] = RSHIFT_WORD_4(u64[0]) ^ reduce;
+# undef RSHIFT_WORD_4
 #endif /* ! WORDS_BIGENDIAN */
 }
 
@@ -215,9 +133,9 @@ gcm_gf_mul (union nettle_block16 *x, const union nettle_block16 *table)
       uint8_t b = x->b[i];
 
       gcm_gf_shift_4(&Z);
-      gcm_gf_add(&Z, &Z, &table[b & 0xf]);
+      block16_xor(&Z, &table[b & 0xf]);
       gcm_gf_shift_4(&Z);
-      gcm_gf_add(&Z, &Z, &table[b >> 4]);
+      block16_xor(&Z, &table[b >> 4]);
     }
   memcpy (x->b, Z.b, sizeof(Z));
 }
@@ -268,38 +186,17 @@ shift_table[0x100] = {
 static void
 gcm_gf_shift_8(union nettle_block16 *x)
 {
-  unsigned long *w = x->w;
-  unsigned long reduce;
+  uint64_t reduce;
 
   /* Shift uses big-endian representation. */
 #if WORDS_BIGENDIAN
-# if SIZEOF_LONG == 4
-  reduce = shift_table[w[3] & 0xff];
-  w[3] = (w[3] >> 8) | ((w[2] & 0xff) << 24);
-  w[2] = (w[2] >> 8) | ((w[1] & 0xff) << 24);
-  w[1] = (w[1] >> 8) | ((w[0] & 0xff) << 24);
-  w[0] = (w[0] >> 8) ^ (reduce << 16);
-# elif SIZEOF_LONG == 8
-  reduce = shift_table[w[1] & 0xff];
-  w[1] = (w[1] >> 8) | ((w[0] & 0xff) << 56);
-  w[0] = (w[0] >> 8) ^ (reduce << 48);
-# else
-#  error Unsupported word size. */
-#endif
+  reduce = shift_table[x->u64[1] & 0xff];
+  x->u64[1] = (x->u64[1] >> 8) | ((x->u64[0] & 0xff) << 56);
+  x->u64[0] = (x->u64[0] >> 8) ^ (reduce << 48);
 #else /* ! WORDS_BIGENDIAN */
-# if SIZEOF_LONG == 4
-  reduce = shift_table[(w[3] >> 24) & 0xff];
-  w[3] = (w[3] << 8) | (w[2] >> 24);
-  w[2] = (w[2] << 8) | (w[1] >> 24);
-  w[1] = (w[1] << 8) | (w[0] >> 24);
-  w[0] = (w[0] << 8) ^ reduce;
-# elif SIZEOF_LONG == 8
-  reduce = shift_table[(w[1] >> 56) & 0xff];
-  w[1] = (w[1] << 8) | (w[0] >> 56);
-  w[0] = (w[0] << 8) ^ reduce;
-# else
-#  error Unsupported word size. */
-# endif
+  reduce = shift_table[(x->u64[1] >> 56) & 0xff];
+  x->u64[1] = (x->u64[1] << 8) | (x->u64[0] >> 56);
+  x->u64[0] = (x->u64[0] << 8) ^ reduce;
 #endif /* ! WORDS_BIGENDIAN */
 }
 
@@ -314,10 +211,10 @@ gcm_gf_mul (union nettle_block16 *x, const union nettle_block16 *table)
   for (i = GCM_BLOCK_SIZE-2; i > 0; i--)
     {
       gcm_gf_shift_8(&Z);
-      gcm_gf_add(&Z, &Z, &table[x->b[i]]);
+      block16_xor(&Z, &table[x->b[i]]);
     }
   gcm_gf_shift_8(&Z);
-  gcm_gf_add(x, &Z, &table[x->b[0]]);
+  block16_xor3(x, &Z, &table[x->b[0]]);
 }
 #  endif /* ! HAVE_NATIVE_gcm_hash8 */
 # else /* GCM_TABLE_BITS != 8 */
@@ -352,12 +249,12 @@ gcm_set_key(struct gcm_key *key,
   /* Algorithm 3 from the gcm paper. First do powers of two, then do
      the rest by adding. */
   while (i /= 2)
-    gcm_gf_shift(&key->h[i], &key->h[2*i]);
+    block16_mulx_ghash(&key->h[i], &key->h[2*i]);
   for (i = 2; i < 1<<GCM_TABLE_BITS; i *= 2)
     {
       unsigned j;
       for (j = 1; j < i; j++)
-	gcm_gf_add(&key->h[i+j], &key->h[i],&key->h[j]);
+	block16_xor3(&key->h[i+j], &key->h[i],&key->h[j]);
     }
 #endif
 }

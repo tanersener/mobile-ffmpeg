@@ -2,7 +2,7 @@ dnl -*- mode: shell-script; sh-indentation: 2; -*-
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([nettle], [3.5.1], [nettle-bugs@lists.lysator.liu.se])
+AC_INIT([nettle], [3.6], [nettle-bugs@lists.lysator.liu.se])
 AC_PREREQ(2.61)
 AC_CONFIG_SRCDIR([arcfour.c])
 # Needed to stop autoconf from looking for files in parent directories.
@@ -10,10 +10,10 @@ AC_CONFIG_AUX_DIR([.])
 
 AC_CONFIG_HEADER([config.h])
 
-LIBNETTLE_MAJOR=7
+LIBNETTLE_MAJOR=8
 LIBNETTLE_MINOR=0
 
-LIBHOGWEED_MAJOR=5
+LIBHOGWEED_MAJOR=6
 LIBHOGWEED_MINOR=0
 
 dnl Note double square brackets, for extra m4 quoting.
@@ -163,19 +163,6 @@ GMP_PROG_EXEEXT_FOR_BUILD
 
 LSH_DEPENDENCY_TRACKING
 
-if test x$enable_dependency_tracking = xyes ; then
-  # Since the makefiles use include to get the dependency files, we must
-  # make sure that the files exist. We generate some more files than are
-  # actually needed.
-
-  AC_CONFIG_COMMANDS([dummy-dep-files],
-  [(cd "$srcdir" && find . '(' -name '*.c' -o -name '*.cxx' ')' -print) \
- | sed 's/\.cx*$//' | (while read f; do \
-      test -f "$f.o.d" || echo > "$f.o.d"; \
-   done)
-])
-fi
-
 if test "x$enable_gcov" = "xyes"; then
   CFLAGS="$CFLAGS -ftest-coverage -fprofile-arcs"
 fi
@@ -213,7 +200,7 @@ AC_C_BIGENDIAN([AC_DEFINE([WORDS_BIGENDIAN], 1)
 
 AC_CACHE_CHECK([for __builtin_bswap64],
 		nettle_cv_c_builtin_bswap64,
-[AC_TRY_COMPILE([
+[AC_TRY_LINK([
 #include <stdint.h>
 ],[
 uint64_t x = 17;
@@ -256,9 +243,10 @@ fi
 # Checks for libraries
 if test "x$enable_public_key" = "xyes" ; then
   if test "x$enable_mini_gmp" = "xno" ; then
-    AC_CHECK_LIB(gmp, __gmpn_sec_div_r,,
+    # mpn_zero_p was added in GMP-6.1.0
+    AC_CHECK_LIB(gmp, __gmpn_zero_p,,
         [AC_MSG_WARN(
-    [GNU MP not found, or too old. GMP-6.0 or later is needed, see https://gmplib.org/.
+    [GNU MP not found, or too old. GMP-6.1.0 or later is needed, see https://gmplib.org/.
     Support for public key algorithms will be unavailable.])]
         enable_public_key=no)
 
@@ -475,8 +463,9 @@ asm_nettle_optional_list="gcm-hash8.asm cpuid.asm \
 
 asm_hogweed_optional_list=""
 if test "x$enable_public_key" = "xyes" ; then
-  asm_hogweed_optional_list="ecc-192-modp.asm ecc-224-modp.asm \
-    ecc-25519-modp.asm ecc-256-redc.asm ecc-384-modp.asm ecc-521-modp.asm"
+  asm_hogweed_optional_list="ecc-secp192r1-modp.asm ecc-secp224r1-modp.asm \
+    ecc-secp256r1-redc.asm ecc-secp384r1-modp.asm ecc-secp521r1-modp.asm \
+    ecc-curve25519-modp.asm ecc-curve448-modp.asm"
 fi
 
 OPT_NETTLE_OBJS=""
@@ -571,17 +560,18 @@ AH_VERBATIM([HAVE_NATIVE],
 [/* Define to 1 each of the following for which a native (ie. CPU specific)
     implementation of the corresponding routine exists.  */
 #undef HAVE_NATIVE_chacha_core
-#undef HAVE_NATIVE_ecc_192_modp
-#undef HAVE_NATIVE_ecc_192_redc
-#undef HAVE_NATIVE_ecc_224_modp
-#undef HAVE_NATIVE_ecc_224_redc
-#undef HAVE_NATIVE_ecc_25519_modp
-#undef HAVE_NATIVE_ecc_256_modp
-#undef HAVE_NATIVE_ecc_256_redc
-#undef HAVE_NATIVE_ecc_384_modp
-#undef HAVE_NATIVE_ecc_384_redc
-#undef HAVE_NATIVE_ecc_521_modp
-#undef HAVE_NATIVE_ecc_521_redc
+#undef HAVE_NATIVE_ecc_curve25519_modp
+#undef HAVE_NATIVE_ecc_curve448_modp
+#undef HAVE_NATIVE_ecc_secp192r1_modp
+#undef HAVE_NATIVE_ecc_secp192r1_redc
+#undef HAVE_NATIVE_ecc_secp224r1_modp
+#undef HAVE_NATIVE_ecc_secp224r1_redc
+#undef HAVE_NATIVE_ecc_secp256r1_modp
+#undef HAVE_NATIVE_ecc_secp256r1_redc
+#undef HAVE_NATIVE_ecc_secp384r1_modp
+#undef HAVE_NATIVE_ecc_secp384r1_redc
+#undef HAVE_NATIVE_ecc_secp521r1_modp
+#undef HAVE_NATIVE_ecc_secp521r1_redc
 #undef HAVE_NATIVE_gcm_hash8
 #undef HAVE_NATIVE_salsa20_core
 #undef HAVE_NATIVE_sha1_compress
@@ -666,13 +656,13 @@ case "$host_os" in
     LIBNETTLE_FORLINK=libnettle.so
     LIBNETTLE_SONAME='$(LIBNETTLE_FORLINK).$(LIBNETTLE_MAJOR)'
     LIBNETTLE_FILE='$(LIBNETTLE_SONAME).$(LIBNETTLE_MINOR)'
-    LIBNETTLE_LINK='$(CC) $(CFLAGS) $(LDFLAGS) -G -h $(LIBNETTLE_SONAME)'
+    LIBNETTLE_LINK='$(CC) $(CFLAGS) $(LDFLAGS) -shared -h $(LIBNETTLE_SONAME)'
     LIBNETTLE_LIBS=''
 
     LIBHOGWEED_FORLINK=libhogweed.so
     LIBHOGWEED_SONAME='$(LIBHOGWEED_FORLINK).$(LIBHOGWEED_MAJOR)'
     LIBHOGWEED_FILE='$(LIBHOGWEED_SONAME).$(LIBHOGWEED_MINOR)'
-    LIBHOGWEED_LINK='$(CC) $(CFLAGS) $(LDFLAGS) -G -h $(LIBHOGWEED_SONAME)'
+    LIBHOGWEED_LINK='$(CC) $(CFLAGS) $(LDFLAGS) --shared -h $(LIBHOGWEED_SONAME)'
     LIBHOGWEED_LIBS='libnettle.so $(LIBS)'
     ;;
   *)
@@ -814,6 +804,68 @@ EOF
   ASM_ALIGN_LOG="$nettle_cv_asm_align_log"
 fi
 
+dnl  Define
+dnl  1. ASM_X86_ENDBR for endbr32/endbr64.
+dnl  2. ASM_X86_MARK_CET to add a .note.gnu.property section to mark
+dnl  Intel CET support if needed.
+dnl  3. ASM_X86_MARK_CET_ALIGN to align ASM_X86_MARK_CET.
+AC_CACHE_CHECK([if Intel CET is enabled],
+  [nettle_cv_asm_x86_intel_cet],
+  [AC_TRY_COMPILE([
+#ifndef __CET__
+#error Intel CET is not enabled
+#endif
+  ], [],
+  [nettle_cv_asm_x86_intel_cet=yes],
+  [nettle_cv_asm_x86_intel_cet=no])])
+if test "$nettle_cv_asm_x86_intel_cet" = yes; then
+  case $ABI in
+  32|standard)
+    ASM_X86_ENDBR=endbr32
+    ASM_X86_MARK_CET_ALIGN=2
+    ;;
+  64)
+    ASM_X86_ENDBR=endbr64
+    ASM_X86_MARK_CET_ALIGN=3
+    ;;
+  x32)
+    ASM_X86_ENDBR=endbr64
+    ASM_X86_MARK_CET_ALIGN=2
+    ;;
+  esac
+  AC_CACHE_CHECK([if .note.gnu.property section is needed],
+    [nettle_cv_asm_x86_gnu_property],
+    [AC_TRY_COMPILE([
+#if !defined __ELF__ || !defined __CET__
+#error GNU property is not needed
+#endif
+    ], [],
+    [nettle_cv_asm_x86_gnu_property=yes],
+    [nettle_cv_asm_x86_gnu_property=no])])
+else
+  nettle_cv_asm_x86_gnu_property=no
+fi
+if test "$nettle_cv_asm_x86_gnu_property" = yes; then
+  ASM_X86_MARK_CET='
+	.pushsection ".note.gnu.property", "a"
+	.p2align ASM_X86_MARK_CET_ALIGN
+	.long 1f - 0f
+	.long 4f - 1f
+	.long 5
+0:
+	.asciz "GNU"
+1:
+	.p2align ASM_X86_MARK_CET_ALIGN
+	.long 0xc0000002
+	.long 3f - 2f
+2:
+	.long 3
+3:
+	.p2align ASM_X86_MARK_CET_ALIGN
+4:
+	.popsection'
+fi
+
 AC_SUBST(ASM_SYMBOL_PREFIX)
 AC_SUBST(ASM_ELF_STYLE)
 AC_SUBST(ASM_COFF_STYLE)
@@ -824,6 +876,9 @@ AC_SUBST(ASM_ALIGN_LOG)
 AC_SUBST(W64_ABI)
 AC_SUBST(ASM_WORDS_BIGENDIAN)
 AC_SUBST(EMULATOR)
+AC_SUBST(ASM_X86_ENDBR)
+AC_SUBST(ASM_X86_MARK_CET)
+AC_SUBST(ASM_X86_MARK_CET_ALIGN)
 
 AC_SUBST(LIBNETTLE_MAJOR)
 AC_SUBST(LIBNETTLE_MINOR)
@@ -951,18 +1006,7 @@ AC_SUBST(BENCH_LIBS)
 
 # Set these flags *last*, or else the test programs won't compile
 if test x$GCC = xyes ; then
-  # Using -ggdb3 makes (some versions of) Redhat's gcc-2.96 dump core
-  if $CC --version | grep '^2\.96$' 1>/dev/null 2>&1; then
-    true
-  else
-    CFLAGS="$CFLAGS -ggdb3"
-  fi
-  # FIXME: It would be better to actually test if this option works and/or is needed.
-  # Or perhaps use -funsigned-char.
-  if $CC --version | grep 'gcc.* 4\.' 1>/dev/null 2>&1; then
-    CFLAGS="$CFLAGS -Wno-pointer-sign"
-  fi
-  CFLAGS="$CFLAGS -Wall -W \
+  CFLAGS="$CFLAGS -ggdb3 -Wall -W -Wno-sign-compare \
   -Wmissing-prototypes -Wmissing-declarations -Wstrict-prototypes \
   -Wpointer-arith -Wbad-function-cast -Wnested-externs"
 

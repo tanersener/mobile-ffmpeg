@@ -47,7 +47,10 @@
 
 #include "dsa.h"
 #include "rsa.h"
+#include "eddsa.h"
+#include "gostdsa.h"
 #include "curve25519.h"
+#include "curve448.h"
 
 #include "nettle-meta.h"
 #include "sexp.h"
@@ -385,7 +388,7 @@ struct ecdsa_ctx
 {
   struct ecc_point pub;
   struct ecc_scalar key;
-  struct knuth_lfib_ctx rctx;
+  struct knuth_lfib_ctx lfib;
   unsigned digest_size;
   uint8_t *digest;
   struct dsa_signature s;
@@ -405,7 +408,7 @@ bench_ecdsa_init (unsigned size)
   ctx = xalloc (sizeof(*ctx));
 
   dsa_signature_init (&ctx->s);  
-  knuth_lfib_init (&ctx->rctx, 17);
+  knuth_lfib_init (&ctx->lfib, 17);
 
   switch (size)
     {
@@ -479,7 +482,7 @@ bench_ecdsa_init (unsigned size)
   mpz_clear (z);
 
   ecdsa_sign (&ctx->key,
-	      &ctx->rctx, (nettle_random_func *) knuth_lfib_random,
+	      &ctx->lfib, (nettle_random_func *) knuth_lfib_random,
 	      ctx->digest_size, ctx->digest,
 	      &ctx->s);
 
@@ -494,7 +497,7 @@ bench_ecdsa_sign (void *p)
 
   dsa_signature_init (&s);
   ecdsa_sign (&ctx->key,
-	      &ctx->rctx, (nettle_random_func *) knuth_lfib_random,
+	      &ctx->lfib, (nettle_random_func *) knuth_lfib_random,
 	      ctx->digest_size, ctx->digest,
 	      &s);
   dsa_signature_clear (&s);
@@ -507,11 +510,178 @@ bench_ecdsa_verify (void *p)
   if (! ecdsa_verify (&ctx->pub, 
 		      ctx->digest_size, ctx->digest,
 		      &ctx->s))
-    die ("Internal error, _ecdsa_verify failed.\n");    
+    die ("Internal error, ecdsa_verify failed.\n");
 }
 
 static void
 bench_ecdsa_clear (void *p)
+{
+  struct ecdsa_ctx *ctx = p;
+
+  ecc_point_clear (&ctx->pub);
+  ecc_scalar_clear (&ctx->key);
+  dsa_signature_clear (&ctx->s);
+  free (ctx->digest);
+
+  free (ctx);
+}
+
+struct eddsa_ctx
+{
+  uint8_t pub[ED448_KEY_SIZE];
+  uint8_t key[ED448_KEY_SIZE];
+  uint8_t signature[ED448_SIGNATURE_SIZE];
+  void (*sign)(const uint8_t *pub,
+	       const uint8_t *priv,
+	       size_t length, const uint8_t *msg,
+	       uint8_t *signature);
+  int (*verify)(const uint8_t *pub,
+		 size_t length, const uint8_t *msg,
+		 const uint8_t *signature);
+};
+
+static void *
+bench_eddsa_init (unsigned size)
+{
+  struct knuth_lfib_ctx lfib;
+  struct eddsa_ctx *ctx;
+  knuth_lfib_init (&lfib, 17);
+
+  ctx = xalloc (sizeof(*ctx));
+  switch (size) {
+  case 255:
+    ctx->sign = ed25519_sha512_sign;
+    ctx->verify = ed25519_sha512_verify;
+
+    knuth_lfib_random (&lfib, ED25519_KEY_SIZE, ctx->key);
+    ed25519_sha512_public_key (ctx->pub, ctx->key);
+    break;
+  case 448:
+    ctx->sign = ed448_shake256_sign;
+    ctx->verify = ed448_shake256_verify;
+
+    knuth_lfib_random (&lfib, ED448_KEY_SIZE, ctx->key);
+    ed448_shake256_public_key (ctx->pub, ctx->key);
+    break;
+  default:
+    abort ();
+  }
+  ctx->sign (ctx->pub, ctx->key, 3, (const uint8_t *) "abc", ctx->signature);
+
+  return ctx;
+}
+
+static void
+bench_eddsa_sign (void *p)
+{
+  struct eddsa_ctx *ctx = p;
+  ctx->sign (ctx->pub, ctx->key, 3, (const uint8_t *) "abc", ctx->signature);
+}
+
+static void
+bench_eddsa_verify (void *p)
+{
+  struct eddsa_ctx *ctx = p;
+  if (!ctx->verify (ctx->pub, 3, (const uint8_t *) "abc", ctx->signature))
+    die ("Internal error, eddsa_verify failed.\n");
+}
+
+static void
+bench_eddsa_clear (void *p)
+{
+  free (p);
+}
+
+static void *
+bench_gostdsa_init (unsigned size)
+{
+  struct ecdsa_ctx *ctx;
+  const struct ecc_curve *ecc;
+
+  const char *xs;
+  const char *ys;
+  const char *zs;
+  mpz_t x, y, z;
+
+  ctx = xalloc (sizeof(*ctx));
+
+  dsa_signature_init (&ctx->s);
+  knuth_lfib_init (&ctx->lfib, 17);
+
+  switch (size)
+    {
+    case 256:
+      ecc = &_nettle_gost_gc256b;
+      xs = "971566ceda436ee7678f7e07e84ebb7217406c0b4747aa8fd2ab1453c3d0dfba";
+      ys = "ad58736965949f8e59830f8de20fc6c0d177f6ab599874f1e2e24ff71f9ce643";
+      zs = "bfcf1d623e5cdd3032a7c6eabb4a923c46e43d640ffeaaf2c3ed39a8fa399924";
+      ctx->digest = hash_string (&nettle_sha256, "abc");
+      ctx->digest_size = 32;
+      break;
+
+    case 512:
+      ecc = &_nettle_gost_gc512a;
+      xs = "03A36340A95BB5F93D131961B5B1C1B3213DF7FF3B5A30376407E2A65C441BC6"
+	   "D1B34662317083243F007B15A8512B526606D3B172B606DCE86DBD6F82DA3D40";
+      ys = "DEAD76318012FED79507809C89CC44848743640EAC9A3C847DA9082E050760A1"
+	   "0679F4B707ABC1872640AD20D7441F66C7A8B3BFF1B8E11B4A076F0A86749F73";
+      zs = "3FC01CDCD4EC5F972EB482774C41E66DB7F380528DFE9E67992BA05AEE462435"
+	   "757530E641077CE587B976C8EEB48C48FD33FD175F0C7DE6A44E014E6BCB074B";
+      ctx->digest = hash_string (&nettle_sha512, "abc");
+      ctx->digest_size = 64;
+      break;
+
+    default:
+      die ("Internal error.\n");
+    }
+  ecc_point_init (&ctx->pub, ecc);
+  ecc_scalar_init (&ctx->key, ecc);
+
+  mpz_init_set_str (x, xs, 16);
+  mpz_init_set_str (y, ys, 16);
+  mpz_init_set_str (z, zs, 16);
+
+  ecc_point_set (&ctx->pub, x, y);
+  ecc_scalar_set (&ctx->key, z);
+
+  mpz_clear (x);
+  mpz_clear (y);
+  mpz_clear (z);
+
+  gostdsa_sign (&ctx->key,
+		&ctx->lfib, (nettle_random_func *) knuth_lfib_random,
+		ctx->digest_size, ctx->digest,
+		&ctx->s);
+
+  return ctx;
+}
+
+static void
+bench_gostdsa_sign (void *p)
+{
+  struct ecdsa_ctx *ctx = p;
+  struct dsa_signature s;
+
+  dsa_signature_init (&s);
+  gostdsa_sign (&ctx->key,
+		&ctx->lfib, (nettle_random_func *) knuth_lfib_random,
+		ctx->digest_size, ctx->digest,
+		&s);
+  dsa_signature_clear (&s);
+}
+
+static void
+bench_gostdsa_verify (void *p)
+{
+  struct ecdsa_ctx *ctx = p;
+  if (! gostdsa_verify (&ctx->pub,
+			ctx->digest_size, ctx->digest,
+			&ctx->s))
+    die ("Internal error, _gostdsa_verify failed.\n");
+}
+
+static void
+bench_gostdsa_clear (void *p)
 {
   struct ecdsa_ctx *ctx = p;
 
@@ -684,45 +854,59 @@ bench_openssl_ecdsa_clear (void *p)
 }
 #endif
 
-struct curve25519_ctx
+struct curve_ctx
 {
-  uint8_t x[CURVE25519_SIZE];
-  uint8_t s[CURVE25519_SIZE];
+  uint8_t x[CURVE448_SIZE];
+  uint8_t s[CURVE448_SIZE];
+  void (*mul_g)(uint8_t *q, const uint8_t *n);
+  void (*mul)(uint8_t *q, const uint8_t *n, const uint8_t *p);
 };
 
-static void
-bench_curve25519_mul_g (void *p)
+static void *
+bench_curve_init (unsigned size)
 {
-  struct curve25519_ctx *ctx = p;
-  uint8_t q[CURVE25519_SIZE];
-  curve25519_mul_g (q, ctx->s);
-}
-
-static void
-bench_curve25519_mul (void *p)
-{
-  struct curve25519_ctx *ctx = p;
-  uint8_t q[CURVE25519_SIZE];
-  curve25519_mul (q, ctx->s, ctx->x);
-}
-
-static void
-bench_curve25519 (void)
-{
-  double mul_g;
-  double mul;
   struct knuth_lfib_ctx lfib;
-  struct curve25519_ctx ctx;
-  knuth_lfib_init (&lfib, 2);
+  struct curve_ctx *ctx = xalloc (sizeof (*ctx));
+  knuth_lfib_init (&lfib, 17);
+  switch (size)
+    {
+    case 255:
+      ctx->mul = curve25519_mul;
+      ctx->mul_g = curve25519_mul_g;
+      knuth_lfib_random (&lfib, CURVE25519_SIZE, ctx->s);
+      break;
+    case 448:
+      ctx->mul = curve448_mul;
+      ctx->mul_g = curve448_mul_g;
+      knuth_lfib_random (&lfib, CURVE448_SIZE, ctx->s);
+      break;
+    default:
+      abort ();
+    }
+  ctx->mul_g (ctx->x, ctx->s);
+  return ctx;
+}
 
-  knuth_lfib_random (&lfib, sizeof(ctx.s), ctx.s);
-  curve25519_mul_g (ctx.x, ctx.s);
+static void
+bench_curve_mul_g (void *p)
+{
+  struct curve_ctx *ctx = p;
+  uint8_t q[CURVE448_SIZE];
+  ctx->mul_g (q, ctx->s);
+}
 
-  mul_g = time_function (bench_curve25519_mul_g, &ctx);
-  mul = time_function (bench_curve25519_mul, &ctx);
+static void
+bench_curve_mul (void *p)
+{
+  struct curve_ctx *ctx = p;
+  uint8_t q[CURVE448_SIZE];
+  ctx->mul (q, ctx->s, ctx->x);
+}
 
-  printf("%16s %4d %9.4f %9.4f\n",
-	 "curve25519", 255, 1e-3/mul_g, 1e-3/mul);
+static void
+bench_curve_clear (void *p)
+{
+  free (p);
 }
 
 struct alg alg_list[] = {
@@ -752,6 +936,12 @@ struct alg alg_list[] = {
   { "ecdsa (openssl)",  384, bench_openssl_ecdsa_init, bench_openssl_ecdsa_sign, bench_openssl_ecdsa_verify, bench_openssl_ecdsa_clear },
   { "ecdsa (openssl)",  521, bench_openssl_ecdsa_init, bench_openssl_ecdsa_sign, bench_openssl_ecdsa_verify, bench_openssl_ecdsa_clear },
 #endif
+  { "eddsa", 255, bench_eddsa_init, bench_eddsa_sign, bench_eddsa_verify, bench_eddsa_clear },
+  { "eddsa", 448, bench_eddsa_init, bench_eddsa_sign, bench_eddsa_verify, bench_eddsa_clear },
+  { "curve", 255, bench_curve_init, bench_curve_mul_g, bench_curve_mul, bench_curve_clear},
+  { "curve", 448, bench_curve_init, bench_curve_mul_g, bench_curve_mul, bench_curve_clear },
+  { "gostdsa",  256, bench_gostdsa_init, bench_gostdsa_sign, bench_gostdsa_verify, bench_gostdsa_clear },
+  { "gostdsa",  512, bench_gostdsa_init, bench_gostdsa_sign, bench_gostdsa_verify, bench_gostdsa_clear },
 };
 
 #define numberof(x)  (sizeof (x) / sizeof ((x)[0]))
@@ -772,9 +962,6 @@ main (int argc, char **argv)
   for (i = 0; i < numberof(alg_list); i++)
     if (!filter || strstr (alg_list[i].name, filter))
       bench_alg (&alg_list[i]);
-
-  if (!filter || strstr("curve25519", filter))
-    bench_curve25519();
 
   return EXIT_SUCCESS;
 }

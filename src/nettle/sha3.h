@@ -48,6 +48,7 @@ extern "C" {
 #define sha3_256_init nettle_sha3_256_init
 #define sha3_256_update nettle_sha3_256_update
 #define sha3_256_digest nettle_sha3_256_digest
+#define sha3_256_shake nettle_sha3_256_shake
 #define sha3_384_init nettle_sha3_384_init
 #define sha3_384_update nettle_sha3_384_update
 #define sha3_384_digest nettle_sha3_384_digest
@@ -134,6 +135,13 @@ void
 sha3_256_digest(struct sha3_256_ctx *ctx,
 		size_t length,
 		uint8_t *digest);
+
+/* Alternative digest function implementing shake256, with arbitrary
+   digest size */
+void
+sha3_256_shake(struct sha3_256_ctx *ctx,
+	       size_t length,
+	       uint8_t *digest);
 
 struct sha3_384_ctx
 {

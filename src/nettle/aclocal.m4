@@ -1,25 +1,3 @@
-dnl Try to detect the type of the third arg to getsockname() et al
-AC_DEFUN([LSH_TYPE_SOCKLEN_T],
-[AH_TEMPLATE([socklen_t], [Length type used by getsockopt])
-AC_CACHE_CHECK([for socklen_t in sys/socket.h], ac_cv_type_socklen_t,
-[AC_EGREP_HEADER(socklen_t, sys/socket.h,
-  [ac_cv_type_socklen_t=yes], [ac_cv_type_socklen_t=no])])
-if test $ac_cv_type_socklen_t = no; then
-        AC_MSG_CHECKING(for AIX)
-        AC_EGREP_CPP(yes, [
-#ifdef _AIX
- yes
-#endif
-],[
-AC_MSG_RESULT(yes)
-AC_DEFINE(socklen_t, size_t)
-],[
-AC_MSG_RESULT(no)
-AC_DEFINE(socklen_t, int)
-])
-fi
-])
-
 dnl Choose cc flags for compiling position independent code
 dnl FIXME: Doesn't do the right thing when crosscompiling.
 AC_DEFUN([LSH_CCPIC],
@@ -166,146 +144,6 @@ dnl echo LDFLAGS = $LDFLAGS
 fi
 ])
 
-dnl Like AC_CHECK_LIB, but uses $KRB_LIBS rather than $LIBS.
-dnl LSH_CHECK_KRB_LIB(LIBRARY, FUNCTION, [, ACTION-IF-FOUND [,
-dnl                  ACTION-IF-NOT-FOUND [, OTHER-LIBRARIES]]])
-
-AC_DEFUN([LSH_CHECK_KRB_LIB],
-[AC_CHECK_LIB([$1], [$2],
-  ifelse([$3], ,
-      [[ac_tr_lib=HAVE_LIB`echo $1 | sed -e 's/[^a-zA-Z0-9_]/_/g' \
-     	    -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
-        AC_DEFINE_UNQUOTED($ac_tr_lib)
-        KRB_LIBS="-l$1 $KRB_LIBS"
-      ]], [$3]),
-  ifelse([$4], , , [$4
-])dnl
-, [$5 $KRB_LIBS])
-])
-
-dnl LSH_LIB_ARGP(ACTION-IF-OK, ACTION-IF-BAD)
-AC_DEFUN([LSH_LIB_ARGP],
-[ ac_argp_save_LIBS="$LIBS"
-  ac_argp_save_LDFLAGS="$LDFLAGS"
-  ac_argp_ok=no
-  # First check if we can link with argp.
-  AC_SEARCH_LIBS(argp_parse, argp,
-  [ LSH_RPATH_FIX
-    AC_CACHE_CHECK([for working argp],
-      lsh_cv_lib_argp_works,
-      [ AC_TRY_RUN(
-[#include <argp.h>
-#include <stdlib.h>
-
-static const struct argp_option
-options[] =
-{
-  { NULL, 0, NULL, 0, NULL, 0 }
-};
-
-struct child_state
-{
-  int n;
-};
-
-static error_t
-child_parser(int key, char *arg, struct argp_state *state)
-{
-  struct child_state *input = (struct child_state *) state->input;
-  
-  switch(key)
-    {
-    default:
-      return ARGP_ERR_UNKNOWN;
-    case ARGP_KEY_END:
-      if (!input->n)
-	input->n = 1;
-      break;
-    }
-  return 0;
-}
-
-const struct argp child_argp =
-{
-  options,
-  child_parser,
-  NULL, NULL, NULL, NULL, NULL
-};
-
-struct main_state
-{
-  struct child_state child;
-  int m;
-};
-
-static error_t
-main_parser(int key, char *arg, struct argp_state *state)
-{
-  struct main_state *input = (struct main_state *) state->input;
-
-  switch(key)
-    {
-    default:
-      return ARGP_ERR_UNKNOWN;
-    case ARGP_KEY_INIT:
-      state->child_inputs[0] = &input->child;
-      break;
-    case ARGP_KEY_END:
-      if (!input->m)
-	input->m = input->child.n;
-      
-      break;
-    }
-  return 0;
-}
-
-static const struct argp_child
-main_children[] =
-{
-  { &child_argp, 0, "", 0 },
-  { NULL, 0, NULL, 0}
-};
-
-static const struct argp
-main_argp =
-{ options, main_parser, 
-  NULL,
-  NULL,
-  main_children,
-  NULL, NULL
-};
-
-int main(int argc, char **argv)
-{
-  struct main_state input = { { 0 }, 0 };
-  char *v[2] = { "foo", NULL };
-
-  argp_parse(&main_argp, 1, v, 0, NULL, &input);
-
-  if ( (input.m == 1) && (input.child.n == 1) )
-    return 0;
-  else
-    return 1;
-}
-], lsh_cv_lib_argp_works=yes,
-   lsh_cv_lib_argp_works=no,
-   lsh_cv_lib_argp_works=no)])
-
-  if test x$lsh_cv_lib_argp_works = xyes ; then
-    ac_argp_ok=yes
-  else
-    # Reset link flags
-    LIBS="$ac_argp_save_LIBS"
-    LDFLAGS="$ac_argp_save_LDFLAGS"
-  fi])
-
-  if test x$ac_argp_ok = xyes ; then
-    ifelse([$1],, true, [$1])
-  else
-    ifelse([$2],, true, [$2])
-  fi   
-])
-
 dnl LSH_GCC_ATTRIBUTES
 dnl Check for gcc's __attribute__ construction
 
@@ -409,18 +247,6 @@ AH_BOTTOM(
 #endif /* !HAVE_STRSIGNAL */
 ])])
 
-dnl LSH_MAKE_CONDITIONAL(symbol, test)
-AC_DEFUN([LSH_MAKE_CONDITIONAL],
-[if $2 ; then
-  IF_$1=''
-  UNLESS_$1='# '
-else
-  IF_$1='# '
-  UNLESS_$1=''
-fi 
-AC_SUBST(IF_$1)
-AC_SUBST(UNLESS_$1)])
-
 dnl LSH_DEPENDENCY_TRACKING
 
 dnl Defines compiler flags DEP_FLAGS to generate dependency
@@ -456,13 +282,6 @@ if test x$enable_dependency_tracking = xyes ; then
   fi
 fi
 
-if test x$enable_dependency_tracking = xyes ; then
-  DEP_INCLUDE='include '
-else
-  DEP_INCLUDE='# '
-fi
-
-AC_SUBST([DEP_INCLUDE])
 AC_SUBST([DEP_FLAGS])
 AC_SUBST([DEP_PROCESS])])
 

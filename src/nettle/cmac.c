@@ -44,30 +44,8 @@
 
 #include "memxor.h"
 #include "nettle-internal.h"
+#include "block-internal.h"
 #include "macros.h"
-
-/* shift one and XOR with 0x87. */
-#if WORDS_BIGENDIAN
-static void
-block_mulx(union nettle_block16 *dst,
-	   const union nettle_block16 *src)
-{
-  uint64_t carry = src->u64[0] >> 63;
-  dst->u64[0] = (src->u64[0] << 1) | (src->u64[1] >> 63);
-  dst->u64[1] = (src->u64[1] << 1) ^ (0x87 & -carry);
-}
-#else /* !WORDS_BIGENDIAN */
-#define LE_SHIFT(x) ((((x) & 0x7f7f7f7f7f7f7f7f) << 1) | \
-                     (((x) & 0x8080808080808080) >> 15))
-static void
-block_mulx(union nettle_block16 *dst,
-	   const union nettle_block16 *src)
-{
-  uint64_t carry = (src->u64[0] & 0x80) >> 7;
-  dst->u64[0] = LE_SHIFT(src->u64[0]) | ((src->u64[1] & 0x80) << 49);
-  dst->u64[1] = LE_SHIFT(src->u64[1]) ^ (0x8700000000000000 & -carry);
-}
-#endif /* !WORDS_BIGENDIAN */
 
 void
 cmac128_set_key(struct cmac128_key *key, const void *cipher,
@@ -79,8 +57,8 @@ cmac128_set_key(struct cmac128_key *key, const void *cipher,
   /* step 1 - generate subkeys k1 and k2 */
   encrypt(cipher, 16, L.b, zero_block.b);
 
-  block_mulx(&key->K1, &L);
-  block_mulx(&key->K2, &key->K1);
+  block16_mulx_be(&key->K1, &L);
+  block16_mulx_be(&key->K2, &key->K1);
 }
 
 void
@@ -118,12 +96,12 @@ cmac128_update(struct cmac128_ctx *ctx, const void *cipher,
   /*
    * now checksum everything but the last block
    */
-  memxor3(Y.b, ctx->X.b, ctx->block.b, 16);
+  block16_xor3(&Y, &ctx->X, &ctx->block);
   encrypt(cipher, 16, ctx->X.b, Y.b);
 
   while (msg_len > 16)
     {
-      memxor3(Y.b, ctx->X.b, msg, 16);
+      block16_xor_bytes (&Y, &ctx->X, msg);
       encrypt(cipher, 16, ctx->X.b, Y.b);
       msg += 16;
       msg_len -= 16;
@@ -150,14 +128,14 @@ cmac128_digest(struct cmac128_ctx *ctx, const struct cmac128_key *key,
       ctx->block.b[ctx->index] = 0x80;
       memset(ctx->block.b + ctx->index + 1, 0, 16 - 1 - ctx->index);
 
-      memxor(ctx->block.b, key->K2.b, 16);
+      block16_xor (&ctx->block, &key->K2);
     }
   else
     {
-      memxor(ctx->block.b, key->K1.b, 16);
+      block16_xor (&ctx->block, &key->K1);
     }
 
-  memxor3(Y.b, ctx->block.b, ctx->X.b, 16);
+  block16_xor3 (&Y, &ctx->block, &ctx->X);
 
   assert(length <= 16);
   if (length == 16)

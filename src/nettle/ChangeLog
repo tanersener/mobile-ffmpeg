@@ -1,3 +1,776 @@
+2020-04-29  Niels Möller  <nisse@lysator.liu.se>
+
+	* Released Nettle-3.6.
+
+2020-04-27  Niels Möller  <nisse@lysator.liu.se>
+
+	* configure.ac: Tweak gcc command line options. Delete checks for
+	older gcc versions. Add -Wno-sign-compare, since warnings for
+	signed/unsigned comparisons adds a lot of noise, in particular
+	when building mini-gmp.
+
+	* mini-gmp.c: Updated mini-gmp from the gmp repository, latest
+	change from 2020-04-20.
+	* mini-gmp.h: Likewise.
+
+2020-04-25  Niels Möller  <nisse@lysator.liu.se>
+
+	* gmp-glue.c (mpz_limbs_read, mpz_limbs_write, mpz_limbs_modify)
+	(mpz_limbs_finish, mpz_roinit_n): Delete compatibility
+	definitions. These functions available in GMP since version 6.0.0.
+	* gmp-glue.h: Delete corresponding declarations, and preprocessor
+	conditions.
+
+	* configure.ac: Update required version of GMP to 6.1.0, needed
+	for mpn_zero_p.
+	* ecc-ecdsa-verify.c (zero_p): Deleted static function, usage
+	replaced with mpn_zero_p.
+	* testsuite/testutils.c (mpn_zero_p): Delete conditional
+	definition.
+	* testsuite/testutils.h: Delete corresponding declarations.
+
+	* Makefile.in (DISTFILES): Add poly1305-internal.h.
+	* testsuite/Makefile.in (DISTFILES): Delete setup-env.
+
+2020-04-23  Niels Möller  <nisse@lysator.liu.se>
+
+	* run-tests: Set WINEPATH, since it appears wine doesn't search
+	for dlls in the unix PATH.
+	* examples/setup-env: Delete creation of extra dll symlinks.
+	* examples/teardown-env: Delete corresponding cleanup.
+	* testsuite/setup-env: Deleted file (same symlink creation).
+	* testsuite/teardown-env: Delete corresponding cleanup.
+
+	* testsuite/ecc-add-test.c (test_main): Delete ASSERTs with
+	functions pointer comparisons. They provide little value, and fail
+	when linking with hogweed.dll on windows.
+	* testsuite/ecc-dup-test.c (test_main): Likewise.
+
+2020-04-22  Niels Möller  <nisse@lysator.liu.se>
+
+	* testsuite/Makefile.in: Use pattern rules for test executables,
+	replacing...
+	(test-rules): ...deleted rule.
+	* testsuite/.test-rules.make: Deleted file.
+
+2020-04-21  Niels Möller  <nisse@lysator.liu.se>
+
+	From Dmitry Baryshkov:
+	* gostdsa-vko.c (gostdsa_vko): New file and function.
+	* testsuite/gostdsa-vko-test.c (test_vko): New test.
+	* nettle.texinfo (GOSTDSA): Document it.
+
+2020-04-19  Niels Möller  <nisse@lysator.liu.se>
+
+	From Dmitry Baryshkov:
+	* gosthash94.h (struct gosthash94_ctx): Rearrange struct to enable
+	use of MD_UPDATE macro, in particular, replacing byte count with
+	block count and index. Also move buffer last, for consistency with
+	other hash functions.
+	* gosthash94.c (gosthash94_update_int): Use MD_UPDATE macro.
+	(gosthash94_write_digest): Update for block count rather than byte
+	count.
+
+2020-04-17  Niels Möller  <nisse@lysator.liu.se>
+
+	* configure.ac (LIBNETTLE_MAJOR): Increase libnettle version
+	number to 8.0, for move of internal poly1305 functions.
+	(LIBNETTLE_MINOR): Reset to zero.
+
+2020-04-15  Niels Möller  <nisse@lysator.liu.se>
+
+	From Dmitry Baryshkov:
+	* poly1305.h (poly1305_set_key, poly1305_digest, _poly1305_block):
+	Removed declarations from this public header file.
+	* poly1305-internal.h: New file, with declarations of internal
+	poly1305 functions.
+	(_poly1305_set_key, _poly1305_digest): Renamed, with leading
+	underscore. Updated definitions and all uses.
+
+2020-04-12  Niels Möller  <nisse@lysator.liu.se>
+
+	* Makefile.in (DISTFILES): Reorder to ensure that generated des
+	headers can't be older than desdata.stamp.
+
+	* testsuite/ed448-test.c: Define _GNU_SOURCE, for getline with gcc
+	-std=c89.
+
+2020-04-06  Niels Möller  <nisse@lysator.liu.se>
+
+	* configure.ac (LIBHOGWEED_MAJOR): Increase libhogweed version
+	number to 6.0, at request of Gnutls team.
+	(LIBHOGWEED_MINOR): Reset to zero.
+
+2020-04-01  Niels Möller  <nisse@lysator.liu.se>
+
+	* config.guess: Update to 2020-01-01 version, from savannah's
+	config.git.
+	* config.sub: Likewise.
+
+2020-03-31  Niels Möller  <nisse@lysator.liu.se>
+
+	* aclocal.m4 (LSH_TYPE_SOCKLEN_T, LSH_CHECK_KRB_LIB, LSH_LIB_ARGP)
+	(LSH_MAKE_CONDITIONAL): Delete unused macros.
+
+	* config.make.in (abs_top_builddir, TEST_SHLIB_DIR): New variables.
+
+	* run-tests: Check TEST_SHLIB_DIR, and set up LD_LIBRARY_PATH and
+	related member variables.
+
+	* testsuite/Makefile.in (check): Pass only TEST_SHLIB_DIR
+	to the run-tests script, and leave setting of LD_LIBRARY_PATH and
+	related variables to that script.
+	* examples/Makefile.in (check): Likewise.
+
+2020-03-26  Niels Möller  <nisse@lysator.liu.se>
+
+	* configure.ac: Bump package version to 3.6.
+	(LIBNETTLE_MINOR): Bump minor number, now 7.1.
+	(LIBHOGWEED_MINOR): Bump minor numbers, now 5.1
+
+2020-03-14  Niels Möller  <nisse@lysator.liu.se>
+
+	From H.J. Lu:
+	* configure.ac (ASM_X86_ENDBR)
+	(ASM_X86_MARK_CETASM_X86_MARK_CET_ALIGN): New substituted
+	variables.
+	* config.m4.in: Substituted here. Add ASM_X86_MARK_CET to
+	diversion inserted at end of assembly files.
+	* asm.m4 (PROLOGUE): Add ASM_X86_ENDBR at entry point.
+
+2020-03-09  Niels Möller  <nisse@lysator.liu.se>
+
+	From Daiki Ueno:
+	* chacha-crypt.c (chacha_crypt32): New function.
+	* chacha-set-nonce.c (chacha_set_counter, chacha_set_counter32):
+	New functions.
+	* chacha.h (CHACHA_COUNTER_SIZE, CHACHA_COUNTER32_SIZE): New constants.
+	* chacha-poly1305.c (chacha_poly1305_encrypt)
+	(chacha_poly1305_decrypt): Use chacha_crypt32.
+	* testsuite/chacha-test.c: Update tests to use new functions.
+	* nettle.texinfo: Document new chacha functions, and update
+	out-of-date chacha-poly1305 documentation.
+
+2020-03-08  Niels Möller  <nisse@lysator.liu.se>
+
+	From Dmitry Baryshkov:
+	* cmac-des3-meta.c (nettle_cmac_des): New file, moving definition
+	from...
+	* testsuite/cmac-test.c: ... old location.
+	* nettle-meta.h (nettle_cmac_des): Declare it.
+
+2020-02-15  Niels Möller  <nisse@lysator.liu.se>
+
+	From Dmitry Baryshkov:
+	* ecc-internal.h (ecc_modq_add, ecc_modq_mul, ecc_modp_sqr)
+	(ecc_modp_mul, ecc_mod_submul_1, ecc_modp_mul_1, ecc_modp_add)
+	(ecc_modp_sub): Deleted macros. Updated callers to use respective
+	functions instead.
+	(ecc_modp_addmul_1): Delete unused macro.
+
+2020-02-09  Niels Möller  <nisse@lysator.liu.se>
+
+	Addition of struct nettle_mac based on patches by Daiki Ueno.
+	* nettle-meta-macs.c (nettle_get_macs): New file, new function.
+	* testsuite/meta-mac-test.c: New test.
+
+	* nettle-meta.h (_NETTLE_HMAC): New macro.
+	(nettle_hmac_md5, nettle_hmac_ripemd160, nettle_hmac_sha1)
+	(nettle_hmac_sha224, nettle_hmac_sha256, nettle_hmac_sha384)
+	(nettle_hmac_sha512): Declare.
+	(struct nettle_mac): New public struct,
+	* testsuite/testutils.h: ...moved from this file.
+
+	* hmac-md5-meta.c: New file.
+	* hmac-ripemd160-meta.c: Likewise.
+	* hmac-sha1-meta.c: Likewise.
+	* hmac-sha224-meta.c: Likewise.
+	* hmac-sha256-meta.c: Likewise.
+	* hmac-sha384-meta.c: Likewise.
+	* hmac-sha512-meta.c: Likewise.
+
+	* Makefile.in (nettle_SOURCES): Add new files.
+
+	* testsuite/testutils.h (_NETTLE_HMAC): Delete unused version of
+	this macro.
+	* testsuite/testutils.c (test_mac): Allow testing with smaller
+	digest size.
+	* testsuite/hmac-test.c (test_main): Use test_mac for tests using
+	key size == digest size.
+
+	* testsuite/cmac-test.c (nettle_cmac_aes128, nettle_cmac_aes256):
+	Moved to...
+	* cmac-aes128-meta.c: New file.
+	* cmac-aes256-meta.c: New file.
+
+	* nettle-meta.h (struct nettle_mac): New public struct,
+	* testsuite/testutils.h: ...moved from this file.
+
+2020-02-06  Niels Möller  <nisse@lysator.liu.se>
+
+	From Dmitry Baryshkov:
+	* gost28147.h: Deleted, move declarations to gost28147-internal.h.
+
+2020-02-05  Niels Möller  <nisse@lysator.liu.se>
+
+	* configure.ac: On Solaris, link shared libraries with --shared
+	rather than -G. For gcc, --shared is the proper way. For Solaris'
+	proprietary cc, according to docs, it accepts --shared as an alias
+	for -G since Oracle Solaris Studio 12.4, and it was made more gcc
+	compatible in later versions. Since 12.4 was released in 2014,
+	don't attempt to cater for older versions.
+
+2020-01-26  Niels Möller  <nisse@lysator.liu.se>
+
+	* ecc-internal.h (struct ecc_curve): Delete g, the curve
+	generator, since it was used only by tests. Update all curve
+	instances.
+
+	* eccdata.c (output_curve): Delete output of ecc_g.
+	(output_point): Delete name argument, and update callers.
+
+	* testsuite/testutils.c (ecc_ref): Table of reference points moved
+	out of test_ecc_mul_a. Add generator to the list of points.
+	(test_ecc_mul_a): Use ecc_ref table also for the n == 1 case.
+	(test_ecc_ga, test_ecc_get_g, test_ecc_get_ga): New functions,
+	using the tabulated generator.
+
+	* testsuite/ecc-add-test.c: Use test_ecc_get_g, instead of
+	accessing ecc->g.
+	* testsuite/ecc-dup-test.c: Likewise.
+	* testsuite/ecc-mul-a-test.c: Use test_ecc_get_ga and test_ecc_ga.
+	Delete special case for n == 1.
+	* testsuite/ecc-mul-g-test.c: Use test_ecc_ga.
+
+	Support for GOST DSA, contributed by Dmitry Baryshkov.
+	* gostdsa-verify.c (gostdsa_verify): New file and function.
+	* gostdsa-sign.c (gostdsa_sign): New file and function.
+	* ecc-gostdsa-verify.c (ecdsa_in_range, ecc_gostdsa_verify_itch)
+	(ecc_gostdsa_verify): New file and functions.
+	* ecc-gostdsa-sign.c (ecc_gostdsa_sign_itch, ecc_gostdsa_sign):
+	New file and functions.
+	* ecc-internal.h (ECC_GOSTDSA_SIGN_ITCH): New macro.
+	* ecc-hash.c (gost_hash): New function.
+	* testsuite/gostdsa-verify-test.c: New test.
+	* testsuite/gostdsa-sign-test.c: New test.
+	* testsuite/gostdsa-keygen-test.c: New test.
+	* testsuite/Makefile.in (TS_HOGWEED_SOURCES): Add new tests.
+
+	Support for GOST gc256b and gc512a curves, contributed by Dmitry
+	Baryshkov.
+	* eccdata.c (ecc_curve_init): Add parameters for gost_gc256b and
+	gost_gc512a.
+	* ecc-gost-gc256b.c: New file, define _nettle_gost_gc256b.
+	* ecc-gost-gc512a.c: New file, define _nettle_gost_gc512a.
+	* Makefile.in: Add rules to generate ecc-gost-gc256b.h and
+	ecc-gost-gc512a.h.
+	(hogweed_SOURCES): Add ecc-gost-gc256b.c ecc-gost-gc512a.c.
+	* examples/ecc-benchmark.c (curves): Add to list.
+	* testsuite/testutils.c (ecc_curves): Add to list.
+	(test_ecc_mul_a): Reference points for new curves.
+
+	* NEWS: Started on entries for Nettle-3.6.
+
+2020-01-25  Niels Möller  <nisse@lysator.liu.se>
+
+	* examples/hogweed-benchmark.c (bench_curve_init): Pass correct
+	sizes to knuth_lfib_random. Patch contributed by Dmitry Baryshkov.
+
+2020-01-15  Niels Möller  <nisse@lysator.liu.se>
+
+	* Makefile.in: Replace suffix rules by pattern rules. Move .asm
+	rule above .c rule, since now the order of rules in the Makefile
+	matters, rather than the order in the .SUFFIXES list.
+	(aesdata, desdata, twofishdata, shadata, gcmdata, eccparams):
+	Individual rules replaced by a pattern rule.
+	(eccdata): Add explicit dependencies, to complement the pattern
+	rule.
+	* examples/Makefile.in: Replace suffix rules by pattern rules.
+	* testsuite/Makefile.in: Likewise.
+	* tools/Makefile.in: Likewise.
+
+	* config.make.in: Empty .SUFFIXES, to not accidentally use any
+	suffix rules.
+
+	* aclocal.m4 (DEP_INCLUDE): Delete substituted variable.
+
+	* Makefile.in: Use the GNU make directive -include to include
+	dependency .d files. Delete dependency files on make clean.
+	* examples/Makefile.in: Likewise.
+	* testsuite/Makefile.in: Likewise. Also use $(OBJEXT) properly.
+	* tools/Makefile.in: Likewise.
+
+	* configure.ac (dummy-dep-files): Delete these config commands.
+
+2020-01-10  Niels Möller  <nisse@lysator.liu.se>
+
+	From Dmitry Eremin-Solenikov: Consistently rename ecc files and
+	internal functions to include curve name rather than just number
+	of bits. E.g.,
+	* ecc-256.c (nettle_ecc_256_redc): File and function renamed to...
+	* ecc-secp256r1.c (_nettle_ecc_256_redc): ... new names.
+	* eccdata.c (ecc_curve_init, main): Take curve name as input, not
+	bit size.
+
+2020-01-03  Niels Möller  <nisse@lysator.liu.se>
+
+	Add benchmarking of ed25519, ed448 and curve448.
+	* examples/hogweed-benchmark.c: (struct eddsa_ctx): New struct.
+	(bench_eddsa_init, bench_eddsa_sign, bench_eddsa_verify)
+	(bench_eddsa_clear): New functions.
+	(struct curve_ctx): New struct, generalizing struct curve25519_ctx.
+	(bench_curve_init, bench_curve_mul_g, bench_curve_mul)
+	(bench_curve_clear): New functions.
+	(struct curve25519_ctx, bench_curve25519_mul_g)
+	(bench_curve25519_mul, bench_curve25519): Deleted.
+	(alg_list): Add eddsa and curve entries.
+	(main): Delete call to bench_curve25519.
+
+2020-01-02  Niels Möller  <nisse@lysator.liu.se>
+
+	* eddsa-internal.h (nettle_eddsa_dom_func): New typedef.
+	(struct ecc_eddsa): Use function pointer to represent eddsa dom
+	string. To avoid calling sha512_update with empty input for
+	ed25519.
+	* ed448-shake256.c (ed448_dom): New function, calling
+	sha3_256_update with the magic dom prefix.
+	(_nettle_ed448_shake256): Point to it.
+	* ed25519-sha512.c (_nettle_ed25519_sha512): Add do-nothing dom function.
+
+	* eddsa-sign.c (_eddsa_sign): Update to use dom function pointer.
+	* eddsa-verify.c (_eddsa_verify): Likewise.
+
+	* eddsa-internal.h (struct ecc_eddsa): Add magic dom string,
+	needed for ed448.
+	* ed25519-sha512.c (_nettle_ed25519_sha512): Empty dom string.
+	* ed448-shake256.c (_nettle_ed448_shake256): New file and
+	parameter struct.
+
+	* eddsa-hash.c (_eddsa_hash): Add digest_size as input argument.
+	Handle ed448 digests with two extra bytes. Update callers.
+	* eddsa-verify.c (_eddsa_verify): Hash dom string.
+	* eddsa-sign.c (_eddsa_sign_itch): Assert that
+	_eddsa_compress_itch isn't too large.
+	(_eddsa_sign): New argument k1, with the hash prefix. Add hashing
+	of this prefix and the dom string. Update callers. Fix final
+	reduction, it's different for ed25519, with q slightly larger than
+	a power of two, and ed448, with q slightly smaller.
+	* eddsa-pubkey.c (_eddsa_public_key_itch): Assert that
+	_eddsa_compress_itch isn't too large.
+
+	Implementation of ed448-shake256, based on patch by Daiki Ueno.
+	* ed448-shake256-pubkey.c (ed448_shake256_public_key): New file
+	and function.
+	* ed448-shake256-sign.c (ed448_shake256_sign): New file and function.
+	* ed448-shake256-verify.c (ed448_shake256_verify): New file and function.
+
+	* Makefile.in (hogweed_SOURCES): Add new ed448 files.
+
+	* testsuite/eddsa-verify-test.c (test_ed448): New function.
+	(test_main): New ed448 tests.
+	* testsuite/eddsa-sign-test.c (test_ed448_sign): New function.
+	(test_main): New ed448 tests.
+	* testsuite/ed448-test.c: New tests.
+	* testsuite/Makefile.in (TS_HOGWEED_SOURCES): Add ed448-test.c.
+
+	* nettle.texinfo (Curve 25519 and Curve 448): Document ed448.
+
+2020-01-01  Niels Möller  <nisse@lysator.liu.se>
+
+	* ecc-448.c (ecc_mod_pow_2kp1): New function.
+	(ecc_mod_pow_446m224m1): Reduce scratch usage from 6*n to 5*n, at
+	the cost of one copy operation. Also use ecc_mod_pow_2kp1 where
+	applicable.
+	(ECC_448_INV_ITCH): Reduce to 5*ECC_LIMB_SIZE.
+	(ECC_448_SQRT_ITCH): Reduce to 9*ECC_LIMB_SIZE.
+
+	* testsuite/eddsa-compress-test.c: Test also with curve448.
+
+2019-12-30  Niels Möller  <nisse@lysator.liu.se>
+
+	Preparation for ed448, based on patch by Daiki Ueno.
+	* eddsa-internal.h (struct ecc_eddsa): New struct for eddsa
+	parameters.
+	* ed25519-sha512.c (_nettle_ed25519_sha512): New parameter struct.
+	* eddsa-expand.c (_eddsa_expand_key): Replace input
+	struct nettle_hash with struct ecc_eddsa, and generalize for
+	ed448. Update all callers.
+	* eddsa-sign.c (_eddsa_sign): Likewise.
+	* eddsa-verify.c (_eddsa_verify): Likewise.
+	* eddsa-compress.c (_eddsa_compress): Store sign bit in most
+	significant bit of last byte, as specified by RFC 8032.
+	* eddsa-decompress.c (_eddsa_decompress): Corresponding update.
+	Also generalize to support ed448, and make validity checks
+	stricter.
+	* testsuite/eddsa-sign-test.c (test_ed25519_sign): New function.
+	(test_main): Use it.
+	* testsuite/eddsa-verify-test.c (test_ed25519): New function.
+	(test_main): Use it.
+
+2019-12-28  Niels Möller  <nisse@lysator.liu.se>
+
+	* bignum.h: Drop unrelated include of nettle-meta.h.
+	* pss.h: Include nettle-meta.h explicitly.
+	* eddsa-internal.h: Likewise.
+
+2019-12-25  Niels Möller  <nisse@lysator.liu.se>
+
+	Support for SHAKE256, based on patch by Daiki Ueno.
+	* shake256.c (sha3_256_shake): New file and function.
+	* Makefile.in (nettle_SOURCES): Add shake256.c.
+	* testsuite/testutils.c (test_hash): Allow arbitrary digest size,
+	if hash->digest_size == 0.
+	* testsuite/shake.awk: New script to extract test vectors.
+	* testsuite/Makefile.in (TS_NETTLE_SOURCES): Add shake256-test.c.
+	(DISTFILES): Add shake.awk.
+	* nettle.texinfo (Recommended hash functions): Document SHAKE-256.
+
+	* sha3.c (_sha3_pad): Generalized with an argument for the magic
+	suffix defining the sha3 instance.
+	* sha3-internal.h (_sha3_pad_hash): New macro, for SHA3 hashes.
+	Updated all callers of _sha3_pad.
+	(_sha3_pad_shake): New macro, using the SHAKE magic byte 0x1f.
+
+2019-12-19  Niels Möller  <nisse@lysator.liu.se>
+
+	* ecc-mul-a-eh.c (ecc_mul_a_eh) [ECC_MUL_A_EH_WBITS == 0]: Use
+	add_hh rather than add_hhh.
+	(table_init) [[ECC_MUL_A_EH_WBITS > 0]: Likewise.
+	* ecc-internal.h (ECC_MUL_A_EH_ITCH) [ECC_MUL_A_EH_WBITS == 0]:
+	Reduced from 13*n to 12*n.
+
+2019-12-18  Niels Möller  <nisse@lysator.liu.se>
+
+	Rename add and dup functions for Edwards curves.
+	* ecc-dup-th.c (ecc_dup_th): New file, move and rename ecc_dup_eh.
+	* ecc-add-th.c (ecc_add_th): New file, move and rename ecc_add_eh.
+	* ecc-add-thh.c (ecc_add_thh): New file, move and rename
+	ecc_add_ehh.
+	* ecc-dup-eh.c (ecc_dup_eh_untwisted): Rename to just ecc_dup_eh.
+	* ecc-add-eh.c (ecc_add_ehh_untwisted): Rename to just ecc_add_eh.
+	* ecc-add-ehh.c (ecc_add_ehh_untwisted): Rename to just ecc_add_ehh.
+	* ecc-internal.h (ecc_dup_th, ecc_add_th, ecc_add_thh): Declare
+	new functions, delete declarations of ecc_*_untwisted variants.
+	(ECC_DUP_TH_ITCH, ECC_ADD_TH_ITCH, ECC_ADD_THH_ITCH): New macros.
+	* ecc-25519.c (_nettle_curve25519): Update, use ecc_dup_th and
+	friends.
+	* ecc-448.c (_nettle_curve448): Update for rename, without
+	_untwisted suffix.
+	* Makefile.in (hogweed_SOURCES): Added ecc-dup-th.c, ecc-add-th.c,
+	and ecc-add-thh.c
+	* testsuite/ecc-dup-test.c (test_main): Update asserts.
+	* testsuite/ecc-add-test.c (test_main): Likewise.
+
+	* eddsa-verify.c (_eddsa_verify): Use function pointer rather than
+	calling ecc_add_eh directly. Preparation for eddsa over curve448.
+
+2019-12-17  Niels Möller  <nisse@lysator.liu.se>
+
+	* examples/ecc-benchmark.c (bench_dup_hh): Rename, and use
+	ecc->dup pointer.
+	(bench_dup_jj): ... old name.
+	(bench_add_hh): Rename, and use ecc->addd_hh pointer.
+	(bench_add_jja): ... old name.
+	(bench_dup_eh, bench_add_eh): Deleted.
+	(bench_curve): Update, and delete curve25519 special case.
+	(main): Update table headers accordingly.
+
+2019-12-15  Niels Möller  <nisse@lysator.liu.se>
+
+	* ecc-dup-eh.c (ecc_dup_eh): Eliminate one unneeded ecc_modp_add.
+
+2019-12-14  Niels Möller  <nisse@lysator.liu.se>
+
+	* ecc-mul-m.c (ecc_mul_m): New file and function. Implements
+	multipliction for curves in Montgomery representation, as used for
+	curve25519 and curve448. Extracted from curve25519_mul.
+	* ecc-internal.h (ecc_mul_m): Declare.
+	(ECC_MUL_M_ITCH): New macro.
+	* Makefile.in (hogweed_SOURCES): Add ecc-mul-m.c.
+
+	* curve25519-mul.c (curve25519_mul): Use ecc_mul_m.
+	* curve448-mul.c (curve448_mul): Likewise.
+
+2019-12-13  Niels Möller  <nisse@lysator.liu.se>
+
+	* Merge curve448 implementation.
+
+2019-12-09  Niels Möller  <nisse@lysator.liu.se>
+
+	* ecc-internal.h: Revert itch macro changes. We now have
+	h_to_a_itch <= mul_itch, mul_g_itch. Add asserts at a few places
+	relying on this.
+	(ECC_ECDSA_KEYGEN_ITCH, ECC_MAX): Delete macros.
+	(ECC_ECDSA_SIGN_ITCH): Revert previous change.
+
+	* ecc-448.c (ecc_mod_pow_446m224m1): Reduce scratch space from 9*n
+	to 6*n.
+	(ECC_448_INV_ITCH, ECC_448_SQRT_ITCH): Reduce accordingly.
+	* curve448-mul.c (curve448_mul): Reduce allocation from 14*n to 12*n.
+
+2019-12-08  Niels Möller  <nisse@lysator.liu.se>
+
+	* x86_64/ecc-curve448-modp.asm (nettle_ecc_curve448_modp): New
+	assembly function.
+	* ecc-448.c (ecc_448_modp) [HAVE_NATIVE_ecc_curve448_modp]: Use
+	native nettle_ecc_curve448_modp if available.
+	* configure.ac (asm_hogweed_optional_list): Add ecc-curve448-modp.asm.
+	(HAVE_NATIVE_ecc_curve448_modp): New config.h define.
+
+2019-12-03  Niels Möller  <nisse@lysator.liu.se>
+
+	* ecc-448.c (ecc_448_modp) [GMP_NUMB_BITS == 64]: New function.
+
+2019-12-01  Niels Möller  <nisse@lysator.liu.se>
+
+	Curve 448 support contributed by Daiki Ueno.
+	* eccdata.c (enum ecc_type): Add ECC_TYPE_EDWARDS.
+	(ecc_add): Support untwisted edwards curves.
+	(ecc_curve_init): Add curve448 parameters.
+	* ecc-internal.h (ECC_ECDSA_KEYGEN_ITCH): New macro.
+	(ECC_ECDSA_SIGN_ITCH): Increased from 12*size to 13*size.
+	(ECC_MAX): New macro.
+	* ecc-448.c: New file.
+	(ecc_mod_pow_2k, ecc_mod_pow_446m224m1, ecc_448_inv)
+	(ecc_448_zero_p, ecc_448_sqrt): New functions.
+	(_nettle_curve448): New curve definition.
+	* curve448.h (CURVE448_SIZE): New constant.
+	(curve448_mul_g, curve448_mul): Declare new public functions.
+	* ecc-eh-to-a.c (ecc_eh_to_a): Update assert to allow the curve448
+	Edwards curve.
+	* curve448-mul.c (curve448_mul): New file and function.
+	* curve448-mul-g.c (curve448_mul_g): New file and function.
+	* curve448-eh-to-x.c (curve448_eh_to_x): New file and function.
+	* ecc-dup-eh.c (ecc_dup_eh_untwisted): New function.
+	* ecc-add-ehh.c (ecc_add_ehh_untwisted): New function.
+	* ecc-add-eh.c (ecc_add_eh_untwisted): New function.
+	* ecc-point.c (ecc_point_set): Add point validation for curve448.
+	* ecc-point-mul.c (ecc_point_mul): Allow h_to_a_itch larger than
+	mul_itch.
+	* ecc-point-mul-g.c (ecc_point_mul_g): Allow h_to_a_itch
+	larger than mul_g_itch. Switch from TMP_DECL/_ALLOC/_FREE to
+	gmp_alloc_limbs/gmp_free_limbs.
+	* ecdsa-keygen.c (ecdsa_generate_keypair): Use
+	ECC_ECDSA_KEYGEN_ITCH.
+	* Makefile.in (hogweed_SOURCES): Add ecc-448.c, curve448-mul-g.c,
+	curve448-mul.c, and curve448-eh-to-x.c.
+	(HEADERS): Add curve448.h.
+	(ecc-448.h): New generated file.
+
+	* testsuite/testutils.c (ecc_curves): Add _nettle_curve448 to list
+	of tested curves.
+	(test_ecc_mul_a): Add curve448.
+	* testsuite/ecdsa-keygen-test.c (ecc_valid_p): Add curve448 support.
+	* testsuite/ecdh-test.c (test_main): Add tests for (non-standard)
+	curve448 diffie-hellman.
+	* testsuite/ecc-add-test.c (test_main): Update for testing of curve448.
+	* testsuite/ecc-dup-test.c (test_main): Likewise.
+	* testsuite/ecc-mul-a-test.c (test_main): Likewise. Also increase
+	scratch allocation for h_to_a_itch.
+	* testsuite/ecc-mul-g-test.c (test_main): Likewise.
+	* testsuite/curve448-dh-test.c: Test for curve448.
+	* testsuite/Makefile.in (TS_HOGWEED_SOURCES): Add curve448-dh-test.c.
+
+	* examples/ecc-benchmark.c: Add curve448 to list of benchmarked
+	curves.
+
+	* nettle.texinfo (Curve 25519 and Curve 448): Add docs.
+
+2019-12-07  Niels Möller  <nisse@lysator.liu.se>
+
+	* ecc-eh-to-a.c (ecc_eh_to_a): Require op == 0, delete code only
+	used for non-standard ecdsa over curve25519.
+	* testsuite/ecdsa-sign-test.c (test_main): Delete test of ecdsa
+	over curve25519.
+	* testsuite/ecdsa-verify-test.c (test_main): Likewise.
+	* testsuite/ecdsa-keygen-test.c (test_main): Exclude curve25519
+	from test.
+
+2019-12-05  Niels Möller  <nisse@lysator.liu.se>
+
+	* configure.ac: Use AC_TRY_LINK rather than AC_TRY_COMPILE to
+	check for __builtin_bswap64. Since calling an non-existing
+	function typically results in a warning only at compile time, but
+	fails at link time. Patch contributed by by George Koehler.
+
+2019-12-04  Niels Möller  <nisse@lysator.liu.se>
+
+	* testsuite/testutils.c (test_cipher_cfb8): Add cast of size_t to
+	unsigned long for argument to fprintf.
+
+2019-11-21  Niels Möller  <nisse@lysator.liu.se>
+
+	* eccdata.c (ecc_curve_init_str): Delete unused t and d arguments.
+	Related to the the edwards_root member of struct ecc_curve, which
+	was used by ecc_a_to_eh before it was deleted, see 2014-09-17
+	entry below.
+	(ecc_curve_init): Delete corresponding curve25519 constants, and
+	NULL arguments passed for the other curves.
+
+	* Merge curve448 preparations, from September 2017.
+
+2017-09-23  Niels Möller  <nisse@lysator.liu.se>
+
+	* eccdata.c: Reorganize curve25519 precomputation to work directly
+	with the twisted Edwards curve, with new point addition based on a
+	patch from Daiki Ueno.
+	* ecc-25519.c (_nettle_curve25519): Update for removed Montgomery
+	curve constant.
+
+	* ecc-internal.h (struct ecc_curve): Delete unused pointer
+	edwards_root. Update all instances.
+	* eccdata.c (output_curve): Don't output it.
+
+	* testsuite/ecc-add-test.c (test_main): Reduce test duplication.
+	Use ecc->add_hhh_itch.
+	* testsuite/ecc-dup-test.c (test_main): Reduce test duplication.
+	Use ecc->dup_itch.
+
+2017-09-23  Daiki Ueno  <dueno@redhat.com>
+
+	* ecc-eh-to-a.c (ecc_eh_to_a): Use ecc->q.bit_size, instead of
+	hard-coded value for curve25519.
+	* eddsa-sign.c (_eddsa_sign): Likewise.
+
+	* ecc-internal.h (ecc_dup_func): New typedef.
+	(struct ecc_curve): New constants add_hh_itch and dup_itch, new
+	function pointers add_hh and dup.
+	* ecc-192.c, ecc-224.c, ecc-256.c, ecc-384.c, ecc-521.c,
+	ecc-25519.c: Update accordingly.
+	* ecc-mul-g-eh.c (ecc_mul_g_eh): Use new function pointers.
+	* ecc-mul-a-eh.c (ecc_mul_a_eh, table_init, ecc_mul_a_eh):
+	Likewise.
+	* testsuite/ecc-dup-test.c (test_main): Likewise.
+	* testsuite/ecc-add-test.c (test_main): Likewise.
+
+2019-10-01  Niels Möller  <nisse@lysator.liu.se>
+
+	* testsuite/testutils.c (test_cipher_cfb8): Reset destination area
+	between tests. Encrypt/decrypt final partial block.
+
+	From Daiki Ueno, fixing bug reported by Stephan Mueller:
+	* cfb.c (cfb8_decrypt): Don't truncate output IV if input is
+	shorter than block size.
+	* testsuite/testutils.c (test_cipher_cfb8): Test splitting input
+	into multiple calls to cfb8_encrypt and cfb8_decrypt.
+
+2019-09-30  Niels Möller  <nisse@lysator.liu.se>
+
+	* testsuite/siv-test.c (test_cipher_siv): Fix out-of-bounds read.
+	Trim allocation size for de_data, drop some uses of
+	SIV_DIGEST_SIZE, call FAIL for unexpected returned values.
+	(test_compare_results): Delete digest argument.
+
+2019-09-15  Niels Möller  <nisse@lysator.liu.se>
+
+	From Dmitry Eremin-Solenikov:
+	* gost28147.c (_gost28147_encrypt_block): New file, encrypt
+	function and sbox tables moved here.
+	* gosthash94.c: Update functions to take sbox array as argument.
+	(gost_block_compress): Use _gost28147_encrypt_block.
+	(gosthash94cp_update,gosthash94cp_digest): New functions.
+	* gost28147-internal.h: New file.
+	* gost28147.h: New file.
+	* gosthash94-meta.c (nettle_gosthash94cp): New hash algorithm.
+	* nettle-meta-hashes.c (_nettle_hashes): Add nettle_gosthash94 and
+	nettle_gosthash94cp.
+	* hmac-gosthash94.c (hmac_gosthash94_set_key)
+	(hmac_gosthash94_update, hmac_gosthash94_digest)
+	(hmac_gosthash94cp_set_key, hmac_gosthash94cp_update)
+	(hmac_gosthash94cp_digest): New file and functions.
+	* pbkdf2-hmac-gosthash94.c (pbkdf2_hmac_gosthash94cp): New file
+	and function.
+	* testsuite/pbkdf2-test.c (test_main): Add
+	pbkdf2-hmac-gosthash94cp tests.
+	* testsuite/hmac-test.c (test_main): Add hmac-gosthash94 tests.
+	* testsuite/gosthash94-test.c (test_main): Add gosthash94cp tests.
+	* nettle.texinfo (Legacy hash functions): Document gosthash94cp.
+
+	* testsuite/dlopen-test.c (main): Use libnettle.dylib on MacOS.
+
+2019-07-08  Niels Möller  <nisse@lysator.liu.se>
+
+	* nettle-types.h (union nettle_block16): Mark w member as deprecated.
+	* eax.c (block16_xor): Use uint64_t member of nettle_block16.
+	* gcm.c (gcm_gf_add, gcm_gf_shift, gcm_gf_shift_8): Likewise.
+
+2019-07-10  Niels Möller  <nisse@lysator.liu.se>
+
+	From Dmitry Eremin-Solenikov:
+	* cmac64.c (_cmac64_block_mulx, cmac64_set_key, cmac64_init)
+	(cmac64_update, cmac64_digest): New file, new functions.
+	* cmac-des3.c (cmac_des3_set_key, cmac_des3_update)
+	(cmac_des3_digest): New file, new functions.
+	* cmac.h: Add cmac64 and cmac_des3 declarations.
+	* Makefile.in (nettle_SOURCES): Add cmac64.c and cmac-des3.c.
+	* testsuite/cmac-test.c (test_main): Add tests for cmac_des3.
+
+2019-07-02  Niels Möller  <nisse@lysator.liu.se>
+
+	From Dmitry Eremin-Solenikov:
+	* testsuite/testutils.c (test_mac): New function.
+	* testsuite/cmac-test.c (nettle_cmac_aes128, nettle_cmac_aes256):
+	New algorithm structs.
+	(test_cmac_aes128, test_cmac_aes256): Use test_mac.
+
+2019-06-06  Niels Möller  <nisse@lysator.liu.se>
+
+	Update for cmac changes, enabling const for the _message functions.
+	* siv-cmac.c (_siv_s2v): Take a const struct cmac128_key as argument,
+	and use a local struct cmac128_ctx for message-specific state.
+	(siv_cmac_set_key): Take a struct cmac128_key as argument. Updated
+	callers.
+	(siv_cmac_encrypt_message, siv_cmac_decrypt_message): Take a const
+	struct cmac128_key as argument. Updated callers.
+
+	* siv-cmac.h (SIV_CMAC_CTX): Changed to use struct cmac128_key
+	rather than struct cmac128_ctx.
+
+	* siv-cmac-aes256.c (siv_cmac_aes256_encrypt_message)
+	(siv_cmac_aes256_decrypt_message): Likewise.
+	* siv-cmac-aes128.c (siv_cmac_aes128_encrypt_message)
+	(siv_cmac_aes128_decrypt_message): The ctx argument made const.
+
+2019-05-15  Niels Möller  <nisse@lysator.liu.se>
+
+	* siv-cmac.h (SIV_CMAC_AES128_KEY_SIZE, SIV_CMAC_AES256_KEY_SIZE):
+	New constants.
+	* testsuite/siv-test.c: Simplify tests a little.
+
+	* siv-cmac.h (SIV_MIN_NONCE_SIZE): New constant, 1.
+	* siv-cmac.c (_siv_s2v): Require non-empty nonce.
+	* nettle.texinfo (SIV-CMAC): Update documentation.
+
+2019-05-06  Niels Möller  <nisse@lysator.liu.se>
+
+	SIV-CMAC mode, based on patch by Nikos Mavrogiannopoulos:
+	* siv-cmac.h (SIV_BLOCK_SIZE, SIV_DIGEST_SIZE): New constants.
+	(SIV_CMAC_CTX): New macro.
+	(struct siv_cmac_aes128_ctx, struct siv_cmac_aes256_ctx): New
+	context structs.
+	* siv-cmac.c (_siv_s2v, siv_cmac_set_key)
+	(siv_cmac_encrypt_message)
+	(siv_cmac_decrypt_message): New file, new functions.
+	* siv-cmac-aes128.c (siv_cmac_aes128_set_key)
+	(siv_cmac_aes128_encrypt_message)
+	(siv_cmac_aes128_decrypt_message): New file, new functions.
+	* siv-cmac-aes256.c (siv_cmac_aes256_set_key)
+	(siv_cmac_aes256_encrypt_message)
+	(siv_cmac_aes256_decrypt_message): New file, new functions.
+	* Makefile.in (nettle_SOURCES): Add siv-cmac source files.
+	(HEADERS): Add siv-cmac.h.
+	* testsuite/siv-test.c: New file.
+	* testsuite/Makefile.in (TS_NETTLE_SOURCES): Added siv-test.c
+	* nettle.texinfo (SIV-CMAC): Documentation.
+
+2019-04-30  Niels Möller  <nisse@lysator.liu.se>
+
+	Based on a patch contributed by Nikos Mavrogiannopoulos.
+	* cmac.c (_cmac128_block_mulx): Renamed function...
+	(block_mulx): ... from old name.
+	* cmac-internal.h (_cmac128_block_mulx): New file, declare function.
+	* Makefile.in (DISTFILES): Added cmac-internal.h.
+
 2019-06-26  Niels Möller  <nisse@lysator.liu.se>
 
 	* Released nettle-3.5.1.
