@@ -187,9 +187,9 @@ download_gpl_library_source() {
     GPL_LIB_ORIG_DIR="x264-296494a4011f58f32adc54304a2654627558c59a"
     ;;
   x265)
-    GPL_LIB_URL="https://bitbucket.org/multicoreware/x265/downloads/x265_3.3.tar.gz"
-    GPL_LIB_FILE="x265_3.3.tar.gz"
-    GPL_LIB_ORIG_DIR="x265_3.3"
+    GPL_LIB_URL="https://bitbucket.org/multicoreware/x265/downloads/x265_3.4.tar.gz"
+    GPL_LIB_FILE="x265_3.4.tar.gz"
+    GPL_LIB_ORIG_DIR="x265_3.4"
     ;;
   xvidcore)
     GPL_LIB_URL="https://downloads.xvid.com/downloads/xvidcore-1.3.7.tar.gz"
