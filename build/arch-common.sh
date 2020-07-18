@@ -182,9 +182,9 @@ download_gpl_library_source() {
     GPL_LIB_ORIG_DIR="vid.stab-1.1.0"
     ;;
   x264)
-    GPL_LIB_URL="https://code.videolan.org/videolan/x264/-/archive/296494a4011f58f32adc54304a2654627558c59a/x264-296494a4011f58f32adc54304a2654627558c59a.tar.bz2"
-    GPL_LIB_FILE="x264-296494a4011f58f32adc54304a2654627558c59a.tar.bz2"
-    GPL_LIB_ORIG_DIR="x264-296494a4011f58f32adc54304a2654627558c59a"
+    GPL_LIB_URL="https://code.videolan.org/videolan/x264/-/archive/cde9a93319bea766a92e306d69059c76de970190/x264-cde9a93319bea766a92e306d69059c76de970190.tar.bz2"
+    GPL_LIB_FILE="x264-cde9a93319bea766a92e306d69059c76de970190.tar.bz2"
+    GPL_LIB_ORIG_DIR="x264-cde9a93319bea766a92e306d69059c76de970190"
     ;;
   x265)
     GPL_LIB_URL="https://bitbucket.org/multicoreware/x265/downloads/x265_3.4.tar.gz"
