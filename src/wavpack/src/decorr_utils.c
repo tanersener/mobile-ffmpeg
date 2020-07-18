@@ -173,8 +173,8 @@ int read_shaping_info (WavpackStream *wps, WavpackMetadata *wpmd)
     if (wpmd->byte_length == 2) {
         char *byteptr = (char *)wpmd->data;
 
-        wps->dc.shaping_acc [0] = (int32_t) restore_weight (*byteptr++) << 16;
-        wps->dc.shaping_acc [1] = (int32_t) restore_weight (*byteptr++) << 16;
+        wps->dc.shaping_acc [0] = (uint32_t) restore_weight (*byteptr++) << 16;
+        wps->dc.shaping_acc [1] = (uint32_t) restore_weight (*byteptr++) << 16;
         return TRUE;
     }
     else if (wpmd->byte_length >= (wps->wphdr.flags & MONO_DATA ? 4 : 8)) {

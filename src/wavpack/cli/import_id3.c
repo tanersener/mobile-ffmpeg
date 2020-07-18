@@ -187,22 +187,20 @@ static int ImportID3v2_syncsafe (WavpackContext *wpc, unsigned char *tag_data, i
                 }
             }
             else if (frame_body [0] == 1) {
-                unsigned char *fp = frame_body + 1, *fe = frame_body + frame_size - (frame_size & 1);
+                unsigned char *fp = frame_body + 1, *fe = frame_body + frame_size;
                 uint16_t *wide_string = malloc (frame_size);
 
-                while (si < 2 && fp < fe - 2 && fp [0] == 0xFF && fp [1] == 0xFE) {
+                while (si < 2 && fp <= fe - 4 && fp [0] == 0xFF && fp [1] == 0xFE && (fp [2] | fp [3])) {
                     utf8_strings [si] = malloc (frame_size * 2);
                     fp += 2;
 
-                    for (i = 0; fp < fe; ++i, fp += 2)
+                    for (i = 0; fp <= fe - 2; ++i, fp += 2)
                         if (!(wide_string [i] = fp [0] | (fp [1] << 8))) {
                             fp += 2;
                             break;
                         }
 
-                    if (fp == fe)
-                        wide_string [i] = 0;
-
+                    wide_string [i] = 0;
                     WideCharToUTF8 (wide_string, utf8_strings [si++], frame_size * 2);
                 }
 
@@ -243,7 +241,7 @@ static int ImportID3v2_syncsafe (WavpackContext *wpc, unsigned char *tag_data, i
                     items_imported++;
                     if (bytes_used) *bytes_used += (int) (strlen ((char *) utf8_strings [0]) + strlen ((char *) utf8_strings [1]) + 1);
                 }
-                else    // if not TXXX, look up item in the table to find APEv2 item name
+                else if (!txxx_mode && si == 1)    // if not TXXX, look up item in the table to find APEv2 item name
                     for (i = 0; i < NUM_TEXT_TAG_ITEMS; ++i)
                         if (!strncmp ((char *) frame_header, text_tag_table [i].id3_item, 4)) {
                             if (wpc && !WavpackAppendTagItem (wpc, text_tag_table [i].ape_item, (char *) utf8_strings [0], (int) strlen ((char *) utf8_strings [0]))) {

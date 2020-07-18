@@ -62,8 +62,8 @@ typedef int32_t f32;
 #define get_sign(f)         (((f) >> 31) & 0x1)
 
 #define set_mantissa(f,v)   (f) ^= (((f) ^ (v)) & 0x7fffff)
-#define set_exponent(f,v)   (f) ^= (((f) ^ ((v) << 23)) & 0x7f800000)
-#define set_sign(f,v)       (f) ^= (((f) ^ ((v) << 31)) & 0x80000000)
+#define set_exponent(f,v)   (f) ^= (((f) ^ ((uint32_t)(v) << 23)) & 0x7f800000)
+#define set_sign(f,v)       (f) ^= (((f) ^ ((uint32_t)(v) << 31)) & 0x80000000)
 
 #include <stdio.h>
 
@@ -114,41 +114,15 @@ typedef struct {
     unsigned char id;
 } WavpackMetadata;
 
-#define ID_UNIQUE               0x3f
-#define ID_OPTIONAL_DATA        0x20
-#define ID_ODD_SIZE             0x40
-#define ID_LARGE                0x80
 
-#define ID_DUMMY                0x0
-#define ID_ENCODER_INFO         0x1
-#define ID_DECORR_TERMS         0x2
-#define ID_DECORR_WEIGHTS       0x3
-#define ID_DECORR_SAMPLES       0x4
-#define ID_ENTROPY_VARS         0x5
-#define ID_HYBRID_PROFILE       0x6
-#define ID_SHAPING_WEIGHTS      0x7
-#define ID_FLOAT_INFO           0x8
-#define ID_INT32_INFO           0x9
-#define ID_WV_BITSTREAM         0xa
-#define ID_WVC_BITSTREAM        0xb
-#define ID_WVX_BITSTREAM        0xc
-#define ID_CHANNEL_INFO         0xd
-#define ID_DSD_BLOCK            0xe
+///////////////////////// WavPack Configuration ///////////////////////////////
 
-#define ID_RIFF_HEADER          (ID_OPTIONAL_DATA | 0x1)
-#define ID_RIFF_TRAILER         (ID_OPTIONAL_DATA | 0x2)
-#define ID_ALT_HEADER           (ID_OPTIONAL_DATA | 0x3)
-#define ID_ALT_TRAILER          (ID_OPTIONAL_DATA | 0x4)
-#define ID_CONFIG_BLOCK         (ID_OPTIONAL_DATA | 0x5)
-#define ID_MD5_CHECKSUM         (ID_OPTIONAL_DATA | 0x6)
-#define ID_SAMPLE_RATE          (ID_OPTIONAL_DATA | 0x7)
-#define ID_ALT_EXTENSION        (ID_OPTIONAL_DATA | 0x8)
-#define ID_ALT_MD5_CHECKSUM     (ID_OPTIONAL_DATA | 0x9)
-#define ID_NEW_CONFIG_BLOCK     (ID_OPTIONAL_DATA | 0xa)
-#define ID_CHANNEL_IDENTITIES   (ID_OPTIONAL_DATA | 0xb)
-#define ID_BLOCK_CHECKSUM       (ID_OPTIONAL_DATA | 0xf)
+/*
+ * These config flags are not actually used for external configuration, which is
+ * why they're not in the external wavpack.h file, but they are used internally
+ * in the flags field of the WavpackConfig struct.
+ */
 
-#define CONFIG_BYTES_STORED     3       // 1-4 bytes/sample
 #define CONFIG_MONO_FLAG        4       // not stereo
 #define CONFIG_FLOAT_DATA       0x80    // ieee 32-bit floating point data
 
@@ -244,7 +218,8 @@ struct words_data {
 };
 
 typedef struct {
-    int32_t value, filter0, filter1, filter2, filter3, filter4, filter5, filter6, factor, byte;
+    int32_t value, filter0, filter1, filter2, filter3, filter4, filter5, filter6, factor;
+    unsigned int byte;
 } DSDfilters;
 
 typedef struct {
@@ -279,7 +254,7 @@ typedef struct {
     struct {
         unsigned char *byteptr, *endptr, (*probabilities) [256], *lookup_buffer, **value_lookup, mode, ready;
         int history_bins, p0, p1;
-        int16_t (*summed_probabilities) [256];
+        uint16_t (*summed_probabilities) [256];
         uint32_t low, high, value;
         DSDfilters filters [2];
         int32_t *ptable;
@@ -460,7 +435,7 @@ uint32_t bs_close_read (Bitstream *bs);
 #define getbits(value, nbits, bs) do { \
     while ((nbits) > (bs)->bc) { \
         if (++((bs)->ptr) == (bs)->end) (bs)->wrap (bs); \
-        (bs)->sr |= (int32_t)*((bs)->ptr) << (bs)->bc; \
+        (bs)->sr |= (uint32_t)*((bs)->ptr) << (bs)->bc; \
         (bs)->bc += sizeof (*((bs)->ptr)) * 8; \
     } \
     *(value) = (bs)->sr; \
@@ -474,7 +449,7 @@ uint32_t bs_close_read (Bitstream *bs);
     } \
 } while (0)
 
-#define putbit(bit, bs) do { if (bit) (bs)->sr |= (1 << (bs)->bc); \
+#define putbit(bit, bs) do { if (bit) (bs)->sr |= (1U << (bs)->bc); \
     if (++((bs)->bc) == sizeof (*((bs)->ptr)) * 8) { \
         *((bs)->ptr) = (bs)->sr; \
         (bs)->sr = (bs)->bc = 0; \
@@ -488,7 +463,7 @@ uint32_t bs_close_read (Bitstream *bs);
         if (++((bs)->ptr) == (bs)->end) (bs)->wrap (bs); \
     }} while (0)
 
-#define putbit_1(bs) do { (bs)->sr |= (1 << (bs)->bc); \
+#define putbit_1(bs) do { (bs)->sr |= (1U << (bs)->bc); \
     if (++((bs)->bc) == sizeof (*((bs)->ptr)) * 8) { \
         *((bs)->ptr) = (bs)->sr; \
         (bs)->sr = (bs)->bc = 0; \
@@ -496,7 +471,7 @@ uint32_t bs_close_read (Bitstream *bs);
     }} while (0)
 
 #define putbits(value, nbits, bs) do { \
-    (bs)->sr |= (int32_t)(value) << (bs)->bc; \
+    (bs)->sr |= (uint32_t)(value) << (bs)->bc; \
     if (((bs)->bc += (nbits)) >= sizeof (*((bs)->ptr)) * 8) \
         do { \
             *((bs)->ptr) = (bs)->sr; \
@@ -588,7 +563,7 @@ uint32_t LOG2BUFFER (int32_t *samples, uint32_t num_samples, int limit);
 signed char store_weight (int weight);
 int restore_weight (signed char weight);
 
-#define WORD_EOF ((int32_t)(1L << 31))
+#define WORD_EOF ((int32_t)(1U << 31))
 
 void WavpackFloatNormalize (int32_t *values, int32_t num_values, int delta_exp);
 

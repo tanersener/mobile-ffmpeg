@@ -402,9 +402,9 @@ static int init_wvx_bitstream (WavpackStream *wps, WavpackMetadata *wpmd)
         return FALSE;
 
     wps->crc_wvx = *cp++;
-    wps->crc_wvx |= (int32_t) *cp++ << 8;
-    wps->crc_wvx |= (int32_t) *cp++ << 16;
-    wps->crc_wvx |= (int32_t) *cp++ << 24;
+    wps->crc_wvx |= (uint32_t) *cp++ << 8;
+    wps->crc_wvx |= (uint32_t) *cp++ << 16;
+    wps->crc_wvx |= (uint32_t) *cp++ << 24;
 
     bs_open_read (&wps->wvxbits, cp, (unsigned char *) wpmd->data + wpmd->byte_length);
     return TRUE;
@@ -507,6 +507,16 @@ static int read_channel_info (WavpackContext *wpc, WavpackMetadata *wpmd)
 
 static int read_channel_identities (WavpackContext *wpc, WavpackMetadata *wpmd)
 {
+    unsigned char *idents = wpmd->data;
+    int i;
+
+    if (!wpmd->data || !wpmd->byte_length)
+        return FALSE;
+
+    for (i = 0; i < wpmd->byte_length; ++i)
+        if (!idents [i])
+            return FALSE;
+
     if (!wpc->channel_identities) {
         wpc->channel_identities = (unsigned char *)malloc (wpmd->byte_length + 1);
         memcpy (wpc->channel_identities, wpmd->data, wpmd->byte_length);
@@ -525,9 +535,9 @@ static int read_config_info (WavpackContext *wpc, WavpackMetadata *wpmd)
 
     if (bytecnt >= 3) {
         wpc->config.flags &= 0xff;
-        wpc->config.flags |= (int32_t) *byteptr++ << 8;
-        wpc->config.flags |= (int32_t) *byteptr++ << 16;
-        wpc->config.flags |= (int32_t) *byteptr++ << 24;
+        wpc->config.flags |= (uint32_t) *byteptr++ << 8;
+        wpc->config.flags |= (uint32_t) *byteptr++ << 16;
+        wpc->config.flags |= (uint32_t) *byteptr++ << 24;
         bytecnt -= 3;
 
         if (bytecnt && (wpc->config.flags & CONFIG_EXTRA_MODE)) {
@@ -575,7 +585,7 @@ static int read_new_config_info (WavpackContext *wpc, WavpackMetadata *wpmd)
         if (bytecnt) {
             int nchans, i;
 
-            wpc->channel_layout = (int32_t) *byteptr++ << 16;
+            wpc->channel_layout = (uint32_t) *byteptr++ << 16;
             bytecnt--;
 
             // another byte means we have a channel count for the layout and maybe a reordering
@@ -954,7 +964,7 @@ static int match_wvc_header (WavpackHeader *wv_hdr, WavpackHeader *wvc_hdr)
             return (wvci - wvi < 0) ? 1 : -1;
         }
 
-    if (((GET_BLOCK_INDEX (*wvc_hdr) - GET_BLOCK_INDEX (*wv_hdr)) << 24) < 0)
+    if ((GET_BLOCK_INDEX (*wvc_hdr) - GET_BLOCK_INDEX (*wv_hdr)) & 0x8000000000LL)
         return 1;
     else
         return -1;

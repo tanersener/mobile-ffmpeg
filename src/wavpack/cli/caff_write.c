@@ -152,7 +152,7 @@ int WriteCaffHeader (FILE *outfile, WavpackContext *wpc, int64_t total_samples, 
     // 3. there are 1 or 2 channels and NOT regular mono/stereo
 
     if (channel_layout_tag || (num_channels > 2 ? num_identified_chans : channel_mask != 5 - num_channels)) {
-        int bits = 0, bmask;
+        unsigned int bits = 0, bmask;
 
         for (bmask = 1; bmask; bmask <<= 1)     // count the set bits in the channel mask
             if (bmask & channel_mask)

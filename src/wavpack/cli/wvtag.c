@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////
 //                           **** WAVPACK ****                            //
 //                  Hybrid Lossless Wavefile Compressor                   //
-//                Copyright (c) 1998 - 2019 David Bryant.                 //
+//                Copyright (c) 1998 - 2020 David Bryant.                 //
 //                          All Rights Reserved.                          //
 //      Distributed under the BSD Software License (see license.txt)      //
 ////////////////////////////////////////////////////////////////////////////
@@ -56,6 +56,7 @@
 #define strdup(x) _strdup(x)
 #define stricmp(x,y) _stricmp(x,y)
 #define strdup(x) _strdup(x)
+#define snprintf _snprintf
 #else
 #define stricmp strcasecmp
 #endif
@@ -64,7 +65,7 @@
 
 static const char *sign_on = "\n"
 " WVTAG  WavPack Metadata Tagging Utility  %s Version %s\n"
-" Copyright (c) 2018 - 2019 David Bryant.  All Rights Reserved.\n\n";
+" Copyright (c) 2018 - 2020 David Bryant.  All Rights Reserved.\n\n";
 
 static const char *version_warning = "\n"
 " WARNING: WVTAG using libwavpack version %s, expected %s (see README)\n\n";
@@ -1160,18 +1161,20 @@ static void list_tags_to_file (WavpackContext *wpc, char *name, FILE *dst)
 // The "fname" parameter can optionally be set to a character array that will accept the suggested
 // filename. This is formed by the tag item name with the extension ".txt" for text fields; for
 // binary fields this is supplied by convention as a NULL terminated string at the beginning of the
-// data, so this is returned. The string should have 256 characters available.
+// data, so this is returned. The string should have 256 bytes available (for 255 chars + NULL).
 
 static int dump_tag_item_to_file (WavpackContext *wpc, const char *tag_item, FILE *dst, char *fname)
 {
+    const char *sanitized_tag_item = filespec_name ((char *) tag_item) ? filespec_name ((char *) tag_item) : tag_item;
+
     if (WavpackGetMode (wpc) & MODE_VALID_TAG) {
         if (WavpackGetTagItem (wpc, tag_item, NULL, 0)) {
             int value_len = WavpackGetTagItem (wpc, tag_item, NULL, 0);
             char *value;
 
             if (fname) {
-                strcpy (fname, tag_item);
-                strcat (fname, ".txt");
+                snprintf (fname, 256, "%s.txt", sanitized_tag_item);
+                fname [255] = 0;
             }
 
             if (!value_len || !dst)
@@ -1211,11 +1214,13 @@ static int dump_tag_item_to_file (WavpackContext *wpc, const char *tag_item, FIL
                     }
 
                     if (fname) {
-                        if (i < 256)
-                            strcpy (fname, value);
+                        char *sanitized_tag_value = filespec_name (value) ? filespec_name (value) : value;
+
+                        if (strlen (sanitized_tag_value) < 256)
+                            strcpy (fname, sanitized_tag_value);
                         else {
-                            strcpy (fname, tag_item);
-                            strcat (fname, ".bin");
+                            snprintf (fname, 256, "%s.bin", sanitized_tag_item);
+                            fname [255] = 0;
                         }
                     }
 

@@ -1,3 +1,76 @@
+2020-04-14  David Bryant  <david@wavpack.com>
+
+  * cli/wvunpack.c, cli/wvtag.c:
+    use _snprintf() on Windows and make sure output is NULL terminated
+
+2020-04-13  David Bryant  <david@wavpack.com>
+
+  * cli/wavpack.c, cli/wvunpack.c, cli/wvgain.c, cli/wvtag.c, cli/wvtest.c:
+    reformat wvunpack "help" and split into long and short versions
+    minor "help" edits for other programs and bump copyright dates
+
+2020-04-12  David Bryant  <david@wavpack.com>
+
+  * include/wavpack.h, src/wavpack_local.h:
+    clean up some duplication in the header files
+
+2020-04-11  David Bryant  <david@wavpack.com>
+
+  * cli/caff_write.c:
+    avoid left-shifting negative value (undefined behavior)
+
+2020-04-08  David Bryant  <david@wavpack.com>
+
+  * cli/wavpack.c:
+    issue #81: avoid left-shifting negative values (undefined behavior)
+
+2020-03-31  David Bryant  <david@wavpack.com>
+
+  * cli/wvunpack.c, cli/wvtag.c:
+    sanitize tag extraction names for length and path inclusion
+
+2020-01-31  David Bryant  <david@wavpack.com>
+
+  * src/unpack_dsd.c, src/wavpack_local.h:
+    OSS-Fuzz issue 20448: fix regression from a recent undefined-behavior fix
+
+2020-01-27  David Bryant  <david@wavpack.com>
+
+  * cli/import_id3.c:
+    fix trailing garbage characters on imported ID3v2 TXXX tags
+
+2020-01-22  David Bryant  <david@wavpack.com>
+
+  * src/common_utils.c:
+    fix for fuzz-triggered divide by zero (bad sample rate)
+
+2020-01-20  David Bryant  <david@wavpack.com>
+
+  * cli/wvtest.c, src/common_utils.c, src/decorr_utils.c, src/entropy_utils.c, src/open_utils.c,
+    src/pack.c, src/pack_dsd.c, src/pack_utils.c, src/tag_utils.c, src/unpack.c, src/unpack_dsd.c,
+    src/unpack_floats.c, src/wavpack_local.h:
+    undefined behavior fixes, mostly left-shifting negative values or shifting >= target width
+
+2020-01-13  David Bryant  <david@wavpack.com>
+
+  * src/tag_utils.c:
+    OSS-Fuzz issue 20060: fix for uninitialized memory access
+
+2020-01-09  David Bryant  <david@wavpack.com>
+
+  * src/tags.c:
+    fix bad malloc() triggered by corrupt APEv2 tag (fuzz testing)
+
+2020-01-09  David Bryant  <david@wavpack.com>
+
+  * src/unpack_seek.c, src/unpack_utils.c:
+    several fixes for uninitialized memory access
+
+2019-12-21  David Bryant  <david@wavpack.com>
+
+  * src/unpack.c:
+    fix for uninitialized memory access (unexpected EOF from get_word())
+
 2019-12-14  David Bryant  <david@wavpack.com>
 
   * cli/wvunpack.c

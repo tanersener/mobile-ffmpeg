@@ -1,3 +1,22 @@
+                      ------------------------------
+                      Release 5.3.0 - April 14, 2020
+                      ------------------------------
+
+ WavPack Library Source Code - 5.3.0
+ wavpack.exe (command-line encoder) - 5.3.0
+ wvunpack.exe (command-line decoder) - 5.3.0
+ wvgain.exe (command-line ReplayGain scanner) - 5.3.0
+ wvtag.exe (command-line tagging utility) - 5.3.0
+ ----------------------------------------------------
+  fixed: OSS-Fuzz issues 19925, 19928, 20060, 20448
+          (no CVEs or vulnerabilities)
+  fixed: trailing garbage characters on imported ID3v2 TXXX tags
+  fixed: various minor undefined behavior and memory access issues
+  fixed: sanitize tag extraction names for length and path inclusion
+  improved: reformat wvunpack "help" and split into long + short versions
+  added: regression testing to Travis CI for OSS-Fuzz crashers
+
+
                      ---------------------------------
                      Release 5.2.0 - December 15, 2019
                      ---------------------------------

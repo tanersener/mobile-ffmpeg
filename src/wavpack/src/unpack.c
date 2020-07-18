@@ -119,6 +119,9 @@ int32_t unpack_samples (WavpackContext *wpc, int32_t *buffer, uint32_t sample_co
         else
             i = get_words_lossless (wps, buffer, sample_count);
 
+        if (i != sample_count)
+            goto get_word_eof;
+
 #ifdef DECORR_MONO_PASS_CONT
         if (sample_count < 16)
             for (tcount = wps->num_terms, dpp = wps->decorr_passes; tcount--; dpp++)
@@ -173,6 +176,9 @@ int32_t unpack_samples (WavpackContext *wpc, int32_t *buffer, uint32_t sample_co
         else
             i = get_words_lossless (wps, buffer, sample_count);
 
+        if (i != sample_count)
+            goto get_word_eof;
+
 #ifdef DECORR_STEREO_PASS_CONT
         if (sample_count < 16 || !DECORR_STEREO_PASS_CONT_AVAILABLE) {
             for (tcount = wps->num_terms, dpp = wps->decorr_passes; tcount--; dpp++)
@@ -199,11 +205,11 @@ int32_t unpack_samples (WavpackContext *wpc, int32_t *buffer, uint32_t sample_co
         if (flags & JOINT_STEREO)
             for (bptr = buffer; bptr < eptr; bptr += 2) {
                 bptr [0] += (bptr [1] -= (bptr [0] >> 1));
-                crc += (crc << 3) + (bptr [0] << 1) + bptr [0] + bptr [1];
+                crc += (crc << 3) + ((uint32_t) bptr [0] << 1) + bptr [0] + bptr [1];
             }
         else
             for (bptr = buffer; bptr < eptr; bptr += 2)
-                crc += (crc << 3) + (bptr [0] << 1) + bptr [0] + bptr [1];
+                crc += (crc << 3) + ((uint32_t) bptr [0] << 1) + bptr [0] + bptr [1];
 
 #ifndef LOSSY_MUTE
         if (!(flags & HYBRID_FLAG))
@@ -442,13 +448,14 @@ int32_t unpack_samples (WavpackContext *wpc, int32_t *buffer, uint32_t sample_co
             if (labs (left) > mute_limit || labs (right) > mute_limit)
                 break;
 
-            crc += (crc << 3) + (left << 1) + left + right;
+            crc += (crc << 3) + ((uint32_t) left << 1) + left + right;
             *bptr++ = left;
             *bptr++ = right;
         }
     else
         i = 0;  /* this line can't execute, but suppresses compiler warning */
 
+get_word_eof:
     if (i != sample_count) {
         memset (buffer, 0, sample_count * (flags & MONO_FLAG ? 4 : 8));
         wps->mute_error = TRUE;
@@ -691,9 +698,9 @@ static void fixup_samples (WavpackContext *wpc, int32_t *buffer, uint32_t sample
 
     if (flags & INT32_DATA) {
         uint32_t count = (flags & MONO_DATA) ? sample_count : sample_count * 2;
-        int sent_bits = wps->int32_sent_bits, zeros = wps->int32_zeros;
-        int ones = wps->int32_ones, dups = wps->int32_dups;
-        uint32_t data, mask = (1 << sent_bits) - 1;
+        int sent_bits = wps->int32_sent_bits & 0x1f, zeros = wps->int32_zeros & 0x1f;
+        int ones = wps->int32_ones & 0x1f, dups = wps->int32_dups & 0x1f;
+        uint32_t data, mask = (1U << sent_bits) - 1;
         int32_t *dptr = buffer;
 
         if (bs_is_open (&wps->wvxbits)) {
@@ -702,15 +709,15 @@ static void fixup_samples (WavpackContext *wpc, int32_t *buffer, uint32_t sample
             while (count--) {
 //              if (sent_bits) {
                     getbits (&data, sent_bits, &wps->wvxbits);
-                    *dptr = (*dptr << sent_bits) | (data & mask);
+                    *dptr = ((uint32_t) *dptr << sent_bits) | (data & mask);
 //              }
 
                 if (zeros)
-                    *dptr <<= zeros;
+                    *(uint32_t*)dptr <<= zeros;
                 else if (ones)
-                    *dptr = ((*dptr + 1) << ones) - 1;
+                    *dptr = ((uint32_t)(*dptr + 1) << ones) - 1;
                 else if (dups)
-                    *dptr = ((*dptr + (*dptr & 1)) << dups) - (*dptr & 1);
+                    *dptr = ((uint32_t)(*dptr + (*dptr & 1)) << dups) - (*dptr & 1);
 
                 crc = crc * 9 + (*dptr & 0xffff) * 3 + ((*dptr >> 16) & 0xffff);
                 dptr++;
@@ -734,11 +741,11 @@ static void fixup_samples (WavpackContext *wpc, int32_t *buffer, uint32_t sample
 
             while (count--) {
                 if (zeros)
-                    *dptr <<= zeros;
+                    *(uint32_t*)dptr <<= zeros;
                 else if (ones)
-                    *dptr = ((*dptr + 1) << ones) - 1;
+                    *dptr = ((uint32_t)(*dptr + 1) << ones) - 1;
                 else if (dups)
-                    *dptr = ((*dptr + (*dptr & 1)) << dups) - (*dptr & 1);
+                    *dptr = ((uint32_t)(*dptr + (*dptr & 1)) << dups) - (*dptr & 1);
 
                 dptr++;
             }
@@ -747,27 +754,29 @@ static void fixup_samples (WavpackContext *wpc, int32_t *buffer, uint32_t sample
             shift += zeros + sent_bits + ones + dups;
     }
 
+    shift &= 0x1f;
+
     if (lossy_flag) {
         int32_t min_value, max_value, min_shifted, max_shifted;
 
         switch (flags & BYTES_STORED) {
             case 0:
-                min_shifted = (min_value = -128 >> shift) << shift;
+                min_shifted = (uint32_t)(min_value = -128 >> shift) << shift;
                 max_shifted = (max_value = 127 >> shift) << shift;
                 break;
 
             case 1:
-                min_shifted = (min_value = -32768 >> shift) << shift;
+                min_shifted = (uint32_t)(min_value = -32768 >> shift) << shift;
                 max_shifted = (max_value = 32767 >> shift) << shift;
                 break;
 
             case 2:
-                min_shifted = (min_value = -8388608 >> shift) << shift;
+                min_shifted = (uint32_t)(min_value = -8388608 >> shift) << shift;
                 max_shifted = (max_value = 8388607 >> shift) << shift;
                 break;
 
             case 3: default:    /* "default" suppresses compiler warning */
-                min_shifted = (min_value = (int32_t) 0x80000000 >> shift) << shift;
+                min_shifted = (uint32_t)(min_value = (int32_t) 0x80000000 >> shift) << shift;
                 max_shifted = (max_value = (int32_t) 0x7fffffff >> shift) << shift;
                 break;
         }
@@ -781,7 +790,7 @@ static void fixup_samples (WavpackContext *wpc, int32_t *buffer, uint32_t sample
             else if (*buffer > max_value)
                 *buffer++ = max_shifted;
             else
-                *buffer++ <<= shift;
+                *(uint32_t*)buffer++ <<= shift;
         }
     }
     else if (shift) {
@@ -789,7 +798,7 @@ static void fixup_samples (WavpackContext *wpc, int32_t *buffer, uint32_t sample
             sample_count *= 2;
 
         while (sample_count--)
-            *buffer++ <<= shift;
+            *(uint32_t*)buffer++ <<= shift;
     }
 }
 

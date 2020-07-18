@@ -237,7 +237,7 @@ int WavpackSeekSample64 (WavpackContext *wpc, int64_t sample)
         decimate_dsd_reset (wpc->decimation_context);
 
     if (samples_to_decode) {
-        buffer = (int32_t *)malloc (samples_to_decode * wpc->config.num_channels * 4);
+        buffer = (int32_t *)calloc (1, samples_to_decode * wpc->config.num_channels * 4);
 
         if (buffer) {
             WavpackUnpackSamples (wpc, buffer, samples_to_decode);

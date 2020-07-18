@@ -36,7 +36,11 @@ int init_dsd_block (WavpackContext *wpc, WavpackMetadata *wpmd)
 
     wps->dsd.byteptr = (unsigned char *)wpmd->data;
     wps->dsd.endptr = wps->dsd.byteptr + wpmd->byte_length;
-    wpc->dsd_multiplier = 1 << *wps->dsd.byteptr++;
+
+    if (*wps->dsd.byteptr > 31)
+        return FALSE;
+
+    wpc->dsd_multiplier = 1U << *wps->dsd.byteptr++;
     wps->dsd.mode = *wps->dsd.byteptr++;
 
     if (!wps->dsd.mode) {
@@ -144,7 +148,7 @@ static int init_dsd_block_fast (WavpackStream *wps, WavpackMetadata *wpmd)
     lb_ptr = wps->dsd.lookup_buffer = (unsigned char *)malloc (wps->dsd.history_bins * MAX_BYTES_PER_BIN);
     wps->dsd.value_lookup = (unsigned char **)malloc (sizeof (*wps->dsd.value_lookup) * wps->dsd.history_bins);
     memset (wps->dsd.value_lookup, 0, sizeof (*wps->dsd.value_lookup) * wps->dsd.history_bins);
-    wps->dsd.summed_probabilities = (int16_t (*)[256])malloc (sizeof (*wps->dsd.summed_probabilities) * wps->dsd.history_bins);
+    wps->dsd.summed_probabilities = (uint16_t (*)[256])malloc (sizeof (*wps->dsd.summed_probabilities) * wps->dsd.history_bins);
     wps->dsd.probabilities = (unsigned char (*)[256])malloc (sizeof (*wps->dsd.probabilities) * wps->dsd.history_bins);
 
     max_probability = *wps->dsd.byteptr++;
@@ -220,7 +224,7 @@ static int decode_fast (WavpackStream *wps, int32_t *output, int sample_count)
         total_samples *= 2;
 
     while (total_samples--) {
-        int mult, index, code, i;
+        unsigned int mult, index, code, i;
 
         if (!wps->dsd.summed_probabilities [wps->dsd.p0] [255])
             return 0;
@@ -334,7 +338,7 @@ static int init_dsd_block_high (WavpackStream *wps, WavpackMetadata *wpmd)
         sp->filter6 = 0;
         sp->factor = *wps->dsd.byteptr++ & 0xff;
         sp->factor |= (*wps->dsd.byteptr++ << 8) & 0xff00;
-        sp->factor = (sp->factor << 16) >> 16;
+        sp->factor = (int32_t)((uint32_t)sp->factor << 16) >> 16;
     }
 
     wps->dsd.high = 0xffffffff;
@@ -382,9 +386,9 @@ static int decode_high (WavpackStream *wps, int32_t *output, int sample_count)
                 wps->dsd.low <<= 8;
             }
 
-            sp [0].value += sp [0].filter6 << 3;
+            sp [0].value += sp [0].filter6 * 8;
             sp [0].byte = (sp [0].byte << 1) | (sp [0].filter0 & 1);
-            sp [0].factor += (((sp [0].value ^ sp [0].filter0) >> 31) | 1) & ((sp [0].value ^ (sp [0].value - (sp [0].filter6 << 4))) >> 31);
+            sp [0].factor += (((sp [0].value ^ sp [0].filter0) >> 31) | 1) & ((sp [0].value ^ (sp [0].value - (sp [0].filter6 * 16))) >> 31);
             sp [0].filter1 += ((sp [0].filter0 & VALUE_ONE) - sp [0].filter1) >> 6;
             sp [0].filter2 += ((sp [0].filter0 & VALUE_ONE) - sp [0].filter2) >> 4;
             sp [0].filter3 += (sp [0].filter2 - sp [0].filter3) >> 4;
@@ -417,9 +421,9 @@ static int decode_high (WavpackStream *wps, int32_t *output, int sample_count)
                 wps->dsd.low <<= 8;
             }
 
-            sp [1].value += sp [1].filter6 << 3;
+            sp [1].value += sp [1].filter6 * 8;
             sp [1].byte = (sp [1].byte << 1) | (sp [1].filter0 & 1);
-            sp [1].factor += (((sp [1].value ^ sp [1].filter0) >> 31) | 1) & ((sp [1].value ^ (sp [1].value - (sp [1].filter6 << 4))) >> 31);
+            sp [1].factor += (((sp [1].value ^ sp [1].filter0) >> 31) | 1) & ((sp [1].value ^ (sp [1].value - (sp [1].filter6 * 16))) >> 31);
             sp [1].filter1 += ((sp [1].filter0 & VALUE_ONE) - sp [1].filter1) >> 6;
             sp [1].filter2 += ((sp [1].filter0 & VALUE_ONE) - sp [1].filter2) >> 4;
             sp [1].filter3 += (sp [1].filter2 - sp [1].filter3) >> 4;

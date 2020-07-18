@@ -57,7 +57,7 @@ int load_tag (WavpackContext *wpc)
                 WavpackLittleEndianToNative (&m_tag->ape_tag_hdr, APE_Tag_Hdr_Format);
 
                 if (m_tag->ape_tag_hdr.version == 2000 && m_tag->ape_tag_hdr.item_count &&
-                    m_tag->ape_tag_hdr.length > sizeof (m_tag->ape_tag_hdr) &&
+                    m_tag->ape_tag_hdr.length > (int) sizeof (m_tag->ape_tag_hdr) &&
                     m_tag->ape_tag_hdr.length <= APE_TAG_MAX_LENGTH &&
                     (m_tag->ape_tag_data = (unsigned char *)malloc (m_tag->ape_tag_hdr.length)) != NULL) {
 

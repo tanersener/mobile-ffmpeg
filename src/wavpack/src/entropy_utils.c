@@ -154,11 +154,11 @@ int read_hybrid_profile (WavpackStream *wps, WavpackMetadata *wpmd)
     if (byteptr + (wps->wphdr.flags & MONO_DATA ? 2 : 4) > endptr)
         return FALSE;
 
-    wps->w.bitrate_acc [0] = (int32_t)(byteptr [0] + (byteptr [1] << 8)) << 16;
+    wps->w.bitrate_acc [0] = (uint32_t)(byteptr [0] + (byteptr [1] << 8)) << 16;
     byteptr += 2;
 
     if (!(wps->wphdr.flags & MONO_DATA)) {
-        wps->w.bitrate_acc [1] = (int32_t)(byteptr [0] + (byteptr [1] << 8)) << 16;
+        wps->w.bitrate_acc [1] = (uint32_t)(byteptr [0] + (byteptr [1] << 8)) << 16;
         byteptr += 2;
     }
 
@@ -347,7 +347,7 @@ int32_t wp_exp2s (int log)
     if ((log >>= 8) <= 9)
         return value >> (9 - log);
     else
-        return value << (log - 9);
+        return value << ((log - 9) & 0x1f);
 }
 
 // These two functions convert internal weights (which are normally +/-1024)
@@ -371,7 +371,7 @@ int restore_weight (signed char weight)
 {
     int result;
 
-    if ((result = (int) weight << 3) > 0)
+    if ((result = (int) weight * 8) > 0)
         result += (result + 64) >> 7;
 
     return result;
