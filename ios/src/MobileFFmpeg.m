@@ -45,6 +45,7 @@ void addExecution(long executionId);
 void removeExecution(long executionId);
 
 NSMutableArray *executions;
+NSLock *executionsLock;
 
 + (void)initialize {
     [MobileFFmpegConfig class];
@@ -52,6 +53,7 @@ NSMutableArray *executions;
     executionIdCounter = [[AtomicLong alloc] initWithInitialValue:3000];
 
     executions = [[NSMutableArray alloc] init];
+    executionsLock = [[NSLock alloc] init];
 
     NSLog(@"Loaded mobile-ffmpeg-%@-%@-%@-%@\n", [MobileFFmpegConfig getPackageName], [ArchDetect getArch], [MobileFFmpegConfig getVersion], [MobileFFmpegConfig getBuildDate]);
 }
@@ -60,7 +62,9 @@ NSMutableArray *executions;
     lastCommandOutput = [[NSMutableString alloc] init];
 
     FFmpegExecution* currentFFmpegExecution = [[FFmpegExecution alloc] initWithExecutionId:newExecutionId andArguments:arguments];
+    [executionsLock lock];
     [executions addObject: currentFFmpegExecution];
+    [executionsLock unlock];
 
     char **commandCharPArray = (char **)av_malloc(sizeof(char*) * ([arguments count] + 1));
 
@@ -90,7 +94,9 @@ NSMutableArray *executions;
     av_free(commandCharPArray[0]);
     av_free(commandCharPArray);
 
+    [executionsLock lock];
     [executions removeObject: currentFFmpegExecution];
+    [executionsLock unlock];
 
     return lastReturnCode;
 }
@@ -290,7 +296,10 @@ NSMutableArray *executions;
  * @return list of ongoing executions
  */
 + (NSArray*)listExecutions {
-    return executions;
+    [executionsLock lock];
+    NSArray *array = [NSArray arrayWithArray:executions];
+    [executionsLock unlock];
+    return array;
 }
 
 @end
