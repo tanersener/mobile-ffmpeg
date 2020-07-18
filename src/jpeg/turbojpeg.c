@@ -1,5 +1,5 @@
 /*
- * Copyright (C)2009-2019 D. R. Commander.  All Rights Reserved.
+ * Copyright (C)2009-2020 D. R. Commander.  All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -43,6 +43,7 @@
 #include "transupp.h"
 #include "./jpegcomp.h"
 #include "./cdjpeg.h"
+#include "jconfigint.h"
 
 extern void jpeg_mem_dest_tj(j_compress_ptr, unsigned char **, unsigned long *,
                              boolean);
@@ -55,7 +56,7 @@ extern void jpeg_mem_src_tj(j_decompress_ptr, const unsigned char *,
 
 /* Error handling (based on example in example.txt) */
 
-static char errStr[JMSG_LENGTH_MAX] = "No error";
+static THREAD_LOCAL char errStr[JMSG_LENGTH_MAX] = "No error";
 
 struct my_error_mgr {
   struct jpeg_error_mgr pub;
@@ -432,7 +433,7 @@ DLLEXPORT int tjDestroy(tjhandle handle)
 
 DLLEXPORT void tjFree(unsigned char *buf)
 {
-  if (buf) free(buf);
+  free(buf);
 }
 
 
@@ -462,7 +463,7 @@ static tjhandle _tjInitCompress(tjinstance *this)
 
   if (setjmp(this->jerr.setjmp_buffer)) {
     /* If we get here, the JPEG code has signaled an error. */
-    if (this) free(this);
+    free(this);
     return NULL;
   }
 
@@ -692,7 +693,7 @@ DLLEXPORT int tjCompress2(tjhandle handle, const unsigned char *srcBuf,
 
 bailout:
   if (cinfo->global_state > CSTATE_START) jpeg_abort_compress(cinfo);
-  if (row_pointer) free(row_pointer);
+  free(row_pointer);
   if (this->jerr.warning) retval = -1;
   this->jerr.stopOnWarning = FALSE;
   return retval;
@@ -866,13 +867,13 @@ DLLEXPORT int tjEncodeYUVPlanes(tjhandle handle, const unsigned char *srcBuf,
 
 bailout:
   if (cinfo->global_state > CSTATE_START) jpeg_abort_compress(cinfo);
-  if (row_pointer) free(row_pointer);
+  free(row_pointer);
   for (i = 0; i < MAX_COMPONENTS; i++) {
-    if (tmpbuf[i] != NULL) free(tmpbuf[i]);
-    if (_tmpbuf[i] != NULL) free(_tmpbuf[i]);
-    if (tmpbuf2[i] != NULL) free(tmpbuf2[i]);
-    if (_tmpbuf2[i] != NULL) free(_tmpbuf2[i]);
-    if (outbuf[i] != NULL) free(outbuf[i]);
+    free(tmpbuf[i]);
+    free(_tmpbuf[i]);
+    free(tmpbuf2[i]);
+    free(_tmpbuf2[i]);
+    free(outbuf[i]);
   }
   if (this->jerr.warning) retval = -1;
   this->jerr.stopOnWarning = FALSE;
@@ -1062,10 +1063,10 @@ DLLEXPORT int tjCompressFromYUVPlanes(tjhandle handle,
 bailout:
   if (cinfo->global_state > CSTATE_START) jpeg_abort_compress(cinfo);
   for (i = 0; i < MAX_COMPONENTS; i++) {
-    if (tmpbuf[i]) free(tmpbuf[i]);
-    if (inbuf[i]) free(inbuf[i]);
+    free(tmpbuf[i]);
+    free(inbuf[i]);
   }
-  if (_tmpbuf) free(_tmpbuf);
+  free(_tmpbuf);
   if (this->jerr.warning) retval = -1;
   this->jerr.stopOnWarning = FALSE;
   return retval;
@@ -1130,7 +1131,7 @@ static tjhandle _tjInitDecompress(tjinstance *this)
 
   if (setjmp(this->jerr.setjmp_buffer)) {
     /* If we get here, the JPEG code has signaled an error. */
-    if (this) free(this);
+    free(this);
     return NULL;
   }
 
@@ -1313,7 +1314,7 @@ DLLEXPORT int tjDecompress2(tjhandle handle, const unsigned char *jpegBuf,
 
 bailout:
   if (dinfo->global_state > DSTATE_START) jpeg_abort_decompress(dinfo);
-  if (row_pointer) free(row_pointer);
+  free(row_pointer);
   if (this->jerr.warning) retval = -1;
   this->jerr.stopOnWarning = FALSE;
   return retval;
@@ -1519,11 +1520,11 @@ DLLEXPORT int tjDecodeYUVPlanes(tjhandle handle,
 
 bailout:
   if (dinfo->global_state > DSTATE_START) jpeg_abort_decompress(dinfo);
-  if (row_pointer) free(row_pointer);
+  free(row_pointer);
   for (i = 0; i < MAX_COMPONENTS; i++) {
-    if (tmpbuf[i] != NULL) free(tmpbuf[i]);
-    if (_tmpbuf[i] != NULL) free(_tmpbuf[i]);
-    if (inbuf[i] != NULL) free(inbuf[i]);
+    free(tmpbuf[i]);
+    free(_tmpbuf[i]);
+    free(inbuf[i]);
   }
   if (this->jerr.warning) retval = -1;
   this->jerr.stopOnWarning = FALSE;
@@ -1731,10 +1732,10 @@ DLLEXPORT int tjDecompressToYUVPlanes(tjhandle handle,
 bailout:
   if (dinfo->global_state > DSTATE_START) jpeg_abort_decompress(dinfo);
   for (i = 0; i < MAX_COMPONENTS; i++) {
-    if (tmpbuf[i]) free(tmpbuf[i]);
-    if (outbuf[i]) free(outbuf[i]);
+    free(tmpbuf[i]);
+    free(outbuf[i]);
   }
-  if (_tmpbuf) free(_tmpbuf);
+  free(_tmpbuf);
   if (this->jerr.warning) retval = -1;
   this->jerr.stopOnWarning = FALSE;
   return retval;
@@ -1979,7 +1980,7 @@ DLLEXPORT int tjTransform(tjhandle handle, const unsigned char *jpegBuf,
 bailout:
   if (cinfo->global_state > CSTATE_START) jpeg_abort_compress(cinfo);
   if (dinfo->global_state > DSTATE_START) jpeg_abort_decompress(dinfo);
-  if (xinfo) free(xinfo);
+  free(xinfo);
   if (this->jerr.warning) retval = -1;
   this->jerr.stopOnWarning = FALSE;
   return retval;
@@ -2074,7 +2075,7 @@ DLLEXPORT unsigned char *tjLoadImage(const char *filename, int *width,
 bailout:
   if (handle) tjDestroy(handle);
   if (file) fclose(file);
-  if (retval < 0 && dstBuf) { free(dstBuf);  dstBuf = NULL; }
+  if (retval < 0) { free(dstBuf);  dstBuf = NULL; }
   return dstBuf;
 }
 
