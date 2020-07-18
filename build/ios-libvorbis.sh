@@ -68,6 +68,6 @@ PKG_CONFIG= ./configure \
 make -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_libvorbis_package_config "1.3.6"
+create_libvorbis_package_config "1.3.7"
 
 make install || exit 1
