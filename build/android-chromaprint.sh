@@ -64,6 +64,6 @@ cmake -Wno-dev \
 make -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_chromaprint_package_config "1.4.3"
+create_chromaprint_package_config "1.5.0"
 
 make install || exit 1

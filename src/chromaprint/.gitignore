@@ -27,6 +27,7 @@ src/libchromaprint.so.*
 *.suo
 Debug
 src/Debug
+*.dll
 *.lib
 *.pdb
 *.dll.manifest

@@ -51,8 +51,8 @@ public:
 		av_opt_set_int(m_resample_ctx, "out_sample_fmt", sample_rate, 0);
 	}
 
-	bool Init() {
-		return avresample_open(m_resample_ctx) >= 0;
+	int Init() {
+		return avresample_open(m_resample_ctx);
 	}
 
 	int Convert(uint8_t **out, int out_count, const uint8_t **in, int in_count) {

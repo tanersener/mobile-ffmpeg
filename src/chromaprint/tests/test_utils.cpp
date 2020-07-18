@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <limits>
 #include "utils.h"
+#include "test_utils.h"
 
 using namespace chromaprint;
 
@@ -91,4 +92,12 @@ TEST(Utils, CountSetBits64) {
     EXPECT_EQ(56, CountSetBits(0xFFFFFFFFFFFFFFU));
     EXPECT_EQ(64, CountSetBits(0xFFFFFFFFFFFFFFFFU));
     EXPECT_EQ(8, CountSetBits(0x0101010101010101U));
+}
+
+TEST(Utils, LoadAudioFile) {
+	std::vector<short> data = LoadAudioFile("data/test_mono_44100.raw");
+	ASSERT_EQ(data.size(), 176400/2);
+	EXPECT_EQ(data[1000], 0);
+	EXPECT_EQ(data[2000], 107);
+	EXPECT_EQ(data[3000], 128);
 }
