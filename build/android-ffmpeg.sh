@@ -326,9 +326,15 @@ else
     DEBUG_OPTIONS="--enable-debug --disable-stripping";
 fi
 
-cd ${BASEDIR}/src/${LIB_NAME} || exit 1
-
 echo -n -e "\n${LIB_NAME}: "
+
+# DOWNLOAD LIBRARY
+DOWNLOAD_RESULT=$(download_library_source ${LIB_NAME})
+if [[ ${DOWNLOAD_RESULT} -ne 0 ]]; then
+    exit 1
+fi
+
+cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
 if [[ -z ${NO_WORKSPACE_CLEANUP_ffmpeg} ]]; then
     echo -e "INFO: Cleaning workspace for ${LIB_NAME}" 1>>${BASEDIR}/build.log 2>&1

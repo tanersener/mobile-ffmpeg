@@ -20,7 +20,7 @@
 package com.arthenica.mobileffmpeg;
 
 /**
- * <p>Represents a callback function to receive a getMediaInformation result.
+ * <p>Represents a callback function to receive asynchronous getMediaInformation result.
  *
  * @author Taner Sener
  */

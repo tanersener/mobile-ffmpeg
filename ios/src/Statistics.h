@@ -20,7 +20,7 @@
 #include <Foundation/Foundation.h>
 
 /**
- * Represents statistics data.
+ * Statistics for running executions.
  */
 @interface Statistics : NSObject
 

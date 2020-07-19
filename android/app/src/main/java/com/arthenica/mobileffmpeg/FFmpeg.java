@@ -27,11 +27,15 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * <p>Main class for FFmpeg operations. Provides {@link #execute(String...)} method to execute
- * FFmpeg commands.
+ * <p>Main class for FFmpeg operations. Supports synchronous {@link #execute(String...)} and
+ * asynchronous {@link #executeAsync(String, ExecuteCallback)} methods to execute FFmpeg commands.
  * <pre>
  *      int rc = FFmpeg.execute("-i file1.mp4 -c:v libxvid file1.avi");
  *      Log.i(Config.TAG, String.format("Command execution %s.", (rc == 0?"completed successfully":"failed with rc=" + rc));
+ * </pre>
+ * <pre>
+ *      long executionId = FFmpeg.executeAsync("-i file1.mp4 -c:v libxvid file1.avi", executeCallback);
+ *      Log.i(Config.TAG, String.format("Asynchronous execution %d started.", executionId));
  * </pre>
  *
  * @author Taner Sener

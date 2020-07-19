@@ -4,6 +4,7 @@ branches:
   - development
 git:
   quiet: true
+  depth: false
 jobs:
   include:
     - name: "Android Main Build"

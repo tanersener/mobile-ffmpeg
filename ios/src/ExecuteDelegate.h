@@ -18,7 +18,7 @@
  */
 
 /**
- * Use this delegate to receive an execution result.
+ * Use this delegate to receive an asynchronous execution result.
  */
 @protocol ExecuteDelegate<NSObject>
 @required

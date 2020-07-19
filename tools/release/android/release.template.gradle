@@ -1,5 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
 
 buildscript {
     repositories {
@@ -7,7 +8,8 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.6.3'
+        classpath 'com.android.tools.build:gradle:3.6.4'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.5'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
     }
 }
@@ -50,6 +52,9 @@ android {
 }
 
 ext {
+    bintrayRepo = 'maven'
+    bintrayName = releaseProject
+
     publishedGroupId = 'com.arthenica'
     libraryName = releaseProject
     artifact = releaseProject
@@ -109,6 +114,32 @@ install {
                 developerConnection gitUrl
                 url siteUrl
             }
+        }
+    }
+}
+
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+bintray {
+    user = properties.getProperty("bintray.user")
+    key = properties.getProperty("bintray.apikey")
+
+    configurations = ['archives']
+    pkg {
+        repo = bintrayRepo
+        name = bintrayName
+        desc = libraryDescription
+        websiteUrl = siteUrl
+        vcsUrl = gitUrl
+        issueTrackerUrl = issueTrackerUrl
+        licenses = allLicenses
+        dryRun = true
+        publish = false
+        override = false
+        publicDownloadNumbers = false
+        version {
+            desc = libraryDescription
         }
     }
 }

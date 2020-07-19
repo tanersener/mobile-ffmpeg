@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":9,"i1":9,"i2":9,"i3":9,"i4":9,"i5":9,"i6":9,"i7":9,"i8":9,"i9":9,"i10":9,"i11":9,"i12":9,"i13":9,"i14":9,"i15":9,"i16":9,"i17":9,"i18":9,"i19":9,"i20":9,"i21":9,"i22":9};
+var methods = {"i0":9,"i1":9,"i2":9,"i3":9,"i4":9,"i5":9,"i6":9,"i7":9,"i8":9,"i9":9,"i10":9,"i11":9,"i12":9,"i13":9,"i14":9,"i15":9,"i16":9,"i17":9,"i18":9,"i19":9,"i20":9,"i21":9,"i22":9,"i23":9};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -47,8 +47,8 @@ var activeTableTab = "activeTableTab";
 </div>
 <div class="subNav">
 <ul class="navList">
-<li><a href="../../../com/arthenica/mobileffmpeg/AbiDetect.html" title="class in com.arthenica.mobileffmpeg"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li><a href="../../../com/arthenica/mobileffmpeg/FFmpeg.html" title="class in com.arthenica.mobileffmpeg"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li><a href="../../../com/arthenica/mobileffmpeg/AsyncGetMediaInformationTask.html" title="class in com.arthenica.mobileffmpeg"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
+<li><a href="../../../com/arthenica/mobileffmpeg/ExecuteCallback.html" title="interface in com.arthenica.mobileffmpeg"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
 <li><a href="../../../index.html?com/arthenica/mobileffmpeg/Config.html" target="_top">Frames</a></li>
@@ -272,37 +272,50 @@ extends java.lang.Object</pre>
 </td>
 </tr>
 <tr id="i15" class="rowColor">
+<td class="colFirst"><code>static void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/Config.html#ignoreSignal-com.arthenica.mobileffmpeg.Signal-">ignoreSignal</a></span>(<a href="../../../com/arthenica/mobileffmpeg/Signal.html" title="enum in com.arthenica.mobileffmpeg">Signal</a>&nbsp;signal)</code>
+<div class="block">Registers a new ignored signal.</div>
+</td>
+</tr>
+<tr id="i16" class="altColor">
 <td class="colFirst"><code>static boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/Config.html#isLTSBuild--">isLTSBuild</a></span>()</code>
 <div class="block">Returns whether MobileFFmpeg release is a long term release or not.</div>
 </td>
 </tr>
-<tr id="i16" class="altColor">
+<tr id="i17" class="rowColor">
 <td class="colFirst"><code>static void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/Config.html#printLastCommandOutput-int-">printLastCommandOutput</a></span>(int&nbsp;logPriority)</code>
 <div class="block">Prints the output of the last executed FFmpeg/FFprobe command to the Logcat at the
  specified priority.</div>
 </td>
 </tr>
-<tr id="i17" class="rowColor">
+<tr id="i18" class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/Config.html#registerNewFFmpegPipe-android.content.Context-">registerNewFFmpegPipe</a></span>(android.content.Context&nbsp;context)</code>
 <div class="block">Creates a new named pipe to use in <code>FFmpeg</code> operations.</div>
 </td>
 </tr>
-<tr id="i18" class="altColor">
+<tr id="i19" class="rowColor">
 <td class="colFirst"><code>static void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/Config.html#resetStatistics--">resetStatistics</a></span>()</code>
 <div class="block">Resets last received statistics.</div>
 </td>
 </tr>
-<tr id="i19" class="rowColor">
+<tr id="i20" class="altColor">
+<td class="colFirst"><code>static int</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/Config.html#setEnvironmentVariable-java.lang.String-java.lang.String-">setEnvironmentVariable</a></span>(java.lang.String&nbsp;variableName,
+                      java.lang.String&nbsp;variableValue)</code>
+<div class="block">Sets an environment variable.</div>
+</td>
+</tr>
+<tr id="i21" class="rowColor">
 <td class="colFirst"><code>static int</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/Config.html#setFontconfigConfigurationPath-java.lang.String-">setFontconfigConfigurationPath</a></span>(java.lang.String&nbsp;path)</code>
 <div class="block">Sets and overrides <code>fontconfig</code> configuration directory.</div>
 </td>
 </tr>
-<tr id="i20" class="altColor">
+<tr id="i22" class="altColor">
 <td class="colFirst"><code>static void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/Config.html#setFontDirectory-android.content.Context-java.lang.String-java.util.Map-">setFontDirectory</a></span>(android.content.Context&nbsp;context,
                 java.lang.String&nbsp;fontDirectoryPath,
@@ -310,17 +323,10 @@ extends java.lang.Object</pre>
 <div class="block">Registers fonts inside the given path, so they are available to use in FFmpeg filters.</div>
 </td>
 </tr>
-<tr id="i21" class="rowColor">
+<tr id="i23" class="rowColor">
 <td class="colFirst"><code>static void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/Config.html#setLogLevel-com.arthenica.mobileffmpeg.Level-">setLogLevel</a></span>(<a href="../../../com/arthenica/mobileffmpeg/Level.html" title="enum in com.arthenica.mobileffmpeg">Level</a>&nbsp;level)</code>
 <div class="block">Sets log level.</div>
-</td>
-</tr>
-<tr id="i22" class="altColor">
-<td class="colFirst"><code>static int</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/Config.html#setNativeEnvironmentVariable-java.lang.String-java.lang.String-">setNativeEnvironmentVariable</a></span>(java.lang.String&nbsp;variableName,
-                            java.lang.String&nbsp;variableValue)</code>
-<div class="block">Sets an environment variable natively.</div>
 </td>
 </tr>
 </table>
@@ -747,21 +753,35 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
-<a name="setNativeEnvironmentVariable-java.lang.String-java.lang.String-">
+<a name="setEnvironmentVariable-java.lang.String-java.lang.String-">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
-<h4>setNativeEnvironmentVariable</h4>
-<pre>public static&nbsp;int&nbsp;setNativeEnvironmentVariable(java.lang.String&nbsp;variableName,
-                                               java.lang.String&nbsp;variableValue)</pre>
-<div class="block"><p>Sets an environment variable natively.</div>
+<h4>setEnvironmentVariable</h4>
+<pre>public static&nbsp;int&nbsp;setEnvironmentVariable(java.lang.String&nbsp;variableName,
+                                         java.lang.String&nbsp;variableValue)</pre>
+<div class="block"><p>Sets an environment variable.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>variableName</code> - environment variable name</dd>
 <dd><code>variableValue</code> - environment variable value</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>zero on success, non-zero on error</dd>
+</dl>
+</li>
+</ul>
+<a name="ignoreSignal-com.arthenica.mobileffmpeg.Signal-">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>ignoreSignal</h4>
+<pre>public static&nbsp;void&nbsp;ignoreSignal(<a href="../../../com/arthenica/mobileffmpeg/Signal.html" title="enum in com.arthenica.mobileffmpeg">Signal</a>&nbsp;signal)</pre>
+<div class="block"><p>Registers a new ignored signal. Ignored signals are not handled by the library.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>signal</code> - signal number to ignore</dd>
 </dl>
 </li>
 </ul>
@@ -792,8 +812,8 @@ extends java.lang.Object</pre>
 </div>
 <div class="subNav">
 <ul class="navList">
-<li><a href="../../../com/arthenica/mobileffmpeg/AbiDetect.html" title="class in com.arthenica.mobileffmpeg"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li><a href="../../../com/arthenica/mobileffmpeg/FFmpeg.html" title="class in com.arthenica.mobileffmpeg"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li><a href="../../../com/arthenica/mobileffmpeg/AsyncGetMediaInformationTask.html" title="class in com.arthenica.mobileffmpeg"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
+<li><a href="../../../com/arthenica/mobileffmpeg/ExecuteCallback.html" title="interface in com.arthenica.mobileffmpeg"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
 <li><a href="../../../index.html?com/arthenica/mobileffmpeg/Config.html" target="_top">Frames</a></li>

@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -47,7 +47,7 @@ var activeTableTab = "activeTableTab";
 </div>
 <div class="subNav">
 <ul class="navList">
-<li><a href="../../../com/arthenica/mobileffmpeg/MediaInformationParser.html" title="class in com.arthenica.mobileffmpeg"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
+<li><a href="../../../com/arthenica/mobileffmpeg/Signal.html" title="enum in com.arthenica.mobileffmpeg"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
 <li><a href="../../../com/arthenica/mobileffmpeg/StatisticsCallback.html" title="interface in com.arthenica.mobileffmpeg"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
@@ -109,7 +109,7 @@ var activeTableTab = "activeTableTab";
 <br>
 <pre>public class <span class="typeNameLabel">Statistics</span>
 extends java.lang.Object</pre>
-<div class="block"><p>Represents statistics data.</div>
+<div class="block"><p>Statistics for running executions.</div>
 <dl>
 <dt><span class="simpleTagLabel">Since:</span></dt>
 <dd>v2.1</dd>
@@ -135,7 +135,8 @@ extends java.lang.Object</pre>
 <td class="colOne"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/Statistics.html#Statistics--">Statistics</a></span>()</code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/Statistics.html#Statistics-int-float-float-long-int-double-double-">Statistics</a></span>(int&nbsp;videoFrameNumber,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/Statistics.html#Statistics-long-int-float-float-long-int-double-double-">Statistics</a></span>(long&nbsp;executionId,
+          int&nbsp;videoFrameNumber,
           float&nbsp;videoFps,
           float&nbsp;videoQuality,
           long&nbsp;size,
@@ -164,57 +165,69 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>long</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/Statistics.html#getSize--">getSize</a></span>()</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/Statistics.html#getExecutionId--">getExecutionId</a></span>()</code>&nbsp;</td>
 </tr>
 <tr id="i2" class="altColor">
+<td class="colFirst"><code>long</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/Statistics.html#getSize--">getSize</a></span>()</code>&nbsp;</td>
+</tr>
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code>double</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/Statistics.html#getSpeed--">getSpeed</a></span>()</code>&nbsp;</td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i4" class="altColor">
 <td class="colFirst"><code>int</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/Statistics.html#getTime--">getTime</a></span>()</code>&nbsp;</td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code>float</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/Statistics.html#getVideoFps--">getVideoFps</a></span>()</code>&nbsp;</td>
 </tr>
-<tr id="i5" class="rowColor">
+<tr id="i6" class="altColor">
 <td class="colFirst"><code>int</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/Statistics.html#getVideoFrameNumber--">getVideoFrameNumber</a></span>()</code>&nbsp;</td>
 </tr>
-<tr id="i6" class="altColor">
+<tr id="i7" class="rowColor">
 <td class="colFirst"><code>float</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/Statistics.html#getVideoQuality--">getVideoQuality</a></span>()</code>&nbsp;</td>
 </tr>
-<tr id="i7" class="rowColor">
+<tr id="i8" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/Statistics.html#setBitrate-double-">setBitrate</a></span>(double&nbsp;bitrate)</code>&nbsp;</td>
 </tr>
-<tr id="i8" class="altColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/Statistics.html#setSize-long-">setSize</a></span>(long&nbsp;size)</code>&nbsp;</td>
-</tr>
 <tr id="i9" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/Statistics.html#setSpeed-double-">setSpeed</a></span>(double&nbsp;speed)</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/Statistics.html#setExecutionId-long-">setExecutionId</a></span>(long&nbsp;executionId)</code>&nbsp;</td>
 </tr>
 <tr id="i10" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/Statistics.html#setTime-int-">setTime</a></span>(int&nbsp;time)</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/Statistics.html#setSize-long-">setSize</a></span>(long&nbsp;size)</code>&nbsp;</td>
 </tr>
 <tr id="i11" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/Statistics.html#setVideoFps-float-">setVideoFps</a></span>(float&nbsp;videoFps)</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/Statistics.html#setSpeed-double-">setSpeed</a></span>(double&nbsp;speed)</code>&nbsp;</td>
 </tr>
 <tr id="i12" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/Statistics.html#setVideoFrameNumber-int-">setVideoFrameNumber</a></span>(int&nbsp;videoFrameNumber)</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/Statistics.html#setTime-int-">setTime</a></span>(int&nbsp;time)</code>&nbsp;</td>
 </tr>
 <tr id="i13" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/Statistics.html#setVideoQuality-float-">setVideoQuality</a></span>(float&nbsp;videoQuality)</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/Statistics.html#setVideoFps-float-">setVideoFps</a></span>(float&nbsp;videoFps)</code>&nbsp;</td>
 </tr>
 <tr id="i14" class="altColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/Statistics.html#setVideoFrameNumber-int-">setVideoFrameNumber</a></span>(int&nbsp;videoFrameNumber)</code>&nbsp;</td>
+</tr>
+<tr id="i15" class="rowColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/Statistics.html#setVideoQuality-float-">setVideoQuality</a></span>(float&nbsp;videoQuality)</code>&nbsp;</td>
+</tr>
+<tr id="i16" class="altColor">
+<td class="colFirst"><code>java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/Statistics.html#toString--">toString</a></span>()</code>&nbsp;</td>
+</tr>
+<tr id="i17" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/Statistics.html#update-com.arthenica.mobileffmpeg.Statistics-">update</a></span>(<a href="../../../com/arthenica/mobileffmpeg/Statistics.html" title="class in com.arthenica.mobileffmpeg">Statistics</a>&nbsp;newStatistics)</code>&nbsp;</td>
 </tr>
@@ -224,7 +237,7 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;java.lang.Object</h3>
-<code>clone, equals, finalize, getClass, hashCode, notify, notifyAll, toString, wait, wait, wait</code></li>
+<code>clone, equals, finalize, getClass, hashCode, notify, notifyAll, wait, wait, wait</code></li>
 </ul>
 </li>
 </ul>
@@ -249,13 +262,14 @@ extends java.lang.Object</pre>
 <pre>public&nbsp;Statistics()</pre>
 </li>
 </ul>
-<a name="Statistics-int-float-float-long-int-double-double-">
+<a name="Statistics-long-int-float-float-long-int-double-double-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>Statistics</h4>
-<pre>public&nbsp;Statistics(int&nbsp;videoFrameNumber,
+<pre>public&nbsp;Statistics(long&nbsp;executionId,
+                  int&nbsp;videoFrameNumber,
                   float&nbsp;videoFps,
                   float&nbsp;videoQuality,
                   long&nbsp;size,
@@ -279,6 +293,24 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>update</h4>
 <pre>public&nbsp;void&nbsp;update(<a href="../../../com/arthenica/mobileffmpeg/Statistics.html" title="class in com.arthenica.mobileffmpeg">Statistics</a>&nbsp;newStatistics)</pre>
+</li>
+</ul>
+<a name="getExecutionId--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getExecutionId</h4>
+<pre>public&nbsp;long&nbsp;getExecutionId()</pre>
+</li>
+</ul>
+<a name="setExecutionId-long-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>setExecutionId</h4>
+<pre>public&nbsp;void&nbsp;setExecutionId(long&nbsp;executionId)</pre>
 </li>
 </ul>
 <a name="getVideoFrameNumber--">
@@ -401,10 +433,23 @@ extends java.lang.Object</pre>
 <a name="setSpeed-double-">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>setSpeed</h4>
 <pre>public&nbsp;void&nbsp;setSpeed(double&nbsp;speed)</pre>
+</li>
+</ul>
+<a name="toString--">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>toString</h4>
+<pre>public&nbsp;java.lang.String&nbsp;toString()</pre>
+<dl>
+<dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
+<dd><code>toString</code>&nbsp;in class&nbsp;<code>java.lang.Object</code></dd>
+</dl>
 </li>
 </ul>
 </li>
@@ -434,7 +479,7 @@ extends java.lang.Object</pre>
 </div>
 <div class="subNav">
 <ul class="navList">
-<li><a href="../../../com/arthenica/mobileffmpeg/MediaInformationParser.html" title="class in com.arthenica.mobileffmpeg"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
+<li><a href="../../../com/arthenica/mobileffmpeg/Signal.html" title="enum in com.arthenica.mobileffmpeg"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
 <li><a href="../../../com/arthenica/mobileffmpeg/StatisticsCallback.html" title="interface in com.arthenica.mobileffmpeg"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">

@@ -96,10 +96,10 @@ esac
 
 if [[ ${APPLE_TVOS_BUILD} -eq 1 ]]; then
     CONFIGURE_POSTFIX="--disable-avfoundation"
-    LIBRARY_COUNT=49
+    LIBRARY_COUNT=48
 else
     CONFIGURE_POSTFIX=""
-    LIBRARY_COUNT=50
+    LIBRARY_COUNT=49
 fi
 
 library=1
@@ -314,9 +314,6 @@ do
                     *-bzip2)
                         CONFIGURE_POSTFIX+=" --enable-bzlib"
                     ;;
-                    *-coreimage)
-                        CONFIGURE_POSTFIX+=" --enable-coreimage"
-                    ;;
                     *-videotoolbox)
                         CONFIGURE_POSTFIX+=" --enable-videotoolbox"
                     ;;
@@ -339,14 +336,12 @@ do
         elif [[ ${library} -eq 44 ]]; then
             CONFIGURE_POSTFIX+=" --disable-audiotoolbox"
         elif [[ ${library} -eq 45 ]]; then
-            CONFIGURE_POSTFIX+=" --disable-coreimage"
-        elif [[ ${library} -eq 46 ]]; then
             CONFIGURE_POSTFIX+=" --disable-bzlib"
-        elif [[ ${library} -eq 47 ]]; then
+        elif [[ ${library} -eq 46 ]]; then
             CONFIGURE_POSTFIX+=" --disable-videotoolbox"
-        elif [[ ${library} -eq 48 ]]; then
+        elif [[ ${library} -eq 47 ]]; then
             CONFIGURE_POSTFIX+=" --disable-avfoundation"
-        elif [[ ${library} -eq 49 ]]; then
+        elif [[ ${library} -eq 48 ]]; then
             CONFIGURE_POSTFIX+=" --disable-iconv"
         fi
     fi
@@ -398,9 +393,15 @@ export CFLAGS="${ARCH_CFLAGS} ${APP_CFLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_CFLA
 export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 export LDFLAGS="${ARCH_LDFLAGS}${FFMPEG_LDFLAGS} ${LINKED_LIBRARIES} ${COMMON_LDFLAGS} ${BITCODE_FLAGS} ${OPTIMIZATION_FLAGS}"
 
-cd ${BASEDIR}/src/${LIB_NAME} || exit 1
-
 echo -n -e "\n${LIB_NAME}: "
+
+# DOWNLOAD LIBRARY
+DOWNLOAD_RESULT=$(download_library_source ${LIB_NAME})
+if [[ ${DOWNLOAD_RESULT} -ne 0 ]]; then
+    exit 1
+fi
+
+cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
 if [[ -z ${NO_WORKSPACE_CLEANUP_ffmpeg} ]]; then
     echo -e "INFO: Cleaning workspace for ${LIB_NAME}" 1>>${BASEDIR}/build.log 2>&1
@@ -416,9 +417,6 @@ if [ ${ARCH} == "x86-64-mac-catalyst" ]; then
 else
     ${SED_INLINE} 's/   \/\/ CFDictionarySetValue(buffer_attributes\, kCVPixelBufferOpenGLESCompatibilityKey/    CFDictionarySetValue(buffer_attributes\, kCVPixelBufferOpenGLESCompatibilityKey/g' ${BASEDIR}/src/${LIB_NAME}/libavcodec/videotoolbox.c
 fi
-
-# Workaround for not supported iOS/tvOS features
-git checkout 2e595085ef653f365af49e6a32f012cc6d9ee03c -- ${BASEDIR}/src/${LIB_NAME}/libavdevice/avfoundation.m 1>>${BASEDIR}/build.log 2>&1
 
 ./configure \
     --sysroot=${SDK_PATH} \

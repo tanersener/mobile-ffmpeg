@@ -1,1 +1,0 @@
-perms=random, hqdn3d=enable='not(between(t,5,6))'

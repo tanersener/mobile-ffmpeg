@@ -28,7 +28,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 /**
- * Helper class for {@link MediaInformation}.
+ * Helper class for parsing {@link MediaInformation}.
  *
  * @since 3.0
  */

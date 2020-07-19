@@ -20,7 +20,7 @@
 package com.arthenica.mobileffmpeg;
 
 /**
- * <p>Represents statistics data.
+ * <p>Statistics for running executions.
  *
  * @author Taner Sener
  * @since v2.1

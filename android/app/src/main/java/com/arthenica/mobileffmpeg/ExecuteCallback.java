@@ -20,7 +20,7 @@
 package com.arthenica.mobileffmpeg;
 
 /**
- * <p>Represents a callback function to receive an execution result.
+ * <p>Represents a callback function to receive an asynchronous execution result.
  *
  * @author Taner Sener
  * @since v2.1
@@ -32,8 +32,8 @@ public interface ExecuteCallback {
      * <p>Called when an asynchronous FFmpeg execution is completed.
      *
      * @param executionId id of the execution that completed
-     * @param returnCode return code of the execution that completed, 0 on successful completion,
-     *                   255 on user cancel, other non-zero codes on error
+     * @param returnCode  return code of the execution completed, 0 on successful completion, 255
+     *                    on user cancel, other non-zero codes on error
      */
     void apply(long executionId, int returnCode);
 

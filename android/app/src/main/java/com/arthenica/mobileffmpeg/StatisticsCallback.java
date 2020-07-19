@@ -20,7 +20,7 @@
 package com.arthenica.mobileffmpeg;
 
 /**
- * <p>Represents a callback function to receive statistics of running operation.
+ * <p>Represents a callback function to receive statistics from running executions.
  *
  * @author Taner Sener
  * @since v2.1

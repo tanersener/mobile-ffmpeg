@@ -18,7 +18,7 @@
  */
 
 /**
- * Use this delegate to redirect FFmpeg logs.
+ * Use this delegate to receive logs from running executions.
  */
 @protocol LogDelegate<NSObject>
 @required

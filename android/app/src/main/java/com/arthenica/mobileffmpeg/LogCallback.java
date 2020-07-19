@@ -20,7 +20,7 @@
 package com.arthenica.mobileffmpeg;
 
 /**
- * <p>Represents a callback function to redirect logs.
+ * <p>Represents a callback function to receive logs from running executions
  *
  * @author Taner Sener
  * @since v2.1

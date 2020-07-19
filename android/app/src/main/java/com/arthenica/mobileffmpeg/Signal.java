@@ -23,6 +23,7 @@ package com.arthenica.mobileffmpeg;
  * <p>Lists signals handled by MobileFFmpeg library.
  *
  * @author Taner Sener
+ * @since v4.4
  */
 public enum Signal {
 

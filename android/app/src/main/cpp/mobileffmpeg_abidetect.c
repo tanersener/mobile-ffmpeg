@@ -122,7 +122,7 @@ JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_AbiDetect_getNativeCpu
  *
  * @param env pointer to native method interface
  * @param object reference to the class on which this method is invoked
- * @return YES or NO
+ * @return yes or no
  */
 JNIEXPORT jboolean JNICALL Java_com_arthenica_mobileffmpeg_AbiDetect_isNativeLTSBuild(JNIEnv *env, jclass object) {
     #if defined(MOBILE_FFMPEG_LTS)

@@ -44,7 +44,7 @@
 /**
  * Returns whether MobileFFmpeg release is a long term release or not.
  *
- * @return YES=1 or NO=0
+ * @return yes=1 or no=0
  */
 + (int)isLTSBuild;
 

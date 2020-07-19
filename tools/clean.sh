@@ -31,6 +31,7 @@ rm -rf ../tvos/test-app/universal/*.xcframework
 rm -rf ../tvos/test-app/universal/mobile-ffmpeg-universal
 
 rm -rf ../src/cpu-features
+rm -rf ../src/ffmpeg
 
 rm -rf ../src/libvidstab
 rm -rf ../src/x264

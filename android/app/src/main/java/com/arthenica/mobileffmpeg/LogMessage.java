@@ -20,7 +20,7 @@
 package com.arthenica.mobileffmpeg;
 
 /**
- * <p>Represents a redirected log message.
+ * <p>Logs for running executions.
  *
  * @author Taner Sener
  * @since v2.1

@@ -20,7 +20,7 @@
 #include "Statistics.h"
 
 /**
- * Use this delegate to redirect FFmpeg statistics.
+ * Use this delegate to receive statistics from running executions.
  */
 @protocol StatisticsDelegate<NSObject>
 @required
