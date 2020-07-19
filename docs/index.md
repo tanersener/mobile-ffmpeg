@@ -7,7 +7,7 @@ FFmpeg for Android, iOS and tvOS
 
 ### 1. Features
 - Includes both `FFmpeg` and `FFprobe`
-- Supports FFmpeg `v3.4.x`, `v4.0.x`, `v4.1`, `v4.2` and `v4.3-dev` releases
+- Supports FFmpeg `v3.4.x`, `v4.0.x`, `v4.1`, `v4.2` , `v4.3` and `v4.4-dev` releases
 - Use prebuilt binaries available under `Github`/`JCenter`/`CocoaPods` or build your own version with external libraries you need
 - Includes 28 external libraries, 5 GPL libraries and 14 architectures in total
 - Exposes both FFmpeg library and MobileFFmpeg wrapper library capabilities
@@ -22,10 +22,10 @@ FFmpeg for Android, iOS and tvOS
 - Creates Android archive with .aar extension
 - Supports `iOS SDK 9.3` or later
 - Builds `armv7`, `armv7s`, `arm64`, `arm64e`, `i386`, `x86_64` and `x86_64` (Mac Catalyst) iOS architectures
-- Supports `bzip2`, `iconv`, `libuuid`, `zlib` iOS system libraries and `AudioToolbox`, `CoreImage`, `VideoToolbox`, `AVFoundation` iOS system frameworks
+- Supports `bzip2`, `iconv`, `libuuid`, `zlib` iOS system libraries and `AudioToolbox`, `VideoToolbox`, `AVFoundation` iOS system frameworks
 - Supports `tvOS SDK 9.2` or later
 - Builds `arm64` and `x86_64` tvOS architectures
-- Supports `bzip2`, `iconv`, `libuuid`, `zlib` tvOS system libraries and `AudioToolbox`, `CoreImage`, `VideoToolbox` tvOS system frameworks
+- Supports `bzip2`, `iconv`, `libuuid`, `zlib` tvOS system libraries and `AudioToolbox`, `VideoToolbox` tvOS system frameworks
 - Android Camera access on [supported devices](https://developer.android.com/ndk/guides/stable_apis#camera)
 - iOS Camera access
 - `ARC` enabled iOS library
@@ -73,7 +73,7 @@ Please remember that some parts of `FFmpeg` are licensed under the `GPL` and onl
 
  - `chromaprint`, `vid.stab` and `x265` are supported since `v2.1`
 
- - `sdl`, `tesseract`, `twolame` external libraries; `zlib`, `MediaCodec` Android system libraries; `bzip2`, `zlib` iOS system libraries and `AudioToolbox`, `CoreImage`, `VideoToolbox`, `AVFoundation` iOS system frameworks are supported since `v3.0`
+ - `sdl`, `tesseract`, `twolame` external libraries; `zlib`, `MediaCodec` Android system libraries; `bzip2`, `zlib` iOS system libraries and `AudioToolbox`, `VideoToolbox`, `AVFoundation` iOS system frameworks are supported since `v3.0`
  
  - Since `v4.2`, `chromaprint`, `sdl` and `tesseract` libraries are not included in binary releases. You can still build them and include in your releases
  

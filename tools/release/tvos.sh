@@ -8,7 +8,7 @@ export SOURCE_PACKAGE="${BASEDIR}/../../prebuilt/tvos-framework"
 export COCOA_PACKAGE="${BASEDIR}/../../prebuilt/tvos-cocoa"
 export UNIVERSAL_PACKAGE="${BASEDIR}/../../prebuilt/tvos-universal"
 export ALL_UNIVERSAL_PACKAGES="${BASEDIR}/../../prebuilt/tvos-all-universal"
-export CUSTOM_OPTIONS="--enable-tvos-zlib --enable-tvos-bzip2 --enable-tvos-coreimage --enable-tvos-audiotoolbox --enable-tvos-videotoolbox"
+export CUSTOM_OPTIONS="--enable-tvos-zlib --enable-tvos-bzip2 --enable-tvos-audiotoolbox --enable-tvos-videotoolbox"
 export GPL_PACKAGES="--enable-gpl --enable-libvidstab --enable-x264 --enable-x265 --enable-xvidcore"
 export FULL_PACKAGES="--enable-fontconfig --enable-freetype --enable-fribidi --enable-gmp --enable-gnutls --enable-kvazaar --enable-lame --enable-libaom --enable-libass --enable-libilbc --enable-libtheora --enable-libvorbis --enable-libvpx --enable-libwebp --enable-libxml2 --enable-opencore-amr --enable-opus --enable-shine --enable-snappy --enable-soxr --enable-speex --enable-twolame --enable-wavpack"
 

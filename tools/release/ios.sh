@@ -6,7 +6,7 @@
 export BASEDIR=$(pwd)
 export SOURCE_PACKAGE="${BASEDIR}/../../prebuilt/ios-xcframework"
 export COCOA_PACKAGE="${BASEDIR}/../../prebuilt/ios-cocoa"
-export CUSTOM_OPTIONS="--xcframework --disable-armv7 --disable-armv7s --disable-i386 --disable-arm64e --enable-ios-zlib --enable-ios-bzip2 --enable-ios-coreimage --enable-ios-avfoundation --enable-ios-audiotoolbox --enable-ios-videotoolbox"
+export CUSTOM_OPTIONS="--xcframework --disable-armv7 --disable-armv7s --disable-i386 --disable-arm64e --enable-ios-zlib --enable-ios-bzip2 --enable-ios-avfoundation --enable-ios-audiotoolbox --enable-ios-videotoolbox"
 export GPL_PACKAGES="--enable-gpl --enable-libvidstab --enable-x264 --enable-x265 --enable-xvidcore"
 export FULL_PACKAGES="--enable-fontconfig --enable-freetype --enable-fribidi --enable-gmp --enable-gnutls --enable-kvazaar --enable-lame --enable-libaom --enable-libass --enable-libilbc --enable-libtheora --enable-libvorbis --enable-libvpx --enable-libwebp --enable-libxml2 --enable-opencore-amr --enable-opus --enable-shine --enable-snappy --enable-soxr --enable-speex --enable-twolame --enable-wavpack"
 

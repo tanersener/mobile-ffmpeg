@@ -55,18 +55,17 @@ LIBRARY_LEPTONICA=41
 LIBRARY_LIBSAMPLERATE=42
 LIBRARY_ZLIB=43
 LIBRARY_AUDIOTOOLBOX=44
-LIBRARY_COREIMAGE=45
-LIBRARY_BZIP2=46
-LIBRARY_VIDEOTOOLBOX=47
-LIBRARY_AVFOUNDATION=48
-LIBRARY_LIBICONV=49
-LIBRARY_LIBUUID=50
+LIBRARY_BZIP2=45
+LIBRARY_VIDEOTOOLBOX=46
+LIBRARY_AVFOUNDATION=47
+LIBRARY_LIBICONV=48
+LIBRARY_LIBUUID=49
 
 # ENABLE ARCH
 ENABLED_ARCHITECTURES=(1 1 1 1 1 1 1)
 
 # ENABLE LIBRARIES
-ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 
 export BASEDIR=$(pwd)
 
@@ -131,7 +130,6 @@ display_help() {
   echo -e "  --full\t\t\tenables all non-GPL external libraries"
   echo -e "  --enable-ios-audiotoolbox\tbuild with built-in Apple AudioToolbox support[no]"
   echo -e "  --enable-ios-avfoundation\tbuild with built-in Apple AVFoundation support[no]"
-  echo -e "  --enable-ios-coreimage\tbuild with built-in Apple CoreImage support[no]"
   echo -e "  --enable-ios-bzip2\t\tbuild with built-in bzip2 support[no]"
   echo -e "  --enable-ios-videotoolbox\tbuild with built-in Apple VideoToolbox support[no]"
   echo -e "  --enable-ios-zlib\t\tbuild with built-in zlib [no]"
@@ -268,7 +266,7 @@ redownload_library() {
   local REDOWNLOAD_VARIABLE=$(echo "REDOWNLOAD_$1" | sed "s/\-/\_/g")
   local library_supported=0
 
-  for library in {0..47}; do
+  for library in {0..42}; do
     library_name=$(get_library_name ${library})
 
     if [[ $1 != "ffmpeg" ]] && [[ ${library_name} == $1 ]]; then
@@ -297,9 +295,6 @@ set_library() {
     ;;
   ios-avfoundation)
     ENABLED_LIBRARIES[LIBRARY_AVFOUNDATION]=$2
-    ;;
-  ios-coreimage)
-    ENABLED_LIBRARIES[LIBRARY_COREIMAGE]=$2
     ;;
   ios-bzip2)
     ENABLED_LIBRARIES[LIBRARY_BZIP2]=$2
@@ -544,7 +539,7 @@ print_enabled_libraries() {
   let enabled=0
 
   # FIRST BUILT-IN LIBRARIES
-  for library in {43..50}; do
+  for library in {43..49}; do
     if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
       if [[ ${enabled} -ge 1 ]]; then
         echo -n ", "
@@ -953,7 +948,7 @@ if [[ -n ${DISPLAY_HELP} ]]; then
 fi
 
 if [[ -n ${BUILD_FULL} ]]; then
-  for library in {0..50}; do
+  for library in {0..49}; do
     if [ ${GPL_ENABLED} == "yes" ]; then
       enable_library $(get_library_name $library)
     else
@@ -1083,7 +1078,7 @@ for run_arch in {0..6}; do
     TARGET_ARCH_LIST+=("${TARGET_ARCH}")
 
     # CLEAR FLAGS
-    for library in {1..51}; do
+    for library in {1..50}; do
       library_name=$(get_library_name $((library - 1)))
       unset "$(echo "OK_${library_name}" | sed "s/\-/\_/g")"
       unset "$(echo "DEPENDENCY_REBUILT_${library_name}" | sed "s/\-/\_/g")"

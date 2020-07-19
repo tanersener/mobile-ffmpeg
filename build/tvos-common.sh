@@ -49,11 +49,10 @@ get_library_name() {
         42) echo "libsamplerate" ;;
         43) echo "tvos-zlib" ;;
         44) echo "tvos-audiotoolbox" ;;
-        45) echo "tvos-coreimage" ;;
-        46) echo "tvos-bzip2" ;;
-        47) echo "tvos-videotoolbox" ;;
-        48) echo "tvos-libiconv" ;;
-        49) echo "tvos-libuuid" ;;
+        45) echo "tvos-bzip2" ;;
+        46) echo "tvos-videotoolbox" ;;
+        47) echo "tvos-libiconv" ;;
+        48) echo "tvos-libuuid" ;;
     esac
 }
 

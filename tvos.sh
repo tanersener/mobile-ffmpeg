@@ -50,17 +50,16 @@ LIBRARY_LEPTONICA=41
 LIBRARY_LIBSAMPLERATE=42
 LIBRARY_ZLIB=43
 LIBRARY_AUDIOTOOLBOX=44
-LIBRARY_COREIMAGE=45
-LIBRARY_BZIP2=46
-LIBRARY_VIDEOTOOLBOX=47
-LIBRARY_LIBICONV=48
-LIBRARY_LIBUUID=49
+LIBRARY_BZIP2=45
+LIBRARY_VIDEOTOOLBOX=46
+LIBRARY_LIBICONV=47
+LIBRARY_LIBUUID=48
 
 # ENABLE ARCH
 ENABLED_ARCHITECTURES=(1 1)
 
 # ENABLE LIBRARIES
-ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 
 export BASEDIR=$(pwd)
 
@@ -120,7 +119,6 @@ display_help() {
 
   echo -e "  --full\t\t\tenables all non-GPL external libraries"
   echo -e "  --enable-tvos-audiotoolbox\tbuild with built-in Apple AudioToolbox support[no]"
-  echo -e "  --enable-tvos-coreimage\tbuild with built-in Apple CoreImage support[no]"
   echo -e "  --enable-tvos-bzip2\t\tbuild with built-in bzip2 support[no]"
   if [[ -z ${MOBILE_FFMPEG_LTS_BUILD} ]]; then
     echo -e "  --enable-tvos-videotoolbox\tbuild with built-in Apple VideoToolbox support[no]"
@@ -262,7 +260,7 @@ redownload_library() {
   local REDOWNLOAD_VARIABLE=$(echo "REDOWNLOAD_$1" | sed "s/\-/\_/g")
   local library_supported=0
 
-  for library in {0..47}; do
+  for library in {0..42}; do
     library_name=$(get_library_name ${library})
 
     if [[ $1 != "ffmpeg" ]] && [[ ${library_name} == $1 ]]; then
@@ -288,9 +286,6 @@ set_library() {
     ;;
   tvos-audiotoolbox)
     ENABLED_LIBRARIES[LIBRARY_AUDIOTOOLBOX]=$2
-    ;;
-  tvos-coreimage)
-    ENABLED_LIBRARIES[LIBRARY_COREIMAGE]=$2
     ;;
   tvos-bzip2)
     ENABLED_LIBRARIES[LIBRARY_BZIP2]=$2
@@ -520,7 +515,7 @@ print_enabled_libraries() {
   let enabled=0
 
   # FIRST BUILT-IN LIBRARIES
-  for library in {43..49}; do
+  for library in {43..48}; do
     if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
       if [[ ${enabled} -ge 1 ]]; then
         echo -n ", "
@@ -830,7 +825,7 @@ if [[ -n ${DISPLAY_HELP} ]]; then
 fi
 
 if [[ -n ${BUILD_FULL} ]]; then
-  for library in {0..49}; do
+  for library in {0..48}; do
     if [ ${GPL_ENABLED} == "yes" ]; then
       enable_library $(get_library_name $library)
     else
@@ -916,7 +911,7 @@ for run_arch in {0..1}; do
     TARGET_ARCH_LIST+=(${TARGET_ARCH})
 
     # CLEAR FLAGS
-    for library in {1..48}; do
+    for library in {1..49}; do
       library_name=$(get_library_name $((library - 1)))
       unset $(echo "OK_${library_name}" | sed "s/\-/\_/g")
       unset $(echo "DEPENDENCY_REBUILT_${library_name}" | sed "s/\-/\_/g")

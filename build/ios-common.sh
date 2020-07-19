@@ -49,12 +49,11 @@ get_library_name() {
         42) echo "libsamplerate" ;;
         43) echo "ios-zlib" ;;
         44) echo "ios-audiotoolbox" ;;
-        45) echo "ios-coreimage" ;;
-        46) echo "ios-bzip2" ;;
-        47) echo "ios-videotoolbox" ;;
-        48) echo "ios-avfoundation" ;;
-        49) echo "ios-libiconv" ;;
-        50) echo "ios-libuuid" ;;
+        45) echo "ios-bzip2" ;;
+        46) echo "ios-videotoolbox" ;;
+        47) echo "ios-avfoundation" ;;
+        48) echo "ios-libiconv" ;;
+        49) echo "ios-libuuid" ;;
     esac
 }
 
