@@ -78,7 +78,7 @@
     if (returnCode == RETURN_CODE_CANCEL) {
         NSLog(@"FFmpeg process ended with cancel with executionId %ld.\n", executionId);
     } else {
-        NSLog(@"FFmpeg process ended with rc %d with executionId %ld.", returnCode, executionId);
+        NSLog(@"FFmpeg process ended with rc %d with executionId %ld.\n", returnCode, executionId);
     }
 }
 
