@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
     s.version           = "VERSION"
     s.summary           = "Mobile FFmpeg Https Static Framework"
     s.description       = <<-DESC
-    Includes FFmpeg v4.3-dev-2955 with gmp v6.2.0 and gnutls v3.6.13 library enabled.
+    Includes FFmpeg v4.4-dev-416 with gmp v6.2.0 and gnutls v3.6.13 library enabled.
     DESC
 
     s.homepage          = "https://github.com/tanersener/mobile-ffmpeg"

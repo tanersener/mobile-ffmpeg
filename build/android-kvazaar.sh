@@ -38,10 +38,8 @@ cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
 make distclean 2>/dev/null 1>/dev/null
 
-# RECONFIGURE IF REQUESTED
-if [[ ${RECONF_kvazaar} -eq 1 ]]; then
-    autoreconf_library ${LIB_NAME}
-fi
+# ALWAYS RECONFIGURE
+autoreconf_library ${LIB_NAME}
 
 # LINKING WITH ANDROID LTS SUPPORT LIBRARY IS NECESSARY FOR API < 18
 if [[ ! -z ${MOBILE_FFMPEG_LTS_BUILD} ]] && [[ ${API} < 18 ]]; then

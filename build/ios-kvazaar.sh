@@ -54,10 +54,8 @@ cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
 make distclean 2>/dev/null 1>/dev/null
 
-# RECONFIGURE IF REQUESTED
-if [[ ${RECONF_kvazaar} -eq 1 ]]; then
-    autoreconf_library ${LIB_NAME}
-fi
+# ALWAYS RECONFIGURE
+autoreconf_library ${LIB_NAME}
 
 ./configure \
     --prefix=${BASEDIR}/prebuilt/$(get_target_build_directory)/${LIB_NAME} \
