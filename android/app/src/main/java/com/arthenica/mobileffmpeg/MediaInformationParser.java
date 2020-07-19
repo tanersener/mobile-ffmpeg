@@ -59,11 +59,14 @@ public class MediaInformationParser {
      */
     public static MediaInformation fromWithError(final String ffprobeJsonOutput) throws JSONException {
         JSONObject jsonObject = new JSONObject(ffprobeJsonOutput);
-        JSONArray streamArray = jsonObject.getJSONArray("streams");
+        JSONArray streamArray = jsonObject.optJSONArray("streams");
 
         ArrayList<StreamInformation> arrayList = new ArrayList<>();
-        for (int i = 0; i < streamArray.length(); i++) {
-            arrayList.add(new StreamInformation(streamArray.getJSONObject(i)));
+        for (int i = 0; streamArray != null && i < streamArray.length(); i++) {
+            JSONObject streamObject = streamArray.optJSONObject(i);
+            if (streamObject != null) {
+                arrayList.add(new StreamInformation(streamObject));
+            }
         }
 
         return new MediaInformation(jsonObject, arrayList);

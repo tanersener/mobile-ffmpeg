@@ -19,9 +19,6 @@
 
 package com.arthenica.mobileffmpeg;
 
-import android.util.Log;
-
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.List;
@@ -151,10 +148,9 @@ public class MediaInformation {
             return null;
         }
 
-        try {
-            return mediaProperties.getString(key);
-        } catch (JSONException e) {
-            Log.e(Config.TAG, "getStringProperty failed.", e);
+        if (mediaProperties.has(key)) {
+            return mediaProperties.optString(key);
+        } else {
             return null;
         }
     }
@@ -171,10 +167,9 @@ public class MediaInformation {
             return null;
         }
 
-        try {
-            return mediaProperties.getLong(key);
-        } catch (JSONException e) {
-            Log.e(Config.TAG, "getNumberProperty failed.", e);
+        if (mediaProperties.has(key)) {
+            return mediaProperties.optLong(key);
+        } else {
             return null;
         }
     }
@@ -191,12 +186,7 @@ public class MediaInformation {
             return null;
         }
 
-        try {
-            return mediaProperties.getJSONObject(key);
-        } catch (JSONException e) {
-            Log.e(Config.TAG, "getProperties failed.", e);
-            return null;
-        }
+        return mediaProperties.optJSONObject(key);
     }
 
     /**
@@ -205,12 +195,7 @@ public class MediaInformation {
      * @return all media properties as a JSONObject or null if no media properties are defined
      */
     public JSONObject getMediaProperties() {
-        try {
-            return jsonObject.getJSONObject(KEY_MEDIA_PROPERTIES);
-        } catch (JSONException e) {
-            Log.e(Config.TAG, "getMediaProperties failed.", e);
-            return null;
-        }
+        return jsonObject.optJSONObject(KEY_MEDIA_PROPERTIES);
     }
 
     /**

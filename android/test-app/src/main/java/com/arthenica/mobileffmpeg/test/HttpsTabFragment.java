@@ -37,7 +37,6 @@ import com.arthenica.mobileffmpeg.LogMessage;
 import com.arthenica.mobileffmpeg.MediaInformation;
 import com.arthenica.mobileffmpeg.StreamInformation;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Iterator;
@@ -136,12 +135,8 @@ public class HttpsTabFragment extends Fragment {
                 if (tags != null) {
                     Iterator<String> keys = tags.keys();
                     while (keys.hasNext()) {
-                        try {
-                            String next = keys.next();
-                            appendLog("Tag: " + next + ":" + tags.getString(next) + "\n");
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+                        String next = keys.next();
+                        appendLog("Tag: " + next + ":" + tags.optString(next) + "\n");
                     }
                 }
             }
@@ -208,12 +203,8 @@ public class HttpsTabFragment extends Fragment {
                         if (tags != null) {
                             Iterator<String> keys = tags.keys();
                             while (keys.hasNext()) {
-                                try {
-                                    String next = keys.next();
-                                    appendLog("Stream tag: " + next + ":" + tags.getString(next) + "\n");
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
+                                String next = keys.next();
+                                appendLog(String.format("Stream tag: %s:%s\n", next, tags.optString(next)));
                             }
                         }
                     }
