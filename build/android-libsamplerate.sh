@@ -38,6 +38,9 @@ cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
 make distclean 2>/dev/null 1>/dev/null
 
+# DISABLE building of examples manually
+${SED_INLINE} 's/examples tests//g' ${BASEDIR}/src/${LIB_NAME}/Makefile*
+
 # RECONFIGURE IF REQUESTED
 if [[ ${RECONF_libsamplerate} -eq 1 ]]; then
     autoreconf_library ${LIB_NAME}
@@ -52,9 +55,6 @@ fi
     --disable-shared \
     --disable-fast-install \
     --host=${BUILD_HOST} || exit 1
-
-# DISABLE building of examples manually
-${SED_INLINE} 's/examples tests//g' ${BASEDIR}/src/${LIB_NAME}/Makefile
 
 make -j$(get_cpu_count) || exit 1
 
