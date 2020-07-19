@@ -256,12 +256,18 @@ redownload_library() {
   for library in {0..47}; do
     library_name=$(get_library_name ${library})
 
-    if [[ $1 != "ffmpeg" ]] && [[ ${library_name} == $1 ]]; then
+    if [[ ${library_name} == $1 ]]; then
       export ${REDOWNLOAD_VARIABLE}=1
       REDOWNLOAD_LIBRARIES+=($1)
       library_supported=1
     fi
   done
+
+  if [[ "ffmpeg" == $1 ]]; then
+    export ${REDOWNLOAD_VARIABLE}=1
+    REDOWNLOAD_LIBRARIES+=($1)
+    library_supported=1
+  fi
 
   if [[ ${library_supported} -eq 0 ]]; then
     echo -e "INFO: --redownload flag detected for library $1 is not supported.\n" 1>>${BASEDIR}/build.log 2>&1
