@@ -63,6 +63,6 @@ export LIBPNG_LIBS="-L${BASEDIR}/prebuilt/android-$(get_target_build)/libpng/lib
 make -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_freetype_package_config "23.1.17"
+create_freetype_package_config "23.2.17"
 
 make install || exit 1
