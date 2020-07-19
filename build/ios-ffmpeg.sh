@@ -95,6 +95,8 @@ case ${ARCH} in
 esac
 
 if [[ ${APPLE_TVOS_BUILD} -eq 1 ]]; then
+
+    # AVFOUNDATION DISABLED ON TVOS. WE DON'T HAVE A CAMERA/MIC THERE TO SUPPORT
     CONFIGURE_POSTFIX="--disable-avfoundation"
     LIBRARY_COUNT=48
 else
@@ -443,6 +445,7 @@ fi
     --disable-v4l2-m2m \
     --disable-outdev=v4l2 \
     --disable-outdev=fbdev \
+    --disable-outdev=audiotoolbox \
     --disable-indev=v4l2 \
     --disable-indev=fbdev \
     --disable-openssl \
@@ -473,12 +476,6 @@ fi
     --disable-vaapi \
     --disable-vdpau \
     ${CONFIGURE_POSTFIX} 1>>${BASEDIR}/build.log 2>&1
-
-# Workaround for issue #328
-echo "" >>ffbuild/config.mak
-echo "all:" >>ffbuild/config.mak
-echo "libswscale/aarch64/hscale.o: ${BASEDIR}/tools/make/ffmpeg/libswscale/aarch64/hscale.S" >>ffbuild/config.mak
-echo '	$(COMPILE_S)' >>ffbuild/config.mak
 
 if [ $? -ne 0 ]; then
     echo "failed"
