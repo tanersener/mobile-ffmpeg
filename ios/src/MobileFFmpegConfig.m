@@ -179,6 +179,9 @@ volatile int handleSIGPIPE = 1;
 /** Holds the id of the current execution */
 __thread volatile long executionId = 0;
 
+/** Holds the default log level */
+int configuredLogLevel = AV_LOG_INFO;
+
 void callbackWait(int milliSeconds) {
     dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(milliSeconds * NSEC_PER_MSEC)));
 }
@@ -300,7 +303,7 @@ void mobileffmpeg_log_callback_function(void *ptr, int level, const char* format
     if (level >= 0) {
         level &= 0xff;
     }
-    int activeLogLevel = [MobileFFmpegConfig getLogLevel];
+    int activeLogLevel = av_log_get_level();
 
     // AV_LOG_STDERR logs are always redirected
     if ((activeLogLevel == AV_LOG_QUIET && level != AV_LOG_STDERR) || (level > activeLogLevel)) {
@@ -348,7 +351,7 @@ void callbackBlockFunction() {
                     if ([callbackData getType] == LogType) {
 
                         // LOG CALLBACK
-                        int activeLogLevel = [MobileFFmpegConfig getLogLevel];
+                        int activeLogLevel = av_log_get_level();
                         int levelValue = [callbackData getLogLevel];
 
                         if ((activeLogLevel == AV_LOG_QUIET && levelValue != AV_LOG_STDERR) || (levelValue > activeLogLevel)) {
@@ -524,7 +527,7 @@ void callbackBlockFunction() {
  * @return log level
  */
 + (int)getLogLevel {
-    return av_log_get_level();
+    return configuredLogLevel;
 }
 
 /**
@@ -533,7 +536,7 @@ void callbackBlockFunction() {
  * @param level log level
  */
 + (void)setLogLevel:(int)level {
-    av_log_set_level(level);
+    configuredLogLevel = level;
 }
 
 /**

@@ -31,6 +31,7 @@ int ffprobe_execute(int argc, char **argv);
 
 extern int lastReturnCode;
 extern NSMutableString *lastCommandOutput;
+extern int configuredLogLevel;
 
 + (void)initialize {
     [MobileFFmpegConfig class];
@@ -44,6 +45,9 @@ extern NSMutableString *lastCommandOutput;
  */
 + (int)executeWithArguments:(NSArray*)arguments {
     lastCommandOutput = [[NSMutableString alloc] init];
+
+    // SETS DEFAULT LOG LEVEL BEFORE STARTING A NEW EXECUTION
+    av_log_set_level(configuredLogLevel);
 
     char **commandCharPArray = (char **)av_malloc(sizeof(char*) * ([arguments count] + 1));
 

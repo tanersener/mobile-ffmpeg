@@ -47,6 +47,8 @@ void removeExecution(long executionId);
 NSMutableArray *executions;
 NSLock *executionsLock;
 
+extern int configuredLogLevel;
+
 + (void)initialize {
     [MobileFFmpegConfig class];
 
@@ -60,6 +62,9 @@ NSLock *executionsLock;
 
 + (int)executeWithId:(long)newExecutionId andArguments:(NSArray*)arguments {
     lastCommandOutput = [[NSMutableString alloc] init];
+
+    // SETS DEFAULT LOG LEVEL BEFORE STARTING A NEW EXECUTION
+    av_log_set_level(configuredLogLevel);
 
     FFmpegExecution* currentFFmpegExecution = [[FFmpegExecution alloc] initWithExecutionId:newExecutionId andArguments:arguments];
     [executionsLock lock];

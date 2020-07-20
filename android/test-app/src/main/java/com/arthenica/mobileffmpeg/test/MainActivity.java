@@ -35,6 +35,7 @@ import androidx.viewpager.widget.ViewPager;
 import com.arthenica.mobileffmpeg.AsyncFFmpegExecuteTask;
 import com.arthenica.mobileffmpeg.Config;
 import com.arthenica.mobileffmpeg.ExecuteCallback;
+import com.arthenica.mobileffmpeg.Level;
 import com.arthenica.mobileffmpeg.Signal;
 import com.arthenica.mobileffmpeg.util.ResourcesUtil;
 import com.arthenica.smartexception.java.Exceptions;
@@ -135,6 +136,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "Listing supported camera ids.");
         listSupportedCameraIds();
         Config.ignoreSignal(Signal.SIGXCPU);
+        Config.setLogLevel(Level.AV_LOG_DEBUG);
     }
 
     @Override

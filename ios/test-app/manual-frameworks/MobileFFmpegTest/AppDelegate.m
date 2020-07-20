@@ -74,6 +74,7 @@ void uncaughtExceptionHandler(NSException *exception) {
     [MobileFFmpegConfig setFontDirectory:resourceFolder with:fontNameMapping];
     [MobileFFmpegConfig setFontDirectory:resourceFolder with:nil];
     [MobileFFmpegConfig ignoreSignal:SIGXCPU];
+    [MobileFFmpegConfig setLogLevel:AV_LOG_DEBUG];
     
     return YES;
 }

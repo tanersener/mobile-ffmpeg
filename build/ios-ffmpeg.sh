@@ -410,15 +410,22 @@ if [[ -z ${NO_WORKSPACE_CLEANUP_ffmpeg} ]]; then
     make distclean 2>/dev/null 1>/dev/null
 fi
 
-# Workaround to prevent adding of -mdynamic-no-pic flag
+########################### CUSTOMIZATIONS #######################
+
+# 1. Workaround to prevent adding of -mdynamic-no-pic flag
 ${SED_INLINE} 's/check_cflags -mdynamic-no-pic && add_asflags -mdynamic-no-pic;/check_cflags -mdynamic-no-pic;/g' ./configure 1>>${BASEDIR}/build.log 2>&1
 
-# Workaround for videotoolbox on mac catalyst
+# 2. Workaround for videotoolbox on mac catalyst
 if [ ${ARCH} == "x86-64-mac-catalyst" ]; then
     ${SED_INLINE} 's/    CFDictionarySetValue(buffer_attributes\, kCVPixelBufferOpenGLESCompatibilityKey/   \/\/ CFDictionarySetValue(buffer_attributes\, kCVPixelBufferOpenGLESCompatibilityKey/g' ${BASEDIR}/src/${LIB_NAME}/libavcodec/videotoolbox.c
 else
     ${SED_INLINE} 's/   \/\/ CFDictionarySetValue(buffer_attributes\, kCVPixelBufferOpenGLESCompatibilityKey/    CFDictionarySetValue(buffer_attributes\, kCVPixelBufferOpenGLESCompatibilityKey/g' ${BASEDIR}/src/${LIB_NAME}/libavcodec/videotoolbox.c
 fi
+
+# 3. Use thread local log level
+${SED_INLINE} 's/static int av_log_level/__thread int av_log_level/g' ${BASEDIR}/src/${LIB_NAME}/libavutil/log.c 1>>${BASEDIR}/build.log 2>&1
+
+###################################################################
 
 ./configure \
     --sysroot=${SDK_PATH} \

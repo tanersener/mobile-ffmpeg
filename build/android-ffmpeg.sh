@@ -348,6 +348,13 @@ export LDFLAGS="${LDFLAGS}"
 # USE HIGHER LIMITS FOR FFMPEG LINKING
 ulimit -n 2048 1>>${BASEDIR}/build.log 2>&1
 
+########################### CUSTOMIZATIONS #######################
+
+# 1. Use thread local log level
+${SED_INLINE} 's/static int av_log_level/__thread int av_log_level/g' ${BASEDIR}/src/${LIB_NAME}/libavutil/log.c 1>>${BASEDIR}/build.log 2>&1
+
+###################################################################
+
 ./configure \
     --cross-prefix="${BUILD_HOST}-" \
     --sysroot="${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/sysroot" \

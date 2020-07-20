@@ -112,6 +112,8 @@ public class CommandTabFragment extends Fragment {
 
         final String ffmpegCommand = String.format("%s", commandText.getText().toString());
 
+        android.util.Log.d(MainActivity.TAG, String.format("Current log level is %s.", Config.getLogLevel()));
+
         android.util.Log.d(MainActivity.TAG, "Testing FFmpeg COMMAND synchronously.");
 
         android.util.Log.d(MainActivity.TAG, String.format("FFmpeg process started with arguments\n\'%s\'", ffmpegCommand));

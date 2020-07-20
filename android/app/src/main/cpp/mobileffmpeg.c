@@ -101,6 +101,9 @@ volatile int handleSIGPIPE = 1;
 /** Holds the id of the current execution */
 __thread volatile long executionId = 0;
 
+/** Holds the default log level */
+int configuredLogLevel = AV_LOG_INFO;
+
 /** Prototypes of native functions defined by Config class. */
 JNINativeMethod configMethods[] = {
     {"enableNativeRedirection", "()V", (void*) Java_com_arthenica_mobileffmpeg_Config_enableNativeRedirection},
@@ -686,7 +689,7 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
  * @param level log level
  */
 JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_Config_setNativeLogLevel(JNIEnv *env, jclass object, jint level) {
-    av_log_set_level(level);
+    configuredLogLevel = level;
 }
 
 /**
@@ -696,7 +699,7 @@ JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_Config_setNativeLogLevel(
  * @param object reference to the class on which this method is invoked
  */
 JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_Config_getNativeLogLevel(JNIEnv *env, jclass object) {
-    return av_log_get_level();
+    return configuredLogLevel;
 }
 
 /**
@@ -785,6 +788,9 @@ JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_Config_nativeFFmpegExecut
     jstring *tempArray = NULL;
     int argumentCount = 1;
     char **argv = NULL;
+
+    // SETS DEFAULT LOG LEVEL BEFORE STARTING A NEW EXECUTION
+    av_log_set_level(configuredLogLevel);
 
     if (stringArray != NULL) {
         int programArgumentCount = (*env)->GetArrayLength(env, stringArray);
