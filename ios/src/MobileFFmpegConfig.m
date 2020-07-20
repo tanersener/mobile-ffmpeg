@@ -198,6 +198,7 @@ void logCallbackDataAdd(int level, NSString *logData) {
 
     [lock lock];
     [callbackDataArray addObject:callbackData];
+    [lastCommandOutput appendString:logData];
     [lock unlock];
 
     callbackNotify();
@@ -310,9 +311,6 @@ void mobileffmpeg_log_callback_function(void *ptr, int level, const char* format
 
     if (logData.length > 0) {
         logCallbackDataAdd(level, logData);
-
-        // BUILDING LAST COMMAND OUTPUT AS EARLY AS POSSIBLE
-        [lastCommandOutput appendString:logData];
     }
 }
 
