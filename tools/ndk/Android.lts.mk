@@ -53,7 +53,7 @@ LOCAL_ARM_NEON := ${MY_ARM_NEON}
 include $(BUILD_SHARED_LIBRARY)
 
 ifeq ($(TARGET_ARCH_ABI), armeabi-v7a)
-    ifeq ("$(shell test -e $(LOCAL_PATH)/../build/.neon && echo neon)","neon")
+    ifeq ("$(shell test -e $(LOCAL_PATH)/../../../../build/.neon && echo neon)","neon")
 
         include $(CLEAR_VARS)
         LOCAL_ARM_MODE := $(MY_ARM_MODE)
