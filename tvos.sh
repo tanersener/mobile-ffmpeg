@@ -818,17 +818,6 @@ while [ ! $# -eq 0 ]; do
   shift
 done
 
-# DETECT BUILD TYPE
-if [[ -n ${BUILD_LTS} ]]; then
-  enable_lts_build
-  BUILD_TYPE_ID+="LTS "
-fi
-
-if [[ -n ${DISPLAY_HELP} ]]; then
-  display_help
-  exit 0
-fi
-
 if [[ -n ${BUILD_FULL} ]]; then
   for library in {0..48}; do
     if [ ${GPL_ENABLED} == "yes" ]; then
@@ -839,6 +828,17 @@ if [[ -n ${BUILD_FULL} ]]; then
       fi
     fi
   done
+fi
+
+# DETECT BUILD TYPE
+if [[ -n ${BUILD_LTS} ]]; then
+  enable_lts_build
+  BUILD_TYPE_ID+="LTS "
+fi
+
+if [[ -n ${DISPLAY_HELP} ]]; then
+  display_help
+  exit 0
 fi
 
 if [[ -z ${BUILD_VERSION} ]]; then
