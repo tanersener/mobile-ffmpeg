@@ -61,7 +61,7 @@ if [[ ${RECONF_mobile_ffmpeg} -eq 1 ]]; then
 fi
 
 VIDEOTOOLBOX_SUPPORT_FLAG=""
-if [[ ${46} -eq 1 ]]; then
+if [[ ${47} -eq 1 ]]; then
     VIDEOTOOLBOX_SUPPORT_FLAG="--enable-videotoolbox"
 fi
 
