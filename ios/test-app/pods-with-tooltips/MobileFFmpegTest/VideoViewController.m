@@ -1,7 +1,7 @@
 //
 // VideoViewController.m
 //
-// Copyright (c) 2018 Taner Sener
+// Copyright (c) 2018-2019 Taner Sener
 //
 // This file is part of MobileFFmpeg.
 //
@@ -54,7 +54,7 @@
 
     // Tooltip view reference
     RCEasyTipView *tooltip;
-    
+
     Statistics *statistics;
 }
 
@@ -62,7 +62,7 @@
     [super viewDidLoad];
 
     // VIDEO CODEC PICKER INIT
-    codecData = @[@"mpeg4", @"h264 (x264)", @"h264 (videotoolbox)", @"x265", @"xvid", @"vp8", @"vp9", @"aom", @"kvazaar", @"theora", @"hap"];
+    codecData = @[@"mpeg4", @"h264 (x264)", @"h264 (openh264)", @"h264 (videotoolbox)", @"x265", @"xvid", @"vp8", @"vp9", @"aom", @"kvazaar", @"theora", @"hap"];
     selectedCodec = 0;
     
     self.videoCodecPicker.dataSource = self;
@@ -73,7 +73,7 @@
     [Util applyPickerViewStyle: self.videoCodecPicker];
     [Util applyVideoPlayerFrameStyle: self.videoPlayerFrame];
     [Util applyHeaderStyle: self.header];
-    
+
     // TOOLTIP INIT
     RCEasyTipPreferences *preferences = [[RCEasyTipPreferences alloc] initWithDefaultPreferences];
     [Util applyTooltipStyle: preferences];
@@ -82,10 +82,10 @@
     preferences.animating.dismissDuration = VIDEO_TEST_TOOLTIP_DURATION;
     preferences.animating.dismissTransform = CGAffineTransformMakeTranslation(0, -15);
     preferences.animating.showInitialTransform = CGAffineTransformMakeTranslation(0, -15);
-    
+
     tooltip = [[RCEasyTipView alloc] initWithPreferences:preferences];
     tooltip.text = VIDEO_TEST_TOOLTIP_TEXT;
-    
+
     // VIDEO PLAYER INIT
     player = [[AVQueuePlayer alloc] init];
     playerLayer = [AVPlayerLayer playerLayerWithPlayer:player];
@@ -98,7 +98,7 @@
     
     playerLayer.frame = rectangularFrame;
     [self.view.layer addSublayer:playerLayer];
-    
+
     alertController = nil;
     statistics = nil;
 
@@ -136,7 +136,7 @@
     selectedCodec = row;
 }
 
-- (void)logCallback: (int)level :(NSString*)message {
+- (void)logCallback:(long)executionId :(int)level :(NSString*)message {
     dispatch_async(dispatch_get_main_queue(), ^{
         NSLog(@"%@", message);
     });
@@ -244,6 +244,8 @@
     // APPLYING NECESSARY TRANSFORMATION HERE
     if ([videoCodec isEqualToString:@"h264 (x264)"]) {
         videoCodec = @"libx264";
+    } else if ([videoCodec isEqualToString:@"h264 (openh264)"]) {
+        videoCodec = @"libopenh264";
     } else if ([videoCodec isEqualToString:@"h264 (videotoolbox)"]) {
         videoCodec = @"h264_videotoolbox";
     } else if ([videoCodec isEqualToString:@"x265"]) {
@@ -405,8 +407,8 @@
 
 + (NSString*)generateVideoEncodeScript:(NSString *)image1 :(NSString *)image2 :(NSString *)image3 :(NSString *)videoFile :(NSString *)videoCodec :(NSString *)customOptions {
     return [NSString stringWithFormat:
-@"-hide_banner -y -loop 1 -i \"%@\" \
--loop 1 -i '%@' \
+@"-hide_banner -y -loop 1 -i %@ \
+-loop 1 -i %@ \
 -loop 1 -i %@ \
 -filter_complex \"\
 [0:v]setpts=PTS-STARTPTS,scale=w=\'if(gte(iw/ih,640/427),min(iw,640),-1)\':h=\'if(gte(iw/ih,640/427),-1,min(ih,427))\',scale=trunc(iw/2)*2:trunc(ih/2)*2,setsar=sar=1/1,split=2[stream1out1][stream1out2];\

@@ -1,7 +1,7 @@
 //
-// MediaInformationParserTest.h
+// ConcurrentExecutionViewController.h
 //
-// Copyright (c) 2018-2020 Taner Sener
+// Copyright (c) 2020 Taner Sener
 //
 // This file is part of MobileFFmpeg.
 //
@@ -19,10 +19,14 @@
 //  along with MobileFFmpeg.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-void assertNumber(NSNumber *expected, NSNumber *real);
-void assertString(NSString *expected, NSString *real);
+#import <UIKit/UIKit.h>
+#import <mobileffmpeg/MobileFFmpegConfig.h>
+#import "Constants.h"
+#import "Util.h"
 
-/**
- * All parser tests are initiated from this method
- */
-void testMediaInformationParser(void);
+@interface ConcurrentExecutionViewController : UIViewController<LogDelegate,ExecuteDelegate>
+
+- (void)setActive;
+
+@end
+

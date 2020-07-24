@@ -1,7 +1,7 @@
 //
 // HttpsViewController.m
 //
-// Copyright (c) 2018 Taner Sener
+// Copyright (c) 2018-2019 Taner Sener
 //
 // This file is part of MobileFFmpeg.
 //
@@ -20,7 +20,7 @@
 //
 
 #import <mobileffmpeg/MobileFFmpegConfig.h>
-#import <mobileffmpeg/MobileFFmpeg.h>
+#import <mobileffmpeg/MobileFFprobe.h>
 #import "HttpsViewController.h"
 #import "RCEasyTipView.h"
 
@@ -56,7 +56,7 @@
     preferences.animating.dismissDuration = HTTPS_TEST_TOOLTIP_DURATION;
     preferences.animating.dismissTransform = CGAffineTransformMakeTranslation(0, -15);
     preferences.animating.showInitialTransform = CGAffineTransformMakeTranslation(0, -15);
-    
+
     tooltip = [[RCEasyTipView alloc] initWithPreferences:preferences];
     tooltip.text = HTTPS_TEST_TOOLTIP_TEXT;
 
@@ -69,7 +69,7 @@
     [super didReceiveMemoryWarning];
 }
 
-- (void)logCallback: (int)level :(NSString*)message {
+- (void)logCallback:(long)executionId :(int)level :(NSString*)message {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self appendOutput: message];
     });
@@ -77,7 +77,7 @@
 
 - (IBAction)getInfoClicked:(id)sender {
     [self hideTooltip];
-    
+
     [self clearOutput];
     
     NSString *testUrl = [self.urlText text];
@@ -94,7 +94,7 @@
     if (information == nil) {
         NSLog(@"Get media information failed\n");
     } else {
-        NSLog(@"Media information for %@\n", [information getPath]);
+        NSLog(@"Media information for %@\n", [information getFilename]);
         
         if ([information getFormat] != nil) {
             [self appendOutput:[NSString stringWithFormat:@"Format: %@\n", [information getFormat]]];
@@ -108,10 +108,10 @@
         if ([information getStartTime] != nil) {
             [self appendOutput:[NSString stringWithFormat:@"Start time: %@\n", [information getStartTime]]];
         }
-        if ([information getMetadataEntries] != nil) {
-            NSDictionary* entries = [information getMetadataEntries];
-            for(NSString *key in [entries allKeys]) {
-                [self appendOutput:[NSString stringWithFormat:@"Metadata: %@:%@", key, [entries objectForKey:key]]];
+        if ([information getTags] != nil) {
+            NSDictionary* tags = [information getTags];
+            for(NSString *key in [tags allKeys]) {
+                [self appendOutput:[NSString stringWithFormat:@"Tag: %@:%@", key, [tags objectForKey:key]]];
             }
         }
         if ([information getStreams] != nil) {
@@ -131,10 +131,7 @@
                 if ([stream getFormat] != nil) {
                     [self appendOutput:[NSString stringWithFormat:@"Stream format: %@\n", [stream getFormat]]];
                 }
-                if ([stream getFullFormat] != nil) {
-                    [self appendOutput:[NSString stringWithFormat:@"Stream full format: %@\n", [stream getFullFormat]]];
-                }
-                
+
                 if ([stream getWidth] != nil) {
                     [self appendOutput:[NSString stringWithFormat:@"Stream width: %@\n", [stream getWidth]]];
                 }
@@ -154,7 +151,7 @@
                 if ([stream getChannelLayout] != nil) {
                     [self appendOutput:[NSString stringWithFormat:@"Stream channel layout: %@\n", [stream getChannelLayout]]];
                 }
-                
+
                 if ([stream getSampleAspectRatio] != nil) {
                     [self appendOutput:[NSString stringWithFormat:@"Stream sample aspect ratio: %@\n", [stream getSampleAspectRatio]]];
                 }
@@ -174,10 +171,10 @@
                     [self appendOutput:[NSString stringWithFormat:@"Stream codec time base: %@\n", [stream getCodecTimeBase]]];
                 }
 
-                if ([stream getMetadataEntries] != nil) {
-                    NSDictionary* entries = [information getMetadataEntries];
-                    for(NSString *key in [entries allKeys]) {
-                        [self appendOutput:[NSString stringWithFormat:@"Stream metadata: %@:%@", key, [entries objectForKey:key]]];
+                if ([stream getTags] != nil) {
+                    NSDictionary* tags = [stream getTags];
+                    for(NSString *key in [tags allKeys]) {
+                        [self appendOutput:[NSString stringWithFormat:@"Stream tag: %@:%@", key, [tags objectForKey:key]]];
                     }
                 }
             }

@@ -12,10 +12,10 @@ android {
     compileSdkVersion 29
     defaultConfig {
         applicationId "com.arthenica.mobileffmpeg.test"
-        minSdkVersion 24
+        minSdkVersion 16
         targetSdkVersion 29
-        versionCode 240432
-        versionName "4.3.2"
+        versionCode 160440
+        versionName "4.4.LTS"
     }
     buildTypes {
         debug {
@@ -51,8 +51,8 @@ android.applicationVariants.all { variant ->
 }
 
 dependencies {
-    implementation project(':app')
-    // implementation 'com.arthenica:mobile-ffmpeg-full:4.3.2'
+    // implementation project(':app')
+    implementation 'com.arthenica:mobile-ffmpeg-full:4.4.LTS'
     implementation 'com.arthenica:smart-exception-java:0.1.0'
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'

@@ -90,7 +90,7 @@
     [super didReceiveMemoryWarning];
 }
 
-- (void)logCallback: (int)level :(NSString*)message {
+- (void)logCallback:(long)executionId :(int)level :(NSString*)message {
     dispatch_async(dispatch_get_main_queue(), ^{
         NSLog(@"%@", message);
     });
@@ -198,6 +198,8 @@
     // APPLYING NECESSARY TRANSFORMATION HERE
     if ([videoCodec isEqualToString:@"h264"]) {
         videoCodec = @"libx264";
+    } else if ([videoCodec containsString:@"h264 (openh264)"]) {
+        videoCodec = @"libopenh264";
     } else if ([videoCodec containsString:@"h264 (videotoolbox)"]) {
         videoCodec = @"h264_videotoolbox";
     } else if ([videoCodec containsString:@"x265"]) {
@@ -349,8 +351,8 @@
 
 + (NSString*)generateVideoEncodeScript:(NSString *)image1 :(NSString *)image2 :(NSString *)image3 :(NSString *)videoFile :(NSString *)videoCodec :(NSString *)customOptions {
     return [NSString stringWithFormat:
-@"-hide_banner -y -loop 1 -i \"%@\" \
--loop 1 -i '%@' \
+@"-hide_banner -y -loop 1 -i %@ \
+-loop 1 -i %@ \
 -loop 1 -i %@ \
 -filter_complex \"\
 [0:v]setpts=PTS-STARTPTS,scale=w=\'if(gte(iw/ih,640/427),min(iw,640),-1)\':h=\'if(gte(iw/ih,640/427),-1,min(ih,427))\',scale=trunc(iw/2)*2:trunc(ih/2)*2,setsar=sar=1/1,split=2[stream1out1][stream1out2];\

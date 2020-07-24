@@ -52,7 +52,7 @@
     [super viewDidLoad];
     
     // AUDIO CODEC PICKER INIT
-    codecData = @[@"aac (audiotoolbox)", @"mp2 (twolame)", @"mp3 (liblame)", @"mp3 (libshine)", @"vorbis", @"opus", @"amr", @"ilbc", @"soxr", @"speex", @"wavpack"];
+    codecData = @[@"aac (audiotoolbox)", @"mp2 (twolame)", @"mp3 (liblame)", @"mp3 (libshine)", @"vorbis", @"opus", @"amr-nb", @"amr-wb", @"ilbc", @"soxr", @"speex", @"wavpack"];
     selectedCodec = 0;
     
     self.audioCodecPicker.dataSource = self;
@@ -63,7 +63,7 @@
     [Util applyButtonStyle: self.encodeButton];
     [Util applyOutputTextStyle: self.outputText];
     [Util applyHeaderStyle: self.header];
-    
+
     // TOOLTIP INIT
     RCEasyTipPreferences *preferences = [[RCEasyTipPreferences alloc] initWithDefaultPreferences];
     [Util applyTooltipStyle: preferences];
@@ -72,7 +72,7 @@
     preferences.animating.dismissDuration = AUDIO_TEST_TOOLTIP_DURATION;
     preferences.animating.dismissTransform = CGAffineTransformMakeTranslation(0, -15);
     preferences.animating.showInitialTransform = CGAffineTransformMakeTranslation(0, -15);
-    
+
     tooltip = [[RCEasyTipView alloc] initWithPreferences:preferences];
     tooltip.text = AUDIO_TEST_TOOLTIP_TEXT;
 
@@ -111,7 +111,7 @@
     selectedCodec = row;
 }
 
-- (void)logCallback: (int)level :(NSString*)message {
+- (void)logCallback:(long)executionId :(int)level :(NSString*)message {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self appendOutput: message];
     });
@@ -213,7 +213,9 @@
         extension = @"ogg";
     } else if ([audioCodec isEqualToString:@"opus"]) {
         extension = @"opus";
-    } else if ([audioCodec isEqualToString:@"amr"]) {
+    } else if ([audioCodec isEqualToString:@"amr-nb"]) {
+        extension = @"amr";
+    } else if ([audioCodec isEqualToString:@"amr-wb"]) {
         extension = @"amr";
     } else if ([audioCodec isEqualToString:@"ilbc"]) {
         extension = @"lbc";
@@ -310,8 +312,10 @@
         return [NSString stringWithFormat:@"-hide_banner -y -i %@ -c:a libvorbis -b:a 64k %@", audioSampleFile, audioOutputFile];
     } else if ([audioCodec isEqualToString:@"opus"]) {
         return [NSString stringWithFormat:@"-hide_banner -y -i %@ -c:a libopus -b:a 64k -vbr on -compression_level 10 %@", audioSampleFile, audioOutputFile];
-    } else if ([audioCodec isEqualToString:@"amr"]) {
+    } else if ([audioCodec isEqualToString:@"amr-nb"]) {
         return [NSString stringWithFormat:@"-hide_banner -y -i %@ -ar 8000 -ab 12.2k -c:a libopencore_amrnb %@", audioSampleFile, audioOutputFile];
+    } else if ([audioCodec isEqualToString:@"amr-wb"]) {
+        return [NSString stringWithFormat:@"-hide_banner -y -i %@ -ar 8000 -ab 12.2k -c:a libvo_amrwbenc -strict experimental %@", audioSampleFile, audioOutputFile];
     } else if ([audioCodec isEqualToString:@"ilbc"]) {
         return [NSString stringWithFormat:@"-hide_banner -y -i %@ -c:a ilbc -ar 8000 -b:a 15200 %@", audioSampleFile, audioOutputFile];
     } else if ([audioCodec isEqualToString:@"speex"]) {

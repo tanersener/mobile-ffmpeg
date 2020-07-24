@@ -1,16 +1,16 @@
 PODS:
-  - mobile-ffmpeg-tvos-min (4.3.2)
+  - mobile-ffmpeg-tvos-full (4.4.LTS)
 
 DEPENDENCIES:
-  - mobile-ffmpeg-tvos-min (= 4.3.2)
+  - mobile-ffmpeg-tvos-full (= 4.4.LTS)
 
 SPEC REPOS:
   trunk:
-    - mobile-ffmpeg-tvos-min
+    - mobile-ffmpeg-tvos-full
 
 SPEC CHECKSUMS:
-  mobile-ffmpeg-tvos-min: 72b759a621b8dcc416d1ce084f03ae92fc372f51
+  mobile-ffmpeg-tvos-full: da004c70b488a8b57d17f671673e5a755de56ce4
 
-PODFILE CHECKSUM: 336efdd780bafc044dda85fe9063f23d6b5181f5
+PODFILE CHECKSUM: 12bb9caefbfa2efced95d1c6e0cb6ea50217a57d
 
-COCOAPODS: 1.9.1
+COCOAPODS: 1.9.2

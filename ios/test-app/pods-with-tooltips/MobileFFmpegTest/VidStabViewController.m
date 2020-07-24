@@ -58,7 +58,7 @@
     [Util applyVideoPlayerFrameStyle: self.videoPlayerFrame];
     [Util applyVideoPlayerFrameStyle: self.stabilizedVideoPlayerFrame];
     [Util applyHeaderStyle: self.header];
-    
+
     // TOOLTIP INIT
     RCEasyTipPreferences *preferences = [[RCEasyTipPreferences alloc] initWithDefaultPreferences];
     [Util applyTooltipStyle: preferences];
@@ -67,7 +67,7 @@
     preferences.animating.dismissDuration = VIDSTAB_TEST_TOOLTIP_DURATION;
     preferences.animating.dismissTransform = CGAffineTransformMakeTranslation(0, -15);
     preferences.animating.showInitialTransform = CGAffineTransformMakeTranslation(0, -15);
-    
+
     tooltip = [[RCEasyTipView alloc] initWithPreferences:preferences];
     tooltip.text = VIDSTAB_TEST_TOOLTIP_TEXT;
 
@@ -109,7 +109,7 @@
     [super didReceiveMemoryWarning];
 }
 
-- (void)logCallback: (int)level :(NSString*)message {
+- (void)logCallback:(long)executionId :(int)level :(NSString*)message {
     dispatch_async(dispatch_get_main_queue(), ^{
         NSLog(@"%@", message);
     });
@@ -303,8 +303,8 @@
 
 + (NSString*)generateVideoCreateScript:(NSString *)image1 :(NSString *)image2 :(NSString *)image3 :(NSString *)videoFile {
     return [NSString stringWithFormat:
-@"-hide_banner -y -loop 1 -i \"%@\" \
--loop 1 -i '%@' \
+@"-hide_banner -y -loop 1 -i %@ \
+-loop 1 -i %@ \
 -loop 1 -i %@ \
 -f lavfi -i color=black:s=640x427 \
 -filter_complex \"\

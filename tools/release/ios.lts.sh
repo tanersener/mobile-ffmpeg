@@ -27,6 +27,7 @@ create_package() {
     # COPY PODSPEC AS THE LAST ITEM
     cp ${BASEDIR}/ios/${PACKAGE_NAME}.podspec ${CURRENT_PACKAGE} || exit 1
     sed -i '' "s/VERSION/${PACKAGE_VERSION}/g" ${CURRENT_PACKAGE}/${PACKAGE_NAME}.podspec || exit 1
+    sed -i '' "s/\,\'AVFoundation\'//g" ${CURRENT_PACKAGE}/${PACKAGE_NAME}.podspec || exit 1
 
     mkdir -p ${ALL_UNIVERSAL_PACKAGES} || exit 1
     local CURRENT_UNIVERSAL_PACKAGE="${ALL_UNIVERSAL_PACKAGES}/${PACKAGE_NAME}-universal"
