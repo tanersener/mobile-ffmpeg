@@ -8,7 +8,7 @@ export SOURCE_PACKAGE="${BASEDIR}/../../prebuilt/ios-xcframework"
 export COCOA_PACKAGE="${BASEDIR}/../../prebuilt/ios-cocoa"
 export CUSTOM_OPTIONS="--xcframework --disable-armv7 --disable-armv7s --disable-i386 --disable-arm64e --enable-ios-zlib --enable-ios-bzip2 --enable-ios-avfoundation --enable-ios-audiotoolbox --enable-ios-videotoolbox"
 export GPL_PACKAGES="--enable-gpl --enable-libvidstab --enable-x264 --enable-x265 --enable-xvidcore"
-export FULL_PACKAGES="--enable-fontconfig --enable-freetype --enable-fribidi --enable-gmp --enable-gnutls --enable-kvazaar --enable-lame --enable-libaom --enable-libass --enable-libilbc --enable-libtheora --enable-libvorbis --enable-libvpx --enable-libwebp --enable-libxml2 --enable-opencore-amr --enable-opus --enable-shine --enable-snappy --enable-soxr --enable-speex --enable-twolame --enable-wavpack"
+export FULL_PACKAGES="--enable-fontconfig --enable-freetype --enable-fribidi --enable-gmp --enable-gnutls --enable-kvazaar --enable-lame --enable-libaom --enable-libass --enable-libilbc --enable-libtheora --enable-libvorbis --enable-libvpx --enable-libwebp --enable-libxml2 --enable-opencore-amr --enable-opus --enable-shine --enable-snappy --enable-soxr --enable-speex --enable-twolame --enable-vo-amrwbenc --enable-wavpack"
 
 create_package() {
     local PACKAGE_NAME="mobile-ffmpeg-$1"
@@ -77,7 +77,7 @@ create_package "https-gpl" "$1" || exit 1
 
 # AUDIO RELEASE
 cd ${BASEDIR}/../.. || exit 1
-./ios.sh ${CUSTOM_OPTIONS} --enable-lame --enable-libilbc --enable-libvorbis --enable-opencore-amr --enable-opus --enable-shine --enable-soxr --enable-speex --enable-twolame --enable-wavpack || exit 1
+./ios.sh ${CUSTOM_OPTIONS} --enable-lame --enable-libilbc --enable-libvorbis --enable-opencore-amr --enable-opus --enable-shine --enable-soxr --enable-speex --enable-twolame --enable-vo-amrwbenc --enable-wavpack || exit 1
 create_package "audio" "$1" || exit 1
 
 # VIDEO RELEASE
