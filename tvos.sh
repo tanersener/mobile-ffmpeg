@@ -52,14 +52,15 @@ LIBRARY_ZLIB=43
 LIBRARY_AUDIOTOOLBOX=44
 LIBRARY_BZIP2=45
 LIBRARY_VIDEOTOOLBOX=46
-LIBRARY_LIBICONV=47
-LIBRARY_LIBUUID=48
+LIBRARY_AVFOUNDATION=47
+LIBRARY_LIBICONV=48
+LIBRARY_LIBUUID=49
 
 # ENABLE ARCH
 ENABLED_ARCHITECTURES=(1 1)
 
 # ENABLE LIBRARIES
-ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 
 export BASEDIR=$(pwd)
 
@@ -521,7 +522,7 @@ print_enabled_libraries() {
   let enabled=0
 
   # FIRST BUILT-IN LIBRARIES
-  for library in {43..48}; do
+  for library in {43..49}; do
     if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
       if [[ ${enabled} -ge 1 ]]; then
         echo -n ", "
@@ -819,7 +820,7 @@ while [ ! $# -eq 0 ]; do
 done
 
 if [[ -n ${BUILD_FULL} ]]; then
-  for library in {0..48}; do
+  for library in {0..46} {48..49}; do
     if [ ${GPL_ENABLED} == "yes" ]; then
       enable_library $(get_library_name $library)
     else
@@ -916,7 +917,7 @@ for run_arch in {0..1}; do
     TARGET_ARCH_LIST+=(${TARGET_ARCH})
 
     # CLEAR FLAGS
-    for library in {1..49}; do
+    for library in {1..50}; do
       library_name=$(get_library_name $((library - 1)))
       unset $(echo "OK_${library_name}" | sed "s/\-/\_/g")
       unset $(echo "DEPENDENCY_REBUILT_${library_name}" | sed "s/\-/\_/g")

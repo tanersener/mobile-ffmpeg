@@ -291,6 +291,7 @@ do
     else
 
         # THE FOLLOWING LIBRARIES SHOULD BE EXPLICITLY DISABLED TO PREVENT AUTODETECT
+        # NOTE THAT IDS MUST BE +1 OF THE INDEX VALUE
         if [[ ${library} -eq 31 ]]; then
             CONFIGURE_POSTFIX+=" --disable-sdl2"
         elif [[ ${library} -eq 46 ]]; then
