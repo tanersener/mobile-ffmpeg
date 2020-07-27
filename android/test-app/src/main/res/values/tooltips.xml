@@ -1,0 +1,10 @@
+<resources>
+    <string name="command_test_tooltip_text">Enter an FFmpeg command without \'ffmpeg\' at the beginning and click one of the RUN buttons</string>
+    <string name="video_test_tooltip_text">Select a video codec and press ENCODE button</string>
+    <string name="https_test_tooltip_text">Enter the https url of a media file and click the button</string>
+    <string name="audio_test_tooltip_text">Select an audio codec and press ENCODE button</string>
+    <string name="subtitle_test_tooltip_text">Click the button to burn subtitles. Created video will play inside the frame below</string>
+    <string name="vidstab_test_tooltip_text">Click the button to stabilize video. Original video will play above and stabilized video will play below</string>
+    <string name="pipe_test_tooltip_text">Click the button to create a video using pipe redirection. Created video will play inside the frame below</string>
+    <string name="concurrent_execution_test_tooltip_text">Use ENCODE and CANCEL buttons to start/stop multiple execution</string>
+</resources>

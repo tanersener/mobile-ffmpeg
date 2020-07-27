@@ -148,7 +148,7 @@ public class CommandTabFragment extends Fragment {
     private void setActive() {
         Log.i(MainActivity.TAG, "Command Tab Activated");
         enableLogCallback();
-        Popup.show(requireContext(), Tooltip.COMMAND_TEST_TOOLTIP_TEXT);
+        Popup.show(requireContext(), getString(R.string.command_test_tooltip_text));
     }
 
     public void appendLog(final String logMessage) {

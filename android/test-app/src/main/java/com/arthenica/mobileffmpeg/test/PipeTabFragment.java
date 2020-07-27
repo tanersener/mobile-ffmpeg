@@ -226,7 +226,7 @@ public class PipeTabFragment extends Fragment {
         Log.i(MainActivity.TAG, "Pipe Tab Activated");
         enableLogCallback();
         enableStatisticsCallback();
-        Popup.show(requireContext(), Tooltip.PIPE_TEST_TOOLTIP_TEXT);
+        Popup.show(requireContext(), getString(R.string.pipe_test_tooltip_text));
     }
 
     protected void showProgressDialog() {
