@@ -9,17 +9,17 @@ FFmpeg for Android, iOS and tvOS
 - Includes both `FFmpeg` and `FFprobe`
 - Supports FFmpeg `v3.4.x`, `v4.0.x`, `v4.1`, `v4.2` , `v4.3` and `v4.4-dev` releases
 - Use prebuilt binaries available under `Github`/`JCenter`/`CocoaPods` or build your own version with external libraries you need
-- Includes 28 external libraries, 5 GPL libraries and 14 architectures in total
+- Includes 29 external libraries, 5 GPL libraries and 14 architectures in total
 - Exposes both FFmpeg library and MobileFFmpeg wrapper library capabilities
 - Supports concurrent execution
-- Includes cross-compile instructions for 46 open-source libraries
+- Includes cross-compile instructions for 47 open-source libraries
 
-   `chromaprint`, `expat`, `ffmpeg`, `fontconfig`, `freetype`, `fribidi`, `giflib`, `gmp`, `gnutls`, `kvazaar`, `lame`, `leptonica`, `libaom`, `libass`, `libiconv`, `libilbc`, `libjpeg`, `libjpeg-turbo`, `libogg`, `libpng`, `libsamplerate`, `libsndfile`, `libtheora`, `libuuid`, `libvorbis`, `libvpx`, `libwebp`, `libxml2`, `nettle`, `opencore-amr`, `openh264`, `opus`, `rubberband`, `sdl`, `shine`, `snappy`, `soxr`, `speex`, `tesseract`, `tiff`, `twolame`, `vid.stab`, `wavpack`, `x264`, `x265`, `xvidcore`
+   `chromaprint`, `expat`, `ffmpeg`, `fontconfig`, `freetype`, `fribidi`, `giflib`, `gmp`, `gnutls`, `kvazaar`, `lame`, `leptonica`, `libaom`, `libass`, `libiconv`, `libilbc`, `libjpeg`, `libjpeg-turbo`, `libogg`, `libpng`, `libsamplerate`, `libsndfile`, `libtheora`, `libuuid`, `libvorbis`, `libvpx`, `libwebp`, `libxml2`, `nettle`, `opencore-amr`, `openh264`, `opus`, `rubberband`, `sdl`, `shine`, `snappy`, `soxr`, `speex`, `tesseract`, `tiff`, `twolame`, `vid.stab`, `vo-amrwbenc`, `wavpack`, `x264`, `x265`, `xvidcore`
 
 - Supports `API Level 16+` on Android
 - Builds `arm-v7a`, `arm-v7a-neon`, `arm64-v8a`, `x86` and `x86_64` Android architectures
 - Supports `zlib` and `MediaCodec` Android system libraries
-- Creates Android archive with .aar extension
+- Creates Android archives with .aar extension
 - Supports `iOS SDK 9.3` or later
 - Builds `armv7`, `armv7s`, `arm64`, `arm64e`, `i386`, `x86_64` and `x86_64` (Mac Catalyst) iOS architectures
 - Supports `bzip2`, `iconv`, `libuuid`, `zlib` iOS system libraries and `AudioToolbox`, `VideoToolbox`, `AVFoundation` iOS system frameworks
@@ -34,7 +34,10 @@ FFmpeg for Android, iOS and tvOS
 - Licensed under LGPL 3.0, can be customized to support GPL v3.0
 
 ### 2. Using
+
 Binaries are available at [Github](https://github.com/tanersener/mobile-ffmpeg/releases), [JCenter](https://bintray.com/bintray/jcenter) and [CocoaPods](https://cocoapods.org).
+
+#### 2.1 Packages
 
 There are eight different prebuilt packages. Below you can see which external libraries are enabled in each of them.
 
@@ -59,10 +62,10 @@ Please remember that some parts of `FFmpeg` are licensed under the `GPL` and onl
 <td align="center"><sup>vid.stab</sup><br><sup>x264</sup><br><sup>x265</sup><br><sup>xvidcore</sup></td>
 <td align="center"><sup>gmp</sup><br><sup>gnutls</sup></td>
 <td align="center"><sup>gmp</sup><br><sup>gnutls</sup><br><sup>vid.stab</sup><br><sup>x264</sup><br><sup>x265</sup><br><sup>xvidcore</sup></td>
-<td align="center"><sup>lame</sup><br><sup>libilbc</sup><br><sup>libvorbis</sup><br><sup>opencore-amr</sup><br><sup>opus</sup><br><sup>shine</sup><br><sup>soxr</sup><br><sup>speex</sup><br><sup>twolame</sup><br><sup>wavpack</sup></td>
+<td align="center"><sup>lame</sup><br><sup>libilbc</sup><br><sup>libvorbis</sup><br><sup>opencore-amr</sup><br><sup>opus</sup><br><sup>shine</sup><br><sup>soxr</sup><br><sup>speex</sup><br><sup>twolame</sup><br><sup>vo-amrwbenc</sup><br><sup>wavpack</sup></td>
 <td align="center"><sup>fontconfig</sup><br><sup>freetype</sup><br><sup>fribidi</sup><br><sup>kvazaar</sup><br><sup>libaom</sup><br><sup>libass</sup><br><sup>libiconv</sup><br><sup>libtheora</sup><br><sup>libvpx</sup><br><sup>libwebp</sup><br><sup>snappy</sup></td>
-<td align="center"><sup>fontconfig</sup><br><sup>freetype</sup><br><sup>fribidi</sup><br><sup>gmp</sup><br><sup>gnutls</sup><br><sup>kvazaar</sup><br><sup>lame</sup><br><sup>libaom</sup><br><sup>libass</sup><br><sup>libiconv</sup><br><sup>libilbc</sup><br><sup>libtheora</sup><br><sup>libvorbis</sup><br><sup>libvpx</sup><br><sup>libwebp</sup><br><sup>libxml2</sup><br><sup>opencore-amr</sup><br><sup>opus</sup><br><sup>shine</sup><br><sup>snappy</sup><br><sup>soxr</sup><br><sup>speex</sup><br><sup>twolame</sup><br><sup>wavpack</sup></td>
-<td align="center"><sup>fontconfig</sup><br><sup>freetype</sup><br><sup>fribidi</sup><br><sup>gmp</sup><br><sup>gnutls</sup><br><sup>kvazaar</sup><br><sup>lame</sup><br><sup>libaom</sup><br><sup>libass</sup><br><sup>libiconv</sup><br><sup>libilbc</sup><br><sup>libtheora</sup><br><sup>libvorbis</sup><br><sup>libvpx</sup><br><sup>libwebp</sup><br><sup>libxml2</sup><br><sup>opencore-amr</sup><br><sup>opus</sup><br><sup>shine</sup><br><sup>snappy</sup><br><sup>soxr</sup><br><sup>speex</sup><br><sup>twolame</sup><br><sup>vid.stab</sup><br><sup>wavpack</sup><br><sup>x264</sup><br><sup>x265</sup><br><sup>xvidcore</sup></td>
+<td align="center"><sup>fontconfig</sup><br><sup>freetype</sup><br><sup>fribidi</sup><br><sup>gmp</sup><br><sup>gnutls</sup><br><sup>kvazaar</sup><br><sup>lame</sup><br><sup>libaom</sup><br><sup>libass</sup><br><sup>libiconv</sup><br><sup>libilbc</sup><br><sup>libtheora</sup><br><sup>libvorbis</sup><br><sup>libvpx</sup><br><sup>libwebp</sup><br><sup>libxml2</sup><br><sup>opencore-amr</sup><br><sup>opus</sup><br><sup>shine</sup><br><sup>snappy</sup><br><sup>soxr</sup><br><sup>speex</sup><br><sup>twolame</sup><br><sup>vo-amrwbenc</sup><br><sup>wavpack</sup></td>
+<td align="center"><sup>fontconfig</sup><br><sup>freetype</sup><br><sup>fribidi</sup><br><sup>gmp</sup><br><sup>gnutls</sup><br><sup>kvazaar</sup><br><sup>lame</sup><br><sup>libaom</sup><br><sup>libass</sup><br><sup>libiconv</sup><br><sup>libilbc</sup><br><sup>libtheora</sup><br><sup>libvorbis</sup><br><sup>libvpx</sup><br><sup>libwebp</sup><br><sup>libxml2</sup><br><sup>opencore-amr</sup><br><sup>opus</sup><br><sup>shine</sup><br><sup>snappy</sup><br><sup>soxr</sup><br><sup>speex</sup><br><sup>twolame</sup><br><sup>vid.stab</sup><br><sup>vo-amrwbenc</sup><br><sup>wavpack</sup><br><sup>x264</sup><br><sup>x265</sup><br><sup>xvidcore</sup></td>
 </tr>
 </tbody>
 </table>
@@ -80,16 +83,18 @@ Please remember that some parts of `FFmpeg` are licensed under the `GPL` and onl
  - `AVFoundation` is not available on `tvOS`, `VideoToolbox` is not available on `tvOS` LTS releases
  
  - Since `v4.3.1`, `iOS` and `tvOS` releases started to use `iconv` system library instead of `iconv` external library
+ 
+ - `vo-amrwbenc` is supported since `v4.4`
 
-#### 2.1 Android
-1. Add MobileFFmpeg dependency to your `build.gradle` in `mobile-ffmpeg-<package name>` format
+#### 2.2 Android
+1. Add MobileFFmpeg dependency to your `build.gradle` in `mobile-ffmpeg-<package name>` pattern.
     ```
     dependencies {
-        implementation 'com.arthenica:mobile-ffmpeg-full:4.3.2'
+        implementation 'com.arthenica:mobile-ffmpeg-full:4.4'
     }
     ```
 
-2. Execute FFmpeg commands.
+2. Execute synchronous FFmpeg commands.
     ```
     import com.arthenica.mobileffmpeg.Config;
     import com.arthenica.mobileffmpeg.FFmpeg;
@@ -106,7 +111,27 @@ Please remember that some parts of `FFmpeg` are licensed under the `GPL` and onl
     }
     ```
 
-3. Execute FFprobe commands.
+3. Execute asynchronous FFmpeg commands.
+    ```
+    import com.arthenica.mobileffmpeg.Config;
+    import com.arthenica.mobileffmpeg.FFmpeg;
+
+    long executionId = FFmpeg.executeAsync("-i file1.mp4 -c:v mpeg4 file2.mp4", new ExecuteCallback() {
+
+        @Override
+        public void apply(final long executionId, final int returnCode) {
+            if (rc == RETURN_CODE_SUCCESS) {
+                Log.i(Config.TAG, "Async command execution completed successfully.");
+            } else if (rc == RETURN_CODE_CANCEL) {
+                Log.i(Config.TAG, "Async command execution cancelled by user.");
+            } else {
+                Log.i(Config.TAG, String.format("Async command execution failed with rc=%d.", rc));
+            }
+        }
+    });
+    ```
+
+4. Execute FFprobe commands.
     ```
     import com.arthenica.mobileffmpeg.Config;
     import com.arthenica.mobileffmpeg.FFprobe;
@@ -121,7 +146,7 @@ Please remember that some parts of `FFmpeg` are licensed under the `GPL` and onl
     }
     ```
 
-4. Check execution output later.
+5. Check execution output later.
     ```
     int rc = Config.getLastReturnCode();
  
@@ -135,24 +160,24 @@ Please remember that some parts of `FFmpeg` are licensed under the `GPL` and onl
     }
     ```
 
-5. Stop an ongoing FFmpeg operation.
-    ```
-    FFmpeg.cancel();
-    ```
+6. Stop ongoing FFmpeg operations.
+    - Stop all executions
+        ```
+        FFmpeg.cancel();
+        ```
+    - Stop a specific execution
+        ```
+        FFmpeg.cancel(executionId);
+        ```
 
-6. Get media information for a file.
+7. Get media information for a file.
     ```
     MediaInformation info = FFprobe.getMediaInformation("<file path or uri>");
     ```
 
-7. Record video using Android camera.
+8. Record video using Android camera.
     ```
     FFmpeg.execute("-f android_camera -i 0:0 -r 30 -pixel_format bgr0 -t 00:00:05 <record file path>");
-    ```
-
-8. List enabled external libraries.
-    ```
-    List<String> externalLibraries = Config.getExternalLibraries();
     ```
 
 9. Enable log callback.
@@ -172,31 +197,44 @@ Please remember that some parts of `FFmpeg` are licensed under the `GPL` and onl
         }
     });
     ```
+11. Ignore the handling of a signal.
+    ```
+    Config.ignoreSignal(Signal.SIGXCPU);
+    ```
 
-11. Set log level.
+12. List ongoing executions.
+    ```
+    final List<FFmpegExecution> ffmpegExecutions = FFmpeg.listExecutions();
+    for (int i = 0; i < ffmpegExecutions.size(); i++) {
+        FFmpegExecution execution = ffmpegExecutions.get(i);
+        Log.d(TAG, String.format("Execution %d = id:%d, startTime:%s, command:%s.", i, execution.getExecutionId(), execution.getStartTime(), execution.getCommand()));
+    }
+    ```
+
+13. Set default log level.
     ```
     Config.setLogLevel(Level.AV_LOG_FATAL);
     ```
 
-12. Register custom fonts directory.
+14. Register custom fonts directory.
     ```
     Config.setFontDirectory(this, "<folder with fonts>", Collections.EMPTY_MAP);
     ```
 
-#### 2.2 iOS / tvOS
-1. Add MobileFFmpeg dependency to your `Podfile` in `mobile-ffmpeg-<package name>` format
+#### 2.3 iOS / tvOS
+1. Add MobileFFmpeg dependency to your `Podfile` in `mobile-ffmpeg-<package name>` pattern.
 
     - iOS
     ```
-    pod 'mobile-ffmpeg-full', '~> 4.3.2'
+    pod 'mobile-ffmpeg-full', '~> 4.4'
     ```
 
     - tvOS
     ```
-    pod 'mobile-ffmpeg-tvos-full', '~> 4.3.2'
+    pod 'mobile-ffmpeg-tvos-full', '~> 4.4'
     ```
 
-2. Execute FFmpeg commands.
+2. Execute synchronous FFmpeg commands.
     ```
     #import <mobileffmpeg/MobileFFmpegConfig.h>
     #import <mobileffmpeg/MobileFFmpeg.h>
@@ -211,8 +249,26 @@ Please remember that some parts of `FFmpeg` are licensed under the `GPL` and onl
         NSLog(@"Command execution failed with rc=%d and output=%@.\n", rc, [MobileFFmpegConfig getLastCommandOutput]);
     }
     ```
-    
-3. Execute FFprobe commands.
+
+3. Execute asynchronous FFmpeg commands.
+    ```
+    #import <mobileffmpeg/MobileFFmpegConfig.h>
+    #import <mobileffmpeg/MobileFFmpeg.h>
+
+    long executionId = [MobileFFmpeg executeAsync:@"-i file1.mp4 -c:v mpeg4 file2.mp4" withCallback:self];
+
+    - (void)executeCallback:(long)executionId :(int)returnCode {
+        if (rc == RETURN_CODE_SUCCESS) {
+            NSLog(@"Async command execution completed successfully.\n");
+        } else if (rc == RETURN_CODE_CANCEL) {
+            NSLog(@"Async command execution cancelled by user.\n");
+        } else {
+            NSLog(@"Async command execution failed with rc=%d.\n", rc);
+        }
+    }
+    ```
+
+4. Execute FFprobe commands.
     ```
     #import <mobileffmpeg/MobileFFmpegConfig.h>
     #import <mobileffmpeg/MobileFFprobe.h>
@@ -228,7 +284,7 @@ Please remember that some parts of `FFmpeg` are licensed under the `GPL` and onl
     }
     ```
     
-4. Check execution output later.
+5. Check execution output later.
     ```
     int rc = [MobileFFmpegConfig getLastReturnCode];
     NSString *output = [MobileFFmpegConfig getLastCommandOutput];
@@ -242,32 +298,33 @@ Please remember that some parts of `FFmpeg` are licensed under the `GPL` and onl
     }
     ```
 
-5. Stop an ongoing FFmpeg operation.
-    ```
-    [MobileFFmpeg cancel];
-    ```
+6. Stop ongoing FFmpeg operations.
+    - Stop all executions
+        ```
+        [MobileFFmpeg cancel];
 
-6. Get media information for a file.
+        ```
+    - Stop a specific execution
+        ```
+        [MobileFFmpeg cancel:executionId];
+        ```
+
+7. Get media information for a file.
     ```
     MediaInformation *mediaInformation = [MobileFFprobe getMediaInformation:@"<file path or uri>"];
     ```
 
-7. Record video and audio using iOS camera. This operation is not supported on `tvOS` since `AVFoundation` is not available on `tvOS`.
+8. Record video and audio using iOS camera. This operation is not supported on `tvOS` since `AVFoundation` is not available on `tvOS`.
 
     ```
     [MobileFFmpeg execute: @"-f avfoundation -r 30 -video_size 1280x720 -pixel_format bgr0 -i 0:0 -vcodec h264_videotoolbox -vsync 2 -f h264 -t 00:00:05 %@", recordFilePath];
-    ```
-
-8. List enabled external libraries.
-    ```
-    NSArray *externalLibraries = [MobileFFmpegConfig getExternalLibraries];
     ```
 
 9. Enable log callback.
     ```
     [MobileFFmpegConfig setLogDelegate:self];
 
-    - (void)logCallback: (int)level :(NSString*)message {
+    - (void)logCallback:(long)executionId :(int)level :(NSString*)message {
         dispatch_async(dispatch_get_main_queue(), ^{
             NSLog(@"%@", message);
         });
@@ -285,12 +342,26 @@ Please remember that some parts of `FFmpeg` are licensed under the `GPL` and onl
     }
     ```
 
-11. Set log level.
+11. Ignore the handling of a signal.
+    ```
+    [MobileFFmpegConfig ignoreSignal:SIGXCPU];
+    ```
+
+12. List ongoing executions.
+    ```
+    NSArray* ffmpegExecutions = [MobileFFmpeg listExecutions];
+    for (int i = 0; i < [ffmpegExecutions count]; i++) {
+        FFmpegExecution* execution = [ffmpegExecutions objectAtIndex:i];
+        NSLog(@"Execution %d = id: %ld, startTime: %@, command: %@.\n", i, [execution getExecutionId], [execution getStartTime], [execution getCommand]);
+    }
+    ```
+
+13. Set default log level.
     ```
     [MobileFFmpegConfig setLogLevel:AV_LOG_FATAL];
     ```
 
-12. Register custom fonts directory.
+14. Register custom fonts directory.
     ```
     [MobileFFmpegConfig setFontDirectory:@"<folder with fonts>" with:nil];
     ```
@@ -307,6 +378,8 @@ Exact version number is obtained using `git describe --tags`.
 
 |  MobileFFmpeg Version | FFmpeg Version | Release Date |
 | :----: | :----: |:----: |
+| [4.4](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v4.4) | 4.4-dev-416 | Jul 25, 2020 |
+| [4.4.LTS](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v4.4.LTS) | 4.4-dev-416 | Jul 24, 2020 |
 | [4.3.2](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v4.3.2) | 4.3-dev-2955 | Apr 15, 2020 |
 | [4.3.1](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v4.3.1) | 4.3-dev-1944 | Jan 13, 2020 |
 | [4.3.1.LTS](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v4.3.1.LTS) | 4.3-dev-1944 | Jan 13, 2020 |
@@ -343,6 +416,7 @@ This table shows the differences between two variants.
 | Android Architectures | arm-v7a-neon<br/>arm64-v8a<br/>x86<br/>x86-64 | arm-v7a<br/>arm-v7a-neon<br/>arm64-v8a<br/>x86<br/>x86-64 |
 | Xcode Support | 10.1 | 7.3.1 |
 | iOS SDK | 12.1 | 9.3 |
+| iOS AVFoundation | Yes | - |
 | iOS Architectures | arm64<br/>arm64e<sup>1</sup><br/>x86-64<br/>x86-64-mac-catalyst<sup>2</sup> | armv7<br/>arm64<br/>i386<br/>x86-64 |
 | tvOS SDK | 10.2 | 9.2 |
 | tvOS Architectures | arm64<br/>x86-64 | arm64<br/>x86-64 |
@@ -417,26 +491,39 @@ A more detailed documentation is available at [Wiki](https://github.com/tanersen
 
 ### 7. License
 
-This project is licensed under the LGPL v3.0. However, if source code is built using optional `--enable-gpl` flag or 
-prebuilt binaries with `-gpl` postfix are used then MobileFFmpeg is subject to the GPL v3.0 license.
+`MobileFFmpeg` is licensed under the LGPL v3.0. However, if source code is built using the optional `--enable-gpl` flag
+or prebuilt binaries with `-gpl` postfix are used, then MobileFFmpeg is subject to the GPL v3.0 license.
 
-Source code of FFmpeg and external libraries is included in compliance with their individual licenses.
+The source code of all external libraries included is in compliance with their individual licenses.
 
 `openh264` source code included in this repository is licensed under the 2-clause BSD License but this license does 
 not cover the `MPEG LA` licensing fees. If you build `mobile-ffmpeg` with `openh264` and distribute that library, then 
 you are subject to pay `MPEG LA` licensing fees. Refer to [OpenH264 FAQ](https://www.openh264.org/faq.html) page for 
 the details. Please note that `mobile-ffmpeg` does not publish a binary with `openh264` inside.
 
-`strip-frameworks.sh` script included and distributed (until v4.x) is published under the [Apache License version 2.0](https://www.apache.org/licenses/LICENSE-2.0).
+`strip-frameworks.sh` script included and distributed (until v4.x) is published under the
+[Apache License version 2.0](https://www.apache.org/licenses/LICENSE-2.0).
 
-In test applications; embedded fonts are licensed under the [SIL Open Font License](https://opensource.org/licenses/OFL-1.1), other digital assets are published in the public domain.
+In test applications; embedded fonts are licensed under the
+[SIL Open Font License](https://opensource.org/licenses/OFL-1.1), other digital assets are published in the public
+domain.
 
 Please visit [License](https://github.com/tanersener/mobile-ffmpeg/wiki/License) page for the details.
 
-### 8. See Also
+### 8. Patents
+
+It is not clearly explained in their documentation but it is believed that `FFmpeg`, `kvazaar`, `x264` and `x265`
+include algorithms which are subject to software patents. If you live in a country where software algorithms are
+patentable then you'll probably need to pay royalty fees to patent holders. We are not lawyers though, so we recommend
+that you seek legal advice first. See [FFmpeg Patent Mini-FAQ](https://ffmpeg.org/legal.html).
+
+`openh264` clearly states that it uses patented algorithms. Therefore, if you build mobile-ffmpeg with openh264 and
+distribute that library, then you are subject to pay MPEG LA licensing fees. Refer to
+[OpenH264 FAQ](https://www.openh264.org/faq.html) page for the details.
+
+### 9. See Also
 
 - [libav gas-preprocessor](https://github.com/libav/gas-preprocessor/raw/master/gas-preprocessor.pl)
 - [FFmpeg API Documentation](https://ffmpeg.org/doxygen/4.0/index.html)
 - [FFmpeg Wiki](https://trac.ffmpeg.org/wiki/WikiStart)
-- [FFmpeg License and Legal Considerations](https://ffmpeg.org/legal.html)
 - [FFmpeg External Library Licenses](https://www.ffmpeg.org/doxygen/4.0/md_LICENSE.html)
