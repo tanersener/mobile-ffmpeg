@@ -74,7 +74,7 @@ ecc_j_to_a (const struct ecc_curve *ecc,
       mpn_zero (izBp + ecc->p.size, ecc->p.size);
       ecc->p.reduce (&ecc->p, izBp);
 
-      ecc_modp_mul (ecc, iz2p, izp, izBp);
+      ecc_mod_mul (&ecc->p, iz2p, izp, izBp);
     }
   else
     {
@@ -83,11 +83,11 @@ ecc_j_to_a (const struct ecc_curve *ecc,
       mpn_copyi (up, p+2*ecc->p.size, ecc->p.size); /* p_z */
       ecc->p.invert (&ecc->p, izp, up, up + ecc->p.size);
 
-      ecc_modp_sqr (ecc, iz2p, izp);
+      ecc_mod_sqr (&ecc->p, iz2p, izp);
     }
 
-  ecc_modp_mul (ecc, iz3p, iz2p, p);
-  /* ecc_modp (and ecc_modp_mul) may return a value up to 2p - 1, so
+  ecc_mod_mul (&ecc->p, iz3p, iz2p, p);
+  /* ecc_mod (and ecc_mod_mul) may return a value up to 2p - 1, so
      do a conditional subtraction. */
   cy = mpn_sub_n (r, iz3p, ecc->p.m, ecc->p.size);
   cnd_copy (cy, r, iz3p, ecc->p.size);
@@ -105,8 +105,8 @@ ecc_j_to_a (const struct ecc_curve *ecc,
 	}
       return;
     }
-  ecc_modp_mul (ecc, iz3p, iz2p, izp);
-  ecc_modp_mul (ecc, tp, iz3p, p + ecc->p.size);
+  ecc_mod_mul (&ecc->p, iz3p, iz2p, izp);
+  ecc_mod_mul (&ecc->p, tp, iz3p, p + ecc->p.size);
   /* And a similar subtraction. */
   cy = mpn_sub_n (r + ecc->p.size, tp, ecc->p.m, ecc->p.size);
   cnd_copy (cy, r + ecc->p.size, tp, ecc->p.size);

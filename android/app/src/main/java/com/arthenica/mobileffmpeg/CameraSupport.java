@@ -33,6 +33,11 @@ import java.util.List;
 import static android.content.Context.CAMERA_SERVICE;
 import static com.arthenica.mobileffmpeg.Config.TAG;
 
+/**
+ * Utility class for camera devices.
+ *
+ * @author Taner Sener
+ */
 class CameraSupport {
 
     /**

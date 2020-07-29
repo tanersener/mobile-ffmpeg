@@ -1,4 +1,4 @@
-.TH KVAZAAR "1" "July 2019" "kvazaar v1.3.0" "User Commands"
+.TH KVAZAAR "1" "April 2020" "kvazaar v2.0.0" "User Commands"
 .SH NAME
 kvazaar \- open source HEVC encoder
 .SH SYNOPSIS
@@ -115,20 +115,25 @@ How often the video parameter set is re\-sent [0]
 Number of reference frames, in range 1..15 [4]
 .TP
 \fB\-\-gop <string>        
-GOP structure [8]
-    \- 0: Disabled
-    \- 8: B\-frame pyramid of length 8
-    \- lp\-<string>: Low\-delay P\-frame GOP
+GOP structure [lp\-g4d3t1]
+    \-  0: Disabled
+    \-  8: B\-frame pyramid of length 8
+    \- 16: B\-frame pyramid of length 16
+    \- lp\-<string>: Low\-delay P/B\-frame GOP
       (e.g. lp\-g8d4t2, see README)
 .TP
-\fB\-\-(no\-)open\-gop
+\fB\-\-intra\-qp\-offset <int>: QP offset for intra frames [\-51..51] [auto]
+    \- N: Set QP offset to N.
+    \- auto: Select offset automatically based
+      on GOP length.
+.TP
+\fB\-\-(no\-)open\-gop       
 Use open GOP configuration. [enabled]
 .TP
 \fB\-\-cqmfile <filename>  
 Read custom quantization matrices from a file.
 .TP
-\fB\-\-scaling-list <string>
-Set scaling list mode. [off]
+\fB\-\-scaling\-list <string>: Set scaling list mode. [off]
     \- off: Disable scaling lists.
     \- custom: use custom list (with \-\-cqmfile).
     \- default: Use default lists.
@@ -137,6 +142,20 @@ Set scaling list mode. [off]
 Target bitrate [0]
     \- 0: Disable rate control.
     \- N: Target N bits per second.
+.TP
+\fB\-\-rc\-algorithm <string>: Select used rc\-algorithm. [lambda]
+    \- lambda: rate control from:
+      DOI: 10.1109/TIP.2014.2336550 
+    \- oba: DOI: 10.1109/TCSVT.2016.2589878
+.TP
+\fB\-\-(no\-)intra\-bits     
+Use Hadamard cost based allocation for intra
+frames. Default on for gop 8 and off for lp\-gop
+.TP
+\fB\-\-(no\-)clip\-neighbour 
+On oba based rate control whether to clip 
+lambda values to same frame's ctus or previous'.
+Default on for RA GOPS and disabled for LP.
 .TP
 \fB\-\-(no\-)lossless       
 Use lossless coding. [disabled]
@@ -176,6 +195,11 @@ Same as \-\-level but warnings instead of errors.
 Used with \-\-level. Use high tier bitrate limits
 instead of the main tier limits during encoding.
 High tier requires level 4 or higher.
+.TP
+\fB\-\-(no\-)vaq <integer>  
+Enable variance adaptive quantization with given
+strength, in range 1..20. Recommended: 5.
+[disabled]
 
 .SS "Compression tools:"
 .TP
@@ -218,6 +242,10 @@ Intra mode search complexity [0]
 Rate\-distortion optimized motion vector costs
 [disabled]
 .TP
+\fB\-\-(no\-)zero\-coeff\-rdo 
+If a CU is set inter, check if forcing zero
+residual improves the RD cost. [enabled]
+.TP
 \fB\-\-(no\-)full\-intra\-search
 Try all intra modes during rough search.
 [disabled]
@@ -248,10 +276,23 @@ Fractional pixel motion estimation level [4]
 \fB\-\-pu\-depth\-inter <int>\-<int>
 Inter prediction units sizes [0\-3]
     \- 0, 1, 2, 3: from 64x64 to 8x8
+    \- Accepts a list of values separated by ','
+      for setting separate depths per GOP layer
+      (values can be omitted to use the first
+      value for the respective layer).
 .TP
 \fB\-\-pu\-depth\-intra <int>\-<int>
 Intra prediction units sizes [1\-4]
     \- 0, 1, 2, 3, 4: from 64x64 to 4x4
+    \- Accepts a list of values separated by ','
+      for setting separate depths per GOP layer
+      (values can be omitted to use the first
+      value for the respective layer).
+.TP
+\fB\-\-ml\-pu\-depth\-intra   
+Predict the pu\-depth\-intra using machine
+ learning trees, overrides the
+ \-\-pu\-depth\-intra parameter. [disabled]
 .TP
 \fB\-\-tr\-depth\-intra <int>
 Transform split depth for intra blocks [0]
@@ -282,7 +323,8 @@ a zero coefficient CU is found. [disabled]
 Try to find skip cu from merge candidates.
 Perform no further search if skip is found.
 For rd=0..1: Try the first candidate.
-For rd=2.. : Try the best candidate based
+For rd=2..
+Try the best candidate based
              on luma satd cost. [enabled]
 .TP
 \fB\-\-max\-merge <integer> 
@@ -336,6 +378,15 @@ Control how slices are used.
     \- tiles: Put tiles in independent slices.
     \- wpp: Put rows in dependent slices.
     \- tiles+wpp: Do both.
+.TP
+\fB\-\-partial\-coding <x\-offset>!<y\-offset>!<slice\-width>!<slice\-height>
+                            
+Encode partial frame.
+Parts must be merged to form a valid bitstream.
+X and Y are CTU offsets.
+Slice width and height must be divisible by CTU
+in pixels unless it is the last CTU row/column.
+This parameter is used by kvaShare.
 
 .SS "Video Usability Information:"
 .TP

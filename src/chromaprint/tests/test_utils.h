@@ -31,11 +31,15 @@ inline std::vector<short> LoadAudioFile(const std::string &file_name)
 {
 	std::string path = TESTS_DIR + file_name;
 	std::ifstream file(path.c_str(), std::ifstream::in | std::ifstream::binary);
-	file.seekg(0, std::ios::end);
-	int length = file.tellg();
-	file.seekg(0, std::ios::beg);
-	std::vector<short> data(length / 2);
-	file.read((char *)&data[0], length);
+	uint8_t buf[4096];
+	std::vector<int16_t> data;
+	while (!file.eof()) {
+		file.read((char *) buf, 4096);
+		size_t nread = file.gcount();
+		for (size_t i = 0; i < nread - 1; i += 2) {
+			data.push_back((int16_t) (((uint16_t) buf[i+1] << 8) | ((uint16_t) buf[i])));
+		}
+	}
 	file.close();
 	return data;
 }

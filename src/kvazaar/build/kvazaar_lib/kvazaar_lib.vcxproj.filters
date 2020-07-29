@@ -52,6 +52,9 @@
     <Filter Include="Threadwrapper">
       <UniqueIdentifier>{f4abece9-e209-4817-a57e-c64ca7c5e05c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Constraint">
+      <UniqueIdentifier>{895fc8cc-6f08-49a7-b377-b5c38a44d1b1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\strategies\strategies-nal.c">
@@ -238,6 +241,12 @@
     </ClCompile>
     <ClCompile Include="..\..\src\threadwrapper\src\semaphore.cpp">
       <Filter>Threadwrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\constraint.c">
+      <Filter>Constraint</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ml_intra_cu_depth_pred.c">
+      <Filter>Constraint</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -452,6 +461,15 @@
     </ClInclude>
     <ClInclude Include="..\..\src\threadwrapper\include\semaphore.h">
       <Filter>Threadwrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\constraint.h">
+      <Filter>Constraint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ml_intra_cu_depth_pred.h">
+      <Filter>Constraint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\gop.h">
+      <Filter>Control</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

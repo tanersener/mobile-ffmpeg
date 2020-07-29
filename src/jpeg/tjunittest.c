@@ -410,8 +410,8 @@ static void compTest(tjhandle handle, unsigned char **dstBuf,
   printf("Done.\n  Result in %s\n", tempStr);
 
 bailout:
-  if (yuvBuf) free(yuvBuf);
-  if (srcBuf) free(srcBuf);
+  free(yuvBuf);
+  free(srcBuf);
 }
 
 
@@ -478,8 +478,8 @@ static void _decompTest(tjhandle handle, unsigned char *jpegBuf,
   printf("\n");
 
 bailout:
-  if (yuvBuf) free(yuvBuf);
-  if (dstBuf) free(dstBuf);
+  free(yuvBuf);
+  free(dstBuf);
 }
 
 
@@ -550,7 +550,7 @@ static void doTest(int w, int h, const int *formats, int nformats, int subsamp,
 bailout:
   if (chandle) tjDestroy(chandle);
   if (dhandle) tjDestroy(dhandle);
-  if (dstBuf) tjFree(dstBuf);
+  tjFree(dstBuf);
 }
 
 
@@ -665,8 +665,8 @@ static void bufSizeTest(void)
   printf("Done.      \n");
 
 bailout:
-  if (srcBuf) free(srcBuf);
-  if (dstBuf) tjFree(dstBuf);
+  free(srcBuf);
+  tjFree(dstBuf);
   if (handle) tjDestroy(handle);
 }
 
@@ -839,7 +839,7 @@ static int doBmpTest(const char *ext, int width, int align, int height, int pf,
   unlink(filename);
 
 bailout:
-  if (buf) tjFree(buf);
+  tjFree(buf);
   if (exitStatus < 0) return exitStatus;
   return retval;
 }

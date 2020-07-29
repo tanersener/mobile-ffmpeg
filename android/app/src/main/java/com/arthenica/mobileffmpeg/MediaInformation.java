@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Taner Sener
+ * Copyright (c) 2018, 2020 Taner Sener
  *
  * This file is part of MobileFFmpeg.
  *
@@ -19,11 +19,9 @@
 
 package com.arthenica.mobileffmpeg;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import org.json.JSONObject;
+
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Media information class.
@@ -32,49 +30,38 @@ import java.util.Set;
  */
 public class MediaInformation {
 
-    /**
-     * Format
-     */
-    private String format;
+    private static final String KEY_MEDIA_PROPERTIES = "format";
+    private static final String KEY_FILENAME = "filename";
+    private static final String KEY_FORMAT = "format_name";
+    private static final String KEY_FORMAT_LONG = "format_long_name";
+    private static final String KEY_START_TIME = "start_time";
+    private static final String KEY_DURATION = "duration";
+    private static final String KEY_SIZE = "size";
+    private static final String KEY_BIT_RATE = "bit_rate";
+    private static final String KEY_TAGS = "tags";
 
     /**
-     * Path
+     * Stores all properties.
      */
-    private String path;
+    private final JSONObject jsonObject;
 
     /**
-     * Duration, in milliseconds
+     * Stores streams.
      */
-    private Long duration;
+    private final List<StreamInformation> streams;
+
+    public MediaInformation(final JSONObject jsonObject, final List<StreamInformation> streams) {
+        this.jsonObject = jsonObject;
+        this.streams = streams;
+    }
 
     /**
-     * Start time, in milliseconds
+     * Returns file name.
+     *
+     * @return media file name
      */
-    private Long startTime;
-
-    /**
-     * Bitrate, kb/s
-     */
-    private Long bitrate;
-
-    /**
-     * Metadata map
-     */
-    private Map<String, String> metadata;
-
-    /**
-     * List of streams
-     */
-    private List<StreamInformation> streams;
-
-    /**
-     * Raw unparsed media information
-     */
-    private String rawInformation;
-
-    public MediaInformation() {
-        this.metadata = new HashMap<>();
-        this.streams = new ArrayList<>();
+    public String getFilename() {
+        return getStringProperty(KEY_FILENAME);
     }
 
     /**
@@ -83,34 +70,16 @@ public class MediaInformation {
      * @return media format
      */
     public String getFormat() {
-        return format;
+        return getStringProperty(KEY_FORMAT);
     }
 
     /**
-     * Sets media format.
+     * Returns long format.
      *
-     * @param format media format
+     * @return media long format
      */
-    public void setFormat(String format) {
-        this.format = format;
-    }
-
-    /**
-     * Returns path.
-     *
-     * @return media path
-     */
-    public String getPath() {
-        return path;
-    }
-
-    /**
-     * Sets path.
-     *
-     * @param path media path
-     */
-    public void setPath(String path) {
-        this.path = path;
+    public String getLongFormat() {
+        return getStringProperty(KEY_FORMAT_LONG);
     }
 
     /**
@@ -118,17 +87,8 @@ public class MediaInformation {
      *
      * @return media duration in milliseconds
      */
-    public Long getDuration() {
-        return duration;
-    }
-
-    /**
-     * Sets duration.
-     *
-     * @param duration media duration in milliseconds
-     */
-    public void setDuration(Long duration) {
-        this.duration = duration;
+    public String getDuration() {
+        return getStringProperty(KEY_DURATION);
     }
 
     /**
@@ -136,17 +96,17 @@ public class MediaInformation {
      *
      * @return media start time in milliseconds
      */
-    public Long getStartTime() {
-        return startTime;
+    public String getStartTime() {
+        return getStringProperty(KEY_START_TIME);
     }
 
     /**
-     * Sets start time.
+     * Returns size.
      *
-     * @param startTime media start time in milliseconds
+     * @return media size in bytes
      */
-    public void setStartTime(Long startTime) {
-        this.startTime = startTime;
+    public String getSize() {
+        return getStringProperty(KEY_SIZE);
     }
 
     /**
@@ -154,63 +114,17 @@ public class MediaInformation {
      *
      * @return media bitrate in kb/s
      */
-    public Long getBitrate() {
-        return bitrate;
+    public String getBitrate() {
+        return getStringProperty(KEY_BIT_RATE);
     }
 
     /**
-     * Sets bitrate.
+     * Returns all tags.
      *
-     * @param bitrate media bitrate in kb/s
+     * @return tags dictionary
      */
-    public void setBitrate(Long bitrate) {
-        this.bitrate = bitrate;
-    }
-
-    /**
-     * Returns unparsed media information.
-     *
-     * @return unparsed media information data
-     */
-    public String getRawInformation() {
-        return rawInformation;
-    }
-
-    /**
-     * Sets unparsed media information.
-     *
-     * @param rawInformation unparsed media information data
-     */
-    public void setRawInformation(String rawInformation) {
-        this.rawInformation = rawInformation;
-    }
-
-    /**
-     * Adds metadata.
-     *
-     * @param key metadata key
-     * @param value metadata value
-     */
-    public void addMetadata(String key, String value) {
-        this.metadata.put(key, value);
-    }
-
-    /**
-     * Returns all metadata entries.
-     *
-     * @return set of metadata entries
-     */
-    public Set<Map.Entry<String, String>> getMetadataEntries() {
-        return this.metadata.entrySet();
-    }
-
-    /**
-     * Adds new stream.
-     *
-     * @param stream new stream information
-     */
-    public void addStream(StreamInformation stream) {
-        this.streams.add(stream);
+    public JSONObject getTags() {
+        return getProperties(KEY_TAGS);
     }
 
     /**
@@ -220,6 +134,77 @@ public class MediaInformation {
      */
     public List<StreamInformation> getStreams() {
         return streams;
+    }
+
+    /**
+     * Returns the media property associated with the key.
+     *
+     * @param key property key
+     * @return media property as string or null if the key is not found
+     */
+    public String getStringProperty(final String key) {
+        JSONObject mediaProperties = getMediaProperties();
+        if (mediaProperties == null) {
+            return null;
+        }
+
+        if (mediaProperties.has(key)) {
+            return mediaProperties.optString(key);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Returns the media property associated with the key.
+     *
+     * @param key property key
+     * @return media property as Long or null if the key is not found
+     */
+    public Long getNumberProperty(String key) {
+        JSONObject mediaProperties = getMediaProperties();
+        if (mediaProperties == null) {
+            return null;
+        }
+
+        if (mediaProperties.has(key)) {
+            return mediaProperties.optLong(key);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Returns the media properties associated with the key.
+     *
+     * @param key properties key
+     * @return media properties as a JSONObject or null if the key is not found
+     */
+    public JSONObject getProperties(String key) {
+        JSONObject mediaProperties = getMediaProperties();
+        if (mediaProperties == null) {
+            return null;
+        }
+
+        return mediaProperties.optJSONObject(key);
+    }
+
+    /**
+     * Returns all media properties.
+     *
+     * @return all media properties as a JSONObject or null if no media properties are defined
+     */
+    public JSONObject getMediaProperties() {
+        return jsonObject.optJSONObject(KEY_MEDIA_PROPERTIES);
+    }
+
+    /**
+     * Returns all properties defined.
+     *
+     * @return all properties as a JSONObject or null if no properties are defined
+     */
+    public JSONObject getAllProperties() {
+        return jsonObject;
     }
 
 }

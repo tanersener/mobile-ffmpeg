@@ -1,3 +1,22 @@
+libvorbis 1.3.7 (2020-07-04) -- "Xiph.Org libVorbis I 20200704 (Reducing Environment)"
+
+* Fix CVE-2018-10393 - out-of-bounds read encoding very low sample rates.
+* Fix CVE-2017-14160 - out-of-bounds read encoding very low sample rates.
+* Fix handling invalid bytes per sample arguments.
+* Fix handling invalid channel count arguments.
+* Fix invalid free on seek failure.
+* Fix negative shift reading blocksize.
+* Fix accepting unreasonable float32 values.
+* Fix tag comparison depending on locale.
+* Fix unnecessarily linking libm.
+* Fix memory leak in test_sharedbook.
+* Update Visual Studio projects for ogg library filename change.
+* Distribute CMake build files with the source package.
+* Remove unnecessary configure --target switch.
+* Add gitlab CI support.
+* Add OSS-Fuzz support.
+* Build system and integration updates.
+
 libvorbis 1.3.6 (2018-03-16) -- "Xiph.Org libVorbis I 20180316 (Now 100% fewer shells)"
 
 * Fix CVE-2018-5146 - out-of-bounds write on codebook decoding.

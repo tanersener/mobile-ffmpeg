@@ -4,6 +4,7 @@ branches:
   - development
 git:
   quiet: true
+  depth: false
 jobs:
   include:
     - name: "Android Main Build"
@@ -24,7 +25,6 @@ jobs:
             - gperf
             - texinfo
             - yasm
-            - nasm
             - bison
             - autogen
             - patch
@@ -38,14 +38,14 @@ jobs:
           - extra-google-m2repository
           - extra-android-m2repository
       install:
-        - echo y | sdkmanager "ndk;21.0.6113669"
+        - echo y | sdkmanager "ndk;21.3.6528147"
         - echo y | sdkmanager "cmake;3.10.2.4988404"
-        - echo y | sdkmanager "lldb;3.1"
       before_install:
         - touch $HOME/.android/repositories.cfg
       before_script:
-        - export ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/21.0.6113669
+        - export ANDROID_NDK_ROOT=${ANDROID_HOME}ndk/21.3.6528147
         - rm -f ./build.log
+        - wget https://www.nasm.us/pub/nasm/releasebuilds/2.14.02/nasm-2.14.02.tar.gz;tar zxvf nasm-2.14.02.tar.gz;cd nasm-2.14.02;./configure;make;sudo make install;cd ..
       after_success:
         - grep -e INFO ./build.log | grep build
       after_failure:
@@ -71,7 +71,6 @@ jobs:
             - gperf
             - texinfo
             - yasm
-            - nasm
             - bison
             - autogen
             - patch
@@ -86,14 +85,14 @@ jobs:
           - extra-google-m2repository
           - extra-android-m2repository
       install:
-        - echo y | sdkmanager "ndk;21.0.6113669"
+        - echo y | sdkmanager "ndk;21.3.6528147"
         - echo y | sdkmanager "cmake;3.10.2.4988404"
-        - echo y | sdkmanager "lldb;3.1"
       before_install:
         - touch $HOME/.android/repositories.cfg
       before_script:
-        - export ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/21.0.6113669
+        - export ANDROID_NDK_ROOT=${ANDROID_HOME}ndk/21.3.6528147
         - rm -f ./build.log
+        - wget https://www.nasm.us/pub/nasm/releasebuilds/2.14.02/nasm-2.14.02.tar.gz;tar zxvf nasm-2.14.02.tar.gz;cd nasm-2.14.02;./configure;make;sudo make install;cd ..
       after_success:
         - grep -e INFO ./build.log | grep build
       after_failure:

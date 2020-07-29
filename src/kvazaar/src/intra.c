@@ -237,47 +237,6 @@ static void intra_pred_dc(
 }
 
 
-/**
-* \brief Generage intra DC prediction with post filtering applied.
-* \param log2_width    Log2 of width, range 2..5.
-* \param in_ref_above  Pointer to -1 index of above reference, length=width*2+1.
-* \param in_ref_left   Pointer to -1 index of left reference, length=width*2+1.
-* \param dst           Buffer of size width*width.
-*/
-static void intra_pred_filtered_dc(
-  const int_fast8_t log2_width,
-  const kvz_pixel *const ref_top,
-  const kvz_pixel *const ref_left,
-  kvz_pixel *const out_block)
-{
-  assert(log2_width >= 2 && log2_width <= 5);
-
-  const int_fast8_t width = 1 << log2_width;
-
-  int_fast16_t sum = 0;
-  for (int_fast8_t i = 0; i < width; ++i) {
-    sum += ref_top[i + 1];
-    sum += ref_left[i + 1];
-  }
-
-  const kvz_pixel dc_val = (sum + width) >> (log2_width + 1);
-
-  // Filter top-left with ([1 2 1] / 4)
-  out_block[0] = (ref_left[1] + 2 * dc_val + ref_top[1] + 2) / 4;
-
-  // Filter rest of the boundary with ([1 3] / 4)
-  for (int_fast8_t x = 1; x < width; ++x) {
-    out_block[x] = (ref_top[x + 1] + 3 * dc_val + 2) / 4;
-  }
-  for (int_fast8_t y = 1; y < width; ++y) {
-    out_block[y * width] = (ref_left[y + 1] + 3 * dc_val + 2) / 4;
-    for (int_fast8_t x = 1; x < width; ++x) {
-      out_block[y * width + x] = dc_val;
-    }
-  }
-}
-
-
 void kvz_intra_predict(
   kvz_intra_references *refs,
   int_fast8_t log2_width,
@@ -314,7 +273,7 @@ void kvz_intra_predict(
   } else if (mode == 1) {
     // Do extra post filtering for edge pixels of luma DC mode.
     if (color == COLOR_Y && width < 32) {
-      intra_pred_filtered_dc(log2_width, used_ref->top, used_ref->left, dst);
+      kvz_intra_pred_filtered_dc(log2_width, used_ref->top, used_ref->left, dst);
     } else {
       intra_pred_dc(log2_width, used_ref->top, used_ref->left, dst);
     }
@@ -665,7 +624,18 @@ void kvz_intra_recon_cu(
     cur_cu = LCU_GET_CU_AT_PX(lcu, lcu_px.x, lcu_px.y);
   }
 
+  // Reset CBFs because CBFs might have been set
+  // for depth earlier
+  if (mode_luma >= 0) {
+    cbf_clear(&cur_cu->cbf, depth, COLOR_Y);
+  }
+  if (mode_chroma >= 0) {
+    cbf_clear(&cur_cu->cbf, depth, COLOR_U);
+    cbf_clear(&cur_cu->cbf, depth, COLOR_V);
+  }
+
   if (depth == 0 || cur_cu->tr_depth > depth) {
+
     const int offset = width / 2;
     const int32_t x2 = x + offset;
     const int32_t y2 = y + offset;
@@ -682,7 +652,7 @@ void kvz_intra_recon_cu(
       LCU_GET_CU_AT_PX(lcu, lcu_px.x + offset, lcu_px.y + offset)->cbf,
     };
 
-    if (mode_luma != -1 && depth < MAX_DEPTH) {
+    if (mode_luma != -1 && depth <= MAX_DEPTH) {
       cbf_set_conditionally(&cur_cu->cbf, child_cbfs, depth, COLOR_Y);
     }
     if (mode_chroma != -1 && depth <= MAX_DEPTH) {
@@ -701,6 +671,6 @@ void kvz_intra_recon_cu(
       intra_recon_tb_leaf(state, x, y, depth, mode_chroma, lcu, COLOR_V);
     }
 
-    kvz_quantize_lcu_residual(state, has_luma, has_chroma, x, y, depth, cur_cu, lcu);
+    kvz_quantize_lcu_residual(state, has_luma, has_chroma, x, y, depth, cur_cu, lcu, false);
   }
 }

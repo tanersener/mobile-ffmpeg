@@ -8,8 +8,9 @@ Originally written 2001 by Niels Möller, updated 2017.
 This manual is placed in the public domain. You may freely copy it, in
 whole or in part, with or without modification. Attribution is
 appreciated, but not required. -->
-<!-- Created by GNU Texinfo 6.3, http://www.gnu.org/software/texinfo/ -->
+<!-- Created by GNU Texinfo 6.5, http://www.gnu.org/software/texinfo/ -->
 <head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <title>Nettle: a low-level cryptographic library</title>
 
 <meta name="description" content="Nettle: a low-level cryptographic library">
@@ -17,7 +18,6 @@ appreciated, but not required. -->
 <meta name="resource-type" content="document">
 <meta name="distribution" content="global">
 <meta name="Generator" content="makeinfo">
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link href="#Top" rel="start" title="Top">
 <link href="#Index" rel="index" title="Index">
 <link href="#SEC_Contents" rel="contents" title="Table of Contents">
@@ -87,6 +87,7 @@ ul.no-bullet {list-style: none}
         <li><a name="toc-SHA3_002d256" href="#SHA3_002d256">7.1.1.6 <acronym>SHA3-256</acronym></a></li>
         <li><a name="toc-SHA3_002d384" href="#SHA3_002d384">7.1.1.7 <acronym>SHA3-384</acronym></a></li>
         <li><a name="toc-SHA3_002d512" href="#SHA3_002d512">7.1.1.8 <acronym>SHA3-512</acronym></a></li>
+        <li><a name="toc-SHAKE_002d256" href="#SHAKE_002d256">7.1.1.9 <acronym>SHAKE-256</acronym></a></li>
       </ul></li>
       <li><a name="toc-Legacy-hash-functions-1" href="#Legacy-hash-functions">7.1.2 Legacy hash functions</a>
       <ul class="no-bullet">
@@ -95,7 +96,7 @@ ul.no-bullet {list-style: none}
         <li><a name="toc-MD4" href="#MD4">7.1.2.3 <acronym>MD4</acronym></a></li>
         <li><a name="toc-RIPEMD160" href="#RIPEMD160">7.1.2.4 <acronym>RIPEMD160</acronym></a></li>
         <li><a name="toc-SHA1" href="#SHA1">7.1.2.5 <acronym>SHA1</acronym></a></li>
-        <li><a name="toc-GOSTHASH94" href="#GOSTHASH94">7.1.2.6 <acronym>GOSTHASH94</acronym></a></li>
+        <li><a name="toc-GOSTHASH94-and-GOSTHASH94CP" href="#GOSTHASH94-and-GOSTHASH94CP">7.1.2.6 <acronym>GOSTHASH94 and GOSTHASH94CP</acronym></a></li>
       </ul></li>
       <li><a name="toc-The-struct-nettle_005fhash-abstraction" href="#nettle_005fhash-abstraction">7.1.3 The <code>struct nettle_hash</code> abstraction</a></li>
     </ul></li>
@@ -107,7 +108,10 @@ ul.no-bullet {list-style: none}
       <li><a name="toc-BLOWFISH" href="#BLOWFISH">7.2.4 BLOWFISH</a></li>
       <li><a name="toc-Camellia" href="#Camellia">7.2.5 Camellia</a></li>
       <li><a name="toc-CAST128" href="#CAST128">7.2.6 CAST128</a></li>
-      <li><a name="toc-ChaCha" href="#ChaCha">7.2.7 ChaCha</a></li>
+      <li><a name="toc-ChaCha" href="#ChaCha">7.2.7 ChaCha</a>
+      <ul class="no-bullet">
+        <li><a name="toc-32_002dbit-counter-variant" href="#g_t32_002dbit-counter-variant">7.2.7.1 32-bit counter variant</a></li>
+      </ul></li>
       <li><a name="toc-DES" href="#DES">7.2.8 DES</a></li>
       <li><a name="toc-DES3" href="#DES3">7.2.9 DES3</a></li>
       <li><a name="toc-Salsa20" href="#Salsa20">7.2.10 Salsa20</a></li>
@@ -148,7 +152,12 @@ ul.no-bullet {list-style: none}
         <li><a name="toc-CCM_002dAES-interface" href="#CCM_002dAES-interface">7.4.3.3 <acronym>CCM</acronym>-<acronym>AES</acronym> interface</a></li>
       </ul></li>
       <li><a name="toc-ChaCha_002dPoly1305-1" href="#ChaCha_002dPoly1305">7.4.4 ChaCha-Poly1305</a></li>
-      <li><a name="toc-The-struct-nettle_005faead-abstraction" href="#nettle_005faead-abstraction">7.4.5 The <code>struct nettle_aead</code> abstraction</a></li>
+      <li><a name="toc-Synthetic-Initialization-Vector-AEAD" href="#SIV_002dCMAC">7.4.5 Synthetic Initialization Vector AEAD</a>
+      <ul class="no-bullet">
+        <li><a name="toc-General-interface" href="#General-interface">7.4.5.1 General interface</a></li>
+        <li><a name="toc-SIV_002dCMAC_002dAES-interface" href="#SIV_002dCMAC_002dAES-interface">7.4.5.2 <acronym>SIV-CMAC</acronym>-<acronym>AES</acronym> interface</a></li>
+      </ul></li>
+      <li><a name="toc-The-struct-nettle_005faead-abstraction" href="#nettle_005faead-abstraction">7.4.6 The <code>struct nettle_aead</code> abstraction</a></li>
     </ul></li>
     <li><a name="toc-Keyed-Hash-Functions" href="#Keyed-hash-functions">7.5 Keyed Hash Functions</a>
     <ul class="no-bullet">
@@ -190,8 +199,9 @@ ul.no-bullet {list-style: none}
       <ul class="no-bullet">
         <li><a name="toc-Side_002dchannel-silence-1" href="#Side_002dchannel-silence">7.7.3.1 Side-channel silence</a></li>
         <li><a name="toc-ECDSA-1" href="#ECDSA">7.7.3.2 ECDSA</a></li>
-        <li><a name="toc-Curve25519" href="#Curve-25519">7.7.3.3 Curve25519</a></li>
-        <li><a name="toc-EdDSA" href="#EdDSA">7.7.3.4 EdDSA</a></li>
+        <li><a name="toc-GOSTDSA-1" href="#GOSTDSA">7.7.3.3 GOSTDSA</a></li>
+        <li><a name="toc-Curve25519-and-Curve448" href="#Curve-25519-and-Curve-448">7.7.3.4 Curve25519 and Curve448</a></li>
+        <li><a name="toc-EdDSA" href="#EdDSA">7.7.3.5 EdDSA</a></li>
       </ul></li>
     </ul></li>
     <li><a name="toc-Randomness-1" href="#Randomness">7.8 Randomness</a>
@@ -304,6 +314,8 @@ Cipher modes
 </td></tr>
 <tr><td align="left" valign="top">&bull; <a href="#CCM">CCM</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
 </td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#SIV_002dCMAC">SIV-CMAC</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
 <tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">
 
 Keyed Hash Functions
@@ -332,7 +344,9 @@ Public-key algorithms
 </td></tr>
 <tr><td align="left" valign="top">&bull; <a href="#ECDSA">ECDSA</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
 </td></tr>
-<tr><td align="left" valign="top">&bull; <a href="#Curve-25519">Curve 25519</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+<tr><td align="left" valign="top">&bull; <a href="#GOSTDSA">GOSTDSA</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#Curve-25519-and-Curve-448">Curve 25519 and Curve 448</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
 </td></tr>
 <tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">
 
@@ -1233,6 +1247,30 @@ octets of the digest are written.
 <p>This function also resets the context.
 </p></dd></dl>
 
+<a name="SHAKE_002d256"></a>
+<h4 class="subsubsection">7.1.1.9 <acronym>SHAKE-256</acronym></h4>
+<a name="index-SHAKE"></a>
+
+<p>In addition to those SHA-3 hash functions, Nettle also provides a SHA-3
+extendable-output function (XOF), SHAKE-256. Unlike SHA-3 hash functions,
+SHAKE can produce an output digest of any desired length.
+</p>
+<p>To use SHAKE256, the context struct, init and update functions are the
+same as for SHA3-256. To get a SHAKE256 digest, the following function
+is used instead of <code>sha3_256_digest</code>. For an output size of
+<code>SHA3_256_DIGEST_SIZE</code>, security is equivalent to SHA3-256 (but the
+digest is different). Increasing output size further does not increase
+security in terms of collision or preimage resistance. It can be seen as
+a built in pseudorandomness generator.
+</p>
+<dl>
+<dt><a name="index-sha3_005f256_005fshake"></a>Function: <em>void</em> <strong>sha3_256_shake</strong> <em>(struct shake256_ctx *<var>ctx</var>, size_t <var>length</var>, uint8_t *<var>digest</var>)</em></dt>
+<dd><p>Performs final processing and produces a SHAKE256 digest, writing it
+to <var>digest</var>. <var>length</var> can be of arbitrary size.
+</p>
+<p>This function also resets the context.
+</p></dd></dl>
+
 <hr>
 <a name="Legacy-hash-functions"></a>
 <div class="header">
@@ -1478,13 +1516,19 @@ octets of the digest are written.
 </p></dd></dl>
 
 
-<a name="GOSTHASH94"></a>
-<h4 class="subsubsection">7.1.2.6 <acronym>GOSTHASH94</acronym></h4>
+<a name="GOSTHASH94-and-GOSTHASH94CP"></a>
+<h4 class="subsubsection">7.1.2.6 <acronym>GOSTHASH94 and GOSTHASH94CP</acronym></h4>
+<a name="index-GOST-hash"></a>
 
-<p>The GOST94 or GOST R 34.11-94 hash algorithm is a Soviet-era algorithm 
+<a name="GOSTHASH94CP"></a><p>The GOST94 or GOST R 34.11-94 hash algorithm is a Soviet-era algorithm 
 used in Russian government standards (see <cite>RFC 4357</cite>).
-It outputs message digests of 256 bits, or 32 octets.
-Nettle defines GOSTHASH94 in <samp>&lt;nettle/gosthash94.h&gt;</samp>.
+It outputs message digests of 256 bits, or 32 octets. The standard itself
+does not fix the S-box used by the hash algorith, so there are two popular
+variants (the testing S-box from the standard itself and the S-box defined
+by CryptoPro company, see RFC 4357). Nettle provides support for the former
+S-box in the form of GOSTHASH94 hash algorithm and for the latter in the
+form of GOSTHASH94CP hash algorithm.
+Nettle defines GOSTHASH94 and GOSTHASH94CP in <samp>&lt;nettle/gosthash94.h&gt;</samp>.
 </p>
 <dl>
 <dt><a name="index-struct-gosthash94_005fctx"></a>Context struct: <strong>struct gosthash94_ctx</strong></dt>
@@ -1519,6 +1563,41 @@ octets of the digest are written.
 </p>
 <p>This function also resets the context in the same way as
 <code>gosthash94_init</code>.
+</p></dd></dl>
+
+<dl>
+<dt><a name="index-struct-gosthash94cp_005fctx"></a>Context struct: <strong>struct gosthash94cp_ctx</strong></dt>
+</dl>
+
+<dl>
+<dt><a name="index-GOSTHASH94CP_005fDIGEST_005fSIZE"></a>Constant: <strong>GOSTHASH94CP_DIGEST_SIZE</strong></dt>
+<dd><p>The size of a GOSTHASH94CP digest, i.e. 32.
+</p></dd></dl>
+
+<dl>
+<dt><a name="index-GOSTHASH94CP_005fBLOCK_005fSIZE"></a>Constant: <strong>GOSTHASH94CP_BLOCK_SIZE</strong></dt>
+<dd><p>The internal block size of GOSTHASH94CP, i.e., 32.
+</p></dd></dl>
+
+<dl>
+<dt><a name="index-gosthash94cp_005finit"></a>Function: <em>void</em> <strong>gosthash94cp_init</strong> <em>(struct gosthash94cp_ctx *<var>ctx</var>)</em></dt>
+<dd><p>Initialize the GOSTHASH94CP state.
+</p></dd></dl>
+
+<dl>
+<dt><a name="index-gosthash94cp_005fupdate"></a>Function: <em>void</em> <strong>gosthash94cp_update</strong> <em>(struct gosthash94cp_ctx *<var>ctx</var>, size_t <var>length</var>, const uint8_t *<var>data</var>)</em></dt>
+<dd><p>Hash some more data.
+</p></dd></dl>
+
+<dl>
+<dt><a name="index-gosthash94cp_005fdigest"></a>Function: <em>void</em> <strong>gosthash94cp_digest</strong> <em>(struct gosthash94cp_ctx *<var>ctx</var>, size_t <var>length</var>, uint8_t *<var>digest</var>)</em></dt>
+<dd><p>Performs final processing and extracts the message digest, writing it
+to <var>digest</var>. <var>length</var> may be smaller than
+<code>GOSTHASH94CP_DIGEST_SIZE</code>, in which case only the first <var>length</var>
+octets of the digest are written.
+</p>
+<p>This function also resets the context in the same way as
+<code>gosthash94cp_init</code>.
 </p></dd></dl>
 
 <hr>
@@ -1556,6 +1635,7 @@ by Nettle&rsquo;s implementation of <acronym>HMAC</acronym> (see <a href="#Keyed
 <dt><a name="index-nettle_005fsha512"></a>Constant Struct: <em>struct nettle_hash</em> <strong>nettle_sha512</strong></dt>
 <dt><a name="index-nettle_005fsha3_005f256"></a>Constant Struct: <em>struct nettle_hash</em> <strong>nettle_sha3_256</strong></dt>
 <dt><a name="index-nettle_005fgosthash94"></a>Constant Struct: <em>struct nettle_hash</em> <strong>nettle_gosthash94</strong></dt>
+<dt><a name="index-nettle_005fgosthash94cp"></a>Constant Struct: <em>struct nettle_hash</em> <strong>nettle_gosthash94cp</strong></dt>
 <dd><p>These are all the hash functions that Nettle implements.
 </p></dd></dl>
 
@@ -2128,6 +2208,11 @@ ChaCha in <samp>&lt;nettle/chacha.h&gt;</samp>.
 </p></dd></dl>
 
 <dl>
+<dt><a name="index-CHACHA_005fCOUNTER_005fSIZE"></a>Constant: <strong>CHACHA_COUNTER_SIZE</strong></dt>
+<dd><p>Size of the counter, 8.
+</p></dd></dl>
+
+<dl>
 <dt><a name="index-chacha_005fset_005fkey"></a>Function: <em>void</em> <strong>chacha_set_key</strong> <em>(struct chacha_ctx *<var>ctx</var>, const uint8_t *<var>key</var>)</em></dt>
 <dd><p>Initialize the cipher. The same function is used for both encryption and
 decryption. Before using the cipher,
@@ -2142,11 +2227,57 @@ zero.
 </p></dd></dl>
 
 <dl>
+<dt><a name="index-chacha_005fset_005fcounter"></a>Function: <em>void</em> <strong>chacha_set_counter</strong> <em>(struct chacha_ctx *<var>ctx</var>, const uint8_t *<var>counter</var>)</em></dt>
+<dd><p>Sets the block counter. It is always of size <code>CHACHA_COUNTER_SIZE</code>,
+8 octets. This is rarely needed since <code>chacha_set_nonce</code>
+initializes the block counter to zero. When it is still necessary, this
+function must be called after <code>chacha_set_nonce</code>.
+</p>
+</dd></dl>
+
+<dl>
 <dt><a name="index-chacha_005fcrypt"></a>Function: <em>void</em> <strong>chacha_crypt</strong> <em>(struct chacha_ctx *<var>ctx</var>, size_t <var>length</var>, uint8_t *<var>dst</var>, const uint8_t *<var>src</var>)</em></dt>
 <dd><p>Encrypts or decrypts the data of a message, using ChaCha. When a
 message is encrypted using a sequence of calls to <code>chacha_crypt</code>,
 all but the last call <em>must</em> use a length that is a multiple of
 <code>CHACHA_BLOCK_SIZE</code>.
+</p></dd></dl>
+
+<a name="g_t32_002dbit-counter-variant"></a>
+<h4 class="subsubsection">7.2.7.1 32-bit counter variant</h4>
+
+<p>While the original paper uses 64-bit counter value, the variant defined
+in <cite>RFC 8439</cite> uses 32-bit counter value. This variant is
+particularly useful for see <a href="#ChaCha_002dPoly1305">ChaCha-Poly1305</a> AEAD construction, which
+supports 12-octet nonces.
+</p>
+<dl>
+<dt><a name="index-CHACHA_005fNONCE96_005fSIZE"></a>Constant: <strong>CHACHA_NONCE96_SIZE</strong></dt>
+<dd><p>Size of the nonce, 12.
+</p></dd></dl>
+
+<dl>
+<dt><a name="index-CHACHA_005fCOUNTER32_005fSIZE"></a>Constant: <strong>CHACHA_COUNTER32_SIZE</strong></dt>
+<dd><p>Size of the counter, 4.
+</p></dd></dl>
+
+<dl>
+<dt><a name="index-chacha_005fset_005fnonce96"></a>Function: <em>void</em> <strong>chacha_set_nonce96</strong> <em>(struct chacha_ctx *<var>ctx</var>, const uint8_t *<var>nonce</var>)</em></dt>
+<dd><p>Sets the nonce. This is similar to the above <code>chacha_set_nonce</code>,
+but the input is always of size <code>CHACHA_NONCE96_SIZE</code>, 12 octets.
+</p></dd></dl>
+
+<dl>
+<dt><a name="index-chacha_005fset_005fcounter32"></a>Function: <em>void</em> <strong>chacha_set_counter32</strong> <em>(struct chacha_ctx *<var>ctx</var>, const uint8_t *<var>counter</var>)</em></dt>
+<dd><p>Sets the block counter. This is similar to the above <code>chacha_set_counter</code>,
+but the input is always of size <code>CHACHA_COUNTER32_SIZE</code>, 4 octets.
+</p></dd></dl>
+
+<dl>
+<dt><a name="index-chacha_005fcrypt32"></a>Function: <em>void</em> <strong>chacha_crypt32</strong> <em>(struct chacha_ctx *<var>ctx</var>, size_t <var>length</var>, uint8_t *<var>dst</var>, const uint8_t *<var>src</var>)</em></dt>
+<dd><p>Encrypts or decrypts the data of a message, using ChaCha. This is similar to the
+above <code>chacha_crypt</code>, but it assumes the internal counter value is 32-bit
+long and the nonce is 96-bit long.
 </p></dd></dl>
 
 <a name="DES"></a>
@@ -3184,7 +3315,9 @@ more adventurous alternative, in particular if performance is important.
 </td></tr>
 <tr><td align="left" valign="top">&bull; <a href="#ChaCha_002dPoly1305" accesskey="4">ChaCha-Poly1305</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
 </td></tr>
-<tr><td align="left" valign="top">&bull; <a href="#nettle_005faead-abstraction" accesskey="5">nettle_aead abstraction</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+<tr><td align="left" valign="top">&bull; <a href="#SIV_002dCMAC" accesskey="5">SIV-CMAC</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#nettle_005faead-abstraction" accesskey="6">nettle_aead abstraction</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
 </td></tr>
 </table>
 
@@ -3929,7 +4062,7 @@ except that <var>cipher</var> and <var>f</var> are replaced with a context struc
 <a name="ChaCha_002dPoly1305"></a>
 <div class="header">
 <p>
-Next: <a href="#nettle_005faead-abstraction" accesskey="n" rel="next">nettle_aead abstraction</a>, Previous: <a href="#CCM" accesskey="p" rel="prev">CCM</a>, Up: <a href="#Authenticated-encryption" accesskey="u" rel="up">Authenticated encryption</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Index" title="Index" rel="index">Index</a>]</p>
+Next: <a href="#SIV_002dCMAC" accesskey="n" rel="next">SIV-CMAC</a>, Previous: <a href="#CCM" accesskey="p" rel="prev">CCM</a>, Up: <a href="#Authenticated-encryption" accesskey="u" rel="up">Authenticated encryption</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Index" title="Index" rel="index">Index</a>]</p>
 </div>
 <a name="ChaCha_002dPoly1305-1"></a>
 <h4 class="subsection">7.4.4 ChaCha-Poly1305</h4>
@@ -3937,17 +4070,12 @@ Next: <a href="#nettle_005faead-abstraction" accesskey="n" rel="next">nettle_aea
 <p>ChaCha-Poly1305 is a combination of the ChaCha stream cipher and the
 poly1305 message authentication code (see <a href="#Poly1305">Poly1305</a>). It originates
 from the NaCl cryptographic library by D. J. Bernstein et al, which
-defines a similar construction but with Salsa20 instead of ChaCha. 
+defines a similar construction but with Salsa20 instead of ChaCha.
 </p>
-<p>Nettle&rsquo;s implementation ChaCha-Poly1305 should be considered
-<strong>experimental</strong>. At the time of this writing, there is no
-authoritative specification for ChaCha-Poly1305, and a couple of
-different incompatible variants. Nettle implements it using the original
-definition of ChaCha, with 64 bits (8 octets) each for the nonce and the
-block counter. Some protocols prefer to use nonces of 12 bytes, and it&rsquo;s
-a small change to ChaCha to use the upper 32 bits of the block counter
-as a nonce, instead limiting message size to <em>2^32</em> blocks or 256
-GBytes, but that variant is currently not supported.
+<p>Nettle&rsquo;s implementation of ChaCha-Poly1305 follows <cite>RFC 8439</cite>,
+where the ChaCha cipher is initialized with a 12-byte nonce and a 4-byte
+block counter. This allows up to 256 gigabytes of data to be encrypted
+using the same key and nonce.
 </p>
 <p>For ChaCha-Poly1305, the ChaCha cipher is initialized with a key, of 256
 bits, and a per-message nonce. The first block of the key stream
@@ -3979,7 +4107,7 @@ little-endian). Nettle defines ChaCha-Poly1305 in
 
 <dl>
 <dt><a name="index-CHACHA_005fPOLY1305_005fNONCE_005fSIZE"></a>Constant: <strong>CHACHA_POLY1305_NONCE_SIZE</strong></dt>
-<dd><p>Same as the ChaCha nonce size, 16.
+<dd><p>ChaCha-Poly1305 nonce size, 12.
 </p></dd></dl>
 
 <dl>
@@ -4024,13 +4152,123 @@ smaller than <code>CHACHA_POLY1305_DIGEST_SIZE</code>, only the first
 </p></dd></dl>
 
 <hr>
+<a name="SIV_002dCMAC"></a>
+<div class="header">
+<p>
+Next: <a href="#nettle_005faead-abstraction" accesskey="n" rel="next">nettle_aead abstraction</a>, Previous: <a href="#ChaCha_002dPoly1305" accesskey="p" rel="prev">ChaCha-Poly1305</a>, Up: <a href="#Authenticated-encryption" accesskey="u" rel="up">Authenticated encryption</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Index" title="Index" rel="index">Index</a>]</p>
+</div>
+<a name="Synthetic-Initialization-Vector-AEAD"></a>
+<h4 class="subsection">7.4.5 Synthetic Initialization Vector AEAD</h4>
+
+<a name="index-SIV-mode"></a>
+<a name="index-SIV_002dCMAC-mode"></a>
+
+<p><acronym>SIV-CMAC</acronym> mode is a combination of counter mode with message
+authentication based on <acronym>CMAC</acronym>. Unlike other counter <acronym>AEAD</acronym>
+modes, it provides protection against accidental nonce misuse, making it
+a good choice for stateless-servers that cannot ensure nonce uniqueness.
+It is constructed on top of a block cipher which must have a block size of
+128 bits. Nettle&rsquo;s support for <acronym>SIV-CMAC</acronym> consists of
+a message encryption and authentication interface, for
+<acronym>SIV-CMAC</acronym> using AES as the underlying block cipher.
+When a nonce is re-used with this mode, message authenticity is retained
+however an attacker can determine whether the same plaintext was protected
+with the two messages sharing the nonce.
+These interfaces are defined in <samp>&lt;nettle/siv-cmac.h&gt;</samp>.
+</p>
+<p>Unlike other <acronym>AEAD</acronym> mode in <acronym>SIV-CMAC</acronym> the initialization
+vector serves as the tag. That means that in the generated ciphertext
+the tag precedes the ciphertext.
+</p>
+<p>Note also, that the <acronym>SIV-CMAC</acronym> algorithm, as specified in
+<cite>RFC 5297</cite>, introduces the notion of authenticated data which
+consist of multiple components. For example with <acronym>SIV-CMAC</acronym> the
+authentication tag of data <code>X</code> followed by <code>Y</code>, is different
+than the concatenated data <code>X || Y</code>. The interfaces described below
+follow the <acronym>AEAD</acronym> paradigm and do not allow access to this
+feature and also require the use of a non-empty nonce. In the
+terminology of the RFC, the input to the S2V function is always a vector
+of three elements, where S1 is the authenticated data, S2 is the nonce,
+and S3 is the plaintext.
+</p>
+
+<a name="General-interface"></a>
+<h4 class="subsubsection">7.4.5.1 General interface</h4>
+
+<dl>
+<dt><a name="index-SIV_005fBLOCK_005fSIZE"></a>Constant: <strong>SIV_BLOCK_SIZE</strong></dt>
+<dd><p><acronym>SIV-CMAC</acronym>&rsquo;s block size, 16.
+</p></dd></dl>
+
+<dl>
+<dt><a name="index-SIV_005fDIGEST_005fSIZE"></a>Constant: <strong>SIV_DIGEST_SIZE</strong></dt>
+<dd><p>Size of the <acronym>SIV-CMAC</acronym> digest or initialization vector, 16.
+</p></dd></dl>
+
+<dl>
+<dt><a name="index-SIV_005fMIN_005fNONCE_005fSIZE"></a>Constant: <strong>SIV_MIN_NONCE_SIZE</strong></dt>
+<dd><p>The the minimum size for an <acronym>SIV-CMAC</acronym> nonce, 1.
+</p></dd></dl>
+
+<a name="SIV_002dCMAC_002dAES-interface"></a>
+<h4 class="subsubsection">7.4.5.2 <acronym>SIV-CMAC</acronym>-<acronym>AES</acronym> interface</h4>
+
+<p>The <acronym>AES</acronym> <acronym>SIV-CMAC</acronym> functions provide an API for using
+<acronym>SIV-CMAC</acronym> mode with the <acronym>AES</acronym> block ciphers. The parameters
+all have the same meaning as the general and message interfaces, except
+that the <var>cipher</var>, <var>f</var>, and <var>ctx</var> parameters are replaced
+with an <acronym>AES</acronym> context structure, and a set-key function must be
+called before using any of the other functions in this interface.
+</p>
+<dl>
+<dt><a name="index-struct-siv_005fcmac_005faes128_005fctx"></a>Context struct: <strong>struct siv_cmac_aes128_ctx</strong></dt>
+<dd><p>Holds state corresponding to a particular message encrypted using the
+AES-128 block cipher.
+</p></dd></dl>
+
+<dl>
+<dt><a name="index-struct-siv_005fcmac_005faes256_005fctx"></a>Context struct: <strong>struct siv_cmac_aes256_ctx</strong></dt>
+<dd><p>Holds state corresponding to a particular message encrypted using the
+AES-256 block cipher.
+</p></dd></dl>
+
+<dl>
+<dt><a name="index-siv_005fcmac_005faes128_005fset_005fkey"></a>Function: <em>void</em> <strong>siv_cmac_aes128_set_key</strong> <em>(struct siv_cmac_aes128_ctx *<var>ctx</var>, const uint8_t *<var>key</var>)</em></dt>
+<dt><a name="index-siv_005fcmac_005faes256_005fset_005fkey"></a>Function: <em>void</em> <strong>siv_cmac_aes256_set_key</strong> <em>(struct siv_cmac_aes256_ctx *<var>ctx</var>, const uint8_t *<var>key</var>)</em></dt>
+<dd><p>Initializes the encryption key for the AES block cipher. One of these
+functions must be called before any of the other functions in the
+<acronym>AES</acronym> <acronym>SIV-CMAC</acronym> interface.
+</p></dd></dl>
+
+<dl>
+<dt><a name="index-siv_005fcmac_005faes128_005fencrypt_005fmessage"></a>Function: <em>void</em> <strong>siv_cmac_aes128_encrypt_message</strong> <em>(struct siv_cmac_aes128_ctx *<var>ctx</var>, size_t <var>nlength</var>, const uint8_t *<var>nonce</var>, size_t <var>alength</var>, const uint8_t *<var>adata</var>, size_t <var>clength</var>, uint8_t *<var>dst</var>, const uint8_t *<var>src</var>)</em></dt>
+<dt><a name="index-siv_005fcmac_005faes256_005fencrypt_005fmessage"></a>Function: <em>void</em> <strong>siv_cmac_aes256_encrypt_message</strong> <em>(struct siv_cmac_aes256_ctx *<var>ctx</var>, size_t <var>nlength</var>, const uint8_t *<var>nonce</var>, size_t <var>alength</var>, const uint8_t *<var>adata</var>, size_t <var>clength</var>, uint8_t *<var>dst</var>, const uint8_t *<var>src</var>)</em></dt>
+<dd><p>Computes the message digest from the <var>adata</var> and <var>src</var>
+parameters, encrypts the plaintext from <var>src</var>, prepends the
+initialization vector to the ciphertext and outputs it to <var>dst</var>.
+The <var>clength</var> variable must be equal to the length of <var>src</var>
+plus <code>SIV_DIGEST_SIZE</code>.
+</p>
+</dd></dl>
+
+<dl>
+<dt><a name="index-siv_005fcmac_005faes128_005fdecrypt_005fmessage"></a>Function: <em>int</em> <strong>siv_cmac_aes128_decrypt_message</strong> <em>(struct siv_cmac_aes128_ctx *<var>ctx</var>, size_t <var>nlength</var>, const uint8_t *<var>nonce</var>, size_t <var>alength</var>, const uint8_t *<var>adata</var>, size_t <var>mlength</var>, uint8_t *<var>dst</var>, const uint8_t *<var>src</var>)</em></dt>
+<dt><a name="index-siv_005fcmac_005faes256_005fdecrypt_005fmessage"></a>Function: <em>int</em> <strong>siv_cmac_aes256_decrypt_message</strong> <em>(struct siv_cmac_aes128_ctx *<var>ctx</var>, size_t <var>nlength</var>, const uint8_t *<var>nonce</var>, size_t <var>alength</var>, const uint8_t *<var>adata</var>, size_t <var>mlength</var>, uint8_t *<var>dst</var>, const uint8_t *<var>src</var>)</em></dt>
+<dd><p>Decrypts the ciphertext from <var>src</var>, outputs the plaintext to
+<var>dst</var>, recalculates the initialization vector from <var>adata</var> and the
+plaintext. If the values of the received and calculated initialization vector
+are equal, this will return 1 indicating a valid and authenticated
+message. Otherwise, this function will return zero.
+</p></dd></dl>
+
+<hr>
 <a name="nettle_005faead-abstraction"></a>
 <div class="header">
 <p>
 Previous: <a href="#ChaCha_002dPoly1305" accesskey="p" rel="prev">ChaCha-Poly1305</a>, Up: <a href="#Authenticated-encryption" accesskey="u" rel="up">Authenticated encryption</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Index" title="Index" rel="index">Index</a>]</p>
 </div>
 <a name="The-struct-nettle_005faead-abstraction"></a>
-<h4 class="subsection">7.4.5 The <code>struct nettle_aead</code> abstraction</h4>
+<h4 class="subsection">7.4.6 The <code>struct nettle_aead</code> abstraction</h4>
 <a name="index-nettle_005faead"></a>
 
 <p>Nettle includes a struct including information about the supported hash
@@ -4524,14 +4762,20 @@ Previous: <a href="#UMAC" accesskey="p" rel="prev">UMAC</a>, Up: <a href="#Keyed
 <a name="CMAC-1"></a>
 <h4 class="subsection">7.5.4 <acronym>CMAC</acronym></h4>
 <a name="index-CMAC"></a>
+<a name="index-CMAC_002d128"></a>
+<a name="index-CMAC_002d64"></a>
 
 <p><acronym>CMAC</acronym> is a message authentication code based on CBC encryption
 mode. It is suitable for systems where block ciphers are preferrable
-and perform better than hash functions. <acronym>CMAC</acronym> is specified in
+and perform better than hash functions. <acronym>CMAC-128</acronym> is specified in
 <cite>RFC4493</cite>. The block size is always 128 bits (16 octets).
+<acronym>CMAC-64</acronym> is specified by
+<a href="https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-38B.pdf">NIST Special Publication 800-38B</a>. The block size is always 64 bits
+(8 octets).
 </p>
-<p>Nettle provides helper functions for <acronym>CMAC</acronym> with
-the <acronym>AES</acronym> block cipher.
+<p>Nettle provides helper functions for <acronym>CMAC-128</acronym> with
+the <acronym>AES</acronym> block cipher and for <acronym>CMAC-64</acronym> with
+the <acronym>Tripple-DES</acronym> block cipher.
 </p>
 <p>Nettle defines <acronym>CMAC</acronym> in <samp>&lt;nettle/cmac.h&gt;</samp>.
 </p>
@@ -4542,7 +4786,7 @@ the <acronym>AES</acronym> block cipher.
 
 <dl>
 <dt><a name="index-CMAC128_005fDIGEST_005fSIZE"></a>Constant: <strong>CMAC128_DIGEST_SIZE</strong></dt>
-<dd><p>The size of an CMAC digest, 16.
+<dd><p>The size of an CMAC-128 digest, 16.
 </p></dd></dl>
 
 <dl>
@@ -4576,6 +4820,34 @@ processing of a new message with the same key.
 
 <dl>
 <dt><a name="index-cmac_005faes256_005fdigest"></a>Function: <em>void</em> <strong>cmac_aes256_digest</strong> <em>(struct cmac_aes256_ctx *<var>ctx</var>, size_t <var>length</var>, uint8_t *<var>digest</var>)</em></dt>
+<dd><p>Extracts the <acronym>MAC</acronym> of the message, writing it to <var>digest</var>.
+<var>length</var> is usually equal to the specified output size, but if you
+provide a smaller value, only the first <var>length</var> octets of the
+<acronym>MAC</acronym> are written. This function resets the context for
+processing of a new message with the same key.
+</p></dd></dl>
+
+<dl>
+<dt><a name="index-struct-cmac_005fdes3_005fctx"></a>Context struct: <strong>struct cmac_des3_ctx</strong></dt>
+</dl>
+
+<dl>
+<dt><a name="index-CMAC64_005fDIGEST_005fSIZE"></a>Constant: <strong>CMAC64_DIGEST_SIZE</strong></dt>
+<dd><p>The size of an CMAC-64 digest, 8.
+</p></dd></dl>
+
+<dl>
+<dt><a name="index-cmac_005fdes3_005fset_005fkey"></a>Function: <em>void</em> <strong>cmac_des3_set_key</strong> <em>(struct cmac_des3_ctx *<var>ctx</var>, const uint8_t *<var>key</var>)</em></dt>
+<dd><p>This function initializes the <acronym>CMAC</acronym> context struct for <acronym>Tripple-DES</acronym>.
+</p></dd></dl>
+
+<dl>
+<dt><a name="index-cmac_005fdes3_005fupdate"></a>Function: <em>void</em> <strong>cmac_des3_update</strong> <em>(struct cmac_des3_ctx *<var>ctx</var>,size_t <var>length</var>, const uint8_t *<var>data</var>)</em></dt>
+<dd><p>This function is called zero or more times to process the message.
+</p></dd></dl>
+
+<dl>
+<dt><a name="index-cmac_005fdes3_005fdigest"></a>Function: <em>void</em> <strong>cmac_des3_digest</strong> <em>(struct cmac_des3_ctx *<var>ctx</var>, size_t <var>length</var>, uint8_t *<var>digest</var>)</em></dt>
 <dd><p>Extracts the <acronym>MAC</acronym> of the message, writing it to <var>digest</var>.
 <var>length</var> is usually equal to the specified output size, but if you
 provide a smaller value, only the first <var>length</var> octets of the
@@ -5639,7 +5911,9 @@ curve&rdquo; is used as a shorthand for the bitsize of the curve&rsquo;s prime
 </td></tr>
 <tr><td align="left" valign="top">&bull; <a href="#ECDSA" accesskey="2">ECDSA</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
 </td></tr>
-<tr><td align="left" valign="top">&bull; <a href="#Curve-25519" accesskey="3">Curve 25519</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+<tr><td align="left" valign="top">&bull; <a href="#GOSTDSA" accesskey="3">GOSTDSA</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#Curve-25519-and-Curve-448" accesskey="4">Curve 25519 and Curve 448</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
 </td></tr>
 </table>
 
@@ -5683,7 +5957,7 @@ in several of the building blocks.
 <a name="ECDSA"></a>
 <div class="header">
 <p>
-Next: <a href="#Curve-25519" accesskey="n" rel="next">Curve 25519</a>, Previous: <a href="#Side_002dchannel-silence" accesskey="p" rel="prev">Side-channel silence</a>, Up: <a href="#Elliptic-curves" accesskey="u" rel="up">Elliptic curves</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Index" title="Index" rel="index">Index</a>]</p>
+Next: <a href="#GOSTDSA" accesskey="n" rel="next">GOSTDSA</a>, Previous: <a href="#Side_002dchannel-silence" accesskey="p" rel="prev">Side-channel silence</a>, Up: <a href="#Elliptic-curves" accesskey="u" rel="up">Elliptic curves</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Index" title="Index" rel="index">Index</a>]</p>
 </div>
 <a name="ECDSA-1"></a>
 <h4 class="subsubsection">7.7.3.2 ECDSA</h4>
@@ -5802,14 +6076,101 @@ See <a href="#Randomness">Randomness</a>.
 </p></dd></dl>
 
 <hr>
-<a name="Curve-25519"></a>
+<a name="GOSTDSA"></a>
+<div class="header">
+<p>
+Next: <a href="#Curve-25519-and-Curve-448" accesskey="n" rel="next">Curve 25519 and Curve 448</a>, Previous: <a href="#ECDSA" accesskey="p" rel="prev">ECDSA</a>, Up: <a href="#Elliptic-curves" accesskey="u" rel="up">Elliptic curves</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Index" title="Index" rel="index">Index</a>]</p>
+</div>
+<a name="GOSTDSA-1"></a>
+<h4 class="subsubsection">7.7.3.3 GOSTDSA</h4>
+<a name="index-GOST-DSA"></a>
+
+<p>GOSTDSA (GOST R 34.10-2001, GOST R 34.10-2012) is a variant of the DSA
+(see <a href="#DSA">DSA</a>) and ECDSA (see <a href="#ECDSA">ECDSA</a>) digital signature schemes, which works
+over an elliptic curve group. Original documents are written in Russian.
+English translations are provided in <cite>RFC 5832</cite> and <cite>RFC 7091</cite>.
+While technically nothing stops one from using GOSTDSA over any curve, it
+is defined only over several 256 and 512-bit curves.  Like DSA and ECDSA,
+creating a signature requires a unique random nonce (repeating the nonce
+with two different messages reveals the private key, and any leak or bias
+in the generation of the nonce also leaks information about the key).
+</p>
+<p>GOST R 34.10-2001 was defined to use GOST R 34.11-94 hash function
+(GOSTHASH94 and GOSTHASH94CP, <cite>RFC 5831</cite>).  GOST R 34.10-2012 is
+defined to use GOST R 34.11-2012 hash function (Streebog, <cite>RFC
+6986</cite>) of corresponding size (256 or 512) depending on curve size.
+</p>
+<p>Nettle defines GOSTDSA in <samp>&lt;nettle/gostdsa.h&gt;</samp>. GOSTDSA reuses ECDSA
+data types (<code>struct ecc_point</code>, <code>struct ecc_scalar</code>) to
+represent public and private keys.  Also to generate a new GOSTDSA key
+pair one has to use <code>ecdsa_generate_keypair()</code> function.
+</p>
+<p>To create and verify GOSTDSA signatures, the following functions are used.
+</p>
+<dl>
+<dt><a name="index-gostdsa_005fsign"></a>Function: <em>void</em> <strong>gostdsa_sign</strong> <em>(const struct ecc_scalar *<var>key</var>, void *<var>random_ctx</var>, nettle_random_func *<var>random</var>, size_t <var>digest_length</var>, const uint8_t *<var>digest</var>, struct dsa_signature *<var>signature</var>)</em></dt>
+<dd><p>Uses the private key <var>key</var> to create a signature on <var>digest</var>.
+<var>random_ctx</var> and <var>random</var> is a randomness generator.
+<code>random(random_ctx, length, dst)</code> should generate <code>length</code>
+random octets and store them at <code>dst</code>. The signature is stored in
+<var>signature</var>, in the same was as for plain DSA.
+</p></dd></dl>
+
+<dl>
+<dt><a name="index-gostdsa_005fverify"></a>Function: <em>int</em> <strong>gostdsa_verify</strong> <em>(const struct ecc_point *<var>pub</var>, size_t <var>length</var>, const uint8_t *<var>digest</var>, const struct dsa_signature *<var>signature</var>)</em></dt>
+<dd><p>Uses the public key <var>pub</var> to verify that <var>signature</var> is a valid
+signature for the message digest <var>digest</var> (of <var>length</var> octets).
+Returns 1 if the signature is valid, otherwise 0.
+</p></dd></dl>
+
+<p>For historical reason several curve IDs (OIDs) may correspond to a single
+curve/generator combination. Following list defines correspondence
+between nettle&rsquo;s view on curves and actual identifiers defined in <cite>RFC
+4357</cite> and <cite>RFC 7836</cite>.
+</p>
+<dl>
+<dt><a name="index-nettle_005fget_005fgost_005fgc256b_0028void_0029"></a>Function: <em>const struct ecc_curve</em> <strong>nettle_get_gost_gc256b(void)</strong></dt>
+<dd><p>Returns curve corresponding to following identifiers:
+</p><ul>
+<li> id-GostR3410-2001-CryptoPro-A-ParamSet (<cite>RFC 4357</cite>)
+</li><li> id-GostR3410-2001-CryptoPro-XchA-ParamSet (<cite>RFC 4357</cite>)
+</li><li> id-tc26-gost-3410-12-256-paramSetB
+</li></ul>
+</dd></dl>
+
+<dl>
+<dt><a name="index-nettle_005fget_005fgost_005fgc512a_0028void_0029"></a>Function: <em>const struct ecc_curve</em> <strong>nettle_get_gost_gc512a(void)</strong></dt>
+<dd><p>Returns curve corresponding to following identifiers:
+</p><ul>
+<li> id-tc26-gost-3410-12-512-paramSetA (<cite>RFC 7836</cite>)
+</li></ul>
+</dd></dl>
+
+<p>For GOST key pairs key derivation/key agreement function (VKO) is defined in
+<cite>RFC 4357</cite> and <cite>RFC 7836</cite>.  Basically shared key is equal to
+hash(cofactor * ukm * priv * pub). Nettle library provides a function that does
+multiplication. Caller should do hashing on his own (it will be either
+GOST R 34.11-94 (see <a href="#GOSTHASH94CP">GOSTHASH94CP</a>) or GOST R 34.11-2012, Streebog, which nor part of the library yet).
+</p>
+<dl>
+<dt><a name="index-gostdsa_005fvko"></a>Function: <em>void</em> <strong>gostdsa_vko</strong> <em>(const struct ecc_scalar *<var>priv</var>, const struct ecc_point *<var>pub</var>, size_t <var>ukm_length</var>, const uint8_t *<var>ukm</var>, uint8_t *<var>out</var>)</em></dt>
+<dd><p>Uses private key <var>priv</var>, public ket <var>pub</var> and shared key material
+<var>ukm</var> to generate shared secret, written to buffer <var>out</var>. The buffer
+should be of the size equal to 2 private key lengths: 64 bytes for 256 bit
+curves and 128 bytes for 512 bit ones. UKM is a shared key material, usually
+transferred in cleartext. It does not have to be secret.
+</p></dd></dl>
+
+<hr>
+<a name="Curve-25519-and-Curve-448"></a>
 <div class="header">
 <p>
 Previous: <a href="#ECDSA" accesskey="p" rel="prev">ECDSA</a>, Up: <a href="#Elliptic-curves" accesskey="u" rel="up">Elliptic curves</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Index" title="Index" rel="index">Index</a>]</p>
 </div>
-<a name="Curve25519"></a>
-<h4 class="subsubsection">7.7.3.3 Curve25519</h4>
+<a name="Curve25519-and-Curve448"></a>
+<h4 class="subsubsection">7.7.3.4 Curve25519 and Curve448</h4>
 <a name="index-Curve-25519"></a>
+<a name="index-Curve-448"></a>
 
 
 <p>Curve25519 is an elliptic curve of Montgomery type, <em>y^2 = x^3 +
@@ -5886,8 +6247,45 @@ the x-coordinates, respectively. They are all of size
 <code>crypto_scalar_mult</code> in the NaCl library.
 </p></dd></dl>
 
+<p>Similarly, Nettle also implements Curve448, an elliptic curve of
+Montgomery type, <em>y^2 = x^3 + 156326 x^2 + x (mod p)</em>, with
+<em>p = 2^448 - 2^224 - 1</em>.  This particular curve was proposed by
+Mike Hamburg in 2015, for fast Diffie-Hellman key exchange, and is also
+described in <cite>RFC 7748</cite>.
+</p>
+<p>Nettle defines Curve 448 in <samp>&lt;nettle/curve448.h&gt;</samp>.
+</p>
+<dl>
+<dt><a name="index-CURVE448_005fSIZE"></a>Constant: <strong>CURVE448_SIZE</strong></dt>
+<dd><p>The octet length of the strings representing curve448 points and scalars, 56.
+</p></dd></dl>
+
+<dl>
+<dt><a name="index-curve448_005fmul_005fg"></a>Function: <em>void</em> <strong>curve448_mul_g</strong> <em>(uint8_t *<var>q</var>, const uint8_t *<var>n</var>)</em></dt>
+<dd><p>Computes <em>Q = N G</em>, where <em>G</em> is the group generator and
+<em>N</em> is an integer. The input argument <var>n</var> and the output
+argument <var>q</var> use a little-endian representation of the scalar and
+the x-coordinate, respectively. They are both of size
+<code>CURVE448_SIZE</code>.
+</p>
+<p>This function is intended to be compatible with the function
+<code>crypto_scalar_mult_base</code> in the NaCl library.
+</p></dd></dl>
+
+<dl>
+<dt><a name="index-curve448_005fmul"></a>Function: <em>void</em> <strong>curve448_mul</strong> <em>(uint8_t *<var>q</var>, const uint8_t *<var>n</var>, const uint8_t *<var>p</var>)</em></dt>
+<dd><p>Computes <em>Q = N P</em>, where <em>P</em> is an input point and <em>N</em>
+is an integer. The input arguments <var>n</var> and <var>p</var> and the output
+argument <var>q</var> use a little-endian representation of the scalar and
+the x-coordinates, respectively. They are all of size
+<code>CURVE448_SIZE</code>.
+</p>
+<p>This function is intended to be compatible with the function
+<code>crypto_scalar_mult</code> in the NaCl library.
+</p></dd></dl>
+
 <a name="EdDSA"></a>
-<h4 class="subsubsection">7.7.3.4 EdDSA</h4>
+<h4 class="subsubsection">7.7.3.5 EdDSA</h4>
 <a name="index-eddsa"></a>
 
 <p>EdDSA is a signature scheme proposed by D. J. Bernstein et al. in 2011.
@@ -5934,6 +6332,36 @@ input and output are of size <code>ED25519_KEY_SIZE</code>.
 
 <dl>
 <dt><a name="index-ed25519_005fsha512_005fverify"></a>Function: <em>int</em> <strong>ed25519_sha512_verify</strong> <em>(const uint8_t *<var>pub</var>, size_t <var>length</var>, const uint8_t *<var>msg</var>, const uint8_t *<var>signature</var>)</em></dt>
+<dd><p>Verifies a message using the provided public key. Returns 1 if the
+signature is valid, otherwise 0.
+</p></dd></dl>
+
+<p>Nettle also provides Ed448, an EdDSA signature scheme based on an
+Edwards curve equivalent to curve448.
+</p>
+<dl>
+<dt><a name="index-ED448_005fKEY_005fSIZE"></a>Constant: <strong>ED448_KEY_SIZE</strong></dt>
+<dd><p>The size of a private or public Ed448 key, 57 octets.
+</p></dd></dl>
+
+<dl>
+<dt><a name="index-ED448_005fSIGNATURE_005fSIZE"></a>Constant: <strong>ED448_SIGNATURE_SIZE</strong></dt>
+<dd><p>The size of an Ed448 signature, 114 octets.
+</p></dd></dl>
+
+<dl>
+<dt><a name="index-ed448_005fshake256_005fpublic_005fkey"></a>Function: <em>void</em> <strong>ed448_shake256_public_key</strong> <em>(uint8_t *<var>pub</var>, const uint8_t *<var>priv</var>)</em></dt>
+<dd><p>Computes the public key corresponding to the given private key. Both
+input and output are of size <code>ED448_KEY_SIZE</code>.
+</p></dd></dl>
+
+<dl>
+<dt><a name="index-ed448_005fshake256_005fsign"></a>Function: <em>void</em> <strong>ed448_shake256_sign</strong> <em>(const uint8_t *<var>pub</var>, const uint8_t *<var>priv</var>, size_t <var>length</var>, const uint8_t *<var>msg</var>, uint8_t *<var>signature</var>)</em></dt>
+<dd><p>Signs a message using the provided key pair.
+</p></dd></dl>
+
+<dl>
+<dt><a name="index-ed448_005fshake256_005fverify"></a>Function: <em>int</em> <strong>ed448_shake256_verify</strong> <em>(const uint8_t *<var>pub</var>, size_t <var>length</var>, const uint8_t *<var>msg</var>, const uint8_t *<var>signature</var>)</em></dt>
 <dd><p>Verifies a message using the provided public key. Returns 1 if the
 signature is valid, otherwise 0.
 </p></dd></dl>
@@ -6804,25 +7232,34 @@ Previous: <a href="#Installation" accesskey="p" rel="prev">Installation</a>, Up:
 <tr><td></td><td valign="top"><a href="#index-CFB_005fSET_005fIV_0028ctx_002c"><code>CFB_SET_IV(<var>ctx</var>,</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#CFB-and-CFB8">CFB and CFB8</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-ChaCha">ChaCha</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Cipher-functions">Cipher functions</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-chacha_005fcrypt"><code>chacha_crypt</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Cipher-functions">Cipher functions</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-chacha_005fcrypt32"><code>chacha_crypt32</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Cipher-functions">Cipher functions</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-chacha_005fpoly1305_005fdecrypt"><code>chacha_poly1305_decrypt</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ChaCha_002dPoly1305">ChaCha-Poly1305</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-chacha_005fpoly1305_005fdigest"><code>chacha_poly1305_digest</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ChaCha_002dPoly1305">ChaCha-Poly1305</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-chacha_005fpoly1305_005fencrypt"><code>chacha_poly1305_encrypt</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ChaCha_002dPoly1305">ChaCha-Poly1305</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-chacha_005fpoly1305_005fset_005fkey"><code>chacha_poly1305_set_key</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ChaCha_002dPoly1305">ChaCha-Poly1305</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-chacha_005fpoly1305_005fset_005fnonce"><code>chacha_poly1305_set_nonce</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ChaCha_002dPoly1305">ChaCha-Poly1305</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-chacha_005fpoly1305_005fupdate"><code>chacha_poly1305_update</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ChaCha_002dPoly1305">ChaCha-Poly1305</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-chacha_005fset_005fcounter"><code>chacha_set_counter</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Cipher-functions">Cipher functions</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-chacha_005fset_005fcounter32"><code>chacha_set_counter32</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Cipher-functions">Cipher functions</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-chacha_005fset_005fkey"><code>chacha_set_key</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Cipher-functions">Cipher functions</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-chacha_005fset_005fnonce"><code>chacha_set_nonce</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Cipher-functions">Cipher functions</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-chacha_005fset_005fnonce96"><code>chacha_set_nonce96</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Cipher-functions">Cipher functions</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Cipher">Cipher</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Cipher-functions">Cipher functions</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Cipher-Block-Chaining">Cipher Block Chaining</a>:</td><td>&nbsp;</td><td valign="top"><a href="#CBC">CBC</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Cipher-Feedback-8_002dbit-Mode">Cipher Feedback 8-bit Mode</a>:</td><td>&nbsp;</td><td valign="top"><a href="#CFB-and-CFB8">CFB and CFB8</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Cipher-Feedback-Mode">Cipher Feedback Mode</a>:</td><td>&nbsp;</td><td valign="top"><a href="#CFB-and-CFB8">CFB and CFB8</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-CMAC">CMAC</a>:</td><td>&nbsp;</td><td valign="top"><a href="#CMAC">CMAC</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-CMAC_002d128">CMAC-128</a>:</td><td>&nbsp;</td><td valign="top"><a href="#CMAC">CMAC</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-CMAC_002d64">CMAC-64</a>:</td><td>&nbsp;</td><td valign="top"><a href="#CMAC">CMAC</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-cmac_005faes128_005fdigest"><code>cmac_aes128_digest</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#CMAC">CMAC</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-cmac_005faes128_005fset_005fkey"><code>cmac_aes128_set_key</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#CMAC">CMAC</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-cmac_005faes128_005fupdate"><code>cmac_aes128_update</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#CMAC">CMAC</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-cmac_005faes256_005fdigest"><code>cmac_aes256_digest</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#CMAC">CMAC</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-cmac_005faes256_005fset_005fkey"><code>cmac_aes256_set_key</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#CMAC">CMAC</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-cmac_005faes256_005fupdate"><code>cmac_aes256_update</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#CMAC">CMAC</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-cmac_005fdes3_005fdigest"><code>cmac_des3_digest</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#CMAC">CMAC</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-cmac_005fdes3_005fset_005fkey"><code>cmac_des3_set_key</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#CMAC">CMAC</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-cmac_005fdes3_005fupdate"><code>cmac_des3_update</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#CMAC">CMAC</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Collision_002dresistant">Collision-resistant</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Hash-functions">Hash functions</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Conditional-entropy">Conditional entropy</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Randomness">Randomness</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Counter-Mode">Counter Mode</a>:</td><td>&nbsp;</td><td valign="top"><a href="#CTR">CTR</a></td></tr>
@@ -6832,9 +7269,12 @@ Previous: <a href="#Installation" accesskey="p" rel="prev">Installation</a>, Up:
 <tr><td></td><td valign="top"><a href="#index-CTR_005fCRYPT"><code>CTR_CRYPT</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#CTR">CTR</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-CTR_005fCTX"><code>CTR_CTX</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#CTR">CTR</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-CTR_005fSET_005fCOUNTER"><code>CTR_SET_COUNTER</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#CTR">CTR</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Curve-25519">Curve 25519</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Curve-25519">Curve 25519</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-curve25519_005fmul"><code>curve25519_mul</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Curve-25519">Curve 25519</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-curve25519_005fmul_005fg"><code>curve25519_mul_g</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Curve-25519">Curve 25519</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Curve-25519">Curve 25519</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Curve-25519-and-Curve-448">Curve 25519 and Curve 448</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Curve-448">Curve 448</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Curve-25519-and-Curve-448">Curve 25519 and Curve 448</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-curve25519_005fmul"><code>curve25519_mul</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Curve-25519-and-Curve-448">Curve 25519 and Curve 448</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-curve25519_005fmul_005fg"><code>curve25519_mul_g</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Curve-25519-and-Curve-448">Curve 25519 and Curve 448</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-curve448_005fmul"><code>curve448_mul</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Curve-25519-and-Curve-448">Curve 25519 and Curve 448</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-curve448_005fmul_005fg"><code>curve448_mul_g</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Curve-25519-and-Curve-448">Curve 25519 and Curve 448</a></td></tr>
 <tr><td colspan="4"> <hr></td></tr>
 <tr><th><a name="Index_cp_letter-D">D</a></th><td></td><td></td></tr>
 <tr><td></td><td valign="top"><a href="#index-DES">DES</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Cipher-functions">Cipher functions</a></td></tr>
@@ -6900,10 +7340,13 @@ Previous: <a href="#Installation" accesskey="p" rel="prev">Installation</a>, Up:
 <tr><td></td><td valign="top"><a href="#index-ecdsa_005fgenerate_005fkeypair"><code>ecdsa_generate_keypair</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ECDSA">ECDSA</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-ecdsa_005fsign"><code>ecdsa_sign</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ECDSA">ECDSA</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-ecdsa_005fverify"><code>ecdsa_verify</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ECDSA">ECDSA</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-ed25519_005fsha512_005fpublic_005fkey"><code>ed25519_sha512_public_key</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Curve-25519">Curve 25519</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-ed25519_005fsha512_005fsign"><code>ed25519_sha512_sign</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Curve-25519">Curve 25519</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-ed25519_005fsha512_005fverify"><code>ed25519_sha512_verify</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Curve-25519">Curve 25519</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-eddsa">eddsa</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Curve-25519">Curve 25519</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-ed25519_005fsha512_005fpublic_005fkey"><code>ed25519_sha512_public_key</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Curve-25519-and-Curve-448">Curve 25519 and Curve 448</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-ed25519_005fsha512_005fsign"><code>ed25519_sha512_sign</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Curve-25519-and-Curve-448">Curve 25519 and Curve 448</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-ed25519_005fsha512_005fverify"><code>ed25519_sha512_verify</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Curve-25519-and-Curve-448">Curve 25519 and Curve 448</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-ed448_005fshake256_005fpublic_005fkey"><code>ed448_shake256_public_key</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Curve-25519-and-Curve-448">Curve 25519 and Curve 448</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-ed448_005fshake256_005fsign"><code>ed448_shake256_sign</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Curve-25519-and-Curve-448">Curve 25519 and Curve 448</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-ed448_005fshake256_005fverify"><code>ed448_shake256_verify</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Curve-25519-and-Curve-448">Curve 25519 and Curve 448</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-eddsa">eddsa</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Curve-25519-and-Curve-448">Curve 25519 and Curve 448</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Entropy">Entropy</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Randomness">Randomness</a></td></tr>
 <tr><td colspan="4"> <hr></td></tr>
 <tr><th><a name="Index_cp_letter-G">G</a></th><td></td><td></td></tr>
@@ -6960,6 +7403,14 @@ Previous: <a href="#Installation" accesskey="p" rel="prev">Installation</a>, Up:
 <tr><td></td><td valign="top"><a href="#index-GCM_005fSET_005fKEY"><code>GCM_SET_KEY</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#GCM">GCM</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-gcm_005fupdate"><code>gcm_update</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#GCM">GCM</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-GCM_005fUPDATE"><code>GCM_UPDATE</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#GCM">GCM</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-GOST-DSA">GOST DSA</a>:</td><td>&nbsp;</td><td valign="top"><a href="#GOSTDSA">GOSTDSA</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-GOST-hash">GOST hash</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Legacy-hash-functions">Legacy hash functions</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-gostdsa_005fsign"><code>gostdsa_sign</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#GOSTDSA">GOSTDSA</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-gostdsa_005fverify"><code>gostdsa_verify</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#GOSTDSA">GOSTDSA</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-gostdsa_005fvko"><code>gostdsa_vko</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#GOSTDSA">GOSTDSA</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-gosthash94cp_005fdigest"><code>gosthash94cp_digest</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Legacy-hash-functions">Legacy hash functions</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-gosthash94cp_005finit"><code>gosthash94cp_init</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Legacy-hash-functions">Legacy hash functions</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-gosthash94cp_005fupdate"><code>gosthash94cp_update</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Legacy-hash-functions">Legacy hash functions</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-gosthash94_005fdigest"><code>gosthash94_digest</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Legacy-hash-functions">Legacy hash functions</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-gosthash94_005finit"><code>gosthash94_init</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Legacy-hash-functions">Legacy hash functions</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-gosthash94_005fupdate"><code>gosthash94_update</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Legacy-hash-functions">Legacy hash functions</a></td></tr>
@@ -7020,6 +7471,8 @@ Previous: <a href="#Installation" accesskey="p" rel="prev">Installation</a>, Up:
 <tr><td></td><td valign="top"><a href="#index-nettle_005fciphers"><code>nettle_ciphers</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Cipher-functions">Cipher functions</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-nettle_005fget_005faeads"><code>nettle_get_aeads</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#nettle_005faead-abstraction">nettle_aead abstraction</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-nettle_005fget_005fciphers"><code>nettle_get_ciphers</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Cipher-functions">Cipher functions</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-nettle_005fget_005fgost_005fgc256b_0028void_0029"><code>nettle_get_gost_gc256b(void)</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#GOSTDSA">GOSTDSA</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-nettle_005fget_005fgost_005fgc512a_0028void_0029"><code>nettle_get_gost_gc512a(void)</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#GOSTDSA">GOSTDSA</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-nettle_005fget_005fhashes"><code>nettle_get_hashes</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#nettle_005fhash-abstraction">nettle_hash abstraction</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-nettle_005fhash">nettle_hash</a>:</td><td>&nbsp;</td><td valign="top"><a href="#nettle_005fhash-abstraction">nettle_hash abstraction</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-nettle_005fhashes"><code>nettle_hashes</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#nettle_005fhash-abstraction">nettle_hash abstraction</a></td></tr>
@@ -7125,6 +7578,7 @@ Previous: <a href="#Installation" accesskey="p" rel="prev">Installation</a>, Up:
 <tr><td></td><td valign="top"><a href="#index-sha3_005f224_005fupdate"><code>sha3_224_update</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Recommended-hash-functions">Recommended hash functions</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-sha3_005f256_005fdigest"><code>sha3_256_digest</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Recommended-hash-functions">Recommended hash functions</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-sha3_005f256_005finit"><code>sha3_256_init</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Recommended-hash-functions">Recommended hash functions</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-sha3_005f256_005fshake"><code>sha3_256_shake</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Recommended-hash-functions">Recommended hash functions</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-sha3_005f256_005fupdate"><code>sha3_256_update</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Recommended-hash-functions">Recommended hash functions</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-sha3_005f384_005fdigest"><code>sha3_384_digest</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Recommended-hash-functions">Recommended hash functions</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-sha3_005f384_005finit"><code>sha3_384_init</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Recommended-hash-functions">Recommended hash functions</a></td></tr>
@@ -7141,7 +7595,16 @@ Previous: <a href="#Installation" accesskey="p" rel="prev">Installation</a>, Up:
 <tr><td></td><td valign="top"><a href="#index-sha512_005fdigest"><code>sha512_digest</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Recommended-hash-functions">Recommended hash functions</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-sha512_005finit"><code>sha512_init</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Recommended-hash-functions">Recommended hash functions</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-sha512_005fupdate"><code>sha512_update</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Recommended-hash-functions">Recommended hash functions</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-SHAKE">SHAKE</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Recommended-hash-functions">Recommended hash functions</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Side_002dchannel-attack">Side-channel attack</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Side_002dchannel-silence">Side-channel silence</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-SIV-mode">SIV mode</a>:</td><td>&nbsp;</td><td valign="top"><a href="#SIV_002dCMAC">SIV-CMAC</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-SIV_002dCMAC-mode">SIV-CMAC mode</a>:</td><td>&nbsp;</td><td valign="top"><a href="#SIV_002dCMAC">SIV-CMAC</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-siv_005fcmac_005faes128_005fdecrypt_005fmessage"><code>siv_cmac_aes128_decrypt_message</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#SIV_002dCMAC">SIV-CMAC</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-siv_005fcmac_005faes128_005fencrypt_005fmessage"><code>siv_cmac_aes128_encrypt_message</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#SIV_002dCMAC">SIV-CMAC</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-siv_005fcmac_005faes128_005fset_005fkey"><code>siv_cmac_aes128_set_key</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#SIV_002dCMAC">SIV-CMAC</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-siv_005fcmac_005faes256_005fdecrypt_005fmessage"><code>siv_cmac_aes256_decrypt_message</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#SIV_002dCMAC">SIV-CMAC</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-siv_005fcmac_005faes256_005fencrypt_005fmessage"><code>siv_cmac_aes256_encrypt_message</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#SIV_002dCMAC">SIV-CMAC</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-siv_005fcmac_005faes256_005fset_005fkey"><code>siv_cmac_aes256_set_key</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#SIV_002dCMAC">SIV-CMAC</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Stream-Cipher">Stream Cipher</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Cipher-functions">Cipher functions</a></td></tr>
 <tr><td colspan="4"> <hr></td></tr>
 <tr><th><a name="Index_cp_letter-T">T</a></th><td></td><td></td></tr>

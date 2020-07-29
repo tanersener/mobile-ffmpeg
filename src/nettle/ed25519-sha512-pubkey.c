@@ -50,8 +50,8 @@ ed25519_sha512_public_key (uint8_t *pub, const uint8_t *priv)
 
 #define k scratch
 #define scratch_out (scratch + ecc->q.size)
-
-  _eddsa_expand_key (ecc, &nettle_sha512, &ctx, priv, digest, k);
+  sha512_init (&ctx);
+  _eddsa_expand_key (ecc, &_nettle_ed25519_sha512, &ctx, priv, digest, k);
   _eddsa_public_key (ecc, k, pub, scratch_out);
 
   gmp_free_limbs (scratch, itch);

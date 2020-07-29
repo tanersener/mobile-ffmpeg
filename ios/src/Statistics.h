@@ -20,15 +20,17 @@
 #include <Foundation/Foundation.h>
 
 /**
- * Represents statistics data.
+ * Statistics for running executions.
  */
 @interface Statistics : NSObject
 
 - (instancetype)init;
 
-- (instancetype)initWithVideoFrameNumber: (int)newVideoFrameNumber fps:(float)newVideoFps quality:(float)newVideoQuality size:(int64_t)newSize time:(int)newTime bitrate:(double)newBitrate speed:(double)newSpeed;
+- (instancetype)initWithId:(long)currentExecutionId videoFrameNumber:(int)newVideoFrameNumber fps:(float)newVideoFps quality:(float)newVideoQuality size:(int64_t)newSize time:(int)newTime bitrate:(double)newBitrate speed:(double)newSpeed;
 
 - (void)update:(Statistics*)statistics;
+
+- (long)getExecutionId;
 
 - (int)getVideoFrameNumber;
 

@@ -14,8 +14,7 @@ trap 'rm -rf $TMP_BUILD_DIR' EXIT
 
 cd $TMP_BUILD_DIR
 
-curl -s -L "https://code.oxygene.sk/acoustid/ffmpeg-build/builds/artifacts/master/download?job=$OS+$ARCH" > artifacts.zip
-unzip artifacts.zip
+curl -s -L "https://github.com/acoustid/ffmpeg-build/releases/download/v4.2.2-3/ffmpeg-4.2.2-audio-$OS-$ARCH.tar.gz" | tar xz
 export FFMPEG_DIR=$TMP_BUILD_DIR/$(ls -d ffmpeg-* | tail)
 
 CMAKE_ARGS=(
@@ -35,6 +34,9 @@ windows)
         -DCMAKE_TOOLCHAIN_FILE=$TMP_BUILD_DIR/toolchain.cmake
         -DCMAKE_C_FLAGS='-static -static-libgcc -static-libstdc++'
         -DCMAKE_CXX_FLAGS='-static -static-libgcc -static-libstdc++'
+        -DHAVE_AV_PACKET_UNREF=1
+        -DHAVE_AV_FRAME_ALLOC=1
+        -DHAVE_AV_FRAME_FREE=1
     )
     STRIP=$ARCH-w64-mingw32-strip
     ;;
@@ -51,11 +53,20 @@ linux)
             -DCMAKE_CXX_FLAGS='-m32 -static -static-libgcc -static-libstdc++'
         )
         ;;
-    x86_64|armhf)
+    x86_64)
         CMAKE_ARGS+=(
             -DCMAKE_C_FLAGS='-static -static-libgcc -static-libstdc++'
             -DCMAKE_CXX_FLAGS='-static -static-libgcc -static-libstdc++'
         )
+        ;;
+    arm*)
+        perl -pe "s!{EXTRA_PATHS}!$FFMPEG_DIR!g" $BASE_DIR/package/toolchain-armhf.cmake.in | perl -pe "s!{ARCH}!$ARCH!g" >toolchain.cmake
+        CMAKE_ARGS+=(
+            -DCMAKE_TOOLCHAIN_FILE=$TMP_BUILD_DIR/toolchain.cmake
+            -DCMAKE_C_FLAGS='-static -static-libgcc -static-libstdc++'
+            -DCMAKE_CXX_FLAGS='-static -static-libgcc -static-libstdc++'
+        )
+        STRIP=arm-linux-gnueabihf-strip
         ;;
     *)
         echo "unsupported architecture ($ARCH)"

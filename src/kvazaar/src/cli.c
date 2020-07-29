@@ -133,10 +133,22 @@ static const struct option long_options[] = {
   { "set-qp-in-cu",             no_argument, NULL, 0 },
   { "open-gop",                 no_argument, NULL, 0 },
   { "no-open-gop",              no_argument, NULL, 0 },
+  { "vaq",                required_argument, NULL, 0 },
+  { "no-vaq",                   no_argument, NULL, 0 },
   { "scaling-list",       required_argument, NULL, 0 },
   { "max-merge",          required_argument, NULL, 0 },
   { "early-skip",               no_argument, NULL, 0 },
   { "no-early-skip",            no_argument, NULL, 0 },
+  { "ml-pu-depth-intra",        no_argument, NULL, 0 },
+  { "partial-coding",     required_argument, NULL, 0 },
+  { "zero-coeff-rdo",           no_argument, NULL, 0 },
+  { "no-zero-coeff-rdo",        no_argument, NULL, 0 },
+  { "intra-qp-offset",    required_argument, NULL, 0 },
+  { "rc-algorithm",       required_argument, NULL, 0 },
+  { "intra-bits",               no_argument, NULL, 0 },
+  { "no-intra-bits",            no_argument, NULL, 0 },
+  { "clip-neighbour",           no_argument, NULL, 0 },
+  { "no-clip-neighbour",        no_argument, NULL, 0 },
   {0, 0, 0, 0}
 };
 
@@ -396,11 +408,16 @@ void print_help(void)
     "                                   - 0: Only send VPS with the first frame.\n"
     "                                   - N: Send VPS with every Nth intra frame.\n"
     "  -r, --ref <integer>        : Number of reference frames, in range 1..15 [4]\n"
-    "      --gop <string>         : GOP structure [8]\n"
-    "                                   - 0: Disabled\n"
-    "                                   - 8: B-frame pyramid of length 8\n"
-    "                                   - lp-<string>: Low-delay P-frame GOP\n"
+    "      --gop <string>         : GOP structure [lp-g4d3t1]\n"
+    "                                   -  0: Disabled\n"
+    "                                   -  8: B-frame pyramid of length 8\n"
+    "                                   - 16: B-frame pyramid of length 16\n"
+    "                                   - lp-<string>: Low-delay P/B-frame GOP\n"
     "                                     (e.g. lp-g8d4t2, see README)\n"
+    "      --intra-qp-offset <int>: QP offset for intra frames [-51..51] [auto]\n"
+    "                                   - N: Set QP offset to N.\n"
+    "                                   - auto: Select offset automatically based\n"
+    "                                     on GOP length.\n"
     "      --(no-)open-gop        : Use open GOP configuration. [enabled]\n"
     "      --cqmfile <filename>   : Read custom quantization matrices from a file.\n"
     "      --scaling-list <string>: Set scaling list mode. [off]\n"
@@ -410,6 +427,15 @@ void print_help(void)
     "      --bitrate <integer>    : Target bitrate [0]\n"
     "                                   - 0: Disable rate control.\n"
     "                                   - N: Target N bits per second.\n"
+    "      --rc-algorithm <string>: Select used rc-algorithm. [lambda]\n"
+    "                                   - lambda: rate control from:\n"
+    "                                     DOI: 10.1109/TIP.2014.2336550 \n"
+    "                                   - oba: DOI: 10.1109/TCSVT.2016.2589878\n"
+    "      --(no-)intra-bits      : Use Hadamard cost based allocation for intra\n"
+    "                               frames. Default on for gop 8 and off for lp-gop\n"
+    "      --(no-)clip-neighbour  : On oba based rate control whether to clip \n"
+    "                               lambda values to same frame's ctus or previous'.\n"
+    "                               Default on for RA GOPS and disabled for LP.\n"
     "      --(no-)lossless        : Use lossless coding. [disabled]\n"
     "      --mv-constraint <string> : Constrain movement vectors. [none]\n"
     "                                   - none: No constraint\n"
@@ -433,6 +459,9 @@ void print_help(void)
     "      --high-tier            : Used with --level. Use high tier bitrate limits\n"
     "                               instead of the main tier limits during encoding.\n"
     "                               High tier requires level 4 or higher.\n"
+    "      --(no-)vaq <integer>   : Enable variance adaptive quantization with given\n"
+    "                               strength, in range 1..20. Recommended: 5.\n"
+    "                               [disabled]\n"
     "\n"
     /* Word wrap to this width to stay under 80 characters (including ") *************/
     "Compression tools:\n"
@@ -457,6 +486,8 @@ void print_help(void)
     "                                        chroma mode search.\n"
     "      --(no-)mv-rdo          : Rate-distortion optimized motion vector costs\n"
     "                               [disabled]\n"
+    "      --(no-)zero-coeff-rdo  : If a CU is set inter, check if forcing zero\n"
+    "                               residual improves the RD cost. [enabled]\n"
     "      --(no-)full-intra-search : Try all intra modes during rough search.\n"
     "                               [disabled]\n"
     "      --(no-)transform-skip  : Try transform skip [disabled]\n"
@@ -476,8 +507,19 @@ void print_help(void)
     "                                   - 4: + 1/4-pixel diagonal\n"
     "      --pu-depth-inter <int>-<int> : Inter prediction units sizes [0-3]\n"
     "                                   - 0, 1, 2, 3: from 64x64 to 8x8\n"
+    "                                   - Accepts a list of values separated by ','\n"
+    "                                     for setting separate depths per GOP layer\n"
+    "                                     (values can be omitted to use the first\n"
+    "                                     value for the respective layer).\n"
     "      --pu-depth-intra <int>-<int> : Intra prediction units sizes [1-4]\n"
     "                                   - 0, 1, 2, 3, 4: from 64x64 to 4x4\n"
+    "                                   - Accepts a list of values separated by ','\n"
+    "                                     for setting separate depths per GOP layer\n"
+    "                                     (values can be omitted to use the first\n"
+    "                                     value for the respective layer).\n"
+    "      --ml-pu-depth-intra    : Predict the pu-depth-intra using machine\n"
+    "                                learning trees, overrides the\n"
+    "                                --pu-depth-intra parameter. [disabled]\n"
     "      --tr-depth-intra <int> : Transform split depth for intra blocks [0]\n"
     "      --(no-)bipred          : Bi-prediction [disabled]\n"
     "      --cu-split-termination <string> : CU split search termination [zero]\n"
@@ -531,6 +573,13 @@ void print_help(void)
     "                                   - tiles: Put tiles in independent slices.\n"
     "                                   - wpp: Put rows in dependent slices.\n"
     "                                   - tiles+wpp: Do both.\n"
+    "      --partial-coding <x-offset>!<y-offset>!<slice-width>!<slice-height>\n"
+    "                             : Encode partial frame.\n" 
+    "                               Parts must be merged to form a valid bitstream.\n"
+    "                               X and Y are CTU offsets.\n"
+    "                               Slice width and height must be divisible by CTU\n"
+    "                               in pixels unless it is the last CTU row/column.\n"
+    "                               This parameter is used by kvaShare.\n"
     "\n"
     /* Word wrap to this width to stay under 80 characters (including ") *************/
     "Video Usability Information:\n"
@@ -564,13 +613,16 @@ void print_help(void)
 void print_frame_info(const kvz_frame_info *const info,
                       const double frame_psnr[3],
                       const uint32_t bytes,
-                      const bool print_psnr)
+                      const bool print_psnr,
+                      const double avg_qp)
 {
-  fprintf(stderr, "POC %4d QP %2d (%c-frame) %10d bits",
+  fprintf(stderr, "POC %4d QP %2d AVG QP %.1f (%c-frame) %10d bits",
           info->poc,
           info->qp,
+          avg_qp,
           "BPI"[info->slice_type % 3],
           bytes << 3);
+
   if (print_psnr) {
     fprintf(stderr, " PSNR Y %2.4f U %2.4f V %2.4f",
             frame_psnr[0], frame_psnr[1], frame_psnr[2]);

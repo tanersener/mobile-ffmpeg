@@ -536,54 +536,58 @@ static unsigned pixels_calc_ssd_generic(const kvz_pixel *const ref, const kvz_pi
 }
 
 static void inter_recon_bipred_generic(const int hi_prec_luma_rec0,
-	const int hi_prec_luma_rec1,
-	const int hi_prec_chroma_rec0,
-	const int hi_prec_chroma_rec1,
-	int32_t height,
-	int32_t width,
-	int32_t ypos,
-	int32_t xpos,
-	const hi_prec_buf_t*high_precision_rec0,
-	const hi_prec_buf_t*high_precision_rec1,
-	lcu_t* lcu,
-	kvz_pixel* temp_lcu_y,
-	kvz_pixel* temp_lcu_u,
-	kvz_pixel* temp_lcu_v) {
+  const int hi_prec_luma_rec1,
+  const int hi_prec_chroma_rec0,
+  const int hi_prec_chroma_rec1,
+  int32_t height,
+  int32_t width,
+  int32_t ypos,
+  int32_t xpos,
+  const hi_prec_buf_t*high_precision_rec0,
+  const hi_prec_buf_t*high_precision_rec1,
+  lcu_t* lcu,
+  kvz_pixel* temp_lcu_y,
+  kvz_pixel* temp_lcu_u,
+  kvz_pixel* temp_lcu_v,
+  bool predict_luma,
+  bool predict_chroma) {
 
-	int shift = 15 - KVZ_BIT_DEPTH;
-	int offset = 1 << (shift - 1);
+  int shift = 15 - KVZ_BIT_DEPTH;
+  int offset = 1 << (shift - 1);
 
-	int y_in_lcu;
-	int x_in_lcu;
+  int y_in_lcu;
+  int x_in_lcu;
 
-	//After reconstruction, merge the predictors by taking an average of each pixel
-	for (int temp_y = 0; temp_y < height; ++temp_y) {
+  //After reconstruction, merge the predictors by taking an average of each pixel
+  for (int temp_y = 0; temp_y < height; ++temp_y) {
 
 
-		for (int temp_x = 0; temp_x < width; ++temp_x) {
-			y_in_lcu = ((ypos + temp_y) & ((LCU_WIDTH)-1));
-			x_in_lcu = ((xpos + temp_x) & ((LCU_WIDTH)-1));
+    for (int temp_x = 0; temp_x < width; ++temp_x) {
+      y_in_lcu = ((ypos + temp_y) & ((LCU_WIDTH)-1));
+      x_in_lcu = ((xpos + temp_x) & ((LCU_WIDTH)-1));
 
-			int16_t sample0_y = (hi_prec_luma_rec0 ? high_precision_rec0->y[y_in_lcu * LCU_WIDTH + x_in_lcu] : (temp_lcu_y[y_in_lcu * LCU_WIDTH + x_in_lcu] << (14 - KVZ_BIT_DEPTH)));
-			int16_t sample1_y = (hi_prec_luma_rec1 ? high_precision_rec1->y[y_in_lcu * LCU_WIDTH + x_in_lcu] : (lcu->rec.y[y_in_lcu * LCU_WIDTH + x_in_lcu] << (14 - KVZ_BIT_DEPTH)));
+      if (predict_luma) {
+        int16_t sample0_y = (hi_prec_luma_rec0 ? high_precision_rec0->y[y_in_lcu * LCU_WIDTH + x_in_lcu] : (temp_lcu_y[y_in_lcu * LCU_WIDTH + x_in_lcu] << (14 - KVZ_BIT_DEPTH)));
+        int16_t sample1_y = (hi_prec_luma_rec1 ? high_precision_rec1->y[y_in_lcu * LCU_WIDTH + x_in_lcu] : (lcu->rec.y[y_in_lcu * LCU_WIDTH + x_in_lcu] << (14 - KVZ_BIT_DEPTH)));
 
-			lcu->rec.y[y_in_lcu * LCU_WIDTH + x_in_lcu] = (kvz_pixel)kvz_fast_clip_32bit_to_pixel((sample0_y + sample1_y + offset) >> shift);
+        lcu->rec.y[y_in_lcu * LCU_WIDTH + x_in_lcu] = (kvz_pixel)kvz_fast_clip_32bit_to_pixel((sample0_y + sample1_y + offset) >> shift);
+      }
 
-			if (temp_x < width >> 1 && temp_y < height >> 1) {
+      if (predict_chroma && (temp_x < width >> 1 && temp_y < height >> 1)) {
 
-				y_in_lcu = (((ypos >> 1) + temp_y) & (LCU_WIDTH_C - 1));
-				x_in_lcu = (((xpos >> 1) + temp_x) & (LCU_WIDTH_C - 1));
+        y_in_lcu = (((ypos >> 1) + temp_y) & (LCU_WIDTH_C - 1));
+        x_in_lcu = (((xpos >> 1) + temp_x) & (LCU_WIDTH_C - 1));
 
-				int16_t sample0_u = (hi_prec_chroma_rec0 ? high_precision_rec0->u[y_in_lcu * LCU_WIDTH_C + x_in_lcu] : (temp_lcu_u[y_in_lcu * LCU_WIDTH_C + x_in_lcu] << (14 - KVZ_BIT_DEPTH)));
-				int16_t sample1_u = (hi_prec_chroma_rec1 ? high_precision_rec1->u[y_in_lcu * LCU_WIDTH_C + x_in_lcu] : (lcu->rec.u[y_in_lcu * LCU_WIDTH_C + x_in_lcu] << (14 - KVZ_BIT_DEPTH)));
-				lcu->rec.u[y_in_lcu * LCU_WIDTH_C + x_in_lcu] = (kvz_pixel)kvz_fast_clip_32bit_to_pixel((sample0_u + sample1_u + offset) >> shift);
+        int16_t sample0_u = (hi_prec_chroma_rec0 ? high_precision_rec0->u[y_in_lcu * LCU_WIDTH_C + x_in_lcu] : (temp_lcu_u[y_in_lcu * LCU_WIDTH_C + x_in_lcu] << (14 - KVZ_BIT_DEPTH)));
+        int16_t sample1_u = (hi_prec_chroma_rec1 ? high_precision_rec1->u[y_in_lcu * LCU_WIDTH_C + x_in_lcu] : (lcu->rec.u[y_in_lcu * LCU_WIDTH_C + x_in_lcu] << (14 - KVZ_BIT_DEPTH)));
+        lcu->rec.u[y_in_lcu * LCU_WIDTH_C + x_in_lcu] = (kvz_pixel)kvz_fast_clip_32bit_to_pixel((sample0_u + sample1_u + offset) >> shift);
 
-				int16_t sample0_v = (hi_prec_chroma_rec0 ? high_precision_rec0->v[y_in_lcu * LCU_WIDTH_C + x_in_lcu] : (temp_lcu_v[y_in_lcu * LCU_WIDTH_C + x_in_lcu] << (14 - KVZ_BIT_DEPTH)));
-				int16_t sample1_v = (hi_prec_chroma_rec1 ? high_precision_rec1->v[y_in_lcu * LCU_WIDTH_C + x_in_lcu] : (lcu->rec.v[y_in_lcu * LCU_WIDTH_C + x_in_lcu] << (14 - KVZ_BIT_DEPTH)));
-				lcu->rec.v[y_in_lcu * LCU_WIDTH_C + x_in_lcu] = (kvz_pixel)kvz_fast_clip_32bit_to_pixel((sample0_v + sample1_v + offset) >> shift);
-			}
-		}
-	}
+        int16_t sample0_v = (hi_prec_chroma_rec0 ? high_precision_rec0->v[y_in_lcu * LCU_WIDTH_C + x_in_lcu] : (temp_lcu_v[y_in_lcu * LCU_WIDTH_C + x_in_lcu] << (14 - KVZ_BIT_DEPTH)));
+        int16_t sample1_v = (hi_prec_chroma_rec1 ? high_precision_rec1->v[y_in_lcu * LCU_WIDTH_C + x_in_lcu] : (lcu->rec.v[y_in_lcu * LCU_WIDTH_C + x_in_lcu] << (14 - KVZ_BIT_DEPTH)));
+        lcu->rec.v[y_in_lcu * LCU_WIDTH_C + x_in_lcu] = (kvz_pixel)kvz_fast_clip_32bit_to_pixel((sample0_v + sample1_v + offset) >> shift);
+      }
+    }
+  }
 
 }
 
@@ -671,6 +675,32 @@ static uint32_t hor_sad_generic(const kvz_pixel *pic_data, const kvz_pixel *ref_
   return result;
 }
 
+// Calculate pixel value variance. Takes in arrays of kvz_pixel
+static double pixel_var_generic(const kvz_pixel *arr, const uint32_t len)
+{
+  double var = 0;
+  double arr_mean = 0;
+
+  // Calculate array mean
+  int i = 0;
+  double sum = 0;
+
+  for (; i < len; ++i) {
+    sum += arr[i];
+  }
+  arr_mean = sum / (double)len;
+
+  // Calculate array variance
+  for (i = 0; i < len; ++i) {
+    double tmp = (double)arr[i] - arr_mean;
+    var += tmp*tmp;
+  }
+
+  var /= len;
+
+  return var;
+}
+
 int kvz_strategy_register_picture_generic(void* opaque, uint8_t bitdepth)
 {
   bool success = true;
@@ -709,6 +739,8 @@ int kvz_strategy_register_picture_generic(void* opaque, uint8_t bitdepth)
   success &= kvz_strategyselector_register(opaque, "get_optimized_sad", "generic", 0, &get_optimized_sad_generic);
   success &= kvz_strategyselector_register(opaque, "ver_sad", "generic", 0, &ver_sad_generic);
   success &= kvz_strategyselector_register(opaque, "hor_sad", "generic", 0, &hor_sad_generic);
+
+  success &= kvz_strategyselector_register(opaque, "pixel_var", "generic", 0, &pixel_var_generic);
 
   return success;
 }

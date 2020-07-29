@@ -39,6 +39,7 @@
 #include "videoframe.h"
 #include "extras/crypto.h"
 
+struct kvz_rc_data;
 
 typedef enum {
   ENCODER_STATE_TYPE_INVALID = 'i',
@@ -53,8 +54,12 @@ typedef struct lcu_stats_t {
   //! \brief Number of bits that were spent
   uint32_t bits;
 
+  uint32_t pixels;
+
   //! \brief Weight of the LCU for rate control
   double weight;
+
+  double original_weight;
 
   //! \brief Lambda value which was used for this LCU
   double lambda;
@@ -64,6 +69,11 @@ typedef struct lcu_stats_t {
 
   //! \brief Rate control beta parameter
   double rc_beta;
+  double distortion;
+  int i_cost;
+
+  int8_t qp;
+  uint8_t skipped;
 } lcu_stats_t;
 
 
@@ -111,6 +121,9 @@ typedef struct encoder_state_config_frame_t {
   //! Number of bits written in the current GOP.
   uint64_t cur_gop_bits_coded;
 
+  //! Number of bits written in the current frame.
+  uint64_t cur_frame_bits_coded;
+
   //! Number of bits targeted for the current GOP.
   double cur_gop_target_bits;
 
@@ -141,11 +154,27 @@ typedef struct encoder_state_config_frame_t {
    */
   lcu_stats_t *lcu_stats;
 
+  pthread_mutex_t rc_lock;
+
+  struct kvz_rc_data *new_ratecontrol;
+
+  struct encoder_state_t const *previous_layer_state;
+
+  /**
+  * \brief Calculated adaptive QP offset for each LCU.
+  */
+  double *aq_offsets;
+
   /**
    * \brief Whether next NAL is the first NAL in the access unit.
    */
   bool first_nal;
+  double icost;
+  double remaining_weight;
+  double i_bits_left;
 
+  double *c_para;
+  double *k_para;
 } encoder_state_config_frame_t;
 
 typedef struct encoder_state_config_tile_t {
@@ -236,7 +265,7 @@ typedef struct encoder_state_t {
   
   //Pointer to the encoder_state of the previous frame
   struct encoder_state_t *previous_encoder_state;
-  
+    
   encoder_state_config_frame_t  *frame;
   encoder_state_config_tile_t   *tile;
   encoder_state_config_slice_t  *slice;
@@ -288,6 +317,11 @@ typedef struct encoder_state_t {
   //Jobs to wait for
   threadqueue_job_t * tqj_recon_done; //Reconstruction is done
   threadqueue_job_t * tqj_bitstream_written; //Bitstream is written
+
+  //Constraint structure  
+  void * constraint;
+
+
 } encoder_state_t;
 
 void kvz_encode_one_frame(encoder_state_t * const state, kvz_picture* frame);

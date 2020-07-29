@@ -1,2 +1,0 @@
-sws_flags=+accurate_rnd+bitexact;
-[0:v][0:s:1]overlay

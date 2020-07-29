@@ -14,19 +14,28 @@ class FingerprintDecompressor
 {
 public:
 	FingerprintDecompressor();
-	std::vector<uint32_t> Decompress(const std::string &fingerprint, int *algorithm = 0);
+	bool Decompress(const std::string &fingerprint);
+
+	std::vector<uint32_t> GetOutput() const { return m_output; }
+	int GetAlgorithm() const { return m_algorithm; }
 
 private:
 	void UnpackBits();
-	std::vector<uint32_t> m_result;
+	std::vector<uint32_t> m_output;
+	int m_algorithm { -1 };
 	std::vector<unsigned char> m_bits;
 	std::vector<unsigned char> m_exceptional_bits;
 };
 
-inline std::vector<uint32_t> DecompressFingerprint(const std::string &data, int *algorithm = 0)
+inline bool DecompressFingerprint(const std::string &input, std::vector<uint32_t> &output, int &algorithm)
 {
 	FingerprintDecompressor decompressor;
-	return decompressor.Decompress(data, algorithm);
+	auto ok = decompressor.Decompress(input);
+	if (ok) {
+		output = decompressor.GetOutput();
+		algorithm = decompressor.GetAlgorithm();
+	}
+	return ok;
 }
 
 }; // namespace chromaprint

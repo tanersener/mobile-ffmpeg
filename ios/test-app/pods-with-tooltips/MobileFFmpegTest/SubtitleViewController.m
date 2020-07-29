@@ -53,7 +53,7 @@ typedef enum {
     
     // Tooltip view reference
     RCEasyTipView *tooltip;
-    
+
     Statistics *statistics;
     
     UITestState state;
@@ -66,7 +66,7 @@ typedef enum {
     [Util applyButtonStyle: self.burnSubtitlesButton];
     [Util applyVideoPlayerFrameStyle: self.videoPlayerFrame];    
     [Util applyHeaderStyle: self.header];
-    
+
     // TOOLTIP INIT
     RCEasyTipPreferences *preferences = [[RCEasyTipPreferences alloc] initWithDefaultPreferences];
     [Util applyTooltipStyle: preferences];
@@ -75,10 +75,10 @@ typedef enum {
     preferences.animating.dismissDuration = SUBTITLE_TEST_TOOLTIP_DURATION;
     preferences.animating.dismissTransform = CGAffineTransformMakeTranslation(0, -15);
     preferences.animating.showInitialTransform = CGAffineTransformMakeTranslation(0, -15);
-    
+
     tooltip = [[RCEasyTipView alloc] initWithPreferences:preferences];
     tooltip.text = SUBTITLE_TEST_TOOLTIP_TEXT;
-    
+
     // VIDEO PLAYER INIT
     player = [[AVQueuePlayer alloc] init];
     playerLayer = [AVPlayerLayer playerLayerWithPlayer:player];
@@ -105,7 +105,7 @@ typedef enum {
     [super didReceiveMemoryWarning];
 }
 
-- (void)logCallback: (int)level :(NSString*)message {
+- (void)logCallback:(long)executionId :(int)level :(NSString*)message {
     dispatch_async(dispatch_get_main_queue(), ^{
         NSLog(@"%@", message);
     });

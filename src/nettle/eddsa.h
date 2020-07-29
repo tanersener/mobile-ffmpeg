@@ -45,6 +45,9 @@ extern "C" {
 #define ed25519_sha512_public_key nettle_ed25519_sha512_public_key
 #define ed25519_sha512_sign nettle_ed25519_sha512_sign
 #define ed25519_sha512_verify nettle_ed25519_sha512_verify
+#define ed448_shake256_public_key nettle_ed448_shake256_public_key
+#define ed448_shake256_sign nettle_ed448_shake256_sign
+#define ed448_shake256_verify nettle_ed448_shake256_verify
 
 #define ED25519_KEY_SIZE 32
 #define ED25519_SIGNATURE_SIZE 64
@@ -63,6 +66,22 @@ ed25519_sha512_verify (const uint8_t *pub,
 		       size_t length, const uint8_t *msg,
 		       const uint8_t *signature);
 
+#define ED448_KEY_SIZE 57
+#define ED448_SIGNATURE_SIZE 114
+
+void
+ed448_shake256_public_key (uint8_t *pub, const uint8_t *priv);
+
+void
+ed448_shake256_sign (const uint8_t *pub,
+		     const uint8_t *priv,
+		     size_t length, const uint8_t *msg,
+		     uint8_t *signature);
+
+int
+ed448_shake256_verify (const uint8_t *pub,
+		       size_t length, const uint8_t *msg,
+		       const uint8_t *signature);
 			   
 #ifdef __cplusplus
 }

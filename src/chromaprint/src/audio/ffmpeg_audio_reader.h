@@ -213,8 +213,9 @@ inline bool FFmpegAudioReader::Open(const std::string &file_name) {
 		m_converter->SetOutputSampleFormat(AV_SAMPLE_FMT_S16);
 		m_converter->SetOutputSampleRate(m_output_sample_rate);
 		m_converter->SetOutputChannelLayout(av_get_default_channel_layout(m_output_channels));
-		if (!m_converter->Init()) {
-			SetError("Could not create an audio converter instance");
+		auto ret = m_converter->Init();
+		if (ret != 0) {
+			SetError("Could not create an audio converter instance", ret);
 			return false;
 		}
 	}

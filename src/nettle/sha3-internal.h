@@ -39,14 +39,25 @@
 #define _sha3_update _nettle_sha3_update
 #define _sha3_pad _nettle_sha3_pad
 
+#define SHA3_HASH_MAGIC 6
+#define SHA3_SHAKE_MAGIC 0x1f
+
 unsigned
 _sha3_update (struct sha3_state *state,
 	      unsigned block_size, uint8_t *block,
 	      unsigned pos,
 	      size_t length, const uint8_t *data);
+
+
 void
 _sha3_pad (struct sha3_state *state,
-	   unsigned block_size, uint8_t *block, unsigned pos);
+	   unsigned block_size, uint8_t *block, unsigned pos, uint8_t magic);
+
+#define _sha3_pad_hash(state, block_size, block, pos) \
+  _sha3_pad (state, block_size, block, pos, SHA3_HASH_MAGIC)
+
+#define _sha3_pad_shake(state, block_size, block, pos) \
+  _sha3_pad (state, block_size, block, pos, SHA3_SHAKE_MAGIC)
 
 
 #endif

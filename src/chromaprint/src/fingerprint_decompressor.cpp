@@ -25,7 +25,7 @@ void FingerprintDecompressor::UnpackBits()
 	for (size_t j = 0; j < m_bits.size(); j++) {
 		int bit = m_bits[j];
 		if (bit == 0) {
-			m_result[i] = (i > 0) ? value ^ m_result[i - 1] : value;
+			m_output[i] = (i > 0) ? value ^ m_output[i - 1] : value;
 			value = 0;
 			last_bit = 0;
 			i++;
@@ -37,25 +37,23 @@ void FingerprintDecompressor::UnpackBits()
 	}
 }
 
-std::vector<uint32_t> FingerprintDecompressor::Decompress(const std::string &data, int *algorithm)
+bool FingerprintDecompressor::Decompress(const std::string &input)
 {
-	if (data.size() < 4) {
+	if (input.size() < 4) {
 		DEBUG("FingerprintDecompressor::Decompress() -- Invalid fingerprint (shorter than 4 bytes)");
-		return std::vector<uint32_t>();
+		return false;
 	}
 
-	if (algorithm) {
-		*algorithm = data[0];
-	}
+	m_algorithm = input[0];
 
 	const size_t num_values =
-		((unsigned char)(data[1]) << 16) |
-		((unsigned char)(data[2]) <<  8) |
-		((unsigned char)(data[3])      );
+		((size_t)((unsigned char)(input[1])) << 16) |
+		((size_t)((unsigned char)(input[2])) <<  8) |
+		((size_t)((unsigned char)(input[3]))      );
 
 	size_t offset = 4;
-	m_bits.resize(GetUnpackedInt3ArraySize(data.size() - offset));
-	UnpackInt3Array(data.begin() + offset, data.end(), m_bits.begin());
+	m_bits.resize(GetUnpackedInt3ArraySize(input.size() - offset));
+	UnpackInt3Array(input.begin() + offset, input.end(), m_bits.begin());
 
 	size_t found_values = 0, num_exceptional_bits = 0;
 	for (size_t i = 0; i < m_bits.size(); i++) {
@@ -71,19 +69,19 @@ std::vector<uint32_t> FingerprintDecompressor::Decompress(const std::string &dat
 	}
 
 	if (found_values != num_values) {
-		DEBUG("FingerprintDecompressor::Decompress() -- Invalid fingerprint (too short, not enough data for normal bits)");
-		return std::vector<uint32_t>();
+		DEBUG("FingerprintDecompressor::Decompress() -- Invalid fingerprint (too short, not enough input for normal bits)");
+		return false;
 	}
 
 	offset += GetPackedInt3ArraySize(m_bits.size());
-	if (data.size() < offset + GetPackedInt5ArraySize(num_exceptional_bits)) {
-		DEBUG("FingerprintDecompressor::Decompress() -- Invalid fingerprint (too short, not enough data for exceptional bits)");
-		return std::vector<uint32_t>();
+	if (input.size() < offset + GetPackedInt5ArraySize(num_exceptional_bits)) {
+		DEBUG("FingerprintDecompressor::Decompress() -- Invalid fingerprint (too short, not enough input for exceptional bits)");
+		return false;
 	}
 
 	if (num_exceptional_bits) {
 		m_exceptional_bits.resize(GetUnpackedInt5ArraySize(GetPackedInt5ArraySize(num_exceptional_bits)));
-		UnpackInt5Array(data.begin() + offset, data.end(), m_exceptional_bits.begin());
+		UnpackInt5Array(input.begin() + offset, input.end(), m_exceptional_bits.begin());
 		for (size_t i = 0, j = 0; i < m_bits.size(); i++) {
 			if (m_bits[i] == kMaxNormalValue) {
 				m_bits[i] += m_exceptional_bits[j++];
@@ -91,10 +89,10 @@ std::vector<uint32_t> FingerprintDecompressor::Decompress(const std::string &dat
 		}
 	}
 
-	m_result.assign(num_values, -1);
+	m_output.assign(num_values, -1);
 
 	UnpackBits();
-	return m_result;
+	return true;
 }
 
 }; // namespace chromaprint

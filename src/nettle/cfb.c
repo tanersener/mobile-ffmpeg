@@ -226,10 +226,12 @@ cfb8_decrypt(const void *ctx, nettle_cipher_func *f,
       src += i;
       dst += i;
 
-      memcpy(buffer, buffer + block_size, block_size);
-      memcpy(buffer + block_size, src,
-	     length < block_size ? length : block_size);
-
+      if (i == block_size)
+	{
+	  memcpy(buffer, buffer + block_size, block_size);
+	  memcpy(buffer + block_size, src,
+		 length < block_size ? length : block_size);
+	}
     }
 
   memcpy(iv, buffer + i, block_size);

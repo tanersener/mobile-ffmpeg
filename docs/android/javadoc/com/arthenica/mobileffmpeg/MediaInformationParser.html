@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":9,"i1":9,"i2":9,"i3":9,"i4":9};
+var methods = {"i0":9,"i1":9};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -48,7 +48,7 @@ var activeTableTab = "activeTableTab";
 <div class="subNav">
 <ul class="navList">
 <li><a href="../../../com/arthenica/mobileffmpeg/MediaInformation.html" title="class in com.arthenica.mobileffmpeg"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li><a href="../../../com/arthenica/mobileffmpeg/Statistics.html" title="class in com.arthenica.mobileffmpeg"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li><a href="../../../com/arthenica/mobileffmpeg/Signal.html" title="enum in com.arthenica.mobileffmpeg"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
 <li><a href="../../../index.html?com/arthenica/mobileffmpeg/MediaInformationParser.html" target="_top">Frames</a></li>
@@ -73,13 +73,13 @@ var activeTableTab = "activeTableTab";
 <ul class="subNavList">
 <li>Summary:&nbsp;</li>
 <li>Nested&nbsp;|&nbsp;</li>
-<li><a href="#field.summary">Field</a>&nbsp;|&nbsp;</li>
+<li>Field&nbsp;|&nbsp;</li>
 <li><a href="#constructor.summary">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.summary">Method</a></li>
 </ul>
 <ul class="subNavList">
 <li>Detail:&nbsp;</li>
-<li><a href="#field.detail">Field</a>&nbsp;|&nbsp;</li>
+<li>Field&nbsp;|&nbsp;</li>
 <li><a href="#constructor.detail">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.detail">Method</a></li>
 </ul>
@@ -109,7 +109,7 @@ var activeTableTab = "activeTableTab";
 <br>
 <pre>public class <span class="typeNameLabel">MediaInformationParser</span>
 extends java.lang.Object</pre>
-<div class="block">Helper class for <a href="../../../com/arthenica/mobileffmpeg/MediaInformation.html" title="class in com.arthenica.mobileffmpeg"><code>MediaInformation</code></a>.</div>
+<div class="block">Helper class for parsing <a href="../../../com/arthenica/mobileffmpeg/MediaInformation.html" title="class in com.arthenica.mobileffmpeg"><code>MediaInformation</code></a>.</div>
 <dl>
 <dt><span class="simpleTagLabel">Since:</span></dt>
 <dd>3.0</dd>
@@ -120,29 +120,6 @@ extends java.lang.Object</pre>
 <div class="summary">
 <ul class="blockList">
 <li class="blockList">
-<!-- =========== FIELD SUMMARY =========== -->
-<ul class="blockList">
-<li class="blockList"><a name="field.summary">
-<!--   -->
-</a>
-<h3>Field Summary</h3>
-<table class="memberSummary" border="0" cellpadding="3" cellspacing="0" summary="Field Summary table, listing fields, and an explanation">
-<caption><span>Fields</span><span class="tabEnd">&nbsp;</span></caption>
-<tr>
-<th class="colFirst" scope="col">Modifier and Type</th>
-<th class="colLast" scope="col">Field and Description</th>
-</tr>
-<tr class="altColor">
-<td class="colFirst"><code>static java.text.SimpleDateFormat</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/MediaInformationParser.html#DURATION_FORMAT">DURATION_FORMAT</a></span></code>&nbsp;</td>
-</tr>
-<tr class="rowColor">
-<td class="colFirst"><code>static java.util.Date</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/MediaInformationParser.html#REFERENCE_DURATION">REFERENCE_DURATION</a></span></code>&nbsp;</td>
-</tr>
-</table>
-</li>
-</ul>
 <!-- ======== CONSTRUCTOR SUMMARY ======== -->
 <ul class="blockList">
 <li class="blockList"><a name="constructor.summary">
@@ -173,35 +150,16 @@ extends java.lang.Object</pre>
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr id="i0" class="altColor">
-<td class="colFirst"><code>static int</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/MediaInformationParser.html#count-java.lang.String-java.lang.String-">count</a></span>(java.lang.String&nbsp;string,
-     java.lang.String&nbsp;substring)</code>&nbsp;</td>
+<td class="colFirst"><code>static <a href="../../../com/arthenica/mobileffmpeg/MediaInformation.html" title="class in com.arthenica.mobileffmpeg">MediaInformation</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/MediaInformationParser.html#from-java.lang.String-">from</a></span>(java.lang.String&nbsp;ffprobeJsonOutput)</code>
+<div class="block">Extracts MediaInformation from the given ffprobe json output.</div>
+</td>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>static <a href="../../../com/arthenica/mobileffmpeg/MediaInformation.html" title="class in com.arthenica.mobileffmpeg">MediaInformation</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/MediaInformationParser.html#from-java.lang.String-">from</a></span>(java.lang.String&nbsp;rawCommandOutput)</code>
-<div class="block">Parses media information command output and builds a <a href="../../../com/arthenica/mobileffmpeg/MediaInformation.html" title="class in com.arthenica.mobileffmpeg"><code>MediaInformation</code></a> instance.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/MediaInformationParser.html#fromWithError-java.lang.String-">fromWithError</a></span>(java.lang.String&nbsp;ffprobeJsonOutput)</code>
+<div class="block">Extracts MediaInformation from the given ffprobe json output.</div>
 </td>
-</tr>
-<tr id="i2" class="altColor">
-<td class="colFirst"><code>static int</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/MediaInformationParser.html#index-java.lang.String-java.lang.String-int-int-">index</a></span>(java.lang.String&nbsp;string,
-     java.lang.String&nbsp;substring,
-     int&nbsp;startIndex,
-     int&nbsp;n)</code>&nbsp;</td>
-</tr>
-<tr id="i3" class="rowColor">
-<td class="colFirst"><code>static java.lang.String</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/MediaInformationParser.html#substring-java.lang.String-java.lang.String-java.util.List-">substring</a></span>(java.lang.String&nbsp;string,
-         java.lang.String&nbsp;start,
-         java.util.List&lt;java.lang.String&gt;&nbsp;ignoredTokens)</code>&nbsp;</td>
-</tr>
-<tr id="i4" class="altColor">
-<td class="colFirst"><code>static java.lang.String</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/MediaInformationParser.html#substring-java.lang.String-java.lang.String-java.lang.String-java.util.List-">substring</a></span>(java.lang.String&nbsp;string,
-         java.lang.String&nbsp;start,
-         java.lang.String&nbsp;end,
-         java.util.List&lt;java.lang.String&gt;&nbsp;ignoredTokens)</code>&nbsp;</td>
 </tr>
 </table>
 <ul class="blockList">
@@ -219,32 +177,6 @@ extends java.lang.Object</pre>
 <div class="details">
 <ul class="blockList">
 <li class="blockList">
-<!-- ============ FIELD DETAIL =========== -->
-<ul class="blockList">
-<li class="blockList"><a name="field.detail">
-<!--   -->
-</a>
-<h3>Field Detail</h3>
-<a name="DURATION_FORMAT">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>DURATION_FORMAT</h4>
-<pre>public static&nbsp;java.text.SimpleDateFormat DURATION_FORMAT</pre>
-</li>
-</ul>
-<a name="REFERENCE_DURATION">
-<!--   -->
-</a>
-<ul class="blockListLast">
-<li class="blockList">
-<h4>REFERENCE_DURATION</h4>
-<pre>public static&nbsp;java.util.Date REFERENCE_DURATION</pre>
-</li>
-</ul>
-</li>
-</ul>
 <!-- ========= CONSTRUCTOR DETAIL ======== -->
 <ul class="blockList">
 <li class="blockList"><a name="constructor.detail">
@@ -274,59 +206,33 @@ extends java.lang.Object</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>from</h4>
-<pre>public static&nbsp;<a href="../../../com/arthenica/mobileffmpeg/MediaInformation.html" title="class in com.arthenica.mobileffmpeg">MediaInformation</a>&nbsp;from(java.lang.String&nbsp;rawCommandOutput)</pre>
-<div class="block">Parses media information command output and builds a <a href="../../../com/arthenica/mobileffmpeg/MediaInformation.html" title="class in com.arthenica.mobileffmpeg"><code>MediaInformation</code></a> instance.</div>
+<pre>public static&nbsp;<a href="../../../com/arthenica/mobileffmpeg/MediaInformation.html" title="class in com.arthenica.mobileffmpeg">MediaInformation</a>&nbsp;from(java.lang.String&nbsp;ffprobeJsonOutput)</pre>
+<div class="block">Extracts MediaInformation from the given ffprobe json output.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>rawCommandOutput</code> - media information command output</dd>
+<dd><code>ffprobeJsonOutput</code> - ffprobe json output</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>parsed instance of null if a parsing error occurs</dd>
+<dd>created <a href="../../../com/arthenica/mobileffmpeg/MediaInformation.html" title="class in com.arthenica.mobileffmpeg"><code>MediaInformation</code></a> instance of null if a parsing error occurs</dd>
 </dl>
 </li>
 </ul>
-<a name="substring-java.lang.String-java.lang.String-java.lang.String-java.util.List-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>substring</h4>
-<pre>public static&nbsp;java.lang.String&nbsp;substring(java.lang.String&nbsp;string,
-                                         java.lang.String&nbsp;start,
-                                         java.lang.String&nbsp;end,
-                                         java.util.List&lt;java.lang.String&gt;&nbsp;ignoredTokens)</pre>
-</li>
-</ul>
-<a name="substring-java.lang.String-java.lang.String-java.util.List-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>substring</h4>
-<pre>public static&nbsp;java.lang.String&nbsp;substring(java.lang.String&nbsp;string,
-                                         java.lang.String&nbsp;start,
-                                         java.util.List&lt;java.lang.String&gt;&nbsp;ignoredTokens)</pre>
-</li>
-</ul>
-<a name="index-java.lang.String-java.lang.String-int-int-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>index</h4>
-<pre>public static&nbsp;int&nbsp;index(java.lang.String&nbsp;string,
-                        java.lang.String&nbsp;substring,
-                        int&nbsp;startIndex,
-                        int&nbsp;n)</pre>
-</li>
-</ul>
-<a name="count-java.lang.String-java.lang.String-">
+<a name="fromWithError-java.lang.String-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
-<h4>count</h4>
-<pre>public static&nbsp;int&nbsp;count(java.lang.String&nbsp;string,
-                        java.lang.String&nbsp;substring)</pre>
+<h4>fromWithError</h4>
+<pre>public static&nbsp;<a href="../../../com/arthenica/mobileffmpeg/MediaInformation.html" title="class in com.arthenica.mobileffmpeg">MediaInformation</a>&nbsp;fromWithError(java.lang.String&nbsp;ffprobeJsonOutput)
+                                      throws org.json.JSONException</pre>
+<div class="block">Extracts MediaInformation from the given ffprobe json output.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>ffprobeJsonOutput</code> - ffprobe json output</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>created <a href="../../../com/arthenica/mobileffmpeg/MediaInformation.html" title="class in com.arthenica.mobileffmpeg"><code>MediaInformation</code></a> instance</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code>org.json.JSONException</code> - if a parsing error occurs</dd>
+</dl>
 </li>
 </ul>
 </li>
@@ -357,7 +263,7 @@ extends java.lang.Object</pre>
 <div class="subNav">
 <ul class="navList">
 <li><a href="../../../com/arthenica/mobileffmpeg/MediaInformation.html" title="class in com.arthenica.mobileffmpeg"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li><a href="../../../com/arthenica/mobileffmpeg/Statistics.html" title="class in com.arthenica.mobileffmpeg"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li><a href="../../../com/arthenica/mobileffmpeg/Signal.html" title="enum in com.arthenica.mobileffmpeg"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
 <li><a href="../../../index.html?com/arthenica/mobileffmpeg/MediaInformationParser.html" target="_top">Frames</a></li>
@@ -382,13 +288,13 @@ extends java.lang.Object</pre>
 <ul class="subNavList">
 <li>Summary:&nbsp;</li>
 <li>Nested&nbsp;|&nbsp;</li>
-<li><a href="#field.summary">Field</a>&nbsp;|&nbsp;</li>
+<li>Field&nbsp;|&nbsp;</li>
 <li><a href="#constructor.summary">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.summary">Method</a></li>
 </ul>
 <ul class="subNavList">
 <li>Detail:&nbsp;</li>
-<li><a href="#field.detail">Field</a>&nbsp;|&nbsp;</li>
+<li>Field&nbsp;|&nbsp;</li>
 <li><a href="#constructor.detail">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.detail">Method</a></li>
 </ul>

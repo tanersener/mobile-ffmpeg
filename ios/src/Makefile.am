@@ -4,12 +4,14 @@ libmobileffmpeg_la_LIBADD = @FFMPEG_LIBS@
 
 libmobileffmpeg_la_SOURCES = \
     ArchDetect.m \
+    AtomicLong.m \
     fftools_cmdutils.c \
     fftools_ffmpeg.c \
     fftools_ffmpeg_filter.c \
     fftools_ffmpeg_hw.c \
     fftools_ffmpeg_opt.c \
     fftools_ffprobe.c \
+    FFmpegExecution.m \
     MediaInformation.m \
     MediaInformationParser.m \
     MobileFFmpeg.m \
@@ -25,6 +27,9 @@ endif
 
 include_HEADERS = \
     ArchDetect.h \
+    AtomicLong.h \
+    ExecuteDelegate.h \
+    FFmpegExecution.h \
 	fftools_cmdutils.h \
     fftools_ffmpeg.h \
 	LogDelegate.h \

@@ -28,6 +28,7 @@ test_main (void)
   struct hmac_sha1_ctx sha1ctx;
   struct hmac_sha256_ctx sha256ctx;
   struct hmac_sha512_ctx sha512ctx;
+  struct hmac_gosthash94cp_ctx gosthash94cpctx;
 
   /* Test vectors for PBKDF2 from RFC 6070. */
 
@@ -110,4 +111,27 @@ test_main (void)
   PBKDF2_HMAC_TEST(pbkdf2_hmac_sha256, LDATA("passwd"), 1, LDATA("salt"),
 		   SHEX("55ac046e56e3089fec1691c22544b605"));
 
+  /* From TC26 document, MR 26.2.001-2012 */
+
+  hmac_gosthash94cp_set_key (&gosthash94cpctx, LDATA("password"));
+  PBKDF2_TEST (&gosthash94cpctx, hmac_gosthash94cp_update, hmac_gosthash94cp_digest,
+	       GOSTHASH94CP_DIGEST_SIZE, 1, LDATA("salt"),
+	       SHEX("7314e7c04fb2e662c543674253f68bd0b73445d07f241bed872882da21662d58"));
+
+  PBKDF2_TEST (&gosthash94cpctx, hmac_gosthash94cp_update, hmac_gosthash94cp_digest,
+	       GOSTHASH94CP_DIGEST_SIZE, 4096, LDATA("salt"),
+	       SHEX("1f1829a94bdff5be10d0aeb36af498e7a97467f3b31116a5a7c1afff9deadafe"));
+
+  hmac_gosthash94cp_set_key (&gosthash94cpctx, LDATA("passwordPASSWORDpassword"));
+  PBKDF2_TEST (&gosthash94cpctx, hmac_gosthash94cp_update, hmac_gosthash94cp_digest,
+	       GOSTHASH94CP_DIGEST_SIZE, 4096, LDATA("saltSALTsaltSALTsaltSALTsaltSALTsalt"),
+	       SHEX("788358c69cb2dbe251a7bb17d5f4241f265a792a35becde8d56f326b49c85047b7638acb4764b1fd"));
+
+  hmac_gosthash94cp_set_key (&gosthash94cpctx, LDATA("pass\0word"));
+  PBKDF2_TEST (&gosthash94cpctx, hmac_gosthash94cp_update, hmac_gosthash94cp_digest,
+	       GOSTHASH94CP_DIGEST_SIZE, 4096, LDATA("sa\0lt"),
+	       SHEX("43e06c5590b08c0225242373127edf9c8e9c3291"));
+
+  PBKDF2_HMAC_TEST (pbkdf2_hmac_gosthash94cp, LDATA("password"), 1, LDATA("salt"),
+	       SHEX("7314e7c04fb2e662c543674253f68bd0b73445d07f241bed872882da21662d58"));
 }

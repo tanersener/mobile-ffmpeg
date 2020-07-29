@@ -105,7 +105,7 @@ __thread AVDictionary *format_opts, *codec_opts, *resample_opts;
 FILE *report_file;
 int report_file_level = AV_LOG_DEBUG;
 __thread int hide_banner = 0;
-__thread int longjmp_value = 0;
+__thread volatile int longjmp_value = 0;
 
 enum show_muxdemuxers {
     SHOW_DEFAULT,

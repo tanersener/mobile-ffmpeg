@@ -34,7 +34,7 @@
  * @param arguments FFprobe command options/arguments as string array
  * @return zero on successful execution, 255 on user cancel and non-zero on error
  */
-+ (int)executeWithArguments: (NSArray*)arguments;
++ (int)executeWithArguments:(NSArray*)arguments;
 
 /**
  * Synchronously executes FFprobe command provided. Space character is used to split command
@@ -43,23 +43,45 @@
  * @param command FFprobe command
  * @return zero on successful execution, 255 on user cancel and non-zero on error
  */
-+ (int)execute: (NSString*)command;
++ (int)execute:(NSString*)command;
+
+/**
+ * Returns media information for the given file.
+ *
+ * This method does not support executing multiple concurrent operations. If you execute
+ * multiple operations (execute or getMediaInformation) at the same time, the response of this
+ * method is not predictable.
+ *
+ * @param path or uri of media file
+ * @return media information
+ */
++ (MediaInformation*)getMediaInformation:(NSString*)path;
+
+/**
+ * Returns media information for the given command.
+ *
+ * This method does not support executing multiple concurrent operations. If you execute
+ * multiple operations (execute or getMediaInformation) at the same time, the response of this
+ * method is not predictable.
+ *
+ * @param command ffprobe command
+ * @return media information
+ */
++ (MediaInformation*)getMediaInformationFromCommand:(NSString*)command;
 
 /**
  * Returns media information for given file.
  *
- * @param path file path or uri of media file
- * @return media information
- */
-+ (MediaInformation*)getMediaInformation: (NSString*)path;
-
-/**
- * Returns media information for given file.
+ * This method does not support executing multiple concurrent operations. If you execute
+ * multiple operations (execute or getMediaInformation) at the same time, the response of this
+ * method is not predictable.
  *
  * @param path path or uri of media file
  * @param timeout complete timeout
+ * @deprecated this method is deprecated since v4.3.1. You can still use this method but
+ * timeout parameter is not effective anymore.
  * @return media information
  */
-+ (MediaInformation*)getMediaInformation: (NSString*)path timeout:(long)timeout;
++ (MediaInformation*)getMediaInformation:(NSString*)path timeout:(long)timeout __attribute__((deprecated));
 
 @end

@@ -94,16 +94,8 @@ case ${ARCH} in
     ;;
 esac
 
-if [[ ${APPLE_TVOS_BUILD} -eq 1 ]]; then
-    CONFIGURE_POSTFIX="--disable-avfoundation"
-    LIBRARY_COUNT=49
-else
-    CONFIGURE_POSTFIX=""
-    LIBRARY_COUNT=50
-fi
-
 library=1
-while [[ ${library} -le ${LIBRARY_COUNT} ]]
+while [[ ${library} -le 49 ]]
 do
     if [[ ${!library} -eq 1 ]]; then
         ENABLED_LIBRARY=$(get_library_name $((library - 1)))
@@ -198,11 +190,8 @@ do
             ;;
             opencore-amr)
                 FFMPEG_CFLAGS+=" $(pkg-config --cflags opencore-amrnb)"
-                FFMPEG_CFLAGS+=" $(pkg-config --cflags opencore-amrwb)"
                 FFMPEG_LDFLAGS+=" $(pkg-config --libs --static opencore-amrnb)"
-                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static opencore-amrwb)"
                 CONFIGURE_POSTFIX+=" --enable-libopencore-amrnb"
-                CONFIGURE_POSTFIX+=" --enable-libopencore-amrwb"
             ;;
             openh264)
                 FFMPEG_CFLAGS+=" $(pkg-config --cflags openh264)"
@@ -256,6 +245,11 @@ do
                 FFMPEG_CFLAGS+=" $(pkg-config --cflags twolame)"
                 FFMPEG_LDFLAGS+=" $(pkg-config --libs --static twolame)"
                 CONFIGURE_POSTFIX+=" --enable-libtwolame"
+            ;;
+            vo-amrwbenc)
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags vo-amrwbenc)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static vo-amrwbenc)"
+                CONFIGURE_POSTFIX+=" --enable-libvo-amrwbenc"
             ;;
             wavpack)
                 FFMPEG_CFLAGS+=" $(pkg-config --cflags wavpack)"
@@ -312,9 +306,6 @@ do
                     *-bzip2)
                         CONFIGURE_POSTFIX+=" --enable-bzlib"
                     ;;
-                    *-coreimage)
-                        CONFIGURE_POSTFIX+=" --enable-coreimage"
-                    ;;
                     *-videotoolbox)
                         CONFIGURE_POSTFIX+=" --enable-videotoolbox"
                     ;;
@@ -330,14 +321,13 @@ do
     else
 
         # THE FOLLOWING LIBRARIES SHOULD BE EXPLICITLY DISABLED TO PREVENT AUTODETECT
+        # NOTE THAT IDS MUST BE +1 OF THE INDEX VALUE
         if [[ ${library} -eq 30 ]]; then
             CONFIGURE_POSTFIX+=" --disable-sdl2"
-        elif [[ ${library} -eq 43 ]]; then
-            CONFIGURE_POSTFIX+=" --disable-zlib"
         elif [[ ${library} -eq 44 ]]; then
-            CONFIGURE_POSTFIX+=" --disable-audiotoolbox"
+            CONFIGURE_POSTFIX+=" --disable-zlib"
         elif [[ ${library} -eq 45 ]]; then
-            CONFIGURE_POSTFIX+=" --disable-coreimage"
+            CONFIGURE_POSTFIX+=" --disable-audiotoolbox"
         elif [[ ${library} -eq 46 ]]; then
             CONFIGURE_POSTFIX+=" --disable-bzlib"
         elif [[ ${library} -eq 47 ]]; then
@@ -366,7 +356,7 @@ fi
 if [[ -z ${MOBILE_FFMPEG_DEBUG} ]]; then
     DEBUG_OPTIONS="--disable-debug";
 else
-    DEBUG_OPTIONS="--enable-debug";
+    DEBUG_OPTIONS="--enable-debug --disable-stripping";
 fi
 
 # CFLAGS PARTS
@@ -396,27 +386,37 @@ export CFLAGS="${ARCH_CFLAGS} ${APP_CFLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_CFLA
 export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 export LDFLAGS="${ARCH_LDFLAGS}${FFMPEG_LDFLAGS} ${LINKED_LIBRARIES} ${COMMON_LDFLAGS} ${BITCODE_FLAGS} ${OPTIMIZATION_FLAGS}"
 
-cd ${BASEDIR}/src/${LIB_NAME} || exit 1
-
 echo -n -e "\n${LIB_NAME}: "
+
+# DOWNLOAD LIBRARY
+DOWNLOAD_RESULT=$(download_library_source ${LIB_NAME})
+if [[ ${DOWNLOAD_RESULT} -ne 0 ]]; then
+    exit 1
+fi
+
+cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
 if [[ -z ${NO_WORKSPACE_CLEANUP_ffmpeg} ]]; then
     echo -e "INFO: Cleaning workspace for ${LIB_NAME}" 1>>${BASEDIR}/build.log 2>&1
     make distclean 2>/dev/null 1>/dev/null
 fi
 
-# Workaround to prevent adding of -mdynamic-no-pic flag
+########################### CUSTOMIZATIONS #######################
+
+# 1. Workaround to prevent adding of -mdynamic-no-pic flag
 ${SED_INLINE} 's/check_cflags -mdynamic-no-pic && add_asflags -mdynamic-no-pic;/check_cflags -mdynamic-no-pic;/g' ./configure 1>>${BASEDIR}/build.log 2>&1
 
-# Workaround for videotoolbox on mac catalyst
+# 2. Workaround for videotoolbox on mac catalyst
 if [ ${ARCH} == "x86-64-mac-catalyst" ]; then
     ${SED_INLINE} 's/    CFDictionarySetValue(buffer_attributes\, kCVPixelBufferOpenGLESCompatibilityKey/   \/\/ CFDictionarySetValue(buffer_attributes\, kCVPixelBufferOpenGLESCompatibilityKey/g' ${BASEDIR}/src/${LIB_NAME}/libavcodec/videotoolbox.c
 else
     ${SED_INLINE} 's/   \/\/ CFDictionarySetValue(buffer_attributes\, kCVPixelBufferOpenGLESCompatibilityKey/    CFDictionarySetValue(buffer_attributes\, kCVPixelBufferOpenGLESCompatibilityKey/g' ${BASEDIR}/src/${LIB_NAME}/libavcodec/videotoolbox.c
 fi
 
-# Workaround for not supported iOS/tvOS features
-git checkout 2e595085ef653f365af49e6a32f012cc6d9ee03c -- ${BASEDIR}/src/${LIB_NAME}/libavdevice/avfoundation.m 1>>${BASEDIR}/build.log 2>&1
+# 3. Use thread local log level
+${SED_INLINE} 's/static int av_log_level/__thread int av_log_level/g' ${BASEDIR}/src/${LIB_NAME}/libavutil/log.c 1>>${BASEDIR}/build.log 2>&1
+
+###################################################################
 
 ./configure \
     --sysroot=${SDK_PATH} \
@@ -443,6 +443,7 @@ git checkout 2e595085ef653f365af49e6a32f012cc6d9ee03c -- ${BASEDIR}/src/${LIB_NA
     --disable-v4l2-m2m \
     --disable-outdev=v4l2 \
     --disable-outdev=fbdev \
+    --disable-outdev=audiotoolbox \
     --disable-indev=v4l2 \
     --disable-indev=fbdev \
     --disable-openssl \
@@ -473,12 +474,6 @@ git checkout 2e595085ef653f365af49e6a32f012cc6d9ee03c -- ${BASEDIR}/src/${LIB_NA
     --disable-vaapi \
     --disable-vdpau \
     ${CONFIGURE_POSTFIX} 1>>${BASEDIR}/build.log 2>&1
-
-# Workaround for issue #328
-echo "" >>ffbuild/config.mak
-echo "all:" >>ffbuild/config.mak
-echo "libswscale/aarch64/hscale.o: ${BASEDIR}/tools/make/ffmpeg/libswscale/aarch64/hscale.S" >>ffbuild/config.mak
-echo '	$(COMPILE_S)' >>ffbuild/config.mak
 
 if [ $? -ne 0 ]; then
     echo "failed"

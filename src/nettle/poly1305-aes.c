@@ -38,13 +38,14 @@
 #include <string.h>
 
 #include "poly1305.h"
+#include "poly1305-internal.h"
 #include "macros.h"
 
 void
 poly1305_aes_set_key (struct poly1305_aes_ctx *ctx, const uint8_t * key)
 {
   aes128_set_encrypt_key(&ctx->aes, (key));
-  poly1305_set_key(&ctx->pctx, (key+16));
+  _poly1305_set_key(&ctx->pctx, (key+16));
   ctx->index = 0;
 }
 
@@ -82,7 +83,7 @@ poly1305_aes_digest (struct poly1305_aes_ctx *ctx,
     }
   aes128_encrypt(&ctx->aes, POLY1305_BLOCK_SIZE, s.b, ctx->nonce);
   
-  poly1305_digest (&ctx->pctx, &s);
+  _poly1305_digest (&ctx->pctx, &s);
   memcpy (digest, s.b, length);
 
   INCREMENT (16, ctx->nonce);

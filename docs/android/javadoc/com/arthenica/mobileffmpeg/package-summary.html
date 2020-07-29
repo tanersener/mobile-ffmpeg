@@ -81,15 +81,27 @@
 </tr>
 <tbody>
 <tr class="altColor">
+<td class="colFirst"><a href="../../../com/arthenica/mobileffmpeg/ExecuteCallback.html" title="interface in com.arthenica.mobileffmpeg">ExecuteCallback</a></td>
+<td class="colLast">
+<div class="block">Represents a callback function to receive an asynchronous execution result.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a href="../../../com/arthenica/mobileffmpeg/GetMediaInformationCallback.html" title="interface in com.arthenica.mobileffmpeg">GetMediaInformationCallback</a></td>
+<td class="colLast">
+<div class="block">Represents a callback function to receive asynchronous getMediaInformation result.</div>
+</td>
+</tr>
+<tr class="altColor">
 <td class="colFirst"><a href="../../../com/arthenica/mobileffmpeg/LogCallback.html" title="interface in com.arthenica.mobileffmpeg">LogCallback</a></td>
 <td class="colLast">
-<div class="block">Represents a callback function to redirect logs.</div>
+<div class="block">Represents a callback function to receive logs from running executions</div>
 </td>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><a href="../../../com/arthenica/mobileffmpeg/StatisticsCallback.html" title="interface in com.arthenica.mobileffmpeg">StatisticsCallback</a></td>
 <td class="colLast">
-<div class="block">Represents a callback function to receive statistics of running operation.</div>
+<div class="block">Represents a callback function to receive statistics from running executions.</div>
 </td>
 </tr>
 </tbody>
@@ -106,20 +118,43 @@
 <tr class="altColor">
 <td class="colFirst"><a href="../../../com/arthenica/mobileffmpeg/AbiDetect.html" title="class in com.arthenica.mobileffmpeg">AbiDetect</a></td>
 <td class="colLast">
-<div class="block">This class is used to detect running ABI name using Android's <code>cpufeatures</code>
- library.</div>
+<div class="block">This class is used to detect running ABI name using Google <code>cpu-features</code> library.</div>
 </td>
 </tr>
 <tr class="rowColor">
+<td class="colFirst"><a href="../../../com/arthenica/mobileffmpeg/AsyncFFmpegExecuteTask.html" title="class in com.arthenica.mobileffmpeg">AsyncFFmpegExecuteTask</a></td>
+<td class="colLast">
+<div class="block">Utility class to execute an FFmpeg command asynchronously.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><a href="../../../com/arthenica/mobileffmpeg/AsyncFFprobeExecuteTask.html" title="class in com.arthenica.mobileffmpeg">AsyncFFprobeExecuteTask</a></td>
+<td class="colLast">
+<div class="block">Utility class to execute an FFprobe command asynchronously.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a href="../../../com/arthenica/mobileffmpeg/AsyncGetMediaInformationTask.html" title="class in com.arthenica.mobileffmpeg">AsyncGetMediaInformationTask</a></td>
+<td class="colLast">
+<div class="block">Utility class to get media information asynchronously.</div>
+</td>
+</tr>
+<tr class="altColor">
 <td class="colFirst"><a href="../../../com/arthenica/mobileffmpeg/Config.html" title="class in com.arthenica.mobileffmpeg">Config</a></td>
 <td class="colLast">
 <div class="block">This class is used to configure MobileFFmpeg library utilities/tools.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><a href="../../../com/arthenica/mobileffmpeg/FFmpeg.html" title="class in com.arthenica.mobileffmpeg">FFmpeg</a></td>
 <td class="colLast">
 <div class="block">Main class for FFmpeg operations.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><a href="../../../com/arthenica/mobileffmpeg/FFmpegExecution.html" title="class in com.arthenica.mobileffmpeg">FFmpegExecution</a></td>
+<td class="colLast">
+<div class="block">Represents an ongoing FFmpeg execution.</div>
 </td>
 </tr>
 <tr class="rowColor">
@@ -131,7 +166,7 @@
 <tr class="altColor">
 <td class="colFirst"><a href="../../../com/arthenica/mobileffmpeg/LogMessage.html" title="class in com.arthenica.mobileffmpeg">LogMessage</a></td>
 <td class="colLast">
-<div class="block">Represents a redirected log message.</div>
+<div class="block">Logs for running executions.</div>
 </td>
 </tr>
 <tr class="rowColor">
@@ -143,13 +178,13 @@
 <tr class="altColor">
 <td class="colFirst"><a href="../../../com/arthenica/mobileffmpeg/MediaInformationParser.html" title="class in com.arthenica.mobileffmpeg">MediaInformationParser</a></td>
 <td class="colLast">
-<div class="block">Helper class for <a href="../../../com/arthenica/mobileffmpeg/MediaInformation.html" title="class in com.arthenica.mobileffmpeg"><code>MediaInformation</code></a>.</div>
+<div class="block">Helper class for parsing <a href="../../../com/arthenica/mobileffmpeg/MediaInformation.html" title="class in com.arthenica.mobileffmpeg"><code>MediaInformation</code></a>.</div>
 </td>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><a href="../../../com/arthenica/mobileffmpeg/Statistics.html" title="class in com.arthenica.mobileffmpeg">Statistics</a></td>
 <td class="colLast">
-<div class="block">Represents statistics data.</div>
+<div class="block">Statistics for running executions.</div>
 </td>
 </tr>
 <tr class="altColor">
@@ -179,6 +214,12 @@
 <td class="colFirst"><a href="../../../com/arthenica/mobileffmpeg/Level.html" title="enum in com.arthenica.mobileffmpeg">Level</a></td>
 <td class="colLast">
 <div class="block">Helper enumeration type for log levels.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><a href="../../../com/arthenica/mobileffmpeg/Signal.html" title="enum in com.arthenica.mobileffmpeg">Signal</a></td>
+<td class="colLast">
+<div class="block">Lists signals handled by MobileFFmpeg library.</div>
 </td>
 </tr>
 </tbody>

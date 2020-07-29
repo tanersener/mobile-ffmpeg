@@ -92,6 +92,7 @@ FingerprinterConfigurationTest3::FingerprinterConfigurationTest3()
 	set_classifiers(kClassifiersTest3, 16);
 	set_filter_coefficients(kChromaFilterCoefficients, kChromaFilterSize);
 	set_interpolate(true);
+	set_frame_size(kDefaultFrameSize);
 }
 
 FingerprinterConfigurationTest4::FingerprinterConfigurationTest4()

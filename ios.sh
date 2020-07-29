@@ -42,19 +42,19 @@ LIBRARY_TWOLAME=28
 LIBRARY_SDL=29
 LIBRARY_TESSERACT=30
 LIBRARY_OPENH264=31
-LIBRARY_GIFLIB=32
-LIBRARY_JPEG=33
-LIBRARY_LIBOGG=34
-LIBRARY_LIBPNG=35
-LIBRARY_NETTLE=36
-LIBRARY_TIFF=37
-LIBRARY_EXPAT=38
-LIBRARY_SNDFILE=39
-LIBRARY_LEPTONICA=40
-LIBRARY_LIBSAMPLERATE=41
-LIBRARY_ZLIB=42
-LIBRARY_AUDIOTOOLBOX=43
-LIBRARY_COREIMAGE=44
+LIBRARY_VO_AMRWBENC=32
+LIBRARY_GIFLIB=33
+LIBRARY_JPEG=34
+LIBRARY_LIBOGG=35
+LIBRARY_LIBPNG=36
+LIBRARY_NETTLE=37
+LIBRARY_TIFF=38
+LIBRARY_EXPAT=39
+LIBRARY_SNDFILE=40
+LIBRARY_LEPTONICA=41
+LIBRARY_LIBSAMPLERATE=42
+LIBRARY_ZLIB=43
+LIBRARY_AUDIOTOOLBOX=44
 LIBRARY_BZIP2=45
 LIBRARY_VIDEOTOOLBOX=46
 LIBRARY_AVFOUNDATION=47
@@ -68,10 +68,10 @@ ENABLED_ARCHITECTURES=(1 1 1 1 1 1 1)
 ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 
 export BASEDIR=$(pwd)
-export MOBILE_FFMPEG_TMPDIR="${BASEDIR}/.tmp"
 
 RECONF_LIBRARIES=()
 REBUILD_LIBRARIES=()
+REDOWNLOAD_LIBRARIES=()
 
 # CHECKING IF XCODE IS INSTALLED
 if ! [ -x "$(command -v xcrun)" ]; then
@@ -113,7 +113,7 @@ display_help() {
 
   echo -e "Licensing options:"
 
-  echo -e "  --enable-gpl\t\t\tallow use of GPL libraries, resulting libs will be licensed under GPLv3.0 [no]\n"
+  echo -e "  --enable-gpl\t\t\tallow use of GPL libraries, created libs will be licensed under GPLv3.0 [no]\n"
 
   echo -e "Platforms:"
 
@@ -130,7 +130,6 @@ display_help() {
   echo -e "  --full\t\t\tenables all non-GPL external libraries"
   echo -e "  --enable-ios-audiotoolbox\tbuild with built-in Apple AudioToolbox support[no]"
   echo -e "  --enable-ios-avfoundation\tbuild with built-in Apple AVFoundation support[no]"
-  echo -e "  --enable-ios-coreimage\tbuild with built-in Apple CoreImage support[no]"
   echo -e "  --enable-ios-bzip2\t\tbuild with built-in bzip2 support[no]"
   echo -e "  --enable-ios-videotoolbox\tbuild with built-in Apple VideoToolbox support[no]"
   echo -e "  --enable-ios-zlib\t\tbuild with built-in zlib [no]"
@@ -161,6 +160,7 @@ display_help() {
   echo -e "  --enable-speex\t\tbuild with speex [no]"
   echo -e "  --enable-tesseract\t\tbuild with tesseract [no]"
   echo -e "  --enable-twolame\t\tbuild with twolame [no]"
+  echo -e "  --enable-vo-amrwbenc\t\tbuild with vo-amrwbenc [no]"
   echo -e "  --enable-wavpack\t\tbuild with wavpack [no]\n"
 
   echo -e "GPL libraries:"
@@ -174,6 +174,7 @@ display_help() {
   echo -e "Advanced options:"
 
   echo -e "  --reconf-LIBRARY\t\trun autoreconf before building LIBRARY [no]"
+  echo -e "  --redownload-LIBRARY\t\tdownload LIBRARY even it is detected as already downloaded [no]"
   echo -e "  --rebuild-LIBRARY\t\tbuild LIBRARY even it is detected as already built [no]\n"
 }
 
@@ -227,7 +228,7 @@ reconf_library() {
   local RECONF_VARIABLE=$(echo "RECONF_$1" | sed "s/\-/\_/g")
   local library_supported=0
 
-  for library in {1..42}; do
+  for library in {1..43}; do
     library_name=$(get_library_name $((library - 1)))
 
     if [[ $1 != "ffmpeg" ]] && [[ ${library_name} == "$1" ]]; then
@@ -246,7 +247,7 @@ rebuild_library() {
   local REBUILD_VARIABLE=$(echo "REBUILD_$1" | sed "s/\-/\_/g")
   local library_supported=0
 
-  for library in {1..42}; do
+  for library in {1..43}; do
     library_name=$(get_library_name $((library - 1)))
 
     if [[ $1 != "ffmpeg" ]] && [[ ${library_name} == "$1" ]]; then
@@ -258,6 +259,31 @@ rebuild_library() {
 
   if [[ ${library_supported} -eq 0 ]]; then
     echo -e "INFO: --rebuild flag detected for library $1 is not supported.\n" 1>>"${BASEDIR}/build.log" 2>&1
+  fi
+}
+
+redownload_library() {
+  local REDOWNLOAD_VARIABLE=$(echo "REDOWNLOAD_$1" | sed "s/\-/\_/g")
+  local library_supported=0
+
+  for library in {0..42}; do
+    library_name=$(get_library_name ${library})
+
+    if [[ ${library_name} == $1 ]]; then
+      export ${REDOWNLOAD_VARIABLE}=1
+      REDOWNLOAD_LIBRARIES+=($1)
+      library_supported=1
+    fi
+  done
+
+  if [[ "ffmpeg" == $1 ]]; then
+    export ${REDOWNLOAD_VARIABLE}=1
+    REDOWNLOAD_LIBRARIES+=($1)
+    library_supported=1
+  fi
+
+  if [[ ${library_supported} -eq 0 ]]; then
+    echo -e "INFO: --redownload flag detected for library $1 is not supported.\n" 1>>${BASEDIR}/build.log 2>&1
   fi
 }
 
@@ -275,9 +301,6 @@ set_library() {
     ;;
   ios-avfoundation)
     ENABLED_LIBRARIES[LIBRARY_AVFOUNDATION]=$2
-    ;;
-  ios-coreimage)
-    ENABLED_LIBRARIES[LIBRARY_COREIMAGE]=$2
     ;;
   ios-bzip2)
     ENABLED_LIBRARIES[LIBRARY_BZIP2]=$2
@@ -415,6 +438,9 @@ set_library() {
     ENABLED_LIBRARIES[LIBRARY_TWOLAME]=$2
     ENABLED_LIBRARIES[LIBRARY_SNDFILE]=$2
     ;;
+  vo-amrwbenc)
+    ENABLED_LIBRARIES[LIBRARY_VO_AMRWBENC]=$2
+    ;;
   wavpack)
     ENABLED_LIBRARIES[LIBRARY_WAVPACK]=$2
     ;;
@@ -519,7 +545,7 @@ print_enabled_libraries() {
   let enabled=0
 
   # FIRST BUILT-IN LIBRARIES
-  for library in {42..49}; do
+  for library in {43..49}; do
     if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
       if [[ ${enabled} -ge 1 ]]; then
         echo -n ", "
@@ -530,7 +556,7 @@ print_enabled_libraries() {
   done
 
   # THEN EXTERNAL LIBRARIES
-  for library in {0..31}; do
+  for library in {0..32}; do
     if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
       if [[ ${enabled} -ge 1 ]]; then
         echo -n ", "
@@ -580,6 +606,26 @@ print_rebuild_requested_libraries() {
     echo -n "${REBUILD_LIBRARY}"
 
     counter=$((counter + 1))
+  done
+
+  if [[ ${counter} -gt 0 ]]; then
+    echo ""
+  fi
+}
+
+print_redownload_requested_libraries() {
+  local counter=0
+
+  for REDOWNLOAD_LIBRARY in "${REDOWNLOAD_LIBRARIES[@]}"; do
+    if [[ ${counter} -eq 0 ]]; then
+      echo -n "Redownload: "
+    else
+      echo -n ", "
+    fi
+
+    echo -n ${REDOWNLOAD_LIBRARY}
+
+    counter=$((${counter} + 1))
   done
 
   if [[ ${counter} -gt 0 ]]; then
@@ -637,6 +683,9 @@ build_modulemap() {
 framework module mobileffmpeg {
 
   header "ArchDetect.h"
+  header "AtomicLong.h"
+  header "ExecuteDelegate.h"
+  header "FFmpegExecution.h"
   header "LogDelegate.h"
   header "MediaInformation.h"
   header "MediaInformationParser.h"
@@ -732,7 +781,7 @@ create_external_library_package() {
         elif [[ ${LIBRARY_LIBWEBP} == "$1" ]]; then
           license_directories=("${BASEDIR}/prebuilt/ios-universal/libwebpmux-universal" "${BASEDIR}/prebuilt/ios-universal/libwebpdemux-universal" "${BASEDIR}/prebuilt/ios-universal/libwebp-universal" "${BASEDIR}/prebuilt/ios-framework/libwebpmux.framework" "${BASEDIR}/prebuilt/ios-framework/libwebpdemux.framework" "${BASEDIR}/prebuilt/ios-framework/libwebp.framework")
         elif [[ ${LIBRARY_OPENCOREAMR} == "$1" ]]; then
-          license_directories=("${BASEDIR}/prebuilt/ios-universal/libopencore-amrwb-universal" "${BASEDIR}/prebuilt/ios-universal/libopencore-amrnb-universal" "${BASEDIR}/prebuilt/ios-framework/libopencore-amrwb.framework" "${BASEDIR}/prebuilt/ios-framework/libopencore-amrnb.framework")
+          license_directories=("${BASEDIR}/prebuilt/ios-universal/libopencore-amrnb-universal" "${BASEDIR}/prebuilt/ios-framework/libopencore-amrnb.framework")
         elif [[ ${LIBRARY_NETTLE} == "$1" ]]; then
           license_directories=("${BASEDIR}/prebuilt/ios-universal/libnettle-universal" "${BASEDIR}/prebuilt/ios-universal/libhogweed-universal" "${BASEDIR}/prebuilt/ios-framework/libnettle.framework" "${BASEDIR}/prebuilt/ios-framework/libhogweed.framework")
         else
@@ -790,11 +839,11 @@ get_external_library_license_path() {
   25) echo "${BASEDIR}/src/$(get_library_name "$1")/COPYING.LGPL" ;;
   27) echo "${BASEDIR}/src/$(get_library_name "$1")/LICENSE.md" ;;
   29) echo "${BASEDIR}/src/$(get_library_name "$1")/COPYING.txt" ;;
-  33) echo "${BASEDIR}/src/$(get_library_name "$1")/LICENSE.md " ;;
-  36) echo "${BASEDIR}/src/$(get_library_name "$1")/COPYING.LESSERv3" ;;
-  37) echo "${BASEDIR}/src/$(get_library_name "$1")/COPYRIGHT" ;;
-  40) echo "${BASEDIR}/src/$(get_library_name "$1")/leptonica-license.txt" ;;
-  4 | 9 | 12 | 18 | 20 | 26 | 31 | 35) echo "${BASEDIR}/src/$(get_library_name "$1")/LICENSE" ;;
+  34) echo "${BASEDIR}/src/$(get_library_name "$1")/LICENSE.md " ;;
+  37) echo "${BASEDIR}/src/$(get_library_name "$1")/COPYING.LESSERv3" ;;
+  38) echo "${BASEDIR}/src/$(get_library_name "$1")/COPYRIGHT" ;;
+  41) echo "${BASEDIR}/src/$(get_library_name "$1")/leptonica-license.txt" ;;
+  4 | 9 | 12 | 18 | 20 | 26 | 31 | 36) echo "${BASEDIR}/src/$(get_library_name "$1")/LICENSE" ;;
   *) echo "${BASEDIR}/src/$(get_library_name "$1")/COPYING" ;;
   esac
 }
@@ -812,6 +861,7 @@ GPL_ENABLED="no"
 DISPLAY_HELP=""
 BUILD_TYPE_ID=""
 BUILD_LTS=""
+BUILD_FULL=""
 MOBILE_FFMPEG_XCF_BUILD=""
 BUILD_FORCE=""
 BUILD_VERSION=$(git describe --tags 2>>"${BASEDIR}/build.log")
@@ -863,12 +913,13 @@ while [ ! $# -eq 0 ]; do
 
     rebuild_library "${BUILD_LIBRARY}"
     ;;
+    --redownload-*)
+    DOWNLOAD_LIBRARY=$(echo $1 | sed -e 's/^--[A-Za-z]*-//g')
+
+    redownload_library ${DOWNLOAD_LIBRARY}
+    ;;
   --full)
-    for library in {0..49}; do
-      if [[ $library -ne 17 ]] && [[ $library -ne 18 ]] && [[ $library -ne 19 ]] && [[ $library -ne 20 ]] && [[ $library -ne 21 ]]; then
-        enable_library "$(get_library_name $library)"
-      fi
-    done
+    BUILD_FULL="1"
     ;;
   --enable-gpl)
     GPL_ENABLED="yes"
@@ -889,6 +940,18 @@ while [ ! $# -eq 0 ]; do
   esac
   shift
 done
+
+if [[ -n ${BUILD_FULL} ]]; then
+  for library in {0..49}; do
+    if [ ${GPL_ENABLED} == "yes" ]; then
+      enable_library $(get_library_name $library)
+    else
+      if [[ $library -ne 17 ]] && [[ $library -ne 18 ]] && [[ $library -ne 19 ]] && [[ $library -ne 20 ]] && [[ $library -ne 21 ]]; then
+        enable_library $(get_library_name $library)
+      fi
+    fi
+  done
+fi
 
 # DETECT BUILD TYPE
 if [[ -n ${BUILD_LTS} ]]; then
@@ -972,8 +1035,9 @@ print_enabled_architectures
 print_enabled_libraries
 print_reconfigure_requested_libraries
 print_rebuild_requested_libraries
+print_redownload_requested_libraries
 
-# CHECKING GPL LIBRARIES
+# CHECK GPL LIBRARIES
 for gpl_library in {17..21}; do
   if [[ ${ENABLED_LIBRARIES[$gpl_library]} -eq 1 ]]; then
     library_name=$(get_library_name ${gpl_library})
@@ -1049,7 +1113,7 @@ if [[ -n ${TARGET_ARCH_LIST[0]} ]]; then
   fi
 
   # 1. EXTERNAL LIBRARIES
-  for library in {0..41}; do
+  for library in {0..42}; do
     if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
 
       library_name=$(get_library_name ${library})
@@ -1124,12 +1188,6 @@ if [[ -n ${TARGET_ARCH_LIST[0]} ]]; then
         fi
 
       elif [[ ${LIBRARY_OPENCOREAMR} == "$library" ]]; then
-
-        LIBRARY_CREATED=$(create_external_library_package $library "libopencore-amrwb" "libopencore-amrwb.a" "${library_version}")
-        if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
-          echo -e "failed\n"
-          exit 1
-        fi
 
         LIBRARY_CREATED=$(create_external_library_package $library "libopencore-amrnb" "libopencore-amrnb.a" "${library_version}")
         if [[ ${LIBRARY_CREATED} -ne 0 ]]; then

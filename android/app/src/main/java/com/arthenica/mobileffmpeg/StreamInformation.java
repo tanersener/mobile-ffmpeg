@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Taner Sener
+ * Copyright (c) 2018, 2020 Taner Sener
  *
  * This file is part of MobileFFmpeg.
  *
@@ -19,9 +19,7 @@
 
 package com.arthenica.mobileffmpeg;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import org.json.JSONObject;
 
 /**
  * Stream information class.
@@ -30,68 +28,32 @@ import java.util.Set;
  */
 public class StreamInformation {
 
-    /**
-     * Stream index
-     */
-    private Long index;
-
-    private String type;
-    private String codec;
-    private String fullCodec;
-    private String format;
-    private String fullFormat;
-
-    private Long width;
-    private Long height;
-
-    private Long bitrate;
-    private Long sampleRate;
-    private String sampleFormat;
-    private String channelLayout;
-
-    /**
-     * SAR
-     */
-    private String sampleAspectRatio;
+    private static final String KEY_INDEX = "index";
+    private static final String KEY_TYPE = "codec_type";
+    private static final String KEY_CODEC = "codec_name";
+    private static final String KEY_CODEC_LONG = "codec_long_name";
+    private static final String KEY_FORMAT = "pix_fmt";
+    private static final String KEY_WIDTH = "width";
+    private static final String KEY_HEIGHT = "height";
+    private static final String KEY_BIT_RATE = "bit_rate";
+    private static final String KEY_SAMPLE_RATE = "sample_rate";
+    private static final String KEY_SAMPLE_FORMAT = "sample_fmt";
+    private static final String KEY_CHANNEL_LAYOUT = "channel_layout";
+    private static final String KEY_SAMPLE_ASPECT_RATIO = "sample_aspect_ratio";
+    private static final String KEY_DISPLAY_ASPECT_RATIO = "display_aspect_ratio";
+    private static final String KEY_AVERAGE_FRAME_RATE = "avg_frame_rate";
+    private static final String KEY_REAL_FRAME_RATE = "r_frame_rate";
+    private static final String KEY_TIME_BASE = "time_base";
+    private static final String KEY_CODEC_TIME_BASE = "codec_time_base";
+    private static final String KEY_TAGS = "tags";
 
     /**
-     * DAR
+     * Stores all properties.
      */
-    private String displayAspectRatio;
+    private final JSONObject jsonObject;
 
-    /**
-     * fps
-     */
-    private String averageFrameRate;
-
-    /**
-     * tbr
-     */
-    private String realFrameRate;
-
-    /**
-     * tbn
-     */
-    private String timeBase;
-
-    /**
-     * tbc
-     */
-    private String codecTimeBase;
-
-    /**
-     * Metadata map
-     */
-    private final Map<String, String> metadata;
-
-    /**
-     * Side data map
-     */
-    private final Map<String, String> sidedata;
-
-    public StreamInformation() {
-        this.metadata = new HashMap<>();
-        this.sidedata = new HashMap<>();
+    public StreamInformation(final JSONObject jsonObject) {
+        this.jsonObject = jsonObject;
     }
 
     /**
@@ -100,16 +62,7 @@ public class StreamInformation {
      * @return stream index, starting from zero
      */
     public Long getIndex() {
-        return index;
-    }
-
-    /**
-     * Sets stream index.
-     *
-     * @param index stream index, starting from zero
-     */
-    public void setIndex(Long index) {
-        this.index = index;
+        return getNumberProperty(KEY_INDEX);
     }
 
     /**
@@ -118,16 +71,7 @@ public class StreamInformation {
      * @return stream type; audio or video
      */
     public String getType() {
-        return type;
-    }
-
-    /**
-     * Sets stream type.
-     *
-     * @param type stream type; audio or video
-     */
-    public void setType(String type) {
-        this.type = type;
+        return getStringProperty(KEY_TYPE);
     }
 
     /**
@@ -136,16 +80,7 @@ public class StreamInformation {
      * @return stream codec
      */
     public String getCodec() {
-        return codec;
-    }
-
-    /**
-     * Sets stream codec.
-     *
-     * @param codec stream codec
-     */
-    public void setCodec(String codec) {
-        this.codec = codec;
+        return getStringProperty(KEY_CODEC);
     }
 
     /**
@@ -154,16 +89,7 @@ public class StreamInformation {
      * @return stream codec with additional profile and mode information
      */
     public String getFullCodec() {
-        return fullCodec;
-    }
-
-    /**
-     * Sets full stream codec.
-     *
-     * @param fullCodec stream codec with additional profile and mode information
-     */
-    public void setFullCodec(String fullCodec) {
-        this.fullCodec = fullCodec;
+        return getStringProperty(KEY_CODEC_LONG);
     }
 
     /**
@@ -172,34 +98,7 @@ public class StreamInformation {
      * @return stream format
      */
     public String getFormat() {
-        return format;
-    }
-
-    /**
-     * Sets stream format.
-     *
-     * @param format stream format
-     */
-    public void setFormat(String format) {
-        this.format = format;
-    }
-
-    /**
-     * Returns full stream format.
-     *
-     * @return stream format with
-     */
-    public String getFullFormat() {
-        return fullFormat;
-    }
-
-    /**
-     * Sets full stream format.
-     *
-     * @param fullFormat stream format with
-     */
-    public void setFullFormat(String fullFormat) {
-        this.fullFormat = fullFormat;
+        return getStringProperty(KEY_FORMAT);
     }
 
     /**
@@ -208,16 +107,7 @@ public class StreamInformation {
      * @return width in pixels
      */
     public Long getWidth() {
-        return width;
-    }
-
-    /**
-     * Sets width.
-     *
-     * @param width width in pixels
-     */
-    public void setWidth(Long width) {
-        this.width = width;
+        return getNumberProperty(KEY_WIDTH);
     }
 
     /**
@@ -226,16 +116,7 @@ public class StreamInformation {
      * @return height in pixels
      */
     public Long getHeight() {
-        return height;
-    }
-
-    /**
-     * Sets height.
-     *
-     * @param height height in pixels
-     */
-    public void setHeight(Long height) {
-        this.height = height;
+        return getNumberProperty(KEY_HEIGHT);
     }
 
     /**
@@ -243,17 +124,8 @@ public class StreamInformation {
      *
      * @return bitrate in kb/s
      */
-    public Long getBitrate() {
-        return bitrate;
-    }
-
-    /**
-     * Sets bitrate.
-     *
-     * @param bitrate bitrate in kb/s
-     */
-    public void setBitrate(Long bitrate) {
-        this.bitrate = bitrate;
+    public String getBitrate() {
+        return getStringProperty(KEY_BIT_RATE);
     }
 
     /**
@@ -261,17 +133,8 @@ public class StreamInformation {
      *
      * @return sample rate in hz
      */
-    public Long getSampleRate() {
-        return sampleRate;
-    }
-
-    /**
-     * Sets sample rate.
-     *
-     * @param sampleRate sample rate in hz
-     */
-    public void setSampleRate(Long sampleRate) {
-        this.sampleRate = sampleRate;
+    public String getSampleRate() {
+        return getStringProperty(KEY_SAMPLE_RATE);
     }
 
     /**
@@ -280,16 +143,7 @@ public class StreamInformation {
      * @return sample format
      */
     public String getSampleFormat() {
-        return sampleFormat;
-    }
-
-    /**
-     * Sets sample format.
-     *
-     * @param sampleFormat sample format
-     */
-    public void setSampleFormat(String sampleFormat) {
-        this.sampleFormat = sampleFormat;
+        return getStringProperty(KEY_SAMPLE_FORMAT);
     }
 
     /**
@@ -298,16 +152,7 @@ public class StreamInformation {
      * @return channel layout
      */
     public String getChannelLayout() {
-        return channelLayout;
-    }
-
-    /**
-     * Sets channel layout.
-     *
-     * @param channelLayout channel layout
-     */
-    public void setChannelLayout(String channelLayout) {
-        this.channelLayout = channelLayout;
+        return getStringProperty(KEY_CHANNEL_LAYOUT);
     }
 
     /**
@@ -316,16 +161,7 @@ public class StreamInformation {
      * @return sample aspect ratio
      */
     public String getSampleAspectRatio() {
-        return sampleAspectRatio;
-    }
-
-    /**
-     * Sets sample aspect ratio.
-     *
-     * @param sampleAspectRatio sample aspect ratio
-     */
-    public void setSampleAspectRatio(String sampleAspectRatio) {
-        this.sampleAspectRatio = sampleAspectRatio;
+        return getStringProperty(KEY_SAMPLE_ASPECT_RATIO);
     }
 
     /**
@@ -334,16 +170,7 @@ public class StreamInformation {
      * @return display aspect ratio
      */
     public String getDisplayAspectRatio() {
-        return displayAspectRatio;
-    }
-
-    /**
-     * Sets display aspect ratio.
-     *
-     * @param displayAspectRatio display aspect ratio
-     */
-    public void setDisplayAspectRatio(String displayAspectRatio) {
-        this.displayAspectRatio = displayAspectRatio;
+        return getStringProperty(KEY_DISPLAY_ASPECT_RATIO);
     }
 
     /**
@@ -352,16 +179,7 @@ public class StreamInformation {
      * @return average frame rate in fps
      */
     public String getAverageFrameRate() {
-        return averageFrameRate;
-    }
-
-    /**
-     * Sets average frame rate.
-     *
-     * @param averageFrameRate average frame rate in fps
-     */
-    public void setAverageFrameRate(String averageFrameRate) {
-        this.averageFrameRate = averageFrameRate;
+        return getStringProperty(KEY_AVERAGE_FRAME_RATE);
     }
 
     /**
@@ -370,16 +188,7 @@ public class StreamInformation {
      * @return real frame rate in tbr
      */
     public String getRealFrameRate() {
-        return realFrameRate;
-    }
-
-    /**
-     * Sets real frame rate.
-     *
-     * @param realFrameRate real frame rate in tbr
-     */
-    public void setRealFrameRate(String realFrameRate) {
-        this.realFrameRate = realFrameRate;
+        return getStringProperty(KEY_REAL_FRAME_RATE);
     }
 
     /**
@@ -388,16 +197,7 @@ public class StreamInformation {
      * @return time base in tbn
      */
     public String getTimeBase() {
-        return timeBase;
-    }
-
-    /**
-     * Sets time base.
-     *
-     * @param timeBase time base in tbn
-     */
-    public void setTimeBase(String timeBase) {
-        this.timeBase = timeBase;
+        return getStringProperty(KEY_TIME_BASE);
     }
 
     /**
@@ -406,74 +206,78 @@ public class StreamInformation {
      * @return codec time base in tbc
      */
     public String getCodecTimeBase() {
-        return codecTimeBase;
+        return getStringProperty(KEY_CODEC_TIME_BASE);
     }
 
     /**
-     * Sets codec time base.
+     * Returns all tags.
      *
-     * @param codecTimeBase codec time base in tbc
+     * @return tags dictionary
      */
-    public void setCodecTimeBase(String codecTimeBase) {
-        this.codecTimeBase = codecTimeBase;
+    public JSONObject getTags() {
+        return getProperties(KEY_TAGS);
     }
 
     /**
-     * Adds metadata.
+     * Returns the stream property associated with the key.
      *
-     * @param key metadata key
-     * @param value metadata value
+     * @param key property key
+     * @return stream property as string or null if the key is not found
      */
-    public void addMetadata(String key, String value) {
-        this.metadata.put(key, value);
+    public String getStringProperty(final String key) {
+        JSONObject mediaProperties = getAllProperties();
+        if (mediaProperties == null) {
+            return null;
+        }
+
+        if (mediaProperties.has(key)) {
+            return mediaProperties.optString(key);
+        } else {
+            return null;
+        }
     }
 
     /**
-     * Retrieves metadata value associated with this key.
+     * Returns the stream property associated with the key.
      *
-     * @param key metadata key
-     * @return metadata value associated with this key
+     * @param key property key
+     * @return stream property as Long or null if the key is not found
      */
-    public String getMetadata(String key) {
-        return this.metadata.get(key);
+    public Long getNumberProperty(String key) {
+        JSONObject mediaProperties = getAllProperties();
+        if (mediaProperties == null) {
+            return null;
+        }
+
+        if (mediaProperties.has(key)) {
+            return mediaProperties.optLong(key);
+        } else {
+            return null;
+        }
     }
 
     /**
-     * Returns all metadata entries.
+     * Returns the stream properties associated with the key.
      *
-     * @return set of metadata entries
+     * @param key properties key
+     * @return stream properties as a JSONObject or null if the key is not found
      */
-    public Set<Map.Entry<String, String>> getMetadataEntries() {
-        return this.metadata.entrySet();
+    public JSONObject getProperties(String key) {
+        JSONObject mediaProperties = getAllProperties();
+        if (mediaProperties == null) {
+            return null;
+        }
+
+        return mediaProperties.optJSONObject(key);
     }
 
     /**
-     * Adds side data.
+     * Returns all stream properties defined.
      *
-     * @param key side data key
-     * @param value side data value
+     * @return all stream properties as a JSONObject or null if no properties are defined
      */
-    public void addSidedata(String key, String value) {
-        this.sidedata.put(key, value);
-    }
-
-    /**
-     * Retrieves side data value associated with this key.
-     *
-     * @param key side data key
-     * @return side data value associated with this key
-     */
-    public String getSidedata(String key) {
-        return this.sidedata.get(key);
-    }
-
-    /**
-     * Returns all side data entries.
-     *
-     * @return set of site data entries
-     */
-    public Set<Map.Entry<String, String>> getSidedataEntries() {
-        return this.sidedata.entrySet();
+    public JSONObject getAllProperties() {
+        return jsonObject;
     }
 
 }

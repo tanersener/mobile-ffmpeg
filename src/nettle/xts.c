@@ -44,31 +44,7 @@
 #include "macros.h"
 #include "memxor.h"
 #include "nettle-internal.h"
-
-/* shift left one and XOR with 0x87 if there is carry. */
-/* the algorithm reads this as a 128bit Little Endian number */
-/* src and dest can point to the same buffer for in-place operations */
-#if WORDS_BIGENDIAN
-#define BE_SHIFT(x) ((((x) & 0x7f7f7f7f7f7f7f7f) << 1) | \
-                     (((x) & 0x8080808080808080) >> 15))
-static void
-xts_shift(union nettle_block16 *dst,
-          const union nettle_block16 *src)
-{
-  uint64_t carry = (src->u64[1] & 0x80) >> 7;
-  dst->u64[1] = BE_SHIFT(src->u64[1]) | ((src->u64[0] & 0x80) << 49);
-  dst->u64[0] = BE_SHIFT(src->u64[0]) ^ (0x8700000000000000 & -carry);
-}
-#else /* !WORDS_BIGENDIAN */
-static void
-xts_shift(union nettle_block16 *dst,
-          const union nettle_block16 *src)
-{
-  uint64_t carry = src->u64[1] >> 63;
-  dst->u64[1] = (src->u64[1] << 1) | (src->u64[0] >> 63);
-  dst->u64[0] = (src->u64[0] << 1) ^ (0x87 & -carry);
-}
-#endif /* !WORDS_BIGNDIAN */
+#include "block-internal.h"
 
 static void
 check_length(size_t length, uint8_t *dst)
@@ -107,7 +83,7 @@ xts_encrypt_message(const void *enc_ctx, const void *twk_ctx,
 
       /* shift T for next block if any */
       if (length > XTS_BLOCK_SIZE)
-          xts_shift(&T, &T);
+          block16_mulx_le(&T, &T);
     }
 
   /* if the last block is partial, handle via stealing */
@@ -121,7 +97,7 @@ xts_encrypt_message(const void *enc_ctx, const void *twk_ctx,
       memxor(S.b, T.b, XTS_BLOCK_SIZE);	        /* CC -> S */
 
       /* shift T for next block */
-      xts_shift(&T, &T);
+      block16_mulx_le(&T, &T);
 
       length -= XTS_BLOCK_SIZE;
       src += XTS_BLOCK_SIZE;
@@ -162,7 +138,7 @@ xts_decrypt_message(const void *dec_ctx, const void *twk_ctx,
 
       /* shift T for next block if any */
       if (length > XTS_BLOCK_SIZE)
-          xts_shift(&T, &T);
+          block16_mulx_le(&T, &T);
     }
 
   /* if the last block is partial, handle via stealing */
@@ -173,7 +149,7 @@ xts_decrypt_message(const void *dec_ctx, const void *twk_ctx,
       union nettle_block16 S;
 
       /* we need the last T(n) and save the T(n-1) for later */
-      xts_shift(&T1, &T);
+      block16_mulx_le(&T1, &T);
 
       memxor3(C.b, src, T1.b, XTS_BLOCK_SIZE);	/* C -> CC */
       decf(dec_ctx, XTS_BLOCK_SIZE, S.b, C.b);  /* PP */

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder.AppleTV.Storyboard" version="3.0" toolsVersion="15702" targetRuntime="AppleTV" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="B80-EI-IC6">
+<document type="com.apple.InterfaceBuilder.AppleTV.Storyboard" version="3.0" toolsVersion="16097.2" targetRuntime="AppleTV" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="B80-EI-IC6">
     <device id="appleTV" appearance="light"/>
     <dependencies>
         <deployment identifier="tvOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15704"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -21,7 +21,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3Wr-qB-Pyg" userLabel="Run FFmpeg Button" customClass="TvButton">
-                                <rect key="frame" x="895" y="299" width="130" height="32"/>
+                                <rect key="frame" x="895" y="202" width="130" height="32"/>
                                 <color key="backgroundColor" red="0.94117647058823528" green="0.94117647058823528" blue="0.95983767649706664" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="32" id="Vbs-En-ncY"/>
@@ -41,7 +41,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0OP-Pr-kwN" userLabel="Run FFprobe Button" customClass="TvButton">
-                                <rect key="frame" x="895" y="361" width="130" height="32"/>
+                                <rect key="frame" x="895" y="264" width="130" height="32"/>
                                 <color key="backgroundColor" red="0.94117647058823528" green="0.94117647058823528" blue="0.96078431372549" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="130" id="85g-G9-Rc6"/>
@@ -63,7 +63,7 @@
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="MobileFFmpegTest" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4qP-Cg-LeP">
-                                <rect key="frame" x="90" y="157" width="1740" height="50"/>
+                                <rect key="frame" x="90" y="60" width="1740" height="50"/>
                                 <color key="backgroundColor" red="0.95686274509803915" green="0.40784313725490196" blue="0.25882352941176467" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="e4q-j1-NcS"/>
@@ -73,7 +73,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Enter command" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="WEh-8G-EBV">
-                                <rect key="frame" x="110" y="237" width="1700" height="32"/>
+                                <rect key="frame" x="110" y="140" width="1700" height="32"/>
                                 <color key="backgroundColor" red="0.90198421478271484" green="0.9058806300163269" blue="0.91761696338653564" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="32" id="0at-Ak-O3K"/>
@@ -82,7 +82,7 @@
                                 <textInputTraits key="textInputTraits" autocorrectionType="no"/>
                             </textField>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="gqc-19-yb3">
-                                <rect key="frame" x="120" y="423" width="1680" height="557"/>
+                                <rect key="frame" x="120" y="326" width="1680" height="654"/>
                                 <color key="backgroundColor" red="0.94117647058823528" green="0.94117647058823528" blue="0.96078431372549022" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <accessibility key="accessibilityConfiguration" hint="Run output"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="15"/>
@@ -214,7 +214,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="MBy-vc-Squ" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3753" y="-847"/>
+            <point key="canvasLocation" x="3753" y="-1346"/>
         </scene>
         <!--Subtitle-->
         <scene sceneID="rI0-su-mKv">
@@ -292,7 +292,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="gBl-fG-K1P" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3753" y="-2380"/>
+            <point key="canvasLocation" x="3753" y="-2759"/>
         </scene>
         <!--Video-->
         <scene sceneID="wg7-f3-ORb">
@@ -307,7 +307,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="MobileFFmpegTest" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qjq-ds-G4r">
-                                <rect key="frame" x="90" y="157" width="1740" height="50"/>
+                                <rect key="frame" x="90" y="60" width="1740" height="50"/>
                                 <color key="backgroundColor" red="0.95686274510000002" green="0.40784313729999999" blue="0.25882352939999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="xbI-E1-tqj"/>
@@ -317,7 +317,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="z7Q-Af-rbI" customClass="TvButton">
-                                <rect key="frame" x="920" y="359" width="80" height="32"/>
+                                <rect key="frame" x="920" y="262" width="80" height="32"/>
                                 <color key="backgroundColor" red="0.94117647058823528" green="0.94117647058823528" blue="0.96078431372549022" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="80" id="6F7-uT-WDk"/>
@@ -338,14 +338,14 @@
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wZ4-t0-3Pz">
-                                <rect key="frame" x="20" y="421" width="1880" height="579"/>
+                                <rect key="frame" x="20" y="324" width="1880" height="676"/>
                                 <color key="tintColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="mpeg4" borderStyle="roundedRect" placeholder="mpeg4, h264, x265, xvid, vp8, vp9, aom, kvazaar, theora, hap" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="ATw-Py-5o6" userLabel="Video Codec Text">
-                                <rect key="frame" x="720.5" y="267" width="479" height="32"/>
+                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="mpeg4" borderStyle="roundedRect" placeholder="mpeg4, h264, h264 (openh264), h264 (videotoolbox), x265, xvid, vp8, vp9, aom, kvazaar, theora, hap" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="ATw-Py-5o6" userLabel="Video Codec Text">
+                                <rect key="frame" x="590" y="170" width="740" height="32"/>
                                 <color key="backgroundColor" red="0.90198421480000002" green="0.90588062999999996" blue="0.91761696339999999" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                 <constraints>
                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="400" id="ES2-Xg-2lJ"/>
@@ -524,7 +524,7 @@
                                 <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                 <textInputTraits key="textInputTraits" autocorrectionType="no"/>
                             </textView>
-                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="aac" borderStyle="roundedRect" placeholder="aac, mp2, mp3, vorbis, opus, amr, ilbc, soxr, speex, wavpack" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="2HS-ir-3UC" userLabel="Audio Codec Text">
+                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="aac" borderStyle="roundedRect" placeholder="aac, mp2, mp3, vorbis, opus, amr-nb, amr-wb, ilbc, soxr, speex, wavpack" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="2HS-ir-3UC" userLabel="Audio Codec Text">
                                 <rect key="frame" x="860" y="227" width="200" height="32"/>
                                 <color key="backgroundColor" red="0.90198421480000002" green="0.90588062999999996" blue="0.91761696339999999" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                 <constraints>
@@ -643,7 +643,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="PPR-Et-aGw" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3753" y="668"/>
+            <point key="canvasLocation" x="3753" y="42"/>
         </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="X72-b8-XEC">
@@ -655,18 +655,246 @@
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     </tabBar>
                     <connections>
-                        <segue destination="9pv-A4-QxB" kind="relationship" relationship="viewControllers" id="Ubx-0c-rC0"/>
-                        <segue destination="8rJ-Kc-sve" kind="relationship" relationship="viewControllers" id="KEo-kH-f6T"/>
                         <segue destination="bz3-AU-N9p" kind="relationship" relationship="viewControllers" id="JDI-eG-1Hg"/>
                         <segue destination="e0F-AO-I4l" kind="relationship" relationship="viewControllers" id="E5k-nD-0Nr"/>
                         <segue destination="CNM-FA-Rhq" kind="relationship" relationship="viewControllers" id="QGr-t3-scR"/>
                         <segue destination="LcP-dY-3WS" kind="relationship" relationship="viewControllers" id="ddI-xj-pQA"/>
                         <segue destination="edn-dz-Nyo" kind="relationship" relationship="viewControllers" id="kLE-O5-vhM"/>
+                        <segue destination="jQU-O1-Ofc" kind="relationship" relationship="viewControllers" id="3FT-mG-2Hj"/>
                     </connections>
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="DzI-74-Owy" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1116" y="-2676"/>
+        </scene>
+        <!--Concurrent Execution-->
+        <scene sceneID="pAt-JY-FOd">
+            <objects>
+                <viewController title="Concurrent Execution" id="jQU-O1-Ofc" customClass="ConcurrentExecutionViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="Nkq-e9-hXY"/>
+                        <viewControllerLayoutGuide type="bottom" id="XqD-AV-1Wz"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="f8j-Ks-8wp">
+                        <rect key="frame" x="0.0" y="0.0" width="1920" height="1080"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" textAlignment="natural" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cbQ-aT-Gcf">
+                                <rect key="frame" x="120" y="299" width="1680" height="681"/>
+                                <color key="backgroundColor" red="0.94117647059999998" green="0.94117647059999998" blue="0.96078431369999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <accessibility key="accessibilityConfiguration" hint="Run output"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                <textInputTraits key="textInputTraits" autocorrectionType="no"/>
+                            </textView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="MobileFFmpegTest" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eFn-Ut-bfl" userLabel="Header">
+                                <rect key="frame" x="90" y="157" width="1740" height="50"/>
+                                <color key="backgroundColor" red="0.95686274510000002" green="0.40784313729999999" blue="0.25882352939999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="50" id="4MS-tD-J5S"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="18"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="rvK-Az-k8D" customClass="TvButton">
+                                <rect key="frame" x="120" y="237" width="200" height="32"/>
+                                <color key="backgroundColor" red="0.94117647059999998" green="0.94117647059999998" blue="0.95983767649999996" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="200" id="FNo-0b-Waw"/>
+                                    <constraint firstAttribute="height" constant="32" id="j5X-FV-Ylr"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <color key="tintColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <state key="normal" title="ENCODE 1">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </state>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="string" keyPath="layer.cornerRadius" value="5"/>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="encode1Clicked:" destination="jQU-O1-Ofc" eventType="primaryActionTriggered" id="LVa-KC-2Lm"/>
+                                    <action selector="runFFmpegAction:" destination="9pv-A4-QxB" eventType="touchUpInside" id="2YU-8K-IFG"/>
+                                    <action selector="runFFmpegAction:" destination="9pv-A4-QxB" eventType="primaryActionTriggered" id="MyL-zJ-rfM"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="249" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PXO-rZ-PXJ" customClass="TvButton">
+                                <rect key="frame" x="350" y="237" width="200" height="32"/>
+                                <color key="backgroundColor" red="0.94117647059999998" green="0.94117647059999998" blue="0.95983767649999996" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="200" id="8yh-hp-kss"/>
+                                    <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="32" id="HXb-f5-osl"/>
+                                    <constraint firstAttribute="height" constant="32" id="L5v-Q3-1f3"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <color key="tintColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <state key="normal" title="ENCODE 2">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </state>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="string" keyPath="layer.cornerRadius" value="5"/>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="encode2Clicked:" destination="jQU-O1-Ofc" eventType="primaryActionTriggered" id="Yps-1i-w3h"/>
+                                    <action selector="runFFmpegAction:" destination="9pv-A4-QxB" eventType="primaryActionTriggered" id="9eD-0P-hmS"/>
+                                    <action selector="runFFmpegAction:" destination="9pv-A4-QxB" eventType="touchUpInside" id="o4x-tt-wFm"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aiX-4j-gRO" customClass="TvButton">
+                                <rect key="frame" x="860" y="237" width="200" height="32"/>
+                                <color key="backgroundColor" red="0.94117647059999998" green="0.94117647059999998" blue="0.95983767649999996" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="32" id="6Qw-zg-plL"/>
+                                    <constraint firstAttribute="height" constant="32" id="YAc-oM-B99"/>
+                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="200" id="gQf-nm-06v"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <color key="tintColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <state key="normal" title="CANCEL 1">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </state>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="string" keyPath="layer.cornerRadius" value="5"/>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="cancel1Button:" destination="jQU-O1-Ofc" eventType="primaryActionTriggered" id="5zo-zJ-aa6"/>
+                                    <action selector="runFFmpegAction:" destination="9pv-A4-QxB" eventType="touchUpInside" id="SVS-yI-c27"/>
+                                    <action selector="runFFmpegAction:" destination="9pv-A4-QxB" eventType="primaryActionTriggered" id="enh-ke-f1U"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="niE-sM-ZEP" customClass="TvButton">
+                                <rect key="frame" x="1140" y="237" width="200" height="32"/>
+                                <color key="backgroundColor" red="0.94117647059999998" green="0.94117647059999998" blue="0.95983767649999996" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="200" id="5xI-cd-diY"/>
+                                    <constraint firstAttribute="height" constant="32" id="WKM-WJ-c3I"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <color key="tintColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <state key="normal" title="CANCEL 2">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </state>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="string" keyPath="layer.cornerRadius" value="5"/>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="cancel2Button:" destination="jQU-O1-Ofc" eventType="primaryActionTriggered" id="XHw-Hc-DlO"/>
+                                    <action selector="runFFmpegAction:" destination="9pv-A4-QxB" eventType="touchUpInside" id="RWd-0P-8lD"/>
+                                    <action selector="runFFmpegAction:" destination="9pv-A4-QxB" eventType="primaryActionTriggered" id="oCD-o3-f22"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0eo-Im-Mar" customClass="TvButton">
+                                <rect key="frame" x="1370" y="237" width="200" height="32"/>
+                                <color key="backgroundColor" red="0.94117647059999998" green="0.94117647059999998" blue="0.95983767649999996" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="32" id="5fM-ww-NoF"/>
+                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="200" id="Ck4-fA-hNj"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <color key="tintColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <state key="normal" title="CANCEL 3">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </state>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="string" keyPath="layer.cornerRadius" value="5"/>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="cancel3Button:" destination="jQU-O1-Ofc" eventType="primaryActionTriggered" id="YZF-Oc-okb"/>
+                                    <action selector="runFFmpegAction:" destination="9pv-A4-QxB" eventType="primaryActionTriggered" id="3xW-gl-Ovf"/>
+                                    <action selector="runFFmpegAction:" destination="9pv-A4-QxB" eventType="touchUpInside" id="93A-cs-xME"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="TLG-f9-I9U" customClass="TvButton">
+                                <rect key="frame" x="1600" y="237" width="200" height="32"/>
+                                <color key="backgroundColor" red="0.94117647059999998" green="0.94117647059999998" blue="0.95983767649999996" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="32" id="2QI-JJ-rxK"/>
+                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="200" id="paT-zo-FZR"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <color key="tintColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <state key="normal" title="CANCEL ALL">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </state>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="string" keyPath="layer.cornerRadius" value="5"/>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="cancelAllButton:" destination="jQU-O1-Ofc" eventType="primaryActionTriggered" id="UMa-NI-aF8"/>
+                                    <action selector="runFFmpegAction:" destination="9pv-A4-QxB" eventType="primaryActionTriggered" id="ZWC-6z-NK4"/>
+                                    <action selector="runFFmpegAction:" destination="9pv-A4-QxB" eventType="touchUpInside" id="m0u-1S-BTU"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="f7O-6x-bsn" customClass="TvButton">
+                                <rect key="frame" x="580" y="237" width="200" height="32"/>
+                                <color key="backgroundColor" red="0.94117647059999998" green="0.94117647059999998" blue="0.95983767649999996" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="32" id="bMY-Ln-tXN"/>
+                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="200" id="xa2-Pz-fW3"/>
+                                    <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="32" id="yO7-l8-Jh0"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <color key="tintColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <state key="normal" title="ENCODE 3">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </state>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="string" keyPath="layer.cornerRadius" value="5"/>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="encode3Clicked:" destination="jQU-O1-Ofc" eventType="primaryActionTriggered" id="FUz-ZS-X6h"/>
+                                    <action selector="runFFmpegAction:" destination="9pv-A4-QxB" eventType="touchUpInside" id="2vb-cm-UBZ"/>
+                                    <action selector="runFFmpegAction:" destination="9pv-A4-QxB" eventType="primaryActionTriggered" id="ehT-wd-dU4"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="cbQ-aT-Gcf" firstAttribute="leading" secondItem="ijY-Sd-6tH" secondAttribute="leading" constant="30" id="0dP-J4-KMY"/>
+                            <constraint firstItem="f7O-6x-bsn" firstAttribute="leading" secondItem="PXO-rZ-PXJ" secondAttribute="trailing" constant="30" id="2O6-vn-rBS"/>
+                            <constraint firstItem="niE-sM-ZEP" firstAttribute="top" secondItem="eFn-Ut-bfl" secondAttribute="bottom" constant="30" id="79W-Ic-9mI"/>
+                            <constraint firstItem="eFn-Ut-bfl" firstAttribute="top" secondItem="ijY-Sd-6tH" secondAttribute="top" id="8aU-Tz-Rjt"/>
+                            <constraint firstItem="aiX-4j-gRO" firstAttribute="centerX" secondItem="f8j-Ks-8wp" secondAttribute="centerX" id="90z-NZ-fjl"/>
+                            <constraint firstItem="cbQ-aT-Gcf" firstAttribute="top" secondItem="niE-sM-ZEP" secondAttribute="bottom" constant="30" id="BzA-8D-9XY"/>
+                            <constraint firstItem="aiX-4j-gRO" firstAttribute="top" secondItem="eFn-Ut-bfl" secondAttribute="bottom" constant="30" id="Enj-mM-1SO"/>
+                            <constraint firstItem="0eo-Im-Mar" firstAttribute="top" secondItem="eFn-Ut-bfl" secondAttribute="bottom" constant="30" id="GMy-hK-xbJ"/>
+                            <constraint firstItem="aiX-4j-gRO" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="f7O-6x-bsn" secondAttribute="trailing" id="J4q-TC-eUv"/>
+                            <constraint firstItem="cbQ-aT-Gcf" firstAttribute="top" secondItem="rvK-Az-k8D" secondAttribute="bottom" constant="30" id="LL6-XC-6t4"/>
+                            <constraint firstItem="ijY-Sd-6tH" firstAttribute="trailing" secondItem="TLG-f9-I9U" secondAttribute="trailing" constant="30" id="LNU-5s-pXn"/>
+                            <constraint firstItem="f7O-6x-bsn" firstAttribute="top" secondItem="eFn-Ut-bfl" secondAttribute="bottom" constant="30" id="ODP-HQ-SN0"/>
+                            <constraint firstItem="PXO-rZ-PXJ" firstAttribute="leading" secondItem="rvK-Az-k8D" secondAttribute="trailing" constant="30" id="R3B-wS-Jey"/>
+                            <constraint firstItem="eFn-Ut-bfl" firstAttribute="leading" secondItem="ijY-Sd-6tH" secondAttribute="leading" id="RnZ-hU-67d"/>
+                            <constraint firstItem="rvK-Az-k8D" firstAttribute="leading" secondItem="ijY-Sd-6tH" secondAttribute="leading" constant="30" id="WJq-dK-EDI"/>
+                            <constraint firstItem="rvK-Az-k8D" firstAttribute="top" secondItem="eFn-Ut-bfl" secondAttribute="bottom" constant="30" id="Xfs-zY-8PK"/>
+                            <constraint firstItem="PXO-rZ-PXJ" firstAttribute="top" secondItem="eFn-Ut-bfl" secondAttribute="bottom" constant="30" id="edY-lv-Dlm"/>
+                            <constraint firstItem="niE-sM-ZEP" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="aiX-4j-gRO" secondAttribute="trailing" id="fMy-hD-B89"/>
+                            <constraint firstItem="ijY-Sd-6tH" firstAttribute="trailing" secondItem="cbQ-aT-Gcf" secondAttribute="trailing" constant="30" id="huV-We-7eE"/>
+                            <constraint firstItem="TLG-f9-I9U" firstAttribute="leading" secondItem="0eo-Im-Mar" secondAttribute="trailing" constant="30" id="inw-hr-5c4"/>
+                            <constraint firstItem="TLG-f9-I9U" firstAttribute="top" secondItem="eFn-Ut-bfl" secondAttribute="bottom" constant="30" id="l9r-LH-sHa"/>
+                            <constraint firstItem="ijY-Sd-6tH" firstAttribute="bottom" secondItem="cbQ-aT-Gcf" secondAttribute="bottom" constant="40" id="mDP-Vs-oCd"/>
+                            <constraint firstItem="0eo-Im-Mar" firstAttribute="leading" secondItem="niE-sM-ZEP" secondAttribute="trailing" constant="30" id="nTU-4H-Iw3"/>
+                            <constraint firstItem="cbQ-aT-Gcf" firstAttribute="top" secondItem="TLG-f9-I9U" secondAttribute="bottom" constant="30" id="pj6-gr-Jcs"/>
+                            <constraint firstItem="ijY-Sd-6tH" firstAttribute="trailing" secondItem="eFn-Ut-bfl" secondAttribute="trailing" id="wOK-fy-KQU"/>
+                            <constraint firstItem="cbQ-aT-Gcf" firstAttribute="top" secondItem="0eo-Im-Mar" secondAttribute="bottom" constant="30" id="zxT-IH-uZP"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="ijY-Sd-6tH"/>
+                    </view>
+                    <tabBarItem key="tabBarItem" title="CONCURRENT EXECUTION" id="7jl-ox-Ex5">
+                        <offsetWrapper key="titlePositionAdjustment" horizontal="0.0" vertical="-16"/>
+                    </tabBarItem>
+                    <connections>
+                        <outlet property="cancel1Button" destination="aiX-4j-gRO" id="SKs-qQ-qS6"/>
+                        <outlet property="cancel2Button" destination="niE-sM-ZEP" id="HjI-hn-0pi"/>
+                        <outlet property="cancel3Button" destination="0eo-Im-Mar" id="SfH-Xy-mcJ"/>
+                        <outlet property="cancelAllButton" destination="TLG-f9-I9U" id="De3-c8-ROx"/>
+                        <outlet property="encode1Button" destination="rvK-Az-k8D" id="XFr-o6-kme"/>
+                        <outlet property="encode2Button" destination="PXO-rZ-PXJ" id="Znv-xc-k2C"/>
+                        <outlet property="encode3Button" destination="f7O-6x-bsn" id="zaK-l8-8DI"/>
+                        <outlet property="header" destination="eFn-Ut-bfl" id="bnV-2d-ohK"/>
+                        <outlet property="outputText" destination="cbQ-aT-Gcf" id="UlW-Br-ueq"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="YEr-Vt-ZPz" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3753" y="1467"/>
         </scene>
     </scenes>
 </document>

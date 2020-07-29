@@ -24,11 +24,16 @@
  */
 
 /*
+ * CHANGES 06.2020
+ * - ignoring signals implemented
+ * - cancel_operation() method signature updated with id
+ * - cancel by execution id implemented
+ *
  * CHANGES 01.2020
  * - ffprobe support changes
  *
  * CHANGES 12.2019
- * - Concurrent execution support
+ * - concurrent execution support
  *
  * CHANGES 08.2018
  * --------------------------------------------------------
@@ -239,6 +244,16 @@ __thread int restore_tty;
 static void free_input_threads(void);
 #endif
 
+extern volatile int handleSIGQUIT;
+extern volatile int handleSIGINT;
+extern volatile int handleSIGTERM;
+extern volatile int handleSIGXCPU;
+extern volatile int handleSIGPIPE;
+
+extern __thread volatile long executionId;
+extern int cancelRequested(long executionId);
+extern void removeExecution(long executionId);
+
 /* sub2video hack:
    Convert subtitles to video with alpha to insert them in filter graphs.
    This is a temporary solution until libavfilter gets real subtitles support.
@@ -402,12 +417,12 @@ void term_exit(void)
     term_exit_sigsafe();
 }
 
-volatile int received_sigterm = 0;
-volatile int received_nb_signals = 0;
+static volatile int received_sigterm = 0;
+static volatile int received_nb_signals = 0;
 __thread atomic_int transcode_init_done = ATOMIC_VAR_INIT(0);
 __thread volatile int ffmpeg_exited = 0;
-__thread int main_ffmpeg_return_code = 0;
-extern __thread int longjmp_value;
+__thread volatile int main_ffmpeg_return_code = 0;
+extern __thread volatile int longjmp_value;
 
 static void
 sigterm_handler(int sig)
@@ -476,17 +491,27 @@ void term_init(void)
 
             tcsetattr (0, TCSANOW, &tty);
         }
-        signal(SIGQUIT, sigterm_handler); /* Quit (POSIX).  */
+        if (handleSIGQUIT == 1) {
+            signal(SIGQUIT, sigterm_handler); /* Quit (POSIX).  */
+        }
     }
 #endif
 
-    signal(SIGINT , sigterm_handler); /* Interrupt (ANSI).    */
-    signal(SIGTERM, sigterm_handler); /* Termination (ANSI).  */
+    if (handleSIGINT == 1) {
+        signal(SIGINT , sigterm_handler); /* Interrupt (ANSI).    */
+    }
+    if (handleSIGTERM == 1) {
+        signal(SIGTERM, sigterm_handler); /* Termination (ANSI).  */
+    }
 #ifdef SIGXCPU
-    signal(SIGXCPU, sigterm_handler);
+    if (handleSIGXCPU == 1) {
+        signal(SIGXCPU, sigterm_handler);
+    }
 #endif
 #ifdef SIGPIPE
-    signal(SIGPIPE, SIG_IGN); /* Broken pipe (POSIX). */
+    if (handleSIGPIPE == 1) {
+        signal(SIGPIPE, SIG_IGN); /* Broken pipe (POSIX). */
+    }
 #endif
 #if HAVE_SETCONSOLECTRLHANDLER
     SetConsoleCtrlHandler((PHANDLER_ROUTINE) CtrlHandler, TRUE);
@@ -701,6 +726,8 @@ static void ffmpeg_cleanup(int ret)
     if (received_sigterm) {
         av_log(NULL, AV_LOG_INFO, "Exiting normally, received signal %d.\n",
                (int) received_sigterm);
+    } else if (cancelRequested(executionId)) {
+        av_log(NULL, AV_LOG_INFO, "Exiting normally, received cancel signal.\n");
     } else if (ret && atomic_load(&transcode_init_done)) {
         av_log(NULL, AV_LOG_INFO, "Conversion failed!\n");
     }
@@ -2362,7 +2389,7 @@ static int ifilter_send_eof(InputFilter *ifilter, int64_t pts)
     if (ifilter->filter) {
 
         /* THIS VALIDATION IS REQUIRED TO COMPLETE CANCELLATION */
-        if (!received_sigterm) {
+        if (!received_sigterm && !cancelRequested(executionId)) {
             ret = av_buffersrc_close(ifilter->filter, pts, AV_BUFFERSRC_FLAG_PUSH);
         }
         if (ret < 0)
@@ -4829,7 +4856,7 @@ static int transcode(void)
         goto fail;
 #endif
 
-    while (!received_sigterm) {
+    while (!received_sigterm && !cancelRequested(executionId)) {
         int64_t cur_time= av_gettime_relative();
 
         /* if 'q' pressed, exits */
@@ -5029,9 +5056,13 @@ void set_report_callback(void (*callback)(int, float, float, int64_t, int, doubl
     report_callback = callback;
 }
 
-void cancel_operation()
+void cancel_operation(long id)
 {
-    sigterm_handler(SIGINT);
+    if (id == 0) {
+        sigterm_handler(SIGINT);
+    } else {
+        removeExecution(id);
+    }
 }
 
 __thread OptionDef *ffmpeg_options = NULL;
@@ -5541,10 +5572,10 @@ int ffmpeg_execute(int argc, char **argv)
         if ((decode_error_stat[0] + decode_error_stat[1]) * max_error_rate < decode_error_stat[1])
             exit_program(69);
 
-        exit_program(received_nb_signals ? 255 : main_ffmpeg_return_code);
+        exit_program((received_nb_signals || cancelRequested(executionId))? 255 : main_ffmpeg_return_code);
 
     } else {
-        main_ffmpeg_return_code = longjmp_value;
+        main_ffmpeg_return_code = (received_nb_signals || cancelRequested(executionId)) ? 255 : longjmp_value;
     }
 
     return main_ffmpeg_return_code;

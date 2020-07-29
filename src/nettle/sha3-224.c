@@ -63,7 +63,7 @@ sha3_224_digest(struct sha3_224_ctx *ctx,
 		size_t length,
 		uint8_t *digest)
 {
-  _sha3_pad (&ctx->state, SHA3_224_BLOCK_SIZE, ctx->block, ctx->index);
+  _sha3_pad_hash (&ctx->state, SHA3_224_BLOCK_SIZE, ctx->block, ctx->index);
   _nettle_write_le64 (length, digest, ctx->state.a);
   sha3_224_init (ctx);
 }

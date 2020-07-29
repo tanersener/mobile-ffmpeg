@@ -20,13 +20,14 @@
 package com.arthenica.mobileffmpeg;
 
 /**
- * <p>Represents statistics data.
+ * <p>Statistics for running executions.
  *
  * @author Taner Sener
  * @since v2.1
  */
 public class Statistics {
 
+    private long executionId;
     private int videoFrameNumber;
     private float videoFps;
     private float videoQuality;
@@ -36,6 +37,7 @@ public class Statistics {
     private double speed;
 
     public Statistics() {
+        executionId = 0;
         videoFrameNumber = 0;
         videoFps = 0;
         videoQuality = 0;
@@ -45,7 +47,8 @@ public class Statistics {
         speed = 0;
     }
 
-    public Statistics(int videoFrameNumber, float videoFps, float videoQuality, long size, int time, double bitrate, double speed) {
+    public Statistics(long executionId, int videoFrameNumber, float videoFps, float videoQuality, long size, int time, double bitrate, double speed) {
+        this.executionId = executionId;
         this.videoFrameNumber = videoFrameNumber;
         this.videoFps = videoFps;
         this.videoQuality = videoQuality;
@@ -57,33 +60,42 @@ public class Statistics {
 
     public void update(final Statistics newStatistics) {
         if (newStatistics != null) {
+            this.executionId = newStatistics.getExecutionId();
             if (newStatistics.getVideoFrameNumber() > 0) {
                 this.videoFrameNumber = newStatistics.getVideoFrameNumber();
             }
-            if (newStatistics.getVideoFps() > 0){
+            if (newStatistics.getVideoFps() > 0) {
                 this.videoFps = newStatistics.getVideoFps();
             }
 
-            if (newStatistics.getVideoQuality() > 0){
+            if (newStatistics.getVideoQuality() > 0) {
                 this.videoQuality = newStatistics.getVideoQuality();
             }
 
-            if (newStatistics.getSize() > 0){
+            if (newStatistics.getSize() > 0) {
                 this.size = newStatistics.getSize();
             }
 
-            if (newStatistics.getTime() > 0){
+            if (newStatistics.getTime() > 0) {
                 this.time = newStatistics.getTime();
             }
 
-            if (newStatistics.getBitrate() > 0){
+            if (newStatistics.getBitrate() > 0) {
                 this.bitrate = newStatistics.getBitrate();
             }
 
-            if (newStatistics.getSpeed() > 0){
+            if (newStatistics.getSpeed() > 0) {
                 this.speed = newStatistics.getSpeed();
             }
         }
+    }
+
+    public long getExecutionId() {
+        return executionId;
+    }
+
+    public void setExecutionId(long executionId) {
+        this.executionId = executionId;
     }
 
     public int getVideoFrameNumber() {
@@ -140,6 +152,32 @@ public class Statistics {
 
     public void setSpeed(double speed) {
         this.speed = speed;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder stringBuilder = new StringBuilder();
+
+        stringBuilder.append("Statistics{");
+        stringBuilder.append("executionId=");
+        stringBuilder.append(executionId);
+        stringBuilder.append(", videoFrameNumber=");
+        stringBuilder.append(videoFrameNumber);
+        stringBuilder.append(", videoFps=");
+        stringBuilder.append(videoFps);
+        stringBuilder.append(", videoQuality=");
+        stringBuilder.append(videoQuality);
+        stringBuilder.append(", size=");
+        stringBuilder.append(size);
+        stringBuilder.append(", time=");
+        stringBuilder.append(time);
+        stringBuilder.append(", bitrate=");
+        stringBuilder.append(bitrate);
+        stringBuilder.append(", speed=");
+        stringBuilder.append(speed);
+        stringBuilder.append('}');
+
+        return stringBuilder.toString();
     }
 
 }

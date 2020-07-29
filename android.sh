@@ -41,34 +41,36 @@ LIBRARY_TWOLAME=29
 LIBRARY_SDL=30
 LIBRARY_TESSERACT=31
 LIBRARY_OPENH264=32
-LIBRARY_GIFLIB=33
-LIBRARY_JPEG=34
-LIBRARY_LIBOGG=35
-LIBRARY_LIBPNG=36
-LIBRARY_LIBUUID=37
-LIBRARY_NETTLE=38
-LIBRARY_TIFF=39
-LIBRARY_EXPAT=40
-LIBRARY_SNDFILE=41
-LIBRARY_LEPTONICA=42
-LIBRARY_LIBSAMPLERATE=43
-LIBRARY_ZLIB=44
-LIBRARY_MEDIA_CODEC=45
+LIBRARY_VO_AMRWBENC=33
+LIBRARY_GIFLIB=34
+LIBRARY_JPEG=35
+LIBRARY_LIBOGG=36
+LIBRARY_LIBPNG=37
+LIBRARY_LIBUUID=38
+LIBRARY_NETTLE=39
+LIBRARY_TIFF=40
+LIBRARY_EXPAT=41
+LIBRARY_SNDFILE=42
+LIBRARY_LEPTONICA=43
+LIBRARY_LIBSAMPLERATE=44
+LIBRARY_ZLIB=45
+LIBRARY_MEDIA_CODEC=46
+LIBRARY_CPU_FEATURES=47
 
 # ENABLE ARCH
 ENABLED_ARCHITECTURES=(1 1 1 1 1)
 
 # ENABLE LIBRARIES
-ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1)
 
 export BASEDIR=$(pwd)
-export MOBILE_FFMPEG_TMPDIR="${BASEDIR}/.tmp"
 
 # USING API LEVEL 24 / Android 7.0 (NOUGAT)
 export API=24
 
 RECONF_LIBRARIES=()
 REBUILD_LIBRARIES=()
+REDOWNLOAD_LIBRARIES=()
 
 get_mobile_ffmpeg_version() {
   local MOBILE_FFMPEG_VERSION=$(grep '#define MOBILE_FFMPEG_VERSION' ${BASEDIR}/android/app/src/main/cpp/mobileffmpeg.h | grep -Eo '\".*\"' | sed -e 's/\"//g')
@@ -99,7 +101,7 @@ When compilation ends an Android Archive (AAR) file is created under the prebuil
 
   echo -e "Licensing options:"
 
-  echo -e "  --enable-gpl\t\t\tallow use of GPL libraries, resulting libs will be licensed under GPLv3.0 [no]\n"
+  echo -e "  --enable-gpl\t\t\tallow use of GPL libraries, created libs will be licensed under GPLv3.0 [no]\n"
 
   echo -e "Platforms:"
 
@@ -141,6 +143,7 @@ When compilation ends an Android Archive (AAR) file is created under the prebuil
   echo -e "  --enable-speex\t\tbuild with speex [no]"
   echo -e "  --enable-tesseract\t\tbuild with tesseract [no]"
   echo -e "  --enable-twolame\t\tbuild with twolame [no]"
+  echo -e "  --enable-vo-amrwbenc\t\tbuild with vo-amrwbenc [no]"
   echo -e "  --enable-wavpack\t\tbuild with wavpack [no]\n"
 
   echo -e "GPL libraries:"
@@ -154,6 +157,7 @@ When compilation ends an Android Archive (AAR) file is created under the prebuil
   echo -e "Advanced options:"
 
   echo -e "  --reconf-LIBRARY\t\trun autoreconf before building LIBRARY [no]"
+  echo -e "  --redownload-LIBRARY\t\tdownload LIBRARY even it is detected as already downloaded [no]"
   echo -e "  --rebuild-LIBRARY\t\tbuild LIBRARY even it is detected as already built [no]\n"
 }
 
@@ -211,7 +215,7 @@ reconf_library() {
   local RECONF_VARIABLE=$(echo "RECONF_$1" | sed "s/\-/\_/g")
   local library_supported=0
 
-  for library in {1..44}; do
+  for library in {1..45}; do
     library_name=$(get_library_name $((library - 1)))
 
     if [[ $1 != "ffmpeg" ]] && [[ ${library_name} == $1 ]]; then
@@ -230,8 +234,8 @@ rebuild_library() {
   local REBUILD_VARIABLE=$(echo "REBUILD_$1" | sed "s/\-/\_/g")
   local library_supported=0
 
-  for library in {1..44}; do
-    library_name=$(get_library_name $((library - 1)))
+  for library in {0..47}; do
+    library_name=$(get_library_name ${library})
 
     if [[ $1 != "ffmpeg" ]] && [[ ${library_name} == $1 ]]; then
       export ${REBUILD_VARIABLE}=1
@@ -242,6 +246,31 @@ rebuild_library() {
 
   if [[ ${library_supported} -eq 0 ]]; then
     echo -e "INFO: --rebuild flag detected for library $1 is not supported.\n" 1>>${BASEDIR}/build.log 2>&1
+  fi
+}
+
+redownload_library() {
+  local REDOWNLOAD_VARIABLE=$(echo "REDOWNLOAD_$1" | sed "s/\-/\_/g")
+  local library_supported=0
+
+  for library in {0..47}; do
+    library_name=$(get_library_name ${library})
+
+    if [[ ${library_name} == $1 ]]; then
+      export ${REDOWNLOAD_VARIABLE}=1
+      REDOWNLOAD_LIBRARIES+=($1)
+      library_supported=1
+    fi
+  done
+
+  if [[ "ffmpeg" == $1 ]]; then
+    export ${REDOWNLOAD_VARIABLE}=1
+    REDOWNLOAD_LIBRARIES+=($1)
+    library_supported=1
+  fi
+
+  if [[ ${library_supported} -eq 0 ]]; then
+    echo -e "INFO: --redownload flag detected for library $1 is not supported.\n" 1>>${BASEDIR}/build.log 2>&1
   fi
 }
 
@@ -384,6 +413,9 @@ set_library() {
     ENABLED_LIBRARIES[LIBRARY_TWOLAME]=$2
     ENABLED_LIBRARIES[LIBRARY_SNDFILE]=$2
     ;;
+  vo-amrwbenc)
+    ENABLED_LIBRARIES[LIBRARY_VO_AMRWBENC]=$2
+    ;;
   wavpack)
     ENABLED_LIBRARIES[LIBRARY_WAVPACK]=$2
     ;;
@@ -481,19 +513,7 @@ print_enabled_libraries() {
 
   let enabled=0
 
-  # FIRST BUILT-IN LIBRARIES
-  for library in {44..45}; do
-    if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
-      if [[ ${enabled} -ge 1 ]]; then
-        echo -n ", "
-      fi
-      echo -n $(get_library_name $library)
-      enabled=$((${enabled} + 1))
-    fi
-  done
-
-  # THEN EXTERNAL LIBRARIES
-  for library in {0..32}; do
+  for library in {45..47} {0..33}; do
     if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
       if [[ ${enabled} -ge 1 ]]; then
         echo -n ", "
@@ -550,6 +570,26 @@ print_rebuild_requested_libraries() {
   fi
 }
 
+print_redownload_requested_libraries() {
+  local counter=0
+
+  for REDOWNLOAD_LIBRARY in "${REDOWNLOAD_LIBRARIES[@]}"; do
+    if [[ ${counter} -eq 0 ]]; then
+      echo -n "Redownload: "
+    else
+      echo -n ", "
+    fi
+
+    echo -n ${REDOWNLOAD_LIBRARY}
+
+    counter=$((${counter} + 1))
+  done
+
+  if [[ ${counter} -gt 0 ]]; then
+    echo ""
+  fi
+}
+
 build_application_mk() {
   if [[ ! -z ${MOBILE_FFMPEG_LTS_BUILD} ]]; then
     local LTS_BUILD_FLAG="-DMOBILE_FFMPEG_LTS "
@@ -559,8 +599,6 @@ build_application_mk() {
     local APP_STL="c++_shared"
   else
     local APP_STL="none"
-
-    ${SED_INLINE} 's/c++_shared //g' ${BASEDIR}/android/jni/Android.mk 1>>${BASEDIR}/build.log 2>&1
   fi
 
   local BUILD_DATE="-DMOBILE_FFMPEG_BUILD_DATE=$(date +%Y%m%d 2>>${BASEDIR}/build.log)"
@@ -582,13 +620,23 @@ APP_LDFLAGS := -Wl,--hash-style=both
 EOF
 }
 
+if [[ -z ${ANDROID_NDK_ROOT} ]]; then
+  echo "ANDROID_NDK_ROOT not defined"
+  exit 1
+fi
+
+if [[ -z ${ANDROID_HOME} ]]; then
+  echo "ANDROID_HOME not defined"
+  exit 1
+fi
+
 # ENABLE COMMON FUNCTIONS
 . ${BASEDIR}/build/android-common.sh
 
 DETECTED_NDK_VERSION=$(grep -Eo Revision.* ${ANDROID_NDK_ROOT}/source.properties | sed 's/Revision//g;s/=//g;s/ //g')
 
 echo -e "\nINFO: Using Android NDK v${DETECTED_NDK_VERSION} provided at ${ANDROID_NDK_ROOT}\n" 1>>${BASEDIR}/build.log 2>&1
-echo -e "INFO: Build options: $@\n" 1>>${BASEDIR}/build.log 2>&1
+echo -e "INFO: Build options: $*\n" 1>>${BASEDIR}/build.log 2>&1
 
 # CLEAR OLD NATIVE LIBS
 rm -rf ${BASEDIR}/android/libs 1>>${BASEDIR}/build.log 2>&1
@@ -597,6 +645,7 @@ rm -rf ${BASEDIR}/android/obj 1>>${BASEDIR}/build.log 2>&1
 GPL_ENABLED="no"
 DISPLAY_HELP=""
 BUILD_LTS=""
+BUILD_FULL=""
 BUILD_TYPE_ID=""
 BUILD_VERSION=$(git describe --tags 2>>${BASEDIR}/build.log)
 
@@ -648,12 +697,13 @@ while [ ! $# -eq 0 ]; do
 
     rebuild_library ${BUILD_LIBRARY}
     ;;
+  --redownload-*)
+    DOWNLOAD_LIBRARY=$(echo $1 | sed -e 's/^--[A-Za-z]*-//g')
+
+    redownload_library ${DOWNLOAD_LIBRARY}
+    ;;
   --full)
-    for library in {0..45}; do
-      if [[ $library -ne 18 ]] && [[ $library -ne 19 ]] && [[ $library -ne 20 ]] && [[ $library -ne 21 ]] && [[ $library -ne 22 ]]; then
-        enable_library $(get_library_name $library)
-      fi
-    done
+    BUILD_FULL="1"
     ;;
   --enable-gpl)
     GPL_ENABLED="yes"
@@ -699,14 +749,16 @@ if [[ ! -z ${DISPLAY_HELP} ]]; then
   exit 0
 fi
 
-if [[ -z ${ANDROID_NDK_ROOT} ]]; then
-  echo "ANDROID_NDK_ROOT not defined"
-  exit 1
-fi
-
-if [[ -z ${ANDROID_HOME} ]]; then
-  echo "ANDROID_HOME not defined"
-  exit 1
+if [[ -n ${BUILD_FULL} ]]; then
+  for library in {0..46}; do
+    if [ ${GPL_ENABLED} == "yes" ]; then
+      enable_library $(get_library_name $library)
+    else
+      if [[ $library -ne 18 ]] && [[ $library -ne 19 ]] && [[ $library -ne 20 ]] && [[ $library -ne 21 ]] && [[ $library -ne 22 ]]; then
+        enable_library $(get_library_name $library)
+      fi
+    fi
+  done
 fi
 
 if [[ -z ${BUILD_VERSION} ]]; then
@@ -730,8 +782,9 @@ print_enabled_architectures
 print_enabled_libraries
 print_reconfigure_requested_libraries
 print_rebuild_requested_libraries
+print_redownload_requested_libraries
 
-# CHECKING GPL LIBRARIES
+# CHECK GPL LIBRARIES
 for gpl_library in {18,19,20,21,22}; do
   if [[ ${ENABLED_LIBRARIES[$gpl_library]} -eq 1 ]]; then
     library_name=$(get_library_name ${gpl_library})
@@ -756,7 +809,7 @@ export ORIGINAL_API=${API}
 
 for run_arch in {0..4}; do
   if [[ ${ENABLED_ARCHITECTURES[$run_arch]} -eq 1 ]]; then
-    if [[ (${run_arch} -eq ${ARCH_ARM64_V8A} || ${run_arch} -eq ${ARCH_X86_64}) && ${API} < 21 ]]; then
+    if [[ (${run_arch} -eq ${ARCH_ARM64_V8A} || ${run_arch} -eq ${ARCH_X86_64}) && ${API} -lt 21 ]]; then
 
       # 64 bit ABIs supported after API 21
       export API=21
@@ -771,8 +824,8 @@ for run_arch in {0..4}; do
     . ${BASEDIR}/build/main-android.sh "${ENABLED_LIBRARIES[@]}" || exit 1
 
     # CLEAR FLAGS
-    for library in {1..46}; do
-      library_name=$(get_library_name $((library - 1)))
+    for library in {0..47}; do
+      library_name=$(get_library_name ${library})
       unset $(echo "OK_${library_name}" | sed "s/\-/\_/g")
       unset $(echo "DEPENDENCY_REBUILT_${library_name}" | sed "s/\-/\_/g")
     done

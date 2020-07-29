@@ -25,9 +25,8 @@ EXTRA_DIST = \
 	vorbis-uninstalled.pc.in \
 	vorbisenc-uninstalled.pc.in \
 	vorbisfile-uninstalled.pc.in \
-	symbian \
-	macosx win32
-
+	symbian macosx win32 \
+	CMakeLists.txt cmake/FindOgg.cmake cmake/VorbisConfig.cmake.in
 
 DISTCHECK_CONFIGURE_FLAGS = --enable-docs
 

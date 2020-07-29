@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Taner Sener
+ * Copyright (c) 2018, 2020 Taner Sener
  *
  * This file is part of MobileFFmpeg.
  *
@@ -19,263 +19,144 @@
 
 #include "StreamInformation.h"
 
+#define KEY_INDEX @"index"
+#define KEY_TYPE @"codec_type"
+#define KEY_CODEC @"codec_name"
+#define KEY_CODEC_LONG @"codec_long_name"
+#define KEY_FORMAT @"pix_fmt"
+#define KEY_WIDTH @"width"
+#define KEY_HEIGHT @"height"
+#define KEY_BIT_RATE @"bit_rate"
+#define KEY_SAMPLE_RATE @"sample_rate"
+#define KEY_SAMPLE_FORMAT @"sample_fmt"
+#define KEY_CHANNEL_LAYOUT @"channel_layout"
+#define KEY_SAMPLE_ASPECT_RATIO @"sample_aspect_ratio"
+#define KEY_DISPLAY_ASPECT_RATIO @"display_aspect_ratio"
+#define KEY_AVERAGE_FRAME_RATE @"avg_frame_rate"
+#define KEY_REAL_FRAME_RATE @"r_frame_rate"
+#define KEY_TIME_BASE @"time_base"
+#define KEY_CODEC_TIME_BASE @"codec_time_base"
+#define KEY_TAGS @"tags"
+
 @implementation StreamInformation {
 
     /**
-     * Stream index
+     * Stores all properties.
      */
-    NSNumber *index;
-    
-    NSString *type;
-    NSString *codec;
-    NSString *fullCodec;
-    NSString *format;
-    NSString *fullFormat;
-    
-    NSNumber *width;
-    NSNumber *height;
-    
-    NSNumber *bitrate;
-    NSNumber *sampleRate;
-    NSString *sampleFormat;
-    NSString *channelLayout;
-    
-    /**
-     * SAR
-     */
-    NSString *sampleAspectRatio;
-    
-    /**
-     * DAR
-     */
-    NSString *displayAspectRatio;
-    
-    /**
-     * fps
-     */
-    NSString *averageFrameRate;
-    
-    /**
-     * tbr
-     */
-    NSString *realFrameRate;
-    
-    /**
-     * tbn
-     */
-    NSString *timeBase;
-    
-    /**
-     * tbc
-     */
-    NSString *codecTimeBase;
-    
-    /**
-     * Metadata map
-     */
-    NSMutableDictionary *metadata;
-
-    /**
-     * Side data map
-     */
-    NSMutableDictionary *sidedata;
+    NSDictionary *dictionary;
 
 }
 
-- (instancetype)init {
+- (instancetype)init:(NSDictionary*)streamDictionary {
     self = [super init];
     if (self) {
-        index = nil;
-        type = nil;
-        codec = nil;
-        fullCodec = nil;
-        format = nil;
-        fullFormat = nil;
-        width = nil;
-        height = nil;
-        bitrate = nil;
-        sampleRate = nil;
-        sampleFormat = nil;
-        channelLayout = nil;
-        sampleAspectRatio = nil;
-        displayAspectRatio = nil;
-        averageFrameRate = nil;
-        realFrameRate = nil;
-        timeBase = nil;
-        codecTimeBase = nil;
-        metadata = [[NSMutableDictionary alloc] init];
-        sidedata = [[NSMutableDictionary alloc] init];
+        dictionary = streamDictionary;
     }
-    
+
     return self;
 }
 
 - (NSNumber*)getIndex {
-    return index;
-}
-
-- (void)setIndex:(NSNumber*) newIndex {
-    index = newIndex;
+    return [self getNumberProperty:KEY_INDEX];
 }
 
 - (NSString*)getType {
-    return type;
-}
-
-- (void)setType:(NSString*) newType {
-    type = newType;
+    return [self getStringProperty:KEY_TYPE];
 }
 
 - (NSString*)getCodec {
-    return codec;
-}
-
-- (void)setCodec:(NSString*) newCodec {
-    codec = newCodec;
+    return [self getStringProperty:KEY_CODEC];
 }
 
 - (NSString*)getFullCodec {
-    return fullCodec;
-}
-
-- (void)setFullCodec:(NSString*) newFullCodec {
-    fullCodec = newFullCodec;
+    return [self getStringProperty:KEY_CODEC_LONG];
 }
 
 - (NSString*)getFormat {
-    return format;
-}
-
-- (void)setFormat:(NSString*) newFormat {
-    format = newFormat;
-}
-
-- (NSString*)getFullFormat {
-    return fullFormat;
-}
-
-- (void)setFullFormat:(NSString*) newFullFormat {
-    fullFormat = newFullFormat;
+    return [self getStringProperty:KEY_FORMAT];
 }
 
 - (NSNumber*)getWidth {
-    return width;
-}
-
-- (void)setWidth:(NSNumber*) newWidth {
-    width = newWidth;
+    return [self getNumberProperty:KEY_WIDTH];
 }
 
 - (NSNumber*)getHeight {
-    return height;
+    return [self getNumberProperty:KEY_HEIGHT];
 }
 
-- (void)setHeight:(NSNumber*) newHeight {
-    height = newHeight;
+- (NSString*)getBitrate {
+    return [self getStringProperty:KEY_BIT_RATE];
 }
 
-- (NSNumber*)getBitrate {
-    return bitrate;
-}
-
-- (void)setBitrate:(NSNumber*) newBitrate {
-    bitrate = newBitrate;
-}
-
-- (NSNumber*)getSampleRate {
-    return sampleRate;
-}
-
-- (void)setSampleRate:(NSNumber*) newSampleRate {
-    sampleRate = newSampleRate;
+- (NSString*)getSampleRate {
+    return [self getStringProperty:KEY_SAMPLE_RATE];
 }
 
 - (NSString*)getSampleFormat {
-    return sampleFormat;
-}
-
-- (void)setSampleFormat:(NSString*) newSampleFormat {
-    sampleFormat = newSampleFormat;
+    return [self getStringProperty:KEY_SAMPLE_FORMAT];
 }
 
 - (NSString*)getChannelLayout {
-    return channelLayout;
-}
-
-- (void)setChannelLayout:(NSString*) newChannelLayout {
-    channelLayout = newChannelLayout;
+    return [self getStringProperty:KEY_CHANNEL_LAYOUT];
 }
 
 - (NSString*)getSampleAspectRatio {
-    return sampleAspectRatio;
-}
-
-- (void)setSampleAspectRatio:(NSString*) newSampleAspectRatio {
-    sampleAspectRatio = newSampleAspectRatio;
+    return [self getStringProperty:KEY_SAMPLE_ASPECT_RATIO];
 }
 
 - (NSString*)getDisplayAspectRatio {
-    return displayAspectRatio;
-}
-
-- (void)setDisplayAspectRatio:(NSString*) newDisplayAspectRatio {
-    displayAspectRatio = newDisplayAspectRatio;
+    return [self getStringProperty:KEY_DISPLAY_ASPECT_RATIO];
 }
 
 - (NSString*)getAverageFrameRate {
-    return averageFrameRate;
-}
-
-- (void)setAverageFrameRate:(NSString*) newAverageFrameRate {
-    averageFrameRate = newAverageFrameRate;
+    return [self getStringProperty:KEY_AVERAGE_FRAME_RATE];
 }
 
 - (NSString*)getRealFrameRate {
-    return realFrameRate;
-}
-
-- (void)setRealFrameRate:(NSString*) newRealFrameRate {
-    realFrameRate = newRealFrameRate;
+    return [self getStringProperty:KEY_REAL_FRAME_RATE];
 }
 
 - (NSString*)getTimeBase {
-    return timeBase;
-}
-
-- (void)setTimeBase:(NSString*) newTimeBase {
-    timeBase = newTimeBase;
+    return [self getStringProperty:KEY_TIME_BASE];
 }
 
 - (NSString*)getCodecTimeBase {
-    return codecTimeBase;
+    return [self getStringProperty:KEY_CODEC_TIME_BASE];
 }
 
-- (void)setCodecTimeBase:(NSString*) newCodecTimeBase {
-    codecTimeBase = newCodecTimeBase;
+- (NSDictionary*)getTags {
+    return [self getProperties:KEY_TAGS];
 }
 
-- (void)addMetadata:(NSString*)key :(NSString*)value {
-    metadata[key] = value;
+- (NSString*)getStringProperty:(NSString*)key {
+    NSDictionary* allProperties = [self getAllProperties];
+    if (allProperties == nil) {
+        return nil;
+    }
+
+    return allProperties[key];
 }
 
-- (NSString*)getMetadata:(NSString*)key {
-    return metadata[key];
+- (NSNumber*)getNumberProperty:(NSString*)key {
+    NSDictionary* mediaProperties = [self getAllProperties];
+    if (mediaProperties == nil) {
+        return nil;
+    }
+
+    return mediaProperties[key];
 }
 
-- (NSDictionary*)getMetadataEntries {
-    return metadata;
+- (NSDictionary*)getProperties:(NSString*)key {
+    NSDictionary* allProperties = [self getAllProperties];
+    if (allProperties == nil) {
+        return nil;
+    }
+
+    return allProperties[key];
 }
 
-- (void)addSidedata:(NSString*)key :(NSString*)value {
-    sidedata[key] = value;
-}
-
-- (NSString*)getSidedata:(NSString*)key {
-    return sidedata[key];
-}
-
-- (NSDictionary*)getSidedataEntries {
-    return sidedata;
+- (NSDictionary*)getAllProperties {
+    return dictionary;
 }
 
 @end

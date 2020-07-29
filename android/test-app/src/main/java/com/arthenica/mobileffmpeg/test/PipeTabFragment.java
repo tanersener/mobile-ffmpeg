@@ -35,6 +35,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.arthenica.mobileffmpeg.Config;
+import com.arthenica.mobileffmpeg.ExecuteCallback;
 import com.arthenica.mobileffmpeg.LogCallback;
 import com.arthenica.mobileffmpeg.LogMessage;
 import com.arthenica.mobileffmpeg.Statistics;
@@ -42,7 +43,6 @@ import com.arthenica.mobileffmpeg.StatisticsCallback;
 import com.arthenica.mobileffmpeg.util.AsyncCatImageTask;
 import com.arthenica.mobileffmpeg.util.DialogUtil;
 import com.arthenica.mobileffmpeg.util.ResourcesUtil;
-import com.arthenica.mobileffmpeg.util.SingleExecuteCallback;
 import com.arthenica.smartexception.java.Exceptions;
 
 import java.io.File;
@@ -108,7 +108,7 @@ public class PipeTabFragment extends Fragment {
 
             @Override
             public void apply(final Statistics newStatistics) {
-                MainActivity.addUIAction(new Callable() {
+                MainActivity.addUIAction(new Callable<Object>() {
 
                     @Override
                     public Object call() {
@@ -155,17 +155,17 @@ public class PipeTabFragment extends Fragment {
 
             final String ffmpegCommand = Video.generateCreateVideoWithPipesScript(pipe1, pipe2, pipe3, videoFile.getAbsolutePath());
 
-            Log.d(TAG, String.format("FFmpeg process started with arguments\n'%s'", ffmpegCommand));
+            Log.d(TAG, String.format("FFmpeg process started with arguments\n'%s'.", ffmpegCommand));
 
-            MainActivity.executeAsync(new SingleExecuteCallback() {
+            MainActivity.executeAsync(new ExecuteCallback() {
 
                 @Override
-                public void apply(final int returnCode, final String commandOutput) {
-                    Log.d(TAG, String.format("FFmpeg process exited with rc %d", returnCode));
+                public void apply(final long executionId, final int returnCode) {
+                    Log.d(TAG, String.format("FFmpeg process exited with rc %d.", returnCode));
 
                     hideProgressDialog();
 
-                    MainActivity.addUIAction(new Callable() {
+                    MainActivity.addUIAction(new Callable<Object>() {
 
                         @Override
                         public Object call() {
@@ -174,7 +174,7 @@ public class PipeTabFragment extends Fragment {
                                 playVideo();
                             } else {
                                 Popup.show(requireContext(), "Create failed. Please check log for the details.");
-                                Log.d(TAG, String.format("Create failed with rc=%d", returnCode));
+                                Log.d(TAG, String.format("Create failed with rc=%d.", returnCode));
                             }
 
                             return null;
@@ -189,7 +189,7 @@ public class PipeTabFragment extends Fragment {
             startAsyncCatImageProcess(image3File.getAbsolutePath(), pipe3);
 
         } catch (IOException e) {
-            Log.e(TAG, String.format("Create video failed %s", Exceptions.getStackTraceString(e)));
+            Log.e(TAG, String.format("Create video failed %s.", Exceptions.getStackTraceString(e)));
             Popup.show(requireContext(), "Create video failed");
         }
     }
@@ -251,7 +251,7 @@ public class PipeTabFragment extends Fragment {
 
             TextView textView = progressDialog.findViewById(R.id.progressDialogText);
             if (textView != null) {
-                textView.setText(String.format("Creating video: %% %s", completePercentage));
+                textView.setText(String.format("Creating video: %% %s.", completePercentage));
             }
         }
     }
@@ -259,7 +259,7 @@ public class PipeTabFragment extends Fragment {
     protected void hideProgressDialog() {
         progressDialog.dismiss();
 
-        MainActivity.addUIAction(new Callable() {
+        MainActivity.addUIAction(new Callable<Object>() {
 
             @Override
             public Object call() {

@@ -269,6 +269,8 @@ static void encode_transform_coeff(encoder_state_t * const state,
     if (state->must_code_qp_delta) {
       const int qp_pred      = kvz_get_cu_ref_qp(state, x_cu, y_cu, state->last_qp);
       const int qp_delta     = cur_cu->qp - qp_pred;
+      assert(KVZ_BIT_DEPTH == 8 && "This range applies only to 8-bit encoding.");
+      assert(qp_delta >= -26 && qp_delta <= 25 && "QP delta not in valid range [-26, 25]."); // This range applies only to 8-bit encoding
       const int qp_delta_abs = ABS(qp_delta);
       cabac_data_t* cabac    = &state->cabac;
 

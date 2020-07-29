@@ -3,82 +3,13 @@
 #include "cmac.h"
 
 #define test_cmac_aes128(key, msg, ref)					\
-  test_cmac_hash ((nettle_set_key_func*) cmac_aes128_set_key,		\
-		  (nettle_hash_update_func*) cmac_aes128_update,	\
-		  (nettle_hash_digest_func*) cmac_aes128_digest,	\
-		  sizeof(struct cmac_aes128_ctx),			\
-		  key, msg, ref)
+  test_mac(&nettle_cmac_aes128, key, msg, ref)
 
 #define test_cmac_aes256(key, msg, ref)					\
-  test_cmac_hash ((nettle_set_key_func*) cmac_aes256_set_key,		\
-		  (nettle_hash_update_func*) cmac_aes256_update,	\
-		  (nettle_hash_digest_func*) cmac_aes256_digest,	\
-		  sizeof(struct cmac_aes256_ctx),			\
-		  key, msg, ref)
+  test_mac(&nettle_cmac_aes256, key, msg, ref)
 
-static void
-test_cmac_hash (nettle_set_key_func *set_key,
-		nettle_hash_update_func *update,
-		nettle_hash_digest_func *digest, size_t ctx_size,
-		const struct tstring *key, const struct tstring *msg,
-		const struct tstring *ref)
-{
-  void *ctx;
-  uint8_t hash[16];
-  unsigned i;
-
-  ctx = xalloc(ctx_size);
-
-  ASSERT (ref->length == sizeof(hash));
-  ASSERT (key->length == 16 || key->length == 32);
-  set_key (ctx, key->data);
-  update (ctx, msg->length, msg->data);
-  digest (ctx, sizeof(hash), hash);
-  if (!MEMEQ (ref->length, ref->data, hash))
-    {
-      fprintf (stderr, "cmac_hash failed, msg: ");
-      print_hex (msg->length, msg->data);
-      fprintf(stderr, "Output:");
-      print_hex (16, hash);
-      fprintf(stderr, "Expected:");
-      tstring_print_hex(ref);
-      fprintf(stderr, "\n");
-      FAIL();
-    }
-
-  /* attempt to re-use the structure */
-  update (ctx, msg->length, msg->data);
-  digest (ctx, sizeof(hash), hash);
-  if (!MEMEQ (ref->length, ref->data, hash))
-    {
-      fprintf (stderr, "cmac_hash failed on re-use, msg: ");
-      print_hex (msg->length, msg->data);
-      fprintf(stderr, "Output:");
-      print_hex (16, hash);
-      fprintf(stderr, "Expected:");
-      tstring_print_hex(ref);
-      fprintf(stderr, "\n");
-      FAIL();
-    }
-
-  /* attempt byte-by-byte hashing */
-  set_key (ctx, key->data);
-  for (i=0;i<msg->length;i++)
-    update (ctx, 1, msg->data+i);
-  digest (ctx, sizeof(hash), hash);
-  if (!MEMEQ (ref->length, ref->data, hash))
-    {
-      fprintf (stderr, "cmac_hash failed on byte-by-byte, msg: ");
-      print_hex (msg->length, msg->data);
-      fprintf(stderr, "Output:");
-      print_hex (16, hash);
-      fprintf(stderr, "Expected:");
-      tstring_print_hex(ref);
-      fprintf(stderr, "\n");
-      FAIL();
-    }
-  free (ctx);
-}
+#define test_cmac_des3(key, msg, ref)					\
+  test_mac(&nettle_cmac_des3, key, msg, ref)
 
 void
 test_main(void)
@@ -144,4 +75,21 @@ test_main(void)
 		  SHEX("6bc1bee22e409f96e93d7e117393172aae2d8a571e03ac9c9eb76fac45af8e5130c81c46a35ce411e5fbc1191a0a52eff69f2445df4f9b17ad2b417be66c3710"),
 		  SHEX("e1992190549f6ed5696a2c056c315410"));
 
+  /* CMAC-3DES vectors from NIST SP800-38B examples */
+  test_cmac_des3 (SHEX("0123456789abcdef23456789abcdef01456789abcdef0123"),
+		  SDATA(""),
+		  SHEX("7db0d37df936c550"));
+
+  test_cmac_des3 (SHEX("0123456789abcdef23456789abcdef01456789abcdef0123"),
+		  SHEX("6bc1bee22e409f96e93d7e117393172a"),
+		  SHEX("30239cf1f52e6609"));
+
+  test_cmac_des3 (SHEX("0123456789abcdef23456789abcdef01456789abcdef0123"),
+		  SHEX("6bc1bee22e409f96e93d7e117393172aae2d8a57"),
+		  SHEX("6c9f3ee4923f6be2"));
+
+
+  test_cmac_des3 (SHEX("0123456789abcdef23456789abcdef01456789abcdef0123"),
+		  SHEX("6bc1bee22e409f96e93d7e117393172aae2d8a571e03ac9c9eb76fac45af8e51"),
+		  SHEX("99429bd0bf7904e5"));
 }

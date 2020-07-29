@@ -38,6 +38,8 @@
 #include "nettle-meta.h"
 
 const struct nettle_hash * const _nettle_hashes[] = {
+  &nettle_gosthash94,
+  &nettle_gosthash94cp,
   &nettle_md2,
   &nettle_md4,
   &nettle_md5,

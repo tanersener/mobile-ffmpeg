@@ -76,7 +76,7 @@ esac
 CONFIGURE_POSTFIX=""
 HIGH_PRIORITY_INCLUDES=""
 
-for library in {1..46}
+for library in {1..49}
 do
     if [[ ${!library} -eq 1 ]]; then
         ENABLED_LIBRARY=$(get_library_name $((library - 1)))
@@ -163,7 +163,7 @@ do
             libvpx)
                 CFLAGS+=" $(pkg-config --cflags vpx)"
                 LDFLAGS+=" $(pkg-config --libs vpx)"
-                LDFLAGS+=" $(pkg-config --libs --static cpufeatures)"
+                LDFLAGS+=" $(pkg-config --libs cpu-features)"
                 CONFIGURE_POSTFIX+=" --enable-libvpx"
             ;;
             libwebp)
@@ -178,11 +178,8 @@ do
             ;;
             opencore-amr)
                 CFLAGS+=" $(pkg-config --cflags opencore-amrnb)"
-                CFLAGS+=" $(pkg-config --cflags opencore-amrwb)"
                 LDFLAGS+=" $(pkg-config --libs --static opencore-amrnb)"
-                LDFLAGS+=" $(pkg-config --libs --static opencore-amrwb)"
                 CONFIGURE_POSTFIX+=" --enable-libopencore-amrnb"
-                CONFIGURE_POSTFIX+=" --enable-libopencore-amrwb"
             ;;
             openh264)
                 FFMPEG_CFLAGS+=" $(pkg-config --cflags openh264)"
@@ -236,6 +233,11 @@ do
                 LDFLAGS+=" $(pkg-config --libs --static twolame)"
                 CONFIGURE_POSTFIX+=" --enable-libtwolame"
             ;;
+            vo-amrwbenc)
+                CFLAGS+=" $(pkg-config --cflags vo-amrwbenc)"
+                LDFLAGS+=" $(pkg-config --libs --static vo-amrwbenc)"
+                CONFIGURE_POSTFIX+=" --enable-libvo-amrwbenc"
+            ;;
             wavpack)
                 CFLAGS+=" $(pkg-config --cflags wavpack)"
                 LDFLAGS+=" $(pkg-config --libs --static wavpack)"
@@ -285,14 +287,14 @@ do
             ;;
             android-media-codec)
                 CONFIGURE_POSTFIX+=" --enable-mediacodec"
-            ;;
         esac
     else
 
         # THE FOLLOWING LIBRARIES SHOULD BE EXPLICITLY DISABLED TO PREVENT AUTODETECT
+        # NOTE THAT IDS MUST BE +1 OF THE INDEX VALUE
         if [[ ${library} -eq 31 ]]; then
             CONFIGURE_POSTFIX+=" --disable-sdl2"
-        elif [[ ${library} -eq 45 ]]; then
+        elif [[ ${library} -eq 46 ]]; then
             CONFIGURE_POSTFIX+=" --disable-zlib"
         fi
     fi
@@ -322,12 +324,18 @@ if [[ -z ${MOBILE_FFMPEG_DEBUG} ]]; then
         DEBUG_OPTIONS="--disable-debug --disable-lto";
     fi
 else
-    DEBUG_OPTIONS="--enable-debug";
+    DEBUG_OPTIONS="--enable-debug --disable-stripping";
+fi
+
+echo -n -e "\n${LIB_NAME}: "
+
+# DOWNLOAD LIBRARY
+DOWNLOAD_RESULT=$(download_library_source ${LIB_NAME})
+if [[ ${DOWNLOAD_RESULT} -ne 0 ]]; then
+    exit 1
 fi
 
 cd ${BASEDIR}/src/${LIB_NAME} || exit 1
-
-echo -n -e "\n${LIB_NAME}: "
 
 if [[ -z ${NO_WORKSPACE_CLEANUP_ffmpeg} ]]; then
     echo -e "INFO: Cleaning workspace for ${LIB_NAME}" 1>>${BASEDIR}/build.log 2>&1
@@ -341,6 +349,13 @@ export LDFLAGS="${LDFLAGS}"
 # USE HIGHER LIMITS FOR FFMPEG LINKING
 ulimit -n 2048 1>>${BASEDIR}/build.log 2>&1
 
+########################### CUSTOMIZATIONS #######################
+
+# 1. Use thread local log level
+${SED_INLINE} 's/static int av_log_level/__thread int av_log_level/g' ${BASEDIR}/src/${LIB_NAME}/libavutil/log.c 1>>${BASEDIR}/build.log 2>&1
+
+###################################################################
+
 ./configure \
     --cross-prefix="${BUILD_HOST}-" \
     --sysroot="${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/sysroot" \
@@ -351,6 +366,7 @@ ulimit -n 2048 1>>${BASEDIR}/build.log 2>&1
     --cpu="${TARGET_CPU}" \
     --cc="${CC}" \
     --cxx="${CXX}" \
+    --extra-libs="$(pkg-config --libs --static cpu-features)" \
     --target-os=android \
     ${ASM_FLAGS} \
     --enable-cross-compile \

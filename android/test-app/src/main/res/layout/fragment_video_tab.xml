@@ -45,7 +45,7 @@
             android:background="@drawable/rounded_button"
             android:fontFamily="sans-serif"
             android:gravity="center"
-            android:text="@string/video_encode_button_text"
+            android:text="@string/encode_button_text"
             android:textAlignment="center"
             android:textColor="@android:color/white"
             android:textSize="16sp"

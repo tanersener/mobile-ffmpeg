@@ -301,15 +301,17 @@ static void inter_cp_with_ext_border(const kvz_pixel *ref_buf, int ref_stride,
 /**
  * \brief Reconstruct an inter PU using uniprediction.
  *
- * \param state         encoder state
- * \param ref           picture to copy the data from
- * \param xpos          PU x position
- * \param ypos          PU y position
- * \param width         PU width
- * \param height        PU height
- * \param mv_param      motion vector
- * \param lcu           destination lcu
- * \param hi_prec_out   destination of high precision output, or NULL if not needed
+ * \param state          encoder state
+ * \param ref            picture to copy the data from
+ * \param xpos           PU x position
+ * \param ypos           PU y position
+ * \param width          PU width
+ * \param height         PU height
+ * \param mv_param       motion vector
+ * \param lcu            destination lcu
+ * \param hi_prec_out    destination of high precision output, or NULL if not needed
+ * \param predict_luma   Enable or disable luma prediction for this call.
+ * \param predict_chroma Enable or disable chroma prediction for this call.
 */
 static void inter_recon_unipred(const encoder_state_t * const state,
                                 const kvz_picture * const ref,
@@ -319,7 +321,9 @@ static void inter_recon_unipred(const encoder_state_t * const state,
                                 int32_t height,
                                 const int16_t mv_param[2],
                                 lcu_t *lcu,
-                                hi_prec_buf_t *hi_prec_out)
+                                hi_prec_buf_t *hi_prec_out,
+                                bool predict_luma,
+                                bool predict_chroma)
 {
   const vector2d_t pu_in_tile = { xpos, ypos };
   const vector2d_t pu_in_lcu = { xpos % LCU_WIDTH, ypos % LCU_WIDTH };
@@ -340,38 +344,43 @@ static void inter_recon_unipred(const encoder_state_t * const state,
   const int8_t fractional_luma = ((mv_param[0] & 3) || (mv_param[1] & 3));
 
   // Generate prediction for luma.
-  if (fractional_luma) {
-    // With a fractional MV, do interpolation.
-    if (state->encoder_control->cfg.bipred && hi_prec_out) {
-      inter_recon_14bit_frac_luma(state, ref,
-                                  pu_in_tile.x, pu_in_tile.y,
-                                  width, height,
-                                  mv_param, hi_prec_out);
-    } else {
-      inter_recon_frac_luma(state, ref,
-                            pu_in_tile.x, pu_in_tile.y,
-                            width, height,
-                            mv_param, lcu);
+  if (predict_luma) {
+    if (fractional_luma) {
+      // With a fractional MV, do interpolation.
+      if (state->encoder_control->cfg.bipred && hi_prec_out) {
+        inter_recon_14bit_frac_luma(state, ref,
+          pu_in_tile.x, pu_in_tile.y,
+          width, height,
+          mv_param, hi_prec_out);
+      }
+      else {
+        inter_recon_frac_luma(state, ref,
+          pu_in_tile.x, pu_in_tile.y,
+          width, height,
+          mv_param, lcu);
+      }
     }
-  } else {
-    // With an integer MV, copy pixels directly from the reference.
-    const int lcu_pu_index = pu_in_lcu.y * LCU_WIDTH + pu_in_lcu.x;
-    if (mv_is_outside_frame) {
-      inter_cp_with_ext_border(ref->y, ref->width,
-                               ref->width, ref->height,
-                               &lcu->rec.y[lcu_pu_index], LCU_WIDTH,
-                               width, height,
-                               &mv_in_frame);
-    } else {
-      const int frame_mv_index = mv_in_frame.y * ref->width + mv_in_frame.x;
-      kvz_pixels_blit(&ref->y[frame_mv_index],
-                      &lcu->rec.y[lcu_pu_index],
-                      width, height,
-                      ref->width, LCU_WIDTH);
+    else {
+      // With an integer MV, copy pixels directly from the reference.
+      const int lcu_pu_index = pu_in_lcu.y * LCU_WIDTH + pu_in_lcu.x;
+      if (mv_is_outside_frame) {
+        inter_cp_with_ext_border(ref->y, ref->width,
+          ref->width, ref->height,
+          &lcu->rec.y[lcu_pu_index], LCU_WIDTH,
+          width, height,
+          &mv_in_frame);
+      }
+      else {
+        const int frame_mv_index = mv_in_frame.y * ref->width + mv_in_frame.x;
+        kvz_pixels_blit(&ref->y[frame_mv_index],
+          &lcu->rec.y[lcu_pu_index],
+          width, height,
+          ref->width, LCU_WIDTH);
+      }
     }
   }
 
-  if (state->encoder_control->chroma_format == KVZ_CSP_400) {
+  if (!predict_chroma) {
     return;
   }
 
@@ -422,15 +431,17 @@ static void inter_recon_unipred(const encoder_state_t * const state,
 /**
  * \brief Reconstruct bi-pred inter PU
  *
- * \param state     encoder state
- * \param ref1      reference picture to copy the data from
- * \param ref2      other reference picture to copy the data from
- * \param xpos      PU x position
- * \param ypos      PU y position
- * \param width     PU width
- * \param height    PU height
- * \param mv_param  motion vectors
- * \param lcu       destination lcu
+ * \param state          encoder state
+ * \param ref1           reference picture to copy the data from
+ * \param ref2           other reference picture to copy the data from
+ * \param xpos           PU x position
+ * \param ypos           PU y position
+ * \param width          PU width
+ * \param height         PU height
+ * \param mv_param       motion vectors
+ * \param lcu            destination lcu
+ * \param predict_luma   Enable or disable luma prediction for this call.
+ * \param predict_chroma Enable or disable chroma prediction for this call.
  */
 void kvz_inter_recon_bipred(const encoder_state_t * const state,
                             const kvz_picture * ref1,
@@ -440,7 +451,9 @@ void kvz_inter_recon_bipred(const encoder_state_t * const state,
                             int32_t width,
                             int32_t height,
                             int16_t mv_param[2][2],
-                            lcu_t* lcu)
+                            lcu_t* lcu,
+                            bool predict_luma,
+                            bool predict_chroma)
 {
   kvz_pixel temp_lcu_y[LCU_WIDTH*LCU_WIDTH];
   kvz_pixel temp_lcu_u[LCU_WIDTH_C*LCU_WIDTH_C];
@@ -459,7 +472,8 @@ void kvz_inter_recon_bipred(const encoder_state_t * const state,
 
 
   //Reconstruct both predictors
-  inter_recon_unipred(state, ref1, xpos, ypos, width, height, mv_param[0], lcu, high_precision_rec0);
+  inter_recon_unipred(state, ref1, xpos, ypos, width, height, mv_param[0], lcu, high_precision_rec0,
+                      predict_luma, predict_chroma);
   if (!hi_prec_luma_rec0){
     memcpy(temp_lcu_y, lcu->rec.y, sizeof(kvz_pixel) * 64 * 64); // copy to temp_lcu_y
   }
@@ -467,10 +481,15 @@ void kvz_inter_recon_bipred(const encoder_state_t * const state,
     memcpy(temp_lcu_u, lcu->rec.u, sizeof(kvz_pixel) * 32 * 32); // copy to temp_lcu_u
     memcpy(temp_lcu_v, lcu->rec.v, sizeof(kvz_pixel) * 32 * 32); // copy to temp_lcu_v
   }
-  inter_recon_unipred(state, ref2, xpos, ypos, width, height, mv_param[1], lcu, high_precision_rec1);
+  inter_recon_unipred(state, ref2, xpos, ypos, width, height, mv_param[1], lcu, high_precision_rec1,
+                      predict_luma, predict_chroma);
 
   // After reconstruction, merge the predictors by taking an average of each pixel
-  kvz_inter_recon_bipred_blend(hi_prec_luma_rec0, hi_prec_luma_rec1, hi_prec_chroma_rec0, hi_prec_chroma_rec1, height, width, ypos, xpos, high_precision_rec0, high_precision_rec1, lcu, temp_lcu_y, temp_lcu_u, temp_lcu_v);
+  kvz_inter_recon_bipred_blend(hi_prec_luma_rec0, hi_prec_luma_rec1, 
+                               hi_prec_chroma_rec0, hi_prec_chroma_rec1,
+                               height, width, ypos, xpos,
+                               high_precision_rec0, high_precision_rec1,
+                               lcu, temp_lcu_y, temp_lcu_u, temp_lcu_v, predict_luma, predict_chroma);
  
   if (high_precision_rec0 != 0) kvz_hi_prec_buf_t_free(high_precision_rec0);
   if (high_precision_rec1 != 0) kvz_hi_prec_buf_t_free(high_precision_rec1);
@@ -488,54 +507,87 @@ void kvz_inter_recon_bipred(const encoder_state_t * const state,
  * \param x       x-coordinate of the CU in pixels
  * \param y       y-coordinate of the CU in pixels
  * \param width   CU width
+ * \param predict_luma   Enable or disable luma prediction for this call.
+ * \param predict_chroma Enable or disable chroma prediction for this call.
  */
 void kvz_inter_recon_cu(const encoder_state_t * const state,
                         lcu_t *lcu,
                         int32_t x,
                         int32_t y,
-                        int32_t width)
+                        int32_t width,
+                        bool predict_luma,
+                        bool predict_chroma)
 {
   cu_info_t *cu = LCU_GET_CU_AT_PX(lcu, SUB_SCU(x), SUB_SCU(y));
-
   const int num_pu = kvz_part_mode_num_parts[cu->part_size];
   for (int i = 0; i < num_pu; ++i) {
-    const int pu_x = PU_GET_X(cu->part_size, width, x, i);
-    const int pu_y = PU_GET_Y(cu->part_size, width, y, i);
-    const int pu_w = PU_GET_W(cu->part_size, width, i);
-    const int pu_h = PU_GET_H(cu->part_size, width, i);
+    kvz_inter_pred_pu(state, lcu, x, y, width, predict_luma, predict_chroma, i);
+  }
+}
 
-    cu_info_t *pu = LCU_GET_CU_AT_PX(lcu, SUB_SCU(pu_x), SUB_SCU(pu_y));
+/**
+ * Predict a single PU.
+ *
+ * The PU may use either uniprediction or biprediction.
+ *
+ * \param state          encoder state
+ * \param lcu            containing LCU
+ * \param x              x-coordinate of the CU in pixels
+ * \param y              y-coordinate of the CU in pixels
+ * \param width          CU width
+ * \param predict_luma   Enable or disable luma prediction for this call.
+ * \param predict_chroma Enable or disable chroma prediction for this call.
+ * \param i_pu           Index of the PU. Always zero for 2Nx2N. Used for SMP+AMP.
+ */
+void kvz_inter_pred_pu(const encoder_state_t * const state,
+                       lcu_t *lcu,
+                       int32_t x,
+                       int32_t y,
+                       int32_t width,
+                       bool predict_luma,
+                       bool predict_chroma,
+                       int i_pu)
 
-    if (pu->inter.mv_dir == 3) {
-      const kvz_picture *const refs[2] = {
-        state->frame->ref->images[
-          state->frame->ref_LX[0][
-            pu->inter.mv_ref[0]]],
-        state->frame->ref->images[
-          state->frame->ref_LX[1][
-            pu->inter.mv_ref[1]]],
-      };
-      kvz_inter_recon_bipred(state,
-                             refs[0], refs[1],
-                             pu_x, pu_y,
-                             pu_w, pu_h,
-                             pu->inter.mv,
-                             lcu);
-    } else {
-      const int mv_idx = pu->inter.mv_dir - 1;
-      const kvz_picture *const ref =
-        state->frame->ref->images[
-          state->frame->ref_LX[mv_idx][
-            pu->inter.mv_ref[mv_idx]]];
+{
+  cu_info_t *cu = LCU_GET_CU_AT_PX(lcu, SUB_SCU(x), SUB_SCU(y));
+  const int pu_x = PU_GET_X(cu->part_size, width, x, i_pu);
+  const int pu_y = PU_GET_Y(cu->part_size, width, y, i_pu);
+  const int pu_w = PU_GET_W(cu->part_size, width, i_pu);
+  const int pu_h = PU_GET_H(cu->part_size, width, i_pu);
+  cu_info_t *pu = LCU_GET_CU_AT_PX(lcu, SUB_SCU(pu_x), SUB_SCU(pu_y));
 
-      inter_recon_unipred(state,
-                          ref,
-                          pu_x, pu_y,
-                          pu_w, pu_h,
-                          pu->inter.mv[mv_idx],
-                          lcu,
-                          NULL);
-    }
+  if (pu->inter.mv_dir == 3) {
+    const kvz_picture *const refs[2] = {
+      state->frame->ref->images[
+        state->frame->ref_LX[0][
+          pu->inter.mv_ref[0]]],
+      state->frame->ref->images[
+        state->frame->ref_LX[1][
+          pu->inter.mv_ref[1]]],
+    };
+    kvz_inter_recon_bipred(state,
+      refs[0], refs[1],
+      pu_x, pu_y,
+      pu_w, pu_h,
+      pu->inter.mv,
+      lcu,
+      predict_luma, predict_chroma);
+  }
+  else {
+    const int mv_idx = pu->inter.mv_dir - 1;
+    const kvz_picture *const ref =
+      state->frame->ref->images[
+        state->frame->ref_LX[mv_idx][
+          pu->inter.mv_ref[mv_idx]]];
+
+    inter_recon_unipred(state,
+      ref,
+      pu_x, pu_y,
+      pu_w, pu_h,
+      pu->inter.mv[mv_idx],
+      lcu,
+      NULL,
+      predict_luma, predict_chroma);
   }
 }
 

@@ -3,6 +3,7 @@
     <string-array name="video_codec">
         <item>mpeg4</item>
         <item>x264</item>
+        <item>openh264</item>
         <item>x265</item>
         <item>xvid</item>
         <item>vp8</item>

@@ -70,46 +70,42 @@ ecc_add_ehh (const struct ecc_curve *ecc,
      x3 = A*F*T		2 mul		A, C, G
      y3 = A*G*(D-C)	2 mul		F, G
      z3 = F*G		mul
-
-     But when working with the twist curve, we have to negate the
-     factor C = x1*x2. We change subtract to add in the y3
-     expression, and swap F and G.
   */
 #define C scratch
 #define D (scratch + ecc->p.size)
 #define T (scratch + 2*ecc->p.size)
-#define E (scratch + 3*ecc->p.size) 
+#define E (scratch + 3*ecc->p.size)
 #define A (scratch + 4*ecc->p.size)
 #define B (scratch + 5*ecc->p.size)
 #define F D
 #define G E
 
-  ecc_modp_mul (ecc, C, x1, x2);
-  ecc_modp_mul (ecc, D, y1, y2);
-  ecc_modp_add (ecc, A, x1, y1);
-  ecc_modp_add (ecc, B, x2, y2);
-  ecc_modp_mul (ecc, T, A, B);
-  ecc_modp_sub (ecc, T, T, C);
-  ecc_modp_sub (ecc, T, T, D);
-  ecc_modp_mul (ecc, x3, C, D);
-  ecc_modp_mul (ecc, E, x3, ecc->b);
-  ecc_modp_add (ecc, C, D, C);	/* ! */
-  
-  ecc_modp_mul (ecc, A, z1, z2);
-  ecc_modp_sqr (ecc, B, A);
+  ecc_mod_mul (&ecc->p, C, x1, x2);
+  ecc_mod_mul (&ecc->p, D, y1, y2);
+  ecc_mod_add (&ecc->p, A, x1, y1);
+  ecc_mod_add (&ecc->p, B, x2, y2);
+  ecc_mod_mul (&ecc->p, T, A, B);
+  ecc_mod_sub (&ecc->p, T, T, C);
+  ecc_mod_sub (&ecc->p, T, T, D);
+  ecc_mod_mul (&ecc->p, x3, C, D);
+  ecc_mod_mul (&ecc->p, E, x3, ecc->b);
+  ecc_mod_sub (&ecc->p, C, D, C);
 
-  ecc_modp_sub (ecc, F, B, E);
-  ecc_modp_add (ecc, G, B, E);
+  ecc_mod_mul (&ecc->p, A, z1, z2);
+  ecc_mod_sqr (&ecc->p, B, A);
+
+  ecc_mod_sub (&ecc->p, F, B, E);
+  ecc_mod_add (&ecc->p, G, B, E);
 
   /* x3 */
-  ecc_modp_mul (ecc, B, G, T); /* ! */
-  ecc_modp_mul (ecc, x3, B, A);
+  ecc_mod_mul (&ecc->p, B, F, T);
+  ecc_mod_mul (&ecc->p, x3, B, A);
 
   /* y3 */
-  ecc_modp_mul (ecc, B, F, C); /* ! */
-  ecc_modp_mul (ecc, y3, B, A);
+  ecc_mod_mul (&ecc->p, B, G, C);
+  ecc_mod_mul (&ecc->p, y3, B, A);
 
   /* z3 */
-  ecc_modp_mul (ecc, B, F, G);
+  ecc_mod_mul (&ecc->p, B, F, G);
   mpn_copyi (z3, B, ecc->p.size);
 }

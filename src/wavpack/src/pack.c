@@ -502,7 +502,7 @@ int pack_block (WavpackContext *wpc, int32_t *buffer)
 
         for (sptr = buffer, i = 0; i < (int32_t) sample_count; sptr += 2, i++) {
             lor |= sptr [0] | sptr [1];
-            diff |= sptr [0] - sptr [1];
+            diff |= sptr [0] ^ sptr [1];
 
             if (lor && diff)
                 break;
@@ -1014,7 +1014,7 @@ static int pack_samples (WavpackContext *wpc, int32_t *buffer)
         int32_t *eptr = buffer + (sample_count * 2);
 
         for (bptr = buffer; bptr < eptr; bptr += 2)
-            crc += (crc << 3) + (bptr [0] << 1) + bptr [0] + bptr [1];
+            crc += (crc << 3) + ((uint32_t)bptr [0] << 1) + bptr [0] + bptr [1];
 
         if (wps->num_passes) {
             execute_stereo (wpc, buffer, !wps->num_terms, 1);
@@ -1241,7 +1241,7 @@ static int pack_samples (WavpackContext *wpc, int32_t *buffer)
                 int shaping_weight;
 
                 left = *bptr++;
-                crc2 += (crc2 << 3) + (left << 1) + left + (right = *bptr++);
+                crc2 += (crc2 << 3) + ((uint32_t)left << 1) + left + (right = *bptr++);
 
                 if (flags & HYBRID_SHAPE) {
                     if (shaping_array)
@@ -1355,7 +1355,7 @@ static int pack_samples (WavpackContext *wpc, int32_t *buffer)
                 wps->dc.error [1] += right;
                 m = (m + 1) & (MAX_TERM - 1);
 
-                if ((crc += (crc << 3) + (left << 1) + left + right) != crc2)
+                if ((crc += (crc << 3) + ((uint32_t)left << 1) + left + right) != crc2)
                     lossy = TRUE;
 
                 if (wpc->config.flags & CONFIG_CALC_NOISE) {

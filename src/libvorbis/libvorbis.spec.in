@@ -5,9 +5,9 @@ Summary:	The Vorbis General Audio Compression Codec.
 
 Group:		System Environment/Libraries
 License:	BSD
-URL:		http://www.xiph.org/
+URL:		https://xiph.org/
 Vendor:		Xiph.org Foundation <team@xiph.org>
-Source:		http://downloads.xiph.org/releases/vorbis/%{name}-%{version}.tar.gz
+Source:		https://downloads.xiph.org/releases/vorbis/%{name}-%{version}.tar.gz
 BuildRoot:	%{_tmppath}/%{name}-%{version}-root
 
 # We're forced to use an epoch since both Red Hat and Ximian use it in their

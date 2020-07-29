@@ -21,6 +21,7 @@
 
 #import <mobileffmpeg/MobileFFmpegConfig.h>
 #import <mobileffmpeg/MobileFFmpeg.h>
+#import <mobileffmpeg/MobileFFprobe.h>
 #import "CommandViewController.h"
 #import "RCEasyTipView.h"
 
@@ -37,7 +38,7 @@
 @implementation CommandViewController {
 
     // Tooltip view reference
-    RCEasyTipView *tooltip;    
+    RCEasyTipView *tooltip;
 }
 
 - (void)viewDidLoad {
@@ -61,8 +62,8 @@
 
     tooltip = [[RCEasyTipView alloc] initWithPreferences:preferences];
     tooltip.text = COMMAND_TEST_TOOLTIP_TEXT;
-    
-    dispatch_async(dispatch_get_main_queue(), ^{        
+
+    dispatch_async(dispatch_get_main_queue(), ^{
         [self setActive];
     });
 }
@@ -71,7 +72,7 @@
     [super didReceiveMemoryWarning];
 }
 
-- (void)logCallback: (int)level :(NSString*)message {
+- (void)logCallback:(long)executionId :(int)level :(NSString*)message {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self appendOutput: message];
     });
@@ -79,13 +80,15 @@
 
 - (IBAction)runFFmpegAction:(id)sender {
     [self hideTooltip];
-    
+
     [self clearOutput];
     
     [[self commandText] endEditing:TRUE];
     
     NSString *ffmpegCommand = [NSString stringWithFormat:@"-hide_banner %@", [[self commandText] text]];
     
+    NSLog(@"Current log level is %d.\n", [MobileFFmpegConfig getLogLevel]);
+
     NSLog(@"Testing FFmpeg COMMAND synchronously.\n");
     
     NSLog(@"FFmpeg process started with arguments\n\'%@\'\n", ffmpegCommand);
@@ -102,7 +105,7 @@
 
 - (IBAction)runFFprobeAction:(id)sender {
     [self hideTooltip];
-    
+
     [self clearOutput];
     
     [[self commandText] endEditing:TRUE];

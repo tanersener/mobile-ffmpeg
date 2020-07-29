@@ -19,6 +19,7 @@
  ****************************************************************************/
 
 #include "cfg.h"
+#include "gop.h"
 
 #include <limits.h>
 #include <stdio.h>
@@ -40,6 +41,8 @@ int kvz_config_init(kvz_config *cfg)
   cfg->framerate_num   = 25;
   cfg->framerate_denom = 1;
   cfg->qp              = 22;
+  cfg->intra_qp_offset = 0;
+  cfg->intra_qp_offset_auto = true;
   cfg->intra_period    = 64;
   cfg->vps_period      = 0;
   cfg->deblock_enable  = 1;
@@ -98,10 +101,14 @@ int kvz_config_init(kvz_config *cfg)
   cfg->cpuid = 1;
 
   // Defaults for what sizes of PUs are tried.
-  cfg->pu_depth_inter.min = 2; // 0-3
-  cfg->pu_depth_inter.max = 3; // 0-3
-  cfg->pu_depth_intra.min = 2; // 0-4
-  cfg->pu_depth_intra.max = 3; // 0-4
+  memset( cfg->pu_depth_inter.min, -1, sizeof( cfg->pu_depth_inter.min ) );
+  memset( cfg->pu_depth_inter.max, -1, sizeof( cfg->pu_depth_inter.max ) );
+  memset( cfg->pu_depth_intra.min, -1, sizeof( cfg->pu_depth_intra.min ) );
+  memset( cfg->pu_depth_intra.max, -1, sizeof( cfg->pu_depth_intra.max ) );
+  *cfg->pu_depth_inter.min = 2; // 0-3
+  *cfg->pu_depth_inter.max = 3; // 0-3
+  *cfg->pu_depth_intra.min = 2; // 0-4
+  *cfg->pu_depth_intra.max = 3; // 0-4
 
   cfg->add_encoder_info = true;
   cfg->calc_psnr = true;
@@ -136,10 +143,25 @@ int kvz_config_init(kvz_config *cfg)
 
   cfg->me_max_steps = (uint32_t)-1;
 
+  cfg->vaq = 0;
+
   cfg->scaling_list = KVZ_SCALING_LIST_OFF;
 
   cfg->max_merge = 5;
   cfg->early_skip = true;
+
+  cfg->ml_pu_depth_intra = false;
+
+  cfg->partial_coding.startCTU_x = 0;
+  cfg->partial_coding.startCTU_y = 0;
+  cfg->partial_coding.fullWidth = 0;
+  cfg->partial_coding.fullHeight = 0;
+
+  cfg->zero_coeff_rdo = true;
+
+  cfg->rc_algorithm = KVZ_NO_RC;
+  cfg->intra_bit_allocation = false;
+  cfg->clip_neighbour = true;
 
   return 1;
 }
@@ -297,6 +319,45 @@ static int parse_array(const char *array, uint8_t *coeff_key, int size,
   return 1;
 }
 
+static int parse_pu_depth_list( const char *array, int32_t *depths_min, int32_t *depths_max, int size )
+{
+    char *list = strdup( array );
+    char *token;
+    int i = 0;
+    int ptr = -1;
+    int len = strlen( list );
+    int retval = 1;
+
+    //Reset depths in case multiple pu depth parameters are given
+    if(size > 1) memset( depths_max + 1, -1, (size - 1) * sizeof( *depths_max ) );
+    if(size > 1) memset( depths_min + 1, -1, (size - 1) * sizeof( *depths_min ) );
+
+    token = strtok( list, "," );
+    while( ptr < len && list[ptr + 1] == ',' )
+    {
+        i++;
+        ptr++;
+    }
+    while( retval && token != NULL && i < size ) {
+        retval &= (sscanf( token, "%d-%d", &depths_min[i], &depths_max[i] ) == 2);
+        ptr += (retval ? 4 : 0);
+        i++;
+        token = strtok( NULL, "," );
+        while(ptr < len && list[ptr + 1] == ',' ){
+          i++;
+          ptr++;
+        }
+    }
+
+    if( i >= size && ( token != NULL ) ) {
+        fprintf( stderr, "parsing failed : too many values.\n" );
+        retval = 0;
+    }
+    
+    free( list );
+    return retval;
+}
+
 static int parse_slice_specification(const char* const arg, int32_t * const nslices, int32_t** const array) {
   const char* current_arg = NULL;
   int32_t current_value;
@@ -386,19 +447,21 @@ int kvz_config_parse(kvz_config *cfg, const char *name, const char *value)
 
   static const char * const scaling_list_names[] = { "off", "custom", "default", NULL };
 
+  static const char * const rc_algorithm_names[] = { "no-rc", "lambda", "oba", NULL };
   static const char * const preset_values[11][25*2] = {
+
       {
         "ultrafast",
         "rd", "0",
         "pu-depth-intra", "2-3",
-        "pu-depth-inter", "2-3",
+        "pu-depth-inter", "1-2",
         "me", "hexbs",
-        "gop", "lp-g4d4t1",
+        "gop", "8",
         "ref", "1",
-        "bipred", "0",
+        "bipred", "1",
         "deblock", "0:0",
         "signhide", "0",
-        "subme", "2",
+        "subme", "0",
         "sao", "off",
         "rdoq", "0",
         "rdoq-skip", "0",
@@ -419,11 +482,11 @@ int kvz_config_parse(kvz_config *cfg, const char *name, const char *value)
         "superfast",
         "rd", "0",
         "pu-depth-intra", "2-3",
-        "pu-depth-inter", "2-3",
+        "pu-depth-inter", "1-2",
         "me", "hexbs",
-        "gop", "lp-g4d4t1",
+        "gop", "8",
         "ref", "1",
-        "bipred", "0",
+        "bipred", "1",
         "deblock", "0:0",
         "signhide", "0",
         "subme", "2",
@@ -449,9 +512,9 @@ int kvz_config_parse(kvz_config *cfg, const char *name, const char *value)
         "pu-depth-intra", "2-3",
         "pu-depth-inter", "1-3",
         "me", "hexbs",
-        "gop", "lp-g4d4t1",
+        "gop", "8",
         "ref", "1",
-        "bipred", "0",
+        "bipred", "1",
         "deblock", "0:0",
         "signhide", "0",
         "subme", "2",
@@ -477,9 +540,9 @@ int kvz_config_parse(kvz_config *cfg, const char *name, const char *value)
         "pu-depth-intra", "2-3",
         "pu-depth-inter", "1-3",
         "me", "hexbs",
-        "gop", "lp-g4d4t1",
+        "gop", "8",
         "ref", "1",
-        "bipred", "0",
+        "bipred", "1",
         "deblock", "0:0",
         "signhide", "0",
         "subme", "4",
@@ -505,9 +568,9 @@ int kvz_config_parse(kvz_config *cfg, const char *name, const char *value)
         "pu-depth-intra", "1-3",
         "pu-depth-inter", "1-3",
         "me", "hexbs",
-        "gop", "lp-g4d4t1",
+        "gop", "8",
         "ref", "2",
-        "bipred", "0",
+        "bipred", "1",
         "deblock", "0:0",
         "signhide", "0",
         "subme", "4",
@@ -533,9 +596,9 @@ int kvz_config_parse(kvz_config *cfg, const char *name, const char *value)
         "pu-depth-intra", "1-4",
         "pu-depth-inter", "0-3",
         "me", "hexbs",
-        "gop", "8",
+        "gop", "16",
         "ref", "4",
-        "bipred", "0",
+        "bipred", "1",
         "deblock", "0:0",
         "signhide", "0",
         "subme", "4",
@@ -557,11 +620,11 @@ int kvz_config_parse(kvz_config *cfg, const char *name, const char *value)
       },
       {
         "slow",
-        "rd", "0",
+        "rd", "1",
         "pu-depth-intra", "1-4",
         "pu-depth-inter", "0-3",
         "me", "hexbs",
-        "gop", "8",
+        "gop", "16",
         "ref", "4",
         "bipred", "1",
         "deblock", "0:0",
@@ -589,7 +652,7 @@ int kvz_config_parse(kvz_config *cfg, const char *name, const char *value)
         "pu-depth-intra", "1-4",
         "pu-depth-inter", "0-3",
         "me", "hexbs",
-        "gop", "8",
+        "gop", "16",
         "ref", "4",
         "bipred", "1",
         "deblock", "0:0",
@@ -616,8 +679,8 @@ int kvz_config_parse(kvz_config *cfg, const char *name, const char *value)
         "rd", "2",
         "pu-depth-intra", "1-4",
         "pu-depth-inter", "0-3",
-        "me", "hexbs",
-        "gop", "8",
+        "me", "tz",
+        "gop", "16",
         "ref", "4",
         "bipred", "1",
         "deblock", "0:0",
@@ -626,7 +689,7 @@ int kvz_config_parse(kvz_config *cfg, const char *name, const char *value)
         "sao", "full",
         "rdoq", "1",
         "rdoq-skip", "0",
-        "transform-skip", "0",
+        "transform-skip", "1",
         "mv-rdo", "0",
         "full-intra-search", "0",
         "smp", "1",
@@ -645,7 +708,7 @@ int kvz_config_parse(kvz_config *cfg, const char *name, const char *value)
         "pu-depth-intra", "1-4",
         "pu-depth-inter", "0-3",
         "me", "tz",
-        "gop", "8",
+        "gop", "16",
         "ref", "4",
         "bipred", "1",
         "deblock", "0:0",
@@ -662,7 +725,7 @@ int kvz_config_parse(kvz_config *cfg, const char *name, const char *value)
         "cu-split-termination", "off",
         "me-early-termination", "off",
         "intra-rdo-et", "0",
-        "early-skip", "1",
+        "early-skip", "0",
         "fast-residual-cost", "0",
         "max-merge", "5",
         NULL
@@ -892,9 +955,9 @@ int kvz_config_parse(kvz_config *cfg, const char *name, const char *value)
   else if OPT("cpuid")
     cfg->cpuid = atobool(value);
   else if OPT("pu-depth-inter")
-    return sscanf(value, "%d-%d", &cfg->pu_depth_inter.min, &cfg->pu_depth_inter.max) == 2;
+    return parse_pu_depth_list(value, cfg->pu_depth_inter.min, cfg->pu_depth_inter.max, KVZ_MAX_GOP_LAYERS);
   else if OPT("pu-depth-intra")
-    return sscanf(value, "%d-%d", &cfg->pu_depth_intra.min, &cfg->pu_depth_intra.max) == 2;
+    return parse_pu_depth_list(value, cfg->pu_depth_intra.min, cfg->pu_depth_intra.max, KVZ_MAX_GOP_LAYERS);
   else if OPT("info")
     cfg->add_encoder_info = atobool(value);
   else if OPT("gop") {
@@ -928,41 +991,23 @@ int kvz_config_parse(kvz_config *cfg, const char *name, const char *value)
       cfg->gop_len = gop.g;
       cfg->gop_lp_definition.d = gop.d;
       cfg->gop_lp_definition.t = gop.t;
+
+      cfg->intra_bit_allocation = true;
+      cfg->clip_neighbour = false;
     } else if (atoi(value) == 8) {
       cfg->gop_lowdelay = 0;
-      // GOP
-      cfg->gop_len = 8;
-      cfg->gop[0].poc_offset = 8; cfg->gop[0].qp_offset = 1; cfg->gop[0].layer = 1; cfg->gop[0].qp_factor = 0.442;  cfg->gop[0].is_ref = 1;
-      cfg->gop[0].ref_pos_count = 0;
-      cfg->gop[0].ref_neg_count = 3; cfg->gop[0].ref_neg[0] = 8; cfg->gop[0].ref_neg[1] = 12; cfg->gop[0].ref_neg[2] = 16;
+      cfg->gop_len = sizeof(kvz_gop_ra8) / sizeof(kvz_gop_ra8[0]);
+      memcpy(cfg->gop, kvz_gop_ra8, sizeof(kvz_gop_ra8));
+      cfg->intra_bit_allocation = false;
+      cfg->clip_neighbour = true;
 
-      cfg->gop[1].poc_offset = 4; cfg->gop[1].qp_offset = 2; cfg->gop[1].layer = 2; cfg->gop[1].qp_factor = 0.3536; cfg->gop[1].is_ref = 1;
-      cfg->gop[1].ref_neg_count = 2; cfg->gop[1].ref_neg[0] = 4; cfg->gop[1].ref_neg[1] = 8;
-      cfg->gop[1].ref_pos_count = 1; cfg->gop[1].ref_pos[0] = 4;
+    } else if (atoi(value) == 16) {
+      cfg->gop_lowdelay = 0;
+      cfg->gop_len = sizeof(kvz_gop_ra16) / sizeof(kvz_gop_ra16[0]);
+      memcpy(cfg->gop, kvz_gop_ra16, sizeof(kvz_gop_ra16));
+      cfg->intra_bit_allocation = false;
+      cfg->clip_neighbour = true;
 
-      cfg->gop[2].poc_offset = 2; cfg->gop[2].qp_offset = 3; cfg->gop[2].layer = 3; cfg->gop[2].qp_factor = 0.3536; cfg->gop[2].is_ref = 1;
-      cfg->gop[2].ref_neg_count = 2; cfg->gop[2].ref_neg[0] = 2; cfg->gop[2].ref_neg[1] = 6;
-      cfg->gop[2].ref_pos_count = 2; cfg->gop[2].ref_pos[0] = 2; cfg->gop[2].ref_pos[1] = 6;
-
-      cfg->gop[3].poc_offset = 1; cfg->gop[3].qp_offset = 4; cfg->gop[3].layer = 4; cfg->gop[3].qp_factor = 0.68;   cfg->gop[3].is_ref = 0;
-      cfg->gop[3].ref_neg_count = 1; cfg->gop[3].ref_neg[0] = 1;
-      cfg->gop[3].ref_pos_count = 3; cfg->gop[3].ref_pos[0] = 1; cfg->gop[3].ref_pos[1] = 3; cfg->gop[3].ref_pos[2] = 7;
-
-      cfg->gop[4].poc_offset = 3; cfg->gop[4].qp_offset = 4; cfg->gop[4].layer = 4; cfg->gop[4].qp_factor = 0.68;   cfg->gop[4].is_ref = 0;
-      cfg->gop[4].ref_neg_count = 2; cfg->gop[4].ref_neg[0] = 1; cfg->gop[4].ref_neg[1] = 3;
-      cfg->gop[4].ref_pos_count = 2; cfg->gop[4].ref_pos[0] = 1; cfg->gop[4].ref_pos[1] = 5;
-
-      cfg->gop[5].poc_offset = 6; cfg->gop[5].qp_offset = 3; cfg->gop[5].layer = 3; cfg->gop[5].qp_factor = 0.3536; cfg->gop[5].is_ref = 1;
-      cfg->gop[5].ref_neg_count = 2; cfg->gop[5].ref_neg[0] = 2; cfg->gop[5].ref_neg[1] = 6;
-      cfg->gop[5].ref_pos_count = 1; cfg->gop[5].ref_pos[0] = 2;
-
-      cfg->gop[6].poc_offset = 5; cfg->gop[6].qp_offset = 4; cfg->gop[6].layer = 4; cfg->gop[6].qp_factor = 0.68;   cfg->gop[6].is_ref = 0;
-      cfg->gop[6].ref_neg_count = 2;  cfg->gop[6].ref_neg[0] = 1; cfg->gop[6].ref_neg[1] = 5;
-      cfg->gop[6].ref_pos_count = 2; cfg->gop[6].ref_pos[0] = 1; cfg->gop[6].ref_pos[1] = 3;
-
-      cfg->gop[7].poc_offset = 7; cfg->gop[7].qp_offset = 4; cfg->gop[7].layer = 4; cfg->gop[7].qp_factor = 0.68;   cfg->gop[7].is_ref = 0;
-      cfg->gop[7].ref_neg_count = 3; cfg->gop[7].ref_neg[0] = 1; cfg->gop[7].ref_neg[1] = 3; cfg->gop[7].ref_neg[2] = 7;
-      cfg->gop[7].ref_pos_count = 1; cfg->gop[7].ref_pos[0] = 1;
     } else if (atoi(value) == 0) {
       //Disable gop
       cfg->gop_len = 0;
@@ -974,13 +1019,26 @@ int kvz_config_parse(kvz_config *cfg, const char *name, const char *value)
       return 0;
     }
   }
+  else if OPT("intra-qp-offset") {
+    cfg->intra_qp_offset = atoi(value);
+    if( cfg->intra_qp_offset == 0 && !strcmp( value, "auto" ) )
+    {
+        cfg->intra_qp_offset_auto = true;
+    } else {
+        cfg->intra_qp_offset_auto = false;
+    }
+  }
   else if OPT("open-gop") {
     cfg->open_gop = (bool)atobool(value);
   }
   else if OPT("bipred")
     cfg->bipred = atobool(value);
-  else if OPT("bitrate")
+  else if OPT("bitrate") {
     cfg->target_bitrate = atoi(value);
+    if (!cfg->rc_algorithm) {
+      cfg->rc_algorithm = KVZ_LAMBDA;
+    }
+  }
   else if OPT("preset") {
     int preset_line = 0;
 
@@ -1249,6 +1307,9 @@ int kvz_config_parse(kvz_config *cfg, const char *name, const char *value)
   }
   else if (OPT("fast-residual-cost"))
     cfg->fast_residual_cost_limit = atoi(value);
+  else if (OPT("vaq")) {
+    cfg->vaq = (int)atoi(value);
+  }
   else if (OPT("max-merge")) {
     int max_merge = atoi(value);
     if (max_merge < 1 || max_merge > 5) {
@@ -1258,7 +1319,45 @@ int kvz_config_parse(kvz_config *cfg, const char *name, const char *value)
     cfg->max_merge = (uint8_t)max_merge;
   }
   else if OPT("early-skip") {
-  cfg->early_skip = (bool)atobool(value);
+    cfg->early_skip = (bool)atobool(value);
+  }
+  else if OPT("ml-pu-depth-intra") {
+    cfg->ml_pu_depth_intra = (bool)atobool(value);
+  }
+  else if OPT("partial-coding") {
+    uint32_t firstCTU_x;
+    uint32_t firstCTU_y;
+    uint32_t fullWidth;
+    uint32_t fullHeight;
+    if (4 != sscanf(value, "%u!%u!%u!%u", &firstCTU_x,
+      &firstCTU_y, &fullWidth, &fullHeight)) {
+      fprintf(stderr, "invalid partial-coding options. Expected \"%%u!%%u!%%u!%%u\", but got \"%s\"\n", value);
+      return 0;
+    }
+    cfg->partial_coding.startCTU_x = firstCTU_x;
+    cfg->partial_coding.startCTU_y = firstCTU_y;
+    cfg->partial_coding.fullWidth = fullWidth;
+    cfg->partial_coding.fullHeight = fullHeight;
+  }
+  else if OPT("zero-coeff-rdo") {
+  cfg->zero_coeff_rdo = (bool)atobool(value);
+  }
+  else if OPT("rc-algorithm") {
+    int8_t rc_algorithm = 0;
+    if (!parse_enum(value, rc_algorithm_names, &rc_algorithm)) {
+      fprintf(stderr, "Invalid rate control algorithm %s. Valid values include %s, %s, and %s\n", value, 
+        rc_algorithm_names[0],
+        rc_algorithm_names[1],
+        rc_algorithm_names[2]);
+      return 0;
+    }
+    cfg->rc_algorithm = rc_algorithm;
+  }
+  else if OPT("intra-bits") {
+    cfg->intra_bit_allocation = atobool(value);
+  }
+  else if OPT("clip-neighbour") {
+    cfg->clip_neighbour = atobool(value);
   }
   else {
     return 0;
@@ -1372,6 +1471,11 @@ int kvz_config_validate(const kvz_config *const cfg)
 {
   int error = 0;
 
+  if (cfg->vaq < 0) {
+    fprintf(stderr, "vaq strength must be positive\n");
+    error = 1;
+  }
+
   if (cfg->width <= 0) {
     fprintf(stderr, "Input error: width must be positive\n");
     error = 1;
@@ -1477,33 +1581,49 @@ int kvz_config_validate(const kvz_config *const cfg)
       error = 1;
   }
 
+  if (abs(cfg->intra_qp_offset) > 51) {
+    fprintf(stderr, "Input error: --intra-qp-offset out of range [-51..51]\n");
+    error = 1;
+  }
+
   if (cfg->target_bitrate < 0) {
       fprintf(stderr, "Input error: --bitrate must be nonnegative\n");
       error = 1;
   }
 
-  if (!WITHIN(cfg->pu_depth_inter.min, PU_DEPTH_INTER_MIN, PU_DEPTH_INTER_MAX) ||
-      !WITHIN(cfg->pu_depth_inter.max, PU_DEPTH_INTER_MIN, PU_DEPTH_INTER_MAX))
+  for( size_t i = 0; i < KVZ_MAX_GOP_LAYERS; i++ )
   {
-    fprintf(stderr, "Input error: illegal value for --pu-depth-inter (%d-%d)\n",
-            cfg->pu_depth_inter.min, cfg->pu_depth_inter.max);
-    error = 1;
-  } else if (cfg->pu_depth_inter.min > cfg->pu_depth_inter.max) {
-    fprintf(stderr, "Input error: Inter PU depth min (%d) > max (%d)\n",
-            cfg->pu_depth_inter.min, cfg->pu_depth_inter.max);
-    error = 1;
-  }
+      if( cfg->pu_depth_inter.min[i] < 0 || cfg->pu_depth_inter.max[i] < 0 ) continue;
 
-  if (!WITHIN(cfg->pu_depth_intra.min, PU_DEPTH_INTRA_MIN, PU_DEPTH_INTRA_MAX) ||
-      !WITHIN(cfg->pu_depth_intra.max, PU_DEPTH_INTRA_MIN, PU_DEPTH_INTRA_MAX))
-  {
-    fprintf(stderr, "Input error: illegal value for --pu-depth-intra (%d-%d)\n",
-      cfg->pu_depth_intra.min, cfg->pu_depth_intra.max);
-    error = 1;
-  } else if (cfg->pu_depth_intra.min > cfg->pu_depth_intra.max) {
-    fprintf(stderr, "Input error: Intra PU depth min (%d) > max (%d)\n",
-            cfg->pu_depth_intra.min, cfg->pu_depth_intra.max);
-    error = 1;
+      if( !WITHIN( cfg->pu_depth_inter.min[i], PU_DEPTH_INTER_MIN, PU_DEPTH_INTER_MAX ) ||
+          !WITHIN( cfg->pu_depth_inter.max[i], PU_DEPTH_INTER_MIN, PU_DEPTH_INTER_MAX ) )
+      {
+          fprintf( stderr, "Input error: illegal value for --pu-depth-inter (%d-%d)\n",
+                   cfg->pu_depth_inter.min[i], cfg->pu_depth_inter.max[i] );
+          error = 1;
+      }
+      else if( cfg->pu_depth_inter.min[i] > cfg->pu_depth_inter.max[i] )
+      {
+          fprintf( stderr, "Input error: Inter PU depth min (%d) > max (%d)\n",
+                   cfg->pu_depth_inter.min[i], cfg->pu_depth_inter.max[i] );
+          error = 1;
+      }
+
+      if( cfg->pu_depth_intra.min[i] < 0 || cfg->pu_depth_intra.max[i] < 0 ) continue;
+
+      if( !WITHIN( cfg->pu_depth_intra.min[i], PU_DEPTH_INTRA_MIN, PU_DEPTH_INTRA_MAX ) ||
+          !WITHIN( cfg->pu_depth_intra.max[i], PU_DEPTH_INTRA_MIN, PU_DEPTH_INTRA_MAX ) )
+      {
+          fprintf( stderr, "Input error: illegal value for --pu-depth-intra (%d-%d)\n",
+                   cfg->pu_depth_intra.min[i], cfg->pu_depth_intra.max[i] );
+          error = 1;
+      }
+      else if( cfg->pu_depth_intra.min[i] > cfg->pu_depth_intra.max[i] )
+      {
+          fprintf( stderr, "Input error: Intra PU depth min (%d) > max (%d)\n",
+                   cfg->pu_depth_intra.min[i], cfg->pu_depth_intra.max[i] );
+          error = 1;
+      }
   }
 
   // Tile separation should be at round position in terms of LCU, should be monotonic, and should not start by 0
@@ -1569,6 +1689,16 @@ int kvz_config_validate(const kvz_config *const cfg)
 
   if (validate_hevc_level((kvz_config *const) cfg)) {
     // a level error found and it's not okay
+    error = 1;
+  }
+
+  if(cfg->target_bitrate > 0 && cfg->rc_algorithm == KVZ_NO_RC) {
+    fprintf(stderr, "Bitrate set but rc-algorithm is turned off.\n");
+    error = 1;
+  }
+
+  if(cfg->target_bitrate == 0 && cfg->rc_algorithm != KVZ_NO_RC) {
+    fprintf(stderr, "Rate control algorithm set but bitrate not set.\n");
     error = 1;
   }
 

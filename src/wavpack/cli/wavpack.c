@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////
 //                           **** WAVPACK ****                            //
 //                  Hybrid Lossless Wavefile Compressor                   //
-//                Copyright (c) 1998 - 2019 David Bryant.                 //
+//                Copyright (c) 1998 - 2020 David Bryant.                 //
 //                          All Rights Reserved.                          //
 //      Distributed under the BSD Software License (see license.txt)      //
 ////////////////////////////////////////////////////////////////////////////
@@ -65,7 +65,7 @@
 
 static const char *sign_on = "\n"
 " WAVPACK  Hybrid Lossless Audio Compressor  %s Version %s\n"
-" Copyright (c) 1998 - 2019 David Bryant.  All Rights Reserved.\n\n";
+" Copyright (c) 1998 - 2020 David Bryant.  All Rights Reserved.\n\n";
 
 static const char *version_warning = "\n"
 " WARNING: WAVPACK using libwavpack version %s, expected %s (see README)\n\n";
@@ -90,6 +90,11 @@ static const char *usage =
 "          -c  = create correction file (.wvc) for hybrid mode (=lossless)\n"
 "          -f  = fast mode (fast, but some compromise in compression ratio)\n"
 "          -h  = high quality (better compression ratio, but slower)\n"
+#ifdef _WIN32
+"          --pause = pause before exiting (if console window disappears)\n"
+#else
+"          -o FILENAME | PATH = specify output filename or path\n"
+#endif
 "          -v  = verify output file integrity after write (no pipes)\n"
 "          -x  = extra encode processing (no decoding speed penalty)\n"
 "          --help = complete help\n\n"
@@ -3756,7 +3761,7 @@ static void load_little_endian_unsigned_samples (int32_t *dst, void *src, int bp
 
         case 4:
             while (count--) {
-                *dst++ = (sptr [0] | ((int32_t) sptr [1] << 8) | ((int32_t) sptr [2] << 16) | ((int32_t) sptr [3] << 24)) - 0x80000000;
+                *dst++ = (sptr [0] | sptr [1] << 8 | sptr [2] << 16 | (uint32_t) sptr [3] << 24) ^ 0x80000000;
                 sptr += 4;
             }
 
@@ -3778,7 +3783,7 @@ static void load_little_endian_signed_samples (int32_t *dst, void *src, int bps,
 
         case 2:
             while (count--) {
-                *dst++ = sptr [0] | ((int32_t)(signed char) sptr [1] << 8);
+                *dst++ = (int16_t)(sptr [0] | sptr [1] << 8);
                 sptr += 2;
             }
 
@@ -3786,7 +3791,7 @@ static void load_little_endian_signed_samples (int32_t *dst, void *src, int bps,
 
         case 3:
             while (count--) {
-                *dst++ = sptr [0] | ((int32_t) sptr [1] << 8) | ((int32_t)(signed char) sptr [2] << 16);
+                *dst++ = (int32_t)((uint32_t)(sptr [0] | sptr [1] << 8 | sptr [2] << 16) << 8) >> 8;
                 sptr += 3;
             }
 
@@ -3794,7 +3799,7 @@ static void load_little_endian_signed_samples (int32_t *dst, void *src, int bps,
 
         case 4:
             while (count--) {
-                *dst++ = sptr [0] | ((int32_t) sptr [1] << 8) | ((int32_t) sptr [2] << 16) | ((int32_t)(signed char) sptr [3] << 24);
+                *dst++ = sptr [0] | sptr [1] << 8 | sptr [2] << 16 | (uint32_t) sptr [3] << 24;
                 sptr += 4;
             }
 
@@ -3832,7 +3837,7 @@ static void load_big_endian_unsigned_samples (int32_t *dst, void *src, int bps, 
 
         case 4:
             while (count--) {
-                *dst++ = (sptr [3] | ((int32_t) sptr [2] << 8) | ((int32_t) sptr [1] << 16) | ((int32_t) sptr [0] << 24)) - 0x80000000;
+                *dst++ = (sptr [3] | sptr [2] << 8 | sptr [1] << 16 | (uint32_t) sptr [0] << 24) ^ 0x80000000;
                 sptr += 4;
             }
 
@@ -3854,7 +3859,7 @@ static void load_big_endian_signed_samples (int32_t *dst, void *src, int bps, in
 
         case 2:
             while (count--) {
-                *dst++ = sptr [1] | ((int32_t)(signed char) sptr [0] << 8);
+                *dst++ = (int16_t)(sptr [1] | sptr [0] << 8);
                 sptr += 2;
             }
 
@@ -3862,7 +3867,7 @@ static void load_big_endian_signed_samples (int32_t *dst, void *src, int bps, in
 
         case 3:
             while (count--) {
-                *dst++ = sptr [2] | ((int32_t) sptr [1] << 8) | ((int32_t)(signed char) sptr [0] << 16);
+                *dst++ = (int32_t)((uint32_t)(sptr [2] | sptr [1] << 8 | sptr [0] << 16) << 8) >> 8;
                 sptr += 3;
             }
 
@@ -3870,7 +3875,7 @@ static void load_big_endian_signed_samples (int32_t *dst, void *src, int bps, in
 
         case 4:
             while (count--) {
-                *dst++ = sptr [3] | ((int32_t) sptr [2] << 8) | ((int32_t) sptr [1] << 16) | ((int32_t)(signed char) sptr [0] << 24);
+                *dst++ = sptr [3] | sptr [2] << 8 | sptr [1] << 16 | (uint32_t) sptr [0] << 24;
                 sptr += 4;
             }
 

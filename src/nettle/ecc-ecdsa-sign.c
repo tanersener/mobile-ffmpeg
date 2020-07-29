@@ -88,9 +88,9 @@ ecc_ecdsa_sign (const struct ecc_curve *ecc,
   /* Process hash digest */
   ecc_hash (&ecc->q, hp, length, digest);
 
-  ecc_modq_mul (ecc, tp, zp, rp);
-  ecc_modq_add (ecc, hp, hp, tp);
-  ecc_modq_mul (ecc, tp, hp, kinv);
+  ecc_mod_mul (&ecc->q, tp, zp, rp);
+  ecc_mod_add (&ecc->q, hp, hp, tp);
+  ecc_mod_mul (&ecc->q, tp, hp, kinv);
 
   mpn_copyi (sp, tp, ecc->p.size);
 #undef P

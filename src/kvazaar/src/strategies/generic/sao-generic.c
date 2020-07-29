@@ -19,6 +19,7 @@
  ****************************************************************************/
 
 #include "strategies/generic/sao-generic.h"
+#include "strategies/generic/sao_shared_generics.h"
 
 #include "cu.h"
 #include "encoder.h"
@@ -26,51 +27,6 @@
 #include "kvazaar.h"
 #include "sao.h"
 #include "strategyselector.h"
-
-
-// Mapping of edge_idx values to eo-classes.
-static int sao_calc_eo_cat(kvz_pixel a, kvz_pixel b, kvz_pixel c)
-{
-  // Mapping relationships between a, b and c to eo_idx.
-  static const int sao_eo_idx_to_eo_category[] = { 1, 2, 0, 3, 4 };
-
-  int eo_idx = 2 + SIGN3((int)c - (int)a) + SIGN3((int)c - (int)b);
-
-  return sao_eo_idx_to_eo_category[eo_idx];
-}
-
-
-static int sao_edge_ddistortion_generic(const kvz_pixel *orig_data,
-                                        const kvz_pixel *rec_data,
-                                        int block_width,
-                                        int block_height,
-                                        int eo_class,
-                                        int offsets[NUM_SAO_EDGE_CATEGORIES])
-{
-  int y, x;
-  int sum = 0;
-  vector2d_t a_ofs = g_sao_edge_offsets[eo_class][0];
-  vector2d_t b_ofs = g_sao_edge_offsets[eo_class][1];
-
-  for (y = 1; y < block_height - 1; ++y) {
-    for (x = 1; x < block_width - 1; ++x) {
-      const kvz_pixel *c_data = &rec_data[y * block_width + x];
-      kvz_pixel a = c_data[a_ofs.y * block_width + a_ofs.x];
-      kvz_pixel c = c_data[0];
-      kvz_pixel b = c_data[b_ofs.y * block_width + b_ofs.x];
-
-      int offset = offsets[sao_calc_eo_cat(a, b, c)];
-
-      if (offset != 0) {
-        int diff = orig_data[y * block_width + x] - c;
-        // Offset is applied to reconstruction, so it is subtracted from diff.
-        sum += (diff - offset) * (diff - offset) - diff * diff;
-      }
-    }
-  }
-
-  return sum;
-}
 
 
 /**
@@ -93,6 +49,9 @@ static void calc_sao_edge_dir_generic(const kvz_pixel *orig_data,
 
   // Don't sample the edge pixels because this function doesn't have access to
   // their neighbours.
+
+  
+
   for (y = 1; y < block_height - 1; ++y) {
     for (x = 1; x < block_width - 1; ++x) {
       const kvz_pixel *c_data = &rec_data[y * block_width + x];
@@ -151,36 +110,6 @@ static void sao_reconstruct_color_generic(const encoder_control_t * const encode
   }
 }
 
-
-static int sao_band_ddistortion_generic(const encoder_state_t * const state,
-                                        const kvz_pixel *orig_data,
-                                        const kvz_pixel *rec_data,
-                                        int block_width,
-                                        int block_height,
-                                        int band_pos,
-                                        int sao_bands[4])
-{
-  int y, x;
-  int shift = state->encoder_control->bitdepth-5;
-  int sum = 0;
-
-  for (y = 0; y < block_height; ++y) {
-    for (x = 0; x < block_width; ++x) {
-      int band = (rec_data[y * block_width + x] >> shift) - band_pos;
-      int offset = 0;
-      if (band >= 0 && band < 4) {
-        offset = sao_bands[band];
-      }
-      if (offset != 0) {
-        int diff = orig_data[y * block_width + x] - rec_data[y * block_width + x];
-        // Offset is applied to reconstruction, so it is subtracted from diff.
-        sum += (diff - offset) * (diff - offset) - diff * diff;
-      }
-    }
-  }
-
-  return sum;
-}
 
 
 int kvz_strategy_register_sao_generic(void* opaque, uint8_t bitdepth)

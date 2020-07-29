@@ -1,12 +1,12 @@
-# wavpack 5.2.0 configure.ac
+# wavpack 5.3.0 configure.ac
 
-AC_INIT(wavpack, 5.2.0, bryant@wavpack.com)
+AC_INIT(wavpack, 5.3.0, bryant@wavpack.com)
 AC_CONFIG_SRCDIR([src/pack.c])
 AM_INIT_AUTOMAKE
 AM_MAINTAINER_MODE
 
 LIBWAVPACK_MAJOR=5
-LIBWAVPACK_MINOR=2
+LIBWAVPACK_MINOR=3
 LIBWAVPACK_MICRO=0
 LIBWAVPACK_VERSION_STRING=$LIBWAVPACK_MAJOR.$LIBWAVPACK_MINOR.$LIBWAVPACK_MICRO
 
@@ -21,7 +21,7 @@ AC_DEFINE_UNQUOTED(LIBWAVPACK_VERSION_STRING, "$LIBWAVPACK_VERSION_STRING", [lib
 #  ? : +1 :  ?   == internal changes that doesn't break anything.
 # CURRENT : REVISION : AGE
 LT_CURRENT=3
-LT_REVISION=1
+LT_REVISION=2
 LT_AGE=2
 
 AC_SUBST(LT_CURRENT)
@@ -194,7 +194,7 @@ fi
 
 AC_ARG_ENABLE(man,
               [AC_HELP_STRING([--enable-man],
-                              [regenerate man pages from Docbook [default=no]])],enable_man=yes,
+                              [regenerate man pages from Docbook [default=no]])],enable_man=$enableval,
               enable_man=no)
 
 if test "${enable_man}" != no; then

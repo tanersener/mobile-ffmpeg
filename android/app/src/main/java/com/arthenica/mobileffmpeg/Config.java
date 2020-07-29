@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Taner Sener
+ * Copyright (c) 2018-2020 Taner Sener
  *
  * This file is part of MobileFFmpeg.
  *
@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
@@ -78,6 +79,8 @@ public class Config {
 
     private static int lastCreatedPipeIndex;
 
+    private static final List<FFmpegExecution> executions;
+
     static {
 
         Log.i(Config.TAG, "Loading mobile-ffmpeg.");
@@ -89,7 +92,6 @@ public class Config {
                 // libc++_shared.so included only when tesseract or x265 is enabled
                 System.loadLibrary("c++_shared");
             }
-            System.loadLibrary("cpufeatures");
             System.loadLibrary("avutil");
             System.loadLibrary("swscale");
             System.loadLibrary("swresample");
@@ -141,6 +143,8 @@ public class Config {
         enableRedirection();
 
         lastCreatedPipeIndex = 0;
+
+        executions = Collections.synchronizedList(new ArrayList<FFmpegExecution>());
     }
 
     /**
@@ -214,10 +218,11 @@ public class Config {
     /**
      * <p>Log redirection method called by JNI/native part.
      *
-     * @param levelValue log level as defined in {@link Level}
-     * @param logMessage redirected log message
+     * @param executionId id of the execution that generated this log, 0 by default
+     * @param levelValue  log level as defined in {@link Level}
+     * @param logMessage  redirected log message
      */
-    private static void log(final int levelValue, final byte[] logMessage) {
+    private static void log(final long executionId, final int levelValue, final byte[] logMessage) {
         final Level level = Level.from(levelValue);
         final String text = new String(logMessage);
 
@@ -229,7 +234,7 @@ public class Config {
 
         if (logCallbackFunction != null) {
             try {
-                logCallbackFunction.apply(new LogMessage(level, text));
+                logCallbackFunction.apply(new LogMessage(executionId, level, text));
             } catch (final Exception e) {
                 Log.e(Config.TAG, "Exception thrown inside LogCallback block", e);
             }
@@ -274,6 +279,7 @@ public class Config {
     /**
      * <p>Statistics redirection method called by JNI/native part.
      *
+     * @param executionId      id of the execution that generated this statistics, 0 by default
      * @param videoFrameNumber last processed frame number for videos
      * @param videoFps         frames processed per second for videos
      * @param videoQuality     quality of the video stream
@@ -282,10 +288,10 @@ public class Config {
      * @param bitrate          output bit rate in kbits/s
      * @param speed            processing speed = processed duration / operation duration
      */
-    private static void statistics(final int videoFrameNumber, final float videoFps,
-                                   final float videoQuality, final long size, final int time,
-                                   final double bitrate, final double speed) {
-        final Statistics newStatistics = new Statistics(videoFrameNumber, videoFps, videoQuality, size, time, bitrate, speed);
+    private static void statistics(final long executionId, final int videoFrameNumber,
+                                   final float videoFps, final float videoQuality, final long size,
+                                   final int time, final double bitrate, final double speed) {
+        final Statistics newStatistics = new Statistics(executionId, videoFrameNumber, videoFps, videoQuality, size, time, bitrate, speed);
         lastReceivedStatistics.update(newStatistics);
 
         if (statisticsCallbackFunction != null) {
@@ -587,12 +593,63 @@ public class Config {
     }
 
     /**
+     * <p>Sets an environment variable.
+     *
+     * @param variableName  environment variable name
+     * @param variableValue environment variable value
+     * @return zero on success, non-zero on error
+     */
+    public static int setEnvironmentVariable(final String variableName, final String variableValue) {
+        return setNativeEnvironmentVariable(variableName, variableValue);
+    }
+
+    /**
+     * <p>Registers a new ignored signal. Ignored signals are not handled by the library.
+     *
+     * @param signal signal number to ignore
+     */
+    public static void ignoreSignal(final Signal signal) {
+        ignoreNativeSignal(signal.getValue());
+    }
+
+    /**
+     * <p>Synchronously executes FFmpeg with arguments provided.
+     *
+     * @param executionId id of the execution
+     * @param arguments   FFmpeg command options/arguments as string array
+     * @return zero on successful execution, 255 on user cancel and non-zero on error
+     */
+    static int ffmpegExecute(final long executionId, final String[] arguments) {
+        final FFmpegExecution currentFFmpegExecution = new FFmpegExecution(executionId, arguments);
+        executions.add(currentFFmpegExecution);
+
+        try {
+            final int lastReturnCode = nativeFFmpegExecute(executionId, arguments);
+
+            Config.setLastReturnCode(lastReturnCode);
+
+            return lastReturnCode;
+        } finally {
+            executions.remove(currentFFmpegExecution);
+        }
+    }
+
+    /**
      * Updates return code value for the last executed command.
      *
      * @param newLastReturnCode new last return code value
      */
     static void setLastReturnCode(int newLastReturnCode) {
         lastReturnCode = newLastReturnCode;
+    }
+
+    /**
+     * <p>Lists ongoing FFmpeg executions.
+     *
+     * @return list of ongoing FFmpeg executions
+     */
+    static List<FFmpegExecution> listFFmpegExecutions() {
+        return new ArrayList<>(executions);
     }
 
     /**
@@ -624,28 +681,31 @@ public class Config {
      *
      * @return FFmpeg version
      */
-    native static String getNativeFFmpegVersion();
+    private native static String getNativeFFmpegVersion();
 
     /**
      * <p>Returns MobileFFmpeg library version natively.
      *
      * @return MobileFFmpeg version
      */
-    native static String getNativeVersion();
+    private native static String getNativeVersion();
 
     /**
      * <p>Synchronously executes FFmpeg natively with arguments provided.
      *
-     * @param arguments FFmpeg command options/arguments as string array
+     * @param executionId id of the execution
+     * @param arguments   FFmpeg command options/arguments as string array
      * @return zero on successful execution, 255 on user cancel and non-zero on error
      */
-    native static int nativeFFmpegExecute(final String[] arguments);
+    private native static int nativeFFmpegExecute(final long executionId, final String[] arguments);
 
     /**
      * <p>Cancels an ongoing FFmpeg operation natively. This function does not wait for termination
      * to complete and returns immediately.
+     *
+     * @param executionId id of the execution
      */
-    native static void nativeFFmpegCancel();
+    native static void nativeFFmpegCancel(final long executionId);
 
     /**
      * <p>Synchronously executes FFprobe natively with arguments provided.
@@ -663,14 +723,14 @@ public class Config {
      * @param ffmpegPipePath full path of ffmpeg pipe
      * @return zero on successful creation, non-zero on error
      */
-    native static int registerNewNativeFFmpegPipe(final String ffmpegPipePath);
+    private native static int registerNewNativeFFmpegPipe(final String ffmpegPipePath);
 
     /**
      * <p>Returns MobileFFmpeg library build date natively.
      *
      * @return MobileFFmpeg library build date
      */
-    native static String getNativeBuildDate();
+    private native static String getNativeBuildDate();
 
     /**
      * <p>Sets an environment variable natively.
@@ -679,13 +739,20 @@ public class Config {
      * @param variableValue environment variable value
      * @return zero on success, non-zero on error
      */
-    public native static int setNativeEnvironmentVariable(final String variableName, final String variableValue);
+    private native static int setNativeEnvironmentVariable(final String variableName, final String variableValue);
 
     /**
      * <p>Returns log output of the last executed single command natively.
      *
      * @return output of the last executed single command
      */
-    native static String getNativeLastCommandOutput();
+    private native static String getNativeLastCommandOutput();
+
+    /**
+     * <p>Registers a new ignored signal natively. Ignored signals are not handled by the library.
+     *
+     * @param signum signal number
+     */
+    private native static void ignoreNativeSignal(final int signum);
 
 }

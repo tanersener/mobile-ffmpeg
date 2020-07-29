@@ -3,6 +3,30 @@
 
 #include <immintrin.h>
 
+// The calling convention used by MSVC on 32-bit builds will essentially
+// disallow functions to have more than 3 XMM/YMM parameters, because it
+// will not provide more than 8-byte param alignment, and only the first
+// three vector params will be carried in SIMD registers. Now the
+// vectorcall convention could probably be problematic in globally visible
+// funcitons, but likely not in static ones.
+#if defined _MSC_VER && defined _WIN32 && !defined _WIN64
+  #define FIX_W32 __vectorcall
+#else
+  #define FIX_W32
+#endif
+
+// Non-inline functions defined in this header are likely to trigger a
+// warning for each module including this header that does NOT use them,
+// at least on unix-ish platforms (GCC/Clang both on native Unix and MinGW).
+// Tell 'em we actually want to do that, it's not an accident.
+#if defined __GNUC__ || defined __clang__ || defined __MINGW32__ || defined __MINGW64__
+  #define FIX_UNUSED __attribute__((unused))
+#else
+  #define FIX_UNUSED
+#endif
+
+#define FIX_NOINLINE FIX_W32 FIX_UNUSED
+
 /*
  * Reorder coefficients from raster to scan order
  * Fun fact: Once upon a time, doing this in a loop looked like this:
@@ -109,6 +133,21 @@ static INLINE void get_first_last_nz_int16(__m256i ints, int32_t *first, int32_t
   uint32_t nonzero_bytes = ~((uint32_t)_mm256_movemask_epi8(zeros));
   *first = (    (int32_t)_tzcnt_u32(nonzero_bytes)) >> 1;
   *last = (31 - (int32_t)_lzcnt_u32(nonzero_bytes)) >> 1;
+}
+
+static int32_t FIX_NOINLINE hsum_8x32b(const __m256i v)
+{
+  __m256i sum1 = v;
+  __m256i sum2 = _mm256_permute4x64_epi64(sum1, _MM_SHUFFLE(1, 0, 3, 2));
+  __m256i sum3 = _mm256_add_epi32        (sum1, sum2);
+  __m256i sum4 = _mm256_shuffle_epi32    (sum3, _MM_SHUFFLE(1, 0, 3, 2));
+  __m256i sum5 = _mm256_add_epi32        (sum3, sum4);
+  __m256i sum6 = _mm256_shuffle_epi32    (sum5, _MM_SHUFFLE(2, 3, 0, 1));
+  __m256i sum7 = _mm256_add_epi32        (sum5, sum6);
+
+  __m128i sum8 = _mm256_castsi256_si128  (sum7);
+  int32_t sum9 = _mm_cvtsi128_si32       (sum8);
+  return  sum9;
 }
 
 #endif

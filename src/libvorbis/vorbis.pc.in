@@ -11,5 +11,5 @@ Version: @VERSION@
 Requires.private: ogg
 Conflicts:
 Libs: -L${libdir} -lvorbis 
-Libs.private: -lm
+Libs.private: @VORBIS_LIBS@
 Cflags: -I${includedir}

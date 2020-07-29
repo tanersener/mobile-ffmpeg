@@ -32,6 +32,8 @@ int ffprobe_execute(int argc, char **argv);
 /** Forward declaration for function defined in mobileffmpeg.c */
 void clearLastCommandOutput();
 
+extern int configuredLogLevel;
+
 /**
  * Synchronously executes FFprobe natively with arguments provided.
  *
@@ -44,6 +46,9 @@ JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_Config_nativeFFprobeExecu
     jstring *tempArray = NULL;
     int argumentCount = 1;
     char **argv = NULL;
+
+    // SETS DEFAULT LOG LEVEL BEFORE STARTING A NEW EXECUTION
+    av_log_set_level(configuredLogLevel);
 
     if (stringArray != NULL) {
         int programArgumentCount = (*env)->GetArrayLength(env, stringArray);

@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -132,7 +132,8 @@ extends java.lang.Object</pre>
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/MediaInformation.html#MediaInformation--">MediaInformation</a></span>()</code>&nbsp;</td>
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/MediaInformation.html#MediaInformation-org.json.JSONObject-java.util.List-">MediaInformation</a></span>(org.json.JSONObject&nbsp;jsonObject,
+                java.util.List&lt;<a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html" title="class in com.arthenica.mobileffmpeg">StreamInformation</a>&gt;&nbsp;streams)</code>&nbsp;</td>
 </tr>
 </table>
 </li>
@@ -150,28 +151,27 @@ extends java.lang.Object</pre>
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr id="i0" class="altColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/MediaInformation.html#addMetadata-java.lang.String-java.lang.String-">addMetadata</a></span>(java.lang.String&nbsp;key,
-           java.lang.String&nbsp;value)</code>
-<div class="block">Adds metadata.</div>
+<td class="colFirst"><code>org.json.JSONObject</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/MediaInformation.html#getAllProperties--">getAllProperties</a></span>()</code>
+<div class="block">Returns all properties defined.</div>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/MediaInformation.html#addStream-com.arthenica.mobileffmpeg.StreamInformation-">addStream</a></span>(<a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html" title="class in com.arthenica.mobileffmpeg">StreamInformation</a>&nbsp;stream)</code>
-<div class="block">Adds new stream.</div>
-</td>
-</tr>
-<tr id="i2" class="altColor">
-<td class="colFirst"><code>java.lang.Long</code></td>
+<td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/MediaInformation.html#getBitrate--">getBitrate</a></span>()</code>
 <div class="block">Returns bitrate.</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
-<td class="colFirst"><code>java.lang.Long</code></td>
+<tr id="i2" class="altColor">
+<td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/MediaInformation.html#getDuration--">getDuration</a></span>()</code>
 <div class="block">Returns duration.</div>
+</td>
+</tr>
+<tr id="i3" class="rowColor">
+<td class="colFirst"><code>java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/MediaInformation.html#getFilename--">getFilename</a></span>()</code>
+<div class="block">Returns file name.</div>
 </td>
 </tr>
 <tr id="i4" class="altColor">
@@ -181,69 +181,57 @@ extends java.lang.Object</pre>
 </td>
 </tr>
 <tr id="i5" class="rowColor">
-<td class="colFirst"><code>java.util.Set&lt;java.util.Map.Entry&lt;java.lang.String,java.lang.String&gt;&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/MediaInformation.html#getMetadataEntries--">getMetadataEntries</a></span>()</code>
-<div class="block">Returns all metadata entries.</div>
+<td class="colFirst"><code>java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/MediaInformation.html#getLongFormat--">getLongFormat</a></span>()</code>
+<div class="block">Returns long format.</div>
 </td>
 </tr>
 <tr id="i6" class="altColor">
-<td class="colFirst"><code>java.lang.String</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/MediaInformation.html#getPath--">getPath</a></span>()</code>
-<div class="block">Returns path.</div>
+<td class="colFirst"><code>org.json.JSONObject</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/MediaInformation.html#getMediaProperties--">getMediaProperties</a></span>()</code>
+<div class="block">Returns all media properties.</div>
 </td>
 </tr>
 <tr id="i7" class="rowColor">
-<td class="colFirst"><code>java.lang.String</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/MediaInformation.html#getRawInformation--">getRawInformation</a></span>()</code>
-<div class="block">Returns unparsed media information.</div>
+<td class="colFirst"><code>java.lang.Long</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/MediaInformation.html#getNumberProperty-java.lang.String-">getNumberProperty</a></span>(java.lang.String&nbsp;key)</code>
+<div class="block">Returns the media property associated with the key.</div>
 </td>
 </tr>
 <tr id="i8" class="altColor">
-<td class="colFirst"><code>java.lang.Long</code></td>
+<td class="colFirst"><code>org.json.JSONObject</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/MediaInformation.html#getProperties-java.lang.String-">getProperties</a></span>(java.lang.String&nbsp;key)</code>
+<div class="block">Returns the media properties associated with the key.</div>
+</td>
+</tr>
+<tr id="i9" class="rowColor">
+<td class="colFirst"><code>java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/MediaInformation.html#getSize--">getSize</a></span>()</code>
+<div class="block">Returns size.</div>
+</td>
+</tr>
+<tr id="i10" class="altColor">
+<td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/MediaInformation.html#getStartTime--">getStartTime</a></span>()</code>
 <div class="block">Returns start time.</div>
 </td>
 </tr>
-<tr id="i9" class="rowColor">
+<tr id="i11" class="rowColor">
 <td class="colFirst"><code>java.util.List&lt;<a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html" title="class in com.arthenica.mobileffmpeg">StreamInformation</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/MediaInformation.html#getStreams--">getStreams</a></span>()</code>
 <div class="block">Returns all streams.</div>
 </td>
 </tr>
-<tr id="i10" class="altColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/MediaInformation.html#setBitrate-java.lang.Long-">setBitrate</a></span>(java.lang.Long&nbsp;bitrate)</code>
-<div class="block">Sets bitrate.</div>
-</td>
-</tr>
-<tr id="i11" class="rowColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/MediaInformation.html#setDuration-java.lang.Long-">setDuration</a></span>(java.lang.Long&nbsp;duration)</code>
-<div class="block">Sets duration.</div>
-</td>
-</tr>
 <tr id="i12" class="altColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/MediaInformation.html#setFormat-java.lang.String-">setFormat</a></span>(java.lang.String&nbsp;format)</code>
-<div class="block">Sets media format.</div>
+<td class="colFirst"><code>java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/MediaInformation.html#getStringProperty-java.lang.String-">getStringProperty</a></span>(java.lang.String&nbsp;key)</code>
+<div class="block">Returns the media property associated with the key.</div>
 </td>
 </tr>
 <tr id="i13" class="rowColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/MediaInformation.html#setPath-java.lang.String-">setPath</a></span>(java.lang.String&nbsp;path)</code>
-<div class="block">Sets path.</div>
-</td>
-</tr>
-<tr id="i14" class="altColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/MediaInformation.html#setRawInformation-java.lang.String-">setRawInformation</a></span>(java.lang.String&nbsp;rawInformation)</code>
-<div class="block">Sets unparsed media information.</div>
-</td>
-</tr>
-<tr id="i15" class="rowColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/MediaInformation.html#setStartTime-java.lang.Long-">setStartTime</a></span>(java.lang.Long&nbsp;startTime)</code>
-<div class="block">Sets start time.</div>
+<td class="colFirst"><code>org.json.JSONObject</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/MediaInformation.html#getTags--">getTags</a></span>()</code>
+<div class="block">Returns all tags.</div>
 </td>
 </tr>
 </table>
@@ -268,13 +256,14 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="MediaInformation--">
+<a name="MediaInformation-org.json.JSONObject-java.util.List-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>MediaInformation</h4>
-<pre>public&nbsp;MediaInformation()</pre>
+<pre>public&nbsp;MediaInformation(org.json.JSONObject&nbsp;jsonObject,
+                        java.util.List&lt;<a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html" title="class in com.arthenica.mobileffmpeg">StreamInformation</a>&gt;&nbsp;streams)</pre>
 </li>
 </ul>
 </li>
@@ -285,6 +274,20 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Method Detail</h3>
+<a name="getFilename--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getFilename</h4>
+<pre>public&nbsp;java.lang.String&nbsp;getFilename()</pre>
+<div class="block">Returns file name.</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>media file name</dd>
+</dl>
+</li>
+</ul>
 <a name="getFormat--">
 <!--   -->
 </a>
@@ -299,45 +302,17 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
-<a name="setFormat-java.lang.String-">
+<a name="getLongFormat--">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>setFormat</h4>
-<pre>public&nbsp;void&nbsp;setFormat(java.lang.String&nbsp;format)</pre>
-<div class="block">Sets media format.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>format</code> - media format</dd>
-</dl>
-</li>
-</ul>
-<a name="getPath--">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getPath</h4>
-<pre>public&nbsp;java.lang.String&nbsp;getPath()</pre>
-<div class="block">Returns path.</div>
+<h4>getLongFormat</h4>
+<pre>public&nbsp;java.lang.String&nbsp;getLongFormat()</pre>
+<div class="block">Returns long format.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>media path</dd>
-</dl>
-</li>
-</ul>
-<a name="setPath-java.lang.String-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>setPath</h4>
-<pre>public&nbsp;void&nbsp;setPath(java.lang.String&nbsp;path)</pre>
-<div class="block">Sets path.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>path</code> - media path</dd>
+<dd>media long format</dd>
 </dl>
 </li>
 </ul>
@@ -347,25 +322,11 @@ extends java.lang.Object</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>getDuration</h4>
-<pre>public&nbsp;java.lang.Long&nbsp;getDuration()</pre>
+<pre>public&nbsp;java.lang.String&nbsp;getDuration()</pre>
 <div class="block">Returns duration.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>media duration in milliseconds</dd>
-</dl>
-</li>
-</ul>
-<a name="setDuration-java.lang.Long-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>setDuration</h4>
-<pre>public&nbsp;void&nbsp;setDuration(java.lang.Long&nbsp;duration)</pre>
-<div class="block">Sets duration.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>duration</code> - media duration in milliseconds</dd>
 </dl>
 </li>
 </ul>
@@ -375,7 +336,7 @@ extends java.lang.Object</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>getStartTime</h4>
-<pre>public&nbsp;java.lang.Long&nbsp;getStartTime()</pre>
+<pre>public&nbsp;java.lang.String&nbsp;getStartTime()</pre>
 <div class="block">Returns start time.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
@@ -383,17 +344,17 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
-<a name="setStartTime-java.lang.Long-">
+<a name="getSize--">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>setStartTime</h4>
-<pre>public&nbsp;void&nbsp;setStartTime(java.lang.Long&nbsp;startTime)</pre>
-<div class="block">Sets start time.</div>
+<h4>getSize</h4>
+<pre>public&nbsp;java.lang.String&nbsp;getSize()</pre>
+<div class="block">Returns size.</div>
 <dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>startTime</code> - media start time in milliseconds</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>media size in bytes</dd>
 </dl>
 </li>
 </ul>
@@ -403,7 +364,7 @@ extends java.lang.Object</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>getBitrate</h4>
-<pre>public&nbsp;java.lang.Long&nbsp;getBitrate()</pre>
+<pre>public&nbsp;java.lang.String&nbsp;getBitrate()</pre>
 <div class="block">Returns bitrate.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
@@ -411,96 +372,24 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
-<a name="setBitrate-java.lang.Long-">
+<a name="getTags--">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>setBitrate</h4>
-<pre>public&nbsp;void&nbsp;setBitrate(java.lang.Long&nbsp;bitrate)</pre>
-<div class="block">Sets bitrate.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>bitrate</code> - media bitrate in kb/s</dd>
-</dl>
-</li>
-</ul>
-<a name="getRawInformation--">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getRawInformation</h4>
-<pre>public&nbsp;java.lang.String&nbsp;getRawInformation()</pre>
-<div class="block">Returns unparsed media information.</div>
+<h4>getTags</h4>
+<pre>public&nbsp;org.json.JSONObject&nbsp;getTags()</pre>
+<div class="block">Returns all tags.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>unparsed media information data</dd>
-</dl>
-</li>
-</ul>
-<a name="setRawInformation-java.lang.String-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>setRawInformation</h4>
-<pre>public&nbsp;void&nbsp;setRawInformation(java.lang.String&nbsp;rawInformation)</pre>
-<div class="block">Sets unparsed media information.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>rawInformation</code> - unparsed media information data</dd>
-</dl>
-</li>
-</ul>
-<a name="addMetadata-java.lang.String-java.lang.String-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>addMetadata</h4>
-<pre>public&nbsp;void&nbsp;addMetadata(java.lang.String&nbsp;key,
-                        java.lang.String&nbsp;value)</pre>
-<div class="block">Adds metadata.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>key</code> - metadata key</dd>
-<dd><code>value</code> - metadata value</dd>
-</dl>
-</li>
-</ul>
-<a name="getMetadataEntries--">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getMetadataEntries</h4>
-<pre>public&nbsp;java.util.Set&lt;java.util.Map.Entry&lt;java.lang.String,java.lang.String&gt;&gt;&nbsp;getMetadataEntries()</pre>
-<div class="block">Returns all metadata entries.</div>
-<dl>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>set of metadata entries</dd>
-</dl>
-</li>
-</ul>
-<a name="addStream-com.arthenica.mobileffmpeg.StreamInformation-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>addStream</h4>
-<pre>public&nbsp;void&nbsp;addStream(<a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html" title="class in com.arthenica.mobileffmpeg">StreamInformation</a>&nbsp;stream)</pre>
-<div class="block">Adds new stream.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>stream</code> - new stream information</dd>
+<dd>tags dictionary</dd>
 </dl>
 </li>
 </ul>
 <a name="getStreams--">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>getStreams</h4>
 <pre>public&nbsp;java.util.List&lt;<a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html" title="class in com.arthenica.mobileffmpeg">StreamInformation</a>&gt;&nbsp;getStreams()</pre>
@@ -508,6 +397,82 @@ extends java.lang.Object</pre>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>list of streams</dd>
+</dl>
+</li>
+</ul>
+<a name="getStringProperty-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getStringProperty</h4>
+<pre>public&nbsp;java.lang.String&nbsp;getStringProperty(java.lang.String&nbsp;key)</pre>
+<div class="block">Returns the media property associated with the key.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>key</code> - property key</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>media property as string or null if the key is not found</dd>
+</dl>
+</li>
+</ul>
+<a name="getNumberProperty-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getNumberProperty</h4>
+<pre>public&nbsp;java.lang.Long&nbsp;getNumberProperty(java.lang.String&nbsp;key)</pre>
+<div class="block">Returns the media property associated with the key.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>key</code> - property key</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>media property as Long or null if the key is not found</dd>
+</dl>
+</li>
+</ul>
+<a name="getProperties-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getProperties</h4>
+<pre>public&nbsp;org.json.JSONObject&nbsp;getProperties(java.lang.String&nbsp;key)</pre>
+<div class="block">Returns the media properties associated with the key.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>key</code> - properties key</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>media properties as a JSONObject or null if the key is not found</dd>
+</dl>
+</li>
+</ul>
+<a name="getMediaProperties--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getMediaProperties</h4>
+<pre>public&nbsp;org.json.JSONObject&nbsp;getMediaProperties()</pre>
+<div class="block">Returns all media properties.</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>all media properties as a JSONObject or null if no media properties are defined</dd>
+</dl>
+</li>
+</ul>
+<a name="getAllProperties--">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>getAllProperties</h4>
+<pre>public&nbsp;org.json.JSONObject&nbsp;getAllProperties()</pre>
+<div class="block">Returns all properties defined.</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>all properties as a JSONObject or null if no properties are defined</dd>
 </dl>
 </li>
 </ul>

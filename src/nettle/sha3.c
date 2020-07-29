@@ -92,10 +92,10 @@ _sha3_update (struct sha3_state *state,
 
 void
 _sha3_pad (struct sha3_state *state,
-	   unsigned block_size, uint8_t *block, unsigned pos)
+	   unsigned block_size, uint8_t *block, unsigned pos, uint8_t magic)
 {
   assert (pos < block_size);
-  block[pos++] = 6;
+  block[pos++] = magic;
 
   memset (block + pos, 0, block_size - pos);
   block[block_size - 1] |= 0x80;

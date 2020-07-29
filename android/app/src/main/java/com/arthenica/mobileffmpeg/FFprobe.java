@@ -72,7 +72,7 @@ public class FFprobe {
     }
 
     /**
-     * <p>Returns media information for given file.
+     * <p>Returns media information for the given file.
      *
      * <p>This method does not support executing multiple concurrent operations. If you execute
      * multiple operations (execute or getMediaInformation) at the same time, the response of this
@@ -83,14 +83,22 @@ public class FFprobe {
      * @since 3.0
      */
     public static MediaInformation getMediaInformation(final String path) {
-        final int rc = execute(new String[]{"-v", "info", "-hide_banner", "-i", path});
+        return getMediaInformationFromCommandArguments(new String[]{"-v", "error", "-hide_banner", "-print_format", "json", "-show_format", "-show_streams", "-i", path});
+    }
 
-        if (rc == 0) {
-            return MediaInformationParser.from(Config.getLastCommandOutput());
-        } else {
-            Log.i(Config.TAG, Config.getLastCommandOutput());
-            return null;
-        }
+    /**
+     * <p>Returns media information for the given command.
+     *
+     * <p>This method does not support executing multiple concurrent operations. If you execute
+     * multiple operations (execute or getMediaInformation) at the same time, the response of this
+     * method is not predictable.
+     *
+     * @param command command to execute
+     * @return media information
+     * @since 4.3.3
+     */
+    public static MediaInformation getMediaInformationFromCommand(final String command) {
+        return getMediaInformationFromCommandArguments(FFmpeg.parseArguments(command));
     }
 
     /**
@@ -109,6 +117,17 @@ public class FFprobe {
      */
     public static MediaInformation getMediaInformation(final String path, final Long timeout) {
         return getMediaInformation(path);
+    }
+
+    private static MediaInformation getMediaInformationFromCommandArguments(final String[] arguments) {
+        final int rc = execute(arguments);
+
+        if (rc == 0) {
+            return MediaInformationParser.from(Config.getLastCommandOutput());
+        } else {
+            Log.w(Config.TAG, Config.getLastCommandOutput());
+            return null;
+        }
     }
 
 }

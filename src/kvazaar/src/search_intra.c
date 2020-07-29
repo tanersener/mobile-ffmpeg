@@ -406,8 +406,9 @@ static int8_t search_intra_rough(encoder_state_t * const state,
   kvz_pixels_blit(orig, orig_block, width, width, origstride, width);
 
   int8_t modes_selected = 0;
-  unsigned min_cost = UINT_MAX;
-  unsigned max_cost = 0;
+  // Note: get_cost and get_cost_dual may return negative costs.
+  int32_t min_cost = INT_MAX;
+  int32_t max_cost = INT_MIN;
   
   // Initial offset decides how many modes are tried before moving on to the
   // recursive search.

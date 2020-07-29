@@ -37,7 +37,7 @@ import com.arthenica.mobileffmpeg.LogCallback;
 import com.arthenica.mobileffmpeg.LogMessage;
 import com.arthenica.mobileffmpeg.util.DialogUtil;
 import com.arthenica.mobileffmpeg.util.ResourcesUtil;
-import com.arthenica.mobileffmpeg.util.SingleExecuteCallback;
+import com.arthenica.mobileffmpeg.ExecuteCallback;
 import com.arthenica.smartexception.java.Exceptions;
 
 import java.io.File;
@@ -132,17 +132,17 @@ public class VidStabTabFragment extends Fragment {
 
             final String ffmpegCommand = Video.generateShakingVideoScript(image1File.getAbsolutePath(), image2File.getAbsolutePath(), image3File.getAbsolutePath(), videoFile.getAbsolutePath());
 
-            Log.d(TAG, String.format("FFmpeg process started with arguments\n'%s'", ffmpegCommand));
+            Log.d(TAG, String.format("FFmpeg process started with arguments\n'%s'.", ffmpegCommand));
 
-            MainActivity.executeAsync(new SingleExecuteCallback() {
+            MainActivity.executeAsync(new ExecuteCallback() {
 
                 @Override
-                public void apply(final int returnCode, final String commandOutput) {
-                    Log.d(TAG, String.format("FFmpeg process exited with rc %d", returnCode));
+                public void apply(final long executionId, final int returnCode) {
+                    Log.d(TAG, String.format("FFmpeg process exited with rc %d.", returnCode));
 
                     hideCreateProgressDialog();
 
-                    MainActivity.addUIAction(new Callable() {
+                    MainActivity.addUIAction(new Callable<Object>() {
 
                         @Override
                         public Object call() {
@@ -154,28 +154,28 @@ public class VidStabTabFragment extends Fragment {
 
                                 showStabilizeProgressDialog();
 
-                                Log.d(TAG, String.format("FFmpeg process started with arguments\n'%s'", analyzeVideoCommand));
+                                Log.d(TAG, String.format("FFmpeg process started with arguments\n'%s'.", analyzeVideoCommand));
 
-                                MainActivity.executeAsync(new SingleExecuteCallback() {
+                                MainActivity.executeAsync(new ExecuteCallback() {
 
                                     @Override
-                                    public void apply(final int returnCode, final String commandOutput) {
-                                        Log.d(TAG, String.format("FFmpeg process exited with rc %d", returnCode));
+                                    public void apply(final long executionId, final int returnCode) {
+                                        Log.d(TAG, String.format("FFmpeg process exited with rc %d.", returnCode));
 
                                         if (returnCode == RETURN_CODE_SUCCESS) {
                                             final String stabilizeVideoCommand = String.format("-y -i %s -vf vidstabtransform=smoothing=30:input=%s -c:v mpeg4 %s", videoFile.getAbsolutePath(), shakeResultsFile.getAbsolutePath(), stabilizedVideoFile.getAbsolutePath());
 
-                                            Log.d(TAG, String.format("FFmpeg process started with arguments\n'%s'", stabilizeVideoCommand));
+                                            Log.d(TAG, String.format("FFmpeg process started with arguments\n'%s'.", stabilizeVideoCommand));
 
-                                            MainActivity.executeAsync(new SingleExecuteCallback() {
+                                            MainActivity.executeAsync(new ExecuteCallback() {
 
                                                 @Override
-                                                public void apply(final int returnCode, final String commandOutput) {
-                                                    Log.d(TAG, String.format("FFmpeg process exited with rc %d", returnCode));
+                                                public void apply(final long executionId, final int returnCode) {
+                                                    Log.d(TAG, String.format("FFmpeg process exited with rc %d.", returnCode));
 
                                                     hideStabilizeProgressDialog();
 
-                                                    MainActivity.addUIAction(new Callable() {
+                                                    MainActivity.addUIAction(new Callable<Object>() {
 
                                                         @Override
                                                         public Object call() {
@@ -185,7 +185,7 @@ public class VidStabTabFragment extends Fragment {
                                                                 playStabilizedVideo();
                                                             } else {
                                                                 Popup.show(requireContext(), "Stabilize video failed. Please check log for the details.");
-                                                                Log.d(TAG, String.format("Stabilize video failed with rc=%d", returnCode));
+                                                                Log.d(TAG, String.format("Stabilize video failed with rc=%d.", returnCode));
                                                             }
 
                                                             return null;
@@ -197,14 +197,14 @@ public class VidStabTabFragment extends Fragment {
                                         } else {
                                             hideStabilizeProgressDialog();
                                             Popup.show(requireContext(), "Stabilize video failed. Please check log for the details.");
-                                            Log.d(TAG, String.format("Stabilize video failed with rc=%d", returnCode));
+                                            Log.d(TAG, String.format("Stabilize video failed with rc=%d.", returnCode));
                                         }
                                     }
                                 }, analyzeVideoCommand);
 
                             } else {
                                 Popup.show(requireContext(), "Create video failed. Please check log for the details.");
-                                Log.d(TAG, String.format("Create failed with rc=%d", returnCode));
+                                Log.d(TAG, String.format("Create failed with rc=%d.", returnCode));
                             }
 
                             return null;
@@ -214,7 +214,7 @@ public class VidStabTabFragment extends Fragment {
             }, ffmpegCommand);
 
         } catch (IOException e) {
-            Log.e(TAG, String.format("Stabilize video failed %s", Exceptions.getStackTraceString(e)));
+            Log.e(TAG, String.format("Stabilize video failed %s.", Exceptions.getStackTraceString(e)));
             Popup.show(requireContext(), "Stabilize video failed");
         }
     }

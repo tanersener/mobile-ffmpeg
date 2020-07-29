@@ -157,28 +157,35 @@ static float sao_mode_bits_band(const encoder_state_t * const state,
   return mode_bits;
 }
 
-
 /**
  * \brief calculate an array of intensity correlations for each intensity value
  */
+// NOTE: There's also an AVX2 variant of this in strategies/avx2/sao-avx2.c.
+// It has to be separate, because it returns the offset array in different
+// format (an array of YMM vectors).
 void kvz_calc_sao_offset_array(const encoder_control_t * const encoder, const sao_info_t *sao, int *offset, color_t color_i)
 {
-  int val;
-  int values = (1<<encoder->bitdepth);
-  int shift = encoder->bitdepth-5;
-  int band_pos = (color_i == COLOR_V) ? 1 : 0;
+  int32_t val;
+  const int32_t values = (1<<encoder->bitdepth);
+  const int32_t shift = encoder->bitdepth-5;
+  const int32_t band_pos = (color_i == COLOR_V) ? 1 : 0;
+  const int32_t cur_bp   = sao->band_position[band_pos];
 
   // Loop through all intensity values and construct an offset array
   for (val = 0; val < values; val++) {
-    int cur_band = val>>shift;
-    if (cur_band >= sao->band_position[band_pos] && cur_band < sao->band_position[band_pos] + 4) {
-      offset[val] = CLIP(0, values - 1, val + sao->offsets[cur_band - sao->band_position[band_pos] + 1 + 5 * band_pos]);
+    int32_t cur_band     = val >> shift;
+    int32_t cb_minus_cbp = cur_band - cur_bp;
+
+    if (cb_minus_cbp >= 0 && cb_minus_cbp <= 3) {
+      uint32_t offset_id    = cb_minus_cbp + 1 + 5 * band_pos;
+      int32_t val_unclipped = val + sao->offsets[offset_id];
+      offset[val] = CLIP(0, values - 1, val_unclipped);
+
     } else {
       offset[val] = val;
     }
   }
 }
-
 
 /**
  * \param orig_data  Original pixel data. 64x64 for luma, 32x32 for chroma.
@@ -254,8 +261,11 @@ static void calc_sao_bands(const encoder_state_t * const state, const kvz_pixel 
   //Loop pixels and take top 5 bits to classify different bands
   for (y = 0; y < block_height; ++y) {
     for (x = 0; x < block_width; ++x) {
-      sao_bands[0][rec_data[y * block_width + x]>>shift] += orig_data[y * block_width + x] - rec_data[y * block_width + x];
-      sao_bands[1][rec_data[y * block_width + x]>>shift]++;
+      int32_t curr_pos = y * block_width + x;
+
+      kvz_pixel sb_index = rec_data[curr_pos] >> shift;
+      sao_bands[0][sb_index] += orig_data[curr_pos] - rec_data[curr_pos];
+      sao_bands[1][sb_index]++;
     }
   }
 }

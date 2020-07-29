@@ -138,24 +138,25 @@ PROLOGUE(nettle_memxor)
 	adds	N, #8
 	beq	.Lmemxor_odd_done
 
-	C We have TNC/8 left-over bytes in r4, high end
+	C We have TNC/8 left-over bytes in r4, high end on LE and low end on
+	C BE, excess bits to be discarded by alignment adjustment at the other
 	S0ADJ	r4, CNT
+	C now byte-aligned at low end on LE and high end on BE
 	ldr	r3, [DST]
 	eor	r3, r4
-
-	C memxor_leftover does an LSB store
-	C so we need to reverse if actually BE
-IF_BE(<	rev	r3, r3>)
 
 	pop	{r4,r5,r6}
 
 	C Store bytes, one by one.
 .Lmemxor_leftover:
+	C bring uppermost byte down for saving while preserving lower ones
+IF_BE(<	ror	r3, #24>)
 	strb	r3, [DST], #+1
 	subs	N, #1
 	beq	.Lmemxor_done
 	subs	TNC, #8
-	lsr	r3, #8
+	C bring down next byte, no need to preserve
+IF_LE(<	lsr	r3, #8>)
 	bne	.Lmemxor_leftover
 	b	.Lmemxor_bytes
 .Lmemxor_odd_done:

@@ -38,6 +38,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.arthenica.mobileffmpeg.Config;
+import com.arthenica.mobileffmpeg.ExecuteCallback;
 import com.arthenica.mobileffmpeg.FFmpeg;
 import com.arthenica.mobileffmpeg.LogCallback;
 import com.arthenica.mobileffmpeg.LogMessage;
@@ -45,7 +46,6 @@ import com.arthenica.mobileffmpeg.Statistics;
 import com.arthenica.mobileffmpeg.StatisticsCallback;
 import com.arthenica.mobileffmpeg.util.DialogUtil;
 import com.arthenica.mobileffmpeg.util.ResourcesUtil;
-import com.arthenica.mobileffmpeg.util.SingleExecuteCallback;
 import com.arthenica.smartexception.java.Exceptions;
 
 import java.io.File;
@@ -122,7 +122,7 @@ public class VideoTabFragment extends Fragment implements AdapterView.OnItemSele
 
             @Override
             public void apply(final Statistics newStatistics) {
-                MainActivity.addUIAction(new Callable() {
+                MainActivity.addUIAction(new Callable<Object>() {
 
                     @Override
                     public Object call() {
@@ -174,13 +174,13 @@ public class VideoTabFragment extends Fragment implements AdapterView.OnItemSele
 
             final String ffmpegCommand = Video.generateEncodeVideoScript(image1File.getAbsolutePath(), image2File.getAbsolutePath(), image3File.getAbsolutePath(), videoFile.getAbsolutePath(), getSelectedVideoCodec(), getCustomOptions());
 
-            Log.d(TAG, String.format("FFmpeg process started with arguments\n'%s'", ffmpegCommand));
+            Log.d(TAG, String.format("FFmpeg process started with arguments\n'%s'.", ffmpegCommand));
 
-            MainActivity.executeAsync(new SingleExecuteCallback() {
+            long executionId = FFmpeg.executeAsync(ffmpegCommand, new ExecuteCallback() {
 
                 @Override
-                public void apply(final int returnCode, final String commandOutput) {
-                    Log.d(TAG, String.format("FFmpeg process exited with rc %d", returnCode));
+                public void apply(final long executionId, final int returnCode) {
+                    Log.d(TAG, String.format("FFmpeg process exited with rc %d.", returnCode));
 
                     Log.d(TAG, "FFmpeg process output:");
 
@@ -188,7 +188,7 @@ public class VideoTabFragment extends Fragment implements AdapterView.OnItemSele
 
                     hideProgressDialog();
 
-                    MainActivity.addUIAction(new Callable() {
+                    MainActivity.addUIAction(new Callable<Object>() {
 
                         @Override
                         public Object call() {
@@ -197,17 +197,19 @@ public class VideoTabFragment extends Fragment implements AdapterView.OnItemSele
                                 playVideo();
                             } else {
                                 Popup.show(requireContext(), "Encode failed. Please check log for the details.");
-                                Log.d(TAG, String.format("Encode failed with rc=%d", returnCode));
+                                Log.d(TAG, String.format("Encode failed with rc=%d.", returnCode));
                             }
 
                             return null;
                         }
                     });
                 }
-            }, ffmpegCommand);
+            });
+
+            Log.d(TAG, String.format("Async FFmpeg process started with executionId %d.", executionId));
 
         } catch (IOException e) {
-            Log.e(TAG, String.format("Encode video failed %s", Exceptions.getStackTraceString(e)));
+            Log.e(TAG, String.format("Encode video failed %s.", Exceptions.getStackTraceString(e)));
             Popup.show(requireContext(), "Encode video failed");
         }
     }
@@ -223,13 +225,13 @@ public class VideoTabFragment extends Fragment implements AdapterView.OnItemSele
 
             final String ffmpegCommand = String.format("-hide_banner -i %s %s", imageFile.getAbsolutePath(), outputFile.getAbsolutePath());
 
-            Log.d(TAG, String.format("FFmpeg process started with arguments\n'%s'", ffmpegCommand));
+            Log.d(TAG, String.format("FFmpeg process started with arguments\n'%s'.", ffmpegCommand));
 
             int returnCode = FFmpeg.execute(ffmpegCommand);
 
-            Log.d(TAG, String.format("FFmpeg process exited with rc %d", returnCode));
+            Log.d(TAG, String.format("FFmpeg process exited with rc %d.", returnCode));
         } catch (IOException e) {
-            Log.e(TAG, String.format("Encode webp failed %s", Exceptions.getStackTraceString(e)));
+            Log.e(TAG, String.format("Encode webp failed %s.", Exceptions.getStackTraceString(e)));
             Popup.show(requireContext(), "Encode webp failed");
         }
     }
@@ -268,6 +270,9 @@ public class VideoTabFragment extends Fragment implements AdapterView.OnItemSele
         switch (videoCodec) {
             case "x264":
                 videoCodec = "libx264";
+                break;
+            case "openh264":
+                videoCodec = "libopenh264";
                 break;
             case "x265":
                 videoCodec = "libx265";
@@ -376,7 +381,7 @@ public class VideoTabFragment extends Fragment implements AdapterView.OnItemSele
 
             TextView textView = progressDialog.findViewById(R.id.progressDialogText);
             if (textView != null) {
-                textView.setText(String.format("Encoding video: %% %s", completePercentage));
+                textView.setText(String.format("Encoding video: %% %s.", completePercentage));
             }
         }
     }
@@ -384,7 +389,7 @@ public class VideoTabFragment extends Fragment implements AdapterView.OnItemSele
     protected void hideProgressDialog() {
         progressDialog.dismiss();
 
-        MainActivity.addUIAction(new Callable() {
+        MainActivity.addUIAction(new Callable<Object>() {
 
             @Override
             public Object call() {

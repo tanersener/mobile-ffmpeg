@@ -54,6 +54,7 @@
 
 #include "chacha-internal.h"
 #include "chacha-poly1305.h"
+#include "poly1305-internal.h"
 
 #include "macros.h"
 
@@ -80,7 +81,7 @@ chacha_poly1305_set_nonce (struct chacha_poly1305_ctx *ctx,
   chacha_set_nonce96 (&ctx->chacha, nonce);
   /* Generate authentication key */
   _chacha_core (u.x, ctx->chacha.state, CHACHA_ROUNDS);
-  poly1305_set_key (&ctx->poly1305, u.subkey);  
+  _poly1305_set_key (&ctx->poly1305, u.subkey);
   /* For final poly1305 processing */
   memcpy (ctx->s.b, u.subkey + 16, 16);
   /* Increment block count */
@@ -130,7 +131,7 @@ chacha_poly1305_encrypt (struct chacha_poly1305_ctx *ctx,
   assert (ctx->data_size % CHACHA_POLY1305_BLOCK_SIZE == 0);
   poly1305_pad (ctx);
 
-  chacha_crypt (&ctx->chacha, length, dst, src);
+  chacha_crypt32 (&ctx->chacha, length, dst, src);
   poly1305_update (ctx, length, dst);
   ctx->data_size += length;
 }
@@ -146,7 +147,7 @@ chacha_poly1305_decrypt (struct chacha_poly1305_ctx *ctx,
   poly1305_pad (ctx);
 
   poly1305_update (ctx, length, src);
-  chacha_crypt (&ctx->chacha, length, dst, src);
+  chacha_crypt32 (&ctx->chacha, length, dst, src);
   ctx->data_size += length;
 }
 			 
@@ -162,6 +163,6 @@ chacha_poly1305_digest (struct chacha_poly1305_ctx *ctx,
 
   _poly1305_block (&ctx->poly1305, buf, 1);
 
-  poly1305_digest (&ctx->poly1305, &ctx->s);
+  _poly1305_digest (&ctx->poly1305, &ctx->s);
   memcpy (digest, &ctx->s.b, length);
 }

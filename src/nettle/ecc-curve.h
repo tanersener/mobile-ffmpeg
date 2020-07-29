@@ -43,6 +43,8 @@ extern "C" {
 /* The contents of this struct is internal. */
 struct ecc_curve;
 
+const struct ecc_curve * _NETTLE_ATTRIBUTE_PURE nettle_get_gost_gc256b(void);
+const struct ecc_curve * _NETTLE_ATTRIBUTE_PURE nettle_get_gost_gc512a(void);
 const struct ecc_curve * _NETTLE_ATTRIBUTE_PURE nettle_get_secp_192r1(void);
 const struct ecc_curve * _NETTLE_ATTRIBUTE_PURE nettle_get_secp_224r1(void);
 const struct ecc_curve * _NETTLE_ATTRIBUTE_PURE nettle_get_secp_256r1(void);

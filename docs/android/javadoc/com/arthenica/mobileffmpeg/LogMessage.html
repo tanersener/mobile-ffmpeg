@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -109,7 +109,7 @@ var activeTableTab = "activeTableTab";
 <br>
 <pre>public class <span class="typeNameLabel">LogMessage</span>
 extends java.lang.Object</pre>
-<div class="block"><p>Represents a redirected log message.</div>
+<div class="block"><p>Logs for running executions.</div>
 <dl>
 <dt><span class="simpleTagLabel">Since:</span></dt>
 <dd>v2.1</dd>
@@ -132,7 +132,8 @@ extends java.lang.Object</pre>
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/LogMessage.html#LogMessage-com.arthenica.mobileffmpeg.Level-java.lang.String-">LogMessage</a></span>(<a href="../../../com/arthenica/mobileffmpeg/Level.html" title="enum in com.arthenica.mobileffmpeg">Level</a>&nbsp;level,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/LogMessage.html#LogMessage-long-com.arthenica.mobileffmpeg.Level-java.lang.String-">LogMessage</a></span>(long&nbsp;executionId,
+          <a href="../../../com/arthenica/mobileffmpeg/Level.html" title="enum in com.arthenica.mobileffmpeg">Level</a>&nbsp;level,
           java.lang.String&nbsp;text)</code>&nbsp;</td>
 </tr>
 </table>
@@ -151,12 +152,20 @@ extends java.lang.Object</pre>
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr id="i0" class="altColor">
+<td class="colFirst"><code>long</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/LogMessage.html#getExecutionId--">getExecutionId</a></span>()</code>&nbsp;</td>
+</tr>
+<tr id="i1" class="rowColor">
 <td class="colFirst"><code><a href="../../../com/arthenica/mobileffmpeg/Level.html" title="enum in com.arthenica.mobileffmpeg">Level</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/LogMessage.html#getLevel--">getLevel</a></span>()</code>&nbsp;</td>
 </tr>
-<tr id="i1" class="rowColor">
+<tr id="i2" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/LogMessage.html#getText--">getText</a></span>()</code>&nbsp;</td>
+</tr>
+<tr id="i3" class="rowColor">
+<td class="colFirst"><code>java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/LogMessage.html#toString--">toString</a></span>()</code>&nbsp;</td>
 </tr>
 </table>
 <ul class="blockList">
@@ -164,7 +173,7 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;java.lang.Object</h3>
-<code>clone, equals, finalize, getClass, hashCode, notify, notifyAll, toString, wait, wait, wait</code></li>
+<code>clone, equals, finalize, getClass, hashCode, notify, notifyAll, wait, wait, wait</code></li>
 </ul>
 </li>
 </ul>
@@ -180,13 +189,14 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="LogMessage-com.arthenica.mobileffmpeg.Level-java.lang.String-">
+<a name="LogMessage-long-com.arthenica.mobileffmpeg.Level-java.lang.String-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>LogMessage</h4>
-<pre>public&nbsp;LogMessage(<a href="../../../com/arthenica/mobileffmpeg/Level.html" title="enum in com.arthenica.mobileffmpeg">Level</a>&nbsp;level,
+<pre>public&nbsp;LogMessage(long&nbsp;executionId,
+                  <a href="../../../com/arthenica/mobileffmpeg/Level.html" title="enum in com.arthenica.mobileffmpeg">Level</a>&nbsp;level,
                   java.lang.String&nbsp;text)</pre>
 </li>
 </ul>
@@ -198,6 +208,15 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Method Detail</h3>
+<a name="getExecutionId--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getExecutionId</h4>
+<pre>public&nbsp;long&nbsp;getExecutionId()</pre>
+</li>
+</ul>
 <a name="getLevel--">
 <!--   -->
 </a>
@@ -210,10 +229,23 @@ extends java.lang.Object</pre>
 <a name="getText--">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>getText</h4>
 <pre>public&nbsp;java.lang.String&nbsp;getText()</pre>
+</li>
+</ul>
+<a name="toString--">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>toString</h4>
+<pre>public&nbsp;java.lang.String&nbsp;toString()</pre>
+<dl>
+<dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
+<dd><code>toString</code>&nbsp;in class&nbsp;<code>java.lang.Object</code></dd>
+</dl>
 </li>
 </ul>
 </li>

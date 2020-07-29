@@ -54,8 +54,8 @@ public:
 		av_opt_set_int(m_swr_ctx, "osr", sample_rate, 0);
 	}
 
-	bool Init() {
-		return swr_init(m_swr_ctx) >= 0;
+	int Init() {
+		return swr_init(m_swr_ctx);
 	}
 
 	int Convert(uint8_t **out, int out_count, const uint8_t **in, int in_count) {

@@ -43,20 +43,10 @@
 
 /* Low-level ECDSA verify */
 
-/* FIXME: Use mpn_zero_p. */
-static int
-zero_p (const mp_limb_t *xp, mp_size_t n)
-{
-  while (n > 0)
-    if (xp[--n] > 0)
-      return 0;
-  return 1;
-}
-
 static int
 ecdsa_in_range (const struct ecc_curve *ecc, const mp_limb_t *xp)
 {
-  return !zero_p (xp, ecc->p.size)
+  return !mpn_zero_p (xp, ecc->p.size)
     && mpn_cmp (xp, ecc->q.m, ecc->p.size) < 0;
 }
 
@@ -112,17 +102,17 @@ ecc_ecdsa_verify (const struct ecc_curve *ecc,
 
   /* u1 = h / s, P1 = u1 * G */
   ecc_hash (&ecc->q, hp, length, digest);
-  ecc_modq_mul (ecc, u1, hp, sinv);
+  ecc_mod_mul (&ecc->q, u1, hp, sinv);
 
   /* u2 = r / s, P2 = u2 * Y */
-  ecc_modq_mul (ecc, u2, rp, sinv);
+  ecc_mod_mul (&ecc->q, u2, rp, sinv);
 
    /* Total storage: 5*ecc->p.size + ecc->mul_itch */
   ecc->mul (ecc, P2, u2, pp, u2 + ecc->p.size);
 
   /* u = 0 can happen only if h = 0 or h = q, which is extremely
      unlikely. */
-  if (!zero_p (u1, ecc->p.size))
+  if (!mpn_zero_p (u1, ecc->p.size))
     {
       /* Total storage: 7*ecc->p.size + ecc->mul_g_itch (ecc->p.size) */
       ecc->mul_g (ecc, P1, u1, P1 + 3*ecc->p.size);

@@ -261,8 +261,8 @@ __thread AVInputFormat *iformat = NULL;
 
 __thread struct AVHashContext *hash;
 
-__thread int main_ffprobe_return_code = 0;
-extern __thread int longjmp_value;
+__thread volatile int main_ffprobe_return_code = 0;
+extern __thread volatile int longjmp_value;
 
 static const struct {
     double bin_val;

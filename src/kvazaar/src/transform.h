@@ -60,6 +60,7 @@ void kvz_quantize_lcu_residual(encoder_state_t *state,
                                int32_t y,
                                uint8_t depth,
                                cu_info_t *cur_cu,
-                               lcu_t* lcu);
+                               lcu_t* lcu,
+                               bool early_skip);
 
 #endif

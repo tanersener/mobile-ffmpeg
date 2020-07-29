@@ -28,6 +28,7 @@
 // Define function pointers.
 angular_pred_func *kvz_angular_pred;
 intra_pred_planar_func *kvz_intra_pred_planar;
+intra_pred_filtered_dc_func *kvz_intra_pred_filtered_dc;
 
 int kvz_strategy_register_intra(void* opaque, uint8_t bitdepth) {
   bool success = true;

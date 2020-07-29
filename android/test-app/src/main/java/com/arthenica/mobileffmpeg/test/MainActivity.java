@@ -32,10 +32,12 @@ import androidx.core.app.ActivityCompat;
 import androidx.viewpager.widget.PagerTabStrip;
 import androidx.viewpager.widget.ViewPager;
 
+import com.arthenica.mobileffmpeg.AsyncFFmpegExecuteTask;
 import com.arthenica.mobileffmpeg.Config;
-import com.arthenica.mobileffmpeg.util.AsyncSingleFFmpegExecuteTask;
+import com.arthenica.mobileffmpeg.ExecuteCallback;
+import com.arthenica.mobileffmpeg.Level;
+import com.arthenica.mobileffmpeg.Signal;
 import com.arthenica.mobileffmpeg.util.ResourcesUtil;
-import com.arthenica.mobileffmpeg.util.SingleExecuteCallback;
 import com.arthenica.smartexception.java.Exceptions;
 
 import java.io.File;
@@ -61,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
         Exceptions.registerRootPackage("com.arthenica");
     }
 
-    protected static final Queue<Callable> actionQueue = new ConcurrentLinkedQueue<>();
+    protected static final Queue<Callable<Object>> actionQueue = new ConcurrentLinkedQueue<>();
 
     protected static final Handler handler = new Handler();
 
@@ -69,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void run() {
-            Callable callable;
+            Callable<Object> callable;
 
             do {
                 callable = actionQueue.poll();
@@ -77,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
                     try {
                         callable.call();
                     } catch (final Exception e) {
-                        android.util.Log.e(TAG, String.format("Running UI action received error.%s", Exceptions.getStackTraceString(e)));
+                        android.util.Log.e(TAG, String.format("Running UI action received error.%s.", Exceptions.getStackTraceString(e)));
                     }
                 }
             } while (callable != null);
@@ -128,11 +130,13 @@ public class MainActivity extends AppCompatActivity {
             registerAppFont();
             Log.d(TAG, "Application fonts registered.");
         } catch (final IOException e) {
-            Log.e(TAG, String.format("Font registration failed.%s", Exceptions.getStackTraceString(e)));
+            Log.e(TAG, String.format("Font registration failed.%s.", Exceptions.getStackTraceString(e)));
         }
 
         Log.d(TAG, "Listing supported camera ids.");
         listSupportedCameraIds();
+        Config.ignoreSignal(Signal.SIGXCPU);
+        Config.setLogLevel(Level.AV_LOG_DEBUG);
     }
 
     @Override
@@ -145,11 +149,11 @@ public class MainActivity extends AppCompatActivity {
     /**
      * <p>Starts a new asynchronous FFmpeg operation with command provided.
      *
-     * @param singleExecuteCallback callback function to receive result of this execution
-     * @param command               FFmpeg command
+     * @param ExecuteCallback callback function to receive result of this execution
+     * @param command         FFmpeg command
      */
-    public static void executeAsync(final SingleExecuteCallback singleExecuteCallback, final String command) {
-        final AsyncSingleFFmpegExecuteTask asyncCommandTask = new AsyncSingleFFmpegExecuteTask(command, singleExecuteCallback);
+    public static void executeAsync(final ExecuteCallback ExecuteCallback, final String command) {
+        final AsyncFFmpegExecuteTask asyncCommandTask = new AsyncFFmpegExecuteTask(command, ExecuteCallback);
         asyncCommandTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
@@ -157,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
         handler.postDelayed(runnable, 250);
     }
 
-    public static void addUIAction(final Callable callable) {
+    public static void addUIAction(final Callable<Object> callable) {
         actionQueue.add(callable);
     }
 
@@ -171,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
         final HashMap<String, String> fontNameMapping = new HashMap<>();
         fontNameMapping.put("MyFontName", "Doppio One");
         Config.setFontDirectory(this, cacheDirectory.getAbsolutePath(), fontNameMapping);
-        // Config.setFontDirectory(this, cacheDirectory.getAbsolutePath(), null);
+        Config.setEnvironmentVariable("FFREPORT", String.format("file=%s", new File(cacheDirectory.getAbsolutePath(), "ffreport.txt").getAbsolutePath()));
     }
 
     protected void listSupportedCameraIds() {

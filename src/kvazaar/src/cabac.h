@@ -106,9 +106,9 @@ void kvz_cabac_finish(cabac_data_t *data);
 void kvz_cabac_write_coeff_remain(cabac_data_t *cabac, uint32_t symbol,
                               uint32_t r_param);
 void kvz_cabac_write_coeff_remain_encry(struct encoder_state_t * const state, cabac_data_t * const cabac, const uint32_t symbol,
-		const uint32_t r_param, int32_t base_level);
+                                        const uint32_t r_param, int32_t base_level);
 void kvz_cabac_write_ep_ex_golomb(struct encoder_state_t * const state, cabac_data_t *data,
-								uint32_t symbol, uint32_t count);
+                                  uint32_t symbol, uint32_t count);
 void kvz_cabac_write_unary_max_symbol(cabac_data_t *data, cabac_ctx_t *ctx,
                                   uint32_t symbol, int32_t offset,
                                   uint32_t max_symbol);

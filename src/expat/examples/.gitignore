@@ -2,3 +2,4 @@
 /outline
 *.o
 /elements
+/.deps

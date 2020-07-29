@@ -55,7 +55,7 @@ typedef struct encoder_control_t
     int32_t width_in_lcu;
     int32_t height_in_lcu;
     int32_t real_width;  /*!< \brief real input picture width */
-    int32_t real_height; /*!< \brief real input picture width */
+    int32_t real_height; /*!< \brief real input picture height */
     int64_t pixels_per_pic;
     int8_t source_scan_type;
   } in;
@@ -132,6 +132,8 @@ typedef struct encoder_control_t
     int right;
     int down;
   } max_inter_ref_lcu;
+
+  int32_t poc_lsb_bits;
 
 } encoder_control_t;
 

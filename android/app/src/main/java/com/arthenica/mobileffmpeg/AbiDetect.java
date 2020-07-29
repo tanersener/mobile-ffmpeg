@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Taner Sener
+ * Copyright (c) 2018-2020 Taner Sener
  *
  * This file is part of MobileFFmpeg.
  *
@@ -19,11 +19,8 @@
 
 package com.arthenica.mobileffmpeg;
 
-import android.os.Build;
-
 /**
- * <p>This class is used to detect running ABI name using Android's <code>cpufeatures</code>
- * library.
+ * <p>This class is used to detect running ABI name using Google <code>cpu-features</code> library.
  *
  * @author Taner Sener
  * @since v1.0
@@ -33,10 +30,6 @@ public class AbiDetect {
     static {
         armV7aNeonLoaded = false;
 
-        /* LOAD NOT-LOADED LIBRARIES ON API < 21 */
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            System.loadLibrary("cpufeatures");
-        }
         System.loadLibrary("mobileffmpeg_abidetect");
 
         /* ALL LIBRARIES LOADED AT STARTUP */
@@ -90,7 +83,7 @@ public class AbiDetect {
     /**
      * <p>Returns whether MobileFFmpeg release is a long term release or not.
      *
-     * @return YES or NO
+     * @return yes or no
      */
     native static boolean isNativeLTSBuild();
 

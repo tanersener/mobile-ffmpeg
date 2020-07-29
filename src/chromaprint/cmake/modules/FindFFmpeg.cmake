@@ -18,7 +18,7 @@
 #and search the path which contain the libname/header.h (usefull for new version)
 
 #Then we need to include ${FFMPEG_libname_INCLUDE_DIRS} (in old version case, use by ffmpeg header and osg plugin code)
-#                                                       (in new version case, use by ffmpeg header) 
+#                                                       (in new version case, use by ffmpeg header)
 #and ${FFMPEG_libname_INCLUDE_DIRS/libname}             (in new version case, use by osg plugin code)
 
 # Macro to find header and lib directories
@@ -124,6 +124,6 @@ IF   (FFMPEG_LIBAVFORMAT_FOUND AND FFMPEG_LIBAVCODEC_FOUND AND FFMPEG_LIBAVUTIL_
 
 ELSE ()
 
-#    MESSAGE(STATUS "Could not find FFMPEG")
+   MESSAGE(STATUS "Could not find FFMPEG")
 
 ENDIF()

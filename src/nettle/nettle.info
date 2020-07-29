@@ -1,4 +1,4 @@
-This is nettle.info, produced by makeinfo version 6.3 from
+This is nettle.info, produced by makeinfo version 6.5 from
 nettle.texinfo.
 
 This manual is for the Nettle library (version 3.4), a low-level
@@ -50,16 +50,16 @@ cryptographic library.
 
 Reference
 
-* Hash functions::              
-* Cipher functions::            
-* Cipher modes::                
-* Keyed hash functions::        
-* Key derivation functions::    
-* Public-key algorithms::       
-* Randomness::                  
-* ASCII encoding::              
-* Miscellaneous functions::     
-* Compatibility functions::     
+* Hash functions::
+* Cipher functions::
+* Cipher modes::
+* Keyed hash functions::
+* Key derivation functions::
+* Public-key algorithms::
+* Randomness::
+* ASCII encoding::
+* Miscellaneous functions::
+* Compatibility functions::
 
 Hash functions
 
@@ -69,11 +69,12 @@ Hash functions
 
 Cipher modes
 
-* CBC::                         
-* CTR::                         
+* CBC::
+* CTR::
 * CFB and CFB8::
-* GCM::                         
-* CCM::                         
+* GCM::
+* CCM::
+* SIV-CMAC::
 
 Keyed Hash Functions
 
@@ -91,7 +92,8 @@ Elliptic curves
 
 * Side-channel silence::
 * ECDSA::
-* Curve 25519::
+* GOSTDSA::
+* Curve 25519 and Curve 448::
 
 
 
@@ -323,29 +325,29 @@ Nettle.
 
      #include <stdio.h>
      #include <stdlib.h>
-
+     
      #include <nettle/sha1.h>
-
+     
      #define BUF_SIZE 1000
-
+     
      static void
      display_hex(unsigned length, uint8_t *data)
      {
        unsigned i;
-
+     
        for (i = 0; i<length; i++)
          printf("%02x ", data[i]);
-
+     
        printf("\n");
      }
-
+     
      int
      main(int argc, char **argv)
      {
        struct sha1_ctx ctx;
        uint8_t buffer[BUF_SIZE];
        uint8_t digest[SHA1_DIGEST_SIZE];
-
+       
        sha1_init(&ctx);
        for (;;)
        {
@@ -356,11 +358,11 @@ Nettle.
        }
        if (ferror(stdin))
          return EXIT_FAILURE;
-
+     
        sha1_digest(&ctx, SHA1_DIGEST_SIZE, digest);
-
+     
        display_hex(SHA1_DIGEST_SIZE, digest);
-       return EXIT_SUCCESS;
+       return EXIT_SUCCESS;  
      }
 
    On a typical Unix system, this program can be compiled and linked
@@ -460,17 +462,17 @@ This chapter describes all the Nettle functions, grouped by family.
 
 * Menu:
 
-* Hash functions::              
-* Cipher functions::            
-* Cipher modes::                
+* Hash functions::
+* Cipher functions::
+* Cipher modes::
 * Authenticated encryption::
-* Keyed hash functions::        
-* Key derivation functions::    
-* Public-key algorithms::       
-* Randomness::                  
-* ASCII encoding::              
-* Miscellaneous functions::     
-* Compatibility functions::     
+* Keyed hash functions::
+* Key derivation functions::
+* Public-key algorithms::
+* Randomness::
+* ASCII encoding::
+* Miscellaneous functions::
+* Compatibility functions::
 
 
 File: nettle.info,  Node: Hash functions,  Next: Cipher functions,  Prev: Reference,  Up: Reference
@@ -826,6 +828,28 @@ This is SHA3 with 512-bit output size.
 
      This function also resets the context.
 
+7.1.1.9 SHAKE-256
+.................
+
+In addition to those SHA-3 hash functions, Nettle also provides a SHA-3
+extendable-output function (XOF), SHAKE-256.  Unlike SHA-3 hash
+functions, SHAKE can produce an output digest of any desired length.
+
+   To use SHAKE256, the context struct, init and update functions are
+the same as for SHA3-256.  To get a SHAKE256 digest, the following
+function is used instead of ‘sha3_256_digest’.  For an output size of
+‘SHA3_256_DIGEST_SIZE’, security is equivalent to SHA3-256 (but the
+digest is different).  Increasing output size further does not increase
+security in terms of collision or preimage resistance.  It can be seen
+as a built in pseudorandomness generator.
+
+ -- Function: void sha3_256_shake (struct shake256_ctx *CTX, size_t
+          LENGTH, uint8_t *DIGEST)
+     Performs final processing and produces a SHAKE256 digest, writing
+     it to DIGEST.  LENGTH can be of arbitrary size.
+
+     This function also resets the context.
+
 
 File: nettle.info,  Node: Legacy hash functions,  Next: nettle_hash abstraction,  Prev: Recommended hash functions,  Up: Hash functions
 
@@ -1012,13 +1036,18 @@ for Standards and Technology).  It outputs hash values of 160 bits, or
      This function also resets the context in the same way as
      ‘sha1_init’.
 
-7.1.2.6 GOSTHASH94
-..................
+7.1.2.6 GOSTHASH94 and GOSTHASH94CP
+...................................
 
 The GOST94 or GOST R 34.11-94 hash algorithm is a Soviet-era algorithm
 used in Russian government standards (see ‘RFC 4357’).  It outputs
-message digests of 256 bits, or 32 octets.  Nettle defines GOSTHASH94 in
-‘<nettle/gosthash94.h>’.
+message digests of 256 bits, or 32 octets.  The standard itself does not
+fix the S-box used by the hash algorith, so there are two popular
+variants (the testing S-box from the standard itself and the S-box
+defined by CryptoPro company, see RFC 4357).  Nettle provides support
+for the former S-box in the form of GOSTHASH94 hash algorithm and for
+the latter in the form of GOSTHASH94CP hash algorithm.  Nettle defines
+GOSTHASH94 and GOSTHASH94CP in ‘<nettle/gosthash94.h>’.
 
  -- Context struct: struct gosthash94_ctx
 
@@ -1044,6 +1073,31 @@ message digests of 256 bits, or 32 octets.  Nettle defines GOSTHASH94 in
 
      This function also resets the context in the same way as
      ‘gosthash94_init’.
+
+ -- Context struct: struct gosthash94cp_ctx
+
+ -- Constant: GOSTHASH94CP_DIGEST_SIZE
+     The size of a GOSTHASH94CP digest, i.e.  32.
+
+ -- Constant: GOSTHASH94CP_BLOCK_SIZE
+     The internal block size of GOSTHASH94CP, i.e., 32.
+
+ -- Function: void gosthash94cp_init (struct gosthash94cp_ctx *CTX)
+     Initialize the GOSTHASH94CP state.
+
+ -- Function: void gosthash94cp_update (struct gosthash94cp_ctx *CTX,
+          size_t LENGTH, const uint8_t *DATA)
+     Hash some more data.
+
+ -- Function: void gosthash94cp_digest (struct gosthash94cp_ctx *CTX,
+          size_t LENGTH, uint8_t *DIGEST)
+     Performs final processing and extracts the message digest, writing
+     it to DIGEST.  LENGTH may be smaller than
+     ‘GOSTHASH94CP_DIGEST_SIZE’, in which case only the first LENGTH
+     octets of the digest are written.
+
+     This function also resets the context in the same way as
+     ‘gosthash94cp_init’.
 
 
 File: nettle.info,  Node: nettle_hash abstraction,  Prev: Legacy hash functions,  Up: Hash functions
@@ -1074,6 +1128,7 @@ Nettle’s implementation of HMAC (*note Keyed hash functions::).
  -- Constant Struct: struct nettle_hash nettle_sha512
  -- Constant Struct: struct nettle_hash nettle_sha3_256
  -- Constant Struct: struct nettle_hash nettle_gosthash94
+ -- Constant Struct: struct nettle_hash nettle_gosthash94cp
      These are all the hash functions that Nettle implements.
 
    Nettle also exports a list of all these hashes.
@@ -1572,6 +1627,9 @@ ChaCha in ‘<nettle/chacha.h>’.
  -- Constant: CHACHA_NONCE_SIZE
      Size of the nonce, 8.
 
+ -- Constant: CHACHA_COUNTER_SIZE
+     Size of the counter, 8.
+
  -- Function: void chacha_set_key (struct chacha_ctx *CTX, const uint8_t
           *KEY)
      Initialize the cipher.  The same function is used for both
@@ -1584,12 +1642,51 @@ ChaCha in ‘<nettle/chacha.h>’.
      octets.  This function also initializes the block counter, setting
      it to zero.
 
+ -- Function: void chacha_set_counter (struct chacha_ctx *CTX, const
+          uint8_t *COUNTER)
+     Sets the block counter.  It is always of size
+     ‘CHACHA_COUNTER_SIZE’, 8 octets.  This is rarely needed since
+     ‘chacha_set_nonce’ initializes the block counter to zero.  When it
+     is still necessary, this function must be called after
+     ‘chacha_set_nonce’.
+
  -- Function: void chacha_crypt (struct chacha_ctx *CTX, size_t LENGTH,
           uint8_t *DST, const uint8_t *SRC)
      Encrypts or decrypts the data of a message, using ChaCha.  When a
      message is encrypted using a sequence of calls to ‘chacha_crypt’,
      all but the last call _must_ use a length that is a multiple of
      ‘CHACHA_BLOCK_SIZE’.
+
+7.2.7.1 32-bit counter variant
+..............................
+
+While the original paper uses 64-bit counter value, the variant defined
+in ‘RFC 8439’ uses 32-bit counter value.  This variant is particularly
+useful for *note ChaCha-Poly1305:: AEAD construction, which supports
+12-octet nonces.
+
+ -- Constant: CHACHA_NONCE96_SIZE
+     Size of the nonce, 12.
+
+ -- Constant: CHACHA_COUNTER32_SIZE
+     Size of the counter, 4.
+
+ -- Function: void chacha_set_nonce96 (struct chacha_ctx *CTX, const
+          uint8_t *NONCE)
+     Sets the nonce.  This is similar to the above ‘chacha_set_nonce’,
+     but the input is always of size ‘CHACHA_NONCE96_SIZE’, 12 octets.
+
+ -- Function: void chacha_set_counter32 (struct chacha_ctx *CTX, const
+          uint8_t *COUNTER)
+     Sets the block counter.  This is similar to the above
+     ‘chacha_set_counter’, but the input is always of size
+     ‘CHACHA_COUNTER32_SIZE’, 4 octets.
+
+ -- Function: void chacha_crypt32 (struct chacha_ctx *CTX, size_t
+          LENGTH, uint8_t *DST, const uint8_t *SRC)
+     Encrypts or decrypts the data of a message, using ChaCha.  This is
+     similar to the above ‘chacha_crypt’, but it assumes the internal
+     counter value is 32-bit long and the nonce is 96-bit long.
 
 7.2.8 DES
 ---------
@@ -1954,8 +2051,8 @@ Keyed hash functions::) or signature to authenticate the message.
 
 * Menu:
 
-* CBC::                         
-* CTR::                         
+* CBC::
+* CTR::
 * CFB and CFB8::
 * XTS::
 
@@ -2462,10 +2559,11 @@ performance is important.
 
 * Menu:
 
-* EAX::                         
-* GCM::                         
-* CCM::                         
+* EAX::
+* GCM::
+* CCM::
 * ChaCha-Poly1305::
+* SIV-CMAC::
 * nettle_aead abstraction::
 
 
@@ -3151,7 +3249,7 @@ be called before using any of the other functions in this interface.
      context structure.
 
 
-File: nettle.info,  Node: ChaCha-Poly1305,  Next: nettle_aead abstraction,  Prev: CCM,  Up: Authenticated encryption
+File: nettle.info,  Node: ChaCha-Poly1305,  Next: SIV-CMAC,  Prev: CCM,  Up: Authenticated encryption
 
 7.4.4 ChaCha-Poly1305
 ---------------------
@@ -3161,15 +3259,10 @@ poly1305 message authentication code (*note Poly1305::).  It originates
 from the NaCl cryptographic library by D. J. Bernstein et al, which
 defines a similar construction but with Salsa20 instead of ChaCha.
 
-   Nettle’s implementation ChaCha-Poly1305 should be considered
-*experimental*.  At the time of this writing, there is no authoritative
-specification for ChaCha-Poly1305, and a couple of different
-incompatible variants.  Nettle implements it using the original
-definition of ChaCha, with 64 bits (8 octets) each for the nonce and the
-block counter.  Some protocols prefer to use nonces of 12 bytes, and
-it’s a small change to ChaCha to use the upper 32 bits of the block
-counter as a nonce, instead limiting message size to 2^32 blocks or 256
-GBytes, but that variant is currently not supported.
+   Nettle’s implementation of ChaCha-Poly1305 follows ‘RFC 8439’, where
+the ChaCha cipher is initialized with a 12-byte nonce and a 4-byte block
+counter.  This allows up to 256 gigabytes of data to be encrypted using
+the same key and nonce.
 
    For ChaCha-Poly1305, the ChaCha cipher is initialized with a key, of
 256 bits, and a per-message nonce.  The first block of the key stream
@@ -3196,7 +3289,7 @@ little-endian).  Nettle defines ChaCha-Poly1305 in
      ChaCha-Poly1305 key size, 32.
 
  -- Constant: CHACHA_POLY1305_NONCE_SIZE
-     Same as the ChaCha nonce size, 16.
+     ChaCha-Poly1305 nonce size, 12.
 
  -- Constant: CHACHA_POLY1305_DIGEST_SIZE
      Digest size, 16.
@@ -3232,9 +3325,107 @@ little-endian).  Nettle defines ChaCha-Poly1305 in
      LENGTH octets of the digest are written.
 
 
+File: nettle.info,  Node: SIV-CMAC,  Next: nettle_aead abstraction,  Prev: ChaCha-Poly1305,  Up: Authenticated encryption
+
+7.4.5 Synthetic Initialization Vector AEAD
+------------------------------------------
+
+SIV-CMAC mode is a combination of counter mode with message
+authentication based on CMAC.  Unlike other counter AEAD modes, it
+provides protection against accidental nonce misuse, making it a good
+choice for stateless-servers that cannot ensure nonce uniqueness.  It is
+constructed on top of a block cipher which must have a block size of 128
+bits.  Nettle’s support for SIV-CMAC consists of a message encryption
+and authentication interface, for SIV-CMAC using AES as the underlying
+block cipher.  When a nonce is re-used with this mode, message
+authenticity is retained however an attacker can determine whether the
+same plaintext was protected with the two messages sharing the nonce.
+These interfaces are defined in ‘<nettle/siv-cmac.h>’.
+
+   Unlike other AEAD mode in SIV-CMAC the initialization vector serves
+as the tag.  That means that in the generated ciphertext the tag
+precedes the ciphertext.
+
+   Note also, that the SIV-CMAC algorithm, as specified in ‘RFC 5297’,
+introduces the notion of authenticated data which consist of multiple
+components.  For example with SIV-CMAC the authentication tag of data
+‘X’ followed by ‘Y’, is different than the concatenated data ‘X || Y’.
+The interfaces described below follow the AEAD paradigm and do not allow
+access to this feature and also require the use of a non-empty nonce.
+In the terminology of the RFC, the input to the S2V function is always a
+vector of three elements, where S1 is the authenticated data, S2 is the
+nonce, and S3 is the plaintext.
+
+7.4.5.1 General interface
+.........................
+
+ -- Constant: SIV_BLOCK_SIZE
+     SIV-CMAC’s block size, 16.
+
+ -- Constant: SIV_DIGEST_SIZE
+     Size of the SIV-CMAC digest or initialization vector, 16.
+
+ -- Constant: SIV_MIN_NONCE_SIZE
+     The the minimum size for an SIV-CMAC nonce, 1.
+
+7.4.5.2 SIV-CMAC-AES interface
+..............................
+
+The AES SIV-CMAC functions provide an API for using SIV-CMAC mode with
+the AES block ciphers.  The parameters all have the same meaning as the
+general and message interfaces, except that the CIPHER, F, and CTX
+parameters are replaced with an AES context structure, and a set-key
+function must be called before using any of the other functions in this
+interface.
+
+ -- Context struct: struct siv_cmac_aes128_ctx
+     Holds state corresponding to a particular message encrypted using
+     the AES-128 block cipher.
+
+ -- Context struct: struct siv_cmac_aes256_ctx
+     Holds state corresponding to a particular message encrypted using
+     the AES-256 block cipher.
+
+ -- Function: void siv_cmac_aes128_set_key (struct siv_cmac_aes128_ctx
+          *CTX, const uint8_t *KEY)
+ -- Function: void siv_cmac_aes256_set_key (struct siv_cmac_aes256_ctx
+          *CTX, const uint8_t *KEY)
+     Initializes the encryption key for the AES block cipher.  One of
+     these functions must be called before any of the other functions in
+     the AES SIV-CMAC interface.
+
+ -- Function: void siv_cmac_aes128_encrypt_message (struct
+          siv_cmac_aes128_ctx *CTX, size_t NLENGTH, const uint8_t
+          *NONCE, size_t ALENGTH, const uint8_t *ADATA, size_t CLENGTH,
+          uint8_t *DST, const uint8_t *SRC)
+ -- Function: void siv_cmac_aes256_encrypt_message (struct
+          siv_cmac_aes256_ctx *CTX, size_t NLENGTH, const uint8_t
+          *NONCE, size_t ALENGTH, const uint8_t *ADATA, size_t CLENGTH,
+          uint8_t *DST, const uint8_t *SRC)
+     Computes the message digest from the ADATA and SRC parameters,
+     encrypts the plaintext from SRC, prepends the initialization vector
+     to the ciphertext and outputs it to DST.  The CLENGTH variable must
+     be equal to the length of SRC plus ‘SIV_DIGEST_SIZE’.
+
+ -- Function: int siv_cmac_aes128_decrypt_message (struct
+          siv_cmac_aes128_ctx *CTX, size_t NLENGTH, const uint8_t
+          *NONCE, size_t ALENGTH, const uint8_t *ADATA, size_t MLENGTH,
+          uint8_t *DST, const uint8_t *SRC)
+ -- Function: int siv_cmac_aes256_decrypt_message (struct
+          siv_cmac_aes128_ctx *CTX, size_t NLENGTH, const uint8_t
+          *NONCE, size_t ALENGTH, const uint8_t *ADATA, size_t MLENGTH,
+          uint8_t *DST, const uint8_t *SRC)
+     Decrypts the ciphertext from SRC, outputs the plaintext to DST,
+     recalculates the initialization vector from ADATA and the
+     plaintext.  If the values of the received and calculated
+     initialization vector are equal, this will return 1 indicating a
+     valid and authenticated message.  Otherwise, this function will
+     return zero.
+
+
 File: nettle.info,  Node: nettle_aead abstraction,  Prev: ChaCha-Poly1305,  Up: Authenticated encryption
 
-7.4.5 The ‘struct nettle_aead’ abstraction
+7.4.6 The ‘struct nettle_aead’ abstraction
 ------------------------------------------
 
 Nettle includes a struct including information about the supported hash
@@ -3644,10 +3835,14 @@ File: nettle.info,  Node: CMAC,  Prev: UMAC,  Up: Keyed hash functions
 
 CMAC is a message authentication code based on CBC encryption mode.  It
 is suitable for systems where block ciphers are preferrable and perform
-better than hash functions.  CMAC is specified in ‘RFC4493’.  The block
-size is always 128 bits (16 octets).
+better than hash functions.  CMAC-128 is specified in ‘RFC4493’.  The
+block size is always 128 bits (16 octets).  CMAC-64 is specified by NIST
+Special Publication 800-38B
+(https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-38B.pdf).
+The block size is always 64 bits (8 octets).
 
-   Nettle provides helper functions for CMAC with the AES block cipher.
+   Nettle provides helper functions for CMAC-128 with the AES block
+cipher and for CMAC-64 with the Tripple-DES block cipher.
 
    Nettle defines CMAC in ‘<nettle/cmac.h>’.
 
@@ -3655,7 +3850,7 @@ size is always 128 bits (16 octets).
  -- Context struct: struct cmac_aes256_ctx
 
  -- Constant: CMAC128_DIGEST_SIZE
-     The size of an CMAC digest, 16.
+     The size of an CMAC-128 digest, 16.
 
  -- Function: void cmac_aes128_set_key (struct cmac_aes128_ctx *CTX,
           const uint8_t *KEY)
@@ -3683,6 +3878,27 @@ size is always 128 bits (16 octets).
 
  -- Function: void cmac_aes256_digest (struct cmac_aes256_ctx *CTX,
           size_t LENGTH, uint8_t *DIGEST)
+     Extracts the MAC of the message, writing it to DIGEST.  LENGTH is
+     usually equal to the specified output size, but if you provide a
+     smaller value, only the first LENGTH octets of the MAC are written.
+     This function resets the context for processing of a new message
+     with the same key.
+
+ -- Context struct: struct cmac_des3_ctx
+
+ -- Constant: CMAC64_DIGEST_SIZE
+     The size of an CMAC-64 digest, 8.
+
+ -- Function: void cmac_des3_set_key (struct cmac_des3_ctx *CTX, const
+          uint8_t *KEY)
+     This function initializes the CMAC context struct for Tripple-DES.
+
+ -- Function: void cmac_des3_update (struct cmac_des3_ctx *CTX,size_t
+          LENGTH, const uint8_t *DATA)
+     This function is called zero or more times to process the message.
+
+ -- Function: void cmac_des3_digest (struct cmac_des3_ctx *CTX, size_t
+          LENGTH, uint8_t *DIGEST)
      Extracts the MAC of the message, writing it to DIGEST.  LENGTH is
      usually equal to the specified output size, but if you provide a
      smaller value, only the first LENGTH octets of the MAC are written.
@@ -4700,7 +4916,8 @@ bitsize of the curve’s prime p, e.g., 256 bits for the SECP 256R1 curve.
 
 * Side-channel silence::
 * ECDSA::
-* Curve 25519::
+* GOSTDSA::
+* Curve 25519 and Curve 448::
 
 
 File: nettle.info,  Node: Side-channel silence,  Next: ECDSA,  Up: Elliptic curves
@@ -4733,7 +4950,7 @@ memory, not on the actual data bits.  This implies a performance penalty
 in several of the building blocks.
 
 
-File: nettle.info,  Node: ECDSA,  Next: Curve 25519,  Prev: Side-channel silence,  Up: Elliptic curves
+File: nettle.info,  Node: ECDSA,  Next: GOSTDSA,  Prev: Side-channel silence,  Up: Elliptic curves
 
 7.7.3.2 ECDSA
 .............
@@ -4838,10 +5055,88 @@ used.
      Randomness::.
 
 
-File: nettle.info,  Node: Curve 25519,  Prev: ECDSA,  Up: Elliptic curves
+File: nettle.info,  Node: GOSTDSA,  Next: Curve 25519 and Curve 448,  Prev: ECDSA,  Up: Elliptic curves
 
-7.7.3.3 Curve25519
-..................
+7.7.3.3 GOSTDSA
+...............
+
+GOSTDSA (GOST R 34.10-2001, GOST R 34.10-2012) is a variant of the DSA
+(*note DSA::) and ECDSA (*note ECDSA::) digital signature schemes, which
+works over an elliptic curve group.  Original documents are written in
+Russian.  English translations are provided in ‘RFC 5832’ and ‘RFC
+7091’.  While technically nothing stops one from using GOSTDSA over any
+curve, it is defined only over several 256 and 512-bit curves.  Like DSA
+and ECDSA, creating a signature requires a unique random nonce
+(repeating the nonce with two different messages reveals the private
+key, and any leak or bias in the generation of the nonce also leaks
+information about the key).
+
+   GOST R 34.10-2001 was defined to use GOST R 34.11-94 hash function
+(GOSTHASH94 and GOSTHASH94CP, ‘RFC 5831’).  GOST R 34.10-2012 is defined
+to use GOST R 34.11-2012 hash function (Streebog, ‘RFC 6986’) of
+corresponding size (256 or 512) depending on curve size.
+
+   Nettle defines GOSTDSA in ‘<nettle/gostdsa.h>’.  GOSTDSA reuses ECDSA
+data types (‘struct ecc_point’, ‘struct ecc_scalar’) to represent public
+and private keys.  Also to generate a new GOSTDSA key pair one has to
+use ‘ecdsa_generate_keypair()’ function.
+
+   To create and verify GOSTDSA signatures, the following functions are
+used.
+
+ -- Function: void gostdsa_sign (const struct ecc_scalar *KEY, void
+          *RANDOM_CTX, nettle_random_func *RANDOM, size_t DIGEST_LENGTH,
+          const uint8_t *DIGEST, struct dsa_signature *SIGNATURE)
+     Uses the private key KEY to create a signature on DIGEST.
+     RANDOM_CTX and RANDOM is a randomness generator.
+     ‘random(random_ctx, length, dst)’ should generate ‘length’ random
+     octets and store them at ‘dst’.  The signature is stored in
+     SIGNATURE, in the same was as for plain DSA.
+
+ -- Function: int gostdsa_verify (const struct ecc_point *PUB, size_t
+          LENGTH, const uint8_t *DIGEST, const struct dsa_signature
+          *SIGNATURE)
+     Uses the public key PUB to verify that SIGNATURE is a valid
+     signature for the message digest DIGEST (of LENGTH octets).
+     Returns 1 if the signature is valid, otherwise 0.
+
+   For historical reason several curve IDs (OIDs) may correspond to a
+single curve/generator combination.  Following list defines
+correspondence between nettle’s view on curves and actual identifiers
+defined in ‘RFC 4357’ and ‘RFC 7836’.
+
+ -- Function: const struct ecc_curve nettle_get_gost_gc256b(void)
+     Returns curve corresponding to following identifiers:
+        • id-GostR3410-2001-CryptoPro-A-ParamSet (‘RFC 4357’)
+        • id-GostR3410-2001-CryptoPro-XchA-ParamSet (‘RFC 4357’)
+        • id-tc26-gost-3410-12-256-paramSetB
+
+ -- Function: const struct ecc_curve nettle_get_gost_gc512a(void)
+     Returns curve corresponding to following identifiers:
+        • id-tc26-gost-3410-12-512-paramSetA (‘RFC 7836’)
+
+   For GOST key pairs key derivation/key agreement function (VKO) is
+defined in ‘RFC 4357’ and ‘RFC 7836’.  Basically shared key is equal to
+hash(cofactor * ukm * priv * pub).  Nettle library provides a function
+that does multiplication.  Caller should do hashing on his own (it will
+be either GOST R 34.11-94 (*note GOSTHASH94CP::) or GOST R 34.11-2012,
+Streebog, which nor part of the library yet).
+
+ -- Function: void gostdsa_vko (const struct ecc_scalar *PRIV, const
+          struct ecc_point *PUB, size_t UKM_LENGTH, const uint8_t *UKM,
+          uint8_t *OUT)
+     Uses private key PRIV, public ket PUB and shared key material UKM
+     to generate shared secret, written to buffer OUT.  The buffer
+     should be of the size equal to 2 private key lengths: 64 bytes for
+     256 bit curves and 128 bytes for 512 bit ones.  UKM is a shared key
+     material, usually transferred in cleartext.  It does not have to be
+     secret.
+
+
+File: nettle.info,  Node: Curve 25519 and Curve 448,  Prev: ECDSA,  Up: Elliptic curves
+
+7.7.3.4 Curve25519 and Curve448
+...............................
 
 Curve25519 is an elliptic curve of Montgomery type, y^2 = x^3 + 486662
 x^2 + x (mod p), with p = 2^255 - 19.  Montgomery curves have the
@@ -4907,7 +5202,38 @@ of the point input to curve25519_mul was not ignored.  The
      This function is intended to be compatible with the function
      ‘crypto_scalar_mult’ in the NaCl library.
 
-7.7.3.4 EdDSA
+   Similarly, Nettle also implements Curve448, an elliptic curve of
+Montgomery type, y^2 = x^3 + 156326 x^2 + x (mod p), with p = 2^448 -
+2^224 - 1.  This particular curve was proposed by Mike Hamburg in 2015,
+for fast Diffie-Hellman key exchange, and is also described in ‘RFC
+7748’.
+
+   Nettle defines Curve 448 in ‘<nettle/curve448.h>’.
+
+ -- Constant: CURVE448_SIZE
+     The octet length of the strings representing curve448 points and
+     scalars, 56.
+
+ -- Function: void curve448_mul_g (uint8_t *Q, const uint8_t *N)
+     Computes Q = N G, where G is the group generator and N is an
+     integer.  The input argument N and the output argument Q use a
+     little-endian representation of the scalar and the x-coordinate,
+     respectively.  They are both of size ‘CURVE448_SIZE’.
+
+     This function is intended to be compatible with the function
+     ‘crypto_scalar_mult_base’ in the NaCl library.
+
+ -- Function: void curve448_mul (uint8_t *Q, const uint8_t *N, const
+          uint8_t *P)
+     Computes Q = N P, where P is an input point and N is an integer.
+     The input arguments N and P and the output argument Q use a
+     little-endian representation of the scalar and the x-coordinates,
+     respectively.  They are all of size ‘CURVE448_SIZE’.
+
+     This function is intended to be compatible with the function
+     ‘crypto_scalar_mult’ in the NaCl library.
+
+7.7.3.5 EdDSA
 .............
 
 EdDSA is a signature scheme proposed by D. J. Bernstein et al.  in 2011.
@@ -4948,6 +5274,30 @@ lost.
      Signs a message using the provided key pair.
 
  -- Function: int ed25519_sha512_verify (const uint8_t *PUB, size_t
+          LENGTH, const uint8_t *MSG, const uint8_t *SIGNATURE)
+     Verifies a message using the provided public key.  Returns 1 if the
+     signature is valid, otherwise 0.
+
+   Nettle also provides Ed448, an EdDSA signature scheme based on an
+Edwards curve equivalent to curve448.
+
+ -- Constant: ED448_KEY_SIZE
+     The size of a private or public Ed448 key, 57 octets.
+
+ -- Constant: ED448_SIGNATURE_SIZE
+     The size of an Ed448 signature, 114 octets.
+
+ -- Function: void ed448_shake256_public_key (uint8_t *PUB, const
+          uint8_t *PRIV)
+     Computes the public key corresponding to the given private key.
+     Both input and output are of size ‘ED448_KEY_SIZE’.
+
+ -- Function: void ed448_shake256_sign (const uint8_t *PUB, const
+          uint8_t *PRIV, size_t LENGTH, const uint8_t *MSG, uint8_t
+          *SIGNATURE)
+     Signs a message using the provided key pair.
+
+ -- Function: int ed448_shake256_verify (const uint8_t *PUB, size_t
           LENGTH, const uint8_t *MSG, const uint8_t *SIGNATURE)
      Verifies a message using the provided public key.  Returns 1 if the
      signature is valid, otherwise 0.
@@ -5523,7 +5873,7 @@ Function and Concept Index
  [index ]
 * Menu:
 
-* 3DES:                                  Cipher functions.    (line 558)
+* 3DES:                                  Cipher functions.    (line 600)
 * ABI compatibility:                     Compatibility.       (line   6)
 * AEAD:                                  Authenticated encryption.
                                                               (line   6)
@@ -5663,26 +6013,35 @@ Function and Concept Index
 * CFB_ENCRYPT:                           CFB and CFB8.        (line  98)
 * CFB_SET_IV(CTX,:                       CFB and CFB8.        (line  93)
 * ChaCha:                                Cipher functions.    (line 466)
-* chacha_crypt:                          Cipher functions.    (line 493)
-* chacha_poly1305_decrypt:               ChaCha-Poly1305.     (line  68)
-* chacha_poly1305_digest:                ChaCha-Poly1305.     (line  74)
-* chacha_poly1305_encrypt:               ChaCha-Poly1305.     (line  66)
-* chacha_poly1305_set_key:               ChaCha-Poly1305.     (line  53)
-* chacha_poly1305_set_nonce:             ChaCha-Poly1305.     (line  58)
-* chacha_poly1305_update:                ChaCha-Poly1305.     (line  62)
-* chacha_set_key:                        Cipher functions.    (line 481)
-* chacha_set_nonce:                      Cipher functions.    (line 487)
+* chacha_crypt:                          Cipher functions.    (line 504)
+* chacha_crypt32:                        Cipher functions.    (line 536)
+* chacha_poly1305_decrypt:               ChaCha-Poly1305.     (line  63)
+* chacha_poly1305_digest:                ChaCha-Poly1305.     (line  69)
+* chacha_poly1305_encrypt:               ChaCha-Poly1305.     (line  61)
+* chacha_poly1305_set_key:               ChaCha-Poly1305.     (line  48)
+* chacha_poly1305_set_nonce:             ChaCha-Poly1305.     (line  53)
+* chacha_poly1305_update:                ChaCha-Poly1305.     (line  57)
+* chacha_set_counter:                    Cipher functions.    (line 496)
+* chacha_set_counter32:                  Cipher functions.    (line 530)
+* chacha_set_key:                        Cipher functions.    (line 484)
+* chacha_set_nonce:                      Cipher functions.    (line 490)
+* chacha_set_nonce96:                    Cipher functions.    (line 525)
 * Cipher:                                Cipher functions.    (line   6)
 * Cipher Block Chaining:                 CBC.                 (line   6)
 * Cipher Feedback 8-bit Mode:            CFB and CFB8.        (line   6)
 * Cipher Feedback Mode:                  CFB and CFB8.        (line   6)
 * CMAC:                                  CMAC.                (line   6)
-* cmac_aes128_digest:                    CMAC.                (line  29)
-* cmac_aes128_set_key:                   CMAC.                (line  21)
-* cmac_aes128_update:                    CMAC.                (line  25)
-* cmac_aes256_digest:                    CMAC.                (line  45)
-* cmac_aes256_set_key:                   CMAC.                (line  37)
-* cmac_aes256_update:                    CMAC.                (line  41)
+* CMAC-128:                              CMAC.                (line   6)
+* CMAC-64:                               CMAC.                (line   6)
+* cmac_aes128_digest:                    CMAC.                (line  33)
+* cmac_aes128_set_key:                   CMAC.                (line  25)
+* cmac_aes128_update:                    CMAC.                (line  29)
+* cmac_aes256_digest:                    CMAC.                (line  49)
+* cmac_aes256_set_key:                   CMAC.                (line  41)
+* cmac_aes256_update:                    CMAC.                (line  45)
+* cmac_des3_digest:                      CMAC.                (line  70)
+* cmac_des3_set_key:                     CMAC.                (line  62)
+* cmac_des3_update:                      CMAC.                (line  66)
 * Collision-resistant:                   Hash functions.      (line  18)
 * Conditional entropy:                   Randomness.          (line  51)
 * Counter Mode:                          CTR.                 (line   6)
@@ -5692,19 +6051,28 @@ Function and Concept Index
 * CTR_CRYPT:                             CTR.                 (line  60)
 * CTR_CTX:                               CTR.                 (line  48)
 * CTR_SET_COUNTER:                       CTR.                 (line  55)
-* Curve 25519:                           Curve 25519.         (line   6)
-* curve25519_mul:                        Curve 25519.         (line  60)
-* curve25519_mul_g:                      Curve 25519.         (line  51)
-* DES:                                   Cipher functions.    (line 503)
-* DES3:                                  Cipher functions.    (line 558)
-* des3_decrypt:                          Cipher functions.    (line 617)
-* des3_encrypt:                          Cipher functions.    (line 610)
-* des3_set_key:                          Cipher functions.    (line 599)
-* des_check_parity:                      Cipher functions.    (line 544)
-* des_decrypt:                           Cipher functions.    (line 540)
-* des_encrypt:                           Cipher functions.    (line 533)
-* des_fix_parity:                        Cipher functions.    (line 548)
-* des_set_key:                           Cipher functions.    (line 526)
+* Curve 25519:                           Curve 25519 and Curve 448.
+                                                              (line   6)
+* Curve 448:                             Curve 25519 and Curve 448.
+                                                              (line   6)
+* curve25519_mul:                        Curve 25519 and Curve 448.
+                                                              (line  60)
+* curve25519_mul_g:                      Curve 25519 and Curve 448.
+                                                              (line  51)
+* curve448_mul:                          Curve 25519 and Curve 448.
+                                                              (line  91)
+* curve448_mul_g:                        Curve 25519 and Curve 448.
+                                                              (line  82)
+* DES:                                   Cipher functions.    (line 545)
+* DES3:                                  Cipher functions.    (line 600)
+* des3_decrypt:                          Cipher functions.    (line 659)
+* des3_encrypt:                          Cipher functions.    (line 652)
+* des3_set_key:                          Cipher functions.    (line 641)
+* des_check_parity:                      Cipher functions.    (line 586)
+* des_decrypt:                           Cipher functions.    (line 582)
+* des_encrypt:                           Cipher functions.    (line 575)
+* des_fix_parity:                        Cipher functions.    (line 590)
+* des_set_key:                           Cipher functions.    (line 568)
 * dsa_compat_generate_keypair:           DSA.                 (line 300)
 * dsa_generate_keypair:                  DSA.                 (line 198)
 * dsa_generate_params:                   DSA.                 (line 131)
@@ -5756,10 +6124,20 @@ Function and Concept Index
 * ecdsa_generate_keypair:                ECDSA.               (line  93)
 * ecdsa_sign:                            ECDSA.               (line  75)
 * ecdsa_verify:                          ECDSA.               (line  84)
-* ed25519_sha512_public_key:             Curve 25519.         (line 100)
-* ed25519_sha512_sign:                   Curve 25519.         (line 105)
-* ed25519_sha512_verify:                 Curve 25519.         (line 110)
-* eddsa:                                 Curve 25519.         (line  73)
+* ed25519_sha512_public_key:             Curve 25519 and Curve 448.
+                                                              (line 131)
+* ed25519_sha512_sign:                   Curve 25519 and Curve 448.
+                                                              (line 136)
+* ed25519_sha512_verify:                 Curve 25519 and Curve 448.
+                                                              (line 141)
+* ed448_shake256_public_key:             Curve 25519 and Curve 448.
+                                                              (line 155)
+* ed448_shake256_sign:                   Curve 25519 and Curve 448.
+                                                              (line 160)
+* ed448_shake256_verify:                 Curve 25519 and Curve 448.
+                                                              (line 165)
+* eddsa:                                 Curve 25519 and Curve 448.
+                                                              (line 104)
 * Entropy:                               Randomness.          (line  51)
 * Galois Counter Mode:                   GCM.                 (line   6)
 * GCM:                                   GCM.                 (line   6)
@@ -5814,12 +6192,24 @@ Function and Concept Index
 * GCM_SET_KEY:                           GCM.                 (line 111)
 * gcm_update:                            GCM.                 (line  55)
 * GCM_UPDATE:                            GCM.                 (line 120)
+* GOST DSA:                              GOSTDSA.             (line   6)
+* GOST hash:                             Legacy hash functions.
+                                                              (line 189)
+* gostdsa_sign:                          GOSTDSA.             (line  30)
+* gostdsa_verify:                        GOSTDSA.             (line  39)
+* gostdsa_vko:                           GOSTDSA.             (line  68)
+* gosthash94cp_digest:                   Legacy hash functions.
+                                                              (line 239)
+* gosthash94cp_init:                     Legacy hash functions.
+                                                              (line 232)
+* gosthash94cp_update:                   Legacy hash functions.
+                                                              (line 235)
 * gosthash94_digest:                     Legacy hash functions.
-                                                              (line 209)
+                                                              (line 214)
 * gosthash94_init:                       Legacy hash functions.
-                                                              (line 202)
+                                                              (line 207)
 * gosthash94_update:                     Legacy hash functions.
-                                                              (line 205)
+                                                              (line 210)
 * Hash function:                         Hash functions.      (line   6)
 * HKDF:                                  Key derivation functions.
                                                               (line  16)
@@ -5887,17 +6277,19 @@ Function and Concept Index
                                                               (line   6)
 * nettle_aeads:                          nettle_aead abstraction.
                                                               (line  33)
-* nettle_cipher:                         Cipher functions.    (line 785)
-* nettle_ciphers:                        Cipher functions.    (line 832)
+* nettle_cipher:                         Cipher functions.    (line 827)
+* nettle_ciphers:                        Cipher functions.    (line 874)
 * nettle_get_aeads:                      nettle_aead abstraction.
                                                               (line  28)
-* nettle_get_ciphers:                    Cipher functions.    (line 827)
+* nettle_get_ciphers:                    Cipher functions.    (line 869)
+* nettle_get_gost_gc256b(void):          GOSTDSA.             (line  51)
+* nettle_get_gost_gc512a(void):          GOSTDSA.             (line  57)
 * nettle_get_hashes:                     nettle_hash abstraction.
-                                                              (line  33)
+                                                              (line  34)
 * nettle_hash:                           nettle_hash abstraction.
                                                               (line   6)
 * nettle_hashes:                         nettle_hash abstraction.
-                                                              (line  38)
+                                                              (line  39)
 * One-way:                               Hash functions.      (line  14)
 * One-way function:                      Public-key algorithms.
                                                               (line  18)
@@ -5975,17 +6367,17 @@ Function and Concept Index
 * rsa_sha512_sign_tr(const:              RSA.                 (line 158)
 * rsa_sha512_verify:                     RSA.                 (line 250)
 * rsa_sha512_verify_digest:              RSA.                 (line 262)
-* Salsa20:                               Cipher functions.    (line 624)
-* salsa20r12_crypt:                      Cipher functions.    (line 702)
-* salsa20_128_set_key:                   Cipher functions.    (line 667)
-* salsa20_256_set_key:                   Cipher functions.    (line 669)
-* salsa20_crypt:                         Cipher functions.    (line 687)
-* salsa20_set_key:                       Cipher functions.    (line 671)
-* salsa20_set_nonce:                     Cipher functions.    (line 681)
-* Serpent:                               Cipher functions.    (line 710)
-* serpent_decrypt:                       Cipher functions.    (line 742)
-* serpent_encrypt:                       Cipher functions.    (line 735)
-* serpent_set_key:                       Cipher functions.    (line 730)
+* Salsa20:                               Cipher functions.    (line 666)
+* salsa20r12_crypt:                      Cipher functions.    (line 744)
+* salsa20_128_set_key:                   Cipher functions.    (line 709)
+* salsa20_256_set_key:                   Cipher functions.    (line 711)
+* salsa20_crypt:                         Cipher functions.    (line 729)
+* salsa20_set_key:                       Cipher functions.    (line 713)
+* salsa20_set_nonce:                     Cipher functions.    (line 723)
+* Serpent:                               Cipher functions.    (line 752)
+* serpent_decrypt:                       Cipher functions.    (line 784)
+* serpent_encrypt:                       Cipher functions.    (line 777)
+* serpent_set_key:                       Cipher functions.    (line 772)
 * sha1_digest:                           Legacy hash functions.
                                                               (line 177)
 * sha1_init:                             Legacy hash functions.
@@ -6022,6 +6414,8 @@ Function and Concept Index
                                                               (line 244)
 * sha3_256_init:                         Recommended hash functions.
                                                               (line 237)
+* sha3_256_shake:                        Recommended hash functions.
+                                                              (line 330)
 * sha3_256_update:                       Recommended hash functions.
                                                               (line 240)
 * sha3_384_digest:                       Recommended hash functions.
@@ -6054,14 +6448,24 @@ Function and Concept Index
                                                               (line  96)
 * sha512_update:                         Recommended hash functions.
                                                               (line  99)
+* SHAKE:                                 Recommended hash functions.
+                                                              (line 318)
 * Side-channel attack:                   Side-channel silence.
                                                               (line   6)
+* SIV mode:                              SIV-CMAC.            (line   6)
+* SIV-CMAC mode:                         SIV-CMAC.            (line   6)
+* siv_cmac_aes128_decrypt_message:       SIV-CMAC.            (line  83)
+* siv_cmac_aes128_encrypt_message:       SIV-CMAC.            (line  70)
+* siv_cmac_aes128_set_key:               SIV-CMAC.            (line  62)
+* siv_cmac_aes256_decrypt_message:       SIV-CMAC.            (line  87)
+* siv_cmac_aes256_encrypt_message:       SIV-CMAC.            (line  74)
+* siv_cmac_aes256_set_key:               SIV-CMAC.            (line  64)
 * Stream Cipher:                         Cipher functions.    (line  12)
-* Triple-DES:                            Cipher functions.    (line 558)
-* Twofish:                               Cipher functions.    (line 749)
-* twofish_decrypt:                       Cipher functions.    (line 778)
-* twofish_encrypt:                       Cipher functions.    (line 771)
-* twofish_set_key:                       Cipher functions.    (line 766)
+* Triple-DES:                            Cipher functions.    (line 600)
+* Twofish:                               Cipher functions.    (line 791)
+* twofish_decrypt:                       Cipher functions.    (line 820)
+* twofish_encrypt:                       Cipher functions.    (line 813)
+* twofish_set_key:                       Cipher functions.    (line 808)
 * UMAC:                                  UMAC.                (line   6)
 * umac128_digest:                        UMAC.                (line 113)
 * umac128_set_key:                       UMAC.                (line  76)
@@ -6107,51 +6511,54 @@ Function and Concept Index
 
 Tag Table:
 Node: Top543
-Node: Introduction2774
-Node: Copyright4353
-Node: Conventions9324
-Node: Example11478
-Node: Linking12728
-Node: Compatibility13593
-Node: Reference17219
-Node: Hash functions17773
-Node: Recommended hash functions19307
-Node: Legacy hash functions30838
-Node: nettle_hash abstraction38692
-Node: Cipher functions40856
-Node: Cipher modes77401
-Node: CBC78634
-Node: CTR82026
-Node: CFB and CFB884648
-Node: XTS90430
-Node: Authenticated encryption96801
-Node: EAX100154
-Node: GCM106329
-Node: CCM119166
-Node: ChaCha-Poly1305131954
-Node: nettle_aead abstraction135829
-Node: Keyed hash functions137518
-Node: HMAC139169
-Node: UMAC147189
-Node: CMAC153064
-Node: Poly1305155249
-Node: Key derivation functions157906
-Node: Public-key algorithms164032
-Node: RSA168103
-Node: RSA-Footnotes188700
-Ref: RSA-Footnote-1188753
-Node: DSA188931
-Node: Elliptic curves204411
-Node: Side-channel silence205770
-Node: ECDSA207217
-Node: Curve 25519211965
-Node: Randomness217483
-Node: ASCII encoding232838
-Node: Miscellaneous functions239565
-Node: Compatibility functions240725
-Node: Nettle soup241414
-Node: Installation242411
-Node: Index243787
+Node: Introduction2610
+Node: Copyright4189
+Node: Conventions9160
+Node: Example11314
+Node: Linking12613
+Node: Compatibility13478
+Node: Reference17104
+Node: Hash functions17555
+Node: Recommended hash functions19089
+Node: Legacy hash functions31605
+Ref: GOSTHASH94CP38357
+Node: nettle_hash abstraction40787
+Node: Cipher functions43011
+Node: Cipher modes81272
+Node: CBC82455
+Node: CTR85847
+Node: CFB and CFB888469
+Node: XTS94251
+Node: Authenticated encryption100622
+Node: EAX103913
+Node: GCM110088
+Node: CCM122925
+Node: ChaCha-Poly1305135713
+Node: SIV-CMAC139217
+Node: nettle_aead abstraction143966
+Node: Keyed hash functions145655
+Node: HMAC147306
+Node: UMAC155326
+Node: CMAC161201
+Node: Poly1305164508
+Node: Key derivation functions167165
+Node: Public-key algorithms173291
+Node: RSA177362
+Node: RSA-Footnotes197959
+Ref: RSA-Footnote-1198012
+Node: DSA198190
+Node: Elliptic curves213670
+Node: Side-channel silence215055
+Node: ECDSA216502
+Node: GOSTDSA221246
+Node: Curve 25519 and Curve 448225242
+Node: Randomness233155
+Node: ASCII encoding248510
+Node: Miscellaneous functions255237
+Node: Compatibility functions256397
+Node: Nettle soup257086
+Node: Installation258083
+Node: Index259459
 
 End Tag Table
 

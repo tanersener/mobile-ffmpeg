@@ -37,8 +37,9 @@ import com.arthenica.mobileffmpeg.LogMessage;
 import com.arthenica.mobileffmpeg.MediaInformation;
 import com.arthenica.mobileffmpeg.StreamInformation;
 
-import java.util.Map;
-import java.util.Set;
+import org.json.JSONObject;
+
+import java.util.Iterator;
 import java.util.concurrent.Callable;
 
 public class HttpsTabFragment extends Fragment {
@@ -105,9 +106,9 @@ public class HttpsTabFragment extends Fragment {
         if (testUrl.isEmpty()) {
             testUrl = HTTPS_TEST_DEFAULT_URL;
             urlText.setText(testUrl);
-            android.util.Log.d(MainActivity.TAG, String.format("Testing HTTPS with default url '%s'", testUrl));
+            android.util.Log.d(MainActivity.TAG, String.format("Testing HTTPS with default url '%s'.", testUrl));
         } else {
-            android.util.Log.d(MainActivity.TAG, String.format("Testing HTTPS with url '%s'", testUrl));
+            android.util.Log.d(MainActivity.TAG, String.format("Testing HTTPS with url '%s'.", testUrl));
         }
 
         // HTTPS COMMAND ARGUMENTS
@@ -115,7 +116,7 @@ public class HttpsTabFragment extends Fragment {
         if (information == null) {
             appendLog("Get media information failed\n");
         } else {
-            appendLog("Media information for " + information.getPath() + "\n");
+            appendLog("Media information for " + information.getFilename() + "\n");
 
             if (information.getFormat() != null) {
                 appendLog("Format: " + information.getFormat() + "\n");
@@ -129,10 +130,14 @@ public class HttpsTabFragment extends Fragment {
             if (information.getStartTime() != null) {
                 appendLog("Start time: " + information.getStartTime() + "\n");
             }
-            if (information.getMetadataEntries() != null) {
-                Set<Map.Entry<String, String>> entries = information.getMetadataEntries();
-                for (Map.Entry<String, String> entry : entries) {
-                    appendLog("Metadata: " + entry.getKey() + ":" + entry.getValue() + "\n");
+            if (information.getTags() != null) {
+                JSONObject tags = information.getTags();
+                if (tags != null) {
+                    Iterator<String> keys = tags.keys();
+                    while (keys.hasNext()) {
+                        String next = keys.next();
+                        appendLog("Tag: " + next + ":" + tags.optString(next) + "\n");
+                    }
                 }
             }
             if (information.getStreams() != null) {
@@ -151,9 +156,6 @@ public class HttpsTabFragment extends Fragment {
                     }
                     if (stream.getFormat() != null) {
                         appendLog("Stream format: " + stream.getFormat() + "\n");
-                    }
-                    if (stream.getFullFormat() != null) {
-                        appendLog("Stream full format: " + stream.getFullFormat() + "\n");
                     }
 
                     if (stream.getWidth() != null) {
@@ -196,10 +198,14 @@ public class HttpsTabFragment extends Fragment {
                         appendLog("Stream codec time base: " + stream.getCodecTimeBase() + "\n");
                     }
 
-                    if (stream.getMetadataEntries() != null) {
-                        Set<Map.Entry<String, String>> entries = stream.getMetadataEntries();
-                        for (Map.Entry<String, String> entry : entries) {
-                            appendLog("Stream metadata: " + entry.getKey() + ":" + entry.getValue() + "\n");
+                    if (stream.getTags() != null) {
+                        JSONObject tags = stream.getTags();
+                        if (tags != null) {
+                            Iterator<String> keys = tags.keys();
+                            while (keys.hasNext()) {
+                                String next = keys.next();
+                                appendLog(String.format("Stream tag: %s:%s\n", next, tags.optString(next)));
+                            }
                         }
                     }
                 }

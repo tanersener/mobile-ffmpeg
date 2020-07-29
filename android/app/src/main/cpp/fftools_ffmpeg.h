@@ -17,6 +17,9 @@
  */
 
 /*
+ * CHANGES 06.2020
+ * - cancel_operation() method signature updated with id
+ *
  * CHANGES 01.2020
  * - ffprobe support changes
  *
@@ -685,7 +688,7 @@ int hwaccel_decode_init(AVCodecContext *avctx);
 
 void set_report_callback(void (*callback)(int, float, float, int64_t, int, double, double));
 
-void cancel_operation();
+void cancel_operation(long id);
 
 int opt_map(void *optctx, const char *opt, const char *arg);
 int opt_map_channel(void *optctx, const char *opt, const char *arg);

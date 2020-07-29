@@ -334,8 +334,8 @@ int WavpackSetConfiguration64 (WavpackContext *wpc, WavpackConfig *config, int64
         // skip past channels that are specified in the channel mask (no reason to store those)
 
         while (*chan_ids)
-            if (*chan_ids <= 32 && *chan_ids > lastchan && (mask_copy & (1 << (*chan_ids-1)))) {
-                mask_copy &= ~(1 << (*chan_ids-1));
+            if (*chan_ids <= 32 && *chan_ids > lastchan && (mask_copy & (1U << (*chan_ids-1)))) {
+                mask_copy &= ~(1U << (*chan_ids-1));
                 lastchan = *chan_ids++;
             }
             else
@@ -367,13 +367,13 @@ int WavpackSetConfiguration64 (WavpackContext *wpc, WavpackConfig *config, int64
         // if there are any bits [still] set in the channel_mask, get the next one or two IDs from there
         if (chan_mask)
             for (pos = 0; pos < 32; ++pos)
-                if (chan_mask & (1 << pos)) {
+                if (chan_mask & (1U << pos)) {
                     if (left_chan_id) {
                         right_chan_id = pos + 1;
                         break;
                     }
                     else {
-                        chan_mask &= ~(1 << pos);
+                        chan_mask &= ~(1U << pos);
                         left_chan_id = pos + 1;
                     }
                 }
@@ -401,8 +401,8 @@ int WavpackSetConfiguration64 (WavpackContext *wpc, WavpackConfig *config, int64
                 for (i = 0; i < NUM_STEREO_PAIRS; ++i)
                     if ((left_chan_id == stereo_pairs [i].a && right_chan_id == stereo_pairs [i].b) ||
                         (left_chan_id == stereo_pairs [i].b && right_chan_id == stereo_pairs [i].a)) {
-                            if (right_chan_id <= 32 && (chan_mask & (1 << (right_chan_id-1))))
-                                chan_mask &= ~(1 << (right_chan_id-1));
+                            if (right_chan_id <= 32 && (chan_mask & (1U << (right_chan_id-1))))
+                                chan_mask &= ~(1U << (right_chan_id-1));
                             else if (chan_ids && *chan_ids == right_chan_id)
                                 chan_ids++;
 
@@ -640,7 +640,7 @@ int WavpackPackSamples (WavpackContext *wpc, int32_t *sample_buffer, uint32_t sa
 
                     case 3:
                         while (cnt--) {
-                            *dptr++ = (*sptr << 8) >> 8;
+                            *dptr++ = (int32_t)((uint32_t)*sptr << 8) >> 8;
                             sptr += nch;
                         }
 
@@ -677,8 +677,8 @@ int WavpackPackSamples (WavpackContext *wpc, int32_t *sample_buffer, uint32_t sa
 
                     case 3:
                         while (cnt--) {
-                            *dptr++ = (sptr [0] << 8) >> 8;
-                            *dptr++ = (sptr [1] << 8) >> 8;
+                            *dptr++ = (int32_t)((uint32_t)sptr [0] << 8) >> 8;
+                            *dptr++ = (int32_t)((uint32_t)sptr [1] << 8) >> 8;
                             sptr += nch;
                         }
 
@@ -960,7 +960,7 @@ static int pack_streams (WavpackContext *wpc, uint32_t block_samples)
         uint32_t flags = wps->wphdr.flags;
 
         flags &= ~MAG_MASK;
-        flags += (1 << MAG_LSB) * ((flags & BYTES_STORED) * 8 + 7);
+        flags += (1U << MAG_LSB) * ((flags & BYTES_STORED) * 8 + 7);
 
         SET_BLOCK_INDEX (wps->wphdr, wps->sample_index);
         wps->wphdr.block_samples = block_samples;

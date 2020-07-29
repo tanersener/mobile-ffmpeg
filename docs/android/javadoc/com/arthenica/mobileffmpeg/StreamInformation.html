@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10,"i19":10,"i20":10,"i21":10,"i22":10,"i23":10,"i24":10,"i25":10,"i26":10,"i27":10,"i28":10,"i29":10,"i30":10,"i31":10,"i32":10,"i33":10,"i34":10,"i35":10,"i36":10,"i37":10,"i38":10,"i39":10,"i40":10,"i41":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10,"i19":10,"i20":10,"i21":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -132,7 +132,7 @@ extends java.lang.Object</pre>
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html#StreamInformation--">StreamInformation</a></span>()</code>&nbsp;</td>
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html#StreamInformation-org.json.JSONObject-">StreamInformation</a></span>(org.json.JSONObject&nbsp;jsonObject)</code>&nbsp;</td>
 </tr>
 </table>
 </li>
@@ -150,257 +150,135 @@ extends java.lang.Object</pre>
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr id="i0" class="altColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html#addMetadata-java.lang.String-java.lang.String-">addMetadata</a></span>(java.lang.String&nbsp;key,
-           java.lang.String&nbsp;value)</code>
-<div class="block">Adds metadata.</div>
+<td class="colFirst"><code>org.json.JSONObject</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html#getAllProperties--">getAllProperties</a></span>()</code>
+<div class="block">Returns all stream properties defined.</div>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html#addSidedata-java.lang.String-java.lang.String-">addSidedata</a></span>(java.lang.String&nbsp;key,
-           java.lang.String&nbsp;value)</code>
-<div class="block">Adds side data.</div>
-</td>
-</tr>
-<tr id="i2" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html#getAverageFrameRate--">getAverageFrameRate</a></span>()</code>
 <div class="block">Returns display aspect ratio.</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
-<td class="colFirst"><code>java.lang.Long</code></td>
+<tr id="i2" class="altColor">
+<td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html#getBitrate--">getBitrate</a></span>()</code>
 <div class="block">Returns bitrate.</div>
 </td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html#getChannelLayout--">getChannelLayout</a></span>()</code>
 <div class="block">Returns channel layout.</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
+<tr id="i4" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html#getCodec--">getCodec</a></span>()</code>
 <div class="block">Returns stream codec.</div>
 </td>
 </tr>
-<tr id="i6" class="altColor">
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html#getCodecTimeBase--">getCodecTimeBase</a></span>()</code>
 <div class="block">Returns codec time base.</div>
 </td>
 </tr>
-<tr id="i7" class="rowColor">
+<tr id="i6" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html#getDisplayAspectRatio--">getDisplayAspectRatio</a></span>()</code>
 <div class="block">Returns display aspect ratio.</div>
 </td>
 </tr>
-<tr id="i8" class="altColor">
+<tr id="i7" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html#getFormat--">getFormat</a></span>()</code>
 <div class="block">Returns stream format.</div>
 </td>
 </tr>
-<tr id="i9" class="rowColor">
+<tr id="i8" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html#getFullCodec--">getFullCodec</a></span>()</code>
 <div class="block">Returns full stream codec.</div>
 </td>
 </tr>
-<tr id="i10" class="altColor">
-<td class="colFirst"><code>java.lang.String</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html#getFullFormat--">getFullFormat</a></span>()</code>
-<div class="block">Returns full stream format.</div>
-</td>
-</tr>
-<tr id="i11" class="rowColor">
+<tr id="i9" class="rowColor">
 <td class="colFirst"><code>java.lang.Long</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html#getHeight--">getHeight</a></span>()</code>
 <div class="block">Returns height.</div>
 </td>
 </tr>
-<tr id="i12" class="altColor">
+<tr id="i10" class="altColor">
 <td class="colFirst"><code>java.lang.Long</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html#getIndex--">getIndex</a></span>()</code>
 <div class="block">Returns stream index.</div>
 </td>
 </tr>
+<tr id="i11" class="rowColor">
+<td class="colFirst"><code>java.lang.Long</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html#getNumberProperty-java.lang.String-">getNumberProperty</a></span>(java.lang.String&nbsp;key)</code>
+<div class="block">Returns the stream property associated with the key.</div>
+</td>
+</tr>
+<tr id="i12" class="altColor">
+<td class="colFirst"><code>org.json.JSONObject</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html#getProperties-java.lang.String-">getProperties</a></span>(java.lang.String&nbsp;key)</code>
+<div class="block">Returns the stream properties associated with the key.</div>
+</td>
+</tr>
 <tr id="i13" class="rowColor">
-<td class="colFirst"><code>java.lang.String</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html#getMetadata-java.lang.String-">getMetadata</a></span>(java.lang.String&nbsp;key)</code>
-<div class="block">Retrieves metadata value associated with this key.</div>
-</td>
-</tr>
-<tr id="i14" class="altColor">
-<td class="colFirst"><code>java.util.Set&lt;java.util.Map.Entry&lt;java.lang.String,java.lang.String&gt;&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html#getMetadataEntries--">getMetadataEntries</a></span>()</code>
-<div class="block">Returns all metadata entries.</div>
-</td>
-</tr>
-<tr id="i15" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html#getRealFrameRate--">getRealFrameRate</a></span>()</code>
 <div class="block">Returns real frame rate.</div>
 </td>
 </tr>
-<tr id="i16" class="altColor">
+<tr id="i14" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html#getSampleAspectRatio--">getSampleAspectRatio</a></span>()</code>
 <div class="block">Returns sample aspect ratio.</div>
 </td>
 </tr>
-<tr id="i17" class="rowColor">
+<tr id="i15" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html#getSampleFormat--">getSampleFormat</a></span>()</code>
 <div class="block">Returns sample format.</div>
 </td>
 </tr>
-<tr id="i18" class="altColor">
-<td class="colFirst"><code>java.lang.Long</code></td>
+<tr id="i16" class="altColor">
+<td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html#getSampleRate--">getSampleRate</a></span>()</code>
 <div class="block">Returns sample rate.</div>
 </td>
 </tr>
-<tr id="i19" class="rowColor">
+<tr id="i17" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html#getSidedata-java.lang.String-">getSidedata</a></span>(java.lang.String&nbsp;key)</code>
-<div class="block">Retrieves side data value associated with this key.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html#getStringProperty-java.lang.String-">getStringProperty</a></span>(java.lang.String&nbsp;key)</code>
+<div class="block">Returns the stream property associated with the key.</div>
 </td>
 </tr>
-<tr id="i20" class="altColor">
-<td class="colFirst"><code>java.util.Set&lt;java.util.Map.Entry&lt;java.lang.String,java.lang.String&gt;&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html#getSidedataEntries--">getSidedataEntries</a></span>()</code>
-<div class="block">Returns all side data entries.</div>
+<tr id="i18" class="altColor">
+<td class="colFirst"><code>org.json.JSONObject</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html#getTags--">getTags</a></span>()</code>
+<div class="block">Returns all tags.</div>
 </td>
 </tr>
-<tr id="i21" class="rowColor">
+<tr id="i19" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html#getTimeBase--">getTimeBase</a></span>()</code>
 <div class="block">Returns time base.</div>
 </td>
 </tr>
-<tr id="i22" class="altColor">
+<tr id="i20" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html#getType--">getType</a></span>()</code>
 <div class="block">Returns stream type.</div>
 </td>
 </tr>
-<tr id="i23" class="rowColor">
+<tr id="i21" class="rowColor">
 <td class="colFirst"><code>java.lang.Long</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html#getWidth--">getWidth</a></span>()</code>
 <div class="block">Returns width.</div>
-</td>
-</tr>
-<tr id="i24" class="altColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html#setAverageFrameRate-java.lang.String-">setAverageFrameRate</a></span>(java.lang.String&nbsp;averageFrameRate)</code>
-<div class="block">Sets average frame rate.</div>
-</td>
-</tr>
-<tr id="i25" class="rowColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html#setBitrate-java.lang.Long-">setBitrate</a></span>(java.lang.Long&nbsp;bitrate)</code>
-<div class="block">Sets bitrate.</div>
-</td>
-</tr>
-<tr id="i26" class="altColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html#setChannelLayout-java.lang.String-">setChannelLayout</a></span>(java.lang.String&nbsp;channelLayout)</code>
-<div class="block">Sets channel layout.</div>
-</td>
-</tr>
-<tr id="i27" class="rowColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html#setCodec-java.lang.String-">setCodec</a></span>(java.lang.String&nbsp;codec)</code>
-<div class="block">Sets stream codec.</div>
-</td>
-</tr>
-<tr id="i28" class="altColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html#setCodecTimeBase-java.lang.String-">setCodecTimeBase</a></span>(java.lang.String&nbsp;codecTimeBase)</code>
-<div class="block">Sets codec time base.</div>
-</td>
-</tr>
-<tr id="i29" class="rowColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html#setDisplayAspectRatio-java.lang.String-">setDisplayAspectRatio</a></span>(java.lang.String&nbsp;displayAspectRatio)</code>
-<div class="block">Sets display aspect ratio.</div>
-</td>
-</tr>
-<tr id="i30" class="altColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html#setFormat-java.lang.String-">setFormat</a></span>(java.lang.String&nbsp;format)</code>
-<div class="block">Sets stream format.</div>
-</td>
-</tr>
-<tr id="i31" class="rowColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html#setFullCodec-java.lang.String-">setFullCodec</a></span>(java.lang.String&nbsp;fullCodec)</code>
-<div class="block">Sets full stream codec.</div>
-</td>
-</tr>
-<tr id="i32" class="altColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html#setFullFormat-java.lang.String-">setFullFormat</a></span>(java.lang.String&nbsp;fullFormat)</code>
-<div class="block">Sets full stream format.</div>
-</td>
-</tr>
-<tr id="i33" class="rowColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html#setHeight-java.lang.Long-">setHeight</a></span>(java.lang.Long&nbsp;height)</code>
-<div class="block">Sets height.</div>
-</td>
-</tr>
-<tr id="i34" class="altColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html#setIndex-java.lang.Long-">setIndex</a></span>(java.lang.Long&nbsp;index)</code>
-<div class="block">Sets stream index.</div>
-</td>
-</tr>
-<tr id="i35" class="rowColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html#setRealFrameRate-java.lang.String-">setRealFrameRate</a></span>(java.lang.String&nbsp;realFrameRate)</code>
-<div class="block">Sets real frame rate.</div>
-</td>
-</tr>
-<tr id="i36" class="altColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html#setSampleAspectRatio-java.lang.String-">setSampleAspectRatio</a></span>(java.lang.String&nbsp;sampleAspectRatio)</code>
-<div class="block">Sets sample aspect ratio.</div>
-</td>
-</tr>
-<tr id="i37" class="rowColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html#setSampleFormat-java.lang.String-">setSampleFormat</a></span>(java.lang.String&nbsp;sampleFormat)</code>
-<div class="block">Sets sample format.</div>
-</td>
-</tr>
-<tr id="i38" class="altColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html#setSampleRate-java.lang.Long-">setSampleRate</a></span>(java.lang.Long&nbsp;sampleRate)</code>
-<div class="block">Sets sample rate.</div>
-</td>
-</tr>
-<tr id="i39" class="rowColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html#setTimeBase-java.lang.String-">setTimeBase</a></span>(java.lang.String&nbsp;timeBase)</code>
-<div class="block">Sets time base.</div>
-</td>
-</tr>
-<tr id="i40" class="altColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html#setType-java.lang.String-">setType</a></span>(java.lang.String&nbsp;type)</code>
-<div class="block">Sets stream type.</div>
-</td>
-</tr>
-<tr id="i41" class="rowColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/StreamInformation.html#setWidth-java.lang.Long-">setWidth</a></span>(java.lang.Long&nbsp;width)</code>
-<div class="block">Sets width.</div>
 </td>
 </tr>
 </table>
@@ -425,13 +303,13 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="StreamInformation--">
+<a name="StreamInformation-org.json.JSONObject-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>StreamInformation</h4>
-<pre>public&nbsp;StreamInformation()</pre>
+<pre>public&nbsp;StreamInformation(org.json.JSONObject&nbsp;jsonObject)</pre>
 </li>
 </ul>
 </li>
@@ -456,20 +334,6 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
-<a name="setIndex-java.lang.Long-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>setIndex</h4>
-<pre>public&nbsp;void&nbsp;setIndex(java.lang.Long&nbsp;index)</pre>
-<div class="block">Sets stream index.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>index</code> - stream index, starting from zero</dd>
-</dl>
-</li>
-</ul>
 <a name="getType--">
 <!--   -->
 </a>
@@ -481,20 +345,6 @@ extends java.lang.Object</pre>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>stream type; audio or video</dd>
-</dl>
-</li>
-</ul>
-<a name="setType-java.lang.String-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>setType</h4>
-<pre>public&nbsp;void&nbsp;setType(java.lang.String&nbsp;type)</pre>
-<div class="block">Sets stream type.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>type</code> - stream type; audio or video</dd>
 </dl>
 </li>
 </ul>
@@ -512,20 +362,6 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
-<a name="setCodec-java.lang.String-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>setCodec</h4>
-<pre>public&nbsp;void&nbsp;setCodec(java.lang.String&nbsp;codec)</pre>
-<div class="block">Sets stream codec.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>codec</code> - stream codec</dd>
-</dl>
-</li>
-</ul>
 <a name="getFullCodec--">
 <!--   -->
 </a>
@@ -537,20 +373,6 @@ extends java.lang.Object</pre>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>stream codec with additional profile and mode information</dd>
-</dl>
-</li>
-</ul>
-<a name="setFullCodec-java.lang.String-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>setFullCodec</h4>
-<pre>public&nbsp;void&nbsp;setFullCodec(java.lang.String&nbsp;fullCodec)</pre>
-<div class="block">Sets full stream codec.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>fullCodec</code> - stream codec with additional profile and mode information</dd>
 </dl>
 </li>
 </ul>
@@ -568,48 +390,6 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
-<a name="setFormat-java.lang.String-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>setFormat</h4>
-<pre>public&nbsp;void&nbsp;setFormat(java.lang.String&nbsp;format)</pre>
-<div class="block">Sets stream format.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>format</code> - stream format</dd>
-</dl>
-</li>
-</ul>
-<a name="getFullFormat--">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getFullFormat</h4>
-<pre>public&nbsp;java.lang.String&nbsp;getFullFormat()</pre>
-<div class="block">Returns full stream format.</div>
-<dl>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>stream format with</dd>
-</dl>
-</li>
-</ul>
-<a name="setFullFormat-java.lang.String-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>setFullFormat</h4>
-<pre>public&nbsp;void&nbsp;setFullFormat(java.lang.String&nbsp;fullFormat)</pre>
-<div class="block">Sets full stream format.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>fullFormat</code> - stream format with</dd>
-</dl>
-</li>
-</ul>
 <a name="getWidth--">
 <!--   -->
 </a>
@@ -621,20 +401,6 @@ extends java.lang.Object</pre>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>width in pixels</dd>
-</dl>
-</li>
-</ul>
-<a name="setWidth-java.lang.Long-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>setWidth</h4>
-<pre>public&nbsp;void&nbsp;setWidth(java.lang.Long&nbsp;width)</pre>
-<div class="block">Sets width.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>width</code> - width in pixels</dd>
 </dl>
 </li>
 </ul>
@@ -652,45 +418,17 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
-<a name="setHeight-java.lang.Long-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>setHeight</h4>
-<pre>public&nbsp;void&nbsp;setHeight(java.lang.Long&nbsp;height)</pre>
-<div class="block">Sets height.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>height</code> - height in pixels</dd>
-</dl>
-</li>
-</ul>
 <a name="getBitrate--">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>getBitrate</h4>
-<pre>public&nbsp;java.lang.Long&nbsp;getBitrate()</pre>
+<pre>public&nbsp;java.lang.String&nbsp;getBitrate()</pre>
 <div class="block">Returns bitrate.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>bitrate in kb/s</dd>
-</dl>
-</li>
-</ul>
-<a name="setBitrate-java.lang.Long-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>setBitrate</h4>
-<pre>public&nbsp;void&nbsp;setBitrate(java.lang.Long&nbsp;bitrate)</pre>
-<div class="block">Sets bitrate.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>bitrate</code> - bitrate in kb/s</dd>
 </dl>
 </li>
 </ul>
@@ -700,25 +438,11 @@ extends java.lang.Object</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>getSampleRate</h4>
-<pre>public&nbsp;java.lang.Long&nbsp;getSampleRate()</pre>
+<pre>public&nbsp;java.lang.String&nbsp;getSampleRate()</pre>
 <div class="block">Returns sample rate.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>sample rate in hz</dd>
-</dl>
-</li>
-</ul>
-<a name="setSampleRate-java.lang.Long-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>setSampleRate</h4>
-<pre>public&nbsp;void&nbsp;setSampleRate(java.lang.Long&nbsp;sampleRate)</pre>
-<div class="block">Sets sample rate.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>sampleRate</code> - sample rate in hz</dd>
 </dl>
 </li>
 </ul>
@@ -736,20 +460,6 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
-<a name="setSampleFormat-java.lang.String-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>setSampleFormat</h4>
-<pre>public&nbsp;void&nbsp;setSampleFormat(java.lang.String&nbsp;sampleFormat)</pre>
-<div class="block">Sets sample format.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>sampleFormat</code> - sample format</dd>
-</dl>
-</li>
-</ul>
 <a name="getChannelLayout--">
 <!--   -->
 </a>
@@ -761,20 +471,6 @@ extends java.lang.Object</pre>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>channel layout</dd>
-</dl>
-</li>
-</ul>
-<a name="setChannelLayout-java.lang.String-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>setChannelLayout</h4>
-<pre>public&nbsp;void&nbsp;setChannelLayout(java.lang.String&nbsp;channelLayout)</pre>
-<div class="block">Sets channel layout.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>channelLayout</code> - channel layout</dd>
 </dl>
 </li>
 </ul>
@@ -792,20 +488,6 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
-<a name="setSampleAspectRatio-java.lang.String-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>setSampleAspectRatio</h4>
-<pre>public&nbsp;void&nbsp;setSampleAspectRatio(java.lang.String&nbsp;sampleAspectRatio)</pre>
-<div class="block">Sets sample aspect ratio.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>sampleAspectRatio</code> - sample aspect ratio</dd>
-</dl>
-</li>
-</ul>
 <a name="getDisplayAspectRatio--">
 <!--   -->
 </a>
@@ -817,20 +499,6 @@ extends java.lang.Object</pre>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>display aspect ratio</dd>
-</dl>
-</li>
-</ul>
-<a name="setDisplayAspectRatio-java.lang.String-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>setDisplayAspectRatio</h4>
-<pre>public&nbsp;void&nbsp;setDisplayAspectRatio(java.lang.String&nbsp;displayAspectRatio)</pre>
-<div class="block">Sets display aspect ratio.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>displayAspectRatio</code> - display aspect ratio</dd>
 </dl>
 </li>
 </ul>
@@ -848,20 +516,6 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
-<a name="setAverageFrameRate-java.lang.String-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>setAverageFrameRate</h4>
-<pre>public&nbsp;void&nbsp;setAverageFrameRate(java.lang.String&nbsp;averageFrameRate)</pre>
-<div class="block">Sets average frame rate.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>averageFrameRate</code> - average frame rate in fps</dd>
-</dl>
-</li>
-</ul>
 <a name="getRealFrameRate--">
 <!--   -->
 </a>
@@ -873,20 +527,6 @@ extends java.lang.Object</pre>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>real frame rate in tbr</dd>
-</dl>
-</li>
-</ul>
-<a name="setRealFrameRate-java.lang.String-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>setRealFrameRate</h4>
-<pre>public&nbsp;void&nbsp;setRealFrameRate(java.lang.String&nbsp;realFrameRate)</pre>
-<div class="block">Sets real frame rate.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>realFrameRate</code> - real frame rate in tbr</dd>
 </dl>
 </li>
 </ul>
@@ -904,20 +544,6 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
-<a name="setTimeBase-java.lang.String-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>setTimeBase</h4>
-<pre>public&nbsp;void&nbsp;setTimeBase(java.lang.String&nbsp;timeBase)</pre>
-<div class="block">Sets time base.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>timeBase</code> - time base in tbn</dd>
-</dl>
-</li>
-</ul>
 <a name="getCodecTimeBase--">
 <!--   -->
 </a>
@@ -932,109 +558,79 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
-<a name="setCodecTimeBase-java.lang.String-">
+<a name="getTags--">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>setCodecTimeBase</h4>
-<pre>public&nbsp;void&nbsp;setCodecTimeBase(java.lang.String&nbsp;codecTimeBase)</pre>
-<div class="block">Sets codec time base.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>codecTimeBase</code> - codec time base in tbc</dd>
-</dl>
-</li>
-</ul>
-<a name="addMetadata-java.lang.String-java.lang.String-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>addMetadata</h4>
-<pre>public&nbsp;void&nbsp;addMetadata(java.lang.String&nbsp;key,
-                        java.lang.String&nbsp;value)</pre>
-<div class="block">Adds metadata.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>key</code> - metadata key</dd>
-<dd><code>value</code> - metadata value</dd>
-</dl>
-</li>
-</ul>
-<a name="getMetadata-java.lang.String-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getMetadata</h4>
-<pre>public&nbsp;java.lang.String&nbsp;getMetadata(java.lang.String&nbsp;key)</pre>
-<div class="block">Retrieves metadata value associated with this key.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>key</code> - metadata key</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>metadata value associated with this key</dd>
-</dl>
-</li>
-</ul>
-<a name="getMetadataEntries--">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getMetadataEntries</h4>
-<pre>public&nbsp;java.util.Set&lt;java.util.Map.Entry&lt;java.lang.String,java.lang.String&gt;&gt;&nbsp;getMetadataEntries()</pre>
-<div class="block">Returns all metadata entries.</div>
+<h4>getTags</h4>
+<pre>public&nbsp;org.json.JSONObject&nbsp;getTags()</pre>
+<div class="block">Returns all tags.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>set of metadata entries</dd>
+<dd>tags dictionary</dd>
 </dl>
 </li>
 </ul>
-<a name="addSidedata-java.lang.String-java.lang.String-">
+<a name="getStringProperty-java.lang.String-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>addSidedata</h4>
-<pre>public&nbsp;void&nbsp;addSidedata(java.lang.String&nbsp;key,
-                        java.lang.String&nbsp;value)</pre>
-<div class="block">Adds side data.</div>
+<h4>getStringProperty</h4>
+<pre>public&nbsp;java.lang.String&nbsp;getStringProperty(java.lang.String&nbsp;key)</pre>
+<div class="block">Returns the stream property associated with the key.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>key</code> - side data key</dd>
-<dd><code>value</code> - side data value</dd>
-</dl>
-</li>
-</ul>
-<a name="getSidedata-java.lang.String-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getSidedata</h4>
-<pre>public&nbsp;java.lang.String&nbsp;getSidedata(java.lang.String&nbsp;key)</pre>
-<div class="block">Retrieves side data value associated with this key.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>key</code> - side data key</dd>
+<dd><code>key</code> - property key</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>side data value associated with this key</dd>
+<dd>stream property as string or null if the key is not found</dd>
 </dl>
 </li>
 </ul>
-<a name="getSidedataEntries--">
+<a name="getNumberProperty-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getNumberProperty</h4>
+<pre>public&nbsp;java.lang.Long&nbsp;getNumberProperty(java.lang.String&nbsp;key)</pre>
+<div class="block">Returns the stream property associated with the key.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>key</code> - property key</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>stream property as Long or null if the key is not found</dd>
+</dl>
+</li>
+</ul>
+<a name="getProperties-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getProperties</h4>
+<pre>public&nbsp;org.json.JSONObject&nbsp;getProperties(java.lang.String&nbsp;key)</pre>
+<div class="block">Returns the stream properties associated with the key.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>key</code> - properties key</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>stream properties as a JSONObject or null if the key is not found</dd>
+</dl>
+</li>
+</ul>
+<a name="getAllProperties--">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
-<h4>getSidedataEntries</h4>
-<pre>public&nbsp;java.util.Set&lt;java.util.Map.Entry&lt;java.lang.String,java.lang.String&gt;&gt;&nbsp;getSidedataEntries()</pre>
-<div class="block">Returns all side data entries.</div>
+<h4>getAllProperties</h4>
+<pre>public&nbsp;org.json.JSONObject&nbsp;getAllProperties()</pre>
+<div class="block">Returns all stream properties defined.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>set of site data entries</dd>
+<dd>all stream properties as a JSONObject or null if no properties are defined</dd>
 </dl>
 </li>
 </ul>

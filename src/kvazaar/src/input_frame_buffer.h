@@ -66,6 +66,7 @@ void kvz_init_input_frame_buffer(input_frame_buffer_t *input_buffer);
 
 kvz_picture* kvz_encoder_feed_frame(input_frame_buffer_t *buf,
                                     struct encoder_state_t *const state,
-                                    struct kvz_picture *const img_in);
+                                    struct kvz_picture *const img_in,
+                                    int first_done);
 
 #endif // INPUT_FRAME_BUFFER_H_

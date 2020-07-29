@@ -13,19 +13,19 @@ AM_CPPFLAGS = -I$(top_srcdir)/include @OGG_CFLAGS@
 #LDFLAGS = -all-static 
 
 decoder_example_SOURCES = decoder_example.c
-decoder_example_LDADD = $(top_builddir)/lib/libvorbis.la @OGG_LIBS@
+decoder_example_LDADD = $(top_builddir)/lib/libvorbis.la @VORBIS_LIBS@ @OGG_LIBS@
 
 encoder_example_SOURCES = encoder_example.c
-encoder_example_LDADD = $(top_builddir)/lib/libvorbisenc.la $(top_builddir)/lib/libvorbis.la @OGG_LIBS@
+encoder_example_LDADD = $(top_builddir)/lib/libvorbisenc.la $(top_builddir)/lib/libvorbis.la @VORBIS_LIBS@ @OGG_LIBS@
 
 chaining_example_SOURCES = chaining_example.c
-chaining_example_LDADD = $(top_builddir)/lib/libvorbisfile.la $(top_builddir)/lib/libvorbis.la @OGG_LIBS@
+chaining_example_LDADD = $(top_builddir)/lib/libvorbisfile.la $(top_builddir)/lib/libvorbis.la @VORBIS_LIBS@ @OGG_LIBS@
 
 vorbisfile_example_SOURCES = vorbisfile_example.c
-vorbisfile_example_LDADD = $(top_builddir)/lib/libvorbisfile.la $(top_builddir)/lib/libvorbis.la @OGG_LIBS@
+vorbisfile_example_LDADD = $(top_builddir)/lib/libvorbisfile.la $(top_builddir)/lib/libvorbis.la @VORBIS_LIBS@ @OGG_LIBS@
 
 seeking_example_SOURCES = seeking_example.c
-seeking_example_LDADD = $(top_builddir)/lib/libvorbisfile.la $(top_builddir)/lib/libvorbis.la @OGG_LIBS@
+seeking_example_LDADD = $(top_builddir)/lib/libvorbisfile.la $(top_builddir)/lib/libvorbis.la @VORBIS_LIBS@ @OGG_LIBS@
 
 debug:
 	$(MAKE) all CFLAGS="@DEBUG@"

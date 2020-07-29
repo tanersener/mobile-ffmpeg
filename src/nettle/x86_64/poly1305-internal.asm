@@ -41,14 +41,14 @@ define(<H0>, <%r9>)
 define(<H1>, <%r10>)
 define(<H2>, <%r11>)
 	
-	C poly1305_set_key(struct poly1305_ctx *ctx, const uint8_t key[16])
+	C _poly1305_set_key(struct poly1305_ctx *ctx, const uint8_t key[16])
 	.text
 	C Registers:
 	C  %rdi: ctx
 	C  %rsi: key
 	C  %r8: mask
 	ALIGN(16)
-PROLOGUE(nettle_poly1305_set_key)
+PROLOGUE(_nettle_poly1305_set_key)
 	W64_ENTRY(2,0)
 	mov	$0x0ffffffc0fffffff, %r8
 	mov	(%rsi), %rax
@@ -69,7 +69,7 @@ PROLOGUE(nettle_poly1305_set_key)
 	W64_EXIT(2,0)
 	ret
 
-EPILOGUE(nettle_poly1305_set_key)
+EPILOGUE(_nettle_poly1305_set_key)
 
 C 64-bit multiplication mod 2^130 - 5
 C
@@ -142,12 +142,12 @@ PROLOGUE(_nettle_poly1305_block)
 	ret
 EPILOGUE(_nettle_poly1305_block)
 
-	C poly1305_digest (struct poly1305_ctx *ctx, uint8_t *s)
+	C _poly1305_digest (struct poly1305_ctx *ctx, uint8_t *s)
 	C Registers:
 	C   %rdi: ctx
 	C   %rsi: s
 	
-PROLOGUE(nettle_poly1305_digest)
+PROLOGUE(_nettle_poly1305_digest)
 	W64_ENTRY(2, 0)
 
 	mov	P1305_H0 (CTX), H0
@@ -182,5 +182,5 @@ define(<T1>, <%rax>)
 	mov	XREG(%rax), P1305_H2 (CTX)
 	W64_EXIT(2, 0)
 	ret
-EPILOGUE(nettle_poly1305_digest)
+EPILOGUE(_nettle_poly1305_digest)
 

@@ -137,14 +137,14 @@ TEST(API, TestDecodeFingerprint)
 TEST(API, TestHashFingerprint)
 {
 	uint32_t fingerprint[] = { 19681, 22345, 312312, 453425 };
-    uint32_t hash;
+	uint32_t hash;
 
-    ASSERT_EQ(0, chromaprint_hash_fingerprint(NULL, 4, &hash));
-    ASSERT_EQ(0, chromaprint_hash_fingerprint(fingerprint, -1, &hash));
-    ASSERT_EQ(0, chromaprint_hash_fingerprint(fingerprint, 4, NULL));
+	ASSERT_EQ(0, chromaprint_hash_fingerprint(NULL, 4, &hash));
+	ASSERT_EQ(0, chromaprint_hash_fingerprint(fingerprint, -1, &hash));
+	ASSERT_EQ(0, chromaprint_hash_fingerprint(fingerprint, 4, NULL));
 
-    ASSERT_EQ(1, chromaprint_hash_fingerprint(fingerprint, 4, &hash));
-    ASSERT_EQ(17249, hash);
+	ASSERT_EQ(1, chromaprint_hash_fingerprint(fingerprint, 4, &hash));
+	ASSERT_EQ(17249, hash);
 }
 
 TEST(API, TestDecodeFingerprintOutOfRange)
@@ -155,6 +155,45 @@ TEST(API, TestDecodeFingerprintOutOfRange)
 	const char *encoded = "AQABz9GSJEkkKYmS4Tp6xvjx-tBpXMfRpUP1w3yGHmUPcWTwhnhgiYNeeBcu5HhbxA2PZuEFnSd-9FECq-gJPbtQ_fiLfkf3wvnRl9AO__jxCj7-QjzyoFek4xcmPnA2-qjUDz9yTsR56PFRJp4GP8ePLj2qY-NRfkL2oXEx6cFThPCh7_iRVnzQbX9wHc0UT0I_5Duao1KVGOsPlpdQLcqFHxf5oqfRFVpySvjR_Ch7_NCO87h05ChL7Do65vDIFC2H8zhyKnhqXJ6GdsuLw4c276h-TGEcfAfjmWgeYzy6HT6u5UhvhCceZSp0PD5iZzka9Zh05NOEZmsgxZTx50ifa8hxpRv0E1vHKciFHk0cFY0moRKzabgbDb3gH_2RH8k3lGuEKc_x3_hRPehX5ODRfDX6JCtOIVyOMFyP-4XyHWkaF9fRt0VzD7sOJlUkHX2Q9Ed-9PnR8EpwijfCJJFi9PmhLySPhmOC-sIZiI8m_ML3INJ3pI6UknCNnkHzyNDEpchz400d9IN99PiSo9kyDf0xXTrS_HCC79D64Tx4o1YSIReeCKH84Q0ORT7CNMKPmQma62inD7xoodlEJNOJXEHzo3qCMEn4omWg_UPKqBN69EYz5kPyDrkeCb2OKd2i4RJ6PB3CQ5Wo5shTMUH7Hf6IHsd5NNcQnjFGo8oP__DJQz8OJk9s5BROotERSmSOjyaUv0LqsziV4zmaK5jIFLXAxEk0xIfeIcyFqiEVXL_hGLnQUOXRJ8SHSLnRr_jx5IU35CH0N0gfHtdQ_Wj0ZniT7ENZXPDRrijZIMxn7Dkqo0nIoG_QVDsO_mi6yOibDJqyHf6DSiX2fdAyVEyCXDyqhD2aRyf2H09EMJkchE-g60GYK3grNHHwHE9I9DrSMoJ2ZMd7_Ch7WEftI24DqTrCEteio9ePLxIVIj-uW1CjK6goVoYnhYZuuElwNDfyIT4e4lGWKWhEyUF5XKic47xQ0ZygO0XXhAgTMzP-FN_x4_lQiynCxBlxPgivIEyNL0e64zu-hCR-fMzBieLxIzy0MEZ-MNcc-Bqc53gYUfCPh0c6MmFI6DWaijk-K8g_PNXRhKjTD72UBSXzgT_-YIx27EsUJ6iThkJTZUd-aM_R03iaCk-CUwITPUcPVVfwLA8m0UbTrLgSHR3-Y8-DUsKVB6EkJWh-_HgPTv3AZs_R23CcBfWRM1B1hB1K63iipLg9XETcZ0I3jynO8PiF64YtH1klhDvxhThXzFex3kG1HPZu9Dmu47mh5UGtHKp1POjyUMWfDJo6of8Gtgvy5EDfo1bgnWiX6wCGhEEAKADJIUAbILJzTAgDBDBCAgQQMEQQJABBwgJgBBMAAGaEAMwAh5wAikDkhQBGCIGkAgQASghihAmlEBDEMCOUAYYJ4pRVwhAEAiXEYWAUMchQBpQVhkwhgDUMAQAoMkgxJRUwjgFBBRBCEGM0BgBAAIhQRBJkkALCCAUMQIAIIQBQRDGDBAECAAGY4MYQIhSgBCEkKAHEggG8cAIYJIgUwJAHpCHAMAaEQEYo6IgAADgEAUIIBAQcMEIgYBkECEABCEYKAYYcA4oowBBABAAvBJJKMGIAEAYwA5QADAAGCINMaAKQJcQYjCCzxBBACAcGMM4II8IQKIghgFgABTOEUAegMQQ4wYCBSjgAiAFCEGCAYwZIIAA0QChAhBROUAQAEo4YR4AQhhhliAAMEAQUBtooAg5xjCADgCGAOCQIQgQghigwQAikBBAEAA";
 
 	chromaprint_decode_fingerprint(encoded, strlen(encoded), &fp, &length, &algorithm, 1);
+}
+
+TEST(API, TestDecodeFingerprintEmpty)
+{
+	uint32_t *fp;
+	int length, algorithm;
+
+	const char *encoded = "AQAAAA";
+
+	auto ret = chromaprint_decode_fingerprint(encoded, strlen(encoded), &fp, &length, &algorithm, 1);
+	ASSERT_EQ(1, ret);
+	ASSERT_EQ(0, length);
+	ASSERT_EQ(1, algorithm);
+}
+
+TEST(API, TestDecodeFingerprintNull)
+{
+	uint32_t *fp;
+	int length, algorithm;
+
+	const char *encoded = "null";
+
+	auto ret = chromaprint_decode_fingerprint(encoded, strlen(encoded), &fp, &length, &algorithm, 1);
+	ASSERT_EQ(0, ret);
+	ASSERT_EQ(0, length);
+	ASSERT_EQ(0, algorithm);
+}
+
+TEST(API, TestDecodeFingerprintCoustidFingerprint)
+{
+	uint32_t *fp;
+	int length, algorithm;
+
+	const char *encoded = "coustid Fingerprint";
+
+	auto ret = chromaprint_decode_fingerprint(encoded, strlen(encoded), &fp, &length, &algorithm, 1);
+	ASSERT_EQ(0, ret);
+	ASSERT_EQ(0, length);
+	ASSERT_EQ(0, algorithm);
 }
 
 }; // namespace chromaprint

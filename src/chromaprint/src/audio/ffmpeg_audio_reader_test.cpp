@@ -12,7 +12,7 @@ TEST(FFmpegAudioReaderTest, ReadRaw) {
 	ASSERT_TRUE(reader.SetInputChannels(2));
 	ASSERT_TRUE(reader.SetInputSampleRate(44100));
 
-	ASSERT_TRUE(reader.Open(TESTS_DIR "/data/test_stereo_44100.raw"));
+	ASSERT_TRUE(reader.Open(TESTS_DIR "/data/test_stereo_44100.raw")) << reader.GetError();
 	ASSERT_TRUE(reader.IsOpen());
 
 	ASSERT_EQ(2, reader.GetChannels());

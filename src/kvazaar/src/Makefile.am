@@ -53,6 +53,8 @@ libkvazaar_la_SOURCES = \
 	checkpoint.h \
 	cfg.c \
 	cfg.h \
+	constraint.c \
+	constraint.h \ 
 	context.c \
 	context.h \
 	cu.c \
@@ -72,6 +74,7 @@ libkvazaar_la_SOURCES = \
 	filter.c \
 	filter.h \
 	global.h \
+	gop.h \
 	image.c \
 	image.h \
 	imagelist.c \
@@ -85,6 +88,8 @@ libkvazaar_la_SOURCES = \
 	kvazaar.c \
 	kvazaar_internal.h \
 	kvz_math.h \
+	ml_intra_cu_depth_pred.c \
+	ml_intra_cu_depth_pred.h \
 	nal.c \
 	nal.h \
 	rate_control.c \
@@ -126,6 +131,9 @@ libkvazaar_la_SOURCES = \
 	strategies/generic/sao-generic.h \
 	strategies/generic/encode_coding_tree-generic.c \
 	strategies/generic/encode_coding_tree-generic.h \
+	strategies/missing-intel-intrinsics.h \
+	strategies/optimized_sad_func_ptr_t.h \
+	strategies/generic/sao_shared_generics.h \
 	strategies/strategies-common.h \
 	strategies/strategies-dct.c \
 	strategies/strategies-dct.h \
@@ -179,6 +187,7 @@ libaltivec_la_SOURCES = \
 	strategies/altivec/picture-altivec.h
 
 libavx2_la_SOURCES = \
+	strategies/avx2/avx2_common_functions.h \
 	strategies/avx2/dct-avx2.c \
 	strategies/avx2/dct-avx2.h \
 	strategies/avx2/intra-avx2.c \
@@ -189,6 +198,7 @@ libavx2_la_SOURCES = \
 	strategies/avx2/picture-avx2.h \
 	strategies/avx2/quant-avx2.c \
 	strategies/avx2/quant-avx2.h \
+	strategies/avx2/reg_sad_pow2_widths-avx2.h \
 	strategies/avx2/sao-avx2.c \
 	strategies/avx2/sao-avx2.h \
 	strategies/avx2/encode_coding_tree-avx2.c \
@@ -200,7 +210,8 @@ libsse2_la_SOURCES = \
 
 libsse41_la_SOURCES = \
 	strategies/sse41/picture-sse41.c \
-	strategies/sse41/picture-sse41.h
+	strategies/sse41/picture-sse41.h \
+	strategies/sse41/reg_sad_pow2_widths-sse41.h
 
 if HAVE_PPC
 
@@ -212,8 +223,11 @@ endif #HAVE_PPC
 
 if HAVE_X86
 
-if HAVE_AVX2
+if HAVE_AVX2_GCC
 libavx2_la_CFLAGS = -mavx2 -mbmi -mabm -mbmi2
+endif
+if HAVE_AVX2_CLANG
+libavx2_la_CFLAGS = -mavx2 -mbmi -mpopcnt -mlzcnt -mbmi2
 endif
 if HAVE_SSE4_1
 libsse41_la_CFLAGS = -msse4.1

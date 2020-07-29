@@ -2,7 +2,7 @@
 
    Information about algorithms.
 
-   Copyright (C) 2002, 2014 Niels Möller
+   Copyright (C) 2002, 2014, 2020 Niels Möller
 
    This file is part of GNU Nettle.
 
@@ -130,6 +130,7 @@ extern const struct nettle_hash nettle_md2;
 extern const struct nettle_hash nettle_md4;
 extern const struct nettle_hash nettle_md5;
 extern const struct nettle_hash nettle_gosthash94;
+extern const struct nettle_hash nettle_gosthash94cp;
 extern const struct nettle_hash nettle_ripemd160;
 extern const struct nettle_hash nettle_sha1;
 extern const struct nettle_hash nettle_sha224;
@@ -142,6 +143,24 @@ extern const struct nettle_hash nettle_sha3_224;
 extern const struct nettle_hash nettle_sha3_256;
 extern const struct nettle_hash nettle_sha3_384;
 extern const struct nettle_hash nettle_sha3_512;
+
+struct nettle_mac
+{
+  const char *name;
+
+  /* Size of the context struct */
+  unsigned context_size;
+
+  /* Size of digests */
+  unsigned digest_size;
+
+  /* Key size */
+  unsigned key_size;
+
+  nettle_set_key_func *set_key;
+  nettle_hash_update_func *update;
+  nettle_hash_digest_func *digest;
+};
 
 struct nettle_aead
 {
@@ -237,6 +256,36 @@ nettle_get_armors (void);
 extern const struct nettle_armor nettle_base64;
 extern const struct nettle_armor nettle_base64url;
 extern const struct nettle_armor nettle_base16;
+
+#define _NETTLE_HMAC(name, HASH) {		\
+  #name,					\
+  sizeof(struct name##_ctx),			\
+  HASH##_DIGEST_SIZE,				\
+  HASH##_DIGEST_SIZE,				\
+  name##_set_key_wrapper,			\
+  (nettle_hash_update_func *) name##_update,	\
+  (nettle_hash_digest_func *) name##_digest,	\
+}
+
+/* null-terminated list of macs implemented by this
+   version of nettle */
+const struct nettle_mac * const * _NETTLE_ATTRIBUTE_PURE
+nettle_get_macs (void);
+
+#define nettle_macs (nettle_get_macs())
+
+extern const struct nettle_mac nettle_cmac_aes128;
+extern const struct nettle_mac nettle_cmac_aes256;
+extern const struct nettle_mac nettle_cmac_des3;
+
+/* HMAC variants with key size = digest size */
+extern const struct nettle_mac nettle_hmac_md5;
+extern const struct nettle_mac nettle_hmac_ripemd160;
+extern const struct nettle_mac nettle_hmac_sha1;
+extern const struct nettle_mac nettle_hmac_sha224;
+extern const struct nettle_mac nettle_hmac_sha256;
+extern const struct nettle_mac nettle_hmac_sha384;
+extern const struct nettle_mac nettle_hmac_sha512;
 
 #ifdef __cplusplus
 }

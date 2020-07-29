@@ -85,41 +85,41 @@ ecc_add_jja (const struct ecc_curve *ecc,
 #define y2 (q + ecc->p.size)
 
   /* zz */
-  ecc_modp_sqr (ecc, zz, z1);
+  ecc_mod_sqr (&ecc->p, zz, z1);
   /* h*/
-  ecc_modp_mul (ecc, h, x2, zz);
-  ecc_modp_sub (ecc, h, h, x1);
+  ecc_mod_mul (&ecc->p, h, x2, zz);
+  ecc_mod_sub (&ecc->p, h, h, x1);
   /* hh */
-  ecc_modp_sqr (ecc, hh, h);
+  ecc_mod_sqr (&ecc->p, hh, h);
   /* Do z^3 early, store at w. */
-  ecc_modp_mul (ecc, w, zz, z1);
+  ecc_mod_mul (&ecc->p, w, zz, z1);
   /* z_3, use j area for scratch */
-  ecc_modp_add (ecc, r + 2*ecc->p.size, p + 2*ecc->p.size, h);
-  ecc_modp_sqr (ecc, j, r + 2*ecc->p.size);
-  ecc_modp_sub (ecc, j, j, zz);
-  ecc_modp_sub (ecc, r + 2*ecc->p.size, j, hh);
+  ecc_mod_add (&ecc->p, r + 2*ecc->p.size, p + 2*ecc->p.size, h);
+  ecc_mod_sqr (&ecc->p, j, r + 2*ecc->p.size);
+  ecc_mod_sub (&ecc->p, j, j, zz);
+  ecc_mod_sub (&ecc->p, r + 2*ecc->p.size, j, hh);
   
   /* w */
-  ecc_modp_mul (ecc, j, y2, w);
-  ecc_modp_sub (ecc, w, j, y1);
-  ecc_modp_mul_1 (ecc, w, w, 2);
+  ecc_mod_mul (&ecc->p, j, y2, w);
+  ecc_mod_sub (&ecc->p, w, j, y1);
+  ecc_mod_mul_1 (&ecc->p, w, w, 2);
   
   /* i replaces hh, j */
-  ecc_modp_mul_1 (ecc, hh, hh, 4);
-  ecc_modp_mul (ecc, j, hh, h);
+  ecc_mod_mul_1 (&ecc->p, hh, hh, 4);
+  ecc_mod_mul (&ecc->p, j, hh, h);
 
   /* v */
-  ecc_modp_mul (ecc, v, x1, hh);
+  ecc_mod_mul (&ecc->p, v, x1, hh);
 
   /* x_3, use (h, hh) as sqratch */  
-  ecc_modp_sqr (ecc, h, w);
-  ecc_modp_sub (ecc, r, h, j);
-  ecc_modp_submul_1 (ecc, r, v, 2);
+  ecc_mod_sqr (&ecc->p, h, w);
+  ecc_mod_sub (&ecc->p, r, h, j);
+  ecc_mod_submul_1 (&ecc->p, r, v, 2);
 
   /* y_3, use (h, hh) as sqratch */
-  ecc_modp_mul (ecc, h, y1, j); /* frees j */
-  ecc_modp_sub (ecc, r + ecc->p.size, v, r);
-  ecc_modp_mul (ecc, j, r + ecc->p.size, w);
-  ecc_modp_submul_1 (ecc, j, h, 2);
+  ecc_mod_mul (&ecc->p, h, y1, j); /* frees j */
+  ecc_mod_sub (&ecc->p, r + ecc->p.size, v, r);
+  ecc_mod_mul (&ecc->p, j, r + ecc->p.size, w);
+  ecc_mod_submul_1 (&ecc->p, j, h, 2);
   mpn_copyi (r + ecc->p.size, j, ecc->p.size);
 }

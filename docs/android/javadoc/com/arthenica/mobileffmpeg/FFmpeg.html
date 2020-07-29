@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":9,"i1":9,"i2":9,"i3":41};
+var methods = {"i0":9,"i1":9,"i2":9,"i3":9,"i4":41,"i5":9,"i6":9,"i7":9,"i8":9,"i9":9};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],8:["t4","Concrete Methods"],32:["t6","Deprecated Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -47,8 +47,8 @@ var activeTableTab = "activeTableTab";
 </div>
 <div class="subNav">
 <ul class="navList">
-<li><a href="../../../com/arthenica/mobileffmpeg/Config.html" title="class in com.arthenica.mobileffmpeg"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li><a href="../../../com/arthenica/mobileffmpeg/FFprobe.html" title="class in com.arthenica.mobileffmpeg"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li><a href="../../../com/arthenica/mobileffmpeg/ExecuteCallback.html" title="interface in com.arthenica.mobileffmpeg"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
+<li><a href="../../../com/arthenica/mobileffmpeg/FFmpegExecution.html" title="class in com.arthenica.mobileffmpeg"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
 <li><a href="../../../index.html?com/arthenica/mobileffmpeg/FFmpeg.html" target="_top">Frames</a></li>
@@ -109,11 +109,15 @@ var activeTableTab = "activeTableTab";
 <br>
 <pre>public class <span class="typeNameLabel">FFmpeg</span>
 extends java.lang.Object</pre>
-<div class="block"><p>Main class for FFmpeg operations. Provides <a href="../../../com/arthenica/mobileffmpeg/FFmpeg.html#execute-java.lang.String:A-"><code>execute(String...)</code></a> method to execute
- FFmpeg commands.
+<div class="block"><p>Main class for FFmpeg operations. Supports synchronous <a href="../../../com/arthenica/mobileffmpeg/FFmpeg.html#execute-java.lang.String:A-"><code>execute(String...)</code></a> and
+ asynchronous <a href="../../../com/arthenica/mobileffmpeg/FFmpeg.html#executeAsync-java.lang.String-com.arthenica.mobileffmpeg.ExecuteCallback-"><code>executeAsync(String, ExecuteCallback)</code></a> methods to execute FFmpeg commands.
  <pre>
       int rc = FFmpeg.execute("-i file1.mp4 -c:v libxvid file1.avi");
       Log.i(Config.TAG, String.format("Command execution %s.", (rc == 0?"completed successfully":"failed with rc=" + rc));
+ </pre>
+ <pre>
+      long executionId = FFmpeg.executeAsync("-i file1.mp4 -c:v libxvid file1.avi", executeCallback);
+      Log.i(Config.TAG, String.format("Asynchronous execution %d started.", executionId));
  </pre></div>
 <dl>
 <dt><span class="simpleTagLabel">Since:</span></dt>
@@ -144,18 +148,24 @@ extends java.lang.Object</pre>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
+<td class="colFirst"><code>static void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/FFmpeg.html#cancel-long-">cancel</a></span>(long&nbsp;executionId)</code>
+<div class="block">Cancels an ongoing operation.</div>
+</td>
+</tr>
+<tr id="i2" class="altColor">
 <td class="colFirst"><code>static int</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/FFmpeg.html#execute-java.lang.String-">execute</a></span>(java.lang.String&nbsp;command)</code>
 <div class="block">Synchronously executes FFmpeg command provided.</div>
 </td>
 </tr>
-<tr id="i2" class="altColor">
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code>static int</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/FFmpeg.html#execute-java.lang.String:A-">execute</a></span>(java.lang.String[]&nbsp;arguments)</code>
 <div class="block">Synchronously executes FFmpeg with arguments provided.</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i4" class="altColor">
 <td class="colFirst"><code>static int</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/FFmpeg.html#execute-java.lang.String-java.lang.String-">execute</a></span>(java.lang.String&nbsp;command,
        java.lang.String&nbsp;delimiter)</code>
@@ -164,6 +174,42 @@ extends java.lang.Object</pre>
  errors. Consider using a more advanced method like <a href="../../../com/arthenica/mobileffmpeg/FFmpeg.html#execute-java.lang.String-"><code>execute(String)</code></a> or
  <a href="../../../com/arthenica/mobileffmpeg/FFmpeg.html#execute-java.lang.String:A-"><code>execute(String[])</code></a></span></div>
 </div>
+</td>
+</tr>
+<tr id="i5" class="rowColor">
+<td class="colFirst"><code>static long</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/FFmpeg.html#executeAsync-java.lang.String:A-com.arthenica.mobileffmpeg.ExecuteCallback-">executeAsync</a></span>(java.lang.String[]&nbsp;arguments,
+            <a href="../../../com/arthenica/mobileffmpeg/ExecuteCallback.html" title="interface in com.arthenica.mobileffmpeg">ExecuteCallback</a>&nbsp;executeCallback)</code>
+<div class="block">Asynchronously executes FFmpeg with arguments provided.</div>
+</td>
+</tr>
+<tr id="i6" class="altColor">
+<td class="colFirst"><code>static long</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/FFmpeg.html#executeAsync-java.lang.String:A-com.arthenica.mobileffmpeg.ExecuteCallback-java.util.concurrent.Executor-">executeAsync</a></span>(java.lang.String[]&nbsp;arguments,
+            <a href="../../../com/arthenica/mobileffmpeg/ExecuteCallback.html" title="interface in com.arthenica.mobileffmpeg">ExecuteCallback</a>&nbsp;executeCallback,
+            java.util.concurrent.Executor&nbsp;executor)</code>
+<div class="block">Asynchronously executes FFmpeg with arguments provided.</div>
+</td>
+</tr>
+<tr id="i7" class="rowColor">
+<td class="colFirst"><code>static long</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/FFmpeg.html#executeAsync-java.lang.String-com.arthenica.mobileffmpeg.ExecuteCallback-">executeAsync</a></span>(java.lang.String&nbsp;command,
+            <a href="../../../com/arthenica/mobileffmpeg/ExecuteCallback.html" title="interface in com.arthenica.mobileffmpeg">ExecuteCallback</a>&nbsp;executeCallback)</code>
+<div class="block">Asynchronously executes FFmpeg command provided.</div>
+</td>
+</tr>
+<tr id="i8" class="altColor">
+<td class="colFirst"><code>static long</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/FFmpeg.html#executeAsync-java.lang.String-com.arthenica.mobileffmpeg.ExecuteCallback-java.util.concurrent.Executor-">executeAsync</a></span>(java.lang.String&nbsp;command,
+            <a href="../../../com/arthenica/mobileffmpeg/ExecuteCallback.html" title="interface in com.arthenica.mobileffmpeg">ExecuteCallback</a>&nbsp;executeCallback,
+            java.util.concurrent.Executor&nbsp;executor)</code>
+<div class="block">Asynchronously executes FFmpeg command provided.</div>
+</td>
+</tr>
+<tr id="i9" class="rowColor">
+<td class="colFirst"><code>static java.util.List&lt;<a href="../../../com/arthenica/mobileffmpeg/FFmpegExecution.html" title="class in com.arthenica.mobileffmpeg">FFmpegExecution</a>&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../com/arthenica/mobileffmpeg/FFmpeg.html#listExecutions--">listExecutions</a></span>()</code>
+<div class="block">Lists ongoing executions.</div>
 </td>
 </tr>
 </table>
@@ -200,7 +246,45 @@ extends java.lang.Object</pre>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>arguments</code> - FFmpeg command options/arguments as string array</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>zero on successful execution, 255 on user cancel and non-zero on error</dd>
+<dd>0 on successful execution, 255 on user cancel, other non-zero codes on error</dd>
+</dl>
+</li>
+</ul>
+<a name="executeAsync-java.lang.String:A-com.arthenica.mobileffmpeg.ExecuteCallback-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>executeAsync</h4>
+<pre>public static&nbsp;long&nbsp;executeAsync(java.lang.String[]&nbsp;arguments,
+                                <a href="../../../com/arthenica/mobileffmpeg/ExecuteCallback.html" title="interface in com.arthenica.mobileffmpeg">ExecuteCallback</a>&nbsp;executeCallback)</pre>
+<div class="block"><p>Asynchronously executes FFmpeg with arguments provided.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>arguments</code> - FFmpeg command options/arguments as string array</dd>
+<dd><code>executeCallback</code> - callback that will be notified when execution is completed</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>returns a unique id that represents this execution</dd>
+</dl>
+</li>
+</ul>
+<a name="executeAsync-java.lang.String:A-com.arthenica.mobileffmpeg.ExecuteCallback-java.util.concurrent.Executor-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>executeAsync</h4>
+<pre>public static&nbsp;long&nbsp;executeAsync(java.lang.String[]&nbsp;arguments,
+                                <a href="../../../com/arthenica/mobileffmpeg/ExecuteCallback.html" title="interface in com.arthenica.mobileffmpeg">ExecuteCallback</a>&nbsp;executeCallback,
+                                java.util.concurrent.Executor&nbsp;executor)</pre>
+<div class="block"><p>Asynchronously executes FFmpeg with arguments provided.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>arguments</code> - FFmpeg command options/arguments as string array</dd>
+<dd><code>executeCallback</code> - callback that will be notified when execution is completed</dd>
+<dd><code>executor</code> - executor that will be used to run this asynchronous operation</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>returns a unique id that represents this execution</dd>
 </dl>
 </li>
 </ul>
@@ -222,7 +306,7 @@ extends java.lang.Object</pre>
 <dd><code>command</code> - FFmpeg command</dd>
 <dd><code>delimiter</code> - delimiter used to split arguments</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>zero on successful execution, 255 on user cancel and non-zero on error</dd>
+<dd>0 on successful execution, 255 on user cancel, other non-zero codes on error</dd>
 <dt><span class="simpleTagLabel">Since:</span></dt>
 <dd>3.0</dd>
 </dl>
@@ -242,19 +326,92 @@ extends java.lang.Object</pre>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>command</code> - FFmpeg command</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>zero on successful execution, 255 on user cancel and non-zero on error</dd>
+<dd>0 on successful execution, 255 on user cancel, other non-zero codes on error</dd>
+</dl>
+</li>
+</ul>
+<a name="executeAsync-java.lang.String-com.arthenica.mobileffmpeg.ExecuteCallback-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>executeAsync</h4>
+<pre>public static&nbsp;long&nbsp;executeAsync(java.lang.String&nbsp;command,
+                                <a href="../../../com/arthenica/mobileffmpeg/ExecuteCallback.html" title="interface in com.arthenica.mobileffmpeg">ExecuteCallback</a>&nbsp;executeCallback)</pre>
+<div class="block"><p>Asynchronously executes FFmpeg command provided. Space character is used to split command
+ into arguments. You can use single and double quote characters to specify arguments inside
+ your command.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>command</code> - FFmpeg command</dd>
+<dd><code>executeCallback</code> - callback that will be notified when execution is completed</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>returns a unique id that represents this execution</dd>
+</dl>
+</li>
+</ul>
+<a name="executeAsync-java.lang.String-com.arthenica.mobileffmpeg.ExecuteCallback-java.util.concurrent.Executor-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>executeAsync</h4>
+<pre>public static&nbsp;long&nbsp;executeAsync(java.lang.String&nbsp;command,
+                                <a href="../../../com/arthenica/mobileffmpeg/ExecuteCallback.html" title="interface in com.arthenica.mobileffmpeg">ExecuteCallback</a>&nbsp;executeCallback,
+                                java.util.concurrent.Executor&nbsp;executor)</pre>
+<div class="block"><p>Asynchronously executes FFmpeg command provided. Space character is used to split command
+ into arguments. You can use single and double quote characters to specify arguments inside
+ your command.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>command</code> - FFmpeg command</dd>
+<dd><code>executeCallback</code> - callback that will be notified when execution is completed</dd>
+<dd><code>executor</code> - executor that will be used to run this asynchronous operation</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>returns a unique id that represents this execution</dd>
 </dl>
 </li>
 </ul>
 <a name="cancel--">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>cancel</h4>
 <pre>public static&nbsp;void&nbsp;cancel()</pre>
-<div class="block"><p>Cancels an ongoing operation. This function does not wait for termination to complete and
- returns immediately.</div>
+<div class="block"><p>Cancels an ongoing operation.
+
+ <p>This function does not wait for termination to complete and returns immediately.</div>
+</li>
+</ul>
+<a name="cancel-long-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>cancel</h4>
+<pre>public static&nbsp;void&nbsp;cancel(long&nbsp;executionId)</pre>
+<div class="block"><p>Cancels an ongoing operation.
+
+ <p>This function does not wait for termination to complete and returns immediately.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>executionId</code> - id of the execution</dd>
+</dl>
+</li>
+</ul>
+<a name="listExecutions--">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>listExecutions</h4>
+<pre>public static&nbsp;java.util.List&lt;<a href="../../../com/arthenica/mobileffmpeg/FFmpegExecution.html" title="class in com.arthenica.mobileffmpeg">FFmpegExecution</a>&gt;&nbsp;listExecutions()</pre>
+<div class="block"><p>Lists ongoing executions.</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>list of ongoing executions</dd>
+</dl>
 </li>
 </ul>
 </li>
@@ -284,8 +441,8 @@ extends java.lang.Object</pre>
 </div>
 <div class="subNav">
 <ul class="navList">
-<li><a href="../../../com/arthenica/mobileffmpeg/Config.html" title="class in com.arthenica.mobileffmpeg"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li><a href="../../../com/arthenica/mobileffmpeg/FFprobe.html" title="class in com.arthenica.mobileffmpeg"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li><a href="../../../com/arthenica/mobileffmpeg/ExecuteCallback.html" title="interface in com.arthenica.mobileffmpeg"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
+<li><a href="../../../com/arthenica/mobileffmpeg/FFmpegExecution.html" title="class in com.arthenica.mobileffmpeg"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
 <li><a href="../../../index.html?com/arthenica/mobileffmpeg/FFmpeg.html" target="_top">Frames</a></li>

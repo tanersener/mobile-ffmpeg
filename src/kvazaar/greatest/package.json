@@ -1,0 +1,9 @@
+{
+  "name": "greatest",
+  "version": "v0.11.0",
+  "repo": "silentbicycle/greatest",
+  "src": ["greatest.h"],
+  "description": "A C unit testing library in 1 file. No dependencies, no dynamic allocation",
+  "license": "ISC",
+  "keywords": ["test", "unit", "testing"]
+}

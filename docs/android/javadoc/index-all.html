@@ -78,44 +78,43 @@
 </dd>
 <dt><a href="com/arthenica/mobileffmpeg/AbiDetect.html" title="class in com.arthenica.mobileffmpeg"><span class="typeNameLink">AbiDetect</span></a> - Class in <a href="com/arthenica/mobileffmpeg/package-summary.html">com.arthenica.mobileffmpeg</a></dt>
 <dd>
-<div class="block">This class is used to detect running ABI name using Android's <code>cpufeatures</code>
- library.</div>
+<div class="block">This class is used to detect running ABI name using Google <code>cpu-features</code> library.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/MediaInformation.html#addMetadata-java.lang.String-java.lang.String-">addMetadata(String, String)</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/MediaInformation.html" title="class in com.arthenica.mobileffmpeg">MediaInformation</a></dt>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/ExecuteCallback.html#apply-long-int-">apply(long, int)</a></span> - Method in interface com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/ExecuteCallback.html" title="interface in com.arthenica.mobileffmpeg">ExecuteCallback</a></dt>
 <dd>
-<div class="block">Adds metadata.</div>
+<div class="block">Called when an asynchronous FFmpeg execution is completed.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/StreamInformation.html#addMetadata-java.lang.String-java.lang.String-">addMetadata(String, String)</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/StreamInformation.html" title="class in com.arthenica.mobileffmpeg">StreamInformation</a></dt>
-<dd>
-<div class="block">Adds metadata.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/StreamInformation.html#addSidedata-java.lang.String-java.lang.String-">addSidedata(String, String)</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/StreamInformation.html" title="class in com.arthenica.mobileffmpeg">StreamInformation</a></dt>
-<dd>
-<div class="block">Adds side data.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/MediaInformation.html#addStream-com.arthenica.mobileffmpeg.StreamInformation-">addStream(StreamInformation)</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/MediaInformation.html" title="class in com.arthenica.mobileffmpeg">MediaInformation</a></dt>
-<dd>
-<div class="block">Adds new stream.</div>
-</dd>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/GetMediaInformationCallback.html#apply-com.arthenica.mobileffmpeg.MediaInformation-">apply(MediaInformation)</a></span> - Method in interface com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/GetMediaInformationCallback.html" title="interface in com.arthenica.mobileffmpeg">GetMediaInformationCallback</a></dt>
+<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/LogCallback.html#apply-com.arthenica.mobileffmpeg.LogMessage-">apply(LogMessage)</a></span> - Method in interface com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/LogCallback.html" title="interface in com.arthenica.mobileffmpeg">LogCallback</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/StatisticsCallback.html#apply-com.arthenica.mobileffmpeg.Statistics-">apply(Statistics)</a></span> - Method in interface com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/StatisticsCallback.html" title="interface in com.arthenica.mobileffmpeg">StatisticsCallback</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/util/SingleExecuteCallback.html#apply-int-java.lang.String-">apply(int, String)</a></span> - Method in interface com.arthenica.mobileffmpeg.util.<a href="com/arthenica/mobileffmpeg/util/SingleExecuteCallback.html" title="interface in com.arthenica.mobileffmpeg.util">SingleExecuteCallback</a></dt>
+<dt><a href="com/arthenica/mobileffmpeg/AsyncFFmpegExecuteTask.html" title="class in com.arthenica.mobileffmpeg"><span class="typeNameLink">AsyncFFmpegExecuteTask</span></a> - Class in <a href="com/arthenica/mobileffmpeg/package-summary.html">com.arthenica.mobileffmpeg</a></dt>
+<dd>
+<div class="block">Utility class to execute an FFmpeg command asynchronously.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/AsyncFFmpegExecuteTask.html#AsyncFFmpegExecuteTask-java.lang.String-com.arthenica.mobileffmpeg.ExecuteCallback-">AsyncFFmpegExecuteTask(String, ExecuteCallback)</a></span> - Constructor for class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/AsyncFFmpegExecuteTask.html" title="class in com.arthenica.mobileffmpeg">AsyncFFmpegExecuteTask</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/util/SingleGetMediaInformationCallback.html#apply-com.arthenica.mobileffmpeg.MediaInformation-">apply(MediaInformation)</a></span> - Method in interface com.arthenica.mobileffmpeg.util.<a href="com/arthenica/mobileffmpeg/util/SingleGetMediaInformationCallback.html" title="interface in com.arthenica.mobileffmpeg.util">SingleGetMediaInformationCallback</a></dt>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/AsyncFFmpegExecuteTask.html#AsyncFFmpegExecuteTask-java.lang.String:A-com.arthenica.mobileffmpeg.ExecuteCallback-">AsyncFFmpegExecuteTask(String[], ExecuteCallback)</a></span> - Constructor for class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/AsyncFFmpegExecuteTask.html" title="class in com.arthenica.mobileffmpeg">AsyncFFmpegExecuteTask</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="com/arthenica/mobileffmpeg/util/AsyncSingleFFmpegExecuteTask.html" title="class in com.arthenica.mobileffmpeg.util"><span class="typeNameLink">AsyncSingleFFmpegExecuteTask</span></a> - Class in <a href="com/arthenica/mobileffmpeg/util/package-summary.html">com.arthenica.mobileffmpeg.util</a></dt>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/AsyncFFmpegExecuteTask.html#AsyncFFmpegExecuteTask-long-java.lang.String-com.arthenica.mobileffmpeg.ExecuteCallback-">AsyncFFmpegExecuteTask(long, String, ExecuteCallback)</a></span> - Constructor for class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/AsyncFFmpegExecuteTask.html" title="class in com.arthenica.mobileffmpeg">AsyncFFmpegExecuteTask</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/util/AsyncSingleFFmpegExecuteTask.html#AsyncSingleFFmpegExecuteTask-java.lang.String-com.arthenica.mobileffmpeg.util.SingleExecuteCallback-">AsyncSingleFFmpegExecuteTask(String, SingleExecuteCallback)</a></span> - Constructor for class com.arthenica.mobileffmpeg.util.<a href="com/arthenica/mobileffmpeg/util/AsyncSingleFFmpegExecuteTask.html" title="class in com.arthenica.mobileffmpeg.util">AsyncSingleFFmpegExecuteTask</a></dt>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/AsyncFFmpegExecuteTask.html#AsyncFFmpegExecuteTask-long-java.lang.String:A-com.arthenica.mobileffmpeg.ExecuteCallback-">AsyncFFmpegExecuteTask(long, String[], ExecuteCallback)</a></span> - Constructor for class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/AsyncFFmpegExecuteTask.html" title="class in com.arthenica.mobileffmpeg">AsyncFFmpegExecuteTask</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="com/arthenica/mobileffmpeg/util/AsyncSingleFFprobeExecuteTask.html" title="class in com.arthenica.mobileffmpeg.util"><span class="typeNameLink">AsyncSingleFFprobeExecuteTask</span></a> - Class in <a href="com/arthenica/mobileffmpeg/util/package-summary.html">com.arthenica.mobileffmpeg.util</a></dt>
+<dt><a href="com/arthenica/mobileffmpeg/AsyncFFprobeExecuteTask.html" title="class in com.arthenica.mobileffmpeg"><span class="typeNameLink">AsyncFFprobeExecuteTask</span></a> - Class in <a href="com/arthenica/mobileffmpeg/package-summary.html">com.arthenica.mobileffmpeg</a></dt>
+<dd>
+<div class="block">Utility class to execute an FFprobe command asynchronously.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/AsyncFFprobeExecuteTask.html#AsyncFFprobeExecuteTask-java.lang.String-com.arthenica.mobileffmpeg.ExecuteCallback-">AsyncFFprobeExecuteTask(String, ExecuteCallback)</a></span> - Constructor for class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/AsyncFFprobeExecuteTask.html" title="class in com.arthenica.mobileffmpeg">AsyncFFprobeExecuteTask</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/util/AsyncSingleFFprobeExecuteTask.html#AsyncSingleFFprobeExecuteTask-java.lang.String-com.arthenica.mobileffmpeg.util.SingleExecuteCallback-">AsyncSingleFFprobeExecuteTask(String, SingleExecuteCallback)</a></span> - Constructor for class com.arthenica.mobileffmpeg.util.<a href="com/arthenica/mobileffmpeg/util/AsyncSingleFFprobeExecuteTask.html" title="class in com.arthenica.mobileffmpeg.util">AsyncSingleFFprobeExecuteTask</a></dt>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/AsyncFFprobeExecuteTask.html#AsyncFFprobeExecuteTask-java.lang.String:A-com.arthenica.mobileffmpeg.ExecuteCallback-">AsyncFFprobeExecuteTask(String[], ExecuteCallback)</a></span> - Constructor for class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/AsyncFFprobeExecuteTask.html" title="class in com.arthenica.mobileffmpeg">AsyncFFprobeExecuteTask</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="com/arthenica/mobileffmpeg/util/AsyncSingleGetMediaInformationTask.html" title="class in com.arthenica.mobileffmpeg.util"><span class="typeNameLink">AsyncSingleGetMediaInformationTask</span></a> - Class in <a href="com/arthenica/mobileffmpeg/util/package-summary.html">com.arthenica.mobileffmpeg.util</a></dt>
-<dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/util/AsyncSingleGetMediaInformationTask.html#AsyncSingleGetMediaInformationTask-java.lang.String-com.arthenica.mobileffmpeg.util.SingleGetMediaInformationCallback-">AsyncSingleGetMediaInformationTask(String, SingleGetMediaInformationCallback)</a></span> - Constructor for class com.arthenica.mobileffmpeg.util.<a href="com/arthenica/mobileffmpeg/util/AsyncSingleGetMediaInformationTask.html" title="class in com.arthenica.mobileffmpeg.util">AsyncSingleGetMediaInformationTask</a></dt>
+<dt><a href="com/arthenica/mobileffmpeg/AsyncGetMediaInformationTask.html" title="class in com.arthenica.mobileffmpeg"><span class="typeNameLink">AsyncGetMediaInformationTask</span></a> - Class in <a href="com/arthenica/mobileffmpeg/package-summary.html">com.arthenica.mobileffmpeg</a></dt>
+<dd>
+<div class="block">Utility class to get media information asynchronously.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/AsyncGetMediaInformationTask.html#AsyncGetMediaInformationTask-java.lang.String-com.arthenica.mobileffmpeg.GetMediaInformationCallback-">AsyncGetMediaInformationTask(String, GetMediaInformationCallback)</a></span> - Constructor for class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/AsyncGetMediaInformationTask.html" title="class in com.arthenica.mobileffmpeg">AsyncGetMediaInformationTask</a></dt>
 <dd>&nbsp;</dd>
 </dl>
 <a name="I:C">
@@ -124,6 +123,10 @@
 <h2 class="title">C</h2>
 <dl>
 <dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/FFmpeg.html#cancel--">cancel()</a></span> - Static method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/FFmpeg.html" title="class in com.arthenica.mobileffmpeg">FFmpeg</a></dt>
+<dd>
+<div class="block">Cancels an ongoing operation.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/FFmpeg.html#cancel-long-">cancel(long)</a></span> - Static method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/FFmpeg.html" title="class in com.arthenica.mobileffmpeg">FFmpeg</a></dt>
 <dd>
 <div class="block">Cancels an ongoing operation.</div>
 </dd>
@@ -139,8 +142,6 @@
 <dd>
 <div class="block">This class is used to configure MobileFFmpeg library utilities/tools.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/MediaInformationParser.html#count-java.lang.String-java.lang.String-">count(String, String)</a></span> - Static method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/MediaInformationParser.html" title="class in com.arthenica.mobileffmpeg">MediaInformationParser</a></dt>
-<dd>&nbsp;</dd>
 </dl>
 <a name="I:D">
 <!--   -->
@@ -151,13 +152,11 @@
 <dd>
 <div class="block">Disables log and statistics redirection.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/util/AsyncSingleFFmpegExecuteTask.html#doInBackground-java.lang.String...-">doInBackground(String...)</a></span> - Method in class com.arthenica.mobileffmpeg.util.<a href="com/arthenica/mobileffmpeg/util/AsyncSingleFFmpegExecuteTask.html" title="class in com.arthenica.mobileffmpeg.util">AsyncSingleFFmpegExecuteTask</a></dt>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/AsyncFFmpegExecuteTask.html#doInBackground-java.lang.Void...-">doInBackground(Void...)</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/AsyncFFmpegExecuteTask.html" title="class in com.arthenica.mobileffmpeg">AsyncFFmpegExecuteTask</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/util/AsyncSingleFFprobeExecuteTask.html#doInBackground-java.lang.String...-">doInBackground(String...)</a></span> - Method in class com.arthenica.mobileffmpeg.util.<a href="com/arthenica/mobileffmpeg/util/AsyncSingleFFprobeExecuteTask.html" title="class in com.arthenica.mobileffmpeg.util">AsyncSingleFFprobeExecuteTask</a></dt>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/AsyncFFprobeExecuteTask.html#doInBackground-java.lang.Void...-">doInBackground(Void...)</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/AsyncFFprobeExecuteTask.html" title="class in com.arthenica.mobileffmpeg">AsyncFFprobeExecuteTask</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/util/AsyncSingleGetMediaInformationTask.html#doInBackground-java.lang.String...-">doInBackground(String...)</a></span> - Method in class com.arthenica.mobileffmpeg.util.<a href="com/arthenica/mobileffmpeg/util/AsyncSingleGetMediaInformationTask.html" title="class in com.arthenica.mobileffmpeg.util">AsyncSingleGetMediaInformationTask</a></dt>
-<dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/MediaInformationParser.html#DURATION_FORMAT">DURATION_FORMAT</a></span> - Static variable in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/MediaInformationParser.html" title="class in com.arthenica.mobileffmpeg">MediaInformationParser</a></dt>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/AsyncGetMediaInformationTask.html#doInBackground-java.lang.String...-">doInBackground(String...)</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/AsyncGetMediaInformationTask.html" title="class in com.arthenica.mobileffmpeg">AsyncGetMediaInformationTask</a></dt>
 <dd>&nbsp;</dd>
 </dl>
 <a name="I:E">
@@ -201,6 +200,26 @@
 <dd>
 <div class="block">Synchronously executes FFprobe command provided.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/FFmpeg.html#executeAsync-java.lang.String:A-com.arthenica.mobileffmpeg.ExecuteCallback-">executeAsync(String[], ExecuteCallback)</a></span> - Static method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/FFmpeg.html" title="class in com.arthenica.mobileffmpeg">FFmpeg</a></dt>
+<dd>
+<div class="block">Asynchronously executes FFmpeg with arguments provided.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/FFmpeg.html#executeAsync-java.lang.String:A-com.arthenica.mobileffmpeg.ExecuteCallback-java.util.concurrent.Executor-">executeAsync(String[], ExecuteCallback, Executor)</a></span> - Static method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/FFmpeg.html" title="class in com.arthenica.mobileffmpeg">FFmpeg</a></dt>
+<dd>
+<div class="block">Asynchronously executes FFmpeg with arguments provided.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/FFmpeg.html#executeAsync-java.lang.String-com.arthenica.mobileffmpeg.ExecuteCallback-">executeAsync(String, ExecuteCallback)</a></span> - Static method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/FFmpeg.html" title="class in com.arthenica.mobileffmpeg">FFmpeg</a></dt>
+<dd>
+<div class="block">Asynchronously executes FFmpeg command provided.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/FFmpeg.html#executeAsync-java.lang.String-com.arthenica.mobileffmpeg.ExecuteCallback-java.util.concurrent.Executor-">executeAsync(String, ExecuteCallback, Executor)</a></span> - Static method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/FFmpeg.html" title="class in com.arthenica.mobileffmpeg">FFmpeg</a></dt>
+<dd>
+<div class="block">Asynchronously executes FFmpeg command provided.</div>
+</dd>
+<dt><a href="com/arthenica/mobileffmpeg/ExecuteCallback.html" title="interface in com.arthenica.mobileffmpeg"><span class="typeNameLink">ExecuteCallback</span></a> - Interface in <a href="com/arthenica/mobileffmpeg/package-summary.html">com.arthenica.mobileffmpeg</a></dt>
+<dd>
+<div class="block">Represents a callback function to receive an asynchronous execution result.</div>
+</dd>
 </dl>
 <a name="I:F">
 <!--   -->
@@ -211,6 +230,12 @@
 <dd>
 <div class="block">Main class for FFmpeg operations.</div>
 </dd>
+<dt><a href="com/arthenica/mobileffmpeg/FFmpegExecution.html" title="class in com.arthenica.mobileffmpeg"><span class="typeNameLink">FFmpegExecution</span></a> - Class in <a href="com/arthenica/mobileffmpeg/package-summary.html">com.arthenica.mobileffmpeg</a></dt>
+<dd>
+<div class="block">Represents an ongoing FFmpeg execution.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/FFmpegExecution.html#FFmpegExecution-long-java.lang.String:A-">FFmpegExecution(long, String[])</a></span> - Constructor for class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/FFmpegExecution.html" title="class in com.arthenica.mobileffmpeg">FFmpegExecution</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="com/arthenica/mobileffmpeg/FFprobe.html" title="class in com.arthenica.mobileffmpeg"><span class="typeNameLink">FFprobe</span></a> - Class in <a href="com/arthenica/mobileffmpeg/package-summary.html">com.arthenica.mobileffmpeg</a></dt>
 <dd>
 <div class="block">Main class for FFprobe operations.</div>
@@ -233,7 +258,11 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/MediaInformationParser.html#from-java.lang.String-">from(String)</a></span> - Static method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/MediaInformationParser.html" title="class in com.arthenica.mobileffmpeg">MediaInformationParser</a></dt>
 <dd>
-<div class="block">Parses media information command output and builds a <a href="com/arthenica/mobileffmpeg/MediaInformation.html" title="class in com.arthenica.mobileffmpeg"><code>MediaInformation</code></a> instance.</div>
+<div class="block">Extracts MediaInformation from the given ffprobe json output.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/MediaInformationParser.html#fromWithError-java.lang.String-">fromWithError(String)</a></span> - Static method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/MediaInformationParser.html" title="class in com.arthenica.mobileffmpeg">MediaInformationParser</a></dt>
+<dd>
+<div class="block">Extracts MediaInformation from the given ffprobe json output.</div>
 </dd>
 </dl>
 <a name="I:G">
@@ -244,6 +273,14 @@
 <dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/AbiDetect.html#getAbi--">getAbi()</a></span> - Static method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/AbiDetect.html" title="class in com.arthenica.mobileffmpeg">AbiDetect</a></dt>
 <dd>
 <div class="block">Returns loaded ABI name.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/MediaInformation.html#getAllProperties--">getAllProperties()</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/MediaInformation.html" title="class in com.arthenica.mobileffmpeg">MediaInformation</a></dt>
+<dd>
+<div class="block">Returns all properties defined.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/StreamInformation.html#getAllProperties--">getAllProperties()</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/StreamInformation.html" title="class in com.arthenica.mobileffmpeg">StreamInformation</a></dt>
+<dd>
+<div class="block">Returns all stream properties defined.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/StreamInformation.html#getAverageFrameRate--">getAverageFrameRate()</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/StreamInformation.html" title="class in com.arthenica.mobileffmpeg">StreamInformation</a></dt>
 <dd>
@@ -275,6 +312,8 @@
 <dd>
 <div class="block">Returns codec time base.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/FFmpegExecution.html#getCommand--">getCommand()</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/FFmpegExecution.html" title="class in com.arthenica.mobileffmpeg">FFmpegExecution</a></dt>
+<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/StreamInformation.html#getDisplayAspectRatio--">getDisplayAspectRatio()</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/StreamInformation.html" title="class in com.arthenica.mobileffmpeg">StreamInformation</a></dt>
 <dd>
 <div class="block">Returns display aspect ratio.</div>
@@ -283,6 +322,12 @@
 <dd>
 <div class="block">Returns duration.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/FFmpegExecution.html#getExecutionId--">getExecutionId()</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/FFmpegExecution.html" title="class in com.arthenica.mobileffmpeg">FFmpegExecution</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/LogMessage.html#getExecutionId--">getExecutionId()</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/LogMessage.html" title="class in com.arthenica.mobileffmpeg">LogMessage</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/Statistics.html#getExecutionId--">getExecutionId()</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/Statistics.html" title="class in com.arthenica.mobileffmpeg">Statistics</a></dt>
+<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/Config.html#getExternalLibraries--">getExternalLibraries()</a></span> - Static method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/Config.html" title="class in com.arthenica.mobileffmpeg">Config</a></dt>
 <dd>
 <div class="block">Returns supported external libraries.</div>
@@ -290,6 +335,10 @@
 <dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/Config.html#getFFmpegVersion--">getFFmpegVersion()</a></span> - Static method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/Config.html" title="class in com.arthenica.mobileffmpeg">Config</a></dt>
 <dd>
 <div class="block">Returns FFmpeg version bundled within the library.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/MediaInformation.html#getFilename--">getFilename()</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/MediaInformation.html" title="class in com.arthenica.mobileffmpeg">MediaInformation</a></dt>
+<dd>
+<div class="block">Returns file name.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/util/Pair.html#getFirst--">getFirst()</a></span> - Method in class com.arthenica.mobileffmpeg.util.<a href="com/arthenica/mobileffmpeg/util/Pair.html" title="class in com.arthenica.mobileffmpeg.util">Pair</a></dt>
 <dd>&nbsp;</dd>
@@ -306,10 +355,6 @@
 <dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/StreamInformation.html#getFullCodec--">getFullCodec()</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/StreamInformation.html" title="class in com.arthenica.mobileffmpeg">StreamInformation</a></dt>
 <dd>
 <div class="block">Returns full stream codec.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/StreamInformation.html#getFullFormat--">getFullFormat()</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/StreamInformation.html" title="class in com.arthenica.mobileffmpeg">StreamInformation</a></dt>
-<dd>
-<div class="block">Returns full stream format.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/StreamInformation.html#getHeight--">getHeight()</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/StreamInformation.html" title="class in com.arthenica.mobileffmpeg">StreamInformation</a></dt>
 <dd>
@@ -337,9 +382,13 @@
 <dd>
 <div class="block">Returns log level.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/MediaInformation.html#getLongFormat--">getLongFormat()</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/MediaInformation.html" title="class in com.arthenica.mobileffmpeg">MediaInformation</a></dt>
+<dd>
+<div class="block">Returns long format.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/FFprobe.html#getMediaInformation-java.lang.String-">getMediaInformation(String)</a></span> - Static method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/FFprobe.html" title="class in com.arthenica.mobileffmpeg">FFprobe</a></dt>
 <dd>
-<div class="block">Returns media information for given file.</div>
+<div class="block">Returns media information for the given file.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/FFprobe.html#getMediaInformation-java.lang.String-java.lang.Long-">getMediaInformation(String, Long)</a></span> - Static method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/FFprobe.html" title="class in com.arthenica.mobileffmpeg">FFprobe</a></dt>
 <dd>
@@ -348,17 +397,17 @@
  <code>timeout</code> parameter is not effective anymore.</span></div>
 </div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/StreamInformation.html#getMetadata-java.lang.String-">getMetadata(String)</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/StreamInformation.html" title="class in com.arthenica.mobileffmpeg">StreamInformation</a></dt>
+<dt><a href="com/arthenica/mobileffmpeg/GetMediaInformationCallback.html" title="interface in com.arthenica.mobileffmpeg"><span class="typeNameLink">GetMediaInformationCallback</span></a> - Interface in <a href="com/arthenica/mobileffmpeg/package-summary.html">com.arthenica.mobileffmpeg</a></dt>
 <dd>
-<div class="block">Retrieves metadata value associated with this key.</div>
+<div class="block">Represents a callback function to receive asynchronous getMediaInformation result.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/MediaInformation.html#getMetadataEntries--">getMetadataEntries()</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/MediaInformation.html" title="class in com.arthenica.mobileffmpeg">MediaInformation</a></dt>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/FFprobe.html#getMediaInformationFromCommand-java.lang.String-">getMediaInformationFromCommand(String)</a></span> - Static method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/FFprobe.html" title="class in com.arthenica.mobileffmpeg">FFprobe</a></dt>
 <dd>
-<div class="block">Returns all metadata entries.</div>
+<div class="block">Returns media information for the given command.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/StreamInformation.html#getMetadataEntries--">getMetadataEntries()</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/StreamInformation.html" title="class in com.arthenica.mobileffmpeg">StreamInformation</a></dt>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/MediaInformation.html#getMediaProperties--">getMediaProperties()</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/MediaInformation.html" title="class in com.arthenica.mobileffmpeg">MediaInformation</a></dt>
 <dd>
-<div class="block">Returns all metadata entries.</div>
+<div class="block">Returns all media properties.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/Abi.html#getName--">getName()</a></span> - Method in enum com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/Abi.html" title="enum in com.arthenica.mobileffmpeg">Abi</a></dt>
 <dd>
@@ -372,17 +421,25 @@
 <dd>
 <div class="block">Returns ABI name of the running cpu.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/MediaInformation.html#getNumberProperty-java.lang.String-">getNumberProperty(String)</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/MediaInformation.html" title="class in com.arthenica.mobileffmpeg">MediaInformation</a></dt>
+<dd>
+<div class="block">Returns the media property associated with the key.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/StreamInformation.html#getNumberProperty-java.lang.String-">getNumberProperty(String)</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/StreamInformation.html" title="class in com.arthenica.mobileffmpeg">StreamInformation</a></dt>
+<dd>
+<div class="block">Returns the stream property associated with the key.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/Config.html#getPackageName--">getPackageName()</a></span> - Static method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/Config.html" title="class in com.arthenica.mobileffmpeg">Config</a></dt>
 <dd>
 <div class="block">Returns package name.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/MediaInformation.html#getPath--">getPath()</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/MediaInformation.html" title="class in com.arthenica.mobileffmpeg">MediaInformation</a></dt>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/MediaInformation.html#getProperties-java.lang.String-">getProperties(String)</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/MediaInformation.html" title="class in com.arthenica.mobileffmpeg">MediaInformation</a></dt>
 <dd>
-<div class="block">Returns path.</div>
+<div class="block">Returns the media properties associated with the key.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/MediaInformation.html#getRawInformation--">getRawInformation()</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/MediaInformation.html" title="class in com.arthenica.mobileffmpeg">MediaInformation</a></dt>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/StreamInformation.html#getProperties-java.lang.String-">getProperties(String)</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/StreamInformation.html" title="class in com.arthenica.mobileffmpeg">StreamInformation</a></dt>
 <dd>
-<div class="block">Returns unparsed media information.</div>
+<div class="block">Returns the stream properties associated with the key.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/StreamInformation.html#getRealFrameRate--">getRealFrameRate()</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/StreamInformation.html" title="class in com.arthenica.mobileffmpeg">StreamInformation</a></dt>
 <dd>
@@ -404,17 +461,15 @@
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/util/Trio.html#getSecond--">getSecond()</a></span> - Method in class com.arthenica.mobileffmpeg.util.<a href="com/arthenica/mobileffmpeg/util/Trio.html" title="class in com.arthenica.mobileffmpeg.util">Trio</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/StreamInformation.html#getSidedata-java.lang.String-">getSidedata(String)</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/StreamInformation.html" title="class in com.arthenica.mobileffmpeg">StreamInformation</a></dt>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/MediaInformation.html#getSize--">getSize()</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/MediaInformation.html" title="class in com.arthenica.mobileffmpeg">MediaInformation</a></dt>
 <dd>
-<div class="block">Retrieves side data value associated with this key.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/StreamInformation.html#getSidedataEntries--">getSidedataEntries()</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/StreamInformation.html" title="class in com.arthenica.mobileffmpeg">StreamInformation</a></dt>
-<dd>
-<div class="block">Returns all side data entries.</div>
+<div class="block">Returns size.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/Statistics.html#getSize--">getSize()</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/Statistics.html" title="class in com.arthenica.mobileffmpeg">Statistics</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/Statistics.html#getSpeed--">getSpeed()</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/Statistics.html" title="class in com.arthenica.mobileffmpeg">Statistics</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/FFmpegExecution.html#getStartTime--">getStartTime()</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/FFmpegExecution.html" title="class in com.arthenica.mobileffmpeg">FFmpegExecution</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/MediaInformation.html#getStartTime--">getStartTime()</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/MediaInformation.html" title="class in com.arthenica.mobileffmpeg">MediaInformation</a></dt>
 <dd>
@@ -424,9 +479,25 @@
 <dd>
 <div class="block">Returns all streams.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/MediaInformation.html#getStringProperty-java.lang.String-">getStringProperty(String)</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/MediaInformation.html" title="class in com.arthenica.mobileffmpeg">MediaInformation</a></dt>
+<dd>
+<div class="block">Returns the media property associated with the key.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/StreamInformation.html#getStringProperty-java.lang.String-">getStringProperty(String)</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/StreamInformation.html" title="class in com.arthenica.mobileffmpeg">StreamInformation</a></dt>
+<dd>
+<div class="block">Returns the stream property associated with the key.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/Config.html#getSupportedCameraIds-android.content.Context-">getSupportedCameraIds(Context)</a></span> - Static method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/Config.html" title="class in com.arthenica.mobileffmpeg">Config</a></dt>
 <dd>
 <div class="block">Returns the list of camera ids supported.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/MediaInformation.html#getTags--">getTags()</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/MediaInformation.html" title="class in com.arthenica.mobileffmpeg">MediaInformation</a></dt>
+<dd>
+<div class="block">Returns all tags.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/StreamInformation.html#getTags--">getTags()</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/StreamInformation.html" title="class in com.arthenica.mobileffmpeg">StreamInformation</a></dt>
+<dd>
+<div class="block">Returns all tags.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/LogMessage.html#getText--">getText()</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/LogMessage.html" title="class in com.arthenica.mobileffmpeg">LogMessage</a></dt>
 <dd>&nbsp;</dd>
@@ -446,6 +517,8 @@
 <dd>
 <div class="block">Returns level value.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/Signal.html#getValue--">getValue()</a></span> - Method in enum com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/Signal.html" title="enum in com.arthenica.mobileffmpeg">Signal</a></dt>
+<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/Config.html#getVersion--">getVersion()</a></span> - Static method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/Config.html" title="class in com.arthenica.mobileffmpeg">Config</a></dt>
 <dd>
 <div class="block">Returns MobileFFmpeg library version.</div>
@@ -466,8 +539,10 @@
 </a>
 <h2 class="title">I</h2>
 <dl>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/MediaInformationParser.html#index-java.lang.String-java.lang.String-int-int-">index(String, String, int, int)</a></span> - Static method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/MediaInformationParser.html" title="class in com.arthenica.mobileffmpeg">MediaInformationParser</a></dt>
-<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/Config.html#ignoreSignal-com.arthenica.mobileffmpeg.Signal-">ignoreSignal(Signal)</a></span> - Static method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/Config.html" title="class in com.arthenica.mobileffmpeg">Config</a></dt>
+<dd>
+<div class="block">Registers a new ignored signal.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/Config.html#isLTSBuild--">isLTSBuild()</a></span> - Static method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/Config.html" title="class in com.arthenica.mobileffmpeg">Config</a></dt>
 <dd>
 <div class="block">Returns whether MobileFFmpeg release is a long term release or not.</div>
@@ -482,15 +557,19 @@
 <dd>
 <div class="block">Helper enumeration type for log levels.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/FFmpeg.html#listExecutions--">listExecutions()</a></span> - Static method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/FFmpeg.html" title="class in com.arthenica.mobileffmpeg">FFmpeg</a></dt>
+<dd>
+<div class="block">Lists ongoing executions.</div>
+</dd>
 <dt><a href="com/arthenica/mobileffmpeg/LogCallback.html" title="interface in com.arthenica.mobileffmpeg"><span class="typeNameLink">LogCallback</span></a> - Interface in <a href="com/arthenica/mobileffmpeg/package-summary.html">com.arthenica.mobileffmpeg</a></dt>
 <dd>
-<div class="block">Represents a callback function to redirect logs.</div>
+<div class="block">Represents a callback function to receive logs from running executions</div>
 </dd>
 <dt><a href="com/arthenica/mobileffmpeg/LogMessage.html" title="class in com.arthenica.mobileffmpeg"><span class="typeNameLink">LogMessage</span></a> - Class in <a href="com/arthenica/mobileffmpeg/package-summary.html">com.arthenica.mobileffmpeg</a></dt>
 <dd>
-<div class="block">Represents a redirected log message.</div>
+<div class="block">Logs for running executions.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/LogMessage.html#LogMessage-com.arthenica.mobileffmpeg.Level-java.lang.String-">LogMessage(Level, String)</a></span> - Constructor for class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/LogMessage.html" title="class in com.arthenica.mobileffmpeg">LogMessage</a></dt>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/LogMessage.html#LogMessage-long-com.arthenica.mobileffmpeg.Level-java.lang.String-">LogMessage(long, Level, String)</a></span> - Constructor for class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/LogMessage.html" title="class in com.arthenica.mobileffmpeg">LogMessage</a></dt>
 <dd>&nbsp;</dd>
 </dl>
 <a name="I:M">
@@ -502,11 +581,11 @@
 <dd>
 <div class="block">Media information class.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/MediaInformation.html#MediaInformation--">MediaInformation()</a></span> - Constructor for class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/MediaInformation.html" title="class in com.arthenica.mobileffmpeg">MediaInformation</a></dt>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/MediaInformation.html#MediaInformation-org.json.JSONObject-java.util.List-">MediaInformation(JSONObject, List&lt;StreamInformation&gt;)</a></span> - Constructor for class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/MediaInformation.html" title="class in com.arthenica.mobileffmpeg">MediaInformation</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="com/arthenica/mobileffmpeg/MediaInformationParser.html" title="class in com.arthenica.mobileffmpeg"><span class="typeNameLink">MediaInformationParser</span></a> - Class in <a href="com/arthenica/mobileffmpeg/package-summary.html">com.arthenica.mobileffmpeg</a></dt>
 <dd>
-<div class="block">Helper class for <a href="com/arthenica/mobileffmpeg/MediaInformation.html" title="class in com.arthenica.mobileffmpeg"><code>MediaInformation</code></a>.</div>
+<div class="block">Helper class for parsing <a href="com/arthenica/mobileffmpeg/MediaInformation.html" title="class in com.arthenica.mobileffmpeg"><code>MediaInformation</code></a>.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/MediaInformationParser.html#MediaInformationParser--">MediaInformationParser()</a></span> - Constructor for class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/MediaInformationParser.html" title="class in com.arthenica.mobileffmpeg">MediaInformationParser</a></dt>
 <dd>&nbsp;</dd>
@@ -518,11 +597,11 @@
 </a>
 <h2 class="title">O</h2>
 <dl>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/util/AsyncSingleFFmpegExecuteTask.html#onPostExecute-java.lang.Integer-">onPostExecute(Integer)</a></span> - Method in class com.arthenica.mobileffmpeg.util.<a href="com/arthenica/mobileffmpeg/util/AsyncSingleFFmpegExecuteTask.html" title="class in com.arthenica.mobileffmpeg.util">AsyncSingleFFmpegExecuteTask</a></dt>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/AsyncFFmpegExecuteTask.html#onPostExecute-java.lang.Integer-">onPostExecute(Integer)</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/AsyncFFmpegExecuteTask.html" title="class in com.arthenica.mobileffmpeg">AsyncFFmpegExecuteTask</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/util/AsyncSingleFFprobeExecuteTask.html#onPostExecute-java.lang.Integer-">onPostExecute(Integer)</a></span> - Method in class com.arthenica.mobileffmpeg.util.<a href="com/arthenica/mobileffmpeg/util/AsyncSingleFFprobeExecuteTask.html" title="class in com.arthenica.mobileffmpeg.util">AsyncSingleFFprobeExecuteTask</a></dt>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/AsyncFFprobeExecuteTask.html#onPostExecute-java.lang.Integer-">onPostExecute(Integer)</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/AsyncFFprobeExecuteTask.html" title="class in com.arthenica.mobileffmpeg">AsyncFFprobeExecuteTask</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/util/AsyncSingleGetMediaInformationTask.html#onPostExecute-com.arthenica.mobileffmpeg.MediaInformation-">onPostExecute(MediaInformation)</a></span> - Method in class com.arthenica.mobileffmpeg.util.<a href="com/arthenica/mobileffmpeg/util/AsyncSingleGetMediaInformationTask.html" title="class in com.arthenica.mobileffmpeg.util">AsyncSingleGetMediaInformationTask</a></dt>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/AsyncGetMediaInformationTask.html#onPostExecute-com.arthenica.mobileffmpeg.MediaInformation-">onPostExecute(MediaInformation)</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/AsyncGetMediaInformationTask.html" title="class in com.arthenica.mobileffmpeg">AsyncGetMediaInformationTask</a></dt>
 <dd>&nbsp;</dd>
 </dl>
 <a name="I:P">
@@ -545,8 +624,6 @@
 </a>
 <h2 class="title">R</h2>
 <dl>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/MediaInformationParser.html#REFERENCE_DURATION">REFERENCE_DURATION</a></span> - Static variable in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/MediaInformationParser.html" title="class in com.arthenica.mobileffmpeg">MediaInformationParser</a></dt>
-<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/Config.html#registerNewFFmpegPipe-android.content.Context-">registerNewFFmpegPipe(Context)</a></span> - Static method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/Config.html" title="class in com.arthenica.mobileffmpeg">Config</a></dt>
 <dd>
 <div class="block">Creates a new named pipe to use in <code>FFmpeg</code> operations.</div>
@@ -573,40 +650,14 @@
 <dd>
 <div class="block">The second element of the trio.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/StreamInformation.html#setAverageFrameRate-java.lang.String-">setAverageFrameRate(String)</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/StreamInformation.html" title="class in com.arthenica.mobileffmpeg">StreamInformation</a></dt>
-<dd>
-<div class="block">Sets average frame rate.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/MediaInformation.html#setBitrate-java.lang.Long-">setBitrate(Long)</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/MediaInformation.html" title="class in com.arthenica.mobileffmpeg">MediaInformation</a></dt>
-<dd>
-<div class="block">Sets bitrate.</div>
-</dd>
 <dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/Statistics.html#setBitrate-double-">setBitrate(double)</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/Statistics.html" title="class in com.arthenica.mobileffmpeg">Statistics</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/StreamInformation.html#setBitrate-java.lang.Long-">setBitrate(Long)</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/StreamInformation.html" title="class in com.arthenica.mobileffmpeg">StreamInformation</a></dt>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/Config.html#setEnvironmentVariable-java.lang.String-java.lang.String-">setEnvironmentVariable(String, String)</a></span> - Static method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/Config.html" title="class in com.arthenica.mobileffmpeg">Config</a></dt>
 <dd>
-<div class="block">Sets bitrate.</div>
+<div class="block">Sets an environment variable.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/StreamInformation.html#setChannelLayout-java.lang.String-">setChannelLayout(String)</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/StreamInformation.html" title="class in com.arthenica.mobileffmpeg">StreamInformation</a></dt>
-<dd>
-<div class="block">Sets channel layout.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/StreamInformation.html#setCodec-java.lang.String-">setCodec(String)</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/StreamInformation.html" title="class in com.arthenica.mobileffmpeg">StreamInformation</a></dt>
-<dd>
-<div class="block">Sets stream codec.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/StreamInformation.html#setCodecTimeBase-java.lang.String-">setCodecTimeBase(String)</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/StreamInformation.html" title="class in com.arthenica.mobileffmpeg">StreamInformation</a></dt>
-<dd>
-<div class="block">Sets codec time base.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/StreamInformation.html#setDisplayAspectRatio-java.lang.String-">setDisplayAspectRatio(String)</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/StreamInformation.html" title="class in com.arthenica.mobileffmpeg">StreamInformation</a></dt>
-<dd>
-<div class="block">Sets display aspect ratio.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/MediaInformation.html#setDuration-java.lang.Long-">setDuration(Long)</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/MediaInformation.html" title="class in com.arthenica.mobileffmpeg">MediaInformation</a></dt>
-<dd>
-<div class="block">Sets duration.</div>
-</dd>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/Statistics.html#setExecutionId-long-">setExecutionId(long)</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/Statistics.html" title="class in com.arthenica.mobileffmpeg">Statistics</a></dt>
+<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/Config.html#setFontconfigConfigurationPath-java.lang.String-">setFontconfigConfigurationPath(String)</a></span> - Static method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/Config.html" title="class in com.arthenica.mobileffmpeg">Config</a></dt>
 <dd>
 <div class="block">Sets and overrides <code>fontconfig</code> configuration directory.</div>
@@ -615,119 +666,43 @@
 <dd>
 <div class="block">Registers fonts inside the given path, so they are available to use in FFmpeg filters.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/MediaInformation.html#setFormat-java.lang.String-">setFormat(String)</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/MediaInformation.html" title="class in com.arthenica.mobileffmpeg">MediaInformation</a></dt>
-<dd>
-<div class="block">Sets media format.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/StreamInformation.html#setFormat-java.lang.String-">setFormat(String)</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/StreamInformation.html" title="class in com.arthenica.mobileffmpeg">StreamInformation</a></dt>
-<dd>
-<div class="block">Sets stream format.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/StreamInformation.html#setFullCodec-java.lang.String-">setFullCodec(String)</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/StreamInformation.html" title="class in com.arthenica.mobileffmpeg">StreamInformation</a></dt>
-<dd>
-<div class="block">Sets full stream codec.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/StreamInformation.html#setFullFormat-java.lang.String-">setFullFormat(String)</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/StreamInformation.html" title="class in com.arthenica.mobileffmpeg">StreamInformation</a></dt>
-<dd>
-<div class="block">Sets full stream format.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/StreamInformation.html#setHeight-java.lang.Long-">setHeight(Long)</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/StreamInformation.html" title="class in com.arthenica.mobileffmpeg">StreamInformation</a></dt>
-<dd>
-<div class="block">Sets height.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/StreamInformation.html#setIndex-java.lang.Long-">setIndex(Long)</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/StreamInformation.html" title="class in com.arthenica.mobileffmpeg">StreamInformation</a></dt>
-<dd>
-<div class="block">Sets stream index.</div>
-</dd>
 <dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/Config.html#setLogLevel-com.arthenica.mobileffmpeg.Level-">setLogLevel(Level)</a></span> - Static method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/Config.html" title="class in com.arthenica.mobileffmpeg">Config</a></dt>
 <dd>
 <div class="block">Sets log level.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/Config.html#setNativeEnvironmentVariable-java.lang.String-java.lang.String-">setNativeEnvironmentVariable(String, String)</a></span> - Static method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/Config.html" title="class in com.arthenica.mobileffmpeg">Config</a></dt>
-<dd>
-<div class="block">Sets an environment variable natively.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/MediaInformation.html#setPath-java.lang.String-">setPath(String)</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/MediaInformation.html" title="class in com.arthenica.mobileffmpeg">MediaInformation</a></dt>
-<dd>
-<div class="block">Sets path.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/MediaInformation.html#setRawInformation-java.lang.String-">setRawInformation(String)</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/MediaInformation.html" title="class in com.arthenica.mobileffmpeg">MediaInformation</a></dt>
-<dd>
-<div class="block">Sets unparsed media information.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/StreamInformation.html#setRealFrameRate-java.lang.String-">setRealFrameRate(String)</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/StreamInformation.html" title="class in com.arthenica.mobileffmpeg">StreamInformation</a></dt>
-<dd>
-<div class="block">Sets real frame rate.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/StreamInformation.html#setSampleAspectRatio-java.lang.String-">setSampleAspectRatio(String)</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/StreamInformation.html" title="class in com.arthenica.mobileffmpeg">StreamInformation</a></dt>
-<dd>
-<div class="block">Sets sample aspect ratio.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/StreamInformation.html#setSampleFormat-java.lang.String-">setSampleFormat(String)</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/StreamInformation.html" title="class in com.arthenica.mobileffmpeg">StreamInformation</a></dt>
-<dd>
-<div class="block">Sets sample format.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/StreamInformation.html#setSampleRate-java.lang.Long-">setSampleRate(Long)</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/StreamInformation.html" title="class in com.arthenica.mobileffmpeg">StreamInformation</a></dt>
-<dd>
-<div class="block">Sets sample rate.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/Statistics.html#setSize-long-">setSize(long)</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/Statistics.html" title="class in com.arthenica.mobileffmpeg">Statistics</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/Statistics.html#setSpeed-double-">setSpeed(double)</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/Statistics.html" title="class in com.arthenica.mobileffmpeg">Statistics</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/MediaInformation.html#setStartTime-java.lang.Long-">setStartTime(Long)</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/MediaInformation.html" title="class in com.arthenica.mobileffmpeg">MediaInformation</a></dt>
-<dd>
-<div class="block">Sets start time.</div>
-</dd>
 <dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/Statistics.html#setTime-int-">setTime(int)</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/Statistics.html" title="class in com.arthenica.mobileffmpeg">Statistics</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/StreamInformation.html#setTimeBase-java.lang.String-">setTimeBase(String)</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/StreamInformation.html" title="class in com.arthenica.mobileffmpeg">StreamInformation</a></dt>
-<dd>
-<div class="block">Sets time base.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/StreamInformation.html#setType-java.lang.String-">setType(String)</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/StreamInformation.html" title="class in com.arthenica.mobileffmpeg">StreamInformation</a></dt>
-<dd>
-<div class="block">Sets stream type.</div>
-</dd>
 <dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/Statistics.html#setVideoFps-float-">setVideoFps(float)</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/Statistics.html" title="class in com.arthenica.mobileffmpeg">Statistics</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/Statistics.html#setVideoFrameNumber-int-">setVideoFrameNumber(int)</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/Statistics.html" title="class in com.arthenica.mobileffmpeg">Statistics</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/Statistics.html#setVideoQuality-float-">setVideoQuality(float)</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/Statistics.html" title="class in com.arthenica.mobileffmpeg">Statistics</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/StreamInformation.html#setWidth-java.lang.Long-">setWidth(Long)</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/StreamInformation.html" title="class in com.arthenica.mobileffmpeg">StreamInformation</a></dt>
+<dt><a href="com/arthenica/mobileffmpeg/Signal.html" title="enum in com.arthenica.mobileffmpeg"><span class="typeNameLink">Signal</span></a> - Enum in <a href="com/arthenica/mobileffmpeg/package-summary.html">com.arthenica.mobileffmpeg</a></dt>
 <dd>
-<div class="block">Sets width.</div>
-</dd>
-<dt><a href="com/arthenica/mobileffmpeg/util/SingleExecuteCallback.html" title="interface in com.arthenica.mobileffmpeg.util"><span class="typeNameLink">SingleExecuteCallback</span></a> - Interface in <a href="com/arthenica/mobileffmpeg/util/package-summary.html">com.arthenica.mobileffmpeg.util</a></dt>
-<dd>
-<div class="block">Represents a callback function to receive a single execution result.</div>
-</dd>
-<dt><a href="com/arthenica/mobileffmpeg/util/SingleGetMediaInformationCallback.html" title="interface in com.arthenica.mobileffmpeg.util"><span class="typeNameLink">SingleGetMediaInformationCallback</span></a> - Interface in <a href="com/arthenica/mobileffmpeg/util/package-summary.html">com.arthenica.mobileffmpeg.util</a></dt>
-<dd>
-<div class="block">Represents a callback function to receive a single getMediaInformation result.</div>
+<div class="block">Lists signals handled by MobileFFmpeg library.</div>
 </dd>
 <dt><a href="com/arthenica/mobileffmpeg/Statistics.html" title="class in com.arthenica.mobileffmpeg"><span class="typeNameLink">Statistics</span></a> - Class in <a href="com/arthenica/mobileffmpeg/package-summary.html">com.arthenica.mobileffmpeg</a></dt>
 <dd>
-<div class="block">Represents statistics data.</div>
+<div class="block">Statistics for running executions.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/Statistics.html#Statistics--">Statistics()</a></span> - Constructor for class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/Statistics.html" title="class in com.arthenica.mobileffmpeg">Statistics</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/Statistics.html#Statistics-int-float-float-long-int-double-double-">Statistics(int, float, float, long, int, double, double)</a></span> - Constructor for class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/Statistics.html" title="class in com.arthenica.mobileffmpeg">Statistics</a></dt>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/Statistics.html#Statistics-long-int-float-float-long-int-double-double-">Statistics(long, int, float, float, long, int, double, double)</a></span> - Constructor for class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/Statistics.html" title="class in com.arthenica.mobileffmpeg">Statistics</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="com/arthenica/mobileffmpeg/StatisticsCallback.html" title="interface in com.arthenica.mobileffmpeg"><span class="typeNameLink">StatisticsCallback</span></a> - Interface in <a href="com/arthenica/mobileffmpeg/package-summary.html">com.arthenica.mobileffmpeg</a></dt>
 <dd>
-<div class="block">Represents a callback function to receive statistics of running operation.</div>
+<div class="block">Represents a callback function to receive statistics from running executions.</div>
 </dd>
 <dt><a href="com/arthenica/mobileffmpeg/StreamInformation.html" title="class in com.arthenica.mobileffmpeg"><span class="typeNameLink">StreamInformation</span></a> - Class in <a href="com/arthenica/mobileffmpeg/package-summary.html">com.arthenica.mobileffmpeg</a></dt>
 <dd>
 <div class="block">Stream information class.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/StreamInformation.html#StreamInformation--">StreamInformation()</a></span> - Constructor for class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/StreamInformation.html" title="class in com.arthenica.mobileffmpeg">StreamInformation</a></dt>
-<dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/MediaInformationParser.html#substring-java.lang.String-java.lang.String-java.lang.String-java.util.List-">substring(String, String, String, List&lt;String&gt;)</a></span> - Static method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/MediaInformationParser.html" title="class in com.arthenica.mobileffmpeg">MediaInformationParser</a></dt>
-<dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/MediaInformationParser.html#substring-java.lang.String-java.lang.String-java.util.List-">substring(String, String, List&lt;String&gt;)</a></span> - Static method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/MediaInformationParser.html" title="class in com.arthenica.mobileffmpeg">MediaInformationParser</a></dt>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/StreamInformation.html#StreamInformation-org.json.JSONObject-">StreamInformation(JSONObject)</a></span> - Constructor for class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/StreamInformation.html" title="class in com.arthenica.mobileffmpeg">StreamInformation</a></dt>
 <dd>&nbsp;</dd>
 </dl>
 <a name="I:T">
@@ -743,6 +718,10 @@
 <dd>
 <div class="block">The third element of the trio.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/LogMessage.html#toString--">toString()</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/LogMessage.html" title="class in com.arthenica.mobileffmpeg">LogMessage</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/Statistics.html#toString--">toString()</a></span> - Method in class com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/Statistics.html" title="class in com.arthenica.mobileffmpeg">Statistics</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="com/arthenica/mobileffmpeg/util/Trio.html" title="class in com.arthenica.mobileffmpeg.util"><span class="typeNameLink">Trio</span></a>&lt;<a href="com/arthenica/mobileffmpeg/util/Trio.html" title="type parameter in Trio">A</a>,<a href="com/arthenica/mobileffmpeg/util/Trio.html" title="type parameter in Trio">B</a>,<a href="com/arthenica/mobileffmpeg/util/Trio.html" title="type parameter in Trio">C</a>&gt; - Class in <a href="com/arthenica/mobileffmpeg/util/package-summary.html">com.arthenica.mobileffmpeg.util</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/util/Trio.html#Trio-A-B-C-">Trio(A, B, C)</a></span> - Constructor for class com.arthenica.mobileffmpeg.util.<a href="com/arthenica/mobileffmpeg/util/Trio.html" title="class in com.arthenica.mobileffmpeg.util">Trio</a></dt>
@@ -769,12 +748,21 @@
 <dd>
 <div class="block">Returns the enum constant of this type with the specified name.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/Signal.html#valueOf-java.lang.String-">valueOf(String)</a></span> - Static method in enum com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/Signal.html" title="enum in com.arthenica.mobileffmpeg">Signal</a></dt>
+<dd>
+<div class="block">Returns the enum constant of this type with the specified name.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/Abi.html#values--">values()</a></span> - Static method in enum com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/Abi.html" title="enum in com.arthenica.mobileffmpeg">Abi</a></dt>
 <dd>
 <div class="block">Returns an array containing the constants of this enum type, in
 the order they are declared.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/Level.html#values--">values()</a></span> - Static method in enum com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/Level.html" title="enum in com.arthenica.mobileffmpeg">Level</a></dt>
+<dd>
+<div class="block">Returns an array containing the constants of this enum type, in
+the order they are declared.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/arthenica/mobileffmpeg/Signal.html#values--">values()</a></span> - Static method in enum com.arthenica.mobileffmpeg.<a href="com/arthenica/mobileffmpeg/Signal.html" title="enum in com.arthenica.mobileffmpeg">Signal</a></dt>
 <dd>
 <div class="block">Returns an array containing the constants of this enum type, in
 the order they are declared.</div>

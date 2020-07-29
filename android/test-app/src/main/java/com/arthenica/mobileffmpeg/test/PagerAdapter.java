@@ -26,7 +26,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 
 public class PagerAdapter extends FragmentPagerAdapter {
-    private static final int NUMBER_OF_TABS = 7;
+    private static final int NUMBER_OF_TABS = 8;
 
     private final Context context;
 
@@ -58,6 +58,9 @@ public class PagerAdapter extends FragmentPagerAdapter {
             }
             case 6: {
                 return PipeTabFragment.newInstance();
+            }
+            case 7: {
+                return ConcurrentExecutionTabFragment.newInstance();
             }
             default: {
                 return null;
@@ -93,6 +96,9 @@ public class PagerAdapter extends FragmentPagerAdapter {
             }
             case 6: {
                 return context.getString(R.string.pipe_tab);
+            }
+            case 7: {
+                return context.getString(R.string.concurrent_tab);
             }
             default: {
                 return null;

@@ -58,7 +58,7 @@
     [super viewDidLoad];
 
     // VIDEO CODEC PICKER INIT
-    codecData = @[@"mpeg4", @"h264 (x264)", @"h264 (videotoolbox)", @"x265", @"xvid", @"vp8", @"vp9", @"aom", @"kvazaar", @"theora", @"hap"];
+    codecData = @[@"mpeg4", @"h264 (x264)", @"h264 (openh264)", @"h264 (videotoolbox)", @"x265", @"xvid", @"vp8", @"vp9", @"aom", @"kvazaar", @"theora", @"hap"];
     selectedCodec = 0;
     
     self.videoCodecPicker.dataSource = self;
@@ -120,7 +120,7 @@
     selectedCodec = row;
 }
 
-- (void)logCallback: (int)level :(NSString*)message {
+- (void)logCallback:(long)executionId :(int)level :(NSString*)message {
     dispatch_async(dispatch_get_main_queue(), ^{
         NSLog(@"%@", message);
     });
@@ -228,6 +228,8 @@
     // APPLYING NECESSARY TRANSFORMATION HERE
     if ([videoCodec isEqualToString:@"h264 (x264)"]) {
         videoCodec = @"libx264";
+    } else if ([videoCodec isEqualToString:@"h264 (openh264)"]) {
+        videoCodec = @"libopenh264";
     } else if ([videoCodec isEqualToString:@"h264 (videotoolbox)"]) {
         videoCodec = @"h264_videotoolbox";
     } else if ([videoCodec isEqualToString:@"x265"]) {

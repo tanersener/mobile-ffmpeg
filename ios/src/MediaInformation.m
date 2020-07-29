@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Taner Sener
+ * Copyright (c) 2018, 2020 Taner Sener
  *
  * This file is part of MobileFFmpeg.
  *
@@ -19,128 +19,109 @@
 
 #include "MediaInformation.h"
 
+#define KEY_MEDIA_PROPERTIES @"format"
+#define KEY_FILENAME @"filename"
+#define KEY_FORMAT @"format_name"
+#define KEY_FORMAT_LONG @"format_long_name"
+#define KEY_START_TIME @"start_time"
+#define KEY_DURATION @"duration"
+#define KEY_SIZE @"size"
+#define KEY_BIT_RATE @"bit_rate"
+#define KEY_TAGS @"tags"
+
 @implementation MediaInformation {
 
     /**
-     * Format
+     * Stores all properties.
      */
-    NSString *format;
-    
+    NSDictionary *dictionary;
+
     /**
-     * Path
+     * Stores streams.
      */
-    NSString *path;
-    
-    /**
-     * Duration, in milliseconds
-     */
-    NSNumber *duration;
-    
-    /**
-     * Start time, in milliseconds
-     */
-    NSNumber *startTime;
-    
-    /**
-     * Bitrate, kb/s
-     */
-    NSNumber *bitrate;
-    
-    /**
-     * Metadata map
-     */
-    NSMutableDictionary *metadata;
-    
-    /**
-     * List of streams
-     */
-    NSMutableArray *streams;
-    
-    /**
-     * Raw unparsed media information
-     */
-    NSString *rawInformation;
+    NSArray *streamArray;
 
 }
 
-- (instancetype)init {
+- (instancetype)init:(NSDictionary*)mediaDictionary withStreams:(NSArray*)streams{
     self = [super init];
     if (self) {
-        format = nil;
-        path = nil;
-        duration = nil;
-        startTime = nil;
-        bitrate = nil;
-        metadata = [[NSMutableDictionary alloc] init];
-        streams = [[NSMutableArray alloc] init];
-        rawInformation = nil;
+        dictionary = mediaDictionary;
+        streamArray = streams;
     }
-    
+
     return self;
 }
 
+- (NSString*)getFilename {
+    return [self getStringProperty:KEY_FILENAME];
+}
+
 - (NSString*)getFormat {
-    return format;
+    return [self getStringProperty:KEY_FORMAT];
 }
 
-- (void)setFormat:(NSString*)newFormat {
-    format = newFormat;
+- (NSString*)getLongFormat {
+    return [self getStringProperty:KEY_FORMAT_LONG];
 }
 
-- (NSString*)getPath {
-    return path;
+- (NSString*)getStartTime {
+    return [self getStringProperty:KEY_START_TIME];
 }
 
-- (void)setPath:(NSString*)newPath {
-    path = newPath;
+- (NSString*)getDuration {
+    return [self getStringProperty:KEY_DURATION];
 }
 
-- (NSNumber*)getDuration {
-    return duration;
+- (NSString*)getSize {
+    return [self getStringProperty:KEY_SIZE];
 }
 
-- (void)setDuration:(NSNumber*)newDuration {
-    duration = newDuration;
+- (NSString*)getBitrate {
+    return [self getStringProperty:KEY_BIT_RATE];
 }
 
-- (NSNumber*)getStartTime {
-    return startTime;
-}
-
-- (void)setStartTime:(NSNumber*)newStartTime {
-    startTime = newStartTime;
-}
-
-- (NSNumber*)getBitrate {
-    return bitrate;
-}
-
-- (void)setBitrate:(NSNumber*)newBitrate {
-    bitrate = newBitrate;
-}
-
-- (NSString*)getRawInformation {
-    return rawInformation;
-}
-
-- (void)setRawInformation:(NSString*)newRawInformation {
-    rawInformation = newRawInformation;
-}
-
-- (void)addMetadata:(NSString*)key :(NSString*)value {
-    metadata[key] = value;
-}
-
-- (NSDictionary*)getMetadataEntries {
-    return metadata;
-}
-
-- (void)addStream:(StreamInformation*)stream {
-    [streams addObject:stream];
+- (NSDictionary*)getTags {
+    return [self getProperties:KEY_TAGS];
 }
 
 - (NSArray*)getStreams {
-    return streams;
+    return streamArray;
+}
+
+- (NSString*)getStringProperty:(NSString*)key {
+    NSDictionary* mediaProperties = [self getMediaProperties];
+    if (mediaProperties == nil) {
+        return nil;
+    }
+
+    return mediaProperties[key];
+}
+
+- (NSNumber*)getNumberProperty:(NSString*)key {
+    NSDictionary* mediaProperties = [self getMediaProperties];
+    if (mediaProperties == nil) {
+        return nil;
+    }
+
+    return mediaProperties[key];
+}
+
+- (NSDictionary*)getProperties:(NSString*)key {
+    NSDictionary* mediaProperties = [self getMediaProperties];
+    if (mediaProperties == nil) {
+        return nil;
+    }
+
+    return mediaProperties[key];
+}
+
+- (NSDictionary*)getMediaProperties {
+    return dictionary[KEY_MEDIA_PROPERTIES];
+}
+
+- (NSDictionary*)getAllProperties {
+    return dictionary;
 }
 
 @end

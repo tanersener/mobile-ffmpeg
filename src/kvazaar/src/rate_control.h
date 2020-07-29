@@ -29,10 +29,39 @@
 #include "global.h" // IWYU pragma: keep
 
 #include "encoderstate.h"
+#include "pthread.h"
+
+typedef struct kvz_rc_data {
+  double *c_para[KVZ_MAX_GOP_LAYERS];
+  double *k_para[KVZ_MAX_GOP_LAYERS];
+  double pic_c_para[KVZ_MAX_GOP_LAYERS];
+  double pic_k_para[KVZ_MAX_GOP_LAYERS];
+  double previous_lambdas[KVZ_MAX_GOP_LAYERS + 1];
+  double previous_frame_lambda;
+  double *intra_bpp;
+  double *intra_dis;
+  double intra_pic_distortion;
+  double intra_pic_bpp;
+
+  double intra_alpha;
+  double intra_beta;
+
+  pthread_rwlock_t ck_ctu_lock[KVZ_MAX_GOP_LAYERS];
+  pthread_mutex_t ck_frame_lock;
+  pthread_mutex_t lambda_lock;
+  pthread_mutex_t intra_lock;
+} kvz_rc_data;
+
+kvz_rc_data * kvz_get_rc_data(const encoder_control_t * const encoder);
+void kvz_free_rc_data();
 
 void kvz_set_picture_lambda_and_qp(encoder_state_t * const state);
 
 void kvz_set_lcu_lambda_and_qp(encoder_state_t * const state,
                                vector2d_t pos);
+
+void kvz_set_ctu_qp_lambda(encoder_state_t * const state, vector2d_t pos);
+void kvz_update_after_picture(encoder_state_t * const state);
+void kvz_estimate_pic_lambda(encoder_state_t * const state);
 
 #endif // RATE_CONTROL_H_

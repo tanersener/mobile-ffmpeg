@@ -561,7 +561,7 @@ static int encode_buffer_high (WavpackStream *wps, int32_t *buffer, int num_samp
         *dp++ = sp->factor;
         *dp++ = sp->factor >> 8;
         sp->filter6 = 0;
-        sp->factor = (sp->factor << 16) >> 16;
+        sp->factor = (int32_t)((uint32_t) sp->factor << 16) >> 16;
     }
 
     sp = wps->dsd.filters;
@@ -597,8 +597,8 @@ static int encode_buffer_high (WavpackStream *wps, int32_t *buffer, int num_samp
                 low <<= 8;
             }
 
-            sp [0].value += sp [0].filter6 << 3;
-            sp [0].factor += (((sp [0].value ^ sp [0].filter0) >> 31) | 1) & ((sp [0].value ^ (sp [0].value - (sp [0].filter6 << 4))) >> 31);
+            sp [0].value += sp [0].filter6 * 8;
+            sp [0].factor += (((sp [0].value ^ sp [0].filter0) >> 31) | 1) & ((sp [0].value ^ (sp [0].value - (sp [0].filter6 * 16))) >> 31);
             sp [0].filter1 += ((sp [0].filter0 & VALUE_ONE) - sp [0].filter1) >> 6;
             sp [0].filter2 += ((sp [0].filter0 & VALUE_ONE) - sp [0].filter2) >> 4;
             sp [0].filter3 += (sp [0].filter2 - sp [0].filter3) >> 4;
@@ -631,8 +631,8 @@ static int encode_buffer_high (WavpackStream *wps, int32_t *buffer, int num_samp
                 low <<= 8;
             }
 
-            sp [1].value += sp [1].filter6 << 3;
-            sp [1].factor += (((sp [1].value ^ sp [1].filter0) >> 31) | 1) & ((sp [1].value ^ (sp [1].value - (sp [1].filter6 << 4))) >> 31);
+            sp [1].value += sp [1].filter6 * 8;
+            sp [1].factor += (((sp [1].value ^ sp [1].filter0) >> 31) | 1) & ((sp [1].value ^ (sp [1].value - (sp [1].filter6 * 16))) >> 31);
             sp [1].filter1 += ((sp [1].filter0 & VALUE_ONE) - sp [1].filter1) >> 6;
             sp [1].filter2 += ((sp [1].filter0 & VALUE_ONE) - sp [1].filter2) >> 4;
             sp [1].filter3 += (sp [1].filter2 - sp [1].filter3) >> 4;
