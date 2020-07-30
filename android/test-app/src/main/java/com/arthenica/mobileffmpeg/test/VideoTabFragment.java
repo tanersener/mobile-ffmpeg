@@ -356,7 +356,7 @@ public class VideoTabFragment extends Fragment implements AdapterView.OnItemSele
         Log.i(MainActivity.TAG, "Video Tab Activated");
         enableLogCallback();
         enableStatisticsCallback();
-        Popup.show(requireContext(), Tooltip.VIDEO_TEST_TOOLTIP_TEXT);
+        Popup.show(requireContext(), getString(R.string.video_test_tooltip_text));
     }
 
     protected void showProgressDialog() {

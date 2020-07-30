@@ -263,7 +263,7 @@ public class ConcurrentExecutionTabFragment extends Fragment {
     public void setActive() {
         Log.i(MainActivity.TAG, "Concurrent Execution Tab Activated");
         enableLogCallback();
-        Popup.show(requireContext(), Tooltip.CONCURRENT_EXECUTION_TEST_TOOLTIP_TEXT);
+        Popup.show(requireContext(), getString(R.string.concurrent_execution_test_tooltip_text));
     }
 
     public void appendLog(final String logMessage) {

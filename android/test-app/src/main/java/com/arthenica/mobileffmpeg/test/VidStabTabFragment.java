@@ -282,7 +282,7 @@ public class VidStabTabFragment extends Fragment {
     public void setActive() {
         Log.i(MainActivity.TAG, "VidStab Tab Activated");
         enableLogCallback();
-        Popup.show(requireContext(), Tooltip.VIDSTAB_TEST_TOOLTIP_TEXT);
+        Popup.show(requireContext(), getString(R.string.vidstab_test_tooltip_text));
     }
 
     protected void showCreateProgressDialog() {

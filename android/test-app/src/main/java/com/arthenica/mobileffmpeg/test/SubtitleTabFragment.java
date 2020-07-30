@@ -272,7 +272,7 @@ public class SubtitleTabFragment extends Fragment {
         Log.i(MainActivity.TAG, "Subtitle Tab Activated");
         enableLogCallback();
         enableStatisticsCallback();
-        Popup.show(requireContext(), Tooltip.SUBTITLE_TEST_TOOLTIP_TEXT);
+        Popup.show(requireContext(), getString(R.string.subtitle_test_tooltip_text));
     }
 
     protected void showCreateProgressDialog() {
