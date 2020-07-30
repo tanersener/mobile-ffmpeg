@@ -85,20 +85,41 @@ public class Config {
 
         Log.i(Config.TAG, "Loading mobile-ffmpeg.");
 
-        /* LOAD NOT-LOADED LIBRARIES ON API < 21 */
+        boolean nativeFFmpegLoaded = false;
+        boolean nativeFFmpegTriedAndFailed = false;
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+
+            /* LOADING LIBRARIES MANUALLY ON API < 21 */
             final List<String> externalLibrariesEnabled = getExternalLibraries();
             if (externalLibrariesEnabled.contains("tesseract") || externalLibrariesEnabled.contains("x265") || externalLibrariesEnabled.contains("snappy") || externalLibrariesEnabled.contains("openh264") || externalLibrariesEnabled.contains("rubberband")) {
-                // libc++_shared.so included only when tesseract or x265 is enabled
                 System.loadLibrary("c++_shared");
             }
-            System.loadLibrary("avutil");
-            System.loadLibrary("swscale");
-            System.loadLibrary("swresample");
-            System.loadLibrary("avcodec");
-            System.loadLibrary("avformat");
-            System.loadLibrary("avfilter");
-            System.loadLibrary("avdevice");
+
+            if (AbiDetect.ARM_V7A.equals(AbiDetect.getNativeAbi())) {
+                try {
+                    System.loadLibrary("avutil_neon");
+                    System.loadLibrary("swscale_neon");
+                    System.loadLibrary("swresample_neon");
+                    System.loadLibrary("avcodec_neon");
+                    System.loadLibrary("avformat_neon");
+                    System.loadLibrary("avfilter_neon");
+                    System.loadLibrary("avdevice_neon");
+                    nativeFFmpegLoaded = true;
+                } catch (final UnsatisfiedLinkError e) {
+                    Log.i(Config.TAG, "NEON supported armeabi-v7a ffmpeg library not found. Loading default armeabi-v7a library.", e);
+                    nativeFFmpegTriedAndFailed = true;
+                }
+            }
+
+            if (!nativeFFmpegLoaded) {
+                System.loadLibrary("avutil");
+                System.loadLibrary("swscale");
+                System.loadLibrary("swresample");
+                System.loadLibrary("avcodec");
+                System.loadLibrary("avformat");
+                System.loadLibrary("avfilter");
+                System.loadLibrary("avdevice");
+            }
         }
 
         /* ALL MOBILE-FFMPEG LIBRARIES LOADED AT STARTUP */
@@ -106,30 +127,23 @@ public class Config {
         FFmpeg.class.getName();
         FFprobe.class.getName();
 
-        /*
-         * NEON supported arm-v7a library has a different name
-         */
-        boolean nativeLibraryLoaded = false;
-        if (AbiDetect.ARM_V7A.equals(AbiDetect.getNativeAbi())) {
-            if (AbiDetect.isNativeLTSBuild()) {
+        boolean nativeMobileFFmpegLoaded = false;
+        if (!nativeFFmpegTriedAndFailed && AbiDetect.ARM_V7A.equals(AbiDetect.getNativeAbi())) {
+            try {
 
                 /*
-                 * IF CPU SUPPORTS ARM-V7A-NEON THE TRY TO LOAD IT FIRST. IF NOT LOAD DEFAULT ARM-V7A
+                 * THE TRY TO LOAD ARM-V7A-NEON FIRST. IF NOT LOAD DEFAULT ARM-V7A
                  */
 
-                try {
-                    System.loadLibrary("mobileffmpeg_armv7a_neon");
-                    nativeLibraryLoaded = true;
-                    AbiDetect.setArmV7aNeonLoaded(true);
-                } catch (final UnsatisfiedLinkError e) {
-                    Log.i(Config.TAG, "NEON supported armeabi-v7a library not found. Loading default armeabi-v7a library.", e);
-                }
-            } else {
+                System.loadLibrary("mobileffmpeg_armv7a_neon");
+                nativeMobileFFmpegLoaded = true;
                 AbiDetect.setArmV7aNeonLoaded(true);
+            } catch (final UnsatisfiedLinkError e) {
+                Log.i(Config.TAG, "NEON supported armeabi-v7a mobileffmpeg library not found. Loading default armeabi-v7a library.", e);
             }
         }
 
-        if (!nativeLibraryLoaded) {
+        if (!nativeMobileFFmpegLoaded) {
             System.loadLibrary("mobileffmpeg");
         }
 
@@ -503,7 +517,7 @@ public class Config {
      * @return MobileFFmpeg version
      */
     public static String getVersion() {
-        if (AbiDetect.isNativeLTSBuild()) {
+        if (isLTSBuild()) {
             return String.format("%s-lts", getNativeVersion());
         } else {
             return getNativeVersion();

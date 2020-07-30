@@ -726,22 +726,14 @@ while [ ! $# -eq 0 ]; do
 done
 
 # DETECT BUILD TYPE
-rm -f ${BASEDIR}/android/jni/Android.mk 1>>${BASEDIR}/build.log 2>&1
 rm -f ${BASEDIR}/android/app/build.gradle 1>>${BASEDIR}/build.log 2>&1
 if [[ ! -z ${BUILD_LTS} ]]; then
   enable_lts_build
   BUILD_TYPE_ID+="LTS "
 
-  cp ${BASEDIR}/tools/ndk/Android.lts.mk ${BASEDIR}/android/jni/Android.mk 1>>${BASEDIR}/build.log 2>&1
   cp ${BASEDIR}/tools/release/android/build.lts.gradle ${BASEDIR}/android/app/build.gradle 1>>${BASEDIR}/build.log 2>&1
 else
-  cp ${BASEDIR}/tools/ndk/Android.mk ${BASEDIR}/android/jni/Android.mk 1>>${BASEDIR}/build.log 2>&1
   cp ${BASEDIR}/tools/release/android/build.gradle ${BASEDIR}/android/app/build.gradle 1>>${BASEDIR}/build.log 2>&1
-
-  if [[ -z ${BUILD_FORCE} ]] && [[ ${ENABLED_ARCHITECTURES[${ARCH_ARM_V7A}]} -eq 1 ]]; then
-    echo -e "INFO: Disabled arm-v7a architecture which is not included in Main releases.\n" 1>>${BASEDIR}/build.log 2>&1
-    disable_arch "arm-v7a"
-  fi
 fi
 
 if [[ ! -z ${DISPLAY_HELP} ]]; then
@@ -769,14 +761,6 @@ fi
 echo -e "\nBuilding mobile-ffmpeg ${BUILD_TYPE_ID}library for Android\n"
 echo -e -n "INFO: Building mobile-ffmpeg ${BUILD_VERSION} ${BUILD_TYPE_ID}library for Android: " 1>>${BASEDIR}/build.log 2>&1
 echo -e $(date) 1>>${BASEDIR}/build.log 2>&1
-
-# PERFORM THIS CHECK ONLY ON LTS
-if [[ ! -z ${MOBILE_FFMPEG_LTS_BUILD} ]] && [[ ${ENABLED_ARCHITECTURES[0]} -eq 0 ]] && [[ ${ENABLED_ARCHITECTURES[1]} -eq 1 ]]; then
-  ENABLED_ARCHITECTURES[ARCH_ARM_V7A]=1
-
-  echo -e "(*) arm-v7a architecture enabled since arm-v7a-neon will be built\n"
-  echo -e "(*) arm-v7a architecture enabled since arm-v7a-neon will be built\n" 1>>${BASEDIR}/build.log 2>&1
-fi
 
 print_enabled_architectures
 print_enabled_libraries
@@ -834,15 +818,21 @@ done
 
 export API=${ORIGINAL_API}
 
-rm -f ${BASEDIR}/android/build/.neon 1>>${BASEDIR}/build.log 2>&1
+rm -f ${BASEDIR}/android/build/.armv7 1>>${BASEDIR}/build.log 2>&1
+rm -f ${BASEDIR}/android/build/.armv7neon 1>>${BASEDIR}/build.log 2>&1
 ANDROID_ARCHITECTURES=""
-if [[ ${ENABLED_ARCHITECTURES[1]} -eq 1 ]]; then
+if [[ ${ENABLED_ARCHITECTURES[0]} -eq 1 ]] || [[ ${ENABLED_ARCHITECTURES[1]} -eq 1 ]]; then
   ANDROID_ARCHITECTURES+="$(get_android_arch 0) "
+fi
+if [[ ${ENABLED_ARCHITECTURES[0]} -eq 1 ]]; then
   mkdir -p ${BASEDIR}/android/build 1>>${BASEDIR}/build.log 2>&1
-  cat >"${BASEDIR}/android/build/.neon" <<EOF
+  cat >"${BASEDIR}/android/build/.armv7" <<EOF
 EOF
-elif [[ ${ENABLED_ARCHITECTURES[0]} -eq 1 ]]; then
-  ANDROID_ARCHITECTURES+="$(get_android_arch 0) "
+fi
+if [[ ${ENABLED_ARCHITECTURES[1]} -eq 1 ]]; then
+  mkdir -p ${BASEDIR}/android/build 1>>${BASEDIR}/build.log 2>&1
+  cat >"${BASEDIR}/android/build/.armv7neon" <<EOF
+EOF
 fi
 if [[ ${ENABLED_ARCHITECTURES[2]} -eq 1 ]]; then
   ANDROID_ARCHITECTURES+="$(get_android_arch 2) "

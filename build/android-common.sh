@@ -141,11 +141,7 @@ get_target_build() {
             echo "arm"
         ;;
         arm-v7a-neon)
-            if [[ ! -z ${MOBILE_FFMPEG_LTS_BUILD} ]]; then
-                echo "arm/neon"
-            else
-                echo "arm"
-            fi
+            echo "arm/neon"
         ;;
         arm64-v8a)
             echo "arm64"
