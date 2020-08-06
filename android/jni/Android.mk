@@ -13,10 +13,8 @@ ifeq ($(TARGET_ARCH_ABI), armeabi-v7a)
 endif
 ifeq ($(MY_ARMV7_NEON), true)
     FFMPEG_INCLUDES := $(MY_LOCAL_PATH)/../../prebuilt/android-$(TARGET_ARCH)/neon/ffmpeg/include
-    $(call import-module, cpu-features/neon)
 else
     FFMPEG_INCLUDES := $(MY_LOCAL_PATH)/../../prebuilt/android-$(TARGET_ARCH)/ffmpeg/include
-    $(call import-module, cpu-features)
 endif
 
 MY_ARM_MODE := arm
@@ -49,6 +47,8 @@ LOCAL_LDLIBS := -llog -lz -landroid
 LOCAL_STATIC_LIBRARIES := cpu-features
 LOCAL_ARM_NEON := ${MY_ARM_NEON}
 include $(BUILD_SHARED_LIBRARY)
+
+$(call import-module, cpu-features)
 
 ifeq ($(TARGET_PLATFORM),android-16)
     MY_SRC_FILES := mobileffmpeg.c mobileffprobe.c android_lts_support.c mobileffmpeg_exception.c fftools_cmdutils.c fftools_ffmpeg.c fftools_ffprobe.c fftools_ffmpeg_opt.c fftools_ffmpeg_hw.c fftools_ffmpeg_filter.c
