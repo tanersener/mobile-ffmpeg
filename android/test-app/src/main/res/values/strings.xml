@@ -25,4 +25,5 @@
     <string name="cancel_button_text_2">Cancel 2</string>
     <string name="cancel_button_text_3">Cancel 3</string>
     <string name="cancel_button_text_all">Cancel All</string>
+    <string name="saf_button_text">SAF</string>
 </resources>
