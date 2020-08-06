@@ -20,7 +20,11 @@
 package com.arthenica.mobileffmpeg;
 
 import android.content.Context;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Build;
+import android.os.ParcelFileDescriptor;
+import android.provider.DocumentsContract;
 import android.util.Log;
 
 import java.io.File;
@@ -769,4 +773,46 @@ public class Config {
      */
     private native static void ignoreNativeSignal(final int signum);
 
+    /**
+     * <p>Convert Structured Access Framework Uri (<code></code>"content:…"</code>) for MobileFfmpeg.
+     *
+     * @return String can be passed to FFmpeg or FFprobe
+     */
+    private static String getSafParameter(Context context, Uri uri, String openMode) {
+
+        String displayName = "unknown";
+        final Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
+        try {
+            if (cursor != null && cursor.moveToFirst()) {
+                displayName = cursor.getString(cursor.getColumnIndex(DocumentsContract.Document.COLUMN_DISPLAY_NAME));
+            }
+        } catch (Throwable ex) {
+            Log.e(TAG, "failed to get column", ex);
+        } finally {
+            if (cursor != null)
+                cursor.close();
+        }
+
+        int fd = -1;
+        try {
+            ParcelFileDescriptor parcelFileDescriptor = context.getContentResolver().openFileDescriptor(uri, openMode);
+            fd = parcelFileDescriptor.detachFd();
+        } catch (Throwable e) {
+            Log.e(TAG, "obtaining " + openMode + " ParcelFileDescriptor for " + uri, e);
+        }
+
+        // workaround for https://issuetracker.google.com/issues/162440528: ANDROID_CREATE_DOCUMENT generating file names like "transcode.mp3 (2)"
+        if (displayName.lastIndexOf(' ') > displayName.lastIndexOf('.')) {
+            displayName = displayName.substring(0, displayName.lastIndexOf(' '));
+        }
+        return "\"saf:" + fd + "/" + displayName + "\"";
+    }
+
+    public static String getSafParameterForRead(Context context, Uri uri) {
+        return getSafParameter(context, uri, "r");
+    }
+
+    public static String getSafParameterForReadAndWrite(Context context, Uri uri) {
+        return getSafParameter(context, uri, "rw");
+    }
 }
