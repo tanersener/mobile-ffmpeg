@@ -306,6 +306,8 @@ void monitorWait(int milliSeconds) {
     ts.tv_nsec = tp.tv_usec * 1000;
     ts.tv_sec += milliSeconds / 1000;
     ts.tv_nsec += (milliSeconds % 1000)*1000000;
+    ts.tv_sec += ts.tv_nsec / 1000000000L;
+    ts.tv_nsec = ts.tv_nsec % 1000000000L;
 
     pthread_mutex_lock(&monitorMutex);
     pthread_cond_timedwait(&monitorCondition, &monitorMutex, &ts);
