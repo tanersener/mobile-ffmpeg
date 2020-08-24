@@ -265,7 +265,7 @@ download_gpl_library_source() {
   x265)
     GPL_LIB_URL="https://github.com/videolan/x265/archive/3.4.tar.gz"
     GPL_LIB_FILE="x265_3.4.tar.gz"
-    GPL_LIB_ORIG_DIR="x265_3.4"
+    GPL_LIB_ORIG_DIR="x265-3.4"
     ;;
   xvidcore)
     GPL_LIB_URL="https://downloads.xvid.com/downloads/xvidcore-1.3.7.tar.gz"
