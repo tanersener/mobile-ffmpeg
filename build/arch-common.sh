@@ -263,7 +263,7 @@ download_gpl_library_source() {
     GPL_LIB_ORIG_DIR="x264-cde9a93319bea766a92e306d69059c76de970190"
     ;;
   x265)
-    GPL_LIB_URL="https://bitbucket.org/multicoreware/x265/downloads/x265_3.4.tar.gz"
+    GPL_LIB_URL="https://github.com/videolan/x265/archive/3.4.tar.gz"
     GPL_LIB_FILE="x265_3.4.tar.gz"
     GPL_LIB_ORIG_DIR="x265_3.4"
     ;;
