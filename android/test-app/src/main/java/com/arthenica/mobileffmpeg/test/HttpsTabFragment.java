@@ -216,7 +216,6 @@ public class HttpsTabFragment extends Fragment {
     public void setActive() {
         Log.i(MainActivity.TAG, "Https Tab Activated");
         enableLogCallback();
-        ((MainActivity)requireActivity()).enableSaf(false);
         Popup.show(requireContext(), getString(R.string.https_test_tooltip_text));
     }
 

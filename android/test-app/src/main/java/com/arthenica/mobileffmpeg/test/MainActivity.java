@@ -23,15 +23,9 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.widget.Switch;
-import android.widget.ToggleButton;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -193,28 +187,6 @@ public class MainActivity extends AppCompatActivity {
                 android.util.Log.d(MainActivity.TAG, "Supported camera detected: " + supportedCameraId);
             }
         }
-    }
-
-    private Switch saf_button;
-    public boolean isSafUsed() {
-        return saf_button != null ? saf_button.isChecked() : false;
-    }
-
-    public void enableSaf(boolean enabled) {
-        if (saf_button != null)
-            saf_button.setEnabled(enabled);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            MenuInflater inflater = getMenuInflater();
-            inflater.inflate(R.menu.saf_menu, menu);
-            MenuItem item = (MenuItem) menu.findItem(R.id.saf_button);
-            saf_button = item.getActionView().findViewById(R.id.saf_button);
-            saf_button.setText("SAF");
-        }
-        return true;
     }
 
 }

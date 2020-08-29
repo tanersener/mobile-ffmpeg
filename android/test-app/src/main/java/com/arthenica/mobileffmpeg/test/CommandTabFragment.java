@@ -19,8 +19,6 @@
 
 package com.arthenica.mobileffmpeg.test;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.util.AndroidRuntimeException;
@@ -45,8 +43,6 @@ public class CommandTabFragment extends Fragment {
 
     private EditText commandText;
     private TextView outputText;
-    private static final int REQUEST_SAF_FFPROBE = 11;
-    private boolean backFromIntent = false;
 
     public CommandTabFragment() {
         super(R.layout.fragment_command_tab);
@@ -63,7 +59,7 @@ public class CommandTabFragment extends Fragment {
 
             @Override
             public void onClick(View v) {
-                runFFmpeg(commandText.getText().toString());
+                runFFmpeg();
             }
         });
 
@@ -72,10 +68,7 @@ public class CommandTabFragment extends Fragment {
 
             @Override
             public void onClick(View v) {
-                if (((MainActivity)requireActivity()).isSafUsed())
-                    chooseInputFile();
-                else
-                    runFFprobe(commandText.getText().toString());
+                runFFprobe();
             }
         });
 
@@ -88,9 +81,7 @@ public class CommandTabFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (!backFromIntent)
-            setActive();
-        backFromIntent = false;
+        setActive();
     }
 
     public static CommandTabFragment newInstance() {
@@ -116,8 +107,10 @@ public class CommandTabFragment extends Fragment {
         });
     }
 
-    private void runFFmpeg(final String ffmpegCommand) {
+    public void runFFmpeg() {
         clearLog();
+
+        final String ffmpegCommand = String.format("%s", commandText.getText().toString());
 
         android.util.Log.d(MainActivity.TAG, String.format("Current log level is %s.", Config.getLogLevel()));
 
@@ -134,8 +127,10 @@ public class CommandTabFragment extends Fragment {
         }
     }
 
-    private void runFFprobe(String ffprobeCommand) {
+    public void runFFprobe() {
         clearLog();
+
+        final String ffprobeCommand = String.format("%s", commandText.getText().toString());
 
         android.util.Log.d(MainActivity.TAG, "Testing FFprobe COMMAND synchronously.");
 
@@ -150,19 +145,9 @@ public class CommandTabFragment extends Fragment {
         }
     }
 
-    private void runFFprobe(Uri inputUri) {
-        if (commandText.getText().toString().trim().isEmpty()) {
-            runFFprobe("-hide_banner -print_format json -show_format -show_streams " + Config.getSafParameterForRead(requireContext(), inputUri));
-        }
-        else {
-            runFFprobe(commandText.getText().toString() + " " + Config.getSafParameterForRead(requireContext(), inputUri));
-        }
-    }
-
     private void setActive() {
         Log.i(MainActivity.TAG, "Command Tab Activated");
         enableLogCallback();
-        ((MainActivity)requireActivity()).enableSaf(true);
         Popup.show(requireContext(), getString(R.string.command_test_tooltip_text));
     }
 
@@ -174,22 +159,4 @@ public class CommandTabFragment extends Fragment {
         outputText.setText("");
     }
 
-    private void chooseInputFile() {
-        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT)
-                .setType("*/*")
-                .putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"image/*", "video/*", "audio/*"})
-                .addCategory(Intent.CATEGORY_OPENABLE);
-        startActivityForResult(intent, REQUEST_SAF_FFPROBE);
-        Popup.show(requireContext(), "choose input for FFPROBE");
-        backFromIntent = true;
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_SAF_FFPROBE && resultCode == MainActivity.RESULT_OK && data != null) {
-            runFFprobe(data.getData());
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
-    }
 }

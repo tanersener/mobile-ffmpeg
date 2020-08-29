@@ -20,7 +20,6 @@
 package com.arthenica.mobileffmpeg.test;
 
 import android.app.AlertDialog;
-import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -59,16 +58,13 @@ public class PipeTabFragment extends Fragment {
     private VideoView videoView;
     private AlertDialog progressDialog;
     private Statistics statistics;
-    private Uri videoUri;
-    private static final int REQUEST_CREATE_DOCUMENT = 12;
-    private boolean backFromIntent = false;
 
     public PipeTabFragment() {
         super(R.layout.fragment_pipe_tab);
     }
 
     @Override
-    public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         View createButton = view.findViewById(R.id.createButton);
@@ -77,12 +73,7 @@ public class PipeTabFragment extends Fragment {
 
                 @Override
                 public void onClick(View v) {
-                    if (((MainActivity)requireActivity()).isSafUsed())
-                        chooseOutputVideoAndCreate();
-                    else {
-                        videoUri = Uri.fromFile(getVideoFile());
-                        createVideo(videoUri.getPath());
-                    }
+                    createVideo();
                 }
             });
         }
@@ -95,9 +86,7 @@ public class PipeTabFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (!backFromIntent)
-            setActive();
-        backFromIntent = false;
+        setActive();
     }
 
     public static PipeTabFragment newInstance() {
@@ -137,11 +126,11 @@ public class PipeTabFragment extends Fragment {
         asyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, imagePath, namedPipePath);
     }
 
-    public void createVideo(String videoPath) {
+    public void createVideo() {
         final File image1File = new File(requireContext().getCacheDir(), "colosseum.jpg");
         final File image2File = new File(requireContext().getCacheDir(), "pyramid.jpg");
         final File image3File = new File(requireContext().getCacheDir(), "tajmahal.jpg");
-        final File videoFile = new File(videoPath);
+        final File videoFile = getVideoFile();
 
         String pipe1 = Config.registerNewFFmpegPipe(requireContext());
         String pipe2 = Config.registerNewFFmpegPipe(requireContext());
@@ -164,7 +153,7 @@ public class PipeTabFragment extends Fragment {
             ResourcesUtil.resourceToFile(getResources(), R.drawable.pyramid, image2File);
             ResourcesUtil.resourceToFile(getResources(), R.drawable.tajmahal, image3File);
 
-            final String ffmpegCommand = Video.generateCreateVideoWithPipesScript(pipe1, pipe2, pipe3, videoPath);
+            final String ffmpegCommand = Video.generateCreateVideoWithPipesScript(pipe1, pipe2, pipe3, videoFile.getAbsolutePath());
 
             Log.d(TAG, String.format("FFmpeg process started with arguments\n'%s'.", ffmpegCommand));
 
@@ -208,7 +197,7 @@ public class PipeTabFragment extends Fragment {
     protected void playVideo() {
         MediaController mediaController = new MediaController(requireContext());
         mediaController.setAnchorView(videoView);
-        videoView.setVideoURI(videoUri);
+        videoView.setVideoURI(Uri.parse("file://" + getVideoFile().getAbsolutePath()));
         videoView.setMediaController(mediaController);
         videoView.requestFocus();
         videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
@@ -233,30 +222,10 @@ public class PipeTabFragment extends Fragment {
         return new File(requireContext().getFilesDir(), "video.mp4");
     }
 
-    private void chooseOutputVideoAndCreate() {
-        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT)
-            .setType("video/*")
-            .putExtra(Intent.EXTRA_TITLE, "video.mp4")
-            .addCategory(Intent.CATEGORY_OPENABLE);
-        startActivityForResult(intent, REQUEST_CREATE_DOCUMENT);
-        backFromIntent = true;
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_CREATE_DOCUMENT && resultCode == MainActivity.RESULT_OK && data != null) {
-            videoUri = data.getData();
-            createVideo(Config.getSafParameterForReadAndWrite(requireContext(), videoUri));
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
-    }
-
     public void setActive() {
         Log.i(MainActivity.TAG, "Pipe Tab Activated");
         enableLogCallback();
         enableStatisticsCallback();
-        ((MainActivity)requireActivity()).enableSaf(false);
         Popup.show(requireContext(), getString(R.string.pipe_test_tooltip_text));
     }
 

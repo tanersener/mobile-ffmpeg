@@ -263,7 +263,6 @@ public class AudioTabFragment extends Fragment implements AdapterView.OnItemSele
         disableLogCallback();
         createAudioSample();
         enableLogCallback();
-        ((MainActivity)requireActivity()).enableSaf(true);
         Popup.show(requireContext(), getString(R.string.audio_test_tooltip_text));
     }
 
