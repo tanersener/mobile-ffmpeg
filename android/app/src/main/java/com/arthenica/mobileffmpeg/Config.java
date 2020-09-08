@@ -802,10 +802,12 @@ public class Config {
         }
 
         // workaround for https://issuetracker.google.com/issues/162440528: ANDROID_CREATE_DOCUMENT generating file names like "transcode.mp3 (2)"
-        if (displayName.lastIndexOf(' ') > displayName.lastIndexOf('.')) {
-            displayName = displayName.substring(0, displayName.lastIndexOf(' '));
+        if (displayName.lastIndexOf('.') > 0 && displayName.lastIndexOf(' ') > displayName.lastIndexOf('.')) {
+            String extension = displayName.substring(displayName.lastIndexOf('.'), displayName.lastIndexOf(' '));
+            displayName += extension;
         }
-        return "\"saf:" + fd + "/" + displayName + "\"";
+        // spaces can break argument list parsing, see https://github.com/alexcohn/mobile-ffmpeg/pull/1#issuecomment-688643836
+        return "saf:" + fd + "/" + displayName.replace(' ', ' ');
     }
 
     public static String getSafParameterForRead(Context context, Uri uri) {
