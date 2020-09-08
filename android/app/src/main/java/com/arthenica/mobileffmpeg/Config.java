@@ -781,16 +781,12 @@ public class Config {
     private static String getSafParameter(Context context, Uri uri, String openMode) {
 
         String displayName = "unknown";
-        final Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
-        try {
+        try (Cursor cursor = context.getContentResolver().query(uri, null, null, null, null)) {
             if (cursor != null && cursor.moveToFirst()) {
                 displayName = cursor.getString(cursor.getColumnIndex(DocumentsContract.Document.COLUMN_DISPLAY_NAME));
             }
         } catch (Throwable ex) {
             Log.e(TAG, "failed to get column", ex);
-        } finally {
-            if (cursor != null)
-                cursor.close();
         }
 
         int fd = -1;
