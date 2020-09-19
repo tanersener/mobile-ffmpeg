@@ -25,8 +25,10 @@
 #include "libavformat/avformat.h"
 #include "libavutil/avstring.h"
 
-#include "mobileffmpeg.h"
 #include "saf_wrapper.h"
+
+/** JNI wrapper in mobileffmpeg.c */
+void closeParcelFileDescriptor(int fd);
 
 // in these wrappers, we call the original functions, so we remove the shadow defines
 #undef avio_closep
@@ -51,7 +53,6 @@ static int64_t fd_seek(void *opaque, int64_t offset, int whence) {
     if (fd < 0) {
         return AVERROR(EINVAL);
     }
-    LOGD("fd_seek fd=%d %lld %d\n", fd, (long long)offset, whence);
 
     int64_t ret;
     if (whence == AVSEEK_SIZE) {
@@ -65,41 +66,35 @@ static int64_t fd_seek(void *opaque, int64_t offset, int whence) {
     return ret < 0 ? AVERROR(errno) : ret;
 }
 
-__thread char link_name_buf[1024];
-static const char *get_link_name(int fd) {
-        char path[1024];
-
-        sprintf(path, "/proc/self/fd/%d", fd);
-        int nbytes = readlink(path, link_name_buf, sizeof(link_name_buf));
-        link_name_buf[nbytes] = '\0';
-        return link_name_buf;
-}
-
-static AVIOContext *maybe_get_fd_avio_context(const char *filename, int write_flag) {
+/*
+ * returns NULL if the filename is not of expected format (e.g. 'saf:72/video.md4')
+ */
+static AVIOContext *create_fd_avio_context(const char *filename, int flags) {
     union {int fd; void* opaque;} fdunion;
     fdunion.fd = -1;
     const char *fd_ptr = NULL;
     if (av_strstart(filename, "saf:", &fd_ptr)) {
         char *final;
         fdunion.fd = strtol(fd_ptr, &final, 10);
-        if (fd_ptr == final) {/* No digits found */
+        if (fd_ptr == final) { /* No digits found */
             fdunion.fd = -1;
         }
     }
 
     if (fdunion.fd >= 0) {
-        LOGD("recovered fd=%d for %s. Size is %lld -> %s\n", fdunion.fd, write_flag ? "write" : "read", (long long)fd_seek(fdunion.opaque, 0, AVSEEK_SIZE), get_link_name(fdunion.fd));
+        int write_flag = flags & AVIO_FLAG_WRITE ? 1 : 0;
         return avio_alloc_context(av_malloc(4096), 4096, write_flag, fdunion.opaque, fd_read_packet, write_flag ? fd_write_packet : NULL, fd_seek);
     }
     return NULL;
 }
 
-static void release_fd_avio_contextp(AVIOContext **ctx) {
-    if (fd_seek((*ctx)->opaque, 0, AVSEEK_SIZE) >= 0) {
-        LOGD("release_fd_avio_context %p->%d\n", *ctx, (int)(*ctx)->opaque);
-        close((int)(*ctx)->opaque);
-        *ctx = NULL;
+static void close_fd_avio_context(AVIOContext *ctx) {
+    if (fd_seek(ctx->opaque, 0, AVSEEK_SIZE) >= 0) {
+        int fd = (int)ctx->opaque;
+        close(fd);
+        closeParcelFileDescriptor(fd);
     }
+    ctx->opaque = NULL;
 }
 
 int android_avformat_open_input(AVFormatContext **ps, const char *filename,
@@ -107,15 +102,17 @@ int android_avformat_open_input(AVFormatContext **ps, const char *filename,
     if (!(*ps) && !(*ps = avformat_alloc_context()))
         return AVERROR(ENOMEM);
 
-    (*ps)->pb = maybe_get_fd_avio_context(filename, 0);
+    (*ps)->pb = create_fd_avio_context(filename, AVIO_FLAG_READ);
 
     return avformat_open_input(ps, filename, fmt, options);
 }
 
 int android_avio_open2(AVIOContext **s, const char *filename, int flags,
                const AVIOInterruptCB *int_cb, AVDictionary **options) {
-    if ((*s = maybe_get_fd_avio_context(filename, (flags & AVIO_FLAG_WRITE) != 0 ? 1 : 0))) {
-        // for saf: pseudo-protocol, int_cb is silently ignored
+    AVIOContext *fd_context = create_fd_avio_context(filename, flags);
+
+    if (fd_context) {
+        *s = fd_context;
         return 0;
     }
     return avio_open2(s, filename, flags, int_cb, options);
@@ -126,13 +123,13 @@ int android_avio_open(AVIOContext **s, const char *url, int flags) {
 }
 
 int android_avio_closep(AVIOContext **s) {
-    release_fd_avio_contextp(s);
+    close_fd_avio_context(*s);
     return avio_closep(s);
 }
 
 void android_avformat_close_input(AVFormatContext **ps) {
     if (*ps && (*ps)->pb) {
-        release_fd_avio_contextp(&(*ps)->pb);
+        close_fd_avio_context((*ps)->pb);
     }
     avformat_close_input(ps);
 }

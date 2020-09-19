@@ -26,6 +26,7 @@ import android.os.Build;
 import android.os.ParcelFileDescriptor;
 import android.provider.DocumentsContract;
 import android.util.Log;
+import android.util.SparseArray;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -84,6 +85,7 @@ public class Config {
     private static int lastCreatedPipeIndex;
 
     private static final List<FFmpegExecution> executions;
+    private static SparseArray<ParcelFileDescriptor> pfdmap = new SparseArray<>();
 
     static {
 
@@ -792,7 +794,8 @@ public class Config {
         int fd = -1;
         try {
             ParcelFileDescriptor parcelFileDescriptor = context.getContentResolver().openFileDescriptor(uri, openMode);
-            fd = parcelFileDescriptor.detachFd();
+            fd = parcelFileDescriptor.getFd();
+            pfdmap.put(fd, parcelFileDescriptor);
         } catch (Throwable e) {
             Log.e(TAG, "obtaining " + openMode + " ParcelFileDescriptor for " + uri, e);
         }
@@ -813,5 +816,17 @@ public class Config {
 
     public static String getSafParameterForWrite(Context context, Uri uri) {
         return getSafParameter(context, uri, "w");
+    }
+
+    private static void closeParcelFileDescriptor(int fd) {
+        try {
+            ParcelFileDescriptor pfd = pfdmap.get(fd);
+            if (pfd != null) {
+                pfd.close();
+                pfdmap.delete(fd);
+            }
+        } catch (Throwable e) {
+            Log.e(TAG, "closeParcelFileDescriptor " + fd, e);
+        }
     }
 }

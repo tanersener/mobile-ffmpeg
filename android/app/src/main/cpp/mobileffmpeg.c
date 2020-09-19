@@ -79,6 +79,9 @@ static jmethodID logMethod;
 /** Global reference of statistics redirection method in Java */
 static jmethodID statisticsMethod;
 
+/** Global reference of closeParcelFileDescriptor method in Java */
+static jmethodID closeParcelFileDescriptorMethod;
+
 /** Global reference of String class in Java */
 static jclass stringClass;
 
@@ -655,6 +658,12 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_FALSE;
     }
 
+    closeParcelFileDescriptorMethod = (*env)->GetStaticMethodID(env, localConfigClass, "closeParcelFileDescriptor", "(I)V");
+    if (logMethod == NULL) {
+        LOGE("OnLoad thread failed to GetStaticMethodID for %s.\n", "closeParcelFileDescriptor");
+        return JNI_FALSE;
+    }
+
     stringConstructor = (*env)->GetMethodID(env, localStringClass, "<init>", "([BLjava/lang/String;)V");
     if (stringConstructor == NULL) {
         LOGE("OnLoad thread failed to GetMethodID for %s.\n", "<init>");
@@ -690,7 +699,7 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
  * @param object reference to the class on which this method is invoked
  * @param level log level
  */
-JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_Config_setNativeLogLevel(JNIEnv *env, jclass object, jint level) {
+    JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_Config_setNativeLogLevel(JNIEnv *env, jclass object, jint level) {
     configuredLogLevel = level;
 }
 
@@ -942,4 +951,13 @@ JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_Config_ignoreNativeSignal
     } else if (signum == SIGPIPE) {
         handleSIGPIPE = 0;
     }
+}
+
+/**
+ * used by saf_wrapper; is expected to be called from a Java thread, therefore we don't need attach/detach
+ */
+void closeParcelFileDescriptor(int fd) {
+    JNIEnv *env = NULL;
+    (*globalVm)->GetEnv(globalVm, (void**) &env, JNI_VERSION_1_6);
+    (*env)->CallStaticVoidMethod(env, configClass, closeParcelFileDescriptorMethod, fd);
 }
