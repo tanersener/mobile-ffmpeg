@@ -326,8 +326,8 @@ public class SafTabFragment extends Fragment {
                                 playVideo(outUri, new MediaPlayer.OnCompletionListener() {
                                     @Override
                                     public void onCompletion(MediaPlayer mediaPlayer) {
-                                        inUri = outUri;
-                                        runFFprobe();
+                                        videoView.setVisibility(View.GONE);
+                                        outputText.setVisibility(View.VISIBLE);
                                     }
                                 });
                             } else {
