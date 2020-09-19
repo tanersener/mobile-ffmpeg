@@ -102,7 +102,7 @@ public class SafTabFragment extends Fragment {
 
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT)
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT)
                         .setType("*/*")
                         .putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"image/*", "video/*", "audio/*"})
                         .addCategory(Intent.CATEGORY_OPENABLE);
