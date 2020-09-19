@@ -803,14 +803,15 @@ public class Config {
             displayName += extension;
         }
         // spaces can break argument list parsing, see https://github.com/alexcohn/mobile-ffmpeg/pull/1#issuecomment-688643836
-        return "saf:" + fd + "/" + displayName.replace(' ', (char)0xa0);
+        final char NBSP = (char)0xa0;
+        return "saf:" + fd + "/" + displayName.replace(' ', NBSP);
     }
 
     public static String getSafParameterForRead(Context context, Uri uri) {
         return getSafParameter(context, uri, "r");
     }
 
-    public static String getSafParameterForReadAndWrite(Context context, Uri uri) {
-        return getSafParameter(context, uri, "rw");
+    public static String getSafParameterForWrite(Context context, Uri uri) {
+        return getSafParameter(context, uri, "w");
     }
 }

@@ -58,7 +58,6 @@ import java.util.concurrent.Callable;
 import static android.app.Activity.RESULT_OK;
 import static com.arthenica.mobileffmpeg.Config.RETURN_CODE_SUCCESS;
 import static com.arthenica.mobileffmpeg.test.MainActivity.TAG;
-import static com.arthenica.mobileffmpeg.test.MainActivity.handler;
 
 public class SafTabFragment extends Fragment {
 
@@ -153,13 +152,13 @@ public class SafTabFragment extends Fragment {
 
         final String ffprobeCommand = "-hide_banner -print_format json -show_format -show_streams " + Config.getSafParameterForRead(getContext(), inUri);
 
-        Log.d(MainActivity.TAG, "Testing FFprobe COMMAND synchronously.");
+        Log.d(TAG, "Testing FFprobe COMMAND synchronously.");
 
-        Log.d(MainActivity.TAG, String.format("FFprobe process started with arguments\n\'%s\'", ffprobeCommand));
+        Log.d(TAG, String.format("FFprobe process started with arguments\n\'%s\'", ffprobeCommand));
 
         int result = FFprobe.execute(ffprobeCommand);
 
-        Log.d(MainActivity.TAG, String.format("FFprobe process exited with rc %d", result));
+        Log.d(TAG, String.format("FFprobe process exited with rc %d", result));
 
         if (result != 0) {
             Popup.show(requireContext(), "Command failed. Please check output for the details.");
@@ -177,10 +176,10 @@ public class SafTabFragment extends Fragment {
             runFFprobeButton.setEnabled(false);
             runFFmpegButton.setEnabled(false);
             outputText.setEnabled(false);
-            Log.i(MainActivity.TAG, "SAF Tab Dectivated");
+            Log.i(TAG, "SAF Tab Dectivated");
             return;
         }
-        Log.i(MainActivity.TAG, "SAF Tab Activated");
+        Log.i(TAG, "SAF Tab Activated");
         enableLogCallback();
         enableStatisticsCallback();
         Popup.show(requireContext(), getString(R.string.saf_test_tooltip_text));
@@ -199,7 +198,7 @@ public class SafTabFragment extends Fragment {
         backFromIntent = true;
         if (requestCode == REQUEST_SAF_FFPROBE && resultCode == RESULT_OK && data != null) {
             inUri = data.getData();
-            handler.post(new Runnable() {
+            MainActivity.handler.post(new Runnable() {
                 @Override
                 public void run() {
                     runFFprobe();
@@ -207,7 +206,7 @@ public class SafTabFragment extends Fragment {
             });
         } else if (requestCode == REQUEST_SAF_FFMPEG && resultCode == MainActivity.RESULT_OK && data != null) {
             outUri = data.getData();
-            handler.post(new Runnable() {
+            MainActivity.handler.post(new Runnable() {
                 @Override
                 public void run() {
                     encodeVideo();
@@ -284,7 +283,7 @@ public class SafTabFragment extends Fragment {
         final File image1File = new File(requireContext().getCacheDir(), "colosseum.jpg");
         final File image2File = new File(requireContext().getCacheDir(), "pyramid.jpg");
         final File image3File = new File(requireContext().getCacheDir(), "tajmahal.jpg");
-        final String videoPath = Config.getSafParameterForReadAndWrite(requireContext(), outUri);
+        final String videoPath = Config.getSafParameterForWrite(requireContext(), outUri);
 
         try {
             // IF VIDEO IS PLAYING STOP PLAYBACK
@@ -324,7 +323,13 @@ public class SafTabFragment extends Fragment {
                         public Object call() {
                             if (returnCode == RETURN_CODE_SUCCESS) {
                                 Log.d(TAG, "Encode completed successfully; playing video.");
-                                playVideo();
+                                playVideo(outUri, new MediaPlayer.OnCompletionListener() {
+                                    @Override
+                                    public void onCompletion(MediaPlayer mediaPlayer) {
+                                        inUri = outUri;
+                                        runFFprobe();
+                                    }
+                                });
                             } else {
                                 Popup.show(requireContext(), "Encode failed. Please check log for the details.");
                                 Log.d(TAG, String.format("Encode failed with rc=%d.", returnCode));
@@ -344,13 +349,13 @@ public class SafTabFragment extends Fragment {
         }
     }
 
-    private void playVideo() {
+    private void playVideo(Uri videoUri, MediaPlayer.OnCompletionListener onCompletionListener) {
         videoView.setVisibility(View.VISIBLE);
         outputText.setVisibility(View.GONE);
 
         MediaController mediaController = new MediaController(requireContext());
         mediaController.setAnchorView(videoView);
-        videoView.setVideoURI(outUri);
+        videoView.setVideoURI(videoUri);
         videoView.setMediaController(mediaController);
         videoView.requestFocus();
         videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
@@ -368,18 +373,7 @@ public class SafTabFragment extends Fragment {
                 return false;
             }
         });
-        videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-              @Override
-              public void onCompletion(MediaPlayer mediaPlayer) {
-                  inUri = outUri;
-                  handler.post(new Runnable() {
-                      @Override
-                      public void run() {
-                          runFFprobe();
-                      }
-                  });
-              }
-        });
+        videoView.setOnCompletionListener(onCompletionListener);
         videoView.start();
     }
 
