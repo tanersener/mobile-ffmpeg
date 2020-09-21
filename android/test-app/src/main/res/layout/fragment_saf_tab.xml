@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    tools:context=".SafTabFragment">
+
+    <Button
+        android:id="@+id/runFFmpegButton"
+        android:layout_width="140dp"
+        android:layout_height="36dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/rounded_button"
+        android:fontFamily="sans-serif"
+        android:gravity="center"
+        android:text="@string/command_run_ffmpeg_button_text"
+        android:textAlignment="center"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        tools:targetApi="jelly_bean" />
+
+    <Button
+        android:id="@+id/runFFprobeButton"
+        android:layout_width="140dp"
+        android:layout_height="36dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/rounded_button"
+        android:fontFamily="sans-serif"
+        android:gravity="center"
+        android:text="@string/command_run_ffprobe_button_text"
+        android:textAlignment="center"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        tools:targetApi="jelly_bean" />
+
+    <TextView
+        android:id="@+id/outputText"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="6dp"
+        android:layout_marginBottom="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/rounded_output_frame"
+        android:fontFamily="sans-serif"
+        android:gravity="bottom"
+        android:overScrollMode="ifContentScrolls"
+        android:scrollbars="vertical"
+        android:textColor="@android:color/black"
+        android:textSize="14sp"
+        android:typeface="sans"
+        tools:targetApi="jelly_bean" />
+
+    <VideoView
+        android:visibility="gone"
+        android:id="@+id/videoPlayerFrame"
+        android:layout_width="wrap_content"
+        android:background="@drawable/rounded_video_frame"
+        android:layout_height="0dp"
+        android:layout_gravity="bottom"
+        android:layout_margin="20dp"
+        android:layout_weight="1" />
+
+</LinearLayout>

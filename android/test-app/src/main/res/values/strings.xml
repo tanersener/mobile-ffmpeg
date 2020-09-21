@@ -8,6 +8,7 @@
     <string name="vidstab_tab">VID.STAB</string>
     <string name="pipe_tab">PIPE</string>
     <string name="concurrent_tab">CONCURRENT</string>
+    <string name="saf_tab">SAF</string>
     <string name="command_text_input_placeholder">Enter command</string>
     <string name="command_run_ffmpeg_button_text">RUN FFMPEG</string>
     <string name="command_run_ffprobe_button_text">RUN FFPROBE</string>

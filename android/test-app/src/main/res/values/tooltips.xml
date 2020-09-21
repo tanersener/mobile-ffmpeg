@@ -7,4 +7,5 @@
     <string name="vidstab_test_tooltip_text">Click the button to stabilize video. Original video will play above and stabilized video will play below</string>
     <string name="pipe_test_tooltip_text">Click the button to create a video using pipe redirection. Created video will play inside the frame below</string>
     <string name="concurrent_execution_test_tooltip_text">Use ENCODE and CANCEL buttons to start/stop multiple execution</string>
+    <string name="saf_test_tooltip_text">Use system file picker to test scoped storage extension</string>
 </resources>

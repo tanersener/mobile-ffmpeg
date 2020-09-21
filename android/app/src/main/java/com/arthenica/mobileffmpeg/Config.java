@@ -20,8 +20,13 @@
 package com.arthenica.mobileffmpeg;
 
 import android.content.Context;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Build;
+import android.os.ParcelFileDescriptor;
+import android.provider.DocumentsContract;
 import android.util.Log;
+import android.util.SparseArray;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -80,6 +85,7 @@ public class Config {
     private static int lastCreatedPipeIndex;
 
     private static final List<FFmpegExecution> executions;
+    private static SparseArray<ParcelFileDescriptor> pfdmap = new SparseArray<>();
 
     static {
 
@@ -769,4 +775,58 @@ public class Config {
      */
     private native static void ignoreNativeSignal(final int signum);
 
+    /**
+     * <p>Convert Structured Access Framework Uri (<code></code>"content:…"</code>) for MobileFfmpeg.
+     *
+     * @return String can be passed to FFmpeg or FFprobe
+     */
+    private static String getSafParameter(Context context, Uri uri, String openMode) {
+
+        String displayName = "unknown";
+        try (Cursor cursor = context.getContentResolver().query(uri, null, null, null, null)) {
+            if (cursor != null && cursor.moveToFirst()) {
+                displayName = cursor.getString(cursor.getColumnIndex(DocumentsContract.Document.COLUMN_DISPLAY_NAME));
+            }
+        } catch (Throwable ex) {
+            Log.e(TAG, "failed to get column", ex);
+        }
+
+        int fd = -1;
+        try {
+            ParcelFileDescriptor parcelFileDescriptor = context.getContentResolver().openFileDescriptor(uri, openMode);
+            fd = parcelFileDescriptor.getFd();
+            pfdmap.put(fd, parcelFileDescriptor);
+        } catch (Throwable e) {
+            Log.e(TAG, "obtaining " + openMode + " ParcelFileDescriptor for " + uri, e);
+        }
+
+        // workaround for https://issuetracker.google.com/issues/162440528: ANDROID_CREATE_DOCUMENT generating file names like "transcode.mp3 (2)"
+        if (displayName.lastIndexOf('.') > 0 && displayName.lastIndexOf(' ') > displayName.lastIndexOf('.')) {
+            String extension = displayName.substring(displayName.lastIndexOf('.'), displayName.lastIndexOf(' '));
+            displayName += extension;
+        }
+        // spaces can break argument list parsing, see https://github.com/alexcohn/mobile-ffmpeg/pull/1#issuecomment-688643836
+        final char NBSP = (char)0xa0;
+        return "saf:" + fd + "/" + displayName.replace(' ', NBSP);
+    }
+
+    public static String getSafParameterForRead(Context context, Uri uri) {
+        return getSafParameter(context, uri, "r");
+    }
+
+    public static String getSafParameterForWrite(Context context, Uri uri) {
+        return getSafParameter(context, uri, "w");
+    }
+
+    private static void closeParcelFileDescriptor(int fd) {
+        try {
+            ParcelFileDescriptor pfd = pfdmap.get(fd);
+            if (pfd != null) {
+                pfd.close();
+                pfdmap.delete(fd);
+            }
+        } catch (Throwable e) {
+            Log.e(TAG, "closeParcelFileDescriptor " + fd, e);
+        }
+    }
 }
