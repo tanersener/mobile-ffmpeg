@@ -261,8 +261,6 @@ public class VideoTabFragment extends Fragment implements AdapterView.OnItemSele
     }
 
     public String getSelectedVideoCodec() {
-
-        // NOTE THAT MPEG4 CODEC IS ASSIGNED HERE
         String videoCodec = selectedCodec;
 
         // VIDEO CODEC SPINNER HAS BASIC NAMES, FFMPEG NEEDS LONGER AND EXACT CODEC NAMES.

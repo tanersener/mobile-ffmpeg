@@ -64,7 +64,7 @@ public class HttpsTabFragment extends Fragment {
 
             @Override
             public void onClick(View v) {
-                getInfo();
+                runGetMediaInformation();
             }
         });
 
@@ -99,7 +99,7 @@ public class HttpsTabFragment extends Fragment {
         });
     }
 
-    public void getInfo() {
+    public void runGetMediaInformation() {
         clearLog();
 
         String testUrl = urlText.getText().toString();

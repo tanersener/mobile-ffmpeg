@@ -224,7 +224,7 @@ public class SubtitleTabFragment extends Fragment {
                 }
             });
 
-            Log.d(TAG, String.format("FFmpeg started execution id: %d.", executionId));
+            Log.d(TAG, String.format("Async FFmpeg process started with executionId %d.", executionId));
 
         } catch (IOException e) {
             Log.e(TAG, String.format("Burn subtitles failed %s.", Exceptions.getStackTraceString(e)));

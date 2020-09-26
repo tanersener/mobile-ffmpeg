@@ -198,7 +198,7 @@ public class AudioTabFragment extends Fragment implements AdapterView.OnItemSele
 
         String ffmpegCommand = String.format("-hide_banner -y -f lavfi -i sine=frequency=1000:duration=5 -c:a pcm_s16le %s", audioSampleFile.getAbsolutePath());
 
-        android.util.Log.d(TAG, String.format("Sample file is created with '%s'.", ffmpegCommand));
+        android.util.Log.d(TAG, String.format("Creating audio sample with '%s'.", ffmpegCommand));
 
         int result = FFmpeg.execute(ffmpegCommand);
         if (result == 0) {
