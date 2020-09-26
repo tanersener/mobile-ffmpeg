@@ -986,7 +986,7 @@ if [[ -n ${MOBILE_FFMPEG_LTS_BUILD} ]] && [[ "${DETECTED_IOS_SDK_VERSION}" != "$
 fi
 
 # DISABLE 32-bit architectures on newer IOS versions
-if [[ ${DETECTED_IOS_SDK_VERSION} == 11* ]] || [[ ${DETECTED_IOS_SDK_VERSION} == 12* ]] || [[ ${DETECTED_IOS_SDK_VERSION} == 13* ]]; then
+if [[ ${DETECTED_IOS_SDK_VERSION} == 11* ]] || [[ ${DETECTED_IOS_SDK_VERSION} == 12* ]] || [[ ${DETECTED_IOS_SDK_VERSION} == 13* ]] || [[ ${DETECTED_IOS_SDK_VERSION} == 14* ]]; then
   if [[ -z ${BUILD_FORCE} ]] && [[ ${ENABLED_ARCHITECTURES[${ARCH_ARMV7}]} -eq 1 ]]; then
     echo -e "INFO: Disabled armv7 architecture which is not supported on SDK ${DETECTED_IOS_SDK_VERSION}\n" 1>>"${BASEDIR}/build.log" 2>&1
     disable_arch "armv7"
@@ -1009,7 +1009,7 @@ elif [[ ${DETECTED_IOS_SDK_VERSION} != 10* ]]; then
 fi
 
 # DISABLE x86-64-mac-catalyst architecture on IOS versions lower than 13
-if [[ ${DETECTED_IOS_SDK_VERSION} != 13* ]] && [[ -z ${BUILD_FORCE} ]] && [[ ${ENABLED_ARCHITECTURES[${ARCH_X86_64_MAC_CATALYST}]} -eq 1 ]]; then
+if [[ ${DETECTED_IOS_SDK_VERSION} != 13* || ${DETECTED_IOS_SDK_VERSION} != 14* ]] && [[ -z ${BUILD_FORCE} ]] && [[ ${ENABLED_ARCHITECTURES[${ARCH_X86_64_MAC_CATALYST}]} -eq 1 ]]; then
   echo -e "INFO: Disabled x86-64-mac-catalyst architecture which is not supported on SDK ${DETECTED_IOS_SDK_VERSION}\n" 1>>"${BASEDIR}/build.log" 2>&1
   disable_arch "x86-64-mac-catalyst"
 fi
