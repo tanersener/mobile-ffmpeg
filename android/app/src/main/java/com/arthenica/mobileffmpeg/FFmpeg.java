@@ -139,7 +139,8 @@ public class FFmpeg {
      * @return returns a unique id that represents this execution
      */
     public static long executeAsync(final String command, final ExecuteCallback executeCallback) {
-        final long newExecutionId = executionIdCounter.incrementAndGet();
+//        final long newExecutionId = executionIdCounter.incrementAndGet();
+        final long newExecutionId = System.currentTimeMillis()
 
         AsyncFFmpegExecuteTask asyncFFmpegExecuteTask = new AsyncFFmpegExecuteTask(newExecutionId, command, executeCallback);
         asyncFFmpegExecuteTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
