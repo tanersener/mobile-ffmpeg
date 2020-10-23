@@ -10,67 +10,113 @@ let package = Package(
             name: "Mobile-FFmpeg-Full-GPL-4.4-IOS-XCFramework",
             targets: ["Mobile-FFmpeg-Full-GPL-4.4-IOS-XCFramework"]),
     ],
-    dependencies: [
-        // Dependencies declare other packages that this package depends on.
-        // .package(url: /* package url */, from: "1.0.0"),
-    ],
+    dependencies: [],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
             name: "Mobile-FFmpeg-Full-GPL-4.4-IOS-XCFramework",
-            dependencies: []),
+            dependencies: [
+                "expat",
+                "fontconfig",
+                "freetype",
+                "fribidi",
+                "giflib",
+                "gmp",
+                "gnutls",
+                "jpeg",
+                "kvazaar",
+                "lame",
+                "libaom",
+                "libass",
+                "libavcodec",
+                "libavdevice",
+                "libavfilter",
+                "libavformat",
+                "libavutil",
+                "libhogweed",
+                "libilbc",
+                "libnettle",
+                "libogg",
+                "libopencore-amrnb",
+                "libpng",
+                "libsndfile",
+                "libswresample",
+                "libswscale",
+                "libtheora",
+                "libtheoradec",
+                "libtheoraenc",
+                "libvidstab",
+                "libvorbis",
+                "libvorbisenc",
+                "libvpx",
+                "libwebp",
+                "libwebpdemux",
+                "libxml2",
+                "mobileffmpeg",
+                "opus",
+                "shine",
+                "snappy",
+                "soxr",
+                "speex",
+                "tiff",
+                "twolame",
+                "vo-amrwbenc",
+                "wavpack",
+                "x264",
+                "x265",
+                "xvidcore"]),
+        .binaryTarget(name: "expat", path: "full-gpl-4.4-ios-xcframework/expat.xcframework"),
+        .binaryTarget(name: "fontconfig", path: "full-gpl-4.4-ios-xcframework/fontconfig.xcframework"),
+        .binaryTarget(name: "freetype", path: "full-gpl-4.4-ios-xcframework/freetype.xcframework"),
+        .binaryTarget(name: "fribidi", path: "full-gpl-4.4-ios-xcframework/fribidi.xcframework"),
+        .binaryTarget(name: "giflib", path: "full-gpl-4.4-ios-xcframework/giflib.xcframework"),
+        .binaryTarget(name: "gmp", path: "full-gpl-4.4-ios-xcframework/gmp.xcframework"),
+        .binaryTarget(name: "gnutls", path: "full-gpl-4.4-ios-xcframework/gnutls.xcframework"),
+        .binaryTarget(name: "jpeg", path: "full-gpl-4.4-ios-xcframework/jpeg.xcframework"),
+        .binaryTarget(name: "kvazaar", path: "full-gpl-4.4-ios-xcframework/kvazaar.xcframework"),
+        .binaryTarget(name: "lame", path: "full-gpl-4.4-ios-xcframework/lame.xcframework"),
+        .binaryTarget(name: "libaom", path: "full-gpl-4.4-ios-xcframework/libaom.xcframework"),
+        .binaryTarget(name: "libass", path: "full-gpl-4.4-ios-xcframework/libass.xcframework"),
+        .binaryTarget(name: "libavcodec", path: "full-gpl-4.4-ios-xcframework/libavcodec.xcframework"),
+        .binaryTarget(name: "libavdevice", path: "full-gpl-4.4-ios-xcframework/libavdevice.xcframework"),
+        .binaryTarget(name: "libavfilter", path: "full-gpl-4.4-ios-xcframework/libavfilter.xcframework"),
+        .binaryTarget(name: "libavformat", path: "full-gpl-4.4-ios-xcframework/libavformat.xcframework"),
+        .binaryTarget(name: "libavutil", path: "full-gpl-4.4-ios-xcframework/libavutil.xcframework"),
+        .binaryTarget(name: "libhogweed", path: "full-gpl-4.4-ios-xcframework/libhogweed.xcframework"),
+        .binaryTarget(name: "libilbc", path: "full-gpl-4.4-ios-xcframework/libilbc.xcframework"),
+        .binaryTarget(name: "libnettle", path: "full-gpl-4.4-ios-xcframework/libnettle.xcframework"),
+        .binaryTarget(name: "libogg", path: "full-gpl-4.4-ios-xcframework/libogg.xcframework"),
+        .binaryTarget(name: "libopencore-amrnb", path: "full-gpl-4.4-ios-xcframework/libopencore-amrnb.xcframework"),
+        .binaryTarget(name: "libpng", path: "full-gpl-4.4-ios-xcframework/libpng.xcframework"),
+        .binaryTarget(name: "libsndfile", path: "full-gpl-4.4-ios-xcframework/libsndfile.xcframework"),
+        .binaryTarget(name: "libswresample", path: "full-gpl-4.4-ios-xcframework/libswresample.xcframework"),
+        .binaryTarget(name: "libswscale", path: "full-gpl-4.4-ios-xcframework/libswscale.xcframework"),
+        .binaryTarget(name: "libtheora", path: "full-gpl-4.4-ios-xcframework/libtheora.xcframework"),
+        .binaryTarget(name: "libtheoradec", path: "full-gpl-4.4-ios-xcframework/libtheoradec.xcframework"),
+        .binaryTarget(name: "libtheoraenc", path: "full-gpl-4.4-ios-xcframework/libtheoraenc.xcframework"),
+        .binaryTarget(name: "libvidstab", path: "full-gpl-4.4-ios-xcframework/libvidstab.xcframework"),
+        .binaryTarget(name: "libvorbis", path: "full-gpl-4.4-ios-xcframework/libvorbis.xcframework"),
+        .binaryTarget(name: "libvorbisenc", path: "full-gpl-4.4-ios-xcframework/libvorbisenc.xcframework"),
+        .binaryTarget(name: "libvpx", path: "full-gpl-4.4-ios-xcframework/libvpx.xcframework"),
+        .binaryTarget(name: "libwebp", path: "full-gpl-4.4-ios-xcframework/libwebp.xcframework"),
+        .binaryTarget(name: "libwebpdemux", path: "full-gpl-4.4-ios-xcframework/libwebpdemux.xcframework"),
+        .binaryTarget(name: "libxml2", path: "full-gpl-4.4-ios-xcframework/libxml2.xcframework"),
+        .binaryTarget(name: "mobileffmpeg", path: "full-gpl-4.4-ios-xcframework/mobileffmpeg.xcframework"),
+        .binaryTarget(name: "opus", path: "full-gpl-4.4-ios-xcframework/opus.xcframework"),
+        .binaryTarget(name: "shine", path: "full-gpl-4.4-ios-xcframework/shine.xcframework"),
+        .binaryTarget(name: "snappy", path: "full-gpl-4.4-ios-xcframework/snappy.xcframework"),
+        .binaryTarget(name: "soxr", path: "full-gpl-4.4-ios-xcframework/soxr.xcframework"),
+        .binaryTarget(name: "speex", path: "full-gpl-4.4-ios-xcframework/speex.xcframework"),
+        .binaryTarget(name: "tiff", path: "full-gpl-4.4-ios-xcframework/tiff.xcframework"),
+        .binaryTarget(name: "twolame", path: "full-gpl-4.4-ios-xcframework/twolame.xcframework"),
+        .binaryTarget(name: "vo-amrwbenc", path: "full-gpl-4.4-ios-xcframework/vo-amrwbenc.xcframework"),
+        .binaryTarget(name: "wavpack", path: "full-gpl-4.4-ios-xcframework/wavpack.xcframework"),
+        .binaryTarget(name: "x264", path: "full-gpl-4.4-ios-xcframework/x264.xcframework"),
+        .binaryTarget(name: "x265", path: "full-gpl-4.4-ios-xcframework/x265.xcframework"),
+        .binaryTarget(name: "xvidcore", path: "full-gpl-4.4-ios-xcframework/xvidcore.xcframework"),
         .testTarget(
             name: "Mobile-FFmpeg-Full-GPL-4.4-IOS-XCFrameworkTests",
             dependencies: ["Mobile-FFmpeg-Full-GPL-4.4-IOS-XCFramework"]),
     ]
 )
-// .binaryTarget(name: "Crypto", path: "full-gpl-4.4-ios-xcframework/expat.xcframework")
-// .binaryTarget(name: "Crypto", path: "full-gpl-4.4-ios-xcframework/fontconfig.xcframework")
-// .binaryTarget(name: "Crypto", path: "full-gpl-4.4-ios-xcframework/freetype.xcframework")
-// .binaryTarget(name: "Crypto", path: "full-gpl-4.4-ios-xcframework/fribidi.xcframework")
-// .binaryTarget(name: "Crypto", path: "full-gpl-4.4-ios-xcframework/giflib.xcframework")
-// .binaryTarget(name: "Crypto", path: "full-gpl-4.4-ios-xcframework/gmp.xcframework")
-// .binaryTarget(name: "Crypto", path: "full-gpl-4.4-ios-xcframework/gnutls.xcframework")
-// .binaryTarget(name: "Crypto", path: "full-gpl-4.4-ios-xcframework/jpeg.xcframework")
-// .binaryTarget(name: "Crypto", path: "full-gpl-4.4-ios-xcframework/kvazaar.xcframework")
-// .binaryTarget(name: "Crypto", path: "full-gpl-4.4-ios-xcframework/lame.xcframework")
-// .binaryTarget(name: "Crypto", path: "full-gpl-4.4-ios-xcframework/libaom.xcframework")
-// .binaryTarget(name: "Crypto", path: "full-gpl-4.4-ios-xcframework/libass.xcframework")
-// .binaryTarget(name: "Crypto", path: "full-gpl-4.4-ios-xcframework/libavcodec.xcframework")
-// .binaryTarget(name: "Crypto", path: "full-gpl-4.4-ios-xcframework/libavdevice.xcframework")
-// .binaryTarget(name: "Crypto", path: "full-gpl-4.4-ios-xcframework/libavfilter.xcframework")
-// .binaryTarget(name: "Crypto", path: "full-gpl-4.4-ios-xcframework/libavformat.xcframework")
-// .binaryTarget(name: "Crypto", path: "full-gpl-4.4-ios-xcframework/libavutil.xcframework")
-// .binaryTarget(name: "Crypto", path: "full-gpl-4.4-ios-xcframework/libhogweed.xcframework")
-// .binaryTarget(name: "Crypto", path: "full-gpl-4.4-ios-xcframework/liblibc.xcframework")
-// .binaryTarget(name: "Crypto", path: "full-gpl-4.4-ios-xcframework/libnettle.xcframework")
-// .binaryTarget(name: "Crypto", path: "full-gpl-4.4-ios-xcframework/libogg.xcframework")
-// .binaryTarget(name: "Crypto", path: "full-gpl-4.4-ios-xcframework/libopencore-ammb.xcframework")
-// .binaryTarget(name: "Crypto", path: "full-gpl-4.4-ios-xcframework/libpng.xcframework")
-// .binaryTarget(name: "Crypto", path: "full-gpl-4.4-ios-xcframework/libsndfile.xcframework")
-// .binaryTarget(name: "Crypto", path: "full-gpl-4.4-ios-xcframework/libswresample.xcframework")
-// .binaryTarget(name: "Crypto", path: "full-gpl-4.4-ios-xcframework/libswscale.xcframework")
-// .binaryTarget(name: "Crypto", path: "full-gpl-4.4-ios-xcframework/libtheora.xcframework")
-// .binaryTarget(name: "Crypto", path: "full-gpl-4.4-ios-xcframework/libtheoradec.xcframework")
-// .binaryTarget(name: "Crypto", path: "full-gpl-4.4-ios-xcframework/libtheoraenc.xcframework")
-// .binaryTarget(name: "Crypto", path: "full-gpl-4.4-ios-xcframework/libvidstab.xcframework")
-// .binaryTarget(name: "Crypto", path: "full-gpl-4.4-ios-xcframework/libvorbis.xcframework")
-// .binaryTarget(name: "Crypto", path: "full-gpl-4.4-ios-xcframework/libvorbisenc.xcframework")
-// .binaryTarget(name: "Crypto", path: "full-gpl-4.4-ios-xcframework/libvpx.xcframework")
-// .binaryTarget(name: "Crypto", path: "full-gpl-4.4-ios-xcframework/libwebp.xcframework")
-// .binaryTarget(name: "Crypto", path: "full-gpl-4.4-ios-xcframework/libwebpdemux.xcframework")
-// .binaryTarget(name: "Crypto", path: "full-gpl-4.4-ios-xcframework/xml2.xcframework")
-// .binaryTarget(name: "Crypto", path: "full-gpl-4.4-ios-xcframework/mobileffmpeg.xcframework")
-// .binaryTarget(name: "Crypto", path: "full-gpl-4.4-ios-xcframework/opus.xcframework")
-// .binaryTarget(name: "Crypto", path: "full-gpl-4.4-ios-xcframework/shine.xcframework")
-// .binaryTarget(name: "Crypto", path: "full-gpl-4.4-ios-xcframework/snappy.xcframework")
-// .binaryTarget(name: "Crypto", path: "full-gpl-4.4-ios-xcframework/soxr.xcframework")
-// .binaryTarget(name: "Crypto", path: "full-gpl-4.4-ios-xcframework/speex.xcframework")
-// .binaryTarget(name: "Crypto", path: "full-gpl-4.4-ios-xcframework/tiff.xcframework")
-// .binaryTarget(name: "Crypto", path: "full-gpl-4.4-ios-xcframework/twolame.xcframework")
-// .binaryTarget(name: "Crypto", path: "full-gpl-4.4-ios-xcframework/vo-amrwbenc.xcframework")
-// .binaryTarget(name: "Crypto", path: "full-gpl-4.4-ios-xcframework/wavpack.xcframework")
-// .binaryTarget(name: "Crypto", path: "full-gpl-4.4-ios-xcframework/x264.xcframework")
-// .binaryTarget(name: "Crypto", path: "full-gpl-4.4-ios-xcframework/x265.xcframework")
-// .binaryTarget(name: "Crypto", path: "full-gpl-4.4-ios-xcframework/xvidcore.xcframework")
