@@ -1,0 +1,19 @@
+framework module mobileffmpeg {
+
+  header "ArchDetect.h"
+  header "AtomicLong.h"
+  header "ExecuteDelegate.h"
+  header "FFmpegExecution.h"
+  header "LogDelegate.h"
+  header "MediaInformation.h"
+  header "MediaInformationParser.h"
+  header "MobileFFmpeg.h"
+  header "MobileFFmpegConfig.h"
+  header "MobileFFprobe.h"
+  header "Statistics.h"
+  header "StatisticsDelegate.h"
+  header "StreamInformation.h"
+  header "mobileffmpeg_exception.h"
+
+  export *
+}
