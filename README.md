@@ -155,12 +155,12 @@ Please remember that some parts of `FFmpeg` are licensed under the `GPL` and onl
 
         @Override
         public void apply(final long executionId, final int returnCode) {
-            if (rc == RETURN_CODE_SUCCESS) {
+            if (returnCode == RETURN_CODE_SUCCESS) {
                 Log.i(Config.TAG, "Async command execution completed successfully.");
-            } else if (rc == RETURN_CODE_CANCEL) {
+            } else if (returnCode == RETURN_CODE_CANCEL) {
                 Log.i(Config.TAG, "Async command execution cancelled by user.");
             } else {
-                Log.i(Config.TAG, String.format("Async command execution failed with rc=%d.", rc));
+                Log.i(Config.TAG, String.format("Async command execution failed with returnCode=%d.", returnCode));
             }
         }
     });
