@@ -349,7 +349,7 @@ download_gpl_library_source() {
 
 get_cpu_count() {
   if [ "$(uname)" == "Darwin" ]; then
-    echo $(sysctl -n hw.physicalcpu)
+    echo $(sysctl -n hw.logicalcpu)
   else
     echo $(nproc)
   fi

@@ -1,0 +1,14 @@
+module Cfftools [system][extern_c] {
+
+   header "fftools_ffmpeg.h"
+   header "fftools_cmdutils.h"
+   header "mobileffmpeg_exception.h"
+   
+   link "ffmpeg"
+
+   requires objc
+   
+   export *
+   
+}
+

@@ -38,12 +38,12 @@ FFmpeg for Android, iOS and tvOS
 #### 1.2 iOS
 - Builds `armv7`, `armv7s`, `arm64`, `arm64e`, `i386`, `x86_64` and `x86_64` (Mac Catalyst) architectures
 - Supports `bzip2`, `iconv`, `libuuid`, `zlib` system libraries and `AudioToolbox`, `VideoToolbox`, `AVFoundation` system frameworks
-- Objective-C API
+- Swift API
 - Camera access
-- `ARC` enabled library
 - Built with `-fembed-bitcode` flag
-- Creates static frameworks, static xcframeworks and static universal (fat) libraries (.a)
-- Supports `iOS SDK 9.3` or later
+- Creates static frameworks and static xcframeworks
+- Supports `iOS SDK 14.0` or later and `macOS SDK 11.0` or later
+- Supports `Apple Silicon`
  
 #### 1.3 tvOS
 - Builds `arm64` and `x86_64` architectures
@@ -271,134 +271,109 @@ Please remember that some parts of `FFmpeg` are licensed under the `GPL` and onl
 
 2. Execute synchronous FFmpeg commands.
     ```
-    #import <mobileffmpeg/MobileFFmpegConfig.h>
-    #import <mobileffmpeg/MobileFFmpeg.h>
+    import MobileFFmpeg
+    import MobileFFmpeg
 
-    int rc = [MobileFFmpeg execute: @"-i file1.mp4 -c:v mpeg4 file2.mp4"];
-   
-    if (rc == RETURN_CODE_SUCCESS) {
-        NSLog(@"Command execution completed successfully.\n");
-    } else if (rc == RETURN_CODE_CANCEL) {
-        NSLog(@"Command execution cancelled by user.\n");
-    } else {
-        NSLog(@"Command execution failed with rc=%d and output=%@.\n", rc, [MobileFFmpegConfig getLastCommandOutput]);
+    let ffmpegSession = FFmpegSession(withCommand: "-i file1.mp4 -c:v mpeg4 file2.mp4")
+    ffmpegSession.execute { rc, log, error in
+        if (rc == RETURN_CODE_SUCCESS) {
+            NSLog(log)
+        } else if (rc == RETURN_CODE_CANCEL) {
+            NSLog("Command execution cancelled by user.\n")
+        } else {
+            NSLog(error?.localizedDescription)
+        }
     }
     ```
 
 3. Execute asynchronous FFmpeg commands.
     ```
-    #import <mobileffmpeg/MobileFFmpegConfig.h>
-    #import <mobileffmpeg/MobileFFmpeg.h>
+    import MobileFFmpeg
+    import MobileFFmpeg
+    
+    let ffmpegSession = FFmpegSession(withCommand: "-i file1.mp4 -c:v mpeg4 file2.mp4")
+    
+    ffmpegSession.executeAsync()
 
-    long executionId = [MobileFFmpeg executeAsync:@"-i file1.mp4 -c:v mpeg4 file2.mp4" withCallback:self];
+    ...
+    To check the log output, you can attach a subscriber to the property lastLogOutput, or add an observer using KVO.
 
-    - (void)executeCallback:(long)executionId :(int)returnCode {
-        if (rc == RETURN_CODE_SUCCESS) {
-            NSLog(@"Async command execution completed successfully.\n");
-        } else if (rc == RETURN_CODE_CANCEL) {
-            NSLog(@"Async command execution cancelled by user.\n");
-        } else {
-            NSLog(@"Async command execution failed with rc=%d.\n", rc);
-        }
-    }
-    ```
+    let cancellable  = ffmpegSession.$lastLogOutput
+                            .sink { logData in
+                                NSLog(logData)
+                            }
+    
+    similarly, to obtain the session statistics, you can attach a Combine subscriber or add an observer using KVO.
+
+    example Combine Subscriber:
+    let cancellable1 = ffmpegSession.$statistics
+                                        .sink { statistics in
+                                                NSLog("Progress: \(statistics.progress)")
+                                              }
+    
+    example using KVO:
+    ffmpegSession.addObserver(self, forKeyPath: "statistics", options: [.new], context: &context) // register the observer
+    ...       
+    // observer must implement the key-value observing method
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        guard let session = object as? FFmpegSession else { return }
+        NSLog(session.statistics.progress.localizedAdditionalDescription)
+    }                        
+    ...                                          
 
 4. Execute FFprobe commands.
     ```
-    #import <mobileffmpeg/MobileFFmpegConfig.h>
-    #import <mobileffmpeg/MobileFFprobe.h>
-
-    int rc = [MobileFFprobe execute: @"-i file1.mp4"];
-   
-    if (rc == RETURN_CODE_SUCCESS) {
-        NSLog(@"Command execution completed successfully.\n");
-    } else if (rc == RETURN_CODE_CANCEL) {
-        NSLog(@"Command execution cancelled by user.\n");
-    } else {
-        NSLog(@"Command execution failed with rc=%d and output=%@.\n", rc, [MobileFFmpegConfig getLastCommandOutput]);
-    }
-    ```
+    import MobileFFmpeg
+    import MobileFFmpeg
     
-5. Check execution output later.
-    ```
-    int rc = [MobileFFmpegConfig getLastReturnCode];
-    NSString *output = [MobileFFmpegConfig getLastCommandOutput];
-
-    if (rc == RETURN_CODE_SUCCESS) {
-        NSLog(@"Command execution completed successfully.\n");
-    } else if (rc == RETURN_CODE_CANCEL) {
-        NSLog(@"Command execution cancelled by user.\n");
-    } else {
-        NSLog(@"Command execution failed with rc=%d and output=%@.\n", rc, output);
+    Use a completion handler to obtain the command log output and retun code.
+    
+    MobileFFprobe.execute(withCommand: "-i file1.mp4") { rc, returnedOutput, error in
+        if rc == RETURN_CODE_SUCCESS {
+            NSLog(returnedOutput)
+        } else if rc == RETURN_CODE_CANCEL {
+            NSLog("Command execution cancelled by user.\n");
+        } else if let error = error {
+            NSLog(error.localizedDescription)
+        }
     }
-    ```
+   ...
+    
 
-6. Stop ongoing FFmpeg operations.
-    - Stop all executions
-        ```
-        [MobileFFmpeg cancel];
-
-        ```
-    - Stop a specific execution
-        ```
-        [MobileFFmpeg cancel:executionId];
-        ```
-
+6. Stop an ongoing FFmpeg operation.
+    
+        ffmpegSession.cancel()
+        ...
+    
 7. Get media information for a file.
     ```
-    MediaInformation *mediaInformation = [MobileFFprobe getMediaInformation:@"<file path or uri>"];
+    Call the MobileFFprobe class method "getMediaInformation(forURL:<path>)" to obtain basic metadata from a media file. This method will throws an error in cases of failure.  You call this method in a try expression and handle any errors in the catch clauses of a do statement.
+
+    do {
+        let mediaInfo = try MobileFFprobe.getMediaInformation(forURL: "<file path or uri>")
+    } catch {
+        NSLog("\(error.localizedDescription)")
+    }
+}
     ```
 
 8. Record video and audio using iOS camera. This operation is not supported on `tvOS` since `AVFoundation` is not available on `tvOS`.
 
     ```
-    [MobileFFmpeg execute: @"-f avfoundation -r 30 -video_size 1280x720 -pixel_format bgr0 -i 0:0 -vcodec h264_videotoolbox -vsync 2 -f h264 -t 00:00:05 %@", recordFilePath];
-    ```
-
-9. Enable log callback.
-    ```
-    [MobileFFmpegConfig setLogDelegate:self];
-
-    - (void)logCallback:(long)executionId :(int)level :(NSString*)message {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            NSLog(@"%@", message);
-        });
+    ffmpegSession.execute(withCommand: "-f avfoundation -r 30 -video_size 1280x720 -pixel_format bgr0 -i 0:0 -vcodec h264_videotoolbox -vsync 2 -f h264 -t 00:00:05 \(recordFilePath)") { returnCode, logOutput, error in
+        ...
     }
+    
+    
     ```
-
-10. Enable statistics callback.
+13. Set default log level for a particular session.
     ```
-    [MobileFFmpegConfig setStatisticsDelegate:self];
-
-    - (void)statisticsCallback:(Statistics *)newStatistics {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            NSLog(@"frame: %d, time: %d\n", newStatistics.getVideoFrameNumber, newStatistics.getTime);
-        });
-    }
-    ```
-
-11. Ignore the handling of a signal.
-    ```
-    [MobileFFmpegConfig ignoreSignal:SIGXCPU];
-    ```
-
-12. List ongoing executions.
-    ```
-    NSArray* ffmpegExecutions = [MobileFFmpeg listExecutions];
-    for (int i = 0; i < [ffmpegExecutions count]; i++) {
-        FFmpegExecution* execution = [ffmpegExecutions objectAtIndex:i];
-        NSLog(@"Execution %d = id: %ld, startTime: %@, command: %@.\n", i, [execution getExecutionId], [execution getStartTime], [execution getCommand]);
-    }
-    ```
-
-13. Set default log level.
-    ```
-    [MobileFFmpegConfig setLogLevel:AV_LOG_FATAL];
+    ffmpegSession.logLevel = AV_LOG_FATAL
     ```
 
 14. Register custom fonts directory.
     ```
-    [MobileFFmpegConfig setFontDirectory:@"<folder with fonts>" with:nil];
+    MobileFFmpegConfig.setFontDirectory(path: "<folder with fonts>", withFontNameMapping: nil)
     ```
 
 #### 2.4 Manual Installation

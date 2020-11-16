@@ -19486,7 +19486,6 @@ $as_echo "#define SDL_VIDEO_RENDER_OGL_ES2 1" >>confdefs.h
         SUMMARY_audio="${SUMMARY_audio} nacl"
         SOURCES="$SOURCES $srcdir/src/video/nacl/*.c"
         SUMMARY_video="${SUMMARY_video} nacl opengles2"
-
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 }
@@ -21710,6 +21709,8 @@ fi
 
 CheckOpenGLX11()
 {
+    if [[ $MACOSX_DEPLOYMENT_TARGET != 10.15* ]] && [[ $MACOSX_DEPLOYMENT_TARGET != 11* ]]; then
+
     if test x$enable_video = xyes -a x$enable_video_opengl = xyes; then
         { $as_echo "$as_me:${as_lineno-$LINENO}: checking for OpenGL (GLX) support" >&5
 $as_echo_n "checking for OpenGL (GLX) support... " >&6; }
@@ -21749,6 +21750,7 @@ $as_echo "#define SDL_VIDEO_RENDER_OGL 1" >>confdefs.h
 
             SUMMARY_video="${SUMMARY_video} opengl"
         fi
+    fi
     fi
 }
 
@@ -21838,6 +21840,7 @@ fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
             { $as_echo "$as_me:${as_lineno-$LINENO}: result: $video_opengles_v1" >&5
 $as_echo "$video_opengles_v1" >&6; }
+if [[ $IPHONEOS_DEPLOYMENT_TARGET != 13* ]] && [[ $IPHONEOS_DEPLOYMENT_TARGET != 14* ]]; then
             if test x$video_opengles_v1 = xyes; then
 
 $as_echo "#define SDL_VIDEO_OPENGL_ES 1" >>confdefs.h
@@ -21847,6 +21850,7 @@ $as_echo "#define SDL_VIDEO_RENDER_OGL_ES 1" >>confdefs.h
 
                 SUMMARY_video="${SUMMARY_video} opengl_es1"
             fi
+          fi
         fi
 
         if test x$enable_video_opengles2 = xyes; then
@@ -22003,9 +22007,11 @@ $as_echo "#define SDL_VIDEO_RENDER_OGL 1" >>confdefs.h
 }
 
 CheckMacGL()
-{
-    if test x$enable_video = xyes -a x$enable_video_opengl = xyes; then
+{   
+    if [[ $MACOSX_DEPLOYMENT_TARGET != 10.15* ]] && [[ $MACOSX_DEPLOYMENT_TARGET != 11* ]]; then
 
+    if test x$enable_video = xyes -a x$enable_video_opengl = xyes; then
+        
 $as_echo "#define SDL_VIDEO_OPENGL 1" >>confdefs.h
 
 
@@ -22015,6 +22021,7 @@ $as_echo "#define SDL_VIDEO_OPENGL_CGL 1" >>confdefs.h
 $as_echo "#define SDL_VIDEO_RENDER_OGL 1" >>confdefs.h
 
         SUMMARY_video="${SUMMARY_video} opengl"
+    fi
     fi
 }
 
@@ -24412,6 +24419,7 @@ $as_echo "#define SDL_TIMER_UNIX 1" >>confdefs.h
 
 $as_echo "#define SDL_VIDEO_DRIVER_UIKIT 1" >>confdefs.h
 
+if [[ $IPHONEOS_DEPLOYMENT_TARGET != 13* ]] && [[ $IPHONEOS_DEPLOYMENT_TARGET != 14* ]]; then
 
 $as_echo "#define SDL_VIDEO_OPENGL_ES2 1" >>confdefs.h
 
@@ -24423,6 +24431,7 @@ $as_echo "#define SDL_VIDEO_RENDER_OGL_ES 1" >>confdefs.h
 
 
 $as_echo "#define SDL_VIDEO_RENDER_OGL_ES2 1" >>confdefs.h
+fi
 
         SOURCES="$SOURCES $srcdir/src/video/uikit/*.m"
         EXTRA_LDFLAGS="$EXTRA_LDFLAGS -lm -liconv -lobjc"
@@ -24433,7 +24442,9 @@ $as_echo "#define SDL_VIDEO_RENDER_OGL_ES2 1" >>confdefs.h
         EXTRA_LDFLAGS="$EXTRA_LDFLAGS -Wl,-framework,CoreMotion"
         EXTRA_LDFLAGS="$EXTRA_LDFLAGS -Wl,-framework,Foundation"
         EXTRA_LDFLAGS="$EXTRA_LDFLAGS -Wl,-framework,GameController"
+if [[ $IPHONEOS_DEPLOYMENT_TARGET != 13* ]] && [[ $IPHONEOS_DEPLOYMENT_TARGET != 14* ]]; then
         EXTRA_LDFLAGS="$EXTRA_LDFLAGS -Wl,-framework,OpenGLES"
+fi
         EXTRA_LDFLAGS="$EXTRA_LDFLAGS -Wl,-framework,QuartzCore"
         EXTRA_LDFLAGS="$EXTRA_LDFLAGS -Wl,-framework,UIKit"
 
