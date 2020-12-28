@@ -5,7 +5,7 @@
 
 export BASEDIR=$(pwd)
 export PACKAGE_DIRECTORY="${BASEDIR}/../../prebuilt/android-aar/mobile-ffmpeg"
-export CUSTOM_OPTIONS="--disable-arm-v7a --enable-android-zlib --enable-android-media-codec"
+export CUSTOM_OPTIONS="--speed --disable-arm-v7a --enable-android-zlib --enable-android-media-codec"
 export GPL_PACKAGES="--enable-gpl --enable-libvidstab --enable-x264 --enable-x265 --enable-xvidcore"
 export FULL_PACKAGES="--enable-fontconfig --enable-freetype --enable-fribidi --enable-gmp --enable-gnutls --enable-kvazaar --enable-lame --enable-libaom --enable-libass --enable-libiconv --enable-libilbc --enable-libtheora --enable-libvorbis --enable-libvpx --enable-libwebp --enable-libxml2 --enable-opencore-amr --enable-opus --enable-shine --enable-snappy --enable-soxr --enable-speex --enable-twolame --enable-vo-amrwbenc --enable-wavpack"
 
