@@ -1,0 +1,33 @@
+name: PullRequest
+
+on: [pull_request]
+
+jobs:
+  buildTest:
+    name: Build Android
+    runs-on: macOS-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.3.2
+        with:
+          fetch-depth: 0
+      - name: Build project
+        run: cd android && ./gradlew assembleDebug
+  Check:
+    name: Check Android
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.3.2
+        with:
+          fetch-depth: 0
+      - name: Install Android SDK
+        uses: malinskiy/action-android/install-sdk@release/0.1.0
+      - name: Code checks
+        run: cd android && ./gradlew check
+      - name: Archive Lint report
+        uses: actions/upload-artifact@v2.0.1
+        if: ${{ always() }}
+        with:
+          name: FFmpeg-Lint-report
+          path: android/**/reports/lint-results.html
