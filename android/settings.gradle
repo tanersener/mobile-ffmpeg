@@ -1,4 +1,4 @@
-include ':app', ':test-app'
+include ':mobileFFmpegLib', ':test-app'
 include ':mobile-ffmpeg'
 project(':mobile-ffmpeg').projectDir = new File('..')
 rootProject.name='Mobile FFmpeg (android)'
