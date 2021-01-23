@@ -159,6 +159,7 @@ When compilation ends an Android Archive (AAR) file is created under the prebuil
   echo -e "  --reconf-LIBRARY\t\trun autoreconf before building LIBRARY [no]"
   echo -e "  --redownload-LIBRARY\t\tdownload LIBRARY even it is detected as already downloaded [no]"
   echo -e "  --rebuild-LIBRARY\t\tbuild LIBRARY even it is detected as already built [no]\n"
+  echo -e "  --no-archive\t\tdo not build Android archive [no]\n"
 }
 
 display_version() {
@@ -702,6 +703,9 @@ while [ ! $# -eq 0 ]; do
 
     redownload_library ${DOWNLOAD_LIBRARY}
     ;;
+  --no-archive)
+    NO_ARCHIVE="1"
+    ;;
   --full)
     BUILD_FULL="1"
     ;;
@@ -844,7 +848,7 @@ if [[ ${ENABLED_ARCHITECTURES[4]} -eq 1 ]]; then
   ANDROID_ARCHITECTURES+="$(get_android_arch 4) "
 fi
 
-if [[ ! -z ${ANDROID_ARCHITECTURES} ]]; then
+if [[ ! -z ${ANDROID_ARCHITECTURES} ]] && [ -z ${NO_ARCHIVE} ]; then
 
   echo -n -e "\nmobile-ffmpeg: "
 
