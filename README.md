@@ -1,4 +1,4 @@
-# MobileFFmpeg [![Financial Contributors on Open Collective](https://opencollective.com/mobile-ffmpeg/all/badge.svg?label=financial+contributors)](https://opencollective.com/mobile-ffmpeg) ![GitHub release](https://img.shields.io/badge/release-v4.4-blue.svg) ![Bintray](https://img.shields.io/badge/bintray-v4.4-blue.svg) ![CocoaPods](https://img.shields.io/badge/pod-v4.4-blue.svg) [![Build Status](https://travis-ci.org/tanersener/mobile-ffmpeg.svg?branch=master)](https://travis-ci.org/tanersener/mobile-ffmpeg)
+# MobileFFmpeg [![Financial Contributors on Open Collective](https://opencollective.com/mobile-ffmpeg/all/badge.svg?label=financial+contributors)](https://opencollective.com/mobile-ffmpeg) ![GitHub release](https://img.shields.io/badge/release-v4.4-blue.svg) ![Maven Central](https://img.shields.io/maven-central/v/com.arthenica/mobile-ffmpeg-min) ![CocoaPods](https://img.shields.io/badge/pod-v4.4-blue.svg) [![Build Status](https://travis-ci.org/tanersener/mobile-ffmpeg.svg?branch=master)](https://travis-ci.org/tanersener/mobile-ffmpeg)
 
 FFmpeg for Android, iOS and tvOS
 
@@ -6,7 +6,7 @@ FFmpeg for Android, iOS and tvOS
 
 ### 1. Features
 - Includes both `FFmpeg` and `FFprobe`
-- Use binaries available at `Github`/`JCenter`/`CocoaPods` or build your own version with external libraries you need
+- Use binaries available at `Github`/`Maven Central`/`CocoaPods` or build your own version with external libraries you need
 - Supports
     - Android, iOS and tvOS
     - FFmpeg `v3.4.x`, `v4.0.x`, `v4.1`, `v4.2` , `v4.3` and `v4.4-dev` releases
@@ -56,7 +56,7 @@ FFmpeg for Android, iOS and tvOS
 
 ### 2. Using
 
-Prebuilt binaries are available at [Github](https://github.com/tanersener/mobile-ffmpeg/releases), [JCenter](https://bintray.com/bintray/jcenter) and [CocoaPods](https://cocoapods.org).
+Prebuilt binaries are available at [Github](https://github.com/tanersener/mobile-ffmpeg/releases), [Maven Central](https://repo1.maven.org/maven2) and [CocoaPods](https://cocoapods.org).
 
 #### 2.1 Packages
 
@@ -122,6 +122,15 @@ Please remember that some parts of `FFmpeg` are licensed under the `GPL` and onl
  - `vo-amrwbenc` is supported since `v4.4`
 
 #### 2.2 Android
+  - For versions `4.4` and `4.4.LTS`, add `mavenCentral()` to your `build.gradle` and make sure that it is listed
+    before `jcenter()`
+  - For `4.3.2` and older releases, add `jcenter()`
+    ```
+    repositories {
+        mavenCentral()
+    }
+    ```
+
 1. Add MobileFFmpeg dependency to your `build.gradle` in `mobile-ffmpeg-<package name>` pattern.
     ```
     dependencies {
