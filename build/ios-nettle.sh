@@ -39,7 +39,7 @@ export LDFLAGS=$(get_ldflags ${LIB_NAME})
 
 OPTIONAL_CPU_SUPPORT=""
 case ${ARCH} in
-    armv7 | armv7s | arm64 | arm64e)
+    armv7 | armv7s | arm64 | arm64e | arm64-simulator)
         OPTIONAL_CPU_SUPPORT="--enable-arm-neon"
     ;;
     i386 | x86-64 | x86-64-mac-catalyst)

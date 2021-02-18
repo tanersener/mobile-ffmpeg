@@ -43,7 +43,7 @@ case ${ARCH} in
     x86 | x86-64 | x86-64-mac-catalyst)
         ARCH_OPTIONS+=" --enable-intel-sse=yes"
     ;;
-    armv7 | armv7s | arm64 | arm64e)
+    armv7 | armv7s | arm64 | arm64e | arm64-simulator)
         ARCH_OPTIONS+=" --enable-arm-neon=yes"
     ;;
 esac

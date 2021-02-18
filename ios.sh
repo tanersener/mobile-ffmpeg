@@ -8,6 +8,7 @@ ARCH_ARM64E=3
 ARCH_I386=4
 ARCH_X86_64=5
 ARCH_X86_64_MAC_CATALYST=6
+ARCH_ARM64_SIMULATOR=7
 
 # LIBRARY INDEXES
 LIBRARY_FONTCONFIG=0
@@ -62,7 +63,8 @@ LIBRARY_LIBICONV=48
 LIBRARY_LIBUUID=49
 
 # ENABLE ARCH
-ENABLED_ARCHITECTURES=(1 1 1 1 1 1 1)
+ENABLED_ARCHITECTURES=(1 1 1 1 1 1 1 1)
+#ENABLED_ARCHITECTURES=(0 0 0 0 0 0 0 1)
 
 # ENABLE LIBRARIES
 ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
@@ -124,6 +126,7 @@ display_help() {
   echo -e "  --disable-i386\t\tdo not build i386 platform [yes]"
   echo -e "  --disable-x86-64\t\tdo not build x86-64 platform [yes]"
   echo -e "  --disable-x86-64-mac-catalyst\tdo not build x86-64-mac-catalyst platform [yes]\n"
+  echo -e "  --disable-arm64-simulator\t\tdo not build arm64-simulator platform [yes]"
 
   echo -e "Libraries:"
 
@@ -497,6 +500,9 @@ set_arch() {
   x86-64-mac-catalyst)
     ENABLED_ARCHITECTURES[ARCH_X86_64_MAC_CATALYST]=$2
     ;;
+  arm64-simulator)
+    ENABLED_ARCHITECTURES[ARCH_ARM64_SIMULATOR]=$2
+    ;;
   *)
     print_unknown_platform "$1"
     ;;
@@ -522,7 +528,7 @@ print_enabled_architectures() {
   echo -n "Architectures: "
 
   let enabled=0
-  for print_arch in {0..6}; do
+  for print_arch in {0..7}; do
     if [[ ${ENABLED_ARCHITECTURES[$print_arch]} -eq 1 ]]; then
       if [[ ${enabled} -ge 1 ]]; then
         echo -n ", "
@@ -1059,7 +1065,7 @@ done
 
 TARGET_ARCH_LIST=()
 
-for run_arch in {0..6}; do
+for run_arch in {0..7}; do
   if [[ ${ENABLED_ARCHITECTURES[$run_arch]} -eq 1 ]]; then
     export ARCH=$(get_arch_name $run_arch)
     export TARGET_SDK=$(get_target_sdk)

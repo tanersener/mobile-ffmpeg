@@ -41,7 +41,7 @@ export ASM_FLAGS=$(get_asmflags ${LIB_NAME})
 
 ARCH_OPTIONS=""
 case ${ARCH} in
-    armv7 | armv7s | arm64 | arm64e)
+    armv7 | armv7s | arm64 | arm64e | arm64-simulator)
         ARCH_OPTIONS="-DWITH_SIMD=1"
     ;;
     *)

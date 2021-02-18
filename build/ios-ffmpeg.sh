@@ -60,7 +60,7 @@ case ${ARCH} in
         NEON_FLAG="	--enable-neon"
         BITCODE_FLAGS="-fembed-bitcode -Wc,-fembed-bitcode"
     ;;
-    arm64)
+    arm64 | arm64-simulator)
         TARGET_CPU="armv8"
         TARGET_ARCH="aarch64"
         NEON_FLAG="	--enable-neon"

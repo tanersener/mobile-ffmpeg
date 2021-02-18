@@ -112,6 +112,7 @@ get_arch_name() {
         4) echo "i386" ;;
         5) echo "x86-64" ;;
         6) echo "x86-64-mac-catalyst" ;;
+        7) echo "arm64-simulator" ;;
     esac
 }
 
@@ -146,7 +147,7 @@ get_target_build_directory() {
 
 get_target_arch() {
     case ${ARCH} in
-        arm64 | arm64e)
+        arm64 | arm64e | arm64-simulator)
             echo "aarch64"
         ;;
         x86-64 | x86-64-mac-catalyst)
@@ -167,7 +168,7 @@ get_sdk_name() {
         armv7 | armv7s | arm64 | arm64e)
             echo "iphoneos"
         ;;
-        i386 | x86-64)
+        i386 | x86-64 | arm64-simulator)
             echo "iphonesimulator"
         ;;
         x86-64-mac-catalyst)
@@ -185,7 +186,7 @@ get_min_version_cflags() {
         armv7 | armv7s | arm64 | arm64e)
             echo "-miphoneos-version-min=${IOS_MIN_VERSION}"
         ;;
-        i386 | x86-64)
+        i386 | x86-64 | arm64-simulator)
             echo "-mios-simulator-version-min=${IOS_MIN_VERSION}"
         ;;
         x86-64-mac-catalyst)
@@ -206,7 +207,7 @@ get_common_cflags() {
     local BUILD_DATE="-DMOBILE_FFMPEG_BUILD_DATE=$(date +%Y%m%d 2>>${BASEDIR}/build.log)"
 
     case ${ARCH} in
-        i386 | x86-64)
+        i386 | x86-64 | arm64-simulator)
             echo "-fstrict-aliasing -DIOS ${LTS_BUILD_FLAG}${BUILD_DATE} -isysroot ${SDK_PATH}"
         ;;
         x86-64-mac-catalyst)
@@ -226,7 +227,7 @@ get_arch_specific_cflags() {
         armv7s)
             echo "-arch armv7s -target $(get_target_host) -march=armv7s -mcpu=generic -mfpu=neon -mfloat-abi=softfp -DMOBILE_FFMPEG_ARMV7S"
         ;;
-        arm64)
+        arm64 | arm64-simulator)
             echo "-arch arm64 -target $(get_target_host) -march=armv8-a+crc+crypto -mcpu=generic -DMOBILE_FFMPEG_ARM64"
         ;;
         arm64e)
@@ -251,7 +252,7 @@ get_size_optimization_cflags() {
         armv7 | armv7s | arm64 | arm64e | x86-64-mac-catalyst)
           ARCH_OPTIMIZATION="-Oz -Wno-ignored-optimization-argument"
         ;;
-        i386 | x86-64)
+        i386 | x86-64 | arm64-simulator)
           ARCH_OPTIMIZATION="-O2 -Wno-ignored-optimization-argument"
         ;;
     esac
@@ -268,7 +269,7 @@ get_size_optimization_asm_cflags() {
                 armv7 | armv7s | arm64 | arm64e | x86-64-mac-catalyst)
                     ARCH_OPTIMIZATION="-Oz"
                 ;;
-                i386 | x86-64)
+                i386 | x86-64 | arm64-simulator)
                     ARCH_OPTIMIZATION="-O2"
                 ;;
             esac
@@ -444,7 +445,7 @@ get_arch_specific_ldflags() {
         armv7s)
             echo "-arch armv7s -march=armv7s -mfpu=neon -mfloat-abi=softfp -fembed-bitcode -target $(get_target_host)"
         ;;
-        arm64)
+        arm64 | arm64-simulator)
             echo "-arch arm64 -march=armv8-a+crc+crypto -fembed-bitcode -target $(get_target_host)"
         ;;
         arm64e)
@@ -890,7 +891,7 @@ set_toolchain_clang_paths() {
                 export AS="${LOCAL_GAS_PREPROCESSOR} -arch arm -- ${CC} ${LOCAL_ASMFLAGS}"
             fi
         ;;
-        arm64 | arm64e)
+        arm64 | arm64e | arm64-simulator)
             if [ "$1" == "x265" ]; then
                 export AS="${LOCAL_GAS_PREPROCESSOR}"
                 export AS_ARGUMENTS="-arch aarch64"

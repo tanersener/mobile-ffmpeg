@@ -48,7 +48,7 @@ cd build
 
 ASM_FLAGS=""
 case ${ARCH} in
-    armv7 | armv7s | arm64 | arm64e)
+    armv7 | armv7s | arm64 | arm64e | arm64-simulator)
         ASM_FLAGS="-DSSE2_FOUND=0 -DSSE3_FOUND=0 -DSSSE3_FOUND=0 -DSSE4_1_FOUND=0"
     ;;
     *)

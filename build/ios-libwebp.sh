@@ -40,7 +40,7 @@ export PKG_CONFIG_LIBDIR="${INSTALL_PKG_CONFIG_DIR}"
 
 ARCH_OPTIONS=""
 case ${ARCH} in
-    armv7 | armv7s | arm64 | arm64e)
+    armv7 | armv7s | arm64 | arm64e | arm64-simulator)
         ARCH_OPTIONS="--enable-neon --enable-neon-rtcd"
     ;;
     x86-64-mac-catalyst)
