@@ -51,7 +51,7 @@ case ${ARCH} in
     armv7 | armv7s)
         ARCH_OPTIONS="-DENABLE_ASSEMBLY=1 -DCROSS_COMPILE_ARM=1"
     ;;
-    arm64 | arm64e)
+    arm64 | arm64e | arm64-simulator)
         ARCH_OPTIONS="-DENABLE_ASSEMBLY=0 -DCROSS_COMPILE_ARM=1"
     ;;
     x86-64-mac-catalyst)

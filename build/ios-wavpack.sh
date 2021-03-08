@@ -48,7 +48,7 @@ fi
 
 ASM_FLAGS=""
 case ${ARCH} in
-    armv7 | armv7s | arm64 | arm64e)
+    armv7 | armv7s | arm64 | arm64e | arm64-simulator)
         ASM_FLAGS="--disable-asm"
     ;;
     *)

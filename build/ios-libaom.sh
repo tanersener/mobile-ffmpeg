@@ -52,6 +52,10 @@ case ${ARCH} in
         TOOLCHAIN_FILE="${BASEDIR}/src/${LIB_NAME}/build/cmake/toolchains/arm64-ios.cmake"
         ARCH_OPTIONS="-DARCH_ARM=1 -DENABLE_NEON=1 -DHAVE_NEON=1"
     ;;
+    arm64-simulator)
+        TOOLCHAIN_FILE="${BASEDIR}/src/${LIB_NAME}/build/cmake/toolchains/arm64-ios.cmake"
+        ARCH_OPTIONS="-DARCH_ARM=1 -DENABLE_NEON=1 -DHAVE_NEON=1"
+    ;;
     arm64e)
         TOOLCHAIN_FILE="${BASEDIR}/src/${LIB_NAME}/build/cmake/toolchains/arm-ios-common.cmake"
         ARCH_OPTIONS="-DAOM_TARGET_CPU=arm64 -DCMAKE_SYSTEM_PROCESSOR=arm64e -DCMAKE_OSX_ARCHITECTURES=arm64e -DARCH_ARM=1 -DENABLE_NEON=1 -DHAVE_NEON=1"

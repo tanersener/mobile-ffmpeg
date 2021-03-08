@@ -476,7 +476,7 @@ get_ldflags() {
     case $1 in
         mobile-ffmpeg)
             case ${ARCH} in
-                armv7 | armv7s | arm64 | arm64e | x86-64-mac-catalyst)
+                armv7 | armv7s | arm64 | arm64e | x86-64-mac-catalyst | arm64-simulator)
                     echo "${ARCH_FLAGS} ${LINKED_LIBRARIES} ${COMMON_FLAGS} -fembed-bitcode -Wc,-fembed-bitcode ${OPTIMIZATION_FLAGS}"
                 ;;
                 *)

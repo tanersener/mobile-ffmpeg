@@ -712,6 +712,36 @@ EOF
 # 2 - library name
 # 3 - static library name
 # 4 - library version
+create_fat_library_packages() {
+  echo "check if arm64-simulator arch is built\n" 1>>"${BASEDIR}/build.log" 2>&1
+  if [[ "${TARGET_ARCH_LIST[@]}" =~ "arm64-simulator" ]]; then
+    echo "arm64-simulator arch built. Merge it with x86_64 arch if found\n" 1>>"${BASEDIR}/build.log" 2>&1
+    local ARM64_SIMULATOR_STATIC_LIBRARY_PATH=$(find ${BASEDIR}/prebuilt/ios-arm64-simulator -name $3)
+    local X86_64_STATIC_LIBRARY_PATH=$(find ${BASEDIR}/prebuilt/ios-x86_64 -name $3)
+    echo -e "X86_64_STATIC_LIBRARY_PATH = $X86_64_STATIC_LIBRARY_PATH\n" 1>>"${BASEDIR}/build.log" 2>&1
+    if [ -f "$X86_64_STATIC_LIBRARY_PATH" ]; then
+      echo "$X86_64_STATIC_LIBRARY_PATH exists. => merge simulator libraries\n" 1>>"${BASEDIR}/build.log" 2>&1
+
+      LIPO_COMMAND="${LIPO} -create $X86_64_STATIC_LIBRARY_PATH $ARM64_SIMULATOR_STATIC_LIBRARY_PATH"
+
+      local FRAMEWORK_PATH=${BASEDIR}/prebuilt/ios-arm64_x86_64-simulator/$2
+      echo "Will merge in $FRAMEWORK_PATH\n" 1>>"${BASEDIR}/build.log" 2>&1
+      mkdir -p "${FRAMEWORK_PATH}" 1>>"${BASEDIR}/build.log" 2>&1
+
+      LIPO_COMMAND+=" -output ${FRAMEWORK_PATH}/$3"
+
+      echo "Will run lipo command: ${LIPO_COMMAND}" 1>>"${BASEDIR}/build.log" 2>&1
+
+      ${LIPO_COMMAND} 1>>"${BASEDIR}/build.log" 2>&1
+
+    fi
+  fi
+}
+
+# 1 - library index
+# 2 - library name
+# 3 - static library name
+# 4 - library version
 create_external_library_package() {
   if [[ -n ${MOBILE_FFMPEG_XCF_BUILD} ]]; then
 
@@ -725,6 +755,30 @@ create_external_library_package() {
 
         build_info_plist "${FRAMEWORK_PATH}/Info.plist" "$2" "com.arthenica.mobileffmpeg.${CAPITAL_CASE_LIBRARY_NAME}" "$4" "$4"
         cp "${STATIC_LIBRARY_PATH}" "${FRAMEWORK_PATH}/$2" 1>>"${BASEDIR}/build.log" 2>&1
+
+        if [[ ${TARGET_ARCH} = "arm64-simulator" ]]; then
+          local X86_64_STATIC_LIBRARY_PATH=$(find ${BASEDIR}/prebuilt/ios-x86_64 -name $3)
+          echo -e "X86_64_STATIC_LIBRARY_PATH = $X86_64_STATIC_LIBRARY_PATH\n" 1>>"${BASEDIR}/build.log" 2>&1
+          if [ -f "$X86_64_STATIC_LIBRARY_PATH" ]; then
+            echo "$X86_64_STATIC_LIBRARY_PATH exists. => merge simulator libraries\n" 1>>"${BASEDIR}/build.log" 2>&1
+
+            local FRAMEWORK_PATH=${BASEDIR}/prebuilt/ios-xcframework/.tmp/ios-arm64_x86_64-simulator/$2.framework
+            mkdir -p "${FRAMEWORK_PATH}" 1>>"${BASEDIR}/build.log" 2>&1 || exit 1
+            #local STATIC_LIBRARY_PATH=$(find ${BASEDIR}/prebuilt/ios-${TARGET_ARCH} -name $3)
+            #local CAPITAL_CASE_LIBRARY_NAME=$(to_capital_case "$2")
+
+            build_info_plist "${FRAMEWORK_PATH}/Info.plist" "$2" "com.arthenica.mobileffmpeg.${CAPITAL_CASE_LIBRARY_NAME}" "$4" "$4"
+            #cp "${STATIC_LIBRARY_PATH}" "${FRAMEWORK_PATH}/$2" 1>>"${BASEDIR}/build.log" 2>&1
+
+            LIPO_COMMAND="${LIPO} -create $X86_64_STATIC_LIBRARY_PATH $STATIC_LIBRARY_PATH"
+            
+            LIPO_COMMAND+=" -output ${FRAMEWORK_PATH}/$2"
+
+            echo "Will run lipo command: ${LIPO_COMMAND}" 1>>"${BASEDIR}/build.log" 2>&1
+
+            ${LIPO_COMMAND} 1>>"${BASEDIR}/build.log" 2>&1
+          fi
+        fi
       fi
     done
 
@@ -734,14 +788,40 @@ create_external_library_package() {
 
     BUILD_COMMAND="xcodebuild -create-xcframework "
 
+    local ARM64_X86_64_SIMULATOR_FRAMEWORK_PATH=${BASEDIR}/prebuilt/ios-xcframework/.tmp/ios-arm64_x86_64-simulator/$2.framework
+    local ARM64_X86_64_SIMULATOR_PATH=${ARM64_X86_64_SIMULATOR_FRAMEWORK_PATH}/$2
+
     for TARGET_ARCH in "${TARGET_ARCH_LIST[@]}"; do
       if [[ ${TARGET_ARCH} != "arm64e" ]]; then
         local FRAMEWORK_PATH=${BASEDIR}/prebuilt/ios-xcframework/.tmp/ios-${TARGET_ARCH}/$2.framework
-        BUILD_COMMAND+=" -framework ${FRAMEWORK_PATH}"
+        if [[ "${TARGET_ARCH}" == "arm64-simulator" ]]; then
+          if [ ! -f "$ARM64_X86_64_SIMULATOR_PATH" ]; then
+            echo "arm64_x86_64-simulator not found at ${ARM64_X86_64_SIMULATOR_PATH}" 1>>"${BASEDIR}/build.log" 2>&1
+            echo "... add arm64-simulator instead\n" 1>>"${BASEDIR}/build.log" 2>&1
+            BUILD_COMMAND+=" -framework ${FRAMEWORK_PATH}"
+          fi
+        else
+          if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
+            if [ ! -f "$ARM64_X86_64_SIMULATOR_PATH" ]; then
+              echo "arm64_x86_64-simulator not found at ${ARM64_X86_64_SIMULATOR_PATH}" 1>>"${BASEDIR}/build.log" 2>&1
+              echo "... add x86_64 instead\n" 1>>"${BASEDIR}/build.log" 2>&1
+              BUILD_COMMAND+=" -framework ${FRAMEWORK_PATH}"
+            fi
+          else
+            BUILD_COMMAND+=" -framework ${FRAMEWORK_PATH}"
+          fi
+        fi
+
       fi
     done
 
+    if [ -f "$ARM64_X86_64_SIMULATOR_PATH" ]; then
+      BUILD_COMMAND+=" -framework ${ARM64_X86_64_SIMULATOR_FRAMEWORK_PATH}"
+    fi
+
     BUILD_COMMAND+=" -output ${XCFRAMEWORK_PATH}"
+
+    echo "Running build command => ${BUILD_COMMAND}" 1>>"${BASEDIR}/build.log" 2>&1
 
     COMMAND_OUTPUT=$(${BUILD_COMMAND} 2>&1)
 
@@ -1097,7 +1177,27 @@ for run_arch in {0..7}; do
   fi
 done
 
-FFMPEG_LIBS="libavcodec libavdevice libavfilter libavformat libavutil libswresample libswscale"
+export FFMPEG_LIBS="libavcodec libavdevice libavfilter libavformat libavutil libswresample libswscale"
+
+# 2. FFMPEG & MOBILE FFMPEG
+if [[ -n ${MOBILE_FFMPEG_XCF_BUILD} ]]; then
+
+  # FFMPEG
+  for FFMPEG_LIB in ${FFMPEG_LIBS}; do
+
+    library_name=$FFMPEG_LIB
+    static_archive_name="$FFMPEG_LIB.a"
+    echo "Creating optional fat package for $FFMPEG_LIB | $library_name | $static_archive_name\n" 1>>"${BASEDIR}/build.log" 2>&1
+    LIBRARY_CREATED=$(create_fat_library_packages $FFMPEG_LIB "$library_name" "$static_archive_name" "${library_version}")
+
+    if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
+      echo -e "failed\n"
+      #exit 1
+    fi
+
+  done
+
+fi
 
 BUILD_LIBRARY_EXTENSION="a"
 
@@ -1219,6 +1319,7 @@ if [[ -n ${TARGET_ARCH_LIST[0]} ]]; then
 
         library_name=$(get_library_name $((library)))
         static_archive_name=$(get_static_archive_name $((library)))
+        echo "Creating external package for $library\n" 1>>"${BASEDIR}/build.log" 2>&1
         LIBRARY_CREATED=$(create_external_library_package $library "$library_name" "$static_archive_name" "${library_version}")
         if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
           echo -e "failed\n"
@@ -1277,12 +1378,58 @@ if [[ -n ${TARGET_ARCH_LIST[0]} ]]; then
 
           build_info_plist "${FFMPEG_LIB_FRAMEWORK_PATH}/Info.plist" "${FFMPEG_LIB}" "com.arthenica.mobileffmpeg.${FFMPEG_LIB_CAPITALCASE}" "${FFMPEG_LIB_VERSION}" "${FFMPEG_LIB_VERSION}"
 
-          BUILD_COMMAND+=" -framework ${FFMPEG_LIB_FRAMEWORK_PATH}"
+          if [[ "${TARGET_ARCH}" == "arm64-simulator" ]]; then
+            X86_64_STATIC_LIBRARY_PATH="${BASEDIR}/prebuilt/ios-x86_64/ffmpeg/lib/${FFMPEG_LIB}.${BUILD_LIBRARY_EXTENSION}"
+            echo "Creating fat package for arm64_x86_64-simulator. Check if $X86_64_STATIC_LIBRARY_PATH exists..." 1>>"${BASEDIR}/build.log" 2>&1
+            if [ -f "$X86_64_STATIC_LIBRARY_PATH" ]; then
+
+              FFMPEG_LIB_FRAMEWORK_PATH=${BASEDIR}/prebuilt/ios-xcframework/.tmp/ios-arm64_x86_64-simulator/${FFMPEG_LIB}.framework
+
+              rm -rf "${FFMPEG_LIB_FRAMEWORK_PATH}" 1>>"${BASEDIR}/build.log" 2>&1
+              mkdir -p "${FFMPEG_LIB_FRAMEWORK_PATH}/Headers" 1>>"${BASEDIR}/build.log" 2>&1 || exit 1
+
+              cp -r ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}/ffmpeg/include/${FFMPEG_LIB}/* ${FFMPEG_LIB_FRAMEWORK_PATH}/Headers 1>>"${BASEDIR}/build.log" 2>&1
+
+              LIPO_COMMAND="${LIPO} -create ${X86_64_STATIC_LIBRARY_PATH} ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}/ffmpeg/lib/${FFMPEG_LIB}.${BUILD_LIBRARY_EXTENSION}"
+
+              LIPO_COMMAND+=" -output ${FFMPEG_LIB_FRAMEWORK_PATH}/${FFMPEG_LIB}"
+              
+              ${LIPO_COMMAND} 1>>"${BASEDIR}/build.log" 2>&1
+
+              # COPY THE LICENSES
+              if [ ${GPL_ENABLED} == "yes" ]; then
+
+                # GPLv3.0
+                cp "${BASEDIR}/LICENSE.GPLv3" "${FFMPEG_LIB_FRAMEWORK_PATH}/LICENSE" 1>>"${BASEDIR}/build.log" 2>&1
+              else
+
+                # LGPLv3.0
+                cp "${BASEDIR}/LICENSE.LGPLv3" "${FFMPEG_LIB_FRAMEWORK_PATH}/LICENSE" 1>>"${BASEDIR}/build.log" 2>&1
+              fi
+
+              build_info_plist "${FFMPEG_LIB_FRAMEWORK_PATH}/Info.plist" "${FFMPEG_LIB}" "com.arthenica.mobileffmpeg.${FFMPEG_LIB_CAPITALCASE}" "${FFMPEG_LIB_VERSION}" "${FFMPEG_LIB_VERSION}"
+
+              BUILD_COMMAND+=" -framework ${FFMPEG_LIB_FRAMEWORK_PATH}"
+            else
+              BUILD_COMMAND+=" -framework ${FFMPEG_LIB_FRAMEWORK_PATH}"
+            fi
+          else
+            if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
+              ARM64_SIMULATOR_STATIC_LIBRARY_PATH="${BASEDIR}/prebuilt/ios-arm64-simulator/ffmpeg/lib/${FFMPEG_LIB}.${BUILD_LIBRARY_EXTENSION}"
+              if [ ! -f "$ARM64_SIMULATOR_STATIC_LIBRARY_PATH" ]; then
+                BUILD_COMMAND+=" -framework ${FFMPEG_LIB_FRAMEWORK_PATH}"
+              fi
+            else
+              BUILD_COMMAND+=" -framework ${FFMPEG_LIB_FRAMEWORK_PATH}"
+            fi
+          fi
         fi
 
       done
 
       BUILD_COMMAND+=" -output ${XCFRAMEWORK_PATH}"
+
+      echo "Running build command => ${BUILD_COMMAND}" 1>>"${BASEDIR}/build.log" 2>&1
 
       COMMAND_OUTPUT=$(${BUILD_COMMAND} 2>&1)
 
@@ -1326,12 +1473,52 @@ if [[ -n ${TARGET_ARCH_LIST[0]} ]]; then
           cp "${BASEDIR}/LICENSE.LGPLv3" "${MOBILE_FFMPEG_FRAMEWORK_PATH}/LICENSE" 1>>"${BASEDIR}/build.log" 2>&1
         fi
 
-        BUILD_COMMAND+=" -framework ${MOBILE_FFMPEG_FRAMEWORK_PATH}"
+        if [[ "${TARGET_ARCH}" == "arm64-simulator" ]]; then
+          X86_64_STATIC_LIBRARY_PATH="${BASEDIR}/prebuilt/ios-x86_64/mobile-ffmpeg/lib/libmobileffmpeg.${BUILD_LIBRARY_EXTENSION}"
+          echo "Creating mobileffmpeg fat package for arm64_x86_64-simulator. Check if $X86_64_STATIC_LIBRARY_PATH exists..." 1>>"${BASEDIR}/build.log" 2>&1
+          if [ -f "$X86_64_STATIC_LIBRARY_PATH" ]; then
+            MOBILE_FFMPEG_FRAMEWORK_PATH="${BASEDIR}/prebuilt/ios-xcframework/.tmp/ios-arm64_x86_64-simulator/mobileffmpeg.framework"
 
+            rm -rf "${MOBILE_FFMPEG_FRAMEWORK_PATH}" 1>>"${BASEDIR}/build.log" 2>&1
+            mkdir -p "${MOBILE_FFMPEG_FRAMEWORK_PATH}/Headers" 1>>"${BASEDIR}/build.log" 2>&1 || exit 1
+            mkdir -p "${MOBILE_FFMPEG_FRAMEWORK_PATH}/Modules" 1>>"${BASEDIR}/build.log" 2>&1 || exit 1
+            build_modulemap "${MOBILE_FFMPEG_FRAMEWORK_PATH}/Modules/module.modulemap"
+
+            cp -r ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}/mobile-ffmpeg/include/* ${MOBILE_FFMPEG_FRAMEWORK_PATH}/Headers 1>>"${BASEDIR}/build.log" 2>&1
+            
+            
+            LIPO_COMMAND="${LIPO} -create ${X86_64_STATIC_LIBRARY_PATH} ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}/mobile-ffmpeg/lib/libmobileffmpeg.${BUILD_LIBRARY_EXTENSION}"
+
+            LIPO_COMMAND+=" -output ${MOBILE_FFMPEG_FRAMEWORK_PATH}/mobileffmpeg"
+            
+            ${LIPO_COMMAND} 1>>"${BASEDIR}/build.log" 2>&1
+
+            # COPY THE LICENSES
+            if [ ${GPL_ENABLED} == "yes" ]; then
+              cp "${BASEDIR}/LICENSE.GPLv3" "${MOBILE_FFMPEG_FRAMEWORK_PATH}/LICENSE" 1>>"${BASEDIR}/build.log" 2>&1
+            else
+              cp "${BASEDIR}/LICENSE.LGPLv3" "${MOBILE_FFMPEG_FRAMEWORK_PATH}/LICENSE" 1>>"${BASEDIR}/build.log" 2>&1
+            fi
+            BUILD_COMMAND+=" -framework ${MOBILE_FFMPEG_FRAMEWORK_PATH}"
+          else
+            BUILD_COMMAND+=" -framework ${MOBILE_FFMPEG_FRAMEWORK_PATH}"
+          fi
+        else
+          if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
+            ARM64_SIMULATOR_STATIC_LIBRARY_PATH="${BASEDIR}/prebuilt/ios-arm64-simulator/mobile-ffmpeg/lib/libmobileffmpeg.${BUILD_LIBRARY_EXTENSION}"
+            if [ ! -f "$ARM64_SIMULATOR_STATIC_LIBRARY_PATH" ]; then
+              BUILD_COMMAND+=" -framework ${MOBILE_FFMPEG_FRAMEWORK_PATH}"
+            fi
+          else
+            BUILD_COMMAND+=" -framework ${MOBILE_FFMPEG_FRAMEWORK_PATH}"
+          fi
+        fi
       fi
     done;
 
     BUILD_COMMAND+=" -output ${XCFRAMEWORK_PATH}"
+
+    echo "Running build command => ${BUILD_COMMAND}" 1>>"${BASEDIR}/build.log" 2>&1
 
     COMMAND_OUTPUT=$(${BUILD_COMMAND} 2>&1)
 

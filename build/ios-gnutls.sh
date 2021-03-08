@@ -50,7 +50,7 @@ export GMP_LIBS="-L${BASEDIR}/prebuilt/$(get_target_build_directory)/gmp/lib -lg
 
 ARCH_OPTIONS=""
 case ${ARCH} in
-    arm64 | arm64e)
+    arm64 | arm64e | arm64-simulator)
         ARCH_OPTIONS="--enable-hardware-acceleration"
     ;;
     i386)

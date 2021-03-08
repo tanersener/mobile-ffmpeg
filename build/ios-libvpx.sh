@@ -49,7 +49,7 @@ case ${ARCH} in
         TARGET="$(get_target_arch)-darwin-gcc"
         ASM_FLAGS="--disable-runtime-cpu-detect --enable-neon --enable-neon-asm"
     ;;
-    arm64)
+    arm64 | arm64-simulator)
         TARGET="arm64-darwin-gcc"
 
         # --enable-neon-asm option not added because it causes the following error

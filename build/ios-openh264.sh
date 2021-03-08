@@ -42,7 +42,7 @@ case ${ARCH} in
     armv7 | armv7s)
         CFLAGS+=" -DHAVE_NEON"
     ;;
-    arm64 | arm64e)
+    arm64 | arm64e | arm64-simulator)
         CFLAGS+=" -DHAVE_NEON_AARCH64"
     ;;
     x86-64-mac-catalyst)
