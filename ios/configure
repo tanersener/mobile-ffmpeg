@@ -9335,15 +9335,15 @@ fi
 $as_echo "$lt_cv_ld_force_load" >&6; }
     case $host_os in
     rhapsody* | darwin1.[012])
-      _lt_dar_allow_undefined='$wl-undefined ${wl}suppress' ;;
+      _lt_dar_allow_undefined='' ;;
     darwin1.*)
-      _lt_dar_allow_undefined='$wl-flat_namespace $wl-undefined ${wl}suppress' ;;
+      _lt_dar_allow_undefined='' ;;
     darwin*)
       case ${MACOSX_DEPLOYMENT_TARGET},$host in
 	10.[012],*|,*powerpc*)
-	  _lt_dar_allow_undefined='$wl-flat_namespace $wl-undefined ${wl}suppress' ;;
+	  _lt_dar_allow_undefined='' ;;
 	*)
-	  _lt_dar_allow_undefined='$wl-undefined ${wl}dynamic_lookup' ;;
+	  _lt_dar_allow_undefined='${wl}dynamic_lookup' ;;
       esac
     ;;
   esac

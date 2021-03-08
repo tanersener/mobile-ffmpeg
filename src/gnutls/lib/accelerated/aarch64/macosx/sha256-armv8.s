@@ -40,6 +40,8 @@
 # 1 "lib/accelerated/aarch64/macosx/sha256-armv8.s.tmp.S"
 # 1 "<built-in>"
 # 1 "<command-line>"
+# 1 "/usr/aarch64-linux-gnu/include/stdc-predef.h" 1 3
+# 1 "<command-line>" 2
 # 1 "lib/accelerated/aarch64/macosx/sha256-armv8.s.tmp.S"
 # 56 "lib/accelerated/aarch64/macosx/sha256-armv8.s.tmp.S"
 # 1 "lib/accelerated/aarch64/aarch64-common.h" 1
@@ -67,7 +69,6 @@ _sha256_block_data_order:
  tst w16,#(1<<0)
  b.ne Lneon_entry
 
-.long 0xd503233f
  stp x29,x30,[sp,#-128]!
  add x29,sp,#0
 
@@ -1027,7 +1028,6 @@ Loop_16_xx:
  ldp x25,x26,[x29,#64]
  ldp x27,x28,[x29,#80]
  ldp x29,x30,[sp],#128
-.long 0xd50323bf
  ret
 
 

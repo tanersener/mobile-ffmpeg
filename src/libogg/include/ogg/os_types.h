@@ -34,7 +34,7 @@
      typedef int64_t ogg_int64_t;
      typedef uint64_t ogg_uint64_t;
 #  elif defined(__MINGW32__)
-#    include <sys/types.h>
+#    include <stdint.h>
      typedef short ogg_int16_t;
      typedef unsigned short ogg_uint16_t;
      typedef int ogg_int32_t;
@@ -70,7 +70,7 @@
 
 #elif (defined(__APPLE__) && defined(__MACH__)) /* MacOS X Framework build */
 
-#  include <sys/types.h>
+#  include <stdint.h>
    typedef int16_t ogg_int16_t;
    typedef uint16_t ogg_uint16_t;
    typedef int32_t ogg_int32_t;
@@ -81,7 +81,7 @@
 #elif defined(__HAIKU__)
 
   /* Haiku */
-#  include <sys/types.h>
+#  include <stdint.h>
    typedef short ogg_int16_t;
    typedef unsigned short ogg_uint16_t;
    typedef int ogg_int32_t;

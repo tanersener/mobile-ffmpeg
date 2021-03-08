@@ -40,6 +40,8 @@
 # 1 "lib/accelerated/aarch64/macosx/aes-aarch64.s.tmp.S"
 # 1 "<built-in>"
 # 1 "<command-line>"
+# 1 "/usr/aarch64-linux-gnu/include/stdc-predef.h" 1 3
+# 1 "<command-line>" 2
 # 1 "lib/accelerated/aarch64/macosx/aes-aarch64.s.tmp.S"
 # 1 "lib/accelerated/aarch64/aarch64-common.h" 1
 # 2 "lib/accelerated/aarch64/macosx/aes-aarch64.s.tmp.S" 2
@@ -224,7 +226,6 @@ Lenc_key_abort:
 
 .align 5
 _aes_v8_set_decrypt_key:
-.long 0xd503233f
  stp x29,x30,[sp,#-16]!
  add x29,sp,#0
  bl Lenc_key
@@ -258,7 +259,6 @@ Loop_imc:
  eor x0,x0,x0
 Ldec_key_abort:
  ldp x29,x30,[sp],#16
-.long 0xd50323bf
  ret
 
 .globl _aes_v8_encrypt

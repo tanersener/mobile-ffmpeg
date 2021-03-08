@@ -2,7 +2,7 @@ ARCH = armv7
 include $(SRC_PATH)build/platform-darwin.mk
 CXX = clang++
 CC = clang
-ifneq ($(filter %86 x86_64, $(ARCH)),)
+ifneq ($(filter %86 x86_64 arm64-simulator, $(ARCH)),)
 SDKTYPE = iPhoneSimulator
 else
 SDKTYPE = iPhoneOS

@@ -1,0 +1,1 @@
+../mpn/generic/compute_powtab.c

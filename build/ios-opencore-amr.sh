@@ -42,6 +42,9 @@ case ${ARCH} in
 	x86-64 | x86-64-mac-catalyst)
 		export CXX="xcrun --sdk $(get_sdk_name) clang++ -arch x86_64"
 	;;
+    arm64-simulator)
+        export CXX="xcrun --sdk $(get_sdk_name) clang++ -arch arm64"
+    ;;
 	*)
 		export CXX="xcrun --sdk $(get_sdk_name) clang++ -arch ${ARCH}"
 	;;

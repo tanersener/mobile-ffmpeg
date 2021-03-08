@@ -48,7 +48,7 @@ COMMON_ASM_ARM_SRCS=\
 	$(COMMON_SRCDIR)/arm/mc_neon.S\
 
 COMMON_OBJSARM += $(COMMON_ASM_ARM_SRCS:.S=.$(OBJ))
-ifeq ($(ASM_ARCH), arm)
+ifneq ($(filter armv%, $(ASM_ARCH)),)
 COMMON_OBJS += $(COMMON_OBJSARM)
 endif
 OBJS += $(COMMON_OBJSARM)
@@ -61,7 +61,7 @@ COMMON_ASM_ARM64_SRCS=\
 	$(COMMON_SRCDIR)/arm64/mc_aarch64_neon.S\
 
 COMMON_OBJSARM64 += $(COMMON_ASM_ARM64_SRCS:.S=.$(OBJ))
-ifeq ($(ASM_ARCH), arm64)
+ifneq ($(filter arm64%, $(ASM_ARCH)),)
 COMMON_OBJS += $(COMMON_OBJSARM64)
 endif
 OBJS += $(COMMON_OBJSARM64)
