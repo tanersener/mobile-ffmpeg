@@ -1009,7 +1009,7 @@ elif [[ ${DETECTED_IOS_SDK_VERSION} != 10* ]]; then
 fi
 
 # DISABLE x86-64-mac-catalyst architecture on IOS versions lower than 13
-if [[ ${DETECTED_IOS_SDK_VERSION} != 13* || ${DETECTED_IOS_SDK_VERSION} != 14* ]] && [[ -z ${BUILD_FORCE} ]] && [[ ${ENABLED_ARCHITECTURES[${ARCH_X86_64_MAC_CATALYST}]} -eq 1 ]]; then
+if [[ ${DETECTED_IOS_SDK_VERSION} != 13* && ${DETECTED_IOS_SDK_VERSION} != 14* ]] && [[ -z ${BUILD_FORCE} ]] && [[ ${ENABLED_ARCHITECTURES[${ARCH_X86_64_MAC_CATALYST}]} -eq 1 ]]; then
   echo -e "INFO: Disabled x86-64-mac-catalyst architecture which is not supported on SDK ${DETECTED_IOS_SDK_VERSION}\n" 1>>"${BASEDIR}/build.log" 2>&1
   disable_arch "x86-64-mac-catalyst"
 fi
