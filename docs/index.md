@@ -1,7 +1,7 @@
 ---
 layout: default
 ---
-FFmpeg for Android, iOS and tvOS
+FFmpeg for Android, iOS and tvOS. Not maintained anymore. Superseded by [FFmpegKit](https://github.com/tanersener/ffmpeg-kit).
 
 <img src="https://github.com/tanersener/mobile-ffmpeg/raw/dev-v3.x/docs/assets/mobile-ffmpeg-logo-v7.png" width="240">
 
