@@ -1,8 +1,8 @@
 # MobileFFmpeg [![Financial Contributors on Open Collective](https://opencollective.com/mobile-ffmpeg/all/badge.svg?label=financial+contributors)](https://opencollective.com/mobile-ffmpeg) ![GitHub release](https://img.shields.io/badge/release-v4.4-blue.svg) ![Maven Central](https://img.shields.io/maven-central/v/com.arthenica/mobile-ffmpeg-min) ![CocoaPods](https://img.shields.io/badge/pod-v4.4-blue.svg) [![Build Status](https://travis-ci.org/tanersener/mobile-ffmpeg.svg?branch=master)](https://travis-ci.org/tanersener/mobile-ffmpeg)
 
-FFmpeg for Android, iOS and tvOS. Not maintained anymore. Superseded by [FFmpegKit](https://github.com/tanersener/ffmpeg-kit). 
+FFmpeg for Android, iOS and tvOS. 
 
-See [What’s next for MobileFFmpeg?](https://tanersener.medium.com/whats-next-for-mobileffmpeg-44d2fac6f09b).
+Not maintained anymore as explained in [What’s next for MobileFFmpeg?](https://tanersener.medium.com/whats-next-for-mobileffmpeg-44d2fac6f09b). Superseded by [FFmpegKit](https://github.com/tanersener/ffmpeg-kit).
 
 <img src="https://github.com/tanersener/mobile-ffmpeg/blob/master/docs/assets/mobile-ffmpeg-logo-v7.png" width="320">
 
